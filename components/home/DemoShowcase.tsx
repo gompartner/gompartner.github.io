@@ -27,6 +27,7 @@ export function DemoShowcase() {
           <Reveal key={project.id} delay={(i % 3) * 0.08}>
             <Link
               href={project.demoUrl!}
+              data-gtm-cta={`demo_card_${project.id}`}
               className="group flex h-full flex-col gap-4 rounded-3xl border border-border bg-background p-5 transition-all duration-300 hover:border-accent/30 hover:shadow-xl"
             >
               <DemoPreview category={project.category} />

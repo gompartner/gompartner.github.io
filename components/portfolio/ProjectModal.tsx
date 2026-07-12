@@ -139,6 +139,7 @@ export function ProjectModal({ project, onClose }: ProjectModalProps) {
             {project.demoUrl && (
               <a
                 href={project.demoUrl}
+                data-gtm-cta={`project_modal_demo_${project.id}`}
                 className="inline-flex items-center gap-2 px-5 py-2.5 rounded-full bg-accent text-accent-foreground text-sm font-medium hover:bg-accent-hover transition-colors"
               >
                 <ExternalLink size={16} />

@@ -60,11 +60,15 @@ export function CtaBand() {
           </ul>
 
           <div className="mt-9 flex flex-wrap items-center justify-center gap-3">
-            <Button href="/contact">
+            <Button href="/contact" data-gtm-cta="cta_band_contact">
               상담 문의하기
               <ArrowRight size={18} aria-hidden />
             </Button>
-            <Button href={`mailto:${profile.email}`} variant="outline">
+            <Button
+              href={`mailto:${profile.email}`}
+              variant="outline"
+              data-gtm-cta="cta_band_email"
+            >
               <Mail size={17} aria-hidden />
               이메일 보내기
             </Button>

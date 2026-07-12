@@ -85,6 +85,7 @@ export function Header() {
           <ThemeToggle />
           <Link
             href="/contact"
+            data-gtm-cta="header_contact"
             className="hidden md:inline-flex items-center rounded-full bg-accent px-4 py-2 text-sm font-medium text-accent-foreground transition-all hover:bg-accent-hover active:scale-95"
           >
             상담 문의
@@ -136,6 +137,7 @@ export function Header() {
               <Link
                 href="/contact"
                 onClick={() => setIsMobileOpen(false)}
+                data-gtm-cta="header_contact_mobile"
                 className="flex items-center justify-center rounded-xl bg-accent px-4 py-3 text-base font-medium text-accent-foreground transition-colors hover:bg-accent-hover"
               >
                 상담 문의하기

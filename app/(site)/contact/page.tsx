@@ -93,7 +93,7 @@ export default function ContactPage() {
                 상담과 견적은 무료입니다. 부담 없이 보내주세요.
               </p>
               <div className="mt-6">
-                <Button href={`mailto:${profile.email}`}>
+                <Button href={`mailto:${profile.email}`} data-gtm-cta="contact_email">
                   {profile.email}
                   <ArrowRight size={17} aria-hidden />
                 </Button>

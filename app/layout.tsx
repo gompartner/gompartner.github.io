@@ -1,9 +1,12 @@
 import type { Metadata } from "next";
 import { Geist_Mono } from "next/font/google";
 import localFont from "next/font/local";
+import Script from "next/script";
 import "./globals.css";
+import { CtaTracker } from "@/components/analytics/CtaTracker";
 import { ThemeProvider } from "@/components/layout/ThemeProvider";
 import { profile } from "@/data/profile";
+import { GTM_ID } from "@/lib/analytics";
 
 // 실사용 글리프만 담은 서브셋(152KB) — 원본 2MB는 assets/fonts에 보관,
 // 콘텐츠에 새 글자가 생기면 `python3 scripts/subset_font.py`로 재생성
@@ -85,6 +88,22 @@ export default function RootLayout({
       suppressHydrationWarning
     >
       <body className="min-h-screen bg-background text-foreground antialiased">
+        <noscript>
+          <iframe
+            src={`https://www.googletagmanager.com/ns.html?id=${GTM_ID}`}
+            height="0"
+            width="0"
+            style={{ display: "none", visibility: "hidden" }}
+          />
+        </noscript>
+        <Script id="gtm" strategy="afterInteractive">
+          {`(function(w,d,s,l,i){w[l]=w[l]||[];w[l].push({'gtm.start':
+new Date().getTime(),event:'gtm.js'});var f=d.getElementsByTagName(s)[0],
+j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
+'https://www.googletagmanager.com/gtm.js?id='+i+dl;f.parentNode.insertBefore(j,f);
+})(window,document,'script','dataLayer','${GTM_ID}');`}
+        </Script>
+        <CtaTracker />
         <ThemeProvider>{children}</ThemeProvider>
       </body>
     </html>
