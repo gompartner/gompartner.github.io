@@ -30,6 +30,7 @@ export function Footer() {
           <div className="flex items-center gap-3" aria-label="소셜 링크">
             <a
               href={`mailto:${profile.email}`}
+              data-gtm-cta="footer_email"
               aria-label="이메일 보내기"
               className="w-9 h-9 flex items-center justify-center rounded-full text-foreground-secondary hover:text-foreground hover:bg-surface-secondary transition-colors"
             >
@@ -61,6 +62,7 @@ export function Footer() {
                 <li key={href}>
                   <Link
                     href={href}
+                    data-gtm-cta={href === "/contact" ? "footer_contact" : undefined}
                     className="text-sm text-foreground-tertiary hover:text-foreground-secondary transition-colors"
                   >
                     {label}

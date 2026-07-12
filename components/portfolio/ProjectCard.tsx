@@ -91,6 +91,7 @@ export function ProjectCard({ project, index, onClick }: ProjectCardProps) {
           {project.demoUrl && (
             <a
               href={project.demoUrl}
+              data-gtm-cta={`project_demo_${project.id}`}
               aria-label={`${project.title} 데모 보기`}
               className="flex items-center gap-1.5 text-xs text-foreground-secondary hover:text-foreground transition-colors"
             >

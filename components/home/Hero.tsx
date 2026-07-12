@@ -47,11 +47,11 @@ export function Hero() {
             className="animate-fade-up flex flex-wrap items-center gap-3 pt-1"
             style={{ animationDelay: "0.26s" }}
           >
-            <Button href="/contact">
+            <Button href="/contact" data-gtm-cta="hero_contact">
               상담 문의하기
               <ArrowRight size={18} aria-hidden />
             </Button>
-            <Button href="#showcase" variant="outline">
+            <Button href="#showcase" variant="outline" data-gtm-cta="hero_demo">
               데모 직접 체험
             </Button>
           </div>
