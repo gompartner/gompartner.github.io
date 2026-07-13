@@ -1,7 +1,6 @@
 import { profile } from "@/data/profile";
 import { faqItems } from "@/data/faq";
-
-const siteUrl = process.env.NEXT_PUBLIC_SITE_URL ?? "https://gom-senior.dev";
+import { siteUrl } from "@/lib/site";
 
 export function PersonJsonLd() {
   const schema = {

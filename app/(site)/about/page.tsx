@@ -6,6 +6,7 @@ import { profile } from "@/data/profile";
 export const metadata: Metadata = {
   title: "About",
   description: `${profile.name}의 소규모 웹사이트 제작, 운영, 마케팅 이벤트 페이지 관리 방향을 소개합니다.`,
+  alternates: { canonical: "/about" },
 };
 
 export default function AboutPage() {

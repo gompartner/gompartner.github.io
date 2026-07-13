@@ -10,6 +10,7 @@ export const metadata: Metadata = {
   title: "Career",
   description:
     "근무경력, 기술경력, 학력, 자격, 교육 이력을 포트폴리오 형식으로 소개합니다.",
+  alternates: { canonical: "/career" },
 };
 
 export default function CareerPage() {

@@ -6,6 +6,7 @@ import { skillCategories } from "@/data/skills";
 export const metadata: Metadata = {
   title: "Skills",
   description: "백엔드, 데이터베이스, 운영개발을 중심으로 보유 기술 스택과 숙련도를 확인하세요.",
+  alternates: { canonical: "/skills" },
 };
 
 export default function SkillsPage() {

@@ -45,6 +45,8 @@ export async function generateMetadata({ params }: DemoPageProps): Promise<Metad
   return {
     title: `${demo.title} | 데모`,
     description: demo.description,
+    // 체험용 샘플 페이지 — 검색 색인에서 제외하고 크롤은 핵심 페이지에 집중
+    robots: { index: false, follow: true },
   };
 }
 

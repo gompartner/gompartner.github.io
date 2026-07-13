@@ -10,6 +10,7 @@ export const metadata: Metadata = {
   title: "상담 문의",
   description:
     "홈페이지 제작, 리뉴얼, 예약·관리 시스템, 유지보수 상담을 환영합니다. 상담과 견적은 무료입니다.",
+  alternates: { canonical: "/contact" },
 };
 
 const preparationItems = [

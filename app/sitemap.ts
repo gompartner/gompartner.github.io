@@ -1,10 +1,8 @@
 import type { MetadataRoute } from "next";
 import { blogPosts } from "@/data/blog";
-import { projects } from "@/data/projects";
+import { siteUrl } from "@/lib/site";
 
 export const dynamic = "force-static";
-
-const siteUrl = process.env.NEXT_PUBLIC_SITE_URL ?? "https://gom-senior.dev";
 
 export default function sitemap(): MetadataRoute.Sitemap {
   const routes = [
@@ -31,14 +29,6 @@ export default function sitemap(): MetadataRoute.Sitemap {
     priority: 0.7,
   }));
 
-  const demoRoutes = projects
-    .filter((project) => project.demoUrl?.startsWith("/demo/"))
-    .map((project) => ({
-      url: `${siteUrl}${project.demoUrl}`,
-      lastModified: new Date(),
-      changeFrequency: "monthly" as const,
-      priority: 0.6,
-    }));
-
-  return [...staticRoutes, ...blogRoutes, ...demoRoutes];
+  // /demo/*는 noindex 정책이라 사이트맵에서 제외한다.
+  return [...staticRoutes, ...blogRoutes];
 }

@@ -7,6 +7,7 @@ import { CtaTracker } from "@/components/analytics/CtaTracker";
 import { ThemeProvider } from "@/components/layout/ThemeProvider";
 import { profile } from "@/data/profile";
 import { GTM_ID } from "@/lib/analytics";
+import { siteUrl } from "@/lib/site";
 
 // 실사용 글리프만 담은 서브셋(152KB) — 원본 2MB는 assets/fonts에 보관,
 // 콘텐츠에 새 글자가 생기면 `python3 scripts/subset_font.py`로 재생성
@@ -23,8 +24,6 @@ const geistMono = Geist_Mono({
   subsets: ["latin"],
   display: "swap",
 });
-
-const siteUrl = process.env.NEXT_PUBLIC_SITE_URL ?? "https://gompartner.github.io";
 
 export const metadata: Metadata = {
   metadataBase: new URL(siteUrl),
@@ -70,9 +69,6 @@ export const metadata: Metadata = {
     index: true,
     follow: true,
     googleBot: { index: true, follow: true, "max-image-preview": "large" },
-  },
-  alternates: {
-    canonical: siteUrl,
   },
 };
 
