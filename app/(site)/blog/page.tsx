@@ -7,6 +7,7 @@ export const metadata: Metadata = {
   title: "Blog",
   description:
     "홈페이지 제작, 랜딩페이지, 운영과 유지보수. 15년 웹 개발 경험을 사업자의 눈높이로 풀어내는 블로그입니다.",
+  alternates: { canonical: "/blog" },
 };
 
 export default function BlogPage() {
