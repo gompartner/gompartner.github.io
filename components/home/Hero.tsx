@@ -66,12 +66,12 @@ export function Hero() {
           </motion.span>
 
           <h1 className="break-keep text-4xl font-semibold leading-[1.15] tracking-tight text-foreground sm:text-5xl lg:text-[3rem]">
-            홈페이지는 예쁘게 만드는 것보다
+            홈페이지를 만드는 것에서 끝나지 않습니다.
             <br />
             <span className="bg-gradient-to-r from-accent to-accent-hover bg-clip-text text-transparent">
-              문의가 들어오게 만드는 것
-            </span>
-            이 중요합니다
+              오픈 이후의 운영까지
+            </span>{" "}
+            함께합니다.
           </h1>
 
           <motion.p

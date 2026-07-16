@@ -141,12 +141,12 @@ export function LandingB() {
               variants={heroItem}
               className="mt-8 break-keep text-4xl font-semibold leading-[1.15] tracking-tight sm:text-5xl lg:text-6xl"
             >
-              홈페이지는 예쁘게 만드는 것보다
+              홈페이지를 만드는 것에서 끝나지 않습니다.
               <br />
               <span className="bg-gradient-to-r from-accent to-accent-hover bg-clip-text text-transparent">
-                문의가 들어오게
+                오픈 이후의 운영까지
               </span>{" "}
-              만드는 것이 중요합니다
+              함께합니다.
             </motion.h1>
 
             <motion.p
