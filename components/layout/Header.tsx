@@ -23,6 +23,9 @@ export function Header() {
 
   useEffect(() => {
     const handleScroll = () => setIsScrolled(window.scrollY > 20);
+    // 새로고침 시 브라우저가 스크롤 위치를 복원해도 scroll 이벤트는 발생하지
+    // 않으므로, 마운트 직후 현재 위치를 한 번 반영한다
+    handleScroll();
     window.addEventListener("scroll", handleScroll, { passive: true });
     return () => window.removeEventListener("scroll", handleScroll);
   }, []);
