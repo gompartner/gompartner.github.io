@@ -51,6 +51,7 @@ function formatDateTime(date: Date | null) {
 export function AdminInquiries() {
   const [user, setUser] = useState<User | null>(null);
   const [authReady, setAuthReady] = useState(false);
+  const [authError, setAuthError] = useState<string | null>(null);
   const [loadState, setLoadState] = useState<LoadState>("idle");
   const [inquiries, setInquiries] = useState<Inquiry[]>([]);
 
@@ -104,8 +105,18 @@ export function AdminInquiries() {
   }, [user, loadInquiries]);
 
   async function signIn() {
-    const { auth, authApi } = await firebase();
-    await authApi.signInWithPopup(auth, new authApi.GoogleAuthProvider()).catch(() => {});
+    setAuthError(null);
+    try {
+      const { auth, authApi } = await firebase();
+      await authApi.signInWithPopup(auth, new authApi.GoogleAuthProvider());
+    } catch (err) {
+      const e = err as { code?: string; message?: string };
+      // 사용자가 팝업을 직접 닫은 경우는 오류로 취급하지 않음
+      if (e.code === "auth/popup-closed-by-user" || e.code === "auth/cancelled-popup-request") {
+        return;
+      }
+      setAuthError(e.code ?? e.message ?? "알 수 없는 오류");
+    }
   }
 
   async function signOut() {
@@ -184,6 +195,11 @@ export function AdminInquiries() {
                 <LogIn size={16} aria-hidden />
                 Google로 로그인
               </button>
+              {authError && (
+                <p className="rounded-2xl bg-destructive/10 px-4 py-2.5 text-xs text-destructive" role="alert">
+                  로그인 오류: {authError}
+                </p>
+              )}
             </div>
           ) : loadState === "loading" ? (
             <p className="flex items-center gap-2 text-sm text-foreground-tertiary">
