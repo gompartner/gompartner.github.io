@@ -23,8 +23,23 @@ const LIMITS = { name: 100, contact: 200, message: 2000 } as const;
 const inputClasses =
   "w-full rounded-2xl border border-border bg-background px-4 py-3 text-sm text-foreground placeholder:text-foreground-tertiary focus-visible:outline focus-visible:outline-2 focus-visible:outline-accent";
 
+function LengthCounter({ length, limit }: { length: number; limit: number }) {
+  return (
+    <span
+      className={`text-xs tabular-nums ${
+        length >= limit ? "font-medium text-warning" : "text-foreground-tertiary"
+      }`}
+      aria-live="polite"
+    >
+      {length.toLocaleString()} / {limit.toLocaleString()}자
+    </span>
+  );
+}
+
 export function ContactForm() {
   const [status, setStatus] = useState<FormStatus>("idle");
+  const [nameLength, setNameLength] = useState(0);
+  const [contactLength, setContactLength] = useState(0);
   const [messageLength, setMessageLength] = useState(0);
 
   async function handleSubmit(e: React.FormEvent<HTMLFormElement>) {
@@ -117,15 +132,19 @@ export function ContactForm() {
       <h2 className="font-semibold text-foreground">문의 양식</h2>
       <div className="mt-5 flex flex-col gap-4">
         <div>
-          <label htmlFor="contact-name" className="mb-1.5 block text-sm font-medium text-foreground-secondary">
-            이름 <span className="text-accent">*</span>
-          </label>
+          <div className="mb-1.5 flex items-end justify-between gap-2">
+            <label htmlFor="contact-name" className="block text-sm font-medium text-foreground-secondary">
+              이름 <span className="text-accent">*</span>
+            </label>
+            <LengthCounter length={nameLength} limit={LIMITS.name} />
+          </div>
           <input
             id="contact-name"
             name="name"
             type="text"
             required
             maxLength={LIMITS.name}
+            onChange={(e) => setNameLength(e.currentTarget.value.length)}
             autoComplete="name"
             placeholder="성함 또는 상호"
             className={inputClasses}
@@ -133,15 +152,19 @@ export function ContactForm() {
         </div>
 
         <div>
-          <label htmlFor="contact-contact" className="mb-1.5 block text-sm font-medium text-foreground-secondary">
-            연락처 <span className="text-accent">*</span>
-          </label>
+          <div className="mb-1.5 flex items-end justify-between gap-2">
+            <label htmlFor="contact-contact" className="block text-sm font-medium text-foreground-secondary">
+              연락처 <span className="text-accent">*</span>
+            </label>
+            <LengthCounter length={contactLength} limit={LIMITS.contact} />
+          </div>
           <input
             id="contact-contact"
             name="contact"
             type="text"
             required
             maxLength={LIMITS.contact}
+            onChange={(e) => setContactLength(e.currentTarget.value.length)}
             placeholder="이메일 또는 전화번호"
             className={inputClasses}
           />
@@ -168,16 +191,7 @@ export function ContactForm() {
             <label htmlFor="contact-message" className="block text-sm font-medium text-foreground-secondary">
               문의 내용 <span className="text-accent">*</span>
             </label>
-            <span
-              className={`text-xs tabular-nums ${
-                messageLength >= LIMITS.message
-                  ? "font-medium text-warning"
-                  : "text-foreground-tertiary"
-              }`}
-              aria-live="polite"
-            >
-              {messageLength.toLocaleString()} / {LIMITS.message.toLocaleString()}자
-            </span>
+            <LengthCounter length={messageLength} limit={LIMITS.message} />
           </div>
           <textarea
             id="contact-message"
