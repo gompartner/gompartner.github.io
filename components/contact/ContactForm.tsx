@@ -42,9 +42,14 @@ export function ContactForm() {
   const [contact, setContact] = useState("");
   const [message, setMessage] = useState("");
 
-  // 필수 필드가 (공백 제외) 채워져야만 제출 가능
+  // 필수 필드가 (공백 제외) 채워지고 글자수 한도 안일 때만 제출 가능
+  // — maxLength는 한글 조합 입력(IME)에서 뚫릴 수 있어 상한도 함께 검사한다
+  const filled = (value: string, limit: number) =>
+    value.trim().length > 0 && value.length <= limit;
   const isValid =
-    name.trim().length > 0 && contact.trim().length > 0 && message.trim().length > 0;
+    filled(name, LIMITS.name) &&
+    filled(contact, LIMITS.contact) &&
+    filled(message, LIMITS.message);
 
   async function handleSubmit(e: React.FormEvent<HTMLFormElement>) {
     e.preventDefault();
@@ -210,11 +215,18 @@ export function ContactForm() {
             placeholder="어떤 사업을 하시는지, 무엇이 필요한지 편하게 적어주세요."
             className={inputClasses}
           />
-          {message.length >= LIMITS.message && (
-            <p className="mt-1.5 text-xs text-warning">
-              최대 {LIMITS.message.toLocaleString()}자까지 입력할 수 있습니다. 더 긴 내용은
+          {message.length > LIMITS.message ? (
+            <p className="mt-1.5 text-xs text-destructive">
+              글자수를 초과해 문의를 보낼 수 없습니다. 내용을 줄이거나 더 긴 내용은
               이메일로 보내주세요.
             </p>
+          ) : (
+            message.length >= LIMITS.message && (
+              <p className="mt-1.5 text-xs text-warning">
+                최대 {LIMITS.message.toLocaleString()}자까지 입력할 수 있습니다. 더 긴
+                내용은 이메일로 보내주세요.
+              </p>
+            )
           )}
         </div>
 
