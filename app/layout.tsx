@@ -28,17 +28,21 @@ const geistMono = Geist_Mono({
 export const metadata: Metadata = {
   metadataBase: new URL(siteUrl),
   title: {
-    default: `${profile.name} — 사업에 필요한 웹사이트, 빠르게 만들고 오래 운영합니다`,
+    default: `${profile.name} — 홈페이지·웹사이트 제작, 만들고 오래 운영합니다`,
     template: `%s | ${profile.name}`,
   },
   description: profile.bio,
   keywords: [
+    "홈페이지 제작",
+    "웹사이트 제작",
+    "랜딩페이지 제작",
+    "홈페이지 제작 업체",
+    "소상공인 홈페이지 제작",
+    "홈페이지 유지보수",
     "소상공인 웹사이트",
     "이벤트 페이지",
     "웹사이트 유지보수",
     "마케팅 페이지",
-    "백엔드 개발자",
-    "웹 에이전시",
     profile.name,
   ],
   authors: [{ name: profile.name }],
@@ -48,7 +52,7 @@ export const metadata: Metadata = {
     locale: "ko_KR",
     url: siteUrl,
     siteName: `${profile.name} Portfolio`,
-    title: `${profile.name} — 사업에 필요한 웹사이트, 빠르게 만들고 오래 운영합니다`,
+    title: `${profile.name} — 홈페이지·웹사이트 제작, 만들고 오래 운영합니다`,
     description: profile.bio,
     images: [
       {
@@ -61,7 +65,7 @@ export const metadata: Metadata = {
   },
   twitter: {
     card: "summary_large_image",
-    title: `${profile.name} — 사업에 필요한 웹사이트, 빠르게 만들고 오래 운영합니다`,
+    title: `${profile.name} — 홈페이지·웹사이트 제작, 만들고 오래 운영합니다`,
     description: profile.bio,
     images: ["/og-image.png"],
   },

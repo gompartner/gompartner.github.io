@@ -41,7 +41,7 @@ export const services: ServiceItem[] = [
   },
   {
     icon: Workflow,
-    title: "업무 자동화·API 연동",
+    title: "업무 자동화·외부 서비스 연동",
     description:
       "문자·메일 발송, 결제, 카카오·네이버 연동까지. 반복되는 일은 시스템에 맡기세요.",
   },
@@ -61,7 +61,7 @@ export const capabilityChips = [
   "문자·이메일 발송",
   "카카오·네이버 연동",
   "웹사이트 리뉴얼",
-  "SEO 기본 적용",
+  "검색 노출 기본 적용",
   "모바일 최적화",
   "관리자 페이지",
 ];

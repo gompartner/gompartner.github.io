@@ -1,17 +1,36 @@
 import type { Metadata } from "next";
 import Link from "next/link";
-import { ArrowRight, CheckCircle2, Mail } from "lucide-react";
+import { ArrowRight, BadgeCheck, CheckCircle2, Clock, Mail } from "lucide-react";
 import Section, { SectionHeading } from "@/components/ui/Section";
 import { Button } from "@/components/ui/Button";
 import { Reveal } from "@/components/motion/Reveal";
+import { ContactForm } from "@/components/contact/ContactForm";
 import { profile } from "@/data/profile";
 
 export const metadata: Metadata = {
-  title: "상담 문의",
+  title: "상담 문의 — 홈페이지 제작 무료 견적",
   description:
     "홈페이지 제작, 리뉴얼, 예약·관리 시스템, 유지보수 상담을 환영합니다. 상담과 견적은 무료입니다.",
   alternates: { canonical: "/contact" },
 };
+
+const consultInfo = [
+  {
+    icon: Clock,
+    title: "답변 시간",
+    description: "보통 영업일 기준 24시간 안에 회신드립니다.",
+  },
+  {
+    icon: BadgeCheck,
+    title: "상담 비용",
+    description: "상담과 견적은 무료입니다. 문의만 하셔도 괜찮습니다.",
+  },
+  {
+    icon: Mail,
+    title: "연락 방법",
+    description: "문의 양식 또는 이메일, 편한 쪽으로 보내주세요.",
+  },
+];
 
 const preparationItems = [
   "어떤 업종·사업인지 간단한 소개",
@@ -43,16 +62,30 @@ export default function ContactPage() {
     <Section aria-labelledby="contact-heading">
       <div className="grid gap-12 lg:grid-cols-[1fr_1fr] lg:gap-16">
         {/* 좌측: 안내 */}
-        <div>
+        <div className="flex flex-col gap-6">
           <SectionHeading
             label="Contact"
             title="상담 문의"
             titleId="contact-heading"
             description="홈페이지 제작, 리뉴얼, 예약·관리 시스템, 유지보수까지. 지금 상황을 알려주시면 현실적인 방향을 제안해 드립니다."
-            className="mb-10"
+            className="mb-4"
           />
 
           <Reveal>
+            <ul className="grid gap-4 sm:grid-cols-3">
+              {consultInfo.map(({ icon: Icon, title, description }) => (
+                <li key={title} className="rounded-3xl border border-border bg-surface p-5">
+                  <Icon size={18} className="text-accent" aria-hidden />
+                  <h2 className="mt-3 text-sm font-semibold text-foreground">{title}</h2>
+                  <p className="mt-1.5 text-sm leading-relaxed text-foreground-secondary">
+                    {description}
+                  </p>
+                </li>
+              ))}
+            </ul>
+          </Reveal>
+
+          <Reveal delay={0.08}>
             <div className="rounded-3xl border border-border bg-surface p-7">
               <h2 className="font-semibold text-foreground">
                 문의하실 때 알려주시면 좋은 것
@@ -78,29 +111,6 @@ export default function ContactPage() {
               </p>
             </div>
           </Reveal>
-        </div>
-
-        {/* 우측: 이메일 CTA + 다음 단계 */}
-        <div className="flex flex-col gap-6">
-          <Reveal delay={0.08}>
-            <div className="rounded-3xl border border-accent/15 bg-gradient-to-br from-accent/12 to-accent/4 p-7 text-center md:p-9">
-              <div className="mx-auto flex h-12 w-12 items-center justify-center rounded-2xl bg-accent/15 text-accent">
-                <Mail size={22} aria-hidden />
-              </div>
-              <h2 className="mt-4 text-xl font-semibold text-foreground">
-                이메일로 문의하기
-              </h2>
-              <p className="mt-2 text-sm text-foreground-secondary">
-                상담과 견적은 무료입니다. 부담 없이 보내주세요.
-              </p>
-              <div className="mt-6">
-                <Button href={`mailto:${profile.email}`} data-gtm-cta="contact_email">
-                  {profile.email}
-                  <ArrowRight size={17} aria-hidden />
-                </Button>
-              </div>
-            </div>
-          </Reveal>
 
           <Reveal delay={0.16}>
             <div className="rounded-3xl border border-border bg-surface p-7">
@@ -120,6 +130,33 @@ export default function ContactPage() {
                   </li>
                 ))}
               </ol>
+            </div>
+          </Reveal>
+        </div>
+
+        {/* 우측: 문의 폼(주) + 이메일(보조) */}
+        <div className="flex flex-col gap-6">
+          <Reveal delay={0.08}>
+            <ContactForm />
+          </Reveal>
+
+          <Reveal delay={0.16}>
+            <div className="rounded-3xl border border-border bg-surface p-6 text-center">
+              <p className="text-sm text-foreground-secondary">
+                양식이 불편하면 이메일로 보내셔도 됩니다.
+              </p>
+              <div className="mt-4">
+                <Button
+                  href={`mailto:${profile.email}`}
+                  variant="outline"
+                  size="sm"
+                  data-gtm-cta="contact_email"
+                >
+                  <Mail size={15} aria-hidden />
+                  {profile.email}
+                  <ArrowRight size={14} aria-hidden />
+                </Button>
+              </div>
             </div>
           </Reveal>
 

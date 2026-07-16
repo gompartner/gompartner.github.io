@@ -1,0 +1,620 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>곰선임 — GSAP 랜딩 프로토타입</title>
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/variable/pretendardvariable-dynamic-subset.min.css" />
+<style>
+  :root {
+    --bg: #0a0a0f;
+    --bg-soft: #101018;
+    --fg: #f5f5f7;
+    --fg-dim: rgba(245, 245, 247, 0.62);
+    --fg-faint: rgba(245, 245, 247, 0.38);
+    --accent: #2997ff;
+    --accent-deep: #0071e3;
+    --line: rgba(245, 245, 247, 0.1);
+  }
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  html { scroll-behavior: smooth; }
+
+  body {
+    background: var(--bg);
+    color: var(--fg);
+    font-family: "Pretendard Variable", Pretendard, -apple-system, "Apple SD Gothic Neo", sans-serif;
+    overflow-x: hidden;
+    -webkit-font-smoothing: antialiased;
+  }
+
+  ::selection { background: rgba(41, 151, 255, 0.35); }
+
+  /* ── 배경 모프 블롭 ─────────────────────────────── */
+  .blobs {
+    position: fixed;
+    inset: 0;
+    z-index: 0;
+    overflow: hidden;
+    pointer-events: none;
+  }
+  .blob {
+    position: absolute;
+    width: 55vmax;
+    height: 55vmax;
+    border-radius: 42% 58% 55% 45% / 55% 42% 58% 45%;
+    filter: blur(90px);
+    opacity: 0.5;
+    will-change: transform;
+  }
+  .blob-a {
+    top: -20vmax; left: -12vmax;
+    background: radial-gradient(circle at 35% 35%, rgba(0, 113, 227, 0.55), transparent 65%);
+  }
+  .blob-b {
+    bottom: -25vmax; right: -15vmax;
+    background: radial-gradient(circle at 60% 40%, rgba(122, 60, 255, 0.4), transparent 65%);
+  }
+  .blob-c {
+    top: 30%; left: 45%;
+    width: 34vmax; height: 34vmax;
+    background: radial-gradient(circle at 50% 50%, rgba(41, 151, 255, 0.3), transparent 62%);
+  }
+
+  .grain {
+    position: fixed;
+    inset: 0;
+    z-index: 1;
+    pointer-events: none;
+    opacity: 0.5;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='120' height='120'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='2'/%3E%3CfeColorMatrix values='0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0.04 0'/%3E%3C/filter%3E%3Crect width='120' height='120' filter='url(%23n)'/%3E%3C/svg%3E");
+  }
+
+  main { position: relative; z-index: 2; }
+
+  .container { max-width: 1120px; margin: 0 auto; padding: 0 24px; }
+
+  /* ── 헤더 ─────────────────────────────────────── */
+  header {
+    position: fixed;
+    top: 0; left: 0; right: 0;
+    z-index: 10;
+    backdrop-filter: blur(16px);
+    background: rgba(10, 10, 15, 0.55);
+    border-bottom: 1px solid var(--line);
+  }
+  .nav {
+    max-width: 1120px;
+    margin: 0 auto;
+    padding: 0 24px;
+    height: 64px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+  }
+  .logo { font-weight: 700; font-size: 18px; letter-spacing: -0.02em; }
+  .logo em { font-style: normal; color: var(--accent); }
+
+  /* ── 히어로 ───────────────────────────────────── */
+  .hero {
+    min-height: 100svh;
+    display: flex;
+    align-items: center;
+    padding: 140px 0 80px;
+  }
+  .hero-grid {
+    display: grid;
+    gap: 56px;
+    align-items: center;
+    grid-template-columns: 1fr;
+  }
+  @media (min-width: 960px) {
+    .hero-grid { grid-template-columns: 1.05fr 0.95fr; }
+  }
+
+  .badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    padding: 8px 16px;
+    border: 1px solid var(--line);
+    border-radius: 999px;
+    font-size: 14px;
+    color: var(--fg-dim);
+    background: rgba(255, 255, 255, 0.03);
+  }
+  .badge .dot {
+    width: 7px; height: 7px;
+    border-radius: 50%;
+    background: #30d158;
+    box-shadow: 0 0 12px rgba(48, 209, 88, 0.9);
+  }
+
+  h1 {
+    margin-top: 26px;
+    font-size: clamp(2.4rem, 5.4vw, 4.1rem);
+    line-height: 1.16;
+    letter-spacing: -0.03em;
+    font-weight: 700;
+  }
+  /* 글자 스플릿: 줄 마스크 + 글자 회전 진입 */
+  h1 .line { display: block; overflow: hidden; padding-bottom: 0.08em; margin-bottom: -0.08em; }
+  h1 .word { display: inline-block; white-space: nowrap; }
+  h1 .char {
+    display: inline-block;
+    transform-origin: 50% 100%;
+    will-change: transform, opacity;
+  }
+  h1 .grad .char {
+    background: linear-gradient(92deg, var(--accent-deep), var(--accent) 55%, #7ac0ff);
+    -webkit-background-clip: text;
+    background-clip: text;
+    color: transparent;
+  }
+
+  .hero-sub {
+    margin-top: 24px;
+    max-width: 34em;
+    font-size: 1.13rem;
+    line-height: 1.75;
+    color: var(--fg-dim);
+  }
+
+  .cta-row { margin-top: 36px; display: flex; flex-wrap: wrap; gap: 14px; }
+
+  .btn {
+    position: relative;
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    padding: 15px 30px;
+    border-radius: 999px;
+    font-size: 15.5px;
+    font-weight: 600;
+    text-decoration: none;
+    color: var(--fg);
+    border: 1px solid var(--line);
+    background: rgba(255, 255, 255, 0.04);
+    transform-style: preserve-3d;
+    will-change: transform, box-shadow;
+    transition: box-shadow 0.4s ease;
+  }
+  .btn-primary {
+    border: none;
+    background: linear-gradient(120deg, var(--accent-deep), var(--accent));
+    box-shadow: 0 8px 28px rgba(0, 113, 227, 0.35);
+  }
+  .btn-primary:hover { box-shadow: 0 18px 56px rgba(41, 151, 255, 0.55); }
+  .btn:not(.btn-primary):hover { box-shadow: 0 14px 40px rgba(255, 255, 255, 0.08); }
+
+  .hero-note { margin-top: 20px; font-size: 14px; color: var(--fg-faint); }
+
+  /* 히어로 비주얼 (패럴랙스 줌 대상) */
+  .hero-visual { perspective: 1200px; }
+  .mock {
+    border-radius: 22px;
+    border: 1px solid var(--line);
+    background: linear-gradient(160deg, rgba(255,255,255,0.07), rgba(255,255,255,0.02));
+    box-shadow: 0 40px 120px rgba(0, 0, 0, 0.55);
+    overflow: hidden;
+    will-change: transform;
+  }
+  .mock-bar {
+    display: flex; gap: 7px;
+    padding: 14px 16px;
+    border-bottom: 1px solid var(--line);
+  }
+  .mock-bar span { width: 11px; height: 11px; border-radius: 50%; background: rgba(255,255,255,0.14); }
+  .mock-bar span:first-child { background: #ff5f57; }
+  .mock-bar span:nth-child(2) { background: #febc2e; }
+  .mock-bar span:nth-child(3) { background: #28c840; }
+  .mock-body { padding: 30px 26px 36px; }
+  .sk { border-radius: 10px; background: rgba(255,255,255,0.08); }
+  .sk-title { width: 62%; height: 22px; background: linear-gradient(90deg, rgba(41,151,255,0.55), rgba(122,60,255,0.4)); }
+  .sk-line { margin-top: 14px; height: 12px; }
+  .sk-line.w80 { width: 80%; } .sk-line.w55 { width: 55%; }
+  .sk-cards { display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px; margin-top: 26px; }
+  .sk-card { height: 84px; border-radius: 14px; background: rgba(255,255,255,0.05); border: 1px solid var(--line); }
+  .sk-btn { margin-top: 26px; width: 42%; height: 40px; border-radius: 999px; background: linear-gradient(120deg, var(--accent-deep), var(--accent)); box-shadow: 0 10px 30px rgba(0,113,227,0.4); }
+
+  /* ── 공통 섹션 ────────────────────────────────── */
+  section { padding: 130px 0; position: relative; }
+  .eyebrow {
+    font-size: 13px;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    color: var(--accent);
+    font-weight: 600;
+  }
+  .section-title {
+    margin-top: 14px;
+    font-size: clamp(1.8rem, 3.6vw, 2.6rem);
+    letter-spacing: -0.02em;
+    line-height: 1.3;
+    font-weight: 700;
+  }
+  .section-desc { margin-top: 16px; color: var(--fg-dim); line-height: 1.75; max-width: 38em; }
+
+  /* 스테이트먼트 */
+  .statement { text-align: center; }
+  .statement p.big {
+    font-size: clamp(1.9rem, 4.4vw, 3.2rem);
+    font-weight: 700;
+    letter-spacing: -0.025em;
+    line-height: 1.35;
+  }
+  .statement .mask { display: block; overflow: hidden; }
+  .statement .mask > span { display: block; will-change: transform; }
+  .statement .accent {
+    background: linear-gradient(92deg, var(--accent-deep), var(--accent), #7ac0ff);
+    -webkit-background-clip: text;
+    background-clip: text;
+    color: transparent;
+  }
+  .statement .small { margin-top: 28px; color: var(--fg-dim); font-size: 1.1rem; }
+
+  /* 서비스 카드 */
+  .cards {
+    margin-top: 56px;
+    display: grid;
+    gap: 20px;
+    grid-template-columns: 1fr;
+    perspective: 1100px;
+  }
+  @media (min-width: 760px) { .cards { grid-template-columns: repeat(3, 1fr); } }
+
+  .card {
+    border-radius: 24px;
+    border: 1px solid var(--line);
+    background: linear-gradient(165deg, rgba(255,255,255,0.055), rgba(255,255,255,0.015));
+    padding: 34px 28px;
+    transform-style: preserve-3d;
+    will-change: transform, box-shadow;
+    transition: box-shadow 0.45s ease, border-color 0.45s ease;
+  }
+  .card:hover {
+    border-color: rgba(41, 151, 255, 0.35);
+    box-shadow: 0 30px 80px rgba(0, 113, 227, 0.22), 0 6px 24px rgba(0, 0, 0, 0.5);
+  }
+  .card .icon {
+    width: 52px; height: 52px;
+    display: grid; place-items: center;
+    border-radius: 16px;
+    font-size: 24px;
+    background: rgba(41, 151, 255, 0.13);
+    border: 1px solid rgba(41, 151, 255, 0.25);
+    transform: translateZ(36px);
+  }
+  .card h3 { margin-top: 22px; font-size: 1.3rem; letter-spacing: -0.01em; transform: translateZ(26px); }
+  .card p { margin-top: 12px; color: var(--fg-dim); line-height: 1.7; font-size: 0.97rem; transform: translateZ(16px); }
+
+  /* CTA 밴드 */
+  .cta-band {
+    border-radius: 32px;
+    border: 1px solid rgba(41, 151, 255, 0.22);
+    background:
+      radial-gradient(90% 140% at 50% 0%, rgba(0, 113, 227, 0.22), transparent 60%),
+      linear-gradient(165deg, rgba(255,255,255,0.05), rgba(255,255,255,0.01));
+    padding: 74px 28px;
+    text-align: center;
+  }
+  .cta-band h2 { font-size: clamp(1.7rem, 3.4vw, 2.4rem); letter-spacing: -0.02em; }
+  .cta-band p { margin-top: 16px; color: var(--fg-dim); }
+  .cta-band .btn { margin-top: 34px; }
+
+  footer {
+    border-top: 1px solid var(--line);
+    padding: 40px 0 60px;
+    color: var(--fg-faint);
+    font-size: 14px;
+    text-align: center;
+  }
+
+  /* 스크롤 리빌 초기 상태는 JS(gsap.set)에서만 지정 —
+     JS 실패·모션 감소 환경에서도 콘텐츠가 항상 보이도록 CSS로는 숨기지 않는다 */
+
+  @media (prefers-reduced-motion: reduce) {
+    html { scroll-behavior: auto; }
+  }
+</style>
+</head>
+<body>
+
+<div class="blobs" aria-hidden="true">
+  <div class="blob blob-a"></div>
+  <div class="blob blob-b"></div>
+  <div class="blob blob-c"></div>
+</div>
+<div class="grain" aria-hidden="true"></div>
+
+<header>
+  <nav class="nav">
+    <span class="logo">곰<em>선임</em></span>
+    <a class="btn btn-primary" style="padding:10px 22px;font-size:14px" href="#contact" data-tilt>상담 문의</a>
+  </nav>
+</header>
+
+<main>
+  <!-- 1. 히어로 -->
+  <section class="hero">
+    <div class="container hero-grid">
+      <div>
+        <span class="badge" data-hero-fade>
+          <span class="dot"></span>
+          상담부터 제작·운영까지 직접 진행합니다
+        </span>
+
+        <h1 id="headline" aria-label="홈페이지는 예쁘게 만드는 것보다 문의가 들어오게 만드는 것이 중요합니다">
+          <span class="line">홈페이지는</span>
+          <span class="line">예쁘게 만드는 것보다</span>
+          <span class="line grad">문의가 들어오게</span>
+          <span class="line">만드는 것이 중요합니다</span>
+        </h1>
+
+        <p class="hero-sub" data-hero-fade>
+          소상공인과 기업을 위한 홈페이지 제작 및 운영.
+          제작부터 유지보수, 검색 노출까지 직접 챙깁니다.
+        </p>
+
+        <div class="cta-row" data-hero-fade>
+          <a class="btn btn-primary" href="#contact" data-tilt>무료 상담하기 →</a>
+          <a class="btn" href="#services" data-tilt>서비스 보기</a>
+        </div>
+
+        <p class="hero-note" data-hero-fade>상담과 견적은 무료입니다.</p>
+      </div>
+
+      <div class="hero-visual" aria-hidden="true">
+        <div class="mock" id="mock" data-tilt data-tilt-max="6">
+          <div class="mock-bar"><span></span><span></span><span></span></div>
+          <div class="mock-body">
+            <div class="sk sk-title"></div>
+            <div class="sk sk-line w80"></div>
+            <div class="sk sk-line w55"></div>
+            <div class="sk-cards">
+              <div class="sk-card"></div><div class="sk-card"></div><div class="sk-card"></div>
+            </div>
+            <div class="sk sk-btn"></div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- 2. 스테이트먼트 -->
+  <section class="statement">
+    <div class="container">
+      <p class="big">
+        <span class="mask"><span data-line-reveal>홈페이지를 만드는 사람은 많습니다.</span></span>
+        <span class="mask"><span data-line-reveal><span class="accent">끝까지 운영하는 사람</span>은 많지 않습니다.</span></span>
+      </p>
+      <p class="small" data-reveal>상담한 사람이 만들고, 만든 사람이 끝까지 운영합니다.</p>
+    </div>
+  </section>
+
+  <!-- 3. 서비스 카드 -->
+  <section id="services">
+    <div class="container">
+      <p class="eyebrow" data-reveal>Services</p>
+      <h2 class="section-title" data-reveal>필요한 것만, 제대로</h2>
+      <p class="section-desc" data-reveal>
+        과한 기능을 권하지 않습니다. 지금 사업에 필요한 범위만 제안하고, 오래 쓸 수 있게 만듭니다.
+      </p>
+
+      <div class="cards" id="cards">
+        <article class="card" data-tilt>
+          <div class="icon">🏠</div>
+          <h3>홈페이지 제작</h3>
+          <p>검색에 잡히고, 신뢰를 주고, 문의로 이어지는 홈페이지를 만듭니다. 모바일부터 PC까지 자연스럽게 동작합니다.</p>
+        </article>
+        <article class="card" data-tilt>
+          <div class="icon">🚀</div>
+          <h3>랜딩페이지 제작</h3>
+          <p>광고비가 아깝지 않도록, 방문자가 신청까지 도달하는 흐름을 설계해 빠르게 제작합니다.</p>
+        </article>
+        <article class="card" data-tilt>
+          <div class="icon">🛠️</div>
+          <h3>유지보수·운영</h3>
+          <p>오픈 후가 진짜 시작입니다. 수정, 개선, 장애 대응까지 담당 개발자처럼 함께합니다.</p>
+        </article>
+      </div>
+    </div>
+  </section>
+
+  <!-- 4. CTA -->
+  <section id="contact">
+    <div class="container">
+      <div class="cta-band" data-reveal>
+        <h2>지금 필요한 것부터, 가볍게 시작하세요</h2>
+        <p>상담한 사람이 만들고, 만든 사람이 끝까지 운영합니다.</p>
+        <a class="btn btn-primary" href="mailto:gompartner@gmail.com" data-tilt>무료 상담하기 →</a>
+      </div>
+    </div>
+  </section>
+</main>
+
+<footer>© 2026 곰선임 — GSAP 인터랙션 프로토타입</footer>
+
+<script src="https://cdn.jsdelivr.net/npm/gsap@3.12.5/dist/gsap.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/gsap@3.12.5/dist/ScrollTrigger.min.js"></script>
+<script>
+(function () {
+  "use strict";
+
+  const reduceMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+  const finePointer = window.matchMedia("(hover: hover) and (pointer: fine)").matches;
+
+  // 모션 감소 환경: 애니메이션 전부 생략, 콘텐츠는 이미 전부 보이는 상태
+  if (reduceMotion || typeof gsap === "undefined") return;
+
+  gsap.registerPlugin(ScrollTrigger);
+  gsap.config({ force3D: true });
+
+  /* ── 1a. 히어로 헤드라인: 단어→글자 스플릿 + 회전 스태거 ── */
+  const headline = document.getElementById("headline");
+  headline.querySelectorAll(".line").forEach((line) => {
+    const split = (textNode) => {
+      const frag = document.createDocumentFragment();
+      textNode.textContent.split(" ").forEach((word, wi, arr) => {
+        const w = document.createElement("span");
+        w.className = "word";
+        for (const ch of word) {
+          const c = document.createElement("span");
+          c.className = "char";
+          c.textContent = ch;
+          w.appendChild(c);
+        }
+        frag.appendChild(w);
+        if (wi < arr.length - 1) frag.appendChild(document.createTextNode(" "));
+      });
+      return frag;
+    };
+    // 그라디언트 줄의 중첩 span도 처리
+    [...line.childNodes].forEach((node) => {
+      if (node.nodeType === Node.TEXT_NODE && node.textContent.trim()) {
+        line.replaceChild(split(node), node);
+      } else if (node.nodeType === Node.ELEMENT_NODE) {
+        [...node.childNodes].forEach((inner) => {
+          if (inner.nodeType === Node.TEXT_NODE && inner.textContent.trim()) {
+            node.replaceChild(split(inner), inner);
+          }
+        });
+      }
+    });
+  });
+  headline.setAttribute("aria-hidden", "false");
+  headline.querySelectorAll(".word").forEach((w) => w.setAttribute("aria-hidden", "true"));
+
+  const intro = gsap.timeline({ defaults: { ease: "expo.out" } });
+  intro
+    .from(headline.querySelectorAll(".char"), {
+      yPercent: 115,
+      rotateX: -90,
+      opacity: 0,
+      duration: 1.1,
+      stagger: { each: 0.018, from: "start" },
+    })
+    .from(
+      "[data-hero-fade]",
+      { y: 40, opacity: 0, duration: 0.9, stagger: 0.12 },
+      "-=0.55"
+    )
+    .from("#mock", { y: 70, opacity: 0, scale: 0.94, duration: 1.1 }, "-=0.8");
+
+  /* ── 1b. 배경 블롭: 마우스 추적 + 모프 루프 ── */
+  const blobA = document.querySelector(".blob-a");
+  const blobB = document.querySelector(".blob-b");
+  const blobC = document.querySelector(".blob-c");
+
+  // borderRadius 모프 루프 (형태가 계속 뭉그러지며 변함)
+  [blobA, blobB, blobC].forEach((blob, i) => {
+    gsap.to(blob, {
+      borderRadius: "58% 42% 45% 55% / 45% 58% 42% 55%",
+      scale: 1.12,
+      duration: 7 + i * 2,
+      ease: "sine.inOut",
+      repeat: -1,
+      yoyo: true,
+    });
+  });
+
+  if (finePointer) {
+    const ax = gsap.quickTo(blobA, "x", { duration: 1.6, ease: "power3.out" });
+    const ay = gsap.quickTo(blobA, "y", { duration: 1.6, ease: "power3.out" });
+    const bx = gsap.quickTo(blobB, "x", { duration: 2.4, ease: "power3.out" });
+    const by = gsap.quickTo(blobB, "y", { duration: 2.4, ease: "power3.out" });
+    const cx = gsap.quickTo(blobC, "x", { duration: 1.1, ease: "power3.out" });
+    const cy = gsap.quickTo(blobC, "y", { duration: 1.1, ease: "power3.out" });
+
+    window.addEventListener("pointermove", (e) => {
+      const nx = e.clientX / window.innerWidth - 0.5;
+      const ny = e.clientY / window.innerHeight - 0.5;
+      ax(nx * 120); ay(ny * 120);
+      bx(nx * -160); by(ny * -160);
+      cx(nx * 220); cy(ny * 220);
+    }, { passive: true });
+  }
+
+  /* ── 1c. 히어로 비주얼 패럴랙스 줌 ── */
+  gsap.to("#mock", {
+    scale: 1.14,
+    ease: "none",
+    scrollTrigger: {
+      trigger: ".hero",
+      start: "top top",
+      end: "bottom top",
+      scrub: 0.6,
+    },
+  });
+
+  /* ── 2. 스크롤 리빌: 뷰포트 20% 진입 시 등장 ── */
+  gsap.utils.toArray("[data-reveal]").forEach((el) => {
+    gsap.fromTo(el,
+      { y: 60, opacity: 0 },
+      {
+        y: 0,
+        opacity: 1,
+        duration: 1.1,
+        ease: "power4.out",
+        scrollTrigger: { trigger: el, start: "top 80%", once: true },
+      }
+    );
+  });
+
+  // 스테이트먼트: 줄 단위 마스크 리빌
+  gsap.utils.toArray("[data-line-reveal]").forEach((el, i) => {
+    gsap.fromTo(el,
+      { yPercent: 110 },
+      {
+        yPercent: 0,
+        duration: 1.2,
+        delay: i * 0.14,
+        ease: "expo.out",
+        scrollTrigger: { trigger: el, start: "top 80%", once: true },
+      }
+    );
+  });
+
+  // 서비스 카드 3장: 0.15초 간격 스태거
+  gsap.fromTo("#cards .card",
+    { y: 60, opacity: 0 },
+    {
+      y: 0,
+      opacity: 1,
+      duration: 1.15,
+      ease: "power4.out",
+      stagger: 0.15,
+      scrollTrigger: { trigger: "#cards", start: "top 80%", once: true },
+    }
+  );
+
+  /* ── 3. 3D 틸트 호버 ── */
+  if (finePointer) {
+    document.querySelectorAll("[data-tilt]").forEach((el) => {
+      const max = parseFloat(el.dataset.tiltMax || "8");
+      const rx = gsap.quickTo(el, "rotationX", { duration: 0.5, ease: "power3.out" });
+      const ry = gsap.quickTo(el, "rotationY", { duration: 0.5, ease: "power3.out" });
+
+      el.addEventListener("pointermove", (e) => {
+        const r = el.getBoundingClientRect();
+        const px = (e.clientX - r.left) / r.width - 0.5;
+        const py = (e.clientY - r.top) / r.height - 0.5;
+        rx(-py * max * 2);
+        ry(px * max * 2);
+      });
+      el.addEventListener("pointerleave", () => {
+        gsap.to(el, {
+          rotationX: 0,
+          rotationY: 0,
+          duration: 0.9,
+          ease: "elastic.out(1, 0.45)",
+          overwrite: "auto",
+        });
+      });
+    });
+  }
+})();
+</script>
+</body>
+</html>

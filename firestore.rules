@@ -1,0 +1,50 @@
+rules_version = '2';
+
+// Firebase 콘솔 → Firestore Database → 규칙 탭에 붙여넣고 "게시"
+// ADMIN_UID: Authentication → 사용자 탭에서 본인 계정의 UID로 교체
+service cloud.firestore {
+  match /databases/{database}/documents {
+
+    function isAdmin() {
+      return request.auth != null
+        && request.auth.uid == "ADMIN_UID";
+    }
+
+    match /inquiries/{inquiryId} {
+      // 누구나 문의 접수(생성)는 가능 — 단, 필드 형식을 엄격히 검증
+      allow create: if
+        request.resource.data.keys().hasOnly(
+          ['name', 'contact', 'need', 'message', 'status', 'createdAt']
+        )
+        && request.resource.data.name is string
+        && request.resource.data.name.size() > 0
+        && request.resource.data.name.size() <= 100
+        && request.resource.data.contact is string
+        && request.resource.data.contact.size() > 0
+        && request.resource.data.contact.size() <= 200
+        && request.resource.data.need is string
+        && request.resource.data.need.size() <= 100
+        && request.resource.data.message is string
+        && request.resource.data.message.size() > 0
+        && request.resource.data.message.size() <= 2000
+        && request.resource.data.status == 'new'
+        && request.resource.data.createdAt == request.time;
+
+      // 열람은 관리자만
+      allow read: if isAdmin();
+
+      // 상태 변경(new/done)만 관리자에게 허용 — 다른 필드 수정 금지
+      allow update: if isAdmin()
+        && request.resource.data.diff(resource.data).affectedKeys().hasOnly(['status'])
+        && request.resource.data.status in ['new', 'done'];
+
+      // 삭제는 전면 금지
+      allow delete: if false;
+    }
+
+    // 그 외 모든 문서 접근 금지
+    match /{document=**} {
+      allow read, write: if false;
+    }
+  }
+}

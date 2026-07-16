@@ -221,7 +221,7 @@ export function AdminDemo() {
                 <div>
                   <h2 className="text-sm font-semibold text-slate-100">신청 내역</h2>
                   <p className="mt-0.5 text-xs text-slate-500">
-                    상태를 변경하면 브라우저에 저장됩니다
+                    접수된 신청을 확인하고 상태를 관리합니다
                     {changedCount > 0 && ` · ${changedCount}건 변경됨`}
                   </p>
                 </div>
@@ -294,9 +294,6 @@ export function AdminDemo() {
             </section>
           </div>
 
-          <p className="pt-2 text-center text-xs text-slate-600">
-            곰선임 데모 사이트 — 모든 데이터는 샘플이며 상태 변경은 내 브라우저에만 저장됩니다.
-          </p>
         </main>
       </div>
     </div>

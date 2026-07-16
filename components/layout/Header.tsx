@@ -10,10 +10,10 @@ import { profile } from "@/data/profile";
 import { ThemeToggle } from "./ThemeToggle";
 
 const navItems = [
-  { href: "/", label: "Home" },
-  { href: "/about", label: "About" },
-  { href: "/portfolio", label: "Portfolio" },
-  { href: "/blog", label: "Blog" },
+  { href: "/", label: "홈" },
+  { href: "/about", label: "소개" },
+  { href: "/portfolio", label: "포트폴리오" },
+  { href: "/blog", label: "블로그" },
 ];
 
 export function Header() {
@@ -30,10 +30,12 @@ export function Header() {
   return (
     <header
       className={cn(
-        "fixed top-0 left-0 right-0 z-50 transition-all duration-300",
+        // backdrop-filter는 고정 헤더 + 배경 애니메이션 조합에서 스크롤 중
+        // 깜빡임을 유발해 사용하지 않는다. 거의 불투명한 배경으로 대체.
+        "fixed top-0 left-0 right-0 z-50 border-b transition-[background-color,border-color,box-shadow] duration-300 [transform:translateZ(0)]",
         isScrolled
-          ? "bg-background/80 backdrop-blur-xl border-b border-border shadow-sm"
-          : "bg-transparent"
+          ? "bg-background/95 border-border shadow-sm"
+          : "bg-transparent border-transparent"
       )}
     >
       <nav

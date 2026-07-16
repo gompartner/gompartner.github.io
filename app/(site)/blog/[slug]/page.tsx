@@ -1,10 +1,10 @@
 import type { Metadata } from "next";
-import Image from "next/image";
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import { ArrowLeft, ArrowRight, Clock, Mail } from "lucide-react";
 import { Badge } from "@/components/ui/Badge";
 import Section from "@/components/ui/Section";
+import { BlogPreview } from "@/components/blog/BlogPreview";
 import { blogPosts, getBlogPostBySlug } from "@/data/blog";
 import { profile } from "@/data/profile";
 import { formatDate } from "@/lib/utils";
@@ -101,18 +101,13 @@ export default async function BlogPostPage({ params }: BlogPostPageProps) {
             </span>
           </div>
 
-          {post.heroImageUrl && (
-            <div className="relative aspect-[3/2] w-full overflow-hidden rounded-3xl border border-border bg-surface mt-8">
-              <Image
-                src={post.heroImageUrl}
-                alt={`${post.title} 대표 이미지`}
-                fill
-                preload
-                className="object-cover"
-                sizes="(max-width: 768px) 100vw, 768px"
-              />
+          {/* 블로그 전용 미리보기 —
+              본문 폭까지 늘리면 성겨 보여 카드 크기로 유지하고 배너에 얹는다 */}
+          <div className="mt-8 rounded-3xl border border-accent/15 bg-gradient-to-br from-accent/12 via-accent/6 to-transparent p-6 md:p-10">
+            <div className="mx-auto max-w-md">
+              <BlogPreview category={post.category} />
             </div>
-          )}
+          </div>
         </header>
 
         <div className="mt-12 space-y-7">
@@ -176,7 +171,7 @@ export default async function BlogPostPage({ params }: BlogPostPageProps) {
             읽으면서 우리 사업이 떠오르셨나요?
           </h2>
           <p className="mx-auto mt-3 max-w-lg text-foreground-secondary leading-relaxed">
-            새로 만들 계획이든, 운영 중인 사이트의 고민이든 좋습니다. 15년의 현업 경험으로
+            새로 만들 계획이든, 운영 중인 사이트의 고민이든 좋습니다. 현업 경험으로
             지금 상황에 맞는 가장 현실적인 방향을 함께 정리해 드립니다.
           </p>
           <div className="mt-7 flex flex-wrap items-center justify-center gap-3">

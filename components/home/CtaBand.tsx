@@ -34,7 +34,7 @@ export function CtaBand() {
             <span className="text-left text-sm leading-tight">
               <span className="block font-semibold text-foreground">{profile.name}</span>
               <span className="block text-foreground-tertiary">
-                15년차 웹 개발자 · 소개 보기
+                웹사이트 파트너 · 소개 보기
               </span>
             </span>
           </Link>
@@ -43,15 +43,16 @@ export function CtaBand() {
             지금 필요한 것부터, 가볍게 시작하세요
           </h2>
           <p className="mx-auto mt-4 max-w-xl text-foreground-secondary">
-            무엇부터 해야 할지 몰라도 괜찮습니다. 상담에서 지금 상황에 맞는
-            범위와 순서를 함께 정리해 드립니다.
+            상담한 사람이 만들고, 만든 사람이 끝까지 운영합니다. 무엇부터 해야
+            할지 몰라도 괜찮습니다 — 상담에서 지금 상황에 맞는 범위와 순서를
+            함께 정리해 드립니다.
           </p>
 
-          <ul className="mx-auto mt-8 flex max-w-2xl flex-col items-center gap-3 sm:flex-row sm:justify-center sm:gap-6">
+          <ul className="mx-auto mt-8 flex max-w-3xl flex-col items-center gap-3 sm:flex-row sm:flex-wrap sm:justify-center sm:gap-x-6 sm:gap-y-3">
             {checklist.map((item) => (
               <li
                 key={item}
-                className="flex items-center gap-2 text-sm text-foreground-secondary"
+                className="flex items-center gap-2 whitespace-nowrap text-sm text-foreground-secondary"
               >
                 <CheckCircle2 size={16} className="flex-shrink-0 text-accent" aria-hidden />
                 {item}

@@ -177,7 +177,7 @@ export function HomepageDemo() {
       </section>
 
       <footer className="border-t border-amber-200 bg-white py-8 text-center text-sm text-stone-400">
-        © 곰곰 베이커리 — 곰선임 데모 사이트 (모든 정보는 가상입니다)
+        © 곰곰 베이커리. All rights reserved.
       </footer>
     </div>
   );

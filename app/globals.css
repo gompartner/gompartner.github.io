@@ -55,6 +55,13 @@ html {
   scroll-behavior: smooth;
 }
 
+/* 제목 줄바꿈 균형 — 한 글자만 다음 줄로 떨어지는 고아 줄 방지 */
+h1,
+h2,
+h3 {
+  text-wrap: balance;
+}
+
 @keyframes grow-bar {
   from {
     transform: scaleY(0);
@@ -80,8 +87,28 @@ html {
   animation: fade-up 0.55s cubic-bezier(0.25, 0.1, 0.25, 1) both;
 }
 
+/* 히어로 배경 블롭 — 형태가 천천히 뭉그러지며 변하는 모프 루프 */
+/* 마우스 추적(바깥 레이어의 transform)과 겹치지 않도록 모프는 안쪽 레이어에서
+   border-radius/scale만 움직인다 */
+@keyframes blob-morph {
+  0%,
+  100% {
+    border-radius: 42% 58% 55% 45% / 55% 42% 58% 45%;
+    scale: 1;
+  }
+  50% {
+    border-radius: 58% 42% 45% 55% / 45% 58% 42% 55%;
+    scale: 1.1;
+  }
+}
+
+.animate-blob {
+  animation: blob-morph 9s ease-in-out infinite;
+}
+
 @media (prefers-reduced-motion: reduce) {
-  .animate-fade-up {
+  .animate-fade-up,
+  .animate-blob {
     animation: none;
   }
 }
@@ -90,6 +117,9 @@ body {
   background: var(--background);
   color: var(--foreground);
   font-family: var(--font-pretendard, -apple-system, BlinkMacSystemFont, "Apple SD Gothic Neo", "Segoe UI", sans-serif);
+  /* 한국어 타이포그래피: 단어 중간 줄바꿈 방지 (긴 URL 등은 break-word로 안전장치) */
+  word-break: keep-all;
+  overflow-wrap: break-word;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
 }

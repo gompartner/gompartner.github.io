@@ -14,7 +14,7 @@ const categories = [
   { id: "landing", label: "랜딩페이지" },
   { id: "system", label: "예약·문의" },
   { id: "admin", label: "관리자" },
-  { id: "operation", label: "API·운영" },
+  { id: "operation", label: "자동화" },
 ];
 
 export function PortfolioGrid() {
