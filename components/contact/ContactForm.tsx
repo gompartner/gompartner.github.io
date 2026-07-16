@@ -38,9 +38,13 @@ function LengthCounter({ length, limit }: { length: number; limit: number }) {
 
 export function ContactForm() {
   const [status, setStatus] = useState<FormStatus>("idle");
-  const [nameLength, setNameLength] = useState(0);
-  const [contactLength, setContactLength] = useState(0);
-  const [messageLength, setMessageLength] = useState(0);
+  const [name, setName] = useState("");
+  const [contact, setContact] = useState("");
+  const [message, setMessage] = useState("");
+
+  // 필수 필드가 (공백 제외) 채워져야만 제출 가능
+  const isValid =
+    name.trim().length > 0 && contact.trim().length > 0 && message.trim().length > 0;
 
   async function handleSubmit(e: React.FormEvent<HTMLFormElement>) {
     e.preventDefault();
@@ -136,7 +140,7 @@ export function ContactForm() {
             <label htmlFor="contact-name" className="block text-sm font-medium text-foreground-secondary">
               이름 <span className="text-accent">*</span>
             </label>
-            <LengthCounter length={nameLength} limit={LIMITS.name} />
+            <LengthCounter length={name.length} limit={LIMITS.name} />
           </div>
           <input
             id="contact-name"
@@ -144,7 +148,8 @@ export function ContactForm() {
             type="text"
             required
             maxLength={LIMITS.name}
-            onChange={(e) => setNameLength(e.currentTarget.value.length)}
+            value={name}
+            onChange={(e) => setName(e.currentTarget.value)}
             autoComplete="name"
             placeholder="성함 또는 상호"
             className={inputClasses}
@@ -156,7 +161,7 @@ export function ContactForm() {
             <label htmlFor="contact-contact" className="block text-sm font-medium text-foreground-secondary">
               연락처 <span className="text-accent">*</span>
             </label>
-            <LengthCounter length={contactLength} limit={LIMITS.contact} />
+            <LengthCounter length={contact.length} limit={LIMITS.contact} />
           </div>
           <input
             id="contact-contact"
@@ -164,7 +169,8 @@ export function ContactForm() {
             type="text"
             required
             maxLength={LIMITS.contact}
-            onChange={(e) => setContactLength(e.currentTarget.value.length)}
+            value={contact}
+            onChange={(e) => setContact(e.currentTarget.value)}
             placeholder="이메일 또는 전화번호"
             className={inputClasses}
           />
@@ -191,7 +197,7 @@ export function ContactForm() {
             <label htmlFor="contact-message" className="block text-sm font-medium text-foreground-secondary">
               문의 내용 <span className="text-accent">*</span>
             </label>
-            <LengthCounter length={messageLength} limit={LIMITS.message} />
+            <LengthCounter length={message.length} limit={LIMITS.message} />
           </div>
           <textarea
             id="contact-message"
@@ -199,11 +205,12 @@ export function ContactForm() {
             required
             rows={5}
             maxLength={LIMITS.message}
-            onChange={(e) => setMessageLength(e.currentTarget.value.length)}
+            value={message}
+            onChange={(e) => setMessage(e.currentTarget.value)}
             placeholder="어떤 사업을 하시는지, 무엇이 필요한지 편하게 적어주세요."
             className={inputClasses}
           />
-          {messageLength >= LIMITS.message && (
+          {message.length >= LIMITS.message && (
             <p className="mt-1.5 text-xs text-warning">
               최대 {LIMITS.message.toLocaleString()}자까지 입력할 수 있습니다. 더 긴 내용은
               이메일로 보내주세요.
@@ -228,7 +235,11 @@ export function ContactForm() {
           </p>
         )}
 
-        <Button type="submit" disabled={status === "submitting"} className="w-full">
+        <Button
+          type="submit"
+          disabled={status === "submitting" || !isValid}
+          className="w-full"
+        >
           {status === "submitting" ? (
             "보내는 중…"
           ) : (
