@@ -43,7 +43,7 @@ export function SectionHeading({ label, title, titleId, description, className }
         {title}
       </h2>
       {description && (
-        <p className="mt-4 text-lg text-foreground-secondary max-w-2xl">{description}</p>
+        <p className="mt-4 text-lg text-foreground-secondary max-w-3xl">{description}</p>
       )}
     </div>
   );

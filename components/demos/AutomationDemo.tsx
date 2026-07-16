@@ -261,9 +261,6 @@ export function AutomationDemo() {
           </div>
         </section>
 
-        <p className="mt-12 text-center text-xs text-neutral-700">
-          {"//"} 곰선임 데모 사이트 — 실제 발송 없이 브라우저 안에서만 동작하는 시뮬레이션입니다.
-        </p>
       </div>
     </div>
   );

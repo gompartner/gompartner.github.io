@@ -2,9 +2,18 @@
 
 import { motion } from "framer-motion";
 import { useEffect, useRef } from "react";
-import Image from "next/image";
-import { X, ExternalLink, CheckCircle2, User } from "lucide-react";
-import { Badge } from "@/components/ui/Badge";
+import Link from "next/link";
+import {
+  X,
+  ExternalLink,
+  CheckCircle2,
+  CircleAlert,
+  Clock,
+  MessageCircle,
+  Target,
+  TrendingUp,
+  User,
+} from "lucide-react";
 import type { Project } from "@/lib/types";
 
 interface ProjectModalProps {
@@ -65,18 +74,7 @@ export function ProjectModal({ project, onClose }: ProjectModalProps) {
           <X size={18} />
         </button>
 
-        {/* Image */}
-        <div className="relative h-56 w-full bg-surface-secondary">
-          <Image
-            src={project.imageUrl}
-            alt={`${project.title} 스크린샷`}
-            fill
-            className="object-cover"
-            sizes="672px"
-          />
-        </div>
-
-        <div className="p-6 md:p-8 space-y-6">
+        <div className="p-6 pt-12 md:p-8 md:pt-12 space-y-6">
           {/* Header */}
           <div>
             <p className="text-xs text-foreground-tertiary uppercase tracking-wider mb-2">
@@ -85,57 +83,96 @@ export function ProjectModal({ project, onClose }: ProjectModalProps) {
             <h2 className="text-2xl font-semibold text-foreground">{project.title}</h2>
           </div>
 
-          {/* Long description */}
-          <p className="text-foreground-secondary leading-relaxed">
-            {project.longDescription ?? project.description}
-          </p>
-
-          {/* Tech stack */}
-          <div>
-            <h3 className="text-sm font-semibold text-foreground-secondary uppercase tracking-wider mb-3">
-              사용 기술
-            </h3>
-            <div className="flex flex-wrap gap-2">
-              {project.techStack.map((tech) => (
-                <Badge key={tech} variant="subtle">
-                  {tech}
-                </Badge>
-              ))}
+          {/* 제작 목적 | 해결한 문제 */}
+          <div className="grid gap-6 md:grid-cols-2">
+            <div>
+              <h3 className="text-sm font-semibold text-foreground-secondary uppercase tracking-wider mb-3">
+                제작 목적
+              </h3>
+              <p className="flex items-start gap-2 text-sm leading-relaxed text-foreground-secondary">
+                <Target size={16} className="text-accent mt-0.5 flex-shrink-0" aria-hidden />
+                {project.purpose}
+              </p>
+            </div>
+            <div>
+              <h3 className="text-sm font-semibold text-foreground-secondary uppercase tracking-wider mb-3">
+                해결한 문제
+              </h3>
+              <p className="flex items-start gap-2 text-sm leading-relaxed text-foreground-secondary">
+                <CircleAlert size={16} className="text-accent mt-0.5 flex-shrink-0" aria-hidden />
+                {project.problemSolved}
+              </p>
             </div>
           </div>
 
-          {/* Achievements */}
-          <div>
-            <h3 className="text-sm font-semibold text-foreground-secondary uppercase tracking-wider mb-3">
-              성과
-            </h3>
-            <ul className="space-y-2">
-              {project.achievements.map((ach) => (
-                <li key={ach} className="flex items-start gap-2 text-sm text-foreground-secondary">
-                  <CheckCircle2 size={16} className="text-success mt-0.5 flex-shrink-0" aria-hidden />
-                  {ach}
-                </li>
-              ))}
-            </ul>
+          {/* 주요 기능 | 기대 효과 */}
+          <div className="grid gap-6 md:grid-cols-2">
+            <div>
+              <h3 className="text-sm font-semibold text-foreground-secondary uppercase tracking-wider mb-3">
+                주요 기능
+              </h3>
+              <ul className="space-y-2">
+                {project.features.map((feature) => (
+                  <li key={feature} className="flex items-start gap-2 text-sm text-foreground-secondary">
+                    <CheckCircle2 size={16} className="text-success mt-0.5 flex-shrink-0" aria-hidden />
+                    {feature}
+                  </li>
+                ))}
+              </ul>
+            </div>
+            <div>
+              <h3 className="text-sm font-semibold text-foreground-secondary uppercase tracking-wider mb-3">
+                이런 효과를 기대할 수 있습니다
+              </h3>
+              <ul className="space-y-2">
+                {project.operationEffect.map((effect) => (
+                  <li key={effect} className="flex items-start gap-2 text-sm text-foreground-secondary">
+                    <TrendingUp size={16} className="text-accent mt-0.5 flex-shrink-0" aria-hidden />
+                    {effect}
+                  </li>
+                ))}
+              </ul>
+            </div>
           </div>
 
-          {/* Responsibilities */}
-          <div>
-            <h3 className="text-sm font-semibold text-foreground-secondary uppercase tracking-wider mb-3">
-              담당 업무
-            </h3>
-            <ul className="space-y-2">
-              {project.responsibilities.map((resp) => (
-                <li key={resp} className="flex items-start gap-2 text-sm text-foreground-secondary">
-                  <User size={16} className="text-accent mt-0.5 flex-shrink-0" aria-hidden />
-                  {resp}
-                </li>
-              ))}
-            </ul>
+          {/* 이런 분께 추천 | 예상 제작 기간 */}
+          <div className="grid gap-6 md:grid-cols-2">
+            <div>
+              <h3 className="text-sm font-semibold text-foreground-secondary uppercase tracking-wider mb-3">
+                이런 분께 추천
+              </h3>
+              <ul className="space-y-2">
+                {project.recommendedFor.map((item) => (
+                  <li key={item} className="flex items-start gap-2 text-sm text-foreground-secondary">
+                    <User size={16} className="text-accent mt-0.5 flex-shrink-0" aria-hidden />
+                    {item}
+                  </li>
+                ))}
+              </ul>
+            </div>
+            <div>
+              <h3 className="text-sm font-semibold text-foreground-secondary uppercase tracking-wider mb-3">
+                예상 제작 기간
+              </h3>
+              <p className="flex items-start gap-2 text-sm text-foreground-secondary">
+                <Clock size={16} className="text-accent mt-0.5 flex-shrink-0" aria-hidden />
+                <span>
+                  {project.buildTime}
+                  <span className="text-foreground-tertiary">
+                    {" "}
+                    · 정확한 기간은 상담에서 확정됩니다
+                  </span>
+                </span>
+              </p>
+            </div>
           </div>
+
+          <p className="text-xs text-foreground-tertiary">
+            이 화면들은 기능을 체험해 보시라고 만든 샘플 데모입니다.
+          </p>
 
           {/* Links */}
-          <div className="flex items-center gap-4 pt-2 border-t border-border">
+          <div className="flex flex-wrap items-center gap-3 pt-2 border-t border-border">
             {project.demoUrl && (
               <a
                 href={project.demoUrl}
@@ -146,6 +183,14 @@ export function ProjectModal({ project, onClose }: ProjectModalProps) {
                 데모 보기
               </a>
             )}
+            <Link
+              href="/contact"
+              data-gtm-cta={`project_modal_contact_${project.id}`}
+              className="inline-flex items-center gap-2 px-5 py-2.5 rounded-full border border-border text-foreground text-sm font-medium hover:bg-surface transition-colors"
+            >
+              <MessageCircle size={16} />
+              이런 사이트 상담하기
+            </Link>
           </div>
         </div>
       </motion.div>

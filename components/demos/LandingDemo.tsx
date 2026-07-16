@@ -278,9 +278,6 @@ export function LandingDemo() {
             );
           })}
         </div>
-        <p className="mt-14 text-center text-xs text-zinc-600">
-          곰선임 데모 사이트 — 실제 이벤트가 아니며 입력 정보는 내 브라우저에만 저장됩니다.
-        </p>
       </section>
     </div>
   );

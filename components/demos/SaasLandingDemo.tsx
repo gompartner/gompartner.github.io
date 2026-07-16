@@ -567,9 +567,6 @@ export function SaasLandingDemo() {
           <span>개인정보처리방침</span>
           <span>고객센터</span>
         </p>
-        <p className="mt-8 text-xs text-slate-600">
-          곰선임 데모 사이트 — 실제 서비스가 아닌 샘플이며 입력값은 내 브라우저에만 저장됩니다.
-        </p>
       </footer>
     </div>
   );

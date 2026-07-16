@@ -19,7 +19,7 @@ export function DemoShowcase() {
         label="Live Demos"
         title="말보다, 직접 만져보세요"
         titleId="showcase-heading"
-        description="이미지 캡처가 아니라 클릭하고 입력해 볼 수 있는 샘플 데모입니다. 실제 프로젝트는 사업에 맞춰 새로 설계합니다."
+        description="직접 클릭하고 입력해 보는 샘플 데모입니다. 실제 프로젝트는 사업에 맞춰 새로 설계합니다."
       />
 
       <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
@@ -32,11 +32,11 @@ export function DemoShowcase() {
             >
               <DemoPreview category={project.category} />
               <div className="flex flex-1 flex-col">
-                <div className="flex items-center justify-between gap-2">
+                <div className="flex items-start justify-between gap-2">
                   <h3 className="font-semibold text-foreground transition-colors group-hover:text-accent">
                     {project.title}
                   </h3>
-                  <Badge variant="subtle" size="sm">
+                  <Badge variant="subtle" size="sm" className="shrink-0 whitespace-nowrap">
                     샘플 데모
                   </Badge>
                 </div>
@@ -56,11 +56,11 @@ export function DemoShowcase() {
           </Reveal>
         ))}
 
-        {/* 마지막 슬롯: 포트폴리오 안내 카드 */}
-        <Reveal delay={0.16}>
+        {/* 마지막 행: 포트폴리오 안내 밴드 — 홀로 남는 카드 없이 행 전체를 채운다 */}
+        <Reveal delay={0.16} className="md:col-span-2 lg:col-span-3">
           <Link
             href="/portfolio"
-            className="group flex h-full min-h-48 flex-col items-center justify-center gap-3 rounded-3xl border border-dashed border-border p-5 text-center transition-all duration-300 hover:border-accent/40 hover:bg-surface/60"
+            className="group flex min-h-24 flex-col items-center justify-center gap-2 rounded-3xl border border-dashed border-border p-6 text-center transition-all duration-300 hover:border-accent/40 hover:bg-surface/60 sm:flex-row sm:gap-4"
           >
             <p className="font-medium text-foreground">
               각 데모의 기획 배경과 구현 설명이 궁금하다면

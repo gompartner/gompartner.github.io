@@ -54,10 +54,10 @@ export function Footer() {
           <nav aria-label="푸터 네비게이션">
             <ul className="flex items-center gap-4" role="list">
               {[
-                { href: "/portfolio", label: "Portfolio" },
-                { href: "/career", label: "Career" },
-                { href: "/skills", label: "Skills" },
-                { href: "/contact", label: "Contact" },
+                { href: "/portfolio", label: "포트폴리오" },
+                { href: "/about", label: "소개" },
+                { href: "/blog", label: "블로그" },
+                { href: "/contact", label: "상담 문의" },
               ].map(({ href, label }) => (
                 <li key={href}>
                   <Link

@@ -4,33 +4,42 @@ import { motion, useInView } from "framer-motion";
 import { useRef } from "react";
 import Image from "next/image";
 import Link from "next/link";
-import { ArrowRight, MapPin, Briefcase, Heart } from "lucide-react";
+import {
+  ArrowRight,
+  Briefcase,
+  Mail,
+  MapPin,
+  RefreshCcw,
+  Smartphone,
+  Target,
+  Zap,
+} from "lucide-react";
 import { profile } from "@/data/profile";
 
 const values = [
   {
-    icon: "🎯",
+    icon: Target,
     title: "사업자 중심 제작",
     description:
       "예산과 시간이 제한된 소규모 사업자가 바로 사용할 수 있는 웹사이트를 우선합니다.",
   },
   {
-    icon: "⚡",
+    icon: Zap,
     title: "빠른 구축과 운영",
     description:
-      "템플릿 기반 제작과 필요한 커스터마이징을 조합해 빠르게 오픈하고 지속 운영합니다.",
+      "필요한 것부터 빠르게 오픈하고, 오픈 이후에도 꾸준히 운영하며 개선합니다.",
   },
   {
-    icon: "📱",
+    icon: Smartphone,
     title: "모바일 최적화",
     description:
-      "방문자가 가장 많이 보는 모바일 화면에서 문의와 예약, 이벤트 참여가 자연스럽게 이어지도록 구성합니다.",
+      "방문자가 가장 많이 보는 모바일 화면에서 문의와 예약이 자연스럽게 이어지도록 구성합니다.",
   },
   {
-    icon: "🛠️",
+    icon: RefreshCcw,
     title: "지속적 개선",
     description:
-      "오픈 이후 콘텐츠 업데이트, SEO, 이벤트 페이지 운영, 간단한 자동화까지 함께 개선합니다.",
+      "콘텐츠 업데이트, 검색 노출, 이벤트 페이지 운영까지 만든 뒤에도 함께 개선합니다.",
   },
 ];
 
@@ -82,112 +91,86 @@ export function AboutContent() {
             </p>
             <p className="flex items-center gap-2 text-foreground-secondary text-sm">
               <Briefcase size={15} aria-hidden />
-              15년차 백엔드 개발자
+              상담부터 제작·운영까지 직접
             </p>
-            <p className="flex items-center gap-2 text-foreground-secondary text-sm">
-              <Heart size={15} aria-hidden />
-              웹사이트 제작 / 유지보수 / 마케팅 이벤트
-            </p>
+            <a
+              href={`mailto:${profile.email}`}
+              className="flex items-center gap-2 text-foreground-secondary text-sm transition-colors hover:text-foreground"
+            >
+              <Mail size={15} aria-hidden />
+              {profile.email}
+            </a>
           </div>
 
           <p className="text-foreground-secondary leading-relaxed">{profile.bio}</p>
 
+          <p className="text-sm text-foreground-tertiary">
+            1인 업체입니다. 상담한 사람이 만들고, 만든 사람이 끝까지 운영합니다.
+          </p>
         </motion.div>
       </div>
 
       {/* Values */}
       <div>
-        <motion.h2
+        <motion.div
           initial={{ opacity: 0, y: 20 }}
           animate={inView ? { opacity: 1, y: 0 } : {}}
           transition={{ duration: 0.5, delay: 0.2 }}
-          className="text-2xl md:text-3xl font-semibold tracking-tight mb-8"
+          className="mb-10"
         >
-          개발 철학
-        </motion.h2>
+          <p className="text-[13px] font-semibold uppercase tracking-[0.14em] text-accent">
+            Approach
+          </p>
+          <h2 className="mt-3 text-2xl md:text-3xl font-semibold tracking-tight">
+            일하는 방식
+          </h2>
+          <p className="mt-3 max-w-xl text-foreground-secondary leading-relaxed">
+            기술보다 사업에 도움이 되는지를 먼저 봅니다. 네 가지 기준으로
+            만들고 운영합니다.
+          </p>
+        </motion.div>
         <div className="grid sm:grid-cols-2 gap-4">
-          {values.map((value, i) => (
+          {values.map(({ icon: Icon, title, description }, i) => (
             <motion.div
-              key={value.title}
+              key={title}
               initial={{ opacity: 0, y: 20 }}
               animate={inView ? { opacity: 1, y: 0 } : {}}
               transition={{ duration: 0.5, delay: 0.25 + i * 0.08 }}
               className="p-6 rounded-2xl border border-border bg-surface"
             >
-              <span className="text-3xl" aria-hidden>
-                {value.icon}
-              </span>
-              <h3 className="mt-3 font-semibold text-foreground">{value.title}</h3>
+              <div className="flex h-11 w-11 items-center justify-center rounded-xl bg-accent/10 text-accent">
+                <Icon size={20} aria-hidden />
+              </div>
+              <h3 className="mt-4 font-semibold text-foreground">{title}</h3>
               <p className="mt-2 text-sm text-foreground-secondary leading-relaxed">
-                {value.description}
+                {description}
               </p>
             </motion.div>
           ))}
         </div>
       </div>
 
-      {/* Currently */}
+      {/* 상담 CTA */}
       <motion.div
         initial={{ opacity: 0, y: 20 }}
         animate={inView ? { opacity: 1, y: 0 } : {}}
         transition={{ duration: 0.5, delay: 0.5 }}
-        className="p-8 rounded-2xl bg-accent/5 border border-accent/20"
+        className="flex flex-col items-center gap-4 rounded-3xl bg-gradient-to-br from-accent/12 to-accent/4 p-10 text-center"
       >
-        <h2 className="text-xl font-semibold text-foreground mb-4">현재 관심사</h2>
-        <ul className="space-y-2 text-foreground-secondary">
-          {[
-            "소상공인과 1인 사업자를 위한 빠른 웹사이트 제작",
-            "월 단위 유지보수와 콘텐츠 업데이트 운영",
-            "예약, 문의, 챗봇, 뉴스레터 등 가벼운 자동화 연계",
-            "마케팅 이벤트 페이지와 모바일 전환율 개선",
-          ].map((item) => (
-            <li key={item} className="flex items-start gap-2 text-sm">
-              <span className="text-accent mt-1" aria-hidden>
-                →
-              </span>
-              {item}
-            </li>
-          ))}
-        </ul>
-      </motion.div>
-
-      {/* 경력·기술 상세로 연결 (헤더 메뉴에서 About으로 통합됨) */}
-      <motion.div
-        initial={{ opacity: 0, y: 20 }}
-        animate={inView ? { opacity: 1, y: 0 } : {}}
-        transition={{ duration: 0.5, delay: 0.6 }}
-        className="grid gap-4 sm:grid-cols-2"
-      >
-        {[
-          {
-            href: "/career",
-            title: "경력 살펴보기",
-            description: "2009년부터 지금까지, 8개 기업에서의 실무 이력",
-          },
-          {
-            href: "/skills",
-            title: "기술 스택 보기",
-            description: "백엔드부터 웹 UI, 클라우드, AI까지 다루는 기술",
-          },
-        ].map(({ href, title, description }) => (
-          <Link
-            key={href}
-            href={href}
-            className="group flex items-center justify-between gap-4 rounded-2xl border border-border bg-surface p-6 transition-all duration-300 hover:-translate-y-0.5 hover:border-accent/30 hover:shadow-lg"
-          >
-            <div>
-              <h2 className="font-semibold text-foreground transition-colors group-hover:text-accent">
-                {title}
-              </h2>
-              <p className="mt-1 text-sm text-foreground-secondary">{description}</p>
-            </div>
-            <ArrowRight
-              size={18}
-              aria-hidden
-              className="flex-shrink-0 text-foreground-tertiary transition-transform duration-300 group-hover:translate-x-1 group-hover:text-accent"
-            />
-          </Link>
-        ))}
+        <p className="text-xl font-semibold text-foreground">
+          어떤 사이트가 필요한지 막연해도 괜찮습니다.
+        </p>
+        <p className="text-sm text-foreground-secondary">
+          상담과 견적은 무료입니다. 편하게 물어보세요.
+        </p>
+        <Link
+          href="/contact"
+          data-gtm-cta="about_contact"
+          className="inline-flex items-center gap-2 rounded-full bg-accent px-6 py-3 text-sm font-medium text-accent-foreground transition-all hover:bg-accent-hover active:scale-95"
+        >
+          상담 문의하기
+          <ArrowRight size={16} aria-hidden />
+        </Link>
       </motion.div>
     </div>
   );

@@ -7,9 +7,9 @@ export function Differentiators() {
     <Section id="why" aria-labelledby="why-heading" className="py-20 md:py-28">
       <SectionHeading
         label="Why"
-        title="AI는 도구로, 15년 경험은 기준으로"
+        title="왜 곰선임에게 맡기면 좋은가요"
         titleId="why-heading"
-        description="AI로 제작 속도를 높이고, 15년의 운영 경험으로 완성도를 검증합니다. 둘 중 하나만으로는 부족합니다."
+        description="빠르게 만들고, 오랜 운영 경험으로 완성도를 검증하고, 오픈 이후까지 함께합니다."
       />
 
       <div className="grid gap-5 md:grid-cols-2 lg:grid-cols-3">
@@ -40,7 +40,7 @@ export function Differentiators() {
               둘 다 포기하지 않습니다.&rdquo;
             </p>
             <p className="mt-3 text-sm text-foreground-secondary">
-              AI 시대의 속도와 15년차의 기준을 함께 제공합니다.
+              빠른 제작 속도와 운영 경험의 기준을 함께 제공합니다.
             </p>
           </div>
         </Reveal>

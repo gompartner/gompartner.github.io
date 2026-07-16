@@ -326,9 +326,6 @@ export function ReservationDemo() {
           </div>
         </div>
 
-        <p className="mt-12 text-center text-xs text-neutral-400">
-          곰선임 데모 사이트 — 예약 정보는 내 브라우저에만 저장됩니다.
-        </p>
       </div>
     </div>
   );

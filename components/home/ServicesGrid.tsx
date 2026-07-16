@@ -1,5 +1,6 @@
 import Section, { SectionHeading } from "@/components/ui/Section";
 import { Reveal } from "@/components/motion/Reveal";
+import { TiltCard } from "@/components/motion/TiltCard";
 import { services, capabilityChips } from "@/data/services";
 
 export function ServicesGrid() {
@@ -14,16 +15,18 @@ export function ServicesGrid() {
 
       <div className="grid gap-5 md:grid-cols-2 lg:grid-cols-3">
         {services.map(({ icon: Icon, title, description }, i) => (
-          <Reveal key={title} delay={(i % 3) * 0.08}>
-            <article className="group h-full rounded-3xl border border-border bg-surface p-6 transition-all duration-300 hover:-translate-y-1 hover:border-accent/30 hover:shadow-xl">
-              <div className="flex h-12 w-12 items-center justify-center rounded-2xl bg-accent/10 text-accent transition-colors duration-300 group-hover:bg-accent group-hover:text-accent-foreground">
-                <Icon size={22} aria-hidden />
-              </div>
-              <h3 className="mt-5 text-xl font-semibold text-foreground">{title}</h3>
-              <p className="mt-3 text-sm leading-relaxed text-foreground-secondary">
-                {description}
-              </p>
-            </article>
+          <Reveal key={title} delay={(i % 3) * 0.08} className="h-full">
+            <TiltCard className="h-full">
+              <article className="group h-full rounded-3xl border border-border bg-surface p-6 transition-[border-color,box-shadow] duration-300 hover:border-accent/30 hover:shadow-xl">
+                <div className="flex h-12 w-12 items-center justify-center rounded-2xl bg-accent/10 text-accent transition-colors duration-300 group-hover:bg-accent group-hover:text-accent-foreground">
+                  <Icon size={22} aria-hidden />
+                </div>
+                <h3 className="mt-5 text-xl font-semibold text-foreground">{title}</h3>
+                <p className="mt-3 text-sm leading-relaxed text-foreground-secondary">
+                  {description}
+                </p>
+              </article>
+            </TiltCard>
           </Reveal>
         ))}
       </div>
@@ -33,7 +36,7 @@ export function ServicesGrid() {
           <p className="text-sm font-medium text-foreground-tertiary">
             이 외에도 필요한 만큼 만들 수 있습니다
           </p>
-          <ul className="mt-5 flex flex-wrap justify-center gap-2.5">
+          <ul className="mx-auto mt-5 flex max-w-3xl flex-wrap justify-center gap-2.5">
             {capabilityChips.map((chip) => (
               <li
                 key={chip}
