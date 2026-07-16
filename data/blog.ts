@@ -529,7 +529,7 @@ export const blogPosts: BlogPost[] = [
       },
       {
         type: "quote",
-        text: "홈페이지는 예쁘게 만드는 것보다 문의가 들어오게 만드는 것이 중요합니다.",
+        text: "홈페이지를 만드는 것에서 끝나지 않습니다. 오픈 이후의 운영까지 함께합니다.",
       },
       {
         type: "paragraph",
