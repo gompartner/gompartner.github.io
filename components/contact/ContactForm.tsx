@@ -17,11 +17,15 @@ const needOptions = [
 
 type FormStatus = "idle" | "submitting" | "success" | "error";
 
+// Firestore 보안 규칙과 동일한 제한 — 초과분은 입력 단계에서 차단
+const LIMITS = { name: 100, contact: 200, message: 2000 } as const;
+
 const inputClasses =
   "w-full rounded-2xl border border-border bg-background px-4 py-3 text-sm text-foreground placeholder:text-foreground-tertiary focus-visible:outline focus-visible:outline-2 focus-visible:outline-accent";
 
 export function ContactForm() {
   const [status, setStatus] = useState<FormStatus>("idle");
+  const [messageLength, setMessageLength] = useState(0);
 
   async function handleSubmit(e: React.FormEvent<HTMLFormElement>) {
     e.preventDefault();
@@ -121,6 +125,7 @@ export function ContactForm() {
             name="name"
             type="text"
             required
+            maxLength={LIMITS.name}
             autoComplete="name"
             placeholder="성함 또는 상호"
             className={inputClasses}
@@ -136,6 +141,7 @@ export function ContactForm() {
             name="contact"
             type="text"
             required
+            maxLength={LIMITS.contact}
             placeholder="이메일 또는 전화번호"
             className={inputClasses}
           />
@@ -158,17 +164,37 @@ export function ContactForm() {
         </div>
 
         <div>
-          <label htmlFor="contact-message" className="mb-1.5 block text-sm font-medium text-foreground-secondary">
-            문의 내용 <span className="text-accent">*</span>
-          </label>
+          <div className="mb-1.5 flex items-end justify-between gap-2">
+            <label htmlFor="contact-message" className="block text-sm font-medium text-foreground-secondary">
+              문의 내용 <span className="text-accent">*</span>
+            </label>
+            <span
+              className={`text-xs tabular-nums ${
+                messageLength >= LIMITS.message
+                  ? "font-medium text-warning"
+                  : "text-foreground-tertiary"
+              }`}
+              aria-live="polite"
+            >
+              {messageLength.toLocaleString()} / {LIMITS.message.toLocaleString()}자
+            </span>
+          </div>
           <textarea
             id="contact-message"
             name="message"
             required
             rows={5}
+            maxLength={LIMITS.message}
+            onChange={(e) => setMessageLength(e.currentTarget.value.length)}
             placeholder="어떤 사업을 하시는지, 무엇이 필요한지 편하게 적어주세요."
             className={inputClasses}
           />
+          {messageLength >= LIMITS.message && (
+            <p className="mt-1.5 text-xs text-warning">
+              최대 {LIMITS.message.toLocaleString()}자까지 입력할 수 있습니다. 더 긴 내용은
+              이메일로 보내주세요.
+            </p>
+          )}
         </div>
 
         {/* 스팸 방지 허니팟 — 사람에게는 보이지 않는다 */}
