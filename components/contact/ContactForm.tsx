@@ -120,7 +120,7 @@ export function ContactForm() {
   if (status === "success") {
     return (
       <div
-        className="flex flex-col items-center gap-3 rounded-3xl border border-border bg-surface p-9 text-center"
+        className="glass iri-border flex flex-col items-center gap-3 rounded-3xl p-9 text-center"
         role="status"
       >
         <CheckCircle2 size={36} className="text-success" aria-hidden />
@@ -135,7 +135,7 @@ export function ContactForm() {
   return (
     <form
       onSubmit={handleSubmit}
-      className="rounded-3xl border border-border bg-surface p-7"
+      className="glass iri-border rounded-3xl p-7"
       aria-label="상담 문의 양식"
     >
       <h2 className="font-semibold text-foreground">문의 양식</h2>
@@ -262,7 +262,7 @@ export function ContactForm() {
           )}
         </Button>
         <p className="text-center text-xs text-foreground-tertiary">
-          상담과 견적은 무료입니다.
+          편하게 남겨주세요. 보통 하루 안에 회신드립니다.
         </p>
       </div>
     </form>

@@ -165,7 +165,7 @@ export default async function BlogPostPage({ params }: BlogPostPageProps) {
 
         <aside
           aria-label="상담 문의 안내"
-          className="mt-16 rounded-3xl border border-border bg-surface p-8 text-center md:p-10"
+          className="iri-border glass mt-16 rounded-3xl p-8 text-center md:p-10"
         >
           <h2 className="text-2xl font-semibold tracking-tight text-foreground">
             읽으면서 우리 사업이 떠오르셨나요?

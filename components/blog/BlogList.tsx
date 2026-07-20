@@ -40,10 +40,10 @@ export function BlogList({ posts }: BlogListProps) {
             aria-selected={activeCategory === category}
             onClick={() => setActiveCategory(category)}
             className={cn(
-              "px-4 py-2 rounded-full text-sm font-medium transition-all duration-200",
+              "rounded-full px-4 py-2 text-sm font-medium transition-all duration-200",
               activeCategory === category
-                ? "bg-foreground text-background"
-                : "bg-surface border border-border text-foreground-secondary hover:text-foreground hover:border-foreground-tertiary"
+                ? "bg-accent text-white shadow-sm"
+                : "glass text-foreground-secondary hover:text-foreground"
             )}
           >
             {category}

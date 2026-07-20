@@ -64,6 +64,7 @@ export default function ContactPage() {
         {/* 좌측: 안내 */}
         <div className="flex flex-col gap-6">
           <SectionHeading
+            size="display"
             label="Contact"
             title="상담 문의"
             titleId="contact-heading"
@@ -73,9 +74,17 @@ export default function ContactPage() {
 
           <Reveal>
             <ul className="grid gap-4 sm:grid-cols-3">
-              {consultInfo.map(({ icon: Icon, title, description }) => (
-                <li key={title} className="rounded-3xl border border-border bg-surface p-5">
-                  <Icon size={18} className="text-accent" aria-hidden />
+              {consultInfo.map(({ icon: Icon, title, description }, i) => (
+                <li key={title} className="rounded-3xl glass iri-border p-5">
+                  <span
+                    className="flex h-10 w-10 items-center justify-center rounded-xl"
+                    style={{
+                      backgroundColor: ["#e6e8ff", "#d5f7f2", "#ffe6e3"][i % 3],
+                      color: ["#4f5be6", "#17c3b2", "#ff6b5e"][i % 3],
+                    }}
+                  >
+                    <Icon size={18} aria-hidden />
+                  </span>
                   <h2 className="mt-3 text-sm font-semibold text-foreground">{title}</h2>
                   <p className="mt-1.5 text-sm leading-relaxed text-foreground-secondary">
                     {description}
@@ -86,7 +95,7 @@ export default function ContactPage() {
           </Reveal>
 
           <Reveal delay={0.08}>
-            <div className="rounded-3xl border border-border bg-surface p-7">
+            <div className="rounded-3xl glass iri-border p-7">
               <h2 className="font-semibold text-foreground">
                 문의하실 때 알려주시면 좋은 것
               </h2>
@@ -113,7 +122,7 @@ export default function ContactPage() {
           </Reveal>
 
           <Reveal delay={0.16}>
-            <div className="rounded-3xl border border-border bg-surface p-7">
+            <div className="rounded-3xl glass iri-border p-7">
               <h2 className="font-semibold text-foreground">이후 진행 순서</h2>
               <ol className="mt-5 space-y-5">
                 {nextSteps.map(({ step, title, description }) => (
@@ -141,7 +150,7 @@ export default function ContactPage() {
           </Reveal>
 
           <Reveal delay={0.16}>
-            <div className="rounded-3xl border border-border bg-surface p-6 text-center">
+            <div className="rounded-3xl glass iri-border p-6 text-center">
               <p className="text-sm text-foreground-secondary">
                 양식이 불편하면 이메일로 보내셔도 됩니다.
               </p>

@@ -18,8 +18,18 @@ function HomepagePreview() {
         <div className="mt-1 h-4 w-16 rounded-full bg-accent" />
       </div>
       <div className="grid grid-cols-3 gap-1.5">
-        {[0, 1, 2].map((i) => (
-          <div key={i} className="h-8 rounded-md border border-border bg-surface/70" />
+        {[
+          ["#e6e8ff", "#4f5be6"],
+          ["#d5f7f2", "#17c3b2"],
+          ["#ffe6e3", "#ff6b5e"],
+        ].map(([bg, c], i) => (
+          <div
+            key={i}
+            className="flex h-8 items-center justify-center rounded-md"
+            style={{ backgroundColor: bg }}
+          >
+            <div className="h-2.5 w-2.5 rounded" style={{ backgroundColor: c }} />
+          </div>
         ))}
       </div>
     </div>
@@ -32,13 +42,19 @@ function LandingPreview() {
       <div className="h-1.5 w-14 rounded-full bg-warning/60" />
       <div className="h-2.5 w-3/4 rounded bg-foreground/70" />
       <div className="h-1.5 w-1/2 rounded bg-foreground-tertiary/35" />
-      <div className="mt-1 flex gap-1.5 font-mono">
-        {[0, 1, 2, 3].map((i) => (
+      <div className="mt-1 flex gap-1.5">
+        {[
+          ["#e6e8ff", "#4f5be6"],
+          ["#d5f7f2", "#17c3b2"],
+          ["#fff3d6", "#ffc63b"],
+          ["#ffe6e3", "#ff6b5e"],
+        ].map(([bg, c], i) => (
           <div
             key={i}
-            className="flex h-7 w-7 items-center justify-center rounded-md border border-border bg-surface/70"
+            className="flex h-7 w-7 items-center justify-center rounded-md"
+            style={{ backgroundColor: bg }}
           >
-            <div className="h-2 w-3 rounded-sm bg-foreground/50" />
+            <div className="h-2.5 w-2.5 rounded-sm" style={{ backgroundColor: c }} />
           </div>
         ))}
       </div>
@@ -76,11 +92,11 @@ function SystemPreview() {
 function AdminPreview() {
   return (
     <div className="flex h-full p-3 gap-2">
-      <div className="flex w-1/5 flex-col gap-1.5 rounded-md bg-foreground/85 p-1.5 dark:bg-surface-secondary">
-        <div className="h-1.5 w-3/4 rounded bg-background/70 dark:bg-foreground/50" />
-        <div className="mt-1 h-1 w-full rounded bg-background/40 dark:bg-foreground/25" />
-        <div className="h-1 w-5/6 rounded bg-background/40 dark:bg-foreground/25" />
-        <div className="h-1 w-4/6 rounded bg-background/40 dark:bg-foreground/25" />
+      <div className="flex w-1/5 flex-col gap-1.5 rounded-md bg-[#4f5be6] p-1.5">
+        <div className="h-1.5 w-3/4 rounded bg-white/80" />
+        <div className="mt-1 h-1 w-full rounded bg-white/45" />
+        <div className="h-1 w-5/6 rounded bg-white/45" />
+        <div className="h-1 w-4/6 rounded bg-white/45" />
       </div>
       <div className="flex flex-1 flex-col gap-1.5">
         <div className="flex gap-1.5">
@@ -137,21 +153,61 @@ function OperationPreview() {
   );
 }
 
-const previews: Record<Project["category"], () => React.ReactElement> = {
+// 유지보수·운영 — 운영 상태 패널(가동률 + 상태 로그)로 "오픈 이후 관리"를 보여준다
+function MaintenancePreview() {
+  return (
+    <div className="flex h-full flex-col gap-2 p-3">
+      <div className="flex items-center gap-2 rounded-md border border-border bg-surface/70 px-2 py-1.5">
+        <div className="h-1.5 w-1.5 rounded-full bg-success" />
+        <div className="h-1.5 w-14 rounded bg-foreground/60" />
+        <div className="ml-auto h-1.5 w-8 rounded-full bg-success/40" />
+      </div>
+      <div className="flex flex-1 items-end gap-1 rounded-md border border-border bg-surface/70 p-2">
+        {[60, 80, 50, 90, 70, 100, 85, 95, 75, 100, 88, 92].map((h, i) => (
+          <div
+            key={i}
+            className="flex-1 rounded-sm"
+            style={{
+              height: `${h}%`,
+              backgroundColor: ["#c9cff5", "#a9ead9", "#17c3b2", "#4f5be6"][i % 4],
+            }}
+          />
+        ))}
+      </div>
+      <div className="space-y-1.5">
+        {["bg-success", "bg-success", "bg-warning"].map((dot, i) => (
+          <div
+            key={i}
+            className="flex items-center gap-1.5 rounded-md border border-border bg-surface/70 px-2 py-1"
+          >
+            <div className={`h-1 w-1 rounded-full ${dot}`} />
+            <div className="h-1 w-2/5 rounded bg-foreground-tertiary/40" />
+            <div className="ml-auto h-1 w-6 rounded bg-foreground-tertiary/25" />
+          </div>
+        ))}
+      </div>
+    </div>
+  );
+}
+
+export type PreviewCategory = Project["category"] | "maintenance";
+
+const previews: Record<PreviewCategory, () => React.ReactElement> = {
   homepage: HomepagePreview,
   landing: LandingPreview,
   system: SystemPreview,
   admin: AdminPreview,
   operation: OperationPreview,
+  maintenance: MaintenancePreview,
 };
 
-export function DemoPreview({ category }: { category: Project["category"] }) {
+export function DemoPreview({ category }: { category: PreviewCategory }) {
   const Preview = previews[category];
 
   return (
     <div
       aria-hidden
-      className="pointer-events-none select-none overflow-hidden rounded-xl border border-border bg-background shadow-sm transition-all duration-300 group-hover:-translate-y-1 group-hover:shadow-lg"
+      className="pointer-events-none select-none overflow-hidden rounded-xl border border-border bg-background shadow-sm transition-shadow duration-300 group-hover:shadow-md"
     >
       <div className="flex items-center gap-1 border-b border-border bg-surface px-2.5 py-1.5">
         <span className="h-1.5 w-1.5 rounded-full bg-destructive/50" />

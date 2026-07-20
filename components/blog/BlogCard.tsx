@@ -24,7 +24,7 @@ export function BlogCard({ post, index }: { post: BlogPost; index: number }) {
       <Link
         href={`/blog/${post.slug}`}
         aria-label={`${post.title} 글 읽기`}
-        className="group flex flex-col gap-5 rounded-3xl border border-border bg-background p-5 transition-all duration-300 hover:border-accent/30 hover:shadow-xl sm:flex-row"
+        className="iri-border glass group flex flex-col gap-5 rounded-3xl p-5 transition-[transform,box-shadow] duration-300 ease-out hover:-translate-y-1 hover:shadow-2xl sm:flex-row"
       >
         {/* 카테고리별 블로그 전용 미리보기 */}
         <div className="w-full flex-shrink-0 self-center sm:w-48">

@@ -1,36 +1,26 @@
 @import "tailwindcss";
 
 :root {
-  /* Apple-style minimal palette */
+  /* meetzi 컨셉 — 밝은 화이트/연블루 + 비비드 블루 + 플레이풀 포인트 (라이트 전용) */
   --background: #ffffff;
-  --foreground: #1d1d1f;
-  --foreground-secondary: #6e6e73;
-  --foreground-tertiary: #a1a1a6;
-  --surface: #f5f5f7;
-  --surface-secondary: #e8e8ed;
-  --border: #d2d2d7;
-  --accent: #0071e3;
-  --accent-hover: #0077ed;
+  --foreground: #1b2150;
+  --foreground-secondary: #6b7194;
+  --foreground-tertiary: #9096b5;
+  --surface: #f3f6ff;
+  --surface-secondary: #e9edff;
+  --border: #e6e8f5;
+  --accent: #4f5be6;
+  --accent-hover: #3b46c9;
   --accent-foreground: #ffffff;
-  --success: #34c759;
-  --warning: #ff9f0a;
-  --destructive: #ff3b30;
+  --teal: #17c3b2;
+  --coral: #ff6b5e;
+  --yellow: #ffc63b;
+  --green: #34d17d;
+  --success: #34d17d;
+  --warning: #f5a524;
+  --destructive: #ff6b5e;
 
-  /* Spacing */
   --section-padding: 6rem;
-}
-
-.dark {
-  --background: #000000;
-  --foreground: #f5f5f7;
-  --foreground-secondary: #86868b;
-  --foreground-tertiary: #6e6e73;
-  --surface: #1c1c1e;
-  --surface-secondary: #2c2c2e;
-  --border: #38383a;
-  --accent: #2997ff;
-  --accent-hover: #409cff;
-  --accent-foreground: #ffffff;
 }
 
 @theme inline {
@@ -44,6 +34,10 @@
   --color-accent: var(--accent);
   --color-accent-hover: var(--accent-hover);
   --color-accent-foreground: var(--accent-foreground);
+  --color-teal: var(--teal);
+  --color-coral: var(--coral);
+  --color-yellow: var(--yellow);
+  --color-green: var(--green);
   --color-success: var(--success);
   --color-warning: var(--warning);
   --color-destructive: var(--destructive);
@@ -55,83 +49,57 @@ html {
   scroll-behavior: smooth;
 }
 
-/* 제목 줄바꿈 균형 — 한 글자만 다음 줄로 떨어지는 고아 줄 방지 */
 h1,
 h2,
 h3 {
   text-wrap: balance;
 }
 
-@keyframes grow-bar {
-  from {
-    transform: scaleY(0);
-  }
-  to {
-    transform: scaleY(1);
-  }
+/* ── meetzi 유틸리티 ─────────────────────────────────────────────────── */
+
+/* 소프트 화이트 카드 (구 .glass 재활용) */
+.glass {
+  background: #ffffff;
+  border: 1px solid var(--border);
+  box-shadow: 0 10px 30px -14px rgba(27, 33, 80, 0.14);
 }
 
-/* 히어로 인트로 — JS 하이드레이션과 무관하게 첫 페인트에서 시작 (LCP 보호) */
-@keyframes fade-up {
-  from {
-    opacity: 0;
-    transform: translateY(20px);
-  }
-  to {
-    opacity: 1;
-    transform: translateY(0);
-  }
+/* 구 무지개 림 — no-op으로 중립화 (position만 유지) */
+.iri-border {
+  position: relative;
 }
 
-.animate-fade-up {
-  animation: fade-up 0.55s cubic-bezier(0.25, 0.1, 0.25, 1) both;
+/* 블루 CTA 소프트 글로우 (구 .iri-glow 재활용) */
+.iri-glow {
+  box-shadow: 0 14px 30px -10px rgba(79, 91, 230, 0.5);
 }
 
-/* 히어로 배경 블롭 — 형태가 천천히 뭉그러지며 변하는 모프 루프 */
-/* 마우스 추적(바깥 레이어의 transform)과 겹치지 않도록 모프는 안쪽 레이어에서
-   border-radius/scale만 움직인다 */
-@keyframes blob-morph {
-  0%,
-  100% {
-    border-radius: 42% 58% 55% 45% / 55% 42% 58% 45%;
-    scale: 1;
-  }
-  50% {
-    border-radius: 58% 42% 45% 55% / 45% 58% 42% 55%;
-    scale: 1.1;
-  }
+/* 강조 텍스트 — 솔리드 블루 (구 .iri-text 재활용) */
+.iri-text {
+  color: var(--accent);
 }
 
-.animate-blob {
-  animation: blob-morph 9s ease-in-out infinite;
-}
-
-@media (prefers-reduced-motion: reduce) {
-  .animate-fade-up,
-  .animate-blob {
-    animation: none;
-  }
+/* 풀블리드 블루 CTA 밴드 */
+.block-blue {
+  background-color: var(--accent);
+  color: #ffffff;
 }
 
 body {
   background: var(--background);
   color: var(--foreground);
   font-family: var(--font-pretendard, -apple-system, BlinkMacSystemFont, "Apple SD Gothic Neo", "Segoe UI", sans-serif);
-  /* 한국어 타이포그래피: 단어 중간 줄바꿈 방지 (긴 URL 등은 break-word로 안전장치) */
   word-break: keep-all;
   overflow-wrap: break-word;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
 }
 
-/* Focus visible for accessibility */
 :focus-visible {
   outline: 2px solid var(--accent);
   outline-offset: 2px;
-  border-radius: 4px;
 }
 
-/* Custom scrollbar */
 ::-webkit-scrollbar {
   width: 6px;
 }
@@ -140,13 +108,11 @@ body {
 }
 ::-webkit-scrollbar-thumb {
   background: var(--border);
-  border-radius: 3px;
 }
 ::-webkit-scrollbar-thumb:hover {
   background: var(--foreground-tertiary);
 }
 
-/* Selection */
 ::selection {
   background: var(--accent);
   color: var(--accent-foreground);

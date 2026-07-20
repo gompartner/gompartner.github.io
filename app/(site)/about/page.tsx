@@ -13,6 +13,7 @@ export default function AboutPage() {
   return (
     <Section>
       <SectionHeading
+        size="display"
         label="About"
         title="어떤 사람이 만드나요"
         description="작은 사업이 웹에서 빠르게 시작하고 꾸준히 운영될 수 있도록 돕는 방향으로 일합니다."

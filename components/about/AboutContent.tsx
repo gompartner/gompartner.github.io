@@ -8,7 +8,7 @@ import {
   ArrowRight,
   Briefcase,
   Mail,
-  MapPin,
+  Video,
   RefreshCcw,
   Smartphone,
   Target,
@@ -86,7 +86,7 @@ export function AboutContent() {
 
           <div className="flex flex-col gap-2">
             <p className="flex items-center gap-2 text-foreground-secondary text-sm">
-              <MapPin size={15} aria-hidden />
+              <Video size={15} aria-hidden />
               {profile.location}
             </p>
             <p className="flex items-center gap-2 text-foreground-secondary text-sm">
@@ -136,9 +136,15 @@ export function AboutContent() {
               initial={{ opacity: 0, y: 20 }}
               animate={inView ? { opacity: 1, y: 0 } : {}}
               transition={{ duration: 0.5, delay: 0.25 + i * 0.08 }}
-              className="p-6 rounded-2xl border border-border bg-surface"
+              className="iri-border glass rounded-2xl p-6"
             >
-              <div className="flex h-11 w-11 items-center justify-center rounded-xl bg-accent/10 text-accent">
+              <div
+                className="flex h-11 w-11 items-center justify-center rounded-xl"
+                style={{
+                  backgroundColor: ["#e6e8ff", "#d5f7f2", "#ffe6e3", "#fff3d6"][i % 4],
+                  color: ["#4f5be6", "#17c3b2", "#ff6b5e", "#ffc63b"][i % 4],
+                }}
+              >
                 <Icon size={20} aria-hidden />
               </div>
               <h3 className="mt-4 font-semibold text-foreground">{title}</h3>
@@ -155,18 +161,18 @@ export function AboutContent() {
         initial={{ opacity: 0, y: 20 }}
         animate={inView ? { opacity: 1, y: 0 } : {}}
         transition={{ duration: 0.5, delay: 0.5 }}
-        className="flex flex-col items-center gap-4 rounded-3xl bg-gradient-to-br from-accent/12 to-accent/4 p-10 text-center"
+        className="glass flex flex-col items-center gap-4 rounded-3xl p-10 text-center"
       >
         <p className="text-xl font-semibold text-foreground">
           어떤 사이트가 필요한지 막연해도 괜찮습니다.
         </p>
         <p className="text-sm text-foreground-secondary">
-          상담과 견적은 무료입니다. 편하게 물어보세요.
+          편하게 물어보세요. 무엇부터 해야 할지 몰라도 괜찮습니다.
         </p>
         <Link
           href="/contact"
           data-gtm-cta="about_contact"
-          className="inline-flex items-center gap-2 rounded-full bg-accent px-6 py-3 text-sm font-medium text-accent-foreground transition-all hover:bg-accent-hover active:scale-95"
+          className="inline-flex items-center gap-2 rounded-full bg-accent px-6 py-3 text-sm font-medium text-accent-foreground iri-glow transition-all hover:bg-accent-hover active:scale-95"
         >
           상담 문의하기
           <ArrowRight size={16} aria-hidden />
