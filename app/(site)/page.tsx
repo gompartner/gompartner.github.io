@@ -1,14 +1,9 @@
 import type { Metadata } from "next";
 import { Hero } from "@/components/home/Hero";
 import { Statement } from "@/components/home/Statement";
-import { PainPoints } from "@/components/home/PainPoints";
 import { ServicesGrid } from "@/components/home/ServicesGrid";
-import { DemoShowcase } from "@/components/home/DemoShowcase";
-import { Differentiators } from "@/components/home/Differentiators";
-import { ProcessTimeline } from "@/components/home/ProcessTimeline";
 import { PricingGuide } from "@/components/home/PricingGuide";
 import { Faq } from "@/components/home/Faq";
-import { CtaBand } from "@/components/home/CtaBand";
 import { FaqJsonLd } from "@/components/seo/JsonLd";
 import { profile } from "@/data/profile";
 
@@ -28,14 +23,9 @@ export default function HomePage() {
       <FaqJsonLd />
       <Hero />
       <Statement />
-      <PainPoints />
       <ServicesGrid />
-      <Differentiators />
-      <ProcessTimeline />
-      <DemoShowcase />
       <PricingGuide />
       <Faq />
-      <CtaBand />
     </>
   );
 }

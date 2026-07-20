@@ -12,9 +12,10 @@ export default function PortfolioPage() {
   return (
     <Section>
       <SectionHeading
+        size="display"
         label="Portfolio"
-        title="말보다, 직접 만져보세요"
-        description="직접 클릭하고 입력해 보는 샘플 데모입니다. 실제 프로젝트는 사업에 맞춰 새로 설계합니다."
+        title="데모 체험"
+        description="여러분 사업에 맞는 건 상담하면서 새로 만들어 드립니다."
       />
       <PortfolioGrid />
     </Section>

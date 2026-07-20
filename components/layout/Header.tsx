@@ -7,7 +7,6 @@ import { useState, useEffect } from "react";
 import { Menu, X } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { profile } from "@/data/profile";
-import { ThemeToggle } from "./ThemeToggle";
 
 const navItems = [
   { href: "/", label: "홈" },
@@ -37,7 +36,7 @@ export function Header() {
         // 깜빡임을 유발해 사용하지 않는다. 거의 불투명한 배경으로 대체.
         "fixed top-0 left-0 right-0 z-50 border-b transition-[background-color,border-color,box-shadow] duration-300 [transform:translateZ(0)]",
         isScrolled
-          ? "bg-background/95 border-border shadow-sm"
+          ? "bg-white/70 backdrop-blur-xl border-border shadow-sm"
           : "bg-transparent border-transparent"
       )}
     >
@@ -87,11 +86,10 @@ export function Header() {
         </ul>
 
         <div className="flex items-center gap-2">
-          <ThemeToggle />
           <Link
             href="/contact"
             data-gtm-cta="header_contact"
-            className="hidden md:inline-flex items-center rounded-full bg-accent px-4 py-2 text-sm font-medium text-accent-foreground transition-all hover:bg-accent-hover active:scale-95"
+            className="hidden md:inline-flex items-center rounded-full bg-accent px-4 py-2 text-sm font-medium text-accent-foreground iri-glow transition-all hover:bg-accent-hover active:scale-95"
           >
             상담 문의
           </Link>

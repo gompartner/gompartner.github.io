@@ -1,12 +1,10 @@
 "use client";
 
-import { useState, useCallback } from "react";
+import { useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { cn } from "@/lib/utils";
 import { projects } from "@/data/projects";
-import type { Project } from "@/lib/types";
 import { ProjectCard } from "./ProjectCard";
-import { ProjectModal } from "./ProjectModal";
 
 const categories = [
   { id: "all", label: "전체" },
@@ -19,27 +17,19 @@ const categories = [
 
 export function PortfolioGrid() {
   const [activeCategory, setActiveCategory] = useState("all");
-  const [selectedProject, setSelectedProject] = useState<Project | null>(null);
 
-  const filtered = activeCategory === "all"
-    ? projects
-    : projects.filter((p) => p.category === activeCategory);
-
-  const handleSelect = useCallback((project: Project) => {
-    setSelectedProject(project);
-  }, []);
-
-  const handleClose = useCallback(() => {
-    setSelectedProject(null);
-  }, []);
+  const filtered =
+    activeCategory === "all"
+      ? projects
+      : projects.filter((p) => p.category === activeCategory);
 
   return (
     <>
-      {/* Filter tabs */}
+      {/* 카테고리 필터 */}
       <div
         role="tablist"
         aria-label="프로젝트 카테고리 필터"
-        className="flex flex-wrap gap-2 mb-10"
+        className="mb-10 flex flex-wrap gap-2"
       >
         {categories.map(({ id, label }) => (
           <button
@@ -48,10 +38,10 @@ export function PortfolioGrid() {
             aria-selected={activeCategory === id}
             onClick={() => setActiveCategory(id)}
             className={cn(
-              "px-4 py-2 rounded-full text-sm font-medium transition-all duration-200",
+              "rounded-full px-4 py-2 text-sm font-medium transition-all duration-200",
               activeCategory === id
-                ? "bg-foreground text-background"
-                : "bg-surface border border-border text-foreground-secondary hover:text-foreground hover:border-foreground-tertiary"
+                ? "bg-accent text-white shadow-sm"
+                : "glass text-foreground-secondary hover:text-foreground"
             )}
           >
             {label}
@@ -59,35 +49,20 @@ export function PortfolioGrid() {
         ))}
       </div>
 
-      {/* Grid */}
-      <motion.div
-        layout
-        className="grid sm:grid-cols-2 lg:grid-cols-3 gap-6"
-      >
+      {/* 그리드 */}
+      <motion.div layout className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
         <AnimatePresence mode="popLayout">
           {filtered.map((project, i) => (
-            <ProjectCard
-              key={project.id}
-              project={project}
-              index={i}
-              onClick={() => handleSelect(project)}
-            />
+            <ProjectCard key={project.id} project={project} index={i} />
           ))}
         </AnimatePresence>
       </motion.div>
 
       {filtered.length === 0 && (
-        <p className="text-center text-foreground-secondary py-16">
+        <p className="py-16 text-center text-foreground-secondary">
           해당 카테고리의 프로젝트가 없습니다.
         </p>
       )}
-
-      {/* Modal */}
-      <AnimatePresence>
-        {selectedProject && (
-          <ProjectModal project={selectedProject} onClose={handleClose} />
-        )}
-      </AnimatePresence>
     </>
   );
 }

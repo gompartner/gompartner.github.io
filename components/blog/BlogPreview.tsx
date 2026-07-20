@@ -34,7 +34,7 @@ function CostScene() {
       <div className="my-1 h-px bg-border" />
       <div className="flex items-center justify-between gap-2">
         <div className="h-3 w-1/3 rounded bg-foreground/50" />
-        <div className="h-3 w-14 rounded bg-accent" />
+        <div className="h-3 w-14 rounded bg-[#34d17d]" />
       </div>
     </div>
   );
@@ -53,7 +53,7 @@ function LandingScene() {
         <div className="h-6 rounded bg-foreground-tertiary/15" />
       </div>
       <div className="my-0.5 h-4 w-px bg-accent/40" />
-      <div className="h-6 w-2/5 rounded-full bg-accent shadow-[0_4px_14px_rgba(0,113,227,0.4)]" />
+      <div className="h-6 w-2/5 rounded-full bg-[#ff6b5e] shadow-[0_4px_14px_rgba(255,107,94,0.4)]" />
     </div>
   );
 }
@@ -66,8 +66,8 @@ function SearchScene() {
         <div className="h-2.5 w-2.5 rounded-full border-[1.5px] border-foreground-tertiary/50" />
         <div className="h-2 w-1/2 rounded bg-foreground-tertiary/25" />
       </div>
-      <div className="space-y-1 rounded-md border border-accent/40 bg-accent/10 p-2">
-        <div className="h-2.5 w-3/5 rounded bg-accent/80" />
+      <div className="space-y-1 rounded-md border border-[#17c3b2]/40 bg-[#17c3b2]/10 p-2">
+        <div className="h-2.5 w-3/5 rounded bg-[#17c3b2]" />
         <div className="h-2 w-4/5 rounded bg-foreground-tertiary/25" />
       </div>
       {[0, 1].map((i) => (
@@ -113,7 +113,7 @@ function MarketingScene() {
       {bars.map((h, i) => (
         <div
           key={i}
-          className={`w-5 rounded-t ${i >= bars.length - 2 ? "bg-accent" : "bg-accent/30"}`}
+          className={`w-5 rounded-t ${i >= bars.length - 2 ? "bg-[#ff6b5e]" : "bg-[#17c3b2]/40"}`}
           style={{ height: `${h}%` }}
         />
       ))}
@@ -125,13 +125,13 @@ function MarketingScene() {
 function StartupScene() {
   return (
     <div className="flex h-full flex-col items-center justify-center gap-2.5 p-3">
-      <div className="flex h-10 w-10 items-center justify-center rounded-2xl bg-accent/15">
-        <div className="h-4 w-4 rounded-full bg-accent" />
+      <div className="flex h-10 w-10 items-center justify-center rounded-2xl bg-[#ffc63b]/20">
+        <div className="h-4 w-4 rounded-full bg-[#ffc63b]" />
       </div>
       <div className="h-3 w-1/2 rounded bg-foreground/50" />
       <div className="h-2 w-2/3 rounded bg-foreground-tertiary/25" />
       <div className="mt-1 flex gap-1.5">
-        <div className="h-5 w-16 rounded-full bg-accent" />
+        <div className="h-5 w-16 rounded-full bg-[#ffc63b]" />
         <div className="h-5 w-16 rounded-full border border-border" />
       </div>
     </div>
@@ -145,11 +145,11 @@ function KnowhowScene() {
       <div className="h-3 w-2/5 rounded bg-foreground/50" />
       {[80, 65, 72].map((w, i) => (
         <div key={i} className="flex items-center gap-2">
-          <div className="h-1.5 w-1.5 rounded-full bg-accent" />
+          <div className="h-1.5 w-1.5 rounded-full bg-[#17c3b2]" />
           <div className="h-2 rounded bg-foreground-tertiary/20" style={{ width: `${w}%` }} />
         </div>
       ))}
-      <div className="mt-1 rounded-md border-l-2 border-accent bg-accent/10 p-2">
+      <div className="mt-1 rounded-md border-l-2 border-[#17c3b2] bg-[#17c3b2]/10 p-2">
         <div className="h-2 w-3/4 rounded bg-foreground-tertiary/30" />
       </div>
     </div>

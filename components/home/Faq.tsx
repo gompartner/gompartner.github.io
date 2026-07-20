@@ -1,12 +1,13 @@
 import { ChevronDown } from "lucide-react";
 import Section, { SectionHeading } from "@/components/ui/Section";
 import { Reveal } from "@/components/motion/Reveal";
+import { Doodles } from "@/components/home/Doodles";
 import { faqItems } from "@/data/faq";
 import type { FaqItem } from "@/data/faq";
 
 function FaqColumn({ items }: { items: FaqItem[] }) {
   return (
-    <div className="h-fit divide-y divide-border rounded-3xl border border-border bg-surface px-6">
+    <div className="iri-border glass h-fit divide-y divide-border rounded-3xl px-6">
       {items.map(({ question, answer }) => (
         <details key={question} className="group py-5">
           <summary className="flex cursor-pointer list-none items-center justify-between gap-4 font-medium text-foreground [&::-webkit-details-marker]:hidden">
@@ -33,9 +34,16 @@ export function Faq() {
   const right = faqItems.slice(half);
 
   return (
-    <Section id="faq" aria-labelledby="faq-heading" className="py-20 md:py-28">
+    <Section
+      id="faq"
+      aria-labelledby="faq-heading"
+      className="relative overflow-hidden py-24 md:py-32 lg:py-40"
+    >
+      <Doodles variant={2} />
       <SectionHeading
+        index="03"
         label="FAQ"
+        size="display"
         title="자주 묻는 질문"
         titleId="faq-heading"
         description="상담 전에 가장 많이 물어보시는 것들입니다. 더 궁금한 점은 편하게 문의해 주세요."

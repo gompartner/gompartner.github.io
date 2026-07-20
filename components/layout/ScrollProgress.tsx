@@ -18,7 +18,7 @@ export function ScrollProgress() {
   return (
     <motion.div
       aria-hidden
-      className="fixed top-0 left-0 right-0 z-[60] h-0.5 origin-left bg-gradient-to-r from-accent to-accent-hover"
+      className="fixed top-0 left-0 right-0 z-[60] h-0.5 origin-left bg-[linear-gradient(to_right,#db2777,#7c3aed,#2563eb,#9333ea)]"
       style={{ scaleX: progress }}
     />
   );

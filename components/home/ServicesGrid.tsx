@@ -1,53 +1,97 @@
+import Link from "next/link";
+import { ArrowUpRight } from "lucide-react";
 import Section, { SectionHeading } from "@/components/ui/Section";
 import { Reveal } from "@/components/motion/Reveal";
-import { TiltCard } from "@/components/motion/TiltCard";
-import { services, capabilityChips } from "@/data/services";
+import { DemoPreview } from "@/components/home/DemoPreview";
+import { Doodles } from "@/components/home/Doodles";
+import { services } from "@/data/services";
+import { projects } from "@/data/projects";
+
+// 서비스 preview 카테고리 → 해당 라이브 데모 URL (Services + Demos 병합)
+const demoByCategory: Record<string, string> = Object.fromEntries(
+  projects.filter((p) => p.demoUrl).map((p) => [p.category, p.demoUrl!])
+);
+
+// meetzi식 컬러 아이콘 타일 팔레트 (카드 인덱스로 순환)
+const iconTiles = [
+  { c: "#4f5be6", bg: "#e6e8ff" },
+  { c: "#17c3b2", bg: "#d5f7f2" },
+  { c: "#ff6b5e", bg: "#ffe6e3" },
+  { c: "#ffc63b", bg: "#fff3d6" },
+  { c: "#34d17d", bg: "#dcf6e8" },
+  { c: "#4f5be6", bg: "#e6e8ff" },
+];
 
 export function ServicesGrid() {
   return (
-    <Section id="services" aria-labelledby="services-heading" className="py-20 md:py-28">
+    <Section
+      id="services"
+      aria-labelledby="services-heading"
+      className="relative overflow-hidden py-24 md:py-32 lg:py-40"
+    >
+      <Doodles variant={0} />
       <SectionHeading
+        index="01"
         label="Services"
-        title="필요한 것만, 제대로"
+        size="display"
+        title="이런 걸 만들어 드립니다"
         titleId="services-heading"
-        description="과한 기능을 권하지 않습니다. 지금 사업에 필요한 범위만 제안하고, 오래 쓸 수 있게 만듭니다."
+        description="아래 미리보기는 직접 클릭해 만져보는 샘플입니다. 지금 필요한 범위만 골라 만들고, 오픈 뒤에도 검색·트렌드에 맞춰 꾸준히 손봐가며 함께 운영합니다."
       />
 
-      <div className="grid gap-5 md:grid-cols-2 lg:grid-cols-3">
-        {services.map(({ icon: Icon, title, description }, i) => (
-          <Reveal key={title} delay={(i % 3) * 0.08} className="h-full">
-            <TiltCard className="h-full">
-              <article className="group h-full rounded-3xl border border-border bg-surface p-6 transition-[border-color,box-shadow] duration-300 hover:border-accent/30 hover:shadow-xl">
-                <div className="flex h-12 w-12 items-center justify-center rounded-2xl bg-accent/10 text-accent transition-colors duration-300 group-hover:bg-accent group-hover:text-accent-foreground">
-                  <Icon size={22} aria-hidden />
+      {/* 소프트 라운드 유리 카드 — 각 카드에서 바로 데모 체험 */}
+      <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
+        {services.map(({ icon: Icon, title, description, preview }, i) => {
+          const demoUrl = demoByCategory[preview];
+          return (
+            <Reveal key={title} delay={(i % 3) * 0.08} className="h-full">
+              <article className="iri-border glass group flex h-full flex-col rounded-3xl p-6 transition-[transform,box-shadow] duration-300 ease-out hover:-translate-y-1 hover:shadow-2xl md:p-7">
+                <div className="flex items-center justify-between">
+                  <span
+                    className="flex h-12 w-12 items-center justify-center rounded-2xl transition-transform duration-300 group-hover:-rotate-6"
+                    style={{
+                      backgroundColor: iconTiles[i % iconTiles.length].bg,
+                      color: iconTiles[i % iconTiles.length].c,
+                    }}
+                  >
+                    <Icon size={24} aria-hidden />
+                  </span>
+                  <span className="text-2xl font-black tabular-nums leading-none text-foreground-tertiary/40">
+                    {String(i + 1).padStart(2, "0")}
+                  </span>
                 </div>
-                <h3 className="mt-5 text-xl font-semibold text-foreground">{title}</h3>
-                <p className="mt-3 text-sm leading-relaxed text-foreground-secondary">
+
+                {/* 결과물 미리보기 */}
+                <div className="mt-6">
+                  <DemoPreview category={preview} />
+                </div>
+
+                <h3 className="mt-6 text-xl font-bold tracking-tight text-foreground">
+                  {title}
+                </h3>
+                <p className="mt-2.5 break-keep text-sm leading-relaxed text-foreground-secondary">
                   {description}
                 </p>
-              </article>
-            </TiltCard>
-          </Reveal>
-        ))}
-      </div>
 
-      <Reveal delay={0.15}>
-        <div className="mt-14 text-center">
-          <p className="text-sm font-medium text-foreground-tertiary">
-            이 외에도 필요한 만큼 만들 수 있습니다
-          </p>
-          <ul className="mx-auto mt-5 flex max-w-3xl flex-wrap justify-center gap-2.5">
-            {capabilityChips.map((chip) => (
-              <li
-                key={chip}
-                className="rounded-full border border-border bg-background px-4 py-1.5 text-sm text-foreground-secondary"
-              >
-                {chip}
-              </li>
-            ))}
-          </ul>
-        </div>
-      </Reveal>
+                {demoUrl && (
+                  <Link
+                    href={demoUrl}
+                    data-gtm-cta={`service_demo_${preview}`}
+                    className="mt-auto inline-flex items-center gap-1.5 pt-5 text-sm font-semibold text-accent transition-colors hover:text-accent-hover"
+                  >
+                    직접 체험하기
+                    <ArrowUpRight
+                      size={15}
+                      aria-hidden
+                      className="transition-transform duration-300 group-hover:translate-x-0.5 group-hover:-translate-y-0.5"
+                    />
+                  </Link>
+                )}
+              </article>
+            </Reveal>
+          );
+        })}
+      </div>
     </Section>
   );
 }
