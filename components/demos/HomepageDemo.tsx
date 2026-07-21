@@ -311,16 +311,16 @@ export function HomepageDemo() {
     const list = listRef.current;
     const card = cardRefs.current[id];
     if (!list || !card) return;
-    if (list.scrollHeight > list.clientHeight) {
+    // 가로 슬라이더(모바일)를 먼저 판정 — 세로는 패딩 등으로 1~2px 오차가 생겨 오판할 수 있다
+    if (list.scrollWidth > list.clientWidth + 1) {
+      list.scrollTo({
+        left: card.getBoundingClientRect().left - list.getBoundingClientRect().left + list.scrollLeft - 16,
+        behavior: "smooth",
+      });
+    } else if (list.scrollHeight > list.clientHeight + 1) {
       // 데스크톱: 세로 내부 스크롤 리스트
       list.scrollTo({
         top: card.getBoundingClientRect().top - list.getBoundingClientRect().top + list.scrollTop - 8,
-        behavior: "smooth",
-      });
-    } else if (list.scrollWidth > list.clientWidth) {
-      // 모바일: 가로 슬라이더
-      list.scrollTo({
-        left: card.getBoundingClientRect().left - list.getBoundingClientRect().left + list.scrollLeft - 16,
         behavior: "smooth",
       });
     }
@@ -492,8 +492,8 @@ export function HomepageDemo() {
         }
       `}</style>
 
-      {/* 상단 내비 */}
-      <nav className="fixed inset-x-0 top-0 z-40 mix-blend-difference">
+      {/* 상단 내비 — 히어로 위에서만 보이고, 스크롤 후에는 스티키 예약바가 헤더 역할을 한다 */}
+      <nav className="absolute inset-x-0 top-0 z-40 mix-blend-difference">
         <div className="flex items-center justify-between px-5 py-5 text-white sm:px-8">
           <a href="#top" className="text-lg font-black uppercase tracking-widest">
             Grizzly<span className="align-super text-[10px] font-semibold tracking-normal">™</span>
@@ -609,6 +609,14 @@ export function HomepageDemo() {
               예약하기
               <ArrowUpRight size={15} aria-hidden />
             </button>
+            <button
+              type="button"
+              onClick={() => openTutorial(0)}
+              aria-label="예약 가이드 보기"
+              className="shrink-0 rounded-lg border border-stone-200 p-2.5 text-stone-400 transition-colors hover:border-[#111] hover:text-[#111]"
+            >
+              <HelpCircle size={16} aria-hidden />
+            </button>
           </div>
           {/* 예약 진행 스테퍼 */}
           <ol className="mt-2.5 flex items-center gap-1 overflow-x-auto text-[11px] font-medium text-stone-400 sm:gap-2 sm:text-xs">
@@ -630,16 +638,6 @@ export function HomepageDemo() {
                 </li>
               );
             })}
-            <li className="ml-auto shrink-0">
-              <button
-                type="button"
-                onClick={() => openTutorial(0)}
-                className="flex items-center gap-1 text-stone-400 transition-colors hover:text-[#111]"
-              >
-                <HelpCircle size={13} aria-hidden />
-                예약 가이드
-              </button>
-            </li>
           </ol>
         </div>
       </div>
@@ -651,8 +649,9 @@ export function HomepageDemo() {
           <Reveal>
             <p className="mt-3 text-sm text-stone-500">지도의 핀이 곧 지역 선택입니다 — 핀을 눌러 예약을 시작하세요.</p>
           </Reveal>
+          {/* 모바일은 지도-카드 사이 간격을 더 넉넉하게 */}
           <div
-            className="mt-8 grid gap-6 lg:grid-cols-[2fr_3fr]"
+            className="mt-8 grid gap-10 lg:gap-6 lg:grid-cols-[2fr_3fr]"
             style={{ "--map-h": mapHeight ? `${mapHeight}px` : "600px" } as React.CSSProperties}
           >
             {/* 좌측: 서울 행정구역 지도 + 핀 오버레이 */}
@@ -707,8 +706,9 @@ export function HomepageDemo() {
                             aria-hidden
                           />
                         </span>
+                        {/* 작은 화면에서는 라벨끼리 겹쳐서 핀만 보여준다 */}
                         <span
-                          className={`absolute left-1/2 top-full -translate-x-1/2 whitespace-nowrap text-xs font-bold tracking-tight ${
+                          className={`absolute left-1/2 top-full hidden -translate-x-1/2 whitespace-nowrap text-xs font-bold tracking-tight sm:block ${
                             active ? "text-[#15803d]" : "text-stone-600"
                           }`}
                           aria-hidden
@@ -730,7 +730,7 @@ export function HomepageDemo() {
             {/* 우측: 지점 카드 리스트 — 모바일은 가로 슬라이더, 데스크톱은 지도 높이에 맞춘 내부 스크롤 */}
             <div
               ref={listRef}
-              className="-mx-4 flex snap-x snap-mandatory gap-4 overflow-x-auto px-4 pb-3 lg:mx-0 lg:grid lg:max-h-[var(--map-h)] lg:grid-cols-2 lg:content-start lg:gap-5 lg:overflow-y-auto lg:overflow-x-hidden lg:px-0 lg:pb-0 lg:pr-3 lg:[scrollbar-width:thin]"
+              className="flex snap-x snap-mandatory gap-4 overflow-x-auto pb-3 lg:grid lg:max-h-[var(--map-h)] lg:grid-cols-2 lg:content-start lg:gap-5 lg:overflow-y-auto lg:overflow-x-hidden lg:pb-0 lg:pr-3 lg:[scrollbar-width:thin]"
             >
               {locations.map((loc) => {
                 const active = booking.locationId === loc.id;
@@ -1040,11 +1040,12 @@ export function HomepageDemo() {
               <p className="font-mono text-xs font-semibold uppercase tracking-[0.2em] text-stone-500">
                 내 예약 ({(booking.reservations ?? []).length})
               </p>
-              <div className="mt-4 flex snap-x gap-4 overflow-x-auto pb-3 [scrollbar-width:thin]">
+              {/* 모바일은 세로 스택, sm 이상은 한 줄 가로 스트립 */}
+              <div className="mt-4 flex flex-col gap-3 sm:snap-x sm:flex-row sm:gap-4 sm:overflow-x-auto sm:pb-3 sm:[scrollbar-width:thin]">
                 {(booking.reservations ?? []).map((r) => {
                   const loc = locations.find((l) => l.id === r.locationId);
                   return (
-                    <div key={r.id} className="w-64 shrink-0 snap-start rounded-2xl border border-stone-200 bg-white p-4">
+                    <div key={r.id} className="w-full rounded-2xl border border-stone-200 bg-white p-4 sm:w-64 sm:shrink-0 sm:snap-start">
                       <button
                         type="button"
                         onClick={() => {
@@ -1141,10 +1142,11 @@ export function HomepageDemo() {
             }
           />
         </div>
-        <div className="mt-8 overflow-x-auto pb-4 [scrollbar-width:thin]">
-          <div className="mx-auto flex w-max snap-x gap-4 px-4">
+        {/* 모바일은 세로 스택, sm 이상은 가로 캐러셀 */}
+        <div className="mt-8 sm:overflow-x-auto sm:pb-4 sm:[scrollbar-width:thin]">
+          <div className="flex flex-col gap-3 px-4 sm:mx-auto sm:w-max sm:snap-x sm:flex-row sm:gap-4">
             {reviews.map((r) => (
-              <blockquote key={r.text} className="w-80 shrink-0 snap-start rounded-2xl border border-stone-200 bg-white p-6">
+              <blockquote key={r.text} className="w-full rounded-2xl border border-stone-200 bg-white p-6 sm:w-80 sm:shrink-0 sm:snap-start">
                 <Stars rating={r.rating} size={15} />
                 <p className="mt-4 leading-relaxed">{r.text}</p>
                 <footer className="mt-5 font-mono text-sm font-medium text-stone-400">{r.meta}</footer>
@@ -1249,7 +1251,7 @@ export function HomepageDemo() {
               className="inline-flex items-center gap-1.5 rounded-full border border-stone-700 px-3.5 py-2 font-medium text-stone-300 transition-colors hover:border-[#4ade80] hover:text-[#4ade80]"
             >
               <RotateCcw size={13} aria-hidden />
-              입장 영상 다시 보기
+              스튜디오 투어 보기
             </button>
           </div>
         </div>
@@ -1337,13 +1339,21 @@ export function HomepageDemo() {
           >
             <div
               className="pointer-events-none absolute rounded-2xl border-2 border-[#16A34A] transition-all duration-300"
-              style={{
-                top: tutRect.top - 8,
-                left: tutRect.left - 8,
-                width: tutRect.width + 16,
-                height: tutRect.height + 16,
-                boxShadow: "0 0 0 9999px rgba(0,0,0,.55)",
-              }}
+              style={(() => {
+                // 대상이 화면보다 크거나 가장자리에 붙어도 초록 테두리 4변이 항상 보이게 뷰포트 안쪽으로 클램프
+                const inset = 6;
+                const left = Math.max(tutRect.left - 8, inset);
+                const top = Math.max(tutRect.top - 8, inset);
+                const right = Math.min(tutRect.left + tutRect.width + 8, window.innerWidth - inset);
+                const bottom = Math.min(tutRect.top + tutRect.height + 8, window.innerHeight - inset);
+                return {
+                  top,
+                  left,
+                  width: Math.max(right - left, 0),
+                  height: Math.max(bottom - top, 0),
+                  boxShadow: "0 0 0 9999px rgba(0,0,0,.55)",
+                };
+              })()}
               aria-hidden
             />
             <div
