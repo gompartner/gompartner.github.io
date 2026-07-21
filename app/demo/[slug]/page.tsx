@@ -3,11 +3,6 @@ import type { ComponentType } from "react";
 import { notFound } from "next/navigation";
 import { projects } from "@/data/projects";
 import { HomepageDemo } from "@/components/demos/HomepageDemo";
-import { LandingDemo } from "@/components/demos/LandingDemo";
-import { ReservationDemo } from "@/components/demos/ReservationDemo";
-import { AdminDemo } from "@/components/demos/AdminDemo";
-import { AutomationDemo } from "@/components/demos/AutomationDemo";
-import { SaasLandingDemo } from "@/components/demos/SaasLandingDemo";
 
 interface DemoPageProps {
   params: Promise<{ slug: string }>;
@@ -15,11 +10,6 @@ interface DemoPageProps {
 
 const demoComponents: Record<string, ComponentType> = {
   "small-business-homepage": HomepageDemo,
-  "event-promotion-landing": LandingDemo,
-  "reservation-inquiry-system": ReservationDemo,
-  "operations-admin-dashboard": AdminDemo,
-  "api-automation-hub": AutomationDemo,
-  "saas-product-landing": SaasLandingDemo,
 };
 
 function findDemo(slug: string) {
