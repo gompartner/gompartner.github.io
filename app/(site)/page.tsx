@@ -60,13 +60,13 @@ export default function HomePage() {
             </div>
           </div>
           <Link
-            href="/demo/clinic-report"
-            aria-label="피부 진단 결과 보고서 프로그램 데모 보기"
+            href="/demo/small-business-homepage"
+            aria-label="프라이빗 짐 예약 서비스 데모 보기"
             className="block overflow-hidden rounded-[10px] border border-border bg-white lg:col-span-7"
           >
             <Image
-              src="/images/demos/clinic-report.jpg"
-              alt="피부 진단 결과 보고서 미리보기 화면"
+              src="/images/demos/private-gym.jpg"
+              alt="프라이빗 짐 예약 서비스 첫 화면"
               width={1440}
               height={900}
               priority
