@@ -1,4 +1,5 @@
 import { Header } from "@/components/layout/Header";
+import { ChannelTalk } from "@/components/layout/ChannelTalk";
 import { Footer } from "@/components/layout/Footer";
 import {
   PersonJsonLd,
@@ -16,6 +17,7 @@ export default function SiteLayout({
       <PersonJsonLd />
       <ProfessionalServiceJsonLd />
       <WebSiteJsonLd />
+      <ChannelTalk />
       <Header />
       <main className="flex-1 pt-16">{children}</main>
       <Footer />
