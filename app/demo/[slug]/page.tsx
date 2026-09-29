@@ -2,13 +2,31 @@ import type { Metadata } from "next";
 import type { ComponentType } from "react";
 import { notFound } from "next/navigation";
 import { projects } from "@/data/projects";
+import { AccessibilityDemo } from "@/components/demos/AccessibilityDemo";
+import { ApplicationDemo } from "@/components/demos/ApplicationDemo";
+import { ClinicHomepageDemo } from "@/components/demos/ClinicHomepageDemo";
+import { ClinicReportDemo } from "@/components/demos/ClinicReportDemo";
+import { CommunityMapDemo } from "@/components/demos/CommunityMapDemo";
+import { DistrictPortalDemo } from "@/components/demos/DistrictPortalDemo";
 import { HomepageDemo } from "@/components/demos/HomepageDemo";
+import { JobPortalDemo } from "@/components/demos/JobPortalDemo";
+import { MaintenanceDemo } from "@/components/demos/MaintenanceDemo";
+import { RetirementDemo } from "@/components/demos/RetirementDemo";
 
 interface DemoPageProps {
   params: Promise<{ slug: string }>;
 }
 
 const demoComponents: Record<string, ComponentType> = {
+  "clinic-report": ClinicReportDemo,
+  "clinic-homepage": ClinicHomepageDemo,
+  "community-map": CommunityMapDemo,
+  "program-application": ApplicationDemo,
+  "maintenance-dashboard": MaintenanceDemo,
+  "retirement-calculator": RetirementDemo,
+  "job-portal": JobPortalDemo,
+  "accessibility-review": AccessibilityDemo,
+  "district-portal": DistrictPortalDemo,
   "small-business-homepage": HomepageDemo,
 };
 
@@ -18,8 +36,8 @@ function findDemo(slug: string) {
 
 export function generateStaticParams() {
   return projects
-    .filter((project) => project.demoUrl?.startsWith("/demo/"))
-    .map((project) => ({ slug: project.demoUrl?.replace("/demo/", "") ?? project.id }));
+    .filter((project) => project.demoUrl.startsWith("/demo/"))
+    .map((project) => ({ slug: project.demoUrl.replace("/demo/", "") }));
 }
 
 export async function generateMetadata({ params }: DemoPageProps): Promise<Metadata> {
