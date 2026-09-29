@@ -2,7 +2,7 @@ import type { Metadata } from "next";
 import Image from "next/image";
 import Link from "next/link";
 import { Check } from "lucide-react";
-import { EstimateCalculator } from "@/components/landing/EstimateCalculator";
+import { ChannelTalkButton } from "@/components/layout/ChannelTalk";
 import { WorksTabs } from "@/components/landing/WorksTabs";
 import { history, projects } from "@/data/projects";
 import { profile } from "@/data/profile";
@@ -18,11 +18,11 @@ export const metadata: Metadata = {
     absolute: `홈페이지·업무 프로그램 제작 | ${profile.name}`,
   },
   description:
-    "17년 경력의 1인 웹 개발자가 홈페이지, 업무 프로그램, 기존 시스템 고도화를 직접 작업합니다. 작업 종류를 고르면 예상 비용과 기간을 바로 확인할 수 있습니다.",
+    "17년 경력의 1인 웹 개발자가 홈페이지, 업무 프로그램, 기존 시스템 고도화를 직접 작업합니다.",
   alternates: { canonical: "/" },
 };
 
-const promises = ["17년 경력 개발자 직접 작업", "가격 공개", "원본 소스 제공", "완료 후 1개월 무상 유지보수"];
+const promises = ["17년 경력 개발자 직접 작업", "채팅으로 바로 상담", "원본 소스 제공", "완료 후 1개월 무상 유지보수"];
 
 
 const container = "mx-auto w-full max-w-[1248px] px-4 md:px-6";
@@ -51,9 +51,9 @@ export default function HomePage() {
               ))}
             </ul>
             <div className="mt-8 flex flex-wrap gap-3">
-              <a href="#estimate" data-gtm-cta="hero_estimate" className={primaryButton}>
-                견적 확인
-              </a>
+              <ChannelTalkButton cta="hero_chat" className={primaryButton}>
+                채팅 상담
+              </ChannelTalkButton>
               <a href="#works" data-gtm-cta="hero_works" className={secondaryButton}>
                 제작 사례
               </a>
@@ -123,18 +123,6 @@ export default function HomePage() {
                 ))}
               </tbody>
             </table>
-          </div>
-        </div>
-      </section>
-
-      <section id="estimate" aria-labelledby="estimate-title" className="scroll-mt-16 border-t border-border bg-surface">
-        <div className={`${container} py-16 md:py-24`}>
-          <h2 id="estimate-title" className={h2}>
-            예상 견적
-          </h2>
-          <p className={lead}>작업 종류와 옵션을 선택하면 예상 비용과 기간을 바로 확인할 수 있습니다.</p>
-          <div className="mt-10">
-            <EstimateCalculator />
           </div>
         </div>
       </section>
