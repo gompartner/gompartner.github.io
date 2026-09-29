@@ -117,7 +117,7 @@ export const projects: Project[] = [
 // 실제 작업 이력 — SW기술자 경력관리시스템에 기업 확인된 기술경력 기준.
 // 부업으로 운영하므로 발주처·회사명은 쓰지 않고 업종과 기간만 쓴다.
 export const history: { period: string; kind: "신규 제작" | "유지보수"; work: string }[] = [
-  { period: "2021~현재", kind: "신규 제작", work: "LMS(학습관리시스템) 솔루션 개발 및 운영 자문" },
+  { period: "2021~현재", kind: "신규 제작", work: "솔루션 개발 및 운영 자문" },
   { period: "2019~2021", kind: "신규 제작", work: "에듀테크 기업 학습 서비스 개발" },
   { period: "2019~2021", kind: "유지보수", work: "대학교 홈페이지·전산장비 통합 유지보수" },
   { period: "2018~2019", kind: "신규 제작", work: "공공기관 홈페이지 개편, 리서치 센터 구축" },
