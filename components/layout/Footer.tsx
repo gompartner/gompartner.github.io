@@ -1,77 +1,21 @@
-import Image from "next/image";
-import Link from "next/link";
-import { Mail, BookOpen } from "lucide-react";
 import { profile } from "@/data/profile";
 
 export function Footer() {
   const currentYear = new Date().getFullYear();
 
   return (
-    <footer className="border-t border-border bg-surface">
-      <div className="max-w-6xl mx-auto px-6 md:px-12 py-12">
-        <div className="flex flex-col md:flex-row items-center justify-between gap-6">
-          {/* Brand */}
-          <div className="flex items-center gap-3">
-            <Image
-              src="/images/logo.svg"
-              alt=""
-              width={36}
-              height={36}
-              className="h-9 w-9"
-              loading="lazy"
-            />
-            <div className="text-left">
-              <p className="font-semibold text-foreground">{profile.name}</p>
-              <p className="text-sm text-foreground-secondary mt-1">{profile.title}</p>
-            </div>
-          </div>
-
-          {/* Social Links */}
-          <div className="flex items-center gap-3" aria-label="소셜 링크">
-            <a
-              href={`mailto:${profile.email}`}
-              data-gtm-cta="footer_email"
-              aria-label="이메일 보내기"
-              className="w-9 h-9 flex items-center justify-center rounded-full text-foreground-secondary hover:text-foreground hover:bg-surface-secondary transition-colors"
-            >
-              <Mail size={18} />
-            </a>
-            <Link
-              href="/blog"
-              aria-label="블로그"
-              className="w-9 h-9 flex items-center justify-center rounded-full text-foreground-secondary hover:text-foreground hover:bg-surface-secondary transition-colors"
-            >
-              <BookOpen size={18} />
-            </Link>
-          </div>
-        </div>
-
-        {/* Bottom bar */}
-        <div className="mt-8 pt-6 border-t border-border flex flex-col md:flex-row items-center justify-between gap-3">
-          <p className="text-sm text-foreground-tertiary">
-            © {currentYear} {profile.name}. All rights reserved.
-          </p>
-          <nav aria-label="푸터 네비게이션">
-            <ul className="flex items-center gap-4" role="list">
-              {[
-                { href: "/portfolio", label: "포트폴리오" },
-                { href: "/about", label: "소개" },
-                { href: "/blog", label: "블로그" },
-                { href: "/contact", label: "상담 문의" },
-              ].map(({ href, label }) => (
-                <li key={href}>
-                  <Link
-                    href={href}
-                    data-gtm-cta={href === "/contact" ? "footer_contact" : undefined}
-                    className="text-sm text-foreground-tertiary hover:text-foreground-secondary transition-colors"
-                  >
-                    {label}
-                  </Link>
-                </li>
-              ))}
-            </ul>
-          </nav>
-        </div>
+    <footer className="border-t border-border">
+      <div className="mx-auto flex w-full max-w-[1248px] flex-col gap-2 px-4 py-8 text-[15px] leading-[1.5] text-foreground-tertiary md:flex-row md:items-center md:justify-between md:px-6">
+        <p>
+          © {currentYear} {profile.name} · {profile.title}
+        </p>
+        <a
+          href={`mailto:${profile.email}`}
+          data-gtm-cta="footer_email"
+          className="text-foreground-secondary underline-offset-4 hover:text-foreground hover:underline"
+        >
+          {profile.email}
+        </a>
       </div>
     </footer>
   );

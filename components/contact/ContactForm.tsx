@@ -8,11 +8,11 @@ import { profile } from "@/data/profile";
 const FORM_ENDPOINT = "https://formspree.io/f/xbdndwog";
 
 const needOptions = [
-  "홈페이지 제작",
-  "랜딩페이지",
-  "예약·관리 시스템",
-  "유지보수",
-  "아직 모르겠어요 — 상담으로 정할게요",
+  "홈페이지·웹사이트 구축",
+  "기존 시스템 고도화·유지보수",
+  "서버 이전·마이그레이션",
+  "업무 프로그램·외부 연동",
+  "아직 정하지 않았어요",
 ];
 
 type FormStatus = "idle" | "submitting" | "success" | "error";
@@ -21,13 +21,13 @@ type FormStatus = "idle" | "submitting" | "success" | "error";
 const LIMITS = { name: 100, contact: 200, message: 2000 } as const;
 
 const inputClasses =
-  "w-full rounded-2xl border border-border bg-background px-4 py-3 text-sm text-foreground placeholder:text-foreground-tertiary focus-visible:outline focus-visible:outline-2 focus-visible:outline-accent";
+  "w-full min-h-12 rounded-md border border-[#6d7882] bg-white px-4 py-3 text-[17px] leading-[1.5] text-foreground placeholder:text-foreground-tertiary focus-visible:outline focus-visible:outline-2 focus-visible:outline-accent";
 
 function LengthCounter({ length, limit }: { length: number; limit: number }) {
   return (
     <span
-      className={`text-xs tabular-nums ${
-        length >= limit ? "font-medium text-warning" : "text-foreground-tertiary"
+      className={`text-[15px] tabular-nums ${
+        length >= limit ? "font-bold text-warning" : "text-foreground-tertiary"
       }`}
       aria-live="polite"
     >
@@ -120,12 +120,12 @@ export function ContactForm() {
   if (status === "success") {
     return (
       <div
-        className="glass iri-border flex flex-col items-center gap-3 rounded-3xl p-9 text-center"
+        className="flex flex-col items-center gap-3 rounded-[10px] border border-border bg-white p-9 text-center"
         role="status"
       >
         <CheckCircle2 size={36} className="text-success" aria-hidden />
-        <h2 className="text-xl font-semibold text-foreground">문의가 접수되었습니다</h2>
-        <p className="text-sm leading-relaxed text-foreground-secondary">
+        <h2 className="text-xl font-bold text-foreground">문의가 접수되었습니다</h2>
+        <p className="text-[15px] leading-relaxed text-foreground-secondary">
           보통 영업일 기준 24시간 안에 회신드립니다.
         </p>
       </div>
@@ -135,14 +135,14 @@ export function ContactForm() {
   return (
     <form
       onSubmit={handleSubmit}
-      className="glass iri-border rounded-3xl p-7"
+      className="rounded-[10px] border border-border bg-white p-6 md:p-8"
       aria-label="상담 문의 양식"
     >
-      <h2 className="font-semibold text-foreground">문의 양식</h2>
+      <h3 className="text-[19px] font-bold leading-[1.5] text-foreground">문의 양식</h3>
       <div className="mt-5 flex flex-col gap-4">
         <div>
           <div className="mb-1.5 flex items-end justify-between gap-2">
-            <label htmlFor="contact-name" className="block text-sm font-medium text-foreground-secondary">
+            <label htmlFor="contact-name" className="block text-[17px] font-bold text-foreground">
               이름 <span className="text-accent">*</span>
             </label>
             <LengthCounter length={name.length} limit={LIMITS.name} />
@@ -156,14 +156,14 @@ export function ContactForm() {
             value={name}
             onChange={(e) => setName(e.currentTarget.value)}
             autoComplete="name"
-            placeholder="성함 또는 상호"
+            placeholder="성함 또는 회사명"
             className={inputClasses}
           />
         </div>
 
         <div>
           <div className="mb-1.5 flex items-end justify-between gap-2">
-            <label htmlFor="contact-contact" className="block text-sm font-medium text-foreground-secondary">
+            <label htmlFor="contact-contact" className="block text-[17px] font-bold text-foreground">
               연락처 <span className="text-accent">*</span>
             </label>
             <LengthCounter length={contact.length} limit={LIMITS.contact} />
@@ -182,7 +182,7 @@ export function ContactForm() {
         </div>
 
         <div>
-          <label htmlFor="contact-need" className="mb-1.5 block text-sm font-medium text-foreground-secondary">
+          <label htmlFor="contact-need" className="mb-1.5 block text-[17px] font-bold text-foreground">
             필요한 것
           </label>
           <select id="contact-need" name="need" defaultValue="" className={inputClasses}>
@@ -199,7 +199,7 @@ export function ContactForm() {
 
         <div>
           <div className="mb-1.5 flex items-end justify-between gap-2">
-            <label htmlFor="contact-message" className="block text-sm font-medium text-foreground-secondary">
+            <label htmlFor="contact-message" className="block text-[17px] font-bold text-foreground">
               문의 내용 <span className="text-accent">*</span>
             </label>
             <LengthCounter length={message.length} limit={LIMITS.message} />
@@ -212,17 +212,17 @@ export function ContactForm() {
             maxLength={LIMITS.message}
             value={message}
             onChange={(e) => setMessage(e.currentTarget.value)}
-            placeholder="어떤 사업을 하시는지, 무엇이 필요한지 편하게 적어주세요."
+            placeholder="공고 링크나 요구사항, 희망 일정과 예산을 적어 주세요."
             className={inputClasses}
           />
           {message.length > LIMITS.message ? (
-            <p className="mt-1.5 text-xs text-destructive">
+            <p className="mt-1.5 text-[15px] text-destructive">
               글자수를 초과해 문의를 보낼 수 없습니다. 내용을 줄이거나 더 긴 내용은
               이메일로 보내주세요.
             </p>
           ) : (
             message.length >= LIMITS.message && (
-              <p className="mt-1.5 text-xs text-warning">
+              <p className="mt-1.5 text-[15px] text-warning">
                 최대 {LIMITS.message.toLocaleString()}자까지 입력할 수 있습니다. 더 긴
                 내용은 이메일로 보내주세요.
               </p>
@@ -241,7 +241,7 @@ export function ContactForm() {
         />
 
         {status === "error" && (
-          <p className="rounded-2xl bg-destructive/10 px-4 py-3 text-sm text-destructive" role="alert">
+          <p className="rounded-md bg-destructive/10 px-4 py-3 text-[15px] text-destructive" role="alert">
             전송에 문제가 생겼습니다. 잠시 후 다시 시도하시거나, 아래 이메일(
             {profile.email})로 보내주세요.
           </p>
@@ -253,7 +253,7 @@ export function ContactForm() {
           className="w-full"
         >
           {status === "submitting" ? (
-            "보내는 중…"
+            "보내는 중"
           ) : (
             <>
               문의 보내기
@@ -261,7 +261,7 @@ export function ContactForm() {
             </>
           )}
         </Button>
-        <p className="text-center text-xs text-foreground-tertiary">
+        <p className="text-center text-[15px] text-foreground-tertiary">
           편하게 남겨주세요. 보통 하루 안에 회신드립니다.
         </p>
       </div>

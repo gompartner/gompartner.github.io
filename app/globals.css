@@ -1,24 +1,27 @@
 @import "tailwindcss";
 
 :root {
-  /* meetzi 컨셉 — 밝은 화이트/연블루 + 비비드 블루 + 플레이풀 포인트 (라이트 전용) */
+  /* KRDS(범정부 디자인 시스템) 기본 모드 토큰 — 출처: KRDS-uiux/krds-uiux krds_tokens.css
+     텍스트 gray-90, 보조 텍스트 gray-70(7:1 이상), 약한 텍스트 gray-60(4.5:1 이상),
+     primary-50 버튼, primary-60 hover (라이트 전용) */
   --background: #ffffff;
-  --foreground: #1b2150;
-  --foreground-secondary: #6b7194;
-  --foreground-tertiary: #9096b5;
-  --surface: #f3f6ff;
-  --surface-secondary: #e9edff;
-  --border: #e6e8f5;
-  --accent: #4f5be6;
-  --accent-hover: #3b46c9;
+  --foreground: #1e2124;
+  --foreground-secondary: #464c53;
+  --foreground-tertiary: #58616a;
+  --surface: #f4f5f6;
+  --surface-secondary: #e6e8ea;
+  --border: #cdd1d5;
+  --accent: #256ef4;
+  --accent-hover: #0b50d0;
   --accent-foreground: #ffffff;
-  --teal: #17c3b2;
-  --coral: #ff6b5e;
-  --yellow: #ffc63b;
-  --green: #34d17d;
-  --success: #34d17d;
-  --warning: #f5a524;
-  --destructive: #ff6b5e;
+  --accent-surface: #ecf2fe;
+  --teal: #2f7d6d;
+  --coral: #de3412;
+  --yellow: #9e6a00;
+  --green: #228738;
+  --success: #228738;
+  --warning: #9e6a00;
+  --destructive: #de3412;
 
   --section-padding: 6rem;
 }
@@ -34,6 +37,7 @@
   --color-accent: var(--accent);
   --color-accent-hover: var(--accent-hover);
   --color-accent-foreground: var(--accent-foreground);
+  --color-accent-surface: var(--accent-surface);
   --color-teal: var(--teal);
   --color-coral: var(--coral);
   --color-yellow: var(--yellow);
@@ -57,11 +61,10 @@ h3 {
 
 /* ── meetzi 유틸리티 ─────────────────────────────────────────────────── */
 
-/* 소프트 화이트 카드 (구 .glass 재활용) */
+/* 종이 위 흰 박스 — 그림자 없이 선으로만 구분 */
 .glass {
   background: #ffffff;
   border: 1px solid var(--border);
-  box-shadow: 0 10px 30px -14px rgba(27, 33, 80, 0.14);
 }
 
 /* 구 무지개 림 — no-op으로 중립화 (position만 유지) */
@@ -69,9 +72,9 @@ h3 {
   position: relative;
 }
 
-/* 블루 CTA 소프트 글로우 (구 .iri-glow 재활용) */
+/* 구 CTA 글로우 — 제안서 컨셉에서는 쓰지 않아 no-op */
 .iri-glow {
-  box-shadow: 0 14px 30px -10px rgba(79, 91, 230, 0.5);
+  box-shadow: none;
 }
 
 /* 강조 텍스트 — 솔리드 블루 (구 .iri-text 재활용) */
@@ -89,6 +92,8 @@ body {
   background: var(--background);
   color: var(--foreground);
   font-family: var(--font-pretendard, -apple-system, BlinkMacSystemFont, "Apple SD Gothic Neo", "Segoe UI", sans-serif);
+  font-size: 17px;
+  line-height: 1.5;
   word-break: keep-all;
   overflow-wrap: break-word;
   -webkit-font-smoothing: antialiased;
@@ -96,7 +101,7 @@ body {
 }
 
 :focus-visible {
-  outline: 2px solid var(--accent);
+  outline: 3px solid var(--accent);
   outline-offset: 2px;
 }
 

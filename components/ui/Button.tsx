@@ -17,18 +17,18 @@ type ButtonProps = ButtonAsButton | ButtonAsLink;
 
 function buttonClasses({ variant = "primary", size = "md" }: ButtonStyleProps, className?: string) {
   return cn(
-    "inline-flex items-center justify-center gap-2 font-semibold rounded-full transition-all duration-200 focus-visible:outline-accent disabled:opacity-50 disabled:pointer-events-none",
-    size === "sm" && "text-sm px-5 py-2.5",
-    size === "md" && "text-base px-7 py-3.5",
-    size === "lg" && "text-lg px-9 py-4.5",
+    "inline-flex items-center justify-center gap-2 font-bold rounded-md transition-colors duration-200 focus-visible:outline-accent disabled:opacity-50 disabled:pointer-events-none",
+    size === "sm" && "text-[15px] h-10 px-4",
+    size === "md" && "text-[17px] h-12 px-6",
+    size === "lg" && "text-[17px] h-14 px-7",
     variant === "primary" &&
-      "bg-accent text-accent-foreground iri-glow hover:bg-accent-hover active:scale-[0.97]",
+      "bg-accent text-accent-foreground hover:bg-accent-hover",
     variant === "secondary" &&
-      "bg-foreground text-background hover:opacity-90 active:scale-[0.97]",
+      "bg-foreground text-background hover:opacity-90",
     variant === "ghost" &&
-      "text-foreground hover:bg-surface active:scale-[0.97]",
+      "text-foreground hover:bg-surface",
     variant === "outline" &&
-      "border border-foreground/15 bg-white/50 text-foreground backdrop-blur hover:bg-white/75 active:scale-[0.97]",
+      "border border-foreground/20 bg-white text-foreground hover:border-foreground/40",
     className
   );
 }

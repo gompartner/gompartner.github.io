@@ -1,6 +1,5 @@
 import { Header } from "@/components/layout/Header";
 import { Footer } from "@/components/layout/Footer";
-import { ScrollProgress } from "@/components/layout/ScrollProgress";
 import {
   PersonJsonLd,
   ProfessionalServiceJsonLd,
@@ -17,7 +16,6 @@ export default function SiteLayout({
       <PersonJsonLd />
       <ProfessionalServiceJsonLd />
       <WebSiteJsonLd />
-      <ScrollProgress />
       <Header />
       <main className="flex-1 pt-16">{children}</main>
       <Footer />

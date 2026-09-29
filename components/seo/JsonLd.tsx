@@ -1,6 +1,4 @@
 import { profile } from "@/data/profile";
-import { faqItems } from "@/data/faq";
-import { services } from "@/data/services";
 import { siteUrl } from "@/lib/site";
 
 export function PersonJsonLd() {
@@ -12,7 +10,6 @@ export function PersonJsonLd() {
     jobTitle: profile.title,
     description: profile.bio,
     url: siteUrl,
-    sameAs: [`${siteUrl}/blog`],
     address: {
       "@type": "PostalAddress",
       addressLocality: "서울",
@@ -20,36 +17,14 @@ export function PersonJsonLd() {
     },
     email: profile.email,
     knowsAbout: [
-      "홈페이지 제작",
-      "웹사이트 제작",
-      "랜딩페이지 제작",
-      "웹사이트 유지보수",
-      "예약 시스템",
-      "업무 자동화",
-      "검색엔진 최적화",
+      "웹사이트 구축",
+      "레거시 시스템 고도화",
+      "Java Spring",
+      "PHP 마이그레이션",
+      "AWS 이전",
+      "워드프레스 이관",
+      "업무 프로그램 개발",
     ],
-  };
-
-  return (
-    <script
-      type="application/ld+json"
-      dangerouslySetInnerHTML={{ __html: JSON.stringify(schema) }}
-    />
-  );
-}
-
-export function FaqJsonLd() {
-  const schema = {
-    "@context": "https://schema.org",
-    "@type": "FAQPage",
-    mainEntity: faqItems.map(({ question, answer }) => ({
-      "@type": "Question",
-      name: question,
-      acceptedAnswer: {
-        "@type": "Answer",
-        text: answer,
-      },
-    })),
   };
 
   return (
@@ -78,14 +53,6 @@ export function ProfessionalServiceJsonLd() {
       "@type": "Person",
       name: profile.name,
     },
-    makesOffer: services.map((service) => ({
-      "@type": "Offer",
-      itemOffered: {
-        "@type": "Service",
-        name: service.title,
-        description: service.description,
-      },
-    })),
   };
 
   return (
