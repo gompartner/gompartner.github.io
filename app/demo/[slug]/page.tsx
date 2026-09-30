@@ -7,6 +7,7 @@ import { ApplicationDemo } from "@/components/demos/ApplicationDemo";
 import { ClinicHomepageDemo } from "@/components/demos/ClinicHomepageDemo";
 import { ClinicReportDemo } from "@/components/demos/ClinicReportDemo";
 import { CommunityMapDemo } from "@/components/demos/CommunityMapDemo";
+import { ExcelAutomationDemo } from "@/components/demos/ExcelAutomationDemo";
 import { DistrictPortalDemo } from "@/components/demos/DistrictPortalDemo";
 import { HomepageDemo } from "@/components/demos/HomepageDemo";
 import { JobPortalDemo } from "@/components/demos/JobPortalDemo";
@@ -30,6 +31,7 @@ const demoComponents: Record<string, ComponentType> = {
   "district-portal": DistrictPortalDemo,
   "small-business-homepage": HomepageDemo,
   "shop-admin": ShopAdminDemo,
+  "excel-automation": ExcelAutomationDemo,
 };
 
 function findDemo(slug: string) {
