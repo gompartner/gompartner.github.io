@@ -1,8 +1,15 @@
 "use client";
 
+import Image from "next/image";
 import { useMemo, useState } from "react";
-import { ClipboardList, FileText, Plus, Printer, RotateCcw, Sparkles, TriangleAlert, UserRound } from "lucide-react";
+import { Plus, Printer, RotateCcw, TriangleAlert } from "lucide-react";
 import { useLocalStorage } from "@/hooks/useLocalStorage";
+
+/* 사진 출처 (Unsplash 무료 라이선스)
+   hero-face.jpg  AI 생성(Z-Image-Turbo, Apache 2.0)
+   serum.jpg      CRYSTALWEED cannabis, w1an547rkxo
+   cream.jpg      Jocelyn Morales, JiqTLjzEH18
+   mirror.jpg     Sum Sum, Skzxaqy8KpQ */
 
 const STORAGE_KEY = "gs-demo:clinic-report:v2";
 
@@ -14,14 +21,26 @@ const STORAGE_KEY = "gs-demo:clinic-report:v2";
 type AreaId = "moisture" | "oil" | "pore" | "wrinkle" | "tone" | "redness";
 type Gender = "여" | "남";
 
-const AREAS: { id: AreaId; label: string; care: string }[] = [
-  { id: "moisture", label: "수분", care: "보습 관리와 저자극 보습제 사용을 권합니다." },
-  { id: "oil", label: "유분 밸런스", care: "피지 조절 관리와 가벼운 수분 제형을 권합니다." },
-  { id: "pore", label: "모공", care: "주 1~2회 각질 관리와 피지 조절을 권합니다." },
-  { id: "wrinkle", label: "주름·탄력", care: "탄력 관리 프로그램과 레티놀 계열 홈케어를 권합니다." },
-  { id: "tone", label: "색소·톤", care: "색소 관리와 자외선 차단제 덧바름을 권합니다." },
-  { id: "redness", label: "민감·홍조", care: "진정 관리와 향료·알코올 성분 회피를 권합니다." },
+// 영역마다 고유 색을 두고, 색만으로 구분하지 않도록 이름과 숫자를 항상 함께 쓴다
+const AREAS: { id: AreaId; label: string; care: string; color: string }[] = [
+  { id: "moisture", label: "수분", care: "보습 관리와 저자극 보습제 사용을 권합니다.", color: "#3f7fb4" },
+  { id: "oil", label: "유분 밸런스", care: "피지 조절 관리와 가벼운 수분 제형을 권합니다.", color: "#b8862b" },
+  { id: "pore", label: "모공", care: "주 1~2회 각질 관리와 피지 조절을 권합니다.", color: "#7a5fa6" },
+  { id: "wrinkle", label: "주름·탄력", care: "탄력 관리 프로그램과 레티놀 계열 홈케어를 권합니다.", color: "#9c3a5c" },
+  { id: "tone", label: "색소·톤", care: "색소 관리와 자외선 차단제 덧바름을 권합니다.", color: "#b0694a" },
+  { id: "redness", label: "민감·홍조", care: "진정 관리와 향료·알코올 성분 회피를 권합니다.", color: "#c24a62" },
 ];
+
+// 관리 권장 카드 사진 (첫째, 둘째 카드 순서)
+const CARE_PHOTOS = ["/images/demo-clinic-report/serum.jpg", "/images/demo-clinic-report/cream.jpg"];
+
+// 색 토큰: 살구빛 바탕, 자두색 글자, 베리색 강조
+const INK = "#2a1f2b";
+const MUTED = "#6e5a64";
+const LINE = "#e8d9d1";
+const BG = "#f7eee9";
+const BERRY = "#9c3a5c";
+const APRICOT = "#e39a72";
 
 // 예시 비교 평균: 성별별 20대 기준값에서 10년마다 영역별로 감소
 const BASE_20S: Record<Gender, number[]> = {
@@ -76,9 +95,9 @@ const INITIAL_STATE: State = {
 };
 
 const STEPS = [
-  { id: "customer", label: "고객 선택", icon: UserRound },
-  { id: "input", label: "측정값 입력", icon: ClipboardList },
-  { id: "report", label: "결과지", icon: FileText },
+  { id: "customer", label: "고객 선택" },
+  { id: "input", label: "측정값 입력" },
+  { id: "report", label: "결과지" },
 ] as const;
 
 type StepId = (typeof STEPS)[number]["id"];
@@ -109,6 +128,10 @@ function ageGroup(age: number) {
   return `${Math.min(Math.max(Math.floor(age / 10), 2), 6) * 10}대`;
 }
 
+function groupLabel(c: Customer) {
+  return `${c.gender === "여" ? "여성" : "남성"} ${ageGroup(c.age)}`;
+}
+
 function totalScore(scores: Scores) {
   return Math.round(AREAS.reduce((sum, a) => sum + scores[a.id], 0) / AREAS.length);
 }
@@ -123,11 +146,19 @@ function today() {
   return `${d.getFullYear()}-${pad(d.getMonth() + 1)}-${pad(d.getDate())}`;
 }
 
+function formatDate(date: string) {
+  const [y, m, d] = date.split("-");
+  return `${y}년 ${Number(m)}월 ${Number(d)}일`;
+}
+
 function fieldStatus(raw: string | undefined): "empty" | "invalid" | "ok" {
   if (raw === undefined || raw.trim() === "") return "empty";
   const n = Number(raw);
   return Number.isInteger(n) && n >= 0 && n <= 100 ? "ok" : "invalid";
 }
+
+const inputClass =
+  "mt-1 h-12 w-full rounded-[12px] border border-[#cdb9ae] bg-white px-4 text-[17px] focus:border-[#9c3a5c] focus:outline-none";
 
 export function ClinicReportDemo() {
   const [state, setState, hydrated] = useLocalStorage<State>(STORAGE_KEY, INITIAL_STATE);
@@ -203,155 +234,158 @@ export function ClinicReportDemo() {
   }
 
   return (
-    <div className="min-h-screen bg-[#f4f5f6] text-[#1e2124]">
+    <div className="min-h-screen" style={{ background: BG, color: INK }}>
       <style>{`
         @page { size: A4; margin: 0; }
         @media print {
           body * { visibility: hidden !important; }
           .report-sheet, .report-sheet * { visibility: visible !important; }
-          .report-sheet { position: absolute; inset: 0 auto auto 0; width: 210mm; min-height: 297mm; margin: 0; box-shadow: none !important; border: 0 !important; transform: none !important; }
+          .sheet-zoom { zoom: 1 !important; }
+          .report-sheet { position: absolute; inset: 0 auto auto 0; width: 210mm; height: 296mm; min-height: 0 !important; overflow: hidden; margin: 0; box-shadow: none !important; border: 0 !important; transform: none !important; -webkit-print-color-adjust: exact; print-color-adjust: exact; }
         }
       `}</style>
 
-      <header className="border-b border-[#cdd1d5] bg-white print:hidden">
-        <div className="mx-auto flex max-w-[1248px] flex-wrap items-center gap-3 px-4 py-3 md:px-6">
-          <div className="flex items-center gap-2">
-            <span className="flex h-9 w-9 items-center justify-center rounded-md bg-[#2f7d6d] text-white">
-              <Sparkles size={18} aria-hidden />
-            </span>
-            <span>
-              <span className="block text-[17px] font-bold leading-[1.4]">피부 진단 결과지</span>
-              <span className="block text-[15px] leading-[1.4] text-[#58616a]">샘플 피부과의원 데모</span>
-            </span>
-          </div>
-          <nav className="grid w-full grid-cols-3 gap-1 sm:ml-auto sm:flex sm:w-auto" aria-label="진행 단계">
-            {STEPS.map((s, i) => {
-              const Icon = s.icon;
-              const active = step === s.id;
-              return (
-                <button
-                  key={s.id}
-                  type="button"
-                  onClick={() => setStep(s.id)}
-                  aria-current={active ? "step" : undefined}
-                  className={`inline-flex h-10 items-center justify-center gap-1.5 whitespace-nowrap rounded-md px-2 text-[15px] font-bold transition-colors sm:px-3 ${
-                    active ? "bg-[#2f7d6d] text-white" : "text-[#464c53] hover:bg-[#f4f5f6]"
-                  }`}
-                >
-                  <Icon size={16} aria-hidden className="hidden sm:block" />
-                  <span>
-                    {i + 1}. {s.label}
-                  </span>
-                </button>
-              );
-            })}
-          </nav>
-        </div>
-      </header>
+      <Hero
+        customer={hydrated ? customer : undefined}
+        session={hydrated ? latest : undefined}
+        previous={hydrated ? previous : undefined}
+        step={step}
+        onStep={setStep}
+      />
 
-      <main className="mx-auto max-w-[1248px] px-4 py-6 pb-24 md:px-6">
+      <main className="mx-auto max-w-[1200px] px-4 pb-28 pt-10 md:px-6 md:pt-14">
         {!hydrated ? (
-          <p className="py-20 text-center text-[17px] text-[#58616a]">불러오는 중</p>
+          <p className="py-20 text-center text-[17px]" style={{ color: MUTED }}>
+            불러오는 중
+          </p>
         ) : (
           <>
             {step === "customer" && (
-              <section className="grid gap-5 md:grid-cols-[1fr_340px]">
-                <div className="rounded-[10px] border border-[#cdd1d5] bg-white p-6">
-                  <h2 className="text-[19px] font-bold leading-[1.5]">고객 선택</h2>
-                  <ul className="mt-4 divide-y divide-[#e6e8ea]">
-                    {state.customers.map((c) => (
-                      <li key={c.id}>
-                        <button
-                          type="button"
-                          onClick={() => {
-                            selectCustomer(c.id);
-                            setStep(c.sessions.length ? "report" : "input");
-                          }}
-                          className={`flex w-full items-center gap-3 rounded-md px-3 py-3 text-left transition-colors ${
-                            c.id === customer?.id ? "bg-[#eef6f4]" : "hover:bg-[#f4f5f6]"
-                          }`}
-                        >
-                          <span className="flex-1">
-                            <span className="block text-[17px] font-bold leading-[1.5]">{maskName(c.name)}</span>
-                            <span className="block text-[15px] leading-[1.5] text-[#58616a]">
-                              {c.gender}, {c.age}세, 차트 {c.chartNo}
+              <section className="grid gap-6 print:hidden lg:grid-cols-[1fr_400px]">
+                <div>
+                  <h2 className="text-[28px] font-bold leading-[1.3] tracking-[-0.02em]">고객 선택</h2>
+                  <ul className="mt-6 grid gap-3 sm:grid-cols-2">
+                    {state.customers.map((c) => {
+                      const active = c.id === customer?.id;
+                      const last = c.sessions.at(-1);
+                      return (
+                        <li key={c.id}>
+                          <button
+                            type="button"
+                            onClick={() => {
+                              selectCustomer(c.id);
+                              setStep(c.sessions.length ? "report" : "input");
+                            }}
+                            className={`flex w-full items-center gap-4 rounded-[20px] border-2 bg-white p-5 text-left transition-[border-color,transform] duration-150 active:scale-[0.98] ${
+                              active ? "border-[#9c3a5c]" : "border-transparent hover:border-[#e8d9d1]"
+                            }`}
+                          >
+                            <span
+                              className="grid h-14 w-14 shrink-0 place-items-center rounded-full text-[22px] font-bold text-white"
+                              style={{ background: active ? BERRY : APRICOT }}
+                              aria-hidden
+                            >
+                              {c.name.trim()[0]}
                             </span>
-                          </span>
-                          <span className="text-[15px] text-[#58616a]">
-                            {c.sessions.length ? `측정 ${c.sessions.length}회` : "측정 기록 없음"}
-                          </span>
-                        </button>
-                      </li>
-                    ))}
+                            <span className="min-w-0 flex-1">
+                              <span className="block text-[19px] font-bold leading-[1.4]">{maskName(c.name)} 님</span>
+                              <span className="block text-[15px] leading-[1.5]" style={{ color: MUTED }}>
+                                {c.gender}, {c.age}세, 차트 {c.chartNo}
+                              </span>
+                            </span>
+                            <span className="text-right">
+                              {last ? (
+                                <>
+                                  <span className="block text-[32px] font-bold leading-none tabular-nums" style={{ color: BERRY }}>
+                                    {totalScore(last.scores)}
+                                  </span>
+                                  <span className="mt-1 block text-[13px]" style={{ color: MUTED }}>
+                                    측정 {c.sessions.length}회
+                                  </span>
+                                </>
+                              ) : (
+                                <span className="text-[15px]" style={{ color: MUTED }}>
+                                  측정 기록 없음
+                                </span>
+                              )}
+                            </span>
+                          </button>
+                        </li>
+                      );
+                    })}
                   </ul>
                 </div>
                 <form
-                  className="h-fit rounded-[10px] border border-[#cdd1d5] bg-white p-6"
+                  className="h-fit overflow-hidden rounded-[20px] bg-white"
                   onSubmit={(e) => {
                     e.preventDefault();
                     addCustomer();
                   }}
                 >
-                  <h3 className="text-[19px] font-bold leading-[1.5]">신규 고객</h3>
-                  <label className="mt-4 block text-[15px] font-bold" htmlFor="new-name">
-                    이름
-                  </label>
-                  <input
-                    id="new-name"
-                    value={newName}
-                    onChange={(e) => setNewName(e.target.value)}
-                    maxLength={20}
-                    className="mt-1 h-12 w-full rounded-md border border-[#6d7882] px-3 text-[17px]"
+                  <Image
+                    src="/images/demo-clinic-report/mirror.jpg"
+                    alt="상담 의자에 앉아 거울로 피부를 확인하는 고객"
+                    width={1200}
+                    height={675}
+                    className="aspect-[2/1] w-full object-cover object-[50%_30%]"
                   />
-                  <div className="mt-3 grid grid-cols-2 gap-3">
-                    <div>
-                      <span className="block text-[15px] font-bold">성별</span>
-                      <div className="mt-1 flex gap-1" role="radiogroup" aria-label="성별">
-                        {(["여", "남"] as Gender[]).map((g) => (
-                          <button
-                            key={g}
-                            type="button"
-                            role="radio"
-                            aria-checked={newGender === g}
-                            onClick={() => setNewGender(g)}
-                            className={`h-12 flex-1 rounded-md border text-[17px] font-bold ${
-                              newGender === g ? "border-[#2f7d6d] bg-[#eef6f4] text-[#2f7d6d]" : "border-[#6d7882]"
-                            }`}
-                          >
-                            {g}
-                          </button>
-                        ))}
-                      </div>
-                    </div>
-                    <label className="block">
-                      <span className="block text-[15px] font-bold">나이</span>
-                      <input
-                        inputMode="numeric"
-                        value={newAge}
-                        onChange={(e) => setNewAge(e.target.value.replace(/\D/g, ""))}
-                        maxLength={2}
-                        className="mt-1 h-12 w-full rounded-md border border-[#6d7882] px-3 text-[17px]"
-                      />
+                  <div className="p-6">
+                    <h3 className="text-[21px] font-bold leading-[1.4]">신규 고객 등록</h3>
+                    <label className="mt-4 block text-[15px] font-bold" htmlFor="new-name">
+                      이름
                     </label>
+                    <input id="new-name" value={newName} onChange={(e) => setNewName(e.target.value)} maxLength={20} className={inputClass} />
+                    <div className="mt-3 grid grid-cols-2 gap-3">
+                      <div>
+                        <span className="block text-[15px] font-bold">성별</span>
+                        <div className="mt-1 flex gap-1 rounded-[12px] p-1" style={{ background: BG }} role="radiogroup" aria-label="성별">
+                          {(["여", "남"] as Gender[]).map((g) => (
+                            <button
+                              key={g}
+                              type="button"
+                              role="radio"
+                              aria-checked={newGender === g}
+                              onClick={() => setNewGender(g)}
+                              className={`h-10 flex-1 rounded-[9px] text-[17px] font-bold transition-colors duration-150 ${
+                                newGender === g ? "bg-white text-[#9c3a5c] shadow-[0_1px_3px_rgba(42,31,43,0.12)]" : "text-[#6e5a64]"
+                              }`}
+                            >
+                              {g}
+                            </button>
+                          ))}
+                        </div>
+                      </div>
+                      <label className="block">
+                        <span className="block text-[15px] font-bold">나이</span>
+                        <input
+                          inputMode="numeric"
+                          value={newAge}
+                          onChange={(e) => setNewAge(e.target.value.replace(/\D/g, ""))}
+                          maxLength={2}
+                          className={inputClass}
+                        />
+                      </label>
+                    </div>
+                    <button
+                      type="submit"
+                      disabled={!canAdd}
+                      className="mt-5 inline-flex h-12 w-full items-center justify-center gap-1 rounded-full text-[17px] font-bold text-white transition-transform duration-150 active:scale-[0.98] disabled:opacity-40"
+                      style={{ background: BERRY }}
+                    >
+                      <Plus size={18} aria-hidden />
+                      등록 후 측정값 입력
+                    </button>
                   </div>
-                  <button
-                    type="submit"
-                    disabled={!canAdd}
-                    className="mt-5 inline-flex h-12 w-full items-center justify-center gap-1 rounded-md bg-[#2f7d6d] text-[17px] font-bold text-white disabled:bg-[#b1b8be]"
-                  >
-                    <Plus size={18} aria-hidden />
-                    등록 후 측정값 입력
-                  </button>
                 </form>
               </section>
             )}
 
             {step === "input" && customer && (
-              <section className="mx-auto max-w-[720px] rounded-[10px] border border-[#cdd1d5] bg-white p-6 md:p-8">
-                <div className="flex flex-wrap items-end gap-3">
+              <section className="print:hidden">
+                <div className="flex flex-wrap items-end gap-4">
                   <div>
-                    <h2 className="text-[19px] font-bold leading-[1.5]">{maskName(customer.name)} 님 측정값 입력</h2>
-                    <p className="text-[15px] leading-[1.5] text-[#58616a]">
+                    <h2 className="text-[28px] font-bold leading-[1.3] tracking-[-0.02em]">{maskName(customer.name)} 님 측정값 입력</h2>
+                    <p className="mt-1 text-[17px] leading-[1.5]" style={{ color: MUTED }}>
                       진단기 결과지의 영역별 점수(0~100)를 입력하세요.
                     </p>
                   </div>
@@ -361,17 +395,22 @@ export function ClinicReportDemo() {
                       type="date"
                       value={draftDate}
                       onChange={(e) => setDraftDate(e.target.value)}
-                      className="ml-2 h-10 rounded-md border border-[#6d7882] px-2 text-[15px] font-normal"
+                      className="ml-2 h-11 rounded-[12px] border border-[#cdb9ae] bg-white px-3 text-[15px] font-normal"
                     />
                   </label>
                 </div>
 
-                <div className="mt-6 grid grid-cols-2 gap-4 sm:grid-cols-3">
+                <div className="mt-6 grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
                   {AREAS.map((a, i) => {
-                    const bad = fieldStatus(draft[a.id]) === "invalid";
+                    const status = fieldStatus(draft[a.id]);
+                    const bad = status === "invalid";
+                    const value = status === "ok" ? Number(draft[a.id]) : 0;
                     return (
-                      <label key={a.id} className="block">
-                        <span className="block text-[15px] font-bold">{a.label}</span>
+                      <label key={a.id} className="block rounded-[20px] bg-white p-5">
+                        <span className="flex items-center gap-2 text-[17px] font-bold">
+                          <span className="h-3 w-3 rounded-full" style={{ background: a.color }} aria-hidden />
+                          {a.label}
+                        </span>
                         <input
                           inputMode="numeric"
                           value={draft[a.id] ?? ""}
@@ -381,11 +420,18 @@ export function ClinicReportDemo() {
                           }}
                           aria-invalid={bad}
                           placeholder="0~100"
-                          className={`mt-1 h-14 w-full rounded-md border px-3 text-[24px] font-bold tabular-nums ${
-                            bad ? "border-[#de3412] bg-[#fdefec]" : "border-[#6d7882]"
+                          className={`mt-2 h-16 w-full rounded-[12px] border px-4 text-[32px] font-bold tabular-nums placeholder:text-[20px] placeholder:font-normal focus:outline-none ${
+                            bad ? "border-[#c0392b] bg-[#fdefec]" : "border-[#e8d9d1] bg-white focus:border-[#9c3a5c]"
                           }`}
                         />
-                        {bad && <span className="mt-1 block text-[15px] text-[#bd2c0f]">0~100 사이 숫자</span>}
+                        {/* 입력한 값만큼 막대가 차올라 오타(예: 580)를 바로 알아챌 수 있다 */}
+                        <span className="mt-3 block h-2 overflow-hidden rounded-full bg-[#f3e6df]" aria-hidden>
+                          <span
+                            className="block h-full rounded-full transition-[width] duration-300 ease-out motion-reduce:transition-none"
+                            style={{ width: `${value}%`, background: a.color }}
+                          />
+                        </span>
+                        {bad && <span className="mt-2 block text-[15px] text-[#b3261e]">0~100 사이 숫자</span>}
                       </label>
                     );
                   })}
@@ -400,7 +446,7 @@ export function ClinicReportDemo() {
                   onChange={(e) => setDraftMemo(e.target.value)}
                   maxLength={120}
                   rows={2}
-                  className="mt-1 w-full rounded-md border border-[#6d7882] px-3 py-2 text-[17px] leading-[1.5]"
+                  className="mt-1 w-full rounded-[16px] border border-[#e8d9d1] bg-white px-4 py-3 text-[17px] leading-[1.5] focus:border-[#9c3a5c] focus:outline-none"
                 />
 
                 <div className="mt-6 flex flex-wrap items-center gap-3">
@@ -408,21 +454,21 @@ export function ClinicReportDemo() {
                     type="button"
                     onClick={saveSession}
                     disabled={!canSave}
-                    className="inline-flex h-12 items-center rounded-md bg-[#2f7d6d] px-6 text-[17px] font-bold text-white disabled:bg-[#b1b8be]"
+                    className="inline-flex h-14 items-center rounded-full px-8 text-[17px] font-bold text-white transition-transform duration-150 active:scale-[0.98] disabled:opacity-40"
+                    style={{ background: BERRY }}
                   >
                     결과지 만들기
                   </button>
                   <button
                     type="button"
-                    onClick={() =>
-                      setDraft(Object.fromEntries(AREAS.map((a) => [a.id, String(SAMPLE_NOW[a.id])])) as Draft)
-                    }
-                    className="h-12 rounded-md px-3 text-[15px] font-bold text-[#2f7d6d] underline underline-offset-4"
+                    onClick={() => setDraft(Object.fromEntries(AREAS.map((a) => [a.id, String(SAMPLE_NOW[a.id])])) as Draft)}
+                    className="h-12 rounded-md px-3 text-[15px] font-bold underline underline-offset-4"
+                    style={{ color: BERRY }}
                   >
                     예시 값 채우기
                   </button>
                   {!canSave && (
-                    <span className="inline-flex items-center gap-1 text-[15px] text-[#bd2c0f]">
+                    <span className="inline-flex items-center gap-1 text-[15px] text-[#b3261e]">
                       <TriangleAlert size={16} aria-hidden />
                       {invalidCount > 0 ? `${invalidCount}칸 확인 필요` : `${emptyCount}칸 남음`}
                     </span>
@@ -433,29 +479,51 @@ export function ClinicReportDemo() {
 
             {step === "report" && (
               <section>
-                <div className="mb-4 flex flex-wrap items-center gap-3 print:hidden">
-                  <button type="button" onClick={resetDemo} className="inline-flex items-center gap-1 text-[15px] font-bold text-[#2f7d6d] underline underline-offset-4">
-                    <RotateCcw size={14} aria-hidden />
-                    예시로 초기화
-                  </button>
-                  <button
-                    type="button"
-                    onClick={() => window.print()}
-                    disabled={!latest}
-                    className="ml-auto inline-flex h-12 items-center gap-2 rounded-md bg-[#2f7d6d] px-5 text-[17px] font-bold text-white disabled:bg-[#b1b8be]"
-                  >
-                    <Printer size={18} aria-hidden />
-                    인쇄·PDF 저장
-                  </button>
-                </div>
                 {customer && latest ? (
-                  <ScaledSheet>
-                    <ReportSheet customer={customer} session={latest} previous={previous ?? null} />
-                  </ScaledSheet>
+                  <>
+                    <ReportScreen customer={customer} session={latest} previous={previous ?? null} />
+
+                    <div className="mt-16 flex flex-wrap items-end gap-3 print:hidden">
+                      <div>
+                        <h2 className="text-[28px] font-bold leading-[1.3] tracking-[-0.02em]">인쇄용 결과지</h2>
+                        <p className="mt-1 text-[17px]" style={{ color: MUTED }}>
+                          A4 한 장으로 인쇄하거나 PDF로 저장합니다.
+                        </p>
+                      </div>
+                      <div className="ml-auto flex items-center gap-4">
+                        <button
+                          type="button"
+                          onClick={resetDemo}
+                          className="inline-flex items-center gap-1 text-[15px] font-bold underline underline-offset-4"
+                          style={{ color: BERRY }}
+                        >
+                          <RotateCcw size={14} aria-hidden />
+                          예시로 초기화
+                        </button>
+                        <button
+                          type="button"
+                          onClick={() => window.print()}
+                          className="inline-flex h-12 items-center gap-2 rounded-full px-6 text-[17px] font-bold text-white transition-transform duration-150 active:scale-[0.98]"
+                          style={{ background: INK }}
+                        >
+                          <Printer size={18} aria-hidden />
+                          인쇄·PDF 저장
+                        </button>
+                      </div>
+                    </div>
+                    <div className="mt-6">
+                      <ScaledSheet>
+                        <ReportSheet customer={customer} session={latest} previous={previous ?? null} />
+                      </ScaledSheet>
+                    </div>
+                  </>
                 ) : (
-                  <div className="rounded-[10px] border border-dashed border-[#b1b8be] bg-white p-10 text-center text-[17px] text-[#58616a]">
+                  <div
+                    className="rounded-[20px] border border-dashed border-[#cdb9ae] bg-white p-12 text-center text-[17px] print:hidden"
+                    style={{ color: MUTED }}
+                  >
                     아직 측정 기록이 없습니다.{" "}
-                    <button type="button" onClick={() => setStep("input")} className="font-bold text-[#2f7d6d] underline">
+                    <button type="button" onClick={() => setStep("input")} className="font-bold underline" style={{ color: BERRY }}>
                       측정값 입력
                     </button>
                   </div>
@@ -469,11 +537,234 @@ export function ClinicReportDemo() {
   );
 }
 
+/** 사진을 꽉 채운 첫 화면. 선택한 고객의 종합 점수를 큰 원형 게이지로 보여 준다 */
+function Hero({
+  customer,
+  session,
+  previous,
+  step,
+  onStep,
+}: {
+  customer?: Customer;
+  session?: Session;
+  previous?: Session;
+  step: StepId;
+  onStep: (s: StepId) => void;
+}) {
+  const total = session ? totalScore(session.scores) : null;
+  const avgTotal = customer ? totalScore(averageFor(customer.gender, customer.age)) : null;
+  const prevTotal = previous ? totalScore(previous.scores) : null;
+
+  return (
+    <header className="relative isolate overflow-hidden text-white print:hidden">
+      <Image src="/images/demo-clinic-report/hero-face.jpg" alt="" fill priority sizes="100vw" className="-z-20 object-cover object-[50%_25%]" />
+      <div
+        className="absolute inset-0 -z-10"
+        style={{ background: "linear-gradient(90deg, rgba(42,31,43,0.92) 0%, rgba(42,31,43,0.72) 45%, rgba(42,31,43,0.25) 100%)" }}
+        aria-hidden
+      />
+
+      <div className="mx-auto flex max-w-[1200px] flex-wrap items-center gap-3 px-4 pt-5 md:px-6">
+        <p className="text-[17px] font-bold">
+          곰선임피부과의원 <span className="font-normal text-white/70">피부 진단 결과지</span>
+        </p>
+        <nav className="flex w-full gap-1 rounded-full bg-white/15 p-1 backdrop-blur-md sm:ml-auto sm:w-auto" aria-label="진행 단계">
+          {STEPS.map((s, i) => {
+            const active = step === s.id;
+            return (
+              <button
+                key={s.id}
+                type="button"
+                onClick={() => onStep(s.id)}
+                aria-current={active ? "step" : undefined}
+                className={`h-10 flex-1 whitespace-nowrap rounded-full px-4 text-[15px] font-bold transition-colors duration-150 sm:flex-none ${
+                  active ? "bg-white text-[#2a1f2b]" : "text-white/80 hover:text-white"
+                }`}
+              >
+                {i + 1}. {s.label}
+              </button>
+            );
+          })}
+        </nav>
+      </div>
+
+      <div className="mx-auto grid max-w-[1200px] items-end gap-8 px-4 pb-12 pt-14 md:grid-cols-[1fr_auto] md:px-6 md:pb-16 md:pt-28">
+        <div>
+          {customer ? (
+            <>
+              <p className="text-[17px] text-white/75">{session ? `${formatDate(session.date)} 측정` : "측정 기록 없음"}</p>
+              <h1 className="mt-3 text-[44px] font-bold leading-[1.15] tracking-[-0.03em] md:text-[72px]">
+                {maskName(customer.name)} 님의
+                <br />
+                피부 결과지
+              </h1>
+              <p className="mt-5 text-[17px] text-white/75">
+                {customer.gender}, {customer.age}세, 차트 {customer.chartNo}
+              </p>
+            </>
+          ) : (
+            <h1 className="text-[44px] font-bold leading-[1.15] tracking-[-0.03em] md:text-[72px]">피부 진단 결과지</h1>
+          )}
+        </div>
+
+        {customer && total !== null && avgTotal !== null && (
+          <div className="flex items-center gap-6">
+            <ScoreRing value={total} size={188} stroke={12} track="rgba(255,255,255,0.2)" color="#ffffff">
+              <span className="block text-[15px] text-white/75">종합 점수</span>
+              <span className="block text-[60px] font-bold leading-none tabular-nums">{total}</span>
+            </ScoreRing>
+            <dl className="space-y-3 text-[15px]">
+              <div>
+                <dt className="text-white/70">
+                  {groupLabel(customer)} 평균 {avgTotal}점보다
+                </dt>
+                <dd className="text-[19px]">
+                  <DiffText value={total - avgTotal} light />
+                </dd>
+              </div>
+              {prevTotal !== null && (
+                <div>
+                  <dt className="text-white/70">지난 측정보다</dt>
+                  <dd className="text-[19px]">
+                    <DiffText value={total - prevTotal} light />
+                  </dd>
+                </div>
+              )}
+            </dl>
+          </div>
+        )}
+      </div>
+    </header>
+  );
+}
+
+/** 결과지 화면: 영역별 게이지 카드, 방사형 차트, 사진이 들어간 관리 권장 카드 */
+function ReportScreen({ customer, session, previous }: { customer: Customer; session: Session; previous: Session | null }) {
+  const avg = averageFor(customer.gender, customer.age);
+  const focus = [...AREAS].sort((a, b) => session.scores[a.id] - avg[a.id] - (session.scores[b.id] - avg[b.id])).slice(0, 2);
+  const group = groupLabel(customer);
+
+  return (
+    <div className="print:hidden">
+      <h2 className="text-[28px] font-bold leading-[1.3] tracking-[-0.02em]">영역별 점수</h2>
+      <p className="mt-1 text-[17px]" style={{ color: MUTED }}>
+        막대 위 세로선은 {group} 평균입니다.
+      </p>
+      <ul className="mt-6 grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
+        {AREAS.map((a) => {
+          const v = session.scores[a.id];
+          const prev = previous?.scores[a.id];
+          return (
+            <li key={a.id} className="rounded-[20px] bg-white p-6">
+              <div className="flex items-baseline justify-between">
+                <span className="flex items-center gap-2 text-[17px] font-bold">
+                  <span className="h-3 w-3 rounded-full" style={{ background: a.color }} aria-hidden />
+                  {a.label}
+                </span>
+                <span className="text-[44px] font-bold leading-none tabular-nums" style={{ color: a.color }}>
+                  {v}
+                </span>
+              </div>
+              <div className="relative mt-5 h-3 rounded-full bg-[#f3e6df]" aria-hidden>
+                <span className="absolute inset-y-0 left-0 rounded-full" style={{ width: `${v}%`, background: a.color }} />
+                <span className="absolute -top-1.5 h-6 w-[3px] -translate-x-1/2 rounded-full" style={{ left: `${avg[a.id]}%`, background: INK }} />
+              </div>
+              <p className="mt-3 flex flex-wrap justify-between gap-x-3 text-[15px]" style={{ color: MUTED }}>
+                <span>
+                  평균 {avg[a.id]} <DiffText value={v - avg[a.id]} />
+                </span>
+                {prev !== undefined && (
+                  <span>
+                    지난번 {prev} <DiffText value={v - prev} />
+                  </span>
+                )}
+              </p>
+            </li>
+          );
+        })}
+      </ul>
+
+      <div className="mt-12 grid gap-6 lg:grid-cols-[440px_1fr]">
+        <div className="rounded-[20px] bg-white p-6">
+          <h2 className="text-[21px] font-bold">영역별 비교</h2>
+          <div className="mt-2 flex justify-center">
+            <RadarChart scores={session.scores} average={avg} averageLabel={`${group} 평균`} />
+          </div>
+        </div>
+        <div>
+          <h2 className="text-[21px] font-bold">관리가 필요한 영역</h2>
+          <ul className="mt-4 grid gap-4 sm:grid-cols-2">
+            {focus.map((a, i) => (
+              <li key={a.id} className="overflow-hidden rounded-[20px] bg-white">
+                <Image src={CARE_PHOTOS[i]} alt="" width={900} height={900} className="aspect-[4/3] w-full object-cover" />
+                <div className="p-5">
+                  <p className="flex items-center gap-2 text-[19px] font-bold">
+                    <span className="h-3 w-3 rounded-full" style={{ background: a.color }} aria-hidden />
+                    {a.label}
+                  </p>
+                  <p className="mt-2 text-[17px] leading-[1.6]" style={{ color: MUTED }}>
+                    {a.care}
+                  </p>
+                </div>
+              </li>
+            ))}
+          </ul>
+          {session.memo && (
+            <blockquote className="mt-4 rounded-[20px] p-6 text-[19px] leading-[1.6] text-white" style={{ background: BERRY }}>
+              <p className="text-[15px] font-bold text-white/75">상담 메모</p>
+              <p className="mt-2">{session.memo}</p>
+            </blockquote>
+          )}
+        </div>
+      </div>
+    </div>
+  );
+}
+
+function ScoreRing({
+  value,
+  size,
+  stroke,
+  track,
+  color,
+  children,
+}: {
+  value: number;
+  size: number;
+  stroke: number;
+  track: string;
+  color: string;
+  children: React.ReactNode;
+}) {
+  const r = (size - stroke) / 2;
+  const len = 2 * Math.PI * r;
+  return (
+    <div className="relative shrink-0" style={{ width: size, height: size }}>
+      <svg width={size} height={size} viewBox={`0 0 ${size} ${size}`} className="-rotate-90" aria-hidden>
+        <circle cx={size / 2} cy={size / 2} r={r} fill="none" stroke={track} strokeWidth={stroke} />
+        <circle
+          cx={size / 2}
+          cy={size / 2}
+          r={r}
+          fill="none"
+          stroke={color}
+          strokeWidth={stroke}
+          strokeLinecap="round"
+          strokeDasharray={`${(len * value) / 100} ${len}`}
+        />
+      </svg>
+      <div className="absolute inset-0 grid place-items-center text-center">
+        <div>{children}</div>
+      </div>
+    </div>
+  );
+}
+
 /** A4(794px) 결과지를 화면 폭에 맞춰 줄여 보여준다 — 인쇄 시에는 원래 크기 */
 function ScaledSheet({ children }: { children: React.ReactNode }) {
   return (
     <div className="mx-auto w-full max-w-[794px] [container-type:inline-size]">
-      <div className="origin-top-left [zoom:min(1,calc(100cqw/794px))]">{children}</div>
+      <div className="sheet-zoom origin-top-left [zoom:min(1,calc(100cqw/794px))]">{children}</div>
     </div>
   );
 }
@@ -484,156 +775,197 @@ function ReportSheet({ customer, session, previous }: { customer: Customer; sess
   const avgTotal = totalScore(avg);
   const prevTotal = previous ? totalScore(previous.scores) : null;
   const focus = [...AREAS].sort((a, b) => session.scores[a.id] - avg[a.id] - (session.scores[b.id] - avg[b.id])).slice(0, 2);
-  const group = `${customer.gender === "여" ? "여성" : "남성"} ${ageGroup(customer.age)}`;
+  const group = groupLabel(customer);
 
   return (
-    <article className="report-sheet flex w-[794px] min-h-[1123px] flex-col bg-white px-[56px] py-[52px] text-[#1e2124] shadow-[0_8px_24px_-12px_rgba(0,0,0,0.2)]">
-      <header className="flex items-end justify-between border-b-2 border-[#1e2124] pb-4">
-        <h1 className="text-[28px] font-bold leading-[1.4]">피부 진단 결과지</h1>
-        <p className="text-right text-[15px] leading-[1.5] text-[#464c53]">
-          샘플 피부과의원
-          <br />
-          측정일 {session.date}
-        </p>
+    <article className="report-sheet flex min-h-[1123px] w-[794px] flex-col bg-white shadow-[0_20px_40px_-24px_rgba(42,31,43,0.35)]" style={{ color: INK }}>
+      <header className="flex items-end justify-between px-[56px] pb-6 pt-[44px] text-white" style={{ background: INK }}>
+        <div>
+          <p className="text-[13px] text-white/70">곰선임피부과의원</p>
+          <h1 className="mt-1 text-[30px] font-bold leading-[1.3]">피부 진단 결과지</h1>
+        </div>
+        <p className="text-right text-[15px] leading-[1.5] text-white/80">측정일 {session.date}</p>
       </header>
 
-      <dl className="mt-5 grid grid-cols-4 gap-4 rounded-[10px] bg-[#f4f5f6] px-5 py-4 text-[15px] leading-[1.5]">
-        <div>
-          <dt className="text-[#58616a]">고객</dt>
-          <dd className="font-bold">{maskName(customer.name)} 님</dd>
-        </div>
-        <div>
-          <dt className="text-[#58616a]">성별·나이</dt>
-          <dd className="font-bold">
-            {customer.gender}, {customer.age}세
-          </dd>
-        </div>
-        <div>
-          <dt className="text-[#58616a]">차트번호</dt>
-          <dd className="font-bold tabular-nums">{customer.chartNo}</dd>
-        </div>
-        <div>
-          <dt className="text-[#58616a]">비교 기준</dt>
-          <dd className="font-bold">{group} 평균</dd>
-        </div>
-      </dl>
+      <div className="flex flex-1 flex-col px-[56px] pb-[40px]">
+        <dl className="mt-6 grid grid-cols-4 gap-4 rounded-[12px] px-5 py-4 text-[15px] leading-[1.5]" style={{ background: BG }}>
+          <div>
+            <dt style={{ color: MUTED }}>고객</dt>
+            <dd className="font-bold">{maskName(customer.name)} 님</dd>
+          </div>
+          <div>
+            <dt style={{ color: MUTED }}>성별·나이</dt>
+            <dd className="font-bold">
+              {customer.gender}, {customer.age}세
+            </dd>
+          </div>
+          <div>
+            <dt style={{ color: MUTED }}>차트번호</dt>
+            <dd className="font-bold tabular-nums">{customer.chartNo}</dd>
+          </div>
+          <div>
+            <dt style={{ color: MUTED }}>비교 기준</dt>
+            <dd className="font-bold">{group} 평균</dd>
+          </div>
+        </dl>
 
-      <section className="mt-8 grid grid-cols-[1fr_400px] items-center gap-2">
-        <div>
-          <p className="text-[15px] text-[#58616a]">종합 점수</p>
-          <p className="text-[64px] font-bold leading-[1.1] tabular-nums">{total}</p>
-          <p className="mt-2 text-[17px] leading-[1.5]">
-            {group} 평균 {avgTotal}점보다 <Diff value={total - avgTotal} suffix="점" />
-          </p>
-          {prevTotal !== null && (
-            <p className="text-[17px] leading-[1.5]">
-              지난 측정({previous?.date})보다 <Diff value={total - prevTotal} suffix="점" />
-            </p>
-          )}
-        </div>
-        <RadarChart scores={session.scores} average={avg} averageLabel={`${group} 평균`} />
-      </section>
-
-      <table className="mt-8 w-full text-[15px] leading-[1.5]">
-        <caption className="sr-only">영역별 점수와 평균 비교</caption>
-        <thead>
-          <tr className="border-b border-[#1e2124] text-left">
-            <th scope="col" className="py-2 font-bold">영역</th>
-            <th scope="col" className="py-2 text-right font-bold">내 점수</th>
-            <th scope="col" className="py-2 text-right font-bold">평균</th>
-            <th scope="col" className="py-2 text-right font-bold">차이</th>
-          </tr>
-        </thead>
-        <tbody>
-          {AREAS.map((a) => (
-            <tr key={a.id} className="border-b border-[#e6e8ea]">
-              <th scope="row" className="py-2 text-left font-normal">{a.label}</th>
-              <td className="py-2 text-right font-bold tabular-nums">{session.scores[a.id]}</td>
-              <td className="py-2 text-right tabular-nums text-[#58616a]">{avg[a.id]}</td>
-              <td className="py-2 text-right tabular-nums">
-                <Diff value={session.scores[a.id] - avg[a.id]} />
-              </td>
-            </tr>
-          ))}
-        </tbody>
-      </table>
-
-      <section className="mt-8">
-        <h2 className="text-[17px] font-bold">관리가 필요한 영역</h2>
-        <ul className="mt-3 space-y-2">
-          {focus.map((a) => (
-            <li key={a.id} className="rounded-[10px] bg-[#f4f5f6] px-4 py-3 text-[15px] leading-[1.5]">
-              <b>{a.label}</b>: {a.care}
-            </li>
-          ))}
-        </ul>
-      </section>
-
-      {session.memo && (
-        <section className="mt-6 rounded-[10px] border border-[#cdd1d5] px-4 py-3 text-[15px] leading-[1.5]">
-          <p className="font-bold">상담 메모</p>
-          <p className="mt-1">{session.memo}</p>
+        <section className="mt-6 grid grid-cols-[1fr_330px] items-center gap-2">
+          <div className="flex items-center gap-5">
+            <ScoreRing value={total} size={150} stroke={10} track="#f3e6df" color={BERRY}>
+              <span className="block text-[13px]" style={{ color: MUTED }}>
+                종합 점수
+              </span>
+              <span className="block text-[48px] font-bold leading-none tabular-nums">{total}</span>
+            </ScoreRing>
+            <div className="text-[15px] leading-[1.6]">
+              <p>
+                {group} 평균 {avgTotal}점보다
+                <br />
+                <DiffText value={total - avgTotal} withUnit />
+              </p>
+              {prevTotal !== null && (
+                <p className="mt-2">
+                  지난 측정보다
+                  <br />
+                  <DiffText value={total - prevTotal} withUnit />
+                </p>
+              )}
+            </div>
+          </div>
+          <RadarChart scores={session.scores} average={avg} averageLabel={`${group} 평균`} compact />
         </section>
-      )}
 
-      <footer className="mt-auto border-t border-[#cdd1d5] pt-3 text-[13px] leading-[1.5] text-[#58616a]">
-        본 결과지는 진단기 측정값을 바탕으로 한 참고 자료이며 의학적 진단을 대신하지 않습니다.
-      </footer>
+        <table className="mt-4 w-full text-[15px] leading-[1.5]">
+          <caption className="sr-only">영역별 점수와 평균 비교</caption>
+          <thead>
+            <tr className="border-b-2 text-left" style={{ borderColor: INK }}>
+              <th scope="col" className="py-2 font-bold">
+                영역
+              </th>
+              <th scope="col" className="w-[190px] py-2">
+                <span className="sr-only">점수 막대</span>
+              </th>
+              <th scope="col" className="py-2 text-right font-bold">
+                내 점수
+              </th>
+              <th scope="col" className="py-2 text-right font-bold">
+                평균
+              </th>
+              <th scope="col" className="py-2 text-right font-bold">
+                차이
+              </th>
+            </tr>
+          </thead>
+          <tbody>
+            {AREAS.map((a) => (
+              <tr key={a.id} className="border-b" style={{ borderColor: LINE }}>
+                <th scope="row" className="py-2 text-left font-normal">
+                  <span className="mr-2 inline-block h-2.5 w-2.5 rounded-full align-middle" style={{ background: a.color }} aria-hidden />
+                  {a.label}
+                </th>
+                <td className="py-2 pr-4" aria-hidden>
+                  <span className="relative block h-2 rounded-full bg-[#f3e6df]">
+                    <span className="absolute inset-y-0 left-0 rounded-full" style={{ width: `${session.scores[a.id]}%`, background: a.color }} />
+                    <span className="absolute -top-1 h-4 w-[2px] -translate-x-1/2" style={{ left: `${avg[a.id]}%`, background: INK }} />
+                  </span>
+                </td>
+                <td className="py-2 text-right font-bold tabular-nums">{session.scores[a.id]}</td>
+                <td className="py-2 text-right tabular-nums" style={{ color: MUTED }}>
+                  {avg[a.id]}
+                </td>
+                <td className="py-2 text-right tabular-nums">
+                  <DiffText value={session.scores[a.id] - avg[a.id]} />
+                </td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
+
+        <section className="mt-6">
+          <h2 className="text-[17px] font-bold">관리가 필요한 영역</h2>
+          <ul className="mt-3 grid grid-cols-2 gap-3">
+            {focus.map((a) => (
+              <li key={a.id} className="rounded-[12px] px-4 py-3 text-[15px] leading-[1.5]" style={{ background: BG }}>
+                <b style={{ color: a.color }}>{a.label}</b>
+                <br />
+                {a.care}
+              </li>
+            ))}
+          </ul>
+        </section>
+
+        {session.memo && (
+          <section className="mt-4 rounded-[12px] border px-4 py-3 text-[15px] leading-[1.5]" style={{ borderColor: LINE }}>
+            <p className="font-bold">상담 메모</p>
+            <p className="mt-1">{session.memo}</p>
+          </section>
+        )}
+
+        <footer className="mt-auto border-t pt-3 text-[13px] leading-[1.5]" style={{ borderColor: LINE, color: MUTED }}>
+          본 결과지는 진단기 측정값을 바탕으로 한 참고 자료이며 의학적 진단을 대신하지 않습니다.
+        </footer>
+      </div>
     </article>
   );
 }
 
-function Diff({ value, suffix = "" }: { value: number; suffix?: string }) {
-  if (value === 0) return <span className="text-[#58616a]">같음</span>;
-  // 색만으로 구분하지 않도록 ▲▼와 '높음/낮음' 문구를 함께 쓴다
+/** 증감 표시. 색만으로 구분하지 않도록 ▲▼와 높음/낮음 문구를 함께 쓴다 */
+function DiffText({ value, light = false, withUnit = false }: { value: number; light?: boolean; withUnit?: boolean }) {
+  if (value === 0) return <span className={light ? "text-white/80" : "text-[#6e5a64]"}>같음</span>;
+  const up = value > 0;
+  const color = light ? (up ? "#ffe3b8" : "#ffc4cf") : up ? "#2f6ea8" : "#b3261e";
   return (
-    <span className={`whitespace-nowrap font-bold ${value > 0 ? "text-[#0b50d0]" : "text-[#bd2c0f]"}`}>
-      {value > 0 ? "▲" : "▼"} {Math.abs(value)}
-      {suffix} {suffix ? (value > 0 ? "높음" : "낮음") : ""}
+    <span className="whitespace-nowrap font-bold" style={{ color }}>
+      {up ? "▲" : "▼"} {Math.abs(value)}
+      {light || withUnit ? `점 ${up ? "높음" : "낮음"}` : ""}
     </span>
   );
 }
 
-/** 6개 영역 방사형 차트 — 내 점수(파랑 실선·면) vs 비교 평균(회색 점선) */
-function RadarChart({ scores, average, averageLabel }: { scores: Scores; average: Scores; averageLabel: string }) {
-  const size = 400;
+/** 6개 영역 방사형 차트. 내 점수(베리색 실선·면)와 비교 평균(점선) */
+function RadarChart({
+  scores,
+  average,
+  averageLabel,
+  compact = false,
+}: {
+  scores: Scores;
+  average: Scores;
+  averageLabel: string;
+  compact?: boolean;
+}) {
+  const size = compact ? 330 : 400;
   const c = size / 2;
-  const r = 118;
+  const r = compact ? 92 : 118;
   const angle = (i: number) => -Math.PI / 2 + (i * 2 * Math.PI) / AREAS.length;
-  const point = (i: number, v: number) => [c + Math.cos(angle(i)) * (r * v) / 100, c + Math.sin(angle(i)) * (r * v) / 100];
+  const point = (i: number, v: number) => [c + (Math.cos(angle(i)) * (r * v)) / 100, c + (Math.sin(angle(i)) * (r * v)) / 100];
   const poly = (s: Scores) => AREAS.map((a, i) => point(i, s[a.id]).join(",")).join(" ");
   const [hover, setHover] = useState<number | null>(null);
 
   const rings = useMemo(() => [20, 40, 60, 80, 100], []);
 
   return (
-    <figure>
-      <figcaption className="mb-2 flex justify-end gap-4 text-[13px] text-[#464c53]">
+    <figure className="max-w-full">
+      <figcaption className="mb-2 flex justify-end gap-4 text-[13px]" style={{ color: MUTED }}>
         <span className="inline-flex items-center gap-1.5">
-          <span className="h-[2px] w-5 bg-[#256ef4]" aria-hidden />
+          <span className="h-[2px] w-5" style={{ background: BERRY }} aria-hidden />
           내 점수
         </span>
         <span className="inline-flex items-center gap-1.5">
-          <span className="w-5 border-t-2 border-dashed border-[#6d7882]" aria-hidden />
+          <span className="w-5 border-t-2 border-dashed" style={{ borderColor: MUTED }} aria-hidden />
           {averageLabel}
         </span>
       </figcaption>
-      <svg viewBox={`0 20 ${size} ${size - 40}`} width={size} height={size - 40} role="img" aria-label="영역별 점수 방사형 차트">
+      <svg viewBox={`0 20 ${size} ${size - 40}`} width={size} height={size - 40} className="h-auto max-w-full" role="img" aria-label="영역별 점수 방사형 차트">
         {rings.map((v) => (
-          <polygon
-            key={v}
-            points={AREAS.map((_, i) => point(i, v).join(",")).join(" ")}
-            fill="none"
-            stroke="#e6e8ea"
-            strokeWidth={1}
-          />
+          <polygon key={v} points={AREAS.map((_, i) => point(i, v).join(",")).join(" ")} fill="none" stroke={LINE} strokeWidth={1} />
         ))}
         {AREAS.map((a, i) => {
           const [x, y] = point(i, 100);
           const [lx, ly] = point(i, 122);
           return (
             <g key={a.id}>
-              <line x1={c} y1={c} x2={x} y2={y} stroke="#e6e8ea" strokeWidth={1} />
+              <line x1={c} y1={c} x2={x} y2={y} stroke={LINE} strokeWidth={1} />
               <text
                 x={lx}
                 y={ly}
@@ -641,41 +973,42 @@ function RadarChart({ scores, average, averageLabel }: { scores: Scores; average
                 dominantBaseline="middle"
                 fontSize={13}
                 fontWeight={700}
-                fill="#464c53"
+                fill={INK}
               >
                 {a.label}
               </text>
             </g>
           );
         })}
-        <polygon points={poly(average)} fill="none" stroke="#6d7882" strokeWidth={2} strokeDasharray="5 4" />
-        <polygon points={poly(scores)} fill="rgba(37,110,244,0.14)" stroke="#256ef4" strokeWidth={2} strokeLinejoin="round" />
+        <polygon points={poly(average)} fill="none" stroke={MUTED} strokeWidth={2} strokeDasharray="5 4" />
+        <polygon points={poly(scores)} fill="rgba(156,58,92,0.16)" stroke={BERRY} strokeWidth={2} strokeLinejoin="round" />
         {AREAS.map((a, i) => {
           const [x, y] = point(i, scores[a.id]);
           return (
             <g key={a.id} onMouseEnter={() => setHover(i)} onMouseLeave={() => setHover(null)}>
               <circle cx={x} cy={y} r={12} fill="transparent" />
-              <circle cx={x} cy={y} r={4} fill="#256ef4" stroke="#fff" strokeWidth={2} />
+              <circle cx={x} cy={y} r={5} fill={a.color} stroke="#fff" strokeWidth={2} />
             </g>
           );
         })}
-        {hover !== null && (() => {
-          const a = AREAS[hover];
-          const [x, y] = point(hover, scores[a.id]);
-          const tx = Math.min(Math.max(x - 60, 4), size - 124);
-          const ty = y > c ? y - 52 : y + 12;
-          return (
-            <g pointerEvents="none">
-              <rect x={tx} y={ty} width={120} height={40} rx={6} fill="#1e2124" />
-              <text x={tx + 10} y={ty + 17} fontSize={12} fill="#fff" fontWeight={700}>
-                {a.label} {scores[a.id]}점
-              </text>
-              <text x={tx + 10} y={ty + 32} fontSize={12} fill="#cdd1d5">
-                평균 {average[a.id]}점
-              </text>
-            </g>
-          );
-        })()}
+        {hover !== null &&
+          (() => {
+            const a = AREAS[hover];
+            const [x, y] = point(hover, scores[a.id]);
+            const tx = Math.min(Math.max(x - 60, 4), size - 124);
+            const ty = y > c ? y - 52 : y + 12;
+            return (
+              <g pointerEvents="none">
+                <rect x={tx} y={ty} width={120} height={40} rx={8} fill={INK} />
+                <text x={tx + 10} y={ty + 17} fontSize={12} fill="#fff" fontWeight={700}>
+                  {a.label} {scores[a.id]}점
+                </text>
+                <text x={tx + 10} y={ty + 32} fontSize={12} fill="#e8d9d1">
+                  평균 {average[a.id]}점
+                </text>
+              </g>
+            );
+          })()}
       </svg>
     </figure>
   );

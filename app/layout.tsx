@@ -25,24 +25,28 @@ const geistMono = Geist_Mono({
   display: "swap",
 });
 
+// 메인 첫 화면 문구와 맞춘 사이트 제목·설명
+const siteTitle = `홈페이지·업무 프로그램 제작 | ${profile.name}`;
+const siteDescription =
+  "17년 경력 개발자가 홈페이지와 업무 프로그램을 직접 만듭니다. 원본 소스를 제공하고 완료 후 1개월 무상 유지보수합니다.";
+
 export const metadata: Metadata = {
   metadataBase: new URL(siteUrl),
   title: {
-    default: `${profile.name} — 홈페이지·웹사이트 제작, 만들고 오래 운영합니다`,
+    default: siteTitle,
     template: `%s | ${profile.name}`,
   },
-  description: profile.bio,
+  description: siteDescription,
   keywords: [
     "홈페이지 제작",
-    "웹사이트 제작",
-    "랜딩페이지 제작",
-    "홈페이지 제작 업체",
-    "소상공인 홈페이지 제작",
+    "업무 프로그램 개발",
     "홈페이지 유지보수",
-    "소상공인 웹사이트",
-    "이벤트 페이지",
-    "웹사이트 유지보수",
-    "마케팅 페이지",
+    "홈페이지 리뉴얼",
+    "공공기관 홈페이지",
+    "병원 홈페이지 제작",
+    "예약 시스템 개발",
+    "웹접근성 개선",
+    "1인 개발자 외주",
     profile.name,
   ],
   authors: [{ name: profile.name }],
@@ -51,22 +55,22 @@ export const metadata: Metadata = {
     type: "website",
     locale: "ko_KR",
     url: siteUrl,
-    siteName: `${profile.name} Portfolio`,
-    title: `${profile.name} — 홈페이지·웹사이트 제작, 만들고 오래 운영합니다`,
-    description: profile.bio,
+    siteName: profile.name,
+    title: siteTitle,
+    description: siteDescription,
     images: [
       {
         url: "/og-image.png",
         width: 1200,
         height: 630,
-        alt: `${profile.name} 포트폴리오`,
+        alt: `${profile.name} 홈페이지·업무 프로그램 제작`,
       },
     ],
   },
   twitter: {
     card: "summary_large_image",
-    title: `${profile.name} — 홈페이지·웹사이트 제작, 만들고 오래 운영합니다`,
-    description: profile.bio,
+    title: siteTitle,
+    description: siteDescription,
     images: ["/og-image.png"],
   },
   robots: {
