@@ -80,6 +80,17 @@ export const projects: Project[] = [
     demoUrl: "/demo/excel-automation",
   },
   {
+    id: "lms",
+    kind: "신규 제작",
+    category: "온라인 강의",
+    title: "온라인 강의·수료 관리 LMS",
+    description: "실제로 본 구간만 진도로 인정하고, 이어보기와 수료 조건, 수료증 출력, 관리자 독려와 이탈 구간 분석까지 갖춘 학원·교육기관용 강의 시스템입니다.",
+    features: ["구간 기반 진도 관리", "이어보기", "수료 평가·수료증 출력", "독려 대상 관리", "차시별 이탈 구간 통계"],
+    imageUrl: "/images/demos/lms.jpg",
+    imageAlt: "온라인 강의·수료 관리 LMS 수강 화면",
+    demoUrl: "/demo/lms",
+  },
+  {
     id: "maintenance-dashboard",
     kind: "유지보수",
     category: "홈페이지 유지보수",
