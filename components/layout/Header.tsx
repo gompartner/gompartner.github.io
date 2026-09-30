@@ -7,10 +7,11 @@ import { cn } from "@/lib/utils";
 import { profile } from "@/data/profile";
 import { ChannelTalkButton } from "@/components/layout/ChannelTalk";
 
-// 원페이지 구성 — 메뉴는 같은 페이지의 섹션으로 이동한다
+// 메뉴는 첫 화면의 섹션과 무료 도구 페이지로 이동한다
 const navItems = [
   { href: "/#works", label: "제작 사례" },
   { href: "/#history", label: "작업 이력" },
+  { href: "/tools/privacy-policy", label: "무료 도구" },
 ];
 
 export function Header() {

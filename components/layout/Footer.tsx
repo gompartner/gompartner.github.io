@@ -1,3 +1,4 @@
+import Link from "next/link";
 import { profile } from "@/data/profile";
 
 export function Footer() {
@@ -9,6 +10,10 @@ export function Footer() {
         <p>
           © {currentYear} {profile.name} · {profile.title}
         </p>
+        <div className="flex flex-wrap items-center gap-x-5 gap-y-1">
+        <Link href="/tools/privacy-policy" className="text-foreground-secondary underline-offset-4 hover:text-foreground hover:underline">
+          개인정보처리방침 생성기
+        </Link>
         <a
           href={`mailto:${profile.email}`}
           data-gtm-cta="footer_email"
@@ -16,6 +21,7 @@ export function Footer() {
         >
           {profile.email}
         </a>
+        </div>
       </div>
     </footer>
   );
