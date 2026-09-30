@@ -11,7 +11,7 @@ import { ChannelTalkButton } from "@/components/layout/ChannelTalk";
 const navItems = [
   { href: "/#works", label: "제작 사례" },
   { href: "/#history", label: "작업 이력" },
-  { href: "/tools/privacy-policy", label: "무료 도구" },
+  { href: "/tools", label: "무료 도구" },
 ];
 
 export function Header() {

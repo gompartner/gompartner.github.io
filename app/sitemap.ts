@@ -1,5 +1,6 @@
 import type { MetadataRoute } from "next";
 import { projects } from "@/data/projects";
+import { tools } from "@/data/tools";
 import { siteUrl } from "@/lib/site";
 
 export const dynamic = "force-static";
@@ -23,12 +24,12 @@ export default function sitemap(): MetadataRoute.Sitemap {
       changeFrequency: "monthly",
       priority: 1.0,
     },
-    {
-      url: `${siteUrl}/tools/privacy-policy`,
+    ...["/tools", ...tools.map((t) => t.href)].map((path) => ({
+      url: `${siteUrl}${path}`,
       lastModified,
-      changeFrequency: "monthly",
+      changeFrequency: "monthly" as const,
       priority: 0.8,
-    },
+    })),
     ...demos,
   ];
 }
