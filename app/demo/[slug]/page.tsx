@@ -10,6 +10,7 @@ import { CommunityMapDemo } from "@/components/demos/CommunityMapDemo";
 import { ExcelAutomationDemo } from "@/components/demos/ExcelAutomationDemo";
 import { DistrictPortalDemo } from "@/components/demos/DistrictPortalDemo";
 import { HomepageDemo } from "@/components/demos/HomepageDemo";
+import { LmsDemo } from "@/components/demos/LmsDemo";
 import { JobPortalDemo } from "@/components/demos/JobPortalDemo";
 import { MaintenanceDemo } from "@/components/demos/MaintenanceDemo";
 import { RetirementDemo } from "@/components/demos/RetirementDemo";
@@ -32,6 +33,7 @@ const demoComponents: Record<string, ComponentType> = {
   "small-business-homepage": HomepageDemo,
   "shop-admin": ShopAdminDemo,
   "excel-automation": ExcelAutomationDemo,
+  lms: LmsDemo,
 };
 
 function findDemo(slug: string) {
