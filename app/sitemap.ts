@@ -1,17 +1,28 @@
 import type { MetadataRoute } from "next";
+import { projects } from "@/data/projects";
 import { siteUrl } from "@/lib/site";
 
 export const dynamic = "force-static";
 
-// 원페이지 구성이라 색인 대상은 첫 화면 하나뿐이다.
-// /demo/*는 noindex 정책이라 사이트맵에서 제외한다.
+// 첫 화면과 데모 페이지를 색인 대상으로 둔다.
 export default function sitemap(): MetadataRoute.Sitemap {
+  const lastModified = new Date();
+  const demos = projects
+    .filter((project) => project.demoUrl.startsWith("/demo/"))
+    .map((project) => ({
+      url: `${siteUrl}${project.demoUrl}`,
+      lastModified,
+      changeFrequency: "monthly" as const,
+      priority: 0.7,
+    }));
+
   return [
     {
       url: `${siteUrl}/`,
-      lastModified: new Date(),
+      lastModified,
       changeFrequency: "monthly",
       priority: 1.0,
     },
+    ...demos,
   ];
 }

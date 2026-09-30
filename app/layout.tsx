@@ -73,6 +73,9 @@ export const metadata: Metadata = {
     description: siteDescription,
     images: ["/og-image.png"],
   },
+  verification: {
+    other: { "naver-site-verification": "1c5242ef5ddbce4e807bad7225bb0770a1cb06c1" },
+  },
   robots: {
     index: true,
     follow: true,

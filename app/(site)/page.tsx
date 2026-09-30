@@ -3,7 +3,7 @@ import { Check } from "lucide-react";
 import { ChannelTalkButton } from "@/components/layout/ChannelTalk";
 import { Doodles } from "@/components/landing/Doodles";
 import { HeroSlider } from "@/components/landing/HeroSlider";
-import { WorksGrid } from "@/components/landing/WorksGrid";
+import { WorksSearch } from "@/components/landing/WorksSearch";
 import { history, projects } from "@/data/projects";
 import { profile } from "@/data/profile";
 
@@ -77,7 +77,7 @@ export default function HomePage() {
           <p className={lead}>고객 정보 보호를 위해 기관명과 데이터는 가상으로 재구성했습니다.</p>
 
           <div className="mt-8">
-            <WorksGrid projects={projects} />
+            <WorksSearch projects={projects} />
           </div>
         </div>
       </section>
