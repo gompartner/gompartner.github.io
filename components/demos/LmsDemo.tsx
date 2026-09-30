@@ -85,6 +85,13 @@ function merge(segs: Seg[]): Seg[] {
 }
 const watched = (segs: Seg[]) => segs.reduce((t, [a, b]) => t + (b - a), 0);
 const ratio = (p: Progress, l: Lesson) => Math.min(1, watched(p.segs) / l.duration);
+// 이름 가운데 글자를 초성으로 가린다 (김하늘 → 김ㅎ늘, 2글자는 김*)
+const CHO = "ㄱㄲㄴㄷㄸㄹㅁㅂㅃㅅㅆㅇㅈㅉㅊㅋㅌㅍㅎ";
+function maskName(name: string) {
+  if (name.length < 3) return name[0] + "*";
+  const code = name.charCodeAt(1) - 0xac00;
+  return name[0] + (code >= 0 && code < 11172 ? CHO[Math.floor(code / 588)] : "*") + name.slice(2);
+}
 const clock = (s: number) => `${String(Math.floor(s / 60)).padStart(2, "0")}:${String(Math.floor(s % 60)).padStart(2, "0")}`;
 
 // 관리자 화면의 가상 수강생 (지금 학습 중인 수강생은 실제 진도와 이어진다)
@@ -546,7 +553,7 @@ function Learner({
               </p>
               <h2 className="mt-4 text-[34px] font-bold tracking-[0.3em]">수료증</h2>
               <p className="mt-8 text-[18px]">
-                성명 <b>김하늘</b>
+                성명 <b>{maskName("김하늘")}</b>
               </p>
               <p className="mt-1 text-[18px]">
                 과정 <b>{COURSE}</b> (총 {LESSONS.length}차시)
@@ -697,7 +704,7 @@ function Admin({ mine, notify }: { mine: { progress: number; quiz: number | null
                     <td className="px-4 py-2.5">
                       <input
                         type="checkbox"
-                        aria-label={`${r.name} 선택`}
+                        aria-label={`${maskName(r.name)} 선택`}
                         checked={selected.has(r.name)}
                         onChange={() =>
                           setSelected((prev) => {
@@ -710,7 +717,7 @@ function Admin({ mine, notify }: { mine: { progress: number; quiz: number | null
                       />
                     </td>
                     <td className="py-2.5 font-bold">
-                      {r.name}
+                      {maskName(r.name)}
                       {r.live && (
                         <span className="ml-2 rounded px-1.5 py-0.5 text-[12px]" style={{ background: C.brandSoft, color: C.brand }}>
                           내 강의실과 연동
