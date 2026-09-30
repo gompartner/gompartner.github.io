@@ -10,6 +10,7 @@ export const fieldsById: Record<string, Field[]> = {
   "community-map": ["공공기관·학교"],
   "program-application": ["공공기관·학교"],
   "private-gym": ["가게·매장"],
+  "shop-admin": ["가게·매장", "기업"],
   "maintenance-dashboard": ["공공기관·학교", "기업"],
   "district-portal": ["공공기관·학교"],
   "job-portal": ["기업", "공공기관·학교"],

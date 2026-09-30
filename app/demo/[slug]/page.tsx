@@ -12,6 +12,7 @@ import { HomepageDemo } from "@/components/demos/HomepageDemo";
 import { JobPortalDemo } from "@/components/demos/JobPortalDemo";
 import { MaintenanceDemo } from "@/components/demos/MaintenanceDemo";
 import { RetirementDemo } from "@/components/demos/RetirementDemo";
+import { ShopAdminDemo } from "@/components/demos/ShopAdminDemo";
 
 interface DemoPageProps {
   params: Promise<{ slug: string }>;
@@ -28,6 +29,7 @@ const demoComponents: Record<string, ComponentType> = {
   "accessibility-review": AccessibilityDemo,
   "district-portal": DistrictPortalDemo,
   "small-business-homepage": HomepageDemo,
+  "shop-admin": ShopAdminDemo,
 };
 
 function findDemo(slug: string) {
