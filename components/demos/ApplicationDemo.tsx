@@ -1,6 +1,7 @@
 "use client";
 
 import { useMemo, useState } from "react";
+import Image from "next/image";
 import { IBM_Plex_Sans_KR } from "next/font/google";
 import {
   CalendarDays,
@@ -20,12 +21,15 @@ const plex = IBM_Plex_Sans_KR({ preload: false, weight: ["400", "700"], subsets:
 
 const STORAGE_KEY = "gs-demo:application:v1";
 
-/* 지원사업 신청·심사 시스템 데모 (가상 기관 샘플진흥원).
+/* 지원사업 신청·심사 시스템 데모 (가상 기관 곰선임진흥원).
    신청자는 모집 공고에서 사업을 골라 3단계 신청서를 제출하고,
    관리자는 신청 목록을 검색·심사하고 통계와 엑셀 파일을 받는다.
 
-   디자인: 진흥원 상징색(에메랄드) 면 위에 공고 카드를 올리고, 마감 D-day를 가장 크게 보여준다.
-   관리자 화면은 같은 색을 선과 숫자에만 쓰는 차분한 업무 화면이다. */
+   디자인: 사람이 일하는 사진을 화면 가득 깔고, 마감이 가장 가까운 사업의 D-day를 가장 크게 보여준다.
+   공고 카드마다 분야 사진을 넣고, 관리자 화면은 상태별 도넛 차트와 사업별 누적 막대로 현황을 보여준다.
+
+   사진(Unsplash 무료 라이선스): 첫 화면 Van Tay Media(Hh-PIe3qIug), 인턴십 Vitaly Gariev(ztHn6CEx2e8),
+   창업 Mimi Thian(jxUuXxUFfp4), 디지털 전환 EvoMao(whfShwuM2LM), 연구 인력 National Cancer Institute(AkhByKwf5N8) */
 
 const C = {
   brand: "#00745c",
@@ -52,6 +56,7 @@ interface Program {
   target: string;
   support: string;
   category: string;
+  image: string;
 }
 
 interface Application {
@@ -77,6 +82,7 @@ interface State {
 const PROGRAMS: Program[] = [
   {
     id: "p1",
+    image: "/images/demo-application/p1.jpg",
     name: "2026년 경력 재개 여성 인턴십 지원사업",
     start: "2026-09-01",
     end: "2026-10-15",
@@ -86,6 +92,7 @@ const PROGRAMS: Program[] = [
   },
   {
     id: "p2",
+    image: "/images/demo-application/p2.jpg",
     name: "청년 창업 초기 사업화 지원",
     start: "2026-09-15",
     end: "2026-10-31",
@@ -95,6 +102,7 @@ const PROGRAMS: Program[] = [
   },
   {
     id: "p3",
+    image: "/images/demo-application/p3.jpg",
     name: "중소기업 디지털 전환 컨설팅",
     start: "2026-08-01",
     end: "2026-10-05",
@@ -104,6 +112,7 @@ const PROGRAMS: Program[] = [
   },
   {
     id: "p4",
+    image: "/images/demo-application/p4.jpg",
     name: "2026년 상반기 연구 인력 채용 지원",
     start: "2026-03-02",
     end: "2026-04-30",
@@ -117,18 +126,19 @@ const FIELDS = ["IT·소프트웨어", "바이오·의료", "제조·기계", "�
 
 const STATUSES: Status[] = ["접수", "서류 검토", "선정", "탈락"];
 
-const STATUS_STYLE: Record<Status, { color: string; icon: typeof Inbox }> = {
-  접수: { color: C.sub, icon: Inbox },
-  "서류 검토": { color: C.warning, icon: FileSearch },
-  선정: { color: C.success, icon: CheckCircle2 },
-  탈락: { color: C.danger, icon: XCircle },
+// color는 글자(대비 4.5:1 이상), fill은 차트 면 색
+const STATUS_STYLE: Record<Status, { color: string; fill: string; icon: typeof Inbox }> = {
+  접수: { color: C.sub, fill: "#8fa39b", icon: Inbox },
+  "서류 검토": { color: C.warning, fill: C.sun, icon: FileSearch },
+  선정: { color: C.success, fill: C.brand, icon: CheckCircle2 },
+  탈락: { color: C.danger, fill: "#d8574f", icon: XCircle },
 };
 
 const SEED_NAMES = [
   "김하늘", "이서연", "박지훈", "최민지", "정우진", "강수아", "조현우", "윤지아", "장도현", "임하은",
   "한예린", "오승민", "서지유", "신동현", "권나윤", "황민재", "안소희", "송재원", "전유나", "홍석진",
 ];
-const SEED_ORGS = ["개인", "주식회사 샘플랩", "샘플디자인", "개인", "샘플소프트", "개인", "샘플바이오", "샘플에너지"];
+const SEED_ORGS = ["개인", "주식회사 곰선임랩", "곰선임디자인", "개인", "곰선임소프트", "개인", "곰선임바이오", "곰선임에너지"];
 const SEED_STATUS: Status[] = ["접수", "서류 검토", "선정", "탈락", "서류 검토", "접수", "선정", "서류 검토", "접수", "탈락"];
 
 function buildSeed(): Application[] {
@@ -218,7 +228,7 @@ export function ApplicationDemo() {
           <div className="flex items-center gap-2.5">
             <Emblem inverse={admin} />
             <div className="leading-[1.3]">
-              <p className="text-[19px] font-bold tracking-[-0.02em]">샘플진흥원</p>
+              <p className="text-[19px] font-bold tracking-[-0.02em]">곰선임진흥원</p>
               <p className={`text-[15px] ${admin ? "text-[#c4cfca]" : "text-[#5b6862]"}`}>
                 {admin ? "지원사업 심사 관리" : "지원사업 통합 신청"}
               </p>
@@ -273,7 +283,7 @@ export function ApplicationDemo() {
   );
 }
 
-/** 샘플진흥원 상징: 초록 원 안의 새싹 모양 */
+/** 곰선임진흥원 상징: 초록 원 안의 새싹 모양 */
 function Emblem({ inverse }: { inverse: boolean }) {
   return (
     <svg width="36" height="36" viewBox="0 0 36 36" aria-hidden>
@@ -378,7 +388,9 @@ function ApplicantView({ state, setState }: { state: State; setState: (u: (s: St
     return (
       <main className="mx-auto max-w-[1248px] px-4 py-10 pb-28 md:px-6">
         <section className="mx-auto max-w-[640px] overflow-hidden rounded-2xl bg-white ring-1 ring-[#d3dbd7]">
-          <div className="bg-[#00745c] px-6 py-8 text-center text-white">
+          <div className="relative isolate overflow-hidden bg-[#00745c] px-6 py-10 text-center text-white">
+            <Image src={PROGRAMS.find((p) => p.id === programId)!.image} alt="" fill sizes="640px" className="-z-20 object-cover" />
+            <span aria-hidden className="absolute inset-0 -z-10 bg-[rgba(0,81,63,0.86)]" />
             <CheckCircle2 size={44} className="mx-auto" aria-hidden />
             <h2 className="mt-3 text-[26px] font-bold tracking-[-0.02em]">신청이 접수되었습니다</h2>
             <p className="mt-1 text-[#d7efe7]">{programName(programId)}</p>
@@ -401,7 +413,9 @@ function ApplicantView({ state, setState }: { state: State; setState: (u: (s: St
     return (
       <main className="mx-auto max-w-[1248px] px-4 py-8 pb-28 md:px-6">
         <div className="mx-auto grid max-w-[960px] overflow-hidden rounded-2xl bg-white ring-1 ring-[#d3dbd7] md:grid-cols-[260px_1fr]">
-          <aside className="bg-[#00745c] p-6 text-white md:p-8">
+          <aside className="relative isolate overflow-hidden bg-[#00513f] p-6 text-white md:p-8">
+            <Image src={program.image} alt="" fill sizes="260px" className="-z-20 object-cover" />
+            <span aria-hidden className="absolute inset-0 -z-10 bg-[linear-gradient(180deg,rgba(0,81,63,0.78),rgba(0,58,45,0.96)_55%)]" />
             <p className="text-[15px] text-[#d7efe7]">신청서 작성</p>
             <h2 className="mt-1 text-[21px] font-bold leading-[1.4] tracking-[-0.02em]">{program.name}</h2>
             <p className="mt-2 text-[15px] text-[#d7efe7]">마감 {dot(program.end)}</p>
@@ -441,8 +455,21 @@ function ApplicantView({ state, setState }: { state: State; setState: (u: (s: St
           </aside>
 
           <section className="p-6 md:p-10" aria-label={`${step}단계 ${STEPS[step - 1]}`}>
-            <h3 className="text-[22px] font-bold tracking-[-0.02em]">
-              {step}. {STEPS[step - 1]}
+            <div className="flex gap-1.5" aria-hidden>
+              {STEPS.map((label, i) => (
+                <span key={label} className="h-1.5 flex-1 overflow-hidden rounded-full bg-[#e3e9e6]">
+                  <span
+                    className="block h-full rounded-full bg-[#00745c] transition-transform duration-300 ease-[cubic-bezier(0.23,1,0.32,1)] motion-reduce:transition-none"
+                    style={{ transform: `scaleX(${i < step ? 1 : 0})`, transformOrigin: "left" }}
+                  />
+                </span>
+              ))}
+            </div>
+            <p className="mt-5 text-[15px] font-bold tabular-nums text-[#00745c]">
+              {step} / {STEPS.length}
+            </p>
+            <h3 className="text-[26px] font-bold tracking-[-0.02em]">
+              {STEPS[step - 1]}
             </h3>
             <div className="mt-6 space-y-5">
               {step === 1 && (
@@ -567,32 +594,76 @@ function ApplicantView({ state, setState }: { state: State; setState: (u: (s: St
     );
   }
 
+  // 마감이 가장 가까운 모집 중 사업을 첫 화면에 크게 보여 준다
+  const nearest = PROGRAMS.filter((p) => daysLeft(p.end) >= 0).sort((a, b) => daysLeft(a.end) - daysLeft(b.end))[0];
+  const nearestLeft = nearest ? daysLeft(nearest.end) : 0;
+
   return (
     <main className="pb-28">
-      <section aria-labelledby="notice-title" className="bg-[#00745c] text-white">
-        <div className="mx-auto max-w-[1248px] px-4 pb-14 pt-10 md:px-6 md:pb-20 md:pt-14">
-          <div className="flex flex-wrap items-end justify-between gap-4">
-            <div>
-              <h1 id="notice-title" className="text-[32px] font-bold leading-[1.3] tracking-[-0.03em] md:text-[44px]">
-                지원사업 모집 공고
-              </h1>
-              <p className="mt-2 text-[17px] text-[#d7efe7]">현재 {openCount}개 사업을 모집하고 있습니다.</p>
-            </div>
-            <p className="flex items-center gap-2 text-[15px] text-[#d7efe7]">
+      <section aria-labelledby="notice-title" className="relative isolate overflow-hidden bg-[#0c1f19] text-white">
+        <Image
+          src="/images/demo-application/hero.jpg"
+          alt=""
+          fill
+          priority
+          sizes="100vw"
+          className="-z-20 object-cover object-[60%_40%]"
+        />
+        <div
+          aria-hidden
+          className="absolute inset-0 -z-10"
+          style={{
+            background:
+              "linear-gradient(90deg, rgba(6,26,20,0.94) 0%, rgba(6,26,20,0.82) 38%, rgba(6,26,20,0.62) 70%, rgba(6,26,20,0.45) 100%), linear-gradient(0deg, rgba(6,26,20,0.9) 0%, rgba(6,26,20,0) 45%)",
+          }}
+        />
+        {/* 좁은 화면에서는 글자가 사진 위에 겹치므로 한 겹 더 어둡게 */}
+        <div aria-hidden className="absolute inset-0 -z-10 bg-[rgba(6,26,20,0.5)] md:hidden" />
+        <div className="mx-auto grid max-w-[1248px] gap-10 px-4 pb-28 pt-14 md:px-6 md:pb-36 md:pt-24 lg:grid-cols-[1.3fr_1fr] lg:items-end">
+          <div>
+            <h1 id="notice-title" className="text-[40px] font-bold leading-[1.15] tracking-[-0.04em] md:text-[68px]">
+              지원사업
+              <br />
+              모집 공고
+            </h1>
+            <p className="mt-5 text-[19px] text-[#d7efe7]">현재 {openCount}개 사업을 모집하고 있습니다.</p>
+            <p className="mt-2 flex items-center gap-2 text-[15px] text-[#a9c9bd]">
               <CalendarDays size={18} aria-hidden />
               기준일 {dot(new Date().toISOString().slice(0, 10))}
             </p>
           </div>
 
-          <ul className="mt-8 grid gap-4 md:grid-cols-2">
-            {PROGRAMS.map((p) => (
-              <ProgramCard key={p.id} program={p} onApply={() => start(p.id)} />
-            ))}
-          </ul>
+          {nearest && (
+            <div className="border-l-4 border-[#f5c33b] pl-5 md:pl-7">
+              <p className="text-[15px] font-bold text-[#f5c33b]">마감 임박</p>
+              <p className="mt-1 text-[96px] font-bold leading-[0.95] tracking-[-0.05em] tabular-nums text-[#f5c33b] md:text-[128px]">
+                {nearestLeft === 0 ? "D-day" : `D-${nearestLeft}`}
+              </p>
+              <p className="mt-3 text-[21px] font-bold leading-[1.4] tracking-[-0.02em]">{nearest.name}</p>
+              <p className="mt-1 text-[15px] text-[#c4dcd3]">
+                {nearest.category} 분야, {dot(nearest.end)} 마감
+              </p>
+              <button
+                type="button"
+                onClick={() => start(nearest.id)}
+                className={`mt-5 inline-flex h-12 items-center justify-center rounded-full bg-[#f5c33b] px-6 text-[17px] font-bold text-[#15201c] transition-[background-color,transform] duration-150 hover:bg-[#ffd55e] active:scale-[0.97] ${focusRing}`}
+              >
+                신청하기
+              </button>
+            </div>
+          )}
         </div>
       </section>
 
-      <section aria-labelledby="mine-title" className="mx-auto max-w-[1248px] px-4 pt-12 md:px-6">
+      <section aria-label="사업 목록" className="relative mx-auto -mt-16 max-w-[1248px] px-4 md:-mt-20 md:px-6">
+        <ul className="grid gap-5 md:grid-cols-2 lg:grid-cols-4">
+          {PROGRAMS.map((p) => (
+            <ProgramCard key={p.id} program={p} onApply={() => start(p.id)} />
+          ))}
+        </ul>
+      </section>
+
+      <section aria-labelledby="mine-title" className="mx-auto max-w-[1248px] px-4 pt-16 md:px-6">
         <h2 id="mine-title" className="text-[26px] font-bold tracking-[-0.02em]">
           내 신청 조회
         </h2>
@@ -638,46 +709,50 @@ function ProgramCard({ program: p, onApply }: { program: Program; onApply: () =>
 
   return (
     <li
-      className={`flex flex-col rounded-2xl p-6 md:p-7 ${
-        closed ? "bg-[#00513f] text-[#c4dcd3]" : "bg-white text-[#15201c] shadow-[0_18px_40px_-24px_rgba(0,40,30,0.55)]"
+      className={`flex flex-col overflow-hidden rounded-2xl bg-white ${
+        closed ? "text-[#45524d] ring-1 ring-[#d3dbd7]" : "text-[#15201c] shadow-[0_24px_48px_-28px_rgba(0,40,30,0.6)]"
       }`}
     >
-      <div className="flex items-start justify-between gap-4">
-        <div>
-          <p className={`text-[15px] font-bold ${closed ? "text-[#a9c9bd]" : "text-[#00745c]"}`}>{p.category} 분야</p>
-          <h3 className="mt-1 text-[21px] font-bold leading-[1.4] tracking-[-0.02em]">{p.name}</h3>
-        </div>
-        <p
-          className={`shrink-0 rounded-xl px-3 py-1.5 text-center leading-[1.2] ${
-            closed ? "bg-white/10" : urgent ? "bg-[#f5c33b] text-[#15201c]" : "bg-[#e2f2ec] text-[#00513f]"
+      <div className="relative aspect-[4/3] overflow-hidden bg-[#0c1f19]">
+        <Image
+          src={p.image}
+          alt=""
+          fill
+          sizes="(min-width: 1024px) 300px, (min-width: 768px) 50vw, 100vw"
+          className={`object-cover ${closed ? "opacity-60 grayscale" : ""}`}
+        />
+        <span aria-hidden className="absolute inset-0 bg-gradient-to-t from-[rgba(6,26,20,0.75)] to-transparent to-60%" />
+        <span className="absolute bottom-3 left-4 text-[15px] font-bold text-white">{p.category} 분야</span>
+        <span
+          className={`absolute right-3 top-3 rounded-lg px-2.5 py-1 text-[17px] font-bold tabular-nums leading-[1.3] ${
+            closed ? "bg-[#15201c]/80 text-white" : urgent ? "bg-[#f5c33b] text-[#15201c]" : "bg-white text-[#00513f]"
           }`}
         >
-          <span className="block text-[13px] font-bold">{closed ? "모집" : "마감까지"}</span>
-          <span className="block text-[26px] font-bold tabular-nums tracking-[-0.02em]">
-            {closed ? "마감" : left === 0 ? "D-day" : `D-${left}`}
-          </span>
-        </p>
+          {closed ? "모집 마감" : left === 0 ? "D-day" : `D-${left}`}
+        </span>
       </div>
 
-      <dl className="mt-5 grid grid-cols-[72px_1fr] gap-x-3 gap-y-1.5 text-[15px]">
-        <dt className={closed ? "text-[#a9c9bd]" : "text-[#5b6862]"}>모집 기간</dt>
-        <dd className="tabular-nums">
-          {dot(p.start)} ~ {dot(p.end)}
-        </dd>
-        <dt className={closed ? "text-[#a9c9bd]" : "text-[#5b6862]"}>지원 대상</dt>
-        <dd>{p.target}</dd>
-        <dt className={closed ? "text-[#a9c9bd]" : "text-[#5b6862]"}>지원 내용</dt>
-        <dd className={closed ? "" : "font-bold"}>{p.support}</dd>
-      </dl>
+      <div className="flex flex-1 flex-col p-5">
+        <h3 className="text-[19px] font-bold leading-[1.4] tracking-[-0.02em]">{p.name}</h3>
+        <p className={`mt-2 text-[15px] font-bold ${closed ? "" : "text-[#00745c]"}`}>{p.support}</p>
+        <dl className="mt-3 grid grid-cols-[64px_1fr] gap-x-2 gap-y-1 text-[15px]">
+          <dt className="text-[#5b6862]">모집 기간</dt>
+          <dd className="tabular-nums">
+            {dot(p.start)} ~ {dot(p.end)}
+          </dd>
+          <dt className="text-[#5b6862]">지원 대상</dt>
+          <dd>{p.target}</dd>
+        </dl>
 
-      <div className="mt-auto pt-6">
-        {closed ? (
-          <p className="text-[15px] font-bold">모집이 끝난 사업입니다.</p>
-        ) : (
-          <button type="button" onClick={onApply} className={primaryBtn}>
-            신청하기
-          </button>
-        )}
+        <div className="mt-auto pt-5">
+          {closed ? (
+            <p className="text-[15px] font-bold">모집이 끝난 사업입니다.</p>
+          ) : (
+            <button type="button" onClick={onApply} className={`${primaryBtn} w-full`}>
+              신청하기
+            </button>
+          )}
+        </div>
       </div>
     </li>
   );
@@ -760,34 +835,46 @@ function AdminView({
             예시로 초기화
           </button>
         </div>
-        <div className="grid lg:grid-cols-[minmax(0,1fr)_minmax(0,1.2fr)]">
-          <dl className="grid grid-cols-2 gap-px border-b border-[#e3e9e6] bg-[#e3e9e6] lg:border-b-0 lg:border-r">
-            <div className="col-span-2 bg-white px-5 py-4">
-              <dt className="text-[15px] text-[#5b6862]">전체 신청</dt>
-              <dd className="text-[36px] font-bold leading-[1.2] tabular-nums tracking-[-0.02em]">{state.apps.length}</dd>
-            </div>
-            {STATUSES.map((s) => (
-              <div key={s} className="bg-white px-5 py-4">
-                <dt>
-                  <StatusBadge status={s} />
-                </dt>
-                <dd className="text-[28px] font-bold leading-[1.2] tabular-nums">{counts[s]}</dd>
-              </div>
-            ))}
-          </dl>
+        <div className="grid lg:grid-cols-[minmax(0,1fr)_minmax(0,1.3fr)]">
+          <div className="flex flex-col items-center gap-6 border-b border-[#e3e9e6] px-5 py-6 sm:flex-row lg:border-b-0 lg:border-r">
+            <StatusDonut counts={counts} total={state.apps.length} />
+            <dl className="grid w-full grid-cols-2 gap-x-4 gap-y-3 sm:grid-cols-1">
+              {STATUSES.map((s) => (
+                <div key={s} className="flex items-center justify-between gap-3">
+                  <dt className="flex items-center gap-2">
+                    <span aria-hidden className="h-3 w-3 rounded-[3px]" style={{ background: STATUS_STYLE[s].fill }} />
+                    <StatusBadge status={s} />
+                  </dt>
+                  <dd className="text-[22px] font-bold tabular-nums">{counts[s]}</dd>
+                </div>
+              ))}
+            </dl>
+          </div>
 
-          <div className="px-5 py-4">
+          <div className="px-5 py-6">
             <h3 className="text-[15px] font-bold text-[#45524d]">사업별 신청 수</h3>
-            <ul className="mt-3 space-y-3">
+            <ul className="mt-4 space-y-4">
               {perProgram.map(({ program, count }) => (
-                <li key={program.id}>
-                  <div className="flex items-baseline justify-between gap-3 text-[15px]">
-                    <span className="truncate text-[#15201c]">{program.name}</span>
-                    <span className="shrink-0 font-bold tabular-nums">{count}건</span>
-                  </div>
-                  <span className="mt-1 block h-2 w-full rounded-[4px] bg-[#eef1ef]" title={`${program.name} ${count}건`}>
-                    <span className="block h-2 rounded-[4px] bg-[#00745c]" style={{ width: `${(count / maxCount) * 100}%` }} />
+                <li key={program.id} className="flex items-center gap-3">
+                  <span className="relative hidden h-10 w-10 shrink-0 overflow-hidden rounded-lg sm:block">
+                    <Image src={program.image} alt="" fill sizes="40px" className="object-cover" />
                   </span>
+                  <div className="min-w-0 flex-1">
+                    <div className="flex items-baseline justify-between gap-3 text-[15px]">
+                      <span className="truncate text-[#15201c]">{program.name}</span>
+                      <span className="shrink-0 font-bold tabular-nums">{count}건</span>
+                    </div>
+                    <span
+                      className="mt-1.5 flex h-3 overflow-hidden rounded-[4px] bg-[#eef1ef]"
+                      style={{ width: `${Math.max(8, (count / maxCount) * 100)}%` }}
+                      title={STATUSES.map((st) => `${st} ${state.apps.filter((a) => a.programId === program.id && a.status === st).length}건`).join(", ")}
+                    >
+                      {STATUSES.map((st) => {
+                        const n = state.apps.filter((a) => a.programId === program.id && a.status === st).length;
+                        return n ? <span key={st} style={{ flexGrow: n, background: STATUS_STYLE[st].fill }} /> : null;
+                      })}
+                    </span>
+                  </div>
                 </li>
               ))}
             </ul>
@@ -896,6 +983,39 @@ function AdminView({
         </div>
       </section>
     </div>
+  );
+}
+
+/** 상태별 비율 도넛 차트. 가운데에 전체 신청 수를 쓴다 */
+function StatusDonut({ counts, total }: { counts: Record<Status, number>; total: number }) {
+  const r = 52;
+  const circ = 2 * Math.PI * r;
+  // 각 조각의 시작 위치 = 앞 조각 길이의 합
+  const lens = STATUSES.map((s) => (total ? (counts[s] / total) * circ : 0));
+  const starts = lens.map((_, i) => lens.slice(0, i).reduce((a, b) => a + b, 0));
+  return (
+    <figure className="relative h-[148px] w-[148px] shrink-0">
+      <svg viewBox="0 0 132 132" className="h-full w-full -rotate-90" role="img" aria-label={`전체 신청 ${total}건 상태별 비율`}>
+        <circle cx="66" cy="66" r={r} fill="none" stroke="#eef1ef" strokeWidth="18" />
+        {STATUSES.map((s, i) => (
+          <circle
+            key={s}
+            cx="66"
+            cy="66"
+            r={r}
+            fill="none"
+            stroke={STATUS_STYLE[s].fill}
+            strokeWidth="18"
+            strokeDasharray={`${Math.max(0, lens[i] - 2)} ${circ}`}
+            strokeDashoffset={-starts[i]}
+          />
+        ))}
+      </svg>
+      <figcaption className="absolute inset-0 flex flex-col items-center justify-center leading-[1.2]">
+        <span className="text-[13px] text-[#5b6862]">전체 신청</span>
+        <span className="text-[34px] font-bold tabular-nums tracking-[-0.02em]">{total}</span>
+      </figcaption>
+    </figure>
   );
 }
 

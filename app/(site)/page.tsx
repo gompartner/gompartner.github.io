@@ -1,9 +1,9 @@
 import type { Metadata } from "next";
-import Image from "next/image";
-import Link from "next/link";
 import { Check } from "lucide-react";
 import { ChannelTalkButton } from "@/components/layout/ChannelTalk";
-import { WorksTabs } from "@/components/landing/WorksTabs";
+import { Doodles } from "@/components/landing/Doodles";
+import { HeroSlider } from "@/components/landing/HeroSlider";
+import { WorksGrid } from "@/components/landing/WorksGrid";
 import { history, projects } from "@/data/projects";
 import { profile } from "@/data/profile";
 
@@ -18,9 +18,13 @@ export const metadata: Metadata = {
     absolute: `홈페이지·업무 프로그램 제작 | ${profile.name}`,
   },
   description:
-    "17년 경력의 1인 웹 개발자가 홈페이지, 업무 프로그램, 기존 시스템 고도화를 직접 작업합니다.",
+    "17년 경력 개발자가 홈페이지와 업무 프로그램을 직접 만듭니다. 원본 소스를 제공하고 완료 후 1개월 무상 유지보수합니다.",
   alternates: { canonical: "/" },
 };
+
+// 첫 화면 배너에 넘겨 보여 줄 대표 제작 사례
+const featuredIds = ["private-gym", "clinic-homepage", "district-portal"];
+const featured = featuredIds.map((id) => projects.find((p) => p.id === id)!);
 
 const promises = ["17년 경력 개발자 직접 작업", "채팅으로 바로 상담", "원본 소스 제공", "완료 후 1개월 무상 유지보수"];
 
@@ -36,7 +40,8 @@ const secondaryButton =
 export default function HomePage() {
   return (
     <>
-      <section aria-labelledby="hero-title" className="border-b border-border bg-surface">
+      <section aria-labelledby="hero-title" className="relative isolate overflow-hidden border-b border-border bg-surface">
+        <Doodles variant={0} />
         <div className={`${container} grid gap-10 py-12 md:py-20 lg:grid-cols-12 lg:items-center lg:gap-6`}>
           <div className="lg:col-span-5">
             <h1 id="hero-title" className="text-[32px] font-bold leading-[1.4] tracking-[-0.02em] md:text-[44px]">
@@ -59,24 +64,12 @@ export default function HomePage() {
               </a>
             </div>
           </div>
-          <Link
-            href="/demo/small-business-homepage"
-            aria-label="프라이빗 짐 예약 서비스 데모 보기"
-            className="block overflow-hidden rounded-[10px] border border-border bg-white lg:col-span-7"
-          >
-            <Image
-              src="/images/demos/private-gym.jpg"
-              alt="프라이빗 짐 예약 서비스 첫 화면"
-              width={1440}
-              height={900}
-              priority
-              className="h-auto w-full"
-            />
-          </Link>
+          <HeroSlider slides={featured} />
         </div>
       </section>
 
-      <section id="works" aria-labelledby="works-title" className="scroll-mt-16">
+      <section id="works" aria-labelledby="works-title" className="relative isolate scroll-mt-16 overflow-hidden">
+        <Doodles variant={1} />
         <div className={`${container} py-16 md:py-24`}>
           <h2 id="works-title" className={h2}>
             제작 사례
@@ -84,12 +77,13 @@ export default function HomePage() {
           <p className={lead}>고객 정보 보호를 위해 기관명과 데이터는 가상으로 재구성했습니다.</p>
 
           <div className="mt-8">
-            <WorksTabs projects={projects} />
+            <WorksGrid projects={projects} />
           </div>
         </div>
       </section>
 
-      <section id="history" aria-labelledby="history-title" className="scroll-mt-16 border-t border-border">
+      <section id="history" aria-labelledby="history-title" className="relative isolate scroll-mt-16 overflow-hidden border-t border-border">
+        <Doodles variant={2} />
         <div className={`${container} py-16 md:py-24`}>
           <h2 id="history-title" className={h2}>
             작업 이력
