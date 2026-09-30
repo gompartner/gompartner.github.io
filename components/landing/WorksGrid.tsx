@@ -6,18 +6,21 @@ import { AnimatePresence, motion, useReducedMotion } from "framer-motion";
 import type { Project } from "@/lib/types";
 
 const EASE_OUT = [0.23, 1, 0.32, 1] as const;
+const normalize = (s: string) => s.toLowerCase().replace(/\s+/g, "");
 const EASE_IN_OUT = [0.77, 0, 0.175, 1] as const;
 
 const secondaryButton =
   "inline-flex h-12 items-center justify-center rounded-md border border-[#6d7882] bg-white px-6 text-[17px] font-bold text-foreground transition-colors hover:bg-surface";
 
 // 신규 제작과 유지보수를 한 목록에 보여 주고, 구분은 썸네일 왼쪽 위 라벨로 표시한다.
-// 검색으로 목록이 바뀌면 빠지는 카드는 흐려지며 사라지고, 남는 카드는 새 자리로 미끄러진다.
-// 동작 줄이기 설정이면 자리 이동과 크기 변화 없이 흐려지기만 한다.
-export function WorksGrid({ projects }: { projects: Project[] }) {
+// 조건이 바뀌면 빠지는 카드는 흐려지고, 남는 카드는 새 자리로 미끄러지고,
+// 새로 들어오는 카드는 위에서 아래로 인쇄되듯 드러난다.
+// marks에 든 단어가 있는 기능 태그에는 형광펜이 왼쪽부터 그어진다.
+// 동작 줄이기 설정이면 자리 이동 없이 흐려지기만 하고 형광펜은 바로 칠해진다.
+export function WorksGrid({ projects, marks = [] }: { projects: Project[]; marks?: readonly string[] }) {
   const reduce = useReducedMotion();
-  const hidden = reduce ? { opacity: 0 } : { opacity: 0, transform: "scale(0.96)" };
-  const shown = reduce ? { opacity: 1 } : { opacity: 1, transform: "scale(1)" };
+  const hidden = reduce ? { opacity: 0 } : { opacity: 0, clipPath: "inset(0% 0% 100% 0% round 10px)" };
+  const shown = reduce ? { opacity: 1 } : { opacity: 1, clipPath: "inset(0% 0% 0% 0% round 10px)" };
 
   return (
     <ul className="relative grid gap-6 md:grid-cols-2 lg:grid-cols-3">
@@ -27,15 +30,8 @@ export function WorksGrid({ projects }: { projects: Project[] }) {
             key={w.id}
             layout={!reduce}
             initial={hidden}
-            animate={{
-              ...shown,
-              transition: {
-                duration: 0.22,
-                ease: EASE_OUT,
-                delay: Math.min(i, 5) * 0.04,
-              },
-            }}
-            exit={{ ...hidden, transition: { duration: 0.15, ease: EASE_OUT } }}
+            animate={{ ...shown, transition: { duration: 0.3, ease: EASE_OUT, delay: 0.08 + Math.min(i, 5) * 0.05 } }}
+            exit={{ opacity: 0, transition: { duration: 0.12, ease: EASE_OUT } }}
             transition={{ layout: { duration: 0.28, ease: EASE_IN_OUT } }}
             className="flex flex-col overflow-hidden rounded-[10px] border border-border bg-white"
           >
@@ -54,11 +50,26 @@ export function WorksGrid({ projects }: { projects: Project[] }) {
               <h3 className="mt-1 text-[19px] font-bold leading-[1.5]">{w.title}</h3>
               <p className="mt-2 text-[17px] leading-[1.5] text-foreground-secondary">{w.description}</p>
               <ul className="mt-4 flex flex-wrap gap-2" aria-label="주요 기능">
-                {w.features.map((f) => (
-                  <li key={f} className="rounded-[4px] bg-surface px-3 py-1 text-[15px] leading-[1.5] text-foreground-secondary">
-                    {f}
-                  </li>
-                ))}
+                {w.features.map((f) => {
+                  const marked = marks.some((k) => normalize(f).includes(normalize(k)));
+                  return (
+                    <li
+                      key={f}
+                      className={`relative isolate overflow-hidden rounded-[4px] bg-surface px-3 py-1 text-[15px] leading-[1.5] transition-colors duration-200 ${
+                        marked ? "text-foreground" : "text-foreground-secondary"
+                      }`}
+                    >
+                      <span
+                        aria-hidden
+                        style={{ transitionDelay: marked && !reduce ? `${300 + Math.min(i, 5) * 60}ms` : "0ms" }}
+                        className={`absolute inset-0 -z-10 origin-left bg-[#ffe58a] transition-transform duration-[450ms] ease-[cubic-bezier(0.23,1,0.32,1)] motion-reduce:transition-none ${
+                          marked ? "scale-x-100" : "scale-x-0"
+                        }`}
+                      />
+                      {f}
+                    </li>
+                  );
+                })}
               </ul>
               <div className="mt-auto pt-6">
                 <Link href={w.demoUrl} data-gtm-cta={`demo_open_${w.id}`} className={secondaryButton}>
