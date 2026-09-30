@@ -2,9 +2,11 @@ import type { Metadata } from "next";
 import { Check } from "lucide-react";
 import { ChannelTalkButton } from "@/components/layout/ChannelTalk";
 import { Doodles } from "@/components/landing/Doodles";
+import { HistoryTimeline } from "@/components/landing/HistoryTimeline";
+import { careerYears, historyFields, historyTotal } from "@/lib/history";
 import { HeroSlider } from "@/components/landing/HeroSlider";
 import { WorksSearch } from "@/components/landing/WorksSearch";
-import { history, projects } from "@/data/projects";
+import { projects } from "@/data/projects";
 import { profile } from "@/data/profile";
 
 // KRDS(범정부 디자인 시스템) 기준 원페이지 랜딩.
@@ -82,42 +84,14 @@ export default function HomePage() {
         </div>
       </section>
 
-      <section id="history" aria-labelledby="history-title" className="relative isolate scroll-mt-16 overflow-hidden border-t border-border">
+      <section id="history" aria-labelledby="history-title" className="relative isolate scroll-mt-16 overflow-clip border-t border-border">
         <Doodles variant={2} />
         <div className={`${container} py-16 md:py-24`}>
           <h2 id="history-title" className={h2}>
             작업 이력
           </h2>
           <p className={lead}>발주처와 소속 회사명은 공개하지 않습니다.</p>
-          <div className="mt-8 overflow-x-auto">
-            <table className="w-full min-w-[560px] text-[17px] leading-[1.5]">
-              <caption className="sr-only">연도별 작업 이력</caption>
-              <thead>
-                <tr className="border-y-2 border-foreground text-left">
-                  <th scope="col" className="w-[140px] py-3 font-bold">기간</th>
-                  <th scope="col" className="w-[120px] py-3 font-bold">구분</th>
-                  <th scope="col" className="py-3 font-bold">내용</th>
-                </tr>
-              </thead>
-              <tbody>
-                {history.map((h) => (
-                  <tr key={h.period + h.work} className="border-b border-border">
-                    <td className="py-4 tabular-nums text-foreground-secondary">{h.period}</td>
-                    <td className="py-4">
-                      <span
-                        className={`rounded-[4px] px-2 py-0.5 text-[15px] font-bold ${
-                          h.kind === "유지보수" ? "bg-surface text-foreground-secondary" : "bg-accent-surface text-accent-hover"
-                        }`}
-                      >
-                        {h.kind}
-                      </span>
-                    </td>
-                    <td className="py-4">{h.work}</td>
-                  </tr>
-                ))}
-              </tbody>
-            </table>
-          </div>
+          <HistoryTimeline fields={historyFields} total={historyTotal} careerYears={careerYears} />
         </div>
       </section>
     </>

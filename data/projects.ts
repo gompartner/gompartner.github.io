@@ -114,21 +114,43 @@ export const projects: Project[] = [
   },
 ];
 
-// 실제 작업 이력 — SW기술자 경력관리시스템에 기업 확인된 기술경력 기준.
+// 실제 작업 이력: SW기술자 경력관리시스템에 기업 확인된 기술경력과 업무 메일 기준.
 // 부업으로 운영하므로 발주처·회사명은 쓰지 않고 업종과 기간만 쓴다.
-export const history: { period: string; kind: "신규 제작" | "유지보수"; work: string }[] = [
-  { period: "2021~현재", kind: "신규 제작", work: "솔루션 개발 및 운영 자문" },
-  { period: "2019~2021", kind: "신규 제작", work: "에듀테크 기업 학습 서비스 개발" },
-  { period: "2019~2021", kind: "유지보수", work: "대학교 홈페이지·전산장비 통합 유지보수" },
-  { period: "2018~2019", kind: "신규 제작", work: "공공기관 홈페이지 개편, 리서치 센터 구축" },
-  { period: "2018~2019", kind: "신규 제작", work: "증강현실 기반 IoT 사이클 트레이닝 컴퓨터 개발" },
-  { period: "2018", kind: "신규 제작", work: "중앙행정기관 대표 홈페이지 클라우드 전환 및 개선" },
-  { period: "2018~2019", kind: "유지보수", work: "광역의회 홈페이지 유지관리" },
-  { period: "2017", kind: "신규 제작", work: "수출지원 정보시스템 재구축, 공공기관 홈페이지 재구축" },
-  { period: "2017", kind: "신규 제작", work: "온라인 보험 사이트 리뉴얼 및 노후준비 솔루션 구축" },
-  { period: "2016~2017", kind: "신규 제작", work: "공공 취업 포털 개편, 숙련기술인 정보시스템 구축" },
-  { period: "2016", kind: "신규 제작", work: "중계대출 시스템 구축" },
-  { period: "2010~2012", kind: "신규 제작", work: "중앙행정기관·국가도서관 홈페이지 재구축 및 개편, 웹접근성 개편" },
-  { period: "2011", kind: "신규 제작", work: "대기업 물류관리 시스템 고도화" },
-  { period: "2009~2016", kind: "유지보수", work: "자치구 포털사이트 구축 및 유지보수 (7년)" },
+// demo는 같은 유형으로 다시 만든 제작 사례 id다.
+export type HistoryKind = "신규 구축" | "개편" | "유지보수" | "앱 개발";
+
+export interface HistoryItem {
+  period: string;
+  sector: string;
+  kind: HistoryKind;
+  work: string;
+  tasks?: string[];
+  demo?: string;
+}
+
+export const history: HistoryItem[] = [
+  { period: "2022", sector: "병원", kind: "유지보수", work: "병원 홈페이지 수정", demo: "clinic-homepage" },
+  { period: "2021~현재", sector: "교육", kind: "신규 구축", work: "LMS 솔루션 개발 및 운영 자문", tasks: ["학습 관리 솔루션 개발", "결제 연동", "도입 기관 운영 자문"] },
+  { period: "2021", sector: "구청", kind: "유지보수", work: "구청·평생학습관 홈페이지 유지보수", tasks: ["운영 중 수정 요청 처리", "후임 업체 인수인계"] },
+  { period: "2020", sector: "지자체", kind: "신규 구축", work: "지도 기반 공유공간 안내 서비스 구축", tasks: ["화면 퍼블리싱", "테스트와 오류 수정", "최종보고회", "산출물 작성, 소스 인계"], demo: "community-map" },
+  { period: "2019~2021", sector: "교육", kind: "신규 구축", work: "에듀테크 기업 학습 서비스 개발" },
+  { period: "2019~2021", sector: "대학교", kind: "유지보수", work: "대학교 홈페이지·전산장비 통합 유지보수", tasks: ["월간 정기 점검 보고서", "보안 취약점 조치", "학내 포털 연계", "메뉴, 연락처 등 수시 수정"], demo: "maintenance-dashboard" },
+  { period: "2019", sector: "기업", kind: "앱 개발", work: "웹과 Android·iOS 앱 서비스 구축" },
+  { period: "2019", sector: "부동산", kind: "유지보수", work: "부동산 앱 Android·iOS 유지보수" },
+  { period: "2018~2019", sector: "공공기관", kind: "신규 구축", work: "구인구직·사업 신청 DB 시스템 구축", tasks: ["회원가입, 사업 신청", "관리자 화면", "통계 검수", "요구사항 수정과 일일 처리 보고"], demo: "program-application" },
+  { period: "2018~2019", sector: "보안", kind: "신규 구축", work: "원격접근제어·다중인증 보안 솔루션 개발", tasks: ["공인 시험기관 시험 인증 대응"] },
+  { period: "2018~2019", sector: "공공기관", kind: "개편", work: "공공기관 홈페이지 개편, 리서치 센터 구축" },
+  { period: "2018~2019", sector: "IoT", kind: "신규 구축", work: "증강현실 기반 IoT 사이클 트레이닝 컴퓨터 개발" },
+  { period: "2018~2019", sector: "광역의회", kind: "유지보수", work: "광역의회 홈페이지 유지관리" },
+  { period: "2018", sector: "중앙행정기관", kind: "개편", work: "대표 홈페이지 클라우드 전환 및 개선" },
+  { period: "2017", sector: "공공기관", kind: "개편", work: "수출지원 정보시스템 재구축, 공공기관 홈페이지 재구축", tasks: ["정보시스템 DB 재구축"] },
+  { period: "2017", sector: "보험", kind: "개편", work: "온라인 보험 사이트 리뉴얼, 노후준비 솔루션 구축", demo: "retirement-calculator" },
+  { period: "2017", sector: "교육", kind: "앱 개발", work: "영어 스피킹 학습 앱 개발" },
+  { period: "2016~2017", sector: "공공기관", kind: "개편", work: "공공 취업 포털 개편, 숙련기술인 정보시스템 구축", demo: "job-portal" },
+  { period: "2016", sector: "금융", kind: "신규 구축", work: "중계대출 시스템 구축" },
+  { period: "2016", sector: "기업", kind: "앱 개발", work: "기업 원스톱 서비스 웹과 Android 앱 개발" },
+  { period: "2011", sector: "대기업", kind: "개편", work: "물류관리 시스템 고도화" },
+  { period: "2010~2012", sector: "중앙행정기관", kind: "개편", work: "중앙행정기관·국가도서관 홈페이지 재구축", tasks: ["홈페이지 재구축 및 개편", "웹접근성 개편"], demo: "accessibility-review" },
+  { period: "2009~2016", sector: "구청", kind: "유지보수", work: "자치구 포털사이트 구축 및 유지보수", tasks: ["포털 구축", "7년간 유지보수와 기능 개선"], demo: "district-portal" },
 ];
+
