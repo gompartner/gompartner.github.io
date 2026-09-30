@@ -58,6 +58,17 @@ export const projects: Project[] = [
     demoUrl: "/demo/small-business-homepage",
   },
   {
+    id: "shop-admin",
+    kind: "신규 제작",
+    category: "쇼핑몰 관리자",
+    title: "쇼핑몰 옵션·주문 관리자",
+    description: "5단계까지 옵션을 넣으면 조합표가 자동으로 만들어지고, 조합별 재고와 주문 상태를 한 번에 관리합니다.",
+    features: ["옵션 조합 자동 생성", "조합별 재고·판매 관리", "주문 상태 일괄 변경", "송장번호 입력", "엑셀 다운로드"],
+    imageUrl: "/images/demos/shop-admin.jpg",
+    imageAlt: "쇼핑몰 옵션·주문 관리자 화면",
+    demoUrl: "/demo/shop-admin",
+  },
+  {
     id: "maintenance-dashboard",
     kind: "유지보수",
     category: "홈페이지 유지보수",
