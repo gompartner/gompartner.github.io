@@ -69,6 +69,17 @@ export const projects: Project[] = [
     demoUrl: "/demo/shop-admin",
   },
   {
+    id: "excel-automation",
+    kind: "신규 제작",
+    category: "업무 자동화",
+    title: "거래처 주문 엑셀 취합 자동화",
+    description: "양식이 다른 거래처 주문 엑셀을 올리면 열을 맞추고 오류를 검사해, 품목별 집계와 거래처별 발주서를 만듭니다.",
+    features: ["엑셀 업로드", "열 자동 맞춤", "오류 검사·일괄 수정", "품목별 집계", "발주서 인쇄·엑셀 다운로드"],
+    imageUrl: "/images/demos/excel-automation.jpg",
+    imageAlt: "거래처 주문 엑셀 취합 자동화 화면",
+    demoUrl: "/demo/excel-automation",
+  },
+  {
     id: "maintenance-dashboard",
     kind: "유지보수",
     category: "홈페이지 유지보수",

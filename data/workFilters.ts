@@ -11,6 +11,7 @@ export const fieldsById: Record<string, Field[]> = {
   "program-application": ["공공기관·학교"],
   "private-gym": ["가게·매장"],
   "shop-admin": ["가게·매장", "기업"],
+  "excel-automation": ["기업", "가게·매장"],
   "maintenance-dashboard": ["공공기관·학교", "기업"],
   "district-portal": ["공공기관·학교"],
   "job-portal": ["기업", "공공기관·학교"],
