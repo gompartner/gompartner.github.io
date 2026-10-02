@@ -25,6 +25,17 @@ export const projects: Project[] = [
     demoUrl: "/demo/clinic-homepage",
   },
   {
+    id: "dental-homepage",
+    kind: "신규 제작",
+    category: "병원 홈페이지",
+    title: "치과 홈페이지",
+    description: "첫 화면의 치아 그림에서 불편한 이를 누르면 필요한 진료와 건강보험 적용, 예상 비용을 보여 주고 바로 예약 신청으로 이어지는 치과 홈페이지입니다.",
+    features: ["치아 지도", "증상별 진료·비용 안내", "온라인 예약 신청", "야간 진료시간 표시", "모바일 대응"],
+    imageUrl: "/images/demos/dental-homepage.jpg",
+    imageAlt: "치과 홈페이지 치아 지도 화면",
+    demoUrl: "/demo/dental-homepage",
+  },
+  {
     id: "community-map",
     kind: "신규 제작",
     category: "지도 서비스",

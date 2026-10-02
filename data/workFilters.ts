@@ -7,6 +7,7 @@ export type Field = (typeof fields)[number];
 export const fieldsById: Record<string, Field[]> = {
   "clinic-report": ["병원"],
   "clinic-homepage": ["병원"],
+  "dental-homepage": ["병원"],
   "community-map": ["공공기관·학교"],
   "program-application": ["공공기관·학교"],
   "private-gym": ["가게·매장"],
