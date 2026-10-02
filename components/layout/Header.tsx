@@ -2,7 +2,10 @@
 
 import Image from "next/image";
 import Link from "next/link";
+import { usePathname } from "next/navigation";
 import { useEffect, useState } from "react";
+import { AnimatePresence, motion, useReducedMotion } from "framer-motion";
+import { Menu, X } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { profile } from "@/data/profile";
 import { ChannelTalkButton } from "@/components/layout/ChannelTalk";
@@ -16,6 +19,23 @@ const navItems = [
 
 export function Header() {
   const [isScrolled, setIsScrolled] = useState(false);
+  const [menuOpen, setMenuOpen] = useState(false);
+  const pathname = usePathname();
+  const reduce = !!useReducedMotion();
+
+  // 다른 페이지로 이동하면 모바일 메뉴를 닫는다
+  const [prevPath, setPrevPath] = useState(pathname);
+  if (prevPath !== pathname) {
+    setPrevPath(pathname);
+    setMenuOpen(false);
+  }
+
+  useEffect(() => {
+    if (!menuOpen) return;
+    const onKey = (e: KeyboardEvent) => e.key === "Escape" && setMenuOpen(false);
+    window.addEventListener("keydown", onKey);
+    return () => window.removeEventListener("keydown", onKey);
+  }, [menuOpen]);
 
   useEffect(() => {
     const handleScroll = () => setIsScrolled(window.scrollY > 8);
@@ -30,7 +50,7 @@ export function Header() {
     <header
       className={cn(
         "fixed top-0 left-0 right-0 z-50 border-b bg-background transition-colors duration-200",
-        isScrolled ? "border-border" : "border-transparent"
+        isScrolled || menuOpen ? "border-border" : "border-transparent"
       )}
     >
       <nav
@@ -65,8 +85,43 @@ export function Header() {
           >
             채팅 상담
           </ChannelTalkButton>
+          <button
+            type="button"
+            onClick={() => setMenuOpen((v) => !v)}
+            aria-expanded={menuOpen}
+            aria-controls="mobile-menu"
+            aria-label={menuOpen ? "메뉴 닫기" : "메뉴 열기"}
+            className="inline-flex h-10 w-10 items-center justify-center rounded-md border border-border text-foreground transition-colors hover:bg-surface md:hidden"
+          >
+            <span className={cn("inline-flex transition-transform duration-200 motion-reduce:transition-none", menuOpen && "rotate-90")}>
+              {menuOpen ? <X size={20} aria-hidden /> : <Menu size={20} aria-hidden />}
+            </span>
+          </button>
         </div>
       </nav>
+
+      <AnimatePresence initial={false}>
+        {menuOpen && (
+          <motion.div
+            id="mobile-menu"
+            className="overflow-hidden border-t border-border bg-background md:hidden"
+            initial={reduce ? { opacity: 0 } : { height: 0 }}
+            animate={reduce ? { opacity: 1 } : { height: "auto" }}
+            exit={reduce ? { opacity: 0 } : { height: 0 }}
+            transition={{ duration: 0.22, ease: [0.23, 1, 0.32, 1] }}
+          >
+            <ul className="mx-auto w-full max-w-[1248px] px-4 py-2" role="list">
+              {navItems.map(({ href, label }) => (
+                <li key={href} className="border-b border-border last:border-b-0">
+                  <Link href={href} onClick={() => setMenuOpen(false)} className="flex h-12 items-center text-[17px] text-foreground">
+                    {label}
+                  </Link>
+                </li>
+              ))}
+            </ul>
+          </motion.div>
+        )}
+      </AnimatePresence>
     </header>
   );
 }

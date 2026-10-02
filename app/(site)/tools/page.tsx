@@ -4,7 +4,7 @@ import { tools } from "@/data/tools";
 
 export const metadata: Metadata = {
   title: "무료 도구",
-  description: "홈페이지 운영에 필요한 개인정보처리방침 생성기, 웹접근성 자가 점검표를 무료로 씁니다.",
+  description: "개인정보처리방침 생성기, 웹접근성 자가 점검표, 검색 결과 미리보기, JWT 파서를 무료로 씁니다.",
   alternates: { canonical: "/tools" },
 };
 
