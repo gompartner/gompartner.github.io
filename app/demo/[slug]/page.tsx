@@ -5,6 +5,7 @@ import { projects } from "@/data/projects";
 import { AccessibilityDemo } from "@/components/demos/AccessibilityDemo";
 import { ApplicationDemo } from "@/components/demos/ApplicationDemo";
 import { ClinicHomepageDemo } from "@/components/demos/ClinicHomepageDemo";
+import { DentalHomepageDemo } from "@/components/demos/DentalHomepageDemo";
 import { ClinicReportDemo } from "@/components/demos/ClinicReportDemo";
 import { CommunityMapDemo } from "@/components/demos/CommunityMapDemo";
 import { ExcelAutomationDemo } from "@/components/demos/ExcelAutomationDemo";
@@ -23,6 +24,7 @@ interface DemoPageProps {
 const demoComponents: Record<string, ComponentType> = {
   "clinic-report": ClinicReportDemo,
   "clinic-homepage": ClinicHomepageDemo,
+  "dental-homepage": DentalHomepageDemo,
   "community-map": CommunityMapDemo,
   "program-application": ApplicationDemo,
   "maintenance-dashboard": MaintenanceDemo,
