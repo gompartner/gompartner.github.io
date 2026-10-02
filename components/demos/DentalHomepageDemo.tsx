@@ -9,16 +9,16 @@ import { Bus, Car, ChevronRight, Menu, Moon, Phone, TrainFront, X } from "lucide
    병원명, 의료진, 주소, 전화번호, 사업자 정보, 진료비는 모두 가상이다.
 
    디자인: 흰 바탕에 짙은 청록 잉크(#10302f)와 청록 강조색(#0b6664), 옅은 민트(#e3f1ef).
-   첫 화면이 치아 지도다. 사진 대신 위아래 치아 32개 그림을 크게 두고, 불편한 치아를 누르면
+   첫 화면은 아래 테두리를 웃는 입 모양으로 깎은 진료실 사진과 오늘 진료시간 카드이고,
+   바로 아래가 치아 지도다. 위아래 치아 32개 그림을 크게 두고, 불편한 치아를 누르면
    오른쪽에 그 자리의 증상, 필요한 진료, 건강보험 적용, 예상 비용이 나오고 바로 예약 신청으로 이어진다.
    누른 치아에서 같은 종류 치아로 색이 퍼져 나가 어느 치아를 말하는지 보여 준다.
    진료시간은 따로 짙은 표를 두지 않고 예약 신청 옆에 붙였다.
 
-   사진 출처(Unsplash 무료 라이선스, public/images/demo-dental):
-   lobby Benyamin Bohlouli(B_sK_xgzwVA),
-   implant Jonathan Borba(W9YEY6G8LVM), whitening Ozkan Guner(7Mut2WMWttA), ortho Alexander Krivitskiy(-x5vrLlYEsw),
-   caries Katarzyna Zygnerska(rubu_NvklJE), scaling Quilia(y8fWicGsv4g), ct Quang Tri NGUYEN(VckdJzo7ig0),
-   doctor1 Filip Rankovic Grobgaard(9_1Y_IKP4tY), doctor2 Ozkan Guner(AWqHc49SU-c) */
+   사진 출처(public/images/demo-dental):
+   AI 생성(Z-Image-Turbo, Apache 2.0) hero, doctor1, doctor2, ortho, lobby, implant
+   Unsplash 무료 라이선스 whitening Ozkan Guner(7Mut2WMWttA),
+   caries Katarzyna Zygnerska(rubu_NvklJE), scaling Quilia(y8fWicGsv4g), ct Quang Tri NGUYEN(VckdJzo7ig0) */
 
 const IMG = "/images/demo-dental";
 const CLINIC = "곰선임치과의원";
@@ -265,7 +265,7 @@ const ARCH = buildArch();
 /* ---------- 진료 안내 ---------- */
 
 const TREATMENTS: { id: TreatmentId; img: string; title: string; body: string; pos?: string }[] = [
-  { id: "implant", img: "implant", title: "임플란트", body: "CT로 잇몸뼈 높이와 신경 위치를 확인한 뒤 심습니다. 만 65세 이상은 2개까지 건강보험이 적용됩니다.", pos: "50% 60%" },
+  { id: "implant", img: "implant", title: "임플란트", body: "CT로 잇몸뼈 높이와 신경 위치를 확인한 뒤 심습니다. 만 65세 이상은 2개까지 건강보험이 적용됩니다.", pos: "50% 25%" },
   { id: "ortho", img: "ortho", title: "치아 교정", body: "투명교정과 장치 교정을 함께 진료합니다. 교정과 전문의가 진단부터 마무리까지 맡습니다." },
   { id: "caries", img: "caries", title: "충치·신경치료", body: "충치 크기에 맞춰 레진, 인레이, 크라운으로 치료하고 필요한 경우 신경치료를 합니다." },
   { id: "scaling", img: "scaling", title: "스케일링·잇몸 치료", body: "치석 제거와 잇몸 염증 치료를 합니다. 스케일링은 만 19세 이상 1년에 한 번 건강보험이 적용됩니다." },
@@ -280,7 +280,7 @@ const DOCTORS = [
     field: "임플란트, 보철, 신경치료",
     career: ["통합치의학과 전문의", "곰선임대학교 치과대학 졸업", "대한구강악안면임플란트학회 정회원"],
     img: "doctor2",
-    pos: "50% 30%",
+    pos: "50% 25%",
   },
   {
     name: "이선임",
@@ -470,7 +470,8 @@ export function DentalHomepageDemo() {
       </header>
 
       <main id="top">
-        <ToothMap onReserve={goReserve} status={status} />
+        <Hero now={now} status={status} />
+        <ToothMap onReserve={goReserve} />
 
         {/* 진료 안내 */}
         <section id="treatments" className="scroll-mt-16">
@@ -676,7 +677,120 @@ export function DentalHomepageDemo() {
 
 /* ---------- 첫 화면: 치아 지도 ---------- */
 
-function ToothMap({ onReserve, status }: { onReserve: (id: TreatmentId) => void; status: ReturnType<typeof openStatus> }) {
+/* ---------- 첫 화면 ---------- */
+
+// 사진 아래 테두리를 웃는 입 모양 호로 깎았다. 처음 열릴 때 사진이 위에서 아래로 펼쳐지고
+// 병원명 밑에 미소 곡선이 그어진 뒤 오늘 진료시간 카드가 올라온다.
+function Hero({ now, status }: { now: Date | null; status: ReturnType<typeof openStatus> }) {
+  const reduce = !!useReducedMotion();
+  const today = now ? HOURS.find((h) => h.day === now.getDay()) : null;
+  const facts = [
+    { label: "야간 진료", value: "화, 목 21:00까지" },
+    { label: "토요일", value: "14:00까지 진료" },
+    { label: "주차", value: "2시간 무료" },
+  ];
+
+  return (
+    <section id="intro" className="overflow-hidden" style={{ backgroundColor: C.paper }}>
+      <div className={`${container} grid items-center gap-10 pb-14 pt-10 md:pb-20 md:pt-14 lg:grid-cols-12 lg:gap-8`}>
+        <div className="lg:col-span-5">
+          <p className="text-[17px] font-bold" style={{ color: C.accent }}>
+            통합치의학과, 치과교정과 전문의 진료
+          </p>
+          <h1 className="mt-3 text-[48px] font-bold leading-[1.1] tracking-[-0.055em] sm:text-[60px] lg:text-[72px]">
+            곰선임
+            <br />
+            <span className="relative inline-block">
+              치과의원
+              <svg viewBox="0 0 200 28" className="absolute -bottom-4 left-0 h-5 w-full overflow-visible" preserveAspectRatio="none" aria-hidden>
+                <motion.path
+                  d="M6 6 Q100 30 194 6"
+                  fill="none"
+                  stroke={C.accent}
+                  strokeWidth={6}
+                  strokeLinecap="round"
+                  vectorEffect="non-scaling-stroke"
+                  initial={reduce ? false : { pathLength: 0 }}
+                  animate={{ pathLength: 1 }}
+                  transition={{ duration: 0.7, delay: 0.35, ease: EASE }}
+                />
+              </svg>
+            </span>
+          </h1>
+          <p className="mt-9 max-w-[28rem] text-[19px]" style={{ color: C.muted }}>
+            충치와 신경치료, 임플란트, 교정, 잇몸 치료를 봅니다. 평일 저녁에 오시기 어려우면 화요일과 목요일 야간 진료를 이용하세요.
+          </p>
+          <div className="mt-8 flex flex-wrap gap-3">
+            <a
+              href="#reserve"
+              className="inline-flex h-12 items-center rounded-[6px] px-6 text-[17px] font-bold text-white transition-[transform,opacity] duration-150 hover:opacity-90 active:scale-[0.97]"
+              style={{ backgroundColor: C.accent }}
+            >
+              예약 신청
+            </a>
+            <a
+              href="#map"
+              className="inline-flex h-12 items-center gap-2 rounded-[6px] border bg-white px-5 text-[17px] font-bold transition-[transform,background-color] duration-150 hover:bg-[#f3f8f7] active:scale-[0.97]"
+              style={{ borderColor: C.toothLine }}
+            >
+              <ToothMark />
+              증상별 진료 안내
+            </a>
+          </div>
+          <dl className="mt-10 grid grid-cols-3 border-t" style={{ borderColor: C.line }}>
+            {facts.map((f, i) => (
+              <div key={f.label} className={`pt-4 ${i > 0 ? "border-l pl-4" : ""}`} style={{ borderColor: C.line }}>
+                <dt className="text-[15px]" style={{ color: C.muted }}>
+                  {f.label}
+                </dt>
+                <dd className="mt-0.5 text-[16px] font-bold sm:text-[17px]">{f.value}</dd>
+              </div>
+            ))}
+          </dl>
+        </div>
+
+        <div className="relative lg:col-span-7">
+          <motion.div
+            className="relative aspect-[4/3] overflow-hidden lg:aspect-[6/5]"
+            style={{ borderRadius: "24px 24px 50% 50% / 24px 24px 16% 16%", backgroundColor: C.mint }}
+            initial={reduce ? false : { clipPath: "inset(0% 0% 100% 0%)" }}
+            animate={{ clipPath: "inset(0% 0% 0% 0%)" }}
+            transition={{ duration: 0.9, ease: EASE }}
+          >
+            <Image src={`${IMG}/hero.jpg`} alt="" fill priority sizes="(min-width: 1024px) 700px, 100vw" className="object-cover object-[72%_50%]" />
+          </motion.div>
+
+          <motion.aside
+            className="absolute bottom-3 left-3 w-[15rem] rounded-[10px] bg-white p-4 shadow-[0_12px_32px_rgba(16,48,47,0.16)] sm:bottom-8 sm:left-6 lg:-left-6 lg:bottom-12 lg:w-[17rem] lg:p-5"
+            initial={reduce ? false : { opacity: 0, y: 16 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.4, delay: 0.6, ease: EASE }}
+            aria-label="오늘 진료시간"
+          >
+            <p className="flex items-center justify-between gap-2 text-[15px]" style={{ color: C.muted }}>
+              {today ? `오늘 ${today.label}` : "진료시간"}
+              {today && "night" in today && (
+                <span className="inline-flex items-center gap-1 rounded-[4px] px-2 py-0.5 text-[13px] font-bold" style={{ backgroundColor: C.mint, color: C.accent }}>
+                  <Moon size={13} aria-hidden />
+                  야간 진료
+                </span>
+              )}
+            </p>
+            <p className="mt-1 text-[24px] font-bold tracking-[-0.02em] tabular-nums lg:text-[26px]">{today ? today.time : "09:30 ~ 18:30"}</p>
+            {status && (
+              <p className="mt-2 flex items-center gap-2 text-[15px] font-bold" style={{ color: status.open ? C.accent : C.muted }}>
+                <span className="h-2 w-2 shrink-0 rounded-full" style={{ backgroundColor: status.open ? C.accent : C.toothLine }} aria-hidden />
+                {status.text}
+              </p>
+            )}
+          </motion.aside>
+        </div>
+      </div>
+    </section>
+  );
+}
+
+function ToothMap({ onReserve }: { onReserve: (id: TreatmentId) => void }) {
   const reduce = !!useReducedMotion();
   const [selected, setSelected] = useState<Selection>(36);
   const [symptomIndex, setSymptomIndex] = useState(0);
@@ -694,18 +808,10 @@ function ToothMap({ onReserve, status }: { onReserve: (id: TreatmentId) => void;
     <section id="map" className="scroll-mt-16" style={{ backgroundColor: C.mist }}>
       <div className={`${container} grid gap-8 py-10 md:py-14 lg:grid-cols-12 lg:gap-12`}>
         <div className="lg:col-span-6">
-          <div className="flex flex-wrap items-center gap-x-3 gap-y-2">
-            <span className="inline-flex items-center gap-1.5 rounded-[4px] px-2.5 py-1 text-[15px] font-bold" style={{ backgroundColor: C.mint, color: C.accent }}>
-              <Moon size={15} aria-hidden />
-              화요일, 목요일 저녁 9시까지
-            </span>
-            {status && (
-              <span className="text-[15px] font-bold" style={{ color: status.open ? C.accent : C.muted }}>
-                {status.text}
-              </span>
-            )}
-          </div>
-          <h1 className="mt-4 text-[36px] font-bold leading-[1.2] tracking-[-0.045em] md:text-[52px]">어디가 불편하세요?</h1>
+          <p className="text-[17px] font-bold" style={{ color: C.accent }}>
+            증상별 안내
+          </p>
+          <h2 className="mt-2 text-[32px] font-bold leading-[1.2] tracking-[-0.045em] md:text-[44px]">어디가 불편하세요?</h2>
           <p className="mt-3 text-[19px]" style={{ color: C.muted }}>
             불편한 치아를 누르면 필요한 진료와 비용을 알려 드립니다.
           </p>
@@ -745,7 +851,7 @@ function ToothMap({ onReserve, status }: { onReserve: (id: TreatmentId) => void;
                 <p className="text-[15px]" style={{ color: C.muted }}>
                   {selected === "gum" ? "잇몸 전체" : `치아 번호 ${selected}`}
                 </p>
-                <h2 className="mt-0.5 text-[28px] font-bold tracking-[-0.035em] md:text-[32px]">{title}</h2>
+                <h3 className="mt-0.5 text-[28px] font-bold tracking-[-0.035em] md:text-[32px]">{title}</h3>
 
                 <fieldset className="mt-5">
                   <legend className="text-[17px] font-bold">어떤 증상인가요?</legend>
