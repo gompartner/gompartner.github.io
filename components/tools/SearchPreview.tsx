@@ -40,7 +40,7 @@ const ENGINES = {
 type Fields = { name: string; region: string; industry: string; url: string; strengths: string; title: string; desc: string };
 
 const EXAMPLE: Fields = {
-  name: "곰선임치과의원",
+  name: "곰파트너치과의원",
   region: "강남역",
   industry: "치과",
   url: "https://www.example.co.kr",
@@ -128,7 +128,7 @@ export function SearchPreview() {
           <legend className="w-full border-b-2 border-foreground pb-2 text-[19px] font-bold">가게 정보</legend>
           <label className="block text-[16px] font-bold">
             상호
-            <input value={f.name} onChange={set("name")} className={input} placeholder="곰선임치과의원" />
+            <input value={f.name} onChange={set("name")} className={input} placeholder="곰파트너치과의원" />
           </label>
           <div className="grid grid-cols-2 gap-3">
             <label className="block text-[16px] font-bold">
