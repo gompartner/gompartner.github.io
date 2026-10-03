@@ -2,7 +2,6 @@
 
 import { useMemo, useState, useSyncExternalStore } from "react";
 import Image from "next/image";
-import { Do_Hyeon, Gowun_Dodum } from "next/font/google";
 import { AnimatePresence, motion } from "framer-motion";
 import {
   Accessibility,
@@ -28,7 +27,7 @@ import { useReducedMotionSafe } from "@/hooks/useReducedMotionSafe";
    개최지, 주최 기관, 입장료, 프로그램, 연락처는 모두 가상이다.
 
    디자인: 크림 바탕(#fffaf0)에 짙은 초록(#1f4d3a), 꽃잎 분홍(#e8577a), 버터 노랑(#f6d365).
-   제목은 고운돋움, 큰 숫자는 도현체로 둥글고 가볍게 잡았다.
+   제목과 큰 숫자는 굵은 고딕(Pretendard Bold), 본문은 보통 고딕으로 맞췄다.
    섹션 제목 옆 작은 꽃이 화면에 들어올 때 꽃잎을 펼친다.
    전시 구역은 호수를 둘러싼 그림 지도이고, 구역을 누르면 볼거리와 사진 찍기 좋은 곳이 나온다.
    "언제 가면 좋을까" 문장의 빈칸을 바꾸면 지도 위에 추천 동선이 선으로 그려진다.
@@ -37,8 +36,6 @@ import { useReducedMotionSafe } from "@/hooks/useReducedMotionSafe";
    사진 출처(public/images/demo-flower):
    AI 생성(Z-Image-Turbo, Apache 2.0) hero, tulip, rose, night */
 
-const display = Gowun_Dodum({ weight: "400", preload: false, display: "swap" });
-const numFont = Do_Hyeon({ weight: "400", preload: false, display: "swap" });
 
 const IMG = "/images/demo-flower";
 const EXPO = "2027 ○○ 꽃박람회";
@@ -364,7 +361,7 @@ function SectionTitle({ id, eyebrow, title, color = C.pink }: { id: string; eyeb
         <p className="text-[15px] font-semibold" style={{ color: C.pinkText }}>
           {eyebrow}
         </p>
-        <h2 id={`${id}-title`} className={`${display.className} mt-1 text-[28px] leading-tight md:text-[36px]`} style={{ color: C.green }}>
+        <h2 id={`${id}-title`} className={`font-bold tracking-[-0.03em] mt-1 text-[28px] leading-tight md:text-[36px]`} style={{ color: C.green }}>
           {title}
         </h2>
       </div>
@@ -382,7 +379,7 @@ function Header() {
       <div className="mx-auto flex h-16 max-w-[1200px] items-center justify-between gap-4 px-4 md:px-6">
         <a href="#top" className="flex items-center gap-2" aria-label={`${EXPO} 처음으로`}>
           <Flower size={30} animate={false} />
-          <span className={`${display.className} text-[18px] leading-none md:text-[20px]`} style={{ color: C.green }}>
+          <span className={`font-bold tracking-[-0.03em] text-[18px] leading-none md:text-[20px]`} style={{ color: C.green }}>
             {EXPO}
           </span>
         </a>
@@ -496,7 +493,7 @@ function Hero({ today }: { today: number }) {
             <MapPin size={16} aria-hidden />
             □□시 ○○호수공원 일대
           </motion.p>
-          <h1 id="hero-title" className={`${display.className} mt-4 text-[40px] leading-[1.15] sm:text-[52px] md:text-[64px]`} style={{ color: C.green }}>
+          <h1 id="hero-title" className={`font-bold tracking-[-0.03em] mt-4 text-[40px] leading-[1.15] sm:text-[52px] md:text-[64px]`} style={{ color: C.green }}>
             <motion.span
               className="block"
               initial={reduce ? false : { opacity: 0, y: 16 }}
@@ -530,7 +527,7 @@ function Hero({ today }: { today: number }) {
             </div>
             <div className="rounded-2xl p-4 text-white" style={{ background: C.green }} aria-live="polite">
               <dt className="text-[14px] text-white/80">{countLabel || "개막까지"}</dt>
-              <dd className={`${numFont.className} mt-1 text-[34px] leading-none`}>{countValue || " "}</dd>
+              <dd className={`font-bold tabular-nums tracking-[-0.02em] mt-1 text-[34px] leading-none`}>{countValue || " "}</dd>
             </div>
           </dl>
 
@@ -589,7 +586,7 @@ function BloomSection() {
             return (
               <li key={b.name} className="flex flex-col gap-3 px-5 py-5 sm:flex-row sm:items-center sm:gap-6 md:px-8" style={{ borderColor: C.line }}>
                 <div className="sm:w-[180px]">
-                  <p className={`${display.className} text-[22px]`} style={{ color: C.ink }}>
+                  <p className={`font-bold tracking-[-0.03em] text-[22px]`} style={{ color: C.ink }}>
                     {b.name}
                   </p>
                   <p className="text-[15px]" style={{ color: C.muted }}>
@@ -717,7 +714,7 @@ function InfoSection() {
                     >
                       <Minus size={16} aria-hidden />
                     </button>
-                    <span className={`${numFont.className} w-8 text-center text-[22px]`} style={{ color: C.ink }} aria-live="polite">
+                    <span className={`font-bold tabular-nums tracking-[-0.02em] w-8 text-center text-[22px]`} style={{ color: C.ink }} aria-live="polite">
                       {count[t.id]}
                     </span>
                     <button
@@ -747,7 +744,7 @@ function InfoSection() {
                 )}
                 {!resident && !group && people > 0 && <span className="block">20명 이상이면 단체 20% 할인</span>}
               </div>
-              <p className={`${numFont.className} text-[32px] leading-none`} style={{ color: C.green }} aria-live="polite">
+              <p className={`font-bold tabular-nums tracking-[-0.02em] text-[32px] leading-none`} style={{ color: C.green }} aria-live="polite">
                 {total.toLocaleString("ko-KR")}원
               </p>
             </div>
@@ -823,7 +820,7 @@ function GardenMap({
       {/* 잔디와 호수 */}
       <rect x="0" y="0" width="800" height="560" rx="32" fill="#eaf4e4" />
       <path d="M300 230 C 330 170, 470 160, 520 210 C 580 260, 560 340, 480 360 C 400 380, 300 360, 285 300 C 278 270, 285 250, 300 230 Z" fill={C.lake} />
-      <text x="420" y="285" textAnchor="middle" fontSize="18" fill="#3d6f80" className={display.className}>
+      <text x="420" y="285" textAnchor="middle" fontSize="18" fill="#3d6f80" fontWeight="700">
         ○○호수
       </text>
       {/* 산책로 */}
@@ -946,7 +943,7 @@ function ZoneDetail({ zone }: { zone: Zone }) {
         )}
       </div>
       <div className="p-6">
-        <h3 className={`${display.className} text-[26px]`} style={{ color: C.green }}>
+        <h3 className={`font-bold tracking-[-0.03em] text-[26px]`} style={{ color: C.green }}>
           {zone.name}
         </h3>
         <p className="mt-2 text-[16px] leading-[1.7]" style={{ color: C.ink }}>
@@ -1023,7 +1020,7 @@ function MapSection() {
               언제 가면 좋을까요? 분홍 글자를 누르면 바뀝니다.
             </p>
             <div className="mt-3 flex items-start gap-3">
-              <p className={`${display.className} flex-1 text-[24px] leading-[1.9] md:text-[30px]`} style={{ color: C.ink }}>
+              <p className={`flex-1 font-semibold tracking-[-0.02em] text-[24px] leading-[1.9] md:text-[30px]`} style={{ color: C.ink }}>
                 <Blank label="요일" value={when} options={WHEN} onChange={(v) => { setWhen(v); setPicked(null); }} />
                 <Blank label="시간대" value={time} options={TIME} onChange={(v) => { setTime(v); setPicked(null); }} />에
                 <Blank label="함께 가는 사람" value={who} options={WHO} onChange={(v) => { setWho(v); setPicked(null); }} />
@@ -1138,7 +1135,7 @@ function ProgramSection({ today }: { today: number }) {
                   <span className="text-[13px]" style={{ color: on ? "#fff" : f.dow === 0 ? C.pinkText : f.dow === 6 ? "#3a5fb0" : C.muted }}>
                     {WEEKDAY[f.dow]}
                   </span>
-                  <span className={`${numFont.className} text-[22px] leading-none`}>{f.d}</span>
+                  <span className={`font-bold tabular-nums tracking-[-0.02em] text-[22px] leading-none`}>{f.d}</span>
                   {f.night && <Moon size={11} className="mt-0.5" aria-label="야간 개장" />}
                   {isToday && <span className="absolute -top-2 rounded-full px-1.5 text-[11px] font-bold text-white" style={{ background: C.pinkText }}>오늘</span>}
                 </button>
@@ -1180,7 +1177,7 @@ function ProgramSection({ today }: { today: number }) {
                 transition={{ duration: 0.3, ease: EASE, delay: reduce ? 0 : i * 0.04 }}
                 className="flex items-center gap-4 rounded-2xl bg-white px-4 py-4 md:px-6"
               >
-                <span className={`${numFont.className} w-[56px] shrink-0 text-[22px]`} style={{ color: C.green }}>
+                <span className={`font-bold tabular-nums tracking-[-0.02em] w-[64px] shrink-0 whitespace-nowrap text-[22px]`} style={{ color: C.green }}>
                   {p.time}
                 </span>
                 <div className="min-w-0 flex-1">
@@ -1323,7 +1320,7 @@ export function FlowerExpoDemo() {
       </main>
       <footer className="pb-24 pt-12" style={{ background: C.green, color: "#e4efe6" }}>
         <div className="mx-auto max-w-[1200px] px-4 text-[15px] leading-[1.8] md:px-6">
-          <p className={`${display.className} text-[22px] text-white`}>{EXPO}</p>
+          <p className={`font-bold tracking-[-0.03em] text-[22px] text-white`}>{EXPO}</p>
           <p className="mt-3">주최 □□시 | 주관 ○○꽃박람회 조직위원회</p>
           <p>□□시 □□로 200 ○○호수공원 관리사무소 2층</p>
           <p className="flex items-center gap-1">

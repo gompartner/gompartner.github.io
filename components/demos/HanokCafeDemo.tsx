@@ -2,7 +2,6 @@
 
 import { useMemo, useRef, useState, useSyncExternalStore } from "react";
 import Image from "next/image";
-import { Gowun_Batang } from "next/font/google";
 import { AnimatePresence, motion } from "framer-motion";
 import { Car, Check, List, MapPin, Menu, Minus, Phone, Plus, RotateCcw, TrainFront, X } from "lucide-react";
 import { useReducedMotionSafe } from "@/hooks/useReducedMotionSafe";
@@ -12,7 +11,7 @@ import { useReducedMotionSafe } from "@/hooks/useReducedMotionSafe";
    상호, 대표자, 주소, 전화번호, 사업자 정보, 메뉴와 가격은 모두 가상이다.
 
    디자인: 한지색 바탕(#f3ede2)에 옅은 섬유 질감, 먹색 글씨(#1f1b16), 낙관 주홍(#a8432a),
-   소나무 초록(#3f5a3c)과 황토(#b08850)를 보조색으로 쓴다. 제목은 고운바탕 명조, 본문은 Pretendard.
+   소나무 초록(#3f5a3c)과 황토(#b08850)를 보조색으로 쓴다. 제목은 굵은 고딕(Pretendard Bold), 본문은 보통 고딕.
    첫 화면 사진은 창호지 문 두 짝이 양옆으로 열리며 드러나고, 구역 이름은 세로쓰기로 둔다.
 
    메뉴는 검색창 대신 "따뜻한 차 중에 달지 않은 걸로 주세요" 문장의 낱말을 눌러 바꾸면
@@ -23,7 +22,6 @@ import { useReducedMotionSafe } from "@/hooks/useReducedMotionSafe";
    사진 출처(public/images/demo-cafe):
    AI 생성(Z-Image-Turbo, Apache 2.0) hero, coffee, bingsu, omija, yard */
 
-const batang = Gowun_Batang({ weight: ["400", "700"], preload: false, display: "swap" });
 
 const IMG = "/images/demo-cafe";
 const CAFE = "○○ 한옥 찻집";
@@ -206,7 +204,7 @@ function BrushRule({ className = "", color = "#1f1b16" }: { className?: string; 
 function Seal({ lines, size = 64, className = "" }: { lines: string[]; size?: number; className?: string }) {
   return (
     <span
-      className={`${batang.className} inline-flex items-center justify-center rounded-[6px] border-2 border-[#f3ede2]/50 bg-[#a8432a] text-[#f8efe4] shadow-[inset_0_0_0_3px_#a8432a,inset_0_0_0_4px_rgba(248,239,228,0.6)] ${className}`}
+      className={`tracking-[-0.02em] inline-flex items-center justify-center rounded-[6px] border-2 border-[#f3ede2]/50 bg-[#a8432a] text-[#f8efe4] shadow-[inset_0_0_0_3px_#a8432a,inset_0_0_0_4px_rgba(248,239,228,0.6)] ${className}`}
       style={{ width: size, height: size, writingMode: "vertical-rl", fontSize: size / 4.2, lineHeight: 1.05 }}
       aria-hidden
     >
@@ -222,7 +220,7 @@ function Seal({ lines, size = 64, className = "" }: { lines: string[]; size?: nu
 function SectionMark({ text }: { text: string }) {
   return (
     <p
-      className={`${batang.className} hidden text-[15px] tracking-[0.4em] text-[#a8432a] lg:block`}
+      className={`hidden text-[15px] tracking-[0.4em] text-[#a8432a] lg:block`}
       style={{ writingMode: "vertical-rl" }}
     >
       {text}
@@ -276,7 +274,7 @@ function Header() {
       <div className="mx-auto flex h-16 max-w-[1200px] items-center justify-between px-4 sm:px-6">
         <a href="#top" className="flex items-center gap-2.5">
           <LogoMark />
-          <span className={`${batang.className} text-[20px] font-bold tracking-[-0.01em]`}>{CAFE}</span>
+          <span className={`text-[20px] font-bold tracking-[-0.01em]`}>{CAFE}</span>
         </a>
         <nav aria-label="주 메뉴" className="hidden md:block">
           <ul className="flex items-center gap-8 text-[16px]">
@@ -365,13 +363,13 @@ function Hero({ status }: { status: ReturnType<typeof openStatus> }) {
         <div className="relative z-10 flex flex-col justify-center lg:py-20 lg:pr-10">
           <div className="flex items-start gap-5">
             <p
-              className={`${batang.className} hidden pt-2 text-[15px] tracking-[0.45em] text-[#6b5a48] sm:block`}
+              className={`hidden pt-2 text-[15px] tracking-[0.45em] text-[#6b5a48] sm:block`}
               style={{ writingMode: "vertical-rl" }}
             >
               □□동 골목 안 한옥
             </p>
             <div>
-              <h1 className={`${batang.className} text-[44px] font-bold leading-[1.2] tracking-[-0.02em] sm:text-[56px]`}>
+              <h1 className={`text-[44px] font-bold leading-[1.2] tracking-[-0.02em] sm:text-[56px]`}>
                 ○○
                 <br />
                 한옥 찻집
@@ -423,7 +421,7 @@ function Hero({ status }: { status: ReturnType<typeof openStatus> }) {
             <div className="flex items-start justify-between gap-3">
               <div>
                 <p className="text-[14px] text-[#6b5a48]">{status ? `오늘 ${WEEKDAY[status.day]}요일` : "오늘"}</p>
-                <p className={`${batang.className} mt-1 text-[26px] font-bold leading-tight`}>
+                <p className={`tracking-[-0.02em] mt-1 text-[26px] font-bold leading-tight`}>
                   {status?.day === 1 ? "쉬는 날" : "11:00 ~ 21:00"}
                 </p>
               </div>
@@ -497,7 +495,7 @@ function MenuRow({ item }: { item: MenuItem }) {
   return (
     <li className="py-3.5">
       <div className="flex items-baseline gap-3">
-        <span className={`${batang.className} text-[20px] font-bold`}>{item.name}</span>
+        <span className={`tracking-[-0.02em] text-[20px] font-bold`}>{item.name}</span>
         {item.season && <span className="rounded-[2px] border border-[#a8432a] px-1.5 text-[13px] leading-[1.6] text-[#a8432a]">가을</span>}
         <span className="mb-1 flex-1 border-b border-dotted border-[#1f1b16]/35" aria-hidden />
         <span className="text-[17px] font-semibold tabular-nums">{won(item.price)}</span>
@@ -530,7 +528,7 @@ function MenuSection() {
       <div className="mx-auto flex max-w-[1200px] gap-10 px-4 sm:px-6">
         <SectionMark text="차림표" />
         <div className="min-w-0 flex-1">
-          <h2 className={`${batang.className} text-[34px] font-bold leading-[1.3] sm:text-[40px]`}>오늘 많이 찾는 메뉴</h2>
+          <h2 className={`tracking-[-0.02em] text-[34px] font-bold leading-[1.3] sm:text-[40px]`}>오늘 많이 찾는 메뉴</h2>
           <p className="mt-3 text-[#5b5045]">10월부터 11월까지 홍시 빙수와 단호박 식혜를 함께 냅니다.</p>
 
           <ul className="mt-10 grid gap-8 sm:grid-cols-3 sm:gap-6">
@@ -540,7 +538,7 @@ function MenuSection() {
                   <Image src={`${IMG}/${f.img}.jpg`} alt={f.alt} fill sizes="(min-width:640px) 30vw, 85vw" className="object-cover" />
                 </div>
                 <div className="flex flex-col items-center gap-3 pt-1">
-                  <p className={`${batang.className} text-[20px] font-bold tracking-[0.12em]`} style={{ writingMode: "vertical-rl" }}>
+                  <p className={`text-[20px] font-bold tracking-[0.12em]`} style={{ writingMode: "vertical-rl" }}>
                     {f.name}
                   </p>
                   <p className="text-[14px] font-semibold tabular-nums text-[#a8432a]" style={{ writingMode: "vertical-rl" }}>
@@ -552,7 +550,7 @@ function MenuSection() {
           </ul>
 
           <div className="mt-20 flex flex-wrap items-end justify-between gap-4">
-            <h3 className={`${batang.className} text-[26px] font-bold sm:text-[30px]`}>무엇을 드릴까요?</h3>
+            <h3 className={`tracking-[-0.02em] text-[26px] font-bold sm:text-[30px]`}>무엇을 드릴까요?</h3>
             <button
               type="button"
               onClick={() => setShowAll((v) => !v)}
@@ -568,7 +566,7 @@ function MenuSection() {
             <div className="mt-8 grid gap-10 lg:grid-cols-3">
               {(Object.keys(KIND_LABEL) as Kind[]).map((k) => (
                 <div key={k} className="flex gap-4">
-                  <p className={`${batang.className} shrink-0 text-[22px] font-bold text-[#a8432a]`} style={{ writingMode: "vertical-rl" }}>
+                  <p className={`tracking-[-0.02em] shrink-0 text-[22px] font-bold text-[#a8432a]`} style={{ writingMode: "vertical-rl" }}>
                     {KIND_LABEL[k]}
                   </p>
                   <ul className="min-w-0 flex-1 divide-y divide-[#1f1b16]/10">
@@ -581,7 +579,7 @@ function MenuSection() {
             </div>
           ) : (
             <>
-              <p className={`${batang.className} mt-8 text-[24px] leading-[2.1] sm:text-[30px]`}>
+              <p className={`tracking-[-0.02em] font-semibold mt-8 text-[24px] leading-[2.1] sm:text-[30px]`}>
                 <Token label="온도" options={TOKENS.temp} value={temp} onChange={setTemp} />
                 <Token label="종류" options={TOKENS.kind} value={kind} onChange={setKind} />
                 중에
@@ -642,11 +640,11 @@ function SpaceSection() {
           </div>
           <div>
             <div className="flex items-start gap-4">
-              <p className={`${batang.className} text-[15px] tracking-[0.4em] text-[#d98b6f]`} style={{ writingMode: "vertical-rl" }}>
+              <p className={`text-[15px] tracking-[0.4em] text-[#d98b6f]`} style={{ writingMode: "vertical-rl" }}>
                 공간
               </p>
               <div>
-                <h2 className={`${batang.className} text-[32px] font-bold leading-[1.35] sm:text-[38px]`}>
+                <h2 className={`tracking-[-0.02em] text-[32px] font-bold leading-[1.35] sm:text-[38px]`}>
                   마당을 가운데 둔
                   <br />ㄱ자 한옥
                 </h2>
@@ -754,7 +752,7 @@ function FloorPlan({
         <rect x={382} y={312} width={6} height={22} fill="#5a4130" />
         <circle cx={420} cy={370} r={14} fill="#b08850" />
       </g>
-      <text x={330} y={360} fontSize={16} fill="#6b5a48" className={batang.className}>
+      <text x={330} y={360} fontSize={16} fill="#6b5a48" fontWeight={700}>
         마당
       </text>
 
@@ -826,7 +824,6 @@ function FloorPlan({
               fontWeight={700}
               textAnchor="middle"
               fill={isSel ? "#f3ede2" : "#1f1b16"}
-              className={batang.className}
               style={{ transition: "fill 200ms" }}
             >
               {s.name}
@@ -908,7 +905,7 @@ function ReserveSection({ minute }: { minute: number }) {
       <div className="mx-auto flex max-w-[1200px] gap-10 px-4 sm:px-6">
         <SectionMark text="자리 예약" />
         <div className="min-w-0 flex-1">
-          <h2 className={`${batang.className} text-[34px] font-bold leading-[1.3] sm:text-[40px]`}>어디에 앉으시겠어요?</h2>
+          <h2 className={`tracking-[-0.02em] text-[34px] font-bold leading-[1.3] sm:text-[40px]`}>어디에 앉으시겠어요?</h2>
           <p className="mt-3 max-w-[40em] text-[#5b5045]">
             좌식 방과 툇마루, 별채는 두 시간씩 예약할 수 있습니다. 대청마루는 예약 없이 오신 순서대로 앉습니다.
           </p>
@@ -956,7 +953,7 @@ function ReserveSection({ minute }: { minute: number }) {
                     >
                       <Seal lines={["예약", "접수"]} size={68} />
                     </motion.div>
-                    <h3 className={`${batang.className} pr-20 text-[26px] font-bold leading-[1.35]`}>예약 신청을 받았습니다</h3>
+                    <h3 className={`tracking-[-0.02em] pr-20 text-[26px] font-bold leading-[1.35]`}>예약 신청을 받았습니다</h3>
                     <p className="mt-2 pr-20 text-[15px] text-[#5b5045]">확정되면 문자로 알려 드립니다.</p>
                     <dl className="mt-6 divide-y divide-[#1f1b16]/10 text-[16px]">
                       {[
@@ -999,7 +996,7 @@ function ReserveSection({ minute }: { minute: number }) {
                     <div aria-live="polite">
                       {space ? (
                         <div>
-                          <p className={`${batang.className} text-[24px] font-bold`}>{space.name}</p>
+                          <p className={`tracking-[-0.02em] text-[24px] font-bold`}>{space.name}</p>
                           <p className="mt-0.5 text-[15px] text-[#a8432a]">
                             {space.type}
                             {space.reservable ? ` · ${space.min}~${space.max}명` : ""}
@@ -1169,7 +1166,7 @@ function MapSketch() {
       </text>
       <path d="M150 268 V140 H420 V100" stroke="#a8432a" strokeWidth={3} strokeDasharray="7 6" fill="none" />
       <rect x={370} y={40} width={100} height={60} rx={4} fill="#1f1b16" />
-      <text x={420} y={76} fontSize={16} fill="#f3ede2" textAnchor="middle" className={batang.className}>
+      <text x={420} y={76} fontSize={16} fill="#f3ede2" textAnchor="middle" fontWeight={700}>
         ○○ 찻집
       </text>
       <rect x={430} y={190} width={100} height={36} rx={4} fill="#e6dcc7" stroke="#b08850" />
@@ -1192,7 +1189,7 @@ function Location() {
         <SectionMark text="오시는 길" />
         <div className="grid min-w-0 flex-1 gap-10 lg:grid-cols-2">
           <div>
-            <h2 className={`${batang.className} text-[34px] font-bold leading-[1.3] sm:text-[40px]`}>오시는 길</h2>
+            <h2 className={`tracking-[-0.02em] text-[34px] font-bold leading-[1.3] sm:text-[40px]`}>오시는 길</h2>
             <p className="mt-4 flex items-start gap-2 text-[19px] font-semibold">
               <MapPin size={20} className="mt-1 shrink-0 text-[#a8432a]" aria-hidden />
               {ADDRESS}
@@ -1232,7 +1229,7 @@ function Footer() {
     <footer className="bg-[#1f1b16] py-10 text-[14px] leading-[1.8] text-[#b9ad9c]">
       <div className="mx-auto flex max-w-[1200px] flex-col gap-4 px-4 sm:flex-row sm:items-start sm:justify-between sm:px-6">
         <div>
-          <p className={`${batang.className} text-[18px] font-bold text-[#efe7da]`}>{CAFE}</p>
+          <p className={`tracking-[-0.02em] text-[18px] font-bold text-[#efe7da]`}>{CAFE}</p>
           <p className="mt-2">
             대표 김○○ | 사업자등록번호 000-00-00000 | {ADDRESS} | {TEL}
           </p>

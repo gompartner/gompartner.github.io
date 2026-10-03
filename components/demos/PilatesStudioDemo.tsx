@@ -2,7 +2,6 @@
 
 import { useEffect, useId, useRef, useState, useSyncExternalStore } from "react";
 import Image from "next/image";
-import { Noto_Serif_KR } from "next/font/google";
 import { AnimatePresence, motion } from "framer-motion";
 import { Bus, Car, ChevronDown, List, Menu, MessageSquareText, TrainFront, X } from "lucide-react";
 import { useReducedMotionSafe } from "@/hooks/useReducedMotionSafe";
@@ -12,7 +11,7 @@ import { useReducedMotionSafe } from "@/hooks/useReducedMotionSafe";
    스튜디오명, 강사, 주소, 전화번호, 사업자 정보, 수강료는 모두 가상이다.
 
    디자인: 따뜻한 흰 종이색(#f5f2ec) 바탕에 쪽빛(#24365a)을 주색으로, 모래색과 흙색을 보조로 쓴다.
-   제목은 명조(Noto Serif KR), 본문은 사이트 기본 글꼴. 첫 화면에는 붓으로 한 번에 그린 듯한
+   제목은 굵은 고딕(Pretendard Bold), 본문은 보통 고딕. 첫 화면에는 붓으로 한 번에 그린 듯한
    원이 그려지고, 로고의 ○은 숨 쉬듯 천천히 커졌다 작아진다. 구역 제목 옆에는 세로쓰기 이름표를 둔다.
    카드 격자 대신 문장, 표, 점으로 정보를 보여 준다.
 
@@ -26,7 +25,6 @@ import { useReducedMotionSafe } from "@/hooks/useReducedMotionSafe";
    사진 출처(public/images/demo-pilates):
    AI 생성(Z-Image-Turbo, Apache 2.0) hero, teacher, mat, studio */
 
-const serif = Noto_Serif_KR({ weight: ["500", "700"], preload: false, display: "swap" });
 
 const IMG = "/images/demo-pilates";
 const STUDIO = "○○ 필라테스";
@@ -328,7 +326,7 @@ function Logo({ light = false }: { light?: boolean }) {
         />
         <circle cx="15" cy="15" r="2.2" fill={light ? C.onIndigo : C.clay} />
       </svg>
-      <span className={`${serif.className} text-[19px] font-bold tracking-[-0.01em]`}>{STUDIO}</span>
+      <span className={`text-[19px] font-bold tracking-[-0.01em]`}>{STUDIO}</span>
     </span>
   );
 }
@@ -460,7 +458,7 @@ function TodayCard({ status }: { status: Status }) {
       <p className="text-[14px]" style={{ color: C.muted }}>
         {status?.label ?? "운영시간"}
       </p>
-      <p className={`${serif.className} mt-0.5 text-[24px] font-bold`}>{status?.time ?? "평일 07:00 ~ 22:00"}</p>
+      <p className={`tracking-[-0.02em] mt-0.5 text-[24px] font-bold`}>{status?.time ?? "평일 07:00 ~ 22:00"}</p>
       <p className="mt-1 flex items-center gap-2 text-[14px]" style={{ color: status?.open ? C.indigo : C.muted }}>
         <span className="inline-block h-2 w-2 rounded-full" style={{ background: status?.open ? C.indigo : C.clay }} aria-hidden />
         {status?.text ?? "토요일 09:00 ~ 15:00, 일요일 쉼"}
@@ -494,7 +492,7 @@ function Hero({ status }: { status: Status }) {
               1:1 리포머, 6명 이하 소그룹 수업
             </p>
             <motion.h1
-              className={`${serif.className} relative mt-3 text-[40px] font-bold leading-[1.25] tracking-[-0.02em] md:text-[58px]`}
+              className={`relative mt-3 text-[40px] font-bold leading-[1.25] tracking-[-0.02em] md:text-[58px]`}
               initial={reduce ? false : { opacity: 0, y: 14 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.7, ease: EASE, delay: 0.5 }}
@@ -536,7 +534,7 @@ function SectionHead({ tag, title, desc, id }: { tag: string; title: string; des
   return (
     <div className="flex gap-5 md:gap-8">
       <span
-        className={`${serif.className} hidden shrink-0 border-l pl-3 text-[15px] tracking-[0.3em] md:block`}
+        className={`hidden shrink-0 border-l pl-3 text-[15px] tracking-[0.3em] md:block`}
         style={{ writingMode: "vertical-rl", color: C.clayDeep, borderColor: C.clay }}
         aria-hidden
       >
@@ -546,7 +544,7 @@ function SectionHead({ tag, title, desc, id }: { tag: string; title: string; des
         <p className="text-[14px] font-semibold md:hidden" style={{ color: C.clayDeep }}>
           {tag}
         </p>
-        <h2 id={id} className={`${serif.className} text-[28px] font-bold leading-[1.35] tracking-[-0.02em] md:text-[36px]`}>
+        <h2 id={id} className={`text-[28px] font-bold leading-[1.35] tracking-[-0.02em] md:text-[36px]`}>
           {title}
         </h2>
         {desc && (
@@ -682,7 +680,7 @@ function Finder({ onSchedule, onPrivate }: { onSchedule: (t: ClassType, level?: 
 
         {mode === "sentence" ? (
           <div className="mt-10 grid gap-10 md:grid-cols-[1.1fr_1fr] md:items-start md:gap-14">
-            <div className={`${serif.className} text-[26px] leading-[1.9] md:text-[34px]`}>
+            <div className={`tracking-[-0.02em] font-semibold text-[26px] leading-[1.9] md:text-[34px]`}>
               요즘 <Blank label="불편한 곳" value={part} options={PART_OPTIONS} onChange={setPart} />, 운동은{" "}
               <Blank label="운동 경험" value={exp} options={EXP_OPTIONS} onChange={setExp} />.
             </div>
@@ -699,7 +697,7 @@ function Finder({ onSchedule, onPrivate }: { onSchedule: (t: ClassType, level?: 
                 <p className="text-[14px]" style={{ color: "#b9c3d8" }}>
                   추천 수업
                 </p>
-                <p className={`${serif.className} mt-1 text-[28px] font-bold`}>
+                <p className={`tracking-[-0.02em] mt-1 text-[28px] font-bold`}>
                   {info.name}
                   {rec.level && <span className="ml-2 align-middle text-[16px] font-medium">{rec.level}반</span>}
                 </p>
@@ -740,10 +738,10 @@ function Finder({ onSchedule, onPrivate }: { onSchedule: (t: ClassType, level?: 
           <ol className="mt-10 border-t" style={{ borderColor: C.line }}>
             {(Object.keys(CLASS_INFO) as ClassType[]).map((t, i) => (
               <li key={t} className="grid gap-2 border-b py-6 md:grid-cols-[60px_240px_1fr_200px] md:items-baseline md:gap-6" style={{ borderColor: C.line }}>
-                <span className={`${serif.className} text-[15px]`} style={{ color: C.clayDeep }}>
+                <span className={`tracking-[-0.02em] text-[15px]`} style={{ color: C.clayDeep }}>
                   {String(i + 1).padStart(2, "0")}
                 </span>
-                <span className={`${serif.className} text-[22px] font-bold`}>
+                <span className={`tracking-[-0.02em] text-[22px] font-bold`}>
                   {CLASS_INFO[t].name}
                   <span className="ml-2 font-sans text-[14px] font-normal" style={{ color: C.muted }}>
                     {CLASS_INFO[t].cap === 1 ? "1명" : `최대 ${CLASS_INFO[t].cap}명`}, 50분
@@ -893,7 +891,7 @@ function Schedule({
               <tr>
                 <th scope="col" className="w-[80px]" />
                 {WEEK.map((d) => (
-                  <th key={d} scope="col" className={`${serif.className} pb-2 text-[17px] font-bold`}>
+                  <th key={d} scope="col" className={`tracking-[-0.02em] pb-2 text-[17px] font-bold`}>
                     {DAY_NAMES[d]}
                   </th>
                 ))}
@@ -928,7 +926,7 @@ function Schedule({
                 type="button"
                 aria-pressed={mobileDay === d}
                 onClick={() => setMobileDay(d)}
-                className={`${serif.className} h-11 rounded-[6px] text-[17px] font-bold`}
+                className={`tracking-[-0.02em] h-11 rounded-[6px] text-[17px] font-bold`}
                 style={mobileDay === d ? { background: C.indigo, color: C.onIndigo } : { background: "#fffdf9", color: C.ink }}
               >
                 {DAY_NAMES[d]}
@@ -1048,7 +1046,7 @@ function BookingDrawer({ target, onClose }: { target: Session | "private" | null
                 <p className="text-[14px] font-semibold" style={{ color: C.clayDeep }}>
                   체험 수업 신청
                 </p>
-                <h3 id="booking-title" ref={headingRef} tabIndex={-1} className={`${serif.className} mt-1 text-[24px] font-bold outline-none`}>
+                <h3 id="booking-title" ref={headingRef} tabIndex={-1} className={`tracking-[-0.02em] mt-1 text-[24px] font-bold outline-none`}>
                   {className}
                 </h3>
               </div>
@@ -1077,7 +1075,7 @@ function BookingDrawer({ target, onClose }: { target: Session | "private" | null
 
             {done ? (
               <div className="mt-6" role="status">
-                <p className={`${serif.className} text-[20px] font-bold`}>신청을 받았습니다</p>
+                <p className={`tracking-[-0.02em] text-[20px] font-bold`}>신청을 받았습니다</p>
                 <p className="mt-2">{done}</p>
                 <button
                   type="button"
@@ -1215,7 +1213,7 @@ function Pricing() {
                 <dt className="text-[14px]" style={{ color: C.muted }}>
                   {PASS_TYPES.find((p) => p.id === type)!.label} {count}회 총액
                 </dt>
-                <dd className={`${serif.className} text-[36px] font-bold leading-tight md:text-[44px]`} style={{ color: C.indigo }}>
+                <dd className={`tracking-[-0.02em] text-[36px] font-bold leading-tight md:text-[44px]`} style={{ color: C.indigo }}>
                   {manwon(total)}
                 </dd>
               </div>
@@ -1262,7 +1260,7 @@ function Teachers() {
             <p className="text-[15px] font-semibold" style={{ color: C.clayDeep }}>
               원장, 1:1 리포머
             </p>
-            <h3 className={`${serif.className} mt-1 text-[30px] font-bold`}>박○○</h3>
+            <h3 className={`tracking-[-0.02em] mt-1 text-[30px] font-bold`}>박○○</h3>
             <p className="mt-4" style={{ color: C.muted }}>
               물리치료사로 병원에서 일하다 필라테스를 가르치기 시작했습니다. 아픈 곳이 있는 분은 첫 시간에 꼭 몸 상태를 먼저 묻습니다.
             </p>
@@ -1278,7 +1276,7 @@ function Teachers() {
               {OTHER_TEACHERS.map((t) => (
                 <li key={t.name} className="flex gap-4 border-b py-4" style={{ borderColor: C.line }}>
                   <span
-                    className={`${serif.className} inline-flex h-11 w-11 shrink-0 items-center justify-center rounded-full border-2 text-[17px] font-bold`}
+                    className={`tracking-[-0.02em] inline-flex h-11 w-11 shrink-0 items-center justify-center rounded-full border-2 text-[17px] font-bold`}
                     style={{ borderColor: C.indigo, color: C.indigo }}
                     aria-hidden
                   >
@@ -1392,7 +1390,7 @@ function Location({ status }: { status: Status }) {
             <MiniMap />
           </div>
           <div>
-            <p className={`${serif.className} text-[22px] font-bold`}>{ADDRESS}</p>
+            <p className={`tracking-[-0.02em] text-[22px] font-bold`}>{ADDRESS}</p>
             <ul className="mt-5 space-y-4">
               {[
                 { icon: TrainFront, title: "지하철", body: "□□역 3번 출구에서 180m, 걸어서 3분" },
