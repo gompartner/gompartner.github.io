@@ -1,4 +1,4 @@
-// 홈페이지 제작 패키지. 크몽 서비스 가격과 같게 맞춘다.
+// 홈페이지 제작 패키지. 크몽 서비스(#796239)의 가격, 작업 기간과 같게 맞춘다.
 // 업무 프로그램(결과지, 관리자, 자동화, LMS 등)은 패키지 없이 별도 견적이다.
 
 export type PlanId = "basic" | "standard" | "premium";
@@ -25,7 +25,7 @@ export const plans: Plan[] = [
     id: "standard",
     name: "표준",
     price: 490_000,
-    days: 10,
+    days: 14,
     summary: "문의와 예약 신청을 받는 홈페이지",
     includes: ["10쪽 이내", "기본 패키지 전부", "문의·예약 신청 폼", "공지·사진 직접 올리기"],
   },
@@ -33,7 +33,7 @@ export const plans: Plan[] = [
     id: "premium",
     name: "고급",
     price: 990_000,
-    days: 14,
+    days: 30,
     summary: "업종에 맞춘 기능이 들어간 홈페이지",
     includes: ["10쪽 이내", "표준 패키지 전부", "자리 예약, 픽업 주문 같은 맞춤 기능 1개", "업종에 맞춘 첫 화면 디자인"],
   },
