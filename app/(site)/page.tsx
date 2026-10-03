@@ -5,10 +5,13 @@ import { Doodles } from "@/components/landing/Doodles";
 import { HistoryTimeline } from "@/components/landing/HistoryTimeline";
 import { careerYears, historyFields, historyTotal } from "@/lib/history";
 import { HeroSlider } from "@/components/landing/HeroSlider";
-import { WorksSearch } from "@/components/landing/WorksSearch";
 import { projects } from "@/data/projects";
 import { profile } from "@/data/profile";
-import { formatWon, planByProject, plans } from "@/data/pricing";
+import { PricingSection } from "@/components/landing/PricingSection";
+import { WorksGrid } from "@/components/landing/WorksGrid";
+import { industries } from "@/data/industries";
+import { fieldsById } from "@/data/workFilters";
+import Link from "next/link";
 
 // KRDS(범정부 디자인 시스템) 기준 원페이지 랜딩.
 // 서체 Pretendard, 굵기 400/700, 행간 1.5 이상, 본문 17px,
@@ -28,6 +31,10 @@ export const metadata: Metadata = {
 // 첫 화면 배너에 넘겨 보여 줄 대표 제작 사례
 const featuredIds = ["private-gym", "clinic-homepage", "district-portal"];
 const featured = featuredIds.map((id) => projects.find((p) => p.id === id)!);
+
+// 제작 사례 구간에 보여 줄 대표 6개. 업종이 겹치지 않게 고르고 전체는 /works에서 본다.
+const showcaseIds = ["dental-homepage", "pharmacy", "bakery-cafe", "flower-expo", "shop-admin", "lms"];
+const showcase = showcaseIds.map((id) => projects.find((p) => p.id === id)!);
 
 const promises = ["17년 경력 개발자 직접 작업", "채팅으로 바로 상담", "원본 소스 제공", "완료 후 1개월 무상 유지보수"];
 
@@ -80,60 +87,22 @@ export default function HomePage() {
           <p className={lead}>고객 정보 보호를 위해 기관명과 데이터는 가상으로 재구성했습니다.</p>
 
           <div className="mt-8">
-            <WorksSearch projects={projects} />
+            <WorksGrid projects={showcase} />
+          </div>
+          <div className="mt-8 flex flex-wrap items-center gap-3">
+            <Link href="/works" data-gtm-cta="works_all" className={primaryButton}>
+              제작 사례 전체 보기 ({projects.length}건)
+            </Link>
+            {industries.map((ind) => (
+              <Link key={ind.slug} href={`/works/${ind.slug}`} data-gtm-cta={`works_${ind.slug}`} className={secondaryButton}>
+                {ind.label} ({projects.filter((p) => (fieldsById[p.id] ?? []).includes(ind.field)).length})
+              </Link>
+            ))}
           </div>
         </div>
       </section>
 
-      <section id="pricing" aria-labelledby="pricing-title" className="relative isolate scroll-mt-16 overflow-hidden border-t border-border bg-surface">
-        <div className={`${container} py-16 md:py-24`}>
-          <h2 id="pricing-title" className={h2}>
-            홈페이지 제작 가격
-          </h2>
-          <p className={lead}>모든 패키지에 원본 소스와 완료 후 1개월 무상 유지보수가 들어갑니다. 업무 프로그램은 기능을 듣고 따로 견적을 드립니다.</p>
-
-          <ul className="mt-8 grid gap-4 md:grid-cols-3">
-            {plans.map((plan) => {
-              const examples = projects.filter((p) => planByProject[p.id] === plan.id);
-              return (
-                <li key={plan.id} className="flex flex-col rounded-[10px] border border-border bg-white p-6">
-                  <p className="text-[17px] font-bold">
-                    {plan.name} <span className="font-normal text-foreground-secondary">· {plan.days}일</span>
-                  </p>
-                  <p className="mt-1 text-[32px] font-bold leading-[1.3] tabular-nums">{formatWon(plan.price)}</p>
-                  <p className="mt-1 text-[17px] text-foreground-secondary">{plan.summary}</p>
-                  <ul className="mt-5 space-y-2 border-t border-border pt-5 text-[17px]">
-                    {plan.includes.map((item) => (
-                      <li key={item} className="flex gap-2">
-                        <Check size={20} strokeWidth={2.5} className="mt-[3px] shrink-0 text-accent" aria-hidden />
-                        {item}
-                      </li>
-                    ))}
-                  </ul>
-                  {examples.length > 0 && (
-                    <p className="mt-5 text-[15px] leading-[1.6] text-foreground-secondary">
-                      비슷한 데모:{" "}
-                      {examples.map((p, i) => (
-                        <span key={p.id}>
-                          {i > 0 && ", "}
-                          <a href={p.demoUrl} className="underline underline-offset-4 hover:text-accent">
-                            {p.title.replace(" 홈페이지", "")}
-                          </a>
-                        </span>
-                      ))}
-                    </p>
-                  )}
-                </li>
-              );
-            })}
-          </ul>
-          <div className="mt-8">
-            <ChannelTalkButton cta="pricing_chat" className={primaryButton}>
-              채팅으로 상담하기
-            </ChannelTalkButton>
-          </div>
-        </div>
-      </section>
+      <PricingSection />
 
       <section id="history" aria-labelledby="history-title" className="relative isolate scroll-mt-16 overflow-clip border-t border-border">
         <Doodles variant={2} />
