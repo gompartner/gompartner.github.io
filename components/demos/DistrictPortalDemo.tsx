@@ -41,7 +41,7 @@ const MENU: { title: string; items: string[] }[] = [
 ];
 
 const SLIDES = [
-  { tag: "행사", title: "곰선임천 가을 등불 축제", body: "10월 10일부터 19일까지 곰선임천 산책로 일대에서 열립니다.", date: "2026.10.10 ~ 10.19" },
+  { tag: "행사", title: "△△천 가을 등불 축제", body: "10월 10일부터 19일까지 △△천 산책로 일대에서 열립니다.", date: "2026.10.10 ~ 10.19" },
   { tag: "공모", title: "2027년 주민 참여 예산 제안 접수", body: "우리 동네에 필요한 사업을 구민이 직접 제안합니다.", date: "2026.09.21 ~ 10.31" },
   { tag: "안내", title: "추석 연휴 쓰레기 배출 일정", body: "연휴 기간 생활폐기물 수거 일정이 바뀝니다. 동별 일정을 확인하세요.", date: "2026.10.03 ~ 10.09" },
 ];
@@ -59,16 +59,16 @@ const FREQUENT = [
 
 const BOARD: Record<string, { title: string; date: string; dept: string }[]> = {
   새소식: [
-    { title: "곰선임구, 공공 와이파이 설치 구역 12곳 확대", date: "2026.09.26", dept: "정보통신과" },
+    { title: "○○구, 공공 와이파이 설치 구역 12곳 확대", date: "2026.09.26", dept: "정보통신과" },
     { title: "어르신 독감 예방접종 10월 13일부터 시작", date: "2026.09.24", dept: "보건소" },
-    { title: "곰선임천 산책로 야간 조명 교체 공사 안내", date: "2026.09.22", dept: "치수과" },
+    { title: "△△천 산책로 야간 조명 교체 공사 안내", date: "2026.09.22", dept: "치수과" },
     { title: "청년 월세 지원 2차 신청 접수", date: "2026.09.18", dept: "청년정책과" },
     { title: "구립 작은도서관 3곳 주말 운영 시간 연장", date: "2026.09.15", dept: "문화체육과" },
   ],
   고시공고: [
-    { title: "곰선임구 도시계획시설(도로) 결정 열람 공고", date: "2026.09.25", dept: "도시계획과" },
+    { title: "○○구 도시계획시설(도로) 결정 열람 공고", date: "2026.09.25", dept: "도시계획과" },
     { title: "2026년 하반기 공유재산 대부 입찰 공고", date: "2026.09.23", dept: "재산관리과" },
-    { title: "곰선임동 일대 지구단위계획 주민 의견 청취", date: "2026.09.19", dept: "도시계획과" },
+    { title: "○○동 일대 지구단위계획 주민 의견 청취", date: "2026.09.19", dept: "도시계획과" },
     { title: "옥외광고물 표시 제한 구역 지정 고시", date: "2026.09.12", dept: "건축과" },
   ],
   채용: [
@@ -77,7 +77,7 @@ const BOARD: Record<string, { title: string; date: string; dept: string }[]> = {
     { title: "방문 건강관리 간호사 채용", date: "2026.09.16", dept: "보건소" },
   ],
   행사: [
-    { title: "곰선임천 가을 등불 축제", date: "2026.10.10", dept: "문화체육과" },
+    { title: "△△천 가을 등불 축제", date: "2026.10.10", dept: "문화체육과" },
     { title: "구민 건강 걷기 대회", date: "2026.10.18", dept: "보건소" },
     { title: "작은 음악회: 구청 광장 저녁 공연", date: "2026.10.24", dept: "문화체육과" },
     { title: "청소년 진로 박람회", date: "2026.11.07", dept: "교육지원과" },
@@ -100,8 +100,8 @@ const DEPTS = [
 ];
 
 const CENTERS = [
-  { name: "곰선임1동 주민센터", address: "곰선임로 21", phone: "02-000-3101" },
-  { name: "곰선임2동 주민센터", address: "곰선임천로 8", phone: "02-000-3201" },
+  { name: "○○1동 주민센터", address: "○○로 21", phone: "02-000-3101" },
+  { name: "○○2동 주민센터", address: "△△천로 8", phone: "02-000-3201" },
   { name: "가람동 주민센터", address: "가람길 45", phone: "02-000-3301" },
   { name: "누리동 주민센터", address: "누리로 112", phone: "02-000-3401" },
   { name: "한울동 주민센터", address: "한울로 7", phone: "02-000-3501" },
@@ -221,7 +221,7 @@ export function DistrictPortalDemo() {
                 <path d="M3 17 Q8 13 12 17 T21 17" stroke="#fff" strokeWidth="2" fill="none" />
               </svg>
             </span>
-            <span className="text-[21px] font-bold tracking-[-0.02em]">곰선임구청</span>
+            <span className="text-[21px] font-bold tracking-[-0.02em]">○○구청</span>
           </a>
 
           <nav aria-label="주 메뉴" className="ml-6 hidden lg:block">
@@ -407,9 +407,9 @@ export function DistrictPortalDemo() {
             <h2 id="mayor-title" className="relative mt-2 text-[24px] font-bold leading-[1.4]">
               구민과 함께 만드는
               <br />
-              곰선임구
+              ○○구
             </h2>
-            <p className="relative mt-3 text-[16px] leading-[1.6] text-[#ffe9df]">곰선임구청장 홍선임입니다. 구정 운영 방향과 약속을 소개합니다.</p>
+            <p className="relative mt-3 text-[16px] leading-[1.6] text-[#ffe9df]">○○구청장 홍○○입니다. 구정 운영 방향과 약속을 소개합니다.</p>
             <a href="#top" className="relative mt-6 inline-flex h-11 items-center rounded-md bg-white px-5 text-[16px] font-bold" style={{ color: SUNSET_TEXT }}>
               인사말 보기
             </a>
@@ -474,7 +474,7 @@ export function DistrictPortalDemo() {
                   <MapPin size={18} aria-hidden className="shrink-0 text-[#5a6473]" />
                   <span className="flex-1">
                     <span className="block text-[16px] font-bold">{c.name}</span>
-                    <span className="block text-[14px] text-[#5a6473]">곰선임구 {c.address}</span>
+                    <span className="block text-[14px] text-[#5a6473]">○○구 {c.address}</span>
                   </span>
                   <a href={`tel:${c.phone}`} className="text-[15px] tabular-nums hover:underline">
                     {c.phone}
@@ -501,11 +501,11 @@ export function DistrictPortalDemo() {
           </ul>
           <div className="mt-6 flex flex-wrap items-end justify-between gap-6">
             <address className="text-[15px] not-italic leading-[1.7]">
-              (00000) 곰선임시 곰선임구 곰선임로 100 곰선임구청
+              (00000) □□시 ○○구 ○○로 100 ○○구청
               <br />
               대표전화 02-000-0000 (평일 09:00 ~ 18:00)
               <br />
-              곰선임구청 누리집의 모든 콘텐츠는 저작권법의 보호를 받습니다.
+              ○○구청 누리집의 모든 콘텐츠는 저작권법의 보호를 받습니다.
             </address>
             <div className="flex h-14 w-32 items-center justify-center rounded-md border border-[#3a4c6d] text-center text-[13px] leading-[1.3]">
               웹 접근성

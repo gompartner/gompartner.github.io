@@ -4,7 +4,7 @@ import { useMemo, useRef, useState } from "react";
 import { IBM_Plex_Sans_KR } from "next/font/google";
 import { CalendarClock, CheckCircle2, PiggyBank, Phone, ShieldCheck, TrendingUp, Wallet } from "lucide-react";
 
-/* 노후준비 계산기 데모: 가상의 보험사 곰선임생명.
+/* 노후준비 계산기 데모: 가상의 보험사 ○○생명.
    금액 단위는 모두 만 원. 적립 기간은 월 복리, 은퇴 후에는 연 2.5%로 운용하면서
    (희망 생활비 - 국민연금)을 매달 꺼내 쓴다고 계산한다. 물가상승률 반영 시 연 2%. */
 
@@ -191,7 +191,7 @@ export function RetirementDemo() {
             <span className="flex h-9 w-9 items-center justify-center rounded-full bg-white">
               <ShieldCheck size={20} color={NAVY} aria-hidden />
             </span>
-            <span className="text-[18px] font-bold">곰선임생명</span>
+            <span className="text-[18px] font-bold">○○생명</span>
           </div>
           <nav className="hidden gap-6 text-[15px] text-[#c9d6e6] sm:flex" aria-label="주요 메뉴">
             <span>보험상품</span>

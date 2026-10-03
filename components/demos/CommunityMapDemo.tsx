@@ -18,7 +18,7 @@ import {
 } from "lucide-react";
 import type { LucideIcon } from "lucide-react";
 
-/* 곰선임시 공유공간 지도 데모.
+/* ○○시 공유공간 지도 데모.
    외부 지도 없이 손그림 느낌의 일러스트 지도(SVG, 1000×750 좌표)에 핀을 올린다.
    동 이름표 위치는 핀 영역과 겹치지 않도록 좌표로 확인해 배치했다.
    분류 색은 dataviz 검증 스크립트 통과 순서(녹·자·황·청·적)이며,
@@ -80,26 +80,26 @@ const DONGS = [
 ];
 
 const PLACES: Place[] = [
-  { id: "p1", name: "해오름 마을회의실", dong: "해오름동", address: "곰선임시 해오름로 12", category: "meeting", hours: [9, 22], closedDay: "일요일", capacity: 20, fee: "무료", reserve: "온라인", phone: "000-100-0101", facilities: ["빔프로젝터", "화이트보드", "와이파이"], x: 260, y: 90 },
-  { id: "p2", name: "솔빛 청년공유실", dong: "솔빛동", address: "곰선임시 솔빛길 34", category: "meeting", hours: [10, 21], closedDay: "월요일", capacity: 12, fee: "무료", reserve: "온라인", phone: "000-100-0102", facilities: ["TV 화면", "와이파이", "음료 반입"], x: 420, y: 90 },
-  { id: "p3", name: "가람 주민회의실", dong: "가람동", address: "곰선임시 가람대로 101", category: "meeting", hours: [9, 18], closedDay: "주말", capacity: 30, fee: "유료", feeDetail: "시간당 1만 원", reserve: "전화", phone: "000-100-0103", facilities: ["빔프로젝터", "마이크", "주차"], x: 590, y: 360 },
-  { id: "p4", name: "미르 소모임실", dong: "미르동", address: "곰선임시 미르로 8", category: "meeting", hours: [9, 22], closedDay: "없음", capacity: 8, fee: "무료", reserve: "온라인", phone: "000-100-0104", facilities: ["화이트보드", "와이파이"], x: 500, y: 600 },
-  { id: "p5", name: "누리 목공방", dong: "누리동", address: "곰선임시 누리로 45", category: "workshop", hours: [10, 20], closedDay: "월요일", capacity: 10, fee: "유료", feeDetail: "재료비 별도", reserve: "전화", phone: "000-100-0201", facilities: ["공구 대여", "앞치마", "환기 시설"], x: 720, y: 100 },
-  { id: "p6", name: "새터 도자기 공방", dong: "새터동", address: "곰선임시 새터길 7", category: "workshop", hours: [11, 19], closedDay: "화요일", capacity: 8, fee: "유료", feeDetail: "1회 2만 원", reserve: "방문", phone: "000-100-0202", facilities: ["가마", "앞치마"], x: 80, y: 340 },
-  { id: "p7", name: "한울 메이커스페이스", dong: "한울동", address: "곰선임시 한울대로 220", category: "workshop", hours: [9, 21], closedDay: "일요일", capacity: 16, fee: "무료", reserve: "온라인", phone: "000-100-0203", facilities: ["3D 프린터", "레이저 커터", "교육 프로그램"], x: 750, y: 370 },
-  { id: "p8", name: "다솜 뜨개 사랑방", dong: "다솜동", address: "곰선임시 다솜로 19", category: "workshop", hours: [13, 18], closedDay: "주말", capacity: 12, fee: "무료", reserve: "방문", phone: "000-100-0204", facilities: ["재료 비치", "난방"], x: 120, y: 650 },
-  { id: "p9", name: "해오름 작은도서관", dong: "해오름동", address: "곰선임시 해오름로 58", category: "library", hours: [10, 19], closedDay: "월요일", capacity: 25, fee: "무료", reserve: "방문", phone: "000-100-0301", facilities: ["열람석", "어린이 책", "와이파이"], x: 90, y: 230 },
-  { id: "p10", name: "솔빛 책마루", dong: "솔빛동", address: "곰선임시 솔빛길 90", category: "library", hours: [9, 18], closedDay: "일요일", capacity: 18, fee: "무료", reserve: "방문", phone: "000-100-0302", facilities: ["열람석", "스터디룸"], x: 580, y: 200 },
-  { id: "p11", name: "가람 마을서재", dong: "가람동", address: "곰선임시 가람대로 15", category: "library", hours: [10, 20], closedDay: "화요일", capacity: 15, fee: "무료", reserve: "방문", phone: "000-100-0303", facilities: ["열람석", "노트북석"], x: 300, y: 380 },
-  { id: "p12", name: "미르 그림책방", dong: "미르동", address: "곰선임시 미르로 77", category: "library", hours: [10, 18], closedDay: "월요일", capacity: 14, fee: "무료", reserve: "방문", phone: "000-100-0304", facilities: ["어린이 책", "수유실"], x: 720, y: 700 },
-  { id: "p13", name: "누리 생활체육관", dong: "누리동", address: "곰선임시 누리로 150", category: "sports", hours: [6, 22], closedDay: "없음", capacity: 60, fee: "유료", feeDetail: "1회 3천 원", reserve: "온라인", phone: "000-100-0401", facilities: ["샤워실", "주차", "탈의실"], x: 690, y: 270 },
-  { id: "p14", name: "새터 탁구장", dong: "새터동", address: "곰선임시 새터길 42", category: "sports", hours: [9, 21], closedDay: "일요일", capacity: 16, fee: "무료", reserve: "방문", phone: "000-100-0402", facilities: ["탁구대 4대", "탈의실"], x: 210, y: 470 },
-  { id: "p15", name: "한울 풋살장", dong: "한울동", address: "곰선임시 한울대로 310", category: "sports", hours: [7, 22], closedDay: "없음", capacity: 20, fee: "유료", feeDetail: "2시간 4만 원", reserve: "온라인", phone: "000-100-0403", facilities: ["야간 조명", "주차"], x: 930, y: 480 },
-  { id: "p16", name: "가람 요가실", dong: "가람동", address: "곰선임시 가람대로 180", category: "sports", hours: [7, 21], closedDay: "주말", capacity: 15, fee: "무료", reserve: "온라인", phone: "000-100-0404", facilities: ["요가 매트", "탈의실"], x: 520, y: 470 },
-  { id: "p17", name: "해오름 다함께돌봄센터", dong: "해오름동", address: "곰선임시 해오름로 30", category: "care", hours: [8, 20], closedDay: "주말", capacity: 20, fee: "무료", reserve: "전화", phone: "000-100-0501", facilities: ["간식 제공", "학습 지도"], x: 300, y: 210 },
-  { id: "p18", name: "누리 공동육아방", dong: "누리동", address: "곰선임시 누리로 12", category: "care", hours: [10, 17], closedDay: "주말", capacity: 12, fee: "무료", reserve: "온라인", phone: "000-100-0502", facilities: ["수유실", "장난감 대여"], x: 920, y: 250 },
-  { id: "p19", name: "다솜 아이키움터", dong: "다솜동", address: "곰선임시 다솜로 60", category: "care", hours: [9, 19], closedDay: "일요일", capacity: 18, fee: "무료", reserve: "전화", phone: "000-100-0503", facilities: ["놀이 공간", "간식 제공"], x: 340, y: 560 },
-  { id: "p20", name: "미르 어르신 쉼터", dong: "미르동", address: "곰선임시 미르로 120", category: "care", hours: [9, 18], closedDay: "주말", capacity: 25, fee: "무료", reserve: "방문", phone: "000-100-0504", facilities: ["안마 의자", "건강 체조"], x: 930, y: 650 },
+  { id: "p1", name: "해오름 마을회의실", dong: "해오름동", address: "○○시 해오름로 12", category: "meeting", hours: [9, 22], closedDay: "일요일", capacity: 20, fee: "무료", reserve: "온라인", phone: "000-100-0101", facilities: ["빔프로젝터", "화이트보드", "와이파이"], x: 260, y: 90 },
+  { id: "p2", name: "솔빛 청년공유실", dong: "솔빛동", address: "○○시 솔빛길 34", category: "meeting", hours: [10, 21], closedDay: "월요일", capacity: 12, fee: "무료", reserve: "온라인", phone: "000-100-0102", facilities: ["TV 화면", "와이파이", "음료 반입"], x: 420, y: 90 },
+  { id: "p3", name: "가람 주민회의실", dong: "가람동", address: "○○시 가람대로 101", category: "meeting", hours: [9, 18], closedDay: "주말", capacity: 30, fee: "유료", feeDetail: "시간당 1만 원", reserve: "전화", phone: "000-100-0103", facilities: ["빔프로젝터", "마이크", "주차"], x: 590, y: 360 },
+  { id: "p4", name: "미르 소모임실", dong: "미르동", address: "○○시 미르로 8", category: "meeting", hours: [9, 22], closedDay: "없음", capacity: 8, fee: "무료", reserve: "온라인", phone: "000-100-0104", facilities: ["화이트보드", "와이파이"], x: 500, y: 600 },
+  { id: "p5", name: "누리 목공방", dong: "누리동", address: "○○시 누리로 45", category: "workshop", hours: [10, 20], closedDay: "월요일", capacity: 10, fee: "유료", feeDetail: "재료비 별도", reserve: "전화", phone: "000-100-0201", facilities: ["공구 대여", "앞치마", "환기 시설"], x: 720, y: 100 },
+  { id: "p6", name: "새터 도자기 공방", dong: "새터동", address: "○○시 새터길 7", category: "workshop", hours: [11, 19], closedDay: "화요일", capacity: 8, fee: "유료", feeDetail: "1회 2만 원", reserve: "방문", phone: "000-100-0202", facilities: ["가마", "앞치마"], x: 80, y: 340 },
+  { id: "p7", name: "한울 메이커스페이스", dong: "한울동", address: "○○시 한울대로 220", category: "workshop", hours: [9, 21], closedDay: "일요일", capacity: 16, fee: "무료", reserve: "온라인", phone: "000-100-0203", facilities: ["3D 프린터", "레이저 커터", "교육 프로그램"], x: 750, y: 370 },
+  { id: "p8", name: "다솜 뜨개 사랑방", dong: "다솜동", address: "○○시 다솜로 19", category: "workshop", hours: [13, 18], closedDay: "주말", capacity: 12, fee: "무료", reserve: "방문", phone: "000-100-0204", facilities: ["재료 비치", "난방"], x: 120, y: 650 },
+  { id: "p9", name: "해오름 작은도서관", dong: "해오름동", address: "○○시 해오름로 58", category: "library", hours: [10, 19], closedDay: "월요일", capacity: 25, fee: "무료", reserve: "방문", phone: "000-100-0301", facilities: ["열람석", "어린이 책", "와이파이"], x: 90, y: 230 },
+  { id: "p10", name: "솔빛 책마루", dong: "솔빛동", address: "○○시 솔빛길 90", category: "library", hours: [9, 18], closedDay: "일요일", capacity: 18, fee: "무료", reserve: "방문", phone: "000-100-0302", facilities: ["열람석", "스터디룸"], x: 580, y: 200 },
+  { id: "p11", name: "가람 마을서재", dong: "가람동", address: "○○시 가람대로 15", category: "library", hours: [10, 20], closedDay: "화요일", capacity: 15, fee: "무료", reserve: "방문", phone: "000-100-0303", facilities: ["열람석", "노트북석"], x: 300, y: 380 },
+  { id: "p12", name: "미르 그림책방", dong: "미르동", address: "○○시 미르로 77", category: "library", hours: [10, 18], closedDay: "월요일", capacity: 14, fee: "무료", reserve: "방문", phone: "000-100-0304", facilities: ["어린이 책", "수유실"], x: 720, y: 700 },
+  { id: "p13", name: "누리 생활체육관", dong: "누리동", address: "○○시 누리로 150", category: "sports", hours: [6, 22], closedDay: "없음", capacity: 60, fee: "유료", feeDetail: "1회 3천 원", reserve: "온라인", phone: "000-100-0401", facilities: ["샤워실", "주차", "탈의실"], x: 690, y: 270 },
+  { id: "p14", name: "새터 탁구장", dong: "새터동", address: "○○시 새터길 42", category: "sports", hours: [9, 21], closedDay: "일요일", capacity: 16, fee: "무료", reserve: "방문", phone: "000-100-0402", facilities: ["탁구대 4대", "탈의실"], x: 210, y: 470 },
+  { id: "p15", name: "한울 풋살장", dong: "한울동", address: "○○시 한울대로 310", category: "sports", hours: [7, 22], closedDay: "없음", capacity: 20, fee: "유료", feeDetail: "2시간 4만 원", reserve: "온라인", phone: "000-100-0403", facilities: ["야간 조명", "주차"], x: 930, y: 480 },
+  { id: "p16", name: "가람 요가실", dong: "가람동", address: "○○시 가람대로 180", category: "sports", hours: [7, 21], closedDay: "주말", capacity: 15, fee: "무료", reserve: "온라인", phone: "000-100-0404", facilities: ["요가 매트", "탈의실"], x: 520, y: 470 },
+  { id: "p17", name: "해오름 다함께돌봄센터", dong: "해오름동", address: "○○시 해오름로 30", category: "care", hours: [8, 20], closedDay: "주말", capacity: 20, fee: "무료", reserve: "전화", phone: "000-100-0501", facilities: ["간식 제공", "학습 지도"], x: 300, y: 210 },
+  { id: "p18", name: "누리 공동육아방", dong: "누리동", address: "○○시 누리로 12", category: "care", hours: [10, 17], closedDay: "주말", capacity: 12, fee: "무료", reserve: "온라인", phone: "000-100-0502", facilities: ["수유실", "장난감 대여"], x: 920, y: 250 },
+  { id: "p19", name: "다솜 아이키움터", dong: "다솜동", address: "○○시 다솜로 60", category: "care", hours: [9, 19], closedDay: "일요일", capacity: 18, fee: "무료", reserve: "전화", phone: "000-100-0503", facilities: ["놀이 공간", "간식 제공"], x: 340, y: 560 },
+  { id: "p20", name: "미르 어르신 쉼터", dong: "미르동", address: "○○시 미르로 120", category: "care", hours: [9, 18], closedDay: "주말", capacity: 25, fee: "무료", reserve: "방문", phone: "000-100-0504", facilities: ["안마 의자", "건강 체조"], x: 930, y: 650 },
 ];
 
 const fmtHours = ([s, e]: [number, number]) => `${String(s).padStart(2, "0")}:00~${String(e).padStart(2, "0")}:00`;
@@ -266,7 +266,7 @@ export function CommunityMapDemo() {
             <MapPin size={24} strokeWidth={2.4} aria-hidden />
           </span>
           <div>
-            <p className={`${jua.className} text-[26px] leading-[1.2]`}>곰선임시 공유공간 지도</p>
+            <p className={`${jua.className} text-[26px] leading-[1.2]`}>○○시 공유공간 지도</p>
             <p className="text-[15px] text-[#e2f3e8]">회의실, 공방, 작은도서관을 동네 지도에서 찾아보세요</p>
           </div>
           {openCount !== null && (
