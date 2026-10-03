@@ -33,7 +33,7 @@ export default async function IndustryWorksPage({ params }: Props) {
 
   return (
     <>
-      <div className="mx-auto w-full max-w-[1248px] px-4 py-10 md:px-6 md:py-14">
+      <div className="mx-auto w-full max-w-[1248px] px-4 pb-10 pt-14 md:px-6 md:py-14">
         <p className="text-[15px] font-bold text-accent">
           <Link href="/works" className="underline-offset-4 hover:underline">
             제작 사례

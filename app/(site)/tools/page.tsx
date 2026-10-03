@@ -10,7 +10,7 @@ export const metadata: Metadata = {
 
 export default function ToolsPage() {
   return (
-    <div className="mx-auto w-full max-w-[1248px] px-4 py-10 md:px-6 md:py-14">
+    <div className="mx-auto w-full max-w-[1248px] px-4 pb-10 pt-14 md:px-6 md:py-14">
       <h1 className="text-[28px] font-bold leading-[1.4] tracking-[-0.01em] md:text-[36px]">무료 도구</h1>
       <p className="mt-2 text-[17px] leading-[1.6] text-foreground-secondary">홈페이지를 운영하며 필요한 문서와 점검을 바로 할 수 있습니다.</p>
       <ul className="mt-8 grid gap-4 md:grid-cols-2">
