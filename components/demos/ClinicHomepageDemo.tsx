@@ -5,7 +5,7 @@ import Image from "next/image";
 import Link from "next/link";
 import { Bus, Car, ChevronRight, Menu, Phone, TrainFront, X } from "lucide-react";
 
-/* 병원 홈페이지 데모: 가상의 곰선임피부과의원.
+/* 병원 홈페이지 데모: 가상의 ○○피부과의원.
    /demo/clinic-report(원내 결과지 프로그램)와 같은 병원으로 설정했다.
    병원명, 의료진, 주소, 전화번호, 사업자 정보는 모두 가상이다.
 
@@ -21,7 +21,7 @@ import { Bus, Car, ChevronRight, Menu, Phone, TrainFront, X } from "lucide-react
 
 const IMG = "/images/demo-clinic-homepage";
 
-const CLINIC = "곰선임피부과의원";
+const CLINIC = "○○피부과의원";
 const TEL = "02-000-0000";
 
 const C = {
@@ -55,18 +55,18 @@ const TREATMENTS = [
 
 const DOCTORS = [
   {
-    name: "김선임",
+    name: "김○○",
     role: "대표원장",
     field: "여드름, 색소 질환",
-    career: ["피부과 전문의", "곰선임대학교병원 피부과 전공의 수료", "대한피부과학회 정회원"],
+    career: ["피부과 전문의", "△△대학교병원 피부과 전공의 수료", "대한피부과학회 정회원"],
     img: "doctor-1",
     pos: "100% 40%",
   },
   {
-    name: "이선임",
+    name: "이○○",
     role: "원장",
     field: "피부 탄력, 레이저 시술",
-    career: ["피부과 전문의", "곰선임의료원 피부과 임상강사", "대한피부레이저학회 정회원"],
+    career: ["피부과 전문의", "☆☆의료원 피부과 임상강사", "대한피부레이저학회 정회원"],
     img: "doctor-2",
     pos: "50% 60%",
   },
@@ -227,7 +227,7 @@ export function ClinicHomepageDemo() {
                 피부과 전문의 진료
               </p>
               <h1 className="mt-3 text-[56px] font-extralight leading-[1.05] tracking-[-0.06em] sm:text-[80px] md:text-[112px]">
-                곰선임
+                ○○
                 <br />
                 <span className="font-semibold">피부과의원</span>
               </h1>
@@ -483,14 +483,14 @@ export function ClinicHomepageDemo() {
               </div>
             </div>
             <div className="lg:col-span-5 lg:pt-[76px]">
-              <p className="text-[24px] font-semibold tracking-[-0.03em]">곰선임시 곰선임로 123 곰선임빌딩 4층</p>
+              <p className="text-[24px] font-semibold tracking-[-0.03em]">□□시 □□로 123 □□빌딩 4층</p>
               <p className="mt-1" style={{ color: C.muted }}>
                 대표전화 {TEL}
               </p>
               <ul className="mt-6 border-t" style={{ borderColor: C.line }}>
                 {[
-                  { icon: TrainFront, title: "지하철", body: "곰선임역 2번 출구에서 150m, 도보 2분" },
-                  { icon: Bus, title: "버스", body: "곰선임역 정류장 하차 (간선 100, 지선 1234)" },
+                  { icon: TrainFront, title: "지하철", body: "□□역 2번 출구에서 150m, 도보 2분" },
+                  { icon: Bus, title: "버스", body: "□□역 정류장 하차 (간선 100, 지선 1234)" },
                   { icon: Car, title: "주차", body: "건물 지하 주차장 이용, 진료 시 1시간 무료" },
                 ].map(({ icon: Icon, title, body }) => (
                   <li key={title} className="flex gap-3 border-b py-4" style={{ borderColor: C.line }}>
@@ -504,7 +504,7 @@ export function ClinicHomepageDemo() {
               </ul>
               <Image
                 src={`${IMG}/lobby.jpg`}
-                alt="곰선임피부과의원 대기실"
+                alt="○○피부과의원 대기실"
                 width={800}
                 height={1198}
                 sizes="(min-width:1024px) 480px, 100vw"
@@ -523,8 +523,8 @@ export function ClinicHomepageDemo() {
           <dl className="mt-4 flex flex-wrap gap-x-6 gap-y-1 text-[15px]">
             {[
               ["상호", CLINIC],
-              ["대표자", "김선임"],
-              ["주소", "곰선임시 곰선임로 123 곰선임빌딩 4층"],
+              ["대표자", "김○○"],
+              ["주소", "□□시 □□로 123 □□빌딩 4층"],
               ["전화", TEL],
               ["사업자등록번호", "000-00-00000"],
             ].map(([k, v]) => (
@@ -552,7 +552,7 @@ function Portrait({ src, pos }: { src: string; pos: string }) {
 
 function MapIllustration() {
   return (
-    <svg viewBox="0 0 640 380" className="h-auto w-full" role="img" aria-label="곰선임역 2번 출구와 병원 위치 약도">
+    <svg viewBox="0 0 640 380" className="h-auto w-full" role="img" aria-label="□□역 2번 출구와 병원 위치 약도">
       <rect width="640" height="380" fill="#f6f0ee" />
       {[
         [30, 30, 180, 120],
@@ -568,21 +568,21 @@ function MapIllustration() {
       <rect x="215" y="0" width="30" height="380" fill="#fbf9f8" />
       <rect x="405" y="0" width="30" height="380" fill="#fbf9f8" />
       <line x1="0" y1="180" x2="640" y2="180" stroke="#d9c8c3" strokeWidth="2" strokeDasharray="12 10" />
-      <text x="20" y="152" fontSize="15" fill="#5b5357">곰선임로</text>
+      <text x="20" y="152" fontSize="15" fill="#5b5357">□□로</text>
       <g transform="translate(150 186)">
         <rect x="-44" y="18" width="88" height="30" rx="15" fill="#2a2326" />
         <text x="0" y="39" fontSize="15" fontWeight="700" fill="#f3ecea" textAnchor="middle">
           2번 출구
         </text>
       </g>
-      <text x="36" y="250" fontSize="15" fill="#5b5357">곰선임역</text>
+      <text x="36" y="250" fontSize="15" fill="#5b5357">□□역</text>
       <path d="M194 204 L300 204 L318 226" fill="none" stroke="#7a4b56" strokeWidth="3" strokeDasharray="6 6" />
       <g transform="translate(325 268)">
         <path d="M0 -44 C-22 -44 -30 -26 -30 -16 C-30 6 0 30 0 30 C0 30 30 6 30 -16 C30 -26 22 -44 0 -44 Z" fill="#7a4b56" />
         <circle cx="0" cy="-16" r="11" fill="#fbf9f8" />
       </g>
       <text x="325" y="326" fontSize="15" fontWeight="700" fill="#2a2326" textAnchor="middle">
-        곰선임빌딩 4층
+        □□빌딩 4층
       </text>
     </svg>
   );

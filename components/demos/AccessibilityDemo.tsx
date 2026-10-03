@@ -51,13 +51,13 @@ const ISSUES: Issue[] = [
 ];
 
 const BANNERS = [
-  { src: "/images/demo-a11y/banner-1.svg", alt: "가을 시민 음악회, 10월 18일 토요일 오후 6시, 곰선임시민회관 대공연장" },
+  { src: "/images/demo-a11y/banner-1.svg", alt: "가을 시민 음악회, 10월 18일 토요일 오후 6시, ○○시민회관 대공연장" },
   { src: "/images/demo-a11y/banner-2.svg", alt: "생활문화 동아리 모집, 9월 1일부터 10월 31일까지, 선정 동아리에 연습 공간 지원" },
   { src: "/images/demo-a11y/banner-3.svg", alt: "시민 사진 공모전, 주제는 우리 동네의 계절, 11월 15일까지 접수" },
 ];
 
 const NOTICES = [
-  { date: "2026.09.26", title: "곰선임시민회관 대공연장 좌석 교체 공사 안내" },
+  { date: "2026.09.26", title: "○○시민회관 대공연장 좌석 교체 공사 안내" },
   { date: "2026.09.22", title: "2026 하반기 문화예술교육 강사 모집 결과" },
   { date: "2026.09.18", title: "추석 연휴 문화시설 운영 시간 변경" },
   { date: "2026.09.10", title: "생활문화 동아리 지원사업 설명회 개최" },
@@ -65,10 +65,10 @@ const NOTICES = [
 
 type Status = "open" | "closed" | "soon";
 const SCHEDULE: { name: string; date: string; place: string; status: Status }[] = [
-  { name: "가을 시민 음악회", date: "10.18(토)", place: "곰선임시민회관 대공연장", status: "open" },
-  { name: "어린이 인형극 한마당", date: "10.25(토)", place: "곰선임아트홀", status: "open" },
+  { name: "가을 시민 음악회", date: "10.18(토)", place: "○○시민회관 대공연장", status: "open" },
+  { name: "어린이 인형극 한마당", date: "10.25(토)", place: "○○아트홀", status: "open" },
   { name: "전통 공예 체험 교실", date: "10.04(토)", place: "문화재단 교육실", status: "closed" },
-  { name: "시민 사진 공모전 전시", date: "11.22(토)", place: "곰선임시립미술관", status: "soon" },
+  { name: "시민 사진 공모전 전시", date: "11.22(토)", place: "○○시립미술관", status: "soon" },
 ];
 
 const STATUS_TEXT: Record<Status, string> = { open: "접수 중", closed: "마감", soon: "접수 예정" };
@@ -111,7 +111,7 @@ export function AccessibilityDemo() {
             </span>
             <div>
               <p className="text-[17px] font-bold leading-tight">웹접근성 점검</p>
-              <p className="text-[15px] leading-tight text-[#474c68]">곰선임시 문화재단 메인 페이지</p>
+              <p className="text-[15px] leading-tight text-[#474c68]">○○시 문화재단 메인 페이지</p>
             </div>
           </div>
 
@@ -315,7 +315,7 @@ function SamplePage({
         )}
         <div className="flex flex-wrap items-center gap-x-6 gap-y-2 border-b border-[#e3dfe6] px-4 py-3 md:px-6">
           {/* eslint-disable-next-line @next/next/no-img-element */}
-          <img src="/images/demo-a11y/logo.svg" alt={good ? "곰선임시 문화재단" : undefined} width={200} height={44} className="h-9 w-auto" />
+          <img src="/images/demo-a11y/logo.svg" alt={good ? "○○시 문화재단" : undefined} width={200} height={44} className="h-9 w-auto" />
           <nav aria-label={good ? "주 메뉴" : undefined} className="flex flex-wrap gap-x-4 gap-y-1 text-[15px] font-bold text-[#2b1a33]">
             {["재단 소개", "공연·전시", "교육", "지원사업", "알림 마당"].map((m) => (
               <a key={m} href="#sample-main" onClick={(e) => e.preventDefault()} className="rounded px-1 py-0.5 hover:text-[#6b2d8c]">
@@ -327,7 +327,7 @@ function SamplePage({
       </Region>
 
       <main id="sample-main" tabIndex={-1} className="focus:outline-none">
-        <h1 className="sr-only">곰선임시 문화재단 메인</h1>
+        <h1 className="sr-only">○○시 문화재단 메인</h1>
         <Region {...region("banner")}>
           <Banner good={good} reduced={reduced} />
         </Region>
@@ -420,9 +420,9 @@ function SamplePage({
       </main>
 
       <footer className="border-t border-[#e3dfe6] bg-[#2b1a33] px-4 py-5 text-[15px] text-[#e7dcec] md:px-6">
-        <p className="font-bold text-white">곰선임시 문화재단</p>
-        <p className="mt-1">곰선임시 곰선임로 45, 문화재단 빌딩 3층 | 대표전화 000-000-0000</p>
-        <p className="mt-1">© 곰선임시 문화재단</p>
+        <p className="font-bold text-white">○○시 문화재단</p>
+        <p className="mt-1">○○시 ○○로 45, 문화재단 빌딩 3층 | 대표전화 000-000-0000</p>
+        <p className="mt-1">© ○○시 문화재단</p>
       </footer>
     </div>
   );

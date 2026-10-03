@@ -208,7 +208,7 @@ export function ShopAdminDemo() {
       style={{ background: C.bg, color: C.text, ["--panel" as string]: C.panel }}
     >
       <aside className="fixed inset-y-0 left-0 hidden w-56 flex-col border-r px-4 py-5 lg:flex" style={{ background: C.text, borderColor: C.rule }}>
-          <p className="px-2 text-[15px] font-bold text-white">곰선임 리빙</p>
+          <p className="px-2 text-[15px] font-bold text-white">○○ 리빙</p>
           <p className="px-2 text-[13px]" style={{ color: "#9ca3af" }}>판매자 관리자</p>
           <nav aria-label="관리 메뉴" className="mt-8 grid gap-1">
             {[
@@ -232,7 +232,7 @@ export function ShopAdminDemo() {
         <div className="mx-auto flex max-w-[1200px] items-center justify-between gap-4 px-4 py-4 md:px-6">
           <div>
             <p className="text-[13px] font-bold lg:hidden" style={{ color: C.action }}>
-              곰선임 리빙 관리자
+              ○○ 리빙 관리자
             </p>
             <h1 className="text-[20px] font-bold leading-tight md:text-[24px]">{tab === "options" ? "상품 옵션" : "주문 관리"}</h1>
           </div>

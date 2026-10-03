@@ -143,7 +143,7 @@ export function LmsDemo() {
       <header className="border-b bg-white" style={{ borderColor: C.line }}>
         <div className="mx-auto flex max-w-[1200px] flex-wrap items-center gap-3 px-4 py-3 md:px-6">
           <p className="mr-auto text-[18px] font-bold" style={{ color: C.brand }}>
-            곰선임 아카데미
+            ○○ 아카데미
           </p>
           <div role="tablist" aria-label="화면 선택" className="relative flex rounded-full p-1" style={{ background: C.bg }}>
             {(
@@ -561,7 +561,7 @@ function Learner({
               <p className="mt-8 text-[16px] leading-[1.8]">위 사람은 본 기관에서 실시한 온라인 과정을 성실히 이수하였기에 이 증서를 드립니다.</p>
               <p className="mt-8 text-[16px]">2026년 10월 1일</p>
               <div className="relative mx-auto mt-4 w-fit">
-                <p className="text-[20px] font-bold">곰선임 아카데미 원장</p>
+                <p className="text-[20px] font-bold">○○ 아카데미 원장</p>
                 <motion.span
                   aria-hidden
                   className="absolute -top-3 -right-14 grid size-14 place-items-center rounded-full border-[3px] text-[13px] font-bold"

@@ -5,7 +5,7 @@ import Image from "next/image";
 import { AnimatePresence, motion, useReducedMotion } from "framer-motion";
 import { Bus, Car, ChevronRight, Menu, Moon, Phone, TrainFront, X } from "lucide-react";
 
-/* 치과 홈페이지 데모: 가상의 곰선임치과의원.
+/* 치과 홈페이지 데모: 가상의 ○○치과의원.
    병원명, 의료진, 주소, 전화번호, 사업자 정보, 진료비는 모두 가상이다.
 
    디자인: 흰 바탕에 짙은 청록 잉크(#10302f)와 청록 강조색(#0b6664), 옅은 민트(#e3f1ef).
@@ -21,9 +21,9 @@ import { Bus, Car, ChevronRight, Menu, Moon, Phone, TrainFront, X } from "lucide
    caries Katarzyna Zygnerska(rubu_NvklJE), scaling Quilia(y8fWicGsv4g), ct Quang Tri NGUYEN(VckdJzo7ig0) */
 
 const IMG = "/images/demo-dental";
-const CLINIC = "곰선임치과의원";
+const CLINIC = "○○치과의원";
 const TEL = "02-000-0000";
-const ADDRESS = "곰선임시 곰선임로 45 곰선임타워 3층";
+const ADDRESS = "□□시 □□로 45 □□타워 3층";
 
 const C = {
   paper: "#ffffff",
@@ -275,18 +275,18 @@ const TREATMENTS: { id: TreatmentId; img: string; title: string; body: string; p
 
 const DOCTORS = [
   {
-    name: "김선임",
+    name: "김○○",
     role: "대표원장",
     field: "임플란트, 보철, 신경치료",
-    career: ["통합치의학과 전문의", "곰선임대학교 치과대학 졸업", "대한구강악안면임플란트학회 정회원"],
+    career: ["통합치의학과 전문의", "△△대학교 치과대학 졸업", "대한구강악안면임플란트학회 정회원"],
     img: "doctor2",
     pos: "50% 25%",
   },
   {
-    name: "이선임",
+    name: "이○○",
     role: "원장",
     field: "치아 교정",
-    career: ["치과교정과 전문의", "곰선임대학교치과병원 교정과 수련", "대한치과교정학회 인정의"],
+    career: ["치과교정과 전문의", "△△대학교치과병원 교정과 수련", "대한치과교정학회 인정의"],
     img: "doctor1",
     pos: "50% 20%",
   },
@@ -623,8 +623,8 @@ export function DentalHomepageDemo() {
               </p>
               <ul className="mt-6 border-t" style={{ borderColor: C.line }}>
                 {[
-                  { icon: TrainFront, title: "지하철", body: "곰선임역 4번 출구에서 200m, 도보 3분" },
-                  { icon: Bus, title: "버스", body: "곰선임타워 정류장 하차 (간선 200, 지선 4567)" },
+                  { icon: TrainFront, title: "지하철", body: "□□역 4번 출구에서 200m, 도보 3분" },
+                  { icon: Bus, title: "버스", body: "□□타워 정류장 하차 (간선 200, 지선 4567)" },
                   { icon: Car, title: "주차", body: "건물 지하 2~4층, 진료 시 2시간 무료" },
                 ].map(({ icon: Icon, title, body }) => (
                   <li key={title} className="flex gap-3 border-b py-4" style={{ borderColor: C.line }}>
@@ -638,7 +638,7 @@ export function DentalHomepageDemo() {
               </ul>
               <Image
                 src={`${IMG}/lobby.jpg`}
-                alt="곰선임치과의원 대기실"
+                alt="○○치과의원 대기실"
                 width={1400}
                 height={910}
                 sizes="(min-width:1024px) 480px, 100vw"
@@ -657,7 +657,7 @@ export function DentalHomepageDemo() {
           <dl className="mt-4 flex flex-wrap gap-x-6 gap-y-1 text-[15px]">
             {[
               ["상호", CLINIC],
-              ["대표자", "김선임"],
+              ["대표자", "김○○"],
               ["주소", ADDRESS],
               ["전화", TEL],
               ["사업자등록번호", "000-00-00000"],
@@ -698,7 +698,7 @@ function Hero({ now, status }: { now: Date | null; status: ReturnType<typeof ope
             통합치의학과, 치과교정과 전문의 진료
           </p>
           <h1 className="mt-3 text-[48px] font-bold leading-[1.1] tracking-[-0.055em] sm:text-[60px] lg:text-[72px]">
-            곰선임
+            ○○
             <br />
             <span className="relative inline-block">
               치과의원
@@ -1369,7 +1369,7 @@ function ToothMark() {
 
 function MapIllustration() {
   return (
-    <svg viewBox="0 0 640 380" className="h-auto w-full" role="img" aria-label="곰선임역 4번 출구와 병원 위치 약도">
+    <svg viewBox="0 0 640 380" className="h-auto w-full" role="img" aria-label="□□역 4번 출구와 병원 위치 약도">
       <rect width="640" height="380" fill="#f3f8f7" />
       {[
         [30, 30, 180, 120],
@@ -1385,21 +1385,21 @@ function MapIllustration() {
       <rect x="215" y="0" width="30" height="380" fill="#ffffff" />
       <rect x="405" y="0" width="30" height="380" fill="#ffffff" />
       <line x1="0" y1="180" x2="640" y2="180" stroke="#c9d9d7" strokeWidth="2" strokeDasharray="12 10" />
-      <text x="20" y="152" fontSize="15" fill="#4f6261">곰선임로</text>
+      <text x="20" y="152" fontSize="15" fill="#4f6261">□□로</text>
       <g transform="translate(320 186)">
         <rect x="-44" y="18" width="88" height="30" rx="6" fill="#10302f" />
         <text x="0" y="39" fontSize="15" fontWeight="700" fill="#eef6f5" textAnchor="middle">
           4번 출구
         </text>
       </g>
-      <text x="262" y="300" fontSize="15" fill="#4f6261">곰선임역</text>
+      <text x="262" y="300" fontSize="15" fill="#4f6261">□□역</text>
       <path d="M364 204 L420 204 L470 226" fill="none" stroke="#0b6664" strokeWidth="3" strokeDasharray="6 6" />
       <g transform="translate(525 268)">
         <path d="M0 -44 C-22 -44 -30 -26 -30 -16 C-30 6 0 30 0 30 C0 30 30 6 30 -16 C30 -26 22 -44 0 -44 Z" fill="#0b6664" />
         <circle cx="0" cy="-16" r="11" fill="#ffffff" />
       </g>
       <text x="525" y="326" fontSize="15" fontWeight="700" fill="#10302f" textAnchor="middle">
-        곰선임타워 3층
+        □□타워 3층
       </text>
     </svg>
   );

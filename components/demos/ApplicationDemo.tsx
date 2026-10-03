@@ -21,7 +21,7 @@ const plex = IBM_Plex_Sans_KR({ preload: false, weight: ["400", "700"], subsets:
 
 const STORAGE_KEY = "gs-demo:application:v1";
 
-/* 지원사업 신청·심사 시스템 데모 (가상 기관 곰선임진흥원).
+/* 지원사업 신청·심사 시스템 데모 (가상 기관 ○○진흥원).
    신청자는 모집 공고에서 사업을 골라 3단계 신청서를 제출하고,
    관리자는 신청 목록을 검색·심사하고 통계와 엑셀 파일을 받는다.
 
@@ -138,7 +138,7 @@ const SEED_NAMES = [
   "김하늘", "이서연", "박지훈", "최민지", "정우진", "강수아", "조현우", "윤지아", "장도현", "임하은",
   "한예린", "오승민", "서지유", "신동현", "권나윤", "황민재", "안소희", "송재원", "전유나", "홍석진",
 ];
-const SEED_ORGS = ["개인", "주식회사 곰선임랩", "곰선임디자인", "개인", "곰선임소프트", "개인", "곰선임바이오", "곰선임에너지"];
+const SEED_ORGS = ["개인", "주식회사 △△랩", "□□디자인", "개인", "☆☆소프트", "개인", "◇◇바이오", "△△에너지"];
 const SEED_STATUS: Status[] = ["접수", "서류 검토", "선정", "탈락", "서류 검토", "접수", "선정", "서류 검토", "접수", "탈락"];
 
 function buildSeed(): Application[] {
@@ -228,7 +228,7 @@ export function ApplicationDemo() {
           <div className="flex items-center gap-2.5">
             <Emblem inverse={admin} />
             <div className="leading-[1.3]">
-              <p className="text-[19px] font-bold tracking-[-0.02em]">곰선임진흥원</p>
+              <p className="text-[19px] font-bold tracking-[-0.02em]">○○진흥원</p>
               <p className={`text-[15px] ${admin ? "text-[#c4cfca]" : "text-[#5b6862]"}`}>
                 {admin ? "지원사업 심사 관리" : "지원사업 통합 신청"}
               </p>
@@ -283,7 +283,7 @@ export function ApplicationDemo() {
   );
 }
 
-/** 곰선임진흥원 상징: 초록 원 안의 새싹 모양 */
+/** ○○진흥원 상징: 초록 원 안의 새싹 모양 */
 function Emblem({ inverse }: { inverse: boolean }) {
   return (
     <svg width="36" height="36" viewBox="0 0 36 36" aria-hidden>
