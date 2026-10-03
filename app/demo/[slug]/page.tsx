@@ -3,6 +3,8 @@ import type { ComponentType } from "react";
 import { notFound } from "next/navigation";
 import { projects } from "@/data/projects";
 import { AccessibilityDemo } from "@/components/demos/AccessibilityDemo";
+import { BakeryCafeDemo } from "@/components/demos/BakeryCafeDemo";
+import { PharmacyDemo } from "@/components/demos/PharmacyDemo";
 import { ApplicationDemo } from "@/components/demos/ApplicationDemo";
 import { ClinicHomepageDemo } from "@/components/demos/ClinicHomepageDemo";
 import { DentalHomepageDemo } from "@/components/demos/DentalHomepageDemo";
@@ -31,6 +33,8 @@ const demoComponents: Record<string, ComponentType> = {
   "hanok-cafe": HanokCafeDemo,
   "pilates-studio": PilatesStudioDemo,
   "flower-expo": FlowerExpoDemo,
+  "bakery-cafe": BakeryCafeDemo,
+  pharmacy: PharmacyDemo,
   "community-map": CommunityMapDemo,
   "program-application": ApplicationDemo,
   "maintenance-dashboard": MaintenanceDemo,
