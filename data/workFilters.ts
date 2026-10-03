@@ -13,6 +13,7 @@ export const fieldsById: Record<string, Field[]> = {
   "online-store": ["가게·매장", "기업"],
   pension: ["가게·매장"],
   company: ["기업"],
+  "cert-lab": ["기업"],
   "law-firm": ["전문직·부동산"],
   "tax-office": ["전문직·부동산", "금융"],
   "real-estate": ["전문직·부동산"],

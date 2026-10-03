@@ -6,6 +6,7 @@ import { AccessibilityDemo } from "@/components/demos/AccessibilityDemo";
 import { OnlineStoreDemo } from "@/components/demos/OnlineStoreDemo";
 import { PensionDemo } from "@/components/demos/PensionDemo";
 import { CompanyDemo } from "@/components/demos/CompanyDemo";
+import { CertLabDemo } from "@/components/demos/CertLabDemo";
 import { LawFirmDemo } from "@/components/demos/LawFirmDemo";
 import { TaxOfficeDemo } from "@/components/demos/TaxOfficeDemo";
 import { RealEstateDemo } from "@/components/demos/RealEstateDemo";
@@ -44,6 +45,7 @@ const demoComponents: Record<string, ComponentType> = {
   "online-store": OnlineStoreDemo,
   pension: PensionDemo,
   company: CompanyDemo,
+  "cert-lab": CertLabDemo,
   "law-firm": LawFirmDemo,
   "tax-office": TaxOfficeDemo,
   "real-estate": RealEstateDemo,
