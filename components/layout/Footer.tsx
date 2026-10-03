@@ -9,7 +9,7 @@ export function Footer() {
     <footer className="border-t border-border">
       <div className="mx-auto flex w-full max-w-[1248px] flex-col gap-2 px-4 py-8 text-[15px] leading-[1.5] text-foreground-tertiary md:flex-row md:items-center md:justify-between md:px-6">
         <p>
-          © {currentYear} {profile.name} · {profile.title}
+          © {currentYear} {profile.name}
         </p>
         <div className="flex flex-wrap items-center gap-x-5 gap-y-1">
         {tools.map((t) => (
