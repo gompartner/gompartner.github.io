@@ -1,11 +1,18 @@
 import Link from "next/link";
 import { ArrowLeft } from "lucide-react";
+import { PlanBar } from "@/components/demos/PlanBar";
+import { projects } from "@/data/projects";
 
-export default function DemoLayout({
+export default async function DemoLayout({
   children,
+  params,
 }: Readonly<{
   children: React.ReactNode;
+  params: Promise<{ slug: string }>;
 }>) {
+  const { slug } = await params;
+  const project = projects.find((p) => p.demoUrl === `/demo/${slug}`);
+
   return (
     <>
       {children}
@@ -16,6 +23,7 @@ export default function DemoLayout({
         <ArrowLeft size={15} aria-hidden />
         다른 데모 보기
       </Link>
+      {project && <PlanBar projectId={project.id} />}
     </>
   );
 }

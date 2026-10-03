@@ -14,6 +14,7 @@ import { useReducedMotionSafe } from "@/hooks/useReducedMotionSafe";
 // 메뉴는 첫 화면의 섹션과 무료 도구 페이지로 이동한다
 const navItems = [
   { href: "/#works", label: "제작 사례" },
+  { href: "/#pricing", label: "가격" },
   { href: "/#history", label: "작업 이력" },
   { href: "/tools", label: "무료 도구" },
 ];
