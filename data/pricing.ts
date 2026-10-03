@@ -53,6 +53,7 @@ export const planByProject: Record<string, PlanId> = {
   "private-gym": "standard",
   pension: "premium",
   company: "premium",
+  "cert-lab": "premium",
   "law-firm": "premium",
   "tax-office": "premium",
   "real-estate": "premium",

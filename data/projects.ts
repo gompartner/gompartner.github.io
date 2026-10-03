@@ -91,6 +91,17 @@ export const projects: Project[] = [
     demoUrl: "/demo/company",
   },
   {
+    id: "cert-lab",
+    kind: "신규 제작",
+    category: "기업 홈페이지",
+    title: "시험인증기관 홈페이지 리뉴얼",
+    description: "제품 조건을 고르면 필요한 KC·해외 인증과 예상 기간을 보여 주고, 접수번호로 시험 진행 단계와 전자파 측정 결과를 확인할 수 있는 시험인증기관 홈페이지입니다.",
+    features: ["인증 찾기", "시험 진행 조회", "해외인증 지도", "견적 문의", "모바일 대응"],
+    imageUrl: "/images/demos/cert-lab.jpg",
+    imageAlt: "시험인증기관 홈페이지 첫 화면",
+    demoUrl: "/demo/cert-lab",
+  },
+  {
     id: "law-firm",
     kind: "신규 제작",
     category: "전문직 홈페이지",
