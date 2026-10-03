@@ -1,11 +1,12 @@
 "use client";
 
 import { useEffect, useLayoutEffect, useRef, useState } from "react";
-import { AnimatePresence, motion, useReducedMotion } from "framer-motion";
+import { AnimatePresence, motion } from "framer-motion";
 import { Check, ChevronDown, ListFilter, RotateCcw, Search } from "lucide-react";
 import type { Project } from "@/lib/types";
 import { capabilities, fields, fieldsById, type Capability, type Field } from "@/data/workFilters";
 import { WorksGrid } from "./WorksGrid";
+import { useReducedMotionSafe } from "@/hooks/useReducedMotionSafe";
 
 const EASE_OUT = [0.23, 1, 0.32, 1] as const;
 
@@ -173,7 +174,7 @@ const swap = {
 
 // 조건을 지우는 아이콘. 누르면 거꾸로 돌면서 사라진다.
 function ResetButton({ show, onClick }: { show: boolean; onClick: () => void }) {
-  const reduce = useReducedMotion();
+  const reduce = useReducedMotionSafe();
   return (
     <AnimatePresence initial={false}>
       {show && (
@@ -215,7 +216,7 @@ function WordPicker<T extends string>({
   onOpenChange: (open: boolean) => void;
   onChange: (value: T | null) => void;
 }) {
-  const reduce = useReducedMotion();
+  const reduce = useReducedMotionSafe();
   const wrapRef = useRef<HTMLSpanElement>(null);
   const triggerRef = useRef<HTMLButtonElement>(null);
   const listRef = useRef<HTMLDivElement>(null);
@@ -331,7 +332,7 @@ function WordPicker<T extends string>({
 // 글자가 바뀌면 이전 글자는 위로 빠지고 새 글자가 아래에서 올라온다(dir이 -1이면 반대).
 // 폭은 새 글자 길이에 맞춰 늘거나 줄어든다.
 function RollingText({ text, dir = 1 }: { text: string; dir?: number }) {
-  const reduce = useReducedMotion();
+  const reduce = useReducedMotionSafe();
   const sizerRef = useRef<HTMLSpanElement>(null);
   const [width, setWidth] = useState<number | null>(null);
 

@@ -1,10 +1,11 @@
 "use client";
 
-import { AnimatePresence, motion, useReducedMotion } from "framer-motion";
+import { AnimatePresence, motion } from "framer-motion";
 import { Printer, RotateCcw } from "lucide-react";
 import { ChannelTalkButton } from "@/components/layout/ChannelTalk";
 import { useLocalStorage } from "@/hooks/useLocalStorage";
 import { kwcag } from "@/data/kwcag";
+import { useReducedMotionSafe } from "@/hooks/useReducedMotionSafe";
 
 /* 웹접근성 자가 점검표 (KWCAG 2.2, 33개 항목).
    항목마다 예·아니오·해당 없음을 고르면 원칙별 준수율과 고칠 항목을 보여 주고, 결과를 인쇄할 수 있다.
@@ -23,7 +24,7 @@ const ANSWERS: [Answer, string][] = [
 const allItems = kwcag.flatMap((p) => p.items);
 
 export function AccessibilityChecker() {
-  const reduce = !!useReducedMotion();
+  const reduce = useReducedMotionSafe();
   const [answers, setAnswers] = useLocalStorage<Record<string, Answer>>(STORAGE_KEY, {});
   const set = (no: string, a: Answer) => setAnswers((s) => ({ ...s, [no]: a }));
 

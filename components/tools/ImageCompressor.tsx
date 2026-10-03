@@ -1,9 +1,10 @@
 "use client";
 
 import { useEffect, useRef, useState } from "react";
-import { AnimatePresence, motion, useReducedMotion } from "framer-motion";
+import { AnimatePresence, motion } from "framer-motion";
 import { CircleAlert, Download, ImagePlus, Trash2 } from "lucide-react";
 import { ChannelTalkButton } from "@/components/layout/ChannelTalk";
+import { useReducedMotionSafe } from "@/hooks/useReducedMotionSafe";
 
 /* 이미지 용량 줄이기.
    사진을 canvas에 다시 그려 JPG나 WebP로 저장한다. 다시 그리면 촬영 위치 같은 EXIF 정보는 자연히 빠진다.
@@ -96,7 +97,7 @@ function outName(item: Item) {
 let seq = 0;
 
 export function ImageCompressor() {
-  const reduce = !!useReducedMotion();
+  const reduce = useReducedMotionSafe();
   const [items, setItems] = useState<Item[]>([]);
   const [settings, setSettings] = useState<Settings>({ format: "jpeg", quality: 0.8, maxWidth: 1920 });
   const [selected, setSelected] = useState<string | null>(null);

@@ -1,8 +1,9 @@
 "use client";
 
 import { useState, useSyncExternalStore } from "react";
-import { AnimatePresence, motion, useReducedMotion } from "framer-motion";
+import { AnimatePresence, motion } from "framer-motion";
 import { Check, CircleAlert, Copy, ShieldCheck, ShieldX } from "lucide-react";
+import { useReducedMotionSafe } from "@/hooks/useReducedMotionSafe";
 
 /* JWT 파서.
    토큰을 붙여 넣으면 헤더, 페이로드, 서명 세 부분을 색으로 나누고, 표준 클레임을 한국어 이름과 한국 시간으로 풀어 보여 준다.
@@ -101,7 +102,7 @@ async function verifyHmac(parts: string[], hash: string, secret: string) {
 }
 
 export function JwtParser() {
-  const reduce = !!useReducedMotion();
+  const reduce = useReducedMotionSafe();
   const [token, setToken] = useState("");
   const [secret, setSecret] = useState("");
   const [verified, setVerified] = useState<{ key: string; ok: boolean } | null>(null);

@@ -2,8 +2,9 @@
 
 import Image from "next/image";
 import Link from "next/link";
-import { AnimatePresence, motion, useReducedMotion } from "framer-motion";
+import { AnimatePresence, motion } from "framer-motion";
 import type { Project } from "@/lib/types";
+import { useReducedMotionSafe } from "@/hooks/useReducedMotionSafe";
 
 const EASE_OUT = [0.23, 1, 0.32, 1] as const;
 const normalize = (s: string) => s.toLowerCase().replace(/\s+/g, "");
@@ -18,7 +19,7 @@ const secondaryButton =
 // marks에 든 단어가 있는 기능 태그에는 형광펜이 왼쪽부터 그어진다.
 // 동작 줄이기 설정이면 자리 이동 없이 흐려지기만 하고 형광펜은 바로 칠해진다.
 export function WorksGrid({ projects, marks = [] }: { projects: Project[]; marks?: readonly string[] }) {
-  const reduce = useReducedMotion();
+  const reduce = useReducedMotionSafe();
   const hidden = reduce ? { opacity: 0 } : { opacity: 0, clipPath: "inset(0% 0% 100% 0% round 10px)" };
   const shown = reduce ? { opacity: 1 } : { opacity: 1, clipPath: "inset(0% 0% 0% 0% round 10px)" };
 

@@ -1,9 +1,10 @@
 "use client";
 
 import { useEffect, useMemo, useState } from "react";
-import { AnimatePresence, motion, useReducedMotion } from "framer-motion";
+import { AnimatePresence, motion } from "framer-motion";
 import { Download, PackageCheck, Plus, RotateCcw, Search, Trash2, Truck, X } from "lucide-react";
 import { useLocalStorage } from "@/hooks/useLocalStorage";
+import { useReducedMotionSafe } from "@/hooks/useReducedMotionSafe";
 
 const STORAGE_KEY = "gs-demo:shop-admin:v1";
 
@@ -38,7 +39,7 @@ const EASE = [0.23, 1, 0.32, 1] as const;
 
 // 숫자가 바뀌면 새 값이 아래에서 올라오고 이전 값은 위로 빠진다 (240ms)
 function Rolling({ value }: { value: string }) {
-  const reduce = useReducedMotion();
+  const reduce = useReducedMotionSafe();
   return (
     <span className="relative inline-flex overflow-hidden align-bottom">
       <AnimatePresence mode="popLayout" initial={false}>
@@ -182,7 +183,7 @@ export function ShopAdminDemo() {
   const [state, setState, hydrated] = useLocalStorage<State>(STORAGE_KEY, initialState);
   const [tab, setTab] = useState<"options" | "orders">("options");
   const [toast, setToast] = useState<{ id: number; text: string } | null>(null);
-  const reduce = useReducedMotion();
+  const reduce = useReducedMotionSafe();
   const notify: Notify = (text) => setToast((t) => ({ id: (t?.id ?? 0) + 1, text }));
 
   // 처리 결과 알림은 3.2초 뒤 저절로 닫힌다
@@ -339,7 +340,7 @@ function OptionsPanel({
   const [filter, setFilter] = useState("");
   const [limit, setLimit] = useState(PAGE);
 
-  const reduce = useReducedMotion();
+  const reduce = useReducedMotionSafe();
   // 일괄 적용한 재고 칸을 잠깐 강조한다 (id가 바뀌면 다시 재생)
   const [flash, setFlash] = useState<{ id: number; keys: Set<string> }>({ id: 0, keys: new Set() });
   // 처음 보인 조합은 그대로 두고, 이후 새로 생긴 조합만 펼쳐 보인다
@@ -654,7 +655,7 @@ function OptionsPanel({
 }
 
 function OrdersPanel({ state, setState, notify }: { state: State; setState: SetState; notify: Notify }) {
-  const reduce = useReducedMotion();
+  const reduce = useReducedMotionSafe();
   const [status, setStatus] = useState<Status | "전체">("전체");
   const [query, setQuery] = useState("");
   const [selected, setSelected] = useState<Set<string>>(new Set());

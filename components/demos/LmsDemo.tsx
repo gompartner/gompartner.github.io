@@ -1,9 +1,10 @@
 "use client";
 
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
-import { AnimatePresence, motion, useReducedMotion } from "framer-motion";
+import { AnimatePresence, motion } from "framer-motion";
 import { Check, CheckCircle2, Circle, Lock, Pause, Play, Printer, RotateCcw, Send, X } from "lucide-react";
 import { useLocalStorage } from "@/hooks/useLocalStorage";
+import { useReducedMotionSafe } from "@/hooks/useReducedMotionSafe";
 
 /* 온라인 강의·수료 관리 LMS 데모 (학원·교육기관용).
    수강생 화면: 차시 영상(슬라이드로 대신함)을 보면 실제로 본 구간만 진도로 잡고, 이어보기와 수료 조건을 보여 준다.
@@ -122,7 +123,7 @@ const statusOf = (progress: number, days: number, quiz: number | null): LearnerS
   progress >= 90 && quiz !== null && quiz >= PASS_SCORE ? "수료" : progress >= 90 ? "평가 대기" : days >= 7 || progress < 30 ? "독려 대상" : "학습 중";
 
 export function LmsDemo() {
-  const reduce = !!useReducedMotion();
+  const reduce = useReducedMotionSafe();
   const [state, setState, hydrated] = useLocalStorage<State>(STORAGE_KEY, initialState);
   const [view, setView] = useState<"learner" | "admin">("learner");
   const [toast, setToast] = useState<{ id: number; text: string } | null>(null);
@@ -223,7 +224,7 @@ export function LmsDemo() {
 type SetState = (updater: State | ((prev: State) => State)) => void;
 
 function Ring({ value }: { value: number }) {
-  const reduce = useReducedMotion();
+  const reduce = useReducedMotionSafe();
   const r = 26;
   const len = 2 * Math.PI * r;
   return (
@@ -263,7 +264,7 @@ function Learner({
   courseProgress: number;
   notify: (t: string) => void;
 }) {
-  const reduce = !!useReducedMotion();
+  const reduce = useReducedMotionSafe();
   const [playing, setPlaying] = useState(false);
   const [speed, setSpeed] = useState(1);
   const [answers, setAnswers] = useState<(number | null)[]>(QUIZ.map(() => null));
@@ -593,7 +594,7 @@ function Learner({
 }
 
 function Admin({ mine, notify }: { mine: { progress: number; quiz: number | null }; notify: (t: string) => void }) {
-  const reduce = !!useReducedMotion();
+  const reduce = useReducedMotionSafe();
   const [filter, setFilter] = useState<LearnerStatus | "전체">("전체");
   const [selected, setSelected] = useState<Set<string>>(new Set());
   const [lesson, setLesson] = useState(3);

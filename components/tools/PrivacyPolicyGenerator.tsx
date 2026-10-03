@@ -1,10 +1,11 @@
 "use client";
 
 import { useEffect, useMemo, useState } from "react";
-import { AnimatePresence, motion, useReducedMotion } from "framer-motion";
+import { AnimatePresence, motion } from "framer-motion";
 import { Check, Copy, Download, Plus, X } from "lucide-react";
 import { ChannelTalkButton } from "@/components/layout/ChannelTalk";
 import { useLocalStorage } from "@/hooks/useLocalStorage";
+import { useReducedMotionSafe } from "@/hooks/useReducedMotionSafe";
 
 /* 개인정보처리방침 생성기.
    「개인정보 보호법」 제30조와 개인정보보호위원회 작성지침의 필수 기재 항목을 기준으로,
@@ -347,7 +348,7 @@ const label = "block text-[15px] font-bold";
 const input = "mt-1.5 h-11 w-full rounded-md border border-[#6d7882] bg-white px-3 text-[16px]";
 
 export function PrivacyPolicyGenerator() {
-  const reduce = !!useReducedMotion();
+  const reduce = useReducedMotionSafe();
   const [form, setForm] = useLocalStorage<Form>(STORAGE_KEY, initialForm);
   const [copied, setCopied] = useState<"text" | "html" | null>(null);
   // 처음 불러올 때는 모든 조항이 번쩍이지 않도록, 저장값을 읽은 뒤부터 강조한다

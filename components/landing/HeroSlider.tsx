@@ -4,10 +4,11 @@
 // 마우스를 올리거나 포커스가 들어오면 멈추고, 동작 줄이기 설정이면 자동으로 넘기지 않는다.
 import Image from "next/image";
 import Link from "next/link";
-import { AnimatePresence, motion, useReducedMotion } from "framer-motion";
+import { AnimatePresence, motion } from "framer-motion";
 import { ChevronLeft, ChevronRight, Pause, Play } from "lucide-react";
 import { useEffect, useState } from "react";
 import type { Project } from "@/lib/types";
+import { useReducedMotionSafe } from "@/hooks/useReducedMotionSafe";
 
 const INTERVAL = 5000;
 const EASE_OUT = [0.23, 1, 0.32, 1] as const;
@@ -20,7 +21,7 @@ export function HeroSlider({ slides }: { slides: Project[] }) {
   const [dir, setDir] = useState(1);
   const [playing, setPlaying] = useState(true);
   const [hold, setHold] = useState(false);
-  const reduce = useReducedMotion();
+  const reduce = useReducedMotionSafe();
   const auto = playing && !hold && !reduce;
 
   useEffect(() => {

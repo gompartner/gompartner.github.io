@@ -1,8 +1,9 @@
 "use client";
 
 import { useState, useSyncExternalStore } from "react";
-import { AnimatePresence, motion, useReducedMotion } from "framer-motion";
+import { AnimatePresence, motion } from "framer-motion";
 import { CircleAlert, Clock } from "lucide-react";
+import { useReducedMotionSafe } from "@/hooks/useReducedMotionSafe";
 
 /* cron 표현식 한국어 풀이.
    5칸(분 시 일 월 요일), 초를 붙인 6칸(Spring, Quartz), 연도까지 붙인 7칸(Quartz)과 @daily 같은 약칭을 읽는다.
@@ -379,7 +380,7 @@ const getNow = () => Math.floor(Date.now() / 10_000) * 10;
 /* ---------- 화면 ---------- */
 
 export function CronExplainer() {
-  const reduce = !!useReducedMotion();
+  const reduce = useReducedMotionSafe();
   const [expr, setExpr] = useState("30 9 * * 1-5");
   const now = useSyncExternalStore(subscribeNow, getNow, () => 0);
 

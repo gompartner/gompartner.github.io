@@ -2,8 +2,9 @@
 
 import { useEffect, useMemo, useRef, useState, useSyncExternalStore } from "react";
 import Image from "next/image";
-import { AnimatePresence, motion, useReducedMotion } from "framer-motion";
+import { AnimatePresence, motion } from "framer-motion";
 import { Bus, Car, ChevronRight, Menu, Moon, Phone, TrainFront, X } from "lucide-react";
+import { useReducedMotionSafe } from "@/hooks/useReducedMotionSafe";
 
 /* 치과 홈페이지 데모: 가상의 ○○치과의원.
    병원명, 의료진, 주소, 전화번호, 사업자 정보, 진료비는 모두 가상이다.
@@ -682,7 +683,7 @@ export function DentalHomepageDemo() {
 // 사진 아래 테두리를 웃는 입 모양 호로 깎았다. 처음 열릴 때 사진이 위에서 아래로 펼쳐지고
 // 병원명 밑에 미소 곡선이 그어진 뒤 오늘 진료시간 카드가 올라온다.
 function Hero({ now, status }: { now: Date | null; status: ReturnType<typeof openStatus> }) {
-  const reduce = !!useReducedMotion();
+  const reduce = useReducedMotionSafe();
   const today = now ? HOURS.find((h) => h.day === now.getDay()) : null;
   const facts = [
     { label: "야간 진료", value: "화, 목 21:00까지" },
@@ -791,7 +792,7 @@ function Hero({ now, status }: { now: Date | null; status: ReturnType<typeof ope
 }
 
 function ToothMap({ onReserve }: { onReserve: (id: TreatmentId) => void }) {
-  const reduce = !!useReducedMotion();
+  const reduce = useReducedMotionSafe();
   const [selected, setSelected] = useState<Selection>(36);
   const [symptomIndex, setSymptomIndex] = useState(0);
 
@@ -1056,7 +1057,7 @@ function nextOpenDays(todayKey: string) {
 }
 
 function Reservation({ treatment, onTreatment }: { treatment: TreatmentId; onTreatment: (id: TreatmentId) => void }) {
-  const reduce = useReducedMotion();
+  const reduce = useReducedMotionSafe();
   const [dayIndex, setDayIndex] = useState(0);
   const [time, setTime] = useState<string | null>(null);
   const [name, setName] = useState("");
