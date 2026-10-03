@@ -2,11 +2,12 @@
 
 // 첫 화면 배너: 대표 제작 사례를 5초마다 넘긴다.
 // 마우스를 올리거나 포커스가 들어오면 멈추고, 동작 줄이기 설정이면 자동으로 넘기지 않는다.
+// 화면을 좌우로 밀어도 넘어간다(세로 스크롤은 그대로 둔다).
 import Image from "next/image";
 import Link from "next/link";
 import { AnimatePresence, motion } from "framer-motion";
 import { ChevronLeft, ChevronRight, Pause, Play } from "lucide-react";
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import type { Project } from "@/lib/types";
 import { useReducedMotionSafe } from "@/hooks/useReducedMotionSafe";
 
@@ -38,6 +39,24 @@ export function HeroSlider({ slides }: { slides: Project[] }) {
     setIndex((i) => (i + step + slides.length) % slides.length);
   };
 
+  // 손가락이나 마우스로 40px 넘게 가로로 밀면 넘기고, 그때는 데모로 이동하는 클릭을 막는다
+  const start = useRef<{ x: number; y: number } | null>(null);
+  const swiped = useRef(false);
+  const onPointerDown = (e: React.PointerEvent) => {
+    start.current = { x: e.clientX, y: e.clientY };
+    swiped.current = false;
+  };
+  const onPointerUp = (e: React.PointerEvent) => {
+    if (!start.current) return;
+    const dx = e.clientX - start.current.x;
+    const dy = e.clientY - start.current.y;
+    start.current = null;
+    if (Math.abs(dx) > 40 && Math.abs(dx) > Math.abs(dy)) {
+      swiped.current = true;
+      go(dx < 0 ? 1 : -1);
+    }
+  };
+
   const work = slides[index];
 
   return (
@@ -55,7 +74,17 @@ export function HeroSlider({ slides }: { slides: Project[] }) {
         href={work.demoUrl}
         data-gtm-cta={`hero_slide_${work.id}`}
         aria-label={`${work.title} 데모 보기`}
-        className="relative block aspect-[16/10] overflow-hidden rounded-[10px] border border-border bg-white"
+        className="relative block aspect-[16/10] touch-pan-y select-none overflow-hidden rounded-[10px] border border-border bg-white"
+        draggable={false}
+        onPointerDown={onPointerDown}
+        onPointerUp={onPointerUp}
+        onPointerCancel={() => (start.current = null)}
+        onClick={(e) => {
+          if (swiped.current) {
+            e.preventDefault();
+            swiped.current = false;
+          }
+        }}
       >
         <AnimatePresence initial={false} custom={dir}>
           <motion.div
@@ -78,7 +107,8 @@ export function HeroSlider({ slides }: { slides: Project[] }) {
               width={1440}
               height={900}
               priority={index === 0}
-              className="h-full w-full object-cover object-top"
+              draggable={false}
+              className="pointer-events-none h-full w-full object-cover object-top"
             />
           </motion.div>
         </AnimatePresence>
