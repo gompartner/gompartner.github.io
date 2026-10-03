@@ -1322,7 +1322,7 @@ function Space() {
           <div className="flex flex-col gap-6 md:pt-24">
             <figure>
               <div className="relative aspect-[4/3] overflow-hidden rounded-[12px]">
-                <Image src={`${IMG}/mat.jpg`} alt="매트에서 옆구리 스트레칭을 하는 그룹 수업" fill sizes="(min-width: 768px) 40vw, 100vw" className="object-cover" />
+                <Image src={`${IMG}/mat.jpg`} alt="매트 여섯 장이 깔린 매트실" fill sizes="(min-width: 768px) 40vw, 100vw" className="object-cover" />
               </div>
               <figcaption className="mt-2.5 text-[15px]" style={{ color: C.muted }}>
                 매트실. 그룹 수업은 최대 6명입니다.
