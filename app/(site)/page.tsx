@@ -29,7 +29,7 @@ export const metadata: Metadata = {
 };
 
 // 첫 화면 배너에 넘겨 보여 줄 대표 제작 사례
-const featuredIds = ["private-gym", "clinic-homepage", "district-portal"];
+const featuredIds = ["hanok-cafe", "bakery-cafe", "flower-expo", "dental-homepage"];
 const featured = featuredIds.map((id) => projects.find((p) => p.id === id)!);
 
 // 제작 사례 구간에 보여 줄 대표 6개. 업종이 겹치지 않게 고르고 전체는 /works에서 본다.
