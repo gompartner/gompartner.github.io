@@ -29,11 +29,12 @@ export const metadata: Metadata = {
 };
 
 // 첫 화면 배너에 넘겨 보여 줄 대표 제작 사례
-const featuredIds = ["hanok-cafe", "bakery-cafe", "flower-expo", "dental-homepage"];
+// 크몽 판매량 순(쇼핑몰, 숙박, 기업, 병원, 법률, 세무, 부동산)으로 노출한다
+const featuredIds = ["online-store", "pension", "company", "dental-homepage"];
 const featured = featuredIds.map((id) => projects.find((p) => p.id === id)!);
 
-// 제작 사례 구간에 보여 줄 대표 6개. 업종이 겹치지 않게 고르고 전체는 /works에서 본다.
-const showcaseIds = ["dental-homepage", "pharmacy", "bakery-cafe", "flower-expo", "shop-admin", "lms"];
+// 제작 사례 구간에 보여 줄 대표 6개. 판매량 순으로 고르고 전체는 /works에서 본다.
+const showcaseIds = ["online-store", "pension", "company", "dental-homepage", "law-firm", "tax-office"];
 const showcase = showcaseIds.map((id) => projects.find((p) => p.id === id)!);
 
 const promises = ["17년 경력 개발자 직접 작업", "채팅으로 바로 상담", "원본 소스 제공", "완료 후 1개월 무상 유지보수"];
