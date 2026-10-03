@@ -10,6 +10,9 @@ import { ClinicReportDemo } from "@/components/demos/ClinicReportDemo";
 import { CommunityMapDemo } from "@/components/demos/CommunityMapDemo";
 import { ExcelAutomationDemo } from "@/components/demos/ExcelAutomationDemo";
 import { DistrictPortalDemo } from "@/components/demos/DistrictPortalDemo";
+import { FlowerExpoDemo } from "@/components/demos/FlowerExpoDemo";
+import { HanokCafeDemo } from "@/components/demos/HanokCafeDemo";
+import { PilatesStudioDemo } from "@/components/demos/PilatesStudioDemo";
 import { HomepageDemo } from "@/components/demos/HomepageDemo";
 import { LmsDemo } from "@/components/demos/LmsDemo";
 import { JobPortalDemo } from "@/components/demos/JobPortalDemo";
@@ -25,6 +28,9 @@ const demoComponents: Record<string, ComponentType> = {
   "clinic-report": ClinicReportDemo,
   "clinic-homepage": ClinicHomepageDemo,
   "dental-homepage": DentalHomepageDemo,
+  "hanok-cafe": HanokCafeDemo,
+  "pilates-studio": PilatesStudioDemo,
+  "flower-expo": FlowerExpoDemo,
   "community-map": CommunityMapDemo,
   "program-application": ApplicationDemo,
   "maintenance-dashboard": MaintenanceDemo,
