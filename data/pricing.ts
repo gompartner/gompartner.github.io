@@ -51,6 +51,11 @@ export const planByProject: Record<string, PlanId> = {
   "bakery-cafe": "premium",
   pharmacy: "premium",
   "private-gym": "standard",
+  pension: "premium",
+  company: "premium",
+  "law-firm": "premium",
+  "tax-office": "premium",
+  "real-estate": "premium",
 };
 
 export const formatWon = (n: number) => `${n.toLocaleString("ko-KR")}원`;

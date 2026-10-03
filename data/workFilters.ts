@@ -1,7 +1,7 @@
 // 제작 사례를 "○○에서 쓰는 ○○ 기능" 문장으로 고르기 위한 분류.
 // 새 제작 사례를 추가하면 fieldsById에 업종을 적는다. 기능은 기능 태그·제목·설명에서 keywords로 찾는다.
 
-export const fields = ["병원", "공공기관·학교", "가게·매장", "금융", "기업"] as const;
+export const fields = ["병원", "전문직·부동산", "공공기관·학교", "가게·매장", "금융", "기업"] as const;
 export type Field = (typeof fields)[number];
 
 export const fieldsById: Record<string, Field[]> = {
@@ -10,6 +10,12 @@ export const fieldsById: Record<string, Field[]> = {
   "dental-homepage": ["병원"],
   "hanok-cafe": ["가게·매장"],
   "pilates-studio": ["가게·매장"],
+  "online-store": ["가게·매장", "기업"],
+  pension: ["가게·매장"],
+  company: ["기업"],
+  "law-firm": ["전문직·부동산"],
+  "tax-office": ["전문직·부동산", "금융"],
+  "real-estate": ["전문직·부동산"],
   "bakery-cafe": ["가게·매장"],
   pharmacy: ["병원", "가게·매장"],
   "flower-expo": ["공공기관·학교"],

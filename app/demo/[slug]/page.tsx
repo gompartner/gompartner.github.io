@@ -3,6 +3,12 @@ import type { ComponentType } from "react";
 import { notFound } from "next/navigation";
 import { projects } from "@/data/projects";
 import { AccessibilityDemo } from "@/components/demos/AccessibilityDemo";
+import { OnlineStoreDemo } from "@/components/demos/OnlineStoreDemo";
+import { PensionDemo } from "@/components/demos/PensionDemo";
+import { CompanyDemo } from "@/components/demos/CompanyDemo";
+import { LawFirmDemo } from "@/components/demos/LawFirmDemo";
+import { TaxOfficeDemo } from "@/components/demos/TaxOfficeDemo";
+import { RealEstateDemo } from "@/components/demos/RealEstateDemo";
 import { BakeryCafeDemo } from "@/components/demos/BakeryCafeDemo";
 import { PharmacyDemo } from "@/components/demos/PharmacyDemo";
 import { ApplicationDemo } from "@/components/demos/ApplicationDemo";
@@ -35,6 +41,12 @@ const demoComponents: Record<string, ComponentType> = {
   "flower-expo": FlowerExpoDemo,
   "bakery-cafe": BakeryCafeDemo,
   pharmacy: PharmacyDemo,
+  "online-store": OnlineStoreDemo,
+  pension: PensionDemo,
+  company: CompanyDemo,
+  "law-firm": LawFirmDemo,
+  "tax-office": TaxOfficeDemo,
+  "real-estate": RealEstateDemo,
   "community-map": CommunityMapDemo,
   "program-application": ApplicationDemo,
   "maintenance-dashboard": MaintenanceDemo,
