@@ -1,10 +1,11 @@
 "use client";
 
 import { useEffect, useMemo, useState } from "react";
-import { AnimatePresence, motion, useReducedMotion } from "framer-motion";
+import { AnimatePresence, motion } from "framer-motion";
 import { Check, Copy, Download } from "lucide-react";
 import { ChannelTalkButton } from "@/components/layout/ChannelTalk";
 import { useLocalStorage } from "@/hooks/useLocalStorage";
+import { useReducedMotionSafe } from "@/hooks/useReducedMotionSafe";
 
 /* 이용약관 생성기.
    공정거래위원회 전자상거래 표준약관의 조항 구성을 따라, 사이트 유형과 회원가입·유료 결제·게시물 여부를 고르면
@@ -561,7 +562,7 @@ const chip = (on: boolean) =>
   `min-h-12 rounded-md border px-3 py-2 text-left text-[15px] font-bold transition-colors ${on ? "border-accent bg-accent-surface text-accent-hover" : "border-border hover:bg-surface"}`;
 
 export function TermsGenerator() {
-  const reduce = !!useReducedMotion();
+  const reduce = useReducedMotionSafe();
   const [form, setForm] = useLocalStorage<Form>(STORAGE_KEY, initialForm);
   const [copied, setCopied] = useState<"text" | "html" | null>(null);
   // 처음 불러올 때는 모든 조항이 번쩍이지 않도록, 저장값을 읽은 뒤부터 강조한다

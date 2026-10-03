@@ -1,9 +1,10 @@
 "use client";
 
 import { useState } from "react";
-import { AnimatePresence, motion, useReducedMotion } from "framer-motion";
+import { AnimatePresence, motion } from "framer-motion";
 import { Check, ChevronDown, CircleAlert, Copy } from "lucide-react";
 import { ChannelTalkButton } from "@/components/layout/ChannelTalk";
+import { useReducedMotionSafe } from "@/hooks/useReducedMotionSafe";
 
 /* 검색 결과 미리보기.
    상호, 지역, 업종을 넣으면 제목과 설명을 추천하고, 구글과 네이버 검색 결과에 어떻게 보이는지 그린다.
@@ -75,7 +76,7 @@ function escapeAttr(s: string) {
 }
 
 export function SearchPreview() {
-  const reduce = !!useReducedMotion();
+  const reduce = useReducedMotionSafe();
   const [f, setF] = useState<Fields>(EXAMPLE);
   const [codeOpen, setCodeOpen] = useState(false);
   const [copied, setCopied] = useState(false);

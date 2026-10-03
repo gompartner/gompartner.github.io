@@ -1,8 +1,9 @@
 "use client";
 
 // 작업 이력: 연도로 소속을 짐작할 수 없도록 연도 없이 분야별 건수와 대표 프로젝트만 보여 준다.
-import { motion, useReducedMotion } from "framer-motion";
+import { motion } from "framer-motion";
 import type { HistoryField } from "@/lib/history";
+import { useReducedMotionSafe } from "@/hooks/useReducedMotionSafe";
 
 const EASE_OUT = [0.23, 1, 0.32, 1] as const;
 
@@ -13,7 +14,7 @@ interface Props {
 }
 
 export function HistoryTimeline({ fields, total, careerYears }: Props) {
-  const reduce = !!useReducedMotion();
+  const reduce = useReducedMotionSafe();
 
   return (
     <>

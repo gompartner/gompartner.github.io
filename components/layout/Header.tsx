@@ -4,11 +4,12 @@ import Image from "next/image";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { useEffect, useState } from "react";
-import { AnimatePresence, motion, useReducedMotion } from "framer-motion";
+import { AnimatePresence, motion } from "framer-motion";
 import { Menu, X } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { profile } from "@/data/profile";
 import { ChannelTalkButton } from "@/components/layout/ChannelTalk";
+import { useReducedMotionSafe } from "@/hooks/useReducedMotionSafe";
 
 // 메뉴는 첫 화면의 섹션과 무료 도구 페이지로 이동한다
 const navItems = [
@@ -21,7 +22,7 @@ export function Header() {
   const [isScrolled, setIsScrolled] = useState(false);
   const [menuOpen, setMenuOpen] = useState(false);
   const pathname = usePathname();
-  const reduce = !!useReducedMotion();
+  const reduce = useReducedMotionSafe();
 
   // 다른 페이지로 이동하면 모바일 메뉴를 닫는다
   const [prevPath, setPrevPath] = useState(pathname);

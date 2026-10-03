@@ -1,8 +1,9 @@
 "use client";
 
 import { useState, useSyncExternalStore } from "react";
-import { AnimatePresence, motion, useReducedMotion } from "framer-motion";
+import { AnimatePresence, motion } from "framer-motion";
 import { Check, ChevronDown, CircleAlert, Copy } from "lucide-react";
+import { useReducedMotionSafe } from "@/hooks/useReducedMotionSafe";
 
 /* 유닉스 시간 변환기.
    지금 시각의 유닉스 시간을 1초마다 보여 주고, 숫자를 넣으면 자릿수로 초, 밀리초, 마이크로초, 나노초를 구분해 날짜로 바꾼다.
@@ -121,7 +122,7 @@ function Row({ label, value, copyLabel, copied, onCopy }: { label: string; value
 }
 
 export function UnixTimeConverter() {
-  const reduce = !!useReducedMotion();
+  const reduce = useReducedMotionSafe();
   const now = useSyncExternalStore(subscribeNow, getNow, () => 0);
   const { copied, copy } = useCopy();
   const [input, setInput] = useState("");

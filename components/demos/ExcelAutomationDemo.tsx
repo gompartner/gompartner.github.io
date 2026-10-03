@@ -1,8 +1,9 @@
 "use client";
 
 import { useEffect, useMemo, useRef, useState } from "react";
-import { AnimatePresence, motion, useReducedMotion } from "framer-motion";
+import { AnimatePresence, motion } from "framer-motion";
 import { AlertTriangle, CheckCircle2, Download, FileSpreadsheet, Printer, Upload, Wand2 } from "lucide-react";
+import { useReducedMotionSafe } from "@/hooks/useReducedMotionSafe";
 
 /* 거래처 주문 엑셀 취합·검사·발주서 자동화 데모.
    거래처마다 양식이 다른 주문 파일을 올리면 열을 자동으로 맞추고, 엑셀처럼 생긴 격자에서 오류를 표시한다.
@@ -229,7 +230,7 @@ function downloadCsv(name: string, rows: (string | number)[][]) {
 type Tab = "취합" | "집계" | "발주서";
 
 export function ExcelAutomationDemo() {
-  const reduce = !!useReducedMotion();
+  const reduce = useReducedMotionSafe();
   const [sheet, setSheet] = useState<Sheet>(sampleSheet);
   const [loadId, setLoadId] = useState(0);
   const [tab, setTab] = useState<Tab>("취합");
