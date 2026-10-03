@@ -17,7 +17,7 @@ export default async function DemoLayout({
     <>
       {children}
       <Link
-        href="/#works"
+        href="/works"
         className="print:hidden fixed bottom-5 left-5 z-50 inline-flex items-center gap-2 rounded-full border border-white/20 bg-black/60 px-4 py-2.5 text-sm font-medium text-white shadow-lg backdrop-blur-md transition-transform hover:scale-105"
       >
         <ArrowLeft size={15} aria-hidden />

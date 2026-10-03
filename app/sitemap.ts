@@ -1,11 +1,12 @@
 import type { MetadataRoute } from "next";
 import { projects } from "@/data/projects";
 import { tools } from "@/data/tools";
+import { industries } from "@/data/industries";
 import { siteUrl } from "@/lib/site";
 
 export const dynamic = "force-static";
 
-// 첫 화면, 무료 도구, 데모 페이지를 색인 대상으로 둔다.
+// 첫 화면, 제작 사례, 무료 도구, 데모 페이지를 색인 대상으로 둔다.
 export default function sitemap(): MetadataRoute.Sitemap {
   const lastModified = new Date();
   const demos = projects
@@ -24,6 +25,12 @@ export default function sitemap(): MetadataRoute.Sitemap {
       changeFrequency: "monthly",
       priority: 1.0,
     },
+    ...["/works", ...industries.map((i) => `/works/${i.slug}`)].map((path) => ({
+      url: `${siteUrl}${path}`,
+      lastModified,
+      changeFrequency: "monthly" as const,
+      priority: 0.9,
+    })),
     ...["/tools", ...tools.map((t) => t.href)].map((path) => ({
       url: `${siteUrl}${path}`,
       lastModified,
