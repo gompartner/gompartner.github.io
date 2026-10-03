@@ -8,6 +8,7 @@ import { HeroSlider } from "@/components/landing/HeroSlider";
 import { WorksSearch } from "@/components/landing/WorksSearch";
 import { projects } from "@/data/projects";
 import { profile } from "@/data/profile";
+import { formatWon, planByProject, plans } from "@/data/pricing";
 
 // KRDS(범정부 디자인 시스템) 기준 원페이지 랜딩.
 // 서체 Pretendard, 굵기 400/700, 행간 1.5 이상, 본문 17px,
@@ -80,6 +81,56 @@ export default function HomePage() {
 
           <div className="mt-8">
             <WorksSearch projects={projects} />
+          </div>
+        </div>
+      </section>
+
+      <section id="pricing" aria-labelledby="pricing-title" className="relative isolate scroll-mt-16 overflow-hidden border-t border-border bg-surface">
+        <div className={`${container} py-16 md:py-24`}>
+          <h2 id="pricing-title" className={h2}>
+            홈페이지 제작 가격
+          </h2>
+          <p className={lead}>모든 패키지에 원본 소스와 완료 후 1개월 무상 유지보수가 들어갑니다. 업무 프로그램은 기능을 듣고 따로 견적을 드립니다.</p>
+
+          <ul className="mt-8 grid gap-4 md:grid-cols-3">
+            {plans.map((plan) => {
+              const examples = projects.filter((p) => planByProject[p.id] === plan.id);
+              return (
+                <li key={plan.id} className="flex flex-col rounded-[10px] border border-border bg-white p-6">
+                  <p className="text-[17px] font-bold">
+                    {plan.name} <span className="font-normal text-foreground-secondary">· {plan.days}일</span>
+                  </p>
+                  <p className="mt-1 text-[32px] font-bold leading-[1.3] tabular-nums">{formatWon(plan.price)}</p>
+                  <p className="mt-1 text-[17px] text-foreground-secondary">{plan.summary}</p>
+                  <ul className="mt-5 space-y-2 border-t border-border pt-5 text-[17px]">
+                    {plan.includes.map((item) => (
+                      <li key={item} className="flex gap-2">
+                        <Check size={20} strokeWidth={2.5} className="mt-[3px] shrink-0 text-accent" aria-hidden />
+                        {item}
+                      </li>
+                    ))}
+                  </ul>
+                  {examples.length > 0 && (
+                    <p className="mt-5 text-[15px] leading-[1.6] text-foreground-secondary">
+                      비슷한 데모:{" "}
+                      {examples.map((p, i) => (
+                        <span key={p.id}>
+                          {i > 0 && ", "}
+                          <a href={p.demoUrl} className="underline underline-offset-4 hover:text-accent">
+                            {p.title.replace(" 홈페이지", "")}
+                          </a>
+                        </span>
+                      ))}
+                    </p>
+                  )}
+                </li>
+              );
+            })}
+          </ul>
+          <div className="mt-8">
+            <ChannelTalkButton cta="pricing_chat" className={primaryButton}>
+              채팅으로 상담하기
+            </ChannelTalkButton>
           </div>
         </div>
       </section>
