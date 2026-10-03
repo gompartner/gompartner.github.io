@@ -5,6 +5,7 @@ import Link from "next/link";
 import { AnimatePresence, motion } from "framer-motion";
 import type { Project } from "@/lib/types";
 import { useReducedMotionSafe } from "@/hooks/useReducedMotionSafe";
+import { formatWon, planByProject, plans } from "@/data/pricing";
 
 const EASE_OUT = [0.23, 1, 0.32, 1] as const;
 const normalize = (s: string) => s.toLowerCase().replace(/\s+/g, "");
@@ -72,15 +73,27 @@ export function WorksGrid({ projects, marks = [] }: { projects: Project[]; marks
                   );
                 })}
               </ul>
-              <div className="mt-auto pt-6">
+              <div className="mt-auto flex items-end justify-between gap-3 pt-6">
                 <Link href={w.demoUrl} data-gtm-cta={`demo_open_${w.id}`} className={secondaryButton}>
                   데모 보기
                 </Link>
+                <PlanPrice projectId={w.id} />
               </div>
             </div>
           </motion.li>
         ))}
       </AnimatePresence>
     </ul>
+  );
+}
+
+/** 비슷하게 만들 때 맞는 패키지 가격. 업무 프로그램은 별도 견적으로 적는다. */
+function PlanPrice({ projectId }: { projectId: string }) {
+  const plan = plans.find((p) => p.id === planByProject[projectId]);
+  return (
+    <p className="text-right leading-[1.4]">
+      <span className="block text-[15px] text-foreground-secondary">{plan ? `${plan.name} 패키지` : "업무 프로그램"}</span>
+      <span className="text-[19px] font-bold tabular-nums">{plan ? formatWon(plan.price) : "별도 견적"}</span>
+    </p>
   );
 }
