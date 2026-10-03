@@ -74,7 +74,7 @@ export const metadata: Metadata = {
     images: ["/og-image.png?v=20261003"],
   },
   verification: {
-    other: { "naver-site-verification": "1c5242ef5ddbce4e807bad7225bb0770a1cb06c1" },
+    other: { "naver-site-verification": ["1c5242ef5ddbce4e807bad7225bb0770a1cb06c1", "184bef35395b609c58d44964bf16993e76c0dd50"] },
   },
   robots: {
     index: true,
