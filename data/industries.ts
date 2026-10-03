@@ -9,6 +9,8 @@ export interface Industry {
   title: string;
   description: string;
   needs: string[];
+  image: string;
+  imageAlt: string;
 }
 
 export const industries: Industry[] = [
@@ -20,6 +22,8 @@ export const industries: Industry[] = [
     description:
       "피부과, 치과, 약국 홈페이지와 진료 결과지 프로그램 제작 사례입니다. 진료시간 안내, 온라인 예약, 처방전 미리 보내기를 데모에서 직접 눌러 볼 수 있습니다.",
     needs: ["오늘 진료시간과 휴진일 안내", "비급여 진료비 공개", "온라인 예약 신청", "처방전 미리 보내기, 복약 안내"],
+    image: "/images/demo-dental/lobby.jpg",
+    imageAlt: "민트색 벽과 흰 접수대가 있는 밝은 병원 대기실",
   },
   {
     slug: "store",
@@ -29,5 +33,7 @@ export const industries: Industry[] = [
     description:
       "카페, 빵집, 필라테스, 헬스장 홈페이지와 쇼핑몰 관리자, 주문 엑셀 자동화 제작 사례입니다. 메뉴 안내, 자리 예약, 픽업 주문을 데모에서 직접 눌러 볼 수 있습니다.",
     needs: ["메뉴와 가격, 영업시간 안내", "자리·수업 예약", "미리 주문하고 찾아가는 픽업", "주문 정리와 재고 관리"],
+    image: "/images/demo-bakery/display.jpg",
+    imageAlt: "크루아상과 깜파뉴, 크림빵이 놓인 빵집 진열대",
   },
 ];
