@@ -36,4 +36,26 @@ export const industries: Industry[] = [
     image: "/images/demo-bakery/display.jpg",
     imageAlt: "크루아상과 깜파뉴, 크림빵이 놓인 빵집 진열대",
   },
+  {
+    slug: "professional",
+    field: "전문직·부동산",
+    label: "법률·세무·부동산",
+    title: "법률사무소·세무사·부동산 홈페이지 제작",
+    description:
+      "법률사무소, 세무회계 사무소, 공인중개사사무소 홈페이지 제작 사례입니다. 상황별 절차 안내, 세금 신고 달력, 지도 매물 찾기와 상담 예약을 데모에서 직접 눌러 볼 수 있습니다.",
+    needs: ["분야별 업무와 비용 안내", "상담 예약과 접수", "상황별 절차·일정 안내", "매물·사례 목록과 검색"],
+    image: "/images/demo-law/hero.jpg",
+    imageAlt: "책장과 긴 회의 탁자가 있는 조용한 상담실",
+  },
+  {
+    slug: "company",
+    field: "기업",
+    label: "기업·제조",
+    title: "기업·제조업 홈페이지 제작",
+    description:
+      "제조업 회사 홈페이지와 자사 쇼핑몰, 주문 관리자, 엑셀 자동화, 사내 교육 시스템 제작 사례입니다. 견적 문의, 한영 전환, 업무 자동화를 데모에서 직접 눌러 볼 수 있습니다.",
+    needs: ["회사 소개와 연혁, 인증", "설비·제품 사양 안내", "도면 첨부 견적 문의", "한국어·영어 전환"],
+    image: "/images/demo-company/hero.jpg",
+    imageAlt: "CNC 가공 설비가 줄지어 놓인 밝은 공장 안",
+  },
 ];
