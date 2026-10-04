@@ -17,6 +17,8 @@ export function PricingSection({ id = "pricing", cta = "pricing_chat" }: { id?: 
         </h2>
         <p className="mt-2 text-[17px] leading-[1.5] text-foreground-secondary">
           모든 패키지에 원본 소스와 완료 후 1개월 무상 유지보수가 들어갑니다. 업무 프로그램은 기능을 듣고 따로 견적을 드립니다.
+          <br />
+          계약과 결제는 크몽, 위시켓, 아임웹, 당근 같은 중개 플랫폼을 통해 진행합니다.
         </p>
 
         <ul className="mt-8 grid gap-4 md:grid-cols-3">
