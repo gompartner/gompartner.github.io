@@ -24,7 +24,7 @@ export const metadata: Metadata = {
     absolute: `홈페이지·업무 프로그램 제작 | ${profile.name}`,
   },
   description:
-    "병원, 가게, 기업 홈페이지와 업무 프로그램을 직접 만듭니다. 원본 소스를 제공하고 완료 후 1개월 무상 유지보수합니다.",
+    "쇼핑몰, 펜션, 회사, 병원 홈페이지와 업무 프로그램을 직접 만듭니다. 원본 소스를 제공하고 완료 후 1개월 무상 유지보수합니다.",
   alternates: { canonical: "/" },
 };
 

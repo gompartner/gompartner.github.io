@@ -6,6 +6,8 @@ export type PlanId = "basic" | "standard" | "premium";
 export interface Plan {
   id: PlanId;
   name: string;
+  /** 크몽 패키지 제목과 같게 맞춘다. */
+  title: string;
   price: number;
   days: number;
   summary: string;
@@ -16,6 +18,7 @@ export const plans: Plan[] = [
   {
     id: "basic",
     name: "기본",
+    title: "소개 홈페이지",
     price: 299_000,
     days: 6,
     summary: "가게나 병원을 소개하는 홈페이지",
@@ -24,6 +27,7 @@ export const plans: Plan[] = [
   {
     id: "standard",
     name: "표준",
+    title: "문의·예약 홈페이지",
     price: 490_000,
     days: 9,
     summary: "문의와 예약 신청을 받는 홈페이지",
@@ -32,10 +36,11 @@ export const plans: Plan[] = [
   {
     id: "premium",
     name: "고급",
+    title: "맞춤 기능 홈페이지",
     price: 990_000,
     days: 12,
-    summary: "업종에 맞춘 기능이 들어간 홈페이지",
-    includes: ["10쪽 이내", "표준 패키지 전부", "자리 예약, 픽업 주문 같은 맞춤 기능 1개", "업종에 맞춘 첫 화면 디자인"],
+    summary: "자리 예약, 픽업 주문 같은 맞춤 기능이 들어간 홈페이지",
+    includes: ["10쪽 이내", "표준 패키지 전부", "맞춤 기능 1개", "업종에 맞춘 첫 화면 디자인"],
   },
 ];
 

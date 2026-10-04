@@ -25,7 +25,10 @@ export function PricingSection({ id = "pricing", cta = "pricing_chat" }: { id?: 
             return (
               <li key={plan.id} className="flex flex-col rounded-[10px] border border-border bg-white p-6">
                 <p className="text-[17px] font-bold">
-                  {plan.name} <span className="font-normal text-foreground-secondary">· {plan.days}일</span>
+                  {plan.title}{" "}
+                  <span className="font-normal text-foreground-secondary">
+                    · {plan.name} · {plan.days}일
+                  </span>
                 </p>
                 <p className="mt-1 text-[32px] font-bold leading-[1.3] tabular-nums">{formatWon(plan.price)}</p>
                 <p className="mt-1 text-[17px] text-foreground-secondary">{plan.summary}</p>
