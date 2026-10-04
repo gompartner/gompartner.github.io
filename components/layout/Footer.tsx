@@ -17,6 +17,9 @@ export function Footer() {
             {t.title}
           </Link>
         ))}
+        <Link href="/privacy" className="font-bold text-foreground-secondary underline-offset-4 hover:text-foreground hover:underline">
+          개인정보처리방침
+        </Link>
         <a
           href={`mailto:${profile.email}`}
           data-gtm-cta="footer_email"
