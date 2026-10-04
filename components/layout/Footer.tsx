@@ -1,7 +1,6 @@
 import Link from "next/link";
-import { ChevronDown } from "lucide-react";
 import { profile } from "@/data/profile";
-import { tools } from "@/data/tools";
+import { RelatedSites } from "@/components/layout/RelatedSites";
 
 const menu = [
   { href: "/works", label: "제작 사례" },
@@ -35,22 +34,7 @@ export function Footer() {
             </ul>
           </nav>
 
-          {/* 무료 도구는 관련 사이트로 묶어 접어 둔다 */}
-          <details className="group relative w-full md:w-[220px]">
-            <summary className="flex h-10 cursor-pointer list-none items-center justify-between rounded-md border border-border bg-white px-3 text-foreground-secondary [&::-webkit-details-marker]:hidden">
-              관련 사이트
-              <ChevronDown size={18} aria-hidden className="transition-transform group-open:rotate-180" />
-            </summary>
-            <ul className="absolute bottom-full left-0 right-0 z-10 mb-1 max-h-[320px] overflow-y-auto rounded-md border border-border bg-white py-1 shadow-lg">
-              {tools.map((t) => (
-                <li key={t.href}>
-                  <Link href={t.href} className="block px-3 py-2 text-foreground-secondary hover:bg-surface hover:text-foreground">
-                    {t.title}
-                  </Link>
-                </li>
-              ))}
-            </ul>
-          </details>
+          <RelatedSites />
         </div>
 
         <div className="mt-6 border-t border-border pt-6">
