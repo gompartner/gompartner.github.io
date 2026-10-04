@@ -10,17 +10,15 @@ const EASE_OUT = [0.23, 1, 0.32, 1] as const;
 interface Props {
   fields: HistoryField[];
   total: number;
-  careerYears: number;
 }
 
-export function HistoryTimeline({ fields, total, careerYears }: Props) {
+export function HistoryTimeline({ fields, total }: Props) {
   const reduce = useReducedMotionSafe();
 
   return (
     <>
-      <dl className="mt-8 grid grid-cols-3 gap-3 md:max-w-[640px]">
+      <dl className="mt-8 grid grid-cols-2 gap-3 md:max-w-[430px]">
         {[
-          ["경력", `${careerYears}년`],
           ["프로젝트", `${total}건`],
           ["분야", `${fields.length}개`],
         ].map(([label, value]) => (

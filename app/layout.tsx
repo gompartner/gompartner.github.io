@@ -28,7 +28,7 @@ const geistMono = Geist_Mono({
 // 메인 첫 화면 문구와 맞춘 사이트 제목·설명
 const siteTitle = `홈페이지·업무 프로그램 제작 | ${profile.name}`;
 const siteDescription =
-  "17년 경력 개발자가 홈페이지와 업무 프로그램을 직접 만듭니다. 원본 소스를 제공하고 완료 후 1개월 무상 유지보수합니다.";
+  "병원, 가게, 기업 홈페이지와 업무 프로그램을 직접 만듭니다. 원본 소스를 제공하고 완료 후 1개월 무상 유지보수합니다.";
 
 export const metadata: Metadata = {
   metadataBase: new URL(siteUrl),

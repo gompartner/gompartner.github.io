@@ -28,7 +28,6 @@ export const historyFields = sideProjects.map((f) => ({
   count: f.count + history.filter((h) => sectorField[h.sector] === f.field).length,
 }));
 export const historyTotal = historyFields.reduce((sum, f) => sum + f.count, 0);
-export const careerYears = new Date().getFullYear() - 2009;
 
 
 export type HistoryField = (typeof historyFields)[number];
