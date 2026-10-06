@@ -1,6 +1,6 @@
 import { Check } from "lucide-react";
 import { ChannelTalkButton } from "@/components/layout/ChannelTalk";
-import { formatWon, planByProject, planCommon, plans } from "@/data/pricing";
+import { addons, formatWon, manwon, planByProject, planCommon, plans } from "@/data/pricing";
 import { projects } from "@/data/projects";
 
 const h2 = "text-[24px] font-bold leading-[1.5] tracking-[-0.01em] md:text-[32px]";
@@ -54,6 +54,28 @@ export function PricingSection({ id = "pricing", cta = "pricing_chat" }: { id?: 
             );
           })}
         </ul>
+        <h3 className="mt-12 text-[19px] font-bold md:text-[21px]">추가 기능 가격</h3>
+        <table className="mt-4 w-full max-w-[640px] border-t-2 border-foreground text-[17px]">
+          <caption className="sr-only">추가 기능 가격</caption>
+          <thead>
+            <tr className="border-b border-border text-left text-[15px] text-foreground-secondary">
+              <th scope="col" className="py-2.5 font-medium">기능</th>
+              <th scope="col" className="py-2.5 text-right font-medium">가격</th>
+            </tr>
+          </thead>
+          <tbody>
+            {addons.map((a) => (
+              <tr key={a.id} className="border-b border-border">
+                <th scope="row" className="py-2.5 text-left font-normal">{a.name}</th>
+                <td className="py-2.5 text-right tabular-nums">
+                  {manwon(a.price)}
+                  {a.unit !== "식" && <span className="text-foreground-secondary"> / {a.unit}</span>}
+                </td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
+        <p className="mt-3 text-[15px] text-foreground-secondary">고급 패키지에 든 맞춤 기능 1개는 따로 받지 않습니다.</p>
         <div className="mt-8">
           <ChannelTalkButton cta={cta} className={primaryButton}>
             채팅으로 상담하기
