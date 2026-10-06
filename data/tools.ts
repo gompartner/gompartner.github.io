@@ -1,4 +1,4 @@
-// 무료 도구 목록 (메뉴, 목록 페이지, 사이트맵이 함께 쓴다)
+// 도구 목록 (메뉴, 목록 페이지, 사이트맵이 함께 쓴다)
 export const tools = [
   {
     href: "/tools/privacy-policy",

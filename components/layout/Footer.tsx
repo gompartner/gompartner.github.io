@@ -5,7 +5,7 @@ import { RelatedSites } from "@/components/layout/RelatedSites";
 const menu = [
   { href: "/works", label: "제작 사례" },
   { href: "/#pricing", label: "가격" },
-  { href: "/tools", label: "무료 도구" },
+  { href: "/tools", label: "도구" },
 ];
 
 const link = "underline-offset-4 hover:text-foreground hover:underline";

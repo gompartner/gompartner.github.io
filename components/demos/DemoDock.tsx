@@ -7,7 +7,7 @@ import type { TourStep } from "@/data/tours";
 
 // 데모 왼쪽 아래 버튼 묶음: 다른 데모 보기, 만든 이야기, 사용법 가이드.
 // 사용법 가이드는 프라이빗 짐 데모(HomepageDemo)의 스포트라이트 가이드와 같은 방식이다.
-// 첫 단계 영역이 처음 화면에 들어오면 한 번 자동으로 열고, 이후에는 물음표 버튼으로 다시 연다.
+// 가이드는 물음표 버튼을 눌렀을 때만 연다(저절로 열면 설명 없이는 못 쓰는 화면처럼 보인다).
 
 const pill =
   "inline-flex h-10 items-center gap-2 rounded-full border border-white/20 bg-black/60 px-3.5 text-sm font-medium text-white shadow-lg backdrop-blur-md transition-transform hover:scale-105 motion-reduce:transition-none sm:px-4";
@@ -22,7 +22,7 @@ function resolve(selector: string): HTMLElement | null {
   return el;
 }
 
-export function DemoDock({ projectId, story, tour }: { projectId: string; story?: string[]; tour?: TourStep[] }) {
+export function DemoDock({ story, tour }: { story?: string[]; tour?: TourStep[] }) {
   const [step, setStep] = useState<number | null>(null);
   const [rect, setRect] = useState<Rect | null>(null);
   const [steps, setSteps] = useState<TourStep[]>([]);
@@ -48,37 +48,6 @@ export function DemoDock({ projectId, story, tour }: { projectId: string; story?
     setStep(0);
   }, [tour]);
 
-  // 첫 단계 영역이 처음 보이면 한 번만 자동으로 연다
-  useEffect(() => {
-    if (!tour?.length) return;
-    const key = `demo-tour-seen:${projectId}`;
-    try {
-      if (localStorage.getItem(key)) return;
-    } catch {
-      return;
-    }
-    let io: IntersectionObserver | null = null;
-    const timer = window.setTimeout(() => {
-      const first = resolve(tour[0].target);
-      if (!first) return;
-      io = new IntersectionObserver(
-        ([entry]) => {
-          if (!entry.isIntersecting) return;
-          io?.disconnect();
-          try {
-            localStorage.setItem(key, "1");
-          } catch {}
-          start();
-        },
-        { threshold: 0.3 },
-      );
-      io.observe(first);
-    }, 600);
-    return () => {
-      window.clearTimeout(timer);
-      io?.disconnect();
-    };
-  }, [projectId, tour, start]);
 
   // 가이드가 열려 있는 동안 비추는 영역 좌표를 스크롤·리사이즈에 맞춘다
   useEffect(() => {

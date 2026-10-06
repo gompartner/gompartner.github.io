@@ -17,7 +17,7 @@ export default async function DemoLayout({
   return (
     <>
       {children}
-      {project && <DemoDock projectId={project.id} story={stories[project.id]} tour={tours[project.id]} />}
+      {project && <DemoDock story={stories[project.id]} tour={tours[project.id]} />}
       {project && <PlanBar projectId={project.id} />}
     </>
   );

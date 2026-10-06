@@ -50,7 +50,6 @@ export function WorksGrid({ projects, marks = [] }: { projects: Project[]; marks
             <div className="flex flex-1 flex-col p-6">
               <p className="text-[15px] font-bold leading-[1.5] text-accent">{w.category}</p>
               <h3 className="mt-1 text-[19px] font-bold leading-[1.5]">{w.title}</h3>
-              <p className="mt-2 text-[17px] leading-[1.5] text-foreground-secondary">{w.description}</p>
               <ul className="mt-4 flex flex-wrap gap-2" aria-label="주요 기능">
                 {w.features.map((f) => {
                   const marked = marks.some((k) => normalize(f).includes(normalize(k)));

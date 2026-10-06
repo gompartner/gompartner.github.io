@@ -19,7 +19,7 @@ export interface Project {
   /** 카드 위 작은 분류명 */
   category: string;
   title: string;
-  /** 한 줄 설명 — 카드와 데모 메타 설명에 쓴다 */
+  /** 데모 페이지 메타 설명과 사례 검색에만 쓴다. 카드에는 보여 주지 않는다(사용법은 데모 가이드가 맡는다). */
   description: string;
   /** 주요 기능 태그 */
   features: string[];
