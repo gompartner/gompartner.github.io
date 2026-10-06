@@ -3,7 +3,7 @@
 import { useEffect, useState } from "react";
 import Image from "next/image";
 import Link from "next/link";
-import { Bus, Car, ChevronRight, Menu, Phone, TrainFront, X } from "lucide-react";
+import { ChevronRight, Menu, Phone, X } from "lucide-react";
 
 /* 병원 홈페이지 데모: 가상의 ○○피부과의원.
    /demo/clinic-report(원내 결과지 프로그램)와 같은 병원으로 설정했다.
@@ -475,41 +475,30 @@ export function ClinicHomepageDemo() {
 
         {/* 오시는 길 */}
         <section id="location" className="scroll-mt-16">
-          <div className={`${container} grid gap-8 py-16 md:py-24 lg:grid-cols-12`}>
-            <div className="lg:col-span-7">
+          <div className={`${container} grid gap-8 py-16 md:py-24 lg:grid-cols-12 lg:items-center`}>
+            <Image
+              src={`${IMG}/lobby.jpg`}
+              alt="○○피부과의원 대기실"
+              width={800}
+              height={1198}
+              sizes="(min-width:1024px) 560px, 100vw"
+              className="aspect-[4/3] w-full rounded-[16px] object-cover lg:col-span-6"
+            />
+            <div className="lg:col-span-5 lg:col-start-8">
               <h2 className={heading}>오시는 길</h2>
-              <div className="mt-8 overflow-hidden rounded-[20px]" style={{ boxShadow: `inset 0 0 0 1px ${C.line}` }}>
-                <MapIllustration />
-              </div>
-            </div>
-            <div className="lg:col-span-5 lg:pt-[76px]">
-              <p className="text-[24px] font-semibold tracking-[-0.03em]">□□시 □□로 123 □□빌딩 4층</p>
-              <p className="mt-1" style={{ color: C.muted }}>
-                대표전화 {TEL}
-              </p>
-              <ul className="mt-6 border-t" style={{ borderColor: C.line }}>
+              <p className="mt-6 text-[22px] font-semibold tracking-[-0.03em]">□□시 □□로 123 □□빌딩 4층</p>
+              <dl className="mt-6 border-t" style={{ borderColor: C.line }}>
                 {[
-                  { icon: TrainFront, title: "지하철", body: "□□역 2번 출구에서 150m, 도보 2분" },
-                  { icon: Bus, title: "버스", body: "□□역 정류장 하차 (간선 100, 지선 1234)" },
-                  { icon: Car, title: "주차", body: "건물 지하 주차장 이용, 진료 시 1시간 무료" },
-                ].map(({ icon: Icon, title, body }) => (
-                  <li key={title} className="flex gap-3 border-b py-4" style={{ borderColor: C.line }}>
-                    <Icon size={20} className="mt-0.5 shrink-0" style={{ color: C.accent }} aria-hidden />
-                    <span>
-                      <b className="block">{title}</b>
-                      <span style={{ color: C.muted }}>{body}</span>
-                    </span>
-                  </li>
+                  ["주차", "건물 주차장 2시간 무료, 접수에서 차량 번호 등록"],
+                  ["대중교통", "□□역 2번 출구에서 걸어서 2분"],
+                  ["전화", TEL],
+                ].map(([k, v]) => (
+                  <div key={k} className="grid grid-cols-[88px_1fr] gap-3 border-b py-4" style={{ borderColor: C.line }}>
+                    <dt className="font-bold">{k}</dt>
+                    <dd style={{ color: C.muted }}>{v}</dd>
+                  </div>
                 ))}
-              </ul>
-              <Image
-                src={`${IMG}/lobby.jpg`}
-                alt="○○피부과의원 대기실"
-                width={800}
-                height={1198}
-                sizes="(min-width:1024px) 480px, 100vw"
-                className="mt-6 aspect-[16/10] w-full rounded-[16px] object-cover"
-              />
+              </dl>
             </div>
           </div>
         </section>
@@ -550,40 +539,3 @@ function Portrait({ src, pos }: { src: string; pos: string }) {
   );
 }
 
-function MapIllustration() {
-  return (
-    <svg viewBox="0 0 640 380" className="h-auto w-full" role="img" aria-label="□□역 2번 출구와 병원 위치 약도">
-      <rect width="640" height="380" fill="#f6f0ee" />
-      {[
-        [30, 30, 180, 120],
-        [250, 30, 150, 120],
-        [440, 30, 170, 120],
-        [30, 210, 180, 140],
-        [440, 210, 170, 140],
-      ].map(([x, y, w, h], i) => (
-        <rect key={i} x={x} y={y} width={w} height={h} rx="14" fill="#ebe0dc" />
-      ))}
-      <rect x="250" y="210" width="150" height="140" rx="14" fill="#e2c9c2" />
-      <rect x="0" y="160" width="640" height="40" fill="#fbf9f8" />
-      <rect x="215" y="0" width="30" height="380" fill="#fbf9f8" />
-      <rect x="405" y="0" width="30" height="380" fill="#fbf9f8" />
-      <line x1="0" y1="180" x2="640" y2="180" stroke="#d9c8c3" strokeWidth="2" strokeDasharray="12 10" />
-      <text x="20" y="152" fontSize="15" fill="#5b5357">□□로</text>
-      <g transform="translate(150 186)">
-        <rect x="-44" y="18" width="88" height="30" rx="15" fill="#2a2326" />
-        <text x="0" y="39" fontSize="15" fontWeight="700" fill="#f3ecea" textAnchor="middle">
-          2번 출구
-        </text>
-      </g>
-      <text x="36" y="250" fontSize="15" fill="#5b5357">□□역</text>
-      <path d="M194 204 L300 204 L318 226" fill="none" stroke="#7a4b56" strokeWidth="3" strokeDasharray="6 6" />
-      <g transform="translate(325 268)">
-        <path d="M0 -44 C-22 -44 -30 -26 -30 -16 C-30 6 0 30 0 30 C0 30 30 6 30 -16 C30 -26 22 -44 0 -44 Z" fill="#7a4b56" />
-        <circle cx="0" cy="-16" r="11" fill="#fbf9f8" />
-      </g>
-      <text x="325" y="326" fontSize="15" fontWeight="700" fill="#2a2326" textAnchor="middle">
-        □□빌딩 4층
-      </text>
-    </svg>
-  );
-}

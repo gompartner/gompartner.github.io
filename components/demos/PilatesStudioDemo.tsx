@@ -3,7 +3,7 @@
 import { useEffect, useId, useRef, useState, useSyncExternalStore } from "react";
 import Image from "next/image";
 import { AnimatePresence, motion } from "framer-motion";
-import { Bus, Car, ChevronDown, List, Menu, MessageSquareText, TrainFront, X } from "lucide-react";
+import { ArrowLeft, List, Menu, MessageSquareText, RotateCcw, X } from "lucide-react";
 import { useReducedMotionSafe } from "@/hooks/useReducedMotionSafe";
 
 
@@ -12,12 +12,12 @@ import { useReducedMotionSafe } from "@/hooks/useReducedMotionSafe";
 
    디자인: 따뜻한 흰 종이색(#f5f2ec) 바탕에 쪽빛(#24365a)을 주색으로, 모래색과 흙색을 보조로 쓴다.
    제목은 굵은 고딕(Pretendard Bold), 본문은 보통 고딕. 첫 화면에는 붓으로 한 번에 그린 듯한
-   원이 그려지고, 로고의 ○은 숨 쉬듯 천천히 커졌다 작아진다. 구역 제목 옆에는 세로쓰기 이름표를 둔다.
+   원이 그려지고, 로고의 ○은 숨 쉬듯 천천히 커졌다 작아진다.
    카드 격자 대신 문장, 표, 점으로 정보를 보여 준다.
 
    상호작용
-   1. 수업 고르기: "요즘 [허리가 뻐근하고], 운동은 [처음이에요]." 빈칸을 바꾸면 맞는 수업과 이유가
-      먹이 번지듯 원형으로 드러난다. 전체 수업 목록으로 바꿔 볼 수도 있다.
+   1. 수업 고르기: 불편한 곳, 운동 경험, 1:1과 소그룹 중 선호를 질문 카드 세 장으로 하나씩 묻고
+      마지막에 맞는 수업과 이유가 먹이 번지듯 원형으로 드러난다. 전체 수업 목록으로 바꿔 볼 수도 있다.
    2. 주간 시간표: 요일과 시간 표에 남은 자리를 점으로 보여 주고, 강사와 난이도로 거른다.
       수업을 누르면 체험 수업 신청 창이 열린다. 신청은 실제로 보내지 않는다.
    3. 회원권: 수업 형태와 횟수를 고르면 횟수만큼 점이 채워지고 총액, 회당 금액, 유효기간이 나온다.
@@ -52,7 +52,6 @@ const NAV = [
   { id: "schedule", label: "시간표" },
   { id: "price", label: "회원권" },
   { id: "teachers", label: "강사" },
-  { id: "location", label: "오시는 길" },
 ];
 
 /* ---------- 시간 ---------- */
@@ -130,30 +129,58 @@ const CLASS_INFO: Record<ClassType, { name: string; cap: number; desc: string; f
   },
 };
 
-type Part = "back" | "shoulder" | "pelvis" | "none";
+type Part = "back" | "shoulder" | "knee" | "none";
 type Exp = "new" | "sometimes" | "steady";
+type Pref = "solo" | "group";
 
 const PART_OPTIONS: { id: Part; label: string }[] = [
-  { id: "back", label: "허리가 뻐근하고" },
-  { id: "shoulder", label: "어깨가 자주 뭉치고" },
-  { id: "pelvis", label: "골반이 틀어진 것 같고" },
-  { id: "none", label: "특별히 불편한 곳은 없고" },
+  { id: "back", label: "허리" },
+  { id: "shoulder", label: "목·어깨" },
+  { id: "knee", label: "무릎" },
+  { id: "none", label: "딱히 없어요" },
 ];
 
 const EXP_OPTIONS: { id: Exp; label: string }[] = [
   { id: "new", label: "처음이에요" },
-  { id: "sometimes", label: "가끔 해요" },
+  { id: "sometimes", label: "조금 해 봤어요" },
   { id: "steady", label: "꾸준히 해요" },
+];
+
+const PREF_OPTIONS: { id: Pref; label: string }[] = [
+  { id: "solo", label: "1:1로 배우고 싶어요" },
+  { id: "group", label: "소그룹이 편해요" },
 ];
 
 const PART_REASON: Record<Part, string> = {
   back: "허리를 직접 쓰기보다 배와 골반 주변 근육을 먼저 깨우는 동작부터 합니다.",
   shoulder: "목과 어깨에 들어간 힘을 빼고, 등 근육으로 팔을 쓰는 연습을 합니다.",
-  pelvis: "첫 시간에 양쪽 골반 높이와 다리 길이를 재고 좌우 균형을 맞추는 동작을 고릅니다.",
+  knee: "무릎에 체중이 덜 실리도록 누워서 하는 동작으로 허벅지와 엉덩이 근육부터 키웁니다.",
   none: "",
 };
 
-function recommend(part: Part, exp: Exp): { type: ClassType; level?: Level; reasons: string[] } {
+type Rec = { type: ClassType; level?: Level; reasons: string[] };
+
+function recommend(part: Part, exp: Exp, pref: Pref): Rec {
+  const base = recommendBase(part, exp);
+  const partReason = PART_REASON[part];
+  if (pref === "solo" && base.type !== "private")
+    return {
+      type: "private",
+      reasons: [
+        partReason || "운동 경험에 맞춰 강사가 동작 난이도를 그때그때 조절합니다.",
+        "강사 한 명이 한 사람만 보고, 수업 시간도 원하는 때로 잡습니다.",
+      ],
+    };
+  if (pref === "group" && (base.type === "private" || base.type === "duet"))
+    return {
+      type: "reformer",
+      level: exp === "steady" ? "중급" : "입문",
+      reasons: [partReason, "4명 수업이라 강사가 한 사람씩 자세를 봐 줍니다. 불편한 곳은 수업 전에 강사에게 알려 주세요."],
+    };
+  return base;
+}
+
+function recommendBase(part: Part, exp: Exp): Rec {
   const partReason = PART_REASON[part];
   if (part !== "none") {
     if (exp === "new")
@@ -298,7 +325,6 @@ export function PilatesStudioDemo() {
         <Pricing />
         <Teachers />
         <Space />
-        <Location status={status} />
       </main>
       <Footer />
       <BookingDrawer target={booking} onClose={() => setBooking(null)} />
@@ -530,136 +556,68 @@ function Hero({ status }: { status: Status }) {
 
 /* ---------- 구역 제목 ---------- */
 
-function SectionHead({ tag, title, desc, id }: { tag: string; title: string; desc?: string; id: string }) {
+function SectionHead({ title, desc, id }: { title: string; desc?: string; id: string }) {
   return (
-    <div className="flex gap-5 md:gap-8">
-      <span
-        className={`hidden shrink-0 border-l pl-3 text-[15px] tracking-[0.3em] md:block`}
-        style={{ writingMode: "vertical-rl", color: C.clayDeep, borderColor: C.clay }}
-        aria-hidden
-      >
-        {tag}
-      </span>
-      <div>
-        <p className="text-[14px] font-semibold md:hidden" style={{ color: C.clayDeep }}>
-          {tag}
+    <div>
+      <h2 id={id} className={`text-[28px] font-bold leading-[1.35] tracking-[-0.02em] md:text-[36px]`}>
+        {title}
+      </h2>
+      {desc && (
+        <p className="mt-3 max-w-[620px]" style={{ color: C.muted }}>
+          {desc}
         </p>
-        <h2 id={id} className={`text-[28px] font-bold leading-[1.35] tracking-[-0.02em] md:text-[36px]`}>
-          {title}
-        </h2>
-        {desc && (
-          <p className="mt-3 max-w-[620px]" style={{ color: C.muted }}>
-            {desc}
-          </p>
-        )}
-      </div>
+      )}
     </div>
   );
 }
 
 /* ---------- 수업 고르기 ---------- */
 
-function Blank<T extends string>({
-  value,
-  options,
-  onChange,
-  label,
-}: {
-  value: T;
-  options: { id: T; label: string }[];
-  onChange: (v: T) => void;
-  label: string;
-}) {
-  const [open, setOpen] = useState(false);
-  const reduce = useReducedMotionSafe();
-  const ref = useRef<HTMLSpanElement>(null);
-  const listId = useId();
-  const current = options.find((o) => o.id === value)!;
-
-  useEffect(() => {
-    if (!open) return;
-    const onDown = (e: MouseEvent) => {
-      if (ref.current && !ref.current.contains(e.target as Node)) setOpen(false);
-    };
-    const onKey = (e: KeyboardEvent) => e.key === "Escape" && setOpen(false);
-    document.addEventListener("mousedown", onDown);
-    window.addEventListener("keydown", onKey);
-    return () => {
-      document.removeEventListener("mousedown", onDown);
-      window.removeEventListener("keydown", onKey);
-    };
-  }, [open]);
-
-  return (
-    <span ref={ref} className="relative inline-block align-baseline">
-      <button
-        type="button"
-        aria-label={`${label}: ${current.label}`}
-        aria-expanded={open}
-        aria-controls={listId}
-        onClick={() => setOpen((v) => !v)}
-        className="relative inline-flex items-baseline gap-1 overflow-hidden border-b-2 px-1 pb-0.5"
-        style={{ borderColor: C.indigo, color: C.indigo }}
-      >
-        <AnimatePresence mode="popLayout" initial={false}>
-          <motion.span
-            key={current.id}
-            className="inline-block"
-            initial={reduce ? false : { y: "70%", opacity: 0 }}
-            animate={{ y: 0, opacity: 1 }}
-            exit={reduce ? { opacity: 0 } : { y: "-70%", opacity: 0 }}
-            transition={{ duration: 0.28, ease: EASE }}
-          >
-            {current.label}
-          </motion.span>
-        </AnimatePresence>
-        <ChevronDown size={18} className="self-center" aria-hidden />
-      </button>
-      {open && (
-        <ul
-          id={listId}
-          className="absolute left-0 top-full z-20 mt-2 w-max min-w-[220px] rounded-[10px] border py-1.5 font-sans text-[16px] shadow-lg"
-          style={{ background: "#fffdf9", borderColor: C.line }}
-        >
-          {options.map((o) => (
-            <li key={o.id}>
-              <button
-                type="button"
-                aria-pressed={o.id === value}
-                onClick={() => {
-                  onChange(o.id);
-                  setOpen(false);
-                }}
-                className="flex h-11 w-full items-center px-4 text-left hover:bg-[#ece6db]"
-                style={{ color: o.id === value ? C.indigo : C.ink, fontWeight: o.id === value ? 700 : 400 }}
-              >
-                {o.label}
-              </button>
-            </li>
-          ))}
-        </ul>
-      )}
-    </span>
-  );
-}
-
 function Finder({ onSchedule, onPrivate }: { onSchedule: (t: ClassType, level?: Level) => void; onPrivate: () => void }) {
-  const [mode, setMode] = useState<"sentence" | "list">("sentence");
-  const [part, setPart] = useState<Part>("back");
-  const [exp, setExp] = useState<Exp>("new");
+  const [mode, setMode] = useState<"quiz" | "list">("quiz");
+  const [step, setStep] = useState(0);
+  const [part, setPart] = useState<Part | null>(null);
+  const [exp, setExp] = useState<Exp | null>(null);
+  const [pref, setPref] = useState<Pref | null>(null);
   const reduce = useReducedMotionSafe();
-  const rec = recommend(part, exp);
-  const info = CLASS_INFO[rec.type];
+  const headingRef = useRef<HTMLHeadingElement>(null);
+  const moved = useRef(false);
+  const rec = part && exp && pref ? recommend(part, exp, pref) : null;
+  const info = rec ? CLASS_INFO[rec.type] : null;
+
+  // 카드를 넘기면 새 질문 제목으로 초점을 옮겨 키보드와 화면 읽기 사용자가 이어서 고를 수 있게 한다.
+  useEffect(() => {
+    if (!moved.current) return;
+    headingRef.current?.focus();
+  }, [step]);
+
+  const go = (next: number) => {
+    moved.current = true;
+    setStep(next);
+  };
+  const restart = () => {
+    setPart(null);
+    setExp(null);
+    setPref(null);
+    go(0);
+  };
+
+  const questions = [
+    { title: "어디가 불편하세요?", options: PART_OPTIONS, value: part, pick: (v: string) => setPart(v as Part) },
+    { title: "운동은 해 보셨어요?", options: EXP_OPTIONS, value: exp, pick: (v: string) => setExp(v as Exp) },
+    { title: "어떤 수업이 편하세요?", options: PREF_OPTIONS, value: pref, pick: (v: string) => setPref(v as Pref) },
+  ];
+  const q = step < questions.length ? questions[step] : null;
 
   return (
     <section aria-labelledby="find-title" id="find" className="scroll-mt-16 px-4 py-16 md:px-6 md:py-24">
       <div className="mx-auto max-w-[1200px]">
         <div className="flex flex-wrap items-end justify-between gap-4">
-          <SectionHead id="find-title" tag="수업 고르기" title="어떤 수업이 맞을까요?" />
+          <SectionHead id="find-title" title="어떤 수업이 맞을까요?" />
           <div className="inline-flex rounded-full border p-1" style={{ borderColor: C.line }} role="group" aria-label="보기 방식">
             {(
               [
-                { id: "sentence", label: "문장으로 고르기", icon: MessageSquareText },
+                { id: "quiz", label: "질문으로 고르기", icon: MessageSquareText },
                 { id: "list", label: "전체 수업 보기", icon: List },
               ] as const
             ).map((m) => (
@@ -678,60 +636,114 @@ function Finder({ onSchedule, onPrivate }: { onSchedule: (t: ClassType, level?: 
           </div>
         </div>
 
-        {mode === "sentence" ? (
-          <div className="mt-10 grid gap-10 md:grid-cols-[1.1fr_1fr] md:items-start md:gap-14">
-            <div className={`tracking-[-0.02em] font-semibold text-[26px] leading-[1.9] md:text-[34px]`}>
-              요즘 <Blank label="불편한 곳" value={part} options={PART_OPTIONS} onChange={setPart} />, 운동은{" "}
-              <Blank label="운동 경험" value={exp} options={EXP_OPTIONS} onChange={setExp} />.
-            </div>
+        {mode === "quiz" ? (
+          <div className="mt-10 max-w-[720px]">
+            <div className="rounded-[12px] border p-6 md:p-8" style={{ background: "#fffdf9", borderColor: C.line }}>
+              {q ? (
+                <>
+                  <p className="text-[15px]" style={{ color: C.muted }}>
+                    {step + 1} / {questions.length}
+                  </p>
+                  <h3 ref={headingRef} tabIndex={-1} className="mt-1 text-[24px] font-bold tracking-[-0.02em] outline-none md:text-[28px]">
+                    {q.title}
+                  </h3>
+                  <div className="mt-6 grid gap-2.5 sm:grid-cols-2" role="group" aria-label={q.title}>
+                    {q.options.map((o) => (
+                      <button
+                        key={o.id}
+                        type="button"
+                        aria-pressed={q.value === o.id}
+                        onClick={() => {
+                          q.pick(o.id);
+                          go(step + 1);
+                        }}
+                        className="flex h-14 items-center rounded-[10px] border px-5 text-left text-[17px] font-semibold transition-colors hover:bg-[#ece6db]"
+                        style={q.value === o.id ? { borderColor: C.indigo, color: C.indigo, boxShadow: `inset 0 0 0 1px ${C.indigo}` } : { borderColor: C.line }}
+                      >
+                        {o.label}
+                      </button>
+                    ))}
+                  </div>
+                </>
+              ) : (
+                rec &&
+                info && (
+                  <div aria-live="polite">
+                    <h3 ref={headingRef} tabIndex={-1} className="sr-only">
+                      추천 결과
+                    </h3>
+                    <motion.div
+                      key={`${rec.type}-${part}-${exp}-${pref}`}
+                      className="rounded-[12px] p-6 md:p-8"
+                      style={{ background: C.indigo, color: C.onIndigo }}
+                      initial={reduce ? false : { clipPath: "circle(0% at 0% 0%)" }}
+                      animate={{ clipPath: "circle(150% at 0% 0%)" }}
+                      transition={{ duration: 0.7, ease: EASE_INK }}
+                    >
+                      <p className="text-[14px]" style={{ color: "#b9c3d8" }}>
+                        추천 수업
+                      </p>
+                      <p className={`tracking-[-0.02em] mt-1 text-[28px] font-bold`}>
+                        {info.name}
+                        {rec.level && <span className="ml-2 align-middle text-[16px] font-medium">{rec.level}반</span>}
+                      </p>
+                      <ul className="mt-4 space-y-2.5">
+                        {rec.reasons.filter(Boolean).map((r) => (
+                          <li key={r} className="flex gap-2.5">
+                            <span className="mt-[0.7em] inline-block h-1.5 w-1.5 shrink-0 rounded-full" style={{ background: C.clay }} aria-hidden />
+                            <span>{r}</span>
+                          </li>
+                        ))}
+                      </ul>
+                      <p className="mt-4 text-[15px]" style={{ color: "#b9c3d8" }}>
+                        {info.from}
+                      </p>
+                      {rec.type === "private" ? (
+                        <button
+                          type="button"
+                          onClick={onPrivate}
+                          className="mt-6 inline-flex h-12 items-center rounded-full px-6 font-semibold"
+                          style={{ background: C.paper, color: C.indigo }}
+                        >
+                          1:1 체험 수업 신청
+                        </button>
+                      ) : (
+                        <button
+                          type="button"
+                          onClick={() => onSchedule(rec.type, rec.level)}
+                          className="mt-6 inline-flex h-12 items-center rounded-full px-6 font-semibold"
+                          style={{ background: C.paper, color: C.indigo }}
+                        >
+                          시간표에서 이 수업 보기
+                        </button>
+                      )}
+                    </motion.div>
+                  </div>
+                )
+              )}
 
-            <div aria-live="polite">
-              <motion.div
-                key={`${rec.type}-${part}-${exp}`}
-                className="rounded-[12px] p-6 md:p-8"
-                style={{ background: C.indigo, color: C.onIndigo }}
-                initial={reduce ? false : { clipPath: "circle(0% at 0% 0%)" }}
-                animate={{ clipPath: "circle(150% at 0% 0%)" }}
-                transition={{ duration: 0.7, ease: EASE_INK }}
-              >
-                <p className="text-[14px]" style={{ color: "#b9c3d8" }}>
-                  추천 수업
-                </p>
-                <p className={`tracking-[-0.02em] mt-1 text-[28px] font-bold`}>
-                  {info.name}
-                  {rec.level && <span className="ml-2 align-middle text-[16px] font-medium">{rec.level}반</span>}
-                </p>
-                <ul className="mt-4 space-y-2.5">
-                  {rec.reasons.filter(Boolean).map((r) => (
-                    <li key={r} className="flex gap-2.5">
-                      <span className="mt-[0.7em] inline-block h-1.5 w-1.5 shrink-0 rounded-full" style={{ background: C.clay }} aria-hidden />
-                      <span>{r}</span>
-                    </li>
-                  ))}
-                </ul>
-                <p className="mt-4 text-[15px]" style={{ color: "#b9c3d8" }}>
-                  {info.from}
-                </p>
-                {rec.type === "private" ? (
+              {step > 0 && (
+                <div className="mt-6 flex flex-wrap gap-2 border-t pt-5" style={{ borderColor: C.line }}>
                   <button
                     type="button"
-                    onClick={onPrivate}
-                    className="mt-6 inline-flex h-12 items-center rounded-full px-6 font-semibold"
-                    style={{ background: C.paper, color: C.indigo }}
+                    onClick={() => go(step - 1)}
+                    className="inline-flex h-11 items-center gap-1.5 rounded-full border px-4 text-[15px] font-semibold"
+                    style={{ borderColor: C.line, color: C.ink }}
                   >
-                    1:1 체험 수업 신청
+                    <ArrowLeft size={16} aria-hidden />
+                    이전으로
                   </button>
-                ) : (
                   <button
                     type="button"
-                    onClick={() => onSchedule(rec.type, rec.level)}
-                    className="mt-6 inline-flex h-12 items-center rounded-full px-6 font-semibold"
-                    style={{ background: C.paper, color: C.indigo }}
+                    onClick={restart}
+                    className="inline-flex h-11 items-center gap-1.5 rounded-full px-4 text-[15px] font-semibold"
+                    style={{ color: C.muted }}
                   >
-                    시간표에서 이 수업 보기
+                    <RotateCcw size={16} aria-hidden />
+                    처음부터 다시
                   </button>
-                )}
-              </motion.div>
+                </div>
+              )}
             </div>
           </div>
         ) : (
@@ -860,7 +872,6 @@ function Schedule({
       <div className="mx-auto max-w-[1200px]">
         <SectionHead
           id="schedule-title"
-          tag="시간표"
           title="이번 주 그룹 수업"
           desc="수업을 누르면 체험 수업을 신청할 수 있습니다. 점 하나가 자리 하나이고, 채워진 점은 이미 예약된 자리입니다. 1:1 수업은 시간표와 따로 원하는 시간에 잡습니다."
         />
@@ -1150,7 +1161,7 @@ function Pricing() {
   return (
     <section aria-labelledby="price-title" id="price" className="scroll-mt-16 px-4 py-16 md:px-6 md:py-24">
       <div className="mx-auto max-w-[1200px]">
-        <SectionHead id="price-title" tag="회원권" title="회원권 금액" desc="수업 형태와 횟수를 고르면 총액과 한 번에 드는 금액을 보여 드립니다." />
+        <SectionHead id="price-title" title="회원권 금액" desc="수업 형태와 횟수를 고르면 총액과 한 번에 드는 금액을 보여 드립니다." />
 
         <div className="mt-10 grid gap-10 md:grid-cols-[1fr_1.1fr] md:gap-16">
           <div className="space-y-7">
@@ -1251,7 +1262,7 @@ function Teachers() {
   return (
     <section aria-labelledby="teachers-title" id="teachers" className="scroll-mt-16 px-4 py-16 md:px-6 md:py-24" style={{ background: C.sand }}>
       <div className="mx-auto max-w-[1200px]">
-        <SectionHead id="teachers-title" tag="강사" title="가르치는 사람들" />
+        <SectionHead id="teachers-title" title="가르치는 사람들" />
         <div className="mt-10 grid gap-10 md:grid-cols-[1.15fr_1fr] md:items-center md:gap-16">
           <div className="relative aspect-[4/3] overflow-hidden rounded-[12px]">
             <Image src={`${IMG}/teacher.jpg`} alt="박○○ 원장" fill sizes="(min-width: 768px) 55vw, 100vw" className="object-cover" style={{ objectPosition: "50% 30%" }} />
@@ -1309,7 +1320,7 @@ function Space() {
   return (
     <section aria-labelledby="space-title" className="px-4 py-16 md:px-6 md:py-24">
       <div className="mx-auto max-w-[1200px]">
-        <SectionHead id="space-title" tag="공간" title="스튜디오 둘러보기" />
+        <SectionHead id="space-title" title="스튜디오 둘러보기" />
         <div className="mt-10 grid gap-6 md:grid-cols-[1.5fr_1fr] md:gap-8">
           <figure>
             <div className="relative aspect-[4/3] overflow-hidden rounded-[12px]">
@@ -1348,98 +1359,6 @@ function Space() {
   );
 }
 
-/* ---------- 오시는 길 ---------- */
-
-function MiniMap() {
-  return (
-    <svg viewBox="0 0 640 380" className="h-auto w-full" role="img" aria-label="□□역 3번 출구에서 스튜디오까지 가는 약도">
-      <rect width="640" height="380" fill="#fffdf9" />
-      <path d="M0 150 H640" stroke={C.line} strokeWidth="26" />
-      <path d="M380 0 V380" stroke={C.line} strokeWidth="22" />
-      <path d="M0 290 Q 200 260 640 320" stroke={C.indigoSoft} strokeWidth="18" fill="none" />
-      <text x="20" y="128" fontSize="15" fill={C.muted}>
-        □□로
-      </text>
-      <text x="392" y="30" fontSize="15" fill={C.muted}>
-        □□대로
-      </text>
-      <circle cx="150" cy="150" r="16" fill={C.indigo} />
-      <text x="150" y="155" fontSize="13" fill="#fff" textAnchor="middle" fontWeight="700">
-        3
-      </text>
-      <text x="112" y="196" fontSize="15" fill={C.ink}>
-        □□역 3번 출구
-      </text>
-      <path d="M168 150 H330" stroke={C.clay} strokeWidth="3" strokeDasharray="6 7" fill="none" />
-      <circle cx="330" cy="120" r="20" fill="none" stroke={C.indigo} strokeWidth="5" />
-      <circle cx="330" cy="120" r="5" fill={C.clay} />
-      <text x="262" y="82" fontSize="16" fill={C.ink} fontWeight="700">
-        □□빌딩 2층
-      </text>
-    </svg>
-  );
-}
-
-function Location({ status }: { status: Status }) {
-  return (
-    <section aria-labelledby="location-title" id="location" className="scroll-mt-16 px-4 py-16 md:px-6 md:py-24" style={{ background: C.sand }}>
-      <div className="mx-auto max-w-[1200px]">
-        <SectionHead id="location-title" tag="오시는 길" title="오시는 길과 운영시간" />
-        <div className="mt-10 grid gap-10 md:grid-cols-[1.2fr_1fr] md:gap-14">
-          <div className="overflow-hidden rounded-[12px] border" style={{ borderColor: C.line }}>
-            <MiniMap />
-          </div>
-          <div>
-            <p className={`tracking-[-0.02em] text-[22px] font-bold`}>{ADDRESS}</p>
-            <ul className="mt-5 space-y-4">
-              {[
-                { icon: TrainFront, title: "지하철", body: "□□역 3번 출구에서 180m, 걸어서 3분" },
-                { icon: Bus, title: "버스", body: "□□역 정류장 하차 (간선 300, 지선 5678)" },
-                { icon: Car, title: "주차", body: "건물 지하 주차장 2시간 무료, 안내 데스크에서 등록" },
-              ].map((r) => (
-                <li key={r.title} className="flex gap-3">
-                  <r.icon size={20} className="mt-1 shrink-0" style={{ color: C.indigo }} aria-hidden />
-                  <span>
-                    <span className="font-semibold">{r.title}</span>
-                    <span className="block text-[15px]" style={{ color: C.muted }}>
-                      {r.body}
-                    </span>
-                  </span>
-                </li>
-              ))}
-            </ul>
-            <table className="mt-7 w-full border-t text-[15px]" style={{ borderColor: C.line }}>
-              <caption className="sr-only">운영시간</caption>
-              <tbody>
-                {HOURS.map((h) => (
-                  <tr key={h.label} className="border-b" style={{ borderColor: C.line }}>
-                    <th scope="row" className="py-3 text-left font-normal" style={{ color: C.muted }}>
-                      {h.label}
-                    </th>
-                    <td className="py-3 text-right font-semibold">{h.time}</td>
-                  </tr>
-                ))}
-              </tbody>
-            </table>
-            {status && (
-              <p className="mt-3 text-[15px] font-semibold" style={{ color: status.open ? C.indigo : C.clayDeep }}>
-                {status.text}
-              </p>
-            )}
-            <a
-              href={`tel:${TEL}`}
-              className="mt-6 inline-flex h-12 items-center rounded-full px-6 font-semibold"
-              style={{ background: C.indigo, color: C.onIndigo }}
-            >
-              전화 문의 {TEL}
-            </a>
-          </div>
-        </div>
-      </div>
-    </section>
-  );
-}
-
 /* ---------- 바닥글 ---------- */
 
 function Footer() {
@@ -1447,6 +1366,10 @@ function Footer() {
     <footer className="px-4 pb-24 pt-12 md:px-6" style={{ background: C.indigo, color: C.onIndigo }}>
       <div className="mx-auto max-w-[1200px]">
         <Logo light />
+        <p className="mt-5 text-[16px] font-semibold">{ADDRESS} (□□역 3번 출구에서 걸어서 3분)</p>
+        <p className="mt-1 text-[15px]" style={{ color: "#b9c3d8" }}>
+          주차는 건물 지하 주차장 2시간 무료, 안내 데스크에서 차량 번호를 등록해 주세요.
+        </p>
         <dl className="mt-6 grid gap-x-8 gap-y-1.5 text-[14px] sm:grid-cols-2 md:grid-cols-3" style={{ color: "#b9c3d8" }}>
           {[
             ["상호", STUDIO],

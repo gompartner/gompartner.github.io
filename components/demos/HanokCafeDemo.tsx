@@ -3,7 +3,7 @@
 import { useMemo, useRef, useState, useSyncExternalStore } from "react";
 import Image from "next/image";
 import { AnimatePresence, motion } from "framer-motion";
-import { Car, Check, List, MapPin, Menu, Minus, Phone, Plus, RotateCcw, TrainFront, X } from "lucide-react";
+import { Check, List, Menu, Minus, Phone, Plus, RotateCcw, X } from "lucide-react";
 import { useReducedMotionSafe } from "@/hooks/useReducedMotionSafe";
 
 
@@ -217,17 +217,6 @@ function Seal({ lines, size = 64, className = "" }: { lines: string[]; size?: nu
   );
 }
 
-function SectionMark({ text }: { text: string }) {
-  return (
-    <p
-      className={`hidden text-[15px] tracking-[0.4em] text-[#a8432a] lg:block`}
-      style={{ writingMode: "vertical-rl" }}
-    >
-      {text}
-    </p>
-  );
-}
-
 function LogoMark() {
   return (
     <svg viewBox="0 0 40 40" className="h-9 w-9" aria-hidden>
@@ -361,13 +350,7 @@ function Hero({ status }: { status: ReturnType<typeof openStatus> }) {
     <section id="top" className="relative overflow-hidden">
       <div className="mx-auto grid max-w-[1200px] gap-8 px-4 pb-14 pt-10 sm:px-6 lg:min-h-[640px] lg:grid-cols-[minmax(0,5fr)_minmax(0,7fr)] lg:gap-0 lg:pb-0 lg:pt-0">
         <div className="relative z-10 flex flex-col justify-center lg:py-20 lg:pr-10">
-          <div className="flex items-start gap-5">
-            <p
-              className={`hidden pt-2 text-[15px] tracking-[0.45em] text-[#6b5a48] sm:block`}
-              style={{ writingMode: "vertical-rl" }}
-            >
-              □□동 골목 안 한옥
-            </p>
+          <div>
             <div>
               <h1 className={`text-[44px] font-bold leading-[1.2] tracking-[-0.02em] sm:text-[56px]`}>
                 ○○
@@ -526,7 +509,6 @@ function MenuSection() {
   return (
     <section id="menu" className="scroll-mt-16 border-t border-[#1f1b16]/10 py-20 lg:py-28">
       <div className="mx-auto flex max-w-[1200px] gap-10 px-4 sm:px-6">
-        <SectionMark text="차림표" />
         <div className="min-w-0 flex-1">
           <h2 className={`tracking-[-0.02em] text-[34px] font-bold leading-[1.3] sm:text-[40px]`}>오늘 많이 찾는 메뉴</h2>
           <p className="mt-3 text-[#5b5045]">10월부터 11월까지 홍시 빙수와 단호박 식혜를 함께 냅니다.</p>
@@ -639,10 +621,7 @@ function SpaceSection() {
             <Image src={`${IMG}/yard.jpg`} alt="기와지붕 아래 툇마루와 소나무가 있는 한옥 마당" fill sizes="(min-width:1024px) 58vw, 100vw" className="object-cover" />
           </div>
           <div>
-            <div className="flex items-start gap-4">
-              <p className={`text-[15px] tracking-[0.4em] text-[#d98b6f]`} style={{ writingMode: "vertical-rl" }}>
-                공간
-              </p>
+            <div>
               <div>
                 <h2 className={`tracking-[-0.02em] text-[32px] font-bold leading-[1.35] sm:text-[38px]`}>
                   마당을 가운데 둔
@@ -903,7 +882,6 @@ function ReserveSection({ minute }: { minute: number }) {
   return (
     <section id="reserve" className="scroll-mt-16 py-20 lg:py-28">
       <div className="mx-auto flex max-w-[1200px] gap-10 px-4 sm:px-6">
-        <SectionMark text="자리 예약" />
         <div className="min-w-0 flex-1">
           <h2 className={`tracking-[-0.02em] text-[34px] font-bold leading-[1.3] sm:text-[40px]`}>어디에 앉으시겠어요?</h2>
           <p className="mt-3 max-w-[40em] text-[#5b5045]">
@@ -1147,77 +1125,52 @@ function ReserveSection({ minute }: { minute: number }) {
 
 /* ---------- 오시는 길 ---------- */
 
-function MapSketch() {
-  return (
-    <svg viewBox="0 0 560 340" className="h-auto w-full" role="img" aria-label="□□역 2번 출구에서 찻집까지 가는 약도">
-      <rect width={560} height={340} fill="#f8f3ea" />
-      <path d="M0 250 H560" stroke="#cdbfa6" strokeWidth={34} />
-      <path d="M150 0 V340" stroke="#cdbfa6" strokeWidth={26} />
-      <path d="M150 140 H420 V90" stroke="#d9c9ac" strokeWidth={12} fill="none" />
-      <text x={20} y={240} fontSize={15} fill="#6b5a48">
-        □□로
-      </text>
-      <text x={160} y={28} fontSize={15} fill="#6b5a48">
-        12길
-      </text>
-      <rect x={90} y={268} width={120} height={40} rx={4} fill="#3f5a3c" />
-      <text x={150} y={294} fontSize={15} fill="#f3ede2" textAnchor="middle">
-        □□역 2번 출구
-      </text>
-      <path d="M150 268 V140 H420 V100" stroke="#a8432a" strokeWidth={3} strokeDasharray="7 6" fill="none" />
-      <rect x={370} y={40} width={100} height={60} rx={4} fill="#1f1b16" />
-      <text x={420} y={76} fontSize={16} fill="#f3ede2" textAnchor="middle" fontWeight={700}>
-        ○○ 찻집
-      </text>
-      <rect x={430} y={190} width={100} height={36} rx={4} fill="#e6dcc7" stroke="#b08850" />
-      <text x={480} y={213} fontSize={14} fill="#4a4036" textAnchor="middle">
-        공영주차장
-      </text>
-    </svg>
-  );
-}
+const WAY_STEPS = [
+  "□□역 2번 출구로 나와 왼쪽으로 50m 걸어요.",
+  "편의점을 끼고 12길 골목으로 들어가요.",
+  "세탁소를 지나 골목 끝에서 오른쪽으로 꺾어요.",
+  "파란 대문에 ○○ 현판이 걸린 집이 찻집이에요.",
+];
 
 function Location() {
-  const rows = [
-    { icon: TrainFront, title: "지하철", body: "□□역 2번 출구로 나와 12길 골목으로 걸어서 6분" },
-    { icon: Car, title: "주차", body: "전용 주차장이 없습니다. 옆 □□공영주차장을 이용하시면 2시간 할인권을 드립니다." },
-    { icon: Phone, title: "전화", body: `${TEL} (예약 변경, 단체 문의)` },
-  ];
   return (
     <section id="location" className="scroll-mt-16 border-t border-[#1f1b16]/10 py-20 lg:py-28">
-      <div className="mx-auto flex max-w-[1200px] gap-10 px-4 sm:px-6">
-        <SectionMark text="오시는 길" />
-        <div className="grid min-w-0 flex-1 gap-10 lg:grid-cols-2">
-          <div>
-            <h2 className={`tracking-[-0.02em] text-[34px] font-bold leading-[1.3] sm:text-[40px]`}>오시는 길</h2>
-            <p className="mt-4 flex items-start gap-2 text-[19px] font-semibold">
-              <MapPin size={20} className="mt-1 shrink-0 text-[#a8432a]" aria-hidden />
-              {ADDRESS}
-            </p>
-            <ul className="mt-6 space-y-5">
-              {rows.map((r) => (
-                <li key={r.title} className="flex gap-3">
-                  <r.icon size={20} className="mt-1 shrink-0 text-[#6b5a48]" aria-hidden />
-                  <div>
-                    <p className="text-[15px] font-semibold">{r.title}</p>
-                    <p className="text-[16px] text-[#4a4036]">{r.body}</p>
-                  </div>
-                </li>
-              ))}
-            </ul>
-            <BrushRule className="mt-8 h-2 w-full opacity-25" />
-            <dl className="mt-3 grid grid-cols-[96px_1fr] gap-y-2 text-[16px]">
-              <dt className="text-[#6b5a48]">화 ~ 일</dt>
-              <dd>11:00 ~ 21:00 (주문 마감 20:30)</dd>
-              <dt className="text-[#6b5a48]">월요일</dt>
-              <dd>쉽니다</dd>
-              <dt className="text-[#6b5a48]">명절</dt>
-              <dd>설, 추석 당일 쉽니다</dd>
-            </dl>
-          </div>
-          <div className="overflow-hidden rounded-[6px] border border-[#1f1b16]/12">
-            <MapSketch />
-          </div>
+      <div className="mx-auto grid max-w-[1200px] gap-12 px-4 sm:px-6 lg:grid-cols-[minmax(0,7fr)_minmax(0,5fr)] lg:gap-16">
+        <div>
+          <h2 className={`tracking-[-0.02em] text-[34px] font-bold leading-[1.3] sm:text-[40px]`}>골목 안쪽에 있어요</h2>
+          <p className="mt-3 text-[#5b5045]">지도 앱으로는 입구를 찾기 어렵습니다. 역에서 걸어서 6분이에요.</p>
+          <ol className="mt-8 border-t border-[#1f1b16]/15">
+            {WAY_STEPS.map((step, i) => (
+              <li key={step} className="flex items-baseline gap-4 border-b border-[#1f1b16]/15 py-4">
+                <span className="w-6 shrink-0 text-[20px] font-bold tabular-nums text-[#a8432a]">{i + 1}</span>
+                <span className="text-[17px] leading-[1.6]">{step}</span>
+              </li>
+            ))}
+          </ol>
+          <p className="mt-6 text-[16px] text-[#4a4036]">
+            전용 주차장이 없습니다. 골목 입구 □□공영주차장에 세우시면 2시간 할인권을 드려요.
+          </p>
+        </div>
+
+        <div className="lg:pt-2">
+          <p className="text-[17px] font-semibold">{ADDRESS}</p>
+          <BrushRule className="mt-5 h-2 w-full opacity-25" />
+          <dl className="mt-3 grid grid-cols-[96px_1fr] gap-y-2 text-[16px]">
+            <dt className="text-[#6b5a48]">화 ~ 일</dt>
+            <dd>11:00 ~ 21:00 (주문 마감 20:30)</dd>
+            <dt className="text-[#6b5a48]">월요일</dt>
+            <dd>쉽니다</dd>
+            <dt className="text-[#6b5a48]">명절</dt>
+            <dd>설, 추석 당일 쉽니다</dd>
+          </dl>
+          <a
+            href={`tel:${TEL}`}
+            className="mt-8 inline-flex h-12 items-center gap-2 rounded-[4px] bg-[#1f1b16] px-6 text-[16px] font-semibold text-[#f3ede2] transition-colors hover:bg-[#a8432a]"
+          >
+            <Phone size={17} aria-hidden />
+            {TEL}
+          </a>
+          <p className="mt-3 text-[15px] text-[#6b5a48]">골목에서 헤매시면 전화 주세요. 나가서 모셔 올게요.</p>
         </div>
       </div>
     </section>

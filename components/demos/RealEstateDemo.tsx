@@ -1,9 +1,9 @@
 "use client";
 
-import { useEffect, useRef, useState, useSyncExternalStore } from "react";
+import { useEffect, useRef, useState } from "react";
 import Image from "next/image";
 import { AnimatePresence, motion } from "framer-motion";
-import { CalendarDays, Car, Check, Layers, Menu, Phone, RotateCcw, TrainFront, X } from "lucide-react";
+import { Check, Layers, Menu, Phone, Plus, RotateCcw, X } from "lucide-react";
 import { useReducedMotionSafe } from "@/hooks/useReducedMotionSafe";
 
 /* 부동산 홈페이지 데모: 가상의 ○○ 공인중개사사무소.
@@ -17,7 +17,8 @@ import { useReducedMotionSafe } from "@/hooks/useReducedMotionSafe";
    같은 단지에 여러 건이 남으면 숫자 묶음으로 보여 준다. 목록에 마우스를 올리면 핀이, 핀을 누르면 목록이 함께 표시된다.
    매물 상세에는 면적, 층, 방향, 관리비와 함께 법정 상한 요율로 계산한 중개보수를 보여 준다.
    전세와 월세 비교는 보증금, 월세, 대출 금리, 예금 금리로 한 달에 실제로 드는 돈을 막대로 비교한다.
-   방문 예약은 지도에서 고른 매물이 자동으로 들어가고, 접수 화면에는 이름과 번호를 가려서 보여 준다.
+   보러 가기는 목록이나 상세에서 담은 매물(최대 3개)을 한 번에 신청한다. 담은 게 없으면 보고 있는 매물이 들어가고,
+   원하는 때와 전화번호만 받는다. 접수 화면에는 번호를 가려서 보여 준다.
 
    사진 출처(public/images/demo-realty):
    AI 생성(Z-Image-Turbo, Apache 2.0) hero, interior */
@@ -47,9 +48,8 @@ const EASE = [0.22, 1, 0.36, 1] as const;
 const NAV = [
   { id: "map", label: "지도로 매물 찾기" },
   { id: "compare", label: "전세·월세 비교" },
-  { id: "visit", label: "방문 예약" },
+  { id: "visit", label: "매물 보러 가기" },
   { id: "agent", label: "중개사 소개" },
-  { id: "location", label: "오시는 길" },
 ];
 
 /* ---------- 매물 ---------- */
@@ -217,21 +217,7 @@ function wonText(won: number) {
   return won % 10000 === 0 ? `${(won / 10000).toLocaleString("ko-KR")}만 원` : `${won.toLocaleString("ko-KR")}원`;
 }
 
-/* ---------- 이름, 번호 가리기 ---------- */
-
-const CHO = "ㄱㄲㄴㄷㄸㄹㅁㅂㅃㅅㅆㅇㅈㅉㅊㅋㅌㅍㅎ";
-
-/** 병원식 마스킹: 김하늘은 김ㅎ늘로 */
-function maskName(name: string) {
-  const chars = [...name.trim()];
-  if (chars.length < 2) return chars.join("");
-  const hide = (ch: string) => {
-    const code = ch.charCodeAt(0) - 0xac00;
-    return code >= 0 && code < 11172 ? CHO[Math.floor(code / 588)] : "*";
-  };
-  if (chars.length === 2) return chars[0] + hide(chars[1]);
-  return chars.map((ch, i) => (i === 0 || i === chars.length - 1 ? ch : hide(ch))).join("");
-}
+/* ---------- 번호 가리기 ---------- */
 
 function maskPhone(phone: string) {
   const digits = phone.replace(/\D/g, "");
@@ -242,20 +228,25 @@ const r2 = (n: number) => Math.round(n * 100) / 100;
 
 /* ---------- 페이지 ---------- */
 
+const BASKET_MAX = 3;
+
 export function RealEstateDemo() {
   const [selectedId, setSelectedId] = useState("a2");
   const [deal, setDeal] = useState<Deal | "all">("all");
+  const [basket, setBasket] = useState<string[]>([]);
+
+  const toggleBasket = (id: string) =>
+    setBasket((b) => (b.includes(id) ? b.filter((x) => x !== id) : b.length >= BASKET_MAX ? b : [...b, id]));
 
   return (
     <div className="min-h-screen overflow-x-clip text-[16px] leading-[1.7] md:text-[17px]" style={{ background: C.white, color: C.ink }}>
       <Header />
       <main>
         <Hero onDeal={setDeal} />
-        <MapSearch deal={deal} onDeal={setDeal} selectedId={selectedId} onSelect={setSelectedId} />
+        <MapSearch deal={deal} onDeal={setDeal} selectedId={selectedId} onSelect={setSelectedId} basket={basket} onToggle={toggleBasket} />
         <Compare />
-        <Visit selectedId={selectedId} onSelect={setSelectedId} />
+        <Visit selectedId={selectedId} basket={basket} onToggle={toggleBasket} onClear={() => setBasket([])} />
         <Agent />
-        <Location />
       </main>
       <Footer />
     </div>
@@ -405,13 +396,10 @@ function Hero({ onDeal }: { onDeal: (d: Deal) => void }) {
   );
 }
 
-function SectionHead({ id, tag, title, desc }: { id: string; tag: string; title: string; desc?: string }) {
+function SectionHead({ id, title, desc }: { id: string; title: string; desc?: string }) {
   return (
     <div>
-      <p className="text-[15px] font-bold" style={{ color: C.coralText }}>
-        {tag}
-      </p>
-      <h2 id={id} className="mt-1.5 text-[26px] font-bold leading-[1.35] tracking-[-0.03em] md:text-[34px]">
+      <h2 id={id} className="text-[26px] font-bold leading-[1.35] tracking-[-0.03em] md:text-[34px]">
         {title}
       </h2>
       {desc && (
@@ -555,11 +543,15 @@ function MapSearch({
   onDeal,
   selectedId,
   onSelect,
+  basket,
+  onToggle,
 }: {
   deal: Deal | "all";
   onDeal: (d: Deal | "all") => void;
   selectedId: string;
   onSelect: (id: string) => void;
+  basket: string[];
+  onToggle: (id: string) => void;
 }) {
   const reduce = useReducedMotionSafe();
   const [kind, setKind] = useState<Kind | "all">("all");
@@ -625,7 +617,6 @@ function MapSearch({
       <div className="mx-auto max-w-[1200px]">
         <SectionHead
           id="map-title"
-          tag="지도로 매물 찾기"
           title="□□동 매물을 지도에서 고르세요"
           desc="조건을 바꾸면 지도와 목록이 함께 바뀝니다. 같은 단지에 매물이 여러 건이면 숫자로 묶어 보여 드리고, 누르면 펼쳐집니다."
         />
@@ -821,12 +812,15 @@ function MapSearch({
             {visible.map((l) => {
               const selected = l.id === selectedId;
               const active = l.id === activeId;
+              const saved = basket.includes(l.id);
+              const full = !saved && basket.length >= BASKET_MAX;
               return (
                 <li
                   key={l.id}
                   ref={(el) => {
                     itemRefs.current[l.id] = el;
                   }}
+                  className="relative"
                 >
                   <button
                     type="button"
@@ -836,10 +830,10 @@ function MapSearch({
                     onMouseLeave={() => setHoverId(null)}
                     onFocus={() => setHoverId(l.id)}
                     onBlur={() => setHoverId(null)}
-                    className="block w-full rounded-[10px] border bg-white px-4 py-3 text-left transition-colors"
+                    className="block w-full rounded-[10px] border bg-white py-3 pl-4 pr-16 text-left transition-colors"
                     style={{ borderColor: selected ? C.ink : active ? C.coral : C.line, boxShadow: selected ? `inset 0 0 0 1px ${C.ink}` : "none" }}
                   >
-                    <span className="flex items-baseline justify-between gap-2">
+                    <span className="flex items-baseline gap-2">
                       <span className="text-[19px] font-bold tabular-nums tracking-[-0.02em]">{priceText(l)}</span>
                       <span className="shrink-0 text-[13px] font-semibold" style={{ color: C.muted }}>
                         {KIND_LABEL[l.kind]}
@@ -850,6 +844,7 @@ function MapSearch({
                       전용 {areaText(l.area, unit)} · {l.floor}층 · {l.dir} · □□역 도보 {l.walk}분
                     </span>
                   </button>
+                  <BasketButton saved={saved} full={full} name={l.name} onToggle={() => onToggle(l.id)} />
                 </li>
               );
             })}
@@ -864,9 +859,26 @@ function MapSearch({
           </ul>
         </div>
 
-        <Detail listing={LISTING_BY_ID[selectedId]} unit={unit} />
+        <Detail listing={LISTING_BY_ID[selectedId]} unit={unit} basket={basket} onToggle={onToggle} />
       </div>
     </section>
+  );
+}
+
+function BasketButton({ saved, full, name, onToggle }: { saved: boolean; full: boolean; name: string; onToggle: () => void }) {
+  return (
+    <button
+      type="button"
+      onClick={onToggle}
+      disabled={full}
+      aria-pressed={saved}
+      aria-label={saved ? `${name} 보러 갈 목록에서 빼기` : `${name} 보러 갈 목록에 담기`}
+      title={full ? `${BASKET_MAX}개까지 담을 수 있습니다` : saved ? "목록에서 빼기" : "보러 갈 목록에 담기"}
+      className="absolute right-3 top-1/2 inline-flex h-11 w-11 -translate-y-1/2 items-center justify-center rounded-full border transition-colors disabled:opacity-35"
+      style={saved ? { background: C.coral, borderColor: C.coral, color: "#fff" } : { background: "#fff", borderColor: C.line, color: C.ink }}
+    >
+      {saved ? <Check size={18} aria-hidden /> : <Plus size={18} aria-hidden />}
+    </button>
   );
 }
 
@@ -893,9 +905,11 @@ function StorePlan() {
   );
 }
 
-function Detail({ listing: l, unit }: { listing: Listing; unit: Unit }) {
+function Detail({ listing: l, unit, basket, onToggle }: { listing: Listing; unit: Unit; basket: string[]; onToggle: (id: string) => void }) {
   const reduce = useReducedMotionSafe();
   const fee = brokerFee(l);
+  const saved = basket.includes(l.id);
+  const full = !saved && basket.length >= BASKET_MAX;
 
   const rows: [string, string][] = [
     ["면적", `전용 ${areaText(l.area, unit)} / 공급 ${areaText(l.supply, unit)}`],
@@ -999,10 +1013,27 @@ function Detail({ listing: l, unit }: { listing: Listing; unit: Unit }) {
               )}
             </div>
 
-            <a href="#visit" className="mt-5 inline-flex h-12 items-center gap-2 rounded-[6px] px-5 font-semibold" style={{ background: C.ink, color: "#fff" }}>
-              <CalendarDays size={18} aria-hidden />
-              이 매물 보러 가기 예약
-            </a>
+            <div className="mt-5 flex flex-wrap items-center gap-x-4 gap-y-2">
+              <button
+                type="button"
+                onClick={() => onToggle(l.id)}
+                disabled={full}
+                aria-pressed={saved}
+                className="inline-flex h-12 items-center gap-2 rounded-[6px] border px-5 font-semibold disabled:opacity-40"
+                style={saved ? { background: "#fff", borderColor: C.ink, color: C.ink } : { background: C.ink, borderColor: C.ink, color: "#fff" }}
+              >
+                {saved ? <Check size={18} aria-hidden /> : <Plus size={18} aria-hidden />}
+                {saved ? "보러 갈 목록에 담김" : "보러 갈 목록에 담기"}
+              </button>
+              <a href="#visit" className="text-[15px] font-semibold underline underline-offset-4">
+                담은 매물 {basket.length}개 보기
+              </a>
+            </div>
+            {full && (
+              <p className="mt-2 text-[14px]" style={{ color: C.muted }}>
+                한 번에 {BASKET_MAX}개까지 보러 갈 수 있습니다. 담은 매물을 하나 빼 주세요.
+              </p>
+            )}
           </div>
         </motion.article>
       </AnimatePresence>
@@ -1085,7 +1116,6 @@ function Compare() {
       <div className="mx-auto max-w-[1200px]">
         <SectionHead
           id="compare-title"
-          tag="전세·월세 비교"
           title="한 달에 실제로 나가는 돈을 비교해 보세요"
           desc="전세는 대출 이자와 보증금으로 묶이는 내 돈의 예금 이자를, 월세는 월세에 보증금 몫을 더해 계산합니다."
         />
@@ -1177,144 +1207,119 @@ function Compare() {
   );
 }
 
-/* ---------- 방문 예약 ---------- */
+/* ---------- 매물 보러 가기 ---------- */
 
-const noopSubscribe = () => () => {};
-const DAY_NAMES = ["일", "월", "화", "수", "목", "금", "토"];
-const TIMES = ["10:00", "11:00", "13:00", "14:00", "15:00", "16:00", "17:00", "18:00"];
+const WHEN = ["평일 저녁", "토요일 오전", "토요일 오후", "상관없음"];
 
-/** 오늘 0시 시각. 서버 렌더에서는 -1을 돌려 날짜에 따른 화면 차이를 막는다. */
-function useToday() {
-  return useSyncExternalStore(
-    noopSubscribe,
-    () => {
-      const d = new Date();
-      d.setHours(0, 0, 0, 0);
-      return d.getTime();
-    },
-    () => -1,
-  );
-}
-
-function Visit({ selectedId, onSelect }: { selectedId: string; onSelect: (id: string) => void }) {
+function Visit({ selectedId, basket, onToggle, onClear }: { selectedId: string; basket: string[]; onToggle: (id: string) => void; onClear: () => void }) {
   const reduce = useReducedMotionSafe();
-  const today = useToday();
-  const [name, setName] = useState("");
   const [phone, setPhone] = useState("");
-  const [day, setDay] = useState<number | null>(null);
-  const [time, setTime] = useState<string | null>(null);
+  const [when, setWhen] = useState<string | null>(null);
   const [error, setError] = useState("");
-  const [done, setDone] = useState<{ name: string; phone: string; listing: string; when: string } | null>(null);
+  const [done, setDone] = useState<{ phone: string; listings: Listing[]; when: string } | null>(null);
 
-  // 내일부터 일요일을 빼고 6일
-  const days: Date[] = [];
-  if (today > 0) {
-    for (let i = 1; days.length < 6; i++) {
-      const d = new Date(today);
-      d.setDate(d.getDate() + i);
-      if (d.getDay() !== 0) days.push(d);
-    }
-  }
-  const dayLabel = (d: Date) => `${d.getMonth() + 1}월 ${d.getDate()}일 (${DAY_NAMES[d.getDay()]})`;
-  const pickedDay = day === null ? null : days.find((d) => d.getTime() === day) ?? null;
-  const saturday = pickedDay?.getDay() === 6;
-  const times = saturday ? TIMES.filter((t) => t <= "16:00") : TIMES;
-  const listing = LISTING_BY_ID[selectedId];
+  const fromBasket = basket.length > 0;
+  const picked = (fromBasket ? basket : [selectedId]).map((id) => LISTING_BY_ID[id]);
 
   const submit = (e: React.FormEvent) => {
     e.preventDefault();
-    if (name.trim().length < 2) return setError("이름을 두 글자 이상 적어 주세요.");
-    if (phone.replace(/\D/g, "").length < 10) return setError("연락받을 휴대전화 번호를 적어 주세요.");
-    if (!pickedDay || !time || !times.includes(time)) return setError("방문하실 날짜와 시간을 골라 주세요.");
+    if (!when) return setError("보러 가기 좋은 때를 골라 주세요.");
+    if (phone.replace(/\D/g, "").length < 10) return setError("문자 받을 휴대전화 번호를 적어 주세요.");
     setError("");
-    setDone({ name: maskName(name), phone: maskPhone(phone), listing: `${listing.name} ${priceText(listing)}`, when: `${dayLabel(pickedDay)} ${time}` });
+    setDone({ phone: maskPhone(phone), listings: picked, when });
   };
 
   const reset = () => {
     setDone(null);
-    setDay(null);
-    setTime(null);
+    setWhen(null);
+    onClear();
   };
-
-  const inputClass = "mt-1 h-12 w-full rounded-[6px] border bg-white px-3 outline-none focus:border-[#18202a]";
 
   return (
     <section aria-labelledby="visit-title" id="visit" className="scroll-mt-16 px-4 py-14 md:px-6 md:py-20" style={{ background: C.gray }}>
       <div className="mx-auto max-w-[1200px]">
         <SectionHead
           id="visit-title"
-          tag="매물 문의, 방문 예약"
-          title="보고 싶은 매물과 시간을 남겨 주세요"
-          desc="지도에서 고른 매물이 자동으로 들어갑니다. 집주인, 세입자와 시간을 맞춘 뒤 전화로 확정해 드립니다."
+          title="보고 싶은 매물을 담아 두고 한 번에 보러 오세요"
+          desc={`매물 목록이나 상세에서 담은 매물이 여기에 모입니다. ${BASKET_MAX}곳까지 같은 날 이어서 보여 드립니다.`}
         />
         <div className="mt-8 grid items-start gap-6 md:grid-cols-[1.15fr_1fr]">
-          <form onSubmit={submit} noValidate className="space-y-5 rounded-[12px] bg-white p-5 md:p-7">
-            <label className="block">
-              <span className="text-[15px] font-semibold">관심 매물</span>
-              <select value={selectedId} onChange={(e) => onSelect(e.target.value)} className={inputClass} style={{ borderColor: C.line }}>
-                {LISTINGS.map((l) => (
-                  <option key={l.id} value={l.id}>
-                    {l.name} {priceText(l)}
-                  </option>
+          <form onSubmit={submit} noValidate className="space-y-6 rounded-[12px] bg-white p-5 md:p-7">
+            <div>
+              <p className="flex items-baseline justify-between gap-3">
+                <span className="text-[15px] font-semibold">보러 갈 매물</span>
+                <span className="text-[14px] tabular-nums" style={{ color: C.muted }}>
+                  {fromBasket ? `${basket.length} / ${BASKET_MAX}` : "보고 있던 매물"}
+                </span>
+              </p>
+              <ul className="mt-2 space-y-2">
+                {picked.map((l) => (
+                  <li key={l.id} className="flex items-center gap-3 rounded-[10px] border py-3 pl-4 pr-2" style={{ borderColor: C.line }}>
+                    <span className="min-w-0 flex-1">
+                      <span className="block font-semibold">{l.name}</span>
+                      <span className="block text-[14px] tabular-nums" style={{ color: C.muted }}>
+                        {priceText(l)} · {l.floor}층 · {l.moveIn}
+                      </span>
+                    </span>
+                    {fromBasket && (
+                      <button
+                        type="button"
+                        onClick={() => onToggle(l.id)}
+                        disabled={!!done}
+                        aria-label={`${l.name} 빼기`}
+                        className="inline-flex h-11 w-11 shrink-0 items-center justify-center rounded-full disabled:opacity-40"
+                        style={{ color: C.muted }}
+                      >
+                        <X size={18} aria-hidden />
+                      </button>
+                    )}
+                  </li>
                 ))}
-              </select>
-            </label>
-            <div className="grid gap-4 sm:grid-cols-2">
-              <label className="block">
-                <span className="text-[15px] font-semibold">이름</span>
-                <input value={name} onChange={(e) => setName(e.target.value)} autoComplete="name" placeholder="김하늘" className={inputClass} style={{ borderColor: C.line }} />
-              </label>
-              <label className="block">
-                <span className="text-[15px] font-semibold">휴대전화</span>
-                <input value={phone} onChange={(e) => setPhone(e.target.value)} inputMode="tel" autoComplete="tel" placeholder="010-1234-5678" className={inputClass} style={{ borderColor: C.line }} />
-              </label>
-            </div>
-            <fieldset>
-              <legend className="text-[15px] font-semibold">희망 방문일</legend>
-              <div className="mt-1.5 grid grid-cols-2 gap-1.5 sm:grid-cols-3">
-                {days.map((d) => (
-                  <button
-                    key={d.getTime()}
-                    type="button"
-                    aria-pressed={day === d.getTime()}
-                    onClick={() => setDay(d.getTime())}
-                    className="h-11 rounded-[6px] border text-[15px] font-semibold tabular-nums"
-                    style={day === d.getTime() ? { background: C.ink, color: "#fff", borderColor: C.ink } : { borderColor: C.line }}
-                  >
-                    {dayLabel(d)}
-                  </button>
-                ))}
-              </div>
-            </fieldset>
-            <fieldset>
-              <legend className="text-[15px] font-semibold">희망 시간</legend>
-              <div className="mt-1.5 grid grid-cols-4 gap-1.5">
-                {times.map((t) => (
-                  <button
-                    key={t}
-                    type="button"
-                    aria-pressed={time === t}
-                    onClick={() => setTime(t)}
-                    className="h-11 rounded-[6px] border text-[15px] font-semibold tabular-nums"
-                    style={time === t ? { background: C.ink, color: "#fff", borderColor: C.ink } : { borderColor: C.line }}
-                  >
-                    {t}
-                  </button>
-                ))}
-              </div>
-              {saturday && (
-                <p className="mt-1.5 text-[14px]" style={{ color: C.muted }}>
-                  토요일은 16시까지 안내합니다.
-                </p>
+              </ul>
+              {basket.length < BASKET_MAX && (
+                <a href="#map" className="mt-2 inline-flex h-10 items-center gap-1.5 text-[15px] font-semibold" style={{ color: C.coralText }}>
+                  <Plus size={16} aria-hidden />
+                  지도에서 더 담기
+                </a>
               )}
+            </div>
+
+            <fieldset>
+              <legend className="text-[15px] font-semibold">보러 가기 좋은 때</legend>
+              <div className="mt-2 grid grid-cols-2 gap-1.5">
+                {WHEN.map((w) => (
+                  <label
+                    key={w}
+                    className="flex h-12 cursor-pointer items-center justify-center rounded-[6px] border text-[15px] font-semibold has-[:focus-visible]:outline has-[:focus-visible]:outline-2 has-[:focus-visible]:outline-offset-2"
+                    style={when === w ? { background: C.ink, color: "#fff", borderColor: C.ink } : { borderColor: C.line }}
+                  >
+                    <input type="radio" name="visit-when" value={w} checked={when === w} onChange={() => setWhen(w)} className="sr-only" />
+                    {w}
+                  </label>
+                ))}
+              </div>
             </fieldset>
+
+            <label className="block">
+              <span className="text-[15px] font-semibold">휴대전화</span>
+              <input
+                value={phone}
+                onChange={(e) => setPhone(e.target.value)}
+                inputMode="tel"
+                autoComplete="tel"
+                placeholder="010-1234-5678"
+                className="mt-1 h-12 w-full rounded-[6px] border bg-white px-3 outline-none focus:border-[#18202a]"
+                style={{ borderColor: C.line }}
+              />
+            </label>
+
             {error && (
               <p className="text-[15px] font-semibold" style={{ color: "#b3261e" }} role="alert">
                 {error}
               </p>
             )}
-            <button type="submit" disabled={!!done} className="h-13 w-full rounded-[6px] py-3.5 text-[17px] font-bold disabled:opacity-40" style={{ background: C.coral, color: "#fff" }}>
-              방문 예약 신청
+            <button type="submit" disabled={!!done} className="w-full rounded-[6px] py-3.5 text-[17px] font-bold disabled:opacity-40" style={{ background: C.coral, color: "#fff" }}>
+              {picked.length}곳 보러 가기 신청
             </button>
           </form>
 
@@ -1334,36 +1339,41 @@ function Visit({ selectedId, onSelect }: { selectedId: string; onSelect: (id: st
                     <span className="inline-flex h-8 w-8 items-center justify-center rounded-full" style={{ background: C.coral, color: "#fff" }}>
                       <Check size={18} aria-hidden />
                     </span>
-                    예약 신청을 받았습니다
+                    신청을 받았습니다
                   </p>
-                  <dl className="mt-5 text-[15px]">
-                    {[
-                      ["신청인", done.name],
-                      ["연락처", done.phone],
-                      ["매물", done.listing],
-                      ["방문 희망", done.when],
-                    ].map(([k, v]) => (
-                      <div key={k} className="flex justify-between gap-4 border-t py-2.5" style={{ borderColor: C.line }}>
-                        <dt style={{ color: C.muted }}>{k}</dt>
-                        <dd className="text-right font-semibold">{v}</dd>
-                      </div>
-                    ))}
+                  <p className="mt-3">중개사가 집주인과 시간을 맞춘 뒤 문자로 알려 드립니다.</p>
+                  <dl className="mt-4 text-[15px]">
+                    <div className="flex justify-between gap-4 border-t py-2.5" style={{ borderColor: C.line }}>
+                      <dt style={{ color: C.muted }}>원하는 때</dt>
+                      <dd className="text-right font-semibold">{done.when}</dd>
+                    </div>
+                    <div className="flex justify-between gap-4 border-t py-2.5" style={{ borderColor: C.line }}>
+                      <dt style={{ color: C.muted }}>문자 받을 번호</dt>
+                      <dd className="text-right font-semibold tabular-nums">{done.phone}</dd>
+                    </div>
+                    <div className="flex justify-between gap-4 border-t py-2.5" style={{ borderColor: C.line }}>
+                      <dt style={{ color: C.muted }}>매물</dt>
+                      <dd className="text-right font-semibold">
+                        {done.listings.map((l) => (
+                          <span key={l.id} className="block">
+                            {l.name}
+                          </span>
+                        ))}
+                      </dd>
+                    </div>
                   </dl>
-                  <p className="mt-3 text-[15px]" style={{ color: C.muted }}>
-                    오늘 안에 {TEL}로 전화를 드려 시간을 확정합니다.
-                  </p>
                   <button type="button" onClick={reset} className="mt-4 inline-flex h-10 items-center gap-1.5 text-[15px] font-semibold">
                     <RotateCcw size={16} aria-hidden />
-                    다른 매물 예약
+                    새로 담기
                   </button>
                 </motion.div>
               ) : (
                 <motion.div key="how" exit={{ opacity: 0 }} className="rounded-[12px] bg-white p-6">
-                  <p className="font-bold">방문 전에 알아 두시면 좋아요</p>
+                  <p className="font-bold">보러 오시는 날 챙겨 드려요</p>
                   <ul className="mt-3 space-y-3 text-[15px]">
                     {[
-                      ["등기부등본", "방문하시는 날 최신 등기부등본을 함께 확인해 드립니다."],
-                      ["전세라면", "전세보증보험 가입이 되는지 미리 알아보고 안내합니다."],
+                      ["등기부등본", "매물마다 최신 등기부등본을 뽑아 함께 봅니다."],
+                      ["전세라면", "전세보증보험 가입이 되는지 미리 알아봐 둡니다."],
                       ["주차", "사무소 앞 상가 주차장을 1시간 쓰실 수 있습니다."],
                     ].map(([t, d]) => (
                       <li key={t}>
@@ -1399,7 +1409,7 @@ function Agent() {
   return (
     <section aria-labelledby="agent-title" id="agent" className="scroll-mt-16 px-4 py-14 md:px-6 md:py-20">
       <div className="mx-auto max-w-[1200px]">
-        <SectionHead id="agent-title" tag="중개사 소개" title="□□동에서 15년째 중개하고 있습니다" />
+        <SectionHead id="agent-title" title="□□동에서 15년째 중개하고 있습니다" />
         <div className="mt-8 grid items-start gap-6 md:grid-cols-[1fr_1.2fr]">
           <div className="rounded-[12px] border p-5 md:p-7" style={{ borderColor: C.line }}>
             <div className="flex items-center gap-4">
@@ -1418,7 +1428,9 @@ function Agent() {
               {[
                 ["중개사무소 등록번호", REG_NO],
                 ["손해배상책임 보장", "△△공제 2억 원"],
-                ["상담", "평일 09:30 ~ 19:00, 토요일 10:00 ~ 17:00"],
+                ["사무소", ADDRESS],
+                ["찾아오기", "□□역 2번 출구에서 걸어서 3분, 상가 주차장 1시간 무료"],
+                ["상담", "평일 09:30 ~ 19:00, 토요일 10:00 ~ 17:00, 일요일은 예약하신 분만"],
               ].map(([k, v]) => (
                 <div key={k} className="flex flex-wrap justify-between gap-x-4 border-t py-2.5" style={{ borderColor: C.line }}>
                   <dt style={{ color: C.muted }}>{k}</dt>
@@ -1450,103 +1462,6 @@ function Agent() {
                 </li>
               ))}
             </ul>
-          </div>
-        </div>
-      </div>
-    </section>
-  );
-}
-
-/* ---------- 오시는 길 ---------- */
-
-function MiniMap() {
-  return (
-    <svg viewBox="0 0 640 360" className="h-auto w-full" role="img" aria-label="□□역 2번 출구에서 □□로를 따라 걸어 □□아파트 상가 1층 사무소까지 가는 약도">
-      <rect width="640" height="360" fill={C.gray} />
-      <path d="M0 150 H640" stroke="#fff" strokeWidth="32" />
-      <path d="M200 0 V360" stroke="#fff" strokeWidth="24" />
-      <text x="520" y="186" fontSize="15" fill={C.muted}>
-        □□로
-      </text>
-      <rect x="160" y="133" width="80" height="34" rx="17" fill={C.ink} />
-      <text x="200" y="155" fontSize="14" fill="#fff" textAnchor="middle" fontWeight={700}>
-        □□역
-      </text>
-      <circle cx="252" cy="182" r="13" fill={C.ink} />
-      <text x="252" y="187" fontSize="13" fill="#fff" textAnchor="middle" fontWeight={700}>
-        2
-      </text>
-      <path d="M266 186 H400 V214" stroke={C.coral} strokeWidth="3" strokeDasharray="6 7" fill="none" />
-      <rect x="330" y="214" width="220" height="110" rx="6" fill={C.grayDeep} />
-      <text x="440" y="244" fontSize="14" fill={C.muted} textAnchor="middle">
-        □□아파트 상가
-      </text>
-      <rect x="350" y="262" width="80" height="44" rx="4" fill={C.coral} />
-      <text x="390" y="289" fontSize="13" fill="#fff" textAnchor="middle" fontWeight={700}>
-        105호
-      </text>
-      <text x="442" y="290" fontSize="15" fill={C.ink} fontWeight={700}>
-        1층 사무소
-      </text>
-      <rect x="330" y="30" width="220" height="90" rx="6" fill={C.grayDeep} />
-      {[350, 420, 490].map((x) => (
-        <rect key={x} x={x} y="50" width="44" height="50" rx="3" fill="#cdd5de" />
-      ))}
-      <text x="40" y="60" fontSize="14" fill={C.muted}>
-        □□아파트
-      </text>
-    </svg>
-  );
-}
-
-function Location() {
-  return (
-    <section aria-labelledby="location-title" id="location" className="scroll-mt-16 px-4 py-14 md:px-6 md:py-20" style={{ background: C.gray }}>
-      <div className="mx-auto max-w-[1200px]">
-        <SectionHead id="location-title" tag="오시는 길" title="□□역 2번 출구에서 걸어서 3분" />
-        <div className="mt-8 grid gap-8 md:grid-cols-[1.2fr_1fr] md:gap-12">
-          <div className="overflow-hidden rounded-[12px] border bg-white" style={{ borderColor: C.line }}>
-            <MiniMap />
-          </div>
-          <div>
-            <p className="text-[20px] font-bold leading-[1.5] tracking-[-0.02em]">{ADDRESS}</p>
-            <ul className="mt-5 space-y-4">
-              {[
-                { icon: TrainFront, title: "지하철", body: "□□역 2번 출구로 나와 □□로를 따라 150m, □□아파트 상가 1층" },
-                { icon: Car, title: "주차", body: "상가 주차장에 세우시고 사무소에서 주차권을 받아 가세요. 1시간 무료입니다." },
-              ].map((r) => (
-                <li key={r.title} className="flex gap-3">
-                  <r.icon size={20} className="mt-1 shrink-0" style={{ color: C.coralText }} aria-hidden />
-                  <span>
-                    <span className="font-semibold">{r.title}</span>
-                    <span className="block text-[15px]" style={{ color: C.muted }}>
-                      {r.body}
-                    </span>
-                  </span>
-                </li>
-              ))}
-            </ul>
-            <table className="mt-6 w-full text-[15px]">
-              <caption className="pb-1 text-left font-bold">상담 시간</caption>
-              <tbody>
-                {[
-                  ["평일", "09:30 ~ 19:00"],
-                  ["토요일", "10:00 ~ 17:00"],
-                  ["일요일, 공휴일", "예약하신 분만 안내"],
-                ].map(([k, v]) => (
-                  <tr key={k} className="border-t" style={{ borderColor: C.line }}>
-                    <th scope="row" className="py-2.5 text-left font-normal" style={{ color: C.muted }}>
-                      {k}
-                    </th>
-                    <td className="py-2.5 text-right font-semibold">{v}</td>
-                  </tr>
-                ))}
-              </tbody>
-            </table>
-            <a href={`tel:${TEL}`} className="mt-6 inline-flex h-12 items-center gap-2 rounded-[6px] px-6 font-semibold" style={{ background: C.ink, color: "#fff" }}>
-              <Phone size={18} aria-hidden />
-              전화 {TEL}
-            </a>
           </div>
         </div>
       </div>

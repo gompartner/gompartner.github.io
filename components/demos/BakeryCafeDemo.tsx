@@ -428,13 +428,10 @@ function Hero({ clock }: { clock: Clock }) {
   );
 }
 
-function SectionHead({ id, tag, title, desc }: { id: string; tag: string; title: string; desc?: string }) {
+function SectionHead({ id, title, desc }: { id: string; title: string; desc?: string }) {
   return (
     <div>
-      <p className="inline-block rounded-full px-3 py-1 text-[14px] font-semibold" style={{ background: C.butterSoft, color: C.crustDeep }}>
-        {tag}
-      </p>
-      <h2 id={id} className="mt-3 text-[28px] font-bold leading-[1.35] tracking-[-0.03em] md:text-[38px]">
+      <h2 id={id} className="text-[28px] font-bold leading-[1.35] tracking-[-0.03em] md:text-[38px]">
         {title}
       </h2>
       {desc && (
@@ -591,7 +588,6 @@ function Oven({ clock: realClock, onAdd }: { clock: Clock; onAdd: (id: string) =
       <div className="mx-auto max-w-[1200px]">
         <SectionHead
           id="oven-title"
-          tag="빵 나오는 시간"
           title="오늘은 어떤 빵이 언제 나올까요"
           desc="시계 한 바퀴가 아침 8시부터 저녁 8시까지입니다. 바늘이 지나간 점은 이미 나온 빵이고, 점을 누르면 남은 개수를 볼 수 있습니다."
         />
@@ -918,7 +914,6 @@ function Order({
       <div className="mx-auto max-w-[1200px]">
         <SectionHead
           id="order-title"
-          tag="미리 담기"
           title="쟁반에 담아 두면 따로 챙겨 둘게요"
           desc="찾으러 오실 시간은 고른 빵이 처음 나오는 시간 뒤로만 고를 수 있습니다. 값은 가게에서 치릅니다."
         />
@@ -1247,7 +1242,7 @@ function Story() {
           <Image src={`${IMG}/display.jpg`} alt="크루아상, 깜파뉴, 크림빵, 과일 타르트가 놓인 진열대" fill sizes="(min-width: 768px) 50vw, 100vw" className="object-cover" />
         </div>
         <div>
-          <SectionHead id="story-title" tag="가게 이야기" title="그날 구운 빵만 팝니다" />
+          <SectionHead id="story-title" title="그날 구운 빵만 팝니다" />
           <dl className="mt-8 space-y-6">
             {[
               ["새벽 4시", "두 사람이 반죽을 시작합니다. 깜파뉴 반죽은 이틀 전에 미리 만들어 둡니다."],
@@ -1313,7 +1308,7 @@ function Location({ clock }: { clock: Clock }) {
   return (
     <section aria-labelledby="location-title" id="location" className="scroll-mt-16 px-4 py-16 md:px-6 md:py-24" style={{ background: C.kraft }}>
       <div className="mx-auto max-w-[1200px]">
-        <SectionHead id="location-title" tag="오시는 길" title="오시는 길과 영업시간" />
+        <SectionHead id="location-title" title="오시는 길과 영업시간" />
         <div className="mt-10 grid gap-10 md:grid-cols-[1.2fr_1fr] md:gap-14">
           <div className="overflow-hidden rounded-[12px] border" style={{ borderColor: C.line }}>
             <MiniMap />

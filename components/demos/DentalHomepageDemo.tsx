@@ -3,7 +3,7 @@
 import { useEffect, useMemo, useRef, useState, useSyncExternalStore } from "react";
 import Image from "next/image";
 import { AnimatePresence, motion } from "framer-motion";
-import { Bus, Car, ChevronRight, Menu, Moon, Phone, TrainFront, X } from "lucide-react";
+import { ChevronRight, Menu, Moon, Phone, X } from "lucide-react";
 import { useReducedMotionSafe } from "@/hooks/useReducedMotionSafe";
 
 /* 치과 홈페이지 데모: 가상의 ○○치과의원.
@@ -49,7 +49,6 @@ const NAV = [
   { id: "doctors", label: "의료진" },
   { id: "fees", label: "비급여 안내" },
   { id: "reserve", label: "진료시간·예약" },
-  { id: "location", label: "오시는 길" },
 ]
 
 type TreatmentId = "implant" | "ortho" | "caries" | "endo" | "scaling" | "whitening" | "wisdom" | "check";
@@ -607,47 +606,6 @@ export function DentalHomepageDemo() {
         </section>
 
         <Reservation treatment={reserveTreatment} onTreatment={setReserveTreatment} />
-
-        {/* 오시는 길 */}
-        <section id="location" className="scroll-mt-16">
-          <div className={`${container} grid gap-8 py-16 md:py-24 lg:grid-cols-12`}>
-            <div className="lg:col-span-7">
-              <h2 className={heading}>오시는 길</h2>
-              <div className="mt-8 overflow-hidden rounded-[12px]" style={{ boxShadow: `inset 0 0 0 1px ${C.line}` }}>
-                <MapIllustration />
-              </div>
-            </div>
-            <div className="lg:col-span-5 lg:pt-[76px]">
-              <p className="text-[22px] font-bold tracking-[-0.03em]">{ADDRESS}</p>
-              <p className="mt-1" style={{ color: C.muted }}>
-                대표전화 {TEL}
-              </p>
-              <ul className="mt-6 border-t" style={{ borderColor: C.line }}>
-                {[
-                  { icon: TrainFront, title: "지하철", body: "□□역 4번 출구에서 200m, 도보 3분" },
-                  { icon: Bus, title: "버스", body: "□□타워 정류장 하차 (간선 200, 지선 4567)" },
-                  { icon: Car, title: "주차", body: "건물 지하 2~4층, 진료 시 2시간 무료" },
-                ].map(({ icon: Icon, title, body }) => (
-                  <li key={title} className="flex gap-3 border-b py-4" style={{ borderColor: C.line }}>
-                    <Icon size={20} className="mt-0.5 shrink-0" style={{ color: C.accent }} aria-hidden />
-                    <span>
-                      <b className="block">{title}</b>
-                      <span style={{ color: C.muted }}>{body}</span>
-                    </span>
-                  </li>
-                ))}
-              </ul>
-              <Image
-                src={`${IMG}/lobby.jpg`}
-                alt="○○치과의원 대기실"
-                width={1400}
-                height={910}
-                sizes="(min-width:1024px) 480px, 100vw"
-                className="mt-6 aspect-[16/10] w-full rounded-[10px] object-cover"
-              />
-            </div>
-          </div>
-        </section>
       </main>
 
       <footer style={{ backgroundColor: C.ink, color: C.onInkMuted }}>
@@ -809,10 +767,7 @@ function ToothMap({ onReserve }: { onReserve: (id: TreatmentId) => void }) {
     <section id="map" className="scroll-mt-16" style={{ backgroundColor: C.mist }}>
       <div className={`${container} grid gap-8 py-10 md:py-14 lg:grid-cols-12 lg:gap-12`}>
         <div className="lg:col-span-6">
-          <p className="text-[17px] font-bold" style={{ color: C.accent }}>
-            증상별 안내
-          </p>
-          <h2 className="mt-2 text-[32px] font-bold leading-[1.2] tracking-[-0.045em] md:text-[44px]">어디가 불편하세요?</h2>
+          <h2 className="text-[32px] font-bold leading-[1.2] tracking-[-0.045em] md:text-[44px]">어디가 불편하세요?</h2>
           <p className="mt-3 text-[19px]" style={{ color: C.muted }}>
             불편한 치아를 누르면 필요한 진료와 비용을 알려 드립니다.
           </p>
@@ -1111,7 +1066,7 @@ function Reservation({ treatment, onTreatment }: { treatment: TreatmentId; onTre
           <p className="mt-4" style={{ color: C.muted }}>
             신청하시면 진료 시간 안에 확인 전화를 드리고, 통화 후 예약이 확정됩니다. 당일 예약은 전화로 문의해 주세요.
           </p>
-<ReserveHours />
+          <ReserveHours />
         </div>
 
         <div className="rounded-[12px] border bg-white p-5 md:p-8 lg:col-span-8" style={{ borderColor: C.line }}>
@@ -1353,6 +1308,16 @@ function ReserveHours() {
           {status.text}
         </p>
       )}
+      <dl className="mt-8 border-t pt-4 text-[16px]" style={{ borderColor: C.line }}>
+        <div className="flex gap-3">
+          <dt className="w-10 shrink-0 font-bold">주소</dt>
+          <dd>{ADDRESS} (□□역 4번 출구에서 걸어서 3분)</dd>
+        </div>
+        <div className="mt-2 flex gap-3">
+          <dt className="w-10 shrink-0 font-bold">주차</dt>
+          <dd>건물 지하 2~4층, 진료 시 2시간 무료</dd>
+        </div>
+      </dl>
     </div>
   );
 }
@@ -1368,40 +1333,3 @@ function ToothMark() {
   );
 }
 
-function MapIllustration() {
-  return (
-    <svg viewBox="0 0 640 380" className="h-auto w-full" role="img" aria-label="□□역 4번 출구와 병원 위치 약도">
-      <rect width="640" height="380" fill="#f3f8f7" />
-      {[
-        [30, 30, 180, 120],
-        [250, 30, 150, 120],
-        [440, 30, 170, 120],
-        [30, 210, 180, 140],
-        [250, 210, 150, 140],
-      ].map(([x, y, w, h], i) => (
-        <rect key={i} x={x} y={y} width={w} height={h} rx="10" fill="#e1ecea" />
-      ))}
-      <rect x="440" y="210" width="170" height="140" rx="10" fill="#bfdcd8" />
-      <rect x="0" y="160" width="640" height="40" fill="#ffffff" />
-      <rect x="215" y="0" width="30" height="380" fill="#ffffff" />
-      <rect x="405" y="0" width="30" height="380" fill="#ffffff" />
-      <line x1="0" y1="180" x2="640" y2="180" stroke="#c9d9d7" strokeWidth="2" strokeDasharray="12 10" />
-      <text x="20" y="152" fontSize="15" fill="#4f6261">□□로</text>
-      <g transform="translate(320 186)">
-        <rect x="-44" y="18" width="88" height="30" rx="6" fill="#10302f" />
-        <text x="0" y="39" fontSize="15" fontWeight="700" fill="#eef6f5" textAnchor="middle">
-          4번 출구
-        </text>
-      </g>
-      <text x="262" y="300" fontSize="15" fill="#4f6261">□□역</text>
-      <path d="M364 204 L420 204 L470 226" fill="none" stroke="#0b6664" strokeWidth="3" strokeDasharray="6 6" />
-      <g transform="translate(525 268)">
-        <path d="M0 -44 C-22 -44 -30 -26 -30 -16 C-30 6 0 30 0 30 C0 30 30 6 30 -16 C30 -26 22 -44 0 -44 Z" fill="#0b6664" />
-        <circle cx="0" cy="-16" r="11" fill="#ffffff" />
-      </g>
-      <text x="525" y="326" fontSize="15" fontWeight="700" fill="#10302f" textAnchor="middle">
-        □□타워 3층
-      </text>
-    </svg>
-  );
-}

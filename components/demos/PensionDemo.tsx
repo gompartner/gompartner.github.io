@@ -519,16 +519,10 @@ function Hero({ today }: { today: number }) {
   );
 }
 
-function SectionHead({ id, tag, title, desc, light = false }: { id: string; tag: string; title: string; desc?: string; light?: boolean }) {
+function SectionHead({ id, title, desc, light = false }: { id: string; title: string; desc?: string; light?: boolean }) {
   return (
     <div>
-      <p className="flex items-center gap-2 text-[15px] font-bold" style={{ color: light ? C.coral : C.coralDeep }}>
-        <svg width="22" height="8" viewBox="0 0 22 8" aria-hidden>
-          <path d="M1 5 Q4 1 7 5 T13 5 T19 5" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" />
-        </svg>
-        {tag}
-      </p>
-      <h2 id={id} className="mt-1.5 text-[28px] font-bold leading-[1.35] tracking-[-0.03em] md:text-[38px]" style={{ color: light ? C.white : C.navy }}>
+      <h2 id={id} className="text-[28px] font-bold leading-[1.35] tracking-[-0.03em] md:text-[38px]" style={{ color: light ? C.white : C.navy }}>
         {title}
       </h2>
       {desc && (
@@ -750,7 +744,6 @@ function Rooms({ roomId, onRoom, checkIn, checkOut }: { roomId: string; onRoom: 
       <div className="mx-auto max-w-[1200px]">
         <SectionHead
           id="rooms-title"
-          tag="객실 배치도"
           title="바다 쪽 세 칸, 정원 쪽 세 칸"
           desc="그림에서 객실을 누르면 자세한 내용이 나와요. 날짜를 고르고 오면 그날 마감된 객실은 회색으로 보입니다."
         />
@@ -896,7 +889,6 @@ function Booking({ today, roomId, onRoom, checkIn, checkOut, setCheckIn, setChec
       <div className="mx-auto max-w-[1200px]">
         <SectionHead
           id="booking-title"
-          tag="날짜·요금"
           title="날짜를 고르면 빈 방과 요금이 나와요"
           desc="입실일을 누르고 퇴실일을 누르세요. 마우스로는 끌어서 고를 수도 있습니다. 칸에 적힌 숫자는 그날 밤 남은 방 수예요."
         />
@@ -1602,7 +1594,7 @@ function Guide({ today, checkIn }: { today: number; checkIn: number | null }) {
   return (
     <section aria-labelledby="guide-title" id="guide" className="scroll-mt-16 px-4 py-16 md:px-6 md:py-24" style={{ background: C.navy }}>
       <div className="mx-auto max-w-[1200px]">
-        <SectionHead id="guide-title" tag="이용 안내" title="오시기 전에 봐 주세요" light />
+        <SectionHead id="guide-title" title="오시기 전에 봐 주세요" light />
         <div className="mt-10 grid items-start gap-8 lg:grid-cols-[1.2fr_1fr]">
           <ul className="grid gap-3 sm:grid-cols-2">
             {rules.map((r) => (
@@ -1674,7 +1666,7 @@ function Around() {
   return (
     <section aria-labelledby="around-title" id="around" className="scroll-mt-16 px-4 py-16 md:px-6 md:py-24">
       <div className="mx-auto max-w-[1200px]">
-        <SectionHead id="around-title" tag="주변 즐길 거리" title="걸어서, 차로 가까운 곳" />
+        <SectionHead id="around-title" title="걸어서, 차로 가까운 곳" />
         <ul className="mt-10 grid gap-3 sm:grid-cols-2 lg:grid-cols-5">
           {places.map((p, i) => (
             <motion.li
@@ -1759,7 +1751,7 @@ function Location() {
   return (
     <section aria-labelledby="location-title" id="location" className="scroll-mt-16 px-4 py-16 md:px-6 md:py-24" style={{ background: C.sandSoft }}>
       <div className="mx-auto max-w-[1200px]">
-        <SectionHead id="location-title" tag="오시는 길" title="□□ 해수욕장 바로 앞이에요" />
+        <SectionHead id="location-title" title="□□ 해수욕장 바로 앞이에요" />
         <div className="mt-10 grid gap-10 md:grid-cols-[1.2fr_1fr] md:gap-14">
           <div className="overflow-hidden rounded-[20px] border" style={{ borderColor: C.line }}>
             <MiniMap />

@@ -3,7 +3,7 @@
 import { createContext, useContext, useEffect, useRef, useState } from "react";
 import Image from "next/image";
 import { AnimatePresence, motion } from "framer-motion";
-import { BadgeCheck, Bus, Car, Check, CircleAlert, Clock, FileUp, Menu, RotateCcw, Trash2, Truck, X } from "lucide-react";
+import { BadgeCheck, Check, CircleAlert, FileUp, Menu, RotateCcw, Trash2, X } from "lucide-react";
 import { useReducedMotionSafe } from "@/hooks/useReducedMotionSafe";
 
 /* 기업 홈페이지 데모: 가상의 (주)○○정밀, CNC 정밀 가공 제조업체.
@@ -89,7 +89,6 @@ const KO = {
   btnCheck: "가공 가능 여부 확인",
   btnQuote: "견적 문의",
 
-  aboutTag: "회사 소개",
   aboutTitle: "2009년부터 정밀 부품 가공 한 가지만 해 왔습니다",
   aboutBody: [
     "머시닝센터 두 대로 시작해 지금은 5축 가공기와 항온 가공실, 3차원 측정실을 갖추고 있습니다.",
@@ -103,7 +102,6 @@ const KO = {
     { k: "거래처", u: "곳" },
   ],
 
-  checkTag: "가공 범위 확인",
   checkTitle: "도면 보내기 전에 가공할 수 있는지 먼저 보세요",
   checkDesc: "소재와 크기, 공차, 수량을 넣으면 어느 설비에서 가공할지와 대략적인 납기가 나옵니다. 정확한 판단은 도면을 보고 드립니다.",
   shape: "형태",
@@ -144,7 +142,6 @@ const KO = {
   rThin: "가장 얇은 쪽이 3mm보다 얇아 가공 중 휨을 먼저 확인해야 합니다.",
   rQty: "500개가 넘는 수량은 양산 일정과 단가를 따로 협의합니다.",
 
-  eqTag: "보유 설비",
   eqTitle: "공정별 보유 설비",
   eqDesc: "모든 가공기는 해마다 정도 검사를 받고, 측정기는 공인 교정기관에서 교정합니다.",
   eqFilter: "설비 종류",
@@ -154,18 +151,15 @@ const KO = {
   eqTotal: (n: number) => `${n}대`,
   eqSum: (n: number) => `선택한 종류 ${n}대`,
 
-  prTag: "생산 품목",
   prTitle: "지금 만들고 있는 부품",
   prDesc: "고객사 도면은 공개하지 않아 품목과 사양만 적었습니다.",
   prFilter: "산업 분류",
   prCats: { all: "전체", semi: "반도체 장비", medical: "의료기기", battery: "2차전지 장비", robot: "로봇·자동화" } as Record<PrCat | "all", string>,
   prRows: { material: "소재", tol: "공차", machine: "설비", qty: "수량" },
 
-  hiTag: "연혁·인증",
   hiTitle: "연혁",
   certTitle: "인증 현황",
 
-  qTag: "견적 문의",
   qTitle: "도면을 보내 주시면 견적을 드립니다",
   qDesc: `영업일 기준 하루 안에 담당 엔지니어가 연락드립니다. 급한 건은 ${TEL}로 전화 주세요.`,
   fCompany: "회사명",
@@ -201,17 +195,22 @@ const KO = {
   noFile: "첨부 없음",
   again: "새 문의 쓰기",
 
-  locTag: "오시는 길",
-  locTitle: "□□산업단지 3블록에 있습니다",
+  locTitle: "납품·방문 안내",
   address: "□□시 □□구 □□산단로 00",
-  hours: "평일 08:30 ~ 17:30, 토·일·공휴일 휴무",
-  routes: [
-    { k: "자가용", v: "□□IC에서 나와 산단로를 따라 10분. 공장 정문 옆 방문 주차장을 쓰시면 됩니다." },
-    { k: "대중교통", v: "□□역에서 00번 버스를 타고 □□산업단지 3블록 정류장에서 내려 200m" },
-    { k: "납품 차량", v: "2번 화물 출입구로 들어오세요. 5톤 화물차까지 하역할 수 있습니다." },
+  hours: "사무실 평일 08:30 ~ 17:30, 토·일·공휴일 휴무",
+  navKey: "내비게이션 검색어",
+  navQuery: "○○정밀 □□공장",
+  truck: "화물차 납품",
+  truckBody: "산단로 쪽 2번 게이트로 들어와 공장 뒤 하역장에 대 주세요. 5톤 화물차까지 지게차로 내립니다.",
+  dockCaption: "하역장 운영 시간",
+  dockHead: ["요일", "시간", "참고"],
+  dockRows: [
+    ["평일", "08:30 ~ 17:00", "점심 12:00 ~ 13:00 하역 쉼"],
+    ["토요일", "09:00 ~ 12:00", "전날까지 예약한 차량만"],
+    ["일요일·공휴일", "하역 없음", ""],
   ],
-  map: { name: "(주)○○정밀", ic: "□□IC", stop: "3블록 정류장", road: "□□산단로", gate: "2번 화물 출입구", block: "3블록" },
-  mapLabel: "□□IC에서 산단로를 따라 들어와 3블록 정류장 앞에 있는 공장 약도",
+  car: "승용차 방문",
+  carBody: "정문으로 들어와 오른쪽 방문 주차장에 대 주세요. 경비실에서 방문증을 받으시면 됩니다.",
 
   foot: { name: "상호", ceo: "대표", biz: "사업자등록번호", addr: "주소", tel: "전화", fax: "팩스", email: "이메일" },
   ceo: "김○○",
@@ -242,7 +241,6 @@ const EN: Dict = {
   btnCheck: "Check machinability",
   btnQuote: "Request a quote",
 
-  aboutTag: "About us",
   aboutTitle: "Precision machining is all we have done since 2009",
   aboutBody: [
     "We started with two machining centers. Today we run 5-axis machines, a temperature-controlled machining room and a CMM room.",
@@ -256,7 +254,6 @@ const EN: Dict = {
     { k: "Customers", u: "" },
   ],
 
-  checkTag: "Machinability",
   checkTitle: "Check whether we can make it before sending drawings",
   checkDesc: "Enter material, size, tolerance and quantity to see which machine would be used and a rough lead time. Final review is done with your drawing.",
   shape: "Shape",
@@ -297,7 +294,6 @@ const EN: Dict = {
   rThin: "The thinnest side is under 3 mm, so distortion during machining must be checked first.",
   rQty: "Quantities over 500 need a separate schedule and price agreement.",
 
-  eqTag: "Equipment",
   eqTitle: "Equipment by process",
   eqDesc: "All machines are checked for accuracy every year, and measuring instruments are calibrated by an accredited lab.",
   eqFilter: "Equipment type",
@@ -307,18 +303,15 @@ const EN: Dict = {
   eqTotal: (n: number) => `${n}`,
   eqSum: (n: number) => `${n} units in this type`,
 
-  prTag: "Products",
   prTitle: "Parts we are making now",
   prDesc: "Customer drawings are confidential, so only part names and specifications are listed.",
   prFilter: "Industry",
   prCats: { all: "All", semi: "Semiconductor", medical: "Medical", battery: "Battery equipment", robot: "Robotics" },
   prRows: { material: "Material", tol: "Tolerance", machine: "Machine", qty: "Quantity" },
 
-  hiTag: "History",
   hiTitle: "Company history",
   certTitle: "Certifications",
 
-  qTag: "Request a quote",
   qTitle: "Send us your drawing for a quotation",
   qDesc: `An engineer will contact you within one business day. For urgent requests, call ${TEL}.`,
   fCompany: "Company",
@@ -354,17 +347,22 @@ const EN: Dict = {
   noFile: "No file",
   again: "Write a new request",
 
-  locTag: "Location",
-  locTitle: "Block 3, □□ Industrial Complex",
+  locTitle: "Deliveries and visits",
   address: "00 □□sandan-ro, □□-gu, □□-si",
-  hours: "Weekdays 08:30 to 17:30, closed on weekends and holidays",
-  routes: [
-    { k: "By car", v: "10 minutes from □□ IC along Sandan-ro. Visitor parking is next to the main gate." },
-    { k: "By bus", v: "Bus 00 from □□ Station, get off at the Block 3 stop and walk 200 m." },
-    { k: "Deliveries", v: "Use freight gate 2. Trucks up to 5 tons can unload." },
+  hours: "Office open weekdays 08:30 to 17:30, closed on weekends and holidays",
+  navKey: "Navigation search",
+  navQuery: "○○정밀 □□공장",
+  truck: "Truck deliveries",
+  truckBody: "Enter through gate 2 on Sandan-ro and park at the loading dock behind the plant. We unload trucks up to 5 tons by forklift.",
+  dockCaption: "Loading dock hours",
+  dockHead: ["Day", "Hours", "Note"],
+  dockRows: [
+    ["Weekdays", "08:30 to 17:00", "No unloading 12:00 to 13:00"],
+    ["Saturday", "09:00 to 12:00", "Booked by the day before only"],
+    ["Sun, holidays", "Closed", ""],
   ],
-  map: { name: "○○ Precision", ic: "□□ IC", stop: "Block 3 stop", road: "Sandan-ro", gate: "Freight gate 2", block: "Block 3" },
-  mapLabel: "Map showing the factory in front of the Block 3 bus stop, reached from □□ IC along Sandan-ro",
+  car: "Visiting by car",
+  carBody: "Come in through the main gate and use the visitor lot on the right. Pick up a visitor pass at the guard house.",
 
   foot: { name: "Company", ceo: "CEO", biz: "Business reg. no.", addr: "Address", tel: "Tel", fax: "Fax", email: "Email" },
   ceo: "Kim ○○",
@@ -424,7 +422,7 @@ export function CompanyDemo() {
           <Products />
           <History />
           <Quote memo={memo} setMemo={setMemo} />
-          <Location />
+          <Visit />
         </main>
         <Footer />
       </div>
@@ -576,8 +574,7 @@ function Hero() {
       <div className="mx-auto max-w-[1200px]">
         <div className="grid items-center gap-10 md:grid-cols-[1fr_1.15fr] md:gap-12">
           <div>
-            <p className="inline-flex items-center gap-2 text-[15px] font-bold" style={{ color: C.orange }}>
-              <span className="h-2 w-2" style={{ background: C.orange }} aria-hidden />
+            <p className="text-[15px] font-bold" style={{ color: C.orange }}>
               {t.heroTag}
             </p>
             <h1 className="mt-3 text-[36px] font-bold leading-[1.25] tracking-[-0.03em] md:text-[52px]">{t.company}</h1>
@@ -621,14 +618,10 @@ function Hero() {
   );
 }
 
-function SectionHead({ id, tag, title, desc, dark = false }: { id: string; tag: string; title: string; desc?: string; dark?: boolean }) {
+function SectionHead({ id, title, desc, dark = false }: { id: string; title: string; desc?: string; dark?: boolean }) {
   return (
     <div>
-      <p className="inline-flex items-center gap-2 text-[15px] font-bold" style={{ color: dark ? C.orange : C.orangeText }}>
-        <span className="h-2 w-2" style={{ background: C.orange }} aria-hidden />
-        {tag}
-      </p>
-      <h2 id={id} className="mt-2 text-[27px] font-bold leading-[1.35] tracking-[-0.03em] md:text-[36px]">
+      <h2 id={id} className="text-[27px] font-bold leading-[1.35] tracking-[-0.03em] md:text-[36px]">
         {title}
       </h2>
       {desc && (
@@ -675,7 +668,7 @@ function About() {
     <section aria-labelledby="about-title" id="about" className="scroll-mt-16 px-4 py-16 md:px-6 md:py-24">
       <div className="mx-auto grid max-w-[1200px] items-start gap-10 md:grid-cols-[1.1fr_1fr] md:gap-14">
         <div>
-          <SectionHead id="about-title" tag={t.aboutTag} title={t.aboutTitle} />
+          <SectionHead id="about-title" title={t.aboutTitle} />
           <div className="mt-5 space-y-3" style={{ color: C.muted }}>
             {t.aboutBody.map((p) => (
               <p key={p}>{p}</p>
@@ -977,7 +970,7 @@ function Checker({ onQuote }: { onQuote: (s: string) => void }) {
   return (
     <section aria-labelledby="check-title" id="check" className="scroll-mt-16 px-4 py-16 md:px-6 md:py-24" style={{ background: C.gray, ...GRID_LIGHT }}>
       <div className="mx-auto max-w-[1200px]">
-        <SectionHead id="check-title" tag={t.checkTag} title={t.checkTitle} desc={t.checkDesc} />
+        <SectionHead id="check-title" title={t.checkTitle} desc={t.checkDesc} />
 
         <div className="mt-10 grid items-start gap-6 lg:grid-cols-[1fr_1.1fr]">
           <div className="space-y-6 rounded-[6px] border bg-white p-5 md:p-7" style={{ borderColor: C.line }}>
@@ -1138,7 +1131,7 @@ function Equipment() {
   return (
     <section aria-labelledby="equipment-title" id="equipment" className="scroll-mt-16 px-4 py-16 md:px-6 md:py-24">
       <div className="mx-auto max-w-[1200px]">
-        <SectionHead id="equipment-title" tag={t.eqTag} title={t.eqTitle} desc={t.eqDesc} />
+        <SectionHead id="equipment-title" title={t.eqTitle} desc={t.eqDesc} />
         <div className="mt-8 flex flex-wrap items-center justify-between gap-3">
           <div role="group" aria-label={t.eqFilter} className="flex flex-wrap gap-2">
             {(["all", "mc", "fiveAx", "lathe", "cmm"] as const).map((k) => (
@@ -1220,7 +1213,7 @@ function Products() {
   return (
     <section aria-labelledby="products-title" id="products" className="scroll-mt-16 px-4 py-16 md:px-6 md:py-24" style={{ background: C.gray, ...GRID_LIGHT }}>
       <div className="mx-auto max-w-[1200px]">
-        <SectionHead id="products-title" tag={t.prTag} title={t.prTitle} desc={t.prDesc} />
+        <SectionHead id="products-title" title={t.prTitle} desc={t.prDesc} />
         <div role="group" aria-label={t.prFilter} className="mt-8 flex flex-wrap gap-2">
           {(["all", "semi", "medical", "battery", "robot"] as const).map((k) => (
             <button
@@ -1304,7 +1297,7 @@ function History() {
   return (
     <section aria-labelledby="history-title" id="history" className="scroll-mt-16 px-4 py-16 md:px-6 md:py-24" style={{ background: C.steel, color: C.white, ...GRID_DARK }}>
       <div className="mx-auto max-w-[1200px]">
-        <SectionHead id="history-title" tag={t.hiTag} title={t.hiTitle} dark />
+        <SectionHead id="history-title" title={t.hiTitle} dark />
 
         <ol className="mt-10 lg:mt-14 lg:grid lg:grid-cols-8">
           {HISTORY.map((h, i) => (
@@ -1468,7 +1461,7 @@ function Quote({ memo, setMemo }: { memo: string; setMemo: (s: string) => void }
     <section aria-labelledby="quote-title" id="quote" className="scroll-mt-16 px-4 py-16 md:px-6 md:py-24">
       <div className="mx-auto grid max-w-[1200px] items-start gap-10 lg:grid-cols-[0.8fr_1.2fr] lg:gap-14">
         <div>
-          <SectionHead id="quote-title" tag={t.qTag} title={t.qTitle} desc={t.qDesc} />
+          <SectionHead id="quote-title" title={t.qTitle} desc={t.qDesc} />
           <dl className="mt-8 border-l border-t text-[15px]" style={{ borderColor: C.line }}>
             {(
               [
@@ -1650,100 +1643,71 @@ function Quote({ memo, setMemo }: { memo: string; setMemo: (s: string) => void }
   );
 }
 
-/* ---------- 오시는 길 ---------- */
+/* ---------- 납품·방문 안내 ---------- */
 
-function MiniMap() {
+function Visit() {
   const { t } = useLang();
-  const blocks = [
-    [40, 40, 120, 90],
-    [180, 40, 120, 90],
-    [40, 230, 120, 90],
-    [180, 230, 120, 90],
-    [480, 230, 120, 90],
-    [480, 40, 120, 90],
-  ];
   return (
-    <svg viewBox="0 0 640 360" className="h-auto w-full" role="img" aria-label={t.mapLabel}>
-      <rect width="640" height="360" fill={C.gray} />
-      <g stroke={C.grid} strokeWidth="1">
-        {Array.from({ length: 21 }, (_, i) => (
-          <path key={`v${i}`} d={`M${i * 32} 0 V360`} />
-        ))}
-        {Array.from({ length: 12 }, (_, i) => (
-          <path key={`h${i}`} d={`M0 ${i * 32} H640`} />
-        ))}
-      </g>
-      <path d="M0 180 H640" stroke={C.white} strokeWidth="34" />
-      <path d="M0 180 H640" stroke={C.line} strokeWidth="1" strokeDasharray="12 10" />
-      <path d="M320 0 V360" stroke={C.white} strokeWidth="24" />
-      <text x="20" y="171" fontSize="14" fill={C.muted}>
-        {t.map.road}
-      </text>
-      {blocks.map(([x, y, w, h]) => (
-        <rect key={`${x}-${y}`} x={x} y={y} width={w} height={h} rx="3" fill="#dfe2e6" stroke={C.line} />
-      ))}
-      <rect x="350" y="40" width="110" height="90" rx="3" fill={C.steel} />
-      <rect x="350" y="40" width="110" height="6" fill={C.orange} />
-      <text x="405" y="92" fontSize="14" fill={C.white} textAnchor="middle" fontWeight={700}>
-        {t.map.name}
-      </text>
-      <rect x="440" y="128" width="20" height="12" fill={C.orange} />
-      <text x="470" y="140" fontSize="12" fill={C.ink}>
-        {t.map.gate}
-      </text>
-      <rect x="360" y="206" width="78" height="22" rx="3" fill={C.white} stroke={C.steel} />
-      <text x="399" y="221" fontSize="12" fill={C.ink} textAnchor="middle">
-        {t.map.stop}
-      </text>
-      <path d="M600 180 L620 180" stroke={C.orange} strokeWidth="3" />
-      <rect x="566" y="322" width="62" height="26" rx="3" fill={C.steel} />
-      <text x="597" y="340" fontSize="13" fill={C.white} textAnchor="middle" fontWeight={700}>
-        {t.map.ic}
-      </text>
-      <path d="M597 322 V196 H460" stroke={C.orange} strokeWidth="3" strokeDasharray="7 6" fill="none" />
-      <text x="190" y="290" fontSize="13" fill={C.muted}>
-        {t.map.block}
-      </text>
-    </svg>
-  );
-}
-
-function Location() {
-  const { t } = useLang();
-  const icons = [Car, Bus, Truck];
-  return (
-    <section aria-labelledby="location-title" id="location" className="scroll-mt-16 px-4 py-16 md:px-6 md:py-24" style={{ background: C.gray }}>
+    <section aria-labelledby="visit-title" id="visit" className="scroll-mt-16 px-4 py-16 md:px-6 md:py-24" style={{ background: C.gray }}>
       <div className="mx-auto max-w-[1200px]">
-        <SectionHead id="location-title" tag={t.locTag} title={t.locTitle} />
-        <div className="mt-10 grid gap-10 md:grid-cols-[1.2fr_1fr] md:gap-14">
-          <div className="overflow-hidden rounded-[4px] border" style={{ borderColor: C.line }}>
-            <MiniMap />
-          </div>
+        <SectionHead id="visit-title" title={t.locTitle} />
+        <div className="mt-10 grid items-start gap-10 md:grid-cols-[1fr_1.3fr] md:gap-14">
           <div>
             <p className="text-[21px] font-bold tracking-[-0.02em]">{t.address}</p>
-            <p className="mt-2 inline-flex items-center gap-1.5 text-[15px]" style={{ color: C.muted }}>
-              <Clock size={16} aria-hidden />
+            <dl className="mt-4 grid gap-1 text-[15px]">
+              <div className="flex flex-wrap gap-x-2">
+                <dt style={{ color: C.muted }}>{t.navKey}</dt>
+                <dd className="font-bold">{t.navQuery}</dd>
+              </div>
+            </dl>
+            <p className="mt-1 text-[15px]" style={{ color: C.muted }}>
               {t.hours}
             </p>
-            <ul className="mt-6 space-y-4">
-              {t.routes.map((r, i) => {
-                const Icon = icons[i];
-                return (
-                  <li key={r.k} className="flex gap-3">
-                    <Icon size={20} className="mt-1 shrink-0" style={{ color: C.orangeText }} aria-hidden />
-                    <span>
-                      <span className="font-bold">{r.k}</span>
-                      <span className="block text-[15px]" style={{ color: C.muted }}>
-                        {r.v}
-                      </span>
-                    </span>
-                  </li>
-                );
-              })}
-            </ul>
             <a href={`tel:${TEL}`} className="mt-7 inline-flex h-12 items-center rounded-[4px] px-6 font-bold tabular-nums" style={{ background: C.steel, color: C.white }}>
               {t.call} {TEL}
             </a>
+          </div>
+
+          <div className="grid gap-8">
+            <div>
+              <h3 className="text-[19px] font-bold tracking-[-0.02em]">{t.truck}</h3>
+              <p className="mt-1.5" style={{ color: C.muted }}>
+                {t.truckBody}
+              </p>
+              <div className="mt-4 overflow-x-auto rounded-[4px] border bg-white" style={{ borderColor: C.line }}>
+                <table className="w-full min-w-[420px] text-left text-[15px]">
+                  <caption className="sr-only">{t.dockCaption}</caption>
+                  <thead>
+                    <tr style={{ background: C.steel, color: C.white }}>
+                      {t.dockHead.map((h) => (
+                        <th key={h} scope="col" className="px-4 py-2.5 font-bold">
+                          {h}
+                        </th>
+                      ))}
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {t.dockRows.map(([day, time, note]) => (
+                      <tr key={day} className="border-t" style={{ borderColor: C.line }}>
+                        <th scope="row" className="px-4 py-3 font-bold">
+                          {day}
+                        </th>
+                        <td className="px-4 py-3 tabular-nums">{time}</td>
+                        <td className="px-4 py-3" style={{ color: C.muted }}>
+                          {note}
+                        </td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              </div>
+            </div>
+            <div className="border-t pt-7" style={{ borderColor: C.line }}>
+              <h3 className="text-[19px] font-bold tracking-[-0.02em]">{t.car}</h3>
+              <p className="mt-1.5" style={{ color: C.muted }}>
+                {t.carBody}
+              </p>
+            </div>
           </div>
         </div>
       </div>

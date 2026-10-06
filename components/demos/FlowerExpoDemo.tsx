@@ -344,10 +344,10 @@ function Flower({
 }
 
 /** 섹션 제목. 화면에 들어오면 옆의 꽃이 핀다 */
-function SectionTitle({ id, eyebrow, title, color = C.pink }: { id: string; eyebrow: string; title: string; color?: string }) {
+function SectionTitle({ id, title, color = C.pink }: { id: string; title: string; color?: string }) {
   const reduce = useReducedMotionSafe();
   return (
-    <div className="flex items-end gap-3">
+    <div className="flex items-center gap-3">
       <motion.div
         className="shrink-0"
         initial={reduce ? false : { rotate: -60, scale: 0.3 }}
@@ -357,14 +357,9 @@ function SectionTitle({ id, eyebrow, title, color = C.pink }: { id: string; eyeb
       >
         <Flower size={44} color={color} />
       </motion.div>
-      <div>
-        <p className="text-[15px] font-semibold" style={{ color: C.pinkText }}>
-          {eyebrow}
-        </p>
-        <h2 id={`${id}-title`} className={`font-bold tracking-[-0.03em] mt-1 text-[28px] leading-tight md:text-[36px]`} style={{ color: C.green }}>
-          {title}
-        </h2>
-      </div>
+      <h2 id={`${id}-title`} className={`font-bold tracking-[-0.03em] text-[28px] leading-tight md:text-[36px]`} style={{ color: C.green }}>
+        {title}
+      </h2>
     </div>
   );
 }
@@ -557,7 +552,7 @@ function BloomSection() {
     <section id="bloom" className="py-16 md:py-24" aria-labelledby="bloom-title">
       <div className="mx-auto max-w-[1200px] px-4 md:px-6">
         <div className="flex flex-col gap-6 md:flex-row md:items-end md:justify-between">
-          <SectionTitle id="bloom" eyebrow="개화 예상" title="이 주에는 어떤 꽃이 피었을까요" />
+          <SectionTitle id="bloom" title="이 주에는 어떤 꽃이 피었을까요" />
           <div role="tablist" aria-label="주 선택" className="flex gap-2 overflow-x-auto">
             {BLOOM_WEEKS.map((w, i) => (
               <button
@@ -636,7 +631,7 @@ function InfoSection() {
   return (
     <section id="info" className="py-16 md:py-24" style={{ background: C.greenSoft }} aria-labelledby="info-title">
       <div className="mx-auto max-w-[1200px] px-4 md:px-6">
-        <SectionTitle id="info" eyebrow="관람 안내" title="운영시간과 입장료" color={C.yellow} />
+        <SectionTitle id="info" title="운영시간과 입장료" color={C.yellow} />
 
         <div className="mt-10 grid gap-6 lg:grid-cols-[1fr_1.1fr]">
           <div className="rounded-3xl bg-white p-6 md:p-8">
@@ -991,7 +986,7 @@ function MapSection() {
     <section id="map" className="py-16 md:py-24" aria-labelledby="map-title">
       <div className="mx-auto max-w-[1200px] px-4 md:px-6">
         <div className="flex flex-col gap-6 md:flex-row md:items-end md:justify-between">
-          <SectionTitle id="map" eyebrow="전시 구역" title="호수를 한 바퀴 돌며 보는 여섯 구역" color="#7b8fd6" />
+          <SectionTitle id="map" title="호수를 한 바퀴 돌며 보는 여섯 구역" color="#7b8fd6" />
           <div role="tablist" aria-label="보기 방식" className="inline-flex self-start rounded-full border bg-white p-1" style={{ borderColor: C.line }}>
             {(
               [
@@ -1114,7 +1109,7 @@ function ProgramSection({ today }: { today: number }) {
   return (
     <section id="program" className="py-16 md:py-24" style={{ background: C.yellowSoft }} aria-labelledby="program-title">
       <div className="mx-auto max-w-[1200px] px-4 md:px-6">
-        <SectionTitle id="program" eyebrow="프로그램" title="날짜별 공연과 체험" />
+        <SectionTitle id="program" title="날짜별 공연과 체험" />
 
         <div className="-mx-4 mt-8 overflow-x-auto px-4 pb-2 md:mx-0 md:px-0">
           <div role="tablist" aria-label="날짜 선택" className="flex gap-2">
@@ -1228,7 +1223,7 @@ function WaySection() {
   return (
     <section id="way" className="py-16 md:py-24" aria-labelledby="way-title">
       <div className="mx-auto max-w-[1200px] px-4 md:px-6">
-        <SectionTitle id="way" eyebrow="오시는 길" title="□□시 ○○호수공원" color="#4f8a5b" />
+        <SectionTitle id="way" title="□□시 ○○호수공원" color="#4f8a5b" />
         <p className="mt-4 flex items-center gap-2 text-[17px]" style={{ color: C.ink }}>
           <MapPin size={18} aria-hidden style={{ color: C.pinkText }} />
           □□시 □□로 200 ○○호수공원 정문
@@ -1259,7 +1254,7 @@ function FaqSection() {
   return (
     <section id="faq" className="py-16 md:py-24" style={{ background: C.greenSoft }} aria-labelledby="faq-title">
       <div className="mx-auto max-w-[880px] px-4 md:px-6">
-        <SectionTitle id="faq" eyebrow="자주 묻는 질문" title="가기 전에 많이 묻는 것" color={C.pink} />
+        <SectionTitle id="faq" title="가기 전에 많이 묻는 것" color={C.pink} />
         <ul className="mt-8 space-y-2">
           {FAQ.map((f, i) => {
             const on = open === i;

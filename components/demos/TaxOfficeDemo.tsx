@@ -6,7 +6,6 @@ import { AnimatePresence, motion } from "framer-motion";
 import {
   Calculator,
   CalendarDays,
-  Car,
   Check,
   ChevronDown,
   ClipboardList,
@@ -16,7 +15,6 @@ import {
   Plus,
   RotateCcw,
   Search,
-  TrainFront,
   X,
 } from "lucide-react";
 import { useReducedMotionSafe } from "@/hooks/useReducedMotionSafe";
@@ -402,8 +400,7 @@ export function TaxOfficeDemo() {
         <Contact prefill={prefill} />
         <News />
         <About />
-        <Faq />
-        <Location />
+        <Faq minute={minute} />
       </main>
       <Footer />
     </div>
@@ -488,7 +485,7 @@ function Header() {
             transition={{ duration: 0.26, ease: EASE }}
           >
             <ul className="px-4 py-2">
-              {[...NAV, { id: "contact", label: "상담 신청" }, { id: "location", label: "오시는 길" }].map((n) => (
+              {[...NAV, { id: "contact", label: "상담 신청" }].map((n) => (
                 <li key={n.id}>
                   <a href={`#${n.id}`} onClick={() => setOpen(false)} className="flex h-12 items-center text-[17px]">
                     {n.label}
@@ -573,14 +570,10 @@ function Hero({ minute }: { minute: number }) {
   );
 }
 
-function SectionHead({ id, tag, title, desc }: { id: string; tag: string; title: string; desc?: string }) {
+function SectionHead({ id, title, desc }: { id: string; title: string; desc?: string }) {
   return (
     <div>
-      <p className="inline-flex items-center gap-2 text-[15px] font-bold" style={{ color: C.green }}>
-        <span className="inline-block h-[2px] w-5" style={{ background: C.green }} aria-hidden />
-        {tag}
-      </p>
-      <h2 id={id} className="mt-1.5 text-[28px] font-bold leading-[1.35] tracking-[-0.03em] md:text-[36px]">
+      <h2 id={id} className="text-[28px] font-bold leading-[1.35] tracking-[-0.03em] md:text-[36px]">
         {title}
       </h2>
       {desc && (
@@ -655,7 +648,6 @@ function TaxCalendar({ minute, onAsk }: { minute: number; onAsk: AskFn }) {
       <div className="mx-auto max-w-[1200px]">
         <SectionHead
           id="calendar-title"
-          tag="내 세금 달력"
           title="내 사업에 맞는 신고 기한만 모아 봅니다"
           desc="사업자 유형과 직원 여부를 고르면 올해 1월부터 다음 해 3월까지의 기한이 펼쳐집니다. 기한을 누르면 준비할 서류가 나옵니다."
         />
@@ -954,7 +946,6 @@ function FeeCalculator({ onAsk }: { onAsk: AskFn }) {
       <div className="mx-auto max-w-[1200px]">
         <SectionHead
           id="fee-title"
-          tag="기장료 계산"
           title="한 달 기장료를 미리 어림해 보세요"
           desc="부가세 신고와 원천세 신고는 기장료에 들어 있습니다. 종합소득세나 법인세 신고 때는 1년에 한 번 조정료가 따로 붙습니다."
         />
@@ -1092,7 +1083,7 @@ function Contact({ prefill }: { prefill: Prefill }) {
   return (
     <section aria-labelledby="contact-title" id="contact" className="scroll-mt-16 px-4 py-16 md:px-6 md:py-24" style={{ background: C.greenSoft }}>
       <div className="mx-auto max-w-[1200px]">
-        <SectionHead id="contact-title" tag="상담 신청" title="첫 상담 30분은 비용을 받지 않습니다" desc="남겨 주신 시간에 세무사가 직접 전화드립니다. 자료를 미리 보내지 않으셔도 됩니다." />
+        <SectionHead id="contact-title" title="첫 상담 30분은 비용을 받지 않습니다" desc="남겨 주신 시간에 세무사가 직접 전화드립니다. 자료를 미리 보내지 않으셔도 됩니다." />
         <ContactForm key={prefill.key} prefill={prefill} />
       </div>
     </section>
@@ -1274,7 +1265,7 @@ function News() {
   return (
     <section aria-labelledby="news-title" id="news" className="scroll-mt-16 px-4 py-16 md:px-6 md:py-24">
       <div className="mx-auto max-w-[1200px]">
-        <SectionHead id="news-title" tag="세무 소식" title="사장님이 알아 두면 좋은 짧은 글" />
+        <SectionHead id="news-title" title="사장님이 알아 두면 좋은 짧은 글" />
         <div className="mt-8 flex flex-col gap-3 md:flex-row md:items-center">
           <label className="relative block md:w-[300px]">
             <span className="sr-only">세무 소식 검색</span>
@@ -1362,7 +1353,7 @@ function About() {
   return (
     <section aria-labelledby="about-title" id="about" className="scroll-mt-16 px-4 py-16 md:px-6 md:py-24" style={{ background: "rgba(255,255,255,0.6)" }}>
       <div className="mx-auto max-w-[1200px]">
-        <SectionHead id="about-title" tag="세무사 소개" title="맡은 장부는 세무사가 직접 봅니다" />
+        <SectionHead id="about-title" title="맡은 장부는 세무사가 직접 봅니다" />
         <div className="mt-10 grid items-start gap-8 md:grid-cols-[1fr_1fr] md:gap-12">
           <div className="rounded-[10px] border bg-white p-6 md:p-8" style={{ borderColor: C.line }}>
             <div className="flex items-center gap-4">
@@ -1417,176 +1408,70 @@ function About() {
   );
 }
 
-/* ---------- 자주 묻는 질문 ---------- */
+/* ---------- 이번 달 많이 받은 질문 ---------- */
 
-const FAQS = [
+// 답 끝에 다는 기한은 세금 달력과 같은 계산(buildYear)에서 가져온다.
+const FAQ_PROFILE: Profile = { type: "general", staff: true, half: false, freelancePay: true, sincere: false };
+
+const FAQS: { q: string; a: string; kinds: Kind[] }[] = [
   {
-    q: "기장을 다른 사무소에서 옮기면 자료는 어떻게 옮기나요?",
-    a: "홈택스에서 저희 사무소 수임 동의만 해 주시면 됩니다. 이전 사무소에 장부 파일과 지난 신고서 사본은 저희가 요청하고, 보통 2주 안에 옮기기가 끝납니다. 이전 사무소에 따로 연락하지 않으셔도 됩니다.",
+    q: "부가세 고지서가 왔는데 신고도 따로 해야 하나요?",
+    a: "개인 일반과세자는 고지서 금액만 내면 됩니다. 상반기보다 매출이 3분의 1 아래로 줄었다면 예정신고로 바꿔 덜 낼 수 있으니 매출 자료를 보내 주세요.",
+    kinds: ["vatPrepay"],
   },
   {
-    q: "기장을 맡기면 제가 따로 할 일이 있나요?",
-    a: "사업용 카드를 홈택스에 등록하고, 현금으로 낸 경비 영수증만 매달 사진으로 보내 주시면 됩니다. 세금계산서와 카드 내역은 저희가 홈택스에서 가져옵니다.",
+    q: "종합소득세 중간예납은 고지된 금액을 그대로 내야 하나요?",
+    a: "작년 세액의 절반이 고지됩니다. 올해 실적이 작년의 30% 아래로 줄었으면 상반기 장부로 직접 계산해 신고하고 덜 낼 수 있습니다.",
+    kinds: ["incomeMid"],
   },
   {
-    q: "매출이 적은데도 기장을 해야 하나요?",
-    a: "새로 시작했거나 매출이 업종 기준보다 적으면 간편장부 대상이라 직접 적어도 됩니다. 다만 간편장부 대상자가 복식부기로 신고하면 산출세액의 20%, 100만 원까지 기장세액공제를 받습니다.",
+    q: "프리랜서에게 3.3%를 떼고 줬어요. 따로 낼 서류가 있나요?",
+    a: "다음 달 10일까지 원천세를 신고하고, 말일까지 간이지급명세서를 냅니다. 기장을 맡기셨다면 지급 내역만 보내 주시면 됩니다.",
+    kinds: ["withhold", "simpleStatement"],
   },
   {
-    q: "종합소득세 신고만 따로 맡길 수 있나요?",
-    a: "네. 1년치 경비 자료를 받아 신고만 대행합니다. 비용은 매출과 자료 양을 보고 미리 알려 드립니다.",
-  },
-  {
-    q: "세무 조사 통지를 받았어요. 어떻게 해야 하나요?",
-    a: "통지서를 받은 날 바로 전화 주세요. 조사 대상 기간과 항목을 확인하고, 필요하면 조사 연기 신청부터 함께 준비합니다.",
-  },
-  {
-    q: "계약 기간이 정해져 있나요?",
-    a: "월 단위 계약입니다. 그만두실 때는 한 달 전에만 말씀해 주시면 되고, 장부 파일은 다음 사무소에 그대로 넘겨 드립니다.",
+    q: "직원 연말정산은 언제부터 준비하면 되나요?",
+    a: "12월에 직원별 공제 서류를 모아 두시면 1월에 정산하고 2월 급여에서 돌려주거나 더 걷습니다. 지급명세서는 3월에 제출합니다.",
+    kinds: ["payStatement"],
   },
 ];
 
-function Faq() {
-  const reduce = useReducedMotionSafe();
-  const [open, setOpen] = useState<number | null>(0);
+function nextOf(kind: Kind, today: Date) {
+  const y = today.getFullYear();
+  return [...buildYear(y, FAQ_PROFILE), ...buildYear(y + 1, FAQ_PROFILE)]
+    .filter((d) => d.kind === kind && d.real >= today)
+    .sort((a, b) => a.real.getTime() - b.real.getTime())[0];
+}
+
+function Faq({ minute }: { minute: number }) {
+  const today = todayOf(minute);
+  const month = today ? `${today.getMonth() + 1}월에` : "이번 달";
 
   return (
     <section aria-labelledby="faq-title" id="faq" className="scroll-mt-16 px-4 py-16 md:px-6 md:py-24">
-      <div className="mx-auto grid max-w-[1200px] gap-8 md:grid-cols-[320px_1fr] md:gap-12">
-        <SectionHead id="faq-title" tag="자주 묻는 질문" title="상담 전에 많이 묻는 것들" />
-        <ul className="border-t" style={{ borderColor: C.ink }}>
-          {FAQS.map((f, i) => {
-            const isOpen = open === i;
+      <div className="mx-auto max-w-[860px]">
+        <SectionHead id="faq-title" title={`${month} 많이 받은 질문`} />
+        <ul className="mt-8 border-t" style={{ borderColor: C.ink }}>
+          {FAQS.map((f) => {
+            const dues = today ? f.kinds.map((k) => nextOf(k, today)).filter((d): d is Deadline => !!d) : [];
             return (
-              <li key={f.q} className="border-b" style={{ borderColor: C.line }}>
-                <h3>
-                  <button
-                    type="button"
-                    aria-expanded={isOpen}
-                    aria-controls={`faq-${i}`}
-                    onClick={() => setOpen(isOpen ? null : i)}
-                    className="flex w-full items-start gap-3 py-4 text-left font-semibold leading-[1.5]"
-                  >
-                    <span className="font-bold tabular-nums" style={{ color: C.green }}>
-                      Q
+              <li key={f.q} className="border-b py-6" style={{ borderColor: C.line }}>
+                <h3 className="text-[18px] font-bold leading-[1.5] md:text-[19px]">{f.q}</h3>
+                <p className="mt-2" style={{ color: C.muted }}>
+                  {f.a}
+                </p>
+                <p className="mt-2 min-h-[22px] text-[14px] tabular-nums" style={{ color: C.green }}>
+                  {dues.map((d, i) => (
+                    <span key={d.id}>
+                      {i > 0 && ", "}
+                      {d.title} {md(d.real)}까지
                     </span>
-                    <span className="flex-1">{f.q}</span>
-                    <ChevronDown size={20} className="mt-1 shrink-0 transition-transform" style={{ transform: isOpen ? "rotate(180deg)" : undefined, color: C.muted }} aria-hidden />
-                  </button>
-                </h3>
-                <AnimatePresence initial={false}>
-                  {isOpen && (
-                    <motion.div
-                      id={`faq-${i}`}
-                      initial={reduce ? false : { height: 0, opacity: 0 }}
-                      animate={{ height: "auto", opacity: 1 }}
-                      exit={reduce ? { opacity: 0 } : { height: 0, opacity: 0 }}
-                      transition={{ duration: 0.25, ease: EASE }}
-                      className="overflow-hidden"
-                    >
-                      <p className="pb-5 pl-7 text-[15px]" style={{ color: C.muted }}>
-                        {f.a}
-                      </p>
-                    </motion.div>
-                  )}
-                </AnimatePresence>
+                  ))}
+                </p>
               </li>
             );
           })}
         </ul>
-      </div>
-    </section>
-  );
-}
-
-/* ---------- 오시는 길 ---------- */
-
-function MiniMap() {
-  return (
-    <svg viewBox="0 0 640 360" className="h-auto w-full" role="img" aria-label="□□역 3번 출구에서 길을 건너 □□빌딩 5층에 있는 사무소 약도">
-      <rect width="640" height="360" fill={C.card} />
-      {[60, 120, 180, 240, 300].map((y) => (
-        <path key={y} d={`M0 ${y} H640`} stroke={C.rule} strokeWidth="1" />
-      ))}
-      <path d="M0 210 H640" stroke={C.line} strokeWidth="32" />
-      <path d="M420 0 V360" stroke={C.line} strokeWidth="20" />
-      <text x="24" y="258" fontSize="15" fill={C.muted}>
-        □□로
-      </text>
-      <circle cx="160" cy="210" r="16" fill={C.ink} />
-      <text x="160" y="215" fontSize="13" fill="#fff" textAnchor="middle" fontWeight={700}>
-        3
-      </text>
-      <text x="96" y="176" fontSize="15" fill={C.ink}>
-        □□역 3번 출구
-      </text>
-      <path d="M178 210 H300 V140" stroke={C.green} strokeWidth="3" strokeDasharray="6 7" fill="none" />
-      <rect x="250" y="40" width="130" height="96" rx="4" fill={C.paper} stroke={C.green} strokeWidth="2" />
-      <text x="315" y="78" fontSize="15" fill={C.ink} textAnchor="middle" fontWeight={700}>
-        □□빌딩
-      </text>
-      <text x="315" y="104" fontSize="13" fill={C.green} textAnchor="middle" fontWeight={700}>
-        5층 {OFFICE}
-      </text>
-      <rect x="460" y="250" width="140" height="70" rx="4" fill={C.greenSoft} />
-      <text x="530" y="290" fontSize="13" fill={C.muted} textAnchor="middle">
-        △△은행
-      </text>
-    </svg>
-  );
-}
-
-function Location() {
-  return (
-    <section aria-labelledby="location-title" id="location" className="scroll-mt-16 px-4 py-16 md:px-6 md:py-24" style={{ background: "rgba(255,255,255,0.6)" }}>
-      <div className="mx-auto max-w-[1200px]">
-        <SectionHead id="location-title" tag="오시는 길" title="□□역 3번 출구에서 걸어서 2분" />
-        <div className="mt-10 grid gap-10 md:grid-cols-[1.2fr_1fr] md:gap-14">
-          <div className="overflow-hidden rounded-[10px] border" style={{ borderColor: C.line }}>
-            <MiniMap />
-          </div>
-          <div>
-            <p className="text-[22px] font-bold tracking-[-0.02em]">{ADDRESS}</p>
-            <ul className="mt-5 space-y-4">
-              {[
-                { icon: TrainFront, title: "지하철", body: "□□역 3번 출구로 나와 △△은행 옆 건물" },
-                { icon: Car, title: "주차", body: "건물 지하 주차장 1시간 무료, 상담 때 차량 번호를 말씀해 주세요." },
-              ].map((r) => (
-                <li key={r.title} className="flex gap-3">
-                  <r.icon size={20} className="mt-1 shrink-0" style={{ color: C.green }} aria-hidden />
-                  <span>
-                    <span className="font-semibold">{r.title}</span>
-                    <span className="block text-[15px]" style={{ color: C.muted }}>
-                      {r.body}
-                    </span>
-                  </span>
-                </li>
-              ))}
-            </ul>
-            <table className="mt-7 w-full border-t text-[15px] tabular-nums" style={{ borderColor: C.ink }}>
-              <caption className="sr-only">상담 시간</caption>
-              <tbody>
-                {[
-                  ["평일", "09:00 ~ 18:00"],
-                  ["점심시간", "12:00 ~ 13:00"],
-                  ["1월, 5월 토요일", "10:00 ~ 15:00"],
-                  ["그 밖의 주말, 공휴일", "쉽니다"],
-                ].map(([k, v]) => (
-                  <tr key={k} className="border-b" style={{ borderColor: C.line }}>
-                    <th scope="row" className="py-3 text-left font-normal" style={{ color: C.muted }}>
-                      {k}
-                    </th>
-                    <td className="py-3 text-right font-semibold">{v}</td>
-                  </tr>
-                ))}
-              </tbody>
-            </table>
-            <a href={`tel:${TEL}`} className="mt-6 inline-flex h-12 items-center gap-2 rounded-[6px] px-6 font-semibold tabular-nums" style={{ background: C.green, color: "#fff" }}>
-              <Phone size={18} aria-hidden />
-              전화 {TEL}
-            </a>
-          </div>
-        </div>
       </div>
     </section>
   );
@@ -1599,12 +1484,19 @@ function Footer() {
     <footer className="px-4 pb-24 pt-12 md:px-6" style={{ background: C.greenDeep, color: "#e5eee9" }}>
       <div className="mx-auto max-w-[1200px]">
         <Logo light />
+        <div className="mt-6 space-y-1 text-[15px]">
+          <p>
+            {ADDRESS} (□□역 3번 출구, △△은행 옆), 건물 지하 주차 1시간 무료
+          </p>
+          <p className="tabular-nums">
+            상담 시간 평일 09:00 ~ 18:00 (점심 12:00 ~ 13:00), 1월과 5월은 토요일 10:00 ~ 15:00
+          </p>
+        </div>
         <dl className="mt-6 grid gap-x-8 gap-y-1.5 text-[14px] sm:grid-cols-2 md:grid-cols-3" style={{ color: "#a9c4b8" }}>
           {[
             ["상호", OFFICE],
             ["대표세무사", "김○○"],
             ["사업자등록번호", "000-00-00000"],
-            ["주소", ADDRESS],
             ["전화", TEL],
             ["이메일", "hello@example.com"],
           ].map(([k, v]) => (

@@ -3,7 +3,7 @@
 import { useEffect, useRef, useState, useSyncExternalStore } from "react";
 import Image from "next/image";
 import { AnimatePresence, motion } from "framer-motion";
-import { Banknote, Building2, CalendarCheck, Car, Check, ChevronDown, KeyRound, Menu, Phone, RotateCcw, ShieldCheck, TrainFront, Users, Video, X } from "lucide-react";
+import { Banknote, Building2, CalendarCheck, Check, ChevronDown, KeyRound, Menu, Phone, RotateCcw, ShieldCheck, Users, Video, X } from "lucide-react";
 import { useReducedMotionSafe } from "@/hooks/useReducedMotionSafe";
 
 /* 법률사무소 홈페이지 데모: 가상의 법률사무소 ○○.
@@ -16,8 +16,8 @@ import { useReducedMotionSafe } from "@/hooks/useReducedMotionSafe";
 
    내 상황 고르기는 분야와 상황 카드를 고르면 흔한 절차가 세로 길로 그려지고,
    단계를 누르면 쉬운 설명과 준비 서류 목록이 열린다. 서류를 챙길 때마다 체크하면 단계 표시가 채워진다.
-   상담 예약은 방식, 분야, 앞으로 14일 중 날짜(평일, 토요일은 오전만), 시간을 고르고
-   이름과 연락처를 적으면 가린 이름과 번호, 상담 번호가 담긴 확인 창이 뜬다.
+   상담 예약은 가장 빨리 잡을 수 있는 시간 6개를 목록으로 보여 주고, 다른 날짜 보기로 다음 6개를 넘긴다.
+   방식을 먼저 고르면 그 방식이 되는 시간만 남는다. 이름과 연락처를 적으면 가린 이름과 번호, 상담 번호가 담긴 확인 창이 뜬다.
    해결 사례는 분야로 거르고, 자주 묻는 질문은 펼쳐 본다.
 
    사진 출처(public/images/demo-law):
@@ -52,7 +52,6 @@ const NAV = [
   { id: "fees", label: "상담 비용" },
   { id: "cases", label: "해결 사례" },
   { id: "faq", label: "자주 묻는 질문" },
-  { id: "location", label: "오시는 길" },
 ];
 
 /* ---------- 시간 ---------- */
@@ -427,7 +426,6 @@ export function LawFirmDemo() {
         <Cases />
         <Booking minute={minute} preset={preset} />
         <Faq />
-        <Location />
       </main>
       <Footer />
     </div>
@@ -481,7 +479,12 @@ function Header() {
           </ul>
         </nav>
         <div className="flex items-center gap-2">
-          <a href={`tel:${TEL}`} aria-label={`전화 ${TEL}`} className="inline-flex h-11 w-11 items-center justify-center rounded-[4px] border md:hidden" style={{ borderColor: C.line, color: C.navy }}>
+          <a
+            href={`tel:${TEL}`}
+            aria-label={`전화 ${TEL}`}
+            className="inline-flex h-11 w-11 items-center justify-center rounded-[4px] border md:hidden"
+            style={{ borderColor: C.line, color: C.navy }}
+          >
             <Phone size={19} aria-hidden />
           </a>
           <a href="#booking" className="hidden h-11 items-center rounded-[4px] px-5 text-[15px] font-semibold md:inline-flex" style={{ background: C.navy, color: C.ivory }}>
@@ -536,11 +539,7 @@ function Hero() {
       <div className="mx-auto max-w-[1200px]">
         <div className="grid items-center gap-10 md:grid-cols-[1fr_1.15fr] md:gap-14">
           <motion.div initial={reduce ? false : { opacity: 0, y: 14 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.6, ease: EASE }}>
-            <p className="flex items-center gap-3 text-[15px] font-semibold" style={{ color: C.goldText }}>
-              <span className="h-px w-8" style={{ background: C.gold }} aria-hidden />
-              □□법원 건너편 법률사무소
-            </p>
-            <h1 className="mt-4 text-[36px] font-bold leading-[1.25] tracking-[-0.03em] md:text-[52px]" style={{ color: C.navy }}>
+            <h1 className="text-[36px] font-bold leading-[1.25] tracking-[-0.03em] md:text-[52px]" style={{ color: C.navy }}>
               {FIRM}
             </h1>
             <p className="mt-5 max-w-[480px]" style={{ color: C.muted }}>
@@ -586,14 +585,10 @@ function Hero() {
   );
 }
 
-function SectionHead({ id, tag, title, desc, light = false }: { id: string; tag: string; title: string; desc?: string; light?: boolean }) {
+function SectionHead({ id, title, desc, light = false }: { id: string; title: string; desc?: string; light?: boolean }) {
   return (
     <div>
-      <p className="flex items-center gap-3 text-[15px] font-semibold" style={{ color: light ? C.gold : C.goldText }}>
-        <span className="h-px w-8" style={{ background: C.gold }} aria-hidden />
-        {tag}
-      </p>
-      <h2 id={id} className="mt-3 text-[27px] font-bold leading-[1.35] tracking-[-0.03em] md:text-[36px]" style={{ color: light ? C.ivory : C.navy }}>
+      <h2 id={id} className="text-[27px] font-bold leading-[1.35] tracking-[-0.03em] md:text-[36px]" style={{ color: light ? C.ivory : C.navy }}>
         {title}
       </h2>
       {desc && (
@@ -632,7 +627,6 @@ function Guide({ onBook }: { onBook: (f: Field) => void }) {
       <div className="mx-auto max-w-[1200px]">
         <SectionHead
           id="guide-title"
-          tag="상황별 절차"
           title="지금 겪는 일을 고르면 앞으로의 절차가 보여요"
           desc="단계를 누르면 무슨 일을 하는지와 준비할 서류가 나옵니다. 챙긴 서류에 표시해 두면 상담 때 빠진 것을 바로 알 수 있어요."
         />
@@ -918,7 +912,6 @@ function Lawyers() {
         <div className="grid items-end gap-8 md:grid-cols-[1fr_420px]">
           <SectionHead
             id="lawyers-title"
-            tag="변호사 소개"
             title="두 변호사가 분야를 나누어 맡습니다"
             desc="사건을 맡으면 처음 상담한 변호사가 끝까지 진행합니다. 진행 상황은 단계가 바뀔 때마다 문자로 알려 드려요."
           />
@@ -931,7 +924,11 @@ function Lawyers() {
           {LAWYERS.map((l) => (
             <li key={l.name} className="border-t-2 bg-white p-6 md:p-8" style={{ borderColor: C.navy }}>
               <div className="flex items-center gap-4">
-                <span className="relative inline-flex h-16 w-16 shrink-0 items-center justify-center rounded-full text-[24px] font-bold" style={{ background: C.navy, color: C.ivory }} aria-hidden>
+                <span
+                  className="relative inline-flex h-16 w-16 shrink-0 items-center justify-center rounded-full text-[24px] font-bold"
+                  style={{ background: C.navy, color: C.ivory }}
+                  aria-hidden
+                >
                   <span className="absolute inset-[3px] rounded-full border" style={{ borderColor: C.gold }} />
                   {l.initial}
                 </span>
@@ -998,7 +995,7 @@ function Fees() {
   return (
     <section aria-labelledby="fees-title" id="fees" className="scroll-mt-16 px-4 py-16 md:px-6 md:py-24" style={{ background: C.white }}>
       <div className="mx-auto max-w-[1200px]">
-        <SectionHead id="fees-title" tag="상담 비용" title="비용은 상담 전에 먼저 알려 드려요" />
+        <SectionHead id="fees-title" title="비용은 상담 전에 먼저 알려 드려요" />
         <div className="mt-10 grid items-start gap-10 lg:grid-cols-[1fr_340px]">
           <table className="w-full border-t-2 text-left" style={{ borderColor: C.navy }}>
             <caption className="sr-only">항목별 상담과 사건 비용</caption>
@@ -1102,7 +1099,7 @@ function Cases() {
   return (
     <section aria-labelledby="cases-title" id="cases" className="scroll-mt-16 px-4 py-16 md:px-6 md:py-24" style={{ background: C.navy }}>
       <div className="mx-auto max-w-[1200px]">
-        <SectionHead id="cases-title" tag="해결 사례" title="최근 맡았던 사건들" desc="의뢰인 동의를 받아 알아볼 수 없게 고쳐 적었습니다." light />
+        <SectionHead id="cases-title" title="최근 맡았던 사건들" desc="의뢰인 동의를 받아 알아볼 수 없게 고쳐 적었습니다." light />
         <div role="group" aria-label="분야로 거르기" className="mt-8 flex flex-wrap gap-2">
           {[{ id: "all" as const, label: "전체" }, ...FIELDS].map((f) => (
             <button
@@ -1184,25 +1181,42 @@ const METHODS: {
   },
 ];
 
-const WEEKDAY_SLOTS = ["10:00", "11:00", "14:00", "15:00", "16:00", "17:00"];
-const SAT_SLOTS = ["10:00", "11:00"];
+const WEEKDAY_HOURS = [10, 11, 14, 15, 16, 17];
+const SAT_HOURS = [10, 11];
+const PAGE = 6;
 
-const dateKey = (d: Date) => `${d.getFullYear()}-${d.getMonth() + 1}-${d.getDate()}`;
+type Slot = { key: string; date: Date; hour: number; methods: Method[] };
 
-function bookableDays(minute: number) {
+const hourLabel = (h: number) => (h < 12 ? `오전 ${h}시` : h === 12 ? "낮 12시" : `오후 ${h - 12}시`);
+const slotLabel = (sl: Slot) => `${sl.date.getMonth() + 1}월 ${sl.date.getDate()}일 (${DAY_NAMES[sl.date.getDay()]}) ${hourLabel(sl.hour)}`;
+
+/** 앞으로 4주 동안 비어 있는 시간. 날짜와 시간 순서로 정해지므로 다시 그려도 같다. */
+function openSlots(minute: number) {
   if (minute < 0) return [];
   const now = new Date(minute * 60_000);
-  const out: Date[] = [];
-  for (let i = 1; i <= 14; i++) {
+  const out: Slot[] = [];
+  for (let i = 1; i <= 28; i++) {
     const d = new Date(now.getFullYear(), now.getMonth(), now.getDate() + i);
     if (d.getDay() === 0 || HOLIDAYS[`${d.getMonth() + 1}-${d.getDate()}`]) continue;
-    out.push(d);
+    const sat = d.getDay() === 6;
+    (sat ? SAT_HOURS : WEEKDAY_HOURS).forEach((h, j) => {
+      const n = d.getDate() * 3 + d.getMonth() + j * 5;
+      const methods: Method[] = [];
+      if (n % 4 !== 0) methods.push("visit");
+      if (n % 3 !== 1) methods.push("phone");
+      if (!sat && n % 5 < 2) methods.push("video");
+      if (n % 7 === 2) methods.length = 0;
+      if (methods.length)
+        out.push({
+          key: `${d.getFullYear()}-${d.getMonth() + 1}-${d.getDate()}-${h}`,
+          date: d,
+          hour: h,
+          methods,
+        });
+    });
   }
   return out;
 }
-
-/** 이미 찬 시간. 날짜와 시간 순서로 정해지므로 다시 그려도 같다. */
-const isBooked = (d: Date, i: number) => (d.getDate() * 3 + d.getMonth() + i * 5) % 4 === 0;
 
 type Confirm = {
   no: string;
@@ -1214,11 +1228,11 @@ type Confirm = {
 };
 
 function Booking({ minute, preset }: { minute: number; preset: { field: Field; n: number } | null }) {
-  const [method, setMethod] = useState<Method>("visit");
+  const [method, setMethod] = useState<Method | null>(null);
   const [field, setField] = useState<Field | null>(preset?.field ?? null);
   const [prevPreset, setPrevPreset] = useState(preset);
-  const [day, setDay] = useState<string | null>(null);
-  const [slot, setSlot] = useState<string | null>(null);
+  const [page, setPage] = useState(0);
+  const [slotKey, setSlotKey] = useState<string | null>(null);
   const [name, setName] = useState("");
   const [phone, setPhone] = useState("");
   const [memo, setMemo] = useState("");
@@ -1232,27 +1246,37 @@ function Booking({ minute, preset }: { minute: number; preset: { field: Field; n
     if (preset) setField(preset.field);
   }
 
-  const days = bookableDays(minute);
-  const picked = days.find((d) => dateKey(d) === day) ?? null;
-  const slots = picked ? (picked.getDay() === 6 ? SAT_SLOTS : WEEKDAY_SLOTS) : [];
+  const all = openSlots(minute);
+  const slots = method ? all.filter((sl) => sl.methods.includes(method)) : all;
+  const pages = Math.max(1, Math.ceil(slots.length / PAGE));
+  const shown = slots.slice(page * PAGE, page * PAGE + PAGE);
+  const picked = all.find((sl) => sl.key === slotKey) ?? null;
+
+  const pickMethod = (m: Method) => {
+    const next = method === m ? null : m;
+    setMethod(next);
+    setPage(0);
+    if (next && picked && !picked.methods.includes(next)) setSlotKey(null);
+  };
 
   const submit = (e: React.FormEvent) => {
     e.preventDefault();
+    if (!method) return setError("상담 방식을 골라 주세요.");
     if (!field) return setError("상담 받을 분야를 골라 주세요.");
-    if (!picked || !slot) return setError("날짜와 시간을 골라 주세요.");
+    if (!picked) return setError("상담 시간을 골라 주세요.");
     if (name.trim().length < 2) return setError("이름을 두 글자 이상 적어 주세요.");
     if (phone.replace(/\D/g, "").length < 10) return setError("연락받을 휴대전화 번호를 적어 주세요.");
     if (!agree) return setError("개인정보 수집에 동의해 주셔야 예약할 수 있어요.");
     setError("");
-    const mm = String(picked.getMonth() + 1).padStart(2, "0");
-    const dd = String(picked.getDate()).padStart(2, "0");
+    const mm = String(picked.date.getMonth() + 1).padStart(2, "0");
+    const dd = String(picked.date.getDate()).padStart(2, "0");
     const t = new Date();
     const seq = String(100 + ((t.getMinutes() * 60 + t.getSeconds()) % 900));
     setConfirm({
       no: `${mm}${dd}-${seq}`,
       method,
       field,
-      when: `${picked.getMonth() + 1}월 ${picked.getDate()}일 (${DAY_NAMES[picked.getDay()]}) ${slot}`,
+      when: slotLabel(picked),
       name: maskName(name),
       phone: maskPhone(phone),
     });
@@ -1260,8 +1284,8 @@ function Booking({ minute, preset }: { minute: number; preset: { field: Field; n
 
   const reset = () => {
     setConfirm(null);
-    setDay(null);
-    setSlot(null);
+    setPage(0);
+    setSlotKey(null);
     setName("");
     setPhone("");
     setMemo("");
@@ -1273,7 +1297,7 @@ function Booking({ minute, preset }: { minute: number; preset: { field: Field; n
   return (
     <section aria-labelledby="booking-title" id="booking" className="scroll-mt-16 px-4 py-16 md:px-6 md:py-24">
       <div className="mx-auto max-w-[1200px]">
-        <SectionHead id="booking-title" tag="상담 예약" title="편한 방식과 시간을 골라 주세요" desc="평일은 오전 10시부터 오후 6시까지, 토요일은 오전에만 상담합니다." />
+        <SectionHead id="booking-title" title="편한 방식과 시간을 골라 주세요" desc="평일은 오전 10시부터 오후 6시까지, 토요일은 오전에만 상담합니다." />
 
         <form onSubmit={submit} noValidate className="mt-10 grid gap-10 border-t-2 pt-8 lg:grid-cols-[1fr_1fr] lg:gap-14" style={{ borderColor: C.navy }}>
           <div className="min-w-0 space-y-8">
@@ -1287,7 +1311,7 @@ function Booking({ minute, preset }: { minute: number; preset: { field: Field; n
                     key={m.id}
                     type="button"
                     aria-pressed={method === m.id}
-                    onClick={() => setMethod(m.id)}
+                    onClick={() => pickMethod(m.id)}
                     className="flex h-[72px] flex-col items-center justify-center gap-1 rounded-[4px] border text-[15px] font-semibold"
                     style={pill(method === m.id)}
                   >
@@ -1297,7 +1321,7 @@ function Booking({ minute, preset }: { minute: number; preset: { field: Field; n
                 ))}
               </div>
               <p className="mt-2 text-[14px]" style={{ color: C.muted }}>
-                {METHODS.find((m) => m.id === method)!.desc}
+                {method ? METHODS.find((m) => m.id === method)!.desc : "방식을 고르면 그 방식으로 가능한 시간만 남아요."}
               </p>
             </fieldset>
 
@@ -1323,84 +1347,67 @@ function Booking({ minute, preset }: { minute: number; preset: { field: Field; n
 
             <fieldset>
               <legend className="font-bold" style={{ color: C.navy }}>
-                날짜
+                가장 빨리 가능한 상담 시간
               </legend>
-              {days.length ? (
-                <div className="mt-3 grid grid-cols-4 gap-1.5 sm:grid-cols-6">
-                  {days.map((d) => {
-                    const k = dateKey(d);
-                    const sat = d.getDay() === 6;
-                    return (
-                      <button
-                        key={k}
-                        type="button"
-                        aria-pressed={day === k}
-                        aria-label={`${d.getMonth() + 1}월 ${d.getDate()}일 ${DAY_NAMES[d.getDay()]}요일${sat ? ", 오전만" : ""}`}
-                        onClick={() => {
-                          setDay(k);
-                          setSlot(null);
-                        }}
-                        className="flex h-[60px] flex-col items-center justify-center rounded-[4px] border leading-[1.2]"
-                        style={pill(day === k)}
-                      >
-                        <span className="text-[16px] font-bold tabular-nums">
-                          {d.getMonth() + 1}/{d.getDate()}
-                        </span>
-                        <span
-                          className="text-[13px]"
-                          style={{
-                            color: day === k ? "#c9cedb" : sat ? C.goldText : C.muted,
-                          }}
-                        >
-                          {DAY_NAMES[d.getDay()]}
-                          {sat ? " 오전" : ""}
-                        </span>
-                      </button>
-                    );
-                  })}
-                </div>
+              {all.length ? (
+                <>
+                  <ul className="mt-3 border-t" style={{ borderColor: C.line }}>
+                    {shown.map((sl) => {
+                      const on = slotKey === sl.key;
+                      const id = `law-slot-${sl.key}`;
+                      return (
+                        <li key={sl.key} className="border-b" style={{ borderColor: C.line }}>
+                          <label htmlFor={id} className="flex min-h-[60px] cursor-pointer items-center gap-3 px-2 py-2.5" style={on ? { background: C.white } : undefined}>
+                            <input
+                              id={id}
+                              type="radio"
+                              name="law-slot"
+                              value={sl.key}
+                              checked={on}
+                              onChange={() => setSlotKey(sl.key)}
+                              className="h-5 w-5 shrink-0 accent-[#14213d]"
+                            />
+                            <span className="flex min-w-0 flex-1 flex-col gap-0.5 sm:flex-row sm:items-center sm:justify-between sm:gap-3">
+                              <span className="font-semibold tabular-nums" style={{ color: on ? C.navy : C.ink }}>
+                                {slotLabel(sl)}
+                              </span>
+                              <span className="flex shrink-0 gap-2.5 text-[14px]" style={{ color: C.muted }}>
+                                {METHODS.filter((m) => sl.methods.includes(m.id)).map((m) => (
+                                  <span key={m.id} className="inline-flex items-center gap-1">
+                                    <m.icon size={15} aria-hidden style={{ color: C.gold }} />
+                                    {m.label}
+                                  </span>
+                                ))}
+                              </span>
+                            </span>
+                          </label>
+                        </li>
+                      );
+                    })}
+                  </ul>
+                  <div className="mt-3 flex flex-wrap items-center justify-between gap-2 text-[15px]">
+                    <button
+                      type="button"
+                      onClick={() => setPage((p) => Math.max(0, p - 1))}
+                      disabled={page === 0}
+                      className="inline-flex h-11 items-center px-1 font-semibold disabled:invisible"
+                      style={{ color: C.navy }}
+                    >
+                      앞 시간 보기
+                    </button>
+                    <button
+                      type="button"
+                      onClick={() => setPage((p) => Math.min(pages - 1, p + 1))}
+                      disabled={page >= pages - 1}
+                      className="inline-flex h-11 items-center rounded-[4px] border px-4 font-semibold disabled:cursor-not-allowed disabled:opacity-40"
+                      style={{ borderColor: C.navy, color: C.navy }}
+                    >
+                      다른 날짜 보기
+                    </button>
+                  </div>
+                </>
               ) : (
-                <div className="mt-3 h-[192px] rounded-[4px]" style={{ background: C.goldSoft }} />
-              )}
-            </fieldset>
-
-            <fieldset>
-              <legend className="font-bold" style={{ color: C.navy }}>
-                시간
-              </legend>
-              {picked ? (
-                <div className="mt-3 grid grid-cols-3 gap-1.5 sm:grid-cols-6">
-                  {slots.map((s, i) => {
-                    const booked = isBooked(picked, i);
-                    return (
-                      <button
-                        key={s}
-                        type="button"
-                        disabled={booked}
-                        aria-pressed={slot === s}
-                        aria-label={`${s}${booked ? ", 예약 마감" : ""}`}
-                        onClick={() => setSlot(s)}
-                        className="h-12 rounded-[4px] border text-[15px] font-semibold tabular-nums disabled:cursor-not-allowed"
-                        style={
-                          booked
-                            ? {
-                                borderColor: C.line,
-                                color: "#a3a7b0",
-                                background: "transparent",
-                                textDecoration: "line-through",
-                              }
-                            : pill(slot === s)
-                        }
-                      >
-                        {s}
-                      </button>
-                    );
-                  })}
-                </div>
-              ) : (
-                <p className="mt-3 text-[15px]" style={{ color: C.muted }}>
-                  날짜를 먼저 골라 주세요.
-                </p>
+                <div className="mt-3 h-[372px] rounded-[4px]" style={{ background: C.goldSoft }} />
               )}
             </fieldset>
           </div>
@@ -1470,6 +1477,16 @@ function Booking({ minute, preset }: { minute: number; preset: { field: Field; n
             </div>
           </div>
         </form>
+
+        <p className="mt-12 flex flex-wrap gap-x-3 gap-y-1 border-t pt-5 text-[15px]" style={{ borderColor: C.line, color: C.muted }}>
+          <span>□□법원 정문 건너편 □□빌딩 3층</span>
+          <span aria-hidden>·</span>
+          <span>건물 지하 주차 1시간 지원</span>
+          <span aria-hidden>·</span>
+          <a href={`tel:${TEL}`} className="font-semibold underline-offset-4 hover:underline" style={{ color: C.navy }}>
+            {TEL}
+          </a>
+        </p>
       </div>
       <ConfirmDialog data={confirm} onClose={reset} />
     </section>
@@ -1599,7 +1616,7 @@ function Faq() {
   return (
     <section aria-labelledby="faq-title" id="faq" className="scroll-mt-16 px-4 py-16 md:px-6 md:py-24" style={{ background: C.white }}>
       <div className="mx-auto grid max-w-[1200px] gap-10 lg:grid-cols-[360px_1fr] lg:gap-14">
-        <SectionHead id="faq-title" tag="자주 묻는 질문" title="상담 전에 많이 물어보세요" />
+        <SectionHead id="faq-title" title="상담 전에 많이 물어보세요" />
         <ul className="border-t-2" style={{ borderColor: C.navy }}>
           {FAQS.map((f, i) => {
             const on = open === i;
@@ -1646,116 +1663,6 @@ function Faq() {
             );
           })}
         </ul>
-      </div>
-    </section>
-  );
-}
-
-/* ---------- 오시는 길 ---------- */
-
-function MiniMap() {
-  return (
-    <svg viewBox="0 0 640 380" className="h-auto w-full" role="img" aria-label="□□역 3번 출구에서 □□법원 건너편 □□빌딩 3층 사무소까지 가는 약도">
-      <rect width="640" height="380" fill={C.paper} />
-      <path d="M0 196 H640" stroke={C.line} strokeWidth="34" />
-      <path d="M0 196 H640" stroke={C.white} strokeWidth="1.5" strokeDasharray="14 12" />
-      <path d="M118 0 V380" stroke={C.line} strokeWidth="22" />
-      <text x="520" y="232" fontSize="14" fill={C.muted}>
-        □□로
-      </text>
-      {/* 법원 */}
-      <rect x="250" y="36" width="250" height="116" fill={C.navyMist} stroke={C.line} />
-      <text x="375" y="100" fontSize="16" fill={C.navySoft} textAnchor="middle" fontWeight={700}>
-        □□법원
-      </text>
-      {/* 횡단보도 */}
-      {[0, 1, 2, 3, 4].map((i) => (
-        <rect key={i} x="402" y={182 + i * 6} width="34" height="3" fill={C.white} />
-      ))}
-      {/* 사무소 건물 */}
-      <rect x="300" y="236" width="200" height="110" fill={C.white} stroke={C.navy} />
-      <rect x="300" y="236" width="200" height="4" fill={C.gold} />
-      <text x="400" y="282" fontSize="14" fill={C.muted} textAnchor="middle">
-        □□빌딩
-      </text>
-      <text x="400" y="308" fontSize="16" fill={C.navy} textAnchor="middle" fontWeight={700}>
-        3층 {FIRM}
-      </text>
-      {/* 역 출구 */}
-      <rect x="100" y="222" width="36" height="24" rx="3" fill={C.navy} />
-      <text x="118" y="239" fontSize="13" fill={C.ivory} textAnchor="middle" fontWeight={700}>
-        3
-      </text>
-      <text x="30" y="276" fontSize="14" fill={C.ink}>
-        □□역 3번 출구
-      </text>
-      <path d="M140 226 H300" stroke={C.gold} strokeWidth="3" strokeDasharray="6 7" />
-    </svg>
-  );
-}
-
-function Location() {
-  return (
-    <section aria-labelledby="location-title" id="location" className="scroll-mt-16 px-4 py-16 md:px-6 md:py-24">
-      <div className="mx-auto max-w-[1200px]">
-        <SectionHead id="location-title" tag="오시는 길" title="□□법원 건너편 □□빌딩 3층" />
-        <div className="mt-10 grid gap-10 md:grid-cols-[1.2fr_1fr] md:gap-14">
-          <div className="overflow-hidden border" style={{ borderColor: C.line }}>
-            <MiniMap />
-          </div>
-          <div>
-            <p className="text-[20px] font-bold tracking-[-0.02em] md:text-[22px]" style={{ color: C.navy }}>
-              {ADDRESS}
-            </p>
-            <ul className="mt-6 space-y-5 border-t pt-6" style={{ borderColor: C.line }}>
-              {[
-                {
-                  icon: TrainFront,
-                  title: "지하철",
-                  body: "□□역 3번 출구로 나와 법원 쪽으로 200m, 횡단보도 앞 건물입니다.",
-                },
-                {
-                  icon: Car,
-                  title: "주차",
-                  body: "건물 지하 주차장을 이용하시면 상담 시간 동안 주차비를 내 드립니다.",
-                },
-              ].map((r) => (
-                <li key={r.title} className="flex gap-3">
-                  <r.icon size={20} className="mt-1 shrink-0" style={{ color: C.gold }} aria-hidden />
-                  <span>
-                    <span className="font-semibold">{r.title}</span>
-                    <span className="block text-[15px]" style={{ color: C.muted }}>
-                      {r.body}
-                    </span>
-                  </span>
-                </li>
-              ))}
-            </ul>
-            <table className="mt-6 w-full text-[15px]">
-              <caption className="pb-2 text-left font-bold" style={{ color: C.navy }}>
-                상담 시간
-              </caption>
-              <tbody>
-                {[
-                  ["평일", "10:00 ~ 18:00"],
-                  ["토요일", "10:00 ~ 12:00"],
-                  ["일요일, 공휴일", "쉽니다"],
-                ].map(([k, v]) => (
-                  <tr key={k} className="border-t" style={{ borderColor: C.line }}>
-                    <th scope="row" className="py-2.5 text-left font-normal" style={{ color: C.muted }}>
-                      {k}
-                    </th>
-                    <td className="py-2.5 text-right font-semibold tabular-nums">{v}</td>
-                  </tr>
-                ))}
-              </tbody>
-            </table>
-            <a href={`tel:${TEL}`} className="mt-7 inline-flex h-12 items-center gap-2 rounded-[4px] px-6 font-semibold" style={{ background: C.navy, color: C.ivory }}>
-              <Phone size={18} aria-hidden />
-              {TEL}
-            </a>
-          </div>
-        </div>
       </div>
     </section>
   );

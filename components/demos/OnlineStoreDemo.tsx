@@ -648,13 +648,10 @@ function Hero() {
   );
 }
 
-function SectionHead({ id, tag, title, desc }: { id: string; tag: string; title: string; desc?: string }) {
+function SectionHead({ id, title, desc }: { id: string; title: string; desc?: string }) {
   return (
     <div className="border-t pt-6" style={{ borderColor: C.ink }}>
-      <p className="text-[15px] font-semibold" style={{ color: C.terra }}>
-        {tag}
-      </p>
-      <h2 id={id} className="mt-1.5 text-[28px] font-bold leading-[1.35] tracking-[-0.03em] md:text-[40px]">
+      <h2 id={id} className="text-[28px] font-bold leading-[1.35] tracking-[-0.03em] md:text-[40px]">
         {title}
       </h2>
       {desc && (
@@ -846,7 +843,6 @@ function Shop({ onOpen }: { onOpen: (id: string, glaze: GlazeId) => void }) {
       <div className="mx-auto max-w-[1200px]">
         <SectionHead
           id="shop-title"
-          tag="그릇"
           title="유약을 바꿔 가며 골라 보세요"
           desc="색 동그라미를 누르면 그림이 그 유약으로 바뀝니다. 그릇을 누르면 크기와 각인을 고를 수 있어요."
         />
@@ -1841,7 +1837,6 @@ function Delivery({ minute, region, onRegion }: { minute: number; region: Region
       <div className="mx-auto max-w-[1200px]">
         <SectionHead
           id="delivery-title"
-          tag="배송 안내"
           title="지금 주문하면 언제 받을까요"
           desc="평일 오후 2시 전 주문은 그날 포장해서 보냅니다. 주말에는 보내지 않고, 택배도 주말을 빼고 셉니다."
         />
@@ -1940,7 +1935,7 @@ function Story() {
           <Image src={`${IMG}/detail.jpg`} alt="유약이 고르게 녹아 윤이 나는 그릇들을 가까이서 찍은 모습" fill sizes="(min-width: 768px) 55vw, 100vw" className="object-cover" />
         </div>
         <div>
-          <SectionHead id="story-title" tag="공방 이야기" title="물레 두 대와 가마 하나" />
+          <SectionHead id="story-title" title="물레 두 대와 가마 하나" />
           <p className="mt-5" style={{ color: C.muted }}>
             대표 김○○와 이○○ 두 사람이 2019년부터 □□동 작업실에서 그릇을 만들고 있습니다. 한 번 가마를 땔 때 200점 남짓 나오고, 그중 흠이 없는 것만 골라 올립니다.
           </p>
@@ -2023,7 +2018,7 @@ function Visit({ minute }: { minute: number }) {
   return (
     <section aria-labelledby="visit-title" id="visit" className="scroll-mt-16 px-4 py-16 md:px-6 md:py-24" style={{ background: C.paper }}>
       <div className="mx-auto max-w-[1200px]">
-        <SectionHead id="visit-title" tag="공방 위치" title="작업실에서 직접 보고 사셔도 돼요" desc="온라인에 없는 시험 작품과 흠이 조금 있는 그릇도 공방에서 싸게 팝니다." />
+        <SectionHead id="visit-title" title="작업실에서 직접 보고 사셔도 돼요" desc="온라인에 없는 시험 작품과 흠이 조금 있는 그릇도 공방에서 싸게 팝니다." />
         <div className="mt-10 grid gap-10 md:grid-cols-[1.2fr_1fr] md:gap-14">
           <div className="overflow-hidden rounded-[4px] border" style={{ borderColor: C.line }}>
             <MiniMap />
@@ -2101,7 +2096,7 @@ function Faq() {
   return (
     <section aria-labelledby="faq-title" id="faq" className="scroll-mt-16 px-4 py-16 md:px-6 md:py-24">
       <div className="mx-auto max-w-[1200px]">
-        <SectionHead id="faq-title" tag="자주 묻는 질문" title="교환, 반품, 배송" />
+        <SectionHead id="faq-title" title="교환, 반품, 배송" />
         <div className="mt-8 border-t" style={{ borderColor: C.line }}>
           {FAQS.map((f) => (
             <details key={f.q} className="group border-b" style={{ borderColor: C.line }}>

@@ -8,10 +8,9 @@ import {
   BatteryFull,
   Bluetooth,
   Briefcase,
-  Bus,
-  Car,
   Check,
   ChevronDown,
+  Copy,
   CircleAlert,
   Factory,
   FileText,
@@ -22,7 +21,6 @@ import {
   Mail,
   Menu,
   Monitor,
-  Package,
   Plug,
   Plus,
   RotateCcw,
@@ -105,7 +103,7 @@ const MOBILE_EXTRA = [
   { id: "finder", label: "필요한 인증 찾기" },
   { id: "track", label: "시험 진행 조회" },
   { id: "quote", label: "견적 문의" },
-  { id: "location", label: "오시는 길" },
+  { id: "ship", label: "시료 보내실 곳" },
 ] as const;
 
 /* ---------- 시간 ---------- */
@@ -216,7 +214,7 @@ export function CertLabDemo() {
         <Support minute={minute} />
         <Quote certs={certs} setCerts={setCerts} />
         <Recruit />
-        <Location />
+        <Shipping />
       </main>
       <Footer />
     </div>
@@ -411,16 +409,10 @@ function Hero() {
   );
 }
 
-function SectionHead({ id, tag, title, desc, light = false }: { id: string; tag: string; title: string; desc?: string; light?: boolean }) {
+function SectionHead({ id, title, desc, light = false }: { id: string; title: string; desc?: string; light?: boolean }) {
   return (
     <div>
-      <p className="inline-flex items-center gap-2 text-[15px] font-bold" style={{ color: light ? "#7fd6e8" : C.cyanText }}>
-        <svg width="22" height="12" viewBox="0 0 22 12" aria-hidden>
-          <path d="M1 8 H5 L7 3 L10 11 L13 1 L15 7 H21" fill="none" stroke={C.cyan} strokeWidth="1.8" strokeLinejoin="round" strokeLinecap="round" />
-        </svg>
-        {tag}
-      </p>
-      <h2 id={id} className="mt-2 text-[27px] font-bold leading-[1.35] tracking-[-0.03em] md:text-[36px]">
+      <h2 id={id} className="text-[27px] font-bold leading-[1.35] tracking-[-0.03em] md:text-[36px]">
         {title}
       </h2>
       {desc && (
@@ -472,7 +464,6 @@ function Services() {
       <div className="mx-auto max-w-[1200px]">
         <SectionHead
           id="services-title"
-          tag="인증업무"
           title="시험부터 인증서 발급까지 한 곳에서 진행합니다"
           desc="전자파, 무선, 전기안전 시험실을 모두 갖추고 있어 시료를 여러 곳에 나눠 보내지 않아도 됩니다."
         />
@@ -536,7 +527,6 @@ function Domestic() {
       <div className="mx-auto max-w-[1200px]">
         <SectionHead
           id="domestic-title"
-          tag="국내인증"
           title="KC 인증 종류와 처리 기간"
           desc="같은 KC 표시라도 근거 법령과 절차가 다릅니다. 처리 기간은 시료와 서류가 모두 들어온 날부터 셉니다."
         />
@@ -978,7 +968,6 @@ function Finder({ onAdd }: { onAdd: (names: string[]) => void }) {
       <div className="mx-auto max-w-[1200px]">
         <SectionHead
           id="finder-title"
-          tag="필요한 인증 찾기"
           title="우리 제품에 필요한 인증 찾기"
           desc="전원과 무선 기능, 제품 분류, 판매할 국가를 고르면 받아야 할 가능성이 높은 인증을 국가별로 보여 드립니다."
         />
@@ -1269,7 +1258,6 @@ function GlobalMap() {
       <div className="mx-auto max-w-[1200px]">
         <SectionHead
           id="global-title"
-          tag="해외인증"
           title="대륙별 해외인증 안내"
           desc="지도에서 대륙을 누르면 국가별로 받아야 하는 인증과 내용을 볼 수 있습니다. 국내 성적서를 인정하는 국가는 여기서 시험하고, 현지 시험이 필요한 국가는 협력 기관과 진행합니다."
           light
@@ -1548,7 +1536,6 @@ function Tracking({ minute }: { minute: number }) {
       <div className="mx-auto max-w-[1200px]">
         <SectionHead
           id="track-title"
-          tag="시험 진행 조회"
           title="시험이 어디까지 왔는지 확인하세요"
           desc="접수 확인 메일에 적힌 접수번호를 넣으면 단계별 날짜와 시험 결과를 볼 수 있습니다."
         />
@@ -1739,7 +1726,7 @@ function About() {
       <div className="mx-auto max-w-[1200px]">
         <div className="grid items-start gap-10 md:grid-cols-[1.1fr_1fr] md:gap-14">
           <div>
-            <SectionHead id="about-title" tag="회사소개" title="인사말" />
+            <SectionHead id="about-title" title="인사말" />
             <div className="mt-5 space-y-3" style={{ color: C.muted }}>
               <p>{COMPANY}은 전자파 시험실 하나로 시작해 지금은 무선, 전기안전, 해외 인증까지 맡는 지정시험기관이 되었습니다.</p>
               <p>시험은 결과만큼 일정이 중요합니다. 시료가 들어온 날 시험 일정을 정해 알려 드리고, 기준을 넘는 항목이 나오면 원인 주파수와 대책을 함께 말씀드립니다. 처음 인증을 받는 회사도 서류 준비부터 차근차근 안내해 드리겠습니다.</p>
@@ -1875,7 +1862,7 @@ function Facilities() {
   return (
     <section aria-labelledby="facility-title" id="facility" className="scroll-mt-16 px-4 py-16 md:px-6 md:py-24" style={{ background: C.paper, ...GRAPH }}>
       <div className="mx-auto max-w-[1200px]">
-        <SectionHead id="facility-title" tag="시험 설비" title="주요 시험 설비" desc="측정 장비는 해마다 공인 교정기관에서 교정하고, 무향실은 정기적으로 성능을 검증합니다." />
+        <SectionHead id="facility-title" title="주요 시험 설비" desc="측정 장비는 해마다 공인 교정기관에서 교정하고, 무향실은 정기적으로 성능을 검증합니다." />
         <ul className="mt-10 grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
           {FACILITIES.map((f, i) => (
             <motion.li
@@ -1983,7 +1970,7 @@ function Support({ minute }: { minute: number }) {
   return (
     <section aria-labelledby="support-title" id="support" className="scroll-mt-16 px-4 py-16 md:px-6 md:py-24">
       <div className="mx-auto max-w-[1200px]">
-        <SectionHead id="support-title" tag="고객지원" title="새소식과 자료실" desc="고시 개정 소식과 시험 신청에 필요한 양식을 올려 둡니다." />
+        <SectionHead id="support-title" title="새소식과 자료실" desc="고시 개정 소식과 시험 신청에 필요한 양식을 올려 둡니다." />
 
         <div className="mt-10 grid items-start gap-10 lg:grid-cols-[1.25fr_1fr] lg:gap-12">
           <div className="min-w-0">
@@ -2248,7 +2235,7 @@ function Quote({ certs, setCerts }: { certs: string[]; setCerts: (fn: (prev: str
     <section aria-labelledby="quote-title" id="quote" className="scroll-mt-16 px-4 py-16 md:px-6 md:py-24" style={{ background: C.paper }}>
       <div className="mx-auto grid max-w-[1200px] items-start gap-10 lg:grid-cols-[0.8fr_1.2fr] lg:gap-14">
         <div>
-          <SectionHead id="quote-title" tag="견적문의" title="제품 사양을 보내 주시면 견적을 드립니다" desc="영업일 기준 하루 안에 담당 시험원이 견적서를 메일로 보내 드립니다. 급한 일정은 전화로 먼저 말씀해 주세요." />
+          <SectionHead id="quote-title" title="제품 사양을 보내 주시면 견적을 드립니다" desc="영업일 기준 하루 안에 담당 시험원이 견적서를 메일로 보내 드립니다. 급한 일정은 전화로 먼저 말씀해 주세요." />
           <dl className="mt-8 overflow-hidden rounded-[10px] border bg-white text-[15px]" style={{ borderColor: C.line }}>
             {[
               ["전화", TEL],
@@ -2485,7 +2472,7 @@ function Recruit() {
     <section aria-labelledby="recruit-title" id="recruit" className="scroll-mt-16 px-4 py-16 md:px-6 md:py-20">
       <div className="mx-auto grid max-w-[1200px] items-start gap-8 md:grid-cols-[1fr_1.4fr] md:gap-14">
         <div>
-          <SectionHead id="recruit-title" tag="채용정보" title="함께 시험할 사람을 찾습니다" desc="상시 채용합니다. 이력서와 자기소개서를 메일로 보내 주시면 서류 검토 후 2주 안에 연락드립니다." />
+          <SectionHead id="recruit-title" title="함께 시험할 사람을 찾습니다" desc="상시 채용합니다. 이력서와 자기소개서를 메일로 보내 주시면 서류 검토 후 2주 안에 연락드립니다." />
           <a href={`mailto:${EMAIL}`} className="mt-6 inline-flex h-11 items-center gap-2 rounded-[8px] border px-4 text-[15px] font-bold" style={{ borderColor: C.line, color: C.indigo }}>
             <Mail size={17} aria-hidden />
             {EMAIL}
@@ -2514,99 +2501,132 @@ function Recruit() {
   );
 }
 
-/* ---------- 오시는 길 ---------- */
+/* ---------- 시료 보내실 곳 ---------- */
 
-function MiniMap() {
-  return (
-    <svg viewBox="0 0 640 360" className="h-auto w-full" role="img" aria-label="□□역 2번 출구에서 □□로를 따라 400m 걸으면 오른쪽에 있는 시험인증원 약도. 시료 접수실은 건물 뒤편 하역장 옆에 있습니다.">
-      <rect width="640" height="360" fill={C.paper} />
-      <g stroke={C.grid} strokeWidth="1">
-        {Array.from({ length: 17 }, (_, i) => (
-          <path key={`v${i}`} d={`M${i * 40} 0 V360`} />
-        ))}
-        {Array.from({ length: 10 }, (_, i) => (
-          <path key={`h${i}`} d={`M0 ${i * 40} H640`} />
-        ))}
-      </g>
-      <path d="M0 210 H640" stroke={C.white} strokeWidth="34" />
-      <path d="M0 210 H640" stroke={C.line} strokeWidth="1" strokeDasharray="12 10" />
-      <path d="M140 0 V360" stroke={C.white} strokeWidth="24" />
-      <path d="M500 0 V360" stroke={C.white} strokeWidth="18" />
-      <text x="560" y="201" fontSize="14" fill={C.muted}>
-        □□로
-      </text>
-      <rect x="30" y="40" width="88" height="140" rx="6" fill="#e6eaf2" stroke={C.line} />
-      <rect x="164" y="240" width="140" height="90" rx="6" fill="#e6eaf2" stroke={C.line} />
-      <rect x="524" y="240" width="96" height="90" rx="6" fill="#e6eaf2" stroke={C.line} />
-      <circle cx="140" cy="210" r="17" fill={C.indigo} />
-      <text x="140" y="215" fontSize="13" fill={C.white} textAnchor="middle" fontWeight={700}>
-        2
-      </text>
-      <text x="40" y="262" fontSize="14" fill={C.ink} fontWeight={700}>
-        □□역 2번 출구
-      </text>
-      <path d="M158 196 H366 V168" stroke={C.cyan} strokeWidth="3.5" strokeDasharray="7 6" fill="none" strokeLinecap="round" />
-      <text x="250" y="186" fontSize="13" fill={C.cyanText} textAnchor="middle" fontWeight={700}>
-        걸어서 6분
-      </text>
-      <rect x="306" y="44" width="170" height="122" rx="8" fill={C.indigo} />
-      <path d="M318 132 H334 L340 116 L348 142 L356 100 L364 128 L370 120 H382" fill="none" stroke={C.cyan} strokeWidth="2.2" strokeLinejoin="round" />
-      <text x="391" y="82" fontSize="15" fill={C.white} textAnchor="middle" fontWeight={700}>
-        ○○시험인증원
-      </text>
-      <text x="420" y="132" fontSize="12" fill="#c8cdea" textAnchor="middle">
-        본관 1~4층
-      </text>
-      <rect x="306" y="16" width="86" height="22" rx="4" fill={C.white} stroke={C.indigo} />
-      <text x="349" y="31" fontSize="12" fill={C.indigo} textAnchor="middle" fontWeight={700}>
-        시료 접수실
-      </text>
-    </svg>
-  );
-}
+const SHIP_TO = `${ADDRESS} 1층 시료접수실`;
+const SHIP_RECEIVER = "시료접수팀";
+const SHIP_TEL = "02-000-0002";
 
-function Location() {
-  const routes = [
-    { icon: Bus, title: "대중교통", body: "□□역 2번 출구로 나와 □□로를 따라 400m, 오른쪽 건물입니다." },
-    { icon: Car, title: "자가용", body: "□□IC에서 10분. 방문객 주차장은 건물 앞, 상담 방문 시 2시간 무료입니다." },
-    { icon: Package, title: "시료 보내실 곳", body: "건물 뒤편 하역장 옆 시료 접수실. 택배는 상자에 접수번호를 적어 주세요." },
-  ];
+const BOX_ITEMS = [
+  { id: "sample", name: "시료", note: "시험용 1대와 예비 1대" },
+  { id: "number", name: "접수번호 적은 종이", note: "견적 회신 메일에 있는 번호" },
+  { id: "manual", name: "사용설명서", note: "켜는 법과 시험 모드 들어가는 법" },
+  { id: "circuit", name: "회로도", note: "부품 목록이 있으면 함께" },
+];
+
+function Shipping() {
+  const [copied, setCopied] = useState(false);
+  const [packed, setPacked] = useState<string[]>([]);
+  const timer = useRef<number | undefined>(undefined);
+  const listId = useId();
+
+  useEffect(() => () => window.clearTimeout(timer.current), []);
+
+  const copy = async () => {
+    try {
+      await navigator.clipboard.writeText(`${SHIP_TO} (${SHIP_RECEIVER}, ${SHIP_TEL})`);
+      setCopied(true);
+      window.clearTimeout(timer.current);
+      timer.current = window.setTimeout(() => setCopied(false), 2000);
+    } catch {
+      setCopied(false);
+    }
+  };
+
+  const toggle = (id: string) => setPacked((prev) => (prev.includes(id) ? prev.filter((v) => v !== id) : [...prev, id]));
+
   return (
-    <section aria-labelledby="location-title" id="location" className="scroll-mt-16 px-4 py-16 md:px-6 md:py-24" style={{ background: C.paper }}>
+    <section aria-labelledby="ship-title" id="ship" className="scroll-mt-16 px-4 py-16 md:px-6 md:py-24" style={{ background: C.paper }}>
       <div className="mx-auto max-w-[1200px]">
-        <SectionHead id="location-title" tag="오시는 길" title="□□역 2번 출구에서 걸어서 6분" />
-        <div className="mt-10 grid gap-10 md:grid-cols-[1.2fr_1fr] md:gap-14">
-          <div className="overflow-hidden rounded-[10px] border" style={{ borderColor: C.line }}>
-            <MiniMap />
+        <SectionHead id="ship-title" title="시료 보내실 곳" desc="택배로 보내 주시면 도착한 날 접수 확인 문자를 드립니다. 평일 17시까지 도착한 시료는 그날 바로 접수합니다." />
+        <div className="mt-10 grid items-start gap-6 md:grid-cols-[1.15fr_1fr] md:gap-8">
+          <div className="rounded-[10px] border bg-white p-5 md:p-7" style={{ borderColor: C.line }}>
+            <dl className="grid gap-4 text-[16px]">
+              <div className="grid gap-1 sm:grid-cols-[96px_1fr] sm:gap-4">
+                <dt className="font-bold" style={{ color: C.muted }}>
+                  받는 주소
+                </dt>
+                <dd className="text-[18px] font-bold leading-[1.5] tracking-[-0.02em]">{SHIP_TO}</dd>
+              </div>
+              <div className="grid gap-1 sm:grid-cols-[96px_1fr] sm:gap-4">
+                <dt className="font-bold" style={{ color: C.muted }}>
+                  받는 사람
+                </dt>
+                <dd>{SHIP_RECEIVER}</dd>
+              </div>
+              <div className="grid gap-1 sm:grid-cols-[96px_1fr] sm:gap-4">
+                <dt className="font-bold" style={{ color: C.muted }}>
+                  전화
+                </dt>
+                <dd>
+                  <a href={`tel:${SHIP_TEL}`} className="tabular-nums underline underline-offset-4">
+                    {SHIP_TEL}
+                  </a>
+                </dd>
+              </div>
+            </dl>
+            <div className="mt-6 flex flex-wrap items-center gap-3 border-t pt-5" style={{ borderColor: C.line }}>
+              <button
+                type="button"
+                onClick={copy}
+                className="inline-flex h-11 items-center gap-2 rounded-[8px] px-5 font-bold"
+                style={{ background: C.indigo, color: C.white }}
+              >
+                {copied ? <Check size={17} strokeWidth={3} aria-hidden /> : <Copy size={17} aria-hidden />}
+                {copied ? "복사됨" : "주소 복사"}
+              </button>
+              <span className="sr-only" role="status">
+                {copied ? "주소를 복사했습니다" : ""}
+              </span>
+              <p className="text-[15px]" style={{ color: C.muted }}>
+                상자 겉면에도 접수번호를 적어 주세요.
+              </p>
+            </div>
           </div>
-          <div>
-            <p className="text-[21px] font-bold tracking-[-0.02em]">{ADDRESS}</p>
-            <p className="mt-1 text-[15px]" style={{ color: C.muted }}>
-              평일 09:00 ~ 18:00, 시료 접수는 17:00까지
+
+          <fieldset className="rounded-[10px] border bg-white p-5 md:p-7" style={{ borderColor: C.line }}>
+            <legend className="sr-only">상자에 넣을 것</legend>
+            <p className="font-bold" aria-hidden>
+              상자에 넣을 것
             </p>
-            <ul className="mt-6 space-y-4">
-              {routes.map((r) => (
-                <li key={r.title} className="flex gap-3">
-                  <r.icon size={20} className="mt-1 shrink-0" style={{ color: C.cyanText }} aria-hidden />
-                  <span>
-                    <span className="font-bold">{r.title}</span>
-                    <span className="block text-[15px]" style={{ color: C.muted }}>
-                      {r.body}
-                    </span>
-                  </span>
-                </li>
-              ))}
+            <ul className="mt-3 grid gap-1" aria-describedby={listId}>
+              {BOX_ITEMS.map((b) => {
+                const on = packed.includes(b.id);
+                return (
+                  <li key={b.id}>
+                    <label className="flex cursor-pointer items-start gap-3 rounded-[8px] px-2 py-2.5 hover:bg-[#f4f7fb]">
+                      <input
+                        type="checkbox"
+                        checked={on}
+                        onChange={() => toggle(b.id)}
+                        className="mt-1 h-[18px] w-[18px] shrink-0 accent-[#23307a]"
+                      />
+                      <span className="min-w-0">
+                        <span className={`block font-bold ${on ? "line-through" : ""}`} style={{ color: on ? C.muted : C.ink }}>
+                          {b.name}
+                        </span>
+                        <span className="block text-[15px]" style={{ color: C.muted }}>
+                          {b.note}
+                        </span>
+                      </span>
+                    </label>
+                  </li>
+                );
+              })}
             </ul>
-            <a href={`tel:${TEL}`} className="mt-7 inline-flex h-12 items-center rounded-[8px] px-6 font-bold tabular-nums" style={{ background: C.indigo, color: C.white }}>
-              전화 {TEL}
-            </a>
-          </div>
+            <p id={listId} className="mt-3 px-2 text-[15px] tabular-nums" style={{ color: C.muted }}>
+              {packed.length === BOX_ITEMS.length ? "모두 챙겼습니다." : `${BOX_ITEMS.length}개 중 ${packed.length}개 챙김`}
+            </p>
+          </fieldset>
         </div>
+
+        <p className="mt-8 text-[15px]" style={{ color: C.muted }}>
+          방문 상담은 하루 전까지 전화로 예약해 주세요. {ADDRESS}
+        </p>
       </div>
     </section>
   );
 }
-
 /* ---------- 바닥글 ---------- */
 
 function Footer() {
@@ -2630,8 +2650,8 @@ function Footer() {
             </a>
           </li>
           <li>
-            <a href="#location" className="hover:underline">
-              오시는 길
+            <a href="#ship" className="hover:underline">
+              시료 보내실 곳
             </a>
           </li>
         </ul>

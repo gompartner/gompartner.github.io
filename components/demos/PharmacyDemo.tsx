@@ -7,7 +7,6 @@ import {
   AArrowUp,
   CalendarDays,
   Camera,
-  Car,
   Check,
   MessageSquare,
   Menu,
@@ -15,7 +14,6 @@ import {
   Printer,
   RotateCcw,
   Search,
-  TrainFront,
   X,
 } from "lucide-react";
 import { useReducedMotionSafe } from "@/hooks/useReducedMotionSafe";
@@ -173,7 +171,6 @@ export function PharmacyDemo() {
         <Pillbox minute={minute} />
         <Stock />
         <Hours minute={minute} />
-        <Location />
       </main>
       <Footer />
     </div>
@@ -351,13 +348,10 @@ function Hero({ minute }: { minute: number }) {
   );
 }
 
-function SectionHead({ id, tag, title, desc }: { id: string; tag: string; title: string; desc?: string }) {
+function SectionHead({ id, title, desc }: { id: string; title: string; desc?: string }) {
   return (
     <div>
-      <p className="text-[15px] font-bold" style={{ color: C.mint }}>
-        {tag}
-      </p>
-      <h2 id={id} className="mt-1.5 text-[28px] font-bold leading-[1.35] tracking-[-0.03em] md:text-[36px]">
+      <h2 id={id} className="text-[28px] font-bold leading-[1.35] tracking-[-0.03em] md:text-[36px]">
         {title}
       </h2>
       {desc && (
@@ -461,7 +455,6 @@ function Prescription({ minute }: { minute: number }) {
       <div className="mx-auto max-w-[1200px]">
         <SectionHead
           id="rx-title"
-          tag="처방전 미리 보내기"
           title="오시기 전에 사진으로 보내 주세요"
           desc="받은 처방전을 찍어 보내면 미리 조제해 둡니다. 약이 준비되면 문자로 알려 드리고, 처방전 원본은 찾으러 오실 때 내 주세요."
         />
@@ -767,7 +760,6 @@ function Pillbox({ minute }: { minute: number }) {
       <div className="mx-auto max-w-[1200px]">
         <SectionHead
           id="pillbox-title"
-          tag="복약 시간표"
           title="약 봉투에 적힌 대로 고르면 약통이 만들어져요"
           desc="먹은 칸을 누르면 뚜껑이 열리며 표시됩니다. 인쇄해서 냉장고에 붙여 두셔도 됩니다."
         />
@@ -950,7 +942,6 @@ function Stock() {
       <div className="mx-auto max-w-[1200px]">
         <SectionHead
           id="stock-title"
-          tag="상비약 찾기"
           title="찾는 약이 있는지 먼저 보고 오세요"
           desc="증상이나 약 이름으로 찾을 수 있습니다. 없는 약은 주문해 두면 다음 날 받아 가실 수 있어요."
         />
@@ -1047,7 +1038,7 @@ function Hours({ minute }: { minute: number }) {
   return (
     <section aria-labelledby="hours-title" id="hours" className="scroll-mt-16 px-4 py-16 md:px-6 md:py-24" style={{ background: C.bg }}>
       <div className="mx-auto max-w-[1200px]">
-        <SectionHead id="hours-title" tag="영업시간·당번" title="쉬는 날과 휴일 당번" desc="일요일은 쉬고, 둘째·넷째 일요일에는 휴일 당번으로 문을 엽니다." />
+        <SectionHead id="hours-title" title="쉬는 날과 휴일 당번" desc="일요일은 쉬고, 둘째·넷째 일요일에는 휴일 당번으로 문을 엽니다." />
         <div className="mt-10 grid items-start gap-8 md:grid-cols-[1fr_340px]">
           <div className="rounded-[16px] bg-white p-4 md:p-6">
             <div className="flex items-center justify-between">
@@ -1126,75 +1117,12 @@ function Hours({ minute }: { minute: number }) {
             <p className="mt-3 text-[14px]" style={{ color: C.muted }}>
               점심시간 없이 문을 엽니다.
             </p>
-          </div>
-        </div>
-      </div>
-    </section>
-  );
-}
-
-/* ---------- 오시는 길 ---------- */
-
-function MiniMap() {
-  return (
-    <svg viewBox="0 0 640 360" className="h-auto w-full" role="img" aria-label="□□역 1번 출구 앞 □□내과 건물 1층에 있는 약국 약도">
-      <rect width="640" height="360" fill={C.white} />
-      <path d="M0 200 H640" stroke={C.line} strokeWidth="30" />
-      <path d="M150 0 V360" stroke={C.line} strokeWidth="22" />
-      <text x="470" y="236" fontSize="15" fill={C.muted}>
-        □□로
-      </text>
-      <circle cx="150" cy="200" r="16" fill={C.ink} />
-      <text x="150" y="205" fontSize="13" fill="#fff" textAnchor="middle" fontWeight={700}>
-        1
-      </text>
-      <text x="40" y="256" fontSize="15" fill={C.ink}>
-        □□역 1번 출구
-      </text>
-      <path d="M168 200 H330" stroke={C.mint} strokeWidth="3" strokeDasharray="6 7" />
-      <rect x="300" y="60" width="200" height="118" rx="8" fill={C.bg} stroke={C.line} />
-      <text x="400" y="92" fontSize="14" fill={C.muted} textAnchor="middle">
-        2층 □□내과, 3층 □□소아과
-      </text>
-      <rect x="320" y="120" width="70" height="46" rx="6" fill={C.mint} />
-      <path d="M350 130 H360 V138 H368 V148 H360 V156 H350 V148 H342 V138 H350Z" fill="#fff" />
-      <text x="400" y="150" fontSize="16" fill={C.ink} fontWeight={700}>
-        1층 {PHARMACY}
-      </text>
-    </svg>
-  );
-}
-
-function Location() {
-  return (
-    <section aria-labelledby="location-title" id="location" className="scroll-mt-16 px-4 py-16 md:px-6 md:py-24">
-      <div className="mx-auto max-w-[1200px]">
-        <SectionHead id="location-title" tag="오시는 길" title="□□역 1번 출구 바로 앞이에요" />
-        <div className="mt-10 grid gap-10 md:grid-cols-[1.2fr_1fr] md:gap-14">
-          <div className="overflow-hidden rounded-[12px] border" style={{ borderColor: C.line }}>
-            <MiniMap />
-          </div>
-          <div>
-            <p className="text-[22px] font-bold tracking-[-0.02em]">{ADDRESS}</p>
-            <ul className="mt-5 space-y-4">
-              {[
-                { icon: TrainFront, title: "지하철", body: "□□역 1번 출구에서 50m, 같은 건물 2층 □□내과, 3층 □□소아과" },
-                { icon: Car, title: "주차", body: "건물 뒤 주차장 30분 무료, 약 받으실 때 말씀해 주세요." },
-              ].map((r) => (
-                <li key={r.title} className="flex gap-3">
-                  <r.icon size={20} className="mt-1 shrink-0" style={{ color: C.mint }} aria-hidden />
-                  <span>
-                    <span className="font-semibold">{r.title}</span>
-                    <span className="block text-[15px]" style={{ color: C.muted }}>
-                      {r.body}
-                    </span>
-                  </span>
-                </li>
-              ))}
-            </ul>
-            <a href={`tel:${TEL}`} className="mt-7 inline-flex h-12 items-center rounded-full px-6 font-semibold" style={{ background: C.mint, color: "#fff" }}>
-              전화 {TEL}
-            </a>
+            <div className="mt-5 border-t pt-4" style={{ borderColor: C.line }}>
+              <p className="font-semibold">□□의원 건물 1층, □□역 1번 출구 앞</p>
+              <a href={`tel:${TEL}`} className="mt-3 inline-flex h-12 items-center rounded-full px-6 font-semibold tabular-nums" style={{ background: C.mint, color: "#fff" }}>
+                전화 {TEL}
+              </a>
+            </div>
           </div>
         </div>
       </div>
