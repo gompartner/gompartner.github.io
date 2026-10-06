@@ -1585,7 +1585,7 @@ function Compare() {
         <div className="mt-6 border-t pt-5" style={{ borderColor: C.line }} aria-live="polite">
           <p className="text-[20px] font-bold leading-[1.45] tracking-[-0.02em] md:text-[22px]">
             {diff <= 1 ? (
-              "두 방식의 월 비용 차이가 1만 원 이하입니다."
+              "두 방식의 월 비용 차이는 1만 원 이하입니다."
             ) : (
               <>
                 <span style={{ color: C.accentText }}>{jTotal < mTotal ? "전세" : "월세"}</span>가 월 {diff.toLocaleString("ko-KR")}만 원 적게 듭니다.
@@ -1845,8 +1845,8 @@ function RequestForm() {
           {[
             ["접수 확인", "담당 중개사가 전화로 매물 정보를 확인합니다."],
             ["권리 확인", "등기부등본과 소유자 신분을 확인합니다. 소유자가 아니면 위임장이 필요합니다."],
-            ["현장 확인", "방문해 사진을 찍고 면적, 방향, 관리비를 확인합니다."],
-            ["광고 게시", "표시·광고 명시사항을 갖춰 매물을 올리고, 거래가 끝나면 바로 내립니다."],
+            ["현장 확인", "현장을 방문해 사진 촬영과 면적, 방향, 관리비를 확인합니다."],
+            ["광고 게시", "표시·광고 명시사항에 맞춰 매물을 등록하고, 거래 완료 시 바로 삭제합니다."],
           ].map(([t, d]) => (
             <div key={t}>
               <dt className="font-semibold">{t}</dt>
@@ -1982,7 +1982,7 @@ function Tour({ selectedId, basket, onToggle, onClear, onMore }: { selectedId: s
                 </span>
                 매물투어신청이 접수되었습니다
               </p>
-              <p className="mt-3">집주인과 일정을 맞춘 뒤 문자로 안내드립니다.</p>
+              <p className="mt-3">집주인과 일정 확인 후 문자로 안내해 드립니다.</p>
               <dl className="mt-4 text-[15px]">
                 <div className="flex justify-between gap-4 border-t py-2.5" style={{ borderColor: C.line }}>
                   <dt style={{ color: C.muted }}>방문 희망 시간</dt>
@@ -2015,9 +2015,9 @@ function Tour({ selectedId, basket, onToggle, onClear, onMore }: { selectedId: s
               </h2>
               <dl className="mt-3 space-y-3 text-[15px]">
                 {[
-                  ["등기부등본", "매물마다 최신 등기부등본을 떼어 봅니다."],
-                  ["전세 매물", "전세보증보험 가입 가능 여부를 미리 확인해 둡니다."],
-                  ["주차", "사무소 앞 상가 주차장을 1시간 이용할 수 있습니다."],
+                  ["등기부등본", "모든 매물은 최신 등기부등본을 확인합니다."],
+                  ["전세 매물", "전세보증보험 가입 가능 여부를 미리 확인해 드립니다."],
+                  ["주차", "사무소 앞 상가 주차장 1시간 무료"],
                 ].map(([t, d]) => (
                   <div key={t}>
                     <dt className="font-semibold">{t}</dt>
@@ -2052,7 +2052,7 @@ function About() {
           인사말
         </h2>
         <p className="mt-3" style={{ color: C.muted }}>
-          □□아파트 입주 때부터 이 동네에서 중개하고 있습니다. 동마다 해가 얼마나 드는지, 학교는 어디로 배정되는지 물어보시면 알려 드립니다.
+          □□아파트 입주 때부터 한자리에서 중개하고 있습니다. 매매, 전세, 월세 모두 취급하오니 언제든지 편하게 문의주세요.
         </p>
         <p className="mt-4 font-bold">대표 공인중개사 {AGENT}</p>
 
