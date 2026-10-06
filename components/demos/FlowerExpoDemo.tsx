@@ -948,11 +948,11 @@ function Home({ today, go, openNotice }: { today: number; go: Go; openNotice: (i
           <QuickTiles go={go} />
         </div>
         <div className="mt-12 grid gap-10 md:mt-16 lg:grid-cols-2 lg:gap-10">
-          <section aria-labelledby="home-notice-title">
+          <section aria-labelledby="home-notice-title" className="min-w-0">
             <BoxHead id="home-notice-title" title="공지사항" more={() => go("notice")} />
             <NoticeList limit={5} onOpen={openNotice} />
           </section>
-          <section aria-labelledby="home-gallery-title">
+          <section aria-labelledby="home-gallery-title" className="min-w-0">
             <BoxHead id="home-gallery-title" title="포토갤러리" more={() => go("gallery")} />
             <ul className="mt-4 grid grid-cols-2 gap-2">
               {PHOTOS.map((p) => (
