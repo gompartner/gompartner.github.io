@@ -12,9 +12,6 @@ export default function JwtParserPage() {
   return (
     <div className="mx-auto w-full max-w-[1248px] px-4 pb-10 pt-14 md:px-6 md:py-14">
       <h1 className="text-[28px] font-bold leading-[1.4] tracking-[-0.01em] md:text-[36px]">JWT 파서</h1>
-      <p className="mt-2 max-w-[720px] text-[17px] leading-[1.6] text-foreground-secondary">
-        토큰을 붙여 넣으면 헤더와 페이로드를 풀고, 만료 시각을 한국 시간으로 보여 드립니다.
-      </p>
       <JwtParser />
     </div>
   );

@@ -12,9 +12,6 @@ export default function UnixTimePage() {
   return (
     <div className="mx-auto w-full max-w-[1248px] px-4 pb-10 pt-14 md:px-6 md:py-14">
       <h1 className="text-[28px] font-bold leading-[1.4] tracking-[-0.01em] md:text-[36px]">유닉스 시간 변환기</h1>
-      <p className="mt-2 max-w-[720px] text-[17px] leading-[1.6] text-foreground-secondary">
-        유닉스 시간을 한국 시간으로, 날짜를 유닉스 시간으로 바꿉니다. 초와 밀리초는 자릿수로 알아서 구분합니다.
-      </p>
       <UnixTimeConverter />
     </div>
   );

@@ -12,9 +12,6 @@ export default function ImageCompressPage() {
   return (
     <div className="mx-auto w-full max-w-[1248px] px-4 pb-10 pt-14 md:px-6 md:py-14">
       <h1 className="text-[28px] font-bold leading-[1.4] tracking-[-0.01em] md:text-[36px]">이미지 용량 줄이기</h1>
-      <p className="mt-2 max-w-[720px] text-[17px] leading-[1.6] text-foreground-secondary">
-        홈페이지가 느린 가장 흔한 이유는 큰 사진입니다. 사진을 넣고 화질과 가로 크기를 고르면 용량을 줄여 드리고, 원본과 나란히 비교해 볼 수 있습니다.
-      </p>
       <ImageCompressor />
     </div>
   );

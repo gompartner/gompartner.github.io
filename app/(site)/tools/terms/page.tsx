@@ -12,9 +12,6 @@ export default function TermsPage() {
   return (
     <div className="mx-auto w-full max-w-[1248px] px-4 pb-10 pt-14 md:px-6 md:py-14">
       <h1 className="text-[28px] font-bold leading-[1.4] tracking-[-0.01em] md:text-[36px]">이용약관 생성기</h1>
-      <p className="mt-2 max-w-[720px] text-[17px] leading-[1.6] text-foreground-secondary">
-        사이트 유형과 회원가입, 결제, 게시판 여부를 고르면 공정거래위원회 전자상거래 표준약관 구성에 맞춰 필요한 조항만 담은 이용약관을 만들어 드립니다.
-      </p>
       <TermsGenerator />
     </div>
   );

@@ -18,7 +18,6 @@ export default function ToolsPage() {
             <Link href={t.href} className="block h-full rounded-[10px] border border-border p-6 transition-colors hover:border-accent hover:bg-accent-surface">
               <p className="text-[15px] font-bold text-accent">{t.for}</p>
               <h2 className="mt-1 text-[21px] font-bold">{t.title}</h2>
-              <p className="mt-2 text-[16px] leading-[1.6] text-foreground-secondary">{t.description}</p>
             </Link>
           </li>
         ))}

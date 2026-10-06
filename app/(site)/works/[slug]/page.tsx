@@ -44,7 +44,6 @@ export default async function IndustryWorksPage({ params }: Props) {
               · {ind.label}
             </p>
             <h1 className="mt-1 text-[28px] font-bold leading-[1.4] tracking-[-0.01em] md:text-[36px]">{ind.title} 사례</h1>
-            <p className="mt-2 max-w-[760px] text-[17px] leading-[1.6] text-foreground-secondary">{ind.description}</p>
           </div>
           <div className="relative aspect-[16/10] overflow-hidden rounded-[10px]">
             <Image src={ind.image} alt={ind.imageAlt} fill priority sizes="(min-width: 768px) 45vw, 100vw" className="object-cover" />
