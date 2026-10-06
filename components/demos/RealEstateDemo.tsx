@@ -1832,9 +1832,6 @@ function RequestForm() {
               <button type="submit" className="h-12 w-full rounded-[6px] text-[17px] font-bold sm:w-auto sm:px-10" style={{ background: C.accent, color: "#fff" }}>
                 매물 의뢰하기
               </button>
-              <p className="text-[14px]" style={{ color: C.muted }}>
-                데모 화면이라 입력한 내용은 어디에도 보내지 않습니다.
-              </p>
             </motion.form>
           )}
         </AnimatePresence>
@@ -2018,7 +2015,7 @@ function Tour({ selectedId, basket, onToggle, onClear, onMore }: { selectedId: s
               </h2>
               <dl className="mt-3 space-y-3 text-[15px]">
                 {[
-                  ["등기부등본", "매물마다 최신 등기부등본을 함께 확인합니다."],
+                  ["등기부등본", "매물마다 최신 등기부등본을 떼어 봅니다."],
                   ["전세 매물", "전세보증보험 가입 가능 여부를 미리 확인해 둡니다."],
                   ["주차", "사무소 앞 상가 주차장을 1시간 이용할 수 있습니다."],
                 ].map(([t, d]) => (
@@ -2055,7 +2052,7 @@ function About() {
           인사말
         </h2>
         <p className="mt-3" style={{ color: C.muted }}>
-          □□아파트 입주 때부터 이 동네에서 중개하고 있습니다. 단지별 동 배치와 층마다 다른 일조, 학교 배정까지 직접 확인한 내용으로 안내드립니다.
+          □□아파트 입주 때부터 이 동네에서 중개하고 있습니다. 동마다 해가 얼마나 드는지, 학교는 어디로 배정되는지 물어보시면 알려 드립니다.
         </p>
         <p className="mt-4 font-bold">대표 공인중개사 {AGENT}</p>
 

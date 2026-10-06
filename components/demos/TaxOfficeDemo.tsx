@@ -402,13 +402,13 @@ const BOARD_TOTAL: Record<BoardId, number> = { news: 213, column: 86, notice: 41
 /* ---------- 업무분야 ---------- */
 
 const SERVICES: { name: string; desc: string; topic: string }[] = [
-  { name: "세무기장/신고", desc: "장부 작성과 부가가치세, 원천세, 종합소득세, 법인세 신고를 맡습니다.", topic: "신규 기장" },
-  { name: "세무조정", desc: "결산 뒤 회계 이익을 세법 기준으로 맞춰 법인세와 종합소득세를 계산합니다.", topic: "법인세" },
+  { name: "세무기장/신고", desc: "장부 작성, 부가가치세·원천세·종합소득세·법인세 신고", topic: "신규 기장" },
+  { name: "세무조정", desc: "결산 후 회계 이익을 세법 기준으로 조정해 법인세, 종합소득세를 계산합니다.", topic: "법인세" },
   { name: "양도소득세", desc: "부동산과 주식 양도 전에 세액을 미리 계산하고 신고합니다.", topic: "양도·상속·증여" },
-  { name: "상속세·증여세", desc: "재산 평가와 공제 검토, 신고와 분할 납부 신청까지 진행합니다.", topic: "양도·상속·증여" },
-  { name: "법인설립·법인전환", desc: "개인사업자의 법인전환 시점을 검토하고 설립 뒤 첫 신고까지 돕습니다.", topic: "법인전환" },
-  { name: "세무조사대응", desc: "조사 통지를 받은 날부터 자료 준비와 의견 진술을 함께합니다.", topic: "세무조사대응" },
-  { name: "4대보험", desc: "직원 입사와 퇴사 신고, 보수총액 신고, 두루누리 지원 신청을 처리합니다.", topic: "원천세·인건비" },
+  { name: "상속세·증여세", desc: "재산 평가, 공제 검토, 신고, 분할 납부 신청", topic: "양도·상속·증여" },
+  { name: "법인설립·법인전환", desc: "법인으로 바꿀 시점을 따져 보고, 설립 후 첫 신고를 도와드립니다.", topic: "법인전환" },
+  { name: "세무조사대응", desc: "조사 통지를 받으면 자료 준비와 의견 진술을 같이 합니다.", topic: "세무조사대응" },
+  { name: "4대보험", desc: "직원 입사·퇴사 신고, 보수총액 신고, 두루누리 지원 신청", topic: "원천세·인건비" },
 ];
 
 const SHORTCUTS = [
@@ -962,7 +962,7 @@ function Home({
                   <Image src={`${IMG}/office.jpg`} alt="" fill sizes="112px" className="object-cover" />
                 </span>
                 <p className="text-[15px] leading-[1.6]" style={{ color: C.muted }}>
-                  맡은 장부는 세무사가 직접 봅니다. 신고서를 내기 전에 숫자를 사장님과 한 번 더 맞춰 봅니다.{" "}
+                  음식점과 소매점 장부를 가장 많이 맡고 있습니다.{" "}
                   <button type="button" onClick={() => go("about")} className="font-semibold underline underline-offset-4" style={{ color: C.ink }}>
                     인사말 전체
                   </button>
@@ -1660,8 +1660,7 @@ function About() {
           </h2>
           <div className="mt-4 space-y-3" style={{ color: C.muted }}>
             <p>{OFFICE}는 개인사업자와 소규모 법인의 장부와 신고를 맡는 사무소입니다.</p>
-            <p>음식점과 소매점 장부를 가장 많이 봅니다. 맡은 장부는 세무사가 직접 보고, 신고서를 내기 전에 숫자를 사장님과 전화로 한 번 더 맞춰 봅니다.</p>
-            <p>상담실은 문이 닫히는 별도 방입니다. 상담 내용은 세무사법에 따라 비밀이 지켜집니다.</p>
+            <p>음식점과 소매점 장부를 가장 많이 맡고 있습니다. 장부는 세무사가 직접 보고, 신고 전에 사장님께 전화로 숫자를 한 번 더 확인합니다.</p>
           </div>
           <p className="mt-5 font-bold">대표세무사 김ㅅ우</p>
         </div>
@@ -1939,9 +1938,6 @@ function ContactForm({ prefill }: { prefill: Prefill }) {
               <button type="submit" className="h-12 w-full rounded-[6px] text-[17px] font-bold md:w-auto md:px-10" style={{ background: C.green, color: "#fff" }}>
                 상담신청
               </button>
-              <p className="mt-3 text-[14px]" style={{ color: C.muted }}>
-                데모 화면이라 입력한 내용은 어디에도 보내지 않습니다.
-              </p>
             </div>
           </motion.form>
         )}

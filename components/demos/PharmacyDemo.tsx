@@ -382,7 +382,7 @@ function Intro() {
         </span>
       </div>
       <p className="mt-2 text-[16px]" style={{ color: C.muted }}>
-        둘째·넷째 일요일은 휴일지킴이약국으로 문을 엽니다. 동물약도 취급하고, 건물 주차장을 30분 무료로 쓸 수 있습니다.
+        동물약도 취급합니다.
       </p>
       <dl className="mt-4 grid border-t text-[16px] sm:grid-cols-2" style={{ borderColor: C.line }}>
         {rows.map(([k, v]) => (
@@ -704,9 +704,6 @@ function Prescription({ status }: { status: Status | null }) {
                 </button>
               </div>
             </div>
-            <p className="mt-2 text-[14px]" style={{ color: C.muted }}>
-              사진은 이 화면에만 표시되며 서버로 전송되지 않습니다.
-            </p>
           </div>
 
           <fieldset>
@@ -734,7 +731,7 @@ function Prescription({ status }: { status: Status | null }) {
               })}
             </div>
             <p className="mt-2 text-[14px]" style={{ color: C.muted }}>
-              영업시간 밖에 보낸 처방전은 다음 영업 시작 후 조제합니다.
+              영업시간 외에 보내신 처방전은 문을 연 뒤에 조제합니다.
             </p>
           </fieldset>
 
@@ -816,9 +813,8 @@ function Prescription({ status }: { status: Status | null }) {
                 <h3 className="border-b pb-2 font-bold" style={{ borderColor: C.line }}>이용 안내</h3>
                 <ol className="mt-3 list-decimal space-y-2 pl-5 text-[15px]" style={{ color: C.muted }}>
                   {[
-                    "약사가 처방 내용과 재고를 확인합니다. 재고가 없는 약은 전화로 안내합니다.",
-                    "조제 진행은 접수 · 조제 중 · 조제 완료 순으로 표시됩니다.",
-                    "조제가 완료되면 문자를 보내 드립니다.",
+                    "재고가 없는 약이 있으면 전화를 드립니다.",
+                    "조제가 끝나면 문자를 보내 드립니다.",
                     "약 수령 시 처방전 원본을 제출해 주십시오. 원본이 없으면 약을 드릴 수 없습니다.",
                   ].map((t) => (
                     <li key={t}>{t}</li>
@@ -1002,8 +998,8 @@ function Stock() {
         </p>
       )}
       <ul className="mt-4 space-y-1 text-[14px]" style={{ color: C.muted }}>
-        <li>주문 요청 버튼이 있는 품목은 지금 재고가 없습니다. 요청하시면 다음 날 오후 2시 이후 수령할 수 있습니다.</li>
-        <li>복용 중인 약이 있거나 임신 중이면 일반의약품도 약사와 먼저 상담하시기 바랍니다.</li>
+        <li>재고가 없는 품목은 주문 요청을 하시면 다음 날 오후 2시부터 찾아가실 수 있습니다.</li>
+        <li>드시는 약이 있거나 임신 중이시면 약사에게 먼저 물어봐 주십시오.</li>
       </ul>
     </Panel>
   );
