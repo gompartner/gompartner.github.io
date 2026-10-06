@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import { useCallback, useEffect, useState } from "react";
-import { ArrowLeft, CircleHelp, NotebookPen } from "lucide-react";
+import { ArrowDown, ArrowLeft, ArrowUp, CircleHelp, NotebookPen } from "lucide-react";
 import type { TourStep } from "@/data/tours";
 
 // 데모 왼쪽 아래 버튼 묶음: 다른 데모 보기, 만든 이야기, 사용법 가이드.
@@ -170,6 +170,26 @@ export function DemoDock({ projectId, story, tour }: { projectId: string; story?
               )}
             </div>
             <p className="mt-1.5 text-[15px] leading-relaxed text-stone-600">{current.desc}</p>
+            {/* 안내 영역이 충분히 보이지 않으면(살짝 걸친 경우 포함) 방향을 알려 주고 눌러서 되돌아가게 한다 (프라이빗 짐 가이드와 같은 동작) */}
+            {(() => {
+              const vh = window.innerHeight;
+              const topBound = 72; // 데모 상단 고정 머리글에 가려지는 영역
+              const visible = Math.min(rect.top + rect.height, vh) - Math.max(rect.top, topBound);
+              const needed = Math.min(rect.height * 0.5, 200);
+              const dir = visible >= needed ? null : rect.top + rect.height / 2 < vh / 2 ? "up" : "down";
+              return (
+                dir && (
+                  <button
+                    type="button"
+                    onClick={() => open(step!)}
+                    className="mt-3 flex w-full items-center justify-center gap-1.5 rounded-lg bg-[#16A34A]/10 py-2.5 text-sm font-semibold text-[#15803d] transition-colors hover:bg-[#16A34A]/20"
+                  >
+                    {dir === "up" ? <ArrowUp size={14} aria-hidden /> : <ArrowDown size={14} aria-hidden />}
+                    안내 영역이 {dir === "up" ? "위" : "아래"}에 있어요
+                  </button>
+                )
+              );
+            })()}
             <div className="mt-4 flex items-center justify-between">
               <button type="button" onClick={close} className="text-sm text-stone-400 hover:text-stone-600">
                 건너뛰기
@@ -190,7 +210,7 @@ export function DemoDock({ projectId, story, tour }: { projectId: string; story?
                   onClick={() => (last ? close() : open(step! + 1))}
                   className="rounded-lg bg-[#111] px-4 py-2 text-sm font-bold text-white"
                 >
-                  {last ? "확인" : "다음"}
+                  {last ? "시작하기" : "다음"}
                 </button>
               </div>
             </div>
