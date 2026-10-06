@@ -85,18 +85,10 @@ const HOURS = [
 
 const DAY_NAMES = ["일", "월", "화", "수", "목", "금", "토"];
 
+/** 운영시간 표에서 오늘 요일 줄을 짚기 위한 요일 값. 서버 렌더에서는 null. */
 function todayStatus(minute: number) {
-  if (!minute) return null;
-  const now = new Date(minute * 60_000);
-  const day = now.getDay();
-  const m = now.getHours() * 60 + now.getMinutes();
-  const row = HOURS.find((h) => (h.days as readonly number[]).includes(day))!;
-  const base = { day, rowLabel: row.label, time: row.time };
-  if (!row.open) return { ...base, text: "오늘 휴무", open: false };
-  const [start, end] = row.open;
-  if (m < start) return { ...base, text: "운영 전", open: false };
-  if (m >= end) return { ...base, text: "운영 종료", open: false };
-  return { ...base, text: "운영 중", open: true };
+  if (!minute || minute < 0) return null;
+  return { day: new Date(minute * 60_000).getDay() };
 }
 
 type Status = ReturnType<typeof todayStatus>;
@@ -356,7 +348,7 @@ export function PilatesStudioDemo() {
     <div className="min-h-screen text-[16px] leading-[1.7] md:text-[17px]" style={{ background: C.paper, color: C.ink }}>
       <Header onConsult={consult} />
       <main>
-        <Intro status={status} onConsult={consult} />
+        <Intro onConsult={consult} />
         <Schedule
           highlight={highlight}
           onClearHighlight={() => setHighlight(null)}
@@ -438,14 +430,14 @@ function Header({ onConsult }: { onConsult: () => void }) {
           <button
             type="button"
             onClick={onConsult}
-            className="inline-flex h-10 items-center rounded-full px-4 text-[15px] font-semibold md:hidden"
+            className="inline-flex h-10 items-center rounded-[4px] px-4 text-[15px] font-semibold md:hidden"
             style={{ background: C.indigo, color: C.onIndigo }}
           >
             상담 신청
           </button>
           <button
             type="button"
-            className="inline-flex h-11 w-11 items-center justify-center rounded-full lg:hidden"
+            className="inline-flex h-11 w-11 items-center justify-center rounded-[4px] lg:hidden"
             aria-label={open ? "메뉴 닫기" : "메뉴 열기"}
             aria-expanded={open}
             aria-controls="pilates-menu"
@@ -506,41 +498,46 @@ function ConsultTab({ onConsult }: { onConsult: () => void }) {
 
 /* ---------- 첫 화면: 소개 띠 ---------- */
 
-function Intro({ status, onConsult }: { status: Status; onConsult: () => void }) {
+function Intro({ onConsult }: { onConsult: () => void }) {
   return (
-    <section id="top" aria-labelledby="studio-name" className="border-b px-4 py-8 md:px-6 md:py-10" style={{ borderColor: C.line }}>
-      <div className="mx-auto grid max-w-[1200px] gap-6 md:grid-cols-[1fr_auto] md:items-end md:gap-10">
-        <div>
-          <h1 id="studio-name" className="text-[32px] font-bold leading-[1.25] tracking-[-0.02em] md:text-[44px]">
-            {STUDIO}
-          </h1>
-          <ul className="mt-3 space-y-0.5" style={{ color: C.muted }}>
-            <li>1:1 개인레슨 · 2:1 듀엣레슨 · 그룹레슨(최대 6명)</li>
-            <li>물리치료사 출신 원장 운영, 첫 수업 체형 상담 포함</li>
-            <li>□□역 3번 출구 도보 3분, 건물 주차 2시간 무료</li>
-          </ul>
+    <section id="top" aria-labelledby="studio-name" className="border-b px-4 pb-8 pt-6 md:px-6 md:pb-10 md:pt-8" style={{ borderColor: C.line }}>
+      <div className="mx-auto max-w-[1200px]">
+        <div className="relative aspect-[4/3] overflow-hidden rounded-[6px] sm:aspect-[21/9]">
+          <Image
+            src={`${IMG}/hero.jpg`}
+            alt="한지 창으로 빛이 드는 리포머실"
+            fill
+            priority
+            sizes="(min-width: 1200px) 1200px, 100vw"
+            className="object-cover"
+          />
         </div>
-        <div className="flex flex-wrap items-center gap-x-6 gap-y-3">
-          <p className="text-[15px]">
-            <span style={{ color: C.muted }}>{status ? `오늘(${DAY_NAMES[status.day]}) ` : "평일 "}</span>
-            <span className="font-semibold">{status?.time ?? "07:00 ~ 22:00"}</span>
-            {status && (
-              <span
-                className="ml-2 inline-flex h-6 items-center rounded-[4px] px-2 text-[13px] font-semibold"
-                style={status.open ? { background: C.indigo, color: C.onIndigo } : { background: C.sand, color: C.clayDeep }}
-              >
-                {status.text}
-              </span>
-            )}
-          </p>
-          <button
-            type="button"
-            onClick={onConsult}
-            className="hidden h-12 items-center rounded-full px-6 text-[16px] font-semibold md:inline-flex"
-            style={{ background: C.indigo, color: C.onIndigo }}
-          >
-            상담 신청
-          </button>
+        <div className="mt-6 grid gap-6 md:grid-cols-[1fr_auto] md:items-end md:gap-10">
+          <div>
+            <h1 id="studio-name" className="text-[32px] font-bold leading-[1.25] tracking-[-0.02em] md:text-[44px]">
+              {STUDIO}
+            </h1>
+            <p className="mt-3 max-w-[40em]" style={{ color: C.muted }}>
+              1:1 개인레슨, 2:1 듀엣레슨, 최대 6명 그룹레슨을 합니다. 물리치료사 출신 원장이 첫 수업 때 체형 상담을 함께 하고,
+              □□역 3번 출구에서 걸어서 3분입니다. 건물 주차는 2시간 무료입니다.
+            </p>
+          </div>
+          <div className="flex flex-wrap items-center gap-x-6 gap-y-3">
+            <p className="text-[15px] tabular-nums">
+              <span style={{ color: C.muted }}>평일 </span>
+              <span className="font-semibold">07:00 ~ 22:00</span>
+              <span style={{ color: C.muted }}>, 토요일 </span>
+              <span className="font-semibold">09:00 ~ 15:00</span>
+            </p>
+            <button
+              type="button"
+              onClick={onConsult}
+              className="hidden h-12 items-center rounded-[4px] px-6 text-[16px] font-semibold transition-colors hover:bg-[#1a2846] md:inline-flex"
+              style={{ background: C.indigo, color: C.onIndigo }}
+            >
+              상담 신청
+            </button>
+          </div>
         </div>
       </div>
     </section>
@@ -559,48 +556,32 @@ function SectionTitle({ id, children }: { id: string; children: React.ReactNode 
 
 /* ---------- 그룹 시간표 ---------- */
 
-function Seats({ cap, booked }: { cap: number; booked: number }) {
-  return (
-    <span className="inline-flex gap-[3px]" aria-hidden>
-      {Array.from({ length: cap }, (_, i) => (
-        <span
-          key={i}
-          className="inline-block h-[7px] w-[7px] rounded-full border"
-          style={{ borderColor: C.indigo, background: i < booked ? C.indigo : "transparent" }}
-        />
-      ))}
-    </span>
-  );
-}
-
 function seatsLeft(s: Session) {
   return CLASS_INFO[s.type].cap - s.booked;
 }
 
 function seatText(s: Session) {
   const left = seatsLeft(s);
-  return left <= 0 ? "마감" : `잔여 ${left}/${CLASS_INFO[s.type].cap}`;
+  return left <= 0 ? "마감" : `${left}자리 남음`;
 }
 
-function Chips<T extends string>({ label, value, options, onChange }: { label: string; value: T; options: T[]; onChange: (v: T) => void }) {
+function Filter<T extends string>({ label, value, options, onChange }: { label: string; value: T; options: T[]; onChange: (v: T) => void }) {
   return (
-    <div className="flex flex-wrap items-center gap-2" role="group" aria-label={label}>
-      <span className="mr-1 text-[14px]" style={{ color: C.muted }}>
-        {label}
-      </span>
-      {options.map((o) => (
-        <button
-          key={o}
-          type="button"
-          aria-pressed={value === o}
-          onClick={() => onChange(o)}
-          className="h-9 rounded-full border px-3.5 text-[14px] font-medium transition-colors"
-          style={value === o ? { background: C.indigo, borderColor: C.indigo, color: C.onIndigo } : { borderColor: C.line, color: C.ink, background: C.card }}
-        >
-          {o}
-        </button>
-      ))}
-    </div>
+    <label className="inline-flex items-center gap-2 text-[14px]">
+      <span style={{ color: C.muted }}>{label}</span>
+      <select
+        value={value}
+        onChange={(e) => onChange(e.target.value as T)}
+        className="h-10 min-w-[104px] rounded-[4px] border px-2.5 text-[15px]"
+        style={{ borderColor: C.line, background: C.card, color: C.ink }}
+      >
+        {options.map((o) => (
+          <option key={o} value={o}>
+            {o === "전체" ? `${label} 전체` : o}
+          </option>
+        ))}
+      </select>
+    </label>
   );
 }
 
@@ -650,11 +631,14 @@ function Schedule({
         <span className="block text-[13px]" style={{ color: C.muted }}>
           {s.teacher}
         </span>
-        <span className="mt-1 flex items-center justify-between gap-1.5">
-          <span className="text-[13px] font-semibold" style={{ color: full ? C.clayDeep : C.indigo }}>
-            {seatText(s)}
-          </span>
-          <Seats cap={CLASS_INFO[s.type].cap} booked={s.booked} />
+        <span className="mt-1 block text-[13px] font-semibold tabular-nums" style={{ color: full ? C.clayDeep : C.indigo }}>
+          {seatText(s)}
+          {!full && (
+            <span className="font-normal" style={{ color: C.muted }}>
+              {" "}
+              / 정원 {CLASS_INFO[s.type].cap}명
+            </span>
+          )}
         </span>
       </button>
     );
@@ -665,14 +649,14 @@ function Schedule({
       <div className="mx-auto max-w-[1200px]">
         <div className="flex flex-col gap-4 lg:flex-row lg:items-end lg:justify-between">
           <SectionTitle id="schedule-title">그룹 시간표</SectionTitle>
-          <div className="flex flex-col gap-3 md:flex-row md:flex-wrap md:items-center md:gap-6">
-            <Chips label="강사" value={teacher} options={["전체", ...TEACHERS]} onChange={onTeacher} />
-            <Chips label="난이도" value={level} options={["전체", "입문", "중급"] as ("전체" | Level)[]} onChange={setLevel} />
+          <div className="flex flex-wrap items-center gap-x-4 gap-y-3">
+            <Filter label="강사" value={teacher} options={["전체", ...TEACHERS]} onChange={onTeacher} />
+            <Filter label="난이도" value={level} options={["전체", "입문", "중급"] as ("전체" | Level)[]} onChange={setLevel} />
             {highlight && (
               <button
                 type="button"
                 onClick={onClearHighlight}
-                className="inline-flex h-9 w-fit items-center gap-1.5 rounded-full px-3.5 text-[14px] font-semibold"
+                className="inline-flex h-10 w-fit items-center gap-1.5 rounded-[4px] px-3.5 text-[14px] font-semibold"
                 style={{ background: C.indigo, color: C.onIndigo }}
                 aria-label={`추천 레슨 표시 해제: ${CLASS_INFO[highlight.type].name}`}
               >
@@ -772,7 +756,7 @@ function Program({ onSchedule, onBook }: { onSchedule: (t: ClassType, level?: Le
             aria-expanded={finder}
             aria-controls="lesson-finder-panel"
             onClick={() => setFinder((v) => !v)}
-            className="inline-flex h-10 items-center gap-1.5 rounded-full border px-4 text-[15px] font-semibold transition-colors hover:bg-[#ece6db]"
+            className="inline-flex h-10 items-center gap-1.5 rounded-[4px] border px-4 text-[15px] font-semibold transition-colors hover:bg-[#ece6db]"
             style={{ borderColor: C.indigo, color: C.indigo }}
           >
             {finder ? <X size={16} aria-hidden /> : <Search size={16} aria-hidden />}
@@ -937,7 +921,7 @@ function Finder({ onSchedule, onBook }: { onSchedule: (t: ClassType, level?: Lev
                 <button
                   type="button"
                   onClick={() => onBook(rec.type as "private" | "duet")}
-                  className="mt-5 inline-flex h-12 items-center rounded-full px-6 font-semibold"
+                  className="mt-5 inline-flex h-12 items-center rounded-[4px] px-6 font-semibold"
                   style={{ background: C.paper, color: C.indigo }}
                 >
                   체험레슨 신청
@@ -946,7 +930,7 @@ function Finder({ onSchedule, onBook }: { onSchedule: (t: ClassType, level?: Lev
                 <button
                   type="button"
                   onClick={() => onSchedule(rec.type, rec.level)}
-                  className="mt-5 inline-flex h-12 items-center rounded-full px-6 font-semibold"
+                  className="mt-5 inline-flex h-12 items-center rounded-[4px] px-6 font-semibold"
                   style={{ background: C.paper, color: C.indigo }}
                 >
                   시간표 보기
@@ -962,13 +946,13 @@ function Finder({ onSchedule, onBook }: { onSchedule: (t: ClassType, level?: Lev
           <button
             type="button"
             onClick={() => setStep(step - 1)}
-            className="inline-flex h-11 items-center gap-1.5 rounded-full border px-4 text-[15px] font-semibold"
+            className="inline-flex h-11 items-center gap-1.5 rounded-[4px] border px-4 text-[15px] font-semibold"
             style={{ borderColor: C.line, color: C.ink }}
           >
             <ArrowLeft size={16} aria-hidden />
             이전
           </button>
-          <button type="button" onClick={restart} className="inline-flex h-11 items-center gap-1.5 rounded-full px-4 text-[15px] font-semibold" style={{ color: C.muted }}>
+          <button type="button" onClick={restart} className="inline-flex h-11 items-center gap-1.5 rounded-[4px] px-4 text-[15px] font-semibold" style={{ color: C.muted }}>
             <RotateCcw size={16} aria-hidden />
             다시 하기
           </button>
@@ -1048,7 +1032,7 @@ function Pricing() {
 
 /* ---------- 강사 소개 ---------- */
 
-const TEACHER_INFO: { name: Teacher; role: string; lessons: string; career: string[]; photo?: string }[] = [
+const TEACHER_INFO: { name: Teacher; role: string; lessons: string; career: string[]; photo: string }[] = [
   {
     name: "박ㅅ연",
     role: "원장",
@@ -1061,12 +1045,14 @@ const TEACHER_INFO: { name: Teacher; role: string; lessons: string; career: stri
     role: "강사",
     lessons: "그룹 매트, 아침 수업",
     career: ["필라테스 지도자 자격", "요가 지도 경력 6년"],
+    photo: `${IMG}/teacher-2.jpg`,
   },
   {
     name: "정ㅎ윤",
     role: "강사",
     lessons: "그룹 리포머, 체형 교정",
     career: ["필라테스 지도자 자격", "생활스포츠지도사 2급"],
+    photo: `${IMG}/teacher-3.jpg`,
   },
 ];
 
@@ -1079,19 +1065,9 @@ function Teachers({ onShow }: { onShow: (t: Teacher) => void }) {
           {TEACHER_INFO.map((t) => (
             <li key={t.name} className="border-t-2 py-5" style={{ borderColor: C.indigo }}>
               <div className="flex items-center gap-4">
-                {t.photo ? (
-                  <span className="relative block h-[72px] w-[72px] shrink-0 overflow-hidden rounded-full">
-                    <Image src={t.photo} alt={`${t.name} ${t.role}`} fill sizes="72px" className="object-cover" style={{ objectPosition: "50% 25%" }} />
-                  </span>
-                ) : (
-                  <span
-                    className="inline-flex h-[72px] w-[72px] shrink-0 items-center justify-center rounded-full border-2 text-[24px] font-bold"
-                    style={{ borderColor: C.indigo, color: C.indigo }}
-                    aria-hidden
-                  >
-                    {t.name[0]}
-                  </span>
-                )}
+                <span className="relative block h-[96px] w-[76px] shrink-0 overflow-hidden rounded-[4px]" style={{ background: C.sand }}>
+                  <Image src={t.photo} alt={`${t.name} ${t.role}`} fill sizes="76px" className="object-cover" style={{ objectPosition: "50% 25%" }} />
+                </span>
                 <div>
                   <h3 className="text-[21px] font-bold tracking-[-0.01em]">
                     {t.name}
@@ -1115,7 +1091,7 @@ function Teachers({ onShow }: { onShow: (t: Teacher) => void }) {
               <button
                 type="button"
                 onClick={() => onShow(t.name)}
-                className="mt-4 inline-flex h-10 items-center rounded-full border px-4 text-[14px] font-semibold transition-colors hover:bg-[#ece6db]"
+                className="mt-4 inline-flex h-10 items-center rounded-[4px] border px-4 text-[14px] font-semibold transition-colors hover:bg-[#ece6db]"
                 style={{ borderColor: C.line, color: C.indigo }}
                 aria-label={`${t.name} 강사 그룹 시간표 보기`}
               >
@@ -1148,15 +1124,14 @@ function About() {
         <p className="mt-3 max-w-[720px]" style={{ color: C.muted }}>
           호흡을 먼저 배우고, 몸 상태에 맞춰 동작을 고릅니다. 모든 첫 수업은 체형 상담을 함께 하는 50분 체험레슨입니다.
         </p>
-        <div className="mt-6 grid grid-cols-2 gap-3 md:grid-cols-[2fr_1fr_1fr] md:gap-4">
+        <div className="mt-6 grid gap-3 md:grid-cols-[3fr_2fr] md:gap-4">
           {[
-            { src: `${IMG}/hero.jpg`, alt: "한지 창으로 빛이 드는 리포머실", cap: "리포머실", wide: true },
-            { src: `${IMG}/studio.jpg`, alt: "리포머 기구가 놓인 스튜디오", cap: "기구실" },
-            { src: `${IMG}/mat.jpg`, alt: "매트 여섯 장이 깔린 매트실", cap: "매트실" },
+            { src: `${IMG}/studio.jpg`, alt: "리포머 기구가 놓인 스튜디오", cap: "리포머실, 기구 6대", wide: true },
+            { src: `${IMG}/mat.jpg`, alt: "매트 여섯 장이 깔린 매트실", cap: "매트실", wide: false },
           ].map((p) => (
-            <figure key={p.cap} className={p.wide ? "col-span-2 md:col-span-1" : ""}>
-              <div className="relative aspect-[4/3] overflow-hidden rounded-[6px]">
-                <Image src={p.src} alt={p.alt} fill sizes="(min-width: 768px) 40vw, 100vw" className="object-cover" />
+            <figure key={p.cap}>
+              <div className={`relative overflow-hidden rounded-[6px] ${p.wide ? "aspect-[4/3]" : "aspect-[4/3] md:aspect-auto md:h-full"}`}>
+                <Image src={p.src} alt={p.alt} fill sizes="(min-width: 768px) 50vw, 100vw" className="object-cover" />
               </div>
               <figcaption className="mt-1.5 text-[14px]" style={{ color: C.muted }}>
                 {p.cap}
@@ -1336,7 +1311,7 @@ function BookingDrawer({ target, onClose }: { target: BookingTarget | null; onCl
               <h3 id="booking-title" ref={headingRef} tabIndex={-1} className="pt-1.5 text-[24px] font-bold tracking-[-0.02em] outline-none">
                 {isConsult ? "상담 신청" : "체험레슨 신청"}
               </h3>
-              <button type="button" onClick={onClose} aria-label="닫기" className="inline-flex h-11 w-11 shrink-0 items-center justify-center rounded-full hover:bg-[#ece6db]">
+              <button type="button" onClick={onClose} aria-label="닫기" className="inline-flex h-11 w-11 shrink-0 items-center justify-center rounded-[4px] hover:bg-[#ece6db]">
                 <X size={22} aria-hidden />
               </button>
             </div>
@@ -1352,9 +1327,8 @@ function BookingDrawer({ target, onClose }: { target: BookingTarget | null; onCl
                     <dt style={{ color: C.muted }}>강사</dt>
                     <dd>{session.teacher}</dd>
                     <dt style={{ color: C.muted }}>자리</dt>
-                    <dd className="flex items-center gap-2">
-                      {seatText(session)}
-                      <Seats cap={CLASS_INFO[session.type].cap} booked={session.booked} />
+                    <dd className="tabular-nums">
+                      {seatText(session)} (정원 {CLASS_INFO[session.type].cap}명)
                     </dd>
                   </>
                 )}
@@ -1370,7 +1344,7 @@ function BookingDrawer({ target, onClose }: { target: BookingTarget | null; onCl
                 <button
                   type="button"
                   onClick={onClose}
-                  className="mt-6 inline-flex h-12 w-full items-center justify-center rounded-full font-semibold"
+                  className="mt-6 inline-flex h-12 w-full items-center justify-center rounded-[4px] font-semibold"
                   style={{ background: C.indigo, color: C.onIndigo }}
                 >
                   닫기
@@ -1434,7 +1408,7 @@ function BookingDrawer({ target, onClose }: { target: BookingTarget | null; onCl
                     {error}
                   </p>
                 )}
-                <button type="submit" className="inline-flex h-12 w-full items-center justify-center rounded-full font-semibold" style={{ background: C.indigo, color: C.onIndigo }}>
+                <button type="submit" className="inline-flex h-12 w-full items-center justify-center rounded-[4px] font-semibold" style={{ background: C.indigo, color: C.onIndigo }}>
                   {isConsult ? "상담 신청" : "체험레슨 신청"}
                 </button>
               </form>

@@ -13,16 +13,12 @@ import {
   ChevronRight,
   CookingPot,
   Eye,
-  Fish,
   Flame,
-  Footprints,
   Menu,
   Minus,
   Plus,
   Refrigerator,
   ShowerHead,
-  Store,
-  Sunrise,
   Trees,
   Tv,
   Users,
@@ -349,7 +345,7 @@ export function PensionDemo() {
 
   return (
     <div className="min-h-screen text-[16px] leading-[1.7] md:text-[17px]" style={{ background: C.white, color: C.ink }}>
-      <Header page={page} go={go} today={today} />
+      <Header page={page} go={go} />
       <main>
         {page === "home" && (
           <>
@@ -411,10 +407,9 @@ function blurActive() {
   if (el instanceof HTMLElement) el.blur();
 }
 
-function Header({ page, go, today }: { page: Page; go: Go; today: number }) {
+function Header({ page, go }: { page: Page; go: Go }) {
   const [open, setOpen] = useState(false);
   const reduce = useReducedMotionSafe();
-  const left = today >= 0 ? remainingOn(today) : null;
 
   useEffect(() => {
     if (!open) return;
@@ -492,11 +487,6 @@ function Header({ page, go, today }: { page: Page; go: Go; today: number }) {
             style={{ background: C.coral, color: C.navyDeep }}
           >
             실시간예약
-            {left !== null && (
-              <span className="hidden rounded-[4px] bg-white/80 px-1.5 text-[12px] font-bold tabular-nums sm:inline" aria-label={`오늘 예약 가능 객실 ${left}실`}>
-                오늘 {left}실
-              </span>
-            )}
           </button>
           <button
             type="button"
@@ -1121,11 +1111,11 @@ function GuideShortcuts({ go }: { go: Go }) {
 }
 
 const PLACES = [
-  { icon: Waves, name: "□□ 해수욕장", how: "도보 3분", body: "해변 계단으로 내려가면 바로 모래사장입니다. 7월 초부터 8월 말까지 안전 요원이 있습니다." },
-  { icon: Footprints, name: "□□ 해안 산책로", how: "도보 15분", body: "바위 해안을 따라 2km쯤 이어집니다. 해 뜨는 시간에 걷기 좋습니다." },
-  { icon: Sunrise, name: "□□ 등대 전망대", how: "차량 8분", body: "펜션에서 보이는 빨간 등대입니다. 맑은 날에는 멀리 섬까지 보입니다." },
-  { icon: Fish, name: "□□항 수산시장", how: "차량 10분", body: "회를 떠 와서 객실에서 드셔도 됩니다. 조개를 사 와서 바비큐에 올리는 손님도 많습니다." },
-  { icon: Store, name: "□□ 전통시장", how: "차량 15분", body: "끝자리 2, 7일에 장이 섭니다. 감자전과 메밀전병 가게가 모여 있습니다." },
+  { name: "□□ 해수욕장", how: "도보 3분", body: "해변 계단으로 내려가면 바로 모래사장입니다. 7월 초부터 8월 말까지 안전 요원이 있습니다." },
+  { name: "□□ 해안 산책로", how: "도보 15분", body: "바위 해안을 따라 2km쯤 이어집니다. 해 뜨는 시간에 걷기 좋습니다." },
+  { name: "□□ 등대 전망대", how: "차량 8분", body: "펜션에서 보이는 빨간 등대입니다. 맑은 날에는 멀리 섬까지 보입니다." },
+  { name: "□□항 수산시장", how: "차량 10분", body: "회를 떠 와서 객실에서 드셔도 됩니다. 조개를 사 와서 바비큐에 올리는 손님도 많습니다." },
+  { name: "□□ 전통시장", how: "차량 15분", body: "끝자리 2, 7일에 장이 섭니다. 감자전과 메밀전병 가게가 모여 있습니다." },
 ];
 
 function PlacesSection({ go }: { go: Go }) {
@@ -1142,15 +1132,14 @@ function PlacesSection({ go }: { go: Go }) {
         >
           주변관광지
         </SectionTitle>
-        <ul className="mt-6 grid grid-cols-2 gap-3 md:grid-cols-5">
+        <ul className="mt-6 grid grid-cols-2 gap-x-5 md:grid-cols-5">
           {PLACES.map((p) => (
-            <li key={p.name} className="rounded-[10px] border p-4" style={{ borderColor: C.line }}>
-              <p.icon size={22} style={{ color: C.coralDeep }} aria-hidden />
-              <p className="mt-2 font-bold" style={{ color: C.navy }}>
-                {p.name}
-              </p>
-              <p className="text-[14px]" style={{ color: C.muted }}>
+            <li key={p.name} className="border-t py-3" style={{ borderColor: C.line }}>
+              <p className="text-[14px] font-semibold tabular-nums" style={{ color: C.muted }}>
                 {p.how}
+              </p>
+              <p className="mt-0.5 font-bold" style={{ color: C.navy }}>
+                {p.name}
               </p>
             </li>
           ))}
@@ -1258,7 +1247,7 @@ function AboutPage({ go }: { go: Go }) {
           <ul className="mt-6 grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
             {facilities.map((f) => (
               <li key={f.name} className="flex gap-3 rounded-[10px] border p-4" style={{ borderColor: C.line }}>
-                <f.icon size={22} className="mt-0.5 shrink-0" style={{ color: C.coralDeep }} aria-hidden />
+                <f.icon size={20} className="mt-0.5 shrink-0" style={{ color: C.muted }} aria-hidden />
                 <span>
                   <b style={{ color: C.navy }}>{f.name}</b>
                   <span className="block text-[15px]" style={{ color: C.muted }}>
@@ -1994,10 +1983,7 @@ function AroundPage({ go }: { go: Go }) {
       <SubBody>
         <ul className="grid gap-4 md:grid-cols-2">
           {PLACES.map((p) => (
-            <li key={p.name} className="flex gap-4 rounded-[10px] border p-5" style={{ borderColor: C.line }}>
-              <span className="inline-flex h-12 w-12 shrink-0 items-center justify-center rounded-[10px]" style={{ background: C.seaSoft, color: C.navy }}>
-                <p.icon size={22} aria-hidden />
-              </span>
+            <li key={p.name} className="rounded-[10px] border p-5" style={{ borderColor: C.line }}>
               <span>
                 <span className="flex flex-wrap items-baseline gap-x-2">
                   <b className="text-[18px]" style={{ color: C.navy }}>

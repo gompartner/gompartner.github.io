@@ -13,7 +13,7 @@ import { useReducedMotionSafe } from "@/hooks/useReducedMotionSafe";
    대메뉴 6개에 마우스를 올리거나 초점을 주면 하위 메뉴 전체가 한 번에 펼쳐지는 펼침 메뉴,
    넓은 화면 오른쪽에 고정 퀵메뉴(네이버 예약, 카카오톡 상담, 전화 상담, 비급여 안내, 오시는 길, TOP),
    좁은 화면에는 아래쪽 빠른 메뉴 막대(예약, 카카오톡, 길찾기, 전화)를 둔다.
-   메인은 배너, 진료과목 바로가기, 공지사항·진료시간·상담 세 상자, 증상 자가체크(치아 지도), 의료진 순서.
+   메인은 배너, 진료과목 이름 띠, 공지사항과 진료시간, 상담 전화 줄, 증상 자가체크(치아 지도), 의료진 순서.
    하위 페이지는 라우트를 늘리지 않고 상태로 화면을 바꾼다.
 
    디자인: 흰 바탕에 짙은 청록 잉크(#10302f)와 청록 강조색(#0b6664), 옅은 민트(#e3f1ef).
@@ -523,12 +523,16 @@ const FAQ = [
 
 /* ---------- 공지사항 ---------- */
 
+const NOTICE_TOTAL = 137;
 const NOTICES = [
-  { no: 24, date: "2026.10.02", title: "한글날 휴진 안내", body: "10월 9일 한글날은 휴진합니다. 10월 10일 토요일은 09:30부터 14:00까지 정상 진료합니다." },
-  { no: 23, date: "2026.09.21", title: "2026년 구강검진 마감 안내", body: "국민건강보험 구강검진은 12월 31일까지 받으실 수 있습니다. 연말에는 예약이 몰리니 미리 예약해 주십시오." },
-  { no: 22, date: "2026.09.01", title: "화 · 목 야간진료 시간 안내", body: "화요일과 목요일은 점심시간 외 저녁시간 없이 21:00까지 진료합니다. 접수 마감은 20:30입니다." },
-  { no: 21, date: "2026.08.12", title: "주차장 이용 안내", body: "건물 지하 2~4층 주차장을 이용해 주십시오. 진료 시 2시간 무료이며 접수에서 차량 번호를 등록해 드립니다." },
-  { no: 20, date: "2026.07.28", title: "여름 휴가 기간 정상 진료 안내", body: "7월과 8월에도 휴가 없이 정상 진료합니다." },
+  { no: 137, date: "2026.10.02", title: "10월 9일(금) 한글날 휴진, 10일(토) 정상 진료", body: "10월 9일 한글날은 휴진합니다. 10월 10일 토요일은 09:30부터 14:00까지 정상 진료합니다. 예약 변경은 전화로 해 주십시오." },
+  { no: 136, date: "2026.09.24", title: "10월 16일(목) 야간진료 18:30 단축 (원장 학회 참석)", body: "대표원장 학회 참석으로 10월 16일 목요일은 18:30까지 진료합니다. 이날 저녁 예약 환자분께는 개별 연락을 드렸습니다." },
+  { no: 135, date: "2026.09.21", title: "2026년 건강보험 구강검진 12월 31일 마감", body: "국민건강보험 구강검진은 12월 31일까지 받으실 수 있습니다. 12월에는 예약이 몰리니 11월 중 예약을 권합니다. 검진은 본인 부담금이 없습니다." },
+  { no: 134, date: "2026.09.08", title: "구강스캐너 도입, 크라운 본뜨기 방식 변경", body: "9월부터 크라운과 인레이 치료에 구강스캐너를 사용합니다. 입안에 본뜨는 재료를 물고 기다리는 과정이 없어지며 비용은 같습니다." },
+  { no: 133, date: "2026.08.29", title: "11월 1일부터 일부 비급여 진료비 변경", body: "금 시세 상승으로 11월 1일부터 금 인레이 비용이 40만 원에서 45만 원으로 바뀝니다. 10월 31일까지 치료를 시작하신 분은 이전 금액으로 진행합니다." },
+  { no: 132, date: "2026.08.12", title: "지하 주차장 도색 공사(8/18~8/20) 기간 주차 안내", body: "건물 지하 주차장 도색 공사로 8월 18일부터 20일까지 지하 3층만 이용할 수 있습니다. 공영주차장 이용 시 영수증을 가져오시면 1시간 주차비를 지원합니다." },
+  { no: 131, date: "2026.07.28", title: "여름휴가 없이 7·8월 정상 진료", body: "7월과 8월에도 휴가 없이 정상 진료합니다. 방학 기간 학생 교정 상담은 오전 예약이 비교적 여유롭습니다." },
+  { no: 130, date: "2026.07.03", title: "만 65세 이상 보험임플란트 상담 일정 안내", body: "만 65세 이상은 평생 2개까지 보험임플란트를 받으실 수 있습니다. 화요일과 목요일 오전에 상담 시간을 따로 두었습니다." },
 ];
 
 /* ---------- 예약 ---------- */
@@ -966,19 +970,12 @@ function QuickMenu({ go, linkOut }: { go: Go; linkOut: (w: "naver" | "kakao" | "
 
 /* ---------- 메인 ---------- */
 
-const SHORTCUTS: { id: Exclude<TreatmentId, "check">; img: string; pos?: string }[] = [
-  { id: "implant", img: "implant", pos: "50% 25%" },
-  { id: "ortho", img: "ortho" },
-  { id: "caries", img: "caries" },
-  { id: "gum", img: "scaling" },
-  { id: "wisdom", img: "ct" },
-  { id: "whitening", img: "whitening" },
-];
+/** 배너 아래 진료과목 띠: 이름만 나열한다 */
+const SHORTCUTS = TREATMENT_ORDER as Exclude<TreatmentId, "check">[];
 
 function HomePage({ go, reserve, linkOut }: { go: Go; reserve: (id: TreatmentId) => void; linkOut: (w: "naver" | "kakao" | "map") => void }) {
   const now = useNow();
   const status = openStatus(now);
-  const today = now?.getDay();
 
   return (
     <>
@@ -986,7 +983,7 @@ function HomePage({ go, reserve, linkOut }: { go: Go; reserve: (id: TreatmentId)
       <section className="relative isolate overflow-hidden" style={{ backgroundColor: C.ink }} aria-labelledby="main-title">
         <Image src={`${IMG}/hero.jpg`} alt="" fill priority sizes="100vw" className="-z-10 object-cover object-[72%_50%]" />
         <div className="absolute inset-0 -z-10" style={{ background: "linear-gradient(90deg, rgba(16,48,47,0.86) 0%, rgba(16,48,47,0.6) 50%, rgba(16,48,47,0.15) 100%)" }} aria-hidden />
-        <div className={`${container} pb-24 pt-14 text-white md:pb-28 md:pt-20`}>
+        <div className={`${container} pb-14 pt-14 text-white md:pb-20 md:pt-20`}>
           <p className="text-[17px] font-bold" style={{ color: C.onInkMuted }}>
             통합치의학과 · 치과교정과 전문의 진료
           </p>
@@ -1003,28 +1000,20 @@ function HomePage({ go, reserve, linkOut }: { go: Go; reserve: (id: TreatmentId)
       </section>
 
       {/* 진료과목 바로가기 */}
-      <section id="shortcut" aria-labelledby="shortcut-title" className={`${container} relative -mt-14`}>
-        <div className="rounded-[12px] border bg-white p-5 shadow-[0_12px_32px_rgba(16,48,47,0.12)] md:p-6" style={{ borderColor: C.line }}>
-          <div className="flex items-center justify-between">
-            <h2 id="shortcut-title" className="text-[20px] font-bold tracking-[-0.03em]">
-              진료과목
-            </h2>
-            <button type="button" onClick={() => go("treat")} className="inline-flex items-center text-[15px] font-bold" style={{ color: C.muted }}>
-              전체 보기
-              <ChevronRight size={16} aria-hidden />
-            </button>
-          </div>
-          <ul className="mt-4 grid grid-cols-3 gap-x-2 gap-y-4 md:grid-cols-6">
-            {SHORTCUTS.map((s) => (
-              <li key={s.id}>
-                <button type="button" onClick={() => go("treat", s.id)} className="group flex w-full flex-col items-center gap-2 rounded-[6px] py-1">
-                  <span
-                    className="relative block h-16 w-16 overflow-hidden rounded-full border-2 transition-colors group-hover:border-[#0b6664] md:h-20 md:w-20"
-                    style={{ borderColor: C.line, backgroundColor: C.mint }}
-                  >
-                    <Image src={`${IMG}/${s.img}.jpg`} alt="" fill sizes="80px" className="object-cover" style={{ objectPosition: s.pos ?? "50% 50%" }} />
-                  </span>
-                  <span className="text-[15px] font-bold md:text-[16px]">{TREATMENT_NAME[s.id]}</span>
+      <section id="shortcut" aria-labelledby="shortcut-title" className="border-b" style={{ borderColor: C.line }}>
+        <div className={`${container} flex items-stretch`}>
+          <h2 id="shortcut-title" className="flex shrink-0 items-center pr-4 text-[16px] font-bold md:pr-6 md:text-[17px]" style={{ color: C.accent }}>
+            진료과목
+          </h2>
+          <ul className="flex min-w-0 flex-1 overflow-x-auto [scrollbar-width:none]">
+            {SHORTCUTS.map((id) => (
+              <li key={id} className="shrink-0">
+                <button
+                  type="button"
+                  onClick={() => go("treat", id)}
+                  className="flex h-14 items-center border-b-2 border-transparent px-3 text-[16px] font-bold transition-colors hover:border-[#0b6664] hover:text-[#0b6664] md:h-16 md:px-4 md:text-[17px]"
+                >
+                  {TREATMENT_NAME[id]}
                 </button>
               </li>
             ))}
@@ -1032,9 +1021,9 @@ function HomePage({ go, reserve, linkOut }: { go: Go; reserve: (id: TreatmentId)
         </div>
       </section>
 
-      {/* 공지사항 · 진료시간 · 상담 */}
-      <section className={`${container} grid gap-4 py-10 md:grid-cols-2 md:py-14 lg:grid-cols-3`} aria-label="병원 소식과 진료 안내">
-        <div className="rounded-[10px] border p-5 md:p-6" style={{ borderColor: C.line }}>
+      {/* 공지사항 · 진료시간 */}
+      <section className={`${container} grid gap-x-10 gap-y-8 pb-4 pt-10 md:pt-14 lg:grid-cols-12`} aria-label="병원 소식과 진료시간">
+        <div className="lg:col-span-7">
           <div className="flex items-center justify-between border-b-2 pb-3" style={{ borderColor: C.ink }}>
             <h2 className="text-[20px] font-bold tracking-[-0.03em]">공지사항</h2>
             <button type="button" onClick={() => go("community", "notice")} aria-label="공지사항 더보기" className="inline-flex h-8 w-8 items-center justify-center rounded-[4px] border" style={{ borderColor: C.line }}>
@@ -1042,12 +1031,12 @@ function HomePage({ go, reserve, linkOut }: { go: Go; reserve: (id: TreatmentId)
             </button>
           </div>
           <ul>
-            {NOTICES.slice(0, 4).map((n) => (
-              <li key={n.no} className="border-b last:border-b-0" style={{ borderColor: C.line }}>
+            {NOTICES.slice(0, 5).map((n) => (
+              <li key={n.no} className="border-b" style={{ borderColor: C.line }}>
                 <button type="button" onClick={() => go("community", `notice-${n.no}`)} className="flex w-full items-center justify-between gap-3 py-3 text-left hover:text-[#0b6664]">
                   <span className="min-w-0 truncate">{n.title}</span>
                   <span className="shrink-0 text-[14px] tabular-nums" style={{ color: C.muted }}>
-                    {n.date.slice(5)}
+                    {n.date}
                   </span>
                 </button>
               </li>
@@ -1055,11 +1044,11 @@ function HomePage({ go, reserve, linkOut }: { go: Go; reserve: (id: TreatmentId)
           </ul>
         </div>
 
-        <div id="hours-box" className="rounded-[10px] p-5 md:p-6" style={{ backgroundColor: C.ink, color: C.onInk }}>
+        <div id="hours-box" className="rounded-[6px] p-5 md:p-6 lg:col-span-5" style={{ backgroundColor: C.ink, color: C.onInk }}>
           <div className="flex items-center justify-between border-b pb-3" style={{ borderColor: "rgba(238,246,245,0.2)" }}>
             <h2 className="text-[20px] font-bold tracking-[-0.03em]">진료시간</h2>
             {status && (
-              <span className="rounded-[4px] px-2 py-0.5 text-[14px] font-bold" style={{ backgroundColor: status.open ? "#bfe0db" : "rgba(238,246,245,0.12)", color: status.open ? C.ink : C.onInk }}>
+              <span className="text-[15px] font-bold" style={{ color: status.open ? "#bfe0db" : C.onInkMuted }}>
                 {status.text}
               </span>
             )}
@@ -1067,25 +1056,17 @@ function HomePage({ go, reserve, linkOut }: { go: Go; reserve: (id: TreatmentId)
           <table className="mt-2 w-full">
             <caption className="sr-only">요일별 진료시간</caption>
             <tbody>
-              {HOURS_GROUPED.map((h) => {
-                const isToday = today !== undefined && h.days.includes(today);
-                return (
-                  <tr key={h.label}>
-                    <th scope="row" className="py-2 pr-2 text-left font-normal" style={{ color: isToday ? "#fff" : C.onInkMuted }}>
-                      {h.label}
-                      {isToday && (
-                        <span className="ml-1.5 rounded-[4px] px-1.5 py-0.5 text-[12px] font-bold" style={{ backgroundColor: "#bfe0db", color: C.ink }}>
-                          오늘
-                        </span>
-                      )}
-                    </th>
-                    <td className={`py-2 text-right tabular-nums ${isToday ? "font-bold text-white" : ""}`}>
-                      {h.night && <Moon size={14} className="mr-1 inline align-[-1px]" aria-label="야간진료" />}
-                      {h.time}
-                    </td>
-                  </tr>
-                );
-              })}
+              {HOURS_GROUPED.map((h) => (
+                <tr key={h.label}>
+                  <th scope="row" className="py-2 pr-2 text-left font-normal" style={{ color: C.onInkMuted }}>
+                    {h.label}
+                  </th>
+                  <td className="py-2 text-right tabular-nums">
+                    {h.night && <Moon size={14} className="mr-1 inline align-[-1px]" aria-label="야간진료" />}
+                    {h.time}
+                  </td>
+                </tr>
+              ))}
               <tr>
                 <th scope="row" className="py-2 pr-2 text-left font-normal" style={{ color: C.onInkMuted }}>
                   점심시간
@@ -1100,34 +1081,38 @@ function HomePage({ go, reserve, linkOut }: { go: Go; reserve: (id: TreatmentId)
             토요일은 점심시간 없이 진료합니다. 접수 마감은 진료 종료 30분 전입니다.
           </p>
         </div>
+      </section>
 
-        <div className="flex flex-col rounded-[10px] border p-5 md:col-span-2 md:p-6 lg:col-span-1" style={{ borderColor: C.line, backgroundColor: C.mist }}>
-          <h2 className="border-b-2 pb-3 text-[20px] font-bold tracking-[-0.03em]" style={{ borderColor: C.ink }}>
-            상담 및 예약
-          </h2>
-          <a href={`tel:${TEL}`} className="mt-4 inline-flex items-center gap-2 text-[30px] font-bold tracking-[-0.02em] tabular-nums">
-            <Phone size={24} aria-hidden style={{ color: C.accent }} />
-            {TEL}
-          </a>
-          <div className="mt-4 grid grid-cols-2 gap-2">
-            <button type="button" onClick={() => linkOut("naver")} className={`${btnLine} h-11 px-2 text-[15px]`} style={{ borderColor: C.line }}>
+      {/* 상담 및 예약 */}
+      <section className={`${container} pb-12 md:pb-16`} aria-labelledby="contact-title">
+        <div className="flex flex-col gap-x-8 gap-y-4 border-y py-6 md:flex-row md:items-center" style={{ borderColor: C.line }}>
+          <div className="shrink-0">
+            <h2 id="contact-title" className="text-[16px] font-bold" style={{ color: C.muted }}>
+              상담 및 예약
+            </h2>
+            <a href={`tel:${TEL}`} className="mt-1 inline-flex items-center gap-2 text-[28px] font-bold tracking-[-0.02em] tabular-nums md:text-[30px]">
+              <Phone size={22} aria-hidden style={{ color: C.accent }} />
+              {TEL}
+            </a>
+          </div>
+          <div className="flex gap-2">
+            <button type="button" onClick={() => linkOut("naver")} className={`${btnLine} h-11 px-3 text-[15px]`} style={{ borderColor: C.line }}>
               <NaverMark />
               네이버 예약
             </button>
-            <button type="button" onClick={() => linkOut("kakao")} className={`${btnLine} h-11 px-2 text-[15px]`} style={{ borderColor: C.line }}>
+            <button type="button" onClick={() => linkOut("kakao")} className={`${btnLine} h-11 px-3 text-[15px]`} style={{ borderColor: C.line }}>
               <KakaoMark />
               카카오톡 상담
             </button>
           </div>
-          <p className="mt-5 text-[15px]" style={{ color: C.muted }}>
+          <p className="text-[15px] md:ml-auto md:text-right" style={{ color: C.muted }}>
             {ADDRESS}
             <br />
-            □□역 4번 출구 도보 3분, 건물 주차 2시간 무료
+            □□역 4번 출구 도보 3분, 건물 주차 2시간 무료{" "}
+            <button type="button" onClick={() => go("about", "location")} className="font-bold underline underline-offset-2" style={{ color: C.accent }}>
+              오시는 길
+            </button>
           </p>
-          <button type="button" onClick={() => go("about", "location")} className="mt-auto inline-flex items-center gap-0.5 self-start pt-4 text-[15px] font-bold" style={{ color: C.accent }}>
-            오시는 길
-            <ChevronRight size={16} aria-hidden />
-          </button>
         </div>
       </section>
 
@@ -1336,30 +1321,21 @@ function Tour() {
 }
 
 function HoursTable() {
-  const now = useNow();
   return (
     <table className="w-full border-t-2" style={{ borderColor: C.ink }}>
       <caption className="sr-only">요일별 진료시간</caption>
       <tbody>
-        {HOURS.map((h) => {
-          const isToday = now?.getDay() === h.day;
-          return (
-            <tr key={h.label} className="border-b" style={{ borderColor: C.line, backgroundColor: isToday ? C.mist : undefined }}>
-              <th scope="row" className={`py-3 pl-2 pr-3 text-left ${isToday ? "font-bold" : "font-normal"}`}>
-                {h.label}
-                {isToday && (
-                  <span className="ml-2 rounded-[4px] px-1.5 py-0.5 text-[13px] font-bold text-white" style={{ backgroundColor: C.ink }}>
-                    오늘
-                  </span>
-                )}
-              </th>
-              <td className={`py-3 pr-2 text-right tabular-nums ${isToday ? "font-bold" : ""}`} style={{ color: h.open ? C.ink : C.error }}>
-                {"night" in h && h.night && <Moon size={14} className="mr-1 inline align-[-1px]" style={{ color: C.accent }} aria-label="야간진료" />}
-                {h.time}
-              </td>
-            </tr>
-          );
-        })}
+        {HOURS.map((h) => (
+          <tr key={h.label} className="border-b" style={{ borderColor: C.line }}>
+            <th scope="row" className="py-3 pl-2 pr-3 text-left font-normal">
+              {h.label}
+            </th>
+            <td className="py-3 pr-2 text-right tabular-nums" style={{ color: h.open ? C.ink : C.error }}>
+              {"night" in h && h.night && <Moon size={14} className="mr-1 inline align-[-1px]" style={{ color: C.accent }} aria-label="야간진료" />}
+              {h.time}
+            </td>
+          </tr>
+        ))}
         <tr className="border-b" style={{ borderColor: C.line }}>
           <th scope="row" className="py-3 pl-2 pr-3 text-left font-normal" style={{ color: C.muted }}>
             점심시간 (평일)
@@ -1449,17 +1425,17 @@ function TreatmentDetail({ id, reserve }: { id: Exclude<TreatmentId, "check">; r
 
 function InfoGrid({ visits, insurance, cost }: { visits: string; insurance: string; cost: string }) {
   return (
-    <dl className="mt-6 grid overflow-hidden rounded-[10px] border sm:grid-cols-3" style={{ borderColor: C.line }}>
+    <dl className="mt-5 border-t" style={{ borderColor: C.line }}>
       {[
         ["치료 기간", visits],
         ["보험 적용", insurance],
         ["예상 비용", cost],
-      ].map(([k, v], i) => (
-        <div key={k} className={`p-4 ${i > 0 ? "border-t sm:border-l sm:border-t-0" : ""}`} style={{ borderColor: C.line, backgroundColor: C.mist }}>
-          <dt className="text-[14px]" style={{ color: C.muted }}>
+      ].map(([k, v]) => (
+        <div key={k} className="flex gap-4 border-b py-2.5" style={{ borderColor: C.line }}>
+          <dt className="w-20 shrink-0 text-[15px]" style={{ color: C.muted }}>
             {k}
           </dt>
-          <dd className="mt-1 text-[16px] font-bold">{v}</dd>
+          <dd className="text-[16px] font-bold">{v}</dd>
         </div>
       ))}
     </dl>
@@ -1627,6 +1603,10 @@ function Notice({ no, go }: { no: number | null; go: Go }) {
     );
   }
   return (
+    <>
+    <p className="mb-2 text-[15px]" style={{ color: C.muted }}>
+      총 <b style={{ color: C.ink }}>{NOTICE_TOTAL}</b>건, 1/{Math.ceil(NOTICE_TOTAL / 10)}쪽
+    </p>
     <table className="w-full border-t-2" style={{ borderColor: C.ink }}>
       <caption className="sr-only">공지사항 목록</caption>
       <thead>
@@ -1660,6 +1640,17 @@ function Notice({ no, go }: { no: number | null; go: Go }) {
         ))}
       </tbody>
     </table>
+    <p className="mt-6 flex justify-center gap-1 text-[15px] tabular-nums" aria-label="쪽 번호">
+      {[1, 2, 3, 4, 5].map((n) => (
+        <span key={n} className="inline-flex h-9 min-w-9 items-center justify-center rounded-[4px] px-2" style={n === 1 ? { backgroundColor: C.ink, color: "#fff", fontWeight: 700 } : { color: C.muted }}>
+          {n}
+        </span>
+      ))}
+      <span className="inline-flex h-9 items-center px-2" style={{ color: C.muted }}>
+        … {Math.ceil(NOTICE_TOTAL / 10)}
+      </span>
+    </p>
+    </>
   );
 }
 
@@ -1707,7 +1698,7 @@ function ToothMap({ preset, onReserve }: { preset: Preset; onReserve: (id: Treat
       </div>
 
       <div className="lg:col-span-6">
-        <div className="rounded-[12px] border bg-white p-5 md:p-8" style={{ borderColor: C.line }} aria-live="polite">
+        <div className="border-t-2 pt-5 lg:pt-6" style={{ borderColor: C.ink }} aria-live="polite">
           <AnimatePresence mode="wait" initial={false}>
             <motion.div
               key={String(selected)}
@@ -1763,10 +1754,7 @@ function ToothMap({ preset, onReserve }: { preset: Preset; onReserve: (id: Treat
               className="mt-6 border-t pt-6"
               style={{ borderColor: C.line }}
             >
-              <p className="text-[15px] font-bold" style={{ color: C.accent }}>
-                필요한 진료
-              </p>
-              <p className="mt-1 text-[24px] font-bold tracking-[-0.03em]">{TREATMENT_NAME[symptom.treatment]}</p>
+              <p className="text-[24px] font-bold tracking-[-0.03em]">{TREATMENT_NAME[symptom.treatment]}</p>
               <p className="mt-2" style={{ color: C.muted }}>
                 {symptom.body}
               </p>

@@ -36,9 +36,6 @@ const PAPER_TEXTURE = `url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2
 
 /* ---------- 영업시간 ---------- */
 
-const OPEN = 660; // 11:00
-const LAST_ORDER = 1230; // 20:30
-const CLOSE = 1260; // 21:00
 const WEEKDAY = ["일", "월", "화", "수", "목", "금", "토"];
 
 const minuteSubscribe = (cb: () => void) => {
@@ -53,18 +50,6 @@ function useMinute() {
     () => Math.floor(Date.now() / 60_000),
     () => -1,
   );
-}
-
-function openStatus(minute: number) {
-  if (minute < 0) return null;
-  const now = new Date(minute * 60_000);
-  const day = now.getDay();
-  const m = now.getHours() * 60 + now.getMinutes();
-  if (day === 1) return { day, text: "오늘 휴무", open: false };
-  if (m < OPEN) return { day, text: "11:00 영업 시작", open: false };
-  if (m >= CLOSE) return { day, text: "오늘 영업 종료", open: false };
-  if (m >= LAST_ORDER) return { day, text: "주문 마감 (21:00까지 이용 가능)", open: false };
-  return { day, text: "영업 중 (주문 마감 20:30)", open: true };
 }
 
 /* ---------- 메뉴 ---------- */
@@ -302,7 +287,6 @@ function LogoMark({ light = false }: { light?: boolean }) {
 
 export function HanokCafeDemo() {
   const minute = useMinute();
-  const status = openStatus(minute);
   const reduce = useReducedMotionSafe();
 
   const [groupId, setGroupId] = useState<GroupId>("gunneon");
@@ -338,7 +322,7 @@ export function HanokCafeDemo() {
         <TopNav groupId={groupId} onGroup={pickGroup} />
         <div className="min-w-0 flex-1">
           <main>
-            <Intro status={status} onReserve={() => scrollTo("space")} onMenuBoard={openMenuBoard} />
+            <Intro onReserve={() => scrollTo("space")} onMenuBoard={openMenuBoard} />
             <SpaceSection groupId={groupId} unitId={unitId} ink={ink} inkKey={inkKey} onPick={pickUnit} minute={minute} />
             <MenuSection showAll={fullMenu} setShowAll={setFullMenu} />
             <Location />
@@ -413,7 +397,7 @@ function SideNav({ groupId, onGroup }: { groupId: GroupId; onGroup: (id: GroupId
 /** 좁은 화면: 위쪽 상호 줄 + 가로로 밀리는 메뉴 띠 */
 function TopNav({ groupId, onGroup }: { groupId: GroupId; onGroup: (id: GroupId) => void }) {
   return (
-    <header className="sticky top-0 z-40 border-b border-[#1f1b16]/10 bg-[#f3ede2]/95 backdrop-blur-md lg:hidden">
+    <header className="sticky top-0 z-40 border-b border-[#1f1b16]/10 bg-[#f3ede2] lg:hidden">
       <div className="flex h-14 items-center justify-between px-4">
         <a href="#top" className="flex items-center gap-2">
           <LogoMark />
@@ -477,7 +461,7 @@ function HanjiDoor({ side }: { side: "left" | "right" }) {
   );
 }
 
-function Intro({ status, onReserve, onMenuBoard }: { status: ReturnType<typeof openStatus>; onReserve: () => void; onMenuBoard: () => void }) {
+function Intro({ onReserve, onMenuBoard }: { onReserve: () => void; onMenuBoard: () => void }) {
   const reduce = useReducedMotionSafe();
   return (
     <section id="top" aria-labelledby="cafe-title" className="scroll-mt-28 px-4 pt-4 sm:px-6 lg:scroll-mt-0 lg:px-10 lg:pt-10">
@@ -516,31 +500,10 @@ function Intro({ status, onReserve, onMenuBoard }: { status: ReturnType<typeof o
         <div className="mt-6 grid gap-6 border-b border-[#1f1b16]/15 pb-10 lg:grid-cols-[minmax(0,1fr)_auto] lg:items-end">
           <div>
             <p className="max-w-[34em] text-[17px] text-[#4a4036]">1962년에 지은 ㄱ자 한옥을 고쳐 전통차와 커피, 우리 다과를 냅니다.</p>
-            <dl className="mt-5 grid grid-cols-2 gap-x-6 gap-y-3 text-[15px] sm:grid-cols-4">
-              <div>
-                <dt className="text-[#6b5a48]">영업시간</dt>
-                <dd className="font-semibold">11:00 ~ 21:00</dd>
-              </div>
-              <div>
-                <dt className="text-[#6b5a48]">휴무</dt>
-                <dd className="font-semibold">월요일, 설·추석 당일</dd>
-              </div>
-              <div>
-                <dt className="text-[#6b5a48]">{status ? `오늘(${WEEKDAY[status.day]})` : "오늘"}</dt>
-                <dd className="flex min-h-[1.6em] items-center gap-1.5 font-semibold">
-                  {status && (
-                    <>
-                      <span className={`h-2 w-2 shrink-0 rounded-full ${status.open ? "bg-[#3f5a3c]" : "bg-[#a8432a]"}`} aria-hidden />
-                      {status.text}
-                    </>
-                  )}
-                </dd>
-              </div>
-              <div>
-                <dt className="text-[#6b5a48]">좌석</dt>
-                <dd className="font-semibold">{TOTAL_SEATS}석 (좌식 방 3실)</dd>
-              </div>
-            </dl>
+            <p className="mt-4 max-w-[34em] text-[16px] leading-[1.75] text-[#4a4036]">
+              화요일부터 일요일까지 <b className="font-semibold text-[#1f1b16]">11:00 ~ 21:00</b>에 문을 엽니다. 주문은 20:30까지 받고 월요일과 설·추석 당일은 쉽니다.
+              좌식 방 3실에 {TOTAL_SEATS}석이 있고 방 단위로 예약받습니다.
+            </p>
           </div>
           <div className="flex flex-wrap gap-2">
             <button type="button" onClick={onReserve} className="inline-flex h-12 items-center rounded-[4px] bg-[#1f1b16] px-6 text-[16px] font-semibold text-[#f3ede2] transition-colors hover:bg-[#a8432a]">
@@ -1167,7 +1130,7 @@ function MenuSection({ showAll, setShowAll }: { showAll: boolean; setShowAll: (v
             </p>
 
             <div className="mt-6">
-              <div className="h-3.5 rounded-full bg-gradient-to-b from-[#7a5a3e] to-[#4a3424] shadow-[0_2px_4px_rgba(0,0,0,0.25)]" aria-hidden />
+              <div className="h-3.5 rounded-full bg-[#5a4130]" aria-hidden />
               <motion.div
                 key={comboKey}
                 className="mx-3 overflow-hidden bg-[#faf6ee] shadow-[inset_0_8px_10px_-8px_rgba(0,0,0,0.25)]"
@@ -1188,7 +1151,7 @@ function MenuSection({ showAll, setShowAll }: { showAll: boolean; setShowAll: (v
                   </ul>
                 </div>
               </motion.div>
-              <div className="h-3.5 rounded-full bg-gradient-to-b from-[#7a5a3e] to-[#4a3424] shadow-[0_2px_4px_rgba(0,0,0,0.25)]" aria-hidden />
+              <div className="h-3.5 rounded-full bg-[#5a4130]" aria-hidden />
             </div>
           </div>
 
@@ -1201,10 +1164,7 @@ function MenuSection({ showAll, setShowAll }: { showAll: boolean; setShowAll: (v
                     <Image src={`${IMG}/${b.img}.jpg`} alt={b.alt} fill sizes="64px" className="object-cover" />
                   </span>
                   <span className="min-w-0 flex-1">
-                    <span className="flex items-center gap-2">
-                      <span className="rounded-[2px] bg-[#a8432a] px-1.5 text-[12px] font-bold leading-[1.7] text-white">대표</span>
-                      <span className="text-[17px] font-bold">{b.name}</span>
-                    </span>
+                    <span className="block text-[17px] font-bold">{b.name}</span>
                     <span className="mt-0.5 block text-[15px] tabular-nums text-[#5b5045]">{won(priceOf(b.name))}</span>
                   </span>
                 </li>

@@ -4,15 +4,12 @@ import { useEffect, useRef, useState, useSyncExternalStore } from "react";
 import Image from "next/image";
 import { AnimatePresence, motion } from "framer-motion";
 import {
-  Calculator,
   Check,
   ChevronLeft,
   ChevronRight,
-  ClipboardList,
   ExternalLink,
   House,
   List,
-  MapPin,
   Menu,
   Minus,
   Phone,
@@ -27,13 +24,13 @@ import { useReducedMotionSafe } from "@/hooks/useReducedMotionSafe";
    사무소 이름, 세무사 이름, 주소, 전화번호, 사업자 정보, 기장료는 모두 가상이다.
    신고 기한은 실제 세법의 기본 기한을 따르되, 음력 공휴일은 해마다 바뀌어 계산에서 뺀다.
 
-   구조: 개인 세무사무소에서 가장 흔한 포털형. 첫 화면은 섹션을 세로로 쌓지 않고 박스 그리드 한 화면이다
-   (사무소·전화 / 이달 신고일정 / 기장료 안내 / 세무소식 / 바로가기 / 세무사 인사말).
+   구조: 개인 세무사무소에서 흔한 포털형. 첫 화면은 사무소명·전화 줄 아래 이달 신고일정과 기장료 안내 두 박스,
+   그 아래 세무소식·세무사 인사말·관련 사이트를 선으로만 나눈 목록으로 둔다.
    메뉴(사무소 소개, 업무분야, 세무일정, 요금안내, 세무자료실, 오시는 길, 상담신청)는 라우트 없이
    컴포넌트 상태로 하위 화면을 바꾼다.
 
    디자인: 장부 느낌의 따뜻한 흰 바탕(#fbfaf6), 짙은 초록(#1f5c45), 먹색 글자(#1d2422).
-   다가오는 기한의 D-day는 형광펜 노랑(#f4d35e)으로 칠하고, 숫자는 모두 고정폭 숫자로 맞춘다.
+   D-day는 화면마다 가장 가까운 기한 하나에만 형광펜 노랑(#f4d35e)으로 달고, 나머지는 날짜로만 적는다.
 
    세무일정은 사업자 유형, 직원 유무와 원천세 납부 방법, 성실신고확인대상 여부로
    올해 1월부터 다음 해 3월까지의 신고 기한을 계산해 월 탭과 목록으로 보여 준다.
@@ -389,8 +386,8 @@ const POSTS: Post[] = [
   { id: 12, board: "news", cat: "신고일정", date: "2026.09.30", title: "10월 부가세, 개인은 고지서로 냅니다", body: "개인 일반과세자는 직전 기 납부세액의 절반이 고지됩니다. 신고는 필요 없고 고지서 금액만 기한 안에 내면 됩니다. 법인은 예정신고를 해야 합니다." },
   { id: 11, board: "column", cat: "절세", date: "2026.09.12", title: "노란우산공제, 12월 전에 넣으면 올해 소득공제에 들어갑니다", body: "사업소득 금액에 따라 연 200만 원에서 600만 원까지 소득공제를 받습니다. 연말에 한꺼번에 넣어도 그해 납입액으로 인정됩니다." },
   { id: 10, board: "news", cat: "세법개정", date: "2026.08.28", title: "올해 세법 개정안에서 소상공인이 볼 부분", body: "고용을 늘린 사업장의 세액공제, 업무용 승용차 기준, 간편장부 대상 기준이 어떻게 바뀌는지 표로 정리했습니다. 사무실에 인쇄본도 둡니다." },
-  { id: 9, board: "column", cat: "절세", date: "2026.08.05", title: "사업용 카드를 홈택스에 등록하셨나요", body: "개인사업자는 사업에 쓰는 카드를 홈택스에 등록해 두면 사용 내역이 자동으로 모입니다. 영수증을 따로 모으지 않아도 매입세액공제를 챙길 수 있습니다." },
-  { id: 8, board: "news", cat: "신고일정", date: "2026.07.20", title: "간이과세자 7월 고지서, 금액이 맞는지 보세요", body: "작년 세액의 절반이 고지됩니다. 상반기 매출이 작년보다 크게 줄었다면 신고로 대신해 덜 낼 수 있습니다." },
+  { id: 9, board: "column", cat: "절세", date: "2026.08.05", title: "사업용 카드 홈택스 등록 안내", body: "개인사업자는 사업에 쓰는 카드를 홈택스에 등록해 두면 사용 내역이 자동으로 모입니다. 영수증을 따로 모으지 않아도 매입세액공제를 챙길 수 있습니다." },
+  { id: 8, board: "news", cat: "신고일정", date: "2026.07.20", title: "간이과세자 7월 부가세 고지서 금액 확인", body: "작년 세액의 절반이 고지됩니다. 상반기 매출이 작년보다 크게 줄었다면 신고로 대신해 덜 낼 수 있습니다." },
   { id: 7, board: "notice", cat: "사무소", date: "2026.07.01", title: "토요일 상담은 1월과 5월에만 엽니다", body: "부가세 확정신고와 종합소득세 신고가 몰리는 1월, 5월에는 토요일 오전 10시부터 오후 3시까지 상담합니다." },
   { id: 6, board: "column", cat: "경비", date: "2026.06.15", title: "업무용 승용차, 운행기록부가 필요한 경우", body: "차량 관련 비용이 연 1,500만 원을 넘으면 운행기록부가 있어야 넘는 금액을 경비로 인정받습니다. 성실신고확인대상은 업무용 자동차 보험도 확인합니다." },
   { id: 5, board: "news", cat: "세법개정", date: "2026.05.10", title: "간이과세 기준 금액은 연 매출 1억 400만 원입니다", body: "직전 연도 매출이 1억 400만 원 미만이면 간이과세자가 될 수 있습니다. 부동산 임대업과 과세 유흥업은 4,800만 원 기준이 그대로입니다." },
@@ -398,6 +395,9 @@ const POSTS: Post[] = [
   { id: 3, board: "column", cat: "인건비", date: "2026.03.18", title: "직원 4대보험 취득신고는 입사일 다음 달 15일까지", body: "신고가 늦으면 과태료가 붙고 두루누리 지원도 놓칠 수 있습니다. 입사자 정보는 입사 당일 보내 주시면 사무소에서 신고합니다." },
   { id: 2, board: "notice", cat: "사무소", date: "2026.02.03", title: "자료 전달 방법이 바뀌었습니다", body: "증빙 자료는 이메일이나 카카오톡 채널로 보내 주시면 됩니다. 원본이 필요한 서류는 따로 안내드립니다." },
 ];
+
+/* 게시판에 쌓인 전체 글 수. 데모에는 최근 글만 넣어 두고 첫 쪽만 보여 준다. */
+const BOARD_TOTAL: Record<BoardId, number> = { news: 213, column: 86, notice: 41 };
 
 /* ---------- 업무분야 ---------- */
 
@@ -689,6 +689,15 @@ function DdayBadge({ n, big = false }: { n: number; big?: boolean }) {
   );
 }
 
+function Radio({ name, checked, onChange, children }: { name: string; checked: boolean; onChange: () => void; children: React.ReactNode }) {
+  return (
+    <label className="flex min-h-10 cursor-pointer items-center gap-2.5 text-[15px] leading-[1.4]">
+      <input type="radio" name={name} checked={checked} onChange={onChange} className="h-[18px] w-[18px] shrink-0 accent-[#1f5c45]" />
+      {children}
+    </label>
+  );
+}
+
 function Pill({ on, onClick, children, disabled }: { on: boolean; onClick: () => void; children: React.ReactNode; disabled?: boolean }) {
   return (
     <button
@@ -704,17 +713,18 @@ function Pill({ on, onClick, children, disabled }: { on: boolean; onClick: () =>
   );
 }
 
-/** 메인 박스: 제목 줄과 더보기(+) 아이콘 */
-function Box({ id, title, onMore, className = "", children }: { id: string; title: string; onMore?: () => void; className?: string; children: React.ReactNode }) {
+/** 메인 박스. 일정과 기장료 두 곳만 박스로 묶는다. */
+function Box({ id, title, more, onMore, className = "", children }: { id: string; title: string; more?: string; onMore?: () => void; className?: string; children: React.ReactNode }) {
   return (
-    <section id={id} aria-labelledby={`${id}-title`} className={`flex min-w-0 flex-col rounded-[10px] border bg-white ${className}`} style={{ borderColor: C.line }}>
-      <div className="flex items-center justify-between gap-3 border-b py-2 pl-5 pr-2" style={{ borderColor: C.line }}>
+    <section id={id} aria-labelledby={`${id}-title`} className={`flex min-w-0 flex-col rounded-[8px] border bg-white ${className}`} style={{ borderColor: C.line }}>
+      <div className="flex items-center justify-between gap-3 border-b py-2 pl-5 pr-3" style={{ borderColor: C.line }}>
         <h2 id={`${id}-title`} className="py-1 text-[18px] font-bold tracking-[-0.02em]">
           {title}
         </h2>
-        {onMore && (
-          <button type="button" onClick={onMore} aria-label={`${title} 더보기`} title="더보기" className="inline-flex h-10 w-10 items-center justify-center rounded-[6px] hover:bg-[#f3f1ea]" style={{ color: C.muted }}>
-            <Plus size={20} aria-hidden />
+        {onMore && more && (
+          <button type="button" onClick={onMore} className="inline-flex h-10 items-center gap-0.5 text-[14px] hover:underline" style={{ color: C.muted }}>
+            {more}
+            <ChevronRight size={15} aria-hidden />
           </button>
         )}
       </div>
@@ -723,9 +733,26 @@ function Box({ id, title, onMore, className = "", children }: { id: string; titl
   );
 }
 
+/** 박스 없이 선으로만 나누는 목록 제목 */
+function ListHead({ id, title, onMore }: { id: string; title: string; onMore?: () => void }) {
+  return (
+    <div className="flex items-end justify-between border-b-2 pb-2" style={{ borderColor: C.ink }}>
+      <h2 id={id} className="text-[19px] font-bold tracking-[-0.02em]">
+        {title}
+      </h2>
+      {onMore && (
+        <button type="button" onClick={onMore} aria-label={`${title} 더보기`} className="inline-flex h-9 items-center gap-0.5 text-[14px] hover:underline" style={{ color: C.muted }}>
+          더보기
+          <ChevronRight size={15} aria-hidden />
+        </button>
+      )}
+    </div>
+  );
+}
+
 const inputCls = "mt-1.5 h-12 w-full rounded-[6px] border bg-white px-3 outline-none focus:border-[#1f5c45]";
 
-/* ---------- 메인: 박스 그리드 ---------- */
+/* ---------- 메인 ---------- */
 
 /** 이번 달 기한(지난 것 포함)과, 남은 게 적으면 다음 달 기한을 붙인다 */
 function monthDigest(today: Date, p: Profile) {
@@ -764,192 +791,204 @@ function Home({
   const latest = POSTS.slice(0, 5);
   const boardLabel = (b: BoardId) => BOARDS.find((x) => x.id === b)?.label ?? "";
   const monthIdxOf = (d: Date) => (today ? (d.getFullYear() - today.getFullYear()) * 12 + d.getMonth() : 0);
+  // D-day는 가장 가까운 기한 하나에만 단다
+  const nearest = digest && today ? [...digest.thisMonth, ...digest.nextMonth].find((d) => d.real >= today) ?? null : null;
 
   const row = (d: Deadline) => {
     const past = today ? d.real < today : false;
     return (
-      <li key={d.id}>
-        <button
-          type="button"
-          onClick={() => openDeadline(d.id, monthIdxOf(d.due))}
-          className="flex w-full items-center gap-3 rounded-[6px] px-2 py-2 text-left hover:bg-[#f6f5f0]"
-          style={{ opacity: past ? 0.55 : 1 }}
-        >
-          {today && (past ? <span className="inline-flex min-w-[58px] justify-center text-[14px]" style={{ color: C.muted }}>지남</span> : <DdayBadge n={dayDiff(d.real, today)} />)}
-          <span className="min-w-0 flex-1">
-            <span className="block font-semibold leading-[1.4]">{d.title}</span>
-            <span className="block text-[14px] tabular-nums" style={{ color: C.muted }}>
-              {md(d.real)}
-              {d.shifted ? ` (${d.shifted}로 연기)` : ""}
+      <tr key={d.id} className="border-b" style={{ borderColor: C.line, color: past ? C.muted : C.ink }}>
+        <td className="whitespace-nowrap py-2.5 pr-3 align-top tabular-nums">{md(d.real)}</td>
+        <td className="py-1 pr-2 align-top">
+          <button type="button" onClick={() => openDeadline(d.id, monthIdxOf(d.due))} className="block py-1.5 text-left font-semibold leading-[1.45] underline-offset-4 hover:underline">
+            {d.title}
+          </button>
+        </td>
+        <td className="whitespace-nowrap py-2.5 text-right align-top text-[14px] tabular-nums">
+          {past ? (
+            "지남"
+          ) : nearest?.id === d.id && today ? (
+            <span className="px-1 font-bold" style={{ background: C.yellow, color: C.ink }}>
+              {dday(dayDiff(d.real, today))}
             </span>
-          </span>
-        </button>
-      </li>
+          ) : d.shifted ? (
+            `${d.shifted}로 연기`
+          ) : (
+            ""
+          )}
+        </td>
+      </tr>
     );
   };
 
   return (
-    <div className="px-4 pb-16 pt-5 md:px-6 md:pt-8">
-      <div className="mx-auto grid max-w-[1200px] gap-4 lg:grid-cols-12">
-        {/* 사무소 */}
-        <section aria-labelledby="tax-home-title" className="flex flex-col rounded-[10px] p-5 md:p-6 lg:col-span-4" style={{ background: C.green, color: "#fff" }}>
-          <h1 id="tax-home-title" tabIndex={-1} className="text-[30px] font-bold leading-[1.3] tracking-[-0.03em] outline-none md:text-[34px]">
-            {OFFICE}
-          </h1>
-          <p className="mt-1 text-[15px]" style={{ color: "#cfe0d7" }}>
-            개인사업자·법인 세무기장, 신고대리
-          </p>
-          <a href={`tel:${TEL}`} className="mt-5 inline-flex items-center gap-2 text-[28px] font-bold tabular-nums tracking-[-0.01em]">
-            <Phone size={24} aria-hidden />
-            {TEL}
-          </a>
-          <dl className="mt-3 space-y-1 text-[15px] tabular-nums" style={{ color: "#e5eee9" }}>
-            <div className="flex gap-3">
-              <dt className="w-[52px] shrink-0" style={{ color: "#a9c4b8" }}>
-                평일
-              </dt>
-              <dd>09:00 ~ 18:00 (점심 12:00 ~ 13:00)</dd>
+    <>
+      <section aria-labelledby="tax-home-title" className="border-b bg-white px-4 md:px-6" style={{ borderColor: C.line }}>
+        <div className="mx-auto flex max-w-[1200px] flex-col gap-4 py-6 md:flex-row md:items-end md:justify-between md:py-8">
+          <div>
+            <h1 id="tax-home-title" tabIndex={-1} className="text-[30px] font-bold leading-[1.3] tracking-[-0.03em] outline-none md:text-[34px]">
+              {OFFICE}
+            </h1>
+            <p className="mt-1 text-[15px]" style={{ color: C.muted }}>
+              개인사업자·법인 세무기장, 신고대리 / 대표세무사 김ㅅ우
+            </p>
+          </div>
+          <div className="flex flex-wrap items-end gap-x-6 gap-y-3">
+            <div>
+              <a href={`tel:${TEL}`} className="inline-flex items-center gap-2 text-[26px] font-bold tabular-nums tracking-[-0.01em]" style={{ color: C.green }}>
+                <Phone size={22} aria-hidden />
+                {TEL}
+              </a>
+              <p className="text-[14px] tabular-nums" style={{ color: C.muted }}>
+                평일 09:00 ~ 18:00 (점심 12:00 ~ 13:00), 토요일은 1월과 5월만
+              </p>
             </div>
-            <div className="flex gap-3">
-              <dt className="w-[52px] shrink-0" style={{ color: "#a9c4b8" }}>
-                토요일
-              </dt>
-              <dd>1월, 5월만 10:00 ~ 15:00</dd>
-            </div>
-          </dl>
-          <div className="mt-auto flex gap-2 pt-6">
-            <button type="button" onClick={() => go("contact")} className="h-12 flex-1 rounded-[6px] text-[16px] font-bold" style={{ background: "#fff", color: C.greenDeep }}>
+            <button type="button" onClick={() => go("contact")} className="h-12 rounded-[6px] px-5 text-[16px] font-bold" style={{ background: C.green, color: "#fff" }}>
               상담신청
             </button>
-            <button type="button" onClick={() => go("map")} aria-label="오시는 길" title="오시는 길" className="inline-flex h-12 w-12 items-center justify-center rounded-[6px] border" style={{ borderColor: "rgba(255,255,255,0.4)" }}>
-              <MapPin size={20} aria-hidden />
-            </button>
           </div>
-        </section>
+        </div>
+      </section>
 
-        {/* 이달의 신고일정 */}
-        <Box id="tax-schedule" title={today ? `${today.getMonth() + 1}월 신고일정` : "이달의 신고일정"} onMore={() => go("schedule")} className="lg:col-span-8">
-          <div className="flex flex-wrap items-center gap-1.5" role="group" aria-label="사업자 유형">
-            {BIZ.map((b) => (
-              <button
-                key={b.id}
-                type="button"
-                aria-pressed={profile.type === b.id}
-                onClick={() => setProfile({ ...profile, type: b.id })}
-                className="h-10 rounded-[6px] border px-3 text-[15px] font-semibold"
-                style={profile.type === b.id ? { background: C.ink, color: "#fff", borderColor: C.ink } : { borderColor: C.line }}
-              >
-                {b.short}
-              </button>
-            ))}
-            <label className="ml-1 inline-flex h-10 cursor-pointer items-center gap-2 text-[15px]">
-              <input type="checkbox" checked={profile.staff} onChange={(e) => setProfile({ ...profile, staff: e.target.checked })} className="h-5 w-5 accent-[#1f5c45]" />
-              직원 있음
-            </label>
-          </div>
-          <div className="mt-3 min-h-[220px]" aria-live="polite">
-            {digest && today && (
-              <>
-                {digest.thisMonth.length === 0 ? (
-                  <p className="px-2 py-3 text-[15px]" style={{ color: C.muted }}>
-                    이번 달은 신고 기한이 없습니다.
-                  </p>
-                ) : (
-                  <ul className="divide-y" style={{ borderColor: C.line }}>
-                    {digest.thisMonth.map(row)}
-                  </ul>
-                )}
-                {digest.nextMonth.length > 0 && (
-                  <>
-                    <p className="mt-3 border-t px-2 pt-3 text-[14px] font-bold" style={{ borderColor: C.line, color: C.muted }}>
-                      {digest.nm.getMonth() + 1}월
-                    </p>
-                    <ul>{digest.nextMonth.map(row)}</ul>
-                  </>
-                )}
-              </>
-            )}
-          </div>
-        </Box>
-
-        {/* 기장료 안내 */}
-        <Box id="tax-fee" title="기장료 안내" onMore={() => go("fee")} className="lg:col-span-5">
-          <FeeGrid fee={fee} setFee={setFee} compact />
-          <div className="mt-3 flex flex-wrap items-center justify-between gap-3 rounded-[6px] px-3 py-2.5" style={{ background: C.greenSoft }} aria-live="polite">
-            <p className="text-[15px] leading-[1.5]">
-              {fee.corp ? "법인" : "개인"}, {BANDS[fee.band].label}
-              <span className="block text-[18px] font-bold tabular-nums">월 {comma(monthlyFee(fee.band, fee.corp) + staffFee(fee.staff))}원부터</span>
-            </p>
-            <button
-              type="button"
-              onClick={() => ask({ topics: ["신규 기장"], biz: fee.corp ? "법인" : "", memo: `${fee.corp ? "법인" : "개인사업자"}, 작년 매출 ${BANDS[fee.band].label}, 기장료 상담 원합니다.` })}
-              className="h-11 rounded-[6px] px-4 text-[15px] font-semibold"
-              style={{ background: C.green, color: "#fff" }}
-            >
-              기장 상담 신청
-            </button>
-          </div>
-          <p className="mt-2 text-[13px]" style={{ color: C.muted }}>
-            부가세 별도, 직원 {fee.staff}명 기준
-          </p>
-        </Box>
-
-        {/* 세무소식 */}
-        <Box id="tax-news" title="세무소식" onMore={() => go("board")} className="lg:col-span-7">
-          <ul className="-my-1">
-            {latest.map((p) => (
-              <li key={p.id}>
-                <button type="button" onClick={() => openPost(p)} className="grid w-full grid-cols-[auto_1fr] items-baseline gap-x-3 rounded-[6px] px-2 py-2 text-left hover:bg-[#f6f5f0] sm:grid-cols-[auto_1fr_auto]">
-                  <span className="text-[13px] font-semibold" style={{ color: C.green }}>
-                    [{boardLabel(p.board)}]
-                  </span>
-                  <span className="truncate text-[15px] font-semibold">{p.title}</span>
-                  <span className="col-start-2 text-[13px] tabular-nums sm:col-start-auto" style={{ color: C.muted }}>
-                    {p.date}
-                  </span>
-                </button>
-              </li>
-            ))}
-          </ul>
-        </Box>
-
-        {/* 바로가기 */}
-        <Box id="tax-links" title="바로가기" className="lg:col-span-8">
-          <ul className="grid grid-cols-2 gap-2 sm:grid-cols-3">
-            {SHORTCUTS.map((s) => (
-              <li key={s.name}>
-                <a
-                  href={s.href}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="flex h-full min-h-[52px] items-center justify-between gap-2 rounded-[6px] border px-3 py-2 text-[15px] font-semibold leading-[1.35] hover:border-[#1f5c45]"
+      <div className="px-4 pb-16 pt-6 md:px-6 md:pt-8">
+        <div className="mx-auto grid max-w-[1200px] items-start gap-5 lg:grid-cols-12">
+          {/* 이달의 신고일정 */}
+          <Box id="tax-schedule" title={today ? `${today.getMonth() + 1}월 신고일정` : "이달의 신고일정"} more="전체 일정" onMore={() => go("schedule")} className="lg:col-span-7">
+            <div className="flex flex-wrap items-center gap-x-4 gap-y-2">
+              <label className="flex items-center gap-2 text-[15px] font-semibold">
+                사업자 유형
+                <select
+                  value={profile.type}
+                  onChange={(e) => setProfile({ ...profile, type: e.target.value as BizType })}
+                  className="h-10 rounded-[6px] border bg-white px-2 font-normal"
                   style={{ borderColor: C.line }}
                 >
-                  {s.name}
-                  <ExternalLink size={15} className="shrink-0" style={{ color: C.muted }} aria-hidden />
-                  <span className="sr-only">(새 창)</span>
-                </a>
-              </li>
-            ))}
-          </ul>
-        </Box>
+                  {BIZ.map((b) => (
+                    <option key={b.id} value={b.id}>
+                      {b.label}
+                    </option>
+                  ))}
+                </select>
+              </label>
+              <label className="inline-flex h-10 cursor-pointer items-center gap-2 text-[15px]">
+                <input type="checkbox" checked={profile.staff} onChange={(e) => setProfile({ ...profile, staff: e.target.checked })} className="h-5 w-5 accent-[#1f5c45]" />
+                직원 있음
+              </label>
+            </div>
+            <div className="mt-3 min-h-[220px]" aria-live="polite">
+              {digest && today && (
+                <table className="w-full border-t-2 text-[15px]" style={{ borderColor: C.ink }}>
+                  <caption className="sr-only">신고, 납부 기한</caption>
+                  <thead>
+                    <tr className="border-b text-[13px]" style={{ borderColor: C.line, color: C.muted }}>
+                      <th scope="col" className="w-[120px] py-2 text-left font-semibold">
+                        기한
+                      </th>
+                      <th scope="col" className="py-2 text-left font-semibold">
+                        신고·납부
+                      </th>
+                      <th scope="col" className="w-[96px] py-2 text-right font-semibold">
+                        비고
+                      </th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {digest.thisMonth.length === 0 ? (
+                      <tr className="border-b" style={{ borderColor: C.line }}>
+                        <td colSpan={3} className="py-3 text-[15px]" style={{ color: C.muted }}>
+                          이번 달은 신고 기한이 없습니다.
+                        </td>
+                      </tr>
+                    ) : (
+                      digest.thisMonth.map(row)
+                    )}
+                    {digest.nextMonth.map(row)}
+                  </tbody>
+                </table>
+              )}
+            </div>
+          </Box>
 
-        {/* 사무소 소개 요약 */}
-        <Box id="tax-about" title="세무사 인사말" onMore={() => go("about")} className="lg:col-span-4">
-          <div className="flex items-start gap-3">
-            <span className="relative h-[72px] w-[72px] shrink-0 overflow-hidden rounded-[6px]">
-              <Image src={`${IMG}/office.jpg`} alt="" fill sizes="72px" className="object-cover" />
-            </span>
-            <p className="text-[15px] leading-[1.6]" style={{ color: C.muted }}>
-              맡은 장부는 세무사가 직접 봅니다. 신고서를 내기 전에 숫자를 사장님과 한 번 더 맞춰 봅니다.
-              <span className="mt-1 block font-semibold" style={{ color: C.ink }}>
-                대표세무사 김ㅅ우
-              </span>
+          {/* 기장료 안내 */}
+          <Box id="tax-fee" title="기장료 안내" more="요금표" onMore={() => go("fee")} className="lg:col-span-5">
+            <FeeGrid fee={fee} setFee={setFee} compact />
+            <div className="mt-4 flex flex-wrap items-end justify-between gap-3 border-t pt-3" style={{ borderColor: C.ink }} aria-live="polite">
+              <p className="text-[15px] leading-[1.5]">
+                {fee.corp ? "법인" : "개인"}, {BANDS[fee.band].label}
+                <span className="block text-[20px] font-bold tabular-nums">월 {comma(monthlyFee(fee.band, fee.corp) + staffFee(fee.staff))}원부터</span>
+              </p>
+              <button
+                type="button"
+                onClick={() => ask({ topics: ["신규 기장"], biz: fee.corp ? "법인" : "", memo: `${fee.corp ? "법인" : "개인사업자"}, 작년 매출 ${BANDS[fee.band].label}, 기장료 상담 원합니다.` })}
+                className="h-11 rounded-[6px] border px-4 text-[15px] font-semibold"
+                style={{ borderColor: C.green, color: C.green }}
+              >
+                기장 상담 신청
+              </button>
+            </div>
+            <p className="mt-2 text-[13px]" style={{ color: C.muted }}>
+              부가세 별도, 직원 {fee.staff}명 기준
             </p>
+          </Box>
+        </div>
+
+        <div className="mx-auto mt-12 grid max-w-[1200px] gap-10 lg:grid-cols-12">
+          {/* 세무소식 */}
+          <section id="tax-news" aria-labelledby="tax-news-title" className="min-w-0 lg:col-span-7">
+            <ListHead id="tax-news-title" title="세무소식" onMore={() => go("board")} />
+            <ul>
+              {latest.map((p) => (
+                <li key={p.id} className="border-b" style={{ borderColor: C.line }}>
+                  <button type="button" onClick={() => openPost(p)} className="grid w-full grid-cols-[auto_1fr] items-baseline gap-x-3 py-2.5 text-left sm:grid-cols-[auto_1fr_auto]">
+                    <span className="text-[13px] font-semibold" style={{ color: C.green }}>
+                      [{boardLabel(p.board)}]
+                    </span>
+                    <span className="truncate text-[15px] hover:underline">{p.title}</span>
+                    <span className="col-start-2 text-[13px] tabular-nums sm:col-start-auto" style={{ color: C.muted }}>
+                      {p.date}
+                    </span>
+                  </button>
+                </li>
+              ))}
+            </ul>
+          </section>
+
+          <div className="min-w-0 space-y-10 lg:col-span-5">
+            {/* 세무사 인사말 */}
+            <section id="tax-about" aria-labelledby="tax-about-title">
+              <ListHead id="tax-about-title" title="세무사 인사말" />
+              <div className="mt-3 flex items-start gap-4">
+                <span className="relative h-[84px] w-[112px] shrink-0 overflow-hidden rounded-[4px]">
+                  <Image src={`${IMG}/office.jpg`} alt="" fill sizes="112px" className="object-cover" />
+                </span>
+                <p className="text-[15px] leading-[1.6]" style={{ color: C.muted }}>
+                  맡은 장부는 세무사가 직접 봅니다. 신고서를 내기 전에 숫자를 사장님과 한 번 더 맞춰 봅니다.{" "}
+                  <button type="button" onClick={() => go("about")} className="font-semibold underline underline-offset-4" style={{ color: C.ink }}>
+                    인사말 전체
+                  </button>
+                </p>
+              </div>
+            </section>
+
+            {/* 바로가기 */}
+            <section id="tax-links" aria-labelledby="tax-links-title">
+              <ListHead id="tax-links-title" title="관련 사이트" />
+              <ul className="grid grid-cols-2 text-[15px]">
+                {SHORTCUTS.map((s) => (
+                  <li key={s.name} className="border-b" style={{ borderColor: C.line }}>
+                    <a href={s.href} target="_blank" rel="noopener noreferrer" className="flex min-h-[44px] items-center gap-1.5 py-2 pr-2 leading-[1.35] hover:underline">
+                      {s.name}
+                      <ExternalLink size={13} className="shrink-0" style={{ color: C.muted }} aria-hidden />
+                      <span className="sr-only">(새 창)</span>
+                    </a>
+                  </li>
+                ))}
+              </ul>
+            </section>
           </div>
-        </Box>
+        </div>
       </div>
-    </div>
+    </>
   );
 }
 
@@ -1050,26 +1089,26 @@ function Schedule({
 
   return (
     <div className="grid items-start gap-6 lg:grid-cols-[290px_1fr]">
-      <div className="space-y-6 rounded-[10px] border bg-white p-5" style={{ borderColor: C.line }}>
+      <div className="space-y-5 border-t-2 pt-4" style={{ borderColor: C.ink }}>
         <fieldset>
           <legend className="text-[15px] font-bold">사업자 유형</legend>
-          <div className="mt-2 grid grid-cols-2 gap-2 lg:grid-cols-1">
+          <div className="mt-1 grid grid-cols-2 gap-x-3 lg:grid-cols-1">
             {BIZ.map((b) => (
-              <Pill key={b.id} on={type === b.id} onClick={() => set({ type: b.id })}>
+              <Radio key={b.id} name="sch-biz" checked={type === b.id} onChange={() => set({ type: b.id })}>
                 {b.label}
-              </Pill>
+              </Radio>
             ))}
           </div>
         </fieldset>
-        <fieldset>
-          <legend className="text-[15px] font-bold">직원</legend>
-          <div className="mt-2 flex flex-wrap gap-2">
-            <Pill on={!staff} onClick={() => set({ staff: false })}>
+        <fieldset className="border-t pt-4" style={{ borderColor: C.line }}>
+          <legend className="float-left w-full text-[15px] font-bold">직원</legend>
+          <div className="clear-both flex flex-wrap gap-x-5">
+            <Radio name="sch-staff" checked={!staff} onChange={() => set({ staff: false })}>
               없음
-            </Pill>
-            <Pill on={staff} onClick={() => set({ staff: true })}>
+            </Radio>
+            <Radio name="sch-staff" checked={staff} onChange={() => set({ staff: true })}>
               있음
-            </Pill>
+            </Radio>
           </div>
           <label className="mt-3 flex min-h-11 cursor-pointer items-start gap-2.5 text-[15px] leading-[1.45]">
             <input type="checkbox" checked={freelancePay} onChange={(e) => set({ freelancePay: e.target.checked })} className="mt-0.5 h-5 w-5 shrink-0 accent-[#1f5c45]" />
@@ -1080,18 +1119,18 @@ function Schedule({
               <p className="text-[14px] font-semibold" style={{ color: C.muted }}>
                 원천세 납부
               </p>
-              <div className="mt-1.5 flex flex-wrap gap-2">
-                <Pill on={!half} onClick={() => set({ half: false })}>
+              <div className="flex flex-wrap gap-x-5">
+                <Radio name="sch-half" checked={!half} onChange={() => set({ half: false })}>
                   매월
-                </Pill>
-                <Pill on={half} onClick={() => set({ half: true })}>
+                </Radio>
+                <Radio name="sch-half" checked={half} onChange={() => set({ half: true })}>
                   반기 (승인받음)
-                </Pill>
+                </Radio>
               </div>
             </div>
           )}
         </fieldset>
-        <label className={`flex min-h-11 items-start gap-2.5 text-[15px] leading-[1.45] ${sincereOk ? "cursor-pointer" : "opacity-50"}`}>
+        <label className={`flex min-h-11 items-start gap-2.5 border-t pt-4 text-[15px] leading-[1.45] ${sincereOk ? "cursor-pointer" : "opacity-50"}`} style={{ borderColor: C.line }}>
           <input type="checkbox" disabled={!sincereOk} checked={eff.sincere} onChange={(e) => set({ sincere: e.target.checked })} className="mt-0.5 h-5 w-5 shrink-0 accent-[#1f5c45]" />
           <span>
             <span className="font-bold">성실신고확인대상</span>
@@ -1103,7 +1142,7 @@ function Schedule({
       </div>
 
       <div className="min-w-0 space-y-4">
-        <div className="flex min-h-[84px] flex-wrap items-center justify-between gap-3 rounded-[10px] border bg-white px-5 py-4" style={{ borderColor: C.line }} aria-live="polite">
+        <div className="flex min-h-[72px] flex-wrap items-center justify-between gap-3 border-b-2 pb-3" style={{ borderColor: C.ink }} aria-live="polite">
           {today && next && (
             <>
               <div className="flex min-w-0 items-center gap-3">
@@ -1207,13 +1246,9 @@ function Schedule({
                         )}
                       </span>
                       <span className="min-w-0 font-semibold leading-[1.4]">{d.title}</span>
-                      {past ? (
-                        <span className="text-[13px]" style={{ color: C.muted }}>
-                          지남
-                        </span>
-                      ) : (
-                        <DdayBadge n={dayDiff(d.real, today)} />
-                      )}
+                      <span className="text-[13px] tabular-nums" style={{ color: C.muted }}>
+                        {past ? "지남" : DAY_NAMES[d.real.getDay()] + "요일"}
+                      </span>
                     </button>
                   </li>
                 );
@@ -1241,7 +1276,6 @@ function Schedule({
                     </p>
                     <h2 className="text-[22px] font-bold leading-[1.35] tracking-[-0.02em]">{selected.title}</h2>
                   </div>
-                  <DdayBadge n={dayDiff(selected.real, today)} />
                 </div>
                 <dl className="mt-3 grid gap-1 text-[15px] tabular-nums sm:grid-cols-[auto_1fr] sm:gap-x-4">
                   <dt style={{ color: C.muted }}>법정 기한</dt>
@@ -1260,8 +1294,7 @@ function Schedule({
                 <p className="mt-3 text-[15px]" style={{ color: C.muted }}>
                   {KIND_INFO[selected.kind].about}
                 </p>
-                <h3 className="mt-4 flex items-center gap-1.5 font-bold">
-                  <ClipboardList size={18} style={{ color: C.green }} aria-hidden />
+                <h3 className="mt-4 font-bold">
                   준비 서류
                 </h3>
                 <ul className="mt-1">
@@ -1312,14 +1345,14 @@ function FeeGrid({ fee, setFee, compact = false }: { fee: FeePick; setFee: (f: F
     const on = fee.band === band && fee.corp === corp;
     const v = monthlyFee(band, corp);
     return (
-      <td className="p-0.5">
+      <td className="p-0">
         <button
           type="button"
           aria-pressed={on}
           onClick={() => setFee({ ...fee, band, corp })}
           aria-label={`${corp ? "법인" : "개인"} ${BANDS[band].label}, 월 ${comma(v)}원`}
-          className={`w-full rounded-[4px] px-2 text-right font-semibold tabular-nums transition-colors ${compact ? "h-10 text-[15px]" : "h-11 text-[16px]"}`}
-          style={on ? { background: C.green, color: "#fff" } : { background: "#f6f5f0" }}
+          className={`w-full px-2 text-right tabular-nums underline-offset-4 hover:underline ${compact ? "h-10 text-[15px]" : "h-11 text-[16px]"} ${on ? "font-bold underline" : ""}`}
+          style={{ color: on ? C.green : C.ink }}
         >
           {compact ? `${v / 10_000}만` : `${comma(v)}원`}
         </button>
@@ -1354,8 +1387,8 @@ function FeeGrid({ fee, setFee, compact = false }: { fee: FeePick; setFee: (f: F
       </thead>
       <tbody>
         {BANDS.map((b, i) => (
-          <tr key={b.label} className="border-t" style={{ borderColor: C.line }}>
-            <th scope="row" className="py-0.5 pr-2 text-left font-normal tabular-nums" style={{ color: fee.band === i ? C.ink : C.muted, fontWeight: fee.band === i ? 700 : 400 }}>
+          <tr key={b.label} className="border-t" style={{ borderColor: C.line, background: fee.band === i ? C.greenSoft : undefined }}>
+            <th scope="row" className="py-0.5 pl-1 pr-2 text-left font-normal tabular-nums" style={{ color: fee.band === i ? C.ink : C.muted, fontWeight: fee.band === i ? 700 : 400 }}>
               {compact ? b.short : b.label}
             </th>
             {cell(i, false)}
@@ -1419,8 +1452,8 @@ function FeeTable({ fee, setFee, onAsk }: { fee: FeePick; setFee: (f: FeePick) =
           </div>
         </div>
         <div aria-live="polite">
-          <p className="mt-5 flex items-center gap-2 text-[15px] font-bold" style={{ color: C.muted }}>
-            <Calculator size={18} style={{ color: C.green }} aria-hidden />월 합계
+          <p className="mt-5 text-[15px] font-bold" style={{ color: C.muted }}>
+            월 합계
           </p>
           <p className="mt-1 text-[34px] font-bold leading-[1.2] tracking-[-0.02em] tabular-nums">{comma(total)}원~</p>
           <table className="mt-4 w-full text-[15px] tabular-nums">
@@ -1472,6 +1505,10 @@ function Board({ board, setBoard, postId, setPostId }: { board: BoardId; setBoar
   const q = query.trim();
   const list = POSTS.filter((p) => p.board === board && (!q || p.title.includes(q) || p.body.includes(q)));
   const post = POSTS.find((p) => p.id === postId && p.board === board) ?? null;
+  const inBoard = POSTS.filter((p) => p.board === board);
+  const total = q ? list.length : BOARD_TOTAL[board];
+  const pages = Math.ceil(total / 10);
+  const numOf = (p: Post) => BOARD_TOTAL[board] - inBoard.indexOf(p);
 
   return (
     <div className="grid items-start gap-6 md:grid-cols-[200px_1fr]">
@@ -1523,7 +1560,7 @@ function Board({ board, setBoard, postId, setPostId }: { board: BoardId; setBoar
           <>
             <div className="flex flex-wrap items-center justify-between gap-3">
               <p className="text-[15px] tabular-nums" style={{ color: C.muted }}>
-                전체 <span className="font-bold" style={{ color: C.ink }}>{list.length}</span>건
+                전체 <span className="font-bold" style={{ color: C.ink }}>{total}</span>건
               </p>
               <label className="relative block w-full sm:w-[280px]">
                 <span className="sr-only">게시글 검색</span>
@@ -1560,7 +1597,7 @@ function Board({ board, setBoard, postId, setPostId }: { board: BoardId; setBoar
                 {list.map((p) => (
                   <tr key={p.id} className="border-b" style={{ borderColor: C.line }}>
                     <td className="hidden py-3 text-center tabular-nums sm:table-cell" style={{ color: C.muted }}>
-                      {p.id}
+                      {numOf(p)}
                     </td>
                     <td className="hidden py-3 text-center text-[14px] sm:table-cell" style={{ color: C.green }}>
                       {p.cat}
@@ -1583,6 +1620,25 @@ function Board({ board, setBoard, postId, setPostId }: { board: BoardId; setBoar
             {list.length === 0 && (
               <p className="py-10 text-center" style={{ color: C.muted }}>
                 검색 결과가 없습니다.
+              </p>
+            )}
+            {pages > 1 && (
+              <p className="mt-6 flex justify-center gap-1 text-[15px] tabular-nums" aria-label="쪽 번호">
+                {Array.from({ length: Math.min(pages, 5) }, (_, i) => (
+                  <span
+                    key={i}
+                    aria-current={i === 0 ? "page" : undefined}
+                    className="inline-flex h-9 min-w-9 items-center justify-center rounded-[4px] px-1"
+                    style={i === 0 ? { background: C.ink, color: "#fff", fontWeight: 700 } : { color: C.muted }}
+                  >
+                    {i + 1}
+                  </span>
+                ))}
+                {pages > 5 && (
+                  <span className="inline-flex h-9 items-center px-1" style={{ color: C.muted }}>
+                    ... {pages}
+                  </span>
+                )}
               </p>
             )}
           </>
@@ -1632,10 +1688,7 @@ function About() {
               <p className="mt-2 text-[15px]">{m.area}</p>
               <ul className="mt-3 space-y-1 border-t pt-3 text-[14px]" style={{ borderColor: C.line, color: C.muted }}>
                 {m.career.map((c) => (
-                  <li key={c} className="flex gap-2">
-                    <Check size={15} className="mt-[5px] shrink-0" style={{ color: C.green }} aria-hidden />
-                    {c}
-                  </li>
+                  <li key={c}>{c}</li>
                 ))}
               </ul>
             </li>

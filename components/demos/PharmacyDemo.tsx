@@ -1,25 +1,17 @@
 "use client";
 
 import { useEffect, useRef, useState, useSyncExternalStore } from "react";
-import Image from "next/image";
 import { AnimatePresence, motion } from "framer-motion";
 import {
   AArrowUp,
-  Bus,
-  CalendarDays,
   Camera,
-  Car,
   Check,
-  Clock,
-  MapPin,
   Menu,
   MessageSquare,
   Phone,
-  Pill,
   Printer,
   RotateCcw,
   Search,
-  TrainFront,
   X,
 } from "lucide-react";
 import { useReducedMotionSafe } from "@/hooks/useReducedMotionSafe";
@@ -28,20 +20,16 @@ import { useReducedMotionSafe } from "@/hooks/useReducedMotionSafe";
    상호, 약사 이름, 주소, 전화번호, 사업자 정보, 재고는 모두 가상이다. 약 이름은 상표 대신 성분과 용도로 적는다.
 
    뼈대: 운영 안내형. 대한약사회 휴일지킴이약국 상세 화면처럼 머리글 맨 위에 영업 상태 띠를 두고,
-   첫 화면은 약국 정보 카드(배지, 주소, 오늘 운영시간)와 요일별 운영시간 표, 오시는 길 카드다.
+   첫 화면은 약국 정보 카드(주소, 운영시간, 약사)와 요일별 운영시간 표, 오시는 길 카드다.
    그 아래로 처방전 미리 보내기, 취급 품목(품목 분류 + 증상 분류), 복약 달력 패널이 이어진다.
-   구간 제목은 패널 머리 띠에 두고 설명 문단은 두지 않는다.
+   실시간 영업 상태는 머리글 띠 한 곳에만 둔다. 구간 제목은 흰 바탕 제목과 밑줄로 두고 설명 문단은 두지 않는다.
 
    디자인: 흰 바탕에 약국 초록(#0b7a5f), 옅은 민트(#e3f2ec), 주의 주황(#b45309).
    어르신도 보기 쉽게 머리글에 글자 크게 버튼을 두고, 누르면 화면 전체가 커진다.
 
    운영: 평일 09:00 ~ 익일 01:00(22:00 이후 공공심야약국), 토요일 09:00 ~ 18:00,
-   일요일·공휴일 휴무, 둘째·넷째 일요일은 휴일지킴이약국으로 10:00 ~ 18:00.
+   일요일·공휴일 휴무, 둘째·넷째 일요일은 휴일지킴이약국으로 10:00 ~ 18:00. */
 
-   사진 출처(public/images/demo-pharmacy):
-   AI 생성(Z-Image-Turbo, Apache 2.0) hero */
-
-const IMG = "/images/demo-pharmacy";
 const PHARMACY = "○○ 약국";
 const TEL = "02-000-0000";
 const ADDRESS = "□□시 □□로 140 □□의원 건물 1층";
@@ -206,7 +194,7 @@ export function PharmacyDemo() {
       <Header big={big} onBig={() => setBig((v) => !v)} status={status} />
       <main style={{ zoom: big ? 1.18 : 1 }} className="px-4 pb-16 pt-5 md:px-6 md:pt-8">
         <div className="mx-auto max-w-[1200px] space-y-5 md:space-y-6">
-          <Intro minute={minute} status={status} />
+          <Intro />
           <div className="grid items-start gap-5 md:gap-6 lg:grid-cols-[1.15fr_1fr]">
             <Hours minute={minute} />
             <Location />
@@ -246,12 +234,6 @@ function StatusStrip({ status }: { status: Status | null }) {
               {status.label}
             </span>
             <span className="min-w-0 truncate">{status.sub}</span>
-            {status.late && (
-              <span className="ml-auto hidden shrink-0 rounded-[4px] border border-white/60 px-2 text-[13px] font-semibold sm:inline">공공심야약국</span>
-            )}
-            {status.duty && (
-              <span className="ml-auto hidden shrink-0 rounded-[4px] border border-white/60 px-2 text-[13px] font-semibold sm:inline">휴일지킴이약국</span>
-            )}
           </>
         ) : (
           <span aria-hidden> </span>
@@ -351,38 +333,32 @@ function Header({ big, onBig, status }: { big: boolean; onBig: () => void; statu
 function Panel({
   id,
   title,
-  icon: Icon,
   aside,
   children,
   className = "",
 }: {
   id: string;
   title: string;
-  icon: typeof Clock;
   aside?: React.ReactNode;
   children: React.ReactNode;
   className?: string;
 }) {
   return (
-    <section id={id} aria-labelledby={`${id}-title`} className={`scroll-mt-32 overflow-hidden rounded-[10px] border bg-white ${className}`} style={{ borderColor: C.line }}>
-      <div className="flex min-h-[56px] flex-wrap items-center justify-between gap-x-3 gap-y-1 border-b px-4 py-2.5 md:px-6" style={{ borderColor: C.line, background: C.mintSoft }}>
-        <h2 id={`${id}-title`} className="flex items-center gap-2 text-[20px] font-bold tracking-[-0.02em] md:text-[22px]" style={{ color: C.mintDeep }}>
-          <Icon size={21} aria-hidden />
+    <section id={id} aria-labelledby={`${id}-title`} className={`scroll-mt-32 rounded-[10px] border bg-white px-4 pb-5 pt-3 md:px-6 md:pb-6 md:pt-4 ${className}`} style={{ borderColor: C.line }}>
+      <div className="flex min-h-[52px] flex-wrap items-center justify-between gap-x-3 gap-y-2 border-b-2 pb-2.5" style={{ borderColor: C.ink }}>
+        <h2 id={`${id}-title`} className="text-[20px] font-bold tracking-[-0.02em] md:text-[22px]">
           {title}
         </h2>
         {aside}
       </div>
-      <div className="p-4 md:p-6">{children}</div>
+      <div className="pt-4 md:pt-5">{children}</div>
     </section>
   );
 }
 
-const BADGES = ["공공심야약국", "휴일지킴이약국", "주차", "동물약취급"];
-
 /* ---------- 약국 정보 카드 ---------- */
 
-function Intro({ minute, status }: { minute: number; status: Status | null }) {
-  const today = minute < 0 ? null : planFor(new Date(minute * 60_000));
+function Intro() {
   const rows: [string, React.ReactNode][] = [
     ["주소", ADDRESS],
     [
@@ -391,48 +367,33 @@ function Intro({ minute, status }: { minute: number; status: Status | null }) {
         {TEL}
       </a>,
     ],
-    ["오늘 운영시간", today ? (today.open ? rangeText(today) : `휴무 (${today.note})`) : " "],
+    ["운영시간", "평일 09:00 ~ 익일 01:00, 토요일 09:00 ~ 18:00"],
     ["약사", "개설 약사 박○○ 외 1명"],
   ];
 
   return (
     <section id="top" aria-labelledby="pharmacy-name" className="scroll-mt-32 rounded-[10px] border bg-white p-4 md:p-6 print:hidden" style={{ borderColor: C.line }}>
-      <div className="flex gap-4 md:gap-6">
-        <div className="min-w-0 flex-1">
-          <h1 id="pharmacy-name" className="text-[28px] font-bold leading-[1.25] tracking-[-0.03em] md:text-[36px]">
-            {PHARMACY}
-          </h1>
-          <ul className="mt-3 flex flex-wrap gap-1.5" aria-label="약국 특성">
-            {BADGES.map((b, i) => (
-              <li
-                key={b}
-                className="rounded-[4px] border px-2 py-0.5 text-[14px] font-semibold"
-                style={i < 2 ? { background: C.mint, color: "#fff", borderColor: C.mint } : { borderColor: C.line, color: C.muted }}
-              >
-                {b}
-              </li>
-            ))}
-          </ul>
-        </div>
-        <div className="relative h-[84px] w-[112px] shrink-0 overflow-hidden rounded-[6px] md:h-[150px] md:w-[220px]">
-          <Image src={`${IMG}/hero.jpg`} alt="흰 선반에 약상자가 정리된 약국 안과 나무 상담대" fill priority sizes="220px" className="object-cover" style={{ objectPosition: "35% center" }} />
-        </div>
+      <div className="flex flex-wrap items-center gap-x-3 gap-y-1.5">
+        <h1 id="pharmacy-name" className="text-[28px] font-bold leading-[1.25] tracking-[-0.03em] md:text-[36px]">
+          {PHARMACY}
+        </h1>
+        <span className="rounded-[4px] px-2 py-0.5 text-[14px] font-semibold text-white" style={{ background: C.mint }}>
+          공공심야약국
+        </span>
       </div>
-      <dl className="mt-5 grid border-t text-[16px] sm:grid-cols-2" style={{ borderColor: C.line }}>
+      <p className="mt-2 text-[16px]" style={{ color: C.muted }}>
+        둘째·넷째 일요일은 휴일지킴이약국으로 문을 엽니다. 동물약도 취급하고, 건물 주차장을 30분 무료로 쓸 수 있습니다.
+      </p>
+      <dl className="mt-4 grid border-t text-[16px] sm:grid-cols-2" style={{ borderColor: C.line }}>
         {rows.map(([k, v]) => (
           <div key={k} className="flex gap-3 border-b py-2.5 sm:pr-4" style={{ borderColor: C.line }}>
-            <dt className="w-[96px] shrink-0" style={{ color: C.muted }}>
+            <dt className="w-[80px] shrink-0" style={{ color: C.muted }}>
               {k}
             </dt>
             <dd className="min-w-0 font-medium">{v}</dd>
           </div>
         ))}
       </dl>
-      {status && status.state !== "open" && (
-        <p className="mt-3 text-[15px] font-semibold" style={{ color: C.warn }}>
-          {status.label} · {status.sub}
-        </p>
-      )}
     </section>
   );
 }
@@ -451,7 +412,6 @@ const WEEK_ROWS: { label: string; days: number[]; time: string; note?: string }[
 
 function Hours({ minute }: { minute: number }) {
   const now = minute < 0 ? null : new Date(minute * 60_000);
-  const todayHoliday = now ? HOLIDAYS[`${now.getMonth() + 1}-${now.getDate()}`] : undefined;
   const [offset, setOffset] = useState(0);
   const base = now ? new Date(now.getFullYear(), now.getMonth() + offset, 1) : null;
   const cells = base
@@ -462,21 +422,15 @@ function Hours({ minute }: { minute: number }) {
     : [];
 
   return (
-    <Panel id="hours" title="운영시간" icon={Clock} className="print:hidden">
+    <Panel id="hours" title="운영시간" className="print:hidden">
       <table className="w-full text-[16px]">
         <caption className="sr-only">요일별 운영시간</caption>
         <tbody>
           {WEEK_ROWS.map((r) => {
-            const isToday = !!now && r.days.includes(now.getDay()) && !todayHoliday;
             return (
-              <tr key={r.label} className="border-b" style={{ borderColor: C.line, background: isToday ? C.mintSoft : undefined }} aria-current={isToday ? "date" : undefined}>
+              <tr key={r.label} className="border-b" style={{ borderColor: C.line }}>
                 <th scope="row" className="w-[92px] py-2.5 pl-2 text-left align-top font-semibold" style={{ color: r.days[0] === 0 ? "#b3261e" : C.ink }}>
                   {r.label}
-                  {isToday && (
-                    <span className="ml-1.5 rounded-[4px] px-1.5 py-0.5 text-[12px] font-bold text-white" style={{ background: C.mint }}>
-                      오늘
-                    </span>
-                  )}
                 </th>
                 <td className="py-2.5 pr-2 tabular-nums">
                   <span className="font-semibold">{r.time}</span>
@@ -489,7 +443,7 @@ function Hours({ minute }: { minute: number }) {
               </tr>
             );
           })}
-          <tr className="border-b" style={{ borderColor: C.line, background: todayHoliday ? C.mintSoft : undefined }}>
+          <tr className="border-b" style={{ borderColor: C.line }}>
             <th scope="row" className="py-2.5 pl-2 text-left font-semibold" style={{ color: "#b3261e" }}>
               공휴일
             </th>
@@ -536,7 +490,6 @@ function Hours({ minute }: { minute: number }) {
           {cells.map((d, i) => {
             if (!d) return <li key={`e${i}`} aria-hidden />;
             const p = planFor(d);
-            const isToday = !!now && d.toDateString() === now.toDateString();
             return (
               <li
                 key={d.getDate()}
@@ -544,10 +497,10 @@ function Hours({ minute }: { minute: number }) {
                 style={{
                   background: p.duty ? C.mint : p.open ? C.white : "#eef1f0",
                   color: p.duty ? "#fff" : p.open ? C.ink : "#6f7c77",
-                  outline: isToday ? `2px solid ${C.ink}` : `1px solid ${C.line}`,
-                  outlineOffset: isToday ? 0 : -1,
+                  outline: `1px solid ${C.line}`,
+                  outlineOffset: -1,
                 }}
-                aria-label={`${d.getMonth() + 1}월 ${d.getDate()}일 ${DAY_NAMES[d.getDay()]}요일, ${p.open ? rangeText(p) : "휴무"}${p.note ? `, ${p.note}` : ""}${isToday ? ", 오늘" : ""}`}
+                aria-label={`${d.getMonth() + 1}월 ${d.getDate()}일 ${DAY_NAMES[d.getDay()]}요일, ${p.open ? rangeText(p) : "휴무"}${p.note ? `, ${p.note}` : ""}`}
               >
                 {d.getDate()}
               </li>
@@ -578,46 +531,36 @@ const MAP_LINKS = [
 ];
 
 function Location() {
-  const rows: { icon: typeof MapPin; title: string; body: string[] }[] = [
-    { icon: MapPin, title: "주소", body: [ADDRESS] },
-    { icon: Phone, title: "전화번호", body: [TEL, "팩스 02-000-0001"] },
-    { icon: Car, title: "주차안내", body: ["건물 지하 주차장 30분 무료 (약 수령 시 주차권 제공)"] },
-    { icon: TrainFront, title: "지하철 이용 시", body: ["□□역 1번 출구에서 □□의원 방향 50m"] },
-    { icon: Bus, title: "버스 이용 시", body: ["□□의원 앞 정류장 하차, 간선 000 · 지선 0000"] },
+  const rows: [string, string[]][] = [
+    ["주소", [ADDRESS]],
+    ["전화번호", [TEL, "팩스 02-000-0001"]],
+    ["주차", ["건물 지하 주차장 30분 무료 (약 수령 시 주차권 제공)"]],
+    ["지하철", ["□□역 1번 출구에서 □□의원 방향 50m"]],
+    ["버스", ["□□의원 앞 정류장 하차, 간선 000 · 지선 0000"]],
   ];
   return (
-    <Panel id="location" title="오시는 길" icon={MapPin} className="print:hidden">
-      <ul className="divide-y" style={{ borderColor: C.line }}>
-        {rows.map((r) => (
-          <li key={r.title} className="flex gap-3 py-3 first:pt-0" style={{ borderColor: C.line }}>
-            <r.icon size={20} className="mt-0.5 shrink-0" style={{ color: C.mint }} aria-hidden />
-            <div className="min-w-0">
-              <p className="text-[15px] font-semibold" style={{ color: C.muted }}>
-                {r.title}
-              </p>
-              {r.body.map((b) => (
-                <p key={b} className="font-medium">
-                  {b}
-                </p>
+    <Panel id="location" title="오시는 길" className="print:hidden">
+      <dl>
+        {rows.map(([k, body]) => (
+          <div key={k} className="flex gap-3 border-b py-2.5 first:pt-0" style={{ borderColor: C.line }}>
+            <dt className="w-[72px] shrink-0 font-semibold" style={{ color: C.muted }}>
+              {k}
+            </dt>
+            <dd className="min-w-0">
+              {body.map((b) => (
+                <p key={b}>{b}</p>
               ))}
-            </div>
-          </li>
+            </dd>
+          </div>
         ))}
-      </ul>
-      <div className="mt-4 grid grid-cols-3 gap-2">
+      </dl>
+      <p className="mt-3 flex flex-wrap gap-x-4 gap-y-1 text-[15px] font-semibold">
         {MAP_LINKS.map((l) => (
-          <a
-            key={l.label}
-            href={l.href}
-            target="_blank"
-            rel="noopener noreferrer"
-            className="inline-flex h-12 items-center justify-center rounded-[6px] border px-2 text-center text-[15px] font-semibold leading-[1.2] hover:border-[#0b7a5f]"
-            style={{ borderColor: C.line }}
-          >
-            {l.label}
+          <a key={l.label} href={l.href} target="_blank" rel="noopener noreferrer" className="underline underline-offset-4 hover:text-[#0b7a5f]" style={{ color: C.mintDeep }}>
+            {l.label}에서 보기
           </a>
         ))}
-      </div>
+      </p>
     </Panel>
   );
 }
@@ -719,7 +662,7 @@ function Prescription({ status }: { status: Status | null }) {
   const fieldLabel = "block text-[15px] font-bold";
 
   return (
-    <Panel id="rx" title="처방전 미리 보내기" icon={Camera} className="print:hidden">
+    <Panel id="rx" title="처방전 미리 보내기" className="print:hidden">
       <div className="grid items-start gap-6 md:grid-cols-[1.15fr_1fr] md:gap-8">
         <form onSubmit={submit} noValidate className="space-y-6">
           <div>
@@ -790,11 +733,9 @@ function Prescription({ status }: { status: Status | null }) {
                 );
               })}
             </div>
-            {status && status.state !== "open" && (
-              <p className="mt-2 text-[14px] font-semibold" style={{ color: C.warn }}>
-                {status.label} · {status.sub}. 영업 시작 후 조제합니다.
-              </p>
-            )}
+            <p className="mt-2 text-[14px]" style={{ color: C.muted }}>
+              영업시간 밖에 보낸 처방전은 다음 영업 시작 후 조제합니다.
+            </p>
           </fieldset>
 
           <div className="grid gap-3 sm:grid-cols-2">
@@ -871,21 +812,18 @@ function Prescription({ status }: { status: Status | null }) {
                 </div>
               </motion.div>
             ) : (
-              <motion.div key="how" exit={{ opacity: 0 }} className="rounded-[10px] p-5" style={{ background: C.bg }}>
-                <h3 className="font-bold">이용 안내</h3>
-                <ul className="mt-3 space-y-2.5 text-[15px]">
+              <motion.div key="how" exit={{ opacity: 0 }}>
+                <h3 className="border-b pb-2 font-bold" style={{ borderColor: C.line }}>이용 안내</h3>
+                <ol className="mt-3 list-decimal space-y-2 pl-5 text-[15px]" style={{ color: C.muted }}>
                   {[
                     "약사가 처방 내용과 재고를 확인합니다. 재고가 없는 약은 전화로 안내합니다.",
                     "조제 진행은 접수 · 조제 중 · 조제 완료 순으로 표시됩니다.",
                     "조제가 완료되면 문자를 보내 드립니다.",
                     "약 수령 시 처방전 원본을 제출해 주십시오. 원본이 없으면 약을 드릴 수 없습니다.",
                   ].map((t) => (
-                    <li key={t} className="flex gap-2">
-                      <Check size={17} className="mt-[3px] shrink-0" style={{ color: C.mint }} aria-hidden />
-                      <span>{t}</span>
-                    </li>
+                    <li key={t}>{t}</li>
                   ))}
-                </ul>
+                </ol>
               </motion.div>
             )}
           </AnimatePresence>
@@ -947,10 +885,9 @@ const STOCK: { name: string; use: string; kind: Kind; cat?: Cat; state: StockSta
   { name: "자동 전자 혈압계", use: "가정용 혈압 측정", kind: "device", state: "order" },
 ];
 
-const STATE_LABEL: Record<StockState, { text: string; color: string; bg: string }> = {
-  many: { text: "재고 있음", color: C.mintDeep, bg: C.mintSoft },
+/** 재고가 넉넉한 품목은 표시하지 않고, 적은 품목만 배지를 단다 */
+const STATE_LABEL: Partial<Record<StockState, { text: string; color: string; bg: string }>> = {
   few: { text: "재고 적음", color: C.warn, bg: C.warnSoft },
-  order: { text: "주문 시 다음 날 입고", color: C.muted, bg: "#eef1f0" },
 };
 
 function Stock() {
@@ -967,7 +904,6 @@ function Stock() {
     <Panel
       id="stock"
       title="취급 품목"
-      icon={Pill}
       className="print:hidden"
       aside={
         <label className="relative block w-full sm:w-[260px]">
@@ -1051,22 +987,22 @@ function Stock() {
                   {asked && <Check size={15} aria-hidden />}
                   {asked ? "주문 요청됨" : "주문 요청"}
                 </button>
-              ) : (
+              ) : st ? (
                 <span className="shrink-0 rounded-[4px] px-2.5 py-1 text-[14px] font-semibold" style={{ color: st.color, background: st.bg }}>
                   {st.text}
                 </span>
-              )}
+              ) : null}
             </li>
           );
         })}
       </ul>
       {list.length === 0 && (
-        <p className="mt-4 rounded-[6px] p-5 text-center" style={{ background: C.bg, color: C.muted }}>
+        <p className="py-6 text-center" style={{ color: C.muted }}>
           검색 결과가 없습니다. 전화 {TEL}로 문의해 주십시오.
         </p>
       )}
       <ul className="mt-4 space-y-1 text-[14px]" style={{ color: C.muted }}>
-        <li>주문 요청 품목은 다음 날 오후 2시 이후 수령할 수 있습니다.</li>
+        <li>주문 요청 버튼이 있는 품목은 지금 재고가 없습니다. 요청하시면 다음 날 오후 2시 이후 수령할 수 있습니다.</li>
         <li>복용 중인 약이 있거나 임신 중이면 일반의약품도 약사와 먼저 상담하시기 바랍니다.</li>
       </ul>
     </Panel>
@@ -1159,7 +1095,6 @@ function Pillbox({ minute }: { minute: number }) {
     <Panel
       id="pillbox"
       title="복약 달력"
-      icon={CalendarDays}
       aside={
         <button type="button" onClick={() => window.print()} className="inline-flex h-10 items-center gap-1.5 rounded-[6px] border bg-white px-3.5 text-[15px] font-semibold print:hidden" style={{ borderColor: C.line }}>
           <Printer size={17} aria-hidden />
@@ -1223,7 +1158,7 @@ function Pillbox({ minute }: { minute: number }) {
                   {start
                     ? dates.map((d, i) => (
                         <th key={i} scope="col" className="text-[14px] font-semibold" style={{ color: d.getDay() === 0 ? "#b3261e" : C.muted }}>
-                          {i === 0 ? "오늘" : `${d.getMonth() + 1}/${d.getDate()}`}
+                          {`${d.getMonth() + 1}/${d.getDate()}`}
                           <span className="block text-[12px] font-normal">{DAY_NAMES[d.getDay()]}</span>
                         </th>
                       ))
@@ -1248,19 +1183,12 @@ function Pillbox({ minute }: { minute: number }) {
                             type="button"
                             onClick={() => toggle(key)}
                             aria-pressed={on}
-                            aria-label={`${d === 0 ? "오늘" : `${d}일 뒤`} ${slotName(s)} 복용${on ? " 완료" : ""}`}
+                            aria-label={`${dates[d] ? `${dates[d].getMonth() + 1}월 ${dates[d].getDate()}일` : `${d + 1}일째`} ${slotName(s)} 복용${on ? " 완료" : ""}`}
                             className="relative block h-[56px] w-full overflow-hidden rounded-[6px] border [perspective:300px]"
                             style={{ borderColor: on ? C.mint : C.line, background: on ? C.mintSoft : C.white }}
                           >
-                            <span className="absolute inset-0 flex items-center justify-center gap-0.5">
-                              {on ? (
-                                <Check size={20} style={{ color: C.mint }} aria-hidden />
-                              ) : (
-                                <>
-                                  <span className="h-2.5 w-4 rounded-full" style={{ background: "#f0b44c" }} />
-                                  <span className="h-3 w-3 rounded-full" style={{ background: "#e7eeeb", border: "1px solid #cbd6d1" }} />
-                                </>
-                              )}
+                            <span className="absolute inset-0 flex items-center justify-center">
+                              {on && <Check size={20} style={{ color: C.mint }} aria-hidden />}
                             </span>
                             <motion.span
                               aria-hidden

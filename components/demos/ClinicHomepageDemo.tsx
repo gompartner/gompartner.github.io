@@ -10,13 +10,12 @@ import { ChevronRight, Menu, Phone, X } from "lucide-react";
    구성: 실제 동네 피부과에서 흔한 두 갈래형.
    첫 화면을 "피부질환 진료"(건강보험)와 "피부미용 시술"(비급여) 두 판으로 나누고,
    메뉴와 문의 전화도 일반진료 / 시술상담 둘로 나눈다. 갈래마다 색을 따로 쓴다.
-   메인은 두 갈래 판, 요일별 진료시간 띠(오늘 강조), 장비소개 탭, 의료진, 공지사항 · 오시는 길 순서.
+   메인은 첫 화면 사진, 두 갈래 진료 안내, 요일별 진료시간 띠(오늘 강조), 장비소개 탭, 의료진, 공지사항 · 오시는 길 순서.
    하위 페이지는 라우트를 늘리지 않고 상태로 화면을 바꾼다(기본 패키지 5쪽 구성).
 
    사진 출처(Unsplash 무료 라이선스, public/images/demo-clinic-homepage):
    hero AI 생성(Z-Image-Turbo, Apache 2.0), acne karelys Ruiz(PqyzuzFiQfY), pigment Reece van der Merwe(4p6XsMzkTsE),
    lifting Look Studio(HtXyytr9304), pores Look Studio(TQSPgNqeCo8), hair Farhad Ibrahimzade(szpFxaqS658),
-   general ONNE Beauty(lZ7tao79Y1A), doctor-1 Sasun Bughdaryan(RlIppR1I3E8), doctor-2 Ashkan Forouzani(l-NIPb-9Njg),
    lobby Ishan Sharma(0EWVvxSyDE0) */
 
 const IMG = "/images/demo-clinic-homepage";
@@ -145,16 +144,12 @@ const DOCTORS = [
     role: "대표원장",
     field: "피부질환, 여드름 · 색소",
     career: ["피부과 전문의", "△△대학교병원 피부과 전공의 수료", "대한피부과학회 정회원"],
-    img: "doctor-1",
-    pos: "100% 40%",
   },
   {
     name: "이○○",
     role: "원장",
     field: "리프팅, 레이저 시술",
     career: ["피부과 전문의", "△△의료원 피부과 임상강사", "대한피부레이저학회 정회원"],
-    img: "doctor-2",
-    pos: "50% 60%",
   },
 ];
 
@@ -170,7 +165,6 @@ const HOURS = [
   { short: "토", label: "토요일", day: 6, start: "09:30", end: "14:00", open: [570, 840] },
   { short: "일", label: "일요일 · 공휴일", day: 0, start: "", end: "", open: null },
 ] as const;
-const LUNCH = [780, 840]; // 평일 13:00 ~ 14:00
 
 type Now = { day: number; minutes: number };
 
@@ -188,17 +182,6 @@ function useToday() {
   return now;
 }
 
-function openStatus(now: Now | null) {
-  if (!now) return null;
-  const row = HOURS.find((h) => h.day === now.day);
-  if (!row || !row.open) return { text: "오늘 휴진", open: false };
-  const [start, end] = row.open;
-  if (now.minutes < start) return { text: `진료 시작 전 · ${row.start} 진료 시작`, open: false };
-  if (now.minutes >= end) return { text: "오늘 진료 종료", open: false };
-  if (now.day >= 1 && now.day <= 5 && now.minutes >= LUNCH[0] && now.minutes < LUNCH[1]) return { text: "점심시간 · 14:00 진료 재개", open: false };
-  return { text: `진료 중 · ${row.end}까지`, open: true };
-}
-
 /* ---------- 법정 비급여 진료비 ---------- */
 
 const FEES = [
@@ -214,11 +197,15 @@ const FEES = [
   { item: "진료기록 사본", unit: "1매", price: 1000, note: "6매부터 1매당 100원" },
 ];
 
+const NOTICE_TOTAL = 214;
 const NOTICES = [
-  { no: 18, date: "2026.10.02", title: "한글날 휴진 안내", body: "10월 9일 한글날은 휴진합니다. 10월 10일 토요일은 09:30부터 14:00까지 정상 진료합니다." },
-  { no: 17, date: "2026.09.14", title: "토요일 진료 접수 마감 안내", body: "토요일은 13:30에 접수를 마감합니다. 점심시간 없이 14:00까지 진료합니다." },
-  { no: 16, date: "2026.08.18", title: "주차장 이용 안내 변경", body: "건물 주차장 2시간 무료입니다. 접수에서 차량 번호를 등록해 주십시오." },
-  { no: 15, date: "2026.07.30", title: "여름철 대상포진 진료 안내", body: "물집이 띠 모양으로 생기고 따끔거리면 빨리 진료를 받으십시오. 발진 후 72시간 안에 치료를 시작하는 것이 좋습니다." },
+  { no: 214, date: "2026.10.02", title: "10월 9일(금) 한글날 휴진, 10일(토) 정상 진료", body: "10월 9일 한글날은 휴진합니다. 10월 10일 토요일은 09:30부터 14:00까지 정상 진료합니다." },
+  { no: 213, date: "2026.09.26", title: "10월 21일(수) 오후 휴진 (대표원장 학회 참석)", body: "대표원장 학회 참석으로 10월 21일 수요일은 13:00까지 진료합니다. 이날 오후 예약은 다른 날로 옮겨 드렸습니다." },
+  { no: 212, date: "2026.09.14", title: "피코 레이저 장비 1대 추가 도입", body: "색소 레이저 대기가 길어 피코 레이저 1대를 추가로 들였습니다. 10월부터 평일 저녁 시술 예약을 더 받습니다." },
+  { no: 211, date: "2026.08.29", title: "11월 1일부터 초음파 리프팅 비용 변경", body: "장비 소모품 단가 인상으로 11월 1일부터 초음파 리프팅 300샷 비용이 30만 원에서 33만 원으로 바뀝니다. 10월 31일까지 결제하신 회차는 이전 비용으로 진행합니다." },
+  { no: 210, date: "2026.08.18", title: "건물 주차장 무료 시간 2시간으로 변경", body: "9월부터 진료 시 건물 주차장 2시간 무료입니다. 접수에서 차량 번호를 등록해 주십시오." },
+  { no: 209, date: "2026.07.30", title: "대상포진은 발진 후 72시간 안에 진료받으십시오", body: "물집이 띠 모양으로 생기고 따끔거리면 빨리 진료를 받으십시오. 발진 후 72시간 안에 항바이러스제를 시작해야 신경통을 줄일 수 있습니다." },
+  { no: 208, date: "2026.07.11", title: "토요일 접수 마감 13:30으로 변경", body: "토요일은 13:30에 접수를 마감합니다. 점심시간 없이 14:00까지 진료합니다." },
 ];
 
 const man = (n: number) => (n >= 10000 ? `${(n / 10000).toLocaleString("ko-KR")}만 원` : `${n.toLocaleString("ko-KR")}원`);
@@ -291,7 +278,7 @@ export function ClinicHomepageDemo() {
               aria-expanded={menuOpen}
               aria-controls="mobile-menu"
               aria-label={menuOpen ? "메뉴 닫기" : "메뉴 열기"}
-              className="inline-flex h-10 w-10 items-center justify-center rounded-full border lg:hidden"
+              className="inline-flex h-10 w-10 items-center justify-center rounded-[6px] border lg:hidden"
               style={{ borderColor: C.line }}
             >
               {menuOpen ? <X size={20} aria-hidden /> : <Menu size={20} aria-hidden />}
@@ -402,7 +389,7 @@ function CallButton({ label, tel, track, light }: { label: string; tel: string; 
   return (
     <a
       href={`tel:${tel}`}
-      className="inline-flex h-12 items-center justify-center gap-1.5 rounded-full px-5 text-[16px] font-semibold transition-opacity hover:opacity-90"
+      className="inline-flex h-12 items-center justify-center gap-1.5 rounded-[6px] px-5 text-[16px] font-semibold transition-opacity hover:opacity-90"
       style={light ? { backgroundColor: "#fff", color: TRACK[track].accent } : { backgroundColor: TRACK[track].accent, color: "#fff" }}
     >
       <Phone size={16} aria-hidden />
@@ -493,11 +480,29 @@ function PageBand({ title, sub, track, children }: { title: string; sub: string;
 function Home({ now, go }: { now: Now | null; go: (p: Page) => void }) {
   return (
     <>
-      {/* 두 갈래 첫 화면 */}
-      <section id="two-ways" aria-label="진료 분야" className="grid md:grid-cols-2">
+      {/* 첫 화면 */}
+      <section className="relative isolate overflow-hidden" style={{ backgroundColor: TRACK.beauty.tint }} aria-labelledby="hero-title">
+        <Image src={`${IMG}/hero.jpg`} alt="" fill priority sizes="100vw" className="-z-10 object-cover object-[70%_30%]" />
+        <div className="absolute inset-0 -z-10" style={{ background: "linear-gradient(90deg, rgba(251,249,248,0.94) 0%, rgba(251,249,248,0.75) 45%, rgba(251,249,248,0) 75%)" }} aria-hidden />
+        <div className={`${container} py-16 md:py-24`}>
+          <p className="text-[16px] font-semibold" style={{ color: TRACK.beauty.accent }}>
+            피부과 전문의 2인 진료
+          </p>
+          <h2 id="hero-title" className="mt-2 max-w-[520px] text-[36px] font-light leading-[1.2] tracking-[-0.05em] md:text-[52px]">
+            피부질환 진료와
+            <br />
+            피부미용 시술
+          </h2>
+          <p className="mt-4 text-[17px] md:text-[18px]" style={{ color: C.muted }}>
+            평일 19:00, 토요일 14:00까지 진료합니다.
+          </p>
+        </div>
+      </section>
+
+      {/* 두 갈래 진료 안내 */}
+      <section id="two-ways" aria-label="진료 분야" className={`${container} grid gap-x-10 md:grid-cols-2`}>
         <WayPanel
           track="medical"
-          img="general"
           badge="건강보험 진료"
           title="피부질환 진료"
           lines={DISEASES.map((d) => d.items)}
@@ -508,7 +513,6 @@ function Home({ now, go }: { now: Now | null; go: (p: Page) => void }) {
         />
         <WayPanel
           track="beauty"
-          img="lifting"
           badge="비급여 시술"
           title="피부미용 시술"
           lines={CATS.map((c) => c.label)}
@@ -543,7 +547,7 @@ function Home({ now, go }: { now: Now | null; go: (p: Page) => void }) {
               </button>
             </div>
             <ul className="mt-6 border-t" style={{ borderColor: C.ink }}>
-              {NOTICES.map((n) => (
+              {NOTICES.slice(0, 5).map((n) => (
                 <li key={n.no} className="flex items-center justify-between gap-4 border-b py-3.5" style={{ borderColor: C.line }}>
                   <span className="min-w-0 truncate">{n.title}</span>
                   <span className="shrink-0 text-[15px] tabular-nums" style={{ color: C.muted }}>
@@ -565,7 +569,6 @@ function Home({ now, go }: { now: Now | null; go: (p: Page) => void }) {
 
 function WayPanel({
   track,
-  img,
   badge,
   title,
   lines,
@@ -575,7 +578,6 @@ function WayPanel({
   onMore,
 }: {
   track: Track;
-  img: string;
   badge: string;
   title: string;
   lines: string[];
@@ -585,56 +587,49 @@ function WayPanel({
   onMore: () => void;
 }) {
   const t = TRACK[track];
-  const dark = track === "beauty";
   return (
-    <article className="flex flex-col" style={{ backgroundColor: dark ? t.accent : t.tint, color: dark ? "#fff" : C.ink }} aria-labelledby={`way-${track}`}>
-      <div className="relative aspect-[16/9] md:aspect-[16/10]" style={{ backgroundColor: t.soft }}>
-        <Image src={`${IMG}/${img}.jpg`} alt="" fill priority sizes="(min-width:768px) 50vw, 100vw" className="object-cover" />
-      </div>
-      <div className="flex flex-1 flex-col p-6 md:p-10">
-        <p className="text-[15px] font-semibold" style={{ color: dark ? t.soft : t.accent }}>
-          {badge}
+    <article className="flex flex-col border-t-[3px] py-8 md:py-10" style={{ borderColor: t.accent }} aria-labelledby={`way-${track}`}>
+      <p className="text-[15px] font-semibold" style={{ color: t.accent }}>
+        {badge}
+      </p>
+      <h2 id={`way-${track}`} className="mt-1 text-[30px] font-light leading-[1.2] tracking-[-0.05em] md:text-[38px]">
+        {title}
+      </h2>
+      <ul className="mt-4 space-y-1">
+        {lines.map((l) => (
+          <li key={l} style={{ color: C.muted }}>
+            {l}
+          </li>
+        ))}
+      </ul>
+      <div className="mt-auto pt-6">
+        <p className="flex items-baseline gap-2">
+          <span className="text-[15px] font-semibold" style={{ color: t.accent }}>
+            {phoneLabel}
+          </span>
+          <a href={`tel:${tel}`} className="text-[24px] font-semibold tracking-[-0.02em] tabular-nums hover:underline">
+            {tel}
+          </a>
         </p>
-        <h2 id={`way-${track}`} className="mt-1 text-[34px] font-light leading-[1.2] tracking-[-0.05em] md:text-[44px]">
-          {title}
-        </h2>
-        <ul className="mt-5 space-y-1.5 border-t pt-5" style={{ borderColor: dark ? "rgba(255,255,255,0.25)" : t.soft }}>
-          {lines.map((l) => (
-            <li key={l} style={{ color: dark ? "rgba(255,255,255,0.88)" : C.muted }}>
-              {l}
-            </li>
-          ))}
-        </ul>
-        <div className="mt-auto pt-8">
-          <p className="flex items-baseline gap-2">
-            <span className="text-[15px] font-semibold" style={{ color: dark ? t.soft : t.accent }}>
-              {phoneLabel}
-            </span>
-            <a href={`tel:${tel}`} className="text-[26px] font-semibold tracking-[-0.02em] tabular-nums hover:underline">
-              {tel}
-            </a>
-          </p>
-          <div className="mt-4 flex flex-wrap gap-2">
-            <CallButton label={callLabel} tel={tel} track={track} light={dark} />
-            <button
-              type="button"
-              onClick={onMore}
-              className="inline-flex h-12 items-center gap-0.5 rounded-full border px-5 text-[16px] font-semibold transition-colors"
-              style={{ borderColor: dark ? "rgba(255,255,255,0.6)" : t.accent, color: dark ? "#fff" : t.accent }}
-            >
-              자세히 보기
-              <ChevronRight size={17} aria-hidden />
-            </button>
-          </div>
+        <div className="mt-4 flex flex-wrap gap-2">
+          <CallButton label={callLabel} tel={tel} track={track} />
+          <button
+            type="button"
+            onClick={onMore}
+            className="inline-flex h-12 items-center gap-0.5 rounded-[6px] border px-5 text-[16px] font-semibold transition-colors"
+            style={{ borderColor: t.accent, color: t.accent, backgroundColor: "#fff" }}
+          >
+            자세히 보기
+            <ChevronRight size={17} aria-hidden />
+          </button>
         </div>
       </div>
     </article>
   );
 }
 
-/** 요일별 진료시간 띠. 오늘 칸을 진하게 채운다 */
+/** 요일별 진료시간 띠. 오늘 칸만 진하게 채우고 다른 실시간 표시는 두지 않는다 */
 function WeekHours({ id, now }: { id: string; now: Now | null }) {
-  const status = openStatus(now);
   return (
     <section id={id} className="border-b bg-white" style={{ borderColor: C.line }} aria-labelledby={`${id}-title`}>
       <div className={`${container} grid gap-6 py-8 md:py-10 lg:grid-cols-[220px_1fr] lg:items-center`}>
@@ -642,10 +637,6 @@ function WeekHours({ id, now }: { id: string; now: Now | null }) {
           <h2 id={`${id}-title`} className="text-[24px] font-semibold tracking-[-0.03em]">
             진료시간
           </h2>
-          <p className="mt-1 flex items-center gap-2 font-semibold" style={{ color: status?.open ? TRACK.medical.accent : C.muted }} aria-live="polite">
-            {status && <span className="h-2 w-2 rounded-full" style={{ backgroundColor: status.open ? TRACK.medical.accent : C.line }} aria-hidden />}
-            {status ? status.text : " "}
-          </p>
         </div>
         <div>
           <ol className="grid grid-cols-7 gap-1 sm:gap-2" aria-label="요일별 진료시간">
@@ -654,16 +645,13 @@ function WeekHours({ id, now }: { id: string; now: Now | null }) {
               return (
                 <li
                   key={h.short}
-                  className="flex flex-col items-center rounded-[10px] px-0.5 py-3 text-center"
+                  className="flex flex-col items-center rounded-[6px] px-0.5 py-3 text-center"
                   style={{ backgroundColor: isToday ? C.ink : C.paper, color: isToday ? "#fff" : C.ink, border: `1px solid ${isToday ? C.ink : C.line}` }}
                   aria-current={isToday ? "date" : undefined}
                 >
                   <span className="text-[15px] font-semibold" style={{ color: isToday ? "#fff" : h.open ? C.ink : "#b3261e" }}>
                     <span className="sr-only">{h.label}</span>
                     <span aria-hidden>{h.short}</span>
-                  </span>
-                  <span className="mt-0.5 h-5 text-[12px] font-semibold" style={{ color: TRACK.beauty.soft }}>
-                    {isToday ? "오늘" : ""}
                   </span>
                   {h.open ? (
                     <span className="mt-1 text-[13px] leading-[1.35] tabular-nums sm:text-[15px]">
@@ -721,17 +709,14 @@ function DoctorRows() {
   return (
     <ul className="mt-8 border-t" style={{ borderColor: C.ink }}>
       {DOCTORS.map((d) => (
-        <li key={d.name} className="grid grid-cols-[72px_1fr] gap-x-5 gap-y-3 border-b py-6 md:grid-cols-[96px_220px_1fr] md:items-center" style={{ borderColor: C.line }}>
-          <span className="relative block h-[72px] w-[72px] overflow-hidden rounded-full md:h-24 md:w-24" style={{ backgroundColor: TRACK.beauty.soft }} aria-hidden>
-            <Image src={`${IMG}/${d.img}.jpg`} alt="" fill sizes="96px" className="object-cover" style={{ objectPosition: d.pos }} />
-          </span>
-          <div className="self-center">
+        <li key={d.name} className="grid gap-x-5 gap-y-3 border-b py-6 md:grid-cols-[220px_1fr] md:items-center" style={{ borderColor: C.line }}>
+          <div>
             <p className="text-[15px] font-semibold" style={{ color: C.muted }}>
               {d.role}
             </p>
             <h3 className="text-[26px] font-semibold tracking-[-0.03em]">{d.name}</h3>
           </div>
-          <div className="col-span-2 md:col-span-1">
+          <div>
             <p className="font-semibold">진료 분야 {d.field}</p>
             <ul className="mt-1 flex flex-wrap gap-x-4 text-[15px]" style={{ color: C.muted }}>
               {d.career.map((c) => (
@@ -824,7 +809,7 @@ function MedicalPage({ now }: { now: Now | null }) {
             </p>
           </div>
           <div className="relative aspect-[4/3] overflow-hidden rounded-[16px]" style={{ backgroundColor: t.soft }}>
-            <Image src={`${IMG}/general.jpg`} alt="" fill sizes="(min-width:1024px) 600px, 100vw" className="object-cover" />
+            <Image src={`${IMG}/lobby.jpg`} alt="" fill sizes="(min-width:1024px) 600px, 100vw" className="object-cover object-[50%_75%]" />
           </div>
         </div>
       </section>
@@ -1082,11 +1067,15 @@ function NoticePage() {
             <p className="border-b py-8" style={{ borderColor: C.line }}>
               {n.body}
             </p>
-            <button type="button" onClick={() => setOpen(null)} className="mt-6 inline-flex h-11 items-center rounded-full border px-6 font-semibold" style={{ borderColor: C.line }}>
+            <button type="button" onClick={() => setOpen(null)} className="mt-6 inline-flex h-11 items-center rounded-[6px] border px-6 font-semibold" style={{ borderColor: C.line }}>
               목록
             </button>
           </article>
         ) : (
+          <>
+          <p className="mb-2 text-[15px]" style={{ color: C.muted }}>
+            총 <b style={{ color: C.ink }}>{NOTICE_TOTAL}</b>건
+          </p>
           <ul className="border-t-2" style={{ borderColor: C.ink }}>
             {NOTICES.map((x) => (
               <li key={x.no} className="border-b" style={{ borderColor: C.line }}>
@@ -1104,6 +1093,17 @@ function NoticePage() {
               </li>
             ))}
           </ul>
+          <p className="mt-6 flex justify-center gap-1 text-[15px] tabular-nums" aria-label="쪽 번호">
+            {[1, 2, 3, 4, 5].map((p) => (
+              <span key={p} className="inline-flex h-9 min-w-9 items-center justify-center rounded-[4px] px-2" style={p === 1 ? { backgroundColor: C.ink, color: "#fff", fontWeight: 600 } : { color: C.muted }}>
+                {p}
+              </span>
+            ))}
+            <span className="inline-flex h-9 items-center px-2" style={{ color: C.muted }}>
+              … {Math.ceil(NOTICE_TOTAL / 10)}
+            </span>
+          </p>
+          </>
         )}
       </div>
     </>

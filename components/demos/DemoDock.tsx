@@ -10,7 +10,7 @@ import type { TourStep } from "@/data/tours";
 // 첫 단계 영역이 처음 화면에 들어오면 한 번 자동으로 열고, 이후에는 물음표 버튼으로 다시 연다.
 
 const pill =
-  "inline-flex h-10 items-center gap-2 rounded-full border border-white/20 bg-black/60 px-3.5 text-sm font-medium text-white shadow-lg backdrop-blur-md transition-transform hover:scale-105 motion-reduce:transition-none sm:px-4";
+  "inline-flex h-10 items-center gap-2 rounded-full border border-white/20 bg-black/60 px-3.5 text-sm font-medium text-white shadow-lg backdrop-blur-md transition-colors hover:bg-black/75 sm:px-4";
 
 type Rect = { top: number; left: number; width: number; height: number };
 

@@ -9,13 +9,15 @@ import { useReducedMotionSafe } from "@/hooks/useReducedMotionSafe";
 /* 부동산 홈페이지 데모: 가상의 ○○ 공인중개사사무소.
    상호, 대표 공인중개사, 등록번호, 주소, 전화번호, 사업자 정보, 매물과 거래 내역은 모두 가상이다.
 
-   구조: 매물 솔루션형(검색 우선). 첫 화면에 사진과 소개 문단 없이 검색 필터 바와 매물 종류별 개수 타일을 두고,
+   구조: 매물 솔루션형(검색 우선). 첫 화면에 사진과 소개 문단 없이 검색 필터 바와 매물 종류별 개수 줄을 두고,
    그 아래를 지도검색 / 목록검색 탭으로 나눈다. 메뉴(매물 의뢰하기, 매물투어신청, 부동산 계산기, 사무소 소개)는
    라우트 없이 컴포넌트 상태로 하위 화면을 바꾼다.
 
-   디자인: 흰 바탕(#ffffff)에 차가운 회색(#f3f5f7), 먹색(#18202a) 검색 띠, 지도 핀과 강조에만 코럴(#ef6351).
+   디자인: 흰 바탕에 옅은 회색 검색 띠, 파랑(#1e5bb8)은 버튼과 지도 핀에만, 급매 배지만 빨강. 매물 카드 배지는 1개까지.
 
-   지도검색은 □□역, 초등학교, 공원, 아파트 단지를 그린 지도에 매물 핀을 꽂고, 같은 단지에 여러 건이 남으면 숫자 묶음으로 보여 준다.
+   지도검색은 포털 지도 타일 색(미색 바탕, 노란 큰길, 도로명)으로 그린 □□역 주변 약도에 매물 핀을 꽂고,
+   같은 단지에 여러 건이 남으면 숫자 묶음으로 보여 준다. 데모에는 대표 매물 12건만 넣고,
+   매물마다 같은 조건 매물 수(similar)를 더해 전체 137건 규모로 보여 준다.
    목록에 마우스를 올리면 핀이, 핀을 누르면 목록이 함께 표시된다.
    매물 상세는 중개대상물 표시·광고 명시사항 순서(매물번호, 소재지, 면적, 가격, 거래형태, 층, 사용승인일, 방향,
    방·욕실, 입주가능일, 주차대수, 관리비)로 적고, 입주가능일은 날짜, 즉시입주, ○월 초순·중순·하순만 쓴다.
@@ -35,17 +37,35 @@ const AGENT = "김ㅁ수";
 
 const C = {
   white: "#ffffff",
-  gray: "#f3f5f7",
-  grayDeep: "#e6eaef",
-  ink: "#18202a",
-  inkSoft: "#2a3442",
-  muted: "#566170",
-  line: "#dfe4ea",
-  coral: "#ef6351",
-  coralText: "#c23a28",
-  coralSoft: "#fdebe7",
-  park: "#dcefe0",
-  water: "#d6e6f2",
+  gray: "#f4f5f6",
+  grayDeep: "#e7e9eb",
+  ink: "#222529",
+  inkSoft: "#3b4046",
+  muted: "#5d636b",
+  line: "#dcdfe3",
+  accent: "#1e5bb8",
+  accentText: "#174a99",
+  accentSoft: "#eaf1fb",
+  heart: "#e2483d",
+  urgent: "#d6332a",
+};
+
+/* 지도 타일 색. 포털 지도처럼 바탕은 옅은 미색, 큰길은 연한 노랑 */
+const MAP = {
+  ground: "#f3f1ec",
+  block: "#e6e2da",
+  building: "#dcd7cd",
+  apt: "#e3dfe8",
+  aptBuilding: "#d3cddc",
+  park: "#d5e8c9",
+  school: "#f1e9cf",
+  water: "#c5dbee",
+  road: "#ffffff",
+  roadEdge: "#d8d3c8",
+  main: "#fbe8a8",
+  mainEdge: "#e2c56a",
+  label: "#5b5f66",
+  halo: "#ffffff",
 };
 
 const EASE = [0.22, 1, 0.36, 1] as const;
@@ -74,6 +94,8 @@ interface Listing {
   id: string;
   /** 매물번호 */
   no: string;
+  /** 이 매물과 같은 단지·조건으로 올라와 있는 매물 수(대표 매물 포함). 데모에는 대표 매물만 넣는다. */
+  similar: number;
   zone: ZoneId;
   name: string;
   dong: string;
@@ -108,21 +130,24 @@ interface Listing {
 }
 
 const LISTINGS: Listing[] = [
-  { id: "a1", no: "2610-031", zone: "A", name: "□□아파트 102동", dong: "□□동", kind: "apt", deal: "sale", price: 92000, area: 84.97, supply: 112.4, floor: 12, total: 20, rooms: 3, baths: 2, dir: "남향", approved: "2008.11.20", moveIn: "2027년 1월 초순(협의 가능)", fee: 28, parking: "총 1,240대(세대당 1.3대)", walk: 6, x: 200, y: 150, badges: ["추천"], tags: ["초등학교 도보 3분", "올수리"] },
-  { id: "a2", no: "2610-030", zone: "A", name: "□□아파트 105동", dong: "□□동", kind: "apt", deal: "jeonse", price: 45000, area: 59.92, supply: 84.3, floor: 7, total: 20, rooms: 3, baths: 2, dir: "남동향", approved: "2008.11.20", moveIn: "즉시입주", fee: 21, parking: "총 1,240대(세대당 1.3대)", walk: 6, x: 290, y: 218, badges: ["신규"], tags: ["발코니 확장", "전세대출 가능"] },
-  { id: "a3", no: "2609-027", zone: "A", name: "□□아파트 101동", dong: "□□동", kind: "apt", deal: "monthly", price: 10000, rent: 110, area: 59.92, supply: 84.3, floor: 3, total: 20, rooms: 3, baths: 2, dir: "남향", approved: "2008.11.20", moveIn: "2026년 11월 하순", fee: 20, parking: "총 1,240대(세대당 1.3대)", walk: 5, x: 378, y: 150, badges: [], tags: ["저층", "반려동물 협의"] },
-  { id: "b1", no: "2609-025", zone: "B", name: "□□파크아파트 201동", dong: "□□2동", kind: "apt", deal: "sale", price: 128000, area: 114.8, supply: 145.2, floor: 18, total: 25, rooms: 4, baths: 2, dir: "남향", approved: "2015.06.30", moveIn: "2027년 3월 5일", fee: 38, parking: "총 980대(세대당 1.5대)", walk: 7, x: 498, y: 318, badges: ["추천"], tags: ["공원 조망", "드레스룸"] },
-  { id: "b2", no: "2610-029", zone: "B", name: "□□파크아파트 203동", dong: "□□2동", kind: "apt", deal: "jeonse", price: 63000, area: 84.95, supply: 110.7, floor: 9, total: 25, rooms: 3, baths: 2, dir: "남서향", approved: "2015.06.30", moveIn: "2026년 12월 중순", fee: 29, parking: "총 980대(세대당 1.5대)", walk: 8, x: 592, y: 378, badges: ["급매"], tags: ["시스템 에어컨", "공원 앞"] },
-  { id: "c1", no: "2610-028", zone: "C", name: "□□오피스텔 A동", dong: "□□동", kind: "officetel", deal: "monthly", price: 1000, rent: 68, area: 24.5, supply: 48.6, floor: 11, total: 15, rooms: 1, baths: 1, dir: "동향", approved: "2019.03.14", moveIn: "즉시입주", fee: 12, parking: "총 180대(세대당 0.6대)", walk: 2, x: 466, y: 160, badges: ["신규"], tags: ["가전 포함", "역 도보 2분"] },
-  { id: "c2", no: "2609-024", zone: "C", name: "□□오피스텔 B동", dong: "□□동", kind: "officetel", deal: "jeonse", price: 21000, area: 33.1, supply: 62.3, floor: 8, total: 15, rooms: 2, baths: 1, dir: "남향", approved: "2019.03.14", moveIn: "2026년 11월 초순", fee: 15, parking: "총 180대(세대당 0.6대)", walk: 3, x: 548, y: 212, badges: [], tags: ["방 2개", "전세대출 가능"] },
-  { id: "d1", no: "2609-022", zone: "D", name: "□□빌라", dong: "□□동", kind: "villa", deal: "sale", price: 29000, area: 49.6, supply: 62.1, floor: 3, total: 4, rooms: 2, baths: 1, dir: "남향", approved: "2019.08.02", moveIn: "즉시입주", fee: 5, feeNote: "수도·전기 사용료 별도", parking: "총 8대(세대당 1대)", walk: 8, x: 365, y: 345, badges: ["급매"], tags: ["엘리베이터", "초등학교 옆"] },
-  { id: "e1", no: "2608-019", zone: "E", name: "□□하우스", dong: "□□동", kind: "villa", deal: "jeonse", price: 24000, area: 56.2, supply: 70.8, floor: 2, total: 5, rooms: 3, baths: 1, dir: "동남향", approved: "2012.04.25", moveIn: "2026년 12월 하순", fee: 6, feeNote: "수도·전기 사용료 별도", parking: "총 6대(세대당 0.6대)", walk: 12, x: 75, y: 220, badges: [], tags: ["방 3개", "전세보증보험 가입 가능"] },
-  { id: "g1", no: "2608-017", zone: "G", name: "□□빌라 2차", dong: "□□2동", kind: "villa", deal: "monthly", price: 500, rent: 45, area: 36.4, supply: 46, floor: 4, total: 4, rooms: 1, baths: 1, dir: "서향", approved: "2004.10.11", moveIn: "즉시입주", fee: 4, feeNote: "수도 사용료 포함", parking: "주차 불가", walk: 14, x: 735, y: 330, badges: [], tags: ["원룸", "옥상 사용"] },
-  { id: "f1", no: "2610-032", zone: "F", name: "□□시장 상가 1층", dong: "□□동", kind: "store", deal: "monthly", price: 3000, rent: 250, area: 43.2, supply: 66, floor: 1, total: 3, rooms: 0, baths: 1, dir: "남향", approved: "1998.05.18", moveIn: "즉시입주", fee: 18, parking: "공영 주차장 이용", walk: 9, x: 330, y: 482, badges: ["신규", "추천"], tags: ["1층 모퉁이", "무권리"] },
-  { id: "f2", no: "2607-012", zone: "F", name: "□□프라자 2층", dong: "□□동", kind: "store", deal: "sale", price: 75000, area: 66.8, supply: 118, floor: 2, total: 5, rooms: 0, baths: 1, dir: "동향", approved: "2006.09.07", moveIn: "2027년 6월 하순", fee: 32, parking: "총 3대", walk: 10, x: 522, y: 482, badges: [], tags: ["임차인 승계", "학원 자리"] },
+  { id: "a1", no: "21734", similar: 14, zone: "A", name: "□□아파트 102동", dong: "□□동", kind: "apt", deal: "sale", price: 92000, area: 84.97, supply: 112.4, floor: 12, total: 20, rooms: 3, baths: 2, dir: "남향", approved: "2008.11.20", moveIn: "2027년 1월 초순(협의 가능)", fee: 28, parking: "총 1,240대(세대당 1.3대)", walk: 6, x: 200, y: 150, badges: ["추천"], tags: ["초등학교 도보 3분", "올수리"] },
+  { id: "a2", no: "21761", similar: 17, zone: "A", name: "□□아파트 105동", dong: "□□동", kind: "apt", deal: "jeonse", price: 45000, area: 59.92, supply: 84.3, floor: 7, total: 20, rooms: 3, baths: 2, dir: "남동향", approved: "2008.11.20", moveIn: "즉시입주", fee: 21, parking: "총 1,240대(세대당 1.3대)", walk: 6, x: 290, y: 218, badges: ["신규"], tags: ["발코니 확장", "전세대출 가능"] },
+  { id: "a3", no: "21598", similar: 9, zone: "A", name: "□□아파트 101동", dong: "□□동", kind: "apt", deal: "monthly", price: 10000, rent: 110, area: 59.92, supply: 84.3, floor: 3, total: 20, rooms: 3, baths: 2, dir: "남향", approved: "2008.11.20", moveIn: "2026년 11월 하순", fee: 20, parking: "총 1,240대(세대당 1.3대)", walk: 5, x: 378, y: 150, badges: [], tags: ["저층", "반려동물 협의"] },
+  { id: "b1", no: "21522", similar: 11, zone: "B", name: "□□파크아파트 201동", dong: "□□2동", kind: "apt", deal: "sale", price: 128000, area: 114.8, supply: 145.2, floor: 18, total: 25, rooms: 4, baths: 2, dir: "남향", approved: "2015.06.30", moveIn: "2027년 3월 5일", fee: 38, parking: "총 980대(세대당 1.5대)", walk: 7, x: 498, y: 318, badges: ["추천"], tags: ["공원 조망", "드레스룸"] },
+  { id: "b2", no: "21749", similar: 7, zone: "B", name: "□□파크아파트 203동", dong: "□□2동", kind: "apt", deal: "jeonse", price: 63000, area: 84.95, supply: 110.7, floor: 9, total: 25, rooms: 3, baths: 2, dir: "남서향", approved: "2015.06.30", moveIn: "2026년 12월 중순", fee: 29, parking: "총 980대(세대당 1.5대)", walk: 8, x: 592, y: 378, badges: ["급매"], tags: ["시스템 에어컨", "공원 앞"] },
+  { id: "c1", no: "21740", similar: 15, zone: "C", name: "□□오피스텔 A동", dong: "□□동", kind: "officetel", deal: "monthly", price: 1000, rent: 68, area: 24.5, supply: 48.6, floor: 11, total: 15, rooms: 1, baths: 1, dir: "동향", approved: "2019.03.14", moveIn: "즉시입주", fee: 12, parking: "총 180대(세대당 0.6대)", walk: 2, x: 466, y: 160, badges: ["신규"], tags: ["가전 포함", "역 도보 2분"] },
+  { id: "c2", no: "21467", similar: 11, zone: "C", name: "□□오피스텔 B동", dong: "□□동", kind: "officetel", deal: "jeonse", price: 21000, area: 33.1, supply: 62.3, floor: 8, total: 15, rooms: 2, baths: 1, dir: "남향", approved: "2019.03.14", moveIn: "2026년 11월 초순", fee: 15, parking: "총 180대(세대당 0.6대)", walk: 3, x: 548, y: 212, badges: [], tags: ["방 2개", "전세대출 가능"] },
+  { id: "d1", no: "21390", similar: 16, zone: "D", name: "□□빌라", dong: "□□동", kind: "villa", deal: "sale", price: 29000, area: 49.6, supply: 62.1, floor: 3, total: 4, rooms: 2, baths: 1, dir: "남향", approved: "2019.08.02", moveIn: "즉시입주", fee: 5, feeNote: "수도·전기 사용료 별도", parking: "총 8대(세대당 1대)", walk: 8, x: 365, y: 345, badges: ["급매"], tags: ["엘리베이터", "초등학교 옆"] },
+  { id: "e1", no: "20981", similar: 13, zone: "E", name: "□□하우스", dong: "□□동", kind: "villa", deal: "jeonse", price: 24000, area: 56.2, supply: 70.8, floor: 2, total: 5, rooms: 3, baths: 1, dir: "동남향", approved: "2012.04.25", moveIn: "2026년 12월 하순", fee: 6, feeNote: "수도·전기 사용료 별도", parking: "총 6대(세대당 0.6대)", walk: 12, x: 75, y: 220, badges: [], tags: ["방 3개", "전세보증보험 가입 가능"] },
+  { id: "g1", no: "20746", similar: 12, zone: "G", name: "□□빌라 2차", dong: "□□2동", kind: "villa", deal: "monthly", price: 500, rent: 45, area: 36.4, supply: 46, floor: 4, total: 4, rooms: 1, baths: 1, dir: "서향", approved: "2004.10.11", moveIn: "즉시입주", fee: 4, feeNote: "수도 사용료 포함", parking: "주차 불가", walk: 14, x: 735, y: 330, badges: [], tags: ["원룸", "옥상 사용"] },
+  { id: "f1", no: "21768", similar: 7, zone: "F", name: "□□시장 상가 1층", dong: "□□동", kind: "store", deal: "monthly", price: 3000, rent: 250, area: 43.2, supply: 66, floor: 1, total: 3, rooms: 0, baths: 1, dir: "남향", approved: "1998.05.18", moveIn: "즉시입주", fee: 18, parking: "공영 주차장 이용", walk: 9, x: 330, y: 482, badges: ["추천"], tags: ["1층 모퉁이", "무권리"] },
+  { id: "f2", no: "20315", similar: 5, zone: "F", name: "□□프라자 2층", dong: "□□동", kind: "store", deal: "sale", price: 75000, area: 66.8, supply: 118, floor: 2, total: 5, rooms: 0, baths: 1, dir: "동향", approved: "2006.09.07", moveIn: "2027년 6월 하순", fee: 32, parking: "총 3대", walk: 10, x: 522, y: 482, badges: [], tags: ["임차인 승계", "학원 자리"] },
 ];
 
 const LISTING_BY_ID = Object.fromEntries(LISTINGS.map((l) => [l.id, l])) as Record<string, Listing>;
+
+/** 조건에 맞는 전체 매물 수. 대표 매물마다 같은 조건 매물 수를 더한다(전체 137건). */
+const countOf = (list: Listing[]) => list.reduce((n, l) => n + l.similar, 0);
 
 /** 만 원 단위 금액을 "9억 2,000만" 꼴로 */
 function eokMan(man: number) {
@@ -374,7 +399,7 @@ function Logo({ light = false }: { light?: boolean }) {
     <span className="inline-flex items-center gap-2">
       <svg width="30" height="30" viewBox="0 0 30 30" aria-hidden>
         <rect width="30" height="30" rx="6" fill={light ? "#fff" : C.ink} />
-        <path d="M15 25 C15 25 7 17.5 7 12.5 A8 8 0 0 1 23 12.5 C23 17.5 15 25 15 25Z" fill={C.coral} />
+        <path d="M15 25 C15 25 7 17.5 7 12.5 A8 8 0 0 1 23 12.5 C23 17.5 15 25 15 25Z" fill={C.accent} />
         <path d="M11.5 13 L15 10 L18.5 13 V16.5 H11.5Z" fill="#fff" />
       </svg>
       <span className="text-[17px] font-bold tracking-[-0.02em] md:text-[19px]">{OFFICE}</span>
@@ -414,8 +439,8 @@ function Header({ view, go, basketCount }: { view: View; go: (v: View) => void; 
                     type="button"
                     onClick={() => pick(n.id)}
                     aria-current={on ? "page" : undefined}
-                    className="h-10 rounded-[6px] px-3 text-[15px] font-semibold transition-colors hover:text-[#c23a28]"
-                    style={{ color: on ? C.ink : C.muted, boxShadow: on ? `inset 0 -2px 0 ${C.coral}` : undefined }}
+                    className="h-10 rounded-[6px] px-3 text-[15px] font-semibold transition-colors hover:text-[#174a99]"
+                    style={{ color: on ? C.ink : C.muted, boxShadow: on ? `inset 0 -2px 0 ${C.accent}` : undefined }}
                   >
                     {n.label}
                   </button>
@@ -432,7 +457,7 @@ function Header({ view, go, basketCount }: { view: View; go: (v: View) => void; 
             title="관심매물"
             className="relative inline-flex h-11 w-11 items-center justify-center rounded-[6px]"
           >
-            <Heart size={21} fill={basketCount ? C.coral : "none"} style={{ color: basketCount ? C.coral : C.ink }} aria-hidden />
+            <Heart size={21} fill={basketCount ? C.heart : "none"} style={{ color: basketCount ? C.heart : C.ink }} aria-hidden />
             {basketCount > 0 && (
               <span className="absolute right-0.5 top-0.5 inline-flex h-[18px] min-w-[18px] items-center justify-center rounded-full px-1 text-[11px] font-bold tabular-nums" style={{ background: C.ink, color: "#fff" }} aria-hidden>
                 {basketCount}
@@ -482,7 +507,7 @@ function Header({ view, go, basketCount }: { view: View; go: (v: View) => void; 
                 </li>
               ))}
               <li>
-                <a href={`tel:${TEL}`} className="flex h-12 items-center text-[17px] font-semibold" style={{ color: C.coralText }}>
+                <a href={`tel:${TEL}`} className="flex h-12 items-center text-[17px] font-semibold" style={{ color: C.accentText }}>
                   전화 {TEL}
                 </a>
               </li>
@@ -514,7 +539,7 @@ function SubPage({ title, children }: { title: string; children: React.ReactNode
 
 /* ---------- 매물검색 (첫 화면) ---------- */
 
-const selectCls = "h-11 w-full rounded-[6px] border bg-white px-2.5 text-[15px] font-semibold outline-none focus:border-[#ef6351]";
+const selectCls = "h-11 w-full rounded-[6px] border bg-white px-2.5 text-[15px] font-semibold outline-none focus:border-[#1e5bb8]";
 
 function SearchPage({
   selectedId,
@@ -538,7 +563,9 @@ function SearchPage({
   const [sort, setSort] = useState<"new" | "low" | "wide">("new");
 
   const visible = LISTINGS.filter((l) => matches(l, filter));
-  const kindCount = (k: Kind) => LISTINGS.filter((l) => l.kind === k).length;
+  const kindCount = (k: Kind) => countOf(LISTINGS.filter((l) => l.kind === k));
+  const found = countOf(visible);
+  const pages = Math.ceil(found / 12);
 
   const apply = (f: Filter) => {
     setDraft(f);
@@ -560,18 +587,18 @@ function SearchPage({
 
   return (
     <>
-      <section aria-labelledby="realty-page-title" className="px-4 pb-6 pt-6 md:px-6 md:pb-8 md:pt-8" style={{ background: C.ink, color: "#fff" }}>
+      <section aria-labelledby="realty-page-title" className="border-b px-4 pb-5 pt-6 md:px-6 md:pb-6 md:pt-7" style={{ background: C.gray, borderColor: C.line }}>
         <div className="mx-auto max-w-[1200px]">
           <div className="flex flex-wrap items-baseline justify-between gap-x-4 gap-y-1">
             <h1 id="realty-page-title" tabIndex={-1} className="text-[24px] font-bold tracking-[-0.03em] outline-none md:text-[28px]">
               □□동 매물검색
             </h1>
-            <p className="text-[14px]" style={{ color: "#aab4c0" }}>
-              평일 09:30 ~ 19:00 · 토요일 10:00 ~ 17:00
+            <p className="text-[14px]" style={{ color: C.muted }}>
+              평일 09:30 ~ 19:00, 토요일 10:00 ~ 17:00
             </p>
           </div>
 
-          <form id="realty-search" onSubmit={submit} className="mt-4 rounded-[10px] bg-white p-3 md:p-4" style={{ color: C.ink }} aria-label="매물 검색 조건">
+          <form id="realty-search" onSubmit={submit} className="mt-4 rounded-[4px] border bg-white p-3 md:p-4" style={{ borderColor: C.line }} aria-label="매물 검색 조건">
             <div className="grid grid-cols-2 gap-x-3 gap-y-3 md:grid-cols-4 lg:grid-cols-[auto_1fr_1fr_1fr_1fr_auto]">
               <fieldset className="col-span-2 min-w-0 md:col-span-4 lg:col-span-1">
                 <legend className="mb-1 text-[13px] font-semibold" style={{ color: C.muted }}>
@@ -581,7 +608,7 @@ function SearchPage({
                   {(["all", "sale", "jeonse", "monthly"] as const).map((d) => {
                     const on = draft.deal === d;
                     return (
-                      <label key={d} className="flex h-11 flex-1 cursor-pointer items-center justify-center border-l px-3 text-[15px] font-semibold first:border-l-0 has-[:focus-visible]:outline has-[:focus-visible]:outline-2 has-[:focus-visible]:-outline-offset-2" style={{ borderColor: C.line, ...(on ? { background: C.ink, color: "#fff" } : {}) }}>
+                      <label key={d} className="flex h-11 flex-1 cursor-pointer items-center justify-center border-l px-3 text-[15px] font-semibold first:border-l-0 has-[:focus-visible]:outline has-[:focus-visible]:outline-2 has-[:focus-visible]:-outline-offset-2" style={{ borderColor: C.line, ...(on ? { background: C.accent, color: "#fff" } : {}) }}>
                         <input type="radio" name="realty-deal" value={d} checked={on} onChange={() => setDraft({ ...draft, deal: d })} className="sr-only" />
                         {d === "all" ? "전체" : DEAL_LABEL[d]}
                       </label>
@@ -642,7 +669,7 @@ function SearchPage({
                 <button type="button" onClick={() => apply(EMPTY)} aria-label="초기화" title="초기화" className="inline-flex h-11 w-11 shrink-0 items-center justify-center rounded-[6px] border" style={{ borderColor: C.line }}>
                   <RotateCcw size={18} aria-hidden />
                 </button>
-                <button type="submit" className="inline-flex h-11 flex-1 items-center justify-center gap-1.5 rounded-[6px] px-5 text-[16px] font-bold lg:flex-none" style={{ background: C.coral, color: "#fff" }}>
+                <button type="submit" className="inline-flex h-11 flex-1 items-center justify-center gap-1.5 rounded-[6px] px-5 text-[16px] font-bold lg:flex-none" style={{ background: C.accent, color: "#fff" }}>
                   <Search size={18} aria-hidden />
                   매물검색
                 </button>
@@ -650,21 +677,22 @@ function SearchPage({
             </div>
           </form>
 
-          <ul className="mt-3 grid grid-cols-2 gap-2 sm:grid-cols-4" aria-label="매물 종류별 매물 수">
-            {(Object.keys(KIND_LABEL) as Kind[]).map((k) => {
+          <ul className="mt-3 flex flex-wrap items-center text-[15px]" aria-label="매물 종류별 매물 수">
+            {([["all", "전체"], ...(Object.keys(KIND_LABEL) as Kind[]).map((k) => [k, KIND_LABEL[k]])] as [Filter["kind"], string][]).map(([k, label], i) => {
               const on = filter.kind === k;
               return (
-                <li key={k}>
+                <li key={k} className="flex items-center">
+                  {i > 0 && <span className="mx-1 h-3 w-px" style={{ background: "#c4c9cf" }} aria-hidden />}
                   <button
                     type="button"
                     aria-pressed={on}
-                    onClick={() => apply({ ...filter, kind: on ? "all" : k })}
-                    className="flex h-full w-full items-baseline justify-between gap-2 rounded-[8px] border px-4 py-3 text-left transition-colors"
-                    style={on ? { background: "#fff", color: C.ink, borderColor: "#fff" } : { borderColor: "rgba(255,255,255,0.22)", background: C.inkSoft }}
+                    onClick={() => apply({ ...filter, kind: k })}
+                    className="inline-flex h-10 items-center gap-1 px-2 underline-offset-4 hover:underline"
+                    style={{ color: on ? C.ink : C.muted, fontWeight: on ? 700 : 400 }}
                   >
-                    <span className="text-[15px] font-semibold">{KIND_LABEL[k]}</span>
-                    <span className="text-[24px] font-bold tabular-nums" style={{ color: on ? C.coralText : "#fff" }}>
-                      {kindCount(k)}
+                    {label}
+                    <span className="tabular-nums" style={{ color: on ? C.accentText : C.muted }}>
+                      {k === "all" ? countOf(LISTINGS) : kindCount(k)}
                     </span>
                   </button>
                 </li>
@@ -704,7 +732,7 @@ function SearchPage({
                       }
                     }}
                     className="-mb-px inline-flex h-12 items-center gap-1.5 border-b-2 px-4 text-[16px] font-bold"
-                    style={{ borderColor: on ? C.coral : "transparent", color: on ? C.ink : C.muted }}
+                    style={{ borderColor: on ? C.accent : "transparent", color: on ? C.ink : C.muted }}
                   >
                     <Icon size={18} aria-hidden />
                     {t.label}
@@ -714,7 +742,7 @@ function SearchPage({
             </div>
             <div className="flex items-center gap-3 pb-2">
               <p className="text-[15px]" aria-live="polite">
-                검색 결과 <span className="font-bold tabular-nums" style={{ color: C.coralText }}>{visible.length}</span>건
+                검색 결과 <span className="font-bold tabular-nums" style={{ color: C.accentText }}>{found}</span>건
               </p>
               {tab === "list" && (
                 <label className="flex items-center gap-1.5">
@@ -742,6 +770,20 @@ function SearchPage({
                   ))}
                 </ul>
                 {visible.length === 0 && <Empty onReset={() => apply(EMPTY)} />}
+                {pages > 1 && (
+                  <p className="mt-6 flex justify-center gap-1 text-[15px] tabular-nums" aria-label="쪽 번호">
+                    {Array.from({ length: Math.min(pages, 10) }, (_, i) => (
+                      <span
+                        key={i}
+                        aria-current={i === 0 ? "page" : undefined}
+                        className="inline-flex h-9 min-w-9 items-center justify-center rounded-[4px] border px-1"
+                        style={i === 0 ? { background: C.accent, borderColor: C.accent, color: "#fff", fontWeight: 700 } : { borderColor: C.line, color: C.muted }}
+                      >
+                        {i + 1}
+                      </span>
+                    ))}
+                  </p>
+                )}
               </div>
             )}
           </div>
@@ -755,7 +797,7 @@ function SearchPage({
 
 function Empty({ onReset }: { onReset: () => void }) {
   return (
-    <div className="rounded-[10px] p-6 text-center" style={{ background: C.gray, color: C.muted }}>
+    <div className="rounded-[6px] p-6 text-center" style={{ background: C.gray, color: C.muted }}>
       조건에 맞는 매물이 없습니다.
       <button type="button" onClick={onReset} className="mt-2 block w-full font-semibold underline underline-offset-4" style={{ color: C.ink }}>
         초기화
@@ -772,7 +814,7 @@ function BadgeList({ badges }: { badges: Badge[] }) {
         <span
           key={b}
           className="rounded-[3px] px-1.5 text-[12px] font-bold leading-[20px]"
-          style={b === "급매" ? { background: C.coral, color: "#fff" } : b === "추천" ? { background: C.ink, color: "#fff" } : { border: `1px solid ${C.coral}`, color: C.coralText }}
+          style={b === "급매" ? { background: C.urgent, color: "#fff" } : b === "추천" ? { border: `1px solid ${C.ink}`, color: C.ink } : { border: `1px solid ${C.accent}`, color: C.accentText }}
         >
           {b}
         </span>
@@ -792,7 +834,7 @@ function HeartButton({ saved, full, name, onToggle, className = "" }: { saved: b
       title={full ? `관심매물은 ${BASKET_MAX}개까지 담을 수 있습니다` : saved ? "관심매물 해제" : "관심매물 담기"}
       className={`inline-flex h-11 w-11 items-center justify-center rounded-full transition-colors disabled:opacity-35 ${className}`}
     >
-      <Heart size={22} fill={saved ? C.coral : "none"} style={{ color: saved ? C.coral : C.muted }} aria-hidden />
+      <Heart size={22} fill={saved ? C.heart : "none"} style={{ color: saved ? C.heart : C.muted }} aria-hidden />
     </button>
   );
 }
@@ -804,7 +846,7 @@ function ListingCard({ l, selected, saved, full, onPick, onToggle }: { l: Listin
         type="button"
         aria-pressed={selected}
         onClick={onPick}
-        className="block h-full w-full rounded-[10px] border bg-white p-4 pr-14 text-left transition-colors hover:border-[#18202a]"
+        className="block h-full w-full rounded-[6px] border bg-white p-4 pr-14 text-left transition-colors hover:border-[#222529]"
         style={{ borderColor: selected ? C.ink : C.line, boxShadow: selected ? `inset 0 0 0 1px ${C.ink}` : undefined }}
       >
         <span className="flex flex-wrap items-center gap-1.5">
@@ -833,93 +875,100 @@ function ListingCard({ l, selected, saved, full, onPick, onToggle }: { l: Listin
 /* ---------- 지도검색 ---------- */
 
 function NeighborhoodMap() {
-  const villas = (x0: number, y0: number, cols: number, rows: number, gap = 40) =>
+  // 단지 안 동 건물. 좌표는 정수로 둔다.
+  const blocks = (x0: number, y0: number, cols: number, rows: number, w: number, h: number, gx: number, gy: number, fill: string) =>
     Array.from({ length: cols * rows }, (_, i) => (
-      <rect key={`${x0}-${y0}-${i}`} x={x0 + (i % cols) * gap} y={y0 + Math.floor(i / cols) * gap} width={gap - 10} height={gap - 12} rx="3" fill="#d5dce4" />
+      <rect key={`${x0}-${y0}-${i}`} x={x0 + (i % cols) * gx} y={y0 + Math.floor(i / cols) * gy} width={w} height={h} fill={fill} />
     ));
-  const towers = (x0: number, y0: number) =>
-    Array.from({ length: 6 }, (_, i) => <rect key={`${x0}-${i}`} x={x0 + (i % 3) * 72} y={y0 + Math.floor(i / 3) * 66} width="54" height="30" rx="3" fill="#cdd5de" />);
 
-  const road = (d: string, w: number) => (
+  const road = (d: string, w: number, main = false) => (
     <g key={d}>
-      <path d={d} stroke={C.line} strokeWidth={w + 3} fill="none" />
-      <path d={d} stroke="#fff" strokeWidth={w} fill="none" />
+      <path d={d} stroke={main ? MAP.mainEdge : MAP.roadEdge} strokeWidth={w + 2} fill="none" />
+      <path d={d} stroke={main ? MAP.main : MAP.road} strokeWidth={w} fill="none" />
     </g>
+  );
+
+  const label = (x: number, y: number, text: string, size = 12, opts: { fill?: string; bold?: boolean; rotate?: number } = {}) => (
+    <text
+      x={x}
+      y={y}
+      fontSize={size}
+      fill={opts.fill ?? MAP.label}
+      fontWeight={opts.bold ? 700 : 400}
+      textAnchor="middle"
+      stroke={MAP.halo}
+      strokeWidth="3"
+      paintOrder="stroke"
+      transform={opts.rotate ? `rotate(${opts.rotate} ${x} ${y})` : undefined}
+    >
+      {text}
+    </text>
   );
 
   return (
     <svg viewBox="0 0 800 520" className="absolute inset-0 h-full w-full" aria-hidden>
-      <rect width="800" height="520" fill={C.gray} />
-      <path d="M0 34 C160 20 300 48 420 34 S660 18 800 36" stroke={C.water} strokeWidth="20" fill="none" />
-      <text x="40" y="64" fontSize="13" fill={C.muted}>
-        □□천
-      </text>
+      <rect width="800" height="520" fill={MAP.ground} />
+      <path d="M0 30 C160 18 300 44 420 31 S660 16 800 33" stroke={MAP.water} strokeWidth="22" fill="none" />
 
-      {/* 단지와 건물 */}
-      <rect x="164" y="104" width="242" height="142" rx="6" fill={C.grayDeep} />
-      {towers(180, 124)}
-      <rect x="434" y="104" width="134" height="142" rx="6" fill={C.grayDeep} />
-      <rect x="448" y="128" width="40" height="70" rx="3" fill="#cdd5de" />
-      <rect x="516" y="150" width="40" height="70" rx="3" fill="#cdd5de" />
-      <rect x="578" y="104" width="70" height="142" rx="6" fill={C.park} />
-      {[
-        [596, 130],
-        [626, 156],
-        [600, 190],
-        [630, 222],
-      ].map(([cx, cy]) => (
-        <circle key={`${cx}-${cy}`} cx={cx} cy={cy} r="10" fill="#bfdcc6" />
-      ))}
-      <rect x="164" y="274" width="140" height="142" rx="6" fill="#f3ecd8" />
-      <rect x="182" y="300" width="70" height="90" rx="30" fill="none" stroke="#e0d3ae" strokeWidth="3" />
-      <rect x="264" y="290" width="28" height="110" rx="3" fill="#e3d7b6" />
-      <rect x="316" y="274" width="90" height="142" rx="6" fill={C.grayDeep} />
-      {villas(326, 290, 2, 3)}
-      <rect x="434" y="274" width="214" height="142" rx="6" fill={C.grayDeep} />
-      {towers(450, 290)}
-      {villas(16, 110, 3, 7)}
-      {villas(678, 110, 3, 7)}
-      <rect x="164" y="446" width="484" height="62" rx="6" fill={C.grayDeep} />
-      {Array.from({ length: 11 }, (_, i) => (
-        <rect key={i} x={174 + i * 43} y="456" width="34" height="42" rx="3" fill="#d5dce4" />
-      ))}
+      {/* 블록 */}
+      <rect x="160" y="100" width="250" height="152" fill={MAP.apt} />
+      {blocks(176, 122, 3, 2, 56, 22, 76, 68, MAP.aptBuilding)}
+      <rect x="430" y="100" width="142" height="152" fill={MAP.block} />
+      <rect x="446" y="124" width="44" height="74" fill={MAP.building} />
+      <rect x="512" y="146" width="44" height="74" fill={MAP.building} />
+      <rect x="580" y="100" width="72" height="152" fill={MAP.park} />
+      <rect x="160" y="270" width="146" height="152" fill={MAP.school} />
+      <rect x="176" y="296" width="72" height="96" rx="34" fill="none" stroke="#ddd0a6" strokeWidth="2" />
+      <rect x="262" y="286" width="30" height="112" fill="#e6dbb8" />
+      <rect x="318" y="270" width="92" height="152" fill={MAP.block} />
+      {blocks(328, 284, 2, 4, 30, 26, 40, 34, MAP.building)}
+      <rect x="430" y="270" width="222" height="152" fill={MAP.apt} />
+      {blocks(446, 292, 3, 2, 52, 22, 70, 64, MAP.aptBuilding)}
+      <rect x="10" y="100" width="134" height="322" fill={MAP.block} />
+      {blocks(20, 110, 3, 8, 30, 28, 42, 39, MAP.building)}
+      <rect x="668" y="100" width="132" height="322" fill={MAP.block} />
+      {blocks(678, 110, 3, 8, 30, 28, 40, 39, MAP.building)}
+      <rect x="160" y="440" width="492" height="80" fill={MAP.block} />
+      {blocks(170, 450, 11, 1, 36, 44, 44, 0, MAP.building)}
 
       {/* 길 */}
-      {road("M0 90 H800", 12)}
-      {road("M0 430 H800", 12)}
-      {road("M150 0 V520", 12)}
-      {road("M660 0 V520", 12)}
-      {road("M0 260 H800", 26)}
-      {road("M420 0 V520", 22)}
+      {road("M0 88 H800", 10)}
+      {road("M0 432 H800", 10)}
+      {road("M150 0 V520", 10)}
+      {road("M660 0 V520", 10)}
+      {road("M0 262 H800", 22, true)}
+      {road("M420 0 V520", 18, true)}
 
-      {/* 이름 */}
-      <text x="285" y="118" fontSize="13" fill={C.muted} textAnchor="middle">
-        □□아파트
-      </text>
-      <text x="501" y="118" fontSize="13" fill={C.muted} textAnchor="middle">
-        □□오피스텔
-      </text>
-      <text x="613" y="240" fontSize="12" fill="#4d7a59" textAnchor="middle">
-        □□공원
-      </text>
-      <text x="234" y="410" fontSize="13" fill="#8a7a4c" textAnchor="middle">
-        □□초등학교
-      </text>
-      <text x="541" y="410" fontSize="13" fill={C.muted} textAnchor="middle">
-        □□파크아파트
-      </text>
-      <text x="740" y="282" fontSize="13" fill={C.muted} textAnchor="middle">
-        □□로
-      </text>
-      <text x="300" y="516" fontSize="12" fill={C.muted}>
-        □□시장 상가
-      </text>
+      {/* 도로명 */}
+      {label(90, 266, "□□대로", 12, { bold: true })}
+      {label(740, 266, "□□대로", 12, { bold: true })}
+      {label(424, 400, "□□로", 12, { bold: true, rotate: -90 })}
+      {label(424, 140, "□□로", 12, { bold: true, rotate: -90 })}
+      {label(560, 92, "□□로12길", 11)}
+      {label(560, 436, "□□로8길", 11)}
+      {label(154, 360, "□□로3길", 11, { rotate: -90 })}
+      {label(664, 180, "□□로21길", 11, { rotate: -90 })}
+      {label(60, 22, "□□천", 12, { fill: "#4f7da6" })}
+
+      {/* 시설 이름 */}
+      {label(285, 116, "□□아파트", 12)}
+      {label(501, 116, "□□오피스텔", 12)}
+      {label(616, 180, "□□근린공원", 11, { fill: "#4b7a43" })}
+      {label(233, 414, "□□초등학교", 12, { fill: "#7d6d3f" })}
+      {label(541, 414, "□□파크아파트", 12)}
+      {label(300, 512, "□□시장", 11)}
 
       {/* 역 */}
-      <rect x="378" y="243" width="84" height="34" rx="17" fill={C.ink} />
-      <text x="420" y="265" fontSize="14" fill="#fff" textAnchor="middle" fontWeight={700}>
-        □□역
-      </text>
+      <circle cx="392" cy="246" r="8" fill="#3a9a46" stroke="#fff" strokeWidth="2" />
+      {label(392, 234, "□□역", 13, { bold: true, fill: MAP.label })}
+
+      {/* 축척 */}
+      <g transform="translate(16 494)">
+        <path d="M0 0 V6 H60 V0" stroke={MAP.label} strokeWidth="1.5" fill="none" />
+        <text x="66" y="7" fontSize="11" fill={MAP.label}>
+          100m
+        </text>
+      </g>
     </svg>
   );
 }
@@ -927,7 +976,7 @@ function NeighborhoodMap() {
 function PinShape({ active }: { active: boolean }) {
   return (
     <svg viewBox="0 0 28 36" className="h-[31px] w-6 md:h-9 md:w-7" aria-hidden>
-      <path d="M14 35 C14 35 2 21.5 2 13 A12 12 0 0 1 26 13 C26 21.5 14 35 14 35Z" fill={active ? C.ink : C.coral} stroke="#fff" strokeWidth="2" />
+      <path d="M14 35 C14 35 2 21.5 2 13 A12 12 0 0 1 26 13 C26 21.5 14 35 14 35Z" fill={active ? C.urgent : C.accent} stroke="#fff" strokeWidth="2" />
       <circle cx="14" cy="13" r="4.5" fill="#fff" />
     </svg>
   );
@@ -978,7 +1027,7 @@ function MapSearch({
 
   return (
     <div id="realty-map" className="grid items-start gap-4 lg:grid-cols-[1fr_360px]">
-      <div className="min-w-0 overflow-hidden rounded-[10px] border bg-white" style={{ borderColor: C.line }}>
+      <div className="min-w-0 overflow-hidden rounded-[6px] border bg-white" style={{ borderColor: C.line }}>
         <div className="flex items-center justify-between gap-2 border-b px-3 py-2" style={{ borderColor: C.line }}>
           <p className="text-[14px] font-semibold" style={{ color: C.muted }}>
             □□역 주변
@@ -1007,7 +1056,7 @@ function MapSearch({
                 key={`z-${zone}`}
                 type="button"
                 onClick={() => setOpenZone(zone)}
-                aria-label={`${z.name} 매물 ${items.length}건 펼치기`}
+                aria-label={`${z.name} 매물 ${countOf(items)}건 펼치기`}
                 className="absolute z-10 flex flex-col items-center"
                 style={{ left: `${r2(z.x / 8)}%`, top: `${r2(z.y / 5.2)}%`, x: "-50%", y: "-50%" }}
                 initial={reduce ? false : { scale: 0.6, opacity: 0 }}
@@ -1015,10 +1064,10 @@ function MapSearch({
                 transition={{ duration: 0.25, ease: EASE }}
               >
                 <span
-                  className="inline-flex h-9 w-9 items-center justify-center rounded-full border-2 text-[15px] font-bold tabular-nums md:h-11 md:w-11 md:text-[17px]"
-                  style={{ background: C.coral, borderColor: "#fff", color: "#fff", boxShadow: "0 2px 8px rgba(24,32,42,0.25)" }}
+                  className="inline-flex h-9 min-w-9 items-center justify-center rounded-full border-2 px-1.5 text-[14px] font-bold tabular-nums md:h-10 md:min-w-10 md:text-[15px]"
+                  style={{ background: C.accent, borderColor: "#fff", color: "#fff", boxShadow: "0 1px 4px rgba(0,0,0,0.25)" }}
                 >
-                  {items.length}
+                  {countOf(items)}
                 </span>
                 <span className="mt-0.5 hidden whitespace-nowrap rounded-[4px] bg-white px-1.5 text-[12px] font-semibold md:block">{z.name}</span>
               </motion.button>
@@ -1083,8 +1132,8 @@ function MapSearch({
                 onMouseLeave={() => setHoverId(null)}
                 onFocus={() => setHoverId(l.id)}
                 onBlur={() => setHoverId(null)}
-                className="block w-full rounded-[10px] border bg-white py-3 pl-4 pr-14 text-left transition-colors"
-                style={{ borderColor: selected ? C.ink : active ? C.coral : C.line, boxShadow: selected ? `inset 0 0 0 1px ${C.ink}` : "none" }}
+                className="block w-full rounded-[6px] border bg-white py-3 pl-4 pr-14 text-left transition-colors"
+                style={{ borderColor: selected ? C.ink : active ? C.accent : C.line, boxShadow: selected ? `inset 0 0 0 1px ${C.ink}` : "none" }}
               >
                 <span className="flex flex-wrap items-center gap-1.5">
                   <span className="text-[12px] tabular-nums" style={{ color: C.muted }}>
@@ -1093,7 +1142,14 @@ function MapSearch({
                   <BadgeList badges={l.badges} />
                 </span>
                 <span className="block text-[18px] font-bold tabular-nums tracking-[-0.02em]">{priceText(l)}</span>
-                <span className="block font-semibold">{l.name}</span>
+                <span className="block font-semibold">
+                  {l.name}
+                  {l.similar > 1 && (
+                    <span className="ml-1.5 text-[14px] font-normal" style={{ color: C.muted }}>
+                      외 {l.similar - 1}건
+                    </span>
+                  )}
+                </span>
                 <span className="block text-[14px]" style={{ color: C.muted }}>
                   전용 {areaText(l.area)} · {l.floor}/{l.total}층 · 역 도보 {l.walk}분
                 </span>
@@ -1163,7 +1219,7 @@ function Detail({ listing: l, basket, onToggle, onTour, onCalc }: { listing: Lis
         <motion.article
           key={l.id}
           aria-labelledby="detail-title"
-          className="grid overflow-hidden rounded-[10px] border bg-white lg:grid-cols-[0.8fr_1.2fr]"
+          className="grid overflow-hidden rounded-[6px] border bg-white lg:grid-cols-[0.8fr_1.2fr]"
           style={{ borderColor: C.line }}
           initial={reduce ? false : { opacity: 0, y: 12 }}
           animate={{ opacity: 1, y: 0 }}
@@ -1188,7 +1244,7 @@ function Detail({ listing: l, basket, onToggle, onTour, onCalc }: { listing: Lis
                 <h2 id="detail-title" className="text-[22px] font-bold tracking-[-0.02em] md:text-[26px]">
                   {l.name}
                 </h2>
-                <p className="text-[26px] font-bold tabular-nums tracking-[-0.02em] md:text-[30px]" style={{ color: C.coralText }}>
+                <p className="text-[26px] font-bold tabular-nums tracking-[-0.02em] md:text-[30px]" style={{ color: C.accentText }}>
                   {priceText(l)}
                 </p>
               </div>
@@ -1213,10 +1269,10 @@ function Detail({ listing: l, basket, onToggle, onTour, onCalc }: { listing: Lis
               ))}
             </dl>
 
-            <div id="realty-fee" className="mt-5 rounded-[10px] p-4" style={{ background: C.gray }}>
+            <div id="realty-fee" className="mt-6 border-t-2 pt-3" style={{ borderColor: C.ink }}>
               <div className="flex flex-wrap items-center justify-between gap-x-3">
                 <h3 className="font-bold">중개보수</h3>
-                <button type="button" onClick={onCalc} className="inline-flex h-9 items-center gap-0.5 text-[14px] font-semibold" style={{ color: C.coralText }}>
+                <button type="button" onClick={onCalc} className="inline-flex h-9 items-center gap-0.5 text-[14px] font-semibold" style={{ color: C.accentText }}>
                   중개보수 계산기
                   <ChevronRight size={16} aria-hidden />
                 </button>
@@ -1233,10 +1289,10 @@ function Detail({ listing: l, basket, onToggle, onTour, onCalc }: { listing: Lis
                 className="inline-flex h-12 items-center gap-2 rounded-[6px] border px-5 font-semibold disabled:opacity-40"
                 style={saved ? { background: "#fff", borderColor: C.ink, color: C.ink } : { background: C.ink, borderColor: C.ink, color: "#fff" }}
               >
-                <Heart size={18} fill={saved ? C.coral : "none"} style={{ color: saved ? C.coral : "#fff" }} aria-hidden />
+                <Heart size={18} fill={saved ? C.heart : "none"} style={{ color: saved ? C.heart : "#fff" }} aria-hidden />
                 {saved ? "관심매물 해제" : "관심매물 담기"}
               </button>
-              <button type="button" onClick={onTour} className="inline-flex h-12 items-center rounded-[6px] px-5 font-semibold" style={{ background: C.coral, color: "#fff" }}>
+              <button type="button" onClick={onTour} className="inline-flex h-12 items-center rounded-[6px] px-5 font-semibold" style={{ background: C.accent, color: "#fff" }}>
                 매물투어신청
               </button>
               <a href={`tel:${TEL}`} aria-label={`전화 문의 ${TEL}`} title="전화 문의" className="inline-flex h-12 w-12 items-center justify-center rounded-[6px] border" style={{ borderColor: C.line }}>
@@ -1394,7 +1450,7 @@ function FeeCalculator() {
 
   return (
     <div className="grid items-start gap-6 lg:grid-cols-[1fr_400px]">
-      <div className="space-y-6 rounded-[10px] border p-5 md:p-6" style={{ borderColor: C.line }}>
+      <div className="space-y-6 rounded-[6px] border p-5 md:p-6" style={{ borderColor: C.line }}>
         <Radios
           legend="중개대상물"
           name="fee-kind"
@@ -1422,7 +1478,7 @@ function FeeCalculator() {
           {deal === "monthly" && <ManInput id="fee-rent" label="월세" value={rent} onChange={setRent} />}
         </div>
       </div>
-      <div className="rounded-[10px] p-5 md:p-6" style={{ background: C.gray }} aria-live="polite">
+      <div className="rounded-[6px] p-5 md:p-6" style={{ background: C.gray }} aria-live="polite">
         <h2 className="font-bold">중개보수 상한</h2>
         <FeeLines fee={fee} />
       </div>
@@ -1439,12 +1495,12 @@ function Slider({ label, value, min, max, step, onChange, format }: { label: str
         </span>
         <span className="font-bold tabular-nums">{format(value)}</span>
       </span>
-      <input type="range" min={min} max={max} step={step} value={value} onChange={(e) => onChange(Number(e.target.value))} aria-valuetext={format(value)} className="mt-1 h-8 w-full accent-[#ef6351]" />
+      <input type="range" min={min} max={max} step={step} value={value} onChange={(e) => onChange(Number(e.target.value))} aria-valuetext={format(value)} className="mt-1 h-8 w-full accent-[#1e5bb8]" />
     </label>
   );
 }
 
-const PART_COLOR = { loan: "#46566a", opp: "#a9b4c2", rent: C.coral };
+const PART_COLOR = { loan: "#46566a", opp: "#a9b4c2", rent: C.accent };
 const PART_LABEL = { loan: "대출 이자", opp: "예금 이자 손실", rent: "월세" };
 
 function Compare() {
@@ -1475,7 +1531,7 @@ function Compare() {
 
   return (
     <div className="grid items-start gap-6 lg:grid-cols-[400px_1fr]">
-      <div className="space-y-5 rounded-[10px] border p-5 md:p-6" style={{ borderColor: C.line }}>
+      <div className="space-y-5 rounded-[6px] border p-5 md:p-6" style={{ borderColor: C.line }}>
         <h2 className="font-bold">전세 조건</h2>
         <Slider label="전세 보증금" value={jeonse} min={5000} max={80000} step={500} onChange={setJeonse} format={manText} />
         <h2 className="border-t pt-5 font-bold" style={{ borderColor: C.line }}>
@@ -1491,7 +1547,7 @@ function Compare() {
         <Slider label="예금 금리 (연)" value={saveRate} min={1} max={5} step={0.1} onChange={setSaveRate} format={(v) => `${v.toFixed(1)}%`} />
       </div>
 
-      <div className="min-w-0 rounded-[10px] p-5 md:p-7" style={{ background: C.gray }}>
+      <div className="min-w-0 rounded-[6px] p-5 md:p-7" style={{ background: C.gray }}>
         <h2 className="text-[15px] font-semibold" style={{ color: C.muted }}>
           월 비용
         </h2>
@@ -1526,13 +1582,13 @@ function Compare() {
           ))}
         </ul>
 
-        <div className="mt-6 rounded-[10px] bg-white p-5" aria-live="polite">
+        <div className="mt-6 border-t pt-5" style={{ borderColor: C.line }} aria-live="polite">
           <p className="text-[20px] font-bold leading-[1.45] tracking-[-0.02em] md:text-[22px]">
             {diff <= 1 ? (
               "두 방식의 월 비용 차이가 1만 원 이하입니다."
             ) : (
               <>
-                <span style={{ color: C.coralText }}>{jTotal < mTotal ? "전세" : "월세"}</span>가 월 {diff.toLocaleString("ko-KR")}만 원 적게 듭니다.
+                <span style={{ color: C.accentText }}>{jTotal < mTotal ? "전세" : "월세"}</span>가 월 {diff.toLocaleString("ko-KR")}만 원 적게 듭니다.
               </>
             )}
           </p>
@@ -1631,7 +1687,7 @@ function RequestForm() {
           {done ? (
             <motion.div
               key="done"
-              className="rounded-[10px] border-2 bg-white p-6"
+              className="rounded-[6px] border-2 bg-white p-6"
               style={{ borderColor: C.ink }}
               initial={reduce ? false : { opacity: 0, y: 16 }}
               animate={{ opacity: 1, y: 0 }}
@@ -1639,7 +1695,7 @@ function RequestForm() {
               transition={{ duration: 0.35, ease: EASE }}
             >
               <p className="flex items-center gap-2 text-[20px] font-bold">
-                <span className="inline-flex h-8 w-8 items-center justify-center rounded-full" style={{ background: C.coral, color: "#fff" }}>
+                <span className="inline-flex h-8 w-8 items-center justify-center rounded-full" style={{ background: C.accent, color: "#fff" }}>
                   <Check size={18} aria-hidden />
                 </span>
                 매물 의뢰가 접수되었습니다
@@ -1663,7 +1719,7 @@ function RequestForm() {
               </button>
             </motion.div>
           ) : (
-            <motion.form key="form" exit={{ opacity: 0 }} onSubmit={submit} noValidate className="space-y-6 rounded-[10px] border p-5 md:p-7" style={{ borderColor: C.line }}>
+            <motion.form key="form" exit={{ opacity: 0 }} onSubmit={submit} noValidate className="space-y-6 rounded-[6px] border p-5 md:p-7" style={{ borderColor: C.line }}>
               <Radios
                 legend="의뢰 구분"
                 name="req-deal"
@@ -1760,7 +1816,7 @@ function RequestForm() {
                 </label>
               </div>
               <label className="flex min-h-11 cursor-pointer items-start gap-2.5 text-[15px] leading-[1.5]">
-                <input type="checkbox" checked={agree} onChange={(e) => setAgree(e.target.checked)} className="mt-0.5 h-5 w-5 shrink-0 accent-[#ef6351]" />
+                <input type="checkbox" checked={agree} onChange={(e) => setAgree(e.target.checked)} className="mt-0.5 h-5 w-5 shrink-0 accent-[#1e5bb8]" />
                 <span>
                   개인정보 수집·이용 동의 (필수)
                   <span className="block text-[14px]" style={{ color: C.muted }}>
@@ -1773,7 +1829,7 @@ function RequestForm() {
                   {error}
                 </p>
               )}
-              <button type="submit" className="h-12 w-full rounded-[6px] text-[17px] font-bold sm:w-auto sm:px-10" style={{ background: C.coral, color: "#fff" }}>
+              <button type="submit" className="h-12 w-full rounded-[6px] text-[17px] font-bold sm:w-auto sm:px-10" style={{ background: C.accent, color: "#fff" }}>
                 매물 의뢰하기
               </button>
               <p className="text-[14px]" style={{ color: C.muted }}>
@@ -1784,7 +1840,7 @@ function RequestForm() {
         </AnimatePresence>
       </div>
 
-      <section aria-labelledby="req-guide-title" className="rounded-[10px] p-5 md:p-6" style={{ background: C.gray }}>
+      <section aria-labelledby="req-guide-title" className="rounded-[6px] p-5 md:p-6" style={{ background: C.gray }}>
         <h2 id="req-guide-title" className="font-bold">
           매물 등록 절차
         </h2>
@@ -1836,7 +1892,7 @@ function Tour({ selectedId, basket, onToggle, onClear, onMore }: { selectedId: s
 
   return (
     <div className="grid items-start gap-6 md:grid-cols-[1.15fr_1fr]">
-      <form onSubmit={submit} noValidate className="space-y-6 rounded-[10px] border p-5 md:p-7" style={{ borderColor: C.line }}>
+      <form onSubmit={submit} noValidate className="space-y-6 rounded-[6px] border p-5 md:p-7" style={{ borderColor: C.line }}>
         <div>
           <p className="flex items-baseline justify-between gap-3">
             <span className="text-[15px] font-bold">투어 매물</span>
@@ -1846,7 +1902,7 @@ function Tour({ selectedId, basket, onToggle, onClear, onMore }: { selectedId: s
           </p>
           <ul className="mt-2 space-y-2">
             {picked.map((l) => (
-              <li key={l.id} className="flex items-center gap-3 rounded-[10px] border py-3 pl-4 pr-2" style={{ borderColor: C.line }}>
+              <li key={l.id} className="flex items-center gap-3 rounded-[6px] border py-3 pl-4 pr-2" style={{ borderColor: C.line }}>
                 <span className="min-w-0 flex-1">
                   <span className="block text-[13px] tabular-nums" style={{ color: C.muted }}>
                     매물번호 {l.no}
@@ -1865,7 +1921,7 @@ function Tour({ selectedId, basket, onToggle, onClear, onMore }: { selectedId: s
             ))}
           </ul>
           {basket.length < BASKET_MAX && (
-            <button type="button" onClick={onMore} className="mt-2 inline-flex h-10 items-center gap-1.5 text-[15px] font-semibold" style={{ color: C.coralText }}>
+            <button type="button" onClick={onMore} className="mt-2 inline-flex h-10 items-center gap-1.5 text-[15px] font-semibold" style={{ color: C.accentText }}>
               <Plus size={16} aria-hidden />
               관심매물 더 담기
             </button>
@@ -1906,7 +1962,7 @@ function Tour({ selectedId, basket, onToggle, onClear, onMore }: { selectedId: s
             {error}
           </p>
         )}
-        <button type="submit" disabled={!!done} className="w-full rounded-[6px] py-3.5 text-[17px] font-bold disabled:opacity-40" style={{ background: C.coral, color: "#fff" }}>
+        <button type="submit" disabled={!!done} className="w-full rounded-[6px] py-3.5 text-[17px] font-bold disabled:opacity-40" style={{ background: C.accent, color: "#fff" }}>
           {picked.length}곳 매물투어신청
         </button>
       </form>
@@ -1916,7 +1972,7 @@ function Tour({ selectedId, basket, onToggle, onClear, onMore }: { selectedId: s
           {done ? (
             <motion.div
               key="done"
-              className="rounded-[10px] border-2 bg-white p-6"
+              className="rounded-[6px] border-2 bg-white p-6"
               style={{ borderColor: C.ink }}
               initial={reduce ? false : { opacity: 0, y: 16 }}
               animate={{ opacity: 1, y: 0 }}
@@ -1924,7 +1980,7 @@ function Tour({ selectedId, basket, onToggle, onClear, onMore }: { selectedId: s
               transition={{ duration: 0.35, ease: EASE }}
             >
               <p className="flex items-center gap-2 text-[20px] font-bold">
-                <span className="inline-flex h-8 w-8 items-center justify-center rounded-full" style={{ background: C.coral, color: "#fff" }}>
+                <span className="inline-flex h-8 w-8 items-center justify-center rounded-full" style={{ background: C.accent, color: "#fff" }}>
                   <Check size={18} aria-hidden />
                 </span>
                 매물투어신청이 접수되었습니다
@@ -1956,7 +2012,7 @@ function Tour({ selectedId, basket, onToggle, onClear, onMore }: { selectedId: s
               </button>
             </motion.div>
           ) : (
-            <motion.section key="how" exit={{ opacity: 0 }} aria-labelledby="visit-guide-title" className="rounded-[10px] p-6" style={{ background: C.gray }}>
+            <motion.section key="how" exit={{ opacity: 0 }} aria-labelledby="visit-guide-title" className="rounded-[6px] p-6" style={{ background: C.gray }}>
               <h2 id="visit-guide-title" className="font-bold">
                 방문 안내
               </h2>
@@ -2021,8 +2077,8 @@ function About() {
       </section>
 
       <div className="space-y-8">
-        <section aria-labelledby="office-info-title" className="rounded-[10px] p-5 md:p-6" style={{ background: C.gray }}>
-          <h2 id="office-info-title" className="font-bold">
+        <section aria-labelledby="office-info-title">
+          <h2 id="office-info-title" className="text-[21px] font-bold tracking-[-0.02em]">
             중개사무소 정보
           </h2>
           <dl className="mt-2 text-[15px]">
@@ -2044,7 +2100,7 @@ function About() {
           <h2 id="done-title" className="text-[21px] font-bold tracking-[-0.02em]">
             거래완료
           </h2>
-          <ul className="mt-3 divide-y rounded-[10px] border" style={{ borderColor: C.line }}>
+          <ul className="mt-3 divide-y rounded-[6px] border" style={{ borderColor: C.line }}>
             {DEALS_DONE.map((d, i) => (
               <li key={i} className="flex items-center justify-between gap-3 px-4 py-3" style={{ borderColor: C.line }}>
                 <span className="min-w-0">
@@ -2055,8 +2111,8 @@ function About() {
                     {d.when} 계약
                   </span>
                 </span>
-                <span className="rounded-[4px] px-2 text-[14px] font-semibold" style={{ background: C.coralSoft, color: C.coralText }}>
-                  {d.deal} 완료
+                <span className="shrink-0 text-[14px]" style={{ color: C.muted }}>
+                  {d.deal}
                 </span>
               </li>
             ))}
@@ -2071,7 +2127,7 @@ function About() {
 
 function Footer() {
   return (
-    <footer className="px-4 pb-24 pt-12 md:px-6" style={{ background: C.ink, color: "#c9d0d8" }}>
+    <footer className="px-4 pb-24 pt-12 md:px-6" style={{ background: "#33373d", color: "#c9cdd2" }}>
       <div className="mx-auto max-w-[1200px]">
         <span style={{ color: "#fff" }}>
           <Logo light />

@@ -4,20 +4,15 @@ import { useEffect, useRef, useState, useSyncExternalStore } from "react";
 import Image from "next/image";
 import { AnimatePresence, motion } from "framer-motion";
 import {
-  Banknote,
   Building2,
   CalendarCheck,
   Check,
   ChevronDown,
   ChevronRight,
-  KeyRound,
   MapPin,
   Menu,
   Phone,
-  Plus,
   RotateCcw,
-  ShieldCheck,
-  Users,
   Video,
   X,
 } from "lucide-react";
@@ -29,7 +24,7 @@ import { useReducedMotionSafe } from "@/hooks/useReducedMotionSafe";
    변호사 광고 규정에 맞춰 승소율, 최고, 유일, 결과 보장 같은 표현은 쓰지 않는다.
    "전문"은 대한변협 전문분야 등록 표기에만 쓴다. 형사 사건 성공보수는 받지 않는 것으로 적는다.
 
-   구조: 종합 로펌형. 첫 화면은 풀폭 사진 위 사무소명과 업무분야 진입 띠, 그 아래 변호사 소개와
+   구조: 종합 로펌형. 첫 화면은 풀폭 사진 위 사무소명, 그 아래 업무분야 4칸 글 목록(분야명 + 다루는 사건), 변호사 소개와
    성공사례·상담 안내·오시는 길을 나란히 둔 게시판형 묶음이다.
    하위 화면은 라우트 없이 상태로 바꾼다. 서브 비주얼, 위치 표시줄, 좌측 하위 메뉴(LNB)와 문서형 본문.
    업무분야 하위 화면에서 사건을 고르면 예상 기간, 진행 절차, 준비 서류 체크 목록이 나온다.
@@ -40,7 +35,7 @@ import { useReducedMotionSafe } from "@/hooks/useReducedMotionSafe";
    큰 제목은 명조 계열. 1px 선으로 나누고 모서리는 작게, 그림자는 거의 쓰지 않는다.
 
    사진 출처(public/images/demo-law):
-   AI 생성(Z-Image-Turbo, Apache 2.0) hero, desk */
+   AI 생성(Z-Image-Turbo, Apache 2.0) hero, desk, lawyer-1(김ㅈ우), lawyer-2(이ㅅ연) */
 
 const IMG = "/images/demo-law";
 const FIRM = "법률사무소 ○○";
@@ -122,32 +117,22 @@ type Field = "lease" | "family" | "criminal" | "civil";
 const FIELDS: {
   id: Field;
   label: string;
-  icon: typeof KeyRound;
-  desc: string;
 }[] = [
   {
     id: "lease",
     label: "임대차·부동산",
-    icon: KeyRound,
-    desc: "보증금 반환, 계약 갱신, 매매 분쟁",
   },
   {
     id: "family",
     label: "이혼·가사",
-    icon: Users,
-    desc: "협의·재판 이혼, 양육비, 재산분할",
   },
   {
     id: "criminal",
     label: "형사",
-    icon: ShieldCheck,
-    desc: "경찰 조사 동행, 고소 대리, 합의",
   },
   {
     id: "civil",
     label: "민사 채권",
-    icon: Banknote,
-    desc: "대여금, 물품 대금, 가압류와 집행",
   },
 ];
 
@@ -701,6 +686,17 @@ function QuickRail({ go }: { go: Go }) {
             전화상담
           </a>
         </li>
+        <li className="border-t" style={{ borderColor: C.navySoft }}>
+          <button type="button" onClick={() => go({ page: "location" })} className="flex w-[64px] flex-col items-center gap-1 py-4 text-[13px] font-semibold" style={{ color: C.ivory }}>
+            <MapPin size={20} aria-hidden style={{ color: C.gold }} />
+            오시는 길
+          </button>
+        </li>
+        <li className="border-t" style={{ borderColor: C.navySoft }}>
+          <button type="button" onClick={() => window.scrollTo({ top: 0 })} className="flex w-[64px] items-center justify-center py-3 text-[12px] font-semibold" style={{ color: "#c9cfdc" }}>
+            TOP
+          </button>
+        </li>
       </ul>
     </aside>
   );
@@ -716,7 +712,7 @@ function Home({ go }: { go: Go }) {
         <div className="relative h-[420px] md:h-[540px]">
           <Image src={`${IMG}/hero.jpg`} alt="책장이 늘어선 상담실과 긴 회의 탁자" fill priority sizes="100vw" className="object-cover" />
           <div className="absolute inset-0" style={{ background: "linear-gradient(180deg, rgba(20,33,61,0.25) 0%, rgba(20,33,61,0.55) 55%, rgba(20,33,61,0.88) 100%)" }} aria-hidden />
-          <div className="absolute inset-x-0 bottom-0 px-4 pb-24 md:px-6 md:pb-28">
+          <div className="absolute inset-x-0 bottom-0 px-4 pb-12 md:px-6 md:pb-16">
             <motion.div
               className="mx-auto max-w-[1200px]"
               initial={reduce ? false : { opacity: 0, y: 12 }}
@@ -727,61 +723,62 @@ function Home({ go }: { go: Go }) {
                 {FIRM}
               </h1>
               <p className="mt-3 max-w-[560px] text-[16px] md:text-[18px]" style={{ color: "#dfe3ec" }}>
-                임대차·부동산, 이혼·가사, 형사, 민사 채권 사건을 맡습니다. 첫 상담 30분은 변호사가 직접 하며 비용을 받지 않습니다.
+                □□법원 건너편에서 변호사 2명이 직접 상담하고 사건을 진행합니다.
               </p>
             </motion.div>
           </div>
         </div>
 
-        <nav id="practice" aria-label="업무분야" className="relative -mt-14 px-4 md:-mt-16 md:px-6">
-          <ul className="mx-auto grid max-w-[1200px] grid-cols-2 border-t-4 lg:grid-cols-4" style={{ borderColor: C.gold, background: C.white }}>
-            {FIELDS.map((f, i) => (
-              <li
-                key={f.id}
-                className={`${i < 2 ? "border-b lg:border-b-0" : ""} ${i % 2 === 0 ? "border-r" : ""} lg:border-r lg:last:border-r-0`}
-                style={{ borderColor: C.line }}
-              >
-                <button
-                  id={`go-field-${f.id}`}
-                  type="button"
-                  onClick={() => go({ page: "practice", field: f.id })}
-                  className="group flex h-full w-full flex-col items-start gap-2 p-4 text-left md:flex-row md:gap-4 md:p-6"
+        <nav id="practice" aria-label="업무분야" className="border-b px-4 md:px-6" style={{ borderColor: C.line, background: C.white }}>
+          <div className="mx-auto max-w-[1200px] py-8 md:py-10">
+            <h2 className="text-[22px] font-bold tracking-[-0.02em] md:text-[24px]" style={{ color: C.navy, fontFamily: SERIF }}>
+              업무분야
+            </h2>
+            <ul className="mt-4 grid border-t sm:grid-cols-2 lg:grid-cols-4" style={{ borderColor: C.navy }}>
+              {FIELDS.map((f, i) => (
+                <li
+                  key={f.id}
+                  className={`border-b py-4 lg:border-b-0 lg:py-5 ${i % 2 === 0 ? "sm:pr-6" : "sm:pl-6"} lg:px-5 lg:first:pl-0 ${i < 3 ? "lg:border-r" : ""}`}
+                  style={{ borderColor: C.line }}
                 >
-                  <f.icon size={26} className="shrink-0" style={{ color: C.gold }} aria-hidden />
-                  <span className="min-w-0 flex-1">
-                    <span className="flex items-center gap-1 text-[17px] font-bold md:text-[19px]" style={{ color: C.navy }}>
-                      {f.label}
-                      <ChevronRight size={18} aria-hidden className="transition-transform group-hover:translate-x-0.5" style={{ color: C.muted }} />
-                    </span>
-                    <span className="mt-0.5 block text-[14px] leading-[1.5]" style={{ color: C.muted }}>
-                      {f.desc}
-                    </span>
-                  </span>
-                </button>
-              </li>
-            ))}
-          </ul>
+                  <button
+                    id={`go-field-${f.id}`}
+                    type="button"
+                    onClick={() => go({ page: "practice", field: f.id })}
+                    className="text-left text-[18px] font-bold underline-offset-4 hover:underline md:text-[19px]"
+                    style={{ color: C.navy, fontFamily: SERIF }}
+                  >
+                    {f.label}
+                  </button>
+                  <p className="mt-1.5 text-[14px] leading-[1.6]" style={{ color: C.muted }}>
+                    {FIELD_INFO[f.id].cases.join(" / ")}
+                  </p>
+                </li>
+              ))}
+            </ul>
+          </div>
         </nav>
       </section>
 
       <section aria-labelledby="home-lawyers" className="px-4 pt-16 md:px-6 md:pt-20">
         <div className="mx-auto max-w-[1200px]">
-          <BoardHead id="home-lawyers" title="변호사 소개" more="변호사 소개 상세보기" onMore={() => go({ page: "lawyers" })} />
+          <BoardHead id="home-lawyers" title="변호사 소개" more="더보기" onMore={() => go({ page: "lawyers" })} />
           <ul className="grid md:grid-cols-2">
             {LAWYERS.map((l, i) => (
-              <li key={l.name} className={`flex gap-4 border-b py-6 ${i === 0 ? "md:border-r md:pr-8" : "md:pl-8"}`} style={{ borderColor: C.line }}>
-                <Initial ch={l.initial} />
+              <li key={l.name} className={`flex gap-5 border-b py-6 ${i === 0 ? "md:border-r md:pr-8" : "md:pl-8"}`} style={{ borderColor: C.line }}>
+                <Portrait src={l.photo} name={l.name} />
                 <div className="min-w-0">
                   <p className="text-[20px] font-bold leading-[1.3]" style={{ color: C.navy, fontFamily: SERIF }}>
                     {l.name}
-                    <span className="ml-2 text-[15px] font-semibold" style={{ color: C.goldText, fontFamily: "inherit" }}>
+                    <span className="ml-2 text-[15px] font-semibold" style={{ color: C.muted, fontFamily: "inherit" }}>
                       {l.role}
                     </span>
                   </p>
-                  <p className="mt-1 text-[15px]" style={{ color: C.muted }}>
-                    {l.career[0]}
-                  </p>
-                  <p className="mt-1 text-[15px]">주요 분야 {l.fields.join(", ")}</p>
+                  <ul className="mt-2 space-y-0.5 text-[15px]" style={{ color: C.muted }}>
+                    {l.career.slice(0, 3).map((c) => (
+                      <li key={c}>{c}</li>
+                    ))}
+                  </ul>
                 </div>
               </li>
             ))}
@@ -792,7 +789,7 @@ function Home({ go }: { go: Go }) {
       <div className="px-4 pb-20 pt-14 md:px-6 md:pb-24">
         <div className="mx-auto grid max-w-[1200px] gap-12 lg:grid-cols-[1.4fr_1fr_1fr] lg:gap-10">
           <section aria-labelledby="home-cases" id="home-cases-box" className="min-w-0">
-            <BoardHead id="home-cases" moreId="go-cases" title="성공사례" more="성공사례 더보기" onMore={() => go({ page: "cases" })} />
+            <BoardHead id="home-cases" moreId="go-cases" title="성공사례" more="더보기" onMore={() => go({ page: "cases" })} />
             <ul>
               {CASES.slice(0, 5).map((c) => (
                 <li key={c.title} className="border-b" style={{ borderColor: C.line }}>
@@ -811,7 +808,7 @@ function Home({ go }: { go: Go }) {
           </section>
 
           <section aria-labelledby="home-consult" className="min-w-0">
-            <BoardHead id="home-consult" title="상담 안내" more="상담 비용 안내 더보기" onMore={() => go({ page: "fees" })} />
+            <BoardHead id="home-consult" title="상담 안내" />
             <HoursTable />
             <p className="mt-3 text-[15px]" style={{ color: C.muted }}>
               첫 상담 30분은 비용을 받지 않습니다.
@@ -829,7 +826,7 @@ function Home({ go }: { go: Go }) {
           </section>
 
           <section aria-labelledby="home-location" className="min-w-0">
-            <BoardHead id="home-location" title="오시는 길" more="오시는 길 자세히 보기" onMore={() => go({ page: "location" })} />
+            <BoardHead id="home-location" title="오시는 길" />
             <MiniMap />
             <p className="mt-3 text-[15px]">{ADDRESS}</p>
             <p className="text-[15px]" style={{ color: C.muted }}>
@@ -842,28 +839,27 @@ function Home({ go }: { go: Go }) {
   );
 }
 
-function BoardHead({ id, moreId, title, more, onMore }: { id: string; moreId?: string; title: string; more: string; onMore: () => void }) {
+function BoardHead({ id, moreId, title, more, onMore }: { id: string; moreId?: string; title: string; more?: string; onMore?: () => void }) {
   return (
-    <div className="flex items-center justify-between border-b-2 pb-2" style={{ borderColor: C.navy }}>
+    <div className="flex min-h-[44px] items-end justify-between border-b-2 pb-2" style={{ borderColor: C.navy }}>
       <h2 id={id} className="text-[22px] font-bold tracking-[-0.02em] md:text-[24px]" style={{ color: C.navy, fontFamily: SERIF }}>
         {title}
       </h2>
-      <button id={moreId} type="button" onClick={onMore} aria-label={more} title={more} className="inline-flex h-11 w-11 items-center justify-center rounded-[4px] hover:bg-[#efe6d6]" style={{ color: C.navy }}>
-        <Plus size={22} aria-hidden />
-      </button>
+      {more && onMore && (
+        <button id={moreId} type="button" onClick={onMore} aria-label={`${title} ${more}`} className="inline-flex h-11 items-center gap-0.5 px-1 text-[14px] underline-offset-4 hover:underline" style={{ color: C.muted }}>
+          {more}
+          <ChevronRight size={15} aria-hidden />
+        </button>
+      )}
     </div>
   );
 }
 
-function Initial({ ch, size = 56 }: { ch: string; size?: number }) {
+/** 변호사 사진. 프로필 사진처럼 세로 직사각형으로 자른다. */
+function Portrait({ src, name, large = false }: { src: string; name: string; large?: boolean }) {
   return (
-    <span
-      className="relative inline-flex shrink-0 items-center justify-center rounded-full font-bold"
-      style={{ background: C.navy, color: C.ivory, width: size, height: size, fontSize: size * 0.4, fontFamily: SERIF }}
-      aria-hidden
-    >
-      <span className="absolute inset-[3px] rounded-full border" style={{ borderColor: C.gold }} />
-      {ch}
+    <span className={`relative block shrink-0 overflow-hidden ${large ? "h-[200px] w-[160px]" : "h-[132px] w-[104px]"}`} style={{ background: C.navyMist }}>
+      <Image src={src} alt={`${name} 변호사`} fill sizes={large ? "160px" : "104px"} className="object-cover" style={{ objectPosition: "center 20%" }} />
     </span>
   );
 }
@@ -1063,7 +1059,7 @@ function Intro() {
 
 const LAWYERS = [
   {
-    initial: "김",
+    photo: `${IMG}/lawyer-1.jpg`,
     name: "김ㅈ우",
     role: "대표변호사",
     fields: ["임대차·부동산", "민사 채권"],
@@ -1071,7 +1067,7 @@ const LAWYERS = [
     note: "전세보증금, 계약갱신 거절, 대여금처럼 생활에서 생기는 돈 문제를 주로 맡습니다.",
   },
   {
-    initial: "이",
+    photo: `${IMG}/lawyer-2.jpg`,
     name: "이ㅅ연",
     role: "변호사",
     fields: ["이혼·가사", "형사"],
@@ -1088,7 +1084,7 @@ function Lawyers() {
         {LAWYERS.map((l) => (
           <li key={l.name} className="grid gap-6 border-t-2 pt-6 md:grid-cols-[200px_1fr]" style={{ borderColor: C.navy }}>
             <div className="flex items-center gap-4 md:flex-col md:items-start">
-              <Initial ch={l.initial} size={72} />
+              <Portrait src={l.photo} name={l.name} large />
               <div>
                 <p className="text-[24px] font-bold leading-[1.3]" style={{ color: C.navy, fontFamily: SERIF }}>
                   {l.name}
@@ -1393,7 +1389,7 @@ function Fees({ go }: { go: Go }) {
 const CASES: { field: Field; date: string; title: string; body: string; result: string; tag: string }[] = [
   {
     field: "lease",
-    date: "2026.09.18",
+    date: "2026.09.24",
     title: "계약 종료 5개월 뒤에도 돌려받지 못한 전세보증금",
     body: "임차권등기명령으로 대항력을 지킨 뒤 이사하고, 지급명령을 신청했습니다.",
     result: "집주인이 이의를 내지 않아 지급명령이 확정됐고, 경매 신청 전에 보증금을 모두 돌려받았습니다.",
@@ -1401,7 +1397,7 @@ const CASES: { field: Field; date: string; title: string; body: string; result: 
   },
   {
     field: "family",
-    date: "2026.09.02",
+    date: "2026.09.11",
     title: "이혼을 거부하던 배우자와의 재판상 이혼",
     body: "소송 전에 부동산을 가압류하고, 조정 기일에 양육 계획을 구체적으로 냈습니다.",
     result: "조정으로 이혼이 성립했고 친권, 양육권과 매달 양육비를 정했습니다.",
@@ -1409,7 +1405,7 @@ const CASES: { field: Field; date: string; title: string; body: string; result: 
   },
   {
     field: "criminal",
-    date: "2026.08.21",
+    date: "2026.09.09",
     title: "술자리 다툼으로 폭행 혐의 조사를 받게 된 직장인",
     body: "경찰 조사에 함께 들어가고, 상대방과의 합의 절차를 도왔습니다.",
     result: "합의서를 냈고 불송치 결정을 받았습니다.",
@@ -1417,7 +1413,7 @@ const CASES: { field: Field; date: string; title: string; body: string; result: 
   },
   {
     field: "civil",
-    date: "2026.08.07",
+    date: "2026.08.19",
     title: "지인에게 빌려준 1,500만 원 대여금 청구",
     body: "차용증이 없어 이체 내역과 문자로 빌려준 사실을 정리하고 소액사건으로 청구했습니다.",
     result: "판결을 받아 상대방 예금을 압류해 원금과 이자를 받았습니다.",
@@ -1425,7 +1421,7 @@ const CASES: { field: Field; date: string; title: string; body: string; result: 
   },
   {
     field: "lease",
-    date: "2026.07.24",
+    date: "2026.07.30",
     title: "실거주를 이유로 갱신을 거절한 뒤 새 임차인을 들인 임대인",
     body: "전입 기록과 중개 광고를 근거로 주택임대차분쟁조정을 신청했습니다.",
     result: "조정에서 손해배상금과 이사 비용을 받기로 합의했습니다.",
@@ -1433,7 +1429,7 @@ const CASES: { field: Field; date: string; title: string; body: string; result: 
   },
   {
     field: "family",
-    date: "2026.07.10",
+    date: "2026.07.28",
     title: "협의이혼 뒤 1년 넘게 밀린 양육비",
     body: "양육비부담조서를 근거로 상대방 급여 압류를 신청했습니다.",
     result: "밀린 양육비를 받았고, 이후 양육비는 급여에서 바로 들어오고 있습니다.",
@@ -1441,7 +1437,7 @@ const CASES: { field: Field; date: string; title: string; body: string; result: 
   },
   {
     field: "criminal",
-    date: "2026.06.26",
+    date: "2026.07.03",
     title: "중고 거래 사기 피해자 여러 명의 고소 대리",
     body: "피해자들의 송금 내역과 대화를 모아 한 번에 고소장을 냈습니다.",
     result: "피의자가 특정되어 재판에 넘겨졌고, 피해금 일부를 배상받았습니다.",
@@ -1449,7 +1445,7 @@ const CASES: { field: Field; date: string; title: string; body: string; result: 
   },
   {
     field: "civil",
-    date: "2026.06.12",
+    date: "2026.06.17",
     title: "6개월 밀린 거래처 물품대금",
     body: "거래처 예금을 가압류한 뒤 지급명령을 신청했습니다.",
     result: "나누어 갚기로 합의하고 공정증서로 남겼습니다.",
@@ -1459,12 +1455,18 @@ const CASES: { field: Field; date: string; title: string; body: string; result: 
 
 const CASE_TAGS = [...new Set(CASES.map((c) => c.tag))];
 
+/* 게시판에 쌓인 전체 글 수. 데모에는 각 분야 최근 글만 넣어 두고 첫 쪽만 보여 준다. */
+const CASE_TOTAL: Record<Field, number> = { lease: 58, family: 43, criminal: 27, civil: 19 };
+const CASE_ALL = Object.values(CASE_TOTAL).reduce((a, b) => a + b, 0);
+
 function Cases() {
   const reduce = useReducedMotionSafe();
   const [field, setField] = useState<Field | "all">("all");
   const [tag, setTag] = useState("all");
   const [open, setOpen] = useState<string | null>(null);
   const list = CASES.filter((c) => (field === "all" || c.field === field) && (tag === "all" || c.tag === tag));
+  const total = tag !== "all" ? list.length : field === "all" ? CASE_ALL : CASE_TOTAL[field];
+  const pages = Math.ceil(total / 10);
 
   return (
     <div>
@@ -1501,7 +1503,7 @@ function Cases() {
       </div>
 
       <p className="mt-5 text-[14px]" style={{ color: C.muted }} aria-live="polite">
-        총 <strong style={{ color: C.navy }}>{list.length}</strong>건
+        총 <strong style={{ color: C.navy }}>{total}</strong>건
       </p>
       <div className="mt-2 border-t-2" style={{ borderColor: C.navy }}>
         <div className="hidden grid-cols-[56px_110px_1fr_120px_100px] gap-3 border-b px-2 py-3 text-center text-[14px] font-semibold md:grid" style={{ borderColor: C.line, background: C.paper, color: C.muted }} aria-hidden>
@@ -1518,7 +1520,7 @@ function Cases() {
         ) : (
           <ul>
             {list.map((c) => {
-              const no = CASES.length - CASES.indexOf(c);
+              const no = CASE_ALL - CASES.indexOf(c);
               const on = open === c.title;
               const pid = `case-${no}`;
               return (
@@ -1582,6 +1584,25 @@ function Cases() {
           </ul>
         )}
       </div>
+      {pages > 1 && (
+        <p className="mt-6 flex justify-center gap-1 text-[15px] tabular-nums" aria-label="쪽 번호">
+          {Array.from({ length: Math.min(pages, 5) }, (_, i) => (
+            <span
+              key={i}
+              aria-current={i === 0 ? "page" : undefined}
+              className="inline-flex h-9 min-w-9 items-center justify-center px-1"
+              style={i === 0 ? { color: C.navy, fontWeight: 700, borderBottom: `2px solid ${C.navy}` } : { color: C.muted }}
+            >
+              {i + 1}
+            </span>
+          ))}
+          {pages > 5 && (
+            <span className="inline-flex h-9 items-center px-1" style={{ color: C.muted }}>
+              ... {pages}
+            </span>
+          )}
+        </p>
+      )}
     </div>
   );
 }
@@ -1898,8 +1919,8 @@ function ConfirmDialog({ data, onClose }: { data: Confirm | null; onClose: () =>
             aria-modal="true"
             aria-labelledby="confirm-title"
             onClick={(e) => e.stopPropagation()}
-            className="relative w-full max-w-[420px] border-t-4 px-6 pb-7 pt-8 md:px-8"
-            style={{ background: C.paper, borderColor: C.gold }}
+            className="relative w-full max-w-[420px] border px-6 pb-7 pt-8 md:px-8"
+            style={{ background: C.paper, borderColor: C.line }}
             initial={reduce ? false : { y: 24, opacity: 0 }}
             animate={{ y: 0, opacity: 1 }}
             exit={reduce ? { opacity: 0 } : { y: 12, opacity: 0 }}

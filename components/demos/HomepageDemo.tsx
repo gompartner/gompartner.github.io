@@ -5,7 +5,6 @@ import { AnimatePresence, motion } from "framer-motion";
 import {
   ArrowDown,
   ArrowUp,
-  ArrowUpRight,
   Calendar,
   Car,
   Check,
@@ -79,6 +78,10 @@ const locations = [
   { id: "sinchon", name: "신촌점", x: 41, y: 46, price: 15000, rating: 4.6, reviews: 51, available: false, img: "/images/demo-gym/zone-weight.jpg", facilities: ["샤워", "락커", "PT"] },
   { id: "samsung", name: "삼성점", x: 73.5, y: 71, price: 20000, rating: 4.9, reviews: 156, available: true, img: "/images/demo-gym/zone-cardio.jpg", facilities: ["주차", "샤워", "락커", "PT"] },
 ];
+
+// 후기 영역의 평점은 지점별 후기 수로 가중 평균한다
+const REVIEW_TOTAL = locations.reduce((n, l) => n + l.reviews, 0);
+const REVIEW_AVG = (locations.reduce((n, l) => n + l.rating * l.reviews, 0) / REVIEW_TOTAL).toFixed(1);
 
 const facilityIcons: Record<string, typeof Car> = { 주차: Car, 샤워: ShowerHead, 락커: Lock, PT: Dumbbell };
 
@@ -328,7 +331,17 @@ export function HomepageDemo() {
     if (!hydrated || !mapInView || autoTutRef.current) return;
     const frame = requestAnimationFrame(() => {
       autoTutRef.current = true;
+      // DemoDock 안내와 같은 키: 한 번 본 뒤에는 자동으로 띄우지 않는다(물음표 버튼으로 다시 열 수 있다)
+      const seenKey = "demo-tour-seen:small-business-homepage";
+      try {
+        if (localStorage.getItem(seenKey)) return;
+      } catch {
+        return;
+      }
       if (!booking.locationId && (booking.reservations ?? []).length === 0) {
+        try {
+          localStorage.setItem(seenKey, "1");
+        } catch {}
         openTutorial(0);
       }
     });
@@ -571,29 +584,27 @@ export function HomepageDemo() {
         />
         {/* pb-24: 화면 아래 양쪽 모서리의 사이트 공용 버튼과 겹치지 않게 띄운다 */}
         <div key={introKey} className="gym-hero-in absolute inset-x-0 bottom-0 px-4 pb-24 text-stone-100 sm:px-8">
-          <h1 className="gym-hero-title max-w-4xl text-[11vw] font-black leading-[1.08] tracking-tight sm:text-7xl">
+          <p className="text-sm font-semibold text-stone-300">그리즐리 프라이빗 짐</p>
+          <h1 className="gym-hero-title mt-2 max-w-4xl text-[11vw] font-black leading-[1.08] tracking-tight sm:text-7xl">
             1시간 단위 단독 이용
           </h1>
           <div className="mt-6 flex flex-wrap items-end justify-between gap-x-8 gap-y-5 border-t border-white/25 pt-5">
-            <dl className="grid grid-cols-[auto_1fr] gap-x-4 gap-y-1 text-[15px] text-stone-200/90">
-              <dt className="text-stone-400">지점</dt>
-              <dd>서울 {locations.length}곳</dd>
-              <dt className="text-stone-400">운영</dt>
-              <dd>매일 06:00 ~ 22:00, 무인 운영</dd>
-              <dt className="text-stone-400">이용</dt>
-              <dd>예약한 시간 동안 한 팀만 이용합니다.</dd>
-            </dl>
+            <div className="max-w-xl text-[15px] leading-relaxed text-stone-200/90">
+              <p>
+                서울 {locations.length}개 지점을 매일 06:00 ~ 22:00 무인으로 운영합니다. 예약한 시간에는 한 팀만 들어옵니다.
+              </p>
+              <p className="mt-2 text-amber-200">10월 31일까지 첫 예약 1시간 무료 (1인 1회)</p>
+            </div>
             <div className="flex flex-wrap items-center gap-3">
               <a
                 href="#booking"
-                className="inline-flex items-center gap-1.5 rounded-full bg-white px-6 py-3 font-bold text-[#111] transition-colors hover:bg-amber-300"
+                className="inline-flex items-center gap-1.5 rounded-lg bg-white px-6 py-3 font-bold text-[#111] transition-colors hover:bg-amber-300"
               >
                 첫 1시간 무료 예약
-                <ArrowUpRight size={16} aria-hidden />
               </a>
               <a
                 href="#map"
-                className="inline-flex items-center gap-1.5 rounded-full border border-white/40 px-6 py-3 font-semibold backdrop-blur transition-colors hover:border-amber-300 hover:text-amber-300"
+                className="inline-flex items-center gap-1.5 rounded-lg border border-white/40 bg-black/40 px-6 py-3 font-semibold transition-colors hover:border-amber-300 hover:text-amber-300"
               >
                 <ArrowDown size={16} aria-hidden />
                 지점 안내
@@ -604,7 +615,7 @@ export function HomepageDemo() {
       </header>
 
       {/* 빠른 예약 바 + 진행 스테퍼 (Sticky) */}
-      <div className="sticky top-0 z-30 border-b border-stone-200 bg-white/95 backdrop-blur">
+      <div className="sticky top-0 z-30 border-b border-stone-200 bg-white">
         <div className="mx-auto max-w-6xl px-4 py-3">
           {/* 현재 선택 요약 — 실제 선택은 지도와 캘린더에서 한다 */}
           <div className="flex items-center gap-3">
@@ -642,7 +653,6 @@ export function HomepageDemo() {
               className="inline-flex shrink-0 items-center gap-1.5 rounded-lg bg-[#111] px-5 py-2.5 text-sm font-bold text-white transition-colors hover:bg-stone-800 active:scale-95"
             >
               예약하기
-              <ArrowUpRight size={15} aria-hidden />
             </button>
             <button
               type="button"
@@ -689,7 +699,7 @@ export function HomepageDemo() {
             {/* 좌측: 서울 행정구역 지도 + 핀 오버레이 */}
             <Reveal className="relative lg:sticky lg:top-36 lg:self-start">
               <div ref={mapRef} className="relative">
-                <div className="overflow-hidden rounded-2xl border border-stone-200 bg-[#FBFAF8]">
+                <div className="overflow-hidden rounded-lg border border-stone-200 bg-[#FBFAF8]">
                 <div
                   className="relative transition-transform duration-700 ease-out motion-reduce:transition-none"
                   style={
@@ -775,15 +785,15 @@ export function HomepageDemo() {
                       }}
                       onMouseEnter={() => setHoverId(loc.id)}
                       onMouseLeave={() => setHoverId(null)}
-                      className={`group overflow-hidden rounded-2xl border bg-white transition-all duration-300 hover:-translate-y-1 hover:shadow-lg ${
-                        highlight ? "border-[#111] shadow-lg" : "border-stone-200"
+                      className={`overflow-hidden rounded-lg border bg-white transition-colors duration-200 hover:border-stone-500 ${
+                        highlight ? "border-[#111]" : "border-stone-200"
                       }`}
                     >
                       <div className="relative overflow-hidden">
                         <img
                           src={loc.img}
                           alt={`${loc.name} 내부`}
-                          className="aspect-[16/10] w-full object-cover transition-transform duration-500 group-hover:scale-105"
+                          className="aspect-[16/10] w-full object-cover"
                         />
                         {active && (
                           <span className="absolute left-0 top-0 bg-[#16A34A] px-3 py-1.5 text-xs font-bold text-white">
@@ -804,9 +814,9 @@ export function HomepageDemo() {
                             {loc.rating} <span className="text-stone-400">({loc.reviews})</span>
                           </p>
                         </div>
-                        <p className="mt-1 font-mono text-lg font-bold">
+                        <p className="mt-1 tabular-nums text-lg font-bold">
                           {(loc.price + RATE_BANDS[0].diff).toLocaleString()}원
-                          <span className="font-sans text-sm font-normal text-stone-400"> 부터 / 1시간</span>
+                          <span className="text-sm font-normal text-stone-400"> 부터 / 1시간</span>
                         </p>
                         <div className="mt-4 flex items-center gap-3 text-stone-500">
                           {loc.facilities.map((f) => {
@@ -862,7 +872,7 @@ export function HomepageDemo() {
             <Reveal>
               {/* 선택한 지점 미리보기 — 무엇을 예약 중인지 항상 보이게 */}
               {selected && (
-                <div className="mb-6 flex items-center gap-4 rounded-2xl border border-stone-200 bg-stone-50 p-3">
+                <div className="mb-6 flex items-center gap-4 rounded-lg border border-stone-200 bg-stone-50 p-3">
                   <img src={selected.img} alt={`${selected.name} 내부`} className="h-16 w-16 shrink-0 rounded-xl object-cover" />
                   <div className="min-w-0 flex-1">
                     <p className="font-bold">{selected.name}</p>
@@ -901,7 +911,7 @@ export function HomepageDemo() {
                       <span className={`block text-xs ${active ? "text-stone-300" : d.weekend ? "text-[#EF4444]" : "text-stone-400"}`}>
                         {d.weekday}
                       </span>
-                      <span className="font-mono text-base font-bold">{d.day}</span>
+                      <span className="tabular-nums text-base font-bold">{d.day}</span>
                     </button>
                   );
                 })}
@@ -939,7 +949,7 @@ export function HomepageDemo() {
                           aria-pressed={chosen}
                           aria-label={`${slot} ${taken ? "예약 완료" : `${price.toLocaleString()}원`}`}
                           onClick={() => toggleTime(slot)}
-                          className={`rounded-lg border py-2 font-mono transition-colors ${
+                          className={`rounded-lg border py-2 tabular-nums transition-colors ${
                             taken
                               ? "cursor-not-allowed border-stone-100 bg-stone-100 text-stone-300"
                               : chosen
@@ -978,7 +988,7 @@ export function HomepageDemo() {
             {/* 예약 요약 */}
             {/* 좌측 컬럼 높이를 꽉 채워 아래 여백이 생기지 않게 한다 */}
             <Reveal className="lg:h-full">
-              <div id="booking-summary" className="flex h-full flex-col rounded-2xl border border-stone-200 bg-white p-6">
+              <div id="booking-summary" className="flex h-full flex-col rounded-lg border border-stone-200 bg-white p-6">
                 {(() => {
                   // 내 예약에서 클릭한 예약의 QR 보기가 우선
                   const viewing = (booking.reservations ?? []).find((r) => r.id === viewingId);
@@ -988,7 +998,7 @@ export function HomepageDemo() {
                     <div className="flex h-full flex-col justify-center text-center">
                       <h3 className="text-sm font-bold text-stone-600">입장 QR</h3>
                       <p className="mt-3 text-lg font-bold">{loc?.name}</p>
-                      <p className="mt-1 font-mono text-sm text-stone-500">
+                      <p className="mt-1 tabular-nums text-sm text-stone-500">
                         {viewing.date.slice(5).replace("-", ".")} · {viewing.times.join(", ")}
                       </p>
                       <div className="mx-auto mt-5 flex h-28 w-28 items-center justify-center rounded-xl border border-stone-200 bg-[#F4F4F4]">
@@ -1010,7 +1020,7 @@ export function HomepageDemo() {
                       <Check size={22} aria-hidden />
                     </span>
                     <p className="mt-4 text-lg font-bold" role="status">예약 확정</p>
-                    <p className="mt-1 font-mono text-sm text-stone-500">
+                    <p className="mt-1 tabular-nums text-sm text-stone-500">
                       {selected?.name} · {booking.date?.slice(5).replace("-", ".")} · {booking.times.join(", ")}
                     </p>
                     <div className="mx-auto mt-5 flex h-28 w-28 items-center justify-center rounded-xl border border-stone-200 bg-[#F4F4F4]">
@@ -1035,8 +1045,8 @@ export function HomepageDemo() {
                     <dl className="mt-4 flex-1 space-y-2.5 text-sm lg:flex lg:flex-col lg:justify-evenly lg:space-y-0">
                       {/* 선택상자가 있는 행과 높이가 같도록 모든 행을 min-h-9로 통일 */}
                       <div className="flex min-h-9 items-center justify-between"><dt className="text-stone-500">지점</dt><dd className="font-semibold">{selected?.name ?? "미선택"}</dd></div>
-                      <div className="flex min-h-9 items-center justify-between"><dt className="text-stone-500">날짜</dt><dd className="font-mono font-semibold">{booking.date ?? "미선택"}</dd></div>
-                      <div className="flex min-h-9 items-center justify-between"><dt className="text-stone-500">시간</dt><dd className="max-w-[55%] text-right font-mono font-semibold">{booking.times.length ? booking.times.join(", ") : "미선택"}</dd></div>
+                      <div className="flex min-h-9 items-center justify-between"><dt className="text-stone-500">날짜</dt><dd className="tabular-nums font-semibold">{booking.date ?? "미선택"}</dd></div>
+                      <div className="flex min-h-9 items-center justify-between"><dt className="text-stone-500">시간</dt><dd className="max-w-[55%] text-right tabular-nums font-semibold">{booking.times.length ? booking.times.join(", ") : "미선택"}</dd></div>
                       <div className="flex min-h-9 items-center justify-between">
                         <dt className="text-stone-500">인원</dt>
                         <dd>
@@ -1051,13 +1061,13 @@ export function HomepageDemo() {
                           </select>
                         </dd>
                       </div>
-                      <div className="flex min-h-9 items-center justify-between"><dt className="text-stone-500">이용 요금</dt><dd className="font-mono font-semibold">{hoursCost.toLocaleString()}원</dd></div>
-                      <div className="flex min-h-9 items-center justify-between"><dt className="text-stone-500">인원 추가</dt><dd className="font-mono font-semibold">{extraCost.toLocaleString()}원</dd></div>
+                      <div className="flex min-h-9 items-center justify-between"><dt className="text-stone-500">이용 요금</dt><dd className="tabular-nums font-semibold">{hoursCost.toLocaleString()}원</dd></div>
+                      <div className="flex min-h-9 items-center justify-between"><dt className="text-stone-500">인원 추가</dt><dd className="tabular-nums font-semibold">{extraCost.toLocaleString()}원</dd></div>
                     </dl>
                     {/* 카드가 컬럼 높이만큼 늘어나면 총액·버튼이 하단에 붙는다 */}
                     <div className="mt-4 flex items-baseline justify-between border-t border-stone-200 pt-4 lg:mt-auto">
                       <p className="text-sm font-semibold text-stone-500">총 금액</p>
-                      <p className="font-mono text-2xl font-black">{total.toLocaleString()}원</p>
+                      <p className="tabular-nums text-2xl font-black">{total.toLocaleString()}원</p>
                     </div>
                     {stage === "confirm" ? (
                       <div className="mt-5">
@@ -1107,14 +1117,14 @@ export function HomepageDemo() {
           {(booking.reservations ?? []).length > 0 && (
             <div id="my-bookings" className="mt-14 scroll-mt-40">
               <h3 className="text-lg font-bold">
-                내 예약 <span className="font-mono text-stone-500">{(booking.reservations ?? []).length}</span>
+                내 예약 <span className="tabular-nums text-stone-500">{(booking.reservations ?? []).length}</span>
               </h3>
               {/* 모바일은 세로 스택, sm 이상은 한 줄 가로 스트립 */}
               <div className="mt-4 flex flex-col gap-3 sm:snap-x sm:flex-row sm:gap-4 sm:overflow-x-auto sm:pb-3 sm:[scrollbar-width:thin]">
                 {(booking.reservations ?? []).map((r) => {
                   const loc = locations.find((l) => l.id === r.locationId);
                   return (
-                    <div key={r.id} className="w-full rounded-2xl border border-stone-200 bg-white p-4 sm:w-64 sm:shrink-0 sm:snap-start">
+                    <div key={r.id} className="w-full rounded-lg border border-stone-200 bg-white p-4 sm:w-64 sm:shrink-0 sm:snap-start">
                       <button
                         type="button"
                         onClick={() => {
@@ -1129,13 +1139,13 @@ export function HomepageDemo() {
                         </span>
                         <span className="min-w-0 flex-1">
                           <span className="block truncate font-bold">{loc?.name ?? r.locationId}</span>
-                          <span className="block font-mono text-xs text-stone-500">
+                          <span className="block tabular-nums text-xs text-stone-500">
                             {r.date.slice(5).replace("-", ".")} · {r.times.join(", ")}
                           </span>
                         </span>
                       </button>
                       <div className="mt-3 flex items-center justify-between border-t border-stone-100 pt-3">
-                        <p className="font-mono text-sm font-semibold">
+                        <p className="tabular-nums text-sm font-semibold">
                           {r.total.toLocaleString()}원
                           {r.method === "onsite" && <span className="ml-1.5 text-xs font-medium text-amber-600">방문 시 결제</span>}
                         </p>
@@ -1171,7 +1181,7 @@ export function HomepageDemo() {
             <div className="grid grid-cols-2 gap-3 sm:gap-4">
               {gallery.map((g) => (
                 <Reveal key={g.label}>
-                  <figure className="overflow-hidden rounded-2xl bg-white">
+                  <figure className="overflow-hidden rounded-lg bg-white">
                     <img src={g.img} alt={`${g.label} 내부`} className="aspect-[4/3] w-full object-cover" />
                     <figcaption className="px-3.5 py-2 text-sm font-semibold">{g.label}</figcaption>
                   </figure>
@@ -1216,7 +1226,7 @@ export function HomepageDemo() {
                   {RATE_BANDS.map((b) => (
                     <th key={b.id} scope="col" className="px-2 py-2.5 text-right font-bold">
                       {b.label}
-                      <span className="block font-mono text-[11px] font-normal text-stone-500">{b.time}</span>
+                      <span className="block tabular-nums text-[11px] font-normal text-stone-500">{b.time}</span>
                     </th>
                   ))}
                 </tr>
@@ -1226,7 +1236,7 @@ export function HomepageDemo() {
                   <tr key={loc.id} className={booking.locationId === loc.id ? "bg-[#16A34A]/10" : undefined}>
                     <th scope="row" className="py-2.5 pr-2 font-semibold">{loc.name}</th>
                     {RATE_BANDS.map((b) => (
-                      <td key={b.id} className="px-2 py-2.5 text-right font-mono">
+                      <td key={b.id} className="px-2 py-2.5 text-right tabular-nums">
                         {(loc.price + b.diff).toLocaleString()}원
                       </td>
                     ))}
@@ -1259,7 +1269,7 @@ export function HomepageDemo() {
                     ["퇴실", "종료 10분 전 정리를 시작해 주시기 바랍니다. 다음 예약이 이어질 수 있습니다."],
                   ].map(([k, v], i) => (
                     <li key={k} className="grid grid-cols-[28px_72px_1fr] gap-2">
-                      <span className="font-mono font-bold text-stone-400">{i + 1}</span>
+                      <span className="tabular-nums font-bold text-stone-400">{i + 1}</span>
                       <span className="font-semibold text-[#111]">{k}</span>
                       <span>{v}</span>
                     </li>
@@ -1345,10 +1355,8 @@ export function HomepageDemo() {
             id="reviews-title"
             title="이용 후기"
             aside={
-              <p className="flex items-baseline gap-2">
-                <span className="font-mono text-5xl font-black">4.9</span>
-                <Star size={22} className="fill-[#111] text-[#111]" aria-hidden />
-                <span className="text-sm text-stone-500">평균 평점</span>
+              <p className="text-sm tabular-nums text-stone-500">
+                지점 후기 {REVIEW_TOTAL.toLocaleString()}건, 평균 {REVIEW_AVG}점
               </p>
             }
           />
@@ -1357,7 +1365,7 @@ export function HomepageDemo() {
         <div className="mt-8 sm:overflow-x-auto sm:pb-4 sm:[scrollbar-width:thin]">
           <div className="flex flex-col gap-3 px-4 sm:mx-auto sm:w-max sm:snap-x sm:flex-row sm:gap-4">
             {reviews.map((r) => (
-              <blockquote key={r.text} className="w-full rounded-2xl border border-stone-200 bg-white p-6 sm:w-80 sm:shrink-0 sm:snap-start">
+              <blockquote key={r.text} className="w-full rounded-lg border border-stone-200 bg-white p-6 sm:w-80 sm:shrink-0 sm:snap-start">
                 <Stars rating={r.rating} size={15} />
                 <p className="mt-4 leading-relaxed">{r.text}</p>
                 <footer className="mt-5 text-sm font-medium text-stone-500">{r.meta}</footer>
@@ -1398,13 +1406,13 @@ export function HomepageDemo() {
             <button
               type="button"
               onClick={() => scrollTo("map")}
-              className="rounded-full bg-[#16A34A] px-7 py-3.5 font-bold transition-colors hover:bg-[#15803d]"
+              className="rounded-lg bg-[#16A34A] px-7 py-3.5 font-bold transition-colors hover:bg-[#15803d]"
             >
               지금 예약하기
             </button>
             <a
               href="tel:02-000-0000"
-              className="rounded-full border border-white/40 px-7 py-3.5 font-semibold backdrop-blur transition-colors hover:border-[#4ade80] hover:text-[#4ade80]"
+              className="rounded-lg border border-white/40 bg-black/40 px-7 py-3.5 font-semibold transition-colors hover:border-[#4ade80] hover:text-[#4ade80]"
             >
               문의하기
             </a>
@@ -1434,7 +1442,7 @@ export function HomepageDemo() {
             <button
               type="button"
               onClick={replay}
-              className="inline-flex items-center gap-1.5 rounded-full border border-stone-700 px-3.5 py-2 font-medium text-stone-300 transition-colors hover:border-[#4ade80] hover:text-[#4ade80]"
+              className="inline-flex items-center gap-1.5 rounded-md border border-stone-700 px-3.5 py-2 font-medium text-stone-300 transition-colors hover:border-[#4ade80] hover:text-[#4ade80]"
             >
               <RotateCcw size={13} aria-hidden />
               입장 영상 다시 보기
@@ -1461,7 +1469,7 @@ export function HomepageDemo() {
               initial={{ y: 24 }}
               animate={{ y: 0 }}
               exit={{ y: 24 }}
-              className="w-full max-w-sm rounded-2xl bg-white p-6"
+              className="w-full max-w-sm rounded-lg bg-white p-6"
               onClick={(e) => e.stopPropagation()}
             >
               <div className="flex items-center gap-2">
@@ -1469,7 +1477,7 @@ export function HomepageDemo() {
                   N
                 </span>
                 <p className="font-bold">네이버페이 결제</p>
-                <span className="ml-auto rounded-full bg-stone-100 px-2.5 py-1 text-[11px] font-semibold text-stone-500">
+                <span className="ml-auto rounded-md bg-stone-100 px-2.5 py-1 text-[11px] font-semibold text-stone-500">
                   테스트
                 </span>
               </div>
@@ -1483,7 +1491,7 @@ export function HomepageDemo() {
                 </div>
                 <div className="flex justify-between">
                   <dt className="text-stone-500">결제 금액</dt>
-                  <dd className="font-mono font-bold">{total.toLocaleString()}원</dd>
+                  <dd className="tabular-nums font-bold">{total.toLocaleString()}원</dd>
                 </div>
               </dl>
               <div className="mt-5 flex gap-2">
