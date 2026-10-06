@@ -166,9 +166,9 @@ const PREF_OPTIONS: { id: Pref; label: string }[] = [
 ];
 
 const PART_REASON: Record<Part, string> = {
-  back: "허리가 아프시면 배와 골반 근육을 쓰는 동작부터 해요.",
-  shoulder: "어깨에 들어간 힘을 빼고 등으로 팔을 쓰는 연습부터 해요.",
-  knee: "누워서 하는 동작이 많아서 무릎에 무리가 덜 가요.",
+  back: "허리 통증이 있다면 코어와 골반 안정화 동작부터 시작합니다.",
+  shoulder: "굽은 어깨와 거북목 교정을 위한 상체 정렬 위주로 진행합니다.",
+  knee: "누워서 하는 동작 위주로 무릎 부담을 줄여 진행합니다.",
   none: "",
 };
 
@@ -180,13 +180,13 @@ function recommend(part: Part, exp: Exp, pref: Pref): Rec {
   if (pref === "solo" && base.type !== "private")
     return {
       type: "private",
-      reasons: [partReason || "그날 몸 상태를 보고 난이도를 맞춰 드려요."],
+      reasons: [partReason || "그날 컨디션에 맞춰 난이도를 조절해 드립니다."],
     };
   if (pref === "group" && (base.type === "private" || base.type === "duet"))
     return {
       type: "reformer",
       level: exp === "steady" ? "중급" : "입문",
-      reasons: [partReason, "4명 정원이라 강사가 자세를 자주 봐 드릴 수 있어요."],
+      reasons: [partReason, "4:1 소수정예라 자세를 꼼꼼하게 잡아 드립니다."],
     };
   return base;
 }
@@ -197,24 +197,24 @@ function recommendBase(part: Part, exp: Exp): Rec {
     if (exp === "new")
       return {
         type: "private",
-        reasons: [partReason, "아픈 데가 있는데 운동이 처음이시면 개인레슨이 안전해요."],
+        reasons: [partReason, "통증이 있거나 운동이 처음이시라면 1:1 개인레슨을 권장합니다."],
       };
     if (exp === "sometimes")
       return {
         type: "duet",
-        reasons: [partReason, "개인레슨보다 수강료 부담이 덜해요."],
+        reasons: [partReason, "가성비 높은 비용으로 함께 운동할 수 있습니다."],
       };
     return {
       type: "reformer",
       level: "중급",
-      reasons: [partReason, "운동을 꾸준히 하셨다면 그룹 수업도 충분히 따라오실 수 있어요."],
+      reasons: [partReason, "운동 경험이 있다면 그룹레슨도 충분히 따라오실 수 있습니다."],
     };
   }
   if (exp === "new")
-    return { type: "mat", level: "입문", reasons: ["기구 없이 매트에서 호흡과 기본 동작부터 배워요."] };
+    return { type: "mat", level: "입문", reasons: ["매트에서 호흡과 기본 동작을 배우는 입문반"] };
   if (exp === "sometimes")
-    return { type: "reformer", level: "입문", reasons: ["스프링을 약하게 걸고 리포머에 익숙해지는 반이에요."] };
-  return { type: "reformer", level: "중급", reasons: ["쉬는 시간이 짧고 동작을 이어서 하는 중급반이에요."] };
+    return { type: "reformer", level: "입문", reasons: ["리포머에 익숙해지는 초급반"] };
+  return { type: "reformer", level: "중급", reasons: ["동작을 쉬지 않고 이어 가는 중급반"] };
 }
 
 /* ---------- 시간표 ---------- */
@@ -1259,17 +1259,17 @@ function BookingDrawer({ target, onClose }: { target: BookingTarget | null; onCl
   const submit = (e: React.FormEvent) => {
     e.preventDefault();
     const digits = phone.replace(/\D/g, "");
-    if (name.trim().length < 2) return setError("이름을 두 글자 이상 입력해 주십시오.");
+    if (name.trim().length < 2) return setError("이름을 입력해 주십시오.");
     if (!/^01\d{8,9}$/.test(digits)) return setError("휴대전화 번호를 확인해 주십시오. 예: 010-1234-5678");
     if (!agree) return setError("개인정보 수집·이용에 동의해 주십시오.");
     setError("");
     const who = `${maskName(name)} 님`;
     setDone(
       isConsult
-        ? `${who}, ${lesson} 상담 신청을 받았습니다. 하루 안에 ${maskPhone(phone)}로 연락드립니다.`
+        ? `${who}, ${lesson} 상담 신청이 접수되었습니다. 1일 이내 ${maskPhone(phone)}로 연락드립니다.`
         : session
-          ? `${who}, ${when} ${lessonName} 체험레슨 신청을 받았습니다. 하루 안에 ${maskPhone(phone)}로 연락드려 확정합니다.`
-          : `${who}, ${lessonName} 체험레슨 신청을 받았습니다. 하루 안에 ${maskPhone(phone)}로 연락드려 수업 시간을 정합니다.`,
+          ? `${who}, ${when} ${lessonName} 체험레슨 신청이 접수되었습니다. 1일 이내 ${maskPhone(phone)}로 연락드려 확정해 드립니다.`
+          : `${who}, ${lessonName} 체험레슨 신청이 접수되었습니다. 1일 이내 ${maskPhone(phone)}로 연락드려 수업 시간을 안내해 드립니다.`,
     );
     setName("");
     setPhone("");

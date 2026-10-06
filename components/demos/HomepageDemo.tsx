@@ -1264,8 +1264,8 @@ export function HomepageDemo() {
                   {[
                     ["예약·결제", "지점, 날짜, 시간을 선택하고 결제합니다."],
                     ["출입 안내", "출입 비밀번호는 이용 30분 전 예약자 휴대전화로 문자 발송합니다. 입장 QR로도 출입할 수 있습니다."],
-                    ["이용", "예약한 시간 동안 공간 전체를 한 팀만 이용합니다."],
-                    ["퇴실", "종료 10분 전 정리를 시작해 주시기 바랍니다. 다음 예약이 이어질 수 있습니다."],
+                    ["이용", "예약한 시간 동안 공간 전체를 단독으로 이용하실 수 있습니다."],
+                    ["퇴실", "다음 이용자를 위해 종료 10분 전부터 정리 부탁드립니다."],
                   ].map(([k, v], i) => (
                     <li key={k} className="grid grid-cols-[28px_72px_1fr] gap-2">
                       <span className="tabular-nums font-bold text-stone-400">{i + 1}</span>
@@ -1279,8 +1279,8 @@ export function HomepageDemo() {
                 <h3 className="text-lg font-bold">주의사항</h3>
                 <ul className="mt-3 list-disc space-y-1.5 pl-5 text-sm leading-relaxed text-stone-700">
                   <li>실내 전용 운동화를 신어 주시기 바랍니다.</li>
-                  <li>원판과 덤벨은 사용 후 제자리에 정리해 주시기 바랍니다.</li>
-                  <li>음식물 반입과 흡연은 금지입니다. 물은 뚜껑 있는 병만 가능합니다.</li>
+                  <li>사용한 원판과 덤벨은 제자리에 정리해 주세요.</li>
+                  <li>음료를 제외한 음식물 섭취와 흡연은 금지입니다. 물은 뚜껑 있는 병만 가능합니다.</li>
                   <li>보안을 위해 출입구와 공용 공간에 CCTV를 운영합니다. 운동 공간 안에는 없습니다.</li>
                   <li>장비 파손 시 수리비를 청구할 수 있습니다.</li>
                 </ul>
