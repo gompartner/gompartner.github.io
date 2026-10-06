@@ -58,7 +58,7 @@ export function DemoDock({ projectId, story, tour }: { projectId: string; story?
       return;
     }
     let io: IntersectionObserver | null = null;
-    const timer = window.setTimeout(() => {
+    const arm = () => {
       const first = resolve(tour[0].target);
       if (!first) return;
       io = new IntersectionObserver(
@@ -73,9 +73,15 @@ export function DemoDock({ projectId, story, tour }: { projectId: string; story?
         { threshold: 0.3 },
       );
       io.observe(first);
+    };
+    // 공지 팝업(DemoPopup)이 떠 있으면 모두 닫힌 뒤에 연다
+    const timer = window.setTimeout(() => {
+      if (document.body.hasAttribute("data-demo-popup")) window.addEventListener("demo-popup-closed", arm, { once: true });
+      else arm();
     }, 600);
     return () => {
       window.clearTimeout(timer);
+      window.removeEventListener("demo-popup-closed", arm);
       io?.disconnect();
     };
   }, [projectId, tour, start]);
