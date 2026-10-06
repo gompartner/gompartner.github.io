@@ -255,10 +255,10 @@ const CERTS: { name: L; scope: L; org: L; year: number }[] = [
 const NOTICES: { title: L; date: string; body: L }[] = [
   {
     title: l("추석 연휴 휴무 및 출하 일정 안내", "Chuseok holiday closure and shipping schedule"),
-    date: "2026-09-22",
+    date: "2026-09-15",
     body: l(
-      "10월 3일부터 10월 9일까지 휴무합니다. 9월 30일까지 출하 예정인 제품은 일정대로 보내 드리고, 연휴 중 들어온 견적문의는 10월 12일부터 차례로 회신합니다.",
-      "We are closed from October 3 to 9. Orders due by September 30 ship as scheduled, and quote requests received during the holiday are answered from October 12.",
+      "9월 24일(목)부터 9월 28일(월)까지 휴무합니다. 9월 23일까지 출하 예정인 제품은 일정대로 출하하며, 연휴 중 접수된 견적문의는 9월 29일부터 순서대로 회신해 드립니다.",
+      "We are closed from September 24 to 28. Orders due by September 23 ship as scheduled, and quote requests received during the holiday are answered from September 29.",
     ),
   },
   {
@@ -310,7 +310,7 @@ const BUSINESS: Record<string, { desc: L; rows: [L, L][]; machines: MachineKey[]
   },
   fiveAx: {
     desc: l(
-      "여러 면에 경사 구멍이나 곡면이 있는 부품을 가공합니다. ±0.01mm 공차 부품은 항온 가공실에서 깎습니다.",
+      "여러 면에 경사 구멍이나 곡면이 있는 부품을 가공합니다. ±0.01mm 공차 부품은 항온 가공실에서 가공합니다.",
       "Parts with angled holes or curved faces on several sides. ±0.01 mm parts are machined in the temperature-controlled room.",
     ),
     rows: [
@@ -620,7 +620,7 @@ function Home() {
             {x("CNC 선반ㆍMCTㆍ5축 정밀부품 가공", "CNC turning, MCT and 5-axis precision parts")}
           </p>
           <p className="mt-4 max-w-[560px] text-[16px] md:text-[18px]" style={{ color: "#d4d8de" }}>
-            {x("반도체 장비, 의료기기, 2차전지 설비 부품을 가공합니다. 시제품은 1개도 받습니다.", "Parts for semiconductor equipment, medical devices and battery lines. Single prototypes welcome.")}
+            {x("반도체 장비, 의료기기, 2차전지 설비 부품 정밀가공. 시제품 1개부터 양산까지 가능합니다.", "Parts for semiconductor equipment, medical devices and battery lines. Single prototypes welcome.")}
           </p>
           <div className="mt-8 flex flex-wrap gap-3">
             <button type="button" onClick={() => go("equipment", "machines")} className="inline-flex h-12 items-center rounded-[4px] px-6 font-bold" style={{ background: C.orange, color: C.steel }}>
@@ -1008,13 +1008,13 @@ function Greeting() {
         <p className="text-[19px] font-bold leading-[1.6] md:text-[21px]">{x("(주)○○정밀 홈페이지를 찾아 주셔서 감사합니다.", "Thank you for visiting ○○ Precision.")}</p>
         <p>
           {x(
-            "2009년 머시닝센터 두 대로 시작했습니다. 지금은 반도체 장비, 의료기기, 2차전지 설비 부품을 가공하고 있습니다.",
+            "2009년 머시닝센터 2대로 창업한 이래 반도체 장비, 의료기기, 2차전지 설비 부품을 가공하고 있습니다.",
             "We started in 2009 with two machining centers. Today we make parts for semiconductor equipment, medical devices and battery lines.",
           )}
         </p>
         <p>
           {x(
-            "도면에 빠진 치수나 깎기 어려운 형상이 있으면 견적 드릴 때 먼저 말씀드리겠습니다.",
+            "도면 검토 단계에서 누락된 치수나 가공이 어려운 형상을 미리 확인해 드립니다. 앞으로도 많은 이용과 격려 부탁드립니다.",
             "If a drawing is missing dimensions or has features that are hard to machine, we will tell you when we quote.",
           )}
         </p>
@@ -1163,7 +1163,7 @@ function Location() {
           <div>
             <p className="max-w-[760px]">
               {x(
-                "산단로 쪽 2번 게이트로 들어와 공장 뒤 하역장에 대 주십시오. 5톤 화물차까지 지게차로 내립니다.",
+                "산단로 쪽 2번 게이트로 진입해 공장 뒤 하역장을 이용해 주십시오. 5톤 화물차까지 지게차 하역이 가능합니다.",
                 "Enter through gate 2 on Sandan-ro and park at the loading dock behind the plant. We unload trucks up to 5 tons by forklift.",
               )}
             </p>
@@ -1340,7 +1340,7 @@ function Measuring() {
     <div>
       <p className="max-w-[860px]">
         {x(
-          "측정기는 해마다 공인 교정기관에서 교정합니다. 측정 성적서는 요청하시면 제품과 같이 보내 드립니다.",
+          "측정기는 매년 공인 교정기관에서 교정합니다. 측정 성적서는 요청 시 제품과 함께 보내 드립니다.",
           "Measuring instruments are calibrated by an accredited lab every year. Inspection reports are shipped with the parts on request.",
         )}
       </p>
@@ -1401,12 +1401,12 @@ interface Verdict {
 const R = {
   tol5ax: l("±0.01 공차는 항온 가공실의 5축 가공기에서 가공하고 3차원 측정기로 전수 검사합니다.", "±0.01 parts are machined on the 5-axis machine in the temperature-controlled room and 100% inspected on the CMM."),
   tolBig: l("±0.01 공차는 600×500×400mm 이내 부품까지 맞출 수 있습니다. 크기나 공차를 함께 검토해야 합니다.", "±0.01 tolerance is available for parts up to 600×500×400 mm. Size or tolerance needs to be reviewed."),
-  tooBig: l("보유 설비의 최대 가공 범위(1,300×650×600mm)를 넘습니다. 나눠서 가공한 뒤 조립하는 방법을 검토합니다.", "Exceeds our largest envelope (1,300×650×600 mm). Machining in sections and assembling may be an option."),
+  tooBig: l("보유 설비의 최대 가공 범위(1,300×650×600mm)를 넘습니다. 분할 가공 후 조립 방식으로 검토합니다.", "Exceeds our largest envelope (1,300×650×600 mm). Machining in sections and assembling may be an option."),
   latheBig: l("선반 최대 가공 범위(Ø300 × 길이 500mm)를 넘습니다.", "Exceeds our lathe capacity (Ø300 × L500 mm)."),
   round01: l("지름 200mm가 넘는 원통 부품의 ±0.01 공차는 연삭 공정을 따로 검토해야 합니다.", "±0.01 on cylindrical parts over Ø200 needs a separate grinding review."),
-  plastic: l("엔지니어링 플라스틱은 온도에 따라 치수가 변해 ±0.01 공차를 유지하기 어렵습니다.", "Engineering plastics change size with temperature, so holding ±0.01 is difficult."),
-  sus: l("스테인리스는 공구 마모가 커서 납기를 이틀 더 잡습니다.", "Stainless steel wears tools faster, so two extra days are added."),
-  thin: l("가장 얇은 쪽이 3mm보다 얇아 가공 중 휨을 먼저 확인해야 합니다.", "The thinnest side is under 3 mm, so distortion during machining must be checked first."),
+  plastic: l("엔지니어링 플라스틱은 온도에 따른 치수 변화로 ±0.01 공차 유지가 어렵습니다.", "Engineering plastics change size with temperature, so holding ±0.01 is difficult."),
+  sus: l("스테인리스는 공구 마모가 커서 납기가 2일 추가됩니다.", "Stainless steel wears tools faster, so two extra days are added."),
+  thin: l("최소 두께가 3mm 미만이라 가공 중 변형 여부를 먼저 검토해야 합니다.", "The thinnest side is under 3 mm, so distortion during machining must be checked first."),
   qty: l("500개가 넘는 수량은 양산 일정과 단가를 따로 협의합니다.", "Quantities over 500 need a separate schedule and price agreement."),
 };
 
@@ -1769,7 +1769,7 @@ function Checker() {
           </>
         ) : (
           <p className="px-5 py-16 text-center md:px-7" style={{ color: C.muted }}>
-            {x("크기와 수량을 1 이상 숫자로 입력해 주십시오.", "Enter size and quantity as numbers of 1 or more.")}
+            {x("크기와 수량을 입력해 주십시오.", "Enter size and quantity as numbers of 1 or more.")}
           </p>
         )}
       </div>
@@ -1929,12 +1929,12 @@ function Quote() {
     tomorrow.setHours(0, 0, 0, 0);
     tomorrow.setDate(tomorrow.getDate() + 1);
     if (!company.trim()) next.company = x("회사명을 입력해 주십시오.", "Enter your company name.");
-    if (person.trim().length < 2) next.person = x("담당자명을 두 글자 이상 입력해 주십시오.", "Enter the contact person's name.");
-    if (phone.replace(/\D/g, "").length < 9) next.phone = x("연락처를 9자리 이상 숫자로 입력해 주십시오.", "Enter a phone number with at least 9 digits.");
+    if (person.trim().length < 2) next.person = x("담당자명을 입력해 주십시오.", "Enter the contact person's name.");
+    if (phone.replace(/\D/g, "").length < 9) next.phone = x("연락처를 확인해 주십시오.", "Enter a phone number with at least 9 digits.");
     if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email.trim())) next.email = x("이메일 형식을 확인해 주십시오.", "Check the email format.");
     if (!subject.trim()) next.subject = x("문의제목을 입력해 주십시오.", "Enter a subject.");
-    if (due && new Date(`${due}T00:00:00`) < tomorrow) next.due = x("희망 납기는 내일 이후 날짜로 골라 주십시오.", "Choose a date from tomorrow onward.");
-    if (memo.trim().length < 10) next.content = x("문의내용을 10자 이상 입력해 주십시오.", "Enter at least 10 characters.");
+    if (due && new Date(`${due}T00:00:00`) < tomorrow) next.due = x("희망 납기는 내일 이후 날짜로 선택해 주십시오.", "Choose a date from tomorrow onward.");
+    if (memo.trim().length < 10) next.content = x("문의내용을 입력해 주십시오.", "Enter at least 10 characters.");
     if (errors.file) next.file = errors.file;
     if (!agree) next.agree = x("개인정보 수집·이용에 동의해 주십시오.", "Please agree to the collection of personal data.");
     setErrors(next);
