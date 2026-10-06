@@ -1,6 +1,6 @@
 "use client";
 
-// 바닥글의 관련 사이트(도구) 목록. 페이지를 옮기거나 바깥을 누르면 닫는다.
+// 바닥글의 관련 사이트(자료실) 목록. 페이지를 옮기거나 바깥을 누르면 닫는다.
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { useEffect, useRef } from "react";
