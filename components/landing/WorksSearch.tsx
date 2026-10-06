@@ -38,7 +38,6 @@ export function WorksSearch({ projects }: { projects: Project[] }) {
     mode === "pick"
       ? projects.filter((p) => hasField(p, field) && hasCap(p, cap))
       : projects.filter((p) => terms.every((t) => searchText(p).includes(t)));
-  const marks = mode === "pick" ? capKeywords(cap) : terms;
   const active = mode === "pick" ? Boolean(field || cap) : query !== "";
 
   const reset = () => {
@@ -148,7 +147,7 @@ export function WorksSearch({ projects }: { projects: Project[] }) {
 
       <div className="mt-8">
         {results.length > 0 ? (
-          <WorksGrid projects={results} marks={marks} />
+          <WorksGrid projects={results} />
         ) : (
           <motion.div
             initial={{ opacity: 0 }}

@@ -8,7 +8,6 @@ import { useReducedMotionSafe } from "@/hooks/useReducedMotionSafe";
 import { formatWon, planByProject, plans } from "@/data/pricing";
 
 const EASE_OUT = [0.23, 1, 0.32, 1] as const;
-const normalize = (s: string) => s.toLowerCase().replace(/\s+/g, "");
 const EASE_IN_OUT = [0.77, 0, 0.175, 1] as const;
 
 const secondaryButton =
@@ -17,9 +16,8 @@ const secondaryButton =
 // 신규 제작과 유지보수를 한 목록에 보여 주고, 구분은 썸네일 왼쪽 위 라벨로 표시한다.
 // 조건이 바뀌면 빠지는 카드는 흐려지고, 남는 카드는 새 자리로 미끄러지고,
 // 새로 들어오는 카드는 위에서 아래로 인쇄되듯 드러난다.
-// marks에 든 단어가 있는 기능 태그에는 형광펜이 왼쪽부터 그어진다.
-// 동작 줄이기 설정이면 자리 이동 없이 흐려지기만 하고 형광펜은 바로 칠해진다.
-export function WorksGrid({ projects, marks = [] }: { projects: Project[]; marks?: readonly string[] }) {
+// 동작 줄이기 설정이면 자리 이동 없이 흐려지기만 한다.
+export function WorksGrid({ projects }: { projects: Project[] }) {
   const reduce = useReducedMotionSafe();
   const hidden = reduce ? { opacity: 0 } : { opacity: 0, clipPath: "inset(0% 0% 100% 0% round 10px)" };
   const shown = reduce ? { opacity: 1 } : { opacity: 1, clipPath: "inset(0% 0% 0% 0% round 10px)" };
@@ -48,30 +46,10 @@ export function WorksGrid({ projects, marks = [] }: { projects: Project[]; marks
               </span>
             </Link>
             <div className="flex flex-1 flex-col p-6">
-              <p className="text-[15px] font-bold leading-[1.5] text-accent">{w.category}</p>
+              <p className="text-[15px] font-bold leading-[1.5] text-accent">
+                {w.category}·{w.layout}
+              </p>
               <h3 className="mt-1 text-[19px] font-bold leading-[1.5]">{w.title}</h3>
-              <ul className="mt-4 flex flex-wrap gap-2" aria-label="주요 기능">
-                {w.features.map((f) => {
-                  const marked = marks.some((k) => normalize(f).includes(normalize(k)));
-                  return (
-                    <li
-                      key={f}
-                      className={`relative isolate overflow-hidden rounded-[4px] bg-surface px-3 py-1 text-[15px] leading-[1.5] transition-colors duration-200 ${
-                        marked ? "text-foreground" : "text-foreground-secondary"
-                      }`}
-                    >
-                      <span
-                        aria-hidden
-                        style={{ transitionDelay: marked && !reduce ? `${300 + Math.min(i, 5) * 60}ms` : "0ms" }}
-                        className={`absolute inset-0 -z-10 origin-left bg-[#ffe58a] transition-transform duration-[450ms] ease-[cubic-bezier(0.23,1,0.32,1)] motion-reduce:transition-none ${
-                          marked ? "scale-x-100" : "scale-x-0"
-                        }`}
-                      />
-                      {f}
-                    </li>
-                  );
-                })}
-              </ul>
               <div className="mt-auto flex items-end justify-between gap-3 pt-6">
                 <Link href={w.demoUrl} data-gtm-cta={`demo_open_${w.id}`} className={secondaryButton}>
                   데모 보기
