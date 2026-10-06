@@ -274,12 +274,12 @@ export function RetirementDemo() {
               </p>
               {shortfall && (
                 <p className="mt-3 text-[16px] leading-[1.6] text-white/90">
-                  매월 <b className="text-white">{formatMan(result.extraMonthly)}</b>을 더 저축하면 목표 금액을 채울 수 있습니다.
+                  매월 <b className="text-white">{formatMan(result.extraMonthly)}</b>을 추가로 저축하면 필요 노후자금을 준비할 수 있습니다.
                 </p>
               )}
               {result.depletedAge !== null && (
                 <p className="mt-2 text-[15px] leading-[1.6] text-white/85">
-                  지금 계획대로라면 {result.depletedAge}세에 자산이 바닥납니다.
+                  현재 계획 기준 예상 자산 소진 시점: {result.depletedAge}세
                 </p>
               )}
             </div>
