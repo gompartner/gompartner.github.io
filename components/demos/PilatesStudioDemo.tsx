@@ -166,9 +166,9 @@ const PREF_OPTIONS: { id: Pref; label: string }[] = [
 ];
 
 const PART_REASON: Record<Part, string> = {
-  back: "허리 통증이 있으시다면 배와 골반 주변 근육을 먼저 쓰는 동작부터 시작합니다.",
-  shoulder: "목과 어깨에 들어간 힘을 빼고 등 근육으로 팔을 쓰는 연습부터 합니다.",
-  knee: "무릎에 체중이 덜 실리도록 누워서 하는 동작으로 허벅지와 엉덩이 근육을 먼저 키웁니다.",
+  back: "허리가 아프시면 배와 골반 근육을 쓰는 동작부터 해요.",
+  shoulder: "어깨에 들어간 힘을 빼고 등으로 팔을 쓰는 연습부터 해요.",
+  knee: "누워서 하는 동작이 많아서 무릎에 무리가 덜 가요.",
   none: "",
 };
 
@@ -180,16 +180,13 @@ function recommend(part: Part, exp: Exp, pref: Pref): Rec {
   if (pref === "solo" && base.type !== "private")
     return {
       type: "private",
-      reasons: [
-        partReason || "운동 경력에 맞춰 강사가 동작 난이도를 수업마다 조절합니다.",
-        "강사 한 명이 한 분만 지도하고, 수업 시간은 상담 후 정합니다.",
-      ],
+      reasons: [partReason || "그날 몸 상태를 보고 난이도를 맞춰 드려요."],
     };
   if (pref === "group" && (base.type === "private" || base.type === "duet"))
     return {
       type: "reformer",
       level: exp === "steady" ? "중급" : "입문",
-      reasons: [partReason, "4명 정원이라 강사가 한 분씩 자세를 확인합니다. 불편한 부위는 수업 전에 강사에게 알려 주시기 바랍니다."],
+      reasons: [partReason, "4명 정원이라 강사가 자세를 자주 봐 드릴 수 있어요."],
     };
   return base;
 }
@@ -200,24 +197,24 @@ function recommendBase(part: Part, exp: Exp): Rec {
     if (exp === "new")
       return {
         type: "private",
-        reasons: [partReason, "통증이 있고 운동 경력이 없으시다면 개인레슨을 받으시길 권장합니다."],
+        reasons: [partReason, "아픈 데가 있는데 운동이 처음이시면 개인레슨이 안전해요."],
       };
     if (exp === "sometimes")
       return {
         type: "duet",
-        reasons: [partReason, "듀엣레슨은 개인레슨보다 부담이 적고, 강사가 자세를 자주 교정합니다."],
+        reasons: [partReason, "개인레슨보다 수강료 부담이 덜해요."],
       };
     return {
       type: "reformer",
       level: "중급",
-      reasons: [partReason, "운동 경력이 있으시면 4명 그룹 수업도 충분히 따라올 수 있습니다. 불편한 부위는 수업 전에 알려 주시기 바랍니다."],
+      reasons: [partReason, "운동을 꾸준히 하셨다면 그룹 수업도 충분히 따라오실 수 있어요."],
     };
   }
   if (exp === "new")
-    return { type: "mat", level: "입문", reasons: ["기구 없이 매트에서 호흡과 기본 동작부터 배웁니다.", "정원 6명 입문반이라 부담 없이 시작할 수 있습니다."] };
+    return { type: "mat", level: "입문", reasons: ["기구 없이 매트에서 호흡과 기본 동작부터 배워요."] };
   if (exp === "sometimes")
-    return { type: "reformer", level: "입문", reasons: ["리포머 기구에 익숙해지는 입문반부터 시작합니다.", "스프링 강도를 낮게 두고 동작을 하나씩 익힙니다."] };
-  return { type: "reformer", level: "중급", reasons: ["기본 동작을 아는 분들이 모인 중급반입니다.", "쉬는 시간을 줄이고 연속 동작 위주로 진행합니다."] };
+    return { type: "reformer", level: "입문", reasons: ["스프링을 약하게 걸고 리포머에 익숙해지는 반이에요."] };
+  return { type: "reformer", level: "중급", reasons: ["쉬는 시간이 짧고 동작을 이어서 하는 중급반이에요."] };
 }
 
 /* ---------- 시간표 ---------- */
@@ -518,8 +515,7 @@ function Intro({ onConsult }: { onConsult: () => void }) {
               {STUDIO}
             </h1>
             <p className="mt-3 max-w-[40em]" style={{ color: C.muted }}>
-              1:1 개인레슨, 2:1 듀엣레슨, 최대 6명 그룹레슨을 합니다. 물리치료사 출신 원장이 첫 수업 때 체형 상담을 함께 하고,
-              □□역 3번 출구에서 걸어서 3분입니다. 건물 주차는 2시간 무료입니다.
+              □□역 3번 출구 도보 3분 · 건물 주차 2시간 무료
             </p>
           </div>
           <div className="flex flex-wrap items-center gap-x-6 gap-y-3">
@@ -1122,7 +1118,7 @@ function About() {
       <div className="mx-auto max-w-[1200px]">
         <SectionTitle id="about-title">스튜디오 소개</SectionTitle>
         <p className="mt-3 max-w-[720px]" style={{ color: C.muted }}>
-          호흡을 먼저 배우고, 몸 상태에 맞춰 동작을 고릅니다. 모든 첫 수업은 체형 상담을 함께 하는 50분 체험레슨입니다.
+          첫 수업은 체형 상담을 같이 하는 50분 체험레슨이에요.
         </p>
         <div className="mt-6 grid gap-3 md:grid-cols-[3fr_2fr] md:gap-4">
           {[

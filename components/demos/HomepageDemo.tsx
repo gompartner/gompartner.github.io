@@ -137,11 +137,11 @@ const amenities = [
 ];
 
 const reviews = [
-  { rating: 5, text: "한 시간 동안 아무도 없이 혼자 쓰는 게 이렇게 쾌적할 줄 몰랐어요.", meta: "김ㅎ늘 · 강남점 오전" },
-  { rating: 5, text: "통창으로 해 뜨는 거 보면서 러닝하는 맛에 새벽마다 갑니다.", meta: "이ㅈ호 · 성수점 새벽" },
-  { rating: 4, text: "촬영 대관으로 썼는데 조명이 좋아서 보정할 게 없었습니다.", meta: "박* · 홍대점 대관" },
-  { rating: 5, text: "PT 매칭까지 한 번에 예약되는 게 편해요. QR 입장도 빠르고요.", meta: "최ㅅ아 · 삼성점 PT" },
-  { rating: 5, text: "예약한 시간엔 다른 팀이 들어올 수 없어서 운동에만 집중하게 됩니다.", meta: "정ㅁ준 · 잠실점 저녁" },
+  { rating: 5, text: "아무도 없으니까 눈치 안 보고 운동했어요.", meta: "김ㅎ늘 · 강남점 오전" },
+  { rating: 5, text: "통창으로 해 뜨는 거 보면서 뛰는 맛에 새벽마다 가요.", meta: "이ㅈ호 · 성수점 새벽" },
+  { rating: 4, text: "촬영 대관으로 썼는데 조명이 좋아서 보정할 게 별로 없었어요.", meta: "박* · 홍대점 대관" },
+  { rating: 5, text: "PT 선생님이랑 같이 들어갈 수 있어서 편해요. QR 입장도 빠르고요.", meta: "최ㅅ아 · 삼성점 PT" },
+  { rating: 5, text: "다른 팀이 안 들어오니까 기구 기다릴 일이 없어요.", meta: "정ㅁ준 · 잠실점 저녁" },
 ];
 
 const faqs = [
@@ -1072,7 +1072,6 @@ export function HomepageDemo() {
                     {stage === "confirm" ? (
                       <div className="mt-5">
                         <p className="rounded-lg border border-[#16A34A]/30 bg-[#16A34A]/5 px-4 py-3 text-xs leading-relaxed text-[#15803d]">
-                          {booking.times.length}시간 동안 공간 전체를 단독 사용합니다.
                           결제 후 입장 QR이 바로 발급됩니다.
                         </p>
                         <button

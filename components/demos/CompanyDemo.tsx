@@ -286,8 +286,8 @@ const NOTICES: { title: L; date: string; body: L }[] = [
 const BUSINESS: Record<string, { desc: L; rows: [L, L][]; machines: MachineKey[] }> = {
   lathe: {
     desc: l(
-      "CNC 선반과 Y축·부 주축을 갖춘 복합 선반으로 축, 플랜지, 커넥터 같은 원통형 부품을 가공합니다. 밀링이 필요한 형상도 한 번 물려 가공을 마칩니다.",
-      "CNC lathes and turn-mill centers with a Y-axis and sub spindle machine cylindrical parts such as shafts, flanges and connectors. Milled features are finished in the same setup.",
+      "축, 플랜지, 커넥터 같은 원통형 부품을 가공합니다.",
+      "Cylindrical parts such as shafts, flanges and connectors.",
     ),
     rows: [
       [l("최대 가공 크기", "Max. size"), l("Ø300 × 길이 500 mm", "Ø300 × L500 mm")],
@@ -298,8 +298,8 @@ const BUSINESS: Record<string, { desc: L; rows: [L, L][]; machines: MachineKey[]
   },
   mct: {
     desc: l(
-      "수직 머시닝센터로 블록, 하우징, 베이스 플레이트 같은 각형 부품을 가공합니다. 길이 1,300mm 대형 부품까지 가공합니다.",
-      "Vertical machining centers produce prismatic parts such as blocks, housings and base plates, up to 1,300 mm long.",
+      "블록, 하우징, 베이스 플레이트 같은 각형 부품을 가공합니다.",
+      "Prismatic parts such as blocks, housings and base plates.",
     ),
     rows: [
       [l("최대 가공 크기", "Max. size"), l("1,300 × 650 × 600 mm", "1,300 × 650 × 600 mm")],
@@ -310,8 +310,8 @@ const BUSINESS: Record<string, { desc: L; rows: [L, L][]; machines: MachineKey[]
   },
   fiveAx: {
     desc: l(
-      "5축 가공기로 여러 면에 경사 구멍과 곡면이 있는 부품을 한 번에 가공합니다. ±0.01mm 공차 부품은 항온 가공실에서 가공하고 3차원 측정기로 전수 검사합니다.",
-      "5-axis machines finish parts with angled holes and curved faces on several sides in one setup. ±0.01 mm parts are machined in the temperature-controlled room and fully inspected on the CMM.",
+      "여러 면에 경사 구멍이나 곡면이 있는 부품을 가공합니다. ±0.01mm 공차 부품은 항온 가공실에서 깎습니다.",
+      "Parts with angled holes or curved faces on several sides. ±0.01 mm parts are machined in the temperature-controlled room.",
     ),
     rows: [
       [l("최대 가공 크기", "Max. size"), l("600 × 500 × 400 mm", "600 × 500 × 400 mm")],
@@ -620,7 +620,7 @@ function Home() {
             {x("CNC 선반ㆍMCTㆍ5축 정밀부품 가공", "CNC turning, MCT and 5-axis precision parts")}
           </p>
           <p className="mt-4 max-w-[560px] text-[16px] md:text-[18px]" style={{ color: "#d4d8de" }}>
-            {x("반도체 장비, 의료기기, 2차전지 설비 부품을 시제품 1개부터 양산까지 가공합니다.", "We machine parts for semiconductor equipment, medical devices and battery lines, from a single prototype to volume production.")}
+            {x("반도체 장비, 의료기기, 2차전지 설비 부품을 가공합니다. 시제품은 1개도 받습니다.", "Parts for semiconductor equipment, medical devices and battery lines. Single prototypes welcome.")}
           </p>
           <div className="mt-8 flex flex-wrap gap-3">
             <button type="button" onClick={() => go("equipment", "machines")} className="inline-flex h-12 items-center rounded-[4px] px-6 font-bold" style={{ background: C.orange, color: C.steel }}>
@@ -670,7 +670,7 @@ function Home() {
             <button type="button" onClick={() => go("support", "quote")} className="flex h-[150px] flex-col justify-between rounded-[4px] p-4 text-left transition-[filter] hover:brightness-95 md:h-[190px] md:p-5" style={{ background: C.orange, color: C.steel }}>
               <span>
                 <span className="block text-[20px] font-bold md:text-[23px]">{x("견적문의", "Request a Quote")}</span>
-                <span className="mt-1 block text-[14px] leading-[1.5]">{x("도면 파일 첨부 접수, 소재와 수량을 함께 적어 주시면 견적이 빨라집니다.", "Attach your drawing with material and quantity for a faster quote.")}</span>
+                <span className="mt-1 block text-[14px] leading-[1.5]">{x("도면 파일 첨부 접수", "Drawing files accepted")}</span>
               </span>
               <span className="text-[22px] font-bold tabular-nums">{TEL}</span>
             </button>
@@ -1008,14 +1008,14 @@ function Greeting() {
         <p className="text-[19px] font-bold leading-[1.6] md:text-[21px]">{x("(주)○○정밀 홈페이지를 찾아 주셔서 감사합니다.", "Thank you for visiting ○○ Precision.")}</p>
         <p>
           {x(
-            "2009년 머시닝센터 두 대로 시작해 지금은 5축 가공기와 항온 가공실, 3차원 측정실을 갖추고 반도체 장비, 의료기기, 2차전지 설비 부품을 가공하고 있습니다.",
-            "We started in 2009 with two machining centers. Today we run 5-axis machines, a temperature-controlled machining room and a CMM room, making parts for semiconductor equipment, medical devices and battery lines.",
+            "2009년 머시닝센터 두 대로 시작했습니다. 지금은 반도체 장비, 의료기기, 2차전지 설비 부품을 가공하고 있습니다.",
+            "We started in 2009 with two machining centers. Today we make parts for semiconductor equipment, medical devices and battery lines.",
           )}
         </p>
         <p>
           {x(
-            "도면 검토와 가공, 표면 처리 협력사 관리, 측정 성적서 발행까지 한 곳에서 맡습니다. 도면에 빠진 치수나 가공이 어려운 형상은 견적 단계에서 먼저 말씀드립니다.",
-            "Drawing review, machining, surface treatment through partners and inspection reports are handled in one place. Missing dimensions or hard-to-machine features are raised at the quotation stage.",
+            "도면에 빠진 치수나 깎기 어려운 형상이 있으면 견적 드릴 때 먼저 말씀드리겠습니다.",
+            "If a drawing is missing dimensions or has features that are hard to machine, we will tell you when we quote.",
           )}
         </p>
         <p className="pt-4 text-right font-bold">{x("대표이사 김○○", "Kim ○○, CEO")}</p>
@@ -1340,8 +1340,8 @@ function Measuring() {
     <div>
       <p className="max-w-[860px]">
         {x(
-          "모든 가공기는 해마다 정도 검사를 받고, 측정기는 공인 교정기관에서 교정합니다. 출하하는 모든 로트는 3차원 측정기로 검사하고 요청하시면 측정 성적서를 함께 보내 드립니다.",
-          "All machines are checked for accuracy every year, and measuring instruments are calibrated by an accredited lab. Every lot is inspected on the CMM, and inspection reports are sent on request.",
+          "측정기는 해마다 공인 교정기관에서 교정합니다. 측정 성적서는 요청하시면 제품과 같이 보내 드립니다.",
+          "Measuring instruments are calibrated by an accredited lab every year. Inspection reports are shipped with the parts on request.",
         )}
       </p>
       <div className="mt-6">
@@ -2143,7 +2143,7 @@ function Quote() {
                     )}
                   </div>
                   <p id="q-file-hint" className="mt-1 text-[13px]" style={{ color: C.muted }}>
-                    {x("PDF, DWG, DXF, STEP, IGES, ZIP 파일 (최대 30MB). 데모 화면이라 파일은 어디에도 올리지 않습니다.", "PDF, DWG, DXF, STEP, IGES, ZIP (up to 30 MB). This is a demo, so files are not uploaded anywhere.")}
+                    {x("PDF, DWG, DXF, STEP, IGES, ZIP 파일 (최대 30MB)", "PDF, DWG, DXF, STEP, IGES, ZIP (up to 30 MB)")}
                   </p>
                   {errText("file")}
                 </div>
