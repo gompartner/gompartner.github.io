@@ -258,7 +258,6 @@ export function ImageCompressor() {
             }}
           />
         </label>
-        <p className="mt-2 text-[15px] leading-[1.6] text-foreground-secondary">사진은 이 브라우저 안에서만 줄이고 어디로도 보내지 않습니다. 촬영 위치 같은 정보도 함께 지워집니다.</p>
 
         <fieldset className="mt-8">
           <legend className="w-full border-b-2 border-foreground pb-2 text-[19px] font-bold">저장 형식</legend>
@@ -270,7 +269,7 @@ export function ImageCompressor() {
               </label>
             ))}
           </div>
-          <p className="mt-2 text-[15px] leading-[1.6] text-foreground-secondary">WebP가 가장 작습니다. 아주 오래된 브라우저까지 신경 써야 하면 JPG를 고르세요.</p>
+          <p className="mt-2 text-[15px] leading-[1.6] text-foreground-secondary">WebP가 가장 작고, 오래된 브라우저까지 생각하면 JPG가 무난합니다.</p>
         </fieldset>
 
         <fieldset className="mt-6">
@@ -283,7 +282,7 @@ export function ImageCompressor() {
               </label>
             ))}
           </div>
-          <p className="mt-2 text-[15px] leading-[1.6] text-foreground-secondary">첫 화면 큰 사진은 1920px, 본문 사진은 1280px, 목록 사진은 800px이면 충분합니다. 더 작은 사진은 늘리지 않습니다.</p>
+          <p className="mt-2 text-[15px] leading-[1.6] text-foreground-secondary">첫 화면 사진은 1920px, 본문 사진은 1280px, 목록 사진은 800px이면 됩니다.</p>
         </fieldset>
 
         <div className="mt-6">
@@ -305,14 +304,14 @@ export function ImageCompressor() {
             <span>용량 작게</span>
             <span>화질 좋게</span>
           </div>
-          <p className="mt-2 text-[15px] leading-[1.6] text-foreground-secondary">홈페이지용은 75~85가 알맞습니다. PNG로 저장할 때는 화질 설정이 적용되지 않습니다.</p>
+          <p className="mt-2 text-[15px] leading-[1.6] text-foreground-secondary">홈페이지용은 75~85면 됩니다. PNG는 화질 설정이 적용되지 않습니다.</p>
         </div>
       </div>
 
       <div className="min-w-0">
         {items.length === 0 ? (
           <div className="flex h-full min-h-[240px] items-center justify-center rounded-[10px] border border-dashed border-border p-6 text-center text-[17px] text-foreground-secondary">
-            사진을 넣으면 줄어든 용량과 비교 화면을 보여 드립니다.
+            선택한 사진이 없습니다.
           </div>
         ) : (
           <>
@@ -379,7 +378,7 @@ export function ImageCompressor() {
                     className="absolute inset-0 h-full w-full cursor-ew-resize opacity-0"
                   />
                 </div>
-                <p className="mt-2 text-[14px] text-foreground-secondary">사진 위를 좌우로 끌면 원본과 줄인 사진을 비교할 수 있습니다. 확대해서 글자나 얼굴이 뭉개지지 않는지 확인하세요.</p>
+                <p className="mt-2 text-[14px] text-foreground-secondary">사진 위를 좌우로 끌면 원본과 비교할 수 있습니다.</p>
               </section>
             )}
 

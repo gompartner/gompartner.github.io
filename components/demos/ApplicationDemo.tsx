@@ -318,7 +318,7 @@ function validate(step: number, f: FormData): Errors {
     if (!f.name.trim()) e.name = "성명은 필수 입력 항목입니다.";
     if (!/^01[016789]-?\d{3,4}-?\d{4}$/.test(f.phone.trim())) e.phone = "휴대전화번호 형식이 올바르지 않습니다. (예: 010-1234-5678)";
     if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(f.email.trim())) e.email = "이메일 형식이 올바르지 않습니다.";
-    if (!f.org.trim()) e.org = "소속은 필수 입력 항목입니다. 소속이 없으면 '개인'으로 입력합니다.";
+    if (!f.org.trim()) e.org = "소속은 필수 입력 항목입니다. 소속이 없으면 '개인'으로 입력해 주세요.";
   }
   if (step === 2) {
     if (!f.field) e.field = "희망 분야는 필수 선택 항목입니다.";

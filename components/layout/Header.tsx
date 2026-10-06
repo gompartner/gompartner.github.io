@@ -57,7 +57,7 @@ export function Header() {
     >
       <nav
         className="mx-auto flex h-16 w-full max-w-[1248px] items-center justify-between gap-4 px-4 md:px-6"
-        aria-label="메인 네비게이션"
+        aria-label="주 메뉴"
       >
         <Link
           href="/"

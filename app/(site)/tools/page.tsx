@@ -4,7 +4,7 @@ import { tools } from "@/data/tools";
 
 export const metadata: Metadata = {
   title: "자료실",
-  description: "개인정보처리방침·이용약관 생성기, 웹접근성 점검표, 검색 결과 미리보기, QR코드, 이미지 용량 줄이기와 JWT, 유닉스 시간, cron 개발 도구를 무료로 씁니다.",
+  description: "개인정보처리방침·이용약관 생성기, 웹접근성 점검표, 검색 결과 미리보기, QR코드, 이미지 용량 줄이기와 JWT, 유닉스 시간, cron 개발 도구를 무료로 쓸 수 있습니다.",
   alternates: { canonical: "/tools" },
 };
 

@@ -14,8 +14,8 @@ export const tours: Record<string, TourStep[]> = {
   ],
   "shop-admin": [
     { target: "#opt-title", title: "옵션관리", desc: "옵션 값을 더하거나 빼세요." },
-    { target: "#combo-title", title: "품목 목록", desc: "품목 여러 개를 골라 재고를 한 번에 넣으세요." },
-    { target: "#orders-title", title: "주문관리", desc: "주문을 골라 상태를 한꺼번에 바꾸세요." },
+    { target: "#combo-title", title: "품목 목록", desc: "품목을 여러 개 골라 재고를 같이 넣으세요." },
+    { target: "#orders-title", title: "주문관리", desc: "주문을 골라 상태를 바꾸세요." },
   ],
   pension: [
     { target: "#rooms", title: "객실 배치도", desc: "방을 누르세요." },
@@ -103,7 +103,7 @@ export const tours: Record<string, TourStep[]> = {
     { target: "#quick", title: "바로가기", desc: "추천 코스에서 관람 동선을 볼 수 있습니다." },
   ],
   "accessibility-review": [
-    { target: '[aria-label="비교 화면 선택"]', title: "개선 전후", desc: "개선 전과 후를 바꾸세요." },
+    { target: '[aria-label="비교 화면 선택"]', title: "개선 전후", desc: "개선 전과 개선 후를 번갈아 보세요." },
   ],
   "retirement-calculator": [
     { target: "#input-title", title: "내 정보", desc: "나이, 저축액, 생활비를 바꾸세요." },

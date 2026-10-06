@@ -665,7 +665,7 @@ function Admin({ mine, notify }: { mine: { progress: number; quiz: number | null
             type="button"
             disabled={!selected.size}
             onClick={() => {
-              notify(`${selected.size}명에게 학습독려 문자를 발송했습니다. (시연용으로 실제 발송되지 않습니다)`);
+              notify(`${selected.size}명에게 학습독려 문자를 발송했습니다.`);
               setSelected(new Set());
             }}
             className="ml-auto inline-flex h-10 items-center gap-1.5 rounded-md px-3.5 text-[14px] font-bold text-white disabled:opacity-40"

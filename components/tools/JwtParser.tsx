@@ -194,7 +194,6 @@ export function JwtParser() {
           <span style={{ color: COLORS.payload }}>■ 페이로드</span>
           <span style={{ color: COLORS.signature }}>■ 서명</span>
         </p>
-        <p className="mt-3 text-[15px] leading-[1.6] text-foreground-secondary">토큰과 비밀 키는 이 브라우저 안에서만 해석하고 어디로도 보내지 않습니다.</p>
 
         {parsed?.ok && hash && (
           <div className="mt-6 rounded-[10px] border border-border p-4">
@@ -242,7 +241,7 @@ export function JwtParser() {
       <div className="min-w-0" aria-live="polite">
         {!parsed && (
           <div className="flex h-full min-h-[240px] items-center justify-center rounded-[10px] border border-dashed border-border p-6 text-center text-[17px] text-foreground-secondary">
-            토큰을 붙여 넣으면 내용을 풀어 보여 드립니다.
+            입력한 토큰이 없습니다.
           </div>
         )}
         {parsed && !parsed.ok && (

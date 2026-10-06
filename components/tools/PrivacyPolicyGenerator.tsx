@@ -661,7 +661,7 @@ export function PrivacyPolicyGenerator() {
           </article>
         </div>
         <p className="mt-3 text-[14px] leading-[1.6] text-foreground-secondary">
-          이 문서는 작성을 돕기 위한 초안입니다. 실제로 수집하는 항목과 위탁 업체에 맞게 확인한 뒤 게시해 주세요. 입력한 내용은 이 브라우저에만 저장됩니다.
+          초안입니다. 실제로 수집하는 항목과 위탁 업체를 확인한 뒤 게시해 주세요.
         </p>
         <div className="mt-4 flex flex-wrap items-center justify-between gap-3 rounded-[10px] bg-surface p-5">
           <p className="text-[16px] font-bold">홈페이지에 바로 붙이거나 쇼핑몰 푸터를 고쳐야 하나요?</p>

@@ -4,7 +4,7 @@ export const profile: Profile = {
   name: "곰파트너",
   nameEn: "Gom Partner",
   title: "1인 웹 개발자",
-  bio: "1인 웹 개발자입니다. 홈페이지 구축, 기존 시스템 고도화, 유지보수, 업무 프로그램을 직접 작업합니다.",
+  bio: "1인 웹 개발자. 홈페이지 제작과 기존 시스템 고도화, 유지보수, 업무 프로그램 개발을 합니다.",
   location: "재택 · 온라인 미팅",
   email: "gompartner@gmail.com",
   avatarUrl: "",

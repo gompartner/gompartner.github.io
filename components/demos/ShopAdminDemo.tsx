@@ -522,7 +522,7 @@ function OptionsPanel({
 
         {tooMany ? (
           <p className="p-6 text-[16px]" style={{ color: C.danger }}>
-            품목 수가 {MAX_COMBOS.toLocaleString("ko-KR")}개를 초과했습니다. 옵션값을 줄이거나 옵션을 통합하십시오. 오픈마켓 연동 시 품목 수가 제한됩니다.
+            품목 수가 {MAX_COMBOS.toLocaleString("ko-KR")}개를 초과했습니다. 옵션값을 줄이거나 옵션을 합쳐 주십시오.
           </p>
         ) : (
           <>

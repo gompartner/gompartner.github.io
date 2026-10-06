@@ -320,7 +320,7 @@ export function ExcelAutomationDemo() {
       const rows = data.slice(1).map((r) => Array.from({ length: width }, (_, i) => String(r[i] ?? "")));
       load({ fileName: file.name, headers, rows, mapping: headers.map(guessField) }, `${file.name} 파일에서 ${rows.length}행을 불러왔습니다.`);
     } catch {
-      notify("파일을 읽을 수 없습니다. 암호 설정 여부를 확인하십시오.");
+      notify("파일을 읽을 수 없습니다. 암호가 걸린 파일인지 확인해 주세요.");
     }
   };
 
@@ -542,7 +542,7 @@ export function ExcelAutomationDemo() {
           {tab === "집계" && (
             <section aria-label="품목별 집계" className="bg-white p-5 md:p-6">
               <p className="text-[15px]" style={{ color: C.muted }}>
-                정상 {valid.length}행 기준 집계입니다. 오류 행은 집계에서 제외됩니다.
+                정상 {valid.length}행 기준 (오류 행 제외)
               </p>
               <ul className="mt-4 grid gap-3">
                 {byItem.map((it, i) => {

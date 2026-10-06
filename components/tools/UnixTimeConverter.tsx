@@ -267,7 +267,7 @@ export function UnixTimeConverter() {
           </div>
 
           <div className="mt-4" aria-live="polite">
-            {!toTs && <p className="rounded-md border border-dashed border-border px-4 py-6 text-center text-[16px] text-foreground-secondary">날짜를 고르면 유닉스 시간을 보여 드립니다.</p>}
+            {!toTs && <p className="rounded-md border border-dashed border-border px-4 py-6 text-center text-[16px] text-foreground-secondary">선택한 날짜가 없습니다.</p>}
             {toTs && !toTs.ok && (
               <p className="flex gap-2 rounded-md bg-[#fde7e9] px-4 py-3 text-[16px] leading-[1.6] text-[#b42318]">
                 <CircleAlert size={18} className="mt-1 shrink-0" aria-hidden />

@@ -274,12 +274,12 @@ export function RetirementDemo() {
               </p>
               {shortfall && (
                 <p className="mt-3 text-[16px] leading-[1.6] text-white/90">
-                  매월 <b className="text-white">{formatMan(result.extraMonthly)}</b>을 추가로 저축하면 목표 금액을 달성합니다.
+                  매월 <b className="text-white">{formatMan(result.extraMonthly)}</b>을 더 저축하면 목표 금액을 채울 수 있습니다.
                 </p>
               )}
               {result.depletedAge !== null && (
                 <p className="mt-2 text-[15px] leading-[1.6] text-white/85">
-                  현재 계획 기준 자산 소진 예상 연령은 {result.depletedAge}세입니다.
+                  지금 계획대로라면 {result.depletedAge}세에 자산이 바닥납니다.
                 </p>
               )}
             </div>
@@ -348,7 +348,7 @@ export function RetirementDemo() {
             <ConsultForm />
 
             <p className="px-1 text-[13px] leading-[1.6]" style={{ color: INK_3 }}>
-              계산 결과는 입력한 조건을 바탕으로 한 예상치이며 실제 수령액과 다를 수 있습니다. 은퇴 후 운용 수익률은 연 2.5%로 계산했습니다.
+              계산 결과는 입력한 조건을 바탕으로 한 예상치이며 실제 수령액과 다를 수 있습니다.
             </p>
           </section>
         </div>
@@ -549,7 +549,7 @@ function ConsultForm() {
         <div>
           <p className="text-[17px] font-bold">상담 신청이 접수되었습니다</p>
           <p className="mt-1 text-[15px] leading-[1.6]" style={{ color: INK_2 }}>
-            선택하신 {time}에 노후설계 전문 상담사가 연락드립니다.
+            {time}에 상담사가 연락드립니다.
           </p>
           <button
             type="button"

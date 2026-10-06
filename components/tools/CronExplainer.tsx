@@ -476,7 +476,7 @@ export function CronExplainer() {
             </tbody>
           </table>
           <p className="mt-3 text-[14px] leading-[1.6] text-foreground-secondary">
-            요일은 0과 7이 일요일입니다. 식에 ?가 있거나 7칸이면 Quartz 방식으로 보고 1을 일요일로 읽습니다. 일과 요일을 둘 다 지정하면 둘 중 하나만 맞아도 실행합니다.
+            요일은 0과 7이 일요일입니다. ?가 있거나 7칸이면 Quartz 방식으로 보고 1을 일요일로 읽습니다. 일과 요일을 둘 다 지정하면 하나만 맞아도 실행합니다.
           </p>
         </section>
       </div>
@@ -484,7 +484,7 @@ export function CronExplainer() {
       <div className="min-w-0" aria-live="polite">
         {!result && (
           <div className="flex min-h-[240px] items-center justify-center rounded-[10px] border border-dashed border-border p-6 text-center text-[17px] text-foreground-secondary">
-            cron 표현식을 넣으면 뜻을 풀어 드립니다.
+            입력한 표현식이 없습니다.
           </div>
         )}
         {result && !result.ok && (

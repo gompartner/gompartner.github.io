@@ -809,7 +809,7 @@ export function TermsGenerator() {
           </article>
         </div>
         <p className="mt-3 text-[14px] leading-[1.6] text-foreground-secondary">
-          공정거래위원회 표준약관 구성을 따른 초안이며 법률 자문을 대신하지 않습니다. 입력한 내용은 이 브라우저에만 저장됩니다.
+          공정거래위원회 표준약관 구성을 따른 초안이며 법률 자문을 대신하지 않습니다.
         </p>
         <div className="mt-4 flex flex-wrap items-center justify-between gap-3 rounded-[10px] bg-surface p-5">
           <p className="text-[16px] font-bold">약관을 홈페이지 회원가입 화면에 붙여야 하나요?</p>

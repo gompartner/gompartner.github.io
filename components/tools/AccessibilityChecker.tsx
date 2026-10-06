@@ -166,7 +166,7 @@ export function AccessibilityChecker() {
           </div>
         </div>
         <p className="mt-3 text-[14px] leading-[1.6] text-foreground-secondary print:hidden">
-          담당자가 스스로 점검하는 표입니다. 웹접근성 인증 심사를 대신하지 않으며, 답변은 이 브라우저에만 저장됩니다.
+          자가 점검표이며 웹접근성 인증 심사를 대신하지 않습니다.
         </p>
         <div className="mt-4 flex flex-wrap items-center justify-between gap-3 rounded-[10px] bg-surface p-5 print:hidden">
           <p className="text-[16px] font-bold">고칠 항목이 많거나 인증 심사를 앞두고 있나요?</p>

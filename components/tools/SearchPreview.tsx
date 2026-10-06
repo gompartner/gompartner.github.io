@@ -152,7 +152,7 @@ export function SearchPreview() {
 
         <fieldset className="mt-8 grid gap-4">
           <legend className="w-full border-b-2 border-foreground pb-2 text-[19px] font-bold">검색 결과 문구</legend>
-          <p className="text-[15px] leading-[1.6] text-foreground-secondary">비워 두면 위 정보로 추천 문구를 만듭니다. 직접 쓰면 그 문구로 보여 드립니다.</p>
+          <p className="text-[15px] leading-[1.6] text-foreground-secondary">비워 두면 위 정보로 추천 문구를 만듭니다.</p>
           <label className="block text-[16px] font-bold">
             <span className="flex justify-between">
               제목<span className="font-normal tabular-nums text-foreground-secondary">{len(title)}자</span>
@@ -257,7 +257,7 @@ export function SearchPreview() {
         </section>
 
         <div className="mt-6 rounded-[10px] bg-surface p-5">
-          <h2 className="text-[17px] font-bold">검색에 나오려면 등록도 해야 합니다</h2>
+          <h2 className="text-[17px] font-bold">검색엔진 등록</h2>
           <ul className="mt-2 grid gap-1.5 text-[16px] leading-[1.6] text-foreground-secondary">
             <li>
               네이버:{" "}

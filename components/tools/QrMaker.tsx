@@ -331,7 +331,7 @@ export function QrMaker() {
               aria-label={data ? "만든 QR코드" : ""}
               className={`h-auto w-full max-w-[320px] bg-white ${data && !error ? "" : "hidden"}`}
             />
-            {(!data || error) && <p className="text-center text-[16px] text-foreground-secondary">{error || "내용을 넣으면 QR코드가 나타납니다."}</p>}
+            {(!data || error) && <p className="text-center text-[16px] text-foreground-secondary">{error || "입력한 내용이 없습니다."}</p>}
           </div>
           <div className="mt-4 flex flex-wrap gap-2">
             <button type="button" onClick={downloadPng} disabled={!data || !!error} className="inline-flex h-11 items-center gap-1.5 rounded-md bg-accent px-4 text-[15px] font-bold text-accent-foreground hover:bg-accent-hover disabled:opacity-40">
@@ -344,7 +344,7 @@ export function QrMaker() {
             </button>
           </div>
           <p className="mt-3 text-[14px] leading-[1.6] text-foreground-secondary">
-            인쇄소에 넘길 때는 SVG가 깨지지 않습니다. 만든 QR은 기간 제한이 없고 접속 기록도 남기지 않습니다.
+            인쇄용은 SVG로 받으면 깨지지 않습니다. 기간 제한 없이 계속 쓸 수 있습니다.
           </p>
         </section>
 

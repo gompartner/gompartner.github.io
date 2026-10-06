@@ -86,7 +86,7 @@ const INITIAL_STATE: State = {
       chartNo: "2026-0412",
       sessions: [
         { id: "s1", date: "2026-08-21", scores: SAMPLE_PREV, memo: "" },
-        { id: "s2", date: "2026-09-25", scores: SAMPLE_NOW, memo: "4주 전 대비 수분과 톤이 개선되었습니다. 현재 홈케어 유지를 권합니다." },
+        { id: "s2", date: "2026-09-25", scores: SAMPLE_NOW, memo: "4주 전보다 수분과 톤이 좋아짐. 지금 홈케어 그대로 유지." },
       ],
     },
     { id: "c2", name: "이도윤", gender: "남", age: 42, chartNo: "2026-0588", sessions: [] },
