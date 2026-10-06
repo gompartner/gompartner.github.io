@@ -18,11 +18,11 @@ import { useReducedMotionSafe } from "@/hooks/useReducedMotionSafe";
    예약 확인은 영수증 모양으로 보여 준다.
 
    빵 나오는 시간은 8시부터 20시까지를 한 바퀴로 그린 오븐 시계에 점으로 찍는다.
-   상품 카드에도 같은 계산으로 판매 중·남은 개수·나올 예정 시간을 붙인다.
+   상품 카드에는 같은 계산으로 판매 중·남은 개수·나오는 시간을 글자로 적고, 품절만 배지로 띄운다.
    픽업 시간은 담은 빵이 처음 나오는 시간 뒤로만 고를 수 있다.
 
    사진 출처(public/images/demo-bakery):
-   AI 생성(Z-Image-Turbo, Apache 2.0) hero, display */
+   AI 생성(Z-Image-Turbo, Apache 2.0) hero, display, menu/*.jpg(빵마다 1장) */
 
 const IMG = "/images/demo-bakery";
 const BAKERY = "○○ 베이커리";
@@ -81,27 +81,11 @@ function clockOf(minute: number) {
 
 const hhmm = (m: number) => `${String(Math.floor(m / 60)).padStart(2, "0")}:${String(m % 60).padStart(2, "0")}`;
 
-function untilText(diff: number) {
-  if (diff < 60) return `${diff}분 뒤`;
-  const h = Math.floor(diff / 60);
-  const r = diff % 60;
-  return r ? `${h}시간 ${r}분 뒤` : `${h}시간 뒤`;
-}
-
 type Clock = ReturnType<typeof clockOf>;
-
-function shopStatus(clock: Clock) {
-  if (!clock) return null;
-  if (clock.day === 1) return { open: false, text: "정기휴무 (월요일)" };
-  if (clock.m < OPEN) return { open: false, text: "영업 전 · 08:00 영업 시작" };
-  if (clock.m >= CLOSE) return { open: false, text: "영업 종료" };
-  return { open: true, text: "영업중 · 20:00까지" };
-}
 
 /* ---------- 빵 ---------- */
 
 type Allergen = "milk" | "egg" | "nut" | "wheat";
-type Shape = "bun" | "crescent" | "loaf" | "ring" | "bar" | "tart" | "block";
 type Cat = "meal" | "pastry" | "sweet" | "baked";
 
 const CATS: { id: Cat | "all"; label: string }[] = [
@@ -117,8 +101,6 @@ interface Bread {
   name: string;
   price: number;
   cat: Cat;
-  shape: Shape;
-  color: string;
   allergens: Allergen[];
   /** 몇 분마다 하나씩 팔리는지. 남은 개수 계산에만 쓴다. */
   sellEvery: number;
@@ -126,28 +108,30 @@ interface Bread {
 }
 
 const BREADS: Bread[] = [
-  { id: "salt", name: "소금빵", price: 3200, cat: "pastry", shape: "crescent", color: "#d99a4e", allergens: ["milk", "wheat"], sellEvery: 5, desc: "버터를 말아 굽고 굵은 소금을 올립니다." },
-  { id: "croissant", name: "크루아상", price: 4200, cat: "pastry", shape: "crescent", color: "#c27630", allergens: ["milk", "egg", "wheat"], sellEvery: 8, desc: "사흘 동안 반죽을 접어 결이 스물일곱 겹입니다." },
-  { id: "campagne", name: "깜파뉴", price: 7500, cat: "meal", shape: "loaf", color: "#a8682f", allergens: ["wheat"], sellEvery: 25, desc: "통밀과 호밀을 섞어 48시간 저온 발효합니다." },
-  { id: "fig", name: "무화과 호두 깜파뉴", price: 8500, cat: "meal", shape: "loaf", color: "#8f5228", allergens: ["wheat", "nut"], sellEvery: 25, desc: "말린 무화과와 구운 호두를 듬뿍 넣었습니다." },
-  { id: "bagel", name: "플레인 베이글", price: 3500, cat: "meal", shape: "ring", color: "#d4a061", allergens: ["wheat"], sellEvery: 12, desc: "데쳐서 구워 겉은 단단하고 속은 쫄깃합니다." },
-  { id: "pretzel", name: "버터 프레첼", price: 4000, cat: "pastry", shape: "ring", color: "#7a3f17", allergens: ["milk", "wheat"], sellEvery: 12, desc: "가운데를 갈라 차가운 버터를 끼웠습니다." },
-  { id: "redbean", name: "단팥빵", price: 3000, cat: "sweet", shape: "bun", color: "#b86a2a", allergens: ["milk", "egg", "wheat"], sellEvery: 10, desc: "국산 팥을 덜 달게 졸여 꽉 채웁니다." },
-  { id: "cream", name: "우유 크림빵", price: 3500, cat: "sweet", shape: "bun", color: "#e0a95c", allergens: ["milk", "egg", "wheat"], sellEvery: 9, desc: "주문이 들어오면 크림을 채워 드립니다." },
-  { id: "milkbread", name: "우유식빵", price: 5500, cat: "meal", shape: "block", color: "#e3b877", allergens: ["milk", "wheat"], sellEvery: 15, desc: "물 대신 우유로 반죽해 결대로 찢어집니다." },
-  { id: "castella", name: "쌀 카스텔라", price: 6000, cat: "baked", shape: "block", color: "#e6b54a", allergens: ["milk", "egg"], sellEvery: 18, desc: "밀가루 없이 쌀가루와 달걀로 굽습니다." },
-  { id: "financier", name: "휘낭시에", price: 2500, cat: "baked", shape: "bar", color: "#c98a3d", allergens: ["milk", "egg", "nut", "wheat"], sellEvery: 6, desc: "갈색이 나도록 끓인 버터와 아몬드 가루로 굽습니다." },
-  { id: "tart", name: "에그타르트", price: 3000, cat: "sweet", shape: "tart", color: "#f0bb3c", allergens: ["milk", "egg", "wheat"], sellEvery: 7, desc: "겹겹이 부서지는 반죽에 커스터드를 채웁니다." },
+  { id: "salt", name: "소금빵", price: 3200, cat: "pastry", allergens: ["milk", "wheat"], sellEvery: 5, desc: "버터를 말아 굽고 굵은 소금을 올립니다." },
+  { id: "croissant", name: "크루아상", price: 4200, cat: "pastry", allergens: ["milk", "egg", "wheat"], sellEvery: 8, desc: "사흘 동안 반죽을 접어 결이 스물일곱 겹입니다." },
+  { id: "campagne", name: "깜파뉴", price: 7500, cat: "meal", allergens: ["wheat"], sellEvery: 25, desc: "통밀과 호밀을 섞어 48시간 저온 발효합니다." },
+  { id: "fig", name: "무화과 호두 깜파뉴", price: 8500, cat: "meal", allergens: ["wheat", "nut"], sellEvery: 25, desc: "말린 무화과와 구운 호두를 듬뿍 넣었습니다." },
+  { id: "bagel", name: "플레인 베이글", price: 3500, cat: "meal", allergens: ["wheat"], sellEvery: 12, desc: "데쳐서 구워 겉은 단단하고 속은 쫄깃합니다." },
+  { id: "pretzel", name: "버터 프레첼", price: 4000, cat: "pastry", allergens: ["milk", "wheat"], sellEvery: 12, desc: "가운데를 갈라 차가운 버터를 끼웠습니다." },
+  { id: "redbean", name: "단팥빵", price: 3000, cat: "sweet", allergens: ["milk", "egg", "wheat"], sellEvery: 10, desc: "국산 팥을 덜 달게 졸여 꽉 채웁니다." },
+  { id: "cream", name: "우유 크림빵", price: 3500, cat: "sweet", allergens: ["milk", "egg", "wheat"], sellEvery: 9, desc: "주문이 들어오면 크림을 채워 드립니다." },
+  { id: "milkbread", name: "우유식빵", price: 5500, cat: "meal", allergens: ["milk", "wheat"], sellEvery: 15, desc: "물 대신 우유로 반죽해 결대로 찢어집니다." },
+  { id: "castella", name: "쌀 카스텔라", price: 6000, cat: "baked", allergens: ["milk", "egg"], sellEvery: 18, desc: "밀가루 없이 쌀가루와 달걀로 굽습니다." },
+  { id: "financier", name: "휘낭시에", price: 2500, cat: "baked", allergens: ["milk", "egg", "nut", "wheat"], sellEvery: 6, desc: "갈색이 나도록 끓인 버터와 아몬드 가루로 굽습니다." },
+  { id: "tart", name: "에그타르트", price: 3000, cat: "sweet", allergens: ["milk", "egg", "wheat"], sellEvery: 7, desc: "겹겹이 부서지는 반죽에 커스터드를 채웁니다." },
 ];
+
+const breadImg = (id: string) => `${IMG}/menu/${id}.jpg`;
 
 const BREAD_BY_ID = Object.fromEntries(BREADS.map((b) => [b.id, b])) as Record<string, Bread>;
 
 /** 몽소식 짧은 재료 표기 */
 function allergyTags(b: Bread) {
   const tags: string[] = [];
-  if (!b.allergens.includes("milk")) tags.push("NO 우유");
-  if (!b.allergens.includes("egg")) tags.push("NO 계란");
-  tags.push(b.allergens.includes("wheat") ? "글루텐 함유" : "NO 밀가루");
+  if (!b.allergens.includes("milk")) tags.push("우유 없음");
+  if (!b.allergens.includes("egg")) tags.push("달걀 없음");
+  tags.push(b.allergens.includes("wheat") ? "밀 함유" : "밀가루 없음");
   if (b.allergens.includes("nut")) tags.push("견과 함유");
   return tags;
 }
@@ -199,7 +183,7 @@ function stateText(s: BatchState) {
     case "closed":
       return "오늘 휴무";
     case "soon":
-      return `${untilText(s.diff)} 나올 예정`;
+      return "나올 예정";
     case "out":
       return s.left > 0 ? `판매 중 · ${s.left}개 남음` : "품절";
   }
@@ -306,11 +290,11 @@ export function BakeryCafeDemo() {
       <Header view={view} count={count} onGo={go} />
       {view === "home" ? (
         <main>
-          <Banner clock={clock} onGo={go} />
+          <Banner onGo={go} />
           <Oven clock={clock} onAdd={(id) => add(id, 1)} />
           <MenuGrid clock={clock} cart={cart} onAdd={add} onGo={go} />
           <About />
-          <Store clock={clock} />
+          <Store />
         </main>
       ) : (
         <main>
@@ -464,10 +448,7 @@ function nextBatch(clock: Clock) {
   return BATCHES.find((b) => b.at > clock.m) ?? null;
 }
 
-function Banner({ clock, onGo }: { clock: Clock; onGo: (target: string) => void }) {
-  const status = shopStatus(clock);
-  const next = nextBatch(clock);
-
+function Banner({ onGo }: { onGo: (target: string) => void }) {
   return (
     <section id="top" aria-labelledby="bakery-name" className="relative">
       <div className="relative h-[400px] md:h-[480px]">
@@ -490,22 +471,14 @@ function Banner({ clock, onGo }: { clock: Clock; onGo: (target: string) => void 
       </div>
       <div className="border-b" style={{ background: C.paper, borderColor: C.line }}>
         <div className="mx-auto flex min-h-[52px] max-w-[1200px] flex-wrap items-center justify-center gap-x-5 gap-y-1 px-4 py-2 text-[15px] md:px-6">
-          {status ? (
-            <>
-              <span className="inline-flex items-center gap-1.5 font-semibold" style={{ color: status.open ? C.green : C.muted }}>
-                <Clock3 size={16} aria-hidden />
-                {status.text}
-              </span>
-              {next && clock && (
-                <span>
-                  다음 빵 <strong className="tabular-nums">{hhmm(next.at)}</strong> {BREAD_BY_ID[next.bread].name}
-                  <span style={{ color: C.muted }}> ({untilText(next.at - clock.m)})</span>
-                </span>
-              )}
-            </>
-          ) : (
-            <span aria-hidden> </span>
-          )}
+          <span className="inline-flex items-center gap-1.5 font-semibold">
+            <Clock3 size={16} aria-hidden />
+            화요일 ~ 일요일 08:00 ~ 20:00
+          </span>
+          <span style={{ color: C.muted }}>월요일 정기휴무</span>
+          <a href={`tel:${TEL}`} className="font-semibold tabular-nums" style={{ color: C.crust }}>
+            {TEL}
+          </a>
         </div>
       </div>
     </section>
@@ -708,9 +681,8 @@ function Oven({ clock: realClock, onAdd }: { clock: Clock; onAdd: (id: string) =
 
           <div>
             <div className="flex items-start gap-4 rounded-[10px] border p-5" style={{ background: C.paper, borderColor: C.line }}>
-              <svg viewBox="-40 -30 80 60" className="h-[60px] w-[80px] shrink-0" aria-hidden>
-                <BreadShape shape={bread.shape} color={bread.color} />
-              </svg>
+              {/* eslint-disable-next-line @next/next/no-img-element */}
+              <img src={breadImg(bread.id)} alt={bread.name} loading="lazy" className="h-[88px] w-[88px] shrink-0 rounded-[6px] object-cover" />
               <div className="min-w-0 flex-1">
                 <p className="text-[14px] font-semibold tabular-nums" style={{ color: C.crust }}>
                   {hhmm(sel.at)} · {sel.qty}개
@@ -768,89 +740,24 @@ function Oven({ clock: realClock, onAdd }: { clock: Clock; onAdd: (id: string) =
   );
 }
 
-/* ---------- 빵 그림 ---------- */
-
-function BreadShape({ shape, color }: { shape: Shape; color: string }) {
-  const shade = "rgba(80,40,10,0.35)";
-  const shine = "rgba(255,240,200,0.55)";
-  switch (shape) {
-    case "crescent":
-      return (
-        <g>
-          <path d="M-30 10 Q-18 -22 0 -20 Q18 -22 30 10 Q20 4 12 6 Q0 -2 -12 6 Q-20 4 -30 10Z" fill={color} />
-          <path d="M-10 -14 L-6 4 M0 -18 V0 M10 -14 L6 4" stroke={shade} strokeWidth="2" strokeLinecap="round" />
-          <path d="M-14 -12 Q-4 -18 6 -16" stroke={shine} strokeWidth="2.5" fill="none" strokeLinecap="round" />
-        </g>
-      );
-    case "loaf":
-      return (
-        <g>
-          <ellipse cx="0" cy="2" rx="32" ry="18" fill={color} />
-          <path d="M-16 -6 Q-12 4 -8 10 M-2 -10 Q2 2 6 10 M12 -8 Q15 0 18 6" stroke="#f3e2c0" strokeWidth="2.5" fill="none" strokeLinecap="round" />
-        </g>
-      );
-    case "ring":
-      return (
-        <g>
-          <circle cx="0" cy="0" r="21" fill={color} />
-          <circle cx="0" cy="0" r="7" fill={C.kraft} />
-          <path d="M-14 -10 Q-4 -18 8 -16" stroke={shine} strokeWidth="2.5" fill="none" strokeLinecap="round" />
-        </g>
-      );
-    case "bar":
-      return (
-        <g>
-          <rect x="-24" y="-12" width="48" height="24" rx="5" fill={color} />
-          <rect x="-20" y="-8" width="40" height="5" rx="2.5" fill={shine} />
-        </g>
-      );
-    case "tart":
-      return (
-        <g>
-          <circle cx="0" cy="0" r="21" fill="#d9a35a" />
-          <circle cx="0" cy="0" r="15" fill={color} />
-          <circle cx="-4" cy="-3" r="5" fill="#b8641c" opacity="0.6" />
-        </g>
-      );
-    case "block":
-      return (
-        <g>
-          <path d="M-24 18 V-6 Q-24 -20 -10 -20 Q0 -26 10 -20 Q24 -20 24 -6 V18Z" fill={color} />
-          <path d="M-18 -8 Q0 -16 18 -8" stroke={shine} strokeWidth="2.5" fill="none" strokeLinecap="round" />
-        </g>
-      );
-    default:
-      return (
-        <g>
-          <ellipse cx="0" cy="2" rx="25" ry="20" fill={color} />
-          <ellipse cx="-6" cy="-6" rx="10" ry="5" fill={shine} />
-          <circle cx="4" cy="2" r="1.6" fill={shade} />
-          <circle cx="-2" cy="6" r="1.6" fill={shade} />
-        </g>
-      );
-  }
-}
-
 /* ---------- 메뉴 (분류 탭 + 상품 격자) ---------- */
 
+/** 품절만 배지로 띄우고 나머지 상태는 글자로 적는다. */
 function nowBadge(s: BreadNow): { text: string; color: string; bg: string } | null {
-  switch (s.kind) {
-    case "unknown":
-      return null;
-    case "closed":
-      return { text: s.text, color: C.muted, bg: C.kraft };
-    case "sale":
-      return { text: "판매 중", color: "#fff", bg: C.green };
-    case "soon":
-      return { text: `${hhmm(s.at)} 나올 예정`, color: C.ink, bg: C.butter };
-    case "soldout":
-      return { text: "품절", color: "#fff", bg: "#8a7a68" };
-  }
+  return s.kind === "soldout" ? { text: "품절", color: "#fff", bg: "#8a7a68" } : null;
 }
 
 function nowLine(s: BreadNow) {
-  if (s.kind === "sale") return `${s.left}개 남음${s.next !== null ? ` · 다음 ${hhmm(s.next)}` : ""}`;
-  return "";
+  switch (s.kind) {
+    case "sale":
+      return `판매 중 · ${s.left}개 남음`;
+    case "soon":
+      return `${hhmm(s.at)} 나옴`;
+    case "closed":
+      return s.text;
+    default:
+      return "";
+  }
 }
 
 function MenuGrid({
@@ -923,10 +830,9 @@ function MenuGrid({
             const badge = nowBadge(s);
             return (
               <li key={b.id} className="flex flex-col">
-                <div className="relative flex aspect-square items-center justify-center rounded-[8px]" style={{ background: C.kraft, outline: n ? `2px solid ${C.crust}` : undefined }}>
-                  <svg viewBox="-40 -30 80 60" className="w-[62%]" aria-hidden>
-                    <BreadShape shape={b.shape} color={b.color} />
-                  </svg>
+                <div className="relative aspect-square overflow-hidden rounded-[8px]" style={{ background: C.kraft, outline: n ? `2px solid ${C.crust}` : undefined, outlineOffset: n ? 2 : undefined }}>
+                  {/* eslint-disable-next-line @next/next/no-img-element */}
+                  <img src={breadImg(b.id)} alt={b.name} loading="lazy" className="h-full w-full object-cover" />
                   {badge && (
                     <span className="absolute left-2 top-2 rounded-[4px] px-1.5 py-0.5 text-[12px] font-bold" style={{ color: badge.color, background: badge.bg }}>
                       {badge.text}
@@ -938,7 +844,7 @@ function MenuGrid({
                 <p className="text-[13px] leading-[1.5]" style={{ color: C.muted }}>
                   {allergyTags(b).join(" · ")}
                 </p>
-                <p className="min-h-[20px] text-[13px] font-semibold tabular-nums" style={{ color: C.green }}>
+                <p className="min-h-[20px] text-[13px] font-semibold tabular-nums" style={{ color: s.kind === "sale" ? C.green : C.muted }}>
                   {nowLine(s)}
                 </p>
                 <div className="mt-auto pt-2">
@@ -1190,11 +1096,8 @@ function PickupOrder({
                 const b = BREAD_BY_ID[id];
                 return (
                   <li key={id} className="flex items-center gap-3 px-3 py-3" style={{ borderColor: C.line }}>
-                    <span className="flex h-12 w-12 shrink-0 items-center justify-center rounded-[6px]" style={{ background: C.kraft }}>
-                      <svg viewBox="-40 -30 80 60" className="w-10" aria-hidden>
-                        <BreadShape shape={b.shape} color={b.color} />
-                      </svg>
-                    </span>
+                    {/* eslint-disable-next-line @next/next/no-img-element */}
+                    <img src={breadImg(id)} alt={b.name} loading="lazy" className="h-12 w-12 shrink-0 rounded-[6px] object-cover" style={{ background: C.kraft }} />
                     <span className="min-w-0 flex-1">
                       <span className="block truncate font-semibold">{b.name}</span>
                       <span className="block text-[14px] tabular-nums" style={{ color: C.muted }}>
@@ -1602,8 +1505,7 @@ function MiniMap() {
   );
 }
 
-function Store({ clock }: { clock: Clock }) {
-  const status = shopStatus(clock);
+function Store() {
   return (
     <section aria-labelledby="store-title" id="store" className="scroll-mt-16 px-4 py-14 md:px-6 md:py-20" style={{ background: C.kraft }}>
       <div className="mx-auto max-w-[1200px]">
@@ -1643,11 +1545,6 @@ function Store({ clock }: { clock: Clock }) {
                 ))}
               </tbody>
             </table>
-            {status && (
-              <p className="mt-3 text-[15px] font-semibold" style={{ color: status.open ? C.green : C.crustDeep }}>
-                {status.text}
-              </p>
-            )}
             <a href={`tel:${TEL}`} className="mt-5 inline-flex h-12 items-center gap-2 rounded-[6px] px-6 font-semibold" style={{ background: C.crust, color: "#fff" }}>
               <Phone size={18} aria-hidden />
               {TEL}
