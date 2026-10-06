@@ -656,9 +656,6 @@ function Home() {
               <p className="mt-2 text-[16px] font-bold md:text-[18px]" style={{ color: C.cyan }}>
                 KC인증 지정시험기관 · KOLAS 공인시험기관
               </p>
-              <p className="mt-2 max-w-[560px] text-[15px] md:text-[17px]" style={{ color: "#c8cdea" }}>
-                전자파(EMC), 무선(RF), 전기안전 시험과 국내·해외 인증 업무를 합니다.
-              </p>
             </div>
             <form id="cl-track-quick" onSubmit={quick} className="rounded-[10px] bg-white p-4 md:p-5" style={{ color: C.ink }}>
               <label htmlFor="cl-quick-no" className="flex items-center gap-2 text-[16px] font-bold">
@@ -1015,8 +1012,8 @@ function Greeting() {
       </div>
       <div className="mt-8 space-y-4">
         <p className="text-[19px] font-bold leading-[1.6]">{COMPANY} 홈페이지를 찾아 주셔서 감사합니다.</p>
-        <p>{COMPANY}은 전자파 시험실 하나로 시작해 지금은 무선, 전기안전, 해외인증까지 맡는 KC인증 지정시험기관이자 KOLAS 공인시험기관입니다.</p>
-        <p>시료가 들어온 날 시험 일정을 정해 알려 드리고, 기준을 넘는 항목이 나오면 원인 주파수와 대책을 함께 말씀드립니다. 처음 인증을 받는 회사도 서류 준비부터 차례로 안내해 드립니다.</p>
+        <p>{COMPANY}은 전자파 시험실로 문을 열었고, 지금은 무선과 전기안전 시험, 해외인증 업무도 함께 하고 있습니다.</p>
+        <p>기준을 넘는 항목이 나오면 원인과 대책을 함께 말씀드립니다. 인증이 처음인 회사도 편하게 문의해 주십시오.</p>
         <p className="pt-4 text-right font-bold">대표이사 김○○</p>
       </div>
     </div>
@@ -1381,7 +1378,7 @@ const SERVICES = [
   {
     code: "GMA",
     name: "해외 시장 인증 대행",
-    body: "국가별로 다른 인증 서류와 표시 방법을 정리하고, 현지 인증기관 신청과 대리인 업무를 대신합니다.",
+    body: "국가별 인증 서류를 준비하고 현지 인증기관 신청과 대리인 업무를 맡습니다.",
     tests: ["국가별 요구사항 검토", "기술 문서 작성", "현지 기관 신청", "인증서 갱신 관리"],
     std: "북미, 유럽, 아시아 등 60여 개국",
   },
@@ -3146,7 +3143,7 @@ function QuoteForm({ onList }: { onList: () => void }) {
                   )}
                 </div>
                 <p id="q-file-hint" className="mt-1 text-[13px]" style={{ color: C.muted }}>
-                  PDF, 한글, 워드, 엑셀, 이미지, ZIP 파일 (최대 20MB). 데모 화면이라 파일은 어디에도 올리지 않습니다.
+                  PDF, 한글, 워드, 엑셀, 이미지, ZIP 파일 (최대 20MB).
                 </p>
                 {errText("file")}
               </div>
