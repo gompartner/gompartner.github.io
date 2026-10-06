@@ -6,7 +6,7 @@ import { Download, PackageCheck, Plus, RotateCcw, Search, Trash2, Truck, X } fro
 import { useLocalStorage } from "@/hooks/useLocalStorage";
 import { useReducedMotionSafe } from "@/hooks/useReducedMotionSafe";
 
-const STORAGE_KEY = "gs-demo:shop-admin:v1";
+const STORAGE_KEY = "gs-demo:shop-admin:v2";
 
 /* 생활용품 쇼핑몰 관리자 데모.
    옵션 단계(최대 5단계)를 입력하면 조합표가 자동으로 만들어지고, 조합별 재고와 판매 여부를 관리한다.
@@ -15,7 +15,7 @@ const STORAGE_KEY = "gs-demo:shop-admin:v1";
 
    커머스 판매자 관리자 형태: 왼쪽 짙은 메뉴, 흰 패널, 파란 조작색.
    색 (흰 패널 기준 대비): 본문 #111827(17:1), 보조 #4b5563(7.6:1), 조작 #1d4ed8(6.7:1, 버튼은 흰 글자),
-   상태 결제완료 #1d4ed8, 상품준비 #8a5a00, 배송중 #0f6e7a, 배송완료 #4b5563, 취소요청 #b42318 */
+   상태 입금확인 #1d4ed8, 배송준비중 #8a5a00, 배송중 #0f6e7a, 배송완료 #4b5563, 취소신청 #b42318 */
 
 const C = {
   bg: "#f3f4f6",
@@ -29,7 +29,7 @@ const C = {
   actionSoft: "#e8eefc",
   danger: "#b42318",
   warn: "#8a5a00",
-  status: { 결제완료: "#1d4ed8", 상품준비: "#8a5a00", 배송중: "#0f6e7a", 배송완료: "#4b5563", 취소요청: "#b42318" },
+  status: { 입금확인: "#1d4ed8", 배송준비중: "#8a5a00", 배송중: "#0f6e7a", 배송완료: "#4b5563", 취소신청: "#b42318" },
 } as const;
 
 // 색상 옵션은 실제 색 칩으로 보여 준다
@@ -69,7 +69,7 @@ const MAX_GROUPS = 5;
 const MAX_COMBOS = 1000;
 const PAGE = 60;
 
-const STATUSES = ["결제완료", "상품준비", "배송중", "배송완료", "취소요청"] as const;
+const STATUSES = ["입금확인", "배송준비중", "배송중", "배송완료", "취소신청"] as const;
 type Status = (typeof STATUSES)[number];
 
 
@@ -119,7 +119,7 @@ function makeOrders(): Order[] {
     [0, 0, 0, 0, 0], [1, 1, 1, 1, 1], [2, 0, 1, 0, 0], [0, 1, 0, 1, 1], [1, 0, 0, 0, 0], [2, 1, 1, 1, 0],
     [0, 0, 1, 0, 1], [1, 1, 0, 0, 0], [2, 0, 0, 1, 1], [0, 1, 1, 0, 0], [1, 0, 1, 1, 0], [2, 1, 0, 0, 1],
   ];
-  const statuses: Status[] = ["결제완료", "결제완료", "결제완료", "결제완료", "결제완료", "상품준비", "상품준비", "상품준비", "배송중", "배송중", "배송완료", "배송완료", "배송완료", "취소요청"];
+  const statuses: Status[] = ["입금확인", "입금확인", "입금확인", "입금확인", "입금확인", "배송준비중", "배송준비중", "배송준비중", "배송중", "배송중", "배송완료", "배송완료", "배송완료", "취소신청"];
   return Array.from({ length: 28 }, (_, i) => {
     const p = picks[i % picks.length];
     const values = initialGroups.map((g, gi) => g.values[p[gi] % g.values.length]);
@@ -210,11 +210,11 @@ export function ShopAdminDemo() {
     >
       <aside className="fixed inset-y-0 left-0 hidden w-56 flex-col border-r px-4 py-5 lg:flex" style={{ background: C.text, borderColor: C.rule }}>
           <p className="px-2 text-[15px] font-bold text-white">○○ 리빙</p>
-          <p className="px-2 text-[13px]" style={{ color: "#9ca3af" }}>판매자 관리자</p>
+          <p className="px-2 text-[13px]" style={{ color: "#9ca3af" }}>쇼핑몰 관리자</p>
           <nav aria-label="관리 메뉴" className="mt-8 grid gap-1">
             {[
-              ["options", "상품 옵션"],
-              ["orders", "주문 관리"],
+              ["options", "옵션관리"],
+              ["orders", "주문관리"],
             ].map(([id, label]) => (
               <button
                 key={id}
@@ -235,7 +235,7 @@ export function ShopAdminDemo() {
             <p className="text-[13px] font-bold lg:hidden" style={{ color: C.action }}>
               ○○ 리빙 관리자
             </p>
-            <h1 className="text-[20px] font-bold leading-tight md:text-[24px]">{tab === "options" ? "상품 옵션" : "주문 관리"}</h1>
+            <h1 className="text-[20px] font-bold leading-tight md:text-[24px]">{tab === "options" ? "옵션관리" : "주문관리"}</h1>
           </div>
           <button
             type="button"
@@ -244,7 +244,7 @@ export function ShopAdminDemo() {
             style={{ borderColor: C.rule, color: C.muted }}
           >
             <RotateCcw size={15} aria-hidden />
-            처음 상태로
+            초기화
           </button>
         </div>
       </header>
@@ -252,10 +252,10 @@ export function ShopAdminDemo() {
       <main className="mx-auto max-w-[1200px] px-4 md:px-6" aria-busy={!hydrated}>
         <dl className="mt-6 grid grid-cols-2 gap-3 md:grid-cols-4">
           {[
-            ["신규 주문", `${count("결제완료")}건`, C.status["결제완료"]],
-            ["배송 준비", `${count("상품준비")}건`, C.status["상품준비"]],
-            ["품절 옵션", `${soldOut}개`, C.danger],
-            ["품절 임박 (3개 이하)", `${lowStock}개`, C.warn],
+            ["입금확인", `${count("입금확인")}건`, C.status["입금확인"]],
+            ["배송준비중", `${count("배송준비중")}건`, C.status["배송준비중"]],
+            ["품절 품목", `${soldOut}개`, C.danger],
+            ["재고 부족(3개 이하)", `${lowStock}개`, C.warn],
           ].map(([label, value, color]) => (
             <div key={label} className="rounded-[10px] border bg-[var(--panel)] px-4 py-3" style={{ borderColor: C.rule }}>
               <dt className="text-[14px]" style={{ color: C.muted }}>
@@ -270,8 +270,8 @@ export function ShopAdminDemo() {
 
         <div role="tablist" aria-label="관리 메뉴" className="mt-6 flex gap-1 border-b lg:hidden" style={{ borderColor: C.rule }}>
           {[
-            ["options", "상품 옵션"],
-            ["orders", "주문 관리"],
+            ["options", "옵션관리"],
+            ["orders", "주문관리"],
           ].map(([id, label]) => (
             <button
               key={id}
@@ -367,7 +367,7 @@ function OptionsPanel({
   const applyBulk = (patch: Partial<Variant>, message: string) => {
     const keys = selected.size ? [...selected] : visible.map(keyOf);
     setFlash((f) => ({ id: f.id + 1, keys: new Set(keys) }));
-    notify(`${keys.length}개 조합 ${message}`);
+    notify(`품목 ${keys.length}개의 ${message}`);
     setState((s) => {
       const next = { ...s.variants };
       keys.forEach((k) => (next[k] = { ...(next[k] ?? { stock: 10, onSale: true }), ...patch }));
@@ -381,7 +381,7 @@ function OptionsPanel({
     <div className="mt-6 grid gap-6 lg:grid-cols-[360px_1fr]">
       <section aria-labelledby="opt-title" className="self-start rounded-[10px] border bg-[var(--panel)] p-5" style={{ borderColor: C.rule }}>
         <h2 id="opt-title" className="text-[18px] font-bold">
-          옵션 단계
+          옵션 설정
         </h2>
         <label className="mt-4 block text-[14px] font-bold" htmlFor="product-name">
           상품명
@@ -394,7 +394,7 @@ function OptionsPanel({
           style={{ borderColor: C.rule }}
         />
         <label className="mt-3 block text-[14px] font-bold" htmlFor="base-price">
-          기본 판매가
+          판매가
         </label>
         <input
           id="base-price"
@@ -410,10 +410,10 @@ function OptionsPanel({
             <li key={gi} className="rounded-md border p-3" style={{ borderColor: C.rule }}>
               <div className="flex items-center gap-2">
                 <span className="text-[13px] font-bold tabular-nums" style={{ color: C.muted }}>
-                  {gi + 1}단계
+                  옵션{gi + 1}
                 </span>
                 <input
-                  aria-label={`${gi + 1}단계 옵션 이름`}
+                  aria-label={`옵션${gi + 1} 옵션명`}
                   value={g.name}
                   onChange={(e) => updateGroups((all) => all.map((x, i) => (i === gi ? { ...x, name: e.target.value } : x)))}
                   className="h-9 min-w-0 flex-1 rounded border px-2 text-[15px] font-bold"
@@ -421,7 +421,7 @@ function OptionsPanel({
                 />
                 <button
                   type="button"
-                  aria-label={`${g.name} 단계 삭제`}
+                  aria-label={`${g.name} 옵션 삭제`}
                   onClick={() => updateGroups((all) => all.filter((_, i) => i !== gi))}
                   className="grid size-9 place-items-center rounded"
                   style={{ color: C.muted }}
@@ -466,8 +466,8 @@ function OptionsPanel({
                 }}
               >
                 <input
-                  aria-label={`${g.name} 값 추가`}
-                  placeholder={`${g.name} 추가 (추가금은 뒤에 숫자, 예: 500)`}
+                  aria-label={`${g.name} 옵션값 추가`}
+                  placeholder={`옵션값 추가금액 (예: ${g.values[0]?.label ?? "화이트"} 500)`}
                   value={draft[gi] ?? ""}
                   onChange={(e) => setDraft((d) => ({ ...d, [gi]: e.target.value }))}
                   className="h-9 min-w-0 flex-1 rounded border px-2 text-[14px]"
@@ -483,31 +483,31 @@ function OptionsPanel({
         <button
           type="button"
           disabled={state.groups.length >= MAX_GROUPS}
-          onClick={() => updateGroups((g) => [...g, { name: "새 옵션", values: [] }])}
+          onClick={() => updateGroups((g) => [...g, { name: "옵션명", values: [] }])}
           className="mt-4 inline-flex h-11 w-full items-center justify-center gap-1.5 rounded-md border text-[15px] font-bold disabled:opacity-40"
           style={{ borderColor: C.action, color: C.action }}
         >
           <Plus size={16} aria-hidden />
-          옵션 단계 추가 ({state.groups.length}/{MAX_GROUPS})
+          옵션 추가 ({state.groups.length}/{MAX_GROUPS})
         </button>
       </section>
 
       <section aria-labelledby="combo-title" className="min-w-0 rounded-[10px] border bg-[var(--panel)]" style={{ borderColor: C.rule }}>
         <div className="flex flex-wrap items-center justify-between gap-3 border-b p-4" style={{ borderColor: C.rule }}>
           <h2 id="combo-title" className="text-[18px] font-bold">
-            옵션 조합{" "}
+            품목 목록{" "}
             <span className="tabular-nums" style={{ color: C.action }}>
               <Rolling value={`${rows.length.toLocaleString("ko-KR")}개`} />
             </span>
           </h2>
           <select
-            aria-label="옵션 값으로 거르기"
+            aria-label="옵션값 필터"
             value={filter}
             onChange={(e) => setFilter(e.target.value)}
             className="h-10 rounded-md border px-2 text-[15px]"
             style={{ borderColor: C.rule }}
           >
-            <option value="">전체 조합</option>
+            <option value="">전체 품목</option>
             {state.groups.map((g) => (
               <optgroup key={g.name} label={g.name}>
                 {g.values.map((v) => (
@@ -522,12 +522,12 @@ function OptionsPanel({
 
         {tooMany ? (
           <p className="p-6 text-[16px]" style={{ color: C.danger }}>
-            조합이 {MAX_COMBOS.toLocaleString("ko-KR")}개를 넘습니다. 옵션 값을 줄이거나 단계를 합쳐 주세요. (오픈마켓 대부분이 조합 수를 제한합니다)
+            품목 수가 {MAX_COMBOS.toLocaleString("ko-KR")}개를 초과했습니다. 옵션값을 줄이거나 옵션을 통합하십시오. 오픈마켓 연동 시 품목 수가 제한됩니다.
           </p>
         ) : (
           <>
             <div className="flex flex-wrap items-center gap-2 border-b px-4 py-3 text-[14px]" style={{ borderColor: C.rule, background: C.band }}>
-              <span style={{ color: C.muted }}>{selected.size ? `${selected.size}개 선택` : `목록 ${visible.length}개 전체`}에</span>
+              <span style={{ color: C.muted }}>{selected.size ? `선택 품목 ${selected.size}개` : `전체 품목 ${visible.length}개`}</span>
               <input
                 aria-label="일괄 재고 수량"
                 inputMode="numeric"
@@ -536,14 +536,14 @@ function OptionsPanel({
                 className="h-9 w-20 rounded border px-2 text-right tabular-nums"
                 style={{ borderColor: C.rule }}
               />
-              <button type="button" onClick={() => applyBulk({ stock: Number(bulkStock) || 0 }, `재고를 ${Number(bulkStock) || 0}개로 바꿨습니다.`)} className="h-9 rounded px-3 font-bold text-white" style={{ background: C.action }}>
-                재고 적용
+              <button type="button" onClick={() => applyBulk({ stock: Number(bulkStock) || 0 }, `재고수량을 ${Number(bulkStock) || 0}개로 수정했습니다.`)} className="h-9 rounded px-3 font-bold text-white" style={{ background: C.action }}>
+                재고 일괄적용
               </button>
-              <button type="button" onClick={() => applyBulk({ onSale: false }, "판매를 중지했습니다.")} className="h-9 rounded border px-3 font-bold" style={{ borderColor: C.rule }}>
-                판매 중지
+              <button type="button" onClick={() => applyBulk({ onSale: false }, "판매상태를 판매안함으로 변경했습니다.")} className="h-9 rounded border px-3 font-bold" style={{ borderColor: C.rule }}>
+                판매안함
               </button>
-              <button type="button" onClick={() => applyBulk({ onSale: true }, "판매를 다시 시작했습니다.")} className="h-9 rounded border px-3 font-bold" style={{ borderColor: C.rule }}>
-                판매 재개
+              <button type="button" onClick={() => applyBulk({ onSale: true }, "판매상태를 판매함으로 변경했습니다.")} className="h-9 rounded border px-3 font-bold" style={{ borderColor: C.rule }}>
+                판매함
               </button>
             </div>
             <div className="overflow-x-auto">
@@ -553,7 +553,7 @@ function OptionsPanel({
                     <th scope="col" className="w-10 px-4 py-2.5">
                       <input
                         type="checkbox"
-                        aria-label="보이는 조합 모두 선택"
+                        aria-label="품목 전체 선택"
                         checked={allVisibleSelected}
                         onChange={() =>
                           setSelected((prev) => {
@@ -564,10 +564,10 @@ function OptionsPanel({
                         }
                       />
                     </th>
-                    <th scope="col" className="py-2.5">조합</th>
+                    <th scope="col" className="py-2.5">품목</th>
                     <th scope="col" className="py-2.5 text-right">판매가</th>
-                    <th scope="col" className="w-28 py-2.5 text-right">재고</th>
-                    <th scope="col" className="w-24 px-4 py-2.5 text-center">판매</th>
+                    <th scope="col" className="w-28 py-2.5 text-right">재고수량</th>
+                    <th scope="col" className="w-24 px-4 py-2.5 text-center">판매상태</th>
                   </tr>
                 </thead>
                 <tbody>
@@ -612,7 +612,7 @@ function OptionsPanel({
                             initial={flash.keys.has(key) && !reduce ? { backgroundColor: "#fde68a" } : false}
                             animate={{ backgroundColor: "#ffffff" }}
                             transition={{ duration: 0.9, ease: EASE }}
-                            aria-label={`${r.map((x) => x.label).join(" ")} 재고`}
+                            aria-label={`${r.map((x) => x.label).join(" ")} 재고수량`}
                             inputMode="numeric"
                             value={v.stock}
                             onChange={(e) => setVariant(key, { stock: Number(e.target.value.replace(/\D/g, "")) || 0 })}
@@ -628,12 +628,12 @@ function OptionsPanel({
                             type="button"
                             role="switch"
                             aria-checked={v.onSale}
-                            aria-label={`${r.map((x) => x.label).join(" ")} 판매`}
+                            aria-label={`${r.map((x) => x.label).join(" ")} 판매상태`}
                             onClick={() => setVariant(key, { onSale: !v.onSale })}
                             className="rounded-full px-3 py-1 text-[13px] font-bold"
                             style={v.onSale ? { background: C.actionSoft, color: C.action } : { background: C.off, color: C.muted }}
                           >
-                            {v.onSale ? (v.stock === 0 ? "품절" : "판매 중") : "중지"}
+                            {v.onSale ? (v.stock === 0 ? "품절" : "판매함") : "판매안함"}
                           </button>
                         </td>
                       </motion.tr>
@@ -644,7 +644,7 @@ function OptionsPanel({
             </div>
             {visible.length > limit && (
               <button type="button" onClick={() => setLimit((l) => l + PAGE)} className="w-full py-3 text-[15px] font-bold" style={{ color: C.action }}>
-                조합 더 보기 ({(visible.length - limit).toLocaleString("ko-KR")}개 남음)
+                더보기 ({(visible.length - limit).toLocaleString("ko-KR")}개)
               </button>
             )}
           </>
@@ -672,20 +672,20 @@ function OrdersPanel({ state, setState, notify }: { state: State; setState: SetS
     const ok = new Set(picked.filter((o) => !blocked.includes(o)).map((o) => o.no));
     setState((s) => ({ ...s, orders: s.orders.map((o) => (ok.has(o.no) ? { ...o, status: to } : o)) }));
     setSelected(new Set());
-    // 받침 있는 말 뒤에는 "으로" (배송중으로, 상품준비로)
+    // 받침 있는 말 뒤에는 "으로" (배송중으로, 배송완료로)
     const last = to.charCodeAt(to.length - 1) - 0xac00;
     const ro = last >= 0 && (last % 28 !== 0 && last % 28 !== 8) ? "으로" : "로";
     notify(
       ok.size === 0
-        ? `송장번호가 없어 ${blocked.length}건을 ${to}${ro} 바꾸지 못했습니다. 송장번호를 먼저 입력해 주세요.`
+        ? `송장번호 미입력 주문 ${blocked.length}건은 ${to}${ro} 변경할 수 없습니다. 송장번호를 먼저 입력하십시오.`
         : blocked.length
-          ? `${ok.size}건을 ${to}${ro} 바꿨습니다. 송장번호가 없는 ${blocked.length}건은 그대로 두었습니다.`
-          : `${ok.size}건을 ${to}${ro} 바꿨습니다.`,
+          ? `${ok.size}건을 ${to}${ro} 변경했습니다. 송장번호 미입력 ${blocked.length}건은 제외했습니다.`
+          : `${ok.size}건을 ${to}${ro} 변경했습니다.`,
     );
   };
 
   const exportCsv = () => {
-    const head = ["주문번호", "주문일시", "주문자", "옵션", "수량", "결제금액", "상태", "송장번호"];
+    const head = ["주문번호", "주문일시", "주문자명", "상품명(옵션)", "수량", "결제금액", "주문상태", "송장번호"];
     const body = list.map((o) => [o.no, o.date, maskName(o.buyer), `${state.productName} ${o.option}`, o.qty, o.amount, o.status, o.invoice]);
     const csv = [head, ...body].map((r) => r.map((c) => `"${String(c).replace(/"/g, '""')}"`).join(",")).join("\r\n");
     const url = URL.createObjectURL(new Blob(["﻿" + csv], { type: "text/csv;charset=utf-8" }));
@@ -726,8 +726,8 @@ function OrdersPanel({ state, setState, notify }: { state: State; setState: SetS
         <div className="relative ml-auto w-full sm:w-64">
           <Search size={16} aria-hidden className="pointer-events-none absolute top-1/2 left-3 -translate-y-1/2" style={{ color: C.muted }} />
           <input
-            aria-label="주문번호 또는 주문자 검색"
-            placeholder="주문번호, 주문자"
+            aria-label="주문번호 또는 주문자명 검색"
+            placeholder="주문번호, 주문자명"
             value={query}
             onChange={(e) => setQuery(e.target.value)}
             className="h-10 w-full rounded-md border pr-3 pl-9 text-[15px]"
@@ -737,21 +737,21 @@ function OrdersPanel({ state, setState, notify }: { state: State; setState: SetS
       </div>
 
       <div className="flex flex-wrap items-center gap-2 border-b px-4 py-3 text-[14px]" style={{ borderColor: C.rule, background: C.band }}>
-        <span style={{ color: C.muted }}>{selected.size}건 선택</span>
-        <button type="button" disabled={!selected.size} onClick={() => move("상품준비")} className="inline-flex h-9 items-center gap-1 rounded border px-3 font-bold disabled:opacity-40" style={{ borderColor: C.rule }}>
+        <span style={{ color: C.muted }}>선택 주문 {selected.size}건</span>
+        <button type="button" disabled={!selected.size} onClick={() => move("배송준비중")} className="inline-flex h-9 items-center gap-1 rounded border px-3 font-bold disabled:opacity-40" style={{ borderColor: C.rule }}>
           <PackageCheck size={15} aria-hidden />
-          상품준비
+          배송준비중 처리
         </button>
         <button type="button" disabled={!selected.size} onClick={() => move("배송중")} className="inline-flex h-9 items-center gap-1 rounded border px-3 font-bold disabled:opacity-40" style={{ borderColor: C.rule }}>
           <Truck size={15} aria-hidden />
-          배송중
+          배송중 처리
         </button>
         <button type="button" disabled={!selected.size} onClick={() => move("배송완료")} className="h-9 rounded border px-3 font-bold disabled:opacity-40" style={{ borderColor: C.rule }}>
-          배송완료
+          배송완료 처리
         </button>
         <button type="button" onClick={exportCsv} className="ml-auto inline-flex h-9 items-center gap-1 rounded px-3 font-bold text-white" style={{ background: C.action }}>
           <Download size={15} aria-hidden />
-          엑셀 내려받기
+          엑셀 다운로드
         </button>
       </div>
 
@@ -762,16 +762,16 @@ function OrdersPanel({ state, setState, notify }: { state: State; setState: SetS
               <th scope="col" className="w-10 px-4 py-2.5">
                 <input
                   type="checkbox"
-                  aria-label="보이는 주문 모두 선택"
+                  aria-label="주문 전체 선택"
                   checked={allSelected}
                   onChange={() => setSelected(allSelected ? new Set() : new Set(list.map((o) => o.no)))}
                 />
               </th>
               <th scope="col" className="py-2.5">주문번호</th>
-              <th scope="col" className="py-2.5">주문자</th>
-              <th scope="col" className="py-2.5">옵션</th>
-              <th scope="col" className="py-2.5 text-right">금액</th>
-              <th scope="col" className="px-3 py-2.5">상태</th>
+              <th scope="col" className="py-2.5">주문자명</th>
+              <th scope="col" className="py-2.5">옵션정보</th>
+              <th scope="col" className="py-2.5 text-right">결제금액</th>
+              <th scope="col" className="px-3 py-2.5">주문상태</th>
               <th scope="col" className="w-44 px-4 py-2.5">송장번호</th>
             </tr>
           </thead>
@@ -821,7 +821,7 @@ function OrdersPanel({ state, setState, notify }: { state: State; setState: SetS
                   </span>
                 </td>
                 <td className="px-4 py-2">
-                  {o.status === "취소요청" ? (
+                  {o.status === "취소신청" ? (
                     <span style={{ color: C.muted }}>해당 없음</span>
                   ) : (
                     <input
@@ -846,7 +846,7 @@ function OrdersPanel({ state, setState, notify }: { state: State; setState: SetS
             {list.length === 0 && (
               <tr>
                 <td colSpan={7} className="px-4 py-10 text-center" style={{ color: C.muted }}>
-                  조건에 맞는 주문이 없습니다.
+                  검색된 주문내역이 없습니다.
                 </td>
               </tr>
             )}

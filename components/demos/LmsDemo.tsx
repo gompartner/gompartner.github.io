@@ -118,9 +118,9 @@ const DROPOFF = [
   [100, 97, 95, 93, 91, 89, 88, 87, 86, 85],
 ];
 
-type LearnerStatus = "수료" | "학습 중" | "독려 대상" | "평가 대기";
+type LearnerStatus = "수료" | "학습중" | "독려대상" | "평가미응시";
 const statusOf = (progress: number, days: number, quiz: number | null): LearnerStatus =>
-  progress >= 90 && quiz !== null && quiz >= PASS_SCORE ? "수료" : progress >= 90 ? "평가 대기" : days >= 7 || progress < 30 ? "독려 대상" : "학습 중";
+  progress >= 90 && quiz !== null && quiz >= PASS_SCORE ? "수료" : progress >= 90 ? "평가미응시" : days >= 7 || progress < 30 ? "독려대상" : "학습중";
 
 export function LmsDemo() {
   const reduce = useReducedMotionSafe();
@@ -178,13 +178,13 @@ export function LmsDemo() {
             type="button"
             onClick={() => {
               setState(initialState);
-              notify("처음 상태로 되돌렸습니다.");
+              notify("초기화했습니다.");
             }}
             className="inline-flex items-center gap-1 rounded-md px-2 py-1.5 text-[14px] font-bold"
             style={{ color: C.muted }}
           >
             <RotateCcw size={14} aria-hidden />
-            처음 상태로
+            초기화
           </button>
         </div>
       </header>
@@ -316,7 +316,7 @@ function Learner({
   const submitQuiz = () => {
     const score = Math.round((answers.filter((a, k) => a === QUIZ[k].answer).length / QUIZ.length) * 100);
     setState((s) => ({ ...s, quiz: score, certNo: score >= PASS_SCORE ? s.certNo ?? `GSA-2026-${String(1000 + Math.floor(score * 7.3)).padStart(5, "0")}` : s.certNo }));
-    notify(score >= PASS_SCORE ? `평가 ${score}점으로 통과했습니다. 수료증을 출력할 수 있습니다.` : `평가 ${score}점입니다. ${PASS_SCORE}점 이상이면 통과합니다.`);
+    notify(score >= PASS_SCORE ? `최종평가 ${score}점으로 합격입니다. 수료증 출력이 가능합니다.` : `최종평가 ${score}점으로 불합격입니다. 합격 기준은 ${PASS_SCORE}점 이상입니다.`);
   };
 
   return (
@@ -347,7 +347,7 @@ function Learner({
                 style={{ background: C.accent }}
               >
                 <Play size={16} aria-hidden />
-                이어보기 ({clock(prog.pos)}부터)
+                이어 학습하기 ({clock(prog.pos)})
               </button>
             )}
           </div>
@@ -395,17 +395,17 @@ function Learner({
                 {clock(prog.pos)} / {clock(lesson.duration)}
               </span>
               <label className="ml-auto flex items-center gap-2 text-[14px]" style={{ color: C.muted }}>
-                재생 속도
+                배속
                 <select value={speed} onChange={(e) => setSpeed(Number(e.target.value))} className="h-9 rounded-md border bg-white px-2 text-[14px]" style={{ borderColor: C.line, color: C.text }}>
-                  <option value={1}>1배</option>
-                  <option value={1.5}>1.5배</option>
-                  <option value={2}>2배</option>
-                  <option value={30}>30배 (데모 확인용)</option>
+                  <option value={1}>1.0배속</option>
+                  <option value={1.5}>1.5배속</option>
+                  <option value={2}>2.0배속</option>
+                  <option value={30}>30배속(시연용)</option>
                 </select>
               </label>
             </div>
             <p className="mt-3 text-[14px]" style={{ color: C.muted }}>
-              이 차시 진도 <b className="tabular-nums" style={{ color: C.text }}>{Math.round(ratios[i] * 100)}%</b>. 실제로 본 구간만 진도에 들어가며, 90% 이상 보면 완료됩니다.
+              차시 진도율 <b className="tabular-nums" style={{ color: C.text }}>{Math.round(ratios[i] * 100)}%</b> (학습 인정 기준 90% 이상, 실제 재생 구간만 인정)
             </p>
           </div>
         </div>
@@ -413,7 +413,7 @@ function Learner({
         {allDone && (
           <section aria-labelledby="quiz-title" className="mt-6 rounded-[10px] border bg-white p-5" style={{ borderColor: C.line }}>
             <h2 id="quiz-title" className="text-[18px] font-bold">
-              수료 평가
+              최종평가
             </h2>
             <ol className="mt-3 grid gap-4">
               {QUIZ.map((q, k) => (
@@ -439,7 +439,7 @@ function Learner({
               className="mt-4 h-11 rounded-md px-5 text-[15px] font-bold text-white disabled:opacity-40"
               style={{ background: C.brand }}
             >
-              제출하기
+              제출
             </button>
           </section>
         )}
@@ -451,18 +451,18 @@ function Learner({
             <Ring value={courseProgress} />
             <div>
               <p className="text-[14px]" style={{ color: C.muted }}>
-                수강 중인 과정
+                수강과정
               </p>
               <h2 id="course-title" className="text-[18px] font-bold">
                 {COURSE}
               </h2>
             </div>
           </div>
-          <h3 className="mt-5 text-[15px] font-bold">수료 조건</h3>
+          <h3 className="mt-5 text-[15px] font-bold">수료기준</h3>
           <ul className="mt-2 grid gap-1.5 text-[15px]">
             {[
-              [`전 차시 90% 이상 시청 (${done.filter(Boolean).length}/${LESSONS.length})`, allDone],
-              [`평가 ${PASS_SCORE}점 이상${state.quiz !== null ? ` (${state.quiz}점)` : ""}`, passed],
+              [`차시별 진도율 90% 이상 (${done.filter(Boolean).length}/${LESSONS.length}차시)`, allDone],
+              [`최종평가 ${PASS_SCORE}점 이상${state.quiz !== null ? ` (${state.quiz}점)` : ""}`, passed],
             ].map(([t, ok]) => (
               <li key={String(t)} className="flex items-center gap-2">
                 {ok ? <CheckCircle2 size={18} style={{ color: C.brand }} aria-hidden /> : <Circle size={18} style={{ color: C.line }} aria-hidden />}
@@ -557,9 +557,9 @@ function Learner({
                 성명 <b>{maskName("김하늘")}</b>
               </p>
               <p className="mt-1 text-[18px]">
-                과정 <b>{COURSE}</b> (총 {LESSONS.length}차시)
+                과정명 <b>{COURSE}</b> (총 {LESSONS.length}차시)
               </p>
-              <p className="mt-8 text-[16px] leading-[1.8]">위 사람은 본 기관에서 실시한 온라인 과정을 성실히 이수하였기에 이 증서를 드립니다.</p>
+              <p className="mt-8 text-[16px] leading-[1.8]">위 사람은 본 기관에서 실시한 위 과정을 수료하였으므로 이 증서를 수여합니다.</p>
               <p className="mt-8 text-[16px]">2026년 10월 1일</p>
               <div className="relative mx-auto mt-4 w-fit">
                 <p className="text-[20px] font-bold">○○ 아카데미 원장</p>
@@ -582,7 +582,7 @@ function Learner({
                   style={{ background: C.brand }}
                 >
                   <Printer size={16} aria-hidden />
-                  인쇄하기
+                  인쇄
                 </button>
               </div>
             </motion.div>
@@ -613,9 +613,9 @@ function Admin({ mine, notify }: { mine: { progress: number; quiz: number | null
 
   const statusColor: Record<LearnerStatus, { fg: string; bg: string }> = {
     수료: { fg: C.brand, bg: C.brandSoft },
-    "평가 대기": { fg: "#1d4ed8", bg: "#e8eefc" },
-    "학습 중": { fg: C.muted, bg: C.bg },
-    "독려 대상": { fg: C.warn, bg: C.warnSoft },
+    평가미응시: { fg: "#1d4ed8", bg: "#e8eefc" },
+    학습중: { fg: C.muted, bg: C.bg },
+    독려대상: { fg: C.warn, bg: C.warnSoft },
   };
 
   const drop = DROPOFF[lesson];
@@ -627,10 +627,10 @@ function Admin({ mine, notify }: { mine: { progress: number; quiz: number | null
     <div className="grid gap-6">
       <dl className="grid grid-cols-2 gap-3 md:grid-cols-4">
         {[
-          ["수강생", `${rows.length}명`],
+          ["수강인원", `${rows.length}명`],
           ["평균 진도율", `${avg}%`],
-          ["수료", `${count("수료")}명`],
-          ["독려 대상", `${count("독려 대상")}명`],
+          ["수료인원", `${count("수료")}명`],
+          ["독려대상", `${count("독려대상")}명`],
         ].map(([label, value]) => (
           <div key={label} className="rounded-[10px] border bg-white px-4 py-3" style={{ borderColor: C.line }}>
             <dt className="text-[14px]" style={{ color: C.muted }}>
@@ -644,9 +644,9 @@ function Admin({ mine, notify }: { mine: { progress: number; quiz: number | null
       <section aria-labelledby="learners-title" className="rounded-[10px] border bg-white" style={{ borderColor: C.line }}>
         <div className="flex flex-wrap items-center gap-2 border-b p-4" style={{ borderColor: C.line }}>
           <h2 id="learners-title" className="mr-2 text-[17px] font-bold">
-            {COURSE} 수강생
+            {COURSE} 수강생 현황
           </h2>
-          {(["전체", "독려 대상", "학습 중", "평가 대기", "수료"] as const).map((f) => (
+          {(["전체", "독려대상", "학습중", "평가미응시", "수료"] as const).map((f) => (
             <button
               key={f}
               type="button"
@@ -665,14 +665,14 @@ function Admin({ mine, notify }: { mine: { progress: number; quiz: number | null
             type="button"
             disabled={!selected.size}
             onClick={() => {
-              notify(`${selected.size}명에게 학습 독려 문자를 보냈습니다. (데모라 실제로 발송하지 않습니다)`);
+              notify(`${selected.size}명에게 학습독려 문자를 발송했습니다. (시연용으로 실제 발송되지 않습니다)`);
               setSelected(new Set());
             }}
             className="ml-auto inline-flex h-10 items-center gap-1.5 rounded-md px-3.5 text-[14px] font-bold text-white disabled:opacity-40"
             style={{ background: C.brand }}
           >
             <Send size={15} aria-hidden />
-            독려 문자 보내기
+            학습독려 문자 발송
           </button>
         </div>
         <div className="overflow-x-auto">
@@ -682,11 +682,11 @@ function Admin({ mine, notify }: { mine: { progress: number; quiz: number | null
                 <th scope="col" className="w-10 px-4 py-2.5">
                   <span className="sr-only">선택</span>
                 </th>
-                <th scope="col" className="py-2.5">이름</th>
+                <th scope="col" className="py-2.5">성명</th>
                 <th scope="col" className="w-56 py-2.5">진도율</th>
-                <th scope="col" className="py-2.5">마지막 학습</th>
-                <th scope="col" className="py-2.5">평가</th>
-                <th scope="col" className="px-4 py-2.5">상태</th>
+                <th scope="col" className="py-2.5">최종 학습일</th>
+                <th scope="col" className="py-2.5">평가점수</th>
+                <th scope="col" className="px-4 py-2.5">학습상태</th>
               </tr>
             </thead>
             <tbody>
@@ -721,7 +721,7 @@ function Admin({ mine, notify }: { mine: { progress: number; quiz: number | null
                       {maskName(r.name)}
                       {r.live && (
                         <span className="ml-2 rounded px-1.5 py-0.5 text-[12px]" style={{ background: C.brandSoft, color: C.brand }}>
-                          내 강의실과 연동
+                          내 강의실 연동
                         </span>
                       )}
                     </td>
@@ -764,9 +764,9 @@ function Admin({ mine, notify }: { mine: { progress: number; quiz: number | null
           </select>
         </div>
         <p className="mt-2 text-[15px]" style={{ color: C.muted }}>
-          영상 {clock((LESSONS[lesson].duration / 10) * (worst - 1))}~{clock((LESSONS[lesson].duration / 10) * worst)} 구간에서 수강생이 가장 많이 빠져나갔습니다. ({drop[worst - 1] - drop[worst]}%p)
+          최다 이탈 구간 {clock((LESSONS[lesson].duration / 10) * (worst - 1))}~{clock((LESSONS[lesson].duration / 10) * worst)} (이탈률 {drop[worst - 1] - drop[worst]}%p)
         </p>
-        <div className="mt-4 flex h-40 items-end gap-1.5" role="img" aria-label={`${lesson + 1}차시 구간별 남은 수강생 비율: ${drop.join(", ")}%`}>
+        <div className="mt-4 flex h-40 items-end gap-1.5" role="img" aria-label={`${lesson + 1}차시 구간별 잔존율: ${drop.join(", ")}%`}>
           {drop.map((v, k) => (
             <motion.div
               key={`${lesson}-${k}`}

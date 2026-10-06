@@ -129,24 +129,24 @@ function check(sheet: Sheet): Issue[] {
     const rawQty = r[cQty] ?? "";
     const qty = toNumber(rawQty);
     if (rawQty.trim() !== "" && /[^\d,.-]/.test(rawQty) && qty > 0) {
-      issues.push({ id: `q${i}`, row: i, col: cQty, type: "수량", message: `"${rawQty}"에 글자가 섞여 있음`, fix: `고칠 값 ${qty}` });
+      issues.push({ id: `q${i}`, row: i, col: cQty, type: "수량", message: `숫자 외 문자 포함(${rawQty})`, fix: `수정값 ${qty}` });
     } else if (!(qty > 0)) {
-      issues.push({ id: `q${i}`, row: i, col: cQty, type: "수량", message: rawQty.trim() ? `${rawQty}개는 주문할 수 없는 수량` : "수량이 비어 있음" });
+      issues.push({ id: `q${i}`, row: i, col: cQty, type: "수량", message: rawQty.trim() ? `유효하지 않은 수량(${rawQty})` : "수량 누락" });
     }
     const code = normalizeCode(r[cCode] ?? "");
     if (!MASTER[code]) {
-      issues.push({ id: `c${i}`, row: i, col: cCode, type: "품목코드", message: `기준표에 없는 코드 (${r[cCode]})` });
+      issues.push({ id: `c${i}`, row: i, col: cCode, type: "품목코드", message: `미등록 품목코드(${r[cCode]})` });
       return;
     }
     if (code !== r[cCode]) {
-      issues.push({ id: `c${i}`, row: i, col: cCode, type: "품목코드", message: `표기가 기준과 다름 (${r[cCode]})`, fix: `고칠 값 ${code}` });
+      issues.push({ id: `c${i}`, row: i, col: cCode, type: "품목코드", message: `품목코드 형식 오류(${r[cCode]})`, fix: `수정값 ${code}` });
     }
     if (cPrice >= 0 && toNumber(r[cPrice] ?? "") !== MASTER[code].price) {
-      issues.push({ id: `p${i}`, row: i, col: cPrice, type: "단가", message: `기준 단가와 다름 (${r[cPrice]}원)`, fix: `고칠 값 ${MASTER[code].price.toLocaleString("ko-KR")}원` });
+      issues.push({ id: `p${i}`, row: i, col: cPrice, type: "단가", message: `기준단가 불일치(${r[cPrice]}원)`, fix: `수정값 ${MASTER[code].price.toLocaleString("ko-KR")}원` });
     }
     const key = `${cClient >= 0 ? r[cClient] : ""}|${code}`;
     if (seen.has(key)) {
-      issues.push({ id: `d${i}`, row: i, col: cCode, type: "중복", message: `${seen.get(key)! + 2}행과 거래처·품목이 같음`, fix: `${seen.get(key)! + 2}행에 수량 합치기` });
+      issues.push({ id: `d${i}`, row: i, col: cCode, type: "중복", message: `${seen.get(key)! + 2}행과 중복 주문`, fix: `${seen.get(key)! + 2}행에 수량 합산` });
     } else seen.set(key, i);
   });
   return issues;
@@ -308,19 +308,19 @@ export function ExcelAutomationDemo() {
         const raw = await readSheet(file);
         data = raw.map((r) => r.map((c) => (c === null ? "" : c instanceof Date ? c.toLocaleDateString("ko-KR") : String(c))));
       } else {
-        notify("엑셀(.xlsx) 또는 CSV 파일만 올릴 수 있습니다.");
+        notify("엑셀(.xlsx) 또는 CSV 파일만 업로드할 수 있습니다.");
         return;
       }
       if (data.length < 2) {
-        notify("머리글과 주문 행이 있는 파일을 올려 주세요.");
+        notify("머리글 행 또는 주문 행이 없는 파일입니다.");
         return;
       }
       const width = Math.max(...data.map((r) => r.length));
       const headers = Array.from({ length: width }, (_, i) => String(data[0][i] ?? ""));
       const rows = data.slice(1).map((r) => Array.from({ length: width }, (_, i) => String(r[i] ?? "")));
-      load({ fileName: file.name, headers, rows, mapping: headers.map(guessField) }, `${file.name}에서 ${rows.length}행을 읽었습니다.`);
+      load({ fileName: file.name, headers, rows, mapping: headers.map(guessField) }, `${file.name} 파일에서 ${rows.length}행을 불러왔습니다.`);
     } catch {
-      notify("파일을 읽지 못했습니다. 암호가 걸린 파일인지 확인해 주세요.");
+      notify("파일을 읽을 수 없습니다. 암호 설정 여부를 확인하십시오.");
     }
   };
 
@@ -343,7 +343,7 @@ export function ExcelAutomationDemo() {
     setSheet(res.sheet);
     setFixed((f) => ({ id: f.id + 1, cells: res.cells }));
     setActive(null);
-    notify(`${before}건을 고쳤습니다. 남은 ${issues.length - before}건은 직접 확인해 주세요.`);
+    notify(`${before}건을 일괄수정했습니다. 확인 필요 ${issues.length - before}건이 남아 있습니다.`);
   };
 
   const errorCount = issues.filter((i) => !i.fix).length;
@@ -370,7 +370,7 @@ export function ExcelAutomationDemo() {
         <div className="flex flex-wrap items-center gap-3 px-4 py-3 text-white md:px-6">
           <FileSpreadsheet size={22} aria-hidden />
           <div className="mr-auto min-w-0">
-            <p className="text-[13px] opacity-90">○○ 유통 주문 취합</p>
+            <p className="text-[13px] opacity-90">○○ 유통 주문취합</p>
             <h1 className="truncate text-[17px] font-bold">{sheet.fileName}</h1>
           </div>
           <input
@@ -387,7 +387,7 @@ export function ExcelAutomationDemo() {
           />
           <button type="button" onClick={() => fileInput.current?.click()} className="inline-flex h-10 items-center gap-1.5 rounded-md bg-white px-3.5 text-[15px] font-bold" style={{ color: C.action }}>
             <Upload size={16} aria-hidden />
-            파일 올리기
+            엑셀 업로드
           </button>
           <button
             type="button"
@@ -395,10 +395,10 @@ export function ExcelAutomationDemo() {
             className="inline-flex h-10 items-center gap-1.5 rounded-md border border-white/60 px-3.5 text-[15px] font-bold"
           >
             <Download size={16} aria-hidden />
-            샘플 파일 받기
+            샘플 다운로드
           </button>
           <button type="button" onClick={() => load(sampleSheet(), "샘플 주문 20행을 불러왔습니다.")} className="h-10 rounded-md px-2 text-[15px] font-bold underline underline-offset-4">
-            처음 상태로
+            초기화
           </button>
         </div>
       </header>
@@ -416,7 +416,7 @@ export function ExcelAutomationDemo() {
                 className="relative px-4 py-3 text-[15px] font-bold"
                 style={{ color: tab === t ? C.action : C.muted }}
               >
-                {t === "취합" ? "주문 취합" : t === "집계" ? "품목별 집계" : "거래처별 발주서"}
+                {t === "취합" ? "주문취합" : t === "집계" ? "품목별 집계" : "거래처별 발주서"}
                 {tab === t && (
                   <motion.span
                     layoutId="sheet-tab"
@@ -431,7 +431,7 @@ export function ExcelAutomationDemo() {
 
           {tab === "취합" && (
             <div className="overflow-auto bg-white" style={{ maxHeight: "calc(100vh - 150px)" }}>
-              <table className="border-collapse text-[14px]" aria-label="주문 취합 시트">
+              <table className="border-collapse text-[14px]" aria-label="주문취합 시트">
                 <thead className="sticky top-0 z-10">
                   <tr>
                     <th className="w-10 border" style={{ background: C.head, borderColor: C.grid }} />
@@ -456,7 +456,7 @@ export function ExcelAutomationDemo() {
                         >
                           {FIELDS.map((f) => (
                             <option key={f} value={f}>
-                              {f === "무시" ? "사용 안 함" : f}
+                              {f === "무시" ? "미사용" : f}
                             </option>
                           ))}
                         </select>
@@ -542,7 +542,7 @@ export function ExcelAutomationDemo() {
           {tab === "집계" && (
             <section aria-label="품목별 집계" className="bg-white p-5 md:p-6">
               <p className="text-[15px]" style={{ color: C.muted }}>
-                오류가 없는 {valid.length}행을 품목별로 합쳤습니다. 오류 행은 고친 뒤에 들어갑니다.
+                정상 {valid.length}행 기준 집계입니다. 오류 행은 집계에서 제외됩니다.
               </p>
               <ul className="mt-4 grid gap-3">
                 {byItem.map((it, i) => {
@@ -584,7 +584,7 @@ export function ExcelAutomationDemo() {
             <section aria-label="거래처별 발주서" className="p-4 md:p-6">
               <div className="flex flex-wrap items-center justify-between gap-3">
                 <p className="text-[15px]" style={{ color: C.muted }}>
-                  거래처 {byClient.length}곳의 발주서입니다. 한 장씩 인쇄하거나 전체를 엑셀로 받을 수 있습니다.
+                  발주서 {byClient.length}건
                 </p>
                 <button
                   type="button"
@@ -598,7 +598,7 @@ export function ExcelAutomationDemo() {
                   style={{ background: C.action }}
                 >
                   <Download size={16} aria-hidden />
-                  전체 엑셀 받기
+                  전체 엑셀 다운로드
                 </button>
               </div>
               <div className="mt-4 grid gap-4 xl:grid-cols-2">
@@ -613,15 +613,15 @@ export function ExcelAutomationDemo() {
         <aside aria-labelledby="check-title" className="print:hidden order-first border-b bg-white lg:order-none lg:sticky lg:top-0 lg:h-screen lg:overflow-auto lg:border-b-0 lg:border-l" style={{ borderColor: C.grid }}>
           <div className="border-b p-5" style={{ borderColor: C.grid }}>
             <h2 id="check-title" className="text-[17px] font-bold">
-              검사 결과
+              오류 검사 결과
             </h2>
             <div className="mt-3 grid grid-cols-2 gap-2 text-[14px]">
               <p className="rounded-md px-3 py-2" style={{ background: C.fixableSoft, color: C.fixable }}>
-                자동 수정 가능
+                일괄수정 대상
                 <b className="block text-[22px] tabular-nums">{fixable.length}건</b>
               </p>
               <p className="rounded-md px-3 py-2" style={{ background: C.errorSoft, color: C.error }}>
-                직접 확인
+                확인 필요
                 <b className="block text-[22px] tabular-nums">{errorCount}건</b>
               </p>
             </div>
@@ -633,13 +633,13 @@ export function ExcelAutomationDemo() {
               style={{ background: C.action }}
             >
               <Wand2 size={17} aria-hidden />
-              {fixable.length ? `${fixable.length}건 모두 고침` : "고칠 수 있는 항목 없음"}
+              {fixable.length ? `${fixable.length}건 일괄수정` : "일괄수정 대상 없음"}
             </button>
           </div>
           {issues.length === 0 ? (
             <p className="flex items-center gap-2 p-5 text-[15px] font-bold" style={{ color: C.action }}>
               <CheckCircle2 size={18} aria-hidden />
-              오류가 없습니다. 발주서를 만들 수 있습니다.
+              검사 결과 오류가 없습니다.
             </p>
           ) : (
             <ul className="max-h-56 overflow-auto p-2 lg:max-h-none">
@@ -671,7 +671,7 @@ export function ExcelAutomationDemo() {
                         ) : (
                           <span className="flex items-center gap-1" style={{ color: C.error }}>
                             <AlertTriangle size={13} aria-hidden />
-                            칸을 눌러 직접 고쳐 주세요
+                            직접 수정 필요
                           </span>
                         )}
                       </span>
@@ -703,7 +703,7 @@ export function ExcelAutomationDemo() {
             transition={{ duration: 0.15 }}
           >
             <p className="rounded-lg bg-white px-6 py-4 text-[19px] font-bold shadow-lg" style={{ color: C.action }}>
-              여기에 놓으면 주문 파일을 읽습니다
+              주문 파일 업로드
             </p>
           </motion.div>
         )}
@@ -740,7 +740,7 @@ function PurchaseOrder({ client, items, onPrint }: { client: string; items: { co
       <div className="flex items-start justify-between gap-3">
         <div>
           <p className="text-[13px]" style={{ color: C.muted }}>
-            발주서 · ○○ 유통
+            발주서 (발주처 ○○ 유통)
           </p>
           <h3 className="text-[19px] font-bold">{client} 귀하</h3>
         </div>
@@ -754,7 +754,7 @@ function PurchaseOrder({ client, items, onPrint }: { client: string; items: { co
       <table className="mt-3 w-full text-[14px]">
         <thead>
           <tr className="border-b text-left" style={{ borderColor: C.grid, color: C.muted }}>
-            <th scope="col" className="py-1.5">품목</th>
+            <th scope="col" className="py-1.5">품목명</th>
             <th scope="col" className="py-1.5 text-right">수량</th>
             <th scope="col" className="py-1.5 text-right">금액</th>
           </tr>

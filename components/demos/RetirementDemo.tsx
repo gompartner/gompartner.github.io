@@ -49,9 +49,9 @@ const DEFAULTS: Inputs = {
 };
 
 const PRESETS = [
-  { id: "safe", label: "보수적", rate: 2.5, note: "예금·채권 중심" },
-  { id: "base", label: "기본", rate: 4, note: "혼합형" },
-  { id: "bold", label: "적극적", rate: 6, note: "주식 비중 높음" },
+  { id: "safe", label: "안정추구형", rate: 2.5, note: "예금·채권 중심" },
+  { id: "base", label: "위험중립형", rate: 4, note: "혼합형" },
+  { id: "bold", label: "적극투자형", rate: 6, note: "주식 비중 높음" },
 ] as const;
 
 type Point = { age: number; plan: number; need: number };
@@ -161,18 +161,18 @@ type FieldDef = {
 };
 
 const AGE_FIELDS: FieldDef[] = [
-  { key: "age", label: "현재 나이", unit: "세", min: 20, max: 64, step: 1 },
-  { key: "retireAge", label: "은퇴 희망 나이", unit: "세", min: 45, max: 75, step: 1 },
-  { key: "lifeExp", label: "기대 수명", unit: "세", min: 70, max: 100, step: 1 },
+  { key: "age", label: "현재 연령", unit: "세", min: 20, max: 64, step: 1 },
+  { key: "retireAge", label: "은퇴 예정 연령", unit: "세", min: 45, max: 75, step: 1 },
+  { key: "lifeExp", label: "기대수명", unit: "세", min: 70, max: 100, step: 1 },
 ];
 const MONEY_FIELDS: FieldDef[] = [
-  { key: "savings", label: "현재 모은 금액", unit: "만 원", min: 0, max: 50000, step: 100 },
-  { key: "monthly", label: "매달 저축액", unit: "만 원", min: 0, max: 500, step: 5 },
-  { key: "returnRate", label: "예상 연 수익률", unit: "%", min: 0, max: 10, step: 0.5 },
+  { key: "savings", label: "현재 보유자산", unit: "만 원", min: 0, max: 50000, step: 100 },
+  { key: "monthly", label: "월 저축액", unit: "만 원", min: 0, max: 500, step: 5 },
+  { key: "returnRate", label: "예상 수익률(연)", unit: "%", min: 0, max: 10, step: 0.5 },
 ];
 const LIFE_FIELDS: FieldDef[] = [
-  { key: "expense", label: "은퇴 후 희망 월 생활비", unit: "만 원", min: 100, max: 600, step: 10 },
-  { key: "pension", label: "국민연금 예상 월 수령액", unit: "만 원", min: 0, max: 300, step: 5 },
+  { key: "expense", label: "은퇴 후 월 생활비", unit: "만 원", min: 100, max: 600, step: 10 },
+  { key: "pension", label: "국민연금 예상 수령액(월)", unit: "만 원", min: 0, max: 300, step: 5 },
 ];
 
 export function RetirementDemo() {
@@ -203,7 +203,7 @@ export function RetirementDemo() {
         <div className="mx-auto max-w-[1200px] px-4 pb-10 pt-6 md:px-6 md:pb-14 md:pt-10">
           <h1 className="text-[30px] font-bold leading-[1.3] md:text-[42px]">노후준비 계산기</h1>
           <p className="mt-2 text-[16px] leading-[1.6] text-[#c9d6e6] md:text-[17px]">
-            지금의 저축 습관으로 은퇴 후 생활비를 얼마나 채울 수 있는지 확인해 보세요.
+            산출 기준: 적립기간 월 복리, 은퇴 후 연 2.5% 운용, 물가상승률 연 2%
           </p>
         </div>
       </header>
@@ -212,7 +212,7 @@ export function RetirementDemo() {
         <div className="grid gap-5 lg:grid-cols-[minmax(0,1fr)_minmax(0,1.15fr)]">
           {/* 입력 */}
           <section aria-labelledby="input-title" className="rounded-[14px] bg-white p-5 shadow-[0_1px_0_rgba(16,42,67,0.06)] md:p-7">
-            <h2 id="input-title" className="text-[20px] font-bold">내 정보 입력</h2>
+            <h2 id="input-title" className="text-[20px] font-bold">기본정보 입력</h2>
 
             <div className="mt-4">
               <p className="text-[15px] font-bold" style={{ color: INK_2 }}>
@@ -244,9 +244,9 @@ export function RetirementDemo() {
               </div>
             </div>
 
-            <FieldGroup title="나이" fields={AGE_FIELDS} inputs={safe} onChange={set} />
-            <FieldGroup title="모은 돈과 저축" fields={MONEY_FIELDS} inputs={safe} onChange={set} />
-            <FieldGroup title="은퇴 후 생활" fields={LIFE_FIELDS} inputs={safe} onChange={set} />
+            <FieldGroup title="연령" fields={AGE_FIELDS} inputs={safe} onChange={set} />
+            <FieldGroup title="보유자산 및 저축" fields={MONEY_FIELDS} inputs={safe} onChange={set} />
+            <FieldGroup title="은퇴 후 생활비" fields={LIFE_FIELDS} inputs={safe} onChange={set} />
 
             <label className="mt-6 flex cursor-pointer items-center gap-3 rounded-[10px] px-3 py-3" style={{ background: "#f5f7fa" }}>
               <input
@@ -264,32 +264,32 @@ export function RetirementDemo() {
           <section aria-labelledby="result-title" className="space-y-5">
             <div className="rounded-[14px] p-5 text-white md:p-7" style={{ background: shortfall ? "#7a2e1c" : "#0f4c75" }}>
               <h2 id="result-title" className="text-[15px] font-bold text-white/80">
-                은퇴 시점 기준 결과
+                노후자금 진단 결과
               </h2>
               <p className="mt-2 text-[17px] leading-[1.6]">
-                {safe.retireAge}세에 은퇴하면 노후 자금이
+                {safe.retireAge}세 은퇴 기준 노후자금
               </p>
               <p className="mt-1 break-keep text-[34px] font-bold leading-[1.2] tabular-nums md:text-[44px]" aria-live="polite">
-                {formatMan(Math.abs(result.gap))} {shortfall ? "부족해요" : "여유 있어요"}
+                {formatMan(Math.abs(result.gap))} {shortfall ? "부족" : "여유"}
               </p>
               {shortfall && (
                 <p className="mt-3 text-[16px] leading-[1.6] text-white/90">
-                  지금보다 매달 <b className="text-white">{formatMan(result.extraMonthly)}</b>을 더 모으면 목표를 채울 수 있어요.
+                  매월 <b className="text-white">{formatMan(result.extraMonthly)}</b>을 추가로 저축하면 목표 금액을 달성합니다.
                 </p>
               )}
               {result.depletedAge !== null && (
                 <p className="mt-2 text-[15px] leading-[1.6] text-white/85">
-                  지금 계획대로라면 {result.depletedAge}세 무렵 모은 돈을 모두 쓰게 돼요.
+                  현재 계획 기준 자산 소진 예상 연령은 {result.depletedAge}세입니다.
                 </p>
               )}
             </div>
 
             <dl className="grid grid-cols-2 gap-3">
               <Stat icon={<Wallet size={18} aria-hidden />} label="은퇴 시점 예상 자산" value={formatMan(result.projected)} />
-              <Stat icon={<PiggyBank size={18} aria-hidden />} label="필요한 노후 자금" value={formatMan(result.needed)} />
+              <Stat icon={<PiggyBank size={18} aria-hidden />} label="필요 노후자금" value={formatMan(result.needed)} />
               <Stat
                 icon={<TrendingUp size={18} aria-hidden />}
-                label="매달 추가 저축 필요액"
+                label="월 추가 저축 필요액"
                 value={shortfall ? formatMan(result.extraMonthly) : "없음"}
               />
               <Stat
@@ -316,13 +316,13 @@ export function RetirementDemo() {
               <AssetChart points={result.points} retireAge={safe.retireAge} />
               <details className="mt-3">
                 <summary className="cursor-pointer text-[15px] font-bold" style={{ color: C_PLAN }}>
-                  표로 보기
+                  연령별 상세 표
                 </summary>
                 <div className="mt-2 overflow-x-auto">
                   <table className="w-full min-w-[320px] text-[14px] tabular-nums">
                     <thead>
                       <tr className="border-b text-left" style={{ borderColor: LINE }}>
-                        <th scope="col" className="py-2 font-bold">나이</th>
+                        <th scope="col" className="py-2 font-bold">연령</th>
                         <th scope="col" className="py-2 text-right font-bold">예상 자산</th>
                         <th scope="col" className="py-2 text-right font-bold">필요 자산</th>
                       </tr>
@@ -561,7 +561,7 @@ function ConsultForm() {
             className="mt-2 text-[15px] font-bold underline underline-offset-4"
             style={{ color: C_PLAN }}
           >
-            다시 신청하기
+            재신청
           </button>
         </div>
       </div>
@@ -583,7 +583,7 @@ function ConsultForm() {
       <div className="mt-4 grid gap-3 sm:grid-cols-3">
         <label className="block">
           <span className="text-[14px] font-bold" style={{ color: INK_2 }}>
-            이름
+            성명
           </span>
           <input
             value={name}
@@ -609,7 +609,7 @@ function ConsultForm() {
         </label>
         <label className="block">
           <span className="text-[14px] font-bold" style={{ color: INK_2 }}>
-            희망 시간
+            상담 희망 시간
           </span>
           <select
             value={time}
@@ -629,7 +629,7 @@ function ConsultForm() {
         className="mt-4 h-12 w-full rounded-[10px] text-[17px] font-bold text-white transition-opacity disabled:opacity-40"
         style={{ background: C_PLAN }}
       >
-        상담 신청하기
+        상담 신청
       </button>
     </form>
   );

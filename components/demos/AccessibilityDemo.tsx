@@ -36,16 +36,16 @@ interface Issue {
 }
 
 const ISSUES: Issue[] = [
-  { id: 1, item: "적절한 대체 텍스트 제공", region: "banner", problem: "로고와 배너 이미지에 대체 텍스트가 없어 화면낭독기가 파일 이름만 읽습니다.", fix: "이미지마다 담긴 내용을 대체 텍스트로 제공했습니다." },
-  { id: 2, item: "정지 기능 제공", region: "banner", problem: "배너가 3초마다 자동으로 넘어가고 멈출 방법이 없습니다.", fix: "정지·재생, 이전·다음 버튼을 넣고 움직임 줄이기 설정에서는 자동으로 넘기지 않습니다." },
-  { id: 3, item: "반복 영역 건너뛰기", region: "header", problem: "키보드 사용자가 매번 메뉴를 모두 지나야 본문에 닿습니다.", fix: "페이지 맨 앞에 본문 바로가기 링크를 두었습니다." },
-  { id: 4, item: "초점 이동과 표시", region: "header", problem: "키보드 초점 표시를 없애서 현재 위치를 알 수 없습니다.", fix: "링크·버튼·입력란에 굵은 초점 테두리를 표시합니다." },
-  { id: 5, item: "텍스트 콘텐츠의 명도 대비", region: "notice", problem: "공지 날짜와 본문이 연한 회색이라 대비가 2:1에 그칩니다.", fix: "글자와 배경의 명도 대비를 4.5:1 이상으로 높였습니다." },
-  { id: 6, item: "적절한 링크 텍스트", region: "notice", problem: "링크 문구가 '여기를 클릭'이라 어디로 가는지 알 수 없습니다.", fix: "'공지사항 전체 보기'처럼 목적이 드러나는 문구로 바꿨습니다." },
-  { id: 7, item: "표의 구성", region: "schedule", problem: "행사 일정 표에 제목과 제목 셀이 없어 칸의 의미를 알 수 없습니다.", fix: "표 제목과 행·열 제목 셀을 지정했습니다." },
+  { id: 1, item: "적절한 대체 텍스트 제공", region: "banner", problem: "로고와 배너 이미지에 대체 텍스트가 없어 화면낭독기가 파일 이름만 읽습니다.", fix: "이미지별로 내용을 담은 대체 텍스트를 제공합니다." },
+  { id: 2, item: "정지 기능 제공", region: "banner", problem: "배너가 3초마다 자동으로 넘어가고 멈출 방법이 없습니다.", fix: "정지·재생, 이전·다음 버튼을 제공하고, 동작 줄이기 설정 시 자동 전환하지 않습니다." },
+  { id: 3, item: "반복 영역 건너뛰기", region: "header", problem: "키보드 사용 시 페이지마다 메뉴 전체를 거쳐야 본문에 도달합니다.", fix: "페이지 첫 위치에 본문 바로가기 링크를 제공합니다." },
+  { id: 4, item: "초점 이동과 표시", region: "header", problem: "키보드 초점 표시가 제거되어 현재 초점 위치를 알 수 없습니다.", fix: "링크·버튼·입력란에 초점 테두리를 표시합니다." },
+  { id: 5, item: "텍스트 콘텐츠의 명도 대비", region: "notice", problem: "공지 제목과 날짜가 연한 회색으로 명도 대비가 2:1 수준입니다.", fix: "글자와 배경의 명도 대비를 4.5:1 이상으로 높였습니다." },
+  { id: 6, item: "적절한 링크 텍스트", region: "notice", problem: "링크 문구가 '여기를 클릭'이라 어디로 가는지 알 수 없습니다.", fix: "링크 목적을 알 수 있는 문구('공지사항 전체 보기')로 수정했습니다." },
+  { id: 7, item: "표의 구성", region: "schedule", problem: "행사 일정 표에 표 제목과 제목 셀이 없습니다.", fix: "표 제목과 행·열 제목 셀을 지정했습니다." },
   { id: 8, item: "색에 무관한 콘텐츠 인식", region: "schedule", problem: "접수 상태를 초록·빨강 점으로만 구분합니다.", fix: "상태를 글자와 아이콘으로 함께 표시합니다." },
-  { id: 9, item: "레이블 제공", region: "form", problem: "입력란에 안내 문구만 있고 레이블이 없어 입력하면 무엇을 쓰는 칸인지 사라집니다.", fix: "모든 입력란에 레이블을 연결했습니다." },
-  { id: 10, item: "오류 정정", region: "form", problem: "빈칸이 있어도 아무 안내 없이 신청이 되지 않습니다.", fix: "빠진 항목을 입력란 아래와 요약 목록으로 알리고 첫 번째 칸으로 이동합니다." },
+  { id: 9, item: "레이블 제공", region: "form", problem: "입력란에 안내 문구만 있고 레이블이 없어, 입력을 시작하면 항목명을 확인할 수 없습니다.", fix: "모든 입력란에 레이블을 연결했습니다." },
+  { id: 10, item: "오류 정정", region: "form", problem: "필수 항목 누락 시 오류 안내 없이 신청이 처리되지 않습니다.", fix: "누락 항목을 입력란 아래와 오류 요약에 표시하고, 첫 번째 오류 항목으로 초점을 이동합니다." },
   { id: 11, item: "제목 제공", region: "header", alreadyOk: true, problem: "페이지와 영역마다 제목이 있습니다.", fix: "기존 구조를 유지했습니다." },
   { id: 12, item: "기본 언어 표시", region: "header", alreadyOk: true, problem: "문서의 기본 언어가 한국어로 지정되어 있습니다.", fix: "기존 설정을 유지했습니다." },
 ];
@@ -71,7 +71,7 @@ const SCHEDULE: { name: string; date: string; place: string; status: Status }[] 
   { name: "시민 사진 공모전 전시", date: "11.22(토)", place: "○○시립미술관", status: "soon" },
 ];
 
-const STATUS_TEXT: Record<Status, string> = { open: "접수 중", closed: "마감", soon: "접수 예정" };
+const STATUS_TEXT: Record<Status, string> = { open: "접수중", closed: "접수마감", soon: "접수예정" };
 
 function useReducedMotion() {
   const [reduced, setReduced] = useState(false);
@@ -164,7 +164,7 @@ export function AccessibilityDemo() {
           <div className="rounded-[6px] border-2 border-[#161a33] bg-white">
             <div className="flex items-center gap-2 border-b-2 border-[#161a33] px-4 py-3">
               <ClipboardCheck size={20} aria-hidden />
-              <h2 className="text-[17px] font-bold">점검 항목</h2>
+              <h2 className="text-[17px] font-bold">검사항목</h2>
               <span className="ml-auto text-[15px] text-[#474c68]">KWCAG 2.2 기준</span>
             </div>
             <ol className="divide-y divide-[#d5d8e3]">
@@ -196,10 +196,10 @@ export function AccessibilityDemo() {
                         {selected && (
                           <span className="mt-2 block space-y-2 text-[15px] leading-relaxed">
                             <span className="block">
-                              <b className="text-[#9c1c11]">문제</b> {issue.problem}
+                              <b className="text-[#9c1c11]">오류 내용</b> {issue.problem}
                             </span>
                             <span className="block">
-                              <b className="text-[#16603b]">조치</b> {issue.fix}
+                              <b className="text-[#16603b]">조치 내용</b> {issue.fix}
                             </span>
                           </span>
                         )}
@@ -211,7 +211,7 @@ export function AccessibilityDemo() {
             </ol>
           </div>
           <p className="mt-3 text-[15px] leading-relaxed text-[#474c68]">
-            항목을 누르면 샘플 페이지에서 해당 위치를 표시합니다.
+            점검 기준: 한국형 웹 콘텐츠 접근성 지침 2.2
           </p>
         </aside>
       </div>
@@ -317,7 +317,7 @@ function SamplePage({
           {/* eslint-disable-next-line @next/next/no-img-element */}
           <img src="/images/demo-a11y/logo.svg" alt={good ? "○○시 문화재단" : undefined} width={200} height={44} className="h-9 w-auto" />
           <nav aria-label={good ? "주 메뉴" : undefined} className="flex flex-wrap gap-x-4 gap-y-1 text-[15px] font-bold text-[#2b1a33]">
-            {["재단 소개", "공연·전시", "교육", "지원사업", "알림 마당"].map((m) => (
+            {["재단소개", "공연·전시", "교육", "지원사업", "알림마당"].map((m) => (
               <a key={m} href="#sample-main" onClick={(e) => e.preventDefault()} className="rounded px-1 py-0.5 hover:text-[#6b2d8c]">
                 {m}
               </a>
@@ -363,10 +363,10 @@ function SamplePage({
                     <caption className="sr-only">10월과 11월 행사 일정과 접수 상태</caption>
                     <thead>
                       <tr className="border-b-2 border-[#2b1a33] text-left">
-                        <th scope="col" className="py-2 font-bold">행사</th>
-                        <th scope="col" className="py-2 font-bold">날짜</th>
+                        <th scope="col" className="py-2 font-bold">행사명</th>
+                        <th scope="col" className="py-2 font-bold">일시</th>
                         <th scope="col" className="py-2 font-bold">장소</th>
-                        <th scope="col" className="py-2 font-bold">접수</th>
+                        <th scope="col" className="py-2 font-bold">접수상태</th>
                       </tr>
                     </thead>
                     <tbody>
@@ -386,10 +386,10 @@ function SamplePage({
                   <table className="w-full min-w-[420px] text-[15px]">
                     <tbody>
                       <tr className="border-b border-[#eee] bg-[#f4f4f4]">
-                        <td className="py-2">행사</td>
-                        <td className="py-2">날짜</td>
+                        <td className="py-2">행사명</td>
+                        <td className="py-2">일시</td>
                         <td className="py-2">장소</td>
-                        <td className="py-2">접수</td>
+                        <td className="py-2">접수상태</td>
                       </tr>
                       {SCHEDULE.map((s) => (
                         <tr key={s.name} className="border-b border-[#eee]">
@@ -477,7 +477,7 @@ function Banner({ good, reduced }: { good: boolean; reduced: boolean }) {
           <button
             type="button"
             onClick={() => setPlaying((p) => !p)}
-            aria-label={playing && !reduced ? "배너 자동 넘김 정지" : "배너 자동 넘김 재생"}
+            aria-label={playing && !reduced ? "배너 자동 전환 정지" : "배너 자동 전환 재생"}
             disabled={reduced}
             className="flex h-9 w-9 items-center justify-center rounded hover:bg-white/20 disabled:opacity-50"
           >
@@ -501,9 +501,9 @@ function ApplyForm({ good }: { good: boolean }) {
     e.preventDefault();
     if (!good) return; // 개선 전: 아무 안내 없이 넘어가지 않는다
     const next: FormErrors = {};
-    if (!values.name.trim()) next.name = "이름을 입력하세요.";
-    if (!/^01\d-?\d{3,4}-?\d{4}$/.test(values.phone.trim())) next.phone = "연락처를 010-0000-0000 형식으로 입력하세요.";
-    if (!values.event) next.event = "신청할 행사를 선택하세요.";
+    if (!values.name.trim()) next.name = "성명은 필수 입력 항목입니다.";
+    if (!/^01\d-?\d{3,4}-?\d{4}$/.test(values.phone.trim())) next.phone = "연락처 형식이 올바르지 않습니다. (예: 010-0000-0000)";
+    if (!values.event) next.event = "행사명은 필수 선택 항목입니다.";
     if (!values.agree) next.agree = "개인정보 수집·이용에 동의해야 신청할 수 있습니다.";
     setErrors(next);
     const first = (Object.keys(next) as (keyof FormErrors)[])[0];
@@ -524,7 +524,7 @@ function ApplyForm({ good }: { good: boolean }) {
         <div role="alert" className="mt-3 rounded border border-[#d9453a] bg-[#fdecea] px-3 py-2 text-[15px] text-[#8c1a10]">
           <p className="flex items-center gap-1 font-bold">
             <CircleAlert size={16} aria-hidden />
-            입력 내용을 확인해 주세요.
+            입력 내용을 확인하십시오.
           </p>
           <ul className="mt-1 list-disc pl-5">
             {Object.values(errors).map((m) => (
@@ -541,15 +541,15 @@ function ApplyForm({ good }: { good: boolean }) {
       <form onSubmit={submit} noValidate className="mt-3 grid gap-3 sm:grid-cols-2">
         {good ? (
           <>
-            <Field id="f-name" label="이름" error={errors.name}>
+            <Field id="f-name" label="성명" error={errors.name}>
               <input id="f-name" value={values.name} onChange={(e) => setValues((v) => ({ ...v, name: e.target.value }))} aria-invalid={Boolean(errors.name)} aria-describedby={errors.name ? "f-name-err" : undefined} className={`${inputBase} border-[#6b6272]`} />
             </Field>
             <Field id="f-phone" label="연락처" error={errors.phone}>
               <input id="f-phone" inputMode="tel" value={values.phone} onChange={(e) => setValues((v) => ({ ...v, phone: e.target.value }))} aria-invalid={Boolean(errors.phone)} aria-describedby={errors.phone ? "f-phone-err" : undefined} className={`${inputBase} border-[#6b6272]`} />
             </Field>
-            <Field id="f-event" label="행사" error={errors.event}>
+            <Field id="f-event" label="행사명" error={errors.event}>
               <select id="f-event" value={values.event} onChange={(e) => setValues((v) => ({ ...v, event: e.target.value }))} aria-invalid={Boolean(errors.event)} aria-describedby={errors.event ? "f-event-err" : undefined} className={`${inputBase} border-[#6b6272] bg-white`}>
-                <option value="">선택하세요</option>
+                <option value="">선택</option>
                 {openEvents.map((s) => (
                   <option key={s.name}>{s.name}</option>
                 ))}
@@ -565,10 +565,10 @@ function ApplyForm({ good }: { good: boolean }) {
           </>
         ) : (
           <>
-            <input placeholder="이름" className={`${inputBase} border-[#ddd] placeholder:text-[#c8c8c8]`} />
+            <input placeholder="성명" className={`${inputBase} border-[#ddd] placeholder:text-[#c8c8c8]`} />
             <input placeholder="연락처" className={`${inputBase} border-[#ddd] placeholder:text-[#c8c8c8]`} />
             <select className={`${inputBase} border-[#ddd] bg-white text-[#aaa]`} defaultValue="">
-              <option value="">행사</option>
+              <option value="">행사명</option>
               {openEvents.map((s) => (
                 <option key={s.name}>{s.name}</option>
               ))}
@@ -581,7 +581,7 @@ function ApplyForm({ good }: { good: boolean }) {
         )}
         <div className="sm:col-span-2">
           <button type="submit" className={`h-11 rounded px-6 text-[15px] font-bold text-white ${good ? "bg-[#6b2d8c] hover:bg-[#57237a]" : "bg-[#c9a9d9]"}`}>
-            신청하기
+            신청
           </button>
         </div>
       </form>

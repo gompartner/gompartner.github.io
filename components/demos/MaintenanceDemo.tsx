@@ -23,7 +23,7 @@ import { useLocalStorage } from "@/hooks/useLocalStorage";
 
 const plex = IBM_Plex_Sans_KR({ weight: ["400", "700"], subsets: ["latin"], preload: false, display: "swap" });
 
-const STORAGE_KEY = "gs-demo:maintenance:v1";
+const STORAGE_KEY = "gs-demo:maintenance:v2";
 
 /* 기관 홈페이지 유지보수 현황판 데모.
    야간 관제실 느낌의 짙은 청록 작업 화면: 가동 상태 띠, 요청 대기열, 처리 기록.
@@ -31,7 +31,7 @@ const STORAGE_KEY = "gs-demo:maintenance:v1";
 
    색 (어두운 화면 기준 대비 확인):
    바탕 #0f1e2e, 패널 #152a3f, 선 #28435e, 본문 #e6eef6(14:1), 보조 #a3b8cc(8:1),
-   조작 #6fd3ea(9:1, 버튼은 바탕색 글자), 상태 접수 #a9bdff, 처리 중 #f3b847, 완료 #66d6a8, 조치 필요 #ff9a84 */
+   조작 #6fd3ea(9:1, 버튼은 바탕색 글자), 상태 접수 #a9bdff, 처리중 #f3b847, 처리완료 #66d6a8, 조치 필요 #ff9a84 */
 
 const C = {
   bg: "#0f1e2e",
@@ -43,8 +43,8 @@ const C = {
   action: "#6fd3ea",
 } as const;
 
-const REQUEST_TYPES = ["콘텐츠 수정", "오류", "보안", "기능 개선"] as const;
-const STATUSES = ["접수", "처리 중", "완료"] as const;
+const REQUEST_TYPES = ["콘텐츠 수정", "오류 수정", "보안 조치", "기능 개선"] as const;
+const STATUSES = ["접수", "처리중", "처리완료"] as const;
 const DEPARTMENTS = ["입학처", "교무처", "학생지원처", "홍보팀", "정보전산원", "도서관", "체육학과", "간호학과"];
 
 type RequestType = (typeof REQUEST_TYPES)[number];
@@ -83,26 +83,26 @@ const PERIOD = "2026. 9. 1. ~ 2026. 9. 30.";
 
 const SEED_REQUESTS: Request[] = [
   { id: "r16", no: 16, date: "2026-09-28", dept: "입학처", requester: "박서연", type: "콘텐츠 수정", title: "수시 모집 공지 메인 배너 교체", content: "메인 배너를 2027학년도 수시 모집 안내 이미지로 교체 요청합니다.", status: "접수", resolution: "" },
-  { id: "r15", no: 15, date: "2026-09-26", dept: "정보전산원", requester: "정민호", type: "보안", title: "관리자 페이지 접속 IP 제한 추가", content: "외부망에서 관리자 페이지 접속을 막아 주세요.", status: "처리 중", resolution: "학내 IP 대역 목록 확인 중입니다." },
-  { id: "r14", no: 14, date: "2026-09-24", dept: "체육학과", requester: "이도윤", type: "콘텐츠 수정", title: "학과 교수진 사진 변경", content: "신임 교수 2명 사진과 연구실 번호를 반영해 주세요.", status: "완료", resolution: "교수진 페이지 사진과 연락처를 변경했습니다.", doneDate: "2026-09-25" },
-  { id: "r13", no: 13, date: "2026-09-22", dept: "학생지원처", requester: "최지우", type: "오류", title: "장학 공지 게시판 첨부파일 다운로드 오류", content: "한글 파일명 첨부파일이 내려받아지지 않습니다.", status: "완료", resolution: "첨부파일 이름 인코딩 처리를 수정했습니다.", doneDate: "2026-09-23" },
-  { id: "r12", no: 12, date: "2026-09-19", dept: "홍보팀", requester: "한예린", type: "기능 개선", title: "보도자료 게시판 대표 이미지 표시", content: "목록에서 대표 이미지가 보이게 해 주세요.", status: "처리 중", resolution: "목록 화면 수정 후 검토 요청 예정입니다." },
-  { id: "r11", no: 11, date: "2026-09-17", dept: "정보전산원", requester: "정민호", type: "보안", title: "보안 취약점 점검 결과 조치", content: "게시판 검색어 입력값 검증 취약점 2건 조치 요청입니다.", status: "완료", resolution: "입력값 필터를 적용하고 재점검 결과를 전달했습니다.", doneDate: "2026-09-19" },
-  { id: "r10", no: 10, date: "2026-09-15", dept: "교무처", requester: "김하늘", type: "콘텐츠 수정", title: "2학기 학사 일정 표 수정", content: "중간고사 기간 변경분을 반영해 주세요.", status: "완료", resolution: "학사 일정 페이지 표를 수정했습니다.", doneDate: "2026-09-15" },
-  { id: "r09", no: 9, date: "2026-09-11", dept: "도서관", requester: "윤서아", type: "오류", title: "모바일에서 운영 시간 표 깨짐", content: "휴대폰으로 보면 표가 화면 밖으로 넘어갑니다.", status: "완료", resolution: "표를 모바일에서 가로 스크롤되도록 수정했습니다.", doneDate: "2026-09-12" },
-  { id: "r08", no: 8, date: "2026-09-09", dept: "간호학과", requester: "오하준", type: "콘텐츠 수정", title: "실습 안내 자료 파일 교체", content: "실습 안내 PDF 파일을 새 버전으로 바꿔 주세요.", status: "완료", resolution: "첨부파일을 교체했습니다.", doneDate: "2026-09-09" },
-  { id: "r07", no: 7, date: "2026-09-05", dept: "입학처", requester: "박서연", type: "기능 개선", title: "입학 상담 신청 항목 추가", content: "상담 신청 양식에 희망 학과 선택 항목을 추가해 주세요.", status: "완료", resolution: "희망 학과 선택 항목과 관리자 목록 열을 추가했습니다.", doneDate: "2026-09-10" },
-  { id: "r06", no: 6, date: "2026-09-03", dept: "홍보팀", requester: "한예린", type: "콘텐츠 수정", title: "대학 소개 영상 교체", content: "메인 소개 영상을 2026년 버전으로 바꿔 주세요.", status: "완료", resolution: "영상 링크와 썸네일을 교체했습니다.", doneDate: "2026-09-04" },
-  { id: "r05", no: 5, date: "2026-09-01", dept: "학생지원처", requester: "최지우", type: "오류", title: "상담 예약 페이지 접속 오류", content: "상담 예약 페이지가 간헐적으로 열리지 않습니다.", status: "완료", resolution: "세션 설정을 수정하고 3일간 모니터링했습니다.", doneDate: "2026-09-04" },
-  { id: "r04", no: 4, date: "2026-08-27", dept: "교무처", requester: "김하늘", type: "콘텐츠 수정", title: "휴·복학 안내 문구 수정", content: "신청 기간 문구를 수정해 주세요.", status: "완료", resolution: "안내 문구를 수정했습니다.", doneDate: "2026-08-27" },
-  { id: "r03", no: 3, date: "2026-08-20", dept: "정보전산원", requester: "정민호", type: "보안", title: "SSL 인증서 갱신", content: "인증서 만료 전 갱신 요청입니다.", status: "완료", resolution: "인증서를 갱신하고 만료일을 확인했습니다.", doneDate: "2026-08-21" },
+  { id: "r15", no: 15, date: "2026-09-26", dept: "정보전산원", requester: "정민호", type: "보안 조치", title: "관리자 페이지 접속 IP 제한 추가", content: "외부망에서 관리자 페이지 접속 차단을 요청합니다.", status: "처리중", resolution: "학내 IP 대역 목록 확인 중입니다." },
+  { id: "r14", no: 14, date: "2026-09-24", dept: "체육학과", requester: "이도윤", type: "콘텐츠 수정", title: "학과 교수진 사진 변경", content: "신임 교수 2명 사진과 연구실 번호 반영을 요청합니다.", status: "처리완료", resolution: "교수진 페이지 사진과 연락처를 변경했습니다.", doneDate: "2026-09-25" },
+  { id: "r13", no: 13, date: "2026-09-22", dept: "학생지원처", requester: "최지우", type: "오류 수정", title: "장학 공지 게시판 첨부파일 다운로드 오류", content: "한글 파일명 첨부파일이 다운로드되지 않습니다.", status: "처리완료", resolution: "첨부파일 이름 인코딩 처리를 수정했습니다.", doneDate: "2026-09-23" },
+  { id: "r12", no: 12, date: "2026-09-19", dept: "홍보팀", requester: "한예린", type: "기능 개선", title: "보도자료 게시판 대표 이미지 표시", content: "게시판 목록에 대표 이미지 표시를 요청합니다.", status: "처리중", resolution: "목록 화면 수정 후 검토 요청 예정입니다." },
+  { id: "r11", no: 11, date: "2026-09-17", dept: "정보전산원", requester: "정민호", type: "보안 조치", title: "보안 취약점 점검 결과 조치", content: "게시판 검색어 입력값 검증 취약점 2건 조치 요청입니다.", status: "처리완료", resolution: "입력값 필터를 적용하고 재점검 결과를 전달했습니다.", doneDate: "2026-09-19" },
+  { id: "r10", no: 10, date: "2026-09-15", dept: "교무처", requester: "김하늘", type: "콘텐츠 수정", title: "2학기 학사 일정 표 수정", content: "중간고사 기간 변경분 반영을 요청합니다.", status: "처리완료", resolution: "학사 일정 페이지 표를 수정했습니다.", doneDate: "2026-09-15" },
+  { id: "r09", no: 9, date: "2026-09-11", dept: "도서관", requester: "윤서아", type: "오류 수정", title: "모바일에서 운영 시간 표 깨짐", content: "모바일 화면에서 표가 화면 밖으로 넘어갑니다.", status: "처리완료", resolution: "표를 모바일에서 가로 스크롤되도록 수정했습니다.", doneDate: "2026-09-12" },
+  { id: "r08", no: 8, date: "2026-09-09", dept: "간호학과", requester: "오하준", type: "콘텐츠 수정", title: "실습 안내 자료 파일 교체", content: "실습 안내 PDF 파일 교체를 요청합니다.", status: "처리완료", resolution: "첨부파일을 교체했습니다.", doneDate: "2026-09-09" },
+  { id: "r07", no: 7, date: "2026-09-05", dept: "입학처", requester: "박서연", type: "기능 개선", title: "입학 상담 신청 항목 추가", content: "상담 신청 양식에 희망 학과 선택 항목 추가를 요청합니다.", status: "처리완료", resolution: "희망 학과 선택 항목과 관리자 목록 열을 추가했습니다.", doneDate: "2026-09-10" },
+  { id: "r06", no: 6, date: "2026-09-03", dept: "홍보팀", requester: "한예린", type: "콘텐츠 수정", title: "대학 소개 영상 교체", content: "메인 소개 영상을 2026년 버전으로 교체 요청합니다.", status: "처리완료", resolution: "영상 링크와 썸네일을 교체했습니다.", doneDate: "2026-09-04" },
+  { id: "r05", no: 5, date: "2026-09-01", dept: "학생지원처", requester: "최지우", type: "오류 수정", title: "상담 예약 페이지 접속 오류", content: "상담 예약 페이지가 간헐적으로 열리지 않습니다.", status: "처리완료", resolution: "세션 설정을 수정하고 3일간 모니터링했습니다.", doneDate: "2026-09-04" },
+  { id: "r04", no: 4, date: "2026-08-27", dept: "교무처", requester: "김하늘", type: "콘텐츠 수정", title: "휴·복학 안내 문구 수정", content: "신청 기간 문구 수정을 요청합니다.", status: "처리완료", resolution: "안내 문구를 수정했습니다.", doneDate: "2026-08-27" },
+  { id: "r03", no: 3, date: "2026-08-20", dept: "정보전산원", requester: "정민호", type: "보안 조치", title: "SSL 인증서 갱신", content: "인증서 만료 전 갱신 요청입니다.", status: "처리완료", resolution: "인증서를 갱신하고 만료일을 확인했습니다.", doneDate: "2026-08-21" },
 ];
 
 const SEED_CHECKS: CheckItem[] = [
   { id: "server", label: "서버 가동 상태", result: "정상", note: "가동률 99.97%, 9월 11일 12분 지연" },
-  { id: "links", label: "깨진 링크", result: "조치 필요", note: "학과 페이지 외부 링크 3건 수정 예정" },
-  { id: "patch", label: "보안 패치", result: "정상", note: "웹 서버·CMS 최신 보안 패치 적용" },
-  { id: "backup", label: "백업 확인", result: "정상", note: "일일 백업 30회 성공, 복원 테스트 완료" },
+  { id: "links", label: "링크 오류 점검", result: "조치 필요", note: "학과 페이지 외부 링크 3건 수정 예정" },
+  { id: "patch", label: "보안 패치 적용", result: "정상", note: "웹 서버·CMS 최신 보안 패치 적용" },
+  { id: "backup", label: "백업 상태", result: "정상", note: "일일 백업 30회 성공, 복원 테스트 완료" },
   { id: "ssl", label: "SSL 인증서 만료일", result: "정상", note: "2027. 8. 20. 만료" },
   { id: "a11y", label: "웹 접근성 점검", result: "조치 필요", note: "이미지 대체 텍스트 누락 5건" },
 ];
@@ -113,16 +113,16 @@ const INITIAL_STATE: State = { requests: SEED_REQUESTS, checks: SEED_CHECKS };
 const UPTIME = Array.from({ length: 30 }, (_, i) => (i === 10 ? 99.2 : 100));
 
 const TABS = [
-  { id: "requests", label: "수정 요청", icon: ListChecks },
-  { id: "checks", label: "월간 점검", icon: ClipboardCheck },
-  { id: "report", label: "점검 보고서", icon: FileText },
+  { id: "requests", label: "유지보수 요청", icon: ListChecks },
+  { id: "checks", label: "정기점검", icon: ClipboardCheck },
+  { id: "report", label: "월간 점검 보고서", icon: FileText },
 ] as const;
 
 type TabId = (typeof TABS)[number]["id"];
 
 const CHOSEONG = "ㄱㄲㄴㄷㄸㄹㅁㅂㅃㅅㅆㅇㅈㅉㅊㅋㅌㅍㅎ";
 
-/** 가운데 글자를 초성으로 바꾼다. 예: 김하늘은 김ㅎ늘 */
+/** 가운데 글자를 초성으로 바꾼다. 김하늘은 김ㅎ늘, 두 글자는 이* */
 function maskName(name: string) {
   const chars = [...name.trim()];
   if (chars.length < 2) return name;
@@ -130,7 +130,7 @@ function maskName(name: string) {
     const code = c.charCodeAt(0) - 0xac00;
     return code >= 0 && code <= 11171 ? CHOSEONG[Math.floor(code / 588)] : "*";
   };
-  if (chars.length === 2) return chars[0] + toChoseong(chars[1]);
+  if (chars.length === 2) return chars[0] + "*";
   return chars[0] + chars.slice(1, -1).map(toChoseong).join("") + chars[chars.length - 1];
 }
 
@@ -158,8 +158,8 @@ function uid() {
 
 const statusStyle: Record<Status, { icon: typeof Inbox; color: string }> = {
   접수: { icon: Inbox, color: "#a9bdff" },
-  "처리 중": { icon: Clock, color: "#f3b847" },
-  완료: { icon: CheckCircle2, color: "#66d6a8" },
+  처리중: { icon: Clock, color: "#f3b847" },
+  처리완료: { icon: CheckCircle2, color: "#66d6a8" },
 };
 
 function StatusMark({ status }: { status: Status }) {
@@ -190,12 +190,12 @@ export function MaintenanceDemo() {
 
   const monthRequests = useMemo(() => state.requests.filter((r) => r.date.startsWith(MONTH)), [state.requests]);
   const summary = useMemo(() => {
-    const done = monthRequests.filter((r) => r.status === "완료" && r.doneDate);
+    const done = monthRequests.filter((r) => r.status === "처리완료" && r.doneDate);
     const avg = done.length ? done.reduce((sum, r) => sum + daysBetween(r.date, r.doneDate!), 0) / done.length : 0;
     return {
       received: monthRequests.length,
       done: done.length,
-      inProgress: monthRequests.filter((r) => r.status !== "완료").length,
+      inProgress: monthRequests.filter((r) => r.status !== "처리완료").length,
       avgDays: Math.round(avg * 10) / 10,
     };
   }, [monthRequests]);
@@ -210,7 +210,7 @@ export function MaintenanceDemo() {
   );
   const selected = state.requests.find((r) => r.id === selectedId) ?? null;
   const recentDone = state.requests
-    .filter((r) => r.status === "완료" && r.doneDate)
+    .filter((r) => r.status === "처리완료" && r.doneDate)
     .sort((a, b) => (b.doneDate! > a.doneDate! ? 1 : -1))
     .slice(0, 6);
   const checksNeedAction = state.checks.filter((c) => c.result === "조치 필요").length;
@@ -220,7 +220,7 @@ export function MaintenanceDemo() {
   }
 
   function changeStatus(r: Request, status: Status) {
-    updateRequest(r.id, { status, doneDate: status === "완료" ? today() : undefined });
+    updateRequest(r.id, { status, doneDate: status === "처리완료" ? today() : undefined });
   }
 
   function addRequest() {
@@ -309,7 +309,7 @@ export function MaintenanceDemo() {
       <main className="mx-auto max-w-[1248px] px-4 py-6 pb-28 md:px-6">
         {!hydrated ? (
           <p className="py-20 text-center" style={{ color: C.muted }}>
-            불러오는 중
+            불러오는 중입니다.
           </p>
         ) : (
           <>
@@ -319,8 +319,8 @@ export function MaintenanceDemo() {
               <section className="mt-8 grid gap-6 lg:grid-cols-[minmax(0,1fr)_380px]">
                 <div className="min-w-0">
                   <div className="flex flex-wrap items-center gap-2">
-                    <h2 className="mr-2 text-[22px] font-bold">요청 대기열</h2>
-                    <div className="flex flex-wrap gap-1" role="group" aria-label="상태로 보기">
+                    <h2 className="mr-2 text-[22px] font-bold">유지보수 요청 목록</h2>
+                    <div className="flex flex-wrap gap-1" role="group" aria-label="처리상태 필터">
                       {(["전체", ...STATUSES] as const).map((s) => {
                         const active = statusFilter === s;
                         return (
@@ -347,7 +347,7 @@ export function MaintenanceDemo() {
                   <div className="mt-3 flex flex-wrap items-center gap-2">
                     <label className="flex items-center gap-2">
                       <span className="text-[15px] font-bold" style={{ color: C.muted }}>
-                        유형
+                        요청 유형
                       </span>
                       <select
                         value={typeFilter}
@@ -383,7 +383,7 @@ export function MaintenanceDemo() {
                         </select>
                       </label>
                       <label className="block">
-                        <span className="block text-[15px] font-bold">유형</span>
+                        <span className="block text-[15px] font-bold">요청 유형</span>
                         <select
                           value={form.type}
                           onChange={(e) => setForm((f) => ({ ...f, type: e.target.value as RequestType }))}
@@ -404,7 +404,7 @@ export function MaintenanceDemo() {
                         />
                       </label>
                       <label className="block md:col-span-2">
-                        <span className="block text-[15px] font-bold">내용</span>
+                        <span className="block text-[15px] font-bold">요청 내용</span>
                         <textarea
                           value={form.content}
                           onChange={(e) => setForm((f) => ({ ...f, content: e.target.value }))}
@@ -444,7 +444,7 @@ export function MaintenanceDemo() {
                               <span className="min-w-0">
                                 <span className="block text-[17px] font-bold">{r.title}</span>
                                 <span className="block text-[15px]" style={{ color: C.muted }}>
-                                  {r.dept} {maskName(r.requester)}, {r.type}, {shortDate(r.date)} 접수
+                                  {r.dept} {maskName(r.requester)}, {r.type}, 접수일 {shortDate(r.date)}
                                 </span>
                               </span>
                               <StatusMark status={r.status} />
@@ -456,7 +456,7 @@ export function MaintenanceDemo() {
                   </ol>
                   {filtered.length === 0 && (
                     <p className="mt-4 rounded-[10px] border border-dashed px-4 py-10 text-center" style={{ borderColor: C.rule, color: C.muted }}>
-                      조건에 맞는 요청이 없습니다.
+                      검색된 요청이 없습니다.
                     </p>
                   )}
                 </div>
@@ -467,7 +467,7 @@ export function MaintenanceDemo() {
                       <div className="flex items-start justify-between gap-3">
                         <div>
                           <p className="text-[15px] tabular-nums" style={{ color: C.muted }}>
-                            {selected.no}번 요청, {selected.dept} {maskName(selected.requester)}
+                            요청번호 {selected.no}, {selected.dept} {maskName(selected.requester)}
                           </p>
                           <h3 className="mt-1 text-[19px] font-bold leading-[1.4]">{selected.title}</h3>
                         </div>
@@ -483,15 +483,15 @@ export function MaintenanceDemo() {
                       <dl className="mt-4 grid grid-cols-[72px_1fr] gap-x-3 gap-y-2 text-[15px]">
                         <dt style={{ color: C.muted }}>접수일</dt>
                         <dd className="tabular-nums">{formatDate(selected.date)}</dd>
-                        <dt style={{ color: C.muted }}>유형</dt>
+                        <dt style={{ color: C.muted }}>요청 유형</dt>
                         <dd>{selected.type}</dd>
-                        <dt style={{ color: C.muted }}>상태</dt>
+                        <dt style={{ color: C.muted }}>처리상태</dt>
                         <dd>
                           <StatusMark status={selected.status} />
                         </dd>
                         {selected.doneDate && (
                           <>
-                            <dt style={{ color: C.muted }}>완료일</dt>
+                            <dt style={{ color: C.muted }}>처리완료일</dt>
                             <dd className="tabular-nums">{formatDate(selected.doneDate)}</dd>
                           </>
                         )}
@@ -511,7 +511,7 @@ export function MaintenanceDemo() {
                         rows={3}
                         className={`${field} mt-1 h-auto py-2 leading-[1.5]`}
                       />
-                      <p className="mt-4 text-[15px] font-bold">상태 변경</p>
+                      <p className="mt-4 text-[15px] font-bold">처리상태 변경</p>
                       <div className="mt-2 grid grid-cols-3 gap-2">
                         {STATUSES.map((s) => {
                           const on = selected.status === s;
@@ -538,7 +538,7 @@ export function MaintenanceDemo() {
                     </div>
                   ) : (
                     <div>
-                      <h3 className="text-[19px] font-bold">최근 처리 기록</h3>
+                      <h3 className="text-[19px] font-bold">최근 처리 내역</h3>
                       <ol className="mt-4">
                         {recentDone.map((r, i) => {
                           const days = daysBetween(r.date, r.doneDate!);
@@ -553,12 +553,12 @@ export function MaintenanceDemo() {
                               >
                                 <span
                                   className="absolute -left-[6px] top-[7px] h-[11px] w-[11px] rounded-full border-2"
-                                  style={{ borderColor: statusStyle["완료"].color, background: C.panel }}
+                                  style={{ borderColor: statusStyle["처리완료"].color, background: C.panel }}
                                   aria-hidden
                                 />
                                 <span className="block text-[15px] font-bold">{r.title}</span>
                                 <span className="block text-[15px]" style={{ color: C.muted }}>
-                                  {r.dept}, {days ? `${days}일 걸림` : "당일 처리"}
+                                  {r.dept}, {days ? `처리기간 ${days}일` : "당일 처리"}
                                 </span>
                               </span>
                             </li>
@@ -574,7 +574,7 @@ export function MaintenanceDemo() {
             {tab === "checks" && (
               <section className="mt-8">
                 <div className="flex flex-wrap items-baseline gap-3">
-                  <h2 className="text-[22px] font-bold">9월 정기 점검</h2>
+                  <h2 className="text-[22px] font-bold">9월 정기점검</h2>
                   <p className="text-[15px]" style={{ color: C.muted }}>
                     점검일 2026. 9. 29.
                   </p>
@@ -587,7 +587,7 @@ export function MaintenanceDemo() {
                       style={{ background: C.panel, borderTop: i ? `1px solid ${C.rule}` : undefined }}
                     >
                       <p className="font-bold">{c.label}</p>
-                      <div className="flex gap-2" role="radiogroup" aria-label={`${c.label} 결과`}>
+                      <div className="flex gap-2" role="radiogroup" aria-label={`${c.label} 점검결과`}>
                         {(["정상", "조치 필요"] as CheckResult[]).map((v) => {
                           const active = c.result === v;
                           const Icon = v === "정상" ? CheckCircle2 : TriangleAlert;
@@ -653,7 +653,7 @@ export function MaintenanceDemo() {
                 style={{ color: C.action }}
               >
                 <RotateCcw size={14} aria-hidden />
-                예시로 초기화
+                초기화
               </button>
             </div>
           </>
@@ -673,13 +673,13 @@ function HealthBand({
 }) {
   const avgUptime = (UPTIME.reduce((a, b) => a + b, 0) / UPTIME.length).toFixed(2);
   const indicators = [
-    { icon: Server, label: "서버", value: "정상 운영", sub: `가동률 ${avgUptime}%`, warn: false },
-    { icon: KeyRound, label: "SSL 인증서", value: "326일 남음", sub: "2027. 8. 20. 만료", warn: false },
-    { icon: Archive, label: "백업", value: "30회 성공", sub: "최근 9. 29. 03:00", warn: false },
+    { icon: Server, label: "서버", value: "정상", sub: `가동률 ${avgUptime}%`, warn: false },
+    { icon: KeyRound, label: "SSL 인증서", value: "만료 326일 전", sub: "2027. 8. 20. 만료", warn: false },
+    { icon: Archive, label: "백업", value: "30회 성공", sub: "최종 9. 29. 03:00", warn: false },
     {
       icon: checksNeedAction ? TriangleAlert : CheckCircle2,
-      label: "월간 점검",
-      value: checksNeedAction ? `조치 필요 ${checksNeedAction}건` : "모두 정상",
+      label: "정기점검",
+      value: checksNeedAction ? `조치 필요 ${checksNeedAction}건` : "전체 정상",
       sub: "9. 29. 점검",
       warn: checksNeedAction > 0,
     },
@@ -706,15 +706,15 @@ function HealthBand({
             <dd className="font-bold">{summary.received}건</dd>
           </div>
           <div className="flex gap-2">
-            <dt style={{ color: C.muted }}>완료</dt>
+            <dt style={{ color: C.muted }}>처리완료</dt>
             <dd className="font-bold">{summary.done}건</dd>
           </div>
           <div className="flex gap-2">
-            <dt style={{ color: C.muted }}>처리 중</dt>
+            <dt style={{ color: C.muted }}>처리중</dt>
             <dd className="font-bold">{summary.inProgress}건</dd>
           </div>
           <div className="flex gap-2">
-            <dt style={{ color: C.muted }}>평균 처리</dt>
+            <dt style={{ color: C.muted }}>평균 처리기간</dt>
             <dd className="font-bold">{summary.avgDays}일</dd>
           </div>
         </dl>
@@ -777,7 +777,7 @@ function ReportSheet({
 }) {
   const byType = REQUEST_TYPES.map((t) => ({ type: t, count: requests.filter((r) => r.type === t).length }));
   const max = Math.max(1, ...byType.map((b) => b.count));
-  const open = requests.filter((r) => r.status !== "완료");
+  const open = requests.filter((r) => r.status !== "처리완료");
   const needAction = checks.filter((c) => c.result === "조치 필요");
 
   return (
@@ -799,9 +799,9 @@ function ReportSheet({
         <dl className="mt-3 grid grid-cols-4 gap-3 text-center">
           {[
             ["접수", `${summary.received}건`],
-            ["처리 완료", `${summary.done}건`],
-            ["처리 중", `${summary.inProgress}건`],
-            ["평균 처리 기간", `${summary.avgDays}일`],
+            ["처리완료", `${summary.done}건`],
+            ["처리중", `${summary.inProgress}건`],
+            ["평균 처리기간", `${summary.avgDays}일`],
           ].map(([label, value]) => (
             <div key={label} className="rounded-[10px] bg-[#f4f5f6] py-3">
               <dt className="text-[13px] text-[#58616a]">{label}</dt>
@@ -825,15 +825,15 @@ function ReportSheet({
       </section>
 
       <section className="mt-6">
-        <h2 className="text-[17px] font-bold">3. 정기 점검 결과</h2>
+        <h2 className="text-[17px] font-bold">3. 정기점검 결과</h2>
         <table className="mt-3 w-full text-[15px]">
           <thead>
             <tr className="border-b border-[#1e2124] text-left">
               <th scope="col" className="py-2 font-bold">
-                항목
+                점검항목
               </th>
               <th scope="col" className="py-2 font-bold">
-                결과
+                점검결과
               </th>
               <th scope="col" className="py-2 font-bold">
                 비고
@@ -856,7 +856,7 @@ function ReportSheet({
         <h2 className="text-[17px] font-bold">4. 주요 처리 내역</h2>
         <ul className="mt-3 space-y-1 text-[15px]">
           {requests
-            .filter((r) => r.status === "완료")
+            .filter((r) => r.status === "처리완료")
             .slice(0, 6)
             .map((r) => (
               <li key={r.id} className="grid grid-cols-[88px_1fr] gap-3">
@@ -870,7 +870,7 @@ function ReportSheet({
       </section>
 
       <section className="mt-6">
-        <h2 className="text-[17px] font-bold">5. 다음 달 계획</h2>
+        <h2 className="text-[17px] font-bold">5. 익월 계획</h2>
         <ul className="mt-3 list-disc space-y-1 pl-5 text-[15px]">
           {open.map((r) => (
             <li key={r.id}>

@@ -19,7 +19,7 @@ import { useLocalStorage } from "@/hooks/useLocalStorage";
 
 const plex = IBM_Plex_Sans_KR({ preload: false, weight: ["400", "700"], subsets: ["latin"], display: "swap" });
 
-const STORAGE_KEY = "gs-demo:application:v1";
+const STORAGE_KEY = "gs-demo:application:v2";
 
 /* 지원사업 신청·심사 시스템 데모 (가상 기관 ○○진흥원).
    신청자는 모집 공고에서 사업을 골라 3단계 신청서를 제출하고,
@@ -46,7 +46,7 @@ const C = {
   success: "#1d7a3a",
 };
 
-type Status = "접수" | "서류 검토" | "선정" | "탈락";
+type Status = "접수완료" | "서류검토" | "선정" | "탈락";
 
 interface Program {
   id: string;
@@ -124,12 +124,12 @@ const PROGRAMS: Program[] = [
 
 const FIELDS = ["IT·소프트웨어", "바이오·의료", "제조·기계", "문화·콘텐츠", "환경·에너지", "기타"];
 
-const STATUSES: Status[] = ["접수", "서류 검토", "선정", "탈락"];
+const STATUSES: Status[] = ["접수완료", "서류검토", "선정", "탈락"];
 
 // color는 글자(대비 4.5:1 이상), fill은 차트 면 색
 const STATUS_STYLE: Record<Status, { color: string; fill: string; icon: typeof Inbox }> = {
-  접수: { color: C.sub, fill: "#8fa39b", icon: Inbox },
-  "서류 검토": { color: C.warning, fill: C.sun, icon: FileSearch },
+  접수완료: { color: C.sub, fill: "#8fa39b", icon: Inbox },
+  서류검토: { color: C.warning, fill: C.sun, icon: FileSearch },
   선정: { color: C.success, fill: C.brand, icon: CheckCircle2 },
   탈락: { color: C.danger, fill: "#d8574f", icon: XCircle },
 };
@@ -139,7 +139,7 @@ const SEED_NAMES = [
   "한예린", "오승민", "서지유", "신동현", "권나윤", "황민재", "안소희", "송재원", "전유나", "홍석진",
 ];
 const SEED_ORGS = ["개인", "주식회사 △△랩", "□□디자인", "개인", "☆☆소프트", "개인", "◇◇바이오", "△△에너지"];
-const SEED_STATUS: Status[] = ["접수", "서류 검토", "선정", "탈락", "서류 검토", "접수", "선정", "서류 검토", "접수", "탈락"];
+const SEED_STATUS: Status[] = ["접수완료", "서류검토", "선정", "탈락", "서류검토", "접수완료", "선정", "서류검토", "접수완료", "탈락"];
 
 function buildSeed(): Application[] {
   return SEED_NAMES.map((name, i) => {
@@ -169,7 +169,7 @@ const INITIAL_STATE: State = { apps: buildSeed(), mine: [] };
 
 const CHOSEONG = "ㄱㄲㄴㄷㄸㄹㅁㅂㅃㅅㅆㅇㅈㅉㅊㅋㅌㅍㅎ";
 
-/** 가운데 글자를 초성으로 바꾼다. 김하늘은 김ㅎ늘, 이도는 이ㄷ */
+/** 가운데 글자를 초성으로 바꾼다. 김하늘은 김ㅎ늘, 두 글자는 이* */
 function maskName(name: string) {
   const chars = [...name.trim()];
   if (chars.length < 2) return name;
@@ -177,7 +177,7 @@ function maskName(name: string) {
     const code = c.charCodeAt(0) - 0xac00;
     return code >= 0 && code <= 11171 ? CHOSEONG[Math.floor(code / 588)] : "*";
   };
-  if (chars.length === 2) return chars[0] + toChoseong(chars[1]);
+  if (chars.length === 2) return chars[0] + "*";
   return chars[0] + chars.slice(1, -1).map(toChoseong).join("") + chars[chars.length - 1];
 }
 
@@ -230,7 +230,7 @@ export function ApplicationDemo() {
             <div className="leading-[1.3]">
               <p className="text-[19px] font-bold tracking-[-0.02em]">○○진흥원</p>
               <p className={`text-[15px] ${admin ? "text-[#c4cfca]" : "text-[#5b6862]"}`}>
-                {admin ? "지원사업 심사 관리" : "지원사업 통합 신청"}
+                {admin ? "지원사업 심사관리" : "지원사업 통합신청"}
               </p>
             </div>
           </div>
@@ -271,7 +271,7 @@ export function ApplicationDemo() {
       </header>
 
       {!hydrated ? (
-        <p className="py-24 text-center text-[#5b6862]">불러오는 중</p>
+        <p className="py-24 text-center text-[#5b6862]">불러오는 중입니다.</p>
       ) : admin ? (
         <main className="mx-auto max-w-[1248px] px-4 py-8 pb-28 md:px-6">
           <AdminView state={state} updateApp={updateApp} reset={() => setState(INITIAL_STATE)} />
@@ -315,23 +315,23 @@ type Errors = Partial<Record<keyof FormData, string>>;
 function validate(step: number, f: FormData): Errors {
   const e: Errors = {};
   if (step === 1) {
-    if (!f.name.trim()) e.name = "이름을 입력해 주세요.";
-    if (!/^01[016789]-?\d{3,4}-?\d{4}$/.test(f.phone.trim())) e.phone = "휴대전화 번호를 010-1234-5678 형식으로 입력해 주세요.";
-    if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(f.email.trim())) e.email = "이메일 주소를 확인해 주세요.";
-    if (!f.org.trim()) e.org = "소속을 입력해 주세요. 없으면 '개인'으로 입력합니다.";
+    if (!f.name.trim()) e.name = "성명은 필수 입력 항목입니다.";
+    if (!/^01[016789]-?\d{3,4}-?\d{4}$/.test(f.phone.trim())) e.phone = "휴대전화번호 형식이 올바르지 않습니다. (예: 010-1234-5678)";
+    if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(f.email.trim())) e.email = "이메일 형식이 올바르지 않습니다.";
+    if (!f.org.trim()) e.org = "소속은 필수 입력 항목입니다. 소속이 없으면 '개인'으로 입력합니다.";
   }
   if (step === 2) {
-    if (!f.field) e.field = "희망 분야를 선택해 주세요.";
-    if (f.motive.trim().length < 20) e.motive = "신청 동기를 20자 이상 입력해 주세요.";
+    if (!f.field) e.field = "희망 분야는 필수 선택 항목입니다.";
+    if (f.motive.trim().length < 20) e.motive = "신청 동기는 20자 이상 입력해야 합니다.";
   }
   if (step === 3) {
-    if (!f.files.length) e.files = "신청서 파일을 첨부해 주세요.";
+    if (!f.files.length) e.files = "신청서는 필수 제출서류입니다.";
     if (!f.agree) e.agree = "개인정보 수집·이용에 동의해야 신청할 수 있습니다.";
   }
   return e;
 }
 
-const STEPS = ["기본 정보", "신청 내용", "서류 첨부"];
+const STEPS = ["신청자 정보", "신청 내용", "제출서류 첨부"];
 
 function ApplicantView({ state, setState }: { state: State; setState: (u: (s: State) => State) => void }) {
   const [programId, setProgramId] = useState<string | null>(null);
@@ -375,7 +375,7 @@ function ApplicantView({ state, setState }: { state: State; setState: (u: (s: St
       field: form.field,
       files: form.files,
       date: `${now.getFullYear()}-${mm}-${dd}`,
-      status: "접수",
+      status: "접수완료",
       memo: "",
     };
     setState((s) => ({ apps: [app, ...s.apps], mine: [id, ...s.mine] }));
@@ -392,15 +392,15 @@ function ApplicantView({ state, setState }: { state: State; setState: (u: (s: St
             <Image src={PROGRAMS.find((p) => p.id === programId)!.image} alt="" fill sizes="640px" className="-z-20 object-cover" />
             <span aria-hidden className="absolute inset-0 -z-10 bg-[rgba(0,81,63,0.86)]" />
             <CheckCircle2 size={44} className="mx-auto" aria-hidden />
-            <h2 className="mt-3 text-[26px] font-bold tracking-[-0.02em]">신청이 접수되었습니다</h2>
+            <h2 className="mt-3 text-[26px] font-bold tracking-[-0.02em]">신청서 제출 완료</h2>
             <p className="mt-1 text-[#d7efe7]">{programName(programId)}</p>
           </div>
           <div className="px-6 py-8 text-center">
             <p className="text-[15px] text-[#5b6862]">접수번호</p>
             <p className="text-[32px] font-bold tabular-nums tracking-[-0.01em]">{doneId}</p>
-            <p className="mt-3 text-[15px] text-[#5b6862]">심사 결과는 내 신청 조회에서 확인할 수 있습니다.</p>
+            <p className="mt-3 text-[15px] text-[#5b6862]">심사 결과는 신청내역 조회에서 확인할 수 있습니다.</p>
             <button type="button" onClick={() => setProgramId(null)} className={`${primaryBtn} mt-6`}>
-              목록으로
+              목록
             </button>
           </div>
         </section>
@@ -418,7 +418,7 @@ function ApplicantView({ state, setState }: { state: State; setState: (u: (s: St
             <span aria-hidden className="absolute inset-0 -z-10 bg-[linear-gradient(180deg,rgba(0,81,63,0.78),rgba(0,58,45,0.96)_55%)]" />
             <p className="text-[15px] text-[#d7efe7]">신청서 작성</p>
             <h2 className="mt-1 text-[21px] font-bold leading-[1.4] tracking-[-0.02em]">{program.name}</h2>
-            <p className="mt-2 text-[15px] text-[#d7efe7]">마감 {dot(program.end)}</p>
+            <p className="mt-2 text-[15px] text-[#d7efe7]">접수마감 {dot(program.end)}</p>
             <ol className="mt-6 flex gap-2 md:mt-10 md:flex-col md:gap-0" aria-label="작성 단계">
               {STEPS.map((label, i) => {
                 const n = i + 1;
@@ -474,7 +474,7 @@ function ApplicantView({ state, setState }: { state: State; setState: (u: (s: St
             <div className="mt-6 space-y-5">
               {step === 1 && (
                 <>
-                  <Field label="이름" error={errors.name}>
+                  <Field label="성명" error={errors.name}>
                     <input value={form.name} onChange={(e) => set("name", e.target.value)} maxLength={20} className={`${inputClass} ${errors.name ? errorInput : ""}`} />
                   </Field>
                   <Field label="휴대전화" error={errors.phone}>
@@ -499,7 +499,7 @@ function ApplicantView({ state, setState }: { state: State; setState: (u: (s: St
                 <>
                   <Field label="희망 분야" error={errors.field}>
                     <select value={form.field} onChange={(e) => set("field", e.target.value)} className={`${inputClass} ${errors.field ? errorInput : ""}`}>
-                      <option value="">선택해 주세요</option>
+                      <option value="">선택</option>
                       {FIELDS.map((f) => (
                         <option key={f}>{f}</option>
                       ))}
@@ -518,7 +518,7 @@ function ApplicantView({ state, setState }: { state: State; setState: (u: (s: St
               )}
               {step === 3 && (
                 <>
-                  <Field label="첨부 서류 (신청서 필수, 증빙 서류 선택)" error={errors.files}>
+                  <Field label="제출서류 (신청서 필수, 증빙서류 선택)" error={errors.files}>
                     <span
                       className={`mt-1.5 flex min-h-[88px] cursor-pointer flex-col items-center justify-center gap-1 rounded-lg border-2 border-dashed px-3 py-4 text-center font-normal focus-within:outline focus-within:outline-[3px] focus-within:outline-offset-2 focus-within:outline-[#00745c] ${
                         errors.files ? "border-[#b3261e] bg-[#fdf0ef]" : "border-[#8a9791] bg-[#f6f8f6] hover:bg-[#e2f2ec]"
@@ -526,7 +526,7 @@ function ApplicantView({ state, setState }: { state: State; setState: (u: (s: St
                     >
                       <Paperclip size={20} aria-hidden />
                       <span className="font-bold text-[#00513f]">파일 선택</span>
-                      <span className="text-[15px] text-[#5b6862]">hwp, pdf, jpg 파일, 여러 개 선택 가능</span>
+                      <span className="text-[15px] text-[#5b6862]">첨부 가능 형식 hwp, pdf, jpg (복수 선택 가능)</span>
                       <input
                         type="file"
                         multiple
@@ -548,7 +548,7 @@ function ApplicantView({ state, setState }: { state: State; setState: (u: (s: St
                   <div>
                     <dl className="grid grid-cols-[72px_1fr] gap-x-3 gap-y-1 rounded-lg border border-[#d3dbd7] p-4 text-[15px]">
                       <dt className="text-[#5b6862]">수집 항목</dt>
-                      <dd>이름, 휴대전화, 이메일, 소속</dd>
+                      <dd>성명, 휴대전화번호, 이메일, 소속</dd>
                       <dt className="text-[#5b6862]">이용 목적</dt>
                       <dd>지원사업 신청 접수, 심사 결과 안내</dd>
                       <dt className="text-[#5b6862]">보유 기간</dt>
@@ -585,7 +585,7 @@ function ApplicantView({ state, setState }: { state: State; setState: (u: (s: St
                 {step === 1 ? "취소" : "이전"}
               </button>
               <button type="button" onClick={next} className={primaryBtn}>
-                {step === 3 ? "신청하기" : "다음"}
+                {step === 3 ? "제출" : "다음"}
               </button>
             </div>
           </section>
@@ -624,9 +624,9 @@ function ApplicantView({ state, setState }: { state: State; setState: (u: (s: St
             <h1 id="notice-title" className="text-[40px] font-bold leading-[1.15] tracking-[-0.04em] md:text-[68px]">
               지원사업
               <br />
-              모집 공고
+              사업공고
             </h1>
-            <p className="mt-5 text-[19px] text-[#d7efe7]">현재 {openCount}개 사업을 모집하고 있습니다.</p>
+            <p className="mt-5 text-[19px] text-[#d7efe7]">접수중 사업 {openCount}건</p>
             <p className="mt-2 flex items-center gap-2 text-[15px] text-[#a9c9bd]">
               <CalendarDays size={18} aria-hidden />
               기준일 {dot(new Date().toISOString().slice(0, 10))}
@@ -641,14 +641,14 @@ function ApplicantView({ state, setState }: { state: State; setState: (u: (s: St
               </p>
               <p className="mt-3 text-[21px] font-bold leading-[1.4] tracking-[-0.02em]">{nearest.name}</p>
               <p className="mt-1 text-[15px] text-[#c4dcd3]">
-                {nearest.category} 분야, {dot(nearest.end)} 마감
+                {nearest.category} 분야, 접수마감 {dot(nearest.end)}
               </p>
               <button
                 type="button"
                 onClick={() => start(nearest.id)}
                 className={`mt-5 inline-flex h-12 items-center justify-center rounded-full bg-[#f5c33b] px-6 text-[17px] font-bold text-[#15201c] transition-[background-color,transform] duration-150 hover:bg-[#ffd55e] active:scale-[0.97] ${focusRing}`}
               >
-                신청하기
+                신청서 작성
               </button>
             </div>
           )}
@@ -665,11 +665,11 @@ function ApplicantView({ state, setState }: { state: State; setState: (u: (s: St
 
       <section aria-labelledby="mine-title" className="mx-auto max-w-[1248px] px-4 pt-16 md:px-6">
         <h2 id="mine-title" className="text-[26px] font-bold tracking-[-0.02em]">
-          내 신청 조회
+          신청내역 조회
         </h2>
         {mine.length === 0 ? (
           <p className="mt-4 rounded-2xl border-2 border-dashed border-[#b8c3be] px-6 py-10 text-center text-[#45524d]">
-            신청 내역이 없습니다. 모집 중인 사업에서 신청하기를 눌러 주세요.
+            신청내역이 없습니다.
           </p>
         ) : (
           <div className="mt-4 overflow-x-auto rounded-2xl bg-white ring-1 ring-[#d3dbd7]">
@@ -679,7 +679,7 @@ function ApplicantView({ state, setState }: { state: State; setState: (u: (s: St
                   <th scope="col" className="px-5 py-3 font-bold">접수번호</th>
                   <th scope="col" className="px-5 py-3 font-bold">사업명</th>
                   <th scope="col" className="px-5 py-3 font-bold">접수일</th>
-                  <th scope="col" className="px-5 py-3 font-bold">상태</th>
+                  <th scope="col" className="px-5 py-3 font-bold">진행상태</th>
                 </tr>
               </thead>
               <tbody>
@@ -728,7 +728,7 @@ function ProgramCard({ program: p, onApply }: { program: Program; onApply: () =>
             closed ? "bg-[#15201c]/80 text-white" : urgent ? "bg-[#f5c33b] text-[#15201c]" : "bg-white text-[#00513f]"
           }`}
         >
-          {closed ? "모집 마감" : left === 0 ? "D-day" : `D-${left}`}
+          {closed ? "접수마감" : left === 0 ? "D-day" : `D-${left}`}
         </span>
       </div>
 
@@ -736,20 +736,20 @@ function ProgramCard({ program: p, onApply }: { program: Program; onApply: () =>
         <h3 className="text-[19px] font-bold leading-[1.4] tracking-[-0.02em]">{p.name}</h3>
         <p className={`mt-2 text-[15px] font-bold ${closed ? "" : "text-[#00745c]"}`}>{p.support}</p>
         <dl className="mt-3 grid grid-cols-[64px_1fr] gap-x-2 gap-y-1 text-[15px]">
-          <dt className="text-[#5b6862]">모집 기간</dt>
+          <dt className="text-[#5b6862]">접수기간</dt>
           <dd className="tabular-nums">
             {dot(p.start)} ~ {dot(p.end)}
           </dd>
-          <dt className="text-[#5b6862]">지원 대상</dt>
+          <dt className="text-[#5b6862]">지원대상</dt>
           <dd>{p.target}</dd>
         </dl>
 
         <div className="mt-auto pt-5">
           {closed ? (
-            <p className="text-[15px] font-bold">모집이 끝난 사업입니다.</p>
+            <p className="text-[15px] font-bold">접수가 마감된 사업입니다.</p>
           ) : (
             <button type="button" onClick={onApply} className={`${primaryBtn} w-full`}>
-              신청하기
+              신청서 작성
             </button>
           )}
         </div>
@@ -807,8 +807,8 @@ function AdminView({
   const selected = state.apps.find((a) => a.id === selectedId) ?? null;
 
   function downloadCsv() {
-    const header = ["접수번호", "사업명", "신청자", "연락처", "이메일", "소속", "희망 분야", "접수일", "상태"];
-    const rows = filtered.map((a) => [a.id, programName(a.programId), a.name, a.phone, a.email, a.org, a.field, a.date, a.status]);
+    const header = ["접수번호", "사업명", "신청자명", "연락처", "이메일", "소속", "희망 분야", "접수일", "진행상태"];
+    const rows = filtered.map((a) => [a.id, programName(a.programId), maskName(a.name), a.phone, a.email, a.org, a.field, a.date, a.status]);
     const csv = [header, ...rows].map((r) => r.map((v) => `"${String(v).replace(/"/g, '""')}"`).join(",")).join("\r\n");
     const blob = new Blob(["﻿" + csv], { type: "text/csv;charset=utf-8" });
     const url = URL.createObjectURL(blob);
@@ -832,7 +832,7 @@ function AdminView({
             className={`ml-auto inline-flex items-center gap-1 rounded-md px-2 py-1 text-[15px] font-bold text-[#00513f] underline underline-offset-4 ${focusRing}`}
           >
             <RotateCcw size={14} aria-hidden />
-            예시로 초기화
+            초기화
           </button>
         </div>
         <div className="grid lg:grid-cols-[minmax(0,1fr)_minmax(0,1.3fr)]">
@@ -852,7 +852,7 @@ function AdminView({
           </div>
 
           <div className="px-5 py-6">
-            <h3 className="text-[15px] font-bold text-[#45524d]">사업별 신청 수</h3>
+            <h3 className="text-[15px] font-bold text-[#45524d]">사업별 신청 건수</h3>
             <ul className="mt-4 space-y-4">
               {perProgram.map(({ program, count }) => (
                 <li key={program.id} className="flex items-center gap-3">
@@ -889,7 +889,7 @@ function AdminView({
           </h2>
           <div className="mt-3 grid gap-3 md:grid-cols-[1.4fr_160px_1fr_auto]">
             <label className="block text-[15px] font-bold">
-              사업
+              사업명
               <select value={programFilter} onChange={(e) => setProgramFilter(e.target.value)} className={adminInput}>
                 <option value="">전체</option>
                 {PROGRAMS.map((p) => (
@@ -900,7 +900,7 @@ function AdminView({
               </select>
             </label>
             <label className="block text-[15px] font-bold">
-              상태
+              진행상태
               <select value={statusFilter} onChange={(e) => setStatusFilter(e.target.value as Status | "")} className={adminInput}>
                 <option value="">전체</option>
                 {STATUSES.map((s) => (
@@ -912,7 +912,7 @@ function AdminView({
               검색
               <span className="relative block">
                 <Search size={17} className="pointer-events-none absolute left-3 top-1/2 mt-0.5 -translate-y-1/2 text-[#5b6862]" aria-hidden />
-                <input value={query} onChange={(e) => setQuery(e.target.value)} placeholder="접수번호 또는 이름" className={`${adminInput} pl-9`} />
+                <input value={query} onChange={(e) => setQuery(e.target.value)} placeholder="접수번호 또는 신청자명" className={`${adminInput} pl-9`} />
               </span>
             </label>
             <div className="flex items-end">
@@ -941,14 +941,14 @@ function AdminView({
                 <th scope="col" className="px-3 py-2.5 font-bold">사업명</th>
                 <th scope="col" className="px-3 py-2.5 font-bold">신청자</th>
                 <th scope="col" className="px-3 py-2.5 font-bold">접수일</th>
-                <th scope="col" className="px-3 py-2.5 font-bold">상태</th>
+                <th scope="col" className="px-3 py-2.5 font-bold">진행상태</th>
               </tr>
             </thead>
             <tbody>
               {filtered.length === 0 ? (
                 <tr>
                   <td colSpan={5} className="px-3 py-12 text-center text-[#5b6862]">
-                    조건에 맞는 신청이 없습니다. 검색어나 필터를 바꿔 보세요.
+                    검색 결과가 없습니다.
                   </td>
                 </tr>
               ) : (
@@ -1058,11 +1058,11 @@ function DetailPanel({
           <dd>{app.field}</dd>
           <dt className="text-[#5b6862]">접수일</dt>
           <dd className="tabular-nums">{dot(app.date)}</dd>
-          <dt className="text-[#5b6862]">현재 상태</dt>
+          <dt className="text-[#5b6862]">진행상태</dt>
           <dd>
             <StatusBadge status={app.status} />
           </dd>
-          <dt className="text-[#5b6862]">첨부 파일</dt>
+          <dt className="text-[#5b6862]">제출서류</dt>
           <dd>
             <ul className="space-y-1">
               {app.files.map((f) => (
@@ -1078,7 +1078,7 @@ function DetailPanel({
           <p className="text-[15px] font-bold">신청 동기</p>
           <p className="mt-1 rounded-md bg-white p-3 text-[15px] text-[#45524d] ring-1 ring-[#e3e9e6]">{app.motive}</p>
           <label className="mt-4 block text-[15px] font-bold">
-            심사 메모
+            심사의견
             <textarea
               value={memo}
               onChange={(e) => {
@@ -1094,7 +1094,7 @@ function DetailPanel({
       </div>
 
       <div className="mt-4 flex flex-wrap items-center gap-2">
-        <span className="mr-1 text-[15px] font-bold">상태 변경</span>
+        <span className="mr-1 text-[15px] font-bold">진행상태 변경</span>
         {STATUSES.map((s) => (
           <button
             key={s}
@@ -1116,12 +1116,12 @@ function DetailPanel({
           }}
           className={`ml-auto inline-flex h-10 items-center rounded-md bg-[#15201c] px-4 text-[15px] font-bold text-white hover:bg-[#2c3a35] ${focusRing}`}
         >
-          메모 저장
+          저장
         </button>
       </div>
       {saved && (
         <p className="mt-2 text-right text-[15px] font-bold text-[#1d7a3a]" role="status">
-          메모를 저장했습니다.
+          심사의견을 저장했습니다.
         </p>
       )}
     </section>

@@ -86,7 +86,7 @@ const INITIAL_STATE: State = {
       chartNo: "2026-0412",
       sessions: [
         { id: "s1", date: "2026-08-21", scores: SAMPLE_PREV, memo: "" },
-        { id: "s2", date: "2026-09-25", scores: SAMPLE_NOW, memo: "4주 전보다 수분과 톤이 좋아졌습니다. 지금 홈케어를 유지해 주세요." },
+        { id: "s2", date: "2026-09-25", scores: SAMPLE_NOW, memo: "4주 전 대비 수분과 톤이 개선되었습니다. 현재 홈케어 유지를 권합니다." },
       ],
     },
     { id: "c2", name: "이도윤", gender: "남", age: 42, chartNo: "2026-0588", sessions: [] },
@@ -95,16 +95,16 @@ const INITIAL_STATE: State = {
 };
 
 const STEPS = [
-  { id: "customer", label: "고객 선택" },
+  { id: "customer", label: "고객 조회" },
   { id: "input", label: "측정값 입력" },
-  { id: "report", label: "결과지" },
+  { id: "report", label: "결과지 출력" },
 ] as const;
 
 type StepId = (typeof STEPS)[number]["id"];
 
 const CHOSEONG = "ㄱㄲㄴㄷㄸㄹㅁㅂㅃㅅㅆㅇㅈㅉㅊㅋㅌㅍㅎ";
 
-/** 가운데 글자를 초성으로 바꾼다 — 김하늘 → 김ㅎ늘, 이도 → 이ㄷ, 남궁민수 → 남ㄱㅁ수 */
+/** 가운데 글자를 초성으로 바꾼다. 김하늘은 김ㅎ늘, 두 글자는 이*, 남궁민수는 남ㄱㅁ수 */
 export function maskName(name: string) {
   const chars = [...name.trim()];
   if (chars.length < 2) return name;
@@ -112,7 +112,7 @@ export function maskName(name: string) {
     const code = c.charCodeAt(0) - 0xac00;
     return code >= 0 && code <= 11171 ? CHOSEONG[Math.floor(code / 588)] : "*";
   };
-  if (chars.length === 2) return chars[0] + toChoseong(chars[1]);
+  if (chars.length === 2) return chars[0] + "*";
   return chars[0] + chars.slice(1, -1).map(toChoseong).join("") + chars[chars.length - 1];
 }
 
@@ -256,14 +256,14 @@ export function ClinicReportDemo() {
       <main className="mx-auto max-w-[1200px] px-4 pb-28 pt-10 md:px-6 md:pt-14">
         {!hydrated ? (
           <p className="py-20 text-center text-[17px]" style={{ color: MUTED }}>
-            불러오는 중
+            불러오는 중입니다.
           </p>
         ) : (
           <>
             {step === "customer" && (
               <section className="grid gap-6 print:hidden lg:grid-cols-[1fr_400px]">
                 <div>
-                  <h2 className="text-[28px] font-bold leading-[1.3] tracking-[-0.02em]">고객 선택</h2>
+                  <h2 className="text-[28px] font-bold leading-[1.3] tracking-[-0.02em]">고객 목록</h2>
                   <ul className="mt-6 grid gap-3 sm:grid-cols-2">
                     {state.customers.map((c) => {
                       const active = c.id === customer?.id;
@@ -290,7 +290,7 @@ export function ClinicReportDemo() {
                             <span className="min-w-0 flex-1">
                               <span className="block text-[19px] font-bold leading-[1.4]">{maskName(c.name)} 님</span>
                               <span className="block text-[15px] leading-[1.5]" style={{ color: MUTED }}>
-                                {c.gender}, {c.age}세, 차트 {c.chartNo}
+                                {c.gender}, {c.age}세, 차트번호 {c.chartNo}
                               </span>
                             </span>
                             <span className="text-right">
@@ -305,7 +305,7 @@ export function ClinicReportDemo() {
                                 </>
                               ) : (
                                 <span className="text-[15px]" style={{ color: MUTED }}>
-                                  측정 기록 없음
+                                  측정 이력 없음
                                 </span>
                               )}
                             </span>
@@ -332,7 +332,7 @@ export function ClinicReportDemo() {
                   <div className="p-6">
                     <h3 className="text-[21px] font-bold leading-[1.4]">신규 고객 등록</h3>
                     <label className="mt-4 block text-[15px] font-bold" htmlFor="new-name">
-                      이름
+                      고객명
                     </label>
                     <input id="new-name" value={newName} onChange={(e) => setNewName(e.target.value)} maxLength={20} className={inputClass} />
                     <div className="mt-3 grid grid-cols-2 gap-3">
@@ -373,7 +373,7 @@ export function ClinicReportDemo() {
                       style={{ background: BERRY }}
                     >
                       <Plus size={18} aria-hidden />
-                      등록 후 측정값 입력
+                      등록
                     </button>
                   </div>
                 </form>
@@ -386,7 +386,7 @@ export function ClinicReportDemo() {
                   <div>
                     <h2 className="text-[28px] font-bold leading-[1.3] tracking-[-0.02em]">{maskName(customer.name)} 님 측정값 입력</h2>
                     <p className="mt-1 text-[17px] leading-[1.5]" style={{ color: MUTED }}>
-                      진단기 결과지의 영역별 점수(0~100)를 입력하세요.
+                      입력 범위: 영역별 0~100점
                     </p>
                   </div>
                   <label className="ml-auto text-[15px] font-bold">
@@ -431,14 +431,14 @@ export function ClinicReportDemo() {
                             style={{ width: `${value}%`, background: a.color }}
                           />
                         </span>
-                        {bad && <span className="mt-2 block text-[15px] text-[#b3261e]">0~100 사이 숫자</span>}
+                        {bad && <span className="mt-2 block text-[15px] text-[#b3261e]">입력 범위(0~100)를 벗어났습니다.</span>}
                       </label>
                     );
                   })}
                 </div>
 
                 <label className="mt-6 block text-[15px] font-bold" htmlFor="memo">
-                  상담 메모 (결과지에 표시)
+                  상담 메모(결과지 출력)
                 </label>
                 <textarea
                   id="memo"
@@ -457,7 +457,7 @@ export function ClinicReportDemo() {
                     className="inline-flex h-14 items-center rounded-full px-8 text-[17px] font-bold text-white transition-transform duration-150 active:scale-[0.98] disabled:opacity-40"
                     style={{ background: BERRY }}
                   >
-                    결과지 만들기
+                    저장
                   </button>
                   <button
                     type="button"
@@ -465,12 +465,12 @@ export function ClinicReportDemo() {
                     className="h-12 rounded-md px-3 text-[15px] font-bold underline underline-offset-4"
                     style={{ color: BERRY }}
                   >
-                    예시 값 채우기
+                    예시값 입력
                   </button>
                   {!canSave && (
                     <span className="inline-flex items-center gap-1 text-[15px] text-[#b3261e]">
                       <TriangleAlert size={16} aria-hidden />
-                      {invalidCount > 0 ? `${invalidCount}칸 확인 필요` : `${emptyCount}칸 남음`}
+                      {invalidCount > 0 ? `입력 오류 ${invalidCount}건` : `미입력 ${emptyCount}건`}
                     </span>
                   )}
                 </div>
@@ -485,9 +485,9 @@ export function ClinicReportDemo() {
 
                     <div className="mt-16 flex flex-wrap items-end gap-3 print:hidden">
                       <div>
-                        <h2 className="text-[28px] font-bold leading-[1.3] tracking-[-0.02em]">인쇄용 결과지</h2>
+                        <h2 className="text-[28px] font-bold leading-[1.3] tracking-[-0.02em]">결과지 인쇄 미리보기</h2>
                         <p className="mt-1 text-[17px]" style={{ color: MUTED }}>
-                          A4 한 장으로 인쇄하거나 PDF로 저장합니다.
+                          용지 A4, 1매
                         </p>
                       </div>
                       <div className="ml-auto flex items-center gap-4">
@@ -498,7 +498,7 @@ export function ClinicReportDemo() {
                           style={{ color: BERRY }}
                         >
                           <RotateCcw size={14} aria-hidden />
-                          예시로 초기화
+                          초기화
                         </button>
                         <button
                           type="button"
@@ -522,7 +522,7 @@ export function ClinicReportDemo() {
                     className="rounded-[20px] border border-dashed border-[#cdb9ae] bg-white p-12 text-center text-[17px] print:hidden"
                     style={{ color: MUTED }}
                   >
-                    아직 측정 기록이 없습니다.{" "}
+                    측정 이력이 없습니다.{" "}
                     <button type="button" onClick={() => setStep("input")} className="font-bold underline" style={{ color: BERRY }}>
                       측정값 입력
                     </button>
@@ -592,14 +592,14 @@ function Hero({
         <div>
           {customer ? (
             <>
-              <p className="text-[17px] text-white/75">{session ? `${formatDate(session.date)} 측정` : "측정 기록 없음"}</p>
+              <p className="text-[17px] text-white/75">{session ? `측정일 ${formatDate(session.date)}` : "측정 이력 없음"}</p>
               <h1 className="mt-3 text-[44px] font-bold leading-[1.15] tracking-[-0.03em] md:text-[72px]">
-                {maskName(customer.name)} 님의
+                {maskName(customer.name)} 님
                 <br />
-                피부 결과지
+                피부 진단 결과
               </h1>
               <p className="mt-5 text-[17px] text-white/75">
-                {customer.gender}, {customer.age}세, 차트 {customer.chartNo}
+                {customer.gender}, {customer.age}세, 차트번호 {customer.chartNo}
               </p>
             </>
           ) : (
@@ -616,7 +616,7 @@ function Hero({
             <dl className="space-y-3 text-[15px]">
               <div>
                 <dt className="text-white/70">
-                  {groupLabel(customer)} 평균 {avgTotal}점보다
+                  {groupLabel(customer)} 평균({avgTotal}점) 대비
                 </dt>
                 <dd className="text-[19px]">
                   <DiffText value={total - avgTotal} light />
@@ -624,7 +624,7 @@ function Hero({
               </div>
               {prevTotal !== null && (
                 <div>
-                  <dt className="text-white/70">지난 측정보다</dt>
+                  <dt className="text-white/70">직전 측정 대비</dt>
                   <dd className="text-[19px]">
                     <DiffText value={total - prevTotal} light />
                   </dd>
@@ -648,7 +648,7 @@ function ReportScreen({ customer, session, previous }: { customer: Customer; ses
     <div className="print:hidden">
       <h2 className="text-[28px] font-bold leading-[1.3] tracking-[-0.02em]">영역별 점수</h2>
       <p className="mt-1 text-[17px]" style={{ color: MUTED }}>
-        막대 위 세로선은 {group} 평균입니다.
+        세로선: {group} 평균
       </p>
       <ul className="mt-6 grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
         {AREAS.map((a) => {
@@ -675,7 +675,7 @@ function ReportScreen({ customer, session, previous }: { customer: Customer; ses
                 </span>
                 {prev !== undefined && (
                   <span>
-                    지난번 {prev} <DiffText value={v - prev} />
+                    직전 {prev} <DiffText value={v - prev} />
                   </span>
                 )}
               </p>
@@ -692,7 +692,7 @@ function ReportScreen({ customer, session, previous }: { customer: Customer; ses
           </div>
         </div>
         <div>
-          <h2 className="text-[21px] font-bold">관리가 필요한 영역</h2>
+          <h2 className="text-[21px] font-bold">관리 권장 영역</h2>
           <ul className="mt-4 grid gap-4 sm:grid-cols-2">
             {focus.map((a, i) => (
               <li key={a.id} className="overflow-hidden rounded-[20px] bg-white">
@@ -790,11 +790,11 @@ function ReportSheet({ customer, session, previous }: { customer: Customer; sess
       <div className="flex flex-1 flex-col px-[56px] pb-[40px]">
         <dl className="mt-6 grid grid-cols-4 gap-4 rounded-[12px] px-5 py-4 text-[15px] leading-[1.5]" style={{ background: BG }}>
           <div>
-            <dt style={{ color: MUTED }}>고객</dt>
+            <dt style={{ color: MUTED }}>고객명</dt>
             <dd className="font-bold">{maskName(customer.name)} 님</dd>
           </div>
           <div>
-            <dt style={{ color: MUTED }}>성별·나이</dt>
+            <dt style={{ color: MUTED }}>성별/나이</dt>
             <dd className="font-bold">
               {customer.gender}, {customer.age}세
             </dd>
@@ -819,13 +819,13 @@ function ReportSheet({ customer, session, previous }: { customer: Customer; sess
             </ScoreRing>
             <div className="text-[15px] leading-[1.6]">
               <p>
-                {group} 평균 {avgTotal}점보다
+                {group} 평균({avgTotal}점) 대비
                 <br />
                 <DiffText value={total - avgTotal} withUnit />
               </p>
               {prevTotal !== null && (
                 <p className="mt-2">
-                  지난 측정보다
+                  직전 측정 대비
                   <br />
                   <DiffText value={total - prevTotal} withUnit />
                 </p>
@@ -846,13 +846,13 @@ function ReportSheet({ customer, session, previous }: { customer: Customer; sess
                 <span className="sr-only">점수 막대</span>
               </th>
               <th scope="col" className="py-2 text-right font-bold">
-                내 점수
+                측정 점수
               </th>
               <th scope="col" className="py-2 text-right font-bold">
                 평균
               </th>
               <th scope="col" className="py-2 text-right font-bold">
-                차이
+                평균 대비
               </th>
             </tr>
           </thead>
@@ -882,7 +882,7 @@ function ReportSheet({ customer, session, previous }: { customer: Customer; sess
         </table>
 
         <section className="mt-6">
-          <h2 className="text-[17px] font-bold">관리가 필요한 영역</h2>
+          <h2 className="text-[17px] font-bold">관리 권장 영역</h2>
           <ul className="mt-3 grid grid-cols-2 gap-3">
             {focus.map((a) => (
               <li key={a.id} className="rounded-[12px] px-4 py-3 text-[15px] leading-[1.5]" style={{ background: BG }}>
@@ -911,7 +911,7 @@ function ReportSheet({ customer, session, previous }: { customer: Customer; sess
 
 /** 증감 표시. 색만으로 구분하지 않도록 ▲▼와 높음/낮음 문구를 함께 쓴다 */
 function DiffText({ value, light = false, withUnit = false }: { value: number; light?: boolean; withUnit?: boolean }) {
-  if (value === 0) return <span className={light ? "text-white/80" : "text-[#6e5a64]"}>같음</span>;
+  if (value === 0) return <span className={light ? "text-white/80" : "text-[#6e5a64]"}>동일</span>;
   const up = value > 0;
   const color = light ? (up ? "#ffe3b8" : "#ffc4cf") : up ? "#2f6ea8" : "#b3261e";
   return (
@@ -949,7 +949,7 @@ function RadarChart({
       <figcaption className="mb-2 flex justify-end gap-4 text-[13px]" style={{ color: MUTED }}>
         <span className="inline-flex items-center gap-1.5">
           <span className="h-[2px] w-5" style={{ background: BERRY }} aria-hidden />
-          내 점수
+          측정 점수
         </span>
         <span className="inline-flex items-center gap-1.5">
           <span className="w-5 border-t-2 border-dashed" style={{ borderColor: MUTED }} aria-hidden />
