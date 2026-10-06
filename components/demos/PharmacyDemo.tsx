@@ -639,10 +639,10 @@ function Prescription({ status }: { status: Status | null }) {
 
   const submit = (e: React.FormEvent) => {
     e.preventDefault();
-    if (!photo) return setError("처방전 사진을 첨부해 주십시오.");
-    if (pickup === null) return setError("수령 시간을 선택해 주십시오.");
-    if (name.trim().length < 2) return setError("성함을 두 글자 이상 입력해 주십시오.");
-    if (phone.replace(/\D/g, "").length < 10) return setError("휴대전화 번호를 입력해 주십시오.");
+    if (!photo) return setError("처방전 사진을 첨부해 주세요.");
+    if (pickup === null) return setError("수령 시간을 선택해 주세요.");
+    if (name.trim().length < 2) return setError("이름을 입력해 주세요.");
+    if (phone.replace(/\D/g, "").length < 10) return setError("휴대전화 번호를 입력해 주세요.");
     setError("");
     const now = new Date();
     const at = options.find((p) => p.id === pickup)?.at ?? "";
@@ -813,9 +813,9 @@ function Prescription({ status }: { status: Status | null }) {
                 <h3 className="border-b pb-2 font-bold" style={{ borderColor: C.line }}>이용 안내</h3>
                 <ol className="mt-3 list-decimal space-y-2 pl-5 text-[15px]" style={{ color: C.muted }}>
                   {[
-                    "재고가 없는 약이 있으면 전화를 드립니다.",
-                    "조제가 끝나면 문자를 보내 드립니다.",
-                    "약 수령 시 처방전 원본을 제출해 주십시오. 원본이 없으면 약을 드릴 수 없습니다.",
+                    "재고가 없는 약은 전화로 안내해 드립니다.",
+                    "조제가 완료되면 문자로 알려 드립니다.",
+                    "약 수령 시 처방전 원본을 지참해 주세요. 원본이 없으면 조제약을 받으실 수 없습니다.",
                   ].map((t) => (
                     <li key={t}>{t}</li>
                   ))}
@@ -998,8 +998,8 @@ function Stock() {
         </p>
       )}
       <ul className="mt-4 space-y-1 text-[14px]" style={{ color: C.muted }}>
-        <li>재고가 없는 품목은 주문 요청을 하시면 다음 날 오후 2시부터 찾아가실 수 있습니다.</li>
-        <li>드시는 약이 있거나 임신 중이시면 약사에게 먼저 물어봐 주십시오.</li>
+        <li>재고가 없는 품목은 주문 요청 시 다음 날 오후 2시 이후 수령 가능합니다.</li>
+        <li>복용 중인 약이 있거나 임신 중이시면 약사와 먼저 상담해 주세요.</li>
       </ul>
     </Panel>
   );
