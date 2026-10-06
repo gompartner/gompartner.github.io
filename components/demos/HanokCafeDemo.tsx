@@ -68,27 +68,27 @@ interface MenuItem {
 }
 
 const MENU: MenuItem[] = [
-  { name: "작설차", kind: "tea", temp: "hot", sweet: false, price: 7000, desc: "하동 햇차예요. 두 번 더 우려 드려요." },
+  { name: "작설차", kind: "tea", temp: "hot", sweet: false, price: 7000, desc: "하동에서 덖은 햇차. 두 번까지 더 우려 드립니다" },
   { name: "우엉차", kind: "tea", temp: "hot", sweet: false, price: 6500, desc: "" },
-  { name: "냉 작설차", kind: "tea", temp: "cold", sweet: false, price: 7000, desc: "찬물에 우려서 쓴맛이 덜해요." },
-  { name: "쌍화차", kind: "tea", temp: "hot", sweet: true, price: 8000, desc: "대추, 밤, 잣을 올려 드려요." },
+  { name: "냉 작설차", kind: "tea", temp: "cold", sweet: false, price: 7000, desc: "찬물에 우려 쓴맛 없이 깔끔한 작설차" },
+  { name: "쌍화차", kind: "tea", temp: "hot", sweet: true, price: 8000, desc: "10가지 약재로 6시간 이상 달인 차, 대추·밤·잣 고명" },
   { name: "대추차", kind: "tea", temp: "hot", sweet: true, price: 7500, desc: "" },
-  { name: "유자차", kind: "tea", temp: "any", sweet: true, price: 7000, desc: "고흥 유자로 담근 청이에요." },
+  { name: "유자차", kind: "tea", temp: "any", sweet: true, price: 7000, desc: "고흥 유자로 직접 담은 청" },
   { name: "오미자차", kind: "tea", temp: "cold", sweet: true, price: 7000, desc: "" },
   { name: "아메리카노", kind: "coffee", temp: "any", sweet: false, price: 5500, desc: "" },
-  { name: "오늘의 핸드드립", kind: "coffee", temp: "hot", sweet: false, price: 7000, desc: "원두는 날마다 바뀌어요. 약과 한 조각이 같이 나가요." },
-  { name: "콜드브루", kind: "coffee", temp: "cold", sweet: false, price: 6500, desc: "물이나 우유 중에 골라 주세요." },
+  { name: "오늘의 핸드드립", kind: "coffee", temp: "hot", sweet: false, price: 7000, desc: "그날 원두로 내린 커피, 약과 한 조각과 함께 제공됩니다" },
+  { name: "콜드브루", kind: "coffee", temp: "cold", sweet: false, price: 6500, desc: "물 또는 우유 선택" },
   { name: "흑임자 라테", kind: "coffee", temp: "any", sweet: true, price: 7000, desc: "" },
   { name: "인절미 라테", kind: "coffee", temp: "any", sweet: true, price: 7000, desc: "" },
-  { name: "단호박 식혜", kind: "drink", temp: "cold", sweet: true, price: 6500, desc: "가게에서 직접 삭혀요.", season: true },
-  { name: "수정과", kind: "drink", temp: "cold", sweet: true, price: 6000, desc: "곶감을 띄워 드려요." },
-  { name: "미숫가루", kind: "drink", temp: "any", sweet: false, price: 6000, desc: "꿀은 따로 드려요." },
-  { name: "쑥 라테", kind: "drink", temp: "any", sweet: true, price: 7000, desc: "커피가 안 들어가요." },
+  { name: "단호박 식혜", kind: "drink", temp: "cold", sweet: true, price: 6500, desc: "매장에서 직접 삭힌 식혜", season: true },
+  { name: "수정과", kind: "drink", temp: "cold", sweet: true, price: 6000, desc: "곶감을 띄운 수정과" },
+  { name: "미숫가루", kind: "drink", temp: "any", sweet: false, price: 6000, desc: "국산 수제 미숫가루, 꿀은 따로 제공" },
+  { name: "쑥 라테", kind: "drink", temp: "any", sweet: true, price: 7000, desc: "커피 없이 쑥으로만 만든 라테" },
   { name: "인절미 빙수", kind: "dessert", temp: "cold", sweet: true, price: 13000, desc: "" },
-  { name: "홍시 빙수", kind: "dessert", temp: "cold", sweet: true, price: 14000, desc: "얼린 홍시를 통째로 갈아서 올려요.", season: true },
-  { name: "단팥죽", kind: "dessert", temp: "hot", sweet: true, price: 9000, desc: "새알심과 밤이 들어가요." },
-  { name: "약과 세 개", kind: "dessert", temp: "any", sweet: true, price: 5000, desc: "개성약과예요." },
-  { name: "가래떡구이", kind: "dessert", temp: "hot", sweet: false, price: 5500, desc: "조청은 따로 드려요." },
+  { name: "홍시 빙수", kind: "dessert", temp: "cold", sweet: true, price: 14000, desc: "얼린 홍시를 통째로 갈아 올린 빙수", season: true },
+  { name: "단팥죽", kind: "dessert", temp: "hot", sweet: true, price: 9000, desc: "새알심과 밤이 들어간 단팥죽" },
+  { name: "약과 세 개", kind: "dessert", temp: "any", sweet: true, price: 5000, desc: "직접 만든 개성약과" },
+  { name: "가래떡구이", kind: "dessert", temp: "hot", sweet: false, price: 5500, desc: "조청과 함께 제공됩니다" },
   { name: "들기름 누룽지", kind: "dessert", temp: "any", sweet: false, price: 4500, desc: "" },
 ];
 
@@ -165,7 +165,7 @@ const GROUPS: Group[] = [
     name: "대청마루",
     seating: "입식 테이블 4개",
     reservable: false,
-    desc: "서까래가 보이는 안채 가운데 마루예요.",
+    desc: "서까래가 보이는 안채 대청마루",
     img: "hero",
     pos: "60% 50%",
     alt: "창호지 문을 열어 둔 한옥 마루에 찻주전자와 청자 찻잔이 놓인 모습",
@@ -175,7 +175,7 @@ const GROUPS: Group[] = [
     name: "건넌방",
     seating: "좌식 방 1실",
     reservable: true,
-    desc: "신발 벗고 들어가는 방이에요. 가족 모임 때 많이 찾으세요.",
+    desc: "신발을 벗고 들어가는 좌식 공간. 가족 모임에 많이 이용하십니다.",
     img: "hero",
     pos: "25% 50%",
     alt: "창호지 문 안쪽 마루에 놓인 찻상과 찻잔",
@@ -185,7 +185,7 @@ const GROUPS: Group[] = [
     name: "사랑방",
     seating: "좌식 방 2실",
     reservable: true,
-    desc: "문을 닫으면 따로 쓸 수 있는 작은 방 두 칸이에요. 사랑방 2는 마당 쪽으로 창이 나 있어요.",
+    desc: "문을 닫으면 개별룸으로 이용 가능한 작은 방 두 칸. 사랑방 2는 마당 쪽 창이 있습니다.",
     img: "hero",
     pos: "85% 50%",
     alt: "한옥 방 안 낮은 상 위의 찻주전자와 다과",
@@ -195,7 +195,7 @@ const GROUPS: Group[] = [
     name: "툇마루",
     seating: "마루 자리 3곳",
     reservable: true,
-    desc: "마루 끝에 걸터앉아 마당을 보는 자리예요. 비가 오면 처마 안쪽으로 옮겨 드려요.",
+    desc: "마루 끝에 앉아 마당을 바라보는 자리. 우천 시 처마 안쪽으로 자리를 옮겨 드립니다.",
     img: "yard",
     pos: "35% 50%",
     alt: "기와지붕 아래 툇마루와 소나무가 있는 한옥 마당",
@@ -205,7 +205,7 @@ const GROUPS: Group[] = [
     name: "별채",
     seating: "입식 큰 상 1실",
     reservable: true,
-    desc: "마당 건너 따로 떨어진 채예요. 대관료는 없고 한 분에 한 메뉴씩만 주문해 주세요.",
+    desc: "마당 건너 별채. 대관료 없이 1인 1메뉴 주문 부탁드립니다.",
     img: "yard",
     pos: "80% 50%",
     alt: "마당 건너편 기와지붕 별채와 소나무",
@@ -499,7 +499,7 @@ function Intro({ onReserve, onMenuBoard }: { onReserve: () => void; onMenuBoard:
 
         <div className="mt-6 grid gap-6 border-b border-[#1f1b16]/15 pb-10 lg:grid-cols-[minmax(0,1fr)_auto] lg:items-end">
           <div>
-            <p className="max-w-[34em] text-[17px] text-[#4a4036]">1962년에 지은 ㄱ자 한옥이에요. 전통차와 커피, 다과를 드실 수 있어요.</p>
+            <p className="max-w-[34em] text-[17px] text-[#4a4036]">1962년에 지은 ㄱ자 한옥 찻집. 직접 달인 전통차와 커피, 다과를 준비합니다.</p>
             <p className="mt-4 max-w-[34em] text-[16px] leading-[1.75] text-[#4a4036]">
               화요일부터 일요일까지 <b className="font-semibold text-[#1f1b16]">11:00 ~ 21:00</b>에 문을 열어요. 마지막 주문은 20:30이고 월요일과 설·추석 당일은 쉬어요.
               좌식 방 3실은 방 단위로 예약받아요.
@@ -854,7 +854,7 @@ function SpacePanel({ group, unitId, onUnit, minute }: { group: Group; unitId: U
                 <Seal lines={["예약", "접수"]} size={60} />
               </motion.div>
               <p className="pr-16 text-[22px] font-bold leading-[1.35]">예약 신청 완료</p>
-              <p className="mt-1 pr-16 text-[15px] text-[#5b5045]">확정되면 문자 드릴게요.</p>
+              <p className="mt-1 pr-16 text-[15px] text-[#5b5045]">예약이 확정되면 문자로 안내해 드립니다.</p>
               <dl className="mt-4 divide-y divide-[#1f1b16]/10 text-[15px]">
                 {[
                   ["자리", booking.unit.name],
@@ -990,7 +990,7 @@ function SpacePanel({ group, unitId, onUnit, minute }: { group: Group; unitId: U
                     aria-invalid={tried && !nameOk}
                     className="mt-2 h-12 w-full rounded-[4px] border border-[#1f1b16]/25 bg-white/60 px-3 text-[16px] outline-none focus:border-[#1f1b16]"
                   />
-                  {tried && !nameOk && <span className="mt-1 block text-[14px] text-[#a8432a]">이름을 두 글자 이상 입력해 주십시오.</span>}
+                  {tried && !nameOk && <span className="mt-1 block text-[14px] text-[#a8432a]">이름을 입력해 주십시오.</span>}
                 </label>
                 <label className="block">
                   <span className="text-[15px] font-semibold">휴대전화</span>
@@ -1011,7 +1011,7 @@ function SpacePanel({ group, unitId, onUnit, minute }: { group: Group; unitId: U
                 <Check size={18} aria-hidden />
                 예약 신청
               </button>
-              <p className="text-[14px] text-[#6b5a48]">15분 넘게 늦으시면 자리가 다른 손님께 넘어갈 수 있어요.</p>
+              <p className="text-[14px] text-[#6b5a48]">예약 시간 15분 경과 시 자동 취소될 수 있습니다.</p>
             </motion.form>
           ) : null}
         </AnimatePresence>
@@ -1210,10 +1210,10 @@ const ROUTE: Pt[] = [
 ];
 
 const WAY_STEPS: { text: string; upto: number; mark: Pt }[] = [
-  { text: "□□역 2번 출구로 나와 큰길을 따라 50m 걸으면 편의점이 나와요.", upto: 1, mark: [216, 300] },
-  { text: "편의점을 끼고 12길 골목으로 들어오세요.", upto: 2, mark: [216, 196] },
-  { text: "세탁소를 지나 골목 끝에서 오른쪽으로 꺾으세요.", upto: 3, mark: [216, 104] },
-  { text: "파란 대문에 ○○ 현판이 걸린 집이에요.", upto: 4, mark: [372, 104] },
+  { text: "□□역 2번 출구에서 큰길을 따라 50m 직진, 편의점 앞", upto: 1, mark: [216, 300] },
+  { text: "편의점을 끼고 12길 골목으로 진입", upto: 2, mark: [216, 196] },
+  { text: "세탁소를 지나 골목 끝에서 우회전", upto: 3, mark: [216, 104] },
+  { text: "파란 대문, ○○ 현판이 걸린 한옥", upto: 4, mark: [372, 104] },
 ];
 
 const pathOf = (pts: Pt[]) => pts.map((p, i) => `${i ? "L" : "M"}${p[0]} ${p[1]}`).join(" ");
@@ -1347,7 +1347,7 @@ function Location() {
           </div>
           <div>
             <h3 className="text-[18px] font-bold">주차 안내</h3>
-            <p className="mt-2 text-[16px]">주차장이 따로 없어요. 골목 입구 □□공영주차장에 세우시면 2시간 할인권을 드려요.</p>
+            <p className="mt-2 text-[16px]">주차 공간이 없습니다. 골목 입구 □□공영주차장 이용 시 2시간 할인권을 드립니다.</p>
           </div>
         </div>
       </div>
