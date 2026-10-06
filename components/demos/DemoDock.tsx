@@ -190,7 +190,7 @@ export function DemoDock({ projectId, story, tour }: { projectId: string; story?
                   onClick={() => (last ? close() : open(step! + 1))}
                   className="rounded-lg bg-[#111] px-4 py-2 text-sm font-bold text-white"
                 >
-                  {last ? "해 보기" : "다음"}
+                  {last ? "확인" : "다음"}
                 </button>
               </div>
             </div>
