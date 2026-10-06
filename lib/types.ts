@@ -23,6 +23,8 @@ export interface Project {
   description: string;
   /** 주요 기능 태그 */
   features: string[];
+  /** 같은 종류로 실제 해 본 작업. 작업 이력(data/projects.ts history)에 있는 것만 적는다. */
+  realWork?: string;
   /** 데모 화면 스크린샷 (public 기준 경로) */
   imageUrl: string;
   imageAlt: string;

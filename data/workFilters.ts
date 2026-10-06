@@ -44,6 +44,5 @@ export const capabilities = [
   { name: "인쇄·내려받기", keywords: ["인쇄", "PDF", "출력", "엑셀", "다운로드"] },
   { name: "관리자", keywords: ["관리", "심사", "점검표"] },
   { name: "웹접근성", keywords: ["접근성", "점검 항목", "멈춤"] },
-  { name: "모바일", keywords: ["모바일"] },
 ] as const;
 export type Capability = (typeof capabilities)[number]["name"];

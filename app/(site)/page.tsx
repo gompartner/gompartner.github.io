@@ -3,7 +3,7 @@ import { Check } from "lucide-react";
 import { ChannelTalkButton } from "@/components/layout/ChannelTalk";
 import { Doodles } from "@/components/landing/Doodles";
 import { HistoryTimeline } from "@/components/landing/HistoryTimeline";
-import { historyFields, historyTotal } from "@/lib/history";
+import { historyGroups } from "@/lib/history";
 import { HeroSlider } from "@/components/landing/HeroSlider";
 import { projects } from "@/data/projects";
 import { profile } from "@/data/profile";
@@ -85,7 +85,7 @@ export default function HomePage() {
           <h2 id="works-title" className={h2}>
             제작 사례
           </h2>
-          <p className={lead}>고객 정보 보호를 위해 기관명과 데이터는 가상으로 재구성했습니다.</p>
+          <p className={lead}>직접 눌러 볼 수 있게 새로 만든 데모입니다. 같은 일을 실제로 해 본 사례는 카드 아래에 그 작업을 적었습니다.</p>
 
           <div className="mt-8">
             <WorksGrid projects={showcase} />
@@ -111,8 +111,8 @@ export default function HomePage() {
           <h2 id="history-title" className={h2}>
             작업 이력
           </h2>
-          <p className={lead}>발주처와 소속 회사명은 공개하지 않습니다.</p>
-          <HistoryTimeline fields={historyFields} total={historyTotal} />
+          <p className={lead}>경력증명서와 업무 메일로 확인되는 작업만 적었습니다. 발주처와 소속 회사명은 공개하지 않습니다.</p>
+          <HistoryTimeline groups={historyGroups} />
         </div>
       </section>
     </>

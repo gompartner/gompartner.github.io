@@ -15,7 +15,7 @@ export default function WorksPage() {
   return (
     <div className="mx-auto w-full max-w-[1248px] px-4 pb-10 pt-14 md:px-6 md:py-14">
       <h1 className="text-[28px] font-bold leading-[1.4] tracking-[-0.01em] md:text-[36px]">제작 사례</h1>
-      <p className="mt-2 text-[17px] leading-[1.6] text-foreground-secondary">고객 정보 보호를 위해 기관명과 데이터는 가상으로 재구성했습니다.</p>
+      <p className="mt-2 text-[17px] leading-[1.6] text-foreground-secondary">직접 눌러 볼 수 있게 새로 만든 데모입니다. 같은 일을 실제로 해 본 사례는 카드 아래에 그 작업을 적었습니다.</p>
       <ul className="mt-5 flex flex-wrap gap-2" aria-label="업종별 제작 사례">
         {industries.map((ind) => (
           <li key={ind.slug}>
