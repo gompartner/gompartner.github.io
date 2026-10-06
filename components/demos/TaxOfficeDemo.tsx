@@ -5,10 +5,14 @@ import Image from "next/image";
 import { AnimatePresence, motion } from "framer-motion";
 import {
   Calculator,
-  CalendarDays,
   Check,
-  ChevronDown,
+  ChevronLeft,
+  ChevronRight,
   ClipboardList,
+  ExternalLink,
+  House,
+  List,
+  MapPin,
   Menu,
   Minus,
   Phone,
@@ -23,17 +27,23 @@ import { useReducedMotionSafe } from "@/hooks/useReducedMotionSafe";
    사무소 이름, 세무사 이름, 주소, 전화번호, 사업자 정보, 기장료는 모두 가상이다.
    신고 기한은 실제 세법의 기본 기한을 따르되, 음력 공휴일은 해마다 바뀌어 계산에서 뺀다.
 
-   디자인: 장부 느낌의 따뜻한 흰 바탕(#fbfaf6)에 옅은 괘선, 짙은 초록(#1f5c45), 먹색 글자(#1d2422).
+   구조: 개인 세무사무소에서 가장 흔한 포털형. 첫 화면은 섹션을 세로로 쌓지 않고 박스 그리드 한 화면이다
+   (사무소·전화 / 이달 신고일정 / 기장료 안내 / 세무소식 / 바로가기 / 세무사 인사말).
+   메뉴(사무소 소개, 업무분야, 세무일정, 요금안내, 세무자료실, 오시는 길, 상담신청)는 라우트 없이
+   컴포넌트 상태로 하위 화면을 바꾼다.
+
+   디자인: 장부 느낌의 따뜻한 흰 바탕(#fbfaf6), 짙은 초록(#1f5c45), 먹색 글자(#1d2422).
    다가오는 기한의 D-day는 형광펜 노랑(#f4d35e)으로 칠하고, 숫자는 모두 고정폭 숫자로 맞춘다.
 
-   내 세금 달력은 사업자 유형, 직원 유무와 원천세 납부 방법, 성실신고확인대상 여부를 고르면
-   올해 1월부터 다음 해 3월까지의 신고 기한을 달별 띠로 펼치고, 오늘 기준 다음 기한까지 D-day를 센다.
-   기한이 주말이나 공휴일이면 다음 영업일로 옮겨 적고, 기한을 누르면 준비할 서류 목록이 나온다.
-   기장료 계산기는 업종, 연 매출 구간, 직원 수, 법인 여부로 월 기장료와 조정료를 어림하고
-   그 조건을 그대로 상담 신청서에 채워 넘긴다. 상담 신청이 끝나면 이름과 번호를 가려 접수 번호와 함께 보여 준다.
+   세무일정은 사업자 유형, 직원 유무와 원천세 납부 방법, 성실신고확인대상 여부로
+   올해 1월부터 다음 해 3월까지의 신고 기한을 계산해 월 탭과 목록으로 보여 준다.
+   기한이 주말이나 공휴일이면 다음 영업일로 옮겨 적고, 기한을 고르면 준비 서류 체크 목록이 나온다.
+   메인 박스에서 고른 사업자 유형은 세무일정 화면으로 그대로 이어진다.
+   요금안내는 연 매출 구간 x 개인·법인 요금표의 칸을 고르는 방식이고, 직원 수를 더해 월 합계를 낸다.
+   고른 조건은 상담신청서 문의 내용에 채워 넘긴다. 접수 화면에는 이름과 번호를 가려 보여 준다.
 
    사진 출처(public/images/demo-tax):
-   AI 생성(Z-Image-Turbo, Apache 2.0) hero, office */
+   AI 생성(Z-Image-Turbo, Apache 2.0) office */
 
 const IMG = "/images/demo-tax";
 const OFFICE = "○○ 세무회계";
@@ -59,14 +69,6 @@ const C = {
 const RULED = `repeating-linear-gradient(to bottom, transparent 0, transparent 31px, ${C.rule} 31px, ${C.rule} 32px)`;
 
 const EASE = [0.22, 1, 0.36, 1] as const;
-
-const NAV = [
-  { id: "calendar", label: "세금 달력" },
-  { id: "fee", label: "기장료 계산" },
-  { id: "news", label: "세무 소식" },
-  { id: "about", label: "세무사 소개" },
-  { id: "faq", label: "자주 묻는 질문" },
-];
 
 /* ---------- 시간 ---------- */
 
@@ -139,7 +141,6 @@ const md = (d: Date) => `${d.getMonth() + 1}월 ${d.getDate()}일 (${DAY_NAMES[d
 const dayDiff = (a: Date, b: Date) => Math.round((a.getTime() - b.getTime()) / 86_400_000);
 const dday = (n: number) => (n === 0 ? "D-day" : n > 0 ? `D-${n}` : `D+${-n}`);
 const comma = (n: number) => String(Math.round(n)).replace(/\B(?=(\d{3})+(?!\d))/g, ",");
-const man = (n: number) => (n % 10000 === 0 ? `${n / 10000}만` : `${(n / 10000).toFixed(1)}만`);
 
 /* ---------- 신고 일정 ---------- */
 
@@ -333,25 +334,6 @@ function scheduleFor(y: number, p: Profile) {
     .sort((a, b) => a.due.getTime() - b.due.getTime() || a.title.localeCompare(b.title));
 }
 
-/** 첫 화면에 보여 줄 다가오는 주요 기한(개인과 법인을 합친다) */
-function upcomingAll(today: Date) {
-  const y = today.getFullYear();
-  const personal = scheduleFor(y, { type: "general", staff: true, half: false, freelancePay: false, sincere: false });
-  const corp = scheduleFor(y, { type: "corp", staff: false, half: false, freelancePay: false, sincere: false });
-  const map = new Map<string, { d: Deadline; who: string }>();
-  for (const d of personal) map.set(`${d.kind}-${d.due.getTime()}`, { d, who: KIND_GROUP[d.kind] === "withhold" ? "직원 있는 곳" : "개인" });
-  for (const d of corp) {
-    const key = `${d.kind}-${d.due.getTime()}`;
-    const hit = map.get(key);
-    if (hit) hit.who = "개인·법인";
-    else map.set(key, { d, who: "법인" });
-  }
-  return [...map.values()]
-    .filter((x) => x.d.real >= today)
-    .sort((a, b) => a.d.real.getTime() - b.d.real.getTime())
-    .slice(0, 3);
-}
-
 /* ---------- 마스킹 ---------- */
 
 const CHO = "ㄱㄲㄴㄷㄸㄹㅁㅂㅃㅅㅆㅇㅈㅉㅊㅋㅌㅍㅎ";
@@ -373,34 +355,197 @@ function maskPhone(phone: string) {
   return `${digits.slice(0, 3)}-****-${digits.slice(-4)}`;
 }
 
+/* ---------- 요금 ---------- */
+
+const BANDS = [
+  { label: "3천만 원 미만", short: "3천만 미만", fee: 100_000, adjust: 300_000 },
+  { label: "3천만 ~ 1억 원", short: "3천만~1억", fee: 120_000, adjust: 400_000 },
+  { label: "1억 ~ 3억 원", short: "1억~3억", fee: 140_000, adjust: 550_000 },
+  { label: "3억 ~ 5억 원", short: "3억~5억", fee: 170_000, adjust: 750_000 },
+  { label: "5억 ~ 10억 원", short: "5억~10억", fee: 200_000, adjust: 1_100_000 },
+  { label: "10억 ~ 30억 원", short: "10억~30억", fee: 260_000, adjust: 1_600_000 },
+  { label: "30억 원 이상", short: "30억 이상", fee: 350_000, adjust: 2_500_000 },
+];
+
+const CORP_ADD = 50_000;
+const monthlyFee = (band: number, corp: boolean) => BANDS[band].fee + (corp ? CORP_ADD : 0);
+const adjustFee = (band: number, corp: boolean) => (corp ? Math.round((BANDS[band].adjust * 1.3) / 50_000) * 50_000 : BANDS[band].adjust);
+const staffFee = (n: number) => Math.min(n, 5) * 10_000 + Math.max(0, n - 5) * 5_000;
+
+type FeePick = { band: number; corp: boolean; staff: number };
+
+/* ---------- 세무자료실 ---------- */
+
+type BoardId = "news" | "column" | "notice";
+const BOARDS: { id: BoardId; label: string }[] = [
+  { id: "news", label: "세무소식" },
+  { id: "column", label: "세무칼럼" },
+  { id: "notice", label: "공지사항" },
+];
+
+type Post = { id: number; board: BoardId; cat: string; date: string; title: string; body: string };
+
+const POSTS: Post[] = [
+  { id: 12, board: "news", cat: "신고일정", date: "2026.09.30", title: "10월 부가세, 개인은 고지서로 냅니다", body: "개인 일반과세자는 직전 기 납부세액의 절반이 고지됩니다. 신고는 필요 없고 고지서 금액만 기한 안에 내면 됩니다. 법인은 예정신고를 해야 합니다." },
+  { id: 11, board: "column", cat: "절세", date: "2026.09.12", title: "노란우산공제, 12월 전에 넣으면 올해 소득공제에 들어갑니다", body: "사업소득 금액에 따라 연 200만 원에서 600만 원까지 소득공제를 받습니다. 연말에 한꺼번에 넣어도 그해 납입액으로 인정됩니다." },
+  { id: 10, board: "news", cat: "세법개정", date: "2026.08.28", title: "올해 세법 개정안에서 소상공인이 볼 부분", body: "고용을 늘린 사업장의 세액공제, 업무용 승용차 기준, 간편장부 대상 기준이 어떻게 바뀌는지 표로 정리했습니다. 사무실에 인쇄본도 둡니다." },
+  { id: 9, board: "column", cat: "절세", date: "2026.08.05", title: "사업용 카드를 홈택스에 등록하셨나요", body: "개인사업자는 사업에 쓰는 카드를 홈택스에 등록해 두면 사용 내역이 자동으로 모입니다. 영수증을 따로 모으지 않아도 매입세액공제를 챙길 수 있습니다." },
+  { id: 8, board: "news", cat: "신고일정", date: "2026.07.20", title: "간이과세자 7월 고지서, 금액이 맞는지 보세요", body: "작년 세액의 절반이 고지됩니다. 상반기 매출이 작년보다 크게 줄었다면 신고로 대신해 덜 낼 수 있습니다." },
+  { id: 7, board: "notice", cat: "사무소", date: "2026.07.01", title: "토요일 상담은 1월과 5월에만 엽니다", body: "부가세 확정신고와 종합소득세 신고가 몰리는 1월, 5월에는 토요일 오전 10시부터 오후 3시까지 상담합니다." },
+  { id: 6, board: "column", cat: "경비", date: "2026.06.15", title: "업무용 승용차, 운행기록부가 필요한 경우", body: "차량 관련 비용이 연 1,500만 원을 넘으면 운행기록부가 있어야 넘는 금액을 경비로 인정받습니다. 성실신고확인대상은 업무용 자동차 보험도 확인합니다." },
+  { id: 5, board: "news", cat: "세법개정", date: "2026.05.10", title: "간이과세 기준 금액은 연 매출 1억 400만 원입니다", body: "직전 연도 매출이 1억 400만 원 미만이면 간이과세자가 될 수 있습니다. 부동산 임대업과 과세 유흥업은 4,800만 원 기준이 그대로입니다." },
+  { id: 4, board: "notice", cat: "사무소", date: "2026.04.02", title: "△△구 소상공인 무료 세무 상담에 참여합니다", body: "매달 둘째 수요일 오후, △△구 소상공인지원센터에서 김ㅅ우 세무사가 상담합니다. 예약은 센터로 해 주세요." },
+  { id: 3, board: "column", cat: "인건비", date: "2026.03.18", title: "직원 4대보험 취득신고는 입사일 다음 달 15일까지", body: "신고가 늦으면 과태료가 붙고 두루누리 지원도 놓칠 수 있습니다. 입사자 정보는 입사 당일 보내 주시면 사무소에서 신고합니다." },
+  { id: 2, board: "notice", cat: "사무소", date: "2026.02.03", title: "자료 전달 방법이 바뀌었습니다", body: "증빙 자료는 이메일이나 카카오톡 채널로 보내 주시면 됩니다. 원본이 필요한 서류는 따로 안내드립니다." },
+];
+
+/* ---------- 업무분야 ---------- */
+
+const SERVICES: { name: string; desc: string; topic: string }[] = [
+  { name: "세무기장/신고", desc: "장부 작성과 부가가치세, 원천세, 종합소득세, 법인세 신고를 맡습니다.", topic: "신규 기장" },
+  { name: "세무조정", desc: "결산 뒤 회계 이익을 세법 기준으로 맞춰 법인세와 종합소득세를 계산합니다.", topic: "법인세" },
+  { name: "양도소득세", desc: "부동산과 주식 양도 전에 세액을 미리 계산하고 신고합니다.", topic: "양도·상속·증여" },
+  { name: "상속세·증여세", desc: "재산 평가와 공제 검토, 신고와 분할 납부 신청까지 진행합니다.", topic: "양도·상속·증여" },
+  { name: "법인설립·법인전환", desc: "개인사업자의 법인전환 시점을 검토하고 설립 뒤 첫 신고까지 돕습니다.", topic: "법인전환" },
+  { name: "세무조사대응", desc: "조사 통지를 받은 날부터 자료 준비와 의견 진술을 함께합니다.", topic: "세무조사대응" },
+  { name: "4대보험", desc: "직원 입사와 퇴사 신고, 보수총액 신고, 두루누리 지원 신청을 처리합니다.", topic: "원천세·인건비" },
+];
+
+const SHORTCUTS = [
+  { name: "홈택스", href: "https://www.hometax.go.kr" },
+  { name: "위택스", href: "https://www.wetax.go.kr" },
+  { name: "4대사회보험 정보연계센터", href: "https://www.4insure.or.kr" },
+  { name: "정부24", href: "https://www.gov.kr" },
+  { name: "국세법령정보시스템", href: "https://taxlaw.nts.go.kr" },
+  { name: "대법원 인터넷등기소", href: "https://www.iros.go.kr" },
+];
+
 /* ---------- 페이지 ---------- */
 
 const BIZ_CHOICES = ["개인 일반과세자", "개인 간이과세자", "법인", "프리랜서", "사업 준비 중"];
 const BIZ_TO_CHOICE: Record<BizType, string> = { general: "개인 일반과세자", simple: "개인 간이과세자", corp: "법인", free: "프리랜서" };
 
 type Prefill = { key: number; topics: string[]; biz: string; memo: string };
+type AskFn = (p: Omit<Prefill, "key">) => void;
+
+type View = "home" | "about" | "services" | "schedule" | "fee" | "board" | "map" | "contact";
+
+const NAV: { id: Exclude<View, "home" | "contact">; label: string }[] = [
+  { id: "about", label: "사무소 소개" },
+  { id: "services", label: "업무분야" },
+  { id: "schedule", label: "세무일정" },
+  { id: "fee", label: "요금안내" },
+  { id: "board", label: "세무자료실" },
+  { id: "map", label: "오시는 길" },
+];
+
+const VIEW_TITLE: Record<Exclude<View, "home">, string> = {
+  about: "사무소 소개",
+  services: "업무분야",
+  schedule: "사업자별 세무일정",
+  fee: "기장료 안내",
+  board: "세무자료실",
+  map: "오시는 길",
+  contact: "상담신청",
+};
+
+type Go = (v: View) => void;
 
 export function TaxOfficeDemo() {
   const minute = useNowMinute();
-  const reduce = useReducedMotionSafe();
+  const [view, setView] = useState<View>("home");
+  const [profile, setProfile] = useState<Profile>({ type: "general", staff: false, half: false, freelancePay: false, sincere: false });
+  const [selectedId, setSelectedId] = useState<string | null>(null);
+  const [month, setMonth] = useState<number | null>(null);
+  const [fee, setFee] = useState<FeePick>({ band: 2, corp: false, staff: 0 });
+  const [board, setBoard] = useState<BoardId>("news");
+  const [postId, setPostId] = useState<number | null>(null);
   const [prefill, setPrefill] = useState<Prefill>({ key: 0, topics: [], biz: "", memo: "" });
+  const moved = useRef(false);
 
-  const toContact = (p: Omit<Prefill, "key">) => {
+  const go: Go = (v) => {
+    moved.current = true;
+    setView(v);
+  };
+
+  // 화면을 바꾸면 맨 위로 올리고 제목에 초점을 둔다
+  useEffect(() => {
+    if (!moved.current) return;
+    window.scrollTo({ top: 0, behavior: "auto" });
+    document.getElementById(view === "home" ? "tax-home-title" : "tax-page-title")?.focus({ preventScroll: true });
+  }, [view]);
+
+  const ask: AskFn = (p) => {
     setPrefill((prev) => ({ ...p, key: prev.key + 1 }));
-    window.requestAnimationFrame(() => document.getElementById("contact")?.scrollIntoView({ behavior: reduce ? "auto" : "smooth", block: "start" }));
+    go("contact");
+  };
+
+  const openDeadline = (id: string, m: number) => {
+    setSelectedId(id);
+    setMonth(m);
+    go("schedule");
+  };
+
+  const openPost = (p: Post) => {
+    setBoard(p.board);
+    setPostId(p.id);
+    go("board");
   };
 
   return (
-    <div className="min-h-screen text-[16px] leading-[1.7] md:text-[17px]" style={{ background: C.paper, backgroundImage: RULED, color: C.ink }}>
-      <Header />
+    <div className="min-h-screen text-[16px] leading-[1.7] md:text-[17px]" style={{ background: C.paper, color: C.ink }}>
+      <Header view={view} go={go} />
       <main>
-        <Hero minute={minute} />
-        <TaxCalendar minute={minute} onAsk={toContact} />
-        <FeeCalculator onAsk={toContact} />
-        <Contact prefill={prefill} />
-        <News />
-        <About />
-        <Faq minute={minute} />
+        {view === "home" ? (
+          <Home
+            minute={minute}
+            profile={profile}
+            setProfile={(p) => {
+              setProfile(p);
+              setSelectedId(null);
+            }}
+            fee={fee}
+            setFee={setFee}
+            go={go}
+            ask={ask}
+            openDeadline={openDeadline}
+            openPost={openPost}
+          />
+        ) : (
+          <SubPage view={view} go={go}>
+            {view === "schedule" && (
+              <Schedule
+                minute={minute}
+                profile={profile}
+                setProfile={(p) => {
+                  setProfile(p);
+                  setSelectedId(null);
+                }}
+                selectedId={selectedId}
+                setSelectedId={setSelectedId}
+                month={month}
+                setMonth={setMonth}
+                onAsk={ask}
+              />
+            )}
+            {view === "fee" && <FeeTable fee={fee} setFee={setFee} onAsk={ask} />}
+            {view === "board" && (
+              <Board
+                board={board}
+                setBoard={(b) => {
+                  setBoard(b);
+                  setPostId(null);
+                }}
+                postId={postId}
+                setPostId={setPostId}
+              />
+            )}
+            {view === "about" && <About />}
+            {view === "services" && <Services onAsk={ask} />}
+            {view === "map" && <Location />}
+            {view === "contact" && <Contact prefill={prefill} minute={minute} />}
+          </SubPage>
+        )}
       </main>
       <Footer />
     </div>
@@ -424,7 +569,7 @@ function Logo({ light = false }: { light?: boolean }) {
   );
 }
 
-function Header() {
+function Header({ view, go }: { view: View; go: Go }) {
   const [open, setOpen] = useState(false);
   const reduce = useReducedMotionSafe();
 
@@ -435,31 +580,51 @@ function Header() {
     return () => window.removeEventListener("keydown", onKey);
   }, [open]);
 
+  const pick = (v: View) => {
+    setOpen(false);
+    go(v);
+  };
+
   return (
-    <header className="sticky top-0 z-40 border-b backdrop-blur-md" style={{ background: "rgba(251,250,246,0.94)", borderColor: C.line }}>
+    <header className="sticky top-0 z-40 border-b" style={{ background: "rgba(251,250,246,0.97)", borderColor: C.line }}>
       <div className="mx-auto flex h-16 max-w-[1200px] items-center justify-between gap-3 px-4 md:px-6">
-        <a href="#top" aria-label={`${OFFICE} 처음으로`}>
+        <button type="button" onClick={() => pick("home")} aria-label={`${OFFICE} 처음 화면`} className="min-w-0">
           <Logo />
-        </a>
+        </button>
         <nav aria-label="주 메뉴" className="hidden lg:block">
-          <ul className="flex items-center gap-6 text-[15px]">
-            {NAV.map((n) => (
-              <li key={n.id}>
-                <a href={`#${n.id}`} className="transition-colors hover:text-[#1f5c45]" style={{ color: C.muted }}>
-                  {n.label}
-                </a>
-              </li>
-            ))}
+          <ul className="flex items-center gap-1">
+            {NAV.map((n) => {
+              const on = view === n.id;
+              return (
+                <li key={n.id}>
+                  <button
+                    type="button"
+                    onClick={() => pick(n.id)}
+                    aria-current={on ? "page" : undefined}
+                    className="h-10 rounded-[6px] px-3 text-[15px] font-semibold transition-colors hover:text-[#1f5c45]"
+                    style={{ color: on ? C.green : C.muted, boxShadow: on ? `inset 0 -2px 0 ${C.green}` : undefined }}
+                  >
+                    {n.label}
+                  </button>
+                </li>
+              );
+            })}
           </ul>
         </nav>
-        <div className="flex items-center gap-2">
+        <div className="flex shrink-0 items-center gap-2">
           <a href={`tel:${TEL}`} className="hidden h-10 items-center gap-1.5 px-2 text-[15px] font-semibold tabular-nums xl:inline-flex" style={{ color: C.green }}>
             <Phone size={16} aria-hidden />
             {TEL}
           </a>
-          <a href="#contact" className="hidden h-10 items-center rounded-[6px] px-4 text-[15px] font-semibold sm:inline-flex" style={{ background: C.green, color: "#fff" }}>
-            상담 신청
-          </a>
+          <button
+            type="button"
+            onClick={() => pick("contact")}
+            aria-current={view === "contact" ? "page" : undefined}
+            className="hidden h-10 items-center rounded-[6px] px-4 text-[15px] font-semibold sm:inline-flex"
+            style={{ background: C.green, color: "#fff" }}
+          >
+            상담신청
+          </button>
           <button
             type="button"
             className="inline-flex h-11 w-11 items-center justify-center rounded-[6px] lg:hidden"
@@ -484,15 +649,21 @@ function Header() {
             exit={reduce ? { opacity: 0 } : { height: 0 }}
             transition={{ duration: 0.26, ease: EASE }}
           >
-            <ul className="px-4 py-2">
-              {[...NAV, { id: "contact", label: "상담 신청" }].map((n) => (
+            <ul className="grid grid-cols-2 gap-x-4 px-4 py-2">
+              {[...NAV, { id: "contact" as const, label: "상담신청" }].map((n) => (
                 <li key={n.id}>
-                  <a href={`#${n.id}`} onClick={() => setOpen(false)} className="flex h-12 items-center text-[17px]">
+                  <button
+                    type="button"
+                    onClick={() => pick(n.id)}
+                    aria-current={view === n.id ? "page" : undefined}
+                    className="flex h-12 w-full items-center text-left text-[17px]"
+                    style={{ color: view === n.id ? C.green : C.ink, fontWeight: view === n.id ? 700 : 400 }}
+                  >
                     {n.label}
-                  </a>
+                  </button>
                 </li>
               ))}
-              <li>
+              <li className="col-span-2">
                 <a href={`tel:${TEL}`} className="flex h-12 items-center text-[17px] font-semibold tabular-nums" style={{ color: C.green }}>
                   전화 {TEL}
                 </a>
@@ -505,83 +676,16 @@ function Header() {
   );
 }
 
-/* ---------- 첫 화면 ---------- */
+/* ---------- 공용 조각 ---------- */
 
 function DdayBadge({ n, big = false }: { n: number; big?: boolean }) {
   return (
     <span
-      className={`inline-flex shrink-0 items-center rounded-[4px] font-bold tabular-nums ${big ? "px-2.5 py-1 text-[20px]" : "px-2 py-0.5 text-[14px]"}`}
+      className={`inline-flex shrink-0 items-center justify-center rounded-[4px] font-bold tabular-nums ${big ? "px-2.5 py-1 text-[20px]" : "min-w-[58px] px-2 py-0.5 text-[14px]"}`}
       style={{ background: n <= 7 ? C.yellow : C.yellowSoft, color: C.ink }}
     >
       {dday(n)}
     </span>
-  );
-}
-
-function Hero({ minute }: { minute: number }) {
-  const today = todayOf(minute);
-  const list = today ? upcomingAll(today) : [];
-
-  return (
-    <section id="top" className="px-4 pb-14 pt-8 md:px-6 md:pb-20 md:pt-14">
-      <div className="mx-auto grid max-w-[1200px] items-center gap-8 md:grid-cols-[1fr_1.1fr] md:gap-12">
-        <div className="min-w-0">
-          <p className="text-[15px] font-semibold" style={{ color: C.green }}>
-            □□역 3번 출구 앞 세무사 사무소
-          </p>
-          <h1 className="mt-2 text-[38px] font-bold leading-[1.25] tracking-[-0.03em] md:text-[52px]">{OFFICE}</h1>
-          <p className="mt-4 max-w-[520px]" style={{ color: C.muted }}>
-            개인사업자, 법인, 프리랜서의 장부 정리와 세금 신고를 맡고 있습니다. 세무사 두 명이 맡은 사업장을 처음부터 끝까지 직접 봅니다.
-          </p>
-          <div className="mt-6 flex flex-wrap gap-2.5">
-            <a href="#contact" className="inline-flex h-12 items-center rounded-[6px] px-5 font-semibold" style={{ background: C.green, color: "#fff" }}>
-              상담 신청
-            </a>
-            <a href="#calendar" className="inline-flex h-12 items-center gap-2 rounded-[6px] border bg-white px-5 font-semibold" style={{ borderColor: C.line }}>
-              <CalendarDays size={18} style={{ color: C.green }} aria-hidden />내 세금 달력 보기
-            </a>
-          </div>
-
-          <div className="mt-7 rounded-[10px] border bg-white p-4 md:p-5" style={{ borderColor: C.line }} aria-live="polite">
-            <p className="text-[15px] font-bold">다가오는 신고 기한</p>
-            <ul className="mt-2 divide-y" style={{ borderColor: C.line }}>
-              {today
-                ? list.map(({ d, who }) => (
-                    <li key={d.id} className="flex items-center gap-3 py-2.5" style={{ borderColor: C.line }}>
-                      <DdayBadge n={dayDiff(d.real, today)} />
-                      <span className="min-w-0 flex-1">
-                        <span className="block font-semibold leading-[1.4]">{d.title}</span>
-                        <span className="block text-[14px] tabular-nums" style={{ color: C.muted }}>
-                          {md(d.real)}
-                          {d.shifted ? `까지 (${d.shifted}이라 미뤄짐)` : "까지"}, {who}
-                        </span>
-                      </span>
-                    </li>
-                  ))
-                : [0, 1, 2].map((i) => <li key={i} className="h-[68px]" />)}
-            </ul>
-          </div>
-        </div>
-        <div className="relative aspect-[4/3] overflow-hidden rounded-[12px] md:aspect-[7/6]">
-          <Image src={`${IMG}/hero.jpg`} alt="서류와 계산기, 노트북이 놓인 밝은 사무실 책상" fill priority sizes="(min-width: 768px) 55vw, 100vw" className="object-cover" />
-        </div>
-      </div>
-    </section>
-  );
-}
-
-function SectionHead({ id, title, desc }: { id: string; title: string; desc?: string }) {
-  return (
-    <div>
-      <h2 id={id} className="text-[28px] font-bold leading-[1.35] tracking-[-0.03em] md:text-[36px]">
-        {title}
-      </h2>
-      {desc && (
-        <p className="mt-3 max-w-[660px]" style={{ color: C.muted }}>
-          {desc}
-        </p>
-      )}
-    </div>
   );
 }
 
@@ -600,40 +704,341 @@ function Pill({ on, onClick, children, disabled }: { on: boolean; onClick: () =>
   );
 }
 
-/* ---------- 내 세금 달력 ---------- */
+/** 메인 박스: 제목 줄과 더보기(+) 아이콘 */
+function Box({ id, title, onMore, className = "", children }: { id: string; title: string; onMore?: () => void; className?: string; children: React.ReactNode }) {
+  return (
+    <section id={id} aria-labelledby={`${id}-title`} className={`flex min-w-0 flex-col rounded-[10px] border bg-white ${className}`} style={{ borderColor: C.line }}>
+      <div className="flex items-center justify-between gap-3 border-b py-2 pl-5 pr-2" style={{ borderColor: C.line }}>
+        <h2 id={`${id}-title`} className="py-1 text-[18px] font-bold tracking-[-0.02em]">
+          {title}
+        </h2>
+        {onMore && (
+          <button type="button" onClick={onMore} aria-label={`${title} 더보기`} title="더보기" className="inline-flex h-10 w-10 items-center justify-center rounded-[6px] hover:bg-[#f3f1ea]" style={{ color: C.muted }}>
+            <Plus size={20} aria-hidden />
+          </button>
+        )}
+      </div>
+      <div className="flex-1 p-4 md:p-5">{children}</div>
+    </section>
+  );
+}
 
-type AskFn = (p: Omit<Prefill, "key">) => void;
+const inputCls = "mt-1.5 h-12 w-full rounded-[6px] border bg-white px-3 outline-none focus:border-[#1f5c45]";
 
-function TaxCalendar({ minute, onAsk }: { minute: number; onAsk: AskFn }) {
+/* ---------- 메인: 박스 그리드 ---------- */
+
+/** 이번 달 기한(지난 것 포함)과, 남은 게 적으면 다음 달 기한을 붙인다 */
+function monthDigest(today: Date, p: Profile) {
+  const y = today.getFullYear();
+  const all = scheduleFor(y, p);
+  const thisMonth = all.filter((d) => d.due.getFullYear() === y && d.due.getMonth() === today.getMonth());
+  const upcoming = thisMonth.filter((d) => d.real >= today).length;
+  const nm = new Date(y, today.getMonth() + 1, 1);
+  const nextMonth = upcoming < 3 ? all.filter((d) => d.due.getFullYear() === nm.getFullYear() && d.due.getMonth() === nm.getMonth()).slice(0, 3 - upcoming) : [];
+  return { thisMonth, nextMonth, nm };
+}
+
+function Home({
+  minute,
+  profile,
+  setProfile,
+  fee,
+  setFee,
+  go,
+  ask,
+  openDeadline,
+  openPost,
+}: {
+  minute: number;
+  profile: Profile;
+  setProfile: (p: Profile) => void;
+  fee: FeePick;
+  setFee: (f: FeePick) => void;
+  go: Go;
+  ask: AskFn;
+  openDeadline: (id: string, monthIdx: number) => void;
+  openPost: (p: Post) => void;
+}) {
+  const today = todayOf(minute);
+  const digest = today ? monthDigest(today, profile) : null;
+  const latest = POSTS.slice(0, 5);
+  const boardLabel = (b: BoardId) => BOARDS.find((x) => x.id === b)?.label ?? "";
+  const monthIdxOf = (d: Date) => (today ? (d.getFullYear() - today.getFullYear()) * 12 + d.getMonth() : 0);
+
+  const row = (d: Deadline) => {
+    const past = today ? d.real < today : false;
+    return (
+      <li key={d.id}>
+        <button
+          type="button"
+          onClick={() => openDeadline(d.id, monthIdxOf(d.due))}
+          className="flex w-full items-center gap-3 rounded-[6px] px-2 py-2 text-left hover:bg-[#f6f5f0]"
+          style={{ opacity: past ? 0.55 : 1 }}
+        >
+          {today && (past ? <span className="inline-flex min-w-[58px] justify-center text-[14px]" style={{ color: C.muted }}>지남</span> : <DdayBadge n={dayDiff(d.real, today)} />)}
+          <span className="min-w-0 flex-1">
+            <span className="block font-semibold leading-[1.4]">{d.title}</span>
+            <span className="block text-[14px] tabular-nums" style={{ color: C.muted }}>
+              {md(d.real)}
+              {d.shifted ? ` (${d.shifted}로 연기)` : ""}
+            </span>
+          </span>
+        </button>
+      </li>
+    );
+  };
+
+  return (
+    <div className="px-4 pb-16 pt-5 md:px-6 md:pt-8">
+      <div className="mx-auto grid max-w-[1200px] gap-4 lg:grid-cols-12">
+        {/* 사무소 */}
+        <section aria-labelledby="tax-home-title" className="flex flex-col rounded-[10px] p-5 md:p-6 lg:col-span-4" style={{ background: C.green, color: "#fff" }}>
+          <h1 id="tax-home-title" tabIndex={-1} className="text-[30px] font-bold leading-[1.3] tracking-[-0.03em] outline-none md:text-[34px]">
+            {OFFICE}
+          </h1>
+          <p className="mt-1 text-[15px]" style={{ color: "#cfe0d7" }}>
+            개인사업자·법인 세무기장, 신고대리
+          </p>
+          <a href={`tel:${TEL}`} className="mt-5 inline-flex items-center gap-2 text-[28px] font-bold tabular-nums tracking-[-0.01em]">
+            <Phone size={24} aria-hidden />
+            {TEL}
+          </a>
+          <dl className="mt-3 space-y-1 text-[15px] tabular-nums" style={{ color: "#e5eee9" }}>
+            <div className="flex gap-3">
+              <dt className="w-[52px] shrink-0" style={{ color: "#a9c4b8" }}>
+                평일
+              </dt>
+              <dd>09:00 ~ 18:00 (점심 12:00 ~ 13:00)</dd>
+            </div>
+            <div className="flex gap-3">
+              <dt className="w-[52px] shrink-0" style={{ color: "#a9c4b8" }}>
+                토요일
+              </dt>
+              <dd>1월, 5월만 10:00 ~ 15:00</dd>
+            </div>
+          </dl>
+          <div className="mt-auto flex gap-2 pt-6">
+            <button type="button" onClick={() => go("contact")} className="h-12 flex-1 rounded-[6px] text-[16px] font-bold" style={{ background: "#fff", color: C.greenDeep }}>
+              상담신청
+            </button>
+            <button type="button" onClick={() => go("map")} aria-label="오시는 길" title="오시는 길" className="inline-flex h-12 w-12 items-center justify-center rounded-[6px] border" style={{ borderColor: "rgba(255,255,255,0.4)" }}>
+              <MapPin size={20} aria-hidden />
+            </button>
+          </div>
+        </section>
+
+        {/* 이달의 신고일정 */}
+        <Box id="tax-schedule" title={today ? `${today.getMonth() + 1}월 신고일정` : "이달의 신고일정"} onMore={() => go("schedule")} className="lg:col-span-8">
+          <div className="flex flex-wrap items-center gap-1.5" role="group" aria-label="사업자 유형">
+            {BIZ.map((b) => (
+              <button
+                key={b.id}
+                type="button"
+                aria-pressed={profile.type === b.id}
+                onClick={() => setProfile({ ...profile, type: b.id })}
+                className="h-10 rounded-[6px] border px-3 text-[15px] font-semibold"
+                style={profile.type === b.id ? { background: C.ink, color: "#fff", borderColor: C.ink } : { borderColor: C.line }}
+              >
+                {b.short}
+              </button>
+            ))}
+            <label className="ml-1 inline-flex h-10 cursor-pointer items-center gap-2 text-[15px]">
+              <input type="checkbox" checked={profile.staff} onChange={(e) => setProfile({ ...profile, staff: e.target.checked })} className="h-5 w-5 accent-[#1f5c45]" />
+              직원 있음
+            </label>
+          </div>
+          <div className="mt-3 min-h-[220px]" aria-live="polite">
+            {digest && today && (
+              <>
+                {digest.thisMonth.length === 0 ? (
+                  <p className="px-2 py-3 text-[15px]" style={{ color: C.muted }}>
+                    이번 달은 신고 기한이 없습니다.
+                  </p>
+                ) : (
+                  <ul className="divide-y" style={{ borderColor: C.line }}>
+                    {digest.thisMonth.map(row)}
+                  </ul>
+                )}
+                {digest.nextMonth.length > 0 && (
+                  <>
+                    <p className="mt-3 border-t px-2 pt-3 text-[14px] font-bold" style={{ borderColor: C.line, color: C.muted }}>
+                      {digest.nm.getMonth() + 1}월
+                    </p>
+                    <ul>{digest.nextMonth.map(row)}</ul>
+                  </>
+                )}
+              </>
+            )}
+          </div>
+        </Box>
+
+        {/* 기장료 안내 */}
+        <Box id="tax-fee" title="기장료 안내" onMore={() => go("fee")} className="lg:col-span-5">
+          <FeeGrid fee={fee} setFee={setFee} compact />
+          <div className="mt-3 flex flex-wrap items-center justify-between gap-3 rounded-[6px] px-3 py-2.5" style={{ background: C.greenSoft }} aria-live="polite">
+            <p className="text-[15px] leading-[1.5]">
+              {fee.corp ? "법인" : "개인"}, {BANDS[fee.band].label}
+              <span className="block text-[18px] font-bold tabular-nums">월 {comma(monthlyFee(fee.band, fee.corp) + staffFee(fee.staff))}원부터</span>
+            </p>
+            <button
+              type="button"
+              onClick={() => ask({ topics: ["신규 기장"], biz: fee.corp ? "법인" : "", memo: `${fee.corp ? "법인" : "개인사업자"}, 작년 매출 ${BANDS[fee.band].label}, 기장료 상담 원합니다.` })}
+              className="h-11 rounded-[6px] px-4 text-[15px] font-semibold"
+              style={{ background: C.green, color: "#fff" }}
+            >
+              기장 상담 신청
+            </button>
+          </div>
+          <p className="mt-2 text-[13px]" style={{ color: C.muted }}>
+            부가세 별도, 직원 {fee.staff}명 기준
+          </p>
+        </Box>
+
+        {/* 세무소식 */}
+        <Box id="tax-news" title="세무소식" onMore={() => go("board")} className="lg:col-span-7">
+          <ul className="-my-1">
+            {latest.map((p) => (
+              <li key={p.id}>
+                <button type="button" onClick={() => openPost(p)} className="grid w-full grid-cols-[auto_1fr] items-baseline gap-x-3 rounded-[6px] px-2 py-2 text-left hover:bg-[#f6f5f0] sm:grid-cols-[auto_1fr_auto]">
+                  <span className="text-[13px] font-semibold" style={{ color: C.green }}>
+                    [{boardLabel(p.board)}]
+                  </span>
+                  <span className="truncate text-[15px] font-semibold">{p.title}</span>
+                  <span className="col-start-2 text-[13px] tabular-nums sm:col-start-auto" style={{ color: C.muted }}>
+                    {p.date}
+                  </span>
+                </button>
+              </li>
+            ))}
+          </ul>
+        </Box>
+
+        {/* 바로가기 */}
+        <Box id="tax-links" title="바로가기" className="lg:col-span-8">
+          <ul className="grid grid-cols-2 gap-2 sm:grid-cols-3">
+            {SHORTCUTS.map((s) => (
+              <li key={s.name}>
+                <a
+                  href={s.href}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="flex h-full min-h-[52px] items-center justify-between gap-2 rounded-[6px] border px-3 py-2 text-[15px] font-semibold leading-[1.35] hover:border-[#1f5c45]"
+                  style={{ borderColor: C.line }}
+                >
+                  {s.name}
+                  <ExternalLink size={15} className="shrink-0" style={{ color: C.muted }} aria-hidden />
+                  <span className="sr-only">(새 창)</span>
+                </a>
+              </li>
+            ))}
+          </ul>
+        </Box>
+
+        {/* 사무소 소개 요약 */}
+        <Box id="tax-about" title="세무사 인사말" onMore={() => go("about")} className="lg:col-span-4">
+          <div className="flex items-start gap-3">
+            <span className="relative h-[72px] w-[72px] shrink-0 overflow-hidden rounded-[6px]">
+              <Image src={`${IMG}/office.jpg`} alt="" fill sizes="72px" className="object-cover" />
+            </span>
+            <p className="text-[15px] leading-[1.6]" style={{ color: C.muted }}>
+              맡은 장부는 세무사가 직접 봅니다. 신고서를 내기 전에 숫자를 사장님과 한 번 더 맞춰 봅니다.
+              <span className="mt-1 block font-semibold" style={{ color: C.ink }}>
+                대표세무사 김ㅅ우
+              </span>
+            </p>
+          </div>
+        </Box>
+      </div>
+    </div>
+  );
+}
+
+/* ---------- 하위 페이지 틀 ---------- */
+
+function SubPage({ view, go, children }: { view: Exclude<View, "home">; go: Go; children: React.ReactNode }) {
+  const parent = view === "contact" ? "고객센터" : NAV.find((n) => n.id === view)?.label;
+  return (
+    <>
+      <div className="border-b px-4 md:px-6" style={{ borderColor: C.line, background: "#fff" }}>
+        <div className="mx-auto flex max-w-[1200px] flex-wrap items-end justify-between gap-x-6 gap-y-2 py-6 md:py-8">
+          <h1 id="tax-page-title" tabIndex={-1} className="text-[28px] font-bold leading-[1.3] tracking-[-0.03em] outline-none md:text-[34px]">
+            {VIEW_TITLE[view]}
+          </h1>
+          <nav aria-label="현재 위치" className="text-[14px]" style={{ color: C.muted }}>
+            <ol className="flex items-center gap-1">
+              <li>
+                <button type="button" onClick={() => go("home")} className="inline-flex h-9 items-center gap-1 hover:underline">
+                  <House size={15} aria-hidden />홈
+                </button>
+              </li>
+              <li aria-hidden>
+                <ChevronRight size={14} />
+              </li>
+              <li aria-current="page" className="font-semibold" style={{ color: C.ink }}>
+                {parent}
+              </li>
+            </ol>
+          </nav>
+        </div>
+      </div>
+      <div className="px-4 pb-20 pt-8 md:px-6 md:pt-10">
+        <div className="mx-auto max-w-[1200px]">{children}</div>
+      </div>
+    </>
+  );
+}
+
+/* ---------- 세무일정 ---------- */
+
+function Schedule({
+  minute,
+  profile,
+  setProfile,
+  selectedId,
+  setSelectedId,
+  month,
+  setMonth,
+  onAsk,
+}: {
+  minute: number;
+  profile: Profile;
+  setProfile: (p: Profile) => void;
+  selectedId: string | null;
+  setSelectedId: (id: string | null) => void;
+  month: number | null;
+  setMonth: (m: number) => void;
+  onAsk: AskFn;
+}) {
   const reduce = useReducedMotionSafe();
-  const [type, setType] = useState<BizType>("general");
-  const [staff, setStaff] = useState(false);
-  const [half, setHalf] = useState(false);
-  const [freelancePay, setFreelancePay] = useState(false);
-  const [sincere, setSincere] = useState(false);
-  const [selectedId, setSelectedId] = useState<string | null>(null);
   const [checked, setChecked] = useState<Set<string>>(new Set());
-  const stripRef = useRef<HTMLDivElement>(null);
+  const tabsRef = useRef<HTMLDivElement>(null);
 
   const today = todayOf(minute);
-  const ready = !!today;
   const year = today ? today.getFullYear() : 0;
+  const { type, staff, half, freelancePay } = profile;
   const sincereOk = type !== "simple";
-  const profile: Profile = { type, staff, half, freelancePay, sincere: sincere && sincereOk };
-  const items = today ? scheduleFor(year, profile) : [];
+  const eff: Profile = { ...profile, sincere: profile.sincere && sincereOk };
+  const items = today ? scheduleFor(year, eff) : [];
   const next = today ? items.find((d) => d.real >= today) ?? null : null;
-  const selected = items.find((d) => d.id === selectedId) ?? next;
   const remainThisYear = today ? items.filter((d) => d.real >= today && d.due.getFullYear() === year).length : 0;
 
-  const months = ready ? Array.from({ length: 15 }, (_, i) => ({ y: year + Math.floor(i / 12), m: (i % 12) + 1 })) : [];
+  const cur = month ?? (today ? today.getMonth() : 0);
+  const ym = { y: year + Math.floor(cur / 12), m: (cur % 12) + 1 };
+  const inMonth = items.filter((d) => d.due.getFullYear() === ym.y && d.due.getMonth() + 1 === ym.m);
+  const selected = items.find((d) => d.id === selectedId) ?? inMonth.find((d) => today && d.real >= today) ?? inMonth[0] ?? null;
 
-  // 처음 그릴 때 띠를 이번 달 위치로 옮긴다(띠 안에서만 움직인다)
+  const set = (p: Partial<Profile>) => setProfile({ ...profile, ...p });
+  const moveMonth = (m: number) => {
+    setMonth(m);
+    setSelectedId(null);
+  };
+
+  // 고른 달 탭이 탭 줄 안에서 보이게 옮긴다
   useEffect(() => {
-    if (!ready) return;
-    const box = stripRef.current;
-    const cur = box?.querySelector<HTMLElement>('[data-current="true"]');
-    if (box && cur) box.scrollLeft = Math.max(0, cur.offsetLeft - 12);
-  }, [ready]);
+    const box = tabsRef.current;
+    const tab = box?.querySelector<HTMLElement>('[aria-pressed="true"]');
+    if (box && tab) box.scrollLeft = Math.max(0, tab.offsetLeft - box.clientWidth / 2 + tab.offsetWidth / 2);
+  }, [cur, year]);
 
   const toggleCheck = (key: string) =>
     setChecked((prev) => {
@@ -644,449 +1049,700 @@ function TaxCalendar({ minute, onAsk }: { minute: number; onAsk: AskFn }) {
     });
 
   return (
-    <section aria-labelledby="calendar-title" id="calendar" className="scroll-mt-16 px-4 py-16 md:px-6 md:py-24" style={{ background: "rgba(255,255,255,0.6)" }}>
-      <div className="mx-auto max-w-[1200px]">
-        <SectionHead
-          id="calendar-title"
-          title="내 사업에 맞는 신고 기한만 모아 봅니다"
-          desc="사업자 유형과 직원 여부를 고르면 올해 1월부터 다음 해 3월까지의 기한이 펼쳐집니다. 기한을 누르면 준비할 서류가 나옵니다."
-        />
+    <div className="grid items-start gap-6 lg:grid-cols-[290px_1fr]">
+      <div className="space-y-6 rounded-[10px] border bg-white p-5" style={{ borderColor: C.line }}>
+        <fieldset>
+          <legend className="text-[15px] font-bold">사업자 유형</legend>
+          <div className="mt-2 grid grid-cols-2 gap-2 lg:grid-cols-1">
+            {BIZ.map((b) => (
+              <Pill key={b.id} on={type === b.id} onClick={() => set({ type: b.id })}>
+                {b.label}
+              </Pill>
+            ))}
+          </div>
+        </fieldset>
+        <fieldset>
+          <legend className="text-[15px] font-bold">직원</legend>
+          <div className="mt-2 flex flex-wrap gap-2">
+            <Pill on={!staff} onClick={() => set({ staff: false })}>
+              없음
+            </Pill>
+            <Pill on={staff} onClick={() => set({ staff: true })}>
+              있음
+            </Pill>
+          </div>
+          <label className="mt-3 flex min-h-11 cursor-pointer items-start gap-2.5 text-[15px] leading-[1.45]">
+            <input type="checkbox" checked={freelancePay} onChange={(e) => set({ freelancePay: e.target.checked })} className="mt-0.5 h-5 w-5 shrink-0 accent-[#1f5c45]" />
+            사업소득 지급(3.3%) 있음
+          </label>
+          {(staff || freelancePay) && (
+            <div className="mt-3">
+              <p className="text-[14px] font-semibold" style={{ color: C.muted }}>
+                원천세 납부
+              </p>
+              <div className="mt-1.5 flex flex-wrap gap-2">
+                <Pill on={!half} onClick={() => set({ half: false })}>
+                  매월
+                </Pill>
+                <Pill on={half} onClick={() => set({ half: true })}>
+                  반기 (승인받음)
+                </Pill>
+              </div>
+            </div>
+          )}
+        </fieldset>
+        <label className={`flex min-h-11 items-start gap-2.5 text-[15px] leading-[1.45] ${sincereOk ? "cursor-pointer" : "opacity-50"}`}>
+          <input type="checkbox" disabled={!sincereOk} checked={eff.sincere} onChange={(e) => set({ sincere: e.target.checked })} className="mt-0.5 h-5 w-5 shrink-0 accent-[#1f5c45]" />
+          <span>
+            <span className="font-bold">성실신고확인대상</span>
+            <span className="block text-[14px]" style={{ color: C.muted }}>
+              {!sincereOk ? "간이과세자는 해당하지 않습니다" : type === "corp" ? "성실신고 사업자가 전환한 지 3년 안 된 법인 등" : "업종별 매출 기준을 넘은 사업자"}
+            </span>
+          </span>
+        </label>
+      </div>
 
-        <div className="mt-10 grid items-start gap-6 lg:grid-cols-[300px_1fr]">
-          <div className="space-y-6 rounded-[10px] border bg-white p-5" style={{ borderColor: C.line }}>
-            <fieldset>
-              <legend className="text-[15px] font-bold">사업자 유형</legend>
-              <div className="mt-2 grid grid-cols-2 gap-2 lg:grid-cols-1">
-                {BIZ.map((b) => (
-                  <Pill key={b.id} on={type === b.id} onClick={() => { setType(b.id); setSelectedId(null); }}>
-                    {b.label}
-                  </Pill>
-                ))}
-              </div>
-            </fieldset>
-            <fieldset>
-              <legend className="text-[15px] font-bold">직원</legend>
-              <div className="mt-2 flex flex-wrap gap-2">
-                <Pill on={!staff} onClick={() => { setStaff(false); setSelectedId(null); }}>
-                  없음
-                </Pill>
-                <Pill on={staff} onClick={() => { setStaff(true); setSelectedId(null); }}>
-                  있음
-                </Pill>
-              </div>
-              <label className="mt-3 flex min-h-11 cursor-pointer items-start gap-2.5 text-[15px] leading-[1.45]">
-                <input type="checkbox" checked={freelancePay} onChange={(e) => { setFreelancePay(e.target.checked); setSelectedId(null); }} className="mt-0.5 h-5 w-5 shrink-0 accent-[#1f5c45]" />
-                프리랜서에게 3.3%를 떼고 일을 맡깁니다
-              </label>
-              {(staff || freelancePay) && (
-                <div className="mt-3">
-                  <p className="text-[14px] font-semibold" style={{ color: C.muted }}>
-                    원천세 납부
+      <div className="min-w-0 space-y-4">
+        <div className="flex min-h-[84px] flex-wrap items-center justify-between gap-3 rounded-[10px] border bg-white px-5 py-4" style={{ borderColor: C.line }} aria-live="polite">
+          {today && next && (
+            <>
+              <div className="flex min-w-0 items-center gap-3">
+                <DdayBadge n={dayDiff(next.real, today)} big />
+                <div className="min-w-0">
+                  <p className="text-[14px]" style={{ color: C.muted }}>
+                    다음 기한
                   </p>
-                  <div className="mt-1.5 flex flex-wrap gap-2">
-                    <Pill on={!half} onClick={() => { setHalf(false); setSelectedId(null); }}>
-                      매월
-                    </Pill>
-                    <Pill on={half} onClick={() => { setHalf(true); setSelectedId(null); }}>
-                      반기 (승인받음)
-                    </Pill>
-                  </div>
+                  <p className="font-bold leading-[1.4]">
+                    {next.title}, <span className="tabular-nums">{md(next.real)}</span>
+                  </p>
                 </div>
-              )}
-            </fieldset>
-            <label className={`flex min-h-11 items-start gap-2.5 text-[15px] leading-[1.45] ${sincereOk ? "cursor-pointer" : "opacity-50"}`}>
-              <input
-                type="checkbox"
-                disabled={!sincereOk}
-                checked={sincere && sincereOk}
-                onChange={(e) => { setSincere(e.target.checked); setSelectedId(null); }}
-                className="mt-0.5 h-5 w-5 shrink-0 accent-[#1f5c45]"
-              />
-              <span>
-                <span className="font-bold">성실신고확인대상</span>
-                <span className="block text-[14px]" style={{ color: C.muted }}>
-                  {!sincereOk ? "간이과세자는 해당하지 않습니다" : type === "corp" ? "성실신고 사업자가 전환한 지 3년 안 된 법인 등" : "업종별 매출 기준을 넘은 사업자"}
-                </span>
-              </span>
-            </label>
+              </div>
+              <p className="text-[15px] tabular-nums" style={{ color: C.muted }}>
+                올해 남은 기한 <span className="font-bold" style={{ color: C.ink }}>{remainThisYear}건</span>
+              </p>
+            </>
+          )}
+        </div>
+
+        <div className="rounded-[10px] border bg-white" style={{ borderColor: C.line }}>
+          <div className="flex items-center gap-1 border-b px-2 py-2" style={{ borderColor: C.line }}>
+            <button
+              type="button"
+              onClick={() => moveMonth(Math.max(0, cur - 1))}
+              disabled={!today || cur === 0}
+              aria-label="이전 달"
+              className="inline-flex h-10 w-10 shrink-0 items-center justify-center rounded-[6px] disabled:opacity-30"
+            >
+              <ChevronLeft size={20} aria-hidden />
+            </button>
+            <div ref={tabsRef} className="flex min-w-0 flex-1 gap-1 overflow-x-auto" role="group" aria-label="월 선택">
+              {today &&
+                Array.from({ length: 15 }, (_, i) => {
+                  const m = (i % 12) + 1;
+                  const on = i === cur;
+                  const has = items.some((d) => d.due.getFullYear() === year + Math.floor(i / 12) && d.due.getMonth() + 1 === m);
+                  return (
+                    <button
+                      key={i}
+                      type="button"
+                      aria-pressed={on}
+                      onClick={() => moveMonth(i)}
+                      aria-label={`${year + Math.floor(i / 12)}년 ${m}월`}
+                      className="h-10 min-w-[48px] shrink-0 rounded-[6px] px-2 text-[15px] font-semibold tabular-nums"
+                      style={on ? { background: C.green, color: "#fff" } : { color: has ? C.ink : "#a5aca9" }}
+                    >
+                      {i >= 12 ? `${(year + 1) % 100}년 ${m}월` : `${m}월`}
+                    </button>
+                  );
+                })}
+            </div>
+            <button
+              type="button"
+              onClick={() => moveMonth(Math.min(14, cur + 1))}
+              disabled={!today || cur === 14}
+              aria-label="다음 달"
+              className="inline-flex h-10 w-10 shrink-0 items-center justify-center rounded-[6px] disabled:opacity-30"
+            >
+              <ChevronRight size={20} aria-hidden />
+            </button>
           </div>
 
-          <div className="min-w-0 space-y-5">
-            <div className="flex flex-wrap items-center justify-between gap-3 rounded-[10px] border bg-white px-5 py-4" style={{ borderColor: C.line }} aria-live="polite">
-              {today && next ? (
-                <>
-                  <div className="flex min-w-0 items-center gap-3">
-                    <DdayBadge n={dayDiff(next.real, today)} big />
-                    <div className="min-w-0">
-                      <p className="text-[14px]" style={{ color: C.muted }}>
-                        다음 기한
-                      </p>
-                      <p className="font-bold leading-[1.4]">
-                        {next.title}, <span className="tabular-nums">{md(next.real)}</span>
-                      </p>
-                    </div>
-                  </div>
-                  <p className="text-[15px] tabular-nums" style={{ color: C.muted }}>
-                    올해 남은 기한 <span className="font-bold" style={{ color: C.ink }}>{remainThisYear}건</span>
-                  </p>
-                </>
-              ) : (
-                <p className="h-[52px]" />
-              )}
-            </div>
+          <div className="flex flex-wrap items-center gap-x-4 gap-y-1 px-4 pt-3 text-[14px]" style={{ color: C.muted }}>
+            <span className="mr-auto font-bold tabular-nums" style={{ color: C.ink }}>
+              {today ? `${ym.y}년 ${ym.m}월` : ""}
+            </span>
+            {(Object.keys(GROUP_STYLE) as Group[]).map((g) => (
+              <span key={g} className="inline-flex items-center gap-1.5">
+                <span className="inline-block h-3 w-1 rounded-[1px]" style={{ background: GROUP_STYLE[g].bar }} aria-hidden />
+                {GROUP_STYLE[g].label}
+              </span>
+            ))}
+          </div>
 
-            <div className="rounded-[10px] border bg-white" style={{ borderColor: C.line }}>
-              <div className="flex flex-wrap items-center gap-x-4 gap-y-1 border-b px-4 py-3 text-[14px]" style={{ borderColor: C.line, color: C.muted }}>
-                {(Object.keys(GROUP_STYLE) as Group[]).map((g) => (
-                  <span key={g} className="inline-flex items-center gap-1.5">
-                    <span className="inline-block h-3 w-1 rounded-[1px]" style={{ background: GROUP_STYLE[g].bar }} aria-hidden />
-                    {GROUP_STYLE[g].label}
-                  </span>
-                ))}
-                <span className="ml-auto hidden text-[13px] sm:inline">옆으로 밀어 다른 달 보기</span>
-              </div>
-              <div ref={stripRef} className="overflow-x-auto" tabIndex={0} role="region" aria-label="달별 신고 기한">
-                <ol className="flex min-h-[260px]">
-                  {months.map(({ y, m }) => {
-                    const list = items.filter((d) => d.due.getFullYear() === y && d.due.getMonth() + 1 === m);
-                    const current = today && today.getFullYear() === y && today.getMonth() + 1 === m;
+          <ul className="min-h-[180px] p-2" aria-live="polite">
+            {today && inMonth.length === 0 && (
+              <li className="px-3 py-6 text-center text-[15px]" style={{ color: C.muted }}>
+                이 달은 신고 기한이 없습니다.
+              </li>
+            )}
+            {today &&
+              inMonth.map((d) => {
+                const past = d.real < today;
+                const on = selected?.id === d.id;
+                return (
+                  <li key={d.id}>
+                    <button
+                      type="button"
+                      aria-pressed={on}
+                      onClick={() => setSelectedId(d.id)}
+                      className="grid w-full grid-cols-[64px_1fr_auto] items-center gap-3 rounded-[6px] px-3 py-2.5 text-left transition-colors"
+                      style={{ background: on ? C.greenSoft : undefined, boxShadow: `inset 3px 0 0 ${GROUP_STYLE[KIND_GROUP[d.kind]].bar}`, opacity: past && !on ? 0.55 : 1 }}
+                    >
+                      <span className="tabular-nums">
+                        <span className="block font-bold">{d.due.getDate()}일</span>
+                        {d.shifted && (
+                          <span className="block text-[13px] font-semibold" style={{ color: C.red }}>
+                            {d.real.getMonth() + 1}/{d.real.getDate()}로
+                          </span>
+                        )}
+                      </span>
+                      <span className="min-w-0 font-semibold leading-[1.4]">{d.title}</span>
+                      {past ? (
+                        <span className="text-[13px]" style={{ color: C.muted }}>
+                          지남
+                        </span>
+                      ) : (
+                        <DdayBadge n={dayDiff(d.real, today)} />
+                      )}
+                    </button>
+                  </li>
+                );
+              })}
+          </ul>
+        </div>
+
+        <div aria-live="polite">
+          <AnimatePresence mode="wait" initial={false}>
+            {selected && today && (
+              <motion.div
+                key={selected.id}
+                initial={reduce ? false : { opacity: 0, y: 10 }}
+                animate={{ opacity: 1, y: 0 }}
+                exit={reduce ? { opacity: 0 } : { opacity: 0, y: -6 }}
+                transition={{ duration: 0.25, ease: EASE }}
+                className="relative overflow-hidden rounded-[10px] border bg-white py-5 pl-8 pr-5 md:pl-12 md:pr-7"
+                style={{ borderColor: C.line, backgroundImage: RULED, backgroundPosition: "0 10px" }}
+              >
+                <span className="absolute inset-y-0 left-4 w-[3px] border-x md:left-7" style={{ borderColor: C.margin }} aria-hidden />
+                <div className="flex flex-wrap items-start justify-between gap-3">
+                  <div className="min-w-0">
+                    <p className="text-[14px] font-semibold" style={{ color: C.muted }}>
+                      {GROUP_STYLE[KIND_GROUP[selected.kind]].label}
+                    </p>
+                    <h2 className="text-[22px] font-bold leading-[1.35] tracking-[-0.02em]">{selected.title}</h2>
+                  </div>
+                  <DdayBadge n={dayDiff(selected.real, today)} />
+                </div>
+                <dl className="mt-3 grid gap-1 text-[15px] tabular-nums sm:grid-cols-[auto_1fr] sm:gap-x-4">
+                  <dt style={{ color: C.muted }}>법정 기한</dt>
+                  <dd className="font-semibold">
+                    {selected.due.getFullYear()}년 {md(selected.due)}
+                  </dd>
+                  {selected.shifted && (
+                    <>
+                      <dt style={{ color: C.muted }}>실제 기한</dt>
+                      <dd className="font-semibold" style={{ color: C.red }}>
+                        {md(selected.real)} ({selected.shifted}이라 다음 영업일로 연기)
+                      </dd>
+                    </>
+                  )}
+                </dl>
+                <p className="mt-3 text-[15px]" style={{ color: C.muted }}>
+                  {KIND_INFO[selected.kind].about}
+                </p>
+                <h3 className="mt-4 flex items-center gap-1.5 font-bold">
+                  <ClipboardList size={18} style={{ color: C.green }} aria-hidden />
+                  준비 서류
+                </h3>
+                <ul className="mt-1">
+                  {KIND_INFO[selected.kind].prep.map((p, i) => {
+                    const key = `${selected.id}:${i}`;
+                    const on = checked.has(key);
                     return (
-                      <li
-                        key={`${y}-${m}`}
-                        data-current={current ? "true" : undefined}
-                        className="w-[172px] shrink-0 border-r last:border-r-0"
-                        style={{ borderColor: C.line, background: current ? "rgba(244,211,94,0.12)" : undefined }}
-                      >
-                        <p className="flex items-baseline gap-1.5 border-b px-3 py-2" style={{ borderColor: C.line }}>
-                          <span className="text-[18px] font-bold tabular-nums">{m}월</span>
-                          {(m === 1 || current) && (
-                            <span className="text-[13px] tabular-nums" style={{ color: C.muted }}>
-                              {current ? "이번 달" : `${y}년`}
-                            </span>
-                          )}
-                        </p>
-                        <ul className="space-y-1.5 p-2">
-                          {list.length === 0 && (
-                            <li className="px-1.5 py-2 text-[13px]" style={{ color: "#9aa39f" }}>
-                              기한 없음
-                            </li>
-                          )}
-                          {list.map((d) => {
-                            const past = today ? d.real < today : false;
-                            const on = selected?.id === d.id;
-                            const isNext = next?.id === d.id;
-                            return (
-                              <li key={d.id}>
-                                <button
-                                  type="button"
-                                  aria-pressed={on}
-                                  onClick={() => setSelectedId(d.id)}
-                                  aria-label={`${d.title}, ${md(d.real)}까지${d.shifted ? `, ${d.shifted}이라 미뤄짐` : ""}${past ? ", 지남" : ""}`}
-                                  className="block w-full rounded-[4px] py-1.5 pl-2.5 pr-2 text-left text-[14px] leading-[1.4] transition-colors"
-                                  style={{
-                                    borderTop: `1px solid ${on ? C.green : "transparent"}`,
-                                    borderRight: `1px solid ${on ? C.green : "transparent"}`,
-                                    borderBottom: `1px solid ${on ? C.green : "transparent"}`,
-                                    borderLeft: `3px solid ${GROUP_STYLE[KIND_GROUP[d.kind]].bar}`,
-                                    background: on ? C.greenSoft : isNext ? C.yellowSoft : "#f6f5f0",
-                                    opacity: past && !on ? 0.5 : 1,
-                                  }}
-                                >
-                                  <span className="flex items-center justify-between gap-1 tabular-nums">
-                                    <span className="font-bold">
-                                      {d.due.getDate()}일
-                                      {d.shifted && (
-                                        <span className="ml-1 font-semibold" style={{ color: C.red }}>
-                                          {d.real.getMonth() !== d.due.getMonth() ? `${d.real.getMonth() + 1}/${d.real.getDate()}` : `${d.real.getDate()}일`}로
-                                        </span>
-                                      )}
-                                    </span>
-                                    {past ? <span className="text-[12px]">지남</span> : isNext && today ? <span className="rounded-[3px] px-1 text-[12px] font-bold" style={{ background: C.yellow }}>{dday(dayDiff(d.real, today))}</span> : null}
-                                  </span>
-                                  <span className="block">{d.title}</span>
-                                </button>
-                              </li>
-                            );
-                          })}
-                        </ul>
+                      <li key={key}>
+                        <label className="flex min-h-[32px] cursor-pointer items-start gap-2.5 py-0.5 text-[15px] leading-[2]">
+                          <input type="checkbox" checked={on} onChange={() => toggleCheck(key)} className="mt-[9px] h-4 w-4 shrink-0 accent-[#1f5c45]" />
+                          <span style={on ? { textDecoration: "line-through", color: C.muted } : undefined}>{p}</span>
+                        </label>
                       </li>
                     );
                   })}
-                </ol>
-              </div>
-            </div>
-
-            <div aria-live="polite">
-              <AnimatePresence mode="wait" initial={false}>
-                {selected && today && (
-                  <motion.div
-                    key={selected.id}
-                    initial={reduce ? false : { opacity: 0, y: 10 }}
-                    animate={{ opacity: 1, y: 0 }}
-                    exit={reduce ? { opacity: 0 } : { opacity: 0, y: -6 }}
-                    transition={{ duration: 0.25, ease: EASE }}
-                    className="relative overflow-hidden rounded-[10px] border bg-white py-5 pl-8 pr-5 md:pl-12 md:pr-7"
-                    style={{ borderColor: C.line, backgroundImage: RULED, backgroundPosition: "0 10px" }}
-                  >
-                    <span className="absolute inset-y-0 left-4 w-[3px] border-x md:left-7" style={{ borderColor: C.margin }} aria-hidden />
-                    <div className="flex flex-wrap items-start justify-between gap-3">
-                      <div className="min-w-0">
-                        <p className="text-[14px] font-semibold" style={{ color: GROUP_STYLE[KIND_GROUP[selected.kind]].bar === C.ink ? C.muted : C.green }}>
-                          {GROUP_STYLE[KIND_GROUP[selected.kind]].label}
-                        </p>
-                        <h3 className="text-[22px] font-bold leading-[1.35] tracking-[-0.02em]">{selected.title}</h3>
-                      </div>
-                      <DdayBadge n={dayDiff(selected.real, today)} />
-                    </div>
-                    <dl className="mt-3 grid gap-1 text-[15px] tabular-nums sm:grid-cols-[auto_1fr] sm:gap-x-4">
-                      <dt style={{ color: C.muted }}>법정 기한</dt>
-                      <dd className="font-semibold">
-                        {selected.due.getFullYear()}년 {md(selected.due)}
-                      </dd>
-                      {selected.shifted && (
-                        <>
-                          <dt style={{ color: C.muted }}>실제 기한</dt>
-                          <dd className="font-semibold" style={{ color: C.red }}>
-                            {md(selected.due).slice(0, -4)}이 {selected.shifted}이라 다음 영업일인 {md(selected.real)}까지 내면 됩니다
-                          </dd>
-                        </>
-                      )}
-                    </dl>
-                    <p className="mt-3 text-[15px]" style={{ color: C.muted }}>
-                      {KIND_INFO[selected.kind].about}
-                    </p>
-                    <p className="mt-4 flex items-center gap-1.5 font-bold">
-                      <ClipboardList size={18} style={{ color: C.green }} aria-hidden />
-                      준비할 서류
-                    </p>
-                    <ul className="mt-1">
-                      {KIND_INFO[selected.kind].prep.map((p, i) => {
-                        const key = `${selected.id}:${i}`;
-                        const on = checked.has(key);
-                        return (
-                          <li key={key}>
-                            <label className="flex min-h-[32px] cursor-pointer items-start gap-2.5 py-0.5 text-[15px] leading-[2]">
-                              <input type="checkbox" checked={on} onChange={() => toggleCheck(key)} className="mt-[9px] h-4 w-4 shrink-0 accent-[#1f5c45]" />
-                              <span style={on ? { textDecoration: "line-through", color: C.muted } : undefined}>{p}</span>
-                            </label>
-                          </li>
-                        );
-                      })}
-                    </ul>
-                    <button
-                      type="button"
-                      onClick={() =>
-                        onAsk({
-                          topics: [KIND_INFO[selected.kind].topic],
-                          biz: BIZ_TO_CHOICE[type],
-                          memo: `${selected.title} (${md(selected.real)}까지) 준비를 맡기고 싶습니다.`,
-                        })
-                      }
-                      className="mt-4 inline-flex h-11 items-center rounded-[6px] px-4 text-[15px] font-semibold"
-                      style={{ background: C.green, color: "#fff" }}
-                    >
-                      이 신고 상담 신청
-                    </button>
-                  </motion.div>
-                )}
-              </AnimatePresence>
-            </div>
-            <p className="text-[14px]" style={{ color: C.muted }}>
-              실제 일정은 국세청 공지를 따릅니다.
-            </p>
-          </div>
+                </ul>
+                <button
+                  type="button"
+                  onClick={() =>
+                    onAsk({
+                      topics: [KIND_INFO[selected.kind].topic],
+                      biz: BIZ_TO_CHOICE[type],
+                      memo: `${selected.title} (${md(selected.real)}까지) 신고 대리를 맡기고 싶습니다.`,
+                    })
+                  }
+                  className="mt-4 inline-flex h-11 items-center rounded-[6px] px-4 text-[15px] font-semibold"
+                  style={{ background: C.green, color: "#fff" }}
+                >
+                  신고 대리 상담신청
+                </button>
+              </motion.div>
+            )}
+          </AnimatePresence>
         </div>
+        <p className="text-[14px]" style={{ color: C.muted }}>
+          실제 일정은 국세청 공지를 따릅니다. 설, 추석 등 음력 공휴일은 반영하지 않았습니다.
+        </p>
       </div>
-    </section>
+    </div>
   );
 }
 
-/* ---------- 기장료 계산기 ---------- */
+/* ---------- 요금안내 ---------- */
 
-const INDUSTRIES = [
-  { id: "retail", label: "도소매", base: 100_000 },
-  { id: "service", label: "음식·서비스", base: 100_000 },
-  { id: "maker", label: "제조", base: 130_000 },
-  { id: "pro", label: "전문직", base: 120_000 },
-];
+/** 매출 구간 x 개인·법인 요금표. 칸을 누르면 그 조건이 선택된다. */
+function FeeGrid({ fee, setFee, compact = false }: { fee: FeePick; setFee: (f: FeePick) => void; compact?: boolean }) {
+  const cell = (band: number, corp: boolean) => {
+    const on = fee.band === band && fee.corp === corp;
+    const v = monthlyFee(band, corp);
+    return (
+      <td className="p-0.5">
+        <button
+          type="button"
+          aria-pressed={on}
+          onClick={() => setFee({ ...fee, band, corp })}
+          aria-label={`${corp ? "법인" : "개인"} ${BANDS[band].label}, 월 ${comma(v)}원`}
+          className={`w-full rounded-[4px] px-2 text-right font-semibold tabular-nums transition-colors ${compact ? "h-10 text-[15px]" : "h-11 text-[16px]"}`}
+          style={on ? { background: C.green, color: "#fff" } : { background: "#f6f5f0" }}
+        >
+          {compact ? `${v / 10_000}만` : `${comma(v)}원`}
+        </button>
+      </td>
+    );
+  };
+  return (
+    <table className="w-full border-collapse text-[15px]">
+      <caption className="sr-only">연 매출 구간별 월 기장료 (부가세 별도)</caption>
+      <thead>
+        <tr className="text-[14px]" style={{ color: C.muted }}>
+          <th scope="col" className="pb-1.5 text-left font-semibold">
+            연 매출
+          </th>
+          <th scope="col" className="pb-1.5 pr-2 text-right font-semibold">
+            개인
+          </th>
+          <th scope="col" className="pb-1.5 pr-2 text-right font-semibold">
+            법인
+          </th>
+          {!compact && (
+            <>
+              <th scope="col" className="hidden pb-1.5 pr-2 text-right font-semibold sm:table-cell">
+                조정료 개인
+              </th>
+              <th scope="col" className="hidden pb-1.5 pr-2 text-right font-semibold sm:table-cell">
+                조정료 법인
+              </th>
+            </>
+          )}
+        </tr>
+      </thead>
+      <tbody>
+        {BANDS.map((b, i) => (
+          <tr key={b.label} className="border-t" style={{ borderColor: C.line }}>
+            <th scope="row" className="py-0.5 pr-2 text-left font-normal tabular-nums" style={{ color: fee.band === i ? C.ink : C.muted, fontWeight: fee.band === i ? 700 : 400 }}>
+              {compact ? b.short : b.label}
+            </th>
+            {cell(i, false)}
+            {cell(i, true)}
+            {!compact && (
+              <>
+                <td className="hidden pr-2 text-right tabular-nums sm:table-cell" style={{ color: C.muted }}>
+                  {comma(adjustFee(i, false))}원
+                </td>
+                <td className="hidden pr-2 text-right tabular-nums sm:table-cell" style={{ color: C.muted }}>
+                  {comma(adjustFee(i, true))}원
+                </td>
+              </>
+            )}
+          </tr>
+        ))}
+      </tbody>
+    </table>
+  );
+}
 
-const BANDS = [
-  { label: "3천만 원 미만", add: 0, adjust: 300_000 },
-  { label: "3천만 ~ 1억 원", add: 20_000, adjust: 400_000 },
-  { label: "1억 ~ 3억 원", add: 40_000, adjust: 550_000 },
-  { label: "3억 ~ 5억 원", add: 70_000, adjust: 750_000 },
-  { label: "5억 ~ 10억 원", add: 100_000, adjust: 1_100_000 },
-  { label: "10억 ~ 30억 원", add: 160_000, adjust: 1_600_000 },
-  { label: "30억 원 이상", add: 250_000, adjust: 2_500_000 },
-];
-
-function FeeCalculator({ onAsk }: { onAsk: AskFn }) {
-  const [industry, setIndustry] = useState("service");
-  const [band, setBand] = useState(2);
-  const [people, setPeople] = useState(2);
-  const [corp, setCorp] = useState(false);
-
-  const ind = INDUSTRIES.find((i) => i.id === industry) ?? INDUSTRIES[0];
-  const b = BANDS[band];
-  const staffFee = Math.min(people, 5) * 10_000 + Math.max(0, people - 5) * 5_000;
-  const corpFee = corp ? 50_000 : 0;
-  const low = ind.base + b.add + staffFee + corpFee;
-  const high = Math.round((low * 1.2) / 5_000) * 5_000;
-  const adjust = corp ? Math.round((b.adjust * 1.3) / 50_000) * 50_000 : b.adjust;
-
+function FeeTable({ fee, setFee, onAsk }: { fee: FeePick; setFee: (f: FeePick) => void; onAsk: AskFn }) {
+  const base = monthlyFee(fee.band, fee.corp);
+  const sFee = staffFee(fee.staff);
+  const total = base + sFee;
+  const adjust = adjustFee(fee.band, fee.corp);
   const rows = [
-    { k: `기본 기장료 (${ind.label})`, v: ind.base },
-    { k: `매출 구간 (${b.label})`, v: b.add },
-    { k: `인건비 신고 (직원 ${people}명)`, v: staffFee },
-    ...(corp ? [{ k: "법인 장부", v: corpFee }] : []),
+    { k: `기장료 (${fee.corp ? "법인" : "개인"}, ${BANDS[fee.band].label})`, v: base },
+    { k: `인건비 신고 (직원 ${fee.staff}명)`, v: sFee },
   ];
 
   return (
-    <section aria-labelledby="fee-title" id="fee" className="scroll-mt-16 px-4 py-16 md:px-6 md:py-24">
-      <div className="mx-auto max-w-[1200px]">
-        <SectionHead
-          id="fee-title"
-          title="한 달 기장료를 미리 어림해 보세요"
-          desc="부가세 신고와 원천세 신고는 기장료에 들어 있습니다. 종합소득세나 법인세 신고 때는 1년에 한 번 조정료가 따로 붙습니다."
-        />
-        <div className="mt-10 grid items-start gap-6 md:grid-cols-[1fr_400px] md:gap-8">
-          <div className="space-y-7 rounded-[10px] border bg-white p-5 md:p-7" style={{ borderColor: C.line }}>
-            <fieldset>
-              <legend className="text-[15px] font-bold">업종</legend>
-              <div className="mt-2 grid grid-cols-2 gap-2 sm:grid-cols-4">
-                {INDUSTRIES.map((i) => (
-                  <Pill key={i.id} on={industry === i.id} onClick={() => setIndustry(i.id)}>
-                    {i.label}
-                  </Pill>
-                ))}
-              </div>
-            </fieldset>
-            <div>
-              <label htmlFor="fee-band" className="flex flex-wrap items-baseline justify-between gap-2 text-[15px] font-bold">
-                작년 매출
-                <span className="text-[20px] tabular-nums" style={{ color: C.green }}>
-                  {b.label}
-                </span>
-              </label>
-              <input
-                id="fee-band"
-                type="range"
-                min={0}
-                max={BANDS.length - 1}
-                step={1}
-                value={band}
-                onChange={(e) => setBand(Number(e.target.value))}
-                aria-valuetext={b.label}
-                className="mt-3 w-full accent-[#1f5c45]"
-              />
-              <div className="mt-1 flex justify-between text-[13px] tabular-nums" style={{ color: C.muted }} aria-hidden>
-                <span>3천만</span>
-                <span>3억</span>
-                <span>30억 이상</span>
-              </div>
-            </div>
-            <div className="flex flex-wrap items-center justify-between gap-3">
-              <p className="text-[15px] font-bold" id="fee-people-label">
-                직원 수
-                <span className="block text-[14px] font-normal" style={{ color: C.muted }}>
-                  대표자는 빼고 세어 주세요
-                </span>
-              </p>
-              <div className="flex items-center gap-1" role="group" aria-labelledby="fee-people-label">
-                <button type="button" aria-label="직원 한 명 빼기" onClick={() => setPeople((n) => Math.max(0, n - 1))} className="inline-flex h-11 w-11 items-center justify-center rounded-[6px] border" style={{ borderColor: C.line }}>
-                  <Minus size={18} aria-hidden />
-                </button>
-                <span className="w-16 text-center text-[20px] font-bold tabular-nums" aria-live="polite">
-                  {people}명
-                </span>
-                <button type="button" aria-label="직원 한 명 더하기" onClick={() => setPeople((n) => Math.min(50, n + 1))} className="inline-flex h-11 w-11 items-center justify-center rounded-[6px] border" style={{ borderColor: C.line }}>
-                  <Plus size={18} aria-hidden />
-                </button>
-              </div>
-            </div>
-            <fieldset>
-              <legend className="text-[15px] font-bold">사업자 형태</legend>
-              <div className="mt-2 flex flex-wrap gap-2">
-                <Pill on={!corp} onClick={() => setCorp(false)}>
-                  개인사업자
-                </Pill>
-                <Pill on={corp} onClick={() => setCorp(true)}>
-                  법인
-                </Pill>
-              </div>
-            </fieldset>
-          </div>
+    <div className="grid items-start gap-6 lg:grid-cols-[1fr_380px]">
+      <div className="min-w-0 rounded-[10px] border bg-white p-4 md:p-6" style={{ borderColor: C.line }}>
+        <h2 className="text-[20px] font-bold tracking-[-0.02em]">세무기장대행, 결산세무조정료</h2>
+        <div className="mt-4">
+          <FeeGrid fee={fee} setFee={setFee} />
+        </div>
+        <ul className="mt-4 space-y-1 text-[14px]" style={{ color: C.muted }}>
+          <li>부가세 신고와 원천세 신고는 기장료에 들어 있습니다.</li>
+          <li>종합소득세나 법인세 신고 때 1년에 한 번 조정료가 따로 붙습니다.</li>
+          <li>신규사업자는 첫 3개월 기장료를 받지 않습니다. 모든 금액은 부가세 별도입니다.</li>
+        </ul>
+      </div>
 
-          <div className="rounded-[10px] border bg-white p-5 md:p-6" style={{ borderColor: C.line }} aria-live="polite">
-            <p className="flex items-center gap-2 text-[15px] font-bold" style={{ color: C.muted }}>
-              <Calculator size={18} style={{ color: C.green }} aria-hidden />
-              예상 월 기장료
-            </p>
-            <p className="mt-1 text-[34px] font-bold leading-[1.2] tracking-[-0.02em] tabular-nums">
-              {man(low)} ~ {man(high)} 원
-            </p>
-            <table className="mt-5 w-full text-[15px] tabular-nums">
-              <caption className="sr-only">월 기장료 내역</caption>
-              <tbody>
-                {rows.map((r) => (
-                  <tr key={r.k} className="border-t" style={{ borderColor: C.line }}>
-                    <th scope="row" className="py-2.5 pr-3 text-left font-normal" style={{ color: C.muted }}>
-                      {r.k}
-                    </th>
-                    <td className="py-2.5 text-right">{r.v === 0 ? "0원" : `${comma(r.v)}원`}</td>
-                  </tr>
-                ))}
-                <tr className="border-t-2" style={{ borderColor: C.ink }}>
-                  <th scope="row" className="py-2.5 text-left font-bold">
-                    월 합계 (부가세 별도)
-                  </th>
-                  <td className="py-2.5 text-right font-bold">{comma(low)}원부터</td>
-                </tr>
-                <tr className="border-t" style={{ borderColor: C.line }}>
-                  <th scope="row" className="py-2.5 text-left font-bold">
-                    조정료 (1년에 한 번)
-                  </th>
-                  <td className="py-2.5 text-right font-bold">{comma(adjust)}원부터</td>
-                </tr>
-              </tbody>
-            </table>
-            <p className="mt-3 text-[14px]" style={{ color: C.muted }}>
-              거래 건수와 장부 상태에 따라 범위 안에서 정합니다.
-            </p>
-            <button
-              type="button"
-              onClick={() =>
-                onAsk({
-                  topics: ["기장 맡기기"],
-                  biz: corp ? "법인" : "",
-                  memo: `업종 ${ind.label}, 작년 매출 ${b.label}, 직원 ${people}명, ${corp ? "법인" : "개인사업자"}. 계산기 예상 월 ${man(low)} ~ ${man(high)} 원`,
-                })
-              }
-              className="mt-5 h-12 w-full rounded-[6px] text-[16px] font-bold"
-              style={{ background: C.green, color: "#fff" }}
-            >
-              이 조건으로 상담 신청
+      <div className="rounded-[10px] border bg-white p-5 md:p-6 lg:sticky lg:top-20" style={{ borderColor: C.line }}>
+        <div className="flex flex-wrap items-center justify-between gap-3">
+          <p className="text-[15px] font-bold" id="fee-people-label">
+            직원 수 (대표자 제외)
+          </p>
+          <div className="flex items-center gap-1" role="group" aria-labelledby="fee-people-label">
+            <button type="button" aria-label="직원 한 명 빼기" onClick={() => setFee({ ...fee, staff: Math.max(0, fee.staff - 1) })} className="inline-flex h-11 w-11 items-center justify-center rounded-[6px] border" style={{ borderColor: C.line }}>
+              <Minus size={18} aria-hidden />
+            </button>
+            <span className="w-14 text-center text-[20px] font-bold tabular-nums" aria-live="polite">
+              {fee.staff}명
+            </span>
+            <button type="button" aria-label="직원 한 명 더하기" onClick={() => setFee({ ...fee, staff: Math.min(50, fee.staff + 1) })} className="inline-flex h-11 w-11 items-center justify-center rounded-[6px] border" style={{ borderColor: C.line }}>
+              <Plus size={18} aria-hidden />
             </button>
           </div>
         </div>
+        <div aria-live="polite">
+          <p className="mt-5 flex items-center gap-2 text-[15px] font-bold" style={{ color: C.muted }}>
+            <Calculator size={18} style={{ color: C.green }} aria-hidden />월 합계
+          </p>
+          <p className="mt-1 text-[34px] font-bold leading-[1.2] tracking-[-0.02em] tabular-nums">{comma(total)}원~</p>
+          <table className="mt-4 w-full text-[15px] tabular-nums">
+            <caption className="sr-only">월 기장료 내역</caption>
+            <tbody>
+              {rows.map((r) => (
+                <tr key={r.k} className="border-t" style={{ borderColor: C.line }}>
+                  <th scope="row" className="py-2.5 pr-3 text-left font-normal" style={{ color: C.muted }}>
+                    {r.k}
+                  </th>
+                  <td className="py-2.5 text-right">{comma(r.v)}원</td>
+                </tr>
+              ))}
+              <tr className="border-t-2" style={{ borderColor: C.ink }}>
+                <th scope="row" className="py-2.5 text-left font-bold">
+                  조정료 (연 1회)
+                </th>
+                <td className="py-2.5 text-right font-bold">{comma(adjust)}원~</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+        <button
+          type="button"
+          onClick={() =>
+            onAsk({
+              topics: ["신규 기장"],
+              biz: fee.corp ? "법인" : "",
+              memo: `${fee.corp ? "법인" : "개인사업자"}, 작년 매출 ${BANDS[fee.band].label}, 직원 ${fee.staff}명. 요금표 기준 월 ${comma(total)}원부터`,
+            })
+          }
+          className="mt-5 h-12 w-full rounded-[6px] text-[16px] font-bold"
+          style={{ background: C.green, color: "#fff" }}
+        >
+          기장 상담 신청
+        </button>
+        <p className="mt-3 text-[14px]" style={{ color: C.muted }}>
+          거래 건수와 장부 상태에 따라 달라질 수 있습니다.
+        </p>
       </div>
-    </section>
+    </div>
   );
 }
 
-/* ---------- 상담 신청 ---------- */
+/* ---------- 세무자료실 ---------- */
 
-const TOPICS = ["기장 맡기기", "기장 옮기기", "부가세", "종합소득세", "법인세", "원천세·인건비", "법인 전환", "세무 조사"];
+function Board({ board, setBoard, postId, setPostId }: { board: BoardId; setBoard: (b: BoardId) => void; postId: number | null; setPostId: (id: number | null) => void }) {
+  const [query, setQuery] = useState("");
+  const q = query.trim();
+  const list = POSTS.filter((p) => p.board === board && (!q || p.title.includes(q) || p.body.includes(q)));
+  const post = POSTS.find((p) => p.id === postId && p.board === board) ?? null;
+
+  return (
+    <div className="grid items-start gap-6 md:grid-cols-[200px_1fr]">
+      <nav aria-label="세무자료실 메뉴">
+        <ul className="flex gap-1 overflow-x-auto md:flex-col md:rounded-[10px] md:border md:bg-white md:p-2" style={{ borderColor: C.line }}>
+          {BOARDS.map((b) => {
+            const on = board === b.id;
+            return (
+              <li key={b.id} className="shrink-0">
+                <button
+                  type="button"
+                  aria-current={on ? "page" : undefined}
+                  onClick={() => setBoard(b.id)}
+                  className="flex h-11 w-full items-center justify-between rounded-[6px] px-3 text-left text-[15px] font-semibold"
+                  style={on ? { background: C.green, color: "#fff" } : { background: "#fff", border: `1px solid ${C.line}` }}
+                >
+                  {b.label}
+                  <ChevronRight size={16} className="hidden md:block" aria-hidden />
+                </button>
+              </li>
+            );
+          })}
+        </ul>
+      </nav>
+
+      <div className="min-w-0">
+        {post ? (
+          <article aria-labelledby="post-title" className="rounded-[10px] border bg-white" style={{ borderColor: C.line }}>
+            <div className="border-b px-5 py-4 md:px-7" style={{ borderColor: C.ink }}>
+              <p className="text-[14px] font-semibold" style={{ color: C.green }}>
+                {post.cat}
+              </p>
+              <h2 id="post-title" className="text-[21px] font-bold leading-[1.45] tracking-[-0.02em]">
+                {post.title}
+              </h2>
+              <p className="mt-1 text-[14px] tabular-nums" style={{ color: C.muted }}>
+                {post.date} · {OFFICE}
+              </p>
+            </div>
+            <p className="px-5 py-6 md:px-7">{post.body}</p>
+            <div className="border-t px-5 py-3 md:px-7" style={{ borderColor: C.line }}>
+              <button type="button" onClick={() => setPostId(null)} className="inline-flex h-10 items-center gap-1.5 rounded-[6px] border px-4 text-[15px] font-semibold" style={{ borderColor: C.line }}>
+                <List size={16} aria-hidden />
+                목록
+              </button>
+            </div>
+          </article>
+        ) : (
+          <>
+            <div className="flex flex-wrap items-center justify-between gap-3">
+              <p className="text-[15px] tabular-nums" style={{ color: C.muted }}>
+                전체 <span className="font-bold" style={{ color: C.ink }}>{list.length}</span>건
+              </p>
+              <label className="relative block w-full sm:w-[280px]">
+                <span className="sr-only">게시글 검색</span>
+                <Search size={18} className="pointer-events-none absolute left-3 top-1/2 -translate-y-1/2" style={{ color: C.muted }} aria-hidden />
+                <input
+                  type="search"
+                  value={query}
+                  onChange={(e) => setQuery(e.target.value)}
+                  placeholder="제목, 내용"
+                  className="h-11 w-full rounded-[6px] border bg-white pl-10 pr-3 outline-none focus:border-[#1f5c45]"
+                  style={{ borderColor: C.line }}
+                />
+              </label>
+            </div>
+            <table className="mt-3 w-full border-t-2 text-[15px]" style={{ borderColor: C.ink }}>
+              <caption className="sr-only">{BOARDS.find((b) => b.id === board)?.label} 목록</caption>
+              <thead className="hidden sm:table-header-group">
+                <tr className="border-b text-[14px]" style={{ borderColor: C.line, color: C.muted }}>
+                  <th scope="col" className="w-[64px] py-2.5 font-semibold">
+                    번호
+                  </th>
+                  <th scope="col" className="w-[90px] py-2.5 font-semibold">
+                    분류
+                  </th>
+                  <th scope="col" className="py-2.5 text-left font-semibold">
+                    제목
+                  </th>
+                  <th scope="col" className="w-[110px] py-2.5 font-semibold">
+                    등록일
+                  </th>
+                </tr>
+              </thead>
+              <tbody>
+                {list.map((p) => (
+                  <tr key={p.id} className="border-b" style={{ borderColor: C.line }}>
+                    <td className="hidden py-3 text-center tabular-nums sm:table-cell" style={{ color: C.muted }}>
+                      {p.id}
+                    </td>
+                    <td className="hidden py-3 text-center text-[14px] sm:table-cell" style={{ color: C.green }}>
+                      {p.cat}
+                    </td>
+                    <td className="py-1">
+                      <button type="button" onClick={() => setPostId(p.id)} className="block w-full py-2 text-left font-semibold leading-[1.45] hover:underline">
+                        {p.title}
+                        <span className="block text-[13px] font-normal tabular-nums sm:hidden" style={{ color: C.muted }}>
+                          {p.cat} · {p.date}
+                        </span>
+                      </button>
+                    </td>
+                    <td className="hidden py-3 text-center text-[14px] tabular-nums sm:table-cell" style={{ color: C.muted }}>
+                      {p.date}
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+            {list.length === 0 && (
+              <p className="py-10 text-center" style={{ color: C.muted }}>
+                검색 결과가 없습니다.
+              </p>
+            )}
+          </>
+        )}
+      </div>
+    </div>
+  );
+}
+
+/* ---------- 사무소 소개 ---------- */
+
+function About() {
+  return (
+    <div className="space-y-12">
+      <section aria-labelledby="greet-title" className="grid items-start gap-6 md:grid-cols-[1fr_1fr] md:gap-10">
+        <div>
+          <h2 id="greet-title" className="text-[22px] font-bold tracking-[-0.02em]">
+            세무사 인사말
+          </h2>
+          <div className="mt-4 space-y-3" style={{ color: C.muted }}>
+            <p>{OFFICE}는 개인사업자와 소규모 법인의 장부와 신고를 맡는 사무소입니다.</p>
+            <p>음식점과 소매점 장부를 가장 많이 봅니다. 맡은 장부는 세무사가 직접 보고, 신고서를 내기 전에 숫자를 사장님과 전화로 한 번 더 맞춰 봅니다.</p>
+            <p>상담실은 문이 닫히는 별도 방입니다. 상담 내용은 세무사법에 따라 비밀이 지켜집니다.</p>
+          </div>
+          <p className="mt-5 font-bold">대표세무사 김ㅅ우</p>
+        </div>
+        <div className="relative aspect-[4/3] overflow-hidden rounded-[10px]">
+          <Image src={`${IMG}/office.jpg`} alt="책상과 의자 네 개가 놓인 작은 상담실" fill sizes="(min-width: 768px) 50vw, 100vw" className="object-cover" />
+        </div>
+      </section>
+
+      <section aria-labelledby="member-title">
+        <h2 id="member-title" className="text-[22px] font-bold tracking-[-0.02em]">
+          구성원 소개
+        </h2>
+        <ul className="mt-4 grid gap-4 md:grid-cols-3">
+          {[
+            { name: "김ㅅ우", role: "대표세무사", area: "개인사업자 기장, 종합소득세, 세무조사대응", career: ["세무사 등록 2012년", "△△세무서 개인납세과 8년", "△△구 소상공인지원센터 세무 상담 위원"] },
+            { name: "이ㄷ현", role: "세무사", area: "법인 신고, 법인전환, 양도소득세", career: ["세무사 등록 2017년", "△△회계법인 세무본부"] },
+            { name: "박ㅇ진", role: "실장", area: "기장, 4대보험, 인건비 신고", career: ["전산세무 1급", "세무사무소 실무 11년"] },
+          ].map((m) => (
+            <li key={m.name} className="rounded-[10px] border bg-white p-5" style={{ borderColor: C.line }}>
+              <p className="text-[14px] font-semibold" style={{ color: C.green }}>
+                {m.role}
+              </p>
+              <p className="text-[21px] font-bold tracking-[-0.02em]">{m.name}</p>
+              <p className="mt-2 text-[15px]">{m.area}</p>
+              <ul className="mt-3 space-y-1 border-t pt-3 text-[14px]" style={{ borderColor: C.line, color: C.muted }}>
+                {m.career.map((c) => (
+                  <li key={c} className="flex gap-2">
+                    <Check size={15} className="mt-[5px] shrink-0" style={{ color: C.green }} aria-hidden />
+                    {c}
+                  </li>
+                ))}
+              </ul>
+            </li>
+          ))}
+        </ul>
+      </section>
+    </div>
+  );
+}
+
+/* ---------- 업무분야 ---------- */
+
+function Services({ onAsk }: { onAsk: AskFn }) {
+  return (
+    <ul className="grid gap-px overflow-hidden rounded-[10px] border md:grid-cols-2" style={{ borderColor: C.line, background: C.line }}>
+      {SERVICES.map((s) => (
+        <li key={s.name} className="flex flex-col bg-white p-5 md:p-6">
+          <h2 className="text-[19px] font-bold tracking-[-0.02em]">{s.name}</h2>
+          <p className="mt-1.5 flex-1 text-[15px]" style={{ color: C.muted }}>
+            {s.desc}
+          </p>
+          <button
+            type="button"
+            onClick={() => onAsk({ topics: [s.topic], biz: "", memo: `${s.name} 상담을 원합니다.` })}
+            className="mt-3 inline-flex h-10 w-fit items-center gap-1 text-[15px] font-semibold"
+            style={{ color: C.green }}
+          >
+            상담신청
+            <ChevronRight size={16} aria-hidden />
+          </button>
+        </li>
+      ))}
+    </ul>
+  );
+}
+
+/* ---------- 오시는 길 ---------- */
+
+function Location() {
+  return (
+    <div className="grid items-start gap-6 md:grid-cols-[1.2fr_1fr]">
+      <div className="overflow-hidden rounded-[10px] border bg-white" style={{ borderColor: C.line }}>
+        <svg viewBox="0 0 600 380" className="h-auto w-full" role="img" aria-label="□□역 3번 출구에서 △△은행 옆 □□빌딩까지의 약도">
+          <rect width="600" height="380" fill="#f3f1ea" />
+          <rect x="0" y="170" width="600" height="44" fill="#fff" />
+          <rect x="250" y="0" width="36" height="380" fill="#fff" />
+          <rect x="40" y="40" width="180" height="104" rx="4" fill="#e6e2d6" />
+          <rect x="316" y="40" width="110" height="104" rx="4" fill="#e6e2d6" />
+          <rect x="40" y="240" width="180" height="104" rx="4" fill="#e6e2d6" />
+          <rect x="316" y="240" width="110" height="104" rx="4" fill="#e6e2d6" />
+          <rect x="440" y="240" width="130" height="104" rx="4" fill={C.green} />
+          <text x="505" y="290" fontSize="15" fill="#fff" textAnchor="middle" fontWeight={700}>
+            □□빌딩
+          </text>
+          <text x="505" y="312" fontSize="13" fill="#e5eee9" textAnchor="middle">
+            5층
+          </text>
+          <text x="371" y="296" fontSize="13" fill={C.muted} textAnchor="middle">
+            △△은행
+          </text>
+          <rect x="300" y="146" width="44" height="22" rx="11" fill={C.ink} />
+          <text x="322" y="162" fontSize="12" fill="#fff" textAnchor="middle" fontWeight={700}>
+            3번
+          </text>
+          <text x="130" y="198" fontSize="14" fill={C.muted} textAnchor="middle">
+            □□로
+          </text>
+          <path d="M322 168 V226 H505 V240" stroke={C.red} strokeWidth="3" strokeDasharray="6 5" fill="none" />
+          <text x="130" y="96" fontSize="14" fill={C.muted} textAnchor="middle">
+            □□역
+          </text>
+        </svg>
+      </div>
+      <dl className="rounded-[10px] border bg-white text-[15px]" style={{ borderColor: C.line }}>
+        {[
+          ["주소", ADDRESS],
+          ["지하철", "□□역 3번 출구, △△은행 옆 건물 (도보 2분)"],
+          ["주차", "건물 지하 주차장, 상담 고객 1시간 무료"],
+          ["상담 시간", "평일 09:00 ~ 18:00 (점심 12:00 ~ 13:00), 1월과 5월은 토요일 10:00 ~ 15:00"],
+          ["전화", TEL],
+        ].map(([k, v]) => (
+          <div key={k} className="grid grid-cols-[84px_1fr] gap-3 border-b px-5 py-3.5 last:border-b-0" style={{ borderColor: C.line }}>
+            <dt className="font-bold">{k}</dt>
+            <dd className="tabular-nums" style={{ color: C.muted }}>
+              {v}
+            </dd>
+          </div>
+        ))}
+      </dl>
+    </div>
+  );
+}
+
+/* ---------- 상담신청 ---------- */
+
+const TOPICS = ["신규 기장", "세무대리인 변경", "부가세", "종합소득세", "법인세", "원천세·인건비", "양도·상속·증여", "법인전환", "세무조사대응"];
 const TIMES = ["오전 9시 ~ 12시", "오후 1시 ~ 6시", "문자로 먼저 연락"];
 
-function Contact({ prefill }: { prefill: Prefill }) {
+function Contact({ prefill, minute }: { prefill: Prefill; minute: number }) {
   return (
-    <section aria-labelledby="contact-title" id="contact" className="scroll-mt-16 px-4 py-16 md:px-6 md:py-24" style={{ background: C.greenSoft }}>
-      <div className="mx-auto max-w-[1200px]">
-        <SectionHead id="contact-title" title="첫 상담 30분은 비용을 받지 않습니다" desc="남겨 주신 시간에 세무사가 직접 전화드립니다. 자료를 미리 보내지 않으셔도 됩니다." />
+    <div className="grid items-start gap-10 lg:grid-cols-[1.25fr_1fr]">
+      <div>
+        <p style={{ color: C.muted }}>첫 상담 30분은 비용을 받지 않습니다. 남겨 주신 시간에 세무사가 직접 전화드립니다.</p>
         <ContactForm key={prefill.key} prefill={prefill} />
       </div>
-    </section>
+      <Faq minute={minute} />
+    </div>
   );
 }
 
@@ -1098,16 +1754,18 @@ function ContactForm({ prefill }: { prefill: Prefill }) {
   const [biz, setBiz] = useState(prefill.biz);
   const [time, setTime] = useState("");
   const [memo, setMemo] = useState(prefill.memo);
+  const [agree, setAgree] = useState(false);
   const [error, setError] = useState("");
   const [done, setDone] = useState<{ no: string; name: string; phone: string; time: string; topics: string[] } | null>(null);
 
   const submit = (e: React.FormEvent) => {
     e.preventDefault();
-    if (topics.length === 0) return setError("상담 주제를 하나 이상 골라 주세요.");
-    if (name.trim().length < 2) return setError("이름을 두 글자 이상 적어 주세요.");
-    if (phone.replace(/\D/g, "").length < 10) return setError("연락받을 휴대전화 번호를 적어 주세요.");
-    if (!biz) return setError("사업자 유형을 골라 주세요.");
-    if (!time) return setError("연락받기 편한 시간을 골라 주세요.");
+    if (topics.length === 0) return setError("상담 분야를 하나 이상 선택해 주세요.");
+    if (name.trim().length < 2) return setError("이름을 입력해 주세요.");
+    if (phone.replace(/\D/g, "").length < 10) return setError("휴대전화 번호를 입력해 주세요.");
+    if (!biz) return setError("사업자 형태를 선택해 주세요.");
+    if (!time) return setError("통화 가능 시간을 선택해 주세요.");
+    if (!agree) return setError("개인정보 수집·이용에 동의해 주세요.");
     setError("");
     const n = new Date();
     const p2 = (v: number) => String(v).padStart(2, "0");
@@ -1123,10 +1781,11 @@ function ContactForm({ prefill }: { prefill: Prefill }) {
     setBiz("");
     setTime("");
     setMemo("");
+    setAgree(false);
   };
 
   return (
-    <div className="mt-10" aria-live="polite">
+    <div className="mt-5" aria-live="polite">
       <AnimatePresence mode="wait" initial={false}>
         {done ? (
           <motion.div
@@ -1135,19 +1794,19 @@ function ContactForm({ prefill }: { prefill: Prefill }) {
             animate={{ opacity: 1, y: 0 }}
             exit={{ opacity: 0 }}
             transition={{ duration: 0.35, ease: EASE }}
-            className="mx-auto max-w-[560px] rounded-[10px] border bg-white p-6 md:p-8"
+            className="rounded-[10px] border bg-white p-6 md:p-8"
             style={{ borderColor: C.line }}
           >
             <span className="inline-flex h-11 w-11 items-center justify-center rounded-full" style={{ background: C.green, color: "#fff" }}>
               <Check size={22} aria-hidden />
             </span>
-            <p className="mt-4 text-[22px] font-bold tracking-[-0.02em]">{done.name}님, 상담 신청을 받았습니다</p>
+            <p className="mt-4 text-[22px] font-bold tracking-[-0.02em]">{done.name}님, 상담신청이 접수되었습니다</p>
             <dl className="mt-5 divide-y border-y text-[15px]" style={{ borderColor: C.line }}>
               {[
                 ["접수 번호", done.no],
-                ["상담 주제", done.topics.join(", ")],
+                ["상담 분야", done.topics.join(", ")],
                 ["연락처", done.phone],
-                ["연락 시간", done.time],
+                ["통화 시간", done.time],
               ].map(([k, v]) => (
                 <div key={k} className="flex gap-4 py-2.5" style={{ borderColor: C.line }}>
                   <dt className="w-[76px] shrink-0" style={{ color: C.muted }}>
@@ -1158,7 +1817,7 @@ function ContactForm({ prefill }: { prefill: Prefill }) {
               ))}
             </dl>
             <p className="mt-4 text-[15px]" style={{ color: C.muted }}>
-              {done.time === "문자로 먼저 연락" ? "오늘 안에 문자로 통화 가능한 시간을 여쭙겠습니다." : "고르신 시간에 세무사가 직접 전화드립니다."} 급하시면 {TEL}로 접수 번호를 말씀해 주세요.
+              {done.time === "문자로 먼저 연락" ? "오늘 안에 문자로 통화 가능한 시간을 여쭙겠습니다." : "선택하신 시간에 세무사가 직접 전화드립니다."} 급하시면 {TEL}로 접수 번호를 말씀해 주세요.
             </p>
             <button type="button" onClick={reset} className="mt-5 inline-flex h-10 items-center gap-1.5 text-[15px] font-semibold" style={{ color: C.green }}>
               <RotateCcw size={16} aria-hidden />
@@ -1166,9 +1825,9 @@ function ContactForm({ prefill }: { prefill: Prefill }) {
             </button>
           </motion.div>
         ) : (
-          <motion.form key="form" exit={{ opacity: 0 }} onSubmit={submit} noValidate className="grid gap-6 rounded-[10px] border bg-white p-5 md:grid-cols-2 md:gap-x-8 md:p-8" style={{ borderColor: C.line }}>
+          <motion.form key="form" exit={{ opacity: 0 }} onSubmit={submit} noValidate className="grid gap-6 rounded-[10px] border bg-white p-5 md:grid-cols-2 md:gap-x-6 md:p-7" style={{ borderColor: C.line }}>
             <fieldset className="md:col-span-2">
-              <legend className="text-[15px] font-bold">상담 주제 (여러 개 고를 수 있어요)</legend>
+              <legend className="text-[15px] font-bold">상담 분야 (복수 선택)</legend>
               <div className="mt-2 flex flex-wrap gap-2">
                 {TOPICS.map((t) => (
                   <Pill key={t} on={topics.includes(t)} onClick={() => setTopics((p) => (p.includes(t) ? p.filter((x) => x !== t) : [...p, t]))}>
@@ -1179,14 +1838,14 @@ function ContactForm({ prefill }: { prefill: Prefill }) {
             </fieldset>
             <label className="block">
               <span className="text-[15px] font-bold">이름</span>
-              <input value={name} onChange={(e) => setName(e.target.value)} autoComplete="name" placeholder="김하늘" className="mt-1.5 h-12 w-full rounded-[6px] border px-3 outline-none focus:border-[#1f5c45]" style={{ borderColor: C.line }} />
+              <input value={name} onChange={(e) => setName(e.target.value)} autoComplete="name" className={inputCls} style={{ borderColor: C.line }} />
             </label>
             <label className="block">
               <span className="text-[15px] font-bold">휴대전화</span>
-              <input value={phone} onChange={(e) => setPhone(e.target.value)} inputMode="tel" autoComplete="tel" placeholder="010-1234-5678" className="mt-1.5 h-12 w-full rounded-[6px] border px-3 tabular-nums outline-none focus:border-[#1f5c45]" style={{ borderColor: C.line }} />
+              <input value={phone} onChange={(e) => setPhone(e.target.value)} inputMode="tel" autoComplete="tel" placeholder="010-0000-0000" className={`${inputCls} tabular-nums`} style={{ borderColor: C.line }} />
             </label>
             <fieldset>
-              <legend className="text-[15px] font-bold">사업자 유형</legend>
+              <legend className="text-[15px] font-bold">사업자 형태</legend>
               <div className="mt-2 flex flex-wrap gap-2">
                 {BIZ_CHOICES.map((b) => (
                   <Pill key={b} on={biz === b} onClick={() => setBiz(b)}>
@@ -1196,7 +1855,7 @@ function ContactForm({ prefill }: { prefill: Prefill }) {
               </div>
             </fieldset>
             <fieldset>
-              <legend className="text-[15px] font-bold">연락받기 편한 시간</legend>
+              <legend className="text-[15px] font-bold">통화 가능 시간</legend>
               <div className="mt-2 flex flex-wrap gap-2">
                 {TIMES.map((t) => (
                   <Pill key={t} on={time === t} onClick={() => setTime(t)}>
@@ -1206,8 +1865,17 @@ function ContactForm({ prefill }: { prefill: Prefill }) {
               </div>
             </fieldset>
             <label className="block md:col-span-2">
-              <span className="text-[15px] font-bold">남길 말 (선택)</span>
-              <textarea value={memo} onChange={(e) => setMemo(e.target.value)} rows={3} placeholder="지금 상황을 짧게 적어 주시면 통화가 빨라집니다." className="mt-1.5 w-full rounded-[6px] border px-3 py-2.5 outline-none focus:border-[#1f5c45]" style={{ borderColor: C.line }} />
+              <span className="text-[15px] font-bold">문의 내용 (선택)</span>
+              <textarea value={memo} onChange={(e) => setMemo(e.target.value)} rows={3} className="mt-1.5 w-full rounded-[6px] border px-3 py-2.5 outline-none focus:border-[#1f5c45]" style={{ borderColor: C.line }} />
+            </label>
+            <label className="flex min-h-11 cursor-pointer items-start gap-2.5 text-[15px] leading-[1.5] md:col-span-2">
+              <input type="checkbox" checked={agree} onChange={(e) => setAgree(e.target.checked)} className="mt-0.5 h-5 w-5 shrink-0 accent-[#1f5c45]" />
+              <span>
+                개인정보 수집·이용 동의 (필수)
+                <span className="block text-[14px]" style={{ color: C.muted }}>
+                  이름, 휴대전화를 상담 연락에만 쓰고 상담이 끝나면 1년 안에 파기합니다.
+                </span>
+              </span>
             </label>
             <div className="md:col-span-2">
               {error && (
@@ -1216,7 +1884,7 @@ function ContactForm({ prefill }: { prefill: Prefill }) {
                 </p>
               )}
               <button type="submit" className="h-12 w-full rounded-[6px] text-[17px] font-bold md:w-auto md:px-10" style={{ background: C.green, color: "#fff" }}>
-                상담 신청하기
+                상담신청
               </button>
               <p className="mt-3 text-[14px]" style={{ color: C.muted }}>
                 데모 화면이라 입력한 내용은 어디에도 보내지 않습니다.
@@ -1229,210 +1897,31 @@ function ContactForm({ prefill }: { prefill: Prefill }) {
   );
 }
 
-/* ---------- 세무 소식 ---------- */
+/* ---------- 자주 묻는 질문 ---------- */
 
-type NewsCat = "일정" | "절세" | "개정" | "소식";
-const NEWS_CATS: { id: NewsCat | "all"; label: string }[] = [
-  { id: "all", label: "전체" },
-  { id: "일정", label: "신고 일정" },
-  { id: "절세", label: "절세" },
-  { id: "개정", label: "세법 개정" },
-  { id: "소식", label: "사무소 소식" },
-];
-
-const NEWS: { id: number; cat: NewsCat; date: string; title: string; body: string }[] = [
-  { id: 1, cat: "일정", date: "2026.09.30", title: "10월 부가세, 개인은 고지서로 냅니다", body: "개인 일반과세자는 직전 기 납부세액의 절반이 고지됩니다. 신고는 필요 없고 고지서 금액만 기한 안에 내면 됩니다. 법인은 예정신고를 해야 합니다." },
-  { id: 2, cat: "절세", date: "2026.09.12", title: "노란우산공제, 12월 전에 넣으면 올해 소득공제에 들어갑니다", body: "사업소득 금액에 따라 연 200만 원에서 600만 원까지 소득공제를 받습니다. 연말에 한꺼번에 넣어도 그해 납입액으로 인정됩니다." },
-  { id: 3, cat: "개정", date: "2026.08.28", title: "올해 세법 개정안에서 소상공인이 볼 부분", body: "고용을 늘린 사업장의 세액공제, 업무용 승용차 기준, 간편장부 대상 기준이 어떻게 바뀌는지 표로 정리했습니다. 사무실에 인쇄본도 둡니다." },
-  { id: 4, cat: "절세", date: "2026.08.05", title: "사업용 카드를 홈택스에 등록하셨나요", body: "개인사업자는 사업에 쓰는 카드를 홈택스에 등록해 두면 사용 내역이 자동으로 모입니다. 영수증을 따로 모으지 않아도 매입세액공제를 챙길 수 있습니다." },
-  { id: 5, cat: "일정", date: "2026.07.20", title: "간이과세자 7월 고지서, 금액이 맞는지 보세요", body: "작년 세액의 절반이 고지됩니다. 상반기 매출이 작년보다 크게 줄었다면 신고로 대신해 덜 낼 수 있습니다." },
-  { id: 6, cat: "소식", date: "2026.07.01", title: "토요일 상담은 1월과 5월에만 엽니다", body: "부가세 확정신고와 종합소득세 신고가 몰리는 1월, 5월에는 토요일 오전 10시부터 오후 3시까지 상담합니다." },
-  { id: 7, cat: "절세", date: "2026.06.15", title: "업무용 승용차, 운행기록부가 필요한 경우", body: "차량 관련 비용이 연 1,500만 원을 넘으면 운행기록부가 있어야 넘는 금액을 경비로 인정받습니다. 성실신고확인대상은 업무용 자동차 보험도 확인합니다." },
-  { id: 8, cat: "개정", date: "2026.05.10", title: "간이과세 기준 금액은 연 매출 1억 400만 원입니다", body: "직전 연도 매출이 1억 400만 원 미만이면 간이과세자가 될 수 있습니다. 부동산 임대업과 과세 유흥업은 4,800만 원 기준이 그대로입니다." },
-  { id: 9, cat: "소식", date: "2026.04.02", title: "△△구 소상공인 무료 세무 상담에 참여합니다", body: "매달 둘째 수요일 오후, △△구 소상공인지원센터에서 김○○ 세무사가 상담합니다. 예약은 센터로 해 주세요." },
-];
-
-function News() {
-  const reduce = useReducedMotionSafe();
-  const [cat, setCat] = useState<NewsCat | "all">("all");
-  const [query, setQuery] = useState("");
-  const [open, setOpen] = useState<number | null>(null);
-
-  const q = query.trim();
-  const list = NEWS.filter((n) => (cat === "all" || n.cat === cat) && (!q || n.title.includes(q) || n.body.includes(q)));
-  const catLabel = (c: NewsCat) => NEWS_CATS.find((x) => x.id === c)?.label ?? c;
-
-  return (
-    <section aria-labelledby="news-title" id="news" className="scroll-mt-16 px-4 py-16 md:px-6 md:py-24">
-      <div className="mx-auto max-w-[1200px]">
-        <SectionHead id="news-title" title="사장님이 알아 두면 좋은 짧은 글" />
-        <div className="mt-8 flex flex-col gap-3 md:flex-row md:items-center">
-          <label className="relative block md:w-[300px]">
-            <span className="sr-only">세무 소식 검색</span>
-            <Search size={19} className="pointer-events-none absolute left-3.5 top-1/2 -translate-y-1/2" style={{ color: C.muted }} aria-hidden />
-            <input
-              type="search"
-              value={query}
-              onChange={(e) => setQuery(e.target.value)}
-              placeholder="부가세, 카드, 노란우산"
-              className="h-12 w-full rounded-[6px] border bg-white pl-11 pr-4 outline-none focus:border-[#1f5c45]"
-              style={{ borderColor: C.line }}
-            />
-          </label>
-          <div className="flex flex-wrap gap-2" role="group" aria-label="글 분류">
-            {NEWS_CATS.map((c) => (
-              <button
-                key={c.id}
-                type="button"
-                aria-pressed={cat === c.id}
-                onClick={() => setCat(c.id)}
-                className="h-11 rounded-[6px] border px-4 text-[15px] font-semibold"
-                style={cat === c.id ? { background: C.ink, color: "#fff", borderColor: C.ink } : { background: C.card, borderColor: C.line }}
-              >
-                {c.label}
-              </button>
-            ))}
-          </div>
-        </div>
-
-        <ul className="mt-6 border-t" style={{ borderColor: C.ink }}>
-          {list.map((n) => {
-            const isOpen = open === n.id;
-            return (
-              <li key={n.id} className="border-b" style={{ borderColor: C.line }}>
-                <button
-                  type="button"
-                  aria-expanded={isOpen}
-                  aria-controls={`news-${n.id}`}
-                  onClick={() => setOpen(isOpen ? null : n.id)}
-                  className="grid w-full grid-cols-[1fr_auto] items-center gap-x-4 gap-y-0.5 py-4 text-left md:grid-cols-[110px_1fr_110px_auto]"
-                >
-                  <span className="text-[14px] font-semibold" style={{ color: C.green }}>
-                    {catLabel(n.cat)}
-                  </span>
-                  <ChevronDown size={20} className="row-span-2 shrink-0 transition-transform md:order-last md:row-span-1" style={{ transform: isOpen ? "rotate(180deg)" : undefined, color: C.muted }} aria-hidden />
-                  <span className="font-semibold leading-[1.45]">{n.title}</span>
-                  <span className="hidden text-[14px] tabular-nums md:block" style={{ color: C.muted }}>
-                    {n.date}
-                  </span>
-                </button>
-                <AnimatePresence initial={false}>
-                  {isOpen && (
-                    <motion.div
-                      id={`news-${n.id}`}
-                      initial={reduce ? false : { height: 0, opacity: 0 }}
-                      animate={{ height: "auto", opacity: 1 }}
-                      exit={reduce ? { opacity: 0 } : { height: 0, opacity: 0 }}
-                      transition={{ duration: 0.25, ease: EASE }}
-                      className="overflow-hidden"
-                    >
-                      <p className="pb-5 text-[15px] md:pl-[126px] md:pr-[150px]" style={{ color: C.muted }}>
-                        <span className="mb-1 block tabular-nums md:hidden">{n.date}</span>
-                        {n.body}
-                      </p>
-                    </motion.div>
-                  )}
-                </AnimatePresence>
-              </li>
-            );
-          })}
-        </ul>
-        {list.length === 0 && (
-          <p className="mt-6 rounded-[10px] bg-white p-6 text-center" style={{ color: C.muted }}>
-            찾는 글이 없어요. 궁금한 내용은 {TEL}로 물어봐 주세요.
-          </p>
-        )}
-      </div>
-    </section>
-  );
-}
-
-/* ---------- 세무사 소개 ---------- */
-
-function About() {
-  return (
-    <section aria-labelledby="about-title" id="about" className="scroll-mt-16 px-4 py-16 md:px-6 md:py-24" style={{ background: "rgba(255,255,255,0.6)" }}>
-      <div className="mx-auto max-w-[1200px]">
-        <SectionHead id="about-title" title="맡은 장부는 세무사가 직접 봅니다" />
-        <div className="mt-10 grid items-start gap-8 md:grid-cols-[1fr_1fr] md:gap-12">
-          <div className="rounded-[10px] border bg-white p-6 md:p-8" style={{ borderColor: C.line }}>
-            <div className="flex items-center gap-4">
-              <span className="inline-flex h-[72px] w-[72px] shrink-0 items-center justify-center rounded-[6px] p-[3px]" style={{ border: `2px solid ${C.green}` }} aria-hidden>
-                <span className="flex h-full w-full items-center justify-center rounded-[3px] text-[30px] font-bold" style={{ border: `1px solid ${C.green}`, color: C.green }}>
-                  김
-                </span>
-              </span>
-              <div>
-                <p className="text-[14px] font-semibold" style={{ color: C.green }}>
-                  대표세무사
-                </p>
-                <p className="text-[24px] font-bold tracking-[-0.02em]">김○○</p>
-              </div>
-            </div>
-            <p className="mt-5" style={{ color: C.muted }}>
-              음식점과 소매점 장부를 가장 많이 봅니다. 신고서를 내기 전에는 숫자를 사장님과 전화로 한 번 더 맞춰 봅니다.
-            </p>
-            <ul className="mt-5 space-y-2 border-t pt-5 text-[15px]" style={{ borderColor: C.line }}>
-              {["세무사 등록 2012년", "△△세무서 개인납세과 8년 근무", "△△회계법인 세무본부", "△△구 소상공인지원센터 세무 상담 위원"].map((t) => (
-                <li key={t} className="flex gap-2">
-                  <Check size={17} className="mt-[5px] shrink-0" style={{ color: C.green }} aria-hidden />
-                  {t}
-                </li>
-              ))}
-            </ul>
-            <dl className="mt-6 grid grid-cols-2 gap-3 text-[15px]">
-              {[
-                ["이○○ 세무사", "법인 신고, 법인 전환"],
-                ["박○○ 실장", "기장, 인건비 신고"],
-              ].map(([k, v]) => (
-                <div key={k} className="rounded-[6px] px-3 py-2.5" style={{ background: C.paper }}>
-                  <dt className="font-bold">{k}</dt>
-                  <dd className="text-[14px]" style={{ color: C.muted }}>
-                    {v}
-                  </dd>
-                </div>
-              ))}
-            </dl>
-          </div>
-          <div>
-            <div className="relative aspect-[4/3] overflow-hidden rounded-[10px]">
-              <Image src={`${IMG}/office.jpg`} alt="책상과 의자 네 개가 놓인 작은 상담실" fill sizes="(min-width: 768px) 50vw, 100vw" className="object-cover" />
-            </div>
-            <p className="mt-3 text-[15px]" style={{ color: C.muted }}>
-              상담실은 문이 닫히는 별도 방입니다. 매출이나 가족 이야기를 편하게 하셔도 됩니다.
-            </p>
-          </div>
-        </div>
-      </div>
-    </section>
-  );
-}
-
-/* ---------- 이번 달 많이 받은 질문 ---------- */
-
-// 답 끝에 다는 기한은 세금 달력과 같은 계산(buildYear)에서 가져온다.
+// 답 끝에 다는 기한은 세무일정과 같은 계산(buildYear)에서 가져온다.
 const FAQ_PROFILE: Profile = { type: "general", staff: true, half: false, freelancePay: true, sincere: false };
 
 const FAQS: { q: string; a: string; kinds: Kind[] }[] = [
   {
     q: "부가세 고지서가 왔는데 신고도 따로 해야 하나요?",
-    a: "개인 일반과세자는 고지서 금액만 내면 됩니다. 상반기보다 매출이 3분의 1 아래로 줄었다면 예정신고로 바꿔 덜 낼 수 있으니 매출 자료를 보내 주세요.",
+    a: "개인 일반과세자는 고지서 금액만 내면 됩니다. 매출이 직전 기의 3분의 1 아래로 줄었다면 예정신고로 바꿔 덜 낼 수 있습니다.",
     kinds: ["vatPrepay"],
   },
   {
-    q: "종합소득세 중간예납은 고지된 금액을 그대로 내야 하나요?",
-    a: "작년 세액의 절반이 고지됩니다. 올해 실적이 작년의 30% 아래로 줄었으면 상반기 장부로 직접 계산해 신고하고 덜 낼 수 있습니다.",
-    kinds: ["incomeMid"],
-  },
-  {
-    q: "프리랜서에게 3.3%를 떼고 줬어요. 따로 낼 서류가 있나요?",
+    q: "프리랜서에게 3.3%를 떼고 줬습니다. 따로 낼 서류가 있나요?",
     a: "다음 달 10일까지 원천세를 신고하고, 말일까지 간이지급명세서를 냅니다. 기장을 맡기셨다면 지급 내역만 보내 주시면 됩니다.",
     kinds: ["withhold", "simpleStatement"],
   },
   {
-    q: "직원 연말정산은 언제부터 준비하면 되나요?",
-    a: "12월에 직원별 공제 서류를 모아 두시면 1월에 정산하고 2월 급여에서 돌려주거나 더 걷습니다. 지급명세서는 3월에 제출합니다.",
-    kinds: ["payStatement"],
+    q: "기존에 다른 세무사와 거래 중인데 변경이 번거롭지 않나요?",
+    a: "이전 사무소에 자료 인계를 요청하는 일은 저희가 합니다. 홈택스 수임 동의만 해 주시면 됩니다.",
+    kinds: [],
+  },
+  {
+    q: "상담만 받아도 비용이 발생하나요?",
+    a: "첫 상담 30분은 비용을 받지 않습니다. 신고서 검토처럼 자료를 직접 봐야 하는 경우에는 미리 금액을 알려 드립니다.",
+    kinds: [],
   },
 ];
 
@@ -1445,34 +1934,29 @@ function nextOf(kind: Kind, today: Date) {
 
 function Faq({ minute }: { minute: number }) {
   const today = todayOf(minute);
-  const month = today ? `${today.getMonth() + 1}월에` : "이번 달";
-
   return (
-    <section aria-labelledby="faq-title" id="faq" className="scroll-mt-16 px-4 py-16 md:px-6 md:py-24">
-      <div className="mx-auto max-w-[860px]">
-        <SectionHead id="faq-title" title={`${month} 많이 받은 질문`} />
-        <ul className="mt-8 border-t" style={{ borderColor: C.ink }}>
-          {FAQS.map((f) => {
-            const dues = today ? f.kinds.map((k) => nextOf(k, today)).filter((d): d is Deadline => !!d) : [];
-            return (
-              <li key={f.q} className="border-b py-6" style={{ borderColor: C.line }}>
-                <h3 className="text-[18px] font-bold leading-[1.5] md:text-[19px]">{f.q}</h3>
-                <p className="mt-2" style={{ color: C.muted }}>
-                  {f.a}
+    <section aria-labelledby="faq-title">
+      <h2 id="faq-title" className="text-[22px] font-bold tracking-[-0.02em]">
+        자주 묻는 질문
+      </h2>
+      <ul className="mt-4 border-t-2" style={{ borderColor: C.ink }}>
+        {FAQS.map((f) => {
+          const dues = today ? f.kinds.map((k) => nextOf(k, today)).filter((d): d is Deadline => !!d) : [];
+          return (
+            <li key={f.q} className="border-b py-5" style={{ borderColor: C.line }}>
+              <h3 className="font-bold leading-[1.5]">{f.q}</h3>
+              <p className="mt-1.5 text-[15px]" style={{ color: C.muted }}>
+                {f.a}
+              </p>
+              {dues.length > 0 && (
+                <p className="mt-1.5 text-[14px] tabular-nums" style={{ color: C.green }}>
+                  {dues.map((d) => `${d.title} ${md(d.real)}까지`).join(", ")}
                 </p>
-                <p className="mt-2 min-h-[22px] text-[14px] tabular-nums" style={{ color: C.green }}>
-                  {dues.map((d, i) => (
-                    <span key={d.id}>
-                      {i > 0 && ", "}
-                      {d.title} {md(d.real)}까지
-                    </span>
-                  ))}
-                </p>
-              </li>
-            );
-          })}
-        </ul>
-      </div>
+              )}
+            </li>
+          );
+        })}
+      </ul>
     </section>
   );
 }
@@ -1488,14 +1972,12 @@ function Footer() {
           <p>
             {ADDRESS} (□□역 3번 출구, △△은행 옆), 건물 지하 주차 1시간 무료
           </p>
-          <p className="tabular-nums">
-            상담 시간 평일 09:00 ~ 18:00 (점심 12:00 ~ 13:00), 1월과 5월은 토요일 10:00 ~ 15:00
-          </p>
+          <p className="tabular-nums">상담 시간 평일 09:00 ~ 18:00 (점심 12:00 ~ 13:00), 1월과 5월은 토요일 10:00 ~ 15:00</p>
         </div>
         <dl className="mt-6 grid gap-x-8 gap-y-1.5 text-[14px] sm:grid-cols-2 md:grid-cols-3" style={{ color: "#a9c4b8" }}>
           {[
             ["상호", OFFICE],
-            ["대표세무사", "김○○"],
+            ["대표세무사", "김ㅅ우"],
             ["사업자등록번호", "000-00-00000"],
             ["전화", TEL],
             ["이메일", "hello@example.com"],

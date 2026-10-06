@@ -3,22 +3,41 @@
 import { useEffect, useRef, useState, useSyncExternalStore } from "react";
 import Image from "next/image";
 import { AnimatePresence, motion } from "framer-motion";
-import { Banknote, Building2, CalendarCheck, Check, ChevronDown, KeyRound, Menu, Phone, RotateCcw, ShieldCheck, Users, Video, X } from "lucide-react";
+import {
+  Banknote,
+  Building2,
+  CalendarCheck,
+  Check,
+  ChevronDown,
+  ChevronRight,
+  KeyRound,
+  MapPin,
+  Menu,
+  Phone,
+  Plus,
+  RotateCcw,
+  ShieldCheck,
+  Users,
+  Video,
+  X,
+} from "lucide-react";
 import { useReducedMotionSafe } from "@/hooks/useReducedMotionSafe";
 
 /* 법률사무소 홈페이지 데모: 가상의 법률사무소 ○○.
-   사무소 이름, 변호사 이름, 경력, 주소, 전화번호, 사업자 정보, 해결 사례는 모두 가상이다.
+   사무소 이름, 변호사 이름, 경력, 주소, 전화번호, 사업자 정보, 성공사례는 모두 가상이다.
    절차와 기간은 국내에서 흔한 경우를 기준으로 한 일반 안내다.
-   변호사 광고 규정에 맞춰 승소율, 최고, 전문 보장 같은 표현은 쓰지 않고, 형사 사건 성공보수는 받지 않는 것으로 적는다.
+   변호사 광고 규정에 맞춰 승소율, 최고, 유일, 결과 보장 같은 표현은 쓰지 않는다.
+   "전문"은 대한변협 전문분야 등록 표기에만 쓴다. 형사 사건 성공보수는 받지 않는 것으로 적는다.
+
+   구조: 종합 로펌형. 첫 화면은 풀폭 사진 위 사무소명과 업무분야 진입 띠, 그 아래 변호사 소개와
+   성공사례·상담 안내·오시는 길을 나란히 둔 게시판형 묶음이다.
+   하위 화면은 라우트 없이 상태로 바꾼다. 서브 비주얼, 위치 표시줄, 좌측 하위 메뉴(LNB)와 문서형 본문.
+   업무분야 하위 화면에서 사건을 고르면 예상 기간, 진행 절차, 준비 서류 체크 목록이 나온다.
+   상담신청은 방식을 고르면 그 방식이 되는 시간만 남는다. 확인 창에는 가린 이름과 번호, 상담 번호가 나온다.
+   성공사례는 분야와 결과로 거르는 게시판 목록이다.
 
    디자인: 아이보리 바탕(#f6f3ec)에 짙은 남색(#14213d), 바랜 금색(#b08d57)은 가는 선과 작은 표시에만 쓴다.
-   여백을 넉넉히 두고 1px 선으로 나눈다. 모서리는 작게, 그림자는 거의 쓰지 않는다.
-
-   내 상황 고르기는 분야와 상황 카드를 고르면 흔한 절차가 세로 길로 그려지고,
-   단계를 누르면 쉬운 설명과 준비 서류 목록이 열린다. 서류를 챙길 때마다 체크하면 단계 표시가 채워진다.
-   상담 예약은 가장 빨리 잡을 수 있는 시간 6개를 목록으로 보여 주고, 다른 날짜 보기로 다음 6개를 넘긴다.
-   방식을 먼저 고르면 그 방식이 되는 시간만 남는다. 이름과 연락처를 적으면 가린 이름과 번호, 상담 번호가 담긴 확인 창이 뜬다.
-   해결 사례는 분야로 거르고, 자주 묻는 질문은 펼쳐 본다.
+   큰 제목은 명조 계열. 1px 선으로 나누고 모서리는 작게, 그림자는 거의 쓰지 않는다.
 
    사진 출처(public/images/demo-law):
    AI 생성(Z-Image-Turbo, Apache 2.0) hero, desk */
@@ -27,6 +46,7 @@ const IMG = "/images/demo-law";
 const FIRM = "법률사무소 ○○";
 const TEL = "02-000-0000";
 const ADDRESS = "□□시 □□로 88 □□빌딩 3층";
+const SERIF = '"Nanum Myeongjo", "AppleMyungjo", "Noto Serif KR", "Batang", serif';
 
 const C = {
   ivory: "#f6f3ec",
@@ -45,14 +65,6 @@ const C = {
 };
 
 const EASE = [0.22, 1, 0.36, 1] as const;
-
-const NAV = [
-  { id: "guide", label: "상황별 절차" },
-  { id: "lawyers", label: "변호사 소개" },
-  { id: "fees", label: "상담 비용" },
-  { id: "cases", label: "해결 사례" },
-  { id: "faq", label: "자주 묻는 질문" },
-];
 
 /* ---------- 시간 ---------- */
 
@@ -154,7 +166,7 @@ const SITUATIONS: Situation[] = [
   {
     id: "deposit",
     field: "lease",
-    label: "전세 보증금을 못 돌려받고 있어요",
+    label: "전세보증금 반환",
     total: "지급명령으로 끝나면 2~3개월, 소송과 경매까지 가면 1년 넘게",
     steps: [
       {
@@ -186,7 +198,7 @@ const SITUATIONS: Situation[] = [
   {
     id: "renewal",
     field: "lease",
-    label: "집주인이 계약 갱신을 거절했어요",
+    label: "계약갱신 거절",
     total: "분쟁조정은 보통 2~3개월, 손해배상 소송은 6개월 안팎",
     steps: [
       {
@@ -218,7 +230,7 @@ const SITUATIONS: Situation[] = [
   {
     id: "contested",
     field: "family",
-    label: "상대가 이혼에 동의하지 않아요",
+    label: "재판상 이혼",
     total: "조정으로 끝나면 3~6개월, 판결까지 가면 1년 넘게",
     steps: [
       {
@@ -250,7 +262,7 @@ const SITUATIONS: Situation[] = [
   {
     id: "agreed",
     field: "family",
-    label: "협의이혼을 하려는데 양육비가 걱정돼요",
+    label: "협의이혼과 양육비",
     total: "자녀가 있으면 3개월 넘게, 없으면 1개월 넘게",
     steps: [
       {
@@ -282,7 +294,7 @@ const SITUATIONS: Situation[] = [
   {
     id: "summons",
     field: "criminal",
-    label: "경찰 출석 요구를 받았어요",
+    label: "경찰 출석 요구",
     total: "조사 뒤 결과 통지까지 보통 몇 주에서 몇 개월",
     steps: [
       {
@@ -314,7 +326,7 @@ const SITUATIONS: Situation[] = [
   {
     id: "complaint",
     field: "criminal",
-    label: "중고 거래 사기를 당해 고소하고 싶어요",
+    label: "중고 거래 사기 고소",
     total: "고소부터 결과 통지까지 보통 3~6개월",
     steps: [
       {
@@ -346,7 +358,7 @@ const SITUATIONS: Situation[] = [
   {
     id: "loan",
     field: "civil",
-    label: "빌려준 돈을 못 받고 있어요",
+    label: "대여금 청구",
     total: "지급명령으로 끝나면 2~3개월, 소송까지 가면 6개월 넘게",
     steps: [
       {
@@ -378,7 +390,7 @@ const SITUATIONS: Situation[] = [
   {
     id: "goods",
     field: "civil",
-    label: "거래처가 물품 대금을 주지 않아요",
+    label: "물품대금 청구",
     total: "지급명령으로 끝나면 2~3개월",
     steps: [
       {
@@ -409,24 +421,129 @@ const SITUATIONS: Situation[] = [
   },
 ];
 
+/* 업무분야 하위 화면 본문에 쓰는 분야 안내 */
+const FIELD_INFO: Record<Field, { summary: string; cases: string[]; lawyer: string }> = {
+  lease: {
+    summary: "주택과 상가 임대차에서 생기는 보증금, 계약갱신, 원상복구 다툼과 부동산 매매계약 분쟁을 맡습니다.",
+    cases: ["전세보증금 반환", "임차권등기명령", "계약갱신 거절과 손해배상", "매매계약 해제"],
+    lawyer: "김ㅈ우 대표변호사",
+  },
+  family: {
+    summary: "협의이혼과 재판상 이혼, 친권과 양육권, 양육비와 재산분할 사건을 맡습니다.",
+    cases: ["재판상 이혼", "협의이혼 양육 협의", "재산분할", "양육비 이행"],
+    lawyer: "이ㅅ연 변호사",
+  },
+  criminal: {
+    summary: "경찰과 검찰 조사 동행, 피해자 고소 대리, 피해자와의 합의 절차를 맡습니다.",
+    cases: ["경찰 조사 동행", "고소장 작성과 제출", "합의 절차", "불송치 결정 이의신청"],
+    lawyer: "이ㅅ연 변호사",
+  },
+  civil: {
+    summary: "대여금과 물품대금처럼 받을 돈을 받아 내는 사건과 가압류, 강제집행 절차를 맡습니다.",
+    cases: ["대여금 청구", "물품대금 청구", "가압류", "지급명령과 강제집행"],
+    lawyer: "김ㅈ우 대표변호사",
+  },
+};
+
+/* ---------- 메뉴 ---------- */
+
+type Page = "home" | "intro" | "lawyers" | "location" | "practice" | "cases" | "fees" | "faq" | "booking";
+type Target = { page: Page; field?: Field };
+type Go = (t: Target) => void;
+
+type Group = { id: string; label: string; items: (Target & { label: string })[] };
+
+const GROUPS: Group[] = [
+  {
+    id: "about",
+    label: "사무소 소개",
+    items: [
+      { page: "intro", label: "사무소 소개" },
+      { page: "lawyers", label: "변호사 소개" },
+      { page: "location", label: "오시는 길" },
+    ],
+  },
+  {
+    id: "practice",
+    label: "업무분야",
+    items: FIELDS.map((f) => ({ page: "practice" as const, field: f.id, label: f.label })),
+  },
+  { id: "cases", label: "성공사례", items: [{ page: "cases", label: "성공사례" }] },
+  {
+    id: "consult",
+    label: "상담 안내",
+    items: [
+      { page: "fees", label: "상담 비용 안내" },
+      { page: "faq", label: "자주 묻는 질문" },
+      { page: "booking", label: "상담신청" },
+    ],
+  },
+];
+
+const TOP_NAV: (Target & { label: string; group: string })[] = [
+  { page: "intro", label: "사무소 소개", group: "about" },
+  { page: "lawyers", label: "변호사 소개", group: "about" },
+  { page: "practice", field: "lease", label: "업무분야", group: "practice" },
+  { page: "cases", label: "성공사례", group: "cases" },
+  { page: "fees", label: "상담 안내", group: "consult" },
+  { page: "location", label: "오시는 길", group: "about" },
+];
+
+const groupOf = (page: Page) => GROUPS.find((g) => g.items.some((it) => it.page === page)) ?? null;
+const sameTarget = (a: Target, b: Target) => a.page === b.page && (a.page !== "practice" || a.field === b.field);
+const itemLabel = (t: Target) => groupOf(t.page)?.items.find((it) => sameTarget(it, t))?.label ?? "";
+
 /* ---------- 페이지 ---------- */
 
 export function LawFirmDemo() {
   const minute = useNowMinute();
-  const [preset, setPreset] = useState<{ field: Field; n: number } | null>(null);
+  const [nav, setNav] = useState<Target>({ page: "home" });
+  const [checked, setChecked] = useState<Record<string, boolean>>({});
+  const [bookField, setBookField] = useState<Field | null>(null);
+
+  const go: Go = (t) => {
+    setNav(t.page === "practice" ? { page: "practice", field: t.field ?? "lease" } : { page: t.page });
+    window.scrollTo({ top: 0 });
+  };
+
+  const bookCase = (f: Field) => {
+    setBookField(f);
+    go({ page: "booking" });
+  };
+
+  let body: React.ReactNode = null;
+  switch (nav.page) {
+    case "intro":
+      body = <Intro />;
+      break;
+    case "lawyers":
+      body = <Lawyers />;
+      break;
+    case "location":
+      body = <Location />;
+      break;
+    case "practice":
+      body = <Practice key={nav.field} field={nav.field ?? "lease"} checked={checked} setChecked={setChecked} onBook={bookCase} />;
+      break;
+    case "cases":
+      body = <Cases />;
+      break;
+    case "fees":
+      body = <Fees go={go} />;
+      break;
+    case "faq":
+      body = <Faq />;
+      break;
+    case "booking":
+      body = <Booking minute={minute} initialField={bookField} />;
+      break;
+  }
 
   return (
     <div className="min-h-screen text-[16px] leading-[1.7] md:text-[17px]" style={{ background: C.ivory, color: C.ink }}>
-      <Header />
-      <main>
-        <Hero />
-        <Guide onBook={(f) => setPreset((p) => ({ field: f, n: (p?.n ?? 0) + 1 }))} />
-        <Lawyers />
-        <Fees />
-        <Cases />
-        <Booking minute={minute} preset={preset} />
-        <Faq />
-      </main>
+      <Header nav={nav} go={go} />
+      <main>{nav.page === "home" ? <Home go={go} /> : <SubPage nav={nav} go={go}>{body}</SubPage>}</main>
+      <QuickRail go={go} />
       <Footer />
     </div>
   );
@@ -438,21 +555,22 @@ function Logo({ light = false }: { light?: boolean }) {
   const fg = light ? C.ivory : C.navy;
   return (
     <span className="inline-flex items-center gap-2.5">
-      <svg width="32" height="32" viewBox="0 0 32 32" aria-hidden>
+      <svg width="32" height="32" viewBox="0 0 32 32" aria-hidden className="shrink-0">
         <rect x="0.5" y="0.5" width="31" height="31" rx="2" fill="none" stroke={C.gold} />
         <rect x="4" y="4" width="24" height="24" rx="1" fill={fg} />
         <path d="M10 22 H22 M12 10 V20 M16 10 V20 M20 10 V20 M10 10 H22" stroke={light ? C.navy : C.ivory} strokeWidth="1.4" />
       </svg>
-      <span className="text-[18px] font-bold tracking-[-0.02em]" style={{ color: fg }}>
+      <span className="whitespace-nowrap text-[17px] font-bold tracking-[-0.02em] md:text-[18px]" style={{ color: fg, fontFamily: SERIF }}>
         {FIRM}
       </span>
     </span>
   );
 }
 
-function Header() {
+function Header({ nav, go }: { nav: Target; go: Go }) {
   const [open, setOpen] = useState(false);
   const reduce = useReducedMotionSafe();
+  const current = groupOf(nav.page);
 
   useEffect(() => {
     if (!open) return;
@@ -461,35 +579,52 @@ function Header() {
     return () => window.removeEventListener("keydown", onKey);
   }, [open]);
 
+  const move = (t: Target) => {
+    setOpen(false);
+    go(t);
+  };
+
   return (
-    <header className="sticky top-0 z-40 border-b backdrop-blur" style={{ borderColor: C.line, background: "rgba(246,243,236,0.95)" }}>
-      <div className="mx-auto flex h-16 max-w-[1200px] items-center justify-between gap-3 px-4 md:px-6">
-        <a href="#top" aria-label={`${FIRM} 처음으로`}>
+    <header className="sticky top-0 z-40 border-b" style={{ borderColor: C.line, background: C.paper }}>
+      <div className="mx-auto flex h-16 max-w-[1200px] items-center justify-between gap-2 px-4 md:px-6">
+        <button type="button" onClick={() => move({ page: "home" })} aria-label={`${FIRM} 처음 화면`} className="min-w-0">
           <Logo />
-        </a>
+        </button>
         <nav aria-label="주 메뉴" className="hidden lg:block">
-          <ul className="flex items-center gap-7 text-[15px]">
-            {NAV.map((n) => (
-              <li key={n.id}>
-                <a href={`#${n.id}`} className="transition-colors hover:text-[#14213d]" style={{ color: C.muted }}>
-                  {n.label}
-                </a>
-              </li>
-            ))}
+          <ul className="flex items-center gap-1 text-[15px]">
+            {TOP_NAV.map((n) => {
+              const on = n.page === "practice" ? nav.page === "practice" : n.page === "fees" ? current?.id === "consult" : nav.page === n.page;
+              return (
+                <li key={n.label}>
+                  <button
+                    type="button"
+                    onClick={() => move(n)}
+                    aria-current={on ? "page" : undefined}
+                    className="relative inline-flex h-16 items-center px-3 font-semibold transition-colors hover:text-[#14213d]"
+                    style={{ color: on ? C.navy : C.muted }}
+                  >
+                    {n.label}
+                    {on && <span className="absolute inset-x-3 bottom-0 h-[3px]" style={{ background: C.gold }} aria-hidden />}
+                  </button>
+                </li>
+              );
+            })}
           </ul>
         </nav>
-        <div className="flex items-center gap-2">
-          <a
-            href={`tel:${TEL}`}
-            aria-label={`전화 ${TEL}`}
-            className="inline-flex h-11 w-11 items-center justify-center rounded-[4px] border md:hidden"
-            style={{ borderColor: C.line, color: C.navy }}
+        <div className="flex shrink-0 items-center gap-1.5">
+          <a href={`tel:${TEL}`} className="hidden items-center gap-1.5 px-2 text-[15px] font-semibold tabular-nums xl:inline-flex" style={{ color: C.navy }}>
+            <Phone size={16} aria-hidden />
+            {TEL}
+          </a>
+          <button
+            id="go-booking"
+            type="button"
+            onClick={() => move({ page: "booking" })}
+            className="inline-flex h-10 items-center rounded-[4px] px-3 text-[15px] font-semibold md:h-11 md:px-5"
+            style={{ background: C.navy, color: C.ivory }}
           >
-            <Phone size={19} aria-hidden />
-          </a>
-          <a href="#booking" className="hidden h-11 items-center rounded-[4px] px-5 text-[15px] font-semibold md:inline-flex" style={{ background: C.navy, color: C.ivory }}>
-            상담 예약
-          </a>
+            상담신청
+          </button>
           <button
             type="button"
             className="inline-flex h-11 w-11 items-center justify-center rounded-[4px] lg:hidden"
@@ -506,7 +641,7 @@ function Header() {
         {open && (
           <motion.nav
             id="law-menu"
-            aria-label="주 메뉴"
+            aria-label="전체 메뉴"
             className="overflow-hidden border-t lg:hidden"
             style={{ borderColor: C.line }}
             initial={reduce ? false : { height: 0 }}
@@ -514,15 +649,34 @@ function Header() {
             exit={reduce ? { opacity: 0 } : { height: 0 }}
             transition={{ duration: 0.26, ease: EASE }}
           >
-            <ul className="px-4 py-2">
-              {[...NAV, { id: "booking", label: "상담 예약" }].map((n) => (
-                <li key={n.id} className="border-b last:border-b-0" style={{ borderColor: C.line }}>
-                  <a href={`#${n.id}`} onClick={() => setOpen(false)} className="flex h-12 items-center text-[17px]">
-                    {n.label}
-                  </a>
-                </li>
+            <div className="grid gap-x-6 px-4 pb-4 pt-2 sm:grid-cols-2">
+              {GROUPS.map((g) => (
+                <div key={g.id} className="border-b py-3" style={{ borderColor: C.line }}>
+                  <p className="text-[14px] font-bold" style={{ color: C.goldText }}>
+                    {g.label}
+                  </p>
+                  <ul className="mt-1">
+                    {g.items.map((it) => (
+                      <li key={it.label}>
+                        <button
+                          type="button"
+                          onClick={() => move(it)}
+                          aria-current={sameTarget(it, nav) ? "page" : undefined}
+                          className="flex h-11 w-full items-center text-left text-[17px]"
+                          style={{ color: sameTarget(it, nav) ? C.navy : C.ink, fontWeight: sameTarget(it, nav) ? 700 : 400 }}
+                        >
+                          {it.label}
+                        </button>
+                      </li>
+                    ))}
+                  </ul>
+                </div>
               ))}
-            </ul>
+              <a href={`tel:${TEL}`} className="mt-3 inline-flex h-11 items-center gap-2 text-[17px] font-semibold" style={{ color: C.navy }}>
+                <Phone size={18} aria-hidden />
+                전화상담 {TEL}
+              </a>
+            </div>
           </motion.nav>
         )}
       </AnimatePresence>
@@ -530,357 +684,378 @@ function Header() {
   );
 }
 
-/* ---------- 첫 화면 ---------- */
-
-function Hero() {
-  const reduce = useReducedMotionSafe();
+/** 모든 화면 오른쪽 가운데에 붙는 상담 바로가기. 아래쪽 공용 버튼 자리를 피해 세로 가운데에 둔다. */
+function QuickRail({ go }: { go: Go }) {
   return (
-    <section id="top" className="px-4 pb-16 pt-10 md:px-6 md:pb-24 md:pt-16">
-      <div className="mx-auto max-w-[1200px]">
-        <div className="grid items-center gap-10 md:grid-cols-[1fr_1.15fr] md:gap-14">
-          <motion.div initial={reduce ? false : { opacity: 0, y: 14 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.6, ease: EASE }}>
-            <h1 className="text-[36px] font-bold leading-[1.25] tracking-[-0.03em] md:text-[52px]" style={{ color: C.navy }}>
-              {FIRM}
-            </h1>
-            <p className="mt-5 max-w-[480px]" style={{ color: C.muted }}>
-              임대차·부동산, 이혼·가사, 형사, 민사 채권 사건을 맡습니다. 처음 오시는 분은 30분 상담을 무료로 받으실 수 있고, 상담은 변호사가 직접 합니다.
-            </p>
-            <div className="mt-8 flex flex-wrap gap-2.5">
-              <a href="#guide" className="inline-flex h-12 items-center rounded-[4px] px-6 font-semibold" style={{ background: C.navy, color: C.ivory }}>
-                내 상황 절차 보기
-              </a>
-              <a href="#booking" className="inline-flex h-12 items-center gap-2 rounded-[4px] border px-6 font-semibold" style={{ borderColor: C.navy, color: C.navy }}>
-                <CalendarCheck size={18} aria-hidden />
-                상담 예약
-              </a>
-            </div>
-          </motion.div>
-          <div className="relative">
-            <div className="absolute -bottom-3 -right-3 hidden h-full w-full border md:block" style={{ borderColor: C.gold }} aria-hidden />
-            <div className="relative aspect-[4/3] overflow-hidden md:aspect-[7/5]">
-              <Image src={`${IMG}/hero.jpg`} alt="책장이 늘어선 조용한 상담실과 긴 회의 탁자" fill priority sizes="(min-width: 768px) 55vw, 100vw" className="object-cover" />
-            </div>
-          </div>
-        </div>
-
-        <ul className="mt-14 grid border-t sm:grid-cols-2 lg:grid-cols-4" style={{ borderColor: C.navy }}>
-          {FIELDS.map((f) => (
-            <li key={f.id} className="border-b sm:[&:nth-child(odd)]:border-r lg:border-r lg:last:border-r-0" style={{ borderColor: C.line }}>
-              <a href="#guide" className="group flex h-full items-start gap-3 px-1 py-5 sm:px-5">
-                <f.icon size={20} className="mt-1 shrink-0" style={{ color: C.gold }} aria-hidden />
-                <span>
-                  <span className="block font-bold group-hover:underline" style={{ color: C.navy }}>
-                    {f.label}
-                  </span>
-                  <span className="block text-[14px]" style={{ color: C.muted }}>
-                    {f.desc}
-                  </span>
-                </span>
-              </a>
-            </li>
-          ))}
-        </ul>
-      </div>
-    </section>
+    <aside aria-label="빠른 상담" className="fixed right-0 top-1/2 z-30 hidden -translate-y-1/2 xl:block">
+      <ul className="flex flex-col border border-r-0" style={{ borderColor: C.navySoft, background: C.navy }}>
+        <li>
+          <button type="button" onClick={() => go({ page: "booking" })} className="flex w-[64px] flex-col items-center gap-1 py-4 text-[13px] font-semibold" style={{ color: C.ivory }}>
+            <CalendarCheck size={20} aria-hidden style={{ color: C.gold }} />
+            상담예약
+          </button>
+        </li>
+        <li className="border-t" style={{ borderColor: C.navySoft }}>
+          <a href={`tel:${TEL}`} className="flex w-[64px] flex-col items-center gap-1 py-4 text-[13px] font-semibold" style={{ color: C.ivory }}>
+            <Phone size={20} aria-hidden style={{ color: C.gold }} />
+            전화상담
+          </a>
+        </li>
+      </ul>
+    </aside>
   );
 }
 
-function SectionHead({ id, title, desc, light = false }: { id: string; title: string; desc?: string; light?: boolean }) {
+/* ---------- 첫 화면 ---------- */
+
+function Home({ go }: { go: Go }) {
+  const reduce = useReducedMotionSafe();
   return (
-    <div>
-      <h2 id={id} className="text-[27px] font-bold leading-[1.35] tracking-[-0.03em] md:text-[36px]" style={{ color: light ? C.ivory : C.navy }}>
+    <>
+      <section aria-labelledby="home-title" className="relative">
+        <div className="relative h-[420px] md:h-[540px]">
+          <Image src={`${IMG}/hero.jpg`} alt="책장이 늘어선 상담실과 긴 회의 탁자" fill priority sizes="100vw" className="object-cover" />
+          <div className="absolute inset-0" style={{ background: "linear-gradient(180deg, rgba(20,33,61,0.25) 0%, rgba(20,33,61,0.55) 55%, rgba(20,33,61,0.88) 100%)" }} aria-hidden />
+          <div className="absolute inset-x-0 bottom-0 px-4 pb-24 md:px-6 md:pb-28">
+            <motion.div
+              className="mx-auto max-w-[1200px]"
+              initial={reduce ? false : { opacity: 0, y: 12 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.6, ease: EASE }}
+            >
+              <h1 id="home-title" className="text-[40px] font-bold leading-[1.2] tracking-[-0.02em] md:text-[64px]" style={{ color: C.ivory, fontFamily: SERIF }}>
+                {FIRM}
+              </h1>
+              <p className="mt-3 max-w-[560px] text-[16px] md:text-[18px]" style={{ color: "#dfe3ec" }}>
+                임대차·부동산, 이혼·가사, 형사, 민사 채권 사건을 맡습니다. 첫 상담 30분은 변호사가 직접 하며 비용을 받지 않습니다.
+              </p>
+            </motion.div>
+          </div>
+        </div>
+
+        <nav id="practice" aria-label="업무분야" className="relative -mt-14 px-4 md:-mt-16 md:px-6">
+          <ul className="mx-auto grid max-w-[1200px] grid-cols-2 border-t-4 lg:grid-cols-4" style={{ borderColor: C.gold, background: C.white }}>
+            {FIELDS.map((f, i) => (
+              <li
+                key={f.id}
+                className={`${i < 2 ? "border-b lg:border-b-0" : ""} ${i % 2 === 0 ? "border-r" : ""} lg:border-r lg:last:border-r-0`}
+                style={{ borderColor: C.line }}
+              >
+                <button
+                  id={`go-field-${f.id}`}
+                  type="button"
+                  onClick={() => go({ page: "practice", field: f.id })}
+                  className="group flex h-full w-full flex-col items-start gap-2 p-4 text-left md:flex-row md:gap-4 md:p-6"
+                >
+                  <f.icon size={26} className="shrink-0" style={{ color: C.gold }} aria-hidden />
+                  <span className="min-w-0 flex-1">
+                    <span className="flex items-center gap-1 text-[17px] font-bold md:text-[19px]" style={{ color: C.navy }}>
+                      {f.label}
+                      <ChevronRight size={18} aria-hidden className="transition-transform group-hover:translate-x-0.5" style={{ color: C.muted }} />
+                    </span>
+                    <span className="mt-0.5 block text-[14px] leading-[1.5]" style={{ color: C.muted }}>
+                      {f.desc}
+                    </span>
+                  </span>
+                </button>
+              </li>
+            ))}
+          </ul>
+        </nav>
+      </section>
+
+      <section aria-labelledby="home-lawyers" className="px-4 pt-16 md:px-6 md:pt-20">
+        <div className="mx-auto max-w-[1200px]">
+          <BoardHead id="home-lawyers" title="변호사 소개" more="변호사 소개 상세보기" onMore={() => go({ page: "lawyers" })} />
+          <ul className="grid md:grid-cols-2">
+            {LAWYERS.map((l, i) => (
+              <li key={l.name} className={`flex gap-4 border-b py-6 ${i === 0 ? "md:border-r md:pr-8" : "md:pl-8"}`} style={{ borderColor: C.line }}>
+                <Initial ch={l.initial} />
+                <div className="min-w-0">
+                  <p className="text-[20px] font-bold leading-[1.3]" style={{ color: C.navy, fontFamily: SERIF }}>
+                    {l.name}
+                    <span className="ml-2 text-[15px] font-semibold" style={{ color: C.goldText, fontFamily: "inherit" }}>
+                      {l.role}
+                    </span>
+                  </p>
+                  <p className="mt-1 text-[15px]" style={{ color: C.muted }}>
+                    {l.career[0]}
+                  </p>
+                  <p className="mt-1 text-[15px]">주요 분야 {l.fields.join(", ")}</p>
+                </div>
+              </li>
+            ))}
+          </ul>
+        </div>
+      </section>
+
+      <div className="px-4 pb-20 pt-14 md:px-6 md:pb-24">
+        <div className="mx-auto grid max-w-[1200px] gap-12 lg:grid-cols-[1.4fr_1fr_1fr] lg:gap-10">
+          <section aria-labelledby="home-cases" id="home-cases-box" className="min-w-0">
+            <BoardHead id="home-cases" moreId="go-cases" title="성공사례" more="성공사례 더보기" onMore={() => go({ page: "cases" })} />
+            <ul>
+              {CASES.slice(0, 5).map((c) => (
+                <li key={c.title} className="border-b" style={{ borderColor: C.line }}>
+                  <button type="button" onClick={() => go({ page: "cases" })} className="flex min-h-[52px] w-full items-center gap-3 py-2 text-left">
+                    <span className="w-[86px] shrink-0 text-[13px] font-semibold" style={{ color: C.goldText }}>
+                      {FIELD_LABEL[c.field]}
+                    </span>
+                    <span className="min-w-0 flex-1 truncate text-[15px] hover:underline">{c.title}</span>
+                    <span className="hidden shrink-0 text-[13px] tabular-nums sm:inline" style={{ color: C.muted }}>
+                      {c.date}
+                    </span>
+                  </button>
+                </li>
+              ))}
+            </ul>
+          </section>
+
+          <section aria-labelledby="home-consult" className="min-w-0">
+            <BoardHead id="home-consult" title="상담 안내" more="상담 비용 안내 더보기" onMore={() => go({ page: "fees" })} />
+            <HoursTable />
+            <p className="mt-3 text-[15px]" style={{ color: C.muted }}>
+              첫 상담 30분은 비용을 받지 않습니다.
+            </p>
+            <div className="mt-4 grid grid-cols-2 gap-2">
+              <button type="button" onClick={() => go({ page: "booking" })} className="inline-flex h-12 items-center justify-center gap-1.5 rounded-[4px] text-[15px] font-semibold" style={{ background: C.navy, color: C.ivory }}>
+                <CalendarCheck size={17} aria-hidden />
+                상담신청
+              </button>
+              <a href={`tel:${TEL}`} className="inline-flex h-12 items-center justify-center gap-1.5 rounded-[4px] border text-[15px] font-semibold" style={{ borderColor: C.navy, color: C.navy }}>
+                <Phone size={17} aria-hidden />
+                전화상담
+              </a>
+            </div>
+          </section>
+
+          <section aria-labelledby="home-location" className="min-w-0">
+            <BoardHead id="home-location" title="오시는 길" more="오시는 길 자세히 보기" onMore={() => go({ page: "location" })} />
+            <MiniMap />
+            <p className="mt-3 text-[15px]">{ADDRESS}</p>
+            <p className="text-[15px]" style={{ color: C.muted }}>
+              □□선 □□역 3번 출구에서 걸어서 5분
+            </p>
+          </section>
+        </div>
+      </div>
+    </>
+  );
+}
+
+function BoardHead({ id, moreId, title, more, onMore }: { id: string; moreId?: string; title: string; more: string; onMore: () => void }) {
+  return (
+    <div className="flex items-center justify-between border-b-2 pb-2" style={{ borderColor: C.navy }}>
+      <h2 id={id} className="text-[22px] font-bold tracking-[-0.02em] md:text-[24px]" style={{ color: C.navy, fontFamily: SERIF }}>
         {title}
       </h2>
-      {desc && (
-        <p className="mt-3 max-w-[660px]" style={{ color: light ? "#c9cedb" : C.muted }}>
-          {desc}
-        </p>
-      )}
+      <button id={moreId} type="button" onClick={onMore} aria-label={more} title={more} className="inline-flex h-11 w-11 items-center justify-center rounded-[4px] hover:bg-[#efe6d6]" style={{ color: C.navy }}>
+        <Plus size={22} aria-hidden />
+      </button>
     </div>
   );
 }
 
-/* ---------- 내 상황 고르기, 절차 지도 ---------- */
+function Initial({ ch, size = 56 }: { ch: string; size?: number }) {
+  return (
+    <span
+      className="relative inline-flex shrink-0 items-center justify-center rounded-full font-bold"
+      style={{ background: C.navy, color: C.ivory, width: size, height: size, fontSize: size * 0.4, fontFamily: SERIF }}
+      aria-hidden
+    >
+      <span className="absolute inset-[3px] rounded-full border" style={{ borderColor: C.gold }} />
+      {ch}
+    </span>
+  );
+}
 
-function Guide({ onBook }: { onBook: (f: Field) => void }) {
-  const reduce = useReducedMotionSafe();
-  const [field, setField] = useState<Field>("lease");
-  const [sitId, setSitId] = useState("deposit");
-  const [openStep, setOpenStep] = useState<number | null>(0);
-  const [checked, setChecked] = useState<Record<string, boolean>>({});
+function HoursTable() {
+  return (
+    <table className="w-full text-[15px]">
+      <caption className="sr-only">상담 시간</caption>
+      <tbody>
+        {[
+          ["평일", "오전 10시 ~ 오후 6시"],
+          ["토요일", "오전 10시 ~ 낮 12시"],
+          ["일요일·공휴일", "휴무"],
+        ].map(([k, v]) => (
+          <tr key={k} className="border-b" style={{ borderColor: C.line }}>
+            <th scope="row" className="py-2.5 pr-3 text-left font-semibold" style={{ color: C.navy }}>
+              {k}
+            </th>
+            <td className="py-2.5 text-right tabular-nums">{v}</td>
+          </tr>
+        ))}
+      </tbody>
+    </table>
+  );
+}
 
-  const list = SITUATIONS.filter((s) => s.field === field);
-  const sit = SITUATIONS.find((s) => s.id === sitId) ?? list[0];
+/** 오시는 길 약도. 실제 지도 대신 큰길과 역, 사무소 위치만 그린다. */
+function MiniMap({ tall = false }: { tall?: boolean }) {
+  return (
+    <div className={`relative overflow-hidden border ${tall ? "aspect-[16/10]" : "aspect-[16/9]"}`} style={{ borderColor: C.line, background: C.paper }}>
+      <svg viewBox="0 0 320 180" className="h-full w-full" role="img" aria-label="□□역 3번 출구에서 □□로를 따라 법원 건너편 □□빌딩까지 가는 약도">
+        <rect x="0" y="78" width="320" height="22" fill={C.navyMist} />
+        <rect x="148" y="0" width="18" height="180" fill={C.navyMist} />
+        <rect x="190" y="18" width="90" height="46" fill={C.goldSoft} stroke={C.line} />
+        <text x="235" y="46" textAnchor="middle" fontSize="12" fill={C.muted}>
+          □□법원
+        </text>
+        <rect x="190" y="112" width="58" height="44" fill={C.navy} />
+        <text x="219" y="139" textAnchor="middle" fontSize="11" fill={C.ivory}>
+          □□빌딩
+        </text>
+        <circle cx="70" cy="89" r="9" fill={C.white} stroke={C.navy} strokeWidth="2" />
+        <text x="70" y="70" textAnchor="middle" fontSize="11" fill={C.navy}>
+          □□역 3번 출구
+        </text>
+        <path d="M79 89 H157 V134 H186" fill="none" stroke={C.gold} strokeWidth="2" strokeDasharray="4 4" />
+        <text x="10" y="94" fontSize="10" fill={C.muted}>
+          □□로
+        </text>
+      </svg>
+      <MapPin size={22} className="absolute" style={{ left: "66%", top: "52%", color: C.gold }} aria-hidden />
+    </div>
+  );
+}
 
-  const pickField = (f: Field) => {
-    setField(f);
-    setSitId(SITUATIONS.find((s) => s.field === f)!.id);
-    setOpenStep(0);
-  };
+/* ---------- 하위 화면 틀 ---------- */
 
-  const docKey = (step: number, doc: number) => `${sit.id}:${step}:${doc}`;
-  const allDocs = sit.steps.flatMap((st, i) => st.docs.map((_, j) => docKey(i, j)));
-  const doneCount = allDocs.filter((k) => checked[k]).length;
+function SubPage({ nav, go, children }: { nav: Target; go: Go; children: React.ReactNode }) {
+  const group = groupOf(nav.page)!;
+  const label = itemLabel(nav);
+  const headRef = useRef<HTMLHeadingElement>(null);
+  const key = `${nav.page}:${nav.field ?? ""}`;
+
+  useEffect(() => {
+    headRef.current?.focus({ preventScroll: true });
+  }, [key]);
 
   return (
-    <section aria-labelledby="guide-title" id="guide" className="scroll-mt-16 px-4 py-16 md:px-6 md:py-24" style={{ background: C.white }}>
-      <div className="mx-auto max-w-[1200px]">
-        <SectionHead
-          id="guide-title"
-          title="지금 겪는 일을 고르면 앞으로의 절차가 보여요"
-          desc="단계를 누르면 무슨 일을 하는지와 준비할 서류가 나옵니다. 챙긴 서류에 표시해 두면 상담 때 빠진 것을 바로 알 수 있어요."
-        />
+    <>
+      <div className="relative h-[140px] md:h-[200px]">
+        <Image src={`${IMG}/hero.jpg`} alt="" fill sizes="100vw" className="object-cover" style={{ objectPosition: "center 40%" }} />
+        <div className="absolute inset-0" style={{ background: "rgba(20,33,61,0.78)" }} aria-hidden />
+        <div className="absolute inset-0 flex items-center px-4 md:px-6">
+          <p className="mx-auto w-full max-w-[1200px] text-[28px] font-bold tracking-[-0.02em] md:text-[40px]" style={{ color: C.ivory, fontFamily: SERIF }}>
+            {group.label}
+          </p>
+        </div>
+      </div>
 
-        <div className="mt-10 grid gap-10 lg:grid-cols-[380px_1fr] lg:gap-14">
-          <div>
-            <p className="text-[15px] font-semibold" style={{ color: C.muted }} id="field-label">
-              분야
+      <nav aria-label="현재 위치" className="border-b px-4 md:px-6" style={{ borderColor: C.line, background: C.white }}>
+        <ol className="mx-auto flex h-12 max-w-[1200px] items-center gap-1.5 text-[14px]" style={{ color: C.muted }}>
+          <li>
+            <button type="button" onClick={() => go({ page: "home" })} className="inline-flex h-11 items-center hover:underline">
+              홈
+            </button>
+          </li>
+          <li aria-hidden>
+            <ChevronRight size={14} />
+          </li>
+          <li>{group.label}</li>
+          {group.items.length > 1 && (
+            <>
+              <li aria-hidden>
+                <ChevronRight size={14} />
+              </li>
+              <li aria-current="page" className="font-semibold" style={{ color: C.navy }}>
+                {label}
+              </li>
+            </>
+          )}
+        </ol>
+      </nav>
+
+      <div className="px-4 pb-20 pt-8 md:px-6 md:pb-28 md:pt-12">
+        <div className="mx-auto grid max-w-[1200px] gap-8 lg:grid-cols-[220px_1fr] lg:gap-14">
+          <nav aria-label={`${group.label} 하위 메뉴`} className="min-w-0">
+            <p className="hidden h-[72px] items-center px-5 text-[19px] font-bold lg:flex" style={{ background: C.navy, color: C.ivory, fontFamily: SERIF }}>
+              {group.label}
             </p>
-            <div role="group" aria-labelledby="field-label" className="mt-2 grid grid-cols-2 gap-2">
-              {FIELDS.map((f) => (
-                <button
-                  key={f.id}
-                  type="button"
-                  aria-pressed={field === f.id}
-                  onClick={() => pickField(f.id)}
-                  className="flex h-12 items-center gap-2 rounded-[4px] border px-3 text-[15px] font-semibold"
-                  style={
-                    field === f.id
-                      ? {
-                          background: C.navy,
-                          color: C.ivory,
-                          borderColor: C.navy,
-                        }
-                      : { borderColor: C.line, color: C.ink }
-                  }
-                >
-                  <f.icon size={17} aria-hidden style={{ color: field === f.id ? C.gold : C.muted }} />
-                  {f.label}
-                </button>
-              ))}
-            </div>
-
-            <p className="mt-7 text-[15px] font-semibold" style={{ color: C.muted }} id="sit-label">
-              내 상황
-            </p>
-            <div role="group" aria-labelledby="sit-label" className="mt-2 space-y-2">
-              {list.map((s) => {
-                const on = s.id === sit.id;
+            <ul className="-mx-4 flex gap-1.5 overflow-x-auto px-4 pb-1 lg:mx-0 lg:block lg:overflow-visible lg:border-x lg:border-b lg:px-0 lg:pb-0" style={{ borderColor: C.line }}>
+              {group.items.map((it) => {
+                const on = sameTarget(it, nav);
                 return (
-                  <button
-                    key={s.id}
-                    type="button"
-                    aria-pressed={on}
-                    onClick={() => {
-                      setSitId(s.id);
-                      setOpenStep(0);
-                    }}
-                    className="relative block w-full rounded-[4px] border px-5 py-4 text-left transition-colors"
-                    style={on ? { borderColor: C.navy, background: C.ivory } : { borderColor: C.line, background: C.white }}
-                  >
-                    <span className="absolute inset-y-3 left-0 w-[3px]" style={{ background: on ? C.gold : "transparent" }} aria-hidden />
-                    <span className="block font-bold leading-[1.45]" style={{ color: C.navy }}>
-                      “{s.label}”
-                    </span>
-                    <span className="mt-1 block text-[14px]" style={{ color: C.muted }}>
-                      {s.steps.length}단계, {s.total}
-                    </span>
-                  </button>
-                );
-              })}
-            </div>
-          </div>
-
-          <div className="min-w-0">
-            <div className="flex flex-wrap items-end justify-between gap-3 border-b pb-4" style={{ borderColor: C.line }}>
-              <div>
-                <p className="text-[14px] font-semibold" style={{ color: C.goldText }}>
-                  {FIELD_LABEL[sit.field]}
-                </p>
-                <p className="text-[20px] font-bold leading-[1.4] md:text-[22px]" style={{ color: C.navy }}>
-                  {sit.label}
-                </p>
-              </div>
-              <p className="text-[14px] tabular-nums" style={{ color: C.muted }} aria-live="polite">
-                준비 서류 {allDocs.length}개 중 <strong style={{ color: C.navy }}>{doneCount}개</strong> 챙김
-              </p>
-            </div>
-
-            <ol key={sit.id} className="mt-6">
-              {sit.steps.map((st, i) => {
-                const last = i === sit.steps.length - 1;
-                const open = openStep === i;
-                const keys = st.docs.map((_, j) => docKey(i, j));
-                const ready = keys.every((k) => checked[k]);
-                const panelId = `step-${sit.id}-${i}`;
-                return (
-                  <li key={st.title} className="relative grid grid-cols-[36px_1fr] gap-x-4 md:grid-cols-[44px_1fr]">
-                    <div className="relative flex justify-center">
-                      {!last && (
-                        <span className="absolute bottom-0 left-1/2 top-9 w-[2px] -translate-x-1/2 md:top-11" aria-hidden>
-                          <svg className="block h-full w-full" preserveAspectRatio="none" viewBox="0 0 2 100">
-                            <line x1="1" y1="0" x2="1" y2="100" stroke={C.line} strokeWidth="2" />
-                            <motion.line
-                              x1="1"
-                              y1="0"
-                              x2="1"
-                              y2="100"
-                              stroke={C.gold}
-                              strokeWidth="2"
-                              initial={reduce ? false : { pathLength: 0 }}
-                              animate={{ pathLength: 1 }}
-                              transition={{
-                                duration: 0.5,
-                                delay: 0.15 + i * 0.25,
-                                ease: EASE,
-                              }}
-                            />
-                          </svg>
-                        </span>
-                      )}
-                      <motion.span
-                        className="relative z-[1] inline-flex h-9 w-9 items-center justify-center rounded-full border text-[15px] font-bold tabular-nums md:h-11 md:w-11"
-                        style={
-                          ready
-                            ? {
-                                background: C.navy,
-                                borderColor: C.navy,
-                                color: C.ivory,
-                              }
-                            : {
-                                background: C.white,
-                                borderColor: C.navy,
-                                color: C.navy,
-                              }
-                        }
-                        initial={reduce ? false : { scale: 0.6, opacity: 0 }}
-                        animate={{ scale: 1, opacity: 1 }}
-                        transition={{
-                          duration: 0.35,
-                          delay: i * 0.25,
-                          ease: EASE,
-                        }}
-                        aria-hidden
-                      >
-                        {ready ? <Check size={17} /> : i + 1}
-                      </motion.span>
-                    </div>
-
-                    <motion.div
-                      className={last ? "pb-2" : "pb-6"}
-                      initial={reduce ? false : { opacity: 0, x: 10 }}
-                      animate={{ opacity: 1, x: 0 }}
-                      transition={{
-                        duration: 0.4,
-                        delay: 0.05 + i * 0.25,
-                        ease: EASE,
-                      }}
+                  <li key={it.label} className="shrink-0 lg:border-t" style={{ borderColor: C.line }}>
+                    <button
+                      type="button"
+                      onClick={() => go(it)}
+                      aria-current={on ? "page" : undefined}
+                      className={`flex h-11 w-full items-center justify-between gap-2 whitespace-nowrap rounded-[4px] border px-4 text-[15px] lg:h-[52px] lg:rounded-none lg:border-0 lg:px-5 ${on ? "font-bold" : ""}`}
+                      style={on ? { background: C.goldSoft, color: C.navy, borderColor: C.gold } : { background: C.white, color: C.ink, borderColor: C.line }}
                     >
-                      <button
-                        type="button"
-                        aria-expanded={open}
-                        aria-controls={panelId}
-                        onClick={() => setOpenStep(open ? null : i)}
-                        className="flex min-h-11 w-full items-start justify-between gap-3 pt-1 text-left md:pt-2"
-                      >
-                        <span>
-                          <span className="sr-only">{i + 1}단계 </span>
-                          <span className="block font-bold leading-[1.45]" style={{ color: C.navy }}>
-                            {st.title}
-                          </span>
-                          <span className="mt-0.5 block text-[14px]" style={{ color: C.muted }}>
-                            보통 {st.time}
-                            {ready && <span style={{ color: C.goldText }}>, 서류 준비 끝</span>}
-                          </span>
-                        </span>
-                        <ChevronDown
-                          size={20}
-                          className="mt-1 shrink-0 transition-transform"
-                          style={{
-                            color: C.muted,
-                            transform: open ? "rotate(180deg)" : undefined,
-                          }}
-                          aria-hidden
-                        />
-                      </button>
-                      <AnimatePresence initial={false}>
-                        {open && (
-                          <motion.div
-                            id={panelId}
-                            className="overflow-hidden"
-                            initial={reduce ? false : { height: 0, opacity: 0 }}
-                            animate={{ height: "auto", opacity: 1 }}
-                            exit={reduce ? { opacity: 0 } : { height: 0, opacity: 0 }}
-                            transition={{ duration: 0.3, ease: EASE }}
-                          >
-                            <div
-                              className="mt-3 rounded-[4px] border p-4 md:p-5"
-                              style={{
-                                borderColor: C.line,
-                                background: C.paper,
-                              }}
-                            >
-                              <p>{st.body}</p>
-                              <p className="mt-4 text-[14px] font-semibold" style={{ color: C.goldText }}>
-                                준비 서류
-                              </p>
-                              <ul className="mt-1.5 space-y-1">
-                                {st.docs.map((d, j) => {
-                                  const k = docKey(i, j);
-                                  return (
-                                    <li key={d}>
-                                      <label className="flex min-h-11 cursor-pointer items-center gap-3">
-                                        <input
-                                          type="checkbox"
-                                          checked={!!checked[k]}
-                                          onChange={(e) =>
-                                            setChecked((p) => ({
-                                              ...p,
-                                              [k]: e.target.checked,
-                                            }))
-                                          }
-                                          className="h-5 w-5 shrink-0 accent-[#14213d]"
-                                        />
-                                        <span
-                                          className={checked[k] ? "line-through" : ""}
-                                          style={{
-                                            color: checked[k] ? C.muted : C.ink,
-                                          }}
-                                        >
-                                          {d}
-                                        </span>
-                                      </label>
-                                    </li>
-                                  );
-                                })}
-                              </ul>
-                            </div>
-                          </motion.div>
-                        )}
-                      </AnimatePresence>
-                    </motion.div>
+                      {it.label}
+                      <ChevronRight size={16} aria-hidden className="hidden lg:block" style={{ color: on ? C.goldText : C.line }} />
+                    </button>
                   </li>
                 );
               })}
-            </ol>
+            </ul>
+          </nav>
 
-            <div className="mt-6 flex flex-col gap-4 border-t pt-5 sm:flex-row sm:items-center sm:justify-between" style={{ borderColor: C.line }}>
-              <p className="text-[14px]" style={{ color: C.muted }}>
-                사건마다 기간과 절차가 다를 수 있어요.
-              </p>
-              <a
-                href="#booking"
-                onClick={() => onBook(sit.field)}
-                className="inline-flex h-11 shrink-0 items-center justify-center gap-2 rounded-[4px] px-5 text-[15px] font-semibold"
-                style={{ background: C.navy, color: C.ivory }}
-              >
-                <CalendarCheck size={17} aria-hidden />이 상황으로 상담 예약
-              </a>
-            </div>
-          </div>
+          <article className="min-w-0">
+            <h1
+              ref={headRef}
+              tabIndex={-1}
+              className="border-b-2 pb-4 text-[28px] font-bold leading-[1.3] tracking-[-0.02em] outline-none md:text-[34px]"
+              style={{ color: C.navy, borderColor: C.navy, fontFamily: SERIF }}
+            >
+              {label}
+            </h1>
+            <div className="mt-8">{children}</div>
+          </article>
         </div>
       </div>
-    </section>
+    </>
+  );
+}
+
+function DocH2({ id, children }: { id?: string; children: React.ReactNode }) {
+  return (
+    <h2 id={id} className="flex items-center gap-2.5 text-[20px] font-bold tracking-[-0.02em] md:text-[22px]" style={{ color: C.navy }}>
+      <span className="h-[18px] w-[3px]" style={{ background: C.gold }} aria-hidden />
+      {children}
+    </h2>
+  );
+}
+
+/* ---------- 사무소 소개 ---------- */
+
+function Intro() {
+  return (
+    <div className="max-w-[820px]">
+      <div className="relative aspect-[16/7] overflow-hidden">
+        <Image src={`${IMG}/desk.jpg`} alt="서류와 만년필이 놓인 책상" fill sizes="(min-width: 1024px) 820px, 100vw" className="object-cover" />
+      </div>
+      <div className="mt-8 space-y-4">
+        <p>{FIRM}는 임대차·부동산, 이혼·가사, 형사, 민사 채권 사건을 맡는 변호사 2명의 사무소입니다.</p>
+        <p>법률 문제를 겪는 분들이 가장 답답해하시는 것은 앞으로 무슨 일이 언제 일어나는지 모른다는 점입니다. 그래서 상담에서는 사건이 거칠 절차와 예상 기간, 드는 비용을 먼저 설명합니다.</p>
+        <p>사건을 맡으면 처음 상담한 변호사가 끝까지 직접 진행합니다. 서면을 내거나 기일이 잡힐 때마다 진행 상황을 문자로 알려 드립니다.</p>
+        <p className="pt-2 text-right font-semibold" style={{ color: C.navy }}>
+          대표변호사 김ㅈ우
+        </p>
+      </div>
+
+      <div className="mt-12">
+        <DocH2>운영 원칙</DocH2>
+        <dl className="mt-4 border-t" style={{ borderColor: C.navy }}>
+          {[
+            ["상담", "첫 상담 30분은 변호사가 직접 하며 비용을 받지 않습니다."],
+            ["진행", "처음 상담한 변호사가 사건을 끝까지 맡고, 단계가 바뀔 때마다 문자로 알려 드립니다."],
+            ["비용", "착수금과 보수를 위임계약서에 적고, 계약서에 없는 비용은 받지 않습니다."],
+            ["비밀", "상담 중 알게 된 내용은 사건을 맡기지 않으셔도 밖으로 알리지 않습니다."],
+          ].map(([k, v]) => (
+            <div key={k} className="grid gap-1 border-b py-4 sm:grid-cols-[120px_1fr]" style={{ borderColor: C.line }}>
+              <dt className="font-bold" style={{ color: C.navy }}>
+                {k}
+              </dt>
+              <dd>{v}</dd>
+            </div>
+          ))}
+        </dl>
+      </div>
+    </div>
   );
 }
 
@@ -889,15 +1064,15 @@ function Guide({ onBook }: { onBook: (f: Field) => void }) {
 const LAWYERS = [
   {
     initial: "김",
-    name: "김○○",
+    name: "김ㅈ우",
     role: "대표변호사",
     fields: ["임대차·부동산", "민사 채권"],
     career: ["대한변호사협회 전문분야 등록(부동산)", "△△법무법인 소속 변호사", "□□구 마을 무료 법률상담 위원", "□□시 주택임대차분쟁조정 자문"],
-    note: "전세 보증금, 갱신 거절, 대여금처럼 생활에서 생기는 돈 문제를 주로 맡습니다.",
+    note: "전세보증금, 계약갱신 거절, 대여금처럼 생활에서 생기는 돈 문제를 주로 맡습니다.",
   },
   {
     initial: "이",
-    name: "이○○",
+    name: "이ㅅ연",
     role: "변호사",
     fields: ["이혼·가사", "형사"],
     career: ["대한변호사협회 전문분야 등록(가사법)", "△△법률사무소 소속 변호사", "국선변호 사건 수행", "□□가정법원 조정 사건 대리"],
@@ -907,278 +1082,518 @@ const LAWYERS = [
 
 function Lawyers() {
   return (
-    <section aria-labelledby="lawyers-title" id="lawyers" className="scroll-mt-16 px-4 py-16 md:px-6 md:py-24">
-      <div className="mx-auto max-w-[1200px]">
-        <div className="grid items-end gap-8 md:grid-cols-[1fr_420px]">
-          <SectionHead
-            id="lawyers-title"
-            title="두 변호사가 분야를 나누어 맡습니다"
-            desc="사건을 맡으면 처음 상담한 변호사가 끝까지 진행합니다. 진행 상황은 단계가 바뀔 때마다 문자로 알려 드려요."
-          />
-          <div className="relative hidden aspect-[4/3] overflow-hidden md:block">
-            <Image src={`${IMG}/desk.jpg`} alt="서류와 만년필이 놓인 책상" fill sizes="420px" className="object-cover" />
+    <div>
+      <p className="max-w-[720px]">사건을 맡으면 처음 상담한 변호사가 끝까지 진행합니다. 진행 상황은 단계가 바뀔 때마다 문자로 알려 드립니다.</p>
+      <ul className="mt-8 space-y-6">
+        {LAWYERS.map((l) => (
+          <li key={l.name} className="grid gap-6 border-t-2 pt-6 md:grid-cols-[200px_1fr]" style={{ borderColor: C.navy }}>
+            <div className="flex items-center gap-4 md:flex-col md:items-start">
+              <Initial ch={l.initial} size={72} />
+              <div>
+                <p className="text-[24px] font-bold leading-[1.3]" style={{ color: C.navy, fontFamily: SERIF }}>
+                  {l.name}
+                </p>
+                <p className="text-[15px] font-semibold" style={{ color: C.goldText }}>
+                  {l.role}
+                </p>
+              </div>
+            </div>
+            <div className="min-w-0">
+              <p>{l.note}</p>
+              <dl className="mt-5 text-[15px]">
+                <div className="grid gap-1 border-t py-3 sm:grid-cols-[96px_1fr]" style={{ borderColor: C.line }}>
+                  <dt className="font-semibold" style={{ color: C.navy }}>
+                    주요 분야
+                  </dt>
+                  <dd>{l.fields.join(", ")}</dd>
+                </div>
+                <div className="grid gap-1 border-y py-3 sm:grid-cols-[96px_1fr]" style={{ borderColor: C.line }}>
+                  <dt className="font-semibold" style={{ color: C.navy }}>
+                    경력
+                  </dt>
+                  <dd>
+                    <ul className="space-y-1">
+                      {l.career.map((c) => (
+                        <li key={c}>{c}</li>
+                      ))}
+                    </ul>
+                  </dd>
+                </div>
+              </dl>
+            </div>
+          </li>
+        ))}
+      </ul>
+    </div>
+  );
+}
+
+/* ---------- 오시는 길 ---------- */
+
+function Location() {
+  return (
+    <div>
+      <MiniMap tall />
+      <dl className="mt-8 border-t-2" style={{ borderColor: C.navy }}>
+        {[
+          ["주소", ADDRESS],
+          ["전화", TEL],
+          ["지하철", "□□선 □□역 3번 출구에서 □□로를 따라 걸어서 5분"],
+          ["버스", "□□법원 정류장에서 내려 길 건너편"],
+          ["주차", "건물 지하 주차장, 상담 시 1시간 지원"],
+          ["상담 시간", "평일 오전 10시 ~ 오후 6시, 토요일 오전 10시 ~ 낮 12시"],
+        ].map(([k, v]) => (
+          <div key={k} className="grid gap-1 border-b py-4 sm:grid-cols-[120px_1fr]" style={{ borderColor: C.line }}>
+            <dt className="font-bold" style={{ color: C.navy }}>
+              {k}
+            </dt>
+            <dd>{k === "전화" ? <a href={`tel:${TEL}`} className="font-semibold tabular-nums underline-offset-4 hover:underline" style={{ color: C.navy }}>{v}</a> : v}</dd>
           </div>
+        ))}
+      </dl>
+    </div>
+  );
+}
+
+/* ---------- 업무분야: 사건별 절차 ---------- */
+
+function Practice({
+  field,
+  checked,
+  setChecked,
+  onBook,
+}: {
+  field: Field;
+  checked: Record<string, boolean>;
+  setChecked: React.Dispatch<React.SetStateAction<Record<string, boolean>>>;
+  onBook: (f: Field) => void;
+}) {
+  const list = SITUATIONS.filter((s) => s.field === field);
+  const [sitId, setSitId] = useState(list[0].id);
+  const sit = list.find((s) => s.id === sitId) ?? list[0];
+  const info = FIELD_INFO[field];
+
+  const docKey = (step: number, doc: number) => `${sit.id}:${step}:${doc}`;
+  const allDocs = sit.steps.flatMap((st, i) => st.docs.map((_, j) => docKey(i, j)));
+  const doneCount = allDocs.filter((k) => checked[k]).length;
+
+  return (
+    <div>
+      <p className="max-w-[760px]">{info.summary}</p>
+      <dl className="mt-6 grid border-y text-[15px] sm:grid-cols-2" style={{ borderColor: C.line }}>
+        <div className="flex gap-3 py-3 sm:border-r sm:pr-4" style={{ borderColor: C.line }}>
+          <dt className="shrink-0 font-semibold" style={{ color: C.navy }}>
+            담당
+          </dt>
+          <dd>{info.lawyer}</dd>
+        </div>
+        <div className="flex gap-3 border-t py-3 sm:border-t-0 sm:pl-4" style={{ borderColor: C.line }}>
+          <dt className="shrink-0 font-semibold" style={{ color: C.navy }}>
+            다루는 사건
+          </dt>
+          <dd>{info.cases.join(", ")}</dd>
+        </div>
+      </dl>
+
+      <section aria-labelledby="case-steps" className="mt-12">
+        <DocH2 id="case-steps">사건별 절차</DocH2>
+        <div role="group" aria-labelledby="case-steps" id="case-tabs" className="mt-4 flex flex-wrap gap-2">
+          {list.map((s) => {
+            const on = s.id === sit.id;
+            return (
+              <button
+                key={s.id}
+                type="button"
+                aria-pressed={on}
+                onClick={() => setSitId(s.id)}
+                className="h-11 rounded-[4px] border px-4 text-[15px] font-semibold"
+                style={on ? { background: C.navy, color: C.ivory, borderColor: C.navy } : { background: C.white, color: C.ink, borderColor: C.line }}
+              >
+                {s.label}
+              </button>
+            );
+          })}
         </div>
 
-        <ul className="mt-10 grid gap-5 md:grid-cols-2">
-          {LAWYERS.map((l) => (
-            <li key={l.name} className="border-t-2 bg-white p-6 md:p-8" style={{ borderColor: C.navy }}>
-              <div className="flex items-center gap-4">
-                <span
-                  className="relative inline-flex h-16 w-16 shrink-0 items-center justify-center rounded-full text-[24px] font-bold"
-                  style={{ background: C.navy, color: C.ivory }}
-                  aria-hidden
-                >
-                  <span className="absolute inset-[3px] rounded-full border" style={{ borderColor: C.gold }} />
-                  {l.initial}
-                </span>
-                <div>
-                  <p className="text-[22px] font-bold leading-[1.3]" style={{ color: C.navy }}>
-                    {l.name}
-                    <span className="ml-2 text-[15px] font-semibold" style={{ color: C.goldText }}>
-                      {l.role}
-                    </span>
-                  </p>
-                  <p className="mt-1 text-[15px]" style={{ color: C.muted }}>
-                    주요 분야 {l.fields.join(", ")}
-                  </p>
-                </div>
-              </div>
-              <p className="mt-5">{l.note}</p>
-              <ul className="mt-5 space-y-2 border-t pt-5 text-[15px]" style={{ borderColor: C.line }}>
-                {l.career.map((c) => (
-                  <li key={c} className="flex gap-3">
-                    <span className="mt-[11px] h-px w-3 shrink-0" style={{ background: C.gold }} aria-hidden />
-                    {c}
-                  </li>
-                ))}
-              </ul>
+        <div className="mt-6 border p-5 md:p-8" style={{ borderColor: C.line, background: C.white }}>
+          <h3 className="text-[20px] font-bold" style={{ color: C.navy, fontFamily: SERIF }}>
+            {sit.label}
+          </h3>
+
+          <h4 className="mt-6 text-[15px] font-bold" style={{ color: C.goldText }}>
+            예상 기간
+          </h4>
+          <p className="mt-1">{sit.total}</p>
+
+          <h4 className="mt-8 text-[15px] font-bold" style={{ color: C.goldText }}>
+            진행 절차
+          </h4>
+          <ol className="mt-2 border-t" style={{ borderColor: C.navy }}>
+            {sit.steps.map((st, i) => {
+              const keys = st.docs.map((_, j) => docKey(i, j));
+              const done = keys.filter((k) => checked[k]).length;
+              const ready = done === keys.length;
+              return (
+                <li key={st.title} className="grid grid-cols-[40px_1fr] gap-x-3 border-b py-4 md:grid-cols-[48px_1fr_150px] md:gap-x-5" style={{ borderColor: C.line }}>
+                  <span
+                    className="inline-flex h-9 w-9 items-center justify-center rounded-full border text-[15px] font-bold tabular-nums"
+                    style={ready ? { background: C.navy, borderColor: C.navy, color: C.ivory } : { background: C.white, borderColor: C.navy, color: C.navy }}
+                    aria-hidden
+                  >
+                    {ready ? <Check size={17} /> : i + 1}
+                  </span>
+                  <div className="min-w-0">
+                    <p className="font-bold leading-[1.45]" style={{ color: C.navy }}>
+                      <span className="sr-only">{i + 1}단계 </span>
+                      {st.title}
+                    </p>
+                    <p className="mt-1 text-[15px]">{st.body}</p>
+                  </div>
+                  <div className="col-start-2 mt-2 flex flex-wrap gap-x-3 text-[14px] md:col-start-auto md:mt-0 md:block md:text-right">
+                    <p className="tabular-nums" style={{ color: C.muted }}>
+                      {st.time}
+                    </p>
+                    <p className="font-semibold tabular-nums" style={{ color: ready ? C.goldText : C.muted }}>
+                      {ready ? "준비" : `준비 서류 ${keys.length}건 중 ${done}건`}
+                    </p>
+                  </div>
+                </li>
+              );
+            })}
+          </ol>
+
+          <div className="mt-8 flex flex-wrap items-baseline justify-between gap-2">
+            <h4 className="text-[15px] font-bold" style={{ color: C.goldText }} id="doc-list-title">
+              준비 서류
+            </h4>
+            <p className="text-[14px] tabular-nums" style={{ color: C.muted }} aria-live="polite">
+              {allDocs.length}건 중 <strong style={{ color: C.navy }}>{doneCount}건</strong> 준비
+            </p>
+          </div>
+          <div id="doc-list" className="mt-2 grid gap-x-8 border-t sm:grid-cols-2" style={{ borderColor: C.navy }}>
+            {sit.steps.map((st, i) => (
+              <fieldset key={st.title} className="min-w-0 border-b py-3" style={{ borderColor: C.line }}>
+                <legend className="sr-only">{st.title} 준비 서류</legend>
+                <p className="text-[14px] font-semibold" style={{ color: C.muted }} aria-hidden>
+                  {i + 1}. {st.title}
+                </p>
+                <ul className="mt-1">
+                  {st.docs.map((d, j) => {
+                    const k = docKey(i, j);
+                    return (
+                      <li key={d}>
+                        <label className="flex min-h-11 cursor-pointer items-center gap-3">
+                          <input
+                            type="checkbox"
+                            checked={!!checked[k]}
+                            onChange={(e) => setChecked((p) => ({ ...p, [k]: e.target.checked }))}
+                            className="h-5 w-5 shrink-0 accent-[#14213d]"
+                          />
+                          <span className={checked[k] ? "line-through" : ""} style={{ color: checked[k] ? C.muted : C.ink }}>
+                            {d}
+                          </span>
+                        </label>
+                      </li>
+                    );
+                  })}
+                </ul>
+              </fieldset>
+            ))}
+          </div>
+
+          <div className="mt-8 flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
+            <p className="text-[14px]" style={{ color: C.muted }}>
+              사건마다 기간과 절차가 다를 수 있습니다.
+            </p>
+            <button
+              id="book-this-case"
+              type="button"
+              onClick={() => onBook(field)}
+              className="inline-flex h-12 shrink-0 items-center justify-center gap-2 rounded-[4px] px-5 text-[15px] font-semibold"
+              style={{ background: C.navy, color: C.ivory }}
+            >
+              <CalendarCheck size={17} aria-hidden />이 사건 상담 예약
+            </button>
+          </div>
+        </div>
+      </section>
+    </div>
+  );
+}
+
+/* ---------- 상담 비용 안내 ---------- */
+
+const FEES = [
+  { item: "첫 상담 30분", price: "무료", note: "방문, 전화, 화상 모두 같습니다" },
+  { item: "추가 상담", price: "30분마다 5만 원", note: "같은 사건으로 다시 상담하는 경우" },
+  { item: "내용증명 작성, 발송", price: "30만 원부터", note: "분량과 상대방 수에 따라 달라집니다" },
+  { item: "지급명령, 임차권등기명령 신청", price: "50만 원부터", note: "법원에 내는 인지대, 송달료는 따로" },
+  { item: "소송, 형사 사건 수임료", price: "사건 검토 후 안내", note: "착수금과 보수를 계약서에 적어 드립니다" },
+];
+
+function Fees({ go }: { go: Go }) {
+  return (
+    <div>
+      <table className="w-full border-t-2 text-left" style={{ borderColor: C.navy }}>
+        <caption className="sr-only">항목별 상담과 사건 비용</caption>
+        <thead className="hidden md:table-header-group">
+          <tr className="border-b text-[14px]" style={{ borderColor: C.line, color: C.muted, background: C.paper }}>
+            <th scope="col" className="px-3 py-3 font-semibold">
+              항목
+            </th>
+            <th scope="col" className="px-3 py-3 font-semibold">
+              비용
+            </th>
+            <th scope="col" className="px-3 py-3 font-semibold">
+              비고
+            </th>
+          </tr>
+        </thead>
+        <tbody>
+          {FEES.map((f) => (
+            <tr key={f.item} className="grid border-b py-4 md:table-row md:py-0" style={{ borderColor: C.line }}>
+              <th scope="row" className="font-semibold md:w-[34%] md:px-3 md:py-4" style={{ color: C.navy }}>
+                {f.item}
+              </th>
+              <td className="font-bold tabular-nums md:w-[26%] md:px-3 md:py-4" style={{ color: f.price === "무료" ? C.goldText : C.ink }}>
+                {f.price}
+              </td>
+              <td className="text-[15px] md:px-3 md:py-4" style={{ color: C.muted }}>
+                {f.note}
+              </td>
+            </tr>
+          ))}
+        </tbody>
+      </table>
+      <p className="mt-3 text-[14px]" style={{ color: C.muted }}>
+        부가가치세 별도
+      </p>
+
+      <div className="mt-12">
+        <DocH2>수임료 산정 방식</DocH2>
+        <ul className="mt-4 space-y-2">
+          {["민사·가사 사건은 착수금과 성공보수로 나누어 정합니다.", "형사 사건은 성공보수 없이 착수금으로만 정합니다.", "착수금은 사건 진행에 맞춰 나누어 내실 수 있습니다."].map((t) => (
+            <li key={t} className="flex gap-3">
+              <span className="mt-[13px] h-px w-3 shrink-0" style={{ background: C.gold }} aria-hidden />
+              {t}
             </li>
           ))}
         </ul>
+        <button type="button" onClick={() => go({ page: "booking" })} className="mt-8 inline-flex h-12 items-center gap-2 rounded-[4px] px-6 text-[15px] font-semibold" style={{ background: C.navy, color: C.ivory }}>
+          <CalendarCheck size={17} aria-hidden />
+          상담신청
+        </button>
       </div>
-    </section>
+    </div>
   );
 }
 
-/* ---------- 상담 비용 ---------- */
+/* ---------- 성공사례 ---------- */
 
-const FEES = [
-  {
-    item: "첫 상담 30분",
-    price: "무료",
-    note: "방문, 전화, 화상 모두 같습니다",
-  },
-  {
-    item: "추가 상담",
-    price: "30분마다 5만 원",
-    note: "같은 사건으로 다시 상담하는 경우",
-  },
-  {
-    item: "내용증명 작성, 발송",
-    price: "30만 원부터",
-    note: "분량과 상대방 수에 따라 달라집니다",
-  },
-  {
-    item: "지급명령, 임차권등기명령 신청",
-    price: "50만 원부터",
-    note: "법원에 내는 인지대, 송달료는 따로",
-  },
-  {
-    item: "소송, 형사 사건 수임료",
-    price: "사건 검토 후 안내",
-    note: "착수금과 보수를 계약서에 적어 드립니다",
-  },
-];
-
-function Fees() {
-  return (
-    <section aria-labelledby="fees-title" id="fees" className="scroll-mt-16 px-4 py-16 md:px-6 md:py-24" style={{ background: C.white }}>
-      <div className="mx-auto max-w-[1200px]">
-        <SectionHead id="fees-title" title="비용은 상담 전에 먼저 알려 드려요" />
-        <div className="mt-10 grid items-start gap-10 lg:grid-cols-[1fr_340px]">
-          <table className="w-full border-t-2 text-left" style={{ borderColor: C.navy }}>
-            <caption className="sr-only">항목별 상담과 사건 비용</caption>
-            <thead className="sr-only">
-              <tr>
-                <th scope="col">항목</th>
-                <th scope="col">비용</th>
-                <th scope="col">참고</th>
-              </tr>
-            </thead>
-            <tbody>
-              {FEES.map((f) => (
-                <tr key={f.item} className="grid border-b py-4 md:table-row md:py-0" style={{ borderColor: C.line }}>
-                  <th scope="row" className="font-semibold md:w-[34%] md:py-5 md:pr-4" style={{ color: C.navy }}>
-                    {f.item}
-                  </th>
-                  <td className="font-bold tabular-nums md:w-[26%] md:py-5 md:pr-4" style={{ color: f.price === "무료" ? C.goldText : C.ink }}>
-                    {f.price}
-                  </td>
-                  <td className="text-[15px] md:py-5" style={{ color: C.muted }}>
-                    {f.note}
-                  </td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
-          <div className="rounded-[4px] p-6" style={{ background: C.ivory }}>
-            <p className="font-bold" style={{ color: C.navy }}>
-              수임료를 정하는 방식
-            </p>
-            <ul className="mt-3 space-y-3 text-[15px]" style={{ color: C.muted }}>
-              <li>민사·가사 사건은 착수금과 성공보수로 나누어 정합니다.</li>
-              <li>형사 사건은 성공보수 없이 착수금으로만 정합니다.</li>
-              <li>착수금은 나누어 내실 수 있습니다.</li>
-            </ul>
-          </div>
-        </div>
-      </div>
-    </section>
-  );
-}
-
-/* ---------- 해결 사례 ---------- */
-
-const CASES: { field: Field; title: string; body: string; result: string }[] = [
+const CASES: { field: Field; date: string; title: string; body: string; result: string; tag: string }[] = [
   {
     field: "lease",
-    title: "계약이 끝나고 5개월째 보증금을 못 받은 세입자",
-    body: "임차권등기명령으로 권리를 지킨 뒤 이사하고, 지급명령을 신청했습니다.",
+    date: "2026.09.18",
+    title: "계약 종료 5개월 뒤에도 돌려받지 못한 전세보증금",
+    body: "임차권등기명령으로 대항력을 지킨 뒤 이사하고, 지급명령을 신청했습니다.",
     result: "집주인이 이의를 내지 않아 지급명령이 확정됐고, 경매 신청 전에 보증금을 모두 돌려받았습니다.",
-  },
-  {
-    field: "lease",
-    title: "직접 산다며 갱신을 거절한 뒤 새 세입자를 들인 집주인",
-    body: "전입 기록과 중개 광고를 근거로 주택임대차분쟁조정을 신청했습니다.",
-    result: "조정에서 손해배상금과 이사 비용을 받기로 합의했습니다.",
+    tag: "지급명령 확정",
   },
   {
     field: "family",
+    date: "2026.09.02",
     title: "이혼을 거부하던 배우자와의 재판상 이혼",
     body: "소송 전에 부동산을 가압류하고, 조정 기일에 양육 계획을 구체적으로 냈습니다.",
     result: "조정으로 이혼이 성립했고 친권, 양육권과 매달 양육비를 정했습니다.",
+    tag: "조정 성립",
+  },
+  {
+    field: "criminal",
+    date: "2026.08.21",
+    title: "술자리 다툼으로 폭행 혐의 조사를 받게 된 직장인",
+    body: "경찰 조사에 함께 들어가고, 상대방과의 합의 절차를 도왔습니다.",
+    result: "합의서를 냈고 불송치 결정을 받았습니다.",
+    tag: "불송치",
+  },
+  {
+    field: "civil",
+    date: "2026.08.07",
+    title: "지인에게 빌려준 1,500만 원 대여금 청구",
+    body: "차용증이 없어 이체 내역과 문자로 빌려준 사실을 정리하고 소액사건으로 청구했습니다.",
+    result: "판결을 받아 상대방 예금을 압류해 원금과 이자를 받았습니다.",
+    tag: "판결",
+  },
+  {
+    field: "lease",
+    date: "2026.07.24",
+    title: "실거주를 이유로 갱신을 거절한 뒤 새 임차인을 들인 임대인",
+    body: "전입 기록과 중개 광고를 근거로 주택임대차분쟁조정을 신청했습니다.",
+    result: "조정에서 손해배상금과 이사 비용을 받기로 합의했습니다.",
+    tag: "조정 성립",
   },
   {
     field: "family",
+    date: "2026.07.10",
     title: "협의이혼 뒤 1년 넘게 밀린 양육비",
     body: "양육비부담조서를 근거로 상대방 급여 압류를 신청했습니다.",
     result: "밀린 양육비를 받았고, 이후 양육비는 급여에서 바로 들어오고 있습니다.",
+    tag: "압류",
   },
   {
     field: "criminal",
-    title: "술자리 다툼으로 폭행 혐의 조사를 받게 된 직장인",
-    body: "경찰 조사에 함께 들어가고, 상대방과의 합의를 도왔습니다.",
-    result: "합의서를 내 불송치 결정을 받았습니다.",
-  },
-  {
-    field: "criminal",
+    date: "2026.06.26",
     title: "중고 거래 사기 피해자 여러 명의 고소 대리",
     body: "피해자들의 송금 내역과 대화를 모아 한 번에 고소장을 냈습니다.",
     result: "피의자가 특정되어 재판에 넘겨졌고, 피해금 일부를 배상받았습니다.",
+    tag: "기소",
   },
   {
     field: "civil",
-    title: "지인에게 빌려준 1,500만 원",
-    body: "차용증이 없어 이체 내역과 문자로 빌려준 사실을 정리하고 소액사건으로 청구했습니다.",
-    result: "판결을 받아 상대방 예금을 압류해 원금과 이자를 받았습니다.",
-  },
-  {
-    field: "civil",
-    title: "6개월 밀린 거래처 물품 대금",
+    date: "2026.06.12",
+    title: "6개월 밀린 거래처 물품대금",
     body: "거래처 예금을 가압류한 뒤 지급명령을 신청했습니다.",
     result: "나누어 갚기로 합의하고 공정증서로 남겼습니다.",
+    tag: "합의",
   },
 ];
 
+const CASE_TAGS = [...new Set(CASES.map((c) => c.tag))];
+
 function Cases() {
   const reduce = useReducedMotionSafe();
-  const [filter, setFilter] = useState<Field | "all">("all");
-  const list = CASES.filter((c) => filter === "all" || c.field === filter);
+  const [field, setField] = useState<Field | "all">("all");
+  const [tag, setTag] = useState("all");
+  const [open, setOpen] = useState<string | null>(null);
+  const list = CASES.filter((c) => (field === "all" || c.field === field) && (tag === "all" || c.tag === tag));
 
   return (
-    <section aria-labelledby="cases-title" id="cases" className="scroll-mt-16 px-4 py-16 md:px-6 md:py-24" style={{ background: C.navy }}>
-      <div className="mx-auto max-w-[1200px]">
-        <SectionHead id="cases-title" title="최근 맡았던 사건들" desc="의뢰인 동의를 받아 알아볼 수 없게 고쳐 적었습니다." light />
-        <div role="group" aria-label="분야로 거르기" className="mt-8 flex flex-wrap gap-2">
+    <div>
+      <p className="border-l-2 py-1 pl-4 text-[15px]" style={{ borderColor: C.gold, color: C.muted }}>
+        의뢰인 동의를 받아 알아볼 수 없게 고쳐 적었습니다. 사건 결과는 사안마다 다릅니다.
+      </p>
+
+      <div className="mt-6 flex flex-col gap-3 md:flex-row md:items-end md:justify-between">
+        <div role="group" aria-label="분야" className="flex flex-wrap gap-1.5">
           {[{ id: "all" as const, label: "전체" }, ...FIELDS].map((f) => (
             <button
               key={f.id}
               type="button"
-              aria-pressed={filter === f.id}
-              onClick={() => setFilter(f.id)}
-              className="h-11 rounded-[4px] border px-4 text-[15px] font-semibold"
-              style={filter === f.id ? { background: C.ivory, color: C.navy, borderColor: C.ivory } : { borderColor: "#3a4a70", color: "#d7dbe5" }}
+              aria-pressed={field === f.id}
+              onClick={() => setField(f.id)}
+              className="h-10 rounded-[4px] border px-3.5 text-[15px] font-semibold"
+              style={field === f.id ? { background: C.navy, color: C.ivory, borderColor: C.navy } : { background: C.white, borderColor: C.line, color: C.ink }}
             >
               {f.label}
             </button>
           ))}
         </div>
-        <motion.ul layout={!reduce} className="mt-8 grid gap-px md:grid-cols-2" style={{ background: "#2e3d61" }}>
-          <AnimatePresence initial={false} mode="popLayout">
-            {list.map((c) => (
-              <motion.li
-                key={c.title}
-                layout={!reduce}
-                initial={reduce ? false : { opacity: 0 }}
-                animate={{ opacity: 1 }}
-                exit={{ opacity: 0 }}
-                transition={{ duration: 0.25 }}
-                className="p-6 md:p-7"
-                style={{ background: C.navy }}
-              >
-                <p className="text-[14px] font-semibold" style={{ color: C.gold }}>
-                  {FIELD_LABEL[c.field]}
-                </p>
-                <p className="mt-1.5 text-[18px] font-bold leading-[1.45]" style={{ color: C.ivory }}>
-                  {c.title}
-                </p>
-                <p className="mt-3 text-[15px]" style={{ color: "#c9cedb" }}>
-                  {c.body}
-                </p>
-                <p className="mt-3 border-t pt-3 text-[15px]" style={{ borderColor: "#2e3d61", color: C.ivory }}>
-                  <span className="mr-2 font-semibold" style={{ color: C.gold }}>
-                    결과
-                  </span>
-                  {c.result}
-                </p>
-              </motion.li>
+        <label className="flex items-center gap-2 text-[15px] font-semibold" style={{ color: C.navy }}>
+          결과
+          <select value={tag} onChange={(e) => setTag(e.target.value)} className="h-10 min-w-[140px] rounded-[4px] border px-2 font-normal" style={{ borderColor: C.line, background: C.white, color: C.ink }}>
+            <option value="all">전체</option>
+            {CASE_TAGS.map((t) => (
+              <option key={t} value={t}>
+                {t}
+              </option>
             ))}
-          </AnimatePresence>
-        </motion.ul>
+          </select>
+        </label>
       </div>
-    </section>
+
+      <p className="mt-5 text-[14px]" style={{ color: C.muted }} aria-live="polite">
+        총 <strong style={{ color: C.navy }}>{list.length}</strong>건
+      </p>
+      <div className="mt-2 border-t-2" style={{ borderColor: C.navy }}>
+        <div className="hidden grid-cols-[56px_110px_1fr_120px_100px] gap-3 border-b px-2 py-3 text-center text-[14px] font-semibold md:grid" style={{ borderColor: C.line, background: C.paper, color: C.muted }} aria-hidden>
+          <span>번호</span>
+          <span>분야</span>
+          <span>제목</span>
+          <span>결과</span>
+          <span>등록일</span>
+        </div>
+        {list.length === 0 ? (
+          <p className="border-b py-10 text-center text-[15px]" style={{ borderColor: C.line, color: C.muted }}>
+            조건에 맞는 사례가 없습니다.
+          </p>
+        ) : (
+          <ul>
+            {list.map((c) => {
+              const no = CASES.length - CASES.indexOf(c);
+              const on = open === c.title;
+              const pid = `case-${no}`;
+              return (
+                <li key={c.title} className="border-b" style={{ borderColor: C.line }}>
+                  <button
+                    type="button"
+                    aria-expanded={on}
+                    aria-controls={pid}
+                    onClick={() => setOpen(on ? null : c.title)}
+                    className="grid w-full grid-cols-[1fr_auto] items-center gap-x-3 gap-y-1 px-2 py-3.5 text-left md:grid-cols-[56px_110px_1fr_120px_100px] md:py-4 md:text-center"
+                    style={on ? { background: C.paper } : undefined}
+                  >
+                    <span className="hidden text-[14px] tabular-nums md:block" style={{ color: C.muted }}>
+                      {no}
+                    </span>
+                    <span className="order-1 text-[13px] font-semibold md:order-none md:text-[14px]" style={{ color: C.goldText }}>
+                      {FIELD_LABEL[c.field]}
+                    </span>
+                    <span className="order-3 col-span-2 font-semibold leading-[1.45] md:order-none md:col-span-1 md:text-left" style={{ color: C.navy }}>
+                      {c.title}
+                    </span>
+                    <span className="order-2 justify-self-end md:order-none md:justify-self-center">
+                      <span className="inline-block rounded-[2px] border px-2 py-0.5 text-[13px] font-semibold" style={{ borderColor: C.gold, color: C.goldText }}>
+                        {c.tag}
+                      </span>
+                    </span>
+                    <span className="order-4 text-[13px] tabular-nums md:order-none md:text-[14px]" style={{ color: C.muted }}>
+                      {c.date}
+                    </span>
+                  </button>
+                  <AnimatePresence initial={false}>
+                    {on && (
+                      <motion.div
+                        id={pid}
+                        className="overflow-hidden"
+                        initial={reduce ? false : { height: 0, opacity: 0 }}
+                        animate={{ height: "auto", opacity: 1 }}
+                        exit={reduce ? { opacity: 0 } : { height: 0, opacity: 0 }}
+                        transition={{ duration: 0.28, ease: EASE }}
+                      >
+                        <dl className="mx-2 mb-4 border-t text-[15px] md:ml-[178px] md:mr-[232px]" style={{ borderColor: C.line }}>
+                          <div className="grid gap-1 py-3 sm:grid-cols-[72px_1fr]">
+                            <dt className="font-semibold" style={{ color: C.navy }}>
+                              진행
+                            </dt>
+                            <dd>{c.body}</dd>
+                          </div>
+                          <div className="grid gap-1 border-t py-3 sm:grid-cols-[72px_1fr]" style={{ borderColor: C.line }}>
+                            <dt className="font-semibold" style={{ color: C.navy }}>
+                              결과
+                            </dt>
+                            <dd>{c.result}</dd>
+                          </div>
+                        </dl>
+                      </motion.div>
+                    )}
+                  </AnimatePresence>
+                </li>
+              );
+            })}
+          </ul>
+        )}
+      </div>
+    </div>
   );
 }
 
-/* ---------- 상담 예약 ---------- */
+/* ---------- 상담신청 ---------- */
 
 type Method = "visit" | "phone" | "video";
 
-const METHODS: {
-  id: Method;
-  label: string;
-  icon: typeof Phone;
-  desc: string;
-}[] = [
-  {
-    id: "visit",
-    label: "방문",
-    icon: Building2,
-    desc: "사무소에서 서류를 함께 봅니다",
-  },
-  {
-    id: "phone",
-    label: "전화",
-    icon: Phone,
-    desc: "예약 시간에 전화를 드립니다",
-  },
-  {
-    id: "video",
-    label: "화상",
-    icon: Video,
-    desc: "접속 주소를 문자로 보내 드립니다",
-  },
+const METHODS: { id: Method; label: string; icon: typeof Phone; desc: string }[] = [
+  { id: "visit", label: "방문", icon: Building2, desc: "사무소에서 서류를 함께 봅니다." },
+  { id: "phone", label: "전화", icon: Phone, desc: "예약 시간에 전화를 드립니다." },
+  { id: "video", label: "화상", icon: Video, desc: "접속 주소를 문자로 보내 드립니다." },
 ];
 
 const WEEKDAY_HOURS = [10, 11, 14, 15, 16, 17];
@@ -1218,19 +1633,11 @@ function openSlots(minute: number) {
   return out;
 }
 
-type Confirm = {
-  no: string;
-  method: Method;
-  field: Field;
-  when: string;
-  name: string;
-  phone: string;
-};
+type Confirm = { no: string; method: Method; field: Field; when: string; name: string; phone: string };
 
-function Booking({ minute, preset }: { minute: number; preset: { field: Field; n: number } | null }) {
+function Booking({ minute, initialField }: { minute: number; initialField: Field | null }) {
   const [method, setMethod] = useState<Method | null>(null);
-  const [field, setField] = useState<Field | null>(preset?.field ?? null);
-  const [prevPreset, setPrevPreset] = useState(preset);
+  const [field, setField] = useState<Field | null>(initialField);
   const [page, setPage] = useState(0);
   const [slotKey, setSlotKey] = useState<string | null>(null);
   const [name, setName] = useState("");
@@ -1239,12 +1646,6 @@ function Booking({ minute, preset }: { minute: number; preset: { field: Field; n
   const [agree, setAgree] = useState(false);
   const [error, setError] = useState("");
   const [confirm, setConfirm] = useState<Confirm | null>(null);
-
-  // 절차 지도에서 넘어오면 분야를 미리 골라 둔다
-  if (preset !== prevPreset) {
-    setPrevPreset(preset);
-    if (preset) setField(preset.field);
-  }
 
   const all = openSlots(minute);
   const slots = method ? all.filter((sl) => sl.methods.includes(method)) : all;
@@ -1261,25 +1662,18 @@ function Booking({ minute, preset }: { minute: number; preset: { field: Field; n
 
   const submit = (e: React.FormEvent) => {
     e.preventDefault();
-    if (!method) return setError("상담 방식을 골라 주세요.");
-    if (!field) return setError("상담 받을 분야를 골라 주세요.");
-    if (!picked) return setError("상담 시간을 골라 주세요.");
-    if (name.trim().length < 2) return setError("이름을 두 글자 이상 적어 주세요.");
-    if (phone.replace(/\D/g, "").length < 10) return setError("연락받을 휴대전화 번호를 적어 주세요.");
-    if (!agree) return setError("개인정보 수집에 동의해 주셔야 예약할 수 있어요.");
+    if (!method) return setError("상담 방식을 선택해 주세요.");
+    if (!field) return setError("사건 분야를 선택해 주세요.");
+    if (!picked) return setError("상담 시간을 선택해 주세요.");
+    if (name.trim().length < 2) return setError("이름을 두 글자 이상 입력해 주세요.");
+    if (phone.replace(/\D/g, "").length < 10) return setError("휴대전화 번호를 입력해 주세요.");
+    if (!agree) return setError("개인정보 수집과 이용에 동의해 주세요.");
     setError("");
     const mm = String(picked.date.getMonth() + 1).padStart(2, "0");
     const dd = String(picked.date.getDate()).padStart(2, "0");
     const t = new Date();
     const seq = String(100 + ((t.getMinutes() * 60 + t.getSeconds()) % 900));
-    setConfirm({
-      no: `${mm}${dd}-${seq}`,
-      method,
-      field,
-      when: slotLabel(picked),
-      name: maskName(name),
-      phone: maskPhone(phone),
-    });
+    setConfirm({ no: `${mm}${dd}-${seq}`, method, field, when: slotLabel(picked), name: maskName(name), phone: maskPhone(phone) });
   };
 
   const reset = () => {
@@ -1295,201 +1689,176 @@ function Booking({ minute, preset }: { minute: number; preset: { field: Field; n
   const pill = (on: boolean) => (on ? { background: C.navy, color: C.ivory, borderColor: C.navy } : { background: C.white, borderColor: C.line, color: C.ink });
 
   return (
-    <section aria-labelledby="booking-title" id="booking" className="scroll-mt-16 px-4 py-16 md:px-6 md:py-24">
-      <div className="mx-auto max-w-[1200px]">
-        <SectionHead id="booking-title" title="편한 방식과 시간을 골라 주세요" desc="평일은 오전 10시부터 오후 6시까지, 토요일은 오전에만 상담합니다." />
+    <div id="booking">
+      <p>평일은 오전 10시부터 오후 6시까지, 토요일은 낮 12시까지 상담합니다. 첫 상담 30분은 비용을 받지 않습니다.</p>
 
-        <form onSubmit={submit} noValidate className="mt-10 grid gap-10 border-t-2 pt-8 lg:grid-cols-[1fr_1fr] lg:gap-14" style={{ borderColor: C.navy }}>
-          <div className="min-w-0 space-y-8">
-            <fieldset>
-              <legend className="font-bold" style={{ color: C.navy }}>
-                상담 방식
-              </legend>
-              <div className="mt-3 grid grid-cols-3 gap-2">
-                {METHODS.map((m) => (
-                  <button
-                    key={m.id}
-                    type="button"
-                    aria-pressed={method === m.id}
-                    onClick={() => pickMethod(m.id)}
-                    className="flex h-[72px] flex-col items-center justify-center gap-1 rounded-[4px] border text-[15px] font-semibold"
-                    style={pill(method === m.id)}
-                  >
-                    <m.icon size={20} aria-hidden style={{ color: method === m.id ? C.gold : C.muted }} />
-                    {m.label}
-                  </button>
-                ))}
-              </div>
-              <p className="mt-2 text-[14px]" style={{ color: C.muted }}>
-                {method ? METHODS.find((m) => m.id === method)!.desc : "방식을 고르면 그 방식으로 가능한 시간만 남아요."}
-              </p>
-            </fieldset>
-
-            <fieldset>
-              <legend className="font-bold" style={{ color: C.navy }}>
-                분야
-              </legend>
-              <div className="mt-3 grid grid-cols-2 gap-2">
-                {FIELDS.map((f) => (
-                  <button
-                    key={f.id}
-                    type="button"
-                    aria-pressed={field === f.id}
-                    onClick={() => setField(f.id)}
-                    className="h-12 rounded-[4px] border text-[15px] font-semibold"
-                    style={pill(field === f.id)}
-                  >
-                    {f.label}
-                  </button>
-                ))}
-              </div>
-            </fieldset>
-
-            <fieldset>
-              <legend className="font-bold" style={{ color: C.navy }}>
-                가장 빨리 가능한 상담 시간
-              </legend>
-              {all.length ? (
-                <>
-                  <ul className="mt-3 border-t" style={{ borderColor: C.line }}>
-                    {shown.map((sl) => {
-                      const on = slotKey === sl.key;
-                      const id = `law-slot-${sl.key}`;
-                      return (
-                        <li key={sl.key} className="border-b" style={{ borderColor: C.line }}>
-                          <label htmlFor={id} className="flex min-h-[60px] cursor-pointer items-center gap-3 px-2 py-2.5" style={on ? { background: C.white } : undefined}>
-                            <input
-                              id={id}
-                              type="radio"
-                              name="law-slot"
-                              value={sl.key}
-                              checked={on}
-                              onChange={() => setSlotKey(sl.key)}
-                              className="h-5 w-5 shrink-0 accent-[#14213d]"
-                            />
-                            <span className="flex min-w-0 flex-1 flex-col gap-0.5 sm:flex-row sm:items-center sm:justify-between sm:gap-3">
-                              <span className="font-semibold tabular-nums" style={{ color: on ? C.navy : C.ink }}>
-                                {slotLabel(sl)}
-                              </span>
-                              <span className="flex shrink-0 gap-2.5 text-[14px]" style={{ color: C.muted }}>
-                                {METHODS.filter((m) => sl.methods.includes(m.id)).map((m) => (
-                                  <span key={m.id} className="inline-flex items-center gap-1">
-                                    <m.icon size={15} aria-hidden style={{ color: C.gold }} />
-                                    {m.label}
-                                  </span>
-                                ))}
-                              </span>
-                            </span>
-                          </label>
-                        </li>
-                      );
-                    })}
-                  </ul>
-                  <div className="mt-3 flex flex-wrap items-center justify-between gap-2 text-[15px]">
-                    <button
-                      type="button"
-                      onClick={() => setPage((p) => Math.max(0, p - 1))}
-                      disabled={page === 0}
-                      className="inline-flex h-11 items-center px-1 font-semibold disabled:invisible"
-                      style={{ color: C.navy }}
-                    >
-                      앞 시간 보기
-                    </button>
-                    <button
-                      type="button"
-                      onClick={() => setPage((p) => Math.min(pages - 1, p + 1))}
-                      disabled={page >= pages - 1}
-                      className="inline-flex h-11 items-center rounded-[4px] border px-4 font-semibold disabled:cursor-not-allowed disabled:opacity-40"
-                      style={{ borderColor: C.navy, color: C.navy }}
-                    >
-                      다른 날짜 보기
-                    </button>
-                  </div>
-                </>
-              ) : (
-                <div className="mt-3 h-[372px] rounded-[4px]" style={{ background: C.goldSoft }} />
-              )}
-            </fieldset>
-          </div>
-
-          <div className="min-w-0">
-            <div className="space-y-4 rounded-[4px] bg-white p-5 md:p-7">
-              <label className="block">
-                <span className="text-[15px] font-semibold">이름</span>
-                <input
-                  value={name}
-                  onChange={(e) => setName(e.target.value)}
-                  autoComplete="name"
-                  placeholder="김하늘"
-                  className="mt-1.5 h-12 w-full rounded-[4px] border px-3 outline-none focus:border-[#14213d]"
-                  style={{ borderColor: C.line }}
-                />
-              </label>
-              <label className="block">
-                <span className="text-[15px] font-semibold">휴대전화</span>
-                <input
-                  value={phone}
-                  onChange={(e) => setPhone(e.target.value)}
-                  inputMode="tel"
-                  autoComplete="tel"
-                  placeholder="010-1234-5678"
-                  className="mt-1.5 h-12 w-full rounded-[4px] border px-3 outline-none focus:border-[#14213d]"
-                  style={{ borderColor: C.line }}
-                />
-              </label>
-              <label className="block">
-                <span className="text-[15px] font-semibold">간단한 내용</span>
-                <span className="ml-2 text-[14px]" style={{ color: C.muted }}>
-                  선택
-                </span>
-                <textarea
-                  value={memo}
-                  onChange={(e) => setMemo(e.target.value.slice(0, 300))}
-                  rows={4}
-                  placeholder="예) 계약이 8월에 끝났는데 집주인이 새 세입자가 들어와야 돌려준다고 합니다."
-                  className="mt-1.5 w-full resize-none rounded-[4px] border px-3 py-2.5 outline-none focus:border-[#14213d]"
-                  style={{ borderColor: C.line }}
-                />
-                <span className="block text-right text-[13px] tabular-nums" style={{ color: C.muted }}>
-                  {memo.length}/300
-                </span>
-              </label>
-              <div className="rounded-[4px] p-4 text-[14px]" style={{ background: C.ivory, color: C.muted }}>
-                <p>수집 항목: 이름, 휴대전화, 상담 내용</p>
-                <p>이용 목적: 상담 일정 안내와 상담 준비</p>
-                <p>보관 기간: 상담일로부터 1년, 그 뒤 바로 삭제</p>
-                <label className="mt-3 flex min-h-11 cursor-pointer items-center gap-3 text-[15px] font-semibold" style={{ color: C.ink }}>
-                  <input type="checkbox" checked={agree} onChange={(e) => setAgree(e.target.checked)} className="h-5 w-5 shrink-0 accent-[#14213d]" />
-                  개인정보 수집과 이용에 동의합니다
-                </label>
-              </div>
-              {error && (
-                <p className="text-[15px] font-semibold" style={{ color: C.error }} role="alert">
-                  {error}
-                </p>
-              )}
-              <button type="submit" className="h-[52px] w-full rounded-[4px] text-[17px] font-bold" style={{ background: C.navy, color: C.ivory }}>
-                예약하기
-              </button>
-              <p className="text-[14px]" style={{ color: C.muted }}>
-                상담 내용은 변호사만 봅니다.
-              </p>
+      <form onSubmit={submit} noValidate className="mt-8 grid gap-10 xl:grid-cols-[1fr_1fr] xl:gap-12">
+        <div className="min-w-0 space-y-8">
+          <fieldset>
+            <legend className="font-bold" style={{ color: C.navy }}>
+              상담 방식
+            </legend>
+            <div className="mt-3 grid grid-cols-3 gap-2">
+              {METHODS.map((m) => (
+                <button
+                  key={m.id}
+                  type="button"
+                  aria-pressed={method === m.id}
+                  onClick={() => pickMethod(m.id)}
+                  className="flex h-[72px] flex-col items-center justify-center gap-1 rounded-[4px] border text-[15px] font-semibold"
+                  style={pill(method === m.id)}
+                >
+                  <m.icon size={20} aria-hidden style={{ color: method === m.id ? C.gold : C.muted }} />
+                  {m.label}
+                </button>
+              ))}
             </div>
-          </div>
-        </form>
+            {method && (
+              <p className="mt-2 text-[14px]" style={{ color: C.muted }}>
+                {METHODS.find((m) => m.id === method)!.desc}
+              </p>
+            )}
+          </fieldset>
 
-        <p className="mt-12 flex flex-wrap gap-x-3 gap-y-1 border-t pt-5 text-[15px]" style={{ borderColor: C.line, color: C.muted }}>
-          <span>□□법원 정문 건너편 □□빌딩 3층</span>
-          <span aria-hidden>·</span>
-          <span>건물 지하 주차 1시간 지원</span>
-          <span aria-hidden>·</span>
-          <a href={`tel:${TEL}`} className="font-semibold underline-offset-4 hover:underline" style={{ color: C.navy }}>
-            {TEL}
-          </a>
-        </p>
-      </div>
+          <fieldset>
+            <legend className="font-bold" style={{ color: C.navy }}>
+              사건 분야
+            </legend>
+            <div className="mt-3 grid grid-cols-2 gap-2">
+              {FIELDS.map((f) => (
+                <button key={f.id} type="button" aria-pressed={field === f.id} onClick={() => setField(f.id)} className="h-12 rounded-[4px] border text-[15px] font-semibold" style={pill(field === f.id)}>
+                  {f.label}
+                </button>
+              ))}
+            </div>
+          </fieldset>
+
+          <fieldset>
+            <legend className="font-bold" style={{ color: C.navy }}>
+              상담 가능 시간
+            </legend>
+            {all.length ? (
+              <>
+                <ul className="mt-3 border-t" style={{ borderColor: C.navy }}>
+                  {shown.map((sl) => {
+                    const on = slotKey === sl.key;
+                    const id = `law-slot-${sl.key}`;
+                    return (
+                      <li key={sl.key} className="border-b" style={{ borderColor: C.line }}>
+                        <label htmlFor={id} className="flex min-h-[60px] cursor-pointer items-center gap-3 px-2 py-2.5" style={on ? { background: C.goldSoft } : undefined}>
+                          <input id={id} type="radio" name="law-slot" value={sl.key} checked={on} onChange={() => setSlotKey(sl.key)} className="h-5 w-5 shrink-0 accent-[#14213d]" />
+                          <span className="flex min-w-0 flex-1 flex-col gap-0.5 sm:flex-row sm:items-center sm:justify-between sm:gap-3">
+                            <span className="font-semibold tabular-nums" style={{ color: on ? C.navy : C.ink }}>
+                              {slotLabel(sl)}
+                            </span>
+                            <span className="flex shrink-0 gap-2.5 text-[14px]" style={{ color: C.muted }}>
+                              {METHODS.filter((m) => sl.methods.includes(m.id)).map((m) => (
+                                <span key={m.id} className="inline-flex items-center gap-1">
+                                  <m.icon size={15} aria-hidden style={{ color: C.gold }} />
+                                  {m.label}
+                                </span>
+                              ))}
+                            </span>
+                          </span>
+                        </label>
+                      </li>
+                    );
+                  })}
+                </ul>
+                <div className="mt-3 flex flex-wrap items-center justify-between gap-2 text-[15px]">
+                  <button
+                    type="button"
+                    onClick={() => setPage((p) => Math.max(0, p - 1))}
+                    disabled={page === 0}
+                    className="inline-flex h-11 items-center px-1 font-semibold disabled:invisible"
+                    style={{ color: C.navy }}
+                  >
+                    이전 시간
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => setPage((p) => Math.min(pages - 1, p + 1))}
+                    disabled={page >= pages - 1}
+                    className="inline-flex h-11 items-center rounded-[4px] border px-4 font-semibold disabled:cursor-not-allowed disabled:opacity-40"
+                    style={{ borderColor: C.navy, color: C.navy }}
+                  >
+                    다음 시간
+                  </button>
+                </div>
+              </>
+            ) : (
+              <div className="mt-3 h-[372px] rounded-[4px]" style={{ background: C.goldSoft }} />
+            )}
+          </fieldset>
+        </div>
+
+        <div className="min-w-0">
+          <div className="space-y-4 border p-5 md:p-7" style={{ borderColor: C.line, background: C.white }}>
+            <label className="block">
+              <span className="text-[15px] font-semibold">이름</span>
+              <input
+                value={name}
+                onChange={(e) => setName(e.target.value)}
+                autoComplete="name"
+                placeholder="김하늘"
+                className="mt-1.5 h-12 w-full rounded-[4px] border px-3 outline-none focus:border-[#14213d]"
+                style={{ borderColor: C.line }}
+              />
+            </label>
+            <label className="block">
+              <span className="text-[15px] font-semibold">휴대전화</span>
+              <input
+                value={phone}
+                onChange={(e) => setPhone(e.target.value)}
+                inputMode="tel"
+                autoComplete="tel"
+                placeholder="010-1234-5678"
+                className="mt-1.5 h-12 w-full rounded-[4px] border px-3 outline-none focus:border-[#14213d]"
+                style={{ borderColor: C.line }}
+              />
+            </label>
+            <label className="block">
+              <span className="text-[15px] font-semibold">상담 내용</span>
+              <span className="ml-2 text-[14px]" style={{ color: C.muted }}>
+                선택
+              </span>
+              <textarea
+                value={memo}
+                onChange={(e) => setMemo(e.target.value.slice(0, 300))}
+                rows={4}
+                placeholder="예) 계약이 8월에 끝났는데 집주인이 새 세입자가 들어와야 돌려준다고 합니다."
+                className="mt-1.5 w-full resize-none rounded-[4px] border px-3 py-2.5 outline-none focus:border-[#14213d]"
+                style={{ borderColor: C.line }}
+              />
+              <span className="block text-right text-[13px] tabular-nums" style={{ color: C.muted }}>
+                {memo.length}/300
+              </span>
+            </label>
+            <div className="rounded-[4px] p-4 text-[14px]" style={{ background: C.ivory, color: C.muted }}>
+              <p>수집 항목: 이름, 휴대전화, 상담 내용</p>
+              <p>이용 목적: 상담 일정 안내와 상담 준비</p>
+              <p>보관 기간: 상담일로부터 1년, 그 뒤 바로 삭제</p>
+              <label className="mt-3 flex min-h-11 cursor-pointer items-center gap-3 text-[15px] font-semibold" style={{ color: C.ink }}>
+                <input type="checkbox" checked={agree} onChange={(e) => setAgree(e.target.checked)} className="h-5 w-5 shrink-0 accent-[#14213d]" />
+                개인정보 수집과 이용에 동의합니다
+              </label>
+            </div>
+            {error && (
+              <p className="text-[15px] font-semibold" style={{ color: C.error }} role="alert">
+                {error}
+              </p>
+            )}
+            <button type="submit" className="h-[52px] w-full rounded-[4px] text-[17px] font-bold" style={{ background: C.navy, color: C.ivory }}>
+              상담신청
+            </button>
+            <p className="text-[14px]" style={{ color: C.muted }}>
+              상담 내용은 담당 변호사만 봅니다.
+            </p>
+          </div>
+        </div>
+      </form>
       <ConfirmDialog data={confirm} onClose={reset} />
-    </section>
+    </div>
   );
 }
 
@@ -1507,7 +1876,7 @@ function ConfirmDialog({ data, onClose }: { data: Confirm | null; onClose: () =>
 
   const guide = data
     ? data.method === "visit"
-      ? `${ADDRESS}로 오세요. 관련 서류가 있으면 가져와 주세요.`
+      ? `${ADDRESS}로 오시면 됩니다. 관련 서류가 있으면 가져와 주세요.`
       : data.method === "phone"
         ? `예약 시간에 ${TEL}에서 ${data.phone}로 전화를 드립니다.`
         : `상담 30분 전에 ${data.phone}로 화상 접속 주소를 보내 드립니다.`
@@ -1549,9 +1918,9 @@ function ConfirmDialog({ data, onClose }: { data: Confirm | null; onClose: () =>
             <p className="text-[14px] font-semibold" style={{ color: C.goldText }}>
               {FIRM}
             </p>
-            <h3 id="confirm-title" className="mt-1 text-[22px] font-bold" style={{ color: C.navy }}>
-              상담 예약을 받았습니다
-            </h3>
+            <h2 id="confirm-title" className="mt-1 text-[22px] font-bold" style={{ color: C.navy }}>
+              상담신청이 접수되었습니다
+            </h2>
             <dl className="mt-5 border-y text-[15px]" style={{ borderColor: C.line }}>
               {[
                 ["상담 번호", data.no],
@@ -1571,11 +1940,11 @@ function ConfirmDialog({ data, onClose }: { data: Confirm | null; onClose: () =>
             </dl>
             <p className="mt-4 text-[15px]">{guide}</p>
             <p className="mt-2 text-[14px]" style={{ color: C.muted }}>
-              일정을 바꾸려면 상담 번호를 말씀하고 {TEL}로 전화해 주세요.
+              일정을 바꾸시려면 상담 번호를 알려 주시고 {TEL}로 전화해 주세요.
             </p>
             <button type="button" onClick={onClose} className="mt-6 inline-flex h-11 items-center gap-1.5 text-[15px] font-semibold" style={{ color: C.navy }}>
               <RotateCcw size={16} aria-hidden />
-              새로 예약하기
+              새로 신청하기
             </button>
           </motion.div>
         </motion.div>
@@ -1589,7 +1958,7 @@ function ConfirmDialog({ data, onClose }: { data: Confirm | null; onClose: () =>
 const FAQS = [
   {
     q: "첫 상담에는 무엇을 가져가면 되나요?",
-    a: "계약서, 주고받은 문자, 법원이나 경찰에서 받은 서류처럼 사건과 관련된 것을 모두 가져오세요. 위 상황별 절차에서 표시한 준비 서류 목록을 참고하셔도 됩니다.",
+    a: "계약서, 주고받은 문자, 법원이나 경찰에서 받은 서류처럼 사건과 관련된 것을 모두 가져오세요. 업무분야의 사건별 준비 서류 목록을 참고하셔도 됩니다.",
   },
   {
     q: "상담한 내용이 밖으로 알려지지 않나요?",
@@ -1597,14 +1966,14 @@ const FAQS = [
   },
   {
     q: "상담만 받고 사건은 맡기지 않아도 되나요?",
-    a: "네. 상담을 받고 직접 처리하실 수 있는 일이면 방법을 알려 드립니다. 첫 상담 30분은 비용이 없습니다.",
+    a: "네. 직접 처리하실 수 있는 일이면 방법을 알려 드립니다. 첫 상담 30분은 비용이 없습니다.",
   },
   {
     q: "수임료는 나누어 낼 수 있나요?",
     a: "착수금은 사건 진행에 맞춰 나누어 내실 수 있습니다. 금액과 내는 날짜는 계약서에 적어 드립니다.",
   },
   {
-    q: "평일 낮에 시간을 내기 어려워요.",
+    q: "평일 낮에 시간을 내기 어렵습니다.",
     a: "토요일 오전에도 상담합니다. 평일 저녁에는 전화나 화상 상담으로 따로 일정을 잡아 드리니 전화로 말씀해 주세요.",
   },
 ];
@@ -1614,57 +1983,49 @@ function Faq() {
   const [open, setOpen] = useState<number | null>(null);
 
   return (
-    <section aria-labelledby="faq-title" id="faq" className="scroll-mt-16 px-4 py-16 md:px-6 md:py-24" style={{ background: C.white }}>
-      <div className="mx-auto grid max-w-[1200px] gap-10 lg:grid-cols-[360px_1fr] lg:gap-14">
-        <SectionHead id="faq-title" title="상담 전에 많이 물어보세요" />
-        <ul className="border-t-2" style={{ borderColor: C.navy }}>
-          {FAQS.map((f, i) => {
-            const on = open === i;
-            return (
-              <li key={f.q} className="border-b" style={{ borderColor: C.line }}>
-                <h3>
-                  <button
-                    type="button"
-                    aria-expanded={on}
-                    aria-controls={`faq-${i}`}
-                    onClick={() => setOpen(on ? null : i)}
-                    className="flex min-h-[64px] w-full items-center justify-between gap-4 py-4 text-left font-bold"
-                    style={{ color: C.navy }}
-                  >
-                    {f.q}
-                    <ChevronDown
-                      size={20}
-                      className="shrink-0 transition-transform"
-                      style={{
-                        color: C.gold,
-                        transform: on ? "rotate(180deg)" : undefined,
-                      }}
-                      aria-hidden
-                    />
-                  </button>
-                </h3>
-                <AnimatePresence initial={false}>
-                  {on && (
-                    <motion.div
-                      id={`faq-${i}`}
-                      className="overflow-hidden"
-                      initial={reduce ? false : { height: 0, opacity: 0 }}
-                      animate={{ height: "auto", opacity: 1 }}
-                      exit={reduce ? { opacity: 0 } : { height: 0, opacity: 0 }}
-                      transition={{ duration: 0.28, ease: EASE }}
-                    >
-                      <p className="pb-5 pr-8" style={{ color: C.muted }}>
-                        {f.a}
-                      </p>
-                    </motion.div>
-                  )}
-                </AnimatePresence>
-              </li>
-            );
-          })}
-        </ul>
-      </div>
-    </section>
+    <ul className="border-t-2" style={{ borderColor: C.navy }}>
+      {FAQS.map((f, i) => {
+        const on = open === i;
+        return (
+          <li key={f.q} className="border-b" style={{ borderColor: C.line }}>
+            <h2>
+              <button
+                type="button"
+                aria-expanded={on}
+                aria-controls={`faq-${i}`}
+                onClick={() => setOpen(on ? null : i)}
+                className="flex min-h-[64px] w-full items-center justify-between gap-4 py-4 text-left font-bold"
+                style={{ color: C.navy }}
+              >
+                <span className="flex gap-3">
+                  <span style={{ color: C.gold }} aria-hidden>
+                    Q
+                  </span>
+                  {f.q}
+                </span>
+                <ChevronDown size={20} className="shrink-0 transition-transform" style={{ color: C.gold, transform: on ? "rotate(180deg)" : undefined }} aria-hidden />
+              </button>
+            </h2>
+            <AnimatePresence initial={false}>
+              {on && (
+                <motion.div
+                  id={`faq-${i}`}
+                  className="overflow-hidden"
+                  initial={reduce ? false : { height: 0, opacity: 0 }}
+                  animate={{ height: "auto", opacity: 1 }}
+                  exit={reduce ? { opacity: 0 } : { height: 0, opacity: 0 }}
+                  transition={{ duration: 0.28, ease: EASE }}
+                >
+                  <p className="pb-5 pl-7 pr-8" style={{ color: C.muted }}>
+                    {f.a}
+                  </p>
+                </motion.div>
+              )}
+            </AnimatePresence>
+          </li>
+        );
+      })}
+    </ul>
   );
 }
 
@@ -1680,8 +2041,8 @@ function Footer() {
         <dl className="mt-6 grid gap-x-8 gap-y-1.5 text-[14px] sm:grid-cols-2 md:grid-cols-3">
           {[
             ["상호", FIRM],
-            ["대표변호사", "김○○"],
-            ["광고책임변호사", "김○○"],
+            ["대표변호사", "김ㅈ우"],
+            ["광고책임변호사", "김ㅈ우"],
             ["사업자등록번호", "000-00-00000"],
             ["주소", ADDRESS],
             ["전화", TEL],

@@ -1,30 +1,32 @@
 "use client";
 
-import { useEffect, useId, useRef, useState, useSyncExternalStore, type FormEvent, type KeyboardEvent as ReactKeyboardEvent } from "react";
+import { createContext, useContext, useEffect, useId, useRef, useState, useSyncExternalStore, type FormEvent, type KeyboardEvent as ReactKeyboardEvent, type ReactNode } from "react";
 import Image from "next/image";
 import { AnimatePresence, motion } from "framer-motion";
 import {
   Activity,
   BatteryFull,
   Bluetooth,
-  Briefcase,
   Check,
   ChevronDown,
-  Copy,
+  ChevronRight,
   CircleAlert,
+  ClipboardList,
+  Copy,
   Factory,
   FileText,
   FileUp,
-  Globe,
   House,
   Lightbulb,
-  Mail,
   Menu,
+  MessageCircle,
   Monitor,
+  Phone,
   Plug,
   Plus,
   RotateCcw,
   Search,
+  ShieldCheck,
   Signal,
   Trash2,
   Wifi,
@@ -35,19 +37,24 @@ import {
 import { useReducedMotionSafe } from "@/hooks/useReducedMotionSafe";
 
 /* 기업 홈페이지 데모: 가상의 (주)○○시험인증원, 전자파·무선·전기안전 시험과 KC·해외 인증을 맡는 지정시험기관.
-   10년 된 시험인증기관 홈페이지를 새로 만든다는 설정이다. 회사명, 대표자, 주소, 전화번호, 사업자 정보,
-   지정 번호, 담당자, 의뢰사는 모두 가상이고 실제 기관 로고나 등록번호는 쓰지 않는다.
-   옛 메뉴 구성(회사소개, 인증업무, 국내인증, 해외인증, 고객지원)은 그대로 두고 화면 안에서 바로 쓸 수 있게 바꿨다.
+   회사명, 대표자, 주소, 전화번호, 사업자 정보, 지정 번호, 담당자, 의뢰사는 모두 가상이고 실제 기관 로고나 등록번호는 쓰지 않는다.
+
+   구성: 실제 시험인증기관의 포털·게시판형 홈페이지를 따랐다. 메뉴는 회사소개, 인증업무, 국내인증, 해외인증, 고객지원.
+   메인은 큰 사진 대신 맨 위에 조회 도구 줄(인증 대상 조회, 시험진행현황 조회, 성적서 진위확인, 신청서 양식, 견적문의)과
+   접수번호 바로 조회를 두고, 그 아래 새소식·자료실 게시판 2단, 바로가기 배너, 인증 서비스 목록을 둔다.
+   하위 화면은 라우트를 따로 두지 않고 상태로 바꾸며, 왼쪽 하위 메뉴(LNB)와 그 아래 상담 안내 상자, 위치 표시를 쓴다.
+   좁은 화면에서는 LNB가 선택 상자로 바뀐다. 오른쪽 아래 공용 버튼 위에 견적문의·전화연결·카톡상담 버튼을 띄운다.
+   회사소개에는 KOLAS 인정 시험소에 있는 공평성 선언과 고객불만 처리 절차 화면을 둔다.
 
    디자인: 흰색과 서늘한 종이색(#f4f7fb) 바탕에 짙은 남색(#23307a), 신호 청록(#0aa2c0) 하나를 포인트로 쓴다.
-   모눈종이 같은 옅은 격자와 측정한 전자파 파형 선을 반복 모티프로 깔고, 카드는 8~10px로 둥글게, 숫자는 고정폭 숫자로 맞춘다.
 
-   인증 찾기는 전원 방식, 무선 기능, 제품 분류, 판매 국가를 고르면 필요할 가능성이 높은 인증을 국가별로 묶어
-   이유, 주요 시험 항목, 예상 기간과 함께 보여 주고, 견적에 담으면 견적 문의 양식의 인증 칸으로 들어간다.
-   해외인증은 점으로 찍은 세계 지도에서 대륙을 누르면 국가별 인증 이름과 설명이 나오고, 같은 내용을 버튼 목록으로도 고를 수 있다.
-   시험 진행 조회는 접수번호 끝 네 자리로 진행 단계를 정해 단계표와 날짜를 보여 주고,
+   인증 대상 조회는 전원 방식, 무선 기능, 제품 분류, 판매 국가를 고르면 필요할 가능성이 높은 인증을 국가별로 묶어
+   이유, 주요 시험 항목, 예상 기간과 함께 보여 주고, 견적문의에 추가하면 견적문의 양식의 인증 칸으로 들어간다.
+   해외인증은 점으로 찍은 세계 지도와 LNB로 대륙을 고르고, 국가 탭으로 인증 이름과 설명을 본다.
+   시험진행현황 조회는 접수번호 끝 네 자리로 진행 단계를 정해 단계표와 날짜를 보여 주고,
    전자파 시험이면 30MHz~1GHz 방사 방출 그래프에 기준선, 측정값, 최소 여유를 그린다. 동작 줄이기를 켜면 선 그리기를 하지 않는다.
-   견적 문의는 사양서 파일을 골라도 이름과 크기만 보여 주고 어디에도 올리지 않으며, 접수번호와 가린 담당자 정보로 끝난다.
+   견적문의는 고객사를 가린 공개 접수 목록과 작성 양식으로 나뉘고, 사양서 파일은 이름과 크기만 보여 주며 어디에도 올리지 않는다.
+   시료 접수 안내(오시는 길 화면 안)는 받는 주소 복사와 상자에 넣을 것 목록을 둔다.
 
    사진 출처(public/images/demo-certlab):
    AI 생성(Z-Image-Turbo, Apache 2.0) hero, lab */
@@ -58,6 +65,7 @@ const TEL = "02-000-0000";
 const FAX = "02-000-0001";
 const EMAIL = "test@example.com";
 const ADDRESS = "□□시 □□구 □□로 00 ○○시험인증원";
+const HOURS = "평일 09:00 ~ 18:00";
 
 const C = {
   white: "#ffffff",
@@ -91,20 +99,102 @@ const GRAPH = {
   backgroundSize: "60px 60px, 60px 60px, 12px 12px, 12px 12px",
 };
 
-const NAV = [
-  { id: "services", label: "인증업무" },
-  { id: "domestic", label: "국내인증" },
-  { id: "global", label: "해외인증" },
-  { id: "about", label: "회사소개" },
-  { id: "support", label: "고객지원" },
-] as const;
+/* ---------- 메뉴, 화면 상태 ---------- */
 
-const MOBILE_EXTRA = [
-  { id: "finder", label: "필요한 인증 찾기" },
-  { id: "track", label: "시험 진행 조회" },
-  { id: "quote", label: "견적 문의" },
-  { id: "ship", label: "시료 보내실 곳" },
-] as const;
+type MenuId = "about" | "services" | "domestic" | "global" | "support";
+type Route = { m: MenuId | "home"; s: string };
+
+const MENUS: { id: MenuId; label: string; subs: { id: string; label: string }[] }[] = [
+  {
+    id: "about",
+    label: "회사소개",
+    subs: [
+      { id: "greeting", label: "인사말" },
+      { id: "accredit", label: "인정 및 지정 현황" },
+      { id: "facility", label: "시험시설" },
+      { id: "impartiality", label: "공평성 선언" },
+      { id: "complaint", label: "고객불만 처리 절차" },
+      { id: "recruit", label: "인재채용" },
+      { id: "location", label: "오시는 길" },
+    ],
+  },
+  {
+    id: "services",
+    label: "인증업무",
+    subs: [
+      { id: "emc", label: "전자파(EMC) 시험" },
+      { id: "rf", label: "무선(RF) 시험" },
+      { id: "safety", label: "전기안전(SAFETY) 시험" },
+      { id: "gma", label: "해외인증 대행(GMA)" },
+    ],
+  },
+  {
+    id: "domestic",
+    label: "국내인증",
+    subs: [
+      { id: "conform", label: "적합인증" },
+      { id: "register", label: "적합등록" },
+      { id: "elec", label: "전기용품안전인증" },
+      { id: "energy", label: "에너지 효율 관리 제도" },
+      { id: "kcs", label: "자율안전확인신고 (KCs)" },
+    ],
+  },
+  {
+    id: "global",
+    label: "해외인증",
+    subs: [
+      { id: "na", label: "북아메리카" },
+      { id: "sa", label: "남아메리카" },
+      { id: "eu", label: "유럽" },
+      { id: "as", label: "아시아" },
+      { id: "af", label: "아프리카" },
+      { id: "oc", label: "오세아니아" },
+    ],
+  },
+  {
+    id: "support",
+    label: "고객지원",
+    subs: [
+      { id: "finder", label: "인증 대상 조회" },
+      { id: "track", label: "시험진행현황 조회" },
+      { id: "verify", label: "성적서 진위확인" },
+      { id: "quote", label: "견적문의" },
+      { id: "news", label: "새소식" },
+      { id: "files", label: "자료실" },
+      { id: "faq", label: "질의응답" },
+    ],
+  },
+];
+
+interface QuoteRow {
+  no: number;
+  std: string;
+  company: string;
+  date: string;
+  done: boolean;
+}
+
+interface Ctx {
+  route: Route;
+  go: (m: MenuId | "home", s?: string) => void;
+  openQuote: () => void;
+  quoteForm: boolean;
+  setQuoteForm: (v: boolean) => void;
+  certs: string[];
+  setCerts: (fn: (prev: string[]) => string[]) => void;
+  trackQuery: string;
+  setTrackQuery: (v: string) => void;
+  rows: QuoteRow[];
+  addRow: (r: QuoteRow) => void;
+  minute: number;
+}
+
+const ClCtx = createContext<Ctx | null>(null);
+function useCl() {
+  const c = useContext(ClCtx);
+  if (!c) throw new Error("CertLabDemo context");
+  return c;
+}
 
 /* ---------- 시간 ---------- */
 
@@ -128,7 +218,7 @@ const dayStart = (d: Date) => new Date(d.getFullYear(), d.getMonth(), d.getDate(
 
 const CHO = "ㄱㄲㄴㄷㄸㄹㅁㅂㅃㅅㅆㅇㅈㅉㅊㅋㅌㅍㅎ";
 
-/** 병원식 마스킹: 김하늘은 김ㅎ늘로 */
+/** 병원식 마스킹: 김하늘은 김ㅎ늘, 두 글자는 김* */
 function maskName(name: string) {
   const chars = [...name.trim()];
   if (chars.length < 2) return chars.join("");
@@ -136,7 +226,7 @@ function maskName(name: string) {
     const code = ch.charCodeAt(0) - 0xac00;
     return code >= 0 && code < 11172 ? CHO[Math.floor(code / 588)] : "*";
   };
-  if (chars.length === 2) return chars[0] + hide(chars[1]);
+  if (chars.length === 2) return `${chars[0]}*`;
   return chars.map((ch, i) => (i === 0 || i === chars.length - 1 ? ch : hide(ch))).join("");
 }
 
@@ -191,33 +281,80 @@ const LIMIT_PATH = `M${fx(30)} ${dy(40)} H${fx(230)} V${dy(47)} H${fx(1000)}`;
 const WORST = PEAKS.reduce((w, p) => (limitAt(p.f) - p.v < limitAt(w.f) - w.v ? p : w), PEAKS[0]);
 const WORST_MARGIN = (limitAt(WORST.f) - WORST.v).toFixed(1);
 
+/** 고객사 가리기: (주)한빛전자는 (주)한○○○ */
+function maskCompany(name: string) {
+  const v = name.trim();
+  const m = v.match(/^(\(주\)|주식회사\s*|㈜)?(.*)$/);
+  const prefix = m?.[1] ?? "";
+  const body = [...(m?.[2] ?? v)];
+  if (body.length < 2) return v;
+  return `${prefix}${body[0]}${"○".repeat(Math.min(4, body.length - 1))}`;
+}
+
 /* ---------- 페이지 ---------- */
+
+const QUOTE_ROWS: QuoteRow[] = [
+  { no: 684, std: "KC, CE", company: "(주)△△전자", date: "2026-10-06", done: false },
+  { no: 683, std: "FCC", company: "△△테크", date: "2026-10-05", done: true },
+  { no: 682, std: "KC", company: "(주)△△라이팅", date: "2026-10-02", done: true },
+  { no: 681, std: "KOLAS", company: "△△시스템", date: "2026-10-01", done: true },
+  { no: 680, std: "KC, FCC, CE", company: "(주)△△모빌리티", date: "2026-09-29", done: true },
+  { no: 679, std: "KCs", company: "△△기계", date: "2026-09-26", done: true },
+  { no: 678, std: "CE", company: "(주)△△메디칼", date: "2026-09-25", done: true },
+  { no: 677, std: "KC", company: "△△산업", date: "2026-09-23", done: true },
+];
 
 export function CertLabDemo() {
   const minute = useNowMinute();
+  const [route, setRoute] = useState<Route>({ m: "home", s: "" });
+  const [quoteForm, setQuoteForm] = useState(false);
   const [certs, setCerts] = useState<string[]>([]);
+  const [trackQuery, setTrackQuery] = useState("");
+  const [rows, setRows] = useState<QuoteRow[]>(QUOTE_ROWS);
+  const moved = useRef(false);
 
-  const addCerts = (names: string[]) => setCerts((prev) => [...prev, ...names.filter((n) => !prev.includes(n))]);
+  const go = (m: MenuId | "home", s?: string) => {
+    const sub = m === "home" ? "" : (s ?? MENUS.find((n) => n.id === m)!.subs[0].id);
+    moved.current = true;
+    setQuoteForm(false);
+    setRoute({ m, s: sub });
+    window.scrollTo({ top: 0 });
+  };
+
+  const key = `${route.m}/${route.s}`;
+  useEffect(() => {
+    if (!moved.current) return;
+    document.getElementById("cl-page-title")?.focus({ preventScroll: true });
+  }, [key]);
+
+  const ctx: Ctx = {
+    route,
+    go,
+    openQuote: () => {
+      go("support", "quote");
+      setQuoteForm(true);
+    },
+    quoteForm,
+    setQuoteForm,
+    certs,
+    setCerts,
+    trackQuery,
+    setTrackQuery,
+    rows,
+    addRow: (r) => setRows((prev) => [r, ...prev]),
+    minute,
+  };
 
   return (
-    <div className="min-h-screen text-[16px] leading-[1.7] md:text-[17px]" style={{ background: C.white, color: C.ink }}>
-      <Header />
-      <main>
-        <Hero />
-        <Services />
-        <Domestic />
-        <Finder onAdd={addCerts} />
-        <GlobalMap />
-        <Tracking minute={minute} />
-        <About />
-        <Facilities />
-        <Support minute={minute} />
-        <Quote certs={certs} setCerts={setCerts} />
-        <Recruit />
-        <Shipping />
-      </main>
-      <Footer />
-    </div>
+    <ClCtx.Provider value={ctx}>
+      <div className="min-h-screen text-[16px] leading-[1.7] md:text-[17px]" style={{ background: C.white, color: C.ink }}>
+        <UtilBar />
+        <Header />
+        <main>{route.m === "home" ? <Home /> : <SubPage key={key} m={route.m} s={route.s} />}</main>
+        <Footer />
+        <FloatingContact />
+      </div>
+    </ClCtx.Provider>
   );
 }
 
@@ -236,47 +373,118 @@ function Logo({ light = false }: { light?: boolean }) {
   );
 }
 
+function UtilBar() {
+  const { go } = useCl();
+  return (
+    <div className="hidden border-b px-6 md:block" style={{ borderColor: C.line, background: C.paper }}>
+      <ul className="mx-auto flex h-9 max-w-[1200px] items-center justify-end gap-5 text-[13px]" style={{ color: C.muted }}>
+        <li>
+          <button type="button" onClick={() => go("about", "impartiality")} className="hover:underline">
+            공평성 선언
+          </button>
+        </li>
+        <li>
+          <button type="button" onClick={() => go("about", "recruit")} className="hover:underline">
+            인재채용
+          </button>
+        </li>
+        <li>
+          <button type="button" onClick={() => go("about", "location")} className="hover:underline">
+            오시는 길
+          </button>
+        </li>
+        <li className="font-bold tabular-nums" style={{ color: C.indigo }}>
+          대표전화 {TEL}
+        </li>
+      </ul>
+    </div>
+  );
+}
+
 function Header() {
+  const { go, openQuote, route } = useCl();
+  const [drop, setDrop] = useState<MenuId | null>(null);
   const [open, setOpen] = useState(false);
+  const [acc, setAcc] = useState<MenuId | null>(null);
   const reduce = useReducedMotionSafe();
 
   useEffect(() => {
-    if (!open) return;
-    const onKey = (e: KeyboardEvent) => e.key === "Escape" && setOpen(false);
+    if (!drop && !open) return;
+    const onKey = (e: KeyboardEvent) => {
+      if (e.key !== "Escape") return;
+      setDrop(null);
+      setOpen(false);
+    };
     window.addEventListener("keydown", onKey);
     return () => window.removeEventListener("keydown", onKey);
-  }, [open]);
+  }, [drop, open]);
+
+  const pick = (m: MenuId, s?: string) => {
+    setDrop(null);
+    setOpen(false);
+    go(m, s);
+  };
 
   return (
-    <header className="sticky top-0 z-40 border-b bg-white/95 backdrop-blur" style={{ borderColor: C.line }}>
-      <div className="mx-auto flex h-16 max-w-[1200px] items-center justify-between gap-3 px-4 md:px-6">
-        <a href="#top" aria-label={`${COMPANY} 처음으로`} className="flex min-w-0">
+    <header className="sticky top-0 z-40 border-b bg-white" style={{ borderColor: C.line }}>
+      <div className="mx-auto flex h-16 max-w-[1200px] items-center justify-between gap-3 px-4 md:h-[72px] md:px-6">
+        <button type="button" onClick={() => go("home")} aria-label={`${COMPANY} 처음으로`} className="flex min-w-0">
           <Logo />
-        </a>
-        <nav aria-label="주 메뉴" className="hidden lg:block">
-          <ul className="flex items-center gap-7 text-[15px] font-semibold">
-            {NAV.map((n) => (
-              <li key={n.id}>
-                <a href={`#${n.id}`} className="transition-colors hover:text-[#06768c]" style={{ color: C.ink }}>
-                  {n.label}
-                </a>
-              </li>
-            ))}
+        </button>
+        <nav aria-label="주 메뉴" className="hidden h-full lg:block">
+          <ul className="flex h-full">
+            {MENUS.map((m) => {
+              const on = route.m === m.id;
+              const show = drop === m.id;
+              return (
+                <li
+                  key={m.id}
+                  className="relative h-full"
+                  onMouseEnter={() => setDrop(m.id)}
+                  onMouseLeave={() => setDrop(null)}
+                  onFocus={() => setDrop(m.id)}
+                  onBlur={(e) => {
+                    if (!e.currentTarget.contains(e.relatedTarget as Node | null)) setDrop((d) => (d === m.id ? null : d));
+                  }}
+                >
+                  <button
+                    type="button"
+                    onClick={() => pick(m.id)}
+                    aria-current={on ? "true" : undefined}
+                    className="flex h-full items-center px-5 text-[17px] font-bold xl:px-7"
+                    style={{ color: on || show ? C.indigo : C.ink }}
+                  >
+                    {m.label}
+                  </button>
+                  {show && (
+                    <ul className="absolute left-1/2 top-full z-10 w-[220px] -translate-x-1/2 rounded-b-[10px] border border-t-2 bg-white py-2 shadow-[0_10px_24px_rgba(20,26,51,0.12)]" style={{ borderColor: C.line, borderTopColor: C.indigo }}>
+                      {m.subs.map((sub) => {
+                        const cur = route.m === m.id && route.s === sub.id;
+                        return (
+                          <li key={sub.id}>
+                            <button
+                              type="button"
+                              onClick={() => pick(m.id, sub.id)}
+                              aria-current={cur ? "page" : undefined}
+                              className="w-full px-5 py-2 text-left text-[15px] hover:bg-[#f4f7fb]"
+                              style={{ color: cur ? C.indigo : C.ink, fontWeight: cur ? 700 : 400 }}
+                            >
+                              {sub.label}
+                            </button>
+                          </li>
+                        );
+                      })}
+                    </ul>
+                  )}
+                </li>
+              );
+            })}
           </ul>
         </nav>
         <div className="flex shrink-0 items-center gap-1.5">
-          <a
-            href="#track"
-            aria-label="시험 진행 조회"
-            title="시험 진행 조회"
-            className="inline-flex h-10 w-10 items-center justify-center rounded-[8px] border transition-colors hover:border-[#0aa2c0]"
-            style={{ borderColor: C.line, color: C.indigo }}
-          >
-            <Activity size={19} aria-hidden />
-          </a>
-          <a href="#quote" className="hidden h-10 items-center rounded-[8px] px-4 text-[15px] font-bold md:inline-flex" style={{ background: C.indigo, color: C.white }}>
-            견적 문의
-          </a>
+          <button type="button" onClick={openQuote} className="hidden h-10 items-center rounded-[8px] px-4 text-[15px] font-bold md:inline-flex" style={{ background: C.indigo, color: C.white }}>
+            견적문의
+          </button>
           <button
             type="button"
             className="inline-flex h-11 w-11 items-center justify-center rounded-[8px] lg:hidden"
@@ -294,24 +502,45 @@ function Header() {
           <motion.nav
             id="certlab-menu"
             aria-label="주 메뉴"
-            className="overflow-hidden border-t lg:hidden"
+            className="max-h-[calc(100vh-64px)] overflow-y-auto border-t lg:hidden"
             style={{ borderColor: C.line }}
             initial={reduce ? false : { height: 0 }}
             animate={{ height: "auto" }}
             exit={reduce ? { opacity: 0 } : { height: 0 }}
             transition={{ duration: 0.26, ease: EASE }}
           >
-            <ul className="mx-auto grid max-w-[1200px] grid-cols-2 gap-x-4 px-4 py-2 md:px-6">
-              {[...NAV, ...MOBILE_EXTRA].map((n) => (
-                <li key={n.id} className="border-b" style={{ borderColor: C.paper }}>
-                  <a href={`#${n.id}`} onClick={() => setOpen(false)} className="flex h-12 items-center text-[17px]">
-                    {n.label}
-                  </a>
-                </li>
-              ))}
-              <li className="col-span-2">
+            <ul className="mx-auto max-w-[1200px] px-4 py-2 md:px-6">
+              {MENUS.map((m) => {
+                const expanded = acc === m.id;
+                return (
+                  <li key={m.id} className="border-b" style={{ borderColor: C.paper }}>
+                    <button
+                      type="button"
+                      aria-expanded={expanded}
+                      aria-controls={`cl-acc-${m.id}`}
+                      onClick={() => setAcc(expanded ? null : m.id)}
+                      className="flex h-12 w-full items-center justify-between text-[17px] font-bold"
+                    >
+                      {m.label}
+                      <ChevronDown size={20} className="transition-transform" style={{ transform: expanded ? "rotate(180deg)" : undefined, color: C.muted }} aria-hidden />
+                    </button>
+                    {expanded && (
+                      <ul id={`cl-acc-${m.id}`} className="mb-2 rounded-[8px] px-3 py-1" style={{ background: C.paper }}>
+                        {m.subs.map((sub) => (
+                          <li key={sub.id}>
+                            <button type="button" onClick={() => pick(m.id, sub.id)} className="flex min-h-11 w-full items-center text-left text-[15px]" style={{ color: C.muted }}>
+                              {sub.label}
+                            </button>
+                          </li>
+                        ))}
+                      </ul>
+                    )}
+                  </li>
+                );
+              })}
+              <li>
                 <a href={`tel:${TEL}`} className="flex h-12 items-center text-[17px] font-bold tabular-nums" style={{ color: C.indigo }}>
-                  대표 전화 {TEL}
+                  대표전화 {TEL}
                 </a>
               </li>
             </ul>
@@ -322,7 +551,51 @@ function Header() {
   );
 }
 
-/* ---------- 첫 화면 ---------- */
+/** 화면 오른쪽 상담 버튼. 사이트 공용 버튼(오른쪽 아래 80px)을 피해 그 위에 둔다. */
+function FloatingContact() {
+  const { openQuote } = useCl();
+  const [kakao, setKakao] = useState(false);
+
+  useEffect(() => {
+    if (!kakao) return;
+    const onKey = (e: KeyboardEvent) => e.key === "Escape" && setKakao(false);
+    window.addEventListener("keydown", onKey);
+    return () => window.removeEventListener("keydown", onKey);
+  }, [kakao]);
+
+  const item = "flex h-12 w-12 flex-col items-center justify-center gap-0.5 text-[11px] font-bold leading-none md:h-[64px] md:w-[64px] md:text-[12px]";
+  return (
+    <div id="cl-float" role="group" aria-label="상담" className="fixed bottom-[104px] right-2 z-30 print:hidden md:right-4">
+      <div className="relative flex flex-col overflow-hidden rounded-[10px] border shadow-[0_6px_18px_rgba(20,26,51,0.16)]" style={{ borderColor: C.line, background: C.white }}>
+        <button type="button" onClick={openQuote} className={item} style={{ background: C.indigo, color: C.white }}>
+          <ClipboardList size={20} aria-hidden />
+          <span className="sr-only md:not-sr-only">견적문의</span>
+        </button>
+        <a href={`tel:${TEL}`} className={`${item} border-b`} style={{ color: C.indigo, borderColor: C.line }}>
+          <Phone size={19} aria-hidden />
+          <span className="sr-only md:not-sr-only">전화연결</span>
+        </a>
+        <button type="button" onClick={() => setKakao((v) => !v)} aria-expanded={kakao} aria-controls="cl-kakao" className={item} style={{ color: C.indigo }}>
+          <MessageCircle size={19} aria-hidden />
+          <span className="sr-only md:not-sr-only">카톡상담</span>
+        </button>
+      </div>
+      {kakao && (
+        <div id="cl-kakao" className="absolute bottom-0 right-full mr-2 w-[220px] rounded-[10px] border bg-white p-4 text-[14px] leading-[1.55] shadow-[0_6px_18px_rgba(20,26,51,0.16)]" style={{ borderColor: C.line }}>
+          <p className="font-bold">카카오톡 상담</p>
+          <p className="mt-1" style={{ color: C.muted }}>
+            카카오톡에서 &lsquo;○○시험인증원&rsquo; 채널을 추가해 주십시오. {HOURS}
+          </p>
+          <button type="button" onClick={() => setKakao(false)} className="mt-2 inline-flex h-9 items-center rounded-[6px] border px-3 text-[13px] font-bold" style={{ borderColor: C.line }}>
+            닫기
+          </button>
+        </div>
+      )}
+    </div>
+  );
+}
+
+/* ---------- 메인 ---------- */
 
 /** 측정 파형 모티프. 기준선(점선) 아래로 측정값이 지나간다. */
 function WaveMotif({ className = "", opacity = 1 }: { className?: string; opacity?: number }) {
@@ -334,92 +607,781 @@ function WaveMotif({ className = "", opacity = 1 }: { className?: string; opacit
   );
 }
 
-function Hero() {
-  const quick = [
-    { id: "finder", icon: Search, title: "필요한 인증 찾기", sub: "전원, 무선, 판매 국가로 확인" },
-    { id: "track", icon: Activity, title: "시험 진행 조회", sub: "접수번호로 단계와 결과 확인" },
-    { id: "global", icon: Globe, title: "해외인증 안내", sub: "대륙별 국가와 인증 이름" },
-    { id: "support", icon: FileText, title: "자료실", sub: "신청서 양식, 준비 서류" },
+const BOARD: { tab: "news" | "files"; title: string; date: string; body: string; file?: string }[] = [
+  { tab: "news", title: "공평성 선언문 게시", date: "2026-09-30", body: "시험·인증 업무의 공평성을 지키기 위한 선언문을 회사소개 공평성 선언 화면에 게시했습니다." },
+  { tab: "news", title: "고객불만 처리 절차 안내", date: "2026-09-24", body: "고객불만은 전화, 이메일, 서면으로 접수하며 접수 후 14일 이내에 처리 결과를 알려 드립니다. 자세한 절차는 회사소개 고객불만 처리 절차 화면에서 확인하실 수 있습니다." },
+  { tab: "news", title: "추석 연휴 시료 접수 및 성적서 발행 일정 안내", date: "2026-09-15", body: "10월 3일부터 10월 9일까지 시료 접수와 성적서 발행을 쉽니다. 연휴 중 도착한 시료는 10월 12일에 차례로 접수합니다." },
+  { tab: "news", title: "전파법 시행령 개정에 따른 적합성평가 절차 변경 안내", date: "2026-08-28", body: "개정 시행령에 따라 일부 품목의 적합성평가 구분이 바뀝니다. 해당 품목은 담당 시험원이 개별로 안내해 드립니다." },
+  { tab: "news", title: "3m 전파무향실 정기 검증에 따른 시험 일정 조정 안내", date: "2026-08-12", body: "8월 25일부터 8월 27일까지 무향실 정기 검증으로 방사 시험을 쉽니다. 해당 기간 예약 건은 일정을 다시 잡아 연락드립니다." },
+  { tab: "news", title: "△△진흥원 중소기업 인증 지원사업 참여기업 모집 공고", date: "2026-07-21", body: "중소기업의 국내·해외 인증 비용 일부를 지원하는 사업입니다. 신청 서류 작성은 견적문의로 요청하시면 도와 드립니다." },
+  { tab: "files", title: "시험항목별 수수료 및 시험처리기간 안내", date: "2026-09-20", body: "전자파, 무선, 전기안전 시험 항목별 기본 수수료와 처리 기간입니다.", file: "PDF · 412KB" },
+  { tab: "files", title: "[서식] 시험신청서", date: "2026-09-02", body: "시험 신청 시 시료와 함께 보내 주십시오.", file: "HWP · 48KB" },
+  { tab: "files", title: "중소기업 시험수수료 할인 안내", date: "2026-08-18", body: "중소기업 확인서를 내시면 시험수수료를 할인해 드립니다.", file: "PDF · 186KB" },
+  { tab: "files", title: "[서식] 시료 정보 및 시험 모드 기재표", date: "2026-07-30", body: "시료의 동작 모드와 연결 방법을 적어 주십시오.", file: "XLSX · 31KB" },
+  { tab: "files", title: "무선기기 적합인증 제출 기술 문서 목록", date: "2026-07-02", body: "적합인증 신청에 필요한 기술 문서 목록입니다.", file: "PDF · 286KB" },
+  { tab: "files", title: "해외인증 국가별 표시 방법 정리", date: "2026-05-27", body: "국가별 인증 마크와 표시 위치를 정리했습니다.", file: "PDF · 1.2MB" },
+];
+
+const MARKS: { name: string; to: [MenuId, string] }[] = [
+  { name: "KC", to: ["domestic", "conform"] },
+  { name: "KCs", to: ["domestic", "kcs"] },
+  { name: "CE", to: ["global", "eu"] },
+  { name: "UKCA", to: ["global", "eu"] },
+  { name: "FCC", to: ["global", "na"] },
+  { name: "ISED", to: ["global", "na"] },
+  { name: "NRTL", to: ["global", "na"] },
+  { name: "NOM", to: ["global", "na"] },
+  { name: "PSE", to: ["global", "as"] },
+  { name: "TELEC", to: ["global", "as"] },
+  { name: "CCC", to: ["global", "as"] },
+  { name: "BIS", to: ["global", "as"] },
+  { name: "RCM", to: ["global", "oc"] },
+  { name: "ANATEL", to: ["global", "sa"] },
+];
+
+function Home() {
+  const { go, openQuote, setTrackQuery } = useCl();
+  const [no, setNo] = useState(SAMPLE_NO);
+
+  const tools = [
+    { icon: Search, label: "인증 대상 조회", to: () => go("support", "finder") },
+    { icon: Activity, label: "시험진행현황 조회", to: () => go("support", "track") },
+    { icon: ShieldCheck, label: "성적서 진위확인", to: () => go("support", "verify") },
+    { icon: FileText, label: "신청서 양식", to: () => go("support", "files") },
+    { icon: ClipboardList, label: "견적문의", to: openQuote },
+  ];
+
+  const quick = (e: FormEvent) => {
+    e.preventDefault();
+    setTrackQuery(no);
+    go("support", "track");
+  };
+
+  const banners = [
+    { title: "시험시설", sub: "3m 전파무향실 30MHz ~ 18GHz", img: `${IMG}/hero.jpg`, to: () => go("about", "facility") },
+    { title: "시료 접수 안내", sub: "평일 17시까지 도착분 당일 접수", img: `${IMG}/lab.jpg`, to: () => go("about", "location") },
+    { title: "시험수수료 안내", sub: "시험항목별 수수료와 처리기간", img: null, to: () => go("support", "files") },
+    { title: "질의응답", sub: "시험 기간, 시료 수량, 재시험", img: null, to: () => go("support", "faq") },
   ];
 
   return (
-    <section id="top" className="relative overflow-hidden px-4 pb-12 pt-10 md:px-6 md:pb-16 md:pt-14" style={{ background: C.paper, ...GRAPH }}>
-      <WaveMotif className="pointer-events-none absolute inset-x-0 bottom-[118px] h-[120px] w-full md:bottom-[96px] md:h-[160px]" opacity={0.5} />
-      <div className="relative mx-auto max-w-[1200px]">
-        <div className="grid items-center gap-9 md:grid-cols-[1fr_1.15fr] md:gap-12">
-          <div>
-            <p className="text-[15px] font-bold" style={{ color: C.cyanText }}>
-              전파법 지정시험기관 · ISO/IEC 17025 인정 시험소
-            </p>
-            <h1 className="mt-3 text-[34px] font-bold leading-[1.25] tracking-[-0.03em] md:text-[50px]">{COMPANY}</h1>
-            <p className="mt-5 max-w-[520px] text-[16px] md:text-[18px]" style={{ color: C.muted }}>
-              전자파(EMC), 무선(RF), 전기안전 시험을 직접 하고 KC 인증과 해외 인증 신청까지 맡습니다. 시료를 보내신 뒤에는 접수번호로 시험이 어디까지 왔는지 확인할 수 있습니다.
-            </p>
-            <div className="mt-8 flex flex-wrap gap-3">
-              <a href="#finder" className="inline-flex h-12 items-center gap-2 rounded-[8px] px-6 font-bold" style={{ background: C.indigo, color: C.white }}>
-                <Search size={18} aria-hidden />
-                필요한 인증 찾기
-              </a>
-              <a href="#quote" className="inline-flex h-12 items-center rounded-[8px] border bg-white px-6 font-bold" style={{ borderColor: C.line, color: C.indigo }}>
-                견적 문의
-              </a>
+    <>
+      <section id="cl-tools" aria-labelledby="cl-page-title" className="relative overflow-hidden px-4 md:px-6" style={{ background: C.indigoDeep, color: C.white }}>
+        <WaveMotif className="pointer-events-none absolute inset-x-0 top-6 h-[120px] w-full md:h-[150px]" opacity={0.22} />
+        <div className="relative mx-auto max-w-[1200px] pb-6 pt-8 md:pb-8 md:pt-12">
+          <div className="grid items-end gap-7 lg:grid-cols-[1fr_440px] lg:gap-12">
+            <div>
+              <h1 id="cl-page-title" tabIndex={-1} className="text-[30px] font-bold leading-[1.25] tracking-[-0.03em] outline-none md:text-[42px]">
+                {COMPANY}
+              </h1>
+              <p className="mt-2 text-[16px] font-bold md:text-[18px]" style={{ color: C.cyan }}>
+                KC인증 지정시험기관 · KOLAS 공인시험기관
+              </p>
+              <p className="mt-2 max-w-[560px] text-[15px] md:text-[17px]" style={{ color: "#c8cdea" }}>
+                전자파(EMC), 무선(RF), 전기안전 시험과 국내·해외 인증 업무를 합니다.
+              </p>
             </div>
+            <form id="cl-track-quick" onSubmit={quick} className="rounded-[10px] bg-white p-4 md:p-5" style={{ color: C.ink }}>
+              <label htmlFor="cl-quick-no" className="flex items-center gap-2 text-[16px] font-bold">
+                <Activity size={18} style={{ color: C.cyanText }} aria-hidden />
+                시험진행현황 조회
+              </label>
+              <div className="mt-2.5 flex gap-2">
+                <input
+                  id="cl-quick-no"
+                  value={no}
+                  onChange={(e) => setNo(e.target.value)}
+                  placeholder="접수번호"
+                  autoComplete="off"
+                  className="h-12 min-w-0 flex-1 rounded-[8px] border px-3 text-[16px] font-semibold tabular-nums outline-none focus:border-[#23307a]"
+                  style={{ borderColor: C.line }}
+                />
+                <button type="submit" className="inline-flex h-12 shrink-0 items-center gap-1.5 rounded-[8px] px-4 font-bold" style={{ background: C.indigo, color: C.white }}>
+                  <Search size={17} aria-hidden />
+                  조회
+                </button>
+              </div>
+            </form>
           </div>
-          <div className="relative">
-            <div className="relative aspect-[1344/768] overflow-hidden rounded-[10px] border" style={{ borderColor: C.line }}>
-              <Image
-                src={`${IMG}/hero.jpg`}
-                alt="파란 피라미드형 흡수체로 둘러싸인 전파무향실 안 턴테이블 위에 시험할 기기가 놓여 있다"
-                fill
-                priority
-                sizes="(min-width: 768px) 55vw, 100vw"
-                className="object-cover"
-              />
-            </div>
-            <p className="absolute bottom-3 left-3 inline-flex items-center gap-2 rounded-[8px] bg-white/95 px-3 py-1.5 text-[13px] font-semibold md:text-[14px]" style={{ color: C.indigo }}>
-              <span className="h-2 w-2 rounded-full" style={{ background: C.cyan }} aria-hidden />
-              3m 전파무향실 <span className="tabular-nums">30MHz ~ 18GHz</span>
-            </p>
-          </div>
-        </div>
 
-        <ul className="mt-12 grid grid-cols-2 gap-2.5 md:mt-14 md:grid-cols-4 md:gap-3">
-          {quick.map((q) => (
-            <li key={q.id}>
-              <a
-                href={`#${q.id}`}
-                className="group flex h-full items-start gap-3 rounded-[10px] border bg-white p-3.5 transition-colors hover:border-[#0aa2c0] md:p-4"
-                style={{ borderColor: C.line }}
+          <ul aria-label="온라인 서비스" className="mt-7 grid grid-cols-5 gap-px overflow-hidden rounded-[10px] md:mt-10" style={{ background: "rgba(255,255,255,0.14)" }}>
+            {tools.map((t) => (
+              <li key={t.label} style={{ background: C.indigo }}>
+                <button type="button" onClick={t.to} className="flex h-full w-full flex-col items-center justify-start gap-2 px-1 py-3.5 text-center hover:bg-[#2c3a8f] md:flex-row md:justify-center md:gap-2.5 md:py-5">
+                  <t.icon size={22} style={{ color: C.cyan }} aria-hidden />
+                  <span className="text-[12px] font-bold leading-[1.3] sm:text-[13px] md:text-[16px]">{t.label}</span>
+                </button>
+              </li>
+            ))}
+          </ul>
+        </div>
+      </section>
+
+      <section id="cl-boards" aria-label="새소식, 자료실" className="px-4 py-10 md:px-6 md:py-14">
+        <div className="mx-auto grid max-w-[1200px] gap-10 md:grid-cols-2 md:gap-8">
+          {(
+            [
+              ["news", "새소식"],
+              ["files", "자료실"],
+            ] as const
+          ).map(([tab, title]) => (
+            <div key={tab} className="min-w-0">
+              <div className="flex items-center justify-between border-b-2 pb-2.5" style={{ borderColor: C.indigo }}>
+                <h2 className="text-[21px] font-bold tracking-[-0.02em]">{title}</h2>
+                <button type="button" onClick={() => go("support", tab)} className="inline-flex h-9 items-center gap-1 text-[14px] font-bold" style={{ color: C.muted }} aria-label={`${title} 더보기`}>
+                  더보기
+                  <Plus size={15} aria-hidden />
+                </button>
+              </div>
+              <ul>
+                {BOARD.filter((b) => b.tab === tab)
+                  .slice(0, 4)
+                  .map((b) => (
+                    <li key={b.title} className="border-b" style={{ borderColor: C.line }}>
+                      <button type="button" onClick={() => go("support", tab)} className="flex w-full items-center gap-3 py-3 text-left text-[15px] hover:text-[#23307a]">
+                        {b.file && <FileText size={16} className="shrink-0" style={{ color: C.cyanText }} aria-hidden />}
+                        <span className="min-w-0 flex-1 truncate">{b.title}</span>
+                        <span className="shrink-0 text-[13px] tabular-nums" style={{ color: C.muted }}>
+                          {b.date.replaceAll("-", ".")}
+                        </span>
+                      </button>
+                    </li>
+                  ))}
+              </ul>
+            </div>
+          ))}
+        </div>
+      </section>
+
+      <section aria-label="바로가기" className="px-4 md:px-6">
+        <ul className="mx-auto grid max-w-[1200px] grid-cols-2 gap-3 lg:grid-cols-4">
+          {banners.map((b, i) => (
+            <li key={b.title}>
+              <button
+                type="button"
+                onClick={b.to}
+                className="relative flex h-[120px] w-full flex-col justify-end overflow-hidden rounded-[10px] border p-4 text-left md:h-[150px] md:p-5"
+                style={b.img ? { borderColor: C.indigoDeep, color: C.white } : i === 2 ? { background: C.cyanSoft, borderColor: C.cyanSoft } : { background: C.paper, borderColor: C.line }}
               >
-                <span className="inline-flex h-9 w-9 shrink-0 items-center justify-center rounded-[8px]" style={{ background: C.indigoSoft, color: C.indigo }}>
-                  <q.icon size={18} aria-hidden />
+                {b.img && (
+                  <>
+                    <Image src={b.img} alt="" fill sizes="(min-width: 1024px) 25vw, 50vw" className="object-cover" />
+                    <span className="absolute inset-0" style={{ background: "linear-gradient(180deg, rgba(24,33,90,0.2) 0%, rgba(24,33,90,0.85) 100%)" }} aria-hidden />
+                  </>
+                )}
+                <span className="relative flex items-center gap-1 text-[17px] font-bold md:text-[19px]">
+                  {b.title}
+                  <ChevronRight size={18} aria-hidden />
                 </span>
-                <span className="min-w-0">
-                  <span className="block text-[15px] font-bold leading-[1.35] md:text-[16px]">{q.title}</span>
-                  <span className="mt-0.5 hidden text-[13px] leading-[1.4] sm:block" style={{ color: C.muted }}>
-                    {q.sub}
-                  </span>
+                <span className="relative mt-0.5 text-[13px] leading-[1.4] md:text-[14px]" style={{ color: b.img ? "#dfe3f5" : C.muted }}>
+                  {b.sub}
                 </span>
-              </a>
+              </button>
             </li>
           ))}
         </ul>
-      </div>
-    </section>
+      </section>
+
+      <section aria-labelledby="cl-marks" className="px-4 py-10 md:px-6 md:py-14">
+        <div className="mx-auto max-w-[1200px] rounded-[10px] border p-5 md:flex md:items-start md:gap-8 md:p-6" style={{ borderColor: C.line }}>
+          <h2 id="cl-marks" className="shrink-0 text-[18px] font-bold md:w-[120px] md:pt-1.5">
+            인증 서비스
+          </h2>
+          <ul className="mt-3 flex flex-wrap gap-2 md:mt-0">
+            {MARKS.map((mk) => (
+              <li key={mk.name}>
+                <button
+                  type="button"
+                  onClick={() => go(mk.to[0], mk.to[1])}
+                  className="inline-flex h-10 min-w-[64px] items-center justify-center rounded-[8px] border px-3 text-[15px] font-bold tracking-[0.02em] hover:border-[#0aa2c0]"
+                  style={{ borderColor: C.line, color: C.indigo }}
+                >
+                  {mk.name}
+                </button>
+              </li>
+            ))}
+          </ul>
+        </div>
+      </section>
+    </>
   );
 }
 
-function SectionHead({ id, title, desc, light = false }: { id: string; title: string; desc?: string; light?: boolean }) {
+/* ---------- 하위 화면 틀 ---------- */
+
+function SubPage({ m, s: subId }: { m: MenuId; s: string }) {
+  const { go } = useCl();
+  const menu = MENUS.find((n) => n.id === m)!;
+  const sub = menu.subs.find((n) => n.id === subId) ?? menu.subs[0];
+
+  return (
+    <>
+      <section className="border-b px-4 md:px-6" style={{ background: C.paper, borderColor: C.line, ...GRAPH }}>
+        <div className="mx-auto flex max-w-[1200px] flex-col gap-2 py-7 md:flex-row md:items-end md:justify-between md:py-10">
+          <h1 className="text-[28px] font-bold tracking-[-0.03em] md:text-[36px]" style={{ color: C.indigoDeep }}>
+            {menu.label}
+          </h1>
+          <nav aria-label="현재 위치">
+            <ol className="flex flex-wrap items-center gap-1 text-[13px] md:text-[14px]" style={{ color: C.muted }}>
+              <li>
+                <button type="button" onClick={() => go("home")} className="inline-flex h-8 items-center gap-1">
+                  <House size={14} aria-hidden />
+                  HOME
+                </button>
+              </li>
+              <li className="inline-flex items-center gap-1">
+                <ChevronRight size={14} aria-hidden />
+                <button type="button" onClick={() => go(m)} className="inline-flex h-8 items-center">
+                  {menu.label}
+                </button>
+              </li>
+              <li className="inline-flex items-center gap-1">
+                <ChevronRight size={14} aria-hidden />
+                <span aria-current="page" className="font-bold" style={{ color: C.ink }}>
+                  {sub.label}
+                </span>
+              </li>
+            </ol>
+          </nav>
+        </div>
+      </section>
+
+      <div className="px-4 py-8 md:px-6 md:py-12">
+        <div className="mx-auto grid max-w-[1200px] items-start gap-10 lg:grid-cols-[240px_1fr]">
+          <aside className="hidden lg:sticky lg:top-[96px] lg:block">
+            <nav aria-label="하위 메뉴" className="overflow-hidden rounded-[10px] border" style={{ borderColor: C.line }}>
+              <p className="px-5 py-4 text-[19px] font-bold" style={{ background: C.indigo, color: C.white }}>
+                {menu.label}
+              </p>
+              <ul>
+                {menu.subs.map((n) => {
+                  const on = n.id === sub.id;
+                  return (
+                    <li key={n.id} className="border-t" style={{ borderColor: C.line }}>
+                      <button
+                        type="button"
+                        onClick={() => go(m, n.id)}
+                        aria-current={on ? "page" : undefined}
+                        className="flex min-h-12 w-full items-center justify-between gap-2 px-5 py-2.5 text-left text-[15px]"
+                        style={on ? { background: C.indigoSoft, color: C.indigo, fontWeight: 700 } : { color: C.ink }}
+                      >
+                        {n.label}
+                        {on && <ChevronRight size={16} className="shrink-0" aria-hidden />}
+                      </button>
+                    </li>
+                  );
+                })}
+              </ul>
+            </nav>
+            <ContactBox className="mt-4" />
+          </aside>
+
+          <div className="min-w-0">
+            <div className="mb-6 lg:hidden">
+              <label htmlFor="cl-lnb" className="sr-only">
+                {menu.label} 하위 메뉴
+              </label>
+              <span className="relative block">
+                <select
+                  id="cl-lnb"
+                  value={sub.id}
+                  onChange={(e) => go(m, e.target.value)}
+                  className="h-12 w-full appearance-none rounded-[8px] border bg-white pl-4 pr-10 text-[16px] font-bold outline-none focus:border-[#23307a]"
+                  style={{ borderColor: C.indigo, color: C.indigo }}
+                >
+                  {menu.subs.map((n) => (
+                    <option key={n.id} value={n.id}>
+                      {n.label}
+                    </option>
+                  ))}
+                </select>
+                <ChevronDown size={20} className="pointer-events-none absolute right-3 top-1/2 -translate-y-1/2" style={{ color: C.indigo }} aria-hidden />
+              </span>
+            </div>
+            <h2 id="cl-page-title" tabIndex={-1} className="border-b-2 pb-3 text-[24px] font-bold tracking-[-0.03em] outline-none md:text-[30px]" style={{ borderColor: C.ink }}>
+              {sub.label}
+            </h2>
+            <div className="mt-6 md:mt-8">
+              <PageBody m={m} s={sub.id} />
+            </div>
+            <ContactBox className="mt-12 lg:hidden" />
+          </div>
+        </div>
+      </div>
+    </>
+  );
+}
+
+function ContactBox({ className = "" }: { className?: string }) {
+  const { openQuote } = useCl();
+  return (
+    <div className={`rounded-[10px] border p-5 ${className}`} style={{ borderColor: C.line, background: C.paper }}>
+      <p className="text-[15px] font-bold">상담 안내</p>
+      <a href={`tel:${TEL}`} className="mt-1 block text-[24px] font-bold tabular-nums tracking-[-0.02em]" style={{ color: C.indigo }}>
+        {TEL}
+      </a>
+      <p className="text-[14px] tabular-nums" style={{ color: C.muted }}>
+        {HOURS}
+        <br />
+        {EMAIL}
+      </p>
+      <button type="button" onClick={openQuote} className="mt-3 inline-flex h-11 w-full items-center justify-center rounded-[8px] text-[15px] font-bold" style={{ background: C.indigo, color: C.white }}>
+        견적문의
+      </button>
+    </div>
+  );
+}
+
+function PageBody({ m, s: sub }: { m: MenuId; s: string }) {
+  switch (`${m}/${sub}`) {
+    case "about/greeting":
+      return <Greeting />;
+    case "about/accredit":
+      return <Accredit />;
+    case "about/facility":
+      return <Facilities />;
+    case "about/impartiality":
+      return <Impartiality />;
+    case "about/complaint":
+      return <Complaint />;
+    case "about/recruit":
+      return <Recruit />;
+    case "about/location":
+      return <Location />;
+    case "support/finder":
+      return <Finder />;
+    case "support/track":
+      return <Tracking />;
+    case "support/verify":
+      return <Verify />;
+    case "support/quote":
+      return <Quote />;
+    case "support/news":
+      return <Board tab="news" />;
+    case "support/files":
+      return <Board tab="files" />;
+    case "support/faq":
+      return <Faq />;
+  }
+  if (m === "services") return <ServicePage id={sub} />;
+  if (m === "domestic") return <DomesticPage id={sub} />;
+  if (m === "global") return <GlobalPage id={sub as RegionId} />;
+  return null;
+}
+
+/* ---------- 공용 표 ---------- */
+
+function DataTable({ caption, head, rows, min = 520 }: { caption: string; head: string[]; rows: ReactNode[][]; min?: number }) {
+  return (
+    <div className="overflow-x-auto border-t-2" style={{ borderColor: C.indigo }}>
+      <table className="w-full border-collapse text-left text-[15px]" style={{ minWidth: min }}>
+        <caption className="sr-only">{caption}</caption>
+        <thead>
+          <tr style={{ background: C.paper }}>
+            {head.map((h) => (
+              <th key={h} scope="col" className="border-b px-4 py-3 text-[14px] font-bold" style={{ borderColor: C.line }}>
+                {h}
+              </th>
+            ))}
+          </tr>
+        </thead>
+        <tbody>
+          {rows.map((r, ri) => (
+            <tr key={ri} className="border-b align-top" style={{ borderColor: C.line }}>
+              {r.map((cell, ci) =>
+                ci === 0 ? (
+                  <th key={ci} scope="row" className="px-4 py-3.5 font-bold" style={{ color: C.indigo }}>
+                    {cell}
+                  </th>
+                ) : (
+                  <td key={ci} className="px-4 py-3.5">
+                    {cell}
+                  </td>
+                ),
+              )}
+            </tr>
+          ))}
+        </tbody>
+      </table>
+    </div>
+  );
+}
+
+function InfoList({ rows }: { rows: [string, ReactNode][] }) {
+  return (
+    <dl className="border-t-2 text-[15px] md:text-[16px]" style={{ borderColor: C.indigo }}>
+      {rows.map(([k, v]) => (
+        <div key={k} className="grid grid-cols-[96px_1fr] border-b md:grid-cols-[150px_1fr]" style={{ borderColor: C.line }}>
+          <dt className="px-3 py-3 font-bold md:px-5" style={{ background: C.paper }}>
+            {k}
+          </dt>
+          <dd className="min-w-0 px-3 py-3 md:px-5">{v}</dd>
+        </div>
+      ))}
+    </dl>
+  );
+}
+
+function SubHead({ id, children }: { id?: string; children: ReactNode }) {
+  return (
+    <h3 id={id} className="scroll-mt-28 text-[19px] font-bold tracking-[-0.02em] md:text-[21px]">
+      {children}
+    </h3>
+  );
+}
+
+/* ---------- 회사소개 ---------- */
+
+function Greeting() {
+  return (
+    <div className="max-w-[820px]">
+      <div className="relative aspect-[21/9] overflow-hidden rounded-[10px]">
+        <Image src={`${IMG}/lab.jpg`} alt="스펙트럼 분석기와 오실로스코프가 놓인 전자 시험대" fill sizes="(min-width: 1024px) 820px, 100vw" className="object-cover" />
+      </div>
+      <div className="mt-8 space-y-4">
+        <p className="text-[19px] font-bold leading-[1.6]">{COMPANY} 홈페이지를 찾아 주셔서 감사합니다.</p>
+        <p>{COMPANY}은 전자파 시험실 하나로 시작해 지금은 무선, 전기안전, 해외인증까지 맡는 KC인증 지정시험기관이자 KOLAS 공인시험기관입니다.</p>
+        <p>시료가 들어온 날 시험 일정을 정해 알려 드리고, 기준을 넘는 항목이 나오면 원인 주파수와 대책을 함께 말씀드립니다. 처음 인증을 받는 회사도 서류 준비부터 차례로 안내해 드립니다.</p>
+        <p className="pt-4 text-right font-bold">대표이사 김○○</p>
+      </div>
+    </div>
+  );
+}
+
+const ACCREDIT: [string, string, string, string][] = [
+  ["KC인증 지정시험기관", "전자파 적합성(EMC), 무선기기(RF)", "제KT0000호", "△△연구원"],
+  ["KOLAS 공인시험기관", "전기·전자, 전자파 (ISO/IEC 17025)", "제KT0000호", "△△인정기구"],
+  ["전기용품 안전 시험기관", "가정용 전기기기, 조명기기, 정보기기", "제0000-00호", "△△원"],
+  ["에너지 효율 시험기관", "조명기기, 전원 장치", "제0000-000호", "△△공단"],
+  ["해외 인증기관 협력 시험소", "북미, 유럽 인증 시험", "협약 2건", "△△ 인증기관"],
+];
+
+function Accredit() {
   return (
     <div>
-      <h2 id={id} className="text-[27px] font-bold leading-[1.35] tracking-[-0.03em] md:text-[36px]">
-        {title}
-      </h2>
-      {desc && (
-        <p className="mt-3 max-w-[700px]" style={{ color: light ? "#c8cdea" : C.muted }}>
-          {desc}
-        </p>
+      <DataTable caption="인정 및 지정 현황" head={["구분", "분야", "지정·인정 번호", "지정기관"]} rows={ACCREDIT.map((r) => [r[0], r[1], <span key="n" className="tabular-nums">{r[2]}</span>, r[3]])} min={620} />
+      <p className="mt-4 text-[14px]" style={{ color: C.muted }}>
+        인정서와 지정서 사본은 자료실에서 내려받으실 수 있습니다.
+      </p>
+    </div>
+  );
+}
+
+const FACILITIES = [
+  {
+    name: "3m 전파무향실",
+    body: "방사 방출과 방사 내성을 측정합니다. 지름 2m 턴테이블과 1~4m 안테나 마스트를 갖췄습니다.",
+    specs: [
+      ["크기", "9 × 6 × 6 m"],
+      ["주파수", "30MHz ~ 18GHz"],
+      ["턴테이블 하중", "1.2톤"],
+    ],
+    draw: "chamber" as const,
+  },
+  {
+    name: "차폐실",
+    body: "외부 전파를 막은 방에서 정전기, 전도 내성, 서지 같은 내성 시험을 합니다.",
+    specs: [
+      ["차폐 성능", "100dB 이상"],
+      ["정전기 방전", "±30kV까지"],
+      ["서지", "6kV까지"],
+    ],
+    draw: "shield" as const,
+  },
+  {
+    name: "전도 시험 설비",
+    body: "전원선과 통신선으로 나가는 잡음을 의사 전원망(LISN)으로 측정합니다.",
+    specs: [
+      ["주파수", "150kHz ~ 30MHz"],
+      ["전원", "단상·삼상 100A"],
+      ["통신선", "ISN 8선"],
+    ],
+    draw: "conducted" as const,
+  },
+  {
+    name: "안전 시험실",
+    body: "절연, 내전압, 온도 상승, 누설전류를 재고 구조와 부품을 검토합니다.",
+    specs: [
+      ["내전압", "AC 5kV"],
+      ["온도 기록", "60채널"],
+      ["항온항습", "-40 ~ 150°C"],
+    ],
+    draw: "safety" as const,
+  },
+];
+
+function FacilityIcon({ kind }: { kind: (typeof FACILITIES)[number]["draw"] }) {
+  const s = { fill: "none", stroke: C.indigo, strokeWidth: 1.6, strokeLinejoin: "round" as const, strokeLinecap: "round" as const };
+  return (
+    <svg viewBox="0 0 120 64" className="h-16 w-full" aria-hidden>
+      <rect x="0.5" y="0.5" width="119" height="63" rx="6" fill={C.paper} stroke={C.line} />
+      {kind === "chamber" && (
+        <>
+          {Array.from({ length: 9 }, (_, i) => (
+            <path key={i} d={`M${12 + i * 11} 14 l5 -7 l5 7`} {...s} stroke={C.cyan} />
+          ))}
+          <ellipse cx="44" cy="50" rx="18" ry="4" {...s} />
+          <rect x="38" y="36" width="12" height="10" rx="1.5" {...s} />
+          <path d="M92 52 V24 M86 24 H98 M88 28 H96" {...s} />
+        </>
       )}
+      {kind === "shield" && (
+        <>
+          <rect x="16" y="12" width="88" height="42" rx="3" {...s} strokeDasharray="4 3" />
+          <path d="M44 20 l-8 14 h10 l-6 14" {...s} stroke={C.cyan} />
+          <rect x="62" y="34" width="26" height="14" rx="2" {...s} />
+        </>
+      )}
+      {kind === "conducted" && (
+        <>
+          <path d="M10 40 H38 M70 40 H110" {...s} />
+          <rect x="38" y="30" width="32" height="20" rx="2" {...s} />
+          <path d="M42 22 C48 12 54 32 60 18 S66 24 70 18" {...s} stroke={C.cyan} />
+          <text x="54" y="44" textAnchor="middle" fontSize="8" fill={C.indigo} fontWeight={700}>
+            LISN
+          </text>
+        </>
+      )}
+      {kind === "safety" && (
+        <>
+          <rect x="18" y="16" width="34" height="34" rx="3" {...s} />
+          <path d="M37 22 l-7 12 h8 l-5 10" {...s} stroke={C.cyan} />
+          <path d="M70 48 V18 M70 48 a6 6 0 1 0 0.01 0" {...s} />
+          <path d="M84 20 H100 M84 30 H96 M84 40 H100" {...s} strokeDasharray="2 3" />
+        </>
+      )}
+    </svg>
+  );
+}
+
+function Facilities() {
+  return (
+    <ul className="grid gap-4 md:grid-cols-2">
+      {FACILITIES.map((f) => (
+        <li key={f.name} className="flex flex-col rounded-[10px] border bg-white p-5" style={{ borderColor: C.line }}>
+          <FacilityIcon kind={f.draw} />
+          <h3 className="mt-4 text-[19px] font-bold tracking-[-0.02em]">{f.name}</h3>
+          <p className="mt-1.5 text-[15px]" style={{ color: C.muted }}>
+            {f.body}
+          </p>
+          <dl className="mt-4 space-y-1 border-t pt-3 text-[14px]" style={{ borderColor: C.line }}>
+            {f.specs.map(([k, v]) => (
+              <div key={k} className="flex justify-between gap-3">
+                <dt style={{ color: C.muted }}>{k}</dt>
+                <dd className="text-right font-bold tabular-nums">{v}</dd>
+              </div>
+            ))}
+          </dl>
+        </li>
+      ))}
+    </ul>
+  );
+}
+
+const IMPARTIAL = [
+  "모든 시험·인증 업무는 관련 법령과 국제 기준(ISO/IEC 17025)에 따라 독립적이고 공정하게 수행합니다.",
+  "시험 결과에 영향을 줄 수 있는 상업적, 재정적 압력이나 그 밖의 압력을 받지 않으며, 이를 허용하지 않습니다.",
+  "의뢰자와 이해관계가 있는 직원은 해당 시험과 판정에 참여하지 않습니다.",
+  "공평성을 해칠 수 있는 위험을 정기적으로 파악하고 없애거나 줄이는 조치를 합니다.",
+  "업무 중 알게 된 고객의 정보와 기술 자료는 법에서 정한 경우를 빼고 공개하지 않습니다.",
+  "모든 고객에게 같은 기준과 절차로 시험 서비스를 제공합니다.",
+];
+
+function Impartiality() {
+  return (
+    <div className="max-w-[820px] rounded-[10px] border p-6 md:p-9" style={{ borderColor: C.line }}>
+      <p className="text-center text-[22px] font-bold tracking-[-0.02em] md:text-[26px]">공평성 선언문</p>
+      <p className="mt-5">{COMPANY}은 시험·인증 기관으로서 공평성의 중요성을 인식하고, 다음과 같이 선언합니다.</p>
+      <ol className="mt-5 list-decimal space-y-2.5 pl-6 marker:font-bold marker:text-[#23307a]">
+        {IMPARTIAL.map((t) => (
+          <li key={t} className="pl-1">
+            {t}
+          </li>
+        ))}
+      </ol>
+      <p className="mt-8 text-center tabular-nums" style={{ color: C.muted }}>
+        2026년 9월 30일
+      </p>
+      <p className="mt-1 text-center font-bold">{COMPANY} 대표이사 김○○</p>
+    </div>
+  );
+}
+
+const COMPLAINT_STEPS: [string, string, string][] = [
+  ["불만 접수", "전화, 이메일, 서면, 방문으로 접수하고 접수 대장에 기록합니다.", "즉시"],
+  ["접수 확인 통지", "접수번호와 담당자를 고객에게 알립니다.", "1일 이내"],
+  ["조사 및 원인 분석", "시험 기록과 장비 이력을 확인하고 원인을 분석합니다.", "7일 이내"],
+  ["처리 결과 검토", "불만 대상 업무에 참여하지 않은 책임자가 처리 결과를 검토하고 승인합니다.", "10일 이내"],
+  ["결과 통보", "처리 결과와 시정 조치를 서면으로 알립니다.", "14일 이내"],
+];
+
+function Complaint() {
+  return (
+    <div className="grid gap-10">
+      <p className="max-w-[820px]">시험·인증 업무에 대한 고객의 불만과 이의 제기를 공정하게 처리하기 위해 다음 절차를 따릅니다. 불만 제기를 이유로 고객이 불이익을 받는 일은 없습니다.</p>
+      <section aria-labelledby="cl-cp-steps">
+        <SubHead id="cl-cp-steps">처리 절차</SubHead>
+        <div className="mt-3">
+          <DataTable caption="고객불만 처리 절차" head={["단계", "내용", "처리 기한"]} rows={COMPLAINT_STEPS.map(([a, b, c]) => [a, b, <span key="c" className="whitespace-nowrap tabular-nums">{c}</span>])} min={560} />
+        </div>
+      </section>
+      <section aria-labelledby="cl-cp-how">
+        <SubHead id="cl-cp-how">접수 방법</SubHead>
+        <div className="mt-3">
+          <InfoList
+            rows={[
+              ["전화", <span key="t" className="tabular-nums">{TEL} (품질책임자)</span>],
+              ["이메일", EMAIL],
+              ["서면·방문", ADDRESS],
+            ]}
+          />
+        </div>
+      </section>
+    </div>
+  );
+}
+
+const JOBS: [string, string, string][] = [
+  ["EMC 시험원", "전기·전자 관련 학과, 경력 무관", "정규직"],
+  ["RF 시험원", "무선 측정 경험 2년 이상", "정규직"],
+  ["해외인증 담당", "영문 기술 문서 작성 가능자", "정규직"],
+];
+
+function Recruit() {
+  return (
+    <div className="grid gap-6">
+      <DataTable caption="모집 분야" head={["모집 분야", "자격 요건", "고용 형태"]} rows={JOBS} />
+      <InfoList
+        rows={[
+          ["접수 방법", `이메일 접수 (${EMAIL})`],
+          ["제출 서류", "이력서, 자기소개서"],
+          ["전형 절차", "서류 전형, 면접, 최종 합격 (서류 검토 후 2주 이내 연락)"],
+        ]}
+      />
+    </div>
+  );
+}
+
+const SHIP_TO = `${ADDRESS} 1층 시료접수실`;
+const SHIP_RECEIVER = "시료접수팀";
+const SHIP_TEL = "02-000-0002";
+
+const BOX_ITEMS = [
+  { id: "sample", name: "시료", note: "시험용 1대와 예비 1대" },
+  { id: "form", name: "시험신청서", note: "자료실의 [서식] 시험신청서" },
+  { id: "manual", name: "사용설명서", note: "켜는 법과 시험 모드 들어가는 법" },
+  { id: "circuit", name: "회로도", note: "부품 목록이 있으면 함께" },
+];
+
+function Location() {
+  const [copied, setCopied] = useState(false);
+  const [packed, setPacked] = useState<string[]>([]);
+  const timer = useRef<number | undefined>(undefined);
+  const listId = useId();
+
+  useEffect(() => () => window.clearTimeout(timer.current), []);
+
+  const copy = async () => {
+    try {
+      await navigator.clipboard.writeText(`${SHIP_TO} (${SHIP_RECEIVER}, ${SHIP_TEL})`);
+      setCopied(true);
+      window.clearTimeout(timer.current);
+      timer.current = window.setTimeout(() => setCopied(false), 2000);
+    } catch {
+      setCopied(false);
+    }
+  };
+
+  const toggle = (id: string) => setPacked((prev) => (prev.includes(id) ? prev.filter((v) => v !== id) : [...prev, id]));
+
+  return (
+    <div className="grid gap-10">
+      <InfoList
+        rows={[
+          ["주소", ADDRESS],
+          ["전화", <span key="t" className="tabular-nums">{TEL}</span>],
+          ["팩스", <span key="f" className="tabular-nums">{FAX}</span>],
+          ["대중교통", "□□역 2번 출구에서 □□번 버스, □□사거리 정류장 하차 후 도보 3분"],
+          ["자가용", "건물 뒤 방문 주차장 이용 (방문 상담은 하루 전까지 전화 예약)"],
+        ]}
+      />
+
+      <section aria-labelledby="cl-ship">
+        <SubHead id="cl-ship">시료 접수 안내</SubHead>
+        <p className="mt-2" style={{ color: C.muted }}>
+          평일 17시까지 도착한 시료는 그날 접수하고 접수 확인 문자를 보내 드립니다.
+        </p>
+        <div className="mt-5 grid items-start gap-5 xl:grid-cols-[1.15fr_1fr]">
+          <div className="rounded-[10px] border bg-white p-5 md:p-6" style={{ borderColor: C.line }}>
+            <dl className="grid gap-3 text-[16px]">
+              <div className="grid gap-1 sm:grid-cols-[88px_1fr] sm:gap-4">
+                <dt className="font-bold" style={{ color: C.muted }}>
+                  받는 주소
+                </dt>
+                <dd className="text-[17px] font-bold leading-[1.5] tracking-[-0.02em]">{SHIP_TO}</dd>
+              </div>
+              <div className="grid gap-1 sm:grid-cols-[88px_1fr] sm:gap-4">
+                <dt className="font-bold" style={{ color: C.muted }}>
+                  받는 사람
+                </dt>
+                <dd>{SHIP_RECEIVER}</dd>
+              </div>
+              <div className="grid gap-1 sm:grid-cols-[88px_1fr] sm:gap-4">
+                <dt className="font-bold" style={{ color: C.muted }}>
+                  전화
+                </dt>
+                <dd>
+                  <a href={`tel:${SHIP_TEL}`} className="tabular-nums underline underline-offset-4">
+                    {SHIP_TEL}
+                  </a>
+                </dd>
+              </div>
+            </dl>
+            <div className="mt-5 flex flex-wrap items-center gap-3 border-t pt-4" style={{ borderColor: C.line }}>
+              <button type="button" onClick={copy} className="inline-flex h-11 items-center gap-2 rounded-[8px] px-5 font-bold" style={{ background: C.indigo, color: C.white }}>
+                {copied ? <Check size={17} strokeWidth={3} aria-hidden /> : <Copy size={17} aria-hidden />}
+                {copied ? "복사됨" : "주소 복사"}
+              </button>
+              <span className="sr-only" role="status">
+                {copied ? "주소를 복사했습니다" : ""}
+              </span>
+              <p className="text-[15px]" style={{ color: C.muted }}>
+                상자 겉면에 접수번호를 적어 주십시오.
+              </p>
+            </div>
+          </div>
+
+          <fieldset className="rounded-[10px] border bg-white p-5 md:p-6" style={{ borderColor: C.line }}>
+            <legend className="sr-only">동봉 서류</legend>
+            <p className="font-bold" aria-hidden>
+              동봉 서류
+            </p>
+            <ul className="mt-2 grid gap-1" aria-describedby={listId}>
+              {BOX_ITEMS.map((b) => {
+                const on = packed.includes(b.id);
+                return (
+                  <li key={b.id}>
+                    <label className="flex cursor-pointer items-start gap-3 rounded-[8px] px-2 py-2.5 hover:bg-[#f4f7fb]">
+                      <input type="checkbox" checked={on} onChange={() => toggle(b.id)} className="mt-1 h-[18px] w-[18px] shrink-0 accent-[#23307a]" />
+                      <span className="min-w-0">
+                        <span className={`block font-bold ${on ? "line-through" : ""}`} style={{ color: on ? C.muted : C.ink }}>
+                          {b.name}
+                        </span>
+                        <span className="block text-[15px]" style={{ color: C.muted }}>
+                          {b.note}
+                        </span>
+                      </span>
+                    </label>
+                  </li>
+                );
+              })}
+            </ul>
+            <p id={listId} className="mt-2 px-2 text-[15px] tabular-nums" style={{ color: C.muted }}>
+              {packed.length === BOX_ITEMS.length ? "모두 챙겼습니다." : `${BOX_ITEMS.length}개 중 ${packed.length}개 확인`}
+            </p>
+          </fieldset>
+        </div>
+      </section>
     </div>
   );
 }
@@ -457,116 +1419,471 @@ const SERVICES = [
   },
 ];
 
-function Services() {
-  const reduce = useReducedMotionSafe();
+const SERVICE_ID: Record<string, string> = { emc: "EMC", rf: "RF", safety: "SAFETY", gma: "GMA" };
+const SERVICE_TARGETS: Record<string, string> = {
+  EMC: "가전기기, 정보통신기기, 조명기기, 산업용 기기, 의료기기",
+  RF: "블루투스·Wi-Fi 기기, LTE·5G 단말, 무선 충전기, RFID·NFC 기기",
+  GMA: "해외에 판매하는 전기·전자 제품",
+  SAFETY: "가정용 전기기기, 정보·사무기기, 조명기기, 전원 장치·어댑터",
+};
+
+function ServicePage({ id }: { id: string }) {
+  const { go, openQuote } = useCl();
+  const sv = SERVICES.find((v) => v.code === SERVICE_ID[id]) ?? SERVICES[0];
   return (
-    <section aria-labelledby="services-title" id="services" className="scroll-mt-16 px-4 py-16 md:px-6 md:py-24">
-      <div className="mx-auto max-w-[1200px]">
-        <SectionHead
-          id="services-title"
-          title="시험부터 인증서 발급까지 한 곳에서 진행합니다"
-          desc="전자파, 무선, 전기안전 시험실을 모두 갖추고 있어 시료를 여러 곳에 나눠 보내지 않아도 됩니다."
-        />
-        <ul className="mt-10 grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
-          {SERVICES.map((s, i) => (
-            <motion.li
-              key={s.code}
-              className="flex flex-col rounded-[10px] border p-5 md:p-6"
-              style={{ borderColor: C.line }}
-              initial={reduce ? false : { opacity: 0, y: 14 }}
-              whileInView={{ opacity: 1, y: 0 }}
-              viewport={{ once: true, amount: 0.4 }}
-              transition={{ duration: 0.45, delay: i * 0.06, ease: EASE }}
-            >
-              <p className="flex items-baseline justify-between gap-2">
-                <span className="text-[26px] font-bold tracking-[-0.02em]" style={{ color: C.indigo }}>
-                  {s.code}
-                </span>
-                <span className="text-[14px] font-semibold" style={{ color: C.cyanText }}>
-                  {s.name}
-                </span>
-              </p>
-              <p className="mt-3 text-[15px]" style={{ color: C.muted }}>
-                {s.body}
-              </p>
-              <ul className="mt-4 space-y-1.5 text-[15px]">
-                {s.tests.map((tst) => (
-                  <li key={tst} className="flex items-start gap-2">
-                    <Check size={16} className="mt-1 shrink-0" style={{ color: C.cyan }} aria-hidden />
-                    {tst}
-                  </li>
-                ))}
-              </ul>
-              <p className="mt-auto border-t pt-3 text-[13px] leading-[1.5]" style={{ borderColor: C.line, color: C.muted }}>
-                <span className="sr-only">적용 규격: </span>
-                {s.std}
-              </p>
-            </motion.li>
-          ))}
-        </ul>
+    <div className="grid gap-8">
+      <p className="max-w-[820px]">{sv.body}</p>
+      <InfoList
+        rows={[
+          ["시험 항목", sv.tests.join(", ")],
+          ["관련 규격", sv.std],
+          ["시험 대상 품목", SERVICE_TARGETS[sv.code]],
+        ]}
+      />
+      <div className="flex flex-wrap gap-2">
+        <button type="button" onClick={openQuote} className="inline-flex h-12 items-center rounded-[8px] px-6 font-bold" style={{ background: C.indigo, color: C.white }}>
+          견적문의
+        </button>
+        <button type="button" onClick={() => go("support", "finder")} className="inline-flex h-12 items-center gap-1.5 rounded-[8px] border px-5 font-bold" style={{ borderColor: C.line, color: C.indigo }}>
+          <Search size={17} aria-hidden />
+          인증 대상 조회
+        </button>
       </div>
-    </section>
+    </div>
   );
 }
 
 /* ---------- 국내인증 ---------- */
 
-const DOMESTIC = [
-  { name: "적합인증", law: "전파법", target: "무선기기, 유선 통신기기 (블루투스, Wi-Fi, LTE 단말 등)", way: "지정시험기관 시험 후 국립전파연구원 인증", days: "3~8주" },
-  { name: "적합등록", law: "전파법", target: "전자파 장해 우려가 적은 전기·전자 기기 (가전, 정보기기, 조명 등)", way: "시험 성적서를 갖추고 등록", days: "2~3주" },
-  { name: "전기용품 안전인증", law: "전기용품 및 생활용품 안전관리법", target: "교류 전원에 직접 연결하는 가전, 조명, 전원 장치 일부", way: "제품 시험과 공장 심사, 해마다 정기 검사", days: "4~6주" },
-  { name: "전기용품 안전확인", law: "전기용품 및 생활용품 안전관리법", target: "정보·사무기기, 일부 가전과 조명", way: "제품 시험 후 신고", days: "2~4주" },
-  { name: "공급자적합성확인", law: "전기용품 및 생활용품 안전관리법", target: "직류 전원 기기, 위해 우려가 낮은 전기용품", way: "제조·수입자가 시험 후 스스로 확인", days: "1~2주" },
-  { name: "에너지효율 표시", law: "에너지이용 합리화법", target: "효율관리기자재, 대기전력 저감 대상 품목", way: "효율 시험 후 등급·표시 신고", days: "2~3주" },
-  { name: "자율안전확인신고 (KCs)", law: "산업안전보건법", target: "신고 대상 산업용 기계·기구와 방호장치", way: "자율안전기준 시험 후 신고", days: "3~4주" },
-];
+const DOMESTIC: Record<string, { intro: string; law: string; target: string; period: string; docs: string[]; steps: [string, string][]; mark: string }> = {
+  conform: {
+    intro: "전파법에 따라 무선기기와 유선 통신기기를 제조·수입·판매하기 전에 받는 인증입니다. 지정시험기관의 시험성적서를 붙여 신청합니다.",
+    law: "전파법",
+    target: "무선기기, 유선 통신기기 (블루투스, Wi-Fi, LTE 단말 등)",
+    period: "3~8주",
+    docs: ["적합성평가 신청서", "사용자 설명서 (한글)", "외관도와 부품 배치도", "회로도와 부품 목록", "안테나 사양서 (무선기기)", "지정시험기관 시험성적서"],
+    steps: [
+      ["시험 신청", "시험신청서와 시료, 기술 문서를 제출합니다."],
+      ["시험", "전자파 적합성과 무선 항목을 시험하고 시험성적서를 발행합니다."],
+      ["인증 신청", "시험성적서를 붙여 인증기관에 적합인증을 신청합니다."],
+      ["심사", "제출 서류와 시험성적서를 심사합니다."],
+      ["인증서 발급", "인증번호가 부여되고 인증서가 발급됩니다."],
+    ],
+    mark: "KC 마크와 인증번호(R-C-로 시작)를 제품 본체의 잘 보이는 곳에 표시합니다. 본체가 작아 표시하기 어려우면 포장과 설명서에 표시할 수 있습니다.",
+  },
+  register: {
+    intro: "전자파 장해 우려가 적은 전기·전자 기기는 시험성적서를 갖추고 적합등록을 합니다.",
+    law: "전파법",
+    target: "가전, 정보기기, 조명 등 전자파 장해 우려가 적은 전기·전자 기기",
+    period: "2~3주",
+    docs: ["적합성평가 신청서", "지정시험기관 시험성적서", "사용자 설명서", "외관도"],
+    steps: [
+      ["시험 신청", "시험신청서와 시료를 제출합니다."],
+      ["시험", "전도·방사 방출과 내성을 시험합니다."],
+      ["적합등록 신청", "시험성적서를 갖추고 적합등록을 신청합니다."],
+      ["등록 완료", "등록번호가 부여됩니다."],
+    ],
+    mark: "KC 마크와 등록번호(R-R-로 시작)를 제품에 표시합니다.",
+  },
+  elec: {
+    intro: "전기용품 및 생활용품 안전관리법에 따라 위해 정도에 맞춰 안전인증, 안전확인, 공급자적합성확인으로 나뉩니다. 안전인증 대상은 제품 시험과 공장 심사를 함께 받습니다.",
+    law: "전기용품 및 생활용품 안전관리법",
+    target: "교류 전원에 직접 연결하는 가전, 조명, 전원 장치 일부",
+    period: "4~6주",
+    docs: ["안전인증 신청서", "제품 설명서", "회로도와 부품 목록", "주요 부품 인증서", "공장 품질 관리 문서"],
+    steps: [
+      ["신청", "신청서와 시료, 기술 문서를 제출합니다."],
+      ["제품 시험", "절연, 내전압, 온도 상승, 누설전류 등을 시험합니다."],
+      ["공장 심사", "제조 공장의 품질 관리 체계를 심사합니다."],
+      ["인증서 발급", "시험과 심사에 모두 적합하면 인증서를 발급합니다."],
+      ["정기 검사", "인증 후 해마다 정기 검사를 받습니다."],
+    ],
+    mark: "KC 안전인증 마크와 인증번호, 모델명, 정격 전압·소비전력, 제조자명을 제품에 표시합니다.",
+  },
+  energy: {
+    intro: "에너지이용 합리화법에 따라 효율관리기자재는 소비효율 등급을, 대기전력 저감 대상 제품은 대기전력 기준 적합 여부를 시험하고 신고합니다.",
+    law: "에너지이용 합리화법",
+    target: "효율관리기자재 (냉장고, 조명기기 등), 대기전력 저감 대상 제품",
+    period: "2~3주",
+    docs: ["시험 신청서", "제품 사양서", "시료"],
+    steps: [
+      ["시험 신청", "신청서와 시료를 제출합니다."],
+      ["효율 시험", "소비전력, 효율, 대기전력을 측정합니다."],
+      ["성적서 발행", "측정값과 등급을 적은 시험성적서를 발행합니다."],
+      ["신고", "시험성적서로 효율 등급 또는 대기전력을 신고합니다."],
+    ],
+    mark: "에너지소비효율등급 라벨 또는 대기전력 저감 표시를 제품과 포장에 붙입니다.",
+  },
+  kcs: {
+    intro: "산업안전보건법에 따라 신고 대상 산업용 기계·기구와 방호장치는 자율안전기준에 맞는지 시험한 뒤 신고합니다.",
+    law: "산업안전보건법",
+    target: "신고 대상 산업용 기계·기구와 방호장치",
+    period: "3~4주",
+    docs: ["자율안전확인 신고서", "제품 설명서", "자율안전기준 적합 시험성적서", "외관 사진"],
+    steps: [
+      ["시험 신청", "신청서와 기술 문서를 제출합니다."],
+      ["시험", "전기적 안전, 위험 부위 방호, 비상정지 장치를 시험합니다."],
+      ["신고", "시험성적서를 붙여 신고합니다."],
+      ["신고증명서 발급", "신고증명서와 신고번호를 받습니다."],
+    ],
+    mark: "KCs 마크와 신고번호를 제품의 잘 보이는 곳에 표시합니다.",
+  },
+};
 
-function Domestic() {
+function DomesticPage({ id }: { id: string }) {
+  const { openQuote } = useCl();
+  const d = DOMESTIC[id] ?? DOMESTIC.conform;
+  const anchors: [string, string][] = [
+    ["cl-sec-docs", "신청서류"],
+    ["cl-sec-steps", "인증취득 절차"],
+    ["cl-sec-mark", "표시기준"],
+  ];
   return (
-    <section aria-labelledby="domestic-title" id="domestic" className="scroll-mt-16 px-4 py-16 md:px-6 md:py-24" style={{ background: C.paper }}>
-      <div className="mx-auto max-w-[1200px]">
-        <SectionHead
-          id="domestic-title"
-          title="KC 인증 종류와 처리 기간"
-          desc="같은 KC 표시라도 근거 법령과 절차가 다릅니다. 처리 기간은 시료와 서류가 모두 들어온 날부터 셉니다."
-        />
-        <div className="mt-8 overflow-x-auto rounded-[10px] border bg-white" style={{ borderColor: C.line }}>
-          <table className="w-full min-w-[760px] text-left text-[15px]">
-            <caption className="sr-only">국내 인증 종류별 근거 법령, 대상, 절차, 처리 기간</caption>
-            <thead>
-              <tr style={{ background: C.indigo, color: C.white }}>
-                {["인증", "근거 법령", "주요 대상", "절차", "기간"].map((h) => (
-                  <th key={h} scope="col" className="px-4 py-3 text-[14px] font-bold">
-                    {h}
-                  </th>
-                ))}
-              </tr>
-            </thead>
-            <tbody>
-              {DOMESTIC.map((d) => (
-                <tr key={d.name} className="border-t align-top" style={{ borderColor: C.line }}>
-                  <th scope="row" className="whitespace-nowrap px-4 py-3.5 font-bold" style={{ color: C.indigo }}>
-                    {d.name}
-                  </th>
-                  <td className="px-4 py-3.5" style={{ color: C.muted }}>
-                    {d.law}
-                  </td>
-                  <td className="px-4 py-3.5">{d.target}</td>
-                  <td className="px-4 py-3.5" style={{ color: C.muted }}>
-                    {d.way}
-                  </td>
-                  <td className="whitespace-nowrap px-4 py-3.5 font-bold tabular-nums">{d.days}</td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
-        </div>
+    <div className="grid gap-10">
+      <p className="max-w-[820px]">{d.intro}</p>
+      <InfoList
+        rows={[
+          ["근거 법령", d.law],
+          ["대상", d.target],
+          ["처리기간", <span key="p" className="font-bold tabular-nums">{d.period}</span>],
+        ]}
+      />
+      <nav aria-label="본문 바로가기">
+        <ul className="grid grid-cols-3 overflow-hidden rounded-[8px] border" style={{ borderColor: C.line }}>
+          {anchors.map(([href, label], i) => (
+            <li key={href} className={i > 0 ? "border-l" : ""} style={{ borderColor: C.line }}>
+              <a href={`#${href}`} className="flex h-12 items-center justify-center px-1 text-center text-[14px] font-bold hover:bg-[#f4f7fb] md:text-[15px]" style={{ color: C.indigo }}>
+                {label}
+              </a>
+            </li>
+          ))}
+        </ul>
+      </nav>
+      <section aria-labelledby="cl-sec-docs">
+        <SubHead id="cl-sec-docs">신청서류</SubHead>
+        <ul className="mt-3 grid gap-x-6 gap-y-1.5 sm:grid-cols-2">
+          {d.docs.map((v) => (
+            <li key={v} className="flex items-start gap-2">
+              <FileText size={17} className="mt-1 shrink-0" style={{ color: C.cyanText }} aria-hidden />
+              {v}
+            </li>
+          ))}
+        </ul>
+      </section>
+      <section aria-labelledby="cl-sec-steps">
+        <SubHead id="cl-sec-steps">인증취득 절차</SubHead>
+        <ol className="mt-3 grid gap-2 md:grid-cols-[repeat(auto-fit,minmax(150px,1fr))]">
+          {d.steps.map(([title, body], i) => (
+            <li key={title} className="flex gap-3 rounded-[10px] border p-4 md:block" style={{ borderColor: C.line }}>
+              <span className="inline-flex h-7 w-7 shrink-0 items-center justify-center rounded-full text-[13px] font-bold tabular-nums" style={{ background: C.indigo, color: C.white }} aria-hidden>
+                {i + 1}
+              </span>
+              <span className="block md:mt-2">
+                <span className="block font-bold">{title}</span>
+                <span className="block text-[14px] leading-[1.55]" style={{ color: C.muted }}>
+                  {body}
+                </span>
+              </span>
+            </li>
+          ))}
+        </ol>
+      </section>
+      <section aria-labelledby="cl-sec-mark">
+        <SubHead id="cl-sec-mark">표시기준</SubHead>
+        <p className="mt-3 max-w-[820px]">{d.mark}</p>
+      </section>
+      <div>
+        <button type="button" onClick={openQuote} className="inline-flex h-12 items-center rounded-[8px] px-6 font-bold" style={{ background: C.indigo, color: C.white }}>
+          견적문의
+        </button>
       </div>
-    </section>
+    </div>
   );
 }
 
-/* ---------- 필요한 인증 찾기 ---------- */
+/* ---------- 해외인증 ---------- */
+
+type RegionId = "na" | "sa" | "eu" | "as" | "af" | "oc";
+
+type Poly = number[][];
+
+const REGION_SHAPES: Record<RegionId, Poly[]> = {
+  na: [
+    [[33, 65], [83, 48], [194, 41], [278, 41], [328, 86], [347, 121], [306, 145], [278, 183], [275, 207], [255, 197], [250, 218], [268, 262], [262, 268], [236, 236], [206, 207], [175, 152], [140, 128], [100, 100], [60, 95]],
+    [[347, 14], [444, 14], [444, 52], [375, 86], [347, 52]],
+  ],
+  sa: [[[278, 265], [333, 259], [361, 293], [403, 317], [389, 369], [347, 414], [311, 483], [292, 448], [300, 355], [275, 310]]],
+  eu: [[[472, 169], [475, 145], [486, 128], [483, 121], [483, 93], [514, 79], [528, 48], [583, 48], [611, 66], [625, 103], [611, 138], [578, 152], [555, 162], [533, 162], [508, 148]]],
+  af: [[[425, 221], [486, 172], [528, 166], [589, 186], [619, 252], [642, 252], [611, 345], [592, 390], [555, 414], [533, 352], [525, 279], [478, 279], [453, 245]]],
+  as: [
+    [[611, 66], [694, 38], [806, 28], [889, 41], [990, 59], [944, 86], [889, 114], [861, 148], [839, 190], [806, 224], [792, 259], [778, 286], [769, 234], [750, 217], [717, 265], [700, 224], [658, 207], [644, 241], [619, 252], [589, 186], [600, 165], [578, 152], [611, 138], [625, 103]],
+    [[858, 180], [880, 160], [900, 140], [912, 148], [893, 172], [868, 194]],
+    [[764, 276], [792, 314], [833, 324], [892, 321], [892, 300], [847, 282], [828, 269]],
+  ],
+  oc: [
+    [[817, 369], [817, 410], [861, 403], [889, 424], [917, 424], [925, 386], [903, 345], [878, 334], [861, 341], [839, 352]],
+    [[972, 410], [992, 420], [982, 442], [962, 460], [956, 448]],
+  ],
+};
+
+function inPoly(x: number, y: number, poly: Poly) {
+  let inside = false;
+  for (let i = 0, j = poly.length - 1; i < poly.length; j = i++) {
+    const [xi, yi] = poly[i];
+    const [xj, yj] = poly[j];
+    if (yi > y !== yj > y && x < ((xj - xi) * (y - yi)) / (yj - yi) + xi) inside = !inside;
+  }
+  return inside;
+}
+
+const DOT_STEP = 13;
+const REGION_IDS: RegionId[] = ["na", "sa", "eu", "af", "as", "oc"];
+
+/** 모듈을 불러올 때 한 번만 계산하는 점 지도. 서버와 브라우저에서 같은 값이 나온다. */
+const REGION_DOTS: Record<RegionId, [number, number][]> = (() => {
+  const dots: Record<RegionId, [number, number][]> = { na: [], sa: [], eu: [], af: [], as: [], oc: [] };
+  for (let y = 8; y < 500; y += DOT_STEP) {
+    for (let x = 8; x < 1000; x += DOT_STEP) {
+      const id = REGION_IDS.find((r) => REGION_SHAPES[r].some((p) => inPoly(x, y, p)));
+      if (id) dots[id].push([x, y]);
+    }
+  }
+  return dots;
+})();
+
+interface RegionInfo {
+  name: string;
+  label: [number, number];
+  countries: { name: string; certs: { name: string; desc: string }[] }[];
+}
+
+const REGIONS: Record<RegionId, RegionInfo> = {
+  na: {
+    name: "북아메리카",
+    label: [196, 120],
+    countries: [
+      {
+        name: "미국",
+        certs: [
+          { name: "FCC", desc: "전자파와 무선 인증. 무선기기는 FCC ID, 그 밖의 디지털 기기는 공급자 적합성 선언" },
+          { name: "NRTL (UL 등)", desc: "전기안전 인증. 유통사와 설치 현장에서 요구" },
+          { name: "ENERGY STAR", desc: "에너지 효율 자율 표시" },
+        ],
+      },
+      {
+        name: "캐나다",
+        certs: [
+          { name: "ISED", desc: "무선기기 인증과 디지털 기기 ICES-003 표시" },
+          { name: "CSA 규격 안전 인증", desc: "주별 전기안전 규정에 따른 인증" },
+        ],
+      },
+      {
+        name: "멕시코",
+        certs: [
+          { name: "IFT", desc: "통신·무선기기 인증" },
+          { name: "NOM", desc: "전기안전과 에너지 효율 공식 규격 인증" },
+        ],
+      },
+    ],
+  },
+  sa: {
+    name: "남아메리카",
+    label: [338, 372],
+    countries: [
+      {
+        name: "브라질",
+        certs: [
+          { name: "ANATEL", desc: "통신·무선기기 인증, 현지 시험 필요" },
+          { name: "INMETRO", desc: "전기안전과 에너지 효율 인증" },
+        ],
+      },
+      { name: "아르헨티나", certs: [{ name: "ENACOM", desc: "통신·무선기기 형식승인" }, { name: "S마크", desc: "저전압 전기제품 안전 인증" }] },
+      { name: "칠레", certs: [{ name: "SUBTEL", desc: "무선기기 승인" }, { name: "SEC", desc: "전기제품 안전과 효율 인증" }] },
+      { name: "콜롬비아", certs: [{ name: "CRC", desc: "통신 단말기 형식승인" }, { name: "RETIE", desc: "전기설비·제품 기술 규정 적합 인증" }] },
+    ],
+  },
+  eu: {
+    name: "유럽",
+    label: [548, 112],
+    countries: [
+      { name: "유럽연합", certs: [{ name: "CE", desc: "RED, EMC, LVD 지침 적합 선언과 기술 문서" }, { name: "RoHS·WEEE", desc: "유해물질 제한과 폐전자제품 회수 의무" }] },
+      { name: "영국", certs: [{ name: "UKCA", desc: "영국 적합성 표시. CE 성적서를 바탕으로 준비" }] },
+      { name: "유라시아경제연합", certs: [{ name: "EAC", desc: "러시아, 카자흐스탄 등 회원국 공통 기술 규정 인증" }] },
+    ],
+  },
+  af: {
+    name: "아프리카",
+    label: [548, 300],
+    countries: [
+      { name: "남아프리카공화국", certs: [{ name: "ICASA", desc: "통신·무선기기 형식승인" }, { name: "NRCS", desc: "전기안전 의무 규격 승인" }] },
+      { name: "나이지리아", certs: [{ name: "NCC", desc: "통신기기 형식승인" }, { name: "SONCAP", desc: "수입 제품 적합성 평가" }] },
+      { name: "케냐", certs: [{ name: "CA", desc: "통신기기 형식승인" }, { name: "PVoC", desc: "선적 전 적합성 검사" }] },
+      { name: "이집트", certs: [{ name: "NTRA", desc: "통신·무선기기 승인" }] },
+    ],
+  },
+  as: {
+    name: "아시아",
+    label: [760, 132],
+    countries: [
+      { name: "일본", certs: [{ name: "TELEC", desc: "무선기기 기술기준적합증명" }, { name: "PSE", desc: "전기용품안전법 적합 표시" }, { name: "VCCI", desc: "정보기기 전자파 자율 규제" }] },
+      { name: "중국", certs: [{ name: "CCC", desc: "강제인증 목록 품목의 안전·전자파 인증" }, { name: "SRRC", desc: "무선기기 형식승인" }] },
+      { name: "대만", certs: [{ name: "NCC", desc: "통신·무선기기 인증" }, { name: "BSMI", desc: "전기안전과 전자파 검사" }] },
+      { name: "인도", certs: [{ name: "BIS", desc: "전자·IT 제품 의무 등록" }, { name: "WPC", desc: "무선기기 승인" }] },
+      { name: "베트남", certs: [{ name: "MIC", desc: "정보통신기기 적합 인증과 신고" }] },
+      { name: "사우디아라비아", certs: [{ name: "SASO", desc: "제품 안전 적합 인증" }, { name: "CST", desc: "통신·무선기기 형식승인" }] },
+    ],
+  },
+  oc: {
+    name: "오세아니아",
+    label: [868, 384],
+    countries: [
+      { name: "호주", certs: [{ name: "RCM", desc: "전자파, 무선, 전기안전을 하나로 표시. 공급자 등록 필요" }] },
+      { name: "뉴질랜드", certs: [{ name: "RCM", desc: "호주와 같은 표시 체계, 무선은 별도 규정 확인" }] },
+    ],
+  },
+};
+
+const GLOBAL_STEPS = ["견적·계약", "시료 접수", "시험", "현지 기관 신청", "인증서 발급"];
+
+function RegionMap({ region }: { region: RegionId }) {
+  const { go } = useCl();
+  const reduce = useReducedMotionSafe();
+  const [focus, setFocus] = useState<RegionId | null>(null);
+
+  const onKey = (id: RegionId) => (e: ReactKeyboardEvent<SVGGElement>) => {
+    if (e.key === "Enter" || e.key === " ") {
+      e.preventDefault();
+      go("global", id);
+    }
+  };
+
+  return (
+    <div className="rounded-[10px] p-2 md:p-4" style={{ background: C.indigoDeep }}>
+      <svg viewBox="0 0 1000 500" className="h-auto w-full" role="group" aria-label="대륙 선택 지도">
+        {REGION_IDS.map((id) => {
+          const on = region === id;
+          const hot = focus === id;
+          return (
+            <g
+              key={id}
+              role="button"
+              tabIndex={0}
+              aria-pressed={on}
+              aria-label={REGIONS[id].name}
+              onClick={() => go("global", id)}
+              onKeyDown={onKey(id)}
+              onFocus={() => setFocus(id)}
+              onBlur={() => setFocus(null)}
+              onMouseEnter={() => setFocus(id)}
+              onMouseLeave={() => setFocus(null)}
+              className="cursor-pointer outline-none"
+            >
+              {REGION_SHAPES[id].map((p, i) => (
+                <polygon key={i} points={p.map(([x, y]) => `${x},${y}`).join(" ")} fill="transparent" stroke={hot ? C.cyan : "transparent"} strokeWidth="2" strokeDasharray="6 5" strokeLinejoin="round" />
+              ))}
+              {REGION_DOTS[id].map(([x, y]) => (
+                <circle key={`${x}-${y}`} cx={x} cy={y} r={4.4} fill={on ? C.cyan : hot ? "#7c88c9" : "#4a5598"} style={{ transition: reduce ? undefined : "fill 0.25s" }} />
+              ))}
+              <g pointerEvents="none">
+                <rect x={REGIONS[id].label[0] - 66} y={REGIONS[id].label[1] - 21} width="132" height="38" rx="8" fill={on ? C.white : C.indigoDeep} stroke={on ? C.white : "rgba(255,255,255,0.35)"} />
+                <text x={REGIONS[id].label[0]} y={REGIONS[id].label[1] + 6} textAnchor="middle" fontSize="20" fontWeight={700} fill={on ? C.indigo : C.white}>
+                  {REGIONS[id].name}
+                </text>
+              </g>
+            </g>
+          );
+        })}
+      </svg>
+    </div>
+  );
+}
+
+function GlobalPage({ id }: { id: RegionId }) {
+  const { openQuote } = useCl();
+  const region: RegionId = REGIONS[id] ? id : "na";
+  const info = REGIONS[region];
+  const [ci, setCi] = useState(0);
+  const tabRefs = useRef<(HTMLButtonElement | null)[]>([]);
+  const country = info.countries[Math.min(ci, info.countries.length - 1)];
+
+  const onTabKey = (e: ReactKeyboardEvent<HTMLButtonElement>) => {
+    if (e.key !== "ArrowRight" && e.key !== "ArrowLeft") return;
+    e.preventDefault();
+    const n = info.countries.length;
+    const next = (ci + (e.key === "ArrowRight" ? 1 : n - 1)) % n;
+    setCi(next);
+    tabRefs.current[next]?.focus();
+  };
+
+  return (
+    <div className="grid gap-8">
+      <div className="max-w-[720px]">
+        <RegionMap region={region} />
+      </div>
+      <div>
+        <div role="tablist" aria-label={`${info.name} 국가`} className="flex flex-wrap gap-1.5">
+          {info.countries.map((c, i) => {
+            const on = i === ci;
+            return (
+              <button
+                key={c.name}
+                ref={(el) => {
+                  tabRefs.current[i] = el;
+                }}
+                type="button"
+                role="tab"
+                id={`cl-country-${i}`}
+                aria-selected={on}
+                aria-controls="cl-country-panel"
+                tabIndex={on ? 0 : -1}
+                onClick={() => setCi(i)}
+                onKeyDown={onTabKey}
+                className="h-11 rounded-[8px] border px-4 text-[15px] font-bold"
+                style={on ? { background: C.indigo, color: C.white, borderColor: C.indigo } : { borderColor: C.line, color: C.ink }}
+              >
+                {c.name}
+              </button>
+            );
+          })}
+        </div>
+        <div id="cl-country-panel" role="tabpanel" aria-labelledby={`cl-country-${ci}`} className="mt-5 grid gap-8">
+          <section aria-labelledby="cl-gl-overview">
+            <SubHead id="cl-gl-overview">인증개요</SubHead>
+            <div className="mt-3">
+              <DataTable caption={`${country.name} 인증`} head={["인증", "내용"]} rows={country.certs.map((ct) => [ct.name, ct.desc])} min={320} />
+            </div>
+          </section>
+          <section aria-labelledby="cl-gl-steps">
+            <SubHead id="cl-gl-steps">인증처리절차</SubHead>
+            <ol className="mt-3 flex flex-wrap items-center gap-x-1 gap-y-2">
+              {GLOBAL_STEPS.map((st, i) => (
+                <li key={st} className="inline-flex items-center gap-1">
+                  <span className="inline-flex h-10 items-center gap-2 rounded-[8px] border px-3 text-[15px] font-semibold" style={{ borderColor: C.line }}>
+                    <span className="text-[13px] font-bold tabular-nums" style={{ color: C.cyanText }}>
+                      {i + 1}
+                    </span>
+                    {st}
+                  </span>
+                  {i < GLOBAL_STEPS.length - 1 && <ChevronRight size={16} style={{ color: C.muted }} aria-hidden />}
+                </li>
+              ))}
+            </ol>
+            <p className="mt-3 text-[15px]" style={{ color: C.muted }}>
+              국내 시험성적서를 인정하는 국가는 이곳에서 시험하고, 현지 시험이 필요한 국가는 협력 기관과 진행합니다.
+            </p>
+          </section>
+          <div>
+            <button type="button" onClick={openQuote} className="inline-flex h-12 items-center rounded-[8px] px-6 font-bold" style={{ background: C.indigo, color: C.white }}>
+              견적문의
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+}
+
+/* ---------- 인증 대상 조회 ---------- */
 
 type Power = "battery" | "adapter" | "ac";
 type Radio = "none" | "bt" | "wifi" | "cell";
@@ -941,88 +2258,73 @@ function ChipGroup<T extends string>({
   );
 }
 
-function Finder({ onAdd }: { onAdd: (names: string[]) => void }) {
+function Finder() {
+  const { certs, setCerts, openQuote } = useCl();
   const reduce = useReducedMotionSafe();
   const [power, setPower] = useState<Power>("adapter");
   const [radio, setRadio] = useState<Radio>("bt");
   const [kind, setKind] = useState<Kind>("home");
   const [countries, setCountries] = useState<Country[]>(["kr", "us", "eu"]);
-  const [added, setAdded] = useState<string>("");
 
   const input = { power, radio, kind };
   const groups = COUNTRIES.filter((c) => countries.includes(c.v)).map((c) => ({ ...c, items: certsFor(c.v, input) }));
   const all = groups.flatMap((g) => g.items);
   const longest = Math.max(0, ...all.map((c) => maxWeeks(c.period)));
-  const signature = `${power}-${radio}-${kind}-${countries.join(",")}`;
+  const added = all.length > 0 && all.every((c) => certs.includes(c.short));
 
   const toggleCountry = (v: Country) => setCountries((prev) => (prev.includes(v) ? prev.filter((x) => x !== v) : [...prev, v]));
-
-  const addAll = () => {
-    onAdd(all.map((c) => c.short));
-    setAdded(signature);
-    document.getElementById("quote")?.scrollIntoView({ behavior: reduce ? "auto" : "smooth" });
-  };
+  const addAll = () => setCerts((prev) => [...prev, ...all.map((c) => c.short).filter((n) => !prev.includes(n))]);
 
   return (
-    <section aria-labelledby="finder-title" id="finder" className="scroll-mt-16 px-4 py-16 md:px-6 md:py-24" style={GRAPH}>
-      <div className="mx-auto max-w-[1200px]">
-        <SectionHead
-          id="finder-title"
-          title="우리 제품에 필요한 인증 찾기"
-          desc="전원과 무선 기능, 제품 분류, 판매할 국가를 고르면 받아야 할 가능성이 높은 인증을 국가별로 보여 드립니다."
-        />
-
-        <div className="mt-10 grid items-start gap-6 lg:grid-cols-[400px_1fr]">
-          <div className="space-y-6 rounded-[10px] border bg-white p-5 md:p-6 lg:sticky lg:top-20" style={{ borderColor: C.line }}>
-            <ChipGroup legend="전원 방식" value={power} options={POWER_OPTS} onPick={setPower} />
-            <ChipGroup legend="무선 기능" value={radio} options={RADIO_OPTS} onPick={setRadio} />
-            <ChipGroup legend="제품 분류" value={kind} options={KIND_OPTS} onPick={setKind} />
-            <fieldset>
-              <legend className="text-[15px] font-bold">
-                판매 국가 <span className="font-normal" style={{ color: C.muted }}>(여러 곳 선택)</span>
-              </legend>
-              <div className="mt-2 grid grid-cols-2 gap-2 sm:grid-cols-4 lg:grid-cols-2">
-                {COUNTRIES.map((c) => {
-                  const on = countries.includes(c.v);
-                  return (
-                    <button
-                      key={c.v}
-                      type="button"
-                      aria-pressed={on}
-                      onClick={() => toggleCountry(c.v)}
-                      className="inline-flex h-11 items-center gap-2 rounded-[8px] border px-3 text-[15px] font-semibold"
-                      style={on ? { background: C.cyanSoft, color: C.indigoDeep, borderColor: C.cyan } : { background: C.white, color: C.ink, borderColor: C.line }}
-                    >
-                      <span
-                        className="inline-flex h-5 w-5 shrink-0 items-center justify-center rounded-[4px] border"
-                        style={on ? { background: C.cyan, borderColor: C.cyan, color: C.white } : { borderColor: "#b4bdd0" }}
-                        aria-hidden
-                      >
-                        {on && <Check size={14} strokeWidth={3} />}
-                      </span>
-                      {c.label}
-                    </button>
-                  );
-                })}
-              </div>
-            </fieldset>
-          </div>
-
-          <div className="min-w-0">
-            <div className="flex flex-wrap items-center justify-between gap-3 rounded-[10px] px-5 py-4" style={{ background: C.indigo, color: C.white }} aria-live="polite">
-              {groups.length > 0 ? (
-                <p className="text-[16px]">
-                  국가 <strong className="tabular-nums">{groups.length}</strong>곳, 인증 <strong className="tabular-nums">{all.length}</strong>건
-                  {longest > 0 && (
-                    <span style={{ color: "#c8cdea" }}>
-                      {" "}
-                      · 함께 진행하면 약 <span className="tabular-nums">{longest}</span>주
+    <div>
+      <p>제품 조건을 선택하세요.</p>
+      <div className="mt-5 grid items-start gap-6 xl:grid-cols-[340px_1fr]">
+        <div className="space-y-6 rounded-[10px] border p-5" style={{ borderColor: C.line, background: C.paper }}>
+          <ChipGroup legend="전원 방식" value={power} options={POWER_OPTS} onPick={setPower} />
+          <ChipGroup legend="무선 기능" value={radio} options={RADIO_OPTS} onPick={setRadio} />
+          <ChipGroup legend="제품 분류" value={kind} options={KIND_OPTS} onPick={setKind} />
+          <fieldset>
+            <legend className="text-[15px] font-bold">
+              판매 국가 <span className="font-normal" style={{ color: C.muted }}>(복수 선택)</span>
+            </legend>
+            <div className="mt-2 grid grid-cols-2 gap-2 sm:grid-cols-4 xl:grid-cols-2">
+              {COUNTRIES.map((c) => {
+                const on = countries.includes(c.v);
+                return (
+                  <button
+                    key={c.v}
+                    type="button"
+                    aria-pressed={on}
+                    onClick={() => toggleCountry(c.v)}
+                    className="inline-flex h-11 items-center gap-2 rounded-[8px] border px-3 text-[15px] font-semibold"
+                    style={on ? { background: C.cyanSoft, color: C.indigoDeep, borderColor: C.cyan } : { background: C.white, color: C.ink, borderColor: C.line }}
+                  >
+                    <span className="inline-flex h-5 w-5 shrink-0 items-center justify-center rounded-[4px] border" style={on ? { background: C.cyan, borderColor: C.cyan, color: C.white } : { borderColor: "#b4bdd0" }} aria-hidden>
+                      {on && <Check size={14} strokeWidth={3} />}
                     </span>
-                  )}
-                </p>
-              ) : (
-                <p>판매할 국가를 하나 이상 골라 주세요.</p>
-              )}
+                    {c.label}
+                  </button>
+                );
+              })}
+            </div>
+          </fieldset>
+        </div>
+
+        <div className="min-w-0">
+          <div className="flex flex-wrap items-center justify-between gap-3 rounded-[10px] px-5 py-4" style={{ background: C.indigo, color: C.white }} aria-live="polite">
+            {groups.length > 0 ? (
+              <p className="text-[16px]">
+                국가 <strong className="tabular-nums">{groups.length}</strong>곳, 인증 <strong className="tabular-nums">{all.length}</strong>건
+                {longest > 0 && (
+                  <span style={{ color: "#c8cdea" }}>
+                    , 함께 진행 시 약 <span className="tabular-nums">{longest}</span>주
+                  </span>
+                )}
+              </p>
+            ) : (
+              <p>판매 국가를 하나 이상 선택해 주십시오.</p>
+            )}
+            <div className="flex flex-wrap gap-2">
               <button
                 type="button"
                 onClick={addAll}
@@ -1030,358 +2332,80 @@ function Finder({ onAdd }: { onAdd: (names: string[]) => void }) {
                 className="inline-flex h-11 items-center gap-1.5 rounded-[8px] px-4 text-[15px] font-bold disabled:opacity-40"
                 style={{ background: C.cyan, color: C.indigoDeep }}
               >
-                {added === signature ? <Check size={18} aria-hidden /> : <Plus size={18} aria-hidden />}
-                {added === signature ? "견적에 담았습니다" : "견적에 담기"}
+                {added ? <Check size={18} aria-hidden /> : <Plus size={18} aria-hidden />}
+                {added ? "추가됨" : "견적문의에 추가"}
               </button>
-            </div>
-
-            <div className="mt-4 space-y-4">
-              <AnimatePresence initial={false}>
-                {groups.map((g) => (
-                  <motion.section
-                    key={g.v}
-                    aria-label={`${g.label} 인증`}
-                    className="rounded-[10px] border bg-white"
-                    style={{ borderColor: C.line }}
-                    initial={reduce ? false : { opacity: 0, y: 10 }}
-                    animate={{ opacity: 1, y: 0 }}
-                    exit={reduce ? { opacity: 0, transition: { duration: 0 } } : { opacity: 0, y: -6 }}
-                    transition={{ duration: 0.3, ease: EASE }}
-                  >
-                    <h3 className="flex items-center gap-2.5 border-b px-5 py-3 text-[17px] font-bold" style={{ borderColor: C.line }}>
-                      <span className="inline-flex h-7 min-w-9 items-center justify-center rounded-[6px] px-1.5 text-[13px] font-bold tracking-[0.04em]" style={{ background: C.indigoSoft, color: C.indigo }}>
-                        {g.code}
-                      </span>
-                      {g.label}
-                      <span className="ml-auto text-[14px] font-semibold tabular-nums" style={{ color: C.muted }}>
-                        {g.items.length}건
-                      </span>
-                    </h3>
-                    <ul>
-                      {g.items.map((c) => (
-                        <li key={c.id} className="border-b px-5 py-4 last:border-b-0" style={{ borderColor: C.paper }}>
-                          <p className="font-bold" style={{ color: C.indigo }}>
-                            {c.name}
-                          </p>
-                          <p className="mt-1 text-[15px]" style={{ color: C.muted }}>
-                            {c.reason}
-                          </p>
-                          <dl className="mt-2.5 grid gap-x-6 gap-y-1 text-[14px] sm:grid-cols-[1fr_auto]">
-                            <div className="flex min-w-0 gap-2">
-                              <dt className="shrink-0 font-semibold" style={{ color: C.cyanText }}>
-                                시험 항목
-                              </dt>
-                              <dd className="min-w-0">{c.tests}</dd>
-                            </div>
-                            <div className="flex gap-2">
-                              <dt className="shrink-0 font-semibold" style={{ color: C.cyanText }}>
-                                예상 기간
-                              </dt>
-                              <dd className="font-bold tabular-nums">{c.period}</dd>
-                            </div>
-                          </dl>
-                        </li>
-                      ))}
-                    </ul>
-                  </motion.section>
-                ))}
-              </AnimatePresence>
-            </div>
-            <p className="mt-4 text-[14px]" style={{ color: C.muted }}>
-              품목과 사양에 따라 달라질 수 있어 최종 대상은 사양서를 보고 알려 드립니다.
-            </p>
-          </div>
-        </div>
-      </div>
-    </section>
-  );
-}
-
-/* ---------- 해외인증 세계 지도 ---------- */
-
-type RegionId = "na" | "sa" | "eu" | "as" | "af" | "oc";
-
-type Poly = number[][];
-
-const REGION_SHAPES: Record<RegionId, Poly[]> = {
-  na: [
-    [[33, 65], [83, 48], [194, 41], [278, 41], [328, 86], [347, 121], [306, 145], [278, 183], [275, 207], [255, 197], [250, 218], [268, 262], [262, 268], [236, 236], [206, 207], [175, 152], [140, 128], [100, 100], [60, 95]],
-    [[347, 14], [444, 14], [444, 52], [375, 86], [347, 52]],
-  ],
-  sa: [[[278, 265], [333, 259], [361, 293], [403, 317], [389, 369], [347, 414], [311, 483], [292, 448], [300, 355], [275, 310]]],
-  eu: [[[472, 169], [475, 145], [486, 128], [483, 121], [483, 93], [514, 79], [528, 48], [583, 48], [611, 66], [625, 103], [611, 138], [578, 152], [555, 162], [533, 162], [508, 148]]],
-  af: [[[425, 221], [486, 172], [528, 166], [589, 186], [619, 252], [642, 252], [611, 345], [592, 390], [555, 414], [533, 352], [525, 279], [478, 279], [453, 245]]],
-  as: [
-    [[611, 66], [694, 38], [806, 28], [889, 41], [990, 59], [944, 86], [889, 114], [861, 148], [839, 190], [806, 224], [792, 259], [778, 286], [769, 234], [750, 217], [717, 265], [700, 224], [658, 207], [644, 241], [619, 252], [589, 186], [600, 165], [578, 152], [611, 138], [625, 103]],
-    [[858, 180], [880, 160], [900, 140], [912, 148], [893, 172], [868, 194]],
-    [[764, 276], [792, 314], [833, 324], [892, 321], [892, 300], [847, 282], [828, 269]],
-  ],
-  oc: [
-    [[817, 369], [817, 410], [861, 403], [889, 424], [917, 424], [925, 386], [903, 345], [878, 334], [861, 341], [839, 352]],
-    [[972, 410], [992, 420], [982, 442], [962, 460], [956, 448]],
-  ],
-};
-
-function inPoly(x: number, y: number, poly: Poly) {
-  let inside = false;
-  for (let i = 0, j = poly.length - 1; i < poly.length; j = i++) {
-    const [xi, yi] = poly[i];
-    const [xj, yj] = poly[j];
-    if (yi > y !== yj > y && x < ((xj - xi) * (y - yi)) / (yj - yi) + xi) inside = !inside;
-  }
-  return inside;
-}
-
-const DOT_STEP = 13;
-const REGION_IDS: RegionId[] = ["na", "sa", "eu", "af", "as", "oc"];
-
-/** 모듈을 불러올 때 한 번만 계산하는 점 지도. 서버와 브라우저에서 같은 값이 나온다. */
-const REGION_DOTS: Record<RegionId, [number, number][]> = (() => {
-  const dots: Record<RegionId, [number, number][]> = { na: [], sa: [], eu: [], af: [], as: [], oc: [] };
-  for (let y = 8; y < 500; y += DOT_STEP) {
-    for (let x = 8; x < 1000; x += DOT_STEP) {
-      const id = REGION_IDS.find((r) => REGION_SHAPES[r].some((p) => inPoly(x, y, p)));
-      if (id) dots[id].push([x, y]);
-    }
-  }
-  return dots;
-})();
-
-interface RegionInfo {
-  name: string;
-  label: [number, number];
-  countries: { name: string; certs: { name: string; desc: string }[] }[];
-}
-
-const REGIONS: Record<RegionId, RegionInfo> = {
-  na: {
-    name: "북미",
-    label: [196, 120],
-    countries: [
-      {
-        name: "미국",
-        certs: [
-          { name: "FCC", desc: "전자파와 무선 인증. 무선기기는 FCC ID, 그 밖의 디지털 기기는 공급자 적합성 선언" },
-          { name: "NRTL (UL 등)", desc: "전기안전 인증. 유통사와 설치 현장에서 요구" },
-          { name: "ENERGY STAR", desc: "에너지 효율 자율 표시" },
-        ],
-      },
-      {
-        name: "캐나다",
-        certs: [
-          { name: "ISED", desc: "무선기기 인증과 디지털 기기 ICES-003 표시" },
-          { name: "CSA 규격 안전 인증", desc: "주별 전기안전 규정에 따른 인증" },
-        ],
-      },
-      {
-        name: "멕시코",
-        certs: [
-          { name: "IFT", desc: "통신·무선기기 인증" },
-          { name: "NOM", desc: "전기안전과 에너지 효율 공식 규격 인증" },
-        ],
-      },
-    ],
-  },
-  sa: {
-    name: "남미",
-    label: [338, 372],
-    countries: [
-      {
-        name: "브라질",
-        certs: [
-          { name: "ANATEL", desc: "통신·무선기기 인증, 현지 시험 필요" },
-          { name: "INMETRO", desc: "전기안전과 에너지 효율 인증" },
-        ],
-      },
-      { name: "아르헨티나", certs: [{ name: "ENACOM", desc: "통신·무선기기 형식승인" }, { name: "S마크", desc: "저전압 전기제품 안전 인증" }] },
-      { name: "칠레", certs: [{ name: "SUBTEL", desc: "무선기기 승인" }, { name: "SEC", desc: "전기제품 안전과 효율 인증" }] },
-      { name: "콜롬비아", certs: [{ name: "CRC", desc: "통신 단말기 형식승인" }, { name: "RETIE", desc: "전기설비·제품 기술 규정 적합 인증" }] },
-    ],
-  },
-  eu: {
-    name: "유럽",
-    label: [548, 112],
-    countries: [
-      { name: "유럽연합", certs: [{ name: "CE", desc: "RED, EMC, LVD 지침 적합 선언과 기술 문서" }, { name: "RoHS·WEEE", desc: "유해물질 제한과 폐전자제품 회수 의무" }] },
-      { name: "영국", certs: [{ name: "UKCA", desc: "영국 적합성 표시. CE 성적서를 바탕으로 준비" }] },
-      { name: "유라시아경제연합", certs: [{ name: "EAC", desc: "러시아, 카자흐스탄 등 회원국 공통 기술 규정 인증" }] },
-    ],
-  },
-  af: {
-    name: "아프리카",
-    label: [548, 300],
-    countries: [
-      { name: "남아프리카공화국", certs: [{ name: "ICASA", desc: "통신·무선기기 형식승인" }, { name: "NRCS", desc: "전기안전 의무 규격 승인" }] },
-      { name: "나이지리아", certs: [{ name: "NCC", desc: "통신기기 형식승인" }, { name: "SONCAP", desc: "수입 제품 적합성 평가" }] },
-      { name: "케냐", certs: [{ name: "CA", desc: "통신기기 형식승인" }, { name: "PVoC", desc: "선적 전 적합성 검사" }] },
-      { name: "이집트", certs: [{ name: "NTRA", desc: "통신·무선기기 승인" }] },
-    ],
-  },
-  as: {
-    name: "아시아",
-    label: [760, 132],
-    countries: [
-      { name: "일본", certs: [{ name: "TELEC", desc: "무선기기 기술기준적합증명" }, { name: "PSE", desc: "전기용품안전법 적합 표시" }, { name: "VCCI", desc: "정보기기 전자파 자율 규제" }] },
-      { name: "중국", certs: [{ name: "CCC", desc: "강제인증 목록 품목의 안전·전자파 인증" }, { name: "SRRC", desc: "무선기기 형식승인" }] },
-      { name: "대만", certs: [{ name: "NCC", desc: "통신·무선기기 인증" }, { name: "BSMI", desc: "전기안전과 전자파 검사" }] },
-      { name: "인도", certs: [{ name: "BIS", desc: "전자·IT 제품 의무 등록" }, { name: "WPC", desc: "무선기기 승인" }] },
-      { name: "베트남", certs: [{ name: "MIC", desc: "정보통신기기 적합 인증과 신고" }] },
-      { name: "사우디아라비아", certs: [{ name: "SASO", desc: "제품 안전 적합 인증" }, { name: "CST", desc: "통신·무선기기 형식승인" }] },
-    ],
-  },
-  oc: {
-    name: "오세아니아",
-    label: [868, 384],
-    countries: [
-      { name: "호주", certs: [{ name: "RCM", desc: "전자파, 무선, 전기안전을 하나로 표시. 공급자 등록 필요" }] },
-      { name: "뉴질랜드", certs: [{ name: "RCM", desc: "호주와 같은 표시 체계, 무선은 별도 규정 확인" }] },
-    ],
-  },
-};
-
-function GlobalMap() {
-  const reduce = useReducedMotionSafe();
-  const [region, setRegion] = useState<RegionId>("na");
-  const [focus, setFocus] = useState<RegionId | null>(null);
-  const info = REGIONS[region];
-  const panelId = useId();
-
-  const onKey = (id: RegionId) => (e: ReactKeyboardEvent<SVGGElement>) => {
-    if (e.key === "Enter" || e.key === " ") {
-      e.preventDefault();
-      setRegion(id);
-    }
-  };
-
-  return (
-    <section aria-labelledby="global-title" id="global" className="scroll-mt-16 px-4 py-16 md:px-6 md:py-24" style={{ background: C.indigoDeep, color: C.white }}>
-      <div className="mx-auto max-w-[1200px]">
-        <SectionHead
-          id="global-title"
-          title="대륙별 해외인증 안내"
-          desc="지도에서 대륙을 누르면 국가별로 받아야 하는 인증과 내용을 볼 수 있습니다. 국내 성적서를 인정하는 국가는 여기서 시험하고, 현지 시험이 필요한 국가는 협력 기관과 진행합니다."
-          light
-        />
-
-        <div className="mt-10 grid items-start gap-6 lg:grid-cols-[1.35fr_1fr]">
-          <div className="min-w-0">
-            <div className="rounded-[10px] border p-2 md:p-4" style={{ borderColor: "rgba(255,255,255,0.12)", background: "rgba(255,255,255,0.03)" }}>
-              <svg viewBox="0 0 1000 500" className="h-auto w-full" role="group" aria-label="대륙을 골라 해외인증 보기">
-                {REGION_IDS.map((id) => {
-                  const on = region === id;
-                  const hot = focus === id;
-                  return (
-                    <g
-                      key={id}
-                      role="button"
-                      tabIndex={0}
-                      aria-pressed={on}
-                      aria-label={`${REGIONS[id].name}, 국가 ${REGIONS[id].countries.length}곳`}
-                      aria-controls={panelId}
-                      onClick={() => setRegion(id)}
-                      onKeyDown={onKey(id)}
-                      onFocus={() => setFocus(id)}
-                      onBlur={() => setFocus(null)}
-                      onMouseEnter={() => setFocus(id)}
-                      onMouseLeave={() => setFocus(null)}
-                      className="cursor-pointer outline-none"
-                    >
-                      {REGION_SHAPES[id].map((p, i) => (
-                        <polygon
-                          key={i}
-                          points={p.map(([x, y]) => `${x},${y}`).join(" ")}
-                          fill="transparent"
-                          stroke={hot ? C.cyan : "transparent"}
-                          strokeWidth="2"
-                          strokeDasharray="6 5"
-                          strokeLinejoin="round"
-                        />
-                      ))}
-                      {REGION_DOTS[id].map(([x, y]) => (
-                        <circle key={`${x}-${y}`} cx={x} cy={y} r={4.4} fill={on ? C.cyan : hot ? "#7c88c9" : "#4a5598"} style={{ transition: reduce ? undefined : "fill 0.25s" }} />
-                      ))}
-                      <g pointerEvents="none">
-                        <rect
-                          x={REGIONS[id].label[0] - 54}
-                          y={REGIONS[id].label[1] - 21}
-                          width="108"
-                          height="38"
-                          rx="8"
-                          fill={on ? C.white : C.indigoDeep}
-                          stroke={on ? C.white : "rgba(255,255,255,0.35)"}
-                        />
-                        <text x={REGIONS[id].label[0]} y={REGIONS[id].label[1] + 6} textAnchor="middle" fontSize="20" fontWeight={700} fill={on ? C.indigo : C.white}>
-                          {REGIONS[id].name}
-                        </text>
-                      </g>
-                    </g>
-                  );
-                })}
-              </svg>
-            </div>
-            <div className="mt-3 flex flex-wrap gap-2" role="group" aria-label="대륙 목록">
-              {REGION_IDS.map((id) => (
-                <button
-                  key={id}
-                  type="button"
-                  aria-pressed={region === id}
-                  aria-controls={panelId}
-                  onClick={() => setRegion(id)}
-                  className="h-10 rounded-[8px] border px-3.5 text-[15px] font-semibold"
-                  style={region === id ? { background: C.cyan, color: C.indigoDeep, borderColor: C.cyan } : { borderColor: "rgba(255,255,255,0.25)", color: C.white }}
-                >
-                  {REGIONS[id].name}
+              {certs.length > 0 && (
+                <button type="button" onClick={openQuote} className="inline-flex h-11 items-center gap-1 rounded-[8px] border px-4 text-[15px] font-bold" style={{ borderColor: "rgba(255,255,255,0.5)" }}>
+                  견적문의 작성
+                  <span className="tabular-nums">({certs.length})</span>
                 </button>
-              ))}
+              )}
             </div>
           </div>
 
-          <div id={panelId} aria-live="polite" className="min-w-0 rounded-[10px] bg-white p-5 md:p-6" style={{ color: C.ink }}>
-            <AnimatePresence mode="wait" initial={false}>
-              <motion.div
-                key={region}
-                initial={reduce ? false : { opacity: 0, x: 12 }}
-                animate={{ opacity: 1, x: 0 }}
-                exit={reduce ? { opacity: 0, transition: { duration: 0 } } : { opacity: 0, x: -8 }}
-                transition={{ duration: 0.25, ease: EASE }}
-              >
-                <h3 className="flex items-baseline justify-between gap-2 text-[22px] font-bold tracking-[-0.02em]">
-                  {info.name}
-                  <span className="text-[14px] font-semibold tabular-nums" style={{ color: C.muted }}>
-                    국가 {info.countries.length}곳
-                  </span>
-                </h3>
-                <dl className="mt-4 space-y-4">
-                  {info.countries.map((c) => (
-                    <div key={c.name} className="border-t pt-3.5" style={{ borderColor: C.line }}>
-                      <dt className="font-bold" style={{ color: C.indigo }}>
-                        {c.name}
-                      </dt>
-                      <dd>
-                        <ul className="mt-1.5 space-y-1.5">
-                          {c.certs.map((ct) => (
-                            <li key={ct.name} className="flex gap-2.5 text-[15px] leading-[1.55]">
-                              <span className="mt-0.5 inline-flex h-6 shrink-0 items-center rounded-[6px] px-2 text-[13px] font-bold" style={{ background: C.cyanSoft, color: C.cyanText }}>
-                                {ct.name}
-                              </span>
-                              <span style={{ color: C.muted }}>{ct.desc}</span>
-                            </li>
-                          ))}
-                        </ul>
-                      </dd>
-                    </div>
-                  ))}
-                </dl>
-              </motion.div>
+          <div className="mt-4 space-y-4">
+            <AnimatePresence initial={false}>
+              {groups.map((g) => (
+                <motion.section
+                  key={g.v}
+                  aria-label={`${g.label} 인증`}
+                  className="rounded-[10px] border bg-white"
+                  style={{ borderColor: C.line }}
+                  initial={reduce ? false : { opacity: 0, y: 10 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  exit={reduce ? { opacity: 0, transition: { duration: 0 } } : { opacity: 0, y: -6 }}
+                  transition={{ duration: 0.3, ease: EASE }}
+                >
+                  <h3 className="flex items-center gap-2.5 border-b px-5 py-3 text-[17px] font-bold" style={{ borderColor: C.line }}>
+                    <span className="inline-flex h-7 min-w-9 items-center justify-center rounded-[6px] px-1.5 text-[13px] font-bold tracking-[0.04em]" style={{ background: C.indigoSoft, color: C.indigo }}>
+                      {g.code}
+                    </span>
+                    {g.label}
+                    <span className="ml-auto text-[14px] font-semibold tabular-nums" style={{ color: C.muted }}>
+                      {g.items.length}건
+                    </span>
+                  </h3>
+                  <ul>
+                    {g.items.map((c) => (
+                      <li key={c.id} className="border-b px-5 py-4 last:border-b-0" style={{ borderColor: C.paper }}>
+                        <p className="font-bold" style={{ color: C.indigo }}>
+                          {c.name}
+                        </p>
+                        <p className="mt-1 text-[15px]" style={{ color: C.muted }}>
+                          {c.reason}
+                        </p>
+                        <dl className="mt-2.5 grid gap-x-6 gap-y-1 text-[14px] sm:grid-cols-[1fr_auto]">
+                          <div className="flex min-w-0 gap-2">
+                            <dt className="shrink-0 font-semibold" style={{ color: C.cyanText }}>
+                              시험 항목
+                            </dt>
+                            <dd className="min-w-0">{c.tests}</dd>
+                          </div>
+                          <div className="flex gap-2">
+                            <dt className="shrink-0 font-semibold" style={{ color: C.cyanText }}>
+                              예상 기간
+                            </dt>
+                            <dd className="font-bold tabular-nums">{c.period}</dd>
+                          </div>
+                        </dl>
+                      </li>
+                    ))}
+                  </ul>
+                </motion.section>
+              ))}
             </AnimatePresence>
           </div>
+          <p className="mt-4 text-[14px]" style={{ color: C.muted }}>
+            품목과 사양에 따라 달라질 수 있으며, 최종 대상은 사양서 검토 후 안내합니다.
+          </p>
         </div>
       </div>
-    </section>
+    </div>
   );
 }
 
-/* ---------- 시험 진행 조회 ---------- */
+/* ---------- 시험진행현황 조회 ---------- */
 
 const STEPS = ["접수", "시료 입고", "시험 중", "성적서 발행", "인증 신청", "인증 완료"];
 const STEP_OFFSET = [0, 3, 7, 16, 19, 28];
@@ -1510,17 +2534,20 @@ function Spectrum({ pending, replayKey }: { pending: boolean; replayKey: string 
   );
 }
 
-function Tracking({ minute }: { minute: number }) {
+function Tracking() {
+  const { trackQuery, minute } = useCl();
   const reduce = useReducedMotionSafe();
-  const [query, setQuery] = useState(SAMPLE_NO);
-  const [result, setResult] = useState<TrackResult | null>(() => lookup(SAMPLE_NO));
-  const [error, setError] = useState("");
+  const first = trackQuery || SAMPLE_NO;
+  const [query, setQuery] = useState(first);
+  const [result, setResult] = useState<TrackResult | null>(() => lookup(first));
+  const [error, setError] = useState(() => (lookup(first) ? "" : "접수번호 끝 네 자리 숫자를 확인해 주십시오. 예: TE-2609-0412"));
 
   const submit = (e: FormEvent) => {
     e.preventDefault();
     const r = lookup(query);
     if (!r) {
-      setError("접수번호 끝 네 자리 숫자를 확인해 주세요. 예: TE-2609-0412");
+      setError("접수번호 끝 네 자리 숫자를 확인해 주십시오. 예: TE-2609-0412");
+      setResult(null);
       return;
     }
     setError("");
@@ -1532,18 +2559,12 @@ function Tracking({ minute }: { minute: number }) {
   const elapsed = result && today ? Math.round((dayStart(today) - dayStart(result.dates[0])) / 86_400_000) : null;
 
   return (
-    <section aria-labelledby="track-title" id="track" className="scroll-mt-16 px-4 py-16 md:px-6 md:py-24" style={{ background: C.paper }}>
-      <div className="mx-auto max-w-[1200px]">
-        <SectionHead
-          id="track-title"
-          title="시험이 어디까지 왔는지 확인하세요"
-          desc="접수 확인 메일에 적힌 접수번호를 넣으면 단계별 날짜와 시험 결과를 볼 수 있습니다."
-        />
-
-        <form onSubmit={submit} noValidate className="mt-8 flex max-w-[560px] flex-col gap-2 sm:flex-row">
-          <label htmlFor="track-no" className="sr-only">
-            접수번호
-          </label>
+    <div>
+      <form onSubmit={submit} noValidate className="rounded-[10px] border p-4 md:p-5" style={{ borderColor: C.line, background: C.paper }}>
+        <label htmlFor="track-no" className="text-[15px] font-bold">
+          접수번호
+        </label>
+        <div className="mt-2 flex max-w-[560px] flex-col gap-2 sm:flex-row">
           <input
             id="track-no"
             value={query}
@@ -1551,7 +2572,7 @@ function Tracking({ minute }: { minute: number }) {
             placeholder={SAMPLE_NO}
             autoComplete="off"
             aria-invalid={!!error}
-            aria-describedby={error ? "track-err" : undefined}
+            aria-describedby={error ? "track-err" : "track-hint"}
             className="h-12 min-w-0 flex-1 rounded-[8px] border bg-white px-4 text-[17px] font-semibold tracking-[0.02em] tabular-nums outline-none focus:border-[#23307a]"
             style={{ borderColor: error ? C.error : C.line }}
           />
@@ -1559,548 +2580,233 @@ function Tracking({ minute }: { minute: number }) {
             <Search size={18} aria-hidden />
             조회
           </button>
-        </form>
-        {error && (
+        </div>
+        {error ? (
           <p id="track-err" role="alert" className="mt-2 text-[15px] font-semibold" style={{ color: C.error }}>
             {error}
           </p>
+        ) : (
+          <p id="track-hint" className="mt-2 text-[14px]" style={{ color: C.muted }}>
+            접수번호를 입력하세요.
+          </p>
         )}
+      </form>
 
-        {result && (
-          <div className="mt-6 rounded-[10px] border bg-white" style={{ borderColor: C.line }} aria-live="polite">
-            <div className="flex flex-wrap items-center justify-between gap-x-6 gap-y-2 border-b px-5 py-4 md:px-6" style={{ borderColor: C.line }}>
-              <div className="min-w-0">
-                <p className="text-[14px]" style={{ color: C.muted }}>
-                  {result.no} · 의뢰사 (주)△△전자
-                </p>
-                <p className="text-[19px] font-bold tracking-[-0.02em]">
-                  {result.product} <span style={{ color: C.cyanText }}>{TEST_LABEL[result.kind]}</span>
-                </p>
-              </div>
-              <p className="text-[15px]">
-                <span style={{ color: C.muted }}>현재 단계 </span>
-                <strong style={{ color: C.indigo }}>{STEPS[result.step]}</strong>
-                {elapsed !== null && elapsed >= 0 && result.step < 5 && (
-                  <span className="tabular-nums" style={{ color: C.muted }}>
-                    {" "}
-                    · 접수 후 {elapsed + 1}일째
-                  </span>
-                )}
+      {result && (
+        <div className="mt-6 rounded-[10px] border bg-white" style={{ borderColor: C.line }} aria-live="polite">
+          <div className="flex flex-wrap items-center justify-between gap-x-6 gap-y-2 border-b px-5 py-4 md:px-6" style={{ borderColor: C.line }}>
+            <div className="min-w-0">
+              <p className="text-[14px] tabular-nums" style={{ color: C.muted }}>
+                {result.no} · 의뢰사 (주)△△전자
+              </p>
+              <p className="text-[19px] font-bold tracking-[-0.02em]">
+                {result.product} <span style={{ color: C.cyanText }}>{TEST_LABEL[result.kind]}</span>
               </p>
             </div>
-
-            <ol className="grid grid-cols-1 gap-0 px-5 py-5 sm:grid-cols-3 md:px-6 lg:grid-cols-6">
-              {STEPS.map((s, i) => {
-                const done = i < result.step || result.step === 5;
-                const now = i === result.step && result.step !== 5;
-                return (
-                  <li key={s} className="relative flex gap-3 pb-4 sm:block sm:pb-5 sm:pr-3" aria-current={now ? "step" : undefined}>
-                    <div className="flex flex-col items-center sm:flex-row">
-                      <motion.span
-                        className="relative z-10 inline-flex h-8 w-8 shrink-0 items-center justify-center rounded-full border-2 text-[14px] font-bold tabular-nums"
-                        style={
-                          done
-                            ? { background: C.indigo, borderColor: C.indigo, color: C.white }
-                            : now
-                              ? { background: C.white, borderColor: C.cyan, color: C.indigo }
-                              : { background: C.white, borderColor: C.line, color: C.muted }
-                        }
-                        initial={reduce ? false : { scale: 0.6, opacity: 0 }}
-                        animate={{ scale: 1, opacity: 1 }}
-                        transition={{ duration: 0.3, delay: reduce ? 0 : i * 0.07, ease: EASE }}
-                        key={`${result.no}-${i}`}
-                      >
-                        {done ? <Check size={16} strokeWidth={3} aria-hidden /> : i + 1}
-                        {now && !reduce && <span className="absolute inset-[-5px] animate-ping rounded-full border-2 motion-reduce:hidden" style={{ borderColor: C.cyan, opacity: 0.35 }} aria-hidden />}
-                      </motion.span>
-                      {i < STEPS.length - 1 && <span className="mt-1 w-0.5 flex-1 sm:ml-1 sm:mt-0 sm:h-0.5 sm:w-auto" style={{ background: done ? C.indigo : C.line }} aria-hidden />}
-                    </div>
-                    <div className="sm:mt-2.5">
-                      <p className="font-bold" style={{ color: done || now ? C.ink : C.muted }}>
-                        {s}
-                        {now && <span className="sr-only"> (현재 단계)</span>}
-                      </p>
-                      <p className="text-[14px] tabular-nums" style={{ color: C.muted }}>
-                        {done || now ? mdw(result.dates[i]) : `${md(result.dates[i])} 예정`}
-                      </p>
-                    </div>
-                  </li>
-                );
-              })}
-            </ol>
-
-            <div className="border-t px-5 py-5 md:px-6" style={{ borderColor: C.line }}>
-              {result.step < 2 ? (
-                <p className="rounded-[8px] px-4 py-3 text-[15px]" style={{ background: C.paper, color: C.muted }}>
-                  {result.step === 0 ? "시료가 들어오면 시험 일정을 확정해 메일로 알려 드립니다." : `${md(result.dates[2])}에 시험을 시작합니다. 시험 모드 설정이 필요한 시료는 담당 시험원이 먼저 연락드립니다.`}
-                </p>
-              ) : result.kind === "EMC" ? (
-                <div className="grid items-start gap-6 lg:grid-cols-[1.6fr_1fr]">
-                  <div className="min-w-0">
-                    <p className="font-bold">
-                      방사 방출 {result.step === 2 ? "예비 측정" : "측정 결과"} <span className="text-[14px] font-normal" style={{ color: C.muted }}>3m, 수평·수직 편파 중 큰 값</span>
-                    </p>
-                    <div className="mt-3">
-                      <Spectrum pending={false} replayKey={result.no} />
-                    </div>
-                  </div>
-                  <div>
-                    <dl className="divide-y rounded-[8px] border text-[15px]" style={{ borderColor: C.line }}>
-                      {[
-                        ["판정", result.step === 2 ? "측정 중" : "적합"],
-                        ["최소 여유", `${WORST_MARGIN}dB (${WORST.f}MHz)`],
-                        ["기준", "방사 방출 B급, 준첨두값"],
-                        ["측정 장소", "3m 전파무향실"],
-                      ].map(([k, v], i) => (
-                        <div key={k} className="flex items-center justify-between gap-3 px-4 py-2.5" style={{ borderColor: C.line }}>
-                          <dt style={{ color: C.muted }}>{k}</dt>
-                          <dd
-                            className={`text-right tabular-nums ${i === 0 ? "rounded-[6px] px-2.5 py-0.5 font-bold" : "font-semibold"}`}
-                            style={i === 0 ? (result.step === 2 ? { background: C.cyanSoft, color: C.cyanText } : { background: C.okSoft, color: C.ok }) : undefined}
-                          >
-                            {v}
-                          </dd>
-                        </div>
-                      ))}
-                    </dl>
-                    <p className="mt-3 text-[14px]" style={{ color: C.muted }}>
-                      표시한 점은 준첨두값으로 다시 잰 주요 신호입니다. 담당 시험원 김○○, {TEL}
-                    </p>
-                  </div>
-                </div>
-              ) : (
-                <div className="overflow-x-auto">
-                  <table className="w-full min-w-[320px] text-left text-[15px]">
-                    <caption className="pb-2 text-left font-bold">{TEST_LABEL[result.kind]} 항목별 결과</caption>
-                    <thead>
-                      <tr style={{ color: C.muted }}>
-                        <th scope="col" className="py-2 pr-3 font-semibold">
-                          항목
-                        </th>
-                        <th scope="col" className="py-2 font-semibold">
-                          결과
-                        </th>
-                      </tr>
-                    </thead>
-                    <tbody>
-                      {ITEMS[result.kind].map((it, i) => {
-                        const pass = result.step >= 3 || i < 2;
-                        return (
-                          <tr key={it} className="border-t" style={{ borderColor: C.line }}>
-                            <th scope="row" className="py-2.5 pr-3 font-semibold">
-                              {it}
-                            </th>
-                            <td className="py-2.5">
-                              <span className="rounded-[6px] px-2.5 py-0.5 text-[14px] font-bold" style={pass ? { background: C.okSoft, color: C.ok } : { background: C.cyanSoft, color: C.cyanText }}>
-                                {pass ? "적합" : "시험 중"}
-                              </span>
-                            </td>
-                          </tr>
-                        );
-                      })}
-                    </tbody>
-                  </table>
-                </div>
-              )}
-            </div>
-          </div>
-        )}
-      </div>
-    </section>
-  );
-}
-
-/* ---------- 회사소개 ---------- */
-
-const ACCREDIT = [
-  { k: "전파법 지정시험기관", v: "전자파 적합성(EMC), 무선기기(RF) 분야", no: "제KT0000호" },
-  { k: "ISO/IEC 17025 공인시험기관 인정", v: "전기·전자, 전자파 분야", no: "제KT0000호" },
-  { k: "전기용품 안전 시험기관 지정", v: "가정용 전기기기, 조명기기, 정보기기", no: "제0000-00호" },
-  { k: "해외 인증기관 협력 시험소", v: "△△ 인증기관(북미), △△ 인증기관(유럽)", no: "협약 2건" },
-  { k: "에너지 효율 시험기관 지정", v: "조명기기, 전원 장치", no: "제0000-000호" },
-];
-
-function About() {
-  return (
-    <section aria-labelledby="about-title" id="about" className="scroll-mt-16 px-4 py-16 md:px-6 md:py-24">
-      <div className="mx-auto max-w-[1200px]">
-        <div className="grid items-start gap-10 md:grid-cols-[1.1fr_1fr] md:gap-14">
-          <div>
-            <SectionHead id="about-title" title="인사말" />
-            <div className="mt-5 space-y-3" style={{ color: C.muted }}>
-              <p>{COMPANY}은 전자파 시험실 하나로 시작해 지금은 무선, 전기안전, 해외 인증까지 맡는 지정시험기관이 되었습니다.</p>
-              <p>시험은 결과만큼 일정이 중요합니다. 시료가 들어온 날 시험 일정을 정해 알려 드리고, 기준을 넘는 항목이 나오면 원인 주파수와 대책을 함께 말씀드립니다. 처음 인증을 받는 회사도 서류 준비부터 차근차근 안내해 드리겠습니다.</p>
-            </div>
-            <p className="mt-6 font-bold">대표이사 김○○</p>
-          </div>
-          <div className="relative aspect-[4/3] overflow-hidden rounded-[10px] border" style={{ borderColor: C.line }}>
-            <Image
-              src={`${IMG}/lab.jpg`}
-              alt="스펙트럼 분석기와 오실로스코프가 놓인 전자 시험대"
-              fill
-              sizes="(min-width: 768px) 45vw, 100vw"
-              className="object-cover"
-            />
-          </div>
-        </div>
-
-        <h3 className="mt-16 text-[22px] font-bold tracking-[-0.02em] md:text-[26px]">공인 시험소 지정·인정 현황</h3>
-        <ul className="mt-5 grid gap-3 md:grid-cols-2">
-          {ACCREDIT.map((a) => (
-            <li key={a.k} className="flex items-start gap-4 rounded-[10px] border p-4 md:p-5" style={{ borderColor: C.line }}>
-              <span className="inline-flex h-10 w-10 shrink-0 items-center justify-center rounded-[8px]" style={{ background: C.cyanSoft, color: C.cyanText }}>
-                <Check size={20} strokeWidth={2.6} aria-hidden />
-              </span>
-              <span className="min-w-0 flex-1">
-                <span className="block font-bold">{a.k}</span>
-                <span className="block text-[15px]" style={{ color: C.muted }}>
-                  {a.v}
+            <p className="text-[15px]">
+              <span style={{ color: C.muted }}>현재 단계 </span>
+              <strong style={{ color: C.indigo }}>{STEPS[result.step]}</strong>
+              {elapsed !== null && elapsed >= 0 && result.step < 5 && (
+                <span className="tabular-nums" style={{ color: C.muted }}>
+                  {" "}
+                  (접수 후 {elapsed + 1}일째)
                 </span>
-              </span>
-              <span className="shrink-0 text-[14px] font-semibold tabular-nums" style={{ color: C.indigo }}>
-                {a.no}
-              </span>
-            </li>
-          ))}
-        </ul>
-      </div>
-    </section>
-  );
-}
-
-/* ---------- 시험 설비 ---------- */
-
-const FACILITIES = [
-  {
-    name: "3m 전파무향실",
-    body: "방사 방출과 방사 내성을 측정합니다. 지름 2m 턴테이블과 1~4m 안테나 마스트를 갖췄습니다.",
-    specs: [
-      ["크기", "9 × 6 × 6 m"],
-      ["주파수", "30MHz ~ 18GHz"],
-      ["턴테이블 하중", "1.2톤"],
-    ],
-    draw: "chamber" as const,
-  },
-  {
-    name: "차폐실",
-    body: "외부 전파를 막은 방에서 정전기, 전도 내성, 서지 같은 내성 시험을 합니다.",
-    specs: [
-      ["차폐 성능", "100dB 이상"],
-      ["정전기 방전", "±30kV까지"],
-      ["서지", "6kV까지"],
-    ],
-    draw: "shield" as const,
-  },
-  {
-    name: "전도 시험 설비",
-    body: "전원선과 통신선으로 나가는 잡음을 의사 전원망(LISN)으로 측정합니다.",
-    specs: [
-      ["주파수", "150kHz ~ 30MHz"],
-      ["전원", "단상·삼상 100A"],
-      ["통신선", "ISN 8선"],
-    ],
-    draw: "conducted" as const,
-  },
-  {
-    name: "안전 시험실",
-    body: "절연, 내전압, 온도 상승, 누설전류를 재고 구조와 부품을 검토합니다.",
-    specs: [
-      ["내전압", "AC 5kV"],
-      ["온도 기록", "60채널"],
-      ["항온항습", "-40 ~ 150°C"],
-    ],
-    draw: "safety" as const,
-  },
-];
-
-function FacilityIcon({ kind }: { kind: (typeof FACILITIES)[number]["draw"] }) {
-  const s = { fill: "none", stroke: C.indigo, strokeWidth: 1.6, strokeLinejoin: "round" as const, strokeLinecap: "round" as const };
-  return (
-    <svg viewBox="0 0 120 64" className="h-16 w-full" aria-hidden>
-      <rect x="0.5" y="0.5" width="119" height="63" rx="6" fill={C.paper} stroke={C.line} />
-      {kind === "chamber" && (
-        <>
-          {Array.from({ length: 9 }, (_, i) => (
-            <path key={i} d={`M${12 + i * 11} 14 l5 -7 l5 7`} {...s} stroke={C.cyan} />
-          ))}
-          <ellipse cx="44" cy="50" rx="18" ry="4" {...s} />
-          <rect x="38" y="36" width="12" height="10" rx="1.5" {...s} />
-          <path d="M92 52 V24 M86 24 H98 M88 28 H96" {...s} />
-        </>
-      )}
-      {kind === "shield" && (
-        <>
-          <rect x="16" y="12" width="88" height="42" rx="3" {...s} strokeDasharray="4 3" />
-          <path d="M44 20 l-8 14 h10 l-6 14" {...s} stroke={C.cyan} />
-          <rect x="62" y="34" width="26" height="14" rx="2" {...s} />
-        </>
-      )}
-      {kind === "conducted" && (
-        <>
-          <path d="M10 40 H38 M70 40 H110" {...s} />
-          <rect x="38" y="30" width="32" height="20" rx="2" {...s} />
-          <path d="M42 22 C48 12 54 32 60 18 S66 24 70 18" {...s} stroke={C.cyan} />
-          <text x="54" y="44" textAnchor="middle" fontSize="8" fill={C.indigo} fontWeight={700}>
-            LISN
-          </text>
-        </>
-      )}
-      {kind === "safety" && (
-        <>
-          <rect x="18" y="16" width="34" height="34" rx="3" {...s} />
-          <path d="M37 22 l-7 12 h8 l-5 10" {...s} stroke={C.cyan} />
-          <path d="M70 48 V18 M70 48 a6 6 0 1 0 0.01 0" {...s} />
-          <path d="M84 20 H100 M84 30 H96 M84 40 H100" {...s} strokeDasharray="2 3" />
-        </>
-      )}
-    </svg>
-  );
-}
-
-function Facilities() {
-  const reduce = useReducedMotionSafe();
-  return (
-    <section aria-labelledby="facility-title" id="facility" className="scroll-mt-16 px-4 py-16 md:px-6 md:py-24" style={{ background: C.paper, ...GRAPH }}>
-      <div className="mx-auto max-w-[1200px]">
-        <SectionHead id="facility-title" title="주요 시험 설비" desc="측정 장비는 해마다 공인 교정기관에서 교정하고, 무향실은 정기적으로 성능을 검증합니다." />
-        <ul className="mt-10 grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
-          {FACILITIES.map((f, i) => (
-            <motion.li
-              key={f.name}
-              className="flex flex-col rounded-[10px] border bg-white p-5"
-              style={{ borderColor: C.line }}
-              initial={reduce ? false : { opacity: 0, y: 14 }}
-              whileInView={{ opacity: 1, y: 0 }}
-              viewport={{ once: true, amount: 0.4 }}
-              transition={{ duration: 0.45, delay: i * 0.06, ease: EASE }}
-            >
-              <FacilityIcon kind={f.draw} />
-              <h3 className="mt-4 text-[19px] font-bold tracking-[-0.02em]">{f.name}</h3>
-              <p className="mt-1.5 text-[15px]" style={{ color: C.muted }}>
-                {f.body}
-              </p>
-              <dl className="mt-4 space-y-1 border-t pt-3 text-[14px]" style={{ borderColor: C.line }}>
-                {f.specs.map(([k, v]) => (
-                  <div key={k} className="flex justify-between gap-3">
-                    <dt style={{ color: C.muted }}>{k}</dt>
-                    <dd className="text-right font-bold tabular-nums">{v}</dd>
-                  </div>
-                ))}
-              </dl>
-            </motion.li>
-          ))}
-        </ul>
-      </div>
-    </section>
-  );
-}
-
-/* ---------- 고객지원: 새소식, 자료실, 질의응답 ---------- */
-
-type BoardTab = "news" | "files";
-
-const BOARD: { tab: BoardTab; title: string; date: string; file?: string }[] = [
-  { tab: "news", title: "전파법 시행령 개정에 따른 적합성평가 절차 변경 안내", date: "2026-09-28" },
-  { tab: "news", title: "추석 연휴 시료 접수와 성적서 발행 일정 안내", date: "2026-09-15" },
-  { tab: "news", title: "3m 전파무향실 정기 검증에 따른 시험 일정 조정 안내", date: "2026-08-30" },
-  { tab: "news", title: "방송통신기자재 적합성평가 고시 일부 개정 안내", date: "2026-08-12" },
-  { tab: "news", title: "유럽 무선기기 지침 사이버보안 요구사항 시험 대응 안내", date: "2026-07-21" },
-  { tab: "news", title: "전기용품 안전기준 개정 사항 설명회 개최 안내", date: "2026-06-30" },
-  { tab: "files", title: "시험 의뢰서 양식", date: "2026-09-20", file: "HWP · 48KB" },
-  { tab: "files", title: "시료 정보와 시험 모드 기재표", date: "2026-09-02", file: "XLSX · 31KB" },
-  { tab: "files", title: "전자파 적합성 시험 준비 체크리스트", date: "2026-08-18", file: "PDF · 412KB" },
-  { tab: "files", title: "무선기기 적합인증 제출 기술 문서 목록", date: "2026-07-30", file: "PDF · 286KB" },
-  { tab: "files", title: "해외인증 국가별 표시 방법 정리", date: "2026-07-02", file: "PDF · 1.2MB" },
-  { tab: "files", title: "전기용품 안전인증 공장 심사 준비 자료", date: "2026-05-27", file: "PDF · 640KB" },
-];
-
-const FAQ = [
-  {
-    q: "시험 기간은 얼마나 걸리나요?",
-    a: "시료와 서류가 모두 들어온 날부터 셉니다. 전자파 적합등록은 보통 2~3주, 무선 적합인증은 3~5주, 전기용품 안전인증은 공장 심사를 포함해 4~6주 정도 걸립니다.",
-  },
-  {
-    q: "시료는 몇 대를 보내야 하나요?",
-    a: "전자파 시험은 보통 2대, 무선 시험은 일반 시료 1대와 연속 송신으로 설정한 시험용 시료 1대가 필요합니다. 품목에 따라 달라 견적과 함께 안내해 드립니다.",
-  },
-  {
-    q: "시험에서 기준을 넘으면 어떻게 하나요?",
-    a: "넘은 주파수와 크기를 바로 알려 드리고, 페라이트 코어나 필터 같은 대책을 붙여 다시 측정할 수 있습니다. 같은 접수 건 안에서 한 번은 추가 비용 없이 다시 측정합니다.",
-  },
-  {
-    q: "해외 인증도 이곳에서 시험하면 되나요?",
-    a: "미국, 유럽처럼 국내 시험 성적서를 인정하는 국가는 이곳에서 시험해 신청합니다. 중국 CCC처럼 현지 시험이 필요한 국가는 협력 기관을 통해 진행하고 일정을 함께 관리합니다.",
-  },
-  {
-    q: "견적은 언제 받을 수 있나요?",
-    a: "제품 사양서나 사진을 보내 주시면 영업일 기준 하루 안에 견적서를 메일로 보내 드립니다.",
-  },
-];
-
-function Support({ minute }: { minute: number }) {
-  const reduce = useReducedMotionSafe();
-  const [tab, setTab] = useState<BoardTab>("news");
-  const [query, setQuery] = useState("");
-  const [openFaq, setOpenFaq] = useState<number | null>(0);
-  const tabRefs = useRef<Record<BoardTab, HTMLButtonElement | null>>({ news: null, files: null });
-
-  const q = query.trim();
-  const list = BOARD.filter((b) => b.tab === tab && (!q || b.title.includes(q)));
-  const today = minute < 0 ? null : dayStart(new Date(minute * 60_000));
-  const isNew = (date: string) => {
-    if (today === null) return false;
-    const [y, m, d] = date.split("-").map(Number);
-    const diff = (today - new Date(y, m - 1, d).getTime()) / 86_400_000;
-    return diff >= 0 && diff <= 14;
-  };
-
-  const tabs: { id: BoardTab; label: string }[] = [
-    { id: "news", label: "새소식" },
-    { id: "files", label: "자료실" },
-  ];
-
-  const onTabKey = (e: ReactKeyboardEvent<HTMLButtonElement>) => {
-    if (e.key !== "ArrowRight" && e.key !== "ArrowLeft") return;
-    e.preventDefault();
-    const next: BoardTab = tab === "news" ? "files" : "news";
-    setTab(next);
-    tabRefs.current[next]?.focus();
-  };
-
-  return (
-    <section aria-labelledby="support-title" id="support" className="scroll-mt-16 px-4 py-16 md:px-6 md:py-24">
-      <div className="mx-auto max-w-[1200px]">
-        <SectionHead id="support-title" title="새소식과 자료실" desc="고시 개정 소식과 시험 신청에 필요한 양식을 올려 둡니다." />
-
-        <div className="mt-10 grid items-start gap-10 lg:grid-cols-[1.25fr_1fr] lg:gap-12">
-          <div className="min-w-0">
-            <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
-              <div role="tablist" aria-label="게시판" className="inline-flex rounded-[8px] p-1" style={{ background: C.paper }}>
-                {tabs.map((t) => (
-                  <button
-                    key={t.id}
-                    ref={(el) => {
-                      tabRefs.current[t.id] = el;
-                    }}
-                    type="button"
-                    role="tab"
-                    id={`board-tab-${t.id}`}
-                    aria-selected={tab === t.id}
-                    aria-controls="board-panel"
-                    tabIndex={tab === t.id ? 0 : -1}
-                    onClick={() => setTab(t.id)}
-                    onKeyDown={onTabKey}
-                    className="h-10 rounded-[6px] px-5 text-[15px] font-bold transition-colors"
-                    style={tab === t.id ? { background: C.white, color: C.indigo, boxShadow: "0 1px 2px rgba(20,26,51,0.12)" } : { color: C.muted }}
-                  >
-                    {t.label}
-                  </button>
-                ))}
-              </div>
-              <label className="relative block sm:w-[260px]">
-                <span className="sr-only">제목 검색</span>
-                <Search size={18} className="pointer-events-none absolute left-3 top-1/2 -translate-y-1/2" style={{ color: C.muted }} aria-hidden />
-                <input
-                  type="search"
-                  value={query}
-                  onChange={(e) => setQuery(e.target.value)}
-                  placeholder="제목 검색"
-                  className="h-11 w-full rounded-[8px] border pl-10 pr-3 outline-none focus:border-[#23307a]"
-                  style={{ borderColor: C.line }}
-                />
-              </label>
-            </div>
-
-            <div id="board-panel" role="tabpanel" aria-labelledby={`board-tab-${tab}`} className="mt-4">
-              {list.length > 0 ? (
-                <ul className="border-t" style={{ borderColor: C.ink }}>
-                  {list.map((b) => (
-                    <li key={b.title} className="flex flex-wrap items-center gap-x-3 gap-y-1 border-b py-3.5" style={{ borderColor: C.line }}>
-                      {b.file ? (
-                        <FileText size={18} className="shrink-0" style={{ color: C.cyanText }} aria-hidden />
-                      ) : (
-                        <span className="h-1.5 w-1.5 shrink-0 rounded-full" style={{ background: C.indigo }} aria-hidden />
-                      )}
-                      <span className="min-w-0 flex-1 font-semibold">
-                        {b.title}
-                        {isNew(b.date) && (
-                          <span className="ml-2 rounded-[4px] px-1.5 py-0.5 align-middle text-[12px] font-bold" style={{ background: C.cyanSoft, color: C.cyanText }}>
-                            새 글
-                          </span>
-                        )}
-                      </span>
-                      <span className="flex w-full gap-3 pl-[30px] text-[14px] tabular-nums sm:w-auto sm:pl-0" style={{ color: C.muted }}>
-                        {b.file && <span>{b.file}</span>}
-                        <span>{b.date.replaceAll("-", ".")}</span>
-                      </span>
-                    </li>
-                  ))}
-                </ul>
-              ) : (
-                <p className="rounded-[10px] p-6 text-center" style={{ background: C.paper, color: C.muted }}>
-                  &lsquo;{q}&rsquo;가 들어간 글이 없습니다.
-                </p>
               )}
-            </div>
+            </p>
           </div>
 
-          <div className="min-w-0">
-            <h3 className="text-[22px] font-bold tracking-[-0.02em]">질의응답</h3>
-            <ul className="mt-4 border-t" style={{ borderColor: C.ink }}>
-              {FAQ.map((f, i) => {
-                const open = openFaq === i;
-                return (
-                  <li key={f.q} className="border-b" style={{ borderColor: C.line }}>
-                    <h4>
-                      <button
-                        type="button"
-                        id={`faq-q-${i}`}
-                        aria-expanded={open}
-                        aria-controls={`faq-a-${i}`}
-                        onClick={() => setOpenFaq(open ? null : i)}
-                        className="flex w-full items-center gap-3 py-4 text-left font-semibold"
+          <ol className="grid grid-cols-1 gap-0 px-5 py-5 sm:grid-cols-3 md:px-6 xl:grid-cols-6">
+            {STEPS.map((st, i) => {
+              const done = i < result.step || result.step === 5;
+              const now = i === result.step && result.step !== 5;
+              return (
+                <li key={st} className="relative flex gap-3 pb-4 sm:block sm:pb-5 sm:pr-3" aria-current={now ? "step" : undefined}>
+                  <div className="flex flex-col items-center sm:flex-row">
+                    <motion.span
+                      className="relative z-10 inline-flex h-8 w-8 shrink-0 items-center justify-center rounded-full border-2 text-[14px] font-bold tabular-nums"
+                      style={done ? { background: C.indigo, borderColor: C.indigo, color: C.white } : now ? { background: C.white, borderColor: C.cyan, color: C.indigo } : { background: C.white, borderColor: C.line, color: C.muted }}
+                      initial={reduce ? false : { scale: 0.6, opacity: 0 }}
+                      animate={{ scale: 1, opacity: 1 }}
+                      transition={{ duration: 0.3, delay: reduce ? 0 : i * 0.07, ease: EASE }}
+                      key={`${result.no}-${i}`}
+                    >
+                      {done ? <Check size={16} strokeWidth={3} aria-hidden /> : i + 1}
+                    </motion.span>
+                    {i < STEPS.length - 1 && <span className="mt-1 w-0.5 flex-1 sm:ml-1 sm:mt-0 sm:h-0.5 sm:w-auto" style={{ background: done ? C.indigo : C.line }} aria-hidden />}
+                  </div>
+                  <div className="sm:mt-2.5">
+                    <p className="font-bold" style={{ color: done || now ? C.ink : C.muted }}>
+                      {st}
+                      {now && <span className="sr-only"> (현재 단계)</span>}
+                    </p>
+                    <p className="text-[14px] tabular-nums" style={{ color: C.muted }}>
+                      {done || now ? mdw(result.dates[i]) : `${md(result.dates[i])} 예정`}
+                    </p>
+                  </div>
+                </li>
+              );
+            })}
+          </ol>
+
+          <div className="border-t px-5 py-5 md:px-6" style={{ borderColor: C.line }}>
+            {result.step < 2 ? (
+              <p className="rounded-[8px] px-4 py-3 text-[15px]" style={{ background: C.paper, color: C.muted }}>
+                {result.step === 0 ? "시료가 들어오면 시험 일정을 확정해 메일로 알려 드립니다." : `${md(result.dates[2])}에 시험을 시작합니다. 시험 모드 설정이 필요한 시료는 담당 시험원이 먼저 연락드립니다.`}
+              </p>
+            ) : result.kind === "EMC" ? (
+              <div className="grid items-start gap-6 xl:grid-cols-[1.6fr_1fr]">
+                <div className="min-w-0">
+                  <p className="font-bold">
+                    방사 방출 {result.step === 2 ? "예비 측정" : "측정 결과"}{" "}
+                    <span className="text-[14px] font-normal" style={{ color: C.muted }}>
+                      3m, 수평·수직 편파 중 큰 값
+                    </span>
+                  </p>
+                  <div className="mt-3">
+                    <Spectrum pending={false} replayKey={result.no} />
+                  </div>
+                </div>
+                <dl className="divide-y rounded-[8px] border text-[15px]" style={{ borderColor: C.line }}>
+                  {[
+                    ["판정", result.step === 2 ? "측정 중" : "적합"],
+                    ["최소 여유", `${WORST_MARGIN}dB (${WORST.f}MHz)`],
+                    ["기준", "방사 방출 B급, 준첨두값"],
+                    ["측정 장소", "3m 전파무향실"],
+                    ["담당 시험원", "김○○"],
+                  ].map(([k, v], i) => (
+                    <div key={k} className="flex items-center justify-between gap-3 px-4 py-2.5" style={{ borderColor: C.line }}>
+                      <dt style={{ color: C.muted }}>{k}</dt>
+                      <dd
+                        className={`text-right tabular-nums ${i === 0 ? "rounded-[6px] px-2.5 py-0.5 font-bold" : "font-semibold"}`}
+                        style={i === 0 ? (result.step === 2 ? { background: C.cyanSoft, color: C.cyanText } : { background: C.okSoft, color: C.ok }) : undefined}
                       >
-                        <span className="text-[15px] font-bold" style={{ color: C.cyanText }} aria-hidden>
-                          Q
-                        </span>
-                        <span className="flex-1">{f.q}</span>
-                        <ChevronDown size={19} className="shrink-0 transition-transform duration-200" style={{ transform: open ? "rotate(180deg)" : undefined, color: C.muted }} aria-hidden />
-                      </button>
-                    </h4>
-                    <AnimatePresence initial={false}>
-                      {open && (
-                        <motion.div
-                          id={`faq-a-${i}`}
-                          role="region"
-                          aria-labelledby={`faq-q-${i}`}
-                          className="overflow-hidden"
-                          initial={reduce ? false : { height: 0, opacity: 0 }}
-                          animate={{ height: "auto", opacity: 1 }}
-                          exit={reduce ? { opacity: 0, transition: { duration: 0 } } : { height: 0, opacity: 0 }}
-                          transition={{ duration: 0.25, ease: EASE }}
-                        >
-                          <p className="pb-4 pl-7 text-[15px]" style={{ color: C.muted }}>
-                            {f.a}
-                          </p>
-                        </motion.div>
-                      )}
-                    </AnimatePresence>
-                  </li>
-                );
-              })}
-            </ul>
-            <a href="#quote" className="mt-5 inline-flex h-11 items-center gap-2 rounded-[8px] border px-4 text-[15px] font-bold" style={{ borderColor: C.line, color: C.indigo }}>
-              <Mail size={17} aria-hidden />
-              찾는 답이 없으면 문의하기
-            </a>
+                        {v}
+                      </dd>
+                    </div>
+                  ))}
+                </dl>
+              </div>
+            ) : (
+              <div className="overflow-x-auto">
+                <table className="w-full min-w-[320px] text-left text-[15px]">
+                  <caption className="pb-2 text-left font-bold">{TEST_LABEL[result.kind]} 항목별 결과</caption>
+                  <thead>
+                    <tr style={{ color: C.muted }}>
+                      <th scope="col" className="py-2 pr-3 font-semibold">
+                        항목
+                      </th>
+                      <th scope="col" className="py-2 font-semibold">
+                        결과
+                      </th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {ITEMS[result.kind].map((it, i) => {
+                      const pass = result.step >= 3 || i < 2;
+                      return (
+                        <tr key={it} className="border-t" style={{ borderColor: C.line }}>
+                          <th scope="row" className="py-2.5 pr-3 font-semibold">
+                            {it}
+                          </th>
+                          <td className="py-2.5">
+                            <span className="rounded-[6px] px-2.5 py-0.5 text-[14px] font-bold" style={pass ? { background: C.okSoft, color: C.ok } : { background: C.cyanSoft, color: C.cyanText }}>
+                              {pass ? "적합" : "시험 중"}
+                            </span>
+                          </td>
+                        </tr>
+                      );
+                    })}
+                  </tbody>
+                </table>
+              </div>
+            )}
           </div>
         </div>
-      </div>
-    </section>
+      )}
+    </div>
   );
 }
 
-/* ---------- 견적 문의 ---------- */
+/* ---------- 성적서 진위확인 ---------- */
+
+function Verify() {
+  const [no, setNo] = useState("TR-2609-0412");
+  const [shown, setShown] = useState<string | null>(null);
+  const [error, setError] = useState("");
+
+  const submit = (e: FormEvent) => {
+    e.preventDefault();
+    if (!lookup(no)) {
+      setError("성적서 번호 끝 네 자리 숫자를 확인해 주십시오. 예: TR-2609-0412");
+      setShown(null);
+      return;
+    }
+    setError("");
+    setShown(no.trim().toUpperCase());
+  };
+
+  const r = shown ? lookup(shown) : null;
+  const valid = r ? Number(r.no.slice(-4)) % 7 !== 0 : false;
+
+  return (
+    <div>
+      <form onSubmit={submit} noValidate className="rounded-[10px] border p-4 md:p-5" style={{ borderColor: C.line, background: C.paper }}>
+        <label htmlFor="cl-verify-no" className="text-[15px] font-bold">
+          성적서 번호
+        </label>
+        <div className="mt-2 flex max-w-[560px] flex-col gap-2 sm:flex-row">
+          <input
+            id="cl-verify-no"
+            value={no}
+            onChange={(e) => setNo(e.target.value)}
+            autoComplete="off"
+            aria-invalid={!!error}
+            aria-describedby={error ? "cl-verify-err" : undefined}
+            className="h-12 min-w-0 flex-1 rounded-[8px] border bg-white px-4 text-[17px] font-semibold tabular-nums outline-none focus:border-[#23307a]"
+            style={{ borderColor: error ? C.error : C.line }}
+          />
+          <button type="submit" className="inline-flex h-12 items-center justify-center gap-2 rounded-[8px] px-6 font-bold" style={{ background: C.indigo, color: C.white }}>
+            <ShieldCheck size={18} aria-hidden />
+            확인
+          </button>
+        </div>
+        {error && (
+          <p id="cl-verify-err" role="alert" className="mt-2 text-[15px] font-semibold" style={{ color: C.error }}>
+            {error}
+          </p>
+        )}
+      </form>
+      <div aria-live="polite" className="mt-6">
+        {r &&
+          (valid ? (
+            <div>
+              <p className="mb-3 inline-flex items-center gap-2 rounded-[8px] px-3 py-1.5 font-bold" style={{ background: C.okSoft, color: C.ok }}>
+                <Check size={18} strokeWidth={3} aria-hidden />
+                발급된 성적서입니다
+              </p>
+              <InfoList
+                rows={[
+                  ["성적서 번호", <span key="n" className="tabular-nums">{shown}</span>],
+                  ["발급일", <span key="d" className="tabular-nums">{`${r.dates[3].getFullYear()}.${md(r.dates[3])}`}</span>],
+                  ["시험 분야", TEST_LABEL[r.kind]],
+                  ["제품명", r.product],
+                  ["의뢰사", "(주)△△전자"],
+                  ["판정", "적합"],
+                ]}
+              />
+            </div>
+          ) : (
+            <p className="inline-flex items-center gap-2 rounded-[8px] px-3 py-2 font-bold" style={{ background: C.errorSoft, color: C.error }}>
+              <CircleAlert size={18} aria-hidden />
+              발급 기록이 없는 번호입니다. {TEL}로 문의해 주십시오.
+            </p>
+          ))}
+      </div>
+    </div>
+  );
+}
+
+/* ---------- 견적문의 ---------- */
 
 type Field = "company" | "person" | "phone" | "email" | "product" | "file" | "agree";
 type Errors = Partial<Record<Field, string>>;
@@ -2120,12 +2826,12 @@ interface Values {
 
 function validate(v: Values): Errors {
   const e: Errors = {};
-  if (!v.company.trim()) e.company = "회사명을 적어 주세요.";
-  if (v.person.trim().length < 2) e.person = "담당자 이름을 두 글자 이상 적어 주세요.";
-  if (v.phone.replace(/\D/g, "").length < 9) e.phone = "연락처를 9자리 이상 숫자로 적어 주세요.";
-  if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(v.email.trim())) e.email = "이메일 형식을 확인해 주세요.";
-  if (!v.product.trim()) e.product = "제품명을 적어 주세요.";
-  if (!v.agree) e.agree = "개인정보 수집·이용에 동의해 주세요.";
+  if (!v.company.trim()) e.company = "회사명을 입력해 주십시오.";
+  if (v.person.trim().length < 2) e.person = "담당자명을 두 글자 이상 입력해 주십시오.";
+  if (v.phone.replace(/\D/g, "").length < 9) e.phone = "연락처를 9자리 이상 숫자로 입력해 주십시오.";
+  if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(v.email.trim())) e.email = "이메일 형식을 확인해 주십시오.";
+  if (!v.product.trim()) e.product = "제품명을 입력해 주십시오.";
+  if (!v.agree) e.agree = "개인정보 수집·이용에 동의해 주십시오.";
   return e;
 }
 
@@ -2139,7 +2845,67 @@ interface Receipt {
   file: string | null;
 }
 
-function Quote({ certs, setCerts }: { certs: string[]; setCerts: (fn: (prev: string[]) => string[]) => void }) {
+/** 진행규격 칸에 쓰는 짧은 이름 */
+function stdOf(certs: string[]) {
+  const set = new Set<string>();
+  for (const c of certs) {
+    if (c.includes("KCs")) set.add("KCs");
+    else if (/적합|전기용품|에너지|2차전지|공급자/.test(c)) set.add("KC");
+    else if (c.startsWith("CE") || c === "RoHS") set.add("CE");
+    else if (c.startsWith("FCC")) set.add("FCC");
+    else if (c !== "해외인증 상담") set.add(c.split(" ")[0]);
+  }
+  return set.size ? [...set].slice(0, 3).join(", ") : "상담";
+}
+
+function Quote() {
+  const { quoteForm, setQuoteForm, rows } = useCl();
+  return quoteForm ? <QuoteForm onList={() => setQuoteForm(false)} /> : <QuoteList onWrite={() => setQuoteForm(true)} rows={rows} />;
+}
+
+function QuoteList({ rows, onWrite }: { rows: QuoteRow[]; onWrite: () => void }) {
+  return (
+    <div>
+      <div className="flex flex-wrap items-center justify-between gap-3">
+        <p className="text-[15px] tabular-nums" style={{ color: C.muted }}>
+          총 <strong style={{ color: C.ink }}>{rows.length}</strong>건 (최근 접수)
+        </p>
+        <button type="button" onClick={onWrite} className="inline-flex h-11 items-center gap-1.5 rounded-[8px] px-5 text-[15px] font-bold" style={{ background: C.indigo, color: C.white }}>
+          <Plus size={17} aria-hidden />
+          견적문의 작성
+        </button>
+      </div>
+      <div className="mt-3">
+        <DataTable
+          caption="견적문의 접수 목록"
+          head={["번호", "진행규격", "고객사", "등록일", "상태"]}
+          rows={rows.map((r) => [
+            <span key="n" className="font-normal tabular-nums" style={{ color: C.muted }}>
+              {r.no}
+            </span>,
+            <span key="s" className="font-bold">
+              {r.std}
+            </span>,
+            r.company,
+            <span key="d" className="tabular-nums" style={{ color: C.muted }}>
+              {r.date.replaceAll("-", ".")}
+            </span>,
+            <span key="st" className="whitespace-nowrap rounded-[6px] px-2 py-0.5 text-[13px] font-bold" style={r.done ? { background: C.okSoft, color: C.ok } : { background: C.cyanSoft, color: C.cyanText }}>
+              {r.done ? "답변완료" : "접수"}
+            </span>,
+          ])}
+          min={540}
+        />
+      </div>
+      <p className="mt-3 text-[14px]" style={{ color: C.muted }}>
+        고객사명은 일부를 가려 표시하며, 문의 내용은 작성자와 담당자만 볼 수 있습니다.
+      </p>
+    </div>
+  );
+}
+
+function QuoteForm({ onList }: { onList: () => void }) {
+  const { certs, setCerts, go, rows, addRow } = useCl();
   const reduce = useReducedMotionSafe();
   const [values, setValues] = useState<Values>({ company: "", person: "", phone: "", email: "", product: "", agree: false });
   const [model, setModel] = useState("");
@@ -2158,7 +2924,7 @@ function Quote({ certs, setCerts }: { certs: string[]; setCerts: (fn: (prev: str
   const pickFile = (f: File | undefined) => {
     if (!f) return;
     const ext = f.name.split(".").pop()?.toLowerCase() ?? "";
-    const err = !FILE_EXT.includes(ext) ? "PDF, 한글, 워드, 엑셀, 이미지, ZIP 파일만 고를 수 있습니다." : f.size > FILE_MAX ? "20MB가 넘는 파일은 메일로 보내 주세요." : "";
+    const err = !FILE_EXT.includes(ext) ? "PDF, 한글, 워드, 엑셀, 이미지, ZIP 파일만 첨부할 수 있습니다." : f.size > FILE_MAX ? "20MB가 넘는 파일은 메일로 보내 주십시오." : "";
     setFileErr(err);
     if (err) {
       setFile(null);
@@ -2193,6 +2959,13 @@ function Quote({ certs, setCerts }: { certs: string[]; setCerts: (fn: (prev: str
       certs,
       file: file ? `${file.name} (${fileSize(file.size)})` : null,
     });
+    addRow({
+      no: (rows[0]?.no ?? 0) + 1,
+      std: stdOf(certs),
+      company: maskCompany(values.company),
+      date: `${now.getFullYear()}-${pad2(now.getMonth() + 1)}-${pad2(now.getDate())}`,
+      done: false,
+    });
   };
 
   const reset = () => {
@@ -2204,6 +2977,7 @@ function Quote({ certs, setCerts }: { certs: string[]; setCerts: (fn: (prev: str
     setFileErr("");
     setTried(false);
     setCerts(() => []);
+    onList();
   };
 
   const inputCls = "mt-1.5 h-12 w-full rounded-[8px] border bg-white px-3 outline-none focus:border-[#23307a]";
@@ -2232,430 +3006,410 @@ function Quote({ certs, setCerts }: { certs: string[]; setCerts: (fn: (prev: str
   const errorCount = Object.values(errors).filter(Boolean).length;
 
   return (
-    <section aria-labelledby="quote-title" id="quote" className="scroll-mt-16 px-4 py-16 md:px-6 md:py-24" style={{ background: C.paper }}>
-      <div className="mx-auto grid max-w-[1200px] items-start gap-10 lg:grid-cols-[0.8fr_1.2fr] lg:gap-14">
-        <div>
-          <SectionHead id="quote-title" title="제품 사양을 보내 주시면 견적을 드립니다" desc="영업일 기준 하루 안에 담당 시험원이 견적서를 메일로 보내 드립니다. 급한 일정은 전화로 먼저 말씀해 주세요." />
-          <dl className="mt-8 overflow-hidden rounded-[10px] border bg-white text-[15px]" style={{ borderColor: C.line }}>
-            {[
-              ["전화", TEL],
-              ["팩스", FAX],
-              ["이메일", EMAIL],
-              ["상담 시간", "평일 09:00 ~ 18:00"],
-            ].map(([k, v]) => (
-              <div key={k} className="grid grid-cols-[92px_1fr] border-b last:border-b-0" style={{ borderColor: C.line }}>
-                <dt className="px-4 py-3" style={{ color: C.muted, background: "#fafbfd" }}>
-                  {k}
-                </dt>
-                <dd className="px-4 py-3 font-bold tabular-nums">{v}</dd>
+    <div aria-live="polite">
+      <AnimatePresence mode="wait" initial={false}>
+        {done ? (
+          <motion.div
+            key="done"
+            className="overflow-hidden rounded-[10px] border bg-white"
+            style={{ borderColor: C.line }}
+            initial={reduce ? false : { opacity: 0, y: 12 }}
+            animate={{ opacity: 1, y: 0 }}
+            exit={{ opacity: 0 }}
+            transition={{ duration: 0.3, ease: EASE }}
+          >
+            <div className="flex items-center gap-3 px-6 py-5" style={{ background: C.indigo, color: C.white }}>
+              <span className="inline-flex h-10 w-10 shrink-0 items-center justify-center rounded-[8px]" style={{ background: C.cyan, color: C.indigoDeep }}>
+                <Check size={22} strokeWidth={2.6} aria-hidden />
+              </span>
+              <div>
+                <p className="text-[20px] font-bold tracking-[-0.02em]">견적문의가 접수되었습니다</p>
+                <p className="text-[15px]" style={{ color: "#c8cdea" }}>
+                  영업일 기준 1일 이내 담당자가 견적서를 메일로 보내 드립니다.
+                </p>
               </div>
-            ))}
-          </dl>
-        </div>
+            </div>
+            <dl className="px-6 py-5 text-[15px]">
+              {(
+                [
+                  ["접수번호", done.no],
+                  ["회사명", done.company],
+                  ["담당자명", done.person],
+                  ["연락처", done.phone],
+                  ["제품", done.product],
+                  ["진행규격", done.certs.length ? done.certs.join(", ") : "상담 후 결정"],
+                  ["첨부", done.file ?? "없음"],
+                ] as const
+              ).map(([k, v], i) => (
+                <div key={k} className="grid grid-cols-[88px_1fr] gap-3 border-b py-2.5 last:border-b-0" style={{ borderColor: C.line }}>
+                  <dt style={{ color: C.muted }}>{k}</dt>
+                  <dd className={`min-w-0 break-words tabular-nums ${i === 0 ? "text-[19px] font-bold" : "font-semibold"}`} style={i === 0 ? { color: C.indigo } : undefined}>
+                    {v}
+                  </dd>
+                </div>
+              ))}
+            </dl>
+            <div className="flex flex-wrap gap-2 px-6 pb-6">
+              <button type="button" onClick={reset} className="inline-flex h-11 items-center gap-1.5 rounded-[8px] border px-4 text-[15px] font-bold" style={{ borderColor: C.line }}>
+                <RotateCcw size={16} aria-hidden />
+                목록
+              </button>
+              <button type="button" onClick={() => go("about", "location")} className="inline-flex h-11 items-center gap-1 rounded-[8px] border px-4 text-[15px] font-bold" style={{ borderColor: C.line, color: C.indigo }}>
+                시료 접수 안내
+                <ChevronRight size={16} aria-hidden />
+              </button>
+            </div>
+          </motion.div>
+        ) : (
+          <motion.form key="form" onSubmit={submit} noValidate exit={{ opacity: 0 }}>
+            <p className="mb-5">영업일 기준 1일 이내 담당자가 견적서를 메일로 보내 드립니다.</p>
+            {errorCount > 0 && tried && (
+              <p role="alert" className="mb-5 flex items-center gap-2 rounded-[8px] px-3 py-2.5 text-[15px] font-semibold" style={{ background: C.errorSoft, color: C.error }}>
+                <CircleAlert size={18} aria-hidden />
+                입력 내용을 확인해 주십시오. 확인할 항목 {errorCount}개
+              </p>
+            )}
+            <div className="grid gap-5 border-t-2 pt-6 sm:grid-cols-2" style={{ borderColor: C.indigo }}>
+              <div>
+                {label("q-company", "회사명")}
+                <input id="q-company" value={values.company} onChange={(e) => set("company", e.target.value)} autoComplete="organization" placeholder="(주)△△전자" className={inputCls} style={border("company")} {...aria("company")} />
+                {errText("company")}
+              </div>
+              <div>
+                {label("q-person", "담당자명")}
+                <input id="q-person" value={values.person} onChange={(e) => set("person", e.target.value)} autoComplete="name" className={inputCls} style={border("person")} {...aria("person")} />
+                {errText("person")}
+              </div>
+              <div>
+                {label("q-phone", "연락처")}
+                <input id="q-phone" value={values.phone} onChange={(e) => set("phone", e.target.value)} type="tel" inputMode="tel" autoComplete="tel" placeholder="010-0000-0000" className={`${inputCls} tabular-nums`} style={border("phone")} {...aria("phone")} />
+                {errText("phone")}
+              </div>
+              <div>
+                {label("q-email", "이메일")}
+                <input id="q-email" value={values.email} onChange={(e) => set("email", e.target.value)} type="email" autoComplete="email" placeholder="name@example.com" className={inputCls} style={border("email")} {...aria("email")} />
+                {errText("email")}
+              </div>
+              <div>
+                {label("q-product", "제품명")}
+                <input id="q-product" value={values.product} onChange={(e) => set("product", e.target.value)} placeholder="블루투스 스피커" className={inputCls} style={border("product")} {...aria("product")} />
+                {errText("product")}
+              </div>
+              <div>
+                {label("q-model", "모델명", false)}
+                <input id="q-model" value={model} onChange={(e) => setModel(e.target.value)} placeholder="AB-100" className={inputCls} style={{ borderColor: C.line }} />
+              </div>
 
-        <div aria-live="polite">
-          <AnimatePresence mode="wait" initial={false}>
-            {done ? (
-              <motion.div
-                key="done"
-                className="overflow-hidden rounded-[10px] border bg-white"
-                style={{ borderColor: C.line }}
-                initial={reduce ? false : { opacity: 0, y: 12 }}
-                animate={{ opacity: 1, y: 0 }}
-                exit={{ opacity: 0 }}
-                transition={{ duration: 0.35, ease: EASE }}
-              >
-                <div className="flex items-center gap-3 px-6 py-5" style={{ background: C.indigo, color: C.white }}>
-                  <span className="inline-flex h-10 w-10 shrink-0 items-center justify-center rounded-[8px]" style={{ background: C.cyan, color: C.indigoDeep }}>
-                    <Check size={22} strokeWidth={2.6} aria-hidden />
-                  </span>
-                  <div>
-                    <p className="text-[20px] font-bold tracking-[-0.02em]">견적 문의가 접수됐습니다</p>
-                    <p className="text-[15px]" style={{ color: "#c8cdea" }}>
-                      {done.person}님께 영업일 기준 하루 안에 연락드리겠습니다.
+              <fieldset className="sm:col-span-2">
+                <legend className="text-[15px] font-bold">진행규격</legend>
+                <div className="mt-1.5 rounded-[8px] border p-3" style={{ borderColor: C.line, background: "#fafbfd" }}>
+                  {certs.length > 0 ? (
+                    <ul className="flex flex-wrap gap-2">
+                      {certs.map((c) => (
+                        <li key={c}>
+                          <span className="inline-flex h-9 items-center gap-1 rounded-[8px] pl-3 pr-1 text-[14px] font-bold" style={{ background: C.indigo, color: C.white }}>
+                            {c}
+                            <button type="button" onClick={() => toggleCert(c)} aria-label={`${c} 삭제`} className="inline-flex h-7 w-7 items-center justify-center rounded-[6px] hover:bg-white/15">
+                              <X size={15} aria-hidden />
+                            </button>
+                          </span>
+                        </li>
+                      ))}
+                    </ul>
+                  ) : (
+                    <p className="text-[14px]" style={{ color: C.muted }}>
+                      선택한 인증이 없습니다.{" "}
+                      <button type="button" onClick={() => go("support", "finder")} className="font-semibold underline underline-offset-4" style={{ color: C.indigo }}>
+                        인증 대상 조회
+                      </button>
                     </p>
-                  </div>
-                </div>
-                <dl className="px-6 py-5 text-[15px]">
-                  {(
-                    [
-                      ["접수번호", done.no],
-                      ["회사명", done.company],
-                      ["담당자", done.person],
-                      ["연락처", done.phone],
-                      ["제품", done.product],
-                      ["인증", done.certs.length ? done.certs.join(", ") : "상담 후 결정"],
-                      ["첨부", done.file ?? "없음"],
-                    ] as const
-                  ).map(([k, v], i) => (
-                    <div key={k} className="grid grid-cols-[88px_1fr] gap-3 border-b py-2.5 last:border-b-0" style={{ borderColor: C.line }}>
-                      <dt style={{ color: C.muted }}>{k}</dt>
-                      <dd className={`min-w-0 break-words tabular-nums ${i === 0 ? "text-[19px] font-bold" : "font-semibold"}`} style={i === 0 ? { color: C.indigo } : undefined}>
-                        {v}
-                      </dd>
+                  )}
+                  {extra.length > 0 && (
+                    <div className="mt-3 flex flex-wrap gap-1.5 border-t pt-3" style={{ borderColor: C.line }}>
+                      {extra.map((c) => (
+                        <button key={c} type="button" onClick={() => toggleCert(c)} className="inline-flex h-9 items-center gap-1 rounded-[8px] border bg-white px-2.5 text-[14px] font-semibold" style={{ borderColor: C.line, color: C.ink }}>
+                          <Plus size={14} aria-hidden style={{ color: C.cyanText }} />
+                          <span className="sr-only">추가: </span>
+                          {c}
+                        </button>
+                      ))}
                     </div>
-                  ))}
-                </dl>
-                <div className="px-6 pb-6">
-                  <button type="button" onClick={reset} className="inline-flex h-11 items-center gap-1.5 rounded-[8px] border px-4 text-[15px] font-bold" style={{ borderColor: C.line }}>
-                    <RotateCcw size={16} aria-hidden />
-                    새 문의 쓰기
-                  </button>
+                  )}
                 </div>
-              </motion.div>
-            ) : (
-              <motion.form key="form" onSubmit={submit} noValidate exit={{ opacity: 0 }} className="rounded-[10px] border bg-white p-5 md:p-7" style={{ borderColor: C.line }}>
-                {errorCount > 0 && tried && (
-                  <p role="alert" className="mb-5 flex items-center gap-2 rounded-[8px] px-3 py-2.5 text-[15px] font-semibold" style={{ background: C.errorSoft, color: C.error }}>
-                    <CircleAlert size={18} aria-hidden />
-                    입력 내용을 확인해 주세요. 고칠 곳 {errorCount}개
-                  </p>
-                )}
-                <div className="grid gap-5 sm:grid-cols-2">
-                  <div>
-                    {label("q-company", "회사명")}
-                    <input id="q-company" value={values.company} onChange={(e) => set("company", e.target.value)} autoComplete="organization" placeholder="(주)△△전자" className={inputCls} style={border("company")} {...aria("company")} />
-                    {errText("company")}
-                  </div>
-                  <div>
-                    {label("q-person", "담당자")}
-                    <input id="q-person" value={values.person} onChange={(e) => set("person", e.target.value)} autoComplete="name" placeholder="김하늘" className={inputCls} style={border("person")} {...aria("person")} />
-                    {errText("person")}
-                  </div>
-                  <div>
-                    {label("q-phone", "연락처")}
-                    <input id="q-phone" value={values.phone} onChange={(e) => set("phone", e.target.value)} type="tel" inputMode="tel" autoComplete="tel" placeholder="010-1234-5678" className={`${inputCls} tabular-nums`} style={border("phone")} {...aria("phone")} />
-                    {errText("phone")}
-                  </div>
-                  <div>
-                    {label("q-email", "이메일")}
-                    <input id="q-email" value={values.email} onChange={(e) => set("email", e.target.value)} type="email" autoComplete="email" placeholder="name@example.com" className={inputCls} style={border("email")} {...aria("email")} />
-                    {errText("email")}
-                  </div>
-                  <div>
-                    {label("q-product", "제품명")}
-                    <input id="q-product" value={values.product} onChange={(e) => set("product", e.target.value)} placeholder="블루투스 스피커" className={inputCls} style={border("product")} {...aria("product")} />
-                    {errText("product")}
-                  </div>
-                  <div>
-                    {label("q-model", "모델명", false)}
-                    <input id="q-model" value={model} onChange={(e) => setModel(e.target.value)} placeholder="AB-100" className={inputCls} style={{ borderColor: C.line }} />
-                  </div>
+              </fieldset>
 
-                  <fieldset className="sm:col-span-2">
-                    <legend className="text-[15px] font-bold">선택한 인증</legend>
-                    <div className="mt-1.5 rounded-[8px] border p-3" style={{ borderColor: C.line, background: "#fafbfd" }}>
-                      {certs.length > 0 ? (
-                        <ul className="flex flex-wrap gap-2">
-                          {certs.map((c) => (
-                            <li key={c}>
-                              <span className="inline-flex h-9 items-center gap-1 rounded-[8px] pl-3 pr-1 text-[14px] font-bold" style={{ background: C.indigo, color: C.white }}>
-                                {c}
-                                <button type="button" onClick={() => toggleCert(c)} aria-label={`${c} 빼기`} className="inline-flex h-7 w-7 items-center justify-center rounded-[6px] hover:bg-white/15">
-                                  <X size={15} aria-hidden />
-                                </button>
-                              </span>
-                            </li>
-                          ))}
-                        </ul>
-                      ) : (
-                        <p className="text-[14px]" style={{ color: C.muted }}>
-                          <a href="#finder" className="font-semibold underline underline-offset-4" style={{ color: C.indigo }}>
-                            필요한 인증 찾기
-                          </a>
-                          에서 담거나 아래에서 고르세요. 잘 모르면 비워 두셔도 됩니다.
+              <div className="sm:col-span-2">
+                {label("q-file", "사양서 첨부", false)}
+                <div className="mt-1.5 flex flex-wrap items-center gap-3 rounded-[8px] border border-dashed p-3" style={{ borderColor: errors.file ? C.error : "#b4bdd0", background: "#fafbfd" }}>
+                  <label className="inline-flex h-11 cursor-pointer items-center gap-2 rounded-[8px] px-4 text-[15px] font-bold focus-within:outline focus-within:outline-2 focus-within:outline-offset-2" style={{ background: C.indigo, color: C.white }}>
+                    <FileUp size={18} aria-hidden />
+                    파일 선택
+                    <input
+                      ref={fileRef}
+                      id="q-file"
+                      type="file"
+                      accept={FILE_EXT.map((x) => `.${x}`).join(",")}
+                      className="sr-only"
+                      onChange={(e) => pickFile(e.target.files?.[0])}
+                      aria-describedby={errors.file ? "q-file-err q-file-hint" : "q-file-hint"}
+                    />
+                  </label>
+                  {file ? (
+                    <span className="flex min-w-0 flex-1 items-center gap-2 text-[15px]">
+                      <span className="min-w-0 truncate font-semibold">{file.name}</span>
+                      <span className="shrink-0 tabular-nums" style={{ color: C.muted }}>
+                        {fileSize(file.size)}
+                      </span>
+                      <button type="button" onClick={removeFile} aria-label="파일 삭제" className="ml-auto inline-flex h-10 w-10 shrink-0 items-center justify-center rounded-[8px]" style={{ color: C.muted }}>
+                        <Trash2 size={18} aria-hidden />
+                      </button>
+                    </span>
+                  ) : (
+                    <span className="text-[14px]" style={{ color: C.muted }}>
+                      회로도, 부품 목록, 제품 사진
+                    </span>
+                  )}
+                </div>
+                <p id="q-file-hint" className="mt-1 text-[13px]" style={{ color: C.muted }}>
+                  PDF, 한글, 워드, 엑셀, 이미지, ZIP 파일 (최대 20MB). 데모 화면이라 파일은 어디에도 올리지 않습니다.
+                </p>
+                {errText("file")}
+              </div>
+
+              <div className="sm:col-span-2">
+                {label("q-memo", "요청 사항", false)}
+                <textarea
+                  id="q-memo"
+                  value={memo}
+                  onChange={(e) => setMemo(e.target.value)}
+                  rows={4}
+                  placeholder="출시 예정일, 판매 국가, 시료 준비 일정"
+                  className="mt-1.5 w-full rounded-[8px] border bg-white px-3 py-2.5 outline-none focus:border-[#23307a]"
+                  style={{ borderColor: C.line }}
+                />
+              </div>
+
+              <div className="rounded-[8px] border p-4 sm:col-span-2" style={{ borderColor: C.line }}>
+                <p className="text-[14px]" style={{ color: C.muted }}>
+                  수집 항목: 회사명, 담당자명, 연락처, 이메일. 보관 기간: 문의 처리 후 1년.
+                </p>
+                <label className="mt-2 flex cursor-pointer items-start gap-2.5 text-[15px]">
+                  <input id="q-agree" type="checkbox" checked={values.agree} onChange={(e) => set("agree", e.target.checked)} className="mt-1 h-5 w-5 shrink-0 accent-[#23307a]" {...aria("agree")} />
+                  <span>개인정보 수집·이용에 동의합니다.</span>
+                </label>
+                {errText("agree")}
+              </div>
+            </div>
+            <div className="mt-7 flex flex-wrap justify-center gap-2">
+              <button type="button" onClick={onList} className="h-12 rounded-[8px] border px-6 text-[16px] font-bold" style={{ borderColor: C.line }}>
+                목록
+              </button>
+              <button type="submit" className="h-12 min-w-[180px] rounded-[8px] px-6 text-[16px] font-bold" style={{ background: C.indigo, color: C.white }}>
+                문의하기
+              </button>
+            </div>
+          </motion.form>
+        )}
+      </AnimatePresence>
+    </div>
+  );
+}
+
+/* ---------- 새소식, 자료실, 질의응답 ---------- */
+
+function Board({ tab }: { tab: "news" | "files" }) {
+  const [query, setQuery] = useState("");
+  const [open, setOpen] = useState<string | null>(null);
+  const all = BOARD.filter((b) => b.tab === tab);
+  const q = query.trim();
+  const list = all.filter((b) => !q || b.title.includes(q));
+  const searchId = useId();
+
+  return (
+    <div>
+      <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+        <p className="text-[15px] tabular-nums" style={{ color: C.muted }}>
+          총 <strong style={{ color: C.ink }}>{list.length}</strong>건
+        </p>
+        <span className="relative block sm:w-[280px]">
+          <label htmlFor={searchId} className="sr-only">
+            제목 검색
+          </label>
+          <Search size={18} className="pointer-events-none absolute left-3 top-1/2 -translate-y-1/2" style={{ color: C.muted }} aria-hidden />
+          <input
+            id={searchId}
+            type="search"
+            value={query}
+            onChange={(e) => setQuery(e.target.value)}
+            placeholder="제목 검색"
+            className="h-11 w-full rounded-[8px] border pl-10 pr-3 outline-none focus:border-[#23307a]"
+            style={{ borderColor: C.line }}
+          />
+        </span>
+      </div>
+      <div className="mt-3 border-t-2" style={{ borderColor: C.indigo }}>
+        <div className="hidden grid-cols-[64px_1fr_120px] border-b py-3 text-center text-[14px] font-bold md:grid" style={{ background: C.paper, borderColor: C.line }} aria-hidden>
+          <span>번호</span>
+          <span>제목</span>
+          <span>등록일</span>
+        </div>
+        {list.length > 0 ? (
+          <ul>
+            {list.map((b) => {
+              const on = open === b.title;
+              const idx = all.length - all.indexOf(b);
+              const panel = `cl-post-${tab}-${idx}`;
+              return (
+                <li key={b.title} className="border-b" style={{ borderColor: C.line }}>
+                  <button
+                    type="button"
+                    aria-expanded={on}
+                    aria-controls={panel}
+                    onClick={() => setOpen(on ? null : b.title)}
+                    className="grid w-full grid-cols-[1fr] gap-y-0.5 px-1 py-3.5 text-left md:grid-cols-[64px_1fr_120px] md:items-center md:px-0"
+                  >
+                    <span className="hidden text-center text-[14px] tabular-nums md:block" style={{ color: C.muted }}>
+                      {idx}
+                    </span>
+                    <span className="flex min-w-0 items-center gap-2 font-semibold">
+                      {b.file && <FileText size={17} className="shrink-0" style={{ color: C.cyanText }} aria-hidden />}
+                      <span className="min-w-0">{b.title}</span>
+                      <ChevronDown size={17} className="ml-auto shrink-0 transition-transform md:ml-0" style={{ transform: on ? "rotate(180deg)" : undefined, color: C.muted }} aria-hidden />
+                    </span>
+                    <span className="text-[13px] tabular-nums md:text-center md:text-[14px]" style={{ color: C.muted }}>
+                      {b.date.replaceAll("-", ".")}
+                    </span>
+                  </button>
+                  {on && (
+                    <div id={panel} className="px-4 py-5 text-[15px] md:px-[80px]" style={{ background: C.paper }}>
+                      <p>{b.body}</p>
+                      {b.file && (
+                        <p className="mt-3 inline-flex items-center gap-2 rounded-[8px] border bg-white px-3 py-2 text-[14px]" style={{ borderColor: C.line }}>
+                          <FileText size={16} style={{ color: C.cyanText }} aria-hidden />
+                          첨부 {b.title.replace(/^\[서식\]\s*/, "")} ({b.file})
                         </p>
                       )}
-                      {extra.length > 0 && (
-                        <div className="mt-3 flex flex-wrap gap-1.5 border-t pt-3" style={{ borderColor: C.line }}>
-                          {extra.map((c) => (
-                            <button
-                              key={c}
-                              type="button"
-                              onClick={() => toggleCert(c)}
-                              className="inline-flex h-9 items-center gap-1 rounded-[8px] border bg-white px-2.5 text-[14px] font-semibold"
-                              style={{ borderColor: C.line, color: C.ink }}
-                            >
-                              <Plus size={14} aria-hidden style={{ color: C.cyanText }} />
-                              <span className="sr-only">추가: </span>
-                              {c}
-                            </button>
-                          ))}
-                        </div>
-                      )}
                     </div>
-                  </fieldset>
+                  )}
+                </li>
+              );
+            })}
+          </ul>
+        ) : (
+          <p className="p-8 text-center" style={{ background: C.paper, color: C.muted }}>
+            검색 결과가 없습니다.
+          </p>
+        )}
+      </div>
+    </div>
+  );
+}
 
-                  <div className="sm:col-span-2">
-                    {label("q-file", "사양서 파일", false)}
-                    <div className="mt-1.5 flex flex-wrap items-center gap-3 rounded-[8px] border border-dashed p-3" style={{ borderColor: errors.file ? C.error : "#b4bdd0", background: "#fafbfd" }}>
-                      <label className="inline-flex h-11 cursor-pointer items-center gap-2 rounded-[8px] px-4 text-[15px] font-bold focus-within:outline focus-within:outline-2 focus-within:outline-offset-2" style={{ background: C.indigo, color: C.white }}>
-                        <FileUp size={18} aria-hidden />
-                        파일 선택
-                        <input
-                          ref={fileRef}
-                          id="q-file"
-                          type="file"
-                          accept={FILE_EXT.map((x) => `.${x}`).join(",")}
-                          className="sr-only"
-                          onChange={(e) => pickFile(e.target.files?.[0])}
-                          aria-describedby={errors.file ? "q-file-err q-file-hint" : "q-file-hint"}
-                        />
-                      </label>
-                      {file ? (
-                        <span className="flex min-w-0 flex-1 items-center gap-2 text-[15px]">
-                          <span className="min-w-0 truncate font-semibold">{file.name}</span>
-                          <span className="shrink-0 tabular-nums" style={{ color: C.muted }}>
-                            {fileSize(file.size)}
-                          </span>
-                          <button type="button" onClick={removeFile} aria-label="파일 빼기" className="ml-auto inline-flex h-10 w-10 shrink-0 items-center justify-center rounded-[8px]" style={{ color: C.muted }}>
-                            <Trash2 size={18} aria-hidden />
-                          </button>
-                        </span>
-                      ) : (
-                        <span className="text-[14px]" style={{ color: C.muted }}>
-                          회로도, 부품 목록, 제품 사진
-                        </span>
-                      )}
-                    </div>
-                    <p id="q-file-hint" className="mt-1 text-[13px]" style={{ color: C.muted }}>
-                      PDF, 한글, 워드, 엑셀, 이미지, ZIP 파일, 20MB까지. 데모 화면이라 파일은 어디에도 올리지 않습니다.
-                    </p>
-                    {errText("file")}
-                  </div>
+const FAQ = [
+  {
+    q: "시험 기간은 얼마나 걸리나요?",
+    a: "시료와 서류가 모두 들어온 날부터 셉니다. 전자파 적합등록은 보통 2~3주, 무선 적합인증은 3~5주, 전기용품 안전인증은 공장 심사를 포함해 4~6주 정도 걸립니다.",
+  },
+  {
+    q: "시료는 몇 대를 보내야 하나요?",
+    a: "전자파 시험은 보통 2대, 무선 시험은 일반 시료 1대와 연속 송신으로 설정한 시험용 시료 1대가 필요합니다. 품목에 따라 달라 견적과 함께 안내해 드립니다.",
+  },
+  {
+    q: "시험에서 기준을 넘으면 어떻게 하나요?",
+    a: "넘은 주파수와 크기를 바로 알려 드리고, 페라이트 코어나 필터 같은 대책을 붙여 다시 측정할 수 있습니다. 같은 접수 건 안에서 한 번은 추가 비용 없이 다시 측정합니다.",
+  },
+  {
+    q: "해외 인증도 이곳에서 시험하면 되나요?",
+    a: "미국, 유럽처럼 국내 시험 성적서를 인정하는 국가는 이곳에서 시험해 신청합니다. 중국 CCC처럼 현지 시험이 필요한 국가는 협력 기관을 통해 진행하고 일정을 함께 관리합니다.",
+  },
+  {
+    q: "견적은 언제 받을 수 있나요?",
+    a: "제품 사양서나 사진을 보내 주시면 영업일 기준 하루 안에 견적서를 메일로 보내 드립니다.",
+  },
+];
 
-                  <div className="sm:col-span-2">
-                    {label("q-memo", "요청 사항", false)}
-                    <textarea
-                      id="q-memo"
-                      value={memo}
-                      onChange={(e) => setMemo(e.target.value)}
-                      rows={4}
-                      placeholder="출시 예정일, 판매 국가, 시료 준비 일정 등을 적어 주세요."
-                      className="mt-1.5 w-full rounded-[8px] border bg-white px-3 py-2.5 outline-none focus:border-[#23307a]"
-                      style={{ borderColor: C.line }}
-                    />
-                  </div>
-
-                  <div className="sm:col-span-2">
-                    <label className="flex cursor-pointer items-start gap-2.5 text-[15px]">
-                      <input id="q-agree" type="checkbox" checked={values.agree} onChange={(e) => set("agree", e.target.checked)} className="mt-1 h-5 w-5 shrink-0 accent-[#23307a]" {...aria("agree")} />
-                      <span>
-                        개인정보 수집·이용에 동의합니다. <span style={{ color: C.muted }}>수집 항목: 회사명, 담당자, 연락처, 이메일. 보관 기간: 문의 처리 후 1년.</span>
-                      </span>
-                    </label>
-                    {errText("agree")}
-                  </div>
-                </div>
-                <button type="submit" className="mt-7 w-full rounded-[8px] py-3.5 text-[17px] font-bold" style={{ background: C.indigo, color: C.white }}>
-                  견적 문의 보내기
+function Faq() {
+  const reduce = useReducedMotionSafe();
+  const { openQuote } = useCl();
+  const [openFaq, setOpenFaq] = useState<number | null>(0);
+  return (
+    <div>
+      <ul className="border-t-2" style={{ borderColor: C.indigo }}>
+        {FAQ.map((f, i) => {
+          const open = openFaq === i;
+          return (
+            <li key={f.q} className="border-b" style={{ borderColor: C.line }}>
+              <h3>
+                <button
+                  type="button"
+                  id={`faq-q-${i}`}
+                  aria-expanded={open}
+                  aria-controls={`faq-a-${i}`}
+                  onClick={() => setOpenFaq(open ? null : i)}
+                  className="flex w-full items-center gap-3 py-4 text-left font-semibold"
+                >
+                  <span className="text-[15px] font-bold" style={{ color: C.cyanText }} aria-hidden>
+                    Q
+                  </span>
+                  <span className="flex-1">{f.q}</span>
+                  <ChevronDown size={19} className="shrink-0 transition-transform duration-200" style={{ transform: open ? "rotate(180deg)" : undefined, color: C.muted }} aria-hidden />
                 </button>
-              </motion.form>
-            )}
-          </AnimatePresence>
-        </div>
-      </div>
-    </section>
-  );
-}
-
-/* ---------- 채용 ---------- */
-
-const JOBS = [
-  { role: "EMC 시험원", req: "전기·전자 관련 학과, 경력 무관", type: "정규직" },
-  { role: "RF 시험원", req: "무선 측정 경험 2년 이상", type: "정규직" },
-  { role: "해외인증 담당", req: "영문 기술 문서 작성 가능자", type: "정규직" },
-];
-
-function Recruit() {
-  return (
-    <section aria-labelledby="recruit-title" id="recruit" className="scroll-mt-16 px-4 py-16 md:px-6 md:py-20">
-      <div className="mx-auto grid max-w-[1200px] items-start gap-8 md:grid-cols-[1fr_1.4fr] md:gap-14">
-        <div>
-          <SectionHead id="recruit-title" title="함께 시험할 사람을 찾습니다" desc="상시 채용합니다. 이력서와 자기소개서를 메일로 보내 주시면 서류 검토 후 2주 안에 연락드립니다." />
-          <a href={`mailto:${EMAIL}`} className="mt-6 inline-flex h-11 items-center gap-2 rounded-[8px] border px-4 text-[15px] font-bold" style={{ borderColor: C.line, color: C.indigo }}>
-            <Mail size={17} aria-hidden />
-            {EMAIL}
-          </a>
-        </div>
-        <ul className="grid gap-3">
-          {JOBS.map((j) => (
-            <li key={j.role} className="flex items-center gap-4 rounded-[10px] border p-4" style={{ borderColor: C.line }}>
-              <span className="inline-flex h-10 w-10 shrink-0 items-center justify-center rounded-[8px]" style={{ background: C.indigoSoft, color: C.indigo }}>
-                <Briefcase size={19} aria-hidden />
-              </span>
-              <span className="min-w-0 flex-1">
-                <span className="block font-bold">{j.role}</span>
-                <span className="block text-[15px]" style={{ color: C.muted }}>
-                  {j.req}
-                </span>
-              </span>
-              <span className="shrink-0 rounded-[6px] px-2.5 py-1 text-[13px] font-bold" style={{ background: C.cyanSoft, color: C.cyanText }}>
-                {j.type}
-              </span>
+              </h3>
+              <AnimatePresence initial={false}>
+                {open && (
+                  <motion.div
+                    id={`faq-a-${i}`}
+                    role="region"
+                    aria-labelledby={`faq-q-${i}`}
+                    className="overflow-hidden"
+                    initial={reduce ? false : { height: 0, opacity: 0 }}
+                    animate={{ height: "auto", opacity: 1 }}
+                    exit={reduce ? { opacity: 0, transition: { duration: 0 } } : { height: 0, opacity: 0 }}
+                    transition={{ duration: 0.25, ease: EASE }}
+                  >
+                    <p className="pb-4 pl-7 text-[15px]" style={{ color: C.muted }}>
+                      {f.a}
+                    </p>
+                  </motion.div>
+                )}
+              </AnimatePresence>
             </li>
-          ))}
-        </ul>
-      </div>
-    </section>
+          );
+        })}
+      </ul>
+      <button type="button" onClick={openQuote} className="mt-6 inline-flex h-11 items-center rounded-[8px] border px-4 text-[15px] font-bold" style={{ borderColor: C.line, color: C.indigo }}>
+        견적문의
+      </button>
+    </div>
   );
 }
 
-/* ---------- 시료 보내실 곳 ---------- */
-
-const SHIP_TO = `${ADDRESS} 1층 시료접수실`;
-const SHIP_RECEIVER = "시료접수팀";
-const SHIP_TEL = "02-000-0002";
-
-const BOX_ITEMS = [
-  { id: "sample", name: "시료", note: "시험용 1대와 예비 1대" },
-  { id: "number", name: "접수번호 적은 종이", note: "견적 회신 메일에 있는 번호" },
-  { id: "manual", name: "사용설명서", note: "켜는 법과 시험 모드 들어가는 법" },
-  { id: "circuit", name: "회로도", note: "부품 목록이 있으면 함께" },
-];
-
-function Shipping() {
-  const [copied, setCopied] = useState(false);
-  const [packed, setPacked] = useState<string[]>([]);
-  const timer = useRef<number | undefined>(undefined);
-  const listId = useId();
-
-  useEffect(() => () => window.clearTimeout(timer.current), []);
-
-  const copy = async () => {
-    try {
-      await navigator.clipboard.writeText(`${SHIP_TO} (${SHIP_RECEIVER}, ${SHIP_TEL})`);
-      setCopied(true);
-      window.clearTimeout(timer.current);
-      timer.current = window.setTimeout(() => setCopied(false), 2000);
-    } catch {
-      setCopied(false);
-    }
-  };
-
-  const toggle = (id: string) => setPacked((prev) => (prev.includes(id) ? prev.filter((v) => v !== id) : [...prev, id]));
-
-  return (
-    <section aria-labelledby="ship-title" id="ship" className="scroll-mt-16 px-4 py-16 md:px-6 md:py-24" style={{ background: C.paper }}>
-      <div className="mx-auto max-w-[1200px]">
-        <SectionHead id="ship-title" title="시료 보내실 곳" desc="택배로 보내 주시면 도착한 날 접수 확인 문자를 드립니다. 평일 17시까지 도착한 시료는 그날 바로 접수합니다." />
-        <div className="mt-10 grid items-start gap-6 md:grid-cols-[1.15fr_1fr] md:gap-8">
-          <div className="rounded-[10px] border bg-white p-5 md:p-7" style={{ borderColor: C.line }}>
-            <dl className="grid gap-4 text-[16px]">
-              <div className="grid gap-1 sm:grid-cols-[96px_1fr] sm:gap-4">
-                <dt className="font-bold" style={{ color: C.muted }}>
-                  받는 주소
-                </dt>
-                <dd className="text-[18px] font-bold leading-[1.5] tracking-[-0.02em]">{SHIP_TO}</dd>
-              </div>
-              <div className="grid gap-1 sm:grid-cols-[96px_1fr] sm:gap-4">
-                <dt className="font-bold" style={{ color: C.muted }}>
-                  받는 사람
-                </dt>
-                <dd>{SHIP_RECEIVER}</dd>
-              </div>
-              <div className="grid gap-1 sm:grid-cols-[96px_1fr] sm:gap-4">
-                <dt className="font-bold" style={{ color: C.muted }}>
-                  전화
-                </dt>
-                <dd>
-                  <a href={`tel:${SHIP_TEL}`} className="tabular-nums underline underline-offset-4">
-                    {SHIP_TEL}
-                  </a>
-                </dd>
-              </div>
-            </dl>
-            <div className="mt-6 flex flex-wrap items-center gap-3 border-t pt-5" style={{ borderColor: C.line }}>
-              <button
-                type="button"
-                onClick={copy}
-                className="inline-flex h-11 items-center gap-2 rounded-[8px] px-5 font-bold"
-                style={{ background: C.indigo, color: C.white }}
-              >
-                {copied ? <Check size={17} strokeWidth={3} aria-hidden /> : <Copy size={17} aria-hidden />}
-                {copied ? "복사됨" : "주소 복사"}
-              </button>
-              <span className="sr-only" role="status">
-                {copied ? "주소를 복사했습니다" : ""}
-              </span>
-              <p className="text-[15px]" style={{ color: C.muted }}>
-                상자 겉면에도 접수번호를 적어 주세요.
-              </p>
-            </div>
-          </div>
-
-          <fieldset className="rounded-[10px] border bg-white p-5 md:p-7" style={{ borderColor: C.line }}>
-            <legend className="sr-only">상자에 넣을 것</legend>
-            <p className="font-bold" aria-hidden>
-              상자에 넣을 것
-            </p>
-            <ul className="mt-3 grid gap-1" aria-describedby={listId}>
-              {BOX_ITEMS.map((b) => {
-                const on = packed.includes(b.id);
-                return (
-                  <li key={b.id}>
-                    <label className="flex cursor-pointer items-start gap-3 rounded-[8px] px-2 py-2.5 hover:bg-[#f4f7fb]">
-                      <input
-                        type="checkbox"
-                        checked={on}
-                        onChange={() => toggle(b.id)}
-                        className="mt-1 h-[18px] w-[18px] shrink-0 accent-[#23307a]"
-                      />
-                      <span className="min-w-0">
-                        <span className={`block font-bold ${on ? "line-through" : ""}`} style={{ color: on ? C.muted : C.ink }}>
-                          {b.name}
-                        </span>
-                        <span className="block text-[15px]" style={{ color: C.muted }}>
-                          {b.note}
-                        </span>
-                      </span>
-                    </label>
-                  </li>
-                );
-              })}
-            </ul>
-            <p id={listId} className="mt-3 px-2 text-[15px] tabular-nums" style={{ color: C.muted }}>
-              {packed.length === BOX_ITEMS.length ? "모두 챙겼습니다." : `${BOX_ITEMS.length}개 중 ${packed.length}개 챙김`}
-            </p>
-          </fieldset>
-        </div>
-
-        <p className="mt-8 text-[15px]" style={{ color: C.muted }}>
-          방문 상담은 하루 전까지 전화로 예약해 주세요. {ADDRESS}
-        </p>
-      </div>
-    </section>
-  );
-}
 /* ---------- 바닥글 ---------- */
 
 function Footer() {
+  const { go } = useCl();
+  const links: [string, MenuId, string][] = [
+    ["공평성 선언", "about", "impartiality"],
+    ["고객불만 처리 절차", "about", "complaint"],
+    ["인재채용", "about", "recruit"],
+    ["오시는 길", "about", "location"],
+  ];
   return (
-    <footer className="relative overflow-hidden px-4 pb-24 pt-12 md:px-6" style={{ background: C.indigoDeep, color: "#c8cdea" }}>
-      <div className="relative mx-auto max-w-[1200px]">
-        <span className="text-white">
-          <Logo light />
-        </span>
-        <ul className="mt-6 flex flex-wrap gap-x-5 gap-y-1 text-[14px] font-semibold text-white">
-          {NAV.map((n) => (
-            <li key={n.id}>
-              <a href={`#${n.id}`} className="hover:underline">
-                {n.label}
-              </a>
+    <footer className="px-4 pb-24 pt-10 md:px-6" style={{ background: C.indigoDeep, color: "#c8cdea" }}>
+      <div className="mx-auto max-w-[1200px]">
+        <ul className="flex flex-wrap gap-x-5 gap-y-1 border-b pb-5 text-[14px] font-semibold text-white" style={{ borderColor: "rgba(255,255,255,0.15)" }}>
+          {links.map(([label, m, s]) => (
+            <li key={label}>
+              <button type="button" onClick={() => go(m, s)} className="inline-flex h-9 items-center hover:underline">
+                {label}
+              </button>
             </li>
           ))}
-          <li>
-            <a href="#recruit" className="hover:underline">
-              채용정보
-            </a>
-          </li>
-          <li>
-            <a href="#ship" className="hover:underline">
-              시료 보내실 곳
-            </a>
-          </li>
         </ul>
-        <dl className="mt-6 grid gap-x-8 gap-y-1.5 text-[14px] sm:grid-cols-2 md:grid-cols-3" style={{ color: "#a6acd6" }}>
+        <div className="mt-6 text-white">
+          <Logo light />
+        </div>
+        <dl className="mt-5 grid gap-x-8 gap-y-1.5 text-[14px] sm:grid-cols-2 md:grid-cols-3" style={{ color: "#a6acd6" }}>
           {[
             ["상호", COMPANY],
             ["대표", "김○○"],

@@ -3,37 +3,42 @@
 import { useEffect, useRef, useState } from "react";
 import Image from "next/image";
 import { AnimatePresence, motion } from "framer-motion";
-import { Check, Layers, Menu, Phone, Plus, RotateCcw, X } from "lucide-react";
+import { Check, ChevronRight, Heart, Layers, LayoutGrid, Map as MapIcon, Menu, Phone, Plus, RotateCcw, Search, X } from "lucide-react";
 import { useReducedMotionSafe } from "@/hooks/useReducedMotionSafe";
 
 /* 부동산 홈페이지 데모: 가상의 ○○ 공인중개사사무소.
    상호, 대표 공인중개사, 등록번호, 주소, 전화번호, 사업자 정보, 매물과 거래 내역은 모두 가상이다.
 
-   디자인: 흰 바탕(#ffffff)에 차가운 회색(#f3f5f7), 먹색 글자(#18202a), 지도 핀과 강조에만 코럴(#ef6351).
-   첫 화면 바로 아래에 동네 지도를 크게 두고, 매물은 지도와 목록을 함께 본다.
+   구조: 매물 솔루션형(검색 우선). 첫 화면에 사진과 소개 문단 없이 검색 필터 바와 매물 종류별 개수 타일을 두고,
+   그 아래를 지도검색 / 목록검색 탭으로 나눈다. 메뉴(매물 의뢰하기, 매물투어신청, 부동산 계산기, 사무소 소개)는
+   라우트 없이 컴포넌트 상태로 하위 화면을 바꾼다.
 
-   동네 지도 매물 찾기는 □□역, 초등학교, 공원, 아파트 단지를 그린 지도에 매물 핀을 꽂는다.
-   거래 종류, 매물 종류, 가격, 면적(㎡와 평 바꿔 보기), 역까지 걸어서 몇 분인지로 거르고,
-   같은 단지에 여러 건이 남으면 숫자 묶음으로 보여 준다. 목록에 마우스를 올리면 핀이, 핀을 누르면 목록이 함께 표시된다.
-   매물 상세에는 면적, 층, 방향, 관리비와 함께 법정 상한 요율로 계산한 중개보수를 보여 준다.
-   전세와 월세 비교는 보증금, 월세, 대출 금리, 예금 금리로 한 달에 실제로 드는 돈을 막대로 비교한다.
-   보러 가기는 목록이나 상세에서 담은 매물(최대 3개)을 한 번에 신청한다. 담은 게 없으면 보고 있는 매물이 들어가고,
-   원하는 때와 전화번호만 받는다. 접수 화면에는 번호를 가려서 보여 준다.
+   디자인: 흰 바탕(#ffffff)에 차가운 회색(#f3f5f7), 먹색(#18202a) 검색 띠, 지도 핀과 강조에만 코럴(#ef6351).
+
+   지도검색은 □□역, 초등학교, 공원, 아파트 단지를 그린 지도에 매물 핀을 꽂고, 같은 단지에 여러 건이 남으면 숫자 묶음으로 보여 준다.
+   목록에 마우스를 올리면 핀이, 핀을 누르면 목록이 함께 표시된다.
+   매물 상세는 중개대상물 표시·광고 명시사항 순서(매물번호, 소재지, 면적, 가격, 거래형태, 층, 사용승인일, 방향,
+   방·욕실, 입주가능일, 주차대수, 관리비)로 적고, 입주가능일은 날짜, 즉시입주, ○월 초순·중순·하순만 쓴다.
+   상세에는 법정 상한 요율로 계산한 중개보수를 함께 보여 준다.
+   관심매물(최대 3개)은 매물투어신청으로 한 번에 넘어간다. 매물 의뢰하기는 집을 내놓는 쪽의 접수 폼이다.
+   부동산 계산기에는 중개보수 계산과 전월세 비교(보증금, 월세, 대출 금리, 예금 금리로 한 달 비용 막대 비교)가 있다.
 
    사진 출처(public/images/demo-realty):
-   AI 생성(Z-Image-Turbo, Apache 2.0) hero, interior */
+   AI 생성(Z-Image-Turbo, Apache 2.0) interior */
 
 const IMG = "/images/demo-realty";
 const OFFICE = "○○ 공인중개사사무소";
 const TEL = "02-000-0000";
 const ADDRESS = "□□시 □□구 □□로 120, □□아파트 상가 1층 105호";
 const REG_NO = "00000-0000-00000";
+const AGENT = "김ㅁ수";
 
 const C = {
   white: "#ffffff",
   gray: "#f3f5f7",
   grayDeep: "#e6eaef",
   ink: "#18202a",
+  inkSoft: "#2a3442",
   muted: "#566170",
   line: "#dfe4ea",
   coral: "#ef6351",
@@ -45,18 +50,12 @@ const C = {
 
 const EASE = [0.22, 1, 0.36, 1] as const;
 
-const NAV = [
-  { id: "map", label: "지도로 매물 찾기" },
-  { id: "compare", label: "전세·월세 비교" },
-  { id: "visit", label: "매물 보러 가기" },
-  { id: "agent", label: "중개사 소개" },
-];
-
 /* ---------- 매물 ---------- */
 
 type Deal = "sale" | "jeonse" | "monthly";
 type Kind = "apt" | "villa" | "officetel" | "store";
 type ZoneId = "A" | "B" | "C" | "D" | "E" | "F" | "G";
+type Badge = "급매" | "추천" | "신규";
 
 const DEAL_LABEL: Record<Deal, string> = { sale: "매매", jeonse: "전세", monthly: "월세" };
 const KIND_LABEL: Record<Kind, string> = { apt: "아파트", villa: "빌라", officetel: "오피스텔", store: "상가" };
@@ -73,8 +72,11 @@ const ZONES: Record<ZoneId, { name: string; x: number; y: number }> = {
 
 interface Listing {
   id: string;
+  /** 매물번호 */
+  no: string;
   zone: ZoneId;
   name: string;
+  dong: string;
   kind: Kind;
   deal: Deal;
   /** 매매가 또는 보증금(만 원) */
@@ -90,39 +92,44 @@ interface Listing {
   rooms: number;
   baths: number;
   dir: string;
+  /** 사용승인일 */
+  approved: string;
+  /** 입주가능일: 날짜, 즉시입주, ○월 초순/중순/하순 */
   moveIn: string;
   /** 관리비(만 원) */
   fee: number;
+  feeNote?: string;
   parking: string;
   walk: number;
   x: number;
   y: number;
+  badges: Badge[];
   tags: string[];
 }
 
 const LISTINGS: Listing[] = [
-  { id: "a1", zone: "A", name: "□□아파트 102동", kind: "apt", deal: "sale", price: 92000, area: 84.97, supply: 112.4, floor: 12, total: 20, rooms: 3, baths: 2, dir: "남향", moveIn: "2027년 1월 이후 협의", fee: 28, parking: "세대당 1.3대", walk: 6, x: 200, y: 150, tags: ["역세권", "초등학교 도보 3분", "올수리"] },
-  { id: "a2", zone: "A", name: "□□아파트 105동", kind: "apt", deal: "jeonse", price: 45000, area: 59.92, supply: 84.3, floor: 7, total: 20, rooms: 3, baths: 2, dir: "남동향", moveIn: "즉시 입주", fee: 21, parking: "세대당 1.3대", walk: 6, x: 290, y: 218, tags: ["즉시 입주", "발코니 확장", "전세대출 가능"] },
-  { id: "a3", zone: "A", name: "□□아파트 101동", kind: "apt", deal: "monthly", price: 10000, rent: 110, area: 59.92, supply: 84.3, floor: 3, total: 20, rooms: 3, baths: 2, dir: "남향", moveIn: "2026년 11월 말", fee: 20, parking: "세대당 1.3대", walk: 5, x: 378, y: 150, tags: ["저층", "단지 안 정원", "반려동물 협의"] },
-  { id: "b1", zone: "B", name: "□□파크아파트 201동", kind: "apt", deal: "sale", price: 128000, area: 114.8, supply: 145.2, floor: 18, total: 25, rooms: 4, baths: 2, dir: "남향", moveIn: "2027년 3월", fee: 38, parking: "세대당 1.5대", walk: 7, x: 498, y: 318, tags: ["공원 조망", "고층", "드레스룸"] },
-  { id: "b2", zone: "B", name: "□□파크아파트 203동", kind: "apt", deal: "jeonse", price: 63000, area: 84.95, supply: 110.7, floor: 9, total: 25, rooms: 3, baths: 2, dir: "남서향", moveIn: "2026년 12월 중순", fee: 29, parking: "세대당 1.5대", walk: 8, x: 592, y: 378, tags: ["공원 앞", "시스템 에어컨", "중간층"] },
-  { id: "c1", zone: "C", name: "□□오피스텔 A동", kind: "officetel", deal: "monthly", price: 1000, rent: 68, area: 24.5, supply: 48.6, floor: 11, total: 15, rooms: 1, baths: 1, dir: "동향", moveIn: "즉시 입주", fee: 12, parking: "1대 가능", walk: 2, x: 466, y: 160, tags: ["역 도보 2분", "가전 포함", "1인 가구"] },
-  { id: "c2", zone: "C", name: "□□오피스텔 B동", kind: "officetel", deal: "jeonse", price: 21000, area: 33.1, supply: 62.3, floor: 8, total: 15, rooms: 2, baths: 1, dir: "남향", moveIn: "2026년 11월 초", fee: 15, parking: "1대 가능", walk: 3, x: 548, y: 212, tags: ["방 2개", "전세대출 가능", "역세권"] },
-  { id: "d1", zone: "D", name: "□□빌라", kind: "villa", deal: "sale", price: 29000, area: 49.6, supply: 62.1, floor: 3, total: 4, rooms: 2, baths: 1, dir: "남향", moveIn: "즉시 입주", fee: 5, parking: "1대 가능", walk: 8, x: 365, y: 345, tags: ["2019년 준공", "엘리베이터", "초등학교 옆"] },
-  { id: "e1", zone: "E", name: "□□하우스", kind: "villa", deal: "jeonse", price: 24000, area: 56.2, supply: 70.8, floor: 2, total: 5, rooms: 3, baths: 1, dir: "동남향", moveIn: "2026년 12월 말", fee: 6, parking: "1대 가능", walk: 12, x: 75, y: 220, tags: ["방 3개", "조용한 골목", "전세보증보험 가입 가능"] },
-  { id: "g1", zone: "G", name: "□□빌라 2차", kind: "villa", deal: "monthly", price: 500, rent: 45, area: 36.4, supply: 46, floor: 4, total: 4, rooms: 1, baths: 1, dir: "서향", moveIn: "즉시 입주", fee: 4, parking: "주차 불가", walk: 14, x: 735, y: 330, tags: ["원룸", "옥상 사용", "관리비 4만 원"] },
-  { id: "f1", zone: "F", name: "□□시장 상가 1층", kind: "store", deal: "monthly", price: 3000, rent: 250, area: 43.2, supply: 66, floor: 1, total: 3, rooms: 0, baths: 1, dir: "남향", moveIn: "즉시 입주", fee: 18, parking: "공영 주차장 이용", walk: 9, x: 330, y: 482, tags: ["1층 모퉁이", "시장 입구", "권리금 없음"] },
-  { id: "f2", zone: "F", name: "□□프라자 2층", kind: "store", deal: "sale", price: 75000, area: 66.8, supply: 118, floor: 2, total: 5, rooms: 0, baths: 1, dir: "동향", moveIn: "임차인 승계", fee: 32, parking: "건물 주차 3대", walk: 10, x: 522, y: 482, tags: ["임차인 있음", "학원 자리", "엘리베이터"] },
+  { id: "a1", no: "2610-031", zone: "A", name: "□□아파트 102동", dong: "□□동", kind: "apt", deal: "sale", price: 92000, area: 84.97, supply: 112.4, floor: 12, total: 20, rooms: 3, baths: 2, dir: "남향", approved: "2008.11.20", moveIn: "2027년 1월 초순(협의 가능)", fee: 28, parking: "총 1,240대(세대당 1.3대)", walk: 6, x: 200, y: 150, badges: ["추천"], tags: ["초등학교 도보 3분", "올수리"] },
+  { id: "a2", no: "2610-030", zone: "A", name: "□□아파트 105동", dong: "□□동", kind: "apt", deal: "jeonse", price: 45000, area: 59.92, supply: 84.3, floor: 7, total: 20, rooms: 3, baths: 2, dir: "남동향", approved: "2008.11.20", moveIn: "즉시입주", fee: 21, parking: "총 1,240대(세대당 1.3대)", walk: 6, x: 290, y: 218, badges: ["신규"], tags: ["발코니 확장", "전세대출 가능"] },
+  { id: "a3", no: "2609-027", zone: "A", name: "□□아파트 101동", dong: "□□동", kind: "apt", deal: "monthly", price: 10000, rent: 110, area: 59.92, supply: 84.3, floor: 3, total: 20, rooms: 3, baths: 2, dir: "남향", approved: "2008.11.20", moveIn: "2026년 11월 하순", fee: 20, parking: "총 1,240대(세대당 1.3대)", walk: 5, x: 378, y: 150, badges: [], tags: ["저층", "반려동물 협의"] },
+  { id: "b1", no: "2609-025", zone: "B", name: "□□파크아파트 201동", dong: "□□2동", kind: "apt", deal: "sale", price: 128000, area: 114.8, supply: 145.2, floor: 18, total: 25, rooms: 4, baths: 2, dir: "남향", approved: "2015.06.30", moveIn: "2027년 3월 5일", fee: 38, parking: "총 980대(세대당 1.5대)", walk: 7, x: 498, y: 318, badges: ["추천"], tags: ["공원 조망", "드레스룸"] },
+  { id: "b2", no: "2610-029", zone: "B", name: "□□파크아파트 203동", dong: "□□2동", kind: "apt", deal: "jeonse", price: 63000, area: 84.95, supply: 110.7, floor: 9, total: 25, rooms: 3, baths: 2, dir: "남서향", approved: "2015.06.30", moveIn: "2026년 12월 중순", fee: 29, parking: "총 980대(세대당 1.5대)", walk: 8, x: 592, y: 378, badges: ["급매"], tags: ["시스템 에어컨", "공원 앞"] },
+  { id: "c1", no: "2610-028", zone: "C", name: "□□오피스텔 A동", dong: "□□동", kind: "officetel", deal: "monthly", price: 1000, rent: 68, area: 24.5, supply: 48.6, floor: 11, total: 15, rooms: 1, baths: 1, dir: "동향", approved: "2019.03.14", moveIn: "즉시입주", fee: 12, parking: "총 180대(세대당 0.6대)", walk: 2, x: 466, y: 160, badges: ["신규"], tags: ["가전 포함", "역 도보 2분"] },
+  { id: "c2", no: "2609-024", zone: "C", name: "□□오피스텔 B동", dong: "□□동", kind: "officetel", deal: "jeonse", price: 21000, area: 33.1, supply: 62.3, floor: 8, total: 15, rooms: 2, baths: 1, dir: "남향", approved: "2019.03.14", moveIn: "2026년 11월 초순", fee: 15, parking: "총 180대(세대당 0.6대)", walk: 3, x: 548, y: 212, badges: [], tags: ["방 2개", "전세대출 가능"] },
+  { id: "d1", no: "2609-022", zone: "D", name: "□□빌라", dong: "□□동", kind: "villa", deal: "sale", price: 29000, area: 49.6, supply: 62.1, floor: 3, total: 4, rooms: 2, baths: 1, dir: "남향", approved: "2019.08.02", moveIn: "즉시입주", fee: 5, feeNote: "수도·전기 사용료 별도", parking: "총 8대(세대당 1대)", walk: 8, x: 365, y: 345, badges: ["급매"], tags: ["엘리베이터", "초등학교 옆"] },
+  { id: "e1", no: "2608-019", zone: "E", name: "□□하우스", dong: "□□동", kind: "villa", deal: "jeonse", price: 24000, area: 56.2, supply: 70.8, floor: 2, total: 5, rooms: 3, baths: 1, dir: "동남향", approved: "2012.04.25", moveIn: "2026년 12월 하순", fee: 6, feeNote: "수도·전기 사용료 별도", parking: "총 6대(세대당 0.6대)", walk: 12, x: 75, y: 220, badges: [], tags: ["방 3개", "전세보증보험 가입 가능"] },
+  { id: "g1", no: "2608-017", zone: "G", name: "□□빌라 2차", dong: "□□2동", kind: "villa", deal: "monthly", price: 500, rent: 45, area: 36.4, supply: 46, floor: 4, total: 4, rooms: 1, baths: 1, dir: "서향", approved: "2004.10.11", moveIn: "즉시입주", fee: 4, feeNote: "수도 사용료 포함", parking: "주차 불가", walk: 14, x: 735, y: 330, badges: [], tags: ["원룸", "옥상 사용"] },
+  { id: "f1", no: "2610-032", zone: "F", name: "□□시장 상가 1층", dong: "□□동", kind: "store", deal: "monthly", price: 3000, rent: 250, area: 43.2, supply: 66, floor: 1, total: 3, rooms: 0, baths: 1, dir: "남향", approved: "1998.05.18", moveIn: "즉시입주", fee: 18, parking: "공영 주차장 이용", walk: 9, x: 330, y: 482, badges: ["신규", "추천"], tags: ["1층 모퉁이", "무권리"] },
+  { id: "f2", no: "2607-012", zone: "F", name: "□□프라자 2층", dong: "□□동", kind: "store", deal: "sale", price: 75000, area: 66.8, supply: 118, floor: 2, total: 5, rooms: 0, baths: 1, dir: "동향", approved: "2006.09.07", moveIn: "2027년 6월 하순", fee: 32, parking: "총 3대", walk: 10, x: 522, y: 482, badges: [], tags: ["임차인 승계", "학원 자리"] },
 ];
 
 const LISTING_BY_ID = Object.fromEntries(LISTINGS.map((l) => [l.id, l])) as Record<string, Listing>;
 
-/** 만 원 단위 금액을 "9억 2,000" 꼴로 */
-function eok(man: number) {
+/** 만 원 단위 금액을 "9억 2,000만" 꼴로 */
+function eokMan(man: number) {
   const e = Math.floor(man / 10000);
   const rest = man % 10000;
-  if (!e) return rest.toLocaleString("ko-KR");
-  return rest ? `${e}억 ${rest.toLocaleString("ko-KR")}` : `${e}억`;
+  if (!e) return `${rest.toLocaleString("ko-KR")}만`;
+  return rest ? `${e}억 ${rest.toLocaleString("ko-KR")}만` : `${e}억`;
 }
 
 /** 만 원 단위 금액을 "9억 2,000만 원" 꼴로 */
@@ -133,21 +140,20 @@ function manText(man: number) {
   return `${e ? `${e}억 ` : ""}${rest.toLocaleString("ko-KR")}만 원`;
 }
 
-function priceText(l: Listing) {
-  return l.deal === "monthly" ? `월세 ${eok(l.price)}/${l.rent}` : `${DEAL_LABEL[l.deal]} ${eok(l.price)}`;
+/** 실제 매물 사이트 관행: 매 9억 2,000만 / 전 4억 5,000만 / 보 1,000만 / 월 68만 */
+function priceText(l: Pick<Listing, "deal" | "price" | "rent">) {
+  if (l.deal === "monthly") return `보 ${eokMan(l.price)} / 월 ${l.rent}만`;
+  return `${l.deal === "sale" ? "매" : "전"} ${eokMan(l.price)}`;
 }
 
 function shortPrice(l: Listing) {
-  if (l.deal === "monthly") return `${eok(l.price)}/${l.rent}`;
+  if (l.deal === "monthly") return `${l.price.toLocaleString("ko-KR")}/${l.rent}`;
   return l.price >= 10000 ? `${(l.price / 10000).toFixed(1).replace(/\.0$/, "")}억` : `${l.price.toLocaleString("ko-KR")}만`;
 }
 
-type Unit = "m2" | "py";
 const PY = 3.3058;
-
-function areaText(m2: number, unit: Unit) {
-  return unit === "m2" ? `${m2}㎡` : `${(m2 / PY).toFixed(1)}평`;
-}
+const pyeong = (m2: number) => (m2 / PY).toFixed(1);
+const areaText = (m2: number) => `${m2}㎡(${pyeong(m2)}평)`;
 
 /* ---------- 중개보수 ---------- */
 
@@ -183,7 +189,9 @@ interface Fee {
   negotiable: boolean;
 }
 
-function brokerFee(l: Listing): Fee {
+type FeeInput = Pick<Listing, "kind" | "deal" | "price" | "rent">;
+
+function brokerFee(l: FeeInput): Fee {
   let basis = l.price;
   let formula: string | null = null;
   if (l.deal === "monthly" && l.rent) {
@@ -217,7 +225,21 @@ function wonText(won: number) {
   return won % 10000 === 0 ? `${(won / 10000).toLocaleString("ko-KR")}만 원` : `${won.toLocaleString("ko-KR")}원`;
 }
 
-/* ---------- 번호 가리기 ---------- */
+/* ---------- 가리기 ---------- */
+
+const CHO = "ㄱㄲㄴㄷㄸㄹㅁㅂㅃㅅㅆㅇㅈㅉㅊㅋㅌㅍㅎ";
+
+/** 병원식 마스킹: 김하늘은 김ㅎ늘, 두 글자는 김* */
+function maskName(name: string) {
+  const chars = [...name.trim()];
+  if (chars.length < 2) return chars.join("");
+  if (chars.length === 2) return `${chars[0]}*`;
+  const hide = (ch: string) => {
+    const code = ch.charCodeAt(0) - 0xac00;
+    return code >= 0 && code < 11172 ? CHO[Math.floor(code / 588)] : "*";
+  };
+  return chars.map((ch, i) => (i === 0 || i === chars.length - 1 ? ch : hide(ch))).join("");
+}
 
 function maskPhone(phone: string) {
   const digits = phone.replace(/\D/g, "");
@@ -226,27 +248,119 @@ function maskPhone(phone: string) {
 
 const r2 = (n: number) => Math.round(n * 100) / 100;
 
+/* ---------- 검색 조건 ---------- */
+
+const PRICE_RANGES = [
+  { label: "전체", min: 0, max: Infinity },
+  { label: "1억 이하", min: 0, max: 10000 },
+  { label: "1억 ~ 3억", min: 10000, max: 30000 },
+  { label: "3억 ~ 6억", min: 30000, max: 60000 },
+  { label: "6억 ~ 10억", min: 60000, max: 100000 },
+  { label: "10억 초과", min: 100001, max: Infinity },
+];
+
+const AREA_RANGES = [
+  { label: "전체", min: 0 },
+  { label: "33㎡(10평) 이상", min: 33 },
+  { label: "60㎡(18평) 이상", min: 60 },
+  { label: "85㎡(26평) 이상", min: 85 },
+];
+
+const WALK_RANGES = [
+  { label: "상관없음", max: 0 },
+  { label: "5분 이내", max: 5 },
+  { label: "10분 이내", max: 10 },
+];
+
+type Filter = { deal: Deal | "all"; kind: Kind | "all"; price: number; area: number; walk: number };
+const EMPTY: Filter = { deal: "all", kind: "all", price: 0, area: 0, walk: 0 };
+
+function matches(l: Listing, f: Filter) {
+  const pr = PRICE_RANGES[f.price];
+  const w = WALK_RANGES[f.walk].max;
+  return (
+    (f.deal === "all" || l.deal === f.deal) &&
+    (f.kind === "all" || l.kind === f.kind) &&
+    l.price >= pr.min &&
+    l.price <= pr.max &&
+    l.area >= AREA_RANGES[f.area].min &&
+    (w === 0 || l.walk <= w)
+  );
+}
+
 /* ---------- 페이지 ---------- */
 
 const BASKET_MAX = 3;
 
+type View = "search" | "request" | "tour" | "calc" | "about";
+
+const NAV: { id: View; label: string }[] = [
+  { id: "search", label: "매물검색" },
+  { id: "request", label: "매물 의뢰하기" },
+  { id: "tour", label: "매물투어신청" },
+  { id: "calc", label: "부동산 계산기" },
+  { id: "about", label: "사무소 소개" },
+];
+
 export function RealEstateDemo() {
+  const [view, setView] = useState<View>("search");
   const [selectedId, setSelectedId] = useState("a2");
-  const [deal, setDeal] = useState<Deal | "all">("all");
   const [basket, setBasket] = useState<string[]>([]);
+  const [calcTab, setCalcTab] = useState<"fee" | "compare">("fee");
+  const moved = useRef(false);
+
+  const go = (v: View) => {
+    moved.current = true;
+    setView(v);
+  };
+
+  // 화면을 바꾸면 맨 위로 올리고 제목에 초점을 둔다
+  useEffect(() => {
+    if (!moved.current) return;
+    window.scrollTo({ top: 0, behavior: "auto" });
+    document.getElementById("realty-page-title")?.focus({ preventScroll: true });
+  }, [view]);
 
   const toggleBasket = (id: string) =>
     setBasket((b) => (b.includes(id) ? b.filter((x) => x !== id) : b.length >= BASKET_MAX ? b : [...b, id]));
 
   return (
     <div className="min-h-screen overflow-x-clip text-[16px] leading-[1.7] md:text-[17px]" style={{ background: C.white, color: C.ink }}>
-      <Header />
+      <Header view={view} go={go} basketCount={basket.length} />
       <main>
-        <Hero onDeal={setDeal} />
-        <MapSearch deal={deal} onDeal={setDeal} selectedId={selectedId} onSelect={setSelectedId} basket={basket} onToggle={toggleBasket} />
-        <Compare />
-        <Visit selectedId={selectedId} basket={basket} onToggle={toggleBasket} onClear={() => setBasket([])} />
-        <Agent />
+        {view === "search" && (
+          <SearchPage
+            selectedId={selectedId}
+            onSelect={setSelectedId}
+            basket={basket}
+            onToggle={toggleBasket}
+            onTour={() => go("tour")}
+            onCalc={() => {
+              setCalcTab("fee");
+              go("calc");
+            }}
+          />
+        )}
+        {view === "request" && (
+          <SubPage title="매물 의뢰하기">
+            <RequestForm />
+          </SubPage>
+        )}
+        {view === "tour" && (
+          <SubPage title="매물투어신청">
+            <Tour selectedId={selectedId} basket={basket} onToggle={toggleBasket} onClear={() => setBasket([])} onMore={() => go("search")} />
+          </SubPage>
+        )}
+        {view === "calc" && (
+          <SubPage title="부동산 계산기">
+            <Calculators tab={calcTab} setTab={setCalcTab} />
+          </SubPage>
+        )}
+        {view === "about" && (
+          <SubPage title="사무소 소개">
+            <About />
+          </SubPage>
+        )}
       </main>
       <Footer />
     </div>
@@ -263,12 +377,12 @@ function Logo({ light = false }: { light?: boolean }) {
         <path d="M15 25 C15 25 7 17.5 7 12.5 A8 8 0 0 1 23 12.5 C23 17.5 15 25 15 25Z" fill={C.coral} />
         <path d="M11.5 13 L15 10 L18.5 13 V16.5 H11.5Z" fill="#fff" />
       </svg>
-      <span className="text-[18px] font-bold tracking-[-0.02em] md:text-[19px]">{OFFICE}</span>
+      <span className="text-[17px] font-bold tracking-[-0.02em] md:text-[19px]">{OFFICE}</span>
     </span>
   );
 }
 
-function Header() {
+function Header({ view, go, basketCount }: { view: View; go: (v: View) => void; basketCount: number }) {
   const [open, setOpen] = useState(false);
   const reduce = useReducedMotionSafe();
 
@@ -279,25 +393,53 @@ function Header() {
     return () => window.removeEventListener("keydown", onKey);
   }, [open]);
 
+  const pick = (v: View) => {
+    setOpen(false);
+    go(v);
+  };
+
   return (
-    <header className="sticky top-0 z-40 border-b bg-white/95 backdrop-blur" style={{ borderColor: C.line }}>
-      <div className="mx-auto flex h-16 max-w-[1200px] items-center justify-between gap-3 px-4 md:px-6">
-        <a href="#top" aria-label={`${OFFICE} 처음으로`} className="min-w-0">
+    <header className="sticky top-0 z-40 border-b bg-white" style={{ borderColor: C.line }}>
+      <div className="mx-auto flex h-16 max-w-[1200px] items-center justify-between gap-2 px-4 md:px-6">
+        <button type="button" onClick={() => pick("search")} aria-label={`${OFFICE} 처음 화면`} className="min-w-0 text-left">
           <Logo />
-        </a>
+        </button>
         <nav aria-label="주 메뉴" className="hidden lg:block">
-          <ul className="flex items-center gap-6 text-[15px]">
-            {NAV.map((n) => (
-              <li key={n.id}>
-                <a href={`#${n.id}`} className="transition-colors hover:text-[#c23a28]" style={{ color: C.muted }}>
-                  {n.label}
-                </a>
-              </li>
-            ))}
+          <ul className="flex items-center gap-1">
+            {NAV.map((n) => {
+              const on = view === n.id;
+              return (
+                <li key={n.id}>
+                  <button
+                    type="button"
+                    onClick={() => pick(n.id)}
+                    aria-current={on ? "page" : undefined}
+                    className="h-10 rounded-[6px] px-3 text-[15px] font-semibold transition-colors hover:text-[#c23a28]"
+                    style={{ color: on ? C.ink : C.muted, boxShadow: on ? `inset 0 -2px 0 ${C.coral}` : undefined }}
+                  >
+                    {n.label}
+                  </button>
+                </li>
+              );
+            })}
           </ul>
         </nav>
-        <div className="flex shrink-0 items-center gap-2">
-          <a href={`tel:${TEL}`} className="hidden h-10 items-center gap-1.5 rounded-[6px] px-4 text-[15px] font-semibold md:inline-flex" style={{ background: C.ink, color: "#fff" }}>
+        <div className="flex shrink-0 items-center gap-1.5">
+          <button
+            type="button"
+            onClick={() => pick("tour")}
+            aria-label={`관심매물 ${basketCount}개, 매물투어신청`}
+            title="관심매물"
+            className="relative inline-flex h-11 w-11 items-center justify-center rounded-[6px]"
+          >
+            <Heart size={21} fill={basketCount ? C.coral : "none"} style={{ color: basketCount ? C.coral : C.ink }} aria-hidden />
+            {basketCount > 0 && (
+              <span className="absolute right-0.5 top-0.5 inline-flex h-[18px] min-w-[18px] items-center justify-center rounded-full px-1 text-[11px] font-bold tabular-nums" style={{ background: C.ink, color: "#fff" }} aria-hidden>
+                {basketCount}
+              </span>
+            )}
+          </button>
+          <a href={`tel:${TEL}`} className="hidden h-10 items-center gap-1.5 rounded-[6px] px-4 text-[15px] font-semibold xl:inline-flex" style={{ background: C.ink, color: "#fff" }}>
             <Phone size={16} aria-hidden />
             {TEL}
           </a>
@@ -328,9 +470,15 @@ function Header() {
             <ul className="px-4 py-2">
               {NAV.map((n) => (
                 <li key={n.id}>
-                  <a href={`#${n.id}`} onClick={() => setOpen(false)} className="flex h-12 items-center text-[17px]">
+                  <button
+                    type="button"
+                    onClick={() => pick(n.id)}
+                    aria-current={view === n.id ? "page" : undefined}
+                    className="flex h-12 w-full items-center text-left text-[17px]"
+                    style={{ fontWeight: view === n.id ? 700 : 400 }}
+                  >
                     {n.label}
-                  </a>
+                  </button>
                 </li>
               ))}
               <li>
@@ -346,96 +494,343 @@ function Header() {
   );
 }
 
-/* ---------- 첫 화면 ---------- */
-
-function Hero({ onDeal }: { onDeal: (d: Deal) => void }) {
-  const reduce = useReducedMotionSafe();
-  const counts = (Object.keys(DEAL_LABEL) as Deal[]).map((d) => ({ d, n: LISTINGS.filter((l) => l.deal === d).length }));
-
+function SubPage({ title, children }: { title: string; children: React.ReactNode }) {
   return (
-    <section id="top" className="px-4 pb-12 pt-8 md:px-6 md:pb-16 md:pt-12">
-      <div className="mx-auto grid max-w-[1200px] items-center gap-8 md:grid-cols-[1fr_1.15fr] md:gap-12">
-        <motion.div initial={reduce ? false : { opacity: 0, y: 16 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.5, ease: EASE }}>
-          <p className="text-[15px] font-semibold" style={{ color: C.coralText }}>
-            □□동 아파트·빌라·오피스텔·상가
+    <div className="px-4 pb-20 md:px-6">
+      <div className="mx-auto max-w-[1200px]">
+        <div className="flex flex-wrap items-baseline justify-between gap-2 border-b-2 py-6 md:py-8" style={{ borderColor: C.ink }}>
+          <h1 id="realty-page-title" tabIndex={-1} className="text-[28px] font-bold tracking-[-0.03em] outline-none md:text-[32px]">
+            {title}
+          </h1>
+          <p className="text-[14px]" style={{ color: C.muted }}>
+            {OFFICE} · 중개사무소 등록번호 {REG_NO}
           </p>
-          <h1 className="mt-2 text-[34px] font-bold leading-[1.25] tracking-[-0.03em] md:text-[50px]">{OFFICE}</h1>
-          <p className="mt-4 max-w-[480px]" style={{ color: C.muted }}>
-            □□역 2번 출구 앞에서 15년째 동네 매물을 중개하고 있습니다. 지도에서 매물 위치와 역까지 걸리는 시간을 함께 보고 고르세요.
-          </p>
-          <ul className="mt-7 grid grid-cols-3 gap-2.5">
-            {counts.map(({ d, n }) => (
-              <li key={d}>
-                <a
-                  href="#map"
-                  onClick={() => onDeal(d)}
-                  className="flex h-full flex-col rounded-[10px] border px-3.5 py-3 transition-colors hover:border-[#ef6351]"
-                  style={{ borderColor: C.line }}
-                >
-                  <span className="text-[15px]" style={{ color: C.muted }}>
-                    {DEAL_LABEL[d]}
-                  </span>
-                  <span className="text-[22px] font-bold tabular-nums">{n}건</span>
-                </a>
-              </li>
-            ))}
-          </ul>
-          <p className="mt-5 flex flex-wrap items-center gap-x-4 gap-y-1 text-[15px]" style={{ color: C.muted }}>
-            <span>평일 09:30 ~ 19:00</span>
-            <span>토요일 10:00 ~ 17:00</span>
-            <a href={`tel:${TEL}`} className="font-semibold underline underline-offset-4" style={{ color: C.ink }}>
-              {TEL}
-            </a>
-          </p>
-        </motion.div>
-        <div className="relative aspect-[7/4] overflow-hidden rounded-[12px]">
-          <Image src={`${IMG}/hero.jpg`} alt="나무가 늘어선 길을 따라 아파트 단지가 이어진 동네 거리" fill priority sizes="(min-width: 768px) 55vw, 100vw" className="object-cover" />
         </div>
+        <div className="pt-8">{children}</div>
       </div>
-    </section>
-  );
-}
-
-function SectionHead({ id, title, desc }: { id: string; title: string; desc?: string }) {
-  return (
-    <div>
-      <h2 id={id} className="text-[26px] font-bold leading-[1.35] tracking-[-0.03em] md:text-[34px]">
-        {title}
-      </h2>
-      {desc && (
-        <p className="mt-3 max-w-[680px]" style={{ color: C.muted }}>
-          {desc}
-        </p>
-      )}
     </div>
   );
 }
 
-/* ---------- 동네 지도 매물 찾기 ---------- */
+/* ---------- 매물검색 (첫 화면) ---------- */
 
-function Chips<T extends string | number>({ label, value, options, onPick }: { label: string; value: T; options: { v: T; label: string }[]; onPick: (v: T) => void }) {
+const selectCls = "h-11 w-full rounded-[6px] border bg-white px-2.5 text-[15px] font-semibold outline-none focus:border-[#ef6351]";
+
+function SearchPage({
+  selectedId,
+  onSelect,
+  basket,
+  onToggle,
+  onTour,
+  onCalc,
+}: {
+  selectedId: string;
+  onSelect: (id: string) => void;
+  basket: string[];
+  onToggle: (id: string) => void;
+  onTour: () => void;
+  onCalc: () => void;
+}) {
+  const reduce = useReducedMotionSafe();
+  const [draft, setDraft] = useState<Filter>(EMPTY);
+  const [filter, setFilter] = useState<Filter>(EMPTY);
+  const [tab, setTab] = useState<"map" | "list">("map");
+  const [sort, setSort] = useState<"new" | "low" | "wide">("new");
+
+  const visible = LISTINGS.filter((l) => matches(l, filter));
+  const kindCount = (k: Kind) => LISTINGS.filter((l) => l.kind === k).length;
+
+  const apply = (f: Filter) => {
+    setDraft(f);
+    setFilter(f);
+  };
+
+  const submit = (e: React.FormEvent) => {
+    e.preventDefault();
+    setFilter(draft);
+    document.getElementById("realty-results")?.scrollIntoView({ behavior: reduce ? "auto" : "smooth", block: "start" });
+  };
+
+  const pickFromList = (id: string) => {
+    onSelect(id);
+    window.requestAnimationFrame(() => document.getElementById("realty-detail")?.scrollIntoView({ behavior: reduce ? "auto" : "smooth", block: "start" }));
+  };
+
+  const sorted = [...visible].sort((a, b) => (sort === "low" ? a.price + (a.rent ?? 0) * 100 - (b.price + (b.rent ?? 0) * 100) : sort === "wide" ? b.area - a.area : b.no.localeCompare(a.no)));
+
   return (
-    <fieldset className="min-w-0">
-      <legend className="text-[14px] font-semibold" style={{ color: C.muted }}>
-        {label}
-      </legend>
-      <div className="mt-1.5 flex flex-wrap gap-1.5">
-        {options.map((o) => (
-          <button
-            key={String(o.v)}
-            type="button"
-            aria-pressed={value === o.v}
-            onClick={() => onPick(o.v)}
-            className="h-10 rounded-[6px] border px-3 text-[15px] font-semibold transition-colors"
-            style={value === o.v ? { background: C.ink, color: "#fff", borderColor: C.ink } : { background: C.white, borderColor: C.line }}
-          >
-            {o.label}
-          </button>
-        ))}
-      </div>
-    </fieldset>
+    <>
+      <section aria-labelledby="realty-page-title" className="px-4 pb-6 pt-6 md:px-6 md:pb-8 md:pt-8" style={{ background: C.ink, color: "#fff" }}>
+        <div className="mx-auto max-w-[1200px]">
+          <div className="flex flex-wrap items-baseline justify-between gap-x-4 gap-y-1">
+            <h1 id="realty-page-title" tabIndex={-1} className="text-[24px] font-bold tracking-[-0.03em] outline-none md:text-[28px]">
+              □□동 매물검색
+            </h1>
+            <p className="text-[14px]" style={{ color: "#aab4c0" }}>
+              평일 09:30 ~ 19:00 · 토요일 10:00 ~ 17:00
+            </p>
+          </div>
+
+          <form id="realty-search" onSubmit={submit} className="mt-4 rounded-[10px] bg-white p-3 md:p-4" style={{ color: C.ink }} aria-label="매물 검색 조건">
+            <div className="grid grid-cols-2 gap-x-3 gap-y-3 md:grid-cols-4 lg:grid-cols-[auto_1fr_1fr_1fr_1fr_auto]">
+              <fieldset className="col-span-2 min-w-0 md:col-span-4 lg:col-span-1">
+                <legend className="mb-1 text-[13px] font-semibold" style={{ color: C.muted }}>
+                  거래유형
+                </legend>
+                <div className="flex overflow-hidden rounded-[6px] border" style={{ borderColor: C.line }}>
+                  {(["all", "sale", "jeonse", "monthly"] as const).map((d) => {
+                    const on = draft.deal === d;
+                    return (
+                      <label key={d} className="flex h-11 flex-1 cursor-pointer items-center justify-center border-l px-3 text-[15px] font-semibold first:border-l-0 has-[:focus-visible]:outline has-[:focus-visible]:outline-2 has-[:focus-visible]:-outline-offset-2" style={{ borderColor: C.line, ...(on ? { background: C.ink, color: "#fff" } : {}) }}>
+                        <input type="radio" name="realty-deal" value={d} checked={on} onChange={() => setDraft({ ...draft, deal: d })} className="sr-only" />
+                        {d === "all" ? "전체" : DEAL_LABEL[d]}
+                      </label>
+                    );
+                  })}
+                </div>
+              </fieldset>
+              <label className="block min-w-0">
+                <span className="mb-1 block text-[13px] font-semibold" style={{ color: C.muted }}>
+                  매물 종류
+                </span>
+                <select value={draft.kind} onChange={(e) => setDraft({ ...draft, kind: e.target.value as Filter["kind"] })} className={selectCls} style={{ borderColor: C.line }}>
+                  <option value="all">전체</option>
+                  {(Object.keys(KIND_LABEL) as Kind[]).map((k) => (
+                    <option key={k} value={k}>
+                      {KIND_LABEL[k]}
+                    </option>
+                  ))}
+                </select>
+              </label>
+              <label className="block min-w-0">
+                <span className="mb-1 block text-[13px] font-semibold" style={{ color: C.muted }}>
+                  매매가·보증금
+                </span>
+                <select value={draft.price} onChange={(e) => setDraft({ ...draft, price: Number(e.target.value) })} className={selectCls} style={{ borderColor: C.line }}>
+                  {PRICE_RANGES.map((p, i) => (
+                    <option key={p.label} value={i}>
+                      {p.label}
+                    </option>
+                  ))}
+                </select>
+              </label>
+              <label className="block min-w-0">
+                <span className="mb-1 block text-[13px] font-semibold" style={{ color: C.muted }}>
+                  전용면적
+                </span>
+                <select value={draft.area} onChange={(e) => setDraft({ ...draft, area: Number(e.target.value) })} className={selectCls} style={{ borderColor: C.line }}>
+                  {AREA_RANGES.map((a, i) => (
+                    <option key={a.label} value={i}>
+                      {a.label}
+                    </option>
+                  ))}
+                </select>
+              </label>
+              <label className="block min-w-0">
+                <span className="mb-1 block text-[13px] font-semibold" style={{ color: C.muted }}>
+                  역까지 도보
+                </span>
+                <select value={draft.walk} onChange={(e) => setDraft({ ...draft, walk: Number(e.target.value) })} className={selectCls} style={{ borderColor: C.line }}>
+                  {WALK_RANGES.map((w, i) => (
+                    <option key={w.label} value={i}>
+                      {w.label}
+                    </option>
+                  ))}
+                </select>
+              </label>
+              <div className="col-span-2 flex items-end gap-2 md:col-span-4 lg:col-span-1">
+                <button type="button" onClick={() => apply(EMPTY)} aria-label="초기화" title="초기화" className="inline-flex h-11 w-11 shrink-0 items-center justify-center rounded-[6px] border" style={{ borderColor: C.line }}>
+                  <RotateCcw size={18} aria-hidden />
+                </button>
+                <button type="submit" className="inline-flex h-11 flex-1 items-center justify-center gap-1.5 rounded-[6px] px-5 text-[16px] font-bold lg:flex-none" style={{ background: C.coral, color: "#fff" }}>
+                  <Search size={18} aria-hidden />
+                  매물검색
+                </button>
+              </div>
+            </div>
+          </form>
+
+          <ul className="mt-3 grid grid-cols-2 gap-2 sm:grid-cols-4" aria-label="매물 종류별 매물 수">
+            {(Object.keys(KIND_LABEL) as Kind[]).map((k) => {
+              const on = filter.kind === k;
+              return (
+                <li key={k}>
+                  <button
+                    type="button"
+                    aria-pressed={on}
+                    onClick={() => apply({ ...filter, kind: on ? "all" : k })}
+                    className="flex h-full w-full items-baseline justify-between gap-2 rounded-[8px] border px-4 py-3 text-left transition-colors"
+                    style={on ? { background: "#fff", color: C.ink, borderColor: "#fff" } : { borderColor: "rgba(255,255,255,0.22)", background: C.inkSoft }}
+                  >
+                    <span className="text-[15px] font-semibold">{KIND_LABEL[k]}</span>
+                    <span className="text-[24px] font-bold tabular-nums" style={{ color: on ? C.coralText : "#fff" }}>
+                      {kindCount(k)}
+                    </span>
+                  </button>
+                </li>
+              );
+            })}
+          </ul>
+        </div>
+      </section>
+
+      <section id="realty-results" aria-label="검색 결과" className="scroll-mt-16 px-4 pb-16 pt-5 md:px-6">
+        <div className="mx-auto max-w-[1200px]">
+          <div className="flex flex-wrap items-end justify-between gap-3 border-b" style={{ borderColor: C.line }}>
+            <div role="tablist" aria-label="검색 방식" className="flex">
+              {(
+                [
+                  { id: "map", label: "지도검색", icon: MapIcon },
+                  { id: "list", label: "목록검색", icon: LayoutGrid },
+                ] as const
+              ).map((t) => {
+                const on = tab === t.id;
+                const Icon = t.icon;
+                return (
+                  <button
+                    key={t.id}
+                    id={`realty-tab-${t.id}`}
+                    type="button"
+                    role="tab"
+                    aria-selected={on}
+                    aria-controls={`realty-panel-${t.id}`}
+                    tabIndex={on ? 0 : -1}
+                    onClick={() => setTab(t.id)}
+                    onKeyDown={(e) => {
+                      if (e.key === "ArrowRight" || e.key === "ArrowLeft") {
+                        const next = t.id === "map" ? "list" : "map";
+                        setTab(next);
+                        document.getElementById(`realty-tab-${next}`)?.focus();
+                      }
+                    }}
+                    className="-mb-px inline-flex h-12 items-center gap-1.5 border-b-2 px-4 text-[16px] font-bold"
+                    style={{ borderColor: on ? C.coral : "transparent", color: on ? C.ink : C.muted }}
+                  >
+                    <Icon size={18} aria-hidden />
+                    {t.label}
+                  </button>
+                );
+              })}
+            </div>
+            <div className="flex items-center gap-3 pb-2">
+              <p className="text-[15px]" aria-live="polite">
+                검색 결과 <span className="font-bold tabular-nums" style={{ color: C.coralText }}>{visible.length}</span>건
+              </p>
+              {tab === "list" && (
+                <label className="flex items-center gap-1.5">
+                  <span className="sr-only">정렬</span>
+                  <select value={sort} onChange={(e) => setSort(e.target.value as typeof sort)} className="h-10 rounded-[6px] border bg-white px-2 text-[14px] font-semibold" style={{ borderColor: C.line }}>
+                    <option value="new">최신순</option>
+                    <option value="low">낮은 가격순</option>
+                    <option value="wide">넓은 면적순</option>
+                  </select>
+                </label>
+              )}
+            </div>
+          </div>
+
+          <div className="mt-4">
+            {tab === "map" ? (
+              <div id="realty-panel-map" role="tabpanel" aria-labelledby="realty-tab-map">
+                <MapSearch visible={visible} selectedId={selectedId} onSelect={onSelect} basket={basket} onToggle={onToggle} onReset={() => apply(EMPTY)} />
+              </div>
+            ) : (
+              <div id="realty-panel-list" role="tabpanel" aria-labelledby="realty-tab-list">
+                <ul className="grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
+                  {sorted.map((l) => (
+                    <ListingCard key={l.id} l={l} selected={l.id === selectedId} saved={basket.includes(l.id)} full={!basket.includes(l.id) && basket.length >= BASKET_MAX} onPick={() => pickFromList(l.id)} onToggle={() => onToggle(l.id)} />
+                  ))}
+                </ul>
+                {visible.length === 0 && <Empty onReset={() => apply(EMPTY)} />}
+              </div>
+            )}
+          </div>
+
+          <Detail listing={LISTING_BY_ID[selectedId]} basket={basket} onToggle={onToggle} onTour={onTour} onCalc={onCalc} />
+        </div>
+      </section>
+    </>
   );
 }
+
+function Empty({ onReset }: { onReset: () => void }) {
+  return (
+    <div className="rounded-[10px] p-6 text-center" style={{ background: C.gray, color: C.muted }}>
+      조건에 맞는 매물이 없습니다.
+      <button type="button" onClick={onReset} className="mt-2 block w-full font-semibold underline underline-offset-4" style={{ color: C.ink }}>
+        초기화
+      </button>
+    </div>
+  );
+}
+
+function BadgeList({ badges }: { badges: Badge[] }) {
+  if (!badges.length) return null;
+  return (
+    <>
+      {badges.map((b) => (
+        <span
+          key={b}
+          className="rounded-[3px] px-1.5 text-[12px] font-bold leading-[20px]"
+          style={b === "급매" ? { background: C.coral, color: "#fff" } : b === "추천" ? { background: C.ink, color: "#fff" } : { border: `1px solid ${C.coral}`, color: C.coralText }}
+        >
+          {b}
+        </span>
+      ))}
+    </>
+  );
+}
+
+function HeartButton({ saved, full, name, onToggle, className = "" }: { saved: boolean; full: boolean; name: string; onToggle: () => void; className?: string }) {
+  return (
+    <button
+      type="button"
+      onClick={onToggle}
+      disabled={full}
+      aria-pressed={saved}
+      aria-label={saved ? `${name} 관심매물 해제` : `${name} 관심매물 담기`}
+      title={full ? `관심매물은 ${BASKET_MAX}개까지 담을 수 있습니다` : saved ? "관심매물 해제" : "관심매물 담기"}
+      className={`inline-flex h-11 w-11 items-center justify-center rounded-full transition-colors disabled:opacity-35 ${className}`}
+    >
+      <Heart size={22} fill={saved ? C.coral : "none"} style={{ color: saved ? C.coral : C.muted }} aria-hidden />
+    </button>
+  );
+}
+
+function ListingCard({ l, selected, saved, full, onPick, onToggle }: { l: Listing; selected: boolean; saved: boolean; full: boolean; onPick: () => void; onToggle: () => void }) {
+  return (
+    <li className="relative">
+      <button
+        type="button"
+        aria-pressed={selected}
+        onClick={onPick}
+        className="block h-full w-full rounded-[10px] border bg-white p-4 pr-14 text-left transition-colors hover:border-[#18202a]"
+        style={{ borderColor: selected ? C.ink : C.line, boxShadow: selected ? `inset 0 0 0 1px ${C.ink}` : undefined }}
+      >
+        <span className="flex flex-wrap items-center gap-1.5">
+          <span className="text-[13px] tabular-nums" style={{ color: C.muted }}>
+            매물번호 {l.no}
+          </span>
+          <BadgeList badges={l.badges} />
+        </span>
+        <span className="mt-1 block text-[20px] font-bold tabular-nums tracking-[-0.02em]">{priceText(l)}</span>
+        <span className="block font-semibold">
+          {l.name} {l.floor}층
+        </span>
+        <span className="mt-1 block text-[14px] leading-[1.6]" style={{ color: C.muted }}>
+          {l.dong} · {KIND_LABEL[l.kind]}
+          <br />
+          전용 {areaText(l.area)}
+          <br />
+          {l.kind === "store" ? `화장실 ${l.baths}개` : `방 ${l.rooms}개 / 욕실 ${l.baths}개`} · {l.dir}
+        </span>
+      </button>
+      <HeartButton saved={saved} full={full} name={l.name} onToggle={onToggle} className="absolute right-2 top-2" />
+    </li>
+  );
+}
+
+/* ---------- 지도검색 ---------- */
 
 function NeighborhoodMap() {
   const villas = (x0: number, y0: number, cols: number, rows: number, gap = 40) =>
@@ -539,44 +934,26 @@ function PinShape({ active }: { active: boolean }) {
 }
 
 function MapSearch({
-  deal,
-  onDeal,
+  visible,
   selectedId,
   onSelect,
   basket,
   onToggle,
+  onReset,
 }: {
-  deal: Deal | "all";
-  onDeal: (d: Deal | "all") => void;
+  visible: Listing[];
   selectedId: string;
   onSelect: (id: string) => void;
   basket: string[];
   onToggle: (id: string) => void;
+  onReset: () => void;
 }) {
   const reduce = useReducedMotionSafe();
-  const [kind, setKind] = useState<Kind | "all">("all");
-  const [priceMin, setPriceMin] = useState(0);
-  const [priceMax, setPriceMax] = useState(15);
-  const [minArea, setMinArea] = useState(0);
-  const [unit, setUnit] = useState<Unit>("m2");
-  const [walk, setWalk] = useState(0);
   const [hoverId, setHoverId] = useState<string | null>(null);
   const [grouped, setGrouped] = useState(true);
   const [openZone, setOpenZone] = useState<ZoneId | null>(null);
   const listRef = useRef<HTMLUListElement>(null);
   const itemRefs = useRef<Record<string, HTMLLIElement | null>>({});
-
-  const visible = LISTINGS.filter((l) => {
-    const p = l.price / 10000;
-    return (
-      (deal === "all" || l.deal === deal) &&
-      (kind === "all" || l.kind === kind) &&
-      p >= priceMin &&
-      (priceMax >= 15 || p <= priceMax) &&
-      l.area >= minArea &&
-      (walk === 0 || l.walk <= walk)
-    );
-  });
 
   const activeId = hoverId ?? selectedId;
   const activeZone = LISTING_BY_ID[activeId]?.zone;
@@ -590,16 +967,6 @@ function MapSearch({
     else pins.push(...items);
   });
 
-  const reset = () => {
-    onDeal("all");
-    setKind("all");
-    setPriceMin(0);
-    setPriceMax(15);
-    setMinArea(0);
-    setWalk(0);
-    setOpenZone(null);
-  };
-
   const pickFromMap = (id: string) => {
     onSelect(id);
     const list = listRef.current;
@@ -609,276 +976,139 @@ function MapSearch({
     }
   };
 
-  const eokLabel = (v: number) => (v >= 15 ? "15억 이상" : v === 0 ? "0원" : `${v}억`);
-  const areaMax = 120;
-
   return (
-    <section aria-labelledby="map-title" id="map" className="scroll-mt-16 px-4 py-14 md:px-6 md:py-20" style={{ background: C.gray }}>
-      <div className="mx-auto max-w-[1200px]">
-        <SectionHead
-          id="map-title"
-          title="□□동 매물을 지도에서 고르세요"
-          desc="조건을 바꾸면 지도와 목록이 함께 바뀝니다. 같은 단지에 매물이 여러 건이면 숫자로 묶어 보여 드리고, 누르면 펼쳐집니다."
-        />
-
-        <div className="mt-8 grid gap-x-6 gap-y-5 rounded-[12px] bg-white p-4 md:grid-cols-2 md:p-6 lg:grid-cols-[auto_auto_1fr]">
-          <Chips
-            label="거래 종류"
-            value={deal}
-            options={[{ v: "all" as const, label: "전체" }, ...(Object.keys(DEAL_LABEL) as Deal[]).map((d) => ({ v: d, label: DEAL_LABEL[d] }))]}
-            onPick={onDeal}
-          />
-          <Chips
-            label="매물 종류"
-            value={kind}
-            options={[{ v: "all" as const, label: "전체" }, ...(Object.keys(KIND_LABEL) as Kind[]).map((k) => ({ v: k, label: KIND_LABEL[k] }))]}
-            onPick={setKind}
-          />
-          <Chips
-            label="역까지 걸어서"
-            value={walk}
-            options={[
-              { v: 0, label: "상관없음" },
-              { v: 5, label: "5분 이내" },
-              { v: 10, label: "10분 이내" },
-            ]}
-            onPick={setWalk}
-          />
-
-          <fieldset className="min-w-0 md:col-span-1 lg:col-span-2">
-            <legend className="text-[14px] font-semibold" style={{ color: C.muted }}>
-              가격 (매매가, 보증금)
-            </legend>
-            <p className="mt-1 font-bold tabular-nums">
-              {eokLabel(priceMin)} ~ {eokLabel(priceMax)}
-            </p>
-            <div className="mt-1 grid grid-cols-2 gap-4">
-              <label className="block">
-                <span className="sr-only">최저 가격</span>
-                <input
-                  type="range"
-                  min={0}
-                  max={15}
-                  step={0.5}
-                  value={priceMin}
-                  onChange={(e) => setPriceMin(Math.min(Number(e.target.value), priceMax))}
-                  aria-valuetext={eokLabel(priceMin)}
-                  className="h-8 w-full accent-[#ef6351]"
-                />
-              </label>
-              <label className="block">
-                <span className="sr-only">최고 가격</span>
-                <input
-                  type="range"
-                  min={0}
-                  max={15}
-                  step={0.5}
-                  value={priceMax}
-                  onChange={(e) => setPriceMax(Math.max(Number(e.target.value), priceMin))}
-                  aria-valuetext={eokLabel(priceMax)}
-                  className="h-8 w-full accent-[#ef6351]"
-                />
-              </label>
-            </div>
-          </fieldset>
-
-          <fieldset className="min-w-0">
-            <legend className="text-[14px] font-semibold" style={{ color: C.muted }}>
-              전용면적
-            </legend>
-            <div className="mt-1 flex items-center justify-between gap-3">
-              <p className="font-bold tabular-nums">{minArea === 0 ? "전체" : `${areaText(minArea, unit)} 이상`}</p>
-              <div className="flex overflow-hidden rounded-[6px] border" style={{ borderColor: C.line }} role="group" aria-label="면적 단위">
-                {(["m2", "py"] as Unit[]).map((u) => (
-                  <button
-                    key={u}
-                    type="button"
-                    aria-pressed={unit === u}
-                    onClick={() => setUnit(u)}
-                    className="h-9 px-3 text-[14px] font-semibold"
-                    style={unit === u ? { background: C.ink, color: "#fff" } : { background: C.white }}
-                  >
-                    {u === "m2" ? "㎡" : "평"}
-                  </button>
-                ))}
-              </div>
-            </div>
-            <label className="mt-1 block">
-              <span className="sr-only">최소 전용면적</span>
-              <input
-                type="range"
-                min={0}
-                max={areaMax}
-                step={5}
-                value={minArea}
-                onChange={(e) => setMinArea(Number(e.target.value))}
-                aria-valuetext={minArea === 0 ? "전체" : `${areaText(minArea, unit)} 이상`}
-                className="h-8 w-full accent-[#ef6351]"
-              />
-            </label>
-          </fieldset>
+    <div id="realty-map" className="grid items-start gap-4 lg:grid-cols-[1fr_360px]">
+      <div className="min-w-0 overflow-hidden rounded-[10px] border bg-white" style={{ borderColor: C.line }}>
+        <div className="flex items-center justify-between gap-2 border-b px-3 py-2" style={{ borderColor: C.line }}>
+          <p className="text-[14px] font-semibold" style={{ color: C.muted }}>
+            □□역 주변
+          </p>
+          <button
+            type="button"
+            aria-pressed={grouped}
+            onClick={() => {
+              setGrouped((v) => !v);
+              setOpenZone(null);
+            }}
+            className="inline-flex h-9 items-center gap-1.5 rounded-[6px] border px-3 text-[14px] font-semibold"
+            style={grouped ? { borderColor: C.ink } : { borderColor: C.line, color: C.muted }}
+          >
+            <Layers size={16} aria-hidden />
+            단지별 묶기
+          </button>
         </div>
-
-        <div className="mt-5 grid items-start gap-5 lg:grid-cols-[1fr_360px]">
-          <div className="min-w-0 overflow-hidden rounded-[12px] border bg-white" style={{ borderColor: C.line }}>
-            <div className="flex flex-wrap items-center justify-between gap-2 border-b px-4 py-2.5" style={{ borderColor: C.line }}>
-              <p className="text-[15px] font-semibold" aria-live="polite">
-                지도에 <span style={{ color: C.coralText }}>{visible.length}건</span>
-              </p>
-              <div className="flex items-center gap-1.5">
-                <button
-                  type="button"
-                  aria-pressed={grouped}
-                  onClick={() => {
-                    setGrouped((v) => !v);
-                    setOpenZone(null);
-                  }}
-                  className="inline-flex h-9 items-center gap-1.5 rounded-[6px] border px-3 text-[14px] font-semibold"
-                  style={grouped ? { borderColor: C.ink } : { borderColor: C.line, color: C.muted }}
+        <div className="relative w-full" style={{ aspectRatio: "800 / 520" }}>
+          <NeighborhoodMap />
+          <div className="absolute inset-0" onClick={() => setOpenZone(null)} aria-hidden />
+          {clusters.map(({ zone, items }) => {
+            const z = ZONES[zone];
+            return (
+              <motion.button
+                key={`z-${zone}`}
+                type="button"
+                onClick={() => setOpenZone(zone)}
+                aria-label={`${z.name} 매물 ${items.length}건 펼치기`}
+                className="absolute z-10 flex flex-col items-center"
+                style={{ left: `${r2(z.x / 8)}%`, top: `${r2(z.y / 5.2)}%`, x: "-50%", y: "-50%" }}
+                initial={reduce ? false : { scale: 0.6, opacity: 0 }}
+                animate={{ scale: 1, opacity: 1 }}
+                transition={{ duration: 0.25, ease: EASE }}
+              >
+                <span
+                  className="inline-flex h-9 w-9 items-center justify-center rounded-full border-2 text-[15px] font-bold tabular-nums md:h-11 md:w-11 md:text-[17px]"
+                  style={{ background: C.coral, borderColor: "#fff", color: "#fff", boxShadow: "0 2px 8px rgba(24,32,42,0.25)" }}
                 >
-                  <Layers size={16} aria-hidden />
-                  단지별로 묶기
-                </button>
-                <button type="button" onClick={reset} aria-label="조건 처음으로" className="inline-flex h-9 w-9 items-center justify-center rounded-[6px] border" style={{ borderColor: C.line }}>
-                  <RotateCcw size={16} aria-hidden />
-                </button>
-              </div>
-            </div>
-            <div className="relative w-full" style={{ aspectRatio: "800 / 520" }}>
-              <NeighborhoodMap />
-              <div className="absolute inset-0" onClick={() => setOpenZone(null)} aria-hidden />
-              {clusters.map(({ zone, items }) => {
-                const z = ZONES[zone];
-                return (
-                  <motion.button
-                    key={`z-${zone}`}
-                    type="button"
-                    onClick={() => setOpenZone(zone)}
-                    aria-label={`${z.name} 매물 ${items.length}건, 펼쳐 보기`}
-                    className="absolute z-10 flex flex-col items-center"
-                    style={{ left: `${r2(z.x / 8)}%`, top: `${r2(z.y / 5.2)}%`, x: "-50%", y: "-50%" }}
-                    initial={reduce ? false : { scale: 0.6, opacity: 0 }}
-                    animate={{ scale: 1, opacity: 1 }}
-                    transition={{ duration: 0.25, ease: EASE }}
-                  >
-                    <span
-                      className="inline-flex h-9 w-9 items-center justify-center rounded-full border-2 text-[15px] font-bold tabular-nums md:h-11 md:w-11 md:text-[17px]"
-                      style={{ background: C.coral, borderColor: "#fff", color: "#fff", boxShadow: "0 2px 8px rgba(24,32,42,0.25)" }}
-                    >
-                      {items.length}
-                    </span>
-                    <span className="mt-0.5 hidden whitespace-nowrap rounded-[4px] bg-white px-1.5 text-[12px] font-semibold md:block">{z.name}</span>
-                  </motion.button>
-                );
-              })}
-              {pins.map((l) => {
-                const active = l.id === activeId;
-                return (
-                  <button
-                    key={l.id}
-                    type="button"
-                    onClick={() => pickFromMap(l.id)}
-                    onMouseEnter={() => setHoverId(l.id)}
-                    onMouseLeave={() => setHoverId(null)}
-                    onFocus={() => setHoverId(l.id)}
-                    onBlur={() => setHoverId(null)}
-                    aria-label={`${l.name}, ${priceText(l)}`}
-                    aria-pressed={l.id === selectedId}
-                    className="absolute flex h-11 w-10 items-end justify-center"
-                    style={{ left: `${r2(l.x / 8)}%`, top: `${r2(l.y / 5.2)}%`, transform: "translate(-50%, -100%)", zIndex: active ? 30 : 20 }}
-                  >
-                    <span
-                      className={`absolute bottom-full mb-0.5 whitespace-nowrap rounded-[4px] px-1.5 py-0.5 text-[12px] font-bold tabular-nums shadow-sm ${active ? "block" : "hidden lg:block"}`}
-                      style={active ? { background: C.ink, color: "#fff" } : { background: "#fff", color: C.ink }}
-                    >
-                      {shortPrice(l)}
-                    </span>
-                    <motion.span
-                      className="block"
-                      style={{ transformOrigin: "50% 100%" }}
-                      initial={false}
-                      animate={{ scale: active ? 1.25 : 1 }}
-                      transition={{ duration: reduce ? 0 : 0.2, ease: EASE }}
-                    >
-                      <PinShape active={active} />
-                    </motion.span>
-                  </button>
-                );
-              })}
-            </div>
-          </div>
-
-          <ul ref={listRef} className="relative space-y-2 lg:max-h-[620px] lg:overflow-y-auto lg:pr-1" aria-label="매물 목록">
-            {visible.map((l) => {
-              const selected = l.id === selectedId;
-              const active = l.id === activeId;
-              const saved = basket.includes(l.id);
-              const full = !saved && basket.length >= BASKET_MAX;
-              return (
-                <li
-                  key={l.id}
-                  ref={(el) => {
-                    itemRefs.current[l.id] = el;
-                  }}
-                  className="relative"
+                  {items.length}
+                </span>
+                <span className="mt-0.5 hidden whitespace-nowrap rounded-[4px] bg-white px-1.5 text-[12px] font-semibold md:block">{z.name}</span>
+              </motion.button>
+            );
+          })}
+          {pins.map((l) => {
+            const active = l.id === activeId;
+            return (
+              <button
+                key={l.id}
+                type="button"
+                onClick={() => pickFromMap(l.id)}
+                onMouseEnter={() => setHoverId(l.id)}
+                onMouseLeave={() => setHoverId(null)}
+                onFocus={() => setHoverId(l.id)}
+                onBlur={() => setHoverId(null)}
+                aria-label={`${l.name}, ${priceText(l)}`}
+                aria-pressed={l.id === selectedId}
+                className="absolute flex h-11 w-10 items-end justify-center"
+                style={{ left: `${r2(l.x / 8)}%`, top: `${r2(l.y / 5.2)}%`, transform: "translate(-50%, -100%)", zIndex: active ? 30 : 20 }}
+              >
+                <span
+                  className={`absolute bottom-full mb-0.5 whitespace-nowrap rounded-[4px] px-1.5 py-0.5 text-[12px] font-bold tabular-nums shadow-sm ${active ? "block" : "hidden lg:block"}`}
+                  style={active ? { background: C.ink, color: "#fff" } : { background: "#fff", color: C.ink }}
                 >
-                  <button
-                    type="button"
-                    aria-pressed={selected}
-                    onClick={() => onSelect(l.id)}
-                    onMouseEnter={() => setHoverId(l.id)}
-                    onMouseLeave={() => setHoverId(null)}
-                    onFocus={() => setHoverId(l.id)}
-                    onBlur={() => setHoverId(null)}
-                    className="block w-full rounded-[10px] border bg-white py-3 pl-4 pr-16 text-left transition-colors"
-                    style={{ borderColor: selected ? C.ink : active ? C.coral : C.line, boxShadow: selected ? `inset 0 0 0 1px ${C.ink}` : "none" }}
-                  >
-                    <span className="flex items-baseline gap-2">
-                      <span className="text-[19px] font-bold tabular-nums tracking-[-0.02em]">{priceText(l)}</span>
-                      <span className="shrink-0 text-[13px] font-semibold" style={{ color: C.muted }}>
-                        {KIND_LABEL[l.kind]}
-                      </span>
-                    </span>
-                    <span className="mt-0.5 block font-semibold">{l.name}</span>
-                    <span className="block text-[14px]" style={{ color: C.muted }}>
-                      전용 {areaText(l.area, unit)} · {l.floor}층 · {l.dir} · □□역 도보 {l.walk}분
-                    </span>
-                  </button>
-                  <BasketButton saved={saved} full={full} name={l.name} onToggle={() => onToggle(l.id)} />
-                </li>
-              );
-            })}
-            {visible.length === 0 && (
-              <li className="rounded-[10px] bg-white p-6 text-center" style={{ color: C.muted }}>
-                조건에 맞는 매물이 없습니다.
-                <button type="button" onClick={reset} className="mt-2 block w-full font-semibold underline underline-offset-4" style={{ color: C.ink }}>
-                  조건 처음으로
-                </button>
-              </li>
-            )}
-          </ul>
+                  {shortPrice(l)}
+                </span>
+                <motion.span
+                  className="block"
+                  style={{ transformOrigin: "50% 100%" }}
+                  initial={false}
+                  animate={{ scale: active ? 1.25 : 1 }}
+                  transition={{ duration: reduce ? 0 : 0.2, ease: EASE }}
+                >
+                  <PinShape active={active} />
+                </motion.span>
+              </button>
+            );
+          })}
         </div>
-
-        <Detail listing={LISTING_BY_ID[selectedId]} unit={unit} basket={basket} onToggle={onToggle} />
       </div>
-    </section>
-  );
-}
 
-function BasketButton({ saved, full, name, onToggle }: { saved: boolean; full: boolean; name: string; onToggle: () => void }) {
-  return (
-    <button
-      type="button"
-      onClick={onToggle}
-      disabled={full}
-      aria-pressed={saved}
-      aria-label={saved ? `${name} 보러 갈 목록에서 빼기` : `${name} 보러 갈 목록에 담기`}
-      title={full ? `${BASKET_MAX}개까지 담을 수 있습니다` : saved ? "목록에서 빼기" : "보러 갈 목록에 담기"}
-      className="absolute right-3 top-1/2 inline-flex h-11 w-11 -translate-y-1/2 items-center justify-center rounded-full border transition-colors disabled:opacity-35"
-      style={saved ? { background: C.coral, borderColor: C.coral, color: "#fff" } : { background: "#fff", borderColor: C.line, color: C.ink }}
-    >
-      {saved ? <Check size={18} aria-hidden /> : <Plus size={18} aria-hidden />}
-    </button>
+      <ul ref={listRef} className="relative space-y-2 lg:max-h-[600px] lg:overflow-y-auto lg:pr-1" aria-label="지도 매물 목록">
+        {visible.map((l) => {
+          const selected = l.id === selectedId;
+          const active = l.id === activeId;
+          const saved = basket.includes(l.id);
+          const full = !saved && basket.length >= BASKET_MAX;
+          return (
+            <li
+              key={l.id}
+              ref={(el) => {
+                itemRefs.current[l.id] = el;
+              }}
+              className="relative"
+            >
+              <button
+                type="button"
+                aria-pressed={selected}
+                onClick={() => onSelect(l.id)}
+                onMouseEnter={() => setHoverId(l.id)}
+                onMouseLeave={() => setHoverId(null)}
+                onFocus={() => setHoverId(l.id)}
+                onBlur={() => setHoverId(null)}
+                className="block w-full rounded-[10px] border bg-white py-3 pl-4 pr-14 text-left transition-colors"
+                style={{ borderColor: selected ? C.ink : active ? C.coral : C.line, boxShadow: selected ? `inset 0 0 0 1px ${C.ink}` : "none" }}
+              >
+                <span className="flex flex-wrap items-center gap-1.5">
+                  <span className="text-[12px] tabular-nums" style={{ color: C.muted }}>
+                    {l.no}
+                  </span>
+                  <BadgeList badges={l.badges} />
+                </span>
+                <span className="block text-[18px] font-bold tabular-nums tracking-[-0.02em]">{priceText(l)}</span>
+                <span className="block font-semibold">{l.name}</span>
+                <span className="block text-[14px]" style={{ color: C.muted }}>
+                  전용 {areaText(l.area)} · {l.floor}/{l.total}층 · 역 도보 {l.walk}분
+                </span>
+              </button>
+              <HeartButton saved={saved} full={full} name={l.name} onToggle={() => onToggle(l.id)} className="absolute right-2 top-1/2 -translate-y-1/2" />
+            </li>
+          );
+        })}
+        {visible.length === 0 && (
+          <li>
+            <Empty onReset={onReset} />
+          </li>
+        )}
+      </ul>
+    </div>
   );
 }
 
@@ -905,115 +1135,96 @@ function StorePlan() {
   );
 }
 
-function Detail({ listing: l, unit, basket, onToggle }: { listing: Listing; unit: Unit; basket: string[]; onToggle: (id: string) => void }) {
+function Detail({ listing: l, basket, onToggle, onTour, onCalc }: { listing: Listing; basket: string[]; onToggle: (id: string) => void; onTour: () => void; onCalc: () => void }) {
   const reduce = useReducedMotionSafe();
   const fee = brokerFee(l);
   const saved = basket.includes(l.id);
   const full = !saved && basket.length >= BASKET_MAX;
 
+  // 중개대상물 표시·광고 명시사항 순서
   const rows: [string, string][] = [
-    ["면적", `전용 ${areaText(l.area, unit)} / 공급 ${areaText(l.supply, unit)}`],
-    ["층", `${l.floor}층 / 총 ${l.total}층`],
-    [l.kind === "store" ? "구조" : "방, 욕실", l.kind === "store" ? `통으로 쓰는 공간, 화장실 ${l.baths}개` : `방 ${l.rooms}개, 욕실 ${l.baths}개`],
-    ["방향", `${l.dir} (거실 기준)`],
-    ["입주 가능일", l.moveIn],
-    ["관리비", `월 ${l.fee}만 원`],
-    ["주차", l.parking],
-    ["역까지", `□□역 도보 ${l.walk}분`],
+    ["매물번호", l.no],
+    ["소재지", `□□시 □□구 ${l.dong} ${l.name}`],
+    ["면적", `전용 ${areaText(l.area)} / 공급 ${areaText(l.supply)}`],
+    ["가격", priceText(l)],
+    ["거래형태", DEAL_LABEL[l.deal]],
+    ["해당층/총층", `${l.floor}층 / ${l.total}층`],
+    ["사용승인일", l.approved],
+    ["방향", `${l.dir} (${l.kind === "store" ? "주 출입구" : "거실"} 기준)`],
+    [l.kind === "store" ? "화장실" : "방·욕실 수", l.kind === "store" ? `${l.baths}개` : `방 ${l.rooms}개 / 욕실 ${l.baths}개`],
+    ["입주가능일", l.moveIn],
+    ["주차대수", l.parking],
+    ["관리비", `월 ${l.fee}만 원${l.feeNote ? ` (${l.feeNote})` : ""}`],
   ];
 
   return (
-    <div className="mt-8" aria-live="polite">
+    <div id="realty-detail" className="mt-8 scroll-mt-20" aria-live="polite">
       <AnimatePresence mode="wait" initial={false}>
         <motion.article
           key={l.id}
           aria-labelledby="detail-title"
-          className="grid overflow-hidden rounded-[12px] border bg-white md:grid-cols-[0.9fr_1.1fr]"
+          className="grid overflow-hidden rounded-[10px] border bg-white lg:grid-cols-[0.8fr_1.2fr]"
           style={{ borderColor: C.line }}
           initial={reduce ? false : { opacity: 0, y: 12 }}
           animate={{ opacity: 1, y: 0 }}
           exit={reduce ? { opacity: 0, transition: { duration: 0 } } : { opacity: 0, y: -8 }}
           transition={{ duration: 0.3, ease: EASE }}
         >
-          <div className="relative aspect-[4/3] md:aspect-auto md:min-h-full">
+          <div className="relative aspect-[4/3] lg:aspect-auto lg:min-h-full">
             {l.kind === "store" ? (
               <StorePlan />
             ) : (
-              <Image src={`${IMG}/interior.jpg`} alt="햇빛이 드는 비어 있는 아파트 거실" fill sizes="(min-width: 768px) 45vw, 100vw" className="object-cover" />
+              <Image src={`${IMG}/interior.jpg`} alt="햇빛이 드는 비어 있는 아파트 거실" fill sizes="(min-width: 1024px) 40vw, 100vw" className="object-cover" />
             )}
-            <span className="absolute left-3 top-3 rounded-[4px] px-2 py-0.5 text-[13px] font-bold" style={{ background: C.coral, color: "#fff" }}>
-              {KIND_LABEL[l.kind]} {DEAL_LABEL[l.deal]}
-            </span>
           </div>
 
           <div className="p-5 md:p-7">
-            <p className="text-[15px] font-semibold" style={{ color: C.muted }}>
-              선택한 매물
-            </p>
-            <h3 id="detail-title" className="mt-0.5 text-[22px] font-bold tracking-[-0.02em] md:text-[26px]">
-              {l.name}
-            </h3>
-            <p className="text-[26px] font-bold tabular-nums tracking-[-0.02em] md:text-[30px]" style={{ color: C.coralText }}>
-              {priceText(l)}
-            </p>
-            <ul className="mt-3 flex flex-wrap gap-1.5">
-              {l.tags.map((t) => (
+            <div className="flex items-start justify-between gap-3">
+              <div className="min-w-0">
+                <p className="flex flex-wrap items-center gap-1.5 text-[14px]" style={{ color: C.muted }}>
+                  {KIND_LABEL[l.kind]} {DEAL_LABEL[l.deal]}
+                  <BadgeList badges={l.badges} />
+                </p>
+                <h2 id="detail-title" className="text-[22px] font-bold tracking-[-0.02em] md:text-[26px]">
+                  {l.name}
+                </h2>
+                <p className="text-[26px] font-bold tabular-nums tracking-[-0.02em] md:text-[30px]" style={{ color: C.coralText }}>
+                  {priceText(l)}
+                </p>
+              </div>
+              <HeartButton saved={saved} full={full} name={l.name} onToggle={() => onToggle(l.id)} className="shrink-0 border border-[#dfe4ea]" />
+            </div>
+            <ul className="mt-2 flex flex-wrap gap-1.5">
+              {[...l.tags, `□□역 도보 ${l.walk}분`].map((t) => (
                 <li key={t} className="rounded-[4px] px-2 py-0.5 text-[14px]" style={{ background: C.gray }}>
                   {t}
                 </li>
               ))}
             </ul>
 
-            <dl className="mt-5 grid gap-x-6 sm:grid-cols-2">
+            <dl className="mt-5 grid text-[15px] sm:grid-cols-2 sm:gap-x-6" aria-label="중개대상물 표시사항">
               {rows.map(([k, v]) => (
-                <div key={k} className="flex justify-between gap-3 border-t py-2.5 text-[15px]" style={{ borderColor: C.line }}>
-                  <dt style={{ color: C.muted }}>{k}</dt>
-                  <dd className="text-right font-semibold">{v}</dd>
+                <div key={k} className="flex justify-between gap-3 border-t py-2" style={{ borderColor: C.line }}>
+                  <dt className="shrink-0" style={{ color: C.muted }}>
+                    {k}
+                  </dt>
+                  <dd className="text-right font-semibold tabular-nums">{v}</dd>
                 </div>
               ))}
             </dl>
 
-            <div className="mt-5 rounded-[10px] p-4" style={{ background: C.gray }}>
-              <p className="flex flex-wrap items-baseline justify-between gap-x-3">
-                <span className="font-bold">중개보수</span>
-                <span className="text-[13px]" style={{ color: C.muted }}>
-                  상한 요율 기준, 부가가치세 별도
-                </span>
-              </p>
-              <dl className="mt-2 space-y-1.5 text-[15px]">
-                <div className="flex flex-wrap justify-between gap-x-3">
-                  <dt style={{ color: C.muted }}>거래금액</dt>
-                  <dd className="text-right font-semibold tabular-nums">
-                    {fee.formula && (
-                      <span className="block text-[13px] font-normal" style={{ color: C.muted }}>
-                        {fee.formula}
-                      </span>
-                    )}
-                    {manText(fee.basis)}
-                  </dd>
-                </div>
-                <div className="flex flex-wrap justify-between gap-x-3">
-                  <dt style={{ color: C.muted }}>상한 요율</dt>
-                  <dd className="text-right font-semibold">
-                    {fee.rate}%{fee.cap ? `, 한도 ${fee.cap}만 원` : ""}
-                    <span className="block text-[13px] font-normal" style={{ color: C.muted }}>
-                      {fee.rule}
-                    </span>
-                  </dd>
-                </div>
-                <div className="flex items-baseline justify-between gap-x-3 border-t pt-2" style={{ borderColor: C.line }}>
-                  <dt className="font-semibold">{fee.negotiable ? "최대" : "상한 금액"}</dt>
-                  <dd className="text-[22px] font-bold tabular-nums">{wonText(fee.won)}</dd>
-                </div>
-              </dl>
-              {fee.negotiable && (
-                <p className="mt-1 text-[13px]" style={{ color: C.muted }}>
-                  상가는 0.9% 안에서 협의해 정합니다.
-                </p>
-              )}
+            <div id="realty-fee" className="mt-5 rounded-[10px] p-4" style={{ background: C.gray }}>
+              <div className="flex flex-wrap items-center justify-between gap-x-3">
+                <h3 className="font-bold">중개보수</h3>
+                <button type="button" onClick={onCalc} className="inline-flex h-9 items-center gap-0.5 text-[14px] font-semibold" style={{ color: C.coralText }}>
+                  중개보수 계산기
+                  <ChevronRight size={16} aria-hidden />
+                </button>
+              </div>
+              <FeeLines fee={fee} />
             </div>
 
-            <div className="mt-5 flex flex-wrap items-center gap-x-4 gap-y-2">
+            <div className="mt-5 flex flex-wrap items-center gap-2">
               <button
                 type="button"
                 onClick={() => onToggle(l.id)}
@@ -1022,18 +1233,19 @@ function Detail({ listing: l, unit, basket, onToggle }: { listing: Listing; unit
                 className="inline-flex h-12 items-center gap-2 rounded-[6px] border px-5 font-semibold disabled:opacity-40"
                 style={saved ? { background: "#fff", borderColor: C.ink, color: C.ink } : { background: C.ink, borderColor: C.ink, color: "#fff" }}
               >
-                {saved ? <Check size={18} aria-hidden /> : <Plus size={18} aria-hidden />}
-                {saved ? "보러 갈 목록에 담김" : "보러 갈 목록에 담기"}
+                <Heart size={18} fill={saved ? C.coral : "none"} style={{ color: saved ? C.coral : "#fff" }} aria-hidden />
+                {saved ? "관심매물 해제" : "관심매물 담기"}
               </button>
-              <a href="#visit" className="text-[15px] font-semibold underline underline-offset-4">
-                담은 매물 {basket.length}개 보기
+              <button type="button" onClick={onTour} className="inline-flex h-12 items-center rounded-[6px] px-5 font-semibold" style={{ background: C.coral, color: "#fff" }}>
+                매물투어신청
+              </button>
+              <a href={`tel:${TEL}`} aria-label={`전화 문의 ${TEL}`} title="전화 문의" className="inline-flex h-12 w-12 items-center justify-center rounded-[6px] border" style={{ borderColor: C.line }}>
+                <Phone size={18} aria-hidden />
               </a>
             </div>
-            {full && (
-              <p className="mt-2 text-[14px]" style={{ color: C.muted }}>
-                한 번에 {BASKET_MAX}개까지 보러 갈 수 있습니다. 담은 매물을 하나 빼 주세요.
-              </p>
-            )}
+            <p className="mt-2 min-h-[22px] text-[14px]" style={{ color: C.muted }}>
+              {saved ? `관심매물에 담았습니다 (${basket.length}/${BASKET_MAX})` : full ? `관심매물은 ${BASKET_MAX}개까지 담을 수 있습니다.` : ""}
+            </p>
           </div>
         </motion.article>
       </AnimatePresence>
@@ -1041,25 +1253,184 @@ function Detail({ listing: l, unit, basket, onToggle }: { listing: Listing; unit
   );
 }
 
-/* ---------- 전세, 월세 비교 ---------- */
+function FeeLines({ fee }: { fee: Fee }) {
+  return (
+    <>
+      <dl className="mt-2 space-y-1.5 text-[15px]">
+        <div className="flex flex-wrap justify-between gap-x-3">
+          <dt style={{ color: C.muted }}>거래금액</dt>
+          <dd className="text-right font-semibold tabular-nums">
+            {fee.formula && (
+              <span className="block text-[13px] font-normal" style={{ color: C.muted }}>
+                {fee.formula}
+              </span>
+            )}
+            {manText(fee.basis)}
+          </dd>
+        </div>
+        <div className="flex flex-wrap justify-between gap-x-3">
+          <dt style={{ color: C.muted }}>상한 요율</dt>
+          <dd className="text-right font-semibold">
+            {fee.rate}%{fee.cap ? `, 한도 ${fee.cap}만 원` : ""}
+            <span className="block text-[13px] font-normal" style={{ color: C.muted }}>
+              {fee.rule}
+            </span>
+          </dd>
+        </div>
+        <div className="flex items-baseline justify-between gap-x-3 border-t pt-2" style={{ borderColor: C.line }}>
+          <dt className="font-semibold">{fee.negotiable ? "최대" : "상한 금액"}</dt>
+          <dd className="text-[22px] font-bold tabular-nums">{wonText(fee.won)}</dd>
+        </div>
+      </dl>
+      <p className="mt-1 text-[13px]" style={{ color: C.muted }}>
+        부가가치세 별도{fee.negotiable ? ". 주택 외 중개대상물은 0.9% 안에서 협의해 정합니다." : ""}
+      </p>
+    </>
+  );
+}
 
-function Slider({
-  label,
-  value,
-  min,
-  max,
-  step,
-  onChange,
-  format,
-}: {
-  label: string;
-  value: number;
-  min: number;
-  max: number;
-  step: number;
-  onChange: (v: number) => void;
-  format: (v: number) => string;
-}) {
+/* ---------- 부동산 계산기 ---------- */
+
+function Calculators({ tab, setTab }: { tab: "fee" | "compare"; setTab: (t: "fee" | "compare") => void }) {
+  const tabs = [
+    { id: "fee" as const, label: "중개보수 계산" },
+    { id: "compare" as const, label: "전월세 비교" },
+  ];
+  return (
+    <>
+      <div role="tablist" aria-label="계산기 종류" className="inline-flex rounded-[8px] p-1" style={{ background: C.gray }}>
+        {tabs.map((t) => {
+          const on = tab === t.id;
+          return (
+            <button
+              key={t.id}
+              id={`calc-tab-${t.id}`}
+              type="button"
+              role="tab"
+              aria-selected={on}
+              aria-controls={`calc-panel-${t.id}`}
+              tabIndex={on ? 0 : -1}
+              onClick={() => setTab(t.id)}
+              onKeyDown={(e) => {
+                if (e.key === "ArrowRight" || e.key === "ArrowLeft") {
+                  const next = t.id === "fee" ? "compare" : "fee";
+                  setTab(next);
+                  document.getElementById(`calc-tab-${next}`)?.focus();
+                }
+              }}
+              className="h-11 rounded-[6px] px-4 text-[15px] font-bold"
+              style={on ? { background: "#fff", color: C.ink, boxShadow: "0 1px 2px rgba(24,32,42,0.12)" } : { color: C.muted }}
+            >
+              {t.label}
+            </button>
+          );
+        })}
+      </div>
+      <div id={`calc-panel-${tab}`} role="tabpanel" aria-labelledby={`calc-tab-${tab}`} className="mt-6">
+        {tab === "fee" ? <FeeCalculator /> : <Compare />}
+      </div>
+    </>
+  );
+}
+
+function Radios<T extends string>({ legend, name, value, options, onPick }: { legend: string; name: string; value: T; options: { v: T; label: string }[]; onPick: (v: T) => void }) {
+  return (
+    <fieldset className="min-w-0">
+      <legend className="text-[15px] font-bold">{legend}</legend>
+      <div className="mt-2 flex flex-wrap gap-1.5">
+        {options.map((o) => {
+          const on = value === o.v;
+          return (
+            <label
+              key={o.v}
+              className="flex h-11 cursor-pointer items-center rounded-[6px] border px-3.5 text-[15px] font-semibold has-[:focus-visible]:outline has-[:focus-visible]:outline-2 has-[:focus-visible]:outline-offset-2"
+              style={on ? { background: C.ink, color: "#fff", borderColor: C.ink } : { borderColor: C.line }}
+            >
+              <input type="radio" name={name} value={o.v} checked={on} onChange={() => onPick(o.v)} className="sr-only" />
+              {o.label}
+            </label>
+          );
+        })}
+      </div>
+    </fieldset>
+  );
+}
+
+function ManInput({ id, label, value, onChange }: { id: string; label: string; value: number; onChange: (v: number) => void }) {
+  return (
+    <div>
+      <label htmlFor={id} className="text-[15px] font-bold">
+        {label}
+      </label>
+      <div className="relative mt-1.5">
+        <input
+          id={id}
+          type="number"
+          inputMode="numeric"
+          min={0}
+          step={100}
+          value={value || ""}
+          onChange={(e) => onChange(Math.max(0, Math.round(Number(e.target.value) || 0)))}
+          className="h-12 w-full rounded-[6px] border bg-white pl-3 pr-12 text-right text-[17px] font-semibold tabular-nums outline-none focus:border-[#18202a]"
+          style={{ borderColor: C.line }}
+        />
+        <span className="pointer-events-none absolute right-3 top-1/2 -translate-y-1/2 text-[15px]" style={{ color: C.muted }}>
+          만 원
+        </span>
+      </div>
+      <p className="mt-1 text-right text-[13px] tabular-nums" style={{ color: C.muted }}>
+        {value ? manText(value) : " "}
+      </p>
+    </div>
+  );
+}
+
+function FeeCalculator() {
+  const [kind, setKind] = useState<"apt" | "officetel" | "store">("apt");
+  const [deal, setDeal] = useState<Deal>("sale");
+  const [price, setPrice] = useState(50000);
+  const [rent, setRent] = useState(100);
+  const fee = brokerFee({ kind, deal, price, rent: deal === "monthly" ? rent : undefined });
+
+  return (
+    <div className="grid items-start gap-6 lg:grid-cols-[1fr_400px]">
+      <div className="space-y-6 rounded-[10px] border p-5 md:p-6" style={{ borderColor: C.line }}>
+        <Radios
+          legend="중개대상물"
+          name="fee-kind"
+          value={kind}
+          onPick={setKind}
+          options={[
+            { v: "apt", label: "주택" },
+            { v: "officetel", label: "오피스텔(주거용)" },
+            { v: "store", label: "주택 외(상가·토지 등)" },
+          ]}
+        />
+        <Radios
+          legend="거래 종류"
+          name="fee-deal"
+          value={deal}
+          onPick={setDeal}
+          options={[
+            { v: "sale", label: "매매·교환" },
+            { v: "jeonse", label: "전세" },
+            { v: "monthly", label: "월세" },
+          ]}
+        />
+        <div className="grid gap-4 sm:grid-cols-2">
+          <ManInput id="fee-price" label={deal === "sale" ? "매매가" : "보증금"} value={price} onChange={setPrice} />
+          {deal === "monthly" && <ManInput id="fee-rent" label="월세" value={rent} onChange={setRent} />}
+        </div>
+      </div>
+      <div className="rounded-[10px] p-5 md:p-6" style={{ background: C.gray }} aria-live="polite">
+        <h2 className="font-bold">중개보수 상한</h2>
+        <FeeLines fee={fee} />
+      </div>
+    </div>
+  );
+}
+
+function Slider({ label, value, min, max, step, onChange, format }: { label: string; value: number; min: number; max: number; step: number; onChange: (v: number) => void; format: (v: number) => string }) {
   return (
     <label className="block">
       <span className="flex items-baseline justify-between gap-3">
@@ -1068,22 +1439,13 @@ function Slider({
         </span>
         <span className="font-bold tabular-nums">{format(value)}</span>
       </span>
-      <input
-        type="range"
-        min={min}
-        max={max}
-        step={step}
-        value={value}
-        onChange={(e) => onChange(Number(e.target.value))}
-        aria-valuetext={format(value)}
-        className="mt-1 h-8 w-full accent-[#ef6351]"
-      />
+      <input type="range" min={min} max={max} step={step} value={value} onChange={(e) => onChange(Number(e.target.value))} aria-valuetext={format(value)} className="mt-1 h-8 w-full accent-[#ef6351]" />
     </label>
   );
 }
 
 const PART_COLOR = { loan: "#46566a", opp: "#a9b4c2", rent: C.coral };
-const PART_LABEL = { loan: "대출 이자", opp: "못 받는 예금 이자", rent: "월세" };
+const PART_LABEL = { loan: "대출 이자", opp: "예금 이자 손실", rent: "월세" };
 
 function Compare() {
   const reduce = useReducedMotionSafe();
@@ -1112,106 +1474,343 @@ function Compare() {
   const man = (v: number) => `${Math.round(v).toLocaleString("ko-KR")}만 원`;
 
   return (
-    <section aria-labelledby="compare-title" id="compare" className="scroll-mt-16 px-4 py-14 md:px-6 md:py-20">
-      <div className="mx-auto max-w-[1200px]">
-        <SectionHead
-          id="compare-title"
-          title="한 달에 실제로 나가는 돈을 비교해 보세요"
-          desc="전세는 대출 이자와 보증금으로 묶이는 내 돈의 예금 이자를, 월세는 월세에 보증금 몫을 더해 계산합니다."
-        />
-        <div className="mt-8 grid items-start gap-6 lg:grid-cols-[400px_1fr]">
-          <div className="space-y-5 rounded-[12px] border p-5 md:p-6" style={{ borderColor: C.line }}>
-            <p className="font-bold">전세 조건</p>
-            <Slider label="전세 보증금" value={jeonse} min={5000} max={80000} step={500} onChange={setJeonse} format={manText} />
-            <p className="border-t pt-5 font-bold" style={{ borderColor: C.line }}>
-              월세 조건
-            </p>
-            <Slider label="월세 보증금" value={deposit} min={0} max={30000} step={500} onChange={setDeposit} format={(v) => (v ? manText(v) : "없음")} />
-            <Slider label="월세" value={rent} min={10} max={300} step={5} onChange={setRent} format={(v) => `${v}만 원`} />
-            <p className="border-t pt-5 font-bold" style={{ borderColor: C.line }}>
-              내 돈과 금리
-            </p>
-            <Slider label="가진 돈" value={cash} min={0} max={80000} step={500} onChange={setCash} format={(v) => (v ? manText(v) : "없음")} />
-            <Slider label="대출 금리 (연)" value={loanRate} min={2} max={7} step={0.1} onChange={setLoanRate} format={(v) => `${v.toFixed(1)}%`} />
-            <Slider label="예금 금리 (연)" value={saveRate} min={1} max={5} step={0.1} onChange={setSaveRate} format={(v) => `${v.toFixed(1)}%`} />
-          </div>
+    <div className="grid items-start gap-6 lg:grid-cols-[400px_1fr]">
+      <div className="space-y-5 rounded-[10px] border p-5 md:p-6" style={{ borderColor: C.line }}>
+        <h2 className="font-bold">전세 조건</h2>
+        <Slider label="전세 보증금" value={jeonse} min={5000} max={80000} step={500} onChange={setJeonse} format={manText} />
+        <h2 className="border-t pt-5 font-bold" style={{ borderColor: C.line }}>
+          월세 조건
+        </h2>
+        <Slider label="월세 보증금" value={deposit} min={0} max={30000} step={500} onChange={setDeposit} format={(v) => (v ? manText(v) : "없음")} />
+        <Slider label="월세" value={rent} min={10} max={300} step={5} onChange={setRent} format={(v) => `${v}만 원`} />
+        <h2 className="border-t pt-5 font-bold" style={{ borderColor: C.line }}>
+          보유 자금과 금리
+        </h2>
+        <Slider label="보유 자금" value={cash} min={0} max={80000} step={500} onChange={setCash} format={(v) => (v ? manText(v) : "없음")} />
+        <Slider label="대출 금리 (연)" value={loanRate} min={2} max={7} step={0.1} onChange={setLoanRate} format={(v) => `${v.toFixed(1)}%`} />
+        <Slider label="예금 금리 (연)" value={saveRate} min={1} max={5} step={0.1} onChange={setSaveRate} format={(v) => `${v.toFixed(1)}%`} />
+      </div>
 
-          <div className="min-w-0 rounded-[12px] p-5 md:p-7" style={{ background: C.gray }}>
-            <p className="text-[15px] font-semibold" style={{ color: C.muted }}>
-              한 달 비용
-            </p>
-            <svg viewBox="0 0 600 150" className="mt-2 h-auto w-full" role="img" aria-label={`한 달 비용 전세 ${man(jTotal)}, 월세 ${man(mTotal)}`}>
-              {rows.map((row) => {
-                let x = X0;
-                return (
-                  <g key={row.label}>
-                    <text x="0" y={row.y + 25} fontSize="17" fontWeight={700} fill={C.ink}>
-                      {row.label}
-                    </text>
-                    <rect x={X0} y={row.y} width={W} height="38" rx="4" fill="#fff" />
-                    {(Object.keys(PART_COLOR) as (keyof typeof PART_COLOR)[]).map((k) => {
-                      const w = r2((row.parts[k] / maxTotal) * W);
-                      const at = r2(x);
-                      x += w;
-                      return (
-                        <motion.rect
-                          key={k}
-                          y={row.y}
-                          height="38"
-                          fill={PART_COLOR[k]}
-                          initial={false}
-                          animate={{ x: at, width: w }}
-                          transition={{ duration: reduce ? 0 : 0.35, ease: EASE }}
-                        />
-                      );
-                    })}
-                    <text x={X0 + W + 10} y={row.y + 25} fontSize="16" fontWeight={700} fill={C.ink}>
-                      {man(row.total)}
-                    </text>
-                  </g>
-                );
-              })}
-            </svg>
-            <ul className="mt-2 flex flex-wrap gap-x-4 gap-y-1 text-[14px]">
-              {(Object.keys(PART_COLOR) as (keyof typeof PART_COLOR)[]).map((k) => (
-                <li key={k} className="inline-flex items-center gap-1.5">
-                  <span className="h-3 w-3 rounded-[2px]" style={{ background: PART_COLOR[k] }} aria-hidden />
-                  {PART_LABEL[k]}
-                </li>
-              ))}
-            </ul>
+      <div className="min-w-0 rounded-[10px] p-5 md:p-7" style={{ background: C.gray }}>
+        <h2 className="text-[15px] font-semibold" style={{ color: C.muted }}>
+          월 비용
+        </h2>
+        <svg viewBox="0 0 600 150" className="mt-2 h-auto w-full" role="img" aria-label={`월 비용 전세 ${man(jTotal)}, 월세 ${man(mTotal)}`}>
+          {rows.map((row) => {
+            let x = X0;
+            return (
+              <g key={row.label}>
+                <text x="0" y={row.y + 25} fontSize="17" fontWeight={700} fill={C.ink}>
+                  {row.label}
+                </text>
+                <rect x={X0} y={row.y} width={W} height="38" rx="4" fill="#fff" />
+                {(Object.keys(PART_COLOR) as (keyof typeof PART_COLOR)[]).map((k) => {
+                  const w = r2((row.parts[k] / maxTotal) * W);
+                  const at = r2(x);
+                  x += w;
+                  return <motion.rect key={k} y={row.y} height="38" fill={PART_COLOR[k]} initial={false} animate={{ x: at, width: w }} transition={{ duration: reduce ? 0 : 0.35, ease: EASE }} />;
+                })}
+                <text x={X0 + W + 10} y={row.y + 25} fontSize="16" fontWeight={700} fill={C.ink}>
+                  {man(row.total)}
+                </text>
+              </g>
+            );
+          })}
+        </svg>
+        <ul className="mt-2 flex flex-wrap gap-x-4 gap-y-1 text-[14px]">
+          {(Object.keys(PART_COLOR) as (keyof typeof PART_COLOR)[]).map((k) => (
+            <li key={k} className="inline-flex items-center gap-1.5">
+              <span className="h-3 w-3 rounded-[2px]" style={{ background: PART_COLOR[k] }} aria-hidden />
+              {PART_LABEL[k]}
+            </li>
+          ))}
+        </ul>
 
-            <div className="mt-6 rounded-[10px] bg-white p-5" aria-live="polite">
-              <p className="text-[20px] font-bold leading-[1.45] tracking-[-0.02em] md:text-[22px]">
-                {diff === 0 ? (
-                  "이 조건이면 두 방식의 한 달 비용이 거의 같아요."
-                ) : (
-                  <>
-                    이 조건이면 <span style={{ color: C.coralText }}>{jTotal < mTotal ? "전세" : "월세"}</span>가 한 달에 약 {diff.toLocaleString("ko-KR")}만 원 덜 들어요.
-                  </>
-                )}
-              </p>
-              <p className="mt-2" style={{ color: C.muted }}>
-                1년이면 {(diff * 12).toLocaleString("ko-KR")}만 원 차이입니다. 보증금이 같을 때 월세가 {breakEven.toLocaleString("ko-KR")}만 원보다 낮으면 월세가, 높으면 전세가 덜 듭니다.
-              </p>
-              {jeonse > cash && (
-                <p className="mt-2 text-[15px]" style={{ color: C.muted }}>
-                  전세는 모자란 {manText(jeonse - cash)}을 연 {loanRate.toFixed(1)}%로 빌린다고 보고 계산했습니다.
-                </p>
-              )}
-            </div>
-          </div>
+        <div className="mt-6 rounded-[10px] bg-white p-5" aria-live="polite">
+          <p className="text-[20px] font-bold leading-[1.45] tracking-[-0.02em] md:text-[22px]">
+            {diff <= 1 ? (
+              "두 방식의 월 비용 차이가 1만 원 이하입니다."
+            ) : (
+              <>
+                <span style={{ color: C.coralText }}>{jTotal < mTotal ? "전세" : "월세"}</span>가 월 {diff.toLocaleString("ko-KR")}만 원 적게 듭니다.
+              </>
+            )}
+          </p>
+          <p className="mt-2" style={{ color: C.muted }}>
+            연간 {(diff * 12).toLocaleString("ko-KR")}만 원 차이입니다. 보증금이 같을 때 월세가 {breakEven.toLocaleString("ko-KR")}만 원보다 낮으면 월세가, 높으면 전세가 유리합니다.
+          </p>
+          {jeonse > cash && (
+            <p className="mt-2 text-[15px]" style={{ color: C.muted }}>
+              전세 부족분 {manText(jeonse - cash)}은 연 {loanRate.toFixed(1)}% 대출로 계산했습니다.
+            </p>
+          )}
         </div>
       </div>
-    </section>
+    </div>
   );
 }
 
-/* ---------- 매물 보러 가기 ---------- */
+/* ---------- 매물 의뢰하기 (집 내놓기) ---------- */
 
-const WHEN = ["평일 저녁", "토요일 오전", "토요일 오후", "상관없음"];
+type ReqDeal = "sale" | "jeonse" | "monthly";
+type MoveMode = "now" | "date" | "period";
+const PERIODS = ["초순", "중순", "하순"] as const;
 
-function Visit({ selectedId, basket, onToggle, onClear }: { selectedId: string; basket: string[]; onToggle: (id: string) => void; onClear: () => void }) {
+function RequestForm() {
+  const reduce = useReducedMotionSafe();
+  const [deal, setDeal] = useState<ReqDeal>("sale");
+  const [kind, setKind] = useState<Kind>("apt");
+  const [addr, setAddr] = useState("");
+  const [area, setArea] = useState("");
+  const [price, setPrice] = useState(0);
+  const [rent, setRent] = useState(0);
+  const [moveMode, setMoveMode] = useState<MoveMode>("now");
+  const [moveDate, setMoveDate] = useState("");
+  const [moveMonth, setMoveMonth] = useState("");
+  const [period, setPeriod] = useState<(typeof PERIODS)[number]>("초순");
+  const [name, setName] = useState("");
+  const [phone, setPhone] = useState("");
+  const [agree, setAgree] = useState(false);
+  const [error, setError] = useState("");
+  const [done, setDone] = useState<{ no: string; rows: [string, string][] } | null>(null);
+
+  const moveText = () => {
+    if (moveMode === "now") return "즉시입주";
+    if (moveMode === "date") {
+      const [y, m, d] = moveDate.split("-").map(Number);
+      return y ? `${y}년 ${m}월 ${d}일` : "";
+    }
+    const [y, m] = moveMonth.split("-").map(Number);
+    return y ? `${y}년 ${m}월 ${period}` : "";
+  };
+
+  const submit = (e: React.FormEvent) => {
+    e.preventDefault();
+    if (addr.trim().length < 2) return setError("소재지를 입력해 주세요.");
+    if (!Number(area)) return setError("전용면적을 입력해 주세요.");
+    if (!price) return setError(deal === "sale" ? "희망 매매가를 입력해 주세요." : "희망 보증금을 입력해 주세요.");
+    if (deal === "monthly" && !rent) return setError("희망 월세를 입력해 주세요.");
+    if (!moveText()) return setError("입주가능일을 입력해 주세요.");
+    if (name.trim().length < 2) return setError("이름을 입력해 주세요.");
+    if (phone.replace(/\D/g, "").length < 10) return setError("휴대전화 번호를 입력해 주세요.");
+    if (!agree) return setError("개인정보 수집·이용에 동의해 주세요.");
+    setError("");
+    const n = new Date();
+    const p2 = (v: number) => String(v).padStart(2, "0");
+    const no = `R${String(n.getFullYear()).slice(2)}${p2(n.getMonth() + 1)}${p2(n.getDate())}-${p2(n.getMinutes())}`;
+    setDone({
+      no,
+      rows: [
+        ["의뢰 구분", deal === "sale" ? "매도" : `임대(${DEAL_LABEL[deal]})`],
+        ["매물", `${KIND_LABEL[kind]}, ${addr.trim()}`],
+        ["전용면적", areaText(Number(area))],
+        ["희망 가격", priceText({ deal, price, rent })],
+        ["입주가능일", moveText()],
+        ["의뢰인", `${maskName(name)} (${maskPhone(phone)})`],
+      ],
+    });
+  };
+
+  const reset = () => {
+    setDone(null);
+    setAddr("");
+    setArea("");
+    setPrice(0);
+    setRent(0);
+    setName("");
+    setPhone("");
+    setAgree(false);
+  };
+
+  const field = "mt-1.5 h-12 w-full rounded-[6px] border bg-white px-3 outline-none focus:border-[#18202a]";
+
+  return (
+    <div className="grid items-start gap-8 lg:grid-cols-[1.3fr_1fr]">
+      <div aria-live="polite">
+        <AnimatePresence mode="wait" initial={false}>
+          {done ? (
+            <motion.div
+              key="done"
+              className="rounded-[10px] border-2 bg-white p-6"
+              style={{ borderColor: C.ink }}
+              initial={reduce ? false : { opacity: 0, y: 16 }}
+              animate={{ opacity: 1, y: 0 }}
+              exit={{ opacity: 0 }}
+              transition={{ duration: 0.35, ease: EASE }}
+            >
+              <p className="flex items-center gap-2 text-[20px] font-bold">
+                <span className="inline-flex h-8 w-8 items-center justify-center rounded-full" style={{ background: C.coral, color: "#fff" }}>
+                  <Check size={18} aria-hidden />
+                </span>
+                매물 의뢰가 접수되었습니다
+              </p>
+              <p className="mt-2" style={{ color: C.muted }}>
+                접수번호 <span className="font-semibold tabular-nums" style={{ color: C.ink }}>{done.no}</span>. 등기부등본 확인 뒤 담당 중개사가 연락드립니다.
+              </p>
+              <dl className="mt-4 text-[15px]">
+                {done.rows.map(([k, v]) => (
+                  <div key={k} className="flex justify-between gap-4 border-t py-2.5" style={{ borderColor: C.line }}>
+                    <dt className="shrink-0" style={{ color: C.muted }}>
+                      {k}
+                    </dt>
+                    <dd className="text-right font-semibold tabular-nums">{v}</dd>
+                  </div>
+                ))}
+              </dl>
+              <button type="button" onClick={reset} className="mt-4 inline-flex h-10 items-center gap-1.5 text-[15px] font-semibold">
+                <RotateCcw size={16} aria-hidden />
+                새로 작성
+              </button>
+            </motion.div>
+          ) : (
+            <motion.form key="form" exit={{ opacity: 0 }} onSubmit={submit} noValidate className="space-y-6 rounded-[10px] border p-5 md:p-7" style={{ borderColor: C.line }}>
+              <Radios
+                legend="의뢰 구분"
+                name="req-deal"
+                value={deal}
+                onPick={setDeal}
+                options={[
+                  { v: "sale", label: "매도" },
+                  { v: "jeonse", label: "임대(전세)" },
+                  { v: "monthly", label: "임대(월세)" },
+                ]}
+              />
+              <div className="grid gap-4 sm:grid-cols-[180px_1fr]">
+                <label className="block">
+                  <span className="text-[15px] font-bold">매물 종류</span>
+                  <select value={kind} onChange={(e) => setKind(e.target.value as Kind)} className={field} style={{ borderColor: C.line }}>
+                    {(Object.keys(KIND_LABEL) as Kind[]).map((k) => (
+                      <option key={k} value={k}>
+                        {KIND_LABEL[k]}
+                      </option>
+                    ))}
+                  </select>
+                </label>
+                <label className="block">
+                  <span className="text-[15px] font-bold">소재지</span>
+                  <input value={addr} onChange={(e) => setAddr(e.target.value)} placeholder="□□아파트 101동 7층" className={field} style={{ borderColor: C.line }} />
+                </label>
+              </div>
+              <div className="grid gap-4 sm:grid-cols-3">
+                <label className="block">
+                  <span className="text-[15px] font-bold">전용면적</span>
+                  <span className="relative block">
+                    <input value={area} onChange={(e) => setArea(e.target.value.replace(/[^\d.]/g, ""))} inputMode="decimal" className={`${field} pr-9 text-right tabular-nums`} style={{ borderColor: C.line }} />
+                    <span className="pointer-events-none absolute right-3 top-1/2 mt-[3px] -translate-y-1/2 text-[15px]" style={{ color: C.muted }}>
+                      ㎡
+                    </span>
+                  </span>
+                  <span className="mt-1 block text-right text-[13px] tabular-nums" style={{ color: C.muted }}>
+                    {Number(area) ? `${pyeong(Number(area))}평` : " "}
+                  </span>
+                </label>
+                <ManInput id="req-price" label={deal === "sale" ? "희망 매매가" : "희망 보증금"} value={price} onChange={setPrice} />
+                {deal === "monthly" && <ManInput id="req-rent" label="희망 월세" value={rent} onChange={setRent} />}
+              </div>
+              <fieldset>
+                <legend className="text-[15px] font-bold">입주가능일</legend>
+                <div className="mt-2 flex flex-wrap gap-1.5">
+                  {(
+                    [
+                      ["now", "즉시입주"],
+                      ["date", "날짜 지정"],
+                      ["period", "월 초순·중순·하순"],
+                    ] as const
+                  ).map(([v, label]) => (
+                    <label
+                      key={v}
+                      className="flex h-11 cursor-pointer items-center rounded-[6px] border px-3.5 text-[15px] font-semibold has-[:focus-visible]:outline has-[:focus-visible]:outline-2 has-[:focus-visible]:outline-offset-2"
+                      style={moveMode === v ? { background: C.ink, color: "#fff", borderColor: C.ink } : { borderColor: C.line }}
+                    >
+                      <input type="radio" name="req-move" value={v} checked={moveMode === v} onChange={() => setMoveMode(v)} className="sr-only" />
+                      {label}
+                    </label>
+                  ))}
+                </div>
+                {moveMode === "date" && (
+                  <label className="mt-3 block max-w-[240px]">
+                    <span className="sr-only">입주가능 날짜</span>
+                    <input type="date" value={moveDate} onChange={(e) => setMoveDate(e.target.value)} className={field} style={{ borderColor: C.line }} />
+                  </label>
+                )}
+                {moveMode === "period" && (
+                  <div className="mt-3 flex flex-wrap items-center gap-2">
+                    <label className="block w-[200px]">
+                      <span className="sr-only">입주가능 월</span>
+                      <input type="month" value={moveMonth} onChange={(e) => setMoveMonth(e.target.value)} className={`${field} mt-0`} style={{ borderColor: C.line }} />
+                    </label>
+                    <div className="flex overflow-hidden rounded-[6px] border" style={{ borderColor: C.line }} role="group" aria-label="초순, 중순, 하순">
+                      {PERIODS.map((p) => (
+                        <button key={p} type="button" aria-pressed={period === p} onClick={() => setPeriod(p)} className="h-12 px-4 text-[15px] font-semibold" style={period === p ? { background: C.ink, color: "#fff" } : undefined}>
+                          {p}
+                        </button>
+                      ))}
+                    </div>
+                  </div>
+                )}
+              </fieldset>
+              <div className="grid gap-4 sm:grid-cols-2">
+                <label className="block">
+                  <span className="text-[15px] font-bold">이름</span>
+                  <input value={name} onChange={(e) => setName(e.target.value)} autoComplete="name" className={field} style={{ borderColor: C.line }} />
+                </label>
+                <label className="block">
+                  <span className="text-[15px] font-bold">휴대전화</span>
+                  <input value={phone} onChange={(e) => setPhone(e.target.value)} inputMode="tel" autoComplete="tel" placeholder="010-0000-0000" className={`${field} tabular-nums`} style={{ borderColor: C.line }} />
+                </label>
+              </div>
+              <label className="flex min-h-11 cursor-pointer items-start gap-2.5 text-[15px] leading-[1.5]">
+                <input type="checkbox" checked={agree} onChange={(e) => setAgree(e.target.checked)} className="mt-0.5 h-5 w-5 shrink-0 accent-[#ef6351]" />
+                <span>
+                  개인정보 수집·이용 동의 (필수)
+                  <span className="block text-[14px]" style={{ color: C.muted }}>
+                    이름, 휴대전화를 매물 확인 연락에만 쓰고 의뢰가 끝나면 파기합니다.
+                  </span>
+                </span>
+              </label>
+              {error && (
+                <p className="text-[15px] font-semibold" style={{ color: "#b3261e" }} role="alert">
+                  {error}
+                </p>
+              )}
+              <button type="submit" className="h-12 w-full rounded-[6px] text-[17px] font-bold sm:w-auto sm:px-10" style={{ background: C.coral, color: "#fff" }}>
+                매물 의뢰하기
+              </button>
+              <p className="text-[14px]" style={{ color: C.muted }}>
+                데모 화면이라 입력한 내용은 어디에도 보내지 않습니다.
+              </p>
+            </motion.form>
+          )}
+        </AnimatePresence>
+      </div>
+
+      <section aria-labelledby="req-guide-title" className="rounded-[10px] p-5 md:p-6" style={{ background: C.gray }}>
+        <h2 id="req-guide-title" className="font-bold">
+          매물 등록 절차
+        </h2>
+        <dl className="mt-3 space-y-3 text-[15px]">
+          {[
+            ["접수 확인", "담당 중개사가 전화로 매물 정보를 확인합니다."],
+            ["권리 확인", "등기부등본과 소유자 신분을 확인합니다. 소유자가 아니면 위임장이 필요합니다."],
+            ["현장 확인", "방문해 사진을 찍고 면적, 방향, 관리비를 확인합니다."],
+            ["광고 게시", "표시·광고 명시사항을 갖춰 매물을 올리고, 거래가 끝나면 바로 내립니다."],
+          ].map(([t, d]) => (
+            <div key={t}>
+              <dt className="font-semibold">{t}</dt>
+              <dd style={{ color: C.muted }}>{d}</dd>
+            </div>
+          ))}
+        </dl>
+      </section>
+    </div>
+  );
+}
+
+/* ---------- 매물투어신청 ---------- */
+
+const WHEN = ["평일 저녁", "토요일 오전", "토요일 오후", "시간 무관"];
+
+function Tour({ selectedId, basket, onToggle, onClear, onMore }: { selectedId: string; basket: string[]; onToggle: (id: string) => void; onClear: () => void; onMore: () => void }) {
   const reduce = useReducedMotionSafe();
   const [phone, setPhone] = useState("");
   const [when, setWhen] = useState<string | null>(null);
@@ -1223,8 +1822,8 @@ function Visit({ selectedId, basket, onToggle, onClear }: { selectedId: string; 
 
   const submit = (e: React.FormEvent) => {
     e.preventDefault();
-    if (!when) return setError("보러 가기 좋은 때를 골라 주세요.");
-    if (phone.replace(/\D/g, "").length < 10) return setError("문자 받을 휴대전화 번호를 적어 주세요.");
+    if (!when) return setError("방문 희망 시간을 선택해 주세요.");
+    if (phone.replace(/\D/g, "").length < 10) return setError("휴대전화 번호를 입력해 주세요.");
     setError("");
     setDone({ phone: maskPhone(phone), listings: picked, when });
   };
@@ -1236,236 +1835,235 @@ function Visit({ selectedId, basket, onToggle, onClear }: { selectedId: string; 
   };
 
   return (
-    <section aria-labelledby="visit-title" id="visit" className="scroll-mt-16 px-4 py-14 md:px-6 md:py-20" style={{ background: C.gray }}>
-      <div className="mx-auto max-w-[1200px]">
-        <SectionHead
-          id="visit-title"
-          title="보고 싶은 매물을 담아 두고 한 번에 보러 오세요"
-          desc={`매물 목록이나 상세에서 담은 매물이 여기에 모입니다. ${BASKET_MAX}곳까지 같은 날 이어서 보여 드립니다.`}
-        />
-        <div className="mt-8 grid items-start gap-6 md:grid-cols-[1.15fr_1fr]">
-          <form onSubmit={submit} noValidate className="space-y-6 rounded-[12px] bg-white p-5 md:p-7">
-            <div>
-              <p className="flex items-baseline justify-between gap-3">
-                <span className="text-[15px] font-semibold">보러 갈 매물</span>
-                <span className="text-[14px] tabular-nums" style={{ color: C.muted }}>
-                  {fromBasket ? `${basket.length} / ${BASKET_MAX}` : "보고 있던 매물"}
+    <div className="grid items-start gap-6 md:grid-cols-[1.15fr_1fr]">
+      <form onSubmit={submit} noValidate className="space-y-6 rounded-[10px] border p-5 md:p-7" style={{ borderColor: C.line }}>
+        <div>
+          <p className="flex items-baseline justify-between gap-3">
+            <span className="text-[15px] font-bold">투어 매물</span>
+            <span className="text-[14px] tabular-nums" style={{ color: C.muted }}>
+              {fromBasket ? `관심매물 ${basket.length} / ${BASKET_MAX}` : "선택한 매물"}
+            </span>
+          </p>
+          <ul className="mt-2 space-y-2">
+            {picked.map((l) => (
+              <li key={l.id} className="flex items-center gap-3 rounded-[10px] border py-3 pl-4 pr-2" style={{ borderColor: C.line }}>
+                <span className="min-w-0 flex-1">
+                  <span className="block text-[13px] tabular-nums" style={{ color: C.muted }}>
+                    매물번호 {l.no}
+                  </span>
+                  <span className="block font-semibold">{l.name}</span>
+                  <span className="block text-[14px] tabular-nums" style={{ color: C.muted }}>
+                    {priceText(l)} · {l.floor}층 · 입주 {l.moveIn}
+                  </span>
                 </span>
-              </p>
-              <ul className="mt-2 space-y-2">
-                {picked.map((l) => (
-                  <li key={l.id} className="flex items-center gap-3 rounded-[10px] border py-3 pl-4 pr-2" style={{ borderColor: C.line }}>
-                    <span className="min-w-0 flex-1">
-                      <span className="block font-semibold">{l.name}</span>
-                      <span className="block text-[14px] tabular-nums" style={{ color: C.muted }}>
-                        {priceText(l)} · {l.floor}층 · {l.moveIn}
-                      </span>
-                    </span>
-                    {fromBasket && (
-                      <button
-                        type="button"
-                        onClick={() => onToggle(l.id)}
-                        disabled={!!done}
-                        aria-label={`${l.name} 빼기`}
-                        className="inline-flex h-11 w-11 shrink-0 items-center justify-center rounded-full disabled:opacity-40"
-                        style={{ color: C.muted }}
-                      >
-                        <X size={18} aria-hidden />
-                      </button>
-                    )}
-                  </li>
-                ))}
-              </ul>
-              {basket.length < BASKET_MAX && (
-                <a href="#map" className="mt-2 inline-flex h-10 items-center gap-1.5 text-[15px] font-semibold" style={{ color: C.coralText }}>
-                  <Plus size={16} aria-hidden />
-                  지도에서 더 담기
-                </a>
-              )}
-            </div>
-
-            <fieldset>
-              <legend className="text-[15px] font-semibold">보러 가기 좋은 때</legend>
-              <div className="mt-2 grid grid-cols-2 gap-1.5">
-                {WHEN.map((w) => (
-                  <label
-                    key={w}
-                    className="flex h-12 cursor-pointer items-center justify-center rounded-[6px] border text-[15px] font-semibold has-[:focus-visible]:outline has-[:focus-visible]:outline-2 has-[:focus-visible]:outline-offset-2"
-                    style={when === w ? { background: C.ink, color: "#fff", borderColor: C.ink } : { borderColor: C.line }}
-                  >
-                    <input type="radio" name="visit-when" value={w} checked={when === w} onChange={() => setWhen(w)} className="sr-only" />
-                    {w}
-                  </label>
-                ))}
-              </div>
-            </fieldset>
-
-            <label className="block">
-              <span className="text-[15px] font-semibold">휴대전화</span>
-              <input
-                value={phone}
-                onChange={(e) => setPhone(e.target.value)}
-                inputMode="tel"
-                autoComplete="tel"
-                placeholder="010-1234-5678"
-                className="mt-1 h-12 w-full rounded-[6px] border bg-white px-3 outline-none focus:border-[#18202a]"
-                style={{ borderColor: C.line }}
-              />
-            </label>
-
-            {error && (
-              <p className="text-[15px] font-semibold" style={{ color: "#b3261e" }} role="alert">
-                {error}
-              </p>
-            )}
-            <button type="submit" disabled={!!done} className="w-full rounded-[6px] py-3.5 text-[17px] font-bold disabled:opacity-40" style={{ background: C.coral, color: "#fff" }}>
-              {picked.length}곳 보러 가기 신청
-            </button>
-          </form>
-
-          <div aria-live="polite">
-            <AnimatePresence mode="wait">
-              {done ? (
-                <motion.div
-                  key="done"
-                  className="rounded-[12px] border-2 bg-white p-6"
-                  style={{ borderColor: C.ink }}
-                  initial={reduce ? false : { opacity: 0, y: 16 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  exit={{ opacity: 0 }}
-                  transition={{ duration: 0.35, ease: EASE }}
-                >
-                  <p className="flex items-center gap-2 text-[20px] font-bold">
-                    <span className="inline-flex h-8 w-8 items-center justify-center rounded-full" style={{ background: C.coral, color: "#fff" }}>
-                      <Check size={18} aria-hidden />
-                    </span>
-                    신청을 받았습니다
-                  </p>
-                  <p className="mt-3">중개사가 집주인과 시간을 맞춘 뒤 문자로 알려 드립니다.</p>
-                  <dl className="mt-4 text-[15px]">
-                    <div className="flex justify-between gap-4 border-t py-2.5" style={{ borderColor: C.line }}>
-                      <dt style={{ color: C.muted }}>원하는 때</dt>
-                      <dd className="text-right font-semibold">{done.when}</dd>
-                    </div>
-                    <div className="flex justify-between gap-4 border-t py-2.5" style={{ borderColor: C.line }}>
-                      <dt style={{ color: C.muted }}>문자 받을 번호</dt>
-                      <dd className="text-right font-semibold tabular-nums">{done.phone}</dd>
-                    </div>
-                    <div className="flex justify-between gap-4 border-t py-2.5" style={{ borderColor: C.line }}>
-                      <dt style={{ color: C.muted }}>매물</dt>
-                      <dd className="text-right font-semibold">
-                        {done.listings.map((l) => (
-                          <span key={l.id} className="block">
-                            {l.name}
-                          </span>
-                        ))}
-                      </dd>
-                    </div>
-                  </dl>
-                  <button type="button" onClick={reset} className="mt-4 inline-flex h-10 items-center gap-1.5 text-[15px] font-semibold">
-                    <RotateCcw size={16} aria-hidden />
-                    새로 담기
+                {fromBasket && (
+                  <button type="button" onClick={() => onToggle(l.id)} disabled={!!done} aria-label={`${l.name} 관심매물 해제`} className="inline-flex h-11 w-11 shrink-0 items-center justify-center rounded-full disabled:opacity-40" style={{ color: C.muted }}>
+                    <X size={18} aria-hidden />
                   </button>
-                </motion.div>
-              ) : (
-                <motion.div key="how" exit={{ opacity: 0 }} className="rounded-[12px] bg-white p-6">
-                  <p className="font-bold">보러 오시는 날 챙겨 드려요</p>
-                  <ul className="mt-3 space-y-3 text-[15px]">
-                    {[
-                      ["등기부등본", "매물마다 최신 등기부등본을 뽑아 함께 봅니다."],
-                      ["전세라면", "전세보증보험 가입이 되는지 미리 알아봐 둡니다."],
-                      ["주차", "사무소 앞 상가 주차장을 1시간 쓰실 수 있습니다."],
-                    ].map(([t, d]) => (
-                      <li key={t}>
-                        <span className="font-semibold">{t}</span>
-                        <span className="block" style={{ color: C.muted }}>
-                          {d}
-                        </span>
-                      </li>
-                    ))}
-                  </ul>
-                </motion.div>
-              )}
-            </AnimatePresence>
-          </div>
+                )}
+              </li>
+            ))}
+          </ul>
+          {basket.length < BASKET_MAX && (
+            <button type="button" onClick={onMore} className="mt-2 inline-flex h-10 items-center gap-1.5 text-[15px] font-semibold" style={{ color: C.coralText }}>
+              <Plus size={16} aria-hidden />
+              관심매물 더 담기
+            </button>
+          )}
         </div>
+
+        <fieldset>
+          <legend className="text-[15px] font-bold">방문 희망 시간</legend>
+          <div className="mt-2 grid grid-cols-2 gap-1.5">
+            {WHEN.map((w) => (
+              <label
+                key={w}
+                className="flex h-12 cursor-pointer items-center justify-center rounded-[6px] border text-[15px] font-semibold has-[:focus-visible]:outline has-[:focus-visible]:outline-2 has-[:focus-visible]:outline-offset-2"
+                style={when === w ? { background: C.ink, color: "#fff", borderColor: C.ink } : { borderColor: C.line }}
+              >
+                <input type="radio" name="visit-when" value={w} checked={when === w} onChange={() => setWhen(w)} className="sr-only" />
+                {w}
+              </label>
+            ))}
+          </div>
+        </fieldset>
+
+        <label className="block">
+          <span className="text-[15px] font-bold">휴대전화</span>
+          <input
+            value={phone}
+            onChange={(e) => setPhone(e.target.value)}
+            inputMode="tel"
+            autoComplete="tel"
+            placeholder="010-0000-0000"
+            className="mt-1.5 h-12 w-full rounded-[6px] border bg-white px-3 tabular-nums outline-none focus:border-[#18202a]"
+            style={{ borderColor: C.line }}
+          />
+        </label>
+
+        {error && (
+          <p className="text-[15px] font-semibold" style={{ color: "#b3261e" }} role="alert">
+            {error}
+          </p>
+        )}
+        <button type="submit" disabled={!!done} className="w-full rounded-[6px] py-3.5 text-[17px] font-bold disabled:opacity-40" style={{ background: C.coral, color: "#fff" }}>
+          {picked.length}곳 매물투어신청
+        </button>
+      </form>
+
+      <div aria-live="polite">
+        <AnimatePresence mode="wait">
+          {done ? (
+            <motion.div
+              key="done"
+              className="rounded-[10px] border-2 bg-white p-6"
+              style={{ borderColor: C.ink }}
+              initial={reduce ? false : { opacity: 0, y: 16 }}
+              animate={{ opacity: 1, y: 0 }}
+              exit={{ opacity: 0 }}
+              transition={{ duration: 0.35, ease: EASE }}
+            >
+              <p className="flex items-center gap-2 text-[20px] font-bold">
+                <span className="inline-flex h-8 w-8 items-center justify-center rounded-full" style={{ background: C.coral, color: "#fff" }}>
+                  <Check size={18} aria-hidden />
+                </span>
+                매물투어신청이 접수되었습니다
+              </p>
+              <p className="mt-3">집주인과 일정을 맞춘 뒤 문자로 안내드립니다.</p>
+              <dl className="mt-4 text-[15px]">
+                <div className="flex justify-between gap-4 border-t py-2.5" style={{ borderColor: C.line }}>
+                  <dt style={{ color: C.muted }}>방문 희망 시간</dt>
+                  <dd className="text-right font-semibold">{done.when}</dd>
+                </div>
+                <div className="flex justify-between gap-4 border-t py-2.5" style={{ borderColor: C.line }}>
+                  <dt style={{ color: C.muted }}>연락처</dt>
+                  <dd className="text-right font-semibold tabular-nums">{done.phone}</dd>
+                </div>
+                <div className="flex justify-between gap-4 border-t py-2.5" style={{ borderColor: C.line }}>
+                  <dt style={{ color: C.muted }}>매물</dt>
+                  <dd className="text-right font-semibold">
+                    {done.listings.map((l) => (
+                      <span key={l.id} className="block">
+                        {l.name}
+                      </span>
+                    ))}
+                  </dd>
+                </div>
+              </dl>
+              <button type="button" onClick={reset} className="mt-4 inline-flex h-10 items-center gap-1.5 text-[15px] font-semibold">
+                <RotateCcw size={16} aria-hidden />
+                새로 신청
+              </button>
+            </motion.div>
+          ) : (
+            <motion.section key="how" exit={{ opacity: 0 }} aria-labelledby="visit-guide-title" className="rounded-[10px] p-6" style={{ background: C.gray }}>
+              <h2 id="visit-guide-title" className="font-bold">
+                방문 안내
+              </h2>
+              <dl className="mt-3 space-y-3 text-[15px]">
+                {[
+                  ["등기부등본", "매물마다 최신 등기부등본을 함께 확인합니다."],
+                  ["전세 매물", "전세보증보험 가입 가능 여부를 미리 확인해 둡니다."],
+                  ["주차", "사무소 앞 상가 주차장을 1시간 이용할 수 있습니다."],
+                ].map(([t, d]) => (
+                  <div key={t}>
+                    <dt className="font-semibold">{t}</dt>
+                    <dd style={{ color: C.muted }}>{d}</dd>
+                  </div>
+                ))}
+              </dl>
+            </motion.section>
+          )}
+        </AnimatePresence>
       </div>
-    </section>
+    </div>
   );
 }
 
-/* ---------- 중개사 소개, 거래 완료 ---------- */
+/* ---------- 사무소 소개 ---------- */
 
 const DEALS_DONE = [
-  { where: "□□동", what: "아파트 84㎡", deal: "매매", price: "9억 원대", when: "2026년 9월" },
-  { where: "□□동", what: "오피스텔 24㎡", deal: "월세", price: "1,000/60대", when: "2026년 9월" },
-  { where: "□□2동", what: "아파트 59㎡", deal: "전세", price: "4억 초반", when: "2026년 8월" },
-  { where: "□□동", what: "빌라 52㎡", deal: "매매", price: "3억 원대", when: "2026년 8월" },
-  { where: "□□2동", what: "상가 1층 40㎡", deal: "월세", price: "3,000/200대", when: "2026년 7월" },
-  { where: "□□동", what: "아파트 114㎡", deal: "매매", price: "12억 원대", when: "2026년 7월" },
+  { where: "□□동", what: "아파트 84㎡", deal: "매매", when: "2026년 9월" },
+  { where: "□□동", what: "오피스텔 24㎡", deal: "월세", when: "2026년 9월" },
+  { where: "□□2동", what: "아파트 59㎡", deal: "전세", when: "2026년 8월" },
+  { where: "□□동", what: "빌라 52㎡", deal: "매매", when: "2026년 8월" },
+  { where: "□□2동", what: "상가 1층 40㎡", deal: "월세", when: "2026년 7월" },
+  { where: "□□동", what: "아파트 114㎡", deal: "매매", when: "2026년 7월" },
 ];
 
-function Agent() {
+function About() {
   return (
-    <section aria-labelledby="agent-title" id="agent" className="scroll-mt-16 px-4 py-14 md:px-6 md:py-20">
-      <div className="mx-auto max-w-[1200px]">
-        <SectionHead id="agent-title" title="□□동에서 15년째 중개하고 있습니다" />
-        <div className="mt-8 grid items-start gap-6 md:grid-cols-[1fr_1.2fr]">
-          <div className="rounded-[12px] border p-5 md:p-7" style={{ borderColor: C.line }}>
-            <div className="flex items-center gap-4">
-              <span className="inline-flex h-16 w-16 shrink-0 items-center justify-center rounded-full text-[22px] font-bold" style={{ background: C.gray }} aria-hidden>
-                김
-              </span>
-              <div>
-                <p className="text-[22px] font-bold tracking-[-0.02em]">김○○</p>
-                <p style={{ color: C.muted }}>대표 공인중개사</p>
-              </div>
-            </div>
-            <p className="mt-5">
-              □□아파트 입주 때부터 이 동네에서 일했습니다. 단지별 동 배치와 층마다 다른 햇빛, 학교 배정까지 직접 다녀 보고 말씀드립니다.
-            </p>
-            <dl className="mt-5 text-[15px]">
-              {[
-                ["중개사무소 등록번호", REG_NO],
-                ["손해배상책임 보장", "△△공제 2억 원"],
-                ["사무소", ADDRESS],
-                ["찾아오기", "□□역 2번 출구에서 걸어서 3분, 상가 주차장 1시간 무료"],
-                ["상담", "평일 09:30 ~ 19:00, 토요일 10:00 ~ 17:00, 일요일은 예약하신 분만"],
-              ].map(([k, v]) => (
-                <div key={k} className="flex flex-wrap justify-between gap-x-4 border-t py-2.5" style={{ borderColor: C.line }}>
-                  <dt style={{ color: C.muted }}>{k}</dt>
-                  <dd className="font-semibold">{v}</dd>
-                </div>
-              ))}
-            </dl>
-          </div>
+    <div className="grid items-start gap-8 md:grid-cols-[1fr_1.1fr]">
+      <section aria-labelledby="greet-title">
+        <h2 id="greet-title" className="text-[21px] font-bold tracking-[-0.02em]">
+          인사말
+        </h2>
+        <p className="mt-3" style={{ color: C.muted }}>
+          □□아파트 입주 때부터 이 동네에서 중개하고 있습니다. 단지별 동 배치와 층마다 다른 일조, 학교 배정까지 직접 확인한 내용으로 안내드립니다.
+        </p>
+        <p className="mt-4 font-bold">대표 공인중개사 {AGENT}</p>
 
-          <div className="min-w-0">
-            <p className="font-bold">최근 거래 완료</p>
-            <ul className="mt-3 divide-y rounded-[12px] border" style={{ borderColor: C.line }}>
-              {DEALS_DONE.map((d, i) => (
-                <li key={i} className="grid grid-cols-[1fr_auto] items-center gap-x-3 px-4 py-3" style={{ borderColor: C.line }}>
-                  <span className="min-w-0">
-                    <span className="font-semibold">
-                      {d.where} {d.what}
-                    </span>
-                    <span className="block text-[14px]" style={{ color: C.muted }}>
-                      {d.when} 계약
-                    </span>
+        <h2 className="mt-10 text-[21px] font-bold tracking-[-0.02em]">오시는 길</h2>
+        <dl className="mt-3 text-[15px]">
+          {[
+            ["주소", ADDRESS],
+            ["교통", "□□역 2번 출구 도보 3분"],
+            ["주차", "상가 주차장 1시간 무료"],
+            ["상담 시간", "평일 09:30 ~ 19:00, 토요일 10:00 ~ 17:00, 일요일 예약 상담"],
+            ["전화", TEL],
+          ].map(([k, v]) => (
+            <div key={k} className="grid grid-cols-[84px_1fr] gap-3 border-t py-2.5" style={{ borderColor: C.line }}>
+              <dt className="font-semibold">{k}</dt>
+              <dd style={{ color: C.muted }}>{v}</dd>
+            </div>
+          ))}
+        </dl>
+      </section>
+
+      <div className="space-y-8">
+        <section aria-labelledby="office-info-title" className="rounded-[10px] p-5 md:p-6" style={{ background: C.gray }}>
+          <h2 id="office-info-title" className="font-bold">
+            중개사무소 정보
+          </h2>
+          <dl className="mt-2 text-[15px]">
+            {[
+              ["상호", OFFICE],
+              ["대표 공인중개사", AGENT],
+              ["중개사무소 등록번호", REG_NO],
+              ["손해배상책임 보장", "△△공제 2억 원"],
+            ].map(([k, v]) => (
+              <div key={k} className="flex flex-wrap justify-between gap-x-4 border-t py-2.5" style={{ borderColor: C.line }}>
+                <dt style={{ color: C.muted }}>{k}</dt>
+                <dd className="font-semibold">{v}</dd>
+              </div>
+            ))}
+          </dl>
+        </section>
+
+        <section aria-labelledby="done-title">
+          <h2 id="done-title" className="text-[21px] font-bold tracking-[-0.02em]">
+            거래완료
+          </h2>
+          <ul className="mt-3 divide-y rounded-[10px] border" style={{ borderColor: C.line }}>
+            {DEALS_DONE.map((d, i) => (
+              <li key={i} className="flex items-center justify-between gap-3 px-4 py-3" style={{ borderColor: C.line }}>
+                <span className="min-w-0">
+                  <span className="font-semibold">
+                    {d.where} {d.what}
                   </span>
-                  <span className="text-right">
-                    <span className="mr-1.5 text-[14px] font-semibold" style={{ color: C.coralText }}>
-                      {d.deal}
-                    </span>
-                    <span className="font-bold tabular-nums">{d.price}</span>
+                  <span className="block text-[14px]" style={{ color: C.muted }}>
+                    {d.when} 계약
                   </span>
-                </li>
-              ))}
-            </ul>
-          </div>
-        </div>
+                </span>
+                <span className="rounded-[4px] px-2 text-[14px] font-semibold" style={{ background: C.coralSoft, color: C.coralText }}>
+                  {d.deal} 완료
+                </span>
+              </li>
+            ))}
+          </ul>
+        </section>
       </div>
-    </section>
+    </div>
   );
 }
 
@@ -1481,7 +2079,7 @@ function Footer() {
         <dl className="mt-6 grid gap-x-8 gap-y-1.5 text-[14px] sm:grid-cols-2 md:grid-cols-3">
           {[
             ["상호", OFFICE],
-            ["대표 공인중개사", "김○○"],
+            ["대표 공인중개사", AGENT],
             ["중개사무소 등록번호", REG_NO],
             ["사업자등록번호", "000-00-00000"],
             ["주소", ADDRESS],
