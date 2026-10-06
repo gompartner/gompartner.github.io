@@ -156,7 +156,7 @@ export function WorksSearch({ projects }: { projects: Project[] }) {
             className="rounded-[10px] border border-border bg-surface px-6 py-12 text-center"
           >
             <p className="text-[17px] font-bold leading-[1.5]">찾는 사례가 없습니다.</p>
-            <p className="mt-1 text-[17px] leading-[1.5] text-foreground-secondary">비슷한 작업이 되는지 채팅으로 물어봐 주세요.</p>
+            <p className="mt-1 text-[17px] leading-[1.5] text-foreground-secondary">비슷한 작업이 가능한지 채팅으로 문의해 주세요.</p>
           </motion.div>
         )}
       </div>

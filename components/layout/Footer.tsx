@@ -48,7 +48,7 @@ export function Footer() {
               </a>
             </span>
           </p>
-          <p className="mt-1">계약과 결제는 크몽, 위시켓, 아임웹, 당근 같은 중개 플랫폼에서 합니다.</p>
+          <p className="mt-1">계약과 결제는 크몽, 위시켓 등 중개 플랫폼을 통해 진행됩니다.</p>
           <p className="mt-1">
             © {currentYear} {profile.name}
           </p>

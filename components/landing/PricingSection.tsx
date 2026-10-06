@@ -75,7 +75,7 @@ export function PricingSection({ id = "pricing", cta = "pricing_chat" }: { id?: 
             ))}
           </tbody>
         </table>
-        <p className="mt-3 text-[15px] text-foreground-secondary">고급 패키지에 든 맞춤 기능 1개는 따로 받지 않습니다.</p>
+        <p className="mt-3 text-[15px] text-foreground-secondary">고급 패키지에는 맞춤 기능 1개가 포함되어 있습니다.</p>
         <div className="mt-8">
           <ChannelTalkButton cta={cta} className={primaryButton}>
             채팅으로 상담하기
