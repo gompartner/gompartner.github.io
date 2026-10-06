@@ -104,6 +104,18 @@ const ROWS: Row[] = [
 
 const PUBLIC_IDS = new Set(["j05", "j17", "j30"]);
 
+/** 화면에 싣는 공고는 일부. 건수는 실제 포털 규모로 보여 준다 */
+const TOTAL_JOBS = 12847;
+const TODAY_NEW = 316;
+const PER_PAGE = 10;
+
+/** 실은 공고 n건을 전체 규모 건수로 환산 (끝자리가 고르지 않게) */
+function shownCount(n: number) {
+  if (n === 0) return 0;
+  if (n === ROWS.length) return TOTAL_JOBS;
+  return Math.round((n * TOTAL_JOBS) / ROWS.length) - ((n * 37) % 113);
+}
+
 const JOBS: Job[] = ROWS.map((r) => ({
   id: r[0],
   company: r[1],
@@ -261,6 +273,13 @@ function addDays(base: Date, n: number) {
   return d;
 }
 
+const DOW = ["일", "월", "화", "수", "목", "금", "토"];
+
+/** 10.21(수) 형식 */
+function shortDate(d: Date) {
+  return `${String(d.getMonth() + 1).padStart(2, "0")}.${String(d.getDate()).padStart(2, "0")}(${DOW[d.getDay()]})`;
+}
+
 /** 2026-10-07 형식 */
 function isoDate(d: Date) {
   return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, "0")}-${String(d.getDate()).padStart(2, "0")}`;
@@ -308,7 +327,20 @@ export function JobPortalDemo() {
     (filters.posted !== 99 ? 1 : 0) +
     (filters.publicOnly ? 1 : 0);
 
-  const newToday = JOBS.filter((j) => j.postedAgo === 0).length;
+  const sig = `${JSON.stringify(filters)}|${sort}|${onlySaved}`;
+  const [pageState, setPageState] = useState({ sig, n: 1 });
+  const page = pageState.sig === sig ? pageState.n : 1;
+  const total = onlySaved ? results.length : shownCount(results.length);
+  const totalPages = Math.max(1, Math.ceil(total / PER_PAGE));
+  const realPages = Math.max(1, Math.ceil(results.length / PER_PAGE));
+  const from = ((page - 1) % realPages) * PER_PAGE;
+  const pageRows = results.slice(from, from + PER_PAGE);
+  const groupStart = Math.floor((page - 1) / 10) * 10 + 1;
+  const pageNums = Array.from({ length: Math.min(10, totalPages - groupStart + 1) }, (_, i) => groupStart + i);
+  const goPage = (n: number) => {
+    setPageState({ sig, n });
+    document.getElementById("results")?.scrollIntoView({ block: "start", behavior: reduced ? "auto" : "smooth" });
+  };
   const openJob = JOBS.find((j) => j.id === openId) ?? null;
   const confirmJob = JOBS.find((j) => j.id === confirmId) ?? null;
 
@@ -443,7 +475,7 @@ export function JobPortalDemo() {
               </button>
             </form>
             <p className="mx-auto mt-3 max-w-[820px] text-center text-[15px] text-[#3c4660]">
-              채용공고 수 <b className="text-[#1b2a4a] tabular-nums">{JOBS.length.toLocaleString()}</b> 건 · 오늘 등록 <b className="text-[#1b2a4a] tabular-nums">{newToday}</b>건
+              채용공고 수 <b className="text-[#1b2a4a] tabular-nums">{TOTAL_JOBS.toLocaleString()}</b>건 · 오늘 등록 <b className="text-[#1b2a4a] tabular-nums">{TODAY_NEW}</b>건
             </p>
 
             <div className="mx-auto mt-6 grid max-w-[1040px] gap-4 lg:grid-cols-[minmax(0,1fr)_minmax(0,1.2fr)]">
@@ -471,7 +503,7 @@ export function JobPortalDemo() {
                   {ranks.map((w, i) => (
                     <li key={w}>
                       <button type="button" onClick={() => searchWord(w)} className="flex h-9 w-full items-center gap-2 text-left text-[16px] hover:underline">
-                        <span className={`w-5 shrink-0 text-right font-bold tabular-nums ${i < 3 ? "text-[#2455d6]" : "text-[#6b7489]"}`}>{i + 1}</span>
+                        <span className={`w-6 shrink-0 whitespace-nowrap text-right font-bold tabular-nums ${i < 3 ? "text-[#2455d6]" : "text-[#6b7489]"}`}>{i + 1}</span>
                         <span className="truncate">{w}</span>
                       </button>
                     </li>
@@ -502,7 +534,7 @@ export function JobPortalDemo() {
                 </div>
                 <ul id="situation-panel" role="tabpanel" aria-labelledby={`situation-tab-${situation}`} className="mt-3 grid grid-cols-2 gap-2">
                   {SITUATIONS[situation].map((it) => {
-                    const n = JOBS.filter((j) => matches(j, { ...EMPTY_FILTERS, ...it.preset })).length;
+                    const n = shownCount(JOBS.filter((j) => matches(j, { ...EMPTY_FILTERS, ...it.preset })).length);
                     return (
                       <li key={it.label}>
                         <button
@@ -511,7 +543,7 @@ export function JobPortalDemo() {
                           className="flex h-14 w-full items-center justify-between gap-2 rounded-[6px] bg-[#f4f6fa] px-3 text-left text-[15px] font-bold hover:bg-[#fff4c7]"
                         >
                           <span className="break-keep">{it.label}</span>
-                          <span className="shrink-0 text-[14px] font-normal text-[#56607a] tabular-nums">{n}건</span>
+                          <span className="shrink-0 text-[14px] font-normal text-[#56607a] tabular-nums">{n.toLocaleString()}건</span>
                         </button>
                       </li>
                     );
@@ -529,7 +561,7 @@ export function JobPortalDemo() {
               {onlySaved ? "관심공고" : "채용정보"}
             </h2>
             <p className="text-[16px] text-[#3c4660]" aria-live="polite">
-              검색건수 <b className="text-[#c8321f] tabular-nums">{results.length}</b> 건
+              검색건수 <b className="text-[#c8321f] tabular-nums">{total.toLocaleString()}</b>건
             </p>
             <div className="ml-auto flex items-center gap-2">
               <button
@@ -609,7 +641,7 @@ export function JobPortalDemo() {
                 </tr>
               </thead>
               <tbody className="max-md:block">
-                {results.map((j) => (
+                {pageRows.map((j) => (
                   <JobRow
                     key={j.id}
                     job={j}
@@ -622,6 +654,31 @@ export function JobPortalDemo() {
                 ))}
               </tbody>
             </table>
+          )}
+          {results.length > 0 && totalPages > 1 && (
+            <nav aria-label="페이지" className="mt-6 flex flex-wrap items-center justify-center gap-1">
+              {groupStart > 1 && (
+                <button type="button" onClick={() => goPage(groupStart - 1)} className="h-10 rounded-[4px] border border-[#dde2ea] px-3 text-[15px] hover:border-[#1b2a4a]">
+                  이전
+                </button>
+              )}
+              {pageNums.map((n) => (
+                <button
+                  key={n}
+                  type="button"
+                  onClick={() => goPage(n)}
+                  aria-current={n === page ? "page" : undefined}
+                  className={`h-10 min-w-10 rounded-[4px] px-2 text-[15px] tabular-nums ${n === page ? "bg-[#1b2a4a] font-bold text-white" : "border border-[#dde2ea] hover:border-[#1b2a4a]"}`}
+                >
+                  {n}
+                </button>
+              ))}
+              {groupStart + 9 < totalPages && (
+                <button type="button" onClick={() => goPage(groupStart + 10)} className="h-10 rounded-[4px] border border-[#dde2ea] px-3 text-[15px] hover:border-[#1b2a4a]">
+                  다음
+                </button>
+              )}
+            </nav>
           )}
         </section>
       </main>
@@ -659,7 +716,7 @@ export function JobPortalDemo() {
                 초기화
               </button>
               <button type="button" onClick={() => setSheetOpen(false)} className="h-12 rounded-[6px] bg-[#1b2a4a] text-[17px] font-bold text-white">
-                검색 ({results.length}건)
+                검색 ({total.toLocaleString()}건)
               </button>
             </div>
           </div>
@@ -716,19 +773,15 @@ export function JobPortalDemo() {
   );
 }
 
-function DDay({ job, today }: { job: Job; today: Date | null }) {
-  if (!today) return <span className="inline-block h-7 w-12" aria-hidden />;
+function Deadline({ job, today }: { job: Job; today: Date | null }) {
+  if (!today) return <span className="inline-block h-6 w-20" aria-hidden />;
   const n = job.closeIn;
   const urgent = n <= 3;
   return (
-    <span
-      className={`inline-flex h-7 items-center gap-1 rounded-[4px] px-2 text-[15px] font-bold tabular-nums ${
-        urgent ? "bg-[#fde8e4] text-[#b42a19]" : "bg-[#eef2ff] text-[#2455d6]"
-      }`}
-    >
-      {n === 0 ? "오늘 마감" : `D-${n}`}
-      {urgent && n > 0 && <span>마감 임박</span>}
-    </span>
+    <p className="text-[15px] tabular-nums">
+      <span className={urgent ? "font-bold text-[#b42a19]" : "text-[#1b2a4a]"}>~ {shortDate(addDays(today, n))}</span>
+      {urgent && <span className="ml-1.5 font-bold text-[#b42a19]">{n === 0 ? "오늘 마감" : "마감 임박"}</span>}
+    </p>
   );
 }
 
@@ -779,13 +832,8 @@ function JobRow({
         </p>
       </td>
       <td className="px-3 py-3 text-[14px] text-[#3c4660] max-md:col-span-2 max-md:row-start-3 max-md:flex max-md:flex-wrap max-md:items-center max-md:gap-x-3 max-md:px-0 max-md:pb-0 max-md:pt-2">
-        <DDay job={job} today={today} />
-        {today && (
-          <>
-            <p className="md:mt-1.5 tabular-nums">마감일 : {isoDate(addDays(today, job.closeIn))}</p>
-            <p className="tabular-nums">등록일 : {isoDate(addDays(today, -job.postedAgo))}</p>
-          </>
-        )}
+        <Deadline job={job} today={today} />
+        {today && <p className="tabular-nums md:mt-1">등록일 : {isoDate(addDays(today, -job.postedAgo))}</p>}
       </td>
       <td className="px-3 py-3 text-center max-md:col-start-2 max-md:row-start-1 max-md:p-0">
         <button
@@ -829,7 +877,7 @@ function JobDetail({
   return (
     <article className="absolute inset-0 flex flex-col bg-white md:inset-y-0 md:left-auto md:right-0 md:w-[560px] md:border-l-4 md:border-[#1b2a4a] motion-safe:md:animate-[jobdrawer_220ms_ease-out]">
       <div className="flex items-center gap-2 border-b border-[#dde2ea] px-5 py-3">
-        <DDay job={job} today={today} />
+        <Deadline job={job} today={today} />
         <button type="button" onClick={onClose} aria-label="닫기" className="ml-auto flex h-10 w-10 items-center justify-center">
           <X size={24} aria-hidden />
         </button>

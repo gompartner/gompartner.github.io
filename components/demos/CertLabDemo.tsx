@@ -88,17 +88,6 @@ const C = {
 
 const EASE = [0.22, 1, 0.36, 1] as const;
 
-/** 모눈종이: 12px 잔 눈금과 60px 굵은 눈금 */
-const GRAPH = {
-  backgroundImage: [
-    `linear-gradient(${C.grid} 1px, transparent 1px)`,
-    `linear-gradient(90deg, ${C.grid} 1px, transparent 1px)`,
-    "linear-gradient(rgba(35,48,122,0.035) 1px, transparent 1px)",
-    "linear-gradient(90deg, rgba(35,48,122,0.035) 1px, transparent 1px)",
-  ].join(", "),
-  backgroundSize: "60px 60px, 60px 60px, 12px 12px, 12px 12px",
-};
-
 /* ---------- 메뉴, 화면 상태 ---------- */
 
 type MenuId = "about" | "services" | "domestic" | "global" | "support";
@@ -597,23 +586,14 @@ function FloatingContact() {
 
 /* ---------- 메인 ---------- */
 
-/** 측정 파형 모티프. 기준선(점선) 아래로 측정값이 지나간다. */
-function WaveMotif({ className = "", opacity = 1 }: { className?: string; opacity?: number }) {
-  return (
-    <svg viewBox={`${SX0} 60 ${SX1 - SX0} ${SY1 - 60}`} preserveAspectRatio="none" className={className} aria-hidden style={{ opacity }}>
-      <path d={LIMIT_PATH} fill="none" stroke={C.indigo} strokeWidth="1.2" strokeDasharray="5 5" vectorEffect="non-scaling-stroke" opacity="0.45" />
-      <path d={TRACE_PATH} fill="none" stroke={C.cyan} strokeWidth="1.6" vectorEffect="non-scaling-stroke" />
-    </svg>
-  );
-}
-
 const BOARD: { tab: "news" | "files"; title: string; date: string; body: string; file?: string }[] = [
-  { tab: "news", title: "공평성 선언문 게시", date: "2026-09-30", body: "시험·인증 업무의 공평성을 지키기 위한 선언문을 회사소개 공평성 선언 화면에 게시했습니다." },
-  { tab: "news", title: "고객불만 처리 절차 안내", date: "2026-09-24", body: "고객불만은 전화, 이메일, 서면으로 접수하며 접수 후 14일 이내에 처리 결과를 알려 드립니다. 자세한 절차는 회사소개 고객불만 처리 절차 화면에서 확인하실 수 있습니다." },
-  { tab: "news", title: "추석 연휴 시료 접수 및 성적서 발행 일정 안내", date: "2026-09-15", body: "10월 3일부터 10월 9일까지 시료 접수와 성적서 발행을 쉽니다. 연휴 중 도착한 시료는 10월 12일에 차례로 접수합니다." },
-  { tab: "news", title: "전파법 시행령 개정에 따른 적합성평가 절차 변경 안내", date: "2026-08-28", body: "개정 시행령에 따라 일부 품목의 적합성평가 구분이 바뀝니다. 해당 품목은 담당 시험원이 개별로 안내해 드립니다." },
-  { tab: "news", title: "3m 전파무향실 정기 검증에 따른 시험 일정 조정 안내", date: "2026-08-12", body: "8월 25일부터 8월 27일까지 무향실 정기 검증으로 방사 시험을 쉽니다. 해당 기간 예약 건은 일정을 다시 잡아 연락드립니다." },
-  { tab: "news", title: "△△진흥원 중소기업 인증 지원사업 참여기업 모집 공고", date: "2026-07-21", body: "중소기업의 국내·해외 인증 비용 일부를 지원하는 사업입니다. 신청 서류 작성은 견적문의로 요청하시면 도와 드립니다." },
+  { tab: "news", title: "2026년 11월 1일 접수분부터 전자파 시험수수료 조정 안내", date: "2026-09-30", body: "인건비와 장비 교정 비용 상승에 따라 전자파(EMC) 시험수수료를 항목별로 4~7% 조정합니다. 10월 31일까지 견적서를 받으신 건은 기존 수수료를 적용합니다. 항목별 수수료는 자료실의 시험항목별 수수료 및 시험처리기간 안내를 확인해 주십시오." },
+  { tab: "news", title: "추석 연휴(10.3~10.9) 시료 접수 및 성적서 발행 일정 안내", date: "2026-09-15", body: "10월 3일부터 10월 9일까지 시료 접수와 성적서 발행을 쉽니다. 연휴 중 택배로 도착한 시료는 10월 12일에 차례로 접수하며, 9월 30일 이전 시험을 마친 건은 10월 2일까지 성적서를 발행합니다." },
+  { tab: "news", title: "방송통신기자재 적합성평가 고시 개정 시행에 따른 무선충전기 시험 기준 변경", date: "2026-09-08", body: "개정 고시가 2026년 10월 1일부터 시행되어 출력 15W를 넘는 무선충전기는 적합등록에서 적합인증 대상으로 바뀝니다. 시행일 전 접수한 건은 종전 기준으로 시험합니다. 해당 품목은 담당 시험원이 개별로 안내해 드립니다." },
+  { tab: "news", title: "전기용품 안전기준 KC 60335-2-30 개정판 시행 안내 (전기 히터)", date: "2026-08-28", body: "실내용 전기 히터의 표면 온도 상승 한도와 전도 시험 조건이 바뀝니다. 2027년 2월 출시 제품부터 개정판으로 시험하므로 겨울철 출시 예정 제품은 일정을 미리 상담해 주십시오." },
+  { tab: "news", title: "3m 전파무향실 정기 검증으로 8월 25일~27일 방사 시험 휴무", date: "2026-08-12", body: "8월 25일부터 8월 27일까지 무향실 정기 검증(NSA 측정)으로 방사 시험을 쉽니다. 해당 기간 예약 건은 담당 시험원이 일정을 다시 잡아 연락드립니다. 전도 시험과 전기안전 시험은 정상 진행합니다." },
+  { tab: "news", title: "KOLAS 정기 사후평가 결과 인정 범위 유지 및 무선 시험 항목 추가", date: "2026-07-21", body: "7월 정기 사후평가를 마쳐 기존 인정 범위가 유지되었고, 블루투스 저전력(BLE) 송신 출력과 점유주파수폭 시험 항목이 인정 범위에 추가되었습니다." },
+  { tab: "news", title: "△△진흥원 중소기업 인증 지원사업 2차 참여기업 모집 공고", date: "2026-07-02", body: "중소기업의 국내·해외 인증 비용 일부를 지원하는 사업입니다. 신청 마감은 7월 31일이며, 신청 서류 작성은 견적문의로 요청하시면 도와 드립니다." },
   { tab: "files", title: "시험항목별 수수료 및 시험처리기간 안내", date: "2026-09-20", body: "전자파, 무선, 전기안전 시험 항목별 기본 수수료와 처리 기간입니다.", file: "PDF · 412KB" },
   { tab: "files", title: "[서식] 시험신청서", date: "2026-09-02", body: "시험 신청 시 시료와 함께 보내 주십시오.", file: "HWP · 48KB" },
   { tab: "files", title: "중소기업 시험수수료 할인 안내", date: "2026-08-18", body: "중소기업 확인서를 내시면 시험수수료를 할인해 드립니다.", file: "PDF · 186KB" },
@@ -641,7 +621,7 @@ const MARKS: { name: string; to: [MenuId, string] }[] = [
 
 function Home() {
   const { go, openQuote, setTrackQuery } = useCl();
-  const [no, setNo] = useState(SAMPLE_NO);
+  const [no, setNo] = useState("");
 
   const tools = [
     { icon: Search, label: "인증 대상 조회", to: () => go("support", "finder") },
@@ -658,16 +638,15 @@ function Home() {
   };
 
   const banners = [
-    { title: "시험시설", sub: "3m 전파무향실 30MHz ~ 18GHz", img: `${IMG}/hero.jpg`, to: () => go("about", "facility") },
-    { title: "시료 접수 안내", sub: "평일 17시까지 도착분 당일 접수", img: `${IMG}/lab.jpg`, to: () => go("about", "location") },
-    { title: "시험수수료 안내", sub: "시험항목별 수수료와 처리기간", img: null, to: () => go("support", "files") },
-    { title: "질의응답", sub: "시험 기간, 시료 수량, 재시험", img: null, to: () => go("support", "faq") },
+    { title: "시험시설", sub: "3m 전파무향실 30MHz ~ 18GHz", img: `${IMG}/hero.jpg`, pos: "50% 50%", to: () => go("about", "facility") },
+    { title: "시료 접수 안내", sub: "평일 17시까지 도착분 당일 접수", img: `${IMG}/lab.jpg`, pos: "50% 50%", to: () => go("about", "location") },
+    { title: "시험수수료 안내", sub: "시험항목별 수수료와 처리기간", img: `${IMG}/lab.jpg`, pos: "15% 70%", to: () => go("support", "files") },
+    { title: "질의응답", sub: "시험 기간, 시료 수량, 재시험", img: `${IMG}/hero.jpg`, pos: "85% 30%", to: () => go("support", "faq") },
   ];
 
   return (
     <>
       <section id="cl-tools" aria-labelledby="cl-page-title" className="relative overflow-hidden px-4 md:px-6" style={{ background: C.indigoDeep, color: C.white }}>
-        <WaveMotif className="pointer-events-none absolute inset-x-0 top-6 h-[120px] w-full md:h-[150px]" opacity={0.22} />
         <div className="relative mx-auto max-w-[1200px] pb-6 pt-8 md:pb-8 md:pt-12">
           <div className="grid items-end gap-7 lg:grid-cols-[1fr_440px] lg:gap-12">
             <div>
@@ -691,7 +670,7 @@ function Home() {
                   id="cl-quick-no"
                   value={no}
                   onChange={(e) => setNo(e.target.value)}
-                  placeholder="접수번호"
+                  placeholder="접수번호 (예: TE-2609-0412)"
                   autoComplete="off"
                   className="h-12 min-w-0 flex-1 rounded-[8px] border px-3 text-[16px] font-semibold tabular-nums outline-none focus:border-[#23307a]"
                   style={{ borderColor: C.line }}
@@ -755,25 +734,21 @@ function Home() {
 
       <section aria-label="바로가기" className="px-4 md:px-6">
         <ul className="mx-auto grid max-w-[1200px] grid-cols-2 gap-3 lg:grid-cols-4">
-          {banners.map((b, i) => (
+          {banners.map((b) => (
             <li key={b.title}>
               <button
                 type="button"
                 onClick={b.to}
                 className="relative flex h-[120px] w-full flex-col justify-end overflow-hidden rounded-[10px] border p-4 text-left md:h-[150px] md:p-5"
-                style={b.img ? { borderColor: C.indigoDeep, color: C.white } : i === 2 ? { background: C.cyanSoft, borderColor: C.cyanSoft } : { background: C.paper, borderColor: C.line }}
+                style={{ borderColor: C.indigoDeep, color: C.white, background: C.indigoDeep }}
               >
-                {b.img && (
-                  <>
-                    <Image src={b.img} alt="" fill sizes="(min-width: 1024px) 25vw, 50vw" className="object-cover" />
-                    <span className="absolute inset-0" style={{ background: "linear-gradient(180deg, rgba(24,33,90,0.2) 0%, rgba(24,33,90,0.85) 100%)" }} aria-hidden />
-                  </>
-                )}
+                <Image src={b.img} alt="" fill sizes="(min-width: 1024px) 25vw, 50vw" className="object-cover" style={{ objectPosition: b.pos }} />
+                <span className="absolute inset-0" style={{ background: "linear-gradient(180deg, rgba(24,33,90,0.25) 0%, rgba(24,33,90,0.88) 100%)" }} aria-hidden />
                 <span className="relative flex items-center gap-1 text-[17px] font-bold md:text-[19px]">
                   {b.title}
                   <ChevronRight size={18} aria-hidden />
                 </span>
-                <span className="relative mt-0.5 text-[13px] leading-[1.4] md:text-[14px]" style={{ color: b.img ? "#dfe3f5" : C.muted }}>
+                <span className="relative mt-0.5 text-[13px] leading-[1.4] md:text-[14px]" style={{ color: "#dfe3f5" }}>
                   {b.sub}
                 </span>
               </button>
@@ -816,7 +791,7 @@ function SubPage({ m, s: subId }: { m: MenuId; s: string }) {
 
   return (
     <>
-      <section className="border-b px-4 md:px-6" style={{ background: C.paper, borderColor: C.line, ...GRAPH }}>
+      <section className="border-b px-4 md:px-6" style={{ background: C.paper, borderColor: C.line }}>
         <div className="mx-auto flex max-w-[1200px] flex-col gap-2 py-7 md:flex-row md:items-end md:justify-between md:py-10">
           <h1 className="text-[28px] font-bold tracking-[-0.03em] md:text-[36px]" style={{ color: C.indigoDeep }}>
             {menu.label}
@@ -2537,16 +2512,16 @@ function Spectrum({ pending, replayKey }: { pending: boolean; replayKey: string 
 function Tracking() {
   const { trackQuery, minute } = useCl();
   const reduce = useReducedMotionSafe();
-  const first = trackQuery || SAMPLE_NO;
+  const first = trackQuery.trim();
   const [query, setQuery] = useState(first);
-  const [result, setResult] = useState<TrackResult | null>(() => lookup(first));
-  const [error, setError] = useState(() => (lookup(first) ? "" : "접수번호 끝 네 자리 숫자를 확인해 주십시오. 예: TE-2609-0412"));
+  const [result, setResult] = useState<TrackResult | null>(() => (first ? lookup(first) : null));
+  const [error, setError] = useState(() => (!first || lookup(first) ? "" : `접수번호 끝 네 자리 숫자를 확인해 주십시오. 예: ${SAMPLE_NO}`));
 
   const submit = (e: FormEvent) => {
     e.preventDefault();
     const r = lookup(query);
     if (!r) {
-      setError("접수번호 끝 네 자리 숫자를 확인해 주십시오. 예: TE-2609-0412");
+      setError(query.trim() ? `접수번호 끝 네 자리 숫자를 확인해 주십시오. 예: ${SAMPLE_NO}` : "접수번호를 입력해 주십시오.");
       setResult(null);
       return;
     }
@@ -2569,7 +2544,7 @@ function Tracking() {
             id="track-no"
             value={query}
             onChange={(e) => setQuery(e.target.value)}
-            placeholder={SAMPLE_NO}
+            placeholder={`예: ${SAMPLE_NO}`}
             autoComplete="off"
             aria-invalid={!!error}
             aria-describedby={error ? "track-err" : "track-hint"}
@@ -2587,7 +2562,7 @@ function Tracking() {
           </p>
         ) : (
           <p id="track-hint" className="mt-2 text-[14px]" style={{ color: C.muted }}>
-            접수번호를 입력하세요.
+            접수증과 접수 안내 메일에 적힌 번호를 입력하세요.
           </p>
         )}
       </form>
@@ -3221,6 +3196,8 @@ function Board({ tab }: { tab: "news" | "files" }) {
   const [query, setQuery] = useState("");
   const [open, setOpen] = useState<string | null>(null);
   const all = BOARD.filter((b) => b.tab === tab);
+  /** 화면에 싣지 않은 예전 글 수 */
+  const older = tab === "news" ? 211 : 86;
   const q = query.trim();
   const list = all.filter((b) => !q || b.title.includes(q));
   const searchId = useId();
@@ -3229,7 +3206,7 @@ function Board({ tab }: { tab: "news" | "files" }) {
     <div>
       <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
         <p className="text-[15px] tabular-nums" style={{ color: C.muted }}>
-          총 <strong style={{ color: C.ink }}>{list.length}</strong>건
+          총 <strong style={{ color: C.ink }}>{q ? list.length : older + all.length}</strong>건
         </p>
         <span className="relative block sm:w-[280px]">
           <label htmlFor={searchId} className="sr-only">
@@ -3257,7 +3234,7 @@ function Board({ tab }: { tab: "news" | "files" }) {
           <ul>
             {list.map((b) => {
               const on = open === b.title;
-              const idx = all.length - all.indexOf(b);
+              const idx = older + all.length - all.indexOf(b);
               const panel = `cl-post-${tab}-${idx}`;
               return (
                 <li key={b.title} className="border-b" style={{ borderColor: C.line }}>

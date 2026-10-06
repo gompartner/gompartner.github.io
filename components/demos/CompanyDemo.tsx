@@ -3,7 +3,7 @@
 import { createContext, useContext, useEffect, useRef, useState, type FormEvent, type KeyboardEvent as ReactKeyboardEvent } from "react";
 import Image from "next/image";
 import { AnimatePresence, motion } from "framer-motion";
-import { Check, ChevronDown, ChevronRight, CircleAlert, ClipboardList, Cog, FileUp, House, Menu, Package, Ruler, RotateCcw, Trash2, X } from "lucide-react";
+import { Check, ChevronDown, ChevronRight, CircleAlert, FileUp, House, Menu, RotateCcw, Trash2, X } from "lucide-react";
 import { useReducedMotionSafe } from "@/hooks/useReducedMotionSafe";
 
 /* 기업 홈페이지 데모: 가상의 (주)○○정밀, CNC 정밀 가공 제조업체.
@@ -50,11 +50,6 @@ const C = {
 };
 
 const EASE = [0.22, 1, 0.36, 1] as const;
-
-const GRID_DARK = {
-  backgroundImage: "linear-gradient(rgba(255,255,255,0.05) 1px, transparent 1px), linear-gradient(90deg, rgba(255,255,255,0.05) 1px, transparent 1px)",
-  backgroundSize: "32px 32px",
-};
 
 /* ---------- 언어, 화면 상태 ---------- */
 
@@ -600,14 +595,14 @@ function Home() {
     { k: x("최소 공차", "Tightest tolerance"), v: "±0.01", u: "mm" },
     { k: x("최대 가공 크기", "Max. part size"), v: "1,300×650×600", u: "mm" },
     { k: x("선반 최대 지름", "Max. turning dia."), v: "Ø300", u: "mm" },
-    { k: x("보유 가공 설비", "Machines"), v: String(MACHINE_TOTAL), u: x("대", "units") },
   ];
 
-  const quick = [
-    { icon: Cog, title: x("기계설비현황", "Equipment"), sub: x(`가공 설비 ${MACHINE_TOTAL}대`, `${MACHINE_TOTAL} machines`), to: () => go("equipment", "machines") },
-    { icon: Ruler, title: x("가공 가능 범위", "Machinable Range"), sub: x("소재·크기·공차별 가공 설비", "Machine by material, size, tolerance"), to: () => go("equipment", "range") },
-    { icon: Package, title: x("생산제품", "Products"), sub: x("반도체·의료·2차전지·로봇", "Semicon, medical, battery, robotics"), to: () => go("products", "all") },
-    { icon: ClipboardList, title: x("견적문의", "Request a Quote"), sub: x("도면 첨부 접수", "Attach your drawing"), to: () => go("support", "quote") },
+  const links = [
+    { t: x("기계설비", "Machining Equipment"), to: () => go("equipment", "machines") },
+    { t: x("측정설비", "Measuring Equipment"), to: () => go("equipment", "measuring") },
+    { t: x("가공 가능 범위", "Machinable Range"), to: () => go("equipment", "range") },
+    { t: x("인증현황", "Certifications"), to: () => go("about", "certs") },
+    { t: x("오시는 길", "Location"), to: () => go("about", "location") },
   ];
 
   const featured = (["semi", "medical", "battery", "robot"] as const).map((c) => PRODUCTS.find((p) => p.cat === c)!);
@@ -617,7 +612,7 @@ function Home() {
       <section aria-labelledby="co-page-title" className="relative overflow-hidden" style={{ background: C.steel, color: C.white }}>
         <Image src={`${IMG}/hero.jpg`} alt="" fill priority sizes="100vw" className="object-cover" />
         <div className="absolute inset-0" style={{ background: "linear-gradient(90deg, rgba(20,24,29,0.9) 0%, rgba(20,24,29,0.72) 55%, rgba(20,24,29,0.45) 100%)" }} aria-hidden />
-        <div className="relative mx-auto max-w-[1200px] px-4 pb-24 pt-14 md:px-6 md:pb-32 md:pt-24">
+        <div className="relative mx-auto max-w-[1200px] px-4 pb-14 pt-14 md:px-6 md:pb-20 md:pt-24">
           <h1 id="co-page-title" tabIndex={-1} className="text-[34px] font-bold leading-[1.25] tracking-[-0.03em] outline-none md:text-[52px]">
             {s(COMPANY)}
           </h1>
@@ -635,9 +630,9 @@ function Home() {
               {x("견적문의", "Request a Quote")}
             </button>
           </div>
-          <dl className="mt-12 grid max-w-[880px] grid-cols-2 border-l border-t md:grid-cols-4" style={{ borderColor: "rgba(255,255,255,0.18)" }}>
+          <dl className="mt-12 flex max-w-[880px] flex-wrap gap-x-8 gap-y-3 border-t pt-4" style={{ borderColor: "rgba(255,255,255,0.18)" }}>
             {specs.map((sp) => (
-              <div key={sp.k} className="border-b border-r px-3 py-3 md:px-4" style={{ borderColor: "rgba(255,255,255,0.18)", background: "rgba(20,24,29,0.35)" }}>
+              <div key={sp.k}>
                 <dt className="text-[13px]" style={{ color: "#a9b0b9" }}>
                   {sp.k}
                 </dt>
@@ -653,25 +648,44 @@ function Home() {
         </div>
       </section>
 
-      <section id="co-quick" aria-label={x("바로가기", "Quick links")} className="relative px-4 md:px-6">
-        <ul className="relative mx-auto -mt-12 grid max-w-[1200px] grid-cols-2 gap-px overflow-hidden rounded-[6px] border shadow-[0_6px_20px_rgba(30,35,41,0.1)] md:-mt-14 md:grid-cols-4" style={{ borderColor: C.line, background: C.line }}>
-          {quick.map((q) => (
-            <li key={q.title} className="bg-white">
-              <button type="button" onClick={q.to} className="group flex h-full w-full flex-col items-start gap-3 p-4 text-left hover:bg-[#f2f3f5] md:p-6">
-                <q.icon size={28} strokeWidth={1.6} style={{ color: C.orangeText }} aria-hidden />
-                <span className="block">
-                  <span className="flex items-center gap-1 text-[16px] font-bold md:text-[19px]">
-                    {q.title}
-                    <ChevronRight size={18} className="shrink-0 transition-transform group-hover:translate-x-0.5" aria-hidden />
-                  </span>
-                  <span className="mt-0.5 block text-[13px] leading-[1.45] md:text-[14px]" style={{ color: C.muted }}>
-                    {q.sub}
-                  </span>
-                </span>
-              </button>
-            </li>
-          ))}
-        </ul>
+      <section id="co-quick" aria-label={x("바로가기", "Quick links")} className="px-4 pt-10 md:px-6 md:pt-14">
+        <div className="mx-auto max-w-[1200px]">
+          <div className="grid gap-3 md:grid-cols-[1fr_1fr_0.9fr]">
+            <button type="button" onClick={() => go("business", "lathe")} className="group relative block h-[150px] overflow-hidden rounded-[4px] text-left md:h-[190px]" style={{ background: C.steel }}>
+              <Image src={`${IMG}/parts.jpg`} alt="" fill sizes="(min-width: 768px) 36vw, 100vw" className="object-cover opacity-70 transition-opacity group-hover:opacity-55" />
+              <span className="absolute inset-x-0 bottom-0 p-4 md:p-5" style={{ color: C.white, background: "linear-gradient(0deg, rgba(20,24,29,0.85), rgba(20,24,29,0))" }}>
+                <span className="block text-[13px]" style={{ color: "#d4d8de" }}>{x("사업분야", "Business")}</span>
+                <span className="block text-[20px] font-bold md:text-[23px]">{x("CNC 선반 가공", "CNC Turning")}</span>
+                <span className="block text-[14px]" style={{ color: "#d4d8de" }}>{x("최대 Ø300, 복합 선반 Y축 가공", "Up to Ø300, turn-mill with Y-axis")}</span>
+              </span>
+            </button>
+            <button type="button" onClick={() => go("business", "fiveAx")} className="group relative block h-[150px] overflow-hidden rounded-[4px] text-left md:h-[190px]" style={{ background: C.steel }}>
+              <Image src={`${IMG}/hero.jpg`} alt="" fill sizes="(min-width: 768px) 36vw, 100vw" className="object-cover object-[70%_50%] opacity-70 transition-opacity group-hover:opacity-55" />
+              <span className="absolute inset-x-0 bottom-0 p-4 md:p-5" style={{ color: C.white, background: "linear-gradient(0deg, rgba(20,24,29,0.85), rgba(20,24,29,0))" }}>
+                <span className="block text-[13px]" style={{ color: "#d4d8de" }}>{x("사업분야", "Business")}</span>
+                <span className="block text-[20px] font-bold md:text-[23px]">{x("MCTㆍ5축 가공", "MCT and 5-Axis")}</span>
+                <span className="block text-[14px]" style={{ color: "#d4d8de" }}>{x("X1,300 대형 가공, 동시 5축", "Large parts to X1,300, simultaneous 5-axis")}</span>
+              </span>
+            </button>
+            <button type="button" onClick={() => go("support", "quote")} className="flex h-[150px] flex-col justify-between rounded-[4px] p-4 text-left transition-[filter] hover:brightness-95 md:h-[190px] md:p-5" style={{ background: C.orange, color: C.steel }}>
+              <span>
+                <span className="block text-[20px] font-bold md:text-[23px]">{x("견적문의", "Request a Quote")}</span>
+                <span className="mt-1 block text-[14px] leading-[1.5]">{x("도면 파일 첨부 접수, 소재와 수량을 함께 적어 주시면 견적이 빨라집니다.", "Attach your drawing with material and quantity for a faster quote.")}</span>
+              </span>
+              <span className="text-[22px] font-bold tabular-nums">{TEL}</span>
+            </button>
+          </div>
+          <ul className="mt-4 flex flex-wrap items-center border-b pb-4 text-[15px]" style={{ borderColor: C.line }}>
+            {links.map((q, i) => (
+              <li key={q.t} className="flex items-center">
+                {i > 0 && <span className="mx-3 h-3 w-px" style={{ background: C.line }} aria-hidden />}
+                <button type="button" onClick={q.to} className="inline-flex h-10 items-center font-bold hover:underline" style={{ color: C.ink }}>
+                  {q.t}
+                </button>
+              </li>
+            ))}
+          </ul>
+        </div>
       </section>
 
       <section aria-labelledby="co-home-products" className="px-4 py-14 md:px-6 md:py-20">
@@ -846,8 +860,10 @@ function SubPage({ m, s: subId }: { m: MenuId; s: string }) {
 
   return (
     <>
-      <section className="px-4 md:px-6" style={{ background: C.steel, color: C.white, ...GRID_DARK }}>
-        <div className="mx-auto max-w-[1200px] py-9 md:py-14">
+      <section className="relative overflow-hidden px-4 md:px-6" style={{ background: C.steel, color: C.white }}>
+        <Image src={`${IMG}/hero.jpg`} alt="" fill sizes="100vw" className="object-cover object-[50%_40%]" />
+        <div className="absolute inset-0" style={{ background: "rgba(20,24,29,0.78)" }} aria-hidden />
+        <div className="relative mx-auto max-w-[1200px] py-9 md:py-14">
           <h1 className="text-[28px] font-bold tracking-[-0.03em] md:text-[38px]">{s(menu.label)}</h1>
         </div>
       </section>

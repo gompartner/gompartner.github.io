@@ -42,11 +42,17 @@ const MENU: { title: string; items: string[] }[] = [
   { title: "○○구 소개", items: ["구청장", "일반현황", "조직도", "담당자 찾기", "청사안내", "찾아오시는 길"] },
 ];
 
-// 알림판: 실제 구청 배너처럼 기간·대상·문의까지 적는다
+// 알림판: 실제 구청 배너처럼 제목·기간·장소·문의를 배너 안에 크게 박는다
 const SLIDES = [
   {
     tag: "행사",
     title: "△△천 가을 등불 축제",
+    lines: ["제7회 △△천", "가을 등불 축제"],
+    sub: "개막 공연 10. 10.(토) 18:30 △△천 수변무대",
+    bg: "#1d2150",
+    fg: "#ffffff",
+    accent: "#ffc65c",
+    soft: "#d9dcf5",
     rows: [
       ["기간", "2026. 10. 10.(토) ~ 10. 19.(월)"],
       ["장소", "△△천 산책로 일대"],
@@ -56,6 +62,12 @@ const SLIDES = [
   {
     tag: "공모",
     title: "2027년 주민참여예산 사업 제안 접수",
+    lines: ["2027년 주민참여예산", "사업 제안 접수"],
+    sub: "구청 누리집, 동주민센터 방문 접수",
+    bg: "#e4f1e2",
+    fg: "#10351f",
+    accent: "#1c6b37",
+    soft: "#2f5a3d",
     rows: [
       ["기간", "2026. 9. 21.(월) ~ 10. 31.(토)"],
       ["대상", "○○구 거주·직장·학교 구민"],
@@ -64,7 +76,13 @@ const SLIDES = [
   },
   {
     tag: "보건",
-    title: "어르신 독감 예방접종",
+    title: "어르신 독감 무료 예방접종",
+    lines: ["어르신 독감", "무료 예방접종"],
+    sub: "신분증 지참, 지정 의료기관 137곳",
+    bg: "#ddeefa",
+    fg: "#0c2f4a",
+    accent: "#0a5f93",
+    soft: "#2d4d66",
     rows: [
       ["기간", "2026. 10. 13.(화) ~ 11. 30.(월)"],
       ["대상", "만 65세 이상 ○○구민"],
@@ -136,7 +154,7 @@ const QUICK = ["구보", "통합예약", "재난안전", "구민 제안", "주�
 
 const LINK_GROUPS: { title: string; items: string[] }[] = [
   { title: "부서안내", items: ["기획예산과", "총무과", "민원여권과", "복지정책과", "보건소", "도시계획과", "청소행정과", "주차관리과"] },
-  { title: "동주민센터", items: ["○○1동", "○○2동", "가람동", "누리동", "한울동", "새터동"] },
+  { title: "동주민센터", items: ["○○1동", "○○2동", "○○3동", "△△1동", "△△2동", "□□동"] },
   { title: "유관기관", items: ["○○구의회", "○○구 시설관리공단", "○○구 문화재단", "○○구 자원봉사센터"] },
   { title: "관련 사이트", items: ["정부24", "국민신문고", "△△시청", "고용24"] },
 ];
@@ -148,39 +166,6 @@ const FONT_STEPS = [
   { label: "크게", zoom: 1.2 },
   { label: "가장 크게", zoom: 1.3 },
 ];
-
-function Skyline({ className }: { className?: string }) {
-  // 하천 위로 겹겹이 선 건물과 다리. ○○구 대표 그래픽
-  return (
-    <svg viewBox="0 0 600 260" className={className} aria-hidden preserveAspectRatio="xMidYMax slice">
-      <circle cx="470" cy="92" r="46" fill={SUNSET} opacity="0.9" />
-      <g fill="#2b3f63">
-        <rect x="20" y="120" width="44" height="100" />
-        <rect x="70" y="90" width="30" height="130" />
-        <rect x="106" y="138" width="52" height="82" />
-        <rect x="164" y="70" width="36" height="150" />
-        <rect x="206" y="112" width="48" height="108" />
-        <rect x="380" y="104" width="40" height="116" />
-        <rect x="426" y="140" width="56" height="80" />
-        <rect x="488" y="84" width="34" height="136" />
-        <rect x="528" y="126" width="60" height="94" />
-      </g>
-      <g fill="#3c5582">
-        <rect x="260" y="150" width="40" height="70" />
-        <rect x="306" y="128" width="30" height="92" />
-        <rect x="340" y="160" width="36" height="60" />
-      </g>
-      <path d="M0 196 Q150 184 300 196 T600 196 L600 206 L0 206 Z" fill="#1d3152" />
-      <path d="M160 196 Q300 150 440 196" fill="none" stroke="#9fb3d6" strokeWidth="4" />
-      {[190, 230, 270, 310, 350, 390, 420].map((x) => (
-        <line key={x} x1={x} y1="196" x2={x} y2={Math.round(196 - Math.max(8, 44 - Math.abs(300 - x) / 3.2))} stroke="#9fb3d6" strokeWidth="2" />
-      ))}
-      <rect x="0" y="206" width="600" height="54" fill="#0f1c33" />
-      <path d="M0 222 Q90 216 180 222 T360 222 T540 222 T720 222" fill="none" stroke={SUNSET} strokeOpacity="0.55" strokeWidth="2" />
-      <path d="M0 240 Q90 234 180 240 T360 240 T540 240 T720 240" fill="none" stroke="#9fb3d6" strokeOpacity="0.35" strokeWidth="2" />
-    </svg>
-  );
-}
 
 /** 태극 문양을 단순화한 정부 누리집 표시 */
 function GovMark() {
@@ -292,13 +277,11 @@ export function DistrictPortalDemo() {
         <header className="relative z-30 bg-white shadow-[0_1px_0_#dfe3ea]">
           <div className={`${container} flex h-[72px] items-center gap-4`}>
             <a href="#main" className="flex items-center gap-2.5">
-              <span className="flex h-10 w-10 items-center justify-center rounded-full" style={{ background: NAVY }} aria-hidden>
-                <svg viewBox="0 0 24 24" className="h-6 w-6">
-                  <circle cx="16" cy="9" r="4" fill={SUNSET} />
-                  <path d="M3 17 Q8 13 12 17 T21 17" stroke="#fff" strokeWidth="2" fill="none" />
-                </svg>
+              <span className="text-[24px] font-bold tracking-[-0.05em]" style={{ color: NAVY }}>
+                ○○구
               </span>
-              <span className="text-[21px] font-bold tracking-[-0.02em]">○○구청</span>
+              <span className="h-5 w-px bg-[#b9c0cc]" aria-hidden />
+              <span className="text-[17px] font-bold text-[#3a4453]">구청 누리집</span>
             </a>
 
             <nav id="gnb" aria-label="주메뉴" className="ml-auto hidden lg:block">
@@ -372,16 +355,15 @@ export function DistrictPortalDemo() {
         <main id="main">
           {/* 첫 화면: 알림판 + 자주 찾는 서비스 */}
           <div className={`${container} grid gap-4 pt-5 md:pt-6 lg:grid-cols-[minmax(0,1.5fr)_minmax(0,1fr)]`}>
-            <section aria-labelledby="notice-board-title" aria-roledescription="배너 슬라이드" className="relative flex min-h-[320px] flex-col overflow-hidden rounded-[12px] text-white" style={{ background: NAVY }}>
-              <Skyline className="absolute inset-x-0 bottom-0 h-[55%] w-full opacity-60" />
-              <div className="relative flex items-center gap-2 border-b border-white/15 px-5 py-3">
+            <section aria-labelledby="notice-board-title" aria-roledescription="배너 슬라이드" className="flex min-h-[320px] flex-col overflow-hidden rounded-[12px] bg-white">
+              <div className="flex items-center gap-2 border-b border-[#dfe3ea] px-5 py-2.5">
                 <h2 id="notice-board-title" className="text-[17px] font-bold">
                   알림판
                 </h2>
-                <span className="ml-auto text-[15px] tabular-nums" aria-hidden>
+                <span className="ml-auto text-[15px] tabular-nums text-[#3a4453]" aria-hidden>
                   {slide + 1} / {SLIDES.length}
                 </span>
-                <button type="button" aria-label="이전 알림" onClick={() => setSlide((s) => (s + SLIDES.length - 1) % SLIDES.length)} className="flex h-9 w-9 items-center justify-center rounded-[4px] border border-white/40 hover:bg-white/10">
+                <button type="button" aria-label="이전 알림" onClick={() => setSlide((s) => (s + SLIDES.length - 1) % SLIDES.length)} className="flex h-9 w-9 items-center justify-center rounded-[4px] border border-[#b9c0cc] hover:bg-[#f3f5f8]">
                   <ChevronLeft size={18} aria-hidden />
                 </button>
                 <button
@@ -389,31 +371,46 @@ export function DistrictPortalDemo() {
                   aria-label={paused ? "자동 넘김 재생" : "자동 넘김 정지"}
                   aria-pressed={paused}
                   onClick={() => setPaused((p) => !p)}
-                  className="flex h-9 w-9 items-center justify-center rounded-[4px] border border-white/40 hover:bg-white/10"
+                  className="flex h-9 w-9 items-center justify-center rounded-[4px] border border-[#b9c0cc] hover:bg-[#f3f5f8]"
                 >
                   {paused ? <Play size={16} aria-hidden /> : <Pause size={16} aria-hidden />}
                 </button>
-                <button type="button" aria-label="다음 알림" onClick={() => setSlide((s) => (s + 1) % SLIDES.length)} className="flex h-9 w-9 items-center justify-center rounded-[4px] border border-white/40 hover:bg-white/10">
+                <button type="button" aria-label="다음 알림" onClick={() => setSlide((s) => (s + 1) % SLIDES.length)} className="flex h-9 w-9 items-center justify-center rounded-[4px] border border-[#b9c0cc] hover:bg-[#f3f5f8]">
                   <ChevronRight size={18} aria-hidden />
                 </button>
               </div>
-              <div className="relative px-5 pb-28 pt-5 md:px-7 md:pt-6" aria-live={autoplay ? "off" : "polite"} aria-label={`${SLIDES.length}개 중 ${slide + 1}번째`}>
-                <span className="inline-block rounded-[4px] px-2 py-0.5 text-[14px] font-bold text-[#13233f]" style={{ background: "#f6c7a8" }}>
-                  {current.tag}
+              <a
+                href="#main"
+                className="relative flex flex-1 flex-col px-5 pb-5 pt-5 md:px-8 md:pt-7"
+                style={{ background: current.bg, color: current.fg }}
+                aria-live={autoplay ? "off" : "polite"}
+                aria-label={`${SLIDES.length}개 중 ${slide + 1}번째, ${current.tag}: ${current.title}, ${current.rows.map(([k, v]) => `${k} ${v}`).join(", ")}`}
+              >
+                <span className="text-[15px] font-bold" style={{ color: current.accent }} aria-hidden>
+                  {current.tag === "행사" ? "○○구와 함께하는" : current.tag === "공모" ? "구민이 직접 정하는 우리 동네 예산" : "○○구 보건소"}
                 </span>
-                <p className="mt-3 text-[26px] font-bold leading-[1.35] tracking-[-0.02em] md:text-[34px]">{current.title}</p>
-                <dl className="mt-4 grid grid-cols-[auto_1fr] gap-x-4 gap-y-1 text-[16px] text-[#e3e8f1]">
-                  {current.rows.map(([k, v]) => (
-                    <div key={k} className="contents">
-                      <dt className="font-bold text-[#f6c7a8]">{k}</dt>
-                      <dd>{v}</dd>
-                    </div>
+                <span className="mt-1 block text-[32px] font-bold leading-[1.18] tracking-[-0.045em] md:text-[46px]" aria-hidden>
+                  {current.lines.map((ln, i) => (
+                    <span key={ln} className="block" style={i === current.lines.length - 1 ? { color: current.accent } : undefined}>
+                      {ln}
+                    </span>
                   ))}
-                </dl>
-                <a href="#main" className="mt-5 inline-flex h-10 items-center rounded-[4px] bg-white px-4 text-[15px] font-bold" style={{ color: NAVY }}>
-                  자세히보기
-                </a>
-              </div>
+                </span>
+                <span className="mt-2 block text-[16px] font-bold md:text-[18px]" aria-hidden>
+                  {current.sub}
+                </span>
+                <span className="mt-auto flex flex-wrap items-end justify-between gap-3 border-t pt-3 text-[15px]" style={{ borderColor: current.fg === "#ffffff" ? "rgba(255,255,255,0.3)" : "rgba(0,0,0,0.18)" }} aria-hidden>
+                  <span className="grid grid-cols-[auto_1fr] gap-x-3" style={{ color: current.soft }}>
+                    {current.rows.map(([k, v]) => (
+                      <span key={k} className="contents">
+                        <b style={{ color: current.fg }}>{k}</b>
+                        <span>{v}</span>
+                      </span>
+                    ))}
+                  </span>
+                  <span className="text-[18px] font-bold tracking-[-0.04em]">○○구</span>
+                </span>
+              </a>
             </section>
 
             <section aria-labelledby="frequent-title" className="rounded-[12px] bg-white p-5">
@@ -426,11 +423,9 @@ export function DistrictPortalDemo() {
                     <button
                       type="button"
                       onClick={() => openStaff(keyword)}
-                      className="flex w-full flex-col items-center gap-2 rounded-[6px] px-1 py-3 text-center hover:bg-[#fdf0ea]"
+                      className="flex w-full flex-col items-center gap-2 rounded-[6px] px-1 py-3 text-center text-[#2b3442] hover:bg-[#f3f5f8]"
                     >
-                      <span className="flex h-12 w-12 items-center justify-center rounded-full border border-[#f2d3c5] bg-[#fdf0ea]" style={{ color: SUNSET_TEXT }}>
-                        <Icon size={22} aria-hidden />
-                      </span>
+                      <Icon size={30} strokeWidth={1.5} aria-hidden />
                       <span className="text-[14px] font-bold leading-[1.35] break-keep">{label}</span>
                     </button>
                   </li>
@@ -485,7 +480,7 @@ export function DistrictPortalDemo() {
                   </form>
                   <p className="mt-3 flex flex-wrap items-center gap-x-3 gap-y-1 text-[15px] text-[#3a4453]">
                     <span className="font-bold">인기검색어</span>
-                    {["청년 월세", "대형폐기물", "주민참여예산", "등불 축제"].map((w) => (
+                    {["여권", "대형폐기물", "주정차 단속 조회", "전입신고", "재산세 납부", "등본 발급"].map((w) => (
                       <button key={w} type="button" onClick={() => setQuery(w)} className="underline-offset-2 hover:underline">
                         {w}
                       </button>
@@ -601,16 +596,11 @@ export function DistrictPortalDemo() {
 
             <div className="grid content-start gap-4">
               {/* 구청장 */}
-              <section aria-labelledby="mayor-title" className="relative overflow-hidden rounded-[12px] p-5 text-white md:p-6" style={{ background: SUNSET_TEXT }}>
-                <svg viewBox="0 0 200 200" className="absolute -right-10 -top-10 h-48 w-48 opacity-20" aria-hidden>
-                  <circle cx="100" cy="100" r="90" fill="none" stroke="#fff" strokeWidth="2" />
-                  <circle cx="100" cy="100" r="60" fill="none" stroke="#fff" strokeWidth="2" />
-                  <circle cx="100" cy="100" r="30" fill="#fff" />
-                </svg>
-                <h2 id="mayor-title" className="relative text-[20px] font-bold">
+              <section aria-labelledby="mayor-title" className="rounded-[12px] p-5 text-white md:p-6" style={{ background: SUNSET_TEXT }}>
+                <h2 id="mayor-title" className="text-[20px] font-bold">
                   ○○구청장 홍ㄱ동입니다.
                 </h2>
-                <ul className="relative mt-4 grid gap-1.5 text-[16px]">
+                <ul className="mt-4 grid gap-1.5 text-[16px]">
                   {["구청장에게 바란다", "민선9기 공약", "인사말"].map((l) => (
                     <li key={l}>
                       <a href="#main" className="inline-flex items-center gap-1 font-bold underline-offset-4 hover:underline">

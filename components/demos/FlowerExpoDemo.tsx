@@ -586,81 +586,52 @@ function Header({ page, go }: { page: Page; go: Go }) {
 
 /* ─── 메인 ─────────────────────────────────────────────── */
 
-function PosterBanner({ today }: { today: number }) {
-  const diff = today < 0 ? null : START_DAY - today;
-  let badge = "";
-  if (diff !== null) {
-    if (diff > 0) badge = `개막 D-${diff}`;
-    else if (diff > -DAYS) badge = `개최 ${-diff + 1}일째`;
-    else badge = "행사 종료";
-  }
-
+function PosterBanner() {
   return (
     <section aria-labelledby="poster-title" className="relative">
       <div className="relative h-[460px] sm:h-[520px] md:h-[600px]">
         <Image src={`${IMG}/hero.jpg`} alt="" fill priority sizes="100vw" className="object-cover" style={{ objectPosition: "60% 50%" }} />
-        <div className="absolute inset-0" style={{ background: "linear-gradient(180deg, rgba(31,77,58,0.15) 0%, rgba(31,77,58,0.25) 45%, rgba(20,40,30,0.72) 100%)" }} />
-        <div className="absolute inset-3 border-2 md:inset-6" style={{ borderColor: "rgba(255,250,240,0.75)" }} aria-hidden />
+        <div className="absolute inset-0" style={{ background: "linear-gradient(180deg, rgba(31,77,58,0.1) 0%, rgba(31,77,58,0.2) 45%, rgba(20,40,30,0.72) 100%)" }} />
         <div className="absolute inset-x-0 bottom-0 flex flex-col items-center px-6 pb-10 text-center text-white md:pb-14">
           <h1 id="poster-title" className="font-bold leading-[1.05] tracking-[-0.04em]" style={{ textShadow: "0 2px 18px rgba(0,0,0,0.25)" }}>
-            <span className="block text-[44px] md:text-[72px]" style={{ color: C.yellow }}>
-              2027
-            </span>
+            <span className="block text-[30px] md:text-[44px]">2027</span>
             <span className="mt-1 block text-[40px] sm:text-[52px] md:text-[80px]">○○ 꽃박람회</span>
           </h1>
           <p className="mt-4 text-[17px] font-semibold md:text-[20px]">{PERIOD}</p>
           <p className="text-[16px] md:text-[18px]">{PLACE} 일대</p>
-          <p className="mt-4 h-9 min-w-[120px] rounded-full px-4 text-[16px] font-bold leading-9 tabular-nums" style={{ background: C.cream, color: C.green }} aria-live="polite">
-            {badge || " "}
-          </p>
         </div>
-      </div>
-      <div className="grid sm:grid-cols-2">
-        <p className="flex flex-wrap items-baseline justify-center gap-x-3 px-4 py-3 text-center text-white" style={{ background: C.green }}>
-          <strong className="text-[16px]">낮 정원</strong>
-          <span className="text-[15px] tabular-nums">{PERIOD} 매일</span>
-        </p>
-        <p className="flex flex-wrap items-baseline justify-center gap-x-3 px-4 py-3 text-center text-white" style={{ background: "#3a3f7a" }}>
-          <strong className="text-[16px]">야간 정원</strong>
-          <span className="text-[15px] tabular-nums">금·토·일 18:00 ~ 21:30</span>
-        </p>
       </div>
     </section>
   );
 }
 
-function Pill({ children, color }: { children: React.ReactNode; color: string }) {
-  return (
-    <span className="inline-flex h-7 shrink-0 items-center rounded-full px-3 text-[13px] font-bold text-white" style={{ background: color }}>
-      {children}
-    </span>
-  );
-}
-
 function HoursBox() {
-  const rows: [string, string, string][] = [
-    ["입장가능시간", "09:00 ~ 17:00", C.green],
-    ["폐장시간", "18:00", C.pinkText],
-    ["야간 정원", "금·토·일 18:00 ~ 21:30", "#3a3f7a"],
-    ["고객센터", "09:00 ~ 18:00", "#8a6a12"],
+  const rows: [string, string][] = [
+    ["낮 정원", "매일 09:00 ~ 18:00"],
+    ["입장 마감", "17:00"],
+    ["야간 정원", "금·토·일 18:00 ~ 21:30"],
+    ["고객센터", "09:00 ~ 18:00"],
   ];
   return (
     <section id="hours" aria-labelledby="hours-title" className="rounded-[10px] border-2 p-5 md:p-6" style={{ borderColor: C.green, background: C.paper }}>
       <h2 id="hours-title" className="text-[21px] font-bold tracking-[-0.02em]" style={{ color: C.green }}>
         운영시간
       </h2>
-      <dl className="mt-4 space-y-2.5">
-        {rows.map(([k, v, color]) => (
-          <div key={k} className="flex flex-wrap items-center gap-x-3 gap-y-1">
-            <dt className="w-[112px]">
-              <Pill color={color}>{k}</Pill>
-            </dt>
-            <dd className="text-[17px] font-semibold tabular-nums" style={{ color: C.ink }}>
-              {v}
-            </dd>
-          </div>
-        ))}
-      </dl>
+      <table className="mt-3 w-full text-[16px]">
+        <caption className="sr-only">운영시간</caption>
+        <tbody>
+          {rows.map(([k, v]) => (
+            <tr key={k} className="border-b first:border-t" style={{ borderColor: C.line }}>
+              <th scope="row" className="w-[112px] py-2.5 pr-3 text-left font-bold" style={{ color: C.ink }}>
+                {k}
+              </th>
+              <td className="py-2.5 font-semibold tabular-nums" style={{ color: C.ink }}>
+                {v}
+              </td>
+            </tr>
+          ))}
+        </tbody>
+      </table>
       <a href={`tel:${TEL}`} className="mt-5 flex items-center gap-2 border-t pt-4" style={{ borderColor: C.line }}>
         <Phone size={26} style={{ color: C.pinkText }} aria-hidden />
         <span className="text-[30px] font-bold leading-none tracking-[-0.02em] tabular-nums md:text-[34px]" style={{ color: C.pinkText }}>
@@ -852,9 +823,9 @@ function QuickTiles({ go }: { go: Go }) {
     <nav id="quick" aria-label="바로가기" className="grid grid-cols-2 gap-3 md:grid-cols-4 md:gap-4">
       {tiles.map((t) => (
         <button key={t.page} type="button" onClick={() => go(t.page)} className="group relative aspect-[4/3] overflow-hidden rounded-[10px] text-left md:aspect-[5/4]">
-          <Image src={t.src} alt="" fill sizes="(min-width: 768px) 280px, 50vw" className="object-cover motion-safe:transition-transform motion-safe:duration-500 group-hover:scale-[1.04]" />
+          <Image src={t.src} alt="" fill sizes="(min-width: 768px) 280px, 50vw" className="object-cover" />
           <span className="absolute inset-0" style={{ background: "linear-gradient(180deg, rgba(0,0,0,0) 40%, rgba(0,0,0,0.6) 100%)" }} />
-          <span className="absolute inset-x-3 bottom-3 flex items-center justify-between text-[17px] font-bold text-white md:text-[19px]">
+          <span className="absolute inset-x-3 bottom-3 flex items-center justify-between text-[17px] font-bold text-white underline-offset-4 group-hover:underline md:text-[19px]">
             {t.label}
             <ChevronRight size={20} aria-hidden />
           </span>
@@ -874,7 +845,7 @@ function NoticeList({ limit, onOpen }: { limit?: number; onOpen: (i: number) => 
               {n.title}
               {n.isNew && (
                 <span className="ml-1.5 inline-flex h-[18px] items-center rounded-[2px] px-1 align-[2px] text-[11px] font-bold text-white" style={{ background: C.pinkText }}>
-                  NEW
+                  새글
                 </span>
               )}
             </span>
@@ -935,10 +906,10 @@ function FaqList({ limit }: { limit?: number }) {
   );
 }
 
-function Home({ today, go, openNotice }: { today: number; go: Go; openNotice: (i: number) => void }) {
+function Home({ go, openNotice }: { go: Go; openNotice: (i: number) => void }) {
   return (
     <>
-      <PosterBanner today={today} />
+      <PosterBanner />
       <Container className="py-10 md:py-14">
         <div className="grid gap-5 lg:grid-cols-[1fr_1.15fr]">
           <HoursBox />
@@ -1150,9 +1121,7 @@ function GuidePage() {
         <ul className="grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
           {facilities.map(({ icon: Icon, title, body }) => (
             <li key={title} className="flex gap-3 rounded-[10px] border p-4" style={{ borderColor: C.line, background: C.paper }}>
-              <span className="inline-flex h-11 w-11 shrink-0 items-center justify-center rounded-full" style={{ background: C.greenSoft, color: C.green }}>
-                <Icon size={22} aria-hidden />
-              </span>
+              <Icon size={24} className="mt-0.5 shrink-0" style={{ color: C.green }} aria-hidden />
               <span>
                 <span className="block font-semibold">{title}</span>
                 <span className="block text-[15px] leading-[1.6]" style={{ color: C.muted }}>
@@ -1632,7 +1601,7 @@ function NoticePage({ openIndex, setOpenIndex }: { openIndex: number | null; set
                   {n.title}
                   {n.isNew && (
                     <span className="ml-1.5 inline-flex h-[18px] items-center rounded-[2px] px-1 align-[2px] text-[11px] font-bold text-white" style={{ background: C.pinkText }}>
-                      NEW
+                      새글
                     </span>
                   )}
                 </button>
@@ -1715,7 +1684,7 @@ export function FlowerExpoDemo() {
       <Header page={page} go={go} />
       <main ref={mainRef} tabIndex={-1} className="outline-none">
         {page === "home" ? (
-          <Home today={today} go={go} openNotice={openNotice} />
+          <Home go={go} openNotice={openNotice} />
         ) : (
           <SubFrame page={page} go={go}>
             {page === "overview" && <OverviewPage />}

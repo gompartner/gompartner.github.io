@@ -32,12 +32,12 @@ const jua = Jua({ weight: "400", preload: false, display: "swap" });
 
 type CategoryId = "meeting" | "studio" | "library" | "sports" | "community";
 
-const CATEGORIES: { id: CategoryId; label: string; color: string; tint: string; icon: LucideIcon }[] = [
-  { id: "meeting", label: "회의실", color: "#228738", tint: "#e3f3e6", icon: Presentation },
-  { id: "studio", label: "연습·창작공간", color: "#a24fbf", tint: "#f4e8f8", icon: Palette },
-  { id: "library", label: "작은도서관", color: "#9e6a00", tint: "#fbefd6", icon: BookOpen },
-  { id: "sports", label: "체육시설", color: "#256ef4", tint: "#e4edfe", icon: Dumbbell },
-  { id: "community", label: "주민공유공간", color: "#d63d4a", tint: "#fce6e8", icon: Users },
+const CATEGORIES: { id: CategoryId; label: string; color: string; icon: LucideIcon }[] = [
+  { id: "meeting", label: "회의실", color: "#2b7a43", icon: Presentation },
+  { id: "studio", label: "연습·창작공간", color: "#8c4fa3", icon: Palette },
+  { id: "library", label: "작은도서관", color: "#8a6110", icon: BookOpen },
+  { id: "sports", label: "체육시설", color: "#3263c4", icon: Dumbbell },
+  { id: "community", label: "주민공유공간", color: "#bf4049", icon: Users },
 ];
 
 const categoryOf = (id: CategoryId) => CATEGORIES.find((c) => c.id === id)!;
@@ -76,37 +76,64 @@ const W = 1000;
 const H = 750;
 
 const DONGS = [
-  { name: "해오름동", fill: "#f3f8df", d: "M22,24 Q170,6 330,16 Q352,130 360,250 Q280,286 190,300 Q100,286 32,262 Q14,140 22,24Z", lx: 200, ly: 180 },
-  { name: "솔빛동", fill: "#fdf1dc", d: "M330,16 Q500,10 660,26 Q650,130 630,230 Q500,236 360,250 Q352,130 330,16Z", lx: 500, ly: 150 },
-  { name: "누리동", fill: "#e6f2f6", d: "M660,26 Q820,20 980,32 Q984,170 970,300 Q840,316 700,320 Q660,280 630,230 Q650,130 660,26Z", lx: 790, ly: 220 },
-  { name: "새터동", fill: "#f8eaf0", d: "M32,262 Q100,286 190,300 Q214,400 230,510 Q150,540 60,560 Q16,480 20,420 Q18,340 32,262Z", lx: 110, ly: 480 },
-  { name: "가람동", fill: "#eef5e4", d: "M190,300 Q280,286 360,250 Q500,236 630,230 Q660,280 700,320 Q676,400 640,470 Q520,488 400,500 Q316,508 230,510 Q214,400 190,300Z", lx: 430, ly: 400 },
-  { name: "한울동", fill: "#fbf0e2", d: "M700,320 Q840,316 970,300 Q990,420 985,540 Q850,556 720,560 Q690,510 640,470 Q676,400 700,320Z", lx: 840, ly: 400 },
-  { name: "다솜동", fill: "#e8f1f8", d: "M60,560 Q150,540 230,510 Q316,508 400,500 Q420,620 430,735 Q250,742 70,735 Q52,650 60,560Z", lx: 250, ly: 590 },
-  { name: "미르동", fill: "#f1ecf8", d: "M400,500 Q520,488 640,470 Q690,510 720,560 Q850,556 985,540 Q990,640 980,735 Q700,744 430,735 Q420,620 400,500Z", lx: 620, ly: 640 },
+  { name: "중앙동", fill: "#f3f8df", d: "M22,24 Q170,6 330,16 Q352,130 360,250 Q280,286 190,300 Q100,286 32,262 Q14,140 22,24Z", lx: 200, ly: 180 },
+  { name: "신흥동", fill: "#fdf1dc", d: "M330,16 Q500,10 660,26 Q650,130 630,230 Q500,236 360,250 Q352,130 330,16Z", lx: 500, ly: 150 },
+  { name: "동부동", fill: "#e6f2f6", d: "M660,26 Q820,20 980,32 Q984,170 970,300 Q840,316 700,320 Q660,280 630,230 Q650,130 660,26Z", lx: 790, ly: 220 },
+  { name: "산성동", fill: "#f8eaf0", d: "M32,262 Q100,286 190,300 Q214,400 230,510 Q150,540 60,560 Q16,480 20,420 Q18,340 32,262Z", lx: 110, ly: 480 },
+  { name: "교동", fill: "#eef5e4", d: "M190,300 Q280,286 360,250 Q500,236 630,230 Q660,280 700,320 Q676,400 640,470 Q520,488 400,500 Q316,508 230,510 Q214,400 190,300Z", lx: 430, ly: 400 },
+  { name: "남산동", fill: "#fbf0e2", d: "M700,320 Q840,316 970,300 Q990,420 985,540 Q850,556 720,560 Q690,510 640,470 Q676,400 700,320Z", lx: 840, ly: 400 },
+  { name: "수정동", fill: "#e8f1f8", d: "M60,560 Q150,540 230,510 Q316,508 400,500 Q420,620 430,735 Q250,742 70,735 Q52,650 60,560Z", lx: 250, ly: 590 },
+  { name: "신촌동", fill: "#f1ecf8", d: "M400,500 Q520,488 640,470 Q690,510 720,560 Q850,556 985,540 Q990,640 980,735 Q700,744 430,735 Q420,620 400,500Z", lx: 620, ly: 640 },
 ];
 
 const PLACES: Place[] = [
-  { id: "p1", name: "해오름 마을회의실", dong: "해오름동", address: "○○시 해오름로 12", category: "meeting", hours: [9, 22], closedDay: "일요일", capacity: 20, fee: "무료", reserve: "인터넷", pick: "선착순", phone: "000-100-0101", facilities: ["빔프로젝터", "화이트보드", "와이파이"], x: 260, y: 90 },
-  { id: "p2", name: "솔빛 청년공유실", dong: "솔빛동", address: "○○시 솔빛길 34", category: "meeting", hours: [10, 21], closedDay: "월요일", capacity: 12, fee: "무료", reserve: "인터넷", pick: "선착순", phone: "000-100-0102", facilities: ["TV 화면", "와이파이", "음료 반입"], x: 420, y: 90 },
-  { id: "p3", name: "가람 주민회의실", dong: "가람동", address: "○○시 가람대로 101", category: "meeting", hours: [9, 18], closedDay: "주말", capacity: 30, fee: "유료", feeDetail: "시간당 10,000원", reserve: "전화", pick: "선착순", phone: "000-100-0103", facilities: ["빔프로젝터", "마이크", "주차"], x: 590, y: 360 },
-  { id: "p4", name: "미르 소모임실", dong: "미르동", address: "○○시 미르로 8", category: "meeting", hours: [9, 22], closedDay: "없음", capacity: 8, fee: "무료", reserve: "인터넷", pick: "선착순", phone: "000-100-0104", facilities: ["화이트보드", "와이파이"], x: 500, y: 600 },
-  { id: "p5", name: "누리 목공방", dong: "누리동", address: "○○시 누리로 45", category: "studio", hours: [10, 20], closedDay: "월요일", capacity: 10, fee: "유료", feeDetail: "재료비 별도", reserve: "전화", pick: "선착순", phone: "000-100-0201", facilities: ["공구 대여", "앞치마", "환기 시설"], x: 720, y: 100 },
-  { id: "p6", name: "새터 도자기 공방", dong: "새터동", address: "○○시 새터길 7", category: "studio", hours: [11, 19], closedDay: "화요일", capacity: 8, fee: "유료", feeDetail: "1회 20,000원", reserve: "현장방문", pick: "선착순", phone: "000-100-0202", facilities: ["가마", "앞치마"], x: 80, y: 340 },
-  { id: "p7", name: "한울 메이커스페이스", dong: "한울동", address: "○○시 한울대로 220", category: "studio", hours: [9, 21], closedDay: "일요일", capacity: 16, fee: "무료", reserve: "인터넷", pick: "추첨", phone: "000-100-0203", facilities: ["3D 프린터", "레이저 커터", "교육 프로그램"], x: 750, y: 370 },
-  { id: "p8", name: "다솜 음악연습실", dong: "다솜동", address: "○○시 다솜로 19", category: "studio", hours: [13, 22], closedDay: "월요일", capacity: 6, fee: "무료", reserve: "인터넷", pick: "추첨", phone: "000-100-0204", facilities: ["방음 시설", "피아노", "앰프"], x: 120, y: 650 },
-  { id: "p9", name: "해오름 작은도서관", dong: "해오름동", address: "○○시 해오름로 58", category: "library", hours: [10, 19], closedDay: "월요일", capacity: 25, fee: "무료", reserve: "현장방문", pick: "선착순", phone: "000-100-0301", facilities: ["열람석", "어린이 책", "와이파이"], x: 90, y: 230 },
-  { id: "p10", name: "솔빛 책마루", dong: "솔빛동", address: "○○시 솔빛길 90", category: "library", hours: [9, 18], closedDay: "일요일", capacity: 18, fee: "무료", reserve: "현장방문", pick: "선착순", phone: "000-100-0302", facilities: ["열람석", "스터디룸"], x: 580, y: 200 },
-  { id: "p11", name: "가람 마을서재", dong: "가람동", address: "○○시 가람대로 15", category: "library", hours: [10, 20], closedDay: "화요일", capacity: 15, fee: "무료", reserve: "현장방문", pick: "선착순", phone: "000-100-0303", facilities: ["열람석", "노트북석"], x: 300, y: 380 },
-  { id: "p12", name: "미르 그림책방", dong: "미르동", address: "○○시 미르로 77", category: "library", hours: [10, 18], closedDay: "월요일", capacity: 14, fee: "무료", reserve: "현장방문", pick: "선착순", phone: "000-100-0304", facilities: ["어린이 책", "수유실"], x: 720, y: 700 },
-  { id: "p13", name: "누리 생활체육관", dong: "누리동", address: "○○시 누리로 150", category: "sports", hours: [6, 22], closedDay: "없음", capacity: 60, fee: "유료", feeDetail: "1회 3,000원", reserve: "인터넷", pick: "추첨", phone: "000-100-0401", facilities: ["샤워실", "주차", "탈의실"], x: 690, y: 270 },
-  { id: "p14", name: "새터 탁구장", dong: "새터동", address: "○○시 새터길 42", category: "sports", hours: [9, 21], closedDay: "일요일", capacity: 16, fee: "무료", reserve: "현장방문", pick: "선착순", phone: "000-100-0402", facilities: ["탁구대 4대", "탈의실"], x: 210, y: 470 },
-  { id: "p15", name: "한울 풋살장", dong: "한울동", address: "○○시 한울대로 310", category: "sports", hours: [7, 22], closedDay: "없음", capacity: 20, fee: "유료", feeDetail: "2시간 40,000원", reserve: "인터넷", pick: "추첨", phone: "000-100-0403", facilities: ["야간 조명", "주차"], x: 930, y: 480 },
-  { id: "p16", name: "가람 요가실", dong: "가람동", address: "○○시 가람대로 180", category: "sports", hours: [7, 21], closedDay: "주말", capacity: 15, fee: "무료", reserve: "인터넷", pick: "선착순", phone: "000-100-0404", facilities: ["요가 매트", "탈의실"], x: 520, y: 470 },
-  { id: "p17", name: "해오름 마을부엌", dong: "해오름동", address: "○○시 해오름로 30", category: "community", hours: [10, 20], closedDay: "주말", capacity: 12, fee: "유료", feeDetail: "1회 5,000원", reserve: "전화", pick: "선착순", phone: "000-100-0501", facilities: ["조리 기구", "냉장고", "식탁"], x: 300, y: 210 },
-  { id: "p18", name: "누리 공동육아방", dong: "누리동", address: "○○시 누리로 12", category: "community", hours: [10, 17], closedDay: "주말", capacity: 12, fee: "무료", reserve: "인터넷", pick: "선착순", phone: "000-100-0502", facilities: ["수유실", "장난감 대여"], x: 920, y: 250 },
-  { id: "p19", name: "다솜 주민사랑방", dong: "다솜동", address: "○○시 다솜로 60", category: "community", hours: [9, 19], closedDay: "일요일", capacity: 18, fee: "무료", reserve: "전화", pick: "선착순", phone: "000-100-0503", facilities: ["다과 준비", "좌식 탁자"], x: 340, y: 560 },
-  { id: "p20", name: "미르 어르신 쉼터", dong: "미르동", address: "○○시 미르로 120", category: "community", hours: [9, 18], closedDay: "주말", capacity: 25, fee: "무료", reserve: "현장방문", pick: "선착순", phone: "000-100-0504", facilities: ["안마 의자", "건강 체조"], x: 930, y: 650 },
+  { id: "p1", name: "중앙동 마을회의실", dong: "중앙동", address: "○○시 중앙로 12", category: "meeting", hours: [9, 22], closedDay: "일요일", capacity: 20, fee: "무료", reserve: "인터넷", pick: "선착순", phone: "000-100-0101", facilities: ["빔프로젝터", "화이트보드", "와이파이"], x: 260, y: 90 },
+  { id: "p2", name: "신흥동 청년공유실", dong: "신흥동", address: "○○시 신흥로 34", category: "meeting", hours: [10, 21], closedDay: "월요일", capacity: 12, fee: "무료", reserve: "인터넷", pick: "선착순", phone: "000-100-0102", facilities: ["TV 화면", "와이파이", "음료 반입"], x: 420, y: 90 },
+  { id: "p3", name: "교동 주민회의실", dong: "교동", address: "○○시 교동로 101", category: "meeting", hours: [9, 18], closedDay: "주말", capacity: 30, fee: "유료", feeDetail: "시간당 10,000원", reserve: "전화", pick: "선착순", phone: "000-100-0103", facilities: ["빔프로젝터", "마이크", "주차"], x: 590, y: 360 },
+  { id: "p4", name: "신촌동 소모임실", dong: "신촌동", address: "○○시 신촌로 8", category: "meeting", hours: [9, 22], closedDay: "없음", capacity: 8, fee: "무료", reserve: "인터넷", pick: "선착순", phone: "000-100-0104", facilities: ["화이트보드", "와이파이"], x: 500, y: 600 },
+  { id: "p5", name: "동부동 목공방", dong: "동부동", address: "○○시 동부로 45", category: "studio", hours: [10, 20], closedDay: "월요일", capacity: 10, fee: "유료", feeDetail: "재료비 별도", reserve: "전화", pick: "선착순", phone: "000-100-0201", facilities: ["공구 대여", "앞치마", "환기 시설"], x: 720, y: 100 },
+  { id: "p6", name: "산성동 도자기 공방", dong: "산성동", address: "○○시 산성로 7", category: "studio", hours: [11, 19], closedDay: "화요일", capacity: 8, fee: "유료", feeDetail: "1회 20,000원", reserve: "현장방문", pick: "선착순", phone: "000-100-0202", facilities: ["가마", "앞치마"], x: 80, y: 340 },
+  { id: "p7", name: "남산동 메이커스페이스", dong: "남산동", address: "○○시 남산로 220", category: "studio", hours: [9, 21], closedDay: "일요일", capacity: 16, fee: "무료", reserve: "인터넷", pick: "추첨", phone: "000-100-0203", facilities: ["3D 프린터", "레이저 커터", "교육 프로그램"], x: 750, y: 370 },
+  { id: "p8", name: "수정동 음악연습실", dong: "수정동", address: "○○시 수정로 19", category: "studio", hours: [13, 22], closedDay: "월요일", capacity: 6, fee: "무료", reserve: "인터넷", pick: "추첨", phone: "000-100-0204", facilities: ["방음 시설", "피아노", "앰프"], x: 120, y: 650 },
+  { id: "p9", name: "중앙동 작은도서관", dong: "중앙동", address: "○○시 중앙로 58", category: "library", hours: [10, 19], closedDay: "월요일", capacity: 25, fee: "무료", reserve: "현장방문", pick: "선착순", phone: "000-100-0301", facilities: ["열람석", "어린이 책", "와이파이"], x: 90, y: 230 },
+  { id: "p10", name: "신흥동 책마루", dong: "신흥동", address: "○○시 신흥로 90", category: "library", hours: [9, 18], closedDay: "일요일", capacity: 18, fee: "무료", reserve: "현장방문", pick: "선착순", phone: "000-100-0302", facilities: ["열람석", "스터디룸"], x: 580, y: 200 },
+  { id: "p11", name: "교동 마을서재", dong: "교동", address: "○○시 교동로 15", category: "library", hours: [10, 20], closedDay: "화요일", capacity: 15, fee: "무료", reserve: "현장방문", pick: "선착순", phone: "000-100-0303", facilities: ["열람석", "노트북석"], x: 300, y: 380 },
+  { id: "p12", name: "신촌동 그림책방", dong: "신촌동", address: "○○시 신촌로 77", category: "library", hours: [10, 18], closedDay: "월요일", capacity: 14, fee: "무료", reserve: "현장방문", pick: "선착순", phone: "000-100-0304", facilities: ["어린이 책", "수유실"], x: 720, y: 700 },
+  { id: "p13", name: "동부동 생활체육관", dong: "동부동", address: "○○시 동부로 150", category: "sports", hours: [6, 22], closedDay: "없음", capacity: 60, fee: "유료", feeDetail: "1회 3,000원", reserve: "인터넷", pick: "추첨", phone: "000-100-0401", facilities: ["샤워실", "주차", "탈의실"], x: 690, y: 270 },
+  { id: "p14", name: "산성동 탁구장", dong: "산성동", address: "○○시 산성로 42", category: "sports", hours: [9, 21], closedDay: "일요일", capacity: 16, fee: "무료", reserve: "현장방문", pick: "선착순", phone: "000-100-0402", facilities: ["탁구대 4대", "탈의실"], x: 210, y: 470 },
+  { id: "p15", name: "남산동 풋살장", dong: "남산동", address: "○○시 남산로 310", category: "sports", hours: [7, 22], closedDay: "없음", capacity: 20, fee: "유료", feeDetail: "2시간 40,000원", reserve: "인터넷", pick: "추첨", phone: "000-100-0403", facilities: ["야간 조명", "주차"], x: 930, y: 480 },
+  { id: "p16", name: "교동 요가실", dong: "교동", address: "○○시 교동로 180", category: "sports", hours: [7, 21], closedDay: "주말", capacity: 15, fee: "무료", reserve: "인터넷", pick: "선착순", phone: "000-100-0404", facilities: ["요가 매트", "탈의실"], x: 520, y: 470 },
+  { id: "p17", name: "중앙동 마을부엌", dong: "중앙동", address: "○○시 중앙로 30", category: "community", hours: [10, 20], closedDay: "주말", capacity: 12, fee: "유료", feeDetail: "1회 5,000원", reserve: "전화", pick: "선착순", phone: "000-100-0501", facilities: ["조리 기구", "냉장고", "식탁"], x: 300, y: 210 },
+  { id: "p18", name: "동부동 공동육아방", dong: "동부동", address: "○○시 동부로 12", category: "community", hours: [10, 17], closedDay: "주말", capacity: 12, fee: "무료", reserve: "인터넷", pick: "선착순", phone: "000-100-0502", facilities: ["수유실", "장난감 대여"], x: 920, y: 250 },
+  { id: "p19", name: "수정동 주민사랑방", dong: "수정동", address: "○○시 수정로 60", category: "community", hours: [9, 19], closedDay: "일요일", capacity: 18, fee: "무료", reserve: "전화", pick: "선착순", phone: "000-100-0503", facilities: ["다과 준비", "좌식 탁자"], x: 340, y: 560 },
+  { id: "p20", name: "신촌동 어르신 쉼터", dong: "신촌동", address: "○○시 신촌로 120", category: "community", hours: [9, 18], closedDay: "주말", capacity: 25, fee: "무료", reserve: "현장방문", pick: "선착순", phone: "000-100-0504", facilities: ["안마 의자", "건강 체조"], x: 930, y: 650 },
+  { id: "p21", name: "중앙동 행정복지센터 회의실", dong: "중앙동", address: "○○시 중앙로 41", category: "meeting", hours: [9, 18], closedDay: "주말", capacity: 24, fee: "무료", reserve: "인터넷", pick: "선착순", phone: "000-100-0110", facilities: ["빔프로젝터", "마이크"], x: 160, y: 110 },
+  { id: "p22", name: "신흥동 청년센터 세미나실", dong: "신흥동", address: "○○시 신흥로 7", category: "meeting", hours: [10, 21], closedDay: "월요일", capacity: 16, fee: "무료", reserve: "인터넷", pick: "선착순", phone: "000-100-0111", facilities: ["TV 화면", "와이파이"], x: 500, y: 62 },
+  { id: "p23", name: "동부동 마을활력소 회의실", dong: "동부동", address: "○○시 동부로 88", category: "meeting", hours: [9, 21], closedDay: "일요일", capacity: 20, fee: "무료", reserve: "인터넷", pick: "선착순", phone: "000-100-0112", facilities: ["화이트보드", "와이파이"], x: 860, y: 120 },
+  { id: "p24", name: "교동 주민자치회 회의실", dong: "교동", address: "○○시 교동로 63", category: "meeting", hours: [9, 18], closedDay: "주말", capacity: 30, fee: "무료", reserve: "전화", pick: "선착순", phone: "000-100-0113", facilities: ["빔프로젝터", "주차"], x: 385, y: 300 },
+  { id: "p25", name: "남산동 공유오피스 회의실", dong: "남산동", address: "○○시 남산로 140", category: "meeting", hours: [9, 22], closedDay: "없음", capacity: 8, fee: "유료", feeDetail: "시간당 5,000원", reserve: "인터넷", pick: "선착순", phone: "000-100-0114", facilities: ["TV 화면", "와이파이"], x: 820, y: 470 },
+  { id: "p26", name: "수정동 행정복지센터 다목적실", dong: "수정동", address: "○○시 수정로 5", category: "meeting", hours: [9, 18], closedDay: "주말", capacity: 40, fee: "무료", reserve: "인터넷", pick: "선착순", phone: "000-100-0115", facilities: ["마이크", "음향 장비"], x: 175, y: 700 },
+  { id: "p27", name: "신촌동 사회적경제센터 회의실", dong: "신촌동", address: "○○시 신촌로 31", category: "meeting", hours: [9, 20], closedDay: "일요일", capacity: 14, fee: "무료", reserve: "인터넷", pick: "선착순", phone: "000-100-0116", facilities: ["빔프로젝터", "와이파이"], x: 820, y: 610 },
+  { id: "p28", name: "산성동 마을회관 회의실", dong: "산성동", address: "○○시 산성로 15", category: "meeting", hours: [9, 18], closedDay: "주말", capacity: 20, fee: "무료", reserve: "전화", pick: "선착순", phone: "000-100-0117", facilities: ["좌식 탁자"], x: 150, y: 405 },
+  { id: "p29", name: "중앙동 청소년 밴드연습실", dong: "중앙동", address: "○○시 중앙로 77", category: "studio", hours: [14, 22], closedDay: "월요일", capacity: 8, fee: "무료", reserve: "인터넷", pick: "추첨", phone: "000-100-0218", facilities: ["드럼", "앰프", "방음 시설"], x: 60, y: 120 },
+  { id: "p30", name: "교동 공예 공방", dong: "교동", address: "○○시 교동로 22", category: "studio", hours: [10, 19], closedDay: "일요일", capacity: 10, fee: "유료", feeDetail: "재료비 별도", reserve: "전화", pick: "선착순", phone: "000-100-0219", facilities: ["작업대", "공구 대여"], x: 465, y: 282 },
+  { id: "p31", name: "신촌동 영상 녹음실", dong: "신촌동", address: "○○시 신촌로 95", category: "studio", hours: [10, 21], closedDay: "월요일", capacity: 4, fee: "무료", reserve: "인터넷", pick: "추첨", phone: "000-100-0220", facilities: ["녹음 부스", "조명"], x: 600, y: 705 },
+  { id: "p32", name: "남산동 댄스 연습실", dong: "남산동", address: "○○시 남산로 61", category: "studio", hours: [10, 22], closedDay: "일요일", capacity: 15, fee: "유료", feeDetail: "2시간 10,000원", reserve: "인터넷", pick: "선착순", phone: "000-100-0221", facilities: ["전신 거울", "음향 장비"], x: 905, y: 380 },
+  { id: "p33", name: "수정동 창작 공방", dong: "수정동", address: "○○시 수정로 48", category: "studio", hours: [10, 18], closedDay: "월요일", capacity: 12, fee: "무료", reserve: "현장방문", pick: "선착순", phone: "000-100-0222", facilities: ["작업대", "재봉틀"], x: 385, y: 665 },
+  { id: "p34", name: "신흥동 행정복지센터 작은도서관", dong: "신흥동", address: "○○시 신흥로 52", category: "library", hours: [10, 19], closedDay: "월요일", capacity: 20, fee: "무료", reserve: "현장방문", pick: "선착순", phone: "000-100-0323", facilities: ["열람석", "어린이 책"], x: 385, y: 170 },
+  { id: "p35", name: "동부동 아파트 작은도서관", dong: "동부동", address: "○○시 동부로 203", category: "library", hours: [10, 18], closedDay: "일요일", capacity: 16, fee: "무료", reserve: "현장방문", pick: "선착순", phone: "000-100-0324", facilities: ["열람석"], x: 870, y: 205 },
+  { id: "p36", name: "교동 어린이도서관", dong: "교동", address: "○○시 교동로 120", category: "library", hours: [9, 18], closedDay: "월요일", capacity: 30, fee: "무료", reserve: "현장방문", pick: "선착순", phone: "000-100-0325", facilities: ["어린이 책", "수유실"], x: 640, y: 425 },
+  { id: "p37", name: "산성동 마을문고", dong: "산성동", address: "○○시 산성로 70", category: "library", hours: [10, 17], closedDay: "주말", capacity: 10, fee: "무료", reserve: "현장방문", pick: "선착순", phone: "000-100-0326", facilities: ["열람석"], x: 60, y: 505 },
+  { id: "p38", name: "신촌동 북카페 쉼표", dong: "신촌동", address: "○○시 신촌로 150", category: "library", hours: [10, 20], closedDay: "월요일", capacity: 18, fee: "무료", reserve: "현장방문", pick: "선착순", phone: "000-100-0327", facilities: ["열람석", "음료 반입"], x: 880, y: 712 },
+  { id: "p39", name: "중앙동 게이트볼장", dong: "중앙동", address: "○○시 중앙로 120", category: "sports", hours: [6, 18], closedDay: "없음", capacity: 30, fee: "무료", reserve: "현장방문", pick: "선착순", phone: "000-100-0428", facilities: ["야외 벤치"], x: 245, y: 262 },
+  { id: "p40", name: "신흥동 배드민턴장", dong: "신흥동", address: "○○시 신흥로 110", category: "sports", hours: [6, 22], closedDay: "없음", capacity: 40, fee: "유료", feeDetail: "1회 2,000원", reserve: "인터넷", pick: "선착순", phone: "000-100-0429", facilities: ["탈의실", "샤워실"], x: 625, y: 110 },
+  { id: "p41", name: "교동 생활체육공원 테니스장", dong: "교동", address: "○○시 교동로 200", category: "sports", hours: [6, 22], closedDay: "없음", capacity: 16, fee: "유료", feeDetail: "2시간 8,000원", reserve: "인터넷", pick: "추첨", phone: "000-100-0430", facilities: ["야간 조명", "주차"], x: 410, y: 462 },
+  { id: "p42", name: "수정동 다목적 체육관", dong: "수정동", address: "○○시 수정로 101", category: "sports", hours: [7, 21], closedDay: "월요일", capacity: 50, fee: "유료", feeDetail: "1회 2,500원", reserve: "인터넷", pick: "선착순", phone: "000-100-0431", facilities: ["샤워실", "탈의실"], x: 290, y: 700 },
+  { id: "p43", name: "남산동 공공 수영장", dong: "남산동", address: "○○시 남산로 18", category: "sports", hours: [6, 21], closedDay: "월요일", capacity: 80, fee: "유료", feeDetail: "1회 3,500원", reserve: "인터넷", pick: "선착순", phone: "000-100-0432", facilities: ["샤워실", "주차"], x: 720, y: 505 },
+  { id: "p44", name: "신흥동 공유부엌", dong: "신흥동", address: "○○시 신흥로 29", category: "community", hours: [10, 20], closedDay: "월요일", capacity: 10, fee: "유료", feeDetail: "1회 5,000원", reserve: "전화", pick: "선착순", phone: "000-100-0533", facilities: ["조리 기구", "식탁"], x: 455, y: 225 },
+  { id: "p45", name: "교동 다함께돌봄센터", dong: "교동", address: "○○시 교동로 48", category: "community", hours: [13, 19], closedDay: "주말", capacity: 20, fee: "무료", reserve: "전화", pick: "선착순", phone: "000-100-0534", facilities: ["놀이 공간", "간식"], x: 325, y: 452 },
+  { id: "p46", name: "남산동 경로당 사랑방", dong: "남산동", address: "○○시 남산로 230", category: "community", hours: [9, 17], closedDay: "일요일", capacity: 30, fee: "무료", reserve: "현장방문", pick: "선착순", phone: "000-100-0535", facilities: ["안마 의자", "좌식 탁자"], x: 905, y: 560 },
+  { id: "p47", name: "신촌동 마을 공유창고", dong: "신촌동", address: "○○시 신촌로 66", category: "community", hours: [10, 18], closedDay: "주말", capacity: 6, fee: "무료", reserve: "인터넷", pick: "선착순", phone: "000-100-0536", facilities: ["공구 대여", "캠핑 용품"], x: 760, y: 610 },
 ];
 
 /** 인터넷 예약을 받는 곳은 접수중, 전화·현장방문만 받는 곳은 안내중 */
@@ -319,7 +346,6 @@ export function CommunityMapDemo() {
   }, [query, cats, openOnly, now, fee, pick, status]);
 
   const selected = PLACES.find((p) => p.id === selectedId) ?? null;
-  const openCount = now ? PLACES.filter((p) => isOpenAt(p, now)).length : null;
   const detailCount = (fee !== "전체" ? 1 : 0) + (pick !== "전체" ? 1 : 0) + (status !== "전체" ? 1 : 0);
 
   const toggleCat = (id: CategoryId) => setCats((prev) => (prev.includes(id) ? prev.filter((c) => c !== id) : [...prev, id]));
@@ -370,7 +396,7 @@ export function CommunityMapDemo() {
     <div className="flex h-[100dvh] min-h-[560px] flex-col overflow-hidden text-[17px] leading-[1.5]" style={{ color: INK, backgroundColor: MAP_BG }}>
       <style>{`
         @keyframes nb-pin-in { from { opacity: 0; translate: 0 -14px; } to { opacity: 1; translate: 0 0; } }
-        .nb-pin { transform: translate(-50%, -100%) rotate(var(--tilt)); transform-origin: 50% 100%; animation: nb-pin-in .42s cubic-bezier(.2,.8,.25,1.2) both; }
+        .nb-pin { transform: translate(-50%, -100%) rotate(var(--tilt)); transform-origin: 50% 100%; animation: nb-pin-in .32s cubic-bezier(.22,1,.36,1) both; }
         .nb-pin[data-active="true"] { transform: translate(-50%, -100%) scale(1.15); }
         @media (prefers-reduced-motion: reduce) { .nb-pin { animation: none; } }
       `}</style>
@@ -415,11 +441,9 @@ export function CommunityMapDemo() {
             <a href="#place-panel" className="hover:underline">나의 예약내역</a>
             <a href="#place-panel" className="hover:underline">공지사항</a>
           </nav>
-          {openCount !== null && (
-            <p className="ml-auto text-[15px] xl:ml-0" style={{ color: INK_SOFT }}>
-              운영 중 <b style={{ color: LEAF }}>{openCount}</b>곳
-            </p>
-          )}
+          <p className="ml-auto text-[15px] xl:ml-0" style={{ color: INK_SOFT }}>
+            등록 시설 <b style={{ color: LEAF }}>{PLACES.length}</b>곳
+          </p>
         </div>
       </header>
 
@@ -462,7 +486,7 @@ export function CommunityMapDemo() {
                     {
                       left: `${(p.x / W) * 100}%`,
                       top: `${(p.y / H) * 100}%`,
-                      animationDelay: `${i * 28}ms`,
+                      animationDelay: `${Math.min(i, 30) * 12}ms`,
                       zIndex: active ? 30 : 10,
                       "--tilt": `${((i % 3) - 1) * 5}deg`,
                     } as React.CSSProperties
@@ -523,12 +547,10 @@ export function CommunityMapDemo() {
                   type="button"
                   aria-pressed={on}
                   onClick={() => toggleCat(c.id)}
-                  className="inline-flex h-11 shrink-0 items-center gap-1.5 rounded-[6px] border-2 pl-1.5 pr-3 text-[15px] font-bold shadow-[0_2px_6px_rgba(35,48,42,0.2)] transition-colors"
+                  className="inline-flex h-11 shrink-0 items-center gap-1.5 rounded-[6px] border-2 px-3 text-[15px] font-bold shadow-[0_2px_6px_rgba(35,48,42,0.2)] transition-colors"
                   style={on ? { backgroundColor: c.color, borderColor: c.color, color: "#fff" } : { backgroundColor: "#fff", borderColor: "#fff", color: INK }}
                 >
-                  <span className="flex h-7 w-7 items-center justify-center rounded-[4px]" style={{ backgroundColor: on ? "rgba(255,255,255,0.22)" : c.tint }}>
-                    <Icon size={15} strokeWidth={2.4} style={{ color: on ? "#fff" : c.color }} aria-hidden />
-                  </span>
+                  <Icon size={17} strokeWidth={2.2} style={{ color: on ? "#fff" : c.color }} aria-hidden />
                   {c.label}
                 </button>
               );
@@ -554,7 +576,7 @@ export function CommunityMapDemo() {
           className={`${panelVisibility} absolute inset-x-0 bottom-0 z-30 h-[58%] flex-col overflow-hidden rounded-t-[12px] bg-white shadow-[0_-6px_20px_rgba(35,48,42,0.18)] lg:inset-x-auto lg:bottom-3 lg:left-3 lg:top-3 lg:h-auto lg:w-[380px] lg:rounded-[12px] lg:shadow-[0_6px_20px_rgba(35,48,42,0.18)]`}
         >
           {detailOpen && selected ? (
-            <PlaceDetail place={selected} now={now} onBack={() => setDetailOpen(false)} />
+            <PlaceDetail place={selected} onBack={() => setDetailOpen(false)} />
           ) : (
             <>
               <div className="shrink-0 border-b px-4 pb-3 pt-3" style={{ borderColor: LINE }}>
@@ -599,18 +621,15 @@ export function CommunityMapDemo() {
                           className="flex w-full gap-3 border-l-4 px-4 py-3 text-left transition-colors"
                           style={{ borderLeftColor: active ? c.color : "transparent", backgroundColor: active ? "#f6faf7" : undefined }}
                         >
-                          <span className="mt-0.5 flex h-10 w-10 shrink-0 items-center justify-center rounded-[10px]" style={{ backgroundColor: c.tint }}>
-                            <Icon size={20} strokeWidth={2.2} style={{ color: c.color }} aria-hidden />
-                          </span>
+                          <Icon size={20} strokeWidth={2.2} className="mt-1 shrink-0" style={{ color: c.color }} aria-hidden />
                           <span className="min-w-0 flex-1">
-                            <span className="flex flex-wrap gap-1">
-                              <Badge tone={statusOf(p) === "접수중" ? "blue" : "gray"}>{statusOf(p)}</Badge>
-                              <Badge tone={p.fee === "무료" ? "green" : "amber"}>{p.fee}</Badge>
-                              <Badge tone="gray">{p.pick}</Badge>
+                            <span className="flex flex-wrap items-center gap-x-1.5 gap-y-1">
+                              <span className="text-[17px] font-bold">{p.name}</span>
+                              {statusOf(p) === "접수중" && <Badge tone="blue">접수중</Badge>}
+                              {p.pick === "추첨" && <Badge tone="amber">추첨</Badge>}
                             </span>
-                            <span className="mt-1 block text-[17px] font-bold">{p.name}</span>
                             <span className="block text-[15px]" style={{ color: INK_SOFT }}>
-                              {c.label} · {p.dong} · 수용인원 {p.capacity}명
+                              {c.label} · {p.dong} · {p.capacity}명 · {p.feeDetail ? `${p.fee} ${p.feeDetail}` : p.fee}
                             </span>
                             <span className="mt-0.5 flex flex-wrap items-center gap-x-2 text-[15px]" style={{ color: INK_SOFT }}>
                               {fmtHours(p.hours)}
@@ -692,10 +711,9 @@ function DetailFilters({
   );
 }
 
-function PlaceDetail({ place, now, onBack }: { place: Place; now: Date | null; onBack: () => void }) {
+function PlaceDetail({ place, onBack }: { place: Place; onBack: () => void }) {
   const c = categoryOf(place.category);
   const Icon = c.icon;
-  const open = now ? isOpenAt(place, now) : null;
   const backRef = useRef<HTMLButtonElement>(null);
 
   useEffect(() => {
@@ -724,9 +742,7 @@ function PlaceDetail({ place, now, onBack }: { place: Place; now: Date | null; o
       </div>
       <div className="min-h-0 flex-1 overflow-y-auto px-4 pb-24 pt-4">
         <div className="flex items-start gap-3">
-          <span className="flex h-11 w-11 shrink-0 items-center justify-center rounded-[10px]" style={{ backgroundColor: c.color }}>
-            <Icon size={20} color="#fff" strokeWidth={2.4} aria-hidden />
-          </span>
+          <Icon size={24} strokeWidth={2.2} className="mt-1 shrink-0" style={{ color: c.color }} aria-hidden />
           <div className="min-w-0">
             <p className="text-[15px]" style={{ color: INK_SOFT }}>
               {c.label} · {place.dong}
@@ -738,9 +754,7 @@ function PlaceDetail({ place, now, onBack }: { place: Place; now: Date | null; o
         </div>
         <p className="mt-3 flex flex-wrap gap-1">
           <Badge tone={statusOf(place) === "접수중" ? "blue" : "gray"}>{statusOf(place)}</Badge>
-          <Badge tone={place.fee === "무료" ? "green" : "amber"}>{place.fee}</Badge>
-          <Badge tone="gray">{place.pick}</Badge>
-          {open !== null && <Badge tone={open ? "green" : "gray"}>{open ? "운영중" : "운영종료"}</Badge>}
+          {place.pick === "추첨" && <Badge tone="amber">추첨</Badge>}
         </p>
 
         <div className="mt-4 grid grid-cols-3 gap-2">
