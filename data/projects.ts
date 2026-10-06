@@ -7,7 +7,7 @@ export const projects: Project[] = [
     id: "online-store",
     kind: "신규 제작",
     category: "쇼핑몰",
-    layout: "카페24형",
+    layout: "자사몰형",
     title: "도자기 공방 자사 쇼핑몰",
     description: "유약 색을 누르면 그릇 사진의 색이 바뀝니다. 각인 글씨와 포장도 주문 전에 미리 봅니다.",
     features: ["유약 색 미리보기", "각인·포장 미리보기", "지역별 도착일 계산"],
@@ -42,7 +42,7 @@ export const projects: Project[] = [
   {
     id: "company",
     kind: "신규 제작",
-    category: "기업 홈페이지",
+    category: "기업",
     layout: "전통 기업형",
     title: "정밀가공 제조업 회사 홈페이지",
     description: "재질과 크기를 넣으면 가공할 수 있는지 먼저 알려 줍니다. 견적 문의에 도면을 붙일 수 있습니다.",
@@ -54,7 +54,7 @@ export const projects: Project[] = [
   {
     id: "cert-lab",
     kind: "신규 제작",
-    category: "기업 홈페이지",
+    category: "기업",
     layout: "게시판형",
     title: "시험인증기관 홈페이지 리뉴얼",
     description: "제품 조건에 맞는 KC·해외 인증과 걸리는 기간을 찾아 줍니다. 접수번호로 시험 진행 단계도 봅니다.",
@@ -66,7 +66,7 @@ export const projects: Project[] = [
   {
     id: "dental-homepage",
     kind: "신규 제작",
-    category: "병원 홈페이지",
+    category: "병원",
     layout: "퀵메뉴형",
     title: "치과 홈페이지",
     description: "아픈 이를 그림에서 누르면 진료 방법, 건강보험 적용 여부, 대략의 비용이 나옵니다.",
@@ -78,7 +78,7 @@ export const projects: Project[] = [
   {
     id: "clinic-homepage",
     kind: "신규 제작",
-    category: "병원 홈페이지",
+    category: "병원",
     layout: "진료·미용 분리형",
     title: "피부과 홈페이지",
     description: "진료시간, 의료진, 비급여 진료비, 오시는 길만 담은 의원 홈페이지입니다.",
@@ -90,7 +90,7 @@ export const projects: Project[] = [
   {
     id: "pharmacy",
     kind: "신규 제작",
-    category: "약국 홈페이지",
+    category: "약국",
     layout: "운영 안내형",
     title: "동네 약국 홈페이지",
     description: "처방전 사진을 미리 보내고 번호표를 받습니다. 어르신이 읽기 쉽게 글자 크게 보기 버튼을 달았습니다.",
@@ -114,7 +114,7 @@ export const projects: Project[] = [
   {
     id: "law-firm",
     kind: "신규 제작",
-    category: "전문직 홈페이지",
+    category: "전문직",
     layout: "로펌형",
     title: "법률사무소 홈페이지",
     description: "내 상황을 고르면 절차와 준비 서류를 차례로 보여 줍니다. 상담 예약도 같은 화면에서 합니다.",
@@ -126,7 +126,7 @@ export const projects: Project[] = [
   {
     id: "tax-office",
     kind: "신규 제작",
-    category: "전문직 홈페이지",
+    category: "전문직",
     layout: "박스 배치형",
     title: "세무회계 사무소 홈페이지",
     description: "사업자 유형을 고르면 올해 세금 신고 날짜가 달력에 찍힙니다. 기장료도 바로 계산해 봅니다.",
@@ -138,7 +138,7 @@ export const projects: Project[] = [
   {
     id: "real-estate",
     kind: "신규 제작",
-    category: "부동산 홈페이지",
+    category: "부동산",
     layout: "검색 우선형",
     title: "공인중개사사무소 홈페이지",
     description: "지도에서 매물을 고르고 중개보수 상한을 계산합니다. 전세와 월세 중 어느 쪽이 덜 드는지도 비교합니다.",
@@ -174,7 +174,7 @@ export const projects: Project[] = [
   {
     id: "hanok-cafe",
     kind: "신규 제작",
-    category: "가게 홈페이지",
+    category: "가게",
     layout: "공간 중심형",
     title: "한옥 찻집 홈페이지",
     description: "'따뜻하고 덜 단 차'처럼 문장으로 메뉴를 고르고, 평면도에서 방을 눌러 자리를 잡습니다.",
@@ -186,7 +186,7 @@ export const projects: Project[] = [
   {
     id: "bakery-cafe",
     kind: "신규 제작",
-    category: "가게 홈페이지",
+    category: "가게",
     layout: "매장 주문형",
     title: "베이커리 카페 홈페이지",
     description: "빵마다 나오는 시간을 시계 그림에 표시했습니다. 쟁반에 담고 찾으러 올 시간을 정합니다.",
@@ -246,7 +246,7 @@ export const projects: Project[] = [
   {
     id: "district-portal",
     kind: "신규 제작",
-    category: "공공기관 홈페이지",
+    category: "공공기관",
     layout: "전통 포털형",
     title: "구청 홈페이지",
     description: "자주 찾는 민원과 부서 전화번호 찾기를 첫 화면에 두었습니다.",
@@ -282,7 +282,7 @@ export const projects: Project[] = [
   {
     id: "flower-expo",
     kind: "신규 제작",
-    category: "축제 홈페이지",
+    category: "축제",
     layout: "축제 안내형",
     title: "꽃박람회 축제 홈페이지",
     description: "누구와 언제 가는지 고르면 관람 동선을 지도에 그려 줍니다.",
