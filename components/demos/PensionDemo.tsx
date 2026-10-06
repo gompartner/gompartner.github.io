@@ -1111,11 +1111,11 @@ function GuideShortcuts({ go }: { go: Go }) {
 }
 
 const PLACES = [
-  { name: "□□ 해수욕장", how: "도보 3분", body: "정원 끝 계단으로 내려가면 바로 모래사장이에요." },
-  { name: "□□ 해안 산책로", how: "도보 15분", body: "바위 해안을 따라 2km쯤 걸을 수 있어요." },
-  { name: "□□ 등대 전망대", how: "차량 8분", body: "펜션 마당에서 보이는 빨간 등대예요." },
-  { name: "□□항 수산시장", how: "차량 10분", body: "회를 떠 와서 객실에서 드셔도 돼요." },
-  { name: "□□ 전통시장", how: "차량 15분", body: "2, 7일로 끝나는 날에 장이 서요." },
+  { name: "□□ 해수욕장", how: "도보 3분", body: "펜션 바로 앞 해수욕장" },
+  { name: "□□ 해안 산책로", how: "도보 15분", body: "바위 해안을 따라 이어진 약 2km 산책로" },
+  { name: "□□ 등대 전망대", how: "차량 8분", body: "펜션 마당에서 보이는 빨간 등대" },
+  { name: "□□항 수산시장", how: "차량 10분", body: "회 포장 후 객실에서 드실 수 있습니다" },
+  { name: "□□ 전통시장", how: "차량 15분", body: "매달 2, 7로 끝나는 날 오일장" },
 ];
 
 function PlacesSection({ go }: { go: Go }) {
@@ -1234,8 +1234,8 @@ function AboutPage({ go }: { go: Go }) {
             <h2 className="text-[24px] font-bold" style={{ color: C.navy }}>
               인사말
             </h2>
-            <p>{PENSION}은 □□ 해수욕장 바로 앞에 있는 객실 여섯 개짜리 작은 펜션입니다.</p>
-            <p>정원 끝 계단으로 내려가면 바로 모래사장이라 짐 두고 슬리퍼 신고 나가셔도 됩니다.</p>
+            <p>{PENSION}을 찾아 주셔서 감사합니다. □□ 해수욕장 바로 앞, 객실 6개의 작은 펜션입니다.</p>
+            <p>정원 앞 계단으로 내려가시면 바로 백사장입니다. 편히 쉬었다 가실 수 있도록 최선을 다하겠습니다.</p>
             <p className="pt-2 text-[15px]" style={{ color: C.muted }}>
               {PENSION} 대표 {OWNER}
             </p>
@@ -1417,7 +1417,7 @@ function ReservePage({ sel, onPick, go }: { sel: Selection; onPick: (id: string,
   const submit = (e: React.FormEvent) => {
     e.preventDefault();
     if (checkIn === null || !q) return setError("예약현황표에서 객실과 입실일을 선택해 주십시오.");
-    if (name.trim().length < 2) return setError("예약자 이름을 두 글자 이상 입력해 주십시오.");
+    if (name.trim().length < 2) return setError("예약자 이름을 입력해 주십시오.");
     if (phone.replace(/\D/g, "").length < 10) return setError("휴대전화 번호를 입력해 주십시오.");
     if (!arrival) return setError("도착 예정 시간을 선택해 주십시오.");
     if (!agree) return setError("환불규정에 동의해 주십시오.");
@@ -1800,14 +1800,14 @@ const REFUND = [
 
 const NOTES = [
   "예약은 입금 순서로 확정되며, 예약자명과 입금자명이 같아야 합니다.",
-  "기준인원 외 방문객은 입실할 수 없습니다. 인원 추가는 예약할 때 알려 주시기 바랍니다.",
-  "객실 안에서는 금연이며, 고기와 생선을 굽지 못합니다. 흡연은 주차장 옆 흡연 구역을 이용해 주십시오.",
-  "반려동물은 동반할 수 없습니다.",
-  "밤 10시 이후에는 다른 객실 손님을 위해 실외에서 조용히 해 주시기 바랍니다.",
-  "미성년자끼리는 보호자 없이 입실할 수 없습니다.",
-  "주차는 객실당 1대입니다. 추가 차량은 해안길 공영주차장을 이용해 주십시오.",
-  "객실 비품이 파손되거나 없어지면 실비로 배상해야 합니다.",
-  "퇴실할 때 쓰레기는 분리해서 현관 앞에 내놓아 주시기 바랍니다.",
+  "예약 인원 외 방문객은 입실이 불가합니다. 인원 추가는 예약 시 알려 주시기 바랍니다.",
+  "객실 내 금연이며, 육류 및 생선은 굽지 못합니다. 흡연은 주차장 옆 흡연 구역을 이용해 주시기 바랍니다.",
+  "반려동물 동반 입실은 불가합니다.",
+  "밤 10시 이후에는 다른 이용객을 위해 실외 고성방가를 자제하여 주시기 바랍니다.",
+  "미성년자는 보호자 없이 입실이 불가합니다.",
+  "주차는 객실당 1대 가능합니다. 추가 차량은 해안길 공영주차장을 이용해 주시기 바랍니다.",
+  "객실 비품 파손 및 분실 시 실비로 배상하셔야 합니다.",
+  "퇴실 시 뒷정리를 부탁드리며, 쓰레기는 분리수거하여 현관 앞에 놓아 주시기 바랍니다.",
 ];
 
 function GuidePage({ tab, setTab, go, today, checkIn }: { tab: GuideTab; setTab: (t: GuideTab) => void; go: Go; today: number; checkIn: number | null }) {
@@ -1859,8 +1859,8 @@ function GuidePage({ tab, setTab, go, today, checkIn }: { tab: GuideTab; setTab:
               <caption className="sr-only">입실, 퇴실 시간과 추가 요금</caption>
               <tbody>
                 {[
-                  ["입실", "15:00부터 · 일찍 도착하시면 짐을 맡아 드립니다."],
-                  ["퇴실", "11:00까지 · 늦은 퇴실은 전날까지 문의해 주십시오."],
+                  ["입실", "15:00부터 · 일찍 도착하시면 짐 보관 가능"],
+                  ["퇴실", "11:00까지 · 늦은 퇴실은 전날까지 문의 바랍니다"],
                   ["기준인원 초과", `1인 1박 ${won(EXTRA_PERSON)} · 24개월 미만 영유아는 인원에서 제외`],
                   ["바비큐", `17:00 ~ 22:00 · 그릴(숯 포함) ${won(GRILL)}`],
                   ["조식 바구니", `08:00 객실 앞 · 빵, 과일, 커피 1인 ${won(BREAKFAST)}`],
@@ -1926,9 +1926,9 @@ function GuidePage({ tab, setTab, go, today, checkIn }: { tab: GuideTab; setTab:
               )}
               <ul className="mt-4 list-disc space-y-1.5 pl-5 text-[15px]" style={{ color: C.muted }}>
                 <li>취소일은 이용일(입실일) 기준입니다.</li>
-                <li>기상 특보로 이용이 어려우면 날짜를 옮겨 드리거나 전액 환불합니다.</li>
-                <li>환불은 취소 접수 후 3일 안에 입금하신 계좌로 보내 드립니다.</li>
-                <li>날짜 변경은 취소 후 다시 예약하는 것으로 처리합니다.</li>
+                <li>기상 특보 발효로 이용이 어려운 경우 날짜 변경 또는 전액 환불해 드립니다.</li>
+                <li>환불은 취소 접수 후 3일 이내 입금하신 계좌로 처리해 드립니다.</li>
+                <li>날짜 변경은 예약 취소 후 다시 예약하셔야 합니다.</li>
               </ul>
             </>
           )}
@@ -1953,7 +1953,7 @@ function GuidePage({ tab, setTab, go, today, checkIn }: { tab: GuideTab; setTab:
               </dl>
               <ul className="mt-4 list-disc space-y-1.5 pl-5 text-[15px]" style={{ color: C.muted }}>
                 <li>기한 안에 입금하지 않으면 예약이 자동 취소됩니다.</li>
-                <li>예약자명과 입금자명이 다르면 전화로 알려 주시기 바랍니다.</li>
+                <li>예약자명과 입금자명이 다른 경우 전화로 알려 주시기 바랍니다.</li>
                 <li>입금이 확인되면 예약 확정 문자를 보내 드립니다.</li>
               </ul>
             </>
@@ -2070,7 +2070,7 @@ function LocationPage({ go }: { go: Go }) {
                   { icon: null, k: "주소", v: ADDRESS },
                   { icon: Car, k: "자가용", v: "□□ 나들목에서 해안길을 따라 20분 · 펜션 앞 주차장 6대" },
                   { icon: Bus, k: "버스", v: "□□ 터미널에서 군내버스 00번, □□리 정류장 하차 후 도보 5분" },
-                  { icon: Users, k: "픽업", v: "□□ 터미널 도착 전 전화 주시면 시간이 맞을 때 모시러 갑니다." },
+                  { icon: Users, k: "픽업", v: "□□ 터미널 픽업 가능 (도착 전 사전 연락 부탁드립니다)" },
                 ].map((r) => (
                   <tr key={r.k} className="border-b" style={{ borderColor: C.line }}>
                     <th scope="row" className="w-[88px] py-3 pr-2 text-left align-top font-semibold" style={{ color: C.navy }}>
