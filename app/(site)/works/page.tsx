@@ -7,7 +7,7 @@ import { fieldsById } from "@/data/workFilters";
 
 export const metadata: Metadata = {
   title: "제작 사례",
-  description: `병원, 약국, 카페, 공공기관 홈페이지와 업무 프로그램 제작 사례 ${projects.length}건입니다. 모든 사례를 데모로 직접 눌러 볼 수 있습니다.`,
+  description: `병원, 약국, 카페, 공공기관 홈페이지와 업무 프로그램 제작 사례 ${projects.length}건입니다. 모든 사례는 데모로 확인할 수 있습니다.`,
   alternates: { canonical: "/works" },
 };
 

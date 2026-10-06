@@ -105,7 +105,7 @@ export const projects: Project[] = [
     category: "업무 프로그램",
     layout: "결과지 출력형",
     title: "피부 진단 결과지 프로그램",
-    description: "피부 진단기 점수를 넣으면 같은 연령대 평균과 비교한 A4 결과지가 나옵니다.",
+    description: "피부 진단기 점수를 같은 연령대 평균과 비교해 A4 결과지로 출력하는 원내 프로그램입니다.",
     features: ["연령대 평균 비교", "방사형 차트", "A4 인쇄·PDF 저장"],
     imageUrl: "/images/demos/clinic-report-input.jpg",
     imageAlt: "피부 진단 결과지 프로그램의 측정값 입력 화면",
