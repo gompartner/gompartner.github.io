@@ -73,11 +73,6 @@ export function WorksGrid({ projects, marks = [] }: { projects: Project[]; marks
                   );
                 })}
               </ul>
-              {w.realWork && (
-                <p className="mt-4 text-[15px] leading-[1.5] text-foreground-secondary">
-                  <span className="font-bold text-foreground">실제 작업</span> {w.realWork}
-                </p>
-              )}
               <div className="mt-auto flex items-end justify-between gap-3 pt-6">
                 <Link href={w.demoUrl} data-gtm-cta={`demo_open_${w.id}`} className={secondaryButton}>
                   데모 보기

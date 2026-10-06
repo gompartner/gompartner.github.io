@@ -42,7 +42,6 @@ const promises = ["채팅으로 바로 상담", "원본 소스 제공", "완료 
 
 const container = "mx-auto w-full max-w-[1248px] px-4 md:px-6";
 const h2 = "text-[24px] font-bold leading-[1.5] tracking-[-0.01em] md:text-[32px]";
-const lead = "mt-2 text-[17px] leading-[1.5] text-foreground-secondary";
 const primaryButton =
   "inline-flex h-12 items-center justify-center rounded-md bg-accent px-6 text-[17px] font-bold text-accent-foreground transition-colors hover:bg-accent-hover md:h-14 md:px-7";
 const secondaryButton =
@@ -85,7 +84,6 @@ export default function HomePage() {
           <h2 id="works-title" className={h2}>
             제작 사례
           </h2>
-          <p className={lead}>직접 눌러 볼 수 있게 새로 만든 데모입니다. 같은 일을 실제로 해 본 사례는 카드 아래에 그 작업을 적었습니다.</p>
 
           <div className="mt-8">
             <WorksGrid projects={showcase} />
@@ -111,7 +109,6 @@ export default function HomePage() {
           <h2 id="history-title" className={h2}>
             작업 이력
           </h2>
-          <p className={lead}>경력증명서와 업무 메일로 확인되는 작업만 적었습니다. 발주처와 소속 회사명은 공개하지 않습니다.</p>
           <HistoryTimeline groups={historyGroups} />
         </div>
       </section>
