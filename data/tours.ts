@@ -10,7 +10,7 @@ export interface TourStep {
 
 export const tours: Record<string, TourStep[]> = {
   "online-store": [
-    { target: "#best", title: "BEST", desc: "상품을 누르면 상세 화면에서 유약 색과 각인을 고를 수 있습니다." },
+    { target: "#best", title: "많이 찾는 상품", desc: "상품을 누르면 상세 화면에서 유약 색과 각인을 고를 수 있습니다." },
   ],
   "shop-admin": [
     { target: "#opt-title", title: "옵션관리", desc: "옵션 값을 더하거나 빼세요." },

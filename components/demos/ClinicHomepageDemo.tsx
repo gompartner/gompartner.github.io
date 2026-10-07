@@ -16,7 +16,7 @@ import { ChevronRight, Menu, Phone, X } from "lucide-react";
    사진 출처(Unsplash 무료 라이선스, public/images/demo-clinic-homepage):
    hero AI 생성(Z-Image-Turbo, Apache 2.0), acne karelys Ruiz(PqyzuzFiQfY), pigment Reece van der Merwe(4p6XsMzkTsE),
    lifting Look Studio(HtXyytr9304), pores Look Studio(TQSPgNqeCo8), hair Farhad Ibrahimzade(szpFxaqS658),
-   lobby Ishan Sharma(0EWVvxSyDE0) */
+   lobby Ishan Sharma(0EWVvxSyDE0), doctor-a·doctor-b AI 생성(Z-Image-Turbo, Apache 2.0) */
 
 const IMG = "/images/demo-clinic-homepage";
 const CLINIC = "○○피부과의원";
@@ -142,12 +142,14 @@ const DOCTORS = [
   {
     name: "김○○",
     role: "대표원장",
+    photo: "doctor-a.jpg",
     field: "피부질환, 여드름 · 색소",
     career: ["피부과 전문의", "△△대학교병원 피부과 전공의 수료", "대한피부과학회 정회원"],
   },
   {
     name: "이○○",
     role: "원장",
+    photo: "doctor-b.jpg",
     field: "리프팅, 레이저 시술",
     career: ["피부과 전문의", "△△의료원 피부과 임상강사", "대한피부레이저학회 정회원"],
   },
@@ -709,20 +711,25 @@ function DoctorRows() {
   return (
     <ul className="mt-8 border-t" style={{ borderColor: C.ink }}>
       {DOCTORS.map((d) => (
-        <li key={d.name} className="grid gap-x-5 gap-y-3 border-b py-6 md:grid-cols-[220px_1fr] md:items-center" style={{ borderColor: C.line }}>
-          <div>
-            <p className="text-[15px] font-semibold" style={{ color: C.muted }}>
-              {d.role}
-            </p>
-            <h3 className="text-[26px] font-semibold tracking-[-0.03em]">{d.name}</h3>
+        <li key={d.name} className="flex gap-5 border-b py-6 md:items-center" style={{ borderColor: C.line }}>
+          <div className="relative aspect-[4/5] w-[96px] shrink-0 overflow-hidden rounded-[8px] md:w-[128px]" style={{ backgroundColor: C.line }}>
+            <Image src={`${IMG}/${d.photo}`} alt={`${d.role} ${d.name}`} fill sizes="128px" className="object-cover" style={{ objectPosition: "50% 22%" }} />
           </div>
-          <div>
-            <p className="font-semibold">진료 분야 {d.field}</p>
-            <ul className="mt-1 flex flex-wrap gap-x-4 text-[15px]" style={{ color: C.muted }}>
-              {d.career.map((c) => (
-                <li key={c}>{c}</li>
-              ))}
-            </ul>
+          <div className="grid min-w-0 flex-1 gap-x-5 gap-y-3 md:grid-cols-[220px_1fr] md:items-center">
+            <div>
+              <p className="text-[15px] font-semibold" style={{ color: C.muted }}>
+                {d.role}
+              </p>
+              <h3 className="text-[26px] font-semibold tracking-[-0.03em]">{d.name}</h3>
+            </div>
+            <div>
+              <p className="font-semibold">진료 분야 {d.field}</p>
+              <ul className="mt-1 flex flex-wrap gap-x-4 text-[15px]" style={{ color: C.muted }}>
+                {d.career.map((c) => (
+                  <li key={c}>{c}</li>
+                ))}
+              </ul>
+            </div>
           </div>
         </li>
       ))}

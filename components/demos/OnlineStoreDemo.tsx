@@ -10,16 +10,16 @@ import { useReducedMotionSafe } from "@/hooks/useReducedMotionSafe";
    상호, 대표자, 주소, 전화번호, 사업자 정보, 통신판매업 신고번호, 상품과 가격, 재고, 후기는 모두 가상이다.
 
    디자인: 미색 바탕(#f7f4ef)에 먹색 글자(#23201d), 테라코타(#b5562f), 흙빛(#d9c7b4).
-   띠배너, 가운데 로고, 분류 메뉴, BEST·NEW 상품 목록으로 된 메인과
+   띠배너, 가운데 로고, 분류 메뉴, 많이 찾는 상품·새로 들어온 상품 목록으로 된 메인과
    상품 상세, 장바구니, 주문서, 주문 완료를 따로 된 화면으로 둔다(라우트 없이 상태로 바꾼다).
 
-   상품 카드와 상세 화면에서 유약(백자, 청자, 흑유, 분청)을 고르면 그릇 그림의 색이 바뀐다.
-   각인 문구를 적으면 그림 위에 새겨 보이고, 조합마다 남은 수량이 다르다.
+   상품 카드와 상세 화면에서 유약(백자, 청자, 흑유, 분청)을 고르면 그 유약으로 찍은 사진으로 바뀐다.
+   각인 문구를 적으면 사진 위 그릇 자리에 글자를 얹어 보이고, 조합마다 남은 수량이 다르다.
    도착 예정일은 지금 시각을 기준으로 평일 14시 전 주문은 그날 출고하고 주말은 건너뛰어 지역별로 계산한다.
    주문 완료 화면에는 이름과 전화번호를 가려서 보여 준다.
 
    사진 출처(public/images/demo-store):
-   AI 생성(Z-Image-Turbo, Apache 2.0) hero, detail */
+   AI 생성(Z-Image-Turbo, Apache 2.0) hero, detail, products/<상품>-<유약>.jpg */
 
 const IMG = "/images/demo-store";
 const SHOP = "○○ 도자기 공방";
@@ -63,13 +63,6 @@ function useNowMinute() {
 
 const dateText = (d: Date) => `${d.getMonth() + 1}월 ${d.getDate()}일 (${DAY_NAMES[d.getDay()]})`;
 
-function untilText(diff: number) {
-  if (diff < 60) return `${diff}분`;
-  const h = Math.floor(diff / 60);
-  const r = diff % 60;
-  return r ? `${h}시간 ${r}분` : `${h}시간`;
-}
-
 /* ---------- 배송 ---------- */
 
 type Region = "metro" | "local" | "island";
@@ -111,7 +104,7 @@ function estimate(minute: number, region: Region) {
     if (isWorkday(arrive)) left--;
   }
   const dayIndex = (d: Date) => Math.round((d.getTime() - today.getTime()) / 86_400_000);
-  return { today, todayShip, ship, arrive, shipAt: dayIndex(ship), arriveAt: dayIndex(arrive), cutoffLeft: todayShip ? CUTOFF - m : null };
+  return { today, todayShip, ship, arrive, shipAt: dayIndex(ship), arriveAt: dayIndex(arrive) };
 }
 
 /* ---------- 유약, 상품 ---------- */
@@ -138,7 +131,6 @@ const GLAZES: Glaze[] = [
 
 const GLAZE_BY_ID = Object.fromEntries(GLAZES.map((g) => [g.id, g])) as Record<GlazeId, Glaze>;
 
-type Shape = "mug" | "teacup" | "ricebowl" | "noodle" | "plate" | "sidedish" | "vase" | "teapot";
 type Cat = "cup" | "bowl" | "plate" | "etc";
 
 interface Size {
@@ -146,14 +138,12 @@ interface Size {
   label: string;
   spec: string;
   add: number;
-  scale: number;
 }
 
 interface Product {
   id: string;
   name: string;
   price: number;
-  shape: Shape;
   cat: Cat;
   glazes: GlazeId[];
   sizes: Size[];
@@ -169,12 +159,11 @@ const PRODUCTS: Product[] = [
     id: "mug",
     name: "손잡이 머그",
     price: 28_000,
-    shape: "mug",
     cat: "cup",
     glazes: ALL_GLAZES,
     sizes: [
-      { id: "s", label: "300ml", spec: "지름 8cm · 높이 9cm · 용량 300ml", add: 0, scale: 0.94 },
-      { id: "l", label: "400ml", spec: "지름 9cm · 높이 10cm · 용량 400ml", add: 4_000, scale: 1.06 },
+      { id: "s", label: "300ml", spec: "지름 8cm · 높이 9cm · 용량 300ml", add: 0 },
+      { id: "l", label: "400ml", spec: "지름 9cm · 높이 10cm · 용량 400ml", add: 4_000 },
     ],
     added: "2026-09-18",
     desc: "손잡이를 두툼하게 붙여 손가락 세 개가 편하게 들어갑니다.",
@@ -183,10 +172,9 @@ const PRODUCTS: Product[] = [
     id: "teacup",
     name: "물레 찻잔",
     price: 18_000,
-    shape: "teacup",
     cat: "cup",
     glazes: ALL_GLAZES,
-    sizes: [{ id: "s", label: "120ml", spec: "지름 7.5cm · 높이 6cm · 용량 120ml", add: 0, scale: 1 }],
+    sizes: [{ id: "s", label: "120ml", spec: "지름 7.5cm · 높이 6cm · 용량 120ml", add: 0 }],
     added: "2026-06-02",
     desc: "입에 닿는 부분을 얇게 깎아 차가 부드럽게 넘어갑니다.",
   },
@@ -194,12 +182,11 @@ const PRODUCTS: Product[] = [
     id: "ricebowl",
     name: "밥공기",
     price: 22_000,
-    shape: "ricebowl",
     cat: "bowl",
     glazes: ALL_GLAZES,
     sizes: [
-      { id: "s", label: "지름 11cm", spec: "지름 11cm · 높이 6cm · 용량 300ml", add: 0, scale: 0.94 },
-      { id: "l", label: "지름 12.5cm", spec: "지름 12.5cm · 높이 6.5cm · 용량 380ml", add: 3_000, scale: 1.06 },
+      { id: "s", label: "지름 11cm", spec: "지름 11cm · 높이 6cm · 용량 300ml", add: 0 },
+      { id: "l", label: "지름 12.5cm", spec: "지름 12.5cm · 높이 6.5cm · 용량 380ml", add: 3_000 },
     ],
     added: "2026-03-10",
     desc: "굽을 높게 깎아 뜨거운 밥을 담아도 손에 열이 덜 옵니다.",
@@ -208,12 +195,11 @@ const PRODUCTS: Product[] = [
     id: "noodle",
     name: "면기",
     price: 34_000,
-    shape: "noodle",
     cat: "bowl",
     glazes: ALL_GLAZES,
     sizes: [
-      { id: "m", label: "지름 17cm", spec: "지름 17cm · 높이 7cm · 용량 800ml", add: 0, scale: 0.94 },
-      { id: "l", label: "지름 19cm", spec: "지름 19cm · 높이 7.5cm · 용량 1,000ml", add: 5_000, scale: 1.04 },
+      { id: "m", label: "지름 17cm", spec: "지름 17cm · 높이 7cm · 용량 800ml", add: 0 },
+      { id: "l", label: "지름 19cm", spec: "지름 19cm · 높이 7.5cm · 용량 1,000ml", add: 5_000 },
     ],
     added: "2026-08-25",
     desc: "국수, 덮밥, 샐러드까지 두루 담기 좋은 넓은 그릇입니다.",
@@ -222,12 +208,11 @@ const PRODUCTS: Product[] = [
     id: "plate",
     name: "원형 접시",
     price: 32_000,
-    shape: "plate",
     cat: "plate",
     glazes: ALL_GLAZES,
     sizes: [
-      { id: "m", label: "지름 21cm", spec: "지름 21cm · 높이 2.5cm", add: 0, scale: 0.92 },
-      { id: "l", label: "지름 25cm", spec: "지름 25cm · 높이 3cm", add: 8_000, scale: 1.04 },
+      { id: "m", label: "지름 21cm", spec: "지름 21cm · 높이 2.5cm", add: 0 },
+      { id: "l", label: "지름 25cm", spec: "지름 25cm · 높이 3cm", add: 8_000 },
     ],
     added: "2026-05-14",
     desc: "가장자리를 살짝 올려 국물 있는 반찬도 흐르지 않습니다.",
@@ -236,10 +221,9 @@ const PRODUCTS: Product[] = [
     id: "sidedish",
     name: "찬기",
     price: 14_000,
-    shape: "sidedish",
     cat: "plate",
     glazes: ALL_GLAZES,
-    sizes: [{ id: "s", label: "지름 10cm", spec: "지름 10cm · 높이 3.5cm", add: 0, scale: 1 }],
+    sizes: [{ id: "s", label: "지름 10cm", spec: "지름 10cm · 높이 3.5cm", add: 0 }],
     added: "2026-02-20",
     desc: "김치, 나물, 장 종지로 쓰기 좋은 작은 그릇입니다.",
   },
@@ -247,12 +231,11 @@ const PRODUCTS: Product[] = [
     id: "vase",
     name: "한 송이 화병",
     price: 46_000,
-    shape: "vase",
     cat: "etc",
     glazes: ALL_GLAZES,
     sizes: [
-      { id: "s", label: "높이 15cm", spec: "지름 9cm · 높이 15cm", add: 0, scale: 0.92 },
-      { id: "l", label: "높이 20cm", spec: "지름 12cm · 높이 20cm", add: 12_000, scale: 1.06 },
+      { id: "s", label: "높이 15cm", spec: "지름 9cm · 높이 15cm", add: 0 },
+      { id: "l", label: "높이 20cm", spec: "지름 12cm · 높이 20cm", add: 12_000 },
     ],
     added: "2026-09-26",
     gift: true,
@@ -262,10 +245,9 @@ const PRODUCTS: Product[] = [
     id: "teapot",
     name: "옆손잡이 다관",
     price: 68_000,
-    shape: "teapot",
     cat: "etc",
     glazes: ["white", "celadon", "black"],
-    sizes: [{ id: "m", label: "300ml", spec: "지름 11cm · 높이 9cm · 용량 300ml", add: 0, scale: 1 }],
+    sizes: [{ id: "m", label: "300ml", spec: "지름 11cm · 높이 9cm · 용량 300ml", add: 0 }],
     added: "2026-07-08",
     gift: true,
     desc: "안쪽에 거름망 구멍을 직접 뚫어 찻잎이 따라 나오지 않습니다.",
@@ -366,6 +348,10 @@ const REVIEWS: { productId: string; name: string; glaze: GlazeId; rating: number
   { productId: "teacup", name: "정*", glaze: "celadon", rating: 4, date: "2026.08.17", text: "찻잔 입술이 얇아 차 맛이 좋습니다. 생각보다 크기가 작으니 참고하시면 좋겠습니다." },
   { productId: "vase", name: "한ㄱ름", glaze: "white", rating: 5, date: "2026.10.02", text: "선물상자와 쇼핑백을 같이 주문했습니다. 집들이 선물로 바로 들고 갔습니다." },
 ];
+
+/** 상품별 누적 후기 수. 화면에는 최근 후기 몇 건만 보여 준다. */
+const REVIEW_TOTAL: Record<string, number> = { mug: 213, teacup: 87, ricebowl: 164, noodle: 58, plate: 129, sidedish: 71, vase: 46, teapot: 23 };
+const REVIEW_ALL = Object.values(REVIEW_TOTAL).reduce((a, b) => a + b, 0);
 
 /* ---------- 이름, 전화 가리기 ---------- */
 
@@ -483,7 +469,7 @@ export function OnlineStoreDemo() {
 
   return (
     <div className="min-h-screen text-[16px] leading-[1.7] md:text-[17px]" style={{ background: C.bg, color: C.ink }}>
-      <TopBanner minute={minute} />
+      <TopBanner />
       <Header view={view} count={count} go={go} />
       <main ref={mainRef} tabIndex={-1} className="outline-none">
         {view.name === "home" && <Home go={go} />}
@@ -532,12 +518,10 @@ export function OnlineStoreDemo() {
 
 /* ---------- 띠배너, 머리글 ---------- */
 
-function TopBanner({ minute }: { minute: number }) {
-  const est = estimate(minute, "metro");
+function TopBanner() {
   return (
     <p id="top-banner" className="px-4 py-2 text-center text-[14px] font-semibold md:px-6" style={{ background: C.ink, color: C.claySoft }}>
       50,000원 이상 무료배송 · 평일 오후 2시 이전 주문 당일 출고
-      {est?.cutoffLeft != null && <span className="hidden sm:inline"> · 오늘 출고 마감까지 {untilText(est.cutoffLeft)}</span>}
     </p>
   );
 }
@@ -695,147 +679,48 @@ function Header({ view, count, go }: { view: View; count: number; go: Go }) {
   );
 }
 
-/* ---------- 그릇 그림 ---------- */
+/* ---------- 그릇 사진 ---------- */
 
-const MARK: Record<Shape, { x: number; y: number; size: number }> = {
-  mug: { x: 100, y: 88, size: 12 },
-  teacup: { x: 100, y: 98, size: 10 },
-  ricebowl: { x: 100, y: 96, size: 12 },
-  noodle: { x: 100, y: 96, size: 12 },
-  plate: { x: 100, y: 102, size: 12 },
-  sidedish: { x: 100, y: 116, size: 9 },
-  vase: { x: 100, y: 108, size: 11 },
-  teapot: { x: 100, y: 106, size: 12 },
+/** 상품마다 유약별 사진이 한 장씩 있다. 유약을 고르면 그 사진으로 바뀐다. */
+const wareSrc = (productId: string, glaze: GlazeId) => `${IMG}/products/${productId}-${glaze}.jpg`;
+
+/** 각인 글자를 얹을 자리(사진 가로·세로 %)와 글자 크기(사진 폭 대비 %) */
+const MARK: Record<string, { x: number; y: number; size: number }> = {
+  mug: { x: 46, y: 60, size: 5 },
+  teacup: { x: 27, y: 60, size: 3.6 },
+  ricebowl: { x: 50, y: 62, size: 5 },
+  noodle: { x: 50, y: 62, size: 5 },
+  plate: { x: 50, y: 80, size: 4.4 },
+  sidedish: { x: 40, y: 84, size: 3.6 },
+  vase: { x: 48, y: 70, size: 4.4 },
+  teapot: { x: 47, y: 64, size: 4.4 },
 };
 
-const FILL = "motion-safe:transition-[fill,stroke] motion-safe:duration-500";
-const HI = "rgba(255,255,255,0.3)";
-
-function ShapeBody({ shape, g }: { shape: Shape; g: Glaze }) {
-  switch (shape) {
-    case "mug":
-      return (
-        <g>
-          <path className={FILL} d="M138 62 C170 62 170 114 136 114" fill="none" stroke={g.body} strokeWidth="11" strokeLinecap="round" />
-          <path className={FILL} d="M60 40 L140 40 L136 128 Q100 136 64 128 Z" fill={g.body} />
-          <path d="M64 126 Q100 134 136 126 L135.6 132 Q100 140 64.4 132 Z" fill={g.foot} />
-          <ellipse className={FILL} cx="100" cy="40" rx="40" ry="7" fill={g.rim} />
-          <ellipse className={FILL} cx="100" cy="41" rx="34" ry="4.5" fill={g.shade} />
-          <path d="M72 52 L70 116" stroke={HI} strokeWidth="5" strokeLinecap="round" />
-        </g>
-      );
-    case "teacup":
-      return (
-        <g>
-          <path className={FILL} d="M64 66 Q64 120 90 128 L110 128 Q136 120 136 66 Z" fill={g.body} />
-          <path d="M88 126 L112 126 L111 136 L89 136 Z" fill={g.foot} />
-          <ellipse className={FILL} cx="100" cy="66" rx="36" ry="6" fill={g.rim} />
-          <ellipse className={FILL} cx="100" cy="67" rx="31" ry="4" fill={g.shade} />
-          <path d="M74 78 Q74 106 88 120" stroke={HI} strokeWidth="4" fill="none" strokeLinecap="round" />
-        </g>
-      );
-    case "ricebowl":
-      return (
-        <g>
-          <path className={FILL} d="M46 62 Q50 120 86 128 L114 128 Q150 120 154 62 Z" fill={g.body} />
-          <path d="M84 126 L116 126 L114 138 L86 138 Z" fill={g.foot} />
-          <ellipse className={FILL} cx="100" cy="62" rx="54" ry="9" fill={g.rim} />
-          <ellipse className={FILL} cx="100" cy="63" rx="48" ry="6" fill={g.shade} />
-          <path d="M58 76 Q62 104 80 118" stroke={HI} strokeWidth="5" fill="none" strokeLinecap="round" />
-        </g>
-      );
-    case "noodle":
-      return (
-        <g>
-          <path className={FILL} d="M28 70 Q36 118 80 126 L120 126 Q164 118 172 70 Z" fill={g.body} />
-          <path d="M80 124 L120 124 L118 136 L82 136 Z" fill={g.foot} />
-          <ellipse className={FILL} cx="100" cy="70" rx="72" ry="11" fill={g.rim} />
-          <ellipse className={FILL} cx="100" cy="71" rx="64" ry="8" fill={g.shade} />
-          <path d="M42 84 Q50 104 72 116" stroke={HI} strokeWidth="5" fill="none" strokeLinecap="round" />
-        </g>
-      );
-    case "plate":
-      return (
-        <g>
-          <ellipse cx="100" cy="128" rx="40" ry="5" fill={g.foot} />
-          <ellipse className={FILL} cx="100" cy="106" rx="84" ry="28" fill={g.shade} />
-          <ellipse className={FILL} cx="100" cy="100" rx="84" ry="28" fill={g.body} />
-          <ellipse className={FILL} cx="100" cy="102" rx="60" ry="18" fill={g.rim} />
-          <path d="M34 92 Q60 78 100 74" stroke={HI} strokeWidth="4" fill="none" strokeLinecap="round" />
-        </g>
-      );
-    case "sidedish":
-      return (
-        <g>
-          <ellipse cx="100" cy="130" rx="28" ry="4" fill={g.foot} />
-          <path className={FILL} d="M50 96 Q54 126 100 128 Q146 126 150 96 Z" fill={g.body} />
-          <ellipse className={FILL} cx="100" cy="96" rx="50" ry="16" fill={g.rim} />
-          <ellipse className={FILL} cx="100" cy="98" rx="40" ry="11" fill={g.shade} />
-          <path d="M60 106 Q66 118 80 122" stroke={HI} strokeWidth="4" fill="none" strokeLinecap="round" />
-        </g>
-      );
-    case "vase":
-      return (
-        <g>
-          <path className={FILL} d="M91 30 L109 30 L108 54 Q140 70 140 104 Q140 130 114 136 L86 136 Q60 130 60 104 Q60 70 92 54 Z" fill={g.body} />
-          <path d="M86 134 L114 134 L113 139 L87 139 Z" fill={g.foot} />
-          <ellipse className={FILL} cx="100" cy="30" rx="9" ry="3" fill={g.rim} />
-          <ellipse className={FILL} cx="100" cy="30.4" rx="5" ry="1.6" fill={g.shade} />
-          <path d="M72 88 Q69 112 82 126" stroke={HI} strokeWidth="5" fill="none" strokeLinecap="round" />
-        </g>
-      );
-    case "teapot":
-      return (
-        <g>
-          <path className={FILL} d="M62 86 Q42 86 28 62 L36 58 Q48 76 62 76 Z" fill={g.body} />
-          <path className={FILL} d="M138 92 L172 78" stroke={g.body} strokeWidth="11" strokeLinecap="round" />
-          <path className={FILL} d="M58 74 Q52 128 100 132 Q148 128 142 74 Z" fill={g.body} />
-          <path d="M82 130 L118 130 L117 138 L83 138 Z" fill={g.foot} />
-          <ellipse className={FILL} cx="100" cy="74" rx="42" ry="8" fill={g.rim} />
-          <ellipse className={FILL} cx="100" cy="72" rx="30" ry="5" fill={g.body} />
-          <rect className={FILL} x="96.5" y="62" width="7" height="9" fill={g.body} />
-          <circle className={FILL} cx="100" cy="61" r="6" fill={g.rim} />
-          <path d="M68 86 Q66 110 82 122" stroke={HI} strokeWidth="5" fill="none" strokeLinecap="round" />
-        </g>
-      );
-  }
-}
-
-const SPECKS = [
-  [-18, 8],
-  [12, 12],
-  [20, -2],
-  [-6, 16],
-  [4, -4],
-  [-22, -4],
-];
-
-function Ceramic({ shape, glaze, engrave = "", scale = 1 }: { shape: Shape; glaze: GlazeId; engrave?: string; scale?: number }) {
+function WarePhoto({ productId, glaze, engrave = "", alt = "" }: { productId: string; glaze: GlazeId; engrave?: string; alt?: string }) {
   const g = GLAZE_BY_ID[glaze];
-  const mark = MARK[shape];
+  const mark = MARK[productId];
   return (
-    <g>
-      <ellipse cx="100" cy="143" rx="66" ry="6" fill="rgba(35,32,29,0.10)" />
-      <g
-        transform={scale === 1 ? undefined : `translate(100 140) scale(${scale}) translate(-100 -140)`}
-        className="motion-safe:transition-transform motion-safe:duration-500"
-      >
-        <ShapeBody shape={shape} g={g} />
-        {glaze === "buncheong" && (
-          <g aria-hidden>
-            <path d={`M${mark.x - 26} ${mark.y - 14} q 26 -8 52 0`} stroke="#f4ede1" strokeWidth="5" opacity="0.75" fill="none" strokeLinecap="round" />
-            {SPECKS.map(([dx, dy]) => (
-              <circle key={`${dx}${dy}`} cx={mark.x + dx} cy={mark.y + dy} r="1.3" fill="#7d6a52" opacity="0.55" />
-            ))}
-          </g>
-        )}
-        {engrave && (
-          <text x={mark.x} y={mark.y + 4} textAnchor="middle" fontSize={mark.size} fontWeight={600} letterSpacing="1" fill={g.mark}>
-            {engrave}
-          </text>
-        )}
-      </g>
-    </g>
+    <span className="relative block h-full w-full" style={{ containerType: "inline-size" }}>
+      {/* eslint-disable-next-line @next/next/no-img-element */}
+      <img src={wareSrc(productId, glaze)} alt={alt} loading="lazy" className="h-full w-full object-cover" />
+      {engrave && mark && (
+        <span
+          className="pointer-events-none absolute -translate-x-1/2 -translate-y-1/2 whitespace-nowrap font-semibold"
+          style={{
+            left: `${mark.x}%`,
+            top: `${mark.y}%`,
+            fontSize: `${mark.size}cqw`,
+            letterSpacing: "0.08em",
+            color: g.mark,
+            opacity: 0.85,
+            mixBlendMode: glaze === "black" ? "screen" : "multiply",
+          }}
+          aria-hidden
+        >
+          {engrave}
+        </span>
+      )}
+    </span>
   );
 }
 
@@ -907,7 +792,7 @@ function Stars({ n }: { n: number }) {
 
 /* ---------- 상품 카드 ---------- */
 
-function ProductCard({ p, go }: { p: Product; go: Go }) {
+function ProductCard({ p, go, newBadge = true }: { p: Product; go: Go; newBadge?: boolean }) {
   const [glaze, setGlaze] = useState<GlazeId>(p.glazes[0]);
   const g = GLAZE_BY_ID[glaze];
   const soldOut = p.sizes.every((s) => stockOf(p.id, glaze, s.id) === 0);
@@ -915,15 +800,13 @@ function ProductCard({ p, go }: { p: Product; go: Go }) {
 
   return (
     <li className="min-w-0">
-      <button type="button" onClick={open} aria-label={`${p.name} ${g.label} 상세보기`} className="group relative block w-full overflow-hidden rounded-[4px]" style={{ background: C.claySoft }}>
-        <span className="flex aspect-square items-center justify-center">
-          <svg viewBox="0 0 200 160" className="h-auto w-[82%] motion-safe:transition-transform motion-safe:duration-500 group-hover:scale-[1.04]" aria-hidden>
-            <Ceramic shape={p.shape} glaze={glaze} />
-          </svg>
+      <button type="button" onClick={open} aria-label={`${p.name} ${g.label} 상세보기`} className="relative block w-full overflow-hidden rounded-[4px]" style={{ background: C.claySoft }}>
+        <span className="block aspect-square">
+          <WarePhoto productId={p.id} glaze={glaze} />
         </span>
         {soldOut && (
-          <span className="absolute inset-x-0 bottom-0 py-1.5 text-center text-[13px] font-bold tracking-[0.04em]" style={{ background: "rgba(35,32,29,0.78)", color: "#fff" }}>
-            SOLD OUT
+          <span className="absolute inset-x-0 bottom-0 py-1.5 text-center text-[13px] font-bold " style={{ background: "rgba(35,32,29,0.78)", color: "#fff" }}>
+            품절
           </span>
         )}
       </button>
@@ -950,23 +833,26 @@ function ProductCard({ p, go }: { p: Product; go: Go }) {
         </span>
       </button>
       <p className="text-[15px] font-semibold tabular-nums">{won(p.price)}</p>
+      <p className="text-[13px] tabular-nums" style={{ color: C.muted }}>
+        리뷰 {REVIEW_TOTAL[p.id].toLocaleString("ko-KR")}
+      </p>
       <p className="mt-0.5 line-clamp-2 text-[14px] leading-[1.55]" style={{ color: C.muted }}>
         {p.desc}
       </p>
-      {isNew(p) && (
+      {newBadge && isNew(p) && (
         <span className="mt-1.5 inline-block rounded-[2px] border px-1.5 text-[12px] font-bold leading-[18px]" style={{ borderColor: C.terra, color: C.terra }}>
-          NEW
+          신상품
         </span>
       )}
     </li>
   );
 }
 
-function ProductGrid({ list, go }: { list: Product[]; go: Go }) {
+function ProductGrid({ list, go, newBadge = true }: { list: Product[]; go: Go; newBadge?: boolean }) {
   return (
     <ul className="grid grid-cols-2 gap-x-4 gap-y-9 md:grid-cols-4 md:gap-x-6">
       {list.map((p) => (
-        <ProductCard key={p.id} p={p} go={go} />
+        <ProductCard key={p.id} p={p} go={go} newBadge={newBadge} />
       ))}
     </ul>
   );
@@ -1028,7 +914,7 @@ function Home({ go }: { go: Go }) {
 
       <section id="best" aria-labelledby="best-title" className="py-12 md:py-16">
         <Container>
-          <ShelfHead id="best-title" title="BEST" more={() => go({ name: "list", cat: "all", query: "" })} />
+          <ShelfHead id="best-title" title="많이 찾는 상품" more={() => go({ name: "list", cat: "all", query: "" })} />
           <ProductGrid list={best} go={go} />
         </Container>
       </section>
@@ -1040,7 +926,7 @@ function Home({ go }: { go: Go }) {
               <Image src={`${IMG}/detail.jpg`} alt="" fill sizes="180px" className="object-cover" />
             </span>
             <span className="flex flex-col justify-center p-4 md:p-6">
-              <span className="text-[18px] font-bold">시험성적서 & 안전 포장</span>
+              <span className="text-[18px] font-bold">시험성적서와 안전 포장</span>
               <span className="mt-1 text-[14px] leading-[1.55]" style={{ color: C.muted }}>
                 납·카드뮴 불검출 시험 완료, 에어캡과 완충재 이중 포장
               </span>
@@ -1061,8 +947,8 @@ function Home({ go }: { go: Go }) {
 
       <section id="new" aria-labelledby="new-title" className="py-12 md:py-16">
         <Container>
-          <ShelfHead id="new-title" title="NEW" more={() => go({ name: "list", cat: "all", query: "" })} />
-          <ProductGrid list={fresh} go={go} />
+          <ShelfHead id="new-title" title="새로 들어온 상품" more={() => go({ name: "list", cat: "all", query: "" })} />
+          <ProductGrid list={fresh} go={go} newBadge={false} />
         </Container>
       </section>
 
@@ -1073,10 +959,8 @@ function Home({ go }: { go: Go }) {
             {REVIEWS.slice(0, 3).map((r) => (
               <li key={r.name + r.date} className="rounded-[4px] border p-4" style={{ borderColor: C.line, background: C.paper }}>
                 <button type="button" onClick={() => go({ name: "detail", id: r.productId, glaze: r.glaze })} className="flex w-full items-center gap-3 text-left">
-                  <span className="flex h-14 w-14 shrink-0 items-center justify-center rounded-[4px]" style={{ background: C.claySoft }}>
-                    <svg viewBox="0 0 200 160" className="h-auto w-12" aria-hidden>
-                      <Ceramic shape={PRODUCT_BY_ID[r.productId].shape} glaze={r.glaze} />
-                    </svg>
+                  <span className="block h-14 w-14 shrink-0 overflow-hidden rounded-[4px]" style={{ background: C.claySoft }}>
+                    <WarePhoto productId={r.productId} glaze={r.glaze} />
                   </span>
                   <span className="min-w-0">
                     <span className="block font-semibold leading-[1.4]">{PRODUCT_BY_ID[r.productId].name}</span>
@@ -1217,7 +1101,7 @@ function Detail({
     { id: "info", label: "상품상세정보" },
     { id: "ship", label: "배송안내" },
     { id: "return", label: "교환 및 반품" },
-    { id: "review", label: `상품후기 (${reviews.length})` },
+    { id: "review", label: `상품후기 (${REVIEW_TOTAL[p.id]})` },
   ];
 
   return (
@@ -1226,10 +1110,8 @@ function Detail({
 
       <div className="mt-5 grid gap-8 md:grid-cols-[1.1fr_1fr] md:gap-12">
         <div className="md:sticky md:top-[140px] md:self-start">
-          <div className="flex aspect-square items-center justify-center rounded-[4px]" style={{ background: C.claySoft }}>
-            <svg viewBox="0 0 200 160" className="h-auto w-[86%]" role="img" aria-label={`${g.label} ${p.name}${size ? ` ${size.label}` : ""}${text ? `, 각인 ${text}` : ""}`}>
-              <Ceramic shape={p.shape} glaze={glaze} engrave={text} scale={size?.scale ?? 1} />
-            </svg>
+          <div className="aspect-square overflow-hidden rounded-[4px]" style={{ background: C.claySoft }}>
+            <WarePhoto productId={p.id} glaze={glaze} engrave={text} alt={`${g.label} ${p.name}${size ? ` ${size.label}` : ""}${text ? `, 각인 ${text}` : ""}`} />
           </div>
           <p className="mt-2 text-center text-[14px]" style={{ color: C.muted }}>
             {g.label}. {g.note}
@@ -1501,7 +1383,7 @@ function Detail({
           {tab === "info" && <InfoTab p={p} size={size} />}
           {tab === "ship" && <ShipTab minute={minute} region={region} onRegion={onRegion} />}
           {tab === "return" && <ReturnTab />}
-          {tab === "review" && <ReviewList list={reviews} />}
+          {tab === "review" && <ReviewList list={reviews} total={REVIEW_TOTAL[p.id]} />}
         </div>
       </div>
     </Container>
@@ -1582,7 +1464,7 @@ function ArrivalPlanner({ minute, region, onRegion }: { minute: number; region: 
           <>
             <p className="mt-5 text-[24px] font-bold leading-[1.3] tracking-[-0.02em] md:text-[28px]">{dateText(est.arrive)} 도착 예정</p>
             <p className="mt-1 text-[15px] font-semibold" style={{ color: C.terraDeep }}>
-              {est.cutoffLeft !== null ? `오늘 출고 마감까지 ${untilText(est.cutoffLeft)}` : `${dateText(est.ship)} 출고`}
+              {est.todayShip ? "오늘 출고" : `${dateText(est.ship)} 출고`}
             </p>
             <ol className="mt-5 grid grid-cols-8 gap-1">
               {days.map((d, i) => {
@@ -1665,7 +1547,7 @@ function ReturnTab() {
   );
 }
 
-function ReviewList({ list }: { list: typeof REVIEWS }) {
+function ReviewList({ list, total }: { list: typeof REVIEWS; total: number }) {
   if (!list.length)
     return (
       <p className="py-10 text-center" style={{ color: C.muted }}>
@@ -1673,21 +1555,26 @@ function ReviewList({ list }: { list: typeof REVIEWS }) {
       </p>
     );
   return (
-    <ul className="mx-auto max-w-[860px] divide-y border-y" style={{ borderColor: C.line }}>
-      {list.map((r) => (
-        <li key={r.name + r.date} className="py-4" style={{ borderColor: C.line }}>
-          <div className="flex flex-wrap items-center gap-x-3 gap-y-1 text-[14px]" style={{ color: C.muted }}>
-            <Stars n={r.rating} />
-            <span>{r.name}</span>
-            <span>{r.date}</span>
-            <span>
-              [옵션: {GLAZE_BY_ID[r.glaze].label}] {PRODUCT_BY_ID[r.productId].name}
-            </span>
-          </div>
-          <p className="mt-1.5">{r.text}</p>
-        </li>
-      ))}
-    </ul>
+    <div className="mx-auto max-w-[860px]">
+      <p className="mb-2 text-[14px]" style={{ color: C.muted }}>
+        총 <strong style={{ color: C.ink }}>{total.toLocaleString("ko-KR")}</strong>건
+      </p>
+      <ul className="divide-y border-y" style={{ borderColor: C.line }}>
+        {list.map((r) => (
+          <li key={r.name + r.date} className="py-4" style={{ borderColor: C.line }}>
+            <div className="flex flex-wrap items-center gap-x-3 gap-y-1 text-[14px]" style={{ color: C.muted }}>
+              <Stars n={r.rating} />
+              <span>{r.name}</span>
+              <span>{r.date}</span>
+              <span>
+                [옵션: {GLAZE_BY_ID[r.glaze].label}] {PRODUCT_BY_ID[r.productId].name}
+              </span>
+            </div>
+            <p className="mt-1.5">{r.text}</p>
+          </li>
+        ))}
+      </ul>
+    </div>
   );
 }
 
@@ -1754,11 +1641,9 @@ function OrderSteps({ at }: { at: 0 | 1 | 2 }) {
 
 function LineThumb({ l }: { l: CartLine }) {
   return (
-    <span className="flex h-[64px] w-[72px] shrink-0 items-center justify-center rounded-[4px]" style={{ background: C.claySoft }}>
+    <span className="flex h-[72px] w-[72px] shrink-0 items-center justify-center overflow-hidden rounded-[4px]" style={{ background: C.claySoft }}>
       {l.kind === "item" ? (
-        <svg viewBox="0 0 200 160" className="h-auto w-[64px]" aria-hidden>
-          <Ceramic shape={PRODUCT_BY_ID[l.productId].shape} glaze={l.glaze} engrave={l.engrave} />
-        </svg>
+        <WarePhoto productId={l.productId} glaze={l.glaze} engrave={l.engrave} />
       ) : (
         <ShoppingBag size={26} style={{ color: C.terra }} aria-hidden />
       )}
@@ -2178,7 +2063,7 @@ function BrandView() {
 /* ---------- 커뮤니티 ---------- */
 
 const NOTICES = [
-  { title: "추석 연휴 배송 안내 (10월 3일 ~ 10월 9일)", date: "2026.09.25", body: "연휴 기간 주문은 10월 10일(금)부터 순서대로 출고합니다. 연휴 전 마지막 출고는 10월 2일(목) 오후 2시 주문 건까지입니다." },
+  { title: "추석 연휴 배송 안내 (9월 24일 ~ 9월 28일)", date: "2026.09.25", body: "연휴 기간 주문은 9월 29일(화)부터 순서대로 출고합니다. 연휴 전 마지막 출고는 9월 23일(수) 오후 2시 주문 건까지입니다." },
   { title: "흑유 머그 400ml 재입고 안내", date: "2026.09.18", body: "9월 가마에서 흑유 머그 400ml가 다시 나왔습니다. 수량이 많지 않아 조기 품절될 수 있습니다." },
   { title: "물레 체험 10월 일정 안내", date: "2026.09.10", body: "10월 토요일 14:00, 16:00 두 차례 운영합니다. 예약은 전화로 받습니다." },
   { title: "각인 상품 출고 일정 안내", date: "2026.08.30", body: "각인 상품은 주문 다음 영업일에 출고합니다. 각인 상품은 단순 변심 교환·반품이 불가합니다." },
@@ -2266,7 +2151,7 @@ function CommunityView({ initialTab, go }: { initialTab: CommunityTab; go: Go })
             ))}
           </ul>
         )}
-        {tab === "review" && <ReviewList list={REVIEWS} />}
+        {tab === "review" && <ReviewList list={REVIEWS} total={REVIEW_ALL} />}
         {tab === "faq" && (
           <div className="mx-auto max-w-[860px] border-t" style={{ borderColor: C.ink }}>
             {FAQS.map((f) => (
