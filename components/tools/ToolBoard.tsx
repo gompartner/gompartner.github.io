@@ -46,8 +46,8 @@ export function ToolBoard() {
         </form>
       </div>
 
-      <p className="mt-5 text-[15px] text-foreground-secondary">
-        전체 <b className="text-foreground">{list.length}</b>건
+      <p className="mt-5 text-[16px] text-foreground-secondary">
+        총 <b className="text-foreground">{list.length}건</b>
       </p>
       <table className="mt-2 w-full border-t-2 border-foreground text-[16px]">
         <caption className="sr-only">자료실 목록</caption>
