@@ -15,7 +15,7 @@ import { useReducedMotionSafe } from "@/hooks/useReducedMotionSafe";
 const navItems = [
   { href: "/works", label: "포트폴리오" },
   { href: "/#pricing", label: "가격" },
-  { href: "/#history", label: "작업 이력" },
+  { href: "/#history", label: "주요 경력" },
   { href: "/tools", label: "자료실" },
 ];
 

@@ -107,7 +107,7 @@ export default function HomePage() {
         <Doodles variant={2} />
         <div className={`${container} py-16 md:py-24`}>
           <h2 id="history-title" className={h2}>
-            작업 이력
+            주요 경력
           </h2>
           <HistoryTimeline groups={historyGroups} />
         </div>
