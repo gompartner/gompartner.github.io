@@ -60,7 +60,7 @@ export default async function IndustryWorksPage({ params }: Props) {
           <WorksGrid projects={list} />
         </div>
       </div>
-      <PricingSection />
+      <PricingSection compact />
     </>
   );
 }

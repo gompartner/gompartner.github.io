@@ -28,7 +28,7 @@ import { daysAgo, fmtDot, fmtKo, useDemoToday } from "@/hooks/useDemoToday";
 const IMG = "/images/demo-bakery";
 const BAKERY = "곰파트너 베이커리";
 const TEL = "02-000-0000";
-const ADDRESS = "□□시 □□로 5길 21 1층";
+const ADDRESS = "ㅁㄹ시 ㅎㄷ로 5길 21 1층";
 
 const C = {
   cream: "#fbf6ec",
@@ -1680,7 +1680,7 @@ function AboutPage() {
         {[
           ["04:00", "반죽 시작. 깜파뉴 반죽은 이틀 전에 미리 준비합니다."],
           ["17:00", "마지막 소금빵이 나옵니다. 이후에는 남은 빵만 판매합니다."],
-          ["19:00", "남은 빵 30% 할인. 당일 생산·당일 판매를 원칙으로 하며, 남은 빵은 □□동 지역아동센터에 기부합니다."],
+          ["19:00", "남은 빵 30% 할인. 당일 생산·당일 판매를 원칙으로 하며, 남은 빵은 ㅅㄴ동 지역아동센터에 기부합니다."],
         ].map(([t, d]) => (
           <div key={t} className="border-t pt-4" style={{ borderColor: C.kraftDeep }}>
             <dt className="text-[20px] font-bold tabular-nums" style={{ color: C.crust }}>
@@ -1723,23 +1723,23 @@ const HOURS = [
 
 function MiniMap() {
   return (
-    <svg viewBox="0 0 640 380" className="h-auto w-full" role="img" aria-label="□□역 2번 출구에서 매장까지 가는 약도">
+    <svg viewBox="0 0 640 380" className="h-auto w-full" role="img" aria-label="ㅅㅈ역 2번 출구에서 매장까지 가는 약도">
       <rect width="640" height="380" fill={C.paper} />
       <path d="M0 110 H640" stroke={C.line} strokeWidth="28" />
       <path d="M200 0 V380" stroke={C.line} strokeWidth="22" />
       <path d="M200 250 H640" stroke={C.line} strokeWidth="14" />
       <text x="20" y="90" fontSize="15" fill={C.muted}>
-        □□대로
+        ㄷㅅ대로
       </text>
       <text x="420" y="236" fontSize="15" fill={C.muted}>
-        □□로 5길
+        ㅎㄷ로 5길
       </text>
       <circle cx="120" cy="110" r="16" fill={C.crust} />
       <text x="120" y="115" fontSize="13" fill="#fff" textAnchor="middle" fontWeight={700}>
         2
       </text>
       <text x="74" y="156" fontSize="15" fill={C.ink}>
-        □□역 2번 출구
+        ㅅㅈ역 2번 출구
       </text>
       <path d="M138 110 H200 V250 H452" stroke={C.crust} strokeWidth="3" strokeDasharray="6 7" fill="none" />
       <circle cx="470" cy="250" r="20" fill={C.butter} stroke={C.crust} strokeWidth="3" />
@@ -1775,8 +1775,8 @@ function StoreInfo() {
         <p className="text-[20px] font-bold tracking-[-0.02em]">{ADDRESS}</p>
         <ul className="mt-4 space-y-3">
           {[
-            { icon: TrainFront, title: "지하철", body: "□□역 2번 출구에서 도보 5분" },
-            { icon: Car, title: "주차", body: "매장 앞 주차 불가. 50m 옆 □□동 공영주차장을 이용해 주세요." },
+            { icon: TrainFront, title: "지하철", body: "ㅅㅈ역 2번 출구에서 도보 5분" },
+            { icon: Car, title: "주차", body: "매장 앞 주차 불가. 50m 옆 ㅅㄴ동 공영주차장을 이용해 주세요." },
           ].map((r) => (
             <li key={r.title} className="flex gap-3">
               <r.icon size={20} className="mt-1 shrink-0" style={{ color: C.crust }} aria-hidden />

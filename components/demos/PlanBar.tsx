@@ -50,7 +50,7 @@ export function PlanBar({ projectId }: { projectId: string }) {
             채팅 상담
           </Link>
           <Link
-            href="/#pricing"
+            href="/pricing"
             className="flex h-11 items-center justify-center rounded-md border border-black/15 font-bold transition-colors hover:bg-black/5"
           >
             가격표 보기

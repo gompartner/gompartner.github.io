@@ -27,7 +27,7 @@ import { daysAgo, fmtDot, useDemoToday } from "@/hooks/useDemoToday";
 const IMG = "/images/demo-dental";
 const CLINIC = "곰파트너치과의원";
 const TEL = "02-000-0000";
-const ADDRESS = "□□시 □□로 45 □□타워 3층";
+const ADDRESS = "ㄷㅅ시 ㅎㄷ로 45 ㅅㅈ타워 3층";
 
 const C = {
   paper: "#ffffff",
@@ -403,7 +403,7 @@ const DOCTORS = [
     name: "김ㅈ우",
     role: "대표원장",
     field: "임플란트, 보철, 신경치료",
-    career: ["통합치의학과 전문의", "△△대학교 치과대학 졸업", "대한구강악안면임플란트학회 정회원"],
+    career: ["통합치의학과 전문의", "ㄴㄹ대학교 치과대학 졸업", "대한구강악안면임플란트학회 정회원"],
     img: "doctor2",
     pos: "50% 25%",
   },
@@ -411,7 +411,7 @@ const DOCTORS = [
     name: "이ㅅ연",
     role: "원장",
     field: "치아교정",
-    career: ["치과교정과 전문의", "△△대학교치과병원 교정과 수련", "대한치과교정학회 인정의"],
+    career: ["치과교정과 전문의", "ㄴㄹ대학교치과병원 교정과 수련", "대한치과교정학회 인정의"],
     img: "doctor1",
     pos: "50% 20%",
   },
@@ -1149,7 +1149,7 @@ function HomePage({ go, reserve, linkOut }: { go: Go; reserve: (id: TreatmentId)
           <p className="text-[15px] md:ml-auto md:text-right" style={{ color: C.muted }}>
             {ADDRESS}
             <br />
-            □□역 4번 출구 도보 3분, 건물 주차 2시간 무료{" "}
+            ㅁㄹ역 4번 출구 도보 3분, 건물 주차 2시간 무료{" "}
             <button type="button" onClick={() => go("about", "location")} className="font-bold underline underline-offset-2" style={{ color: C.accent }}>
               오시는 길
             </button>
@@ -1407,8 +1407,8 @@ function Location({ linkOut }: { linkOut: (w: "naver" | "kakao" | "map") => void
         <p className="mt-5 text-[20px] font-bold tracking-[-0.02em]">{ADDRESS}</p>
         <dl className="mt-4 border-t" style={{ borderColor: C.line }}>
           {[
-            ["지하철", "□□역 4번 출구에서 도보 3분"],
-            ["버스", "□□타워 정류장 하차"],
+            ["지하철", "ㅁㄹ역 4번 출구에서 도보 3분"],
+            ["버스", "ㅅㅈ타워 정류장 하차"],
             ["주차", "건물 지하 2~4층, 진료 시 2시간 무료"],
             ["전화", TEL],
           ].map(([k, v]) => (

@@ -294,7 +294,7 @@ function SiteHeader({ screen, go }: { screen: Screen; go: Go }) {
 function SiteFooter() {
   return (
     <footer className="border-t bg-white" style={{ borderColor: LINE }}>
-      <div className="mx-auto flex max-w-[1200px] flex-col gap-1 px-4 py-8 text-[14px] md:flex-row md:justify-between md:px-6" style={{ color: INK_3 }}>
+      <div className="mx-auto flex max-w-[1200px] flex-col gap-1 px-4 pt-8 pb-24 text-[14px] md:flex-row md:justify-between md:px-6" style={{ color: INK_3 }}>
         <p>
           고객센터 <b className="tabular-nums" style={{ color: INK_2 }}>{TEL}</b> · 평일 09:00 ~ 18:00
         </p>

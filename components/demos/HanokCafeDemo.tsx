@@ -31,7 +31,7 @@ import { daysAgo, fmtDot, fmtKo, useDemoToday } from "@/hooks/useDemoToday";
 const IMG = "/images/demo-cafe";
 const CAFE = "곰파트너 한옥 찻집";
 const TEL = "02-000-0000";
-const ADDRESS = "□□시 □□로 12길 7";
+const ADDRESS = "ㄴㄹ시 ㅈㅇ로 12길 7";
 
 const EASE = [0.22, 1, 0.36, 1] as const;
 const EASE_IN_OUT = [0.65, 0, 0.35, 1] as const;
@@ -1377,7 +1377,7 @@ const ROUTE: Pt[] = [
 ];
 
 const WAY_STEPS: { text: string; upto: number; mark: Pt }[] = [
-  { text: "□□역 2번 출구에서 큰길을 따라 50m 직진, 편의점 앞", upto: 1, mark: [216, 300] },
+  { text: "ㅎㅅ역 2번 출구에서 큰길을 따라 50m 직진, 편의점 앞", upto: 1, mark: [216, 300] },
   { text: "편의점을 끼고 12길 골목으로 진입", upto: 2, mark: [216, 196] },
   { text: "세탁소를 지나 골목 끝에서 우회전", upto: 3, mark: [216, 104] },
   { text: "파란 대문, 곰파트너 현판이 걸린 한옥", upto: 4, mark: [372, 104] },
@@ -1395,7 +1395,7 @@ function AlleyMap({ step }: { step: number }) {
       <rect x="0" y="282" width="480" height="36" fill="#d6ccb8" />
       <path d="M0 300 H480" stroke="#f3ede2" strokeWidth="2" strokeDasharray="12 10" />
       <text x="470" y="340" fontSize="13" fill="#6b5a48" textAnchor="end">
-        □□로
+        ㅈㅇ로
       </text>
       {/* 골목 */}
       <rect x="204" y="92" width="24" height="190" fill="#e0d5c0" />
@@ -1406,7 +1406,7 @@ function AlleyMap({ step }: { step: number }) {
       {/* 건물들 */}
       <rect x="12" y="324" width="104" height="30" fill="#f8f2e7" stroke="#1f1b16" strokeWidth="1.5" />
       <text x="64" y="344" fontSize="13" fill="#1f1b16" textAnchor="middle" fontWeight={700}>
-        □□역 2번 출구
+        ㅎㅅ역 2번 출구
       </text>
       <rect x="236" y="236" width="76" height="40" fill="#f8f2e7" stroke="#1f1b16" strokeWidth="1.5" />
       <text x="274" y="261" fontSize="13" fill="#1f1b16" textAnchor="middle" fontWeight={700}>
@@ -1418,7 +1418,7 @@ function AlleyMap({ step }: { step: number }) {
       </text>
       <rect x="116" y="232" width="80" height="44" fill="#e6dcc7" stroke="#6b5a48" strokeWidth="1.5" strokeDasharray="4 3" />
       <text x="156" y="252" fontSize="12" fill="#4a4036" textAnchor="middle">
-        □□공영
+        ㅁㄹ공영
       </text>
       <text x="156" y="268" fontSize="12" fill="#4a4036" textAnchor="middle">
         주차장
@@ -1507,7 +1507,7 @@ function Location({ bare = false }: { bare?: boolean }) {
           </div>
           <div>
             <h3 className="text-[18px] font-bold">주차 안내</h3>
-            <p className="mt-2 text-[16px]">주차 공간이 없습니다. 골목 입구 □□공영주차장 이용 시 2시간 할인권을 드립니다.</p>
+            <p className="mt-2 text-[16px]">주차 공간이 없습니다. 골목 입구 ㅁㄹ공영주차장 이용 시 2시간 할인권을 드립니다.</p>
           </div>
         </div>
     </>
@@ -1522,7 +1522,7 @@ function Location({ bare = false }: { bare?: boolean }) {
           <h2 id="location-title" className="text-[30px] font-bold leading-[1.3] tracking-[-0.02em] sm:text-[36px]">
             오시는 길
           </h2>
-          <p className="text-[15px] text-[#6b5a48]">□□역 2번 출구 도보 6분</p>
+          <p className="text-[15px] text-[#6b5a48]">ㅎㅅ역 2번 출구 도보 6분</p>
         </div>
         {content}
       </div>
@@ -1543,7 +1543,7 @@ const ABOUT_FACTS: [string, string][] = [
   ["공간", GROUPS.map((g) => g.name).join(", ")],
   ["편의시설", "개별룸, 좌식, 야외좌석(툇마루), 단체석(별채)"],
   ["화장실", "마당 안쪽"],
-  ["주차", "주차 불가 (□□공영주차장 2시간 할인)"],
+  ["주차", "주차 불가 (ㅁㄹ공영주차장 2시간 할인)"],
 ];
 
 function AboutPage({ onReserve }: { onReserve: (id: GroupId) => void }) {
@@ -1762,8 +1762,8 @@ function LocationPage() {
         <SubTitle id="transit-title">대중교통</SubTitle>
         <dl className="divide-y divide-[#1f1b16]/10 border-b border-[#1f1b16]/15 text-[16px]">
           {[
-            ["지하철", "□□역 2번 출구 도보 6분"],
-            ["버스", "□□역 정류장 하차 후 도보 6분 (간선 000, 지선 0000)"],
+            ["지하철", "ㅎㅅ역 2번 출구 도보 6분"],
+            ["버스", "ㅎㅅ역 정류장 하차 후 도보 6분 (간선 000, 지선 0000)"],
           ].map(([k, v]) => (
             <div key={k} className="grid grid-cols-[96px_1fr] gap-3 py-3 sm:grid-cols-[160px_1fr]">
               <dt className="text-[#6b5a48]">{k}</dt>
@@ -1808,7 +1808,7 @@ const NOTICES: { no: number; title: string; ago: number; body: string[] | ((t: D
     no: 3,
     title: "주차 할인권 안내",
     ago: 89,
-    body: ["매장 주차 공간이 없습니다.", "골목 입구 □□공영주차장 이용 시 2시간 할인권을 드립니다.", "계산하실 때 말씀해 주십시오."],
+    body: ["매장 주차 공간이 없습니다.", "골목 입구 ㅁㄹ공영주차장 이용 시 2시간 할인권을 드립니다.", "계산하실 때 말씀해 주십시오."],
   },
   {
     no: 2,

@@ -32,7 +32,7 @@ import { daysAgo, fmtDot, fmtKo, useDemoToday } from "@/hooks/useDemoToday";
 const IMG = "/images/demo-pilates";
 const STUDIO = "곰파트너 필라테스";
 const TEL = "02-000-0000";
-const ADDRESS = "□□시 □□로 88 □□빌딩 2층";
+const ADDRESS = "ㅁㄹ시 ㅅㄴ로 88 ㅎㄷ빌딩 2층";
 
 const C = {
   paper: "#f5f2ec",
@@ -750,7 +750,7 @@ function Intro({ onConsult }: { onConsult: () => void }) {
               {STUDIO}
             </h1>
             <p className="mt-3 max-w-[40em]" style={{ color: C.muted }}>
-              □□역 3번 출구 도보 3분 · 건물 주차 2시간 무료
+              ㅈㅇ역 3번 출구 도보 3분 · 건물 주차 2시간 무료
             </p>
           </div>
           <div className="flex flex-wrap items-center gap-x-6 gap-y-3">
@@ -1437,11 +1437,11 @@ function Location({ status, bare = false }: { status: Status; bare?: boolean }) 
             <dt style={{ color: C.muted }}>주소</dt>
             <dd>{ADDRESS}</dd>
             <dt style={{ color: C.muted }}>지하철</dt>
-            <dd>□□역 3번 출구 도보 3분</dd>
+            <dd>ㅈㅇ역 3번 출구 도보 3분</dd>
             {bare && (
               <>
                 <dt style={{ color: C.muted }}>버스</dt>
-                <dd>□□역 정류장 하차 후 도보 3분 (간선 000, 지선 0000)</dd>
+                <dd>ㅈㅇ역 정류장 하차 후 도보 3분 (간선 000, 지선 0000)</dd>
               </>
             )}
             <dt style={{ color: C.muted }}>주차</dt>
@@ -1872,7 +1872,7 @@ const NOTICES: Post[] = [
     no: 1,
     title: "곰파트너 필라테스 오픈 안내",
     ago: 219,
-    body: ["□□역 3번 출구 □□빌딩 2층에 문을 열었습니다.", "평일 07:00 ~ 22:00, 토요일 09:00 ~ 15:00 운영합니다."],
+    body: ["ㅈㅇ역 3번 출구 ㅎㄷ빌딩 2층에 문을 열었습니다.", "평일 07:00 ~ 22:00, 토요일 09:00 ~ 15:00 운영합니다."],
   },
 ];
 

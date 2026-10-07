@@ -23,7 +23,7 @@ const IMG = "/images/demo-clinic-homepage";
 const CLINIC = "곰파트너피부과의원";
 const TEL_MED = "02-000-0000";
 const TEL_COS = "02-000-0001";
-const ADDRESS = "□□시 □□로 123 □□빌딩 4층";
+const ADDRESS = "ㅎㄷ시 ㅁㄹ로 123 ㅈㅇ빌딩 4층";
 
 const C = {
   paper: "#fbf9f8",
@@ -145,14 +145,14 @@ const DOCTORS = [
     role: "대표원장",
     photo: "doctor-a.jpg",
     field: "피부질환, 여드름 · 색소",
-    career: ["피부과 전문의", "△△대학교병원 피부과 전공의 수료", "대한피부과학회 정회원"],
+    career: ["피부과 전문의", "ㄴㄹ대학교병원 피부과 전공의 수료", "대한피부과학회 정회원"],
   },
   {
     name: "이ㅅ연",
     role: "원장",
     photo: "doctor-b.jpg",
     field: "리프팅, 레이저 시술",
-    career: ["피부과 전문의", "△△의료원 피부과 임상강사", "대한피부레이저학회 정회원"],
+    career: ["피부과 전문의", "ㅂㄹ의료원 피부과 임상강사", "대한피부레이저학회 정회원"],
   },
 ];
 
@@ -760,7 +760,7 @@ function Location() {
       <p className="mt-6 text-[20px] font-semibold tracking-[-0.02em]">{ADDRESS}</p>
       <dl className="mt-4 border-t" style={{ borderColor: C.line }}>
         {[
-          ["대중교통", "□□역 2번 출구에서 도보 2분"],
+          ["대중교통", "ㄷㅅ역 2번 출구에서 도보 2분"],
           ["주차안내", "건물 주차장 2시간 무료, 접수에서 차량 번호 등록"],
           ["일반진료", TEL_MED],
           ["시술상담", TEL_COS],

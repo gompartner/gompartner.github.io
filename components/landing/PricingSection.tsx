@@ -1,10 +1,11 @@
+import Link from "next/link";
 import { Check } from "lucide-react";
 import { addons, formatWon, manwon, planCommon, plans } from "@/data/pricing";
 
 const h2 = "text-[24px] font-bold leading-[1.5] tracking-[-0.01em] md:text-[32px]";
 
-/** 홈페이지 패키지 3종. 랜딩과 업종별 포트폴리오 페이지에서 함께 쓴다. */
-export function PricingSection({ id = "pricing" }: { id?: string }) {
+/** 홈페이지 패키지 3종. compact 이면 패키지 카드만 보여 주고 상세(추가 기능·진행 안내)는 /pricing 으로 안내한다. */
+export function PricingSection({ id = "pricing", compact = false }: { id?: string; compact?: boolean }) {
   return (
     <section id={id} aria-labelledby={`${id}-title`} className="relative isolate scroll-mt-16 overflow-hidden border-t border-border bg-surface">
       <div className="mx-auto w-full max-w-[1248px] px-4 py-16 md:px-6 md:py-24">
@@ -36,22 +37,30 @@ export function PricingSection({ id = "pricing" }: { id?: string }) {
             );
           })}
         </ul>
-        <div className="mt-4 rounded-[10px] border border-border bg-white p-6">
-          <h3 className="text-[17px] font-bold">
-            추가 기능 <span className="font-normal text-foreground-secondary">· 고급 패키지는 맞춤 기능 1개 포함</span>
-          </h3>
-          <dl className="mt-4 grid border-t border-border text-[17px] md:grid-cols-2 md:gap-x-10">
-            {addons.map((a) => (
-              <div key={a.id} className="flex items-baseline justify-between gap-4 border-b border-border py-3">
-                <dt>{a.name}</dt>
-                <dd className="shrink-0 tabular-nums">
-                  {manwon(a.price)}
-                  {a.unit !== "식" && <span className="text-foreground-secondary"> / {a.unit}</span>}
-                </dd>
-              </div>
-            ))}
-          </dl>
-        </div>
+        {compact ? (
+          <p className="mt-6 text-[17px]">
+            <Link href="/pricing" className="font-bold underline underline-offset-4 hover:text-accent">
+              추가 기능 가격, 진행 안내, 자주 묻는 질문 보기
+            </Link>
+          </p>
+        ) : (
+          <div className="mt-4 rounded-[10px] border border-border bg-white p-6">
+            <h3 className="text-[17px] font-bold">
+              추가 기능 <span className="font-normal text-foreground-secondary">· 고급 패키지는 맞춤 기능 1개 포함</span>
+            </h3>
+            <dl className="mt-4 grid border-t border-border text-[17px] md:grid-cols-2 md:gap-x-10">
+              {addons.map((a) => (
+                <div key={a.id} className="flex items-baseline justify-between gap-4 border-b border-border py-3">
+                  <dt>{a.name}</dt>
+                  <dd className="shrink-0 tabular-nums">
+                    {manwon(a.price)}
+                    {a.unit !== "식" && <span className="text-foreground-secondary"> / {a.unit}</span>}
+                  </dd>
+                </div>
+              ))}
+            </dl>
+          </div>
+        )}
       </div>
     </section>
   );

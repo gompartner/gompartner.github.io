@@ -1,17 +1,11 @@
 import type { Metadata } from "next";
 import { Check } from "lucide-react";
-import { ChannelTalkButton } from "@/components/layout/ChannelTalk";
 import { Doodles } from "@/components/landing/Doodles";
-import { HistoryTimeline } from "@/components/landing/HistoryTimeline";
-import { historyGroups } from "@/lib/history";
 import { HeroSlider } from "@/components/landing/HeroSlider";
 import { projects } from "@/data/projects";
 import { profile } from "@/data/profile";
 import { PricingSection } from "@/components/landing/PricingSection";
-import { ProcessSection } from "@/components/landing/ProcessSection";
 import { WorksGrid } from "@/components/landing/WorksGrid";
-import { industries } from "@/data/industries";
-import { fieldsById } from "@/data/workFilters";
 import Link from "next/link";
 
 // KRDS(범정부 디자인 시스템) 기준 원페이지 랜딩.
@@ -43,10 +37,6 @@ const promises = ["1인 개발자가 직접 제작", "원본 소스 제공", "�
 
 const container = "mx-auto w-full max-w-[1248px] px-4 md:px-6";
 const h2 = "text-[24px] font-bold leading-[1.5] tracking-[-0.01em] md:text-[32px]";
-const primaryButton =
-  "inline-flex h-12 items-center justify-center rounded-md bg-accent px-6 text-[17px] font-bold text-accent-foreground transition-colors hover:bg-accent-hover md:h-14 md:px-7";
-const secondaryButton =
-  "inline-flex h-12 items-center justify-center rounded-md border border-[#6d7882] bg-white px-6 text-[17px] font-bold text-foreground transition-colors hover:bg-surface md:h-14 md:px-7";
 
 export default function HomePage() {
   return (
@@ -66,14 +56,6 @@ export default function HomePage() {
                 </li>
               ))}
             </ul>
-            <div className="mt-8 flex flex-wrap gap-3">
-              <ChannelTalkButton cta="hero_chat" className={primaryButton}>
-                채팅 상담
-              </ChannelTalkButton>
-              <a href="#works" data-gtm-cta="hero_works" className={secondaryButton}>
-                포트폴리오
-              </a>
-            </div>
           </div>
           <HeroSlider slides={featured} />
         </div>
@@ -82,39 +64,23 @@ export default function HomePage() {
       <section id="works" aria-labelledby="works-title" className="relative isolate scroll-mt-16 overflow-hidden">
         <Doodles variant={1} />
         <div className={`${container} py-16 md:py-24`}>
-          <h2 id="works-title" className={h2}>
-            포트폴리오
-          </h2>
+          <div className="flex items-end justify-between gap-4">
+            <h2 id="works-title" className={h2}>
+              포트폴리오
+            </h2>
+            <Link href="/works" data-gtm-cta="works_all" className="shrink-0 text-[16px] font-bold text-foreground-secondary underline-offset-4 hover:text-accent hover:underline md:text-[17px]">
+              전체 보기 {projects.length}건
+            </Link>
+          </div>
 
           <div className="mt-8">
             <WorksGrid projects={showcase} />
           </div>
-          <div className="mt-8 flex flex-wrap items-center gap-3">
-            <Link href="/works" data-gtm-cta="works_all" className={primaryButton}>
-              포트폴리오 전체 보기 ({projects.length}건)
-            </Link>
-            {industries.map((ind) => (
-              <Link key={ind.slug} href={`/works/${ind.slug}`} data-gtm-cta={`works_${ind.slug}`} className={secondaryButton}>
-                {ind.label} ({projects.filter((p) => (fieldsById[p.id] ?? []).includes(ind.field)).length})
-              </Link>
-            ))}
-          </div>
         </div>
       </section>
 
-      <PricingSection />
+      <PricingSection compact />
 
-      <ProcessSection />
-
-      <section id="history" aria-labelledby="history-title" className="relative isolate scroll-mt-16 overflow-clip border-t border-border">
-        <Doodles variant={2} />
-        <div className={`${container} py-16 md:py-24`}>
-          <h2 id="history-title" className={h2}>
-            주요 경력
-          </h2>
-          <HistoryTimeline groups={historyGroups} />
-        </div>
-      </section>
     </>
   );
 }
