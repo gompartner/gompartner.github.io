@@ -1,7 +1,7 @@
 "use client";
 
 import Image from "next/image";
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { Plus, Printer, RotateCcw, TriangleAlert } from "lucide-react";
 import { useLocalStorage } from "@/hooks/useLocalStorage";
 import { daysAgo, fmtDash, useDemoToday } from "@/hooks/useDemoToday";
@@ -183,6 +183,15 @@ export function ClinicReportDemo() {
   const [newName, setNewName] = useState("");
   const [newGender, setNewGender] = useState<Gender>("여");
   const [newAge, setNewAge] = useState("");
+
+  // 사용법 가이드가 하위 화면에서 열리면 첫 화면으로 돌아온다
+  useEffect(() => {
+    const f = () => {
+      setStep("report");
+    };
+    window.addEventListener("demo:go-home", f);
+    return () => window.removeEventListener("demo:go-home", f);
+  }, []);
 
   const customer = state.customers.find((c) => c.id === state.selectedId) ?? state.customers[0];
   const latest = customer?.sessions.at(-1);

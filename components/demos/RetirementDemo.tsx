@@ -201,6 +201,13 @@ export function RetirementDemo() {
     document.getElementById("retire-title")?.focus({ preventScroll: true });
   }, [nav]);
 
+  // 사용법 가이드가 하위 화면에서 열리면 첫 화면으로 돌아간다(스크롤은 가이드가 맡는다)
+  useEffect(() => {
+    const f = () => setScreen("home");
+    window.addEventListener("demo:go-home", f);
+    return () => window.removeEventListener("demo:go-home", f);
+  }, []);
+
   useEffect(() => {
     if (!toast) return;
     const t = window.setTimeout(() => setToast(null), 2800);

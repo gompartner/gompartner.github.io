@@ -451,6 +451,15 @@ export function OnlineStoreDemo() {
     });
   };
 
+  useEffect(() => {
+    const f = () => {
+      setView({ name: "home" });
+      setAdded(false);
+    };
+    window.addEventListener("demo:go-home", f);
+    return () => window.removeEventListener("demo:go-home", f);
+  }, []);
+
   const addLines = (lines: NewLine[]) =>
     setCart((prev) => {
       let next = [...prev];

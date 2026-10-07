@@ -114,7 +114,7 @@ export function DemoDock({ projectId, story, tour }: { projectId: string; story?
               <NotebookPen size={15} aria-hidden />
               <span className="hidden sm:inline">만든 이야기</span>
             </summary>
-            <div className="absolute bottom-full left-0 mb-2 max-h-[60vh] w-[min(360px,calc(100vw-40px))] overflow-y-auto rounded-[12px] border border-black/10 bg-white p-5 text-[15px] leading-[1.7] text-[#1d2327] shadow-xl">
+            <div className="fixed bottom-20 left-4 right-4 max-h-[60vh] overflow-y-auto sm:absolute sm:bottom-full sm:left-0 sm:right-auto sm:mb-2 sm:w-[360px] rounded-[12px] border border-black/10 bg-white p-5 text-[15px] leading-[1.7] text-[#1d2327] shadow-xl">
               <p className="font-bold">만든 이야기</p>
               <div className="mt-2 space-y-2 text-[#3d474f]">
                 {story.map((line) => (

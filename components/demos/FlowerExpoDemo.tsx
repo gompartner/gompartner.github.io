@@ -471,6 +471,12 @@ function Header({ page, go }: { page: Page; go: Go }) {
     return () => window.removeEventListener("keydown", onKey);
   }, [open]);
 
+  useEffect(() => {
+    const f = () => setOpen(false);
+    window.addEventListener("demo:go-home", f);
+    return () => window.removeEventListener("demo:go-home", f);
+  }, []);
+
   const pick = (p: Page) => {
     setOpen(false);
     go(p);
@@ -1677,6 +1683,16 @@ export function FlowerExpoDemo() {
       mainRef.current?.focus({ preventScroll: true });
     });
   };
+
+  /* 사용법 가이드: 하위 화면에서 누르면 첫 화면으로 돌아간다 */
+  useEffect(() => {
+    const f = () => {
+      setPage("home");
+      setNoticeIndex(null);
+    };
+    window.addEventListener("demo:go-home", f);
+    return () => window.removeEventListener("demo:go-home", f);
+  }, []);
 
   const openNotice = (i: number) => {
     go("notice");

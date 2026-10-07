@@ -361,6 +361,18 @@ export function JobPortalDemo() {
     return () => window.removeEventListener("keydown", onKey);
   }, [confirmId, openId]);
 
+  // 사용법 가이드: 하위 화면에서 누르면 열린 창을 닫고 첫 화면(채용정보)으로 돌아간다
+  useEffect(() => {
+    const f = () => {
+      setNav({ page: "채용정보", sub: "" });
+      setOpenId(null);
+      setConfirmId(null);
+      setSheetOpen(false);
+    };
+    window.addEventListener("demo:go-home", f);
+    return () => window.removeEventListener("demo:go-home", f);
+  }, []);
+
   // 상단 메뉴: 채용정보는 첫 화면, 나머지는 하위 화면으로 바꾸고 맨 위로 올린다
   const goMenu = (page: MenuName, sub?: string) => {
     setNav({ page, sub: sub ?? SUBMENU[page][0] ?? "" });

@@ -311,6 +311,14 @@ export function CertLabDemo() {
   const [trackQuery, setTrackQuery] = useState("");
   const [rows, setRows] = useState<QuoteRow[]>(QUOTE_ROWS);
   const moved = useRef(false);
+  useEffect(() => {
+    const f = () => {
+      setQuoteForm(false);
+      setRoute({ m: "home", s: "" });
+    };
+    window.addEventListener("demo:go-home", f);
+    return () => window.removeEventListener("demo:go-home", f);
+  }, []);
 
   const go = (m: MenuId | "home", s?: string) => {
     const sub = m === "home" ? "" : (s ?? MENUS.find((n) => n.id === m)!.subs[0].id);
@@ -409,6 +417,14 @@ function Header() {
   const [open, setOpen] = useState(false);
   const [acc, setAcc] = useState<MenuId | null>(null);
   const reduce = useReducedMotionSafe();
+  useEffect(() => {
+    const f = () => {
+      setDrop(null);
+      setOpen(false);
+    };
+    window.addEventListener("demo:go-home", f);
+    return () => window.removeEventListener("demo:go-home", f);
+  }, []);
 
   useEffect(() => {
     if (!drop && !open) return;
@@ -557,6 +573,13 @@ function Header() {
 function FloatingContact() {
   const { openQuote } = useCl();
   const [kakao, setKakao] = useState(false);
+  useEffect(() => {
+    const f = () => {
+      setKakao(false);
+    };
+    window.addEventListener("demo:go-home", f);
+    return () => window.removeEventListener("demo:go-home", f);
+  }, []);
 
   useEffect(() => {
     if (!kakao) return;

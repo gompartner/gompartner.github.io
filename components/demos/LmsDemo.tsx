@@ -1277,6 +1277,17 @@ export function LmsDemo() {
     window.scrollTo({ top: 0 });
   }, []);
 
+  // 사용법 가이드: 관리자·로그인·강의실(플레이어 등)을 모두 닫고 공개 메인으로
+  useEffect(() => {
+    const f = () => {
+      setView("site");
+      setRoute({ name: "home" });
+      setNavKey((k) => k + 1);
+    };
+    window.addEventListener("demo:go-home", f);
+    return () => window.removeEventListener("demo:go-home", f);
+  }, []);
+
   const ratios = state.lessons.map((p, i) => ratio(p, LESSONS[i]));
   const done = ratios.map((r) => r >= DONE_RATIO);
   const doneCount = done.filter(Boolean).length;

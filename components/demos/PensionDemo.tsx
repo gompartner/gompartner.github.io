@@ -320,6 +320,15 @@ export function PensionDemo() {
     setNav((v) => ({ n: v.n + 1, anchor: opt.anchor }));
   }, []);
 
+  // 사용법 가이드를 하위 화면에서 열면 첫 화면으로 돌아간다
+  useEffect(() => {
+    const f = () => {
+      setPage("home");
+    };
+    window.addEventListener("demo:go-home", f);
+    return () => window.removeEventListener("demo:go-home", f);
+  }, []);
+
   // 화면을 바꾸면 맨 위(또는 지정한 구간)로 옮기고 제목에 초점을 둔다
   useEffect(() => {
     if (nav.n === 0) return;

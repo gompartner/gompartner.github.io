@@ -39,6 +39,11 @@ export function ChannelTalk() {
     if (!PLUGIN_KEY) return;
     loadChannelIO();
     window.ChannelIO?.("boot", { pluginKey: PLUGIN_KEY });
+    // 데모의 "채팅 상담"에서 넘어오면(/?chat=1) 상담창을 바로 연다
+    if (new URLSearchParams(window.location.search).get("chat") === "1") {
+      window.ChannelIO?.("showMessenger");
+      window.history.replaceState(null, "", window.location.pathname + window.location.hash);
+    }
     return () => window.ChannelIO?.("shutdown");
   }, []);
   return null;

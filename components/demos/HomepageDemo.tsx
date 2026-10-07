@@ -326,6 +326,17 @@ export function HomepageDemo() {
   const [demoPayOpen, setDemoPayOpen] = useState(false);
   // 내 예약 목록에서 클릭한 예약의 QR 보기
   const [viewingId, setViewingId] = useState<string | null>(null);
+  // 사용법 가이드: 하위 화면에서 누르면 하위 화면·창을 닫고 첫 화면으로 돌아간다
+  useEffect(() => {
+    const f = () => {
+      setPage("home");
+      setPendingAnchor(null);
+      setDemoPayOpen(false);
+      setViewingId(null);
+    };
+    window.addEventListener("demo:go-home", f);
+    return () => window.removeEventListener("demo:go-home", f);
+  }, []);
   // 핀 드롭 애니메이션은 지도가 스크롤로 보이는 순간 시작한다
   const [mapRef, mapInView] = useInView<HTMLDivElement>();
   // PC에서 카드 리스트 높이를 지도 높이에 맞추고, 핀 호버 시 해당 카드로 스크롤한다

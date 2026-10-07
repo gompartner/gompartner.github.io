@@ -482,6 +482,17 @@ export function TaxOfficeDemo() {
     document.getElementById(view === "home" ? "tax-home-title" : "tax-page-title")?.focus({ preventScroll: true });
   }, [view]);
 
+  // 사용법 가이드가 하위 화면에서 열리면 첫 화면으로 돌아간다(스크롤은 가이드가 맡는다)
+  useEffect(() => {
+    const f = () => {
+      moved.current = false;
+      setPostId(null);
+      setView("home");
+    };
+    window.addEventListener("demo:go-home", f);
+    return () => window.removeEventListener("demo:go-home", f);
+  }, []);
+
   const ask: AskFn = (p) => {
     setPrefill((prev) => ({ ...p, key: prev.key + 1 }));
     go("contact");
@@ -585,6 +596,12 @@ function Header({ view, go }: { view: View; go: Go }) {
     window.addEventListener("keydown", onKey);
     return () => window.removeEventListener("keydown", onKey);
   }, [open]);
+
+  useEffect(() => {
+    const f = () => setOpen(false);
+    window.addEventListener("demo:go-home", f);
+    return () => window.removeEventListener("demo:go-home", f);
+  }, []);
 
   const pick = (v: View) => {
     setOpen(false);

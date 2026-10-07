@@ -385,6 +385,16 @@ export function PilatesStudioDemo() {
     window.scrollTo({ top: 0 });
   };
 
+  // 사용법 가이드를 하위 화면에서 열면 첫 화면으로 돌아간다
+  useEffect(() => {
+    const f = () => {
+      setNav({ page: "home" });
+      setBooking(null);
+    };
+    window.addEventListener("demo:go-home", f);
+    return () => window.removeEventListener("demo:go-home", f);
+  }, []);
+
   /* 첫 화면에서는 시간표 구역으로 내려가고, 하위 화면에서는 그룹 시간표 화면으로 넘어간다 */
   const toSchedule = () => {
     if (nav.page === "home") document.getElementById("schedule")?.scrollIntoView({ behavior: "smooth", block: "start" });

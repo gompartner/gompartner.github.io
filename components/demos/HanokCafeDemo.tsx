@@ -319,6 +319,16 @@ export function HanokCafeDemo() {
     else window.scrollTo({ top: 0 });
   };
 
+  /* 사용법 가이드: 하위 화면에서 누르면 첫 화면으로 돌아간다 */
+  useEffect(() => {
+    const f = () => {
+      setPage("home");
+      setAnchor(null);
+    };
+    window.addEventListener("demo:go-home", f);
+    return () => window.removeEventListener("demo:go-home", f);
+  }, []);
+
   const pickUnit = (id: UnitId, point: { x: number; y: number } | null) => {
     const u = UNITS.find((v) => v.id === id)!;
     setGroupId(u.group);

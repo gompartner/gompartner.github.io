@@ -775,6 +775,17 @@ export function DistrictPortalDemo() {
     window.scrollTo({ top: 0 });
   };
 
+  // 사용법 가이드가 하위 화면에서 열리면 첫 화면으로 돌아온다
+  useEffect(() => {
+    const f = () => {
+      setMenuOpen(false);
+      setLinkGroup(null);
+      setView(null);
+    };
+    window.addEventListener("demo:go-home", f);
+    return () => window.removeEventListener("demo:go-home", f);
+  }, []);
+
   // 자주 찾는 서비스나 바닥글에서 담당자 찾기로 넘어온다
   const openStaff = (keyword = "") => {
     setMenuOpen(false);

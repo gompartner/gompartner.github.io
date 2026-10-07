@@ -229,6 +229,14 @@ export function ClinicHomepageDemo() {
   const [feeTab, setFeeTab] = useState<"price" | "legal">("price");
   const [menuOpen, setMenuOpen] = useState(false);
   const now = useToday();
+  useEffect(() => {
+    const f = () => {
+      setPage("home");
+      setMenuOpen(false);
+    };
+    window.addEventListener("demo:go-home", f);
+    return () => window.removeEventListener("demo:go-home", f);
+  }, []);
 
   const go = (p: Page, tab?: "price" | "legal") => {
     setPage(p);

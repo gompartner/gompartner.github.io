@@ -212,6 +212,15 @@ export function PharmacyDemo() {
     window.scrollTo({ top: 0 });
   };
 
+  // 사용법 가이드를 하위 화면에서 열면 첫 화면으로 돌아간다
+  useEffect(() => {
+    const f = () => {
+      setPage("home");
+    };
+    window.addEventListener("demo:go-home", f);
+    return () => window.removeEventListener("demo:go-home", f);
+  }, []);
+
   let body: React.ReactNode = null;
   switch (page) {
     case "about":

@@ -355,6 +355,16 @@ export function RealEstateDemo() {
     setView(v);
   };
 
+  // 사용법 가이드를 하위 화면에서 열면 첫 화면으로 돌아간다
+  useEffect(() => {
+    const f = () => {
+      moved.current = false;
+      setView("search");
+    };
+    window.addEventListener("demo:go-home", f);
+    return () => window.removeEventListener("demo:go-home", f);
+  }, []);
+
   // 화면을 바꾸면 맨 위로 올리고 제목에 초점을 둔다
   useEffect(() => {
     if (!moved.current) return;

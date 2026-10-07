@@ -352,6 +352,16 @@ export function CompanyDemo() {
     window.scrollTo({ top: 0 });
   };
 
+  // 사용법 가이드가 하위 화면에서 열리면 첫 화면으로 돌아온다
+  useEffect(() => {
+    const f = () => {
+      setPrMachine(null);
+      setRoute({ m: "home", s: "" });
+    };
+    window.addEventListener("demo:go-home", f);
+    return () => window.removeEventListener("demo:go-home", f);
+  }, []);
+
   const key = `${route.m}/${route.s}`;
   useEffect(() => {
     if (!moved.current) return;
@@ -469,6 +479,16 @@ function Header() {
     window.addEventListener("keydown", onKey);
     return () => window.removeEventListener("keydown", onKey);
   }, [mega, open]);
+
+  // 사용법 가이드가 하위 화면에서 열리면 첫 화면으로 돌아온다
+  useEffect(() => {
+    const f = () => {
+      setMega(false);
+      setOpen(false);
+    };
+    window.addEventListener("demo:go-home", f);
+    return () => window.removeEventListener("demo:go-home", f);
+  }, []);
 
   const pick = (m: MenuId, sub?: string) => {
     setMega(false);

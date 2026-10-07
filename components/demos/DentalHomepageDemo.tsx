@@ -616,6 +616,16 @@ export function DentalHomepageDemo() {
     return () => window.clearTimeout(t);
   }, [toast]);
 
+  // 사용법 가이드가 하위 화면에서 열리면 첫 화면으로 돌아온다
+  useEffect(() => {
+    const f = () => {
+      setView({ page: "home" });
+      setToast(null);
+    };
+    window.addEventListener("demo:go-home", f);
+    return () => window.removeEventListener("demo:go-home", f);
+  }, []);
+
   const go: Go = (menu, sub) => {
     if (menu === "home") setView({ page: "home" });
     else setView({ page: "sub", menu, sub: sub ?? MENUS.find((m) => m.id === menu)!.subs[0].id });
@@ -689,6 +699,17 @@ function SiteHeader({ view, go }: { view: View; go: Go }) {
   const triggerRef = useRef<HTMLButtonElement | null>(null);
 
   const current = view.page === "sub" ? view.menu : null;
+
+  // 사용법 가이드가 하위 화면에서 열리면 첫 화면으로 돌아온다
+  useEffect(() => {
+    const f = () => {
+      setMegaOpen(false);
+      setMobileOpen(false);
+      setHover(null);
+    };
+    window.addEventListener("demo:go-home", f);
+    return () => window.removeEventListener("demo:go-home", f);
+  }, []);
 
   const navigate: Go = (menu, sub) => {
     setMegaOpen(false);

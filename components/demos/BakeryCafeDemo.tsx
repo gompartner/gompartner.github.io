@@ -267,6 +267,13 @@ export function BakeryCafeDemo() {
   const [view, setView] = useState<View>("home");
   const pending = useRef<string | null>(null);
   const [navTick, setNavTick] = useState(0);
+  useEffect(() => {
+    const f = () => {
+      setView("home");
+    };
+    window.addEventListener("demo:go-home", f);
+    return () => window.removeEventListener("demo:go-home", f);
+  }, []);
 
   const add = (id: string, delta: number) =>
     setCart((prev) => {
@@ -365,6 +372,13 @@ function Logo() {
 function Header({ view, count, onGo }: { view: View; count: number; onGo: (target: string) => void }) {
   const [open, setOpen] = useState(false);
   const reduce = useReducedMotionSafe();
+  useEffect(() => {
+    const f = () => {
+      setOpen(false);
+    };
+    window.addEventListener("demo:go-home", f);
+    return () => window.removeEventListener("demo:go-home", f);
+  }, []);
 
   useEffect(() => {
     if (!open) return;

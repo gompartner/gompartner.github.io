@@ -203,6 +203,13 @@ export function ShopAdminDemo() {
     return () => window.clearTimeout(t);
   }, [toast]);
 
+  // 사용법 가이드가 하위 화면에서 열리면 첫 화면(옵션 관리)으로 돌아간다
+  useEffect(() => {
+    const f = () => setTab("options");
+    window.addEventListener("demo:go-home", f);
+    return () => window.removeEventListener("demo:go-home", f);
+  }, []);
+
   const rows = useMemo(() => combos(state.groups), [state.groups]);
   const variantOf = (key: string): Variant => state.variants[key] ?? { stock: 10, onSale: true };
   const soldOut = rows.filter((r) => variantOf(keyOf(r)).stock === 0).length;

@@ -1,6 +1,6 @@
 "use client";
 
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { IBM_Plex_Sans_KR } from "next/font/google";
 import {
   Archive,
@@ -201,6 +201,16 @@ export function MaintenanceDemo() {
   const [selectedId, setSelectedId] = useState<string | null>(null);
   const [formOpen, setFormOpen] = useState(false);
   const [form, setForm] = useState({ dept: DEPARTMENTS[0], type: REQUEST_TYPES[0] as RequestType, title: "", content: "" });
+
+  useEffect(() => {
+    const f = () => {
+      setTab("requests");
+      setSelectedId(null);
+      setFormOpen(false);
+    };
+    window.addEventListener("demo:go-home", f);
+    return () => window.removeEventListener("demo:go-home", f);
+  }, []);
 
   const now = useDemoToday();
   const today = fmtDash(now);

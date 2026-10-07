@@ -9,7 +9,8 @@ export function PlanBar({ projectId }: { projectId: string }) {
   return (
     <details className="group fixed bottom-5 right-5 z-50 print:hidden">
       <summary className="inline-flex cursor-pointer list-none items-center gap-2 rounded-full border border-white/20 bg-black/70 px-4 py-2.5 text-sm font-medium text-white shadow-lg backdrop-blur-md transition-colors hover:bg-black/80 [&::-webkit-details-marker]:hidden">
-        {est ? `비슷하게 만들면 ${manwon(est.total)}` : "비슷하게 만들기 견적"}
+        <span className="sm:hidden">{est ? manwon(est.total) : "견적"}</span>
+        <span className="hidden sm:inline">{est ? `비슷하게 만들면 ${manwon(est.total)}` : "비슷하게 만들기 견적"}</span>
         <ChevronUp size={15} className="transition-transform group-open:rotate-180" aria-hidden />
       </summary>
       <div className="absolute bottom-full right-0 mb-2 w-[min(340px,calc(100vw-40px))] rounded-[12px] border border-black/10 bg-white p-5 text-[15px] leading-[1.6] text-[#1d2327] shadow-xl">
@@ -41,12 +42,20 @@ export function PlanBar({ projectId }: { projectId: string }) {
             <p className="mt-1 text-[#5a6670]">필요한 기능과 화면 수를 듣고 금액과 기간을 알려 드립니다.</p>
           </>
         )}
-        <Link
-          href="/#pricing"
-          className="mt-4 flex h-11 items-center justify-center rounded-md bg-[#256ef4] font-bold text-white transition-colors hover:bg-[#0b50d0]"
-        >
-          가격표 보기, 상담하기
-        </Link>
+        <div className="mt-4 grid grid-cols-2 gap-2">
+          <Link
+            href="/?chat=1"
+            className="flex h-11 items-center justify-center rounded-md bg-[#256ef4] font-bold text-white transition-colors hover:bg-[#0b50d0]"
+          >
+            채팅 상담
+          </Link>
+          <Link
+            href="/#pricing"
+            className="flex h-11 items-center justify-center rounded-md border border-black/15 font-bold transition-colors hover:bg-black/5"
+          >
+            가격표 보기
+          </Link>
+        </div>
       </div>
     </details>
   );

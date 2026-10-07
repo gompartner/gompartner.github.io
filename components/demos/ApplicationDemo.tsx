@@ -1,6 +1,6 @@
 "use client";
 
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import Image from "next/image";
 import { IBM_Plex_Sans_KR } from "next/font/google";
 import {
@@ -222,6 +222,13 @@ export function ApplicationDemo() {
   const [stored, setState, hydrated] = useLocalStorage<State>(STORAGE_KEY, INITIAL_STATE);
   const [view, setView] = useState<"applicant" | "admin">("applicant");
   const today = useDemoToday();
+  useEffect(() => {
+    const f = () => {
+      setView("applicant");
+    };
+    window.addEventListener("demo:go-home", f);
+    return () => window.removeEventListener("demo:go-home", f);
+  }, []);
   const state: ViewState = useMemo(() => ({ ...stored, apps: stored.apps.map((a) => resolveApp(a, today)) }), [stored, today]);
 
   // 화면의 접수번호로 저장된 신청서를 찾아 고친다(예시 신청서는 저장 id가 다르다)
@@ -354,6 +361,16 @@ function ApplicantView({ state, setState }: { state: ViewState; setState: (u: (s
   const [form, setForm] = useState<FormData>(EMPTY_FORM);
   const [errors, setErrors] = useState<Errors>({});
   const [doneId, setDoneId] = useState<string | null>(null);
+  useEffect(() => {
+    const f = () => {
+      setProgramId(null);
+      setStep(1);
+      setErrors({});
+      setDoneId(null);
+    };
+    window.addEventListener("demo:go-home", f);
+    return () => window.removeEventListener("demo:go-home", f);
+  }, []);
 
   const mine = state.apps.filter((a) => state.mine.includes(a.id));
   const openCount = PROGRAMS.filter((p) => daysLeft(p) >= 0).length;

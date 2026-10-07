@@ -380,6 +380,19 @@ export function CommunityMapDemo() {
     });
   };
 
+  // 사용법 가이드가 하위 화면에서 열리면 첫 화면으로 돌아온다
+  useEffect(() => {
+    const f = () => {
+      setPage("map");
+      setNoticeIdx(null);
+      setReserveFor(null);
+      setBooked(null);
+      setDetailOpen(false);
+    };
+    window.addEventListener("demo:go-home", f);
+    return () => window.removeEventListener("demo:go-home", f);
+  }, []);
+
   const goPage = (next: PageId) => {
     setPage(next);
     setNoticeIdx(null);
