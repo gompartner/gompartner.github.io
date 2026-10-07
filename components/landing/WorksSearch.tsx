@@ -85,6 +85,31 @@ export function WorksSearch({ projects }: { projects: Project[] }) {
 
   return (
     <>
+      <div role="tablist" aria-label="찾는 방법" className="mb-4 flex gap-5 text-[16px]">
+        {(
+          [
+            ["pick", "조건으로 고르기", ListFilter],
+            ["text", "검색어로 찾기", Search],
+          ] as const
+        ).map(([m, label, Icon]) => (
+          <button
+            key={m}
+            type="button"
+            role="tab"
+            aria-selected={mode === m}
+            onClick={() => {
+              setOpen(null);
+              setMode(m);
+            }}
+            className={`inline-flex items-center gap-1.5 border-b-2 pb-1.5 ${
+              mode === m ? "border-foreground font-bold text-foreground" : "border-transparent text-foreground-secondary hover:text-foreground"
+            }`}
+          >
+            <Icon size={16} strokeWidth={2.5} aria-hidden />
+            {label}
+          </button>
+        ))}
+      </div>
       <div className="relative z-10 flex flex-col gap-4 md:flex-row md:items-start md:justify-between md:gap-8">
         <div className="relative min-h-[48px] flex-1 text-[21px] font-bold leading-[1.8] tracking-[-0.01em] md:text-[26px]">
           <AnimatePresence mode="wait" initial={false}>
@@ -115,8 +140,7 @@ export function WorksSearch({ projects }: { projects: Project[] }) {
                   />
                   을
                 </span>{" "}
-                갖춘 사례 {count}
-                <ResetButton show={active} onClick={reset} />
+                갖춘 사례
               </motion.div>
             ) : (
               <motion.div key="text" {...swap} className="flex flex-wrap items-center gap-x-3">
@@ -141,29 +165,18 @@ export function WorksSearch({ projects }: { projects: Project[] }) {
                     className="w-full border-b-2 border-[#6d7882] bg-transparent py-1 pr-2 pl-10 font-bold text-foreground outline-none transition-colors duration-150 placeholder:font-normal placeholder:text-foreground-tertiary focus:border-accent [&::-webkit-search-cancel-button]:hidden"
                   />
                 </span>
-                <span className="whitespace-nowrap">
-                  사례 {count}
-                  <ResetButton show={active} onClick={reset} />
-                </span>
               </motion.div>
             )}
           </AnimatePresence>
         </div>
 
-        <button
-          type="button"
-          onClick={() => {
-            setOpen(null);
-            setMode(mode === "pick" ? "text" : "pick");
-          }}
-          className="inline-flex h-10 shrink-0 items-center gap-1.5 self-start rounded-md border border-border bg-white px-3 text-[15px] font-bold leading-[1.5] text-foreground-secondary transition-[background-color,transform] duration-150 hover:bg-surface active:scale-[0.97] motion-reduce:active:scale-100 md:mt-2"
-        >
-          {mode === "pick" ? <Search size={16} strokeWidth={2.5} aria-hidden /> : <ListFilter size={16} strokeWidth={2.5} aria-hidden />}
-          {mode === "pick" ? "검색어로 찾기" : "조건으로 고르기"}
-        </button>
       </div>
 
-      <div className="mt-8 flex justify-end">
+      <div className="mt-8 flex items-center justify-between gap-4">
+        <p className="flex items-center text-[16px] text-foreground-secondary">
+          총&nbsp;<b className="text-foreground">{count}</b>
+          <ResetButton show={active} onClick={reset} />
+        </p>
         <div role="radiogroup" aria-label="보기 방식" className="inline-flex rounded-md border border-border bg-white p-0.5">
           {(
             [
