@@ -86,6 +86,13 @@ export async function generateMetadata({ params }: DemoPageProps): Promise<Metad
     title: `${demo.title} | 데모`,
     description: demo.description,
     alternates: { canonical: `/demo/${slug}` },
+    openGraph: {
+      title: `${demo.title} | 데모`,
+      description: demo.description,
+      url: `/demo/${slug}`,
+      images: [{ url: `/og/${slug}.png`, width: 1200, height: 630, alt: `${demo.title} 데모 화면` }],
+    },
+    twitter: { card: "summary_large_image", images: [`/og/${slug}.png`] },
   };
 }
 
