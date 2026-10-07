@@ -5,6 +5,7 @@ import Image from "next/image";
 import { AnimatePresence, motion } from "framer-motion";
 import { Check, ChevronLeft, ChevronRight, List, Minus, Phone, Plus, RotateCcw } from "lucide-react";
 import { useReducedMotionSafe } from "@/hooks/useReducedMotionSafe";
+import { daysAgo, fmtDot, fmtKo, useDemoToday } from "@/hooks/useDemoToday";
 
 /* 한옥 찻집 홈페이지 데모: 가상의 곰파트너 한옥 찻집.
    상호, 대표자, 주소, 전화번호, 사업자 정보, 메뉴와 가격은 모두 가상이다.
@@ -1327,7 +1328,7 @@ function MenuSection({ showAll, setShowAll }: { showAll: boolean; setShowAll: (v
                 </li>
               ))}
             </ul>
-            <p className="mt-3 text-[14px] text-[#6b5a48]">10월 ~ 11월 가을 메뉴: 홍시 빙수, 단호박 식혜</p>
+            <p className="mt-3 text-[14px] text-[#6b5a48]">계절 메뉴: 홍시 빙수, 단호박 식혜</p>
           </div>
         </div>
 
@@ -1638,7 +1639,7 @@ function MenuPage() {
       </section>
 
       <section aria-labelledby="board-title">
-        <SubTitle id="board-title" aside="10월 ~ 11월 가을 메뉴: 홍시 빙수, 단호박 식혜">
+        <SubTitle id="board-title" aside="계절 메뉴: 홍시 빙수, 단호박 식혜">
           메뉴판
         </SubTitle>
         <div role="group" aria-label="메뉴 분류" className="mt-5 flex flex-wrap gap-2">
@@ -1767,52 +1768,54 @@ function LocationPage() {
 
 /* ---------- 하위 화면: 공지사항 ---------- */
 
-const NOTICES: { no: number; title: string; date: string; body: string[] }[] = [
+// ago: 작성일이 오늘에서 며칠 전인지. body 함수는 날짜가 들어간 본문(작성일 기준으로 계산)
+const NOTICES: { no: number; title: string; ago: number; body: string[] | ((t: Date) => string[]) }[] = [
   {
     no: 7,
-    title: "가을 메뉴 출시 (홍시 빙수, 단호박 식혜)",
-    date: "2026.10.01",
-    body: ["10월부터 11월까지 가을 메뉴를 판매합니다.", "홍시 빙수 14,000원", "단호박 식혜 6,500원", "재료 소진 시 조기 마감될 수 있습니다."],
+    title: "계절 메뉴 출시 (홍시 빙수, 단호박 식혜)",
+    ago: 6,
+    body: ["계절 메뉴를 한정 판매합니다.", "홍시 빙수 14,000원", "단호박 식혜 6,500원", "재료 소진 시 조기 마감될 수 있습니다."],
   },
   {
     no: 6,
-    title: "10월 휴무 안내",
-    date: "2026.09.28",
-    body: ["10월 매주 월요일은 정기 휴무입니다.", "10월 9일(금) 한글날은 정상 영업합니다."],
+    title: "정기 휴무 안내",
+    ago: 9,
+    body: ["매주 월요일은 정기 휴무입니다.", "공휴일은 정상 영업합니다."],
   },
   {
     no: 5,
-    title: "추석 연휴 영업 안내",
-    date: "2026.09.15",
-    body: ["9월 25일(금) 추석 당일은 휴무입니다.", "9월 24일(목), 9월 26일(토)은 정상 영업합니다."],
+    title: "명절 연휴 영업 안내",
+    ago: 22,
+    body: (t) => [`${fmtKo(daysAgo(t, -10))} 명절 당일은 휴무입니다.`, `${fmtKo(daysAgo(t, -9))}, ${fmtKo(daysAgo(t, -11))}은 정상 영업합니다.`],
   },
   {
     no: 4,
     title: "우천 시 툇마루 이용 안내",
-    date: "2026.08.20",
+    ago: 48,
     body: ["비가 오는 날에는 툇마루 예약 자리를 처마 안쪽으로 옮겨 드립니다.", "예약 시간과 인원은 그대로 유지됩니다."],
   },
   {
     no: 3,
     title: "주차 할인권 안내",
-    date: "2026.07.10",
+    ago: 89,
     body: ["매장 주차 공간이 없습니다.", "골목 입구 □□공영주차장 이용 시 2시간 할인권을 드립니다.", "계산하실 때 말씀해 주십시오."],
   },
   {
     no: 2,
     title: "좌식 방 예약 안내",
-    date: "2026.06.02",
+    ago: 127,
     body: ["건넌방과 사랑방은 방 단위로 예약받습니다.", "이용 시간은 2시간입니다.", "예약 시간 15분 경과 시 자동 취소될 수 있습니다."],
   },
   {
     no: 1,
     title: "별채 단체 이용 안내",
-    date: "2026.05.15",
+    ago: 145,
     body: ["별채는 6명부터 10명까지 이용할 수 있습니다.", "대관료는 없으며 1인 1메뉴 주문 부탁드립니다."],
   },
 ];
 
 function NoticePage() {
+  const today = useDemoToday();
   const [open, setOpen] = useState<number | null>(null);
   const headRef = useRef<HTMLHeadingElement>(null);
   const idx = NOTICES.findIndex((n) => n.no === open);
@@ -1831,10 +1834,10 @@ function NoticePage() {
           <h2 id="notice-title" ref={headRef} tabIndex={-1} className="text-[22px] font-bold leading-[1.4] tracking-[-0.02em] outline-none sm:text-[24px]">
             {item.title}
           </h2>
-          <p className="mt-1 text-[14px] tabular-nums text-[#6b5a48]">작성일 {item.date}</p>
+          <p className="mt-1 text-[14px] tabular-nums text-[#6b5a48]">작성일 {fmtDot(daysAgo(today, item.ago))}</p>
         </div>
         <div className="space-y-1 py-8 text-[16px] leading-[1.8]">
-          {item.body.map((b) => (
+          {(typeof item.body === "function" ? item.body(daysAgo(today, item.ago)) : item.body).map((b) => (
             <p key={b}>{b}</p>
           ))}
         </div>
@@ -1891,7 +1894,7 @@ function NoticePage() {
             >
               <span className="hidden text-center text-[15px] tabular-nums text-[#6b5a48] sm:block">{n.no}</span>
               <span className="min-w-0 text-[16px] font-medium">{n.title}</span>
-              <span className="text-[14px] tabular-nums text-[#6b5a48] sm:text-center">{n.date}</span>
+              <span className="text-[14px] tabular-nums text-[#6b5a48] sm:text-center">{fmtDot(daysAgo(today, n.ago))}</span>
             </button>
           </li>
         ))}

@@ -5,6 +5,7 @@ import Image from "next/image";
 import { AnimatePresence, motion } from "framer-motion";
 import { ArrowLeft, ChevronRight, List, Menu, MessageSquareText, Phone, RotateCcw, Search, X } from "lucide-react";
 import { useReducedMotionSafe } from "@/hooks/useReducedMotionSafe";
+import { daysAgo, fmtDot, fmtKo, useDemoToday } from "@/hooks/useDemoToday";
 
 /* 필라테스 스튜디오 홈페이지 데모: 가상의 곰파트너 필라테스.
    스튜디오명, 강사, 주소, 전화번호, 사업자 정보, 수강료는 모두 가상이다.
@@ -1812,54 +1813,55 @@ function PricePage({ onConsult }: { onConsult: () => void }) {
 interface Post {
   no: number;
   title: string;
-  date: string;
-  body: string[];
-  /** 이벤트만: 기간과 종료 여부 */
-  period?: string;
-  ended?: boolean;
+  /** 작성일이 오늘에서 며칠 전인지 */
+  ago: number;
+  /** 함수면 작성일 기준으로 날짜를 넣어 만든다 */
+  body: string[] | ((t: Date) => string[]);
+  /** 이벤트만: 기간(오늘 기준 며칠 전 ~ 며칠 전, 음수는 뒤). 종료 여부는 끝 날짜로 계산 */
+  period?: [number, number];
 }
 
 const NOTICES: Post[] = [
   {
     no: 7,
-    title: "10월 그룹 시간표 변경 안내",
-    date: "2026.09.25",
-    body: ["10월부터 화요일 12:30 그룹 수업은 쉽니다.", "목요일 19:00 그룹 리포머는 중급반으로 바뀝니다."],
+    title: "그룹 시간표 변경 안내",
+    ago: 12,
+    body: ["화요일 12:30 그룹 수업은 쉽니다.", "목요일 19:00 그룹 리포머는 중급반으로 바뀝니다."],
   },
   {
     no: 6,
-    title: "추석 연휴 휴무 안내",
-    date: "2026.09.15",
-    body: ["9월 24일(목)부터 9월 26일(토)까지 휴무입니다.", "휴무 기간은 수강권 유효기간에서 제외됩니다."],
+    title: "명절 연휴 휴무 안내",
+    ago: 22,
+    body: (t) => [`${fmtKo(daysAgo(t, -9))}부터 ${fmtKo(daysAgo(t, -11))}까지 휴무입니다.`, "휴무 기간은 수강권 유효기간에서 제외됩니다."],
   },
   {
     no: 5,
     title: "예약 앱 이용 안내",
-    date: "2026.08.01",
+    ago: 67,
     body: ["그룹레슨은 예약 앱에서 예약합니다.", "수업 3시간 전까지 취소할 수 있습니다.", "이후 취소 및 노쇼 시 1회 차감됩니다."],
   },
   {
     no: 4,
     title: "주차 등록 안내",
-    date: "2026.07.01",
+    ago: 98,
     body: ["건물 지하 주차장 2시간 무료입니다.", "안내 데스크에서 차량 번호를 등록해 주십시오."],
   },
   {
     no: 3,
     title: "샤워실 이용 안내",
-    date: "2026.06.10",
+    ago: 119,
     body: ["샤워실은 수업 전후로 이용할 수 있습니다.", "수건과 운동복은 무료로 대여합니다."],
   },
   {
     no: 2,
     title: "개인 사물함 배정 안내",
-    date: "2026.05.20",
+    ago: 140,
     body: ["10회 이상 등록 회원께 개인 사물함을 배정합니다.", "사물함 번호는 안내 데스크에 문의해 주십시오."],
   },
   {
     no: 1,
     title: "곰파트너 필라테스 오픈 안내",
-    date: "2026.03.02",
+    ago: 219,
     body: ["□□역 3번 출구 □□빌딩 2층에 문을 열었습니다.", "평일 07:00 ~ 22:00, 토요일 09:00 ~ 15:00 운영합니다."],
   },
 ];
@@ -1868,36 +1870,38 @@ const EVENTS: Post[] = [
   {
     no: 4,
     title: "그룹/개인레슨 횟수추가 제공 이벤트",
-    date: "2026.10.01",
-    period: "2026.10.01 ~ 2026.10.31",
+    ago: 6,
+    period: [6, -24],
     body: ["기간 중 20회 등록 시 2회, 30회 등록 시 3회를 추가로 드립니다.", "1:1 개인레슨, 2:1 듀엣레슨, 그룹레슨 모두 해당됩니다."],
   },
   {
     no: 3,
     title: "듀엣레슨 함께 등록 이벤트",
-    date: "2026.10.01",
-    period: "2026.10.01 ~ 2026.11.30",
+    ago: 6,
+    period: [6, -54],
     body: ["두 분이 함께 2:1 듀엣레슨 20회 이상 등록 시 1인 수강료 5% 할인"],
   },
   {
     no: 2,
     title: "해피타임 무료기구체험",
-    date: "2026.09.01",
-    period: "2026.09.01 ~ 2026.09.30",
-    ended: true,
+    ago: 36,
+    period: [36, 7],
     body: ["평일 14:00 ~ 16:00 리포머 기구를 무료로 체험할 수 있습니다.", "방문 전 전화로 예약해 주십시오."],
   },
   {
     no: 1,
-    title: "여름 체험레슨 할인",
-    date: "2026.07.01",
-    period: "2026.07.01 ~ 2026.08.31",
-    ended: true,
+    title: "체험레슨 할인",
+    ago: 98,
+    period: [98, 37],
     body: ["체험레슨 1:1 개인레슨 20,000원, 그룹레슨 10,000원"],
   },
 ];
 
 function Board({ items, label }: { items: Post[]; label: string }) {
+  const today = useDemoToday();
+  const day = (n: number) => fmtDot(daysAgo(today, n));
+  const periodText = (p: Post) => (p.period ? `${day(p.period[0])} ~ ${day(p.period[1])}` : "");
+  const ended = (p: Post) => !!p.period && p.period[1] > 0;
   const [open, setOpen] = useState<number | null>(null);
   const headRef = useRef<HTMLHeadingElement>(null);
   const isEvent = items.some((p) => p.period);
@@ -1918,12 +1922,12 @@ function Board({ items, label }: { items: Post[]; label: string }) {
             {item.title}
           </h2>
           <p className="mt-1 text-[14px] tabular-nums" style={{ color: C.muted }}>
-            {item.period ? `기간 ${item.period}` : `작성일 ${item.date}`}
-            {item.period && <span className="ml-3 font-semibold">{item.ended ? "종료" : "진행중"}</span>}
+            {item.period ? `기간 ${periodText(item)}` : `작성일 ${day(item.ago)}`}
+            {item.period && <span className="ml-3 font-semibold">{ended(item) ? "종료" : "진행중"}</span>}
           </p>
         </div>
         <div className="space-y-1 py-8">
-          {item.body.map((b) => (
+          {(typeof item.body === "function" ? item.body(daysAgo(today, item.ago)) : item.body).map((b) => (
             <p key={b}>{b}</p>
           ))}
         </div>
@@ -1994,12 +1998,12 @@ function Board({ items, label }: { items: Post[]; label: string }) {
                 <span className="block font-medium">{p.title}</span>
                 {p.period && (
                   <span className="block text-[14px] tabular-nums" style={{ color: C.muted }}>
-                    {p.period}
+                    {periodText(p)}
                   </span>
                 )}
               </span>
-              <span className="text-[14px] tabular-nums sm:text-center" style={p.period && !p.ended ? { color: C.indigo, fontWeight: 600 } : { color: C.muted }}>
-                {p.period ? (p.ended ? "종료" : "진행중") : p.date}
+              <span className="text-[14px] tabular-nums sm:text-center" style={p.period && !ended(p) ? { color: C.indigo, fontWeight: 600 } : { color: C.muted }}>
+                {p.period ? (ended(p) ? "종료" : "진행중") : day(p.ago)}
               </span>
             </button>
           </li>

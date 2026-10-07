@@ -3,6 +3,7 @@
 import { useEffect, useRef, useState } from "react";
 import Image from "next/image";
 import { ChevronRight, Menu, Phone, X } from "lucide-react";
+import { daysAgo, fmtDot, fmtKo, useDemoToday } from "@/hooks/useDemoToday";
 
 /* 피부과 홈페이지 데모: 가상의 곰파트너피부과의원.
    병원명, 의료진, 주소, 전화번호, 사업자 정보, 진료비는 모두 가상이다.
@@ -200,15 +201,22 @@ const FEES = [
 ];
 
 const NOTICE_TOTAL = 214;
-const NOTICES = [
-  { no: 214, date: "2026.10.02", title: "10월 9일(금) 한글날 휴진, 10일(토) 정상 진료", body: "10월 9일(금) 한글날은 휴진합니다. 10월 10일(토)은 09:30~14:00 정상 진료합니다." },
-  { no: 213, date: "2026.09.26", title: "10월 21일(수) 오후 휴진 (대표원장 학회 참석)", body: "대표원장 학회 참석으로 10월 21일(수)은 13:00까지 진료합니다. 해당일 오후 예약 환자분께는 개별 연락드렸습니다." },
-  { no: 212, date: "2026.09.14", title: "피코 레이저 장비 1대 추가 도입", body: "피코 레이저 1대를 추가 도입했습니다. 10월부터 평일 저녁 시술 예약이 가능합니다." },
-  { no: 211, date: "2026.08.29", title: "11월 1일부터 초음파 리프팅 비용 변경", body: "11월 1일부터 초음파 리프팅 300샷 비용이 30만 원에서 33만 원으로 변경됩니다. 10월 31일까지 결제하신 분은 기존 비용으로 진행합니다." },
-  { no: 210, date: "2026.08.18", title: "건물 주차장 무료 시간 2시간으로 변경", body: "9월부터 진료 시 건물 주차장 2시간 무료입니다. 접수 시 차량 번호를 말씀해 주세요." },
-  { no: 209, date: "2026.07.30", title: "대상포진, 발진 후 72시간 이내 진료가 중요합니다", body: "띠 모양 물집과 따끔거리는 통증이 있다면 빠른 진료를 권해 드립니다. 발진 후 72시간 이내 항바이러스제 치료를 시작해야 신경통을 줄일 수 있습니다." },
-  { no: 208, date: "2026.07.11", title: "토요일 접수 마감 13:30으로 변경", body: "토요일은 점심시간 없이 진료합니다. (접수 마감 13:30)" },
+// ago: 오늘 기준 며칠 전 작성. 날짜가 필요한 본문은 오늘 기준으로 계산한다.
+const nextWed = (t: Date) => {
+  const d = daysAgo(t, -3);
+  return daysAgo(d, -((3 - d.getDay() + 7) % 7));
+};
+const NOTICES: { no: number; ago: number; title: string; body: string | ((t: Date) => string) }[] = [
+  { no: 214, ago: 5, title: "공휴일 휴진 안내", body: "공휴일은 휴진합니다. 토요일은 09:30~14:00 정상 진료합니다." },
+  { no: 213, ago: 11, title: "대표원장 학회 참석으로 오후 휴진 안내", body: (t) => `대표원장 학회 참석으로 ${fmtKo(nextWed(t))}은 13:00까지 진료합니다. 해당일 오후 예약 환자분께는 개별 연락드렸습니다.` },
+  { no: 212, ago: 23, title: "피코 레이저 장비 1대 추가 도입", body: "피코 레이저 1대를 추가 도입했습니다. 평일 저녁에도 시술 예약이 가능합니다." },
+  { no: 211, ago: 39, title: "초음파 리프팅 비용 변경 안내", body: (t) => `${fmtKo(daysAgo(t, -25))}부터 초음파 리프팅 300샷 비용이 30만 원에서 33만 원으로 변경됩니다. 그 전날까지 결제하신 분은 기존 비용으로 진행합니다.` },
+  { no: 210, ago: 50, title: "건물 주차장 무료 시간 2시간으로 변경", body: "진료 시 건물 주차장 2시간 무료입니다. 접수 시 차량 번호를 말씀해 주세요." },
+  { no: 209, ago: 69, title: "대상포진, 발진 후 72시간 이내 진료가 중요합니다", body: "띠 모양 물집과 따끔거리는 통증이 있다면 빠른 진료를 권해 드립니다. 발진 후 72시간 이내 항바이러스제 치료를 시작해야 신경통을 줄일 수 있습니다." },
+  { no: 208, ago: 88, title: "토요일 접수 마감 13:30으로 변경", body: "토요일은 점심시간 없이 진료합니다. (접수 마감 13:30)" },
 ];
+const FEE_AGO = 36; // 비용표 기준일(오늘 기준 며칠 전)
+const fmtYMD = (d: Date) => `${d.getFullYear()}년 ${d.getMonth() + 1}월 ${d.getDate()}일`;
 
 const man = (n: number) => (n >= 10000 ? `${(n / 10000).toLocaleString("ko-KR")}만 원` : `${n.toLocaleString("ko-KR")}원`);
 const container = "mx-auto w-full max-w-[1248px] px-4 md:px-6";
@@ -480,6 +488,7 @@ function PageBand({ title, sub, track, children }: { title: string; sub: string;
 /* ---------- 메인 ---------- */
 
 function Home({ now, go }: { now: Now | null; go: (p: Page) => void }) {
+  const today = useDemoToday();
   return (
     <>
       {/* 첫 화면 */}
@@ -553,7 +562,7 @@ function Home({ now, go }: { now: Now | null; go: (p: Page) => void }) {
                 <li key={n.no} className="flex items-center justify-between gap-4 border-b py-3.5" style={{ borderColor: C.line }}>
                   <span className="min-w-0 truncate">{n.title}</span>
                   <span className="shrink-0 text-[15px] tabular-nums" style={{ color: C.muted }}>
-                    {n.date}
+                    {fmtDot(daysAgo(today, n.ago))}
                   </span>
                 </li>
               ))}
@@ -923,13 +932,15 @@ function BeautyPage({ go }: { go: (p: Page, tab?: "price" | "legal") => void }) 
 /* ---------- 비용 안내 ---------- */
 
 function FeesPage({ tab, setTab }: { tab: "price" | "legal"; setTab: (t: "price" | "legal") => void }) {
+  const today = useDemoToday();
+  const feeDate = daysAgo(today, FEE_AGO);
   const groups: { id: Cat | "disease"; label: string; accent: string }[] = [
     ...CATS.map((c) => ({ id: c.id, label: c.label, accent: TRACK.beauty.accent })),
     { id: "disease", label: "피부질환 비급여", accent: TRACK.medical.accent },
   ];
   return (
     <>
-      <PageBand title="비용 안내" sub="부가세 포함, 2026년 9월 1일 기준" />
+      <PageBand title="비용 안내" sub={`부가세 포함, ${fmtYMD(feeDate)} 기준`} />
       <div className={`${container} py-10 md:py-14`}>
         <Tabs
           id="fee"
@@ -993,7 +1004,7 @@ function FeesPage({ tab, setTab }: { tab: "price" | "legal"; setTab: (t: "price"
                 </table>
               </div>
               <p className="mt-3 text-[15px]" style={{ color: C.muted }}>
-                최종 수정일 2026.09.01
+                최종 수정일 {fmtDot(feeDate)}
               </p>
             </>
           )}
@@ -1057,6 +1068,7 @@ function AboutPage({ now }: { now: Now | null }) {
 /* ---------- 공지사항 ---------- */
 
 function NoticePage() {
+  const today = useDemoToday();
   const [open, setOpen] = useState<number | null>(null);
   const n = open ? NOTICES.find((x) => x.no === open) : null;
   return (
@@ -1068,11 +1080,11 @@ function NoticePage() {
             <header className="border-b border-t-2 py-4" style={{ borderColor: C.ink }}>
               <h2 className="text-[22px] font-semibold">{n.title}</h2>
               <p className="mt-1 text-[14px] tabular-nums" style={{ color: C.muted }}>
-                등록일 {n.date}
+                등록일 {fmtDot(daysAgo(today, n.ago))}
               </p>
             </header>
             <p className="border-b py-8" style={{ borderColor: C.line }}>
-              {n.body}
+              {typeof n.body === "function" ? n.body(today) : n.body}
             </p>
             <button type="button" onClick={() => setOpen(null)} className="mt-6 inline-flex h-11 items-center rounded-[6px] border px-6 font-semibold" style={{ borderColor: C.line }}>
               목록
@@ -1094,7 +1106,7 @@ function NoticePage() {
                     <span className="truncate">{x.title}</span>
                   </span>
                   <span className="shrink-0 text-[15px] tabular-nums" style={{ color: C.muted }}>
-                    {x.date}
+                    {fmtDot(daysAgo(today, x.ago))}
                   </span>
                 </button>
               </li>

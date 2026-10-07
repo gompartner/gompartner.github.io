@@ -21,6 +21,7 @@ import {
   X,
 } from "lucide-react";
 import { useReducedMotionSafe } from "@/hooks/useReducedMotionSafe";
+import { daysAgo, fmtDot, fmtKo, useDemoToday } from "@/hooks/useDemoToday";
 
 /* 꽃박람회 축제 안내 데모: 가상의 "2027 ○○ 꽃박람회".
    개최지, 주최 기관, 입장료, 프로그램, 공지, 연락처는 모두 가상이다.
@@ -354,34 +355,35 @@ function programsFor(i: number): Program[] {
   return list.sort((a, b) => a.time.localeCompare(b.time));
 }
 
-const NOTICES = [
+// ago: 오늘 기준 며칠 전 등록. 신청 마감처럼 날짜가 필요한 본문은 오늘 기준으로 계산한다.
+const NOTICES: { title: string; ago: number; isNew: boolean; body: string | ((t: Date) => string) }[] = [
   {
     title: "2027 ○○ 꽃박람회 사전예매권 판매 안내",
-    date: "2026.10.05",
+    ago: 2,
     isNew: true,
     body: "사전예매권은 2026년 12월 1일부터 2027년 4월 22일까지 온라인으로 판매하며, 일반권 기준 2,000원 할인됩니다. 수량이 정해져 있어 조기 마감될 수 있습니다.",
   },
   {
     title: "꽃박람회 자원봉사자 모집",
-    date: "2026.10.02",
+    ago: 5,
     isNew: true,
-    body: "관람 안내, 체험 보조, 편의시설 운영을 맡을 자원봉사자 120명을 모집합니다. 신청은 10월 31일까지 시민참여 메뉴에서 받습니다.",
+    body: (t) => `관람 안내, 체험 보조, 편의시설 운영을 맡을 자원봉사자 120명을 모집합니다. 신청은 ${fmtKo(daysAgo(t, -24))}까지 시민참여 메뉴에서 받습니다.`,
   },
   {
     title: "참여 정원 조성 작가 공모 결과 발표",
-    date: "2026.09.24",
+    ago: 13,
     isNew: false,
     body: "참여 정원 조성 작가 공모에서 12개 팀을 선정했습니다. 선정된 팀에는 개별 연락드립니다.",
   },
   {
     title: "무료 셔틀버스 운행 안내",
-    date: "2026.09.15",
+    ago: 22,
     isNew: false,
     body: "행사 기간 중 □□역 2번 출구에서 박람회 정문까지 무료 셔틀버스를 10분 간격으로 운행합니다. 야간 개장일 막차는 21:50입니다.",
   },
   {
     title: "2027 ○○ 꽃박람회 개최 일정 확정",
-    date: "2026.08.20",
+    ago: 48,
     isNew: false,
     body: `2027 ○○ 꽃박람회는 ${PERIOD} 17일간 ${PLACE} 일대에서 열립니다.`,
   },
@@ -836,6 +838,7 @@ function QuickTiles({ go }: { go: Go }) {
 }
 
 function NoticeList({ limit, onOpen }: { limit?: number; onOpen: (i: number) => void }) {
+  const today = useDemoToday();
   return (
     <ul>
       {NOTICES.slice(0, limit).map((n, i) => (
@@ -850,7 +853,7 @@ function NoticeList({ limit, onOpen }: { limit?: number; onOpen: (i: number) => 
               )}
             </span>
             <span className="shrink-0 text-[14px] tabular-nums" style={{ color: C.muted }}>
-              {n.date}
+              {fmtDot(daysAgo(today, n.ago))}
             </span>
           </button>
         </li>
@@ -1549,6 +1552,7 @@ function ProgramPage({ today }: { today: number }) {
 /* ─── 소식·자료 ─────────────────────────────────────────── */
 
 function NoticePage({ openIndex, setOpenIndex }: { openIndex: number | null; setOpenIndex: (i: number | null) => void }) {
+  const today = useDemoToday();
   if (openIndex !== null) {
     const n = NOTICES[openIndex];
     return (
@@ -1556,11 +1560,11 @@ function NoticePage({ openIndex, setOpenIndex }: { openIndex: number | null; set
         <header className="border-y-2 py-4" style={{ borderColor: C.green }}>
           <h2 className="text-[20px] font-bold leading-[1.45] md:text-[22px]">{n.title}</h2>
           <p className="mt-1 text-[14px]" style={{ color: C.muted }}>
-            작성자 조직위원회 · 등록일 {n.date}
+            작성자 조직위원회 · 등록일 {fmtDot(daysAgo(today, n.ago))}
           </p>
         </header>
         <p className="min-h-[160px] border-b py-6 text-[16px] leading-[1.8]" style={{ borderColor: C.line }}>
-          {n.body}
+          {typeof n.body === "function" ? n.body(today) : n.body}
         </p>
         <div className="mt-5 flex justify-center">
           <button type="button" onClick={() => setOpenIndex(null)} className="h-11 rounded-[6px] px-8 text-[15px] font-bold text-white" style={{ background: C.green }}>
@@ -1607,7 +1611,7 @@ function NoticePage({ openIndex, setOpenIndex }: { openIndex: number | null; set
                 </button>
               </td>
               <td className="px-2 py-3 text-center text-[14px] tabular-nums" style={{ color: C.muted }}>
-                {n.date}
+                {fmtDot(daysAgo(today, n.ago))}
               </td>
             </tr>
           ))}

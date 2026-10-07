@@ -4,6 +4,7 @@ import { useEffect, useMemo, useRef, useState } from "react";
 import { AnimatePresence, motion } from "framer-motion";
 import { AlertTriangle, CheckCircle2, Download, Printer, Upload, Wand2 } from "lucide-react";
 import { useReducedMotionSafe } from "@/hooks/useReducedMotionSafe";
+import { daysAgo, useDemoToday } from "@/hooks/useDemoToday";
 
 /* 거래처 주문 엑셀 취합·검사·발주서 자동화 데모.
    거래처마다 양식이 다른 주문 파일을 올리면 열을 자동으로 맞추고, 엑셀처럼 생긴 격자에서 오류를 표시한다.
@@ -69,34 +70,51 @@ interface Sheet {
   headers: string[];
   rows: string[][];
   mapping: Field[];
+  /** 샘플 파일이면 true. 주문일을 오늘 기준으로 다시 계산할 때 쓴다 */
+  sample?: boolean;
 }
 
 const SAMPLE_HEADERS = ["주문일", "업체명", "품번", "상품명", "주문수량", "공급가", "비고"];
-const SAMPLE_ROWS: string[][] = [
-  ["10/01", "가나상사", "P-101", "호텔식 세안 타월", "40", "3,500", ""],
-  ["10/01", "가나상사", "P-102", "호텔식 바스 타월", "12", "12,000", ""],
-  ["10/01", "가나상사", "P-1O4", "주방 세제 리필", "20", "5,800", "O와 0 혼동"],
-  ["10/01", "가나상사", "P-107", "무향 핸드워시", "15개", "6,400", ""],
-  ["10/01", "다라유통", "P-101", "호텔식 세안 타월", "60", "3,500", ""],
-  ["10/01", "다라유통", "P-105", "극세사 행주", "30", "3,700", "구 단가"],
-  ["10/01", "다라유통", "p106", "종이 수건", "100", "2,100", ""],
-  ["10/01", "다라유통", "P-101", "호텔식 세안 타월", "20", "3,500", "추가 주문"],
-  ["10/01", "마바마트", "P-103", "대나무 칫솔", "-5", "4,200", ""],
-  ["10/01", "마바마트", "P-108", "욕실 슬리퍼", "24", "4,900", ""],
-  ["10/01", "마바마트", "P-104", "주방 세제 리필", "18", "5,800", ""],
-  ["10/01", "마바마트", "P-999", "향초 세트", "6", "8,000", "신규 품목?"],
-  ["10/01", "사아호텔", "P-102", "호텔식 바스 타월", "80", "11,000", ""],
-  ["10/01", "사아호텔", "P-101", "호텔식 세안 타월", "120", "3,500", ""],
-  ["10/01", "사아호텔", "P-107", "무향 핸드워시", "40", "6,400", ""],
-  ["10/01", "사아호텔", "P-108", "욕실 슬리퍼", "0", "4,900", ""],
-  ["10/01", "사아호텔", "P-106", "종이 수건", "60", "2,100", ""],
-  ["10/01", "자차상회", "P-105", "극세사 행주", "25", "3,900", ""],
-  ["10/01", "자차상회", "P 103", "대나무 칫솔", "10", "4,200", ""],
-  ["10/01", "자차상회", "P-104", "주방 세제 리필", "12", "5,800", ""],
+// 샘플 주문은 주문일 열을 빼고 두고, 오늘 기준 SAMPLE_AGO일 전 날짜를 앞에 붙인다
+const SAMPLE_AGO = 6;
+const SAMPLE_BODY: string[][] = [
+  ["가나상사", "P-101", "호텔식 세안 타월", "40", "3,500", ""],
+  ["가나상사", "P-102", "호텔식 바스 타월", "12", "12,000", ""],
+  ["가나상사", "P-1O4", "주방 세제 리필", "20", "5,800", "O와 0 혼동"],
+  ["가나상사", "P-107", "무향 핸드워시", "15개", "6,400", ""],
+  ["다라유통", "P-101", "호텔식 세안 타월", "60", "3,500", ""],
+  ["다라유통", "P-105", "극세사 행주", "30", "3,700", "구 단가"],
+  ["다라유통", "p106", "종이 수건", "100", "2,100", ""],
+  ["다라유통", "P-101", "호텔식 세안 타월", "20", "3,500", "추가 주문"],
+  ["마바마트", "P-103", "대나무 칫솔", "-5", "4,200", ""],
+  ["마바마트", "P-108", "욕실 슬리퍼", "24", "4,900", ""],
+  ["마바마트", "P-104", "주방 세제 리필", "18", "5,800", ""],
+  ["마바마트", "P-999", "향초 세트", "6", "8,000", "신규 품목?"],
+  ["사아호텔", "P-102", "호텔식 바스 타월", "80", "11,000", ""],
+  ["사아호텔", "P-101", "호텔식 세안 타월", "120", "3,500", ""],
+  ["사아호텔", "P-107", "무향 핸드워시", "40", "6,400", ""],
+  ["사아호텔", "P-108", "욕실 슬리퍼", "0", "4,900", ""],
+  ["사아호텔", "P-106", "종이 수건", "60", "2,100", ""],
+  ["자차상회", "P-105", "극세사 행주", "25", "3,900", ""],
+  ["자차상회", "P 103", "대나무 칫솔", "10", "4,200", ""],
+  ["자차상회", "P-104", "주방 세제 리필", "12", "5,800", ""],
 ];
 
-function sampleSheet(): Sheet {
-  return { fileName: "10월1일_거래처주문_취합.xlsx", headers: SAMPLE_HEADERS, rows: SAMPLE_ROWS.map((r) => [...r]), mapping: SAMPLE_HEADERS.map(guessField) };
+function sampleRows(t: Date) {
+  const d = daysAgo(t, SAMPLE_AGO);
+  const md = `${d.getMonth() + 1}/${String(d.getDate()).padStart(2, "0")}`;
+  return SAMPLE_BODY.map((r) => [md, ...r]);
+}
+
+function sampleSheet(t: Date): Sheet {
+  const d = daysAgo(t, SAMPLE_AGO);
+  return {
+    fileName: `${d.getMonth() + 1}월${d.getDate()}일_거래처주문_취합.xlsx`,
+    headers: SAMPLE_HEADERS,
+    rows: sampleRows(t),
+    mapping: SAMPLE_HEADERS.map(guessField),
+    sample: true,
+  };
 }
 
 const colLetter = (i: number) => String.fromCharCode(65 + i);
@@ -231,7 +249,14 @@ type Tab = "취합" | "집계" | "발주서";
 
 export function ExcelAutomationDemo() {
   const reduce = useReducedMotionSafe();
-  const [sheet, setSheet] = useState<Sheet>(sampleSheet);
+  const today = useDemoToday();
+  const [sheet, setSheet] = useState<Sheet>(() => sampleSheet(today));
+  // 첫 화면은 기준일로 그리고, 브라우저에서 오늘 날짜가 정해지면 샘플 주문일을 다시 맞춘다
+  const [sheetDay, setSheetDay] = useState(today);
+  if (sheetDay !== today) {
+    setSheetDay(today);
+    if (sheet.sample) setSheet(sampleSheet(today));
+  }
   const [loadId, setLoadId] = useState(0);
   const [tab, setTab] = useState<Tab>("취합");
   const [dragging, setDragging] = useState(false);
@@ -396,13 +421,13 @@ export function ExcelAutomationDemo() {
           </button>
           <button
             type="button"
-            onClick={() => downloadCsv("샘플_거래처주문.csv", [SAMPLE_HEADERS, ...SAMPLE_ROWS])}
+            onClick={() => downloadCsv("샘플_거래처주문.csv", [SAMPLE_HEADERS, ...sampleRows(today)])}
             className="inline-flex h-10 items-center gap-1.5 rounded-md border border-white/60 px-3.5 text-[15px] font-bold"
           >
             <Download size={16} aria-hidden />
             샘플 다운로드
           </button>
-          <button type="button" onClick={() => load(sampleSheet(), "샘플 주문 20행을 불러왔습니다.")} className="h-10 rounded-md px-2 text-[15px] font-bold underline underline-offset-4">
+          <button type="button" onClick={() => load(sampleSheet(today), "샘플 주문 20행을 불러왔습니다.")} className="h-10 rounded-md px-2 text-[15px] font-bold underline underline-offset-4">
             초기화
           </button>
         </div>

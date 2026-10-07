@@ -17,6 +17,7 @@ import {
   X,
 } from "lucide-react";
 import { useReducedMotionSafe } from "@/hooks/useReducedMotionSafe";
+import { daysAgo, fmtDot, useDemoToday } from "@/hooks/useDemoToday";
 
 /* 법률사무소 홈페이지 데모: 가상의 법률사무소 곰파트너.
    사무소 이름, 변호사 이름, 경력, 주소, 전화번호, 사업자 정보, 성공사례는 모두 가상이다.
@@ -703,6 +704,7 @@ function QuickRail({ go }: { go: Go }) {
 /* ---------- 첫 화면 ---------- */
 
 function Home({ go }: { go: Go }) {
+  const today = useDemoToday();
   const reduce = useReducedMotionSafe();
   return (
     <>
@@ -797,7 +799,7 @@ function Home({ go }: { go: Go }) {
                     </span>
                     <span className="min-w-0 flex-1 truncate text-[15px] hover:underline">{c.title}</span>
                     <span className="hidden shrink-0 text-[13px] tabular-nums sm:inline" style={{ color: C.muted }}>
-                      {c.date}
+                      {fmtDot(daysAgo(today, c.ago))}
                     </span>
                   </button>
                 </li>
@@ -1382,10 +1384,11 @@ function Fees({ go }: { go: Go }) {
 
 /* ---------- 성공사례 ---------- */
 
-const CASES: { field: Field; date: string; title: string; body: string; result: string; tag: string }[] = [
+// ago: 오늘 기준 며칠 전 게시
+const CASES: { field: Field; ago: number; title: string; body: string; result: string; tag: string }[] = [
   {
     field: "lease",
-    date: "2026.09.24",
+    ago: 13,
     title: "계약 종료 5개월 뒤에도 돌려받지 못한 전세보증금",
     body: "임차권등기명령으로 대항력을 지킨 뒤 이사하고, 지급명령을 신청했습니다.",
     result: "집주인이 이의를 내지 않아 지급명령이 확정됐고, 경매 신청 전에 보증금을 모두 돌려받았습니다.",
@@ -1393,7 +1396,7 @@ const CASES: { field: Field; date: string; title: string; body: string; result: 
   },
   {
     field: "family",
-    date: "2026.09.11",
+    ago: 26,
     title: "이혼을 거부하던 배우자와의 재판상 이혼",
     body: "소송 전에 부동산을 가압류하고, 조정 기일에 양육 계획을 구체적으로 냈습니다.",
     result: "조정으로 이혼이 성립했고 친권, 양육권과 매달 양육비를 정했습니다.",
@@ -1401,7 +1404,7 @@ const CASES: { field: Field; date: string; title: string; body: string; result: 
   },
   {
     field: "criminal",
-    date: "2026.09.09",
+    ago: 28,
     title: "술자리 다툼으로 폭행 혐의 조사를 받게 된 직장인",
     body: "경찰 조사에 함께 들어가고, 상대방과의 합의 절차를 도왔습니다.",
     result: "합의서를 냈고 불송치 결정을 받았습니다.",
@@ -1409,7 +1412,7 @@ const CASES: { field: Field; date: string; title: string; body: string; result: 
   },
   {
     field: "civil",
-    date: "2026.08.19",
+    ago: 49,
     title: "지인에게 빌려준 1,500만 원 대여금 청구",
     body: "차용증이 없어 이체 내역과 문자로 대여 사실을 입증하고 소액사건으로 청구했습니다.",
     result: "판결 후 상대방 예금을 압류해 원금과 이자를 회수했습니다.",
@@ -1417,7 +1420,7 @@ const CASES: { field: Field; date: string; title: string; body: string; result: 
   },
   {
     field: "lease",
-    date: "2026.07.30",
+    ago: 69,
     title: "실거주를 이유로 갱신을 거절한 뒤 새 임차인을 들인 임대인",
     body: "전입 기록과 중개 광고를 근거로 주택임대차분쟁조정을 신청했습니다.",
     result: "조정에서 손해배상금과 이사 비용을 받기로 합의했습니다.",
@@ -1425,7 +1428,7 @@ const CASES: { field: Field; date: string; title: string; body: string; result: 
   },
   {
     field: "family",
-    date: "2026.07.28",
+    ago: 71,
     title: "협의이혼 뒤 1년 넘게 밀린 양육비",
     body: "양육비부담조서를 근거로 상대방 급여 압류를 신청했습니다.",
     result: "미지급 양육비를 회수했고, 이후 양육비는 급여에서 직접 지급되고 있습니다.",
@@ -1433,7 +1436,7 @@ const CASES: { field: Field; date: string; title: string; body: string; result: 
   },
   {
     field: "criminal",
-    date: "2026.07.03",
+    ago: 96,
     title: "중고 거래 사기 피해자 여러 명의 고소 대리",
     body: "피해자들의 송금 내역과 대화를 모아 한 번에 고소장을 냈습니다.",
     result: "피의자가 특정되어 재판에 넘겨졌고, 피해금 일부를 배상받았습니다.",
@@ -1441,7 +1444,7 @@ const CASES: { field: Field; date: string; title: string; body: string; result: 
   },
   {
     field: "civil",
-    date: "2026.06.17",
+    ago: 112,
     title: "6개월 밀린 거래처 물품대금",
     body: "거래처 예금을 가압류한 뒤 지급명령을 신청했습니다.",
     result: "분할 변제로 합의하고 공정증서를 작성했습니다.",
@@ -1456,6 +1459,7 @@ const CASE_TOTAL: Record<Field, number> = { lease: 58, family: 43, criminal: 27,
 const CASE_ALL = Object.values(CASE_TOTAL).reduce((a, b) => a + b, 0);
 
 function Cases() {
+  const today = useDemoToday();
   const reduce = useReducedMotionSafe();
   const [field, setField] = useState<Field | "all">("all");
   const [tag, setTag] = useState("all");
@@ -1544,7 +1548,7 @@ function Cases() {
                       </span>
                     </span>
                     <span className="order-4 text-[13px] tabular-nums md:order-none md:text-[14px]" style={{ color: C.muted }}>
-                      {c.date}
+                      {fmtDot(daysAgo(today, c.ago))}
                     </span>
                   </button>
                   <AnimatePresence initial={false}>

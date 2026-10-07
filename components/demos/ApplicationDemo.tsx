@@ -16,10 +16,11 @@ import {
   XCircle,
 } from "lucide-react";
 import { useLocalStorage } from "@/hooks/useLocalStorage";
+import { daysAgo, fmtDash, fmtDot, useDemoToday } from "@/hooks/useDemoToday";
 
 const plex = IBM_Plex_Sans_KR({ preload: false, weight: ["400", "700"], subsets: ["latin"], display: "swap" });
 
-const STORAGE_KEY = "gs-demo:application:v2";
+const STORAGE_KEY = "gs-demo:application:v3";
 
 /* 지원사업 신청·심사 시스템 데모 (가상 기관 ○○진흥원).
    신청자는 모집 공고에서 사업을 골라 3단계 신청서를 제출하고,
@@ -51,8 +52,9 @@ type Status = "접수완료" | "서류검토" | "선정" | "탈락";
 interface Program {
   id: string;
   name: string;
-  start: string;
-  end: string;
+  /** 접수 시작·마감일: 오늘 기준 며칠 전(음수면 며칠 뒤) */
+  startAgo: number;
+  endAgo: number;
   target: string;
   support: string;
   category: string;
@@ -74,8 +76,11 @@ interface Application {
   memo: string;
 }
 
+/** 저장용. 예시 신청서는 접수일을 오늘 기준 며칠 전(숫자)으로, id는 "seed-001"로 두고 화면에서 접수번호를 만든다. */
+type StoredApplication = Omit<Application, "date"> & { date: string | number };
+
 interface State {
-  apps: Application[];
+  apps: StoredApplication[];
   mine: string[];
 }
 
@@ -83,9 +88,9 @@ const PROGRAMS: Program[] = [
   {
     id: "p1",
     image: "/images/demo-application/p1.jpg",
-    name: "2026년 경력 재개 여성 인턴십 지원사업",
-    start: "2026-09-01",
-    end: "2026-10-15",
+    name: "경력 재개 여성 인턴십 지원사업",
+    startAgo: 36,
+    endAgo: -8,
     target: "경력 단절 기간 1년 이상인 여성",
     support: "3개월 인턴십 연계, 월 150만 원 지원",
     category: "인력",
@@ -94,8 +99,8 @@ const PROGRAMS: Program[] = [
     id: "p2",
     image: "/images/demo-application/p2.jpg",
     name: "청년 창업 초기 사업화 지원",
-    start: "2026-09-15",
-    end: "2026-10-31",
+    startAgo: 22,
+    endAgo: -24,
     target: "창업 3년 이내 만 39세 이하 대표자",
     support: "사업화 자금 최대 2,000만 원, 전문가 멘토링",
     category: "창업",
@@ -104,8 +109,8 @@ const PROGRAMS: Program[] = [
     id: "p3",
     image: "/images/demo-application/p3.jpg",
     name: "중소기업 디지털 전환 컨설팅",
-    start: "2026-08-01",
-    end: "2026-10-05",
+    startAgo: 67,
+    endAgo: 2,
     target: "상시 근로자 50인 미만 중소기업",
     support: "업무 시스템 진단과 전환 컨설팅 5회",
     category: "기업",
@@ -113,9 +118,9 @@ const PROGRAMS: Program[] = [
   {
     id: "p4",
     image: "/images/demo-application/p4.jpg",
-    name: "2026년 상반기 연구 인력 채용 지원",
-    start: "2026-03-02",
-    end: "2026-04-30",
+    name: "연구 인력 채용 지원",
+    startAgo: 219,
+    endAgo: 160,
     target: "연구 인력을 신규 채용하는 기업",
     support: "채용 인력 인건비 50% 지원 (최대 1년)",
     category: "인력",
@@ -141,15 +146,14 @@ const SEED_NAMES = [
 const SEED_ORGS = ["개인", "주식회사 △△랩", "□□디자인", "개인", "☆☆소프트", "개인", "◇◇바이오", "△△에너지"];
 const SEED_STATUS: Status[] = ["접수완료", "서류검토", "선정", "탈락", "서류검토", "접수완료", "선정", "서류검토", "접수완료", "탈락"];
 
-function buildSeed(): Application[] {
+function buildSeed(): StoredApplication[] {
   return SEED_NAMES.map((name, i) => {
     const program = PROGRAMS[i % 4];
     const day = 3 + ((i * 7) % 25);
-    const month = program.id === "p4" ? 4 : 9;
-    const mm = String(month).padStart(2, "0");
-    const dd = String(day).padStart(2, "0");
+    // 모집 중 사업은 34~10일 전, 지난 사업은 187~163일 전 접수
+    const ago = program.id === "p4" ? 190 - day : 37 - day;
     return {
-      id: `2026-${mm}${dd}-${String(i + 1).padStart(3, "0")}`,
+      id: `seed-${String(i + 1).padStart(3, "0")}`,
       programId: program.id,
       name,
       phone: `010-${String(2000 + i * 137).slice(0, 4)}-${String(1000 + i * 311).slice(0, 4)}`,
@@ -158,7 +162,7 @@ function buildSeed(): Application[] {
       motive: "관련 분야 경력을 살려 다시 일을 시작하고 싶어 신청합니다. 사업 참여 후 계획은 첨부한 신청서에 적었습니다.",
       field: FIELDS[i % FIELDS.length],
       files: ["신청서.hwp", i % 3 === 0 ? "사업자등록증.pdf" : "경력증명서.pdf"],
-      date: `2026-${mm}-${dd}`,
+      date: ago,
       status: program.id === "p4" ? (i % 2 ? "선정" : "탈락") : SEED_STATUS[i % SEED_STATUS.length],
       memo: "",
     };
@@ -166,6 +170,9 @@ function buildSeed(): Application[] {
 }
 
 const INITIAL_STATE: State = { apps: buildSeed(), mine: [] };
+
+/** 화면에서 쓰는 상태(날짜·접수번호를 오늘 기준으로 풀어 둔 것) */
+type ViewState = { apps: Application[]; mine: string[] };
 
 const CHOSEONG = "ㄱㄲㄴㄷㄸㄹㅁㅂㅃㅅㅆㅇㅈㅉㅊㅋㅌㅍㅎ";
 
@@ -184,11 +191,13 @@ function maskName(name: string) {
 const programName = (id: string) => PROGRAMS.find((p) => p.id === id)?.name ?? "";
 
 /** 마감일까지 남은 날짜. 오늘 마감이면 0, 지났으면 음수 */
-function daysLeft(end: string) {
-  const today = new Date();
-  today.setHours(0, 0, 0, 0);
-  const due = new Date(`${end}T00:00:00`);
-  return Math.round((due.getTime() - today.getTime()) / 86400000);
+const daysLeft = (p: Program) => -p.endAgo;
+
+/** 저장값을 화면용으로 바꾼다. 예시 신청서는 접수일과 접수번호(연도-월일-순번)를 오늘 기준으로 만든다. */
+function resolveApp(a: StoredApplication, t: Date): Application {
+  if (typeof a.date === "string") return { ...a, date: a.date };
+  const date = fmtDash(daysAgo(t, a.date));
+  return { ...a, date, id: `${date.slice(0, 4)}-${date.slice(5, 7)}${date.slice(8)}-${a.id.slice(5)}` };
 }
 
 const dot = (d: string) => d.replaceAll("-", ".");
@@ -210,11 +219,16 @@ const primaryBtn = `inline-flex h-12 items-center justify-center gap-1.5 rounded
 const secondaryBtn = `inline-flex h-12 items-center justify-center gap-1.5 rounded-full border-[1.5px] border-[#15201c] bg-white px-6 text-[17px] font-bold text-[#15201c] transition-colors hover:bg-[#e2f2ec] ${focusRing}`;
 
 export function ApplicationDemo() {
-  const [state, setState, hydrated] = useLocalStorage<State>(STORAGE_KEY, INITIAL_STATE);
+  const [stored, setState, hydrated] = useLocalStorage<State>(STORAGE_KEY, INITIAL_STATE);
   const [view, setView] = useState<"applicant" | "admin">("applicant");
+  const today = useDemoToday();
+  const state: ViewState = useMemo(() => ({ ...stored, apps: stored.apps.map((a) => resolveApp(a, today)) }), [stored, today]);
 
-  const updateApp = (id: string, patch: Partial<Application>) =>
-    setState((s) => ({ ...s, apps: s.apps.map((a) => (a.id === id ? { ...a, ...patch } : a)) }));
+  // 화면의 접수번호로 저장된 신청서를 찾아 고친다(예시 신청서는 저장 id가 다르다)
+  const updateApp = (id: string, patch: Partial<Application>) => {
+    const key = stored.apps.find((a, i) => state.apps[i]?.id === id)?.id ?? id;
+    setState((s) => ({ ...s, apps: s.apps.map((a) => (a.id === key ? { ...a, ...patch } : a)) }));
+  };
 
   const admin = view === "admin";
 
@@ -333,7 +347,8 @@ function validate(step: number, f: FormData): Errors {
 
 const STEPS = ["신청자 정보", "신청 내용", "제출서류 첨부"];
 
-function ApplicantView({ state, setState }: { state: State; setState: (u: (s: State) => State) => void }) {
+function ApplicantView({ state, setState }: { state: ViewState; setState: (u: (s: State) => State) => void }) {
+  const today = useDemoToday();
   const [programId, setProgramId] = useState<string | null>(null);
   const [step, setStep] = useState(1);
   const [form, setForm] = useState<FormData>(EMPTY_FORM);
@@ -341,7 +356,7 @@ function ApplicantView({ state, setState }: { state: State; setState: (u: (s: St
   const [doneId, setDoneId] = useState<string | null>(null);
 
   const mine = state.apps.filter((a) => state.mine.includes(a.id));
-  const openCount = PROGRAMS.filter((p) => daysLeft(p.end) >= 0).length;
+  const openCount = PROGRAMS.filter((p) => daysLeft(p) >= 0).length;
 
   function start(id: string) {
     setProgramId(id);
@@ -418,7 +433,7 @@ function ApplicantView({ state, setState }: { state: State; setState: (u: (s: St
             <span aria-hidden className="absolute inset-0 -z-10 bg-[linear-gradient(180deg,rgba(0,81,63,0.78),rgba(0,58,45,0.96)_55%)]" />
             <p className="text-[15px] text-[#d7efe7]">신청서 작성</p>
             <h2 className="mt-1 text-[21px] font-bold leading-[1.4] tracking-[-0.02em]">{program.name}</h2>
-            <p className="mt-2 text-[15px] text-[#d7efe7]">접수마감 {dot(program.end)}</p>
+            <p className="mt-2 text-[15px] text-[#d7efe7]">접수마감 {fmtDot(daysAgo(today, program.endAgo))}</p>
             <ol className="mt-6 flex gap-2 md:mt-10 md:flex-col md:gap-0" aria-label="작성 단계">
               {STEPS.map((label, i) => {
                 const n = i + 1;
@@ -595,8 +610,8 @@ function ApplicantView({ state, setState }: { state: State; setState: (u: (s: St
   }
 
   // 마감이 가장 가까운 모집 중 사업을 첫 화면에 크게 보여 준다
-  const nearest = PROGRAMS.filter((p) => daysLeft(p.end) >= 0).sort((a, b) => daysLeft(a.end) - daysLeft(b.end))[0];
-  const nearestLeft = nearest ? daysLeft(nearest.end) : 0;
+  const nearest = PROGRAMS.filter((p) => daysLeft(p) >= 0).sort((a, b) => daysLeft(a) - daysLeft(b))[0];
+  const nearestLeft = nearest ? daysLeft(nearest) : 0;
 
   return (
     <main className="pb-28">
@@ -629,7 +644,7 @@ function ApplicantView({ state, setState }: { state: State; setState: (u: (s: St
             <p className="mt-5 text-[19px] text-[#d7efe7]">접수중 사업 {openCount}건</p>
             <p className="mt-2 flex items-center gap-2 text-[15px] text-[#a9c9bd]">
               <CalendarDays size={18} aria-hidden />
-              기준일 {dot(new Date().toISOString().slice(0, 10))}
+              기준일 {fmtDot(today)}
             </p>
           </div>
 
@@ -641,7 +656,7 @@ function ApplicantView({ state, setState }: { state: State; setState: (u: (s: St
               </p>
               <p className="mt-3 text-[21px] font-bold leading-[1.4] tracking-[-0.02em]">{nearest.name}</p>
               <p className="mt-1 text-[15px] text-[#c4dcd3]">
-                {nearest.category} 분야, 접수마감 {dot(nearest.end)}
+                {nearest.category} 분야, 접수마감 {fmtDot(daysAgo(today, nearest.endAgo))}
               </p>
               <button
                 type="button"
@@ -703,7 +718,8 @@ function ApplicantView({ state, setState }: { state: State; setState: (u: (s: St
 }
 
 function ProgramCard({ program: p, onApply }: { program: Program; onApply: () => void }) {
-  const left = daysLeft(p.end);
+  const today = useDemoToday();
+  const left = daysLeft(p);
   const closed = left < 0;
   const urgent = !closed && left <= 7;
 
@@ -738,7 +754,7 @@ function ProgramCard({ program: p, onApply }: { program: Program; onApply: () =>
         <dl className="mt-3 grid grid-cols-[64px_1fr] gap-x-2 gap-y-1 text-[15px]">
           <dt className="text-[#5b6862]">접수기간</dt>
           <dd className="tabular-nums">
-            {dot(p.start)} ~ {dot(p.end)}
+            {fmtDot(daysAgo(today, p.startAgo))} ~ {fmtDot(daysAgo(today, p.endAgo))}
           </dd>
           <dt className="text-[#5b6862]">지원대상</dt>
           <dd>{p.target}</dd>
@@ -779,7 +795,7 @@ function AdminView({
   updateApp,
   reset,
 }: {
-  state: State;
+  state: ViewState;
   updateApp: (id: string, patch: Partial<Application>) => void;
   reset: () => void;
 }) {

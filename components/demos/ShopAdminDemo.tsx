@@ -5,8 +5,9 @@ import { AnimatePresence, motion } from "framer-motion";
 import { Download, PackageCheck, Plus, RotateCcw, Search, Trash2, Truck, X } from "lucide-react";
 import { useLocalStorage } from "@/hooks/useLocalStorage";
 import { useReducedMotionSafe } from "@/hooks/useReducedMotionSafe";
+import { daysAgo, fmtDash, fmtMD, useDemoToday } from "@/hooks/useDemoToday";
 
-const STORAGE_KEY = "gs-demo:shop-admin:v2";
+const STORAGE_KEY = "gs-demo:shop-admin:v3";
 
 /* 생활용품 쇼핑몰 관리자 데모.
    옵션 단계(최대 5단계)를 입력하면 조합표가 자동으로 만들어지고, 조합별 재고와 판매 여부를 관리한다.
@@ -85,9 +86,11 @@ interface Variant {
   stock: number;
   onSale: boolean;
 }
+/** 저장용 주문. 주문일은 오늘 기준 며칠 전(ago)과 시각으로 두고, 주문번호·주문일시는 화면에서 만든다. */
 interface Order {
-  no: string;
-  date: string;
+  seq: string;
+  ago: number;
+  time: string;
   buyer: string;
   option: string;
   qty: number;
@@ -95,6 +98,13 @@ interface Order {
   status: Status;
   invoice: string;
 }
+type OrderView = Order & { no: string; date: string };
+
+const viewOrder = (o: Order, t: Date): OrderView => {
+  const d = daysAgo(t, o.ago);
+  return { ...o, no: `${fmtDash(d).replaceAll("-", "")}-${o.seq}`, date: `${fmtMD(d)} ${o.time}` };
+};
+
 interface State {
   productName: string;
   basePrice: number;
@@ -126,10 +136,10 @@ function makeOrders(): Order[] {
     const qty = (i % 4 === 0 ? 2 : 1) + (i % 9 === 0 ? 1 : 0);
     const price = 12900 + values.reduce((s, v) => s + v.extra, 0);
     const status = statuses[i % statuses.length];
-    const day = 30 - Math.floor(i / 3);
     return {
-      no: `2026${String(9).padStart(2, "0")}${String(day).padStart(2, "0")}-${String(1041 - i).padStart(5, "0")}`,
-      date: `09.${String(day).padStart(2, "0")} ${String(9 + (i % 12)).padStart(2, "0")}:${String((i * 17) % 60).padStart(2, "0")}`,
+      seq: String(1041 - i).padStart(5, "0"),
+      ago: 7 + Math.floor(i / 3),
+      time: `${String(9 + (i % 12)).padStart(2, "0")}:${String((i * 17) % 60).padStart(2, "0")}`,
       buyer: BUYERS[i % BUYERS.length],
       option: values.map((v) => v.label).join(" / "),
       qty,
@@ -673,18 +683,20 @@ function OrdersPanel({ state, setState, notify }: { state: State; setState: SetS
   const [status, setStatus] = useState<Status | "전체">("전체");
   const [query, setQuery] = useState("");
   const [selected, setSelected] = useState<Set<string>>(new Set());
+  const today = useDemoToday();
+  const orders = useMemo(() => state.orders.map((o) => viewOrder(o, today)), [state.orders, today]);
 
   const q = query.replace(/\s/g, "");
-  const list = state.orders.filter(
+  const list = orders.filter(
     (o) => (status === "전체" || o.status === status) && (!q || o.no.includes(q) || o.buyer.includes(q) || maskName(o.buyer).includes(q)),
   );
-  const picked = state.orders.filter((o) => selected.has(o.no));
+  const picked = orders.filter((o) => selected.has(o.no));
 
   const move = (to: Status) => {
     // 배송중으로 바꾸려면 송장번호가 있어야 한다
     const blocked = to === "배송중" ? picked.filter((o) => !o.invoice) : [];
-    const ok = new Set(picked.filter((o) => !blocked.includes(o)).map((o) => o.no));
-    setState((s) => ({ ...s, orders: s.orders.map((o) => (ok.has(o.no) ? { ...o, status: to } : o)) }));
+    const ok = new Set(picked.filter((o) => !blocked.includes(o)).map((o) => o.seq));
+    setState((s) => ({ ...s, orders: s.orders.map((o) => (ok.has(o.seq) ? { ...o, status: to } : o)) }));
     setSelected(new Set());
     // 받침 있는 말 뒤에는 "으로" (배송중으로, 배송완료로)
     const last = to.charCodeAt(to.length - 1) - 0xac00;
@@ -719,7 +731,7 @@ function OrdersPanel({ state, setState, notify }: { state: State; setState: SetS
       </h2>
       <div className="flex flex-wrap gap-1.5 border-b p-4" style={{ borderColor: C.rule }}>
         {(["전체", ...STATUSES] as const).map((s) => {
-          const n = s === "전체" ? state.orders.length : state.orders.filter((o) => o.status === s).length;
+          const n = s === "전체" ? orders.length : orders.filter((o) => o.status === s).length;
           const on = status === s;
           return (
             <button
@@ -846,7 +858,7 @@ function OrdersPanel({ state, setState, notify }: { state: State; setState: SetS
                       onChange={(e) =>
                         setState((s) => ({
                           ...s,
-                          orders: s.orders.map((x) => (x.no === o.no ? { ...x, invoice: e.target.value.replace(/\D/g, "").slice(0, 14) } : x)),
+                          orders: s.orders.map((x) => (x.seq === o.seq ? { ...x, invoice: e.target.value.replace(/\D/g, "").slice(0, 14) } : x)),
                         }))
                       }
                       className="h-9 w-full rounded border px-2 tabular-nums"

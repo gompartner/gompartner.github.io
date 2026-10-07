@@ -14,6 +14,7 @@ import {
   ScanSearch,
   XCircle,
 } from "lucide-react";
+import { daysAgo, fmtDot, useDemoToday } from "@/hooks/useDemoToday";
 
 // 웹접근성 개선 전후 비교 데모.
 // 같은 샘플 페이지(샘플시 문화재단)를 개선 전/개선 후로 바꿔 보여주고,
@@ -56,11 +57,12 @@ const BANNERS = [
   { src: "/images/demo-a11y/banner-3.svg", alt: "시민 사진 공모전, 주제는 우리 동네의 계절, 11월 15일까지 접수" },
 ];
 
+// ago: 오늘 기준 며칠 전 게시
 const NOTICES = [
-  { date: "2026.09.26", title: "○○시민회관 대공연장 좌석 교체 공사 안내" },
-  { date: "2026.09.22", title: "2026 하반기 문화예술교육 강사 모집 결과" },
-  { date: "2026.09.18", title: "추석 연휴 문화시설 운영 시간 변경" },
-  { date: "2026.09.10", title: "생활문화 동아리 지원사업 설명회 개최" },
+  { ago: 11, title: "○○시민회관 대공연장 좌석 교체 공사 안내" },
+  { ago: 15, title: "문화예술교육 강사 모집 결과" },
+  { ago: 19, title: "명절 연휴 문화시설 운영 시간 변경" },
+  { ago: 27, title: "생활문화 동아리 지원사업 설명회 개최" },
 ];
 
 type Status = "open" | "closed" | "soon";
@@ -297,6 +299,7 @@ function SamplePage({
   reduced: boolean;
 }) {
   const good = mode === "after";
+  const today = useDemoToday();
   const region = (id: RegionId) => ({ id, active: activeRegion === id, number: activeRegion === id ? activeNumber : null });
 
   return (
@@ -347,7 +350,7 @@ function SamplePage({
                     <a href="#sample-main" onClick={(e) => e.preventDefault()} className={`flex-1 truncate ${good ? "text-[#222]" : "text-[#aaaaaa]"}`}>
                       {n.title}
                     </a>
-                    <span className={`shrink-0 tabular-nums ${good ? "text-[#555]" : "text-[#cccccc]"}`}>{n.date}</span>
+                    <span className={`shrink-0 tabular-nums ${good ? "text-[#555]" : "text-[#cccccc]"}`}>{fmtDot(daysAgo(today, n.ago))}</span>
                   </li>
                 ))}
               </ul>

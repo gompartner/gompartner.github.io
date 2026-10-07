@@ -20,10 +20,11 @@ import {
   X,
 } from "lucide-react";
 import { useLocalStorage } from "@/hooks/useLocalStorage";
+import { daysAgo, fmtDash, useDemoToday } from "@/hooks/useDemoToday";
 
 const plex = IBM_Plex_Sans_KR({ weight: ["400", "700"], subsets: ["latin"], preload: false, display: "swap" });
 
-const STORAGE_KEY = "gs-demo:maintenance:v2";
+const STORAGE_KEY = "gs-demo:maintenance:v3";
 
 /* 기관 홈페이지 유지보수 현황판 데모.
    야간 관제실 느낌의 짙은 청록 작업 화면: 가동 상태 띠, 요청 대기열, 처리 기록.
@@ -73,44 +74,51 @@ interface CheckItem {
   note: string;
 }
 
+/** 저장용. 날짜가 숫자면 오늘 기준 며칠 전(예시 데이터), 문자열이면 YYYY-MM-DD(직접 등록·처리한 날) */
+type StoredRequest = Omit<Request, "date" | "doneDate"> & { date: string | number; doneDate?: string | number };
+
 interface State {
-  requests: Request[];
+  requests: StoredRequest[];
   checks: CheckItem[];
 }
 
-const MONTH = "2026-09";
-const PERIOD = "2026. 9. 1. ~ 2026. 9. 30.";
+// 현황·보고서는 오늘까지 최근 30일을 본다.
+const PERIOD_DAYS = 30;
+// 가동 기록에서 짧은 지연이 있었던 날(오늘 기준 며칠 전)
+const DELAY_AGO = 18;
+// SSL 인증서 만료까지 남은 날
+const SSL_LEFT = 326;
 
-const SEED_REQUESTS: Request[] = [
-  { id: "r16", no: 16, date: "2026-09-28", dept: "입학처", requester: "박서연", type: "콘텐츠 수정", title: "수시 모집 공지 메인 배너 교체", content: "메인 배너를 2027학년도 수시 모집 안내 이미지로 교체 요청합니다.", status: "접수", resolution: "" },
-  { id: "r15", no: 15, date: "2026-09-26", dept: "정보전산원", requester: "정민호", type: "보안 조치", title: "관리자 페이지 접속 IP 제한 추가", content: "외부망에서 관리자 페이지 접속 차단을 요청합니다.", status: "처리중", resolution: "학내 IP 대역 목록 확인 중입니다." },
-  { id: "r14", no: 14, date: "2026-09-24", dept: "체육학과", requester: "이도윤", type: "콘텐츠 수정", title: "학과 교수진 사진 변경", content: "신임 교수 2명 사진과 연구실 번호 반영을 요청합니다.", status: "처리완료", resolution: "교수진 페이지 사진과 연락처를 변경했습니다.", doneDate: "2026-09-25" },
-  { id: "r13", no: 13, date: "2026-09-22", dept: "학생지원처", requester: "최지우", type: "오류 수정", title: "장학 공지 게시판 첨부파일 다운로드 오류", content: "한글 파일명 첨부파일이 다운로드되지 않습니다.", status: "처리완료", resolution: "첨부파일 이름 인코딩 처리를 수정했습니다.", doneDate: "2026-09-23" },
-  { id: "r12", no: 12, date: "2026-09-19", dept: "홍보팀", requester: "한예린", type: "기능 개선", title: "보도자료 게시판 대표 이미지 표시", content: "게시판 목록에 대표 이미지 표시를 요청합니다.", status: "처리중", resolution: "목록 화면 수정 후 검토 요청 예정입니다." },
-  { id: "r11", no: 11, date: "2026-09-17", dept: "정보전산원", requester: "정민호", type: "보안 조치", title: "보안 취약점 점검 결과 조치", content: "게시판 검색어 입력값 검증 취약점 2건 조치 요청입니다.", status: "처리완료", resolution: "입력값 필터를 적용하고 재점검 결과를 전달했습니다.", doneDate: "2026-09-19" },
-  { id: "r10", no: 10, date: "2026-09-15", dept: "교무처", requester: "김하늘", type: "콘텐츠 수정", title: "2학기 학사 일정 표 수정", content: "중간고사 기간 변경분 반영을 요청합니다.", status: "처리완료", resolution: "학사 일정 페이지 표를 수정했습니다.", doneDate: "2026-09-15" },
-  { id: "r09", no: 9, date: "2026-09-11", dept: "도서관", requester: "윤서아", type: "오류 수정", title: "모바일에서 운영 시간 표 깨짐", content: "모바일 화면에서 표가 화면 밖으로 넘어갑니다.", status: "처리완료", resolution: "표를 모바일에서 가로 스크롤되도록 수정했습니다.", doneDate: "2026-09-12" },
-  { id: "r08", no: 8, date: "2026-09-09", dept: "간호학과", requester: "오하준", type: "콘텐츠 수정", title: "실습 안내 자료 파일 교체", content: "실습 안내 PDF 파일 교체를 요청합니다.", status: "처리완료", resolution: "첨부파일을 교체했습니다.", doneDate: "2026-09-09" },
-  { id: "r07", no: 7, date: "2026-09-05", dept: "입학처", requester: "박서연", type: "기능 개선", title: "입학 상담 신청 항목 추가", content: "상담 신청 양식에 희망 학과 선택 항목 추가를 요청합니다.", status: "처리완료", resolution: "희망 학과 선택 항목과 관리자 목록 열을 추가했습니다.", doneDate: "2026-09-10" },
-  { id: "r06", no: 6, date: "2026-09-03", dept: "홍보팀", requester: "한예린", type: "콘텐츠 수정", title: "대학 소개 영상 교체", content: "메인 소개 영상을 2026년 버전으로 교체 요청합니다.", status: "처리완료", resolution: "영상 링크와 썸네일을 교체했습니다.", doneDate: "2026-09-04" },
-  { id: "r05", no: 5, date: "2026-09-01", dept: "학생지원처", requester: "최지우", type: "오류 수정", title: "상담 예약 페이지 접속 오류", content: "상담 예약 페이지가 간헐적으로 열리지 않습니다.", status: "처리완료", resolution: "세션 설정을 수정하고 3일간 모니터링했습니다.", doneDate: "2026-09-04" },
-  { id: "r04", no: 4, date: "2026-08-27", dept: "교무처", requester: "김하늘", type: "콘텐츠 수정", title: "휴·복학 안내 문구 수정", content: "신청 기간 문구 수정을 요청합니다.", status: "처리완료", resolution: "안내 문구를 수정했습니다.", doneDate: "2026-08-27" },
-  { id: "r03", no: 3, date: "2026-08-20", dept: "정보전산원", requester: "정민호", type: "보안 조치", title: "SSL 인증서 갱신", content: "인증서 만료 전 갱신 요청입니다.", status: "처리완료", resolution: "인증서를 갱신하고 만료일을 확인했습니다.", doneDate: "2026-08-21" },
+const SEED_REQUESTS: StoredRequest[] = [
+  { id: "r16", no: 16, date: 1, dept: "입학처", requester: "박서연", type: "콘텐츠 수정", title: "수시 모집 공지 메인 배너 교체", content: "메인 배너를 수시 모집 안내 이미지로 교체 요청합니다.", status: "접수", resolution: "" },
+  { id: "r15", no: 15, date: 3, dept: "정보전산원", requester: "정민호", type: "보안 조치", title: "관리자 페이지 접속 IP 제한 추가", content: "외부망에서 관리자 페이지 접속 차단을 요청합니다.", status: "처리중", resolution: "학내 IP 대역 목록 확인 중입니다." },
+  { id: "r14", no: 14, date: 5, dept: "체육학과", requester: "이도윤", type: "콘텐츠 수정", title: "학과 교수진 사진 변경", content: "신임 교수 2명 사진과 연구실 번호 반영을 요청합니다.", status: "처리완료", resolution: "교수진 페이지 사진과 연락처를 변경했습니다.", doneDate: 4 },
+  { id: "r13", no: 13, date: 7, dept: "학생지원처", requester: "최지우", type: "오류 수정", title: "장학 공지 게시판 첨부파일 다운로드 오류", content: "한글 파일명 첨부파일이 다운로드되지 않습니다.", status: "처리완료", resolution: "첨부파일 이름 인코딩 처리를 수정했습니다.", doneDate: 6 },
+  { id: "r12", no: 12, date: 10, dept: "홍보팀", requester: "한예린", type: "기능 개선", title: "보도자료 게시판 대표 이미지 표시", content: "게시판 목록에 대표 이미지 표시를 요청합니다.", status: "처리중", resolution: "목록 화면 수정 후 검토 요청 예정입니다." },
+  { id: "r11", no: 11, date: 12, dept: "정보전산원", requester: "정민호", type: "보안 조치", title: "보안 취약점 점검 결과 조치", content: "게시판 검색어 입력값 검증 취약점 2건 조치 요청입니다.", status: "처리완료", resolution: "입력값 필터를 적용하고 재점검 결과를 전달했습니다.", doneDate: 10 },
+  { id: "r10", no: 10, date: 14, dept: "교무처", requester: "김하늘", type: "콘텐츠 수정", title: "2학기 학사 일정 표 수정", content: "중간고사 기간 변경분 반영을 요청합니다.", status: "처리완료", resolution: "학사 일정 페이지 표를 수정했습니다.", doneDate: 14 },
+  { id: "r09", no: 9, date: 18, dept: "도서관", requester: "윤서아", type: "오류 수정", title: "모바일에서 운영 시간 표 깨짐", content: "모바일 화면에서 표가 화면 밖으로 넘어갑니다.", status: "처리완료", resolution: "표를 모바일에서 가로 스크롤되도록 수정했습니다.", doneDate: 17 },
+  { id: "r08", no: 8, date: 20, dept: "간호학과", requester: "오하준", type: "콘텐츠 수정", title: "실습 안내 자료 파일 교체", content: "실습 안내 PDF 파일 교체를 요청합니다.", status: "처리완료", resolution: "첨부파일을 교체했습니다.", doneDate: 20 },
+  { id: "r07", no: 7, date: 24, dept: "입학처", requester: "박서연", type: "기능 개선", title: "입학 상담 신청 항목 추가", content: "상담 신청 양식에 희망 학과 선택 항목 추가를 요청합니다.", status: "처리완료", resolution: "희망 학과 선택 항목과 관리자 목록 열을 추가했습니다.", doneDate: 19 },
+  { id: "r06", no: 6, date: 26, dept: "홍보팀", requester: "한예린", type: "콘텐츠 수정", title: "대학 소개 영상 교체", content: "메인 소개 영상을 올해 버전으로 교체 요청합니다.", status: "처리완료", resolution: "영상 링크와 썸네일을 교체했습니다.", doneDate: 25 },
+  { id: "r05", no: 5, date: 28, dept: "학생지원처", requester: "최지우", type: "오류 수정", title: "상담 예약 페이지 접속 오류", content: "상담 예약 페이지가 간헐적으로 열리지 않습니다.", status: "처리완료", resolution: "세션 설정을 수정하고 3일간 모니터링했습니다.", doneDate: 25 },
+  { id: "r04", no: 4, date: 33, dept: "교무처", requester: "김하늘", type: "콘텐츠 수정", title: "휴·복학 안내 문구 수정", content: "신청 기간 문구 수정을 요청합니다.", status: "처리완료", resolution: "안내 문구를 수정했습니다.", doneDate: 33 },
+  { id: "r03", no: 3, date: 40, dept: "정보전산원", requester: "정민호", type: "보안 조치", title: "SSL 인증서 갱신", content: "인증서 만료 전 갱신 요청입니다.", status: "처리완료", resolution: "인증서를 갱신하고 만료일을 확인했습니다.", doneDate: 39 },
 ];
 
 const SEED_CHECKS: CheckItem[] = [
-  { id: "server", label: "서버 가동 상태", result: "정상", note: "가동률 99.97%, 9월 11일 12분 지연" },
+  { id: "server", label: "서버 가동 상태", result: "정상", note: "가동률 99.97%, 12분 지연 1회" },
   { id: "links", label: "링크 오류 점검", result: "조치 필요", note: "학과 페이지 외부 링크 3건 수정 예정" },
   { id: "patch", label: "보안 패치 적용", result: "정상", note: "웹 서버·CMS 최신 보안 패치 적용" },
   { id: "backup", label: "백업 상태", result: "정상", note: "일일 백업 30회 성공, 복원 테스트 완료" },
-  { id: "ssl", label: "SSL 인증서 만료일", result: "정상", note: "2027. 8. 20. 만료" },
+  { id: "ssl", label: "SSL 인증서 만료일", result: "정상", note: "1년 인증서 갱신 완료" },
   { id: "a11y", label: "웹 접근성 점검", result: "조치 필요", note: "이미지 대체 텍스트 누락 5건" },
 ];
 
 const INITIAL_STATE: State = { requests: SEED_REQUESTS, checks: SEED_CHECKS };
 
-// 9월 1일~30일 가동률(%). 11일만 짧은 지연이 있었다.
-const UPTIME = Array.from({ length: 30 }, (_, i) => (i === 10 ? 99.2 : 100));
+// 최근 30일 가동률(%). 맨 끝이 오늘. 하루만 짧은 지연이 있었다.
+const UPTIME = Array.from({ length: PERIOD_DAYS }, (_, i) => (i === PERIOD_DAYS - 1 - DELAY_AGO ? 99.2 : 100));
 
 const TABS = [
   { id: "requests", label: "유지보수 요청", icon: ListChecks },
@@ -143,13 +151,19 @@ function formatDate(d: string) {
   return `${y}. ${m}. ${day}.`;
 }
 
+function koDate(d: string) {
+  const [, m, day] = d.split("-").map(Number);
+  return `${m}월 ${day}일`;
+}
+
 function shortDate(d: string) {
   const [, m, day] = d.split("-").map(Number);
   return `${m}. ${day}.`;
 }
 
-function today() {
-  return "2026-09-29";
+function resolveRequest(r: StoredRequest, t: Date): Request {
+  const at = (v: string | number) => (typeof v === "number" ? fmtDash(daysAgo(t, v)) : v);
+  return { ...r, date: at(r.date), doneDate: r.doneDate === undefined ? undefined : at(r.doneDate) };
 }
 
 function uid() {
@@ -188,7 +202,10 @@ export function MaintenanceDemo() {
   const [formOpen, setFormOpen] = useState(false);
   const [form, setForm] = useState({ dept: DEPARTMENTS[0], type: REQUEST_TYPES[0] as RequestType, title: "", content: "" });
 
-  const monthRequests = useMemo(() => state.requests.filter((r) => r.date.startsWith(MONTH)), [state.requests]);
+  const now = useDemoToday();
+  const today = fmtDash(now);
+  const requests = useMemo(() => state.requests.map((r) => resolveRequest(r, now)), [state.requests, now]);
+  const monthRequests = useMemo(() => requests.filter((r) => r.date <= today && daysBetween(r.date, today) < PERIOD_DAYS), [requests, today]);
   const summary = useMemo(() => {
     const done = monthRequests.filter((r) => r.status === "처리완료" && r.doneDate);
     const avg = done.length ? done.reduce((sum, r) => sum + daysBetween(r.date, r.doneDate!), 0) / done.length : 0;
@@ -201,35 +218,35 @@ export function MaintenanceDemo() {
   }, [monthRequests]);
 
   const counts = useMemo(
-    () => Object.fromEntries(STATUSES.map((s) => [s, state.requests.filter((r) => r.status === s).length])) as Record<Status, number>,
-    [state.requests],
+    () => Object.fromEntries(STATUSES.map((s) => [s, requests.filter((r) => r.status === s).length])) as Record<Status, number>,
+    [requests],
   );
 
-  const filtered = state.requests.filter(
+  const filtered = requests.filter(
     (r) => (statusFilter === "전체" || r.status === statusFilter) && (typeFilter === "전체" || r.type === typeFilter),
   );
-  const selected = state.requests.find((r) => r.id === selectedId) ?? null;
-  const recentDone = state.requests
+  const selected = requests.find((r) => r.id === selectedId) ?? null;
+  const recentDone = requests
     .filter((r) => r.status === "처리완료" && r.doneDate)
     .sort((a, b) => (b.doneDate! > a.doneDate! ? 1 : -1))
     .slice(0, 6);
   const checksNeedAction = state.checks.filter((c) => c.result === "조치 필요").length;
 
-  function updateRequest(id: string, patch: Partial<Request>) {
+  function updateRequest(id: string, patch: Partial<StoredRequest>) {
     setState((s) => ({ ...s, requests: s.requests.map((r) => (r.id === id ? { ...r, ...patch } : r)) }));
   }
 
   function changeStatus(r: Request, status: Status) {
-    updateRequest(r.id, { status, doneDate: status === "처리완료" ? today() : undefined });
+    updateRequest(r.id, { status, doneDate: status === "처리완료" ? today : undefined });
   }
 
   function addRequest() {
     if (!form.title.trim()) return;
     const no = Math.max(0, ...state.requests.map((r) => r.no)) + 1;
-    const created: Request = {
+    const created: StoredRequest = {
       id: uid(),
       no,
-      date: today(),
+      date: today,
       dept: form.dept,
       requester: "홍길동",
       type: form.type,
@@ -279,7 +296,7 @@ export function MaintenanceDemo() {
             <span>
               <span className="block text-[17px] font-bold leading-[1.35]">○○대학교 홈페이지 유지보수</span>
               <span className="block text-[15px] leading-[1.35]" style={{ color: C.muted }}>
-                2026년 9월 운영 현황
+                최근 30일 운영 현황
               </span>
             </span>
           </div>
@@ -313,7 +330,7 @@ export function MaintenanceDemo() {
           </p>
         ) : (
           <>
-            {tab !== "report" && <HealthBand summary={summary} checksNeedAction={checksNeedAction} />}
+            {tab !== "report" && <HealthBand summary={summary} checksNeedAction={checksNeedAction} now={now} />}
 
             {tab === "requests" && (
               <section className="mt-8 grid gap-6 lg:grid-cols-[minmax(0,1fr)_380px]">
@@ -574,9 +591,9 @@ export function MaintenanceDemo() {
             {tab === "checks" && (
               <section className="mt-8">
                 <div className="flex flex-wrap items-baseline gap-3">
-                  <h2 className="text-[22px] font-bold">9월 정기점검</h2>
+                  <h2 className="text-[22px] font-bold">정기점검</h2>
                   <p className="text-[15px]" style={{ color: C.muted }}>
-                    점검일 2026. 9. 29.
+                    점검일 {formatDate(today)}
                   </p>
                 </div>
                 <ul className="mt-4 overflow-hidden rounded-[10px] border" style={{ borderColor: C.rule }}>
@@ -631,7 +648,7 @@ export function MaintenanceDemo() {
             {tab === "report" && (
               <section>
                 <div className="mb-4 flex flex-wrap items-center gap-3 print:hidden">
-                  <h2 className="text-[22px] font-bold">9월 월간 점검 보고서</h2>
+                  <h2 className="text-[22px] font-bold">월간 점검 보고서</h2>
                   <button type="button" onClick={() => window.print()} className={`${primaryBtn} ml-auto`}>
                     <Printer size={18} aria-hidden />
                     인쇄·PDF 저장
@@ -639,7 +656,7 @@ export function MaintenanceDemo() {
                 </div>
                 <div className="mx-auto w-full max-w-[794px] [container-type:inline-size]">
                   <div className="[zoom:min(1,calc(100cqw/794px))]">
-                    <ReportSheet requests={monthRequests} checks={state.checks} summary={summary} />
+                    <ReportSheet requests={monthRequests} checks={state.checks} summary={summary} now={now} />
                   </div>
                 </div>
               </section>
@@ -667,20 +684,26 @@ export function MaintenanceDemo() {
 function HealthBand({
   summary,
   checksNeedAction,
+  now,
 }: {
   summary: { received: number; done: number; inProgress: number; avgDays: number };
   checksNeedAction: number;
+  now: Date;
 }) {
+  const day = (ago: number) => fmtDash(daysAgo(now, ago));
+  const start = day(PERIOD_DAYS - 1);
+  const delay = day(DELAY_AGO);
+  const todayLabel = shortDate(day(0));
   const avgUptime = (UPTIME.reduce((a, b) => a + b, 0) / UPTIME.length).toFixed(2);
   const indicators = [
     { icon: Server, label: "서버", value: "정상", sub: `가동률 ${avgUptime}%`, warn: false },
-    { icon: KeyRound, label: "SSL 인증서", value: "만료 326일 전", sub: "2027. 8. 20. 만료", warn: false },
-    { icon: Archive, label: "백업", value: "30회 성공", sub: "최종 9. 29. 03:00", warn: false },
+    { icon: KeyRound, label: "SSL 인증서", value: `만료 ${SSL_LEFT}일 전`, sub: `${formatDate(day(-SSL_LEFT))} 만료`, warn: false },
+    { icon: Archive, label: "백업", value: "30회 성공", sub: `최종 ${todayLabel} 03:00`, warn: false },
     {
       icon: checksNeedAction ? TriangleAlert : CheckCircle2,
       label: "정기점검",
       value: checksNeedAction ? `조치 필요 ${checksNeedAction}건` : "전체 정상",
-      sub: "9. 29. 점검",
+      sub: `${todayLabel} 점검`,
       warn: checksNeedAction > 0,
     },
   ];
@@ -690,7 +713,7 @@ function HealthBand({
       <div className="flex flex-wrap items-end justify-between gap-4">
         <div>
           <p className="text-[15px]" style={{ color: C.muted }}>
-            9월 가동률
+            최근 30일 가동률
           </p>
           <p className="mt-1 flex items-center gap-3 text-[30px] font-bold leading-[1.2] tabular-nums md:text-[36px]">
             <span className="relative flex h-3 w-3" aria-hidden>
@@ -721,23 +744,23 @@ function HealthBand({
       </div>
 
       <div className="mt-4">
-        <div className="flex h-10 gap-[2px]" role="img" aria-label="9월 1일부터 30일까지 일별 가동 기록. 11일에 12분 지연, 나머지 정상">
+        <div className="flex h-10 gap-[2px]" role="img" aria-label={`${koDate(start)}부터 ${koDate(day(0))}까지 일별 가동 기록. ${koDate(delay)}에 12분 지연, 나머지 정상`}>
           {UPTIME.map((u, i) => (
             <span
               key={i}
-              title={`9월 ${i + 1}일 가동률 ${u}%`}
+              title={`${koDate(day(PERIOD_DAYS - 1 - i))} 가동률 ${u}%`}
               className="flex-1 rounded-[2px]"
               style={{ background: u === 100 ? "#3c9f7d" : "#f3b847" }}
             />
           ))}
         </div>
         <div className="mt-1.5 flex flex-wrap justify-between gap-x-3 text-[15px] tabular-nums" style={{ color: C.muted }}>
-          <span>9. 1.</span>
+          <span>{shortDate(start)}</span>
           <span className="inline-flex items-center gap-1" style={{ color: "#f3b847" }}>
             <TriangleAlert size={14} aria-hidden />
-            9. 11. 12분 지연
+            {shortDate(delay)} 12분 지연
           </span>
-          <span>9. 30.</span>
+          <span>{todayLabel}</span>
         </div>
       </div>
 
@@ -770,11 +793,14 @@ function ReportSheet({
   requests,
   checks,
   summary,
+  now,
 }: {
   requests: Request[];
   checks: CheckItem[];
   summary: { received: number; done: number; inProgress: number; avgDays: number };
+  now: Date;
 }) {
+  const period = `${formatDate(fmtDash(daysAgo(now, PERIOD_DAYS - 1)))} ~ ${formatDate(fmtDash(now))}`;
   const byType = REQUEST_TYPES.map((t) => ({ type: t, count: requests.filter((r) => r.type === t).length }));
   const max = Math.max(1, ...byType.map((b) => b.count));
   const open = requests.filter((r) => r.status !== "처리완료");
@@ -790,7 +816,7 @@ function ReportSheet({
         <p className="text-right text-[15px] leading-[1.5] text-[#464c53]">
           점검 기간
           <br />
-          {PERIOD}
+          {period}
         </p>
       </header>
 
