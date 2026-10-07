@@ -56,7 +56,7 @@ export function ToolBoard() {
             <th scope="col" className="w-16 py-3 font-medium">번호</th>
             <th scope="col" className="w-32 py-3 font-medium">분류</th>
             <th scope="col" className="py-3 text-left font-medium">제목</th>
-            <th scope="col" className="w-56 py-3 font-medium">대상</th>
+            <th scope="col" className="w-32 py-3 font-medium">등록일</th>
           </tr>
         </thead>
         <tbody>
@@ -71,7 +71,7 @@ export function ToolBoard() {
                   {t.title}
                 </Link>
               </td>
-              <td className="block text-[14px] text-foreground-secondary md:table-cell md:py-3.5 md:text-center md:text-[15px]">{t.for}</td>
+              <td className="block text-[14px] tabular-nums text-foreground-secondary md:table-cell md:py-3.5 md:text-center md:text-[15px]">{t.date}</td>
             </tr>
           ))}
           {list.length === 0 && (
