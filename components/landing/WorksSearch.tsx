@@ -85,7 +85,7 @@ export function WorksSearch({ projects }: { projects: Project[] }) {
 
   return (
     <>
-      <div role="tablist" aria-label="찾는 방법" className="mb-4 flex gap-5 text-[16px]">
+      <div role="group" aria-label="찾는 방법" className="mb-4 flex gap-5 text-[16px]">
         {(
           [
             ["pick", "조건으로 고르기", ListFilter],
@@ -95,8 +95,7 @@ export function WorksSearch({ projects }: { projects: Project[] }) {
           <button
             key={m}
             type="button"
-            role="tab"
-            aria-selected={mode === m}
+            aria-pressed={mode === m}
             onClick={() => {
               setOpen(null);
               setMode(m);

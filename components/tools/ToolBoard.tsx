@@ -14,13 +14,12 @@ export function ToolBoard() {
   return (
     <div className="mt-8">
       <div className="flex flex-wrap items-end justify-between gap-4">
-        <ul className="flex flex-wrap gap-x-5 gap-y-2 text-[16px]" role="tablist" aria-label="자료 분류">
+        <ul className="flex flex-wrap gap-x-5 gap-y-2 text-[16px]" role="list" aria-label="자료 분류">
           {tabs.map((t) => (
             <li key={t}>
               <button
                 type="button"
-                role="tab"
-                aria-selected={cat === t}
+                aria-pressed={cat === t}
                 onClick={() => setCat(t)}
                 className={`border-b-2 pb-1.5 ${cat === t ? "border-foreground font-bold" : "border-transparent text-foreground-secondary hover:text-foreground"}`}
               >

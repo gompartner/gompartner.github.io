@@ -422,7 +422,7 @@ function SamplePage({
         </div>
       </main>
 
-      <footer className="border-t border-[#e3dfe6] bg-[#2b1a33] px-4 py-5 text-[15px] text-[#e7dcec] md:px-6">
+      <footer className="border-t border-[#e3dfe6] bg-[#2b1a33] px-4 pt-5 pb-24 text-[15px] text-[#e7dcec] md:px-6">
         <p className="font-bold text-white">ㄴㅇ시 문화재단</p>
         <p className="mt-1">ㄴㅇ시 ㄴㅇ로 45, 문화재단 빌딩 3층 | 대표전화 000-000-0000</p>
         <p className="mt-1">© ㄴㅇ시 문화재단</p>

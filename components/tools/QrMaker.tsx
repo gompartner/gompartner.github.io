@@ -192,7 +192,7 @@ export function QrMaker() {
 
   const input = "mt-1.5 h-12 w-full rounded-md border border-[#8a949e] bg-background px-3 text-[17px] focus:border-accent";
   const chip = (on: boolean) =>
-    `inline-flex h-10 cursor-pointer items-center rounded-md border px-4 text-[15px] font-bold transition-colors ${on ? "border-accent bg-accent-surface text-accent" : "border-border hover:bg-surface"}`;
+    `inline-flex h-10 cursor-pointer items-center rounded-md border px-4 text-[15px] font-bold transition-colors ${on ? "border-accent bg-accent-surface text-accent-hover" : "border-border hover:bg-surface"}`;
 
   return (
     <div className="mt-8 grid gap-8 lg:grid-cols-[minmax(0,7fr)_minmax(0,5fr)]">
@@ -296,7 +296,7 @@ export function QrMaker() {
             {LEVELS.map(([v, label, hint]) => (
               <label key={v} className={`flex cursor-pointer flex-col rounded-md border px-4 py-2.5 transition-colors ${level === v ? "border-accent bg-accent-surface" : "border-border hover:bg-surface"}`}>
                 <input type="radio" name="level" checked={level === v} onChange={() => setLevel(v)} className="sr-only" />
-                <span className={`text-[15px] font-bold ${level === v ? "text-accent" : ""}`}>{label}</span>
+                <span className={`text-[15px] font-bold ${level === v ? "text-accent-hover" : ""}`}>{label}</span>
                 <span className="text-[14px] text-foreground-secondary">{hint}</span>
               </label>
             ))}

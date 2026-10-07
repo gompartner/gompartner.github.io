@@ -116,7 +116,7 @@ export function HeroSlider({ slides }: { slides: Project[] }) {
 
       <div className="mt-4 flex items-center gap-3">
         <div className="min-w-0 flex-1" aria-live={auto ? "off" : "polite"}>
-          <p className="text-[15px] font-bold leading-[1.5] text-accent">{work.category}·{work.layout}</p>
+          <p className="text-[15px] font-bold leading-[1.5] text-accent-hover">{work.category}·{work.layout}</p>
           <p className="text-[17px] font-bold leading-[1.5]">{work.title}</p>
         </div>
         <span className="text-[15px] tabular-nums text-foreground-secondary">

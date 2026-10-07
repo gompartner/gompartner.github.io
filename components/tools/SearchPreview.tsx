@@ -199,7 +199,7 @@ export function SearchPreview() {
             네이버 검색 결과 (웹문서)
           </h2>
           <div className="mt-3">
-            <span className="block truncate text-[13px] text-[#03a94d]">{url.host}</span>
+            <span className="block truncate text-[13px] text-[#1b7a3e]">{url.host}</span>
             <p className="mt-1 text-[18px] font-bold leading-[1.4] text-[#0c43b7]">{n.t.text}</p>
             <p className="mt-1 text-[15px] leading-[1.6] text-[#404040]">{n.d.text}</p>
           </div>
@@ -261,21 +261,21 @@ export function SearchPreview() {
           <ul className="mt-2 grid gap-1.5 text-[16px] leading-[1.6] text-foreground-secondary">
             <li>
               네이버:{" "}
-              <a href="https://searchadvisor.naver.com" target="_blank" rel="noopener noreferrer" className="text-accent underline underline-offset-4">
+              <a href="https://searchadvisor.naver.com" target="_blank" rel="noopener noreferrer" className="text-accent-hover underline underline-offset-4">
                 서치어드바이저
               </a>
               에 홈페이지 주소 등록
             </li>
             <li>
               구글:{" "}
-              <a href="https://search.google.com/search-console" target="_blank" rel="noopener noreferrer" className="text-accent underline underline-offset-4">
+              <a href="https://search.google.com/search-console" target="_blank" rel="noopener noreferrer" className="text-accent-hover underline underline-offset-4">
                 서치 콘솔
               </a>
               에 홈페이지 주소 등록
             </li>
             <li>
               지도 검색:{" "}
-              <a href="https://new.smartplace.naver.com" target="_blank" rel="noopener noreferrer" className="text-accent underline underline-offset-4">
+              <a href="https://new.smartplace.naver.com" target="_blank" rel="noopener noreferrer" className="text-accent-hover underline underline-offset-4">
                 네이버 스마트플레이스
               </a>
               에 가게 등록
