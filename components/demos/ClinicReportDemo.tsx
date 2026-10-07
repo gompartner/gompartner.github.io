@@ -566,7 +566,7 @@ function Hero({
 
       <div className="mx-auto flex max-w-[1200px] flex-wrap items-center gap-3 px-4 pt-5 md:px-6">
         <p className="text-[17px] font-bold">
-          ○○피부과의원 <span className="font-normal text-white/70">피부 진단 결과지</span>
+          곰파트너피부과의원 <span className="font-normal text-white/70">피부 진단 결과지</span>
         </p>
         <nav className="flex w-full gap-1 rounded-full bg-white/15 p-1 backdrop-blur-md sm:ml-auto sm:w-auto" aria-label="진행 단계">
           {STEPS.map((s, i) => {
@@ -781,7 +781,7 @@ function ReportSheet({ customer, session, previous }: { customer: Customer; sess
     <article className="report-sheet flex min-h-[1123px] w-[794px] flex-col bg-white shadow-[0_20px_40px_-24px_rgba(42,31,43,0.35)]" style={{ color: INK }}>
       <header className="flex items-end justify-between px-[56px] pb-6 pt-[44px] text-white" style={{ background: INK }}>
         <div>
-          <p className="text-[13px] text-white/70">○○피부과의원</p>
+          <p className="text-[13px] text-white/70">곰파트너피부과의원</p>
           <h1 className="mt-1 text-[30px] font-bold leading-[1.3]">피부 진단 결과지</h1>
         </div>
         <p className="text-right text-[15px] leading-[1.5] text-white/80">측정일 {session.date}</p>

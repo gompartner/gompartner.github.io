@@ -6,7 +6,7 @@ import { AnimatePresence, motion } from "framer-motion";
 import { ArrowLeft, Menu, MessageSquareText, Phone, RotateCcw, Search, X } from "lucide-react";
 import { useReducedMotionSafe } from "@/hooks/useReducedMotionSafe";
 
-/* 필라테스 스튜디오 홈페이지 데모: 가상의 ○○ 필라테스.
+/* 필라테스 스튜디오 홈페이지 데모: 가상의 곰파트너 필라테스.
    스튜디오명, 강사, 주소, 전화번호, 사업자 정보, 수강료는 모두 가상이다.
 
    뼈대: 실제 필라테스 사이트(프로그램 안내형)를 따른다. 첫 화면은 사진 대신 짧은 소개 띠와
@@ -25,7 +25,7 @@ import { useReducedMotionSafe } from "@/hooks/useReducedMotionSafe";
    AI 생성(Z-Image-Turbo, Apache 2.0) hero, teacher, mat, studio */
 
 const IMG = "/images/demo-pilates";
-const STUDIO = "○○ 필라테스";
+const STUDIO = "곰파트너 필라테스";
 const TEL = "02-000-0000";
 const ADDRESS = "□□시 □□로 88 □□빌딩 2층";
 

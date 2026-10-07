@@ -543,8 +543,8 @@ export function HomepageDemo() {
       {/* 상단 메뉴: 히어로 위에서만 보이고, 스크롤 후에는 스티키 예약 바가 머리글 역할을 한다 */}
       <nav aria-label="주 메뉴" className="absolute inset-x-0 top-0 z-40 bg-gradient-to-b from-black/55 to-transparent">
         <div className="flex items-center justify-between gap-3 px-4 py-5 text-white sm:px-8">
-          <a href="#top" className="shrink-0 text-lg font-black tracking-widest">
-            GRIZZLY
+          <a href="#top" className="shrink-0 text-lg font-black tracking-wider">
+            곰파트너 GYM
           </a>
           <ul className="flex items-center gap-3.5 text-sm font-medium sm:gap-6">
             <li><a href="#map" className="transition-opacity hover:opacity-70">지점 안내</a></li>
@@ -584,7 +584,7 @@ export function HomepageDemo() {
         />
         {/* pb-24: 화면 아래 양쪽 모서리의 사이트 공용 버튼과 겹치지 않게 띄운다 */}
         <div key={introKey} className="gym-hero-in absolute inset-x-0 bottom-0 px-4 pb-24 text-stone-100 sm:px-8">
-          <p className="text-sm font-semibold text-stone-300">그리즐리 프라이빗 짐</p>
+          <p className="text-sm font-semibold text-stone-300">곰파트너 프라이빗 짐</p>
           <h1 className="gym-hero-title mt-2 max-w-4xl text-[11vw] font-black leading-[1.08] tracking-tight sm:text-7xl">
             1시간 단위 단독 이용
           </h1>
@@ -1423,10 +1423,10 @@ export function HomepageDemo() {
       <footer className="bg-[#111] pb-24 pt-12 text-sm text-stone-400">
         <div className="mx-auto flex max-w-6xl flex-wrap items-start justify-between gap-6 px-4">
           <div>
-            <p className="font-black tracking-widest text-white">GRIZZLY</p>
+            <p className="font-black tracking-wider text-white">곰파트너 GYM</p>
             <dl className="mt-3 grid grid-cols-[auto_1fr] gap-x-3 gap-y-1 text-xs">
               <dt>상호</dt>
-              <dd className="text-stone-300">그리즐리 프라이빗 짐</dd>
+              <dd className="text-stone-300">곰파트너 프라이빗 짐</dd>
               <dt>대표자</dt>
               <dd className="text-stone-300">김ㅎ준</dd>
               <dt>사업자등록번호</dt>

@@ -370,7 +370,7 @@ export function ExcelAutomationDemo() {
         <div className="flex flex-wrap items-center gap-3 px-4 py-3 text-white md:px-6">
           <FileSpreadsheet size={22} aria-hidden />
           <div className="mr-auto min-w-0">
-            <p className="text-[13px] opacity-90">○○ 유통 주문취합</p>
+            <p className="text-[13px] opacity-90">곰파트너 유통 주문취합</p>
             <h1 className="truncate text-[17px] font-bold">{sheet.fileName}</h1>
           </div>
           <input
@@ -740,7 +740,7 @@ function PurchaseOrder({ client, items, onPrint }: { client: string; items: { co
       <div className="flex items-start justify-between gap-3">
         <div>
           <p className="text-[13px]" style={{ color: C.muted }}>
-            발주서 (발주처 ○○ 유통)
+            발주서 (발주처 곰파트너 유통)
           </p>
           <h3 className="text-[19px] font-bold">{client} 귀하</h3>
         </div>

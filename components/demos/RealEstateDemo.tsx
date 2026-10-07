@@ -6,7 +6,7 @@ import { AnimatePresence, motion } from "framer-motion";
 import { Check, ChevronRight, Heart, Layers, LayoutGrid, Map as MapIcon, Menu, Phone, Plus, RotateCcw, Search, X } from "lucide-react";
 import { useReducedMotionSafe } from "@/hooks/useReducedMotionSafe";
 
-/* 부동산 홈페이지 데모: 가상의 ○○ 공인중개사사무소.
+/* 부동산 홈페이지 데모: 가상의 곰파트너 공인중개사사무소.
    상호, 대표 공인중개사, 등록번호, 주소, 전화번호, 사업자 정보, 매물과 거래 내역은 모두 가상이다.
 
    구조: 매물 솔루션형(검색 우선). 첫 화면에 사진과 소개 문단 없이 검색 필터 바와 매물 종류별 개수 줄을 두고,
@@ -29,7 +29,7 @@ import { useReducedMotionSafe } from "@/hooks/useReducedMotionSafe";
    AI 생성(Z-Image-Turbo, Apache 2.0) interior */
 
 const IMG = "/images/demo-realty";
-const OFFICE = "○○ 공인중개사사무소";
+const OFFICE = "곰파트너 공인중개사사무소";
 const TEL = "02-000-0000";
 const ADDRESS = "□□시 □□구 □□로 120, □□아파트 상가 1층 105호";
 const REG_NO = "00000-0000-00000";

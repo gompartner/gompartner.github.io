@@ -6,7 +6,7 @@ import { AnimatePresence, motion } from "framer-motion";
 import { Car, Check, ChevronLeft, Clock3, Menu, Minus, Phone, Plus, ShoppingBag, TrainFront, Trash2, X } from "lucide-react";
 import { useReducedMotionSafe } from "@/hooks/useReducedMotionSafe";
 
-/* 베이커리 카페 홈페이지 데모: 가상의 ○○ 베이커리.
+/* 베이커리 카페 홈페이지 데모: 가상의 곰파트너 베이커리.
    상호, 대표자, 주소, 전화번호, 사업자 정보, 빵 이름과 가격은 모두 가상이다.
 
    뼈대: 매장 주문형. 옵스·나폴레옹과자점 같은 실제 베이커리 사이트처럼
@@ -25,7 +25,7 @@ import { useReducedMotionSafe } from "@/hooks/useReducedMotionSafe";
    AI 생성(Z-Image-Turbo, Apache 2.0) hero, display, menu/*.jpg(빵마다 1장) */
 
 const IMG = "/images/demo-bakery";
-const BAKERY = "○○ 베이커리";
+const BAKERY = "곰파트너 베이커리";
 const TEL = "02-000-0000";
 const ADDRESS = "□□시 □□로 5길 21 1층";
 
@@ -1566,7 +1566,7 @@ function Footer() {
         <dl className="mt-6 grid gap-x-8 gap-y-1.5 text-[14px] sm:grid-cols-2 md:grid-cols-3" style={{ color: "#e2c8ad" }}>
           {[
             ["상호", BAKERY],
-            ["대표자", "이○○"],
+            ["대표자", "이ㅅ연"],
             ["사업자등록번호", "000-00-00000"],
             ["주소", ADDRESS],
             ["전화", TEL],

@@ -36,7 +36,7 @@ import {
 } from "lucide-react";
 import { useReducedMotionSafe } from "@/hooks/useReducedMotionSafe";
 
-/* 기업 홈페이지 데모: 가상의 (주)○○시험인증원, 전자파·무선·전기안전 시험과 KC·해외 인증을 맡는 지정시험기관.
+/* 기업 홈페이지 데모: 가상의 (주)곰파트너시험인증원, 전자파·무선·전기안전 시험과 KC·해외 인증을 맡는 지정시험기관.
    회사명, 대표자, 주소, 전화번호, 사업자 정보, 지정 번호, 담당자, 의뢰사는 모두 가상이고 실제 기관 로고나 등록번호는 쓰지 않는다.
 
    구성: 실제 시험인증기관의 포털·게시판형 홈페이지를 따랐다. 메뉴는 회사소개, 인증업무, 국내인증, 해외인증, 고객지원.
@@ -60,11 +60,11 @@ import { useReducedMotionSafe } from "@/hooks/useReducedMotionSafe";
    AI 생성(Z-Image-Turbo, Apache 2.0) hero, lab */
 
 const IMG = "/images/demo-certlab";
-const COMPANY = "(주)○○시험인증원";
+const COMPANY = "(주)곰파트너시험인증원";
 const TEL = "02-000-0000";
 const FAX = "02-000-0001";
 const EMAIL = "test@example.com";
-const ADDRESS = "□□시 □□구 □□로 00 ○○시험인증원";
+const ADDRESS = "□□시 □□구 □□로 00 곰파트너시험인증원";
 const HOURS = "평일 09:00 ~ 18:00";
 
 const C = {
@@ -270,7 +270,7 @@ const LIMIT_PATH = `M${fx(30)} ${dy(40)} H${fx(230)} V${dy(47)} H${fx(1000)}`;
 const WORST = PEAKS.reduce((w, p) => (limitAt(p.f) - p.v < limitAt(w.f) - w.v ? p : w), PEAKS[0]);
 const WORST_MARGIN = (limitAt(WORST.f) - WORST.v).toFixed(1);
 
-/** 고객사 가리기: (주)한빛전자는 (주)한○○○ */
+/** 고객사 가리기: (주)한빛전자는 (주)한ㅅ전자 */
 function maskCompany(name: string) {
   const v = name.trim();
   const m = v.match(/^(\(주\)|주식회사\s*|㈜)?(.*)$/);
@@ -573,7 +573,7 @@ function FloatingContact() {
         <div id="cl-kakao" className="absolute bottom-0 right-full mr-2 w-[220px] rounded-[10px] border bg-white p-4 text-[14px] leading-[1.55] shadow-[0_6px_18px_rgba(20,26,51,0.16)]" style={{ borderColor: C.line }}>
           <p className="font-bold">카카오톡 상담</p>
           <p className="mt-1" style={{ color: C.muted }}>
-            카카오톡에서 &lsquo;○○시험인증원&rsquo; 채널을 추가해 주십시오. {HOURS}
+            카카오톡에서 &lsquo;곰파트너시험인증원&rsquo; 채널을 추가해 주십시오. {HOURS}
           </p>
           <button type="button" onClick={() => setKakao(false)} className="mt-2 inline-flex h-9 items-center rounded-[6px] border px-3 text-[13px] font-bold" style={{ borderColor: C.line }}>
             닫기
@@ -1014,7 +1014,7 @@ function Greeting() {
         <p className="text-[19px] font-bold leading-[1.6]">{COMPANY} 홈페이지를 찾아 주셔서 감사합니다.</p>
         <p>{COMPANY}은 전자파 시험실로 문을 열었고, 지금은 무선과 전기안전 시험, 해외인증 업무도 함께 하고 있습니다.</p>
         <p>부적합 항목이 발생하면 원인 분석과 대책을 함께 안내해 드립니다. 인증이 처음이신 기업도 부담 없이 문의해 주시기 바랍니다.</p>
-        <p className="pt-4 text-right font-bold">대표이사 김○○</p>
+        <p className="pt-4 text-right font-bold">대표이사 김ㅈ우</p>
       </div>
     </div>
   );
@@ -1174,7 +1174,7 @@ function Impartiality() {
       <p className="mt-8 text-center tabular-nums" style={{ color: C.muted }}>
         2026년 9월 30일
       </p>
-      <p className="mt-1 text-center font-bold">{COMPANY} 대표이사 김○○</p>
+      <p className="mt-1 text-center font-bold">{COMPANY} 대표이사 김ㅈ우</p>
     </div>
   );
 }
@@ -2644,7 +2644,7 @@ function Tracking() {
                     ["최소 여유", `${WORST_MARGIN}dB (${WORST.f}MHz)`],
                     ["기준", "방사 방출 B급, 준첨두값"],
                     ["측정 장소", "3m 전파무향실"],
-                    ["담당 시험원", "김○○"],
+                    ["담당 시험원", "김ㅈ우"],
                   ].map(([k, v], i) => (
                     <div key={k} className="flex items-center justify-between gap-3 px-4 py-2.5" style={{ borderColor: C.line }}>
                       <dt style={{ color: C.muted }}>{k}</dt>
@@ -3386,7 +3386,7 @@ function Footer() {
         <dl className="mt-5 grid gap-x-8 gap-y-1.5 text-[14px] sm:grid-cols-2 md:grid-cols-3" style={{ color: "#a6acd6" }}>
           {[
             ["상호", COMPANY],
-            ["대표", "김○○"],
+            ["대표", "김ㅈ우"],
             ["사업자등록번호", "000-00-00000"],
             ["주소", ADDRESS],
             ["전화", TEL],

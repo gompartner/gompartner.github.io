@@ -6,7 +6,7 @@ import { AnimatePresence, motion } from "framer-motion";
 import { Check, ChevronDown, ChevronRight, CircleAlert, FileUp, House, Menu, RotateCcw, Trash2, X } from "lucide-react";
 import { useReducedMotionSafe } from "@/hooks/useReducedMotionSafe";
 
-/* 기업 홈페이지 데모: 가상의 (주)○○정밀, CNC 정밀 가공 제조업체.
+/* 기업 홈페이지 데모: 가상의 (주)곰파트너정밀, CNC 정밀 가공 제조업체.
    회사명, 대표자, 주소, 전화번호, 사업자 정보, 설비 모델명, 제조사, 거래처, 인증 기관은 모두 가상이다.
 
    구성: 실제 중소 제조업 홈페이지처럼 서브페이지 구조로 만들었다. 메뉴는 회사소개, 사업분야, 설비현황, 생산제품, 고객지원.
@@ -139,7 +139,7 @@ const MENUS: { id: MenuId; label: L; subs: { id: string; label: L }[] }[] = [
   },
 ];
 
-const COMPANY = l("(주)○○정밀", "○○ Precision Co., Ltd.");
+const COMPANY = l("(주)곰파트너정밀", "Gompartner Precision Co., Ltd.");
 const ADDRESS = l("□□시 □□구 □□산단로 00", "00 □□sandan-ro, □□-gu, □□-si");
 const HOURS = l("평일 08:30 ~ 17:30, 토·일·공휴일 휴무", "Weekdays 08:30 to 17:30, closed on weekends and holidays");
 
@@ -240,7 +240,7 @@ const HISTORY: { year: number; items: L[] }[] = [
   { year: 2018, items: [l("5축 가공기 도입, 반도체 장비 부품 납품 시작", "Added 5-axis machines, began supplying semiconductor equipment parts")] },
   { year: 2016, items: [l("□□산업단지 지금 공장으로 이전", "Moved to the current plant in □□ Industrial Complex")] },
   { year: 2014, items: [l("ISO 9001 인증", "ISO 9001 certified")] },
-  { year: 2012, items: [l("법인 전환, (주)○○정밀로 상호 변경", "Incorporated as ○○ Precision Co., Ltd.")] },
+  { year: 2012, items: [l("법인 전환, (주)곰파트너정밀로 상호 변경", "Incorporated as Gompartner Precision Co., Ltd.")] },
   { year: 2009, items: [l("□□시에서 머시닝센터 2대로 창업", "Founded in □□ with two machining centers")] },
 ];
 
@@ -1005,7 +1005,7 @@ function Greeting() {
         <Image src={`${IMG}/parts.jpg`} alt={x("가공을 마친 알루미늄과 스테인리스 정밀 부품", "Finished aluminum and stainless steel precision parts")} fill sizes="(min-width: 900px) 860px, 100vw" className="object-cover" />
       </div>
       <div className="mt-8 space-y-4">
-        <p className="text-[19px] font-bold leading-[1.6] md:text-[21px]">{x("(주)○○정밀 홈페이지를 찾아 주셔서 감사합니다.", "Thank you for visiting ○○ Precision.")}</p>
+        <p className="text-[19px] font-bold leading-[1.6] md:text-[21px]">{x("(주)곰파트너정밀 홈페이지를 찾아 주셔서 감사합니다.", "Thank you for visiting Gompartner Precision.")}</p>
         <p>
           {x(
             "2009년 머시닝센터 2대로 창업한 이래 반도체 장비, 의료기기, 2차전지 설비 부품을 가공하고 있습니다.",
@@ -1018,7 +1018,7 @@ function Greeting() {
             "If a drawing is missing dimensions or has features that are hard to machine, we will tell you when we quote.",
           )}
         </p>
-        <p className="pt-4 text-right font-bold">{x("대표이사 김○○", "Kim ○○, CEO")}</p>
+        <p className="pt-4 text-right font-bold">{x("대표이사 김ㅈ우", "Kim J.W., CEO")}</p>
       </div>
     </div>
   );
@@ -1028,7 +1028,7 @@ function Overview() {
   const { x, s } = useCo();
   const rows: [string, string][] = [
     [x("회사명", "Company"), s(COMPANY)],
-    [x("대표이사", "CEO"), x("김○○", "Kim ○○")],
+    [x("대표이사", "CEO"), x("김ㅈ우", "Kim J.W.")],
     [x("설립", "Founded"), x("2009년 3월 (2012년 법인 전환)", "March 2009 (incorporated 2012)")],
     [x("직원", "Employees"), x("46명", "46")],
     [x("주요 사업", "Business"), x("CNC 선반, MCT, 5축 정밀부품 가공", "CNC turning, MCT and 5-axis precision machining")],
@@ -1113,7 +1113,7 @@ function Location() {
         {(
           [
             [x("주소", "Address"), s(ADDRESS)],
-            [x("내비게이션", "Navigation"), "○○정밀 □□공장"],
+            [x("내비게이션", "Navigation"), "곰파트너정밀 □□공장"],
             [x("전화", "Tel"), TEL],
             [x("팩스", "Fax"), FAX],
             [x("업무시간", "Office hours"), s(HOURS)],
@@ -2219,7 +2219,7 @@ function Footer() {
           {(
             [
               [x("상호", "Company"), s(COMPANY)],
-              [x("대표", "CEO"), x("김○○", "Kim ○○")],
+              [x("대표", "CEO"), x("김ㅈ우", "Kim J.W.")],
               [x("사업자등록번호", "Business reg. no."), "000-00-00000"],
               [x("주소", "Address"), s(ADDRESS)],
               [x("전화", "Tel"), TEL],

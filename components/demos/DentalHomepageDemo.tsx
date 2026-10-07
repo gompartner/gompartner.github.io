@@ -6,7 +6,7 @@ import { AnimatePresence, motion } from "framer-motion";
 import { ArrowUp, CalendarCheck, ChevronDown, ChevronRight, Home, MapPin, Menu, MessageCircle, Moon, Phone, Plus, Receipt, X } from "lucide-react";
 import { useReducedMotionSafe } from "@/hooks/useReducedMotionSafe";
 
-/* 치과 홈페이지 데모: 가상의 ○○치과의원.
+/* 치과 홈페이지 데모: 가상의 곰파트너치과의원.
    병원명, 의료진, 주소, 전화번호, 사업자 정보, 진료비는 모두 가상이다.
 
    구성: 실제 동네 치과에서 흔한 포털형.
@@ -24,7 +24,7 @@ import { useReducedMotionSafe } from "@/hooks/useReducedMotionSafe";
    caries Katarzyna Zygnerska(rubu_NvklJE), scaling Quilia(y8fWicGsv4g), ct Quang Tri NGUYEN(VckdJzo7ig0) */
 
 const IMG = "/images/demo-dental";
-const CLINIC = "○○치과의원";
+const CLINIC = "곰파트너치과의원";
 const TEL = "02-000-0000";
 const ADDRESS = "□□시 □□로 45 □□타워 3층";
 
@@ -399,7 +399,7 @@ const ARCH = buildArch();
 
 const DOCTORS = [
   {
-    name: "김○○",
+    name: "김ㅈ우",
     role: "대표원장",
     field: "임플란트, 보철, 신경치료",
     career: ["통합치의학과 전문의", "△△대학교 치과대학 졸업", "대한구강악안면임플란트학회 정회원"],
@@ -407,7 +407,7 @@ const DOCTORS = [
     pos: "50% 25%",
   },
   {
-    name: "이○○",
+    name: "이ㅅ연",
     role: "원장",
     field: "치아교정",
     career: ["치과교정과 전문의", "△△대학교치과병원 교정과 수련", "대한치과교정학회 인정의"],
@@ -1291,10 +1291,10 @@ function Greeting() {
           <p>치료를 정하기 전에 엑스레이와 구강 사진을 같이 보면서 설명해 드립니다.</p>
           <p>화요일과 목요일은 21:00까지 진료합니다.</p>
         </div>
-        <p className="mt-8 font-bold">대표원장 김○○</p>
+        <p className="mt-8 font-bold">대표원장 김ㅈ우</p>
       </div>
       <div className="relative aspect-[4/3] overflow-hidden rounded-[10px] lg:col-span-5" style={{ backgroundColor: C.mint }}>
-        <Image src={`${IMG}/doctor2.jpg`} alt="대표원장 김○○" fill sizes="(min-width:1024px) 480px, 100vw" className="object-cover" style={{ objectPosition: "50% 25%" }} />
+        <Image src={`${IMG}/doctor2.jpg`} alt="대표원장 김ㅈ우" fill sizes="(min-width:1024px) 480px, 100vw" className="object-cover" style={{ objectPosition: "50% 25%" }} />
       </div>
     </div>
   );
@@ -2102,7 +2102,7 @@ function SiteFooter({ go }: { go: Go }) {
         <dl className="mt-4 flex flex-wrap gap-x-6 gap-y-1 text-[15px]">
           {[
             ["상호", CLINIC],
-            ["대표자", "김○○"],
+            ["대표자", "김ㅈ우"],
             ["주소", ADDRESS],
             ["전화", TEL],
             ["사업자등록번호", "000-00-00000"],

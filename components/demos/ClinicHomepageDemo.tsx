@@ -4,7 +4,7 @@ import { useEffect, useRef, useState } from "react";
 import Image from "next/image";
 import { ChevronRight, Menu, Phone, X } from "lucide-react";
 
-/* 피부과 홈페이지 데모: 가상의 ○○피부과의원.
+/* 피부과 홈페이지 데모: 가상의 곰파트너피부과의원.
    병원명, 의료진, 주소, 전화번호, 사업자 정보, 진료비는 모두 가상이다.
 
    구성: 실제 동네 피부과에서 흔한 두 갈래형.
@@ -19,7 +19,7 @@ import { ChevronRight, Menu, Phone, X } from "lucide-react";
    lobby Ishan Sharma(0EWVvxSyDE0), doctor-a·doctor-b AI 생성(Z-Image-Turbo, Apache 2.0) */
 
 const IMG = "/images/demo-clinic-homepage";
-const CLINIC = "○○피부과의원";
+const CLINIC = "곰파트너피부과의원";
 const TEL_MED = "02-000-0000";
 const TEL_COS = "02-000-0001";
 const ADDRESS = "□□시 □□로 123 □□빌딩 4층";
@@ -140,14 +140,14 @@ const EQUIP: { id: EquipTab; label: string; items: { name: string; body: string 
 
 const DOCTORS = [
   {
-    name: "김○○",
+    name: "김ㅈ우",
     role: "대표원장",
     photo: "doctor-a.jpg",
     field: "피부질환, 여드름 · 색소",
     career: ["피부과 전문의", "△△대학교병원 피부과 전공의 수료", "대한피부과학회 정회원"],
   },
   {
-    name: "이○○",
+    name: "이ㅅ연",
     role: "원장",
     photo: "doctor-b.jpg",
     field: "리프팅, 레이저 시술",
@@ -331,7 +331,7 @@ export function ClinicHomepageDemo() {
             <dl className="mt-4 flex flex-wrap gap-x-6 gap-y-1 text-[15px]">
               {[
                 ["상호", CLINIC],
-                ["대표자", "김○○"],
+                ["대표자", "김ㅈ우"],
                 ["주소", ADDRESS],
                 ["사업자등록번호", "000-00-00000"],
               ].map(([k, v]) => (

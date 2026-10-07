@@ -16,7 +16,7 @@ import {
 } from "lucide-react";
 import { useReducedMotionSafe } from "@/hooks/useReducedMotionSafe";
 
-/* 약국 홈페이지 데모: 가상의 ○○ 약국.
+/* 약국 홈페이지 데모: 가상의 곰파트너약국.
    상호, 약사 이름, 주소, 전화번호, 사업자 정보, 재고는 모두 가상이다. 약 이름은 상표 대신 성분과 용도로 적는다.
 
    뼈대: 운영 안내형. 대한약사회 휴일지킴이약국 상세 화면처럼 머리글 맨 위에 영업 상태 띠를 두고,
@@ -30,7 +30,7 @@ import { useReducedMotionSafe } from "@/hooks/useReducedMotionSafe";
    운영: 평일 09:00 ~ 익일 01:00(22:00 이후 공공심야약국), 토요일 09:00 ~ 18:00,
    일요일·공휴일 휴무, 둘째·넷째 일요일은 휴일지킴이약국으로 10:00 ~ 18:00. */
 
-const PHARMACY = "○○ 약국";
+const PHARMACY = "곰파트너약국";
 const TEL = "02-000-0000";
 const ADDRESS = "□□시 □□로 140 □□의원 건물 1층";
 
@@ -368,7 +368,7 @@ function Intro() {
       </a>,
     ],
     ["운영시간", "평일 09:00 ~ 익일 01:00, 토요일 09:00 ~ 18:00"],
-    ["약사", "개설 약사 박○○ 외 1명"],
+    ["약사", "개설 약사 박ㅎ준 외 1명"],
   ];
 
   return (
@@ -1222,7 +1222,7 @@ function Footer() {
         <dl className="mt-6 grid gap-x-8 gap-y-1.5 text-[14px] sm:grid-cols-2 md:grid-cols-3" style={{ color: "#b5d6ca" }}>
           {[
             ["상호", PHARMACY],
-            ["개설 약사", "박○○"],
+            ["개설 약사", "박ㅎ준"],
             ["사업자등록번호", "000-00-00000"],
             ["주소", ADDRESS],
             ["전화", TEL],
