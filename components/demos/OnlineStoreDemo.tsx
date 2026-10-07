@@ -123,10 +123,10 @@ interface Glaze {
 }
 
 const GLAZES: Glaze[] = [
-  { id: "white", label: "백자", body: "#efe9de", rim: "#fbf8f2", shade: "#d6ccbd", foot: "#c8a27c", mark: "#8a7f72", note: "희고 매끈하며 음식 색이 잘 보입니다." },
-  { id: "celadon", label: "청자", body: "#9fbaa6", rim: "#c6d8ca", shade: "#7b9884", foot: "#c8a27c", mark: "#46624f", note: "유약이 고인 자리에 푸른빛이 짙게 남습니다." },
-  { id: "black", label: "흑유", body: "#302a26", rim: "#6b5543", shade: "#1b1815", foot: "#8a6a4f", mark: "#cdb99f", note: "입술 부분에 갈색 띠가 흐릅니다." },
-  { id: "buncheong", label: "분청", body: "#cbbca4", rim: "#e9e0d1", shade: "#a99880", foot: "#c8a27c", mark: "#6a5a47", note: "흰 흙을 붓으로 바른 결이 그대로 보입니다." },
+  { id: "white", label: "백자", body: "#efe9de", rim: "#fbf8f2", shade: "#d6ccbd", foot: "#c8a27c", mark: "#8a7f72", note: "희고 매끈해서 음식 색이 잘 살아요." },
+  { id: "celadon", label: "청자", body: "#9fbaa6", rim: "#c6d8ca", shade: "#7b9884", foot: "#c8a27c", mark: "#46624f", note: "유약이 고인 자리에 푸른빛이 짙게 남아요." },
+  { id: "black", label: "흑유", body: "#302a26", rim: "#6b5543", shade: "#1b1815", foot: "#8a6a4f", mark: "#cdb99f", note: "입술 부분에 갈색 띠가 자연스럽게 흘러요." },
+  { id: "buncheong", label: "분청", body: "#cbbca4", rim: "#e9e0d1", shade: "#a99880", foot: "#c8a27c", mark: "#6a5a47", note: "흰 흙을 붓으로 바른 자국이 그대로 보여요." },
 ];
 
 const GLAZE_BY_ID = Object.fromEntries(GLAZES.map((g) => [g.id, g])) as Record<GlazeId, Glaze>;
@@ -166,7 +166,7 @@ const PRODUCTS: Product[] = [
       { id: "l", label: "400ml", spec: "지름 9cm · 높이 10cm · 용량 400ml", add: 4_000 },
     ],
     added: "2026-09-18",
-    desc: "손잡이를 두툼하게 붙여 손가락 세 개가 편하게 들어갑니다.",
+    desc: "손잡이가 도톰해서 손가락 세 개를 넣어도 편하게 잡을 수 있어요.",
   },
   {
     id: "teacup",
@@ -176,7 +176,7 @@ const PRODUCTS: Product[] = [
     glazes: ALL_GLAZES,
     sizes: [{ id: "s", label: "120ml", spec: "지름 7.5cm · 높이 6cm · 용량 120ml", add: 0 }],
     added: "2026-06-02",
-    desc: "입에 닿는 부분을 얇게 깎아 차가 부드럽게 넘어갑니다.",
+    desc: "입에 닿는 부분이 얇아서 차 마실 때 부드러워요.",
   },
   {
     id: "ricebowl",
@@ -189,7 +189,7 @@ const PRODUCTS: Product[] = [
       { id: "l", label: "지름 12.5cm", spec: "지름 12.5cm · 높이 6.5cm · 용량 380ml", add: 3_000 },
     ],
     added: "2026-03-10",
-    desc: "굽을 높게 깎아 뜨거운 밥을 담아도 손에 열이 덜 옵니다.",
+    desc: "굽이 높아서 뜨거운 밥을 담아도 손이 덜 뜨거워요.",
   },
   {
     id: "noodle",
@@ -202,7 +202,7 @@ const PRODUCTS: Product[] = [
       { id: "l", label: "지름 19cm", spec: "지름 19cm · 높이 7.5cm · 용량 1,000ml", add: 5_000 },
     ],
     added: "2026-08-25",
-    desc: "국수, 덮밥, 샐러드까지 두루 담기 좋은 넓은 그릇입니다.",
+    desc: "국수, 덮밥, 샐러드 담기에 좋은 크기의 볼입니다.",
   },
   {
     id: "plate",
@@ -215,7 +215,7 @@ const PRODUCTS: Product[] = [
       { id: "l", label: "지름 25cm", spec: "지름 25cm · 높이 3cm", add: 8_000 },
     ],
     added: "2026-05-14",
-    desc: "가장자리를 살짝 올려 국물 있는 반찬도 흐르지 않습니다.",
+    desc: "가장자리가 살짝 올라와 있어서 국물 있는 반찬도 넘치지 않아요.",
   },
   {
     id: "sidedish",
@@ -239,7 +239,7 @@ const PRODUCTS: Product[] = [
     ],
     added: "2026-09-26",
     gift: true,
-    desc: "입구를 좁게 빚어 꽃 한두 송이만 꽂아도 모양이 잡힙니다.",
+    desc: "입구가 좁아서 꽃 한두 송이만 꽂아도 예뻐요.",
   },
   {
     id: "teapot",
@@ -250,7 +250,7 @@ const PRODUCTS: Product[] = [
     sizes: [{ id: "m", label: "300ml", spec: "지름 11cm · 높이 9cm · 용량 300ml", add: 0 }],
     added: "2026-07-08",
     gift: true,
-    desc: "안쪽에 거름망 구멍을 직접 뚫어 찻잎이 따라 나오지 않습니다.",
+    desc: "안쪽에 거름망 구멍이 있어서 찻잎이 따라 나오지 않아요.",
   },
 ];
 
@@ -341,12 +341,12 @@ function totals(cart: CartLine[], region: Region) {
 /* ---------- 후기 ---------- */
 
 const REVIEWS: { productId: string; name: string; glaze: GlazeId; rating: number; date: string; text: string }[] = [
-  { productId: "mug", name: "김ㅎ늘", glaze: "black", rating: 5, date: "2026.09.30", text: "흑유 머그 두 개 샀습니다. 손잡이가 두툼해서 잡기 편하고 입술 쪽 갈색 띠가 사진보다 진합니다." },
-  { productId: "mug", name: "박*", glaze: "celadon", rating: 4, date: "2026.09.21", text: "400ml로 받았습니다. 생각보다 무게가 있어서 아침 커피용으로 잘 씁니다." },
-  { productId: "ricebowl", name: "이ㅅ진", glaze: "white", rating: 5, date: "2026.09.12", text: "굽이 높아 뜨거운 밥을 담아도 손이 덜 뜨겁습니다. 포장이 꼼꼼했습니다." },
-  { productId: "plate", name: "최ㅇ호", glaze: "buncheong", rating: 5, date: "2026.08.28", text: "분청 접시는 붓 자국이 하나하나 달라서 두 장이 서로 다른 그릇처럼 보입니다." },
-  { productId: "teacup", name: "정*", glaze: "celadon", rating: 4, date: "2026.08.17", text: "찻잔 입술이 얇아 차 맛이 좋습니다. 생각보다 크기가 작으니 참고하시면 좋겠습니다." },
-  { productId: "vase", name: "한ㄱ름", glaze: "white", rating: 5, date: "2026.10.02", text: "선물상자와 쇼핑백을 같이 주문했습니다. 집들이 선물로 바로 들고 갔습니다." },
+  { productId: "mug", name: "김ㅎ늘", glaze: "black", rating: 5, date: "2026.09.30", text: "흑유 머그 두 개 샀어요. 손잡이가 도톰해서 잡기 편하고 입술 쪽 갈색 띠가 사진보다 진해요." },
+  { productId: "mug", name: "박*", glaze: "celadon", rating: 4, date: "2026.09.21", text: "400ml로 받았는데 생각보다 무게감 있어요. 아침 커피용으로 잘 쓰고 있어요." },
+  { productId: "ricebowl", name: "이ㅅ진", glaze: "white", rating: 5, date: "2026.09.12", text: "굽이 높아서 뜨거운 밥 담아도 덜 뜨거워요. 포장도 꼼꼼했어요." },
+  { productId: "plate", name: "최ㅇ호", glaze: "buncheong", rating: 5, date: "2026.08.28", text: "분청 접시 붓 자국이 하나하나 달라서 두 장이 다른 그릇 같아요ㅎㅎ" },
+  { productId: "teacup", name: "정*", glaze: "celadon", rating: 4, date: "2026.08.17", text: "찻잔 입술이 얇아서 차 마시기 좋아요. 생각보다 작으니 참고하세요." },
+  { productId: "vase", name: "한ㄱ름", glaze: "white", rating: 5, date: "2026.10.02", text: "선물상자랑 쇼핑백 같이 주문해서 집들이 선물로 바로 들고 갔어요." },
 ];
 
 /** 상품별 누적 후기 수. 화면에는 최근 후기 몇 건만 보여 준다. */
@@ -2064,9 +2064,9 @@ function BrandView() {
 
 const NOTICES = [
   { title: "추석 연휴 배송 안내 (9월 24일 ~ 9월 28일)", date: "2026.09.25", body: "연휴 기간 주문은 9월 29일(화)부터 순서대로 출고합니다. 연휴 전 마지막 출고는 9월 23일(수) 오후 2시 주문 건까지입니다." },
-  { title: "흑유 머그 400ml 재입고 안내", date: "2026.09.18", body: "9월 가마에서 흑유 머그 400ml가 다시 나왔습니다. 수량이 많지 않아 조기 품절될 수 있습니다." },
+  { title: "흑유 머그 400ml 재입고 안내", date: "2026.09.18", body: "흑유 머그 400ml 재입고되었습니다. 수량이 많지 않아 조기 품절될 수 있습니다." },
   { title: "물레 체험 10월 일정 안내", date: "2026.09.10", body: "10월 토요일 14:00, 16:00 두 차례 운영합니다. 예약은 전화로 받습니다." },
-  { title: "각인 상품 출고 일정 안내", date: "2026.08.30", body: "각인 상품은 주문 다음 영업일에 출고합니다. 각인 상품은 단순 변심 교환·반품이 불가합니다." },
+  { title: "각인 상품 출고 일정 안내", date: "2026.08.30", body: "각인 상품은 주문 다음 영업일에 출고되며, 단순 변심 교환·반품이 불가합니다." },
 ];
 
 const FAQS = [
