@@ -290,7 +290,6 @@ export function HomepageDemo() {
   // 첫 방문 예약 가이드 (스포트라이트 오버레이)
   const [tutStep, setTutStep] = useState<number | null>(null);
   const [tutRect, setTutRect] = useState<{ top: number; left: number; width: number; height: number } | null>(null);
-  const autoTutRef = useRef(false);
 
   const openTutorial = (n: number) => {
     const el = document.getElementById(tutorialSteps[n].target);
@@ -325,29 +324,24 @@ export function HomepageDemo() {
     scrollTo("map");
   };
 
-  // 지도가 처음 보이는 순간 가이드를 보여준다. 이미 예약 이력이나 진행 중인 선택이 있으면 건너뛴다.
-  // 다음 프레임에 열어 effect 안에서 바로 상태를 바꾸지 않는다(취소되면 다음 실행에서 다시 연다).
+  // 가이드는 자동으로 열지 않는다. 한 번도 열지 않았으면 물음표 버튼을 반짝여 알린다(DemoDock과 같은 키).
+  const seenKey = "demo-tour-seen:small-business-homepage";
+  const [tutFresh, setTutFresh] = useState(false);
   useEffect(() => {
-    if (!hydrated || !mapInView || autoTutRef.current) return;
     const frame = requestAnimationFrame(() => {
-      autoTutRef.current = true;
-      // DemoDock 안내와 같은 키: 한 번 본 뒤에는 자동으로 띄우지 않는다(물음표 버튼으로 다시 열 수 있다)
-      const seenKey = "demo-tour-seen:small-business-homepage";
       try {
-        if (localStorage.getItem(seenKey)) return;
-      } catch {
-        return;
-      }
-      if (!booking.locationId && (booking.reservations ?? []).length === 0) {
-        try {
-          localStorage.setItem(seenKey, "1");
-        } catch {}
-        openTutorial(0);
-      }
+        setTutFresh(!localStorage.getItem(seenKey));
+      } catch {}
     });
     return () => cancelAnimationFrame(frame);
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [hydrated, mapInView]);
+  }, []);
+  const openGuide = () => {
+    setTutFresh(false);
+    try {
+      localStorage.setItem(seenKey, "1");
+    } catch {}
+    openTutorial(0);
+  };
 
   const scrollToCard = (id: string) => {
     const list = listRef.current;
@@ -661,11 +655,12 @@ export function HomepageDemo() {
             </button>
             <button
               type="button"
-              onClick={() => openTutorial(0)}
+              onClick={openGuide}
               aria-label="예약 가이드 보기"
-              className="shrink-0 rounded-lg border border-stone-200 p-2.5 text-stone-400 transition-colors hover:border-[#111] hover:text-[#111]"
+              className={`relative shrink-0 rounded-lg border p-2.5 transition-colors hover:border-[#111] hover:text-[#111] ${tutFresh ? "border-[#16A34A] text-[#16A34A]" : "border-stone-200 text-stone-400"}`}
             >
-              <HelpCircle size={16} aria-hidden />
+              {tutFresh && <span aria-hidden className="absolute inset-0 rounded-lg bg-[#16A34A]/40 motion-safe:animate-ping" />}
+              <HelpCircle size={16} aria-hidden className="relative" />
             </button>
           </div>
           {/* 예약 진행 스테퍼 */}

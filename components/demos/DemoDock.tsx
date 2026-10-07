@@ -48,38 +48,25 @@ export function DemoDock({ projectId, story, tour }: { projectId: string; story?
     setStep(0);
   }, [tour]);
 
-  // 첫 단계 영역이 처음 보이면 한 번만 자동으로 연다
+  // 가이드는 자동으로 열지 않는다. 한 번도 열지 않았으면 물음표 버튼을 반짝여 알린다.
+  const seenKey = `demo-tour-seen:${projectId}`;
+  const [fresh, setFresh] = useState(false);
   useEffect(() => {
-    if (!tour?.length) return;
-    const key = `demo-tour-seen:${projectId}`;
+    const frame = requestAnimationFrame(() => {
+      try {
+        setFresh(!localStorage.getItem(seenKey));
+      } catch {}
+    });
+    return () => cancelAnimationFrame(frame);
+  }, [seenKey]);
+
+  const openGuide = () => {
+    setFresh(false);
     try {
-      if (localStorage.getItem(key)) return;
-    } catch {
-      return;
-    }
-    let io: IntersectionObserver | null = null;
-    const arm = () => {
-      const first = resolve(tour[0].target);
-      if (!first) return;
-      io = new IntersectionObserver(
-        ([entry]) => {
-          if (!entry.isIntersecting) return;
-          io?.disconnect();
-          try {
-            localStorage.setItem(key, "1");
-          } catch {}
-          start();
-        },
-        { threshold: 0.3 },
-      );
-      io.observe(first);
-    };
-    const timer = window.setTimeout(arm, 600);
-    return () => {
-      window.clearTimeout(timer);
-      io?.disconnect();
-    };
-  }, [projectId, tour, start]);
+      localStorage.setItem(seenKey, "1");
+    } catch {}
+    start();
+  };
 
   // 가이드가 열려 있는 동안 비추는 영역 좌표를 스크롤·리사이즈에 맞춘다
   useEffect(() => {
@@ -131,8 +118,17 @@ export function DemoDock({ projectId, story, tour }: { projectId: string; story?
         ) : null}
 
         {tour?.length ? (
-          <button type="button" onClick={start} aria-label="사용법 보기" title="사용법 보기" className={pill}>
-            <CircleHelp size={16} aria-hidden />
+          <button
+            type="button"
+            onClick={openGuide}
+            aria-label="사용법 보기"
+            title="사용법 보기"
+            className={`${pill} relative ${fresh ? "border-[#4ade80] bg-[#16A34A]" : ""}`}
+          >
+            {fresh && (
+              <span aria-hidden className="absolute inset-0 rounded-full bg-[#4ade80] opacity-60 motion-safe:animate-ping" />
+            )}
+            <CircleHelp size={16} aria-hidden className="relative" />
           </button>
         ) : null}
       </div>
