@@ -59,7 +59,7 @@ export function ToolBoard() {
             <th scope="col" className="w-32 py-3 font-medium">등록일</th>
           </tr>
         </thead>
-        <tbody>
+        <tbody key={cat + q} className="soft-in">
           {list.map((t) => (
             <tr key={t.href} className="block border-b border-border py-3 md:table-row md:py-0">
               <td className="hidden py-3.5 text-center tabular-nums text-foreground-secondary md:table-cell">{tools.length - tools.indexOf(t)}</td>

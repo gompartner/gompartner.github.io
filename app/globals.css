@@ -122,3 +122,20 @@ body {
   background: var(--accent);
   color: var(--accent-foreground);
 }
+
+/* 페이지 전환·목록 갱신 때 살짝 떠오르며 나타난다. CSS만으로 동작해 첫 화면 표시를 늦추지 않는다. */
+@keyframes soft-in {
+  from {
+    opacity: 0;
+    transform: translateY(6px);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+@media (prefers-reduced-motion: no-preference) {
+  .soft-in {
+    animation: soft-in 0.28s ease-out both;
+  }
+}
