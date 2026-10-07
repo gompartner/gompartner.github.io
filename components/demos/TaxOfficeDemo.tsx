@@ -823,6 +823,9 @@ function Home({
   return (
     <>
       <section aria-labelledby="tax-home-title" className="border-b bg-white px-4 md:px-6" style={{ borderColor: C.line }}>
+        <div className="relative mx-auto mt-4 h-[200px] max-w-[1200px] overflow-hidden rounded-[8px] md:mt-6 md:h-[340px]">
+          <Image src={`${IMG}/hero.jpg`} alt="서류와 계산기, 노트북이 놓인 밝은 사무실 책상" fill priority sizes="(min-width: 1248px) 1200px, 100vw" className="object-cover" />
+        </div>
         <div className="mx-auto flex max-w-[1200px] flex-col gap-4 py-6 md:flex-row md:items-end md:justify-between md:py-8">
           <div>
             <h1 id="tax-home-title" tabIndex={-1} className="text-[30px] font-bold leading-[1.3] tracking-[-0.03em] outline-none md:text-[34px]">

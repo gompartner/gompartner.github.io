@@ -588,13 +588,15 @@ function SearchPage({
 
   return (
     <>
-      <section aria-labelledby="realty-page-title" className="border-b px-4 pb-5 pt-6 md:px-6 md:pb-6 md:pt-7" style={{ background: C.gray, borderColor: C.line }}>
+      <section aria-labelledby="realty-page-title" className="relative isolate border-b px-4 pb-5 pt-10 md:px-6 md:pb-10 md:pt-20" style={{ background: C.ink, borderColor: C.line }}>
+        <Image src={`${IMG}/hero.jpg`} alt="" fill priority sizes="100vw" className="-z-10 object-cover" />
+        <div className="absolute inset-0 -z-10" style={{ background: "rgba(20,22,25,0.55)" }} aria-hidden />
         <div className="mx-auto max-w-[1200px]">
-          <div className="flex flex-wrap items-baseline justify-between gap-x-4 gap-y-1">
+          <div className="flex flex-wrap items-baseline justify-between gap-x-4 gap-y-1 text-white">
             <h1 id="realty-page-title" tabIndex={-1} className="text-[24px] font-bold tracking-[-0.03em] outline-none md:text-[28px]">
               □□동 매물검색
             </h1>
-            <p className="text-[14px]" style={{ color: C.muted }}>
+            <p className="text-[14px]" style={{ color: "rgba(255,255,255,0.88)" }}>
               평일 09:30 ~ 19:00, 토요일 10:00 ~ 17:00
             </p>
           </div>
@@ -678,7 +680,7 @@ function SearchPage({
             </div>
           </form>
 
-          <ul className="mt-3 flex flex-wrap items-center text-[15px]" aria-label="매물 종류별 매물 수">
+          <ul className="mt-2 flex flex-wrap items-center rounded-[4px] border bg-white px-2 text-[15px]" style={{ borderColor: C.line }} aria-label="매물 종류별 매물 수">
             {([["all", "전체"], ...(Object.keys(KIND_LABEL) as Kind[]).map((k) => [k, KIND_LABEL[k]])] as [Filter["kind"], string][]).map(([k, label], i) => {
               const on = filter.kind === k;
               return (

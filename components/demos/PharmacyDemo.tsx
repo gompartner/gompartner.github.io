@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useRef, useState, useSyncExternalStore } from "react";
+import Image from "next/image";
 import { AnimatePresence, motion } from "framer-motion";
 import {
   AArrowUp,
@@ -30,6 +31,7 @@ import { useReducedMotionSafe } from "@/hooks/useReducedMotionSafe";
    운영: 평일 09:00 ~ 익일 01:00(22:00 이후 공공심야약국), 토요일 09:00 ~ 18:00,
    일요일·공휴일 휴무, 둘째·넷째 일요일은 휴일지킴이약국으로 10:00 ~ 18:00. */
 
+const IMG = "/images/demo-pharmacy";
 const PHARMACY = "곰파트너약국";
 const TEL = "02-000-0000";
 const ADDRESS = "□□시 □□로 140 □□의원 건물 1층";
@@ -374,28 +376,33 @@ function Intro() {
   ];
 
   return (
-    <section id="top" aria-labelledby="pharmacy-name" className="scroll-mt-32 rounded-[10px] border bg-white p-4 md:p-6 print:hidden" style={{ borderColor: C.line }}>
-      <div className="flex flex-wrap items-center gap-x-3 gap-y-1.5">
-        <h1 id="pharmacy-name" className="text-[28px] font-bold leading-[1.25] tracking-[-0.03em] md:text-[36px]">
-          {PHARMACY}
-        </h1>
-        <span className="rounded-[4px] px-2 py-0.5 text-[14px] font-semibold text-white" style={{ background: C.mint }}>
-          공공심야약국
-        </span>
+    <section id="top" aria-labelledby="pharmacy-name" className="scroll-mt-32 overflow-hidden rounded-[10px] border bg-white print:hidden" style={{ borderColor: C.line }}>
+      <div className="relative h-[200px] md:h-[360px]">
+        <Image src={`${IMG}/hero.jpg`} alt="흰 선반에 약상자가 정리된 밝은 약국 안과 나무 상담대" fill priority sizes="(min-width: 1248px) 1200px, 100vw" className="object-cover" style={{ objectPosition: "35% center" }} />
       </div>
-      <p className="mt-2 text-[16px]" style={{ color: C.muted }}>
-        동물약도 취급합니다.
-      </p>
-      <dl className="mt-4 grid border-t text-[16px] sm:grid-cols-2" style={{ borderColor: C.line }}>
-        {rows.map(([k, v]) => (
-          <div key={k} className="flex gap-3 border-b py-2.5 sm:pr-4" style={{ borderColor: C.line }}>
-            <dt className="w-[80px] shrink-0" style={{ color: C.muted }}>
-              {k}
-            </dt>
-            <dd className="min-w-0 font-medium">{v}</dd>
-          </div>
-        ))}
-      </dl>
+      <div className="p-4 md:p-6">
+        <div className="flex flex-wrap items-center gap-x-3 gap-y-1.5">
+          <h1 id="pharmacy-name" className="text-[28px] font-bold leading-[1.25] tracking-[-0.03em] md:text-[36px]">
+            {PHARMACY}
+          </h1>
+          <span className="rounded-[4px] px-2 py-0.5 text-[14px] font-semibold text-white" style={{ background: C.mint }}>
+            공공심야약국
+          </span>
+        </div>
+        <p className="mt-2 text-[16px]" style={{ color: C.muted }}>
+          동물약도 취급합니다.
+        </p>
+        <dl className="mt-4 grid border-t text-[16px] sm:grid-cols-2" style={{ borderColor: C.line }}>
+          {rows.map(([k, v]) => (
+            <div key={k} className="flex gap-3 border-b py-2.5 sm:pr-4" style={{ borderColor: C.line }}>
+              <dt className="w-[80px] shrink-0" style={{ color: C.muted }}>
+                {k}
+              </dt>
+              <dd className="min-w-0 font-medium">{v}</dd>
+            </div>
+          ))}
+        </dl>
+      </div>
     </section>
   );
 }
