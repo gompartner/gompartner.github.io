@@ -111,10 +111,10 @@ export function WorksSearch({ projects }: { projects: Project[] }) {
         ))}
       </div>
       <div className="relative z-10 flex flex-col gap-4 md:flex-row md:items-start md:justify-between md:gap-8">
-        <div className="relative min-h-[48px] flex-1 text-[21px] font-bold leading-[1.8] tracking-[-0.01em] md:text-[26px]">
+        <div className="relative min-h-[48px] flex-1 text-[17px] min-[390px]:text-[19px] font-bold leading-[1.8] tracking-[-0.01em] md:text-[26px]">
           <AnimatePresence mode="wait" initial={false}>
             {mode === "pick" ? (
-              <motion.div key="pick" {...swap}>
+              <motion.div key="pick" {...swap} className="whitespace-nowrap md:whitespace-normal">
                 <span className="whitespace-nowrap">
                   <WordPicker
                     id="field"
@@ -125,9 +125,9 @@ export function WorksSearch({ projects }: { projects: Project[] }) {
                     onOpenChange={(o) => setOpen(o ? "field" : null)}
                     onChange={setField}
                   />
-                  에서
+                  <span className="text-[13px] min-[390px]:text-[15px] md:text-[26px]">에서</span>
                 </span>{" "}
-                쓰는{" "}
+                <span className="text-[13px] min-[390px]:text-[15px] md:text-[26px]">쓰는</span>{" "}
                 <span className="whitespace-nowrap">
                   <WordPicker
                     id="cap"
@@ -138,9 +138,9 @@ export function WorksSearch({ projects }: { projects: Project[] }) {
                     onOpenChange={(o) => setOpen(o ? "cap" : null)}
                     onChange={setCap}
                   />
-                  을
+                  <span className="text-[13px] min-[390px]:text-[15px] md:text-[26px]">을</span>
                 </span>{" "}
-                갖춘 사례
+                <span className="whitespace-nowrap text-[13px] min-[390px]:text-[15px] md:text-[26px]">갖춘 사례</span>
               </motion.div>
             ) : (
               <motion.div key="text" {...swap} className="flex flex-wrap items-center gap-x-3">
