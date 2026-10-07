@@ -108,18 +108,18 @@ interface Bread {
 }
 
 const BREADS: Bread[] = [
-  { id: "salt", name: "소금빵", price: 3200, cat: "pastry", allergens: ["milk", "wheat"], sellEvery: 5, desc: "버터를 말아 굽고 굵은 소금을 올립니다." },
-  { id: "croissant", name: "크루아상", price: 4200, cat: "pastry", allergens: ["milk", "egg", "wheat"], sellEvery: 8, desc: "사흘 동안 반죽을 접어 결이 스물일곱 겹입니다." },
-  { id: "campagne", name: "깜파뉴", price: 7500, cat: "meal", allergens: ["wheat"], sellEvery: 25, desc: "통밀과 호밀을 섞어 48시간 저온 발효합니다." },
-  { id: "fig", name: "무화과 호두 깜파뉴", price: 8500, cat: "meal", allergens: ["wheat", "nut"], sellEvery: 25, desc: "말린 무화과와 구운 호두를 듬뿍 넣었습니다." },
-  { id: "bagel", name: "플레인 베이글", price: 3500, cat: "meal", allergens: ["wheat"], sellEvery: 12, desc: "데쳐서 구워 겉은 단단하고 속은 쫄깃합니다." },
-  { id: "pretzel", name: "버터 프레첼", price: 4000, cat: "pastry", allergens: ["milk", "wheat"], sellEvery: 12, desc: "가운데를 갈라 차가운 버터를 끼웠습니다." },
-  { id: "redbean", name: "단팥빵", price: 3000, cat: "sweet", allergens: ["milk", "egg", "wheat"], sellEvery: 10, desc: "국산 팥을 덜 달게 졸여 꽉 채웁니다." },
-  { id: "cream", name: "우유 크림빵", price: 3500, cat: "sweet", allergens: ["milk", "egg", "wheat"], sellEvery: 9, desc: "주문이 들어오면 크림을 채워 드립니다." },
-  { id: "milkbread", name: "우유식빵", price: 5500, cat: "meal", allergens: ["milk", "wheat"], sellEvery: 15, desc: "물 대신 우유로 반죽해 결대로 찢어집니다." },
-  { id: "castella", name: "쌀 카스텔라", price: 6000, cat: "baked", allergens: ["milk", "egg"], sellEvery: 18, desc: "밀가루 없이 쌀가루와 달걀로 굽습니다." },
-  { id: "financier", name: "휘낭시에", price: 2500, cat: "baked", allergens: ["milk", "egg", "nut", "wheat"], sellEvery: 6, desc: "갈색이 나도록 끓인 버터와 아몬드 가루로 굽습니다." },
-  { id: "tart", name: "에그타르트", price: 3000, cat: "sweet", allergens: ["milk", "egg", "wheat"], sellEvery: 7, desc: "겹겹이 부서지는 반죽에 커스터드를 채웁니다." },
+  { id: "salt", name: "소금빵", price: 3200, cat: "pastry", allergens: ["milk", "wheat"], sellEvery: 5, desc: "프랑스산 버터를 넣고 돌소금을 올린 쫄깃 고소한 소금빵" },
+  { id: "croissant", name: "크루아상", price: 4200, cat: "pastry", allergens: ["milk", "egg", "wheat"], sellEvery: 8, desc: "3일 동안 접어 만든 결이 살아 있는 버터 크루아상" },
+  { id: "campagne", name: "깜파뉴", price: 7500, cat: "meal", allergens: ["wheat"], sellEvery: 25, desc: "통밀, 호밀, 천연발효종. 48시간 저온 숙성" },
+  { id: "fig", name: "무화과 호두 깜파뉴", price: 8500, cat: "meal", allergens: ["wheat", "nut"], sellEvery: 25, desc: "반건조 무화과와 구운 호두 듬뿍." },
+  { id: "bagel", name: "플레인 베이글", price: 3500, cat: "meal", allergens: ["wheat"], sellEvery: 12, desc: "겉은 단단하고 속은 쫄깃한 기본 베이글" },
+  { id: "pretzel", name: "버터 프레첼", price: 4000, cat: "pastry", allergens: ["milk", "wheat"], sellEvery: 12, desc: "짭조름한 프레첼에 차가운 버터 한 조각" },
+  { id: "redbean", name: "단팥빵", price: 3000, cat: "sweet", allergens: ["milk", "egg", "wheat"], sellEvery: 10, desc: "국산 팥으로 직접 만든 앙금, 덜 달게" },
+  { id: "cream", name: "우유 크림빵", price: 3500, cat: "sweet", allergens: ["milk", "egg", "wheat"], sellEvery: 9, desc: "주문 즉시 우유 크림을 가득 채워 드려요" },
+  { id: "milkbread", name: "우유식빵", price: 5500, cat: "meal", allergens: ["milk", "wheat"], sellEvery: 15, desc: "물 없이 우유로만 반죽한 결대로 찢어지는 식빵" },
+  { id: "castella", name: "쌀 카스텔라", price: 6000, cat: "baked", allergens: ["milk", "egg"], sellEvery: 18, desc: "밀가루 없이 100% 쌀가루로 구운 카스텔라" },
+  { id: "financier", name: "휘낭시에", price: 2500, cat: "baked", allergens: ["milk", "egg", "nut", "wheat"], sellEvery: 6, desc: "태운 버터와 아몬드 가루로 구운 휘낭시에" },
+  { id: "tart", name: "에그타르트", price: 3000, cat: "sweet", allergens: ["milk", "egg", "wheat"], sellEvery: 7, desc: "바삭한 파이 반죽에 커스터드를 채운 에그타르트" },
 ];
 
 const breadImg = (id: string) => `${IMG}/menu/${id}.jpg`;
@@ -1052,7 +1052,7 @@ function PickupOrder({
     e.preventDefault();
     if (!items.length) return setError("빵을 하나 이상 담아 주십시오.");
     if (activeSlot === null) return setError("픽업 시간을 선택해 주십시오.");
-    if (name.trim().length < 2) return setError("성함을 두 글자 이상 입력해 주십시오.");
+    if (name.trim().length < 2) return setError("성함을 입력해 주십시오.");
     if (phone.replace(/\D/g, "").length < 10) return setError("휴대전화 번호를 입력해 주십시오.");
     setError("");
     const now = new Date();
@@ -1206,8 +1206,8 @@ function PickupOrder({
           예약하기
         </button>
         <ul className="mt-4 space-y-1 text-[14px]" style={{ color: C.muted }}>
-          <li>결제는 매장에서 합니다.</li>
-          <li>픽업 시간 30분이 지나면 진열대로 돌려놓습니다.</li>
+          <li>결제는 매장에서 해 주세요.</li>
+          <li>픽업 시간 30분 경과 시 예약이 취소될 수 있습니다.</li>
         </ul>
       </div>
       <Receipt data={receipt} onClose={closeReceipt} />
@@ -1234,10 +1234,10 @@ function GroupOrder({ minute }: { minute: number }) {
   const submit = (e: React.FormEvent) => {
     e.preventDefault();
     if (!date) return setError("희망 날짜를 선택해 주십시오.");
-    if (minDate && date < minDate) return setError("단체주문은 이틀 뒤부터 예약할 수 있습니다.");
+    if (minDate && date < minDate) return setError("단체주문은 2일 전까지 예약해 주세요.");
     if (new Date(`${date}T00:00:00`).getDay() === 1) return setError("월요일은 정기휴무입니다.");
     if (!qty) return setError("수량을 선택해 주십시오.");
-    if (name.trim().length < 2) return setError("성함을 두 글자 이상 입력해 주십시오.");
+    if (name.trim().length < 2) return setError("성함을 입력해 주십시오.");
     if (phone.replace(/\D/g, "").length < 10) return setError("휴대전화 번호를 입력해 주십시오.");
     setError("");
     setDone({ name: maskName(name), date, qty });
@@ -1423,7 +1423,7 @@ function Receipt({ data, onClose }: { data: ReceiptData | null; onClose: () => v
               <span>{won(total)}</span>
             </p>
             <p className="mt-4 text-center text-[14px]" style={{ color: C.muted }}>
-              결제는 매장에서 합니다. 픽업 시간 30분이 지나면 진열대로 돌려놓습니다.
+              결제는 매장에서 해 주세요. 픽업 시간 30분 경과 시 예약이 취소될 수 있습니다.
             </p>
           </motion.div>
         </motion.div>
@@ -1445,9 +1445,9 @@ function About() {
         <p className="mt-8 text-[22px] font-bold tracking-[-0.02em] md:text-[26px]">당일 생산 · 당일 판매</p>
         <dl className="mt-5 grid gap-5 md:grid-cols-3 md:gap-8">
           {[
-            ["04:00", "반죽을 시작합니다. 깜파뉴 반죽은 이틀 전에 미리 만들어 둡니다."],
-            ["17:00", "마지막 소금빵이 나옵니다. 이후에는 굽지 않고 남은 빵만 판매합니다."],
-            ["19:00", "남은 빵은 30% 할인합니다. 영업 종료 후 남은 빵은 □□동 지역아동센터에 보냅니다."],
+            ["04:00", "반죽 시작. 깜파뉴 반죽은 이틀 전에 미리 준비합니다."],
+            ["17:00", "마지막 소금빵이 나옵니다. 이후에는 남은 빵만 판매합니다."],
+            ["19:00", "남은 빵 30% 할인. 당일 생산·당일 판매를 원칙으로 하며, 남은 빵은 □□동 지역아동센터에 기부합니다."],
           ].map(([t, d]) => (
             <div key={t} className="border-t pt-4" style={{ borderColor: C.kraftDeep }}>
               <dt className="text-[20px] font-bold tabular-nums" style={{ color: C.crust }}>
@@ -1519,7 +1519,7 @@ function Store() {
             <ul className="mt-4 space-y-3">
               {[
                 { icon: TrainFront, title: "지하철", body: "□□역 2번 출구에서 도보 5분" },
-                { icon: Car, title: "주차", body: "매장 앞 주차 불가. 50m 옆 □□동 공영주차장을 이용해 주십시오." },
+                { icon: Car, title: "주차", body: "매장 앞 주차 불가. 50m 옆 □□동 공영주차장을 이용해 주세요." },
               ].map((r) => (
                 <li key={r.title} className="flex gap-3">
                   <r.icon size={20} className="mt-1 shrink-0" style={{ color: C.crust }} aria-hidden />
