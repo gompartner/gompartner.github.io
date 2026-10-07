@@ -3,13 +3,14 @@
 import { createContext, useCallback, useContext, useEffect, useMemo, useRef, useState } from "react";
 import { AnimatePresence, motion } from "framer-motion";
 import Image from "next/image";
-import { Briefcase, Check, ChevronLeft, ChevronRight, ClipboardList, Download, HardHat, LayoutGrid, Lock, Pause, Play, Plus, Printer, RotateCcw, Scale, Send, Users, X } from "lucide-react";
+import { Check, ChevronLeft, ChevronRight, Download, Lock, Pause, Play, Printer, RotateCcw, Send, X } from "lucide-react";
 import { daysAgo, fmtDash, fmtDot, fmtMD, useDemoToday } from "@/hooks/useDemoToday";
 import { useLocalStorage } from "@/hooks/useLocalStorage";
 import { useReducedMotionSafe } from "@/hooks/useReducedMotionSafe";
 
 /* 사내·위탁 이러닝 LMS 데모. 구성은 국내 HRD 이러닝 사이트, 원격평생교육원, 대학 LMS를 따랐다
-   (조사 자료 01_Work/03_Resource/benchmark/LMS.md).
+   (조사 자료 01_Work/03_Resource/benchmark/LMS.md). 화면 디자인은 요즘 플랫폼(패스트캠퍼스, 클래스101, 휴넷, 인프런)처럼
+   흰 바탕, 16:9 썸네일 카드, 밑줄 탭, 과정 상세 오른쪽 고정 신청 카드, 이어서 학습하기 카드, 어두운 플레이어로 했다.
    사이트: 메인(배너, 과정 분야 바로가기, 인기/신규 과정, 공지사항, 자주 묻는 질문, 학습지원센터, 수강 절차), 교육과정, 과정 상세(환급 안내, 수강신청),
    수강신청(개강 일정), 학습지원센터, 로그인(데모 계정).
    학습자: 나의 강의실(학습중인 과정, 학습종료 과정, 수료증 발급) > 과정 강의실(학습현황, 수료기준, 학습하기, 평가, 공지사항, 학습 Q&A) > 학습창.
@@ -19,12 +20,13 @@ import { useReducedMotionSafe } from "@/hooks/useReducedMotionSafe";
    수강생은 시드 고정 난수로 만든 가상 데이터다(서버와 브라우저 결과가 같다). */
 
 const C = {
-  bg: "#f6f3ec",
+  bg: "#f6f6f4",
   surface: "#ffffff",
-  head: "#f1ede4",
-  line: "#e4ded2",
-  text: "#1f2421",
-  muted: "#56605a",
+  soft: "#f3f4f2",
+  head: "#f3f4f2",
+  line: "#e6e7e4",
+  text: "#1b1f1d",
+  muted: "#5c635f",
   brand: "#1f5f46",
   brandSoft: "#e5f0ea",
   accent: "#c2410c",
@@ -271,7 +273,7 @@ const DROPOFF = [
 
 /* ---------- 공통 스타일 ---------- */
 
-const btnBase = "inline-flex h-9 items-center justify-center gap-1.5 rounded-[4px] px-3 text-[14px] font-bold whitespace-nowrap disabled:cursor-not-allowed disabled:opacity-40";
+const btnBase = "inline-flex h-9 items-center justify-center gap-1.5 rounded-md px-3 text-[14px] font-bold whitespace-nowrap disabled:cursor-not-allowed disabled:opacity-40";
 const btnPrimary = { background: C.brand, color: "#fff" };
 const btnLine = { border: `1px solid ${C.line}`, background: "#fff", color: C.text };
 const th = "px-3 py-2.5 text-left text-[14px] font-bold whitespace-nowrap";
@@ -279,7 +281,7 @@ const td = "px-3 py-2.5 whitespace-nowrap";
 
 function Panel({ title, id, right, children }: { title: string; id: string; right?: React.ReactNode; children: React.ReactNode }) {
   return (
-    <section aria-labelledby={id} className="rounded-md border bg-white" style={{ borderColor: C.line }}>
+    <section aria-labelledby={id} className="rounded-[10px] border bg-white" style={{ borderColor: C.line }}>
       <div className="flex flex-wrap items-center gap-2 border-b px-4 py-3" style={{ borderColor: C.line }}>
         <h2 id={id} className="mr-auto text-[17px] font-bold">
           {title}
@@ -301,19 +303,19 @@ function Bar({ value, color = C.brand }: { value: number; color?: string }) {
 
 function SideNav<T extends string>({ title, items, current, onSelect, label }: { title: string; items: [T, string][]; current: T; onSelect: (id: T) => void; label: string }) {
   return (
-    <nav aria-label={label} className="rounded-md border bg-white lg:self-start" style={{ borderColor: C.line }}>
-      <p className="border-b px-4 py-3 text-[16px] font-bold text-white" style={{ background: C.brand, borderColor: C.brand }}>
+    <nav aria-label={label} className="lg:self-start">
+      <p className="px-3 pb-2 text-[13px] font-bold" style={{ color: C.muted }}>
         {title}
       </p>
-      <ul className="flex flex-wrap lg:block">
+      <ul className="flex flex-wrap gap-1 lg:flex-col">
         {items.map(([id, text]) => (
-          <li key={id} className="lg:border-b last:border-b-0" style={{ borderColor: C.line }}>
+          <li key={id}>
             <button
               type="button"
               aria-current={current === id ? "page" : undefined}
               onClick={() => onSelect(id)}
-              className="w-full px-4 py-2.5 text-left text-[15px]"
-              style={current === id ? { color: C.brand, fontWeight: 700, background: C.brandSoft } : { color: C.text }}
+              className="w-full rounded-md px-3 py-2.5 text-left text-[15px]"
+              style={current === id ? { color: C.text, fontWeight: 700, background: "#fff", boxShadow: `inset 0 0 0 1px ${C.line}` } : { color: C.muted }}
             >
               {text}
             </button>
@@ -548,6 +550,35 @@ type Route =
   | { name: "login"; next: Route }
   | { name: "my" };
 
+const wrap = "mx-auto max-w-[1200px] px-4 md:px-6";
+const Sep = () => (
+  <span aria-hidden className="mx-1.5 opacity-40">
+    |
+  </span>
+);
+
+function UnderlineTabs<T extends string>({ items, current, onSelect, label, size = "md", idPrefix }: { items: [T, string][]; current: T; onSelect: (id: T) => void; label: string; size?: "md" | "lg"; idPrefix?: string }) {
+  return (
+    <div role="tablist" aria-label={label} className="relative flex gap-6 overflow-x-auto border-b md:gap-8" style={{ borderColor: C.line }}>
+      {items.map(([id, text]) => (
+        <button
+          key={id}
+          role="tab"
+          type="button"
+          id={idPrefix ? `${idPrefix}-${id}` : undefined}
+          aria-selected={current === id}
+          onClick={() => onSelect(id)}
+          className={`relative shrink-0 pb-3 font-bold whitespace-nowrap ${size === "lg" ? "text-[17px]" : "text-[15px]"}`}
+          style={{ color: current === id ? C.text : C.muted }}
+        >
+          {text}
+          {current === id && <span aria-hidden className="absolute inset-x-0 bottom-0 h-[2px]" style={{ background: C.text }} />}
+        </button>
+      ))}
+    </div>
+  );
+}
+
 function SiteHeader({ route, loggedIn, go, onMy, onLogout, onAdmin, onReset }: { route: Route; loggedIn: boolean; go: (r: Route) => void; onMy: () => void; onLogout: () => void; onAdmin: () => void; onReset: () => void }) {
   const menu: [string, string, () => void, boolean][] = [
     ["lms-gnb-courses", "교육과정", () => go({ name: "courses", cat: "전체" }), route.name === "courses" || route.name === "course"],
@@ -555,40 +586,10 @@ function SiteHeader({ route, loggedIn, go, onMy, onLogout, onAdmin, onReset }: {
     ["lms-gnb-my", "나의 강의실", onMy, route.name === "my"],
     ["lms-gnb-support", "학습지원센터", () => go({ name: "support", tab: "notice" }), route.name === "support"],
   ];
-  const util = "px-1.5 py-1 text-[13px]";
   return (
     <header className="border-b bg-white" style={{ borderColor: C.line }}>
-      <div className="border-b" style={{ borderColor: C.line, background: C.bg }}>
-        <div className="mx-auto flex max-w-[1200px] items-center justify-end gap-1 px-4 md:px-6" style={{ color: C.muted }}>
-          {loggedIn ? (
-            <>
-              <span className={util}>
-                <b style={{ color: C.text }}>{maskName(ME.name)}</b>님
-              </span>
-              <button type="button" onClick={onLogout} className={util}>
-                로그아웃
-              </button>
-            </>
-          ) : (
-            <>
-              <button type="button" onClick={() => go({ name: "login", next: { name: "my" } })} className={util}>
-                로그인
-              </button>
-              <button type="button" onClick={() => go({ name: "login", next: { name: "home" } })} className={util}>
-                회원가입
-              </button>
-            </>
-          )}
-          <button type="button" id="lms-admin" onClick={onAdmin} className={`${util} font-bold`} style={{ color: C.text }}>
-            관리자
-          </button>
-          <button type="button" onClick={onReset} aria-label="초기화" className={`${util} inline-flex items-center`}>
-            <RotateCcw size={13} aria-hidden />
-          </button>
-        </div>
-      </div>
-      <div className="mx-auto flex max-w-[1200px] flex-wrap items-center gap-x-8 gap-y-1 px-4 md:px-6">
-        <button type="button" onClick={() => go({ name: "home" })} className="flex items-center gap-2 py-3" style={{ color: C.brand }}>
+      <div className={`${wrap} flex flex-wrap items-center gap-x-10`}>
+        <button type="button" onClick={() => go({ name: "home" })} className="flex h-16 items-center gap-2" style={{ color: C.brand }}>
           {/* eslint-disable-next-line @next/next/no-img-element */}
           <img src="/images/logo.svg" alt="" aria-hidden width={30} height={30} className="h-[30px] w-[30px] shrink-0" />
           <span className="sr-only">곰파트너 아카데미</span>
@@ -597,20 +598,35 @@ function SiteHeader({ route, loggedIn, go, onMy, onLogout, onAdmin, onReset }: {
             <span className="text-[12px] font-bold opacity-80">아카데미</span>
           </span>
         </button>
-        <nav aria-label="주 메뉴" className="w-full md:ml-auto md:w-auto">
-          <ul className="flex justify-between md:gap-10">
+        <div className="order-2 ml-auto flex items-center gap-1 md:order-3">
+          <button type="button" id="lms-admin" onClick={onAdmin} className="px-2 py-1.5 text-[14px]" style={{ color: C.muted }}>
+            관리자
+          </button>
+          <button type="button" onClick={onReset} aria-label="초기화" className="grid size-9 place-items-center rounded-md" style={{ color: C.muted }}>
+            <RotateCcw size={15} aria-hidden />
+          </button>
+          {loggedIn ? (
+            <>
+              <span className="hidden px-2 text-[14px] sm:inline">
+                <b>{maskName(ME.name)}</b>님
+              </span>
+              <button type="button" onClick={onLogout} className="h-9 rounded-md px-3 text-[14px] font-bold" style={{ background: C.soft }}>
+                로그아웃
+              </button>
+            </>
+          ) : (
+            <button type="button" onClick={() => go({ name: "login", next: { name: "my" } })} className="h-9 rounded-md px-4 text-[14px] font-bold text-white" style={{ background: C.text }}>
+              로그인
+            </button>
+          )}
+        </div>
+        <nav aria-label="주 메뉴" className="order-3 w-full md:order-2 md:w-auto">
+          <ul className="flex justify-between md:justify-start md:gap-8">
             {menu.map(([id, label, onClick, active]) => (
               <li key={id}>
-                <button
-                  type="button"
-                  id={id}
-                  aria-current={active ? "page" : undefined}
-                  onClick={onClick}
-                  className="relative block py-3 text-[15px] font-bold md:py-5 md:text-[17px]"
-                  style={{ color: active ? C.brand : C.text }}
-                >
+                <button type="button" id={id} aria-current={active ? "page" : undefined} onClick={onClick} className="relative block py-3 text-[15px] font-bold whitespace-nowrap md:py-5 md:text-[16px]" style={{ color: active ? C.text : C.muted }}>
                   {label}
-                  {active && <span aria-hidden className="absolute inset-x-0 bottom-0 h-[3px]" style={{ background: C.brand }} />}
+                  {active && <span aria-hidden className="absolute inset-x-0 bottom-0 h-[2px]" style={{ background: C.text }} />}
                 </button>
               </li>
             ))}
@@ -623,19 +639,19 @@ function SiteHeader({ route, loggedIn, go, onMy, onLogout, onAdmin, onReset }: {
 
 function SiteFooter() {
   return (
-    <footer className="mt-16 text-[13px] leading-[1.8]" style={{ background: C.dark, color: "rgba(255,255,255,.72)" }}>
-      <div className="mx-auto max-w-[1200px] px-4 pt-8 pb-28 md:px-6">
-        <p className="flex flex-wrap gap-x-4 font-bold text-white">
+    <footer className="mt-24 border-t text-[13px] leading-[1.8]" style={{ background: C.soft, borderColor: C.line, color: C.muted }}>
+      <div className={`${wrap} pt-10 pb-28`}>
+        <p className="flex flex-wrap gap-x-5 font-bold" style={{ color: C.text }}>
           <span>이용약관</span>
           <span>개인정보처리방침</span>
           <span>학습유의사항</span>
           <span>환불규정</span>
         </p>
         <p className="mt-4">
-          ㄱㅍ아카데미 <span aria-hidden className="mx-1.5 opacity-50">|</span> 대표 김ㅈ우 <span aria-hidden className="mx-1.5 opacity-50">|</span> 사업자등록번호 000-00-00000
+          ㄱㅍ아카데미 <Sep /> 대표 김ㅈ우 <Sep /> 사업자등록번호 000-00-00000
         </p>
         <p>
-          서울특별시 중구 세종대로 000 <span aria-hidden className="mx-1.5 opacity-50">|</span> 학습지원센터 02-000-0000
+          서울특별시 중구 세종대로 000 <Sep /> 학습지원센터 02-000-0000
         </p>
         <p className="mt-3">Copyright © ㄱㅍ아카데미. All rights reserved.</p>
       </div>
@@ -646,30 +662,25 @@ function SiteFooter() {
 function CourseCard({ c, onOpen }: { c: CourseInfo; onOpen: () => void }) {
   return (
     <li className="min-w-0">
-      <button type="button" onClick={onOpen} className="group block w-full overflow-hidden rounded-md border bg-white text-left" style={{ borderColor: C.line }}>
-        <span className="relative block aspect-[16/10] overflow-hidden" style={{ background: C.head }}>
+      <button type="button" onClick={onOpen} className="group block w-full text-left">
+        <span className="relative block aspect-video overflow-hidden rounded-lg" style={{ background: C.soft }}>
           <Image src={c.img} alt={c.imgAlt} fill sizes="(min-width: 1024px) 280px, (min-width: 640px) 45vw, 100vw" className="object-cover" />
         </span>
-        <span className="block p-4">
-          <span className="block text-[13px]" style={{ color: C.muted }}>
-            {c.cat}
-          </span>
-          <span className="mt-1 block text-[17px] font-bold group-hover:underline group-hover:underline-offset-2">{c.title}</span>
-          <span className="mt-1.5 block text-[14px] tabular-nums" style={{ color: C.muted }}>
-            {c.lessons.length}차시 <span aria-hidden className="mx-1 opacity-50">|</span> {c.hours} <span aria-hidden className="mx-1 opacity-50">|</span> 학습기간 {c.period}
-          </span>
-          <span className="mt-3 flex items-baseline justify-between gap-2 border-t pt-3 tabular-nums" style={{ borderColor: C.line }}>
-            <span className="text-[16px] font-bold">{won(c.fee)}</span>
-            {c.refund ? (
-              <span className="text-[13px] font-bold" style={{ color: C.brand }}>
-                환급 {won(Math.round(c.fee * 0.9))}
-              </span>
-            ) : (
-              <span className="text-[13px]" style={{ color: C.muted }}>
-                비환급
-              </span>
-            )}
-          </span>
+        <span className="mt-3 block text-[13px] tabular-nums" style={{ color: C.muted }}>
+          {c.cat} <Sep /> {c.lessons.length}차시 <Sep /> {c.hours}
+        </span>
+        <span className="mt-1 block text-[17px] leading-[1.4] font-bold group-hover:underline group-hover:underline-offset-4">{c.title}</span>
+        <span className="mt-2 flex flex-wrap items-baseline gap-x-2 tabular-nums">
+          <span className="text-[16px] font-bold">{won(c.fee)}</span>
+          {c.refund ? (
+            <span className="text-[13px] font-bold" style={{ color: C.brand }}>
+              환급 {won(Math.round(c.fee * 0.9))}
+            </span>
+          ) : (
+            <span className="text-[13px]" style={{ color: C.muted }}>
+              비환급
+            </span>
+          )}
         </span>
       </button>
     </li>
@@ -678,168 +689,160 @@ function CourseCard({ c, onOpen }: { c: CourseInfo; onOpen: () => void }) {
 
 function Steps() {
   return (
-    <ol className="grid grid-cols-5">
+    <ol className="grid grid-cols-5 gap-2">
       {STEPS.map((s, k) => (
-        <li key={s} className="relative flex flex-col items-center text-center">
-          {k < STEPS.length - 1 && <span aria-hidden className="absolute top-[19px] left-1/2 h-px w-full" style={{ background: C.line }} />}
-          <span className="relative grid size-10 place-items-center rounded-full border-2 bg-white text-[15px] font-bold tabular-nums" style={{ borderColor: C.brand, color: C.brand }}>
-            {k + 1}
+        <li key={s} className="relative">
+          <span aria-hidden className="block h-[3px] rounded-full" style={{ background: k === STEPS.length - 1 ? C.brand : C.line }} />
+          <span className="mt-3 block text-[13px] tabular-nums" style={{ color: C.muted }}>
+            {k + 1}단계
           </span>
-          <span className="mt-2 text-[14px] font-bold md:text-[16px]">{s}</span>
+          <span className="block text-[15px] font-bold md:text-[17px]">{s}</span>
         </li>
       ))}
     </ol>
   );
 }
 
+type HomeTab = "popular" | "new" | Category;
+
 function Home({ go }: { go: (r: Route) => void }) {
   const D = useDates();
-  const [tab, setTab] = useState<"popular" | "new">("popular");
-  const list = (tab === "popular" ? POPULAR : NEWEST).map((id) => COURSES.find((c) => c.id === id)!);
-  const shortcuts: [string, React.ReactNode, () => void][] = [
-    ["전체 과정", <LayoutGrid key="i" size={26} strokeWidth={1.6} aria-hidden />, () => go({ name: "courses", cat: "전체" })],
-    ["법정의무교육", <Scale key="i" size={26} strokeWidth={1.6} aria-hidden />, () => go({ name: "courses", cat: "법정의무교육" })],
-    ["직무", <Briefcase key="i" size={26} strokeWidth={1.6} aria-hidden />, () => go({ name: "courses", cat: "직무" })],
-    ["산업안전", <HardHat key="i" size={26} strokeWidth={1.6} aria-hidden />, () => go({ name: "courses", cat: "산업안전" })],
-    ["리더십", <Users key="i" size={26} strokeWidth={1.6} aria-hidden />, () => go({ name: "courses", cat: "리더십" })],
-    ["수강신청 안내", <ClipboardList key="i" size={26} strokeWidth={1.6} aria-hidden />, () => go({ name: "apply" })],
-  ];
+  const [tab, setTab] = useState<HomeTab>("popular");
+  const list = tab === "popular" ? POPULAR.map((id) => COURSES.find((c) => c.id === id)!) : tab === "new" ? NEWEST.map((id) => COURSES.find((c) => c.id === id)!) : COURSES.filter((c) => c.cat === tab);
 
   return (
     <>
-      <section aria-labelledby="banner-title" className="relative overflow-hidden" style={{ background: C.dark }}>
-        <Image src="/images/demo-lms/hero.jpg" alt="회의 탁자에서 노트북으로 공부하는 직원들" fill priority sizes="100vw" className="object-cover" />
-        <div className="absolute inset-0 bg-black/55" />
-        <div className="relative mx-auto flex min-h-[320px] max-w-[1200px] flex-col justify-center px-4 py-12 text-white md:min-h-[400px] md:px-6">
-          <h1 id="banner-title" className="text-[28px] font-bold leading-[1.3] md:text-[42px]">
+      <section aria-labelledby="banner-title" className={`${wrap} grid items-center gap-8 pt-8 md:grid-cols-[minmax(0,1fr)_minmax(0,1.1fr)] md:gap-12 md:pt-14`}>
+        <div>
+          <h1 id="banner-title" className="text-[30px] leading-[1.3] font-bold break-keep md:text-[44px]">
             사업주 직업능력개발훈련
             <br />
             환급과정
           </h1>
-          <p className="mt-3 text-[17px] md:text-[20px]">우선지원대상기업 교육비 최대 90% 환급</p>
-          <div className="mt-7 flex flex-wrap gap-2">
-            <button type="button" onClick={() => go({ name: "courses", cat: "전체" })} className="h-12 rounded-[4px] bg-white px-6 text-[16px] font-bold" style={{ color: C.brand }}>
+          <p className="mt-4 text-[17px] md:text-[19px]" style={{ color: C.muted }}>
+            우선지원대상기업 교육비 최대 90% 환급
+          </p>
+          <div className="mt-8 flex flex-wrap gap-2">
+            <button type="button" onClick={() => go({ name: "courses", cat: "전체" })} className="h-12 rounded-md px-6 text-[16px] font-bold text-white" style={{ background: C.brand }}>
               과정 보기
             </button>
-            <button type="button" onClick={() => go({ name: "apply" })} className="h-12 rounded-[4px] border border-white/70 px-6 text-[16px] font-bold">
+            <button type="button" onClick={() => go({ name: "apply" })} className="h-12 rounded-md px-6 text-[16px] font-bold" style={{ background: C.soft }}>
               수강신청 안내
             </button>
           </div>
         </div>
+        <div className="relative aspect-[16/10] overflow-hidden rounded-[12px]" style={{ background: C.soft }}>
+          <Image src="/images/demo-lms/hero.jpg" alt="회의 탁자에서 노트북으로 공부하는 직원들" fill priority sizes="(min-width: 768px) 620px, 100vw" className="object-cover" />
+        </div>
       </section>
 
-      <div className="mx-auto max-w-[1200px] px-4 md:px-6">
-        <nav aria-label="과정 분야" className="relative z-10 -mt-8 rounded-md border bg-white" style={{ borderColor: C.line }}>
-          <ul className="grid grid-cols-3 md:grid-cols-6">
-            {shortcuts.map(([label, icon, onClick], k) => (
-              <li key={label} className={`border-b md:border-b-0 ${k % 3 !== 2 ? "border-r" : ""} md:border-r md:last:border-r-0 ${k >= 3 ? "border-b-0" : ""}`} style={{ borderColor: C.line }}>
-                <button type="button" onClick={onClick} className="flex w-full flex-col items-center gap-2 px-2 py-4 text-[14px] font-bold md:py-5 md:text-[15px]" style={{ color: C.text }}>
-                  <span style={{ color: C.brand }}>{icon}</span>
-                  {label}
-                </button>
-              </li>
-            ))}
-          </ul>
-        </nav>
-
-        <section id="lms-courses" aria-labelledby="courses-home-title" className="mt-12">
-          <div className="flex flex-wrap items-end gap-x-6 gap-y-2 border-b" style={{ borderColor: C.line }}>
-            <h2 id="courses-home-title" className="sr-only">
-              과정 목록
-            </h2>
-            <div role="tablist" aria-label="과정 구분" className="flex gap-6">
-              {(
-                [
-                  ["popular", "인기 과정"],
-                  ["new", "신규 과정"],
-                ] as const
-              ).map(([id, label]) => (
-                <button key={id} role="tab" type="button" aria-selected={tab === id} onClick={() => setTab(id)} className="relative pb-3 text-[20px] font-bold md:text-[22px]" style={{ color: tab === id ? C.text : C.muted }}>
-                  {label}
-                  {tab === id && <span aria-hidden className="absolute inset-x-0 -bottom-px h-[3px]" style={{ background: C.text }} />}
-                </button>
-              ))}
-            </div>
-            <button type="button" onClick={() => go({ name: "courses", cat: "전체" })} className="mb-3 ml-auto inline-flex items-center text-[14px]" style={{ color: C.muted }}>
-              전체 과정
-              <ChevronRight size={15} aria-hidden />
-            </button>
-          </div>
-          <ul className="mt-6 grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4">
-            {list.map((c) => (
-              <CourseCard key={c.id} c={c} onOpen={() => go({ name: "course", id: c.id })} />
-            ))}
-          </ul>
-        </section>
-
-        <div className="mt-12 grid grid-cols-1 gap-6 md:grid-cols-2 lg:grid-cols-[1fr_1fr_300px]">
-          <section aria-labelledby="home-notice">
-            <div className="flex items-center border-b-2 pb-2" style={{ borderColor: C.text }}>
-              <h2 id="home-notice" className="mr-auto text-[18px] font-bold">
-                공지사항
-              </h2>
-              <button type="button" aria-label="공지사항 더보기" onClick={() => go({ name: "support", tab: "notice" })} className="grid size-8 place-items-center" style={{ color: C.muted }}>
-                <Plus size={18} aria-hidden />
-              </button>
-            </div>
-            <ul>
-              {D.siteNotices.slice(0, 4).map((n) => (
-                <li key={n.title} className="border-b" style={{ borderColor: C.line }}>
-                  <button type="button" onClick={() => go({ name: "support", tab: "notice" })} className="flex w-full gap-3 py-2.5 text-left text-[15px]">
-                    <span className="min-w-0 flex-1 truncate">{n.title}</span>
-                    <span className="shrink-0 text-[14px] tabular-nums" style={{ color: C.muted }}>
-                      {n.date}
-                    </span>
-                  </button>
-                </li>
-              ))}
-            </ul>
-          </section>
-          <section aria-labelledby="home-faq">
-            <div className="flex items-center border-b-2 pb-2" style={{ borderColor: C.text }}>
-              <h2 id="home-faq" className="mr-auto text-[18px] font-bold">
-                자주 묻는 질문
-              </h2>
-              <button type="button" aria-label="자주 묻는 질문 더보기" onClick={() => go({ name: "support", tab: "faq" })} className="grid size-8 place-items-center" style={{ color: C.muted }}>
-                <Plus size={18} aria-hidden />
-              </button>
-            </div>
-            <ul>
-              {FAQ.slice(0, 4).map((f) => (
-                <li key={f.q} className="border-b" style={{ borderColor: C.line }}>
-                  <button type="button" onClick={() => go({ name: "support", tab: "faq" })} className="flex w-full gap-2 py-2.5 text-left text-[15px]">
-                    <b style={{ color: C.brand }}>Q</b>
-                    <span className="min-w-0 flex-1 truncate">{f.q}</span>
-                  </button>
-                </li>
-              ))}
-            </ul>
-          </section>
-          <section aria-labelledby="home-cs" className="rounded-md border bg-white p-5 md:col-span-2 lg:col-span-1" style={{ borderColor: C.line }}>
-            <h2 id="home-cs" className="text-[18px] font-bold">
-              학습지원센터
-            </h2>
-            <p className="mt-2 text-[26px] font-bold tabular-nums" style={{ color: C.brand }}>
-              02-000-0000
-            </p>
-            <p className="mt-1 text-[14px] leading-[1.7]" style={{ color: C.muted }}>
-              평일 09:00~18:00 (점심시간 12:00~13:00)
-              <br />
-              주말 및 공휴일 휴무
-            </p>
-            <button type="button" onClick={() => go({ name: "support", tab: "ask" })} className={`${btnBase} mt-4 h-10 w-full`} style={btnLine}>
-              1:1 문의
-            </button>
-          </section>
-        </div>
-
-        <section aria-labelledby="home-steps" className="mt-12 rounded-md border bg-white px-4 py-8 md:px-10" style={{ borderColor: C.line }}>
-          <h2 id="home-steps" className="mb-6 text-center text-[20px] font-bold">
-            수강 절차
+      <section id="lms-courses" aria-labelledby="courses-home-title" className={`${wrap} mt-20`}>
+        <div className="flex items-end gap-4">
+          <h2 id="courses-home-title" className="mr-auto text-[24px] font-bold">
+            교육과정
           </h2>
+          <button type="button" onClick={() => go({ name: "courses", cat: "전체" })} className="inline-flex items-center pb-1 text-[14px]" style={{ color: C.muted }}>
+            전체 과정
+            <ChevronRight size={15} aria-hidden />
+          </button>
+        </div>
+        <div className="mt-5">
+          <UnderlineTabs<HomeTab>
+            label="과정 구분"
+            items={[
+              ["popular", "인기 과정"],
+              ["new", "신규 과정"],
+              ...CATS.map((k) => [k, k] as [HomeTab, string]),
+            ]}
+            current={tab}
+            onSelect={setTab}
+          />
+        </div>
+        <ul className="mt-7 grid grid-cols-1 gap-x-5 gap-y-9 sm:grid-cols-2 lg:grid-cols-4">
+          {list.map((c) => (
+            <CourseCard key={c.id} c={c} onOpen={() => go({ name: "course", id: c.id })} />
+          ))}
+        </ul>
+      </section>
+
+      <section aria-labelledby="refund-home" className={`${wrap} mt-20`}>
+        <div className="rounded-[12px] px-6 py-8 md:px-10" style={{ background: C.brandSoft }}>
+          <h2 id="refund-home" className="text-[20px] font-bold md:text-[22px]">
+            기업 규모별 환급률
+          </h2>
+          <dl className="mt-6 grid gap-6 sm:grid-cols-3">
+            {REFUND_RATES.map(([k, r]) => (
+              <div key={k}>
+                <dt className="text-[15px]" style={{ color: C.muted }}>
+                  {k}
+                </dt>
+                <dd className="mt-1 text-[34px] font-bold tabular-nums" style={{ color: C.brand }}>
+                  {r * 100}%
+                </dd>
+              </div>
+            ))}
+          </dl>
+        </div>
+      </section>
+
+      <section aria-labelledby="home-steps" className={`${wrap} mt-20`}>
+        <h2 id="home-steps" className="text-[24px] font-bold">
+          수강 절차
+        </h2>
+        <div className="mt-6">
           <Steps />
-        </section>
+        </div>
+      </section>
+
+      <div className={`${wrap} mt-20 grid grid-cols-1 gap-12 md:grid-cols-2`}>
+        {(
+          [
+            ["home-notice", "공지사항", "notice", D.siteNotices.slice(0, 4).map((n) => [n.title, n.date])],
+            ["home-faq", "자주 묻는 질문", "faq", FAQ.slice(0, 4).map((f) => [f.q, ""])],
+          ] as const
+        ).map(([id, title, tabId, rows]) => (
+          <section key={id} aria-labelledby={id}>
+            <div className="flex items-center">
+              <h2 id={id} className="mr-auto text-[20px] font-bold">
+                {title}
+              </h2>
+              <button type="button" onClick={() => go({ name: "support", tab: tabId })} className="inline-flex items-center text-[14px]" style={{ color: C.muted }}>
+                더보기
+                <ChevronRight size={15} aria-hidden />
+              </button>
+            </div>
+            <ul className="mt-3">
+              {rows.map(([head, date]) => (
+                <li key={head} className="border-b" style={{ borderColor: C.line }}>
+                  <button type="button" onClick={() => go({ name: "support", tab: tabId })} className="flex w-full gap-3 py-3.5 text-left text-[15px]">
+                    <span className="min-w-0 flex-1 truncate">{head}</span>
+                    {date && (
+                      <span className="shrink-0 text-[14px] tabular-nums" style={{ color: C.muted }}>
+                        {date}
+                      </span>
+                    )}
+                  </button>
+                </li>
+              ))}
+            </ul>
+          </section>
+        ))}
       </div>
+
+      <section aria-labelledby="home-cs" className={`${wrap} mt-12`}>
+        <div className="flex flex-wrap items-center gap-x-6 gap-y-3 rounded-[12px] px-6 py-5" style={{ background: C.soft }}>
+          <h2 id="home-cs" className="text-[16px] font-bold">
+            학습지원센터
+          </h2>
+          <p className="text-[20px] font-bold tabular-nums">02-000-0000</p>
+          <p className="text-[14px]" style={{ color: C.muted }}>
+            평일 09:00~18:00 (점심시간 12:00~13:00), 주말 및 공휴일 휴무
+          </p>
+          <button type="button" onClick={() => go({ name: "support", tab: "ask" })} className="h-10 rounded-md bg-white px-4 text-[14px] font-bold sm:ml-auto">
+            1:1 문의
+          </button>
+        </div>
+      </section>
     </>
   );
 }
@@ -847,27 +850,15 @@ function Home({ go }: { go: (r: Route) => void }) {
 function SiteCoursesPage({ cat, go }: { cat: Category | "전체"; go: (r: Route) => void }) {
   const list = COURSES.filter((c) => cat === "전체" || c.cat === cat);
   return (
-    <div className="mx-auto max-w-[1200px] px-4 pt-8 md:px-6">
-      <h1 className="text-[26px] font-bold">교육과정</h1>
-      <div role="tablist" aria-label="과정 분야" className="mt-5 flex flex-wrap gap-1.5">
-        {(["전체", ...CATS] as const).map((k) => (
-          <button
-            key={k}
-            role="tab"
-            type="button"
-            aria-selected={cat === k}
-            onClick={() => go({ name: "courses", cat: k })}
-            className="rounded-[4px] border px-3.5 py-2 text-[15px] font-bold"
-            style={cat === k ? { background: C.text, borderColor: C.text, color: "#fff" } : { borderColor: C.line, color: C.muted, background: "#fff" }}
-          >
-            {k}
-          </button>
-        ))}
+    <div className={`${wrap} pt-10`}>
+      <h1 className="text-[28px] font-bold">교육과정</h1>
+      <div className="mt-6">
+        <UnderlineTabs<Category | "전체"> label="과정 분야" items={(["전체", ...CATS] as const).map((k) => [k, k] as [Category | "전체", string])} current={cat} onSelect={(k) => go({ name: "courses", cat: k })} />
       </div>
-      <p className="mt-5 text-[15px] tabular-nums" style={{ color: C.muted }}>
+      <p className="mt-6 text-[15px] tabular-nums" style={{ color: C.muted }}>
         총 <b style={{ color: C.text }}>{list.length}</b>개 과정
       </p>
-      <ul className="mt-3 grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4">
+      <ul className="mt-4 grid grid-cols-1 gap-x-5 gap-y-9 sm:grid-cols-2 lg:grid-cols-4">
         {list.map((c) => (
           <CourseCard key={c.id} c={c} onOpen={() => go({ name: "course", id: c.id })} />
         ))}
@@ -881,13 +872,15 @@ function CourseDetail({ id, state, setState, go, notify }: { id: string; state: 
   const c = COURSES.find((x) => x.id === id) ?? COURSES[0];
   const [term, setTerm] = useState(0);
   const [confirm, setConfirm] = useState(false);
+  const [allLessons, setAllLessons] = useState(false);
   const applied = state.applied.find((a) => a.id === c.id);
   const status = !state.loggedIn ? null : c.id === "excel" ? "수강중인 과정입니다." : c.id === "biz-doc" ? "신청완료 (학습대기)" : applied ? "신청완료 (승인대기)" : null;
   const terms = D.terms(c.terms);
   const t = terms[Math.min(term, terms.length - 1)];
+  const shown = allLessons ? c.lessons : c.lessons.slice(0, 5);
 
   return (
-    <div className="mx-auto max-w-[1200px] px-4 pt-6 md:px-6">
+    <div className={`${wrap} pt-6`}>
       <nav aria-label="현재 위치" className="flex items-center gap-1 text-[14px]" style={{ color: C.muted }}>
         <button type="button" onClick={() => go({ name: "courses", cat: "전체" })} className="hover:underline">
           교육과정
@@ -898,152 +891,182 @@ function CourseDetail({ id, state, setState, go, notify }: { id: string; state: 
         </button>
       </nav>
 
-      <div className="mt-4 grid grid-cols-1 gap-6 md:grid-cols-[minmax(0,420px)_minmax(0,1fr)]">
-        <div className="relative aspect-[16/10] overflow-hidden rounded-md" style={{ background: C.head }}>
-          <Image src={c.img} alt={c.imgAlt} fill priority sizes="(min-width: 768px) 420px, 100vw" className="object-cover" />
-        </div>
+      <div className="mt-5 grid grid-cols-1 gap-x-12 gap-y-8 lg:grid-cols-[minmax(0,1fr)_360px]">
         <div className="min-w-0">
           <p className="text-[14px]" style={{ color: C.muted }}>
-            {c.cat} <span aria-hidden className="mx-1 opacity-50">|</span> {c.refund ? "환급과정" : "비환급과정"}
+            {c.cat} <Sep /> {c.refund ? "환급과정" : "비환급과정"}
           </p>
-          <h1 className="mt-1 text-[26px] font-bold leading-[1.3]">{c.title}</h1>
-          <dl className="mt-4 grid border-t text-[15px]" style={{ borderColor: C.text }}>
-            {[
-              ["교육시간", `${c.lessons.length}차시 (${c.hours})`],
-              ["학습기간", c.period],
-              ["교육비", won(c.fee)],
-              ["수료기준", "진도율 80% 이상, 총점 60점 이상"],
-            ].map(([k, v]) => (
-              <div key={k} className="grid grid-cols-[96px_minmax(0,1fr)] border-b" style={{ borderColor: C.line }}>
-                <dt className="px-3 py-2.5 font-bold" style={{ background: C.head }}>
-                  {k}
-                </dt>
-                <dd className="px-3 py-2.5 tabular-nums">{v}</dd>
-              </div>
-            ))}
-            <div className="grid grid-cols-[96px_minmax(0,1fr)] border-b" style={{ borderColor: C.line }}>
-              <dt className="px-3 py-2.5 font-bold" style={{ background: C.head }}>
-                <label htmlFor="term-select">기수</label>
-              </dt>
-              <dd className="px-3 py-1.5">
-                <select id="term-select" value={term} onChange={(e) => setTerm(Number(e.target.value))} disabled={!!status} className="h-9 w-full max-w-[360px] rounded-[4px] border bg-white px-2 text-[14px] tabular-nums" style={{ borderColor: C.line }}>
-                  {terms.map((x, k) => (
-                    <option key={x.term} value={k}>
-                      {x.term} ({x.period})
-                    </option>
-                  ))}
-                </select>
-              </dd>
-            </div>
-          </dl>
+          <h1 className="mt-1.5 text-[28px] leading-[1.3] font-bold break-keep md:text-[32px]">{c.title}</h1>
+          <p className="mt-3 text-[15px] tabular-nums" style={{ color: C.muted }}>
+            {c.lessons.length}차시 <Sep /> {c.hours} <Sep /> 학습기간 {c.period}
+          </p>
+          <div className="relative mt-6 aspect-video overflow-hidden rounded-[12px]" style={{ background: C.soft }}>
+            <Image src={c.img} alt={c.imgAlt} fill priority sizes="(min-width: 1024px) 760px, 100vw" className="object-cover" />
+          </div>
+        </div>
 
-          {status ? (
-            <div className="mt-5 flex flex-wrap items-center gap-3">
-              <p className="text-[16px] font-bold" style={{ color: C.brand }}>
-                {status}
+        <aside aria-label="수강신청" className="lg:sticky lg:top-6 lg:col-start-2 lg:row-span-2 lg:row-start-1 lg:self-start">
+          <div className="rounded-[12px] border p-6" style={{ borderColor: C.line }}>
+            <p className="text-[14px]" style={{ color: C.muted }}>
+              교육비
+            </p>
+            <p className="mt-0.5 text-[28px] font-bold tabular-nums">{won(c.fee)}</p>
+            {c.refund ? (
+              <p className="mt-1 text-[15px] tabular-nums">
+                <b style={{ color: C.brand }}>환급 {won(Math.round(c.fee * 0.9))}</b>
+                <span style={{ color: C.muted }}> (우선지원대상기업)</span>
+                <br />
+                <span style={{ color: C.muted }}>자부담 {won(c.fee - Math.round(c.fee * 0.9))}</span>
               </p>
-              {c.id === "excel" && (
-                <button type="button" onClick={() => go({ name: "my" })} className={`${btnBase} h-11 px-5`} style={btnPrimary}>
-                  강의실 입장
-                </button>
-              )}
-            </div>
-          ) : confirm ? (
-            <div className="mt-5 rounded-md border p-4" style={{ borderColor: C.brand }}>
-              <p className="text-[16px] font-bold">신청확인</p>
-              <dl className="mt-2 grid gap-1 text-[15px]">
-                {[
-                  ["과정명", c.title],
-                  ["기수", t.term],
-                  ["학습기간", t.period],
-                  ["교육비", won(c.fee)],
-                ].map(([k, v]) => (
-                  <div key={k} className="flex gap-3">
-                    <dt className="w-16 shrink-0" style={{ color: C.muted }}>
-                      {k}
-                    </dt>
-                    <dd className="tabular-nums">{v}</dd>
-                  </div>
-                ))}
-              </dl>
-              <div className="mt-4 flex gap-2">
-                <button
-                  type="button"
-                  onClick={() => {
-                    setState((s) => ({ ...s, applied: [...s.applied, { id: c.id, term: t.term, period: t.period }] }));
-                    setConfirm(false);
-                    notify("수강신청이 완료되었습니다. 수강승인 후 학습할 수 있습니다.");
-                  }}
-                  className={`${btnBase} h-11 px-5`}
-                  style={btnPrimary}
-                >
-                  신청하기
-                </button>
-                <button type="button" onClick={() => setConfirm(false)} className={`${btnBase} h-11 px-5`} style={btnLine}>
-                  취소
-                </button>
+            ) : (
+              <p className="mt-1 text-[15px]" style={{ color: C.muted }}>
+                비환급과정
+              </p>
+            )}
+            <dl className="mt-5 grid gap-2.5 border-t pt-5 text-[15px]" style={{ borderColor: C.line }}>
+              <div className="grid gap-1.5">
+                <dt>
+                  <label htmlFor="term-select" style={{ color: C.muted }}>
+                    기수
+                  </label>
+                </dt>
+                <dd>
+                  <select id="term-select" value={term} onChange={(e) => setTerm(Number(e.target.value))} disabled={!!status} className="h-11 w-full rounded-md border bg-white px-3 text-[15px]" style={{ borderColor: C.line }}>
+                    {terms.map((x, k) => (
+                      <option key={x.term} value={k}>
+                        {x.term}
+                      </option>
+                    ))}
+                  </select>
+                </dd>
               </div>
-            </div>
-          ) : (
-            <div className="mt-5 flex flex-wrap items-center gap-3">
-              <button type="button" onClick={() => (state.loggedIn ? setConfirm(true) : go({ name: "login", next: { name: "course", id: c.id } }))} className={`${btnBase} h-12 px-8 text-[16px]`} style={btnPrimary}>
+              {[
+                ["학습기간", t.period],
+                ["신청마감", t.close],
+                ["수료증", "수료 시 발급"],
+              ].map(([k, v]) => (
+                <div key={k} className="flex justify-between gap-3">
+                  <dt style={{ color: C.muted }}>{k}</dt>
+                  <dd className="text-right tabular-nums">{v}</dd>
+                </div>
+              ))}
+            </dl>
+
+            {status ? (
+              <div className="mt-6">
+                <p className="text-[15px] font-bold" style={{ color: C.brand }}>
+                  {status}
+                </p>
+                {c.id === "excel" && (
+                  <button type="button" onClick={() => go({ name: "my" })} className="mt-3 h-12 w-full rounded-md text-[16px] font-bold text-white" style={{ background: C.brand }}>
+                    강의실 입장
+                  </button>
+                )}
+              </div>
+            ) : confirm ? (
+              <div className="mt-6 rounded-lg p-4" style={{ background: C.soft }}>
+                <p className="text-[15px] font-bold">신청확인</p>
+                <p className="mt-1 text-[14px] leading-[1.6] tabular-nums" style={{ color: C.muted }}>
+                  {c.title}
+                  <br />
+                  {t.term} ({t.period})
+                </p>
+                <div className="mt-4 grid grid-cols-2 gap-2">
+                  <button type="button" onClick={() => setConfirm(false)} className="h-11 rounded-md bg-white text-[15px] font-bold">
+                    취소
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => {
+                      setState((s) => ({ ...s, applied: [...s.applied, { id: c.id, term: t.term, period: t.period }] }));
+                      setConfirm(false);
+                      notify("수강신청이 완료되었습니다. 수강승인 후 학습할 수 있습니다.");
+                    }}
+                    className="h-11 rounded-md text-[15px] font-bold text-white"
+                    style={{ background: C.brand }}
+                  >
+                    신청하기
+                  </button>
+                </div>
+              </div>
+            ) : (
+              <button type="button" onClick={() => (state.loggedIn ? setConfirm(true) : go({ name: "login", next: { name: "course", id: c.id } }))} className="mt-6 h-12 w-full rounded-md text-[16px] font-bold text-white" style={{ background: C.brand }}>
                 수강신청
               </button>
+            )}
+          </div>
+        </aside>
+
+        <div className="min-w-0 lg:col-start-1">
+          <section aria-labelledby="lessons-title">
+            <div className="flex items-baseline gap-3">
+              <h2 id="lessons-title" className="text-[20px] font-bold">
+                커리큘럼
+              </h2>
               <span className="text-[14px] tabular-nums" style={{ color: C.muted }}>
-                신청마감 {t.close}
+                {c.lessons.length}차시 <Sep /> {c.hours}
               </span>
             </div>
+            <ol className="mt-4 overflow-hidden rounded-[12px] border" style={{ borderColor: C.line }}>
+              {shown.map((l, k) => (
+                <li key={l} className="flex items-center gap-4 border-b px-5 py-3.5 text-[15px] last:border-b-0" style={{ borderColor: C.line }}>
+                  <Play size={14} aria-hidden style={{ color: C.muted }} />
+                  <span className="min-w-0 flex-1">
+                    {k + 1}. {l}
+                  </span>
+                  {c.id === "excel" && (
+                    <span className="shrink-0 text-[14px] tabular-nums" style={{ color: C.muted }}>
+                      {clock(LESSONS[k].duration)}
+                    </span>
+                  )}
+                </li>
+              ))}
+            </ol>
+            {c.lessons.length > 5 && (
+              <button type="button" aria-expanded={allLessons} onClick={() => setAllLessons(!allLessons)} className="mt-3 h-11 w-full rounded-md text-[15px] font-bold" style={{ background: C.soft }}>
+                {allLessons ? "접기" : `전체 ${c.lessons.length}차시 보기`}
+              </button>
+            )}
+          </section>
+
+          <section aria-labelledby="pass-title" className="mt-12">
+            <h2 id="pass-title" className="text-[20px] font-bold">
+              수료기준
+            </h2>
+            <ul className="mt-4 grid gap-2 text-[15px]">
+              {["진도율 80% 이상", "총점 60점 이상 (진행단계평가 30%, 최종평가 70%)", "과정 설문 참여 후 수료증 출력"].map((x) => (
+                <li key={x} className="flex items-center gap-2">
+                  <Check size={16} aria-hidden style={{ color: C.brand }} />
+                  {x}
+                </li>
+              ))}
+            </ul>
+          </section>
+
+          {c.refund && (
+            <section aria-labelledby="refund-title" className="mt-12">
+              <h2 id="refund-title" className="text-[20px] font-bold">
+                환급 안내
+              </h2>
+              <ul className="mt-4 grid gap-3 sm:grid-cols-3">
+                {REFUND_RATES.map(([k, r]) => (
+                  <li key={k} className="rounded-[12px] border p-5 tabular-nums" style={{ borderColor: C.line }}>
+                    <p className="text-[14px]" style={{ color: C.muted }}>
+                      {k} ({r * 100}%)
+                    </p>
+                    <p className="mt-1 text-[20px] font-bold" style={{ color: C.brand }}>
+                      {won(Math.round(c.fee * r))}
+                    </p>
+                    <p className="text-[14px]" style={{ color: C.muted }}>
+                      자부담 {won(c.fee - Math.round(c.fee * r))}
+                    </p>
+                  </li>
+                ))}
+              </ul>
+            </section>
           )}
         </div>
       </div>
-
-      {c.refund && (
-        <section aria-labelledby="refund-title" className="mt-10">
-          <h2 id="refund-title" className="text-[19px] font-bold">
-            환급 안내
-          </h2>
-          <div className="relative mt-3 overflow-x-auto">
-            <table className="w-full min-w-[480px] border-t text-center text-[15px] tabular-nums" style={{ borderColor: C.text }}>
-              <thead style={{ background: C.head }}>
-                <tr>
-                  <th scope="col" className="px-3 py-2.5 font-bold">기업 규모</th>
-                  <th scope="col" className="px-3 py-2.5 font-bold">환급률</th>
-                  <th scope="col" className="px-3 py-2.5 font-bold">환급액</th>
-                  <th scope="col" className="px-3 py-2.5 font-bold">자부담</th>
-                </tr>
-              </thead>
-              <tbody>
-                {REFUND_RATES.map(([k, r]) => (
-                  <tr key={k} className="border-b" style={{ borderColor: C.line }}>
-                    <th scope="row" className="px-3 py-2.5 font-normal">{k}</th>
-                    <td className="px-3 py-2.5">{r * 100}%</td>
-                    <td className="px-3 py-2.5 font-bold" style={{ color: C.brand }}>
-                      {won(Math.round(c.fee * r))}
-                    </td>
-                    <td className="px-3 py-2.5">{won(c.fee - Math.round(c.fee * r))}</td>
-                  </tr>
-                ))}
-              </tbody>
-            </table>
-          </div>
-        </section>
-      )}
-
-      <section aria-labelledby="lessons-title" className="mt-10">
-        <h2 id="lessons-title" className="text-[19px] font-bold">
-          차시 구성
-        </h2>
-        <ol className="mt-3 border-t text-[15px]" style={{ borderColor: C.text }}>
-          {c.lessons.map((l, k) => (
-            <li key={l} className="flex gap-4 border-b px-3 py-2.5" style={{ borderColor: C.line }}>
-              <span className="w-12 shrink-0 tabular-nums" style={{ color: C.muted }}>
-                {k + 1}차시
-              </span>
-              <span>{l}</span>
-            </li>
-          ))}
-        </ol>
-      </section>
     </div>
   );
 }
@@ -1051,46 +1074,39 @@ function CourseDetail({ id, state, setState, go, notify }: { id: string; state: 
 function ApplyPage({ go }: { go: (r: Route) => void }) {
   const D = useDates();
   return (
-    <div className="mx-auto max-w-[1200px] px-4 pt-8 md:px-6">
-      <h1 className="text-[26px] font-bold">수강신청</h1>
-      <section aria-labelledby="apply-steps" className="mt-6 rounded-md border bg-white px-4 py-7 md:px-10" style={{ borderColor: C.line }}>
+    <div className={`${wrap} pt-10`}>
+      <h1 className="text-[28px] font-bold">수강신청</h1>
+      <section aria-labelledby="apply-steps" className="mt-8">
         <h2 id="apply-steps" className="sr-only">
           수강 절차
         </h2>
         <Steps />
       </section>
-      <section aria-labelledby="schedule-title" className="mt-8">
-        <h2 id="schedule-title" className="text-[19px] font-bold">
+      <section aria-labelledby="schedule-title" className="mt-14">
+        <h2 id="schedule-title" className="text-[20px] font-bold">
           개강 일정
         </h2>
-        <div className="relative mt-3 overflow-x-auto">
-          <table className="w-full min-w-[640px] border-t text-[15px] tabular-nums" style={{ borderColor: C.text }}>
-            <thead style={{ background: C.head }}>
-              <tr>
-                <th scope="col" className={th}>과정명</th>
-                <th scope="col" className={th}>기수</th>
-                <th scope="col" className={th}>학습기간</th>
-                <th scope="col" className={th}>신청마감</th>
-                <th scope="col" className={th}><span className="sr-only">신청</span></th>
-              </tr>
-            </thead>
-            <tbody>
-              {COURSES.map((c) => (
-                <tr key={c.id} className="border-b bg-white" style={{ borderColor: C.line }}>
-                  <td className={`${td} font-bold`}>{c.title}</td>
-                  <td className={td}>{D.terms(c.terms)[0].term}</td>
-                  <td className={td}>{D.terms(c.terms)[0].period}</td>
-                  <td className={td}>{D.terms(c.terms)[0].close}</td>
-                  <td className={td}>
-                    <button type="button" onClick={() => go({ name: "course", id: c.id })} className={btnBase} style={btnLine}>
-                      신청
-                    </button>
-                  </td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
-        </div>
+        <ul className="mt-4 border-t" style={{ borderColor: C.line }}>
+          {COURSES.map((c) => {
+            const t = D.terms(c.terms)[0];
+            return (
+              <li key={c.id} className="flex items-center gap-4 border-b py-4" style={{ borderColor: C.line }}>
+                <span className="relative hidden aspect-video w-28 shrink-0 overflow-hidden rounded-md sm:block" style={{ background: C.soft }}>
+                  <Image src={c.img} alt="" fill sizes="112px" className="object-cover" />
+                </span>
+                <span className="min-w-0 flex-1">
+                  <span className="block text-[16px] font-bold">{c.title}</span>
+                  <span className="mt-0.5 block text-[14px] tabular-nums" style={{ color: C.muted }}>
+                    {t.term} <Sep /> {t.period} <Sep /> 신청마감 {t.close}
+                  </span>
+                </span>
+                <button type="button" onClick={() => go({ name: "course", id: c.id })} className="h-10 shrink-0 rounded-md px-4 text-[14px] font-bold" style={{ background: C.soft }}>
+                  신청
+                </button>
+              </li>
+            );
+          })}
+        </ul>
       </section>
     </div>
   );
@@ -1101,51 +1117,45 @@ function SupportPage({ tab, go, loggedIn, notify }: { tab: SupportTab; go: (r: R
   const [open, setOpen] = useState<number | null>(null);
   const [title, setTitle] = useState("");
   const [body, setBody] = useState("");
-  const tabs: [SupportTab, string][] = [
-    ["notice", "공지사항"],
-    ["faq", "자주 묻는 질문"],
-    ["ask", "1:1 문의"],
-  ];
   return (
-    <div className="mx-auto max-w-[1200px] px-4 pt-8 md:px-6">
-      <h1 className="text-[26px] font-bold">학습지원센터</h1>
-      <div role="tablist" aria-label="학습지원센터 메뉴" className="mt-5 flex border-b" style={{ borderColor: C.line }}>
-        {tabs.map(([id, label]) => (
-          <button
-            key={id}
-            role="tab"
-            type="button"
-            aria-selected={tab === id}
-            onClick={() => {
-              setOpen(null);
-              go({ name: "support", tab: id });
-            }}
-            className="relative flex-1 px-2 py-3 text-[15px] font-bold sm:flex-none sm:px-6"
-            style={{ color: tab === id ? C.brand : C.muted }}
-          >
-            {label}
-            {tab === id && <span aria-hidden className="absolute inset-x-0 -bottom-px h-[3px]" style={{ background: C.brand }} />}
-          </button>
-        ))}
+    <div className={`${wrap} pt-10`}>
+      <h1 className="text-[28px] font-bold">학습지원센터</h1>
+      <div className="mt-6">
+        <UnderlineTabs<SupportTab>
+          label="학습지원센터 메뉴"
+          items={[
+            ["notice", "공지사항"],
+            ["faq", "자주 묻는 질문"],
+            ["ask", "1:1 문의"],
+          ]}
+          current={tab}
+          onSelect={(id) => {
+            setOpen(null);
+            go({ name: "support", tab: id });
+          }}
+        />
       </div>
 
       {tab !== "ask" && (
-        <ul className="bg-white">
+        <ul className="mt-2">
           {(tab === "notice" ? D.siteNotices.map((n) => ({ head: n.title, sub: n.date, body: n.body })) : FAQ.map((f) => ({ head: f.q, sub: "", body: [f.a] }))).map((n, k) => (
             <li key={n.head} className="border-b" style={{ borderColor: C.line }}>
-              <button type="button" aria-expanded={open === k} onClick={() => setOpen(open === k ? null : k)} className="flex w-full items-center gap-3 px-4 py-3.5 text-left">
-                <span className="w-6 shrink-0 text-[14px] font-bold tabular-nums" style={{ color: tab === "faq" ? C.brand : C.muted }}>
-                  {tab === "faq" ? "Q" : D.siteNotices.length - k}
-                </span>
-                <span className="min-w-0 flex-1 text-[15px] font-bold">{n.head}</span>
+              <button type="button" aria-expanded={open === k} onClick={() => setOpen(open === k ? null : k)} className="flex w-full items-center gap-3 py-4 text-left">
+                {tab === "faq" && (
+                  <span className="shrink-0 text-[15px] font-bold" style={{ color: C.brand }}>
+                    Q
+                  </span>
+                )}
+                <span className="min-w-0 flex-1 text-[16px] font-bold">{n.head}</span>
                 {n.sub && (
                   <span className="shrink-0 text-[14px] tabular-nums" style={{ color: C.muted }}>
                     {n.sub}
                   </span>
                 )}
+                <ChevronRight size={16} aria-hidden className={`shrink-0 transition-transform ${open === k ? "rotate-90" : ""}`} style={{ color: C.muted }} />
               </button>
               {open === k && (
-                <ul className="grid gap-1 border-t px-4 py-3 pl-[52px] text-[15px] leading-[1.6]" style={{ borderColor: C.line, background: C.bg }}>
+                <ul className="mb-4 grid gap-1 rounded-lg px-5 py-4 text-[15px] leading-[1.7]" style={{ background: C.soft }}>
                   {n.body.map((b) => (
                     <li key={b}>{b}</li>
                   ))}
@@ -1159,7 +1169,7 @@ function SupportPage({ tab, go, loggedIn, notify }: { tab: SupportTab; go: (r: R
       {tab === "ask" &&
         (loggedIn ? (
           <form
-            className="mt-5 grid max-w-[720px] gap-3"
+            className="mt-8 grid max-w-[720px] gap-4"
             onSubmit={(e) => {
               e.preventDefault();
               setTitle("");
@@ -1167,24 +1177,24 @@ function SupportPage({ tab, go, loggedIn, notify }: { tab: SupportTab; go: (r: R
               notify("문의가 등록되었습니다.");
             }}
           >
-            <label className="grid gap-1 text-[15px] font-bold">
+            <label className="grid gap-1.5 text-[15px] font-bold">
               제목
-              <input value={title} onChange={(e) => setTitle(e.target.value)} required maxLength={60} className="h-11 rounded-[4px] border bg-white px-3 font-normal" style={{ borderColor: C.line }} />
+              <input value={title} onChange={(e) => setTitle(e.target.value)} required maxLength={60} className="h-12 rounded-md border bg-white px-3 font-normal" style={{ borderColor: C.line }} />
             </label>
-            <label className="grid gap-1 text-[15px] font-bold">
+            <label className="grid gap-1.5 text-[15px] font-bold">
               내용
-              <textarea value={body} onChange={(e) => setBody(e.target.value)} required rows={6} className="rounded-[4px] border bg-white px-3 py-2 font-normal" style={{ borderColor: C.line }} />
+              <textarea value={body} onChange={(e) => setBody(e.target.value)} required rows={6} className="rounded-md border bg-white px-3 py-2.5 font-normal" style={{ borderColor: C.line }} />
             </label>
             <div>
-              <button type="submit" disabled={!title.trim() || !body.trim()} className={`${btnBase} h-11 px-6`} style={btnPrimary}>
+              <button type="submit" disabled={!title.trim() || !body.trim()} className="h-12 rounded-md px-8 text-[15px] font-bold text-white disabled:opacity-40" style={{ background: C.brand }}>
                 등록
               </button>
             </div>
           </form>
         ) : (
-          <div className="mt-8 text-center">
+          <div className="mt-12 text-center">
             <p className="text-[16px]">로그인 후 이용할 수 있습니다.</p>
-            <button type="button" onClick={() => go({ name: "login", next: { name: "support", tab: "ask" } })} className={`${btnBase} mt-4 h-11 px-6`} style={btnPrimary}>
+            <button type="button" onClick={() => go({ name: "login", next: { name: "support", tab: "ask" } })} className="mt-4 h-12 rounded-md px-8 text-[15px] font-bold text-white" style={{ background: C.text }}>
               로그인
             </button>
           </div>
@@ -1196,26 +1206,26 @@ function SupportPage({ tab, go, loggedIn, notify }: { tab: SupportTab; go: (r: R
 function LoginPage({ onLogin }: { onLogin: () => void }) {
   const [id, setId] = useState("");
   const [pw, setPw] = useState("");
+  const input = "h-12 rounded-md border px-3 text-[15px] font-normal";
   return (
-    <div className="mx-auto max-w-[420px] px-4 pt-12">
-      <h1 className="text-center text-[26px] font-bold">로그인</h1>
+    <div className="mx-auto max-w-[400px] px-4 pt-16">
+      <h1 className="text-center text-[28px] font-bold">로그인</h1>
       <form
-        className="mt-6 grid gap-3 rounded-md border bg-white p-6"
-        style={{ borderColor: C.line }}
+        className="mt-8 grid gap-3"
         onSubmit={(e) => {
           e.preventDefault();
           onLogin();
         }}
       >
-        <label className="grid gap-1 text-[14px] font-bold">
+        <label className="grid gap-1.5 text-[14px] font-bold">
           아이디
-          <input value={id} onChange={(e) => setId(e.target.value)} required autoComplete="username" className="h-11 rounded-[4px] border px-3 text-[15px] font-normal" style={{ borderColor: C.line }} />
+          <input value={id} onChange={(e) => setId(e.target.value)} required autoComplete="username" className={input} style={{ borderColor: C.line }} />
         </label>
-        <label className="grid gap-1 text-[14px] font-bold">
+        <label className="grid gap-1.5 text-[14px] font-bold">
           비밀번호
-          <input type="password" value={pw} onChange={(e) => setPw(e.target.value)} required autoComplete="current-password" className="h-11 rounded-[4px] border px-3 text-[15px] font-normal" style={{ borderColor: C.line }} />
+          <input type="password" value={pw} onChange={(e) => setPw(e.target.value)} required autoComplete="current-password" className={input} style={{ borderColor: C.line }} />
         </label>
-        <button type="submit" className={`${btnBase} mt-2 h-12 text-[16px]`} style={btnPrimary}>
+        <button type="submit" className="mt-3 h-12 rounded-md text-[16px] font-bold text-white" style={{ background: C.text }}>
           로그인
         </button>
         <button
@@ -1225,12 +1235,12 @@ function LoginPage({ onLogin }: { onLogin: () => void }) {
             setPw("demo1234");
             onLogin();
           }}
-          className={`${btnBase} h-12 text-[16px]`}
-          style={btnLine}
+          className="h-12 rounded-md text-[16px] font-bold"
+          style={{ background: C.soft }}
         >
           데모 계정으로 로그인
         </button>
-        <p className="mt-1 flex justify-center gap-4 text-[14px]" style={{ color: C.muted }}>
+        <p className="mt-2 flex justify-center gap-4 text-[14px]" style={{ color: C.muted }}>
           <span>아이디 찾기</span>
           <span>비밀번호 찾기</span>
           <span>회원가입</span>
@@ -1258,9 +1268,12 @@ export function LmsDemo() {
     return () => window.clearTimeout(t);
   }, [toast]);
 
+  // 같은 메뉴를 다시 눌러도 첫 화면으로 돌아가도록 이동할 때마다 키를 바꾼다
+  const [navKey, setNavKey] = useState(0);
   const go = useCallback((r: Route) => {
     setView("site");
     setRoute(r);
+    setNavKey((k) => k + 1);
     window.scrollTo({ top: 0 });
   }, []);
 
@@ -1277,7 +1290,7 @@ export function LmsDemo() {
 
   return (
     <DatesCtx.Provider value={dates}>
-    <div className={`min-h-screen ${view === "admin" ? "pb-24" : ""}`} style={{ background: C.bg, color: C.text }} aria-busy={!hydrated}>
+    <div className={`min-h-screen ${view === "admin" ? "pb-24" : ""}`} style={{ background: view === "site" ? "#fff" : C.bg, color: C.text }} aria-busy={!hydrated}>
       {view === "site" ? (
         <>
           <SiteHeader
@@ -1310,8 +1323,8 @@ export function LmsDemo() {
               />
             )}
             {route.name === "my" && (
-              <div className="mx-auto max-w-[1200px] px-4 pt-6 md:px-6">
-                <LearnerView state={state} setState={setState} ratios={ratios} done={done} progress={progress} notify={notify} />
+              <div className="mx-auto max-w-[1200px] px-4 pt-10 md:px-6">
+                <LearnerView key={navKey} state={state} setState={setState} ratios={ratios} done={done} progress={progress} notify={notify} />
               </div>
             )}
           </main>
@@ -1398,193 +1411,207 @@ function LearnerView({ state, setState, ratios, done, progress, notify }: { stat
   const passed = progress >= PASS_PROGRESS && state.final !== null && total >= PASS_TOTAL;
   const myCert: CertInfo = { no: certNo(D.certPrefix, LEARNERS.length), course: COURSE.title, period: D.course.period, hours: `${Math.floor(TOTAL_MIN / 60)}시간 ${TOTAL_MIN % 60}분`, date: D.myCertDate };
   const pastCert: CertInfo = { no: D.pastCert.no, course: "직장 내 괴롭힘 예방교육", period: D.pastCert.period, hours: "1시간", date: D.pastCert.date };
+  const doneCount = done.filter(Boolean).length;
+  // 이어서 학습할 차시: 보다 만 차시, 없으면 아직 안 끝난 첫 차시
+  const partial = state.lessons.findIndex((p, k) => !done[k] && p.pos > 5);
+  const nextIdx = partial >= 0 ? partial : done.findIndex((d) => !d);
+  const excel = COURSES[0];
+  const waiting = [{ id: "biz-doc", period: D.termsMonth[0].period, status: "학습대기" }, ...state.applied.map((a) => ({ id: a.id, period: a.period, status: "승인대기" }))];
+
+  const rowCls = "flex flex-wrap items-center gap-x-4 gap-y-2 border-b py-4";
 
   return (
-    <div className="grid grid-cols-1 gap-5 lg:grid-cols-[200px_minmax(0,1fr)]">
-      <SideNav<LearnerPage>
-        title="나의 강의실"
-        label="나의 강의실 메뉴"
-        items={[
-          ["ongoing", "학습중인 과정"],
-          ["ended", "학습종료 과정"],
-          ["cert", "수료증 발급"],
-        ]}
-        current={page}
-        onSelect={(id) => {
-          setPage(id);
-          setInRoom(false);
-        }}
-      />
+    <div>
+      {!inRoom && (
+        <>
+          <h1 className="text-[28px] font-bold">나의 강의실</h1>
+          <div className="mt-6">
+            <UnderlineTabs<LearnerPage>
+              label="나의 강의실 메뉴"
+              items={[
+                ["ongoing", "학습중인 과정"],
+                ["ended", "학습종료 과정"],
+                ["cert", "수료증 발급"],
+              ]}
+              current={page}
+              onSelect={setPage}
+            />
+          </div>
+        </>
+      )}
 
-      <div className="min-w-0">
-        {page === "ongoing" && !inRoom && (
-          <Panel title="학습중인 과정" id="ongoing-title">
-            <div className="relative overflow-x-auto">
-              <table className="w-full min-w-[640px] text-[15px]">
-                <thead style={{ background: C.head }}>
-                  <tr>
-                    <th scope="col" className={th}>과정명</th>
-                    <th scope="col" className={th}>학습기간</th>
-                    <th scope="col" className={th}>진도율</th>
-                    <th scope="col" className={th}>총점</th>
-                    <th scope="col" className={th}>수료여부</th>
-                    <th scope="col" className={th}><span className="sr-only">강의실</span></th>
-                  </tr>
-                </thead>
-                <tbody>
-                  <tr className="border-t" style={{ borderColor: C.line }}>
-                    <td className={`${td} font-bold`}>{COURSE.title}</td>
-                    <td className={`${td} tabular-nums`}>{D.course.period}</td>
-                    <td className={`${td} tabular-nums`}>{pct(progress)}</td>
-                    <td className={`${td} tabular-nums`}>{state.final === null ? "-" : `${total}점`}</td>
-                    <td className={td}>{passed ? "수료" : state.final !== null ? "미수료" : "학습중"}</td>
-                    <td className={td}>
-                      <button type="button" onClick={() => setInRoom(true)} className={btnBase} style={btnPrimary}>
-                        강의실 입장
-                      </button>
-                    </td>
-                  </tr>
-                  <tr className="border-t" style={{ borderColor: C.line }}>
-                    <td className={`${td} font-bold`}>비즈니스 문서 작성</td>
-                    <td className={`${td} tabular-nums`}>{D.termsMonth[0].period}</td>
-                    <td className={`${td} tabular-nums`}>0%</td>
-                    <td className={td}>-</td>
-                    <td className={td}>학습대기</td>
-                    <td className={td}>
-                      <button type="button" disabled className={btnBase} style={btnLine}>
-                        강의실 입장
-                      </button>
-                    </td>
-                  </tr>
-                  {state.applied.map((ap) => (
-                    <tr key={ap.id} className="border-t" style={{ borderColor: C.line }}>
-                      <td className={`${td} font-bold`}>{COURSES.find((c) => c.id === ap.id)?.title}</td>
-                      <td className={`${td} tabular-nums`}>{ap.period}</td>
-                      <td className={`${td} tabular-nums`}>0%</td>
-                      <td className={td}>-</td>
-                      <td className={td}>승인대기</td>
-                      <td className={td}>
-                        <button type="button" disabled className={btnBase} style={btnLine}>
-                          강의실 입장
-                        </button>
-                      </td>
-                    </tr>
-                  ))}
-                </tbody>
-              </table>
+      {page === "ongoing" && !inRoom && (
+        <div className="mt-8">
+          <section aria-labelledby="resume-title" className="grid gap-6 rounded-[12px] border p-4 md:grid-cols-[minmax(0,340px)_minmax(0,1fr)] md:p-5" style={{ borderColor: C.line }}>
+            <div className="relative aspect-video overflow-hidden rounded-lg" style={{ background: C.soft }}>
+              <Image src={excel.img} alt={excel.imgAlt} fill sizes="(min-width: 768px) 340px, 100vw" className="object-cover" />
             </div>
-          </Panel>
-        )}
-
-        {page === "ongoing" && inRoom && (
-          <CourseRoom
-            state={state}
-            setState={setState}
-            ratios={ratios}
-            done={done}
-            progress={progress}
-            total={total}
-            passed={passed}
-            tab={tab}
-            setTab={setTab}
-            onBack={() => setInRoom(false)}
-            onPlay={setPlayer}
-            onCert={() => setCert(myCert)}
-            notify={notify}
-          />
-        )}
-
-        {page === "ended" && (
-          <Panel title="학습종료 과정" id="ended-title">
-            <div className="relative overflow-x-auto">
-              <table className="w-full min-w-[620px] text-[15px]">
-                <thead style={{ background: C.head }}>
-                  <tr>
-                    <th scope="col" className={th}>과정명</th>
-                    <th scope="col" className={th}>학습기간</th>
-                    <th scope="col" className={th}>진도율</th>
-                    <th scope="col" className={th}>총점</th>
-                    <th scope="col" className={th}>수료여부</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  {[
-                    ...D.history,
-                  ].map((r) => (
-                    <tr key={r[0]} className="border-t" style={{ borderColor: C.line }}>
-                      <td className={`${td} font-bold`}>{r[0]}</td>
-                      <td className={`${td} tabular-nums`}>{r[1]}</td>
-                      <td className={`${td} tabular-nums`}>{r[2]}</td>
-                      <td className={`${td} tabular-nums`}>{r[3]}</td>
-                      <td className={td} style={{ color: r[4] === "미수료" ? C.warn : C.text }}>
-                        {r[4]}
-                      </td>
-                    </tr>
-                  ))}
-                </tbody>
-              </table>
+            <div className="flex min-w-0 flex-col">
+              <p className="text-[14px] tabular-nums" style={{ color: C.muted }}>
+                {D.course.term} <Sep /> D-{COURSE.dday}
+              </p>
+              <h2 id="resume-title" className="mt-1 text-[22px] font-bold">
+                {COURSE.title}
+              </h2>
+              <p className="mt-1 text-[14px] tabular-nums" style={{ color: C.muted }}>
+                학습기간 {D.course.period}
+              </p>
+              <div className="mt-5">
+                <div className="flex items-baseline justify-between text-[14px] tabular-nums">
+                  <span>
+                    진도율 <b className="text-[18px]">{pct(progress)}</b>
+                  </span>
+                  <span style={{ color: C.muted }}>
+                    {doneCount}/{LESSONS.length}차시 완료
+                  </span>
+                </div>
+                <span className="mt-2 block h-2 overflow-hidden rounded-full" style={{ background: C.soft }}>
+                  <span className="block h-full rounded-full" style={{ width: `${progress}%`, background: C.brand }} />
+                </span>
+              </div>
+              {nextIdx >= 0 && (
+                <p className="mt-4 text-[15px]">
+                  <span style={{ color: C.muted }}>다음 학습</span> <b>{nextIdx + 1}차시 {LESSONS[nextIdx].title}</b>
+                  {state.lessons[nextIdx].pos > 5 && (
+                    <span className="tabular-nums" style={{ color: C.muted }}>
+                      {" "}
+                      ({clock(state.lessons[nextIdx].pos)}부터)
+                    </span>
+                  )}
+                </p>
+              )}
+              <div className="mt-5 flex flex-wrap gap-2 md:mt-auto md:pt-5">
+                {nextIdx >= 0 && (
+                  <button type="button" onClick={() => setPlayer(nextIdx)} className="inline-flex h-12 items-center gap-2 rounded-md px-6 text-[16px] font-bold text-white" style={{ background: C.brand }}>
+                    <Play size={16} aria-hidden />
+                    이어서 학습하기
+                  </button>
+                )}
+                <button type="button" onClick={() => setInRoom(true)} className="h-12 rounded-md px-6 text-[16px] font-bold" style={{ background: C.soft }}>
+                  강의실 입장
+                </button>
+              </div>
             </div>
-          </Panel>
-        )}
+          </section>
 
-        {page === "cert" && (
-          <Panel title="수료증 발급" id="cert-title">
-            <div className="relative overflow-x-auto">
-              <table className="w-full min-w-[620px] text-[15px]">
-                <thead style={{ background: C.head }}>
-                  <tr>
-                    <th scope="col" className={th}>과정명</th>
-                    <th scope="col" className={th}>학습기간</th>
-                    <th scope="col" className={th}>수료번호</th>
-                    <th scope="col" className={th}>수료증</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  <tr className="border-t" style={{ borderColor: C.line }}>
-                    <td className={`${td} font-bold`}>{COURSE.title}</td>
-                    <td className={`${td} tabular-nums`}>{D.course.period}</td>
-                    <td className={`${td} tabular-nums`}>{passed ? myCert.no : "-"}</td>
-                    <td className={td}>
-                      {!passed ? (
-                        <span style={{ color: C.muted }}>미수료</span>
-                      ) : state.survey ? (
-                        <button type="button" onClick={() => setCert(myCert)} className={btnBase} style={btnPrimary}>
-                          <Printer size={15} aria-hidden />
-                          출력
-                        </button>
-                      ) : (
-                        <button
-                          type="button"
-                          onClick={() => {
-                            setPage("ongoing");
-                            setInRoom(true);
-                            setTab("exam");
-                          }}
-                          className={btnBase}
-                          style={btnLine}
-                        >
-                          설문 참여
-                        </button>
-                      )}
-                    </td>
-                  </tr>
-                  <tr className="border-t" style={{ borderColor: C.line }}>
-                    <td className={`${td} font-bold`}>{pastCert.course}</td>
-                    <td className={`${td} tabular-nums`}>{pastCert.period}</td>
-                    <td className={`${td} tabular-nums`}>{pastCert.no}</td>
-                    <td className={td}>
-                      <button type="button" onClick={() => setCert(pastCert)} className={btnBase} style={btnPrimary}>
-                        <Printer size={15} aria-hidden />
-                        출력
-                      </button>
-                    </td>
-                  </tr>
-                </tbody>
-              </table>
-            </div>
-          </Panel>
-        )}
-      </div>
+          <section aria-labelledby="waiting-title" className="mt-12">
+            <h2 id="waiting-title" className="text-[18px] font-bold">
+              신청한 과정
+            </h2>
+            <ul className="mt-2">
+              {waiting.map((w) => {
+                const c = COURSES.find((x) => x.id === w.id)!;
+                return (
+                  <li key={w.id} className={rowCls} style={{ borderColor: C.line }}>
+                    <span className="relative aspect-video w-24 shrink-0 overflow-hidden rounded-md" style={{ background: C.soft }}>
+                      <Image src={c.img} alt="" fill sizes="96px" className="object-cover" />
+                    </span>
+                    <span className="min-w-0 flex-1">
+                      <span className="block text-[16px] font-bold">{c.title}</span>
+                      <span className="block text-[14px] tabular-nums" style={{ color: C.muted }}>
+                        학습기간 {w.period}
+                      </span>
+                    </span>
+                    <span className="text-[14px] font-bold" style={{ color: C.muted }}>
+                      {w.status}
+                    </span>
+                  </li>
+                );
+              })}
+            </ul>
+          </section>
+        </div>
+      )}
+
+      {page === "ongoing" && inRoom && (
+        <CourseRoom
+          state={state}
+          setState={setState}
+          ratios={ratios}
+          done={done}
+          progress={progress}
+          total={total}
+          passed={passed}
+          tab={tab}
+          setTab={setTab}
+          onBack={() => setInRoom(false)}
+          onPlay={setPlayer}
+          onCert={() => setCert(myCert)}
+          notify={notify}
+        />
+      )}
+
+      {page === "ended" && (
+        <ul className="mt-4">
+          {D.history.map((r) => (
+            <li key={r[0]} className={rowCls} style={{ borderColor: C.line }}>
+              <span className="min-w-0 flex-1">
+                <span className="block text-[16px] font-bold">{r[0]}</span>
+                <span className="block text-[14px] tabular-nums" style={{ color: C.muted }}>
+                  {r[1]} <Sep /> 진도율 {r[2]} <Sep /> 총점 {r[3]}
+                </span>
+              </span>
+              <span className="text-[15px] font-bold" style={{ color: r[4] === "미수료" ? C.warn : C.brand }}>
+                {r[4]}
+              </span>
+            </li>
+          ))}
+        </ul>
+      )}
+
+      {page === "cert" && (
+        <ul className="mt-4">
+          <li className={rowCls} style={{ borderColor: C.line }}>
+            <span className="min-w-0 flex-1">
+              <span className="block text-[16px] font-bold">{COURSE.title}</span>
+              <span className="block text-[14px] tabular-nums" style={{ color: C.muted }}>
+                {D.course.period}
+                {passed && (
+                  <>
+                    {" "}
+                    <Sep /> 수료번호 {myCert.no}
+                  </>
+                )}
+              </span>
+            </span>
+            {!passed ? (
+              <span className="text-[15px]" style={{ color: C.muted }}>
+                미수료
+              </span>
+            ) : state.survey ? (
+              <button type="button" onClick={() => setCert(myCert)} className="inline-flex h-10 items-center gap-1.5 rounded-md px-4 text-[14px] font-bold text-white" style={{ background: C.brand }}>
+                <Printer size={15} aria-hidden />
+                출력
+              </button>
+            ) : (
+              <button
+                type="button"
+                onClick={() => {
+                  setPage("ongoing");
+                  setInRoom(true);
+                  setTab("exam");
+                }}
+                className="h-10 rounded-md px-4 text-[14px] font-bold"
+                style={{ background: C.soft }}
+              >
+                설문 참여
+              </button>
+            )}
+          </li>
+          <li className={rowCls} style={{ borderColor: C.line }}>
+            <span className="min-w-0 flex-1">
+              <span className="block text-[16px] font-bold">{pastCert.course}</span>
+              <span className="block text-[14px] tabular-nums" style={{ color: C.muted }}>
+                {pastCert.period} <Sep /> 수료번호 {pastCert.no}
+              </span>
+            </span>
+            <button type="button" onClick={() => setCert(pastCert)} className="inline-flex h-10 items-center gap-1.5 rounded-md px-4 text-[14px] font-bold text-white" style={{ background: C.brand }}>
+              <Printer size={15} aria-hidden />
+              출력
+            </button>
+          </li>
+        </ul>
+      )}
 
       <AnimatePresence>
         {player !== null && (
@@ -1629,189 +1656,152 @@ function CourseRoom({
 }) {
   const D = useDates();
   const reduce = useReducedMotionSafe();
+  const [openLesson, setOpenLesson] = useState<number | null>(null);
   const resumeAt = state.lessons.findIndex((p, k) => !done[k] && p.pos > 5);
-  const tabs: [RoomTab, string][] = [
-    ["study", "학습하기"],
-    ["exam", "평가"],
-    ["notice", "공지사항"],
-    ["qna", "학습 Q&A"],
+  const stats: [string, React.ReactNode, string, boolean][] = [
+    ["진도율", pct(progress), `기준 ${PASS_PROGRESS}% 이상`, progress >= PASS_PROGRESS],
+    ["진행단계평가", state.mid === null ? "미응시" : `${state.mid}점`, `반영비율 ${MID_WEIGHT * 100}%`, state.mid !== null],
+    ["최종평가", state.final === null ? "미응시" : `${state.final}점`, `반영비율 ${FINAL_WEIGHT * 100}%`, state.final !== null],
+    ["총점", `${total}점`, `기준 ${PASS_TOTAL}점 이상`, total >= PASS_TOTAL],
   ];
 
   return (
-    <div className="grid grid-cols-1 gap-4">
+    <div className="grid grid-cols-1">
       <nav aria-label="현재 위치" className="flex items-center gap-1 text-[14px]" style={{ color: C.muted }}>
         <button type="button" onClick={onBack} className="underline-offset-2 hover:underline">
-          학습중인 과정
+          나의 강의실
         </button>
         <ChevronRight size={14} aria-hidden />
         <span style={{ color: C.text }}>{COURSE.title}</span>
       </nav>
 
-      <section aria-labelledby="room-title" className="rounded-md border bg-white" style={{ borderColor: C.line }}>
-        <div className="flex flex-wrap items-baseline gap-x-3 gap-y-1 border-b px-4 py-3" style={{ borderColor: C.line }}>
-          <h2 id="room-title" className="text-[20px] font-bold">
+      <section aria-labelledby="room-title" className="mt-4">
+        <div className="flex flex-wrap items-baseline gap-x-3 gap-y-1">
+          <h2 id="room-title" className="text-[26px] font-bold">
             {COURSE.title}
           </h2>
-          <span className="text-[14px]" style={{ color: C.muted }}>
+          <span className="text-[15px]" style={{ color: C.muted }}>
             {D.course.term}
           </span>
         </div>
-        <dl className="grid gap-x-6 gap-y-1.5 px-4 py-3 text-[15px] sm:grid-cols-2">
-          {[
-            ["학습기간", `${D.course.period} (D-${COURSE.dday})`],
-            ["복습기간", D.course.review],
-            ["강사", maskName(COURSE.teacher)],
-            ["교육시간", `${LESSONS.length}차시 (${Math.floor(TOTAL_MIN / 60)}시간 ${TOTAL_MIN % 60}분)`],
-          ].map(([k, v]) => (
-            <div key={k} className="flex gap-3">
-              <dt className="w-16 shrink-0" style={{ color: C.muted }}>
+        <p className="mt-2 text-[14px] leading-[1.7] tabular-nums" style={{ color: C.muted }}>
+          학습기간 {D.course.period} (D-{COURSE.dday}) <Sep /> 복습기간 {D.course.review} <Sep /> 강사 {maskName(COURSE.teacher)}
+        </p>
+
+        <dl className="mt-6 grid grid-cols-2 gap-px overflow-hidden rounded-[12px] border md:grid-cols-5" style={{ borderColor: C.line, background: C.line }}>
+          {stats.map(([k, v, sub, ok]) => (
+            <div key={k} className="bg-white px-5 py-4">
+              <dt className="text-[14px]" style={{ color: C.muted }}>
                 {k}
               </dt>
-              <dd className="tabular-nums">{v}</dd>
+              <dd className="mt-1 text-[22px] font-bold tabular-nums" style={{ color: ok && (k === "진도율" || k === "총점") ? C.brand : C.text }}>
+                {v}
+              </dd>
+              <dd className="text-[13px]" style={{ color: C.muted }}>
+                {sub}
+              </dd>
             </div>
           ))}
+          <div className="col-span-2 bg-white px-5 py-4 md:col-span-1">
+            <dt className="text-[14px]" style={{ color: C.muted }}>
+              수료여부
+            </dt>
+            <dd className="mt-1 text-[22px] font-bold" style={{ color: passed ? C.brand : state.final !== null ? C.warn : C.text }}>
+              {passed ? "수료" : state.final !== null ? "미수료" : "학습중"}
+            </dd>
+            {passed && (
+              <dd className="mt-1">
+                <button type="button" onClick={state.survey ? onCert : () => setTab("exam")} className="h-9 rounded-md px-3 text-[14px] font-bold" style={state.survey ? { background: C.brand, color: "#fff" } : { background: C.soft }}>
+                  {state.survey ? "수료증 출력" : "설문 참여"}
+                </button>
+              </dd>
+            )}
+          </div>
         </dl>
-        <div className="relative overflow-x-auto border-t" style={{ borderColor: C.line }}>
-          <table className="w-full min-w-[600px] text-center text-[15px]">
-            <caption className="sr-only">학습현황과 수료기준</caption>
-            <thead style={{ background: C.head }}>
-              <tr>
-                <th scope="col" className="px-3 py-2 font-bold">구분</th>
-                <th scope="col" className="px-3 py-2 font-bold">진도율</th>
-                <th scope="col" className="px-3 py-2 font-bold">진행단계평가</th>
-                <th scope="col" className="px-3 py-2 font-bold">최종평가</th>
-                <th scope="col" className="px-3 py-2 font-bold">총점</th>
-                <th scope="col" className="px-3 py-2 font-bold">수료여부</th>
-              </tr>
-            </thead>
-            <tbody className="tabular-nums">
-              <tr className="border-t" style={{ borderColor: C.line }}>
-                <th scope="row" className="px-3 py-2 font-bold" style={{ color: C.muted }}>
-                  수료기준
-                </th>
-                <td className="px-3 py-2">{PASS_PROGRESS}% 이상</td>
-                <td className="px-3 py-2">반영비율 {MID_WEIGHT * 100}%</td>
-                <td className="px-3 py-2">반영비율 {FINAL_WEIGHT * 100}%</td>
-                <td className="px-3 py-2">{PASS_TOTAL}점 이상</td>
-                <td className="px-3 py-2">-</td>
-              </tr>
-              <tr className="border-t" style={{ borderColor: C.line }}>
-                <th scope="row" className="px-3 py-2 font-bold" style={{ color: C.muted }}>
-                  내 현황
-                </th>
-                <td className="px-3 py-2 font-bold" style={{ color: progress >= PASS_PROGRESS ? C.brand : C.text }}>
-                  {pct(progress)}
-                </td>
-                <td className="px-3 py-2">{state.mid === null ? "미응시" : `${state.mid}점`}</td>
-                <td className="px-3 py-2">{state.final === null ? "미응시" : `${state.final}점`}</td>
-                <td className="px-3 py-2 font-bold" style={{ color: total >= PASS_TOTAL ? C.brand : C.text }}>
-                  {total}점
-                </td>
-                <td className="px-3 py-2">
-                  {passed ? (
-                    <span className="inline-flex items-center gap-2">
-                      <b style={{ color: C.brand }}>수료</b>
-                      <button type="button" onClick={state.survey ? onCert : () => setTab("exam")} className={`${btnBase} h-8 px-2.5 text-[13px]`} style={state.survey ? btnPrimary : btnLine}>
-                        {state.survey ? "수료증 출력" : "설문 참여"}
-                      </button>
-                    </span>
-                  ) : state.final !== null ? (
-                    <b style={{ color: C.warn }}>미수료</b>
-                  ) : (
-                    "학습중"
-                  )}
-                </td>
-              </tr>
-            </tbody>
-          </table>
-        </div>
       </section>
 
-      <section className="rounded-md border bg-white" style={{ borderColor: C.line }}>
-        <div role="tablist" aria-label="강의실 메뉴" className="flex border-b" style={{ borderColor: C.line }}>
-          {tabs.map(([id, label]) => (
-            <button
-              key={id}
-              role="tab"
-              type="button"
-              id={`room-tab-${id}`}
-              aria-selected={tab === id}
-              aria-controls={`room-panel-${id}`}
-              onClick={() => setTab(id)}
-              className="relative flex-1 px-2 py-3 text-[15px] font-bold sm:flex-none sm:px-5"
-              style={{ color: tab === id ? C.brand : C.muted }}
-            >
-              {label}
-              {tab === id && (
-                <motion.span layoutId="lms-room-tab" className="absolute inset-x-0 -bottom-px h-[3px]" style={{ background: C.brand }} transition={reduce ? { duration: 0 } : { duration: 0.22, ease: EASE }} />
-              )}
-            </button>
-          ))}
-        </div>
+      <div className="mt-10">
+        <UnderlineTabs<RoomTab>
+          label="강의실 메뉴"
+          size="lg"
+          idPrefix="room-tab"
+          items={[
+            ["study", "학습하기"],
+            ["exam", "평가"],
+            ["notice", "공지사항"],
+            ["qna", "학습 Q&A"],
+          ]}
+          current={tab}
+          onSelect={setTab}
+        />
+      </div>
 
+      <div className="mt-6">
         {tab === "study" && (
           <section id="room-panel-study" role="tabpanel" aria-label="강의 보기">
-            <div className="hidden grid-cols-[64px_minmax(0,1fr)_88px_150px_96px] border-b text-[14px] font-bold md:grid" style={{ borderColor: C.line, background: C.head }}>
-              <span className="px-3 py-2.5">차시</span>
-              <span className="px-3 py-2.5">차시명</span>
-              <span className="px-3 py-2.5">학습시간</span>
-              <span className="px-3 py-2.5">진도율</span>
-              <span className="px-3 py-2.5">
-                <span className="sr-only">학습</span>
-              </span>
-            </div>
-            <ol>
+            <ol className="overflow-hidden rounded-[12px] border" style={{ borderColor: C.line }}>
               {LESSONS.map((l, k) => {
                 const locked = k > 0 && !done[k - 1];
                 const r = Math.round(ratios[k] * 100);
                 const isResume = k === resumeAt;
+                const open = openLesson === k;
                 return (
-                  <li key={l.title} className="grid grid-cols-[44px_minmax(0,1fr)_auto] items-center border-b last:border-b-0 md:grid-cols-[64px_minmax(0,1fr)_88px_150px_96px]" style={{ borderColor: C.line }}>
-                    <span className="px-3 py-3 text-[14px] font-bold tabular-nums" style={{ color: C.muted }}>
-                      {String(k + 1).padStart(2, "0")}
-                    </span>
-                    <span className="min-w-0 px-1 py-3 md:px-3">
-                      <span className="flex items-center gap-1.5 text-[15px] font-bold">
-                        <span className="truncate">{l.title}</span>
-                        <AnimatePresence initial={false}>
-                          {done[k] && (
-                            <motion.span
-                              key="ok"
-                              initial={reduce ? { opacity: 0 } : { scale: 0.4, opacity: 0 }}
-                              animate={{ scale: 1, opacity: 1 }}
-                              transition={reduce ? { duration: 0.12 } : { type: "spring", stiffness: 500, damping: 22 }}
-                              className="shrink-0"
-                              style={{ color: C.brand }}
-                            >
-                              <Check size={16} aria-label="학습완료" />
-                            </motion.span>
-                          )}
+                  <li key={l.title} className="border-b last:border-b-0" style={{ borderColor: C.line }}>
+                    <div className="flex items-center gap-3 px-4 py-4 md:gap-4 md:px-5">
+                      <span
+                        className="grid size-8 shrink-0 place-items-center rounded-full text-[13px] font-bold tabular-nums"
+                        style={done[k] ? { background: C.brand, color: "#fff" } : { background: C.soft, color: C.muted }}
+                      >
+                        <AnimatePresence mode="wait" initial={false}>
+                          <motion.span
+                            key={done[k] ? "ok" : "no"}
+                            initial={reduce ? { opacity: 0 } : { scale: 0.4, opacity: 0 }}
+                            animate={{ scale: 1, opacity: 1 }}
+                            transition={reduce ? { duration: 0.12 } : { type: "spring", stiffness: 500, damping: 22 }}
+                          >
+                            {done[k] ? <Check size={15} aria-label="학습완료" /> : k + 1}
+                          </motion.span>
                         </AnimatePresence>
                       </span>
-                      <span className="mt-1 flex items-center gap-2 text-[13px] tabular-nums md:hidden" style={{ color: C.muted }}>
-                        <span>{clock(l.duration)}</span>
-                        <span>진도율 {r}%</span>
-                      </span>
-                    </span>
-                    <span className="hidden px-3 text-[14px] tabular-nums md:block" style={{ color: C.muted }}>
-                      {clock(l.duration)}
-                    </span>
-                    <span className="hidden items-center gap-2 px-3 md:flex">
-                      <Bar value={r} />
-                      <span className="w-10 shrink-0 text-right text-[14px] tabular-nums">{r}%</span>
-                    </span>
-                    <span className="px-3 py-2">
+                      <button type="button" aria-expanded={open} onClick={() => setOpenLesson(open ? null : k)} className="min-w-0 flex-1 text-left">
+                        <span className="flex items-center gap-1.5 text-[16px] font-bold">
+                          <span className="truncate">{l.title}</span>
+                          <ChevronRight size={15} aria-hidden className={`shrink-0 transition-transform ${open ? "rotate-90" : ""}`} style={{ color: C.muted }} />
+                        </span>
+                        <span className="mt-1.5 flex items-center gap-3 text-[13px] tabular-nums" style={{ color: C.muted }}>
+                          <span>{clock(l.duration)}</span>
+                          <span className="block h-1 w-20 overflow-hidden rounded-full md:w-32" style={{ background: C.soft }}>
+                            <span className="block h-full rounded-full" style={{ width: `${r}%`, background: C.brand }} />
+                          </span>
+                          <span>{r}%</span>
+                        </span>
+                      </button>
                       {locked ? (
-                        <button type="button" disabled className={`${btnBase} w-full`} style={btnLine} aria-label={`${k + 1}차시 학습하기 (이전 차시 학습 후 가능)`}>
+                        <button type="button" disabled className="inline-flex h-10 shrink-0 items-center gap-1 rounded-md px-3 text-[14px] font-bold opacity-40" style={{ background: C.soft }} aria-label={`${k + 1}차시 학습하기 (이전 차시 학습 후 가능)`}>
                           <Lock size={14} aria-hidden />
                           학습하기
                         </button>
                       ) : (
-                        <button type="button" onClick={() => onPlay(k)} className={`${btnBase} w-full`} style={isResume ? { background: C.accent, color: "#fff" } : done[k] ? btnLine : btnPrimary}>
+                        <button
+                          type="button"
+                          onClick={() => onPlay(k)}
+                          className="h-10 shrink-0 rounded-md px-4 text-[14px] font-bold"
+                          style={isResume ? { background: C.accent, color: "#fff" } : done[k] ? { background: C.soft } : { background: C.brand, color: "#fff" }}
+                        >
                           {isResume ? "이어보기" : done[k] ? "복습하기" : "학습하기"}
                         </button>
                       )}
-                    </span>
+                    </div>
+                    {open && (
+                      <ol className="grid gap-1 px-4 pb-4 pl-[60px] text-[14px] md:pl-[68px]" style={{ color: C.muted }}>
+                        {l.pages.map((p, j) => (
+                          <li key={p} className="flex gap-3 tabular-nums">
+                            <span className="w-11 shrink-0">{clock(Math.round((l.duration / l.pages.length) * j))}</span>
+                            <span>{p}</span>
+                          </li>
+                        ))}
+                      </ol>
+                    )}
                   </li>
                 );
               })}
@@ -1819,12 +1809,14 @@ function CourseRoom({
           </section>
         )}
 
-        {tab === "exam" && <ExamTab state={state} setState={setState} progress={progress} notify={notify} />}
-
-        {tab === "notice" && <NoticeTab />}
-
-        {tab === "qna" && <QnaTab state={state} setState={setState} notify={notify} />}
-      </section>
+        {tab !== "study" && (
+          <div className="overflow-hidden rounded-[12px] border" style={{ borderColor: C.line }}>
+            {tab === "exam" && <ExamTab state={state} setState={setState} progress={progress} notify={notify} />}
+            {tab === "notice" && <NoticeTab />}
+            {tab === "qna" && <QnaTab state={state} setState={setState} notify={notify} />}
+          </div>
+        )}
+      </div>
     </div>
   );
 }
@@ -2144,9 +2136,13 @@ function Player({
   const r = Math.round(ratios[index] * 100);
   const nextOpen = index < LESSONS.length - 1 && done[index];
 
+  const dim = "rgba(255,255,255,.62)";
+  const edge = "rgba(255,255,255,.12)";
+  const darkBtn = "inline-flex h-10 flex-1 items-center justify-center gap-1 rounded-md border text-[14px] font-bold disabled:opacity-30";
+
   return (
     <motion.div
-      className="fixed inset-0 z-50 flex items-stretch justify-center bg-black/60 md:items-center md:p-6"
+      className="fixed inset-0 z-50 flex items-stretch justify-center bg-black/70 md:items-center md:p-6"
       initial={{ opacity: 0 }}
       animate={{ opacity: 1 }}
       exit={{ opacity: 0 }}
@@ -2160,20 +2156,21 @@ function Player({
         animate={{ opacity: 1, y: 0 }}
         exit={reduce ? { opacity: 0 } : { opacity: 0, y: 8 }}
         transition={{ duration: 0.22, ease: EASE }}
-        className="flex w-full max-w-[1040px] flex-col overflow-y-auto bg-white md:max-h-[92vh] md:rounded-md"
+        className="flex w-full max-w-[1120px] flex-col overflow-y-auto text-white md:max-h-[92vh] md:rounded-[12px]"
+        style={{ background: "#0f1512" }}
       >
-        <div className="flex items-center gap-3 px-4 py-2.5 text-white" style={{ background: C.dark }}>
+        <div className="flex items-center gap-3 border-b px-4 py-3 md:px-5" style={{ borderColor: edge }}>
           <p id="player-title" className="min-w-0 flex-1 truncate text-[15px] font-bold">
-            {index + 1}차시 {lesson.title}
+            <span style={{ color: dim }}>{COURSE.title}</span> <Sep /> {index + 1}차시 {lesson.title}
           </p>
-          <button type="button" autoFocus onClick={finish} className="inline-flex h-9 shrink-0 items-center gap-1 rounded-[4px] border border-white/40 px-3 text-[14px] font-bold">
+          <button type="button" autoFocus onClick={finish} className="inline-flex h-9 shrink-0 items-center rounded-md px-3 text-[14px] font-bold" style={{ background: "rgba(255,255,255,.1)" }}>
             학습종료
           </button>
         </div>
 
-        <div className="grid lg:grid-cols-[minmax(0,1fr)_260px]">
+        <div className="grid lg:grid-cols-[minmax(0,1fr)_300px]">
           <div className="min-w-0">
-            <div className="relative aspect-video" style={{ background: C.dark }}>
+            <div className="relative aspect-video" style={{ background: "#000" }}>
               <AnimatePresence mode="wait" initial={false}>
                 <motion.div
                   key={`${index}-${pageAt}`}
@@ -2181,33 +2178,22 @@ function Player({
                   animate={{ opacity: 1, x: 0 }}
                   exit={reduce ? { opacity: 0 } : { opacity: 0, x: -24 }}
                   transition={{ duration: 0.3, ease: EASE }}
-                  className="absolute inset-0 flex flex-col justify-center px-6 text-white md:px-12"
+                  className="absolute inset-0 flex flex-col justify-center px-6 md:px-12"
                 >
-                  <p className="text-[14px] opacity-70">
+                  <p className="text-[14px]" style={{ color: dim }}>
                     {index + 1}차시 {pageAt + 1}/{lesson.pages.length}
                   </p>
-                  <p className="mt-2 text-[24px] font-bold leading-[1.3] md:text-[36px]">{lesson.pages[pageAt]}</p>
+                  <p className="mt-2 text-[24px] leading-[1.3] font-bold md:text-[38px]">{lesson.pages[pageAt]}</p>
                 </motion.div>
               </AnimatePresence>
               {askResume && (
-                <div className="absolute inset-0 grid place-items-center bg-black/55 p-4">
-                  <div className="w-full max-w-[340px] rounded-md bg-white p-4 text-center md:p-5" role="alertdialog" aria-label="이어보기">
+                <div className="absolute inset-0 grid place-items-center bg-black/60 p-4">
+                  <div className="w-full max-w-[340px] rounded-[12px] bg-white p-4 text-center md:p-5" role="alertdialog" aria-label="이어보기" style={{ color: C.text }}>
                     <p className="text-[15px] font-bold break-keep md:text-[16px]">이전에 학습한 위치부터 이어서 학습하시겠습니까?</p>
                     <p className="mt-1 text-[14px] tabular-nums" style={{ color: C.muted }}>
                       마지막 학습 위치 {clock(prog.pos)}
                     </p>
-                    <div className="mt-4 flex justify-center gap-2">
-                      <button
-                        type="button"
-                        onClick={() => {
-                          setAskResume(false);
-                          setPlaying(true);
-                        }}
-                        className={`${btnBase} h-10 px-4`}
-                        style={{ background: C.accent, color: "#fff" }}
-                      >
-                        이어보기
-                      </button>
+                    <div className="mt-4 grid grid-cols-2 gap-2">
                       <button
                         type="button"
                         onClick={() => {
@@ -2215,10 +2201,21 @@ function Player({
                           seek(0);
                           setPlaying(true);
                         }}
-                        className={`${btnBase} h-10 px-4`}
-                        style={btnLine}
+                        className="h-10 rounded-md text-[14px] font-bold"
+                        style={{ background: C.soft }}
                       >
                         처음부터
+                      </button>
+                      <button
+                        type="button"
+                        onClick={() => {
+                          setAskResume(false);
+                          setPlaying(true);
+                        }}
+                        className="h-10 rounded-md text-[14px] font-bold text-white"
+                        style={{ background: C.accent }}
+                      >
+                        이어보기
                       </button>
                     </div>
                   </div>
@@ -2226,7 +2223,7 @@ function Player({
               )}
             </div>
 
-            <div className="px-4 pt-3 pb-4">
+            <div className="px-4 pt-4 pb-5 md:px-5">
               {/* 본 구간은 진하게, 건너뛴 구간은 빗금으로 보여 준다 */}
               <div
                 role="slider"
@@ -2244,15 +2241,15 @@ function Player({
                   const rect = e.currentTarget.getBoundingClientRect();
                   seek(Math.max(0, Math.min(1, (e.clientX - rect.left) / rect.width)) * lesson.duration);
                 }}
-                className="relative h-3 cursor-pointer rounded-[2px]"
-                style={{ background: `repeating-linear-gradient(135deg, ${C.line} 0 4px, #f3efe6 4px 8px)` }}
+                className="relative h-2 cursor-pointer rounded-full"
+                style={{ background: "repeating-linear-gradient(135deg, rgba(255,255,255,.22) 0 4px, rgba(255,255,255,.08) 4px 8px)" }}
               >
                 {prog.segs.map(([a, b]) => (
-                  <span key={a} className="absolute inset-y-0" style={{ left: `${(a / lesson.duration) * 100}%`, width: `${((b - a) / lesson.duration) * 100}%`, background: C.brand }} />
+                  <span key={a} className="absolute inset-y-0 rounded-full" style={{ left: `${(a / lesson.duration) * 100}%`, width: `${((b - a) / lesson.duration) * 100}%`, background: "#4fae84" }} />
                 ))}
-                <span className="absolute top-1/2 size-4 -translate-x-1/2 -translate-y-1/2 rounded-full border-2 bg-white" style={{ left: `${(prog.pos / lesson.duration) * 100}%`, borderColor: C.brand }} />
+                <span className="absolute top-1/2 size-4 -translate-x-1/2 -translate-y-1/2 rounded-full bg-white" style={{ left: `${(prog.pos / lesson.duration) * 100}%` }} />
               </div>
-              <div className="mt-3 flex flex-wrap items-center gap-3">
+              <div className="mt-4 flex flex-wrap items-center gap-3">
                 <button
                   type="button"
                   onClick={() => {
@@ -2261,17 +2258,17 @@ function Player({
                     setPlaying((p) => !p);
                   }}
                   aria-label={playing ? "일시정지" : "재생"}
-                  className="grid size-11 place-items-center rounded-[4px] text-white"
-                  style={{ background: C.brand }}
+                  className="grid size-11 place-items-center rounded-full bg-white"
+                  style={{ color: "#0f1512" }}
                 >
                   {playing ? <Pause size={18} aria-hidden /> : <Play size={18} aria-hidden />}
                 </button>
                 <span className="text-[15px] tabular-nums">
-                  {clock(prog.pos)} / {clock(lesson.duration)}
+                  {clock(prog.pos)} <span style={{ color: dim }}>/ {clock(lesson.duration)}</span>
                 </span>
-                <label className="ml-auto flex items-center gap-2 text-[14px]" style={{ color: C.muted }}>
+                <label className="ml-auto flex items-center gap-2 text-[14px]" style={{ color: dim }}>
                   배속
-                  <select value={speed} onChange={(e) => setSpeed(Number(e.target.value))} className="h-9 rounded-[4px] border bg-white px-2 text-[14px]" style={{ borderColor: C.line, color: C.text }}>
+                  <select value={speed} onChange={(e) => setSpeed(Number(e.target.value))} className="h-9 rounded-md border bg-transparent px-2 text-[14px] text-white" style={{ borderColor: edge, colorScheme: "dark" }}>
                     <option value={1}>1.0배속</option>
                     <option value={1.2}>1.2배속</option>
                     <option value={1.5}>1.5배속</option>
@@ -2280,19 +2277,19 @@ function Player({
                   </select>
                 </label>
               </div>
-              <dl className="mt-3 flex flex-wrap gap-x-5 gap-y-1 text-[14px]">
+              <dl className="mt-4 flex flex-wrap gap-x-5 gap-y-1 text-[14px]">
                 <div className="flex gap-1.5">
-                  <dt style={{ color: C.muted }}>차시 진도율</dt>
-                  <dd className="font-bold tabular-nums" style={{ color: done[index] ? C.brand : C.text }}>
+                  <dt style={{ color: dim }}>차시 진도율</dt>
+                  <dd className="font-bold tabular-nums" style={{ color: done[index] ? "#7fd1a8" : "#fff" }}>
                     {r}%
                   </dd>
                 </div>
                 <div className="flex gap-1.5">
-                  <dt style={{ color: C.muted }}>학습완료 기준</dt>
+                  <dt style={{ color: dim }}>학습완료 기준</dt>
                   <dd className="tabular-nums">90% 이상</dd>
                 </div>
                 <div className="flex gap-1.5">
-                  <dt style={{ color: C.muted }}>학습 인정 시간</dt>
+                  <dt style={{ color: dim }}>학습 인정 시간</dt>
                   <dd className="tabular-nums">
                     {clock(watched(prog.segs))} / {clock(lesson.duration)}
                   </dd>
@@ -2301,40 +2298,57 @@ function Player({
             </div>
           </div>
 
-          <aside aria-labelledby="toc-title" className="border-t lg:border-t-0 lg:border-l" style={{ borderColor: C.line }}>
-            <h3 id="toc-title" className="border-b px-4 py-2.5 text-[15px] font-bold" style={{ borderColor: C.line, background: C.head }}>
-              학습 목차
+          <aside aria-labelledby="toc-title" className="flex flex-col border-t lg:border-t-0 lg:border-l" style={{ borderColor: edge }}>
+            <h3 id="toc-title" className="px-4 pt-4 pb-2 text-[15px] font-bold md:px-5">
+              커리큘럼
             </h3>
-            <ol>
-              {lesson.pages.map((p, k) => {
-                const from = Math.round((lesson.duration / lesson.pages.length) * k);
+            <ol className="flex-1 overflow-y-auto px-2 lg:max-h-[56vh]">
+              {LESSONS.map((l, k) => {
+                const locked = k > 0 && !done[k - 1];
+                const cur = k === index;
                 return (
-                  <li key={p}>
+                  <li key={l.title}>
                     <button
                       type="button"
-                      aria-current={k === pageAt ? "true" : undefined}
-                      onClick={() => seek(from)}
-                      className="flex w-full items-center gap-2 border-b px-4 py-2.5 text-left text-[14px]"
-                      style={{ borderColor: C.line, background: k === pageAt ? C.brandSoft : undefined, fontWeight: k === pageAt ? 700 : 400 }}
+                      disabled={locked}
+                      aria-current={cur ? "true" : undefined}
+                      onClick={() => onChange(k)}
+                      className="flex w-full items-center gap-2.5 rounded-md px-2.5 py-2.5 text-left text-[14px] disabled:opacity-40"
+                      style={{ background: cur ? "rgba(255,255,255,.1)" : undefined, fontWeight: cur ? 700 : 400 }}
                     >
-                      <span className="w-5 shrink-0 tabular-nums" style={{ color: C.muted }}>
-                        {k + 1}
+                      <span className="w-5 shrink-0 tabular-nums" style={{ color: done[k] ? "#7fd1a8" : dim }}>
+                        {done[k] ? <Check size={15} aria-label="학습완료" /> : locked ? <Lock size={13} aria-label="잠김" /> : k + 1}
                       </span>
-                      <span className="min-w-0 flex-1">{p}</span>
-                      <span className="shrink-0 tabular-nums" style={{ color: C.muted }}>
-                        {clock(from)}
+                      <span className="min-w-0 flex-1 truncate">{l.title}</span>
+                      <span className="shrink-0 tabular-nums" style={{ color: dim }}>
+                        {Math.round(ratios[k] * 100)}%
                       </span>
                     </button>
+                    {cur && (
+                      <ol className="mb-1 pl-9">
+                        {lesson.pages.map((p, j) => {
+                          const from = Math.round((lesson.duration / lesson.pages.length) * j);
+                          return (
+                            <li key={p}>
+                              <button type="button" aria-current={j === pageAt ? "true" : undefined} onClick={() => seek(from)} className="flex w-full gap-2 py-1.5 pr-2 text-left text-[13px]" style={{ color: j === pageAt ? "#fff" : dim }}>
+                                <span className="w-10 shrink-0 tabular-nums">{clock(from)}</span>
+                                <span className="min-w-0 flex-1">{p}</span>
+                              </button>
+                            </li>
+                          );
+                        })}
+                      </ol>
+                    )}
                   </li>
                 );
               })}
             </ol>
             <div className="flex gap-2 p-4">
-              <button type="button" disabled={index === 0} onClick={() => onChange(index - 1)} className={`${btnBase} flex-1`} style={btnLine}>
+              <button type="button" disabled={index === 0} onClick={() => onChange(index - 1)} className={darkBtn} style={{ borderColor: edge }}>
                 <ChevronLeft size={15} aria-hidden />
                 이전 차시
               </button>
-              <button type="button" disabled={!nextOpen} onClick={() => onChange(index + 1)} className={`${btnBase} flex-1`} style={btnLine}>
+              <button type="button" disabled={!nextOpen} onClick={() => onChange(index + 1)} className={darkBtn} style={{ borderColor: edge }}>
                 다음 차시
                 <ChevronRight size={15} aria-hidden />
               </button>
@@ -2609,7 +2623,7 @@ function StatusPage({ rows, setState, notify, myProgress }: { rows: Row[]; setSt
         </button>
       </form>
 
-      <section aria-labelledby="status-title" className="rounded-md border bg-white" style={{ borderColor: C.line }}>
+      <section aria-labelledby="status-title" className="rounded-[10px] border bg-white" style={{ borderColor: C.line }}>
         <div className="flex flex-wrap items-center gap-2 border-b px-4 py-3" style={{ borderColor: C.line }}>
           <h3 id="status-title" className="mr-auto text-[16px] font-bold">
             수강생 목록 <span className="font-normal tabular-nums" style={{ color: C.muted }}>총 {list.length}명</span>
@@ -2903,7 +2917,7 @@ function CompletePage({ rows, setState, notify }: { rows: Row[]; setState: SetSt
   const list = tab === "wait" ? waiting : confirmed;
 
   return (
-    <section aria-labelledby="complete-title" className="rounded-md border bg-white" style={{ borderColor: C.line }}>
+    <section aria-labelledby="complete-title" className="rounded-[10px] border bg-white" style={{ borderColor: C.line }}>
       <div className="flex flex-wrap items-center gap-2 border-b px-4 py-3" style={{ borderColor: C.line }}>
         <h3 id="complete-title" className="sr-only">
           수료관리
