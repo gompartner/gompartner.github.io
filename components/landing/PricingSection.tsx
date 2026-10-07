@@ -1,13 +1,10 @@
 import { Check } from "lucide-react";
-import { ChannelTalkButton } from "@/components/layout/ChannelTalk";
 import { addons, formatWon, manwon, planCommon, plans } from "@/data/pricing";
 
 const h2 = "text-[24px] font-bold leading-[1.5] tracking-[-0.01em] md:text-[32px]";
-const primaryButton =
-  "inline-flex h-12 items-center justify-center rounded-md bg-accent px-6 text-[17px] font-bold text-accent-foreground transition-colors hover:bg-accent-hover md:h-14 md:px-7";
 
 /** 홈페이지 패키지 3종. 랜딩과 업종별 제작 사례 페이지에서 함께 쓴다. */
-export function PricingSection({ id = "pricing", cta = "pricing_chat" }: { id?: string; cta?: string }) {
+export function PricingSection({ id = "pricing" }: { id?: string }) {
   return (
     <section id={id} aria-labelledby={`${id}-title`} className="relative isolate scroll-mt-16 overflow-hidden border-t border-border bg-surface">
       <div className="mx-auto w-full max-w-[1248px] px-4 py-16 md:px-6 md:py-24">
@@ -54,11 +51,6 @@ export function PricingSection({ id = "pricing", cta = "pricing_chat" }: { id?: 
               </div>
             ))}
           </dl>
-        </div>
-        <div className="mt-8">
-          <ChannelTalkButton cta={cta} className={primaryButton}>
-            채팅으로 상담하기
-          </ChannelTalkButton>
         </div>
       </div>
     </section>

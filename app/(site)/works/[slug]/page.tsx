@@ -61,7 +61,7 @@ export default async function IndustryWorksPage({ params }: Props) {
           <WorksGrid projects={list} />
         </div>
       </div>
-      <PricingSection cta={`industry_${ind.slug}_chat`} />
+      <PricingSection />
     </>
   );
 }
