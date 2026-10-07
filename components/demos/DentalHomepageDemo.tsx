@@ -710,9 +710,8 @@ function SiteHeader({ view, go }: { view: View; go: Go }) {
       </div>
 
       <div className={`${container} flex h-16 items-center gap-4 lg:h-[72px]`}>
-        <button type="button" onClick={() => navigate("home")} className="flex shrink-0 items-center gap-2 text-[20px] font-bold tracking-[-0.03em] lg:w-[170px]">
-          <ToothMark />
-          {CLINIC}
+        <button type="button" onClick={() => navigate("home")} aria-label={CLINIC} className="flex shrink-0 items-center lg:w-[170px]">
+          <BrandLogo />
         </button>
 
         <nav className="hidden h-full flex-1 lg:block" aria-label="주 메뉴" onMouseEnter={() => setMegaOpen(true)}>
@@ -2096,8 +2095,8 @@ function SiteFooter({ go }: { go: Go }) {
         </ul>
       </div>
       <div className={`${container} py-8 pb-48 min-[1440px]:pb-24`}>
-        <p className="text-[20px] font-bold tracking-[-0.03em]" style={{ color: C.onInk }}>
-          {CLINIC}
+        <p style={{ color: C.onInk }}>
+          <BrandLogo />
         </p>
         <dl className="mt-4 flex flex-wrap gap-x-6 gap-y-1 text-[15px]">
           {[
@@ -2119,13 +2118,16 @@ function SiteFooter({ go }: { go: Go }) {
   );
 }
 
-function ToothMark() {
+/* 로고: 메인 사이트와 같은 곰 로고 + 곰파트너(크게) + 업종(작게) */
+function BrandLogo() {
   return (
-    <svg viewBox="0 0 24 24" className="h-6 w-6" aria-hidden>
-      <path
-        d="M7 3.5c-2.6 0-4 2-4 4.6 0 2.4 1 4 1.6 6.2.6 2.3.8 6.2 2.6 6.2 1.7 0 1.8-3.4 2.6-5 .5-1 1.9-1 2.4 0 .8 1.6.9 5 2.6 5 1.8 0 2-3.9 2.6-6.2.6-2.2 1.6-3.8 1.6-6.2 0-2.6-1.4-4.6-4-4.6-2 0-3 1.2-5 1.2s-3-1.2-5-1.2Z"
-        fill={C.accent}
-      />
-    </svg>
+    <span className="inline-flex items-center gap-2">
+      {/* eslint-disable-next-line @next/next/no-img-element -- 메인 사이트와 같은 곰 로고 */}
+      <img src="/images/logo.svg" alt="" aria-hidden width={28} height={28} className="h-7 w-7 shrink-0" />
+      <span className="flex items-baseline gap-1 whitespace-nowrap">
+        <span className="text-[20px] font-bold tracking-[-0.03em]">곰파트너</span>
+        <span className="text-[12px] font-semibold opacity-75">치과의원</span>
+      </span>
+    </span>
   );
 }

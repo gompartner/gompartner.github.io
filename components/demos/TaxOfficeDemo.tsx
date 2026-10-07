@@ -554,17 +554,16 @@ export function TaxOfficeDemo() {
 
 /* ---------- 로고, 머리글 ---------- */
 
-function Logo({ light = false }: { light?: boolean }) {
-  const fg = light ? C.greenDeep : "#fff";
+/* 로고: 메인 사이트와 같은 곰 로고 + 곰파트너(크게) + 업종(작게) */
+function Logo() {
   return (
     <span className="inline-flex items-center gap-2">
-      <svg width="30" height="30" viewBox="0 0 30 30" aria-hidden>
-        <rect width="30" height="30" rx="6" fill={light ? "#fff" : C.green} />
-        <path d="M8 9 H22 M8 14 H22 M8 19 H16" stroke={fg} strokeWidth="2" strokeLinecap="round" />
-        <path d="M11 6 V24" stroke={light ? C.margin : "#e9a49b"} strokeWidth="1.4" />
-        <path d="M17.5 21.5 L19.5 23.5 L23.5 18.5" stroke={fg} strokeWidth="2" fill="none" strokeLinecap="round" strokeLinejoin="round" />
-      </svg>
-      <span className="text-[19px] font-bold tracking-[-0.02em]">{OFFICE}</span>
+      {/* eslint-disable-next-line @next/next/no-img-element -- 메인 사이트와 같은 곰 로고 */}
+      <img src="/images/logo.svg" alt="" aria-hidden width={28} height={28} className="h-7 w-7 shrink-0" />
+      <span className="flex items-baseline gap-1 whitespace-nowrap">
+        <span className="text-[19px] font-bold tracking-[-0.02em]">곰파트너</span>
+        <span className="text-[12px] font-semibold opacity-75">세무회계</span>
+      </span>
     </span>
   );
 }
@@ -2016,7 +2015,7 @@ function Footer() {
   return (
     <footer className="px-4 pb-24 pt-12 md:px-6" style={{ background: C.greenDeep, color: "#e5eee9" }}>
       <div className="mx-auto max-w-[1200px]">
-        <Logo light />
+        <Logo />
         <div className="mt-6 space-y-1 text-[15px]">
           <p>
             {ADDRESS} (□□역 3번 출구, △△은행 옆), 건물 지하 주차 1시간 무료

@@ -211,14 +211,16 @@ export function PharmacyDemo() {
 
 /* ---------- 로고, 머리글, 영업 상태 띠 ---------- */
 
-function Logo({ light = false }: { light?: boolean }) {
+/* 로고: 메인 사이트와 같은 곰 로고 + 곰파트너(크게) + 업종(작게) */
+function Logo() {
   return (
     <span className="inline-flex items-center gap-2">
-      <svg width="30" height="30" viewBox="0 0 30 30" aria-hidden>
-        <rect width="30" height="30" rx="6" fill={light ? "#fff" : C.mint} />
-        <path d="M12 7 H18 V12 H23 V18 H18 V23 H12 V18 H7 V12 H12Z" fill={light ? C.mint : "#fff"} />
-      </svg>
-      <span className="text-[19px] font-bold tracking-[-0.02em]">{PHARMACY}</span>
+      {/* eslint-disable-next-line @next/next/no-img-element -- 메인 사이트와 같은 곰 로고 */}
+      <img src="/images/logo.svg" alt="" aria-hidden width={28} height={28} className="h-7 w-7 shrink-0" />
+      <span className="flex items-baseline gap-1 whitespace-nowrap">
+        <span className="text-[19px] font-bold tracking-[-0.02em]">곰파트너</span>
+        <span className="text-[12px] font-semibold opacity-75">약국</span>
+      </span>
     </span>
   );
 }
@@ -1218,7 +1220,7 @@ function Footer() {
   return (
     <footer className="px-4 pb-28 pt-10 md:px-6 print:hidden" style={{ background: C.mintDeep, color: "#e3f2ec" }}>
       <div className="mx-auto max-w-[1200px]">
-        <Logo light />
+        <Logo />
         <dl className="mt-6 grid gap-x-8 gap-y-1.5 text-[14px] sm:grid-cols-2 md:grid-cols-3" style={{ color: "#b5d6ca" }}>
           {[
             ["상호", PHARMACY],

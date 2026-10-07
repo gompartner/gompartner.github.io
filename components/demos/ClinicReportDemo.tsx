@@ -565,8 +565,14 @@ function Hero({
       />
 
       <div className="mx-auto flex max-w-[1200px] flex-wrap items-center gap-3 px-4 pt-5 md:px-6">
-        <p className="text-[17px] font-bold">
-          곰파트너피부과의원 <span className="font-normal text-white/70">피부 진단 결과지</span>
+        <p className="flex items-center gap-2 whitespace-nowrap">
+          {/* eslint-disable-next-line @next/next/no-img-element -- 메인 사이트와 같은 곰 로고 */}
+          <img src="/images/logo.svg" alt="" aria-hidden width={28} height={28} className="h-7 w-7 shrink-0" />
+          <span className="flex items-baseline gap-1">
+            <span className="text-[17px] font-bold">곰파트너</span>
+            <span className="text-[11px] font-semibold text-white/75">피부과의원</span>
+            <span className="ml-1 text-[17px] text-white/70"> 피부 진단 결과지</span>
+          </span>
         </p>
         <nav className="flex w-full gap-1 rounded-full bg-white/15 p-1 backdrop-blur-md sm:ml-auto sm:w-auto" aria-label="진행 단계">
           {STEPS.map((s, i) => {

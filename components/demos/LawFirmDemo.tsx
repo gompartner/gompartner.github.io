@@ -536,17 +536,16 @@ export function LawFirmDemo() {
 
 /* ---------- 로고, 머리글 ---------- */
 
+/* 로고: 메인 사이트와 같은 곰 로고 + 법률사무소(작게, 위) + 곰파트너(크게) */
 function Logo({ light = false }: { light?: boolean }) {
   const fg = light ? C.ivory : C.navy;
   return (
     <span className="inline-flex items-center gap-2.5">
-      <svg width="32" height="32" viewBox="0 0 32 32" aria-hidden className="shrink-0">
-        <rect x="0.5" y="0.5" width="31" height="31" rx="2" fill="none" stroke={C.gold} />
-        <rect x="4" y="4" width="24" height="24" rx="1" fill={fg} />
-        <path d="M10 22 H22 M12 10 V20 M16 10 V20 M20 10 V20 M10 10 H22" stroke={light ? C.navy : C.ivory} strokeWidth="1.4" />
-      </svg>
-      <span className="whitespace-nowrap text-[17px] font-bold tracking-[-0.02em] md:text-[18px]" style={{ color: fg, fontFamily: SERIF }}>
-        {FIRM}
+      {/* eslint-disable-next-line @next/next/no-img-element -- 메인 사이트와 같은 곰 로고 */}
+      <img src="/images/logo.svg" alt="" aria-hidden width={32} height={32} className="h-8 w-8 shrink-0" />
+      <span className="flex flex-col whitespace-nowrap text-left leading-[1.15]" style={{ color: fg, fontFamily: SERIF }}>
+        <span className="text-[11px] font-bold opacity-75">법률사무소</span>
+        <span className="text-[18px] font-bold tracking-[-0.02em] md:text-[19px]">곰파트너</span>
       </span>
     </span>
   );

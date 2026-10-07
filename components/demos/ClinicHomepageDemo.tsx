@@ -234,14 +234,14 @@ export function ClinicHomepageDemo() {
       <header className="sticky top-0 z-40 border-b" style={{ borderColor: C.line, backgroundColor: C.paper }}>
         <div className={`${container} flex h-16 items-center justify-between gap-4 lg:h-[76px]`}>
           {page === "home" ? (
-            <h1 className="text-[20px] font-semibold tracking-[-0.03em]">
-              <button type="button" onClick={() => go("home")}>
-                {CLINIC}
+            <h1>
+              <button type="button" onClick={() => go("home")} aria-label={CLINIC} className="flex">
+                <BrandLogo />
               </button>
             </h1>
           ) : (
-            <button type="button" onClick={() => go("home")} className="text-[20px] font-semibold tracking-[-0.03em]">
-              {CLINIC}
+            <button type="button" onClick={() => go("home")} aria-label={CLINIC} className="flex">
+              <BrandLogo />
             </button>
           )}
 
@@ -325,8 +325,8 @@ export function ClinicHomepageDemo() {
       <footer style={{ backgroundColor: C.ink, color: C.onInkMuted }}>
         <div className={`${container} grid gap-6 py-10 pb-28 md:grid-cols-2`}>
           <div>
-            <p className="text-[20px] font-semibold tracking-[-0.03em]" style={{ color: C.onInk }}>
-              {CLINIC}
+            <p style={{ color: C.onInk }}>
+              <BrandLogo />
             </p>
             <dl className="mt-4 flex flex-wrap gap-x-6 gap-y-1 text-[15px]">
               {[
@@ -1114,5 +1114,19 @@ function NoticePage() {
         )}
       </div>
     </>
+  );
+}
+
+/* 로고: 메인 사이트와 같은 곰 로고 + 곰파트너(크게) + 업종(작게) */
+function BrandLogo() {
+  return (
+    <span className="inline-flex items-center gap-2">
+      {/* eslint-disable-next-line @next/next/no-img-element -- 메인 사이트와 같은 곰 로고 */}
+      <img src="/images/logo.svg" alt="" aria-hidden width={28} height={28} className="h-7 w-7 shrink-0" />
+      <span className="flex items-baseline gap-1 whitespace-nowrap">
+        <span className="text-[20px] font-semibold tracking-[-0.03em]">곰파트너</span>
+        <span className="text-[12px] font-medium opacity-75">피부과의원</span>
+      </span>
+    </span>
   );
 }

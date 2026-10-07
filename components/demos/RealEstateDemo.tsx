@@ -394,15 +394,16 @@ export function RealEstateDemo() {
 
 /* ---------- 로고, 머리글 ---------- */
 
-function Logo({ light = false }: { light?: boolean }) {
+/* 로고: 메인 사이트와 같은 곰 로고 + 곰파트너(크게) + 업종(작게) */
+function Logo() {
   return (
     <span className="inline-flex items-center gap-2">
-      <svg width="30" height="30" viewBox="0 0 30 30" aria-hidden>
-        <rect width="30" height="30" rx="6" fill={light ? "#fff" : C.ink} />
-        <path d="M15 25 C15 25 7 17.5 7 12.5 A8 8 0 0 1 23 12.5 C23 17.5 15 25 15 25Z" fill={C.accent} />
-        <path d="M11.5 13 L15 10 L18.5 13 V16.5 H11.5Z" fill="#fff" />
-      </svg>
-      <span className="text-[17px] font-bold tracking-[-0.02em] md:text-[19px]">{OFFICE}</span>
+      {/* eslint-disable-next-line @next/next/no-img-element -- 메인 사이트와 같은 곰 로고 */}
+      <img src="/images/logo.svg" alt="" aria-hidden width={28} height={28} className="h-7 w-7 shrink-0" />
+      <span className="flex flex-col whitespace-nowrap leading-[1.15] md:flex-row md:items-baseline md:gap-1 md:leading-normal">
+        <span className="text-[17px] font-bold tracking-[-0.02em] md:text-[19px]">곰파트너</span>
+        <span className="text-[11px] font-semibold opacity-75 md:text-[12px]">공인중개사사무소</span>
+      </span>
     </span>
   );
 }
@@ -2127,7 +2128,7 @@ function Footer() {
     <footer className="px-4 pb-24 pt-12 md:px-6" style={{ background: "#33373d", color: "#c9cdd2" }}>
       <div className="mx-auto max-w-[1200px]">
         <span style={{ color: "#fff" }}>
-          <Logo light />
+          <Logo />
         </span>
         <dl className="mt-6 grid gap-x-8 gap-y-1.5 text-[14px] sm:grid-cols-2 md:grid-cols-3">
           {[
