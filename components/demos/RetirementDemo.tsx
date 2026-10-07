@@ -212,11 +212,13 @@ export function RetirementDemo() {
   return (
     <div className={`${plex.className} min-h-screen`} style={{ background: PAGE, color: INK }}>
       <SiteHeader screen={screen} go={go} />
-      {screen === "home" ? (
-        <HomeScreen inputs={clampInputs(inputs)} set={set} go={go} notice={setToast} />
-      ) : (
-        <CalcScreen inputs={inputs} set={set} go={go} />
-      )}
+      <div key={screen} className="soft-in">
+        {screen === "home" ? (
+          <HomeScreen inputs={clampInputs(inputs)} set={set} go={go} notice={setToast} />
+        ) : (
+          <CalcScreen inputs={inputs} set={set} go={go} />
+        )}
+      </div>
       <SiteFooter />
       <div aria-live="polite" className="pointer-events-none fixed inset-x-0 top-24 z-50 flex justify-center px-4">
         {toast && (
@@ -489,7 +491,7 @@ function HomeScreen({ inputs, set, go, notice }: { inputs: Inputs; set: (key: ke
               })}
             </div>
           </div>
-          <ul id="product-panel" role="tabpanel" aria-label={products.label} className="mt-5 grid gap-3 md:grid-cols-3">
+          <ul key={tab} id="product-panel" role="tabpanel" aria-label={products.label} className="soft-in mt-5 grid gap-3 md:grid-cols-3">
             {products.items.map((it) => (
               <li key={it.name} className="min-w-0 rounded-[10px] border bg-white p-5" style={{ borderColor: LINE }}>
                 <p className="text-[18px] font-bold" style={{ color: NAVY }}>

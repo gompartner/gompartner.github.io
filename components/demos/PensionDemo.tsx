@@ -348,7 +348,7 @@ export function PensionDemo() {
       <Header page={page} go={go} />
       <main>
         {page === "home" && (
-          <>
+          <div key="home" className="soft-in">
             <HeroSlider go={go} />
             <RoomsSection roomId={roomId} onRoom={setRoomId} sel={sel} go={go} />
             <section aria-labelledby="booking-title" id="booking" className="scroll-mt-20 px-4 py-14 md:px-6 md:py-20" style={{ background: C.sandSoft }}>
@@ -362,14 +362,34 @@ export function PensionDemo() {
             </section>
             <GuideShortcuts go={go} />
             <PlacesSection go={go} />
-          </>
+          </div>
         )}
-        {page === "about" && <AboutPage go={go} anchor={nav.anchor} />}
-        {page === "room" && <RoomPage roomId={roomId} go={go} />}
+        {page === "about" && (
+          <div key="about" className="soft-in">
+            <AboutPage go={go} anchor={nav.anchor} />
+          </div>
+        )}
+        {page === "room" && (
+          <div key={`room-${roomId}`} className="soft-in">
+            <RoomPage roomId={roomId} go={go} />
+          </div>
+        )}
         {page === "reserve" && <ReservePage sel={sel} onPick={pickCell} go={go} />}
-        {page === "guide" && <GuidePage tab={guideTab} setTab={setGuideTab} go={go} today={today} checkIn={checkIn} />}
-        {page === "around" && <AroundPage go={go} />}
-        {page === "location" && <LocationPage go={go} />}
+        {page === "guide" && (
+          <div key="guide" className="soft-in">
+            <GuidePage tab={guideTab} setTab={setGuideTab} go={go} today={today} checkIn={checkIn} />
+          </div>
+        )}
+        {page === "around" && (
+          <div key="around" className="soft-in">
+            <AroundPage go={go} />
+          </div>
+        )}
+        {page === "location" && (
+          <div key="location" className="soft-in">
+            <LocationPage go={go} />
+          </div>
+        )}
       </main>
       <Footer go={go} />
     </div>
@@ -784,7 +804,7 @@ function RoomCard({ room, closed, go }: { room: Room; closed: boolean; go: Go })
         aria-live="polite"
       >
         <div className="relative aspect-[16/10]">
-          <Image src={`${IMG}/room.jpg`} alt={`${room.name} 객실 침실`} fill sizes="(min-width: 1024px) 420px, 100vw" className="object-cover" style={{ objectPosition: room.photo }} />
+          <Image src={`${IMG}/rooms/${room.id}.jpg`} alt={`${room.name} 객실`} fill sizes="(min-width: 1024px) 420px, 100vw" className="object-cover" />
         </div>
         <div className="p-5">
           <div className="flex items-baseline justify-between gap-3">
@@ -1302,7 +1322,7 @@ function RoomPage({ roomId, go }: { roomId: string; go: Go }) {
       <SubBody>
         <div id="room-detail" className="grid scroll-mt-28 gap-8 lg:grid-cols-[1.2fr_1fr]">
           <div className="relative aspect-[4/3] overflow-hidden rounded-[10px]">
-            <Image src={`${IMG}/room.jpg`} alt={`${room.name} 객실 침실`} fill sizes="(min-width: 1024px) 640px, 100vw" className="object-cover" style={{ objectPosition: room.photo }} />
+            <Image src={`${IMG}/rooms/${room.id}.jpg`} alt={`${room.name} 객실`} fill sizes="(min-width: 1024px) 640px, 100vw" className="object-cover" />
           </div>
           <div>
             <h2 className="text-[28px] font-bold" style={{ color: C.navy }}>
@@ -1460,194 +1480,196 @@ function ReservePage({ sel, onPick, go }: { sel: Selection; onPick: (id: string,
 
   return (
     <>
-      <SubHeader title="실시간예약" crumbs={["예약안내", "실시간예약"]} go={go} tabs={guideTabs(go, "reserve")} />
-      <SubBody>
-        <SectionTitle id="board-title" aside={<TodayCount today={today} />}>
-          예약현황
-        </SectionTitle>
-        <StatusBoard today={today} roomId={roomId} checkIn={checkIn} nights={nights} onPick={onPick} />
+      <div className="soft-in">
+        <SubHeader title="실시간예약" crumbs={["예약안내", "실시간예약"]} go={go} tabs={guideTabs(go, "reserve")} />
+        <SubBody>
+          <SectionTitle id="board-title" aside={<TodayCount today={today} />}>
+            예약현황
+          </SectionTitle>
+          <StatusBoard today={today} roomId={roomId} checkIn={checkIn} nights={nights} onPick={onPick} />
 
-        <div className="mt-10 grid items-start gap-6 lg:grid-cols-[1.1fr_1fr]">
-          <section aria-labelledby="amount-title" className="min-w-0 rounded-[10px] p-5 md:p-6" style={{ background: C.sandSoft }}>
-            <h2 id="amount-title" className="text-[20px] font-bold" style={{ color: C.navy }}>
-              예약 금액
-            </h2>
-            {checkIn === null ? (
-              <p className="mt-3 text-[15px]" style={{ color: C.muted }}>
-                선택한 객실 없음
-              </p>
-            ) : (
-              <>
-                <dl className="mt-3 grid grid-cols-[72px_1fr] items-center gap-y-2 text-[15px]">
-                  <dt style={{ color: C.muted }}>객실</dt>
-                  <dd className="font-bold">
-                    {room.name} <span className="font-normal">(기준 {room.base}명, 최대 {room.max}명)</span>
-                  </dd>
-                  <dt style={{ color: C.muted }}>입실</dt>
-                  <dd>{dateLabel(checkIn)} 15:00</dd>
-                  <dt style={{ color: C.muted }}>퇴실</dt>
-                  <dd>{dateLabel(checkIn + nights)} 11:00</dd>
-                  <dt>
-                    <label htmlFor="page-nights" style={{ color: C.muted }}>
-                      박수
-                    </label>
-                  </dt>
-                  <dd>
-                    <NightsSelect sel={sel} id="page-nights" />
-                  </dd>
-                  <dt style={{ color: C.muted }}>인원</dt>
-                  <dd>
-                    <PeopleStepper sel={sel} room={room} />
-                  </dd>
-                </dl>
-                {!free && (
-                  <p className="mt-3 text-[14px] font-semibold" style={{ color: C.coralDeep }} role="alert">
-                    선택한 날짜에 예약 완료된 객실입니다. 예약현황표에서 다시 선택해 주십시오.
-                  </p>
-                )}
-                {q && (
-                  <>
-                    <fieldset className="mt-4 space-y-1 border-t pt-3" style={{ borderColor: C.line }}>
-                      <legend className="sr-only">추가 옵션</legend>
-                      <label className="flex min-h-11 cursor-pointer items-center gap-2.5 text-[15px]">
-                        <input type="checkbox" checked={grill} onChange={(e) => setGrill(e.target.checked)} className="h-5 w-5 accent-[#12324a]" />
-                        <span>
-                          바비큐 그릴(숯 포함) <span style={{ color: C.muted }}>{won(GRILL)}</span>
-                        </span>
+          <div className="mt-10 grid items-start gap-6 lg:grid-cols-[1.1fr_1fr]">
+            <section aria-labelledby="amount-title" className="min-w-0 rounded-[10px] p-5 md:p-6" style={{ background: C.sandSoft }}>
+              <h2 id="amount-title" className="text-[20px] font-bold" style={{ color: C.navy }}>
+                예약 금액
+              </h2>
+              {checkIn === null ? (
+                <p className="mt-3 text-[15px]" style={{ color: C.muted }}>
+                  선택한 객실 없음
+                </p>
+              ) : (
+                <>
+                  <dl className="mt-3 grid grid-cols-[72px_1fr] items-center gap-y-2 text-[15px]">
+                    <dt style={{ color: C.muted }}>객실</dt>
+                    <dd className="font-bold">
+                      {room.name} <span className="font-normal">(기준 {room.base}명, 최대 {room.max}명)</span>
+                    </dd>
+                    <dt style={{ color: C.muted }}>입실</dt>
+                    <dd>{dateLabel(checkIn)} 15:00</dd>
+                    <dt style={{ color: C.muted }}>퇴실</dt>
+                    <dd>{dateLabel(checkIn + nights)} 11:00</dd>
+                    <dt>
+                      <label htmlFor="page-nights" style={{ color: C.muted }}>
+                        박수
                       </label>
-                      <label className="flex min-h-11 cursor-pointer items-center gap-2.5 text-[15px]">
-                        <input type="checkbox" checked={breakfast} onChange={(e) => setBreakfast(e.target.checked)} className="h-5 w-5 accent-[#12324a]" />
-                        <span>
-                          조식 바구니(08:00 객실 앞) <span style={{ color: C.muted }}>1인 {won(BREAKFAST)}</span>
-                        </span>
-                      </label>
-                    </fieldset>
-                    <table className="mt-4 w-full text-[15px] tabular-nums">
-                      <caption className="sr-only">박별 요금과 추가 요금</caption>
-                      <thead>
-                        <tr className="text-left text-[13px]" style={{ color: C.muted }}>
-                          <th scope="col" className="pb-2 font-normal">
-                            날짜
-                          </th>
-                          <th scope="col" className="pb-2 font-normal">
-                            구분
-                          </th>
-                          <th scope="col" className="pb-2 text-right font-normal">
-                            금액
-                          </th>
-                        </tr>
-                      </thead>
-                      <tbody>
-                        {q.rows.map((n) => (
-                          <tr key={n.dn} className="border-t" style={{ borderColor: C.line }}>
-                            <td className="py-2">{dateLabel(n.dn)}</td>
-                            <td className="py-2">
-                              <span className="text-[13px] font-semibold" style={{ color: n.type === "weekday" ? C.muted : C.coralDeep }}>
-                                {TYPE_LABEL[n.type]}
-                              </span>
-                            </td>
-                            <td className="py-2 text-right">{won(n.price)}</td>
-                          </tr>
-                        ))}
-                        {q.extraPeople > 0 && (
-                          <tr className="border-t" style={{ borderColor: C.line }}>
-                            <td className="py-2" colSpan={2}>
-                              인원 추가 {q.extraPeople}명 x {nights}박
-                            </td>
-                            <td className="py-2 text-right">{won(q.extraSum)}</td>
-                          </tr>
-                        )}
-                        {grill && (
-                          <tr className="border-t" style={{ borderColor: C.line }}>
-                            <td className="py-2" colSpan={2}>
-                              바비큐 그릴
-                            </td>
-                            <td className="py-2 text-right">{won(q.grillSum)}</td>
-                          </tr>
-                        )}
-                        {breakfast && (
-                          <tr className="border-t" style={{ borderColor: C.line }}>
-                            <td className="py-2" colSpan={2}>
-                              조식 바구니 {q.headcount}명 x {nights}회
-                            </td>
-                            <td className="py-2 text-right">{won(q.breakfastSum)}</td>
-                          </tr>
-                        )}
-                      </tbody>
-                      <tfoot>
-                        <tr className="border-t-2" style={{ borderColor: C.navy }}>
-                          <th scope="row" colSpan={2} className="pt-3 text-left text-[17px]">
-                            합계
-                          </th>
-                          <td className="pt-3 text-right text-[22px] font-bold" style={{ color: C.navy }}>
-                            {won(q.total)}
-                          </td>
-                        </tr>
-                      </tfoot>
-                    </table>
-                    <p className="mt-2 text-[13px]" style={{ color: C.muted }}>
-                      기준인원 초과 1인 1박 {won(EXTRA_PERSON)} · 24개월 미만 영유아는 인원에서 제외
+                    </dt>
+                    <dd>
+                      <NightsSelect sel={sel} id="page-nights" />
+                    </dd>
+                    <dt style={{ color: C.muted }}>인원</dt>
+                    <dd>
+                      <PeopleStepper sel={sel} room={room} />
+                    </dd>
+                  </dl>
+                  {!free && (
+                    <p className="mt-3 text-[14px] font-semibold" style={{ color: C.coralDeep }} role="alert">
+                      선택한 날짜에 예약 완료된 객실입니다. 예약현황표에서 다시 선택해 주십시오.
                     </p>
-                  </>
-                )}
-              </>
-            )}
-          </section>
+                  )}
+                  {q && (
+                    <>
+                      <fieldset className="mt-4 space-y-1 border-t pt-3" style={{ borderColor: C.line }}>
+                        <legend className="sr-only">추가 옵션</legend>
+                        <label className="flex min-h-11 cursor-pointer items-center gap-2.5 text-[15px]">
+                          <input type="checkbox" checked={grill} onChange={(e) => setGrill(e.target.checked)} className="h-5 w-5 accent-[#12324a]" />
+                          <span>
+                            바비큐 그릴(숯 포함) <span style={{ color: C.muted }}>{won(GRILL)}</span>
+                          </span>
+                        </label>
+                        <label className="flex min-h-11 cursor-pointer items-center gap-2.5 text-[15px]">
+                          <input type="checkbox" checked={breakfast} onChange={(e) => setBreakfast(e.target.checked)} className="h-5 w-5 accent-[#12324a]" />
+                          <span>
+                            조식 바구니(08:00 객실 앞) <span style={{ color: C.muted }}>1인 {won(BREAKFAST)}</span>
+                          </span>
+                        </label>
+                      </fieldset>
+                      <table className="mt-4 w-full text-[15px] tabular-nums">
+                        <caption className="sr-only">박별 요금과 추가 요금</caption>
+                        <thead>
+                          <tr className="text-left text-[13px]" style={{ color: C.muted }}>
+                            <th scope="col" className="pb-2 font-normal">
+                              날짜
+                            </th>
+                            <th scope="col" className="pb-2 font-normal">
+                              구분
+                            </th>
+                            <th scope="col" className="pb-2 text-right font-normal">
+                              금액
+                            </th>
+                          </tr>
+                        </thead>
+                        <tbody>
+                          {q.rows.map((n) => (
+                            <tr key={n.dn} className="border-t" style={{ borderColor: C.line }}>
+                              <td className="py-2">{dateLabel(n.dn)}</td>
+                              <td className="py-2">
+                                <span className="text-[13px] font-semibold" style={{ color: n.type === "weekday" ? C.muted : C.coralDeep }}>
+                                  {TYPE_LABEL[n.type]}
+                                </span>
+                              </td>
+                              <td className="py-2 text-right">{won(n.price)}</td>
+                            </tr>
+                          ))}
+                          {q.extraPeople > 0 && (
+                            <tr className="border-t" style={{ borderColor: C.line }}>
+                              <td className="py-2" colSpan={2}>
+                                인원 추가 {q.extraPeople}명 x {nights}박
+                              </td>
+                              <td className="py-2 text-right">{won(q.extraSum)}</td>
+                            </tr>
+                          )}
+                          {grill && (
+                            <tr className="border-t" style={{ borderColor: C.line }}>
+                              <td className="py-2" colSpan={2}>
+                                바비큐 그릴
+                              </td>
+                              <td className="py-2 text-right">{won(q.grillSum)}</td>
+                            </tr>
+                          )}
+                          {breakfast && (
+                            <tr className="border-t" style={{ borderColor: C.line }}>
+                              <td className="py-2" colSpan={2}>
+                                조식 바구니 {q.headcount}명 x {nights}회
+                              </td>
+                              <td className="py-2 text-right">{won(q.breakfastSum)}</td>
+                            </tr>
+                          )}
+                        </tbody>
+                        <tfoot>
+                          <tr className="border-t-2" style={{ borderColor: C.navy }}>
+                            <th scope="row" colSpan={2} className="pt-3 text-left text-[17px]">
+                              합계
+                            </th>
+                            <td className="pt-3 text-right text-[22px] font-bold" style={{ color: C.navy }}>
+                              {won(q.total)}
+                            </td>
+                          </tr>
+                        </tfoot>
+                      </table>
+                      <p className="mt-2 text-[13px]" style={{ color: C.muted }}>
+                        기준인원 초과 1인 1박 {won(EXTRA_PERSON)} · 24개월 미만 영유아는 인원에서 제외
+                      </p>
+                    </>
+                  )}
+                </>
+              )}
+            </section>
 
-          <form onSubmit={submit} noValidate className="rounded-[10px] border p-5 md:p-6" style={{ borderColor: C.line }} aria-labelledby="form-title">
-            <h2 id="form-title" className="text-[20px] font-bold" style={{ color: C.navy }}>
-              예약자 정보
-            </h2>
-            <div className="mt-4 grid gap-4">
-              <label className="block">
-                <span className="text-[15px] font-semibold">예약자명</span>
-                <input value={name} onChange={(e) => setName(e.target.value)} autoComplete="name" className={input} style={{ borderColor: C.line }} />
-              </label>
-              <label className="block">
-                <span className="text-[15px] font-semibold">휴대전화</span>
-                <input value={phone} onChange={(e) => setPhone(e.target.value)} inputMode="tel" autoComplete="tel" placeholder="010-0000-0000" className={input} style={{ borderColor: C.line }} />
-              </label>
-              <label className="block">
-                <span className="text-[15px] font-semibold">도착 예정 시간</span>
-                <select value={arrival} onChange={(e) => setArrival(e.target.value)} className={input} style={{ borderColor: C.line }}>
-                  <option value="">선택</option>
-                  {ARRIVALS.map((a) => (
-                    <option key={a} value={a}>
-                      {a}
-                    </option>
-                  ))}
-                </select>
-              </label>
-              <label className="block">
-                <span className="text-[15px] font-semibold">
-                  요청사항 <span className="font-normal" style={{ color: C.muted }}>(선택)</span>
-                </span>
-                <textarea value={request} onChange={(e) => setRequest(e.target.value)} rows={3} maxLength={200} className="mt-1 w-full rounded-[6px] border px-3 py-2.5 outline-none focus:border-[#12324a]" style={{ borderColor: C.line }} />
-              </label>
-              <div className="rounded-[6px] p-3 text-[15px]" style={{ background: C.sandSoft }}>
-                <label className="flex cursor-pointer items-start gap-2.5">
-                  <input type="checkbox" checked={agree} onChange={(e) => setAgree(e.target.checked)} className="mt-1 h-5 w-5 shrink-0 accent-[#12324a]" />
-                  <span>환불규정과 유의사항에 동의합니다.</span>
+            <form onSubmit={submit} noValidate className="rounded-[10px] border p-5 md:p-6" style={{ borderColor: C.line }} aria-labelledby="form-title">
+              <h2 id="form-title" className="text-[20px] font-bold" style={{ color: C.navy }}>
+                예약자 정보
+              </h2>
+              <div className="mt-4 grid gap-4">
+                <label className="block">
+                  <span className="text-[15px] font-semibold">예약자명</span>
+                  <input value={name} onChange={(e) => setName(e.target.value)} autoComplete="name" className={input} style={{ borderColor: C.line }} />
                 </label>
-                <button type="button" onClick={() => go("guide", { tab: "refund" })} className="ml-[30px] mt-1 text-[14px] font-semibold underline underline-offset-2" style={{ color: C.navy }}>
-                  환불규정 보기
-                </button>
+                <label className="block">
+                  <span className="text-[15px] font-semibold">휴대전화</span>
+                  <input value={phone} onChange={(e) => setPhone(e.target.value)} inputMode="tel" autoComplete="tel" placeholder="010-0000-0000" className={input} style={{ borderColor: C.line }} />
+                </label>
+                <label className="block">
+                  <span className="text-[15px] font-semibold">도착 예정 시간</span>
+                  <select value={arrival} onChange={(e) => setArrival(e.target.value)} className={input} style={{ borderColor: C.line }}>
+                    <option value="">선택</option>
+                    {ARRIVALS.map((a) => (
+                      <option key={a} value={a}>
+                        {a}
+                      </option>
+                    ))}
+                  </select>
+                </label>
+                <label className="block">
+                  <span className="text-[15px] font-semibold">
+                    요청사항 <span className="font-normal" style={{ color: C.muted }}>(선택)</span>
+                  </span>
+                  <textarea value={request} onChange={(e) => setRequest(e.target.value)} rows={3} maxLength={200} className="mt-1 w-full rounded-[6px] border px-3 py-2.5 outline-none focus:border-[#12324a]" style={{ borderColor: C.line }} />
+                </label>
+                <div className="rounded-[6px] p-3 text-[15px]" style={{ background: C.sandSoft }}>
+                  <label className="flex cursor-pointer items-start gap-2.5">
+                    <input type="checkbox" checked={agree} onChange={(e) => setAgree(e.target.checked)} className="mt-1 h-5 w-5 shrink-0 accent-[#12324a]" />
+                    <span>환불규정과 유의사항에 동의합니다.</span>
+                  </label>
+                  <button type="button" onClick={() => go("guide", { tab: "refund" })} className="ml-[30px] mt-1 text-[14px] font-semibold underline underline-offset-2" style={{ color: C.navy }}>
+                    환불규정 보기
+                  </button>
+                </div>
               </div>
-            </div>
-            {error && (
-              <p className="mt-4 text-[15px] font-semibold" style={{ color: "#b3261e" }} role="alert">
-                {error}
+              {error && (
+                <p className="mt-4 text-[15px] font-semibold" style={{ color: "#b3261e" }} role="alert">
+                  {error}
+                </p>
+              )}
+              <button type="submit" className="mt-5 h-[52px] w-full rounded-[6px] text-[17px] font-bold" style={{ background: C.coral, color: C.navyDeep }}>
+                예약하기{q ? ` · ${won(q.total)}` : ""}
+              </button>
+              <p className="mt-3 text-[13px]" style={{ color: C.muted }}>
+                무통장 입금 · 예약 후 6시간 안에 입금하지 않으면 자동 취소됩니다.
               </p>
-            )}
-            <button type="submit" className="mt-5 h-[52px] w-full rounded-[6px] text-[17px] font-bold" style={{ background: C.coral, color: C.navyDeep }}>
-              예약하기{q ? ` · ${won(q.total)}` : ""}
-            </button>
-            <p className="mt-3 text-[13px]" style={{ color: C.muted }}>
-              무통장 입금 · 예약 후 6시간 안에 입금하지 않으면 자동 취소됩니다.
-            </p>
-          </form>
-        </div>
-      </SubBody>
+            </form>
+          </div>
+        </SubBody>
+      </div>
       <TicketDialog data={ticket} onClose={closeTicket} />
     </>
   );
@@ -1859,7 +1881,7 @@ function GuidePage({ tab, setTab, go, today, checkIn }: { tab: GuideTab; setTab:
           })}
         </div>
 
-        <div role="tabpanel" id={`guide-panel-${tab}`} aria-labelledby={`guide-tab-${tab}`} tabIndex={0} className="mt-8 outline-none">
+        <div key={tab} role="tabpanel" id={`guide-panel-${tab}`} aria-labelledby={`guide-tab-${tab}`} tabIndex={0} className="soft-in mt-8 outline-none">
           {tab === "time" && (
             <table className="w-full border-t-2 text-[16px]" style={{ borderColor: C.navy }}>
               <caption className="sr-only">입실, 퇴실 시간과 추가 요금</caption>

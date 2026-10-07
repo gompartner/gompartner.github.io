@@ -275,7 +275,7 @@ export function ClinicReportDemo() {
         ) : (
           <>
             {step === "customer" && (
-              <section className="grid gap-6 print:hidden lg:grid-cols-[1fr_400px]">
+              <section className="soft-in grid gap-6 print:hidden lg:grid-cols-[1fr_400px]">
                 <div>
                   <h2 className="text-[28px] font-bold leading-[1.3] tracking-[-0.02em]">고객 목록</h2>
                   <ul className="mt-6 grid gap-3 sm:grid-cols-2">
@@ -395,7 +395,7 @@ export function ClinicReportDemo() {
             )}
 
             {step === "input" && customer && (
-              <section className="print:hidden">
+              <section className="soft-in print:hidden">
                 <div className="flex flex-wrap items-end gap-4">
                   <div>
                     <h2 className="text-[28px] font-bold leading-[1.3] tracking-[-0.02em]">{maskName(customer.name)} 님 측정값 입력</h2>
@@ -492,7 +492,7 @@ export function ClinicReportDemo() {
             )}
 
             {step === "report" && (
-              <section>
+              <section className="soft-in">
                 {customer && latest ? (
                   <>
                     <ReportScreen customer={customer} session={latest} previous={previous ?? null} />

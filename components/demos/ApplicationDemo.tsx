@@ -287,7 +287,7 @@ export function ApplicationDemo() {
       {!hydrated ? (
         <p className="py-24 text-center text-[#5b6862]">불러오는 중입니다.</p>
       ) : admin ? (
-        <main className="mx-auto max-w-[1248px] px-4 py-8 pb-28 md:px-6">
+        <main key="admin" className="soft-in mx-auto max-w-[1248px] px-4 py-8 pb-28 md:px-6">
           <AdminView state={state} updateApp={updateApp} reset={() => setState(INITIAL_STATE)} />
         </main>
       ) : (
@@ -401,7 +401,7 @@ function ApplicantView({ state, setState }: { state: ViewState; setState: (u: (s
 
   if (programId && doneId) {
     return (
-      <main className="mx-auto max-w-[1248px] px-4 py-10 pb-28 md:px-6">
+      <main key="done" className="soft-in mx-auto max-w-[1248px] px-4 py-10 pb-28 md:px-6">
         <section className="mx-auto max-w-[640px] overflow-hidden rounded-2xl bg-white ring-1 ring-[#d3dbd7]">
           <div className="relative isolate overflow-hidden bg-[#00745c] px-6 py-10 text-center text-white">
             <Image src={PROGRAMS.find((p) => p.id === programId)!.image} alt="" fill sizes="640px" className="-z-20 object-cover" />
@@ -426,7 +426,7 @@ function ApplicantView({ state, setState }: { state: ViewState; setState: (u: (s
   if (programId) {
     const program = PROGRAMS.find((p) => p.id === programId)!;
     return (
-      <main className="mx-auto max-w-[1248px] px-4 py-8 pb-28 md:px-6">
+      <main key={`form-${programId}`} className="soft-in mx-auto max-w-[1248px] px-4 py-8 pb-28 md:px-6">
         <div className="mx-auto grid max-w-[960px] overflow-hidden rounded-2xl bg-white ring-1 ring-[#d3dbd7] md:grid-cols-[260px_1fr]">
           <aside className="relative isolate overflow-hidden bg-[#00513f] p-6 text-white md:p-8">
             <Image src={program.image} alt="" fill sizes="260px" className="-z-20 object-cover" />
@@ -486,7 +486,7 @@ function ApplicantView({ state, setState }: { state: ViewState; setState: (u: (s
             <h3 className="text-[26px] font-bold tracking-[-0.02em]">
               {STEPS[step - 1]}
             </h3>
-            <div className="mt-6 space-y-5">
+            <div key={step} className="soft-in mt-6 space-y-5">
               {step === 1 && (
                 <>
                   <Field label="성명" error={errors.name}>
@@ -614,7 +614,7 @@ function ApplicantView({ state, setState }: { state: ViewState; setState: (u: (s
   const nearestLeft = nearest ? daysLeft(nearest) : 0;
 
   return (
-    <main className="pb-28">
+    <main key="list" className="soft-in pb-28">
       <section aria-labelledby="notice-title" className="relative isolate overflow-hidden bg-[#0c1f19] text-white">
         <Image
           src="/images/demo-application/hero.jpg"
@@ -960,7 +960,7 @@ function AdminView({
                 <th scope="col" className="px-3 py-2.5 font-bold">진행상태</th>
               </tr>
             </thead>
-            <tbody>
+            <tbody key={`${programFilter}|${statusFilter}`} className="soft-in">
               {filtered.length === 0 ? (
                 <tr>
                   <td colSpan={5} className="px-3 py-12 text-center text-[#5b6862]">

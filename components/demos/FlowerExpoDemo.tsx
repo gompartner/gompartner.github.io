@@ -1279,7 +1279,7 @@ function CoursePage() {
           <p className="text-[17px] font-bold" style={{ color: C.green }}>
             소요시간 {course.hours}
           </p>
-          <ol className="mt-3 space-y-3">
+          <ol key={`${who}-${when}`} className="soft-in mt-3 space-y-3">
             {course.zones.map((id, i) => {
               const z = ZONE_BY_ID[id];
               return (
@@ -1362,7 +1362,7 @@ function BloomPage() {
             </th>
           </tr>
         </thead>
-        <tbody>
+        <tbody key={week} className="soft-in">
           {BLOOMS.map((b) => {
             const stage = b.stages[week];
             return (
@@ -1511,7 +1511,7 @@ function ProgramPage({ today }: { today: number }) {
             </th>
           </tr>
         </thead>
-        <tbody>
+        <tbody key={`${current}-${kind}`} className="soft-in">
           {list.map((p) => (
             <tr key={`${current}-${p.time}-${p.title}`} className="border-b" style={{ borderColor: C.line }}>
               <td className="px-2 py-3 align-top font-bold tabular-nums md:px-3" style={{ color: C.green }}>
@@ -1687,6 +1687,7 @@ export function FlowerExpoDemo() {
     <div className="min-h-screen text-[16px] leading-[1.7] md:text-[17px]" style={{ background: C.cream, color: C.ink }}>
       <Header page={page} go={go} />
       <main ref={mainRef} tabIndex={-1} className="outline-none">
+        <div key={page} className="soft-in">
         {page === "home" ? (
           <Home go={go} openNotice={openNotice} />
         ) : (
@@ -1706,6 +1707,7 @@ export function FlowerExpoDemo() {
             )}
           </SubFrame>
         )}
+        </div>
       </main>
       <Footer />
     </div>

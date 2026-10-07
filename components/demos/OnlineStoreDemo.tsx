@@ -473,6 +473,7 @@ export function OnlineStoreDemo() {
       <TopBanner />
       <Header view={view} count={count} go={go} />
       <main ref={mainRef} tabIndex={-1} className="outline-none">
+        <div key={view.name === "list" ? `list|${view.cat}|${view.query}` : view.name === "detail" ? `detail|${view.id}` : view.name} className="soft-in">
         {view.name === "home" && <Home go={go} />}
         {view.name === "list" && <ListView key={`${view.cat}|${view.query}`} cat={view.cat} initialQuery={view.query} go={go} />}
         {view.name === "detail" && (
@@ -498,6 +499,7 @@ export function OnlineStoreDemo() {
         {view.name === "brand" && <BrandView />}
         {view.name === "community" && <CommunityView key={view.tab} initialTab={view.tab} go={go} />}
         {view.name === "visit" && <VisitView minute={minute} />}
+        </div>
       </main>
       <Footer />
 
@@ -1031,7 +1033,7 @@ function ListView({ cat, initialQuery, go }: { cat: CatId; initialQuery: string;
           </label>
         </div>
       </div>
-      <div className="mt-8">
+      <div key={`${sort}|${list.length > 0}`} className="soft-in mt-8">
         {list.length ? (
           <ProductGrid list={list} go={go} />
         ) : (
@@ -1382,7 +1384,7 @@ function Detail({
             </button>
           ))}
         </div>
-        <div id="dtab-panel" role="tabpanel" aria-labelledby={`dtab-${tab}`} className="pt-8">
+        <div key={tab} id="dtab-panel" role="tabpanel" aria-labelledby={`dtab-${tab}`} className="soft-in pt-8">
           {tab === "info" && <InfoTab p={p} size={size} />}
           {tab === "ship" && <ShipTab minute={minute} region={region} onRegion={onRegion} />}
           {tab === "return" && <ReturnTab />}
@@ -2128,7 +2130,7 @@ function CommunityView({ initialTab, go }: { initialTab: CommunityTab; go: Go })
           </button>
         ))}
       </div>
-      <div id="ctab-panel" role="tabpanel" aria-labelledby={`ctab-${tab}`} className="mt-6">
+      <div key={tab} id="ctab-panel" role="tabpanel" aria-labelledby={`ctab-${tab}`} className="soft-in mt-6">
         {tab === "notice" && (
           <ul className="mx-auto max-w-[860px] border-t" style={{ borderColor: C.ink }}>
             {NOTICES.map((n, i) => (

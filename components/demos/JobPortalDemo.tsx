@@ -305,6 +305,8 @@ export function JobPortalDemo() {
   const [period, setPeriod] = useState<RankPeriod>("일간");
   const [situation, setSituation] = useState<Situation>("취업준비");
   const [nav, setNav] = useState<{ page: MenuName; sub: string }>({ page: "채용정보", sub: "" });
+  // 검색 버튼·추천어·바로가기로 확정할 때만 늘려 목록이 입력마다 깜빡이지 않게 한다
+  const [searchSeq, setSearchSeq] = useState(0);
   const today = useToday();
   const isDesktop = useIsDesktop();
   const reduced = useReducedMotionSafe();
@@ -366,6 +368,7 @@ export function JobPortalDemo() {
   };
 
   const toResults = () => {
+    setSearchSeq((n) => n + 1);
     window.setTimeout(() => document.getElementById("results")?.scrollIntoView({ block: "start", behavior: reduced ? "auto" : "smooth" }), 0);
   };
 
@@ -442,7 +445,7 @@ export function JobPortalDemo() {
         </nav>
       </header>
 
-      <main id="main">
+      <main id="main" key={`${nav.page}|${nav.sub}`} className="soft-in">
         {nav.page !== "채용정보" ? (
           <JobSubPage page={nav.page} sub={nav.sub} today={today} onGo={goMenu} />
         ) : (
@@ -515,7 +518,7 @@ export function JobPortalDemo() {
                     ))}
                   </div>
                 </div>
-                <ol id="rank-list" role="tabpanel" aria-label={`${period} 순위`} className="mt-3 grid grid-flow-col grid-cols-2 grid-rows-5 gap-x-4">
+                <ol key={period} id="rank-list" role="tabpanel" aria-label={`${period} 순위`} className="soft-in mt-3 grid grid-flow-col grid-cols-2 grid-rows-5 gap-x-4">
                   {ranks.map((w, i) => (
                     <li key={w}>
                       <button type="button" onClick={() => searchWord(w)} className="flex h-9 w-full items-center gap-2 text-left text-[16px] hover:underline">
@@ -548,7 +551,7 @@ export function JobPortalDemo() {
                     </button>
                   ))}
                 </div>
-                <ul id="situation-panel" role="tabpanel" aria-labelledby={`situation-tab-${situation}`} className="mt-3 grid grid-cols-2 gap-2">
+                <ul key={situation} id="situation-panel" role="tabpanel" aria-labelledby={`situation-tab-${situation}`} className="soft-in mt-3 grid grid-cols-2 gap-2">
                   {SITUATIONS[situation].map((it) => {
                     const n = shownCount(JOBS.filter((j) => matches(j, { ...EMPTY_FILTERS, ...it.preset })).length);
                     return (
@@ -656,7 +659,7 @@ export function JobPortalDemo() {
                   <th scope="col" className="w-[64px] px-3 py-2.5 text-center font-bold">관심</th>
                 </tr>
               </thead>
-              <tbody className="max-md:block">
+              <tbody key={`${JSON.stringify({ ...filters, q: "" })}|${sort}|${onlySaved}|${page}|${searchSeq}`} className="soft-in max-md:block">
                 {pageRows.map((j) => (
                   <JobRow
                     key={j.id}
@@ -1367,7 +1370,7 @@ function PublicJobs({ today }: { today: Date | null }) {
         </label>
       </div>
 
-      <ul className="mt-3 border-t-2 border-[#1b2a4a]">
+      <ul key={`${kind}-${openOnly}`} className="soft-in mt-3 border-t-2 border-[#1b2a4a]">
         {rows.map(({ r, i }) => {
           const [org, title, k, type, count, startAgo, closeIn, period, hours, pay] = r;
           const closed = closeIn < 0;
@@ -1706,7 +1709,7 @@ function Faq() {
           </button>
         ))}
       </div>
-      <ul className="mt-4 border-t-2 border-[#1b2a4a]">
+      <ul key={cat} className="soft-in mt-4 border-t-2 border-[#1b2a4a]">
         {list.map((f) => {
           const on = open === f.q;
           return (

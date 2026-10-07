@@ -311,11 +311,13 @@ export function ShopAdminDemo() {
           ))}
         </div>
 
-        {tab === "options" ? (
-          <OptionsPanel state={state} setState={setState} rows={rows} variantOf={variantOf} notify={notify} />
-        ) : (
-          <OrdersPanel state={state} setState={setState} notify={notify} />
-        )}
+        <div key={tab} className="soft-in">
+          {tab === "options" ? (
+            <OptionsPanel state={state} setState={setState} rows={rows} variantOf={variantOf} notify={notify} />
+          ) : (
+            <OrdersPanel state={state} setState={setState} notify={notify} />
+          )}
+        </div>
       </main>
 
       {/* 화면 읽기 프로그램은 항상 있는 알림 영역으로 읽는다 */}
@@ -594,7 +596,7 @@ function OptionsPanel({
                     <th scope="col" className="w-24 px-4 py-2.5 text-center">판매상태</th>
                   </tr>
                 </thead>
-                <tbody>
+                <tbody key={filter || "all"} className="soft-in">
                   {visible.slice(0, limit).map((r) => {
                     const key = keyOf(r);
                     const v = variantOf(key);

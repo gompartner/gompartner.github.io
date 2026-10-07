@@ -333,7 +333,7 @@ export function MaintenanceDemo() {
             {tab !== "report" && <HealthBand summary={summary} checksNeedAction={checksNeedAction} now={now} />}
 
             {tab === "requests" && (
-              <section className="mt-8 grid gap-6 lg:grid-cols-[minmax(0,1fr)_380px]">
+              <section className="soft-in mt-8 grid gap-6 lg:grid-cols-[minmax(0,1fr)_380px]">
                 <div className="min-w-0">
                   <div className="flex flex-wrap items-center gap-2">
                     <h2 className="mr-2 text-[22px] font-bold">유지보수 요청 목록</h2>
@@ -441,7 +441,7 @@ export function MaintenanceDemo() {
                     </form>
                   )}
 
-                  <ol className="mt-4 space-y-2" aria-label="수정 요청 목록">
+                  <ol key={`${statusFilter}-${typeFilter}`} className="soft-in mt-4 space-y-2" aria-label="수정 요청 목록">
                     {filtered.map((r) => {
                       const active = r.id === selectedId;
                       return (
@@ -472,7 +472,7 @@ export function MaintenanceDemo() {
                     })}
                   </ol>
                   {filtered.length === 0 && (
-                    <p className="mt-4 rounded-[10px] border border-dashed px-4 py-10 text-center" style={{ borderColor: C.rule, color: C.muted }}>
+                    <p key={`${statusFilter}-${typeFilter}`} className="soft-in mt-4 rounded-[10px] border border-dashed px-4 py-10 text-center" style={{ borderColor: C.rule, color: C.muted }}>
                       검색된 요청이 없습니다.
                     </p>
                   )}
@@ -589,7 +589,7 @@ export function MaintenanceDemo() {
             )}
 
             {tab === "checks" && (
-              <section className="mt-8">
+              <section className="soft-in mt-8">
                 <div className="flex flex-wrap items-baseline gap-3">
                   <h2 className="text-[22px] font-bold">정기점검</h2>
                   <p className="text-[15px]" style={{ color: C.muted }}>
@@ -646,7 +646,7 @@ export function MaintenanceDemo() {
             )}
 
             {tab === "report" && (
-              <section>
+              <section className="soft-in">
                 <div className="mb-4 flex flex-wrap items-center gap-3 print:hidden">
                   <h2 className="text-[22px] font-bold">월간 점검 보고서</h2>
                   <button type="button" onClick={() => window.print()} className={`${primaryBtn} ml-auto`}>

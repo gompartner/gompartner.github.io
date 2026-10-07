@@ -496,6 +496,15 @@ export function LawFirmDemo() {
     go({ page: "booking" });
   };
 
+  useEffect(() => {
+    const f = () => {
+      setNav({ page: "home" });
+      setBookField(null);
+    };
+    window.addEventListener("demo:go-home", f);
+    return () => window.removeEventListener("demo:go-home", f);
+  }, []);
+
   let body: React.ReactNode = null;
   switch (nav.page) {
     case "intro":
@@ -527,7 +536,7 @@ export function LawFirmDemo() {
   return (
     <div className="min-h-screen text-[16px] leading-[1.7] md:text-[17px]" style={{ background: C.ivory, color: C.ink }}>
       <Header nav={nav} go={go} />
-      <main>{nav.page === "home" ? <Home go={go} /> : <SubPage nav={nav} go={go}>{body}</SubPage>}</main>
+      <main key={`${nav.page}:${nav.field ?? ""}`} className="soft-in">{nav.page === "home" ? <Home go={go} /> : <SubPage nav={nav} go={go}>{body}</SubPage>}</main>
       <QuickRail go={go} />
       <Footer />
     </div>
@@ -1209,7 +1218,7 @@ function Practice({
           })}
         </div>
 
-        <div className="mt-6 border p-5 md:p-8" style={{ borderColor: C.line, background: C.white }}>
+        <div key={sit.id} className="soft-in mt-6 border p-5 md:p-8" style={{ borderColor: C.line, background: C.white }}>
           <h3 className="text-[20px] font-bold" style={{ color: C.navy }}>
             {sit.label}
           </h3>
@@ -1514,11 +1523,11 @@ function Cases() {
           <span>등록일</span>
         </div>
         {list.length === 0 ? (
-          <p className="border-b py-10 text-center text-[15px]" style={{ borderColor: C.line, color: C.muted }}>
+          <p key={`${field}-${tag}`} className="soft-in border-b py-10 text-center text-[15px]" style={{ borderColor: C.line, color: C.muted }}>
             조건에 맞는 사례가 없습니다.
           </p>
         ) : (
-          <ul>
+          <ul key={`${field}-${tag}`} className="soft-in">
             {list.map((c) => {
               const no = CASE_ALL - CASES.indexOf(c);
               const on = open === c.title;
@@ -1760,7 +1769,7 @@ function Booking({ minute, initialField }: { minute: number; initialField: Field
             </legend>
             {all.length ? (
               <>
-                <ul className="mt-3 border-t" style={{ borderColor: C.navy }}>
+                <ul key={`${method ?? "all"}-${page}`} className="soft-in mt-3 border-t" style={{ borderColor: C.navy }}>
                   {shown.map((sl) => {
                     const on = slotKey === sl.key;
                     const id = `law-slot-${sl.key}`;

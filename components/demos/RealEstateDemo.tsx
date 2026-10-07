@@ -368,7 +368,7 @@ export function RealEstateDemo() {
   return (
     <div className="min-h-screen overflow-x-clip text-[16px] leading-[1.7] md:text-[17px]" style={{ background: C.white, color: C.ink }}>
       <Header view={view} go={go} basketCount={basket.length} />
-      <main>
+      <main key={view} className="soft-in">
         {view === "search" && (
           <SearchPage
             selectedId={selectedId}
@@ -778,12 +778,12 @@ function SearchPage({
 
           <div className="mt-4">
             {tab === "map" ? (
-              <div id="realty-panel-map" role="tabpanel" aria-labelledby="realty-tab-map">
+              <div id="realty-panel-map" role="tabpanel" aria-labelledby="realty-tab-map" className="soft-in">
                 <MapSearch visible={visible} selectedId={selectedId} onSelect={onSelect} basket={basket} onToggle={onToggle} onReset={() => apply(EMPTY)} />
               </div>
             ) : (
-              <div id="realty-panel-list" role="tabpanel" aria-labelledby="realty-tab-list">
-                <ul className="grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
+              <div id="realty-panel-list" role="tabpanel" aria-labelledby="realty-tab-list" className="soft-in">
+                <ul key={`${JSON.stringify(filter)}-${sort}`} className="soft-in grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
                   {sorted.map((l) => (
                     <ListingCard key={l.id} l={l} selected={l.id === selectedId} saved={basket.includes(l.id)} full={!basket.includes(l.id) && basket.length >= BASKET_MAX} onPick={() => pickFromList(l.id)} onToggle={() => onToggle(l.id)} />
                   ))}
@@ -1402,7 +1402,7 @@ function Calculators({ tab, setTab }: { tab: "fee" | "compare"; setTab: (t: "fee
           );
         })}
       </div>
-      <div id={`calc-panel-${tab}`} role="tabpanel" aria-labelledby={`calc-tab-${tab}`} className="mt-6">
+      <div key={tab} id={`calc-panel-${tab}`} role="tabpanel" aria-labelledby={`calc-tab-${tab}`} className="soft-in mt-6">
         {tab === "fee" ? <FeeCalculator /> : <Compare />}
       </div>
     </>

@@ -922,7 +922,7 @@ export function DistrictPortalDemo() {
           {view ? (
             <SubPage view={view} go={go} openStaff={openStaff} goHome={goHome} />
           ) : (
-          <>
+          <div className="soft-in">
           {/* 첫 화면: 알림판 + 자주 찾는 서비스 */}
           <div className={`${container} grid gap-4 pt-5 md:pt-6 lg:grid-cols-[minmax(0,1.5fr)_minmax(0,1fr)]`}>
             <section aria-labelledby="notice-board-title" aria-roledescription="배너 슬라이드" className="flex min-h-[320px] flex-col overflow-hidden rounded-[12px] bg-white">
@@ -1031,7 +1031,7 @@ export function DistrictPortalDemo() {
               </div>
 
               {searchTab === "all" ? (
-                <div id="search-panel-all" role="tabpanel" aria-labelledby="search-tab-all" className="pt-4">
+                <div key="all" id="search-panel-all" role="tabpanel" aria-labelledby="search-tab-all" className="soft-in pt-4">
                   <form role="search" onSubmit={(e) => e.preventDefault()} className="flex gap-2">
                     <label htmlFor="site-search" className="sr-only">
                       통합검색어
@@ -1058,7 +1058,7 @@ export function DistrictPortalDemo() {
                   </p>
                 </div>
               ) : (
-                <div id="search-panel-staff" role="tabpanel" aria-labelledby="search-tab-staff" className="pt-4">
+                <div key="staff" id="search-panel-staff" role="tabpanel" aria-labelledby="search-tab-staff" className="soft-in pt-4">
                   <label htmlFor="dept-search" className="block text-[15px] font-bold text-[#3a4453]">
                     업무명 또는 부서명
                   </label>
@@ -1159,7 +1159,7 @@ export function DistrictPortalDemo() {
                   <Plus size={16} aria-hidden />
                 </a>
               </div>
-              <ul id="board-panel" role="tabpanel" aria-labelledby={`board-tab-${tab}`} className="divide-y divide-[#e6e9ef]">
+              <ul key={tab} id="board-panel" role="tabpanel" aria-labelledby={`board-tab-${tab}`} className="soft-in divide-y divide-[#e6e9ef]">
                 {BOARD[tab].map((b, i) => (
                   <li key={b.title}>
                     <a
@@ -1249,7 +1249,7 @@ export function DistrictPortalDemo() {
                 })}
               </ul>
               {linkGroup && (
-                <ul id="link-group-panel" aria-label={linkGroup} className="mt-3 grid grid-cols-2 gap-x-4 gap-y-1 rounded-[6px] bg-[#f3f5f8] p-4 sm:grid-cols-3 md:grid-cols-4">
+                <ul key={linkGroup} id="link-group-panel" aria-label={linkGroup} className="soft-in mt-3 grid grid-cols-2 gap-x-4 gap-y-1 rounded-[6px] bg-[#f3f5f8] p-4 sm:grid-cols-3 md:grid-cols-4">
                   {LINK_GROUPS.find((g) => g.title === linkGroup)!.items.map((it) => (
                     <li key={it}>
                       <a
@@ -1269,7 +1269,7 @@ export function DistrictPortalDemo() {
               )}
             </div>
           </section>
-          </>
+          </div>
           )}
         </main>
 
@@ -1347,7 +1347,7 @@ function SubPage({ view, go, openStaff, goHome }: { view: View; go: Go; openStaf
 
   return (
     <>
-      <div className="text-white" style={{ background: NAVY }}>
+      <div key={view.menu} className="soft-in text-white" style={{ background: NAVY }}>
         <div className={`${SUB_CONTAINER} py-7 md:py-10`}>
           <p className="text-[28px] font-bold tracking-[-0.04em] md:text-[34px]">{menu.title}</p>
         </div>
@@ -1381,7 +1381,7 @@ function SubPage({ view, go, openStaff, goHome }: { view: View; go: Go; openStaf
           </ul>
         </nav>
 
-        <div className="min-w-0 rounded-[12px] bg-white p-4 md:p-8">
+        <div key={`${view.menu}-${view.item}`} className="soft-in min-w-0 rounded-[12px] bg-white p-4 md:p-8">
           {/* 위치 표시줄 */}
           <ol aria-label="현재 위치" className="flex flex-wrap items-center gap-1 text-[14px] text-[#5a6473]">
             <li>
@@ -1528,7 +1528,7 @@ function BoardView({ kind, posts, index, onOpen }: { kind: BoardKind; posts: Pos
   const cols = BOARD_COLS[kind];
 
   return (
-    <div>
+    <div className="soft-in">
       <div className="flex flex-wrap items-center justify-between gap-3 rounded-[6px] bg-[#f3f5f8] p-3">
         <p className="text-[15px] text-[#3a4453]">
           전체 <b className="text-[#17212b]">{list.length}</b>건, 1/1페이지
@@ -1585,7 +1585,7 @@ function BoardView({ kind, posts, index, onOpen }: { kind: BoardKind; posts: Pos
             ))}
           </tr>
         </thead>
-        <tbody>
+        <tbody key={`${scope}-${q}`} className="soft-in">
           {list.length === 0 ? (
             <tr>
               <td colSpan={8} className="py-10 text-center text-[#5a6473]">
@@ -1641,7 +1641,7 @@ function PostView({ kind, posts, index, onOpen }: { kind: BoardKind; posts: Post
   const next = posts[index + 1];
 
   return (
-    <article>
+    <article key={index} className="soft-in">
       <div className="border-t-2" style={{ borderColor: NAVY }}>
         <h2 className="bg-[#f7f8fa] px-3 py-3 text-[19px] font-bold leading-[1.45]">{p.title}</h2>
         <dl className="flex flex-wrap gap-x-5 gap-y-1 border-y border-[#dfe3ea] px-3 py-2.5 text-[15px]">

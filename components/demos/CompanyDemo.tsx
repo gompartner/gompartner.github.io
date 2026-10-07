@@ -377,7 +377,7 @@ export function CompanyDemo() {
       <div lang={lang} className="min-h-screen text-[16px] leading-[1.7] md:text-[17px]" style={{ background: C.white, color: C.ink }}>
         <TopBar onLang={setLang} />
         <Header />
-        <main>{route.m === "home" ? <Home /> : <SubPage key={key} m={route.m} s={route.s} />}</main>
+        <main key={key} className="soft-in">{route.m === "home" ? <Home /> : <SubPage m={route.m} s={route.s} />}</main>
         <Footer />
       </div>
     </CoCtx.Provider>
@@ -1170,7 +1170,7 @@ function Location() {
           );
         })}
       </div>
-      <div id="co-visit-panel" role="tabpanel" aria-labelledby={`co-visit-tab-${tab}`} className="pt-6">
+      <div key={tab} id="co-visit-panel" role="tabpanel" aria-labelledby={`co-visit-tab-${tab}`} className="soft-in pt-6">
         {tab === "car" ? (
           <div className="max-w-[760px] space-y-2">
             <p>{x("정문으로 들어와 오른쪽 방문 주차장에 주차해 주십시오. 경비실에서 방문증을 받으시면 됩니다.", "Come in through the main gate and use the visitor lot on the right. Pick up a visitor pass at the guard house.")}</p>
@@ -1300,7 +1300,7 @@ function Machines() {
           {x("합계", "Total")} <strong>{x(`${sum}대`, `${sum} units`)}</strong>
         </p>
       </div>
-      <div className="mt-4">
+      <div key={type} className="soft-in mt-4">
         <DataTable
           caption={x("기계설비 현황", "Machining equipment")}
           head={[x("설비명", "Machine"), x("제조사", "Maker"), x("규격", "Spec"), x("대수", "Units"), x("도입", "Since"), x("가공품", "Parts")]}
@@ -1819,7 +1819,7 @@ function Products({ cat }: { cat: PrCat | "all" }) {
         {x("건", "")}
       </p>
       {list.length > 0 ? (
-        <ul className="mt-5 grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
+        <ul key={prMachine ?? "all"} className="soft-in mt-5 grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
           {list.map((p) => (
             <li key={p.name.ko}>
               <ProductCard p={p} />

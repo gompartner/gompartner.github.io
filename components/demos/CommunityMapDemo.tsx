@@ -482,7 +482,7 @@ export function CommunityMapDemo() {
       </header>
 
       {page !== "map" ? (
-        <div className="min-h-0 flex-1 overflow-y-auto bg-white">
+        <div key={page} className="soft-in min-h-0 flex-1 overflow-y-auto bg-white">
           <SubPage
             page={page}
             now={now}
@@ -494,7 +494,7 @@ export function CommunityMapDemo() {
           />
         </div>
       ) : (
-      <div className="relative min-h-0 flex-1" aria-label="공유공간 지도">
+      <div className="soft-in relative min-h-0 flex-1" aria-label="공유공간 지도">
         <div ref={scroller} className={`absolute inset-0 flex overflow-auto [container-type:size] ${besidePanel}`}>
           <div
             ref={canvas}
@@ -653,7 +653,7 @@ export function CommunityMapDemo() {
                   </button>
                 </div>
               ) : (
-                <ul className="min-h-0 flex-1 divide-y overflow-y-auto pb-24" style={{ borderColor: LINE }}>
+                <ul key={[cats.join(","), openOnly, fee, pick, status].join("|")} className="soft-in min-h-0 flex-1 divide-y overflow-y-auto pb-24" style={{ borderColor: LINE }}>
                   {filtered.map((p) => {
                     const c = categoryOf(p.category);
                     const Icon = c.icon;
@@ -1204,7 +1204,7 @@ function MyReservations({ now, store, onCancel, onGo }: { now: Date | null; stor
           </button>
         </div>
       ) : (
-        <ul className="mt-4 border-t-2" style={{ borderColor: INK }}>
+        <ul key={tab} className="soft-in mt-4 border-t-2" style={{ borderColor: INK }}>
           {list.map(({ r, state }) => {
             const place = PLACES.find((p) => p.id === r.placeId)!;
             const c = categoryOf(place.category);
@@ -1289,7 +1289,7 @@ function NoticeView({ idx, setIdx }: { idx: number | null; setIdx: (i: number | 
     const prev = NOTICES[idx - 1];
     const next = NOTICES[idx + 1];
     return (
-      <article>
+      <article key={idx} className="soft-in">
         <div className="border-t-2" style={{ borderColor: INK }}>
           <h2 className="bg-[#f6faf7] px-3 py-3 text-[19px] font-bold">{n.title}</h2>
           <p className="flex gap-5 border-y px-3 py-2 text-[15px]" style={{ borderColor: LINE, color: INK_SOFT }}>
@@ -1334,7 +1334,7 @@ function NoticeView({ idx, setIdx }: { idx: number | null; setIdx: (i: number | 
     );
   }
   return (
-    <div>
+    <div className="soft-in">
       <p className="text-[16px]" style={{ color: INK_SOFT }}>
         총 <b style={{ color: LEAF }}>{NOTICES.length}</b>건
       </p>

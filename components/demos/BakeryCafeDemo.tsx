@@ -328,14 +328,14 @@ export function BakeryCafeDemo() {
     <div className="min-h-screen text-[16px] leading-[1.7] md:text-[17px]" style={{ background: C.cream, color: C.ink }}>
       <Header view={view} count={count} onGo={go} />
       {view === "home" ? (
-        <main>
+        <main key="home" className="soft-in">
           <Banner onGo={go} />
           <Oven clock={clock} onAdd={(id) => add(id, 1)} />
           <MenuGrid clock={clock} cart={cart} onAdd={add} onGo={go} />
           <Store />
         </main>
       ) : (
-        <main>
+        <main key={view} className="soft-in">
           <SubPage view={view} onGo={go}>
             {body}
           </SubPage>
@@ -852,7 +852,7 @@ function MenuGrid({
           </div>
         </div>
 
-        <ul className="mt-6 grid grid-cols-2 gap-x-3 gap-y-6 sm:grid-cols-3 lg:grid-cols-4 lg:gap-x-5">
+        <ul key={`${cat}|${state}`} className="soft-in mt-6 grid grid-cols-2 gap-x-3 gap-y-6 sm:grid-cols-3 lg:grid-cols-4 lg:gap-x-5">
           {list.map(({ b, s }) => {
             const n = cart[b.id] ?? 0;
             const badge = nowBadge(s);

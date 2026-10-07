@@ -632,7 +632,7 @@ export function HomepageDemo() {
       </nav>
 
       {/* 첫 화면은 하위 화면에 있는 동안 숨겨만 둔다(지도 크기 측정, 예약 상태 유지) */}
-      <div hidden={page !== "home"}>
+      <div hidden={page !== "home"} className="soft-in">
       {/* 첫 화면: 매장 안으로 걸어 들어가는 영상 */}
       <header id="top" className="relative h-svh min-h-[600px] overflow-hidden bg-[#111]">
         <video
@@ -1597,7 +1597,7 @@ function GymSubPage({
           })}
         </ul>
       </div>
-      <div className="mx-auto max-w-6xl px-4 pt-10 sm:pt-14">{children}</div>
+      <div key={page} className="soft-in mx-auto max-w-6xl px-4 pt-10 sm:pt-14">{children}</div>
     </main>
   );
 }
@@ -1640,7 +1640,7 @@ function BranchPage({
         </ul>
       </nav>
 
-      <div className="min-w-0">
+      <div key={loc.id} className="soft-in min-w-0">
         <div className="grid gap-8 md:grid-cols-[1fr_1fr]">
           <img src={loc.img} alt={`${loc.name} 내부`} className="aspect-[4/3] w-full rounded-lg object-cover" />
           <div className="min-w-0">

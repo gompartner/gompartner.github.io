@@ -460,7 +460,7 @@ export function ExcelAutomationDemo() {
           </div>
 
           {tab === "취합" && (
-            <div className="overflow-auto bg-white" style={{ maxHeight: "calc(100vh - 150px)" }}>
+            <div className="soft-in overflow-auto bg-white" style={{ maxHeight: "calc(100vh - 150px)" }}>
               <table className="border-collapse text-[14px]" aria-label="주문취합 시트">
                 <thead className="sticky top-0 z-10">
                   <tr>
@@ -570,7 +570,7 @@ export function ExcelAutomationDemo() {
           )}
 
           {tab === "집계" && (
-            <section aria-label="품목별 집계" className="bg-white p-5 md:p-6">
+            <section aria-label="품목별 집계" className="soft-in bg-white p-5 md:p-6">
               <p className="text-[15px]" style={{ color: C.muted }}>
                 정상 {valid.length}행 기준 (오류 행 제외)
               </p>
@@ -611,7 +611,7 @@ export function ExcelAutomationDemo() {
           )}
 
           {tab === "발주서" && (
-            <section aria-label="거래처별 발주서" className="p-4 md:p-6">
+            <section aria-label="거래처별 발주서" className="soft-in p-4 md:p-6">
               <div className="flex flex-wrap items-center justify-between gap-3">
                 <p className="text-[15px]" style={{ color: C.muted }}>
                   발주서 {byClient.length}건

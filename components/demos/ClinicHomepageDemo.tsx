@@ -321,7 +321,7 @@ export function ClinicHomepageDemo() {
         )}
       </header>
 
-      <main>
+      <main key={page} className="soft-in">
         {page === "home" && <Home now={now} go={go} />}
         {page === "medical" && <MedicalPage now={now} />}
         {page === "beauty" && <BeautyPage go={go} />}
@@ -701,7 +701,7 @@ function EquipmentSection() {
       </h2>
       <div className="mt-6">
         <Tabs id="equip" label="장비 분류" tabs={EQUIP} value={tab} onChange={setTab} accent={TRACK.beauty.accent} />
-        <ul id="equip-panel" role="tabpanel" aria-labelledby={`equip-tab-${tab}`} className="grid gap-x-8 sm:grid-cols-2 lg:grid-cols-3">
+        <ul key={tab} id="equip-panel" role="tabpanel" aria-labelledby={`equip-tab-${tab}`} className="soft-in grid gap-x-8 sm:grid-cols-2 lg:grid-cols-3">
           {current.items.map((e) => (
             <li key={e.name} className="border-b py-5" style={{ borderColor: C.line }}>
               <p className="text-[20px] font-semibold tracking-[-0.02em]">{e.name}</p>
@@ -899,7 +899,7 @@ function BeautyPage({ go }: { go: (p: Page, tab?: "price" | "legal") => void }) 
 
       <section className={`${container} py-12 md:py-16`} aria-label="시술 분류">
         <Tabs id="cat" label="시술 분류" tabs={CATS} value={cat} onChange={setCat} accent={t.accent} />
-        <div id="cat-panel" role="tabpanel" aria-labelledby={`cat-tab-${cat}`} className="grid gap-8 pt-8 lg:grid-cols-12">
+        <div key={cat} id="cat-panel" role="tabpanel" aria-labelledby={`cat-tab-${cat}`} className="soft-in grid gap-8 pt-8 lg:grid-cols-12">
           <div className="lg:col-span-4">
             <div className="relative aspect-[4/3] overflow-hidden rounded-[16px]" style={{ backgroundColor: t.soft }}>
               <Image src={`${IMG}/${current.img}.jpg`} alt="" fill sizes="(min-width:1024px) 400px, 100vw" className="object-cover" />
@@ -953,7 +953,7 @@ function FeesPage({ tab, setTab }: { tab: "price" | "legal"; setTab: (t: "price"
           onChange={setTab}
           accent={C.ink}
         />
-        <div id="fee-panel" role="tabpanel" aria-labelledby={`fee-tab-${tab}`} className="pt-8">
+        <div key={tab} id="fee-panel" role="tabpanel" aria-labelledby={`fee-tab-${tab}`} className="soft-in pt-8">
           {tab === "price" ? (
             <div className="space-y-10">
               {groups.map((g) => (

@@ -645,7 +645,7 @@ export function DentalHomepageDemo() {
     <div className="min-h-screen text-[17px] leading-[1.5]" style={{ backgroundColor: C.paper, color: C.ink }}>
       <SiteHeader view={view} go={go} />
 
-      <main id="top">
+      <main id="top" key={view.page === "home" ? "home" : `${view.menu}-${view.sub}`} className="soft-in">
         {view.page === "home" ? (
           <HomePage go={go} reserve={reserve} linkOut={linkOut} />
         ) : (

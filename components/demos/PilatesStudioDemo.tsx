@@ -453,7 +453,7 @@ export function PilatesStudioDemo() {
   return (
     <div className="min-h-screen text-[16px] leading-[1.7] md:text-[17px]" style={{ background: C.paper, color: C.ink }}>
       <Header nav={nav} go={go} onConsult={consult} />
-      <main>
+      <main key={`${nav.page}-${nav.program ?? ""}`} className="soft-in">
         {nav.page === "home" ? (
           <>
             <Intro onConsult={consult} />
@@ -951,7 +951,7 @@ function Schedule({
               </button>
             ))}
           </div>
-          <ul>
+          <ul key={mobileDay} className="soft-in">
             {SESSIONS.filter((s) => s.day === mobileDay).map((s) => (
               <li key={s.id} className="grid grid-cols-[56px_1fr] items-start gap-2 border-b py-2" style={{ borderColor: C.line }}>
                 <span className="pt-3 text-[15px] font-semibold" style={{ color: C.muted }}>
@@ -1108,7 +1108,7 @@ function Finder({ onSchedule, onBook }: { onSchedule: (t: ClassType, level?: Lev
   return (
     <div className="max-w-[720px] rounded-[12px] border p-5 md:p-7" style={{ background: C.card, borderColor: C.line }}>
       {q ? (
-        <>
+        <div key={step} className="soft-in">
           <p className="text-[14px]" style={{ color: C.muted }}>
             {step + 1} / {questions.length}
           </p>
@@ -1132,7 +1132,7 @@ function Finder({ onSchedule, onBook }: { onSchedule: (t: ClassType, level?: Lev
               </button>
             ))}
           </div>
-        </>
+        </div>
       ) : (
         rec &&
         info && (
@@ -1916,7 +1916,7 @@ function Board({ items, label }: { items: Post[]; label: string }) {
     const prev = items[idx + 1];
     const next = items[idx - 1];
     return (
-      <article aria-labelledby="post-title">
+      <article key={item.no} aria-labelledby="post-title" className="soft-in">
         <div className="border-b border-t-2 py-4" style={{ borderTopColor: C.indigo, borderBottomColor: C.line }}>
           <h2 id="post-title" ref={headRef} tabIndex={-1} className="text-[21px] font-bold leading-[1.4] tracking-[-0.02em] outline-none md:text-[24px]">
             {item.title}
@@ -1970,7 +1970,7 @@ function Board({ items, label }: { items: Post[]; label: string }) {
   }
 
   return (
-    <section aria-label={`${label} 목록`}>
+    <section aria-label={`${label} 목록`} className="soft-in">
       <p className="text-[15px]" style={{ color: C.muted }}>
         전체 <b className="font-semibold" style={{ color: C.ink }}>{items.length}</b>건
       </p>

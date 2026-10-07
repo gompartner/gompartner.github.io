@@ -373,7 +373,7 @@ export function HanokCafeDemo() {
         <SideNav page={page} go={go} groupId={groupId} onGroup={pickGroup} />
         <TopNav page={page} go={go} groupId={groupId} onGroup={pickGroup} />
         <div className="min-w-0 flex-1">
-          <main>
+          <main key={page} className="soft-in">
             {page === "home" ? (
               <>
                 <Intro onReserve={() => scrollTo("space")} onMenuBoard={openMenuBoard} />
@@ -1658,7 +1658,7 @@ function MenuPage() {
             );
           })}
         </div>
-        <div className={`mt-6 grid gap-x-10 gap-y-8 ${kinds.length > 1 ? "md:grid-cols-2" : "max-w-[640px]"}`}>
+        <div key={cat} className={`soft-in mt-6 grid gap-x-10 gap-y-8 ${kinds.length > 1 ? "md:grid-cols-2" : "max-w-[640px]"}`}>
           {kinds.map((k) => (
             <div key={k} className="min-w-0">
               <p className="border-b-2 border-[#1f1b16] pb-1.5 text-[18px] font-bold text-[#a8432a]">{KIND_LABEL[k]}</p>

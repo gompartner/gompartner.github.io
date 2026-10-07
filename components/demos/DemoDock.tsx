@@ -17,7 +17,8 @@ type Rect = { top: number; left: number; width: number; height: number };
 /** 선택자로 찾은 요소가 제목이면 그 제목이 속한 구역 전체를 비춘다. */
 function resolve(selector: string): HTMLElement | null {
   const el = document.querySelector<HTMLElement>(selector);
-  if (!el) return null;
+  // 숨겨진 화면(하위 화면에 있을 때의 첫 화면 등)에 있는 요소는 없는 것으로 본다
+  if (!el || el.getClientRects().length === 0) return null;
   if (/^H[1-6]$/.test(el.tagName)) return el.closest<HTMLElement>("section") ?? el.parentElement;
   return el;
 }
@@ -39,13 +40,20 @@ export function DemoDock({ projectId, story, tour }: { projectId: string; story?
     setRect(null);
   };
 
-  // 화면에 실제로 있는 단계만 쓴다 (탭에 가려진 영역 등)
+  // 화면에 실제로 있는 단계만 쓴다 (탭에 가려진 영역 등).
+  // 하위 화면에 있어 안내할 영역이 없으면 데모에 첫 화면으로 돌아가라고 알리고 잠시 뒤 다시 찾는다.
   const start = useCallback(() => {
-    const list = (tour ?? []).filter((s) => resolve(s.target));
-    if (!list.length) return;
-    resolve(list[0].target)?.scrollIntoView({ block: "center", behavior: "instant" as ScrollBehavior });
-    setSteps(list);
-    setStep(0);
+    const begin = () => {
+      const list = (tour ?? []).filter((s) => resolve(s.target));
+      if (!list.length) return false;
+      resolve(list[0].target)?.scrollIntoView({ block: "center", behavior: "instant" as ScrollBehavior });
+      setSteps(list);
+      setStep(0);
+      return true;
+    };
+    if (begin()) return;
+    window.dispatchEvent(new Event("demo:go-home"));
+    window.setTimeout(begin, 350);
   }, [tour]);
 
   // 가이드는 자동으로 열지 않는다. 한 번도 열지 않았으면 물음표 버튼을 반짝여 알린다.

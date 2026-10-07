@@ -758,7 +758,7 @@ function Home({ go }: { go: (r: Route) => void }) {
             onSelect={setTab}
           />
         </div>
-        <ul className="mt-7 grid grid-cols-1 gap-x-5 gap-y-9 sm:grid-cols-2 lg:grid-cols-4">
+        <ul key={tab} className="soft-in mt-7 grid grid-cols-1 gap-x-5 gap-y-9 sm:grid-cols-2 lg:grid-cols-4">
           {list.map((c) => (
             <CourseCard key={c.id} c={c} onOpen={() => go({ name: "course", id: c.id })} />
           ))}
@@ -858,7 +858,7 @@ function SiteCoursesPage({ cat, go }: { cat: Category | "전체"; go: (r: Route)
       <p className="mt-6 text-[15px] tabular-nums" style={{ color: C.muted }}>
         총 <b style={{ color: C.text }}>{list.length}</b>개 과정
       </p>
-      <ul className="mt-4 grid grid-cols-1 gap-x-5 gap-y-9 sm:grid-cols-2 lg:grid-cols-4">
+      <ul key={cat} className="soft-in mt-4 grid grid-cols-1 gap-x-5 gap-y-9 sm:grid-cols-2 lg:grid-cols-4">
         {list.map((c) => (
           <CourseCard key={c.id} c={c} onOpen={() => go({ name: "course", id: c.id })} />
         ))}
@@ -1137,7 +1137,7 @@ function SupportPage({ tab, go, loggedIn, notify }: { tab: SupportTab; go: (r: R
       </div>
 
       {tab !== "ask" && (
-        <ul className="mt-2">
+        <ul key={tab} className="soft-in mt-2">
           {(tab === "notice" ? D.siteNotices.map((n) => ({ head: n.title, sub: n.date, body: n.body })) : FAQ.map((f) => ({ head: f.q, sub: "", body: [f.a] }))).map((n, k) => (
             <li key={n.head} className="border-b" style={{ borderColor: C.line }}>
               <button type="button" aria-expanded={open === k} onClick={() => setOpen(open === k ? null : k)} className="flex w-full items-center gap-3 py-4 text-left">
@@ -1169,7 +1169,7 @@ function SupportPage({ tab, go, loggedIn, notify }: { tab: SupportTab; go: (r: R
       {tab === "ask" &&
         (loggedIn ? (
           <form
-            className="mt-8 grid max-w-[720px] gap-4"
+            className="soft-in mt-8 grid max-w-[720px] gap-4"
             onSubmit={(e) => {
               e.preventDefault();
               setTitle("");
@@ -1192,7 +1192,7 @@ function SupportPage({ tab, go, loggedIn, notify }: { tab: SupportTab; go: (r: R
             </div>
           </form>
         ) : (
-          <div className="mt-12 text-center">
+          <div className="soft-in mt-12 text-center">
             <p className="text-[16px]">로그인 후 이용할 수 있습니다.</p>
             <button type="button" onClick={() => go({ name: "login", next: { name: "support", tab: "ask" } })} className="mt-4 h-12 rounded-md px-8 text-[15px] font-bold text-white" style={{ background: C.text }}>
               로그인
@@ -1308,7 +1308,7 @@ export function LmsDemo() {
             }}
             onReset={reset}
           />
-          <main>
+          <main key={route.name === "course" ? `course:${route.id}` : route.name} className="soft-in">
             {route.name === "home" && <Home go={go} />}
             {route.name === "courses" && <SiteCoursesPage cat={route.cat} go={go} />}
             {route.name === "course" && <CourseDetail key={route.id} id={route.id} state={state} setState={setState} go={go} notify={notify} />}
@@ -1354,7 +1354,7 @@ export function LmsDemo() {
               </button>
             </div>
           </header>
-          <main className="mx-auto max-w-[1200px] px-4 pt-5 md:px-6">
+          <main className="soft-in mx-auto max-w-[1200px] px-4 pt-5 md:px-6">
             <AdminView state={state} setState={setState} myProgress={progress} myDone={done} notify={notify} />
           </main>
         </>
@@ -1441,7 +1441,7 @@ function LearnerView({ state, setState, ratios, done, progress, notify }: { stat
       )}
 
       {page === "ongoing" && !inRoom && (
-        <div className="mt-8">
+        <div className="soft-in mt-8">
           <section aria-labelledby="resume-title" className="grid gap-6 rounded-[12px] border p-4 md:grid-cols-[minmax(0,340px)_minmax(0,1fr)] md:p-5" style={{ borderColor: C.line }}>
             <div className="relative aspect-video overflow-hidden rounded-lg" style={{ background: C.soft }}>
               <Image src={excel.img} alt={excel.imgAlt} fill sizes="(min-width: 768px) 340px, 100vw" className="object-cover" />
@@ -1542,7 +1542,7 @@ function LearnerView({ state, setState, ratios, done, progress, notify }: { stat
       )}
 
       {page === "ended" && (
-        <ul className="mt-4">
+        <ul className="soft-in mt-4">
           {D.history.map((r) => (
             <li key={r[0]} className={rowCls} style={{ borderColor: C.line }}>
               <span className="min-w-0 flex-1">
@@ -1560,7 +1560,7 @@ function LearnerView({ state, setState, ratios, done, progress, notify }: { stat
       )}
 
       {page === "cert" && (
-        <ul className="mt-4">
+        <ul className="soft-in mt-4">
           <li className={rowCls} style={{ borderColor: C.line }}>
             <span className="min-w-0 flex-1">
               <span className="block text-[16px] font-bold">{COURSE.title}</span>
@@ -1666,7 +1666,7 @@ function CourseRoom({
   ];
 
   return (
-    <div className="grid grid-cols-1">
+    <div className="soft-in grid grid-cols-1">
       <nav aria-label="현재 위치" className="flex items-center gap-1 text-[14px]" style={{ color: C.muted }}>
         <button type="button" onClick={onBack} className="underline-offset-2 hover:underline">
           나의 강의실
@@ -1736,7 +1736,7 @@ function CourseRoom({
         />
       </div>
 
-      <div className="mt-6">
+      <div key={tab} className="soft-in mt-6">
         {tab === "study" && (
           <section id="room-panel-study" role="tabpanel" aria-label="강의 보기">
             <ol className="overflow-hidden rounded-[12px] border" style={{ borderColor: C.line }}>
@@ -1856,7 +1856,7 @@ function ExamTab({ state, setState, progress, notify }: { state: State; setState
       setMode("list");
     };
     return (
-      <div id="room-panel-exam" role="tabpanel" aria-labelledby="room-tab-exam" className="p-4">
+      <div key={mode} id="room-panel-exam" role="tabpanel" aria-labelledby="room-tab-exam" className="soft-in p-4">
         <div className="flex flex-wrap items-center gap-2 border-b pb-3" style={{ borderColor: C.line }}>
           <h3 className="mr-auto text-[17px] font-bold">{name}</h3>
           {!isSurvey && (
@@ -1904,7 +1904,7 @@ function ExamTab({ state, setState, progress, notify }: { state: State; setState
   }
 
   return (
-    <div id="room-panel-exam" role="tabpanel" aria-labelledby="room-tab-exam" className="relative overflow-x-auto">
+    <div key="list" id="room-panel-exam" role="tabpanel" aria-labelledby="room-tab-exam" className="soft-in relative overflow-x-auto">
       <table className="w-full min-w-[620px] text-[15px]">
         <thead style={{ background: C.head }}>
           <tr>
@@ -2507,7 +2507,7 @@ function AdminView({ state, setState, myProgress, myDone, notify }: { state: Sta
         current={page}
         onSelect={setPage}
       />
-      <div className="grid min-w-0 grid-cols-1 content-start gap-4">
+      <div key={page} className="soft-in grid min-w-0 grid-cols-1 content-start gap-4">
         {page !== "courses" && page !== "sms" && (
           <div className="flex flex-wrap items-baseline gap-x-4 gap-y-1">
             <h2 className="text-[20px] font-bold">
@@ -2678,7 +2678,7 @@ function StatusPage({ rows, setState, notify, myProgress }: { rows: Row[]; setSt
                 <th scope="col" className={th}>수료여부</th>
               </tr>
             </thead>
-            <tbody className="tabular-nums">
+            <tbody key={`${filter.cond}-${filter.dept}-${filter.q}-${cur}`} className="soft-in tabular-nums">
               {view.map((r, k) => (
                 <RowGroup key={r.id} r={r} no={list.length - ((cur - 1) * PAGE_SIZE + k)} open={open === r.id} onOpen={() => setOpen(open === r.id ? null : r.id)} checked={selected.has(r.id)} onCheck={() => toggle(r.id)} reduce={reduce} />
               ))}
@@ -2980,7 +2980,7 @@ function CompletePage({ rows, setState, notify }: { rows: Row[]; setState: SetSt
               {tab === "done" && <th scope="col" className={th}>수료번호</th>}
             </tr>
           </thead>
-          <tbody className="tabular-nums">
+          <tbody key={tab} className="soft-in tabular-nums">
             {list.map((r) => (
               <tr key={r.id} className="border-t" style={{ borderColor: C.line, background: r.live ? C.brandSoft : undefined }}>
                 {tab === "wait" && (

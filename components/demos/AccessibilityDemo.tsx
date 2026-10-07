@@ -305,7 +305,7 @@ function SamplePage({
   return (
     <div
       lang="ko"
-      className={`font-sans text-[#222] ${good ? "" : "[&_*:focus-visible]:outline-none [&_*:focus]:outline-none"}`}
+      className={`soft-in font-sans text-[#222] ${good ? "" : "[&_*:focus-visible]:outline-none [&_*:focus]:outline-none"}`}
     >
       <Region {...region("header")}>
         {good && (

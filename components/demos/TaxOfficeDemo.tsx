@@ -502,7 +502,7 @@ export function TaxOfficeDemo() {
   return (
     <div className="min-h-screen text-[16px] leading-[1.7] md:text-[17px]" style={{ background: C.paper, color: C.ink }}>
       <Header view={view} go={go} />
-      <main>
+      <main key={view} className="soft-in">
         {view === "home" ? (
           <Home
             minute={minute}
@@ -1230,7 +1230,7 @@ function Schedule({
 
           <ul className="min-h-[180px] p-2" aria-live="polite">
             {today && inMonth.length === 0 && (
-              <li className="px-3 py-6 text-center text-[15px]" style={{ color: C.muted }}>
+              <li key={`${ym.y}-${ym.m}-empty`} className="soft-in px-3 py-6 text-center text-[15px]" style={{ color: C.muted }}>
                 이 달은 신고 기한이 없습니다.
               </li>
             )}
@@ -1239,7 +1239,7 @@ function Schedule({
                 const past = d.real < today;
                 const on = selected?.id === d.id;
                 return (
-                  <li key={d.id}>
+                  <li key={`${ym.y}-${ym.m}-${d.id}`} className="soft-in">
                     <button
                       type="button"
                       aria-pressed={on}
@@ -1545,7 +1545,7 @@ function Board({ board, setBoard, postId, setPostId }: { board: BoardId; setBoar
         </ul>
       </nav>
 
-      <div className="min-w-0">
+      <div key={post ? `post-${post.id}` : `list-${board}`} className="soft-in min-w-0">
         {post ? (
           <article aria-labelledby="post-title" className="rounded-[10px] border bg-white" style={{ borderColor: C.line }}>
             <div className="border-b px-5 py-4 md:px-7" style={{ borderColor: C.ink }}>

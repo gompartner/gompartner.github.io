@@ -350,7 +350,7 @@ export function CertLabDemo() {
       <div className="min-h-screen text-[16px] leading-[1.7] md:text-[17px]" style={{ background: C.white, color: C.ink }}>
         <UtilBar />
         <Header />
-        <main>{route.m === "home" ? <Home /> : <SubPage key={key} m={route.m} s={route.s} />}</main>
+        <main key={key} className="soft-in">{route.m === "home" ? <Home /> : <SubPage m={route.m} s={route.s} />}</main>
         <Footer />
         <FloatingContact />
       </div>
@@ -1833,7 +1833,7 @@ function GlobalPage({ id }: { id: RegionId }) {
             );
           })}
         </div>
-        <div id="cl-country-panel" role="tabpanel" aria-labelledby={`cl-country-${ci}`} className="mt-5 grid gap-8">
+        <div key={ci} id="cl-country-panel" role="tabpanel" aria-labelledby={`cl-country-${ci}`} className="soft-in mt-5 grid gap-8">
           <section aria-labelledby="cl-gl-overview">
             <SubHead id="cl-gl-overview">인증개요</SubHead>
             <div className="mt-3">
@@ -2590,7 +2590,7 @@ function Tracking() {
       </form>
 
       {result && (
-        <div className="mt-6 rounded-[10px] border bg-white" style={{ borderColor: C.line }} aria-live="polite">
+        <div key={result.no} className="soft-in mt-6 rounded-[10px] border bg-white" style={{ borderColor: C.line }} aria-live="polite">
           <div className="flex flex-wrap items-center justify-between gap-x-6 gap-y-2 border-b px-5 py-4 md:px-6" style={{ borderColor: C.line }}>
             <div className="min-w-0">
               <p className="text-[14px] tabular-nums" style={{ color: C.muted }}>
@@ -2777,7 +2777,7 @@ function Verify() {
       <div aria-live="polite" className="mt-6">
         {r &&
           (valid ? (
-            <div>
+            <div key={`ok-${shown}`} className="soft-in">
               <p className="mb-3 inline-flex items-center gap-2 rounded-[8px] px-3 py-1.5 font-bold" style={{ background: C.okSoft, color: C.ok }}>
                 <Check size={18} strokeWidth={3} aria-hidden />
                 발급된 성적서입니다
@@ -2794,7 +2794,7 @@ function Verify() {
               />
             </div>
           ) : (
-            <p className="inline-flex items-center gap-2 rounded-[8px] px-3 py-2 font-bold" style={{ background: C.errorSoft, color: C.error }}>
+            <p key={`no-${shown}`} className="soft-in inline-flex items-center gap-2 rounded-[8px] px-3 py-2 font-bold" style={{ background: C.errorSoft, color: C.error }}>
               <CircleAlert size={18} aria-hidden />
               발급 기록이 없는 번호입니다. {TEL}로 문의해 주십시오.
             </p>
@@ -2858,7 +2858,11 @@ function stdOf(certs: string[]) {
 
 function Quote() {
   const { quoteForm, setQuoteForm, rows } = useCl();
-  return quoteForm ? <QuoteForm onList={() => setQuoteForm(false)} /> : <QuoteList onWrite={() => setQuoteForm(true)} rows={rows} />;
+  return (
+    <div key={quoteForm ? "form" : "list"} className="soft-in">
+      {quoteForm ? <QuoteForm onList={() => setQuoteForm(false)} /> : <QuoteList onWrite={() => setQuoteForm(true)} rows={rows} />}
+    </div>
+  );
 }
 
 function QuoteList({ rows, onWrite }: { rows: QuoteRow[]; onWrite: () => void }) {

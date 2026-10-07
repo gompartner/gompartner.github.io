@@ -241,22 +241,24 @@ export function PharmacyDemo() {
     <div className="min-h-screen text-[17px] leading-[1.6]" style={{ background: C.bg, color: C.ink }}>
       <Header big={big} onBig={() => setBig((v) => !v)} status={status} page={page} go={go} />
       <main style={{ zoom: big ? 1.18 : 1 }} className="px-4 pb-16 pt-5 md:px-6 md:pt-8">
-        {page === "home" ? (
-          <div className="mx-auto max-w-[1200px] space-y-5 md:space-y-6">
-            <Intro />
-            <div className="grid items-start gap-5 md:gap-6 lg:grid-cols-[1.15fr_1fr]">
-              <Hours minute={minute} />
-              <Location />
+        <div key={page} className="soft-in">
+          {page === "home" ? (
+            <div className="mx-auto max-w-[1200px] space-y-5 md:space-y-6">
+              <Intro />
+              <div className="grid items-start gap-5 md:gap-6 lg:grid-cols-[1.15fr_1fr]">
+                <Hours minute={minute} />
+                <Location />
+              </div>
+              <Prescription status={status} />
+              <Stock />
+              <Pillbox minute={minute} />
             </div>
-            <Prescription status={status} />
-            <Stock />
-            <Pillbox minute={minute} />
-          </div>
-        ) : (
-          <SubPage page={page} go={go}>
-            {body}
-          </SubPage>
-        )}
+          ) : (
+            <SubPage page={page} go={go}>
+              {body}
+            </SubPage>
+          )}
+        </div>
       </main>
       <Footer />
     </div>
@@ -1228,7 +1230,7 @@ function Stock() {
         </p>
       )}
 
-      <ul className="mt-4 grid gap-x-6 md:grid-cols-2">
+      <ul key={q ? "search" : `${kind}-${cat}`} className="soft-in mt-4 grid gap-x-6 md:grid-cols-2">
         {list.map((s) => {
           const st = STATE_LABEL[s.state];
           const asked = requested.includes(s.name);
