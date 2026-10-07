@@ -318,15 +318,15 @@ export function BakeryCafeDemo() {
 
 /* ---------- 로고, 머리글 ---------- */
 
-function Logo({ light = false }: { light?: boolean }) {
+function Logo() {
   return (
     <span className="inline-flex items-center gap-2">
-      <svg width="30" height="30" viewBox="0 0 30 30" aria-hidden>
-        <path d="M4 20 Q15 2 26 20 Q20 16 15 17 Q10 16 4 20Z" fill={light ? C.butter : C.crust} />
-        <path d="M11 11 L13 17 M15 9 V17 M19 11 L17 17" stroke={light ? C.crustDeep : C.butter} strokeWidth="1.6" strokeLinecap="round" />
-        <path d="M5 24 H25" stroke={light ? C.butter : C.crust} strokeWidth="2" strokeLinecap="round" />
-      </svg>
-      <span className="text-[19px] font-bold tracking-[-0.02em]">{BAKERY}</span>
+      {/* eslint-disable-next-line @next/next/no-img-element */}
+      <img src="/images/logo.svg" alt="" aria-hidden width={28} height={28} className="h-7 w-7 shrink-0" />
+      <span className="inline-flex items-baseline gap-1.5 whitespace-nowrap">
+        <span className="text-[19px] font-bold tracking-[-0.02em]">곰파트너</span>
+        <span className="text-[12px] font-semibold opacity-80">베이커리</span>
+      </span>
     </span>
   );
 }
@@ -1562,7 +1562,7 @@ function Footer() {
   return (
     <footer className="px-4 pb-40 pt-12 md:px-6" style={{ background: C.crustDeep, color: "#fbeee0" }}>
       <div className="mx-auto max-w-[1200px]">
-        <Logo light />
+        <Logo />
         <dl className="mt-6 grid gap-x-8 gap-y-1.5 text-[14px] sm:grid-cols-2 md:grid-cols-3" style={{ color: "#e2c8ad" }}>
           {[
             ["상호", BAKERY],

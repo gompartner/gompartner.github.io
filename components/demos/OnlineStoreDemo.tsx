@@ -526,14 +526,15 @@ function TopBanner() {
   );
 }
 
-function Logo({ light = false }: { light?: boolean }) {
+function Logo() {
   return (
     <span className="inline-flex items-center gap-2">
-      <svg width="26" height="26" viewBox="0 0 28 28" aria-hidden>
-        <path d="M5 9 H23 Q22 22 14 23 Q6 22 5 9Z" fill={light ? C.clay : C.terra} />
-        <ellipse cx="14" cy="9" rx="9" ry="2.4" fill={light ? "#f7f4ef" : C.ink} />
-      </svg>
-      <span className="text-[18px] font-bold tracking-[-0.02em] md:text-[20px]">{SHOP}</span>
+      {/* eslint-disable-next-line @next/next/no-img-element */}
+      <img src="/images/logo.svg" alt="" aria-hidden width={28} height={28} className="h-7 w-7 shrink-0" />
+      <span className="inline-flex items-baseline gap-1.5 whitespace-nowrap">
+        <span className="text-[18px] font-bold tracking-[-0.02em] md:text-[20px]">곰파트너</span>
+        <span className="text-[11px] font-semibold opacity-80 md:text-[12px]">도자기 공방</span>
+      </span>
     </span>
   );
 }
@@ -2313,7 +2314,7 @@ function Footer() {
           </p>
         </div>
         <div>
-          <Logo light />
+          <Logo />
           <dl className="mt-4 grid gap-y-1 text-[13px]" style={{ color: "#b3a593" }}>
             {[
               ["상호", SHOP],

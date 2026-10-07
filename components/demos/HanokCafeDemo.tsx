@@ -269,17 +269,12 @@ function Seal({ lines, size = 64, className = "" }: { lines: string[]; size?: nu
   );
 }
 
-function LogoMark({ light = false }: { light?: boolean }) {
+function LogoMark() {
   return (
-    <svg viewBox="0 0 40 40" className="h-9 w-9 shrink-0" aria-hidden>
-      <path
-        d="M20 4.5c8.9 0 15.6 6.6 15.4 15.7-.2 8.7-6.9 15.4-15.6 15.3C11 35.4 4.6 28.7 4.6 20 4.7 11 11.2 4.5 20 4.5Z"
-        fill={light ? "#1f1b16" : "#f8f2e7"}
-        stroke={light ? "#efe7da" : "#1f1b16"}
-        strokeWidth="2.2"
-      />
-      <circle cx="27.5" cy="12.5" r="3" fill="#a8432a" />
-    </svg>
+    <>
+      {/* eslint-disable-next-line @next/next/no-img-element */}
+      <img src="/images/logo.svg" alt="" aria-hidden width={32} height={32} className="h-8 w-8 shrink-0" />
+    </>
   );
 }
 
@@ -347,11 +342,10 @@ function SideNav({ groupId, onGroup }: { groupId: GroupId; onGroup: (id: GroupId
   return (
     <aside className="sticky top-0 hidden h-screen w-[220px] shrink-0 flex-col self-start bg-[#1f1b16] px-4 pb-24 pt-6 text-[#efe7da] lg:flex">
       <a href="#top" className="flex items-center gap-2.5">
-        <LogoMark light />
-        <span className="text-[18px] font-bold leading-[1.25]">
-          곰파트너
-          <br />
-          한옥 찻집
+        <LogoMark />
+        <span className="flex flex-col leading-[1.25]">
+          <span className="text-[18px] font-bold">곰파트너</span>
+          <span className="text-[11px] font-semibold opacity-80">한옥 찻집</span>
         </span>
       </a>
       <nav aria-label="공간" className="mt-8">
@@ -401,7 +395,10 @@ function TopNav({ groupId, onGroup }: { groupId: GroupId; onGroup: (id: GroupId)
       <div className="flex h-14 items-center justify-between px-4">
         <a href="#top" className="flex items-center gap-2">
           <LogoMark />
-          <span className="text-[18px] font-bold">{CAFE}</span>
+          <span className="inline-flex items-baseline gap-1.5 whitespace-nowrap">
+            <span className="text-[18px] font-bold">곰파트너</span>
+            <span className="text-[11px] font-semibold opacity-80">한옥 찻집</span>
+          </span>
         </a>
         <a href={`tel:${TEL}`} aria-label={`전화하기 ${TEL}`} className="inline-flex h-11 w-11 items-center justify-center rounded-[4px] bg-[#1f1b16] text-[#f3ede2]">
           <Phone size={18} aria-hidden />
@@ -1360,7 +1357,13 @@ function Footer() {
     <footer className="bg-[#1f1b16] px-4 pb-28 pt-10 text-[14px] leading-[1.8] text-[#b9ad9c] sm:px-6 lg:px-10">
       <div className="mx-auto flex max-w-[1080px] flex-col gap-4 sm:flex-row sm:items-start sm:justify-between">
         <div>
-          <p className="text-[18px] font-bold tracking-[-0.02em] text-[#efe7da]">{CAFE}</p>
+          <p className="flex items-center gap-2 text-[#efe7da]">
+            <LogoMark />
+            <span className="flex items-baseline gap-1.5">
+            <span className="text-[18px] font-bold tracking-[-0.02em]">곰파트너</span>
+            <span className="text-[11px] font-semibold opacity-80">한옥 찻집</span>
+            </span>
+          </p>
           <p className="mt-2">
             대표 김ㅈ우 | 사업자등록번호 000-00-00000 | {ADDRESS} | {TEL}
           </p>

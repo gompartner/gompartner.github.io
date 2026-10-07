@@ -368,25 +368,15 @@ export function PilatesStudioDemo() {
 
 /* ---------- 로고, 머리글 ---------- */
 
-function Logo({ light = false }: { light?: boolean }) {
-  const reduce = useReducedMotionSafe();
+function Logo() {
   return (
     <span className="inline-flex items-center gap-2.5">
-      <svg width="30" height="30" viewBox="0 0 30 30" aria-hidden>
-        <motion.circle
-          cx="15"
-          cy="15"
-          r="10"
-          fill="none"
-          stroke={light ? C.onIndigo : C.indigo}
-          strokeWidth="2.4"
-          style={{ transformBox: "fill-box", transformOrigin: "center" }}
-          animate={reduce ? undefined : { scale: [0.9, 1.15, 0.9] }}
-          transition={{ duration: 5, ease: "easeInOut", repeat: Infinity }}
-        />
-        <circle cx="15" cy="15" r="2.2" fill={light ? C.onIndigo : C.clay} />
-      </svg>
-      <span className="text-[19px] font-bold tracking-[-0.01em]">{STUDIO}</span>
+      {/* eslint-disable-next-line @next/next/no-img-element */}
+      <img src="/images/logo.svg" alt="" aria-hidden width={28} height={28} className="h-7 w-7 shrink-0" />
+      <span className="inline-flex items-baseline gap-1.5 whitespace-nowrap">
+        <span className="text-[19px] font-bold tracking-[-0.01em]">곰파트너</span>
+        <span className="text-[12px] font-semibold opacity-80">필라테스</span>
+      </span>
     </span>
   );
 }
@@ -1422,7 +1412,7 @@ function Footer() {
   return (
     <footer className="px-4 pb-24 pt-12 md:px-6" style={{ background: C.indigo, color: C.onIndigo }}>
       <div className="mx-auto max-w-[1200px]">
-        <Logo light />
+        <Logo />
         <dl className="mt-6 grid gap-x-8 gap-y-1.5 text-[14px] sm:grid-cols-2 md:grid-cols-3" style={{ color: C.onIndigoMuted }}>
           {[
             ["상호", STUDIO],

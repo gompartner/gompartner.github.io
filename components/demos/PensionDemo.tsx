@@ -389,15 +389,15 @@ type Selection = {
 
 /* ---------- 로고, 머리글 ---------- */
 
-function Logo({ light = false }: { light?: boolean }) {
+function Logo() {
   return (
     <span className="inline-flex items-center gap-2">
-      <svg width="30" height="30" viewBox="0 0 30 30" aria-hidden>
-        <rect width="30" height="30" rx="6" fill={light ? C.sand : C.navy} />
-        <circle cx="15" cy="14" r="5" fill={C.coral} />
-        <path d="M5 19 Q8.5 16.5 12 19 T19 19 T26 19 V24 H5Z" fill={light ? C.navy : C.sea} />
-      </svg>
-      <span className="whitespace-nowrap text-[18px] font-bold tracking-[-0.02em] md:text-[19px]">{PENSION}</span>
+      {/* eslint-disable-next-line @next/next/no-img-element */}
+      <img src="/images/logo.svg" alt="" aria-hidden width={28} height={28} className="h-7 w-7 shrink-0" />
+      <span className="inline-flex items-baseline gap-1.5 whitespace-nowrap">
+        <span className="text-[18px] font-bold tracking-[-0.02em] md:text-[19px]">곰파트너</span>
+        <span className="text-[11px] font-semibold opacity-80 md:text-[12px]">바다 펜션</span>
+      </span>
     </span>
   );
 }
@@ -1685,7 +1685,7 @@ function TicketDialog({ data, onClose }: { data: Ticket | null; onClose: () => v
           >
             <div className="px-6 pb-6 pt-5 text-white" style={{ background: C.navy }}>
               <div className="flex items-center justify-between">
-                <Logo light />
+                <Logo />
                 <button ref={closeRef} type="button" onClick={onClose} aria-label="닫기" className="-mr-2 inline-flex h-11 w-11 items-center justify-center rounded-[6px]" style={{ color: C.sand }}>
                   <X size={20} aria-hidden />
                 </button>
@@ -2101,7 +2101,7 @@ function Footer({ go }: { go: Go }) {
     <footer className="px-4 pb-28 pt-10 md:px-6" style={{ background: C.navyDeep, color: C.sand }}>
       <div className="mx-auto max-w-[1200px]">
         <div className="flex flex-wrap items-center justify-between gap-3">
-          <Logo light />
+          <Logo />
           <ul className="flex flex-wrap gap-x-4 text-[14px]">
             {[
               { label: "예약안내", page: "guide" as const },

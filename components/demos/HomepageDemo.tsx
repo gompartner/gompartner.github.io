@@ -543,8 +543,13 @@ export function HomepageDemo() {
       {/* 상단 메뉴: 히어로 위에서만 보이고, 스크롤 후에는 스티키 예약 바가 머리글 역할을 한다 */}
       <nav aria-label="주 메뉴" className="absolute inset-x-0 top-0 z-40 bg-gradient-to-b from-black/55 to-transparent">
         <div className="flex items-center justify-between gap-3 px-4 py-5 text-white sm:px-8">
-          <a href="#top" className="shrink-0 text-lg font-black tracking-wider">
-            곰파트너 GYM
+          <a href="#top" className="flex shrink-0 items-center gap-2">
+            {/* eslint-disable-next-line @next/next/no-img-element */}
+            <img src="/images/logo.svg" alt="" aria-hidden width={28} height={28} className="h-7 w-7 shrink-0" />
+            <span className="inline-flex items-baseline gap-1.5 whitespace-nowrap">
+              <span className="text-lg font-black tracking-wider">곰파트너</span>
+              <span className="text-[11px] font-bold tracking-wider opacity-80">GYM</span>
+            </span>
           </a>
           <ul className="flex items-center gap-3.5 text-sm font-medium sm:gap-6">
             <li><a href="#map" className="transition-opacity hover:opacity-70">지점 안내</a></li>
@@ -1423,7 +1428,14 @@ export function HomepageDemo() {
       <footer className="bg-[#111] pb-24 pt-12 text-sm text-stone-400">
         <div className="mx-auto flex max-w-6xl flex-wrap items-start justify-between gap-6 px-4">
           <div>
-            <p className="font-black tracking-wider text-white">곰파트너 GYM</p>
+            <p className="flex items-center gap-2 text-white">
+              {/* eslint-disable-next-line @next/next/no-img-element */}
+              <img src="/images/logo.svg" alt="" aria-hidden width={24} height={24} className="h-6 w-6 shrink-0" />
+              <span className="inline-flex items-baseline gap-1.5">
+                <span className="font-black tracking-wider">곰파트너</span>
+                <span className="text-[10px] font-bold tracking-wider opacity-80">GYM</span>
+              </span>
+            </p>
             <dl className="mt-3 grid grid-cols-[auto_1fr] gap-x-3 gap-y-1 text-xs">
               <dt>상호</dt>
               <dd className="text-stone-300">곰파트너 프라이빗 짐</dd>
