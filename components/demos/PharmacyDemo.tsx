@@ -1223,7 +1223,7 @@ function Footer() {
         <Logo />
         <dl className="mt-6 grid gap-x-8 gap-y-1.5 text-[14px] sm:grid-cols-2 md:grid-cols-3" style={{ color: "#b5d6ca" }}>
           {[
-            ["상호", PHARMACY],
+            ["상호", "ㄷㅂ약국"],
             ["개설 약사", "박ㅎ준"],
             ["사업자등록번호", "000-00-00000"],
             ["주소", ADDRESS],

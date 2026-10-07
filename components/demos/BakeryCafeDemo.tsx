@@ -1565,7 +1565,7 @@ function Footer() {
         <Logo />
         <dl className="mt-6 grid gap-x-8 gap-y-1.5 text-[14px] sm:grid-cols-2 md:grid-cols-3" style={{ color: "#e2c8ad" }}>
           {[
-            ["상호", BAKERY],
+            ["상호", "ㅁㄷ 베이커리"],
             ["대표자", "이ㅅ연"],
             ["사업자등록번호", "000-00-00000"],
             ["주소", ADDRESS],

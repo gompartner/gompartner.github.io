@@ -3387,7 +3387,7 @@ function Footer() {
         </div>
         <dl className="mt-5 grid gap-x-8 gap-y-1.5 text-[14px] sm:grid-cols-2 md:grid-cols-3" style={{ color: "#a6acd6" }}>
           {[
-            ["상호", COMPANY],
+            ["상호", "(주)ㄴㄹ시험인증원"],
             ["대표", "김ㅈ우"],
             ["사업자등록번호", "000-00-00000"],
             ["주소", ADDRESS],

@@ -2100,7 +2100,7 @@ function SiteFooter({ go }: { go: Go }) {
         </p>
         <dl className="mt-4 flex flex-wrap gap-x-6 gap-y-1 text-[15px]">
           {[
-            ["상호", CLINIC],
+            ["상호", "ㅁㅇ치과의원"],
             ["대표자", "김ㅈ우"],
             ["주소", ADDRESS],
             ["전화", TEL],
@@ -2112,7 +2112,7 @@ function SiteFooter({ go }: { go: Go }) {
             </div>
           ))}
         </dl>
-        <p className="mt-6 text-[15px]">© {CLINIC}</p>
+        <p className="mt-6 text-[15px]">© ㅁㅇ치과의원</p>
       </div>
     </footer>
   );

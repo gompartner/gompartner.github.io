@@ -330,7 +330,7 @@ export function ClinicHomepageDemo() {
             </p>
             <dl className="mt-4 flex flex-wrap gap-x-6 gap-y-1 text-[15px]">
               {[
-                ["상호", CLINIC],
+                ["상호", "ㅅㅎ피부과의원"],
                 ["대표자", "김ㅈ우"],
                 ["주소", ADDRESS],
                 ["사업자등록번호", "000-00-00000"],

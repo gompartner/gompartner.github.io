@@ -2081,7 +2081,7 @@ function About() {
           </h2>
           <dl className="mt-2 text-[15px]">
             {[
-              ["상호", OFFICE],
+              ["상호", "ㅅㄱ 공인중개사사무소"],
               ["대표 공인중개사", AGENT],
               ["중개사무소 등록번호", REG_NO],
               ["손해배상책임 보장", "△△공제 2억 원"],
@@ -2132,7 +2132,7 @@ function Footer() {
         </span>
         <dl className="mt-6 grid gap-x-8 gap-y-1.5 text-[14px] sm:grid-cols-2 md:grid-cols-3">
           {[
-            ["상호", OFFICE],
+            ["상호", "ㅅㄱ 공인중개사사무소"],
             ["대표 공인중개사", AGENT],
             ["중개사무소 등록번호", REG_NO],
             ["사업자등록번호", "000-00-00000"],

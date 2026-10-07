@@ -2222,7 +2222,7 @@ function Footer() {
         <dl className="mt-5 grid gap-x-8 gap-y-1.5 text-[14px] sm:grid-cols-2 md:grid-cols-3" style={{ color: "#a9b0b9" }}>
           {(
             [
-              [x("상호", "Company"), s(COMPANY)],
+              [x("상호", "Company"), x("(주)ㅎㅂ정밀", "HB Precision Co., Ltd.")],
               [x("대표", "CEO"), x("김ㅈ우", "Kim J.W.")],
               [x("사업자등록번호", "Business reg. no."), "000-00-00000"],
               [x("주소", "Address"), s(ADDRESS)],

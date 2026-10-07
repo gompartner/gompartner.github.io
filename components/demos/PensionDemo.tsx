@@ -2118,7 +2118,7 @@ function Footer({ go }: { go: Go }) {
         </div>
         <dl className="mt-6 grid gap-x-8 gap-y-1.5 text-[14px] sm:grid-cols-2 md:grid-cols-3" style={{ color: "#9fb2c0" }}>
           {[
-            ["상호", PENSION],
+            ["상호", "ㅎㅇ 바다 펜션"],
             ["대표", OWNER],
             ["농어촌민박 신고번호", "제0000-00호"],
             ["사업자등록번호", "000-00-00000"],

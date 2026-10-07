@@ -1438,7 +1438,7 @@ export function HomepageDemo() {
             </p>
             <dl className="mt-3 grid grid-cols-[auto_1fr] gap-x-3 gap-y-1 text-xs">
               <dt>상호</dt>
-              <dd className="text-stone-300">곰파트너 프라이빗 짐</dd>
+              <dd className="text-stone-300">ㄱㄹ 프라이빗 짐</dd>
               <dt>대표자</dt>
               <dd className="text-stone-300">김ㅎ준</dd>
               <dt>사업자등록번호</dt>

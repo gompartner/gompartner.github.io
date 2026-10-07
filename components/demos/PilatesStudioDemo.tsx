@@ -1415,7 +1415,7 @@ function Footer() {
         <Logo />
         <dl className="mt-6 grid gap-x-8 gap-y-1.5 text-[14px] sm:grid-cols-2 md:grid-cols-3" style={{ color: C.onIndigoMuted }}>
           {[
-            ["상호", STUDIO],
+            ["상호", "ㅅㄱ 필라테스"],
             ["대표자", "박ㅅ연"],
             ["사업자등록번호", "000-00-00000"],
             ["주소", ADDRESS],

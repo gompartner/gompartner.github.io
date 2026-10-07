@@ -2024,7 +2024,7 @@ function Footer() {
         </div>
         <dl className="mt-6 grid gap-x-8 gap-y-1.5 text-[14px] sm:grid-cols-2 md:grid-cols-3" style={{ color: "#a9c4b8" }}>
           {[
-            ["상호", OFFICE],
+            ["상호", "ㄷㅇ 세무회계"],
             ["대표세무사", "김ㅅ우"],
             ["사업자등록번호", "000-00-00000"],
             ["전화", TEL],
