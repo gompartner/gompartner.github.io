@@ -23,7 +23,7 @@ const hasCap = (p: Project, c: Capability | null) => {
 const normalize = (s: string) => s.toLowerCase().replace(/\s+/g, "");
 const searchText = (p: Project) => normalize([p.title, p.category, p.description, ...p.features, ...(fieldsById[p.id] ?? [])].join(" "));
 
-// 제작 사례는 기본으로 "[업종]에서 쓰는 [기능]을 갖춘 사례 N건" 문장의 빈칸을 골라 거르고,
+// 포트폴리오는 기본으로 "[업종]에서 쓰는 [기능]을 갖춘 사례 N건" 문장의 빈칸을 골라 거르고,
 // 원하면 검색어로 찾는 방식으로 바꿀 수 있다.
 // 빈칸에서 고를 수 있는 단어에는 지금 조건의 사례 수를 붙이고, 0건이 되는 단어는 막아 결과가 비지 않게 한다.
 export function WorksSearch({ projects }: { projects: Project[] }) {
@@ -103,7 +103,7 @@ export function WorksSearch({ projects }: { projects: Project[] }) {
             ) : (
               <motion.div key="text" {...swap} className="flex flex-wrap items-center gap-x-3">
                 <label htmlFor="works-search" className="sr-only">
-                  제작 사례 검색
+                  포트폴리오 검색
                 </label>
                 <span className="relative w-full max-w-[380px]">
                   <Search

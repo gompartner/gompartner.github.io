@@ -1,6 +1,6 @@
 "use client";
 
-// 첫 화면 배너: 대표 제작 사례를 5초마다 넘긴다.
+// 첫 화면 배너: 대표 포트폴리오를 5초마다 넘긴다.
 // 마우스를 올리거나 포커스가 들어오면 멈추고, 동작 줄이기 설정이면 자동으로 넘기지 않는다.
 // 화면을 좌우로 밀어도 넘어간다(세로 스크롤은 그대로 둔다).
 import Image from "next/image";
@@ -64,7 +64,7 @@ export function HeroSlider({ slides }: { slides: Project[] }) {
       className="lg:col-span-7"
       role="region"
       aria-roledescription="carousel"
-      aria-label="대표 제작 사례"
+      aria-label="대표 포트폴리오"
       onMouseEnter={() => setHold(true)}
       onMouseLeave={() => setHold(false)}
       onFocus={() => setHold(true)}

@@ -20,7 +20,7 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
   const ind = industries.find((i) => i.slug === slug);
   if (!ind) return {};
   return {
-    title: `${ind.title} 사례`,
+    title: `${ind.title} 포트폴리오`,
     description: ind.description,
     alternates: { canonical: `/works/${slug}` },
   };
@@ -39,11 +39,11 @@ export default async function IndustryWorksPage({ params }: Props) {
           <div>
             <p className="text-[15px] font-bold text-accent">
               <Link href="/works" className="underline-offset-4 hover:underline">
-                제작 사례
+                포트폴리오
               </Link>{" "}
               · {ind.label}
             </p>
-            <h1 className="mt-1 text-[28px] font-bold leading-[1.4] tracking-[-0.01em] md:text-[36px]">{ind.title} 사례</h1>
+            <h1 className="mt-1 text-[28px] font-bold leading-[1.4] tracking-[-0.01em] md:text-[36px]">{ind.title} 포트폴리오</h1>
           </div>
           <div className="relative aspect-[16/10] overflow-hidden rounded-[10px]">
             <Image src={ind.image} alt={ind.imageAlt} fill priority sizes="(min-width: 768px) 45vw, 100vw" className="object-cover" />

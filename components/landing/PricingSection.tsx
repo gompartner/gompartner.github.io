@@ -3,7 +3,7 @@ import { addons, formatWon, manwon, planCommon, plans } from "@/data/pricing";
 
 const h2 = "text-[24px] font-bold leading-[1.5] tracking-[-0.01em] md:text-[32px]";
 
-/** 홈페이지 패키지 3종. 랜딩과 업종별 제작 사례 페이지에서 함께 쓴다. */
+/** 홈페이지 패키지 3종. 랜딩과 업종별 포트폴리오 페이지에서 함께 쓴다. */
 export function PricingSection({ id = "pricing" }: { id?: string }) {
   return (
     <section id={id} aria-labelledby={`${id}-title`} className="relative isolate scroll-mt-16 overflow-hidden border-t border-border bg-surface">

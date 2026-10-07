@@ -3,7 +3,7 @@ import { profile } from "@/data/profile";
 import { RelatedSites } from "@/components/layout/RelatedSites";
 
 const menu = [
-  { href: "/works", label: "제작 사례" },
+  { href: "/works", label: "포트폴리오" },
   { href: "/#pricing", label: "가격" },
   { href: "/tools", label: "자료실" },
 ];

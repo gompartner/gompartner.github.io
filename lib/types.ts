@@ -14,7 +14,7 @@ export interface Profile {
 
 export interface Project {
   id: string;
-  /** 제작 사례 탭 구분 */
+  /** 포트폴리오 탭 구분 */
   kind: "신규 제작" | "유지보수";
   /** 카드 위 작은 분류명 */
   category: string;

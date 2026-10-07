@@ -28,12 +28,12 @@ export const metadata: Metadata = {
   alternates: { canonical: "/" },
 };
 
-// 첫 화면 배너에 넘겨 보여 줄 대표 제작 사례
+// 첫 화면 배너에 넘겨 보여 줄 대표 포트폴리오
 // 크몽 판매량 순(쇼핑몰, 숙박, 기업, 병원, 법률, 세무, 부동산)으로 노출한다
 const featuredIds = ["online-store", "pension", "company", "dental-homepage"];
 const featured = featuredIds.map((id) => projects.find((p) => p.id === id)!);
 
-// 제작 사례 구간에 보여 줄 대표 6개. 판매량 순으로 고르고 전체는 /works에서 본다.
+// 포트폴리오 구간에 보여 줄 대표 6개. 판매량 순으로 고르고 전체는 /works에서 본다.
 const showcaseIds = ["online-store", "pension", "company", "dental-homepage", "law-firm", "tax-office"];
 const showcase = showcaseIds.map((id) => projects.find((p) => p.id === id)!);
 
@@ -70,7 +70,7 @@ export default function HomePage() {
                 채팅 상담
               </ChannelTalkButton>
               <a href="#works" data-gtm-cta="hero_works" className={secondaryButton}>
-                제작 사례
+                포트폴리오
               </a>
             </div>
           </div>
@@ -82,7 +82,7 @@ export default function HomePage() {
         <Doodles variant={1} />
         <div className={`${container} py-16 md:py-24`}>
           <h2 id="works-title" className={h2}>
-            제작 사례
+            포트폴리오
           </h2>
 
           <div className="mt-8">
@@ -90,7 +90,7 @@ export default function HomePage() {
           </div>
           <div className="mt-8 flex flex-wrap items-center gap-3">
             <Link href="/works" data-gtm-cta="works_all" className={primaryButton}>
-              제작 사례 전체 보기 ({projects.length}건)
+              포트폴리오 전체 보기 ({projects.length}건)
             </Link>
             {industries.map((ind) => (
               <Link key={ind.slug} href={`/works/${ind.slug}`} data-gtm-cta={`works_${ind.slug}`} className={secondaryButton}>

@@ -6,16 +6,16 @@ import { projects } from "@/data/projects";
 import { fieldsById } from "@/data/workFilters";
 
 export const metadata: Metadata = {
-  title: "제작 사례",
-  description: `병원, 약국, 카페, 공공기관 홈페이지와 업무 프로그램 제작 사례 ${projects.length}건입니다. 모든 사례는 데모로 확인할 수 있습니다.`,
+  title: "포트폴리오",
+  description: `병원, 약국, 카페, 공공기관 홈페이지와 업무 프로그램 포트폴리오 ${projects.length}건입니다. 모두 데모로 확인할 수 있습니다.`,
   alternates: { canonical: "/works" },
 };
 
 export default function WorksPage() {
   return (
     <div className="mx-auto w-full max-w-[1248px] px-4 pb-10 pt-14 md:px-6 md:py-14">
-      <h1 className="text-[28px] font-bold leading-[1.4] tracking-[-0.01em] md:text-[36px]">제작 사례</h1>
-      <ul className="mt-5 flex flex-wrap gap-2" aria-label="업종별 제작 사례">
+      <h1 className="text-[28px] font-bold leading-[1.4] tracking-[-0.01em] md:text-[36px]">포트폴리오</h1>
+      <ul className="mt-5 flex flex-wrap gap-2" aria-label="업종별 포트폴리오">
         {industries.map((ind) => (
           <li key={ind.slug}>
             <Link

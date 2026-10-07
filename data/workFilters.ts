@@ -1,5 +1,5 @@
-// 제작 사례를 "○○에서 쓰는 ○○ 기능" 문장으로 고르기 위한 분류.
-// 새 제작 사례를 추가하면 fieldsById에 업종을 적는다. 기능은 기능 태그·제목·설명에서 keywords로 찾는다.
+// 포트폴리오를 "○○에서 쓰는 ○○ 기능" 문장으로 고르기 위한 분류.
+// 새 포트폴리오를 추가하면 fieldsById에 업종을 적는다. 기능은 기능 태그·제목·설명에서 keywords로 찾는다.
 
 export const fields = ["병원", "전문직·부동산", "공공기관·학교", "가게·매장", "금융", "기업"] as const;
 export type Field = (typeof fields)[number];

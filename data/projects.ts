@@ -45,7 +45,7 @@ export const projects: Project[] = [
     category: "기업",
     layout: "전통 기업형",
     title: "정밀가공 제조업 회사 홈페이지",
-    description: "정밀가공 제조업 회사 홈페이지 제작 사례. 설비현황, 가공 가능 범위, 도면 첨부 견적문의, 한영 전환.",
+    description: "정밀가공 제조업 회사 홈페이지 포트폴리오. 설비현황, 가공 가능 범위, 도면 첨부 견적문의, 한영 전환.",
     features: ["설비현황", "가공 가능 범위 확인", "도면 첨부 견적문의", "한영 전환"],
     imageUrl: "/images/demos/company.jpg",
     imageAlt: "정밀가공 회사 홈페이지 첫 화면",
@@ -117,7 +117,7 @@ export const projects: Project[] = [
     category: "전문직",
     layout: "로펌형",
     title: "법률사무소 홈페이지",
-    description: "법률사무소 홈페이지 제작 사례. 업무분야별 사건 절차와 준비 서류, 성공사례 게시판, 상담신청.",
+    description: "법률사무소 홈페이지 포트폴리오. 업무분야별 사건 절차와 준비 서류, 성공사례 게시판, 상담신청.",
     features: ["사건별 절차", "준비 서류 체크", "성공사례 게시판", "상담 예약"],
     imageUrl: "/images/demos/law-firm.jpg",
     imageAlt: "법률사무소 홈페이지 첫 화면",
@@ -319,7 +319,7 @@ export const projects: Project[] = [
 
 // 실제 작업 이력: SW기술자 경력관리시스템에 기업 확인된 기술경력과 업무 메일 기준.
 // 부업으로 운영하므로 발주처·회사명은 쓰지 않고 업종과 기간만 쓴다.
-// demo는 같은 유형으로 다시 만든 제작 사례 id다.
+// demo는 같은 유형으로 다시 만든 포트폴리오 id다.
 export type HistoryKind = "신규 구축" | "개편" | "유지보수" | "앱 개발";
 
 export interface HistoryItem {
