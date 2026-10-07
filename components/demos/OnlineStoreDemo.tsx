@@ -7,7 +7,7 @@ import { Car, Check, ChevronRight, Heart, Minus, Plus, Search, ShoppingBag, Star
 import { daysAgo, fmtDot, useDemoToday } from "@/hooks/useDemoToday";
 import { useReducedMotionSafe } from "@/hooks/useReducedMotionSafe";
 
-/* 자사 쇼핑몰 데모: 가상의 곰선임 도자기 공방. 카페24 쇼핑몰형 구성.
+/* 자사 쇼핑몰 데모: 가상의 곰파트너 도자기 공방. 카페24 쇼핑몰형 구성.
    상호, 대표자, 주소, 전화번호, 사업자 정보, 통신판매업 신고번호, 상품과 가격, 재고, 후기는 모두 가상이다.
 
    디자인: 미색 바탕(#f7f4ef)에 먹색 글자(#23201d), 테라코타(#b5562f), 흙빛(#d9c7b4).
@@ -23,7 +23,7 @@ import { useReducedMotionSafe } from "@/hooks/useReducedMotionSafe";
    AI 생성(Z-Image-Turbo, Apache 2.0) hero, detail, products/<상품>-<유약>.jpg */
 
 const IMG = "/images/demo-store";
-const SHOP = "곰선임 도자기 공방";
+const SHOP = "곰파트너 도자기 공방";
 const TEL = "02-000-0000";
 const ADDRESS = "ㅂㄹ시 ㄷㅅ구 ㅅㄴ로 12길 8 1층";
 
@@ -544,7 +544,7 @@ function Logo() {
       {/* eslint-disable-next-line @next/next/no-img-element */}
       <img src="/images/logo.svg" alt="" aria-hidden width={28} height={28} className="h-7 w-7 shrink-0" />
       <span className="inline-flex items-baseline gap-1.5 whitespace-nowrap">
-        <span className="text-[18px] font-bold tracking-[-0.02em] md:text-[20px]">곰선임</span>
+        <span className="text-[18px] font-bold tracking-[-0.02em] md:text-[20px]">곰파트너</span>
         <span className="text-[11px] font-semibold opacity-80 md:text-[12px]">도자기 공방</span>
       </span>
     </span>

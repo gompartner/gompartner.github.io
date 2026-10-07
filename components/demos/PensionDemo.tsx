@@ -28,7 +28,7 @@ import {
 } from "lucide-react";
 import { useReducedMotionSafe } from "@/hooks/useReducedMotionSafe";
 
-/* 바다 펜션 홈페이지 데모: 가상의 곰선임 바다 펜션(객실 6개).
+/* 바다 펜션 홈페이지 데모: 가상의 곰파트너 바다 펜션(객실 6개).
    상호, 대표자, 주소, 전화번호, 계좌, 신고번호, 객실 이름과 요금, 예약 현황은 모두 가상이다.
 
    뼈대는 실제 펜션 홈페이지 템플릿(2단 드롭다운 메뉴 + 사진 슬라이드 + 하위 페이지)을 따른다.
@@ -46,7 +46,7 @@ import { useReducedMotionSafe } from "@/hooks/useReducedMotionSafe";
    AI 생성(Z-Image-Turbo, Apache 2.0) hero, room */
 
 const IMG = "/images/demo-pension";
-const PENSION = "곰선임 바다 펜션";
+const PENSION = "곰파트너 바다 펜션";
 const TEL = "033-000-0000";
 const ADDRESS = "강원특별자치도 ㅁㄹ군 ㄷㅅ면 해안길 00";
 const BANK = "ㅎㄴ은행 000-000000-00-000";
@@ -424,7 +424,7 @@ function Logo() {
       {/* eslint-disable-next-line @next/next/no-img-element */}
       <img src="/images/logo.svg" alt="" aria-hidden width={28} height={28} className="h-7 w-7 shrink-0" />
       <span className="inline-flex items-baseline gap-1.5 whitespace-nowrap">
-        <span className="text-[18px] font-bold tracking-[-0.02em] md:text-[19px]">곰선임</span>
+        <span className="text-[18px] font-bold tracking-[-0.02em] md:text-[19px]">곰파트너</span>
         <span className="text-[11px] font-semibold opacity-80 md:text-[12px]">바다 펜션</span>
       </span>
     </span>
@@ -2077,7 +2077,7 @@ function MiniMap() {
       <rect x="400" y="150" width="120" height="66" rx="12" fill={C.white} stroke={C.navy} strokeWidth="2" />
       <circle cx="430" cy="183" r="12" fill={C.coral} />
       <text x="448" y="180" fontSize="14" fill={C.navy} fontWeight={700}>
-        곰선임 바다
+        곰파트너 바다
       </text>
       <text x="448" y="198" fontSize="14" fill={C.navy} fontWeight={700}>
         펜션

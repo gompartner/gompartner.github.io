@@ -397,8 +397,8 @@ export function ExcelAutomationDemo() {
           <img src="/images/logo.svg" alt="" aria-hidden width={28} height={28} className="h-7 w-7 shrink-0" />
           <div className="mr-auto min-w-0">
             <p className="flex items-baseline gap-1 whitespace-nowrap">
-              <span className="sr-only">곰선임 유통 주문취합</span>
-              <span aria-hidden className="text-[16px] font-bold">곰선임</span>
+              <span className="sr-only">곰파트너 유통 주문취합</span>
+              <span aria-hidden className="text-[16px] font-bold">곰파트너</span>
               <span aria-hidden className="text-[10px] font-bold opacity-90">유통 주문취합</span>
             </p>
             <h1 className="truncate text-[17px] font-bold">{sheet.fileName}</h1>
@@ -770,7 +770,7 @@ function PurchaseOrder({ client, items, onPrint }: { client: string; items: { co
       <div className="flex items-start justify-between gap-3">
         <div>
           <p className="text-[13px]" style={{ color: C.muted }}>
-            발주서 (발주처 곰선임 유통)
+            발주서 (발주처 곰파트너 유통)
           </p>
           <h3 className="text-[19px] font-bold">{client} 귀하</h3>
         </div>

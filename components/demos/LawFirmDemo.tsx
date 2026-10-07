@@ -19,7 +19,7 @@ import {
 import { useReducedMotionSafe } from "@/hooks/useReducedMotionSafe";
 import { daysAgo, fmtDot, useDemoToday } from "@/hooks/useDemoToday";
 
-/* 법률사무소 홈페이지 데모: 가상의 법률사무소 곰선임.
+/* 법률사무소 홈페이지 데모: 가상의 법률사무소 곰파트너.
    사무소 이름, 변호사 이름, 경력, 주소, 전화번호, 사업자 정보, 성공사례는 모두 가상이다.
    절차와 기간은 국내에서 흔한 경우를 기준으로 한 일반 안내다.
    변호사 광고 규정에 맞춰 승소율, 최고, 유일, 결과 보장 같은 표현은 쓰지 않는다.
@@ -39,7 +39,7 @@ import { daysAgo, fmtDot, useDemoToday } from "@/hooks/useDemoToday";
    AI 생성(Z-Image-Turbo, Apache 2.0) hero, desk, lawyer-1(김ㅈ우), lawyer-2(이ㅅ연) */
 
 const IMG = "/images/demo-law";
-const FIRM = "법률사무소 곰선임";
+const FIRM = "법률사무소 곰파트너";
 const TEL = "02-000-0000";
 const ADDRESS = "ㄱㅇ시 ㅅㄴ로 88 ㅁㄹ빌딩 3층";
 
@@ -545,7 +545,7 @@ export function LawFirmDemo() {
 
 /* ---------- 로고, 머리글 ---------- */
 
-/* 로고: 메인 사이트와 같은 곰 로고 + 법률사무소(작게, 위) + 곰선임(크게) */
+/* 로고: 메인 사이트와 같은 곰 로고 + 법률사무소(작게, 위) + 곰파트너(크게) */
 function Logo({ light = false }: { light?: boolean }) {
   const fg = light ? C.ivory : C.navy;
   return (
@@ -554,7 +554,7 @@ function Logo({ light = false }: { light?: boolean }) {
       <img src="/images/logo.svg" alt="" aria-hidden width={32} height={32} className="h-8 w-8 shrink-0" />
       <span className="flex flex-col whitespace-nowrap text-left leading-[1.15]" style={{ color: fg }}>
         <span className="text-[11px] font-bold opacity-75">법률사무소</span>
-        <span className="text-[18px] font-bold tracking-[-0.02em] md:text-[19px]">곰선임</span>
+        <span className="text-[18px] font-bold tracking-[-0.02em] md:text-[19px]">곰파트너</span>
       </span>
     </span>
   );

@@ -7,7 +7,7 @@ import { ArrowUp, CalendarCheck, ChevronDown, ChevronRight, Home, MapPin, Menu, 
 import { useReducedMotionSafe } from "@/hooks/useReducedMotionSafe";
 import { daysAgo, fmtDot, useDemoToday } from "@/hooks/useDemoToday";
 
-/* 치과 홈페이지 데모: 가상의 곰선임치과의원.
+/* 치과 홈페이지 데모: 가상의 곰파트너치과의원.
    병원명, 의료진, 주소, 전화번호, 사업자 정보, 진료비는 모두 가상이다.
 
    구성: 실제 동네 치과에서 흔한 포털형.
@@ -25,7 +25,7 @@ import { daysAgo, fmtDot, useDemoToday } from "@/hooks/useDemoToday";
    caries Katarzyna Zygnerska(rubu_NvklJE), scaling Quilia(y8fWicGsv4g), ct Quang Tri NGUYEN(VckdJzo7ig0) */
 
 const IMG = "/images/demo-dental";
-const CLINIC = "곰선임치과의원";
+const CLINIC = "곰파트너치과의원";
 const TEL = "02-000-0000";
 const ADDRESS = "ㄷㅅ시 ㅎㄷ로 45 ㅅㅈ타워 3층";
 
@@ -2162,14 +2162,14 @@ function SiteFooter({ go }: { go: Go }) {
   );
 }
 
-/* 로고: 메인 사이트와 같은 곰 로고 + 곰선임(크게) + 업종(작게) */
+/* 로고: 메인 사이트와 같은 곰 로고 + 곰파트너(크게) + 업종(작게) */
 function BrandLogo() {
   return (
     <span className="inline-flex items-center gap-2">
       {/* eslint-disable-next-line @next/next/no-img-element -- 메인 사이트와 같은 곰 로고 */}
       <img src="/images/logo.svg" alt="" aria-hidden width={28} height={28} className="h-7 w-7 shrink-0" />
       <span className="flex items-baseline gap-1 whitespace-nowrap">
-        <span className="text-[20px] font-bold tracking-[-0.03em]">곰선임</span>
+        <span className="text-[20px] font-bold tracking-[-0.03em]">곰파트너</span>
         <span className="text-[12px] font-semibold opacity-75">치과의원</span>
       </span>
     </span>
