@@ -2,10 +2,11 @@
 
 import { useEffect, useLayoutEffect, useRef, useState } from "react";
 import { AnimatePresence, motion } from "framer-motion";
-import { Check, ChevronDown, ListFilter, RotateCcw, Search } from "lucide-react";
+import { Check, ChevronDown, LayoutGrid, List, ListFilter, RotateCcw, Search } from "lucide-react";
 import type { Project } from "@/lib/types";
 import { capabilities, fields, fieldsById, type Capability, type Field } from "@/data/workFilters";
 import { WorksGrid } from "./WorksGrid";
+import { WorksList } from "./WorksList";
 import { useReducedMotionSafe } from "@/hooks/useReducedMotionSafe";
 
 const EASE_OUT = [0.23, 1, 0.32, 1] as const;
@@ -58,6 +59,23 @@ export function WorksSearch({ projects }: { projects: Project[] }) {
       count: projects.filter((p) => hasField(p, field) && hasCap(p, c.name)).length,
     })),
   ];
+
+  // 카드·목록 보기는 이 브라우저에만 기억한다
+  const [view, setView] = useState<"card" | "list">("card");
+  useEffect(() => {
+    const frame = requestAnimationFrame(() => {
+      try {
+        if (localStorage.getItem("works-view") === "list") setView("list");
+      } catch {}
+    });
+    return () => cancelAnimationFrame(frame);
+  }, []);
+  const setViewSaved = (v: "card" | "list") => {
+    setView(v);
+    try {
+      localStorage.setItem("works-view", v);
+    } catch {}
+  };
 
   const count = (
     <span aria-live="polite" className="whitespace-nowrap tabular-nums">
@@ -145,9 +163,33 @@ export function WorksSearch({ projects }: { projects: Project[] }) {
         </button>
       </div>
 
-      <div className="mt-8">
+      <div className="mt-8 flex justify-end">
+        <div role="radiogroup" aria-label="보기 방식" className="inline-flex rounded-md border border-border bg-white p-0.5">
+          {(
+            [
+              ["card", "카드", LayoutGrid],
+              ["list", "목록", List],
+            ] as const
+          ).map(([v, label, Icon]) => (
+            <button
+              key={v}
+              type="button"
+              role="radio"
+              aria-checked={view === v}
+              onClick={() => setViewSaved(v)}
+              className={`inline-flex h-9 items-center gap-1.5 rounded-[5px] px-3 text-[15px] font-bold transition-colors ${
+                view === v ? "bg-foreground text-background" : "text-foreground-secondary hover:text-foreground"
+              }`}
+            >
+              <Icon size={16} aria-hidden />
+              {label}
+            </button>
+          ))}
+        </div>
+      </div>
+      <div className="mt-4">
         {results.length > 0 ? (
-          <WorksGrid projects={results} />
+          view === "list" ? <WorksList projects={results} /> : <WorksGrid projects={results} />
         ) : (
           <motion.div
             initial={{ opacity: 0 }}
