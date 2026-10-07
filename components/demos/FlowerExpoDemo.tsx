@@ -23,7 +23,7 @@ import {
 import { useReducedMotionSafe } from "@/hooks/useReducedMotionSafe";
 import { daysAgo, fmtDot, fmtKo, useDemoToday } from "@/hooks/useDemoToday";
 
-/* 꽃박람회 축제 안내 데모: 가상의 "2027 윤슬 꽃박람회".
+/* 꽃박람회 축제 안내 데모: 가상의 "2027 ㅇㅅ 꽃박람회".
    개최지, 주최 기관, 입장료, 프로그램, 공지, 연락처는 모두 가상이다.
 
    구성은 실제 지역 꽃박람회 누리집의 안내형을 따른다.
@@ -40,9 +40,9 @@ import { daysAgo, fmtDot, fmtKo, useDemoToday } from "@/hooks/useDemoToday";
    AI 생성(Z-Image-Turbo, Apache 2.0) hero, tulip, rose, night */
 
 const IMG = "/images/demo-flower";
-const EXPO = "2027 윤슬 꽃박람회";
+const EXPO = "2027 ㅇㅅ 꽃박람회";
 const TEL = "000-000-0000";
-const PLACE = "나래시 윤슬호수공원";
+const PLACE = "ㄴㄹ시 ㅇㅅ호수공원";
 const PERIOD = "2027. 4. 23.(금) ~ 5. 9.(일)";
 
 const C = {
@@ -358,7 +358,7 @@ function programsFor(i: number): Program[] {
 // ago: 오늘 기준 며칠 전 등록. 신청 마감처럼 날짜가 필요한 본문은 오늘 기준으로 계산한다.
 const NOTICES: { title: string; ago: number; isNew: boolean; body: string | ((t: Date) => string) }[] = [
   {
-    title: "2027 윤슬 꽃박람회 사전예매권 판매 안내",
+    title: "2027 ㅇㅅ 꽃박람회 사전예매권 판매 안내",
     ago: 2,
     isNew: true,
     body: "사전예매권은 2026년 12월 1일부터 2027년 4월 22일까지 온라인으로 판매하며, 일반권 기준 2,000원 할인됩니다. 수량이 정해져 있어 조기 마감될 수 있습니다.",
@@ -379,13 +379,13 @@ const NOTICES: { title: string; ago: number; isNew: boolean; body: string | ((t:
     title: "무료 셔틀버스 운행 안내",
     ago: 22,
     isNew: false,
-    body: "행사 기간 중 나래역 2번 출구에서 박람회 정문까지 무료 셔틀버스를 10분 간격으로 운행합니다. 야간 개장일 막차는 21:50입니다.",
+    body: "행사 기간 중 ㄴㄹ역 2번 출구에서 박람회 정문까지 무료 셔틀버스를 10분 간격으로 운행합니다. 야간 개장일 막차는 21:50입니다.",
   },
   {
-    title: "2027 윤슬 꽃박람회 개최 일정 확정",
+    title: "2027 ㅇㅅ 꽃박람회 개최 일정 확정",
     ago: 48,
     isNew: false,
-    body: `2027 윤슬 꽃박람회는 ${PERIOD} 17일간 ${PLACE} 일대에서 열립니다.`,
+    body: `2027 ㅇㅅ 꽃박람회는 ${PERIOD} 17일간 ${PLACE} 일대에서 열립니다.`,
   },
 ];
 
@@ -402,7 +402,7 @@ const FAQ = [
   { q: "비가 오면 어떻게 운영하나요?", a: "박람회는 정상 운영하며 야외 공연만 실내 전시관 2층으로 옮깁니다. 변경 일정은 정문 안내판과 공지사항에 게시합니다." },
   { q: "유모차나 휠체어를 대여할 수 있나요?", a: "정문 종합안내소에서 신분증을 맡기시면 무료로 대여해 드립니다. 수량이 한정되어 주말 오전에는 조기 소진될 수 있습니다." },
   { q: "음식물 반입이 가능한가요?", a: "도시락과 음료는 반입할 수 있습니다. 돗자리는 잔디 광장에서만 사용할 수 있으며 꽃밭 안에서는 취식할 수 없습니다." },
-  { q: "할인을 받으려면 무엇이 필요한가요?", a: "할인 및 무료 입장 대상은 증빙서류를 지참해 현장매표소에서 제시해 주세요. 나래시민은 주소가 표시된 신분증, 경로와 장애인은 신분증이나 복지카드가 필요합니다." },
+  { q: "할인을 받으려면 무엇이 필요한가요?", a: "할인 및 무료 입장 대상은 증빙서류를 지참해 현장매표소에서 제시해 주세요. ㄴㄹ시민은 주소가 표시된 신분증, 경로와 장애인은 신분증이나 복지카드가 필요합니다." },
 ];
 
 /* ─── 공통 조각 ─────────────────────────────────────────── */
@@ -486,7 +486,7 @@ function Header({ page, go }: { page: Page; go: Go }) {
     <header className="sticky top-0 z-40 border-b" style={{ background: C.cream, borderColor: C.line }}>
       <div className="hidden text-[13px] md:block" style={{ background: C.green, color: "#cfe3d5" }}>
         <Container className="flex h-8 items-center justify-between">
-          <span>주최 나래시 · 주관 윤슬꽃박람회 조직위원회</span>
+          <span>주최 ㄴㄹ시 · 주관 ㅇㅅ꽃박람회 조직위원회</span>
           <span className="flex items-center gap-1">
             <Phone size={12} aria-hidden />
             관람 문의 {TEL}
@@ -603,7 +603,7 @@ function PosterBanner() {
         <div className="absolute inset-x-0 bottom-0 flex flex-col items-center px-6 pb-10 text-center text-white md:pb-14">
           <h1 id="poster-title" className="font-bold leading-[1.05] tracking-[-0.04em]" style={{ textShadow: "0 2px 18px rgba(0,0,0,0.25)" }}>
             <span className="block text-[30px] md:text-[44px]">2027</span>
-            <span className="mt-1 block text-[40px] sm:text-[52px] md:text-[80px]">윤슬 꽃박람회</span>
+            <span className="mt-1 block text-[40px] sm:text-[52px] md:text-[80px]">ㅇㅅ 꽃박람회</span>
           </h1>
           <p className="mt-4 text-[17px] font-semibold md:text-[20px]">{PERIOD}</p>
           <p className="text-[16px] md:text-[18px]">{PLACE} 일대</p>
@@ -750,7 +750,7 @@ function FeeCalculator({ idPrefix }: { idPrefix: string }) {
       </ul>
       <label className="mt-2 flex min-h-11 cursor-pointer items-center gap-3 text-[16px]">
         <input type="checkbox" checked={resident} onChange={(e) => setResident(e.target.checked)} className="h-5 w-5" style={{ accentColor: C.green }} />
-        나래시민 (50% 할인)
+        ㄴㄹ시민 (50% 할인)
       </label>
       <div className="mt-2 flex flex-wrap items-end justify-between gap-2 border-t pt-3" style={{ borderColor: "#efe2b8" }}>
         <p className="text-[15px]" style={{ color: C.muted }}>
@@ -1052,8 +1052,8 @@ function OverviewPage() {
           ["장소", `${PLACE} 일대 (야외 전시 6개 구역, 실내 전시관)`],
           ["주제", "호숫가 정원과 봄꽃"],
           ["규모", "튤립 52종 120만 송이, 덩굴장미 아치 600m, 수국 화분 3천 개"],
-          ["주최", "나래시"],
-          ["주관", "윤슬꽃박람회 조직위원회"],
+          ["주최", "ㄴㄹ시"],
+          ["주관", "ㅇㅅ꽃박람회 조직위원회"],
           ["주요행사", "개막식, 야간 정원, 미디어 분수 공연, 정원 해설 투어, 체험 프로그램"],
         ]}
       />
@@ -1063,13 +1063,13 @@ function OverviewPage() {
 
 function WayPage() {
   const items = [
-    { icon: Bus, title: "무료 셔틀버스", body: "나래역 2번 출구 앞에서 08:40부터 10분 간격으로 출발합니다. 야간 개장일 막차는 21:50입니다." },
-    { icon: TrainFront, title: "지하철·시내버스", body: "나래선 윤슬공원역 3번 출구에서 도보 12분입니다. 시내버스 21, 37, 104번은 박람회 정문 정류장에 정차합니다." },
+    { icon: Bus, title: "무료 셔틀버스", body: "ㄴㄹ역 2번 출구 앞에서 08:40부터 10분 간격으로 출발합니다. 야간 개장일 막차는 21:50입니다." },
+    { icon: TrainFront, title: "지하철·시내버스", body: "ㄴㄹ선 ㅇㅅ공원역 3번 출구에서 도보 12분입니다. 시내버스 21, 37, 104번은 박람회 정문 정류장에 정차합니다." },
     { icon: Car, title: "주차장", body: "제1~3 주차장 2,800면, 승용차 1일 4,000원입니다. 주말 오전 10시 전후 만차가 잦으니 셔틀버스를 이용해 주세요." },
   ];
   return (
     <div className="mx-auto max-w-[900px]">
-      <DefTable caption="주소" rows={[["주소", `나래시 나래로 200 ${PLACE.replace("나래시 ", "")} 정문`], ["문의", `관람 문의 ${TEL} (09:00 ~ 18:00)`]]} />
+      <DefTable caption="주소" rows={[["주소", `ㄴㄹ시 ㄴㄹ로 200 ${PLACE.replace("ㄴㄹ시 ", "")} 정문`], ["문의", `관람 문의 ${TEL} (09:00 ~ 18:00)`]]} />
       <ul className="mt-8 grid gap-4 md:grid-cols-3">
         {items.map(({ icon: Icon, title, body }) => (
           <li key={title} className="rounded-[10px] border-t-4 p-5" style={{ borderColor: C.green, background: C.paper }}>
@@ -1114,7 +1114,7 @@ function GuidePage() {
             <ul className="mt-4 space-y-1 text-[14px] leading-[1.6]" style={{ color: C.muted }}>
               <li>※ 사전예매권은 일반권 기준 2,000원 할인되며 조기 소진될 수 있습니다.</li>
               <li>※ 현장판매는 정문 매표소에서 09:00 ~ 17:00 운영합니다.</li>
-              <li>※ 나래시민은 신분증 제시 시 50% 할인됩니다.</li>
+              <li>※ ㄴㄹ시민은 신분증 제시 시 50% 할인됩니다.</li>
             </ul>
           </div>
           <div>
@@ -1165,7 +1165,7 @@ function GardenMap({ course }: { course: ZoneId[] }) {
       <rect x="0" y="0" width="800" height="560" rx="24" fill="#eaf4e4" />
       <path d="M300 230 C 330 170, 470 160, 520 210 C 580 260, 560 340, 480 360 C 400 380, 300 360, 285 300 C 278 270, 285 250, 300 230 Z" fill={C.lake} />
       <text x="420" y="285" textAnchor="middle" fontSize="18" fill="#3d6f80" fontWeight="700">
-        윤슬호수
+        ㅇㅅ호수
       </text>
       <path
         d="M90 260 C 140 180, 230 90, 380 90 C 560 90, 720 160, 720 300 C 720 440, 560 520, 400 510 C 240 500, 120 450, 90 260 Z"
@@ -1651,16 +1651,16 @@ function Footer() {
     <footer style={{ background: C.green, color: "#e4efe6" }}>
       <div className="border-b" style={{ borderColor: "rgba(255,255,255,0.15)" }}>
         <Container className="flex flex-wrap items-center justify-center gap-x-8 gap-y-2 py-5 text-[15px] font-semibold">
-          <span>나래시</span>
-          <span>윤슬꽃박람회 조직위원회</span>
-          <span>나래시 관광공사</span>
-          <span>나래시 농업기술센터</span>
+          <span>ㄴㄹ시</span>
+          <span>ㅇㅅ꽃박람회 조직위원회</span>
+          <span>ㄴㄹ시 관광공사</span>
+          <span>ㄴㄹ시 농업기술센터</span>
         </Container>
       </div>
       <Container className="pb-28 pt-8 text-[14px] leading-[1.8]">
         <p className="text-[18px] font-bold tracking-[-0.02em] text-white">{EXPO}</p>
-        <p className="mt-2">주최 나래시 | 주관 윤슬꽃박람회 조직위원회</p>
-        <p>나래시 나래로 200 윤슬호수공원 관리사무소 2층</p>
+        <p className="mt-2">주최 ㄴㄹ시 | 주관 ㅇㅅ꽃박람회 조직위원회</p>
+        <p>ㄴㄹ시 ㄴㄹ로 200 ㅇㅅ호수공원 관리사무소 2층</p>
         <p>관람 문의 {TEL} (09:00 ~ 18:00)</p>
       </Container>
     </footer>
