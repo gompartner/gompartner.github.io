@@ -622,11 +622,11 @@ export function TermsGenerator() {
         <div className="mt-6 grid gap-4 sm:grid-cols-2">
           <label className={label}>
             회사·상호명 <span className="text-[#b42318]">*</span>
-            <input value={form.company} onChange={(e) => set("company", e.target.value)} placeholder="예: 곰파트너상회" className={input} />
+            <input value={form.company} onChange={(e) => set("company", e.target.value)} placeholder="예: 곰선임상회" className={input} />
           </label>
           <label className={label}>
             사이트 이름 <span className="text-[#b42318]">*</span>
-            <input value={form.siteName} onChange={(e) => set("siteName", e.target.value)} placeholder="예: 곰파트너몰" className={input} />
+            <input value={form.siteName} onChange={(e) => set("siteName", e.target.value)} placeholder="예: 곰선임몰" className={input} />
           </label>
           <label className={label}>
             사이트 주소

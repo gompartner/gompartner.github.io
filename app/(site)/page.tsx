@@ -19,7 +19,7 @@ import Link from "next/link";
 // 최대 폭 1200px, 화면 여백 16/24px, 버튼·입력 radius 6px, 카드 10px.
 
 export const metadata: Metadata = {
-  // 루트 템플릿(`%s | 곰파트너`)이 브랜드를 또 붙이지 않도록 absolute 사용
+  // 루트 템플릿(`%s | 곰선임`)이 브랜드를 또 붙이지 않도록 absolute 사용
   title: {
     absolute: `홈페이지·업무 프로그램 제작 | ${profile.name}`,
   },
