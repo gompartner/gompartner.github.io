@@ -1,6 +1,5 @@
 import Link from "next/link";
 import { profile } from "@/data/profile";
-import { RelatedSites } from "@/components/layout/RelatedSites";
 
 const menu = [
   { href: "/works", label: "포트폴리오" },
@@ -34,7 +33,6 @@ export function Footer() {
             </ul>
           </nav>
 
-          <RelatedSites />
         </div>
 
         <div className="mt-6 border-t border-border pt-6">
