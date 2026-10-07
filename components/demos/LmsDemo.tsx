@@ -2,12 +2,15 @@
 
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { AnimatePresence, motion } from "framer-motion";
-import { Check, ChevronLeft, ChevronRight, Download, Lock, Pause, Play, Printer, RotateCcw, Send, X } from "lucide-react";
+import Image from "next/image";
+import { Briefcase, Check, ChevronLeft, ChevronRight, ClipboardList, Download, HardHat, LayoutGrid, Lock, Pause, Play, Plus, Printer, RotateCcw, Scale, Send, Users, X } from "lucide-react";
 import { useLocalStorage } from "@/hooks/useLocalStorage";
 import { useReducedMotionSafe } from "@/hooks/useReducedMotionSafe";
 
 /* 사내·위탁 이러닝 LMS 데모. 구성은 국내 HRD 이러닝 사이트, 원격평생교육원, 대학 LMS를 따랐다
    (조사 자료 01_Work/03_Resource/benchmark/LMS.md).
+   사이트: 메인(배너, 과정 분야 바로가기, 인기/신규 과정, 공지사항, 자주 묻는 질문, 학습지원센터, 수강 절차), 교육과정, 과정 상세(환급 안내, 수강신청),
+   수강신청(개강 일정), 학습지원센터, 로그인(데모 계정).
    학습자: 나의 강의실(학습중인 과정, 학습종료 과정, 수료증 발급) > 과정 강의실(학습현황, 수료기준, 학습하기, 평가, 공지사항, 학습 Q&A) > 학습창.
    학습창에서는 실제로 재생한 구간만 진도로 친다. 차시 학습시간의 90% 이상이면 학습완료, 앞 차시를 마쳐야 다음 차시가 열린다.
    수료기준은 진도율 80% 이상 + 총점 60점 이상(진행단계평가 30%, 최종평가 70%), 과정 설문 참여 후 수료증 출력.
@@ -30,7 +33,7 @@ const C = {
 } as const;
 
 const EASE = [0.23, 1, 0.32, 1] as const;
-const STORAGE_KEY = "gs-demo:lms:v2";
+const STORAGE_KEY = "gs-demo:lms:v3";
 const DONE_RATIO = 0.9;
 const PASS_PROGRESS = 80;
 const PASS_TOTAL = 60;
@@ -135,6 +138,13 @@ interface State {
   qna: Qna[];
   sms: SmsLog[];
   confirmed: Record<string, string>;
+  loggedIn: boolean;
+  applied: Applied[];
+}
+interface Applied {
+  id: string;
+  term: string;
+  period: string;
 }
 
 const SMS_TEMPLATES = [
@@ -160,6 +170,8 @@ const initialState: State = {
     { at: "2026.09.28 09:00", kind: "개강 안내", type: "LMS", count: 143, text: "[곰파트너 아카데미] {이름}님, 엑셀 실무 기초 2026년 10월 1기 학습이 시작되었습니다. 학습기간 09.28 ~ 10.27" },
   ],
   confirmed: {},
+  loggedIn: false,
+  applied: [],
 };
 
 function merge(segs: Seg[]): Seg[] {
@@ -317,12 +329,852 @@ function SideNav<T extends string>({ title, items, current, onSelect, label }: {
   );
 }
 
+/* ---------- 사이트 (공개 화면) ---------- */
+
+type Category = "법정의무교육" | "직무" | "산업안전" | "리더십";
+interface CourseInfo {
+  id: string;
+  title: string;
+  cat: Category;
+  lessons: string[];
+  hours: string;
+  period: string;
+  fee: number;
+  refund: boolean;
+  img: string;
+  imgAlt: string;
+  terms: { term: string; period: string; close: string }[];
+}
+
+const TERMS_MONTH = [
+  { term: "2026년 10월 2기", period: "2026.10.19 ~ 2026.11.17", close: "2026.10.15" },
+  { term: "2026년 11월 1기", period: "2026.11.02 ~ 2026.12.01", close: "2026.10.29" },
+];
+const TERMS_QUARTER = [{ term: "2026년 4분기", period: "2026.10.01 ~ 2026.12.31", close: "2026.12.15" }];
+
+const COURSES: CourseInfo[] = [
+  {
+    id: "excel",
+    title: "엑셀 실무 기초",
+    cat: "직무",
+    lessons: LESSONS.map((l) => l.title),
+    hours: `${Math.floor(TOTAL_MIN / 60)}시간 ${TOTAL_MIN % 60}분`,
+    period: "1개월",
+    fee: 120000,
+    refund: true,
+    img: "/images/demo-tax/hero.jpg",
+    imgAlt: "서류와 계산기, 노트북이 놓인 사무실 책상",
+    terms: TERMS_MONTH,
+  },
+  {
+    id: "harass",
+    title: "직장 내 괴롭힘 예방교육",
+    cat: "법정의무교육",
+    lessons: ["직장 내 괴롭힘의 개념", "괴롭힘 판단 기준과 사례", "발생 시 조치 절차", "존중하는 조직문화"],
+    hours: "1시간",
+    period: "3개월",
+    fee: 25000,
+    refund: false,
+    img: "/images/demo-tax/office.jpg",
+    imgAlt: "원탁과 의자가 놓인 회의실",
+    terms: TERMS_QUARTER,
+  },
+  {
+    id: "safety",
+    title: "산업안전보건 교육(사무직)",
+    cat: "산업안전",
+    lessons: ["산업안전보건법 개요", "사무실 안전 수칙", "근골격계 질환 예방", "화재 예방과 대피", "응급처치 기초", "직무 스트레스 관리"],
+    hours: "3시간",
+    period: "3개월",
+    fee: 40000,
+    refund: false,
+    img: "/images/demo-company/hero.jpg",
+    imgAlt: "가공 장비가 늘어선 공장 내부",
+    terms: TERMS_QUARTER,
+  },
+  {
+    id: "privacy",
+    title: "개인정보보호 교육",
+    cat: "법정의무교육",
+    lessons: ["개인정보보호법 개요", "개인정보 수집과 이용", "안전성 확보 조치", "유출 사고 대응", "업무별 처리 사례"],
+    hours: "2시간",
+    period: "3개월",
+    fee: 25000,
+    refund: false,
+    img: "/images/demo-application/p1.jpg",
+    imgAlt: "노트북으로 일하는 직원",
+    terms: TERMS_QUARTER,
+  },
+  {
+    id: "biz-doc",
+    title: "비즈니스 문서 작성",
+    cat: "직무",
+    lessons: ["업무 문서의 기본 구조", "보고서 작성 순서", "핵심 요약 쓰기", "기획서 작성", "회의록 작성", "이메일 작성 예절", "표와 그래프 활용", "맞춤법과 띄어쓰기", "공문서 작성 기준", "실습: 주간 업무 보고서"],
+    hours: "5시간",
+    period: "1개월",
+    fee: 150000,
+    refund: true,
+    img: "/images/demo-law/desk.jpg",
+    imgAlt: "책상 위에 놓인 서류와 만년필",
+    terms: TERMS_MONTH,
+  },
+  {
+    id: "quality",
+    title: "품질관리 실무",
+    cat: "직무",
+    lessons: ["품질관리 개요", "QC 7가지 도구", "관리도 작성", "공정능력 분석", "불량 원인 분석", "8D 보고서 작성", "측정시스템 분석", "실습: 개선 사례"],
+    hours: "8시간",
+    period: "1개월",
+    fee: 210000,
+    refund: true,
+    img: "/images/demo-certlab/lab.jpg",
+    imgAlt: "시험 장비가 놓인 실험실",
+    terms: TERMS_MONTH,
+  },
+  {
+    id: "leader",
+    title: "신임 팀장 리더십",
+    cat: "리더십",
+    lessons: ["팀장의 역할", "목표 설정과 업무 분배", "성과 면담", "피드백 방법", "갈등 관리", "팀 회의 운영"],
+    hours: "3시간",
+    period: "1개월",
+    fee: 90000,
+    refund: true,
+    img: "/images/demo-application/p2.jpg",
+    imgAlt: "노트북 화면을 함께 보는 직원들",
+    terms: TERMS_MONTH,
+  },
+];
+const POPULAR = ["excel", "harass", "safety", "privacy"];
+const NEWEST = ["biz-doc", "quality", "leader"];
+const CATS: Category[] = ["법정의무교육", "직무", "산업안전", "리더십"];
+const won = (n: number) => `${String(n).replace(/\B(?=(\d{3})+(?!\d))/g, ",")}원`;
+// 우선지원대상기업 90%, 1,000인 미만 80%, 1,000인 이상 40%
+const REFUND_RATES: [string, number][] = [
+  ["우선지원대상기업", 0.9],
+  ["1,000인 미만 기업", 0.8],
+  ["1,000인 이상 기업", 0.4],
+];
+
+const SITE_NOTICES = [
+  { title: "2026년 10월 2기 수강신청 안내", date: "2026.10.01", body: ["신청기간 2026.10.01 ~ 2026.10.15", "학습기간 2026.10.19 ~ 2026.11.17"] },
+  ...NOTICES.slice(0, 1),
+  { title: "추석 연휴 학습지원센터 운영 안내", date: "2026.09.22", body: ["2026.09.24 ~ 2026.09.28 학습지원센터 휴무", "휴무 기간 문의는 1:1 문의로 남겨 주시면 순차적으로 답변드립니다."] },
+  ...NOTICES.slice(1, 3),
+];
+const FAQ = [
+  { q: "수료기준은 어떻게 되나요?", a: "진도율 80% 이상, 총점 60점 이상 시 수료됩니다. 과정별 수료기준은 과정 상세에서 확인할 수 있습니다." },
+  { q: "진도율이 올라가지 않습니다.", a: "차시별 학습시간의 90% 이상 학습해야 학습완료로 인정됩니다. [학습종료] 버튼이 아닌 창 닫기로 종료하면 진도가 저장되지 않을 수 있습니다." },
+  { q: "수료증은 어디서 발급받나요?", a: "[나의 강의실 > 수료증 발급]에서 출력할 수 있습니다. 과정 설문 참여 후 출력이 가능합니다." },
+  { q: "복습기간에도 진도율이 반영되나요?", a: "복습기간에는 진도율에 반영되지 않습니다." },
+  { q: "환급은 어떻게 받나요?", a: "수료 후 직업훈련포털(HRD-Net)에 등록된 회사 계좌로 한국산업인력공단에서 환급금을 지급합니다." },
+];
+const STEPS = ["회원가입", "수강신청", "수강승인", "학습", "수료"];
+
+type SupportTab = "notice" | "faq" | "ask";
+type Route =
+  | { name: "home" }
+  | { name: "courses"; cat: Category | "전체" }
+  | { name: "course"; id: string }
+  | { name: "apply" }
+  | { name: "support"; tab: SupportTab }
+  | { name: "login"; next: Route }
+  | { name: "my" };
+
+function SiteHeader({ route, loggedIn, go, onMy, onLogout, onAdmin, onReset }: { route: Route; loggedIn: boolean; go: (r: Route) => void; onMy: () => void; onLogout: () => void; onAdmin: () => void; onReset: () => void }) {
+  const menu: [string, string, () => void, boolean][] = [
+    ["lms-gnb-courses", "교육과정", () => go({ name: "courses", cat: "전체" }), route.name === "courses" || route.name === "course"],
+    ["lms-gnb-apply", "수강신청", () => go({ name: "apply" }), route.name === "apply"],
+    ["lms-gnb-my", "나의 강의실", onMy, route.name === "my"],
+    ["lms-gnb-support", "학습지원센터", () => go({ name: "support", tab: "notice" }), route.name === "support"],
+  ];
+  const util = "px-1.5 py-1 text-[13px]";
+  return (
+    <header className="border-b bg-white" style={{ borderColor: C.line }}>
+      <div className="border-b" style={{ borderColor: C.line, background: C.bg }}>
+        <div className="mx-auto flex max-w-[1200px] items-center justify-end gap-1 px-4 md:px-6" style={{ color: C.muted }}>
+          {loggedIn ? (
+            <>
+              <span className={util}>
+                <b style={{ color: C.text }}>{maskName(ME.name)}</b>님
+              </span>
+              <button type="button" onClick={onLogout} className={util}>
+                로그아웃
+              </button>
+            </>
+          ) : (
+            <>
+              <button type="button" onClick={() => go({ name: "login", next: { name: "my" } })} className={util}>
+                로그인
+              </button>
+              <button type="button" onClick={() => go({ name: "login", next: { name: "home" } })} className={util}>
+                회원가입
+              </button>
+            </>
+          )}
+          <button type="button" id="lms-admin" onClick={onAdmin} className={`${util} font-bold`} style={{ color: C.text }}>
+            관리자
+          </button>
+          <button type="button" onClick={onReset} aria-label="초기화" className={`${util} inline-flex items-center`}>
+            <RotateCcw size={13} aria-hidden />
+          </button>
+        </div>
+      </div>
+      <div className="mx-auto flex max-w-[1200px] flex-wrap items-center gap-x-8 gap-y-1 px-4 md:px-6">
+        <button type="button" onClick={() => go({ name: "home" })} className="flex items-center gap-2 py-3" style={{ color: C.brand }}>
+          {/* eslint-disable-next-line @next/next/no-img-element */}
+          <img src="/images/logo.svg" alt="" aria-hidden width={30} height={30} className="h-[30px] w-[30px] shrink-0" />
+          <span className="sr-only">곰파트너 아카데미</span>
+          <span aria-hidden className="flex items-baseline gap-1 whitespace-nowrap">
+            <span className="text-[20px] font-bold">곰파트너</span>
+            <span className="text-[12px] font-bold opacity-80">아카데미</span>
+          </span>
+        </button>
+        <nav aria-label="주 메뉴" className="w-full md:ml-auto md:w-auto">
+          <ul className="flex justify-between md:gap-10">
+            {menu.map(([id, label, onClick, active]) => (
+              <li key={id}>
+                <button
+                  type="button"
+                  id={id}
+                  aria-current={active ? "page" : undefined}
+                  onClick={onClick}
+                  className="relative block py-3 text-[15px] font-bold md:py-5 md:text-[17px]"
+                  style={{ color: active ? C.brand : C.text }}
+                >
+                  {label}
+                  {active && <span aria-hidden className="absolute inset-x-0 bottom-0 h-[3px]" style={{ background: C.brand }} />}
+                </button>
+              </li>
+            ))}
+          </ul>
+        </nav>
+      </div>
+    </header>
+  );
+}
+
+function SiteFooter() {
+  return (
+    <footer className="mt-16 text-[13px] leading-[1.8]" style={{ background: C.dark, color: "rgba(255,255,255,.72)" }}>
+      <div className="mx-auto max-w-[1200px] px-4 pt-8 pb-28 md:px-6">
+        <p className="flex flex-wrap gap-x-4 font-bold text-white">
+          <span>이용약관</span>
+          <span>개인정보처리방침</span>
+          <span>학습유의사항</span>
+          <span>환불규정</span>
+        </p>
+        <p className="mt-4">
+          ㄱㅍ아카데미 <span aria-hidden className="mx-1.5 opacity-50">|</span> 대표 김ㅈ우 <span aria-hidden className="mx-1.5 opacity-50">|</span> 사업자등록번호 000-00-00000
+        </p>
+        <p>
+          서울특별시 중구 세종대로 000 <span aria-hidden className="mx-1.5 opacity-50">|</span> 학습지원센터 02-000-0000
+        </p>
+        <p className="mt-3">Copyright © ㄱㅍ아카데미. All rights reserved.</p>
+      </div>
+    </footer>
+  );
+}
+
+function CourseCard({ c, onOpen }: { c: CourseInfo; onOpen: () => void }) {
+  return (
+    <li className="min-w-0">
+      <button type="button" onClick={onOpen} className="group block w-full overflow-hidden rounded-md border bg-white text-left" style={{ borderColor: C.line }}>
+        <span className="relative block aspect-[16/10] overflow-hidden" style={{ background: C.head }}>
+          <Image src={c.img} alt={c.imgAlt} fill sizes="(min-width: 1024px) 280px, (min-width: 640px) 45vw, 100vw" className="object-cover" />
+        </span>
+        <span className="block p-4">
+          <span className="block text-[13px]" style={{ color: C.muted }}>
+            {c.cat}
+          </span>
+          <span className="mt-1 block text-[17px] font-bold group-hover:underline group-hover:underline-offset-2">{c.title}</span>
+          <span className="mt-1.5 block text-[14px] tabular-nums" style={{ color: C.muted }}>
+            {c.lessons.length}차시 <span aria-hidden className="mx-1 opacity-50">|</span> {c.hours} <span aria-hidden className="mx-1 opacity-50">|</span> 학습기간 {c.period}
+          </span>
+          <span className="mt-3 flex items-baseline justify-between gap-2 border-t pt-3 tabular-nums" style={{ borderColor: C.line }}>
+            <span className="text-[16px] font-bold">{won(c.fee)}</span>
+            {c.refund ? (
+              <span className="text-[13px] font-bold" style={{ color: C.brand }}>
+                환급 {won(Math.round(c.fee * 0.9))}
+              </span>
+            ) : (
+              <span className="text-[13px]" style={{ color: C.muted }}>
+                비환급
+              </span>
+            )}
+          </span>
+        </span>
+      </button>
+    </li>
+  );
+}
+
+function Steps() {
+  return (
+    <ol className="grid grid-cols-5">
+      {STEPS.map((s, k) => (
+        <li key={s} className="relative flex flex-col items-center text-center">
+          {k < STEPS.length - 1 && <span aria-hidden className="absolute top-[19px] left-1/2 h-px w-full" style={{ background: C.line }} />}
+          <span className="relative grid size-10 place-items-center rounded-full border-2 bg-white text-[15px] font-bold tabular-nums" style={{ borderColor: C.brand, color: C.brand }}>
+            {k + 1}
+          </span>
+          <span className="mt-2 text-[14px] font-bold md:text-[16px]">{s}</span>
+        </li>
+      ))}
+    </ol>
+  );
+}
+
+function Home({ go }: { go: (r: Route) => void }) {
+  const [tab, setTab] = useState<"popular" | "new">("popular");
+  const list = (tab === "popular" ? POPULAR : NEWEST).map((id) => COURSES.find((c) => c.id === id)!);
+  const shortcuts: [string, React.ReactNode, () => void][] = [
+    ["전체 과정", <LayoutGrid key="i" size={26} strokeWidth={1.6} aria-hidden />, () => go({ name: "courses", cat: "전체" })],
+    ["법정의무교육", <Scale key="i" size={26} strokeWidth={1.6} aria-hidden />, () => go({ name: "courses", cat: "법정의무교육" })],
+    ["직무", <Briefcase key="i" size={26} strokeWidth={1.6} aria-hidden />, () => go({ name: "courses", cat: "직무" })],
+    ["산업안전", <HardHat key="i" size={26} strokeWidth={1.6} aria-hidden />, () => go({ name: "courses", cat: "산업안전" })],
+    ["리더십", <Users key="i" size={26} strokeWidth={1.6} aria-hidden />, () => go({ name: "courses", cat: "리더십" })],
+    ["수강신청 안내", <ClipboardList key="i" size={26} strokeWidth={1.6} aria-hidden />, () => go({ name: "apply" })],
+  ];
+
+  return (
+    <>
+      <section aria-labelledby="banner-title" className="relative overflow-hidden" style={{ background: C.dark }}>
+        <Image src="/images/demo-application/hero.jpg" alt="회의 탁자에서 노트북으로 공부하는 직원들" fill priority sizes="100vw" className="object-cover" />
+        <div className="absolute inset-0 bg-black/55" />
+        <div className="relative mx-auto flex min-h-[320px] max-w-[1200px] flex-col justify-center px-4 py-12 text-white md:min-h-[400px] md:px-6">
+          <h1 id="banner-title" className="text-[28px] font-bold leading-[1.3] md:text-[42px]">
+            사업주 직업능력개발훈련
+            <br />
+            환급과정
+          </h1>
+          <p className="mt-3 text-[17px] md:text-[20px]">우선지원대상기업 교육비 최대 90% 환급</p>
+          <div className="mt-7 flex flex-wrap gap-2">
+            <button type="button" onClick={() => go({ name: "courses", cat: "전체" })} className="h-12 rounded-[4px] bg-white px-6 text-[16px] font-bold" style={{ color: C.brand }}>
+              과정 보기
+            </button>
+            <button type="button" onClick={() => go({ name: "apply" })} className="h-12 rounded-[4px] border border-white/70 px-6 text-[16px] font-bold">
+              수강신청 안내
+            </button>
+          </div>
+        </div>
+      </section>
+
+      <div className="mx-auto max-w-[1200px] px-4 md:px-6">
+        <nav aria-label="과정 분야" className="relative z-10 -mt-8 rounded-md border bg-white" style={{ borderColor: C.line }}>
+          <ul className="grid grid-cols-3 md:grid-cols-6">
+            {shortcuts.map(([label, icon, onClick], k) => (
+              <li key={label} className={`border-b md:border-b-0 ${k % 3 !== 2 ? "border-r" : ""} md:border-r md:last:border-r-0 ${k >= 3 ? "border-b-0" : ""}`} style={{ borderColor: C.line }}>
+                <button type="button" onClick={onClick} className="flex w-full flex-col items-center gap-2 px-2 py-4 text-[14px] font-bold md:py-5 md:text-[15px]" style={{ color: C.text }}>
+                  <span style={{ color: C.brand }}>{icon}</span>
+                  {label}
+                </button>
+              </li>
+            ))}
+          </ul>
+        </nav>
+
+        <section id="lms-courses" aria-labelledby="courses-home-title" className="mt-12">
+          <div className="flex flex-wrap items-end gap-x-6 gap-y-2 border-b" style={{ borderColor: C.line }}>
+            <h2 id="courses-home-title" className="sr-only">
+              과정 목록
+            </h2>
+            <div role="tablist" aria-label="과정 구분" className="flex gap-6">
+              {(
+                [
+                  ["popular", "인기 과정"],
+                  ["new", "신규 과정"],
+                ] as const
+              ).map(([id, label]) => (
+                <button key={id} role="tab" type="button" aria-selected={tab === id} onClick={() => setTab(id)} className="relative pb-3 text-[20px] font-bold md:text-[22px]" style={{ color: tab === id ? C.text : C.muted }}>
+                  {label}
+                  {tab === id && <span aria-hidden className="absolute inset-x-0 -bottom-px h-[3px]" style={{ background: C.text }} />}
+                </button>
+              ))}
+            </div>
+            <button type="button" onClick={() => go({ name: "courses", cat: "전체" })} className="mb-3 ml-auto inline-flex items-center text-[14px]" style={{ color: C.muted }}>
+              전체 과정
+              <ChevronRight size={15} aria-hidden />
+            </button>
+          </div>
+          <ul className="mt-6 grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4">
+            {list.map((c) => (
+              <CourseCard key={c.id} c={c} onOpen={() => go({ name: "course", id: c.id })} />
+            ))}
+          </ul>
+        </section>
+
+        <div className="mt-12 grid grid-cols-1 gap-6 md:grid-cols-2 lg:grid-cols-[1fr_1fr_300px]">
+          <section aria-labelledby="home-notice">
+            <div className="flex items-center border-b-2 pb-2" style={{ borderColor: C.text }}>
+              <h2 id="home-notice" className="mr-auto text-[18px] font-bold">
+                공지사항
+              </h2>
+              <button type="button" aria-label="공지사항 더보기" onClick={() => go({ name: "support", tab: "notice" })} className="grid size-8 place-items-center" style={{ color: C.muted }}>
+                <Plus size={18} aria-hidden />
+              </button>
+            </div>
+            <ul>
+              {SITE_NOTICES.slice(0, 4).map((n) => (
+                <li key={n.title} className="border-b" style={{ borderColor: C.line }}>
+                  <button type="button" onClick={() => go({ name: "support", tab: "notice" })} className="flex w-full gap-3 py-2.5 text-left text-[15px]">
+                    <span className="min-w-0 flex-1 truncate">{n.title}</span>
+                    <span className="shrink-0 text-[14px] tabular-nums" style={{ color: C.muted }}>
+                      {n.date}
+                    </span>
+                  </button>
+                </li>
+              ))}
+            </ul>
+          </section>
+          <section aria-labelledby="home-faq">
+            <div className="flex items-center border-b-2 pb-2" style={{ borderColor: C.text }}>
+              <h2 id="home-faq" className="mr-auto text-[18px] font-bold">
+                자주 묻는 질문
+              </h2>
+              <button type="button" aria-label="자주 묻는 질문 더보기" onClick={() => go({ name: "support", tab: "faq" })} className="grid size-8 place-items-center" style={{ color: C.muted }}>
+                <Plus size={18} aria-hidden />
+              </button>
+            </div>
+            <ul>
+              {FAQ.slice(0, 4).map((f) => (
+                <li key={f.q} className="border-b" style={{ borderColor: C.line }}>
+                  <button type="button" onClick={() => go({ name: "support", tab: "faq" })} className="flex w-full gap-2 py-2.5 text-left text-[15px]">
+                    <b style={{ color: C.brand }}>Q</b>
+                    <span className="min-w-0 flex-1 truncate">{f.q}</span>
+                  </button>
+                </li>
+              ))}
+            </ul>
+          </section>
+          <section aria-labelledby="home-cs" className="rounded-md border bg-white p-5 md:col-span-2 lg:col-span-1" style={{ borderColor: C.line }}>
+            <h2 id="home-cs" className="text-[18px] font-bold">
+              학습지원센터
+            </h2>
+            <p className="mt-2 text-[26px] font-bold tabular-nums" style={{ color: C.brand }}>
+              02-000-0000
+            </p>
+            <p className="mt-1 text-[14px] leading-[1.7]" style={{ color: C.muted }}>
+              평일 09:00~18:00 (점심시간 12:00~13:00)
+              <br />
+              주말 및 공휴일 휴무
+            </p>
+            <button type="button" onClick={() => go({ name: "support", tab: "ask" })} className={`${btnBase} mt-4 h-10 w-full`} style={btnLine}>
+              1:1 문의
+            </button>
+          </section>
+        </div>
+
+        <section aria-labelledby="home-steps" className="mt-12 rounded-md border bg-white px-4 py-8 md:px-10" style={{ borderColor: C.line }}>
+          <h2 id="home-steps" className="mb-6 text-center text-[20px] font-bold">
+            수강 절차
+          </h2>
+          <Steps />
+        </section>
+      </div>
+    </>
+  );
+}
+
+function SiteCoursesPage({ cat, go }: { cat: Category | "전체"; go: (r: Route) => void }) {
+  const list = COURSES.filter((c) => cat === "전체" || c.cat === cat);
+  return (
+    <div className="mx-auto max-w-[1200px] px-4 pt-8 md:px-6">
+      <h1 className="text-[26px] font-bold">교육과정</h1>
+      <div role="tablist" aria-label="과정 분야" className="mt-5 flex flex-wrap gap-1.5">
+        {(["전체", ...CATS] as const).map((k) => (
+          <button
+            key={k}
+            role="tab"
+            type="button"
+            aria-selected={cat === k}
+            onClick={() => go({ name: "courses", cat: k })}
+            className="rounded-[4px] border px-3.5 py-2 text-[15px] font-bold"
+            style={cat === k ? { background: C.text, borderColor: C.text, color: "#fff" } : { borderColor: C.line, color: C.muted, background: "#fff" }}
+          >
+            {k}
+          </button>
+        ))}
+      </div>
+      <p className="mt-5 text-[15px] tabular-nums" style={{ color: C.muted }}>
+        총 <b style={{ color: C.text }}>{list.length}</b>개 과정
+      </p>
+      <ul className="mt-3 grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4">
+        {list.map((c) => (
+          <CourseCard key={c.id} c={c} onOpen={() => go({ name: "course", id: c.id })} />
+        ))}
+      </ul>
+    </div>
+  );
+}
+
+function CourseDetail({ id, state, setState, go, notify }: { id: string; state: State; setState: SetState; go: (r: Route) => void; notify: (t: string) => void }) {
+  const c = COURSES.find((x) => x.id === id) ?? COURSES[0];
+  const [term, setTerm] = useState(0);
+  const [confirm, setConfirm] = useState(false);
+  const applied = state.applied.find((a) => a.id === c.id);
+  const status = !state.loggedIn ? null : c.id === "excel" ? "수강중인 과정입니다." : c.id === "biz-doc" ? "신청완료 (학습대기)" : applied ? "신청완료 (승인대기)" : null;
+  const t = c.terms[Math.min(term, c.terms.length - 1)];
+
+  return (
+    <div className="mx-auto max-w-[1200px] px-4 pt-6 md:px-6">
+      <nav aria-label="현재 위치" className="flex items-center gap-1 text-[14px]" style={{ color: C.muted }}>
+        <button type="button" onClick={() => go({ name: "courses", cat: "전체" })} className="hover:underline">
+          교육과정
+        </button>
+        <ChevronRight size={14} aria-hidden />
+        <button type="button" onClick={() => go({ name: "courses", cat: c.cat })} className="hover:underline">
+          {c.cat}
+        </button>
+      </nav>
+
+      <div className="mt-4 grid grid-cols-1 gap-6 md:grid-cols-[minmax(0,420px)_minmax(0,1fr)]">
+        <div className="relative aspect-[16/10] overflow-hidden rounded-md" style={{ background: C.head }}>
+          <Image src={c.img} alt={c.imgAlt} fill priority sizes="(min-width: 768px) 420px, 100vw" className="object-cover" />
+        </div>
+        <div className="min-w-0">
+          <p className="text-[14px]" style={{ color: C.muted }}>
+            {c.cat} <span aria-hidden className="mx-1 opacity-50">|</span> {c.refund ? "환급과정" : "비환급과정"}
+          </p>
+          <h1 className="mt-1 text-[26px] font-bold leading-[1.3]">{c.title}</h1>
+          <dl className="mt-4 grid border-t text-[15px]" style={{ borderColor: C.text }}>
+            {[
+              ["교육시간", `${c.lessons.length}차시 (${c.hours})`],
+              ["학습기간", c.period],
+              ["교육비", won(c.fee)],
+              ["수료기준", "진도율 80% 이상, 총점 60점 이상"],
+            ].map(([k, v]) => (
+              <div key={k} className="grid grid-cols-[96px_minmax(0,1fr)] border-b" style={{ borderColor: C.line }}>
+                <dt className="px-3 py-2.5 font-bold" style={{ background: C.head }}>
+                  {k}
+                </dt>
+                <dd className="px-3 py-2.5 tabular-nums">{v}</dd>
+              </div>
+            ))}
+            <div className="grid grid-cols-[96px_minmax(0,1fr)] border-b" style={{ borderColor: C.line }}>
+              <dt className="px-3 py-2.5 font-bold" style={{ background: C.head }}>
+                <label htmlFor="term-select">기수</label>
+              </dt>
+              <dd className="px-3 py-1.5">
+                <select id="term-select" value={term} onChange={(e) => setTerm(Number(e.target.value))} disabled={!!status} className="h-9 w-full max-w-[360px] rounded-[4px] border bg-white px-2 text-[14px] tabular-nums" style={{ borderColor: C.line }}>
+                  {c.terms.map((x, k) => (
+                    <option key={x.term} value={k}>
+                      {x.term} ({x.period})
+                    </option>
+                  ))}
+                </select>
+              </dd>
+            </div>
+          </dl>
+
+          {status ? (
+            <div className="mt-5 flex flex-wrap items-center gap-3">
+              <p className="text-[16px] font-bold" style={{ color: C.brand }}>
+                {status}
+              </p>
+              {c.id === "excel" && (
+                <button type="button" onClick={() => go({ name: "my" })} className={`${btnBase} h-11 px-5`} style={btnPrimary}>
+                  강의실 입장
+                </button>
+              )}
+            </div>
+          ) : confirm ? (
+            <div className="mt-5 rounded-md border p-4" style={{ borderColor: C.brand }}>
+              <p className="text-[16px] font-bold">신청확인</p>
+              <dl className="mt-2 grid gap-1 text-[15px]">
+                {[
+                  ["과정명", c.title],
+                  ["기수", t.term],
+                  ["학습기간", t.period],
+                  ["교육비", won(c.fee)],
+                ].map(([k, v]) => (
+                  <div key={k} className="flex gap-3">
+                    <dt className="w-16 shrink-0" style={{ color: C.muted }}>
+                      {k}
+                    </dt>
+                    <dd className="tabular-nums">{v}</dd>
+                  </div>
+                ))}
+              </dl>
+              <div className="mt-4 flex gap-2">
+                <button
+                  type="button"
+                  onClick={() => {
+                    setState((s) => ({ ...s, applied: [...s.applied, { id: c.id, term: t.term, period: t.period }] }));
+                    setConfirm(false);
+                    notify("수강신청이 완료되었습니다. 수강승인 후 학습할 수 있습니다.");
+                  }}
+                  className={`${btnBase} h-11 px-5`}
+                  style={btnPrimary}
+                >
+                  신청하기
+                </button>
+                <button type="button" onClick={() => setConfirm(false)} className={`${btnBase} h-11 px-5`} style={btnLine}>
+                  취소
+                </button>
+              </div>
+            </div>
+          ) : (
+            <div className="mt-5 flex flex-wrap items-center gap-3">
+              <button type="button" onClick={() => (state.loggedIn ? setConfirm(true) : go({ name: "login", next: { name: "course", id: c.id } }))} className={`${btnBase} h-12 px-8 text-[16px]`} style={btnPrimary}>
+                수강신청
+              </button>
+              <span className="text-[14px] tabular-nums" style={{ color: C.muted }}>
+                신청마감 {t.close}
+              </span>
+            </div>
+          )}
+        </div>
+      </div>
+
+      {c.refund && (
+        <section aria-labelledby="refund-title" className="mt-10">
+          <h2 id="refund-title" className="text-[19px] font-bold">
+            환급 안내
+          </h2>
+          <div className="relative mt-3 overflow-x-auto">
+            <table className="w-full min-w-[480px] border-t text-center text-[15px] tabular-nums" style={{ borderColor: C.text }}>
+              <thead style={{ background: C.head }}>
+                <tr>
+                  <th scope="col" className="px-3 py-2.5 font-bold">기업 규모</th>
+                  <th scope="col" className="px-3 py-2.5 font-bold">환급률</th>
+                  <th scope="col" className="px-3 py-2.5 font-bold">환급액</th>
+                  <th scope="col" className="px-3 py-2.5 font-bold">자부담</th>
+                </tr>
+              </thead>
+              <tbody>
+                {REFUND_RATES.map(([k, r]) => (
+                  <tr key={k} className="border-b" style={{ borderColor: C.line }}>
+                    <th scope="row" className="px-3 py-2.5 font-normal">{k}</th>
+                    <td className="px-3 py-2.5">{r * 100}%</td>
+                    <td className="px-3 py-2.5 font-bold" style={{ color: C.brand }}>
+                      {won(Math.round(c.fee * r))}
+                    </td>
+                    <td className="px-3 py-2.5">{won(c.fee - Math.round(c.fee * r))}</td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+        </section>
+      )}
+
+      <section aria-labelledby="lessons-title" className="mt-10">
+        <h2 id="lessons-title" className="text-[19px] font-bold">
+          차시 구성
+        </h2>
+        <ol className="mt-3 border-t text-[15px]" style={{ borderColor: C.text }}>
+          {c.lessons.map((l, k) => (
+            <li key={l} className="flex gap-4 border-b px-3 py-2.5" style={{ borderColor: C.line }}>
+              <span className="w-12 shrink-0 tabular-nums" style={{ color: C.muted }}>
+                {k + 1}차시
+              </span>
+              <span>{l}</span>
+            </li>
+          ))}
+        </ol>
+      </section>
+    </div>
+  );
+}
+
+function ApplyPage({ go }: { go: (r: Route) => void }) {
+  return (
+    <div className="mx-auto max-w-[1200px] px-4 pt-8 md:px-6">
+      <h1 className="text-[26px] font-bold">수강신청</h1>
+      <section aria-labelledby="apply-steps" className="mt-6 rounded-md border bg-white px-4 py-7 md:px-10" style={{ borderColor: C.line }}>
+        <h2 id="apply-steps" className="sr-only">
+          수강 절차
+        </h2>
+        <Steps />
+      </section>
+      <section aria-labelledby="schedule-title" className="mt-8">
+        <h2 id="schedule-title" className="text-[19px] font-bold">
+          개강 일정
+        </h2>
+        <div className="relative mt-3 overflow-x-auto">
+          <table className="w-full min-w-[640px] border-t text-[15px] tabular-nums" style={{ borderColor: C.text }}>
+            <thead style={{ background: C.head }}>
+              <tr>
+                <th scope="col" className={th}>과정명</th>
+                <th scope="col" className={th}>기수</th>
+                <th scope="col" className={th}>학습기간</th>
+                <th scope="col" className={th}>신청마감</th>
+                <th scope="col" className={th}><span className="sr-only">신청</span></th>
+              </tr>
+            </thead>
+            <tbody>
+              {COURSES.map((c) => (
+                <tr key={c.id} className="border-b bg-white" style={{ borderColor: C.line }}>
+                  <td className={`${td} font-bold`}>{c.title}</td>
+                  <td className={td}>{c.terms[0].term}</td>
+                  <td className={td}>{c.terms[0].period}</td>
+                  <td className={td}>{c.terms[0].close}</td>
+                  <td className={td}>
+                    <button type="button" onClick={() => go({ name: "course", id: c.id })} className={btnBase} style={btnLine}>
+                      신청
+                    </button>
+                  </td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
+      </section>
+    </div>
+  );
+}
+
+function SupportPage({ tab, go, loggedIn, notify }: { tab: SupportTab; go: (r: Route) => void; loggedIn: boolean; notify: (t: string) => void }) {
+  const [open, setOpen] = useState<number | null>(null);
+  const [title, setTitle] = useState("");
+  const [body, setBody] = useState("");
+  const tabs: [SupportTab, string][] = [
+    ["notice", "공지사항"],
+    ["faq", "자주 묻는 질문"],
+    ["ask", "1:1 문의"],
+  ];
+  return (
+    <div className="mx-auto max-w-[1200px] px-4 pt-8 md:px-6">
+      <h1 className="text-[26px] font-bold">학습지원센터</h1>
+      <div role="tablist" aria-label="학습지원센터 메뉴" className="mt-5 flex border-b" style={{ borderColor: C.line }}>
+        {tabs.map(([id, label]) => (
+          <button
+            key={id}
+            role="tab"
+            type="button"
+            aria-selected={tab === id}
+            onClick={() => {
+              setOpen(null);
+              go({ name: "support", tab: id });
+            }}
+            className="relative flex-1 px-2 py-3 text-[15px] font-bold sm:flex-none sm:px-6"
+            style={{ color: tab === id ? C.brand : C.muted }}
+          >
+            {label}
+            {tab === id && <span aria-hidden className="absolute inset-x-0 -bottom-px h-[3px]" style={{ background: C.brand }} />}
+          </button>
+        ))}
+      </div>
+
+      {tab !== "ask" && (
+        <ul className="bg-white">
+          {(tab === "notice" ? SITE_NOTICES.map((n) => ({ head: n.title, sub: n.date, body: n.body })) : FAQ.map((f) => ({ head: f.q, sub: "", body: [f.a] }))).map((n, k) => (
+            <li key={n.head} className="border-b" style={{ borderColor: C.line }}>
+              <button type="button" aria-expanded={open === k} onClick={() => setOpen(open === k ? null : k)} className="flex w-full items-center gap-3 px-4 py-3.5 text-left">
+                <span className="w-6 shrink-0 text-[14px] font-bold tabular-nums" style={{ color: tab === "faq" ? C.brand : C.muted }}>
+                  {tab === "faq" ? "Q" : SITE_NOTICES.length - k}
+                </span>
+                <span className="min-w-0 flex-1 text-[15px] font-bold">{n.head}</span>
+                {n.sub && (
+                  <span className="shrink-0 text-[14px] tabular-nums" style={{ color: C.muted }}>
+                    {n.sub}
+                  </span>
+                )}
+              </button>
+              {open === k && (
+                <ul className="grid gap-1 border-t px-4 py-3 pl-[52px] text-[15px] leading-[1.6]" style={{ borderColor: C.line, background: C.bg }}>
+                  {n.body.map((b) => (
+                    <li key={b}>{b}</li>
+                  ))}
+                </ul>
+              )}
+            </li>
+          ))}
+        </ul>
+      )}
+
+      {tab === "ask" &&
+        (loggedIn ? (
+          <form
+            className="mt-5 grid max-w-[720px] gap-3"
+            onSubmit={(e) => {
+              e.preventDefault();
+              setTitle("");
+              setBody("");
+              notify("문의가 등록되었습니다.");
+            }}
+          >
+            <label className="grid gap-1 text-[15px] font-bold">
+              제목
+              <input value={title} onChange={(e) => setTitle(e.target.value)} required maxLength={60} className="h-11 rounded-[4px] border bg-white px-3 font-normal" style={{ borderColor: C.line }} />
+            </label>
+            <label className="grid gap-1 text-[15px] font-bold">
+              내용
+              <textarea value={body} onChange={(e) => setBody(e.target.value)} required rows={6} className="rounded-[4px] border bg-white px-3 py-2 font-normal" style={{ borderColor: C.line }} />
+            </label>
+            <div>
+              <button type="submit" disabled={!title.trim() || !body.trim()} className={`${btnBase} h-11 px-6`} style={btnPrimary}>
+                등록
+              </button>
+            </div>
+          </form>
+        ) : (
+          <div className="mt-8 text-center">
+            <p className="text-[16px]">로그인 후 이용할 수 있습니다.</p>
+            <button type="button" onClick={() => go({ name: "login", next: { name: "support", tab: "ask" } })} className={`${btnBase} mt-4 h-11 px-6`} style={btnPrimary}>
+              로그인
+            </button>
+          </div>
+        ))}
+    </div>
+  );
+}
+
+function LoginPage({ onLogin }: { onLogin: () => void }) {
+  const [id, setId] = useState("");
+  const [pw, setPw] = useState("");
+  return (
+    <div className="mx-auto max-w-[420px] px-4 pt-12">
+      <h1 className="text-center text-[26px] font-bold">로그인</h1>
+      <form
+        className="mt-6 grid gap-3 rounded-md border bg-white p-6"
+        style={{ borderColor: C.line }}
+        onSubmit={(e) => {
+          e.preventDefault();
+          onLogin();
+        }}
+      >
+        <label className="grid gap-1 text-[14px] font-bold">
+          아이디
+          <input value={id} onChange={(e) => setId(e.target.value)} required autoComplete="username" className="h-11 rounded-[4px] border px-3 text-[15px] font-normal" style={{ borderColor: C.line }} />
+        </label>
+        <label className="grid gap-1 text-[14px] font-bold">
+          비밀번호
+          <input type="password" value={pw} onChange={(e) => setPw(e.target.value)} required autoComplete="current-password" className="h-11 rounded-[4px] border px-3 text-[15px] font-normal" style={{ borderColor: C.line }} />
+        </label>
+        <button type="submit" className={`${btnBase} mt-2 h-12 text-[16px]`} style={btnPrimary}>
+          로그인
+        </button>
+        <button
+          type="button"
+          onClick={() => {
+            setId("student01");
+            setPw("demo1234");
+            onLogin();
+          }}
+          className={`${btnBase} h-12 text-[16px]`}
+          style={btnLine}
+        >
+          데모 계정으로 로그인
+        </button>
+        <p className="mt-1 flex justify-center gap-4 text-[14px]" style={{ color: C.muted }}>
+          <span>아이디 찾기</span>
+          <span>비밀번호 찾기</span>
+          <span>회원가입</span>
+        </p>
+      </form>
+    </div>
+  );
+}
+
 /* ---------- 루트 ---------- */
 
 export function LmsDemo() {
   const reduce = useReducedMotionSafe();
   const [state, setState, hydrated] = useLocalStorage<State>(STORAGE_KEY, initialState);
-  const [view, setView] = useState<"learner" | "admin">("learner");
+  const [view, setView] = useState<"site" | "admin">("site");
+  const [route, setRoute] = useState<Route>({ name: "home" });
   const [toast, setToast] = useState<{ id: number; text: string } | null>(null);
   const notify = useCallback((text: string) => setToast((t) => ({ id: (t?.id ?? 0) + 1, text })), []);
 
@@ -332,70 +1184,93 @@ export function LmsDemo() {
     return () => window.clearTimeout(t);
   }, [toast]);
 
+  const go = useCallback((r: Route) => {
+    setView("site");
+    setRoute(r);
+    window.scrollTo({ top: 0 });
+  }, []);
+
   const ratios = state.lessons.map((p, i) => ratio(p, LESSONS[i]));
   const done = ratios.map((r) => r >= DONE_RATIO);
   const doneCount = done.filter(Boolean).length;
   const progress = (doneCount / LESSONS.length) * 100;
+  const reset = () => {
+    setState(initialState);
+    setRoute({ name: "home" });
+    setView("site");
+    notify("초기화했습니다.");
+  };
 
   return (
-    <div className="min-h-screen pb-24" style={{ background: C.bg, color: C.text }}>
-      <header className="border-b bg-white" style={{ borderColor: C.line }}>
-        <div className="mx-auto flex max-w-[1200px] flex-wrap items-center gap-x-3 gap-y-2 px-4 py-3 md:px-6">
-          <p className="mr-auto flex items-center gap-2" style={{ color: C.brand }}>
-            {/* eslint-disable-next-line @next/next/no-img-element */}
-            <img src="/images/logo.svg" alt="" aria-hidden width={28} height={28} className="h-7 w-7 shrink-0" />
-            <span className="sr-only">곰파트너 아카데미</span>
-            <span aria-hidden className="flex items-baseline gap-1 whitespace-nowrap">
-              <span className="text-[18px] font-bold">곰파트너</span>
-              <span className="text-[11px] font-bold opacity-80">아카데미</span>
-            </span>
-          </p>
-          <div role="tablist" aria-label="화면 선택" className="relative flex rounded-[4px] border p-0.5" style={{ borderColor: C.line }}>
-            {(
-              [
-                ["learner", "나의 강의실"],
-                ["admin", "관리자"],
-              ] as const
-            ).map(([id, label]) => (
-              <button
-                key={id}
-                role="tab"
-                type="button"
-                aria-selected={view === id}
-                onClick={() => setView(id)}
-                className="relative rounded-[3px] px-3.5 py-1.5 text-[14px] font-bold"
-                style={{ color: view === id ? "#fff" : C.muted }}
-              >
-                {view === id && (
-                  <motion.span layoutId="lms-view" className="absolute inset-0 rounded-[3px]" style={{ background: C.brand }} transition={reduce ? { duration: 0 } : { duration: 0.25, ease: EASE }} />
-                )}
-                <span className="relative">{label}</span>
-              </button>
-            ))}
-          </div>
-          <button
-            type="button"
-            onClick={() => {
-              setState(initialState);
-              notify("초기화했습니다.");
+    <div className={`min-h-screen ${view === "admin" ? "pb-24" : ""}`} style={{ background: C.bg, color: C.text }} aria-busy={!hydrated}>
+      {view === "site" ? (
+        <>
+          <SiteHeader
+            route={route}
+            loggedIn={state.loggedIn}
+            go={go}
+            onMy={() => go(state.loggedIn ? { name: "my" } : { name: "login", next: { name: "my" } })}
+            onLogout={() => {
+              setState((s) => ({ ...s, loggedIn: false }));
+              go({ name: "home" });
             }}
-            aria-label="초기화"
-            className="inline-flex items-center gap-1 rounded-[4px] px-2 py-1.5 text-[14px] font-bold"
-            style={{ color: C.muted }}
-          >
-            <RotateCcw size={14} aria-hidden />
-            <span className="hidden sm:inline">초기화</span>
-          </button>
-        </div>
-      </header>
-
-      <main className="mx-auto max-w-[1200px] px-4 pt-5 md:px-6" aria-busy={!hydrated}>
-        {view === "learner" ? (
-          <LearnerView state={state} setState={setState} ratios={ratios} done={done} progress={progress} notify={notify} />
-        ) : (
-          <AdminView state={state} setState={setState} myProgress={progress} myDone={done} notify={notify} />
-        )}
-      </main>
+            onAdmin={() => {
+              setView("admin");
+              window.scrollTo({ top: 0 });
+            }}
+            onReset={reset}
+          />
+          <main>
+            {route.name === "home" && <Home go={go} />}
+            {route.name === "courses" && <SiteCoursesPage cat={route.cat} go={go} />}
+            {route.name === "course" && <CourseDetail key={route.id} id={route.id} state={state} setState={setState} go={go} notify={notify} />}
+            {route.name === "apply" && <ApplyPage go={go} />}
+            {route.name === "support" && <SupportPage tab={route.tab} go={go} loggedIn={state.loggedIn} notify={notify} />}
+            {route.name === "login" && (
+              <LoginPage
+                onLogin={() => {
+                  setState((s) => ({ ...s, loggedIn: true }));
+                  go(route.next);
+                }}
+              />
+            )}
+            {route.name === "my" && (
+              <div className="mx-auto max-w-[1200px] px-4 pt-6 md:px-6">
+                <LearnerView state={state} setState={setState} ratios={ratios} done={done} progress={progress} notify={notify} />
+              </div>
+            )}
+          </main>
+          <SiteFooter />
+        </>
+      ) : (
+        <>
+          <header className="border-b bg-white" style={{ borderColor: C.line }}>
+            <div className="mx-auto flex max-w-[1200px] flex-wrap items-center gap-x-3 gap-y-2 px-4 py-3 md:px-6">
+              <p className="mr-auto flex items-center gap-2" style={{ color: C.brand }}>
+                {/* eslint-disable-next-line @next/next/no-img-element */}
+                <img src="/images/logo.svg" alt="" aria-hidden width={28} height={28} className="h-7 w-7 shrink-0" />
+                <span className="sr-only">곰파트너 아카데미 관리자</span>
+                <span aria-hidden className="flex items-baseline gap-1 whitespace-nowrap">
+                  <span className="text-[18px] font-bold">곰파트너</span>
+                  <span className="text-[11px] font-bold opacity-80">아카데미</span>
+                  <span className="ml-1.5 text-[14px] font-bold" style={{ color: C.text }}>
+                    관리자
+                  </span>
+                </span>
+              </p>
+              <button type="button" onClick={() => go(route)} className={btnBase} style={btnLine}>
+                사이트 보기
+              </button>
+              <button type="button" onClick={reset} aria-label="초기화" className="grid size-9 place-items-center rounded-[4px]" style={{ color: C.muted }}>
+                <RotateCcw size={15} aria-hidden />
+              </button>
+            </div>
+          </header>
+          <main className="mx-auto max-w-[1200px] px-4 pt-5 md:px-6">
+            <AdminView state={state} setState={setState} myProgress={progress} myDone={done} notify={notify} />
+          </main>
+        </>
+      )}
 
       <p role="status" aria-live="polite" className="sr-only">
         {toast?.text}
@@ -437,7 +1312,7 @@ interface CertInfo {
 
 function LearnerView({ state, setState, ratios, done, progress, notify }: { state: State; setState: SetState; ratios: number[]; done: boolean[]; progress: number; notify: (t: string) => void }) {
   const [page, setPage] = useState<LearnerPage>("ongoing");
-  const [inRoom, setInRoom] = useState(true);
+  const [inRoom, setInRoom] = useState(false);
   const [tab, setTab] = useState<RoomTab>("study");
   const [player, setPlayer] = useState<number | null>(null);
   const [cert, setCert] = useState<CertInfo | null>(null);
@@ -504,6 +1379,20 @@ function LearnerView({ state, setState, ratios, done, progress, notify }: { stat
                       </button>
                     </td>
                   </tr>
+                  {state.applied.map((ap) => (
+                    <tr key={ap.id} className="border-t" style={{ borderColor: C.line }}>
+                      <td className={`${td} font-bold`}>{COURSES.find((c) => c.id === ap.id)?.title}</td>
+                      <td className={`${td} tabular-nums`}>{ap.period}</td>
+                      <td className={`${td} tabular-nums`}>0%</td>
+                      <td className={td}>-</td>
+                      <td className={td}>승인대기</td>
+                      <td className={td}>
+                        <button type="button" disabled className={btnBase} style={btnLine}>
+                          강의실 입장
+                        </button>
+                      </td>
+                    </tr>
+                  ))}
                 </tbody>
               </table>
             </div>

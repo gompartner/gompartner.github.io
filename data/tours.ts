@@ -76,8 +76,9 @@ export const tours: Record<string, TourStep[]> = {
     { target: '[aria-label="주문 파일 올리기"]', title: "엑셀 업로드", desc: "거래처 주문 엑셀을 올리세요." },
   ],
   lms: [
-    { target: '[aria-label="강의 보기"]', title: "학습하기", desc: "영상을 건너뛰면 진도율이 오르지 않습니다." },
-    { target: '[aria-label="화면 선택"]', title: "관리자 화면", desc: "관리자로 바꾸세요." },
+    { target: "#lms-courses", title: "인기 과정", desc: "과정을 고르세요." },
+    { target: "#lms-gnb-my", title: "나의 강의실", desc: "나의 강의실을 누르고 데모 계정으로 로그인하세요." },
+    { target: "#lms-admin", title: "관리자", desc: "관리자를 누르세요." },
   ],
   "job-portal": [
     { target: "#job-search", title: "검색", desc: "검색어를 넣고 검색을 누르세요." },
