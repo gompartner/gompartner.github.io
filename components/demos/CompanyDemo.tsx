@@ -677,7 +677,7 @@ function Home() {
               </span>
             </button>
             <button type="button" onClick={() => go("business", "fiveAx")} className="group relative block h-[150px] overflow-hidden rounded-[4px] text-left md:h-[190px]" style={{ background: C.steel }}>
-              <Image src={`${IMG}/hero.jpg`} alt="" fill sizes="(min-width: 768px) 36vw, 100vw" className="object-cover object-[70%_50%] opacity-70 transition-opacity group-hover:opacity-55" />
+              <Image src={`${IMG}/worker.jpg`} alt="" fill sizes="(min-width: 768px) 36vw, 100vw" className="object-cover object-[70%_50%] opacity-70 transition-opacity group-hover:opacity-55" />
               <span className="absolute inset-x-0 bottom-0 p-4 md:p-5" style={{ color: C.white, background: "linear-gradient(0deg, rgba(20,24,29,0.85), rgba(20,24,29,0))" }}>
                 <span className="block text-[13px]" style={{ color: "#d4d8de" }}>{x("사업분야", "Business")}</span>
                 <span className="block text-[20px] font-bold md:text-[23px]">{x("MCTㆍ5축 가공", "MCT and 5-Axis")}</span>
@@ -878,7 +878,7 @@ function SubPage({ m, s: subId }: { m: MenuId; s: string }) {
   return (
     <>
       <section className="relative overflow-hidden px-4 md:px-6" style={{ background: C.steel, color: C.white }}>
-        <Image src={`${IMG}/hero.jpg`} alt="" fill sizes="100vw" className="object-cover object-[50%_40%]" />
+        <Image src={`${IMG}/worker.jpg`} alt="" fill sizes="100vw" className="object-cover object-[50%_40%]" />
         <div className="absolute inset-0" style={{ background: "rgba(20,24,29,0.78)" }} aria-hidden />
         <div className="relative mx-auto max-w-[1200px] py-9 md:py-14">
           <h1 className="text-[28px] font-bold tracking-[-0.03em] md:text-[38px]">{s(menu.label)}</h1>
