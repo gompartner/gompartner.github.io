@@ -44,7 +44,7 @@ export const plans: Plan[] = [
   },
 ];
 
-export const planCommon = ["원본 소스 제공", "완료 후 1개월 무상 유지보수"];
+export const planCommon = ["원본 소스 제공", "완료 후 1개월 무상 오류 수정"];
 
 /** 패키지에 없는 기능을 더할 때의 단가. 고급 패키지의 맞춤 기능 1개는 따로 받지 않는다. */
 export type AddonId = "page" | "board" | "tool" | "print" | "lang" | "live" | "map" | "pay" | "member" | "cart";

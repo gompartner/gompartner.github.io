@@ -28,7 +28,7 @@ const geistMono = Geist_Mono({
 // 메인 첫 화면 문구와 맞춘 사이트 제목·설명
 const siteTitle = `홈페이지·업무 프로그램 제작 | ${profile.name}`;
 const siteDescription =
-  "쇼핑몰, 펜션, 회사, 병원 홈페이지와 업무 프로그램을 직접 만듭니다. 원본 소스를 제공하고 완료 후 1개월 무상 유지보수합니다.";
+  "쇼핑몰, 펜션, 회사, 병원 홈페이지와 업무 프로그램을 직접 만듭니다. 원본 소스를 제공하고 완료 후 1개월 동안 오류를 무상으로 수정합니다.";
 
 export const metadata: Metadata = {
   metadataBase: new URL(siteUrl),
@@ -60,7 +60,7 @@ export const metadata: Metadata = {
     description: siteDescription,
     images: [
       {
-        url: "/og-image.png?v=20261007b",
+        url: "/og-image.png?v=20261007c",
         width: 1200,
         height: 630,
         alt: `${profile.name} 홈페이지·업무 프로그램 제작`,
@@ -71,7 +71,7 @@ export const metadata: Metadata = {
     card: "summary_large_image",
     title: siteTitle,
     description: siteDescription,
-    images: ["/og-image.png?v=20261007b"],
+    images: ["/og-image.png?v=20261007c"],
   },
   verification: {
     other: { "naver-site-verification": ["1c5242ef5ddbce4e807bad7225bb0770a1cb06c1", "184bef35395b609c58d44964bf16993e76c0dd50"] },

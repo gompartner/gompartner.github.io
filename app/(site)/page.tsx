@@ -24,7 +24,7 @@ export const metadata: Metadata = {
     absolute: `홈페이지·업무 프로그램 제작 | ${profile.name}`,
   },
   description:
-    "쇼핑몰, 펜션, 회사, 병원 홈페이지와 업무 프로그램을 직접 만듭니다. 원본 소스를 제공하고 완료 후 1개월 무상 유지보수합니다.",
+    "쇼핑몰, 펜션, 회사, 병원 홈페이지와 업무 프로그램을 직접 만듭니다. 원본 소스를 제공하고 완료 후 1개월 동안 오류를 무상으로 수정합니다.",
   alternates: { canonical: "/" },
 };
 
@@ -37,7 +37,7 @@ const featured = featuredIds.map((id) => projects.find((p) => p.id === id)!);
 const showcaseIds = ["online-store", "pension", "company", "dental-homepage", "law-firm", "tax-office"];
 const showcase = showcaseIds.map((id) => projects.find((p) => p.id === id)!);
 
-const promises = ["채팅으로 바로 상담", "원본 소스 제공", "완료 후 1개월 무상 유지보수"];
+const promises = ["채팅으로 바로 상담", "원본 소스 제공", "완료 후 1개월 무상 오류 수정"];
 
 
 const container = "mx-auto w-full max-w-[1248px] px-4 md:px-6";
