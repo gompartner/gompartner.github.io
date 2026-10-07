@@ -304,6 +304,7 @@ export function JobPortalDemo() {
   const [confirmId, setConfirmId] = useState<string | null>(null);
   const [period, setPeriod] = useState<RankPeriod>("일간");
   const [situation, setSituation] = useState<Situation>("취업준비");
+  const [nav, setNav] = useState<{ page: MenuName; sub: string }>({ page: "채용정보", sub: "" });
   const today = useToday();
   const isDesktop = useIsDesktop();
   const reduced = useReducedMotionSafe();
@@ -358,6 +359,12 @@ export function JobPortalDemo() {
     return () => window.removeEventListener("keydown", onKey);
   }, [confirmId, openId]);
 
+  // 상단 메뉴: 채용정보는 첫 화면, 나머지는 하위 화면으로 바꾸고 맨 위로 올린다
+  const goMenu = (page: MenuName, sub?: string) => {
+    setNav({ page, sub: sub ?? SUBMENU[page][0] ?? "" });
+    window.scrollTo({ top: 0 });
+  };
+
   const toResults = () => {
     window.setTimeout(() => document.getElementById("results")?.scrollIntoView({ block: "start", behavior: reduced ? "auto" : "smooth" }), 0);
   };
@@ -401,24 +408,26 @@ export function JobPortalDemo() {
       {/* 머리글 */}
       <header className="border-b border-[#dde2ea] bg-white">
         <div className="mx-auto flex h-16 max-w-[1200px] items-center gap-3 px-4 md:px-6">
-          <span className={`${display.className} text-[26px] leading-none tracking-[-0.01em]`}>
+          <a
+            href="#main"
+            onClick={(e) => {
+              e.preventDefault();
+              goMenu("채용정보");
+            }}
+            className={`${display.className} text-[26px] leading-none tracking-[-0.01em]`}
+          >
             ○○<span className="rounded-[4px] bg-[#ffd23f] px-1">일자리</span>
-          </span>
+          </a>
           <nav className="ml-8 hidden lg:block" aria-label="주메뉴">
-            <ul className="flex gap-6 text-[17px] font-bold">
-              {["채용정보", "공공일자리", "취업지원", "기업서비스", "고객센터"].map((m, i) => (
-                <li key={m}>
-                  <a href="#main" aria-current={i === 0 ? "page" : undefined} className={i === 0 ? "border-b-[3px] border-[#ffd23f] pb-1" : "text-[#3c4660] hover:text-[#1b2a4a]"}>
-                    {m}
-                  </a>
-                </li>
-              ))}
-            </ul>
+            <MenuList current={nav.page} onGo={goMenu} />
           </nav>
           <button
             type="button"
             onClick={() => {
-              setOnlySaved((v) => !v);
+              if (nav.page !== "채용정보") {
+                goMenu("채용정보");
+                setOnlySaved(true);
+              } else setOnlySaved((v) => !v);
               toResults();
             }}
             aria-pressed={onlySaved}
@@ -428,9 +437,16 @@ export function JobPortalDemo() {
             관심공고 <span className="tabular-nums">{stored.saved.length}</span>
           </button>
         </div>
+        <nav className="border-t border-[#dde2ea] lg:hidden" aria-label="주메뉴">
+          <MenuList current={nav.page} onGo={goMenu} mobile />
+        </nav>
       </header>
 
       <main id="main">
+        {nav.page !== "채용정보" ? (
+          <JobSubPage page={nav.page} sub={nav.sub} today={today} onGo={goMenu} />
+        ) : (
+          <>
         {/* 검색 */}
         <section aria-labelledby="search-title" className="border-b border-[#dde2ea] bg-[#f4f6fa]">
           <div className="mx-auto max-w-[1200px] px-4 pb-8 pt-8 md:px-6 md:pt-12">
@@ -681,6 +697,8 @@ export function JobPortalDemo() {
             </nav>
           )}
         </section>
+          </>
+        )}
       </main>
 
       <footer className="border-t border-[#dde2ea] bg-[#f4f6fa]">
@@ -1099,5 +1117,691 @@ function ChipGroup<T extends string>({ label, options, value, onToggle }: { labe
         })}
       </div>
     </fieldset>
+  );
+}
+
+/* ---------- 하위 화면 ---------- */
+
+const MENUS = ["채용정보", "공공일자리", "취업지원", "기업서비스", "고객센터"] as const;
+type MenuName = (typeof MENUS)[number];
+
+const SUBMENU: Record<MenuName, string[]> = {
+  채용정보: [],
+  공공일자리: ["공공일자리 목록", "채용박람회"],
+  취업지원: ["취업지원 프로그램", "직업훈련"],
+  기업서비스: ["구인등록 안내", "구인신청"],
+  고객센터: ["공지사항", "자주 묻는 질문", "1:1 문의"],
+};
+
+function MenuList({ current, onGo, mobile }: { current: MenuName; onGo: (p: MenuName) => void; mobile?: boolean }) {
+  return (
+    <ul className={mobile ? "flex overflow-x-auto px-2 text-[16px] font-bold" : "flex gap-6 text-[17px] font-bold"}>
+      {MENUS.map((m) => {
+        const on = m === current;
+        return (
+          <li key={m} className="shrink-0">
+            <button
+              type="button"
+              onClick={() => onGo(m)}
+              aria-current={on ? "page" : undefined}
+              className={
+                mobile
+                  ? `h-11 border-b-[3px] px-3 ${on ? "border-[#ffd23f]" : "border-transparent text-[#3c4660]"}`
+                  : on
+                    ? "border-b-[3px] border-[#ffd23f] pb-1"
+                    : "border-b-[3px] border-transparent pb-1 text-[#3c4660] hover:text-[#1b2a4a]"
+              }
+            >
+              {m}
+            </button>
+          </li>
+        );
+      })}
+    </ul>
+  );
+}
+
+type PublicKind = "공공기관" | "지자체" | "공공근로";
+// [기관, 공고명, 구분, 고용형태, 인원, 접수 시작(N일 전), 마감(N일 후), 근무기간, 근무시간, 임금]
+const PUBLIC_ROWS: [string, string, PublicKind, string, number, number, number, string, string, string][] = [
+  ["○○구청", "2026년 하반기 기간제 근로자 채용 (행정 보조)", "지자체", "기간제", 5, 2, 7, "2026. 11. 2. ~ 12. 31.", "주 5일 09:00 ~ 18:00", "시급 10,320원"],
+  ["○○구 일자리정책과", "2026년 4단계 공공근로사업 참여자 모집", "공공근로", "기간제", 40, 1, 9, "2026. 11. 2. ~ 2027. 1. 29.", "주 5일 09:00 ~ 14:00", "시급 10,320원"],
+  ["○○시설관리공단", "체육시설 운영직 채용", "공공기관", "무기계약직", 3, 3, 12, "채용일부터", "주 5일 교대 근무", "월급 245만 원"],
+  ["○○진흥원", "사업 운영 계약직 연구원", "공공기관", "계약직", 1, 4, 7, "1년 (연장 가능)", "주 5일 09:00 ~ 18:00", "연봉 3,900만 원"],
+  ["△△시 중앙도서관", "도서관 자료정리 보조", "지자체", "기간제", 2, 0, 10, "2026. 11. 2. ~ 2027. 2. 26.", "주 5일 09:00 ~ 13:00", "시급 10,320원"],
+  ["○○문화재단", "축제 운영 보조 단기 인력", "공공기관", "기간제", 10, 5, 2, "2026. 10. 30. ~ 11. 8.", "행사일 10:00 ~ 19:00", "일급 95,000원"],
+  ["○○구 청소행정과", "환경정비 공공근로 참여자 모집", "공공근로", "기간제", 25, 6, 4, "2026. 11. 2. ~ 12. 31.", "주 5일 08:00 ~ 12:00", "시급 10,320원"],
+  ["□□구 보건소", "방문 건강관리 간호사", "지자체", "기간제", 2, 9, -1, "2026. 11. 1. ~ 12. 31.", "주 5일 09:00 ~ 18:00", "월급 290만 원"],
+];
+
+const FAIRS = [
+  ["2026 ○○구 하반기 일자리 박람회", "10. 22.(목) 13:00 ~ 17:00", "○○구청 대강당", "32개사", "사전신청"],
+  ["중장년 채용박람회", "10. 28.(수) 10:00 ~ 16:00", "○○시 일자리센터", "25개사", "사전신청"],
+  ["청년 IT·디지털 채용박람회", "11. 5.(목) 13:00 ~ 18:00", "○○컨벤션센터 3층", "40개사", "예정"],
+  ["경력단절여성 취업박람회", "9. 24.(목) 10:00 ~ 16:00", "○○구 여성회관", "28개사", "종료"],
+];
+
+const PROGRAMS = [
+  { name: "1:1 취업상담", target: "구직자 누구나", when: "평일 10:00 ~ 17:00", where: "○○일자리센터 상담실" },
+  { name: "직업심리검사", target: "구직자 누구나", when: "상시", where: "온라인" },
+  { name: "이력서·자기소개서 클리닉", target: "구직자 누구나", when: "매주 화요일 14:00", where: "○○일자리센터 교육실" },
+  { name: "모의면접", target: "구직자 누구나", when: "매주 목요일 14:00", where: "○○일자리센터 교육실" },
+  { name: "취업특강", target: "청년 구직자", when: "매월 둘째 주 수요일 19:00", where: "○○구청 대강당" },
+  { name: "면접정장 무료 대여", target: "만 18 ~ 39세 청년 구직자", when: "평일 10:00 ~ 19:00", where: "협력 대여점 12곳" },
+];
+
+const TRAININGS = [
+  ["웹 퍼블리셔 양성과정", "2026. 11. 2. ~ 2027. 3. 19.", "주 5일 09:30 ~ 16:30", "국민내일배움카드", "접수중"],
+  ["전산회계 1급 취득과정", "2026. 11. 9. ~ 2027. 1. 15.", "주 5일 19:00 ~ 22:00", "국민내일배움카드", "접수중"],
+  ["요양보호사 자격과정", "2026. 10. 19. ~ 12. 11.", "주 5일 09:00 ~ 18:00", "국민내일배움카드", "마감"],
+  ["물류관리 실무과정", "2026. 11. 16. ~ 12. 24.", "주 5일 09:00 ~ 15:00", "전액 지원", "접수중"],
+];
+
+const NOTICES = [
+  {
+    title: "시스템 점검에 따른 서비스 일시 중단 안내",
+    date: "2026.10.06",
+    views: 812,
+    body: ["시스템 점검으로 아래 시간 동안 서비스 이용이 중단됩니다.", "1. 중단일시: 2026. 10. 10.(토) 00:00 ~ 06:00", "2. 중단내용: 채용정보 검색, 입사지원, 구인신청", "이용에 불편을 드려 죄송합니다."],
+  },
+  { title: "2026 ○○구 하반기 일자리 박람회 개최 안내", date: "2026.10.02", views: 1530, body: ["1. 일시: 2026. 10. 22.(목) 13:00 ~ 17:00", "2. 장소: ○○구청 대강당", "3. 참여기업: 32개사", "4. 신청: 공공일자리 > 채용박람회에서 사전신청"] },
+  {
+    title: "취업사기 피해 예방 안내",
+    date: "2026.09.25",
+    views: 2204,
+    body: ["채용을 이유로 통장, 체크카드, 신분증 사본을 요구하는 경우 취업사기일 수 있습니다.", "피해가 의심되면 경찰청(112) 또는 고객센터(1588-0000)로 신고해 주시기 바랍니다."],
+  },
+  { title: "추석 연휴 고객센터 운영 안내", date: "2026.09.18", views: 634, body: ["추석 연휴(9. 24. ~ 9. 27.) 기간에는 고객센터 전화 상담을 운영하지 않습니다.", "1:1 문의는 연휴 이후 순서대로 답변드립니다."] },
+  { title: "개인정보처리방침 개정 안내", date: "2026.09.01", views: 418, body: ["개인정보처리방침이 2026. 9. 8.부터 다음과 같이 개정됩니다.", "1. 개정내용: 개인정보 보유기간 항목 정비", "2. 시행일: 2026. 9. 8."] },
+];
+
+const FAQS: { cat: "구직" | "구인" | "회원"; q: string; a: string }[] = [
+  { cat: "구직", q: "이력서는 몇 개까지 등록할 수 있나요?", a: "이력서는 최대 5개까지 등록할 수 있으며, 공고마다 다른 이력서로 지원할 수 있습니다." },
+  { cat: "구직", q: "입사지원을 취소할 수 있나요?", a: "마감일 전까지 입사지원 내역에서 지원 취소가 가능합니다." },
+  { cat: "구직", q: "관심공고는 어디에서 확인하나요?", a: "화면 위 관심공고 버튼을 누르면 저장한 공고만 모아 볼 수 있습니다." },
+  { cat: "구인", q: "구인신청 후 언제 공고가 게시되나요?", a: "담당자 검토 후 근무일 기준 1일 이내에 게시됩니다." },
+  { cat: "구인", q: "구인등록 비용이 있나요?", a: "구인등록과 채용공고 게시는 무료입니다." },
+  { cat: "회원", q: "비밀번호를 잊어버렸어요.", a: "로그인 화면의 비밀번호 찾기에서 휴대폰 본인인증 후 다시 설정할 수 있습니다." },
+];
+
+function JobSubPage({ page, sub, today, onGo }: { page: MenuName; sub: string; today: Date | null; onGo: (p: MenuName, sub?: string) => void }) {
+  const items = SUBMENU[page];
+  let body: React.ReactNode = null;
+  if (sub === "공공일자리 목록") body = <PublicJobs today={today} />;
+  else if (sub === "채용박람회") body = <SimpleTable caption="채용박람회 일정" head={["행사명", "일시", "장소", "참여기업", "상태"]} rows={FAIRS} />;
+  else if (sub === "취업지원 프로그램") body = <Programs />;
+  else if (sub === "직업훈련") body = <SimpleTable caption="직업훈련 과정" head={["훈련과정", "훈련기간", "훈련시간", "훈련비", "상태"]} rows={TRAININGS} />;
+  else if (sub === "구인등록 안내") body = <EmployerGuide onApply={() => onGo("기업서비스", "구인신청")} />;
+  else if (sub === "구인신청") body = <EmployerForm />;
+  else if (sub === "공지사항") body = <NoticeBoard key="notice" />;
+  else if (sub === "자주 묻는 질문") body = <Faq />;
+  else if (sub === "1:1 문의") body = <Inquiry />;
+
+  return (
+    <>
+      <div className="border-b border-[#dde2ea] bg-[#f4f6fa]">
+        <div className="mx-auto max-w-[1200px] px-4 py-6 md:px-6 md:py-8">
+          <ol aria-label="현재 위치" className="flex flex-wrap items-center gap-1.5 text-[14px] text-[#56607a]">
+            <li>
+              <button type="button" onClick={() => onGo("채용정보")} className="hover:underline">
+                홈
+              </button>
+            </li>
+            <li aria-hidden>&gt;</li>
+            <li>{page}</li>
+            <li aria-hidden>&gt;</li>
+            <li aria-current="page" className="font-bold text-[#1b2a4a]">
+              {sub}
+            </li>
+          </ol>
+          <h1 className={`${display.className} mt-2 text-[30px] leading-[1.3] md:text-[34px]`}>{sub}</h1>
+        </div>
+      </div>
+      <div className="mx-auto grid max-w-[1200px] gap-5 px-4 pb-14 pt-6 md:px-6 lg:grid-cols-[200px_minmax(0,1fr)] lg:gap-8 lg:pt-8">
+        <nav aria-label={`${page} 메뉴`} className="min-w-0 lg:self-start">
+          <p className="hidden rounded-t-[10px] bg-[#1b2a4a] px-4 py-3 text-[18px] font-bold text-white lg:block">{page}</p>
+          <ul className="flex gap-1.5 overflow-x-auto lg:block lg:overflow-visible lg:rounded-b-[10px] lg:border-2 lg:border-t-0 lg:border-[#1b2a4a]">
+            {items.map((it) => {
+              const on = it === sub;
+              return (
+                <li key={it} className="shrink-0 lg:border-b lg:border-[#dde2ea] lg:last:border-b-0">
+                  <button
+                    type="button"
+                    onClick={() => onGo(page, it)}
+                    aria-current={on ? "page" : undefined}
+                    className={`h-10 rounded-[6px] border-2 px-3 text-[15px] font-bold lg:h-12 lg:w-full lg:rounded-none lg:border-0 lg:px-4 lg:text-left lg:text-[16px] ${
+                      on ? "border-[#1b2a4a] bg-[#1b2a4a] text-white lg:bg-[#fff4c7] lg:text-[#1b2a4a]" : "border-[#dde2ea] bg-white text-[#3c4660] hover:text-[#1b2a4a] lg:hover:bg-[#f4f6fa]"
+                    }`}
+                  >
+                    {it}
+                  </button>
+                </li>
+              );
+            })}
+          </ul>
+        </nav>
+        <div className="min-w-0">{body}</div>
+      </div>
+    </>
+  );
+}
+
+function SimpleTable({ caption, head, rows }: { caption: string; head: string[]; rows: string[][] }) {
+  return (
+    <div className="overflow-x-auto">
+      <table className="w-full min-w-[620px] border-t-2 border-[#1b2a4a] text-left text-[15px]">
+        <caption className="sr-only">{caption}</caption>
+        <thead className="bg-[#f4f6fa]">
+          <tr className="border-b border-[#dde2ea]">
+            {head.map((h) => (
+              <th key={h} scope="col" className="px-3 py-2.5 font-bold">
+                {h}
+              </th>
+            ))}
+          </tr>
+        </thead>
+        <tbody>
+          {rows.map((r) => (
+            <tr key={r[0]} className="border-b border-[#dde2ea] align-top">
+              {r.map((c, i) =>
+                i === 0 ? (
+                  <th key={i} scope="row" className="px-3 py-3 font-bold">
+                    {c}
+                  </th>
+                ) : (
+                  <td key={i} className="px-3 py-3 text-[#3c4660]">
+                    {i === r.length - 1 ? <StatusText value={c} /> : c}
+                  </td>
+                ),
+              )}
+            </tr>
+          ))}
+        </tbody>
+      </table>
+    </div>
+  );
+}
+
+function StatusText({ value }: { value: string }) {
+  const open = value === "접수중" || value === "사전신청";
+  const closed = value === "마감" || value === "종료";
+  return <span className={`font-bold ${open ? "text-[#2455d6]" : closed ? "text-[#6b7489]" : "text-[#1b2a4a]"}`}>{value}</span>;
+}
+
+function PublicJobs({ today }: { today: Date | null }) {
+  const [kind, setKind] = useState<"전체" | PublicKind>("전체");
+  const [openOnly, setOpenOnly] = useState(false);
+  const [openRow, setOpenRow] = useState<number | null>(null);
+  const kinds = ["전체", "공공기관", "지자체", "공공근로"] as const;
+  const rows = PUBLIC_ROWS.map((r, i) => ({ r, i })).filter(({ r }) => (kind === "전체" || r[2] === kind) && (!openOnly || r[6] >= 0));
+
+  return (
+    <div>
+      <div role="tablist" aria-label="공공일자리 구분" className="flex border-b-2 border-[#1b2a4a]">
+        {kinds.map((k) => {
+          const n = PUBLIC_ROWS.filter((r) => k === "전체" || r[2] === k).length;
+          return (
+            <button
+              key={k}
+              type="button"
+              role="tab"
+              aria-selected={kind === k}
+              onClick={() => {
+                setKind(k);
+                setOpenRow(null);
+              }}
+              className={`-mb-0.5 h-11 flex-1 rounded-t-[6px] px-2 text-[15px] font-bold md:flex-none md:px-5 md:text-[16px] ${kind === k ? "bg-[#1b2a4a] text-white" : "text-[#3c4660] hover:text-[#1b2a4a]"}`}
+            >
+              {k} <span className="font-normal tabular-nums">{n}</span>
+            </button>
+          );
+        })}
+      </div>
+      <div className="mt-3 flex flex-wrap items-center justify-between gap-2">
+        <p className="text-[16px] text-[#3c4660]">
+          검색건수 <b className="text-[#c8321f] tabular-nums">{rows.length}</b>건
+        </p>
+        <label className="inline-flex cursor-pointer items-center gap-2 text-[15px] font-bold">
+          <input type="checkbox" checked={openOnly} onChange={(e) => setOpenOnly(e.target.checked)} className="h-5 w-5 accent-[#1b2a4a]" />
+          접수중만
+        </label>
+      </div>
+
+      <ul className="mt-3 border-t-2 border-[#1b2a4a]">
+        {rows.map(({ r, i }) => {
+          const [org, title, k, type, count, startAgo, closeIn, period, hours, pay] = r;
+          const closed = closeIn < 0;
+          const open = openRow === i;
+          const range = today ? `${isoDate(addDays(today, -startAgo))} ~ ${isoDate(addDays(today, closeIn))}` : "";
+          return (
+            <li key={title} className="border-b border-[#dde2ea]">
+              <button
+                type="button"
+                onClick={() => setOpenRow(open ? null : i)}
+                aria-expanded={open}
+                className="grid w-full gap-x-4 gap-y-1 px-1 py-3 text-left md:grid-cols-[minmax(0,1fr)_200px_80px] md:items-center"
+              >
+                <span className="min-w-0">
+                  <span className="block text-[14px] font-bold text-[#56607a]">
+                    {org} <span className="font-normal">| {k}</span>
+                  </span>
+                  <span className="block text-[17px] font-bold leading-[1.45] hover:text-[#2455d6]">{title}</span>
+                  <span className="block text-[15px] text-[#3c4660]">
+                    {type} | {count}명 | {pay}
+                  </span>
+                </span>
+                <span className="text-[14px] text-[#3c4660] tabular-nums">{range}</span>
+                <span className="flex items-center gap-2 md:justify-end">
+                  <StatusText value={closed ? "마감" : "접수중"} />
+                  <ChevronDown size={18} aria-hidden className={open ? "rotate-180" : ""} />
+                </span>
+              </button>
+              {open && (
+                <dl className="mb-3 grid gap-px overflow-hidden rounded-[10px] border-2 border-[#1b2a4a] bg-[#dde2ea] text-[15px] sm:grid-cols-2">
+                  {[
+                    ["모집인원", `${count}명`],
+                    ["고용형태", type],
+                    ["근무기간", period],
+                    ["근무시간", hours],
+                    ["임금", pay],
+                    ["접수기간", range],
+                    ["접수방법", k === "공공근로" ? "주소지 동주민센터 방문 접수" : "기관 누리집 온라인 접수"],
+                    ["문의", `${org} 02-000-0000`],
+                  ].map(([dk, dv]) => (
+                    <div key={dk} className="bg-white px-3 py-2.5">
+                      <dt className="font-bold">{dk}</dt>
+                      <dd className="text-[#3c4660]">{dv}</dd>
+                    </div>
+                  ))}
+                </dl>
+              )}
+            </li>
+          );
+        })}
+      </ul>
+    </div>
+  );
+}
+
+function Programs() {
+  const [applied, setApplied] = useState<string[]>([]);
+  return (
+    <div>
+      <ul className="border-t-2 border-[#1b2a4a]">
+        {PROGRAMS.map((p) => {
+          const done = applied.includes(p.name);
+          return (
+            <li key={p.name} className="grid gap-x-4 gap-y-2 border-b border-[#dde2ea] py-4 sm:grid-cols-[minmax(0,1fr)_auto] sm:items-center">
+              <div className="min-w-0">
+                <h2 className="text-[18px] font-bold">{p.name}</h2>
+                <dl className="mt-1 grid gap-x-4 text-[15px] text-[#3c4660] md:grid-cols-3">
+                  {[
+                    ["대상", p.target],
+                    ["일정", p.when],
+                    ["장소", p.where],
+                  ].map(([k, v]) => (
+                    <div key={k} className="flex gap-1.5">
+                      <dt className="shrink-0 font-bold text-[#1b2a4a]">{k}</dt>
+                      <dd>{v}</dd>
+                    </div>
+                  ))}
+                </dl>
+              </div>
+              {done ? (
+                <p className="inline-flex h-11 items-center gap-1.5 justify-self-start text-[15px] font-bold text-[#1f7a3e] sm:justify-self-end">
+                  <CheckCircle2 size={18} aria-hidden />
+                  신청완료
+                </p>
+              ) : (
+                <button
+                  type="button"
+                  onClick={() => setApplied((a) => [...a, p.name])}
+                  className="h-11 justify-self-start rounded-[6px] bg-[#2455d6] px-5 text-[15px] font-bold text-white hover:bg-[#1c45b3] sm:justify-self-end"
+                >
+                  신청하기
+                </button>
+              )}
+            </li>
+          );
+        })}
+      </ul>
+      <p className="mt-4 text-[15px] text-[#3c4660]">문의 ○○일자리센터 02-000-1500 (평일 09:00 ~ 18:00)</p>
+    </div>
+  );
+}
+
+function EmployerGuide({ onApply }: { onApply: () => void }) {
+  const steps = ["기업회원 가입", "구인신청서 작성", "담당자 검토", "채용공고 게시", "알선·면접"];
+  return (
+    <div>
+      <h2 className="border-b-2 border-[#1b2a4a] pb-1.5 text-[19px] font-bold">구인등록 절차</h2>
+      <ol className="mt-4 grid gap-2 sm:grid-cols-5">
+        {steps.map((s, i) => (
+          <li key={s} className="flex items-center gap-2 rounded-[6px] bg-[#f4f6fa] px-3 py-3 sm:flex-col sm:text-center">
+            <span className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-[#1b2a4a] text-[15px] font-bold text-white tabular-nums">{i + 1}</span>
+            <span className="text-[15px] font-bold">{s}</span>
+          </li>
+        ))}
+      </ol>
+      <h2 className="mt-8 border-b-2 border-[#1b2a4a] pb-1.5 text-[19px] font-bold">이용 안내</h2>
+      <dl className="text-[16px]">
+        {[
+          ["이용대상", "사업자등록증이 있는 사업장"],
+          ["이용요금", "무료"],
+          ["공고 게시", "담당자 검토 후 근무일 기준 1일 이내"],
+          ["게시기간", "최대 30일 (연장 가능)"],
+          ["문의", "기업지원팀 02-000-1520 (평일 09:00 ~ 18:00)"],
+        ].map(([k, v]) => (
+          <div key={k} className="grid border-b border-[#dde2ea] sm:grid-cols-[140px_minmax(0,1fr)]">
+            <dt className="bg-[#f4f6fa] px-3 py-2.5 font-bold">{k}</dt>
+            <dd className="px-3 py-2.5 text-[#3c4660]">{v}</dd>
+          </div>
+        ))}
+      </dl>
+      <p className="mt-4 rounded-[6px] bg-[#f4f6fa] px-3 py-2 text-[14px] leading-[1.6] text-[#3c4660]">
+        『채용절차의 공정화에 관한 법률』에 따라 구직자에게 직무 수행과 관계없는 신체 조건, 출신 지역, 혼인 여부 등의 정보를 요구할 수 없습니다.
+      </p>
+      <div className="mt-6 flex justify-end">
+        <button type="button" onClick={onApply} className="h-12 rounded-[6px] bg-[#2455d6] px-6 text-[16px] font-bold text-white hover:bg-[#1c45b3]">
+          구인신청
+        </button>
+      </div>
+    </div>
+  );
+}
+
+function EmployerForm() {
+  const [done, setDone] = useState<Record<string, string> | null>(null);
+  const [agree, setAgree] = useState(false);
+  const inputCls = "mt-1.5 h-11 w-full rounded-[6px] border-2 border-[#dde2ea] bg-white px-3 text-[16px] focus:border-[#1b2a4a] focus:outline-none";
+
+  if (done) {
+    return (
+      <div className="rounded-[10px] border-2 border-[#1b2a4a] p-6" role="status">
+        <p className="inline-flex items-center gap-2 text-[19px] font-bold">
+          <CheckCircle2 size={22} className="text-[#1f7a3e]" aria-hidden />
+          구인신청이 접수되었습니다.
+        </p>
+        <dl className="mt-4 text-[16px]">
+          {Object.entries(done).map(([k, v]) => (
+            <div key={k} className="flex gap-3 border-b border-[#dde2ea] py-2">
+              <dt className="w-24 shrink-0 font-bold">{k}</dt>
+              <dd className="text-[#3c4660]">{v}</dd>
+            </div>
+          ))}
+        </dl>
+        <button type="button" onClick={() => setDone(null)} className="mt-5 h-11 rounded-[6px] border-2 border-[#1b2a4a] px-5 text-[15px] font-bold">
+          새로 신청
+        </button>
+      </div>
+    );
+  }
+
+  return (
+    <form
+      onSubmit={(e) => {
+        e.preventDefault();
+        const f = new FormData(e.currentTarget);
+        setDone({
+          접수번호: "2026-10-001284",
+          사업장명: String(f.get("company")),
+          모집직종: String(f.get("category")),
+          모집인원: `${f.get("count")}명`,
+          근무지역: String(f.get("region")),
+          처리상태: "담당자 검토 중",
+        });
+      }}
+      className="grid gap-x-6 gap-y-4 sm:grid-cols-2"
+    >
+      <label className="block text-[15px] font-bold">
+        사업장명
+        <input name="company" required className={inputCls} />
+      </label>
+      <label className="block text-[15px] font-bold">
+        사업자등록번호
+        <input name="bizno" required inputMode="numeric" placeholder="000-00-00000" className={inputCls} />
+      </label>
+      <label className="block text-[15px] font-bold">
+        담당자명
+        <input name="manager" required className={inputCls} />
+      </label>
+      <label className="block text-[15px] font-bold">
+        연락처
+        <input name="phone" required type="tel" placeholder="000-0000-0000" className={inputCls} />
+      </label>
+      <label className="block text-[15px] font-bold">
+        모집직종
+        <select name="category" className={inputCls}>
+          {CATEGORIES.map((c) => (
+            <option key={c}>{c}</option>
+          ))}
+        </select>
+      </label>
+      <label className="block text-[15px] font-bold">
+        모집인원
+        <input name="count" required type="number" min={1} defaultValue={1} className={inputCls} />
+      </label>
+      <label className="block text-[15px] font-bold">
+        근무지역
+        <select name="region" className={inputCls}>
+          {REGIONS.map((r) => (
+            <option key={r}>{r}</option>
+          ))}
+        </select>
+      </label>
+      <label className="block text-[15px] font-bold">
+        고용형태
+        <select name="type" className={inputCls}>
+          {TYPES.map((t) => (
+            <option key={t}>{t}</option>
+          ))}
+        </select>
+      </label>
+      <label className="block text-[15px] font-bold sm:col-span-2">
+        직무내용
+        <textarea name="duty" rows={4} className="mt-1.5 w-full rounded-[6px] border-2 border-[#dde2ea] px-3 py-2 text-[16px] focus:border-[#1b2a4a] focus:outline-none" />
+      </label>
+      <label className="flex cursor-pointer items-center gap-2 text-[15px] font-bold sm:col-span-2">
+        <input type="checkbox" checked={agree} onChange={(e) => setAgree(e.target.checked)} className="h-5 w-5 accent-[#1b2a4a]" />
+        개인정보 수집·이용에 동의합니다. (필수)
+      </label>
+      <div className="flex justify-end sm:col-span-2">
+        <button type="submit" disabled={!agree} className="h-12 rounded-[6px] bg-[#2455d6] px-8 text-[16px] font-bold text-white hover:bg-[#1c45b3] disabled:opacity-50">
+          신청
+        </button>
+      </div>
+    </form>
+  );
+}
+
+function NoticeBoard() {
+  const [openIdx, setOpenIdx] = useState<number | null>(null);
+  if (openIdx !== null) {
+    const n = NOTICES[openIdx];
+    return (
+      <article>
+        <div className="border-t-2 border-[#1b2a4a]">
+          <h2 className="bg-[#f4f6fa] px-3 py-3 text-[19px] font-bold">{n.title}</h2>
+          <p className="flex gap-5 border-y border-[#dde2ea] px-3 py-2 text-[15px] text-[#3c4660]">
+            <span>
+              <b className="text-[#1b2a4a]">등록일</b> {n.date}
+            </span>
+            <span>
+              <b className="text-[#1b2a4a]">조회</b> {n.views.toLocaleString()}
+            </span>
+          </p>
+        </div>
+        <div className="min-h-[140px] space-y-2 px-3 py-6 text-[16px] leading-[1.7]">
+          {n.body.map((l) => (
+            <p key={l}>{l}</p>
+          ))}
+        </div>
+        <div className="flex justify-end border-t border-[#dde2ea] pt-4">
+          <button type="button" onClick={() => setOpenIdx(null)} className="h-11 rounded-[6px] bg-[#1b2a4a] px-6 text-[16px] font-bold text-white">
+            목록
+          </button>
+        </div>
+      </article>
+    );
+  }
+  return (
+    <div>
+      <p className="text-[16px] text-[#3c4660]">
+        전체 <b className="text-[#1b2a4a]">{NOTICES.length}</b>건
+      </p>
+      <table className="mt-2 w-full border-t-2 border-[#1b2a4a] text-[15px]">
+        <caption className="sr-only">공지사항 목록</caption>
+        <thead className="bg-[#f4f6fa]">
+          <tr className="border-b border-[#dde2ea]">
+            <th scope="col" className="hidden w-16 px-2 py-2.5 md:table-cell">
+              번호
+            </th>
+            <th scope="col" className="px-2 py-2.5 text-left">
+              제목
+            </th>
+            <th scope="col" className="w-28 px-2 py-2.5">
+              등록일
+            </th>
+            <th scope="col" className="hidden w-20 px-2 py-2.5 md:table-cell">
+              조회
+            </th>
+          </tr>
+        </thead>
+        <tbody>
+          {NOTICES.map((n, i) => (
+            <tr key={n.title} className="border-b border-[#dde2ea]">
+              <td className="hidden px-2 py-3 text-center text-[#56607a] tabular-nums md:table-cell">{NOTICES.length - i}</td>
+              <td className="px-2 py-3">
+                <button type="button" onClick={() => setOpenIdx(i)} className="text-left font-bold underline-offset-4 hover:text-[#2455d6] hover:underline">
+                  {n.title}
+                </button>
+              </td>
+              <td className="px-2 py-3 text-center text-[14px] text-[#3c4660] tabular-nums">{n.date}</td>
+              <td className="hidden px-2 py-3 text-center text-[14px] text-[#3c4660] tabular-nums md:table-cell">{n.views.toLocaleString()}</td>
+            </tr>
+          ))}
+        </tbody>
+      </table>
+    </div>
+  );
+}
+
+function Faq() {
+  const [cat, setCat] = useState<"전체" | "구직" | "구인" | "회원">("전체");
+  const [open, setOpen] = useState<string | null>(null);
+  const list = FAQS.filter((f) => cat === "전체" || f.cat === cat);
+  return (
+    <div>
+      <div role="tablist" aria-label="질문 분류" className="flex flex-wrap gap-1.5">
+        {(["전체", "구직", "구인", "회원"] as const).map((c) => (
+          <button
+            key={c}
+            type="button"
+            role="tab"
+            aria-selected={cat === c}
+            onClick={() => setCat(c)}
+            className={`h-10 rounded-[6px] border-2 px-4 text-[15px] font-bold ${cat === c ? "border-[#1b2a4a] bg-[#1b2a4a] text-white" : "border-[#dde2ea] hover:border-[#1b2a4a]"}`}
+          >
+            {c}
+          </button>
+        ))}
+      </div>
+      <ul className="mt-4 border-t-2 border-[#1b2a4a]">
+        {list.map((f) => {
+          const on = open === f.q;
+          return (
+            <li key={f.q} className="border-b border-[#dde2ea]">
+              <button type="button" onClick={() => setOpen(on ? null : f.q)} aria-expanded={on} className="flex w-full items-center gap-3 px-2 py-3.5 text-left">
+                <span className="w-6 shrink-0 text-[18px] font-bold text-[#2455d6]">Q</span>
+                <span className="w-12 shrink-0 text-[14px] text-[#56607a]">[{f.cat}]</span>
+                <span className="min-w-0 flex-1 text-[16px] font-bold">{f.q}</span>
+                <ChevronDown size={18} aria-hidden className={`shrink-0 ${on ? "rotate-180" : ""}`} />
+              </button>
+              {on && (
+                <p className="flex gap-3 bg-[#f4f6fa] px-2 py-3.5 text-[16px] leading-[1.7] text-[#3c4660]">
+                  <span className="w-6 shrink-0 text-[18px] font-bold text-[#c8321f]">A</span>
+                  <span>{f.a}</span>
+                </p>
+              )}
+            </li>
+          );
+        })}
+      </ul>
+    </div>
+  );
+}
+
+function Inquiry() {
+  const [items, setItems] = useState([{ type: "구직", title: "입사지원 내역이 보이지 않습니다", date: "2026.09.30", status: "답변완료" }]);
+  const [type, setType] = useState("구직");
+  const [title, setTitle] = useState("");
+  const [content, setContent] = useState("");
+  const [sent, setSent] = useState(false);
+  const inputCls = "mt-1.5 w-full rounded-[6px] border-2 border-[#dde2ea] bg-white px-3 text-[16px] focus:border-[#1b2a4a] focus:outline-none";
+  return (
+    <div>
+      <dl className="flex flex-wrap gap-x-6 gap-y-1 rounded-[6px] bg-[#f4f6fa] px-4 py-3 text-[15px]">
+        <div className="flex gap-1.5">
+          <dt className="font-bold">고객센터</dt>
+          <dd>1588-0000</dd>
+        </div>
+        <div className="flex gap-1.5">
+          <dt className="font-bold">상담시간</dt>
+          <dd>평일 09:00 ~ 18:00 (점심시간 12:00 ~ 13:00)</dd>
+        </div>
+      </dl>
+      <form
+        onSubmit={(e) => {
+          e.preventDefault();
+          if (!title.trim() || !content.trim()) return;
+          const d = new Date();
+          const date = `${d.getFullYear()}.${String(d.getMonth() + 1).padStart(2, "0")}.${String(d.getDate()).padStart(2, "0")}`;
+          setItems((list) => [{ type, title: title.trim(), date, status: "답변대기" }, ...list]);
+          setTitle("");
+          setContent("");
+          setSent(true);
+        }}
+        className="mt-5 space-y-4"
+      >
+        <label className="block text-[15px] font-bold">
+          문의유형
+          <select value={type} onChange={(e) => setType(e.target.value)} className={`${inputCls} h-11 sm:w-60`}>
+            {["구직", "구인", "회원", "기타"].map((t) => (
+              <option key={t}>{t}</option>
+            ))}
+          </select>
+        </label>
+        <label className="block text-[15px] font-bold">
+          제목
+          <input value={title} onChange={(e) => setTitle(e.target.value)} required className={`${inputCls} h-11`} />
+        </label>
+        <label className="block text-[15px] font-bold">
+          내용
+          <textarea value={content} onChange={(e) => setContent(e.target.value)} required rows={5} className={`${inputCls} py-2`} />
+        </label>
+        <div className="flex items-center justify-end gap-3">
+          {sent && (
+            <p role="status" className="text-[15px] font-bold text-[#1f7a3e]">
+              문의가 등록되었습니다.
+            </p>
+          )}
+          <button type="submit" className="h-12 rounded-[6px] bg-[#2455d6] px-8 text-[16px] font-bold text-white hover:bg-[#1c45b3]">
+            등록
+          </button>
+        </div>
+      </form>
+
+      <h2 className="mt-10 border-b-2 border-[#1b2a4a] pb-1.5 text-[19px] font-bold">나의 문의 내역</h2>
+      <ul>
+        {items.map((it, i) => (
+          <li key={`${it.title}-${i}`} className="flex flex-wrap items-center gap-x-3 gap-y-1 border-b border-[#dde2ea] px-1 py-3 text-[15px]">
+            <span className="text-[#56607a]">[{it.type}]</span>
+            <span className="min-w-0 flex-1 font-bold">{it.title}</span>
+            <span className="text-[14px] text-[#3c4660] tabular-nums">{it.date}</span>
+            <span className={`font-bold ${it.status === "답변완료" ? "text-[#1f7a3e]" : "text-[#c8321f]"}`}>{it.status}</span>
+          </li>
+        ))}
+      </ul>
+    </div>
   );
 }

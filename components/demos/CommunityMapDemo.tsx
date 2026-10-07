@@ -4,6 +4,7 @@ import { useEffect, useMemo, useRef, useState, useSyncExternalStore } from "reac
 import { Jua } from "next/font/google";
 import {
   BookOpen,
+  CheckCircle2,
   ChevronDown,
   ChevronLeft,
   Dumbbell,
@@ -20,6 +21,7 @@ import {
   Users,
 } from "lucide-react";
 import type { LucideIcon } from "lucide-react";
+import { useLocalStorage } from "@/hooks/useLocalStorage";
 import { useReducedMotionSafe } from "@/hooks/useReducedMotionSafe";
 
 /* ○○시 공유공간 지도 데모.
@@ -284,6 +286,11 @@ export function CommunityMapDemo() {
   const [now, setNow] = useState<Date | null>(null);
   const [userPanel, setUserPanel] = useState<boolean | null>(null);
   const [zoom, setZoom] = useState(0);
+  const [page, setPage] = useState<PageId>("map");
+  const [noticeIdx, setNoticeIdx] = useState<number | null>(null);
+  const [reserveFor, setReserveFor] = useState<string | null>(null);
+  const [booked, setBooked] = useState<Resv | null>(null);
+  const [store, setStore] = useLocalStorage<ResvStore>("gs-demo:community-map:resv:v1", { added: [], cancelled: [] });
   const isDesktop = useIsDesktop();
   const reduced = useReducedMotionSafe();
   const scroller = useRef<HTMLDivElement>(null);
@@ -373,7 +380,20 @@ export function CommunityMapDemo() {
     });
   };
 
+  const goPage = (next: PageId) => {
+    setPage(next);
+    setNoticeIdx(null);
+  };
+
+  const addReservation = (r: Resv) => {
+    setStore((s) => ({ ...s, added: [r, ...s.added] }));
+    setBooked(r);
+    setReserveFor(null);
+  };
+
   const choose = (p: Place, from: "pin" | "list") => {
+    setReserveFor(null);
+    setBooked(null);
     setSelectedId(p.id);
     setDetailOpen(true);
     setUserPanel(true);
@@ -416,13 +436,27 @@ export function CommunityMapDemo() {
 
       <header className="shrink-0 border-b bg-white" style={{ borderColor: LINE }}>
         <div className="flex flex-wrap items-center gap-x-4 gap-y-2 px-4 py-2.5">
-          <a href="#place-panel" className="flex items-center gap-2">
+          <a
+            href="#place-panel"
+            onClick={(e) => {
+              if (page === "map") return;
+              e.preventDefault();
+              goPage("map");
+            }}
+            className="flex items-center gap-2"
+          >
             <span className="flex h-9 w-9 items-center justify-center rounded-[10px] text-white" style={{ backgroundColor: LEAF }}>
               <MapPin size={20} strokeWidth={2.4} aria-hidden />
             </span>
             <span className={`${jua.className} text-[22px] leading-[1.2]`}>○○시 공유공간</span>
           </a>
-          <form role="search" onSubmit={(e) => e.preventDefault()} className="order-last w-full md:order-none md:ml-4 md:w-auto md:flex-1 lg:max-w-[440px]">
+          <form
+            role="search"
+            onSubmit={(e) => {
+              e.preventDefault();
+              goPage("map");
+            }}
+            className="order-last w-full md:order-none md:ml-4 md:w-auto md:flex-1 lg:max-w-[440px]">
             <label className="relative block">
               <span className="sr-only">시설명 또는 동 이름</span>
               <Search size={18} className="pointer-events-none absolute left-3 top-1/2 -translate-y-1/2" style={{ color: INK_SOFT }} aria-hidden />
@@ -435,19 +469,31 @@ export function CommunityMapDemo() {
               />
             </label>
           </form>
-          <nav aria-label="주메뉴" className="ml-auto hidden items-center gap-5 text-[16px] font-bold xl:flex">
-            <span style={{ color: LEAF }}>시설 찾기</span>
-            <a href="#place-panel" className="hover:underline">이용안내</a>
-            <a href="#place-panel" className="hover:underline">나의 예약내역</a>
-            <a href="#place-panel" className="hover:underline">공지사항</a>
+          <nav aria-label="주메뉴" className="ml-auto hidden xl:block">
+            <NavList page={page} onGo={goPage} />
           </nav>
           <p className="ml-auto text-[15px] xl:ml-0" style={{ color: INK_SOFT }}>
             등록 시설 <b style={{ color: LEAF }}>{PLACES.length}</b>곳
           </p>
         </div>
+        <nav aria-label="주메뉴" className="border-t xl:hidden" style={{ borderColor: LINE }}>
+          <NavList page={page} onGo={goPage} mobile />
+        </nav>
       </header>
 
-      {/* 지도 영역 */}
+      {page !== "map" ? (
+        <div className="min-h-0 flex-1 overflow-y-auto bg-white">
+          <SubPage
+            page={page}
+            now={now}
+            store={store}
+            onCancel={(id) => setStore((s) => ({ ...s, cancelled: [...s.cancelled, id] }))}
+            noticeIdx={noticeIdx}
+            setNoticeIdx={setNoticeIdx}
+            onGo={goPage}
+          />
+        </div>
+      ) : (
       <div className="relative min-h-0 flex-1" aria-label="공유공간 지도">
         <div ref={scroller} className={`absolute inset-0 flex overflow-auto [container-type:size] ${besidePanel}`}>
           <div
@@ -575,8 +621,12 @@ export function CommunityMapDemo() {
           aria-label="시설 목록"
           className={`${panelVisibility} absolute inset-x-0 bottom-0 z-30 h-[58%] flex-col overflow-hidden rounded-t-[12px] bg-white shadow-[0_-6px_20px_rgba(35,48,42,0.18)] lg:inset-x-auto lg:bottom-3 lg:left-3 lg:top-3 lg:h-auto lg:w-[380px] lg:rounded-[12px] lg:shadow-[0_6px_20px_rgba(35,48,42,0.18)]`}
         >
-          {detailOpen && selected ? (
-            <PlaceDetail place={selected} onBack={() => setDetailOpen(false)} />
+          {detailOpen && selected && booked?.placeId === selected.id ? (
+            <ReserveDone resv={booked} place={selected} onBack={() => setBooked(null)} onMy={() => goPage("my")} />
+          ) : detailOpen && selected && reserveFor === selected.id && now ? (
+            <ReserveForm place={selected} now={now} onBack={() => setReserveFor(null)} onSubmit={addReservation} />
+          ) : detailOpen && selected ? (
+            <PlaceDetail place={selected} onBack={() => setDetailOpen(false)} onReserve={() => setReserveFor(selected.id)} />
           ) : (
             <>
               <div className="shrink-0 border-b px-4 pb-3 pt-3" style={{ borderColor: LINE }}>
@@ -646,6 +696,7 @@ export function CommunityMapDemo() {
           )}
         </div>
       </div>
+      )}
     </div>
   );
 }
@@ -711,7 +762,7 @@ function DetailFilters({
   );
 }
 
-function PlaceDetail({ place, onBack }: { place: Place; onBack: () => void }) {
+function PlaceDetail({ place, onBack, onReserve }: { place: Place; onBack: () => void; onReserve: () => void }) {
   const c = categoryOf(place.category);
   const Icon = c.icon;
   const backRef = useRef<HTMLButtonElement>(null);
@@ -759,9 +810,9 @@ function PlaceDetail({ place, onBack }: { place: Place; onBack: () => void }) {
 
         <div className="mt-4 grid grid-cols-3 gap-2">
           {statusOf(place) === "접수중" ? (
-            <a href="#place-panel" className="flex h-11 items-center justify-center rounded-[6px] text-[15px] font-bold text-white" style={{ backgroundColor: LEAF }}>
+            <button type="button" onClick={onReserve} className="flex h-11 items-center justify-center rounded-[6px] text-[15px] font-bold text-white" style={{ backgroundColor: LEAF }}>
               예약하기
-            </a>
+            </button>
           ) : (
             <span className="flex h-11 items-center justify-center rounded-[6px] bg-[#eef1ef] text-[15px] font-bold" style={{ color: INK_SOFT }}>
               {place.reserve}
@@ -796,5 +847,619 @@ function PlaceDetail({ place, onBack }: { place: Place; onBack: () => void }) {
         </ul>
       </div>
     </section>
+  );
+}
+
+/* ---------- 하위 화면: 이용안내, 나의 예약내역, 공지사항 ---------- */
+
+type PageId = "map" | "guide" | "my" | "notice";
+
+const NAV: { id: PageId; label: string }[] = [
+  { id: "map", label: "시설 찾기" },
+  { id: "guide", label: "이용안내" },
+  { id: "my", label: "나의 예약내역" },
+  { id: "notice", label: "공지사항" },
+];
+
+type Resv = {
+  id: string;
+  placeId: string;
+  /** 이용일 YYYY-MM-DD */
+  date: string;
+  time: string;
+  people: number;
+  purpose: string;
+  status: "예약완료" | "승인대기";
+  applied: string;
+};
+type ResvStore = { added: Resv[]; cancelled: string[] };
+
+const DOW = ["일", "월", "화", "수", "목", "금", "토"];
+const pad = (n: number) => String(n).padStart(2, "0");
+const isoOf = (d: Date) => `${d.getFullYear()}-${pad(d.getMonth() + 1)}-${pad(d.getDate())}`;
+const plusDays = (d: Date, n: number) => {
+  const x = new Date(d);
+  x.setDate(x.getDate() + n);
+  return x;
+};
+/** 2026. 10. 10.(토) */
+const dateLabel = (iso: string) => {
+  const d = new Date(`${iso}T00:00:00`);
+  return `${d.getFullYear()}. ${d.getMonth() + 1}. ${d.getDate()}.(${DOW[d.getDay()]})`;
+};
+
+function closedOn(place: Place, day: number) {
+  return (
+    (place.closedDay === "주말" && (day === 0 || day === 6)) ||
+    (place.closedDay === "일요일" && day === 0) ||
+    (place.closedDay === "월요일" && day === 1) ||
+    (place.closedDay === "화요일" && day === 2)
+  );
+}
+
+/** 예시 예약 3건: 오늘 기준 상대 날짜 */
+function sampleResv(now: Date): Resv[] {
+  return [
+    { id: "R26100412", placeId: "p1", date: isoOf(plusDays(now, 3)), time: "14:00~16:00", people: 6, purpose: "회의", status: "예약완료", applied: isoOf(plusDays(now, -2)) },
+    { id: "R26100387", placeId: "p13", date: isoOf(plusDays(now, 6)), time: "18:00~20:00", people: 12, purpose: "동아리 활동", status: "승인대기", applied: isoOf(plusDays(now, -3)) },
+    { id: "R26092215", placeId: "p8", date: isoOf(plusDays(now, -12)), time: "15:00~17:00", people: 4, purpose: "동아리 활동", status: "예약완료", applied: isoOf(plusDays(now, -20)) },
+  ];
+}
+
+const NOTICES = [
+  {
+    title: "추석 연휴 공공시설 휴관 안내",
+    date: "2026.09.18",
+    views: 1342,
+    body: ["추석 연휴 기간 공공시설 운영을 다음과 같이 안내합니다.", "1. 휴관기간: 2026. 9. 24.(목) ~ 9. 27.(일)", "2. 대상시설: 회의실, 연습·창작공간, 체육시설 전체", "3. 작은도서관은 시설별로 다르니 문의전화로 확인해 주시기 바랍니다."],
+  },
+  {
+    title: "남산동 공공 수영장 시설 보수에 따른 임시 휴관",
+    date: "2026.10.05",
+    views: 528,
+    body: ["1. 휴관기간: 2026. 10. 19.(월) ~ 10. 30.(금)", "2. 사유: 여과기 교체 공사", "3. 기존 예약은 일괄 취소 후 전액 환불됩니다.", "4. 문의: 000-100-0432"],
+  },
+  {
+    title: "예약 후 미이용 시 이용 제한 안내",
+    date: "2026.09.30",
+    views: 2210,
+    body: ["예약 후 취소 없이 이용하지 않는 경우 다른 시민의 이용 기회가 줄어듭니다.", "1. 미이용 1회: 경고", "2. 미이용 2회: 30일간 예약 제한", "3. 미이용 3회 이상: 90일간 예약 제한"],
+  },
+  {
+    title: "신규 등록 시설 안내 (신촌동 마을 공유창고)",
+    date: "2026.09.22",
+    views: 403,
+    body: ["1. 시설명: 신촌동 마을 공유창고", "2. 주소: ○○시 신촌로 66", "3. 이용시간: 10:00~18:00 (주말 휴관)", "4. 대여물품: 공구, 캠핑 용품"],
+  },
+  { title: "개인정보처리방침 개정 안내", date: "2026.09.01", views: 197, body: ["개인정보처리방침이 2026. 9. 8.부터 개정됩니다.", "1. 개정내용: 예약 정보 보유기간 항목 정비", "2. 시행일: 2026. 9. 8."] },
+].sort((a, b) => b.date.localeCompare(a.date));
+
+function NavList({ page, onGo, mobile }: { page: PageId; onGo: (p: PageId) => void; mobile?: boolean }) {
+  return (
+    <ul className={mobile ? "flex overflow-x-auto px-2 text-[15px] font-bold" : "flex items-center gap-5 text-[16px] font-bold"}>
+      {NAV.map((n) => {
+        const on = n.id === page;
+        return (
+          <li key={n.id} className="shrink-0">
+            <button
+              type="button"
+              onClick={() => onGo(n.id)}
+              aria-current={on ? "page" : undefined}
+              className={mobile ? `h-10 border-b-[3px] px-3 ${on ? "" : "border-transparent"}` : "hover:underline"}
+              style={on ? { color: LEAF, borderColor: mobile ? LEAF : undefined } : undefined}
+            >
+              {n.label}
+            </button>
+          </li>
+        );
+      })}
+    </ul>
+  );
+}
+
+function PanelBack({ onBack, label }: { onBack: () => void; label: string }) {
+  const ref = useRef<HTMLButtonElement>(null);
+  useEffect(() => {
+    ref.current?.focus({ preventScroll: true });
+  }, []);
+  return (
+    <div className="shrink-0 border-b px-4 py-2" style={{ borderColor: LINE }}>
+      <button ref={ref} type="button" onClick={onBack} className="inline-flex h-10 items-center gap-1 rounded-[6px] pr-2 text-[15px] font-bold hover:underline">
+        <ChevronLeft size={18} aria-hidden />
+        {label}
+      </button>
+    </div>
+  );
+}
+
+function ReserveForm({ place, now, onBack, onSubmit }: { place: Place; now: Date; onBack: () => void; onSubmit: (r: Resv) => void }) {
+  const dates: string[] = [];
+  for (let i = 1; dates.length < 7 && i < 21; i++) {
+    const d = plusDays(now, i);
+    if (!closedOn(place, d.getDay())) dates.push(isoOf(d));
+  }
+  const slots: string[] = [];
+  for (let h = place.hours[0]; h + 2 <= place.hours[1]; h += 2) slots.push(`${pad(h)}:00~${pad(h + 2)}:00`);
+  const [date, setDate] = useState(dates[0] ?? "");
+  const [time, setTime] = useState(slots[0] ?? "");
+  const [people, setPeople] = useState(Math.min(4, place.capacity));
+  const [purpose, setPurpose] = useState("회의");
+  const [agree, setAgree] = useState(false);
+  const field = "mt-1.5 h-11 w-full rounded-[6px] border-2 bg-white px-2 text-[16px] outline-none focus:border-[#1f7a4d]";
+
+  return (
+    <section aria-labelledby="reserve-title" className="flex min-h-0 flex-1 flex-col">
+      <PanelBack onBack={onBack} label="시설 정보" />
+      <form
+        onSubmit={(e) => {
+          e.preventDefault();
+          if (!agree) return;
+          onSubmit({
+            id: `R${isoOf(now).slice(2).replace(/-/g, "")}${pad(Math.floor(Math.random() * 90) + 10)}`,
+            placeId: place.id,
+            date,
+            time,
+            people,
+            purpose,
+            status: approvalOf(place) === "자동승인" ? "예약완료" : "승인대기",
+            applied: isoOf(now),
+          });
+        }}
+        className="min-h-0 flex-1 space-y-4 overflow-y-auto px-4 pb-24 pt-4"
+      >
+        <div>
+          <p className="text-[15px]" style={{ color: INK_SOFT }}>
+            예약 신청
+          </p>
+          <h2 id="reserve-title" className={`${jua.className} text-[22px] leading-[1.3]`}>
+            {place.name}
+          </h2>
+        </div>
+        <label className="block text-[15px] font-bold">
+          이용일
+          <select value={date} onChange={(e) => setDate(e.target.value)} className={field} style={{ borderColor: LINE }}>
+            {dates.map((d) => (
+              <option key={d} value={d}>
+                {dateLabel(d)}
+              </option>
+            ))}
+          </select>
+        </label>
+        <label className="block text-[15px] font-bold">
+          이용시간
+          <select value={time} onChange={(e) => setTime(e.target.value)} className={field} style={{ borderColor: LINE }}>
+            {slots.map((t) => (
+              <option key={t}>{t}</option>
+            ))}
+          </select>
+        </label>
+        <label className="block text-[15px] font-bold">
+          이용인원 (최대 {place.capacity}명)
+          <input
+            type="number"
+            min={1}
+            max={place.capacity}
+            value={people}
+            onChange={(e) => setPeople(Math.max(1, Math.min(place.capacity, Number(e.target.value) || 1)))}
+            className={field}
+            style={{ borderColor: LINE }}
+          />
+        </label>
+        <label className="block text-[15px] font-bold">
+          이용목적
+          <select value={purpose} onChange={(e) => setPurpose(e.target.value)} className={field} style={{ borderColor: LINE }}>
+            {["회의", "교육·강좌", "동아리 활동", "기타"].map((p) => (
+              <option key={p}>{p}</option>
+            ))}
+          </select>
+        </label>
+        <dl className="border-t-2 text-[15px]" style={{ borderColor: INK }}>
+          {[
+            ["이용요금", place.feeDetail ? `${place.fee} (${place.feeDetail})` : place.fee],
+            ["승인방식", approvalOf(place)],
+          ].map(([k, v]) => (
+            <div key={k} className="flex gap-3 border-b py-2" style={{ borderColor: LINE }}>
+              <dt className="w-20 shrink-0 font-bold">{k}</dt>
+              <dd style={{ color: INK_SOFT }}>{v}</dd>
+            </div>
+          ))}
+        </dl>
+        <label className="flex cursor-pointer items-start gap-2 text-[15px] font-bold">
+          <input type="checkbox" checked={agree} onChange={(e) => setAgree(e.target.checked)} className="mt-0.5 h-5 w-5 shrink-0 accent-[#1f7a4d]" />
+          시설 이용 수칙 및 개인정보 수집·이용에 동의합니다. (필수)
+        </label>
+        <button type="submit" disabled={!agree || !date || !time} className="h-12 w-full rounded-[6px] text-[16px] font-bold text-white disabled:opacity-50" style={{ backgroundColor: LEAF }}>
+          예약 신청
+        </button>
+      </form>
+    </section>
+  );
+}
+
+function ReserveDone({ resv, place, onBack, onMy }: { resv: Resv; place: Place; onBack: () => void; onMy: () => void }) {
+  return (
+    <section aria-labelledby="done-title" className="flex min-h-0 flex-1 flex-col">
+      <PanelBack onBack={onBack} label="시설 정보" />
+      <div className="min-h-0 flex-1 overflow-y-auto px-4 pb-24 pt-5" role="status">
+        <p id="done-title" className="inline-flex items-center gap-2 text-[19px] font-bold">
+          <CheckCircle2 size={22} style={{ color: LEAF }} aria-hidden />
+          {resv.status === "예약완료" ? "예약이 완료되었습니다." : "예약 신청이 접수되었습니다."}
+        </p>
+        <dl className="mt-4 border-t-2 text-[15px]" style={{ borderColor: INK }}>
+          {[
+            ["예약번호", resv.id],
+            ["시설명", place.name],
+            ["이용일시", `${dateLabel(resv.date)} ${resv.time}`],
+            ["이용인원", `${resv.people}명`],
+            ["예약상태", resv.status],
+          ].map(([k, v]) => (
+            <div key={k} className="flex gap-3 border-b py-2.5" style={{ borderColor: LINE }}>
+              <dt className="w-20 shrink-0 font-bold">{k}</dt>
+              <dd style={{ color: INK_SOFT }}>{v}</dd>
+            </div>
+          ))}
+        </dl>
+        <button type="button" onClick={onMy} className="mt-5 h-12 w-full rounded-[6px] text-[16px] font-bold text-white" style={{ backgroundColor: LEAF }}>
+          나의 예약내역
+        </button>
+      </div>
+    </section>
+  );
+}
+
+function SubPage({
+  page,
+  now,
+  store,
+  onCancel,
+  noticeIdx,
+  setNoticeIdx,
+  onGo,
+}: {
+  page: Exclude<PageId, "map">;
+  now: Date | null;
+  store: ResvStore;
+  onCancel: (id: string) => void;
+  noticeIdx: number | null;
+  setNoticeIdx: (i: number | null) => void;
+  onGo: (p: PageId) => void;
+}) {
+  const label = NAV.find((n) => n.id === page)!.label;
+  return (
+    <>
+      <div className="border-b" style={{ borderColor: LINE, backgroundColor: "#f6faf7" }}>
+        <div className="mx-auto max-w-[1000px] px-4 py-6 md:py-8">
+          <ol aria-label="현재 위치" className="flex flex-wrap items-center gap-1.5 text-[14px]" style={{ color: INK_SOFT }}>
+            <li>
+              <button type="button" onClick={() => onGo("map")} className="hover:underline">
+                홈
+              </button>
+            </li>
+            <li aria-hidden>&gt;</li>
+            <li aria-current="page" className="font-bold" style={{ color: INK }}>
+              {label}
+            </li>
+          </ol>
+          <h1 className={`${jua.className} mt-1 text-[30px] leading-[1.3]`}>{label}</h1>
+        </div>
+      </div>
+      <div className="mx-auto max-w-[1000px] px-4 pb-16 pt-6">
+        {page === "my" && <MyReservations now={now} store={store} onCancel={onCancel} onGo={onGo} />}
+        {page === "notice" && <NoticeView idx={noticeIdx} setIdx={setNoticeIdx} />}
+        {page === "guide" && <GuideView />}
+      </div>
+    </>
+  );
+}
+
+type ResvState = "이용예정" | "이용완료" | "취소";
+
+function MyReservations({ now, store, onCancel, onGo }: { now: Date | null; store: ResvStore; onCancel: (id: string) => void; onGo: (p: PageId) => void }) {
+  const [tab, setTab] = useState<"전체" | ResvState>("전체");
+  const [confirmId, setConfirmId] = useState<string | null>(null);
+
+  useEffect(() => {
+    if (!confirmId) return;
+    const onKey = (e: KeyboardEvent) => e.key === "Escape" && setConfirmId(null);
+    window.addEventListener("keydown", onKey);
+    return () => window.removeEventListener("keydown", onKey);
+  }, [confirmId]);
+
+  if (!now) return <div className="h-40" aria-hidden />;
+  const today = isoOf(now);
+  const all = [...store.added, ...sampleResv(now)].map((r) => ({
+    r,
+    state: (store.cancelled.includes(r.id) ? "취소" : r.date < today ? "이용완료" : "이용예정") as ResvState,
+  }));
+  const list = all.filter((x) => tab === "전체" || x.state === tab);
+  const target = all.find((x) => x.r.id === confirmId)?.r ?? null;
+
+  return (
+    <div>
+      <div role="tablist" aria-label="예약 상태" className="flex flex-wrap gap-1.5">
+        {(["전체", "이용예정", "이용완료", "취소"] as const).map((t) => {
+          const n = all.filter((x) => t === "전체" || x.state === t).length;
+          const on = tab === t;
+          return (
+            <button
+              key={t}
+              type="button"
+              role="tab"
+              aria-selected={on}
+              onClick={() => setTab(t)}
+              className="h-10 rounded-[6px] border-2 px-4 text-[15px] font-bold"
+              style={on ? { backgroundColor: LEAF, borderColor: LEAF, color: "#fff" } : { borderColor: LINE }}
+            >
+              {t} <span className="font-normal tabular-nums">{n}</span>
+            </button>
+          );
+        })}
+      </div>
+
+      {list.length === 0 ? (
+        <div className="mt-4 rounded-[6px] bg-[#f6faf7] px-4 py-12 text-center" style={{ color: INK_SOFT }}>
+          예약내역이 없습니다.
+          <button type="button" onClick={() => onGo("map")} className="mx-auto mt-4 flex h-11 items-center rounded-[6px] px-5 font-bold text-white" style={{ backgroundColor: LEAF }}>
+            시설 찾기
+          </button>
+        </div>
+      ) : (
+        <ul className="mt-4 border-t-2" style={{ borderColor: INK }}>
+          {list.map(({ r, state }) => {
+            const place = PLACES.find((p) => p.id === r.placeId)!;
+            const c = categoryOf(place.category);
+            const shown = state === "이용예정" ? r.status : state;
+            return (
+              <li key={r.id} className="grid gap-x-4 gap-y-2 border-b px-1 py-4 sm:grid-cols-[minmax(0,1fr)_auto] sm:items-center" style={{ borderColor: LINE }}>
+                <div className="min-w-0">
+                  <p className="flex flex-wrap items-center gap-x-2 text-[14px]" style={{ color: INK_SOFT }}>
+                    <span className="tabular-nums">예약번호 {r.id}</span>
+                    <span>신청일 {r.applied.replace(/-/g, ".")}</span>
+                  </p>
+                  <p className="mt-0.5 flex flex-wrap items-center gap-2">
+                    <span className="text-[18px] font-bold">{place.name}</span>
+                    <Badge tone={shown === "예약완료" ? "green" : shown === "승인대기" ? "amber" : shown === "취소" ? "gray" : "blue"}>{shown}</Badge>
+                  </p>
+                  <p className="text-[15px]" style={{ color: INK_SOFT }}>
+                    {c.label} | {dateLabel(r.date)} {r.time} | {r.people}명 | {r.purpose}
+                  </p>
+                </div>
+                {state === "이용예정" && (
+                  <button
+                    type="button"
+                    onClick={() => setConfirmId(r.id)}
+                    className="h-10 justify-self-start rounded-[6px] border-2 px-4 text-[15px] font-bold sm:justify-self-end"
+                    style={{ borderColor: LINE }}
+                  >
+                    예약취소
+                  </button>
+                )}
+              </li>
+            );
+          })}
+        </ul>
+      )}
+
+      <dl className="mt-6 rounded-[6px] bg-[#f6faf7] px-4 py-3 text-[15px]" style={{ color: INK_SOFT }}>
+        <div className="flex gap-2">
+          <dt className="shrink-0 font-bold" style={{ color: INK }}>
+            취소 기한
+          </dt>
+          <dd>이용일 1일 전 18:00까지</dd>
+        </div>
+      </dl>
+
+      {target && (
+        <div className="fixed inset-0 z-[70] flex items-center justify-center p-4" role="alertdialog" aria-modal="true" aria-labelledby="cancel-title">
+          <button type="button" aria-label="닫기" className="absolute inset-0 bg-[#23302a]/50" onClick={() => setConfirmId(null)} />
+          <div className="relative w-full max-w-[380px] rounded-[12px] bg-white p-6">
+            <p id="cancel-title" className="text-[18px] font-bold">
+              예약을 취소하시겠습니까?
+            </p>
+            <p className="mt-2 text-[15px] leading-[1.6]" style={{ color: INK_SOFT }}>
+              {PLACES.find((p) => p.id === target.placeId)!.name}
+              <br />
+              {dateLabel(target.date)} {target.time}
+            </p>
+            <div className="mt-5 grid grid-cols-2 gap-2">
+              <button type="button" autoFocus onClick={() => setConfirmId(null)} className="h-11 rounded-[6px] border-2 text-[15px] font-bold" style={{ borderColor: LINE }}>
+                아니요
+              </button>
+              <button
+                type="button"
+                onClick={() => {
+                  onCancel(target.id);
+                  setConfirmId(null);
+                }}
+                className="h-11 rounded-[6px] bg-[#b3261e] text-[15px] font-bold text-white"
+              >
+                예약취소
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+    </div>
+  );
+}
+
+function NoticeView({ idx, setIdx }: { idx: number | null; setIdx: (i: number | null) => void }) {
+  if (idx !== null && NOTICES[idx]) {
+    const n = NOTICES[idx];
+    const prev = NOTICES[idx - 1];
+    const next = NOTICES[idx + 1];
+    return (
+      <article>
+        <div className="border-t-2" style={{ borderColor: INK }}>
+          <h2 className="bg-[#f6faf7] px-3 py-3 text-[19px] font-bold">{n.title}</h2>
+          <p className="flex gap-5 border-y px-3 py-2 text-[15px]" style={{ borderColor: LINE, color: INK_SOFT }}>
+            <span>
+              <b style={{ color: INK }}>등록일</b> {n.date}
+            </span>
+            <span>
+              <b style={{ color: INK }}>조회</b> {n.views.toLocaleString()}
+            </span>
+          </p>
+        </div>
+        <div className="min-h-[140px] space-y-2 px-3 py-6 text-[16px] leading-[1.7]">
+          {n.body.map((l) => (
+            <p key={l}>{l}</p>
+          ))}
+        </div>
+        <ul className="border-y text-[15px]" style={{ borderColor: LINE }}>
+          {(
+            [
+              ["이전글", prev, idx - 1],
+              ["다음글", next, idx + 1],
+            ] as const
+          ).map(([lbl, item, i]) => (
+            <li key={lbl} className="flex gap-4 border-b px-3 py-2.5 last:border-b-0" style={{ borderColor: LINE }}>
+              <b className="w-14 shrink-0">{lbl}</b>
+              {item ? (
+                <button type="button" onClick={() => setIdx(i)} className="min-w-0 truncate text-left hover:underline">
+                  {item.title}
+                </button>
+              ) : (
+                <span style={{ color: INK_SOFT }}>글이 없습니다.</span>
+              )}
+            </li>
+          ))}
+        </ul>
+        <div className="mt-4 flex justify-end">
+          <button type="button" onClick={() => setIdx(null)} className="h-11 rounded-[6px] px-6 text-[16px] font-bold text-white" style={{ backgroundColor: LEAF }}>
+            목록
+          </button>
+        </div>
+      </article>
+    );
+  }
+  return (
+    <div>
+      <p className="text-[16px]" style={{ color: INK_SOFT }}>
+        총 <b style={{ color: LEAF }}>{NOTICES.length}</b>건
+      </p>
+      <table className="mt-2 w-full border-t-2 text-[15px]" style={{ borderColor: INK }}>
+        <caption className="sr-only">공지사항 목록</caption>
+        <thead className="bg-[#f6faf7]">
+          <tr className="border-b" style={{ borderColor: LINE }}>
+            <th scope="col" className="hidden w-16 px-2 py-2.5 md:table-cell">
+              번호
+            </th>
+            <th scope="col" className="px-2 py-2.5 text-left">
+              제목
+            </th>
+            <th scope="col" className="w-28 px-2 py-2.5">
+              등록일
+            </th>
+            <th scope="col" className="hidden w-20 px-2 py-2.5 md:table-cell">
+              조회
+            </th>
+          </tr>
+        </thead>
+        <tbody>
+          {NOTICES.map((n, i) => (
+            <tr key={n.title} className="border-b" style={{ borderColor: LINE }}>
+              <td className="hidden px-2 py-3 text-center tabular-nums md:table-cell" style={{ color: INK_SOFT }}>
+                {NOTICES.length - i}
+              </td>
+              <td className="px-2 py-3">
+                <button type="button" onClick={() => setIdx(i)} className="text-left font-bold underline-offset-4 hover:underline">
+                  {n.title}
+                </button>
+              </td>
+              <td className="px-2 py-3 text-center text-[14px] tabular-nums" style={{ color: INK_SOFT }}>
+                {n.date}
+              </td>
+              <td className="hidden px-2 py-3 text-center text-[14px] tabular-nums md:table-cell" style={{ color: INK_SOFT }}>
+                {n.views.toLocaleString()}
+              </td>
+            </tr>
+          ))}
+        </tbody>
+      </table>
+    </div>
+  );
+}
+
+function GuideView() {
+  const steps = ["시설 검색", "예약 신청", "승인", "시설 이용"];
+  return (
+    <div>
+      <h2 className="border-b-2 pb-1.5 text-[19px] font-bold" style={{ borderColor: INK }}>
+        예약 절차
+      </h2>
+      <ol className="mt-4 grid gap-2 sm:grid-cols-4">
+        {steps.map((s, i) => (
+          <li key={s} className="flex items-center gap-2 rounded-[6px] bg-[#f6faf7] px-3 py-3">
+            <span className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full text-[15px] font-bold text-white tabular-nums" style={{ backgroundColor: LEAF }}>
+              {i + 1}
+            </span>
+            <span className="text-[16px] font-bold">{s}</span>
+          </li>
+        ))}
+      </ol>
+
+      <h2 className="mt-8 border-b-2 pb-1.5 text-[19px] font-bold" style={{ borderColor: INK }}>
+        승인방식
+      </h2>
+      <dl className="text-[16px]">
+        {[
+          ["자동승인", "무료·선착순 시설, 신청 즉시 예약완료"],
+          ["심사 후 승인", "유료 또는 추첨 시설, 담당자 승인 후 예약완료"],
+        ].map(([k, v]) => (
+          <div key={k} className="grid border-b sm:grid-cols-[140px_minmax(0,1fr)]" style={{ borderColor: LINE }}>
+            <dt className="bg-[#f6faf7] px-3 py-2.5 font-bold">{k}</dt>
+            <dd className="px-3 py-2.5" style={{ color: INK_SOFT }}>
+              {v}
+            </dd>
+          </div>
+        ))}
+      </dl>
+
+      <h2 className="mt-8 border-b-2 pb-1.5 text-[19px] font-bold" style={{ borderColor: INK }}>
+        취소·환불 기준
+      </h2>
+      <div className="overflow-x-auto">
+        <table className="w-full min-w-[360px] text-[15px]">
+          <caption className="sr-only">취소·환불 기준</caption>
+          <thead className="bg-[#f6faf7]">
+            <tr className="border-b" style={{ borderColor: LINE }}>
+              <th scope="col" className="px-3 py-2.5 text-left">
+                취소 시점
+              </th>
+              <th scope="col" className="px-3 py-2.5 text-left">
+                환불 금액
+              </th>
+            </tr>
+          </thead>
+          <tbody>
+            {[
+              ["이용일 3일 전까지", "전액 환불"],
+              ["이용일 2일 전 ~ 1일 전", "이용요금의 50% 환불"],
+              ["이용 당일", "환불 불가"],
+              ["기관 사정으로 취소", "전액 환불"],
+            ].map(([a, b]) => (
+              <tr key={a} className="border-b" style={{ borderColor: LINE }}>
+                <th scope="row" className="px-3 py-2.5 text-left font-bold">
+                  {a}
+                </th>
+                <td className="px-3 py-2.5" style={{ color: INK_SOFT }}>
+                  {b}
+                </td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
+      </div>
+
+      <h2 className="mt-8 border-b-2 pb-1.5 text-[19px] font-bold" style={{ borderColor: INK }}>
+        이용 제한
+      </h2>
+      <ul className="mt-3 list-disc space-y-1 pl-5 text-[16px]" style={{ color: INK_SOFT }}>
+        <li>예약 후 미이용 2회: 30일간 예약 제한</li>
+        <li>예약 목적 외 사용, 타인 양도: 90일간 예약 제한</li>
+        <li>시설물 훼손 시 원상복구 비용 청구</li>
+      </ul>
+    </div>
   );
 }
