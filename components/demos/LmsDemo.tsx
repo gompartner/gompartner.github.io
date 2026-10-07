@@ -352,7 +352,7 @@ const COURSES: CourseInfo[] = [
     period: "1개월",
     fee: 120000,
     refund: true,
-    img: "/images/demo-tax/hero.jpg",
+    img: "/images/demo-lms/course-excel.jpg",
     imgAlt: "서류와 계산기, 노트북이 놓인 사무실 책상",
     terms: "month",
   },
@@ -365,7 +365,7 @@ const COURSES: CourseInfo[] = [
     period: "3개월",
     fee: 25000,
     refund: false,
-    img: "/images/demo-tax/office.jpg",
+    img: "/images/demo-lms/course-harassment.jpg",
     imgAlt: "원탁과 의자가 놓인 회의실",
     terms: "quarter",
   },
@@ -378,7 +378,7 @@ const COURSES: CourseInfo[] = [
     period: "3개월",
     fee: 40000,
     refund: false,
-    img: "/images/demo-company/hero.jpg",
+    img: "/images/demo-lms/course-safety.jpg",
     imgAlt: "가공 장비가 늘어선 공장 내부",
     terms: "quarter",
   },
@@ -391,7 +391,7 @@ const COURSES: CourseInfo[] = [
     period: "3개월",
     fee: 25000,
     refund: false,
-    img: "/images/demo-application/p1.jpg",
+    img: "/images/demo-lms/course-privacy.jpg",
     imgAlt: "노트북으로 일하는 직원",
     terms: "quarter",
   },
@@ -404,7 +404,7 @@ const COURSES: CourseInfo[] = [
     period: "1개월",
     fee: 150000,
     refund: true,
-    img: "/images/demo-law/desk.jpg",
+    img: "/images/demo-lms/course-docs.jpg",
     imgAlt: "책상 위에 놓인 서류와 만년필",
     terms: "month",
   },
@@ -417,7 +417,7 @@ const COURSES: CourseInfo[] = [
     period: "1개월",
     fee: 210000,
     refund: true,
-    img: "/images/demo-certlab/lab.jpg",
+    img: "/images/demo-lms/course-quality.jpg",
     imgAlt: "시험 장비가 놓인 실험실",
     terms: "month",
   },
@@ -430,7 +430,7 @@ const COURSES: CourseInfo[] = [
     period: "1개월",
     fee: 90000,
     refund: true,
-    img: "/images/demo-application/p2.jpg",
+    img: "/images/demo-lms/course-leader.jpg",
     imgAlt: "노트북 화면을 함께 보는 직원들",
     terms: "month",
   },
@@ -708,7 +708,7 @@ function Home({ go }: { go: (r: Route) => void }) {
   return (
     <>
       <section aria-labelledby="banner-title" className="relative overflow-hidden" style={{ background: C.dark }}>
-        <Image src="/images/demo-application/hero.jpg" alt="회의 탁자에서 노트북으로 공부하는 직원들" fill priority sizes="100vw" className="object-cover" />
+        <Image src="/images/demo-lms/hero.jpg" alt="회의 탁자에서 노트북으로 공부하는 직원들" fill priority sizes="100vw" className="object-cover" />
         <div className="absolute inset-0 bg-black/55" />
         <div className="relative mx-auto flex min-h-[320px] max-w-[1200px] flex-col justify-center px-4 py-12 text-white md:min-h-[400px] md:px-6">
           <h1 id="banner-title" className="text-[28px] font-bold leading-[1.3] md:text-[42px]">
