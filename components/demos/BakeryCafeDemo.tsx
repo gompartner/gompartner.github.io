@@ -5,6 +5,7 @@ import Image from "next/image";
 import { AnimatePresence, motion } from "framer-motion";
 import { Car, Check, ChevronRight, Clock3, Menu, Minus, Phone, Plus, ShoppingBag, TrainFront, Trash2, X } from "lucide-react";
 import { useReducedMotionSafe } from "@/hooks/useReducedMotionSafe";
+import { daysAgo, fmtDot, fmtKo, useDemoToday } from "@/hooks/useDemoToday";
 
 /* 베이커리 카페 홈페이지 데모: 가상의 곰파트너 베이커리.
    상호, 대표자, 주소, 전화번호, 사업자 정보, 빵 이름과 가격은 모두 가상이다.
@@ -1171,17 +1172,24 @@ function MenuAllPage({ clock, cart, onAdd }: { clock: Clock; cart: Cart; onAdd: 
 
 /* ---------- 공지사항 ---------- */
 
-const NOTICES = [
-  { no: 6, title: "10월 휴무 안내", date: "2026.10.01", body: ["10월 5일(월), 12일(월), 19일(월), 26일(월) 정기휴무", "10월 9일(금) 한글날 정상 영업"] },
-  { no: 5, title: "[EVENT] 소금빵 DAY", date: "2026.09.20", body: ["매월 마지막 주 토요일", "소금빵 5개 구매 시 1개 증정"] },
-  { no: 4, title: "추석 연휴 휴무 안내", date: "2026.09.10", body: ["9월 24일(목) ~ 9월 26일(토) 휴무", "9월 27일(일)부터 정상 영업"] },
-  { no: 3, title: "단체주문 예약 안내", date: "2026.08.28", body: ["20개 이상 단체주문과 홀 케이크는 이틀 전까지 예약합니다.", "개별 포장 가능"] },
-  { no: 2, title: "곰파트너 베이커리는 천연 발효종을 사용합니다.", date: "2026.08.01", body: ["깜파뉴, 무화과 호두 깜파뉴는 천연 발효종으로 48시간 저온 숙성합니다."] },
-  { no: 1, title: "홈페이지 오픈", date: "2026.07.15", body: ["빵 나오는 시간과 픽업 예약을 홈페이지에서 확인할 수 있습니다."] },
+// ago: 오늘 기준 며칠 전 글인지. 본문이 함수면 게시일 기준으로 날짜를 계산한다.
+const NOTICES: { no: number; title: string; ago: number; body: string[] | ((posted: Date) => string[]) }[] = [
+  { no: 6, title: "정기휴무 안내", ago: 6, body: ["매주 월요일 정기휴무", "공휴일 정상 영업"] },
+  { no: 5, title: "[EVENT] 소금빵 DAY", ago: 17, body: ["매월 마지막 주 토요일", "소금빵 5개 구매 시 1개 증정"] },
+  {
+    no: 4,
+    title: "명절 연휴 휴무 안내",
+    ago: 27,
+    body: (d) => [`${fmtKo(daysAgo(d, -14))} ~ ${fmtKo(daysAgo(d, -16))} 휴무`, `${fmtKo(daysAgo(d, -17))}부터 정상 영업`],
+  },
+  { no: 3, title: "단체주문 예약 안내", ago: 40, body: ["20개 이상 단체주문과 홀 케이크는 이틀 전까지 예약합니다.", "개별 포장 가능"] },
+  { no: 2, title: "곰파트너 베이커리는 천연 발효종을 사용합니다.", ago: 67, body: ["깜파뉴, 무화과 호두 깜파뉴는 천연 발효종으로 48시간 저온 숙성합니다."] },
+  { no: 1, title: "홈페이지 오픈", ago: 84, body: ["빵 나오는 시간과 픽업 예약을 홈페이지에서 확인할 수 있습니다."] },
 ];
 
 function NoticePage() {
   const [open, setOpen] = useState<number | null>(NOTICES[0].no);
+  const today = useDemoToday();
   return (
     <div>
       <p className="text-[15px]" style={{ color: C.muted }}>
@@ -1190,6 +1198,8 @@ function NoticePage() {
       <ul className="mt-3 border-t-2" style={{ borderColor: C.ink }}>
         {NOTICES.map((n) => {
           const on = open === n.no;
+          const posted = daysAgo(today, n.ago);
+          const body = typeof n.body === "function" ? n.body(posted) : n.body;
           return (
             <li key={n.no} className="border-b" style={{ borderColor: C.line }}>
               <button
@@ -1203,12 +1213,12 @@ function NoticePage() {
                 </span>
                 <span className="min-w-0 flex-1 font-semibold">{n.title}</span>
                 <span className="shrink-0 text-[14px] tabular-nums" style={{ color: C.muted }}>
-                  {n.date}
+                  {fmtDot(posted)}
                 </span>
               </button>
               {on && (
                 <ul className="mb-4 space-y-1 rounded-[6px] px-5 py-4 text-[15px] sm:ml-[60px]" style={{ background: C.paper }}>
-                  {n.body.map((line) => (
+                  {body.map((line) => (
                     <li key={line}>{line}</li>
                   ))}
                 </ul>

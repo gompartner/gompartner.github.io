@@ -25,6 +25,7 @@ import {
   Wifi,
 } from "lucide-react";
 import { useLocalStorage } from "@/hooks/useLocalStorage";
+import { useDemoToday } from "@/hooks/useDemoToday";
 
 const STORAGE_KEY = "gs-demo:homepage:v4";
 
@@ -287,6 +288,9 @@ const tutorialSteps = [
 
 export function HomepageDemo() {
   const [booking, setBooking, hydrated] = useLocalStorage<BookingState>(STORAGE_KEY, emptyBooking);
+  // 첫 예약 무료 행사는 이번 달 말일까지로 보여 준다
+  const today = useDemoToday();
+  const promoEnd = new Date(today.getFullYear(), today.getMonth() + 1, 0);
   const videoRef = useRef<HTMLVideoElement>(null);
   // 하위 화면 전환 (지점 안내, 시설 안내, 이용요금, 이용안내)
   const [page, setPage] = useState<GymPage>("home");
@@ -659,7 +663,7 @@ export function HomepageDemo() {
               <p>
                 서울 {locations.length}개 지점을 매일 06:00 ~ 22:00 무인으로 운영합니다. 예약한 시간에는 한 팀만 들어옵니다.
               </p>
-              <p className="mt-2 text-amber-200">10월 31일까지 첫 예약 1시간 무료 (1인 1회)</p>
+              <p className="mt-2 text-amber-200">{promoEnd.getMonth() + 1}월 {promoEnd.getDate()}일까지 첫 예약 1시간 무료 (1인 1회)</p>
             </div>
             <div className="flex flex-wrap items-center gap-3">
               <a
