@@ -143,8 +143,14 @@ export function LmsDemo() {
     <div className="min-h-screen pb-24" style={{ background: C.bg, color: C.text }}>
       <header className="border-b bg-white" style={{ borderColor: C.line }}>
         <div className="mx-auto flex max-w-[1200px] flex-wrap items-center gap-3 px-4 py-3 md:px-6">
-          <p className="mr-auto text-[18px] font-bold" style={{ color: C.brand }}>
-            곰파트너 아카데미
+          <p className="mr-auto flex items-center gap-2" style={{ color: C.brand }}>
+            {/* eslint-disable-next-line @next/next/no-img-element */}
+            <img src="/images/logo.svg" alt="" aria-hidden width={28} height={28} className="h-7 w-7 shrink-0" />
+            <span className="sr-only">곰파트너 아카데미</span>
+            <span aria-hidden className="flex items-baseline gap-1 whitespace-nowrap">
+              <span className="text-[18px] font-bold">곰파트너</span>
+              <span className="text-[11px] font-bold opacity-80">아카데미</span>
+            </span>
           </p>
           <div role="tablist" aria-label="화면 선택" className="relative flex rounded-full p-1" style={{ background: C.bg }}>
             {(

@@ -209,7 +209,15 @@ export function ShopAdminDemo() {
       style={{ background: C.bg, color: C.text, ["--panel" as string]: C.panel }}
     >
       <aside className="fixed inset-y-0 left-0 hidden w-56 flex-col border-r px-4 py-5 lg:flex" style={{ background: C.text, borderColor: C.rule }}>
-          <p className="px-2 text-[15px] font-bold text-white">곰파트너 리빙</p>
+          <p className="flex items-center gap-2 px-2 text-white">
+            {/* eslint-disable-next-line @next/next/no-img-element */}
+            <img src="/images/logo.svg" alt="" aria-hidden width={26} height={26} className="h-[26px] w-[26px] shrink-0" />
+            <span className="sr-only">곰파트너 리빙</span>
+            <span aria-hidden className="flex items-baseline gap-1 whitespace-nowrap">
+              <span className="text-[16px] font-bold">곰파트너</span>
+              <span className="text-[10px] font-bold" style={{ color: "#cbd5e1" }}>리빙</span>
+            </span>
+          </p>
           <p className="px-2 text-[13px]" style={{ color: "#9ca3af" }}>쇼핑몰 관리자</p>
           <nav aria-label="관리 메뉴" className="mt-8 grid gap-1">
             {[
@@ -232,8 +240,14 @@ export function ShopAdminDemo() {
       <header className="border-b bg-[var(--panel)]" style={{ borderColor: C.rule }}>
         <div className="mx-auto flex max-w-[1200px] items-center justify-between gap-4 px-4 py-4 md:px-6">
           <div>
-            <p className="text-[13px] font-bold lg:hidden" style={{ color: C.action }}>
-              곰파트너 리빙 관리자
+            <p className="flex items-center gap-1.5 lg:hidden" style={{ color: C.action }}>
+              {/* eslint-disable-next-line @next/next/no-img-element */}
+              <img src="/images/logo.svg" alt="" aria-hidden width={24} height={24} className="h-6 w-6 shrink-0" />
+              <span className="sr-only">곰파트너 리빙 관리자</span>
+              <span aria-hidden className="flex items-baseline gap-1 whitespace-nowrap">
+                <span className="text-[16px] font-bold">곰파트너</span>
+                <span className="text-[10px] font-bold">리빙 관리자</span>
+              </span>
             </p>
             <h1 className="text-[20px] font-bold leading-tight md:text-[24px]">{tab === "options" ? "옵션관리" : "주문관리"}</h1>
           </div>

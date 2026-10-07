@@ -374,16 +374,20 @@ export function CompanyDemo() {
 
 /* ---------- 로고, 맨 위 띠, 머리글 ---------- */
 
-function Logo({ light = false }: { light?: boolean }) {
-  const { s } = useCo();
+function Logo() {
+  const { s, lang } = useCo();
   return (
     <span className="inline-flex min-w-0 max-w-full items-center gap-2.5">
-      <svg className="shrink-0" width="30" height="30" viewBox="0 0 30 30" aria-hidden>
-        <rect x="1" y="1" width="28" height="28" rx="4" fill={light ? C.white : C.steel} />
-        <circle cx="15" cy="15" r="7.5" fill="none" stroke={C.orange} strokeWidth="2.4" />
-        <path d="M15 4.5 V10 M15 20 V25.5 M4.5 15 H10 M20 15 H25.5" stroke={light ? C.steel : C.white} strokeWidth="1.6" />
-      </svg>
-      <span className="truncate text-[17px] font-bold tracking-[-0.02em] sm:text-[19px]">{s(COMPANY)}</span>
+      {/* eslint-disable-next-line @next/next/no-img-element */}
+      <img src="/images/logo.svg" alt="" aria-hidden width={28} height={28} className="h-7 w-7 shrink-0" />
+      <span className="sr-only">{s(COMPANY)}</span>
+      <span aria-hidden className="flex min-w-0 items-baseline gap-1 whitespace-nowrap">
+        {lang === "ko" && <span className="shrink-0 text-[11px] font-bold sm:text-[12px]">(주)</span>}
+        <span className="text-[18px] font-bold tracking-[-0.02em] sm:text-[20px]">{lang === "ko" ? "곰파트너" : "Gompartner"}</span>
+        <span className="truncate text-[11px] font-bold sm:text-[12px]" style={{ opacity: 0.75 }}>
+          {lang === "ko" ? "정밀" : "Precision Co., Ltd."}
+        </span>
+      </span>
     </span>
   );
 }
@@ -2213,7 +2217,7 @@ function Footer() {
           ))}
         </ul>
         <div className="mt-6 text-white">
-          <Logo light />
+          <Logo />
         </div>
         <dl className="mt-5 grid gap-x-8 gap-y-1.5 text-[14px] sm:grid-cols-2 md:grid-cols-3" style={{ color: "#a9b0b9" }}>
           {(

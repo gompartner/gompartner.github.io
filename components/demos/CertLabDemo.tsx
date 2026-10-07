@@ -349,15 +349,17 @@ export function CertLabDemo() {
 
 /* ---------- 로고, 머리글 ---------- */
 
-function Logo({ light = false }: { light?: boolean }) {
+function Logo() {
   return (
     <span className="inline-flex min-w-0 max-w-full items-center gap-2.5">
-      <svg className="shrink-0" width="32" height="32" viewBox="0 0 32 32" aria-hidden>
-        <rect width="32" height="32" rx="8" fill={light ? C.white : C.indigo} />
-        <path d="M5 21 H9 L11 13 L14 24 L17 8 L20 20 L22 16 H27" fill="none" stroke={C.cyan} strokeWidth="2.2" strokeLinejoin="round" strokeLinecap="round" />
-        <path d="M5 11 H27" stroke={light ? C.indigo : C.white} strokeWidth="1.2" strokeDasharray="2 2" opacity="0.7" />
-      </svg>
-      <span className="truncate text-[17px] font-bold tracking-[-0.02em] sm:text-[18px]">{COMPANY}</span>
+      {/* eslint-disable-next-line @next/next/no-img-element */}
+      <img src="/images/logo.svg" alt="" aria-hidden width={28} height={28} className="h-7 w-7 shrink-0" />
+      <span className="sr-only">{COMPANY}</span>
+      <span aria-hidden className="flex min-w-0 items-baseline gap-1 whitespace-nowrap">
+        <span className="shrink-0 text-[11px] font-bold">(주)</span>
+        <span className="text-[18px] font-bold tracking-[-0.02em] sm:text-[19px]">곰파트너</span>
+        <span className="truncate text-[11px] font-bold sm:text-[12px]" style={{ opacity: 0.75 }}>시험인증원</span>
+      </span>
     </span>
   );
 }
@@ -3381,7 +3383,7 @@ function Footer() {
           ))}
         </ul>
         <div className="mt-6 text-white">
-          <Logo light />
+          <Logo />
         </div>
         <dl className="mt-5 grid gap-x-8 gap-y-1.5 text-[14px] sm:grid-cols-2 md:grid-cols-3" style={{ color: "#a6acd6" }}>
           {[

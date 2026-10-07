@@ -2,7 +2,7 @@
 
 import { useMemo, useRef, useState } from "react";
 import { IBM_Plex_Sans_KR } from "next/font/google";
-import { CalendarClock, CheckCircle2, PiggyBank, Phone, ShieldCheck, TrendingUp, Wallet } from "lucide-react";
+import { CalendarClock, CheckCircle2, PiggyBank, Phone, TrendingUp, Wallet } from "lucide-react";
 
 /* 노후준비 계산기 데모: 가상의 보험사 곰파트너생명.
    금액 단위는 모두 만 원. 적립 기간은 월 복리, 은퇴 후에는 연 2.5%로 운용하면서
@@ -188,10 +188,13 @@ export function RetirementDemo() {
       <header style={{ background: NAVY }} className="text-white">
         <div className="mx-auto flex max-w-[1200px] items-center justify-between px-4 py-4 md:px-6">
           <div className="flex items-center gap-2.5">
-            <span className="flex h-9 w-9 items-center justify-center rounded-full bg-white">
-              <ShieldCheck size={20} color={NAVY} aria-hidden />
+            {/* eslint-disable-next-line @next/next/no-img-element */}
+            <img src="/images/logo.svg" alt="" aria-hidden width={30} height={30} className="h-[30px] w-[30px] shrink-0" />
+            <span className="sr-only">곰파트너생명</span>
+            <span aria-hidden className="flex items-baseline gap-1 whitespace-nowrap">
+              <span className="text-[18px] font-bold">곰파트너</span>
+              <span className="text-[11px] font-bold text-[#c9d6e6]">생명</span>
             </span>
-            <span className="text-[18px] font-bold">곰파트너생명</span>
           </div>
           <nav className="hidden gap-6 text-[15px] text-[#c9d6e6] sm:flex" aria-label="주요 메뉴">
             <span>보험상품</span>

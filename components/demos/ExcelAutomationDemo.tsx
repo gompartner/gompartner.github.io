@@ -2,7 +2,7 @@
 
 import { useEffect, useMemo, useRef, useState } from "react";
 import { AnimatePresence, motion } from "framer-motion";
-import { AlertTriangle, CheckCircle2, Download, FileSpreadsheet, Printer, Upload, Wand2 } from "lucide-react";
+import { AlertTriangle, CheckCircle2, Download, Printer, Upload, Wand2 } from "lucide-react";
 import { useReducedMotionSafe } from "@/hooks/useReducedMotionSafe";
 
 /* 거래처 주문 엑셀 취합·검사·발주서 자동화 데모.
@@ -368,9 +368,14 @@ export function ExcelAutomationDemo() {
     >
       <header className="print:hidden border-b" style={{ background: C.action, borderColor: C.action }}>
         <div className="flex flex-wrap items-center gap-3 px-4 py-3 text-white md:px-6">
-          <FileSpreadsheet size={22} aria-hidden />
+          {/* eslint-disable-next-line @next/next/no-img-element */}
+          <img src="/images/logo.svg" alt="" aria-hidden width={28} height={28} className="h-7 w-7 shrink-0" />
           <div className="mr-auto min-w-0">
-            <p className="text-[13px] opacity-90">곰파트너 유통 주문취합</p>
+            <p className="flex items-baseline gap-1 whitespace-nowrap">
+              <span className="sr-only">곰파트너 유통 주문취합</span>
+              <span aria-hidden className="text-[16px] font-bold">곰파트너</span>
+              <span aria-hidden className="text-[10px] font-bold opacity-90">유통 주문취합</span>
+            </p>
             <h1 className="truncate text-[17px] font-bold">{sheet.fileName}</h1>
           </div>
           <input
