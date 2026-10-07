@@ -1,6 +1,6 @@
 "use client";
 
-import { useMemo, useRef, useState, useSyncExternalStore } from "react";
+import { useEffect, useMemo, useRef, useState, useSyncExternalStore } from "react";
 import Image from "next/image";
 import { AnimatePresence, motion } from "framer-motion";
 import { Check, ChevronLeft, ChevronRight, List, Minus, Phone, Plus, RotateCcw } from "lucide-react";
@@ -20,6 +20,9 @@ import { useReducedMotionSafe } from "@/hooks/useReducedMotionSafe";
    메뉴는 "따뜻한 차 중에 달지 않은 걸로 주세요" 문장의 낱말을 눌러 바꾸면 맞는 메뉴가 두루마리처럼 내려온다.
    옆에는 지도 앱 가게 정보처럼 "대표" 표시가 붙은 메뉴와 가격 목록을 두고, `메뉴판 보기`로 전체 메뉴판을 연다.
    평면도에서 방을 누르면 누른 곳에서 먹이 번지듯 칠해진다. 오시는 길은 골목 약도와 단계별 안내를 함께 움직인다.
+
+   하위 화면(공간 소개, 메뉴, 좌석 예약, 오시는 길, 공지사항)은 새 주소 없이 page 상태로 바꿔 그린다.
+   좌석 예약과 오시는 길 화면은 첫 화면의 평면도 예약, 골목 약도를 bare 모드로 다시 쓴다.
 
    사진 출처(public/images/demo-cafe):
    AI 생성(Z-Image-Turbo, Apache 2.0) hero, coffee, bingsu, omija, yard */
@@ -280,15 +283,40 @@ function LogoMark() {
 
 /* ---------- 데모 ---------- */
 
+type Page = "home" | "about" | "menu" | "reserve" | "location" | "notice";
+type SubId = Exclude<Page, "home">;
+type Go = (p: Page, anchor?: string) => void;
+
+const PAGES: { id: SubId; label: string }[] = [
+  { id: "about", label: "공간 소개" },
+  { id: "menu", label: "메뉴" },
+  { id: "reserve", label: "좌석 예약" },
+  { id: "location", label: "오시는 길" },
+  { id: "notice", label: "공지사항" },
+];
+
 export function HanokCafeDemo() {
   const minute = useMinute();
   const reduce = useReducedMotionSafe();
 
+  const [page, setPage] = useState<Page>("home");
+  const [anchor, setAnchor] = useState<{ id: string; n: number } | null>(null);
   const [groupId, setGroupId] = useState<GroupId>("gunneon");
   const [unitId, setUnitId] = useState<UnitId>("gunneon");
   const [ink, setInk] = useState<{ x: number; y: number } | null>(null);
   const [inkKey, setInkKey] = useState(0);
   const [fullMenu, setFullMenu] = useState(false);
+
+  /* 하위 화면 전환: 맨 위로 올리거나, 지정한 위치로 바로 내려간다 */
+  useEffect(() => {
+    if (anchor) document.getElementById(anchor.id)?.scrollIntoView({ block: "start" });
+  }, [anchor]);
+
+  const go: Go = (p, id) => {
+    setPage(p);
+    if (id) setAnchor((a) => ({ id, n: (a?.n ?? 0) + 1 }));
+    else window.scrollTo({ top: 0 });
+  };
 
   const pickUnit = (id: UnitId, point: { x: number; y: number } | null) => {
     const u = UNITS.find((v) => v.id === id)!;
@@ -300,9 +328,16 @@ export function HanokCafeDemo() {
 
   const scrollTo = (id: string) => document.getElementById(id)?.scrollIntoView({ behavior: reduce ? "auto" : "smooth", block: "start" });
 
+  /* 공간 이름 메뉴: 첫 화면과 좌석 예약에서는 평면도에서 고르고, 다른 화면에서는 공간 소개의 해당 공간으로 간다 */
   const pickGroup = (id: GroupId) => {
     pickUnit(unitsOf(id)[0].id, null);
-    scrollTo("space");
+    if (page === "home" || page === "reserve") scrollTo("space");
+    else go("about", `room-${id}`);
+  };
+
+  const reserveGroup = (id: GroupId) => {
+    pickUnit(unitsOf(id)[0].id, null);
+    go("reserve");
   };
 
   const openMenuBoard = () => {
@@ -310,17 +345,46 @@ export function HanokCafeDemo() {
     scrollTo("menu");
   };
 
+  const space = <SpaceSection groupId={groupId} unitId={unitId} ink={ink} inkKey={inkKey} onPick={pickUnit} minute={minute} bare={page !== "home"} />;
+
+  let body: React.ReactNode = null;
+  switch (page) {
+    case "about":
+      body = <AboutPage onReserve={reserveGroup} />;
+      break;
+    case "menu":
+      body = <MenuPage />;
+      break;
+    case "reserve":
+      body = <ReservePage>{space}</ReservePage>;
+      break;
+    case "location":
+      body = <LocationPage />;
+      break;
+    case "notice":
+      body = <NoticePage />;
+      break;
+  }
+
   return (
     <div className="min-h-screen bg-[#f3ede2] text-[17px] leading-[1.6] text-[#1f1b16]" style={{ backgroundImage: PAPER_TEXTURE }}>
       <div className="lg:flex">
-        <SideNav groupId={groupId} onGroup={pickGroup} />
-        <TopNav groupId={groupId} onGroup={pickGroup} />
+        <SideNav page={page} go={go} groupId={groupId} onGroup={pickGroup} />
+        <TopNav page={page} go={go} groupId={groupId} onGroup={pickGroup} />
         <div className="min-w-0 flex-1">
           <main>
-            <Intro onReserve={() => scrollTo("space")} onMenuBoard={openMenuBoard} />
-            <SpaceSection groupId={groupId} unitId={unitId} ink={ink} inkKey={inkKey} onPick={pickUnit} minute={minute} />
-            <MenuSection showAll={fullMenu} setShowAll={setFullMenu} />
-            <Location />
+            {page === "home" ? (
+              <>
+                <Intro onReserve={() => scrollTo("space")} onMenuBoard={openMenuBoard} />
+                {space}
+                <MenuSection showAll={fullMenu} setShowAll={setFullMenu} />
+                <Location />
+              </>
+            ) : (
+              <SubPage page={page} go={go}>
+                {body}
+              </SubPage>
+            )}
           </main>
           <Footer />
         </div>
@@ -331,27 +395,22 @@ export function HanokCafeDemo() {
 
 /* ---------- 메뉴(내비게이션) ---------- */
 
-const PAGE_LINKS = [
-  { href: "#top", label: "소개" },
-  { href: "#menu", label: "메뉴" },
-  { href: "#location", label: "오시는 길" },
-];
-
 /** 넓은 화면: 왼쪽 세로 메뉴. 공간 이름을 세로쓰기로 오른쪽부터 늘어놓는다. */
-function SideNav({ groupId, onGroup }: { groupId: GroupId; onGroup: (id: GroupId) => void }) {
+function SideNav({ page, go, groupId, onGroup }: { page: Page; go: Go; groupId: GroupId; onGroup: (id: GroupId) => void }) {
+  const spaceOn = page === "home" || page === "reserve";
   return (
     <aside className="sticky top-0 hidden h-screen w-[220px] shrink-0 flex-col self-start bg-[#1f1b16] px-4 pb-24 pt-6 text-[#efe7da] lg:flex">
-      <a href="#top" className="flex items-center gap-2.5">
+      <button type="button" onClick={() => go("home")} aria-label={`${CAFE} 처음으로`} className="flex items-center gap-2.5 text-left">
         <LogoMark />
         <span className="flex flex-col leading-[1.25]">
           <span className="text-[18px] font-bold">곰파트너</span>
           <span className="text-[11px] font-semibold opacity-80">한옥 찻집</span>
         </span>
-      </a>
+      </button>
       <nav aria-label="공간" className="mt-8">
         <ul className="flex flex-row-reverse justify-between">
           {GROUPS.map((g) => {
-            const on = g.id === groupId;
+            const on = spaceOn && g.id === groupId;
             return (
               <li key={g.id}>
                 <button
@@ -371,13 +430,21 @@ function SideNav({ groupId, onGroup }: { groupId: GroupId; onGroup: (id: GroupId
       <BrushRule className="mt-8 h-2 w-full opacity-30" color="#efe7da" />
       <nav aria-label="주 메뉴" className="mt-4">
         <ul className="space-y-1">
-          {PAGE_LINKS.map((l) => (
-            <li key={l.href}>
-              <a href={l.href} className="flex h-10 items-center text-[16px] transition-colors hover:text-[#d98b6f]">
-                {l.label}
-              </a>
-            </li>
-          ))}
+          {PAGES.map((l) => {
+            const on = page === l.id;
+            return (
+              <li key={l.id}>
+                <button
+                  type="button"
+                  onClick={() => go(l.id)}
+                  aria-current={on ? "page" : undefined}
+                  className={`flex h-10 w-full items-center text-left text-[16px] transition-colors hover:text-[#d98b6f] ${on ? "font-bold text-[#d98b6f]" : ""}`}
+                >
+                  {l.label}
+                </button>
+              </li>
+            );
+          })}
         </ul>
       </nav>
       <a href={`tel:${TEL}`} className="mt-4 inline-flex items-center gap-2 text-[15px] text-[#cfc4b4] hover:text-[#efe7da]">
@@ -389,33 +456,42 @@ function SideNav({ groupId, onGroup }: { groupId: GroupId; onGroup: (id: GroupId
 }
 
 /** 좁은 화면: 위쪽 상호 줄 + 가로로 밀리는 메뉴 띠 */
-function TopNav({ groupId, onGroup }: { groupId: GroupId; onGroup: (id: GroupId) => void }) {
+function TopNav({ page, go, groupId, onGroup }: { page: Page; go: Go; groupId: GroupId; onGroup: (id: GroupId) => void }) {
+  const spaceOn = page === "home" || page === "reserve";
   return (
     <header className="sticky top-0 z-40 border-b border-[#1f1b16]/10 bg-[#f3ede2] lg:hidden">
       <div className="flex h-14 items-center justify-between px-4">
-        <a href="#top" className="flex items-center gap-2">
+        <button type="button" onClick={() => go("home")} aria-label={`${CAFE} 처음으로`} className="flex items-center gap-2">
           <LogoMark />
           <span className="inline-flex items-baseline gap-1.5 whitespace-nowrap">
             <span className="text-[18px] font-bold">곰파트너</span>
             <span className="text-[11px] font-semibold opacity-80">한옥 찻집</span>
           </span>
-        </a>
+        </button>
         <a href={`tel:${TEL}`} aria-label={`전화하기 ${TEL}`} className="inline-flex h-11 w-11 items-center justify-center rounded-[4px] bg-[#1f1b16] text-[#f3ede2]">
           <Phone size={18} aria-hidden />
         </a>
       </div>
       <nav aria-label="주 메뉴" className="overflow-x-auto">
         <ul className="flex h-11 items-stretch gap-1 whitespace-nowrap px-2 text-[15px]">
-          {PAGE_LINKS.slice(0, 2).map((l) => (
-            <li key={l.href} className="flex">
-              <a href={l.href} className="flex items-center px-2.5">
-                {l.label}
-              </a>
-            </li>
-          ))}
+          {PAGES.map((l) => {
+            const on = page === l.id;
+            return (
+              <li key={l.id} className="flex">
+                <button
+                  type="button"
+                  onClick={() => go(l.id)}
+                  aria-current={on ? "page" : undefined}
+                  className={`flex items-center px-2.5 ${on ? "font-bold text-[#a8432a] shadow-[inset_0_-2px_0_#a8432a]" : ""}`}
+                >
+                  {l.label}
+                </button>
+              </li>
+            );
+          })}
           <li aria-hidden className="my-3 w-px bg-[#1f1b16]/20" />
           {GROUPS.map((g) => {
-            const on = g.id === groupId;
+            const on = spaceOn && g.id === groupId;
             return (
               <li key={g.id} className="flex">
                 <button
@@ -429,15 +505,79 @@ function TopNav({ groupId, onGroup }: { groupId: GroupId; onGroup: (id: GroupId)
               </li>
             );
           })}
-          <li aria-hidden className="my-3 w-px bg-[#1f1b16]/20" />
-          <li className="flex">
-            <a href="#location" className="flex items-center px-2.5">
-              오시는 길
-            </a>
-          </li>
         </ul>
       </nav>
     </header>
+  );
+}
+
+/* ---------- 하위 화면 틀 ---------- */
+
+function SubPage({ page, go, children }: { page: SubId; go: Go; children: React.ReactNode }) {
+  const label = PAGES.find((p) => p.id === page)!.label;
+  const headRef = useRef<HTMLHeadingElement>(null);
+
+  useEffect(() => {
+    headRef.current?.focus({ preventScroll: true });
+  }, [page]);
+
+  return (
+    <div className="px-4 pb-16 pt-4 sm:px-6 lg:px-10 lg:pb-24 lg:pt-8">
+      <div className="mx-auto max-w-[1080px]">
+        <nav aria-label="현재 위치">
+          <ol className="flex items-center gap-1.5 text-[14px] text-[#6b5a48]">
+            <li>
+              <button type="button" onClick={() => go("home")} className="inline-flex h-11 items-center hover:underline">
+                홈
+              </button>
+            </li>
+            <li aria-hidden>
+              <ChevronRight size={14} />
+            </li>
+            <li aria-current="page" className="font-semibold text-[#1f1b16]">
+              {label}
+            </li>
+          </ol>
+        </nav>
+        <h1 ref={headRef} tabIndex={-1} className="text-[32px] font-bold leading-[1.3] tracking-[-0.02em] outline-none sm:text-[40px]">
+          {label}
+        </h1>
+        <BrushRule className="mt-2 h-2 w-28" color="#a8432a" />
+
+        <nav aria-label="찻집 안내" className="-mx-4 mt-6 overflow-x-auto border-b border-[#1f1b16]/15 px-4 sm:mx-0 sm:px-0">
+          <ul className="flex gap-1 whitespace-nowrap">
+            {PAGES.map((p) => {
+              const on = p.id === page;
+              return (
+                <li key={p.id} className="flex">
+                  <button
+                    type="button"
+                    onClick={() => go(p.id)}
+                    aria-current={on ? "page" : undefined}
+                    className={`flex h-12 items-center px-3 text-[16px] transition-colors ${on ? "font-bold text-[#a8432a] shadow-[inset_0_-3px_0_#a8432a]" : "text-[#4a4036] hover:text-[#1f1b16]"}`}
+                  >
+                    {p.label}
+                  </button>
+                </li>
+              );
+            })}
+          </ul>
+        </nav>
+
+        <div className="mt-10">{children}</div>
+      </div>
+    </div>
+  );
+}
+
+function SubTitle({ id, children, aside }: { id: string; children: React.ReactNode; aside?: React.ReactNode }) {
+  return (
+    <div className="flex flex-wrap items-baseline justify-between gap-x-6 gap-y-1 border-b-2 border-[#1f1b16] pb-2">
+      <h2 id={id} className="text-[24px] font-bold tracking-[-0.02em] sm:text-[26px]">
+        {children}
+      </h2>
+      {aside && <p className="text-[15px] text-[#6b5a48]">{aside}</p>}
+    </div>
   );
 }
 
@@ -686,6 +826,7 @@ function SpaceSection({
   inkKey,
   onPick,
   minute,
+  bare = false,
 }: {
   groupId: GroupId;
   unitId: UnitId;
@@ -693,19 +834,12 @@ function SpaceSection({
   inkKey: number;
   onPick: (id: UnitId, point: { x: number; y: number } | null) => void;
   minute: number;
+  /** 하위 화면(좌석 예약)에 넣을 때는 제목과 바깥 여백 없이 평면도와 안내 판만 그린다 */
+  bare?: boolean;
 }) {
-  return (
-    <section id="space" aria-labelledby="space-title" className="scroll-mt-28 px-4 py-14 sm:px-6 lg:scroll-mt-0 lg:px-10 lg:py-20">
-      <div className="mx-auto max-w-[1080px]">
-        <div className="flex flex-wrap items-baseline justify-between gap-x-6 gap-y-1">
-          <h2 id="space-title" className="text-[30px] font-bold leading-[1.3] tracking-[-0.02em] sm:text-[36px]">
-            공간 안내
-          </h2>
-          <p className="text-[15px] text-[#6b5a48]">1962년 한옥 · 좌석 {TOTAL_SEATS}석</p>
-        </div>
-
-        <div className="mt-8 grid items-start gap-8 lg:grid-cols-[minmax(0,7fr)_minmax(0,5fr)]">
-          <div>
+  const grid = (
+    <div className={`${bare ? "" : "mt-8 "}grid items-start gap-8 lg:grid-cols-[minmax(0,7fr)_minmax(0,5fr)]`}>
+          <div className="min-w-0">
             <div className="rounded-[6px] border border-[#1f1b16]/12 bg-[#f8f3ea] p-3 sm:p-5">
               <FloorPlan selected={unitId} groupId={groupId} ink={ink} inkKey={inkKey} onPick={onPick} />
             </div>
@@ -728,7 +862,26 @@ function SpaceSection({
             {groupOf(groupId).name} 선택됨
           </p>
           <SpacePanel key={groupId} group={groupOf(groupId)} unitId={unitId} onUnit={(id) => onPick(id, null)} minute={minute} />
+    </div>
+  );
+
+  if (bare)
+    return (
+      <div id="space" className="scroll-mt-28 lg:scroll-mt-6">
+        {grid}
+      </div>
+    );
+
+  return (
+    <section id="space" aria-labelledby="space-title" className="scroll-mt-28 px-4 py-14 sm:px-6 lg:scroll-mt-0 lg:px-10 lg:py-20">
+      <div className="mx-auto max-w-[1080px]">
+        <div className="flex flex-wrap items-baseline justify-between gap-x-6 gap-y-1">
+          <h2 id="space-title" className="text-[30px] font-bold leading-[1.3] tracking-[-0.02em] sm:text-[36px]">
+            공간 안내
+          </h2>
+          <p className="text-[15px] text-[#6b5a48]">1962년 한옥 · 좌석 {TOTAL_SEATS}석</p>
         </div>
+        {grid}
       </div>
     </section>
   );
@@ -1083,7 +1236,7 @@ function MenuRow({ item }: { item: MenuItem }) {
   );
 }
 
-function MenuSection({ showAll, setShowAll }: { showAll: boolean; setShowAll: (v: boolean) => void }) {
+function MenuPicker() {
   const reduce = useReducedMotionSafe();
   const [temp, setTemp] = useState<"hot" | "cold">("hot");
   const [kind, setKind] = useState<Kind>("tea");
@@ -1098,6 +1251,45 @@ function MenuSection({ showAll, setShowAll }: { showAll: boolean; setShowAll: (v
   const comboKey = `${temp}-${kind}-${sweet}`;
   const kindWord = TOKENS.kind.find((s) => s.v === kind)?.label;
 
+  return (
+    <div className="min-w-0" id="menu-picker">
+      <p className="text-[24px] font-semibold leading-[2.1] tracking-[-0.02em] sm:text-[30px]">
+        <Token label="온도" options={TOKENS.temp} value={temp} onChange={setTemp} />
+        <Token label="종류" options={TOKENS.kind} value={kind} onChange={setKind} />
+        중에
+        <Token label="단맛" options={TOKENS.sweet} value={sweet} onChange={setSweet} />
+        걸로 주세요
+      </p>
+  
+      <div className="mt-6">
+        <div className="h-3.5 rounded-full bg-[#5a4130]" aria-hidden />
+        <motion.div
+          key={comboKey}
+          className="mx-3 overflow-hidden bg-[#faf6ee] shadow-[inset_0_8px_10px_-8px_rgba(0,0,0,0.25)]"
+          initial={reduce ? false : { height: 0 }}
+          animate={{ height: "auto" }}
+          transition={{ duration: 0.7, ease: EASE_IN_OUT }}
+        >
+          <div className="px-5 py-4 sm:px-8" aria-live="polite">
+            <p className="pt-2 text-[15px] text-[#6b5a48]">
+              {relaxed
+                ? `${TOKENS.sweet.find((s) => s.v === sweet)?.label} ${TOKENS.temp.find((s) => s.v === temp)?.label} ${kindWord}는 없어서 비슷한 메뉴를 보여 드려요`
+                : `${items.length}가지`}
+            </p>
+            <ul className="divide-y divide-[#1f1b16]/10">
+              {items.map((m) => (
+                <MenuRow key={m.name} item={m} />
+              ))}
+            </ul>
+          </div>
+        </motion.div>
+        <div className="h-3.5 rounded-full bg-[#5a4130]" aria-hidden />
+      </div>
+    </div>
+  );
+}
+
+function MenuSection({ showAll, setShowAll }: { showAll: boolean; setShowAll: (v: boolean) => void }) {
   return (
     <section id="menu" aria-labelledby="menu-title" className="scroll-mt-28 border-t border-[#1f1b16]/10 bg-[#efe7da]/60 px-4 py-14 sm:px-6 lg:scroll-mt-0 lg:px-10 lg:py-20">
       <div className="mx-auto max-w-[1080px]">
@@ -1118,40 +1310,7 @@ function MenuSection({ showAll, setShowAll }: { showAll: boolean; setShowAll: (v
         </div>
 
         <div className="mt-8 grid gap-10 lg:grid-cols-[minmax(0,7fr)_minmax(0,5fr)]">
-          <div className="min-w-0" id="menu-picker">
-            <p className="text-[24px] font-semibold leading-[2.1] tracking-[-0.02em] sm:text-[30px]">
-              <Token label="온도" options={TOKENS.temp} value={temp} onChange={setTemp} />
-              <Token label="종류" options={TOKENS.kind} value={kind} onChange={setKind} />
-              중에
-              <Token label="단맛" options={TOKENS.sweet} value={sweet} onChange={setSweet} />
-              걸로 주세요
-            </p>
-
-            <div className="mt-6">
-              <div className="h-3.5 rounded-full bg-[#5a4130]" aria-hidden />
-              <motion.div
-                key={comboKey}
-                className="mx-3 overflow-hidden bg-[#faf6ee] shadow-[inset_0_8px_10px_-8px_rgba(0,0,0,0.25)]"
-                initial={reduce ? false : { height: 0 }}
-                animate={{ height: "auto" }}
-                transition={{ duration: 0.7, ease: EASE_IN_OUT }}
-              >
-                <div className="px-5 py-4 sm:px-8" aria-live="polite">
-                  <p className="pt-2 text-[15px] text-[#6b5a48]">
-                    {relaxed
-                      ? `${TOKENS.sweet.find((s) => s.v === sweet)?.label} ${TOKENS.temp.find((s) => s.v === temp)?.label} ${kindWord}는 없어서 비슷한 메뉴를 보여 드려요`
-                      : `${items.length}가지`}
-                  </p>
-                  <ul className="divide-y divide-[#1f1b16]/10">
-                    {items.map((m) => (
-                      <MenuRow key={m.name} item={m} />
-                    ))}
-                  </ul>
-                </div>
-              </motion.div>
-              <div className="h-3.5 rounded-full bg-[#5a4130]" aria-hidden />
-            </div>
-          </div>
+          <MenuPicker />
 
           <div>
             <h3 className="text-[20px] font-bold">대표 메뉴</h3>
@@ -1274,22 +1433,15 @@ function AlleyMap({ step }: { step: number }) {
   );
 }
 
-function Location() {
+/** bare: 하위 화면(오시는 길)에 넣을 때 제목과 바깥 여백 없이 그린다 */
+function Location({ bare = false }: { bare?: boolean }) {
   const [step, setStep] = useState(0);
   const last = WAY_STEPS.length - 1;
 
-  return (
-    <section id="location" aria-labelledby="location-title" className="scroll-mt-28 border-t border-[#1f1b16]/10 px-4 py-14 sm:px-6 lg:scroll-mt-0 lg:px-10 lg:py-20">
-      <div className="mx-auto max-w-[1080px]">
-        <div className="flex flex-wrap items-baseline justify-between gap-x-6 gap-y-1">
-          <h2 id="location-title" className="text-[30px] font-bold leading-[1.3] tracking-[-0.02em] sm:text-[36px]">
-            오시는 길
-          </h2>
-          <p className="text-[15px] text-[#6b5a48]">□□역 2번 출구 도보 6분</p>
-        </div>
-
-        <div className="mt-8 grid items-start gap-8 lg:grid-cols-[minmax(0,6fr)_minmax(0,5fr)]">
-          <div className="overflow-hidden rounded-[6px] border border-[#1f1b16]/12">
+  const content = (
+    <>
+        <div className={`${bare ? "" : "mt-8 "}grid items-start gap-8 lg:grid-cols-[minmax(0,6fr)_minmax(0,5fr)]`}>
+          <div className="min-w-0 overflow-hidden rounded-[6px] border border-[#1f1b16]/12">
             <AlleyMap step={step} />
           </div>
           <div id="way">
@@ -1347,7 +1499,403 @@ function Location() {
             <p className="mt-2 text-[16px]">주차 공간이 없습니다. 골목 입구 □□공영주차장 이용 시 2시간 할인권을 드립니다.</p>
           </div>
         </div>
+    </>
+  );
+
+  if (bare) return <div id="location">{content}</div>;
+
+  return (
+    <section id="location" aria-labelledby="location-title" className="scroll-mt-28 border-t border-[#1f1b16]/10 px-4 py-14 sm:px-6 lg:scroll-mt-0 lg:px-10 lg:py-20">
+      <div className="mx-auto max-w-[1080px]">
+        <div className="flex flex-wrap items-baseline justify-between gap-x-6 gap-y-1">
+          <h2 id="location-title" className="text-[30px] font-bold leading-[1.3] tracking-[-0.02em] sm:text-[36px]">
+            오시는 길
+          </h2>
+          <p className="text-[15px] text-[#6b5a48]">□□역 2번 출구 도보 6분</p>
+        </div>
+        {content}
       </div>
+    </section>
+  );
+}
+
+/* ---------- 하위 화면: 공간 소개 ---------- */
+
+const peopleOf = (id: GroupId) =>
+  unitsOf(id)
+    .map((u) => (unitsOf(id).length > 1 ? `${u.name} ${u.min}~${u.max}명` : `${u.min}~${u.max}명`))
+    .join(", ");
+
+const ABOUT_FACTS: [string, string][] = [
+  ["건물", "1962년 ㄱ자 한옥"],
+  ["좌석", `${TOTAL_SEATS}석`],
+  ["공간", GROUPS.map((g) => g.name).join(", ")],
+  ["편의시설", "개별룸, 좌식, 야외좌석(툇마루), 단체석(별채)"],
+  ["화장실", "마당 안쪽"],
+  ["주차", "주차 불가 (□□공영주차장 2시간 할인)"],
+];
+
+function AboutPage({ onReserve }: { onReserve: (id: GroupId) => void }) {
+  return (
+    <div>
+      <div className="grid items-start gap-8 lg:grid-cols-[minmax(0,7fr)_minmax(0,5fr)]">
+        <div className="relative aspect-[4/3] min-w-0 overflow-hidden rounded-[4px] sm:aspect-[16/10]">
+          <Image src={`${IMG}/yard.jpg`} alt="기와지붕 아래 툇마루와 소나무가 있는 한옥 마당" fill sizes="(min-width:1024px) 560px, 100vw" className="object-cover" />
+        </div>
+        <div className="min-w-0">
+          <p className="text-[17px] text-[#4a4036]">1962년에 지은 ㄱ자 한옥 찻집. 직접 달인 전통차와 커피, 다과를 준비합니다.</p>
+          <dl className="mt-5 divide-y divide-[#1f1b16]/10 border-y border-[#1f1b16]/15 text-[16px]">
+            {ABOUT_FACTS.map(([k, v]) => (
+              <div key={k} className="grid grid-cols-[84px_1fr] gap-3 py-2.5">
+                <dt className="text-[#a8432a]">{k}</dt>
+                <dd className="min-w-0">{v}</dd>
+              </div>
+            ))}
+          </dl>
+        </div>
+      </div>
+
+      <div className="mt-14">
+        {GROUPS.map((g, i) => (
+          <section
+            key={g.id}
+            id={`room-${g.id}`}
+            aria-labelledby={`room-${g.id}-title`}
+            className="grid scroll-mt-28 gap-6 border-t border-[#1f1b16]/15 py-10 md:grid-cols-2 md:gap-10 lg:scroll-mt-6"
+          >
+            <div className={`relative aspect-[4/3] min-w-0 overflow-hidden rounded-[4px] ${i % 2 ? "md:order-2" : ""}`}>
+              <Image src={`${IMG}/${g.img}.jpg`} alt={g.alt} fill sizes="(min-width:768px) 520px, 100vw" className="object-cover" style={{ objectPosition: g.pos }} />
+            </div>
+            <div className="min-w-0">
+              <p className="text-[15px] font-semibold text-[#a8432a]">{g.seating}</p>
+              <h2 id={`room-${g.id}-title`} className="mt-1 text-[28px] font-bold tracking-[-0.02em]">
+                {g.name}
+              </h2>
+              <p className="mt-3 text-[16px] text-[#4a4036]">{g.desc}</p>
+              <dl className="mt-5 divide-y divide-[#1f1b16]/10 border-y border-[#1f1b16]/10 text-[15px]">
+                {[
+                  ["좌석", `${seatsOf(g.id)}석`],
+                  ["인원", peopleOf(g.id)],
+                  ["이용", g.reservable ? "예약 2시간, 빈자리는 예약 없이 이용" : "예약 없이 오신 순서대로"],
+                ].map(([k, v]) => (
+                  <div key={k} className="grid grid-cols-[64px_1fr] gap-3 py-2.5">
+                    <dt className="text-[#6b5a48]">{k}</dt>
+                    <dd className="min-w-0">{v}</dd>
+                  </div>
+                ))}
+              </dl>
+              {g.reservable && (
+                <button
+                  type="button"
+                  onClick={() => onReserve(g.id)}
+                  className="mt-5 inline-flex h-12 items-center rounded-[4px] bg-[#1f1b16] px-6 text-[16px] font-semibold text-[#f3ede2] transition-colors hover:bg-[#a8432a]"
+                >
+                  {g.name} 예약
+                </button>
+              )}
+            </div>
+          </section>
+        ))}
+      </div>
+    </div>
+  );
+}
+
+/* ---------- 하위 화면: 메뉴 ---------- */
+
+type Cat = "all" | Kind;
+
+const ORIGIN: [string, string][] = [
+  ["쌀 (가래떡, 인절미, 누룽지)", "국내산"],
+  ["팥 (빙수, 단팥죽)", "국내산"],
+  ["대추, 생강", "국내산"],
+  ["유자", "국내산 (고흥)"],
+  ["우유", "국내산"],
+];
+
+function MenuPage() {
+  const [cat, setCat] = useState<Cat>("all");
+  const kinds = cat === "all" ? (Object.keys(KIND_LABEL) as Kind[]) : [cat];
+  const cats: { v: Cat; label: string }[] = [{ v: "all", label: "전체" }, ...(Object.keys(KIND_LABEL) as Kind[]).map((k) => ({ v: k, label: KIND_LABEL[k] }))];
+
+  return (
+    <div className="space-y-16">
+      <section aria-labelledby="best-title">
+        <SubTitle id="best-title">대표 메뉴</SubTitle>
+        <ul className="mt-6 grid gap-6 sm:grid-cols-3">
+          {BEST.map((b) => (
+            <li key={b.name} className="min-w-0">
+              <div className="relative aspect-[4/3] overflow-hidden rounded-[4px]">
+                <Image src={`${IMG}/${b.img}.jpg`} alt={b.alt} fill sizes="(min-width:640px) 340px, 100vw" className="object-cover" />
+              </div>
+              <p className="mt-3 flex items-baseline justify-between gap-3">
+                <span className="text-[18px] font-bold">{b.name}</span>
+                <span className="text-[16px] font-semibold tabular-nums">{won(priceOf(b.name))}</span>
+              </p>
+            </li>
+          ))}
+        </ul>
+      </section>
+
+      <section aria-labelledby="board-title">
+        <SubTitle id="board-title" aside="10월 ~ 11월 가을 메뉴: 홍시 빙수, 단호박 식혜">
+          메뉴판
+        </SubTitle>
+        <div role="group" aria-label="메뉴 분류" className="mt-5 flex flex-wrap gap-2">
+          {cats.map((c) => {
+            const on = c.v === cat;
+            return (
+              <button
+                key={c.v}
+                type="button"
+                onClick={() => setCat(c.v)}
+                aria-pressed={on}
+                className={`h-11 rounded-[4px] border px-4 text-[15px] font-semibold transition-colors ${on ? "border-[#1f1b16] bg-[#1f1b16] text-[#f3ede2]" : "border-[#1f1b16]/20 hover:border-[#1f1b16]"}`}
+              >
+                {c.label}
+              </button>
+            );
+          })}
+        </div>
+        <div className={`mt-6 grid gap-x-10 gap-y-8 ${kinds.length > 1 ? "md:grid-cols-2" : "max-w-[640px]"}`}>
+          {kinds.map((k) => (
+            <div key={k} className="min-w-0">
+              <p className="border-b-2 border-[#1f1b16] pb-1.5 text-[18px] font-bold text-[#a8432a]">{KIND_LABEL[k]}</p>
+              <ul className="divide-y divide-[#1f1b16]/10">
+                {MENU.filter((m) => m.kind === k).map((m) => (
+                  <MenuRow key={m.name} item={m} />
+                ))}
+              </ul>
+            </div>
+          ))}
+        </div>
+        <p className="mt-4 text-[14px] text-[#6b5a48]">가격은 부가세 포함입니다.</p>
+      </section>
+
+      <section aria-labelledby="pick-title">
+        <SubTitle id="pick-title">메뉴 추천</SubTitle>
+        <div className="mt-6 max-w-[640px]">
+          <MenuPicker />
+        </div>
+      </section>
+
+      <section aria-labelledby="origin-title">
+        <SubTitle id="origin-title">원산지 표시</SubTitle>
+        <table className="mt-2 w-full max-w-[640px] border-collapse text-left text-[15px]">
+          <caption className="sr-only">재료별 원산지</caption>
+          <thead>
+            <tr className="border-b border-[#1f1b16]/15 text-[#6b5a48]">
+              <th scope="col" className="py-2.5 font-semibold">
+                품목
+              </th>
+              <th scope="col" className="py-2.5 text-right font-semibold">
+                원산지
+              </th>
+            </tr>
+          </thead>
+          <tbody>
+            {ORIGIN.map(([k, v]) => (
+              <tr key={k} className="border-b border-[#1f1b16]/10">
+                <th scope="row" className="py-2.5 font-normal">
+                  {k}
+                </th>
+                <td className="py-2.5 text-right">{v}</td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
+      </section>
+    </div>
+  );
+}
+
+/* ---------- 하위 화면: 좌석 예약 ---------- */
+
+function ReservePage({ children }: { children: React.ReactNode }) {
+  const rows: [string, string][] = [
+    ["예약 공간", GROUPS.filter((g) => g.reservable).map((g) => g.name).join(", ")],
+    ["예약 없이 이용", GROUPS.filter((g) => !g.reservable).map((g) => `${g.name} (오신 순서대로)`).join(", ")],
+    ["인원", GROUPS.filter((g) => g.reservable).map((g) => `${g.name} ${peopleOf(g.id)}`).join(" / ")],
+    ["이용 시간", "2시간"],
+    ["예약 시간", `${SLOTS.join(", ")} 시작 (화 ~ 일)`],
+    ["예약 확정", "예약 신청 후 문자로 안내"],
+    ["자동 취소", "예약 시간 15분 경과 시"],
+    ["별채 이용", "대관료 없이 1인 1메뉴 주문"],
+    ["변경·취소", `전화 ${TEL}`],
+  ];
+  return (
+    <div className="space-y-16">
+      {children}
+      <section aria-labelledby="reserve-guide-title">
+        <SubTitle id="reserve-guide-title">예약 안내</SubTitle>
+        <dl className="divide-y divide-[#1f1b16]/10 border-b border-[#1f1b16]/15 text-[16px]">
+          {rows.map(([k, v]) => (
+            <div key={k} className="grid grid-cols-[96px_1fr] gap-3 py-3 sm:grid-cols-[160px_1fr]">
+              <dt className="text-[#6b5a48]">{k}</dt>
+              <dd className="min-w-0">{v}</dd>
+            </div>
+          ))}
+        </dl>
+      </section>
+    </div>
+  );
+}
+
+/* ---------- 하위 화면: 오시는 길 ---------- */
+
+function LocationPage() {
+  return (
+    <div className="space-y-16">
+      <Location bare />
+      <section aria-labelledby="transit-title">
+        <SubTitle id="transit-title">대중교통</SubTitle>
+        <dl className="divide-y divide-[#1f1b16]/10 border-b border-[#1f1b16]/15 text-[16px]">
+          {[
+            ["지하철", "□□역 2번 출구 도보 6분"],
+            ["버스", "□□역 정류장 하차 후 도보 6분 (간선 000, 지선 0000)"],
+          ].map(([k, v]) => (
+            <div key={k} className="grid grid-cols-[96px_1fr] gap-3 py-3 sm:grid-cols-[160px_1fr]">
+              <dt className="text-[#6b5a48]">{k}</dt>
+              <dd className="min-w-0">{v}</dd>
+            </div>
+          ))}
+        </dl>
+      </section>
+    </div>
+  );
+}
+
+/* ---------- 하위 화면: 공지사항 ---------- */
+
+const NOTICES: { no: number; title: string; date: string; body: string[] }[] = [
+  {
+    no: 7,
+    title: "가을 메뉴 출시 (홍시 빙수, 단호박 식혜)",
+    date: "2026.10.01",
+    body: ["10월부터 11월까지 가을 메뉴를 판매합니다.", "홍시 빙수 14,000원", "단호박 식혜 6,500원", "재료 소진 시 조기 마감될 수 있습니다."],
+  },
+  {
+    no: 6,
+    title: "10월 휴무 안내",
+    date: "2026.09.28",
+    body: ["10월 매주 월요일은 정기 휴무입니다.", "10월 9일(금) 한글날은 정상 영업합니다."],
+  },
+  {
+    no: 5,
+    title: "추석 연휴 영업 안내",
+    date: "2026.09.15",
+    body: ["9월 25일(금) 추석 당일은 휴무입니다.", "9월 24일(목), 9월 26일(토)은 정상 영업합니다."],
+  },
+  {
+    no: 4,
+    title: "우천 시 툇마루 이용 안내",
+    date: "2026.08.20",
+    body: ["비가 오는 날에는 툇마루 예약 자리를 처마 안쪽으로 옮겨 드립니다.", "예약 시간과 인원은 그대로 유지됩니다."],
+  },
+  {
+    no: 3,
+    title: "주차 할인권 안내",
+    date: "2026.07.10",
+    body: ["매장 주차 공간이 없습니다.", "골목 입구 □□공영주차장 이용 시 2시간 할인권을 드립니다.", "계산하실 때 말씀해 주십시오."],
+  },
+  {
+    no: 2,
+    title: "좌식 방 예약 안내",
+    date: "2026.06.02",
+    body: ["건넌방과 사랑방은 방 단위로 예약받습니다.", "이용 시간은 2시간입니다.", "예약 시간 15분 경과 시 자동 취소될 수 있습니다."],
+  },
+  {
+    no: 1,
+    title: "별채 단체 이용 안내",
+    date: "2026.05.15",
+    body: ["별채는 6명부터 10명까지 이용할 수 있습니다.", "대관료는 없으며 1인 1메뉴 주문 부탁드립니다."],
+  },
+];
+
+function NoticePage() {
+  const [open, setOpen] = useState<number | null>(null);
+  const headRef = useRef<HTMLHeadingElement>(null);
+  const idx = NOTICES.findIndex((n) => n.no === open);
+  const item = idx >= 0 ? NOTICES[idx] : null;
+
+  useEffect(() => {
+    if (open !== null) headRef.current?.focus();
+  }, [open]);
+
+  if (item) {
+    const prev = NOTICES[idx + 1];
+    const next = NOTICES[idx - 1];
+    return (
+      <article aria-labelledby="notice-title">
+        <div className="border-b border-t-2 border-[#1f1b16]/15 border-t-[#1f1b16] py-4">
+          <h2 id="notice-title" ref={headRef} tabIndex={-1} className="text-[22px] font-bold leading-[1.4] tracking-[-0.02em] outline-none sm:text-[24px]">
+            {item.title}
+          </h2>
+          <p className="mt-1 text-[14px] tabular-nums text-[#6b5a48]">작성일 {item.date}</p>
+        </div>
+        <div className="space-y-1 py-8 text-[16px] leading-[1.8]">
+          {item.body.map((b) => (
+            <p key={b}>{b}</p>
+          ))}
+        </div>
+        <dl className="divide-y divide-[#1f1b16]/10 border-y border-[#1f1b16]/15 text-[15px]">
+          {(
+            [
+              ["이전글", prev],
+              ["다음글", next],
+            ] as const
+          ).map(([label, n]) => (
+            <div key={label} className="grid grid-cols-[64px_1fr] items-center gap-3">
+              <dt className="py-3 text-[#6b5a48]">{label}</dt>
+              <dd className="min-w-0">
+                {n ? (
+                  <button type="button" onClick={() => setOpen(n.no)} className="block w-full truncate py-3 text-left hover:underline">
+                    {n.title}
+                  </button>
+                ) : (
+                  <span className="block py-3 text-[#6b5a48]">없음</span>
+                )}
+              </dd>
+            </div>
+          ))}
+        </dl>
+        <button
+          type="button"
+          onClick={() => setOpen(null)}
+          className="mt-6 inline-flex h-11 items-center gap-2 rounded-[4px] border border-[#1f1b16]/25 px-5 text-[15px] font-semibold transition-colors hover:border-[#1f1b16]"
+        >
+          <List size={16} aria-hidden />
+          목록
+        </button>
+      </article>
+    );
+  }
+
+  return (
+    <section aria-label="공지사항 목록">
+      <p className="text-[15px] text-[#6b5a48]">
+        전체 <b className="font-semibold text-[#1f1b16]">{NOTICES.length}</b>건
+      </p>
+      <div className="mt-3 hidden grid-cols-[64px_1fr_120px] border-y-2 border-b-[#1f1b16]/15 border-t-[#1f1b16] py-3 text-center text-[15px] font-semibold sm:grid" aria-hidden>
+        <span>번호</span>
+        <span>제목</span>
+        <span>작성일</span>
+      </div>
+      <ul className="border-t-2 border-[#1f1b16] sm:border-t-0">
+        {NOTICES.map((n) => (
+          <li key={n.no} className="border-b border-[#1f1b16]/10">
+            <button
+              type="button"
+              onClick={() => setOpen(n.no)}
+              className="grid w-full gap-1 px-1 py-4 text-left transition-colors hover:bg-[#1f1b16]/[0.03] sm:grid-cols-[64px_1fr_120px] sm:items-center sm:gap-0 sm:px-0"
+            >
+              <span className="hidden text-center text-[15px] tabular-nums text-[#6b5a48] sm:block">{n.no}</span>
+              <span className="min-w-0 text-[16px] font-medium">{n.title}</span>
+              <span className="text-[14px] tabular-nums text-[#6b5a48] sm:text-center">{n.date}</span>
+            </button>
+          </li>
+        ))}
+      </ul>
     </section>
   );
 }
