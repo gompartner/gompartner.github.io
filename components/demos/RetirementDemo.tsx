@@ -5,7 +5,7 @@ import { IBM_Plex_Sans_KR } from "next/font/google";
 import { daysAgo, fmtDot, useDemoToday } from "@/hooks/useDemoToday";
 import { Calculator, CalendarClock, CheckCircle2, ChevronRight, CreditCard, FileSearch, Home, Landmark, PiggyBank, Phone, ReceiptText, TrendingUp, Wallet } from "lucide-react";
 
-/* 노후준비 계산기 데모: 가상의 보험사 곰파트너생명.
+/* 노후준비 계산기 데모: 가상의 보험사 곰선임생명.
    금액 단위는 모두 만 원. 적립 기간은 월 복리, 은퇴 후에는 연 2.5%로 운용하면서
    (희망 생활비 - 국민연금)을 매달 꺼내 쓴다고 계산한다. 물가상승률 반영 시 연 2%. */
 
@@ -250,12 +250,12 @@ function SiteHeader({ screen, go }: { screen: Screen; go: Go }) {
   return (
     <header className="sticky top-0 z-40 border-b bg-white" style={{ borderColor: LINE }}>
       <div className="mx-auto flex max-w-[1200px] flex-wrap items-center justify-between px-4 md:h-[72px] md:flex-nowrap md:px-6">
-        <button type="button" onClick={() => go("home")} className="flex h-14 items-center gap-2.5 md:h-auto" aria-label="곰파트너생명 메인">
+        <button type="button" onClick={() => go("home")} className="flex h-14 items-center gap-2.5 md:h-auto" aria-label="곰선임생명 메인">
           {/* eslint-disable-next-line @next/next/no-img-element */}
           <img src="/images/logo.svg" alt="" aria-hidden width={30} height={30} className="h-[30px] w-[30px] shrink-0" />
           <span aria-hidden className="flex items-baseline gap-1 whitespace-nowrap">
             <span className="text-[18px] font-bold" style={{ color: NAVY }}>
-              곰파트너
+              곰선임
             </span>
             <span className="text-[11px] font-bold" style={{ color: INK_3 }}>
               생명
@@ -298,7 +298,7 @@ function SiteFooter() {
         <p>
           고객센터 <b className="tabular-nums" style={{ color: INK_2 }}>{TEL}</b> · 평일 09:00 ~ 18:00
         </p>
-        <p>© 곰파트너생명</p>
+        <p>© 곰선임생명</p>
       </div>
     </footer>
   );
@@ -320,25 +320,25 @@ const PRODUCT_TABS = [
     id: "pension",
     label: "연금·저축",
     items: [
-      { name: "곰파트너 연금보험", desc: "10년 확정이율, 유지보너스 지급", age: "15 ~ 70세", term: "종신 연금" },
-      { name: "곰파트너 연금저축보험", desc: "연말정산 세액공제", age: "19 ~ 65세", term: "55세 이후 연금 개시" },
-      { name: "곰파트너 바로받는 연금보험", desc: "목돈 넣고 다음 달부터 연금 수령", age: "45 ~ 80세", term: "10 · 20년 확정 또는 종신" },
+      { name: "곰선임 연금보험", desc: "10년 확정이율, 유지보너스 지급", age: "15 ~ 70세", term: "종신 연금" },
+      { name: "곰선임 연금저축보험", desc: "연말정산 세액공제", age: "19 ~ 65세", term: "55세 이후 연금 개시" },
+      { name: "곰선임 바로받는 연금보험", desc: "목돈 넣고 다음 달부터 연금 수령", age: "45 ~ 80세", term: "10 · 20년 확정 또는 종신" },
     ],
   },
   {
     id: "life",
     label: "종신·정기",
     items: [
-      { name: "곰파트너 종신보험", desc: "평생 사망보장", age: "15 ~ 65세", term: "종신" },
-      { name: "곰파트너 정기보험", desc: "필요한 기간에 집중한 사망보장", age: "19 ~ 60세", term: "60 · 70 · 80세 만기" },
+      { name: "곰선임 종신보험", desc: "평생 사망보장", age: "15 ~ 65세", term: "종신" },
+      { name: "곰선임 정기보험", desc: "필요한 기간에 집중한 사망보장", age: "19 ~ 60세", term: "60 · 70 · 80세 만기" },
     ],
   },
   {
     id: "health",
     label: "건강·암",
     items: [
-      { name: "곰파트너 암보험(비갱신형)", desc: "첫 보험료 그대로, 재진단암 보장(특약)", age: "15 ~ 65세", term: "90 · 100세 만기" },
-      { name: "곰파트너 건강보험", desc: "뇌혈관 · 심장질환, 입원 · 간병비 보장(특약)", age: "15 ~ 70세", term: "100세 만기" },
+      { name: "곰선임 암보험(비갱신형)", desc: "첫 보험료 그대로, 재진단암 보장(특약)", age: "15 ~ 65세", term: "90 · 100세 만기" },
+      { name: "곰선임 건강보험", desc: "뇌혈관 · 심장질환, 입원 · 간병비 보장(특약)", age: "15 ~ 70세", term: "100세 만기" },
     ],
   },
 ] as const;
@@ -365,7 +365,7 @@ function HomeScreen({ inputs, set, go, notice }: { inputs: Inputs; set: (key: ke
   return (
     <main>
       <h1 id="retire-title" tabIndex={-1} className="sr-only">
-        곰파트너생명
+        곰선임생명
       </h1>
 
       {/* 메인 배너 + 간편 진단 */}

@@ -592,7 +592,7 @@ function Hero({
           {/* eslint-disable-next-line @next/next/no-img-element -- 메인 사이트와 같은 곰 로고 */}
           <img src="/images/logo.svg" alt="" aria-hidden width={28} height={28} className="h-7 w-7 shrink-0" />
           <span className="flex items-baseline gap-1">
-            <span className="text-[17px] font-bold">곰파트너</span>
+            <span className="text-[17px] font-bold">곰선임</span>
             <span className="text-[11px] font-semibold text-white/75">피부과의원</span>
             <span className="ml-1 text-[17px] text-white/70"> 피부 진단 결과지</span>
           </span>
@@ -810,7 +810,7 @@ function ReportSheet({ customer, session, previous }: { customer: Customer; sess
     <article className="report-sheet flex min-h-[1123px] w-[794px] flex-col bg-white shadow-[0_20px_40px_-24px_rgba(42,31,43,0.35)]" style={{ color: INK }}>
       <header className="flex items-end justify-between px-[56px] pb-6 pt-[44px] text-white" style={{ background: INK }}>
         <div>
-          <p className="text-[13px] text-white/70">곰파트너피부과의원</p>
+          <p className="text-[13px] text-white/70">곰선임피부과의원</p>
           <h1 className="mt-1 text-[30px] font-bold leading-[1.3]">피부 진단 결과지</h1>
         </div>
         <p className="text-right text-[15px] leading-[1.5] text-white/80">측정일 {session.date}</p>

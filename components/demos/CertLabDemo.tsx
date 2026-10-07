@@ -37,7 +37,7 @@ import {
 import { useReducedMotionSafe } from "@/hooks/useReducedMotionSafe";
 import { daysAgo, fmtDot, useDemoToday } from "@/hooks/useDemoToday";
 
-/* 기업 홈페이지 데모: 가상의 (주)곰파트너시험인증원, 전자파·무선·전기안전 시험과 KC·해외 인증을 맡는 지정시험기관.
+/* 기업 홈페이지 데모: 가상의 (주)곰선임시험인증원, 전자파·무선·전기안전 시험과 KC·해외 인증을 맡는 지정시험기관.
    회사명, 대표자, 주소, 전화번호, 사업자 정보, 지정 번호, 담당자, 의뢰사는 모두 가상이고 실제 기관 로고나 등록번호는 쓰지 않는다.
 
    구성: 실제 시험인증기관의 포털·게시판형 홈페이지를 따랐다. 메뉴는 회사소개, 인증업무, 국내인증, 해외인증, 고객지원.
@@ -61,11 +61,11 @@ import { daysAgo, fmtDot, useDemoToday } from "@/hooks/useDemoToday";
    AI 생성(Z-Image-Turbo, Apache 2.0) hero, lab */
 
 const IMG = "/images/demo-certlab";
-const COMPANY = "(주)곰파트너시험인증원";
+const COMPANY = "(주)곰선임시험인증원";
 const TEL = "02-000-0000";
 const FAX = "02-000-0001";
 const EMAIL = "test@example.com";
-const ADDRESS = "ㄱㅇ시 ㅂㄹ구 ㄷㅅ로 00 곰파트너시험인증원";
+const ADDRESS = "ㄱㅇ시 ㅂㄹ구 ㄷㅅ로 00 곰선임시험인증원";
 const HOURS = "평일 09:00 ~ 18:00";
 
 const C = {
@@ -387,7 +387,7 @@ function Logo() {
       <span className="sr-only">{COMPANY}</span>
       <span aria-hidden className="flex min-w-0 items-baseline gap-1 whitespace-nowrap">
         <span className="shrink-0 text-[11px] font-bold">(주)</span>
-        <span className="text-[18px] font-bold tracking-[-0.02em] sm:text-[19px]">곰파트너</span>
+        <span className="text-[18px] font-bold tracking-[-0.02em] sm:text-[19px]">곰선임</span>
         <span className="truncate text-[11px] font-bold sm:text-[12px]" style={{ opacity: 0.75 }}>시험인증원</span>
       </span>
     </span>
@@ -620,7 +620,7 @@ function FloatingContact() {
         <div id="cl-kakao" className="absolute bottom-0 right-full mr-2 w-[220px] rounded-[10px] border bg-white p-4 text-[14px] leading-[1.55] shadow-[0_6px_18px_rgba(20,26,51,0.16)]" style={{ borderColor: C.line }}>
           <p className="font-bold">카카오톡 상담</p>
           <p className="mt-1" style={{ color: C.muted }}>
-            카카오톡에서 &lsquo;곰파트너시험인증원&rsquo; 채널을 추가해 주십시오. {HOURS}
+            카카오톡에서 &lsquo;곰선임시험인증원&rsquo; 채널을 추가해 주십시오. {HOURS}
           </p>
           <button type="button" onClick={() => setKakao(false)} className="mt-2 inline-flex h-9 items-center rounded-[6px] border px-3 text-[13px] font-bold" style={{ borderColor: C.line }}>
             닫기

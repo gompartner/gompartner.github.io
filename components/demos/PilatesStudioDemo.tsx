@@ -7,7 +7,7 @@ import { ArrowLeft, ChevronRight, List, Menu, MessageSquareText, Phone, RotateCc
 import { useReducedMotionSafe } from "@/hooks/useReducedMotionSafe";
 import { daysAgo, fmtDot, fmtKo, useDemoToday } from "@/hooks/useDemoToday";
 
-/* 필라테스 스튜디오 홈페이지 데모: 가상의 곰파트너 필라테스.
+/* 필라테스 스튜디오 홈페이지 데모: 가상의 곰선임 필라테스.
    스튜디오명, 강사, 주소, 전화번호, 사업자 정보, 수강료는 모두 가상이다.
 
    뼈대: 실제 필라테스 사이트(프로그램 안내형)를 따른다. 첫 화면은 사진 대신 짧은 소개 띠와
@@ -30,7 +30,7 @@ import { daysAgo, fmtDot, fmtKo, useDemoToday } from "@/hooks/useDemoToday";
    AI 생성(Z-Image-Turbo, Apache 2.0) hero, teacher, mat, studio */
 
 const IMG = "/images/demo-pilates";
-const STUDIO = "곰파트너 필라테스";
+const STUDIO = "곰선임 필라테스";
 const TEL = "02-000-0000";
 const ADDRESS = "ㅁㄹ시 ㅅㄴ로 88 ㅎㄷ빌딩 2층";
 
@@ -495,7 +495,7 @@ function Logo() {
       {/* eslint-disable-next-line @next/next/no-img-element */}
       <img src="/images/logo.svg" alt="" aria-hidden width={28} height={28} className="h-7 w-7 shrink-0" />
       <span className="inline-flex items-baseline gap-1.5 whitespace-nowrap">
-        <span className="text-[19px] font-bold tracking-[-0.01em]">곰파트너</span>
+        <span className="text-[19px] font-bold tracking-[-0.01em]">곰선임</span>
         <span className="text-[12px] font-semibold opacity-80">필라테스</span>
       </span>
     </span>
@@ -1870,7 +1870,7 @@ const NOTICES: Post[] = [
   },
   {
     no: 1,
-    title: "곰파트너 필라테스 오픈 안내",
+    title: "곰선임 필라테스 오픈 안내",
     ago: 219,
     body: ["ㅈㅇ역 3번 출구 ㅎㄷ빌딩 2층에 문을 열었습니다.", "평일 07:00 ~ 22:00, 토요일 09:00 ~ 15:00 운영합니다."],
   },

@@ -7,7 +7,7 @@ import { Check, ChevronLeft, ChevronRight, List, Minus, Phone, Plus, RotateCcw }
 import { useReducedMotionSafe } from "@/hooks/useReducedMotionSafe";
 import { daysAgo, fmtDot, fmtKo, useDemoToday } from "@/hooks/useDemoToday";
 
-/* 한옥 찻집 홈페이지 데모: 가상의 곰파트너 한옥 찻집.
+/* 한옥 찻집 홈페이지 데모: 가상의 곰선임 한옥 찻집.
    상호, 대표자, 주소, 전화번호, 사업자 정보, 메뉴와 가격은 모두 가상이다.
 
    뼈대는 공간 탐색형(브랜드 티하우스 매장 소개 페이지 방식)이다. 공간 이름(대청마루, 건넌방, 사랑방, 툇마루, 별채)이
@@ -29,7 +29,7 @@ import { daysAgo, fmtDot, fmtKo, useDemoToday } from "@/hooks/useDemoToday";
    AI 생성(Z-Image-Turbo, Apache 2.0) hero, coffee, bingsu, omija, yard */
 
 const IMG = "/images/demo-cafe";
-const CAFE = "곰파트너 한옥 찻집";
+const CAFE = "곰선임 한옥 찻집";
 const TEL = "02-000-0000";
 const ADDRESS = "ㄴㄹ시 ㅈㅇ로 12길 7";
 
@@ -414,7 +414,7 @@ function SideNav({ page, go, groupId, onGroup }: { page: Page; go: Go; groupId: 
       <button type="button" onClick={() => go("home")} aria-label={`${CAFE} 처음으로`} className="flex items-center gap-2.5 text-left">
         <LogoMark />
         <span className="flex flex-col leading-[1.25]">
-          <span className="text-[18px] font-bold">곰파트너</span>
+          <span className="text-[18px] font-bold">곰선임</span>
           <span className="text-[11px] font-semibold opacity-80">한옥 찻집</span>
         </span>
       </button>
@@ -475,7 +475,7 @@ function TopNav({ page, go, groupId, onGroup }: { page: Page; go: Go; groupId: G
         <button type="button" onClick={() => go("home")} aria-label={`${CAFE} 처음으로`} className="flex items-center gap-2">
           <LogoMark />
           <span className="inline-flex items-baseline gap-1.5 whitespace-nowrap">
-            <span className="text-[18px] font-bold">곰파트너</span>
+            <span className="text-[18px] font-bold">곰선임</span>
             <span className="text-[11px] font-semibold opacity-80">한옥 찻집</span>
           </span>
         </button>
@@ -1380,7 +1380,7 @@ const WAY_STEPS: { text: string; upto: number; mark: Pt }[] = [
   { text: "ㅎㅅ역 2번 출구에서 큰길을 따라 50m 직진, 편의점 앞", upto: 1, mark: [216, 300] },
   { text: "편의점을 끼고 12길 골목으로 진입", upto: 2, mark: [216, 196] },
   { text: "세탁소를 지나 골목 끝에서 우회전", upto: 3, mark: [216, 104] },
-  { text: "파란 대문, 곰파트너 현판이 걸린 한옥", upto: 4, mark: [372, 104] },
+  { text: "파란 대문, 곰선임 현판이 걸린 한옥", upto: 4, mark: [372, 104] },
 ];
 
 const pathOf = (pts: Pt[]) => pts.map((p, i) => `${i ? "L" : "M"}${p[0]} ${p[1]}`).join(" ");
@@ -1426,7 +1426,7 @@ function AlleyMap({ step }: { step: number }) {
       {/* 찻집 */}
       <rect x="340" y="20" width="120" height="70" fill="#2a211a" />
       <text x="400" y="60" fontSize="14" fill="#f3ede2" textAnchor="middle" fontWeight={700}>
-        곰파트너 한옥 찻집
+        곰선임 한옥 찻집
       </text>
       <rect x="360" y="86" width="24" height="8" fill="#2f5d9e" />
 
@@ -1921,7 +1921,7 @@ function Footer() {
           <p className="flex items-center gap-2 text-[#efe7da]">
             <LogoMark />
             <span className="flex items-baseline gap-1.5">
-            <span className="text-[18px] font-bold tracking-[-0.02em]">곰파트너</span>
+            <span className="text-[18px] font-bold tracking-[-0.02em]">곰선임</span>
             <span className="text-[11px] font-semibold opacity-80">한옥 찻집</span>
             </span>
           </p>
@@ -1929,7 +1929,7 @@ function Footer() {
             대표 김ㅈ우 | 사업자등록번호 000-00-00000 | {ADDRESS} | {TEL}
           </p>
         </div>
-        <Seal lines={["곰파트너", "찻집"]} size={52} className="rotate-3 self-start" />
+        <Seal lines={["곰선임", "찻집"]} size={52} className="rotate-3 self-start" />
       </div>
     </footer>
   );

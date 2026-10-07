@@ -229,9 +229,9 @@ export function ShopAdminDemo() {
           <p className="flex items-center gap-2 px-2 text-white">
             {/* eslint-disable-next-line @next/next/no-img-element */}
             <img src="/images/logo.svg" alt="" aria-hidden width={26} height={26} className="h-[26px] w-[26px] shrink-0" />
-            <span className="sr-only">곰파트너 리빙</span>
+            <span className="sr-only">곰선임 리빙</span>
             <span aria-hidden className="flex items-baseline gap-1 whitespace-nowrap">
-              <span className="text-[16px] font-bold">곰파트너</span>
+              <span className="text-[16px] font-bold">곰선임</span>
               <span className="text-[10px] font-bold" style={{ color: "#cbd5e1" }}>리빙</span>
             </span>
           </p>
@@ -260,9 +260,9 @@ export function ShopAdminDemo() {
             <p className="flex items-center gap-1.5 lg:hidden" style={{ color: C.action }}>
               {/* eslint-disable-next-line @next/next/no-img-element */}
               <img src="/images/logo.svg" alt="" aria-hidden width={24} height={24} className="h-6 w-6 shrink-0" />
-              <span className="sr-only">곰파트너 리빙 관리자</span>
+              <span className="sr-only">곰선임 리빙 관리자</span>
               <span aria-hidden className="flex items-baseline gap-1 whitespace-nowrap">
-                <span className="text-[16px] font-bold">곰파트너</span>
+                <span className="text-[16px] font-bold">곰선임</span>
                 <span className="text-[10px] font-bold">리빙 관리자</span>
               </span>
             </p>

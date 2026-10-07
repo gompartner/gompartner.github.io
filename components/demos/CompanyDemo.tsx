@@ -7,7 +7,7 @@ import { Check, ChevronDown, ChevronRight, CircleAlert, FileUp, House, Menu, Rot
 import { useReducedMotionSafe } from "@/hooks/useReducedMotionSafe";
 import { daysAgo, fmtDash, fmtKo, useDemoToday } from "@/hooks/useDemoToday";
 
-/* 기업 홈페이지 데모: 가상의 (주)곰파트너정밀, CNC 정밀 가공 제조업체.
+/* 기업 홈페이지 데모: 가상의 (주)곰선임정밀, CNC 정밀 가공 제조업체.
    회사명, 대표자, 주소, 전화번호, 사업자 정보, 설비 모델명, 제조사, 거래처, 인증 기관은 모두 가상이다.
 
    구성: 실제 중소 제조업 홈페이지처럼 서브페이지 구조로 만들었다. 메뉴는 회사소개, 사업분야, 설비현황, 생산제품, 고객지원.
@@ -140,7 +140,7 @@ const MENUS: { id: MenuId; label: L; subs: { id: string; label: L }[] }[] = [
   },
 ];
 
-const COMPANY = l("(주)곰파트너정밀", "Gompartner Precision Co., Ltd.");
+const COMPANY = l("(주)곰선임정밀", "Gompartner Precision Co., Ltd.");
 const ADDRESS = l("ㅎㄷ시 ㅁㄹ구 ㅅㄴ산단로 00", "00 SN-sandan-ro, MR-gu, HD-si");
 const HOURS = l("평일 08:30 ~ 17:30, 토·일·공휴일 휴무", "Weekdays 08:30 to 17:30, closed on weekends and holidays");
 
@@ -241,7 +241,7 @@ const HISTORY: { year: number; items: L[] }[] = [
   { year: 2018, items: [l("5축 가공기 도입, 반도체 장비 부품 납품 시작", "Added 5-axis machines, began supplying semiconductor equipment parts")] },
   { year: 2016, items: [l("ㅅㄴ산업단지 지금 공장으로 이전", "Moved to the current plant in SN Industrial Complex")] },
   { year: 2014, items: [l("ISO 9001 인증", "ISO 9001 certified")] },
-  { year: 2012, items: [l("법인 전환, (주)곰파트너정밀로 상호 변경", "Incorporated as Gompartner Precision Co., Ltd.")] },
+  { year: 2012, items: [l("법인 전환, (주)곰선임정밀로 상호 변경", "Incorporated as Gompartner Precision Co., Ltd.")] },
   { year: 2009, items: [l("ㅎㄷ시에서 머시닝센터 2대로 창업", "Founded in HD with two machining centers")] },
 ];
 
@@ -405,7 +405,7 @@ function Logo() {
       <span className="sr-only">{s(COMPANY)}</span>
       <span aria-hidden className="flex min-w-0 items-baseline gap-1 whitespace-nowrap">
         {lang === "ko" && <span className="shrink-0 text-[11px] font-bold sm:text-[12px]">(주)</span>}
-        <span className="text-[18px] font-bold tracking-[-0.02em] sm:text-[20px]">{lang === "ko" ? "곰파트너" : "Gompartner"}</span>
+        <span className="text-[18px] font-bold tracking-[-0.02em] sm:text-[20px]">{lang === "ko" ? "곰선임" : "Gompartner"}</span>
         <span className="truncate text-[11px] font-bold sm:text-[12px]" style={{ opacity: 0.75 }}>
           {lang === "ko" ? "정밀" : "Precision Co., Ltd."}
         </span>
@@ -1042,7 +1042,7 @@ function Greeting() {
         <Image src={`${IMG}/parts.jpg`} alt={x("가공을 마친 알루미늄과 스테인리스 정밀 부품", "Finished aluminum and stainless steel precision parts")} fill sizes="(min-width: 900px) 860px, 100vw" className="object-cover" />
       </div>
       <div className="mt-8 space-y-4">
-        <p className="text-[19px] font-bold leading-[1.6] md:text-[21px]">{x("(주)곰파트너정밀 홈페이지를 찾아 주셔서 감사합니다.", "Thank you for visiting Gompartner Precision.")}</p>
+        <p className="text-[19px] font-bold leading-[1.6] md:text-[21px]">{x("(주)곰선임정밀 홈페이지를 찾아 주셔서 감사합니다.", "Thank you for visiting Gompartner Precision.")}</p>
         <p>
           {x(
             "2009년 머시닝센터 2대로 창업한 이래 반도체 장비, 의료기기, 2차전지 설비 부품을 가공하고 있습니다.",
@@ -1150,7 +1150,7 @@ function Location() {
         {(
           [
             [x("주소", "Address"), s(ADDRESS)],
-            [x("내비게이션", "Navigation"), x("곰파트너정밀 ㅎㄷ공장", "Gompartner Precision HD Plant")],
+            [x("내비게이션", "Navigation"), x("곰선임정밀 ㅎㄷ공장", "Gompartner Precision HD Plant")],
             [x("전화", "Tel"), TEL],
             [x("팩스", "Fax"), FAX],
             [x("업무시간", "Office hours"), s(HOURS)],

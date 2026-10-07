@@ -18,7 +18,7 @@ import {
 } from "lucide-react";
 import { useReducedMotionSafe } from "@/hooks/useReducedMotionSafe";
 
-/* 약국 홈페이지 데모: 가상의 곰파트너약국.
+/* 약국 홈페이지 데모: 가상의 곰선임약국.
    상호, 약사 이름, 주소, 전화번호, 사업자 정보, 재고는 모두 가상이다. 약 이름은 상표 대신 성분과 용도로 적는다.
 
    뼈대: 운영 안내형. 대한약사회 휴일지킴이약국 상세 화면처럼 머리글 맨 위에 영업 상태 띠를 두고,
@@ -33,7 +33,7 @@ import { useReducedMotionSafe } from "@/hooks/useReducedMotionSafe";
    일요일·공휴일 휴무, 둘째·넷째 일요일은 휴일지킴이약국으로 10:00 ~ 18:00. */
 
 const IMG = "/images/demo-pharmacy";
-const PHARMACY = "곰파트너약국";
+const PHARMACY = "곰선임약국";
 const TEL = "02-000-0000";
 const ADDRESS = "ㅎㄷ시 ㄷㅅ로 140 ㅅㄴ의원 건물 1층";
 
@@ -276,14 +276,14 @@ export function PharmacyDemo() {
 
 /* ---------- 로고, 머리글, 영업 상태 띠 ---------- */
 
-/* 로고: 메인 사이트와 같은 곰 로고 + 곰파트너(크게) + 업종(작게) */
+/* 로고: 메인 사이트와 같은 곰 로고 + 곰선임(크게) + 업종(작게) */
 function Logo() {
   return (
     <span className="inline-flex items-center gap-2">
       {/* eslint-disable-next-line @next/next/no-img-element -- 메인 사이트와 같은 곰 로고 */}
       <img src="/images/logo.svg" alt="" aria-hidden width={28} height={28} className="h-7 w-7 shrink-0" />
       <span className="flex items-baseline gap-1 whitespace-nowrap">
-        <span className="text-[19px] font-bold tracking-[-0.02em]">곰파트너</span>
+        <span className="text-[19px] font-bold tracking-[-0.02em]">곰선임</span>
         <span className="text-[12px] font-semibold opacity-75">약국</span>
       </span>
     </span>

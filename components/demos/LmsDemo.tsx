@@ -150,11 +150,11 @@ interface Applied {
 const smsTemplates = (endKo: string) => [
   {
     kind: "학습독려",
-    text: `[곰파트너 아카데미] {이름}님, 엑셀 실무 기초 현재 진도율은 {진도율}입니다. 학습종료일 ${endKo}까지 진도율 80% 이상 학습하셔야 수료됩니다.`,
+    text: `[곰선임 아카데미] {이름}님, 엑셀 실무 기초 현재 진도율은 {진도율}입니다. 학습종료일 ${endKo}까지 진도율 80% 이상 학습하셔야 수료됩니다.`,
   },
   {
     kind: "평가 안내",
-    text: `[곰파트너 아카데미] {이름}님, 엑셀 실무 기초 최종평가 응시가 가능합니다. 학습종료일 ${endKo}까지 응시하셔야 수료됩니다.`,
+    text: `[곰선임 아카데미] {이름}님, 엑셀 실무 기초 최종평가 응시가 가능합니다. 학습종료일 ${endKo}까지 응시하셔야 수료됩니다.`,
   },
 ];
 
@@ -491,7 +491,7 @@ function makeDates(today: Date) {
   const templates = smsTemplates(course.endKo);
   const smsSeed: SmsLog[] = [
     { at: `${dot(2)} 10:00`, kind: "학습독려", type: "LMS", count: 52, text: templates[0].text },
-    { at: `${dot(9)} 09:00`, kind: "개강 안내", type: "LMS", count: 143, text: `[곰파트너 아카데미] {이름}님, 엑셀 실무 기초 ${course.term} 학습이 시작되었습니다. 학습기간 ${fmtMD(start)} ~ ${fmtMD(end)}` },
+    { at: `${dot(9)} 09:00`, kind: "개강 안내", type: "LMS", count: 143, text: `[곰선임 아카데미] {이름}님, 엑셀 실무 기초 ${course.term} 학습이 시작되었습니다. 학습기간 ${fmtMD(start)} ~ ${fmtMD(end)}` },
   ];
   const notices = NOTICES.map(({ ago, ...n }) => ({ ...n, date: dot(ago) }));
   return {
@@ -592,9 +592,9 @@ function SiteHeader({ route, loggedIn, go, onMy, onLogout, onAdmin, onReset }: {
         <button type="button" onClick={() => go({ name: "home" })} className="flex h-16 items-center gap-2" style={{ color: C.brand }}>
           {/* eslint-disable-next-line @next/next/no-img-element */}
           <img src="/images/logo.svg" alt="" aria-hidden width={30} height={30} className="h-[30px] w-[30px] shrink-0" />
-          <span className="sr-only">곰파트너 아카데미</span>
+          <span className="sr-only">곰선임 아카데미</span>
           <span aria-hidden className="flex items-baseline gap-1 whitespace-nowrap">
-            <span className="text-[20px] font-bold">곰파트너</span>
+            <span className="text-[20px] font-bold">곰선임</span>
             <span className="text-[12px] font-bold opacity-80">아카데미</span>
           </span>
         </button>
@@ -1348,9 +1348,9 @@ export function LmsDemo() {
               <p className="mr-auto flex items-center gap-2" style={{ color: C.brand }}>
                 {/* eslint-disable-next-line @next/next/no-img-element */}
                 <img src="/images/logo.svg" alt="" aria-hidden width={28} height={28} className="h-7 w-7 shrink-0" />
-                <span className="sr-only">곰파트너 아카데미 관리자</span>
+                <span className="sr-only">곰선임 아카데미 관리자</span>
                 <span aria-hidden className="flex items-baseline gap-1 whitespace-nowrap">
-                  <span className="text-[18px] font-bold">곰파트너</span>
+                  <span className="text-[18px] font-bold">곰선임</span>
                   <span className="text-[11px] font-bold opacity-80">아카데미</span>
                   <span className="ml-1.5 text-[14px] font-bold" style={{ color: C.text }}>
                     관리자
@@ -2430,7 +2430,7 @@ function Certificate({ info, onClose }: { info: CertInfo; onClose: () => void })
         <p className="mt-8 text-[16px] leading-[1.8]">위 사람은 본 기관에서 실시한 위 과정을 수료하였으므로 이 증서를 수여합니다.</p>
         <p className="mt-8 text-[16px]">{info.date}</p>
         <div className="relative mx-auto mt-4 w-fit">
-          <p className="text-[20px] font-bold">곰파트너 아카데미 원장</p>
+          <p className="text-[20px] font-bold">곰선임 아카데미 원장</p>
           <motion.span
             aria-hidden
             className="absolute -top-3 -right-14 grid size-14 place-items-center rounded-full border-[3px] text-[13px] font-bold"

@@ -5,7 +5,7 @@ import Image from "next/image";
 import { ChevronRight, Menu, Phone, X } from "lucide-react";
 import { daysAgo, fmtDot, fmtKo, useDemoToday } from "@/hooks/useDemoToday";
 
-/* 피부과 홈페이지 데모: 가상의 곰파트너피부과의원.
+/* 피부과 홈페이지 데모: 가상의 곰선임피부과의원.
    병원명, 의료진, 주소, 전화번호, 사업자 정보, 진료비는 모두 가상이다.
 
    구성: 실제 동네 피부과에서 흔한 두 갈래형.
@@ -20,7 +20,7 @@ import { daysAgo, fmtDot, fmtKo, useDemoToday } from "@/hooks/useDemoToday";
    lobby Ishan Sharma(0EWVvxSyDE0), doctor-a·doctor-b AI 생성(Z-Image-Turbo, Apache 2.0) */
 
 const IMG = "/images/demo-clinic-homepage";
-const CLINIC = "곰파트너피부과의원";
+const CLINIC = "곰선임피부과의원";
 const TEL_MED = "02-000-0000";
 const TEL_COS = "02-000-0001";
 const ADDRESS = "ㅎㄷ시 ㅁㄹ로 123 ㅈㅇ빌딩 4층";
@@ -1137,14 +1137,14 @@ function NoticePage() {
   );
 }
 
-/* 로고: 메인 사이트와 같은 곰 로고 + 곰파트너(크게) + 업종(작게) */
+/* 로고: 메인 사이트와 같은 곰 로고 + 곰선임(크게) + 업종(작게) */
 function BrandLogo() {
   return (
     <span className="inline-flex items-center gap-2">
       {/* eslint-disable-next-line @next/next/no-img-element -- 메인 사이트와 같은 곰 로고 */}
       <img src="/images/logo.svg" alt="" aria-hidden width={28} height={28} className="h-7 w-7 shrink-0" />
       <span className="flex items-baseline gap-1 whitespace-nowrap">
-        <span className="text-[20px] font-semibold tracking-[-0.03em]">곰파트너</span>
+        <span className="text-[20px] font-semibold tracking-[-0.03em]">곰선임</span>
         <span className="text-[12px] font-medium opacity-75">피부과의원</span>
       </span>
     </span>
