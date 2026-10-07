@@ -1,8 +1,8 @@
 "use client";
 
-import { useMemo, useRef, useState } from "react";
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { IBM_Plex_Sans_KR } from "next/font/google";
-import { CalendarClock, CheckCircle2, PiggyBank, Phone, TrendingUp, Wallet } from "lucide-react";
+import { Calculator, CalendarClock, CheckCircle2, ChevronRight, CreditCard, FileSearch, Home, Landmark, PiggyBank, Phone, ReceiptText, TrendingUp, Wallet } from "lucide-react";
 
 /* 노후준비 계산기 데모: 가상의 보험사 곰파트너생명.
    금액 단위는 모두 만 원. 적립 기간은 월 복리, 은퇴 후에는 연 2.5%로 운용하면서
@@ -175,41 +175,450 @@ const LIFE_FIELDS: FieldDef[] = [
   { key: "pension", label: "국민연금 예상 수령액(월)", unit: "만 원", min: 0, max: 300, step: 5 },
 ];
 
+type Screen = "home" | "calc";
+type Go = (screen: Screen, anchor?: string) => void;
+
+const TEL = "000-0000";
+
 export function RetirementDemo() {
+  const [screen, setScreen] = useState<Screen>("home");
   const [inputs, setInputs] = useState<Inputs>(DEFAULTS);
-  const safe = useMemo(() => clampInputs(inputs), [inputs]);
-  const result = useMemo(() => compute(safe), [safe]);
+  const [nav, setNav] = useState<{ n: number; anchor?: string }>({ n: 0 });
+  const [toast, setToast] = useState<string | null>(null);
+
+  const go: Go = useCallback((next, anchor) => {
+    setScreen(next);
+    setNav((v) => ({ n: v.n + 1, anchor }));
+  }, []);
+
+  // 화면을 바꾸면 맨 위(또는 지정한 구간)로 옮기고 제목에 초점을 둔다
+  useEffect(() => {
+    if (nav.n === 0) return;
+    const target = nav.anchor ? document.getElementById(nav.anchor) : null;
+    if (target) target.scrollIntoView({ block: "start" });
+    else window.scrollTo(0, 0);
+    document.getElementById("retire-title")?.focus({ preventScroll: true });
+  }, [nav]);
+
+  useEffect(() => {
+    if (!toast) return;
+    const t = window.setTimeout(() => setToast(null), 2800);
+    return () => window.clearTimeout(t);
+  }, [toast]);
 
   const set = (key: keyof Inputs, value: number | boolean) => setInputs((prev) => clampInputs({ ...prev, [key]: value }));
-  const shortfall = result.gap > 0;
 
   return (
     <div className={`${plex.className} min-h-screen`} style={{ background: PAGE, color: INK }}>
-      <header style={{ background: NAVY }} className="text-white">
-        <div className="mx-auto flex max-w-[1200px] items-center justify-between px-4 py-4 md:px-6">
-          <div className="flex items-center gap-2.5">
-            {/* eslint-disable-next-line @next/next/no-img-element */}
-            <img src="/images/logo.svg" alt="" aria-hidden width={30} height={30} className="h-[30px] w-[30px] shrink-0" />
-            <span className="sr-only">곰파트너생명</span>
-            <span aria-hidden className="flex items-baseline gap-1 whitespace-nowrap">
-              <span className="text-[18px] font-bold">곰파트너</span>
-              <span className="text-[11px] font-bold text-[#c9d6e6]">생명</span>
+      <SiteHeader screen={screen} go={go} />
+      {screen === "home" ? (
+        <HomeScreen inputs={clampInputs(inputs)} set={set} go={go} notice={setToast} />
+      ) : (
+        <CalcScreen inputs={inputs} set={set} go={go} />
+      )}
+      <SiteFooter />
+      <div aria-live="polite" className="pointer-events-none fixed inset-x-0 top-24 z-50 flex justify-center px-4">
+        {toast && (
+          <p className="rounded-[6px] px-4 py-3 text-[15px] font-bold text-white" style={{ background: INK }}>
+            {toast}
+          </p>
+        )}
+      </div>
+    </div>
+  );
+}
+
+/* ---------- 머리글, 바닥글 ---------- */
+
+const GNB: { label: string; screen: Screen; anchor?: string }[] = [
+  { label: "보험상품", screen: "home", anchor: "products" },
+  { label: "노후준비", screen: "calc" },
+  { label: "고객센터", screen: "home", anchor: "service" },
+];
+
+function SiteHeader({ screen, go }: { screen: Screen; go: Go }) {
+  return (
+    <header className="sticky top-0 z-40 border-b bg-white" style={{ borderColor: LINE }}>
+      <div className="mx-auto flex max-w-[1200px] flex-wrap items-center justify-between px-4 md:h-[72px] md:flex-nowrap md:px-6">
+        <button type="button" onClick={() => go("home")} className="flex h-14 items-center gap-2.5 md:h-auto" aria-label="곰파트너생명 메인">
+          {/* eslint-disable-next-line @next/next/no-img-element */}
+          <img src="/images/logo.svg" alt="" aria-hidden width={30} height={30} className="h-[30px] w-[30px] shrink-0" />
+          <span aria-hidden className="flex items-baseline gap-1 whitespace-nowrap">
+            <span className="text-[18px] font-bold" style={{ color: NAVY }}>
+              곰파트너
             </span>
+            <span className="text-[11px] font-bold" style={{ color: INK_3 }}>
+              생명
+            </span>
+          </span>
+        </button>
+        <a href={`tel:${TEL}`} className="flex h-14 items-center gap-1.5 text-[15px] font-bold tabular-nums md:order-last md:h-auto" style={{ color: INK_2 }}>
+          <Phone size={16} aria-hidden />
+          고객센터 {TEL}
+        </a>
+        <nav aria-label="주 메뉴" className="-mx-4 w-[calc(100%+2rem)] border-t md:mx-0 md:ml-auto md:mr-8 md:w-auto md:border-t-0" style={{ borderColor: LINE }}>
+          <ul className="grid grid-cols-3 md:flex md:gap-2">
+            {GNB.map((g) => {
+              const on = g.screen === "calc" && screen === "calc";
+              return (
+                <li key={g.label}>
+                  <button
+                    type="button"
+                    onClick={() => go(g.screen, g.anchor)}
+                    aria-current={on ? "page" : undefined}
+                    className="flex h-12 w-full items-center justify-center text-[16px] font-bold md:h-[72px] md:px-5 md:text-[17px]"
+                    style={{ color: on ? C_PLAN : INK, boxShadow: on ? `inset 0 -3px 0 ${C_PLAN}` : undefined }}
+                  >
+                    {g.label}
+                  </button>
+                </li>
+              );
+            })}
+          </ul>
+        </nav>
+      </div>
+    </header>
+  );
+}
+
+function SiteFooter() {
+  return (
+    <footer className="border-t bg-white" style={{ borderColor: LINE }}>
+      <div className="mx-auto flex max-w-[1200px] flex-col gap-1 px-4 py-8 text-[14px] md:flex-row md:justify-between md:px-6" style={{ color: INK_3 }}>
+        <p>
+          고객센터 <b className="tabular-nums" style={{ color: INK_2 }}>{TEL}</b> · 평일 09:00 ~ 18:00
+        </p>
+        <p>© 곰파트너생명</p>
+      </div>
+    </footer>
+  );
+}
+
+/* ---------- 메인 ---------- */
+
+const SERVICES = [
+  { icon: Calculator, label: "노후준비 계산기", calc: true },
+  { icon: FileSearch, label: "계약조회" },
+  { icon: ReceiptText, label: "보험금 청구" },
+  { icon: CreditCard, label: "보험료 납입" },
+  { icon: Landmark, label: "보험계약대출" },
+  { icon: Wallet, label: "연금 수령 조회" },
+];
+
+const PRODUCT_TABS = [
+  {
+    id: "pension",
+    label: "연금·저축",
+    items: [
+      { name: "곰파트너 연금보험", desc: "10년 확정이율, 유지보너스 지급", age: "15 ~ 70세", term: "종신 연금" },
+      { name: "곰파트너 연금저축보험", desc: "연말정산 세액공제", age: "19 ~ 65세", term: "55세 이후 연금 개시" },
+      { name: "곰파트너 바로받는 연금보험", desc: "목돈 넣고 다음 달부터 연금 수령", age: "45 ~ 80세", term: "10 · 20년 확정 또는 종신" },
+    ],
+  },
+  {
+    id: "life",
+    label: "종신·정기",
+    items: [
+      { name: "곰파트너 종신보험", desc: "평생 사망보장", age: "15 ~ 65세", term: "종신" },
+      { name: "곰파트너 정기보험", desc: "필요한 기간에 집중한 사망보장", age: "19 ~ 60세", term: "60 · 70 · 80세 만기" },
+    ],
+  },
+  {
+    id: "health",
+    label: "건강·암",
+    items: [
+      { name: "곰파트너 암보험(비갱신형)", desc: "첫 보험료 그대로, 재진단암 보장(특약)", age: "15 ~ 65세", term: "90 · 100세 만기" },
+      { name: "곰파트너 건강보험", desc: "뇌혈관 · 심장질환, 입원 · 간병비 보장(특약)", age: "15 ~ 70세", term: "100세 만기" },
+    ],
+  },
+] as const;
+
+const NOTICES = [
+  { title: "시스템 점검에 따른 서비스 일시 중단 안내", date: "2026.10.05" },
+  { title: "개인정보 처리방침 개정 안내", date: "2026.09.24" },
+  { title: "휴면보험금 찾아가세요", date: "2026.09.10" },
+];
+
+const QUICK_FIELDS: FieldDef[] = [
+  AGE_FIELDS[0],
+  MONEY_FIELDS[1],
+  LIFE_FIELDS[0],
+];
+
+function HomeScreen({ inputs, set, go, notice }: { inputs: Inputs; set: (key: keyof Inputs, value: number) => void; go: Go; notice: (msg: string) => void }) {
+  const result = useMemo(() => compute(inputs), [inputs]);
+  const [tab, setTab] = useState<(typeof PRODUCT_TABS)[number]["id"]>("pension");
+  const products = PRODUCT_TABS.find((t) => t.id === tab)!;
+  const shortfall = result.gap > 0;
+
+  return (
+    <main>
+      <h1 id="retire-title" tabIndex={-1} className="sr-only">
+        곰파트너생명
+      </h1>
+
+      {/* 메인 배너 + 간편 진단 */}
+      <section aria-labelledby="banner-title" className="text-white" style={{ background: NAVY }}>
+        <div className="mx-auto grid max-w-[1200px] gap-8 px-4 py-10 md:px-6 md:py-14 lg:grid-cols-[minmax(0,1fr)_minmax(0,460px)] lg:items-center">
+          <div className="min-w-0">
+            <p className="text-[15px] font-bold text-[#9cc7ef]">노후준비</p>
+            <h2 id="banner-title" className="mt-2 text-[30px] font-bold leading-[1.3] md:text-[42px]">
+              노후준비 계산기
+            </h2>
+            <ul className="mt-4 space-y-1.5 text-[16px] text-[#c9d6e6] md:text-[17px]">
+              <li className="flex items-center gap-2">
+                <CheckCircle2 size={18} aria-hidden className="shrink-0 text-[#9cc7ef]" />
+                국민연금 예상 수령액 반영
+              </li>
+              <li className="flex items-center gap-2">
+                <CheckCircle2 size={18} aria-hidden className="shrink-0 text-[#9cc7ef]" />
+                물가상승률 연 2% 반영
+              </li>
+              <li className="flex items-center gap-2">
+                <CheckCircle2 size={18} aria-hidden className="shrink-0 text-[#9cc7ef]" />
+                부족할 때 월 추가 저축액 산출
+              </li>
+            </ul>
+            <button type="button" onClick={() => go("calc")} className="mt-7 inline-flex h-12 items-center gap-1.5 rounded-[6px] bg-white px-6 text-[17px] font-bold" style={{ color: NAVY }}>
+              노후준비 계산기
+              <ChevronRight size={18} aria-hidden />
+            </button>
           </div>
-          <nav className="hidden gap-6 text-[15px] text-[#c9d6e6] sm:flex" aria-label="주요 메뉴">
-            <span>보험상품</span>
-            <span>연금</span>
-            <span className="font-bold text-white">노후준비 계산기</span>
-            <span>고객센터</span>
-          </nav>
+
+          <form
+            aria-labelledby="input-title"
+            className="min-w-0 rounded-[10px] bg-white p-5 md:p-6"
+            style={{ color: INK }}
+            onSubmit={(e) => {
+              e.preventDefault();
+              go("calc");
+            }}
+          >
+            <h2 id="input-title" className="text-[19px] font-bold">
+              노후자금 간편 진단
+            </h2>
+            <div className="mt-4 space-y-3">
+              {QUICK_FIELDS.map((f) => (
+                <label key={f.key} className="flex items-center justify-between gap-3">
+                  <span className="text-[16px]">{f.label}</span>
+                  <span className="flex items-center gap-1.5">
+                    <input
+                      type="number"
+                      inputMode="decimal"
+                      value={inputs[f.key] as number}
+                      min={f.min}
+                      max={f.max}
+                      step={f.step}
+                      onChange={(e) => {
+                        const n = Number(e.target.value);
+                        if (!Number.isNaN(n)) set(f.key, Math.min(Math.max(n, f.min), f.max));
+                      }}
+                      className="h-10 w-[96px] rounded-[6px] border px-2 text-right text-[16px] font-bold tabular-nums"
+                      style={{ borderColor: "#9aa5b4" }}
+                    />
+                    <span className="w-[38px] text-[14px]" style={{ color: INK_3 }}>
+                      {f.unit}
+                    </span>
+                  </span>
+                </label>
+              ))}
+            </div>
+            <PresetPicker rate={inputs.returnRate} onPick={(r) => set("returnRate", r)} compact />
+            <p className="mt-4 border-t pt-4 text-[15px]" style={{ borderColor: LINE, color: INK_2 }}>
+              {inputs.retireAge}세 은퇴 기준 노후자금
+              <b className="mt-0.5 block text-[24px] tabular-nums" style={{ color: shortfall ? C_NEED : C_PLAN }} aria-live="polite">
+                {formatMan(Math.abs(result.gap))} {shortfall ? "부족" : "여유"}
+              </b>
+            </p>
+            <button type="submit" className="mt-4 h-12 w-full rounded-[6px] text-[17px] font-bold text-white" style={{ background: C_PLAN }}>
+              상세 결과 보기
+            </button>
+          </form>
         </div>
-        <div className="mx-auto max-w-[1200px] px-4 pb-10 pt-6 md:px-6 md:pb-14 md:pt-10">
-          <h1 className="text-[30px] font-bold leading-[1.3] md:text-[42px]">노후준비 계산기</h1>
+      </section>
+
+      {/* 자주 찾는 서비스 */}
+      <section id="service" aria-labelledby="service-title" className="scroll-mt-32 bg-white">
+        <div className="mx-auto max-w-[1200px] px-4 py-10 md:px-6 md:py-12">
+          <h2 id="service-title" className="text-[22px] font-bold md:text-[26px]">
+            자주 찾는 서비스
+          </h2>
+          <ul className="mt-5 grid grid-cols-3 border-l border-t md:grid-cols-6" style={{ borderColor: LINE }}>
+            {SERVICES.map((sv) => (
+              <li key={sv.label} className="min-w-0 border-b border-r" style={{ borderColor: LINE }}>
+                <button
+                  type="button"
+                  onClick={() => ("calc" in sv ? go("calc") : notice("본인인증 후 이용할 수 있습니다."))}
+                  className="flex h-full min-h-[104px] w-full flex-col items-center justify-center gap-2 px-1 text-center text-[15px] font-bold hover:bg-[#f5f7fa] md:text-[16px]"
+                >
+                  <sv.icon size={26} aria-hidden style={{ color: C_PLAN }} />
+                  <span className="break-keep">{sv.label}</span>
+                </button>
+              </li>
+            ))}
+          </ul>
+        </div>
+      </section>
+
+      {/* 보험상품 */}
+      <section id="products" aria-labelledby="products-title" className="scroll-mt-32">
+        <div className="mx-auto max-w-[1200px] px-4 py-10 md:px-6 md:py-12">
+          <div className="flex flex-wrap items-end justify-between gap-3">
+            <h2 id="products-title" className="text-[22px] font-bold md:text-[26px]">
+              보험상품
+            </h2>
+            <div role="tablist" aria-label="상품 분류" className="flex gap-1">
+              {PRODUCT_TABS.map((t) => {
+                const on = t.id === tab;
+                return (
+                  <button
+                    key={t.id}
+                    type="button"
+                    role="tab"
+                    aria-selected={on}
+                    aria-controls="product-panel"
+                    onClick={() => setTab(t.id)}
+                    className="h-10 rounded-[6px] border px-3 text-[15px] font-bold md:px-4"
+                    style={on ? { background: NAVY, borderColor: NAVY, color: "#fff" } : { background: "#fff", borderColor: LINE, color: INK_2 }}
+                  >
+                    {t.label}
+                  </button>
+                );
+              })}
+            </div>
+          </div>
+          <ul id="product-panel" role="tabpanel" aria-label={products.label} className="mt-5 grid gap-3 md:grid-cols-3">
+            {products.items.map((it) => (
+              <li key={it.name} className="min-w-0 rounded-[10px] border bg-white p-5" style={{ borderColor: LINE }}>
+                <p className="text-[18px] font-bold" style={{ color: NAVY }}>
+                  {it.name}
+                </p>
+                <p className="mt-1 text-[15px]" style={{ color: INK_2 }}>
+                  {it.desc}
+                </p>
+                <dl className="mt-3 grid grid-cols-[72px_1fr] gap-y-1 border-t pt-3 text-[14px]" style={{ borderColor: LINE }}>
+                  <dt style={{ color: INK_3 }}>가입나이</dt>
+                  <dd>{it.age}</dd>
+                  <dt style={{ color: INK_3 }}>보험기간</dt>
+                  <dd>{it.term}</dd>
+                </dl>
+              </li>
+            ))}
+          </ul>
+        </div>
+      </section>
+
+      {/* 공지사항, 고객센터 */}
+      <section aria-label="공지사항과 고객센터" className="bg-white">
+        <div className="mx-auto grid max-w-[1200px] gap-8 px-4 py-10 md:grid-cols-[minmax(0,1.6fr)_minmax(0,1fr)] md:px-6 md:py-12">
+          <div className="min-w-0">
+            <h2 className="text-[20px] font-bold">공지사항</h2>
+            <ul className="mt-3 border-t-2" style={{ borderColor: NAVY }}>
+              {NOTICES.map((n) => (
+                <li key={n.title} className="flex items-center justify-between gap-3 border-b py-3 text-[16px]" style={{ borderColor: LINE }}>
+                  <span className="min-w-0 truncate">{n.title}</span>
+                  <span className="shrink-0 text-[14px] tabular-nums" style={{ color: INK_3 }}>
+                    {n.date}
+                  </span>
+                </li>
+              ))}
+            </ul>
+          </div>
+          <div className="min-w-0">
+            <h2 className="text-[20px] font-bold">고객센터</h2>
+            <dl className="mt-3 border-t-2 text-[16px]" style={{ borderColor: NAVY }}>
+              <div className="flex justify-between gap-3 border-b py-3" style={{ borderColor: LINE }}>
+                <dt style={{ color: INK_2 }}>대표번호</dt>
+                <dd className="font-bold tabular-nums">{TEL}</dd>
+              </div>
+              <div className="flex justify-between gap-3 border-b py-3" style={{ borderColor: LINE }}>
+                <dt style={{ color: INK_2 }}>상담시간</dt>
+                <dd>평일 09:00 ~ 18:00</dd>
+              </div>
+              <div className="flex justify-between gap-3 border-b py-3" style={{ borderColor: LINE }}>
+                <dt style={{ color: INK_2 }}>사고 접수</dt>
+                <dd>24시간</dd>
+              </div>
+            </dl>
+          </div>
+        </div>
+      </section>
+    </main>
+  );
+}
+
+function PresetPicker({ rate, onPick, compact = false }: { rate: number; onPick: (rate: number) => void; compact?: boolean }) {
+  return (
+    <div className="mt-4">
+      <p className="text-[15px] font-bold" style={{ color: INK_2 }}>
+        투자 성향
+      </p>
+      <div className="mt-2 grid grid-cols-3 gap-2" role="radiogroup" aria-label="투자 성향">
+        {PRESETS.map((p) => {
+          const active = rate === p.rate;
+          return (
+            <button
+              key={p.id}
+              type="button"
+              role="radio"
+              aria-checked={active}
+              onClick={() => onPick(p.rate)}
+              className={`min-w-0 border-2 px-2 text-left transition-colors ${compact ? "rounded-[6px] py-2" : "rounded-[10px] py-2.5"}`}
+              style={{
+                borderColor: active ? C_PLAN : LINE,
+                background: active ? "#eaf2fb" : "#fff",
+              }}
+            >
+              <span className={`block font-bold ${compact ? "text-[15px]" : "text-[16px]"}`}>{p.label}</span>
+              <span className="block text-[13px] leading-[1.4]" style={{ color: INK_3 }}>
+                연 {p.rate}%{compact ? "" : `, ${p.note}`}
+              </span>
+            </button>
+          );
+        })}
+      </div>
+    </div>
+  );
+}
+
+/* ---------- 노후준비 계산기 ---------- */
+
+function CalcScreen({ inputs, set, go }: { inputs: Inputs; set: (key: keyof Inputs, value: number | boolean) => void; go: Go }) {
+  const safe = useMemo(() => clampInputs(inputs), [inputs]);
+  const result = useMemo(() => compute(safe), [safe]);
+  const shortfall = result.gap > 0;
+
+  return (
+    <>
+      <div style={{ background: NAVY }} className="text-white">
+        <div className="mx-auto max-w-[1200px] px-4 pb-10 pt-6 md:px-6 md:pb-14 md:pt-8">
+          <nav aria-label="현재 위치">
+            <ol className="flex flex-wrap items-center gap-1 text-[14px] text-[#c9d6e6]">
+              <li>
+                <button type="button" onClick={() => go("home")} className="inline-flex items-center gap-1 underline-offset-2 hover:underline">
+                  <Home size={14} aria-hidden />홈
+                </button>
+              </li>
+              <li aria-hidden>
+                <ChevronRight size={14} />
+              </li>
+              <li>노후준비</li>
+              <li aria-hidden>
+                <ChevronRight size={14} />
+              </li>
+              <li aria-current="page" className="font-bold text-white">
+                노후준비 계산기
+              </li>
+            </ol>
+          </nav>
+          <h1 id="retire-title" tabIndex={-1} className="mt-3 text-[30px] font-bold leading-[1.3] outline-none md:text-[42px]">
+            노후준비 계산기
+          </h1>
           <p className="mt-2 text-[16px] leading-[1.6] text-[#c9d6e6] md:text-[17px]">
             산출 기준: 적립기간 월 복리, 은퇴 후 연 2.5% 운용, 물가상승률 연 2%
           </p>
         </div>
-      </header>
+      </div>
 
       <main className="mx-auto -mt-6 max-w-[1200px] px-4 pb-28 md:px-6">
         <div className="grid gap-5 lg:grid-cols-[minmax(0,1fr)_minmax(0,1.15fr)]">
@@ -217,35 +626,7 @@ export function RetirementDemo() {
           <section aria-labelledby="input-title" className="rounded-[14px] bg-white p-5 shadow-[0_1px_0_rgba(16,42,67,0.06)] md:p-7">
             <h2 id="input-title" className="text-[20px] font-bold">기본정보 입력</h2>
 
-            <div className="mt-4">
-              <p className="text-[15px] font-bold" style={{ color: INK_2 }}>
-                투자 성향
-              </p>
-              <div className="mt-2 grid grid-cols-3 gap-2" role="radiogroup" aria-label="투자 성향">
-                {PRESETS.map((p) => {
-                  const active = safe.returnRate === p.rate;
-                  return (
-                    <button
-                      key={p.id}
-                      type="button"
-                      role="radio"
-                      aria-checked={active}
-                      onClick={() => set("returnRate", p.rate)}
-                      className="rounded-[10px] border-2 px-2 py-2.5 text-left transition-colors"
-                      style={{
-                        borderColor: active ? C_PLAN : LINE,
-                        background: active ? "#eaf2fb" : "#fff",
-                      }}
-                    >
-                      <span className="block text-[16px] font-bold">{p.label}</span>
-                      <span className="block text-[13px] leading-[1.4]" style={{ color: INK_3 }}>
-                        연 {p.rate}%, {p.note}
-                      </span>
-                    </button>
-                  );
-                })}
-              </div>
-            </div>
+            <PresetPicker rate={safe.returnRate} onPick={(r) => set("returnRate", r)} />
 
             <FieldGroup title="연령" fields={AGE_FIELDS} inputs={safe} onChange={set} />
             <FieldGroup title="보유자산 및 저축" fields={MONEY_FIELDS} inputs={safe} onChange={set} />
@@ -356,7 +737,7 @@ export function RetirementDemo() {
           </section>
         </div>
       </main>
-    </div>
+    </>
   );
 }
 

@@ -689,8 +689,8 @@ function SiteHeader({ view, go }: { view: View; go: Go }) {
       }}
       onKeyDown={(e) => {
         if (e.key === "Escape" && megaOpen) {
-          setMegaOpen(false);
           triggerRef.current?.focus();
+          setMegaOpen(false);
         }
       }}
       onBlur={(e) => {
@@ -722,14 +722,15 @@ function SiteHeader({ view, go }: { view: View; go: Go }) {
                 <li key={m.id} className="h-full">
                   <button
                     type="button"
-                    aria-expanded={megaOpen}
-                    aria-controls="mega-menu"
+                    aria-current={current === m.id ? "page" : undefined}
                     onMouseEnter={() => setHover(m.id)}
-                    onFocus={() => setHover(m.id)}
-                    onClick={(e) => {
+                    onFocus={(e) => {
+                      // 키보드로 들어오면 펼침 메뉴를 열어 하위 메뉴까지 갈 수 있게 한다
                       triggerRef.current = e.currentTarget;
-                      setMegaOpen((v) => !v);
+                      setHover(m.id);
+                      setMegaOpen(true);
                     }}
+                    onClick={() => navigate(m.id)}
                     className="relative flex h-full w-full items-center justify-center text-[16px] font-bold xl:text-[17px]"
                     style={{ color: on ? C.accent : C.ink }}
                   >

@@ -286,15 +286,15 @@ const GNB: GnbItem[] = [
     label: "펜션소개",
     page: "about",
     subs: [
-      { label: "인사말", page: "about" },
+      { label: "인사말", page: "about", anchor: "greeting" },
       { label: "부대시설", page: "about", anchor: "facilities" },
     ],
   },
-  { label: "객실안내", page: "room", subs: ROOMS.map((r) => ({ label: r.name, page: "room" as const, room: r.id })) },
+  { label: "객실안내", page: "room", subs: ROOMS.map((r) => ({ label: r.name, page: "room" as const, room: r.id, anchor: "room-detail" })) },
   {
     label: "예약안내",
     page: "guide",
-    subs: [...GUIDE_TABS.map((t) => ({ label: t.label, page: "guide" as const, tab: t.id })), { label: "실시간예약", page: "reserve" }],
+    subs: [...GUIDE_TABS.map((t) => ({ label: t.label, page: "guide" as const, tab: t.id, anchor: "guide-body" })), { label: "실시간예약", page: "reserve" }],
   },
   { label: "주변관광지", page: "around", subs: [] },
   { label: "오시는 길", page: "location", subs: [] },
@@ -364,7 +364,7 @@ export function PensionDemo() {
             <PlacesSection go={go} />
           </>
         )}
-        {page === "about" && <AboutPage go={go} />}
+        {page === "about" && <AboutPage go={go} anchor={nav.anchor} />}
         {page === "room" && <RoomPage roomId={roomId} go={go} />}
         {page === "reserve" && <ReservePage sel={sel} onPick={pickCell} go={go} />}
         {page === "guide" && <GuidePage tab={guideTab} setTab={setGuideTab} go={go} today={today} checkIn={checkIn} />}
@@ -409,6 +409,8 @@ function blurActive() {
 
 function Header({ page, go }: { page: Page; go: Go }) {
   const [open, setOpen] = useState(false);
+  // 하위 메뉴를 누르면 마우스가 메뉴 밖으로 나갈 때까지 펼침을 닫아 둔다
+  const [hush, setHush] = useState<string | null>(null);
   const reduce = useReducedMotionSafe();
 
   useEffect(() => {
@@ -446,10 +448,11 @@ function Header({ page, go }: { page: Page; go: Go }) {
             {GNB.map((g) => {
               const active = page === g.page || (g.page === "guide" && page === "reserve");
               return (
-                <li key={g.label} className="group relative flex">
+                <li key={g.label} className="group relative flex" onMouseLeave={() => setHush(null)}>
                   <button
                     type="button"
                     onClick={() => goFrom(g.page)}
+                    onFocus={() => setHush(null)}
                     aria-current={active ? "page" : undefined}
                     className="flex items-center gap-1 px-5 text-[16px] font-semibold"
                     style={{ color: active ? C.coralDeep : C.ink, boxShadow: active ? `inset 0 -3px 0 ${C.coral}` : undefined }}
@@ -457,13 +460,16 @@ function Header({ page, go }: { page: Page; go: Go }) {
                     {g.label}
                     {g.subs.length > 0 && <ChevronDown size={15} aria-hidden className="opacity-60" />}
                   </button>
-                  {g.subs.length > 0 && (
+                  {g.subs.length > 0 && hush !== g.label && (
                     <ul className="invisible absolute left-1/2 top-full z-10 min-w-[150px] -translate-x-1/2 border-t-2 bg-white py-2 opacity-0 shadow-[0_10px_24px_rgba(18,50,74,0.14)] transition-opacity duration-150 group-focus-within:visible group-focus-within:opacity-100 group-hover:visible group-hover:opacity-100 motion-reduce:transition-none" style={{ borderColor: C.coral }}>
                       {g.subs.map((s) => (
                         <li key={s.label}>
                           <button
                             type="button"
-                            onClick={() => goFrom(s.page, s)}
+                            onClick={() => {
+                              setHush(g.label);
+                              goFrom(s.page, s);
+                            }}
                             className="block w-full whitespace-nowrap px-5 py-2 text-center text-[15px] hover:bg-[#f8f4ec] focus-visible:bg-[#f8f4ec]"
                             style={{ color: C.ink }}
                           >
@@ -608,7 +614,7 @@ function HeroSlider({ go }: { go: Go }) {
 function SectionTitle({ id, children, aside }: { id: string; children: React.ReactNode; aside?: React.ReactNode }) {
   return (
     <div className="flex flex-wrap items-end justify-between gap-x-4 gap-y-1 border-b-2 pb-3" style={{ borderColor: C.navy }}>
-      <h2 id={id} className="text-[26px] font-bold leading-[1.3] tracking-[-0.03em] md:text-[32px]" style={{ color: C.navy }}>
+      <h2 id={id} className="scroll-mt-28 text-[26px] font-bold leading-[1.3] tracking-[-0.03em] md:text-[32px]" style={{ color: C.navy }}>
         {children}
       </h2>
       {aside && <div className="text-[15px]" style={{ color: C.muted }}>{aside}</div>}
@@ -1206,7 +1212,7 @@ function SubBody({ children }: { children: React.ReactNode }) {
 
 /* ---------- 펜션소개 ---------- */
 
-function AboutPage({ go }: { go: Go }) {
+function AboutPage({ go, anchor }: { go: Go; anchor?: string }) {
   const facilities = [
     { icon: Flame, name: "공용 바비큐장", body: "17:00 ~ 22:00 · 그릴 3대 · 우천 시 지붕 아래 이용" },
     { icon: Waves, name: "해변 계단", body: "정원 끝에서 □□ 해수욕장 모래사장으로 바로 연결" },
@@ -1221,12 +1227,12 @@ function AboutPage({ go }: { go: Go }) {
         crumbs={["펜션소개"]}
         go={go}
         tabs={[
-          { label: "인사말", on: true, onClick: () => go("about") },
-          { label: "부대시설", on: false, onClick: () => go("about", { anchor: "facilities" }) },
+          { label: "인사말", on: anchor !== "facilities", onClick: () => go("about", { anchor: "greeting" }) },
+          { label: "부대시설", on: anchor === "facilities", onClick: () => go("about", { anchor: "facilities" }) },
         ]}
       />
       <SubBody>
-        <div className="grid gap-8 md:grid-cols-[1fr_1.1fr] md:items-center">
+        <div id="greeting" className="grid scroll-mt-28 gap-8 md:grid-cols-[1fr_1.1fr] md:items-center">
           <div className="relative aspect-[4/3] overflow-hidden rounded-[10px]">
             <Image src={`${IMG}/hero.jpg`} alt="해 질 무렵 바다 앞에 불이 켜진 2층 펜션 건물" fill sizes="(min-width: 768px) 50vw, 100vw" className="object-cover" />
           </div>
@@ -1241,7 +1247,7 @@ function AboutPage({ go }: { go: Go }) {
             </p>
           </div>
         </div>
-        <section aria-labelledby="facilities" className="mt-14 scroll-mt-20">
+        <section aria-labelledby="facilities" className="mt-14 scroll-mt-28">
           <SectionTitle id="facilities">부대시설</SectionTitle>
           <ul className="mt-6 grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
             {facilities.map((f) => (
@@ -1294,7 +1300,7 @@ function RoomPage({ roomId, go }: { roomId: string; go: Go }) {
         tabs={ROOMS.map((r) => ({ label: r.name, on: r.id === roomId, onClick: () => go("room", { room: r.id }) }))}
       />
       <SubBody>
-        <div className="grid gap-8 lg:grid-cols-[1.2fr_1fr]">
+        <div id="room-detail" className="grid scroll-mt-28 gap-8 lg:grid-cols-[1.2fr_1fr]">
           <div className="relative aspect-[4/3] overflow-hidden rounded-[10px]">
             <Image src={`${IMG}/room.jpg`} alt={`${room.name} 객실 침실`} fill sizes="(min-width: 1024px) 640px, 100vw" className="object-cover" style={{ objectPosition: room.photo }} />
           </div>
@@ -1828,7 +1834,7 @@ function GuidePage({ tab, setTab, go, today, checkIn }: { tab: GuideTab; setTab:
     <>
       <SubHeader title="예약안내" crumbs={["예약안내", GUIDE_TABS[idx].label]} go={go} />
       <SubBody>
-        <div role="tablist" aria-label="예약안내" className="grid grid-cols-2 border-l border-t sm:grid-cols-4" style={{ borderColor: C.line }} onKeyDown={onKey}>
+        <div id="guide-body" role="tablist" aria-label="예약안내" className="grid scroll-mt-28 grid-cols-2 border-l border-t sm:grid-cols-4" style={{ borderColor: C.line }} onKeyDown={onKey}>
           {GUIDE_TABS.map((t, i) => {
             const on = t.id === tab;
             return (
