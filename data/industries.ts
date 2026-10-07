@@ -58,4 +58,15 @@ export const industries: Industry[] = [
     image: "/images/industry/company.jpg",
     imageAlt: "CNC 밀링 공구가 금속 부품을 가공하는 모습",
   },
+  {
+    slug: "public",
+    field: "공공기관·학교",
+    label: "공공기관·학교",
+    title: "공공기관·학교 홈페이지 제작",
+    description:
+      "구청 누리집, 축제 홈페이지, 공유공간 지도 서비스, 취업 포털, 사업 신청·심사 시스템 포트폴리오. 웹접근성 개선 전후 비교와 대학 홈페이지 유지보수 현황판을 데모로 볼 수 있습니다.",
+    needs: ["웹접근성 인증 기준 준수", "고시공고·보도자료 게시판", "온라인 신청·접수", "담당자 안내·찾아오시는 길"],
+    image: "/images/demo-flower/hero.jpg",
+    imageAlt: "호수 둘레에 튤립 꽃밭과 벚나무가 늘어선 봄 축제장",
+  },
 ];

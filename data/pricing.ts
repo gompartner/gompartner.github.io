@@ -10,6 +10,8 @@ export interface Plan {
   title: string;
   price: number;
   days: number;
+  /** 작업 중 수정 횟수. 크몽 패키지와 같게 맞춘다. */
+  revisions: number;
   summary: string;
   includes: string[];
 }
@@ -21,6 +23,7 @@ export const plans: Plan[] = [
     title: "소개 홈페이지",
     price: 299_000,
     days: 6,
+    revisions: 2,
     summary: "가게나 병원을 소개하는 홈페이지",
     includes: ["5쪽 이내", "PC·모바일 화면", "전화·지도·영업시간 안내", "네이버·구글 검색 등록"],
   },
@@ -30,6 +33,7 @@ export const plans: Plan[] = [
     title: "문의·예약 홈페이지",
     price: 490_000,
     days: 9,
+    revisions: 3,
     summary: "문의와 예약 신청을 받는 홈페이지",
     includes: ["10쪽 이내", "기본 패키지 전부", "문의·예약 신청 폼", "공지·사진 직접 올리기"],
   },
@@ -39,6 +43,7 @@ export const plans: Plan[] = [
     title: "맞춤 기능 홈페이지",
     price: 990_000,
     days: 12,
+    revisions: 4,
     summary: "예약·주문 같은 맞춤 기능을 넣은 홈페이지",
     includes: ["10쪽 이내", "표준 패키지 전부", "맞춤 기능 1개", "업종에 맞춘 첫 화면 디자인"],
   },

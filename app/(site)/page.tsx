@@ -8,6 +8,7 @@ import { HeroSlider } from "@/components/landing/HeroSlider";
 import { projects } from "@/data/projects";
 import { profile } from "@/data/profile";
 import { PricingSection } from "@/components/landing/PricingSection";
+import { ProcessSection } from "@/components/landing/ProcessSection";
 import { WorksGrid } from "@/components/landing/WorksGrid";
 import { industries } from "@/data/industries";
 import { fieldsById } from "@/data/workFilters";
@@ -37,7 +38,7 @@ const featured = featuredIds.map((id) => projects.find((p) => p.id === id)!);
 const showcaseIds = ["online-store", "pension", "company", "dental-homepage", "law-firm", "tax-office"];
 const showcase = showcaseIds.map((id) => projects.find((p) => p.id === id)!);
 
-const promises = ["채팅으로 바로 상담", "원본 소스 제공", "완료 후 1개월 무상 오류 수정"];
+const promises = ["1인 개발자가 직접 제작", "원본 소스 제공", "완료 후 1개월 무상 오류 수정"];
 
 
 const container = "mx-auto w-full max-w-[1248px] px-4 md:px-6";
@@ -102,6 +103,8 @@ export default function HomePage() {
       </section>
 
       <PricingSection />
+
+      <ProcessSection />
 
       <section id="history" aria-labelledby="history-title" className="relative isolate scroll-mt-16 overflow-clip border-t border-border">
         <Doodles variant={2} />

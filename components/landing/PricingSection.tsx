@@ -25,7 +25,7 @@ export function PricingSection({ id = "pricing" }: { id?: string }) {
                 <p className="mt-1 text-[32px] font-bold leading-[1.3] tabular-nums">{formatWon(plan.price)}</p>
                 <p className="mt-1 text-[17px] text-foreground-secondary">{plan.summary}</p>
                 <ul className="mt-5 space-y-2 border-t border-border pt-5 text-[17px]">
-                  {[...plan.includes, ...planCommon].map((item) => (
+                  {[...plan.includes, `수정 ${plan.revisions}회`, ...planCommon].map((item) => (
                     <li key={item} className="flex gap-2">
                       <Check size={20} strokeWidth={2.5} className="mt-[3px] shrink-0 text-accent" aria-hidden />
                       {item}
