@@ -1023,7 +1023,7 @@ function HomePage({ go, reserve, linkOut }: { go: Go; reserve: (id: TreatmentId)
 
       {/* 공지사항 · 진료시간 */}
       <section className={`${container} grid gap-x-10 gap-y-8 pb-4 pt-10 md:pt-14 lg:grid-cols-12`} aria-label="병원 소식과 진료시간">
-        <div className="lg:col-span-7">
+        <div className="min-w-0 lg:col-span-7">
           <div className="flex items-center justify-between border-b-2 pb-3" style={{ borderColor: C.ink }}>
             <h2 className="text-[20px] font-bold tracking-[-0.03em]">공지사항</h2>
             <button type="button" onClick={() => go("community", "notice")} aria-label="공지사항 더보기" className="inline-flex h-8 w-8 items-center justify-center rounded-[4px] border" style={{ borderColor: C.line }}>
@@ -1285,7 +1285,7 @@ function SubPage({
 function Greeting() {
   return (
     <div className="grid gap-8 lg:grid-cols-12">
-      <div className="lg:col-span-7">
+      <div className="min-w-0 lg:col-span-7">
         <div className="space-y-4 text-[18px]" style={{ color: C.muted }}>
           <p>{CLINIC}을 찾아 주셔서 감사합니다.</p>
           <p>치료를 정하기 전에 엑스레이와 구강 사진을 같이 보면서 설명해 드립니다.</p>
@@ -1397,7 +1397,7 @@ function TreatmentDetail({ id, reserve }: { id: Exclude<TreatmentId, "check">; r
       <div className="relative aspect-[3/2] overflow-hidden rounded-[10px] lg:col-span-5" style={{ backgroundColor: C.mint }}>
         <Image src={`${IMG}/${t.img}.jpg`} alt="" fill sizes="(min-width:1024px) 480px, 100vw" className="object-cover" style={{ objectPosition: t.pos ?? "50% 50%" }} />
       </div>
-      <div className="lg:col-span-7">
+      <div className="min-w-0 lg:col-span-7">
         <p className="text-[19px]">{t.summary}</p>
         <h2 className="mt-8 text-[20px] font-bold">이런 경우 진료합니다</h2>
         <ul className="mt-3 space-y-2">

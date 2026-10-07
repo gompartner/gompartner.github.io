@@ -540,7 +540,7 @@ function Home({ now, go }: { now: Now | null; go: (p: Page) => void }) {
       {/* 공지사항 · 오시는 길 */}
       <section className="border-t bg-white" style={{ borderColor: C.line }}>
         <div className={`${container} grid gap-10 py-14 md:py-20 lg:grid-cols-2`}>
-          <div>
+          <div className="min-w-0">
             <div className="flex items-end justify-between">
               <h2 className={h2}>공지사항</h2>
               <button type="button" onClick={() => go("notice")} className="inline-flex items-center text-[15px] font-semibold" style={{ color: C.muted }}>
