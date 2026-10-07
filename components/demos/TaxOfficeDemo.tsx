@@ -46,7 +46,7 @@ import { useReducedMotionSafe } from "@/hooks/useReducedMotionSafe";
 const IMG = "/images/demo-tax";
 const OFFICE = "곰파트너 세무회계";
 const TEL = "02-000-0000";
-const ADDRESS = "□□시 □□로 88 □□빌딩 5층";
+const ADDRESS = "ㅎㄷ시 ㅅㄴ로 88 ㅁㄹ빌딩 5층";
 
 const C = {
   paper: "#fbfaf6",
@@ -398,7 +398,7 @@ const POSTS: Post[] = [
   { id: 7, board: "notice", cat: "사무소", ago: 98, title: "1월·5월 토요일 상담 운영 안내", body: "부가세 확정신고와 종합소득세 신고 기간인 1월, 5월에는 토요일 10:00~15:00에도 상담합니다." },
   { id: 6, board: "column", cat: "경비", ago: 114, title: "업무용 승용차, 운행기록부가 필요한 경우", body: "차량 관련 비용이 연 1,500만 원을 초과하면 운행기록부를 작성해야 초과분을 경비로 인정받을 수 있습니다. 성실신고확인대상자는 업무전용 자동차보험 가입 여부도 확인합니다." },
   { id: 5, board: "news", cat: "세법개정", ago: 150, title: "간이과세 기준금액 1억 400만 원 안내", body: "직전 연도 공급대가가 1억 400만 원 미만이면 간이과세 적용 대상입니다. 부동산임대업과 과세유흥장소는 4,800만 원 기준이 유지됩니다." },
-  { id: 4, board: "notice", cat: "사무소", ago: 188, title: "△△구 소상공인 무료 세무 상담 참여 안내", body: "매월 둘째 주 수요일 오후 △△구 소상공인지원센터에서 김ㅅ우 세무사가 상담합니다. 예약은 센터로 문의해 주세요." },
+  { id: 4, board: "notice", cat: "사무소", ago: 188, title: "ㄷㅅ구 소상공인 무료 세무 상담 참여 안내", body: "매월 둘째 주 수요일 오후 ㄷㅅ구 소상공인지원센터에서 김ㅅ우 세무사가 상담합니다. 예약은 센터로 문의해 주세요." },
   { id: 3, board: "column", cat: "인건비", ago: 203, title: "직원 4대보험 취득신고는 입사일 다음 달 15일까지", body: "신고가 늦으면 과태료가 부과되고 두루누리 지원을 받지 못할 수 있습니다. 입사자 정보를 입사 당일 보내 주시면 사무소에서 신고해 드립니다." },
   { id: 2, board: "notice", cat: "사무소", ago: 246, title: "증빙자료 전달 방법 변경 안내", body: "증빙자료는 이메일 또는 카카오톡 채널로 보내 주시면 됩니다. 원본이 필요한 서류는 별도로 안내해 드립니다." },
 ];
@@ -1703,8 +1703,8 @@ function About() {
         </h2>
         <ul className="mt-4 grid gap-4 md:grid-cols-3">
           {[
-            { name: "김ㅅ우", role: "대표세무사", area: "개인사업자 기장, 종합소득세, 세무조사대응", career: ["세무사 등록 2012년", "△△세무서 개인납세과 8년", "△△구 소상공인지원센터 세무 상담 위원"] },
-            { name: "이ㄷ현", role: "세무사", area: "법인 신고, 법인전환, 양도소득세", career: ["세무사 등록 2017년", "△△회계법인 세무본부"] },
+            { name: "김ㅅ우", role: "대표세무사", area: "개인사업자 기장, 종합소득세, 세무조사대응", career: ["세무사 등록 2012년", "ㅂㄹ세무서 개인납세과 8년", "ㄷㅅ구 소상공인지원센터 세무 상담 위원"] },
+            { name: "이ㄷ현", role: "세무사", area: "법인 신고, 법인전환, 양도소득세", career: ["세무사 등록 2017년", "ㅈㅇ회계법인 세무본부"] },
             { name: "박ㅇ진", role: "실장", area: "기장, 4대보험, 인건비 신고", career: ["전산세무 1급", "세무사무소 실무 11년"] },
           ].map((m) => (
             <li key={m.name} className="rounded-[10px] border bg-white p-5" style={{ borderColor: C.line }}>
@@ -1758,7 +1758,7 @@ function Location() {
   return (
     <div className="grid items-start gap-6 md:grid-cols-[1.2fr_1fr]">
       <div className="overflow-hidden rounded-[10px] border bg-white" style={{ borderColor: C.line }}>
-        <svg viewBox="0 0 600 380" className="h-auto w-full" role="img" aria-label="□□역 3번 출구에서 △△은행 옆 □□빌딩까지의 약도">
+        <svg viewBox="0 0 600 380" className="h-auto w-full" role="img" aria-label="ㅅㅈ역 3번 출구에서 ㅎㄴ은행 옆 ㅁㄹ빌딩까지의 약도">
           <rect width="600" height="380" fill="#f3f1ea" />
           <rect x="0" y="170" width="600" height="44" fill="#fff" />
           <rect x="250" y="0" width="36" height="380" fill="#fff" />
@@ -1768,31 +1768,31 @@ function Location() {
           <rect x="316" y="240" width="110" height="104" rx="4" fill="#e6e2d6" />
           <rect x="440" y="240" width="130" height="104" rx="4" fill={C.green} />
           <text x="505" y="290" fontSize="15" fill="#fff" textAnchor="middle" fontWeight={700}>
-            □□빌딩
+            ㅁㄹ빌딩
           </text>
           <text x="505" y="312" fontSize="13" fill="#e5eee9" textAnchor="middle">
             5층
           </text>
           <text x="371" y="296" fontSize="13" fill={C.muted} textAnchor="middle">
-            △△은행
+            ㅎㄴ은행
           </text>
           <rect x="300" y="146" width="44" height="22" rx="11" fill={C.ink} />
           <text x="322" y="162" fontSize="12" fill="#fff" textAnchor="middle" fontWeight={700}>
             3번
           </text>
           <text x="130" y="198" fontSize="14" fill={C.muted} textAnchor="middle">
-            □□로
+            ㅅㄴ로
           </text>
           <path d="M322 168 V226 H505 V240" stroke={C.red} strokeWidth="3" strokeDasharray="6 5" fill="none" />
           <text x="130" y="96" fontSize="14" fill={C.muted} textAnchor="middle">
-            □□역
+            ㅅㅈ역
           </text>
         </svg>
       </div>
       <dl className="rounded-[10px] border bg-white text-[15px]" style={{ borderColor: C.line }}>
         {[
           ["주소", ADDRESS],
-          ["지하철", "□□역 3번 출구, △△은행 옆 건물 (도보 2분)"],
+          ["지하철", "ㅅㅈ역 3번 출구, ㅎㄴ은행 옆 건물 (도보 2분)"],
           ["주차", "건물 지하 주차장, 상담 고객 1시간 무료"],
           ["상담 시간", "평일 09:00 ~ 18:00 (점심 12:00 ~ 13:00), 1월과 5월은 토요일 10:00 ~ 15:00"],
           ["전화", TEL],
@@ -2047,7 +2047,7 @@ function Footer() {
         <Logo />
         <div className="mt-6 space-y-1 text-[15px]">
           <p>
-            {ADDRESS} (□□역 3번 출구, △△은행 옆), 건물 지하 주차 1시간 무료
+            {ADDRESS} (ㅅㅈ역 3번 출구, ㅎㄴ은행 옆), 건물 지하 주차 1시간 무료
           </p>
           <p className="tabular-nums">상담 시간 평일 09:00 ~ 18:00 (점심 12:00 ~ 13:00), 1월과 5월은 토요일 10:00 ~ 15:00</p>
         </div>

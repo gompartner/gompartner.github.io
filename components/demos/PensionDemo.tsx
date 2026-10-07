@@ -48,8 +48,8 @@ import { useReducedMotionSafe } from "@/hooks/useReducedMotionSafe";
 const IMG = "/images/demo-pension";
 const PENSION = "곰파트너 바다 펜션";
 const TEL = "033-000-0000";
-const ADDRESS = "강원특별자치도 □□군 □□면 해안길 00";
-const BANK = "△△은행 000-000000-00-000";
+const ADDRESS = "강원특별자치도 ㅁㄹ군 ㄷㅅ면 해안길 00";
+const BANK = "ㅎㄴ은행 000-000000-00-000";
 const OWNER = "김ㅈ우";
 
 const C = {
@@ -459,7 +459,7 @@ function Header({ page, go }: { page: Page; go: Go }) {
     <header className="sticky top-0 z-40 bg-white shadow-[0_1px_0_#e4ddd0]">
       <div className="hidden px-6 md:block" style={{ background: C.navyDeep, color: "#c9d6df" }}>
         <div className="mx-auto flex h-9 max-w-[1200px] items-center justify-between text-[13px]">
-          <span>강원 □□군 □□ 해수욕장 앞 · 농어촌민박</span>
+          <span>강원 ㅁㄹ군 ㅅㄴ 해수욕장 앞 · 농어촌민박</span>
           <span>
             예약문의{" "}
             <a href={`tel:${TEL}`} className="font-semibold text-white">
@@ -613,7 +613,7 @@ function HeroSlider({ go }: { go: Go }) {
             {PENSION}
           </h1>
           <p className="mt-2 text-[16px] md:text-[19px]" style={{ color: "#e8eef2" }}>
-            □□ 해수욕장 도보 3분 · 바다 전망 객실 3실
+            ㅅㄴ 해수욕장 도보 3분 · 바다 전망 객실 3실
           </p>
           <div className="mt-6 flex justify-center gap-2">
             <button type="button" onClick={() => go("reserve")} className="inline-flex h-12 items-center rounded-[6px] px-6 font-bold" style={{ background: C.coral, color: C.navyDeep }}>
@@ -693,7 +693,7 @@ function SitePlan({ roomId, onRoom, closed }: { roomId: string; onRoom: (id: str
       <rect width="720" height="40" fill="#d8d2c6" />
       <path d="M0 20 H720" stroke="#fff" strokeWidth="2" strokeDasharray="14 12" />
       <text x="700" y="26" fontSize="14" fill={C.muted} textAnchor="end">
-        □□ 해안길
+        ㅅㄴ 해안길
       </text>
       <rect x="20" y="56" width="190" height="100" rx="10" fill="#e8e3d9" stroke={C.line} />
       {[50, 80, 110, 140, 170].map((x) => (
@@ -743,7 +743,7 @@ function SitePlan({ roomId, onRoom, closed }: { roomId: string; onRoom: (id: str
       <path d="M90 396 V412" stroke={C.sandDeep} strokeWidth="4" strokeDasharray="4 4" />
       <rect y="412" width="720" height="34" fill={C.sand} />
       <text x="430" y="434" fontSize="14" fill={C.muted} textAnchor="middle">
-        □□ 해수욕장 모래사장
+        ㅅㄴ 해수욕장 모래사장
       </text>
       <rect y="446" width="720" height="54" fill={C.sea} />
       <path d={WAVES(462)} fill="none" stroke="#fff" strokeOpacity="0.6" strokeWidth="2" />
@@ -1146,11 +1146,11 @@ function GuideShortcuts({ go }: { go: Go }) {
 }
 
 const PLACES = [
-  { name: "□□ 해수욕장", how: "도보 3분", body: "펜션 바로 앞 해수욕장" },
-  { name: "□□ 해안 산책로", how: "도보 15분", body: "바위 해안을 따라 이어진 약 2km 산책로" },
-  { name: "□□ 등대 전망대", how: "차량 8분", body: "펜션 마당에서 보이는 빨간 등대" },
-  { name: "□□항 수산시장", how: "차량 10분", body: "회 포장 후 객실에서 드실 수 있습니다" },
-  { name: "□□ 전통시장", how: "차량 15분", body: "매달 2, 7로 끝나는 날 오일장" },
+  { name: "ㅅㄴ 해수욕장", how: "도보 3분", body: "펜션 바로 앞 해수욕장" },
+  { name: "ㅂㄹ 해안 산책로", how: "도보 15분", body: "바위 해안을 따라 이어진 약 2km 산책로" },
+  { name: "ㅈㅇ 등대 전망대", how: "차량 8분", body: "펜션 마당에서 보이는 빨간 등대" },
+  { name: "ㄴㄹ항 수산시장", how: "차량 10분", body: "회 포장 후 객실에서 드실 수 있습니다" },
+  { name: "ㅁㅅ 전통시장", how: "차량 15분", body: "매달 2, 7로 끝나는 날 오일장" },
 ];
 
 function PlacesSection({ go }: { go: Go }) {
@@ -1244,7 +1244,7 @@ function SubBody({ children }: { children: React.ReactNode }) {
 function AboutPage({ go, anchor }: { go: Go; anchor?: string }) {
   const facilities = [
     { icon: Flame, name: "공용 바비큐장", body: "17:00 ~ 22:00 · 그릴 3대 · 우천 시 지붕 아래 이용" },
-    { icon: Waves, name: "해변 계단", body: "정원 끝에서 □□ 해수욕장 모래사장으로 바로 연결" },
+    { icon: Waves, name: "해변 계단", body: "정원 끝에서 ㅅㄴ 해수욕장 모래사장으로 바로 연결" },
     { icon: Trees, name: "정원", body: "객실 사이 잔디 마당 · 소나무 그늘 벤치" },
     { icon: Car, name: "주차장", body: "6대 · 객실당 1대" },
     { icon: Eye, name: "개별 바비큐 테라스", body: "윤슬, 물결, 노을(바다 쪽) · 마당 객실 앞마당" },
@@ -1269,7 +1269,7 @@ function AboutPage({ go, anchor }: { go: Go; anchor?: string }) {
             <h2 className="text-[24px] font-bold" style={{ color: C.navy }}>
               인사말
             </h2>
-            <p>{PENSION}을 찾아 주셔서 감사합니다. □□ 해수욕장 바로 앞, 객실 6개의 작은 펜션입니다.</p>
+            <p>{PENSION}을 찾아 주셔서 감사합니다. ㅅㄴ 해수욕장 바로 앞, 객실 6개의 작은 펜션입니다.</p>
             <p>정원 앞 계단으로 내려가시면 바로 백사장입니다. 편히 쉬었다 가실 수 있도록 최선을 다하겠습니다.</p>
             <p className="pt-2 text-[15px]" style={{ color: C.muted }}>
               {PENSION} 대표 {OWNER}
@@ -2045,7 +2045,7 @@ function AroundPage({ go }: { go: Go }) {
 
 function MiniMap() {
   return (
-    <svg viewBox="0 0 640 380" className="h-auto w-full" role="img" aria-label="□□리 버스 정류장에서 해안길을 따라 걸어서 5분 거리에 있는 펜션 약도. 펜션 앞이 바로 □□ 해수욕장입니다.">
+    <svg viewBox="0 0 640 380" className="h-auto w-full" role="img" aria-label="ㄷㄹ리 버스 정류장에서 해안길을 따라 걸어서 5분 거리에 있는 펜션 약도. 펜션 앞이 바로 ㅅㄴ 해수욕장입니다.">
       <rect width="640" height="380" fill={C.sandSoft} />
       <path d="M0 300 C120 280 220 312 330 296 S520 276 640 292 V380 H0Z" fill={C.sand} />
       <path d="M0 330 C120 312 220 342 330 326 S520 306 640 322 V380 H0Z" fill={C.sea} />
@@ -2053,22 +2053,22 @@ function MiniMap() {
         바다
       </text>
       <text x="470" y="306" fontSize="13" fill={C.muted}>
-        □□ 해수욕장
+        ㅅㄴ 해수욕장
       </text>
       <path d="M0 220 C160 200 300 236 640 210" fill="none" stroke="#d8d2c6" strokeWidth="26" />
       <text x="40" y="196" fontSize="14" fill={C.muted}>
-        □□ 해안길
+        ㅅㄴ 해안길
       </text>
       <path d="M200 0 C210 80 190 150 214 214" fill="none" stroke="#d8d2c6" strokeWidth="20" />
       <text x="222" y="60" fontSize="14" fill={C.muted}>
-        □□ 나들목 방향
+        ㅎㄷ 나들목 방향
       </text>
       <rect x="134" y="226" width="56" height="26" rx="6" fill={C.navy} />
       <text x="162" y="244" fontSize="13" fill="#fff" textAnchor="middle" fontWeight={700}>
         버스
       </text>
       <text x="110" y="272" fontSize="14" fill={C.ink}>
-        □□리 정류장
+        ㄷㄹ리 정류장
       </text>
       <path d="M192 236 C280 238 340 230 400 232" fill="none" stroke={C.coralDeep} strokeWidth="3" strokeDasharray="6 7" />
       <text x="290" y="258" fontSize="13" fill={C.coralDeep} textAnchor="middle" fontWeight={700}>
@@ -2105,9 +2105,9 @@ function LocationPage({ go }: { go: Go }) {
               <tbody>
                 {[
                   { icon: null, k: "주소", v: ADDRESS },
-                  { icon: Car, k: "자가용", v: "□□ 나들목에서 해안길을 따라 20분 · 펜션 앞 주차장 6대" },
-                  { icon: Bus, k: "버스", v: "□□ 터미널에서 군내버스 00번, □□리 정류장 하차 후 도보 5분" },
-                  { icon: Users, k: "픽업", v: "□□ 터미널 픽업 가능 (도착 전 사전 연락 부탁드립니다)" },
+                  { icon: Car, k: "자가용", v: "ㅎㄷ 나들목에서 해안길을 따라 20분 · 펜션 앞 주차장 6대" },
+                  { icon: Bus, k: "버스", v: "ㅎㄷ 터미널에서 군내버스 00번, ㄷㄹ리 정류장 하차 후 도보 5분" },
+                  { icon: Users, k: "픽업", v: "ㅎㄷ 터미널 픽업 가능 (도착 전 사전 연락 부탁드립니다)" },
                 ].map((r) => (
                   <tr key={r.k} className="border-b" style={{ borderColor: C.line }}>
                     <th scope="row" className="w-[88px] py-3 pr-2 text-left align-top font-semibold" style={{ color: C.navy }}>

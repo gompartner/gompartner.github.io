@@ -141,7 +141,7 @@ const MENUS: { id: MenuId; label: L; subs: { id: string; label: L }[] }[] = [
 ];
 
 const COMPANY = l("(주)곰파트너정밀", "Gompartner Precision Co., Ltd.");
-const ADDRESS = l("□□시 □□구 □□산단로 00", "00 □□sandan-ro, □□-gu, □□-si");
+const ADDRESS = l("ㅎㄷ시 ㅁㄹ구 ㅅㄴ산단로 00", "00 SN-sandan-ro, MR-gu, HD-si");
 const HOURS = l("평일 08:30 ~ 17:30, 토·일·공휴일 휴무", "Weekdays 08:30 to 17:30, closed on weekends and holidays");
 
 /* ---------- 도우미 ---------- */
@@ -197,19 +197,19 @@ interface Machine {
 }
 
 const MACHINES: Machine[] = [
-  { type: "mc", mk: "vmc", name: "VMC-850", maker: l("△△공작기계 (국내)", "△△ Machine Tools (Korea)"), spec: l("X850 × Y500 × Z500 mm", "X850 × Y500 × Z500 mm"), spindle: "12,000 rpm", count: 4, year: 2016 },
-  { type: "mc", mk: "large", name: "VMC-1300", maker: l("△△공작기계 (국내)", "△△ Machine Tools (Korea)"), spec: l("X1,300 × Y650 × Z600 mm", "X1,300 × Y650 × Z600 mm"), spindle: "8,000 rpm", count: 2, year: 2019 },
-  { type: "mc", mk: "vmc", name: "HSC-500", maker: l("△△ (일본)", "△△ (Japan)"), spec: l("X500 × Y400 × Z300 mm", "X500 × Y400 × Z300 mm"), spindle: "24,000 rpm", count: 1, year: 2021 },
-  { type: "fiveAx", mk: "fiveAx", name: "5AX-600", maker: l("△△ (독일)", "△△ (Germany)"), spec: l("X600 × Y500 × Z400 mm, A ±120°, C 360°", "X600 × Y500 × Z400 mm, A ±120°, C 360°"), spindle: "20,000 rpm", count: 3, year: 2018 },
-  { type: "lathe", mk: "lathe", name: "TL-300", maker: l("△△기공 (국내)", "△△ Machinery (Korea)"), spec: l("최대 Ø300 × 길이 500 mm", "Max. Ø300 × L500 mm"), spindle: "4,500 rpm", count: 5, year: 2016 },
-  { type: "lathe", mk: "turnMill", name: "TM-200", maker: l("△△ (일본)", "△△ (Japan)"), spec: l("최대 Ø200 × 길이 400 mm, Y축, 부 주축", "Max. Ø200 × L400 mm, Y-axis, sub spindle"), spindle: "6,000 rpm", count: 2, year: 2022 },
+  { type: "mc", mk: "vmc", name: "VMC-850", maker: l("ㄷㅅ공작기계 (국내)", "DS Machine Tools (Korea)"), spec: l("X850 × Y500 × Z500 mm", "X850 × Y500 × Z500 mm"), spindle: "12,000 rpm", count: 4, year: 2016 },
+  { type: "mc", mk: "large", name: "VMC-1300", maker: l("ㄷㅅ공작기계 (국내)", "DS Machine Tools (Korea)"), spec: l("X1,300 × Y650 × Z600 mm", "X1,300 × Y650 × Z600 mm"), spindle: "8,000 rpm", count: 2, year: 2019 },
+  { type: "mc", mk: "vmc", name: "HSC-500", maker: l("ㅂㄹ (일본)", "BR (Japan)"), spec: l("X500 × Y400 × Z300 mm", "X500 × Y400 × Z300 mm"), spindle: "24,000 rpm", count: 1, year: 2021 },
+  { type: "fiveAx", mk: "fiveAx", name: "5AX-600", maker: l("ㅎㅅ (독일)", "HS (Germany)"), spec: l("X600 × Y500 × Z400 mm, A ±120°, C 360°", "X600 × Y500 × Z400 mm, A ±120°, C 360°"), spindle: "20,000 rpm", count: 3, year: 2018 },
+  { type: "lathe", mk: "lathe", name: "TL-300", maker: l("ㅁㅇ기공 (국내)", "MY Machinery (Korea)"), spec: l("최대 Ø300 × 길이 500 mm", "Max. Ø300 × L500 mm"), spindle: "4,500 rpm", count: 5, year: 2016 },
+  { type: "lathe", mk: "turnMill", name: "TM-200", maker: l("ㅂㄹ (일본)", "BR (Japan)"), spec: l("최대 Ø200 × 길이 400 mm, Y축, 부 주축", "Max. Ø200 × L400 mm, Y-axis, sub spindle"), spindle: "6,000 rpm", count: 2, year: 2022 },
 ];
 
 const MEASURES: { name: L; maker: L; range: L; acc: L; count: number; year: number }[] = [
-  { name: l("3차원 측정기 CMM-7106", "CMM 7106"), maker: l("△△ (독일)", "△△ (Germany)"), range: l("X700 × Y1,000 × Z600 mm", "X700 × Y1,000 × Z600 mm"), acc: l("1.9 + L/300 µm", "1.9 + L/300 µm"), count: 1, year: 2022 },
-  { name: l("윤곽·표면 거칠기 측정기", "Contour and roughness tester"), maker: l("△△ (일본)", "△△ (Japan)"), range: l("측정 길이 100 mm", "Stroke 100 mm"), acc: l("Ra 0.01 µm까지", "Down to Ra 0.01 µm"), count: 1, year: 2022 },
-  { name: l("비접촉 영상 측정기", "Vision measuring system"), maker: l("△△ (국내)", "△△ (Korea)"), range: l("X300 × Y200 mm", "X300 × Y200 mm"), acc: l("±2.5 µm", "±2.5 µm"), count: 1, year: 2023 },
-  { name: l("하이트 게이지", "Height gauge"), maker: l("△△ (일본)", "△△ (Japan)"), range: l("높이 600 mm", "Height 600 mm"), acc: l("±1.1 µm", "±1.1 µm"), count: 2, year: 2017 },
+  { name: l("3차원 측정기 CMM-7106", "CMM 7106"), maker: l("ㄴㄹ (독일)", "NR (Germany)"), range: l("X700 × Y1,000 × Z600 mm", "X700 × Y1,000 × Z600 mm"), acc: l("1.9 + L/300 µm", "1.9 + L/300 µm"), count: 1, year: 2022 },
+  { name: l("윤곽·표면 거칠기 측정기", "Contour and roughness tester"), maker: l("ㅈㅇ (일본)", "JY (Japan)"), range: l("측정 길이 100 mm", "Stroke 100 mm"), acc: l("Ra 0.01 µm까지", "Down to Ra 0.01 µm"), count: 1, year: 2022 },
+  { name: l("비접촉 영상 측정기", "Vision measuring system"), maker: l("ㄷㄹ (국내)", "DR (Korea)"), range: l("X300 × Y200 mm", "X300 × Y200 mm"), acc: l("±2.5 µm", "±2.5 µm"), count: 1, year: 2023 },
+  { name: l("하이트 게이지", "Height gauge"), maker: l("ㅈㅇ (일본)", "JY (Japan)"), range: l("높이 600 mm", "Height 600 mm"), acc: l("±1.1 µm", "±1.1 µm"), count: 2, year: 2017 },
 ];
 
 const MACHINE_TOTAL = MACHINES.reduce((n, m) => n + m.count, 0);
@@ -239,18 +239,18 @@ const HISTORY: { year: number; items: L[] }[] = [
   { year: 2021, items: [l("뿌리기업 확인 (정밀가공 분야)", "Confirmed as a root industry company (precision machining)")] },
   { year: 2020, items: [l("기업부설연구소 설립", "Opened the in-house R&D center")] },
   { year: 2018, items: [l("5축 가공기 도입, 반도체 장비 부품 납품 시작", "Added 5-axis machines, began supplying semiconductor equipment parts")] },
-  { year: 2016, items: [l("□□산업단지 지금 공장으로 이전", "Moved to the current plant in □□ Industrial Complex")] },
+  { year: 2016, items: [l("ㅅㄴ산업단지 지금 공장으로 이전", "Moved to the current plant in SN Industrial Complex")] },
   { year: 2014, items: [l("ISO 9001 인증", "ISO 9001 certified")] },
   { year: 2012, items: [l("법인 전환, (주)곰파트너정밀로 상호 변경", "Incorporated as Gompartner Precision Co., Ltd.")] },
-  { year: 2009, items: [l("□□시에서 머시닝센터 2대로 창업", "Founded in □□ with two machining centers")] },
+  { year: 2009, items: [l("ㅎㄷ시에서 머시닝센터 2대로 창업", "Founded in HD with two machining centers")] },
 ];
 
 const CERTS: { name: L; scope: L; org: L; year: number }[] = [
-  { name: l("ISO 9001", "ISO 9001"), scope: l("품질경영시스템", "Quality management system"), org: l("△△인증원", "△△ Certification"), year: 2014 },
-  { name: l("ISO 14001", "ISO 14001"), scope: l("환경경영시스템", "Environmental management system"), org: l("△△인증원", "△△ Certification"), year: 2023 },
-  { name: l("ISO 13485", "ISO 13485"), scope: l("의료기기 품질경영시스템", "Medical device quality management"), org: l("△△인증원", "△△ Certification"), year: 2024 },
-  { name: l("기업부설연구소", "In-house R&D center"), scope: l("연구개발전담 조직 인정", "Recognized R&D organization"), org: l("△△협회", "△△ Association"), year: 2020 },
-  { name: l("뿌리기업", "Root industry company"), scope: l("정밀가공 분야 확인", "Precision machining"), org: l("△△진흥원", "△△ Agency"), year: 2021 },
+  { name: l("ISO 9001", "ISO 9001"), scope: l("품질경영시스템", "Quality management system"), org: l("ㄱㅎ인증원", "GH Certification"), year: 2014 },
+  { name: l("ISO 14001", "ISO 14001"), scope: l("환경경영시스템", "Environmental management system"), org: l("ㄱㅎ인증원", "GH Certification"), year: 2023 },
+  { name: l("ISO 13485", "ISO 13485"), scope: l("의료기기 품질경영시스템", "Medical device quality management"), org: l("ㄱㅎ인증원", "GH Certification"), year: 2024 },
+  { name: l("기업부설연구소", "In-house R&D center"), scope: l("연구개발전담 조직 인정", "Recognized R&D organization"), org: l("ㅅㄹ협회", "SR Association"), year: 2020 },
+  { name: l("뿌리기업", "Root industry company"), scope: l("정밀가공 분야 확인", "Precision machining"), org: l("ㅈㅅ진흥원", "JS Agency"), year: 2021 },
 ];
 
 // 공지 작성일은 오늘 기준 며칠 전(ago)으로 두고, 본문의 날짜도 오늘에서 계산한다.
@@ -1150,7 +1150,7 @@ function Location() {
         {(
           [
             [x("주소", "Address"), s(ADDRESS)],
-            [x("내비게이션", "Navigation"), "곰파트너정밀 □□공장"],
+            [x("내비게이션", "Navigation"), x("곰파트너정밀 ㅎㄷ공장", "Gompartner Precision HD Plant")],
             [x("전화", "Tel"), TEL],
             [x("팩스", "Fax"), FAX],
             [x("업무시간", "Office hours"), s(HOURS)],
@@ -2096,7 +2096,7 @@ function Quote() {
               <div className="grid gap-5 border-t-2 pt-6 sm:grid-cols-2" style={{ borderColor: C.steel }}>
                 <div>
                   {label("company", x("회사명", "Company"))}
-                  <input id="q-company" value={company} onChange={(e) => setCompany(e.target.value)} autoComplete="organization" placeholder="(주)△△테크" className={inputCls} style={border("company")} {...aria("company")} />
+                  <input id="q-company" value={company} onChange={(e) => setCompany(e.target.value)} autoComplete="organization" placeholder={x("(주)ㅎㄴ테크", "HN Tech Co., Ltd.")} className={inputCls} style={border("company")} {...aria("company")} />
                   {errText("company")}
                 </div>
                 <div>

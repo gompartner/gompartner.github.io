@@ -25,7 +25,7 @@ import { useReducedMotionSafe } from "@/hooks/useReducedMotionSafe";
 const IMG = "/images/demo-store";
 const SHOP = "곰파트너 도자기 공방";
 const TEL = "02-000-0000";
-const ADDRESS = "□□시 □□구 □□로 12길 8 1층";
+const ADDRESS = "ㅂㄹ시 ㄷㅅ구 ㅅㄴ로 12길 8 1층";
 
 const C = {
   bg: "#f7f4ef",
@@ -1439,7 +1439,7 @@ function InfoTab({ p, size }: { p: Product; size: Size | null }) {
             ["굽는 온도", "800도 초벌, 1,250도 재벌"],
             ["식기세척기", "사용 가능"],
             ["전자레인지", p.glazes.includes("black") ? "사용 가능 (흑유는 장시간 가열 자제)" : "사용 가능"],
-            ["제조국", "대한민국 (□□시 공방 제작)"],
+            ["제조국", "대한민국 (ㅂㄹ시 공방 제작)"],
             ["품질보증기준", "관련 법 및 소비자분쟁해결 기준에 따름"],
           ]}
         />
@@ -1528,7 +1528,7 @@ function ShipTab({ minute, region, onRegion }: { minute: number; region: Region;
       <SpecTable
         caption="배송 안내"
         rows={[
-          ["배송 방법", "택배 (△△택배)"],
+          ["배송 방법", "택배 (ㅎㄴ택배)"],
           ["배송 비용", `${won(FREE_SHIP)} 이상 무료배송, 미만 ${won(SHIP_FEE)}`],
           ["추가 배송비", `제주·도서산간 ${won(3_000)}`],
           ["당일 출고", "평일 오후 2시 이전 주문 건 당일 출고 (각인 상품 제외)"],
@@ -2055,13 +2055,13 @@ function BrandView() {
         </div>
         <div>
           <p>
-            {SHOP}은 대표 김ㅈ우와 이ㅅ연 두 사람이 2019년부터 □□동 작업실에서 운영합니다. 한 번 가마를 땔 때 200점 남짓 나오며, 흠이 없는 것만 골라 판매합니다.
+            {SHOP}은 대표 김ㅈ우와 이ㅅ연 두 사람이 2019년부터 ㅈㄹ동 작업실에서 운영합니다. 한 번 가마를 땔 때 200점 남짓 나오며, 흠이 없는 것만 골라 판매합니다.
           </p>
           <div className="mt-6">
             <SpecTable
               caption="제작 정보"
               rows={[
-                ["흙", "□□ 지역 백토에 옹기토를 섞어 단단하게 만듭니다."],
+                ["흙", "ㅎㅅ 지역 백토에 옹기토를 섞어 단단하게 만듭니다."],
                 ["굽기", "800도 초벌 후 유약을 입혀 1,250도에서 재벌합니다."],
                 ["유약", "백자, 청자, 흑유, 분청 네 가지를 작업실에서 직접 배합합니다."],
                 ["안전성", "납·카드뮴 용출 시험 불검출 (시험성적서 보유)"],
@@ -2212,27 +2212,27 @@ function visitStatus(minute: number) {
 
 function MiniMap() {
   return (
-    <svg viewBox="0 0 640 380" className="h-auto w-full" role="img" aria-label="□□역 3번 출구에서 공방까지 가는 약도">
+    <svg viewBox="0 0 640 380" className="h-auto w-full" role="img" aria-label="ㅅㅈ역 3번 출구에서 공방까지 가는 약도">
       <rect width="640" height="380" fill={C.paper} />
       <path d="M0 120 H640" stroke={C.claySoft} strokeWidth="30" />
       <path d="M260 0 V380" stroke={C.claySoft} strokeWidth="22" />
       <path d="M260 270 H640" stroke={C.claySoft} strokeWidth="14" />
       <text x="24" y="98" fontSize="15" fill={C.muted}>
-        □□대로
+        ㄱㅇ대로
       </text>
       <text x="430" y="256" fontSize="15" fill={C.muted}>
-        □□로 12길
+        ㅅㄴ로 12길
       </text>
       <rect x="60" y="160" width="140" height="80" rx="4" fill={C.claySoft} />
       <text x="130" y="205" fontSize="13" fill={C.muted} textAnchor="middle">
-        □□근린공원
+        ㄷㅇ근린공원
       </text>
       <circle cx="170" cy="120" r="16" fill={C.ink} />
       <text x="170" y="125" fontSize="13" fill="#fff" textAnchor="middle" fontWeight={700}>
         3
       </text>
       <text x="126" y="84" fontSize="15" fill={C.ink}>
-        □□역 3번 출구
+        ㅅㅈ역 3번 출구
       </text>
       <path d="M188 120 H260 V270 H482" stroke={C.terra} strokeWidth="3" strokeDasharray="6 7" fill="none" />
       <path d="M486 252 H530 Q528 284 508 286 Q488 284 486 252Z" fill={C.terra} />
@@ -2260,7 +2260,7 @@ function VisitView({ minute }: { minute: number }) {
           <p className="text-[20px] font-bold tracking-[-0.02em]">{ADDRESS}</p>
           <ul className="mt-5 space-y-4">
             {[
-              { icon: TrainFront, title: "지하철", body: "□□역 3번 출구에서 도보 7분, 근린공원을 지나 골목 끝에 있습니다." },
+              { icon: TrainFront, title: "지하철", body: "ㅅㅈ역 3번 출구에서 도보 7분, 근린공원을 지나 골목 끝에 있습니다." },
               { icon: Car, title: "주차", body: "공방 앞 2대 주차 가능합니다." },
             ].map((r) => (
               <li key={r.title} className="flex gap-3">
@@ -2323,7 +2323,7 @@ function Footer() {
             입금계좌
           </p>
           <p className="mt-2 text-[14px] leading-[1.7]" style={{ color: "#b3a593" }}>
-            △△은행 000-000000-00-000
+            ㅁㄹ은행 000-000000-00-000
             <br />
             예금주 {SHOP}
           </p>
@@ -2335,7 +2335,7 @@ function Footer() {
               ["상호", "ㅎㄱ 도자기 공방"],
               ["대표자", "김ㅈ우"],
               ["사업자등록번호", "000-00-00000"],
-              ["통신판매업 신고번호", "제0000-□□-0000호"],
+              ["통신판매업 신고번호", "제0000-ㅂㄹㄷㅅ-0000호"],
               ["주소", ADDRESS],
               ["개인정보 보호책임자", "이ㅅ연"],
             ].map(([k, v]) => (
@@ -2348,7 +2348,7 @@ function Footer() {
         </div>
       </div>
       <p className="mx-auto mt-8 max-w-[1200px] text-[13px]" style={{ color: "#8f8273" }}>
-        결제대행 △△페이먼츠. 고객님의 안전거래를 위해 현금 등으로 결제 시 구매안전 서비스를 이용하실 수 있습니다.
+        결제대행 ㅈㅇ페이먼츠. 고객님의 안전거래를 위해 현금 등으로 결제 시 구매안전 서비스를 이용하실 수 있습니다.
       </p>
     </footer>
   );

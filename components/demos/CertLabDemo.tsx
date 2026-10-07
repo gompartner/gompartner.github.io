@@ -65,7 +65,7 @@ const COMPANY = "(주)곰파트너시험인증원";
 const TEL = "02-000-0000";
 const FAX = "02-000-0001";
 const EMAIL = "test@example.com";
-const ADDRESS = "□□시 □□구 □□로 00 곰파트너시험인증원";
+const ADDRESS = "ㄱㅇ시 ㅂㄹ구 ㄷㅅ로 00 곰파트너시험인증원";
 const HOURS = "평일 09:00 ~ 18:00";
 
 const C = {
@@ -279,27 +279,38 @@ const LIMIT_PATH = `M${fx(30)} ${dy(40)} H${fx(230)} V${dy(47)} H${fx(1000)}`;
 const WORST = PEAKS.reduce((w, p) => (limitAt(p.f) - p.v < limitAt(w.f) - w.v ? p : w), PEAKS[0]);
 const WORST_MARGIN = (limitAt(WORST.f) - WORST.v).toFixed(1);
 
-/** 고객사 가리기: (주)한빛전자는 (주)한ㅅ전자 */
+/** 고객사 가리기: (주)한빛전자는 (주)ㅎㅂ전자, 업종 말이 없으면 앞 두 글자만 초성 */
+const COMPANY_SUFFIX = /(전자|테크|시스템|산업|기계|기공|정밀|라이팅|모빌리티|메디칼|전기|통신|소프트|솔루션|엔지니어링|상사|물산|화학|에너지|바이오|로보틱스|네트웍스|컴퍼니|코리아)$/;
 function maskCompany(name: string) {
   const v = name.trim();
   const m = v.match(/^(\(주\)|주식회사\s*|㈜)?(.*)$/);
   const prefix = m?.[1] ?? "";
-  const body = [...(m?.[2] ?? v)];
-  if (body.length < 2) return v;
-  return `${prefix}${body[0]}${"○".repeat(Math.min(4, body.length - 1))}`;
+  const body = m?.[2] ?? v;
+  const toCho = (s: string) =>
+    [...s]
+      .map((ch) => {
+        const code = ch.charCodeAt(0) - 0xac00;
+        return code >= 0 && code < 11172 ? CHO[Math.floor(code / 588)] : ch;
+      })
+      .join("");
+  const sfx = body.match(COMPANY_SUFFIX);
+  if (sfx && sfx.index && sfx.index > 0) return `${prefix}${toCho(body.slice(0, sfx.index))}${sfx[0]}`;
+  const chars = [...body];
+  if (chars.length <= 2) return `${prefix}${toCho(body)}`;
+  return `${prefix}${toCho(chars.slice(0, 2).join(""))}${chars.slice(2).join("")}`;
 }
 
 /* ---------- 페이지 ---------- */
 
 const QUOTE_ROWS: QuoteRow[] = [
-  { no: 684, std: "KC, CE", company: "(주)△△전자", ago: 1, done: false },
-  { no: 683, std: "FCC", company: "△△테크", ago: 2, done: true },
-  { no: 682, std: "KC", company: "(주)△△라이팅", ago: 5, done: true },
-  { no: 681, std: "KOLAS", company: "△△시스템", ago: 6, done: true },
-  { no: 680, std: "KC, FCC, CE", company: "(주)△△모빌리티", ago: 8, done: true },
-  { no: 679, std: "KCs", company: "△△기계", ago: 11, done: true },
-  { no: 678, std: "CE", company: "(주)△△메디칼", ago: 12, done: true },
-  { no: 677, std: "KC", company: "△△산업", ago: 14, done: true },
+  { no: 684, std: "KC, CE", company: "(주)ㅎㄷ전자", ago: 1, done: false },
+  { no: 683, std: "FCC", company: "ㅁㄹ테크", ago: 2, done: true },
+  { no: 682, std: "KC", company: "(주)ㅅㄴ라이팅", ago: 5, done: true },
+  { no: 681, std: "KOLAS", company: "ㄷㅇ시스템", ago: 6, done: true },
+  { no: 680, std: "KC, FCC, CE", company: "(주)ㅈㅇ모빌리티", ago: 8, done: true },
+  { no: 679, std: "KCs", company: "ㅎㅅ기계", ago: 11, done: true },
+  { no: 678, std: "CE", company: "(주)ㅂㄷ메디칼", ago: 12, done: true },
+  { no: 677, std: "KC", company: "ㅁㅇ산업", ago: 14, done: true },
 ];
 
 export function CertLabDemo() {
@@ -631,7 +642,7 @@ const BOARD: { tab: "news" | "files"; title: string; ago: number; body: BoardTex
   { tab: "news", title: "전기용품 안전기준 KC 60335-2-30 개정판 시행 안내 (전기 히터)", ago: 40, body: (t) => `실내용 전기 히터의 표면 온도 상승 한도와 전도 시험 조건이 바뀝니다. ${daysAgo(t, -117).getFullYear()}년 ${daysAgo(t, -117).getMonth() + 1}월 출시 제품부터 개정판으로 시험하므로 출시 예정 제품은 일정을 미리 상담해 주십시오.` },
   { tab: "news", title: "3m 전파무향실 정기 검증에 따른 방사 시험 휴무 안내", ago: 56, body: (t) => `${agoKo(t, 43)}부터 ${agoKo(t, 41)}까지 무향실 정기 검증(NSA 측정)으로 방사 시험을 쉽니다. 해당 기간 예약 건은 담당 시험원이 일정을 다시 잡아 연락드립니다. 전도 시험과 전기안전 시험은 정상 진행합니다.` },
   { tab: "news", title: "KOLAS 정기 사후평가 결과 인정 범위 유지 및 무선 시험 항목 추가", ago: 78, body: "정기 사후평가를 마쳐 기존 인정 범위가 유지되었고, 블루투스 저전력(BLE) 송신 출력과 점유주파수폭 시험 항목이 인정 범위에 추가되었습니다." },
-  { tab: "news", title: "△△진흥원 중소기업 인증 지원사업 2차 참여기업 모집 공고", ago: 97, body: (t) => `중소기업의 국내·해외 인증 비용 일부를 지원하는 사업입니다. 신청 마감은 ${agoKo(t, 68)}이며, 신청 서류 작성은 견적문의로 요청하시면 도와 드립니다.` },
+  { tab: "news", title: "ㅈㅅ진흥원 중소기업 인증 지원사업 2차 참여기업 모집 공고", ago: 97, body: (t) => `중소기업의 국내·해외 인증 비용 일부를 지원하는 사업입니다. 신청 마감은 ${agoKo(t, 68)}이며, 신청 서류 작성은 견적문의로 요청하시면 도와 드립니다.` },
   { tab: "files", title: "시험항목별 수수료 및 시험처리기간 안내", ago: 17, body: "전자파, 무선, 전기안전 시험 항목별 기본 수수료와 처리 기간입니다.", file: "PDF · 412KB" },
   { tab: "files", title: "[서식] 시험신청서", ago: 35, body: "시험 신청 시 시료와 함께 보내 주십시오.", file: "HWP · 48KB" },
   { tab: "files", title: "중소기업 시험수수료 할인 안내", ago: 50, body: "중소기업 확인서를 내시면 시험수수료를 할인해 드립니다.", file: "PDF · 186KB" },
@@ -1059,11 +1070,11 @@ function Greeting() {
 }
 
 const ACCREDIT: [string, string, string, string][] = [
-  ["KC인증 지정시험기관", "전자파 적합성(EMC), 무선기기(RF)", "제KT0000호", "△△연구원"],
-  ["KOLAS 공인시험기관", "전기·전자, 전자파 (ISO/IEC 17025)", "제KT0000호", "△△인정기구"],
-  ["전기용품 안전 시험기관", "가정용 전기기기, 조명기기, 정보기기", "제0000-00호", "△△원"],
-  ["에너지 효율 시험기관", "조명기기, 전원 장치", "제0000-000호", "△△공단"],
-  ["해외 인증기관 협력 시험소", "북미, 유럽 인증 시험", "협약 2건", "△△ 인증기관"],
+  ["KC인증 지정시험기관", "전자파 적합성(EMC), 무선기기(RF)", "제KT0000호", "ㄷㄹ연구원"],
+  ["KOLAS 공인시험기관", "전기·전자, 전자파 (ISO/IEC 17025)", "제KT0000호", "ㄱㅎ인정기구"],
+  ["전기용품 안전 시험기관", "가정용 전기기기, 조명기기, 정보기기", "제0000-00호", "ㅅㄹ원"],
+  ["에너지 효율 시험기관", "조명기기, 전원 장치", "제0000-000호", "ㅇㅈ공단"],
+  ["해외 인증기관 협력 시험소", "북미, 유럽 인증 시험", "협약 2건", "ㅎㄴ 인증기관"],
 ];
 
 function Accredit() {
@@ -1311,7 +1322,7 @@ function Location() {
           ["주소", ADDRESS],
           ["전화", <span key="t" className="tabular-nums">{TEL}</span>],
           ["팩스", <span key="f" className="tabular-nums">{FAX}</span>],
-          ["대중교통", "□□역 2번 출구에서 □□번 버스, □□사거리 정류장 하차 후 도보 3분"],
+          ["대중교통", "ㅅㅈ역 2번 출구에서 00번 버스, ㅁㅅ사거리 정류장 하차 후 도보 3분"],
           ["자가용", "건물 뒤 방문 주차장 이용 (방문 상담은 하루 전까지 전화 예약)"],
         ]}
       />
@@ -2617,7 +2628,7 @@ function Tracking() {
           <div className="flex flex-wrap items-center justify-between gap-x-6 gap-y-2 border-b px-5 py-4 md:px-6" style={{ borderColor: C.line }}>
             <div className="min-w-0">
               <p className="text-[14px] tabular-nums" style={{ color: C.muted }}>
-                {result.no} · 의뢰사 (주)△△전자
+                {result.no} · 의뢰사 (주)ㅎㄷ전자
               </p>
               <p className="text-[19px] font-bold tracking-[-0.02em]">
                 {result.product} <span style={{ color: C.cyanText }}>{TEST_LABEL[result.kind]}</span>
@@ -2811,7 +2822,7 @@ function Verify() {
                   ["발급일", <span key="d" className="tabular-nums">{`${r.dates[3].getFullYear()}.${md(r.dates[3])}`}</span>],
                   ["시험 분야", TEST_LABEL[r.kind]],
                   ["제품명", r.product],
-                  ["의뢰사", "(주)△△전자"],
+                  ["의뢰사", "(주)ㅎㄷ전자"],
                   ["판정", "적합"],
                 ]}
               />
@@ -3098,7 +3109,7 @@ function QuoteForm({ onList }: { onList: () => void }) {
             <div className="grid gap-5 border-t-2 pt-6 sm:grid-cols-2" style={{ borderColor: C.indigo }}>
               <div>
                 {label("q-company", "회사명")}
-                <input id="q-company" value={values.company} onChange={(e) => set("company", e.target.value)} autoComplete="organization" placeholder="(주)△△전자" className={inputCls} style={border("company")} {...aria("company")} />
+                <input id="q-company" value={values.company} onChange={(e) => set("company", e.target.value)} autoComplete="organization" placeholder="(주)ㅎㄷ전자" className={inputCls} style={border("company")} {...aria("company")} />
                 {errText("company")}
               </div>
               <div>

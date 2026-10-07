@@ -41,7 +41,7 @@ import { daysAgo, fmtDot, useDemoToday } from "@/hooks/useDemoToday";
 const IMG = "/images/demo-law";
 const FIRM = "법률사무소 곰파트너";
 const TEL = "02-000-0000";
-const ADDRESS = "□□시 □□로 88 □□빌딩 3층";
+const ADDRESS = "ㄱㅇ시 ㅅㄴ로 88 ㅁㄹ빌딩 3층";
 
 const C = {
   ivory: "#f6f3ec",
@@ -732,7 +732,7 @@ function Home({ go }: { go: Go }) {
                 {FIRM}
               </h1>
               <p className="mt-3 max-w-[560px] text-[16px] md:text-[18px]" style={{ color: "#dfe3ec" }}>
-                □□법원 건너편에서 변호사 2명이 직접 상담하고 사건을 진행합니다.
+                ㄱㅇ법원 건너편에서 변호사 2명이 직접 상담하고 사건을 진행합니다.
               </p>
             </motion.div>
           </div>
@@ -839,7 +839,7 @@ function Home({ go }: { go: Go }) {
             <MiniMap />
             <p className="mt-3 text-[15px]">{ADDRESS}</p>
             <p className="text-[15px]" style={{ color: C.muted }}>
-              □□선 □□역 3번 출구에서 걸어서 5분
+              ㄷㅅ선 ㅅㅈ역 3번 출구에서 걸어서 5분
             </p>
           </section>
         </div>
@@ -899,24 +899,24 @@ function HoursTable() {
 function MiniMap({ tall = false }: { tall?: boolean }) {
   return (
     <div className={`relative overflow-hidden border ${tall ? "aspect-[16/10]" : "aspect-[16/9]"}`} style={{ borderColor: C.line, background: C.paper }}>
-      <svg viewBox="0 0 320 180" className="h-full w-full" role="img" aria-label="□□역 3번 출구에서 □□로를 따라 법원 건너편 □□빌딩까지 가는 약도">
+      <svg viewBox="0 0 320 180" className="h-full w-full" role="img" aria-label="ㅅㅈ역 3번 출구에서 ㅅㄴ로를 따라 법원 건너편 ㅁㄹ빌딩까지 가는 약도">
         <rect x="0" y="78" width="320" height="22" fill={C.navyMist} />
         <rect x="148" y="0" width="18" height="180" fill={C.navyMist} />
         <rect x="190" y="18" width="90" height="46" fill={C.goldSoft} stroke={C.line} />
         <text x="235" y="46" textAnchor="middle" fontSize="12" fill={C.muted}>
-          □□법원
+          ㄱㅇ법원
         </text>
         <rect x="190" y="112" width="58" height="44" fill={C.navy} />
         <text x="219" y="139" textAnchor="middle" fontSize="11" fill={C.ivory}>
-          □□빌딩
+          ㅁㄹ빌딩
         </text>
         <circle cx="70" cy="89" r="9" fill={C.white} stroke={C.navy} strokeWidth="2" />
         <text x="70" y="70" textAnchor="middle" fontSize="11" fill={C.navy}>
-          □□역 3번 출구
+          ㅅㅈ역 3번 출구
         </text>
         <path d="M79 89 H157 V134 H186" fill="none" stroke={C.gold} strokeWidth="2" strokeDasharray="4 4" />
         <text x="10" y="94" fontSize="10" fill={C.muted}>
-          □□로
+          ㅅㄴ로
         </text>
       </svg>
       <MapPin size={22} className="absolute" style={{ left: "66%", top: "52%", color: C.gold }} aria-hidden />
@@ -1071,7 +1071,7 @@ const LAWYERS = [
     name: "김ㅈ우",
     role: "대표변호사",
     fields: ["임대차·부동산", "민사 채권"],
-    career: ["대한변호사협회 전문분야 등록(부동산)", "△△법무법인 소속 변호사", "□□구 마을 무료 법률상담 위원", "□□시 주택임대차분쟁조정 자문"],
+    career: ["대한변호사협회 전문분야 등록(부동산)", "ㅎㅅ법무법인 소속 변호사", "ㅂㄹ구 마을 무료 법률상담 위원", "ㄱㅇ시 주택임대차분쟁조정 자문"],
     note: "전세보증금, 계약갱신 거절, 대여금 사건을 주로 담당하고 있습니다.",
   },
   {
@@ -1079,7 +1079,7 @@ const LAWYERS = [
     name: "이ㅅ연",
     role: "변호사",
     fields: ["이혼·가사", "형사"],
-    career: ["대한변호사협회 전문분야 등록(가사법)", "△△법률사무소 소속 변호사", "국선변호 사건 수행", "□□가정법원 조정 사건 대리"],
+    career: ["대한변호사협회 전문분야 등록(가사법)", "ㅈㅇ법률사무소 소속 변호사", "국선변호 사건 수행", "ㄱㅇ가정법원 조정 사건 대리"],
     note: "이혼, 양육비 사건과 경찰 조사 동행을 주로 담당하고 있습니다.",
   },
 ];
@@ -1141,8 +1141,8 @@ function Location() {
         {[
           ["주소", ADDRESS],
           ["전화", TEL],
-          ["지하철", "□□선 □□역 3번 출구에서 □□로를 따라 걸어서 5분"],
-          ["버스", "□□법원 정류장에서 내려 길 건너편"],
+          ["지하철", "ㄷㅅ선 ㅅㅈ역 3번 출구에서 ㅅㄴ로를 따라 걸어서 5분"],
+          ["버스", "ㄱㅇ법원 정류장에서 내려 길 건너편"],
           ["주차", "건물 지하 주차장, 상담 시 1시간 지원"],
           ["상담 시간", "평일 오전 10시 ~ 오후 6시, 토요일 오전 10시 ~ 낮 12시"],
         ].map(([k, v]) => (
