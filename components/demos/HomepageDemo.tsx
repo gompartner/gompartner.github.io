@@ -157,6 +157,29 @@ const refundRows = [
   ["이용 2시간 이내", "환불 불가"],
 ];
 
+/* 하위 화면: 상단 메뉴 순서 그대로 */
+type GymPage = "home" | "branches" | "facility" | "pricing" | "info";
+const GYM_PAGES: { id: Exclude<GymPage, "home">; label: string }[] = [
+  { id: "branches", label: "지점 안내" },
+  { id: "facility", label: "시설 안내" },
+  { id: "pricing", label: "이용요금" },
+  { id: "info", label: "이용안내" },
+];
+
+/* 지점별 주소·교통 (데모용, 번지는 000) */
+const branchInfo: Record<string, { addr: string; subway: string }> = {
+  gangnam: { addr: "서울 강남구 테헤란로 000, 2층", subway: "2호선 강남역 11번 출구 도보 3분" },
+  jamsil: { addr: "서울 송파구 올림픽로 000, 3층", subway: "2호선 잠실역 7번 출구 도보 5분" },
+  seongsu: { addr: "서울 성동구 성수이로 000, 2층", subway: "2호선 성수역 3번 출구 도보 4분" },
+  hongdae: { addr: "서울 마포구 와우산로 000, 지하 1층", subway: "2호선 홍대입구역 9번 출구 도보 6분" },
+  yeouido: { addr: "서울 영등포구 국제금융로 000, 2층", subway: "5호선 여의도역 3번 출구 도보 4분" },
+  jongno: { addr: "서울 종로구 종로 000, 4층", subway: "1호선 종각역 3번 출구 도보 2분" },
+  yongsan: { addr: "서울 용산구 한강대로 000, 3층", subway: "4호선 신용산역 2번 출구 도보 3분" },
+  kondae: { addr: "서울 광진구 아차산로 000, 2층", subway: "2호선 건대입구역 2번 출구 도보 5분" },
+  sinchon: { addr: "서울 서대문구 연세로 000, 3층", subway: "2호선 신촌역 3번 출구 도보 4분" },
+  samsung: { addr: "서울 강남구 영동대로 000, 2층", subway: "2호선 삼성역 5번 출구 도보 3분" },
+};
+
 /** 요소가 뷰포트에 들어왔는지 한 번만 감지 */
 function useInView<T extends HTMLElement>(threshold = 0.25) {
   const ref = useRef<T>(null);
@@ -265,6 +288,33 @@ const tutorialSteps = [
 export function HomepageDemo() {
   const [booking, setBooking, hydrated] = useLocalStorage<BookingState>(STORAGE_KEY, emptyBooking);
   const videoRef = useRef<HTMLVideoElement>(null);
+  // 하위 화면 전환 (지점 안내, 시설 안내, 이용요금, 이용안내)
+  const [page, setPage] = useState<GymPage>("home");
+  const [branchId, setBranchId] = useState(locations[0].id);
+  const [pendingAnchor, setPendingAnchor] = useState<string | null>(null);
+  const go = (p: GymPage) => {
+    if (p === "branches" && booking.locationId) setBranchId(booking.locationId);
+    setPage(p);
+    window.scrollTo({ top: 0, behavior: "instant" as ScrollBehavior });
+  };
+  // 첫 화면으로 돌아가며 해당 구간으로 이동 (예약하기, 내 예약)
+  const goHome = (anchor = "top") => {
+    setPage("home");
+    setPendingAnchor(anchor);
+  };
+  useEffect(() => {
+    if (page !== "home" || !pendingAnchor) return;
+    const frame = requestAnimationFrame(() => {
+      if (pendingAnchor === "top") window.scrollTo({ top: 0, behavior: "instant" as ScrollBehavior });
+      else document.getElementById(pendingAnchor)?.scrollIntoView({ behavior: "instant" as ScrollBehavior });
+      setPendingAnchor(null);
+    });
+    return () => cancelAnimationFrame(frame);
+  }, [page, pendingAnchor]);
+  // 하위 화면에 있는 동안 첫 화면 영상은 멈춘다
+  useEffect(() => {
+    if (page !== "home") videoRef.current?.pause();
+  }, [page]);
   const [introKey, setIntroKey] = useState(0);
   const [hoverId, setHoverId] = useState<string | null>(null);
   const [stage, setStage] = useState<"select" | "confirm" | "paid">("select");
@@ -325,7 +375,7 @@ export function HomepageDemo() {
   };
 
   // 가이드는 자동으로 열지 않는다. 한 번도 열지 않았으면 물음표 버튼을 반짝여 알린다(DemoDock과 같은 키).
-  const seenKey = "demo-tour-seen:small-business-homepage";
+  const seenKey = "demo-guide-opened:private-gym";
   const [tutFresh, setTutFresh] = useState(false);
   useEffect(() => {
     const frame = requestAnimationFrame(() => {
@@ -534,34 +584,51 @@ export function HomepageDemo() {
         }
       `}</style>
 
-      {/* 상단 메뉴: 히어로 위에서만 보이고, 스크롤 후에는 스티키 예약 바가 머리글 역할을 한다 */}
-      <nav aria-label="주 메뉴" className="absolute inset-x-0 top-0 z-40 bg-gradient-to-b from-black/55 to-transparent">
-        <div className="flex items-center justify-between gap-3 px-4 py-5 text-white sm:px-8">
-          <a href="#top" className="flex shrink-0 items-center gap-2">
+      {/* 상단 메뉴: 첫 화면에서는 영상 위에 겹치고, 하위 화면에서는 검은 띠로 둔다 */}
+      <nav
+        aria-label="주 메뉴"
+        className={page === "home" ? "absolute inset-x-0 top-0 z-40 bg-gradient-to-b from-black/55 to-transparent" : "relative z-40 bg-[#111]"}
+      >
+        <div className="flex flex-wrap items-center justify-between gap-x-3 gap-y-3 px-4 py-5 text-white sm:flex-nowrap sm:px-8">
+          <button type="button" onClick={() => goHome("top")} className="flex shrink-0 items-center gap-2" aria-label="곰파트너 GYM 홈">
             {/* eslint-disable-next-line @next/next/no-img-element */}
             <img src="/images/logo.svg" alt="" aria-hidden width={28} height={28} className="h-7 w-7 shrink-0" />
             <span className="inline-flex items-baseline gap-1.5 whitespace-nowrap">
               <span className="text-lg font-black tracking-wider">곰파트너</span>
               <span className="text-[11px] font-bold tracking-wider opacity-80">GYM</span>
             </span>
-          </a>
-          <ul className="flex items-center gap-3.5 text-sm font-medium sm:gap-6">
-            <li><a href="#map" className="transition-opacity hover:opacity-70">지점 안내</a></li>
-            <li className="hidden md:block"><a href="#facility" className="transition-opacity hover:opacity-70">시설 안내</a></li>
-            <li className="hidden md:block"><a href="#pricing" className="transition-opacity hover:opacity-70">이용요금</a></li>
-            <li className="hidden md:block"><a href="#info" className="transition-opacity hover:opacity-70">이용안내</a></li>
-            <li><a href="#booking" className="font-bold transition-opacity hover:opacity-70">예약하기</a></li>
+          </button>
+          <ul className="-mx-1 flex w-full items-center gap-4 overflow-x-auto px-1 text-sm font-medium sm:mx-0 sm:w-auto sm:gap-6 sm:overflow-visible sm:px-0">
+            {GYM_PAGES.map((p) => (
+              <li key={p.id} className="shrink-0">
+                <button
+                  type="button"
+                  onClick={() => go(p.id)}
+                  aria-current={page === p.id ? "page" : undefined}
+                  className={`transition-opacity hover:opacity-70 ${page === p.id ? "underline decoration-2 underline-offset-8" : ""}`}
+                >
+                  {p.label}
+                </button>
+              </li>
+            ))}
+            <li className="shrink-0">
+              <button type="button" onClick={() => goHome("booking")} className="font-bold transition-opacity hover:opacity-70">
+                예약하기
+              </button>
+            </li>
             {(booking.reservations ?? []).length > 0 && (
-              <li>
-                <a href="#my-bookings" className="font-bold text-[#4ade80] transition-opacity hover:opacity-70">
+              <li className="shrink-0">
+                <button type="button" onClick={() => goHome("my-bookings")} className="font-bold text-[#4ade80] transition-opacity hover:opacity-70">
                   내 예약 {(booking.reservations ?? []).length}
-                </a>
+                </button>
               </li>
             )}
           </ul>
         </div>
       </nav>
 
+      {/* 첫 화면은 하위 화면에 있는 동안 숨겨만 둔다(지도 크기 측정, 예약 상태 유지) */}
+      <div hidden={page !== "home"}>
       {/* 첫 화면: 매장 안으로 걸어 들어가는 영상 */}
       <header id="top" className="relative h-svh min-h-[600px] overflow-hidden bg-[#111]">
         <video
@@ -1172,181 +1239,6 @@ export function HomepageDemo() {
         </div>
       </section>
 
-      {/* 시설 안내: 공간 사진과 장비 규격 */}
-      <section id="facility" aria-labelledby="facility-title" className="scroll-mt-28 bg-[#F4F4F4] py-16 sm:py-24">
-        <div className="mx-auto max-w-6xl px-4">
-          <SectionHead id="facility-title" title="시설 안내" />
-          <div className="mt-8 grid gap-8 lg:grid-cols-[3fr_2fr]">
-            <div className="grid grid-cols-2 gap-3 sm:gap-4">
-              {gallery.map((g) => (
-                <Reveal key={g.label}>
-                  <figure className="overflow-hidden rounded-lg bg-white">
-                    <img src={g.img} alt={`${g.label} 내부`} className="aspect-[4/3] w-full object-cover" />
-                    <figcaption className="px-3.5 py-2 text-sm font-semibold">{g.label}</figcaption>
-                  </figure>
-                </Reveal>
-              ))}
-            </div>
-            <Reveal>
-              <h3 className="text-lg font-bold">장비 목록</h3>
-              <dl className="mt-3 divide-y divide-stone-200 border-y border-stone-200 text-sm">
-                {equipment.map((e) => (
-                  <div key={e.zone} className="grid grid-cols-[72px_1fr] gap-3 py-3">
-                    <dt className="font-semibold">{e.zone}</dt>
-                    <dd className="text-stone-600">{e.items.join(", ")}</dd>
-                  </div>
-                ))}
-              </dl>
-              <h3 className="mt-7 text-lg font-bold">편의시설</h3>
-              <ul className="mt-3 flex flex-wrap gap-x-5 gap-y-2.5 text-sm text-stone-600">
-                {amenities.map((a) => (
-                  <li key={a.label} className="flex items-center gap-1.5">
-                    <a.icon size={16} strokeWidth={1.6} className="text-stone-500" aria-hidden />
-                    {a.label}
-                  </li>
-                ))}
-              </ul>
-              <p className="mt-4 text-xs text-stone-500">공간 면적 66㎡(20평) 기준. 지점마다 장비 구성이 조금씩 다릅니다.</p>
-            </Reveal>
-          </div>
-        </div>
-      </section>
-
-      {/* 이용요금: 지점 x 시간대 요금표 */}
-      <section id="pricing" aria-labelledby="pricing-title" className="scroll-mt-28 py-16 sm:py-24">
-        <div className="mx-auto max-w-6xl px-4">
-          <SectionHead id="pricing-title" title="이용요금" />
-          <Reveal className="mt-8 overflow-x-auto">
-            <table className="w-full min-w-[340px] border-collapse text-left text-sm">
-              <caption className="sr-only">지점별, 시간대별 1시간 이용요금</caption>
-              <thead>
-                <tr className="border-b-2 border-[#111]">
-                  <th scope="col" className="py-2.5 pr-2 font-semibold text-stone-500">지점</th>
-                  {RATE_BANDS.map((b) => (
-                    <th key={b.id} scope="col" className="px-2 py-2.5 text-right font-bold">
-                      {b.label}
-                      <span className="block tabular-nums text-[11px] font-normal text-stone-500">{b.time}</span>
-                    </th>
-                  ))}
-                </tr>
-              </thead>
-              <tbody className="divide-y divide-stone-200">
-                {locations.map((loc) => (
-                  <tr key={loc.id} className={booking.locationId === loc.id ? "bg-[#16A34A]/10" : undefined}>
-                    <th scope="row" className="py-2.5 pr-2 font-semibold">{loc.name}</th>
-                    {RATE_BANDS.map((b) => (
-                      <td key={b.id} className="px-2 py-2.5 text-right tabular-nums">
-                        {(loc.price + b.diff).toLocaleString()}원
-                      </td>
-                    ))}
-                  </tr>
-                ))}
-              </tbody>
-            </table>
-          </Reveal>
-          <ul className="mt-4 space-y-1 text-sm text-stone-600">
-            <li>1시간 단위 예약, 최소 이용 1시간</li>
-            <li>인원 추가 1인 시간당 {EXTRA_GUEST.toLocaleString()}원 (최대 2명)</li>
-            <li>첫 예약은 1시간 무료 (회원 1인 1회)</li>
-          </ul>
-        </div>
-      </section>
-
-      {/* 이용안내: 출입 방법, 지점별 시설, 주의사항, 환불규정 */}
-      <section id="info" aria-labelledby="info-title" className="scroll-mt-28 bg-[#F4F4F4] py-16 sm:py-24">
-        <div className="mx-auto max-w-6xl px-4">
-          <SectionHead id="info-title" title="이용안내" />
-          <div className="mt-8 grid gap-10 lg:grid-cols-2 lg:gap-14">
-            <div className="space-y-9">
-              <Reveal>
-                <h3 className="text-lg font-bold">이용 방법</h3>
-                <ol className="mt-3 space-y-3 text-sm leading-relaxed text-stone-700">
-                  {[
-                    ["예약·결제", "지점, 날짜, 시간을 선택하고 결제합니다."],
-                    ["출입 안내", "출입 비밀번호는 이용 30분 전 예약자 휴대전화로 문자 발송합니다. 입장 QR로도 출입할 수 있습니다."],
-                    ["이용", "예약한 시간 동안 공간 전체를 단독으로 이용하실 수 있습니다."],
-                    ["퇴실", "다음 이용자를 위해 종료 10분 전부터 정리 부탁드립니다."],
-                  ].map(([k, v], i) => (
-                    <li key={k} className="grid grid-cols-[28px_72px_1fr] gap-2">
-                      <span className="tabular-nums font-bold text-stone-400">{i + 1}</span>
-                      <span className="font-semibold text-[#111]">{k}</span>
-                      <span>{v}</span>
-                    </li>
-                  ))}
-                </ol>
-              </Reveal>
-              <Reveal>
-                <h3 className="text-lg font-bold">주의사항</h3>
-                <ul className="mt-3 list-disc space-y-1.5 pl-5 text-sm leading-relaxed text-stone-700">
-                  <li>실내 전용 운동화를 신어 주시기 바랍니다.</li>
-                  <li>사용한 원판과 덤벨은 제자리에 정리해 주세요.</li>
-                  <li>음료를 제외한 음식물 섭취와 흡연은 금지입니다. 물은 뚜껑 있는 병만 가능합니다.</li>
-                  <li>보안을 위해 출입구와 공용 공간에 CCTV를 운영합니다. 운동 공간 안에는 없습니다.</li>
-                  <li>장비 파손 시 수리비를 청구할 수 있습니다.</li>
-                </ul>
-              </Reveal>
-              <Reveal>
-                <h3 className="text-lg font-bold">비상시 대처</h3>
-                <p className="mt-3 text-sm leading-relaxed text-stone-700">
-                  입구 옆 비상 호출 버튼을 누르거나 관리실(<a href="tel:02-000-0000" className="font-semibold underline underline-offset-2">02-000-0000</a>, 24시간)로 연락해 주시기 바랍니다.
-                  자동심장충격기(AED)는 각 지점 입구에 있습니다.
-                </p>
-              </Reveal>
-            </div>
-            <div className="space-y-9">
-              <Reveal>
-                <h3 className="text-lg font-bold">지점별 시설</h3>
-                <div className="mt-3 overflow-x-auto">
-                  <table className="w-full min-w-[320px] border-collapse text-center text-sm">
-                    <caption className="sr-only">지점별 샤워실, 주차, 락커, PT 동반 가능 여부</caption>
-                    <thead>
-                      <tr className="border-b-2 border-[#111]">
-                        <th scope="col" className="py-2 text-left font-semibold text-stone-500">지점</th>
-                        {(["샤워", "주차", "락커", "PT"] as const).map((f) => (
-                          <th key={f} scope="col" className="px-1 py-2 font-bold">
-                            {f === "샤워" ? "샤워실" : f === "PT" ? "PT 동반" : f}
-                          </th>
-                        ))}
-                      </tr>
-                    </thead>
-                    <tbody className="divide-y divide-stone-200">
-                      {locations.map((loc) => (
-                        <tr key={loc.id}>
-                          <th scope="row" className="py-2 text-left font-semibold">{loc.name}</th>
-                          {(["샤워", "주차", "락커", "PT"] as const).map((f) => {
-                            const has = loc.facilities.includes(f);
-                            return (
-                              <td key={f} className={`px-1 py-2 ${has ? "text-[#15803d]" : "text-stone-400"}`}>
-                                {has ? "가능" : "없음"}
-                              </td>
-                            );
-                          })}
-                        </tr>
-                      ))}
-                    </tbody>
-                  </table>
-                </div>
-                <p className="mt-2 text-xs text-stone-500">운동복과 세면도구는 준비되어 있지 않습니다. 주차는 2시간 무료입니다.</p>
-              </Reveal>
-              <Reveal>
-                <h3 className="text-lg font-bold">취소·환불 규정</h3>
-                <table className="mt-3 w-full border-collapse text-sm">
-                  <caption className="sr-only">취소 시점별 환불 비율</caption>
-                  <tbody className="divide-y divide-stone-200 border-y border-stone-200">
-                    {refundRows.map(([when, rate]) => (
-                      <tr key={when}>
-                        <th scope="row" className="py-2.5 text-left font-medium text-stone-600">{when}</th>
-                        <td className="py-2.5 text-right font-semibold">{rate}</td>
-                      </tr>
-                    ))}
-                  </tbody>
-                </table>
-              </Reveal>
-            </div>
-          </div>
-        </div>
-      </section>
-
       {/* 이용 후기 */}
       <section id="reviews" aria-labelledby="reviews-title" className="scroll-mt-28 py-16 sm:py-24">
         <div className="mx-auto max-w-6xl px-4">
@@ -1419,6 +1311,25 @@ export function HomepageDemo() {
         </Reveal>
       </section>
 
+      </div>
+
+      {page !== "home" && (
+        <GymSubPage page={page} go={go} goHome={goHome}>
+          {page === "branches" && (
+            <BranchPage
+              branchId={branchId}
+              setBranchId={setBranchId}
+              onBook={(id) => {
+                selectLocation(id);
+                goHome("booking");
+              }}
+            />
+          )}
+          {page === "facility" && <FacilityPage />}
+          {page === "pricing" && <PricingPage selectedId={booking.locationId} onBook={() => goHome(booking.locationId ? "booking" : "map")} />}
+          {page === "info" && <InfoPage />}
+        </GymSubPage>
+      )}
       {/* 바닥글: 하단 공용 버튼과 겹치지 않게 아래 여백을 둔다 */}
       <footer className="bg-[#111] pb-24 pt-12 text-sm text-stone-400">
         <div className="mx-auto flex max-w-6xl flex-wrap items-start justify-between gap-6 px-4">
@@ -1616,6 +1527,389 @@ export function HomepageDemo() {
           </motion.div>
         )}
       </AnimatePresence>
+    </div>
+  );
+}
+
+/* ---------- 하위 화면 (짐 투어, 이용요금 및 예약, 이용안내, 지점 안내: 어반 프라이빗짐 GNB 기준) ---------- */
+
+function GymSubPage({
+  page,
+  go,
+  goHome,
+  children,
+}: {
+  page: Exclude<GymPage, "home">;
+  go: (p: GymPage) => void;
+  goHome: (anchor?: string) => void;
+  children: React.ReactNode;
+}) {
+  const label = GYM_PAGES.find((p) => p.id === page)?.label ?? "";
+  const headRef = useRef<HTMLHeadingElement>(null);
+  useEffect(() => {
+    headRef.current?.focus({ preventScroll: true });
+  }, [page]);
+
+  return (
+    <main className="pb-20 sm:pb-28">
+      <div className="bg-[#111] text-white">
+        <div className="mx-auto max-w-6xl px-4 pb-8 pt-6 sm:pb-12 sm:pt-10">
+          <nav aria-label="현재 위치">
+            <ol className="flex items-center gap-1.5 text-sm text-stone-400">
+              <li>
+                <button type="button" onClick={() => goHome("top")} className="hover:text-white">
+                  홈
+                </button>
+              </li>
+              <li aria-hidden>
+                <ChevronRight size={13} />
+              </li>
+              <li aria-current="page" className="text-stone-200">
+                {label}
+              </li>
+            </ol>
+          </nav>
+          <h1 ref={headRef} tabIndex={-1} className="mt-3 text-3xl font-black tracking-tight outline-none sm:text-5xl">
+            {label}
+          </h1>
+        </div>
+      </div>
+      <div className="sticky top-0 z-30 border-b border-stone-200 bg-white">
+        <ul className="mx-auto flex max-w-6xl gap-1 overflow-x-auto px-4 text-[15px]">
+          {GYM_PAGES.map((p) => {
+            const on = p.id === page;
+            return (
+              <li key={p.id} className="shrink-0">
+                <button
+                  type="button"
+                  onClick={() => go(p.id)}
+                  aria-current={on ? "page" : undefined}
+                  className={`inline-flex h-12 items-center border-b-2 px-3 ${on ? "border-[#111] font-bold text-[#111]" : "border-transparent text-stone-500 hover:text-[#111]"}`}
+                >
+                  {p.label}
+                </button>
+              </li>
+            );
+          })}
+        </ul>
+      </div>
+      <div className="mx-auto max-w-6xl px-4 pt-10 sm:pt-14">{children}</div>
+    </main>
+  );
+}
+
+function BranchPage({
+  branchId,
+  setBranchId,
+  onBook,
+}: {
+  branchId: string;
+  setBranchId: (id: string) => void;
+  onBook: (id: string) => void;
+}) {
+  const loc = locations.find((l) => l.id === branchId) ?? locations[0];
+  const info = branchInfo[loc.id];
+  const parking = loc.facilities.includes("주차") ? "건물 주차장 2시간 무료" : "건물 주차 불가, 인근 공영주차장 이용";
+
+  return (
+    <div className="grid gap-8 lg:grid-cols-[200px_1fr] lg:gap-12">
+      <nav aria-label="지점 목록" className="min-w-0">
+        <ul className="-mx-4 flex gap-2 overflow-x-auto px-4 pb-1 lg:mx-0 lg:block lg:space-y-0 lg:overflow-visible lg:border-t lg:border-stone-200 lg:px-0 lg:pb-0">
+          {locations.map((l) => {
+            const on = l.id === loc.id;
+            return (
+              <li key={l.id} className="shrink-0 lg:border-b lg:border-stone-200">
+                <button
+                  type="button"
+                  onClick={() => setBranchId(l.id)}
+                  aria-current={on ? "true" : undefined}
+                  className={`flex w-full items-center justify-between gap-3 rounded-lg border px-4 py-2.5 text-left text-[15px] lg:rounded-none lg:border-0 lg:px-1 lg:py-3.5 ${
+                    on ? "border-[#111] bg-[#111] font-bold text-white lg:bg-transparent lg:text-[#111]" : "border-stone-200 text-stone-600 hover:text-[#111]"
+                  }`}
+                >
+                  {l.name}
+                  <ChevronRight size={15} className={`hidden lg:block ${on ? "text-[#111]" : "text-stone-300"}`} aria-hidden />
+                </button>
+              </li>
+            );
+          })}
+        </ul>
+      </nav>
+
+      <div className="min-w-0">
+        <div className="grid gap-8 md:grid-cols-[1fr_1fr]">
+          <img src={loc.img} alt={`${loc.name} 내부`} className="aspect-[4/3] w-full rounded-lg object-cover" />
+          <div className="min-w-0">
+            <h2 className="text-2xl font-black tracking-tight sm:text-3xl">{loc.name}</h2>
+            <p className="mt-2 flex items-center gap-2 text-sm text-stone-500">
+              <Stars rating={loc.rating} />
+              {loc.rating} <span className="text-stone-400">후기 {loc.reviews}건</span>
+            </p>
+            <dl className="mt-5 divide-y divide-stone-200 border-y border-stone-200 text-sm">
+              {[
+                ["주소", info.addr],
+                ["운영시간", "매일 06:00 ~ 22:00 (연중무휴)"],
+                ["전화번호", "02-000-0000"],
+                ["지하철", info.subway],
+                ["주차", parking],
+              ].map(([k, v]) => (
+                <div key={k} className="grid grid-cols-[72px_1fr] gap-3 py-3">
+                  <dt className="font-semibold">{k}</dt>
+                  <dd className="min-w-0 text-stone-600">{v}</dd>
+                </div>
+              ))}
+              <div className="grid grid-cols-[72px_1fr] gap-3 py-3">
+                <dt className="font-semibold">편의시설</dt>
+                <dd className="flex flex-wrap gap-x-4 gap-y-1.5 text-stone-600">
+                  {loc.facilities.map((f) => {
+                    const Icon = facilityIcons[f];
+                    return (
+                      <span key={f} className="inline-flex items-center gap-1.5">
+                        <Icon size={15} strokeWidth={1.6} aria-hidden />
+                        {f === "샤워" ? "샤워실" : f === "PT" ? "PT 동반" : f}
+                      </span>
+                    );
+                  })}
+                </dd>
+              </div>
+            </dl>
+            <div className="mt-6 flex flex-wrap items-center gap-3">
+              <button
+                type="button"
+                onClick={() => onBook(loc.id)}
+                className="rounded-lg bg-[#111] px-6 py-3 text-sm font-bold text-white transition-colors hover:bg-[#16A34A]"
+              >
+                {loc.name} 예약하기
+              </button>
+              {!loc.available && <span className="text-sm font-semibold text-stone-500">오늘 마감</span>}
+            </div>
+          </div>
+        </div>
+
+        <h3 className="mt-12 text-lg font-bold">{loc.name} 이용요금</h3>
+        <table className="mt-3 w-full border-collapse text-sm">
+          <caption className="sr-only">{loc.name} 시간대별 1시간 이용요금</caption>
+          <tbody className="divide-y divide-stone-200 border-y border-stone-200">
+            {RATE_BANDS.map((b) => (
+              <tr key={b.id}>
+                <th scope="row" className="py-3 text-left font-semibold">
+                  {b.label}
+                  <span className="ml-2 tabular-nums text-xs font-normal text-stone-500">{b.time}</span>
+                </th>
+                <td className="py-3 text-right tabular-nums font-semibold">{(loc.price + b.diff).toLocaleString()}원</td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
+        <p className="mt-2 text-xs text-stone-500">1시간 기준. 인원 추가 1인 시간당 {EXTRA_GUEST.toLocaleString()}원</p>
+      </div>
+    </div>
+  );
+}
+
+function FacilityPage() {
+  return (
+    <div className="space-y-14">
+      <div className="grid gap-8 lg:grid-cols-[3fr_2fr]">
+        <div className="grid grid-cols-2 gap-3 sm:gap-4">
+          {gallery.map((g) => (
+            <figure key={g.label} className="min-w-0 overflow-hidden rounded-lg bg-[#F4F4F4]">
+              <img src={g.img} alt={`${g.label} 내부`} className="aspect-[4/3] w-full object-cover" />
+              <figcaption className="px-3.5 py-2 text-sm font-semibold">{g.label}</figcaption>
+            </figure>
+          ))}
+        </div>
+        <div className="min-w-0">
+          <h2 className="text-lg font-bold">공간 정보</h2>
+          <dl className="mt-3 divide-y divide-stone-200 border-y border-stone-200 text-sm">
+            {[
+              ["공간 면적", "66㎡ (20평)"],
+              ["이용 인원", "최소 1명 ~ 최대 2명"],
+              ["운영시간", "매일 06:00 ~ 22:00"],
+              ["예약 단위", "1시간 (최소 1시간부터)"],
+            ].map(([k, v]) => (
+              <div key={k} className="grid grid-cols-[72px_1fr] gap-3 py-3">
+                <dt className="font-semibold">{k}</dt>
+                <dd className="text-stone-600">{v}</dd>
+              </div>
+            ))}
+          </dl>
+          <h2 className="mt-8 text-lg font-bold">장비 목록</h2>
+          <dl className="mt-3 divide-y divide-stone-200 border-y border-stone-200 text-sm">
+            {equipment.map((e) => (
+              <div key={e.zone} className="grid grid-cols-[72px_1fr] gap-3 py-3">
+                <dt className="font-semibold">{e.zone}</dt>
+                <dd className="text-stone-600">{e.items.join(", ")}</dd>
+              </div>
+            ))}
+          </dl>
+          <h2 className="mt-8 text-lg font-bold">편의시설</h2>
+          <ul className="mt-3 flex flex-wrap gap-x-5 gap-y-2.5 text-sm text-stone-600">
+            {amenities.map((a) => (
+              <li key={a.label} className="flex items-center gap-1.5">
+                <a.icon size={16} strokeWidth={1.6} className="text-stone-500" aria-hidden />
+                {a.label}
+              </li>
+            ))}
+          </ul>
+          <p className="mt-4 text-xs text-stone-500">지점마다 장비 구성이 조금씩 다릅니다.</p>
+        </div>
+      </div>
+
+      <div>
+        <h2 className="text-lg font-bold">지점별 시설</h2>
+        <div className="mt-3 overflow-x-auto">
+          <table className="w-full min-w-[320px] border-collapse text-center text-sm">
+            <caption className="sr-only">지점별 샤워실, 주차, 락커, PT 동반 가능 여부</caption>
+            <thead>
+              <tr className="border-b-2 border-[#111]">
+                <th scope="col" className="py-2 text-left font-semibold text-stone-500">지점</th>
+                {(["샤워", "주차", "락커", "PT"] as const).map((f) => (
+                  <th key={f} scope="col" className="px-1 py-2 font-bold">
+                    {f === "샤워" ? "샤워실" : f === "PT" ? "PT 동반" : f}
+                  </th>
+                ))}
+              </tr>
+            </thead>
+            <tbody className="divide-y divide-stone-200">
+              {locations.map((loc) => (
+                <tr key={loc.id}>
+                  <th scope="row" className="py-2 text-left font-semibold">{loc.name}</th>
+                  {(["샤워", "주차", "락커", "PT"] as const).map((f) => {
+                    const has = loc.facilities.includes(f);
+                    return (
+                      <td key={f} className={`px-1 py-2 ${has ? "text-[#15803d]" : "text-stone-400"}`}>
+                        {has ? "가능" : "없음"}
+                      </td>
+                    );
+                  })}
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
+        <p className="mt-2 text-xs text-stone-500">운동복과 세면도구는 준비되어 있지 않습니다. 주차는 2시간 무료입니다.</p>
+      </div>
+    </div>
+  );
+}
+
+function PricingPage({ selectedId, onBook }: { selectedId: string | null; onBook: () => void }) {
+  return (
+    <div className="space-y-14">
+      <div>
+        <p className="text-sm text-stone-600">사전 예약제로 시간당 요금을 기본으로 합니다.</p>
+        <div className="mt-5 overflow-x-auto">
+          <table className="w-full min-w-[340px] border-collapse text-left text-sm">
+            <caption className="sr-only">지점별, 시간대별 1시간 이용요금</caption>
+            <thead>
+              <tr className="border-b-2 border-[#111]">
+                <th scope="col" className="py-2.5 pr-2 font-semibold text-stone-500">지점</th>
+                {RATE_BANDS.map((b) => (
+                  <th key={b.id} scope="col" className="px-2 py-2.5 text-right font-bold">
+                    {b.label}
+                    <span className="block tabular-nums text-[11px] font-normal text-stone-500">{b.time}</span>
+                  </th>
+                ))}
+              </tr>
+            </thead>
+            <tbody className="divide-y divide-stone-200">
+              {locations.map((loc) => (
+                <tr key={loc.id} className={selectedId === loc.id ? "bg-[#16A34A]/10" : undefined}>
+                  <th scope="row" className="py-2.5 pr-2 font-semibold">{loc.name}</th>
+                  {RATE_BANDS.map((b) => (
+                    <td key={b.id} className="px-2 py-2.5 text-right tabular-nums">
+                      {(loc.price + b.diff).toLocaleString()}원
+                    </td>
+                  ))}
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
+        <ul className="mt-4 space-y-1 text-sm text-stone-600">
+          <li>1시간 단위 예약, 최소 이용 1시간</li>
+          <li>인원 추가 1인 시간당 {EXTRA_GUEST.toLocaleString()}원 (최대 2명)</li>
+          <li>첫 예약은 1시간 무료 (회원 1인 1회)</li>
+        </ul>
+      </div>
+
+      <div className="max-w-xl">
+        <h2 className="text-lg font-bold">취소·환불 규정</h2>
+        <table className="mt-3 w-full border-collapse text-sm">
+          <caption className="sr-only">취소 시점별 환불 비율</caption>
+          <tbody className="divide-y divide-stone-200 border-y border-stone-200">
+            {refundRows.map(([when, rate]) => (
+              <tr key={when}>
+                <th scope="row" className="py-2.5 text-left font-medium text-stone-600">{when}</th>
+                <td className="py-2.5 text-right font-semibold">{rate}</td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
+      </div>
+
+      <button
+        type="button"
+        onClick={onBook}
+        className="rounded-lg bg-[#111] px-7 py-3.5 font-bold text-white transition-colors hover:bg-[#16A34A]"
+      >
+        예약하러 가기
+      </button>
+    </div>
+  );
+}
+
+function InfoPage() {
+  return (
+    <div className="grid gap-12 lg:grid-cols-2 lg:gap-14">
+      <div className="min-w-0 space-y-10">
+        <section>
+          <h2 className="text-lg font-bold">이용 방법</h2>
+          <ol className="mt-3 space-y-3 text-sm leading-relaxed text-stone-700">
+            {[
+              ["예약·결제", "지점, 날짜, 시간을 선택하고 결제합니다."],
+              ["출입 안내", "출입 비밀번호는 이용 30분 전 예약자 휴대전화로 문자 발송합니다. 입장 QR로도 출입할 수 있습니다."],
+              ["이용", "예약한 시간 동안 공간 전체를 단독으로 이용하실 수 있습니다."],
+              ["퇴실", "다음 이용자를 위해 종료 10분 전부터 정리 부탁드립니다."],
+            ].map(([k, v], i) => (
+              <li key={k} className="grid grid-cols-[28px_72px_1fr] gap-2">
+                <span className="tabular-nums font-bold text-stone-400">{i + 1}</span>
+                <span className="font-semibold text-[#111]">{k}</span>
+                <span className="min-w-0">{v}</span>
+              </li>
+            ))}
+          </ol>
+        </section>
+        <section>
+          <h2 className="text-lg font-bold">출입 안내</h2>
+          <ul className="mt-3 list-disc space-y-1.5 pl-5 text-sm leading-relaxed text-stone-700">
+            <li>예약 시간 10분 전부터 입장할 수 있습니다.</li>
+            <li>와이파이 비밀번호는 운동 공간 내부에 게시되어 있습니다.</li>
+          </ul>
+        </section>
+      </div>
+      <div className="min-w-0 space-y-10">
+        <section>
+          <h2 className="text-lg font-bold">주의사항</h2>
+          <ul className="mt-3 list-disc space-y-1.5 pl-5 text-sm leading-relaxed text-stone-700">
+            <li>실내 전용 운동화를 신어 주시기 바랍니다.</li>
+            <li>사용한 원판과 덤벨은 제자리에 정리해 주세요.</li>
+            <li>바벨을 바닥에 던지는 등의 과도한 드랍은 자제 부탁 드립니다.</li>
+            <li>음료를 제외한 음식물 섭취와 흡연은 금지입니다. 물은 뚜껑 있는 병만 가능합니다.</li>
+            <li>보안을 위해 출입구와 공용 공간에 CCTV를 운영합니다. 운동 공간 안에는 없습니다.</li>
+            <li>장비 파손 시 수리비를 청구할 수 있습니다.</li>
+            <li>퇴실 시 조명과 냉난방기 전원을 꺼 주세요.</li>
+          </ul>
+        </section>
+        <section>
+          <h2 className="text-lg font-bold">비상시 대처</h2>
+          <p className="mt-3 text-sm leading-relaxed text-stone-700">
+            입구 옆 비상 호출 버튼을 누르거나 관리실(<a href="tel:02-000-0000" className="font-semibold underline underline-offset-2">02-000-0000</a>, 24시간)로 연락해 주시기 바랍니다.
+            자동심장충격기(AED)는 각 지점 입구에 있습니다.
+          </p>
+        </section>
+      </div>
     </div>
   );
 }

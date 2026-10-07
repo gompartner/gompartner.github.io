@@ -3,7 +3,7 @@
 import { useEffect, useMemo, useRef, useState, useSyncExternalStore } from "react";
 import Image from "next/image";
 import { AnimatePresence, motion } from "framer-motion";
-import { Car, Check, ChevronLeft, Clock3, Menu, Minus, Phone, Plus, ShoppingBag, TrainFront, Trash2, X } from "lucide-react";
+import { Car, Check, ChevronRight, Clock3, Menu, Minus, Phone, Plus, ShoppingBag, TrainFront, Trash2, X } from "lucide-react";
 import { useReducedMotionSafe } from "@/hooks/useReducedMotionSafe";
 
 /* 베이커리 카페 홈페이지 데모: 가상의 곰파트너 베이커리.
@@ -47,15 +47,29 @@ const C = {
 
 const EASE = [0.22, 1, 0.36, 1] as const;
 
-type View = "home" | "order";
+type View = "home" | "oven-time" | "menu-all" | "pickup" | "group" | "about" | "notice" | "store";
 
-const NAV: { id: string; label: string }[] = [
-  { id: "oven", label: "빵 나오는 시간" },
-  { id: "menu", label: "메뉴" },
-  { id: "order", label: "예약 주문" },
-  { id: "about", label: "소개" },
-  { id: "store", label: "매장안내" },
+/* 하위 화면 묶음: 상단 메뉴 하나에 하위 화면 하나 이상 (몽소·삼송빵집 메뉴 구성 기준) */
+const GROUPS: { id: string; label: string; items: { id: View; label: string }[] }[] = [
+  { id: "oven", label: "빵 나오는 시간", items: [{ id: "oven-time", label: "빵 나오는 시간" }] },
+  { id: "menu", label: "메뉴", items: [{ id: "menu-all", label: "메뉴" }] },
+  {
+    id: "order",
+    label: "예약 주문",
+    items: [
+      { id: "pickup", label: "픽업 예약" },
+      { id: "group", label: "단체주문 예약" },
+    ],
+  },
+  { id: "about", label: "매장 소개", items: [{ id: "about", label: "매장 소개" }] },
+  { id: "notice", label: "공지사항", items: [{ id: "notice", label: "공지사항" }] },
+  { id: "store", label: "매장안내", items: [{ id: "store", label: "매장안내" }] },
 ];
+
+const SUB_VIEWS = GROUPS.flatMap((g) => g.items.map((it) => it.id));
+const groupOf = (v: View) => GROUPS.find((g) => g.items.some((it) => it.id === v)) ?? null;
+
+const NAV: { id: View; label: string }[] = GROUPS.map((g) => ({ id: g.items[0].id, label: g.label }));
 
 /* ---------- 시간 ---------- */
 
@@ -250,7 +264,6 @@ export function BakeryCafeDemo() {
   const clock = clockOf(minute);
   const [cart, setCart] = useState<Cart>({});
   const [view, setView] = useState<View>("home");
-  const [orderTab, setOrderTab] = useState<"pickup" | "group">("pickup");
   const pending = useRef<string | null>(null);
   const [navTick, setNavTick] = useState(0);
 
@@ -264,7 +277,7 @@ export function BakeryCafeDemo() {
   const count = Object.values(cart).reduce((s, n) => s + n, 0);
   const total = Object.entries(cart).reduce((s, [id, n]) => s + BREAD_BY_ID[id].price * n, 0);
 
-  // 예약 주문 화면에서 메뉴 링크를 누르면 첫 화면으로 돌아간 뒤 그 구간으로 내려간다
+  // 하위 화면에서 첫 화면 구간(빵 나오는 시간, 메뉴 등)을 누르면 첫 화면으로 돌아간 뒤 그 구간으로 내려간다
   useEffect(() => {
     const target = pending.current;
     if (view !== "home" || !target) return;
@@ -274,9 +287,9 @@ export function BakeryCafeDemo() {
   }, [view, navTick]);
 
   const go = (target: string, tab: "pickup" | "group" = "pickup") => {
-    if (target === "order") {
-      setOrderTab(tab);
-      setView("order");
+    const next = target === "order" ? (tab === "group" ? "group" : "pickup") : target;
+    if (SUB_VIEWS.includes(next as View)) {
+      setView(next as View);
       window.scrollTo({ top: 0 });
       return;
     }
@@ -284,6 +297,31 @@ export function BakeryCafeDemo() {
     setView("home");
     setNavTick((n) => n + 1);
   };
+
+  let body: React.ReactNode = null;
+  switch (view) {
+    case "about":
+      body = <AboutPage />;
+      break;
+    case "store":
+      body = <StoreInfo />;
+      break;
+    case "menu-all":
+      body = <MenuAllPage clock={clock} cart={cart} onAdd={add} />;
+      break;
+    case "oven-time":
+      body = <OvenTimePage clock={clock} />;
+      break;
+    case "pickup":
+      body = <PickupOrder clock={clock} cart={cart} onAdd={add} onClear={() => setCart({})} onBack={() => go("menu-all")} />;
+      break;
+    case "group":
+      body = <GroupOrder minute={minute} />;
+      break;
+    case "notice":
+      body = <NoticePage />;
+      break;
+  }
 
   return (
     <div className="min-h-screen text-[16px] leading-[1.7] md:text-[17px]" style={{ background: C.cream, color: C.ink }}>
@@ -293,25 +331,17 @@ export function BakeryCafeDemo() {
           <Banner onGo={go} />
           <Oven clock={clock} onAdd={(id) => add(id, 1)} />
           <MenuGrid clock={clock} cart={cart} onAdd={add} onGo={go} />
-          <About />
           <Store />
         </main>
       ) : (
         <main>
-          <OrderView
-            minute={minute}
-            clock={clock}
-            cart={cart}
-            tab={orderTab}
-            onTab={setOrderTab}
-            onAdd={add}
-            onClear={() => setCart({})}
-            onBack={() => go("menu")}
-          />
+          <SubPage view={view} onGo={go}>
+            {body}
+          </SubPage>
         </main>
       )}
       <Footer />
-      <CartBar show={view === "home" && count > 0} count={count} total={total} onOrder={() => go("order")} />
+      <CartBar show={(view === "home" || view === "menu-all" || view === "oven-time") && count > 0} count={count} total={total} onOrder={() => go("order")} />
     </div>
   );
 }
@@ -342,24 +372,21 @@ function Header({ view, count, onGo }: { view: View; count: number; onGo: (targe
     return () => window.removeEventListener("keydown", onKey);
   }, [open]);
 
-  const navLink = (n: { id: string; label: string }, cls: string) => {
-    const current = n.id === "order" ? view === "order" : false;
+  const navLink = (n: { id: View; label: string }, cls: string) => {
+    const current = view !== "home" && groupOf(view)?.id === groupOf(n.id)?.id;
     return (
-      <a
-        href={`#${n.id}`}
+      <button
+        type="button"
         aria-current={current ? "page" : undefined}
-        onClick={(e) => {
+        onClick={() => {
           setOpen(false);
-          if (n.id === "order" || view !== "home") {
-            e.preventDefault();
-            onGo(n.id);
-          }
+          onGo(n.id);
         }}
         className={cls}
         style={current ? { color: C.crust } : undefined}
       >
         {n.label}
-      </a>
+      </button>
     );
   };
 
@@ -378,7 +405,7 @@ function Header({ view, count, onGo }: { view: View; count: number; onGo: (targe
         >
           <Logo />
         </a>
-        <nav aria-label="주 메뉴" className="hidden md:block">
+        <nav aria-label="주 메뉴" className="hidden lg:block">
           <ul className="flex items-center gap-7 text-[16px] font-semibold">
             {NAV.map((n) => (
               <li key={n.id}>{navLink(n, "transition-colors hover:text-[#9a4f1c]")}</li>
@@ -401,7 +428,7 @@ function Header({ view, count, onGo }: { view: View; count: number; onGo: (targe
           </button>
           <button
             type="button"
-            className="inline-flex h-11 w-11 items-center justify-center rounded-full md:hidden"
+            className="inline-flex h-11 w-11 items-center justify-center rounded-full lg:hidden"
             aria-label={open ? "메뉴 닫기" : "메뉴 열기"}
             aria-expanded={open}
             aria-controls="bakery-menu"
@@ -416,7 +443,7 @@ function Header({ view, count, onGo }: { view: View; count: number; onGo: (targe
           <motion.nav
             id="bakery-menu"
             aria-label="주 메뉴"
-            className="overflow-hidden border-t md:hidden"
+            className="overflow-hidden border-t lg:hidden"
             style={{ borderColor: C.line }}
             initial={reduce ? false : { height: 0 }}
             animate={{ height: "auto" }}
@@ -425,7 +452,7 @@ function Header({ view, count, onGo }: { view: View; count: number; onGo: (targe
           >
             <ul className="px-4 py-2">
               {NAV.map((n) => (
-                <li key={n.id}>{navLink(n, "flex h-12 items-center text-[17px] font-semibold")}</li>
+                <li key={n.id}>{navLink(n, "flex h-12 w-full items-center text-[17px] font-semibold")}</li>
               ))}
               <li>
                 <a href={`tel:${TEL}`} className="flex h-12 items-center gap-2 text-[17px] font-semibold" style={{ color: C.crust }}>
@@ -945,68 +972,252 @@ const SLOTS = Array.from({ length: 23 }, (_, i) => 510 + i * 30); // 08:30 ~ 19:
 
 type ReceiptData = { no: string; items: [string, number][]; day: string; slot: number; name: string; phone: string };
 
-function OrderView({
-  minute,
-  clock,
-  cart,
-  tab,
-  onTab,
-  onAdd,
-  onClear,
-  onBack,
-}: {
-  minute: number;
-  clock: Clock;
-  cart: Cart;
-  tab: "pickup" | "group";
-  onTab: (t: "pickup" | "group") => void;
-  onAdd: (id: string, delta: number) => void;
-  onClear: () => void;
-  onBack: () => void;
-}) {
-  const titleRef = useRef<HTMLHeadingElement>(null);
+/* ---------- 하위 화면 틀 ---------- */
+
+function SubPage({ view, onGo, children }: { view: View; onGo: (target: string) => void; children: React.ReactNode }) {
+  const group = groupOf(view)!;
+  const label = group.items.find((it) => it.id === view)?.label ?? group.label;
+  const headRef = useRef<HTMLHeadingElement>(null);
   useEffect(() => {
-    titleRef.current?.focus();
-  }, []);
+    headRef.current?.focus({ preventScroll: true });
+  }, [view]);
 
   return (
-    <section aria-labelledby="order-title" id="order" className="px-4 py-8 md:px-6 md:py-12">
-      <div className="mx-auto max-w-[1200px]">
-        <button type="button" onClick={onBack} className="-ml-1 inline-flex h-10 items-center gap-1 text-[15px] font-semibold" style={{ color: C.muted }}>
-          <ChevronLeft size={18} aria-hidden />
-          메뉴
-        </button>
-        <SectionTitle
-          id="order-title"
-          title="예약 주문"
-          aside={
-            <div className="flex gap-1" role="group" aria-label="예약 종류">
-              {(
-                [
-                  ["pickup", "픽업 예약"],
-                  ["group", "단체주문 예약"],
-                ] as const
-              ).map(([v, label]) => (
-                <button
-                  key={v}
-                  type="button"
-                  aria-pressed={tab === v}
-                  onClick={() => onTab(v)}
-                  className="h-10 rounded-[6px] border px-3.5 text-[15px] font-semibold"
-                  style={tab === v ? { background: C.ink, color: "#fff", borderColor: C.ink } : { borderColor: C.line, background: C.paper }}
-                >
-                  {label}
+    <>
+      <div className="border-b px-4 md:px-6" style={{ background: C.kraft, borderColor: C.line }}>
+        <div className="mx-auto max-w-[1200px] pb-8 pt-6 md:pb-10 md:pt-8">
+          <nav aria-label="현재 위치">
+            <ol className="flex flex-wrap items-center gap-1.5 text-[14px]" style={{ color: C.muted }}>
+              <li>
+                <button type="button" onClick={() => onGo("top")} className="hover:underline">
+                  홈
                 </button>
-              ))}
-            </div>
-          }
-        />
-        <h3 ref={titleRef} tabIndex={-1} className="sr-only">
-          {tab === "pickup" ? "픽업 예약" : "단체주문 예약"}
-        </h3>
-        {tab === "pickup" ? <PickupOrder clock={clock} cart={cart} onAdd={onAdd} onClear={onClear} onBack={onBack} /> : <GroupOrder minute={minute} />}
+              </li>
+              <li aria-hidden>
+                <ChevronRight size={14} />
+              </li>
+              <li aria-current={group.items.length > 1 ? undefined : "page"}>{group.label}</li>
+              {group.items.length > 1 && (
+                <>
+                  <li aria-hidden>
+                    <ChevronRight size={14} />
+                  </li>
+                  <li aria-current="page" className="font-semibold" style={{ color: C.ink }}>
+                    {label}
+                  </li>
+                </>
+              )}
+            </ol>
+          </nav>
+          <h1 ref={headRef} tabIndex={-1} className="mt-2 text-[30px] font-bold tracking-[-0.03em] outline-none md:text-[40px]">
+            {label}
+          </h1>
+        </div>
       </div>
-    </section>
+      {group.items.length > 1 && (
+        <div className="border-b px-4 md:px-6" style={{ background: C.paper, borderColor: C.line }}>
+          <ul className="mx-auto flex max-w-[1200px] gap-1 overflow-x-auto">
+            {group.items.map((it) => {
+              const on = it.id === view;
+              return (
+                <li key={it.id} className="shrink-0">
+                  <button
+                    type="button"
+                    onClick={() => onGo(it.id)}
+                    aria-current={on ? "page" : undefined}
+                    className="-mb-px inline-flex h-12 items-center border-b-[3px] px-3.5 text-[16px] font-bold"
+                    style={on ? { borderColor: C.crust, color: C.crust } : { borderColor: "transparent", color: C.muted }}
+                  >
+                    {it.label}
+                  </button>
+                </li>
+              );
+            })}
+          </ul>
+        </div>
+      )}
+      <div className="px-4 pb-16 pt-8 md:px-6 md:pb-24 md:pt-10">
+        <div className="mx-auto max-w-[1200px]">{children}</div>
+      </div>
+    </>
+  );
+}
+
+/* ---------- 빵 나오는 시간 (전체 시간표) ---------- */
+
+function OvenTimePage({ clock }: { clock: Clock }) {
+  return (
+    <div className="grid gap-10 lg:grid-cols-[1fr_320px] lg:gap-14">
+      <div className="min-w-0">
+        <table className="w-full border-t-2 text-[15px]" style={{ borderColor: C.ink }}>
+          <caption className="sr-only">빵 나오는 시간표</caption>
+          <thead>
+            <tr className="border-b" style={{ borderColor: C.line }}>
+              <th scope="col" className="w-[72px] py-3 text-left font-semibold">시간</th>
+              <th scope="col" className="py-3 text-left font-semibold">빵</th>
+              <th scope="col" className="w-[56px] py-3 text-right font-semibold">수량</th>
+              <th scope="col" className="hidden w-[120px] py-3 text-right font-semibold sm:table-cell">지금</th>
+            </tr>
+          </thead>
+          <tbody>
+            {BATCHES.map((b) => {
+              const s = batchState(b, clock);
+              return (
+                <tr key={b.at} className="border-b" style={{ borderColor: C.line }}>
+                  <td className="py-3 font-semibold tabular-nums" style={{ color: C.crust }}>
+                    {hhmm(b.at)}
+                  </td>
+                  <td className="py-3 font-semibold">{BREAD_BY_ID[b.bread].name}</td>
+                  <td className="py-3 text-right tabular-nums">{b.qty}개</td>
+                  <td className="hidden py-3 text-right text-[14px] sm:table-cell" style={{ color: s.kind === "out" && s.left > 0 ? C.green : C.muted }}>
+                    {stateText(s)}
+                  </td>
+                </tr>
+              );
+            })}
+          </tbody>
+        </table>
+      </div>
+      <div className="min-w-0">
+        <dl className="border-t-2 text-[15px]" style={{ borderColor: C.ink }}>
+          {[
+            ["빵 나오는 시간", "08:00 ~ 17:00"],
+            ["영업시간", "화요일 ~ 일요일 08:00 ~ 20:00"],
+            ["정기휴무", "매주 월요일"],
+          ].map(([k, v]) => (
+            <div key={k} className="border-b py-3" style={{ borderColor: C.line }}>
+              <dt style={{ color: C.muted }}>{k}</dt>
+              <dd className="font-semibold tabular-nums">{v}</dd>
+            </div>
+          ))}
+        </dl>
+      </div>
+    </div>
+  );
+}
+
+/* ---------- 메뉴 (전체, 설명 포함) ---------- */
+
+function MenuAllPage({ clock, cart, onAdd }: { clock: Clock; cart: Cart; onAdd: (id: string, delta: number) => void }) {
+  return (
+    <div className="space-y-12">
+      {CATS.filter((c) => c.id !== "all").map((c) => (
+        <section key={c.id} aria-labelledby={`cat-${c.id}`}>
+          <h2 id={`cat-${c.id}`} className="border-b-2 pb-2 text-[22px] font-bold tracking-[-0.02em]" style={{ borderColor: C.ink }}>
+            {c.label}
+          </h2>
+          <ul>
+            {BREADS.filter((b) => b.cat === c.id).map((b) => {
+              const n = cart[b.id] ?? 0;
+              const s = breadNow(b.id, clock);
+              return (
+                <li key={b.id} className="flex gap-4 border-b py-4" style={{ borderColor: C.line }}>
+                  {/* eslint-disable-next-line @next/next/no-img-element */}
+                  <img src={breadImg(b.id)} alt={b.name} loading="lazy" className="h-[88px] w-[88px] shrink-0 rounded-[6px] object-cover md:h-[110px] md:w-[110px]" />
+                  <div className="min-w-0 flex-1">
+                    <div className="flex flex-wrap items-baseline justify-between gap-x-3">
+                      <p className="text-[18px] font-bold">{b.name}</p>
+                      <p className="font-semibold tabular-nums">{won(b.price)}</p>
+                    </div>
+                    <p className="mt-0.5 text-[15px]" style={{ color: C.muted }}>
+                      {b.desc}
+                    </p>
+                    <p className="mt-1 text-[13px]" style={{ color: C.muted }}>
+                      {allergyTags(b).join(" · ")} · 첫 출고 {hhmm(FIRST_AT[b.id])}
+                    </p>
+                    <div className="mt-2 flex items-center justify-between gap-3">
+                      <span className="text-[13px] font-semibold tabular-nums" style={{ color: s.kind === "sale" ? C.green : C.muted }}>
+                        {nowLine(s)}
+                      </span>
+                      {n === 0 ? (
+                        <button
+                          type="button"
+                          onClick={() => onAdd(b.id, 1)}
+                          aria-label={`${b.name} 담기`}
+                          className="inline-flex h-9 shrink-0 items-center gap-1 rounded-[6px] border px-3 text-[14px] font-semibold"
+                          style={{ borderColor: C.crust, color: C.crust }}
+                        >
+                          <Plus size={15} aria-hidden />
+                          담기
+                        </button>
+                      ) : (
+                        <div className="flex h-9 shrink-0 items-center rounded-[6px]" style={{ background: C.crust, color: "#fff" }}>
+                          <button type="button" onClick={() => onAdd(b.id, -1)} aria-label={`${b.name} 하나 빼기`} className="inline-flex h-9 w-9 items-center justify-center">
+                            <Minus size={15} aria-hidden />
+                          </button>
+                          <span className="w-6 text-center font-bold tabular-nums" aria-live="polite">
+                            {n}
+                            <span className="sr-only">개 담음</span>
+                          </span>
+                          <button type="button" onClick={() => onAdd(b.id, 1)} aria-label={`${b.name} 하나 더 담기`} className="inline-flex h-9 w-9 items-center justify-center">
+                            <Plus size={15} aria-hidden />
+                          </button>
+                        </div>
+                      )}
+                    </div>
+                  </div>
+                </li>
+              );
+            })}
+          </ul>
+        </section>
+      ))}
+      <p className="text-[14px]" style={{ color: C.muted }}>
+        모든 빵을 같은 작업대에서 만들어 다른 재료가 섞일 수 있습니다.
+      </p>
+    </div>
+  );
+}
+
+/* ---------- 공지사항 ---------- */
+
+const NOTICES = [
+  { no: 6, title: "10월 휴무 안내", date: "2026.10.01", body: ["10월 5일(월), 12일(월), 19일(월), 26일(월) 정기휴무", "10월 9일(금) 한글날 정상 영업"] },
+  { no: 5, title: "[EVENT] 소금빵 DAY", date: "2026.09.20", body: ["매월 마지막 주 토요일", "소금빵 5개 구매 시 1개 증정"] },
+  { no: 4, title: "추석 연휴 휴무 안내", date: "2026.09.10", body: ["9월 24일(목) ~ 9월 26일(토) 휴무", "9월 27일(일)부터 정상 영업"] },
+  { no: 3, title: "단체주문 예약 안내", date: "2026.08.28", body: ["20개 이상 단체주문과 홀 케이크는 이틀 전까지 예약합니다.", "개별 포장 가능"] },
+  { no: 2, title: "곰파트너 베이커리는 천연 발효종을 사용합니다.", date: "2026.08.01", body: ["깜파뉴, 무화과 호두 깜파뉴는 천연 발효종으로 48시간 저온 숙성합니다."] },
+  { no: 1, title: "홈페이지 오픈", date: "2026.07.15", body: ["빵 나오는 시간과 픽업 예약을 홈페이지에서 확인할 수 있습니다."] },
+];
+
+function NoticePage() {
+  const [open, setOpen] = useState<number | null>(NOTICES[0].no);
+  return (
+    <div>
+      <p className="text-[15px]" style={{ color: C.muted }}>
+        전체 <strong className="tabular-nums" style={{ color: C.ink }}>{NOTICES.length}</strong>건
+      </p>
+      <ul className="mt-3 border-t-2" style={{ borderColor: C.ink }}>
+        {NOTICES.map((n) => {
+          const on = open === n.no;
+          return (
+            <li key={n.no} className="border-b" style={{ borderColor: C.line }}>
+              <button
+                type="button"
+                onClick={() => setOpen(on ? null : n.no)}
+                aria-expanded={on}
+                className="flex w-full items-center gap-3 py-4 text-left md:gap-5"
+              >
+                <span className="hidden w-10 shrink-0 text-center text-[14px] tabular-nums sm:block" style={{ color: C.muted }}>
+                  {n.no}
+                </span>
+                <span className="min-w-0 flex-1 font-semibold">{n.title}</span>
+                <span className="shrink-0 text-[14px] tabular-nums" style={{ color: C.muted }}>
+                  {n.date}
+                </span>
+              </button>
+              {on && (
+                <ul className="mb-4 space-y-1 rounded-[6px] px-5 py-4 text-[15px] sm:ml-[60px]" style={{ background: C.paper }}>
+                  {n.body.map((line) => (
+                    <li key={line}>{line}</li>
+                  ))}
+                </ul>
+              )}
+            </li>
+          );
+        })}
+      </ul>
+    </div>
   );
 }
 
@@ -1434,33 +1645,47 @@ function Receipt({ data, onClose }: { data: ReceiptData | null; onClose: () => v
 
 /* ---------- 소개 ---------- */
 
-function About() {
+function AboutPage() {
   return (
-    <section aria-labelledby="about-title" id="about" className="scroll-mt-16 px-4 py-14 md:px-6 md:py-20">
-      <div className="mx-auto max-w-[1200px]">
-        <SectionTitle id="about-title" title="소개" />
-        <div className="relative mt-8 aspect-[16/9] overflow-hidden rounded-[8px] md:aspect-[21/8]">
-          <Image src={`${IMG}/display.jpg`} alt="크루아상, 깜파뉴, 크림빵, 과일 타르트가 놓인 진열대" fill sizes="(min-width: 1200px) 1200px, 100vw" className="object-cover" />
-        </div>
-        <p className="mt-8 text-[22px] font-bold tracking-[-0.02em] md:text-[26px]">당일 생산 · 당일 판매</p>
-        <dl className="mt-5 grid gap-5 md:grid-cols-3 md:gap-8">
-          {[
-            ["04:00", "반죽 시작. 깜파뉴 반죽은 이틀 전에 미리 준비합니다."],
-            ["17:00", "마지막 소금빵이 나옵니다. 이후에는 남은 빵만 판매합니다."],
-            ["19:00", "남은 빵 30% 할인. 당일 생산·당일 판매를 원칙으로 하며, 남은 빵은 □□동 지역아동센터에 기부합니다."],
-          ].map(([t, d]) => (
-            <div key={t} className="border-t pt-4" style={{ borderColor: C.kraftDeep }}>
-              <dt className="text-[20px] font-bold tabular-nums" style={{ color: C.crust }}>
-                {t}
-              </dt>
-              <dd className="mt-1" style={{ color: C.muted }}>
-                {d}
-              </dd>
-            </div>
-          ))}
-        </dl>
+    <div>
+      <div className="relative aspect-[16/9] overflow-hidden rounded-[8px] md:aspect-[21/8]">
+        <Image src={`${IMG}/display.jpg`} alt="크루아상, 깜파뉴, 크림빵, 과일 타르트가 놓인 진열대" fill sizes="(min-width: 1200px) 1200px, 100vw" className="object-cover" />
       </div>
-    </section>
+      <p className="mt-8 text-[22px] font-bold tracking-[-0.02em] md:text-[26px]">당일 생산 · 당일 판매</p>
+      <dl className="mt-5 grid gap-5 md:grid-cols-3 md:gap-8">
+        {[
+          ["04:00", "반죽 시작. 깜파뉴 반죽은 이틀 전에 미리 준비합니다."],
+          ["17:00", "마지막 소금빵이 나옵니다. 이후에는 남은 빵만 판매합니다."],
+          ["19:00", "남은 빵 30% 할인. 당일 생산·당일 판매를 원칙으로 하며, 남은 빵은 □□동 지역아동센터에 기부합니다."],
+        ].map(([t, d]) => (
+          <div key={t} className="border-t pt-4" style={{ borderColor: C.kraftDeep }}>
+            <dt className="text-[20px] font-bold tabular-nums" style={{ color: C.crust }}>
+              {t}
+            </dt>
+            <dd className="mt-1" style={{ color: C.muted }}>
+              {d}
+            </dd>
+          </div>
+        ))}
+      </dl>
+      <h2 className="mt-14 border-b-2 pb-2 text-[22px] font-bold tracking-[-0.02em]" style={{ borderColor: C.ink }}>
+        재료
+      </h2>
+      <dl className="text-[15px]">
+        {[
+          ["밀가루", "프랑스밀, 국산 통밀"],
+          ["버터", "프랑스산 버터"],
+          ["발효종", "천연 발효종 (깜파뉴)"],
+          ["팥", "국산 팥, 직접 만든 앙금"],
+          ["쌀가루", "국산 쌀 100% (쌀 카스텔라)"],
+        ].map(([k, v]) => (
+          <div key={k} className="grid grid-cols-[88px_1fr] gap-3 border-b py-3" style={{ borderColor: C.line }}>
+            <dt className="font-semibold">{k}</dt>
+            <dd style={{ color: C.muted }}>{v}</dd>
+          </div>
+        ))}
+      </dl>
+    </div>
   );
 }
 
@@ -1510,49 +1735,55 @@ function Store() {
     <section aria-labelledby="store-title" id="store" className="scroll-mt-16 px-4 py-14 md:px-6 md:py-20" style={{ background: C.kraft }}>
       <div className="mx-auto max-w-[1200px]">
         <SectionTitle id="store-title" title="매장안내" />
-        <div className="mt-8 grid gap-8 md:grid-cols-[1.2fr_1fr] md:gap-12">
-          <div className="overflow-hidden rounded-[8px] border" style={{ borderColor: C.line }}>
-            <MiniMap />
-          </div>
-          <div>
-            <p className="text-[20px] font-bold tracking-[-0.02em]">{ADDRESS}</p>
-            <ul className="mt-4 space-y-3">
-              {[
-                { icon: TrainFront, title: "지하철", body: "□□역 2번 출구에서 도보 5분" },
-                { icon: Car, title: "주차", body: "매장 앞 주차 불가. 50m 옆 □□동 공영주차장을 이용해 주세요." },
-              ].map((r) => (
-                <li key={r.title} className="flex gap-3">
-                  <r.icon size={20} className="mt-1 shrink-0" style={{ color: C.crust }} aria-hidden />
-                  <span>
-                    <span className="font-semibold">{r.title}</span>
-                    <span className="block text-[15px]" style={{ color: C.muted }}>
-                      {r.body}
-                    </span>
-                  </span>
-                </li>
-              ))}
-            </ul>
-            <table className="mt-6 w-full border-t text-[15px]" style={{ borderColor: C.kraftDeep }}>
-              <caption className="sr-only">영업시간</caption>
-              <tbody>
-                {HOURS.map((h) => (
-                  <tr key={h.label} className="border-b" style={{ borderColor: C.kraftDeep }}>
-                    <th scope="row" className="py-3 text-left font-normal" style={{ color: C.muted }}>
-                      {h.label}
-                    </th>
-                    <td className="py-3 text-right font-semibold tabular-nums">{h.time}</td>
-                  </tr>
-                ))}
-              </tbody>
-            </table>
-            <a href={`tel:${TEL}`} className="mt-5 inline-flex h-12 items-center gap-2 rounded-[6px] px-6 font-semibold" style={{ background: C.crust, color: "#fff" }}>
-              <Phone size={18} aria-hidden />
-              {TEL}
-            </a>
-          </div>
-        </div>
+        <StoreInfo />
       </div>
     </section>
+  );
+}
+
+function StoreInfo() {
+  return (
+    <div className="mt-8 grid gap-8 md:grid-cols-[1.2fr_1fr] md:gap-12">
+      <div className="overflow-hidden rounded-[8px] border" style={{ borderColor: C.line }}>
+        <MiniMap />
+      </div>
+      <div>
+        <p className="text-[20px] font-bold tracking-[-0.02em]">{ADDRESS}</p>
+        <ul className="mt-4 space-y-3">
+          {[
+            { icon: TrainFront, title: "지하철", body: "□□역 2번 출구에서 도보 5분" },
+            { icon: Car, title: "주차", body: "매장 앞 주차 불가. 50m 옆 □□동 공영주차장을 이용해 주세요." },
+          ].map((r) => (
+            <li key={r.title} className="flex gap-3">
+              <r.icon size={20} className="mt-1 shrink-0" style={{ color: C.crust }} aria-hidden />
+              <span>
+                <span className="font-semibold">{r.title}</span>
+                <span className="block text-[15px]" style={{ color: C.muted }}>
+                  {r.body}
+                </span>
+              </span>
+            </li>
+          ))}
+        </ul>
+        <table className="mt-6 w-full border-t text-[15px]" style={{ borderColor: C.kraftDeep }}>
+          <caption className="sr-only">영업시간</caption>
+          <tbody>
+            {HOURS.map((h) => (
+              <tr key={h.label} className="border-b" style={{ borderColor: C.kraftDeep }}>
+                <th scope="row" className="py-3 text-left font-normal" style={{ color: C.muted }}>
+                  {h.label}
+                </th>
+                <td className="py-3 text-right font-semibold tabular-nums">{h.time}</td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
+        <a href={`tel:${TEL}`} className="mt-5 inline-flex h-12 items-center gap-2 rounded-[6px] px-6 font-semibold" style={{ background: C.crust, color: "#fff" }}>
+          <Phone size={18} aria-hidden />
+          {TEL}
+        </a>
+      </div>
+    </div>
   );
 }
 

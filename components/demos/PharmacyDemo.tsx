@@ -7,6 +7,7 @@ import {
   AArrowUp,
   Camera,
   Check,
+  ChevronRight,
   Menu,
   MessageSquare,
   Phone,
@@ -52,14 +53,28 @@ const C = {
 
 const EASE = [0.22, 1, 0.36, 1] as const;
 
-const NAV = [
-  { id: "top", label: "약국소개" },
-  { id: "hours", label: "운영시간" },
-  { id: "rx", label: "처방전 전송" },
-  { id: "stock", label: "취급 품목" },
-  { id: "pillbox", label: "복약 달력" },
-  { id: "location", label: "오시는 길" },
+/* 하위 화면 묶음: 메디서비스 약국 템플릿 메뉴(약국소개, 약사소개, 운영시간, 오시는 길) + 이 약국 기능 */
+type Page = "home" | "about" | "pharmacists" | "hours" | "rx" | "stock" | "pillbox" | "location";
+
+const GROUPS: { id: string; label: string; items: { id: Page; label: string }[] }[] = [
+  {
+    id: "about",
+    label: "약국소개",
+    items: [
+      { id: "about", label: "약국소개" },
+      { id: "pharmacists", label: "약사소개" },
+    ],
+  },
+  { id: "hours", label: "운영시간", items: [{ id: "hours", label: "운영시간" }] },
+  { id: "rx", label: "처방전 전송", items: [{ id: "rx", label: "처방전 전송" }] },
+  { id: "stock", label: "취급 품목", items: [{ id: "stock", label: "취급 품목" }] },
+  { id: "pillbox", label: "복약 달력", items: [{ id: "pillbox", label: "복약 달력" }] },
+  { id: "location", label: "오시는 길", items: [{ id: "location", label: "오시는 길" }] },
 ];
+
+const groupOf = (p: Page) => GROUPS.find((g) => g.items.some((it) => it.id === p)) ?? null;
+
+const NAV = GROUPS.map((g) => ({ id: g.items[0].id, label: g.label }));
 
 /* ---------- 시간 ---------- */
 
@@ -189,22 +204,59 @@ function maskPhone(phone: string) {
 export function PharmacyDemo() {
   const minute = useNowMinute();
   const [big, setBig] = useState(false);
+  const [page, setPage] = useState<Page>("home");
   const status = statusAt(minute);
+
+  const go = (p: Page) => {
+    setPage(p);
+    window.scrollTo({ top: 0 });
+  };
+
+  let body: React.ReactNode = null;
+  switch (page) {
+    case "about":
+      body = <AboutPage />;
+      break;
+    case "pharmacists":
+      body = <PharmacistsPage />;
+      break;
+    case "hours":
+      body = <HoursPage minute={minute} />;
+      break;
+    case "rx":
+      body = <Prescription status={status} />;
+      break;
+    case "stock":
+      body = <Stock />;
+      break;
+    case "pillbox":
+      body = <Pillbox minute={minute} />;
+      break;
+    case "location":
+      body = <Location />;
+      break;
+  }
 
   return (
     <div className="min-h-screen text-[17px] leading-[1.6]" style={{ background: C.bg, color: C.ink }}>
-      <Header big={big} onBig={() => setBig((v) => !v)} status={status} />
+      <Header big={big} onBig={() => setBig((v) => !v)} status={status} page={page} go={go} />
       <main style={{ zoom: big ? 1.18 : 1 }} className="px-4 pb-16 pt-5 md:px-6 md:pt-8">
-        <div className="mx-auto max-w-[1200px] space-y-5 md:space-y-6">
-          <Intro />
-          <div className="grid items-start gap-5 md:gap-6 lg:grid-cols-[1.15fr_1fr]">
-            <Hours minute={minute} />
-            <Location />
+        {page === "home" ? (
+          <div className="mx-auto max-w-[1200px] space-y-5 md:space-y-6">
+            <Intro />
+            <div className="grid items-start gap-5 md:gap-6 lg:grid-cols-[1.15fr_1fr]">
+              <Hours minute={minute} />
+              <Location />
+            </div>
+            <Prescription status={status} />
+            <Stock />
+            <Pillbox minute={minute} />
           </div>
-          <Prescription status={status} />
-          <Stock />
-          <Pillbox minute={minute} />
-        </div>
+        ) : (
+          <SubPage page={page} go={go}>
+            {body}
+          </SubPage>
+        )}
       </main>
       <Footer />
     </div>
@@ -247,7 +299,19 @@ function StatusStrip({ status }: { status: Status | null }) {
   );
 }
 
-function Header({ big, onBig, status }: { big: boolean; onBig: () => void; status: Status | null }) {
+function Header({
+  big,
+  onBig,
+  status,
+  page,
+  go,
+}: {
+  big: boolean;
+  onBig: () => void;
+  status: Status | null;
+  page: Page;
+  go: (p: Page) => void;
+}) {
   const [open, setOpen] = useState(false);
   const reduce = useReducedMotionSafe();
 
@@ -262,16 +326,22 @@ function Header({ big, onBig, status }: { big: boolean; onBig: () => void; statu
     <header className="sticky top-0 z-40 border-b bg-white print:hidden" style={{ borderColor: C.line }}>
       <StatusStrip status={status} />
       <div className="mx-auto flex h-16 max-w-[1200px] items-center justify-between gap-3 px-4 md:px-6">
-        <a href="#top" aria-label={`${PHARMACY} 처음으로`}>
+        <button type="button" onClick={() => go("home")} aria-label={`${PHARMACY} 처음으로`}>
           <Logo />
-        </a>
+        </button>
         <nav aria-label="주 메뉴" className="hidden lg:block">
           <ul className="flex items-center gap-6 text-[16px] font-semibold">
             {NAV.map((n) => (
               <li key={n.id}>
-                <a href={`#${n.id}`} className="transition-colors hover:text-[#0b7a5f]">
+                <button
+                  type="button"
+                  onClick={() => go(n.id)}
+                  aria-current={groupOf(page)?.label === n.label ? "page" : undefined}
+                  className="transition-colors hover:text-[#0b7a5f]"
+                  style={groupOf(page)?.label === n.label ? { color: C.mint } : undefined}
+                >
                   {n.label}
-                </a>
+                </button>
               </li>
             ))}
           </ul>
@@ -319,9 +389,18 @@ function Header({ big, onBig, status }: { big: boolean; onBig: () => void; statu
             <ul className="grid grid-cols-2 px-4 py-2">
               {NAV.map((n) => (
                 <li key={n.id}>
-                  <a href={`#${n.id}`} onClick={() => setOpen(false)} className="flex h-12 items-center text-[17px] font-semibold">
+                  <button
+                    type="button"
+                    onClick={() => {
+                      setOpen(false);
+                      go(n.id);
+                    }}
+                    aria-current={groupOf(page)?.label === n.label ? "page" : undefined}
+                    className="flex h-12 w-full items-center text-left text-[17px] font-semibold"
+                    style={groupOf(page)?.label === n.label ? { color: C.mint } : undefined}
+                  >
                     {n.label}
-                  </a>
+                  </button>
                 </li>
               ))}
             </ul>
@@ -329,6 +408,187 @@ function Header({ big, onBig, status }: { big: boolean; onBig: () => void; statu
         )}
       </AnimatePresence>
     </header>
+  );
+}
+
+/* ---------- 하위 화면 ---------- */
+
+function SubPage({ page, go, children }: { page: Page; go: (p: Page) => void; children: React.ReactNode }) {
+  const group = groupOf(page)!;
+  const label = group.items.find((it) => it.id === page)?.label ?? group.label;
+  const headRef = useRef<HTMLHeadingElement>(null);
+  useEffect(() => {
+    headRef.current?.focus({ preventScroll: true });
+  }, [page]);
+
+  return (
+    <div className="mx-auto max-w-[1200px]">
+      <nav aria-label="현재 위치" className="print:hidden">
+        <ol className="flex flex-wrap items-center gap-1.5 text-[15px]" style={{ color: C.muted }}>
+          <li>
+            <button type="button" onClick={() => go("home")} className="inline-flex h-9 items-center hover:underline">
+              홈
+            </button>
+          </li>
+          <li aria-hidden>
+            <ChevronRight size={14} />
+          </li>
+          <li aria-current={group.items.length > 1 ? undefined : "page"}>{group.label}</li>
+          {group.items.length > 1 && (
+            <>
+              <li aria-hidden>
+                <ChevronRight size={14} />
+              </li>
+              <li aria-current="page" className="font-semibold" style={{ color: C.ink }}>
+                {label}
+              </li>
+            </>
+          )}
+        </ol>
+      </nav>
+      <h1 ref={headRef} tabIndex={-1} className="mt-1 text-[28px] font-bold tracking-[-0.03em] outline-none md:text-[34px] print:hidden">
+        {label}
+      </h1>
+      {group.items.length > 1 && (
+        <ul className="mt-4 flex gap-1 border-b print:hidden" style={{ borderColor: C.line }}>
+          {group.items.map((it) => {
+            const on = it.id === page;
+            return (
+              <li key={it.id}>
+                <button
+                  type="button"
+                  onClick={() => go(it.id)}
+                  aria-current={on ? "page" : undefined}
+                  className="-mb-px inline-flex h-12 items-center border-b-[3px] px-3.5 text-[16px] font-bold"
+                  style={on ? { borderColor: C.mint, color: C.mint } : { borderColor: "transparent", color: C.muted }}
+                >
+                  {it.label}
+                </button>
+              </li>
+            );
+          })}
+        </ul>
+      )}
+      <div className="mt-5 space-y-5 md:mt-6 md:space-y-6">{children}</div>
+    </div>
+  );
+}
+
+function AboutPage() {
+  const rows: [string, React.ReactNode][] = [
+    ["약국명", PHARMACY],
+    ["주소", ADDRESS],
+    [
+      "전화번호",
+      <a key="tel" href={`tel:${TEL}`} className="font-semibold underline underline-offset-4 tabular-nums">
+        {TEL}
+      </a>,
+    ],
+    ["팩스번호", "02-000-0001"],
+    ["개설 약사", "박ㅎ준"],
+  ];
+  return (
+    <>
+      <section aria-labelledby="about-title" className="overflow-hidden rounded-[10px] border bg-white" style={{ borderColor: C.line }}>
+        <div className="relative h-[200px] md:h-[320px]">
+          <Image src={`${IMG}/hero.jpg`} alt="흰 선반에 약상자가 정리된 밝은 약국 안과 나무 상담대" fill sizes="(min-width: 1248px) 1200px, 100vw" className="object-cover" style={{ objectPosition: "35% center" }} />
+        </div>
+        <div className="p-4 md:p-6">
+          <h2 id="about-title" className="text-[22px] font-bold tracking-[-0.02em] md:text-[26px]">
+            안녕하세요. {PHARMACY}입니다.
+          </h2>
+          <ul className="mt-3 space-y-1 text-[16px]">
+            <li>병‧의원 처방조제 가능합니다.</li>
+            <li>약사 상담 가능합니다.</li>
+            <li>동물약도 취급합니다.</li>
+          </ul>
+          <ul className="mt-4 flex flex-wrap gap-1.5" aria-label="약국 특성">
+            {["공공심야약국", "휴일지킴이약국", "동물약취급", "주차"].map((t) => (
+              <li key={t} className="rounded-[4px] border px-2 py-0.5 text-[14px] font-semibold" style={{ borderColor: C.mint, color: C.mintDeep }}>
+                {t}
+              </li>
+            ))}
+          </ul>
+        </div>
+      </section>
+      <Panel id="about-info" title="약국 정보">
+        <dl className="grid border-t text-[16px] sm:grid-cols-2" style={{ borderColor: C.line }}>
+          {rows.map(([k, v]) => (
+            <div key={k} className="flex gap-3 border-b py-2.5 sm:pr-4" style={{ borderColor: C.line }}>
+              <dt className="w-[80px] shrink-0" style={{ color: C.muted }}>
+                {k}
+              </dt>
+              <dd className="min-w-0 font-medium">{v}</dd>
+            </div>
+          ))}
+        </dl>
+      </Panel>
+    </>
+  );
+}
+
+const PHARMACISTS = [
+  {
+    role: "대표약사",
+    name: "박ㅎ준",
+    career: ["□□대학교 약학대학 졸업", "□□대학교병원 약제부 근무", "□□대학교 약학대학 프리셉터", "□□시약사회 약바로쓰기 운동본부 강사"],
+  },
+  {
+    role: "근무약사",
+    name: "김ㅅ희",
+    career: ["□□대학교 약학대학 졸업", "□□병원 약제과 근무", "대한약사회 인증 스포츠약사"],
+  },
+];
+
+function PharmacistsPage() {
+  return (
+    <div className="grid gap-5 md:grid-cols-2 md:gap-6">
+      {PHARMACISTS.map((p) => (
+        <section key={p.name} aria-labelledby={`ph-${p.name}`} className="min-w-0 rounded-[10px] border bg-white p-4 md:p-6" style={{ borderColor: C.line }}>
+          <p className="text-[15px] font-semibold" style={{ color: C.mint }}>
+            {p.role}
+          </p>
+          <h2 id={`ph-${p.name}`} className="text-[24px] font-bold tracking-[-0.02em]">
+            {p.name}
+          </h2>
+          <ul className="mt-3 border-t" style={{ borderColor: C.line }}>
+            {p.career.map((c) => (
+              <li key={c} className="border-b py-2.5 text-[16px]" style={{ borderColor: C.line }}>
+                {c}
+              </li>
+            ))}
+          </ul>
+        </section>
+      ))}
+    </div>
+  );
+}
+
+function HoursPage({ minute }: { minute: number }) {
+  const rows: [string, string][] = [
+    ["평일 운영시간", "09:00 ~ 익일 01:00"],
+    ["토요일 운영시간", "09:00 ~ 18:00"],
+    ["일요일 운영시간", "휴무 (둘째·넷째 일요일 10:00 ~ 18:00)"],
+    ["공휴일 운영시간", "휴무"],
+    ["공공심야약국", "평일 22:00 ~ 익일 01:00"],
+    ["정기휴무", "매주 일요일, 공휴일"],
+  ];
+  return (
+    <div className="grid items-start gap-5 md:gap-6 lg:grid-cols-[1.15fr_1fr]">
+      <Hours minute={minute} />
+      <Panel id="hours-info" title="운영시간 안내">
+        <dl>
+          {rows.map(([k, v]) => (
+            <div key={k} className="flex gap-3 border-b py-2.5 first:pt-0" style={{ borderColor: C.line }}>
+              <dt className="w-[128px] shrink-0 font-semibold" style={{ color: C.muted }}>
+                {k}
+              </dt>
+              <dd className="min-w-0 tabular-nums">{v}</dd>
+            </div>
+          ))}
+        </dl>
+      </Panel>
+    </div>
   );
 }
 
