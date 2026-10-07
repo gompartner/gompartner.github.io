@@ -32,7 +32,7 @@ import { useReducedMotionSafe } from "@/hooks/useReducedMotionSafe";
    성공사례는 분야와 결과로 거르는 게시판 목록이다.
 
    디자인: 아이보리 바탕(#f6f3ec)에 짙은 남색(#14213d), 바랜 금색(#b08d57)은 가는 선과 작은 표시에만 쓴다.
-   큰 제목은 명조 계열. 1px 선으로 나누고 모서리는 작게, 그림자는 거의 쓰지 않는다.
+   글꼴은 사이트 기본 고딕. 1px 선으로 나누고 모서리는 작게, 그림자는 거의 쓰지 않는다.
 
    사진 출처(public/images/demo-law):
    AI 생성(Z-Image-Turbo, Apache 2.0) hero, desk, lawyer-1(김ㅈ우), lawyer-2(이ㅅ연) */
@@ -41,7 +41,6 @@ const IMG = "/images/demo-law";
 const FIRM = "법률사무소 곰파트너";
 const TEL = "02-000-0000";
 const ADDRESS = "□□시 □□로 88 □□빌딩 3층";
-const SERIF = '"Nanum Myeongjo", "AppleMyungjo", "Noto Serif KR", "Batang", serif';
 
 const C = {
   ivory: "#f6f3ec",
@@ -543,7 +542,7 @@ function Logo({ light = false }: { light?: boolean }) {
     <span className="inline-flex items-center gap-2.5">
       {/* eslint-disable-next-line @next/next/no-img-element -- 메인 사이트와 같은 곰 로고 */}
       <img src="/images/logo.svg" alt="" aria-hidden width={32} height={32} className="h-8 w-8 shrink-0" />
-      <span className="flex flex-col whitespace-nowrap text-left leading-[1.15]" style={{ color: fg, fontFamily: SERIF }}>
+      <span className="flex flex-col whitespace-nowrap text-left leading-[1.15]" style={{ color: fg }}>
         <span className="text-[11px] font-bold opacity-75">법률사무소</span>
         <span className="text-[18px] font-bold tracking-[-0.02em] md:text-[19px]">곰파트너</span>
       </span>
@@ -718,7 +717,7 @@ function Home({ go }: { go: Go }) {
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.6, ease: EASE }}
             >
-              <h1 id="home-title" className="text-[40px] font-bold leading-[1.2] tracking-[-0.02em] md:text-[64px]" style={{ color: C.ivory, fontFamily: SERIF }}>
+              <h1 id="home-title" className="text-[40px] font-bold leading-[1.2] tracking-[-0.02em] md:text-[64px]" style={{ color: C.ivory }}>
                 {FIRM}
               </h1>
               <p className="mt-3 max-w-[560px] text-[16px] md:text-[18px]" style={{ color: "#dfe3ec" }}>
@@ -730,7 +729,7 @@ function Home({ go }: { go: Go }) {
 
         <nav id="practice" aria-label="업무분야" className="border-b px-4 md:px-6" style={{ borderColor: C.line, background: C.white }}>
           <div className="mx-auto max-w-[1200px] py-8 md:py-10">
-            <h2 className="text-[22px] font-bold tracking-[-0.02em] md:text-[24px]" style={{ color: C.navy, fontFamily: SERIF }}>
+            <h2 className="text-[22px] font-bold tracking-[-0.02em] md:text-[24px]" style={{ color: C.navy }}>
               업무분야
             </h2>
             <ul className="mt-4 grid border-t sm:grid-cols-2 lg:grid-cols-4" style={{ borderColor: C.navy }}>
@@ -745,7 +744,7 @@ function Home({ go }: { go: Go }) {
                     type="button"
                     onClick={() => go({ page: "practice", field: f.id })}
                     className="text-left text-[18px] font-bold underline-offset-4 hover:underline md:text-[19px]"
-                    style={{ color: C.navy, fontFamily: SERIF }}
+                    style={{ color: C.navy }}
                   >
                     {f.label}
                   </button>
@@ -767,7 +766,7 @@ function Home({ go }: { go: Go }) {
               <li key={l.name} className={`flex gap-5 border-b py-6 ${i === 0 ? "md:border-r md:pr-8" : "md:pl-8"}`} style={{ borderColor: C.line }}>
                 <Portrait src={l.photo} name={l.name} />
                 <div className="min-w-0">
-                  <p className="text-[20px] font-bold leading-[1.3]" style={{ color: C.navy, fontFamily: SERIF }}>
+                  <p className="text-[20px] font-bold leading-[1.3]" style={{ color: C.navy }}>
                     {l.name}
                     <span className="ml-2 text-[15px] font-semibold" style={{ color: C.muted, fontFamily: "inherit" }}>
                       {l.role}
@@ -841,7 +840,7 @@ function Home({ go }: { go: Go }) {
 function BoardHead({ id, moreId, title, more, onMore }: { id: string; moreId?: string; title: string; more?: string; onMore?: () => void }) {
   return (
     <div className="flex min-h-[44px] items-end justify-between border-b-2 pb-2" style={{ borderColor: C.navy }}>
-      <h2 id={id} className="text-[22px] font-bold tracking-[-0.02em] md:text-[24px]" style={{ color: C.navy, fontFamily: SERIF }}>
+      <h2 id={id} className="text-[22px] font-bold tracking-[-0.02em] md:text-[24px]" style={{ color: C.navy }}>
         {title}
       </h2>
       {more && onMore && (
@@ -932,7 +931,7 @@ function SubPage({ nav, go, children }: { nav: Target; go: Go; children: React.R
         <Image src={`${IMG}/hero.jpg`} alt="" fill sizes="100vw" className="object-cover" style={{ objectPosition: "center 40%" }} />
         <div className="absolute inset-0" style={{ background: "rgba(20,33,61,0.78)" }} aria-hidden />
         <div className="absolute inset-0 flex items-center px-4 md:px-6">
-          <p className="mx-auto w-full max-w-[1200px] text-[28px] font-bold tracking-[-0.02em] md:text-[40px]" style={{ color: C.ivory, fontFamily: SERIF }}>
+          <p className="mx-auto w-full max-w-[1200px] text-[28px] font-bold tracking-[-0.02em] md:text-[40px]" style={{ color: C.ivory }}>
             {group.label}
           </p>
         </div>
@@ -965,7 +964,7 @@ function SubPage({ nav, go, children }: { nav: Target; go: Go; children: React.R
       <div className="px-4 pb-20 pt-8 md:px-6 md:pb-28 md:pt-12">
         <div className="mx-auto grid max-w-[1200px] gap-8 lg:grid-cols-[220px_1fr] lg:gap-14">
           <nav aria-label={`${group.label} 하위 메뉴`} className="min-w-0">
-            <p className="hidden h-[72px] items-center px-5 text-[19px] font-bold lg:flex" style={{ background: C.navy, color: C.ivory, fontFamily: SERIF }}>
+            <p className="hidden h-[72px] items-center px-5 text-[19px] font-bold lg:flex" style={{ background: C.navy, color: C.ivory }}>
               {group.label}
             </p>
             <ul className="-mx-4 flex gap-1.5 overflow-x-auto px-4 pb-1 lg:mx-0 lg:block lg:overflow-visible lg:border-x lg:border-b lg:px-0 lg:pb-0" style={{ borderColor: C.line }}>
@@ -994,7 +993,7 @@ function SubPage({ nav, go, children }: { nav: Target; go: Go; children: React.R
               ref={headRef}
               tabIndex={-1}
               className="border-b-2 pb-4 text-[28px] font-bold leading-[1.3] tracking-[-0.02em] outline-none md:text-[34px]"
-              style={{ color: C.navy, borderColor: C.navy, fontFamily: SERIF }}
+              style={{ color: C.navy, borderColor: C.navy }}
             >
               {label}
             </h1>
@@ -1083,7 +1082,7 @@ function Lawyers() {
             <div className="flex items-center gap-4 md:flex-col md:items-start">
               <Portrait src={l.photo} name={l.name} large />
               <div>
-                <p className="text-[24px] font-bold leading-[1.3]" style={{ color: C.navy, fontFamily: SERIF }}>
+                <p className="text-[24px] font-bold leading-[1.3]" style={{ color: C.navy }}>
                   {l.name}
                 </p>
                 <p className="text-[15px] font-semibold" style={{ color: C.goldText }}>
@@ -1209,7 +1208,7 @@ function Practice({
         </div>
 
         <div className="mt-6 border p-5 md:p-8" style={{ borderColor: C.line, background: C.white }}>
-          <h3 className="text-[20px] font-bold" style={{ color: C.navy, fontFamily: SERIF }}>
+          <h3 className="text-[20px] font-bold" style={{ color: C.navy }}>
             {sit.label}
           </h3>
 
