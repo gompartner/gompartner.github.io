@@ -1,17 +1,25 @@
-import Link from "next/link";
 import { Check } from "lucide-react";
 import { addons, formatWon, manwon, planCommon, plans } from "@/data/pricing";
 
+const h1 = "text-[28px] font-bold leading-[1.4] tracking-[-0.01em] md:text-[36px]";
 const h2 = "text-[24px] font-bold leading-[1.5] tracking-[-0.01em] md:text-[32px]";
 
-/** 홈페이지 패키지 3종. compact 이면 패키지 카드만 보여 주고 상세(추가 기능·진행 안내)는 /pricing 으로 안내한다. */
-export function PricingSection({ id = "pricing", compact = false }: { id?: string; compact?: boolean }) {
+/** 홈페이지 패키지 3종. compact 이면 패키지 카드만, 아니면 추가 기능 가격표까지 보여 준다(가격 페이지). */
+export function PricingSection({
+  id = "pricing",
+  compact = false,
+  heading: Heading = "h2",
+}: {
+  id?: string;
+  compact?: boolean;
+  heading?: "h1" | "h2";
+}) {
   return (
     <section id={id} aria-labelledby={`${id}-title`} className="relative isolate scroll-mt-16 overflow-hidden border-t border-border bg-surface">
       <div className="mx-auto w-full max-w-[1248px] px-4 py-16 md:px-6 md:py-24">
-        <h2 id={`${id}-title`} className={h2}>
+        <Heading id={`${id}-title`} className={Heading === "h1" ? h1 : h2}>
           홈페이지 제작 가격
-        </h2>
+        </Heading>
 
         <ul className="mt-8 grid gap-4 md:grid-cols-3">
           {plans.map((plan) => {
@@ -37,13 +45,7 @@ export function PricingSection({ id = "pricing", compact = false }: { id?: strin
             );
           })}
         </ul>
-        {compact ? (
-          <p className="mt-6 text-[17px]">
-            <Link href="/pricing" className="font-bold underline underline-offset-4 hover:text-accent">
-              추가 기능 가격, 진행 안내, 자주 묻는 질문 보기
-            </Link>
-          </p>
-        ) : (
+        {!compact && (
           <div className="mt-4 rounded-[10px] border border-border bg-white p-6">
             <h3 className="text-[17px] font-bold">
               추가 기능 <span className="font-normal text-foreground-secondary">· 고급 패키지는 맞춤 기능 1개 포함</span>

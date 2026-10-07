@@ -5,6 +5,7 @@ import { HeroSlider } from "@/components/landing/HeroSlider";
 import { projects } from "@/data/projects";
 import { profile } from "@/data/profile";
 import { PricingSection } from "@/components/landing/PricingSection";
+import { ProcessSteps } from "@/components/landing/ProcessSteps";
 import { WorksGrid } from "@/components/landing/WorksGrid";
 import Link from "next/link";
 
@@ -80,7 +81,7 @@ export default function HomePage() {
       </section>
 
       <PricingSection compact />
-
+      <ProcessSteps />
     </>
   );
 }

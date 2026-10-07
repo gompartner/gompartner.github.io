@@ -1,10 +1,8 @@
 import { plans } from "@/data/pricing";
 
-const h2 = "text-[24px] font-bold leading-[1.5] tracking-[-0.01em] md:text-[32px]";
-
 // 맡기기 전에 확인하는 것: 진행 순서와 수정·결제·환불·운영 기준.
 // 크몽 서비스(#796239)의 수정 횟수·오류 수정·환불 기준과 같게 유지한다.
-const steps = [
+export const processSteps = [
   { title: "상담", body: "채팅으로 필요한 기능과 일정, 예산을 듣고 가능한 범위를 안내합니다." },
   { title: "견적·일정 확정", body: "작업 범위, 일정, 비용을 문서로 정리해 확정합니다." },
   { title: "디자인·개발", body: "진행 중에 실제 화면을 보내 드리고 확인받습니다. 수정은 패키지 횟수 안에서 반영합니다." },
@@ -14,7 +12,7 @@ const steps = [
 
 const revisions = plans.map((p) => `${p.name} ${p.revisions}회`).join(", ");
 
-const faq = [
+export const faq = [
   {
     q: "수정은 몇 번까지 되나요?",
     a: `패키지별로 ${revisions}입니다. 작업 실수로 생긴 오류는 횟수와 관계없이 완료 전까지 바로 고칩니다. 문구, 위치, 업무 절차를 바꾸는 요청은 수정 횟수에 들어갑니다.`,
@@ -40,34 +38,3 @@ const faq = [
     a: "업무 프로그램은 패키지 없이 필요한 기능과 화면 수를 듣고 따로 견적을 드립니다.",
   },
 ];
-
-export function ProcessSection() {
-  return (
-    <section id="process" aria-labelledby="process-title" className="scroll-mt-16 border-t border-border">
-      <div className="mx-auto w-full max-w-[1248px] px-4 py-16 md:px-6 md:py-24">
-        <h2 id="process-title" className={h2}>
-          진행 안내
-        </h2>
-        <ol className="mt-8 grid gap-4 md:grid-cols-5">
-          {steps.map((s, i) => (
-            <li key={s.title} className="border-t-2 border-foreground pt-4">
-              <p className="text-[15px] font-bold tabular-nums text-foreground-secondary">{i + 1}단계</p>
-              <p className="mt-1 text-[19px] font-bold">{s.title}</p>
-              <p className="mt-2 text-[16px] leading-[1.6] text-foreground-secondary">{s.body}</p>
-            </li>
-          ))}
-        </ol>
-
-        <h3 className="mt-14 text-[19px] font-bold md:text-[21px]">자주 묻는 질문</h3>
-        <dl className="mt-4 divide-y divide-border border-y border-border">
-          {faq.map((f) => (
-            <div key={f.q} className="grid gap-2 py-5 md:grid-cols-[280px_1fr] md:gap-8">
-              <dt className="text-[17px] font-bold">{f.q}</dt>
-              <dd className="text-[17px] leading-[1.7] text-foreground-secondary">{f.a}</dd>
-            </div>
-          ))}
-        </dl>
-      </div>
-    </section>
-  );
-}
