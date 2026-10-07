@@ -114,10 +114,5 @@ export function estimateFor(projectId: string): Estimate | null {
   return { plan, lines, total, days: Math.ceil(days) };
 }
 
-/** 데모별 기준 패키지 (가격표의 "비슷한 데모" 묶음용) */
-export const planByProject: Record<string, PlanId> = Object.fromEntries(
-  Object.entries(estimateSource).map(([id, e]) => [id, e.plan]),
-);
-
 export const manwon = (n: number) => `${(n / 10_000).toLocaleString("ko-KR", { maximumFractionDigits: 1 })}만 원`;
 export const formatWon = (n: number) => `${n.toLocaleString("ko-KR")}원`;

@@ -1,7 +1,6 @@
 import { Check } from "lucide-react";
 import { ChannelTalkButton } from "@/components/layout/ChannelTalk";
-import { addons, formatWon, manwon, planByProject, planCommon, plans } from "@/data/pricing";
-import { projects } from "@/data/projects";
+import { addons, formatWon, manwon, planCommon, plans } from "@/data/pricing";
 
 const h2 = "text-[24px] font-bold leading-[1.5] tracking-[-0.01em] md:text-[32px]";
 const primaryButton =
@@ -18,7 +17,6 @@ export function PricingSection({ id = "pricing", cta = "pricing_chat" }: { id?: 
 
         <ul className="mt-8 grid gap-4 md:grid-cols-3">
           {plans.map((plan) => {
-            const examples = projects.filter((p) => planByProject[p.id] === plan.id);
             return (
               <li key={plan.id} className="flex flex-col rounded-[10px] border border-border bg-white p-6">
                 <p className="text-[17px] font-bold">
@@ -37,19 +35,6 @@ export function PricingSection({ id = "pricing", cta = "pricing_chat" }: { id?: 
                     </li>
                   ))}
                 </ul>
-                {examples.length > 0 && (
-                  <p className="mt-5 text-[15px] leading-[1.6] text-foreground-secondary">
-                    비슷한 데모:{" "}
-                    {examples.map((p, i) => (
-                      <span key={p.id}>
-                        {i > 0 && ", "}
-                        <a href={p.demoUrl} className="underline underline-offset-4 hover:text-accent">
-                          {p.title.replace(" 홈페이지", "")}
-                        </a>
-                      </span>
-                    ))}
-                  </p>
-                )}
               </li>
             );
           })}
