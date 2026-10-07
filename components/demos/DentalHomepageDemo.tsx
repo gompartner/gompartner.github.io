@@ -5,6 +5,7 @@ import Image from "next/image";
 import { AnimatePresence, motion } from "framer-motion";
 import { ArrowUp, CalendarCheck, ChevronDown, ChevronRight, Home, MapPin, Menu, MessageCircle, Moon, Phone, Plus, Receipt, X } from "lucide-react";
 import { useReducedMotionSafe } from "@/hooks/useReducedMotionSafe";
+import { daysAgo, fmtDot, useDemoToday } from "@/hooks/useDemoToday";
 
 /* 치과 홈페이지 데모: 가상의 곰파트너치과의원.
    병원명, 의료진, 주소, 전화번호, 사업자 정보, 진료비는 모두 가상이다.
@@ -524,16 +525,34 @@ const FAQ = [
 /* ---------- 공지사항 ---------- */
 
 const NOTICE_TOTAL = 137;
-const NOTICES = [
-  { no: 137, date: "2026.10.02", title: "10월 9일(금) 한글날 휴진, 10일(토) 정상 진료", body: "10월 9일(금) 한글날은 휴진합니다. 10월 10일(토)은 09:30~14:00 정상 진료합니다. 예약 변경은 전화로 문의해 주세요." },
-  { no: 136, date: "2026.09.24", title: "10월 15일(목) 야간진료 18:30 단축 (원장 학회 참석)", body: "대표원장 학회 참석으로 10월 15일(목)은 18:30까지 진료합니다. 해당일 저녁 예약 환자분께는 개별 연락드렸습니다." },
-  { no: 135, date: "2026.09.21", title: "2026년 건강보험 구강검진 12월 31일 마감", body: "국민건강보험 구강검진은 12월 31일까지 받으실 수 있습니다. 12월에는 예약이 많으니 미리 예약해 주세요. 검진 비용은 무료입니다." },
-  { no: 134, date: "2026.09.08", title: "구강스캐너 도입, 크라운 본뜨기 방식 변경", body: "9월부터 크라운과 인레이 치료에 구강스캐너를 도입했습니다. 본뜨기 과정 없이 진행되며 비용은 동일합니다." },
-  { no: 133, date: "2026.08.29", title: "11월 1일부터 일부 비급여 진료비 변경", body: "금 시세 상승으로 11월 1일부터 금 인레이 비용이 40만 원에서 45만 원으로 변경됩니다. 10월 31일까지 치료를 시작하신 분은 기존 금액으로 진행합니다." },
-  { no: 132, date: "2026.08.12", title: "지하 주차장 도색 공사(8/18~8/20) 기간 주차 안내", body: "지하 주차장 도색 공사로 8월 18일~20일에는 지하 3층만 이용 가능합니다. 공영주차장 이용 시 영수증을 가져오시면 1시간 주차비를 지원해 드립니다." },
-  { no: 131, date: "2026.07.28", title: "여름휴가 없이 7·8월 정상 진료", body: "7~8월에도 휴가 없이 정상 진료합니다. 방학 기간 학생 교정 상담은 오전 예약을 권해 드립니다." },
-  { no: 130, date: "2026.07.03", title: "만 65세 이상 보험임플란트 상담 일정 안내", body: "만 65세 이상은 평생 2개까지 건강보험 임플란트를 받으실 수 있습니다. 화·목 오전에 별도 상담 시간을 운영합니다." },
-];
+/** 작성일은 오늘 기준 며칠 전(ago)으로 두고, 본문 속 날짜도 작성일에서 계산한다 */
+const mdKo = (d: Date) => `${d.getMonth() + 1}월 ${d.getDate()}일`;
+const after = (d: Date, n: number) => new Date(d.getFullYear(), d.getMonth(), d.getDate() + n);
+/** d 이후(같은 날 포함) 첫 목요일 */
+const nextThu = (d: Date) => after(d, (4 - d.getDay() + 7) % 7);
+
+const makeNotices = (today: Date) => {
+  const at = (ago: number) => daysAgo(today, ago);
+  const thu = nextThu(after(at(13), 21));
+  const goldFrom = after(at(39), 64);
+  const paintFrom = after(at(56), 6);
+  return [
+    { no: 137, ago: 5, title: "공휴일 휴진 안내", body: "공휴일은 휴진합니다. 토요일은 09:30~14:00 정상 진료합니다. 예약 변경은 전화로 문의해 주세요." },
+    { no: 136, ago: 13, title: `${mdKo(thu)}(목) 야간진료 18:30 단축 (원장 학회 참석)`, body: `대표원장 학회 참석으로 ${mdKo(thu)}(목)은 18:30까지 진료합니다. 해당일 저녁 예약 환자분께는 개별 연락드렸습니다.` },
+    { no: 135, ago: 16, title: `${at(16).getFullYear()}년 건강보험 구강검진 12월 31일 마감`, body: "국민건강보험 구강검진은 12월 31일까지 받으실 수 있습니다. 12월에는 예약이 많으니 미리 예약해 주세요. 검진 비용은 무료입니다." },
+    { no: 134, ago: 29, title: "구강스캐너 도입, 크라운 본뜨기 방식 변경", body: "크라운과 인레이 치료에 구강스캐너를 도입했습니다. 본뜨기 과정 없이 진행되며 비용은 동일합니다." },
+    { no: 133, ago: 39, title: "금 인레이 비용 변경 안내", body: `금 시세 상승으로 ${mdKo(goldFrom)}부터 금 인레이 비용이 40만 원에서 45만 원으로 변경됩니다. ${mdKo(after(goldFrom, -1))}까지 치료를 시작하신 분은 기존 금액으로 진행합니다.` },
+    { no: 132, ago: 56, title: "지하 주차장 도색 공사 기간 주차 안내", body: `지하 주차장 도색 공사로 ${mdKo(paintFrom)}~${mdKo(after(paintFrom, 2))}에는 지하 3층만 이용 가능합니다. 공영주차장 이용 시 영수증을 가져오시면 1시간 주차비를 지원해 드립니다.` },
+    { no: 131, ago: 71, title: "휴가 기간 없이 정상 진료", body: "올해는 별도 휴가 기간 없이 정상 진료합니다. 방학 기간 학생 교정 상담은 오전 예약을 권해 드립니다." },
+    { no: 130, ago: 96, title: "만 65세 이상 보험임플란트 상담 일정 안내", body: "만 65세 이상은 평생 2개까지 건강보험 임플란트를 받으실 수 있습니다. 화·목 오전에 별도 상담 시간을 운영합니다." },
+  ].map((n) => ({ ...n, date: fmtDot(at(n.ago)) }));
+};
+
+/** 공지 목록, 화면마다 오늘 날짜로 다시 계산한다 */
+const useNotices = () => {
+  const today = useDemoToday();
+  return useMemo(() => makeNotices(today), [today]);
+};
 
 /* ---------- 예약 ---------- */
 
@@ -974,6 +993,7 @@ function QuickMenu({ go, linkOut }: { go: Go; linkOut: (w: "naver" | "kakao" | "
 const SHORTCUTS = TREATMENT_ORDER as Exclude<TreatmentId, "check">[];
 
 function HomePage({ go, reserve, linkOut }: { go: Go; reserve: (id: TreatmentId) => void; linkOut: (w: "naver" | "kakao" | "map") => void }) {
+  const NOTICES = useNotices();
   const now = useNow();
   const status = openStatus(now);
 
@@ -1476,11 +1496,12 @@ function SymptomList({ openSelfcheck }: { openSelfcheck: (p: Preset) => void }) 
 }
 
 function Fees() {
+  const today = useDemoToday();
   return (
     <div className="grid gap-10 lg:grid-cols-12">
       <div className="min-w-0 lg:col-span-8">
         <p className="text-[15px]" style={{ color: C.muted }}>
-          부가세 포함, 2026년 10월 1일 기준
+          부가세 포함, {today.getFullYear()}년 {today.getMonth() + 1}월 1일 기준
         </p>
         <div className="mt-4 space-y-8">
           {FEE_GROUPS.map((g) => (
@@ -1583,6 +1604,7 @@ function FaqList({ items }: { items: { q: string; a: string }[] }) {
 }
 
 function Notice({ no, go }: { no: number | null; go: Go }) {
+  const NOTICES = useNotices();
   const n = no ? NOTICES.find((x) => x.no === no) : null;
   if (n) {
     return (

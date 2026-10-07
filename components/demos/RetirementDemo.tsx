@@ -2,6 +2,7 @@
 
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { IBM_Plex_Sans_KR } from "next/font/google";
+import { daysAgo, fmtDot, useDemoToday } from "@/hooks/useDemoToday";
 import { Calculator, CalendarClock, CheckCircle2, ChevronRight, CreditCard, FileSearch, Home, Landmark, PiggyBank, Phone, ReceiptText, TrendingUp, Wallet } from "lucide-react";
 
 /* 노후준비 계산기 데모: 가상의 보험사 곰파트너생명.
@@ -334,9 +335,9 @@ const PRODUCT_TABS = [
 ] as const;
 
 const NOTICES = [
-  { title: "시스템 점검에 따른 서비스 일시 중단 안내", date: "2026.10.05" },
-  { title: "개인정보 처리방침 개정 안내", date: "2026.09.24" },
-  { title: "휴면보험금 찾아가세요", date: "2026.09.10" },
+  { title: "시스템 점검에 따른 서비스 일시 중단 안내", ago: 2 },
+  { title: "개인정보 처리방침 개정 안내", ago: 13 },
+  { title: "휴면보험금 찾아가세요", ago: 27 },
 ];
 
 const QUICK_FIELDS: FieldDef[] = [
@@ -346,6 +347,7 @@ const QUICK_FIELDS: FieldDef[] = [
 ];
 
 function HomeScreen({ inputs, set, go, notice }: { inputs: Inputs; set: (key: keyof Inputs, value: number) => void; go: Go; notice: (msg: string) => void }) {
+  const today = useDemoToday();
   const result = useMemo(() => compute(inputs), [inputs]);
   const [tab, setTab] = useState<(typeof PRODUCT_TABS)[number]["id"]>("pension");
   const products = PRODUCT_TABS.find((t) => t.id === tab)!;
@@ -518,7 +520,7 @@ function HomeScreen({ inputs, set, go, notice }: { inputs: Inputs; set: (key: ke
                 <li key={n.title} className="flex items-center justify-between gap-3 border-b py-3 text-[16px]" style={{ borderColor: LINE }}>
                   <span className="min-w-0 truncate">{n.title}</span>
                   <span className="shrink-0 text-[14px] tabular-nums" style={{ color: INK_3 }}>
-                    {n.date}
+                    {fmtDot(daysAgo(today, n.ago))}
                   </span>
                 </li>
               ))}
