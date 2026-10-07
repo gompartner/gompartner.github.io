@@ -304,7 +304,7 @@ export function MaintenanceDemo() {
               <ShieldCheck size={18} aria-hidden />
             </span>
             <span>
-              <span className="block text-[17px] font-bold leading-[1.35]">○○대학교 홈페이지 유지보수</span>
+              <span className="block text-[17px] font-bold leading-[1.35]">가람대학교 홈페이지 유지보수</span>
               <span className="block text-[15px] leading-[1.35]" style={{ color: C.muted }}>
                 최근 30일 운영 현황
               </span>
@@ -820,7 +820,7 @@ function ReportSheet({
     <article className="report-sheet flex min-h-[1123px] w-[794px] flex-col bg-white px-[56px] py-[52px] text-[#1e2124] shadow-[0_20px_50px_-20px_rgba(0,0,0,0.6)]">
       <header className="flex items-end justify-between border-b-2 border-[#1e2124] pb-4">
         <div>
-          <p className="text-[15px] text-[#464c53]">○○대학교 홈페이지</p>
+          <p className="text-[15px] text-[#464c53]">가람대학교 홈페이지</p>
           <h1 className="text-[28px] font-bold leading-[1.4]">월간 유지보수 점검 보고서</h1>
         </div>
         <p className="text-right text-[15px] leading-[1.5] text-[#464c53]">
@@ -924,7 +924,7 @@ function ReportSheet({
 
       <footer className="mt-auto flex justify-between border-t border-[#cdd1d5] pt-3 text-[13px] text-[#58616a]">
         <span>작성: 유지보수 담당</span>
-        <span>○○대학교 정보전산원 제출용</span>
+        <span>가람대학교 정보전산원 제출용</span>
       </footer>
     </article>
   );
