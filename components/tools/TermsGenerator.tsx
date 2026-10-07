@@ -630,11 +630,11 @@ export function TermsGenerator() {
           </label>
           <label className={label}>
             사이트 주소
-            <input value={form.siteUrl} onChange={(e) => set("siteUrl", e.target.value)} inputMode="url" placeholder="https://www.example.co.kr" className={input} />
+            <input value={form.siteUrl} onChange={(e) => set("siteUrl", e.target.value)} inputMode="url" placeholder="https://www.gompartner.co.kr" className={input} />
           </label>
           <label className={label}>
             고객 상담 연락처 <span className="text-[#b42318]">*</span>
-            <input value={form.contact} onChange={(e) => set("contact", e.target.value)} placeholder="02-000-0000, help@example.co.kr" className={input} />
+            <input value={form.contact} onChange={(e) => set("contact", e.target.value)} placeholder="02-000-0000, help@gompartner.co.kr" className={input} />
           </label>
         </div>
 

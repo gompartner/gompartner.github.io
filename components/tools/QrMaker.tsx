@@ -85,7 +85,7 @@ export function QrMaker() {
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const [kind, setKind] = useState<Kind>("url");
   const [f, setF] = useState<Fields>({
-    url: "https://www.example.co.kr",
+    url: "https://www.gompartner.co.kr",
     ssid: "",
     password: "",
     security: "WPA",
@@ -213,7 +213,7 @@ export function QrMaker() {
           {kind === "url" && (
             <label className="block text-[16px] font-bold">
               홈페이지 주소
-              <input value={f.url} onChange={set("url")} className={input} inputMode="url" placeholder="https://www.example.co.kr" />
+              <input value={f.url} onChange={set("url")} className={input} inputMode="url" placeholder="https://www.gompartner.co.kr" />
             </label>
           )}
           {kind === "wifi" && (

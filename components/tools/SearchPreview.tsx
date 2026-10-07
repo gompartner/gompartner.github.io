@@ -43,7 +43,7 @@ const EXAMPLE: Fields = {
   name: "곰파트너치과의원",
   region: "강남역",
   industry: "치과",
-  url: "https://www.example.co.kr",
+  url: "https://www.gompartner.co.kr",
   strengths: "화요일, 목요일 저녁 9시까지 진료, 임플란트, 교정",
   title: "",
   desc: "",
@@ -67,7 +67,7 @@ function displayUrl(url: string) {
     const u = new URL(url.startsWith("http") ? url : `https://${url}`);
     return { host: u.hostname, path: u.pathname === "/" ? "" : u.pathname, full: u.origin + u.pathname };
   } catch {
-    return { host: url || "www.example.co.kr", path: "", full: url };
+    return { host: url || "www.gompartner.co.kr", path: "", full: url };
   }
 }
 
@@ -142,7 +142,7 @@ export function SearchPreview() {
           </div>
           <label className="block text-[16px] font-bold">
             홈페이지 주소
-            <input value={f.url} onChange={set("url")} className={input} inputMode="url" placeholder="https://www.example.co.kr" />
+            <input value={f.url} onChange={set("url")} className={input} inputMode="url" placeholder="https://www.gompartner.co.kr" />
           </label>
           <label className="block text-[16px] font-bold">
             자랑할 점
