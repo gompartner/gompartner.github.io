@@ -1,7 +1,7 @@
 // 데모 사용법 가이드. 프라이빗 짐 데모(HomepageDemo)의 스포트라이트 가이드와 같은 방식으로
 // 화면의 해당 영역을 비추며 몇 단계로 안내한다. 첫 영역이 보일 때 한 번 자동으로 열고 물음표 버튼으로 다시 연다.
 // target은 CSS 선택자. 제목(h2 등)을 가리키면 그 제목이 속한 section을 비춘다. 화면에 없으면 그 단계는 건너뛴다.
-// 데모 첫 화면에 있는 요소만 가리킨다. 프라이빗 짐 데모는 자체 가이드가 있어서 여기 넣지 않는다.
+// 데모 첫 화면에 있는 요소만 가리킨다. 프라이빗 짐 데모는 예약 영역에 자체 가이드도 있지만, 다른 데모와 같게 아래 물음표로도 연다.
 export interface TourStep {
   target: string;
   title: string;
@@ -58,6 +58,12 @@ export const tours: Record<string, TourStep[]> = {
     { target: "#realty-search", title: "매물검색", desc: "조건을 고르고 매물검색을 누르세요." },
     { target: "#realty-map", title: "지도검색", desc: "핀을 누르면 매물 상세가 나옵니다." },
     { target: "#realty-fee", title: "중개보수", desc: "거래 금액에 맞춰 상한 보수를 계산합니다." },
+  ],
+  "private-gym": [
+    { target: "#map", title: "지점 선택", desc: "지도의 핀이나 지점 카드에서 지점을 고르세요." },
+    { target: "#booking-date", title: "날짜 선택", desc: "원하는 날짜를 누르세요. 빨간 요일은 주말 요금입니다." },
+    { target: "#booking-time", title: "시간 선택", desc: "초록 테두리 칸이 예약 가능한 시간입니다. 이어서 여러 시간을 고를 수 있습니다." },
+    { target: "#booking-summary", title: "예약 확인, 결제", desc: "총 금액을 확인하고 예약하기와 결제를 누르세요. 입장 QR이 바로 발급됩니다." },
   ],
   "pilates-studio": [
     { target: "#schedule", title: "그룹 시간표", desc: "잔여 자리가 있는 수업을 누르세요." },
