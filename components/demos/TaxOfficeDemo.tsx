@@ -2,6 +2,7 @@
 
 import { useEffect, useRef, useState, useSyncExternalStore } from "react";
 import Image from "next/image";
+import { daysAgo, fmtDot, useDemoToday } from "@/hooks/useDemoToday";
 import { AnimatePresence, motion } from "framer-motion";
 import {
   Check,
@@ -380,20 +381,26 @@ const BOARDS: { id: BoardId; label: string }[] = [
   { id: "notice", label: "공지사항" },
 ];
 
-type Post = { id: number; board: BoardId; cat: string; date: string; title: string; body: string };
+type Post = { id: number; board: BoardId; cat: string; ago: number; title: string; body: string };
+
+/** 게시일은 오늘 기준 며칠 전으로 계산한다 */
+function usePostDate() {
+  const today = useDemoToday();
+  return (p: Post) => fmtDot(daysAgo(today, p.ago));
+}
 
 const POSTS: Post[] = [
-  { id: 12, board: "news", cat: "신고일정", date: "2026.09.30", title: "10월 부가세 예정고지 안내 (개인사업자)", body: "개인 일반과세자는 직전 과세기간 납부세액의 50%가 고지되며, 별도 신고 없이 고지 금액을 기한 내 납부하시면 됩니다. 법인은 예정신고 대상입니다." },
-  { id: 11, board: "column", cat: "절세", date: "2026.09.12", title: "노란우산공제 연말 납입 소득공제 안내", body: "사업소득금액에 따라 연 200만~600만 원까지 소득공제를 받을 수 있습니다. 연말에 일시 납입해도 해당 연도 납입액으로 인정됩니다." },
-  { id: 10, board: "news", cat: "세법개정", date: "2026.08.28", title: "올해 세법 개정안에서 소상공인이 볼 부분", body: "고용증대 세액공제, 업무용 승용차, 간편장부 대상 기준 등 주요 개정 내용을 표로 정리했습니다." },
-  { id: 9, board: "column", cat: "절세", date: "2026.08.05", title: "사업용 카드 홈택스 등록 안내", body: "사업용 신용카드를 홈택스에 등록하면 사용 내역이 자동으로 수집되어 매입세액공제를 받을 수 있습니다." },
-  { id: 8, board: "news", cat: "신고일정", date: "2026.07.20", title: "간이과세자 7월 부가세 고지서 금액 확인", body: "직전 연도 납부세액의 50%가 고지됩니다. 상반기 매출이 크게 줄었다면 예정신고로 세액을 줄일 수 있습니다." },
-  { id: 7, board: "notice", cat: "사무소", date: "2026.07.01", title: "1월·5월 토요일 상담 운영 안내", body: "부가세 확정신고와 종합소득세 신고 기간인 1월, 5월에는 토요일 10:00~15:00에도 상담합니다." },
-  { id: 6, board: "column", cat: "경비", date: "2026.06.15", title: "업무용 승용차, 운행기록부가 필요한 경우", body: "차량 관련 비용이 연 1,500만 원을 초과하면 운행기록부를 작성해야 초과분을 경비로 인정받을 수 있습니다. 성실신고확인대상자는 업무전용 자동차보험 가입 여부도 확인합니다." },
-  { id: 5, board: "news", cat: "세법개정", date: "2026.05.10", title: "간이과세 기준금액 1억 400만 원 안내", body: "직전 연도 공급대가가 1억 400만 원 미만이면 간이과세 적용 대상입니다. 부동산임대업과 과세유흥장소는 4,800만 원 기준이 유지됩니다." },
-  { id: 4, board: "notice", cat: "사무소", date: "2026.04.02", title: "△△구 소상공인 무료 세무 상담 참여 안내", body: "매월 둘째 주 수요일 오후 △△구 소상공인지원센터에서 김ㅅ우 세무사가 상담합니다. 예약은 센터로 문의해 주세요." },
-  { id: 3, board: "column", cat: "인건비", date: "2026.03.18", title: "직원 4대보험 취득신고는 입사일 다음 달 15일까지", body: "신고가 늦으면 과태료가 부과되고 두루누리 지원을 받지 못할 수 있습니다. 입사자 정보를 입사 당일 보내 주시면 사무소에서 신고해 드립니다." },
-  { id: 2, board: "notice", cat: "사무소", date: "2026.02.03", title: "증빙자료 전달 방법 변경 안내", body: "증빙자료는 이메일 또는 카카오톡 채널로 보내 주시면 됩니다. 원본이 필요한 서류는 별도로 안내해 드립니다." },
+  { id: 12, board: "news", cat: "신고일정", ago: 7, title: "부가세 예정고지 안내 (개인사업자)", body: "개인 일반과세자는 직전 과세기간 납부세액의 50%가 고지되며, 별도 신고 없이 고지 금액을 기한 내 납부하시면 됩니다. 법인은 예정신고 대상입니다." },
+  { id: 11, board: "column", cat: "절세", ago: 25, title: "노란우산공제 연말 납입 소득공제 안내", body: "사업소득금액에 따라 연 200만~600만 원까지 소득공제를 받을 수 있습니다. 연말에 일시 납입해도 해당 연도 납입액으로 인정됩니다." },
+  { id: 10, board: "news", cat: "세법개정", ago: 40, title: "올해 세법 개정안에서 소상공인이 볼 부분", body: "고용증대 세액공제, 업무용 승용차, 간편장부 대상 기준 등 주요 개정 내용을 표로 정리했습니다." },
+  { id: 9, board: "column", cat: "절세", ago: 63, title: "사업용 카드 홈택스 등록 안내", body: "사업용 신용카드를 홈택스에 등록하면 사용 내역이 자동으로 수집되어 매입세액공제를 받을 수 있습니다." },
+  { id: 8, board: "news", cat: "신고일정", ago: 79, title: "간이과세자 부가세 예정부과 고지서 금액 확인", body: "직전 연도 납부세액의 50%가 고지됩니다. 상반기 매출이 크게 줄었다면 예정신고로 세액을 줄일 수 있습니다." },
+  { id: 7, board: "notice", cat: "사무소", ago: 98, title: "1월·5월 토요일 상담 운영 안내", body: "부가세 확정신고와 종합소득세 신고 기간인 1월, 5월에는 토요일 10:00~15:00에도 상담합니다." },
+  { id: 6, board: "column", cat: "경비", ago: 114, title: "업무용 승용차, 운행기록부가 필요한 경우", body: "차량 관련 비용이 연 1,500만 원을 초과하면 운행기록부를 작성해야 초과분을 경비로 인정받을 수 있습니다. 성실신고확인대상자는 업무전용 자동차보험 가입 여부도 확인합니다." },
+  { id: 5, board: "news", cat: "세법개정", ago: 150, title: "간이과세 기준금액 1억 400만 원 안내", body: "직전 연도 공급대가가 1억 400만 원 미만이면 간이과세 적용 대상입니다. 부동산임대업과 과세유흥장소는 4,800만 원 기준이 유지됩니다." },
+  { id: 4, board: "notice", cat: "사무소", ago: 188, title: "△△구 소상공인 무료 세무 상담 참여 안내", body: "매월 둘째 주 수요일 오후 △△구 소상공인지원센터에서 김ㅅ우 세무사가 상담합니다. 예약은 센터로 문의해 주세요." },
+  { id: 3, board: "column", cat: "인건비", ago: 203, title: "직원 4대보험 취득신고는 입사일 다음 달 15일까지", body: "신고가 늦으면 과태료가 부과되고 두루누리 지원을 받지 못할 수 있습니다. 입사자 정보를 입사 당일 보내 주시면 사무소에서 신고해 드립니다." },
+  { id: 2, board: "notice", cat: "사무소", ago: 246, title: "증빙자료 전달 방법 변경 안내", body: "증빙자료는 이메일 또는 카카오톡 채널로 보내 주시면 됩니다. 원본이 필요한 서류는 별도로 안내해 드립니다." },
 ];
 
 /* 게시판에 쌓인 전체 글 수. 데모에는 최근 글만 넣어 두고 첫 쪽만 보여 준다. */
@@ -787,6 +794,7 @@ function Home({
 }) {
   const today = todayOf(minute);
   const digest = today ? monthDigest(today, profile) : null;
+  const postDate = usePostDate();
   const latest = POSTS.slice(0, 5);
   const boardLabel = (b: BoardId) => BOARDS.find((x) => x.id === b)?.label ?? "";
   const monthIdxOf = (d: Date) => (today ? (d.getFullYear() - today.getFullYear()) * 12 + d.getMonth() : 0);
@@ -947,7 +955,7 @@ function Home({
                     </span>
                     <span className="truncate text-[15px] hover:underline">{p.title}</span>
                     <span className="col-start-2 text-[13px] tabular-nums sm:col-start-auto" style={{ color: C.muted }}>
-                      {p.date}
+                      {postDate(p)}
                     </span>
                   </button>
                 </li>
@@ -1503,6 +1511,7 @@ function FeeTable({ fee, setFee, onAsk }: { fee: FeePick; setFee: (f: FeePick) =
 /* ---------- 세무자료실 ---------- */
 
 function Board({ board, setBoard, postId, setPostId }: { board: BoardId; setBoard: (b: BoardId) => void; postId: number | null; setPostId: (id: number | null) => void }) {
+  const postDate = usePostDate();
   const [query, setQuery] = useState("");
   const q = query.trim();
   const list = POSTS.filter((p) => p.board === board && (!q || p.title.includes(q) || p.body.includes(q)));
@@ -1547,7 +1556,7 @@ function Board({ board, setBoard, postId, setPostId }: { board: BoardId; setBoar
                 {post.title}
               </h2>
               <p className="mt-1 text-[14px] tabular-nums" style={{ color: C.muted }}>
-                {post.date} · {OFFICE}
+                {postDate(post)} · {OFFICE}
               </p>
             </div>
             <p className="px-5 py-6 md:px-7">{post.body}</p>
@@ -1608,12 +1617,12 @@ function Board({ board, setBoard, postId, setPostId }: { board: BoardId; setBoar
                       <button type="button" onClick={() => setPostId(p.id)} className="block w-full py-2 text-left font-semibold leading-[1.45] hover:underline">
                         {p.title}
                         <span className="block text-[13px] font-normal tabular-nums sm:hidden" style={{ color: C.muted }}>
-                          {p.cat} · {p.date}
+                          {p.cat} · {postDate(p)}
                         </span>
                       </button>
                     </td>
                     <td className="hidden py-3 text-center text-[14px] tabular-nums sm:table-cell" style={{ color: C.muted }}>
-                      {p.date}
+                      {postDate(p)}
                     </td>
                   </tr>
                 ))}

@@ -35,6 +35,7 @@ import {
   Zap,
 } from "lucide-react";
 import { useReducedMotionSafe } from "@/hooks/useReducedMotionSafe";
+import { daysAgo, fmtDot, useDemoToday } from "@/hooks/useDemoToday";
 
 /* 기업 홈페이지 데모: 가상의 (주)곰파트너시험인증원, 전자파·무선·전기안전 시험과 KC·해외 인증을 맡는 지정시험기관.
    회사명, 대표자, 주소, 전화번호, 사업자 정보, 지정 번호, 담당자, 의뢰사는 모두 가상이고 실제 기관 로고나 등록번호는 쓰지 않는다.
@@ -159,7 +160,9 @@ interface QuoteRow {
   no: number;
   std: string;
   company: string;
-  date: string;
+  /** 직접 등록한 글은 실제 날짜(2026-10-07), 예시 글은 오늘 기준 며칠 전(ago) */
+  date?: string;
+  ago?: number;
   done: boolean;
 }
 
@@ -176,6 +179,7 @@ interface Ctx {
   rows: QuoteRow[];
   addRow: (r: QuoteRow) => void;
   minute: number;
+  today: Date;
 }
 
 const ClCtx = createContext<Ctx | null>(null);
@@ -202,6 +206,11 @@ const pad2 = (n: number) => String(n).padStart(2, "0");
 const md = (d: Date) => `${pad2(d.getMonth() + 1)}.${pad2(d.getDate())}`;
 const mdw = (d: Date) => `${md(d)} (${DAY_NAMES[d.getDay()]})`;
 const dayStart = (d: Date) => new Date(d.getFullYear(), d.getMonth(), d.getDate()).getTime();
+/** 10월 5일 */
+const mdKo = (d: Date) => `${d.getMonth() + 1}월 ${d.getDate()}일`;
+/** 오늘 기준 n일 전 날짜를 10월 5일 형식으로 */
+const agoKo = (t: Date, n: number) => mdKo(daysAgo(t, n));
+const rowDate = (r: QuoteRow, t: Date) => (r.ago !== undefined ? fmtDot(daysAgo(t, r.ago)) : (r.date ?? "").replaceAll("-", "."));
 
 /* ---------- 도우미 ---------- */
 
@@ -283,18 +292,19 @@ function maskCompany(name: string) {
 /* ---------- 페이지 ---------- */
 
 const QUOTE_ROWS: QuoteRow[] = [
-  { no: 684, std: "KC, CE", company: "(주)△△전자", date: "2026-10-06", done: false },
-  { no: 683, std: "FCC", company: "△△테크", date: "2026-10-05", done: true },
-  { no: 682, std: "KC", company: "(주)△△라이팅", date: "2026-10-02", done: true },
-  { no: 681, std: "KOLAS", company: "△△시스템", date: "2026-10-01", done: true },
-  { no: 680, std: "KC, FCC, CE", company: "(주)△△모빌리티", date: "2026-09-29", done: true },
-  { no: 679, std: "KCs", company: "△△기계", date: "2026-09-26", done: true },
-  { no: 678, std: "CE", company: "(주)△△메디칼", date: "2026-09-25", done: true },
-  { no: 677, std: "KC", company: "△△산업", date: "2026-09-23", done: true },
+  { no: 684, std: "KC, CE", company: "(주)△△전자", ago: 1, done: false },
+  { no: 683, std: "FCC", company: "△△테크", ago: 2, done: true },
+  { no: 682, std: "KC", company: "(주)△△라이팅", ago: 5, done: true },
+  { no: 681, std: "KOLAS", company: "△△시스템", ago: 6, done: true },
+  { no: 680, std: "KC, FCC, CE", company: "(주)△△모빌리티", ago: 8, done: true },
+  { no: 679, std: "KCs", company: "△△기계", ago: 11, done: true },
+  { no: 678, std: "CE", company: "(주)△△메디칼", ago: 12, done: true },
+  { no: 677, std: "KC", company: "△△산업", ago: 14, done: true },
 ];
 
 export function CertLabDemo() {
   const minute = useNowMinute();
+  const today = useDemoToday();
   const [route, setRoute] = useState<Route>({ m: "home", s: "" });
   const [quoteForm, setQuoteForm] = useState(false);
   const [certs, setCerts] = useState<string[]>([]);
@@ -332,6 +342,7 @@ export function CertLabDemo() {
     rows,
     addRow: (r) => setRows((prev) => [r, ...prev]),
     minute,
+    today,
   };
 
   return (
@@ -588,20 +599,22 @@ function FloatingContact() {
 
 /* ---------- 메인 ---------- */
 
-const BOARD: { tab: "news" | "files"; title: string; date: string; body: string; file?: string }[] = [
-  { tab: "news", title: "2026년 11월 1일 접수분부터 전자파 시험수수료 조정 안내", date: "2026-09-30", body: "인건비와 장비 교정 비용 상승에 따라 전자파(EMC) 시험수수료를 항목별로 4~7% 조정합니다. 10월 31일까지 견적서를 받으신 건은 기존 수수료를 적용합니다. 항목별 수수료는 자료실의 시험항목별 수수료 및 시험처리기간 안내를 확인해 주십시오." },
-  { tab: "news", title: "추석 연휴(9.24~9.28) 시료 접수 및 성적서 발행 일정 안내", date: "2026-09-15", body: "9월 24일부터 9월 28일까지 시료 접수와 성적서 발행 업무를 하지 않습니다. 연휴 중 택배로 도착한 시료는 9월 29일부터 순서대로 접수하며, 9월 22일까지 시험이 완료된 건은 9월 23일까지 성적서를 발행합니다." },
-  { tab: "news", title: "방송통신기자재 적합성평가 고시 개정 시행에 따른 무선충전기 시험 기준 변경", date: "2026-09-08", body: "개정 고시가 2026년 10월 1일부터 시행되어 출력 15W를 넘는 무선충전기는 적합등록에서 적합인증 대상으로 바뀝니다. 시행일 전 접수한 건은 종전 기준으로 시험합니다. 해당 품목은 담당 시험원이 개별로 안내해 드립니다." },
-  { tab: "news", title: "전기용품 안전기준 KC 60335-2-30 개정판 시행 안내 (전기 히터)", date: "2026-08-28", body: "실내용 전기 히터의 표면 온도 상승 한도와 전도 시험 조건이 바뀝니다. 2027년 2월 출시 제품부터 개정판으로 시험하므로 겨울철 출시 예정 제품은 일정을 미리 상담해 주십시오." },
-  { tab: "news", title: "3m 전파무향실 정기 검증으로 8월 25일~27일 방사 시험 휴무", date: "2026-08-12", body: "8월 25일부터 8월 27일까지 무향실 정기 검증(NSA 측정)으로 방사 시험을 쉽니다. 해당 기간 예약 건은 담당 시험원이 일정을 다시 잡아 연락드립니다. 전도 시험과 전기안전 시험은 정상 진행합니다." },
-  { tab: "news", title: "KOLAS 정기 사후평가 결과 인정 범위 유지 및 무선 시험 항목 추가", date: "2026-07-21", body: "7월 정기 사후평가를 마쳐 기존 인정 범위가 유지되었고, 블루투스 저전력(BLE) 송신 출력과 점유주파수폭 시험 항목이 인정 범위에 추가되었습니다." },
-  { tab: "news", title: "△△진흥원 중소기업 인증 지원사업 2차 참여기업 모집 공고", date: "2026-07-02", body: "중소기업의 국내·해외 인증 비용 일부를 지원하는 사업입니다. 신청 마감은 7월 31일이며, 신청 서류 작성은 견적문의로 요청하시면 도와 드립니다." },
-  { tab: "files", title: "시험항목별 수수료 및 시험처리기간 안내", date: "2026-09-20", body: "전자파, 무선, 전기안전 시험 항목별 기본 수수료와 처리 기간입니다.", file: "PDF · 412KB" },
-  { tab: "files", title: "[서식] 시험신청서", date: "2026-09-02", body: "시험 신청 시 시료와 함께 보내 주십시오.", file: "HWP · 48KB" },
-  { tab: "files", title: "중소기업 시험수수료 할인 안내", date: "2026-08-18", body: "중소기업 확인서를 내시면 시험수수료를 할인해 드립니다.", file: "PDF · 186KB" },
-  { tab: "files", title: "[서식] 시료 정보 및 시험 모드 기재표", date: "2026-07-30", body: "시료의 동작 모드와 연결 방법을 적어 주십시오.", file: "XLSX · 31KB" },
-  { tab: "files", title: "무선기기 적합인증 제출 기술 문서 목록", date: "2026-07-02", body: "적합인증 신청에 필요한 기술 문서 목록입니다.", file: "PDF · 286KB" },
-  { tab: "files", title: "해외인증 국가별 표시 방법 정리", date: "2026-05-27", body: "국가별 인증 마크와 표시 위치를 정리했습니다.", file: "PDF · 1.2MB" },
+type BoardText = string | ((t: Date) => string);
+const boardText = (v: BoardText, t: Date) => (typeof v === "function" ? v(t) : v);
+const BOARD: { tab: "news" | "files"; title: string; ago: number; body: BoardText; file?: string }[] = [
+  { tab: "news", title: "전자파 시험수수료 조정 안내", ago: 7, body: (t) => `인건비와 장비 교정 비용 상승에 따라 전자파(EMC) 시험수수료를 항목별로 4~7% 조정합니다. ${daysAgo(t, -25).getFullYear()}년 ${agoKo(t, -25)} 접수분부터 적용하며, ${agoKo(t, -24)}까지 견적서를 받으신 건은 기존 수수료를 적용합니다. 항목별 수수료는 자료실의 시험항목별 수수료 및 시험처리기간 안내를 확인해 주십시오.` },
+  { tab: "news", title: "명절 연휴 시료 접수 및 성적서 발행 일정 안내", ago: 22, body: (t) => `${agoKo(t, 13)}부터 ${agoKo(t, 9)}까지 시료 접수와 성적서 발행 업무를 하지 않습니다. 연휴 중 택배로 도착한 시료는 ${agoKo(t, 8)}부터 순서대로 접수하며, ${agoKo(t, 15)}까지 시험이 완료된 건은 ${agoKo(t, 14)}까지 성적서를 발행합니다.` },
+  { tab: "news", title: "방송통신기자재 적합성평가 고시 개정 시행에 따른 무선충전기 시험 기준 변경", ago: 29, body: (t) => `개정 고시가 ${daysAgo(t, 6).getFullYear()}년 ${agoKo(t, 6)}부터 시행되어 출력 15W를 넘는 무선충전기는 적합등록에서 적합인증 대상으로 바뀝니다. 시행일 전 접수한 건은 종전 기준으로 시험합니다. 해당 품목은 담당 시험원이 개별로 안내해 드립니다.` },
+  { tab: "news", title: "전기용품 안전기준 KC 60335-2-30 개정판 시행 안내 (전기 히터)", ago: 40, body: (t) => `실내용 전기 히터의 표면 온도 상승 한도와 전도 시험 조건이 바뀝니다. ${daysAgo(t, -117).getFullYear()}년 ${daysAgo(t, -117).getMonth() + 1}월 출시 제품부터 개정판으로 시험하므로 출시 예정 제품은 일정을 미리 상담해 주십시오.` },
+  { tab: "news", title: "3m 전파무향실 정기 검증에 따른 방사 시험 휴무 안내", ago: 56, body: (t) => `${agoKo(t, 43)}부터 ${agoKo(t, 41)}까지 무향실 정기 검증(NSA 측정)으로 방사 시험을 쉽니다. 해당 기간 예약 건은 담당 시험원이 일정을 다시 잡아 연락드립니다. 전도 시험과 전기안전 시험은 정상 진행합니다.` },
+  { tab: "news", title: "KOLAS 정기 사후평가 결과 인정 범위 유지 및 무선 시험 항목 추가", ago: 78, body: "정기 사후평가를 마쳐 기존 인정 범위가 유지되었고, 블루투스 저전력(BLE) 송신 출력과 점유주파수폭 시험 항목이 인정 범위에 추가되었습니다." },
+  { tab: "news", title: "△△진흥원 중소기업 인증 지원사업 2차 참여기업 모집 공고", ago: 97, body: (t) => `중소기업의 국내·해외 인증 비용 일부를 지원하는 사업입니다. 신청 마감은 ${agoKo(t, 68)}이며, 신청 서류 작성은 견적문의로 요청하시면 도와 드립니다.` },
+  { tab: "files", title: "시험항목별 수수료 및 시험처리기간 안내", ago: 17, body: "전자파, 무선, 전기안전 시험 항목별 기본 수수료와 처리 기간입니다.", file: "PDF · 412KB" },
+  { tab: "files", title: "[서식] 시험신청서", ago: 35, body: "시험 신청 시 시료와 함께 보내 주십시오.", file: "HWP · 48KB" },
+  { tab: "files", title: "중소기업 시험수수료 할인 안내", ago: 50, body: "중소기업 확인서를 내시면 시험수수료를 할인해 드립니다.", file: "PDF · 186KB" },
+  { tab: "files", title: "[서식] 시료 정보 및 시험 모드 기재표", ago: 69, body: "시료의 동작 모드와 연결 방법을 적어 주십시오.", file: "XLSX · 31KB" },
+  { tab: "files", title: "무선기기 적합인증 제출 기술 문서 목록", ago: 97, body: "적합인증 신청에 필요한 기술 문서 목록입니다.", file: "PDF · 286KB" },
+  { tab: "files", title: "해외인증 국가별 표시 방법 정리", ago: 133, body: "국가별 인증 마크와 표시 위치를 정리했습니다.", file: "PDF · 1.2MB" },
 ];
 
 const MARKS: { name: string; to: [MenuId, string] }[] = [
@@ -622,7 +635,7 @@ const MARKS: { name: string; to: [MenuId, string] }[] = [
 ];
 
 function Home() {
-  const { go, openQuote, setTrackQuery } = useCl();
+  const { go, openQuote, setTrackQuery, today } = useCl();
   const [no, setNo] = useState("");
 
   const tools = [
@@ -669,7 +682,7 @@ function Home() {
                   id="cl-quick-no"
                   value={no}
                   onChange={(e) => setNo(e.target.value)}
-                  placeholder="접수번호 (예: TE-2609-0412)"
+                  placeholder={`접수번호 (예: ${sampleNo(today)})`}
                   autoComplete="off"
                   className="h-12 min-w-0 flex-1 rounded-[8px] border px-3 text-[16px] font-semibold tabular-nums outline-none focus:border-[#23307a]"
                   style={{ borderColor: C.line }}
@@ -720,7 +733,7 @@ function Home() {
                         {b.file && <FileText size={16} className="shrink-0" style={{ color: C.cyanText }} aria-hidden />}
                         <span className="min-w-0 flex-1 truncate">{b.title}</span>
                         <span className="shrink-0 text-[13px] tabular-nums" style={{ color: C.muted }}>
-                          {b.date.replaceAll("-", ".")}
+                          {fmtDot(daysAgo(today, b.ago))}
                         </span>
                       </button>
                     </li>
@@ -2398,7 +2411,15 @@ const ITEMS: Record<Exclude<TestKind, "EMC">, string[]> = {
   SAFETY: ["절연저항", "내전압", "온도 상승", "누설전류"],
 };
 
-const SAMPLE_NO = "TE-2609-0412";
+/** 예시 접수번호: 오늘 기준 보름 전이 속한 달에 접수한 건 (2026-10-07이면 TE-2609-0412) */
+const sampleYm = (t: Date) => {
+  const d = daysAgo(t, 15);
+  return { yy: d.getFullYear() % 100, mm: d.getMonth() + 1 };
+};
+const sampleNo = (t: Date) => {
+  const { yy, mm } = sampleYm(t);
+  return `TE-${pad2(yy)}${pad2(mm)}-0412`;
+};
 
 interface TrackResult {
   no: string;
@@ -2408,14 +2429,15 @@ interface TrackResult {
   dates: Date[];
 }
 
-function lookup(raw: string): TrackResult | null {
+function lookup(raw: string, today: Date): TrackResult | null {
   const s = raw.trim().toUpperCase().replace(/\s/g, "");
   const tail = s.match(/(\d{4})$/);
   if (!tail) return null;
   const seed = Number(tail[1]);
   const ym = s.match(/(\d{2})(0[1-9]|1[0-2])-?\d{4}$/);
-  const yy = ym ? Number(ym[1]) : 26;
-  const mm = ym ? Number(ym[2]) : 9;
+  const base = sampleYm(today);
+  const yy = ym ? Number(ym[1]) : base.yy;
+  const mm = ym ? Number(ym[2]) : base.mm;
   const kind = TEST_KIND[(seed * 7) % 4];
   const start = new Date(2000 + yy, mm - 1, 1 + (seed % 9));
   return {
@@ -2509,16 +2531,17 @@ function Spectrum({ pending, replayKey }: { pending: boolean; replayKey: string 
 }
 
 function Tracking() {
-  const { trackQuery, minute } = useCl();
+  const { trackQuery, minute, today: demoToday } = useCl();
+  const SAMPLE_NO = sampleNo(demoToday);
   const reduce = useReducedMotionSafe();
   const first = trackQuery.trim();
   const [query, setQuery] = useState(first);
-  const [result, setResult] = useState<TrackResult | null>(() => (first ? lookup(first) : null));
-  const [error, setError] = useState(() => (!first || lookup(first) ? "" : `접수번호 끝 네 자리 숫자를 확인해 주십시오. 예: ${SAMPLE_NO}`));
+  const [result, setResult] = useState<TrackResult | null>(() => (first ? lookup(first, demoToday) : null));
+  const [error, setError] = useState(() => (!first || lookup(first, demoToday) ? "" : `접수번호 끝 네 자리 숫자를 확인해 주십시오. 예: ${SAMPLE_NO}`));
 
   const submit = (e: FormEvent) => {
     e.preventDefault();
-    const r = lookup(query);
+    const r = lookup(query, demoToday);
     if (!r) {
       setError(query.trim() ? `접수번호 끝 네 자리 숫자를 확인해 주십시오. 예: ${SAMPLE_NO}` : "접수번호를 입력해 주십시오.");
       setResult(null);
@@ -2704,13 +2727,14 @@ function Tracking() {
 /* ---------- 성적서 진위확인 ---------- */
 
 function Verify() {
+  const { today } = useCl();
   const [no, setNo] = useState("TR-2609-0412");
   const [shown, setShown] = useState<string | null>(null);
   const [error, setError] = useState("");
 
   const submit = (e: FormEvent) => {
     e.preventDefault();
-    if (!lookup(no)) {
+    if (!lookup(no, today)) {
       setError("성적서 번호 끝 네 자리 숫자를 확인해 주십시오. 예: TR-2609-0412");
       setShown(null);
       return;
@@ -2719,7 +2743,7 @@ function Verify() {
     setShown(no.trim().toUpperCase());
   };
 
-  const r = shown ? lookup(shown) : null;
+  const r = shown ? lookup(shown, today) : null;
   const valid = r ? Number(r.no.slice(-4)) % 7 !== 0 : false;
 
   return (
@@ -2838,6 +2862,7 @@ function Quote() {
 }
 
 function QuoteList({ rows, onWrite }: { rows: QuoteRow[]; onWrite: () => void }) {
+  const { today } = useCl();
   return (
     <div>
       <div className="flex flex-wrap items-center justify-between gap-3">
@@ -2862,7 +2887,7 @@ function QuoteList({ rows, onWrite }: { rows: QuoteRow[]; onWrite: () => void })
             </span>,
             r.company,
             <span key="d" className="tabular-nums" style={{ color: C.muted }}>
-              {r.date.replaceAll("-", ".")}
+              {rowDate(r, today)}
             </span>,
             <span key="st" className="whitespace-nowrap rounded-[6px] px-2 py-0.5 text-[13px] font-bold" style={r.done ? { background: C.okSoft, color: C.ok } : { background: C.cyanSoft, color: C.cyanText }}>
               {r.done ? "답변완료" : "접수"}
@@ -3192,6 +3217,7 @@ function QuoteForm({ onList }: { onList: () => void }) {
 /* ---------- 새소식, 자료실, 질의응답 ---------- */
 
 function Board({ tab }: { tab: "news" | "files" }) {
+  const { today } = useCl();
   const [query, setQuery] = useState("");
   const [open, setOpen] = useState<string | null>(null);
   const all = BOARD.filter((b) => b.tab === tab);
@@ -3253,12 +3279,12 @@ function Board({ tab }: { tab: "news" | "files" }) {
                       <ChevronDown size={17} className="ml-auto shrink-0 transition-transform md:ml-0" style={{ transform: on ? "rotate(180deg)" : undefined, color: C.muted }} aria-hidden />
                     </span>
                     <span className="text-[13px] tabular-nums md:text-center md:text-[14px]" style={{ color: C.muted }}>
-                      {b.date.replaceAll("-", ".")}
+                      {fmtDot(daysAgo(today, b.ago))}
                     </span>
                   </button>
                   {on && (
                     <div id={panel} className="px-4 py-5 text-[15px] md:px-[80px]" style={{ background: C.paper }}>
-                      <p>{b.body}</p>
+                      <p>{boardText(b.body, today)}</p>
                       {b.file && (
                         <p className="mt-3 inline-flex items-center gap-2 rounded-[8px] border bg-white px-3 py-2 text-[14px]" style={{ borderColor: C.line }}>
                           <FileText size={16} style={{ color: C.cyanText }} aria-hidden />

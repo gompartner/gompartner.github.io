@@ -5,6 +5,7 @@ import Image from "next/image";
 import { AnimatePresence, motion } from "framer-motion";
 import { Check, ChevronDown, ChevronRight, CircleAlert, FileUp, House, Menu, RotateCcw, Trash2, X } from "lucide-react";
 import { useReducedMotionSafe } from "@/hooks/useReducedMotionSafe";
+import { daysAgo, fmtDash, fmtKo, useDemoToday } from "@/hooks/useDemoToday";
 
 /* 기업 홈페이지 데모: 가상의 (주)곰파트너정밀, CNC 정밀 가공 제조업체.
    회사명, 대표자, 주소, 전화번호, 사업자 정보, 설비 모델명, 제조사, 거래처, 인증 기관은 모두 가상이다.
@@ -252,36 +253,47 @@ const CERTS: { name: L; scope: L; org: L; year: number }[] = [
   { name: l("뿌리기업", "Root industry company"), scope: l("정밀가공 분야 확인", "Precision machining"), org: l("△△진흥원", "△△ Agency"), year: 2021 },
 ];
 
-const NOTICES: { title: L; date: string; body: L }[] = [
-  {
-    title: l("추석 연휴 휴무 및 출하 일정 안내", "Chuseok holiday closure and shipping schedule"),
-    date: "2026-09-15",
-    body: l(
-      "9월 24일(목)부터 9월 28일(월)까지 휴무합니다. 9월 23일까지 출하 예정인 제품은 일정대로 출하하며, 연휴 중 접수된 견적문의는 9월 29일부터 순서대로 회신해 드립니다.",
-      "We are closed from September 24 to 28. Orders due by September 23 ship as scheduled, and quote requests received during the holiday are answered from September 29.",
-    ),
-  },
-  {
-    title: l("하계 휴가 기간 하역장 운영 안내", "Loading dock hours during summer vacation"),
-    date: "2026-07-24",
-    body: l("8월 3일부터 8월 5일까지 하역장은 오전 9시부터 12시까지만 운영합니다. 화물 납품은 전날까지 전화로 예약해 주시기 바랍니다.", "From August 3 to 5 the loading dock is open 09:00 to 12:00 only. Please book deliveries by phone the day before."),
-  },
-  {
-    title: l("ISO 13485 사후 심사 완료", "ISO 13485 surveillance audit completed"),
-    date: "2026-06-18",
-    body: l("의료기기 품질경영시스템 사후 심사를 지적 사항 없이 마쳤습니다.", "The surveillance audit for our medical device quality management system was completed with no findings."),
-  },
-  {
-    title: l("견적문의 메일 주소 분리 안내", "Separate email addresses for quotes"),
-    date: "2026-04-01",
-    body: l(`가공 견적은 ${MAIL_QUOTE}, 그 밖의 문의는 ${MAIL_INFO}로 보내 주시기 바랍니다.`, `Please send machining quote requests to ${MAIL_QUOTE} and other inquiries to ${MAIL_INFO}.`),
-  },
-  {
-    title: l("홈페이지 개편 안내", "Website renewal"),
-    date: "2026-03-02",
-    body: l("설비현황과 생산제품 정보를 새로 정리하고, 견적문의에 도면 첨부 기능을 더했습니다.", "Facility and product information has been updated, and drawings can now be attached to quote requests."),
-  },
-];
+// 공지 작성일은 오늘 기준 며칠 전(ago)으로 두고, 본문의 날짜도 오늘에서 계산한다.
+const EN_MONTH = ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"];
+const koMD = (d: Date) => `${d.getMonth() + 1}월 ${d.getDate()}일`;
+const enMD = (d: Date) => `${EN_MONTH[d.getMonth()]} ${d.getDate()}`;
+
+function makeNotices(today: Date): { title: L; date: string; body: L }[] {
+  const at = (n: number) => daysAgo(today, n);
+  return [
+    {
+      title: l("명절 연휴 휴무 및 출하 일정 안내", "Holiday closure and shipping schedule"),
+      date: fmtDash(at(22)),
+      body: l(
+        `${fmtKo(at(13))}부터 ${fmtKo(at(9))}까지 휴무합니다. ${koMD(at(14))}까지 출하 예정인 제품은 일정대로 출하하며, 연휴 중 접수된 견적문의는 ${koMD(at(8))}부터 순서대로 회신해 드립니다.`,
+        `We are closed from ${enMD(at(13))} to ${enMD(at(9))}. Orders due by ${enMD(at(14))} ship as scheduled, and quote requests received during the holiday are answered from ${enMD(at(8))}.`,
+      ),
+    },
+    {
+      title: l("휴가 기간 하역장 운영 안내", "Loading dock hours during vacation"),
+      date: fmtDash(at(75)),
+      body: l(
+        `${koMD(at(65))}부터 ${koMD(at(63))}까지 하역장은 오전 9시부터 12시까지만 운영합니다. 화물 납품은 전날까지 전화로 예약해 주시기 바랍니다.`,
+        `From ${enMD(at(65))} to ${enMD(at(63))} the loading dock is open 09:00 to 12:00 only. Please book deliveries by phone the day before.`,
+      ),
+    },
+    {
+      title: l("ISO 13485 사후 심사 완료", "ISO 13485 surveillance audit completed"),
+      date: fmtDash(at(111)),
+      body: l("의료기기 품질경영시스템 사후 심사를 지적 사항 없이 마쳤습니다.", "The surveillance audit for our medical device quality management system was completed with no findings."),
+    },
+    {
+      title: l("견적문의 메일 주소 분리 안내", "Separate email addresses for quotes"),
+      date: fmtDash(at(189)),
+      body: l(`가공 견적은 ${MAIL_QUOTE}, 그 밖의 문의는 ${MAIL_INFO}로 보내 주시기 바랍니다.`, `Please send machining quote requests to ${MAIL_QUOTE} and other inquiries to ${MAIL_INFO}.`),
+    },
+    {
+      title: l("홈페이지 개편 안내", "Website renewal"),
+      date: fmtDash(at(219)),
+      body: l("설비현황과 생산제품 정보를 새로 정리하고, 견적문의에 도면 첨부 기능을 더했습니다.", "Facility and product information has been updated, and drawings can now be attached to quote requests."),
+    },
+  ];
+}
 
 const BUSINESS: Record<string, { desc: L; rows: [L, L][]; machines: MachineKey[] }> = {
   lathe: {
@@ -594,6 +606,7 @@ function Header() {
 
 function Home() {
   const { x, s, go } = useCo();
+  const notices = makeNotices(useDemoToday());
 
   const specs = [
     { k: x("최소 공차", "Tightest tolerance"), v: "±0.01", u: "mm" },
@@ -749,7 +762,7 @@ function Home() {
               </button>
             </div>
             <ul>
-              {NOTICES.slice(0, 4).map((n) => (
+              {notices.slice(0, 4).map((n) => (
                 <li key={n.date} className="flex items-baseline justify-between gap-3 border-b py-2.5 text-[15px]" style={{ borderColor: C.line }}>
                   <span className="min-w-0 truncate">{s(n.title)}</span>
                   <span className="shrink-0 text-[13px] tabular-nums" style={{ color: C.muted }}>
@@ -1827,6 +1840,8 @@ function Products({ cat }: { cat: PrCat | "all" }) {
 function Notice() {
   const { x, s } = useCo();
   const [open, setOpen] = useState<number | null>(null);
+  const today = useDemoToday();
+  const NOTICES = makeNotices(today);
   return (
     <div>
       <p className="text-[15px] tabular-nums" style={{ color: C.muted }}>

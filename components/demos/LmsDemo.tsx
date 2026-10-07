@@ -1,9 +1,10 @@
 "use client";
 
-import { useCallback, useEffect, useMemo, useRef, useState } from "react";
+import { createContext, useCallback, useContext, useEffect, useMemo, useRef, useState } from "react";
 import { AnimatePresence, motion } from "framer-motion";
 import Image from "next/image";
 import { Briefcase, Check, ChevronLeft, ChevronRight, ClipboardList, Download, HardHat, LayoutGrid, Lock, Pause, Play, Plus, Printer, RotateCcw, Scale, Send, Users, X } from "lucide-react";
+import { daysAgo, fmtDash, fmtDot, fmtMD, useDemoToday } from "@/hooks/useDemoToday";
 import { useLocalStorage } from "@/hooks/useLocalStorage";
 import { useReducedMotionSafe } from "@/hooks/useReducedMotionSafe";
 
@@ -33,7 +34,7 @@ const C = {
 } as const;
 
 const EASE = [0.23, 1, 0.32, 1] as const;
-const STORAGE_KEY = "gs-demo:lms:v3";
+const STORAGE_KEY = "gs-demo:lms:v4";
 const DONE_RATIO = 0.9;
 const PASS_PROGRESS = 80;
 const PASS_TOTAL = 60;
@@ -41,15 +42,12 @@ const MID_WEIGHT = 0.3;
 const FINAL_WEIGHT = 0.7;
 const ME = { id: "me", name: "김하늘", dept: "인사팀" };
 
+// 학습기간·기수·공지일은 모두 오늘 기준으로 계산한다 (아래 makeDates)
 const COURSE = {
   title: "엑셀 실무 기초",
-  term: "2026년 10월 1기",
-  period: "2026.09.28 ~ 2026.10.27",
-  review: "2026.10.28 ~ 2027.01.27",
   dday: 20,
   teacher: "박서영",
 };
-const TODAY = "2026.10.07";
 
 interface Lesson {
   title: string;
@@ -91,7 +89,7 @@ const SCALE = ["매우 그렇다", "그렇다", "보통이다", "그렇지 않�
 const NOTICES = [
   {
     title: "[필독] 수료기준 및 학습 유의사항",
-    date: "2026.09.28",
+    ago: 9,
     body: [
       "진도율 80% 이상, 총점 60점 이상 시 수료됩니다.",
       "차시별 학습시간의 90% 이상 학습해야 학습완료로 인정됩니다.",
@@ -100,8 +98,8 @@ const NOTICES = [
       "복습기간에는 진도율에 반영되지 않습니다.",
     ],
   },
-  { title: "모사답안 처리 기준 안내", date: "2026.09.28", body: ["모사답안으로 확인된 경우 0점 처리되며 미수료됩니다."] },
-  { title: "학습지원센터 운영시간 안내", date: "2026.09.25", body: ["평일 09:00~18:00 (점심시간 12:00~13:00)", "주말 및 공휴일 휴무", "전화 02-000-0000"] },
+  { title: "모사답안 처리 기준 안내", ago: 9, body: ["모사답안으로 확인된 경우 0점 처리되며 미수료됩니다."] },
+  { title: "학습지원센터 운영시간 안내", ago: 12, body: ["평일 09:00~18:00 (점심시간 12:00~13:00)", "주말 및 공휴일 휴무", "전화 02-000-0000"] },
 ];
 
 interface Qna {
@@ -110,10 +108,10 @@ interface Qna {
   date: string;
   answered: boolean;
 }
-const QNA: Qna[] = [
-  { title: "피벗 테이블 새로 고침이 안 됩니다", writer: "정도윤", date: "2026.10.06", answered: false },
-  { title: "VLOOKUP 결과가 #N/A로 나옵니다", writer: "이서준", date: "2026.10.02", answered: true },
-  { title: "실습 파일은 어디서 받나요?", writer: "최유나", date: "2026.09.29", answered: true },
+const QNA: (Omit<Qna, "date"> & { ago: number })[] = [
+  { title: "피벗 테이블 새로 고침이 안 됩니다", writer: "정도윤", ago: 1, answered: false },
+  { title: "VLOOKUP 결과가 #N/A로 나옵니다", writer: "이서준", ago: 5, answered: true },
+  { title: "실습 파일은 어디서 받나요?", writer: "최유나", ago: 8, answered: true },
 ];
 
 /* ---------- 진도 계산 ---------- */
@@ -147,14 +145,14 @@ interface Applied {
   period: string;
 }
 
-const SMS_TEMPLATES = [
+const smsTemplates = (endKo: string) => [
   {
     kind: "학습독려",
-    text: "[곰파트너 아카데미] {이름}님, 엑셀 실무 기초 현재 진도율은 {진도율}입니다. 학습종료일 10월 27일까지 진도율 80% 이상 학습하셔야 수료됩니다.",
+    text: `[곰파트너 아카데미] {이름}님, 엑셀 실무 기초 현재 진도율은 {진도율}입니다. 학습종료일 ${endKo}까지 진도율 80% 이상 학습하셔야 수료됩니다.`,
   },
   {
     kind: "평가 안내",
-    text: "[곰파트너 아카데미] {이름}님, 엑셀 실무 기초 최종평가 응시가 가능합니다. 학습종료일 10월 27일까지 응시하셔야 수료됩니다.",
+    text: `[곰파트너 아카데미] {이름}님, 엑셀 실무 기초 최종평가 응시가 가능합니다. 학습종료일 ${endKo}까지 응시하셔야 수료됩니다.`,
   },
 ];
 
@@ -165,10 +163,8 @@ const initialState: State = {
   final: null,
   survey: false,
   qna: [],
-  sms: [
-    { at: "2026.10.05 10:00", kind: "학습독려", type: "LMS", count: 52, text: SMS_TEMPLATES[0].text },
-    { at: "2026.09.28 09:00", kind: "개강 안내", type: "LMS", count: 143, text: "[곰파트너 아카데미] {이름}님, 엑셀 실무 기초 2026년 10월 1기 학습이 시작되었습니다. 학습기간 09.28 ~ 10.27" },
-  ],
+  // 관리자가 보낸 문자만 저장한다. 기존 발송내역은 makeDates에서 오늘 기준으로 만든다.
+  sms: [],
   confirmed: {},
   loggedIn: false,
   applied: [],
@@ -199,7 +195,7 @@ function maskName(name: string) {
 }
 // 문자 바이트 (한글 2byte, 90byte 넘으면 LMS)
 const smsBytes = (s: string) => [...s].reduce((n, ch) => n + (ch.charCodeAt(0) > 127 ? 2 : 1), 0);
-const certNo = (index: number) => `2026-10-${String(index + 1).padStart(3, "0")}`;
+const certNo = (prefix: string, index: number) => `${prefix}-${String(index + 1).padStart(3, "0")}`;
 
 /* ---------- 관리자 화면 가상 수강생 ---------- */
 
@@ -223,7 +219,7 @@ interface Learner {
   last: number | null;
   mid: number | null;
   final: number | null;
-  confirmedAt: string | null;
+  confirmedAt: number | null;
 }
 
 const DEPTS = ["생산1팀", "생산2팀", "품질관리팀", "영업팀", "구매팀", "총무팀", "회계팀", "물류팀", "기술연구소", "고객지원팀"];
@@ -254,7 +250,7 @@ const LEARNERS: Learner[] = (() => {
       last,
       mid,
       final: fin,
-      confirmedAt: meets && rand() < 0.55 ? pick(["2026.10.05", "2026.10.06"]) : null,
+      confirmedAt: meets && rand() < 0.55 ? pick([2, 1]) : null,
     });
   }
   return out;
@@ -272,7 +268,6 @@ const DROPOFF = [
   [100, 97, 95, 93, 91, 89, 88, 87, 86, 85],
 ];
 
-const lastDate = (d: number | null) => (d === null ? "-" : d <= 6 ? `2026.10.0${7 - d}` : `2026.09.${30 - (d - 7)}`);
 
 /* ---------- 공통 스타일 ---------- */
 
@@ -343,14 +338,9 @@ interface CourseInfo {
   refund: boolean;
   img: string;
   imgAlt: string;
-  terms: { term: string; period: string; close: string }[];
+  terms: "month" | "quarter";
 }
 
-const TERMS_MONTH = [
-  { term: "2026년 10월 2기", period: "2026.10.19 ~ 2026.11.17", close: "2026.10.15" },
-  { term: "2026년 11월 1기", period: "2026.11.02 ~ 2026.12.01", close: "2026.10.29" },
-];
-const TERMS_QUARTER = [{ term: "2026년 4분기", period: "2026.10.01 ~ 2026.12.31", close: "2026.12.15" }];
 
 const COURSES: CourseInfo[] = [
   {
@@ -364,7 +354,7 @@ const COURSES: CourseInfo[] = [
     refund: true,
     img: "/images/demo-tax/hero.jpg",
     imgAlt: "서류와 계산기, 노트북이 놓인 사무실 책상",
-    terms: TERMS_MONTH,
+    terms: "month",
   },
   {
     id: "harass",
@@ -377,7 +367,7 @@ const COURSES: CourseInfo[] = [
     refund: false,
     img: "/images/demo-tax/office.jpg",
     imgAlt: "원탁과 의자가 놓인 회의실",
-    terms: TERMS_QUARTER,
+    terms: "quarter",
   },
   {
     id: "safety",
@@ -390,7 +380,7 @@ const COURSES: CourseInfo[] = [
     refund: false,
     img: "/images/demo-company/hero.jpg",
     imgAlt: "가공 장비가 늘어선 공장 내부",
-    terms: TERMS_QUARTER,
+    terms: "quarter",
   },
   {
     id: "privacy",
@@ -403,7 +393,7 @@ const COURSES: CourseInfo[] = [
     refund: false,
     img: "/images/demo-application/p1.jpg",
     imgAlt: "노트북으로 일하는 직원",
-    terms: TERMS_QUARTER,
+    terms: "quarter",
   },
   {
     id: "biz-doc",
@@ -416,7 +406,7 @@ const COURSES: CourseInfo[] = [
     refund: true,
     img: "/images/demo-law/desk.jpg",
     imgAlt: "책상 위에 놓인 서류와 만년필",
-    terms: TERMS_MONTH,
+    terms: "month",
   },
   {
     id: "quality",
@@ -429,7 +419,7 @@ const COURSES: CourseInfo[] = [
     refund: true,
     img: "/images/demo-certlab/lab.jpg",
     imgAlt: "시험 장비가 놓인 실험실",
-    terms: TERMS_MONTH,
+    terms: "month",
   },
   {
     id: "leader",
@@ -442,7 +432,7 @@ const COURSES: CourseInfo[] = [
     refund: true,
     img: "/images/demo-application/p2.jpg",
     imgAlt: "노트북 화면을 함께 보는 직원들",
-    terms: TERMS_MONTH,
+    terms: "month",
   },
 ];
 const POPULAR = ["excel", "harass", "safety", "privacy"];
@@ -456,12 +446,89 @@ const REFUND_RATES: [string, number][] = [
   ["1,000인 이상 기업", 0.4],
 ];
 
-const SITE_NOTICES = [
-  { title: "2026년 10월 2기 수강신청 안내", date: "2026.10.01", body: ["신청기간 2026.10.01 ~ 2026.10.15", "학습기간 2026.10.19 ~ 2026.11.17"] },
-  ...NOTICES.slice(0, 1),
-  { title: "추석 연휴 학습지원센터 운영 안내", date: "2026.09.22", body: ["2026.09.24 ~ 2026.09.28 학습지원센터 휴무", "휴무 기간 문의는 1:1 문의로 남겨 주시면 순차적으로 답변드립니다."] },
-  ...NOTICES.slice(1, 3),
-];
+/* ---------- 날짜 (오늘 기준) ---------- */
+
+interface Term {
+  term: string;
+  period: string;
+  close: string;
+}
+const addDays = (d: Date, n: number) => new Date(d.getFullYear(), d.getMonth(), d.getDate() + n);
+const ymdKo = (d: Date) => `${d.getFullYear()}년 ${d.getMonth() + 1}월 ${d.getDate()}일`;
+const mdKo = (d: Date) => `${d.getMonth() + 1}월 ${d.getDate()}일`;
+// 월 과정 기수: 개강 일주일 뒤가 속한 달, 그 날이 15일 이전이면 1기
+const monthTerm = (start: Date) => {
+  const m = addDays(start, 7);
+  return `${m.getFullYear()}년 ${m.getMonth() + 1}월 ${m.getDate() <= 15 ? 1 : 2}기`;
+};
+// n분기 전(0이면 이번 분기)
+const quarterOf = (today: Date, n: number) => {
+  const first = Math.floor(today.getMonth() / 3) * 3 - n * 3;
+  const start = new Date(today.getFullYear(), first, 1);
+  const end = new Date(today.getFullYear(), first + 3, 0);
+  return { start, end, label: `${start.getFullYear()}년 ${Math.floor(start.getMonth() / 3) + 1}분기`, period: `${fmtDot(start)} ~ ${fmtDot(end)}` };
+};
+
+function makeDates(today: Date) {
+  const at = (n: number) => daysAgo(today, n);
+  const dot = (n: number) => fmtDot(at(n));
+  const range = (a: number, b: number) => `${dot(a)} ~ ${dot(b)}`;
+  const start = at(9);
+  const end = at(-20);
+  const q0 = quarterOf(today, 0);
+  const q1 = quarterOf(today, 1);
+  const q2 = quarterOf(today, 2);
+  const y = today.getFullYear();
+  const half = today.getMonth() < 6 ? { label: "하반기", period: `${y - 1}.07.01 ~ ${y - 1}.12.31` } : { label: "상반기", period: `${y}.01.02 ~ ${y}.06.30` };
+  const course = { term: monthTerm(start), period: range(9, -20), review: range(-21, -112), end: dot(-20), endKo: mdKo(end) };
+  const termsMonth: Term[] = [
+    { term: monthTerm(at(-12)), period: range(-12, -41), close: dot(-8) },
+    { term: monthTerm(at(-26)), period: range(-26, -55), close: dot(-22) },
+  ];
+  const termsQuarter: Term[] = [{ term: q0.label, period: q0.period, close: fmtDot(addDays(q0.end, -16)) }];
+  const templates = smsTemplates(course.endKo);
+  const smsSeed: SmsLog[] = [
+    { at: `${dot(2)} 10:00`, kind: "학습독려", type: "LMS", count: 52, text: templates[0].text },
+    { at: `${dot(9)} 09:00`, kind: "개강 안내", type: "LMS", count: 143, text: `[곰파트너 아카데미] {이름}님, 엑셀 실무 기초 ${course.term} 학습이 시작되었습니다. 학습기간 ${fmtMD(start)} ~ ${fmtMD(end)}` },
+  ];
+  const notices = NOTICES.map(({ ago, ...n }) => ({ ...n, date: dot(ago) }));
+  return {
+    today: fmtDot(today),
+    dot,
+    course,
+    termsMonth,
+    terms: (k: CourseInfo["terms"]) => (k === "month" ? termsMonth : termsQuarter),
+    certPrefix: fmtDash(today).slice(0, 7),
+    myCertDate: ymdKo(today),
+    pastCert: { no: `${fmtDash(q1.start).slice(0, 7)}-288`, period: q1.period, date: ymdKo(addDays(q1.start, 42)) },
+    history: [
+      ["직장 내 괴롭힘 예방교육", q1.period, "100%", "92점", "수료"],
+      ["개인정보보호 교육", q2.period, "66.7%", "-", "미수료"],
+      [`산업안전보건 교육(${half.label})`, half.period, "100%", "85점", "수료"],
+    ],
+    adminCourses: [
+      ["엑셀 실무 기초", course.term, 8, course.period, 143, "-", "진행중"],
+      ["비즈니스 문서 작성", termsMonth[0].term, 10, termsMonth[0].period, 61, "-", "수강신청중"],
+      ["직장 내 괴롭힘 예방교육", q1.label, 4, q1.period, 412, "91.7%", "종료"],
+      ["산업안전보건 교육", q1.label, 12, q1.period, 207, "78.3%", "종료"],
+      ["엑셀 실무 기초", monthTerm(at(37)), 8, range(37, 8), 97, "69.1%", "종료"],
+      ["개인정보보호 교육", q2.label, 6, q2.period, 389, "86.4%", "종료"],
+    ] as const,
+    templates,
+    smsSeed,
+    notices,
+    qna: QNA.map(({ ago, ...q }) => ({ ...q, date: dot(ago) })),
+    siteNotices: [
+      { title: `${termsMonth[0].term} 수강신청 안내`, date: dot(6), body: [`신청기간 ${range(6, -8)}`, `학습기간 ${termsMonth[0].period}`] },
+      notices[0],
+      { title: "명절 연휴 학습지원센터 운영 안내", date: dot(15), body: [`${range(13, 9)} 학습지원센터 휴무`, "휴무 기간 문의는 1:1 문의로 남겨 주시면 순차적으로 답변드립니다."] },
+      ...notices.slice(1, 3),
+    ],
+  };
+}
+type Dates = ReturnType<typeof makeDates>;
+const DatesCtx = createContext<Dates>(makeDates(new Date(2026, 9, 7)));
+const useDates = () => useContext(DatesCtx);
 const FAQ = [
   { q: "수료기준은 어떻게 되나요?", a: "진도율 80% 이상, 총점 60점 이상 시 수료됩니다. 과정별 수료기준은 과정 상세에서 확인할 수 있습니다." },
   { q: "진도율이 올라가지 않습니다.", a: "차시별 학습시간의 90% 이상 학습해야 학습완료로 인정됩니다. [학습종료] 버튼이 아닌 창 닫기로 종료하면 진도가 저장되지 않을 수 있습니다." },
@@ -626,6 +693,7 @@ function Steps() {
 }
 
 function Home({ go }: { go: (r: Route) => void }) {
+  const D = useDates();
   const [tab, setTab] = useState<"popular" | "new">("popular");
   const list = (tab === "popular" ? POPULAR : NEWEST).map((id) => COURSES.find((c) => c.id === id)!);
   const shortcuts: [string, React.ReactNode, () => void][] = [
@@ -715,7 +783,7 @@ function Home({ go }: { go: (r: Route) => void }) {
               </button>
             </div>
             <ul>
-              {SITE_NOTICES.slice(0, 4).map((n) => (
+              {D.siteNotices.slice(0, 4).map((n) => (
                 <li key={n.title} className="border-b" style={{ borderColor: C.line }}>
                   <button type="button" onClick={() => go({ name: "support", tab: "notice" })} className="flex w-full gap-3 py-2.5 text-left text-[15px]">
                     <span className="min-w-0 flex-1 truncate">{n.title}</span>
@@ -809,12 +877,14 @@ function SiteCoursesPage({ cat, go }: { cat: Category | "전체"; go: (r: Route)
 }
 
 function CourseDetail({ id, state, setState, go, notify }: { id: string; state: State; setState: SetState; go: (r: Route) => void; notify: (t: string) => void }) {
+  const D = useDates();
   const c = COURSES.find((x) => x.id === id) ?? COURSES[0];
   const [term, setTerm] = useState(0);
   const [confirm, setConfirm] = useState(false);
   const applied = state.applied.find((a) => a.id === c.id);
   const status = !state.loggedIn ? null : c.id === "excel" ? "수강중인 과정입니다." : c.id === "biz-doc" ? "신청완료 (학습대기)" : applied ? "신청완료 (승인대기)" : null;
-  const t = c.terms[Math.min(term, c.terms.length - 1)];
+  const terms = D.terms(c.terms);
+  const t = terms[Math.min(term, terms.length - 1)];
 
   return (
     <div className="mx-auto max-w-[1200px] px-4 pt-6 md:px-6">
@@ -857,7 +927,7 @@ function CourseDetail({ id, state, setState, go, notify }: { id: string; state: 
               </dt>
               <dd className="px-3 py-1.5">
                 <select id="term-select" value={term} onChange={(e) => setTerm(Number(e.target.value))} disabled={!!status} className="h-9 w-full max-w-[360px] rounded-[4px] border bg-white px-2 text-[14px] tabular-nums" style={{ borderColor: C.line }}>
-                  {c.terms.map((x, k) => (
+                  {terms.map((x, k) => (
                     <option key={x.term} value={k}>
                       {x.term} ({x.period})
                     </option>
@@ -979,6 +1049,7 @@ function CourseDetail({ id, state, setState, go, notify }: { id: string; state: 
 }
 
 function ApplyPage({ go }: { go: (r: Route) => void }) {
+  const D = useDates();
   return (
     <div className="mx-auto max-w-[1200px] px-4 pt-8 md:px-6">
       <h1 className="text-[26px] font-bold">수강신청</h1>
@@ -1007,9 +1078,9 @@ function ApplyPage({ go }: { go: (r: Route) => void }) {
               {COURSES.map((c) => (
                 <tr key={c.id} className="border-b bg-white" style={{ borderColor: C.line }}>
                   <td className={`${td} font-bold`}>{c.title}</td>
-                  <td className={td}>{c.terms[0].term}</td>
-                  <td className={td}>{c.terms[0].period}</td>
-                  <td className={td}>{c.terms[0].close}</td>
+                  <td className={td}>{D.terms(c.terms)[0].term}</td>
+                  <td className={td}>{D.terms(c.terms)[0].period}</td>
+                  <td className={td}>{D.terms(c.terms)[0].close}</td>
                   <td className={td}>
                     <button type="button" onClick={() => go({ name: "course", id: c.id })} className={btnBase} style={btnLine}>
                       신청
@@ -1026,6 +1097,7 @@ function ApplyPage({ go }: { go: (r: Route) => void }) {
 }
 
 function SupportPage({ tab, go, loggedIn, notify }: { tab: SupportTab; go: (r: Route) => void; loggedIn: boolean; notify: (t: string) => void }) {
+  const D = useDates();
   const [open, setOpen] = useState<number | null>(null);
   const [title, setTitle] = useState("");
   const [body, setBody] = useState("");
@@ -1059,11 +1131,11 @@ function SupportPage({ tab, go, loggedIn, notify }: { tab: SupportTab; go: (r: R
 
       {tab !== "ask" && (
         <ul className="bg-white">
-          {(tab === "notice" ? SITE_NOTICES.map((n) => ({ head: n.title, sub: n.date, body: n.body })) : FAQ.map((f) => ({ head: f.q, sub: "", body: [f.a] }))).map((n, k) => (
+          {(tab === "notice" ? D.siteNotices.map((n) => ({ head: n.title, sub: n.date, body: n.body })) : FAQ.map((f) => ({ head: f.q, sub: "", body: [f.a] }))).map((n, k) => (
             <li key={n.head} className="border-b" style={{ borderColor: C.line }}>
               <button type="button" aria-expanded={open === k} onClick={() => setOpen(open === k ? null : k)} className="flex w-full items-center gap-3 px-4 py-3.5 text-left">
                 <span className="w-6 shrink-0 text-[14px] font-bold tabular-nums" style={{ color: tab === "faq" ? C.brand : C.muted }}>
-                  {tab === "faq" ? "Q" : SITE_NOTICES.length - k}
+                  {tab === "faq" ? "Q" : D.siteNotices.length - k}
                 </span>
                 <span className="min-w-0 flex-1 text-[15px] font-bold">{n.head}</span>
                 {n.sub && (
@@ -1173,6 +1245,8 @@ function LoginPage({ onLogin }: { onLogin: () => void }) {
 export function LmsDemo() {
   const reduce = useReducedMotionSafe();
   const [state, setState, hydrated] = useLocalStorage<State>(STORAGE_KEY, initialState);
+  const today = useDemoToday();
+  const dates = useMemo(() => makeDates(today), [today]);
   const [view, setView] = useState<"site" | "admin">("site");
   const [route, setRoute] = useState<Route>({ name: "home" });
   const [toast, setToast] = useState<{ id: number; text: string } | null>(null);
@@ -1202,6 +1276,7 @@ export function LmsDemo() {
   };
 
   return (
+    <DatesCtx.Provider value={dates}>
     <div className={`min-h-screen ${view === "admin" ? "pb-24" : ""}`} style={{ background: C.bg, color: C.text }} aria-busy={!hydrated}>
       {view === "site" ? (
         <>
@@ -1293,6 +1368,7 @@ export function LmsDemo() {
         </AnimatePresence>
       </div>
     </div>
+    </DatesCtx.Provider>
   );
 }
 
@@ -1311,6 +1387,7 @@ interface CertInfo {
 }
 
 function LearnerView({ state, setState, ratios, done, progress, notify }: { state: State; setState: SetState; ratios: number[]; done: boolean[]; progress: number; notify: (t: string) => void }) {
+  const D = useDates();
   const [page, setPage] = useState<LearnerPage>("ongoing");
   const [inRoom, setInRoom] = useState(false);
   const [tab, setTab] = useState<RoomTab>("study");
@@ -1319,8 +1396,8 @@ function LearnerView({ state, setState, ratios, done, progress, notify }: { stat
 
   const total = totalScore(state.mid, state.final);
   const passed = progress >= PASS_PROGRESS && state.final !== null && total >= PASS_TOTAL;
-  const myCert: CertInfo = { no: certNo(LEARNERS.length), course: COURSE.title, period: COURSE.period, hours: `${Math.floor(TOTAL_MIN / 60)}시간 ${TOTAL_MIN % 60}분`, date: "2026년 10월 7일" };
-  const pastCert: CertInfo = { no: "2026-07-288", course: "직장 내 괴롭힘 예방교육", period: "2026.07.01 ~ 2026.09.30", hours: "1시간", date: "2026년 8월 12일" };
+  const myCert: CertInfo = { no: certNo(D.certPrefix, LEARNERS.length), course: COURSE.title, period: D.course.period, hours: `${Math.floor(TOTAL_MIN / 60)}시간 ${TOTAL_MIN % 60}분`, date: D.myCertDate };
+  const pastCert: CertInfo = { no: D.pastCert.no, course: "직장 내 괴롭힘 예방교육", period: D.pastCert.period, hours: "1시간", date: D.pastCert.date };
 
   return (
     <div className="grid grid-cols-1 gap-5 lg:grid-cols-[200px_minmax(0,1fr)]">
@@ -1357,7 +1434,7 @@ function LearnerView({ state, setState, ratios, done, progress, notify }: { stat
                 <tbody>
                   <tr className="border-t" style={{ borderColor: C.line }}>
                     <td className={`${td} font-bold`}>{COURSE.title}</td>
-                    <td className={`${td} tabular-nums`}>{COURSE.period}</td>
+                    <td className={`${td} tabular-nums`}>{D.course.period}</td>
                     <td className={`${td} tabular-nums`}>{pct(progress)}</td>
                     <td className={`${td} tabular-nums`}>{state.final === null ? "-" : `${total}점`}</td>
                     <td className={td}>{passed ? "수료" : state.final !== null ? "미수료" : "학습중"}</td>
@@ -1369,7 +1446,7 @@ function LearnerView({ state, setState, ratios, done, progress, notify }: { stat
                   </tr>
                   <tr className="border-t" style={{ borderColor: C.line }}>
                     <td className={`${td} font-bold`}>비즈니스 문서 작성</td>
-                    <td className={`${td} tabular-nums`}>2026.10.19 ~ 2026.11.17</td>
+                    <td className={`${td} tabular-nums`}>{D.termsMonth[0].period}</td>
                     <td className={`${td} tabular-nums`}>0%</td>
                     <td className={td}>-</td>
                     <td className={td}>학습대기</td>
@@ -1432,9 +1509,7 @@ function LearnerView({ state, setState, ratios, done, progress, notify }: { stat
                 </thead>
                 <tbody>
                   {[
-                    ["직장 내 괴롭힘 예방교육", "2026.07.01 ~ 2026.09.30", "100%", "92점", "수료"],
-                    ["개인정보보호 교육", "2026.04.01 ~ 2026.06.30", "66.7%", "-", "미수료"],
-                    ["산업안전보건 교육(상반기)", "2026.01.02 ~ 2026.06.30", "100%", "85점", "수료"],
+                    ...D.history,
                   ].map((r) => (
                     <tr key={r[0]} className="border-t" style={{ borderColor: C.line }}>
                       <td className={`${td} font-bold`}>{r[0]}</td>
@@ -1467,7 +1542,7 @@ function LearnerView({ state, setState, ratios, done, progress, notify }: { stat
                 <tbody>
                   <tr className="border-t" style={{ borderColor: C.line }}>
                     <td className={`${td} font-bold`}>{COURSE.title}</td>
-                    <td className={`${td} tabular-nums`}>{COURSE.period}</td>
+                    <td className={`${td} tabular-nums`}>{D.course.period}</td>
                     <td className={`${td} tabular-nums`}>{passed ? myCert.no : "-"}</td>
                     <td className={td}>
                       {!passed ? (
@@ -1552,6 +1627,7 @@ function CourseRoom({
   onCert: () => void;
   notify: (t: string) => void;
 }) {
+  const D = useDates();
   const reduce = useReducedMotionSafe();
   const resumeAt = state.lessons.findIndex((p, k) => !done[k] && p.pos > 5);
   const tabs: [RoomTab, string][] = [
@@ -1577,13 +1653,13 @@ function CourseRoom({
             {COURSE.title}
           </h2>
           <span className="text-[14px]" style={{ color: C.muted }}>
-            {COURSE.term}
+            {D.course.term}
           </span>
         </div>
         <dl className="grid gap-x-6 gap-y-1.5 px-4 py-3 text-[15px] sm:grid-cols-2">
           {[
-            ["학습기간", `${COURSE.period} (D-${COURSE.dday})`],
-            ["복습기간", COURSE.review],
+            ["학습기간", `${D.course.period} (D-${COURSE.dday})`],
+            ["복습기간", D.course.review],
             ["강사", maskName(COURSE.teacher)],
             ["교육시간", `${LESSONS.length}차시 (${Math.floor(TOTAL_MIN / 60)}시간 ${TOTAL_MIN % 60}분)`],
           ].map(([k, v]) => (
@@ -1756,6 +1832,7 @@ function CourseRoom({
 /* ---------- 학습자: 평가 ---------- */
 
 function ExamTab({ state, setState, progress, notify }: { state: State; setState: SetState; progress: number; notify: (t: string) => void }) {
+  const D = useDates();
   const [mode, setMode] = useState<"list" | "mid" | "final" | "survey">("list");
   const [answers, setAnswers] = useState<(number | null)[]>([]);
 
@@ -1855,7 +1932,7 @@ function ExamTab({ state, setState, progress, notify }: { state: State; setState
                 {r.cond}
               </td>
               <td className={`${td} tabular-nums`}>{r.weight}</td>
-              <td className={`${td} tabular-nums`}>~ 2026.10.27</td>
+              <td className={`${td} tabular-nums`}>~ {D.course.end}</td>
               <td className={`${td} tabular-nums font-bold`}>{r.score}</td>
               <td className={td}>
                 {r.taken ? (
@@ -1879,15 +1956,16 @@ function ExamTab({ state, setState, progress, notify }: { state: State; setState
 /* ---------- 학습자: 공지사항, 학습 Q&A ---------- */
 
 function NoticeTab() {
+  const D = useDates();
   const [open, setOpen] = useState<number | null>(0);
   return (
     <div id="room-panel-notice" role="tabpanel" aria-labelledby="room-tab-notice">
       <ul>
-        {NOTICES.map((n, k) => (
+        {D.notices.map((n, k) => (
           <li key={n.title} className="border-b last:border-b-0" style={{ borderColor: C.line }}>
             <button type="button" aria-expanded={open === k} onClick={() => setOpen(open === k ? null : k)} className="flex w-full items-center gap-3 px-4 py-3 text-left">
               <span className="w-6 shrink-0 text-[14px] tabular-nums" style={{ color: C.muted }}>
-                {NOTICES.length - k}
+                {D.notices.length - k}
               </span>
               <span className="min-w-0 flex-1 truncate text-[15px] font-bold">{n.title}</span>
               <span className="shrink-0 text-[14px] tabular-nums" style={{ color: C.muted }}>
@@ -1909,10 +1987,11 @@ function NoticeTab() {
 }
 
 function QnaTab({ state, setState, notify }: { state: State; setState: SetState; notify: (t: string) => void }) {
+  const D = useDates();
   const [writing, setWriting] = useState(false);
   const [title, setTitle] = useState("");
   const [body, setBody] = useState("");
-  const list = [...state.qna, ...QNA];
+  const list = [...state.qna, ...D.qna];
 
   return (
     <div id="room-panel-qna" role="tabpanel" aria-labelledby="room-tab-qna">
@@ -1921,7 +2000,7 @@ function QnaTab({ state, setState, notify }: { state: State; setState: SetState;
           className="grid gap-3 p-4"
           onSubmit={(e) => {
             e.preventDefault();
-            setState((s) => ({ ...s, qna: [{ title: title.trim(), writer: ME.name, date: TODAY, answered: false }, ...s.qna] }));
+            setState((s) => ({ ...s, qna: [{ title: title.trim(), writer: ME.name, date: D.today, answered: false }, ...s.qna] }));
             setTitle("");
             setBody("");
             setWriting(false);
@@ -2371,6 +2450,7 @@ const PAGE_SIZE = 15;
 const statusText = (r: Row) => (r.confirmed ? "수료" : r.meets ? "수료대상" : r.final !== null ? "미수료" : r.done === 0 && r.last === null ? "미학습" : "학습중");
 
 function AdminView({ state, setState, myProgress, myDone, notify }: { state: State; setState: SetState; myProgress: number; myDone: boolean[]; notify: (t: string) => void }) {
+  const D = useDates();
   const [page, setPage] = useState<AdminPage>("status");
 
   const rows: Row[] = useMemo(() => {
@@ -2391,9 +2471,9 @@ function AdminView({ state, setState, myProgress, myDone, notify }: { state: Sta
       const progress = (l.done / LESSONS.length) * 100;
       const total = totalScore(l.mid, l.final);
       const meets = progress >= PASS_PROGRESS && l.final !== null && total >= PASS_TOTAL;
-      return { ...l, progress, total, meets, confirmed: l.confirmedAt ?? state.confirmed[l.id] ?? null, live: l.id === ME.id };
+      return { ...l, progress, total, meets, confirmed: (l.confirmedAt === null ? null : D.dot(l.confirmedAt)) ?? state.confirmed[l.id] ?? null, live: l.id === ME.id };
     });
-  }, [state.lessons, state.mid, state.final, state.confirmed, myDone]);
+  }, [state.lessons, state.mid, state.final, state.confirmed, myDone, D]);
 
   const avg = rows.reduce((s, r) => s + r.progress, 0) / rows.length;
   const meetsCount = rows.filter((r) => r.meets).length;
@@ -2417,11 +2497,11 @@ function AdminView({ state, setState, myProgress, myDone, notify }: { state: Sta
         {page !== "courses" && page !== "sms" && (
           <div className="flex flex-wrap items-baseline gap-x-4 gap-y-1">
             <h2 className="text-[20px] font-bold">
-              {COURSE.title} <span className="text-[15px] font-normal" style={{ color: C.muted }}>{COURSE.term}</span>
+              {COURSE.title} <span className="text-[15px] font-normal" style={{ color: C.muted }}>{D.course.term}</span>
             </h2>
             <dl className="flex flex-wrap gap-x-4 gap-y-1 text-[14px] tabular-nums">
               {[
-                ["학습기간", `${COURSE.period} (D-${COURSE.dday})`],
+                ["학습기간", `${D.course.period} (D-${COURSE.dday})`],
                 ["수강인원", `${rows.length}명`],
                 ["평균 진도율", pct(Math.round(avg * 10) / 10)],
                 ["수료기준 충족", `${meetsCount}명`],
@@ -2437,7 +2517,7 @@ function AdminView({ state, setState, myProgress, myDone, notify }: { state: Sta
         {page === "status" && <StatusPage rows={rows} setState={setState} notify={notify} myProgress={myProgress} />}
         {page === "complete" && <CompletePage rows={rows} setState={setState} notify={notify} />}
         {page === "lessons" && <LessonStatsPage rows={rows} />}
-        {page === "sms" && <SmsLogPage logs={state.sms} />}
+        {page === "sms" && <SmsLogPage logs={[...state.sms, ...D.smsSeed]} />}
         {page === "courses" && <CoursesPage />}
       </div>
     </div>
@@ -2445,6 +2525,7 @@ function AdminView({ state, setState, myProgress, myDone, notify }: { state: Sta
 }
 
 function StatusPage({ rows, setState, notify, myProgress }: { rows: Row[]; setState: SetState; notify: (t: string) => void; myProgress: number }) {
+  const D = useDates();
   const reduce = useReducedMotionSafe();
   const [draft, setDraft] = useState<{ cond: Cond; dept: string; q: string }>({ cond: "all", dept: "", q: "" });
   const [filter, setFilter] = useState(draft);
@@ -2478,11 +2559,11 @@ function StatusPage({ rows, setState, notify, myProgress }: { rows: Row[]; setSt
 
   const download = () => {
     const head = ["이름", "부서", "진도율", "진행단계평가", "최종평가", "총점", "최종 학습일", "수료여부"];
-    const body = list.map((r) => [maskName(r.name), r.dept, pct(r.progress), r.mid ?? "", r.final ?? "", r.final === null ? "" : r.total, lastDate(r.last), statusText(r)].join(","));
+    const body = list.map((r) => [maskName(r.name), r.dept, pct(r.progress), r.mid ?? "", r.final ?? "", r.final === null ? "" : r.total, (r.last === null ? "-" : D.dot(r.last)), statusText(r)].join(","));
     const blob = new Blob(["﻿" + [head.join(","), ...body].join("\n")], { type: "text/csv;charset=utf-8" });
     const a = document.createElement("a");
     a.href = URL.createObjectURL(blob);
-    a.download = "학습현황_엑셀실무기초_2026년10월1기.csv";
+    a.download = `학습현황_엑셀실무기초_${D.course.term.replace(/ /g, "")}.csv`;
     a.click();
     URL.revokeObjectURL(a.href);
   };
@@ -2640,6 +2721,7 @@ function StatusPage({ rows, setState, notify, myProgress }: { rows: Row[]; setSt
 }
 
 function RowGroup({ r, no, open, onOpen, checked, onCheck, reduce }: { r: Row; no: number; open: boolean; onOpen: () => void; checked: boolean; onCheck: () => void; reduce: boolean }) {
+  const D = useDates();
   const idle = r.last === null || r.last >= 7;
   return (
     <>
@@ -2666,7 +2748,7 @@ function RowGroup({ r, no, open, onOpen, checked, onCheck, reduce }: { r: Row; n
         <td className={td}>{r.final === null ? "-" : r.final}</td>
         <td className={td}>{r.final === null ? "-" : r.total}</td>
         <td className={td} style={{ color: idle ? C.warn : C.text }}>
-          {lastDate(r.last)}
+          {(r.last === null ? "-" : D.dot(r.last))}
         </td>
         <td className={`${td} font-bold`} style={{ color: r.confirmed ? C.brand : r.meets ? C.text : r.final !== null ? C.warn : C.muted }}>
           {statusText(r)}
@@ -2697,9 +2779,10 @@ function RowGroup({ r, no, open, onOpen, checked, onCheck, reduce }: { r: Row; n
 }
 
 function SmsDialog({ recipients, myProgress, onClose, onSend }: { recipients: Row[]; myProgress: number; onClose: () => void; onSend: (log: SmsLog) => void }) {
+  const D = useDates();
   const reduce = useReducedMotionSafe();
   const [tpl, setTpl] = useState(0);
-  const [text, setText] = useState(SMS_TEMPLATES[0].text);
+  const [text, setText] = useState(D.templates[0].text);
   const first = recipients[0];
   const preview = text.replaceAll("{이름}", first ? maskName(first.name) : "").replaceAll("{진도율}", first ? pct(first.live ? myProgress : first.progress) : "");
   const bytes = smsBytes(preview);
@@ -2757,12 +2840,12 @@ function SmsDialog({ recipients, myProgress, onClose, onSend }: { recipients: Ro
                 onChange={(e) => {
                   const v = Number(e.target.value);
                   setTpl(v);
-                  setText(SMS_TEMPLATES[v].text);
+                  setText(D.templates[v].text);
                 }}
                 className="h-10 rounded-[4px] border bg-white px-2 font-normal"
                 style={{ borderColor: C.line }}
               >
-                {SMS_TEMPLATES.map((t, k) => (
+                {D.templates.map((t, k) => (
                   <option key={t.kind} value={k}>
                     {t.kind}
                   </option>
@@ -2796,8 +2879,8 @@ function SmsDialog({ recipients, myProgress, onClose, onSend }: { recipients: Ro
             disabled={!recipients.length || !text.trim()}
             onClick={() => {
               const d = new Date();
-              const at = `${TODAY} ${String(d.getHours()).padStart(2, "0")}:${String(d.getMinutes()).padStart(2, "0")}`;
-              onSend({ at, kind: SMS_TEMPLATES[tpl].kind, type, count: recipients.length, text });
+              const at = `${D.today} ${String(d.getHours()).padStart(2, "0")}:${String(d.getMinutes()).padStart(2, "0")}`;
+              onSend({ at, kind: D.templates[tpl].kind, type, count: recipients.length, text });
             }}
             className={`${btnBase} h-10 px-4`}
             style={btnPrimary}
@@ -2812,6 +2895,7 @@ function SmsDialog({ recipients, myProgress, onClose, onSend }: { recipients: Ro
 }
 
 function CompletePage({ rows, setState, notify }: { rows: Row[]; setState: SetState; notify: (t: string) => void }) {
+  const D = useDates();
   const [tab, setTab] = useState<"wait" | "done">("wait");
   const [selected, setSelected] = useState<Set<string>>(new Set());
   const waiting = rows.filter((r) => r.meets && !r.confirmed);
@@ -2852,7 +2936,7 @@ function CompletePage({ rows, setState, notify }: { rows: Row[]; setState: SetSt
             type="button"
             disabled={!selected.size}
             onClick={() => {
-              setState((s) => ({ ...s, confirmed: { ...s.confirmed, ...Object.fromEntries([...selected].map((id) => [id, TODAY])) } }));
+              setState((s) => ({ ...s, confirmed: { ...s.confirmed, ...Object.fromEntries([...selected].map((id) => [id, D.today])) } }));
               notify(`${selected.size}명을 수료 처리했습니다.`);
               setSelected(new Set());
             }}
@@ -2909,7 +2993,7 @@ function CompletePage({ rows, setState, notify }: { rows: Row[]; setState: SetSt
                 <td className={td}>{r.final ?? "-"}</td>
                 <td className={`${td} font-bold`}>{r.total}</td>
                 <td className={td}>{tab === "wait" ? "미확정" : r.confirmed}</td>
-                {tab === "done" && <td className={td}>{certNo(r.index)}</td>}
+                {tab === "done" && <td className={td}>{certNo(D.certPrefix, r.index)}</td>}
               </tr>
             ))}
             {!list.length && (
@@ -3055,15 +3139,9 @@ function SmsLogPage({ logs }: { logs: SmsLog[] }) {
 }
 
 function CoursesPage() {
+  const D = useDates();
   const [open, setOpen] = useState(true);
-  const courses = [
-    ["엑셀 실무 기초", "2026년 10월 1기", 8, "2026.09.28 ~ 2026.10.27", 143, "-", "진행중"],
-    ["비즈니스 문서 작성", "2026년 10월 2기", 10, "2026.10.19 ~ 2026.11.17", 61, "-", "수강신청중"],
-    ["직장 내 괴롭힘 예방교육", "2026년 3분기", 4, "2026.07.01 ~ 2026.09.30", 412, "91.7%", "종료"],
-    ["산업안전보건 교육", "2026년 3분기", 12, "2026.07.01 ~ 2026.09.30", 207, "78.3%", "종료"],
-    ["엑셀 실무 기초", "2026년 9월 1기", 8, "2026.08.31 ~ 2026.09.29", 97, "69.1%", "종료"],
-    ["개인정보보호 교육", "2026년 2분기", 6, "2026.04.01 ~ 2026.06.30", 389, "86.4%", "종료"],
-  ] as const;
+  const courses = D.adminCourses;
 
   return (
     <Panel title="과정 목록" id="courses-title">

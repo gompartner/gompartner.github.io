@@ -4,6 +4,7 @@ import Image from "next/image";
 import { useMemo, useState } from "react";
 import { Plus, Printer, RotateCcw, TriangleAlert } from "lucide-react";
 import { useLocalStorage } from "@/hooks/useLocalStorage";
+import { daysAgo, fmtDash, useDemoToday } from "@/hooks/useDemoToday";
 
 /* 사진 출처 (Unsplash 무료 라이선스)
    hero-face.jpg  AI 생성(Z-Image-Turbo, Apache 2.0)
@@ -11,7 +12,7 @@ import { useLocalStorage } from "@/hooks/useLocalStorage";
    cream.jpg      Jocelyn Morales, JiqTLjzEH18
    mirror.jpg     Sum Sum, Skzxaqy8KpQ */
 
-const STORAGE_KEY = "gs-demo:clinic-report:v2";
+const STORAGE_KEY = "gs-demo:clinic-report:v3";
 
 /* 원내 PC에서 쓰는 피부 진단 결과지 프로그램 데모.
    진단기가 내는 6개 영역 점수(0~100, 높을수록 좋음)를 입력하면
@@ -55,6 +56,8 @@ type Draft = Partial<Record<AreaId, string>>;
 interface Session {
   id: string;
   date: string;
+  /** 예시 측정 이력은 오늘 기준 며칠 전인지로 두고, 화면에 그릴 때 날짜로 바꾼다 */
+  ago?: number;
   scores: Scores;
   memo: string;
 }
@@ -85,8 +88,8 @@ const INITIAL_STATE: State = {
       age: 37,
       chartNo: "2026-0412",
       sessions: [
-        { id: "s1", date: "2026-08-21", scores: SAMPLE_PREV, memo: "" },
-        { id: "s2", date: "2026-09-25", scores: SAMPLE_NOW, memo: "4주 전보다 수분과 톤이 좋아짐. 지금 홈케어 그대로 유지." },
+        { id: "s1", date: "", ago: 47, scores: SAMPLE_PREV, memo: "" },
+        { id: "s2", date: "", ago: 12, scores: SAMPLE_NOW, memo: "4주 전보다 수분과 톤이 좋아짐. 지금 홈케어 그대로 유지." },
       ],
     },
     { id: "c2", name: "이도윤", gender: "남", age: 42, chartNo: "2026-0588", sessions: [] },
@@ -161,7 +164,18 @@ const inputClass =
   "mt-1 h-12 w-full rounded-[12px] border border-[#cdb9ae] bg-white px-4 text-[17px] focus:border-[#9c3a5c] focus:outline-none";
 
 export function ClinicReportDemo() {
-  const [state, setState, hydrated] = useLocalStorage<State>(STORAGE_KEY, INITIAL_STATE);
+  const [stored, setState, hydrated] = useLocalStorage<State>(STORAGE_KEY, INITIAL_STATE);
+  const now = useDemoToday();
+  const state = useMemo<State>(
+    () => ({
+      ...stored,
+      customers: stored.customers.map((c) => ({
+        ...c,
+        sessions: c.sessions.map((x) => (x.ago === undefined ? x : { ...x, date: fmtDash(daysAgo(now, x.ago)) })),
+      })),
+    }),
+    [stored, now],
+  );
   const [step, setStep] = useState<StepId>("report");
   const [draft, setDraft] = useState<Draft>({});
   const [draftDate, setDraftDate] = useState(today);

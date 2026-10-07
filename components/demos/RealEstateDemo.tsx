@@ -5,6 +5,7 @@ import Image from "next/image";
 import { AnimatePresence, motion } from "framer-motion";
 import { Check, ChevronRight, Heart, Layers, LayoutGrid, Map as MapIcon, Menu, Phone, Plus, RotateCcw, Search, X } from "lucide-react";
 import { useReducedMotionSafe } from "@/hooks/useReducedMotionSafe";
+import { daysAgo, useDemoToday } from "@/hooks/useDemoToday";
 
 /* 부동산 홈페이지 데모: 가상의 곰파트너 공인중개사사무소.
    상호, 대표 공인중개사, 등록번호, 주소, 전화번호, 사업자 정보, 매물과 거래 내역은 모두 가상이다.
@@ -116,8 +117,8 @@ interface Listing {
   dir: string;
   /** 사용승인일 */
   approved: string;
-  /** 입주가능일: 날짜, 즉시입주, ○월 초순/중순/하순 */
-  moveIn: string;
+  /** 입주가능일: 즉시입주, 오늘 기준 몇 달 뒤 초순/중순/하순(m), 오늘 기준 며칠 뒤 날짜(d) */
+  moveIn: MoveIn;
   /** 관리비(만 원) */
   fee: number;
   feeNote?: string;
@@ -129,19 +130,34 @@ interface Listing {
   tags: string[];
 }
 
+type MoveIn = "즉시입주" | { m: number; part: string } | { d: number };
+
+/** 오늘에서 n달 뒤(음수면 n달 전)의 "2026년 11월" */
+function monthText(today: Date, n: number) {
+  const d = new Date(today.getFullYear(), today.getMonth() + n, 1);
+  return `${d.getFullYear()}년 ${d.getMonth() + 1}월`;
+}
+
+function moveInText(v: MoveIn, today: Date) {
+  if (v === "즉시입주") return v;
+  if ("m" in v) return `${monthText(today, v.m)} ${v.part}`;
+  const d = daysAgo(today, -v.d);
+  return `${d.getFullYear()}년 ${d.getMonth() + 1}월 ${d.getDate()}일`;
+}
+
 const LISTINGS: Listing[] = [
-  { id: "a1", no: "21734", similar: 14, zone: "A", name: "□□아파트 102동", dong: "□□동", kind: "apt", deal: "sale", price: 92000, area: 84.97, supply: 112.4, floor: 12, total: 20, rooms: 3, baths: 2, dir: "남향", approved: "2008.11.20", moveIn: "2027년 1월 초순(협의 가능)", fee: 28, parking: "총 1,240대(세대당 1.3대)", walk: 6, x: 200, y: 150, badges: ["추천"], tags: ["초등학교 도보 3분", "올수리"] },
+  { id: "a1", no: "21734", similar: 14, zone: "A", name: "□□아파트 102동", dong: "□□동", kind: "apt", deal: "sale", price: 92000, area: 84.97, supply: 112.4, floor: 12, total: 20, rooms: 3, baths: 2, dir: "남향", approved: "2008.11.20", moveIn: { m: 3, part: "초순(협의 가능)" }, fee: 28, parking: "총 1,240대(세대당 1.3대)", walk: 6, x: 200, y: 150, badges: ["추천"], tags: ["초등학교 도보 3분", "올수리"] },
   { id: "a2", no: "21761", similar: 17, zone: "A", name: "□□아파트 105동", dong: "□□동", kind: "apt", deal: "jeonse", price: 45000, area: 59.92, supply: 84.3, floor: 7, total: 20, rooms: 3, baths: 2, dir: "남동향", approved: "2008.11.20", moveIn: "즉시입주", fee: 21, parking: "총 1,240대(세대당 1.3대)", walk: 6, x: 290, y: 218, badges: ["신규"], tags: ["발코니 확장", "전세대출 가능"] },
-  { id: "a3", no: "21598", similar: 9, zone: "A", name: "□□아파트 101동", dong: "□□동", kind: "apt", deal: "monthly", price: 10000, rent: 110, area: 59.92, supply: 84.3, floor: 3, total: 20, rooms: 3, baths: 2, dir: "남향", approved: "2008.11.20", moveIn: "2026년 11월 하순", fee: 20, parking: "총 1,240대(세대당 1.3대)", walk: 5, x: 378, y: 150, badges: [], tags: ["저층", "반려동물 협의"] },
-  { id: "b1", no: "21522", similar: 11, zone: "B", name: "□□파크아파트 201동", dong: "□□2동", kind: "apt", deal: "sale", price: 128000, area: 114.8, supply: 145.2, floor: 18, total: 25, rooms: 4, baths: 2, dir: "남향", approved: "2015.06.30", moveIn: "2027년 3월 5일", fee: 38, parking: "총 980대(세대당 1.5대)", walk: 7, x: 498, y: 318, badges: ["추천"], tags: ["공원 조망", "드레스룸"] },
-  { id: "b2", no: "21749", similar: 7, zone: "B", name: "□□파크아파트 203동", dong: "□□2동", kind: "apt", deal: "jeonse", price: 63000, area: 84.95, supply: 110.7, floor: 9, total: 25, rooms: 3, baths: 2, dir: "남서향", approved: "2015.06.30", moveIn: "2026년 12월 중순", fee: 29, parking: "총 980대(세대당 1.5대)", walk: 8, x: 592, y: 378, badges: ["급매"], tags: ["시스템 에어컨", "공원 앞"] },
+  { id: "a3", no: "21598", similar: 9, zone: "A", name: "□□아파트 101동", dong: "□□동", kind: "apt", deal: "monthly", price: 10000, rent: 110, area: 59.92, supply: 84.3, floor: 3, total: 20, rooms: 3, baths: 2, dir: "남향", approved: "2008.11.20", moveIn: { m: 1, part: "하순" }, fee: 20, parking: "총 1,240대(세대당 1.3대)", walk: 5, x: 378, y: 150, badges: [], tags: ["저층", "반려동물 협의"] },
+  { id: "b1", no: "21522", similar: 11, zone: "B", name: "□□파크아파트 201동", dong: "□□2동", kind: "apt", deal: "sale", price: 128000, area: 114.8, supply: 145.2, floor: 18, total: 25, rooms: 4, baths: 2, dir: "남향", approved: "2015.06.30", moveIn: { d: 149 }, fee: 38, parking: "총 980대(세대당 1.5대)", walk: 7, x: 498, y: 318, badges: ["추천"], tags: ["공원 조망", "드레스룸"] },
+  { id: "b2", no: "21749", similar: 7, zone: "B", name: "□□파크아파트 203동", dong: "□□2동", kind: "apt", deal: "jeonse", price: 63000, area: 84.95, supply: 110.7, floor: 9, total: 25, rooms: 3, baths: 2, dir: "남서향", approved: "2015.06.30", moveIn: { m: 2, part: "중순" }, fee: 29, parking: "총 980대(세대당 1.5대)", walk: 8, x: 592, y: 378, badges: ["급매"], tags: ["시스템 에어컨", "공원 앞"] },
   { id: "c1", no: "21740", similar: 15, zone: "C", name: "□□오피스텔 A동", dong: "□□동", kind: "officetel", deal: "monthly", price: 1000, rent: 68, area: 24.5, supply: 48.6, floor: 11, total: 15, rooms: 1, baths: 1, dir: "동향", approved: "2019.03.14", moveIn: "즉시입주", fee: 12, parking: "총 180대(세대당 0.6대)", walk: 2, x: 466, y: 160, badges: ["신규"], tags: ["가전 포함", "역 도보 2분"] },
-  { id: "c2", no: "21467", similar: 11, zone: "C", name: "□□오피스텔 B동", dong: "□□동", kind: "officetel", deal: "jeonse", price: 21000, area: 33.1, supply: 62.3, floor: 8, total: 15, rooms: 2, baths: 1, dir: "남향", approved: "2019.03.14", moveIn: "2026년 11월 초순", fee: 15, parking: "총 180대(세대당 0.6대)", walk: 3, x: 548, y: 212, badges: [], tags: ["방 2개", "전세대출 가능"] },
+  { id: "c2", no: "21467", similar: 11, zone: "C", name: "□□오피스텔 B동", dong: "□□동", kind: "officetel", deal: "jeonse", price: 21000, area: 33.1, supply: 62.3, floor: 8, total: 15, rooms: 2, baths: 1, dir: "남향", approved: "2019.03.14", moveIn: { m: 1, part: "초순" }, fee: 15, parking: "총 180대(세대당 0.6대)", walk: 3, x: 548, y: 212, badges: [], tags: ["방 2개", "전세대출 가능"] },
   { id: "d1", no: "21390", similar: 16, zone: "D", name: "□□빌라", dong: "□□동", kind: "villa", deal: "sale", price: 29000, area: 49.6, supply: 62.1, floor: 3, total: 4, rooms: 2, baths: 1, dir: "남향", approved: "2019.08.02", moveIn: "즉시입주", fee: 5, feeNote: "수도·전기 사용료 별도", parking: "총 8대(세대당 1대)", walk: 8, x: 365, y: 345, badges: ["급매"], tags: ["엘리베이터", "초등학교 옆"] },
-  { id: "e1", no: "20981", similar: 13, zone: "E", name: "□□하우스", dong: "□□동", kind: "villa", deal: "jeonse", price: 24000, area: 56.2, supply: 70.8, floor: 2, total: 5, rooms: 3, baths: 1, dir: "동남향", approved: "2012.04.25", moveIn: "2026년 12월 하순", fee: 6, feeNote: "수도·전기 사용료 별도", parking: "총 6대(세대당 0.6대)", walk: 12, x: 75, y: 220, badges: [], tags: ["방 3개", "전세보증보험 가입 가능"] },
+  { id: "e1", no: "20981", similar: 13, zone: "E", name: "□□하우스", dong: "□□동", kind: "villa", deal: "jeonse", price: 24000, area: 56.2, supply: 70.8, floor: 2, total: 5, rooms: 3, baths: 1, dir: "동남향", approved: "2012.04.25", moveIn: { m: 2, part: "하순" }, fee: 6, feeNote: "수도·전기 사용료 별도", parking: "총 6대(세대당 0.6대)", walk: 12, x: 75, y: 220, badges: [], tags: ["방 3개", "전세보증보험 가입 가능"] },
   { id: "g1", no: "20746", similar: 12, zone: "G", name: "□□빌라 2차", dong: "□□2동", kind: "villa", deal: "monthly", price: 500, rent: 45, area: 36.4, supply: 46, floor: 4, total: 4, rooms: 1, baths: 1, dir: "서향", approved: "2004.10.11", moveIn: "즉시입주", fee: 4, feeNote: "수도 사용료 포함", parking: "주차 불가", walk: 14, x: 735, y: 330, badges: [], tags: ["원룸", "옥상 사용"] },
   { id: "f1", no: "21768", similar: 7, zone: "F", name: "□□시장 상가 1층", dong: "□□동", kind: "store", deal: "monthly", price: 3000, rent: 250, area: 43.2, supply: 66, floor: 1, total: 3, rooms: 0, baths: 1, dir: "남향", approved: "1998.05.18", moveIn: "즉시입주", fee: 18, parking: "공영 주차장 이용", walk: 9, x: 330, y: 482, badges: ["추천"], tags: ["1층 모퉁이", "무권리"] },
-  { id: "f2", no: "20315", similar: 5, zone: "F", name: "□□프라자 2층", dong: "□□동", kind: "store", deal: "sale", price: 75000, area: 66.8, supply: 118, floor: 2, total: 5, rooms: 0, baths: 1, dir: "동향", approved: "2006.09.07", moveIn: "2027년 6월 하순", fee: 32, parking: "총 3대", walk: 10, x: 522, y: 482, badges: [], tags: ["임차인 승계", "학원 자리"] },
+  { id: "f2", no: "20315", similar: 5, zone: "F", name: "□□프라자 2층", dong: "□□동", kind: "store", deal: "sale", price: 75000, area: 66.8, supply: 118, floor: 2, total: 5, rooms: 0, baths: 1, dir: "동향", approved: "2006.09.07", moveIn: { m: 8, part: "하순" }, fee: 32, parking: "총 3대", walk: 10, x: 522, y: 482, badges: [], tags: ["임차인 승계", "학원 자리"] },
 ];
 
 const LISTING_BY_ID = Object.fromEntries(LISTINGS.map((l) => [l.id, l])) as Record<string, Listing>;
@@ -1196,6 +1212,7 @@ function StorePlan() {
 
 function Detail({ listing: l, basket, onToggle, onTour, onCalc }: { listing: Listing; basket: string[]; onToggle: (id: string) => void; onTour: () => void; onCalc: () => void }) {
   const reduce = useReducedMotionSafe();
+  const today = useDemoToday();
   const fee = brokerFee(l);
   const saved = basket.includes(l.id);
   const full = !saved && basket.length >= BASKET_MAX;
@@ -1211,7 +1228,7 @@ function Detail({ listing: l, basket, onToggle, onTour, onCalc }: { listing: Lis
     ["사용승인일", l.approved],
     ["방향", `${l.dir} (${l.kind === "store" ? "주 출입구" : "거실"} 기준)`],
     [l.kind === "store" ? "화장실" : "방·욕실 수", l.kind === "store" ? `${l.baths}개` : `방 ${l.rooms}개 / 욕실 ${l.baths}개`],
-    ["입주가능일", l.moveIn],
+    ["입주가능일", moveInText(l.moveIn, today)],
     ["주차대수", l.parking],
     ["관리비", `월 ${l.fee}만 원${l.feeNote ? ` (${l.feeNote})` : ""}`],
   ];
@@ -1868,6 +1885,7 @@ const WHEN = ["평일 저녁", "토요일 오전", "토요일 오후", "시간 �
 
 function Tour({ selectedId, basket, onToggle, onClear, onMore }: { selectedId: string; basket: string[]; onToggle: (id: string) => void; onClear: () => void; onMore: () => void }) {
   const reduce = useReducedMotionSafe();
+  const today = useDemoToday();
   const [phone, setPhone] = useState("");
   const [when, setWhen] = useState<string | null>(null);
   const [error, setError] = useState("");
@@ -1909,7 +1927,7 @@ function Tour({ selectedId, basket, onToggle, onClear, onMore }: { selectedId: s
                   </span>
                   <span className="block font-semibold">{l.name}</span>
                   <span className="block text-[14px] tabular-nums" style={{ color: C.muted }}>
-                    {priceText(l)} · {l.floor}층 · 입주 {l.moveIn}
+                    {priceText(l)} · {l.floor}층 · 입주 {moveInText(l.moveIn, today)}
                   </span>
                 </span>
                 {fromBasket && (
@@ -2039,15 +2057,16 @@ function Tour({ selectedId, basket, onToggle, onClear, onMore }: { selectedId: s
 /* ---------- 사무소 소개 ---------- */
 
 const DEALS_DONE = [
-  { where: "□□동", what: "아파트 84㎡", deal: "매매", when: "2026년 9월" },
-  { where: "□□동", what: "오피스텔 24㎡", deal: "월세", when: "2026년 9월" },
-  { where: "□□2동", what: "아파트 59㎡", deal: "전세", when: "2026년 8월" },
-  { where: "□□동", what: "빌라 52㎡", deal: "매매", when: "2026년 8월" },
-  { where: "□□2동", what: "상가 1층 40㎡", deal: "월세", when: "2026년 7월" },
-  { where: "□□동", what: "아파트 114㎡", deal: "매매", when: "2026년 7월" },
+  { where: "□□동", what: "아파트 84㎡", deal: "매매", ago: 1 },
+  { where: "□□동", what: "오피스텔 24㎡", deal: "월세", ago: 1 },
+  { where: "□□2동", what: "아파트 59㎡", deal: "전세", ago: 2 },
+  { where: "□□동", what: "빌라 52㎡", deal: "매매", ago: 2 },
+  { where: "□□2동", what: "상가 1층 40㎡", deal: "월세", ago: 3 },
+  { where: "□□동", what: "아파트 114㎡", deal: "매매", ago: 3 },
 ];
 
 function About() {
+  const today = useDemoToday();
   return (
     <div className="grid items-start gap-8 md:grid-cols-[1fr_1.1fr]">
       <section aria-labelledby="greet-title">
@@ -2108,7 +2127,7 @@ function About() {
                     {d.where} {d.what}
                   </span>
                   <span className="block text-[14px]" style={{ color: C.muted }}>
-                    {d.when} 계약
+                    {monthText(today, -d.ago)} 계약
                   </span>
                 </span>
                 <span className="shrink-0 text-[14px]" style={{ color: C.muted }}>

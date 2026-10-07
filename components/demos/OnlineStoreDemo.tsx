@@ -4,6 +4,7 @@ import { useEffect, useRef, useState, useSyncExternalStore } from "react";
 import Image from "next/image";
 import { AnimatePresence, motion } from "framer-motion";
 import { Car, Check, ChevronRight, Heart, Minus, Plus, Search, ShoppingBag, Star, TrainFront, Trash2, X } from "lucide-react";
+import { daysAgo, fmtDot, useDemoToday } from "@/hooks/useDemoToday";
 import { useReducedMotionSafe } from "@/hooks/useReducedMotionSafe";
 
 /* 자사 쇼핑몰 데모: 가상의 곰파트너 도자기 공방. 카페24 쇼핑몰형 구성.
@@ -340,13 +341,13 @@ function totals(cart: CartLine[], region: Region) {
 
 /* ---------- 후기 ---------- */
 
-const REVIEWS: { productId: string; name: string; glaze: GlazeId; rating: number; date: string; text: string }[] = [
-  { productId: "mug", name: "김ㅎ늘", glaze: "black", rating: 5, date: "2026.09.30", text: "흑유 머그 두 개 샀어요. 손잡이가 도톰해서 잡기 편하고 입술 쪽 갈색 띠가 사진보다 진해요." },
-  { productId: "mug", name: "박*", glaze: "celadon", rating: 4, date: "2026.09.21", text: "400ml로 받았는데 생각보다 무게감 있어요. 아침 커피용으로 잘 쓰고 있어요." },
-  { productId: "ricebowl", name: "이ㅅ진", glaze: "white", rating: 5, date: "2026.09.12", text: "굽이 높아서 뜨거운 밥 담아도 덜 뜨거워요. 포장도 꼼꼼했어요." },
-  { productId: "plate", name: "최ㅇ호", glaze: "buncheong", rating: 5, date: "2026.08.28", text: "분청 접시 붓 자국이 하나하나 달라서 두 장이 다른 그릇 같아요ㅎㅎ" },
-  { productId: "teacup", name: "정*", glaze: "celadon", rating: 4, date: "2026.08.17", text: "찻잔 입술이 얇아서 차 마시기 좋아요. 생각보다 작으니 참고하세요." },
-  { productId: "vase", name: "한ㄱ름", glaze: "white", rating: 5, date: "2026.10.02", text: "선물상자랑 쇼핑백 같이 주문해서 집들이 선물로 바로 들고 갔어요." },
+const REVIEWS: { productId: string; name: string; glaze: GlazeId; rating: number; ago: number; text: string }[] = [
+  { productId: "mug", name: "김ㅎ늘", glaze: "black", rating: 5, ago: 7, text: "흑유 머그 두 개 샀어요. 손잡이가 도톰해서 잡기 편하고 입술 쪽 갈색 띠가 사진보다 진해요." },
+  { productId: "mug", name: "박*", glaze: "celadon", rating: 4, ago: 16, text: "400ml로 받았는데 생각보다 무게감 있어요. 아침 커피용으로 잘 쓰고 있어요." },
+  { productId: "ricebowl", name: "이ㅅ진", glaze: "white", rating: 5, ago: 25, text: "굽이 높아서 뜨거운 밥 담아도 덜 뜨거워요. 포장도 꼼꼼했어요." },
+  { productId: "plate", name: "최ㅇ호", glaze: "buncheong", rating: 5, ago: 40, text: "분청 접시 붓 자국이 하나하나 달라서 두 장이 다른 그릇 같아요ㅎㅎ" },
+  { productId: "teacup", name: "정*", glaze: "celadon", rating: 4, ago: 51, text: "찻잔 입술이 얇아서 차 마시기 좋아요. 생각보다 작으니 참고하세요." },
+  { productId: "vase", name: "한ㄱ름", glaze: "white", rating: 5, ago: 5, text: "선물상자랑 쇼핑백 같이 주문해서 집들이 선물로 바로 들고 갔어요." },
 ];
 
 /** 상품별 누적 후기 수. 화면에는 최근 후기 몇 건만 보여 준다. */
@@ -878,6 +879,7 @@ function ShelfHead({ id, title, more }: { id: string; title: string; more?: () =
 /* ---------- 메인 ---------- */
 
 function Home({ go }: { go: Go }) {
+  const today = useDemoToday();
   const best = BEST_IDS.map((id) => PRODUCT_BY_ID[id]);
   const fresh = [...PRODUCTS].sort((a, b) => b.added.localeCompare(a.added)).slice(0, 4);
 
@@ -958,7 +960,7 @@ function Home({ go }: { go: Go }) {
           <ShelfHead id="review-title" title="상품 사용후기" more={() => go({ name: "community", tab: "review" })} />
           <ul className="grid gap-3 md:grid-cols-3 md:gap-5">
             {REVIEWS.slice(0, 3).map((r) => (
-              <li key={r.name + r.date} className="rounded-[4px] border p-4" style={{ borderColor: C.line, background: C.paper }}>
+              <li key={r.name + r.ago} className="rounded-[4px] border p-4" style={{ borderColor: C.line, background: C.paper }}>
                 <button type="button" onClick={() => go({ name: "detail", id: r.productId, glaze: r.glaze })} className="flex w-full items-center gap-3 text-left">
                   <span className="block h-14 w-14 shrink-0 overflow-hidden rounded-[4px]" style={{ background: C.claySoft }}>
                     <WarePhoto productId={r.productId} glaze={r.glaze} />
@@ -970,7 +972,7 @@ function Home({ go }: { go: Go }) {
                 </button>
                 <p className="mt-3 text-[15px] leading-[1.65]">{r.text}</p>
                 <p className="mt-2 text-[13px]" style={{ color: C.muted }}>
-                  {r.name} · {r.date}
+                  {r.name} · {fmtDot(daysAgo(today, r.ago))}
                 </p>
               </li>
             ))}
@@ -1549,6 +1551,7 @@ function ReturnTab() {
 }
 
 function ReviewList({ list, total }: { list: typeof REVIEWS; total: number }) {
+  const today = useDemoToday();
   if (!list.length)
     return (
       <p className="py-10 text-center" style={{ color: C.muted }}>
@@ -1562,11 +1565,11 @@ function ReviewList({ list, total }: { list: typeof REVIEWS; total: number }) {
       </p>
       <ul className="divide-y border-y" style={{ borderColor: C.line }}>
         {list.map((r) => (
-          <li key={r.name + r.date} className="py-4" style={{ borderColor: C.line }}>
+          <li key={r.name + r.ago} className="py-4" style={{ borderColor: C.line }}>
             <div className="flex flex-wrap items-center gap-x-3 gap-y-1 text-[14px]" style={{ color: C.muted }}>
               <Stars n={r.rating} />
               <span>{r.name}</span>
-              <span>{r.date}</span>
+              <span>{fmtDot(daysAgo(today, r.ago))}</span>
               <span>
                 [옵션: {GLAZE_BY_ID[r.glaze].label}] {PRODUCT_BY_ID[r.productId].name}
               </span>
@@ -2064,10 +2067,10 @@ function BrandView() {
 /* ---------- 커뮤니티 ---------- */
 
 const NOTICES = [
-  { title: "추석 연휴 배송 안내 (9월 24일 ~ 9월 28일)", date: "2026.09.25", body: "연휴 기간 주문은 9월 29일(화)부터 순서대로 출고합니다. 연휴 전 마지막 출고는 9월 23일(수) 오후 2시 주문 건까지입니다." },
-  { title: "흑유 머그 400ml 재입고 안내", date: "2026.09.18", body: "흑유 머그 400ml 재입고되었습니다. 수량이 많지 않아 조기 품절될 수 있습니다." },
-  { title: "물레 체험 10월 일정 안내", date: "2026.09.10", body: "10월 토요일 14:00, 16:00 두 차례 운영합니다. 예약은 전화로 받습니다." },
-  { title: "각인 상품 출고 일정 안내", date: "2026.08.30", body: "각인 상품은 주문 다음 영업일에 출고되며, 단순 변심 교환·반품이 불가합니다." },
+  { title: "명절 연휴 배송 안내", ago: 12, body: "연휴 기간 주문은 연휴가 끝난 뒤 첫 영업일부터 순서대로 출고합니다. 연휴 전 마지막 출고는 연휴 전날 오후 2시 주문 건까지입니다." },
+  { title: "흑유 머그 400ml 재입고 안내", ago: 19, body: "흑유 머그 400ml 재입고되었습니다. 수량이 많지 않아 조기 품절될 수 있습니다." },
+  { title: "물레 체험 일정 안내", ago: 27, body: "매주 토요일 14:00, 16:00 두 차례 운영합니다. 예약은 전화로 받습니다." },
+  { title: "각인 상품 출고 일정 안내", ago: 38, body: "각인 상품은 주문 다음 영업일에 출고되며, 단순 변심 교환·반품이 불가합니다." },
 ];
 
 const FAQS = [
@@ -2079,6 +2082,7 @@ const FAQS = [
 ];
 
 function CommunityView({ initialTab, go }: { initialTab: CommunityTab; go: Go }) {
+  const today = useDemoToday();
   const [tab, setTab] = useState<CommunityTab>(initialTab);
   const [openNo, setOpenNo] = useState<number | null>(null);
   const tabs: { id: CommunityTab; label: string }[] = [
@@ -2140,7 +2144,7 @@ function CommunityView({ initialTab, go }: { initialTab: CommunityTab; go: Go })
                   </span>
                   <span className="min-w-0 flex-1 font-semibold">{n.title}</span>
                   <span className="hidden shrink-0 text-[14px] tabular-nums sm:inline" style={{ color: C.muted }}>
-                    {n.date}
+                    {fmtDot(daysAgo(today, n.ago))}
                   </span>
                 </button>
                 {openNo === i && (
