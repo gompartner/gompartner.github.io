@@ -39,28 +39,22 @@ export function PricingSection({ id = "pricing", cta = "pricing_chat" }: { id?: 
             );
           })}
         </ul>
-        <h3 className="mt-12 text-[19px] font-bold md:text-[21px]">추가 기능 가격</h3>
-        <table className="mt-4 w-full max-w-[640px] border-t-2 border-foreground text-[17px]">
-          <caption className="sr-only">추가 기능 가격</caption>
-          <thead>
-            <tr className="border-b border-border text-left text-[15px] text-foreground-secondary">
-              <th scope="col" className="py-2.5 font-medium">기능</th>
-              <th scope="col" className="py-2.5 text-right font-medium">가격</th>
-            </tr>
-          </thead>
-          <tbody>
+        <div className="mt-4 rounded-[10px] border border-border bg-white p-6">
+          <h3 className="text-[17px] font-bold">
+            추가 기능 <span className="font-normal text-foreground-secondary">· 고급 패키지는 맞춤 기능 1개 포함</span>
+          </h3>
+          <dl className="mt-4 grid border-t border-border text-[17px] md:grid-cols-2 md:gap-x-10">
             {addons.map((a) => (
-              <tr key={a.id} className="border-b border-border">
-                <th scope="row" className="py-2.5 text-left font-normal">{a.name}</th>
-                <td className="py-2.5 text-right tabular-nums">
+              <div key={a.id} className="flex items-baseline justify-between gap-4 border-b border-border py-3">
+                <dt>{a.name}</dt>
+                <dd className="shrink-0 tabular-nums">
                   {manwon(a.price)}
                   {a.unit !== "식" && <span className="text-foreground-secondary"> / {a.unit}</span>}
-                </td>
-              </tr>
+                </dd>
+              </div>
             ))}
-          </tbody>
-        </table>
-        <p className="mt-3 text-[15px] text-foreground-secondary">고급 패키지에는 맞춤 기능 1개가 포함되어 있습니다.</p>
+          </dl>
+        </div>
         <div className="mt-8">
           <ChannelTalkButton cta={cta} className={primaryButton}>
             채팅으로 상담하기
