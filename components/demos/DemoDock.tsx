@@ -49,7 +49,7 @@ export function DemoDock({ projectId, story, tour }: { projectId: string; story?
   }, [tour]);
 
   // 가이드는 자동으로 열지 않는다. 한 번도 열지 않았으면 물음표 버튼을 반짝여 알린다.
-  const seenKey = `demo-tour-seen:${projectId}`;
+  const seenKey = `demo-guide-opened:${projectId}`;
   const [fresh, setFresh] = useState(false);
   useEffect(() => {
     const frame = requestAnimationFrame(() => {
