@@ -22,8 +22,8 @@ export const industries: Industry[] = [
     description:
       "피부과, 치과, 약국 홈페이지와 진료 결과지 프로그램 포트폴리오. 진료시간 안내, 상담예약, 비급여 진료비, 처방전 전송을 데모로 볼 수 있습니다.",
     needs: ["진료시간·휴진 안내", "비급여 진료비 고지", "온라인 진료 예약", "처방전 전송·복약 안내"],
-    image: "/images/demo-dental/lobby.jpg",
-    imageAlt: "민트색 벽과 흰 접수대가 있는 밝은 병원 대기실",
+    image: "/images/industry/hospital.jpg",
+    imageAlt: "흰 벽과 파란 의자가 있는 밝은 병원 대기실",
   },
   {
     slug: "store",
@@ -33,8 +33,8 @@ export const industries: Industry[] = [
     description:
       "카페, 빵집, 필라테스, 헬스장 홈페이지와 쇼핑몰 관리자, 주문 엑셀 자동화 포트폴리오. 메뉴판, 좌석 예약, 픽업 예약, 수업 시간표가 있습니다.",
     needs: ["메뉴·가격·영업시간 안내", "좌석·수업 예약", "픽업 주문", "주문·재고 관리"],
-    image: "/images/demo-bakery/display.jpg",
-    imageAlt: "크루아상과 깜파뉴, 크림빵이 놓인 빵집 진열대",
+    image: "/images/industry/store.jpg",
+    imageAlt: "큰 화분과 창가 테이블이 있는 카페 안",
   },
   {
     slug: "professional",
@@ -44,8 +44,8 @@ export const industries: Industry[] = [
     description:
       "법률사무소, 세무회계 사무소, 공인중개사사무소 홈페이지 포트폴리오. 사건별 절차, 세무일정, 매물검색, 상담신청.",
     needs: ["업무분야·비용 안내", "상담 예약 접수", "절차·일정 안내", "매물·사례 검색"],
-    image: "/images/demo-law/hero.jpg",
-    imageAlt: "책장과 긴 회의 탁자가 있는 조용한 상담실",
+    image: "/images/industry/professional.jpg",
+    imageAlt: "긴 회의 탁자와 창이 있는 조용한 회의실",
   },
   {
     slug: "company",
@@ -55,7 +55,7 @@ export const industries: Industry[] = [
     description:
       "제조업 회사 홈페이지와 자사 쇼핑몰, 주문 관리자, 엑셀 자동화, 사내 교육 시스템 포트폴리오입니다. 설비현황과 견적문의, 한영 전환 화면을 데모로 볼 수 있습니다.",
     needs: ["회사 소개·연혁·인증", "설비·제품 사양 안내", "도면 첨부 견적 문의", "국문·영문 전환"],
-    image: "/images/demo-company/hero.jpg",
-    imageAlt: "CNC 가공 설비가 줄지어 놓인 밝은 공장 안",
+    image: "/images/industry/company.jpg",
+    imageAlt: "CNC 밀링 공구가 금속 부품을 가공하는 모습",
   },
 ];
