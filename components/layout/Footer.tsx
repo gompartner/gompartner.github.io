@@ -48,7 +48,6 @@ export function Footer() {
               </a>
             </span>
           </p>
-          <p className="mt-1">계약은 모두싸인 전자계약 또는 크몽, 위시켓, 당근 등 중개 플랫폼을 통해 진행합니다.</p>
           <p className="mt-1">
             © {currentYear} {profile.name}
           </p>
