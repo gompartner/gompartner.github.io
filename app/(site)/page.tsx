@@ -29,8 +29,8 @@ export const metadata: Metadata = {
 const featuredIds = ["online-store", "pension", "company", "dental-homepage"];
 const featured = featuredIds.map((id) => projects.find((p) => p.id === id)!);
 
-// 포트폴리오 구간에 보여 줄 대표 6개. 판매량 순으로 고르고 전체는 /works에서 본다.
-const showcaseIds = ["online-store", "pension", "company", "dental-homepage", "law-firm", "tax-office"];
+// 포트폴리오 구간에 보여 줄 6개. 배너와 겹치지 않게 다른 업종으로 고르고 전체는 /works에서 본다.
+const showcaseIds = ["law-firm", "tax-office", "real-estate", "clinic-homepage", "hanok-cafe", "pilates-studio"];
 const showcase = showcaseIds.map((id) => projects.find((p) => p.id === id)!);
 
 const promises = ["1인 개발자가 직접 제작", "원본 소스 제공", "완료 후 1개월 무상 오류 수정"];
