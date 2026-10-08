@@ -4,6 +4,7 @@ import Image from "next/image";
 import Link from "next/link";
 import { AnimatePresence, motion } from "framer-motion";
 import type { Project } from "@/lib/types";
+import { SMALL_IMAGE_HEIGHT, SMALL_IMAGE_WIDTH, smallImage } from "@/lib/images";
 import { useReducedMotionSafe } from "@/hooks/useReducedMotionSafe";
 import { estimateFor, manwon } from "@/data/pricing";
 
@@ -35,8 +36,14 @@ export function WorksGrid({ projects }: { projects: Project[] }) {
             transition={{ layout: { duration: 0.28, ease: EASE_IN_OUT } }}
             className="flex flex-col overflow-hidden rounded-[10px] border border-border bg-white"
           >
-            <Link href={w.demoUrl} aria-label={`${w.title} 데모 보기`} className="relative block border-b border-border">
-              <Image src={w.imageUrl} alt={w.imageAlt} width={1440} height={900} className="aspect-[16/10] h-auto w-full object-cover object-top" />
+            <Link href={w.demoUrl} prefetch={false} aria-label={`${w.title} 데모 보기`} className="relative block border-b border-border">
+              <Image
+                src={smallImage(w.imageUrl)}
+                alt={w.imageAlt}
+                width={SMALL_IMAGE_WIDTH}
+                height={SMALL_IMAGE_HEIGHT}
+                className="aspect-[16/10] h-auto w-full object-cover object-top"
+              />
               <span
                 className={`absolute top-3 left-3 rounded-[4px] px-2 py-0.5 text-[15px] font-bold leading-[1.5] text-white ${
                   w.kind === "유지보수" ? "bg-[#464c53]" : "bg-accent"
@@ -51,7 +58,7 @@ export function WorksGrid({ projects }: { projects: Project[] }) {
               </p>
               <h3 className="mt-1 text-[19px] font-bold leading-[1.5]">{w.title}</h3>
               <div className="mt-auto flex items-end justify-between gap-3 pt-6">
-                <Link href={w.demoUrl} data-gtm-cta={`demo_open_${w.id}`} className={secondaryButton}>
+                <Link href={w.demoUrl} prefetch={false} data-gtm-cta={`demo_open_${w.id}`} className={secondaryButton}>
                   데모 보기
                 </Link>
                 <PlanPrice projectId={w.id} />

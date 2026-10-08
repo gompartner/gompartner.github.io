@@ -3,16 +3,23 @@
 // 첫 화면 배너: 대표 포트폴리오를 5초마다 넘긴다.
 // 마우스를 올리거나 포커스가 들어오면 멈추고, 동작 줄이기 설정이면 자동으로 넘기지 않는다.
 // 화면을 좌우로 밀어도 넘어간다(세로 스크롤은 그대로 둔다).
-import Image from "next/image";
 import Link from "next/link";
 import { AnimatePresence, motion } from "framer-motion";
 import { ChevronLeft, ChevronRight, Pause, Play } from "lucide-react";
 import { useEffect, useRef, useState } from "react";
+import { preload } from "react-dom";
 import type { Project } from "@/lib/types";
+import { SMALL_IMAGE_HEIGHT, SMALL_IMAGE_WIDTH, smallImage } from "@/lib/images";
 import { useReducedMotionSafe } from "@/hooks/useReducedMotionSafe";
 
 const INTERVAL = 5000;
 const EASE_OUT = [0.23, 1, 0.32, 1] as const;
+
+// 배너는 PC(lg 이상)에서만 크게 보이므로 그때만 원본 1440px, 그보다 좁으면 720px 판을 받는다.
+// images.unoptimized 설정이라 next/image가 srcset을 만들지 않아 <picture>로 직접 나눈다.
+// (srcset+sizes 방식은 고배율 화면의 휴대폰이 원본을 고르게 되어 media 조건으로 고정했다.)
+const PC_MEDIA = "(min-width: 1024px)";
+const MOBILE_MEDIA = "(max-width: 1023.98px)";
 
 const control =
   "grid h-10 w-10 place-items-center rounded-md border border-border bg-white text-foreground transition-[background-color,transform] duration-150 hover:bg-surface active:scale-[0.97]";
@@ -59,6 +66,11 @@ export function HeroSlider({ slides }: { slides: Project[] }) {
 
   const work = slides[index];
 
+  // 첫 장은 가장 큰 그림(LCP)이라 화면 폭에 맞는 판 하나만 미리 받아 둔다
+  const first = slides[0];
+  preload(first.imageUrl, { as: "image", media: PC_MEDIA, fetchPriority: "high" });
+  preload(smallImage(first.imageUrl), { as: "image", media: MOBILE_MEDIA, fetchPriority: "high" });
+
   return (
     <div
       className="lg:col-span-7"
@@ -72,6 +84,7 @@ export function HeroSlider({ slides }: { slides: Project[] }) {
     >
       <Link
         href={work.demoUrl}
+        prefetch={false}
         data-gtm-cta={`hero_slide_${work.id}`}
         aria-label={`${work.title} 데모 보기`}
         className="relative block aspect-[16/10] touch-pan-y select-none overflow-hidden rounded-[10px] border border-border bg-white"
@@ -101,15 +114,19 @@ export function HeroSlider({ slides }: { slides: Project[] }) {
             exit="exit"
             transition={{ duration: reduce ? 0.15 : 0.45, ease: EASE_OUT }}
           >
-            <Image
-              src={work.imageUrl}
-              alt={work.imageAlt}
-              width={1440}
-              height={900}
-              priority={index === 0}
-              draggable={false}
-              className="pointer-events-none h-full w-full object-cover object-top"
-            />
+            <picture>
+              <source media={PC_MEDIA} srcSet={work.imageUrl} width={1440} height={900} />
+              <img
+                src={smallImage(work.imageUrl)}
+                alt={work.imageAlt}
+                width={SMALL_IMAGE_WIDTH}
+                height={SMALL_IMAGE_HEIGHT}
+                fetchPriority={index === 0 ? "high" : undefined}
+                decoding="async"
+                draggable={false}
+                className="pointer-events-none h-full w-full object-cover object-top"
+              />
+            </picture>
           </motion.div>
         </AnimatePresence>
       </Link>

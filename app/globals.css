@@ -46,7 +46,7 @@
   --color-warning: var(--warning);
   --color-destructive: var(--destructive);
   --font-sans: var(--font-pretendard);
-  --font-mono: var(--font-geist-mono);
+  --font-mono: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
 }
 
 html {

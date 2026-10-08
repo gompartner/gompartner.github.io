@@ -249,7 +249,7 @@ export function ApplicationDemo() {
           <div className="flex items-center gap-2.5">
             <Emblem inverse={admin} />
             <div className="leading-[1.3]">
-              <p className="text-[19px] font-bold tracking-[-0.02em]">ㄴㅍ진흥원</p>
+              <h1 className="text-[19px] font-bold tracking-[-0.02em]">ㄴㅍ진흥원</h1>
               <p className={`text-[15px] ${admin ? "text-[#c4cfca]" : "text-[#5b6862]"}`}>
                 {admin ? "지원사업 심사관리" : "지원사업 통합신청"}
               </p>
@@ -653,11 +653,11 @@ function ApplicantView({ state, setState }: { state: ViewState; setState: (u: (s
         <div aria-hidden className="absolute inset-0 -z-10 bg-[rgba(6,26,20,0.5)] md:hidden" />
         <div className="mx-auto grid max-w-[1248px] gap-10 px-4 pb-28 pt-14 md:px-6 md:pb-36 md:pt-24 lg:grid-cols-[1.3fr_1fr] lg:items-end">
           <div>
-            <h1 id="notice-title" className="text-[40px] font-bold leading-[1.15] tracking-[-0.04em] md:text-[68px]">
+            <h2 id="notice-title" className="text-[40px] font-bold leading-[1.15] tracking-[-0.04em] md:text-[68px]">
               지원사업
               <br />
               사업공고
-            </h1>
+            </h2>
             <p className="mt-5 text-[19px] text-[#d7efe7]">접수중 사업 {openCount}건</p>
             <p className="mt-2 flex items-center gap-2 text-[15px] text-[#a9c9bd]">
               <CalendarDays size={18} aria-hidden />

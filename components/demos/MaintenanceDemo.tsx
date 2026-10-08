@@ -285,6 +285,9 @@ export function MaintenanceDemo() {
     setTypeFilter("전체");
   }
 
+  // 보고서 탭은 보고서 제목이 h1이므로 머리글 제목은 그때만 span으로 둔다
+  const Brand = tab === "report" ? "span" : "h1";
+
   return (
     <div className={`${plex.className} min-h-screen text-[17px] leading-[1.55]`} style={{ background: C.bg, color: C.text }}>
       <style>{`
@@ -303,12 +306,12 @@ export function MaintenanceDemo() {
             <span className="flex h-9 w-9 items-center justify-center rounded-md border" style={{ borderColor: C.action, color: C.action }}>
               <ShieldCheck size={18} aria-hidden />
             </span>
-            <span>
-              <span className="block text-[17px] font-bold leading-[1.35]">ㄱㄹ대학교 홈페이지 유지보수</span>
+            <div>
+              <Brand className="block text-[17px] font-bold leading-[1.35]">ㄱㄹ대학교 홈페이지 유지보수</Brand>
               <span className="block text-[15px] leading-[1.35]" style={{ color: C.muted }}>
                 최근 30일 운영 현황
               </span>
-            </span>
+            </div>
           </div>
           <nav className="grid w-full grid-cols-3 gap-1 sm:ml-auto sm:flex sm:w-auto" aria-label="메뉴">
             {TABS.map((t) => {

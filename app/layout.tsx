@@ -1,5 +1,4 @@
 import type { Metadata } from "next";
-import { Geist_Mono } from "next/font/google";
 import localFont from "next/font/local";
 import Script from "next/script";
 import "./globals.css";
@@ -17,12 +16,6 @@ const pretendard = localFont({
   display: "swap",
   weight: "100 900",
   fallback: ["-apple-system", "BlinkMacSystemFont", "Apple SD Gothic Neo", "Segoe UI", "sans-serif"],
-});
-
-const geistMono = Geist_Mono({
-  variable: "--font-geist-mono",
-  subsets: ["latin"],
-  display: "swap",
 });
 
 // 메인 첫 화면 문구와 맞춘 사이트 제목·설명
@@ -92,7 +85,7 @@ export default function RootLayout({
     <html
       lang="ko"
       data-scroll-behavior="smooth"
-      className={`${pretendard.variable} ${geistMono.variable}`}
+      className={pretendard.variable}
       suppressHydrationWarning
     >
       <body className="min-h-screen bg-background text-foreground antialiased">

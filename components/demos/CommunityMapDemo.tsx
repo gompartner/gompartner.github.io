@@ -425,6 +425,9 @@ export function CommunityMapDemo() {
     setZoom(next);
   };
 
+  // 하위 화면은 제목이 h1이므로 사이트명은 지도 화면에서만 h1으로 둔다
+  const Brand = page === "map" ? "h1" : "span";
+
   return (
     <div className="flex h-[100dvh] min-h-[560px] flex-col overflow-hidden text-[17px] leading-[1.5]" style={{ color: INK, backgroundColor: MAP_BG }}>
       <style>{`
@@ -461,7 +464,7 @@ export function CommunityMapDemo() {
             <span className="flex h-9 w-9 items-center justify-center rounded-[10px] text-white" style={{ backgroundColor: LEAF }}>
               <MapPin size={20} strokeWidth={2.4} aria-hidden />
             </span>
-            <span className={`${jua.className} text-[22px] leading-[1.2]`}>ㅇㅂ시 공유공간</span>
+            <Brand className={`${jua.className} text-[22px] leading-[1.2]`}>ㅇㅂ시 공유공간</Brand>
           </a>
           <form
             role="search"

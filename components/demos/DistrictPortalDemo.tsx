@@ -774,6 +774,8 @@ export function DistrictPortalDemo() {
     setView(null);
     window.scrollTo({ top: 0 });
   };
+  // 하위 화면은 제목이 h1이므로 로고 락업은 첫 화면에서만 h1으로 둔다
+  const Brand = view ? "div" : "h1";
 
   // 사용법 가이드가 하위 화면에서 열리면 첫 화면으로 돌아온다
   useEffect(() => {
@@ -854,20 +856,22 @@ export function DistrictPortalDemo() {
         {/* 헤더 */}
         <header className="relative z-30 bg-white shadow-[0_1px_0_#dfe3ea]">
           <div className={`${container} flex h-[72px] items-center gap-4`}>
-            <a
-              href="#main"
-              onClick={(e) => {
-                e.preventDefault();
-                goHome();
-              }}
-              className="flex items-center gap-2.5"
-            >
-              <span className="text-[24px] font-bold tracking-[-0.05em]" style={{ color: NAVY }}>
-                ㅎㄷ구
-              </span>
-              <span className="h-5 w-px bg-[#b9c0cc]" aria-hidden />
-              <span className="text-[17px] font-bold text-[#3a4453]">구청 누리집</span>
-            </a>
+            <Brand className="flex items-center">
+              <a
+                href="#main"
+                onClick={(e) => {
+                  e.preventDefault();
+                  goHome();
+                }}
+                className="flex items-center gap-2.5"
+              >
+                <span className="text-[24px] font-bold tracking-[-0.05em]" style={{ color: NAVY }}>
+                  ㅎㄷ구
+                </span>
+                <span className="h-5 w-px bg-[#b9c0cc]" aria-hidden />
+                <span className="text-[17px] font-bold text-[#3a4453]">구청 누리집</span>
+              </a>
+            </Brand>
 
             <nav id="gnb" aria-label="주메뉴" className="ml-auto hidden lg:block">
               <ul className="flex">
