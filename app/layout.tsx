@@ -1,4 +1,4 @@
-import type { Metadata } from "next";
+import type { Metadata, Viewport } from "next";
 import localFont from "next/font/local";
 import Script from "next/script";
 import "./globals.css";
@@ -22,6 +22,9 @@ const pretendard = localFont({
 const siteTitle = `홈페이지·업무 프로그램 제작 | ${profile.name}`;
 const siteDescription =
   "쇼핑몰, 펜션, 회사, 병원 홈페이지와 업무 프로그램을 직접 만듭니다. 원본 소스를 제공하고 완료 후 1개월 동안 오류를 무상으로 수정합니다.";
+
+// 브라우저 주소창·폰 바로가기 색
+export const viewport: Viewport = { themeColor: "#256ef4" };
 
 export const metadata: Metadata = {
   metadataBase: new URL(siteUrl),
