@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import { useCallback, useEffect, useState } from "react";
-import { ArrowDown, ArrowLeft, ArrowUp, CircleHelp, NotebookPen } from "lucide-react";
+import { ArrowDown, ArrowLeft, ArrowUp, CircleHelp, ExternalLink, NotebookPen } from "lucide-react";
 import type { TourStep } from "@/data/tours";
 
 // 데모 왼쪽 아래 버튼 묶음: 다른 데모 보기, 만든 이야기, 사용법 가이드.
@@ -23,7 +23,17 @@ function resolve(selector: string): HTMLElement | null {
   return el;
 }
 
-export function DemoDock({ projectId, story, tour }: { projectId: string; story?: string[]; tour?: TourStep[] }) {
+export function DemoDock({
+  projectId,
+  story,
+  blogUrl,
+  tour,
+}: {
+  projectId: string;
+  story?: string[];
+  blogUrl?: string;
+  tour?: TourStep[];
+}) {
   const [step, setStep] = useState<number | null>(null);
   const [rect, setRect] = useState<Rect | null>(null);
   const [steps, setSteps] = useState<TourStep[]>([]);
@@ -121,6 +131,18 @@ export function DemoDock({ projectId, story, tour }: { projectId: string; story?
                   <p key={line}>{line}</p>
                 ))}
               </div>
+              {blogUrl && (
+                <a
+                  href={blogUrl}
+                  target="_blank"
+                  rel="noopener"
+                  data-gtm-cta={`story_blog_${projectId}`}
+                  className="mt-4 inline-flex items-center gap-1.5 text-[14px] font-bold text-[#256ef4] hover:underline"
+                >
+                  블로그 글
+                  <ExternalLink size={14} aria-hidden />
+                </a>
+              )}
             </div>
           </details>
         ) : null}

@@ -144,3 +144,9 @@ export const stories: Record<string, string[]> = {
     "숫자만 보여 주면 와닿지 않는다. 그래프로 그렸다.",
   ],
 };
+
+// 곰파트너 블로그(gompartner.tistory.com)에 제작기를 발행한 데모. 만든 이야기 끝에 링크로 붙는다.
+// 글을 새로 발행하면 여기에 한 줄 추가한다.
+export const blogPosts: Record<string, string> = {
+  "online-store": "https://gompartner.tistory.com/1",
+};
