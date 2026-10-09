@@ -91,7 +91,7 @@ const estimateSource: Record<string, { plan: PlanId; extras: Extra[] }> = {
   "pilates-studio": { plan: "premium", extras: [["tool"]] }, // 시간표 예약
   "hanok-cafe": { plan: "premium", extras: [["tool"]] }, // 좌석 예약
   "bakery-cafe": { plan: "premium", extras: [["tool"]] }, // 픽업 주문
-  company: { plan: "standard", extras: [["lang"], ["page", 5]] },
+  company: { plan: "standard", extras: [["lang"], ["page", 5], ["tool"]] }, // 가공 가능 범위
   "cert-lab": { plan: "premium", extras: [["tool", 2], ["board"], ["page", 10]] }, // 시험진행현황 조회
   "flower-expo": { plan: "premium", extras: [["page", 10]] }, // 관람요금 계산
   "online-store": { plan: "premium", extras: [["cart"], ["pay"], ["member"]] }, // 유약 색·각인 미리보기
