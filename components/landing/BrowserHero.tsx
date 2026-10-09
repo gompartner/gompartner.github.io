@@ -51,7 +51,7 @@ export function BrowserHero({ tabs, promises }: { tabs: { label: string; project
                   aria-controls="hero-panel"
                   data-gtm-cta={`hero_tab_${t.project.id}`}
                   onClick={() => setActive(i)}
-                  className={`relative shrink-0 px-4 pb-2.5 pt-2 text-[15px] transition-colors duration-150 ${
+                  className={`relative shrink-0 px-2.5 pb-2.5 pt-2 text-[15px] sm:px-4 transition-colors duration-150 ${
                     on ? "font-bold text-foreground" : "text-foreground-secondary hover:text-foreground"
                   }`}
                 >
@@ -99,6 +99,7 @@ export function BrowserHero({ tabs, promises }: { tabs: { label: string; project
               title={`${label} 데모: ${project.title}`}
               poster={project.imageUrl}
               posterSmall={smallImage(project.imageUrl)}
+              ctaId={`hero_open_${project.id}`}
             />
           </div>
         </div>
