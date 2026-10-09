@@ -1,7 +1,6 @@
 import type { Metadata } from "next";
-import { Check } from "lucide-react";
 import { Doodles } from "@/components/landing/Doodles";
-import { HeroSlider } from "@/components/landing/HeroSlider";
+import { BrowserHero } from "@/components/landing/BrowserHero";
 import { projects } from "@/data/projects";
 import { profile } from "@/data/profile";
 import { PricingSection } from "@/components/landing/PricingSection";
@@ -24,13 +23,18 @@ export const metadata: Metadata = {
   alternates: { canonical: "/" },
 };
 
-// 첫 화면 배너에 넘겨 보여 줄 대표 포트폴리오
-// 크몽 판매량 순(쇼핑몰, 숙박, 기업, 병원, 법률, 세무, 부동산)으로 노출한다
-const featuredIds = ["online-store", "pension", "company", "dental-homepage"];
-const featured = featuredIds.map((id) => projects.find((p) => p.id === id)!);
+// 첫 화면 브라우저 창에 탭으로 띄울 데모. 크몽 판매량 순(쇼핑몰, 숙박, 기업, 병원, 전문직)에 동네 가게 하나.
+const heroTabs = [
+  ["쇼핑몰", "online-store"],
+  ["펜션", "pension"],
+  ["회사", "company"],
+  ["치과", "dental-homepage"],
+  ["법률사무소", "law-firm"],
+  ["빵집", "bakery-cafe"],
+].map(([label, id]) => ({ label, project: projects.find((p) => p.id === id)! }));
 
 // 포트폴리오 구간에 보여 줄 6개. 배너와 겹치지 않게 다른 업종으로 고르고 전체는 /works에서 본다.
-const showcaseIds = ["law-firm", "tax-office", "real-estate", "clinic-homepage", "hanok-cafe", "pilates-studio"];
+const showcaseIds = ["pharmacy", "tax-office", "real-estate", "clinic-homepage", "hanok-cafe", "pilates-studio"];
 const showcase = showcaseIds.map((id) => projects.find((p) => p.id === id)!);
 
 const promises = ["1인 개발자가 직접 제작", "원본 소스 제공", "완료 후 1개월 무상 오류 수정"];
@@ -42,25 +46,7 @@ const h2 = "text-[24px] font-bold leading-[1.5] tracking-[-0.01em] md:text-[32px
 export default function HomePage() {
   return (
     <>
-      <section aria-labelledby="hero-title" className="relative isolate overflow-hidden border-b border-border bg-surface">
-        <Doodles variant={0} />
-        <div className={`${container} grid gap-10 py-12 md:py-20 lg:grid-cols-12 lg:items-center lg:gap-6`}>
-          <div className="lg:col-span-5">
-            <h1 id="hero-title" className="text-[32px] font-bold leading-[1.4] tracking-[-0.02em] md:text-[44px]">
-              홈페이지·업무 프로그램 제작
-            </h1>
-            <ul className="mt-6 grid gap-3 sm:grid-cols-2" aria-label="작업 조건">
-              {promises.map((item) => (
-                <li key={item} className="flex items-center gap-2 text-[17px] font-bold leading-[1.5]">
-                  <Check size={20} strokeWidth={2.5} className="shrink-0 text-accent" aria-hidden />
-                  {item}
-                </li>
-              ))}
-            </ul>
-          </div>
-          <HeroSlider slides={featured} />
-        </div>
-      </section>
+      <BrowserHero tabs={heroTabs} promises={promises} />
 
       <section id="works" aria-labelledby="works-title" className="relative isolate scroll-mt-16 overflow-hidden">
         <Doodles variant={1} />

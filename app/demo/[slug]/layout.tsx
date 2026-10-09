@@ -1,4 +1,5 @@
 import { DemoDock } from "@/components/demos/DemoDock";
+import { HideInFrame } from "@/components/demos/HideInFrame";
 import { PlanBar } from "@/components/demos/PlanBar";
 import { projects } from "@/data/projects";
 import { stories } from "@/data/stories";
@@ -17,8 +18,12 @@ export default async function DemoLayout({
   return (
     <>
       {children}
-      {project && <DemoDock projectId={project.id} story={stories[project.id]} tour={tours[project.id]} />}
-      {project && <PlanBar projectId={project.id} />}
+      {project && (
+        <HideInFrame>
+          <DemoDock projectId={project.id} story={stories[project.id]} tour={tours[project.id]} />
+          <PlanBar projectId={project.id} />
+        </HideInFrame>
+      )}
     </>
   );
 }
