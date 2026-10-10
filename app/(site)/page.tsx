@@ -1,6 +1,6 @@
 import type { Metadata } from "next";
 import { Doodles } from "@/components/landing/Doodles";
-import { BrowserHero } from "@/components/landing/BrowserHero";
+import { SampleStackHero } from "@/components/landing/SampleStackHero";
 import { projects } from "@/data/projects";
 import { profile } from "@/data/profile";
 import { PricingSection } from "@/components/landing/PricingSection";
@@ -23,7 +23,7 @@ export const metadata: Metadata = {
   alternates: { canonical: "/" },
 };
 
-// 첫 화면 브라우저 창에 탭으로 띄울 데모. 크몽 판매량 순(쇼핑몰, 숙박, 기업, 병원, 전문직)에 동네 가게 하나.
+// 첫 화면에 카드로 쌓아 넘겨 볼 데모. 크몽 판매량 순(쇼핑몰, 숙박, 기업, 병원, 전문직)에 동네 가게 하나.
 const heroTabs = [
   ["쇼핑몰", "online-store"],
   ["펜션", "pension"],
@@ -46,7 +46,7 @@ const h2 = "text-[24px] font-bold leading-[1.5] tracking-[-0.01em] md:text-[32px
 export default function HomePage() {
   return (
     <>
-      <BrowserHero tabs={heroTabs} promises={promises} />
+      <SampleStackHero tabs={heroTabs} promises={promises} />
 
       <section id="works" aria-labelledby="works-title" className="relative isolate scroll-mt-16 overflow-hidden">
         <Doodles variant={1} />
