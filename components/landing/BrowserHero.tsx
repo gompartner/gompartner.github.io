@@ -23,7 +23,7 @@ export function BrowserHero({ tabs, promises }: { tabs: { label: string; project
 
   return (
     <section aria-labelledby="hero-title" className="border-b border-border bg-surface">
-      <div className={`${container} py-10 md:py-14`}>
+      <div className={`${container} py-8 md:py-10`}>
         <div className="flex flex-col gap-4 lg:flex-row lg:items-end lg:justify-between">
           <h1 id="hero-title" className="text-[32px] font-bold leading-[1.4] tracking-[-0.02em] md:text-[44px]">
             홈페이지·업무 프로그램 제작
@@ -38,7 +38,7 @@ export function BrowserHero({ tabs, promises }: { tabs: { label: string; project
           </ul>
         </div>
 
-        <div className="mt-8 overflow-hidden rounded-[12px] border border-[#b9bec4] bg-white shadow-[0_12px_32px_-12px_rgba(30,33,36,0.25)]">
+        <div className="mt-6 overflow-hidden rounded-[12px] border border-[#b9bec4] bg-white shadow-[0_12px_32px_-12px_rgba(30,33,36,0.25)]">
           <div role="tablist" aria-label="업종별 데모" className="flex items-end gap-1 overflow-x-auto bg-[#dfe2e5] px-2 pt-2 [scrollbar-width:none]">
             {tabs.map((t, i) => {
               const on = i === active;
@@ -81,6 +81,12 @@ export function BrowserHero({ tabs, promises }: { tabs: { label: string; project
               <Lock size={13} className="shrink-0" aria-hidden />
               <span className="truncate">gompartner.co.kr{project.demoUrl}</span>
             </div>
+            {est && (
+              <p className="hidden shrink-0 pl-2 text-[15px] leading-[1.5] text-foreground-secondary md:block">
+                이 화면처럼 만들면 <b className="text-foreground tabular-nums">{manwon(est.total)}</b>
+                <span className="ml-2 text-foreground-tertiary">작업 기간 {est.days}일</span>
+              </p>
+            )}
             <Link
               href={project.demoUrl}
               target="_blank"
@@ -105,7 +111,7 @@ export function BrowserHero({ tabs, promises }: { tabs: { label: string; project
         </div>
 
         {est && (
-          <p className="mt-4 text-right text-[16px] leading-[1.5] text-foreground-secondary">
+          <p className="mt-4 text-right text-[16px] md:hidden leading-[1.5] text-foreground-secondary">
             이 화면처럼 만들면 <b className="text-foreground tabular-nums">{manwon(est.total)}</b>
             <span className="ml-3 text-foreground-tertiary">작업 기간 {est.days}일</span>
           </p>
