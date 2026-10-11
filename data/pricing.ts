@@ -88,6 +88,7 @@ const estimateSource: Record<string, { plan: PlanId; extras: Extra[] }> = {
   "real-estate": { plan: "premium", extras: [["map"], ["tool"]] }, // 매물검색
   pension: { plan: "premium", extras: [["page", 3]] }, // 실시간예약
   "private-gym": { plan: "premium", extras: [["map"], ["pay"]] }, // 지점·시간 예약
+  academy: { plan: "premium", extras: [["tool"], ["board"]] }, // 반 찾기·시간표
   "pilates-studio": { plan: "premium", extras: [["tool"]] }, // 시간표 예약
   "hanok-cafe": { plan: "premium", extras: [["tool"]] }, // 좌석 예약
   "bakery-cafe": { plan: "premium", extras: [["tool"]] }, // 픽업 주문

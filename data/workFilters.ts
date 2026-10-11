@@ -1,7 +1,7 @@
 // 포트폴리오를 "○○에서 쓰는 ○○ 기능" 문장으로 고르기 위한 분류.
 // 새 포트폴리오를 추가하면 fieldsById에 업종을 적는다. 기능은 기능 태그·제목·설명에서 keywords로 찾는다.
 
-export const fields = ["병원", "전문직·부동산", "공공기관·학교", "가게·매장", "금융", "기업"] as const;
+export const fields = ["병원", "전문직·부동산", "학원·교육", "공공기관·학교", "가게·매장", "금융", "기업"] as const;
 export type Field = (typeof fields)[number];
 
 export const fieldsById: Record<string, Field[]> = {
@@ -9,7 +9,8 @@ export const fieldsById: Record<string, Field[]> = {
   "clinic-homepage": ["병원"],
   "dental-homepage": ["병원"],
   "hanok-cafe": ["가게·매장"],
-  "pilates-studio": ["가게·매장"],
+  academy: ["학원·교육"],
+  "pilates-studio": ["가게·매장", "학원·교육"],
   "online-store": ["가게·매장", "기업"],
   pension: ["가게·매장"],
   company: ["기업"],
@@ -25,7 +26,7 @@ export const fieldsById: Record<string, Field[]> = {
   "private-gym": ["가게·매장"],
   "shop-admin": ["가게·매장", "기업"],
   "excel-automation": ["기업", "가게·매장"],
-  lms: ["공공기관·학교", "기업"],
+  lms: ["학원·교육", "공공기관·학교", "기업"],
   "maintenance-dashboard": ["공공기관·학교", "기업"],
   "district-portal": ["공공기관·학교"],
   "job-portal": ["기업", "공공기관·학교"],

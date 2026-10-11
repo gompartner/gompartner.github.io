@@ -65,6 +65,11 @@ export const tours: Record<string, TourStep[]> = {
     { target: "#booking-time", title: "시간 선택", desc: "초록 테두리 칸이 예약 가능한 시간입니다. 이어서 여러 시간을 고를 수 있습니다." },
     { target: "#booking-summary", title: "예약 확인, 결제", desc: "총 금액을 확인하고 예약하기와 결제를 누르세요. 입장 QR이 바로 발급됩니다." },
   ],
+  academy: [
+    { target: "#classes", title: "반 찾기", desc: "밑줄 친 학년과 점수를 바꾸세요." },
+    { target: "#leveltest", title: "레벨테스트 예약", desc: "날짜와 시간을 고르세요." },
+    { target: "#shuttle", title: "차량 운행", desc: "우리 집 정류장을 누르세요." },
+  ],
   "pilates-studio": [
     { target: "#schedule", title: "그룹 시간표", desc: "잔여 자리가 있는 수업을 누르세요." },
     { target: "#lesson-finder", title: "레슨 찾기", desc: "질문 세 개에 답하세요." },

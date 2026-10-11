@@ -9,6 +9,7 @@ import { IndustryCost } from "@/components/works/IndustryCost";
 import { industries } from "@/data/industries";
 import { projects } from "@/data/projects";
 import { fieldsById } from "@/data/workFilters";
+import { estimateFor, manwon } from "@/data/pricing";
 
 type Props = { params: Promise<{ slug: string }> };
 
@@ -20,9 +21,15 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
   const { slug } = await params;
   const ind = industries.find((i) => i.slug === slug);
   if (!ind) return {};
+  // 검색 결과에서 비용이 먼저 보이게 업종 샘플 중 가장 싼 견적을 설명 앞에 붙인다.
+  const totals = projects
+    .filter((p) => (fieldsById[p.id] ?? []).includes(ind.field))
+    .map((p) => estimateFor(p.id)?.total)
+    .filter((n): n is number => n !== undefined);
+  const from = totals.length ? `${manwon(Math.min(...totals))}부터. ` : "";
   return {
-    title: `${ind.title} 포트폴리오`,
-    description: ind.description,
+    title: `${ind.title} 비용·포트폴리오`,
+    description: from + ind.description,
     keywords: ind.keywords,
     alternates: { canonical: `/works/${slug}` },
   };

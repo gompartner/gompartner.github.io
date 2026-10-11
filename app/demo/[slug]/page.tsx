@@ -3,6 +3,7 @@ import type { ComponentType } from "react";
 import { notFound } from "next/navigation";
 import dynamic from "next/dynamic";
 import { projects } from "@/data/projects";
+import { estimateFor, manwon } from "@/data/pricing";
 
 // 데모를 각각 따로 불러와, 데모 하나를 열 때 다른 데모 코드까지 받지 않게 한다.
 const AccessibilityDemo = dynamic(() => import("@/components/demos/AccessibilityDemo").then((m) => m.AccessibilityDemo));
@@ -24,6 +25,7 @@ const ExcelAutomationDemo = dynamic(() => import("@/components/demos/ExcelAutoma
 const DistrictPortalDemo = dynamic(() => import("@/components/demos/DistrictPortalDemo").then((m) => m.DistrictPortalDemo));
 const FlowerExpoDemo = dynamic(() => import("@/components/demos/FlowerExpoDemo").then((m) => m.FlowerExpoDemo));
 const HanokCafeDemo = dynamic(() => import("@/components/demos/HanokCafeDemo").then((m) => m.HanokCafeDemo));
+const AcademyDemo = dynamic(() => import("@/components/demos/AcademyDemo").then((m) => m.AcademyDemo));
 const PilatesStudioDemo = dynamic(() => import("@/components/demos/PilatesStudioDemo").then((m) => m.PilatesStudioDemo));
 const HomepageDemo = dynamic(() => import("@/components/demos/HomepageDemo").then((m) => m.HomepageDemo));
 const LmsDemo = dynamic(() => import("@/components/demos/LmsDemo").then((m) => m.LmsDemo));
@@ -41,6 +43,7 @@ const demoComponents: Record<string, ComponentType> = {
   "clinic-homepage": ClinicHomepageDemo,
   "dental-homepage": DentalHomepageDemo,
   "hanok-cafe": HanokCafeDemo,
+  academy: AcademyDemo,
   "pilates-studio": PilatesStudioDemo,
   "flower-expo": FlowerExpoDemo,
   "bakery-cafe": BakeryCafeDemo,
@@ -85,13 +88,17 @@ export async function generateMetadata({ params }: DemoPageProps): Promise<Metad
     };
   }
 
+  // "치과 홈페이지 제작 샘플"처럼 사장님이 찾는 말로 제목을 짓고, 견적이 있으면 설명 끝에 비용을 붙인다.
+  const title = `${demo.title}${/(홈페이지|쇼핑몰)$/.test(demo.title) ? " 제작" : ""} 샘플`;
+  const est = estimateFor(demo.id);
+  const description = est ? `${demo.description} 이 샘플처럼 만들면 ${manwon(est.total)}, ${est.days}일.` : demo.description;
   return {
-    title: `${demo.title} | 데모`,
-    description: demo.description,
+    title,
+    description,
     alternates: { canonical: `/demo/${slug}` },
     openGraph: {
-      title: `${demo.title} | 데모`,
-      description: demo.description,
+      title,
+      description,
       url: `/demo/${slug}`,
       images: [{ url: `/og/${slug}.png`, width: 1200, height: 630, alt: `${demo.title} 데모 화면` }],
     },

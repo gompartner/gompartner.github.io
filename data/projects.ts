@@ -160,6 +160,18 @@ export const projects: Project[] = [
     demoUrl: "/demo/small-business-homepage",
   },
   {
+    id: "academy",
+    kind: "신규 제작",
+    category: "학원",
+    layout: "반 찾기형",
+    title: "수학·영어 학원 홈페이지",
+    description: "초중등 수학·영어 학원 홈페이지. 학년과 점수를 고르면 맞는 반이 시간표에 표시되고 남은 자리가 보입니다. 레벨테스트 예약, 교습비 게시와 월 교습비 계산, 정류장별 차량 운행 시간.",
+    features: ["반 찾기·시간표", "레벨테스트 예약", "교습비 계산", "차량 운행 노선"],
+    imageUrl: "/images/demos/academy.jpg",
+    imageAlt: "수학·영어 학원 홈페이지 첫 화면",
+    demoUrl: "/demo/academy",
+  },
+  {
     id: "pilates-studio",
     kind: "신규 제작",
     category: "예약 서비스",
