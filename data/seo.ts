@@ -3,7 +3,7 @@ import { profile } from "./profile";
 import { projects } from "./projects";
 
 // 첫 화면 검색 제목·설명. 차별점은 계약 뒤 시안 그림이 아니라, 계약 전에 직접 써 보는 샘플(라이브 데모)과 샘플별 가격.
-// 첫 화면 h1과 같은 말("시안 말고 진짜 화면으로")을 쓴다. 가격·샘플 수는 데이터에서 계산한다.
+// 가격·샘플 수는 데이터에서 계산한다.
 const [basic] = plans;
 const demoCount = projects.filter((p) => p.demoUrl.startsWith("/demo/")).length;
 
