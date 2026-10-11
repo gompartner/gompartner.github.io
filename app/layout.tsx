@@ -5,6 +5,7 @@ import "./globals.css";
 import { CtaTracker } from "@/components/analytics/CtaTracker";
 import { ThemeProvider } from "@/components/layout/ThemeProvider";
 import { profile } from "@/data/profile";
+import { homeDescription, homeTitle } from "@/data/seo";
 import { GTM_ID } from "@/lib/analytics";
 import { siteUrl } from "@/lib/site";
 
@@ -19,9 +20,8 @@ const pretendard = localFont({
 });
 
 // 메인 첫 화면 문구와 맞춘 사이트 제목·설명
-const siteTitle = `홈페이지·업무 프로그램 제작 | ${profile.name}`;
-const siteDescription =
-  "쇼핑몰, 펜션, 회사, 병원 홈페이지와 업무 프로그램을 직접 만듭니다. 원본 소스를 제공하고 완료 후 1개월 동안 오류를 무상으로 수정합니다.";
+const siteTitle = homeTitle;
+const siteDescription = homeDescription;
 
 // 브라우저 주소창·폰 바로가기 색
 export const viewport: Viewport = { themeColor: "#256ef4" };
@@ -35,6 +35,10 @@ export const metadata: Metadata = {
   description: siteDescription,
   keywords: [
     "홈페이지 제작",
+    "홈페이지 제작 비용",
+    "반응형 홈페이지 제작",
+    "쇼핑몰 제작",
+    "학원 홈페이지 제작",
     "업무 프로그램 개발",
     "홈페이지 유지보수",
     "홈페이지 리뉴얼",

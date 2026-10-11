@@ -2,7 +2,7 @@ import type { Metadata } from "next";
 import { Doodles } from "@/components/landing/Doodles";
 import { SampleStackHero } from "@/components/landing/SampleStackHero";
 import { projects } from "@/data/projects";
-import { profile } from "@/data/profile";
+import { homeDescription, homeTitle } from "@/data/seo";
 import { PricingSection } from "@/components/landing/PricingSection";
 import { ProcessSteps } from "@/components/landing/ProcessSteps";
 import { WorksGrid } from "@/components/landing/WorksGrid";
@@ -15,11 +15,8 @@ import Link from "next/link";
 
 export const metadata: Metadata = {
   // 루트 템플릿(`%s | 곰파트너`)이 브랜드를 또 붙이지 않도록 absolute 사용
-  title: {
-    absolute: `홈페이지·업무 프로그램 제작 | ${profile.name}`,
-  },
-  description:
-    "쇼핑몰, 펜션, 회사, 병원 홈페이지와 업무 프로그램을 직접 만듭니다. 원본 소스를 제공하고 완료 후 1개월 동안 오류를 무상으로 수정합니다.",
+  title: { absolute: homeTitle },
+  description: homeDescription,
   alternates: { canonical: "/" },
 };
 

@@ -6,8 +6,8 @@ import { projects } from "@/data/projects";
 import { fieldsById } from "@/data/workFilters";
 
 export const metadata: Metadata = {
-  title: "포트폴리오",
-  description: `병원, 약국, 카페, 공공기관 홈페이지와 업무 프로그램 포트폴리오 ${projects.length}건입니다. 모두 데모로 확인할 수 있습니다.`,
+  title: "홈페이지 제작 포트폴리오",
+  description: `쇼핑몰, 펜션, 회사, 병원, 학원, 카페, 공공기관 홈페이지와 업무 프로그램 포트폴리오 ${projects.length}건. 샘플 화면을 직접 눌러 보고 비슷하게 만들 때 비용을 확인할 수 있습니다.`,
   alternates: { canonical: "/works" },
 };
 
