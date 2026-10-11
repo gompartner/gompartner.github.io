@@ -1,5 +1,9 @@
 import { profile } from "@/data/profile";
+import { plans } from "@/data/pricing";
 import { siteUrl } from "@/lib/site";
+
+// 같은 이름의 다른 회사와 구분되도록 외부 프로필을 묶는다.
+const sameAs = ["https://kmong.com/gig/796239", "https://gompartner.tistory.com"];
 
 export function PersonJsonLd() {
   const schema = {
@@ -10,6 +14,7 @@ export function PersonJsonLd() {
     jobTitle: profile.title,
     description: profile.bio,
     url: siteUrl,
+    sameAs,
     address: {
       "@type": "PostalAddress",
       addressLocality: "서울",
@@ -47,6 +52,20 @@ export function ProfessionalServiceJsonLd() {
     url: siteUrl,
     email: profile.email,
     areaServed: "KR",
+    sameAs,
+    priceRange: `₩${plans[0].price.toLocaleString("ko-KR")}~₩${plans[plans.length - 1].price.toLocaleString("ko-KR")}`,
+    hasOfferCatalog: {
+      "@type": "OfferCatalog",
+      name: "홈페이지 제작 패키지",
+      itemListElement: plans.map((p) => ({
+        "@type": "Offer",
+        name: p.title,
+        description: `${p.summary}. ${p.includes.join(", ")}. 작업 ${p.days}일.`,
+        price: p.price,
+        priceCurrency: "KRW",
+        url: `${siteUrl}/pricing`,
+      })),
+    },
     address: {
       "@type": "PostalAddress",
       addressLocality: "서울",

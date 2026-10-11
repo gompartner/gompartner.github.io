@@ -1,4 +1,4 @@
-import { plans } from "@/data/pricing";
+import { manwon, plans } from "@/data/pricing";
 
 // 맡기기 전에 확인하는 것: 진행 순서와 수정·결제·환불·운영 기준.
 // 크몽 서비스(#796239)의 수정 횟수·오류 수정·환불 기준과 같게 유지한다.
@@ -13,6 +13,14 @@ export const processSteps = [
 const revisions = plans.map((p) => `${p.name} ${p.revisions}회`).join(", ");
 
 export const faq = [
+  {
+    q: "홈페이지 제작 비용은 얼마인가요?",
+    a: `${plans.map((p) => `${p.title} ${manwon(p.price)}`).join(", ")}입니다. 예약, 결제, 회원가입 같은 기능은 가격 페이지의 추가 기능 단가대로 더합니다. 도메인과 호스팅 비용은 따로입니다.`,
+  },
+  {
+    q: "만드는 데 얼마나 걸리나요?",
+    a: `${plans.map((p) => `${p.title} ${p.days}일`).join(", ")}입니다. 자료(로고, 사진, 문구)를 받은 날부터 셉니다. 추가 기능이 붙으면 기능마다 하루에서 나흘 늘어납니다.`,
+  },
   {
     q: "수정은 몇 번까지 되나요?",
     a: `패키지별로 ${revisions}입니다. 작업 실수로 생긴 오류는 횟수와 관계없이 완료 전까지 바로 고칩니다. 문구, 위치, 업무 절차를 바꾸는 요청은 수정 횟수에 들어갑니다.`,
