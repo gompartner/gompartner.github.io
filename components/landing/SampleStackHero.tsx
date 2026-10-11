@@ -61,11 +61,9 @@ export function SampleStackHero({ tabs, promises }: { tabs: Tab[]; promises: str
         {/* 넘겨지는 카드가 글자 뒤로 지나가게 소개 쪽을 위에 둔다. */}
         <div className="relative z-10">
           <h1 id="hero-title" className="text-[32px] font-bold leading-[1.4] tracking-[-0.02em] md:text-[44px]">
-            시안 말고
+            홈페이지·업무
             <br />
-            진짜 화면으로 고르는
-            <br />
-            홈페이지 제작
+            프로그램 제작
           </h1>
           <ul className="mt-6 flex flex-col gap-2" aria-label="작업 조건">
             {promises.map((item) => (
@@ -81,7 +79,7 @@ export function SampleStackHero({ tabs, promises }: { tabs: Tab[]; promises: str
             data-gtm-cta={`hero_open_${current.project.id}`}
             className="group mt-8 inline-flex h-14 items-center gap-2 rounded-[6px] bg-accent px-6 text-[17px] font-bold text-accent-foreground transition-colors hover:bg-accent-hover"
           >
-            {current.label} 샘플 써 보기
+            {current.label} 샘플 둘러보기
             <ArrowRight size={20} aria-hidden className="transition-transform duration-150 group-hover:translate-x-0.5" />
           </Link>
         </div>
