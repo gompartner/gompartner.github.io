@@ -49,8 +49,7 @@ export const plans: Plan[] = [
   },
 ];
 
-// "원본 소스", "무상 오류 수정" 같은 업계 말 대신 사장님이 알아듣는 말로 쓴다.
-export const planCommon = ["홈페이지 파일 전부 전달", "완성 후 한 달 고장 무료 수정"];
+export const planCommon = ["원본 소스 제공", "완료 후 1개월 무상 오류 수정"];
 
 /** 패키지에 없는 기능을 더할 때의 단가. 고급 패키지의 맞춤 기능 1개는 따로 받지 않는다. */
 export type AddonId = "page" | "board" | "tool" | "print" | "lang" | "live" | "map" | "pay" | "member" | "cart";
