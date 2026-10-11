@@ -5,6 +5,7 @@ import { notFound } from "next/navigation";
 import { Check } from "lucide-react";
 import { PricingSection } from "@/components/landing/PricingSection";
 import { WorksGrid } from "@/components/landing/WorksGrid";
+import { IndustryCost } from "@/components/works/IndustryCost";
 import { industries } from "@/data/industries";
 import { projects } from "@/data/projects";
 import { fieldsById } from "@/data/workFilters";
@@ -60,6 +61,7 @@ export default async function IndustryWorksPage({ params }: Props) {
         <div className="mt-10">
           <WorksGrid projects={list} />
         </div>
+        <IndustryCost industry={ind} projects={list} />
       </div>
       <PricingSection compact />
     </>
