@@ -10,5 +10,5 @@ const demoCount = projects.filter((p) => p.demoUrl.startsWith("/demo/")).length;
 export const homeTitle = `홈페이지 제작 ${manwon(basic.price)}부터, 업종별 샘플 ${demoCount}개 | ${profile.name}`;
 export const homeDescription =
   `쇼핑몰, 펜션, 회사, 병원, 학원 홈페이지를 1인 개발자가 직접 만듭니다. ` +
-  `소개 홈페이지 ${manwon(basic.price)} ${basic.days}일, 예약 홈페이지 ${manwon(standard.price)} ${standard.days}일. ` +
-  `원본 소스를 드리고 완료 후 1개월 동안 오류를 무상으로 고칩니다.`;
+  `소개 홈페이지 ${manwon(basic.price)}(${basic.days}일), 예약 홈페이지 ${manwon(standard.price)}(${standard.days}일). ` +
+  `완성 후 한 달 동안 고장 나면 무료로 고쳐 드리고, 다른 업체로 옮겨도 쓸 수 있게 파일을 모두 드립니다.`;
