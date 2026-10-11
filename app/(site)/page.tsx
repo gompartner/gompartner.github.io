@@ -3,6 +3,7 @@ import { Doodles } from "@/components/landing/Doodles";
 import { SampleStackHero } from "@/components/landing/SampleStackHero";
 import { projects } from "@/data/projects";
 import { homeDescription, homeTitle } from "@/data/seo";
+import { planCommon } from "@/data/pricing";
 import { PricingSection } from "@/components/landing/PricingSection";
 import { ProcessSteps } from "@/components/landing/ProcessSteps";
 import { WorksGrid } from "@/components/landing/WorksGrid";
@@ -34,7 +35,7 @@ const heroTabs = [
 const showcaseIds = ["pharmacy", "tax-office", "real-estate", "clinic-homepage", "hanok-cafe", "pilates-studio"];
 const showcase = showcaseIds.map((id) => projects.find((p) => p.id === id)!);
 
-const promises = ["1인 개발자가 직접 제작", "원본 소스 제공", "완료 후 1개월 무상 오류 수정"];
+const promises = ["1인 개발자가 직접 제작", ...planCommon];
 
 
 const container = "mx-auto w-full max-w-[1248px] px-4 md:px-6";
