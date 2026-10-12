@@ -36,7 +36,7 @@ export function IndustryCost({ industry, projects }: { industry: Industry; proje
         name: "가격에 무엇이 포함되나요?",
         acceptedAnswer: {
           "@type": "Answer",
-          text: `${plans.map((p) => `${p.title} ${manwon(p.price)}(${p.includes.join(", ")})`).join(". ")}. 모든 패키지에 원본 소스와 완료 후 1개월 무상 오류 수정이 들어갑니다. 도메인과 호스팅 비용은 따로입니다.`,
+          text: `${plans.map((p) => `${p.title} ${manwon(p.price)}(${p.includes.join(", ")})`).join(". ")}. 모든 패키지에 원본 소스와 완료 후 1개월 무상 오류 수정이 포함됩니다. 도메인과 호스팅 비용은 별도입니다.`,
         },
       },
     ],
