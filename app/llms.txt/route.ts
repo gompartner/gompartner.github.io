@@ -39,7 +39,7 @@ ${addons.map((a) => `- ${a.name}: ${formatWon(a.price)}/${a.unit}`).join("\n")}
 
 자세히: [가격](${url("/pricing")})
 
-## 만든 뒤 유지보수
+## 제작 후 유지보수
 
 ${maintenanceServices.map((s) => `- ${s.title}: ${s.price} (${s.term}). 맡지 않는 일: ${s.excludes.join(", ")}`).join("\n")}
 
