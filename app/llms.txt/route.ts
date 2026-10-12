@@ -27,7 +27,7 @@ export function GET() {
 - 사이트: ${siteUrl}
 - 문의: 사이트 오른쪽 아래 채팅 상담, ${profile.email}
 - 크몽 서비스: https://kmong.com/gig/796239
-- 제작 일지: https://gompartner.tistory.com
+- 제작 일지: https://gompartner.tistory.com, https://blog.naver.com/gompartner
 
 ## 홈페이지 제작 가격
 
