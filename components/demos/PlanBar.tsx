@@ -14,7 +14,7 @@ export function PlanBar({ projectId }: { projectId: string }) {
   return (
     <details className="group fixed bottom-5 right-5 z-50 print:hidden">
       <summary className="inline-flex cursor-pointer list-none items-center gap-2 rounded-full border border-white/20 bg-black/70 px-4 py-2.5 text-sm font-medium text-white shadow-lg backdrop-blur-md transition-colors hover:bg-black/80 [&::-webkit-details-marker]:hidden">
-        <span className="sm:hidden">{est ? manwon(est.total) : "견적"}</span>
+        <span className="sm:hidden">{est ? `제작비 ${manwon(est.total)}` : "제작 견적"}</span>
         <span className="hidden sm:inline">{est ? `비슷하게 만들면 ${manwon(est.total)}` : "비슷하게 만들기 견적"}</span>
         <ChevronUp size={15} className="transition-transform group-open:rotate-180" aria-hidden />
       </summary>
