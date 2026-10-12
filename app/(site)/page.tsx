@@ -33,7 +33,7 @@ const heroTabs = [
 const showcaseIds = ["company", "cert-lab", "excel-automation", "shop-admin", "online-store", "dental-homepage"];
 const showcase = showcaseIds.map((id) => projects.find((p) => p.id === id)!);
 
-const promises = ["신청이 들어오면 바로 알림", "구글 시트에 상담 상태까지 기록", "광고별 신청·계약 수 확인", "계약 전에 샘플로 직접 신청해 보기"];
+const promises = ["접수 즉시 알림", "구글 시트 상담 상태 기록", "광고별 신청·계약 집계", "원본 소스 제공"];
 
 
 const container = "mx-auto w-full max-w-[1248px] px-4 md:px-6";

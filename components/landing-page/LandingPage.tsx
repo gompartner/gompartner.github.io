@@ -3,6 +3,7 @@
 import { useEffect, useRef, useState } from "react";
 import Image from "next/image";
 import Link from "next/link";
+import { Footer } from "@/components/layout/Footer";
 import { AnimatePresence, motion } from "framer-motion";
 import { Check, ChevronDown } from "lucide-react";
 import { formatWon, landingPlans, manwon, planCommon } from "@/data/pricing";
@@ -23,32 +24,20 @@ const container = "mx-auto w-full max-w-[1200px] px-4 md:px-6";
 const h2 = "text-[28px] font-bold leading-[1.35] tracking-[-0.02em] md:text-[36px]";
 
 const FOR_WHOM = [
-  "광고비는 매달 나가는데 신청이 메일, 문자, 카톡으로 흩어져 들어오는 분",
-  "신청을 받고 바로 전화하지 못해 다른 업체에 손님을 뺏긴 적이 있는 분",
-  "네이버와 메타 중 어디서 계약이 나오는지 몰라 광고비를 나눠 쓰는 분",
-  "홈페이지 전체보다 신청 받는 한 쪽이 먼저 필요한 분",
+  "광고 신청을 메일과 문자로 따로 확인하는 경우",
+  "신청 확인이 늦어 상담을 놓치는 경우",
+  "광고별 계약 건수를 확인하기 어려운 경우",
+  "홈페이지보다 신청 페이지가 먼저 필요한 경우",
 ];
 
 const SAMPLE_IDS = ["landing-water-rental", "landing-coding-camp", "landing-move-clean"];
 
 const FAQ: [string, string][] = [
-  [
-    "문자나 카톡 알림은 따로 돈이 드나요?",
-    "발송 업체 요금이 건당 20원 안팎으로 들고, 의뢰인 계정에서 나갑니다. 카톡 알림톡은 사업자 인증을 받은 카카오톡 채널과 알림 문구 심사가 필요해서 며칠 더 걸립니다. 메일 알림은 무료입니다.",
-  ],
-  [
-    "신청 내용은 어디에 저장되나요?",
-    "의뢰인 구글 계정의 구글 시트에만 저장됩니다. 접수 스크립트도 의뢰인 계정에서 돌아가서, 곰파트너가 신청 내용을 따로 보관하지 않습니다.",
-  ],
-  [
-    "매달 드는 돈이 있나요?",
-    "무료 정적 호스팅에 올리면 월 비용이 없습니다. 도메인은 의뢰인 명의로 직접 사고, 1년 2만 원 안팎입니다(패키지 금액 별도).",
-  ],
-  ["받지 않는 업종이 있나요?", "대부·대출 중개, 주식·코인 리딩처럼 광고 규제가 있는 업종은 진행하지 않습니다."],
-  [
-    "얼마나 걸리나요?",
-    `자료를 받은 날부터 ${landingPlans.map((p) => `${p.title} ${p.days}일`).join(", ")}입니다. 수정은 패키지 횟수 안에서 반영합니다.`,
-  ],
+  ["문자·카톡 알림 비용은 별도인가요?", "발송 비용은 건당 20원 내외이며 고객 부담입니다. 카카오 알림톡은 비즈니스 채널 인증과 템플릿 심사가 필요합니다. 메일 알림은 무료입니다."],
+  ["신청 내용은 어디에 저장되나요?", "고객 구글 계정의 구글 시트에 저장됩니다. 곰파트너는 신청 내용을 보관하지 않습니다."],
+  ["월 비용이 있나요?", "무료 호스팅을 사용하여 월 비용은 없습니다. 도메인은 고객 명의로 직접 구매하며 연 2만 원 내외입니다."],
+  ["진행하지 않는 업종이 있나요?", "대부 중개 및 주식·코인 리딩 업종은 진행하지 않습니다."],
+  ["작업 기간은 얼마나 걸리나요?", `자료 전달일 기준 ${landingPlans.map((p) => `${p.title} ${p.days}일`).join(" / ")}입니다.`],
 ];
 
 const PLAN_TO_PKG: Record<string, PackageName> = {
@@ -101,17 +90,11 @@ export function LandingPage() {
       <main>
         {/* 1. 첫 화면 */}
         <section ref={heroRef} aria-labelledby="hero-title" className={`${container} pb-16 pt-8 md:pb-24 md:pt-16`}>
-          <p className="text-[17px] font-bold text-accent">광고 신청 접수 랜딩페이지 제작</p>
-          <h1 id="hero-title" className="mt-3 text-[36px] font-bold leading-[1.3] tracking-[-0.03em] md:text-[56px]">
-            광고 보고 남긴 신청,
+          <h1 id="hero-title" className="text-[36px] font-bold leading-[1.3] tracking-[-0.03em] md:text-[56px]">
+            광고 신청 접수
             <br />
-            통화했는지 계약했는지까지
-            <br />
-            남겨 드립니다
+            랜딩페이지 제작
           </h1>
-          <p className="mt-5 max-w-[640px] text-[17px] leading-[1.6] text-foreground-secondary md:text-[19px]">
-            신청이 들어오면 바로 알리고, 구글 시트에 상담 상태를 적고, 광고별로 계약이 몇 건 나왔는지 묶어 보여 드립니다. 시트에 쌓아 두기만 하는 랜딩과 다른 점입니다.
-          </p>
           <p className="mt-6 text-[22px] font-bold tabular-nums md:text-[26px]">
             {manwon(basic.price)}부터 · 작업 {basic.days}일
           </p>
@@ -120,7 +103,7 @@ export function LandingPage() {
               상담 신청
             </button>
             <a href="#samples" className="flex h-14 items-center rounded-[6px] border border-border px-7 text-[18px] font-bold transition-colors hover:border-accent hover:text-accent">
-              샘플 써 보기
+              제작 사례
             </a>
           </div>
         </section>
@@ -129,7 +112,7 @@ export function LandingPage() {
         <section aria-labelledby="whom-title" className="border-t border-border bg-surface py-16 md:py-24">
           <div className={container}>
             <h2 id="whom-title" className={h2}>
-              이런 분께 맞습니다
+              추천 대상
             </h2>
             <ul className="mt-8 grid gap-3 md:grid-cols-2">
               {FOR_WHOM.map((t) => (
@@ -146,11 +129,8 @@ export function LandingPage() {
         <section aria-labelledby="owner-title" className="py-16 md:py-24">
           <div className={container}>
             <h2 id="owner-title" className={h2}>
-              신청 한 건이 들어오면
+              신청 접수 화면
             </h2>
-            <p className="mt-3 max-w-[720px] text-[17px] leading-[1.6] text-foreground-secondary">
-              휴대폰으로 바로 알림이 오고, 시트에 한 줄이 생깁니다. 시트의 상담 상태를 눌러 바꿔 보세요. 30분 동안 통화 전으로 남아 있으면 한 번 더 알려 드립니다.
-            </p>
             <div className="mt-8 rounded-[12px] border border-border bg-surface p-2 md:p-4">
               <OwnerPreview />
             </div>
@@ -161,7 +141,7 @@ export function LandingPage() {
         <section aria-labelledby="plans-title" className="border-t border-border bg-surface py-16 md:py-24">
           <div className={container}>
             <h2 id="plans-title" className={h2}>
-              패키지
+              요금 안내
             </h2>
             <ul className="mt-8 grid gap-4 md:grid-cols-3">
               {landingPlans.map((plan) => (
@@ -170,7 +150,6 @@ export function LandingPage() {
                     {plan.title} <span className="font-normal text-foreground-secondary">· {plan.days}일</span>
                   </p>
                   <p className="mt-1 text-[32px] font-bold leading-[1.3] tabular-nums">{formatWon(plan.price)}</p>
-                  <p className="mt-1 text-[17px] leading-[1.6] text-foreground-secondary">{plan.summary}</p>
                   <ul className="mt-5 space-y-2 border-t border-border pt-5 text-[17px]">
                     {[...plan.includes, `수정 ${plan.revisions}회`, ...planCommon].map((item) => (
                       <li key={item} className="flex gap-2 leading-[1.5]">
@@ -198,11 +177,8 @@ export function LandingPage() {
         <section id="samples" aria-labelledby="samples-title" className="scroll-mt-6 py-16 md:py-24">
           <div className={container}>
             <h2 id="samples-title" className={h2}>
-              샘플에서 직접 신청해 보세요
+              제작 사례
             </h2>
-            <p className="mt-3 max-w-[720px] text-[17px] leading-[1.6] text-foreground-secondary">
-              신청을 마치면 사장님 쪽 알림과 시트 화면까지 보입니다. 상호와 정보는 가상입니다.
-            </p>
             <ul className="mt-8 grid gap-4 md:grid-cols-3">
               {samples.map((p) => (
                 <li key={p.id}>
@@ -243,18 +219,10 @@ export function LandingPage() {
         <LeadForm ref={formRef} pkg={pkg} onPkg={setPkg} />
       </main>
 
-      <footer className="border-t border-border py-10 pb-28 md:pb-10">
-        <div className={`${container} flex flex-wrap items-center gap-x-6 gap-y-2 text-[15px] text-foreground-secondary`}>
-          <span className="font-bold text-foreground">{profile.name}</span>
-          <span>{profile.email}</span>
-          <Link href="/privacy" className="underline-offset-4 hover:underline">
-            개인정보처리방침
-          </Link>
-          <Link href="/" className="underline-offset-4 hover:underline">
-            홈페이지 제작
-          </Link>
-        </div>
-      </footer>
+      {/* 사이트 공용 바닥글. 아래 고정 신청 바에 가리지 않게 여백을 둔다. */}
+      <div className="pb-24 md:pb-0">
+        <Footer />
+      </div>
 
       <AnimatePresence>
         {heroOut && !formIn && (
