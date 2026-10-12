@@ -1,4 +1,5 @@
 import { faq } from "@/data/faq";
+import { maintenanceServices } from "@/data/maintenance";
 import { industries } from "@/data/industries";
 import { addons, estimateFor, formatWon, manwon, planCommon, plans } from "@/data/pricing";
 import { profile } from "@/data/profile";
@@ -37,6 +38,12 @@ ${plans.map((p) => `- ${p.title}(${p.name}): ${formatWon(p.price)}, 작업 ${p.d
 ${addons.map((a) => `- ${a.name}: ${formatWon(a.price)}/${a.unit}`).join("\n")}
 
 자세히: [가격](${url("/pricing")})
+
+## 만든 뒤 유지보수
+
+${maintenanceServices.map((s) => `- ${s.title}: ${s.price} (${s.term}). 맡지 않는 일: ${s.excludes.join(", ")}`).join("\n")}
+
+자세히: [유지보수](${url("/maintenance")})
 
 ## 업종별 포트폴리오와 비용
 

@@ -82,6 +82,10 @@ export function PricingSection({
           <Link href="/tools/hosting-cost" className="font-bold text-accent underline-offset-4 hover:underline">
             업체별 비교
           </Link>
+          {" · "}
+          <Link href="/maintenance" className="font-bold text-accent underline-offset-4 hover:underline">
+            만든 뒤 유지보수 가격
+          </Link>
         </p>
         {!compact && (
           <div className="mt-4 rounded-[10px] border border-border bg-white p-6">
