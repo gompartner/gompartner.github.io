@@ -1,7 +1,7 @@
 import Link from "next/link";
 import { Check } from "lucide-react";
 import { ChannelTalkButton } from "@/components/layout/ChannelTalk";
-import { addons, formatWon, manwon, planCommon, plans, runningCostNote, samplesForPlan } from "@/data/pricing";
+import { addons, formatWon, landingPlans, manwon, planCommon, plans, runningCostNote, samplesForPlan } from "@/data/pricing";
 import { projects } from "@/data/projects";
 
 const h1 = "text-[28px] font-bold leading-[1.4] tracking-[-0.01em] md:text-[36px]";
@@ -77,6 +77,33 @@ export function PricingSection({
             );
           })}
         </ul>
+        <div className="mt-4 flex flex-col gap-3 rounded-[10px] border border-border bg-white px-6 py-5 md:flex-row md:items-center md:gap-8">
+          <p className="shrink-0 text-[17px] font-bold">
+            랜딩페이지 한 쪽 <span className="tabular-nums">{manwon(landingPlans[0].price)}</span>부터
+          </p>
+          <ul className="flex flex-wrap gap-x-6 gap-y-1 text-[17px]">
+            {landingPlans.map((plan) => {
+              const sample = samplesForPlan(plan.id)[0];
+              const p = sample && projects.find((x) => x.id === sample.id);
+              const label = (
+                <>
+                  {plan.title} <span className="tabular-nums text-foreground-secondary">{manwon(plan.price)} · {plan.days}일</span>
+                </>
+              );
+              return (
+                <li key={plan.id}>
+                  {p ? (
+                    <Link href={p.demoUrl} prefetch={false} className="underline-offset-4 hover:text-accent hover:underline">
+                      {label}
+                    </Link>
+                  ) : (
+                    label
+                  )}
+                </li>
+              );
+            })}
+          </ul>
+        </div>
         <p className="mt-4 text-[15px] leading-[1.6] text-foreground-secondary md:text-[17px]">
           {runningCostNote}{" "}
           <Link href="/tools/hosting-cost" className="font-bold text-accent underline-offset-4 hover:underline">

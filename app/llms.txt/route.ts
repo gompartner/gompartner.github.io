@@ -1,7 +1,7 @@
 import { faq } from "@/data/faq";
 import { maintenanceServices } from "@/data/maintenance";
 import { industries } from "@/data/industries";
-import { addons, estimateFor, formatWon, manwon, planCommon, plans } from "@/data/pricing";
+import { addons, estimateFor, formatWon, landingPlans, manwon, planCommon, plans } from "@/data/pricing";
 import { profile } from "@/data/profile";
 import { projects } from "@/data/projects";
 import { tools } from "@/data/tools";
@@ -33,6 +33,9 @@ export function GET() {
 
 ${plans.map((p) => `- ${p.title}(${p.name}): ${formatWon(p.price)}, 작업 ${p.days}일, 수정 ${p.revisions}회. ${p.summary}. ${p.includes.join(", ")}.`).join("\n")}
 - 모든 패키지: ${planCommon.join(", ")}. 도메인·호스팅 비용은 별도입니다.
+
+한 쪽짜리 랜딩페이지:
+${landingPlans.map((p) => `- ${p.title}(${p.name}): ${formatWon(p.price)}, 작업 ${p.days}일, 수정 ${p.revisions}회. ${p.summary}. ${p.includes.join(", ")}.`).join("\n")}
 
 추가 기능 단가:
 ${addons.map((a) => `- ${a.name}: ${formatWon(a.price)}/${a.unit}`).join("\n")}

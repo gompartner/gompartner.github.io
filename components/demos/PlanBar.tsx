@@ -1,13 +1,14 @@
 import Link from "next/link";
 import { ChevronUp } from "lucide-react";
-import { estimateFor, formatWon, manwon, planCommon, plans } from "@/data/pricing";
+import { estimateFor, formatWon, landingPlans, manwon, planCommon, plans } from "@/data/pricing";
 import { projects } from "@/data/projects";
 
 /** 데모 오른쪽 아래에 "비슷하게 만들면 얼마"를 띄운다. 누르면 패키지와 추가 기능 내역이 펼쳐진다. */
 export function PlanBar({ projectId }: { projectId: string }) {
   const est = estimateFor(projectId);
   const title = projects.find((p) => p.id === projectId)?.title ?? "샘플";
-  const basic = plans[0];
+  // 랜딩 샘플이면 랜딩 패키지 중 가장 싼 것과 견준다
+  const basic = (est?.plan.id.startsWith("landing") ? landingPlans : plans)[0];
   // 상담창 입력칸에 어떤 샘플을 보고 왔는지 미리 채운다
   const chatHref = `/?chat=1&msg=${encodeURIComponent(`${title} 샘플${est ? `(${manwon(est.total)})` : ""} 보고 문의합니다.`)}`;
 

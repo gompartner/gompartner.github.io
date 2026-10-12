@@ -34,6 +34,9 @@ const LmsDemo = dynamic(() => import("@/components/demos/LmsDemo").then((m) => m
 const JobPortalDemo = dynamic(() => import("@/components/demos/JobPortalDemo").then((m) => m.JobPortalDemo));
 const MaintenanceDemo = dynamic(() => import("@/components/demos/MaintenanceDemo").then((m) => m.MaintenanceDemo));
 const RetirementDemo = dynamic(() => import("@/components/demos/RetirementDemo").then((m) => m.RetirementDemo));
+const LandingLaundryDemo = dynamic(() => import("@/components/demos/LandingLaundryDemo").then((m) => m.LandingLaundryDemo));
+const LandingCodingCampDemo = dynamic(() => import("@/components/demos/LandingCodingCampDemo").then((m) => m.LandingCodingCampDemo));
+const LandingMoveCleanDemo = dynamic(() => import("@/components/demos/LandingMoveCleanDemo").then((m) => m.LandingMoveCleanDemo));
 const ShopAdminDemo = dynamic(() => import("@/components/demos/ShopAdminDemo").then((m) => m.ShopAdminDemo));
 
 interface DemoPageProps {
@@ -51,6 +54,9 @@ const demoComponents: Record<string, ComponentType> = {
   "pilates-studio": PilatesStudioDemo,
   "flower-expo": FlowerExpoDemo,
   "bakery-cafe": BakeryCafeDemo,
+  "landing-laundry": LandingLaundryDemo,
+  "landing-coding-camp": LandingCodingCampDemo,
+  "landing-move-clean": LandingMoveCleanDemo,
   pharmacy: PharmacyDemo,
   "online-store": OnlineStoreDemo,
   pension: PensionDemo,
