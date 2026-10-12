@@ -77,7 +77,12 @@ export function PricingSection({
             );
           })}
         </ul>
-        <p className="mt-4 text-[15px] leading-[1.6] text-foreground-secondary md:text-[17px]">{runningCostNote}</p>
+        <p className="mt-4 text-[15px] leading-[1.6] text-foreground-secondary md:text-[17px]">
+          {runningCostNote}{" "}
+          <Link href="/tools/hosting-cost" className="font-bold text-accent underline-offset-4 hover:underline">
+            업체별 비교
+          </Link>
+        </p>
         {!compact && (
           <div className="mt-4 rounded-[10px] border border-border bg-white p-6">
             <h3 className="text-[17px] font-bold">

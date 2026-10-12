@@ -1,5 +1,5 @@
 // 자료실(도구) 목록 (메뉴, 목록 페이지, 사이트맵이 함께 쓴다)
-export const toolCategories = ["운영 문서", "홈페이지 점검", "이미지·QR", "개발 도구"] as const;
+export const toolCategories = ["운영 문서", "홈페이지 점검", "비용 계산", "이미지·QR", "개발 도구"] as const;
 
 export const tools = [
   {
@@ -33,6 +33,14 @@ export const tools = [
     title: "검색 결과 미리보기",
     description: "상호와 지역, 업종을 넣으면 네이버와 구글 검색 결과에 홈페이지가 어떻게 보이는지 미리 보고 제목과 설명을 고칩니다.",
     for: "가게·회사 홈페이지 운영자",
+  },
+  {
+    href: "/tools/hosting-cost",
+    date: "2026.10.12",
+    category: "비용 계산",
+    title: "홈페이지 유지비 계산",
+    description: "카페24, 가비아, 닷홈 같은 웹호스팅과 아임웹, 식스샵 구독 요금, 도메인 비용을 비교하고 첫해와 다음 해 유지비를 계산합니다.",
+    for: "홈페이지를 새로 여는 사장님",
   },
   {
     href: "/tools/qr-code",
