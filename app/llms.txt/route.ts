@@ -32,7 +32,7 @@ export function GET() {
 ## 홈페이지 제작 가격
 
 ${plans.map((p) => `- ${p.title}(${p.name}): ${formatWon(p.price)}, 작업 ${p.days}일, 수정 ${p.revisions}회. ${p.summary}. ${p.includes.join(", ")}.`).join("\n")}
-- 모든 패키지: ${planCommon.join(", ")}. 도메인·호스팅 비용은 따로입니다.
+- 모든 패키지: ${planCommon.join(", ")}. 도메인·호스팅 비용은 별도입니다.
 
 추가 기능 단가:
 ${addons.map((a) => `- ${a.name}: ${formatWon(a.price)}/${a.unit}`).join("\n")}
