@@ -84,7 +84,7 @@ export function PricingSection({
           </Link>
           {" · "}
           <Link href="/maintenance" className="font-bold text-accent underline-offset-4 hover:underline">
-            만든 뒤 유지보수 가격
+            제작 후 유지보수 가격
           </Link>
         </p>
         {!compact && (
