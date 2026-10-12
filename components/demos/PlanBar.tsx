@@ -49,7 +49,7 @@ export function PlanBar({ projectId }: { projectId: string }) {
         ) : (
           <>
             <p className="font-bold">업무 프로그램은 별도 견적입니다</p>
-            <p className="mt-1 text-[#5a6670]">필요한 기능과 화면 수를 듣고 금액과 기간을 알려 드립니다.</p>
+            <p className="mt-1 text-[#5a6670]">필요한 기능과 화면 수를 듣고 금액과 기간을 안내합니다.</p>
           </>
         )}
         <div className="mt-4 grid grid-cols-2 gap-2">
