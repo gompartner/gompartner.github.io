@@ -9,6 +9,8 @@ export const fieldsById: Record<string, Field[]> = {
   "clinic-homepage": ["병원"],
   "dental-homepage": ["병원"],
   "hanok-cafe": ["가게·매장"],
+  "korean-restaurant": ["가게·매장"],
+  interior: ["가게·매장", "기업"],
   academy: ["학원·교육"],
   "pilates-studio": ["가게·매장", "학원·교육"],
   "online-store": ["가게·매장", "기업"],

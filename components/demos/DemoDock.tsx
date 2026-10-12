@@ -180,7 +180,7 @@ export function DemoDock({
           </details>
         ) : null}
 
-        <button type="button" onClick={() => setPhone(true)} data-gtm-cta={`demo_phone_${projectId}`} className={`${pill} hidden md:inline-flex`}>
+        <button type="button" onClick={() => setPhone(true)} data-gtm-cta={`demo_phone_${projectId}`} className={`${pill.replace("inline-flex ", "")} hidden md:inline-flex`}>
           <Smartphone size={15} aria-hidden />
           휴대폰으로 보기
         </button>

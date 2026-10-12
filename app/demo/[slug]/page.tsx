@@ -25,6 +25,8 @@ const ExcelAutomationDemo = dynamic(() => import("@/components/demos/ExcelAutoma
 const DistrictPortalDemo = dynamic(() => import("@/components/demos/DistrictPortalDemo").then((m) => m.DistrictPortalDemo));
 const FlowerExpoDemo = dynamic(() => import("@/components/demos/FlowerExpoDemo").then((m) => m.FlowerExpoDemo));
 const HanokCafeDemo = dynamic(() => import("@/components/demos/HanokCafeDemo").then((m) => m.HanokCafeDemo));
+const KoreanRestaurantDemo = dynamic(() => import("@/components/demos/KoreanRestaurantDemo").then((m) => m.KoreanRestaurantDemo));
+const InteriorDemo = dynamic(() => import("@/components/demos/InteriorDemo").then((m) => m.InteriorDemo));
 const AcademyDemo = dynamic(() => import("@/components/demos/AcademyDemo").then((m) => m.AcademyDemo));
 const PilatesStudioDemo = dynamic(() => import("@/components/demos/PilatesStudioDemo").then((m) => m.PilatesStudioDemo));
 const HomepageDemo = dynamic(() => import("@/components/demos/HomepageDemo").then((m) => m.HomepageDemo));
@@ -43,6 +45,8 @@ const demoComponents: Record<string, ComponentType> = {
   "clinic-homepage": ClinicHomepageDemo,
   "dental-homepage": DentalHomepageDemo,
   "hanok-cafe": HanokCafeDemo,
+  "korean-restaurant": KoreanRestaurantDemo,
+  interior: InteriorDemo,
   academy: AcademyDemo,
   "pilates-studio": PilatesStudioDemo,
   "flower-expo": FlowerExpoDemo,
