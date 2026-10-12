@@ -61,9 +61,9 @@ export function SampleStackHero({ tabs, promises, startPrice }: { tabs: Tab[]; p
         {/* 넘겨지는 카드가 글자 뒤로 지나가게 소개 쪽을 위에 둔다. */}
         <div className="relative z-10">
           <h1 id="hero-title" className="text-[32px] font-bold leading-[1.4] tracking-[-0.02em] md:text-[44px]">
-            홈페이지·업무
+            광고 신청 접수
             <br />
-            프로그램 제작
+            랜딩페이지 제작
           </h1>
           <p className="mt-3 text-[19px] font-bold leading-[1.5] text-accent md:text-[22px]">{startPrice}</p>
           <ul className="mt-6 flex flex-col gap-2" aria-label="작업 조건">

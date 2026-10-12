@@ -3,7 +3,7 @@ import { Doodles } from "@/components/landing/Doodles";
 import { SampleStackHero } from "@/components/landing/SampleStackHero";
 import { projects } from "@/data/projects";
 import { homeDescription, homeTitle } from "@/data/seo";
-import { manwon, plans, previewPromise } from "@/data/pricing";
+import { landingPlans, manwon } from "@/data/pricing";
 import { HomeFaq } from "@/components/landing/HomeFaq";
 import { PricingSection } from "@/components/landing/PricingSection";
 import { ProcessSteps } from "@/components/landing/ProcessSteps";
@@ -22,23 +22,18 @@ export const metadata: Metadata = {
   alternates: { canonical: "/" },
 };
 
-// 첫 화면에 카드로 쌓아 넘겨 볼 데모. 크몽 판매량 순(쇼핑몰, 숙박, 기업, 병원, 전문직)에 동네 가게 하나.
-// 첫 카드 가격이 첫인상이 되니 기본 패키지(29.9만 원) 그대로인 한식당을 맨 앞에 둔다.
+// 첫 화면에 카드로 쌓아 넘겨 볼 샘플. 지금 집중하는 광고 신청 접수 랜딩만 둔다.
 const heroTabs = [
-  ["식당", "korean-restaurant"],
-  ["회사", "company"],
-  ["쇼핑몰", "online-store"],
-  ["펜션", "pension"],
-  ["치과", "dental-homepage"],
-  ["법률사무소", "law-firm"],
-  ["빵집", "bakery-cafe"],
+  ["정수기 렌탈", "landing-water-rental"],
+  ["입주청소", "landing-move-clean"],
+  ["코딩 특강 모집", "landing-coding-camp"],
 ].map(([label, id]) => ({ label, project: projects.find((p) => p.id === id)! }));
 
-// 포트폴리오 구간에 보여 줄 6개. 배너와 겹치지 않게 다른 업종으로 고르고 전체는 /works에서 본다.
-const showcaseIds = ["pharmacy", "tax-office", "real-estate", "clinic-homepage", "hanok-cafe", "pilates-studio"];
+// 포트폴리오 구간 6개. 배너(랜딩)와 겹치지 않게 홈페이지·업무 프로그램 사례로 고르고 전체는 /works에서 본다.
+const showcaseIds = ["company", "cert-lab", "excel-automation", "shop-admin", "online-store", "dental-homepage"];
 const showcase = showcaseIds.map((id) => projects.find((p) => p.id === id)!);
 
-const promises = ["1인 개발자가 직접 제작", previewPromise, "원본 소스 제공", "완료 후 1개월 무상 오류 수정"];
+const promises = ["신청이 들어오면 바로 알림", "구글 시트에 상담 상태까지 기록", "광고별 신청·계약 수 확인", "계약 전에 샘플로 직접 신청해 보기"];
 
 
 const container = "mx-auto w-full max-w-[1248px] px-4 md:px-6";
@@ -47,7 +42,7 @@ const h2 = "text-[24px] font-bold leading-[1.5] tracking-[-0.01em] md:text-[32px
 export default function HomePage() {
   return (
     <>
-      <SampleStackHero tabs={heroTabs} promises={promises} startPrice={`${plans[0].title} ${manwon(plans[0].price)}부터 · 작업 ${plans[0].days}일`} />
+      <SampleStackHero tabs={heroTabs} promises={promises} startPrice={`${manwon(landingPlans[0].price)}부터 · 작업 ${landingPlans[0].days}일`} />
 
       <section id="works" aria-labelledby="works-title" className="relative isolate scroll-mt-16 overflow-hidden">
         <Doodles variant={1} />
@@ -67,7 +62,7 @@ export default function HomePage() {
         </div>
       </section>
 
-      <PricingSection compact />
+      <PricingSection compact primary="landing" />
       <ProcessSteps />
       <HomeFaq />
     </>

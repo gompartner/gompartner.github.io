@@ -55,32 +55,32 @@ export const landingPlans: Plan[] = [
   {
     id: "landing-basic",
     name: "기본",
-    title: "소개 랜딩",
+    title: "신청 접수 랜딩",
     price: 99_000,
-    days: 3,
+    days: 4,
     revisions: 2,
-    summary: "가게나 서비스를 한 쪽에 소개",
-    includes: ["섹션 5개 이내", "PC·모바일 화면", "전화·지도 버튼", "네이버·구글 검색 등록"],
+    summary: "광고를 보고 온 사람이 상담 신청을 남기는 한 쪽 페이지",
+    includes: ["섹션 5개 이내", "PC·모바일 화면", "신청 폼과 개인정보 수집 동의", "접수 메일 알림", "구글 시트 자동 저장"],
   },
   {
     id: "landing-standard",
     name: "표준",
-    title: "신청 폼 랜딩",
+    title: "상담 관리 랜딩",
     price: 149_000,
-    days: 4,
+    days: 5,
     revisions: 2,
-    summary: "신청과 문의를 받는 한 쪽 페이지",
-    includes: ["섹션 8개 이내", "기본 구성 전부", "신청·문의 폼", "개인정보 수집 동의"],
+    summary: "들어온 신청을 통화했는지, 계약했는지까지 시트에서 관리하는 랜딩",
+    includes: ["섹션 7개 이내", "기본 구성 전부", "문자·카톡 알림(발송 비용 별도)", "시트에 상담 상태 칸", "같은 번호 중복 표시"],
   },
   {
     id: "landing-premium",
     name: "고급",
-    title: "맞춤 기능 랜딩",
-    price: 199_000,
-    days: 5,
+    title: "광고 성과 랜딩",
+    price: 249_000,
+    days: 7,
     revisions: 3,
-    summary: "계산기나 일정 선택 같은 기능 1개를 넣은 한 쪽 페이지",
-    includes: ["섹션 10개 이내", "표준 구성 전부", "맞춤 기능 1개", "업종에 맞춘 첫 화면 디자인"],
+    summary: "놓친 신청을 다시 알리고 광고별 신청과 계약 수를 묶어 보여 주는 랜딩",
+    includes: ["섹션 10개 이내", "표준 구성 전부", "30분 미처리 신청 다시 알림", "광고별 신청·계약 주간 요약", "네이버·메타·구글 전환 추적", "견적 계산 같은 맞춤 기능 1개"],
   },
 ];
 
@@ -131,7 +131,7 @@ type Extra = [AddonId, number?];
 
 /** 데모 수준으로 만들 때의 패키지와 추가 기능. 없으면 별도 견적이다. 괄호 안은 패키지에 든 맞춤 기능. */
 const estimateSource: Record<string, { plan: PlanId | LandingPlanId; extras: Extra[] }> = {
-  "landing-laundry": { plan: "landing-basic", extras: [] },
+  "landing-water-rental": { plan: "landing-basic", extras: [] },
   "landing-coding-camp": { plan: "landing-standard", extras: [] },
   "landing-move-clean": { plan: "landing-premium", extras: [] }, // 견적 계산기
   "clinic-homepage": { plan: "standard", extras: [["page", 5]] },

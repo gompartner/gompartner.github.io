@@ -5,6 +5,7 @@ import Image from "next/image";
 import { AnimatePresence, motion } from "framer-motion";
 import { Check, ChevronDown, Clock, MoveHorizontal, Phone, RotateCcw, Users } from "lucide-react";
 import { useReducedMotionSafe } from "@/hooks/useReducedMotionSafe";
+import { LeadReceivedPanel, type LeadRow } from "@/components/demos/LeadReceivedPanel";
 import { daysAgo, fmtKo, useDemoToday } from "@/hooks/useDemoToday";
 
 /* 입주·이사 청소 견적 랜딩 데모: 가상의 곰파트너 클린.
@@ -628,6 +629,14 @@ function Checklist({ reduce }: { reduce: boolean }) {
   );
 }
 
+/* 신청 완료 뒤 사장님 시트에 미리 쌓여 있는 가상 접수. */
+const PAST_LEADS: LeadRow[] = [
+  { at: "오늘 10:15", name: "박ㅅ연", digits: "01044172290", summary: "빌라 18평 · 짐 있음", source: "메타 광고", status: "통화함" },
+  { at: "오늘 08:52", name: "김ㅎ늘", digits: "01083025517", summary: "아파트 32평 · 베란다", source: "메타 광고", status: "통화 전" },
+  { at: "어제 22:47", name: "김ㅎ늘", digits: "01083025517", summary: "아파트 32평 · 베란다", source: "네이버 검색광고", status: "계약" },
+  { at: "어제 13:20", name: "이ㅈ민", digits: "01061253048", summary: "오피스텔 11평", source: "블로그", status: "보류" },
+];
+
 function ApplyForm(p: { today: Date; type: HomeType; py: number; opts: OptId[]; lived: boolean; est: Est; reduce: boolean }) {
   const [date, setDate] = useState<number | null>(null);
   const [slot, setSlot] = useState<Slot>("am");
@@ -716,6 +725,19 @@ function ApplyForm(p: { today: Date; type: HomeType; py: number; opts: OptId[]; 
         <button type="button" onClick={reset} className="mt-5 inline-flex items-center gap-1.5 text-[15px] font-bold underline underline-offset-4">
           <RotateCcw size={16} aria-hidden /> 다시 신청해 보기
         </button>
+        <LeadReceivedPanel
+          business="곰파트너 클린"
+          name={name}
+          phone={phone}
+          summary={`${typeLabel} ${p.py}평${optLabels.length ? ` · ${optLabels.join(", ")}` : ""}${p.lived ? " · 짐 있음" : ""}`}
+          lines={[
+            ["견적", `${typeLabel} ${p.py}평 · ${won(p.est.total)}`],
+            ["희망일", `${fmtKo(done.date)} ${slot === "am" ? "오전 8시 30분" : "오후 1시"}`],
+            ["주소", addr],
+          ]}
+          pastRows={PAST_LEADS}
+          theme={{ accent: C.cobalt, accentSoft: C.lemonSoft, ink: C.ink, muted: C.muted, line: C.line, paper: C.paper }}
+        />
       </motion.div>
     );
   }
