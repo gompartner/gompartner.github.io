@@ -16,7 +16,7 @@ export function IndustryCost({ industry, projects }: { industry: Industry; proje
 
   const lead =
     rows.length === 0
-      ? `소개만 하는 홈페이지는 ${manwon(base.price)}, 작업 기간 ${base.days}일입니다. 신청·심사 같은 업무 프로그램은 화면 수를 듣고 따로 견적을 드립니다.`
+      ? `소개만 하는 홈페이지는 ${manwon(base.price)}, 작업 기간 ${base.days}일입니다. 신청·심사 같은 업무 프로그램은 화면 수를 듣고 별도 견적을 드립니다.`
       : `소개만 하는 홈페이지는 ${manwon(base.price)}, 작업 기간 ${base.days}일입니다. 아래 샘플처럼 기능을 넣으면 ${rangeText(totals.map(manwon))}, 작업 기간은 ${rangeText(days.map((d) => `${d}일`))}입니다.`;
 
   const jsonLd = {
