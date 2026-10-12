@@ -14,7 +14,7 @@ export interface MaintenanceService {
   notes: string[];
 }
 
-export const responseTime = "평일 저녁과 주말에 답장합니다. 받은 뒤 24시간 안에 첫 답장을 드리고, 단순 수정은 3일 안에 반영합니다.";
+export const responseTime = "문의를 남기시면 24시간 이내에 답장합니다. 단순 수정은 절차에 따라 진행하며 최대 3일 안에 반영합니다.";
 
 /** 유지보수 진행 절차. 오류 수정은 2단계에서 금액을 먼저 알리고 동의를 받는다. */
 export const maintenanceSteps = [
