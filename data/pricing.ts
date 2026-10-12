@@ -51,6 +51,22 @@ export const plans: Plan[] = [
 
 export const planCommon = ["원본 소스 제공", "완료 후 1개월 무상 오류 수정"];
 
+/** 결제 전에 보내는 미리보기. 고른 샘플에 상호와 색만 입힌 첫 화면 한 장이다. */
+export const previewPromise = "결제 전에 첫 화면 미리 보기";
+export const previewDetail = "샘플을 고르시면 상호와 색을 입힌 첫 화면을 결제 전에 보내 드립니다. 보시고 진행할지 정하시면 됩니다.";
+
+/** 패키지 금액 밖에서 드는 돈. 도메인(.kr 기준 1년 약 2만 원)과 기본 웹호스팅을 더한 대략값이다. */
+export const runningCostNote =
+  "도메인과 호스팅은 고객 명의로 가입하고 직접 냅니다. 보통 1년에 3~5만 원 정도입니다. 표시한 금액 말고 따로 받는 돈은 없고, 기능을 더할 때만 추가 기능 단가대로 더합니다.";
+
+/** 이 패키지를 바탕으로 만든 샘플(견적 기준). 가격표 카드에 예시로 붙인다. */
+export function samplesForPlan(planId: PlanId) {
+  return Object.entries(estimateSource)
+    .filter(([, src]) => src.plan === planId)
+    .map(([id]) => ({ id, total: estimateFor(id)!.total }))
+    .sort((a, b) => a.total - b.total);
+}
+
 /** 패키지에 없는 기능을 더할 때의 단가. 고급 패키지의 맞춤 기능 1개는 따로 받지 않는다. */
 export type AddonId = "page" | "board" | "tool" | "print" | "lang" | "live" | "map" | "pay" | "member" | "cart";
 

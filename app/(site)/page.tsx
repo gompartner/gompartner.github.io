@@ -3,6 +3,8 @@ import { Doodles } from "@/components/landing/Doodles";
 import { SampleStackHero } from "@/components/landing/SampleStackHero";
 import { projects } from "@/data/projects";
 import { homeDescription, homeTitle } from "@/data/seo";
+import { manwon, plans, previewPromise } from "@/data/pricing";
+import { HomeFaq } from "@/components/landing/HomeFaq";
 import { PricingSection } from "@/components/landing/PricingSection";
 import { ProcessSteps } from "@/components/landing/ProcessSteps";
 import { WorksGrid } from "@/components/landing/WorksGrid";
@@ -21,10 +23,11 @@ export const metadata: Metadata = {
 };
 
 // 첫 화면에 카드로 쌓아 넘겨 볼 데모. 크몽 판매량 순(쇼핑몰, 숙박, 기업, 병원, 전문직)에 동네 가게 하나.
+// 첫 카드 가격이 첫인상이 되니 100만 원 안쪽인 회사를 맨 앞에 둔다.
 const heroTabs = [
+  ["회사", "company"],
   ["쇼핑몰", "online-store"],
   ["펜션", "pension"],
-  ["회사", "company"],
   ["치과", "dental-homepage"],
   ["법률사무소", "law-firm"],
   ["빵집", "bakery-cafe"],
@@ -34,7 +37,7 @@ const heroTabs = [
 const showcaseIds = ["pharmacy", "tax-office", "real-estate", "clinic-homepage", "hanok-cafe", "pilates-studio"];
 const showcase = showcaseIds.map((id) => projects.find((p) => p.id === id)!);
 
-const promises = ["1인 개발자가 직접 제작", "원본 소스 제공", "완료 후 1개월 무상 오류 수정"];
+const promises = ["1인 개발자가 직접 제작", previewPromise, "원본 소스 제공", "완료 후 1개월 무상 오류 수정"];
 
 
 const container = "mx-auto w-full max-w-[1248px] px-4 md:px-6";
@@ -43,7 +46,7 @@ const h2 = "text-[24px] font-bold leading-[1.5] tracking-[-0.01em] md:text-[32px
 export default function HomePage() {
   return (
     <>
-      <SampleStackHero tabs={heroTabs} promises={promises} />
+      <SampleStackHero tabs={heroTabs} promises={promises} startPrice={`${plans[0].title} ${manwon(plans[0].price)}부터 · 작업 ${plans[0].days}일`} />
 
       <section id="works" aria-labelledby="works-title" className="relative isolate scroll-mt-16 overflow-hidden">
         <Doodles variant={1} />
@@ -65,6 +68,7 @@ export default function HomePage() {
 
       <PricingSection compact />
       <ProcessSteps />
+      <HomeFaq />
     </>
   );
 }

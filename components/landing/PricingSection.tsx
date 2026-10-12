@@ -1,5 +1,8 @@
+import Link from "next/link";
 import { Check } from "lucide-react";
-import { addons, formatWon, manwon, planCommon, plans } from "@/data/pricing";
+import { ChannelTalkButton } from "@/components/layout/ChannelTalk";
+import { addons, formatWon, manwon, planCommon, plans, runningCostNote, samplesForPlan } from "@/data/pricing";
+import { projects } from "@/data/projects";
 
 const h1 = "text-[28px] font-bold leading-[1.4] tracking-[-0.01em] md:text-[36px]";
 const h2 = "text-[24px] font-bold leading-[1.5] tracking-[-0.01em] md:text-[32px]";
@@ -23,6 +26,8 @@ export function PricingSection({
 
         <ul className="mt-8 grid gap-4 md:grid-cols-3">
           {plans.map((plan) => {
+            // 이 패키지에 기능 몇 개를 더해 만든 샘플. 싼 것부터 셋만 보여 준다.
+            const samples = samplesForPlan(plan.id).slice(0, 3);
             return (
               <li key={plan.id} className="flex flex-col rounded-[10px] border border-border bg-white p-6">
                 <p className="text-[17px] font-bold">
@@ -41,10 +46,38 @@ export function PricingSection({
                     </li>
                   ))}
                 </ul>
+                {samples.length > 0 && (
+                  <div className="mt-5 border-t border-border pt-4 text-[15px]">
+                    <p className="font-bold text-foreground-secondary">이 패키지로 만든 샘플</p>
+                    <ul className="mt-1.5 space-y-1">
+                      {samples.map((s) => {
+                        const p = projects.find((x) => x.id === s.id)!;
+                        return (
+                          <li key={s.id} className="flex justify-between gap-3">
+                            <Link href={p.demoUrl} prefetch={false} className="underline-offset-4 hover:text-accent hover:underline">
+                              {p.title}
+                            </Link>
+                            <span className="shrink-0 tabular-nums text-foreground-secondary">{manwon(s.total)}</span>
+                          </li>
+                        );
+                      })}
+                    </ul>
+                  </div>
+                )}
+                <div className="mt-auto pt-6">
+                  <ChannelTalkButton
+                    cta={`pricing_chat_${plan.id}`}
+                    message={`${plan.title}(${manwon(plan.price)}) 패키지로 상담받고 싶어요.`}
+                    className="flex h-12 w-full items-center justify-center rounded-[6px] border border-accent text-[17px] font-bold text-accent transition-colors hover:bg-accent hover:text-accent-foreground"
+                  >
+                    이 패키지로 상담
+                  </ChannelTalkButton>
+                </div>
               </li>
             );
           })}
         </ul>
+        <p className="mt-4 text-[15px] leading-[1.6] text-foreground-secondary md:text-[17px]">{runningCostNote}</p>
         {!compact && (
           <div className="mt-4 rounded-[10px] border border-border bg-white p-6">
             <h3 className="text-[17px] font-bold">
