@@ -2,9 +2,11 @@
 // 업무 프로그램(결과지, 관리자, 자동화, LMS 등)은 패키지 없이 별도 견적이다.
 
 export type PlanId = "basic" | "standard" | "premium";
+/** 한 쪽짜리 랜딩페이지. 크몽 랜딩페이지 서비스와 같게 맞춘다. */
+export type LandingPlanId = "landing-basic" | "landing-standard" | "landing-premium";
 
 export interface Plan {
-  id: PlanId;
+  id: PlanId | LandingPlanId;
   name: string;
   /** 크몽 패키지 제목과 같게 맞춘다. */
   title: string;
@@ -49,6 +51,39 @@ export const plans: Plan[] = [
   },
 ];
 
+export const landingPlans: Plan[] = [
+  {
+    id: "landing-basic",
+    name: "기본",
+    title: "소개 랜딩",
+    price: 99_000,
+    days: 3,
+    revisions: 2,
+    summary: "가게나 서비스를 한 쪽에 소개",
+    includes: ["섹션 5개 이내", "PC·모바일 화면", "전화·지도 버튼", "네이버·구글 검색 등록"],
+  },
+  {
+    id: "landing-standard",
+    name: "표준",
+    title: "신청 폼 랜딩",
+    price: 149_000,
+    days: 4,
+    revisions: 2,
+    summary: "신청과 문의를 받는 한 쪽 페이지",
+    includes: ["섹션 8개 이내", "기본 구성 전부", "신청·문의 폼", "개인정보 수집 동의"],
+  },
+  {
+    id: "landing-premium",
+    name: "고급",
+    title: "맞춤 기능 랜딩",
+    price: 199_000,
+    days: 5,
+    revisions: 3,
+    summary: "계산기나 일정 선택 같은 기능 1개를 넣은 한 쪽 페이지",
+    includes: ["섹션 10개 이내", "표준 구성 전부", "맞춤 기능 1개", "업종에 맞춘 첫 화면 디자인"],
+  },
+];
+
 export const planCommon = ["원본 소스 제공", "완료 후 1개월 무상 오류 수정"];
 
 /** 결제 전에 보내는 미리보기. 고른 샘플에 상호와 색만 입힌 첫 화면 한 장이다. */
@@ -60,7 +95,7 @@ export const runningCostNote =
   "도메인과 호스팅은 고객 명의로 직접 구매한 뒤 계정을 공유하거나 권한을 주시면 됩니다. 비용을 전달해 주시면 대리 구매도 가능합니다. 저렴한 웹호스팅이면 1년 3~4만 원, 아임웹 같은 구독형이면 1년 18~21만 원쯤 듭니다. 표시한 금액 외에 별도로 받는 비용은 없고, 기능을 더할 때만 추가 비용이 발생합니다.";
 
 /** 이 패키지를 바탕으로 만든 샘플(견적 기준). 가격표 카드에 예시로 붙인다. */
-export function samplesForPlan(planId: PlanId) {
+export function samplesForPlan(planId: PlanId | LandingPlanId) {
   return Object.entries(estimateSource)
     .filter(([, src]) => src.plan === planId)
     .map(([id]) => ({ id, total: estimateFor(id)!.total }))
@@ -95,7 +130,10 @@ export const addons: Addon[] = [
 type Extra = [AddonId, number?];
 
 /** 데모 수준으로 만들 때의 패키지와 추가 기능. 없으면 별도 견적이다. 괄호 안은 패키지에 든 맞춤 기능. */
-const estimateSource: Record<string, { plan: PlanId; extras: Extra[] }> = {
+const estimateSource: Record<string, { plan: PlanId | LandingPlanId; extras: Extra[] }> = {
+  "landing-laundry": { plan: "landing-basic", extras: [] },
+  "landing-coding-camp": { plan: "landing-standard", extras: [] },
+  "landing-move-clean": { plan: "landing-premium", extras: [] }, // 견적 계산기
   "clinic-homepage": { plan: "standard", extras: [["page", 5]] },
   "dental-homepage": { plan: "premium", extras: [["page", 5]] }, // 증상 자가체크
   pharmacy: { plan: "premium", extras: [["print"]] }, // 처방전 미리 보내기
@@ -125,7 +163,7 @@ export interface Estimate {
 
 export function estimateFor(projectId: string): Estimate | null {
   const src = estimateSource[projectId];
-  const plan = src && plans.find((p) => p.id === src.plan);
+  const plan = src && [...plans, ...landingPlans].find((p) => p.id === src.plan);
   if (!src || !plan) return null;
   let total = plan.price;
   let days = plan.days;
