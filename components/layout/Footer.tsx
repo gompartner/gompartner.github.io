@@ -13,10 +13,11 @@ const menu = [
 
 const link = "underline-offset-4 hover:text-foreground hover:underline";
 
-// 곰파트너 채널. 네이버 블로그는 운영 정보 글, 티스토리는 제작 일지, 유튜브·네이버 클립은 샘플 숏츠다.
+// 곰파트너 채널. 네이버 블로그는 운영 정보 글, 티스토리는 제작 일지, 인스타그램·유튜브·네이버 클립은 샘플 숏츠다.
 const channels = [
   { href: "https://blog.naver.com/gompartner", label: "네이버 블로그", cta: "footer_blog_naver", icon: "naverBlog" },
   { href: "https://gompartner.tistory.com", label: "티스토리", cta: "footer_blog_tistory", icon: "tistory" },
+  { href: "https://www.instagram.com/gompartner.co.kr", label: "인스타그램", cta: "footer_instagram", icon: "instagram" },
   { href: "https://www.youtube.com/@gompartner", label: "유튜브", cta: "footer_youtube", icon: "youtube" },
   { href: "https://clip.naver.com/@gompartner", label: "네이버 클립", cta: "footer_naver_clip", icon: "naverClip" },
 ] as const;
@@ -37,6 +38,23 @@ function ChannelIcon({ name }: { name: (typeof channels)[number]["icon"] }) {
           <rect width="20" height="20" rx="5" fill="#eb531f" />
           <circle cx="7" cy="7" r="1.6" fill="#fff" /><circle cx="10" cy="7" r="1.6" fill="#fff" /><circle cx="13" cy="7" r="1.6" fill="#fff" />
           <circle cx="10" cy="10.5" r="1.6" fill="#fff" /><circle cx="10" cy="14" r="1.6" fill="#fff" />
+        </svg>
+      );
+    case "instagram":
+      return (
+        <svg viewBox="0 0 20 20" className={box} aria-hidden>
+          <defs>
+            <linearGradient id="ig-bg" x1="0" y1="20" x2="20" y2="0">
+              <stop offset="0" stopColor="#feda75" />
+              <stop offset=".35" stopColor="#fa7e1e" />
+              <stop offset=".6" stopColor="#d62976" />
+              <stop offset="1" stopColor="#4f5bd5" />
+            </linearGradient>
+          </defs>
+          <rect width="20" height="20" rx="5" fill="url(#ig-bg)" />
+          <rect x="4.5" y="4.5" width="11" height="11" rx="3.2" fill="none" stroke="#fff" strokeWidth="1.5" />
+          <circle cx="10" cy="10" r="2.6" fill="none" stroke="#fff" strokeWidth="1.5" />
+          <circle cx="13.4" cy="6.6" r=".9" fill="#fff" />
         </svg>
       );
     case "youtube":
@@ -60,7 +78,7 @@ function ChannelIcon({ name }: { name: (typeof channels)[number]["icon"] }) {
 export function Footer() {
   const currentYear = new Date().getFullYear();
   const blogs = channels.slice(0, 2);
-  const videos = channels.slice(2);
+  const social = channels.slice(2);
 
   const channelList = (items: readonly (typeof channels)[number][], label: string) => (
     <div>
@@ -109,7 +127,7 @@ export function Footer() {
           </nav>
 
           {channelList(blogs, "블로그")}
-          {channelList(videos, "영상")}
+          {channelList(social, "SNS")}
         </div>
 
         <div className="mt-10 flex flex-col gap-2 border-t border-border pt-6 md:flex-row md:items-center md:justify-between">
