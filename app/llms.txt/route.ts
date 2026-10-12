@@ -34,7 +34,7 @@ export function GET() {
 ${plans.map((p) => `- ${p.title}(${p.name}): ${formatWon(p.price)}, 작업 ${p.days}일, 수정 ${p.revisions}회. ${p.summary}. ${p.includes.join(", ")}.`).join("\n")}
 - 모든 패키지: ${planCommon.join(", ")}. 도메인·호스팅 비용은 별도입니다.
 
-한 쪽짜리 랜딩페이지:
+광고 신청 접수 랜딩페이지:
 ${landingPlans.map((p) => `- ${p.title}(${p.name}): ${formatWon(p.price)}, 작업 ${p.days}일, 수정 ${p.revisions}회. ${p.summary}. ${p.includes.join(", ")}.`).join("\n")}
 
 추가 기능 단가:

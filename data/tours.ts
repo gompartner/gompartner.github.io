@@ -88,6 +88,10 @@ export const tours: Record<string, TourStep[]> = {
     { target: "#menu-picker", title: "메뉴", desc: "밑줄 친 말을 바꾸세요." },
     { target: "#way", title: "오시는 길", desc: "단계를 누르면 경로가 표시됩니다." },
   ],
+  "landing-water-rental": [
+    { target: "#wr-compare-title", title: "제품 비교", desc: "사용 기간을 바꾸면 월 렌탈료가 바뀝니다." },
+    { target: "#wr-apply", title: "상담 신청", desc: "신청하면 사장님 쪽에 무엇이 오는지 보입니다." },
+  ],
   "landing-move-clean": [
     { target: "#mc-py", title: "견적 계산", desc: "평수를 움직이고 더할 작업을 고르세요." },
     { target: "#mc-apply", title: "예약 신청", desc: "계산한 조건이 그대로 들어갑니다." },
@@ -95,10 +99,6 @@ export const tours: Record<string, TourStep[]> = {
   "landing-coding-camp": [
     { target: "#curriculum", title: "커리큘럼", desc: "주차를 누르면 그 주에 쌓을 블록이 보입니다." },
     { target: "#apply", title: "신청", desc: "학년을 고르면 맞는 반만 남습니다." },
-  ],
-  "landing-laundry": [
-    { target: "#price-title", title: "가격표", desc: "품목을 누르면 영수증에 담깁니다." },
-    { target: "#schedule-title", title: "찾는 날", desc: "맡기는 요일을 고르세요." },
   ],
   "bakery-cafe": [
     { target: "#oven", title: "빵 나오는 시간", desc: "시계를 움직이세요." },

@@ -5,6 +5,7 @@ import Image from "next/image";
 import { AnimatePresence, motion } from "framer-motion";
 import { Check, ChevronDown, RotateCcw } from "lucide-react";
 import { useReducedMotionSafe } from "@/hooks/useReducedMotionSafe";
+import { LeadReceivedPanel, maskName, type LeadRow } from "@/components/demos/LeadReceivedPanel";
 import { daysAgo, fmtDot, fmtKo, useDemoToday } from "@/hooks/useDemoToday";
 
 /* 랜딩페이지 데모(표준 패키지 예시): 가상의 곰파트너 코딩교실 겨울방학 특강 모집.
@@ -577,17 +578,21 @@ function Faq() {
 interface Applied {
   no: string;
   parent: string;
+  phone: string;
   grade: Grade;
   cls: CampClass;
   reply: Date;
 }
 
-const mask = (name: string) => {
-  const s = name.trim();
-  if (s.length < 2) return s;
-  if (s.length === 2) return `${s[0]}ㅇ`;
-  return s[0] + "ㅇ".repeat(s.length - 2) + s[s.length - 1];
-};
+const mask = maskName;
+
+/* 신청 완료 뒤 사장님 시트에 미리 쌓여 있는 가상 접수. */
+const PAST_LEADS: LeadRow[] = [
+  { at: "오늘 11:42", name: "박ㅅ연", digits: "01077315820", summary: "초4 · 게임 만들기반", source: "메타 광고", status: "통화함" },
+  { at: "오늘 09:16", name: "이ㅈ민", digits: "01022904417", summary: "초3 · 블록 코딩반", source: "네이버 검색광고", status: "통화 전" },
+  { at: "어제 21:08", name: "이ㅈ민", digits: "01022904417", summary: "초3 · 블록 코딩반", source: "네이버 검색광고", status: "계약" },
+  { at: "어제 15:31", name: "최ㅇ준", digits: "01050163302", summary: "초5 · 로봇 코딩반", source: "블로그", status: "보류" },
+];
 
 /* 접수 다음 날이 회신일. 토·일이면 월요일로 넘긴다. */
 const replyDay = (today: Date) => {
@@ -635,7 +640,7 @@ function ApplyForm({
     if (!ok || !grade || !cls) return;
     const c = CLASSES.find((x) => x.id === cls)!;
     const no = `CC${fmtDot(today).replace(/\./g, "").slice(2)}-${String(Math.floor(Math.random() * 900) + 100)}`;
-    setDone({ no, parent, grade, cls: c, reply: replyDay(today) });
+    setDone({ no, parent, phone, grade, cls: c, reply: replyDay(today) });
     onApplied(c.id);
   };
 
@@ -689,6 +694,18 @@ function ApplyForm({
                 <RotateCcw className="h-4 w-4" aria-hidden />
                 다른 아이도 신청하기
               </button>
+              <LeadReceivedPanel
+                business="곰파트너 코딩교실"
+                name={done.parent}
+                phone={done.phone}
+                summary={`${done.grade} · ${done.cls.name}`}
+                lines={[
+                  ["학년", done.grade],
+                  ["반", `${done.cls.name} (${done.cls.when})`],
+                ]}
+                pastRows={PAST_LEADS}
+                theme={{ accent: C.blue, accentSoft: "#fff4d1", ink: C.ink, muted: C.muted, line: C.grid, paper: C.paper }}
+              />
             </motion.div>
           ) : (
             <motion.form key="form" onSubmit={submit} noValidate initial={reduce ? false : { opacity: 0 }} animate={{ opacity: 1 }} exit={reduce ? undefined : { opacity: 0 }} className="grid gap-5 md:grid-cols-2">
