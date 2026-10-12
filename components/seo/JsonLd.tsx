@@ -3,7 +3,7 @@ import { plans } from "@/data/pricing";
 import { siteUrl } from "@/lib/site";
 
 // 같은 이름의 다른 회사와 구분되도록 외부 프로필을 묶는다.
-const sameAs = ["https://kmong.com/gig/796239", "https://gompartner.tistory.com", "https://blog.naver.com/gompartner"];
+const sameAs = ["https://kmong.com/gig/796239", "https://gompartner.tistory.com", "https://blog.naver.com/gompartner", "https://www.youtube.com/@gompartner", "https://clip.naver.com/@gompartner"];
 
 export function PersonJsonLd() {
   const schema = {
