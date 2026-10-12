@@ -87,6 +87,7 @@ export function LeadReceivedPanel({
   lines,
   pastRows,
   theme,
+  hideTitle = false,
 }: {
   /** 알림 머리에 붙는 상호. "곰파트너 클린" */
   business: string;
@@ -99,6 +100,8 @@ export function LeadReceivedPanel({
   /** 시트에 미리 쌓여 있는 가상 행. 위가 최근이다. */
   pastRows: LeadRow[];
   theme: LeadTheme;
+  /** 바깥 섹션 제목과 같으면 숨긴다(곰파트너 랜딩). */
+  hideTitle?: boolean;
 }) {
   const reduce = useReducedMotionSafe();
   // 신청 완료 뒤에만 그려지므로 브라우저에서 바로 읽어도 하이드레이션과 어긋나지 않는다.
@@ -139,13 +142,10 @@ export function LeadReceivedPanel({
   const td = "border-b px-3 py-2";
 
   return (
-    <section aria-labelledby="lead-panel-title" className="mt-8 border-t-2 pt-6 text-left" style={{ borderColor: theme.line, color: theme.ink }}>
-      <h3 id="lead-panel-title" className="text-[20px] font-extrabold">
-        사장님 쪽에서는 이렇게 보입니다
+    <section aria-labelledby={hideTitle ? undefined : "lead-panel-title"} aria-label={hideTitle ? "신청 접수 화면" : undefined} className={hideTitle ? "text-left" : "mt-8 border-t-2 pt-6 text-left"} style={{ borderColor: theme.line, color: theme.ink }}>
+      <h3 id="lead-panel-title" className={hideTitle ? "sr-only" : "text-[20px] font-extrabold"}>
+        신청 접수 화면
       </h3>
-      <p className="mt-1.5 text-[15px] leading-[1.6]" style={{ color: theme.muted }}>
-        시트에 쌓이고 끝나지 않습니다. 통화했는지, 계약했는지까지 한 칸에 적고, 연락을 놓친 신청은 다시 알려 드립니다.
-      </p>
 
       <div className="mt-5 grid gap-4">
         {/* 1. 휴대폰 알림 */}
@@ -174,7 +174,7 @@ export function LeadReceivedPanel({
             </p>
           </div>
           <p className="mt-4 text-[13px] font-bold" style={{ color: theme.muted }}>
-            30분 동안 상태가 안 바뀌면 다시 알림
+            30분 미처리 재알림
           </p>
           <div className="mt-1.5 max-w-[340px] rounded-[14px] px-4 py-3 text-[15px] leading-[1.6]" style={{ background: "#ececea", color: theme.ink }} aria-live="polite">
             {waiting > 0 ? (
@@ -182,7 +182,7 @@ export function LeadReceivedPanel({
                 [{business}] 아직 통화 전인 신청 <b>{waiting}건</b>이 있습니다.
               </>
             ) : (
-              <>통화 전인 신청이 없어 다시 알리지 않습니다.</>
+              <>미처리 신청 없음</>
             )}
           </div>
         </div>
@@ -191,9 +191,6 @@ export function LeadReceivedPanel({
         <div className={`${card} min-w-0`} style={{ borderColor: theme.ink, background: "#fff" }}>
           <p className={head}>
             <Sheet size={18} aria-hidden /> 구글 시트
-          </p>
-          <p className="mt-1 text-[14px]" style={{ color: theme.muted }}>
-            상담 상태를 누르면 통화 전, 통화함, 계약, 보류 순서로 바뀝니다. 표는 옆으로 밀어 볼 수 있습니다.
           </p>
           <div className="mt-3 overflow-x-auto rounded-[6px] border" style={{ borderColor: theme.line }}>
             <table className="w-full min-w-[640px] border-collapse text-left text-[14px]">
@@ -220,7 +217,7 @@ export function LeadReceivedPanel({
                         <button
                           type="button"
                           onClick={() => cycle(i)}
-                          aria-label={`${r.name} 상담 상태 ${statuses[i]}, 눌러서 바꾸기`}
+                          aria-label={`${r.name} 상담 상태 ${statuses[i]} 변경`}
                           className="min-w-[64px] rounded-full border px-2.5 py-0.5 text-[13px] font-bold"
                           style={chip(statuses[i])}
                         >
@@ -260,14 +257,11 @@ export function LeadReceivedPanel({
               </tbody>
             </table>
           </div>
-          <p className="mt-2 text-[13px]" style={{ color: theme.muted }}>
-            같은 번호로 다시 들어온 신청에는 중복 표시가 붙습니다. 광고비가 두 번 나간 건 아닌지 바로 보입니다.
-          </p>
         </div>
 
         {/* 3. 광고별 신청과 계약 */}
         <div className={card} style={{ borderColor: theme.ink, background: "#fff" }}>
-          <p className="text-[15px] font-bold">이번 주 광고별 신청과 계약</p>
+          <p className="text-[15px] font-bold">광고별 신청·계약 (이번 주)</p>
           <ul className="mt-3 grid gap-3">
             {bars.map(({ s, mine, n, won }) => (
               <li key={s} className="text-[14px]">
@@ -286,15 +280,8 @@ export function LeadReceivedPanel({
               </li>
             ))}
           </ul>
-          <p className="mt-3 text-[14px] leading-[1.6]" style={{ color: theme.muted }}>
-            신청이 많은 광고와 계약이 많은 광고는 다를 때가 많습니다. 광고비는 아래 막대를 보고 옮기면 됩니다.
-          </p>
         </div>
       </div>
-
-      <p className="mt-3 text-[13px]" style={{ color: theme.muted }}>
-        샘플이라 알림과 시트 저장은 실제로 일어나지 않습니다.
-      </p>
     </section>
   );
 }

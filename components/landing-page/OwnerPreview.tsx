@@ -25,6 +25,7 @@ export function OwnerPreview() {
   return (
     <div className="rounded-[10px] bg-white p-4 text-[#1e2124] md:p-6">
       <LeadReceivedPanel
+        hideTitle
         business="곰파트너"
         name="김하늘"
         phone="010-1234-5678"

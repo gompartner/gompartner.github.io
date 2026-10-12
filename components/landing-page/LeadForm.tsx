@@ -49,10 +49,10 @@ export const LeadForm = forwardRef<HTMLElement, { pkg: PackageName | ""; onPkg: 
 
   const validate = () => {
     const e: Record<string, string> = {};
-    if (!name.trim()) e.name = "이름을 적어 주세요.";
-    if (!PHONE_RE.test(phone.trim())) e.phone = "휴대폰 번호를 010-0000-0000 형식으로 적어 주세요.";
-    if (!business.trim()) e.business = "업종을 적어 주세요.";
-    if (!agree) e.agree = "개인정보 수집·이용에 동의해야 신청할 수 있습니다.";
+    if (!name.trim()) e.name = "이름을 입력해 주세요.";
+    if (!PHONE_RE.test(phone.trim())) e.phone = "휴대폰 번호를 확인해 주세요.";
+    if (!business.trim()) e.business = "업종을 입력해 주세요.";
+    if (!agree) e.agree = "개인정보 수집·이용에 동의해 주세요.";
     setErrors(e);
     return Object.keys(e).length === 0;
   };
@@ -95,7 +95,7 @@ export const LeadForm = forwardRef<HTMLElement, { pkg: PackageName | ""; onPkg: 
         setStatus({ kind: "error", message: data.error || "신청을 저장하지 못했습니다. 다시 시도해 주세요." });
       }
     } catch {
-      setStatus({ kind: "error", message: "연결이 끊겨 신청을 보내지 못했습니다. 다시 시도해 주세요." });
+      setStatus({ kind: "error", message: "신청을 보내지 못했습니다. 다시 시도해 주세요." });
     }
   };
 
@@ -105,15 +105,12 @@ export const LeadForm = forwardRef<HTMLElement, { pkg: PackageName | ""; onPkg: 
         <h2 id="apply-title" className="text-[28px] font-bold leading-[1.35] tracking-[-0.02em] md:text-[36px]">
           상담 신청
         </h2>
-        <p className="mt-3 text-[17px] leading-[1.6] text-foreground-secondary">
-          업종과 쓰고 있는 광고만 알려 주시면 어떤 패키지가 맞는지 먼저 말씀드립니다. 이 폼도 곰파트너가 파는 랜딩과 같은 방식으로 접수됩니다.
-        </p>
 
         {status.kind === "done" ? (
           <div className="mt-8 rounded-[10px] border border-border bg-background p-6 md:p-8" role="status">
             <p className="text-[15px] font-bold text-accent">접수 번호 {status.id}</p>
             <p className="mt-2 text-[24px] font-bold leading-[1.4]">신청이 접수되었습니다.</p>
-            <p className="mt-2 text-[17px] leading-[1.6] text-foreground-secondary">영업일 하루 안에 적어 주신 번호로 연락드립니다.</p>
+            <p className="mt-2 text-[17px] leading-[1.6] text-foreground-secondary">영업일 기준 1일 이내 연락드립니다.</p>
           </div>
         ) : (
           <form onSubmit={submit} noValidate className="mt-8 space-y-6 rounded-[10px] border border-border bg-background p-5 md:p-8">
@@ -143,7 +140,7 @@ export const LeadForm = forwardRef<HTMLElement, { pkg: PackageName | ""; onPkg: 
             </div>
 
             <fieldset>
-              <legend className={label}>쓰고 있는 광고</legend>
+              <legend className={label}>사용 중인 광고</legend>
               <div className="mt-2 flex flex-wrap gap-2">
                 {CHANNELS.map((c) => {
                   const on = channels.includes(c);
@@ -171,9 +168,9 @@ export const LeadForm = forwardRef<HTMLElement, { pkg: PackageName | ""; onPkg: 
 
             <div>
               <label htmlFor="lp-message" className={label}>
-                하고 싶은 말 <span className="font-normal text-foreground-secondary">(선택)</span>
+                문의 내용 <span className="font-normal text-foreground-secondary">(선택)</span>
               </label>
-              <textarea id="lp-message" value={message} onChange={(e) => setMessage(e.target.value)} rows={4} placeholder="한 달 광고비, 지금 신청을 받는 방법, 오픈 희망일 등" className={`${field} mt-2 h-auto py-3 leading-[1.6]`} />
+              <textarea id="lp-message" value={message} onChange={(e) => setMessage(e.target.value)} rows={4} placeholder="월 광고비, 현재 접수 방법, 오픈 희망일 등" className={`${field} mt-2 h-auto py-3 leading-[1.6]`} />
             </div>
 
             {/* 사람 눈에는 보이지 않는 칸. 채워져 있으면 자동 입력으로 보고 버린다. */}
@@ -195,10 +192,10 @@ export const LeadForm = forwardRef<HTMLElement, { pkg: PackageName | ""; onPkg: 
                   <ChevronDown size={16} className="transition-transform group-open:rotate-180" aria-hidden />
                 </summary>
                 <ul className="mt-2 space-y-1">
-                  <li>수집 항목: 이름, 휴대폰 번호, 업종, 쓰고 있는 광고, 관심 패키지, 하고 싶은 말, 들어온 경로</li>
-                  <li>이용 목적: 상담 신청 확인과 회신</li>
-                  <li>보관 기간: 신청일로부터 1년, 이후 바로 지웁니다</li>
-                  <li>동의하지 않을 수 있으며, 동의하지 않으면 이 폼으로는 신청할 수 없습니다.</li>
+                  <li>수집 항목: 이름, 휴대폰 번호, 업종, 사용 중인 광고, 관심 패키지, 문의 내용, 유입 경로</li>
+                  <li>이용 목적: 상담 신청 확인 및 회신</li>
+                  <li>보관 기간: 신청일로부터 1년</li>
+                  <li>동의를 거부할 수 있으며 거부 시 신청이 제한됩니다.</li>
                 </ul>
               </details>
               {errors.agree && <p className="mt-1.5 text-[15px] text-[#d63d4a]">{errors.agree}</p>}
@@ -215,7 +212,7 @@ export const LeadForm = forwardRef<HTMLElement, { pkg: PackageName | ""; onPkg: 
               disabled={status.kind === "sending"}
               className="flex h-14 w-full items-center justify-center rounded-[6px] bg-accent text-[18px] font-bold text-accent-foreground transition-colors hover:bg-accent-hover disabled:opacity-60"
             >
-              {status.kind === "sending" ? "보내는 중" : "상담 신청하기"}
+              {status.kind === "sending" ? "접수 중" : "상담 신청하기"}
             </button>
           </form>
         )}
