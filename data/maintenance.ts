@@ -16,6 +16,15 @@ export interface MaintenanceService {
 
 export const responseTime = "평일 저녁과 주말에 답장합니다. 받은 뒤 24시간 안에 첫 답장을 드리고, 단순 수정은 3일 안에 반영합니다.";
 
+/** 유지보수 진행 절차. 오류 수정은 2단계에서 금액을 먼저 알리고 동의를 받는다. */
+export const maintenanceSteps = [
+  { title: "요청", body: "채팅으로 홈페이지 주소와 고칠 내용을 보내 주세요. 화면 캡처가 있으면 함께 보내 주세요." },
+  { title: "확인·금액 안내", body: "1건 기준에 맞는지 확인합니다. 오류는 원인을 본 뒤 금액과 기간을 먼저 알려 드립니다." },
+  { title: "동의", body: "금액과 기간에 동의하시면 작업을 시작합니다. 동의 전에는 작업하지 않습니다." },
+  { title: "작업·반영", body: "고친 뒤 바뀐 화면을 보내 드리고 확인받습니다." },
+  { title: "기록", body: "무엇을 고쳤는지 정리해 드립니다. 월 유지보수는 월말에 모아서 보고합니다." },
+];
+
 export const maintenanceServices: MaintenanceService[] = [
   {
     id: "monthly",
