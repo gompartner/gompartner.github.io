@@ -1,10 +1,15 @@
 import Link from "next/link";
 import { ChevronUp } from "lucide-react";
-import { estimateFor, formatWon, manwon, planCommon } from "@/data/pricing";
+import { estimateFor, formatWon, manwon, planCommon, plans } from "@/data/pricing";
+import { projects } from "@/data/projects";
 
 /** 데모 오른쪽 아래에 "비슷하게 만들면 얼마"를 띄운다. 누르면 패키지와 추가 기능 내역이 펼쳐진다. */
 export function PlanBar({ projectId }: { projectId: string }) {
   const est = estimateFor(projectId);
+  const title = projects.find((p) => p.id === projectId)?.title ?? "샘플";
+  const basic = plans[0];
+  // 상담창 입력칸에 어떤 샘플을 보고 왔는지 미리 채운다
+  const chatHref = `/?chat=1&msg=${encodeURIComponent(`${title} 샘플${est ? `(${manwon(est.total)})` : ""} 보고 문의합니다.`)}`;
 
   return (
     <details className="group fixed bottom-5 right-5 z-50 print:hidden">
@@ -35,6 +40,11 @@ export function PlanBar({ projectId }: { projectId: string }) {
               ))}
             </dl>
             <p className="mt-3 text-[#5a6670]">{planCommon.join(", ")} 포함</p>
+            {est.plan.id !== basic.id && (
+              <p className="mt-2 text-[#5a6670]">
+                예약·계산 같은 기능 없이 소개만 하면 {basic.title} {manwon(basic.price)}({basic.days}일)부터입니다.
+              </p>
+            )}
           </>
         ) : (
           <>
@@ -44,7 +54,7 @@ export function PlanBar({ projectId }: { projectId: string }) {
         )}
         <div className="mt-4 grid grid-cols-2 gap-2">
           <Link
-            href="/?chat=1"
+            href={chatHref}
             className="flex h-11 items-center justify-center rounded-md bg-[#256ef4] font-bold text-white transition-colors hover:bg-[#0b50d0]"
           >
             채팅 상담

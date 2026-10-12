@@ -19,7 +19,7 @@ const SWIPE = 80;
 
 type Tab = { label: string; project: Project };
 
-export function SampleStackHero({ tabs, promises }: { tabs: Tab[]; promises: string[] }) {
+export function SampleStackHero({ tabs, promises, startPrice }: { tabs: Tab[]; promises: string[]; startPrice: string }) {
   const [index, setIndex] = useState(0);
   const [dir, setDir] = useState(1);
   const reduce = useReducedMotionSafe();
@@ -65,6 +65,7 @@ export function SampleStackHero({ tabs, promises }: { tabs: Tab[]; promises: str
             <br />
             프로그램 제작
           </h1>
+          <p className="mt-3 text-[19px] font-bold leading-[1.5] text-accent md:text-[22px]">{startPrice}</p>
           <ul className="mt-6 flex flex-col gap-2" aria-label="작업 조건">
             {promises.map((item) => (
               <li key={item} className="flex items-center gap-2 text-[17px] font-bold leading-[1.5]">

@@ -29,19 +29,22 @@ function loadChannelIO() {
   document.head.appendChild(s);
 }
 
-/** 상담창 열기 — 버튼 onClick에서 쓴다 */
-export function openChannelTalk() {
-  window.ChannelIO?.("showMessenger");
+/** 상담창 열기 — 버튼 onClick에서 쓴다. message가 있으면 입력칸에 미리 채운다(무엇을 보고 왔는지). */
+export function openChannelTalk(message?: string) {
+  if (message) window.ChannelIO?.("openChat", undefined, message);
+  else window.ChannelIO?.("showMessenger");
 }
 
 export function ChannelTalk() {
   useEffect(() => {
     if (!PLUGIN_KEY) return;
     loadChannelIO();
-    window.ChannelIO?.("boot", { pluginKey: PLUGIN_KEY });
-    // 데모의 "채팅 상담"에서 넘어오면(/?chat=1) 상담창을 바로 연다
-    if (new URLSearchParams(window.location.search).get("chat") === "1") {
-      window.ChannelIO?.("showMessenger");
+    // 휴대폰에서는 화면 아래 고정 상담 줄(MobileCtaBar)이 버튼 역할을 하니 채널톡 버튼을 숨긴다
+    window.ChannelIO?.("boot", { pluginKey: PLUGIN_KEY, hideChannelButtonOnBoot: window.innerWidth < 768 });
+    // 데모의 "채팅 상담"에서 넘어오면(/?chat=1&msg=…) 상담창을 바로 열고 본 샘플을 입력칸에 채운다
+    const params = new URLSearchParams(window.location.search);
+    if (params.get("chat") === "1") {
+      openChannelTalk(params.get("msg") ?? undefined);
       window.history.replaceState(null, "", window.location.pathname + window.location.hash);
     }
     return () => window.ChannelIO?.("shutdown");
@@ -49,9 +52,19 @@ export function ChannelTalk() {
   return null;
 }
 
-export function ChannelTalkButton({ className, children, cta }: { className: string; children: React.ReactNode; cta: string }) {
+export function ChannelTalkButton({
+  className,
+  children,
+  cta,
+  message,
+}: {
+  className: string;
+  children: React.ReactNode;
+  cta: string;
+  message?: string;
+}) {
   return (
-    <button type="button" onClick={openChannelTalk} data-gtm-cta={cta} className={className}>
+    <button type="button" onClick={() => openChannelTalk(message)} data-gtm-cta={cta} className={className}>
       {children}
     </button>
   );

@@ -2,7 +2,8 @@
 
 import Link from "next/link";
 import { useCallback, useEffect, useState } from "react";
-import { ArrowDown, ArrowLeft, ArrowUp, CircleHelp, ExternalLink, NotebookPen } from "lucide-react";
+import { ArrowDown, ArrowLeft, ArrowUp, CircleHelp, ExternalLink, LayoutDashboard, NotebookPen, Smartphone, X } from "lucide-react";
+import QRCode from "qrcode";
 import type { TourStep } from "@/data/tours";
 
 // 데모 왼쪽 아래 버튼 묶음: 다른 데모 보기, 만든 이야기, 사용법 가이드.
@@ -13,6 +14,36 @@ const pill =
   "inline-flex h-10 items-center gap-2 rounded-full border border-white/20 bg-black/60 px-3.5 text-sm font-medium text-white shadow-lg backdrop-blur-md transition-colors hover:bg-black/75 sm:px-4";
 
 type Rect = { top: number; left: number; width: number; height: number };
+
+// 관리자 화면이 따로 있는 데모. 손님 화면에서 바로 넘어가 볼 수 있게 한다.
+const adminDemo: Record<string, string> = { "online-store": "/demo/shop-admin" };
+
+/** PC에서 데모를 휴대폰 폭으로 띄워 보고, QR로 진짜 휴대폰에서도 열게 한다. */
+function PhonePreview({ onClose }: { onClose: () => void }) {
+  const [qr, setQr] = useState("");
+  const path = window.location.pathname;
+  useEffect(() => {
+    QRCode.toDataURL(window.location.origin + path, { margin: 1, width: 240 }).then(setQr, () => {});
+    const onKey = (e: KeyboardEvent) => e.key === "Escape" && onClose();
+    window.addEventListener("keydown", onKey);
+    return () => window.removeEventListener("keydown", onKey);
+  }, [path, onClose]);
+  return (
+    <div className="fixed inset-0 z-[80] flex items-center justify-center gap-10 bg-black/60 p-6" onClick={onClose} role="dialog" aria-modal="true" aria-label="휴대폰으로 보기">
+      <div className="relative h-[min(780px,calc(100vh-48px))] w-[390px] shrink-0 overflow-hidden rounded-[36px] border-[10px] border-[#111] bg-white shadow-2xl" onClick={(e) => e.stopPropagation()}>
+        <iframe src={path} title="휴대폰 화면" className="h-full w-full border-0" />
+      </div>
+      <div className="w-[240px] rounded-[16px] bg-white p-5 text-center text-[#1d2327]" onClick={(e) => e.stopPropagation()}>
+        {qr ? <img src={qr} alt="이 샘플 주소 QR 코드" width={200} height={200} className="mx-auto" /> : <div className="mx-auto h-[200px] w-[200px]" />}
+        <p className="mt-3 text-[15px] leading-[1.5]">휴대폰 카메라로 찍으면 이 샘플이 열립니다.</p>
+        <button type="button" autoFocus onClick={onClose} className="mt-4 inline-flex h-10 items-center gap-1.5 rounded-full bg-[#111] px-4 text-sm font-bold text-white">
+          <X size={15} aria-hidden />
+          닫기
+        </button>
+      </div>
+    </div>
+  );
+}
 
 /** 선택자로 찾은 요소가 제목이면 그 제목이 속한 구역 전체를 비춘다. */
 function resolve(selector: string): HTMLElement | null {
@@ -107,6 +138,8 @@ export function DemoDock({
     };
   }, [step, steps]);
 
+  const [phone, setPhone] = useState(false);
+  const closePhone = useCallback(() => setPhone(false), []);
   const current = step !== null ? steps[step] : null;
   const last = step !== null && step === steps.length - 1;
 
@@ -147,6 +180,18 @@ export function DemoDock({
           </details>
         ) : null}
 
+        <button type="button" onClick={() => setPhone(true)} data-gtm-cta={`demo_phone_${projectId}`} className={`${pill} hidden md:inline-flex`}>
+          <Smartphone size={15} aria-hidden />
+          휴대폰으로 보기
+        </button>
+
+        {adminDemo[projectId] && (
+          <Link href={adminDemo[projectId]} prefetch={false} aria-label="관리자 화면 보기" className={pill}>
+            <LayoutDashboard size={15} aria-hidden />
+            <span className="hidden sm:inline">관리자 화면</span>
+          </Link>
+        )}
+
         {tour?.length ? (
           <button
             type="button"
@@ -162,6 +207,8 @@ export function DemoDock({
           </button>
         ) : null}
       </div>
+
+      {phone && <PhonePreview onClose={closePhone} />}
 
       {current && rect && (
         <div className="fixed inset-0 z-[70]" onClick={close} role="dialog" aria-modal="true" aria-label="사용법">
