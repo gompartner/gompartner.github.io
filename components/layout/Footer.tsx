@@ -14,7 +14,7 @@ const link = "underline-offset-4 hover:text-foreground hover:underline";
 
 // 곰파트너 블로그. 네이버는 운영 정보 글, 티스토리는 제작 일지다.
 const blogs = [
-  { href: "https://blog.naver.com/gompartner", label: "네이버 블로그", cta: "footer_blog_naver" },
+  { href: "https://blog.naver.com/gompartner", label: "네이버", cta: "footer_blog_naver" },
   { href: "https://gompartner.tistory.com", label: "티스토리", cta: "footer_blog_tistory" },
 ];
 
