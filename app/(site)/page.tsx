@@ -7,7 +7,7 @@ import { landingPlans, manwon } from "@/data/pricing";
 import { HomeFaq } from "@/components/landing/HomeFaq";
 import { PricingSection } from "@/components/landing/PricingSection";
 import { ProcessSteps } from "@/components/landing/ProcessSteps";
-import { WorksGrid } from "@/components/landing/WorksGrid";
+import { IndustryWorks } from "@/components/landing/IndustryWorks";
 import Link from "next/link";
 
 // KRDS(범정부 디자인 시스템) 기준 원페이지 랜딩.
@@ -29,9 +29,6 @@ const heroTabs = [
   ["코딩 특강 모집", "landing-coding-camp"],
 ].map(([label, id]) => ({ label, project: projects.find((p) => p.id === id)! }));
 
-// 포트폴리오 구간 6개. 배너(랜딩)와 겹치지 않게 홈페이지·업무 프로그램 사례로 고르고 전체는 /works에서 본다.
-const showcaseIds = ["company", "cert-lab", "excel-automation", "shop-admin", "online-store", "dental-homepage"];
-const showcase = showcaseIds.map((id) => projects.find((p) => p.id === id)!);
 
 const promises = ["접수 즉시 알림", "구글 시트 상담 상태 기록", "광고별 신청·계약 집계", "원본 소스 제공"];
 
@@ -56,9 +53,7 @@ export default function HomePage() {
             </Link>
           </div>
 
-          <div className="mt-8">
-            <WorksGrid projects={showcase} />
-          </div>
+          <IndustryWorks />
         </div>
       </section>
 

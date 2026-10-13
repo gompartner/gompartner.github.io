@@ -74,15 +74,24 @@ export function SampleStackHero({ tabs, promises, startPrice }: { tabs: Tab[]; p
               </li>
             ))}
           </ul>
-          <Link
-            href={current.project.demoUrl}
-            prefetch={false}
-            data-gtm-cta={`hero_open_${current.project.id}`}
-            className="group mt-8 inline-flex h-14 items-center gap-2 rounded-[6px] bg-accent px-6 text-[17px] font-bold text-accent-foreground transition-colors hover:bg-accent-hover"
-          >
-            {current.label} 사례 보기
-            <ArrowRight size={20} aria-hidden className="transition-transform duration-150 group-hover:translate-x-0.5" />
-          </Link>
+          <div className="mt-8 flex flex-wrap gap-3">
+            <Link
+              href={current.project.demoUrl}
+              prefetch={false}
+              data-gtm-cta={`hero_open_${current.project.id}`}
+              className="group inline-flex h-14 items-center gap-2 rounded-[6px] bg-accent px-6 text-[17px] font-bold text-accent-foreground transition-colors hover:bg-accent-hover"
+            >
+              {current.label} 사례 보기
+              <ArrowRight size={20} aria-hidden className="transition-transform duration-150 group-hover:translate-x-0.5" />
+            </Link>
+            <Link
+              href="/landing"
+              data-gtm-cta="hero_landing"
+              className="inline-flex h-14 items-center rounded-[6px] border border-border bg-white px-6 text-[17px] font-bold transition-colors hover:border-accent hover:text-accent"
+            >
+              상담 신청
+            </Link>
+          </div>
         </div>
 
         <div>
