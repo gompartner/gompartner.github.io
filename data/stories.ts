@@ -1,3 +1,5 @@
+import blogPostsJson from "./blogPosts.json";
+
 // 데모 옆 "만든 이야기". 왜 이렇게 만들었는지, 만들다가 바꾼 것만 적는다.
 // 사용법은 여기서 설명하지 않는다. 사용법은 data/tours.ts의 단계 가이드가 맡는다.
 // 말투는 사용자의 옛 작업 메모(kj84) 투: 짧게 끊는 평서문, 괄호 덧말, 솔직한 한마디.
@@ -182,7 +184,5 @@ export const stories: Record<string, string[]> = {
 };
 
 // 곰파트너 블로그(gompartner.tistory.com)에 제작기를 발행한 데모. 만든 이야기 끝에 링크로 붙는다.
-// 글을 새로 발행하면 여기에 한 줄 추가한다.
-export const blogPosts: Record<string, string> = {
-  "online-store": "https://gompartner.tistory.com/1",
-};
+// 목록은 빌드 전에 scripts/blog-links.mjs가 RSS를 읽어 채운다(예약 글은 공개 뒤 빌드 때 들어옴).
+export const blogPosts: Record<string, string> = blogPostsJson;

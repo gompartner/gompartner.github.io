@@ -6,7 +6,8 @@
     "dev": "next dev",
     "build": "next build",
     "start": "next start",
-    "lint": "eslint"
+    "lint": "eslint",
+    "prebuild": "node scripts/blog-links.mjs"
   },
   "dependencies": {
     "clsx": "^2.1.1",
