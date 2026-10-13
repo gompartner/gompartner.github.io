@@ -1,17 +1,19 @@
 "use client";
 
 import Link from "next/link";
-import { useCallback, useEffect, useState } from "react";
+import { useCallback, useEffect, useState, type ReactNode } from "react";
 import { ArrowDown, ArrowLeft, ArrowUp, CircleHelp, ExternalLink, LayoutDashboard, NotebookPen, Smartphone, X } from "lucide-react";
 import QRCode from "qrcode";
 import type { TourStep } from "@/data/tours";
+import { MobileDemoSheet } from "./MobileDemoSheet";
 
-// 데모 왼쪽 아래 버튼 묶음: 다른 데모 보기, 만든 이야기, 사용법 가이드.
+// 데모 왼쪽 아래 버튼 묶음(PC): 다른 사례 보기, 만든 이야기, 사용법 가이드.
+// 휴대폰에서는 MobileDemoSheet가 버튼 하나와 아래 시트로 대신한다.
 // 사용법 가이드는 프라이빗 짐 데모(HomepageDemo)의 스포트라이트 가이드와 같은 방식이다.
 // 첫 단계 영역이 처음 화면에 들어오면 한 번 자동으로 열고, 이후에는 물음표 버튼으로 다시 연다.
 
 const pill =
-  "inline-flex h-10 items-center gap-2 rounded-full border border-white/20 bg-black/60 px-3.5 text-sm font-medium text-white shadow-lg backdrop-blur-md transition-colors hover:bg-black/75 sm:px-4";
+  "inline-flex h-10 items-center gap-2 rounded-full border border-white/20 bg-black/60 px-4 text-sm font-medium text-white shadow-lg backdrop-blur-md transition-colors hover:bg-black/75";
 
 type Rect = { top: number; left: number; width: number; height: number };
 
@@ -59,11 +61,15 @@ export function DemoDock({
   story,
   blogUrl,
   tour,
+  plan,
+  priceLabel,
 }: {
   projectId: string;
   story?: string[];
   blogUrl?: string;
   tour?: TourStep[];
+  plan: ReactNode;
+  priceLabel: string;
 }) {
   const [step, setStep] = useState<number | null>(null);
   const [rect, setRect] = useState<Rect | null>(null);
@@ -145,19 +151,19 @@ export function DemoDock({
 
   return (
     <>
-      <div className="print:hidden fixed bottom-5 left-5 z-50 flex items-end gap-2">
+      <div className="print:hidden fixed bottom-5 left-5 z-50 hidden items-end gap-2 md:flex">
         <Link href="/works" aria-label="다른 사례 보기" className={pill}>
           <ArrowLeft size={15} aria-hidden />
-          <span className="hidden sm:inline">다른 사례 보기</span>
+          <span>다른 사례 보기</span>
         </Link>
 
         {story?.length ? (
           <details className="group relative">
             <summary className={`${pill} cursor-pointer list-none [&::-webkit-details-marker]:hidden`} aria-label="만든 이야기">
               <NotebookPen size={15} aria-hidden />
-              <span className="hidden sm:inline">만든 이야기</span>
+              <span>만든 이야기</span>
             </summary>
-            <div className="fixed bottom-20 left-4 right-4 max-h-[60vh] overflow-y-auto sm:absolute sm:bottom-full sm:left-0 sm:right-auto sm:mb-2 sm:w-[360px] rounded-[12px] border border-black/10 bg-white p-5 text-[15px] leading-[1.7] text-[#1d2327] shadow-xl">
+            <div className="absolute bottom-full left-0 mb-2 max-h-[60vh] w-[360px] overflow-y-auto rounded-[12px] border border-black/10 bg-white p-5 text-[15px] leading-[1.7] text-[#1d2327] shadow-xl">
               <p className="font-bold">만든 이야기</p>
               <div className="mt-2 space-y-2 text-[#3d474f]">
                 {story.map((line) => (
@@ -188,7 +194,7 @@ export function DemoDock({
         {adminDemo[projectId] && (
           <Link href={adminDemo[projectId]} prefetch={false} aria-label="관리자 화면 보기" className={pill}>
             <LayoutDashboard size={15} aria-hidden />
-            <span className="hidden sm:inline">관리자 화면</span>
+            <span>관리자 화면</span>
           </Link>
         )}
 
@@ -207,6 +213,18 @@ export function DemoDock({
           </button>
         ) : null}
       </div>
+
+      <MobileDemoSheet
+        projectId={projectId}
+        priceLabel={priceLabel}
+        plan={plan}
+        story={story}
+        blogUrl={blogUrl}
+        adminHref={adminDemo[projectId]}
+        hasTour={!!tour?.length}
+        fresh={fresh}
+        onTour={openGuide}
+      />
 
       {phone && <PhonePreview onClose={closePhone} />}
 

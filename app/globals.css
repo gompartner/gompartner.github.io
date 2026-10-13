@@ -136,6 +136,6 @@ body {
 }
 @media (prefers-reduced-motion: no-preference) {
   .soft-in {
-    animation: soft-in 0.28s ease-out both;
+    animation: soft-in 0.28s ease-out backwards; /* both면 끝난 뒤에도 transform이 남아 안쪽 fixed 바가 화면에 안 붙는다 */
   }
 }
