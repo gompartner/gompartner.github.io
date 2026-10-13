@@ -35,7 +35,7 @@ export function HistoryTimeline({ groups }: { groups: HistoryGroup[] }) {
                   <Link
                     href={h.demoUrl}
                     prefetch={false}
-                    aria-label={`${h.demoTitle} 데모 보기`}
+                    aria-label={`${h.demoTitle} 사례 보기`}
                     className="shrink-0 text-[15px] font-bold leading-[1.5] text-accent underline-offset-4 hover:underline"
                   >
                     데모

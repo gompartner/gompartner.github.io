@@ -6,7 +6,7 @@ import { Footer } from "@/components/layout/Footer";
 // 없는 주소로 들어왔을 때. (site) 그룹 밖이라 머리글·바닥글을 직접 둔다.
 const pages = [
   { href: "/", label: "첫 화면" },
-  { href: "/works", label: "포트폴리오" },
+  { href: "/works", label: "제작 사례" },
   { href: "/pricing", label: "가격" },
   { href: "/faq", label: "자주 묻는 질문" },
   { href: "/career", label: "주요 경력" },

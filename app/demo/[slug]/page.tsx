@@ -99,9 +99,9 @@ export async function generateMetadata({ params }: DemoPageProps): Promise<Metad
   }
 
   // "치과 홈페이지 제작 샘플"처럼 사장님이 찾는 말로 제목을 짓고, 견적이 있으면 설명 끝에 비용을 붙인다.
-  const title = `${demo.title}${/(홈페이지|쇼핑몰)$/.test(demo.title) ? " 제작" : ""} 샘플`;
+  const title = `${demo.title}${/(홈페이지|쇼핑몰)$/.test(demo.title) ? " 제작" : ""} 사례`;
   const est = estimateFor(demo.id);
-  const description = est ? `${demo.description} 이 샘플처럼 만들면 ${manwon(est.total)}, ${est.days}일.` : demo.description;
+  const description = est ? `${demo.description} 이 사례처럼 만들면 ${manwon(est.total)}, ${est.days}일.` : demo.description;
   return {
     title,
     description,

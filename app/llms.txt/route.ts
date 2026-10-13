@@ -48,11 +48,11 @@ ${maintenanceServices.map((s) => `- ${s.title}: ${s.price} (${s.term}). 맡지 �
 
 자세히: [유지보수](${url("/maintenance")})
 
-## 업종별 포트폴리오와 비용
+## 업종별 제작 사례와 비용
 
 ${industries.map((i) => `- [${i.title}](${url(`/works/${i.slug}`)}): ${i.description}`).join("\n")}
 
-## 샘플 사이트
+## 제작 사례 사이트
 
 ${projects.filter((p) => p.demoUrl.startsWith("/demo/")).map(demoLine).join("\n")}
 
