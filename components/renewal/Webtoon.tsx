@@ -4,7 +4,7 @@ import Image from "next/image";
 import Link from "next/link";
 import { useEffect, useRef, useState } from "react";
 import { motion } from "framer-motion";
-import { List, MessagesSquare } from "lucide-react";
+import { ChevronRight, List, MessagesSquare } from "lucide-react";
 import { landingPlans, manwon, plans } from "@/data/pricing";
 import { maintenanceServices } from "@/data/maintenance";
 import { profile } from "@/data/profile";
@@ -145,6 +145,9 @@ export function Webtoon() {
                 <Bubble className="absolute right-4 top-5" tail="bottom-left" tone="blue">
                   <span id="ask-title">사장님, 어떤 일로 오셨어요?</span>
                 </Bubble>
+                <Bubble className="absolute bottom-5 right-4" tail="top-left" tone="blue" delay={0.35}>
+                  하나 골라 주세요
+                </Bubble>
               </Panel>
               <Gutter size="sm" />
               <ul className="flex flex-col items-end gap-3" aria-labelledby="ask-title">
@@ -158,17 +161,29 @@ export function Webtoon() {
                       viewport={{ once: true, amount: 0.8 }}
                       transition={{ type: "spring", stiffness: 420, damping: 28, delay: i * 0.08 }}
                     >
+                      {/* 누르는 말풍선: 먹색 그림자가 깔린 버튼 모양, 누르면 그림자 쪽으로 눌린다(150ms). */}
                       <button
                         type="button"
                         onClick={() => setPick(c.key)}
                         aria-pressed={on}
-                        className={`group relative rounded-[26px] rounded-br-[6px] border-[3px] px-5 py-3 text-right transition-[transform,background-color] duration-150 hover:-translate-x-1 active:scale-[0.97] ${on ? "bg-accent text-white" : pick ? "bg-white/70 text-foreground-secondary" : "bg-white"}`}
+                        className={`group flex items-center gap-3 rounded-[26px] rounded-br-[6px] border-[3px] py-3 pl-5 pr-3 text-left shadow-[4px_4px_0_#1d1d1f] transition-[transform,box-shadow,background-color] duration-150 ease-out hover:-translate-x-0.5 hover:-translate-y-0.5 hover:shadow-[6px_6px_0_#1d1d1f] active:translate-x-1 active:translate-y-1 active:shadow-none ${on ? "bg-accent text-white" : pick ? "bg-white/70 text-foreground-secondary" : "bg-white hover:bg-[#fff3b0]"}`}
                         style={{ borderColor: ink }}
                       >
-                        <span className="block text-[17px] font-bold md:text-[19px]">{c.say}</span>
-                        <span className={`block text-[13px] font-bold md:text-[14px] ${on ? "text-white/85" : "text-foreground-tertiary"}`}>
-                          {c.service} · {c.price}
+                        <span>
+                          <span className="block text-[17px] font-bold md:text-[19px]">{c.say}</span>
+                          <span className={`block text-[13px] font-bold md:text-[14px] ${on ? "text-white/85" : "text-foreground-tertiary"}`}>
+                            {c.service} · {c.price}
+                          </span>
                         </span>
+                        <motion.span
+                          aria-hidden
+                          animate={reduce || pick ? { x: 0 } : { x: [0, 5, 0] }}
+                          transition={{ duration: 0.6, ease: "easeInOut", repeat: reduce || pick ? 0 : Infinity, repeatDelay: 1.4, delay: 1 + i * 0.15 }}
+                          className={`flex h-8 w-8 shrink-0 items-center justify-center rounded-full border-[2.5px] ${on ? "bg-white text-accent" : "bg-accent text-white"}`}
+                          style={{ borderColor: ink }}
+                        >
+                          <ChevronRight size={18} strokeWidth={3} />
+                        </motion.span>
                       </button>
                     </motion.li>
                   );
