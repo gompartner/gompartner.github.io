@@ -66,7 +66,6 @@ ${tools.map((t) => `- [${t.title}](${url(t.href)}): ${t.description}`).join("\n"
 
 ## Optional
 
-- [주요 경력](${url("/career")})
 - [자주 묻는 질문](${url("/faq")})
 `;
 

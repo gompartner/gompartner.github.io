@@ -13,8 +13,9 @@ import { markReturning, returnPath } from "@/lib/listReturn";
 // 사용법 가이드는 프라이빗 짐 데모(HomepageDemo)의 스포트라이트 가이드와 같은 방식이다.
 // 첫 단계 영역이 처음 화면에 들어오면 한 번 자동으로 열고, 이후에는 물음표 버튼으로 다시 연다.
 
+// 곰파트너 쪽 버튼이라 업종 사이트와 섞이지 않게 웹툰 톤(크림 바탕·먹선·단단한 그림자)으로 둔다.
 const pill =
-  "inline-flex h-10 items-center gap-2 rounded-full border border-white/20 bg-black/60 px-4 text-sm font-medium text-white shadow-lg backdrop-blur-md transition-colors hover:bg-black/75";
+  "inline-flex h-10 items-center gap-2 rounded-full border-[2.5px] border-[#1d1d1f] bg-[#fffdf8] px-4 text-sm font-bold text-[#1d1d1f] shadow-[3px_3px_0_#1d1d1f] transition-[transform,box-shadow,background-color] duration-150 hover:bg-[#fff3b0] active:translate-x-[3px] active:translate-y-[3px] active:shadow-none";
 
 type Rect = { top: number; left: number; width: number; height: number };
 
@@ -171,9 +172,12 @@ export function DemoDock({
               <NotebookPen size={15} aria-hidden />
               <span>만든 이야기</span>
             </summary>
-            <div className="absolute bottom-full left-0 mb-2 max-h-[60vh] w-[360px] overflow-y-auto rounded-[12px] border border-black/10 bg-white p-5 text-[15px] leading-[1.7] text-[#1d2327] shadow-xl">
-              <p className="font-bold">만든 이야기</p>
-              <div className="mt-2 space-y-2 text-[#3d474f]">
+            <div className="absolute bottom-full left-0 mb-3 max-h-[60vh] w-[360px] overflow-y-auto rounded-[6px] border-[3px] border-[#1d1d1f] bg-[#fffdf8] p-5 text-[15px] leading-[1.7] text-[#1d1d1f] shadow-[5px_5px_0_#1d1d1f]">
+              <p className="flex items-center gap-2 font-bold">
+                <img src="/images/logo.svg" alt="" width={24} height={24} />
+                만든 이야기
+              </p>
+              <div className="mt-3 space-y-2 text-[#45413b]">
                 {story.map((line) => (
                   <p key={line}>{line}</p>
                 ))}
@@ -259,7 +263,7 @@ export function DemoDock({
             })()}
           />
           <div
-            className="absolute inset-x-0 bottom-6 mx-auto w-[min(92vw,380px)] rounded-2xl bg-white p-5 text-[#1d2327] shadow-2xl"
+            className="absolute inset-x-0 bottom-6 mx-auto w-[min(92vw,380px)] rounded-[6px] border-[3px] border-[#1d1d1f] bg-[#fffdf8] p-5 text-[#1d1d1f] shadow-[5px_5px_0_#1d1d1f]"
             onClick={(e) => e.stopPropagation()}
           >
             <div className="flex items-center justify-between">
@@ -300,7 +304,7 @@ export function DemoDock({
                   <button
                     type="button"
                     onClick={() => open(step! - 1)}
-                    className="rounded-lg border border-stone-200 px-4 py-2 text-sm font-semibold"
+                    className="rounded-[6px] border-[2.5px] border-[#1d1d1f] bg-white px-4 py-2 text-sm font-bold"
                   >
                     이전
                   </button>
@@ -309,7 +313,7 @@ export function DemoDock({
                   type="button"
                   autoFocus
                   onClick={() => (last ? close() : open(step! + 1))}
-                  className="rounded-lg bg-[#111] px-4 py-2 text-sm font-bold text-white"
+                  className="rounded-[6px] border-[2.5px] border-[#1d1d1f] bg-[#256ef4] px-4 py-2 text-sm font-bold text-white"
                 >
                   {last ? "시작하기" : "다음"}
                 </button>

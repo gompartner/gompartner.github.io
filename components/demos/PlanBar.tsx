@@ -20,11 +20,11 @@ export function PlanBar({ projectId }: { projectId: string }) {
 
   return (
     <details className="group fixed bottom-5 right-5 z-50 hidden md:block print:hidden">
-      <summary className="inline-flex cursor-pointer list-none items-center gap-2 rounded-full border border-white/20 bg-black/70 px-4 py-2.5 text-sm font-medium text-white shadow-lg backdrop-blur-md transition-colors hover:bg-black/80 [&::-webkit-details-marker]:hidden">
+      <summary className="inline-flex cursor-pointer list-none items-center gap-2 rounded-full border-[2.5px] border-[#1d1d1f] bg-[#256ef4] px-4 py-2.5 text-sm font-bold text-white shadow-[3px_3px_0_#1d1d1f] transition-colors hover:bg-[#0b50d0] [&::-webkit-details-marker]:hidden">
         {est ? `비슷하게 만들면 ${manwon(est.total)}` : "비슷하게 만들기 견적"}
         <ChevronUp size={15} className="transition-transform group-open:rotate-180" aria-hidden />
       </summary>
-      <div className="absolute bottom-full right-0 mb-2 w-[min(340px,calc(100vw-40px))] rounded-[12px] border border-black/10 bg-white p-5 text-[15px] leading-[1.6] text-[#1d2327] shadow-xl">
+      <div className="absolute bottom-full right-0 mb-3 w-[min(340px,calc(100vw-40px))] rounded-[6px] border-[3px] border-[#1d1d1f] bg-[#fffdf8] p-5 text-[15px] leading-[1.6] text-[#1d1d1f] shadow-[5px_5px_0_#1d1d1f]">
         <PlanDetail projectId={projectId} />
       </div>
     </details>

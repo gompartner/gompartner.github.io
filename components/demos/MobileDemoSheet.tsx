@@ -5,7 +5,7 @@ import { useEffect, useRef, useState, type ReactNode } from "react";
 import { markReturning } from "@/lib/listReturn";
 import { ArrowLeft, CircleHelp, ExternalLink, Info, LayoutDashboard, X } from "lucide-react";
 
-// 휴대폰에서 데모 아래 도구(제작비, 만든 이야기, 사용법, 다른 사례)를 버튼 하나와 아래 시트로 묶는다.
+// 휴대폰에서 데모 아래 도구(제작비, 만든 이야기, 사용법, 다른 샘플)를 버튼 하나와 아래 시트로 묶는다.
 // 버튼은 오른쪽 아래에 두고, 데모 자체의 하단 고정 바(장바구니, 신청 버튼)가 있으면 그 위로 올린다.
 
 /** 화면 맨 아래에 붙은 데모의 고정 바 높이. 없으면 0. */
@@ -112,21 +112,21 @@ export function MobileDemoSheet({
         onClick={() => setOpen(true)}
         data-gtm-cta={`demo_sheet_${projectId}`}
         aria-haspopup="dialog"
-        className="fixed right-4 z-50 inline-flex h-11 items-center gap-2 rounded-full border border-white/20 bg-black/75 pl-3.5 pr-4 text-[15px] font-bold text-white shadow-lg backdrop-blur-md transition-[bottom] duration-200"
+        className="fixed right-4 z-50 inline-flex h-11 items-center gap-2 rounded-full border-[2.5px] border-[#1d1d1f] bg-[#fffdf8] pl-3.5 pr-4 text-[15px] font-bold text-[#1d1d1f] shadow-[3px_3px_0_#1d1d1f] transition-[bottom] duration-200"
         style={{ bottom: `calc(${lift}px + 12px + env(safe-area-inset-bottom))` }}
       >
         <span className="relative">
           <Info size={18} aria-hidden />
-          {fresh && hasTour && <span aria-hidden className="absolute -right-1 -top-1 h-2.5 w-2.5 rounded-full bg-[#4ade80] ring-2 ring-black" />}
+          {fresh && hasTour && <span aria-hidden className="absolute -right-1 -top-1 h-2.5 w-2.5 rounded-full bg-[#4ade80] ring-2 ring-[#fffdf8]" />}
         </span>
         {priceLabel}
       </button>
 
       {open && (
-        <div className="fixed inset-0 z-[75]" role="dialog" aria-modal="true" aria-label="사례 정보">
+        <div className="fixed inset-0 z-[75]" role="dialog" aria-modal="true" aria-label="샘플 정보">
           <div className="absolute inset-0 bg-black/50" onClick={close} />
           <div
-            className="absolute inset-x-0 bottom-0 flex max-h-[85vh] flex-col rounded-t-[16px] bg-white text-[15px] leading-[1.6] text-[#1d2327] shadow-2xl"
+            className="absolute inset-x-0 bottom-0 flex max-h-[85vh] flex-col rounded-t-[12px] border-t-[3px] border-[#1d1d1f] bg-[#fffdf8] text-[15px] leading-[1.6] text-[#1d1d1f]"
             style={{ transform: `translateY(${drag}px)`, paddingBottom: "env(safe-area-inset-bottom)" }}
           >
             {/* 손잡이를 아래로 끌면 닫힌다 */}
@@ -183,10 +183,10 @@ export function MobileDemoSheet({
               )}
             </div>
 
-            <nav aria-label="사례 이동" className="grid auto-cols-fr grid-flow-col border-t border-black/10">
+            <nav aria-label="샘플 이동" className="grid auto-cols-fr grid-flow-col border-t-[3px] border-[#1d1d1f]">
               <Link href={back} onClick={markReturning} className="flex h-14 flex-col items-center justify-center gap-0.5 text-[13px] font-bold text-[#3d474f]">
                 <ArrowLeft size={18} aria-hidden />
-                다른 사례
+                다른 샘플
               </Link>
               {adminHref && (
                 <Link href={adminHref} prefetch={false} className="flex h-14 flex-col items-center justify-center gap-0.5 text-[13px] font-bold text-[#3d474f]">

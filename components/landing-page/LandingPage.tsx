@@ -80,12 +80,14 @@ export function LandingPage() {
   const samples = SAMPLE_IDS.map((id) => projects.find((p) => p.id === id)).filter((p): p is (typeof projects)[number] => !!p);
 
   return (
-    <div className="min-h-screen bg-background text-foreground">
-      <header className={`${container} flex h-16 items-center`}>
-        <Link href="/" className="flex items-center gap-2 text-[18px] font-bold">
+    <div className="wt min-h-screen text-foreground">
+      <header className="border-b-[3px] border-[#1d1d1f] bg-[#f3ece0]">
+        <div className={`${container} flex h-16 items-center`}>
+        <Link href="/" className="flex items-center gap-2 font-[family-name:var(--font-sfx)] text-[22px]">
           <Image src="/images/logo.svg" alt="" width={26} height={26} className="h-[26px] w-[26px]" />
           {profile.name}
         </Link>
+        </div>
       </header>
 
       <main>

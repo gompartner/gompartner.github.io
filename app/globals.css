@@ -139,3 +139,31 @@ body {
     animation: soft-in 0.28s ease-out backwards; /* both면 끝난 뒤에도 transform이 남아 안쪽 fixed 바가 화면에 안 붙는다 */
   }
 }
+
+/* ── 웹툰 톤(리뉴얼) ─────────────────────────────────────────────────
+   소개 페이지(.wt) 안에서만 색 토큰을 크림 종이·먹선으로 바꾼다. 샘플(데모) 화면은 업종 사이트라 그대로 둔다. */
+.wt {
+  --background: #fffdf8;
+  --foreground: #1d1d1f;
+  --foreground-secondary: #45413b;
+  --foreground-tertiary: #5e5850;
+  --surface: #f3ece0;
+  --surface-secondary: #e8dece;
+  --border: #1d1d1f;
+  --accent-surface: #e3ecfe;
+  background-color: #f3ece0;
+  background-image: radial-gradient(rgba(29, 29, 31, 0.09) 1.2px, transparent 1.3px);
+  background-size: 14px 14px;
+  color: var(--foreground);
+}
+.wt h1 {
+  font-family: var(--font-sfx), var(--font-pretendard), sans-serif;
+  font-weight: 400;
+  letter-spacing: 0;
+}
+/* 컷처럼 보이는 카드: 굵은 먹선과 오른쪽 아래로 밀린 단단한 그림자 */
+.wt-card {
+  border: 3px solid #1d1d1f !important;
+  border-radius: 6px !important;
+  box-shadow: 5px 5px 0 #1d1d1f;
+}

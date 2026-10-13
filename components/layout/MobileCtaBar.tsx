@@ -10,15 +10,15 @@ export function MobileCtaBar() {
   const pathname = usePathname();
   const onPricing = pathname === "/pricing";
   return (
-    <div className="fixed inset-x-0 bottom-0 z-40 grid grid-cols-2 gap-2 border-t border-border bg-white/95 px-4 pb-[calc(10px+env(safe-area-inset-bottom))] pt-2.5 backdrop-blur md:hidden print:hidden">
+    <div className="fixed inset-x-0 bottom-0 z-40 grid grid-cols-2 gap-2 border-t-[3px] border-[#1d1d1f] bg-[#f3ece0]/95 px-4 pb-[calc(10px+env(safe-area-inset-bottom))] pt-2.5 backdrop-blur md:hidden print:hidden">
       <Link
         href={onPricing ? "/works" : "/pricing"}
         data-gtm-cta={onPricing ? "mobilebar_works" : "mobilebar_pricing"}
-        className="flex h-12 items-center justify-center rounded-[6px] border border-border text-[16px] font-bold"
+        className="flex h-12 items-center justify-center rounded-[6px] border-[2.5px] border-[#1d1d1f] bg-white text-[16px] font-bold"
       >
         {onPricing ? "샘플 보기" : "가격 보기"}
       </Link>
-      <ChannelTalkButton cta="mobilebar_chat" className="flex h-12 items-center justify-center rounded-[6px] bg-accent text-[16px] font-bold text-accent-foreground">
+      <ChannelTalkButton cta="mobilebar_chat" className="flex h-12 items-center justify-center rounded-[6px] border-[2.5px] border-[#1d1d1f] bg-accent text-[16px] font-bold text-accent-foreground shadow-[3px_3px_0_#1d1d1f] active:translate-x-[3px] active:translate-y-[3px] active:shadow-none">
         채팅 상담
       </ChannelTalkButton>
     </div>

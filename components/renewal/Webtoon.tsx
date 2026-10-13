@@ -4,10 +4,9 @@ import Image from "next/image";
 import Link from "next/link";
 import { useEffect, useRef, useState } from "react";
 import { motion } from "framer-motion";
-import { ChevronRight, List, MessagesSquare } from "lucide-react";
+import { ChevronRight, List } from "lucide-react";
 import { landingPlans, manwon, plans } from "@/data/pricing";
 import { maintenanceServices } from "@/data/maintenance";
-import { profile } from "@/data/profile";
 import { useReducedMotionSafe } from "@/hooks/useReducedMotionSafe";
 import { AdEpisode, CompanyEpisode, MaintenanceEpisode, ProgramEpisode } from "./episodes";
 import { Bubble, Gutter, Panel, ink } from "./ui";
@@ -45,7 +44,7 @@ const coverShots = [
 function Cover() {
   const reduce = useReducedMotionSafe();
   return (
-    <header className="relative px-4 pb-14 pt-10 md:px-8 md:pb-20 md:pt-14">
+    <header className="relative px-4 pb-14 pt-4 md:px-8 md:pb-20 md:pt-6">
       <div className="grid grid-cols-2 gap-3 md:gap-4">
         {coverShots.map(([src, r], i) => (
           <motion.div
@@ -89,40 +88,26 @@ export function Webtoon() {
   const toAsk = () => askRef.current?.scrollIntoView({ behavior: reduce ? "auto" : "smooth", block: "start" });
 
   return (
-    <div
-      className="min-h-screen bg-[#f3ece0] text-[#1d1d1f]"
-      style={{ backgroundImage: "radial-gradient(rgba(29,29,31,.09) 1.2px, transparent 1.3px)", backgroundSize: "14px 14px" }}
-    >
-      <nav className="sticky top-0 z-40 border-b-[3px] bg-[#f3ece0]/95 backdrop-blur" style={{ borderColor: ink }}>
-        <div className="mx-auto flex h-14 max-w-[720px] items-center justify-between px-4">
-          <Link href="/prototype/webtoon" className="flex items-center gap-2 text-[17px] font-bold">
-            <Image src="/images/logo.svg" alt="" width={26} height={26} />
-            {profile.name}
-          </Link>
-          <div className="flex items-center gap-1">
-            <button
-              type="button"
-              onClick={() => {
-                setListMode((v) => !v);
-                setTimeout(toAsk, 0);
-              }}
-              aria-pressed={listMode}
-              className="flex h-10 items-center gap-1.5 rounded-[6px] px-3 text-[15px] font-bold hover:bg-white/70"
-            >
-              <List size={18} aria-hidden />
-              {listMode ? "이야기로 보기" : "목록으로 보기"}
-            </button>
-            <Link href="/?chat=1" aria-label="채팅 상담" className="flex h-10 w-10 items-center justify-center rounded-[6px] hover:bg-white/70">
-              <MessagesSquare size={20} aria-hidden />
-            </Link>
-          </div>
+    <div className="overflow-x-clip md:px-4 md:py-8">
+      <div className="mx-auto max-w-[720px] bg-[#fffdf8] pb-24 shadow-[0_0_0_3px_#1d1d1f]">
+        <div className="flex justify-end px-4 pt-4 md:px-8">
+          <button
+            type="button"
+            onClick={() => {
+              setListMode((v) => !v);
+              setTimeout(toAsk, 0);
+            }}
+            aria-pressed={listMode}
+            className="flex h-10 items-center gap-1.5 rounded-full border-[2.5px] bg-white px-4 text-[15px] font-bold transition-colors hover:bg-[#fff3b0]"
+            style={{ borderColor: ink }}
+          >
+            <List size={18} aria-hidden />
+            {listMode ? "이야기로 보기" : "목록으로 보기"}
+          </button>
         </div>
-      </nav>
-
-      <main className="mx-auto max-w-[720px] bg-[#fffdf8] pb-24 shadow-[0_0_0_3px_#1d1d1f]">
         <Cover />
 
-        <section ref={askRef} aria-labelledby="ask-title" className="scroll-mt-14 px-4 md:px-8">
+        <section ref={askRef} aria-labelledby="ask-title" className="scroll-mt-20 px-4 md:px-8">
           {listMode ? (
             <div className="py-6">
               <h2 id="ask-title" className="text-[24px] font-bold md:text-[28px]">
@@ -194,7 +179,7 @@ export function Webtoon() {
         </section>
 
         {pick && !listMode && (
-          <div ref={storyRef} key={pick} className="scroll-mt-14 px-4 pt-16 md:px-8 md:pt-24">
+          <div ref={storyRef} key={pick} className="scroll-mt-20 px-4 pt-16 md:px-8 md:pt-24">
             {episodes[pick]()}
             <div className="mt-16 text-center">
               <p className="text-[15px] font-bold text-foreground-tertiary">다른 상황</p>
@@ -212,18 +197,7 @@ export function Webtoon() {
             </div>
           </div>
         )}
-      </main>
-
-      <footer className="mx-auto max-w-[720px] px-4 py-10 text-[14px] text-foreground-secondary md:px-8">
-        <p className="font-bold text-foreground">{profile.name}</p>
-        <p className="mt-1">gompartner@gmail.com</p>
-        <ul className="mt-4 flex flex-wrap gap-x-4 gap-y-1.5 font-bold">
-          <li><Link href="/works" className="hover:underline">샘플 전체</Link></li>
-          <li><Link href="/pricing" className="hover:underline">가격</Link></li>
-          <li><Link href="/faq" className="hover:underline">자주 묻는 질문</Link></li>
-          <li><Link href="/privacy" className="hover:underline">개인정보처리방침</Link></li>
-        </ul>
-      </footer>
+      </div>
     </div>
   );
 }

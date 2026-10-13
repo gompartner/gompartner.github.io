@@ -1,5 +1,6 @@
 import type { Metadata, Viewport } from "next";
 import localFont from "next/font/local";
+import { Black_Han_Sans } from "next/font/google";
 import Script from "next/script";
 import "./globals.css";
 import { CtaTracker } from "@/components/analytics/CtaTracker";
@@ -18,6 +19,9 @@ const pretendard = localFont({
   weight: "100 900",
   fallback: ["-apple-system", "BlinkMacSystemFont", "Apple SD Gothic Neo", "Segoe UI", "sans-serif"],
 });
+
+// 웹툰 톤의 제목·효과음 글꼴. 본문은 Pretendard.
+const sfx = Black_Han_Sans({ weight: "400", subsets: ["latin"], variable: "--font-sfx", display: "swap" });
 
 // 메인 첫 화면 문구와 맞춘 사이트 제목·설명
 const siteTitle = homeTitle;
@@ -92,7 +96,7 @@ export default function RootLayout({
     <html
       lang="ko"
       data-scroll-behavior="smooth"
-      className={pretendard.variable}
+      className={`${pretendard.variable} ${sfx.variable}`}
       suppressHydrationWarning
     >
       <body className="min-h-screen bg-background text-foreground antialiased">
