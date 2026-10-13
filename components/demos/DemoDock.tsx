@@ -1,53 +1,18 @@
 "use client";
 
-import Link from "next/link";
-import { useCallback, useEffect, useState, type ReactNode } from "react";
-import { ArrowDown, ArrowLeft, ArrowUp, CircleHelp, ExternalLink, LayoutDashboard, NotebookPen, Smartphone, X } from "lucide-react";
-import QRCode from "qrcode";
+import { useCallback, useEffect, useRef, useState } from "react";
+import { ArrowDown, ArrowUp, CircleHelp } from "lucide-react";
 import type { TourStep } from "@/data/tours";
-import { MobileDemoSheet } from "./MobileDemoSheet";
-import { markReturning, returnPath } from "@/lib/listReturn";
 
-// 데모 왼쪽 아래 버튼 묶음(PC): 다른 샘플 보기, 만든 이야기, 사용법 가이드.
-// 휴대폰에서는 MobileDemoSheet가 버튼 하나와 아래 시트로 대신한다.
+// 샘플 화면 위에는 '사용법 보기' 버튼 하나만 띄운다. 금액·만든 이야기·다른 샘플은 샘플 표지(/sample/[slug])가 맡는다.
 // 사용법 가이드는 프라이빗 짐 데모(HomepageDemo)의 스포트라이트 가이드와 같은 방식이다.
-// 첫 단계 영역이 처음 화면에 들어오면 한 번 자동으로 열고, 이후에는 물음표 버튼으로 다시 연다.
-
+// 버튼은 PC에서 왼쪽 아래, 휴대폰에서 오른쪽 아래에 두고, 데모 자체의 하단 고정 바가 있으면 그 위로 올린다.
 // 곰파트너 쪽 버튼이라 업종 사이트와 섞이지 않게 웹툰 톤(크림 바탕·먹선·단단한 그림자)으로 둔다.
 const pill =
   "inline-flex h-10 items-center gap-2 rounded-full border-[2.5px] border-[#1d1d1f] bg-[#fffdf8] px-4 text-sm font-bold text-[#1d1d1f] shadow-[3px_3px_0_#1d1d1f] transition-[transform,box-shadow,background-color] duration-150 hover:bg-[#fff3b0] active:translate-x-[3px] active:translate-y-[3px] active:shadow-none";
 
 type Rect = { top: number; left: number; width: number; height: number };
 
-// 관리자 화면이 따로 있는 데모. 손님 화면에서 바로 넘어가 볼 수 있게 한다.
-const adminDemo: Record<string, string> = { "online-store": "/demo/shop-admin" };
-
-/** PC에서 데모를 휴대폰 폭으로 띄워 보고, QR로 진짜 휴대폰에서도 열게 한다. */
-function PhonePreview({ onClose }: { onClose: () => void }) {
-  const [qr, setQr] = useState("");
-  const path = window.location.pathname;
-  useEffect(() => {
-    QRCode.toDataURL(window.location.origin + path, { margin: 1, width: 240 }).then(setQr, () => {});
-    const onKey = (e: KeyboardEvent) => e.key === "Escape" && onClose();
-    window.addEventListener("keydown", onKey);
-    return () => window.removeEventListener("keydown", onKey);
-  }, [path, onClose]);
-  return (
-    <div className="fixed inset-0 z-[80] flex items-center justify-center gap-10 bg-black/60 p-6" onClick={onClose} role="dialog" aria-modal="true" aria-label="휴대폰으로 보기">
-      <div className="relative h-[min(780px,calc(100vh-48px))] w-[390px] shrink-0 overflow-hidden rounded-[36px] border-[10px] border-[#111] bg-white shadow-2xl" onClick={(e) => e.stopPropagation()}>
-        <iframe src={path} title="휴대폰 화면" className="h-full w-full border-0" />
-      </div>
-      <div className="w-[240px] rounded-[16px] bg-white p-5 text-center text-[#1d2327]" onClick={(e) => e.stopPropagation()}>
-        {qr ? <img src={qr} alt="이 샘플 주소 QR 코드" width={200} height={200} className="mx-auto" /> : <div className="mx-auto h-[200px] w-[200px]" />}
-        <p className="mt-3 text-[15px] leading-[1.5]">휴대폰 카메라로 찍으면 이 샘플이 열립니다.</p>
-        <button type="button" autoFocus onClick={onClose} className="mt-4 inline-flex h-10 items-center gap-1.5 rounded-full bg-[#111] px-4 text-sm font-bold text-white">
-          <X size={15} aria-hidden />
-          닫기
-        </button>
-      </div>
-    </div>
-  );
-}
 
 /** 선택자로 찾은 요소가 제목이면 그 제목이 속한 구역 전체를 비춘다. */
 function resolve(selector: string): HTMLElement | null {
@@ -58,21 +23,7 @@ function resolve(selector: string): HTMLElement | null {
   return el;
 }
 
-export function DemoDock({
-  projectId,
-  story,
-  blogUrl,
-  tour,
-  plan,
-  priceLabel,
-}: {
-  projectId: string;
-  story?: string[];
-  blogUrl?: string;
-  tour?: TourStep[];
-  plan: ReactNode;
-  priceLabel: string;
-}) {
+export function DemoDock({ projectId, tour }: { projectId: string; tour?: TourStep[] }) {
   const [step, setStep] = useState<number | null>(null);
   const [rect, setRect] = useState<Rect | null>(null);
   const [steps, setSteps] = useState<TourStep[]>([]);
@@ -146,100 +97,12 @@ export function DemoDock({
     };
   }, [step, steps]);
 
-  // "다른 샘플"은 보던 목록으로 돌아간다
-  const [back, setBack] = useState("/works");
-  useEffect(() => {
-    const frame = requestAnimationFrame(() => setBack(returnPath()));
-    return () => cancelAnimationFrame(frame);
-  }, []);
-
-  const [phone, setPhone] = useState(false);
-  const closePhone = useCallback(() => setPhone(false), []);
   const current = step !== null ? steps[step] : null;
   const last = step !== null && step === steps.length - 1;
 
   return (
     <>
-      <div className="print:hidden fixed bottom-5 left-5 z-50 hidden items-end gap-2 md:flex">
-        <Link href={back} onClick={markReturning} aria-label="다른 샘플 보기" className={pill}>
-          <ArrowLeft size={15} aria-hidden />
-          <span>다른 샘플 보기</span>
-        </Link>
-
-        {story?.length ? (
-          <details className="group relative">
-            <summary className={`${pill} cursor-pointer list-none [&::-webkit-details-marker]:hidden`} aria-label="만든 이야기">
-              <NotebookPen size={15} aria-hidden />
-              <span>만든 이야기</span>
-            </summary>
-            <div className="absolute bottom-full left-0 mb-3 max-h-[60vh] w-[360px] overflow-y-auto rounded-[6px] border-[3px] border-[#1d1d1f] bg-[#fffdf8] p-5 text-[15px] leading-[1.7] text-[#1d1d1f] shadow-[5px_5px_0_#1d1d1f]">
-              <p className="flex items-center gap-2 font-bold">
-                <img src="/images/logo.svg" alt="" width={24} height={24} />
-                만든 이야기
-              </p>
-              <div className="mt-3 space-y-2 text-[#45413b]">
-                {story.map((line) => (
-                  <p key={line}>{line}</p>
-                ))}
-              </div>
-              {blogUrl && (
-                <a
-                  href={blogUrl}
-                  target="_blank"
-                  rel="noopener"
-                  data-gtm-cta={`story_blog_${projectId}`}
-                  className="mt-4 inline-flex items-center gap-1.5 text-[14px] font-bold text-[#256ef4] hover:underline"
-                >
-                  블로그 글
-                  <ExternalLink size={14} aria-hidden />
-                </a>
-              )}
-            </div>
-          </details>
-        ) : null}
-
-        <button type="button" onClick={() => setPhone(true)} data-gtm-cta={`demo_phone_${projectId}`} className={`${pill.replace("inline-flex ", "")} hidden md:inline-flex`}>
-          <Smartphone size={15} aria-hidden />
-          휴대폰으로 보기
-        </button>
-
-        {adminDemo[projectId] && (
-          <Link href={adminDemo[projectId]} prefetch={false} aria-label="관리자 화면 보기" className={pill}>
-            <LayoutDashboard size={15} aria-hidden />
-            <span>관리자 화면</span>
-          </Link>
-        )}
-
-        {tour?.length ? (
-          <button
-            type="button"
-            onClick={openGuide}
-            aria-label="사용법 보기"
-            title="사용법 보기"
-            className={`${pill} relative ${fresh ? "border-[#4ade80] bg-[#16A34A]" : ""}`}
-          >
-            {fresh && (
-              <span aria-hidden className="absolute inset-0 rounded-full bg-[#4ade80] opacity-60 motion-safe:animate-ping" />
-            )}
-            <CircleHelp size={16} aria-hidden className="relative" />
-          </button>
-        ) : null}
-      </div>
-
-      <MobileDemoSheet
-        projectId={projectId}
-        priceLabel={priceLabel}
-        plan={plan}
-        story={story}
-        blogUrl={blogUrl}
-        adminHref={adminDemo[projectId]}
-        backHref={back}
-        hasTour={!!tour?.length}
-        fresh={fresh}
-        onTour={openGuide}
-      />
-
-      {phone && <PhonePreview onClose={closePhone} />}
+      {tour?.length ? <GuideButton fresh={fresh} onClick={openGuide} projectId={projectId} /> : null}
 
       {current && rect && (
         <div className="fixed inset-0 z-[70]" onClick={close} role="dialog" aria-modal="true" aria-label="사용법">
@@ -323,5 +186,61 @@ export function DemoDock({
         </div>
       )}
     </>
+  );
+}
+
+/** 화면 맨 아래에 붙은 데모의 고정 바 높이. 없으면 0. */
+function bottomBarHeight(own: HTMLElement | null): number {
+  const vh = window.innerHeight;
+  let top = vh;
+  for (const x of [24, window.innerWidth / 2, window.innerWidth - 24]) {
+    for (const el of document.elementsFromPoint(x, vh - 6)) {
+      if (own?.contains(el)) continue;
+      for (let n: HTMLElement | null = el as HTMLElement; n && n !== document.body; n = n.parentElement) {
+        if (getComputedStyle(n).position !== "fixed") continue;
+        // 화면 아래에 붙은 넓은 바만 친다(떠 있는 작은 버튼, 표의 고정 칸은 빼고)
+        const r = n.getBoundingClientRect();
+        if (r.bottom >= vh - 40 && r.width >= window.innerWidth * 0.6) top = Math.min(top, r.top);
+        break;
+      }
+    }
+  }
+  return Math.max(vh - top, 0);
+}
+
+/** 사용법 보기 버튼. 한 번도 열지 않았으면 초록으로 반짝인다. */
+function GuideButton({ fresh, onClick, projectId }: { fresh: boolean; onClick: () => void; projectId: string }) {
+  const own = useRef<HTMLButtonElement>(null);
+  const [lift, setLift] = useState(0);
+  useEffect(() => {
+    let frame = 0;
+    const sync = () => {
+      cancelAnimationFrame(frame);
+      frame = requestAnimationFrame(() => setLift(bottomBarHeight(own.current)));
+    };
+    sync();
+    const timer = window.setInterval(sync, 1000);
+    window.addEventListener("scroll", sync, { passive: true });
+    window.addEventListener("resize", sync);
+    return () => {
+      cancelAnimationFrame(frame);
+      window.clearInterval(timer);
+      window.removeEventListener("scroll", sync);
+      window.removeEventListener("resize", sync);
+    };
+  }, []);
+  return (
+    <button
+      ref={own}
+      type="button"
+      onClick={onClick}
+      data-gtm-cta={`demo_guide_${projectId}`}
+      style={{ bottom: `calc(${lift}px + 16px + env(safe-area-inset-bottom))` }}
+      className={`${pill} print:hidden fixed right-4 z-50 transition-[bottom,transform,box-shadow,background-color] md:left-5 md:right-auto ${fresh ? "bg-[#d9f7e3]" : ""}`}
+    >
+      {fresh && <span aria-hidden className="absolute inset-0 rounded-full bg-[#4ade80] opacity-50 motion-safe:animate-ping" />}
+      <CircleHelp size={16} aria-hidden className="relative" />
+      <span className="relative">사용법 보기</span>
+    </button>
   );
 }
