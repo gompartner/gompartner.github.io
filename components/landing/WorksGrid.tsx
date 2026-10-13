@@ -12,7 +12,7 @@ const EASE_OUT = [0.23, 1, 0.32, 1] as const;
 const EASE_IN_OUT = [0.77, 0, 0.175, 1] as const;
 
 const secondaryButton =
-  "inline-flex h-12 items-center justify-center rounded-md border border-[#6d7882] bg-white px-6 text-[17px] font-bold text-foreground transition-colors hover:bg-surface";
+  "inline-flex h-12 items-center justify-center rounded-[6px] border-[2.5px] border-[#1d1d1f] bg-white px-6 text-[17px] font-bold text-foreground shadow-[3px_3px_0_#1d1d1f] transition-[transform,box-shadow,background-color] duration-150 hover:bg-[#fff3b0] active:translate-x-[3px] active:translate-y-[3px] active:shadow-none";
 
 // 신규 제작과 유지보수를 한 목록에 보여 주고, 구분은 썸네일 왼쪽 위 라벨로 표시한다.
 // 조건이 바뀌면 빠지는 카드는 흐려지고, 남는 카드는 새 자리로 미끄러지고,
@@ -36,7 +36,7 @@ export function WorksGrid({ projects }: { projects: Project[] }) {
             transition={{ layout: { duration: 0.28, ease: EASE_IN_OUT } }}
             className="wt-card flex flex-col overflow-hidden rounded-[10px] border border-border bg-white"
           >
-            <Link href={w.demoUrl} prefetch={false} aria-label={`${w.title} 샘플 보기`} className="relative block border-b border-border">
+            <Link href={w.demoUrl.replace("/demo/", "/sample/")} prefetch={false} aria-label={`${w.title} 샘플 보기`} className="relative block border-b border-border">
               <Image
                 src={smallImage(w.imageUrl)}
                 alt={w.imageAlt}
@@ -58,7 +58,7 @@ export function WorksGrid({ projects }: { projects: Project[] }) {
               </p>
               <h3 className="mt-1 text-[19px] font-bold leading-[1.5]">{w.title}</h3>
               <div className="mt-auto flex items-end justify-between gap-3 pt-6">
-                <Link href={w.demoUrl} prefetch={false} data-gtm-cta={`demo_open_${w.id}`} className={secondaryButton}>
+                <Link href={w.demoUrl.replace("/demo/", "/sample/")} prefetch={false} data-gtm-cta={`demo_open_${w.id}`} className={secondaryButton}>
                   샘플 보기
                 </Link>
                 <PlanPrice projectId={w.id} />

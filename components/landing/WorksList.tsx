@@ -14,7 +14,7 @@ export function WorksList({ projects }: { projects: Project[] }) {
         const est = estimateFor(w.id);
         return (
           <li key={w.id} className="border-b border-border">
-            <Link href={w.demoUrl} prefetch={false} data-gtm-cta={`demo_open_${w.id}`} className="group flex items-center gap-4 py-3 md:gap-6">
+            <Link href={w.demoUrl.replace("/demo/", "/sample/")} prefetch={false} data-gtm-cta={`demo_open_${w.id}`} className="group flex items-center gap-4 py-3 md:gap-6">
               <Image
                 src={smallImage(w.imageUrl)}
                 alt=""
