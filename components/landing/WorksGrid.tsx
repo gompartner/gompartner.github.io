@@ -34,7 +34,7 @@ export function WorksGrid({ projects }: { projects: Project[] }) {
             animate={{ ...shown, transition: { duration: 0.3, ease: EASE_OUT, delay: 0.08 + Math.min(i, 5) * 0.05 } }}
             exit={{ opacity: 0, transition: { duration: 0.12, ease: EASE_OUT } }}
             transition={{ layout: { duration: 0.28, ease: EASE_IN_OUT } }}
-            className="flex flex-col overflow-hidden rounded-[10px] border border-border bg-white"
+            className="wt-card flex flex-col overflow-hidden rounded-[10px] border border-border bg-white"
           >
             <Link href={w.demoUrl} prefetch={false} aria-label={`${w.title} 샘플 보기`} className="relative block border-b border-border">
               <Image

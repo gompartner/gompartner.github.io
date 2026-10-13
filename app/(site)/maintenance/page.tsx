@@ -45,7 +45,7 @@ export default function MaintenancePage() {
               key={s.id}
               id={s.id}
               aria-labelledby={`${s.id}-title`}
-              className="scroll-mt-20 rounded-[10px] border border-border bg-white p-5 md:p-8"
+              className="wt-card scroll-mt-20 rounded-[10px] border border-border bg-white p-5 md:p-8"
             >
               <div className="flex flex-col gap-1 border-b border-border pb-5 md:flex-row md:items-end md:justify-between">
                 <div>

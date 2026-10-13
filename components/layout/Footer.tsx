@@ -7,7 +7,6 @@ const menu = [
   { href: "/pricing", label: "가격" },
   { href: "/maintenance", label: "유지보수" },
   { href: "/faq", label: "자주 묻는 질문" },
-  { href: "/career", label: "주요 경력" },
   { href: "/tools", label: "자료실" },
 ];
 
@@ -97,15 +96,15 @@ export function Footer() {
   );
 
   return (
-    <footer className="border-t border-border bg-surface">
+    <footer className="border-t-[3px] border-[#1d1d1f] bg-[#fffdf8]">
       <div className="mx-auto w-full max-w-[1248px] px-4 py-10 text-[15px] leading-[1.6] text-foreground-tertiary md:px-6 md:py-12">
         <div className="grid grid-cols-2 gap-x-6 gap-y-8 md:grid-cols-[1.4fr_1.4fr_1fr_1fr] md:gap-x-10">
           <div className="col-span-2 md:col-span-1">
-            <p className="inline-flex items-center gap-2 text-[17px] font-bold text-foreground">
+            <p className="inline-flex items-center gap-2 font-[family-name:var(--font-sfx)] text-[20px] text-foreground">
               <Image src="/images/logo.svg" alt="" width={24} height={24} className="h-6 w-6" />
               {profile.name}
             </p>
-            <p className="mt-3">홈페이지 제작 · 업무 프로그램 개발</p>
+            <p className="mt-3">랜딩페이지 · 홈페이지 · 유지보수 · 업무 프로그램</p>
             <p className="mt-1">
               <a href={`mailto:${profile.email}`} data-gtm-cta="footer_email" className={link}>
                 {profile.email}

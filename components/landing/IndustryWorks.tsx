@@ -20,7 +20,7 @@ export function IndustryWorks() {
           <Link
             href={`/works/${ind.slug}`}
             data-gtm-cta={`works_industry_${ind.slug}`}
-            className="group block h-full overflow-hidden rounded-[10px] border border-border bg-white transition-colors hover:border-accent"
+            className="wt-card group block h-full overflow-hidden rounded-[10px] border border-border bg-white transition-colors hover:border-accent"
           >
             <Image
               src={`/images/industry/preview/${ind.slug}.jpg`}

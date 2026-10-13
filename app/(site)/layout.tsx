@@ -14,7 +14,7 @@ export default function SiteLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <div className="flex min-h-screen flex-col pb-[76px] md:pb-0">
+    <div className="wt flex min-h-screen flex-col pb-[76px] md:pb-0">
       {/* 키보드 사용자용 본문 바로가기: 평소에는 숨기고 초점을 받을 때만 머리글 위에 보인다 */}
       <a
         href="#main"

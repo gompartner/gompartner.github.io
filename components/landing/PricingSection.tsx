@@ -37,7 +37,7 @@ export function PricingSection({
             // 이 패키지에 기능 몇 개를 더해 만든 샘플. 싼 것부터 셋만 보여 준다.
             const samples = samplesForPlan(plan.id).slice(0, 3);
             return (
-              <li key={plan.id} className="flex flex-col rounded-[10px] border border-border bg-white p-6">
+              <li key={plan.id} className="wt-card flex flex-col rounded-[10px] border border-border bg-white p-6">
                 <p className="text-[17px] font-bold">
                   {plan.title}{" "}
                   <span className="font-normal text-foreground-secondary">

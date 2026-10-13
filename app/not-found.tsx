@@ -9,17 +9,16 @@ const pages = [
   { href: "/works", label: "샘플" },
   { href: "/pricing", label: "가격" },
   { href: "/faq", label: "자주 묻는 질문" },
-  { href: "/career", label: "주요 경력" },
   { href: "/tools", label: "자료실" },
 ];
 
 export default function NotFound() {
   return (
-    <div className="flex min-h-screen flex-col">
+    <div className="wt flex min-h-screen flex-col">
       <Header />
       <main id="main" className="flex-1 pt-16">
         <div className="mx-auto flex w-full max-w-[640px] flex-col items-start px-4 py-20 md:py-28">
-          <Image src="/images/logo.svg" alt="" width={64} height={64} className="h-16 w-16" />
+          <Image src="/images/webtoon/bear-hello.jpg" alt="" width={160} height={160} className="h-40 w-40 border-[3px] border-[#1d1d1f] shadow-[5px_5px_0_#1d1d1f]" />
           <p className="mt-6 text-[15px] font-bold text-accent">404</p>
           <h1 className="mt-1 text-[28px] font-bold leading-[1.4] md:text-[32px]">페이지를 찾을 수 없습니다</h1>
           <p className="mt-2 text-[17px] leading-[1.6] text-foreground-secondary">
@@ -32,7 +31,7 @@ export default function NotFound() {
               <li key={p.href}>
                 <Link
                   href={p.href}
-                  className="flex h-12 items-center justify-between rounded-md border border-border px-4 text-[17px] hover:bg-surface"
+                  className="flex h-12 items-center justify-between rounded-[6px] border-[2.5px] border-[#1d1d1f] bg-white px-4 text-[17px] font-bold shadow-[3px_3px_0_#1d1d1f] hover:bg-[#fff3b0]"
                 >
                   {p.label}
                   <span aria-hidden className="text-foreground-tertiary">
