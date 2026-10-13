@@ -10,7 +10,7 @@ import { siteUrl } from "@/lib/site";
 export const dynamic = "force-static";
 
 // AI 검색(ChatGPT, Perplexity, Claude 등)이 읽는 사이트 요약. llmstxt.org 형식.
-// 가격·사례·도구 데이터에서 만들므로 데이터만 고치면 같이 바뀐다.
+// 가격·샘플·도구 데이터에서 만들므로 데이터만 고치면 같이 바뀐다.
 export function GET() {
   const url = (path: string) => `${siteUrl}${path}`;
 
@@ -48,11 +48,11 @@ ${maintenanceServices.map((s) => `- ${s.title}: ${s.price} (${s.term}). 맡지 �
 
 자세히: [유지보수](${url("/maintenance")})
 
-## 업종별 제작 사례와 비용
+## 업종별 샘플과 비용
 
 ${industries.map((i) => `- [${i.title}](${url(`/works/${i.slug}`)}): ${i.description}`).join("\n")}
 
-## 제작 사례 사이트
+## 샘플 사이트
 
 ${projects.filter((p) => p.demoUrl.startsWith("/demo/")).map(demoLine).join("\n")}
 

@@ -3,7 +3,7 @@
 import { useEffect } from "react";
 import { doneReturning, returningTo, saveList } from "@/lib/listReturn";
 
-/** 목록 페이지의 스크롤 위치를 적어 두고, 사례 화면에서 "다른 사례"로 돌아오면 그 자리로 내려 준다. */
+/** 목록 페이지의 스크롤 위치를 적어 두고, 샘플 화면에서 "다른 샘플"로 돌아오면 그 자리로 내려 준다. */
 export function ListScrollMemory() {
   useEffect(() => {
     const path = window.location.pathname;

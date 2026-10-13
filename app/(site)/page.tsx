@@ -46,10 +46,10 @@ export default function HomePage() {
         <div className={`${container} py-16 md:py-24`}>
           <div className="flex items-end justify-between gap-4">
             <h2 id="works-title" className={h2}>
-              제작 사례
+              샘플
             </h2>
             <Link href="/works" data-gtm-cta="works_all" className="shrink-0 text-[16px] font-bold text-foreground-secondary underline-offset-4 hover:text-accent hover:underline md:text-[17px]">
-              전체 보기 {projects.length}건
+              전체 보기 {projects.length}개
             </Link>
           </div>
 

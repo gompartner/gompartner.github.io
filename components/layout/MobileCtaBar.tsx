@@ -16,7 +16,7 @@ export function MobileCtaBar() {
         data-gtm-cta={onPricing ? "mobilebar_works" : "mobilebar_pricing"}
         className="flex h-12 items-center justify-center rounded-[6px] border border-border text-[16px] font-bold"
       >
-        {onPricing ? "제작 사례" : "가격 보기"}
+        {onPricing ? "샘플 보기" : "가격 보기"}
       </Link>
       <ChannelTalkButton cta="mobilebar_chat" className="flex h-12 items-center justify-center rounded-[6px] bg-accent text-[16px] font-bold text-accent-foreground">
         채팅 상담
