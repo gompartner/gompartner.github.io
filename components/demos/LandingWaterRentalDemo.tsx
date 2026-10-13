@@ -544,9 +544,6 @@ function ApplyForm({
                 <Row k="의무 사용" v={`${term}년 기준 안내`} />
                 <Row k="통화 시간" v={time} />
               </dl>
-              <p className="mt-4 text-[14px]" style={{ color: C.muted }}>
-                샘플 화면이라 실제로 접수되지는 않습니다.
-              </p>
               <button
                 type="button"
                 onClick={() => {
@@ -698,7 +695,6 @@ function Footer() {
         <Logo light />
         <p className="mt-3">곰파트너 렌탈 · 대표 박ㅅ연 · 서울 ㅅㄷ구 ㅇㅇ로 00</p>
         <p>사업자등록번호 000-00-00000 · 통신판매업 신고 0000-서울ㅅㄷ-0000</p>
-        <p className="mt-2 opacity-70">상호와 제품, 금액은 샘플용 가상 정보입니다.</p>
       </div>
     </footer>
   );
