@@ -1,9 +1,6 @@
 import { DemoDock } from "@/components/demos/DemoDock";
 import { HideInFrame } from "@/components/demos/HideInFrame";
-import { PlanBar, PlanDetail, planInfo } from "@/components/demos/PlanBar";
-import { manwon } from "@/data/pricing";
 import { projects } from "@/data/projects";
-import { blogPosts, stories } from "@/data/stories";
 import { tours } from "@/data/tours";
 
 export default async function DemoLayout({
@@ -21,18 +18,7 @@ export default async function DemoLayout({
       {children}
       {project && (
         <HideInFrame>
-          <DemoDock
-            projectId={project.id}
-            story={stories[project.id]}
-            blogUrl={blogPosts[project.id]}
-            tour={tours[project.id]}
-            plan={<PlanDetail projectId={project.id} />}
-            priceLabel={(() => {
-              const { est } = planInfo(project.id);
-              return est ? `제작비 ${manwon(est.total)}` : "샘플 정보";
-            })()}
-          />
-          <PlanBar projectId={project.id} />
+          <DemoDock projectId={project.id} tour={tours[project.id]} />
         </HideInFrame>
       )}
     </>

@@ -5,6 +5,7 @@ import { notFound } from "next/navigation";
 import { Check, Play } from "lucide-react";
 import { ChannelTalkButton } from "@/components/layout/ChannelTalk";
 import { SampleBack } from "@/components/renewal/SampleBack";
+import { Bubble } from "@/components/renewal/ui";
 import { projects } from "@/data/projects";
 import { estimateFor, formatWon, manwon } from "@/data/pricing";
 import { samplePalettes } from "@/data/samplePalettes";
@@ -40,6 +41,10 @@ const subButton =
   "hidden h-14 md:inline-flex items-center justify-center rounded-[6px] border-[3px] border-[#1d1d1f] bg-white px-6 text-[17px] font-bold transition-colors hover:bg-[#fff3b0]";
 const h2 = "text-[24px] font-bold leading-[1.4] md:text-[28px]";
 
+// 만든 이야기 컷 그림: 처음은 자료를 찾아보는 곰, 중간은 고민하고 고치는 곰, 마지막은 완성한 화면을 가리키는 곰
+const storyCut = (i: number, n: number) =>
+  i === 0 ? "/images/webtoon/bear-research.jpg" : i === n - 1 ? "/images/webtoon/bear-point.jpg" : i % 2 ? "/images/webtoon/bear-think.jpg" : "/images/webtoon/bear-work.jpg";
+
 export default async function SamplePage({ params }: Props) {
   const { slug } = await params;
   const p = find(slug);
@@ -57,16 +62,27 @@ export default async function SamplePage({ params }: Props) {
         </span>
       </div>
 
-      {/* 첫 컷: 샘플 화면과 금액 */}
-      <section className="mt-6 grid items-start gap-8 md:grid-cols-[1.25fr_1fr] md:gap-12">
-        <Link href={p.demoUrl} prefetch={false} aria-label={`${p.title} 샘플 열기`} className="group relative block -rotate-1 overflow-hidden border-[3px] border-[#1d1d1f] bg-white shadow-[6px_6px_0_#1d1d1f]">
-          <Image src={p.imageUrl} alt={p.imageAlt} width={1200} height={750} priority sizes="(min-width: 768px) 680px, 100vw" className="aspect-[16/10] h-auto w-full object-cover object-top" />
-          <span aria-hidden className="absolute inset-0 grid place-items-center bg-black/0 transition-colors duration-200 group-hover:bg-black/25">
-            <span className="grid h-16 w-16 scale-90 place-items-center rounded-full border-[3px] border-[#1d1d1f] bg-white opacity-0 shadow-[3px_3px_0_#1d1d1f] transition-[opacity,transform] duration-200 group-hover:scale-100 group-hover:opacity-100">
-              <Play size={26} strokeWidth={2.5} className="ml-1 text-accent" />
+      {/* PC: 왼쪽 컷(캡처와 샘플 열기)은 고정, 오른쪽 내용만 내려간다. 휴대폰: 위에서 아래로 한 줄 */}
+      <div className="mt-6 grid items-start gap-8 md:grid-cols-[minmax(0,1.05fr)_minmax(0,1fr)] md:gap-14">
+        <div className="md:sticky md:top-24">
+          <Link href={p.demoUrl} prefetch={false} aria-label={`${p.title} 샘플 열기`} className="group relative block -rotate-1 overflow-hidden border-[3px] border-[#1d1d1f] bg-white shadow-[6px_6px_0_#1d1d1f]">
+            <Image src={p.imageUrl} alt={p.imageAlt} width={1200} height={750} priority sizes="(min-width: 768px) 620px, 100vw" className="aspect-[16/10] h-auto w-full object-cover object-top" />
+            <span aria-hidden className="absolute inset-0 grid place-items-center bg-black/0 transition-colors duration-200 group-hover:bg-black/25">
+              <span className="grid h-16 w-16 scale-90 place-items-center rounded-full border-[3px] border-[#1d1d1f] bg-white opacity-0 shadow-[3px_3px_0_#1d1d1f] transition-[opacity,transform] duration-200 group-hover:scale-100 group-hover:opacity-100">
+                <Play size={26} strokeWidth={2.5} className="ml-1 text-accent" />
+              </span>
             </span>
-          </span>
-        </Link>
+          </Link>
+          <div className="mt-7 hidden gap-3 md:flex">
+            <Link href={p.demoUrl} prefetch={false} data-gtm-cta={`sample_open_${p.id}`} className={`${openButton} flex-1`}>
+              <Play size={18} strokeWidth={2.5} aria-hidden />
+              샘플 열기
+            </Link>
+            <ChannelTalkButton cta={`sample_chat_${p.id}`} message={`${p.title} 샘플을 보고 문의합니다.`} className={subButton}>
+              채팅 상담
+            </ChannelTalkButton>
+          </div>
+        </div>
 
         <div>
           <h1 className="text-[32px] leading-[1.2] md:text-[44px]">{p.title}</h1>
@@ -102,80 +118,72 @@ export default async function SamplePage({ params }: Props) {
             )}
           </div>
 
-          <div className="mt-6 flex flex-wrap gap-3">
-            <Link href={p.demoUrl} prefetch={false} data-gtm-cta={`sample_open_${p.id}`} className={openButton}>
+          <div className="mt-6 md:hidden">
+            <Link href={p.demoUrl} prefetch={false} data-gtm-cta={`sample_open_${p.id}`} className={`${openButton} w-full`}>
               <Play size={18} strokeWidth={2.5} aria-hidden />
               샘플 열기
             </Link>
-            <ChannelTalkButton cta={`sample_chat_${p.id}`} message={`${p.title} 샘플을 보고 문의합니다.`} className={subButton}>
-              채팅 상담
-            </ChannelTalkButton>
           </div>
-        </div>
-      </section>
 
-      <div className="mt-16 grid gap-12 md:mt-20 md:grid-cols-2 md:gap-16">
-        {/* 넣은 기능: 말풍선 */}
-        <section aria-labelledby="features-title">
-          <h2 id="features-title" className={h2}>
-            넣은 기능
-          </h2>
-          <ul className="mt-5 flex flex-col items-start gap-3">
-            {p.features.map((f, i) => (
-              <li
-                key={f}
-                className={`flex items-center gap-2 rounded-[22px] rounded-bl-[6px] border-[3px] border-[#1d1d1f] bg-white px-4 py-2.5 text-[16px] font-bold shadow-[3px_3px_0_#1d1d1f] md:text-[17px] ${i % 2 ? "ml-6 md:ml-10" : ""}`}
-              >
-                <Check size={18} strokeWidth={3} className="shrink-0 text-accent" aria-hidden />
-                {f}
-              </li>
-            ))}
-          </ul>
-        </section>
-
-        {/* 브랜드 색 */}
-        {colors.length > 0 && (
-          <section aria-labelledby="colors-title">
-            <h2 id="colors-title" className={h2}>
-              색
+          {/* 넣은 기능: 말풍선 */}
+          <section aria-labelledby="features-title" className="mt-14">
+            <h2 id="features-title" className={h2}>
+              넣은 기능
             </h2>
-            <ul className="mt-5 flex flex-wrap gap-5">
-              {colors.map((c) => (
-                <li key={c} className="text-center">
-                  <span className="block h-20 w-20 border-[3px] border-[#1d1d1f] shadow-[3px_3px_0_#1d1d1f] md:h-24 md:w-24" style={{ background: c }} />
-                  <span className="mt-2 block font-mono text-[14px] font-bold uppercase">{c}</span>
+            <ul className="mt-5 flex flex-col items-start gap-3">
+              {p.features.map((f, i) => (
+                <li
+                  key={f}
+                  className={`flex items-center gap-2 rounded-[22px] rounded-bl-[6px] border-[3px] border-[#1d1d1f] bg-white px-4 py-2.5 text-[16px] font-bold shadow-[3px_3px_0_#1d1d1f] md:text-[17px] ${i % 2 ? "ml-6 md:ml-10" : ""}`}
+                >
+                  <Check size={18} strokeWidth={3} className="shrink-0 text-accent" aria-hidden />
+                  {f}
                 </li>
               ))}
             </ul>
-            <p className="mt-4 text-[15px] leading-[1.6] text-foreground-secondary">상호와 로고에 맞춰 색을 바꿔 드립니다.</p>
           </section>
-        )}
-      </div>
 
-      {/* 만든 이야기: 곰이 남긴 작업 메모를 내레이션 상자로 */}
-      {story.length > 0 && (
-        <section aria-labelledby="story-title" className="mt-16 md:mt-20">
-          <div className="flex items-center gap-3">
-            <Image src="/images/webtoon/bear-work.jpg" alt="" width={64} height={64} className="h-14 w-14 rounded-full border-[3px] border-[#1d1d1f] object-cover md:h-16 md:w-16" />
-            <h2 id="story-title" className={h2}>
-              만든 이야기
-            </h2>
-          </div>
-          <ol className="mt-6 flex max-w-[760px] flex-col gap-3">
-            {story.map((line, i) => (
-              <li key={line} className={`w-fit max-w-full border-[3px] border-[#1d1d1f] bg-[#fff3b0] px-4 py-2.5 text-[16px] leading-[1.6] md:text-[17px] ${i % 2 ? "ml-4 md:ml-12" : ""}`}>
-                {line}
-              </li>
-            ))}
-          </ol>
-        </section>
-      )}
+          {/* 브랜드 색 */}
+          {colors.length > 0 && (
+            <section aria-labelledby="colors-title" className="mt-14">
+              <h2 id="colors-title" className={h2}>
+                색
+              </h2>
+              <ul className="mt-5 flex flex-wrap gap-5">
+                {colors.map((c) => (
+                  <li key={c} className="text-center">
+                    <span className="block h-20 w-20 border-[3px] border-[#1d1d1f] shadow-[3px_3px_0_#1d1d1f]" style={{ background: c }} />
+                    <span className="mt-2 block font-mono text-[14px] font-bold uppercase">{c}</span>
+                  </li>
+                ))}
+              </ul>
+              <p className="mt-4 text-[15px] leading-[1.6] text-foreground-secondary">상호와 로고에 맞춰 색을 바꿔 드립니다.</p>
+            </section>
+          )}
 
-      <div className="mt-16 flex flex-wrap justify-center gap-3 md:mt-20">
-        <Link href={p.demoUrl} prefetch={false} data-gtm-cta={`sample_open_bottom_${p.id}`} className={openButton}>
-          <Play size={18} strokeWidth={2.5} aria-hidden />
-          샘플 열기
-        </Link>
+          {/* 만든 이야기: 곰이 작업하며 한 말을 컷마다 말풍선으로 */}
+          {story.length > 0 && (
+            <section aria-labelledby="story-title" className="mt-14">
+              <h2 id="story-title" className={h2}>
+                만든 이야기
+              </h2>
+              <ol className="mt-5 flex flex-col gap-5">
+                {story.map((line, i) => (
+                  <li key={line}>
+                    <figure className={`overflow-hidden border-[3px] border-[#1d1d1f] bg-[#fffdf8] ${i % 2 ? "rotate-[0.6deg]" : "-rotate-[0.6deg]"}`}>
+                      <figcaption className={`flex px-3 pb-5 pt-3 ${i % 2 ? "justify-end" : ""}`}>
+                        <Bubble tail={i % 2 ? "bottom-right" : "bottom-left"} className="max-w-[88%] text-[15px] md:text-[16px]">
+                          {line}
+                        </Bubble>
+                      </figcaption>
+                      <Image src={storyCut(i, story.length)} alt="" width={900} height={900} sizes="(min-width: 768px) 560px, 100vw" className="aspect-[16/9] h-auto w-full border-t-[3px] border-[#1d1d1f] object-cover object-[50%_35%]" />
+                    </figure>
+                  </li>
+                ))}
+              </ol>
+            </section>
+          )}
+        </div>
       </div>
     </div>
   );
