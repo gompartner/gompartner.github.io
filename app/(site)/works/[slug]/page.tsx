@@ -1,3 +1,4 @@
+import { ListScrollMemory } from "@/components/landing/ListScrollMemory";
 import type { Metadata } from "next";
 import Image from "next/image";
 import Link from "next/link";
@@ -67,6 +68,7 @@ export default async function IndustryWorksPage({ params }: Props) {
         </ul>
         <div className="mt-10">
           <WorksGrid projects={list} />
+          <ListScrollMemory />
         </div>
         <IndustryCost industry={ind} projects={list} />
       </div>

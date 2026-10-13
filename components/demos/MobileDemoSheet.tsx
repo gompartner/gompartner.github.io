@@ -2,6 +2,7 @@
 
 import Link from "next/link";
 import { useEffect, useRef, useState, type ReactNode } from "react";
+import { markReturning } from "@/lib/listReturn";
 import { ArrowLeft, CircleHelp, ExternalLink, Info, LayoutDashboard, X } from "lucide-react";
 
 // 휴대폰에서 데모 아래 도구(제작비, 만든 이야기, 사용법, 다른 사례)를 버튼 하나와 아래 시트로 묶는다.
@@ -33,6 +34,7 @@ export function MobileDemoSheet({
   story,
   blogUrl,
   adminHref,
+  backHref: back,
   hasTour,
   fresh,
   onTour,
@@ -43,6 +45,7 @@ export function MobileDemoSheet({
   story?: string[];
   blogUrl?: string;
   adminHref?: string;
+  backHref: string;
   hasTour: boolean;
   fresh: boolean;
   onTour: () => void;
@@ -181,7 +184,7 @@ export function MobileDemoSheet({
             </div>
 
             <nav aria-label="사례 이동" className="grid auto-cols-fr grid-flow-col border-t border-black/10">
-              <Link href="/works" className="flex h-14 flex-col items-center justify-center gap-0.5 text-[13px] font-bold text-[#3d474f]">
+              <Link href={back} onClick={markReturning} className="flex h-14 flex-col items-center justify-center gap-0.5 text-[13px] font-bold text-[#3d474f]">
                 <ArrowLeft size={18} aria-hidden />
                 다른 사례
               </Link>
