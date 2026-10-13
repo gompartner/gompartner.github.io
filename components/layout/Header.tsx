@@ -11,9 +11,9 @@ import { profile } from "@/data/profile";
 import { ChannelTalkButton } from "@/components/layout/ChannelTalk";
 import { useReducedMotionSafe } from "@/hooks/useReducedMotionSafe";
 
-// 메뉴는 포트폴리오·자료실 페이지와 첫 화면의 섹션으로 이동한다
+// 메뉴는 샘플·자료실 페이지와 첫 화면의 섹션으로 이동한다
 const navItems = [
-  { href: "/works", label: "제작 사례" },
+  { href: "/works", label: "샘플" },
   { href: "/pricing", label: "가격" },
   { href: "/maintenance", label: "유지보수" },
   { href: "/faq", label: "자주 묻는 질문" },

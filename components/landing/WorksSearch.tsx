@@ -25,9 +25,9 @@ const hasCap = (p: Project, c: Capability | null) => {
 const normalize = (s: string) => s.toLowerCase().replace(/\s+/g, "");
 const searchText = (p: Project) => normalize([p.title, p.category, p.description, ...p.features, ...(fieldsById[p.id] ?? [])].join(" "));
 
-// 포트폴리오는 기본으로 "[업종]에서 쓰는 [기능]을 갖춘 사례 N건" 문장의 빈칸을 골라 거르고,
+// 샘플은 기본으로 "[업종]에서 쓰는 [기능]을 갖춘 샘플 N개" 문장의 빈칸을 골라 거르고,
 // 원하면 검색어로 찾는 방식으로 바꿀 수 있다.
-// 빈칸에서 고를 수 있는 단어에는 지금 조건의 사례 수를 붙이고, 0건이 되는 단어는 막아 결과가 비지 않게 한다.
+// 빈칸에서 고를 수 있는 단어에는 지금 조건의 샘플 수를 붙이고, 0개가 되는 단어는 막아 결과가 비지 않게 한다.
 export function WorksSearch({ projects }: { projects: Project[] }) {
   const [mode, setMode] = useState<"pick" | "text">("pick");
   const [field, setField] = useState<Field | null>(null);
@@ -35,7 +35,7 @@ export function WorksSearch({ projects }: { projects: Project[] }) {
   const [open, setOpen] = useState<"field" | "cap" | null>(null);
   const [query, setQuery] = useState("");
 
-  // 사례 화면에서 "다른 사례"로 돌아오면 고른 조건을 되살린다
+  // 샘플 화면에서 "다른 샘플"로 돌아오면 고른 조건을 되살린다
   type Filters = { mode: "pick" | "text"; field: Field | null; cap: Capability | null; query: string };
   const restored = useRef(false);
   useEffect(() => {
@@ -103,7 +103,7 @@ export function WorksSearch({ projects }: { projects: Project[] }) {
 
   const count = (
     <span aria-live="polite" className="whitespace-nowrap tabular-nums">
-      <RollingText text={String(results.length)} />건
+      <RollingText text={String(results.length)} />개
     </span>
   );
 
@@ -163,12 +163,12 @@ export function WorksSearch({ projects }: { projects: Project[] }) {
                   />
                   <span className="text-[13px] min-[390px]:text-[15px] md:text-[26px]">을</span>
                 </span>{" "}
-                <span className="whitespace-nowrap text-[13px] min-[390px]:text-[15px] md:text-[26px]">갖춘 사례</span>
+                <span className="whitespace-nowrap text-[13px] min-[390px]:text-[15px] md:text-[26px]">갖춘 샘플</span>
               </motion.div>
             ) : (
               <motion.div key="text" {...swap} className="flex flex-wrap items-center gap-x-3">
                 <label htmlFor="works-search" className="sr-only">
-                  제작 사례 검색
+                  샘플 검색
                 </label>
                 <span className="relative w-full max-w-[380px]">
                   <Search
@@ -233,7 +233,7 @@ export function WorksSearch({ projects }: { projects: Project[] }) {
             transition={{ duration: 0.2, delay: 0.1 }}
             className="rounded-[10px] border border-border bg-surface px-6 py-12 text-center"
           >
-            <p className="text-[17px] font-bold leading-[1.5]">찾는 사례가 없습니다.</p>
+            <p className="text-[17px] font-bold leading-[1.5]">찾는 샘플이 없습니다.</p>
             <p className="mt-1 text-[17px] leading-[1.5] text-foreground-secondary">비슷한 작업이 가능한지 채팅으로 문의해 주세요.</p>
           </motion.div>
         )}

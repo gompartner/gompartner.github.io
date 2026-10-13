@@ -17,7 +17,7 @@ export function IndustryCost({ industry, projects }: { industry: Industry; proje
   const lead =
     rows.length === 0
       ? `소개만 하는 홈페이지는 ${manwon(base.price)}, 작업 기간 ${base.days}일입니다. 신청·심사 같은 업무 프로그램은 화면 수를 듣고 별도 견적을 제공합니다.`
-      : `소개만 하는 홈페이지는 ${manwon(base.price)}, 작업 기간 ${base.days}일입니다. 아래 사례처럼 기능을 넣으면 ${rangeText(totals.map(manwon))}, 작업 기간은 ${rangeText(days.map((d) => `${d}일`))}입니다.`;
+      : `소개만 하는 홈페이지는 ${manwon(base.price)}, 작업 기간 ${base.days}일입니다. 아래 샘플처럼 기능을 넣으면 ${rangeText(totals.map(manwon))}, 작업 기간은 ${rangeText(days.map((d) => `${d}일`))}입니다.`;
 
   const jsonLd = {
     "@context": "https://schema.org",
@@ -51,10 +51,10 @@ export function IndustryCost({ industry, projects }: { industry: Industry; proje
       {rows.length > 0 && (
         <div className="mt-6 overflow-hidden rounded-[10px] border border-border">
           <table className="w-full text-left text-[15px] md:text-[17px]">
-            <caption className="sr-only">{industry.label} 사례별 제작 비용과 기간</caption>
+            <caption className="sr-only">{industry.label} 샘플별 제작 비용과 기간</caption>
             <thead className="bg-surface text-[14px] font-bold text-foreground-secondary md:text-[15px]">
               <tr>
-                <th scope="col" className="px-4 py-3">제작 사례</th>
+                <th scope="col" className="px-4 py-3">샘플</th>
                 <th scope="col" className="hidden px-4 py-3 md:table-cell">구성</th>
                 <th scope="col" className="px-3 py-3 text-right md:px-4">비용</th>
                 <th scope="col" className="px-3 py-3 text-right md:px-4">기간</th>

@@ -29,7 +29,7 @@ export default async function DemoLayout({
             plan={<PlanDetail projectId={project.id} />}
             priceLabel={(() => {
               const { est } = planInfo(project.id);
-              return est ? `제작비 ${manwon(est.total)}` : "사례 정보";
+              return est ? `제작비 ${manwon(est.total)}` : "샘플 정보";
             })()}
           />
           <PlanBar projectId={project.id} />

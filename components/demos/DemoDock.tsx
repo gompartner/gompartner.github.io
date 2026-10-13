@@ -8,7 +8,7 @@ import type { TourStep } from "@/data/tours";
 import { MobileDemoSheet } from "./MobileDemoSheet";
 import { markReturning, returnPath } from "@/lib/listReturn";
 
-// 데모 왼쪽 아래 버튼 묶음(PC): 다른 사례 보기, 만든 이야기, 사용법 가이드.
+// 데모 왼쪽 아래 버튼 묶음(PC): 다른 샘플 보기, 만든 이야기, 사용법 가이드.
 // 휴대폰에서는 MobileDemoSheet가 버튼 하나와 아래 시트로 대신한다.
 // 사용법 가이드는 프라이빗 짐 데모(HomepageDemo)의 스포트라이트 가이드와 같은 방식이다.
 // 첫 단계 영역이 처음 화면에 들어오면 한 번 자동으로 열고, 이후에는 물음표 버튼으로 다시 연다.
@@ -37,8 +37,8 @@ function PhonePreview({ onClose }: { onClose: () => void }) {
         <iframe src={path} title="휴대폰 화면" className="h-full w-full border-0" />
       </div>
       <div className="w-[240px] rounded-[16px] bg-white p-5 text-center text-[#1d2327]" onClick={(e) => e.stopPropagation()}>
-        {qr ? <img src={qr} alt="이 사례 주소 QR 코드" width={200} height={200} className="mx-auto" /> : <div className="mx-auto h-[200px] w-[200px]" />}
-        <p className="mt-3 text-[15px] leading-[1.5]">휴대폰 카메라로 찍으면 이 사례가 열립니다.</p>
+        {qr ? <img src={qr} alt="이 샘플 주소 QR 코드" width={200} height={200} className="mx-auto" /> : <div className="mx-auto h-[200px] w-[200px]" />}
+        <p className="mt-3 text-[15px] leading-[1.5]">휴대폰 카메라로 찍으면 이 샘플이 열립니다.</p>
         <button type="button" autoFocus onClick={onClose} className="mt-4 inline-flex h-10 items-center gap-1.5 rounded-full bg-[#111] px-4 text-sm font-bold text-white">
           <X size={15} aria-hidden />
           닫기
@@ -145,7 +145,7 @@ export function DemoDock({
     };
   }, [step, steps]);
 
-  // "다른 사례"는 보던 목록으로 돌아간다
+  // "다른 샘플"은 보던 목록으로 돌아간다
   const [back, setBack] = useState("/works");
   useEffect(() => {
     const frame = requestAnimationFrame(() => setBack(returnPath()));
@@ -160,9 +160,9 @@ export function DemoDock({
   return (
     <>
       <div className="print:hidden fixed bottom-5 left-5 z-50 hidden items-end gap-2 md:flex">
-        <Link href={back} onClick={markReturning} aria-label="다른 사례 보기" className={pill}>
+        <Link href={back} onClick={markReturning} aria-label="다른 샘플 보기" className={pill}>
           <ArrowLeft size={15} aria-hidden />
-          <span>다른 사례 보기</span>
+          <span>다른 샘플 보기</span>
         </Link>
 
         {story?.length ? (

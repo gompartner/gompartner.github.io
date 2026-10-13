@@ -1,4 +1,4 @@
-// 사례 화면의 "다른 사례"를 누르면 보던 목록(/works, /works/[업종])의 같은 자리로 돌아가게 한다.
+// 샘플 화면의 "다른 샘플"을 누르면 보던 목록(/works, /works/[업종])의 같은 자리로 돌아가게 한다.
 // 목록 주소·스크롤 위치·고른 조건을 이 탭(sessionStorage)에만 적어 둔다.
 
 const SAVED = "list-return";
@@ -22,7 +22,7 @@ export function saveList(patch: Partial<Saved> & { path: string }) {
   } catch {}
 }
 
-/** "다른 사례"가 갈 주소. 목록을 거치지 않고 들어왔으면 전체 목록. */
+/** "다른 샘플"이 갈 주소. 목록을 거치지 않고 들어왔으면 전체 목록. */
 export function returnPath(): string {
   return read()?.path ?? "/works";
 }
@@ -33,7 +33,7 @@ export function markReturning() {
   } catch {}
 }
 
-/** 사례 화면에서 "다른 사례"로 돌아온 참이면 적어 둔 값을 준다. */
+/** 샘플 화면에서 "다른 샘플"로 돌아온 참이면 적어 둔 값을 준다. */
 export function returningTo(path: string): Saved | null {
   try {
     if (!sessionStorage.getItem(RETURNING)) return null;

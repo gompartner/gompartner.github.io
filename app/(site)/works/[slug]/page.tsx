@@ -29,7 +29,7 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
     .filter((n): n is number => n !== undefined);
   const from = totals.length ? `${manwon(Math.min(...totals))}부터. ` : "";
   return {
-    title: `${ind.title} 비용·제작 사례`,
+    title: `${ind.title} 비용·샘플`,
     description: from + ind.description,
     keywords: ind.keywords,
     alternates: { canonical: `/works/${slug}` },
@@ -50,11 +50,11 @@ export default async function IndustryWorksPage({ params }: Props) {
         <div className="mx-auto flex min-h-[240px] w-full max-w-[1248px] flex-col justify-end px-4 pb-8 pt-20 md:min-h-[380px] md:px-6 md:pb-14">
           <p className="text-[15px] font-bold text-white/80">
             <Link href="/works" className="underline-offset-4 hover:underline">
-              제작 사례
+              샘플
             </Link>{" "}
             · {ind.label}
           </p>
-          <h1 className="mt-1 text-[26px] font-bold leading-[1.35] tracking-[-0.01em] text-white md:text-[40px]">{ind.title.replace(/ 제작$/, "")} 제작 사례</h1>
+          <h1 className="mt-1 text-[26px] font-bold leading-[1.35] tracking-[-0.01em] text-white md:text-[40px]">{ind.title} 샘플</h1>
         </div>
       </section>
       <div className="mx-auto w-full max-w-[1248px] px-4 pb-10 md:px-6 md:pb-14">

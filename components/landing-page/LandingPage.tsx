@@ -105,7 +105,7 @@ export function LandingPage() {
               상담 신청
             </button>
             <a href="#samples" className="flex h-14 items-center rounded-[6px] border border-border px-7 text-[18px] font-bold transition-colors hover:border-accent hover:text-accent">
-              제작 사례
+              샘플
             </a>
           </div>
           </div>
@@ -183,7 +183,7 @@ export function LandingPage() {
         <section id="samples" aria-labelledby="samples-title" className="scroll-mt-6 py-16 md:py-24">
           <div className={container}>
             <h2 id="samples-title" className={h2}>
-              제작 사례
+              샘플
             </h2>
             <ul className="mt-8 grid gap-4 md:grid-cols-3">
               {samples.map((p) => (

@@ -3,7 +3,7 @@ import Link from "next/link";
 import { profile } from "@/data/profile";
 
 const menu = [
-  { href: "/works", label: "제작 사례" },
+  { href: "/works", label: "샘플" },
   { href: "/pricing", label: "가격" },
   { href: "/maintenance", label: "유지보수" },
   { href: "/faq", label: "자주 묻는 질문" },
