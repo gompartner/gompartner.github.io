@@ -5,7 +5,8 @@ import { projects } from "@/data/projects";
 import { fieldsById } from "@/data/workFilters";
 
 // 첫 화면 제작 사례는 업종 카드 6장으로 보여 주고, 누르면 업종 페이지(/works/[slug])로 간다.
-// 카드 사진은 public/images/industry/sm/{slug}.jpg (720x450, 16:10으로 잘라 품질 80).
+// 카드 그림은 업종 대표 사례의 PC 화면(브라우저 틀)과 휴대폰 화면을 겹친 것. public/images/industry/preview/{slug}.jpg 960x600.
+// 대표 사례: 치과, 베이커리, 법률사무소, 정밀가공 회사, 수학·영어학원, 구청 누리집. 다시 만들 땐 휴대폰 390x844(2배)로 찍고 하단 사례 바를 피해 위쪽 700px만 쓴다.
 const cards = industries.map((ind) => ({
   ind,
   total: projects.filter((p) => (fieldsById[p.id] ?? []).includes(ind.field)).length,
@@ -22,10 +23,10 @@ export function IndustryWorks() {
             className="group block h-full overflow-hidden rounded-[10px] border border-border bg-white transition-colors hover:border-accent"
           >
             <Image
-              src={`/images/industry/sm/${ind.slug}.jpg`}
-              alt={ind.imageAlt}
-              width={720}
-              height={450}
+              src={`/images/industry/preview/${ind.slug}.jpg`}
+              alt={`${ind.label} 제작 사례 PC·휴대폰 화면`}
+              width={960}
+              height={600}
               className="aspect-[16/10] w-full object-cover"
             />
             <div className="p-5">
