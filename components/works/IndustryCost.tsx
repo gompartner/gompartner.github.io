@@ -64,7 +64,7 @@ export function IndustryCost({ industry, projects }: { industry: Industry; proje
               {rows.map(({ project, est }) => (
                 <tr key={project.id}>
                   <th scope="row" className="px-4 py-3 font-bold">
-                    <Link href={project.demoUrl} prefetch={false} className="underline-offset-4 hover:underline">
+                    <Link href={project.demoUrl.replace("/demo/", "/sample/")} prefetch={false} className="underline-offset-4 hover:underline">
                       {project.title}
                     </Link>
                     <span className="mt-0.5 block text-[14px] font-normal text-foreground-secondary md:hidden">{features(est)}</span>

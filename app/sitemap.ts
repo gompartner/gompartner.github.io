@@ -17,6 +17,14 @@ export default function sitemap(): MetadataRoute.Sitemap {
       changeFrequency: "monthly" as const,
       priority: 0.7,
     }));
+  const samples = projects
+    .filter((project) => project.demoUrl.startsWith("/demo/"))
+    .map((project) => ({
+      url: `${siteUrl}${project.demoUrl.replace("/demo/", "/sample/")}`,
+      lastModified,
+      changeFrequency: "monthly" as const,
+      priority: 0.8,
+    }));
 
   return [
     {
@@ -43,6 +51,7 @@ export default function sitemap(): MetadataRoute.Sitemap {
       changeFrequency: "monthly" as const,
       priority: 0.8,
     })),
+    ...samples,
     ...demos,
   ];
 }

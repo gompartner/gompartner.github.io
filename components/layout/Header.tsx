@@ -74,7 +74,7 @@ export function Header() {
               <li key={href}>
                 <Link
                   href={href}
-                  className={cn("inline-flex h-10 items-center rounded-[6px] px-3 text-[17px] font-bold transition-colors hover:bg-[#fff3b0]", pathname.startsWith(href) ? "text-foreground underline decoration-accent decoration-[3px] underline-offset-8" : "text-foreground-secondary")}
+                  className={cn("inline-flex h-10 items-center rounded-[6px] px-3 text-[17px] font-bold transition-colors hover:bg-[#fff3b0]", (pathname.startsWith(href) || (href === "/works" && pathname.startsWith("/sample/"))) ? "text-foreground underline decoration-accent decoration-[3px] underline-offset-8" : "text-foreground-secondary")}
                 >
                   {label}
                 </Link>
