@@ -49,10 +49,10 @@ export function IndustryCost({ industry, projects }: { industry: Industry; proje
       </h2>
       <p className="mt-3 max-w-[760px] text-[17px] leading-[1.7] text-foreground-secondary">{lead}</p>
       {rows.length > 0 && (
-        <div className="mt-6 overflow-hidden rounded-[10px] border border-border">
+        <div className="wt-card mt-6 overflow-hidden bg-white">
           <table className="w-full text-left text-[15px] md:text-[17px]">
             <caption className="sr-only">{industry.label} 샘플별 제작 비용과 기간</caption>
-            <thead className="bg-surface text-[14px] font-bold text-foreground-secondary md:text-[15px]">
+            <thead className="border-b-[3px] border-[#1d1d1f] bg-[#fff3b0] text-[14px] font-bold text-foreground-secondary md:text-[15px]">
               <tr>
                 <th scope="col" className="px-4 py-3">샘플</th>
                 <th scope="col" className="hidden px-4 py-3 md:table-cell">구성</th>
