@@ -6,6 +6,7 @@ import { ArrowDown, ArrowLeft, ArrowUp, CircleHelp, ExternalLink, LayoutDashboar
 import QRCode from "qrcode";
 import type { TourStep } from "@/data/tours";
 import { MobileDemoSheet } from "./MobileDemoSheet";
+import { markReturning, returnPath } from "@/lib/listReturn";
 
 // 데모 왼쪽 아래 버튼 묶음(PC): 다른 사례 보기, 만든 이야기, 사용법 가이드.
 // 휴대폰에서는 MobileDemoSheet가 버튼 하나와 아래 시트로 대신한다.
@@ -144,6 +145,13 @@ export function DemoDock({
     };
   }, [step, steps]);
 
+  // "다른 사례"는 보던 목록으로 돌아간다
+  const [back, setBack] = useState("/works");
+  useEffect(() => {
+    const frame = requestAnimationFrame(() => setBack(returnPath()));
+    return () => cancelAnimationFrame(frame);
+  }, []);
+
   const [phone, setPhone] = useState(false);
   const closePhone = useCallback(() => setPhone(false), []);
   const current = step !== null ? steps[step] : null;
@@ -152,7 +160,7 @@ export function DemoDock({
   return (
     <>
       <div className="print:hidden fixed bottom-5 left-5 z-50 hidden items-end gap-2 md:flex">
-        <Link href="/works" aria-label="다른 사례 보기" className={pill}>
+        <Link href={back} onClick={markReturning} aria-label="다른 사례 보기" className={pill}>
           <ArrowLeft size={15} aria-hidden />
           <span>다른 사례 보기</span>
         </Link>
@@ -221,6 +229,7 @@ export function DemoDock({
         story={story}
         blogUrl={blogUrl}
         adminHref={adminDemo[projectId]}
+        backHref={back}
         hasTour={!!tour?.length}
         fresh={fresh}
         onTour={openGuide}

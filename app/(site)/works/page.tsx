@@ -1,3 +1,4 @@
+import { ListScrollMemory } from "@/components/landing/ListScrollMemory";
 import type { Metadata } from "next";
 import Link from "next/link";
 import { WorksSearch } from "@/components/landing/WorksSearch";
@@ -29,6 +30,7 @@ export default function WorksPage() {
       </ul>
       <div className="mt-8">
         <WorksSearch projects={projects} />
+          <ListScrollMemory />
       </div>
     </div>
   );

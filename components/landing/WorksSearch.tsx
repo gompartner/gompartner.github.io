@@ -8,6 +8,7 @@ import { capabilities, fields, fieldsById, type Capability, type Field } from "@
 import { WorksGrid } from "./WorksGrid";
 import { WorksList } from "./WorksList";
 import { useReducedMotionSafe } from "@/hooks/useReducedMotionSafe";
+import { returningTo, saveList } from "@/lib/listReturn";
 
 const EASE_OUT = [0.23, 1, 0.32, 1] as const;
 
@@ -33,6 +34,29 @@ export function WorksSearch({ projects }: { projects: Project[] }) {
   const [cap, setCap] = useState<Capability | null>(null);
   const [open, setOpen] = useState<"field" | "cap" | null>(null);
   const [query, setQuery] = useState("");
+
+  // 사례 화면에서 "다른 사례"로 돌아오면 고른 조건을 되살린다
+  type Filters = { mode: "pick" | "text"; field: Field | null; cap: Capability | null; query: string };
+  const restored = useRef(false);
+  useEffect(() => {
+    const f = returningTo(window.location.pathname)?.filters as Filters | undefined;
+    const frame = requestAnimationFrame(() => {
+      if (f) {
+        setMode(f.mode);
+        setField(f.field);
+        setCap(f.cap);
+        setQuery(f.query);
+      } else {
+        // 새로 들어온 목록이면 예전에 고른 조건을 지운다
+        saveList({ path: window.location.pathname, filters: undefined });
+      }
+      restored.current = true;
+    });
+    return () => cancelAnimationFrame(frame);
+  }, []);
+  useEffect(() => {
+    if (restored.current) saveList({ path: window.location.pathname, filters: { mode, field, cap, query } satisfies Filters });
+  }, [mode, field, cap, query]);
 
   const terms = query.split(/\s+/).map(normalize).filter(Boolean);
   const results =
