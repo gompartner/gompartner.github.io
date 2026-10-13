@@ -144,7 +144,7 @@ export function WorksSearch({ projects }: { projects: Project[] }) {
             ) : (
               <motion.div key="text" {...swap} className="flex flex-wrap items-center gap-x-3">
                 <label htmlFor="works-search" className="sr-only">
-                  포트폴리오 검색
+                  제작 사례 검색
                 </label>
                 <span className="relative w-full max-w-[380px]">
                   <Search

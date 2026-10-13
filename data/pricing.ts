@@ -88,7 +88,7 @@ export const planCommon = ["원본 소스 제공", "완료 후 1개월 무상 �
 
 /** 결제 전에 보내는 미리보기. 고른 샘플에 상호와 색만 입힌 첫 화면 한 장이다. */
 export const previewPromise = "결제 전에 첫 화면 미리 보기";
-export const previewDetail = "샘플을 고르시면 상호와 색을 입힌 첫 화면을 결제 전에 보내 드립니다. 보시고 진행할지 정하시면 됩니다.";
+export const previewDetail = "제작 사례를 고르시면 상호와 색을 입힌 첫 화면을 결제 전에 보내 드립니다. 보시고 진행할지 정하시면 됩니다.";
 
 /** 패키지 금액 밖에서 드는 돈. 숫자는 /tools/hosting-cost(data/hostingPrices.ts) 조사값에서 나온 범위다. */
 export const runningCostNote =

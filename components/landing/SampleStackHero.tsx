@@ -80,13 +80,13 @@ export function SampleStackHero({ tabs, promises, startPrice }: { tabs: Tab[]; p
             data-gtm-cta={`hero_open_${current.project.id}`}
             className="group mt-8 inline-flex h-14 items-center gap-2 rounded-[6px] bg-accent px-6 text-[17px] font-bold text-accent-foreground transition-colors hover:bg-accent-hover"
           >
-            {current.label} 샘플 둘러보기
+            {current.label} 사례 보기
             <ArrowRight size={20} aria-hidden className="transition-transform duration-150 group-hover:translate-x-0.5" />
           </Link>
         </div>
 
         <div>
-          <div className="relative mx-auto w-full max-w-[680px] pt-12" aria-roledescription="carousel" aria-label="업종별 샘플">
+          <div className="relative mx-auto w-full max-w-[680px] pt-12" aria-roledescription="carousel" aria-label="업종별 제작 사례">
             {/* 카드 높이를 잡아 두는 자리. 실제 카드는 그 위에 겹쳐 놓는다. */}
             <div aria-hidden className="invisible">
               <CardBody tab={current} />
@@ -142,7 +142,7 @@ export function SampleStackHero({ tabs, promises, startPrice }: { tabs: Tab[]; p
           <div className="mt-5 flex items-center justify-center gap-3">
             <button
               type="button"
-              aria-label="이전 샘플"
+              aria-label="이전 사례"
               onClick={() => go(-1)}
               className="grid h-11 w-11 place-items-center rounded-full border border-border bg-white text-foreground-secondary transition-colors hover:border-foreground-tertiary hover:text-foreground"
             >
@@ -153,7 +153,7 @@ export function SampleStackHero({ tabs, promises, startPrice }: { tabs: Tab[]; p
             </p>
             <button
               type="button"
-              aria-label="다음 샘플"
+              aria-label="다음 사례"
               onClick={() => go(1)}
               className="grid h-11 w-11 place-items-center rounded-full border border-border bg-white text-foreground-secondary transition-colors hover:border-foreground-tertiary hover:text-foreground"
             >
@@ -186,7 +186,7 @@ function CardBody({ tab, dim = false }: { tab: Tab; dim?: boolean }) {
       </div>
       <div className="flex items-center justify-between gap-3 px-5 py-4">
         <div className="min-w-0">
-          <p className="text-[17px] font-bold leading-[1.5]">{label} 샘플</p>
+          <p className="text-[17px] font-bold leading-[1.5]">{label}</p>
           <p className="truncate text-[15px] leading-[1.5] text-foreground-secondary">{project.title}</p>
         </div>
         <div className="flex shrink-0 items-center gap-3">

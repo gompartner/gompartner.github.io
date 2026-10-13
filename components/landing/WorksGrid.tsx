@@ -36,7 +36,7 @@ export function WorksGrid({ projects }: { projects: Project[] }) {
             transition={{ layout: { duration: 0.28, ease: EASE_IN_OUT } }}
             className="flex flex-col overflow-hidden rounded-[10px] border border-border bg-white"
           >
-            <Link href={w.demoUrl} prefetch={false} aria-label={`${w.title} 데모 보기`} className="relative block border-b border-border">
+            <Link href={w.demoUrl} prefetch={false} aria-label={`${w.title} 사례 보기`} className="relative block border-b border-border">
               <Image
                 src={smallImage(w.imageUrl)}
                 alt={w.imageAlt}
@@ -59,7 +59,7 @@ export function WorksGrid({ projects }: { projects: Project[] }) {
               <h3 className="mt-1 text-[19px] font-bold leading-[1.5]">{w.title}</h3>
               <div className="mt-auto flex items-end justify-between gap-3 pt-6">
                 <Link href={w.demoUrl} prefetch={false} data-gtm-cta={`demo_open_${w.id}`} className={secondaryButton}>
-                  데모 보기
+                  사례 보기
                 </Link>
                 <PlanPrice projectId={w.id} />
               </div>

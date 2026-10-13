@@ -56,7 +56,7 @@ export function PricingSection({
                 </ul>
                 {samples.length > 0 && (
                   <div className="mt-5 border-t border-border pt-4 text-[15px]">
-                    <p className="font-bold text-foreground-secondary">이 패키지로 만든 샘플</p>
+                    <p className="font-bold text-foreground-secondary">이 패키지 제작 사례</p>
                     <ul className="mt-1.5 space-y-1">
                       {samples.map((s) => {
                         const p = projects.find((x) => x.id === s.id)!;

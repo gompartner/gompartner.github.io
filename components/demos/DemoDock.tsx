@@ -34,8 +34,8 @@ function PhonePreview({ onClose }: { onClose: () => void }) {
         <iframe src={path} title="휴대폰 화면" className="h-full w-full border-0" />
       </div>
       <div className="w-[240px] rounded-[16px] bg-white p-5 text-center text-[#1d2327]" onClick={(e) => e.stopPropagation()}>
-        {qr ? <img src={qr} alt="이 샘플 주소 QR 코드" width={200} height={200} className="mx-auto" /> : <div className="mx-auto h-[200px] w-[200px]" />}
-        <p className="mt-3 text-[15px] leading-[1.5]">휴대폰 카메라로 찍으면 이 샘플이 열립니다.</p>
+        {qr ? <img src={qr} alt="이 사례 주소 QR 코드" width={200} height={200} className="mx-auto" /> : <div className="mx-auto h-[200px] w-[200px]" />}
+        <p className="mt-3 text-[15px] leading-[1.5]">휴대폰 카메라로 찍으면 이 사례가 열립니다.</p>
         <button type="button" autoFocus onClick={onClose} className="mt-4 inline-flex h-10 items-center gap-1.5 rounded-full bg-[#111] px-4 text-sm font-bold text-white">
           <X size={15} aria-hidden />
           닫기
@@ -146,9 +146,9 @@ export function DemoDock({
   return (
     <>
       <div className="print:hidden fixed bottom-5 left-5 z-50 flex items-end gap-2">
-        <Link href="/works" aria-label="다른 데모 보기" className={pill}>
+        <Link href="/works" aria-label="다른 사례 보기" className={pill}>
           <ArrowLeft size={15} aria-hidden />
-          <span className="hidden sm:inline">다른 데모 보기</span>
+          <span className="hidden sm:inline">다른 사례 보기</span>
         </Link>
 
         {story?.length ? (
