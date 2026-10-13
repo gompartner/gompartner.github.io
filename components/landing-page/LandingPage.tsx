@@ -12,6 +12,7 @@ import { profile } from "@/data/profile";
 import { useReducedMotionSafe } from "@/hooks/useReducedMotionSafe";
 import { LeadForm, type PackageName } from "./LeadForm";
 import { OwnerPreview } from "./OwnerPreview";
+import { HeroPreview } from "./HeroPreview";
 
 /*
   곰파트너 자신의 '광고 신청 접수 랜딩'. 파는 상품과 같은 모양으로 만들었다.
@@ -89,7 +90,8 @@ export function LandingPage() {
 
       <main>
         {/* 1. 첫 화면 */}
-        <section ref={heroRef} aria-labelledby="hero-title" className={`${container} pb-16 pt-8 md:pb-24 md:pt-16`}>
+        <section ref={heroRef} aria-labelledby="hero-title" className={`${container} grid items-center gap-12 pb-16 pt-8 md:pb-24 md:pt-16 lg:grid-cols-[minmax(0,5fr)_minmax(0,6fr)]`}>
+          <div>
           <h1 id="hero-title" className="text-[36px] font-bold leading-[1.3] tracking-[-0.03em] md:text-[56px]">
             광고 신청 접수
             <br />
@@ -105,6 +107,10 @@ export function LandingPage() {
             <a href="#samples" className="flex h-14 items-center rounded-[6px] border border-border px-7 text-[18px] font-bold transition-colors hover:border-accent hover:text-accent">
               제작 사례
             </a>
+          </div>
+          </div>
+          <div className="hidden md:block">
+            <HeroPreview />
           </div>
         </section>
 
