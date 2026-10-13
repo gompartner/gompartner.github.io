@@ -719,9 +719,6 @@ function ApplyForm(p: { today: Date; type: HomeType; py: number; opts: OptId[]; 
           </dt>
           <dd>예약 담당 정ㅁ석 실장</dd>
         </dl>
-        <p className="mt-5 text-[15px]" style={{ color: C.muted }}>
-          샘플 화면이라 실제로 접수되지는 않습니다.
-        </p>
         <button type="button" onClick={reset} className="mt-5 inline-flex items-center gap-1.5 text-[15px] font-bold underline underline-offset-4">
           <RotateCcw size={16} aria-hidden /> 다시 신청해 보기
         </button>
