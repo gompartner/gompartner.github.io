@@ -42,30 +42,39 @@ export default async function IndustryWorksPage({ params }: Props) {
   if (!ind) notFound();
   const list = projects.filter((p) => (fieldsById[p.id] ?? []).includes(ind.field));
 
+  const totals = list.map((p) => estimateFor(p.id)?.total).filter((n): n is number => n !== undefined);
+
   return (
     <>
-      <section className="relative isolate overflow-hidden bg-[#1d2327]">
-        <Image src={ind.image} alt={ind.imageAlt} fill priority sizes="100vw" className="-z-10 object-cover" />
-        <div aria-hidden className="absolute inset-0 -z-10 bg-[linear-gradient(0deg,rgba(17,20,23,.82)_0%,rgba(17,20,23,.45)_55%,rgba(17,20,23,.2)_100%)] md:bg-[linear-gradient(90deg,rgba(17,20,23,.78)_0%,rgba(17,20,23,.55)_45%,rgba(17,20,23,.15)_100%)]" />
-        <div className="mx-auto flex min-h-[240px] w-full max-w-[1248px] flex-col justify-end px-4 pb-8 pt-20 md:min-h-[380px] md:px-6 md:pb-14">
-          <p className="text-[15px] font-bold text-white/80">
-            <Link href="/works" className="underline-offset-4 hover:underline">
-              샘플
-            </Link>{" "}
-            · {ind.label}
-          </p>
-          <h1 className="mt-1 text-[26px] font-bold leading-[1.35] tracking-[-0.01em] text-white md:text-[40px]">{ind.title} 샘플</h1>
+      {/* 업종 첫 컷: 업종 사진을 컷 안에 넣고, 그 업종 사장님이 홈페이지에 바라는 것을 말풍선으로 붙인다 */}
+      <section className="mx-auto w-full max-w-[1248px] px-4 pt-8 md:px-6 md:pt-12">
+        <Link href="/works" className="inline-block border-[3px] border-[#1d1d1f] bg-[#fff3b0] px-3 py-1 text-[15px] font-bold hover:bg-white">
+          샘플 · {ind.label}
+        </Link>
+        <div className="mt-5 grid items-center gap-8 md:grid-cols-[1.1fr_1fr] md:gap-12">
+          <figure className="relative aspect-[4/3] -rotate-1 overflow-hidden border-[3px] border-[#1d1d1f] bg-white shadow-[6px_6px_0_#1d1d1f]">
+            <Image src={ind.image} alt={ind.imageAlt} fill priority sizes="(min-width: 768px) 640px, 100vw" className="object-cover" />
+          </figure>
+          <div>
+            <h1 className="text-[34px] leading-[1.2] md:text-[52px]">{ind.title} 샘플</h1>
+            <p className="mt-3 text-[17px] font-bold md:text-[19px]">
+              샘플 {list.length}개{totals.length > 0 && <> · <span className="text-accent">{manwon(Math.min(...totals))}부터</span></>}
+            </p>
+            <ul className="mt-6 flex flex-col items-start gap-3" aria-label={`${ind.label} 홈페이지에 많이 넣는 기능`}>
+              {ind.needs.map((n, i) => (
+                <li
+                  key={n}
+                  className={`flex items-center gap-2 rounded-[22px] rounded-bl-[6px] border-[3px] border-[#1d1d1f] bg-white px-4 py-2.5 text-[16px] font-bold shadow-[3px_3px_0_#1d1d1f] md:text-[18px] ${i % 2 ? "ml-6 md:ml-10" : ""}`}
+                >
+                  <Check size={18} strokeWidth={3} className="shrink-0 text-accent" aria-hidden />
+                  {n}
+                </li>
+              ))}
+            </ul>
+          </div>
         </div>
       </section>
       <div className="mx-auto w-full max-w-[1248px] px-4 pb-10 md:px-6 md:pb-14">
-        <ul className="mt-6 grid grid-cols-2 gap-2 md:mt-8 lg:grid-cols-4" aria-label={`${ind.label} 홈페이지에 많이 넣는 기능`}>
-          {ind.needs.map((n) => (
-            <li key={n} className="flex items-center gap-1.5 rounded-[8px] bg-surface px-3 py-2.5 text-[14px] font-bold leading-[1.4] md:gap-2 md:rounded-[10px] md:px-4 md:py-3 md:text-[17px]">
-              <Check size={18} strokeWidth={2.5} className="shrink-0 text-accent" aria-hidden />
-              {n}
-            </li>
-          ))}
-        </ul>
         <div className="mt-10">
           <WorksGrid projects={list} />
           <ListScrollMemory />
