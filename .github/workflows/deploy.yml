@@ -4,6 +4,10 @@ on:
   push:
     branches: [main]
   workflow_dispatch:
+  # 티스토리 예약 글(09시·18시 공개)이 사례 화면 블로그 링크에 들어가도록 하루 두 번 다시 빌드한다(UTC).
+  schedule:
+    - cron: "15 0 * * *"
+    - cron: "15 9 * * *"
 
 permissions:
   contents: read
