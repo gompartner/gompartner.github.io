@@ -13,7 +13,7 @@ import { estimateFor, formatWon, manwon } from "@/data/pricing";
 import { samplePalettes } from "@/data/samplePalettes";
 import { scenarios, type Scene } from "@/data/scenes";
 import { fitDescription } from "@/lib/seo";
-import { productOf } from "@/components/landing/WorksGrid";
+import { productOf } from "@/lib/product";
 import { maintenanceServices } from "@/data/maintenance";
 
 // 샘플 표지. 웹툰 한 편처럼 위에서 아래로 읽는다.
