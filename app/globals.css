@@ -167,3 +167,7 @@ body {
   border-radius: 6px !important;
   box-shadow: 5px 5px 0 #1d1d1f;
 }
+/* 말풍선 검색창은 초점이 들어오면 그림자가 파랗게 바뀌는 것으로 표시한다 */
+.wt-input:focus-visible {
+  outline: none;
+}
