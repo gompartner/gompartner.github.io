@@ -2,7 +2,7 @@
 
 import { useEffect, useLayoutEffect, useRef, useState } from "react";
 import { AnimatePresence, motion } from "framer-motion";
-import { Check, ChevronDown, LayoutGrid, List, ListFilter, RotateCcw, Search } from "lucide-react";
+import { Check, ChevronDown, LayoutGrid, List, ListFilter, RotateCcw, Search, X } from "lucide-react";
 import type { Project } from "@/lib/types";
 import { capabilities, fields, fieldsById, type Capability, type Field } from "@/data/workFilters";
 import { WorksGrid } from "./WorksGrid";
@@ -11,6 +11,9 @@ import { useReducedMotionSafe } from "@/hooks/useReducedMotionSafe";
 import { returningTo, saveList } from "@/lib/listReturn";
 
 const EASE_OUT = [0.23, 1, 0.32, 1] as const;
+
+// 검색창 아래 바로 누르는 검색어
+const suggestions = ["예약", "병원", "쇼핑몰", "학원", "계산", "지도", "엑셀", "관리자"];
 
 const capKeywords = (name: Capability | null): readonly string[] => capabilities.find((c) => c.name === name)?.keywords ?? [];
 
@@ -109,7 +112,7 @@ export function WorksSearch({ projects }: { projects: Project[] }) {
 
   return (
     <>
-      <div role="group" aria-label="찾는 방법" className="mb-4 flex gap-5 text-[16px]">
+      <div role="group" aria-label="찾는 방법" className="mb-5 inline-flex rounded-full border-[2.5px] border-[#1d1d1f] bg-white p-1 text-[15px] shadow-[3px_3px_0_#1d1d1f] md:text-[16px]">
         {(
           [
             ["pick", "조건으로 고르기", ListFilter],
@@ -124,8 +127,8 @@ export function WorksSearch({ projects }: { projects: Project[] }) {
               setOpen(null);
               setMode(m);
             }}
-            className={`inline-flex items-center gap-1.5 border-b-2 pb-1.5 ${
-              mode === m ? "border-foreground font-bold text-foreground" : "border-transparent text-foreground-secondary hover:text-foreground"
+            className={`inline-flex h-9 items-center gap-1.5 rounded-full px-4 font-bold transition-colors duration-150 ${
+              mode === m ? "bg-[#1d1d1f] text-white" : "text-foreground-secondary hover:bg-[#fff3b0] hover:text-foreground"
             }`}
           >
             <Icon size={16} strokeWidth={2.5} aria-hidden />
@@ -166,16 +169,16 @@ export function WorksSearch({ projects }: { projects: Project[] }) {
                 <span className="whitespace-nowrap text-[13px] min-[390px]:text-[15px] md:text-[26px]">갖춘 샘플</span>
               </motion.div>
             ) : (
-              <motion.div key="text" {...swap} className="flex flex-wrap items-center gap-x-3">
+              <motion.div key="text" {...swap} className="flex flex-col gap-4">
                 <label htmlFor="works-search" className="sr-only">
                   샘플 검색
                 </label>
-                <span className="relative w-full max-w-[380px]">
+                <span className="relative block w-full max-w-[560px]">
                   <Search
                     size={22}
-                    strokeWidth={2.5}
+                    strokeWidth={2.75}
                     aria-hidden
-                    className="pointer-events-none absolute top-1/2 left-1 -translate-y-1/2 text-foreground-tertiary"
+                    className="pointer-events-none absolute top-1/2 left-5 z-10 -translate-y-1/2 text-accent"
                   />
                   <input
                     id="works-search"
@@ -185,9 +188,35 @@ export function WorksSearch({ projects }: { projects: Project[] }) {
                     value={query}
                     onChange={(e) => setQuery(e.target.value)}
                     placeholder="예: 병원 예약"
-                    className="w-full border-b-2 border-[#6d7882] bg-transparent py-1 pr-2 pl-10 font-bold text-foreground outline-none transition-colors duration-150 placeholder:font-normal placeholder:text-foreground-tertiary focus:border-accent [&::-webkit-search-cancel-button]:hidden"
+                    className="wt-input h-14 w-full rounded-[28px] rounded-bl-[8px] border-[3px] border-[#1d1d1f] bg-white pr-12 pl-13 text-[18px] font-bold text-foreground shadow-[4px_4px_0_#1d1d1f] outline-none transition-[box-shadow,transform] duration-150 placeholder:font-normal placeholder:text-foreground-tertiary focus:-translate-x-0.5 focus:-translate-y-0.5 focus:shadow-[6px_6px_0_#256ef4] md:h-16 md:text-[22px] [&::-webkit-search-cancel-button]:hidden"
                   />
+                  {query && (
+                    <button
+                      type="button"
+                      onClick={() => setQuery("")}
+                      aria-label="검색어 지우기"
+                      className="absolute top-1/2 right-3 z-10 grid size-9 -translate-y-1/2 place-items-center rounded-full text-foreground-secondary hover:bg-[#fff3b0] hover:text-foreground"
+                    >
+                      <X size={20} strokeWidth={2.75} aria-hidden />
+                    </button>
+                  )}
                 </span>
+                <ul aria-label="자주 찾는 말" className="flex flex-wrap gap-2 text-[15px] font-bold tracking-normal">
+                  {suggestions.map((w) => (
+                    <li key={w}>
+                      <button
+                        type="button"
+                        onClick={() => setQuery(w)}
+                        aria-pressed={query === w}
+                        className={`inline-flex h-9 items-center rounded-full border-[2.5px] border-[#1d1d1f] px-3.5 transition-[background-color,transform] duration-150 active:scale-[0.97] ${
+                          query === w ? "bg-[#fff3b0]" : "bg-white hover:bg-[#fff3b0]"
+                        }`}
+                      >
+                        {w}
+                      </button>
+                    </li>
+                  ))}
+                </ul>
               </motion.div>
             )}
           </AnimatePresence>
@@ -200,7 +229,7 @@ export function WorksSearch({ projects }: { projects: Project[] }) {
           총&nbsp;<b className="text-foreground">{count}</b>
           <ResetButton show={active} onClick={reset} />
         </p>
-        <div role="radiogroup" aria-label="보기 방식" className="inline-flex rounded-md border border-border bg-white p-0.5">
+        <div role="radiogroup" aria-label="보기 방식" className="inline-flex rounded-full border-[2.5px] border-[#1d1d1f] bg-white p-1">
           {(
             [
               ["card", "카드", LayoutGrid],
@@ -213,8 +242,8 @@ export function WorksSearch({ projects }: { projects: Project[] }) {
               role="radio"
               aria-checked={view === v}
               onClick={() => setViewSaved(v)}
-              className={`inline-flex h-9 items-center gap-1.5 rounded-[5px] px-3 text-[15px] font-bold transition-colors ${
-                view === v ? "bg-foreground text-background" : "text-foreground-secondary hover:text-foreground"
+              className={`inline-flex h-8 items-center gap-1.5 rounded-full px-3 text-[15px] font-bold transition-colors ${
+                view === v ? "bg-[#1d1d1f] text-white" : "text-foreground-secondary hover:bg-[#fff3b0] hover:text-foreground"
               }`}
             >
               <Icon size={16} aria-hidden />
@@ -231,10 +260,13 @@ export function WorksSearch({ projects }: { projects: Project[] }) {
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             transition={{ duration: 0.2, delay: 0.1 }}
-            className="rounded-[10px] border border-border bg-surface px-6 py-12 text-center"
+            className="mx-auto max-w-[520px] overflow-hidden border-[3px] border-[#1d1d1f] bg-[#fffdf8] shadow-[5px_5px_0_#1d1d1f]"
           >
-            <p className="text-[17px] font-bold leading-[1.5]">찾는 샘플이 없습니다.</p>
-            <p className="mt-1 text-[17px] leading-[1.5] text-foreground-secondary">비슷한 작업이 가능한지 채팅으로 문의해 주세요.</p>
+            <div className="flex flex-col items-center gap-2 px-5 pb-6 pt-5 text-center">
+              <p className="rounded-[22px] rounded-bl-[6px] border-[3px] border-[#1d1d1f] bg-white px-4 py-2.5 text-[17px] font-bold leading-[1.5]">찾는 샘플이 없어요.</p>
+              <p className="text-[16px] leading-[1.5] text-foreground-secondary">비슷한 작업이 가능한지 채팅으로 물어봐 주세요.</p>
+            </div>
+            <img src="/images/webtoon/bear-think.jpg" alt="" className="aspect-[16/9] w-full border-t-[3px] border-[#1d1d1f] object-cover object-[50%_30%]" />
           </motion.div>
         )}
       </div>
@@ -264,7 +296,7 @@ function ResetButton({ show, onClick }: { show: boolean; onClick: () => void }) 
           animate={reduce ? { opacity: 1 } : { opacity: 1, transform: "rotate(0deg) scale(1)" }}
           exit={reduce ? { opacity: 0 } : { opacity: 0, transform: "rotate(-270deg) scale(0.8)" }}
           transition={{ duration: 0.28, ease: EASE_OUT }}
-          className="ml-2 inline-grid size-10 place-items-center rounded-full align-middle text-foreground-secondary hover:bg-surface hover:text-foreground"
+          className="ml-2 inline-grid size-9 place-items-center rounded-full border-[2.5px] border-[#1d1d1f] bg-white align-middle text-foreground hover:bg-[#fff3b0]"
         >
           <RotateCcw size={20} strokeWidth={2.5} aria-hidden />
         </motion.button>
@@ -349,8 +381,8 @@ function WordPicker<T extends string>({
         aria-controls={`works-${id}-list`}
         aria-label={`${label} 고르기, 지금 ${current.label}`}
         onClick={() => onOpenChange(!open)}
-        className={`mx-0.5 inline-flex items-center gap-1 rounded-t-md border-b-2 border-dashed px-2 align-baseline transition-[background-color,border-color,transform] duration-150 active:scale-[0.97] motion-reduce:active:scale-100 ${
-          value ? "border-accent bg-accent-surface text-accent-hover" : "border-[#6d7882] text-foreground hover:bg-surface"
+        className={`mx-0.5 inline-flex items-center gap-1 rounded-[6px] border-b-[3px] border-[#1d1d1f] px-2 align-baseline transition-[background-color,transform] duration-150 active:scale-[0.97] motion-reduce:active:scale-100 ${
+          value ? "bg-[#fff3b0] text-foreground" : "text-foreground hover:bg-[#fff3b0]/70"
         }`}
       >
         <RollingText text={current.label} dir={prev.dir} />
@@ -373,7 +405,7 @@ function WordPicker<T extends string>({
             animate={reduce ? { opacity: 1 } : { opacity: 1, transform: "translateY(0px) scale(1)" }}
             exit={{ opacity: 0, transition: { duration: 0.12 } }}
             transition={{ duration: 0.18, ease: EASE_OUT }}
-            className="absolute top-full left-0 z-20 mt-2 flex w-full max-w-[640px] origin-top-left flex-wrap gap-2 rounded-[10px] border border-border bg-white p-4 text-[17px] font-normal leading-[1.5] tracking-normal shadow-[0_8px_24px_rgba(30,33,36,0.12)]"
+            className="absolute top-full left-0 z-20 mt-3 flex w-full max-w-[640px] origin-top-left flex-wrap gap-2 rounded-[6px] border-[3px] border-[#1d1d1f] bg-[#fffdf8] p-4 text-[17px] font-normal leading-[1.5] tracking-normal shadow-[5px_5px_0_#1d1d1f]"
           >
             {options.map((o) => {
               const selected = o.value === value;
@@ -389,8 +421,8 @@ function WordPicker<T extends string>({
                     onChange(o.value);
                     close();
                   }}
-                  className={`inline-flex h-10 items-center gap-1.5 rounded-md border px-3 transition-[background-color,border-color,transform] duration-150 active:scale-[0.97] disabled:cursor-not-allowed disabled:border-transparent disabled:text-foreground-tertiary disabled:line-through motion-reduce:active:scale-100 ${
-                    selected ? "border-accent bg-accent font-bold text-accent-foreground" : "border-border hover:bg-surface"
+                  className={`inline-flex h-10 items-center gap-1.5 rounded-full border-[2.5px] px-3.5 font-bold transition-[background-color,border-color,transform] duration-150 active:scale-[0.97] disabled:cursor-not-allowed disabled:border-transparent disabled:font-normal disabled:text-foreground-tertiary disabled:line-through motion-reduce:active:scale-100 ${
+                    selected ? "border-[#1d1d1f] bg-accent text-accent-foreground" : "border-[#1d1d1f] bg-white hover:bg-[#fff3b0]"
                   }`}
                 >
                   {selected && <Check size={16} strokeWidth={3} aria-hidden />}
