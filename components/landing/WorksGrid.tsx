@@ -58,7 +58,7 @@ export function WorksGrid({ projects }: { projects: Project[] }) {
               </p>
               <h3 className="mt-1 text-[19px] font-bold leading-[1.5]">{w.title}</h3>
               <div className="mt-auto flex items-end justify-between gap-3 pt-6">
-                <Link href={w.demoUrl.replace("/demo/", "/sample/")} prefetch={false} data-gtm-cta={`demo_open_${w.id}`} className={secondaryButton}>
+                <Link href={w.demoUrl.replace("/demo/", "/sample/")} prefetch={false} data-gtm-cta={`demo_open_${w.id}`} className={`${secondaryButton} shrink-0 whitespace-nowrap`}>
                   샘플 보기
                 </Link>
                 <PlanPrice projectId={w.id} />
@@ -75,10 +75,12 @@ export function WorksGrid({ projects }: { projects: Project[] }) {
 function PlanPrice({ projectId }: { projectId: string }) {
   const est = estimateFor(projectId);
   return (
-    <p className="text-right leading-[1.4]">
-      <span className="block text-[15px] text-foreground-secondary">{est ? "예상 금액" : "업무 프로그램"}</span>
-      {est && est.discount > 0 && <s className="mr-1.5 text-[15px] tabular-nums text-foreground-tertiary">{manwon(est.list)}</s>}
-      <span className="text-[19px] font-bold tabular-nums">{est ? manwon(est.total) : "별도 견적"}</span>
+    <p className="min-w-0 text-right leading-[1.4]">
+      <span className="block whitespace-nowrap text-[15px] text-foreground-secondary">
+        {est ? "예상 금액" : "업무 프로그램"}
+        {est && est.discount > 0 && <s className="ml-1.5 tabular-nums text-foreground-tertiary">{manwon(est.list)}</s>}
+      </span>
+      <span className="whitespace-nowrap text-[19px] font-bold tabular-nums">{est ? manwon(est.total) : "별도 견적"}</span>
     </p>
   );
 }
