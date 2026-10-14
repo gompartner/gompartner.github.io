@@ -312,7 +312,7 @@ export const projects: Project[] = [
     description: "가죽 공방 원데이 클래스 신청 랜딩페이지. 네이버폼, 계좌이체 확인, 카톡 변경 요청을 한 페이지로 합쳤습니다. 회차별 남은 자리, 자동 마감과 대기 신청, 카드·계좌 결제, 예약 번호로 날짜 변경·취소, 사장님용 신청자 표.",
     features: ["회차 신청·남은 자리", "자동 마감·대기 신청", "카드·계좌 결제", "예약 변경·취소", "신청자 표·결제 상태"],
     imageUrl: "/images/demos/landing-leather-class.jpg",
-    imageAlt: "웹툰 컷으로 시작하는 가죽 공방 원데이 클래스 신청 랜딩페이지 첫 화면",
+    imageAlt: "크라프트지 바탕에 가죽 카드지갑 그림을 둔 가죽 공방 원데이 클래스 신청 랜딩페이지 첫 화면",
     demoUrl: "/demo/landing-leather-class",
   },
   {
@@ -372,7 +372,7 @@ export const projects: Project[] = [
     description: "광고 중인 꽃집 홈페이지에서 휴대폰 예약 버튼이 안 눌리는 날의 오류 수정. 증상과 화면 캡처로 접수하고, 원인 확인과 금액 동의, 수리, 확인까지 진행 상황을 보고, 고치기 전후 화면과 수리 보고서를 받습니다.",
     features: ["긴급 수리 접수·캡처 첨부", "진행 상황 타임라인", "금액 동의 후 수리", "전후 화면 비교", "수리 보고서"],
     imageUrl: "/images/demos/maintenance-urgent-fix.jpg",
-    imageAlt: "웹툰 컷으로 시작하는 급한 오류 수정 접수 화면",
+    imageAlt: "오늘 접수 목록과 처리 상태가 보이는 홈페이지 오류 수리 접수 화면",
     demoUrl: "/demo/maintenance-urgent-fix",
   },
   {

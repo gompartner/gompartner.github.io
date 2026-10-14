@@ -11,6 +11,8 @@ export type Scene =
   | { t: "bear"; text: string }
   /** 곰 그림 컷. text는 컷 위 곰의 말 */
   | { t: "cut"; img: BearImg; text?: string }
+  /** 의뢰인 쪽 장면 그림 컷(public 경로). note는 컷 왼쪽 위 내레이션, text는 컷 위 말풍선 */
+  | { t: "pic"; src: string; alt: string; note?: string; text?: string }
   /** 샘플 화면 컷. tours[샘플id][step] 영역을 휴대폰 폭으로 캡처한 그림. text는 화면 아래 설명 한 줄 */
   | { t: "shot"; step: number; text?: string };
 

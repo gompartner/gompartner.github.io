@@ -87,6 +87,22 @@ function SceneView({ s, slug, client, shotOk, cont }: { s: Scene; slug: string; 
           <Image src={`/images/webtoon/${s.img}.jpg`} alt="" width={900} height={900} sizes="(min-width: 768px) 660px, 100vw" className={`aspect-[16/10] h-auto w-full object-cover object-[50%_35%] ${s.text ? "border-t-[3px] border-[#1d1d1f]" : ""}`} />
         </figure>
       );
+    case "pic":
+      return (
+        <figure className="my-2 overflow-hidden border-[3px] border-[#1d1d1f] bg-[#fffdf8]">
+          {s.text && (
+            <figcaption className="flex justify-center px-3 pb-5 pt-4">
+              <Bubble tail="bottom-left" className="max-w-[90%] text-[16px] md:text-[17px]">
+                {s.text}
+              </Bubble>
+            </figcaption>
+          )}
+          <div className={`relative ${s.text ? "border-t-[3px] border-[#1d1d1f]" : ""}`}>
+            <Image src={s.src} alt={s.alt} width={900} height={900} sizes="(min-width: 768px) 660px, 100vw" className="aspect-[16/11] h-auto w-full object-cover object-[50%_40%]" />
+            {s.note && <Narration className="absolute left-3 top-3">{s.note}</Narration>}
+          </div>
+        </figure>
+      );
     case "shot":
       if (!shotOk(s.step)) return s.text ? <Narration>{s.text}</Narration> : null;
       return (
