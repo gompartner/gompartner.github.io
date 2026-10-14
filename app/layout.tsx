@@ -49,10 +49,10 @@ export const metadata: Metadata = {
     description: siteDescription,
     images: [
       {
-        url: "/og-image.png?v=20261008b",
+        url: "/og-image.png?v=20261014",
         width: 1200,
         height: 630,
-        alt: `${profile.name} 홈페이지·업무 프로그램 제작`,
+        alt: `${profile.name} 랜딩페이지·홈페이지·유지보수·업무 프로그램`,
       },
     ],
   },
@@ -60,7 +60,7 @@ export const metadata: Metadata = {
     card: "summary_large_image",
     title: siteTitle,
     description: siteDescription,
-    images: ["/og-image.png?v=20261008b"],
+    images: ["/og-image.png?v=20261014"],
   },
   verification: {
     other: { "naver-site-verification": ["1c5242ef5ddbce4e807bad7225bb0770a1cb06c1", "184bef35395b609c58d44964bf16993e76c0dd50"] },
