@@ -89,8 +89,9 @@ function SceneView({ s, slug, client, shotOk, cont }: { s: Scene; slug: string; 
       if (!shotOk(s.step)) return s.text ? <Narration>{s.text}</Narration> : null;
       return (
         <figure className="my-2 border-[3px] border-[#1d1d1f] bg-[radial-gradient(rgba(29,29,31,.12)_1.2px,transparent_1.3px)] bg-[length:12px_12px] px-4 py-6 md:px-8">
-          <div className="mx-auto max-w-[360px] overflow-hidden rounded-[18px] border-[3px] border-[#1d1d1f] bg-white shadow-[4px_4px_0_#1d1d1f]">
-            <Image src={`/images/sample-cuts/${slug}-${s.step}.jpg`} alt={s.text ?? ""} width={780} height={1440} sizes="360px" className="h-auto w-full" />
+          <div className="mx-auto max-w-[360px] rounded-[18px] border-[3px] border-[#1d1d1f] bg-white p-2.5 shadow-[4px_4px_0_#1d1d1f]">
+            {/* 화면 속 버튼·테두리가 먹선에 붙어 보이지 않게 안쪽 여백을 두고, 캡처는 옅은 선으로 따로 둘렀다 */}
+            <Image src={`/images/sample-cuts/${slug}-${s.step}.jpg`} alt={s.text ?? ""} width={780} height={1440} sizes="360px" className="h-auto w-full rounded-[10px] border border-[#1d1d1f]/15" />
           </div>
           {s.text && <figcaption className="mx-auto mt-4 w-fit max-w-full border-[3px] border-[#1d1d1f] bg-[#fff3b0] px-3.5 py-1.5 text-[15px] font-bold leading-[1.5] md:text-[16px]">{s.text}</figcaption>}
         </figure>
