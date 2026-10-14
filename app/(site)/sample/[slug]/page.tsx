@@ -173,6 +173,7 @@ export default async function SamplePage({ params }: Props) {
               비슷하게 만들면
             </h2>
             <p className="mt-1 flex items-baseline gap-3">
+              {est.discount > 0 && <s className="text-[18px] font-bold tabular-nums text-foreground-tertiary">{manwon(est.list)}</s>}
               <span className="text-[30px] font-bold tabular-nums text-accent md:text-[36px]">{manwon(est.total)}</span>
               <span className="text-[17px] font-bold">작업 {est.days}일</span>
             </p>
@@ -187,6 +188,12 @@ export default async function SamplePage({ params }: Props) {
                   <dd className="tabular-nums">{formatWon(l.amount)}</dd>
                 </div>
               ))}
+              {est.discount > 0 && (
+                <div className="flex justify-between gap-3 py-2 font-bold text-accent">
+                  <dt>샘플 기능 재사용 할인</dt>
+                  <dd className="tabular-nums">-{formatWon(est.discount)}</dd>
+                </div>
+              )}
             </dl>
           </>
         ) : (

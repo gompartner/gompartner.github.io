@@ -135,28 +135,36 @@ const estimateSource: Record<string, { plan: PlanId | LandingPlanId; extras: Ext
   "landing-coding-camp": { plan: "landing-standard", extras: [] },
   "landing-move-clean": { plan: "landing-premium", extras: [] }, // 견적 계산기
   "clinic-homepage": { plan: "standard", extras: [["page", 5]] },
-  "dental-homepage": { plan: "premium", extras: [["page", 5]] }, // 증상 자가체크
-  pharmacy: { plan: "premium", extras: [["print"]] }, // 처방전 미리 보내기
-  "law-firm": { plan: "premium", extras: [["board"]] }, // 사건별 절차 안내
-  "tax-office": { plan: "premium", extras: [["board", 2]] }, // 신고일정
+  "dental-homepage": { plan: "standard", extras: [["tool"], ["page", 5]] }, // 증상 자가체크
+  pharmacy: { plan: "standard", extras: [["print"]] }, // 처방전 미리 보내기는 문의 폼으로
+  "law-firm": { plan: "standard", extras: [["board"]] }, // 사건별 절차 안내
+  "tax-office": { plan: "standard", extras: [["board", 2]] }, // 신고일정
   "real-estate": { plan: "premium", extras: [["map"], ["tool"]] }, // 매물검색
   pension: { plan: "premium", extras: [["page", 3]] }, // 실시간예약
   "private-gym": { plan: "premium", extras: [["map"], ["pay"]] }, // 지점·시간 예약
   "korean-restaurant": { plan: "basic", extras: [] }, // 기본 패키지 범위 그대로
   interior: { plan: "standard", extras: [] }, // 표준 패키지 범위 그대로(시공사례·공지 직접 올리기)
-  academy: { plan: "premium", extras: [["tool"], ["board"]] }, // 반 찾기·시간표
-  "pilates-studio": { plan: "premium", extras: [["tool"]] }, // 시간표 예약
-  "hanok-cafe": { plan: "premium", extras: [["tool"]] }, // 좌석 예약
-  "bakery-cafe": { plan: "premium", extras: [["tool"]] }, // 픽업 주문
+  academy: { plan: "standard", extras: [["tool"], ["board"]] }, // 반 찾기·시간표
+  "pilates-studio": { plan: "standard", extras: [["tool"]] }, // 시간표·레슨 추천
+  "hanok-cafe": { plan: "standard", extras: [["tool"]] }, // 메뉴 찾기·공간 예약
+  "bakery-cafe": { plan: "standard", extras: [["tool", 2]] }, // 빵 나오는 시간·픽업 예약
   company: { plan: "standard", extras: [["lang"], ["page", 5], ["tool"]] }, // 가공 가능 범위
-  "cert-lab": { plan: "premium", extras: [["tool", 2], ["board"], ["page", 10]] }, // 시험진행현황 조회
-  "flower-expo": { plan: "premium", extras: [["page", 10]] }, // 관람요금 계산
+  "cert-lab": { plan: "premium", extras: [] }, // 시험진행현황 조회
+  "flower-expo": { plan: "basic", extras: [["tool"]] }, // 한 페이지 안내+관람요금 계산
   "online-store": { plan: "premium", extras: [["cart"], ["pay"], ["member"]] }, // 유약 색·각인 미리보기
 };
+
+/** 샘플에 이미 있는 기능은 다시 쓰므로 추가 기능 금액을 절반만 받는다. */
+export const sampleReuseRate = 0.5;
 
 export interface Estimate {
   plan: Plan;
   lines: { name: string; amount: number }[];
+  /** 패키지+추가 기능 정가 합계 */
+  list: number;
+  /** 샘플 기능 재사용 할인 금액 */
+  discount: number;
+  /** 실제 제공가(정가에서 할인을 뺀 값) */
   total: number;
   days: number;
 }
@@ -165,15 +173,16 @@ export function estimateFor(projectId: string): Estimate | null {
   const src = estimateSource[projectId];
   const plan = src && [...plans, ...landingPlans].find((p) => p.id === src.plan);
   if (!src || !plan) return null;
-  let total = plan.price;
+  let list = plan.price;
   let days = plan.days;
   const lines = src.extras.map(([id, qty = 1]) => {
     const a = addons.find((x) => x.id === id)!;
-    total += a.price * qty;
+    list += a.price * qty;
     days += a.days * qty;
     return { name: qty > 1 ? `${a.name} ${qty}${a.unit}` : a.name, amount: a.price * qty };
   });
-  return { plan, lines, total, days: Math.ceil(days) };
+  const discount = Math.round(lines.reduce((s, l) => s + l.amount, 0) * sampleReuseRate);
+  return { plan, lines, list, discount, total: list - discount, days: Math.ceil(days) };
 }
 
 export const manwon = (n: number) => `${(n / 10_000).toLocaleString("ko-KR", { maximumFractionDigits: 1 })}만 원`;

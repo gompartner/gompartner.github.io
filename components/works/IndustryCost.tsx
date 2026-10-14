@@ -70,7 +70,10 @@ export function IndustryCost({ industry, projects }: { industry: Industry; proje
                     <span className="mt-0.5 block text-[14px] font-normal text-foreground-secondary md:hidden">{features(est)}</span>
                   </th>
                   <td className="hidden px-4 py-3 text-foreground-secondary md:table-cell">{features(est)}</td>
-                  <td className="whitespace-nowrap px-3 py-3 text-right md:px-4 font-bold">{manwon(est.total)}</td>
+                  <td className="whitespace-nowrap px-3 py-3 text-right md:px-4 font-bold">
+                    {est.discount > 0 && <s className="mr-1.5 hidden font-normal text-foreground-tertiary md:inline">{manwon(est.list)}</s>}
+                    {manwon(est.total)}
+                  </td>
                   <td className="whitespace-nowrap px-3 py-3 text-right md:px-4">{est.days}일</td>
                 </tr>
               ))}
