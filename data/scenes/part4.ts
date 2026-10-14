@@ -46,6 +46,28 @@ export const part4: Record<string, SampleScenario> = {
       { t: "cut", img: "bear-point", text: "한 달 일이 이 화면 하나에 다 있어요." },
     ],
   },
+  "maintenance-urgent-fix": {
+    client: "꽃집 사장님",
+    scenes: [
+      { t: "note", text: "어떤 고민" },
+      { t: "client", text: "어버이날 광고를 켰는데 예약이 하나도 안 들어와요." },
+      { t: "client", text: "휴대폰에서 예약 버튼이 안 눌린대요. 만든 업체는 전화를 안 받고요." },
+      { t: "bear", text: "주소랑 화면 캡처부터 보내 주세요. 원인 보고 금액 먼저 말씀드릴게요." },
+      { t: "note", text: "기획 의도" },
+      { t: "cut", img: "bear-think", text: "급한 수리일수록 지금 어디까지 됐는지가 궁금해요." },
+      { t: "bear", text: "그래서 접수, 확인과 금액 안내, 동의, 작업, 기록을 한 줄로 보여 드려요." },
+      { t: "client", text: "동의 안 하면요?" },
+      { t: "bear", text: "동의 전에는 손대지 않아요. 그 칸에서 멈춰 있어요." },
+      { t: "note", text: "만드는 중" },
+      { t: "cut", img: "bear-research", text: "원인은 휴대폰에서만 버튼을 덮던 상담 띠였어요. PC에선 안 겹쳐서 몰랐던 거예요." },
+      { t: "shot", step: 0, text: "증상을 고르고 화면 캡처를 붙여 접수해요." },
+      { t: "shot", step: 1, text: "단계마다 곰파트너가 남긴 말과 다음에 누를 버튼이 보여요." },
+      { t: "shot", step: 2, text: "고치기 전과 뒤 화면에서 예약하기를 직접 눌러 봐요." },
+      { t: "shot", step: 3, text: "원인, 고친 내용, 확인한 화면, 금액이 보고서로 남아요." },
+      { t: "client", text: "다음에 또 이러면 이 보고서부터 보면 되겠네요." },
+      { t: "cut", img: "bear-point", text: "오류 수정은 건당 5만 원부터예요." },
+    ],
+  },
   "district-portal": {
     client: "주무관님",
     scenes: [

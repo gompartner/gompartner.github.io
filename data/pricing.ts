@@ -137,6 +137,7 @@ const estimateSource: Record<string, { plan: PlanId | LandingPlanId; extras: Ext
   "landing-popup-store": { plan: "landing-premium", extras: [["tool", 2]] }, // 회차 발권, 더해서 현장 웨이팅·돌림판 쿠폰
   "landing-stamp-tour": { plan: "landing-premium", extras: [["tool", 2]] }, // 스탬프 투어, 더해서 해설사 회차 예약·코스 선택 지도
   "landing-zine-fair": { plan: "landing-premium", extras: [["tool", 2]] }, // 입장 회차 등록, 더해서 셀러 필터·부스 지도, 미리 담기
+  "landing-leather-class": { plan: "landing-premium", extras: [["pay"], ["tool"]] }, // 회차 신청·자동 마감, 더해서 결제 연동·예약 변경 조회
   "clinic-homepage": { plan: "standard", extras: [["page", 5]] },
   "dental-homepage": { plan: "standard", extras: [["tool"], ["page", 5]] }, // 증상 자가체크
   pharmacy: { plan: "standard", extras: [["print"]] }, // 처방전 미리 보내기는 문의 폼으로

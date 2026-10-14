@@ -40,6 +40,8 @@ const LandingMoveCleanDemo = dynamic(() => import("@/components/demos/LandingMov
 const LandingPopupStoreDemo = dynamic(() => import("@/components/demos/LandingPopupStoreDemo").then((m) => m.LandingPopupStoreDemo));
 const LandingStampTourDemo = dynamic(() => import("@/components/demos/LandingStampTourDemo").then((m) => m.LandingStampTourDemo));
 const LandingZineFairDemo = dynamic(() => import("@/components/demos/LandingZineFairDemo").then((m) => m.LandingZineFairDemo));
+const LandingLeatherClassDemo = dynamic(() => import("@/components/demos/LandingLeatherClassDemo").then((m) => m.LandingLeatherClassDemo));
+const MaintenanceUrgentFixDemo = dynamic(() => import("@/components/demos/MaintenanceUrgentFixDemo").then((m) => m.MaintenanceUrgentFixDemo));
 const LandingWaterRentalDemo = dynamic(() => import("@/components/demos/LandingWaterRentalDemo").then((m) => m.LandingWaterRentalDemo));
 const ShopAdminDemo = dynamic(() => import("@/components/demos/ShopAdminDemo").then((m) => m.ShopAdminDemo));
 
@@ -64,6 +66,7 @@ const demoComponents: Record<string, ComponentType> = {
   "landing-popup-store": LandingPopupStoreDemo,
   "landing-stamp-tour": LandingStampTourDemo,
   "landing-zine-fair": LandingZineFairDemo,
+  "landing-leather-class": LandingLeatherClassDemo,
   pharmacy: PharmacyDemo,
   "online-store": OnlineStoreDemo,
   pension: PensionDemo,
@@ -75,6 +78,7 @@ const demoComponents: Record<string, ComponentType> = {
   "community-map": CommunityMapDemo,
   "program-application": ApplicationDemo,
   "maintenance-dashboard": MaintenanceDemo,
+  "maintenance-urgent-fix": MaintenanceUrgentFixDemo,
   "retirement-calculator": RetirementDemo,
   "job-portal": JobPortalDemo,
   "accessibility-review": AccessibilityDemo,

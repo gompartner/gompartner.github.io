@@ -114,6 +114,11 @@ export const tours: Record<string, TourStep[]> = {
     { target: "#zf-map", title: "부스 지도", desc: "부스를 누르면 그 셀러가 열립니다." },
     { target: "#zf-wish", title: "미리 담기", desc: "하트로 담은 진을 도는 순서대로 정리합니다." },
   ],
+  "landing-leather-class": [
+    { target: "#lc-apply", title: "수업 신청", desc: "회차를 고르세요. 남은 자리가 0이면 대기 신청으로 바뀝니다." },
+    { target: "#lc-change", title: "예약 확인·변경", desc: "예약 번호로 찾아 날짜를 바꾸거나 취소해 보세요. 환불 금액이 같이 나옵니다." },
+    { target: "#lc-owner", title: "사장님 화면", desc: "회차를 누르면 신청자와 결제 상태, 변경 이력이 보입니다." },
+  ],
   "landing-coding-camp": [
     { target: "#curriculum", title: "커리큘럼", desc: "주차를 누르면 그 주에 쌓을 블록이 보입니다." },
     { target: "#apply", title: "신청", desc: "학년을 고르면 맞는 반만 남습니다." },
@@ -137,6 +142,12 @@ export const tours: Record<string, TourStep[]> = {
   ],
   "maintenance-dashboard": [
     { target: '[aria-label="수정 요청 목록"]', title: "유지보수 요청", desc: "요청을 눌러 처리하세요." },
+  ],
+  "maintenance-urgent-fix": [
+    { target: "#uf-intake", title: "긴급 수리 접수", desc: "증상을 고르고 화면 캡처를 붙여 접수하세요." },
+    { target: "#uf-timeline", title: "진행 상황", desc: "접수하면 단계가 하나씩 넘어갑니다. 금액에 동의해야 수리가 시작됩니다." },
+    { target: "#uf-compare", title: "고치기 전과 뒤", desc: "두 화면에서 예약하기를 눌러 보세요." },
+    { target: "#uf-report", title: "수리 보고서", desc: "원인과 고친 내용이 단계마다 채워집니다." },
   ],
   "district-portal": [
     { target: "#staff-search", title: "담당자 찾기", desc: "업무나 부서 이름으로 찾으세요." },
