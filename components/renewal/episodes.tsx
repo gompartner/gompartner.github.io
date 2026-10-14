@@ -335,7 +335,7 @@ export function MaintenanceEpisode() {
   ];
   return (
     <>
-      <Panel img="/images/webtoon/cafe-broken-5.jpg" alt="손님이 기다리는데 태블릿에 오류 화면이 떠서 당황한 베이커리 사장님">
+      <Panel img="/images/webtoon/cafe-broken-6.jpg" alt="손님이 기다리는데 태블릿에 오류 화면이 떠서 당황한 베이커리 사장님">
         <Narration className="absolute left-3 top-3">토요일 오전 10시</Narration>
         <Bubble className="absolute bottom-4 right-4" tail="top-left">
           예약 받는 날인데 화면이 안 열려요!
