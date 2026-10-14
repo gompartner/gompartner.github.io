@@ -64,7 +64,7 @@ export function Header() {
           className="flex items-center gap-2 font-[family-name:var(--font-sfx)] text-[22px] text-foreground"
           aria-label="맨 위로 이동"
         >
-          <Image src="/images/bear-avatar.webp" alt="" width={34} height={34} className="h-[34px] w-[34px] rounded-full border-2 border-[#1d1d1f] bg-[#fffdf8] object-cover" preload />
+          <Image src="/images/logo.svg" alt="" width={26} height={26} className="h-[26px] w-[26px]" preload />
           {profile.name}
         </Link>
 
