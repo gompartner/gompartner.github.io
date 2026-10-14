@@ -43,7 +43,7 @@ export const part3: Record<string, SampleScenario> = {
       { t: "shot", step: 1, text: "밑줄 친 말을 바꾸면 맞는 차가 나와요." },
       { t: "shot", step: 2, text: "단계를 누르면 약도에 그 경로가 같이 표시돼요." },
       { t: "client", text: "골목 들어오는 길까지 보이니까 전화가 덜 오겠어요." },
-      { t: "cut", img: "bear-point", text: "길 안내는 약도랑 같이 움직여요." },
+      { t: "cut", img: "bear-point", text: "골목길도 약도 보면서 찾아오시면 돼요." },
     ],
   },
 
@@ -132,7 +132,7 @@ export const part3: Record<string, SampleScenario> = {
       { t: "note", text: "이렇게 만들었어요" },
       { t: "shot", step: 0, text: "평수를 움직이고 더할 작업을 고르면 금액, 인원, 시간이 나와요." },
       { t: "shot", step: 1, text: "계산한 조건이 신청 폼에 그대로 들어가요." },
-      { t: "bear", text: "같은 걸 두 번 고르게 하면 거기서 나가요. 그래서 그대로 넘겼어요." },
+      { t: "bear", text: "신청서에서 또 고르게 하면 손님이 귀찮아해요. 그래서 고른 그대로 넘어가게 했어요." },
       { t: "client", text: "견적 묻다 끝나는 전화는 줄겠네요." },
       { t: "cut", img: "bear-point", text: "청소 전후 비교랑 구역별 체크리스트도 있어요." },
     ],

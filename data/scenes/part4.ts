@@ -6,9 +6,9 @@ export const part4: Record<string, SampleScenario> = {
     client: "담당자님",
     scenes: [
       { t: "note", text: "어떤 고민" },
-      { t: "client", text: "공고는 많은데 찾는 사람들이 자꾸 길을 잃어요." },
+      { t: "client", text: "공고는 많은데 원하는 공고를 못 찾고 헤매요." },
       { t: "client", text: "마감이 언제인지도 하나하나 눌러 봐야 알고요." },
-      { t: "bear", text: "찾는 길을 짧게 하고, 마감은 목록에서 바로 보이게 해 볼게요." },
+      { t: "bear", text: "원하는 공고를 몇 번 안 눌러도 찾게 하고, 마감일은 목록에서 바로 보이게 할게요." },
       { t: "note", text: "기획 의도" },
       { t: "cut", img: "bear-think", text: "공고는 서로 비교하며 보는 거라 카드보다 표가 나아요." },
       { t: "bear", text: "그래서 결과를 표로 바꾸고, 줄마다 마감 D-day를 붙였어요." },
@@ -65,7 +65,7 @@ export const part4: Record<string, SampleScenario> = {
       { t: "bear", text: "웹접근성 점검에서 꼭 보는 항목이에요." },
       { t: "bear", text: "구정소식은 게시판으로 따로 모았어요." },
       { t: "client", text: "대표번호로 오는 전화가 좀 줄겠네요." },
-      { t: "cut", img: "bear-point", text: "찾는 사람이 바로 담당자에게 닿게요." },
+      { t: "cut", img: "bear-point", text: "업무 이름만 알면 담당자를 바로 찾아요." },
     ],
   },
   "program-application": {
