@@ -163,8 +163,8 @@ export const part3: Record<string, SampleScenario> = {
       { t: "shot", step: 0, text: "회차를 고르면 남은 자리가 보여요. 결제까지 같은 화면에서 끝나요." },
       { t: "shot", step: 1, text: "예약 번호와 휴대폰 뒷자리로 찾아서 날짜를 바꾸거나 취소해요." },
       { t: "shot", step: 2, text: "사장님은 회차별 신청자와 결제 상태, 변경 이력을 한 표로 봐요." },
+      { t: "bear", text: "카톡으로 오던 변경 요청도 이 표에 쌓여요." },
       { t: "pic", src: "/images/demo-landing-leather-class/calm.jpg", alt: "수강생으로 꽉 찬 작업대 앞에서 태블릿을 들고 웃는 사장님", note: "다음 토요일", text: "전화가 안 와요. 좀 이상할 만큼요." },
-      { t: "cut", img: "bear-point", text: "카톡으로 오던 변경 요청이 이 표에 쌓여요." },
     ],
   },
 
