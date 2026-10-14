@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import { PricingSection } from "@/components/landing/PricingSection";
 import { ProcessSteps } from "@/components/landing/ProcessSteps";
+import { PriceCalculator } from "@/components/renewal/PriceCalculator";
 import { plans, formatWon } from "@/data/pricing";
 
 export const metadata: Metadata = {
@@ -13,6 +14,7 @@ export default function PricingPage() {
   return (
     <>
       <PricingSection heading="h1" />
+      <PriceCalculator />
       <ProcessSteps title="제작 진행 절차" />
     </>
   );
