@@ -51,7 +51,7 @@ export function Header() {
   return (
     <header
       className={cn(
-        "fixed top-0 left-0 right-0 z-50 border-b-[3px] border-[#1d1d1f] bg-[#f3ece0]/95 backdrop-blur transition-shadow duration-200",
+        "fixed top-0 left-0 right-0 z-50 border-b-[3px] border-[#1d1d1f] bg-[#f3ece0] transition-shadow duration-200",
         (isScrolled || menuOpen) && "shadow-[0_3px_0_rgba(29,29,31,.12)]"
       )}
     >
