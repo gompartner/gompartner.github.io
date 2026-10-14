@@ -46,7 +46,7 @@ export function PricingSection({
                 <div className="flex items-center justify-between gap-3 border-b-[3px] border-[#1d1d1f] bg-[#fff3b0] px-5 py-3">
                   <p className="text-[17px] font-bold">{plan.title}</p>
                   <p className="shrink-0 text-[15px] font-bold">
-                    {plan.name !== plan.title && `${plan.name}, `}
+                    {plan.name !== plan.title && `${plan.name} · `}
                     {plan.days}일
                   </p>
                 </div>
@@ -101,7 +101,7 @@ export function PricingSection({
         {crossRow && (
         <div className="mt-8 flex flex-col gap-3 border-[3px] border-[#1d1d1f] bg-white px-5 py-4 md:flex-row md:items-center md:gap-8 md:px-6">
           <p className="shrink-0 text-[17px] font-bold">
-            {landingFirst ? "회사, 가게 홈페이지" : "광고 랜딩페이지"} <span className="tabular-nums text-accent">{manwon(rowPlans[0].price)}</span>부터
+            {landingFirst ? "회사·가게 홈페이지" : "광고 랜딩페이지"} <span className="tabular-nums text-accent">{manwon(rowPlans[0].price)}</span>부터
           </p>
           <ul className="flex flex-wrap gap-x-6 gap-y-1 text-[16px] md:text-[17px]">
             {rowPlans.map((plan) => {
@@ -109,7 +109,7 @@ export function PricingSection({
               const p = sample && projects.find((x) => x.id === sample.id);
               const label = (
                 <>
-                  {plan.title} <span className="tabular-nums text-foreground-secondary">{manwon(plan.price)}, {plan.days}일</span>
+                  {plan.title} <span className="tabular-nums text-foreground-secondary">{manwon(plan.price)} · {plan.days}일</span>
                 </>
               );
               return (

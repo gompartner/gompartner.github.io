@@ -94,22 +94,22 @@ const SIDES: { title: string; rows: Row[] }[] = [
     ],
   },
   {
-    title: "추가 메뉴, 주류",
+    title: "추가·주류",
     rows: [
       { name: "공기밥", price: "1,000" },
       { name: "고기 추가", price: "4,000" },
       { name: "계란후라이 (2개)", price: "2,000" },
-      { name: "소주, 맥주", price: "5,000" },
+      { name: "소주·맥주", price: "5,000" },
       { name: "막걸리", price: "4,000" },
     ],
   },
 ];
 
 const ORIGIN = [
-  ["쇠고기(사골, 양지)", "국내산 한우"],
+  ["쇠고기(사골·양지)", "국내산 한우"],
   ["돼지고기", "국내산"],
   ["쌀", "국내산"],
-  ["배추김치", "배추, 고춧가루 국내산"],
+  ["배추김치", "배추·고춧가루 국내산"],
   ["고등어", "국내산"],
   ["순대", "돼지 창자 국내산"],
 ] as const;
@@ -354,7 +354,7 @@ function Hero({ onMenu }: { onMenu: () => void }) {
       </div>
       <div>
         <p className="text-[16px] font-semibold" style={{ color: C.red }}>
-          ㅁㅍ구 ㅇㄴ동 국밥, 백반
+          ㅁㅍ구 ㅇㄴ동 국밥·백반
         </p>
         <h1 id="hansik-title" className="mt-2 text-[40px] font-bold leading-[1.2] tracking-[-0.03em] sm:text-[52px]">
           {STORE}
@@ -412,7 +412,7 @@ function About() {
           <ul className="grid gap-x-8 gap-y-3 border-t pt-6 text-[16px] sm:grid-cols-2" style={{ borderColor: C.line }}>
             <li className="flex gap-3">
               <span className="w-[5.5em] shrink-0 font-semibold">국물</span>
-              <span style={{ color: C.muted }}>사골과 양지 12시간</span>
+              <span style={{ color: C.muted }}>사골·양지 12시간</span>
             </li>
             <li className="flex gap-3">
               <span className="w-[5.5em] shrink-0 font-semibold">김치</span>
@@ -604,7 +604,7 @@ function Hours() {
             <dt className="font-semibold">라스트오더</dt>
             <dd>마감 30분 전</dd>
             <dt className="font-semibold">정기휴무</dt>
-            <dd>매주 월요일, 설날, 추석 당일</dd>
+            <dd>매주 월요일, 설·추석 당일</dd>
           </dl>
         </div>
 
@@ -767,7 +767,7 @@ function Footer() {
           전화 {TEL}
         </p>
         <p className="mt-6 text-[14px]" style={{ color: "#a39a8c" }}>
-          {STORE}
+          © {STORE}
         </p>
       </div>
     </footer>

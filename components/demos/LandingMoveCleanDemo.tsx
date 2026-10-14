@@ -54,11 +54,11 @@ const TYPES: { id: HomeType; label: string; perPy: number }[] = [
 ];
 
 const OPTIONS: { id: OptId; label: string; price: (py: number) => number; note: string; zone: string }[] = [
-  { id: "veranda", label: "베란다, 발코니", price: () => 30_000, note: "3만 원", zone: "veranda" },
+  { id: "veranda", label: "베란다·발코니", price: () => 30_000, note: "3만 원", zone: "veranda" },
   { id: "air", label: "새집증후군 케어", price: (py) => py * 3_000, note: "평당 3천 원", zone: "all" },
   { id: "mold", label: "욕실 곰팡이 제거", price: () => 50_000, note: "5만 원", zone: "bath" },
   { id: "grout", label: "줄눈 오염 제거", price: () => 40_000, note: "4만 원", zone: "bath" },
-  { id: "builtin", label: "붙박이장, 냉장고장 안쪽", price: () => 30_000, note: "3만 원", zone: "room" },
+  { id: "builtin", label: "붙박이장·냉장고장 안쪽", price: () => 30_000, note: "3만 원", zone: "room" },
 ];
 
 const MIN_PRICE = 200_000;
@@ -76,16 +76,16 @@ function estimate(type: HomeType, py: number, opts: OptId[], lived: boolean) {
 const won = (n: number) => `${n.toLocaleString("ko-KR")}원`;
 
 const ZONES: Record<string, string[]> = {
-  "거실과 방": ["바닥 먼지 흡입 후 물걸레 두 번", "걸레받이, 문틀, 문짝 닦기", "스위치와 콘센트 커버 닦기", "붙박이장 겉면과 선반", "천장 등 커버 먼지 털기"],
-  주방: ["싱크볼과 수전 물때 제거", "상부장, 하부장 안쪽 닦기", "후드 필터 기름때 제거", "인덕션, 가스레인지 상판", "타일 벽 실리콘 주변"],
-  욕실: ["변기 안쪽과 밑동 닦기", "세면대와 수전 물때 제거", "샤워부스 유리 물자국", "배수구 머리카락과 이물질", "환풍기 커버 먼지"],
-  "베란다와 창": ["창틀 레일 먼지와 모래", "창문 유리 안팎 닦기", "방충망 먼지 털기", "베란다 바닥 물청소", "보호 필름, 테이프 자국 제거"],
+  "거실·방": ["바닥 먼지 흡입 후 물걸레 두 번", "걸레받이·문틀·문짝 닦기", "스위치·콘센트 커버 닦기", "붙박이장 겉면과 선반", "천장 등 커버 먼지 털기"],
+  주방: ["싱크볼·수전 물때 제거", "상부장·하부장 안쪽 닦기", "후드 필터 기름때 제거", "인덕션·가스레인지 상판", "타일 벽 실리콘 주변"],
+  욕실: ["변기 안쪽·밑동 닦기", "세면대·수전 물때 제거", "샤워부스 유리 물자국", "배수구 머리카락·이물질", "환풍기 커버 먼지"],
+  "베란다·창": ["창틀 레일 먼지와 모래", "창문 유리 안팎 닦기", "방충망 먼지 털기", "베란다 바닥 물청소", "보호 필름·테이프 자국 제거"],
 };
 
 const STEPS = [
   { t: "08:30", h: "도착과 사진 기록", d: "들어가자마자 집 상태를 사진으로 남깁니다. 끝난 뒤 같은 자리에서 다시 찍어 보내 드립니다." },
   { t: "09:00", h: "위에서 아래로", d: "천장 등과 상부장부터 닦고 바닥은 마지막에 합니다. 떨어진 먼지가 다시 쌓이지 않습니다." },
-  { t: "점심 전", h: "욕실, 주방 집중", d: "물때와 기름때는 약품을 바르고 기다려야 해서 오전에 먼저 발라 둡니다." },
+  { t: "점심 전", h: "욕실·주방 집중", d: "물때와 기름때는 약품을 바르고 기다려야 해서 오전에 먼저 발라 둡니다." },
   { t: "마무리", h: "같이 둘러보기", d: "고객님과 함께 방마다 확인합니다. 바로 그 자리에서 다시 닦습니다." },
 ];
 
@@ -99,7 +99,7 @@ const FAQ = [
   { q: "견적 화면에 나온 금액에서 더 받나요?", a: "고르신 조건과 실제 집 상태가 같으면 그 금액 그대로입니다. 평수가 다르거나 고르지 않은 작업을 현장에서 요청하시면 그 부분만 미리 말씀드리고 더합니다." },
   { q: "청소 끝나고 빠진 곳이 보이면요?", a: "48시간 안에 사진과 함께 알려 주시면 다시 방문해 그 부분을 닦습니다. 재방문 비용은 받지 않습니다." },
   { q: "주말이나 공휴일도 되나요?", a: "됩니다. 이사가 몰리는 월말 주말은 일찍 마감되니 날짜가 정해지면 먼저 신청해 주세요." },
-  { q: "약품이 아이나 반려동물에게 괜찮나요?", a: "주방과 욕실은 중성 세제 위주로 쓰고, 곰팡이 제거제를 쓴 곳은 환기 시간을 따로 잡습니다. 사용 약품 목록은 신청 후 보내 드립니다." },
+  { q: "약품이 아이나 반려동물에게 괜찮나요?", a: "주방·욕실은 중성 세제 위주로 쓰고, 곰팡이 제거제를 쓴 곳은 환기 시간을 따로 잡습니다. 사용 약품 목록은 신청 후 보내 드립니다." },
   { q: "예약금이 있나요?", a: "날짜를 확정할 때 예약금 5만 원을 받고, 남은 금액은 청소가 끝나고 확인하신 뒤 받습니다. 3일 전까지 취소하면 예약금은 돌려드립니다." },
 ];
 
@@ -159,7 +159,7 @@ export function LandingMoveCleanDemo() {
         <div className="relative mx-auto grid max-w-[1200px] gap-10 px-4 md:grid-cols-[1fr_520px] md:px-6">
           <div className="md:pt-6">
             <p className="inline-block rounded-[4px] px-2 py-1 text-[15px] font-bold" style={{ background: C.lemon, color: C.ink }}>
-              입주청소, 이사청소
+              입주청소 · 이사청소
             </p>
             <h1 className="mt-5 text-[40px] font-extrabold leading-[1.15] tracking-[-0.04em] md:text-[64px]">
               평수만 넣으면
@@ -245,7 +245,7 @@ export function LandingMoveCleanDemo() {
               <figure key={r.name} className="rounded-[10px] border p-6" style={{ background: C.white, borderColor: C.line }}>
                 <blockquote className="text-[17px] leading-[1.7]">{r.body}</blockquote>
                 <figcaption className="mt-5 border-t pt-4 text-[15px]" style={{ borderColor: C.line, color: C.muted }}>
-                  <strong style={{ color: C.ink }}>{r.name}</strong> 님, {r.where}, {fmtKo(daysAgo(today, r.ago))}
+                  <strong style={{ color: C.ink }}>{r.name}</strong> 님 · {r.where} · {fmtKo(daysAgo(today, r.ago))}
                 </figcaption>
               </figure>
             ))}
@@ -301,10 +301,10 @@ export function LandingMoveCleanDemo() {
         <div className="mx-auto max-w-[1200px]">
           <p className="text-[16px] font-bold text-white">{SHOP}</p>
           <p>
-            대표 {OWNER} / 사업자등록번호 {BIZ_NO} / {ADDRESS}
+            대표 {OWNER} · 사업자등록번호 {BIZ_NO} · {ADDRESS}
           </p>
           <p>
-            전화 {TEL} / 상담 시간 매일 08:00 ~ 20:00
+            전화 {TEL} · 상담 시간 매일 08:00 ~ 20:00
           </p>
         </div>
       </footer>
@@ -326,7 +326,7 @@ export function LandingMoveCleanDemo() {
             >
               <div className="min-w-0">
                 <p className="truncate text-[13px] opacity-70">
-                  {TYPES.find((t) => t.id === type)!.label} {py}평{opts.length > 0 ? `, 옵션 ${opts.length}개` : ""}
+                  {TYPES.find((t) => t.id === type)!.label} {py}평{opts.length > 0 ? ` · 옵션 ${opts.length}개` : ""}
                 </p>
                 <p className="text-[20px] font-extrabold tabular-nums">{won(est.total)}</p>
               </div>
@@ -631,9 +631,9 @@ function Checklist({ reduce }: { reduce: boolean }) {
 
 /* 신청 완료 뒤 사장님 시트에 미리 쌓여 있는 가상 접수. */
 const PAST_LEADS: LeadRow[] = [
-  { at: "오늘 10:15", name: "박ㅅ연", digits: "01044172290", summary: "빌라 18평, 짐 있음", source: "메타 광고", status: "통화함" },
-  { at: "오늘 08:52", name: "김ㅎ늘", digits: "01083025517", summary: "아파트 32평, 베란다", source: "메타 광고", status: "통화 전" },
-  { at: "어제 22:47", name: "김ㅎ늘", digits: "01083025517", summary: "아파트 32평, 베란다", source: "네이버 검색광고", status: "계약" },
+  { at: "오늘 10:15", name: "박ㅅ연", digits: "01044172290", summary: "빌라 18평 · 짐 있음", source: "메타 광고", status: "통화함" },
+  { at: "오늘 08:52", name: "김ㅎ늘", digits: "01083025517", summary: "아파트 32평 · 베란다", source: "메타 광고", status: "통화 전" },
+  { at: "어제 22:47", name: "김ㅎ늘", digits: "01083025517", summary: "아파트 32평 · 베란다", source: "네이버 검색광고", status: "계약" },
   { at: "어제 13:20", name: "이ㅈ민", digits: "01061253048", summary: "오피스텔 11평", source: "블로그", status: "보류" },
 ];
 
@@ -708,7 +708,7 @@ function ApplyForm(p: { today: Date; type: HomeType; py: number; opts: OptId[]; 
             견적
           </dt>
           <dd>
-            {typeLabel} {p.py}평, {won(p.est.total)}
+            {typeLabel} {p.py}평 · {won(p.est.total)}
           </dd>
           <dt className="font-bold" style={{ color: C.muted }}>
             확인 전화
@@ -726,9 +726,9 @@ function ApplyForm(p: { today: Date; type: HomeType; py: number; opts: OptId[]; 
           business={SHOP}
           name={name}
           phone={phone}
-          summary={`${typeLabel} ${p.py}평${optLabels.length ? ` / ${optLabels.join(", ")}` : ""}${p.lived ? " / 짐 있음" : ""}`}
+          summary={`${typeLabel} ${p.py}평${optLabels.length ? ` · ${optLabels.join(", ")}` : ""}${p.lived ? " · 짐 있음" : ""}`}
           lines={[
-            ["견적", `${typeLabel} ${p.py}평, ${won(p.est.total)}`],
+            ["견적", `${typeLabel} ${p.py}평 · ${won(p.est.total)}`],
             ["희망일", `${fmtKo(done.date)} ${slot === "am" ? "오전 8시 30분" : "오후 1시"}`],
             ["주소", addr],
           ]}
@@ -754,10 +754,10 @@ function ApplyForm(p: { today: Date; type: HomeType; py: number; opts: OptId[]; 
           계산한 조건
         </p>
         <p className="mt-1 text-[18px] font-extrabold">
-          {typeLabel} {p.py}평{p.lived ? ", 짐 있음" : ""}, {won(p.est.total)}
+          {typeLabel} {p.py}평{p.lived ? " · 짐 있음" : ""} · {won(p.est.total)}
         </p>
         <p className="mt-1 text-[15px]" style={{ color: C.muted }}>
-          {optLabels.length ? optLabels.join(", ") : "더할 작업 없음"} / {p.est.staff}명, 약 {p.est.hours}시간
+          {optLabels.length ? optLabels.join(", ") : "더할 작업 없음"} · {p.est.staff}명, 약 {p.est.hours}시간
         </p>
       </div>
 

@@ -62,8 +62,8 @@ interface CampClass {
 }
 
 const CLASSES: CampClass[] = [
-  { id: "block", name: "블록 코딩반", grades: ["초2", "초3"], when: "월, 수 16:00~17:30", fee: 160_000, capacity: 8, left: 3, color: C.yellow },
-  { id: "game", name: "게임 만들기반", grades: ["초4", "초5", "초6"], when: "화, 목 16:00~17:30", fee: 160_000, capacity: 8, left: 1, color: C.blue },
+  { id: "block", name: "블록 코딩반", grades: ["초2", "초3"], when: "월·수 16:00~17:30", fee: 160_000, capacity: 8, left: 3, color: C.yellow },
+  { id: "game", name: "게임 만들기반", grades: ["초4", "초5", "초6"], when: "화·목 16:00~17:30", fee: 160_000, capacity: 8, left: 1, color: C.blue },
   { id: "robot", name: "로봇 코딩반", grades: ["초4", "초5", "초6"], when: "토 10:00~13:00", fee: 180_000, kit: 30_000, capacity: 8, left: 5, color: C.green },
 ];
 
@@ -159,8 +159,8 @@ export function LandingCodingCampDemo() {
 
       <footer className="mx-auto mt-16 max-w-[1080px] border-t-2 px-5 pt-6 text-[14px] leading-[1.8] md:px-8" style={{ borderColor: C.ink, color: C.muted }}>
         <p className="font-bold" style={{ color: C.ink }}>곰파트너</p>
-        <p>ㅁㄹ시 ㅎㄷ로 88 ㅁㄹ프라자 4층 / 02-000-0000</p>
-        <p>학원 등록번호 제0000-00호 / 교습과목 정보(소프트웨어)</p>
+        <p>ㅁㄹ시 ㅎㄷ로 88 ㅁㄹ프라자 4층 · 02-000-0000</p>
+        <p>학원 등록번호 제0000-00호 · 교습과목 정보(소프트웨어)</p>
       </footer>
 
       <StickyApply hidden={formVisible} left={totalLeft} onApply={goForm} />
@@ -205,7 +205,7 @@ function Hero({ deadline, start, totalLeft, totalCap, onApply }: { deadline: Dat
             </dd>
           </div>
           <div className="col-span-2 border-t-2 px-4 py-3 text-[14px] font-semibold" style={{ borderColor: C.ink }}>
-            개강 {fmtKo(start)}, 4주 8회, 노트북은 교실에서 빌려 드려요
+            개강 {fmtKo(start)} · 4주 8회 · 노트북은 교실에서 빌려 드려요
           </div>
         </dl>
 
@@ -588,10 +588,10 @@ const mask = maskName;
 
 /* 신청 완료 뒤 사장님 시트에 미리 쌓여 있는 가상 접수. */
 const PAST_LEADS: LeadRow[] = [
-  { at: "오늘 11:42", name: "박ㅅ연", digits: "01077315820", summary: "초4, 게임 만들기반", source: "메타 광고", status: "통화함" },
-  { at: "오늘 09:16", name: "이ㅈ민", digits: "01022904417", summary: "초3, 블록 코딩반", source: "네이버 검색광고", status: "통화 전" },
-  { at: "어제 21:08", name: "이ㅈ민", digits: "01022904417", summary: "초3, 블록 코딩반", source: "네이버 검색광고", status: "계약" },
-  { at: "어제 15:31", name: "최ㅇ준", digits: "01050163302", summary: "초5, 로봇 코딩반", source: "블로그", status: "보류" },
+  { at: "오늘 11:42", name: "박ㅅ연", digits: "01077315820", summary: "초4 · 게임 만들기반", source: "메타 광고", status: "통화함" },
+  { at: "오늘 09:16", name: "이ㅈ민", digits: "01022904417", summary: "초3 · 블록 코딩반", source: "네이버 검색광고", status: "통화 전" },
+  { at: "어제 21:08", name: "이ㅈ민", digits: "01022904417", summary: "초3 · 블록 코딩반", source: "네이버 검색광고", status: "계약" },
+  { at: "어제 15:31", name: "최ㅇ준", digits: "01050163302", summary: "초5 · 로봇 코딩반", source: "블로그", status: "보류" },
 ];
 
 /* 접수 다음 날이 회신일. 토·일이면 월요일로 넘긴다. */
@@ -678,7 +678,7 @@ function ApplyForm({
                 {[
                   ["접수 번호", done.no],
                   ["보호자", `${mask(done.parent)} 님`],
-                  ["신청한 반", `${done.grade}, ${done.cls.name} (${done.cls.when})`],
+                  ["신청한 반", `${done.grade} · ${done.cls.name} (${done.cls.when})`],
                   ["회신 예정", `${fmtKo(done.reply)} 오후 6시까지 문자`],
                 ].map(([k, v]) => (
                   <div key={k} className="rounded-[8px] border-2 px-4 py-3" style={{ borderColor: C.ink }}>
@@ -698,7 +698,7 @@ function ApplyForm({
                 business="곰파트너"
                 name={done.parent}
                 phone={done.phone}
-                summary={`${done.grade}, ${done.cls.name}`}
+                summary={`${done.grade} · ${done.cls.name}`}
                 lines={[
                   ["학년", done.grade],
                   ["반", `${done.cls.name} (${done.cls.when})`],
@@ -779,7 +779,7 @@ function ApplyForm({
 
               <div className="md:col-span-2">
                 <div className="rounded-[8px] px-4 py-3 text-[14px] leading-[1.7]" style={{ background: C.paper, color: C.muted }}>
-                  수집 항목: 보호자 이름, 연락처, 학년 / 목적: 특강 반 배정과 안내 문자 / 보관: 특강 종료 후 3개월
+                  수집 항목: 보호자 이름, 연락처, 학년 · 목적: 특강 반 배정과 안내 문자 · 보관: 특강 종료 후 3개월
                 </div>
                 <label className="mt-3 flex items-center gap-2.5 text-[16px] font-bold">
                   <input type="checkbox" checked={agree} onChange={(e) => setAgree(e.target.checked)} className="h-5 w-5 accent-[#16181d]" />

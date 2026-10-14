@@ -48,7 +48,7 @@ export function PrivacyPolicy({ version }: { version: PolicyVersion }) {
         개인정보처리방침
       </h1>
       <p className="mt-2 text-[17px] leading-[1.6] text-foreground-secondary">
-        시행일 {version.date}, {version.id}번째 버전
+        시행일 {version.date} · {version.id}번째 버전
       </p>
       {!isLatest && (
         <p className="mt-4 rounded-md border border-border bg-surface px-4 py-3 text-[15px] leading-[1.6]">

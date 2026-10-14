@@ -12,20 +12,20 @@ import { useReducedMotionSafe } from "@/hooks/useReducedMotionSafe";
    사이트 유형과 수집 항목을 고르면 조항을 만들어 준다. 입력값은 이 브라우저에만 저장한다. */
 
 const EASE = [0.23, 1, 0.32, 1] as const;
-const STORAGE_KEY = "gs-tool:privacy-policy:v2";
+const STORAGE_KEY = "gs-tool:privacy-policy:v1";
 
 const SITE_TYPES = ["문의 폼만 있는 홈페이지", "회원제 홈페이지", "쇼핑몰", "예약 서비스"] as const;
 type SiteType = (typeof SITE_TYPES)[number];
 
-const ITEMS = ["이름", "휴대전화번호", "이메일", "아이디와 비밀번호", "주소", "생년월일", "결제 정보", "예약 일시와 희망 내용"] as const;
+const ITEMS = ["이름", "휴대전화번호", "이메일", "아이디·비밀번호", "주소", "생년월일", "결제 정보", "예약 일시·희망 내용"] as const;
 type Item = (typeof ITEMS)[number];
 
 const PURPOSES = {
-  회원: "회원 가입 의사 확인, 본인 식별, 회원 자격 유지와 관리, 부정 이용 방지",
-  문의: "문의, 상담 접수, 사실 확인을 위한 연락, 처리 결과 안내",
-  주문: "주문 확인, 대금 결제, 상품 배송, 교환, 반품, 환불 처리",
-  예약: "예약 접수와 확인, 일정 변경과 취소 안내, 방문 전 알림 발송",
-  마케팅: "이벤트와 혜택 안내 (별도 동의한 경우에 한함)",
+  회원: "회원 가입 의사 확인, 본인 식별, 회원 자격 유지·관리, 부정 이용 방지",
+  문의: "문의·상담 접수, 사실 확인을 위한 연락, 처리 결과 안내",
+  주문: "주문 확인, 대금 결제, 상품 배송, 교환·반품·환불 처리",
+  예약: "예약 접수·확인, 일정 변경·취소 안내, 방문 전 알림 발송",
+  마케팅: "이벤트·혜택 안내 (별도 동의한 경우에 한함)",
 } as const;
 type Purpose = keyof typeof PURPOSES;
 
@@ -62,7 +62,7 @@ const PRESETS: Record<SiteType, Pick<Form, "items" | "purposes" | "retention" | 
     cookies: true,
   },
   "회원제 홈페이지": {
-    items: ["이름", "휴대전화번호", "이메일", "아이디와 비밀번호"],
+    items: ["이름", "휴대전화번호", "이메일", "아이디·비밀번호"],
     purposes: ["회원", "문의"],
     retention: "회원 탈퇴 시까지",
     vendors: [
@@ -72,7 +72,7 @@ const PRESETS: Record<SiteType, Pick<Form, "items" | "purposes" | "retention" | 
     cookies: true,
   },
   쇼핑몰: {
-    items: ["이름", "휴대전화번호", "이메일", "아이디와 비밀번호", "주소", "결제 정보"],
+    items: ["이름", "휴대전화번호", "이메일", "아이디·비밀번호", "주소", "결제 정보"],
     purposes: ["회원", "주문", "문의"],
     retention: "회원 탈퇴 시까지",
     vendors: [
@@ -84,7 +84,7 @@ const PRESETS: Record<SiteType, Pick<Form, "items" | "purposes" | "retention" | 
     cookies: true,
   },
   "예약 서비스": {
-    items: ["이름", "휴대전화번호", "예약 일시와 희망 내용"],
+    items: ["이름", "휴대전화번호", "예약 일시·희망 내용"],
     purposes: ["예약", "문의"],
     retention: "예약 일자 경과 후 1년",
     vendors: [
@@ -140,7 +140,7 @@ function build(f: Form): Section[] {
           "계약 또는 청약철회 등에 관한 기록: 5년 (전자상거래 등에서의 소비자보호에 관한 법률)",
           "대금결제 및 재화 등의 공급에 관한 기록: 5년 (같은 법)",
           "소비자의 불만 또는 분쟁처리에 관한 기록: 3년 (같은 법)",
-          "표시, 광고에 관한 기록: 6개월 (같은 법)",
+          "표시·광고에 관한 기록: 6개월 (같은 법)",
         ]
       : []),
     ...(collectsLog ? ["웹사이트 방문 기록(접속 로그): 3개월 (통신비밀보호법)"] : []),
@@ -152,7 +152,7 @@ function build(f: Form): Section[] {
       parts: [
         {
           kind: "p",
-          text: `${co}${site}${eun(co)} 개인정보 보호법 제30조에 따라 정보주체의 개인정보를 보호하고 이와 관련한 고충을 신속하고 원활하게 처리할 수 있도록 다음과 같이 개인정보 처리방침을 수립하여 공개합니다.`,
+          text: `${co}${site}${eun(co)} 「개인정보 보호법」 제30조에 따라 정보주체의 개인정보를 보호하고 이와 관련한 고충을 신속하고 원활하게 처리할 수 있도록 다음과 같이 개인정보 처리방침을 수립·공개합니다.`,
         },
       ],
     },
@@ -161,7 +161,7 @@ function build(f: Form): Section[] {
       title: "개인정보의 처리 목적",
       parts: [
         { kind: "p", text: `${co}${eun(co)} 다음 목적을 위하여 개인정보를 처리하며, 목적 이외의 용도로는 이용하지 않습니다. 이용 목적이 바뀌는 경우에는 별도의 동의를 받습니다.` },
-        { kind: "ul", items: f.purposes.map((p) => `${p === "회원" ? "회원 관리" : p === "문의" ? "문의, 상담 처리" : p === "주문" ? "주문, 결제, 배송" : p === "예약" ? "예약 관리" : "마케팅, 광고 활용"}: ${PURPOSES[p]}`) },
+        { kind: "ul", items: f.purposes.map((p) => `${p === "회원" ? "회원 관리" : p === "문의" ? "문의·상담 처리" : p === "주문" ? "주문·결제·배송" : p === "예약" ? "예약 관리" : "마케팅·광고 활용"}: ${PURPOSES[p]}`) },
       ],
     },
     {
@@ -181,7 +181,7 @@ function build(f: Form): Section[] {
       id: "retention",
       title: "개인정보의 처리 및 보유 기간",
       parts: [
-        { kind: "p", text: `개인정보는 수집 시 동의받은 보유 기간(${blank(f.retention, "보유 기간")}) 동안 보유하고 이용하며, 목적이 달성되면 지체 없이 파기합니다. 다만 관계 법령에 따라 보존해야 하는 경우에는 해당 기간 동안 보관합니다.` },
+        { kind: "p", text: `개인정보는 수집 시 동의받은 보유 기간(${blank(f.retention, "보유 기간")}) 동안 보유·이용하며, 목적이 달성되면 지체 없이 파기합니다. 다만 관계 법령에 따라 보존해야 하는 경우에는 해당 기간 동안 보관합니다.` },
         ...(legal.length ? [{ kind: "ul" as const, items: legal }] : []),
       ],
     },
@@ -207,9 +207,9 @@ function build(f: Form): Section[] {
     },
     {
       id: "rights",
-      title: "정보주체와 법정대리인의 권리, 의무 및 행사방법",
+      title: "정보주체와 법정대리인의 권리·의무 및 행사방법",
       parts: [
-        { kind: "p", text: "정보주체는 회사에 대해 언제든지 개인정보 열람, 정정, 삭제, 처리정지 및 동의 철회를 요구할 수 있습니다." },
+        { kind: "p", text: "정보주체는 회사에 대해 언제든지 개인정보 열람, 정정·삭제, 처리정지 및 동의 철회를 요구할 수 있습니다." },
         { kind: "p", text: "권리 행사는 서면, 전자우편 등으로 하실 수 있으며 회사는 지체 없이 조치합니다. 법정대리인이나 위임을 받은 자를 통해서도 행사할 수 있습니다." },
       ],
     },
@@ -237,7 +237,7 @@ function build(f: Form): Section[] {
     },
     {
       id: "cookie",
-      title: "개인정보 자동 수집 장치의 설치, 운영 및 거부",
+      title: "개인정보 자동 수집 장치의 설치·운영 및 거부",
       parts: f.cookies
         ? [
             { kind: "p", text: "회사는 이용자에게 맞춤 서비스를 제공하기 위해 이용 정보를 저장하고 수시로 불러오는 쿠키(cookie)를 사용합니다." },
@@ -460,7 +460,7 @@ export function PrivacyPolicyGenerator() {
 
         <div className="mt-6 grid gap-4 sm:grid-cols-2">
           <label className={label}>
-            회사명 또는 상호 <span className="text-[#b42318]">*</span>
+            회사·상호명 <span className="text-[#b42318]">*</span>
             <input value={form.company} onChange={(e) => set("company", e.target.value)} placeholder="예: 곰파트너상회" className={input} />
           </label>
           <label className={label}>
@@ -487,7 +487,7 @@ export function PrivacyPolicyGenerator() {
             {(Object.keys(PURPOSES) as Purpose[]).map((p) => (
               <label key={p} className="inline-flex cursor-pointer items-center gap-2 rounded-md border border-border px-3 py-2 text-[15px] has-[:checked]:border-accent has-[:checked]:bg-accent-surface">
                 <input type="checkbox" checked={form.purposes.includes(p)} onChange={() => set("purposes", toggle(form.purposes, p))} className="size-4 accent-[var(--accent)]" />
-                {p === "회원" ? "회원 관리" : p === "문의" ? "문의, 상담" : p === "주문" ? "주문, 배송" : p === "예약" ? "예약 관리" : "마케팅"}
+                {p === "회원" ? "회원 관리" : p === "문의" ? "문의·상담" : p === "주문" ? "주문·배송" : p === "예약" ? "예약 관리" : "마케팅"}
               </label>
             ))}
           </div>

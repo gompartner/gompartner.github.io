@@ -103,7 +103,7 @@ export function HostingCostCalculator() {
         <table className="w-full min-w-[760px] text-left text-[15px]">
           <thead className="bg-surface">
             <tr>
-              {["업체, 상품", "1년", "설치비", "https", "용량", "출처"].map((h) => (
+              {["업체·상품", "1년", "설치비", "https", "용량", "출처"].map((h) => (
                 <th key={h} scope="col" className="px-4 py-3 font-bold">{h}</th>
               ))}
             </tr>

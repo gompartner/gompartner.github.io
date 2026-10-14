@@ -75,7 +75,7 @@ const MENU: MenuItem[] = [
   { name: "작설차", kind: "tea", temp: "hot", sweet: false, price: 7000, desc: "하동에서 덖은 햇차. 두 번까지 더 우려 드립니다" },
   { name: "우엉차", kind: "tea", temp: "hot", sweet: false, price: 6500, desc: "" },
   { name: "냉 작설차", kind: "tea", temp: "cold", sweet: false, price: 7000, desc: "찬물에 우려 쓴맛 없이 깔끔한 작설차" },
-  { name: "쌍화차", kind: "tea", temp: "hot", sweet: true, price: 8000, desc: "10가지 약재로 6시간 이상 달인 차, 대추, 밤, 잣 고명" },
+  { name: "쌍화차", kind: "tea", temp: "hot", sweet: true, price: 8000, desc: "10가지 약재로 6시간 이상 달인 차, 대추·밤·잣 고명" },
   { name: "대추차", kind: "tea", temp: "hot", sweet: true, price: 7500, desc: "" },
   { name: "유자차", kind: "tea", temp: "any", sweet: true, price: 7000, desc: "고흥 유자로 직접 담은 청" },
   { name: "오미자차", kind: "tea", temp: "cold", sweet: true, price: 7000, desc: "" },
@@ -649,7 +649,7 @@ function Intro({ onReserve, onMenuBoard }: { onReserve: () => void; onMenuBoard:
           <div>
             <p className="max-w-[34em] text-[17px] text-[#4a4036]">1962년에 지은 ㄱ자 한옥 찻집. 직접 달인 전통차와 커피, 다과를 준비합니다.</p>
             <p className="mt-4 max-w-[34em] text-[16px] leading-[1.75] text-[#4a4036]">
-              화요일부터 일요일까지 <b className="font-semibold text-[#1f1b16]">11:00 ~ 21:00</b>에 문을 열어요. 마지막 주문은 20:30이고 월요일과 설날, 추석 당일은 쉬어요.
+              화요일부터 일요일까지 <b className="font-semibold text-[#1f1b16]">11:00 ~ 21:00</b>에 문을 열어요. 마지막 주문은 20:30이고 월요일과 설·추석 당일은 쉬어요.
               좌식 방 3실은 방 단위로 예약받아요.
             </p>
           </div>
@@ -890,7 +890,7 @@ function SpaceSection({
           <h2 id="space-title" className="text-[30px] font-bold leading-[1.3] tracking-[-0.02em] sm:text-[36px]">
             공간 안내
           </h2>
-          <p className="text-[15px] text-[#6b5a48]">1962년 한옥, 좌석 {TOTAL_SEATS}석</p>
+          <p className="text-[15px] text-[#6b5a48]">1962년 한옥 · 좌석 {TOTAL_SEATS}석</p>
         </div>
         {grid}
       </div>
@@ -953,8 +953,8 @@ function SpacePanel({ group, unitId, onUnit, minute }: { group: Group; unitId: U
   };
 
   const facts: [string, string][] = [
-    ["좌석", `${seatsOf(group.id)}석, ${group.seating}`],
-    ["이용", group.reservable ? "예약 2시간, 예약 없이 빈자리 이용 가능" : "예약 없이 오신 순서대로"],
+    ["좌석", `${seatsOf(group.id)}석 · ${group.seating}`],
+    ["이용", group.reservable ? "예약 2시간 · 예약 없이 빈자리 이용 가능" : "예약 없이 오신 순서대로"],
     ["인원", units.length > 1 ? units.map((u) => `${u.name} ${u.min}~${u.max}명`).join(", ") : `${unit.min}~${unit.max}명`],
   ];
   if (group.reservable) facts.push(["예약 시간", "11:00 ~ 19:00 시작 (화 ~ 일)"]);
@@ -1240,7 +1240,7 @@ function MenuRow({ item }: { item: MenuItem }) {
       </div>
       {(item.temp === "any" || item.desc) && (
         <p className="mt-1 text-[15px] text-[#5b5045]">
-          {[item.temp === "any" ? "따뜻하게, 시원하게" : "", item.desc].filter(Boolean).join(" / ")}
+          {[item.temp === "any" ? "따뜻하게, 시원하게" : "", item.desc].filter(Boolean).join(" · ")}
         </p>
       )}
     </li>
@@ -1502,7 +1502,7 @@ function Location({ bare = false }: { bare?: boolean }) {
               <dt className="text-[#6b5a48]">주문 마감</dt>
               <dd>20:30</dd>
               <dt className="text-[#6b5a48]">휴무</dt>
-              <dd>월요일, 설날, 추석 당일</dd>
+              <dd>월요일, 설·추석 당일</dd>
             </dl>
           </div>
           <div>
@@ -1732,7 +1732,7 @@ function ReservePage({ children }: { children: React.ReactNode }) {
     ["예약 확정", "예약 신청 후 문자로 안내"],
     ["자동 취소", "예약 시간 15분 경과 시"],
     ["별채 이용", "대관료 없이 1인 1메뉴 주문"],
-    ["변경, 취소", `전화 ${TEL}`],
+    ["변경·취소", `전화 ${TEL}`],
   ];
   return (
     <div className="space-y-16">

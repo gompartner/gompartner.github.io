@@ -2,7 +2,7 @@
 
 import { useState, useSyncExternalStore } from "react";
 import { AnimatePresence, motion } from "framer-motion";
-import { Check, CircleAlert, Copy, ShieldCheck, ShieldX, Square } from "lucide-react";
+import { Check, CircleAlert, Copy, ShieldCheck, ShieldX } from "lucide-react";
 import { useReducedMotionSafe } from "@/hooks/useReducedMotionSafe";
 
 /* JWT 파서.
@@ -190,18 +190,9 @@ export function JwtParser() {
           />
         </div>
         <p className="mt-2 flex flex-wrap gap-x-4 gap-y-1 text-[14px]">
-          <span className="inline-flex items-center gap-1" style={{ color: COLORS.header }}>
-            <Square size={12} fill="currentColor" aria-hidden />
-            헤더
-          </span>
-          <span className="inline-flex items-center gap-1" style={{ color: COLORS.payload }}>
-            <Square size={12} fill="currentColor" aria-hidden />
-            페이로드
-          </span>
-          <span className="inline-flex items-center gap-1" style={{ color: COLORS.signature }}>
-            <Square size={12} fill="currentColor" aria-hidden />
-            서명
-          </span>
+          <span style={{ color: COLORS.header }}>■ 헤더</span>
+          <span style={{ color: COLORS.payload }}>■ 페이로드</span>
+          <span style={{ color: COLORS.signature }}>■ 서명</span>
         </p>
 
         {parsed?.ok && hash && (

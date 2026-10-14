@@ -11,7 +11,7 @@ import { daysAgo, fmtDash, fmtDot, fmtKo, useDemoToday } from "@/hooks/useDemoTo
    학원명, 강사, 주소, 전화번호, 등록번호, 교습비, 학교명, 정류장은 모두 가상이다.
 
    뼈대: 반 찾기형. 실제 학원 사이트(수학의아침, 탑플수학, 청담어학원, 시대인재, 대형 입시학원)의
-   메뉴 이름을 따랐다. 학원 소개, 강사 소개, 반 편성/시간표, 교습비 안내, 레벨테스트 예약,
+   메뉴 이름을 따랐다. 학원 소개, 강사 소개, 반 편성·시간표, 교습비 안내, 레벨테스트 예약,
    차량 운행, 공지사항. 하위 화면 없이 한 페이지에 구역을 쌓고 머리글 메뉴는 구역으로 내려간다.
    첫 화면은 사진 한 장 위에 학원명, 바로 아래에 사진에 걸친 반 찾기 문장이 놓인다.
 
@@ -135,7 +135,7 @@ function daysText(c: ClassItem, times: Times) {
   return SUBJECT_DAYS[c.subject]
     .slice(0, times)
     .map((d) => DAY[d])
-    .join("");
+    .join("·");
 }
 
 const toMin = (t: string) => {
@@ -200,7 +200,7 @@ const ROUTES: Route[] = [
   {
     id: "r1",
     name: "1호차",
-    area: "ㅎㄷ동, ㅂㅅ동 방면",
+    area: "ㅎㄷ동·ㅂㅅ동 방면",
     stops: [
       { name: "ㅎㄷ마을 3단지 정문", min: 19 },
       { name: "ㅎㄷ초 후문", min: 16 },
@@ -212,7 +212,7 @@ const ROUTES: Route[] = [
   {
     id: "r2",
     name: "2호차",
-    area: "ㅅㄴ동, ㅁㄷ동 방면",
+    area: "ㅅㄴ동·ㅁㄷ동 방면",
     stops: [
       { name: "ㅅㄴ e편한 1단지 후문", min: 21 },
       { name: "ㅅㄴ중 앞 버스정류장", min: 17 },
@@ -226,7 +226,7 @@ const ROUTES: Route[] = [
 /* ---------- 메뉴 ---------- */
 
 const NAV = [
-  { id: "classes", label: "반 편성/시간표" },
+  { id: "classes", label: "반 편성·시간표" },
   { id: "leveltest", label: "레벨테스트 예약" },
   { id: "fee", label: "교습비 안내" },
   { id: "shuttle", label: "차량 운행" },
@@ -399,7 +399,7 @@ function Hero() {
         <div className="absolute inset-x-0 bottom-0 px-4 pb-24 md:px-6 md:pb-28">
           <div className="mx-auto max-w-[1200px]" style={{ color: C.onBoard }}>
             <p className="text-[16px] font-semibold md:text-[17px]" style={{ color: C.onBoardMuted }}>
-              초등 4학년부터 중학교 3학년까지, ㄷㅊ중 ㅁㄷ중 ㅅㄴ중 내신
+              초등 4학년부터 중학교 3학년까지 · ㄷㅊ중 ㅁㄷ중 ㅅㄴ중 내신
             </p>
             <h1 id="academy-name" className="mt-2 text-[34px] font-bold leading-[1.2] tracking-[-0.02em] md:text-[52px]">
               {ACADEMY}
@@ -498,7 +498,7 @@ function ClassSection({
     <section id="classes" aria-labelledby="classes-title" className="scroll-mt-16 px-4 pb-16 md:px-6 md:pb-24">
       <div className="mx-auto max-w-[1200px]">
         <div className="relative -mt-14 rounded-[10px] border p-5 shadow-[0_6px_24px_rgba(20,42,34,0.12)] md:-mt-16 md:p-8" style={{ background: C.card, borderColor: C.line }}>
-          <SectionTitle id="classes-title">반 편성/시간표</SectionTitle>
+          <SectionTitle id="classes-title">반 편성·시간표</SectionTitle>
           <p className="mt-4 text-[19px] leading-[2.2] md:text-[22px]">
             <Blank label="학년" value={pick.grade} options={GRADES} onChange={(grade) => onChange({ grade })} /> 학생이고,{" "}
             <Blank label="과목" value={pick.subject} options={SUBJECTS} onChange={(subject) => onChange({ subject })} /> {examName} 점수는{" "}
@@ -521,7 +521,7 @@ function ClassSection({
                   <p className="mt-1 tabular-nums">
                     {daysText(matched, pick.times)} {timeOf(matched, SUBJECT_DAYS[matched.subject][0]).join("~")}
                     {pick.times === 3 && matched.subject === "영어" && <span style={{ color: C.muted }}> (토 {timeOf(matched, 6).join("~")})</span>}
-                    <span style={{ color: C.muted }}>, 정원 {matched.cap}명</span>
+                    <span style={{ color: C.muted }}> · 정원 {matched.cap}명</span>
                   </p>
                   {altClass && (
                     <p className="mt-1 text-[15px]" style={{ color: C.muted }}>
@@ -639,7 +639,7 @@ function Timetable({
         </div>
       </div>
       <p className="mt-2 text-[15px]" style={{ color: C.muted }}>
-        {gradeLabel(grade)} / 수학 월수금, 영어 화목토 / 회당 {MINUTES[band]}분 / 주 2회반은 앞의 두 요일
+        {gradeLabel(grade)} · 수학 월·수·금, 영어 화·목·토 · 회당 {MINUTES[band]}분 · 주 2회반은 앞의 두 요일
       </p>
 
       {/* 넓은 화면: 요일 x 시간 칸 */}
@@ -760,7 +760,7 @@ function Timetable({
 /* ---------- 레벨테스트 예약 ---------- */
 
 const TEST_SLOTS = { week: ["16:00", "17:30", "19:00"], sat: ["10:00", "11:30", "13:00"] };
-const TEST_MIN: Record<string, number> = { 수학: 50, 영어: 40, "수학, 영어": 90 };
+const TEST_MIN: Record<string, number> = { 수학: 50, 영어: 40, "수학·영어": 90 };
 
 function LevelTest({ pick }: { pick: Pick }) {
   const today = useDemoToday();
@@ -833,7 +833,7 @@ function LevelTest({ pick }: { pick: Pick }) {
           </p>
           <h3 className="mt-8 text-[18px] font-bold">입학 절차</h3>
           <ol className="mt-3 flex flex-wrap items-center gap-x-2 gap-y-2 text-[16px]">
-            {["테스트 예약", "레벨테스트", "원장 상담", "반 배정과 등록"].map((s, i) => (
+            {["테스트 예약", "레벨테스트", "원장 상담", "반 배정·등록"].map((s, i) => (
               <li key={s} className="flex items-center gap-2">
                 {i > 0 && <ChevronRight size={16} aria-hidden style={{ color: C.muted }} />}
                 <span className="rounded-[4px] border px-3 py-1.5" style={{ borderColor: C.line, background: i === 0 ? C.boardSoft : undefined }}>
@@ -844,7 +844,7 @@ function LevelTest({ pick }: { pick: Pick }) {
           </ol>
           <dl className="mt-8 divide-y border-y text-[16px]" style={{ borderColor: C.line }}>
             {[
-              ["시험 요일", "화, 목 16:00, 17:30, 19:00 / 토 10:00, 11:30, 13:00"],
+              ["시험 요일", "화·목 16:00, 17:30, 19:00 / 토 10:00, 11:30, 13:00"],
               ["준비물", "필기구, 최근 학교 시험지(있으면)"],
               ["비용", "무료"],
             ].map(([k, v]) => (
@@ -972,7 +972,7 @@ function LevelTest({ pick }: { pick: Pick }) {
                   <fieldset className="mt-4">
                     <legend className="text-[15px] font-semibold">시험 과목</legend>
                     <div className="mt-1.5 grid grid-cols-3 gap-2">
-                      {["수학", "영어", "수학, 영어"].map((s) => (
+                      {["수학", "영어", "수학·영어"].map((s) => (
                         <button
                           key={s}
                           type="button"
@@ -1132,7 +1132,7 @@ function Fee({ pick, onChange }: { pick: Pick; onChange: (p: Partial<Pick>) => v
                 <caption id="fee-caption" className="px-4 pb-1 pt-4 text-left">
                   <span className="block text-[18px] font-bold">교습비 등 게시</span>
                   <span className="block text-[14px] font-normal" style={{ color: C.muted }}>
-                    교습계열 입시, 검정 및 보습 / 교습과정 보통교과 / 교습기간 1개월(4주)
+                    교습계열 입시·검정 및 보습 · 교습과정 보통교과 · 교습기간 1개월(4주)
                   </span>
                 </caption>
                 <thead>
@@ -1156,7 +1156,7 @@ function Fee({ pick, onChange }: { pick: Pick; onChange: (p: Partial<Pick>) => v
                         </th>
                         <td className="px-3 py-2.5">{CAP[r.b]}명</td>
                         <td className="whitespace-nowrap px-3 py-2.5">
-                          주 {r.t}회, 회당 {MINUTES[r.b]}분
+                          주 {r.t}회 × {MINUTES[r.b]}분
                         </td>
                         <td className="px-3 py-2.5">{(r.t * 4 * MINUTES[r.b]).toLocaleString("ko-KR")}분</td>
                         <td className="px-3 py-2.5 font-semibold">{on ? <Marked key={`${pick.times}${pick.grade}${both}`}>{won(FEES[r.b][r.s][r.t])}</Marked> : won(FEES[r.b][r.s][r.t])}</td>
@@ -1266,7 +1266,7 @@ function Shuttle({ pick, matched }: { pick: Pick; matched: ClassItem | null }) {
   const base = matched ?? classById(`${pick.grade}-${pick.subject}-정규반`);
   const usedDays = SUBJECT_DAYS[base.subject].slice(0, pick.times);
   const groups = [
-    { label: usedDays.filter((d) => d !== 6).map((d) => DAY[d]).join(""), time: timeOf(base, usedDays[0]) },
+    { label: usedDays.filter((d) => d !== 6).map((d) => DAY[d]).join("·"), time: timeOf(base, usedDays[0]) },
     ...(usedDays.includes(6) ? [{ label: "토", time: timeOf(base, 6) }] : []),
   ];
 
@@ -1346,7 +1346,7 @@ function Shuttle({ pick, matched }: { pick: Pick; matched: ClassItem | null }) {
                   </p>
                   <h3 className="mt-0.5 text-[21px] font-bold">{stop.name}</h3>
                   <table className="mt-4 w-full text-[16px] tabular-nums">
-                    <caption className="sr-only">{stop.name} 탑승과 하원 시간</caption>
+                    <caption className="sr-only">{stop.name} 탑승·하원 시간</caption>
                     <thead>
                       <tr className="text-[14px]" style={{ color: C.muted }}>
                         <th scope="col" className="pb-2 text-left font-semibold">
@@ -1387,7 +1387,7 @@ function Shuttle({ pick, matched }: { pick: Pick; matched: ClassItem | null }) {
                 </>
               ) : (
                 <p className="py-6 text-center" style={{ color: C.muted }}>
-                  정류장을 고르면 등원, 하원 시간이 나옵니다.
+                  정류장을 고르면 등원·하원 시간이 나옵니다.
                 </p>
               )}
             </div>
@@ -1505,11 +1505,11 @@ function Results() {
 const TEACHERS = [
   {
     name: "김ㅎ늘",
-    role: "원장 / 수학",
+    role: "원장 · 수학",
     photo: `${IMG}/teacher1.jpg`,
     alt: "화이트보드 앞에 선 남색 스웨터 차림의 수학 강사",
-    classes: "중2, 중3 수학 심화반, 정규반",
-    career: ["수학교육과 졸업", "중등 수학 지도 14년", "ㄷㅊ중, ㅁㄷ중 내신 기출 분석 자료 직접 제작"],
+    classes: "중2·중3 수학 심화반, 정규반",
+    career: ["수학교육과 졸업", "중등 수학 지도 14년", "ㄷㅊ중·ㅁㄷ중 내신 기출 분석 자료 직접 제작"],
     way: "수업 끝 15분은 확인 테스트입니다. 틀린 문제는 다음 수업 전 클리닉에서 다시 풉니다.",
   },
   {
@@ -1570,7 +1570,7 @@ function About() {
           </p>
           <dl className="mt-6 divide-y text-[16px]" style={{ borderColor: "rgba(238,243,239,0.18)" }}>
             {[
-              ["반 편성", "학년과 레벨테스트 점수로 심화반, 정규반, 기초반, 중등은 학교별 내신 대비반을 시험 4주 전에 따로 엽니다."],
+              ["반 편성", "학년과 레벨테스트 점수로 심화반·정규반·기초반, 중등은 학교별 내신 대비반을 시험 4주 전에 따로 엽니다."],
               ["확인 테스트", "매 수업 끝 15분, 점수는 그날 보호자 문자로 보냅니다."],
               ["클리닉", "확인 테스트에서 틀린 문제를 수업 없는 날 자습실에서 다시 풉니다."],
               ["자습실", "평일 14:00~22:00, 토 10:00~17:00, 재원생 누구나"],
@@ -1599,8 +1599,8 @@ function About() {
 /* ---------- 공지사항 ---------- */
 
 const NOTICES = [
-  { ago: 1, title: "11월 레벨테스트 일정", body: "11월은 화요일과 목요일 16:00, 17:30, 19:00과 토요일 오전에 봅니다. 홈페이지 레벨테스트 예약이나 전화로 잡아 주세요." },
-  { ago: 4, title: "ㄷㅊ중, ㅁㄷ중 2학기 기말고사 대비 일정", body: "시험 4주 전부터 학교별 내신 대비반을 엽니다. 토요일 기출 풀이반(10:00~13:00)은 재원생 누구나 들을 수 있습니다." },
+  { ago: 1, title: "11월 레벨테스트 일정", body: "11월은 화·목 16:00, 17:30, 19:00과 토요일 오전에 봅니다. 홈페이지 레벨테스트 예약이나 전화로 잡아 주세요." },
+  { ago: 4, title: "ㄷㅊ중·ㅁㄷ중 2학기 기말고사 대비 일정", body: "시험 4주 전부터 학교별 내신 대비반을 엽니다. 토요일 기출 풀이반(10:00~13:00)은 재원생 누구나 들을 수 있습니다." },
   { ago: 9, title: "2호차 정류장 변경 (ㅁㄷ도서관 앞)", body: "도서관 앞 공사로 2호차 정류장을 도서관 정문에서 맞은편 버스정류장 쪽으로 옮깁니다. 시간은 같습니다." },
   { ago: 15, title: "10월 교습비 납부 안내", body: "교습비는 매달 5일까지 결제 문자 링크나 학원 방문 카드 결제로 냅니다. 형제가 함께 다니면 상담 때 말씀해 주세요." },
   { ago: 26, title: "추석 연휴 휴원", body: "추석 연휴 기간은 쉽니다. 빠진 수업은 연휴 다음 주 토요일에 보강합니다." },
@@ -1655,10 +1655,10 @@ function Footer() {
           <Logo light />
         </span>
         <p className="mt-4">
-          {ACADEMY} / 대표 김ㅎ늘 / {ADDRESS} / 전화 {TEL}
+          {ACADEMY} · 대표 김ㅎ늘 · {ADDRESS} · 전화 {TEL}
         </p>
-        <p>학원 등록번호 제2026-00호(ㅁㄹ교육지원청) / 교습과목 보통교과(수학, 영어)</p>
-        <p className="mt-3">Copyright 2026 {ACADEMY}</p>
+        <p>학원 등록번호 제2026-00호(ㅁㄹ교육지원청) · 교습과목 보통교과(수학, 영어)</p>
+        <p className="mt-3">© 2026 {ACADEMY}</p>
       </div>
     </footer>
   );

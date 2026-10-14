@@ -50,7 +50,7 @@ export function ToolBoard() {
               <span className="min-w-0">
                 <span className="block text-[17px] font-bold leading-[1.4] md:text-[19px]">{t.need}</span>
                 <span className="mt-0.5 block text-[14px] font-bold text-foreground-tertiary">
-                  {t.title} / {t.for}
+                  {t.title} · {t.for}
                 </span>
               </span>
               <span aria-hidden className="flex size-8 shrink-0 items-center justify-center rounded-full border-[2.5px] border-[#1d1d1f] bg-accent text-white transition-transform group-hover:translate-x-0.5">

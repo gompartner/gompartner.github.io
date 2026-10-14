@@ -58,7 +58,7 @@ export function AdEpisode() {
       <Panel img="/images/webtoon/night-phone.jpg" alt="밤늦게 가게 계산대에서 휴대폰을 보는 정수기 렌탈 사장님">
         <Narration className="absolute left-3 top-3">밤 11시</Narration>
         <Bubble className="absolute bottom-4 left-4" tail="top-right">
-          오늘도 광고비는 나갔는데... 신청이 몇 건이었지?
+          오늘도 광고비는 나갔는데… 신청이 몇 건이었지?
         </Bubble>
       </Panel>
       <Gutter size="sm" />
@@ -162,11 +162,11 @@ export function AdEpisode() {
                 style={{ borderColor: ink }}
               >
                 <p className="flex items-center gap-1.5 text-[13px] font-bold text-foreground-tertiary">
-                  <BellRing size={15} aria-hidden /> 문자 <span className="font-normal">지금</span>
+                  <BellRing size={15} aria-hidden /> 문자 · 지금
                 </p>
                 <p className="mt-0.5 text-[16px] font-bold">[곰파트너 렌탈] 새 신청 1건</p>
                 <p className="text-[15px] text-foreground-secondary">
-                  {sent.name}, {sent.phone}, {sent.item}, 네이버 검색광고
+                  {sent.name} · {sent.phone} · {sent.item} · 네이버 검색광고
                 </p>
               </motion.div>
               <Sfx className="bottom-6 left-5 text-[64px] md:text-[80px]" color="#ffd43b" rotate={-10} delay={0.45}>
@@ -217,8 +217,8 @@ export function AdEpisode() {
       <Gutter size="lg" />
       <EndCard
         title="광고 신청 접수 랜딩페이지"
-        price={`${manwon(basic.price)}부터, 작업 ${basic.days}일`}
-        items={["접수 즉시 알림", "구글 시트 상담 상태 기록", "광고별 신청과 계약 집계", "원본 소스 제공"]}
+        price={`${manwon(basic.price)}부터 · 작업 ${basic.days}일`}
+        items={["접수 즉시 알림", "구글 시트 상담 상태 기록", "광고별 신청·계약 집계", "원본 소스 제공"]}
         sample={{ href: "/demo/landing-water-rental", label: "정수기 렌탈 샘플 보기" }}
         consult={{ href: "/landing#apply", label: "상담 신청" }}
       />
@@ -238,11 +238,11 @@ function OldSite() {
       <div className="mt-2 grid grid-cols-[90px_1fr] gap-2">
         <ul className="grid content-start gap-1 bg-white p-1.5 text-[#0000ee] underline">
           {["회사소개", "인사말", "연혁", "제품소개", "설비현황", "Q&A", "자료실"].map((m) => (
-            <li key={m}>&gt; {m}</li>
+            <li key={m}>▶ {m}</li>
           ))}
         </ul>
         <div className="bg-white p-2">
-          <p className="font-bold text-[#cc0000]">[공지] 홈페이지 리뉴얼 준비중입니다</p>
+          <p className="font-bold text-[#cc0000]">★ 공지 ★ 홈페이지 리뉴얼 준비중입니다</p>
           <table className="mt-2 w-full border-collapse border border-gray-500 text-center">
             <tbody>
               {[["MCT", "3대"], ["CNC", "2대"], ["밀링", "1대"]].map(([a, b]) => (
@@ -253,7 +253,7 @@ function OldSite() {
               ))}
             </tbody>
           </table>
-          <p className="mt-3 text-[10px] text-gray-600">방문자수 : 0012345 / 이 사이트는 IE 1024x768에 최적화되어 있습니다</p>
+          <p className="mt-3 text-[10px] text-gray-600">방문자수 : 0012345 · 이 사이트는 IE 1024x768에 최적화되어 있습니다</p>
         </div>
       </div>
     </div>
@@ -265,7 +265,7 @@ function BeforeAfter() {
   const [x, setX] = useState(50);
   return (
     <div className="relative aspect-[16/10] w-full select-none overflow-hidden">
-      <Image src="/images/industry/preview/company.jpg" alt="새로 만든 정밀가공 회사 홈페이지 PC, 휴대폰 화면" fill sizes="(min-width: 768px) 640px, 100vw" className="object-cover" />
+      <Image src="/images/industry/preview/company.jpg" alt="새로 만든 정밀가공 회사 홈페이지 PC·휴대폰 화면" fill sizes="(min-width: 768px) 640px, 100vw" className="object-cover" />
       <div className="absolute inset-0" style={{ clipPath: `inset(0 ${100 - x}% 0 0)` }}>
         <OldSite />
       </div>
@@ -296,7 +296,7 @@ export function CompanyEpisode() {
       <Panel img="/images/webtoon/factory.jpg" alt="사무실에서 오래된 회사 홈페이지를 보며 한숨 쉬는 정밀가공 회사 대표">
         <Narration className="absolute left-3 top-3">정밀가공 회사 사무실</Narration>
         <Bubble className="absolute bottom-4 left-4" tail="top-right">
-          새 거래처가 홈페이지 보고 연락 준다는데... 이걸 보여 줘도 되나.
+          새 거래처가 홈페이지 보고 연락 준다는데… 이걸 보여 줘도 되나.
         </Bubble>
       </Panel>
       <Gutter size="lg" />
@@ -311,9 +311,9 @@ export function CompanyEpisode() {
       </Panel>
       <Gutter size="lg" />
       <EndCard
-        title="회사, 가게 홈페이지"
-        price={`${manwon(basic.price)}부터, 작업 ${basic.days}일`}
-        items={plans.map((p) => `${p.title} ${manwon(p.price)}, ${p.days}일`)}
+        title="회사·가게 홈페이지"
+        price={`${manwon(basic.price)}부터 · 작업 ${basic.days}일`}
+        items={plans.map((p) => `${p.title} ${manwon(p.price)} · ${p.days}일`)}
         sample={{ href: "/demo/company", label: "정밀가공 회사 샘플 보기" }}
         consult={{ href: chat("회사 홈페이지 상담을 원합니다."), label: "채팅 상담" }}
       />
@@ -447,7 +447,7 @@ export function ProgramEpisode() {
       <Panel img="/images/webtoon/excel.jpg" alt="쌓인 주문서와 엑셀 화면 앞에서 지친 사무직 직원">
         <Narration className="absolute left-3 top-3">월요일 저녁 8시</Narration>
         <Bubble className="absolute bottom-4 left-4" tail="top-right">
-          거래처마다 엑셀 양식이 다 달라요...
+          거래처마다 엑셀 양식이 다 달라요…
         </Bubble>
       </Panel>
       <Gutter size="lg" />
@@ -464,7 +464,7 @@ export function ProgramEpisode() {
       <EndCard
         title="업무 프로그램"
         price="별도 견적"
-        items={["필요한 기능과 화면 수를 듣고 견적을 제공합니다.", "주문 엑셀 취합 자동화", "신청, 심사 같은 내부 관리 화면", "온라인 강의(LMS)와 결과지 출력"]}
+        items={["필요한 기능과 화면 수를 듣고 견적을 제공합니다.", "주문·엑셀 취합 자동화", "신청·심사 같은 내부 관리 화면", "온라인 강의(LMS)·결과지 출력"]}
         sample={{ href: "/demo/excel-automation", label: "주문 엑셀 자동화 샘플 보기" }}
         consult={{ href: chat("업무 프로그램 견적 상담을 원합니다."), label: "채팅 상담" }}
       />
