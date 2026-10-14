@@ -104,7 +104,7 @@ export function Footer() {
               <Image src="/images/bear-avatar.webp" alt="" width={32} height={32} className="h-8 w-8 rounded-full border-2 border-[#1d1d1f] bg-[#fffdf8] object-cover" />
               {profile.name}
             </p>
-            <p className="mt-3">랜딩페이지, 홈페이지, 유지보수, 업무 프로그램</p>
+            <p className="mt-3">랜딩페이지 · 홈페이지 · 유지보수 · 업무 프로그램</p>
             <p className="mt-1">
               <a href={`mailto:${profile.email}`} data-gtm-cta="footer_email" className={link}>
                 {profile.email}
@@ -134,7 +134,7 @@ export function Footer() {
             개인정보처리방침
           </Link>
           <p>
-            Copyright {currentYear} {profile.name}
+            © {currentYear} {profile.name}
           </p>
         </div>
       </div>

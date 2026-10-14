@@ -10,7 +10,7 @@ import { landingPlans, manwon, plans } from "@/data/pricing";
 import { fitDescription } from "@/lib/seo";
 
 export const metadata: Metadata = {
-  title: "홈페이지 제작 비용과 가격표",
+  title: "홈페이지 제작 비용·가격표",
   description: fitDescription(`${plans.map((p) => `${p.title} ${manwon(p.price)}`).join(", ")}. 예약, 결제, 회원가입 같은 추가 기능 가격도 함께 적었습니다.`),
   alternates: { canonical: "/pricing" },
 };
@@ -20,7 +20,7 @@ const h2 = "text-[24px] font-bold leading-[1.5] tracking-[-0.01em] md:text-[32px
 // 파는 상품 네 가지. 가격 페이지 맨 위에서 고르고, 아래는 상품마다 따로 나눈다(섞어 보이지 않게).
 const products = [
   { href: "#landing", name: "광고 랜딩페이지", price: `${manwon(landingPlans[0].price)}부터`, what: "광고 보고 온 사람의 신청을 받는 한 페이지" },
-  { href: "#homepage", name: "홈페이지 제작", price: `${manwon(plans[0].price)}부터`, what: "회사나 가게를 소개하고 문의와 예약을 받는 홈페이지" },
+  { href: "#homepage", name: "홈페이지 제작", price: `${manwon(plans[0].price)}부터`, what: "회사·가게 소개, 문의·예약을 받는 홈페이지" },
   { href: "#maintenance", name: "유지보수", price: "월 5만 원부터", what: "만든 홈페이지 수정과 오류 수정" },
   { href: "#program", name: "업무 프로그램", price: "별도 견적", what: "엑셀로 하던 일을 화면으로 옮기기" },
 ];

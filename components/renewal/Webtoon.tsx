@@ -68,7 +68,7 @@ function Cover() {
       >
         곰파트너
       </motion.h1>
-      <p className="mt-4 text-center text-[16px] font-bold md:text-[18px]">랜딩페이지, 홈페이지, 유지보수, 업무 프로그램</p>
+      <p className="mt-4 text-center text-[16px] font-bold md:text-[18px]">랜딩페이지 · 홈페이지 · 유지보수 · 업무 프로그램</p>
     </header>
   );
 }
@@ -157,7 +157,7 @@ export function Webtoon() {
                         <span>
                           <span className="block text-[17px] font-bold md:text-[19px]">{c.say}</span>
                           <span className={`block text-[13px] font-bold md:text-[14px] ${on ? "text-white/85" : "text-foreground-tertiary"}`}>
-                            {c.service}, {c.price}
+                            {c.service} · {c.price}
                           </span>
                         </span>
                         <motion.span

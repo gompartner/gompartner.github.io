@@ -24,7 +24,7 @@ export function IndustryWorks() {
           >
             <Image
               src={`/images/industry/preview/${ind.slug}.jpg`}
-              alt={`${ind.label} 샘플 PC, 휴대폰 화면`}
+              alt={`${ind.label} 샘플 PC·휴대폰 화면`}
               width={960}
               height={600}
               className="aspect-[16/10] w-full object-cover"
@@ -34,7 +34,7 @@ export function IndustryWorks() {
                 <span className="text-[19px] font-bold leading-[1.4] group-hover:text-accent">{ind.label}</span>
                 <span className="shrink-0 text-[15px] tabular-nums text-foreground-secondary">샘플 {total}개</span>
               </p>
-              <p className="mt-2 text-[15px] leading-[1.6] text-foreground-secondary md:text-[16px]">{ind.needs.slice(0, 3).join(", ")}</p>
+              <p className="mt-2 text-[15px] leading-[1.6] text-foreground-secondary md:text-[16px]">{ind.needs.slice(0, 3).join(" · ")}</p>
             </div>
           </Link>
         </li>

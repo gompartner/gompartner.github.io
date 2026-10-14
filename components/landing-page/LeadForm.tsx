@@ -53,7 +53,7 @@ export const LeadForm = forwardRef<HTMLElement, { pkg: PackageName | ""; onPkg: 
     if (!name.trim()) e.name = "이름을 입력해 주세요.";
     if (!PHONE_RE.test(phone.trim())) e.phone = "휴대폰 번호를 확인해 주세요.";
     if (!business.trim()) e.business = "업종을 입력해 주세요.";
-    if (!agree) e.agree = "개인정보 수집과 이용에 동의해 주세요.";
+    if (!agree) e.agree = "개인정보 수집·이용에 동의해 주세요.";
     setErrors(e);
     return Object.keys(e).length === 0;
   };
@@ -184,7 +184,7 @@ export const LeadForm = forwardRef<HTMLElement, { pkg: PackageName | ""; onPkg: 
               <div className="flex items-start gap-3">
                 <input id="lp-agree" type="checkbox" checked={agree} onChange={(e) => setAgree(e.target.checked)} className="mt-1 h-5 w-5 shrink-0 accent-[#256ef4]" aria-invalid={!!errors.agree} />
                 <label htmlFor="lp-agree" className="text-[16px] leading-[1.6]">
-                  개인정보 수집과 이용에 동의합니다.
+                  개인정보 수집·이용에 동의합니다.
                 </label>
               </div>
               <details className="group mt-2 border-2 border-[#1d1d1f] bg-[#fffdf8] px-4 py-3 text-[15px] leading-[1.6] text-foreground-secondary">

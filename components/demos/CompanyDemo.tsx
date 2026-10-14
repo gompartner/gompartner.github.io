@@ -127,7 +127,7 @@ const MENUS: { id: MenuId; label: L; subs: { id: string; label: L }[] }[] = [
       { id: "semi", label: l("반도체 장비", "Semiconductor") },
       { id: "medical", label: l("의료기기", "Medical") },
       { id: "battery", label: l("2차전지 장비", "Battery Equipment") },
-      { id: "robot", label: l("로봇/자동화", "Robotics") },
+      { id: "robot", label: l("로봇·자동화", "Robotics") },
     ],
   },
   {
@@ -142,7 +142,7 @@ const MENUS: { id: MenuId; label: L; subs: { id: string; label: L }[] }[] = [
 
 const COMPANY = l("곰파트너", "Gompartner");
 const ADDRESS = l("ㅎㄷ시 ㅁㄹ구 ㅅㄴ산단로 00", "00 SN-sandan-ro, MR-gu, HD-si");
-const HOURS = l("평일 08:30 ~ 17:30, 토요일, 일요일, 공휴일 휴무", "Weekdays 08:30 to 17:30, closed on weekends and holidays");
+const HOURS = l("평일 08:30 ~ 17:30, 토·일·공휴일 휴무", "Weekdays 08:30 to 17:30, closed on weekends and holidays");
 
 /* ---------- 도우미 ---------- */
 
@@ -197,39 +197,39 @@ interface Machine {
 }
 
 const MACHINES: Machine[] = [
-  { type: "mc", mk: "vmc", name: "VMC-850", maker: l("ㄷㅅ공작기계 (국내)", "DS Machine Tools (Korea)"), spec: l("X850 x Y500 x Z500 mm", "X850 x Y500 x Z500 mm"), spindle: "12,000 rpm", count: 4, year: 2016 },
-  { type: "mc", mk: "large", name: "VMC-1300", maker: l("ㄷㅅ공작기계 (국내)", "DS Machine Tools (Korea)"), spec: l("X1,300 x Y650 x Z600 mm", "X1,300 x Y650 x Z600 mm"), spindle: "8,000 rpm", count: 2, year: 2019 },
-  { type: "mc", mk: "vmc", name: "HSC-500", maker: l("ㅂㄹ (일본)", "BR (Japan)"), spec: l("X500 x Y400 x Z300 mm", "X500 x Y400 x Z300 mm"), spindle: "24,000 rpm", count: 1, year: 2021 },
-  { type: "fiveAx", mk: "fiveAx", name: "5AX-600", maker: l("ㅎㅅ (독일)", "HS (Germany)"), spec: l("X600 x Y500 x Z400 mm, A축 +-120도, C축 360도", "X600 x Y500 x Z400 mm, A +-120 deg, C 360 deg"), spindle: "20,000 rpm", count: 3, year: 2018 },
-  { type: "lathe", mk: "lathe", name: "TL-300", maker: l("ㅁㅇ기공 (국내)", "MY Machinery (Korea)"), spec: l("최대 지름 300 x 길이 500 mm", "Max. dia. 300 x L500 mm"), spindle: "4,500 rpm", count: 5, year: 2016 },
-  { type: "lathe", mk: "turnMill", name: "TM-200", maker: l("ㅂㄹ (일본)", "BR (Japan)"), spec: l("최대 지름 200 x 길이 400 mm, Y축, 부 주축", "Max. dia. 200 x L400 mm, Y-axis, sub spindle"), spindle: "6,000 rpm", count: 2, year: 2022 },
+  { type: "mc", mk: "vmc", name: "VMC-850", maker: l("ㄷㅅ공작기계 (국내)", "DS Machine Tools (Korea)"), spec: l("X850 × Y500 × Z500 mm", "X850 × Y500 × Z500 mm"), spindle: "12,000 rpm", count: 4, year: 2016 },
+  { type: "mc", mk: "large", name: "VMC-1300", maker: l("ㄷㅅ공작기계 (국내)", "DS Machine Tools (Korea)"), spec: l("X1,300 × Y650 × Z600 mm", "X1,300 × Y650 × Z600 mm"), spindle: "8,000 rpm", count: 2, year: 2019 },
+  { type: "mc", mk: "vmc", name: "HSC-500", maker: l("ㅂㄹ (일본)", "BR (Japan)"), spec: l("X500 × Y400 × Z300 mm", "X500 × Y400 × Z300 mm"), spindle: "24,000 rpm", count: 1, year: 2021 },
+  { type: "fiveAx", mk: "fiveAx", name: "5AX-600", maker: l("ㅎㅅ (독일)", "HS (Germany)"), spec: l("X600 × Y500 × Z400 mm, A ±120°, C 360°", "X600 × Y500 × Z400 mm, A ±120°, C 360°"), spindle: "20,000 rpm", count: 3, year: 2018 },
+  { type: "lathe", mk: "lathe", name: "TL-300", maker: l("ㅁㅇ기공 (국내)", "MY Machinery (Korea)"), spec: l("최대 Ø300 × 길이 500 mm", "Max. Ø300 × L500 mm"), spindle: "4,500 rpm", count: 5, year: 2016 },
+  { type: "lathe", mk: "turnMill", name: "TM-200", maker: l("ㅂㄹ (일본)", "BR (Japan)"), spec: l("최대 Ø200 × 길이 400 mm, Y축, 부 주축", "Max. Ø200 × L400 mm, Y-axis, sub spindle"), spindle: "6,000 rpm", count: 2, year: 2022 },
 ];
 
 const MEASURES: { name: L; maker: L; range: L; acc: L; count: number; year: number }[] = [
-  { name: l("3차원 측정기 CMM-7106", "CMM 7106"), maker: l("ㄴㄹ (독일)", "NR (Germany)"), range: l("X700 x Y1,000 x Z600 mm", "X700 x Y1,000 x Z600 mm"), acc: l("1.9 + L/300 um", "1.9 + L/300 um"), count: 1, year: 2022 },
-  { name: l("윤곽, 표면 거칠기 측정기", "Contour and roughness tester"), maker: l("ㅈㅇ (일본)", "JY (Japan)"), range: l("측정 길이 100 mm", "Stroke 100 mm"), acc: l("Ra 0.01 um까지", "Down to Ra 0.01 um"), count: 1, year: 2022 },
-  { name: l("비접촉 영상 측정기", "Vision measuring system"), maker: l("ㄷㄹ (국내)", "DR (Korea)"), range: l("X300 x Y200 mm", "X300 x Y200 mm"), acc: l("+-2.5 um", "+-2.5 um"), count: 1, year: 2023 },
-  { name: l("하이트 게이지", "Height gauge"), maker: l("ㅈㅇ (일본)", "JY (Japan)"), range: l("높이 600 mm", "Height 600 mm"), acc: l("+-1.1 um", "+-1.1 um"), count: 2, year: 2017 },
+  { name: l("3차원 측정기 CMM-7106", "CMM 7106"), maker: l("ㄴㄹ (독일)", "NR (Germany)"), range: l("X700 × Y1,000 × Z600 mm", "X700 × Y1,000 × Z600 mm"), acc: l("1.9 + L/300 µm", "1.9 + L/300 µm"), count: 1, year: 2022 },
+  { name: l("윤곽·표면 거칠기 측정기", "Contour and roughness tester"), maker: l("ㅈㅇ (일본)", "JY (Japan)"), range: l("측정 길이 100 mm", "Stroke 100 mm"), acc: l("Ra 0.01 µm까지", "Down to Ra 0.01 µm"), count: 1, year: 2022 },
+  { name: l("비접촉 영상 측정기", "Vision measuring system"), maker: l("ㄷㄹ (국내)", "DR (Korea)"), range: l("X300 × Y200 mm", "X300 × Y200 mm"), acc: l("±2.5 µm", "±2.5 µm"), count: 1, year: 2023 },
+  { name: l("하이트 게이지", "Height gauge"), maker: l("ㅈㅇ (일본)", "JY (Japan)"), range: l("높이 600 mm", "Height 600 mm"), acc: l("±1.1 µm", "±1.1 µm"), count: 2, year: 2017 },
 ];
 
 const MACHINE_TOTAL = MACHINES.reduce((n, m) => n + m.count, 0);
 
 const PRODUCTS: { cat: PrCat; name: L; material: L; tol: string; mk: MachineKey; qty: L }[] = [
-  { cat: "semi", name: l("웨이퍼 이송 로봇 암 블록", "Wafer transfer robot arm block"), material: l("알루미늄 6061, 경질 아노다이징", "Al 6061, hard anodized"), tol: "+-0.02", mk: "fiveAx", qty: l("월 120개", "120 / month") },
-  { cat: "medical", name: l("수술 기구 연결 커넥터", "Surgical instrument connector"), material: l("스테인리스 630", "SUS 630"), tol: "+-0.01", mk: "turnMill", qty: l("로트당 500개", "500 / lot") },
-  { cat: "battery", name: l("전극 노칭 금형 베이스", "Electrode notching die base"), material: l("공구강 SKD11, 열처리 후 가공", "Tool steel SKD11, machined after hardening"), tol: "+-0.01", mk: "fiveAx", qty: l("주문 생산", "Made to order") },
-  { cat: "robot", name: l("협동 로봇 감속기 하우징", "Cobot reducer housing"), material: l("알루미늄 7075", "Al 7075"), tol: "+-0.02", mk: "fiveAx", qty: l("월 250개", "250 / month") },
-  { cat: "semi", name: l("진공 챔버 포트 플랜지", "Vacuum chamber port flange"), material: l("스테인리스 316L, Ra 0.8", "SUS 316L, Ra 0.8"), tol: "+-0.03", mk: "lathe", qty: l("월 300개", "300 / month") },
-  { cat: "medical", name: l("진단 장비 시료 트레이", "Diagnostic analyzer sample tray"), material: l("PEEK", "PEEK"), tol: "+-0.05", mk: "vmc", qty: l("월 200개", "200 / month") },
-  { cat: "battery", name: l("롤 프레스 베어링 하우징", "Roll press bearing housing"), material: l("탄소강 S45C", "Carbon steel S45C"), tol: "+-0.02", mk: "large", qty: l("월 40개", "40 / month") },
-  { cat: "robot", name: l("비전 검사기 카메라 브래킷", "Vision inspection camera bracket"), material: l("알루미늄 6061, 흑색 아노다이징", "Al 6061, black anodized"), tol: "+-0.05", mk: "vmc", qty: l("월 600개", "600 / month") },
+  { cat: "semi", name: l("웨이퍼 이송 로봇 암 블록", "Wafer transfer robot arm block"), material: l("알루미늄 6061, 경질 아노다이징", "Al 6061, hard anodized"), tol: "±0.02", mk: "fiveAx", qty: l("월 120개", "120 / month") },
+  { cat: "medical", name: l("수술 기구 연결 커넥터", "Surgical instrument connector"), material: l("스테인리스 630", "SUS 630"), tol: "±0.01", mk: "turnMill", qty: l("로트당 500개", "500 / lot") },
+  { cat: "battery", name: l("전극 노칭 금형 베이스", "Electrode notching die base"), material: l("공구강 SKD11, 열처리 후 가공", "Tool steel SKD11, machined after hardening"), tol: "±0.01", mk: "fiveAx", qty: l("주문 생산", "Made to order") },
+  { cat: "robot", name: l("협동 로봇 감속기 하우징", "Cobot reducer housing"), material: l("알루미늄 7075", "Al 7075"), tol: "±0.02", mk: "fiveAx", qty: l("월 250개", "250 / month") },
+  { cat: "semi", name: l("진공 챔버 포트 플랜지", "Vacuum chamber port flange"), material: l("스테인리스 316L, Ra 0.8", "SUS 316L, Ra 0.8"), tol: "±0.03", mk: "lathe", qty: l("월 300개", "300 / month") },
+  { cat: "medical", name: l("진단 장비 시료 트레이", "Diagnostic analyzer sample tray"), material: l("PEEK", "PEEK"), tol: "±0.05", mk: "vmc", qty: l("월 200개", "200 / month") },
+  { cat: "battery", name: l("롤 프레스 베어링 하우징", "Roll press bearing housing"), material: l("탄소강 S45C", "Carbon steel S45C"), tol: "±0.02", mk: "large", qty: l("월 40개", "40 / month") },
+  { cat: "robot", name: l("비전 검사기 카메라 브래킷", "Vision inspection camera bracket"), material: l("알루미늄 6061, 흑색 아노다이징", "Al 6061, black anodized"), tol: "±0.05", mk: "vmc", qty: l("월 600개", "600 / month") },
 ];
 
 const PR_CATS: Record<PrCat, L> = {
   semi: l("반도체 장비", "Semiconductor"),
   medical: l("의료기기", "Medical"),
   battery: l("2차전지 장비", "Battery equipment"),
-  robot: l("로봇/자동화", "Robotics"),
+  robot: l("로봇·자동화", "Robotics"),
 };
 
 const HISTORY: { year: number; items: L[] }[] = [
@@ -302,8 +302,8 @@ const BUSINESS: Record<string, { desc: L; rows: [L, L][]; machines: MachineKey[]
       "Cylindrical parts such as shafts, flanges and connectors.",
     ),
     rows: [
-      [l("최대 가공 크기", "Max. size"), l("지름 300 x 길이 500 mm", "Dia. 300 x L500 mm")],
-      [l("공차", "Tolerance"), l("+-0.01 mm (지름 200 이하)", "+-0.01 mm (up to dia. 200)")],
+      [l("최대 가공 크기", "Max. size"), l("Ø300 × 길이 500 mm", "Ø300 × L500 mm")],
+      [l("공차", "Tolerance"), l("±0.01 mm (Ø200 이하)", "±0.01 mm (up to Ø200)")],
       [l("주요 소재", "Materials"), l("스테인리스, 탄소강, 알루미늄, 황동, PEEK", "Stainless, carbon steel, aluminum, brass, PEEK")],
     ],
     machines: ["lathe", "turnMill"],
@@ -314,20 +314,20 @@ const BUSINESS: Record<string, { desc: L; rows: [L, L][]; machines: MachineKey[]
       "Prismatic parts such as blocks, housings and base plates.",
     ),
     rows: [
-      [l("최대 가공 크기", "Max. size"), l("1,300 x 650 x 600 mm", "1,300 x 650 x 600 mm")],
-      [l("공차", "Tolerance"), l("+-0.02 mm", "+-0.02 mm")],
+      [l("최대 가공 크기", "Max. size"), l("1,300 × 650 × 600 mm", "1,300 × 650 × 600 mm")],
+      [l("공차", "Tolerance"), l("±0.02 mm", "±0.02 mm")],
       [l("주요 소재", "Materials"), l("알루미늄, 탄소강, 공구강, 엔지니어링 플라스틱", "Aluminum, carbon steel, tool steel, engineering plastics")],
     ],
     machines: ["vmc", "large"],
   },
   fiveAx: {
     desc: l(
-      "여러 면에 경사 구멍이나 곡면이 있는 부품을 가공합니다. 공차 0.01mm 부품은 항온 가공실에서 가공합니다.",
-      "Parts with angled holes or curved faces on several sides. 0.01 mm tolerance parts are machined in the temperature-controlled room.",
+      "여러 면에 경사 구멍이나 곡면이 있는 부품을 가공합니다. ±0.01mm 공차 부품은 항온 가공실에서 가공합니다.",
+      "Parts with angled holes or curved faces on several sides. ±0.01 mm parts are machined in the temperature-controlled room.",
     ),
     rows: [
-      [l("최대 가공 크기", "Max. size"), l("600 x 500 x 400 mm", "600 x 500 x 400 mm")],
-      [l("공차", "Tolerance"), l("+-0.01 mm", "+-0.01 mm")],
+      [l("최대 가공 크기", "Max. size"), l("600 × 500 × 400 mm", "600 × 500 × 400 mm")],
+      [l("공차", "Tolerance"), l("±0.01 mm", "±0.01 mm")],
       [l("주요 소재", "Materials"), l("알루미늄 7075, 스테인리스, 열처리 공구강", "Al 7075, stainless, hardened tool steel")],
     ],
     machines: ["fiveAx"],
@@ -627,9 +627,9 @@ function Home() {
   const notices = makeNotices(useDemoToday());
 
   const specs = [
-    { k: x("최소 공차", "Tightest tolerance"), v: "+-0.01", u: "mm" },
-    { k: x("최대 가공 크기", "Max. part size"), v: "1,300 x 650 x 600", u: "mm" },
-    { k: x("선반 최대 지름", "Max. turning dia."), v: "300", u: "mm" },
+    { k: x("최소 공차", "Tightest tolerance"), v: "±0.01", u: "mm" },
+    { k: x("최대 가공 크기", "Max. part size"), v: "1,300×650×600", u: "mm" },
+    { k: x("선반 최대 지름", "Max. turning dia."), v: "Ø300", u: "mm" },
   ];
 
   const links = [
@@ -691,7 +691,7 @@ function Home() {
               <span className="absolute inset-x-0 bottom-0 p-4 md:p-5" style={{ color: C.white, background: "linear-gradient(0deg, rgba(20,24,29,0.85), rgba(20,24,29,0))" }}>
                 <span className="block text-[13px]" style={{ color: "#d4d8de" }}>{x("사업분야", "Business")}</span>
                 <span className="block text-[20px] font-bold md:text-[23px]">{x("CNC 선반 가공", "CNC Turning")}</span>
-                <span className="block text-[14px]" style={{ color: "#d4d8de" }}>{x("최대 지름 300, 복합 선반 Y축 가공", "Up to dia. 300, turn-mill with Y-axis")}</span>
+                <span className="block text-[14px]" style={{ color: "#d4d8de" }}>{x("최대 Ø300, 복합 선반 Y축 가공", "Up to Ø300, turn-mill with Y-axis")}</span>
               </span>
             </button>
             <button type="button" onClick={() => go("business", "fiveAx")} className="group relative block h-[150px] overflow-hidden rounded-[4px] text-left md:h-[190px]" style={{ background: C.steel }}>
@@ -1067,9 +1067,9 @@ function Overview() {
     [x("설립", "Founded"), x("2009년 3월 (2012년 법인 전환)", "March 2009 (incorporated 2012)")],
     [x("직원", "Employees"), x("46명", "46")],
     [x("주요 사업", "Business"), x("CNC 선반, MCT, 5축 정밀부품 가공", "CNC turning, MCT and 5-axis precision machining")],
-    [x("주요 고객 산업", "Industries"), x("반도체 장비, 의료기기, 2차전지 장비, 로봇 자동화", "Semiconductor equipment, medical devices, battery equipment, robotics")],
+    [x("주요 고객 산업", "Industries"), x("반도체 장비, 의료기기, 2차전지 장비, 로봇·자동화", "Semiconductor equipment, medical devices, battery equipment, robotics")],
     [x("보유 설비", "Equipment"), x(`가공 설비 ${MACHINE_TOTAL}대, 측정 설비 ${MEASURES.reduce((n, v) => n + v.count, 0)}대`, `${MACHINE_TOTAL} machines, ${MEASURES.reduce((n, v) => n + v.count, 0)} measuring instruments`)],
-    [x("사업장", "Plant"), x("대지 3,300m2, 건물 2,150m2 (항온 가공실, 3차원 측정실)", "Site 3,300 m2, building 2,150 m2 (temperature-controlled room, CMM room)")],
+    [x("사업장", "Plant"), x("대지 3,300㎡, 건물 2,150㎡ (항온 가공실, 3차원 측정실)", "Site 3,300 m², building 2,150 m² (temperature-controlled room, CMM room)")],
     [x("인증", "Certifications"), "ISO 9001, ISO 14001, ISO 13485"],
     [x("주소", "Address"), s(ADDRESS)],
   ];
@@ -1139,7 +1139,7 @@ function Location() {
   const dock: [string, string, string][] = [
     [x("평일", "Weekdays"), "08:30 ~ 17:00", x("점심 12:00 ~ 13:00 하역 쉼", "No unloading 12:00 to 13:00")],
     [x("토요일", "Saturday"), "09:00 ~ 12:00", x("전날까지 예약한 차량만", "Booked by the day before only")],
-    [x("일요일, 공휴일", "Sun, holidays"), x("하역 없음", "Closed"), ""],
+    [x("일요일·공휴일", "Sun, holidays"), x("하역 없음", "Closed"), ""],
   ];
 
   return (
@@ -1407,7 +1407,7 @@ const BASE_DAYS: Record<MachineKey, number> = { vmc: 5, large: 7, fiveAx: 7, lat
 const MAT_DAYS: Record<Material, number> = { al: 0, sus: 2, steel: 1, plastic: 0 };
 const TOL_DAYS: Record<Tol, number> = { "0.1": 0, "0.05": 1, "0.01": 3 };
 
-const envText = (k: MachineKey, ko = true) => (ENV[k].length === 3 ? `${ENV[k].map(fmt).join(" x ")} mm` : `${ko ? "지름" : "dia."} ${fmt(ENV[k][0])} x ${fmt(ENV[k][1])} mm`);
+const envText = (k: MachineKey) => (ENV[k].length === 3 ? `${ENV[k].map(fmt).join(" × ")} mm` : `Ø${fmt(ENV[k][0])} × ${fmt(ENV[k][1])} mm`);
 
 type Shape = "block" | "round";
 
@@ -1434,18 +1434,18 @@ interface Verdict {
 }
 
 const R = {
-  tol5ax: l("0.01mm 공차는 항온 가공실의 5축 가공기에서 가공하고 3차원 측정기로 전수 검사합니다.", "0.01 mm tolerance parts are machined on the 5-axis machine in the temperature-controlled room and 100% inspected on the CMM."),
-  tolBig: l("0.01mm 공차는 600 x 500 x 400mm 이내 부품까지 맞출 수 있습니다. 크기나 공차를 함께 검토해야 합니다.", "0.01 mm tolerance is available for parts up to 600 x 500 x 400 mm. Size or tolerance needs to be reviewed."),
-  tooBig: l("보유 설비의 최대 가공 범위(1,300 x 650 x 600mm)를 넘습니다. 분할 가공 후 조립 방식으로 검토합니다.", "Exceeds our largest envelope (1,300 x 650 x 600 mm). Machining in sections and assembling may be an option."),
-  latheBig: l("선반 최대 가공 범위(지름 300 x 길이 500mm)를 넘습니다.", "Exceeds our lathe capacity (dia. 300 x L500 mm)."),
-  round01: l("지름 200mm가 넘는 원통 부품의 0.01mm 공차는 연삭 공정을 따로 검토해야 합니다.", "0.01 mm tolerance on cylindrical parts over dia. 200 needs a separate grinding review."),
-  plastic: l("엔지니어링 플라스틱은 온도에 따른 치수 변화로 0.01mm 공차 유지가 어렵습니다.", "Engineering plastics change size with temperature, so holding 0.01 mm is difficult."),
+  tol5ax: l("±0.01 공차는 항온 가공실의 5축 가공기에서 가공하고 3차원 측정기로 전수 검사합니다.", "±0.01 parts are machined on the 5-axis machine in the temperature-controlled room and 100% inspected on the CMM."),
+  tolBig: l("±0.01 공차는 600×500×400mm 이내 부품까지 맞출 수 있습니다. 크기나 공차를 함께 검토해야 합니다.", "±0.01 tolerance is available for parts up to 600×500×400 mm. Size or tolerance needs to be reviewed."),
+  tooBig: l("보유 설비의 최대 가공 범위(1,300×650×600mm)를 넘습니다. 분할 가공 후 조립 방식으로 검토합니다.", "Exceeds our largest envelope (1,300×650×600 mm). Machining in sections and assembling may be an option."),
+  latheBig: l("선반 최대 가공 범위(Ø300 × 길이 500mm)를 넘습니다.", "Exceeds our lathe capacity (Ø300 × L500 mm)."),
+  round01: l("지름 200mm가 넘는 원통 부품의 ±0.01 공차는 연삭 공정을 따로 검토해야 합니다.", "±0.01 on cylindrical parts over Ø200 needs a separate grinding review."),
+  plastic: l("엔지니어링 플라스틱은 온도에 따른 치수 변화로 ±0.01 공차 유지가 어렵습니다.", "Engineering plastics change size with temperature, so holding ±0.01 is difficult."),
   sus: l("스테인리스는 공구 마모가 커서 납기가 2일 추가됩니다.", "Stainless steel wears tools faster, so two extra days are added."),
   thin: l("최소 두께가 3mm 미만이라 가공 중 변형 여부를 먼저 검토해야 합니다.", "The thinnest side is under 3 mm, so distortion during machining must be checked first."),
   qty: l("500개가 넘는 수량은 양산 일정과 단가를 따로 협의합니다.", "Quantities over 500 need a separate schedule and price agreement."),
 };
 
-const fitReason = (k: MachineKey): L => l(`${MACHINE_NAME[k].ko} 가공 범위(${envText(k)}) 안에 들어갑니다.`, `Fits within the ${MACHINE_NAME[k].en} envelope (${envText(k, false)}).`);
+const fitReason = (k: MachineKey): L => l(`${MACHINE_NAME[k].ko} 가공 범위(${envText(k)}) 안에 들어갑니다.`, `Fits within the ${MACHINE_NAME[k].en} envelope (${envText(k)}).`);
 
 function judge(i: CheckInput): Verdict | null {
   const dims = i.shape === "block" ? [i.x, i.y, i.z] : [i.x, i.z];
@@ -1629,12 +1629,12 @@ function Checker() {
 
   const unit = x("개", "pcs");
   const qtyText = `${qty}${lang === "ko" ? unit : ` ${unit}`}`;
-  const sizeText = shape === "block" ? `${sx} x ${sy} x ${sz} mm` : `${x("지름", "Dia.")} ${sx} x ${sz} mm`;
+  const sizeText = shape === "block" ? `${sx} × ${sy} × ${sz} mm` : `Ø${sx} × ${sz} mm`;
   const summary = [
     `${x("형태", "Shape")}: ${shape === "block" ? x("각형 부품", "Prismatic") : x("원통형 부품", "Cylindrical")}`,
     `${x("소재", "Material")}: ${s(MATERIAL_NAME[material])}`,
     `${x("크기", "Size")}: ${sizeText}`,
-    `${x("공차", "Tolerance")}: +-${tol} mm`,
+    `${x("공차", "Tolerance")}: ±${tol} mm`,
     `${x("수량", "Quantity")}: ${qtyText}`,
   ].join("\n");
 
@@ -1692,7 +1692,7 @@ function Checker() {
         <fieldset>
           <legend className="text-[15px] font-bold">{x("크기 (mm)", "Size (mm)")}</legend>
           <div className={`mt-2 grid gap-2 ${shape === "block" ? "grid-cols-3" : "grid-cols-2"}`}>
-            {numField("chk-x", shape === "block" ? x("가로 X", "Width X") : x("지름", "Dia."), sx, setSx)}
+            {numField("chk-x", shape === "block" ? x("가로 X", "Width X") : x("지름 Ø", "Dia. Ø"), sx, setSx)}
             {shape === "block" && numField("chk-y", x("세로 Y", "Depth Y"), sy, setSy)}
             {numField("chk-z", shape === "block" ? x("높이 Z", "Height Z") : x("길이", "Length"), sz, setSz)}
           </div>
@@ -1704,7 +1704,7 @@ function Checker() {
             <div className="mt-2 grid grid-cols-3 gap-2">
               {TOLS.map((o) => (
                 <button key={o} type="button" aria-pressed={tol === o} onClick={() => setTol(o)} className="h-12 rounded-[4px] border text-[15px] font-bold tabular-nums" style={seg(tol === o)}>
-                  +-{o}
+                  ±{o}
                 </button>
               ))}
             </div>
@@ -1752,18 +1752,18 @@ function Checker() {
                 </motion.p>
               </AnimatePresence>
               <span className="text-[14px] tabular-nums" style={{ color: C.muted }}>
-                {s(MATERIAL_NAME[material])}, +-{tol} mm, {qtyText}
+                {s(MATERIAL_NAME[material])}, ±{tol} mm, {qtyText}
               </span>
             </div>
             <div className="px-3 pt-3 md:px-5">
               <EnvelopeView
                 v={v}
-                label={x(`설비 가공 범위 ${envText(v.env)} 안에 부품 ${sizeText}을 같은 비율로 그린 그림`, `Part ${sizeText} drawn to scale inside the machine envelope ${envText(v.env, false)}`)}
+                label={x(`설비 가공 범위 ${envText(v.env)} 안에 부품 ${sizeText}을 같은 비율로 그린 그림`, `Part ${sizeText} drawn to scale inside the machine envelope ${envText(v.env)}`)}
               />
               <ul className="flex flex-wrap gap-x-5 gap-y-1 px-2 text-[13px] tabular-nums" style={{ color: C.muted }}>
                 <li className="inline-flex items-center gap-1.5">
                   <span className="h-0 w-5 border-t-2 border-dashed" style={{ borderColor: C.steel }} aria-hidden />
-                  {x("설비 가공 범위", "Machine envelope")} {envText(v.env, lang === "ko")}
+                  {x("설비 가공 범위", "Machine envelope")} {envText(v.env)}
                 </li>
                 <li className="inline-flex items-center gap-1.5">
                   <span className="h-2.5 w-2.5" style={{ background: v.fits ? C.orange : "#a3a9b1" }} aria-hidden />
@@ -1973,7 +1973,7 @@ function Quote() {
     if (due && new Date(`${due}T00:00:00`) < tomorrow) next.due = x("희망 납기는 내일 이후 날짜로 선택해 주십시오.", "Choose a date from tomorrow onward.");
     if (memo.trim().length < 10) next.content = x("문의내용을 입력해 주십시오.", "Enter at least 10 characters.");
     if (errors.file) next.file = errors.file;
-    if (!agree) next.agree = x("개인정보 수집 및 이용에 동의해 주십시오.", "Please agree to the collection of personal data.");
+    if (!agree) next.agree = x("개인정보 수집·이용에 동의해 주십시오.", "Please agree to the collection of personal data.");
     setErrors(next);
     const order: Field[] = ["company", "person", "phone", "email", "subject", "due", "content", "file", "agree"];
     const first = order.find((f) => next[f]);
@@ -2191,7 +2191,7 @@ function Quote() {
                   </p>
                   <label className="mt-2 flex cursor-pointer items-start gap-2.5 text-[15px]">
                     <input id="q-agree" type="checkbox" checked={agree} onChange={(e) => setAgree(e.target.checked)} className="mt-1 h-5 w-5 shrink-0 accent-[#1e2329]" {...aria("agree")} />
-                    <span>{x("개인정보 수집 및 이용에 동의합니다.", "I agree to the collection and use of personal data.")}</span>
+                    <span>{x("개인정보 수집·이용에 동의합니다.", "I agree to the collection and use of personal data.")}</span>
                   </label>
                   {errText("agree")}
                 </div>

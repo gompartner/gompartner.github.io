@@ -116,7 +116,7 @@ export default async function SamplePage({ params }: Props) {
       <div className="flex items-center justify-between gap-3">
         <SampleBack className="inline-flex h-10 items-center gap-1.5 rounded-full border-[2.5px] border-[#1d1d1f] bg-white px-4 text-[15px] font-bold hover:bg-[#fff3b0]" />
         <span className="border-[3px] border-[#1d1d1f] bg-[#fff3b0] px-3 py-1 text-[14px] font-bold md:text-[15px]">
-          {p.category}, {p.layout}
+          {p.category}·{p.layout}
         </span>
       </div>
 

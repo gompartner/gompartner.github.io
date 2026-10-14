@@ -640,13 +640,13 @@ const BOARD: { tab: "news" | "files"; title: string; ago: number; body: BoardTex
   { tab: "news", title: "전기용품 안전기준 KC 60335-2-30 개정판 시행 안내 (전기 히터)", ago: 40, body: (t) => `실내용 전기 히터의 표면 온도 상승 한도와 전도 시험 조건이 바뀝니다. ${daysAgo(t, -117).getFullYear()}년 ${daysAgo(t, -117).getMonth() + 1}월 출시 제품부터 개정판으로 시험하므로 출시 예정 제품은 일정을 미리 상담해 주십시오.` },
   { tab: "news", title: "3m 전파무향실 정기 검증에 따른 방사 시험 휴무 안내", ago: 56, body: (t) => `${agoKo(t, 43)}부터 ${agoKo(t, 41)}까지 무향실 정기 검증(NSA 측정)으로 방사 시험을 쉽니다. 해당 기간 예약 건은 담당 시험원이 일정을 다시 잡아 연락드립니다. 전도 시험과 전기안전 시험은 정상 진행합니다.` },
   { tab: "news", title: "KOLAS 정기 사후평가 결과 인정 범위 유지 및 무선 시험 항목 추가", ago: 78, body: "정기 사후평가를 마쳐 기존 인정 범위가 유지되었고, 블루투스 저전력(BLE) 송신 출력과 점유주파수폭 시험 항목이 인정 범위에 추가되었습니다." },
-  { tab: "news", title: "ㅈㅅ진흥원 중소기업 인증 지원사업 2차 참여기업 모집 공고", ago: 97, body: (t) => `중소기업의 국내, 해외 인증 비용 일부를 지원하는 사업입니다. 신청 마감은 ${agoKo(t, 68)}이며, 신청 서류 작성은 견적문의로 요청하시면 도와 드립니다.` },
-  { tab: "files", title: "시험항목별 수수료 및 시험처리기간 안내", ago: 17, body: "전자파, 무선, 전기안전 시험 항목별 기본 수수료와 처리 기간입니다.", file: "PDF, 412KB" },
-  { tab: "files", title: "[서식] 시험신청서", ago: 35, body: "시험 신청 시 시료와 함께 보내 주십시오.", file: "HWP, 48KB" },
-  { tab: "files", title: "중소기업 시험수수료 할인 안내", ago: 50, body: "중소기업 확인서를 내시면 시험수수료를 할인해 드립니다.", file: "PDF, 186KB" },
-  { tab: "files", title: "[서식] 시료 정보 및 시험 모드 기재표", ago: 69, body: "시료의 동작 모드와 연결 방법을 적어 주십시오.", file: "XLSX, 31KB" },
-  { tab: "files", title: "무선기기 적합인증 제출 기술 문서 목록", ago: 97, body: "적합인증 신청에 필요한 기술 문서 목록입니다.", file: "PDF, 286KB" },
-  { tab: "files", title: "해외인증 국가별 표시 방법 정리", ago: 133, body: "국가별 인증 마크와 표시 위치를 정리했습니다.", file: "PDF, 1.2MB" },
+  { tab: "news", title: "ㅈㅅ진흥원 중소기업 인증 지원사업 2차 참여기업 모집 공고", ago: 97, body: (t) => `중소기업의 국내·해외 인증 비용 일부를 지원하는 사업입니다. 신청 마감은 ${agoKo(t, 68)}이며, 신청 서류 작성은 견적문의로 요청하시면 도와 드립니다.` },
+  { tab: "files", title: "시험항목별 수수료 및 시험처리기간 안내", ago: 17, body: "전자파, 무선, 전기안전 시험 항목별 기본 수수료와 처리 기간입니다.", file: "PDF · 412KB" },
+  { tab: "files", title: "[서식] 시험신청서", ago: 35, body: "시험 신청 시 시료와 함께 보내 주십시오.", file: "HWP · 48KB" },
+  { tab: "files", title: "중소기업 시험수수료 할인 안내", ago: 50, body: "중소기업 확인서를 내시면 시험수수료를 할인해 드립니다.", file: "PDF · 186KB" },
+  { tab: "files", title: "[서식] 시료 정보 및 시험 모드 기재표", ago: 69, body: "시료의 동작 모드와 연결 방법을 적어 주십시오.", file: "XLSX · 31KB" },
+  { tab: "files", title: "무선기기 적합인증 제출 기술 문서 목록", ago: 97, body: "적합인증 신청에 필요한 기술 문서 목록입니다.", file: "PDF · 286KB" },
+  { tab: "files", title: "해외인증 국가별 표시 방법 정리", ago: 133, body: "국가별 인증 마크와 표시 위치를 정리했습니다.", file: "PDF · 1.2MB" },
 ];
 
 const MARKS: { name: string; to: [MenuId, string] }[] = [
@@ -701,7 +701,7 @@ function Home() {
                 {COMPANY}
               </h1>
               <p className="mt-2 text-[16px] font-bold md:text-[18px]" style={{ color: C.cyan }}>
-                KC인증 지정시험기관, KOLAS 공인시험기관
+                KC인증 지정시험기관 · KOLAS 공인시험기관
               </p>
             </div>
             <form id="cl-track-quick" onSubmit={quick} className="rounded-[10px] bg-white p-4 md:p-5" style={{ color: C.ink }}>
@@ -1069,7 +1069,7 @@ function Greeting() {
 
 const ACCREDIT: [string, string, string, string][] = [
   ["KC인증 지정시험기관", "전자파 적합성(EMC), 무선기기(RF)", "제KT0000호", "ㄷㄹ연구원"],
-  ["KOLAS 공인시험기관", "전기전자, 전자파 (ISO/IEC 17025)", "제KT0000호", "ㄱㅎ인정기구"],
+  ["KOLAS 공인시험기관", "전기·전자, 전자파 (ISO/IEC 17025)", "제KT0000호", "ㄱㅎ인정기구"],
   ["전기용품 안전 시험기관", "가정용 전기기기, 조명기기, 정보기기", "제0000-00호", "ㅅㄹ원"],
   ["에너지 효율 시험기관", "조명기기, 전원 장치", "제0000-000호", "ㅇㅈ공단"],
   ["해외 인증기관 협력 시험소", "북미, 유럽 인증 시험", "협약 2건", "ㅎㄴ 인증기관"],
@@ -1078,7 +1078,7 @@ const ACCREDIT: [string, string, string, string][] = [
 function Accredit() {
   return (
     <div>
-      <DataTable caption="인정 및 지정 현황" head={["구분", "분야", "지정 및 인정 번호", "지정기관"]} rows={ACCREDIT.map((r) => [r[0], r[1], <span key="n" className="tabular-nums">{r[2]}</span>, r[3]])} min={620} />
+      <DataTable caption="인정 및 지정 현황" head={["구분", "분야", "지정·인정 번호", "지정기관"]} rows={ACCREDIT.map((r) => [r[0], r[1], <span key="n" className="tabular-nums">{r[2]}</span>, r[3]])} min={620} />
       <p className="mt-4 text-[14px]" style={{ color: C.muted }}>
         인정서와 지정서 사본은 자료실에서 내려받으실 수 있습니다.
       </p>
@@ -1091,7 +1091,7 @@ const FACILITIES = [
     name: "3m 전파무향실",
     body: "방사 방출과 방사 내성을 측정합니다. 지름 2m 턴테이블과 1~4m 안테나 마스트를 보유하고 있습니다.",
     specs: [
-      ["크기", "9 x 6 x 6 m"],
+      ["크기", "9 × 6 × 6 m"],
       ["주파수", "30MHz ~ 18GHz"],
       ["턴테이블 하중", "1.2톤"],
     ],
@@ -1102,7 +1102,7 @@ const FACILITIES = [
     body: "외부 전파가 차단된 차폐실에서 정전기, 전도 내성, 서지 등 내성 시험을 수행합니다.",
     specs: [
       ["차폐 성능", "100dB 이상"],
-      ["정전기 방전", "+-30kV까지"],
+      ["정전기 방전", "±30kV까지"],
       ["서지", "6kV까지"],
     ],
     draw: "shield" as const,
@@ -1112,7 +1112,7 @@ const FACILITIES = [
     body: "전원선과 통신선으로 나가는 잡음을 의사 전원망(LISN)으로 측정합니다.",
     specs: [
       ["주파수", "150kHz ~ 30MHz"],
-      ["전원", "단상/삼상 100A"],
+      ["전원", "단상·삼상 100A"],
       ["통신선", "ISN 8선"],
     ],
     draw: "conducted" as const,
@@ -1123,7 +1123,7 @@ const FACILITIES = [
     specs: [
       ["내전압", "AC 5kV"],
       ["온도 기록", "60채널"],
-      ["항온항습", "-40 ~ 150도"],
+      ["항온항습", "-40 ~ 150°C"],
     ],
     draw: "safety" as const,
   },
@@ -1198,7 +1198,7 @@ function Facilities() {
 }
 
 const IMPARTIAL = [
-  "모든 시험과 인증 업무는 관련 법령과 국제 기준(ISO/IEC 17025)에 따라 독립적이고 공정하게 수행합니다.",
+  "모든 시험·인증 업무는 관련 법령과 국제 기준(ISO/IEC 17025)에 따라 독립적이고 공정하게 수행합니다.",
   "시험 결과에 영향을 줄 수 있는 상업적, 재정적 압력이나 그 밖의 압력을 받지 않으며, 이를 허용하지 않습니다.",
   "의뢰자와 이해관계가 있는 직원은 해당 시험과 판정에 참여하지 않습니다.",
   "공평성을 해칠 수 있는 위험을 정기적으로 파악하고 없애거나 줄이는 조치를 합니다.",
@@ -1210,7 +1210,7 @@ function Impartiality() {
   return (
     <div className="max-w-[820px] rounded-[10px] border p-6 md:p-9" style={{ borderColor: C.line }}>
       <p className="text-center text-[22px] font-bold tracking-[-0.02em] md:text-[26px]">공평성 선언문</p>
-      <p className="mt-5">{COMPANY}는 시험인증 기관으로서 공평성의 중요성을 인식하고, 다음과 같이 선언합니다.</p>
+      <p className="mt-5">{COMPANY}는 시험·인증 기관으로서 공평성의 중요성을 인식하고, 다음과 같이 선언합니다.</p>
       <ol className="mt-5 list-decimal space-y-2.5 pl-6 marker:font-bold marker:text-[#23307a]">
         {IMPARTIAL.map((t) => (
           <li key={t} className="pl-1">
@@ -1237,7 +1237,7 @@ const COMPLAINT_STEPS: [string, string, string][] = [
 function Complaint() {
   return (
     <div className="grid gap-10">
-      <p className="max-w-[820px]">시험과 인증 업무에 대한 고객의 불만과 이의 제기를 공정하게 처리하기 위해 다음 절차를 따릅니다. 불만 제기를 이유로 고객이 불이익을 받는 일은 없습니다.</p>
+      <p className="max-w-[820px]">시험·인증 업무에 대한 고객의 불만과 이의 제기를 공정하게 처리하기 위해 다음 절차를 따릅니다. 불만 제기를 이유로 고객이 불이익을 받는 일은 없습니다.</p>
       <section aria-labelledby="cl-cp-steps">
         <SubHead id="cl-cp-steps">처리 절차</SubHead>
         <div className="mt-3">
@@ -1251,7 +1251,7 @@ function Complaint() {
             rows={[
               ["전화", <span key="t" className="tabular-nums">{TEL} (품질책임자)</span>],
               ["이메일", EMAIL],
-              ["서면, 방문", ADDRESS],
+              ["서면·방문", ADDRESS],
             ]}
           />
         </div>
@@ -1261,7 +1261,7 @@ function Complaint() {
 }
 
 const JOBS: [string, string, string][] = [
-  ["EMC 시험원", "전기전자 관련 학과, 경력 무관", "정규직"],
+  ["EMC 시험원", "전기·전자 관련 학과, 경력 무관", "정규직"],
   ["RF 시험원", "무선 측정 경험 2년 이상", "정규직"],
   ["해외인증 담당", "영문 기술 문서 작성 가능자", "정규직"],
 ];
@@ -1412,15 +1412,15 @@ const SERVICES = [
     code: "EMC",
     name: "전자파 적합성",
     body: "기기가 내보내는 전자파가 다른 기기를 방해하지 않는지, 외부 전자파에 견디는지 시험합니다.",
-    tests: ["방사 및 전도 방출", "정전기 방전", "방사 및 전도 내성", "서지, 순간 전압 강하"],
-    std: "KS C 9832/9835, CISPR 32/35, IEC 61000-4 시리즈",
+    tests: ["방사·전도 방출", "정전기 방전", "방사·전도 내성", "서지, 순간 전압 강하"],
+    std: "KS C 9832·9835, CISPR 32·35, IEC 61000-4 시리즈",
   },
   {
     code: "RF",
     name: "무선 적합성",
     body: "블루투스, Wi-Fi, LTE 같은 무선 기능의 출력과 주파수가 기준 안에 있는지 시험합니다.",
     tests: ["송신 출력", "주파수 허용편차", "점유주파수폭", "불요발사, 전자파 흡수율"],
-    std: "국립전파연구원 고시, ETSI EN 300 328/301 893, FCC Part 15",
+    std: "국립전파연구원 고시, ETSI EN 300 328·301 893, FCC Part 15",
   },
   {
     code: "GMA",
@@ -1441,9 +1441,9 @@ const SERVICES = [
 const SERVICE_ID: Record<string, string> = { emc: "EMC", rf: "RF", safety: "SAFETY", gma: "GMA" };
 const SERVICE_TARGETS: Record<string, string> = {
   EMC: "가전기기, 정보통신기기, 조명기기, 산업용 기기, 의료기기",
-  RF: "블루투스, Wi-Fi 기기, LTE/5G 단말, 무선 충전기, RFID/NFC 기기",
-  GMA: "해외에 판매하는 전기전자 제품",
-  SAFETY: "가정용 전기기기, 정보기기, 사무기기, 조명기기, 전원 장치, 어댑터",
+  RF: "블루투스·Wi-Fi 기기, LTE·5G 단말, 무선 충전기, RFID·NFC 기기",
+  GMA: "해외에 판매하는 전기·전자 제품",
+  SAFETY: "가정용 전기기기, 정보·사무기기, 조명기기, 전원 장치·어댑터",
 };
 
 function ServicePage({ id }: { id: string }) {
@@ -1476,7 +1476,7 @@ function ServicePage({ id }: { id: string }) {
 
 const DOMESTIC: Record<string, { intro: string; law: string; target: string; period: string; docs: string[]; steps: [string, string][]; mark: string }> = {
   conform: {
-    intro: "전파법에 따라 무선기기와 유선 통신기기를 제조, 수입, 판매하기 전에 받는 인증입니다. 지정시험기관의 시험성적서를 붙여 신청합니다.",
+    intro: "전파법에 따라 무선기기와 유선 통신기기를 제조·수입·판매하기 전에 받는 인증입니다. 지정시험기관의 시험성적서를 붙여 신청합니다.",
     law: "전파법",
     target: "무선기기, 유선 통신기기 (블루투스, Wi-Fi, LTE 단말 등)",
     period: "3~8주",
@@ -1491,14 +1491,14 @@ const DOMESTIC: Record<string, { intro: string; law: string; target: string; per
     mark: "KC 마크와 인증번호(R-C-로 시작)를 제품 본체의 잘 보이는 곳에 표시합니다. 본체가 작아 표시하기 어려우면 포장과 설명서에 표시할 수 있습니다.",
   },
   register: {
-    intro: "전자파 장해 우려가 적은 전기전자 기기는 시험성적서를 갖추고 적합등록을 합니다.",
+    intro: "전자파 장해 우려가 적은 전기·전자 기기는 시험성적서를 갖추고 적합등록을 합니다.",
     law: "전파법",
-    target: "가전, 정보기기, 조명 등 전자파 장해 우려가 적은 전기전자 기기",
+    target: "가전, 정보기기, 조명 등 전자파 장해 우려가 적은 전기·전자 기기",
     period: "2~3주",
     docs: ["적합성평가 신청서", "지정시험기관 시험성적서", "사용자 설명서", "외관도"],
     steps: [
       ["시험 신청", "시험신청서와 시료를 제출합니다."],
-      ["시험", "전도 및 방사 방출과 내성을 시험합니다."],
+      ["시험", "전도·방사 방출과 내성을 시험합니다."],
       ["적합등록 신청", "시험성적서를 갖추고 적합등록을 신청합니다."],
       ["등록 완료", "등록번호가 부여됩니다."],
     ],
@@ -1517,7 +1517,7 @@ const DOMESTIC: Record<string, { intro: string; law: string; target: string; per
       ["인증서 발급", "시험과 심사에 모두 적합하면 인증서를 발급합니다."],
       ["정기 검사", "인증 후 해마다 정기 검사를 받습니다."],
     ],
-    mark: "KC 안전인증 마크와 인증번호, 모델명, 정격 전압, 소비전력, 제조자명을 제품에 표시합니다.",
+    mark: "KC 안전인증 마크와 인증번호, 모델명, 정격 전압·소비전력, 제조자명을 제품에 표시합니다.",
   },
   energy: {
     intro: "에너지이용 합리화법에 따라 효율관리기자재는 소비효율 등급을, 대기전력 저감 대상 제품은 대기전력 기준 적합 여부를 시험하고 신고합니다.",
@@ -1534,9 +1534,9 @@ const DOMESTIC: Record<string, { intro: string; law: string; target: string; per
     mark: "에너지소비효율등급 라벨 또는 대기전력 저감 표시를 제품과 포장에 붙입니다.",
   },
   kcs: {
-    intro: "산업안전보건법에 따라 신고 대상 산업용 기계와 기구, 방호장치는 자율안전기준에 맞는지 시험한 뒤 신고합니다.",
+    intro: "산업안전보건법에 따라 신고 대상 산업용 기계·기구와 방호장치는 자율안전기준에 맞는지 시험한 뒤 신고합니다.",
     law: "산업안전보건법",
-    target: "신고 대상 산업용 기계와 기구, 방호장치",
+    target: "신고 대상 산업용 기계·기구와 방호장치",
     period: "3~4주",
     docs: ["자율안전확인 신고서", "제품 설명서", "자율안전기준 적합 시험성적서", "외관 사진"],
     steps: [
@@ -1699,7 +1699,7 @@ const REGIONS: Record<RegionId, RegionInfo> = {
       {
         name: "멕시코",
         certs: [
-          { name: "IFT", desc: "통신기기와 무선기기 인증" },
+          { name: "IFT", desc: "통신·무선기기 인증" },
           { name: "NOM", desc: "전기안전과 에너지 효율 공식 규격 인증" },
         ],
       },
@@ -1712,20 +1712,20 @@ const REGIONS: Record<RegionId, RegionInfo> = {
       {
         name: "브라질",
         certs: [
-          { name: "ANATEL", desc: "통신기기와 무선기기 인증, 현지 시험 필요" },
+          { name: "ANATEL", desc: "통신·무선기기 인증, 현지 시험 필요" },
           { name: "INMETRO", desc: "전기안전과 에너지 효율 인증" },
         ],
       },
-      { name: "아르헨티나", certs: [{ name: "ENACOM", desc: "통신기기와 무선기기 형식승인" }, { name: "S마크", desc: "저전압 전기제품 안전 인증" }] },
+      { name: "아르헨티나", certs: [{ name: "ENACOM", desc: "통신·무선기기 형식승인" }, { name: "S마크", desc: "저전압 전기제품 안전 인증" }] },
       { name: "칠레", certs: [{ name: "SUBTEL", desc: "무선기기 승인" }, { name: "SEC", desc: "전기제품 안전과 효율 인증" }] },
-      { name: "콜롬비아", certs: [{ name: "CRC", desc: "통신 단말기 형식승인" }, { name: "RETIE", desc: "전기설비와 제품 기술 규정 적합 인증" }] },
+      { name: "콜롬비아", certs: [{ name: "CRC", desc: "통신 단말기 형식승인" }, { name: "RETIE", desc: "전기설비·제품 기술 규정 적합 인증" }] },
     ],
   },
   eu: {
     name: "유럽",
     label: [548, 112],
     countries: [
-      { name: "유럽연합", certs: [{ name: "CE", desc: "RED, EMC, LVD 지침 적합 선언과 기술 문서" }, { name: "RoHS/WEEE", desc: "유해물질 제한과 폐전자제품 회수 의무" }] },
+      { name: "유럽연합", certs: [{ name: "CE", desc: "RED, EMC, LVD 지침 적합 선언과 기술 문서" }, { name: "RoHS·WEEE", desc: "유해물질 제한과 폐전자제품 회수 의무" }] },
       { name: "영국", certs: [{ name: "UKCA", desc: "영국 적합성 표시. CE 성적서를 바탕으로 준비" }] },
       { name: "유라시아경제연합", certs: [{ name: "EAC", desc: "러시아, 카자흐스탄 등 회원국 공통 기술 규정 인증" }] },
     ],
@@ -1734,10 +1734,10 @@ const REGIONS: Record<RegionId, RegionInfo> = {
     name: "아프리카",
     label: [548, 300],
     countries: [
-      { name: "남아프리카공화국", certs: [{ name: "ICASA", desc: "통신기기와 무선기기 형식승인" }, { name: "NRCS", desc: "전기안전 의무 규격 승인" }] },
+      { name: "남아프리카공화국", certs: [{ name: "ICASA", desc: "통신·무선기기 형식승인" }, { name: "NRCS", desc: "전기안전 의무 규격 승인" }] },
       { name: "나이지리아", certs: [{ name: "NCC", desc: "통신기기 형식승인" }, { name: "SONCAP", desc: "수입 제품 적합성 평가" }] },
       { name: "케냐", certs: [{ name: "CA", desc: "통신기기 형식승인" }, { name: "PVoC", desc: "선적 전 적합성 검사" }] },
-      { name: "이집트", certs: [{ name: "NTRA", desc: "통신기기와 무선기기 승인" }] },
+      { name: "이집트", certs: [{ name: "NTRA", desc: "통신·무선기기 승인" }] },
     ],
   },
   as: {
@@ -1745,11 +1745,11 @@ const REGIONS: Record<RegionId, RegionInfo> = {
     label: [760, 132],
     countries: [
       { name: "일본", certs: [{ name: "TELEC", desc: "무선기기 기술기준적합증명" }, { name: "PSE", desc: "전기용품안전법 적합 표시" }, { name: "VCCI", desc: "정보기기 전자파 자율 규제" }] },
-      { name: "중국", certs: [{ name: "CCC", desc: "강제인증 목록 품목의 안전과 전자파 인증" }, { name: "SRRC", desc: "무선기기 형식승인" }] },
-      { name: "대만", certs: [{ name: "NCC", desc: "통신기기와 무선기기 인증" }, { name: "BSMI", desc: "전기안전과 전자파 검사" }] },
-      { name: "인도", certs: [{ name: "BIS", desc: "전자, IT 제품 의무 등록" }, { name: "WPC", desc: "무선기기 승인" }] },
+      { name: "중국", certs: [{ name: "CCC", desc: "강제인증 목록 품목의 안전·전자파 인증" }, { name: "SRRC", desc: "무선기기 형식승인" }] },
+      { name: "대만", certs: [{ name: "NCC", desc: "통신·무선기기 인증" }, { name: "BSMI", desc: "전기안전과 전자파 검사" }] },
+      { name: "인도", certs: [{ name: "BIS", desc: "전자·IT 제품 의무 등록" }, { name: "WPC", desc: "무선기기 승인" }] },
       { name: "베트남", certs: [{ name: "MIC", desc: "정보통신기기 적합 인증과 신고" }] },
-      { name: "사우디아라비아", certs: [{ name: "SASO", desc: "제품 안전 적합 인증" }, { name: "CST", desc: "통신기기와 무선기기 형식승인" }] },
+      { name: "사우디아라비아", certs: [{ name: "SASO", desc: "제품 안전 적합 인증" }, { name: "CST", desc: "통신·무선기기 형식승인" }] },
     ],
   },
   oc: {
@@ -1762,7 +1762,7 @@ const REGIONS: Record<RegionId, RegionInfo> = {
   },
 };
 
-const GLOBAL_STEPS = ["견적과 계약", "시료 접수", "시험", "현지 기관 신청", "인증서 발급"];
+const GLOBAL_STEPS = ["견적·계약", "시료 접수", "시험", "현지 기관 신청", "인증서 발급"];
 
 function RegionMap({ region }: { region: RegionId }) {
   const { go } = useCl();
@@ -1928,7 +1928,7 @@ const RADIO_OPTS: { v: Radio; label: string; icon: typeof Plug }[] = [
   { v: "none", label: "없음", icon: WifiOff },
   { v: "bt", label: "블루투스", icon: Bluetooth },
   { v: "wifi", label: "Wi-Fi", icon: Wifi },
-  { v: "cell", label: "LTE/5G", icon: Signal },
+  { v: "cell", label: "LTE·5G", icon: Signal },
 ];
 
 const KIND_OPTS: { v: Kind; label: string; icon: typeof Plug }[] = [
@@ -1949,20 +1949,20 @@ const COUNTRIES: { v: Country; label: string; code: string }[] = [
   { v: "au", label: "호주", code: "AU" },
 ];
 
-const RADIO_NAME: Record<Radio, string> = { none: "", bt: "블루투스", wifi: "Wi-Fi", cell: "LTE/5G" };
+const RADIO_NAME: Record<Radio, string> = { none: "", bt: "블루투스", wifi: "Wi-Fi", cell: "LTE·5G" };
 
 const KR_EMC_STD: Record<Kind, string> = {
-  home: "KS C 9814-1/2",
-  ict: "KS C 9832/9835",
-  light: "KS C 9815/9547",
-  industrial: "KS C 9610-6-2/6-4",
+  home: "KS C 9814-1·2",
+  ict: "KS C 9832·9835",
+  light: "KS C 9815·9547",
+  industrial: "KS C 9610-6-2·6-4",
 };
 
 const EU_EMC_STD: Record<Kind, string> = {
-  home: "EN 55014-1/2",
-  ict: "EN 55032/55035",
-  light: "EN 55015/61547",
-  industrial: "EN 61000-6-2/6-4",
+  home: "EN 55014-1·2",
+  ict: "EN 55032·55035",
+  light: "EN 55015·61547",
+  industrial: "EN 61000-6-2·6-4",
 };
 
 interface FinderInput {
@@ -1983,7 +1983,7 @@ function certsFor(country: Country, { power, radio, kind }: FinderInput): Cert[]
         name: "방송통신기자재 적합인증 (무선)",
         short: "적합인증 (무선)",
         reason: `${RADIO_NAME[radio]} 기능이 있어 전파법에 따른 적합인증 대상입니다. 전자파 시험도 함께 합니다.`,
-        tests: radio === "cell" ? "송신 출력, 불요발사, 전자파 흡수율(SAR), 전자파 방출과 내성" : "송신 출력, 주파수 허용편차, 점유주파수폭, 불요발사, 전자파 방출과 내성",
+        tests: radio === "cell" ? "송신 출력, 불요발사, 전자파 흡수율(SAR), 전자파 방출·내성" : "송신 출력, 주파수 허용편차, 점유주파수폭, 불요발사, 전자파 방출·내성",
         period: radio === "cell" ? "6~8주" : "3~5주",
       });
     } else {
@@ -1992,7 +1992,7 @@ function certsFor(country: Country, { power, radio, kind }: FinderInput): Cert[]
         name: "방송통신기자재 적합등록 (전자파)",
         short: "적합등록 (전자파)",
         reason: kind === "industrial" ? "산업 환경용(A급) 기기 기준으로 전자파 방출과 내성을 봅니다." : "전원이 들어가는 전자기기라 전자파 적합등록 대상입니다.",
-        tests: `전도 및 방사 방출, 정전기 및 방사 내성 (${KR_EMC_STD[kind]})`,
+        tests: `전도·방사 방출, 정전기·방사 내성 (${KR_EMC_STD[kind]})`,
         period: "2~3주",
       });
     }
@@ -2001,7 +2001,7 @@ function certsFor(country: Country, { power, radio, kind }: FinderInput): Cert[]
         id: "kr-kcs",
         name: "자율안전확인신고 (KCs)",
         short: "자율안전확인신고 (KCs)",
-        reason: "산업용 기계와 기구 중 신고 대상 품목이면 산업안전보건법에 따라 신고합니다.",
+        reason: "산업용 기계·기구 중 신고 대상 품목이면 산업안전보건법에 따라 신고합니다.",
         tests: "전기적 안전, 위험 부위 방호, 비상정지 장치",
         period: "3~4주",
       });
@@ -2011,7 +2011,7 @@ function certsFor(country: Country, { power, radio, kind }: FinderInput): Cert[]
         id: strict ? "kr-safe-cert" : "kr-safe-check",
         name: strict ? "전기용품 안전인증" : "전기용품 안전확인",
         short: strict ? "전기용품 안전인증" : "전기용품 안전확인",
-        reason: strict ? "교류 전원에 바로 연결하는 가전, 조명은 대부분 안전인증 대상이고 공장 심사가 함께 진행됩니다." : "교류 전원을 쓰는 정보통신기기는 보통 안전확인 대상입니다.",
+        reason: strict ? "교류 전원에 바로 연결하는 가전·조명은 대부분 안전인증 대상이고 공장 심사가 함께 진행됩니다." : "교류 전원을 쓰는 정보통신기기는 보통 안전확인 대상입니다.",
         tests: "절연저항, 내전압, 온도 상승, 누설전류, 비정상 동작",
         period: strict ? "4~6주" : "2~4주",
       });
@@ -2021,7 +2021,7 @@ function certsFor(country: Country, { power, radio, kind }: FinderInput): Cert[]
         name: "전기용품 공급자적합성확인",
         short: "공급자적합성확인",
         reason: "안전인증을 받은 어댑터를 쓰면 본체는 직류 전원 기기로 공급자적합성확인 대상인지 봅니다.",
-        tests: "어댑터 인증서 확인, 본체 온도 상승, 절연",
+        tests: "어댑터 인증서 확인, 본체 온도 상승·절연",
         period: "1~2주",
       });
     } else {
@@ -2037,7 +2037,7 @@ function certsFor(country: Country, { power, radio, kind }: FinderInput): Cert[]
     if (ac && (kind === "home" || kind === "light")) {
       out.push({
         id: "kr-energy",
-        name: "에너지소비효율, 대기전력 확인",
+        name: "에너지소비효율·대기전력 확인",
         short: "에너지효율 표시",
         reason: "효율관리기자재나 대기전력 저감 대상 품목이면 효율 시험과 표시가 필요합니다.",
         tests: kind === "light" ? "소비전력, 광효율, 역률" : "소비전력, 대기전력",
@@ -2051,7 +2051,7 @@ function certsFor(country: Country, { power, radio, kind }: FinderInput): Cert[]
       wireless
         ? {
             id: "us-fcc-id",
-            name: radio === "cell" ? "FCC ID (Part 15/22/24/27)" : "FCC ID (Part 15 Subpart C)",
+            name: radio === "cell" ? "FCC ID (Part 15·22·24·27)" : "FCC ID (Part 15 Subpart C)",
             short: "FCC ID",
             reason: "무선기기는 TCB 심사를 거쳐 FCC ID를 받아야 판매할 수 있습니다.",
             tests: "송신 출력, 대역 외 발사, RF 노출, 비의도성 방사(Part 15B)",
@@ -2062,7 +2062,7 @@ function certsFor(country: Country, { power, radio, kind }: FinderInput): Cert[]
             name: "FCC Part 15 Subpart B (SDoC)",
             short: "FCC SDoC",
             reason: "무선 기능이 없는 디지털 기기는 공급자 적합성 선언으로 판매합니다.",
-            tests: kind === "industrial" ? "전도 및 방사 방출 (A급)" : "전도 및 방사 방출 (B급)",
+            tests: kind === "industrial" ? "전도·방사 방출 (A급)" : "전도·방사 방출 (B급)",
             period: "2~3주",
           },
     );
@@ -2086,7 +2086,7 @@ function certsFor(country: Country, { power, radio, kind }: FinderInput): Cert[]
             name: "ISED 인증 (RSS)",
             short: "ISED",
             reason: "무선기기는 캐나다 혁신과학경제개발부 인증 번호(IC)가 필요합니다.",
-            tests: radio === "cell" ? "RSS-130/133 등, RF 노출" : "RSS-247, RSS-Gen, RF 노출",
+            tests: radio === "cell" ? "RSS-130·133 등, RF 노출" : "RSS-247, RSS-Gen, RF 노출",
             period: "FCC와 함께 진행하면 2~3주 추가",
           }
         : {
@@ -2094,7 +2094,7 @@ function certsFor(country: Country, { power, radio, kind }: FinderInput): Cert[]
             name: "ISED ICES-003",
             short: "ICES-003",
             reason: "디지털 기기는 ICES-003 기준에 맞다는 표시를 붙여 판매합니다.",
-            tests: "전도 및 방사 방출",
+            tests: "전도·방사 방출",
             period: "FCC 시험과 함께 1주 추가",
           },
     );
@@ -2117,14 +2117,14 @@ function certsFor(country: Country, { power, radio, kind }: FinderInput): Cert[]
         name: "CE (RED)",
         short: "CE (RED)",
         reason: "무선기기는 무선기기 지침(RED) 하나로 전파, 전자파, 전기안전을 함께 봅니다.",
-        tests: `${radio === "cell" ? "EN 301 908" : radio === "wifi" ? "EN 300 328/301 893" : "EN 300 328"}, EN 301 489, EN 62368-1, EN 62311`,
+        tests: `${radio === "cell" ? "EN 301 908" : radio === "wifi" ? "EN 300 328·301 893" : "EN 300 328"}, EN 301 489, EN 62368-1, EN 62311`,
         period: "5~7주",
       });
     } else {
       out.push({
         id: ac ? "eu-emc-lvd" : "eu-emc",
-        name: ac ? "CE (EMC/LVD)" : "CE (EMC)",
-        short: ac ? "CE (EMC/LVD)" : "CE (EMC)",
+        name: ac ? "CE (EMC·LVD)" : "CE (EMC)",
+        short: ac ? "CE (EMC·LVD)" : "CE (EMC)",
         reason: ac
           ? "교류 50~1,000V 전원을 쓰는 기기라 EMC 지침과 저전압 지침을 함께 적용합니다."
           : power === "adapter"
@@ -2138,7 +2138,7 @@ function certsFor(country: Country, { power, radio, kind }: FinderInput): Cert[]
       id: "eu-rohs",
       name: "RoHS 유해물질 확인",
       short: "RoHS",
-      reason: "전기전자 제품은 납, 카드뮴 등 10가지 유해물질 함량 기준을 지켜야 합니다.",
+      reason: "전기·전자 제품은 납, 카드뮴 등 10가지 유해물질 함량 기준을 지켜야 합니다.",
       tests: "부품별 성분 분석 또는 공급사 자료 검토",
       period: "1~2주",
     });
@@ -2147,7 +2147,7 @@ function certsFor(country: Country, { power, radio, kind }: FinderInput): Cert[]
   if (country === "uk") {
     out.push({
       id: "uk-ukca",
-      name: wireless ? "UKCA (무선기기 규정)" : "UKCA (EMC, 전기안전 규정)",
+      name: wireless ? "UKCA (무선기기 규정)" : "UKCA (EMC·전기안전 규정)",
       short: "UKCA",
       reason: "영국은 EU와 따로 UKCA 표시 규정을 둡니다. CE 시험 성적서를 바탕으로 준비할 수 있습니다.",
       tests: "CE와 같은 시험 항목, 영국 지정 규격 확인",
@@ -2159,8 +2159,8 @@ function certsFor(country: Country, { power, radio, kind }: FinderInput): Cert[]
     if (wireless) {
       out.push({
         id: "jp-telec",
-        name: radio === "cell" ? "TELEC/JATE" : "TELEC 기술기준적합증명",
-        short: radio === "cell" ? "TELEC/JATE" : "TELEC",
+        name: radio === "cell" ? "TELEC·JATE" : "TELEC 기술기준적합증명",
+        short: radio === "cell" ? "TELEC·JATE" : "TELEC",
         reason: radio === "cell" ? "무선 기능은 일본 전파법 인증을, 통신망에 접속하는 단말은 단말기기 기술기준 인증을 함께 받습니다." : "무선 기능은 일본 전파법 인증을 받아야 판매할 수 있습니다.",
         tests: "송신 출력, 주파수 편차, 스퓨리어스 발사",
         period: radio === "cell" ? "8~10주" : "4~6주",
@@ -2182,7 +2182,7 @@ function certsFor(country: Country, { power, radio, kind }: FinderInput): Cert[]
         name: "VCCI (자율 규제)",
         short: "VCCI",
         reason: "정보기기는 VCCI 자율 규제 기준으로 전자파를 맞추는 것이 일반적입니다.",
-        tests: "전도 및 방사 방출",
+        tests: "전도·방사 방출",
         period: "2~3주",
       });
     }
@@ -2194,7 +2194,7 @@ function certsFor(country: Country, { power, radio, kind }: FinderInput): Cert[]
         id: "cn-ccc",
         name: "CCC 강제인증",
         short: "CCC",
-        reason: "강제인증 목록에 든 품목은 CCC 없이 수입, 판매할 수 없습니다. 공장 심사가 함께 진행됩니다.",
+        reason: "강제인증 목록에 든 품목은 CCC 없이 수입·판매할 수 없습니다. 공장 심사가 함께 진행됩니다.",
         tests: "중국 지정시험소 시험 (GB 4943.1, GB 4706.1 등)",
         period: "10~14주",
       });
@@ -2202,8 +2202,8 @@ function certsFor(country: Country, { power, radio, kind }: FinderInput): Cert[]
     if (wireless) {
       out.push({
         id: "cn-srrc",
-        name: radio === "cell" ? "SRRC/CTA (망 접속 허가)" : "SRRC 형식승인",
-        short: radio === "cell" ? "SRRC/CTA" : "SRRC",
+        name: radio === "cell" ? "SRRC·CTA (망 접속 허가)" : "SRRC 형식승인",
+        short: radio === "cell" ? "SRRC·CTA" : "SRRC",
         reason: radio === "cell" ? "무선 형식승인과 함께 통신망 접속 허가를 받아야 합니다." : "무선 기능이 있는 제품은 무선 형식승인이 필요합니다.",
         tests: "주파수 범위, 송신 출력, 스퓨리어스 발사",
         period: radio === "cell" ? "10~14주" : "6~8주",
@@ -2212,7 +2212,7 @@ function certsFor(country: Country, { power, radio, kind }: FinderInput): Cert[]
   }
 
   if (country === "au") {
-    const parts = ["EMC", wireless ? "무선" : "", ac ? "전기안전" : ""].filter(Boolean).join(", ");
+    const parts = ["EMC", wireless ? "무선" : "", ac ? "전기안전" : ""].filter(Boolean).join("·");
     out.push({
       id: "au-rcm",
       name: `RCM (${parts})`,
@@ -2513,7 +2513,7 @@ function Spectrum({ pending, replayKey }: { pending: boolean; replayKey: string 
         주파수 (Hz)
       </text>
       <text x={SX1} y={SY1 + 36} fontSize="12" fill={C.muted} textAnchor="end">
-        세로축 dBuV/m
+        세로축 dBμV/m
       </text>
 
       <path d={LIMIT_PATH} fill="none" stroke={C.error} strokeWidth="1.8" strokeDasharray="6 4" />
@@ -2626,7 +2626,7 @@ function Tracking() {
           <div className="flex flex-wrap items-center justify-between gap-x-6 gap-y-2 border-b px-5 py-4 md:px-6" style={{ borderColor: C.line }}>
             <div className="min-w-0">
               <p className="text-[14px] tabular-nums" style={{ color: C.muted }}>
-                {result.no}, 의뢰사 (주)ㅎㄷ전자
+                {result.no} · 의뢰사 (주)ㅎㄷ전자
               </p>
               <p className="text-[19px] font-bold tracking-[-0.02em]">
                 {result.product} <span style={{ color: C.cyanText }}>{TEST_LABEL[result.kind]}</span>
@@ -2688,7 +2688,7 @@ function Tracking() {
                   <p className="font-bold">
                     방사 방출 {result.step === 2 ? "예비 측정" : "측정 결과"}{" "}
                     <span className="text-[14px] font-normal" style={{ color: C.muted }}>
-                      3m, 수평 및 수직 편파 중 큰 값
+                      3m, 수평·수직 편파 중 큰 값
                     </span>
                   </p>
                   <div className="mt-3">
@@ -2861,7 +2861,7 @@ function validate(v: Values): Errors {
   if (v.phone.replace(/\D/g, "").length < 9) e.phone = "연락처를 확인해 주십시오.";
   if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(v.email.trim())) e.email = "이메일 형식을 확인해 주십시오.";
   if (!v.product.trim()) e.product = "제품명을 입력해 주십시오.";
-  if (!v.agree) e.agree = "개인정보 수집 및 이용에 동의해 주십시오.";
+  if (!v.agree) e.agree = "개인정보 수집·이용에 동의해 주십시오.";
   return e;
 }
 
@@ -3230,7 +3230,7 @@ function QuoteForm({ onList }: { onList: () => void }) {
                 </p>
                 <label className="mt-2 flex cursor-pointer items-start gap-2.5 text-[15px]">
                   <input id="q-agree" type="checkbox" checked={values.agree} onChange={(e) => set("agree", e.target.checked)} className="mt-1 h-5 w-5 shrink-0 accent-[#23307a]" {...aria("agree")} />
-                  <span>개인정보 수집 및 이용에 동의합니다.</span>
+                  <span>개인정보 수집·이용에 동의합니다.</span>
                 </label>
                 {errText("agree")}
               </div>

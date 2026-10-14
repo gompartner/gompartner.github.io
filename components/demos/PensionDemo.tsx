@@ -148,7 +148,7 @@ const TYPE_LABEL: Record<NightType, string> = {
 };
 
 const PRICE_COL: Record<NightType, number> = { weekday: 0, weekend: 1, eve: 1, peak: 2, peakWeekend: 3 };
-const PRICE_HEAD = ["주중", "주말, 공휴일 전날", "성수기 주중", "성수기 주말"];
+const PRICE_HEAD = ["주중", "주말·공휴일 전날", "성수기 주중", "성수기 주말"];
 
 /** dn 날짜에 자는 1박의 요금 구분. 금·토와 공휴일 전날은 주말 요금이다. */
 function nightType(dn: number): NightType {
@@ -182,17 +182,17 @@ type Room = {
 };
 
 const ROOMS: Room[] = [
-  { id: "yunseul", name: "윤슬", side: "sea", base: 2, max: 3, size: 10, structure: "침대룸(퀸1), 화장실1", view: true, bbq: true, spa: true, prices: [150_000, 200_000, 230_000, 280_000], photo: "30% center" },
-  { id: "mulgyeol", name: "물결", side: "sea", base: 2, max: 4, size: 12, structure: "침대룸(퀸1) + 온돌, 화장실1", view: true, bbq: true, spa: false, prices: [140_000, 190_000, 220_000, 270_000], photo: "55% center" },
-  { id: "noeul", name: "노을", side: "sea", base: 4, max: 6, size: 18, structure: "복층 침대룸(퀸1) + 거실 온돌, 화장실1", view: true, bbq: true, spa: true, prices: [240_000, 300_000, 340_000, 400_000], photo: "75% center" },
-  { id: "solsup", name: "솔숲", side: "garden", base: 2, max: 3, size: 8, structure: "침대룸(더블1), 화장실1", view: false, bbq: false, spa: false, prices: [90_000, 130_000, 160_000, 200_000], photo: "20% center" },
-  { id: "deulkkot", name: "들꽃", side: "garden", base: 2, max: 4, size: 11, structure: "침대룸(퀸1) + 온돌, 화장실1", view: false, bbq: false, spa: true, prices: [110_000, 150_000, 190_000, 230_000], photo: "45% center" },
-  { id: "madang", name: "마당", side: "garden", base: 4, max: 8, size: 20, structure: "침대룸2(퀸1, 더블1) + 거실, 화장실2", view: false, bbq: true, spa: false, prices: [200_000, 260_000, 300_000, 360_000], photo: "65% center" },
+  { id: "yunseul", name: "윤슬", side: "sea", base: 2, max: 3, size: 10, structure: "침대룸(퀸1) · 화장실1", view: true, bbq: true, spa: true, prices: [150_000, 200_000, 230_000, 280_000], photo: "30% center" },
+  { id: "mulgyeol", name: "물결", side: "sea", base: 2, max: 4, size: 12, structure: "침대룸(퀸1) + 온돌 · 화장실1", view: true, bbq: true, spa: false, prices: [140_000, 190_000, 220_000, 270_000], photo: "55% center" },
+  { id: "noeul", name: "노을", side: "sea", base: 4, max: 6, size: 18, structure: "복층 침대룸(퀸1) + 거실 온돌 · 화장실1", view: true, bbq: true, spa: true, prices: [240_000, 300_000, 340_000, 400_000], photo: "75% center" },
+  { id: "solsup", name: "솔숲", side: "garden", base: 2, max: 3, size: 8, structure: "침대룸(더블1) · 화장실1", view: false, bbq: false, spa: false, prices: [90_000, 130_000, 160_000, 200_000], photo: "20% center" },
+  { id: "deulkkot", name: "들꽃", side: "garden", base: 2, max: 4, size: 11, structure: "침대룸(퀸1) + 온돌 · 화장실1", view: false, bbq: false, spa: true, prices: [110_000, 150_000, 190_000, 230_000], photo: "45% center" },
+  { id: "madang", name: "마당", side: "garden", base: 4, max: 8, size: 20, structure: "침대룸2(퀸1, 더블1) + 거실 · 화장실2", view: false, bbq: true, spa: false, prices: [200_000, 260_000, 300_000, 360_000], photo: "65% center" },
 ];
 
 const ROOM_INDEX: Record<string, number> = Object.fromEntries(ROOMS.map((r, i) => [r.id, i]));
 
-const featureLine = (r: Room) => [r.view ? "바다 전망" : "정원 전망", r.spa ? "스파 욕조" : null, r.bbq ? "개별 바비큐" : null].filter(Boolean).join(", ");
+const featureLine = (r: Room) => [r.view ? "바다 전망" : "정원 전망", r.spa ? "스파 욕조" : null, r.bbq ? "개별 바비큐" : null].filter(Boolean).join(" · ");
 const sqm = (size: number) => Math.round(size * 3.3);
 
 /* ---------- 가짜 예약 현황 ---------- */
@@ -272,7 +272,7 @@ type GoOpt = { room?: string; tab?: GuideTab; anchor?: string };
 type Go = (page: Page, opt?: GoOpt) => void;
 
 const GUIDE_TABS: { id: GuideTab; label: string }[] = [
-  { id: "time", label: "입실, 퇴실" },
+  { id: "time", label: "입실·퇴실" },
   { id: "notes", label: "유의사항" },
   { id: "refund", label: "환불규정" },
   { id: "deposit", label: "입금 안내" },
@@ -459,7 +459,7 @@ function Header({ page, go }: { page: Page; go: Go }) {
     <header className="sticky top-0 z-40 bg-white shadow-[0_1px_0_#e4ddd0]">
       <div className="hidden px-6 md:block" style={{ background: C.navyDeep, color: "#c9d6df" }}>
         <div className="mx-auto flex h-9 max-w-[1200px] items-center justify-between text-[13px]">
-          <span>강원 ㅁㄹ군 ㅅㄴ 해수욕장 앞 / 농어촌민박</span>
+          <span>강원 ㅁㄹ군 ㅅㄴ 해수욕장 앞 · 농어촌민박</span>
           <span>
             예약문의{" "}
             <a href={`tel:${TEL}`} className="font-semibold text-white">
@@ -613,7 +613,7 @@ function HeroSlider({ go }: { go: Go }) {
             {PENSION}
           </h1>
           <p className="mt-2 text-[16px] md:text-[19px]" style={{ color: "#e8eef2" }}>
-            ㅅㄴ 해수욕장 도보 3분, 바다 전망 객실 3실
+            ㅅㄴ 해수욕장 도보 3분 · 바다 전망 객실 3실
           </p>
           <div className="mt-6 flex justify-center gap-2">
             <button type="button" onClick={() => go("reserve")} className="inline-flex h-12 items-center rounded-[6px] px-6 font-bold" style={{ background: C.coral, color: C.navyDeep }}>
@@ -661,7 +661,8 @@ function TodayCount({ today }: { today: number }) {
       오늘 예약 가능 객실 <b style={{ color: C.coralDeep }}>{a}실</b>
       {sat !== today && (
         <>
-          , 이번 주 토요일 <b style={{ color: C.coralDeep }}>{b}실</b>
+          {" "}
+          · 이번 주 토요일 <b style={{ color: C.coralDeep }}>{b}실</b>
         </>
       )}
     </span>
@@ -788,7 +789,7 @@ function SitePlan({ roomId, onRoom, closed }: { roomId: string; onRoom: (id: str
               {r.name}
             </text>
             <text x={b.x + b.w / 2} y={b.y + b.h / 2 + 22} fontSize="15" textAnchor="middle" fill={on ? C.navyDeep : C.muted}>
-              {shut ? "예약 완료" : `${r.base}~${r.max}명, ${r.size}평`}
+              {shut ? "예약 완료" : `${r.base}~${r.max}명 · ${r.size}평`}
             </text>
           </g>
         );
@@ -825,7 +826,7 @@ function RoomCard({ room, closed, go }: { room: Room; closed: boolean; go: Go })
           </div>
           <ul className="mt-2 space-y-0.5 text-[15px]">
             <li>
-              {room.structure}, {room.size}평({sqm(room.size)}m2)
+              {room.structure} · {room.size}평({sqm(room.size)}㎡)
             </li>
             <li>
               기준 {room.base}명 ~ 최대 {room.max}명
@@ -864,7 +865,7 @@ function RoomsSection({ roomId, onRoom, sel, go }: { roomId: string; onRoom: (id
   return (
     <section aria-labelledby="rooms-title" id="rooms" className="scroll-mt-20 px-4 py-14 md:px-6 md:py-20">
       <div className="mx-auto max-w-[1200px]">
-        <SectionTitle id="rooms-title" aside="바다 전망 3실, 정원 전망 3실">
+        <SectionTitle id="rooms-title" aside="바다 전망 3실 · 정원 전망 3실">
           객실안내
         </SectionTitle>
         <div className="mt-8 grid items-start gap-6 lg:grid-cols-[1.5fr_1fr]">
@@ -1024,7 +1025,7 @@ function StatusBoard({ today, roomId, checkIn, nights, onPick }: { today: number
         </table>
       </div>
       <p className="mt-2 text-[13px]" style={{ color: C.muted }}>
-        (단위: 만 원, 1박 기준) 성수기 7월 15일 ~ 8월 20일, 금요일과 토요일, 공휴일 전날은 주말 요금
+        (단위: 만 원, 1박 기준) 성수기 7월 15일 ~ 8월 20일 · 금·토요일과 공휴일 전날은 주말 요금
       </p>
     </div>
   );
@@ -1116,7 +1117,7 @@ function SummaryBar({ sel, go }: { sel: Selection; go: Go }) {
 
 function GuideShortcuts({ go }: { go: Go }) {
   const items: { label: string; value: string; tab: GuideTab }[] = [
-    { label: "입실, 퇴실", value: "15:00 / 11:00", tab: "time" },
+    { label: "입실·퇴실", value: "15:00 · 11:00", tab: "time" },
     { label: "기준인원 초과", value: `1인 1박 ${won(EXTRA_PERSON)}`, tab: "time" },
     { label: "환불규정", value: "10일 전 취소 100% 환불", tab: "refund" },
     { label: "입금 안내", value: "예약 후 6시간 안", tab: "deposit" },
@@ -1242,11 +1243,11 @@ function SubBody({ children }: { children: React.ReactNode }) {
 
 function AboutPage({ go, anchor }: { go: Go; anchor?: string }) {
   const facilities = [
-    { icon: Flame, name: "공용 바비큐장", body: "17:00 ~ 22:00, 그릴 3대, 우천 시 지붕 아래 이용" },
+    { icon: Flame, name: "공용 바비큐장", body: "17:00 ~ 22:00 · 그릴 3대 · 우천 시 지붕 아래 이용" },
     { icon: Waves, name: "해변 계단", body: "정원 끝에서 ㅅㄴ 해수욕장 모래사장으로 바로 연결" },
-    { icon: Trees, name: "정원", body: "객실 사이 잔디 마당, 소나무 그늘 벤치" },
-    { icon: Car, name: "주차장", body: "6대, 객실당 1대" },
-    { icon: Eye, name: "개별 바비큐 테라스", body: "윤슬, 물결, 노을(바다 쪽)과 마당 객실 앞마당" },
+    { icon: Trees, name: "정원", body: "객실 사이 잔디 마당 · 소나무 그늘 벤치" },
+    { icon: Car, name: "주차장", body: "6대 · 객실당 1대" },
+    { icon: Eye, name: "개별 바비큐 테라스", body: "윤슬, 물결, 노을(바다 쪽) · 마당 객실 앞마당" },
   ];
   return (
     <>
@@ -1312,7 +1313,7 @@ function RoomPage({ roomId, go }: { roomId: string; go: Go }) {
   const info: [string, string][] = [
     ["객실명", room.name],
     ["구조", room.structure],
-    ["크기", `${room.size}평(${sqm(room.size)}m2)`],
+    ["크기", `${room.size}평(${sqm(room.size)}㎡)`],
     ["인원", `기준 ${room.base}명 ~ 최대 ${room.max}명`],
     ["전망", room.view ? "바다 전망" : "정원 전망"],
     ["스파", room.spa ? "스파 욕조" : "없음"],
@@ -1396,7 +1397,7 @@ function RoomPage({ roomId, go }: { roomId: string; go: Go }) {
           </table>
         </div>
         <p className="mt-2 text-[13px]" style={{ color: C.muted }}>
-          1박 기준 / 성수기 7월 15일 ~ 8월 20일 / 기준 {room.base}명, 최대 {room.max}명
+          1박 기준 · 성수기 7월 15일 ~ 8월 20일 · 기준 {room.base}명, 최대 {room.max}명
         </p>
         <div className="mt-8 flex flex-wrap gap-2">
           <button type="button" onClick={() => go("reserve", { room: room.id })} className="h-12 rounded-[6px] px-6 font-bold" style={{ background: C.coral, color: C.navyDeep }}>
@@ -1615,7 +1616,7 @@ function ReservePage({ sel, onPick, go }: { sel: Selection; onPick: (id: string,
                         </tfoot>
                       </table>
                       <p className="mt-2 text-[13px]" style={{ color: C.muted }}>
-                        기준인원 초과 1인 1박 {won(EXTRA_PERSON)}, 24개월 미만 영유아는 인원에서 제외
+                        기준인원 초과 1인 1박 {won(EXTRA_PERSON)} · 24개월 미만 영유아는 인원에서 제외
                       </p>
                     </>
                   )}
@@ -1669,10 +1670,10 @@ function ReservePage({ sel, onPick, go }: { sel: Selection; onPick: (id: string,
                 </p>
               )}
               <button type="submit" className="mt-5 h-[52px] w-full rounded-[6px] text-[17px] font-bold" style={{ background: C.coral, color: C.navyDeep }}>
-                예약하기{q ? ` (${won(q.total)})` : ""}
+                예약하기{q ? ` · ${won(q.total)}` : ""}
               </button>
               <p className="mt-3 text-[13px]" style={{ color: C.muted }}>
-                무통장 입금입니다. 예약 후 6시간 안에 입금하지 않으면 자동 취소됩니다.
+                무통장 입금 · 예약 후 6시간 안에 입금하지 않으면 자동 취소됩니다.
               </p>
             </form>
           </div>
@@ -1895,11 +1896,11 @@ function GuidePage({ tab, setTab, go, today, checkIn }: { tab: GuideTab; setTab:
               <caption className="sr-only">입실, 퇴실 시간과 추가 요금</caption>
               <tbody>
                 {[
-                  ["입실", "15:00부터, 일찍 도착하시면 짐 보관 가능"],
-                  ["퇴실", "11:00까지, 늦은 퇴실은 전날까지 문의 바랍니다"],
-                  ["기준인원 초과", `1인 1박 ${won(EXTRA_PERSON)}, 24개월 미만 영유아는 인원에서 제외`],
-                  ["바비큐", `17:00 ~ 22:00, 그릴(숯 포함) ${won(GRILL)}`],
-                  ["조식 바구니", `08:00 객실 앞 / 빵, 과일, 커피 1인 ${won(BREAKFAST)}`],
+                  ["입실", "15:00부터 · 일찍 도착하시면 짐 보관 가능"],
+                  ["퇴실", "11:00까지 · 늦은 퇴실은 전날까지 문의 바랍니다"],
+                  ["기준인원 초과", `1인 1박 ${won(EXTRA_PERSON)} · 24개월 미만 영유아는 인원에서 제외`],
+                  ["바비큐", `17:00 ~ 22:00 · 그릴(숯 포함) ${won(GRILL)}`],
+                  ["조식 바구니", `08:00 객실 앞 · 빵, 과일, 커피 1인 ${won(BREAKFAST)}`],
                 ].map(([k, v]) => (
                   <tr key={k} className="border-b" style={{ borderColor: C.line }}>
                     <th scope="row" className="w-[34%] px-3 py-3.5 text-left font-semibold sm:w-[180px]" style={{ background: C.sandSoft, color: C.navy }}>
@@ -2101,7 +2102,7 @@ function LocationPage({ go }: { go: Go }) {
               <tbody>
                 {[
                   { icon: null, k: "주소", v: ADDRESS },
-                  { icon: Car, k: "자가용", v: "ㅎㄷ 나들목에서 해안길을 따라 20분, 펜션 앞 주차장 6대" },
+                  { icon: Car, k: "자가용", v: "ㅎㄷ 나들목에서 해안길을 따라 20분 · 펜션 앞 주차장 6대" },
                   { icon: Bus, k: "버스", v: "ㅎㄷ 터미널에서 군내버스 00번, ㄷㄹ리 정류장 하차 후 도보 5분" },
                   { icon: Users, k: "픽업", v: "ㅎㄷ 터미널 픽업 가능 (도착 전 사전 연락 부탁드립니다)" },
                 ].map((r) => (

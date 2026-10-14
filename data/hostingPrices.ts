@@ -77,7 +77,7 @@ export const hostingPlans: HostingPlan[] = [
     storage: "300MB",
     traffic: "한 달 10GB",
     vat: "표기 없음",
-    note: "월 1,000원. 사이트와 도메인 1개",
+    note: "월 1,000원. 사이트·도메인 1개",
     source: "https://www.hosting.kr/webhosting/compare",
   },
   {

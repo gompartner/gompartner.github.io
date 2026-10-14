@@ -154,7 +154,7 @@ export const part2: Record<string, SampleScenario> = {
   academy: {
     client: "원장님",
     scenes: [
-      { t: "note", text: "수학 영어 학원" },
+      { t: "note", text: "수학·영어 학원" },
       { t: "client", text: "학부모님 전화는 늘 같은 질문이에요." },
       { t: "client", text: "우리 애는 어느 반이고 몇 시에 가냐고요." },
       { t: "bear", text: "그 답을 학부모님이 직접 찾게 해 볼게요." },

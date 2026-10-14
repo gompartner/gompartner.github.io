@@ -58,9 +58,9 @@ const TREATMENT_NAME: Record<TreatmentId, string> = {
   endo: "신경치료",
   gum: "잇몸치료",
   wisdom: "사랑니 발치",
-  scaling: "스케일링, 예방",
+  scaling: "스케일링 · 예방",
   whitening: "치아미백",
-  check: "검진, 상담",
+  check: "검진 · 상담",
 };
 
 const TREATMENT_ORDER: TreatmentId[] = ["implant", "ortho", "caries", "endo", "gum", "wisdom", "scaling", "whitening"];
@@ -159,7 +159,7 @@ const MENUS: { id: MenuId; label: string; subs: SubMenu[] }[] = [
       { id: "greeting", label: "인사말" },
       { id: "doctors", label: "의료진 소개" },
       { id: "tour", label: "병원 둘러보기" },
-      { id: "location", label: "진료시간, 오시는 길" },
+      { id: "location", label: "진료시간·오시는 길" },
     ],
   },
   { id: "treat", label: "진료과목", subs: TREATMENT_ORDER.map((id) => ({ id, label: TREATMENT_NAME[id] })) },
@@ -427,16 +427,16 @@ const HOURS = [
   { label: "목요일", day: 4, time: "09:30 ~ 21:00", open: [570, 1260], night: true },
   { label: "금요일", day: 5, time: "09:30 ~ 18:30", open: [570, 1110] },
   { label: "토요일", day: 6, time: "09:30 ~ 14:00", open: [570, 840] },
-  { label: "일요일, 공휴일", day: 0, time: "휴진", open: null },
+  { label: "일요일·공휴일", day: 0, time: "휴진", open: null },
 ] as const;
 const LUNCH = [780, 840]; // 평일 13:00 ~ 14:00
 
 /** 메인 진료시간 상자: 실제 의원처럼 요일을 묶어 적는다 */
 const HOURS_GROUPED = [
-  { label: "월, 수, 금", days: [1, 3, 5], time: "09:30 ~ 18:30" },
-  { label: "화, 목", days: [2, 4], time: "09:30 ~ 21:00", night: true },
+  { label: "월 · 수 · 금", days: [1, 3, 5], time: "09:30 ~ 18:30" },
+  { label: "화 · 목", days: [2, 4], time: "09:30 ~ 21:00", night: true },
   { label: "토요일", days: [6], time: "09:30 ~ 14:00" },
-  { label: "일요일, 공휴일", days: [0], time: "휴진" },
+  { label: "일요일 · 공휴일", days: [0], time: "휴진" },
 ];
 
 function useNow() {
@@ -515,7 +515,7 @@ const FEE_FAQ = [
 ];
 
 const FAQ = [
-  { q: "야간진료 시간에도 모든 진료가 가능한가요?", a: "화요일과 목요일 야간진료 시간에도 모든 진료가 가능합니다. 단, 임플란트 수술은 19:00 이전 예약을 권해 드립니다." },
+  { q: "야간진료 시간에도 모든 진료가 가능한가요?", a: "화·목 야간진료 시간에도 모든 진료가 가능합니다. 단, 임플란트 수술은 19:00 이전 예약을 권해 드립니다." },
   { q: "주차가 가능한가요?", a: "건물 지하 2~4층 주차장을 이용하실 수 있으며, 진료 시 2시간 무료입니다. 접수 시 차량 번호를 말씀해 주세요." },
   { q: "첫 방문 시 준비물이 있나요?", a: "신분증을 지참해 주세요. 다른 치과에서 촬영한 사진이나 복용 중인 약이 있으면 함께 알려 주세요." },
   { q: "어린이 진료도 하나요?", a: "충치 치료, 불소 도포, 실란트(홈메우기)를 진료합니다. 만 12세 이하 영구치 레진 치료는 건강보험이 적용됩니다." },
@@ -544,7 +544,7 @@ const makeNotices = (today: Date) => {
     { no: 133, ago: 39, title: "금 인레이 비용 변경 안내", body: `금 시세 상승으로 ${mdKo(goldFrom)}부터 금 인레이 비용이 40만 원에서 45만 원으로 변경됩니다. ${mdKo(after(goldFrom, -1))}까지 치료를 시작하신 분은 기존 금액으로 진행합니다.` },
     { no: 132, ago: 56, title: "지하 주차장 도색 공사 기간 주차 안내", body: `지하 주차장 도색 공사로 ${mdKo(paintFrom)}~${mdKo(after(paintFrom, 2))}에는 지하 3층만 이용 가능합니다. 공영주차장 이용 시 영수증을 가져오시면 1시간 주차비를 지원해 드립니다.` },
     { no: 131, ago: 71, title: "휴가 기간 없이 정상 진료", body: "올해는 별도 휴가 기간 없이 정상 진료합니다. 방학 기간 학생 교정 상담은 오전 예약을 권해 드립니다." },
-    { no: 130, ago: 96, title: "만 65세 이상 보험임플란트 상담 일정 안내", body: "만 65세 이상은 평생 2개까지 건강보험 임플란트를 받으실 수 있습니다. 화요일과 목요일 오전에 별도 상담 시간을 운영합니다." },
+    { no: 130, ago: 96, title: "만 65세 이상 보험임플란트 상담 일정 안내", body: "만 65세 이상은 평생 2개까지 건강보험 임플란트를 받으실 수 있습니다. 화·목 오전에 별도 상담 시간을 운영합니다." },
   ].map((n) => ({ ...n, date: fmtDot(at(n.ago)) }));
 };
 
@@ -741,7 +741,7 @@ function SiteHeader({ view, go }: { view: View; go: Go }) {
         <div className={`${container} flex h-9 items-center justify-between text-[14px]`} style={{ color: C.muted }}>
           <p className="flex items-center gap-1.5">
             <Moon size={14} aria-hidden style={{ color: C.accent }} />
-            화, 목 야간진료 21:00까지, 토요일 14:00까지 진료
+            화 · 목 야간진료 21:00까지, 토요일 14:00까지 진료
           </p>
           <a href={`tel:${TEL}`} className="font-bold tabular-nums hover:underline">
             대표전화 {TEL}
@@ -820,7 +820,7 @@ function SiteHeader({ view, go }: { view: View; go: Go }) {
             <p className="mt-2 text-[14px]" style={{ color: C.muted }}>
               평일 09:30 ~ 18:30
               <br />
-              화, 목 09:30 ~ 21:00
+              화 · 목 09:30 ~ 21:00
             </p>
           </div>
           <div className="grid flex-1 grid-cols-6">
@@ -1026,13 +1026,13 @@ function HomePage({ go, reserve, linkOut }: { go: Go; reserve: (id: TreatmentId)
         <div className="absolute inset-0 -z-10" style={{ background: "linear-gradient(90deg, rgba(16,48,47,0.86) 0%, rgba(16,48,47,0.6) 50%, rgba(16,48,47,0.15) 100%)" }} aria-hidden />
         <div className={`${container} pb-14 pt-14 text-white md:pb-20 md:pt-20`}>
           <p className="text-[17px] font-bold" style={{ color: C.onInkMuted }}>
-            통합치의학과, 치과교정과 전문의 진료
+            통합치의학과 · 치과교정과 전문의 진료
           </p>
           <h1 id="main-title" className="mt-2 text-[40px] font-bold leading-[1.15] tracking-[-0.045em] md:text-[56px]">
             {CLINIC}
           </h1>
           <p className="mt-4 text-[18px] md:text-[20px]" style={{ color: C.onInk }}>
-            화, 목 야간진료 21:00까지
+            화 · 목 야간진료 21:00까지
             <br className="sm:hidden" />
             <span className="hidden sm:inline">, </span>
             토요일 14:00까지 진료합니다.
@@ -1343,9 +1343,9 @@ function Greeting() {
 
 function Tour() {
   const photos = [
-    { img: "lobby", label: "접수, 대기 공간" },
+    { img: "lobby", label: "접수 · 대기 공간" },
     { img: "hero", label: "진료실" },
-    { img: "ct", label: "파노라마, CT 촬영실" },
+    { img: "ct", label: "파노라마 · CT 촬영실" },
   ];
   return (
     <ul className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
@@ -1690,7 +1690,7 @@ function Notice({ no, go }: { no: number | null; go: Go }) {
         </span>
       ))}
       <span className="inline-flex h-9 items-center px-2" style={{ color: C.muted }}>
-        ... {Math.ceil(NOTICE_TOTAL / 10)}
+        … {Math.ceil(NOTICE_TOTAL / 10)}
       </span>
     </p>
     </>
@@ -2156,7 +2156,7 @@ function SiteFooter({ go }: { go: Go }) {
             </div>
           ))}
         </dl>
-        <p className="mt-6 text-[15px]">Copyright 곰파트너</p>
+        <p className="mt-6 text-[15px]">© 곰파트너</p>
       </div>
     </footer>
   );
