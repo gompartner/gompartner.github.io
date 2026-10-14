@@ -24,7 +24,7 @@ export function WorksList({ projects }: { projects: Project[] }) {
               />
               <div className="min-w-0 flex-1">
                 <p className="text-[14px] font-bold text-accent md:text-[15px]">
-                  {w.category}·{w.layout}
+                  {w.category}, {w.layout}
                   <span className="ml-2 font-normal text-foreground-secondary">{w.kind}</span>
                 </p>
                 <p className="mt-0.5 truncate text-[17px] font-bold group-hover:text-accent group-hover:underline group-hover:underline-offset-4">{w.title}</p>

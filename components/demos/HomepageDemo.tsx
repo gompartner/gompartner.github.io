@@ -92,7 +92,7 @@ const TIME_SLOTS = Array.from({ length: 16 }, (_, i) => `${String(i + 6).padStar
 const RATE_BANDS = [
   { id: "day", label: "평일 주간", time: "06:00 ~ 18:00", diff: -3000 },
   { id: "evening", label: "평일 저녁", time: "18:00 ~ 22:00", diff: 0 },
-  { id: "weekend", label: "주말·공휴일", time: "06:00 ~ 22:00", diff: 4000 },
+  { id: "weekend", label: "주말, 공휴일", time: "06:00 ~ 22:00", diff: 4000 },
 ] as const;
 const EXTRA_GUEST = 5000;
 
@@ -138,11 +138,11 @@ const amenities = [
 ];
 
 const reviews = [
-  { rating: 5, text: "아무도 없으니까 눈치 안 보고 운동했어요.", meta: "김ㅎ늘 · 강남점 오전" },
-  { rating: 5, text: "통창으로 해 뜨는 거 보면서 뛰는 맛에 새벽마다 가요.", meta: "이ㅈ호 · 성수점 새벽" },
-  { rating: 4, text: "촬영 대관으로 썼는데 조명이 좋아서 보정할 게 별로 없었어요.", meta: "박* · 홍대점 대관" },
-  { rating: 5, text: "PT 선생님이랑 같이 들어갈 수 있어서 편해요. QR 입장도 빠르고요.", meta: "최ㅅ아 · 삼성점 PT" },
-  { rating: 5, text: "다른 팀이 안 들어오니까 기구 기다릴 일이 없어요.", meta: "정ㅁ준 · 잠실점 저녁" },
+  { rating: 5, text: "아무도 없으니까 눈치 안 보고 운동했어요.", meta: "김ㅎ늘, 강남점 오전" },
+  { rating: 5, text: "통창으로 해 뜨는 거 보면서 뛰는 맛에 새벽마다 가요.", meta: "이ㅈ호, 성수점 새벽" },
+  { rating: 4, text: "촬영 대관으로 썼는데 조명이 좋아서 보정할 게 별로 없었어요.", meta: "박*, 홍대점 대관" },
+  { rating: 5, text: "PT 선생님이랑 같이 들어갈 수 있어서 편해요. QR 입장도 빠르고요.", meta: "최ㅅ아, 삼성점 PT" },
+  { rating: 5, text: "다른 팀이 안 들어오니까 기구 기다릴 일이 없어요.", meta: "정ㅁ준, 잠실점 저녁" },
 ];
 
 const faqs = [
@@ -960,7 +960,7 @@ export function HomepageDemo() {
                     <p className="font-bold">{selected.name}</p>
                     <p className="mt-0.5 flex items-center gap-1 text-xs text-stone-500">
                       <Star size={11} className="fill-[#111] text-[#111]" aria-hidden />
-                      {selected.rating} ({selected.reviews}) · {selected.facilities.join(" · ")}
+                      {selected.rating} ({selected.reviews}) / {selected.facilities.join(", ")}
                     </p>
                   </div>
                   <button
@@ -1081,7 +1081,7 @@ export function HomepageDemo() {
                       <h3 className="text-sm font-bold text-stone-600">입장 QR</h3>
                       <p className="mt-3 text-lg font-bold">{loc?.name}</p>
                       <p className="mt-1 tabular-nums text-sm text-stone-500">
-                        {viewing.date.slice(5).replace("-", ".")} · {viewing.times.join(", ")}
+                        {viewing.date.slice(5).replace("-", ".")} / {viewing.times.join(", ")}
                       </p>
                       <div className="mx-auto mt-5 flex h-28 w-28 items-center justify-center rounded-xl border border-stone-200 bg-[#F4F4F4]">
                         <QrCode size={72} aria-label="입장 QR 코드" />
@@ -1103,7 +1103,7 @@ export function HomepageDemo() {
                     </span>
                     <p className="mt-4 text-lg font-bold" role="status">예약 확정</p>
                     <p className="mt-1 tabular-nums text-sm text-stone-500">
-                      {selected?.name} · {booking.date?.slice(5).replace("-", ".")} · {booking.times.join(", ")}
+                      {selected?.name} / {booking.date?.slice(5).replace("-", ".")} / {booking.times.join(", ")}
                     </p>
                     <div className="mx-auto mt-5 flex h-28 w-28 items-center justify-center rounded-xl border border-stone-200 bg-[#F4F4F4]">
                       <QrCode size={72} aria-label="입장 QR 코드" />
@@ -1221,7 +1221,7 @@ export function HomepageDemo() {
                         <span className="min-w-0 flex-1">
                           <span className="block truncate font-bold">{loc?.name ?? r.locationId}</span>
                           <span className="block tabular-nums text-xs text-stone-500">
-                            {r.date.slice(5).replace("-", ".")} · {r.times.join(", ")}
+                            {r.date.slice(5).replace("-", ".")} / {r.times.join(", ")}
                           </span>
                         </span>
                       </button>
@@ -1307,7 +1307,7 @@ export function HomepageDemo() {
           <h2 id="visit-title" className="text-3xl font-black tracking-tight sm:text-5xl">
             예약하기
           </h2>
-          <p className="mt-3 text-stone-200">서울 {locations.length}개 지점 · 매일 06:00 ~ 22:00</p>
+          <p className="mt-3 text-stone-200">서울 {locations.length}개 지점, 매일 06:00 ~ 22:00</p>
           <div className="mt-8 flex flex-wrap items-center justify-center gap-3">
             <button
               type="button"
@@ -1738,7 +1738,7 @@ function FacilityPage() {
           <h2 className="text-lg font-bold">공간 정보</h2>
           <dl className="mt-3 divide-y divide-stone-200 border-y border-stone-200 text-sm">
             {[
-              ["공간 면적", "66㎡ (20평)"],
+              ["공간 면적", "66m2 (20평)"],
               ["이용 인원", "최소 1명 ~ 최대 2명"],
               ["운영시간", "매일 06:00 ~ 22:00"],
               ["예약 단위", "1시간 (최소 1시간부터)"],
@@ -1850,7 +1850,7 @@ function PricingPage({ selectedId, onBook }: { selectedId: string | null; onBook
       </div>
 
       <div className="max-w-xl">
-        <h2 className="text-lg font-bold">취소·환불 규정</h2>
+        <h2 className="text-lg font-bold">취소, 환불 규정</h2>
         <table className="mt-3 w-full border-collapse text-sm">
           <caption className="sr-only">취소 시점별 환불 비율</caption>
           <tbody className="divide-y divide-stone-200 border-y border-stone-200">
@@ -1883,7 +1883,7 @@ function InfoPage() {
           <h2 className="text-lg font-bold">이용 방법</h2>
           <ol className="mt-3 space-y-3 text-sm leading-relaxed text-stone-700">
             {[
-              ["예약·결제", "지점, 날짜, 시간을 선택하고 결제합니다."],
+              ["예약과 결제", "지점, 날짜, 시간을 선택하고 결제합니다."],
               ["출입 안내", "출입 비밀번호는 이용 30분 전 예약자 휴대전화로 문자 발송합니다. 입장 QR로도 출입할 수 있습니다."],
               ["이용", "예약한 시간 동안 공간 전체를 단독으로 이용하실 수 있습니다."],
               ["퇴실", "다음 이용자를 위해 종료 10분 전부터 정리 부탁드립니다."],

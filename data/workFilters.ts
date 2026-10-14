@@ -4,6 +4,17 @@
 export const fields = ["병원", "전문직·부동산", "학원·교육", "공공기관·학교", "가게·매장", "금융", "기업"] as const;
 export type Field = (typeof fields)[number];
 
+// 화면에 보이는 업종 이름. 위 값은 분류 키로만 쓴다.
+export const fieldLabel: Record<Field, string> = {
+  병원: "병원",
+  "전문직·부동산": "전문직과 부동산",
+  "학원·교육": "학원과 교육",
+  "공공기관·학교": "공공기관과 학교",
+  "가게·매장": "가게와 매장",
+  금융: "금융",
+  기업: "기업",
+};
+
 export const fieldsById: Record<string, Field[]> = {
   "clinic-report": ["병원"],
   "clinic-homepage": ["병원"],
@@ -44,10 +55,10 @@ export const capabilities = [
   { name: "예약", keywords: ["예약"] },
   { name: "결제", keywords: ["결제"] },
   { name: "지도", keywords: ["지도"] },
-  { name: "신청·심사", keywords: ["신청", "심사"] },
+  { name: "신청과 심사", keywords: ["신청", "심사"] },
   { name: "검색", keywords: ["검색", "찾기", "필터"] },
-  { name: "통계·그래프", keywords: ["통계", "그래프", "차트", "비교"] },
-  { name: "인쇄·내려받기", keywords: ["인쇄", "PDF", "출력", "엑셀", "다운로드"] },
+  { name: "통계와 그래프", keywords: ["통계", "그래프", "차트", "비교"] },
+  { name: "인쇄와 내려받기", keywords: ["인쇄", "PDF", "출력", "엑셀", "다운로드"] },
   { name: "관리자", keywords: ["관리", "심사", "점검표"] },
   { name: "웹접근성", keywords: ["접근성", "점검 항목", "멈춤"] },
 ] as const;

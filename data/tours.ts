@@ -140,6 +140,6 @@ export const tours: Record<string, TourStep[]> = {
   ],
   "retirement-calculator": [
     { target: "#input-title", title: "내 정보", desc: "나이, 저축액, 생활비를 바꾸세요." },
-    { target: '[aria-label="투자 성향"]', title: "투자 성향", desc: "성향을 바꾸면 부족·여유 금액이 다시 계산됩니다." },
+    { target: '[aria-label="투자 성향"]', title: "투자 성향", desc: "성향을 바꾸면 부족하거나 남는 금액이 다시 계산됩니다." },
   ],
 };

@@ -30,7 +30,7 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
     .filter((n): n is number => n !== undefined);
   const from = totals.length ? `${manwon(Math.min(...totals))}부터. ` : "";
   return {
-    title: `${ind.title} 비용·샘플`,
+    title: `${ind.title} 비용과 샘플`,
     description: fitDescription(from + ind.description),
     keywords: ind.keywords,
     alternates: { canonical: `/works/${slug}` },
@@ -50,7 +50,7 @@ export default async function IndustryWorksPage({ params }: Props) {
       {/* 업종 첫 컷: 업종 사진을 컷 안에 넣고, 그 업종 사장님이 홈페이지에 바라는 것을 말풍선으로 붙인다 */}
       <section className="mx-auto w-full max-w-[1248px] px-4 pt-8 md:px-6 md:pt-12">
         <Link href="/works" className="inline-block border-[3px] border-[#1d1d1f] bg-[#fff3b0] px-3 py-1 text-[15px] font-bold hover:bg-white">
-          샘플 · {ind.label}
+          샘플, {ind.label}
         </Link>
         <div className="mt-5 grid items-center gap-8 md:grid-cols-[1.1fr_1fr] md:gap-12">
           <figure className="relative aspect-[4/3] -rotate-1 overflow-hidden border-[3px] border-[#1d1d1f] bg-white shadow-[6px_6px_0_#1d1d1f]">
@@ -59,7 +59,7 @@ export default async function IndustryWorksPage({ params }: Props) {
           <div>
             <h1 className="text-[34px] leading-[1.2] md:text-[52px]">{ind.title} 샘플</h1>
             <p className="mt-3 text-[17px] font-bold md:text-[19px]">
-              샘플 {list.length}개{totals.length > 0 && <> · <span className="text-accent">{manwon(Math.min(...totals))}부터</span></>}
+              샘플 {list.length}개{totals.length > 0 && <>, <span className="text-accent">{manwon(Math.min(...totals))}부터</span></>}
             </p>
             <ul className="mt-6 flex flex-col items-start gap-3" aria-label={`${ind.label} 홈페이지에 많이 넣는 기능`}>
               {ind.needs.map((n, i) => (

@@ -8,10 +8,10 @@ import { profile } from "@/data/profile";
 const FORM_ENDPOINT = "https://formspree.io/f/xbdndwog";
 
 const needOptions = [
-  "홈페이지·웹사이트 구축",
-  "기존 시스템 고도화·유지보수",
-  "서버 이전·마이그레이션",
-  "업무 프로그램·외부 연동",
+  "홈페이지, 웹사이트 구축",
+  "기존 시스템 고도화와 유지보수",
+  "서버 이전, 마이그레이션",
+  "업무 프로그램, 외부 연동",
   "아직 정하지 않았어요",
 ];
 

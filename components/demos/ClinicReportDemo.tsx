@@ -2,7 +2,7 @@
 
 import Image from "next/image";
 import { useEffect, useMemo, useState } from "react";
-import { Plus, Printer, RotateCcw, TriangleAlert } from "lucide-react";
+import { ChevronDown, ChevronUp, Plus, Printer, RotateCcw, TriangleAlert } from "lucide-react";
 import { useLocalStorage } from "@/hooks/useLocalStorage";
 import { daysAgo, fmtDash, useDemoToday } from "@/hooks/useDemoToday";
 
@@ -27,9 +27,9 @@ const AREAS: { id: AreaId; label: string; care: string; color: string }[] = [
   { id: "moisture", label: "수분", care: "보습 관리와 저자극 보습제 사용을 권합니다.", color: "#3f7fb4" },
   { id: "oil", label: "유분 밸런스", care: "피지 조절 관리와 가벼운 수분 제형을 권합니다.", color: "#b8862b" },
   { id: "pore", label: "모공", care: "주 1~2회 각질 관리와 피지 조절을 권합니다.", color: "#7a5fa6" },
-  { id: "wrinkle", label: "주름·탄력", care: "탄력 관리 프로그램과 레티놀 계열 홈케어를 권합니다.", color: "#9c3a5c" },
-  { id: "tone", label: "색소·톤", care: "색소 관리와 자외선 차단제 덧바름을 권합니다.", color: "#b0694a" },
-  { id: "redness", label: "민감·홍조", care: "진정 관리와 향료·알코올 성분 회피를 권합니다.", color: "#c24a62" },
+  { id: "wrinkle", label: "주름, 탄력", care: "탄력 관리 프로그램과 레티놀 계열 홈케어를 권합니다.", color: "#9c3a5c" },
+  { id: "tone", label: "색소, 톤", care: "색소 관리와 자외선 차단제 덧바름을 권합니다.", color: "#b0694a" },
+  { id: "redness", label: "민감, 홍조", care: "진정 관리와 향료, 알코올 성분 회피를 권합니다.", color: "#c24a62" },
 ];
 
 // 관리 권장 카드 사진 (첫째, 둘째 카드 순서)
@@ -530,7 +530,7 @@ export function ClinicReportDemo() {
                           style={{ background: INK }}
                         >
                           <Printer size={18} aria-hidden />
-                          인쇄·PDF 저장
+                          인쇄, PDF 저장
                         </button>
                       </div>
                     </div>
@@ -944,9 +944,12 @@ function DiffText({ value, light = false, withUnit = false }: { value: number; l
   const up = value > 0;
   const color = light ? (up ? "#ffe3b8" : "#ffc4cf") : up ? "#2f6ea8" : "#b3261e";
   return (
-    <span className="whitespace-nowrap font-bold" style={{ color }}>
-      {up ? "▲" : "▼"} {Math.abs(value)}
-      {light || withUnit ? `점 ${up ? "높음" : "낮음"}` : ""}
+    <span className="inline-flex items-center gap-0.5 whitespace-nowrap font-bold" style={{ color }}>
+      {up ? <ChevronUp size={14} strokeWidth={3} aria-hidden /> : <ChevronDown size={14} strokeWidth={3} aria-hidden />}
+      <span>
+        {Math.abs(value)}
+        {light || withUnit ? `점 ${up ? "높음" : "낮음"}` : <span className="sr-only">{up ? " 높음" : " 낮음"}</span>}
+      </span>
     </span>
   );
 }

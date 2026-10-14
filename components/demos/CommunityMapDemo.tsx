@@ -36,7 +36,7 @@ type CategoryId = "meeting" | "studio" | "library" | "sports" | "community";
 
 const CATEGORIES: { id: CategoryId; label: string; color: string; icon: LucideIcon }[] = [
   { id: "meeting", label: "회의실", color: "#2b7a43", icon: Presentation },
-  { id: "studio", label: "연습·창작공간", color: "#8c4fa3", icon: Palette },
+  { id: "studio", label: "연습/창작공간", color: "#8c4fa3", icon: Palette },
   { id: "library", label: "작은도서관", color: "#8a6110", icon: BookOpen },
   { id: "sports", label: "체육시설", color: "#3263c4", icon: Dumbbell },
   { id: "community", label: "주민공유공간", color: "#bf4049", icon: Users },
@@ -700,7 +700,7 @@ export function CommunityMapDemo() {
                               {p.pick === "추첨" && <Badge tone="amber">추첨</Badge>}
                             </span>
                             <span className="block text-[15px]" style={{ color: INK_SOFT }}>
-                              {c.label} · {p.dong} · {p.capacity}명 · {p.feeDetail ? `${p.fee} ${p.feeDetail}` : p.fee}
+                              {c.label}, {p.dong}, {p.capacity}명, {p.feeDetail ? `${p.fee} ${p.feeDetail}` : p.fee}
                             </span>
                             <span className="mt-0.5 flex flex-wrap items-center gap-x-2 text-[15px]" style={{ color: INK_SOFT }}>
                               {fmtHours(p.hours)}
@@ -817,7 +817,7 @@ function PlaceDetail({ place, onBack, onReserve }: { place: Place; onBack: () =>
           <Icon size={24} strokeWidth={2.2} className="mt-1 shrink-0" style={{ color: c.color }} aria-hidden />
           <div className="min-w-0">
             <p className="text-[15px]" style={{ color: INK_SOFT }}>
-              {c.label} · {place.dong}
+              {c.label}, {place.dong}
             </p>
             <h2 id="place-title" className={`${jua.className} text-[24px] leading-[1.3]`}>
               {place.name}
@@ -932,7 +932,7 @@ const NOTICES = [
     title: "추석 연휴 공공시설 휴관 안내",
     date: "2026.09.18",
     views: 1342,
-    body: ["추석 연휴 기간 공공시설 운영을 다음과 같이 안내합니다.", "1. 휴관기간: 2026. 9. 24.(목) ~ 9. 27.(일)", "2. 대상시설: 회의실, 연습·창작공간, 체육시설 전체", "3. 작은도서관은 시설별로 다르니 문의전화로 확인해 주시기 바랍니다."],
+    body: ["추석 연휴 기간 공공시설 운영을 다음과 같이 안내합니다.", "1. 휴관기간: 2026. 9. 24.(목) ~ 9. 27.(일)", "2. 대상시설: 회의실, 연습/창작공간, 체육시설 전체", "3. 작은도서관은 시설별로 다르니 문의전화로 확인해 주시기 바랍니다."],
   },
   {
     title: "남산동 공공 수영장 시설 보수에 따른 임시 휴관",
@@ -1069,7 +1069,7 @@ function ReserveForm({ place, now, onBack, onSubmit }: { place: Place; now: Date
         <label className="block text-[15px] font-bold">
           이용목적
           <select value={purpose} onChange={(e) => setPurpose(e.target.value)} className={field} style={{ borderColor: LINE }}>
-            {["회의", "교육·강좌", "동아리 활동", "기타"].map((p) => (
+            {["회의", "교육, 강좌", "동아리 활동", "기타"].map((p) => (
               <option key={p}>{p}</option>
             ))}
           </select>
@@ -1087,7 +1087,7 @@ function ReserveForm({ place, now, onBack, onSubmit }: { place: Place; now: Date
         </dl>
         <label className="flex cursor-pointer items-start gap-2 text-[15px] font-bold">
           <input type="checkbox" checked={agree} onChange={(e) => setAgree(e.target.checked)} className="mt-0.5 h-5 w-5 shrink-0 accent-[#1f7a4d]" />
-          시설 이용 수칙 및 개인정보 수집·이용에 동의합니다. (필수)
+          시설 이용 수칙과 개인정보 수집 및 이용에 동의합니다. (필수)
         </label>
         <button type="submit" disabled={!agree || !date || !time} className="h-12 w-full rounded-[6px] text-[16px] font-bold text-white disabled:opacity-50" style={{ backgroundColor: LEAF }}>
           예약 신청
@@ -1425,7 +1425,7 @@ function GuideView() {
       </h2>
       <dl className="text-[16px]">
         {[
-          ["자동승인", "무료·선착순 시설, 신청 즉시 예약완료"],
+          ["자동승인", "무료, 선착순 시설, 신청 즉시 예약완료"],
           ["심사 후 승인", "유료 또는 추첨 시설, 담당자 승인 후 예약완료"],
         ].map(([k, v]) => (
           <div key={k} className="grid border-b sm:grid-cols-[140px_minmax(0,1fr)]" style={{ borderColor: LINE }}>
@@ -1438,11 +1438,11 @@ function GuideView() {
       </dl>
 
       <h2 className="mt-8 border-b-2 pb-1.5 text-[19px] font-bold" style={{ borderColor: INK }}>
-        취소·환불 기준
+        취소, 환불 기준
       </h2>
       <div className="overflow-x-auto">
         <table className="w-full min-w-[360px] text-[15px]">
-          <caption className="sr-only">취소·환불 기준</caption>
+          <caption className="sr-only">취소, 환불 기준</caption>
           <thead className="bg-[#f6faf7]">
             <tr className="border-b" style={{ borderColor: LINE }}>
               <th scope="col" className="px-3 py-2.5 text-left">

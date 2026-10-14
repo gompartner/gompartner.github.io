@@ -13,7 +13,7 @@ export function formatDate(dateString: string): string {
 export function formatDateRange(start: string, end?: string): string {
   const startFormatted = formatDate(start);
   const endFormatted = end ? formatDate(end) : "현재";
-  return `${startFormatted} — ${endFormatted}`;
+  return `${startFormatted} ~ ${endFormatted}`;
 }
 
 export function calculateDuration(start: string, end?: string): string {

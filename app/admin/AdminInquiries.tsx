@@ -180,7 +180,7 @@ export function AdminInquiries() {
           {!authReady ? (
             <p className="flex items-center gap-2 text-sm text-foreground-tertiary">
               <Loader2 size={15} className="animate-spin" aria-hidden />
-              불러오는 중…
+              불러오는 중...
             </p>
           ) : !user ? (
             <div className="flex flex-col items-center gap-4 rounded-3xl border border-border bg-surface p-12 text-center">
@@ -204,7 +204,7 @@ export function AdminInquiries() {
           ) : loadState === "loading" ? (
             <p className="flex items-center gap-2 text-sm text-foreground-tertiary">
               <Loader2 size={15} className="animate-spin" aria-hidden />
-              문의를 불러오는 중…
+              문의를 불러오는 중...
             </p>
           ) : loadState === "denied" ? (
             <div className="flex flex-col items-center gap-3 rounded-3xl border border-border bg-surface p-12 text-center">
@@ -239,7 +239,7 @@ export function AdminInquiries() {
                       </p>
                       <p className="mt-0.5 text-xs text-foreground-tertiary">
                         {formatDateTime(inquiry.createdAt)}
-                        {inquiry.need && ` · ${inquiry.need}`}
+                        {inquiry.need && `, ${inquiry.need}`}
                       </p>
                     </div>
                     <button

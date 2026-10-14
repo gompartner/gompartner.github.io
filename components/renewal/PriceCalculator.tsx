@@ -65,7 +65,7 @@ export function PriceCalculator() {
                       <input type="radio" name="calc-plan" value={p.id} checked={on} onChange={() => setPlanId(p.id)} className="sr-only" />
                       <span className="text-[16px] font-bold">{p.title}</span>
                       <span className={`text-[14px] font-bold tabular-nums ${on ? "text-white/85" : "text-foreground-secondary"}`}>
-                        {manwon(p.price)} · {p.days}일
+                        {manwon(p.price)}, {p.days}일
                       </span>
                     </label>
                   );
@@ -141,7 +141,7 @@ export function PriceCalculator() {
               )}
             </dl>
             <p className="mt-3 flex items-baseline justify-between gap-3 border-t-[3px] border-[#1d1d1f] pt-4">
-              <span className="text-[16px] font-bold">합계 · 작업 {days}일</span>
+              <span className="text-[16px] font-bold">합계 (작업 {days}일)</span>
               <span className="text-[30px] font-bold tabular-nums text-accent md:text-[34px]">{manwon(total)}</span>
             </p>
             <label className="mt-4 flex cursor-pointer items-start gap-2.5 text-[15px] leading-[1.5]">
@@ -166,7 +166,7 @@ export function PriceCalculator() {
         className={`fixed inset-x-4 z-40 flex items-center justify-between rounded-full border-[2.5px] border-[#1d1d1f] bg-[#fff3b0] px-4 py-2 text-[15px] font-bold shadow-[3px_3px_0_#1d1d1f] transition-[opacity,transform] duration-200 md:hidden ${inCalc && !receiptSeen ? "opacity-100" : "pointer-events-none translate-y-2 opacity-0"}`}
         style={{ bottom: "calc(86px + env(safe-area-inset-bottom))" }}
       >
-        <span>합계 · {days}일</span>
+        <span>합계 ({days}일)</span>
         <span className="tabular-nums text-accent">{manwon(total)}</span>
       </p>
     </section>
