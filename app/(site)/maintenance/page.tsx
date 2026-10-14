@@ -3,6 +3,7 @@ import Image from "next/image";
 import { Check, ChevronDown, X } from "lucide-react";
 import { ChannelTalkButton } from "@/components/layout/ChannelTalk";
 import { ProcessSteps } from "@/components/landing/ProcessSteps";
+import { fitDescription } from "@/lib/seo";
 import {
   maintenanceServices,
   maintenanceSteps,
@@ -10,9 +11,8 @@ import {
 } from "@/data/maintenance";
 
 export const metadata: Metadata = {
-  title: "홈페이지 유지보수 비용 (월 관리, 오류 수정, 업체 변경 인계)",
-  description:
-    "홈페이지 월 유지보수 5만 원부터, 오류 수정 건당 5만 원부터, 다른 업체가 만든 홈페이지 유지보수 인계 점검 10만 원, 검색 노출 세팅 5만 원. 1건 기준과 하는 일, 맡지 않는 일을 나눠 적었습니다.",
+  title: "홈페이지 유지보수 비용 (월 관리, 오류 수정)",
+  description: fitDescription("월 유지보수 5만 원, 오류 수정 건당 5만 원부터, 다른 업체가 만든 홈페이지 인계 점검 10만 원. 하는 일과 맡지 않는 일을 적었습니다."),
   alternates: { canonical: "/maintenance" },
 };
 

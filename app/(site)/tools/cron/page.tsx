@@ -1,10 +1,10 @@
 import type { Metadata } from "next";
 import { CronExplainer } from "@/components/tools/CronExplainer";
+import { fitDescription } from "@/lib/seo";
 
 export const metadata: Metadata = {
   title: "cron 표현식 한국어 풀이 (다음 실행 시각 계산, 무료)",
-  description:
-    "cron 표현식을 넣으면 \"평일 오전 9시 30분에 실행\"처럼 한국어 문장으로 풀고, 칸별 뜻과 다음 실행 시각 10개를 한국 시간으로 보여 줍니다. 초를 포함한 Spring, Quartz 식도 읽습니다.",
+  description: fitDescription("cron 표현식을 \"평일 오전 9시 30분에 실행\"처럼 한국어로 풀고 다음 실행 시각을 한국 시간으로 보여 줍니다."),
   alternates: { canonical: "/tools/cron" },
 };
 

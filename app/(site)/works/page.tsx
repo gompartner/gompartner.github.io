@@ -6,10 +6,11 @@ import { WorksSearch } from "@/components/landing/WorksSearch";
 import { industries } from "@/data/industries";
 import { projects } from "@/data/projects";
 import { fieldsById } from "@/data/workFilters";
+import { fitDescription } from "@/lib/seo";
 
 export const metadata: Metadata = {
   title: "홈페이지 제작 샘플",
-  description: `쇼핑몰, 펜션, 회사, 병원, 학원, 카페, 공공기관 홈페이지와 업무 프로그램 샘플 ${projects.length}개. 샘플을 직접 사용해 보고 비슷하게 만들 때 비용을 확인할 수 있습니다.`,
+  description: fitDescription(`쇼핑몰, 펜션, 회사, 병원, 학원, 카페, 공공기관 홈페이지와 업무 프로그램 샘플 ${projects.length}개. 샘플을 직접 사용해 보고 비슷하게 만들 때 비용을 확인할 수 있습니다.`),
   alternates: { canonical: "/works" },
 };
 

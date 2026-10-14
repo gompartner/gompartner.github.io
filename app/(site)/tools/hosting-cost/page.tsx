@@ -1,10 +1,10 @@
 import type { Metadata } from "next";
 import { HostingCostCalculator } from "@/components/tools/HostingCostCalculator";
+import { fitDescription } from "@/lib/seo";
 
 export const metadata: Metadata = {
   title: "홈페이지 유지비 계산 (웹호스팅·도메인 비용 비교)",
-  description:
-    "카페24, 가비아, 닷홈, 호스팅케이알, 아이비호스팅 웹호스팅과 아임웹, 식스샵 구독 요금, 도메인 1년 비용을 비교하고 첫해와 다음 해 유지비를 계산합니다.",
+  description: fitDescription("카페24, 가비아, 닷홈, 아임웹 같은 웹호스팅과 도메인 요금을 비교해 첫해와 다음 해 유지비를 계산합니다."),
   alternates: { canonical: "/tools/hosting-cost" },
 };
 
