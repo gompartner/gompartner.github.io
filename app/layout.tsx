@@ -108,9 +108,9 @@ export default function RootLayout({
             style={{ display: "none", visibility: "hidden" }}
           />
         </noscript>
-        {/* 첫 화면 미리보기(iframe) 안의 데모는 방문으로 세지 않는다 */}
+        {/* 첫 화면 미리보기(iframe) 안의 데모, 미리보기 주소·로컬, 자동 브라우저(로봇)는 방문으로 세지 않는다 */}
         <Script id="gtm" strategy="afterInteractive">
-          {`if(window.self===window.top)(function(w,d,s,l,i){w[l]=w[l]||[];w[l].push({'gtm.start':
+          {`if(window.self===window.top&&/(^|\\.)gompartner\\.co\\.kr$/.test(location.hostname)&&!navigator.webdriver&&!/HeadlessChrome|bot|crawl|spider|Lighthouse/i.test(navigator.userAgent))(function(w,d,s,l,i){w[l]=w[l]||[];w[l].push({'gtm.start':
 new Date().getTime(),event:'gtm.js'});var f=d.getElementsByTagName(s)[0],
 j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
 'https://www.googletagmanager.com/gtm.js?id='+i+dl;f.parentNode.insertBefore(j,f);
