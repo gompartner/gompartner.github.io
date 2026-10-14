@@ -13,7 +13,8 @@ const PAST: LeadRow[] = [
   { at: "어제 14:12", name: "최ㅇ준", digits: "01050160000", summary: "인테리어 · 랜딩 고급", source: "블로그", status: "통화 전" },
 ];
 
-const THEME = { accent: "#256ef4", accentSoft: "#ecf2fe", ink: "#1e2124", muted: "#58616a", line: "#cdd1d5", paper: "#f4f5f6" };
+// 웹툰 톤: 먹선과 크림 종이. 칸 선은 연한 베이지로 둔다.
+const THEME = { accent: "#256ef4", accentSoft: "#e3ecfe", ink: "#1d1d1f", muted: "#5e5850", line: "#d8cfbf", paper: "#f3ece0" };
 
 /**
  * 신청이 들어왔을 때 사장님 쪽 화면(알림·시트·광고별 계약 수) 미리보기.
@@ -21,9 +22,9 @@ const THEME = { accent: "#256ef4", accentSoft: "#ecf2fe", ink: "#1e2124", muted:
  */
 export function OwnerPreview() {
   const hydrated = useSyncExternalStore(noopSubscribe, () => true, () => false);
-  if (!hydrated) return <div className="min-h-[1200px] rounded-[10px] bg-white md:min-h-[720px]" aria-hidden />;
+  if (!hydrated) return <div className="min-h-[1200px] bg-white md:min-h-[720px]" aria-hidden />;
   return (
-    <div className="rounded-[10px] bg-white p-4 text-[#1e2124] md:p-6">
+    <div className="bg-white p-4 text-[#1d1d1f] md:p-6">
       <LeadReceivedPanel
         hideTitle
         business="곰파트너"
