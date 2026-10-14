@@ -28,7 +28,7 @@ import {
 } from "lucide-react";
 import { useReducedMotionSafe } from "@/hooks/useReducedMotionSafe";
 
-/* 바다 펜션 홈페이지 데모: 가상의 곰파트너 바다 펜션(객실 6개).
+/* 바다 펜션 홈페이지 데모: 가상의 바다 펜션(상호는 곰파트너, 객실 6개).
    상호, 대표자, 주소, 전화번호, 계좌, 신고번호, 객실 이름과 요금, 예약 현황은 모두 가상이다.
 
    뼈대는 실제 펜션 홈페이지 템플릿(2단 드롭다운 메뉴 + 사진 슬라이드 + 하위 페이지)을 따른다.
@@ -46,7 +46,7 @@ import { useReducedMotionSafe } from "@/hooks/useReducedMotionSafe";
    AI 생성(Z-Image-Turbo, Apache 2.0) hero, room */
 
 const IMG = "/images/demo-pension";
-const PENSION = "곰파트너 바다 펜션";
+const PENSION = "곰파트너";
 const TEL = "033-000-0000";
 const ADDRESS = "강원특별자치도 ㅁㄹ군 ㄷㅅ면 해안길 00";
 const BANK = "ㅎㄴ은행 000-000000-00-000";
@@ -425,7 +425,7 @@ function Logo() {
       <img src="/images/logo.svg" alt="" aria-hidden width={28} height={28} className="h-7 w-7 shrink-0" />
       <span className="inline-flex items-baseline gap-1.5 whitespace-nowrap">
         <span className="text-[18px] font-bold tracking-[-0.02em] md:text-[19px]">곰파트너</span>
-        <span className="text-[11px] font-semibold opacity-80 md:text-[12px]">바다 펜션</span>
+        <span className="text-[11px] font-semibold opacity-80 md:text-[12px]">펜션 샘플</span>
       </span>
     </span>
   );
@@ -1269,7 +1269,7 @@ function AboutPage({ go, anchor }: { go: Go; anchor?: string }) {
             <h2 className="text-[24px] font-bold" style={{ color: C.navy }}>
               인사말
             </h2>
-            <p>{PENSION}을 찾아 주셔서 감사합니다. ㅅㄴ 해수욕장 바로 앞, 객실 6개의 작은 펜션입니다.</p>
+            <p>{PENSION}를 찾아 주셔서 감사합니다. ㅅㄴ 해수욕장 바로 앞, 객실 6개의 작은 펜션입니다.</p>
             <p>정원 앞 계단으로 내려가시면 바로 백사장입니다. 편히 쉬었다 가실 수 있도록 최선을 다하겠습니다.</p>
             <p className="pt-2 text-[15px]" style={{ color: C.muted }}>
               {PENSION} 대표 {OWNER}
@@ -2076,11 +2076,8 @@ function MiniMap() {
       </text>
       <rect x="400" y="150" width="120" height="66" rx="12" fill={C.white} stroke={C.navy} strokeWidth="2" />
       <circle cx="430" cy="183" r="12" fill={C.coral} />
-      <text x="448" y="180" fontSize="14" fill={C.navy} fontWeight={700}>
-        곰파트너 바다
-      </text>
-      <text x="448" y="198" fontSize="14" fill={C.navy} fontWeight={700}>
-        펜션
+      <text x="448" y="188" fontSize="14" fill={C.navy} fontWeight={700}>
+        {PENSION}
       </text>
       <rect x="540" y="160" width="50" height="40" rx="6" fill="#e8e3d9" />
       <text x="565" y="185" fontSize="13" fill={C.ink} textAnchor="middle" fontWeight={700}>
@@ -2155,7 +2152,7 @@ function Footer({ go }: { go: Go }) {
         </div>
         <dl className="mt-6 grid gap-x-8 gap-y-1.5 text-[14px] sm:grid-cols-2 md:grid-cols-3" style={{ color: "#9fb2c0" }}>
           {[
-            ["상호", "ㅎㅇ 바다 펜션"],
+            ["상호", PENSION],
             ["대표", OWNER],
             ["농어촌민박 신고번호", "제0000-00호"],
             ["사업자등록번호", "000-00-00000"],

@@ -26,7 +26,7 @@ import { daysAgo, fmtDash, fmtDot, fmtKo, useDemoToday } from "@/hooks/useDemoTo
    사진(public/images/demo-academy): hero, classroom, study, teacher1, teacher2 */
 
 const IMG = "/images/demo-academy";
-const ACADEMY = "곰파트너 수학·영어학원";
+const ACADEMY = "곰파트너";
 const TEL = "02-000-0000";
 const ADDRESS = "ㅁㄹ시 ㅎㄷ로 120 ㅁㄹ빌딩 3층";
 
@@ -288,7 +288,7 @@ function Logo({ light = false }: { light?: boolean }) {
       <span className="inline-flex items-baseline gap-1.5 whitespace-nowrap">
         <span className="text-[19px] font-bold tracking-[-0.01em]">곰파트너</span>
         <span className="text-[12px] font-semibold" style={{ opacity: light ? 0.85 : 0.8 }}>
-          수학·영어학원
+          학원 샘플
         </span>
       </span>
     </span>

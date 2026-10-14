@@ -33,7 +33,7 @@ import {
 import { useReducedMotionSafe } from "@/hooks/useReducedMotionSafe";
 import { daysAgo, fmtDot, useDemoToday } from "@/hooks/useDemoToday";
 
-/* 인테리어 시공 업체 홈페이지 데모: 가상의 곰파트너 인테리어(아파트 리모델링).
+/* 인테리어 시공 업체 홈페이지 데모: 곰파트너 인테리어 샘플(아파트 리모델링).
    상호, 대표자, 주소, 전화번호, 사업자 정보, 시공 사례, 공지는 모두 가상이다.
 
    49만 원 표준 패키지("문의·예약 홈페이지") 범위로만 만든다.
@@ -51,7 +51,7 @@ import { daysAgo, fmtDot, useDemoToday } from "@/hooks/useDemoToday";
    사진(public/images/demo-interior): hero, case1(거실), case2(주방), case3(욕실), before·after(같은 집 거실 전후). AI 생성 예정. */
 
 const IMG = "/images/demo-interior";
-const SHOP = "곰파트너 인테리어";
+const SHOP = "곰파트너";
 const TEL = "02-000-0000";
 const MOBILE = "010-0000-0000";
 const OWNER = "박ㅈ훈";
@@ -492,11 +492,11 @@ function Logo({ light = false }: { light?: boolean }) {
     <span className="inline-flex items-center gap-2">
       {/* eslint-disable-next-line @next/next/no-img-element */}
       <img src="/images/logo.svg" alt="" aria-hidden width={28} height={28} className="h-7 w-7 shrink-0" />
-      <span className="sr-only">{SHOP}</span>
+      <span className="sr-only">{SHOP} 인테리어 샘플</span>
       <span aria-hidden className="inline-flex items-baseline gap-1.5 whitespace-nowrap">
         <span className="text-[19px] font-bold tracking-[-0.02em] md:text-[20px]">곰파트너</span>
         <span className="text-[12px] font-semibold" style={{ color: light ? "#c8d6d0" : C.wood }}>
-          인테리어
+          인테리어 샘플
         </span>
       </span>
     </span>
@@ -1616,7 +1616,7 @@ function QuotePage({ today, onSubmit, count }: { today: Date; onSubmit: (q: Inqu
                         문자
                       </p>
                       <p className="mt-2 whitespace-pre-line rounded-[10px] rounded-tl-[2px] bg-white px-3.5 py-3 text-[15px] leading-[1.6]">
-                        {`[곰파트너 인테리어] 새 견적문의
+                        {`[곰파트너] 새 견적문의
 ${done.name} ${done.phone}
 ${done.town} ${done.pyeong} ${done.living}
 ${done.works.join(", ")}
@@ -2052,7 +2052,7 @@ function NoticePage({ ctx, anchor }: { ctx: Ctx; anchor?: string }) {
 function TownMap() {
   // 단지 배치를 단순화한 동네 지도. 회색 약도 대신 단지·공원 면 색으로 구분한다.
   return (
-    <svg viewBox="0 0 640 380" role="img" aria-label="ㄱㄷ로와 ㅅㅍ대로가 만나는 사거리, ㅎㅇ아파트 상가동 1층에 곰파트너 인테리어가 있습니다. ㄱㄷ동 주민센터 버스 정류장은 길 건너편에 있습니다." className="block h-auto w-full">
+    <svg viewBox="0 0 640 380" role="img" aria-label="ㄱㄷ로와 ㅅㅍ대로가 만나는 사거리, ㅎㅇ아파트 상가동 1층에 곰파트너가 있습니다. ㄱㄷ동 주민센터 버스 정류장은 길 건너편에 있습니다." className="block h-auto w-full">
       <rect width="640" height="380" fill="#efe7da" />
       {/* 단지와 공원 */}
       <rect x="20" y="20" width="300" height="190" rx="6" fill="#dbe6df" />
@@ -2106,9 +2106,9 @@ function TownMap() {
         <circle cx="0" cy="-37" r="8" fill="#ffffff" />
       </g>
       <g transform="translate(248 72)">
-        <rect x="-86" y="-20" width="172" height="34" rx="4" fill="#ffffff" stroke={C.wood} strokeWidth="2" />
+        <rect x="-56" y="-20" width="112" height="34" rx="4" fill="#ffffff" stroke={C.wood} strokeWidth="2" />
         <text x="0" y="3" textAnchor="middle" fontSize="16" fontWeight="700" fill={C.ink}>
-          곰파트너 인테리어
+          곰파트너
         </text>
       </g>
     </svg>

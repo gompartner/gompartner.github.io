@@ -61,11 +61,11 @@ import { daysAgo, fmtDot, useDemoToday } from "@/hooks/useDemoToday";
    AI 생성(Z-Image-Turbo, Apache 2.0) hero, lab */
 
 const IMG = "/images/demo-certlab";
-const COMPANY = "(주)곰파트너시험인증원";
+const COMPANY = "곰파트너";
 const TEL = "02-000-0000";
 const FAX = "02-000-0001";
 const EMAIL = "test@example.com";
-const ADDRESS = "ㄱㅇ시 ㅂㄹ구 ㄷㅅ로 00 곰파트너시험인증원";
+const ADDRESS = "ㄱㅇ시 ㅂㄹ구 ㄷㅅ로 00 곰파트너";
 const HOURS = "평일 09:00 ~ 18:00";
 
 const C = {
@@ -384,11 +384,9 @@ function Logo() {
     <span className="inline-flex min-w-0 max-w-full items-center gap-2.5">
       {/* eslint-disable-next-line @next/next/no-img-element */}
       <img src="/images/logo.svg" alt="" aria-hidden width={28} height={28} className="h-7 w-7 shrink-0" />
-      <span className="sr-only">{COMPANY}</span>
-      <span aria-hidden className="flex min-w-0 items-baseline gap-1 whitespace-nowrap">
-        <span className="shrink-0 text-[11px] font-bold">(주)</span>
+      <span className="flex min-w-0 items-baseline gap-1.5 whitespace-nowrap">
         <span className="text-[18px] font-bold tracking-[-0.02em] sm:text-[19px]">곰파트너</span>
-        <span className="truncate text-[11px] font-bold sm:text-[12px]" style={{ opacity: 0.75 }}>시험인증원</span>
+        <span className="truncate text-[11px] font-bold sm:text-[12px]" style={{ opacity: 0.75 }}>시험인증 샘플</span>
       </span>
     </span>
   );
@@ -620,7 +618,7 @@ function FloatingContact() {
         <div id="cl-kakao" className="absolute bottom-0 right-full mr-2 w-[220px] rounded-[10px] border bg-white p-4 text-[14px] leading-[1.55] shadow-[0_6px_18px_rgba(20,26,51,0.16)]" style={{ borderColor: C.line }}>
           <p className="font-bold">카카오톡 상담</p>
           <p className="mt-1" style={{ color: C.muted }}>
-            카카오톡에서 &lsquo;곰파트너시험인증원&rsquo; 채널을 추가해 주십시오. {HOURS}
+            카카오톡에서 &lsquo;곰파트너&rsquo; 채널을 추가해 주십시오. {HOURS}
           </p>
           <button type="button" onClick={() => setKakao(false)} className="mt-2 inline-flex h-9 items-center rounded-[6px] border px-3 text-[13px] font-bold" style={{ borderColor: C.line }}>
             닫기
@@ -1061,7 +1059,7 @@ function Greeting() {
       </div>
       <div className="mt-8 space-y-4">
         <p className="text-[19px] font-bold leading-[1.6]">{COMPANY} 홈페이지를 찾아 주셔서 감사합니다.</p>
-        <p>{COMPANY}은 전자파 시험실로 문을 열었고, 지금은 무선과 전기안전 시험, 해외인증 업무도 함께 하고 있습니다.</p>
+        <p>{COMPANY}는 전자파 시험실로 문을 열었고, 지금은 무선과 전기안전 시험, 해외인증 업무도 함께 하고 있습니다.</p>
         <p>부적합 항목이 발생하면 원인 분석과 대책을 함께 안내해 드립니다. 인증이 처음이신 기업도 부담 없이 문의해 주시기 바랍니다.</p>
         <p className="pt-4 text-right font-bold">대표이사 김ㅈ우</p>
       </div>
@@ -1212,7 +1210,7 @@ function Impartiality() {
   return (
     <div className="max-w-[820px] rounded-[10px] border p-6 md:p-9" style={{ borderColor: C.line }}>
       <p className="text-center text-[22px] font-bold tracking-[-0.02em] md:text-[26px]">공평성 선언문</p>
-      <p className="mt-5">{COMPANY}은 시험·인증 기관으로서 공평성의 중요성을 인식하고, 다음과 같이 선언합니다.</p>
+      <p className="mt-5">{COMPANY}는 시험·인증 기관으로서 공평성의 중요성을 인식하고, 다음과 같이 선언합니다.</p>
       <ol className="mt-5 list-decimal space-y-2.5 pl-6 marker:font-bold marker:text-[#23307a]">
         {IMPARTIAL.map((t) => (
           <li key={t} className="pl-1">
@@ -3451,7 +3449,7 @@ function Footer() {
         </div>
         <dl className="mt-5 grid gap-x-8 gap-y-1.5 text-[14px] sm:grid-cols-2 md:grid-cols-3" style={{ color: "#a6acd6" }}>
           {[
-            ["상호", "(주)ㄴㄹ시험인증원"],
+            ["상호", "곰파트너"],
             ["대표", "김ㅈ우"],
             ["사업자등록번호", "000-00-00000"],
             ["주소", ADDRESS],

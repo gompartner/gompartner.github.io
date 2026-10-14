@@ -21,7 +21,7 @@ import {
 } from "lucide-react";
 import { useReducedMotionSafe } from "@/hooks/useReducedMotionSafe";
 
-/* 세무회계 사무소 홈페이지 데모: 가상의 곰파트너 세무회계.
+/* 세무회계 사무소 홈페이지 데모: 가상의 세무회계 사무소(상호는 곰파트너).
    사무소 이름, 세무사 이름, 주소, 전화번호, 사업자 정보, 기장료는 모두 가상이다.
    신고 기한은 실제 세법의 기본 기한을 따르되, 음력 공휴일은 해마다 바뀌어 계산에서 뺀다.
 
@@ -44,7 +44,7 @@ import { useReducedMotionSafe } from "@/hooks/useReducedMotionSafe";
    AI 생성(Z-Image-Turbo, Apache 2.0) office */
 
 const IMG = "/images/demo-tax";
-const OFFICE = "곰파트너 세무회계";
+const OFFICE = "곰파트너";
 const TEL = "02-000-0000";
 const ADDRESS = "ㅎㄷ시 ㅅㄴ로 88 ㅁㄹ빌딩 5층";
 
@@ -580,7 +580,7 @@ function Logo() {
       <img src="/images/logo.svg" alt="" aria-hidden width={28} height={28} className="h-7 w-7 shrink-0" />
       <span className="flex items-baseline gap-1 whitespace-nowrap">
         <span className="text-[19px] font-bold tracking-[-0.02em]">곰파트너</span>
-        <span className="text-[12px] font-semibold opacity-75">세무회계</span>
+        <span className="text-[12px] font-semibold opacity-75">세무사무소 샘플</span>
       </span>
     </span>
   );
@@ -2053,7 +2053,7 @@ function Footer() {
         </div>
         <dl className="mt-6 grid gap-x-8 gap-y-1.5 text-[14px] sm:grid-cols-2 md:grid-cols-3" style={{ color: "#a9c4b8" }}>
           {[
-            ["상호", "ㄷㅇ 세무회계"],
+            ["상호", OFFICE],
             ["대표세무사", "김ㅅ우"],
             ["사업자등록번호", "000-00-00000"],
             ["전화", TEL],
