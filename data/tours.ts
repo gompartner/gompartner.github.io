@@ -96,6 +96,24 @@ export const tours: Record<string, TourStep[]> = {
     { target: "#mc-py", title: "견적 계산", desc: "평수를 움직이고 더할 작업을 고르세요." },
     { target: "#mc-apply", title: "예약 신청", desc: "계산한 조건이 그대로 들어갑니다." },
   ],
+  "landing-popup-store": [
+    { target: "#rc-reserve", title: "회차 발권", desc: "날짜와 회차를 고르고 발권하세요. 입장권이 인쇄돼 나옵니다." },
+    { target: "#rc-wait", title: "현장 번호표", desc: "번호표를 뽑으면 앞 팀 수가 줄어듭니다." },
+    { target: "#rc-roulette", title: "돌림판", desc: "돌리기를 누르세요. 결과는 쿠폰으로 나옵니다." },
+    { target: "#rc-perks", title: "구디백과 SNS 인증", desc: "남은 구디백 수를 보고, 세 가지를 체크하세요." },
+  ],
+  "landing-stamp-tour": [
+    { target: "#ib-course", title: "코스 지도", desc: "전체 코스와 짧은 코스를 바꾸고 장소 번호를 누르세요." },
+    { target: "#ib-stamp", title: "도장판", desc: "장소마다 QR 찍기를 누르면 도장이 찍힙니다." },
+    { target: "#ib-guide", title: "해설사 동행", desc: "날짜와 시간을 고르세요. 남은 자리가 보입니다." },
+    { target: "#ib-gift", title: "기념품 신청", desc: "도장을 다 모으면 신청 칸이 열립니다." },
+  ],
+  "landing-zine-fair": [
+    { target: "#zf-entry", title: "사전 입장 등록", desc: "날짜와 들어오는 시간을 고르세요. 등록하면 입장 QR이 나옵니다." },
+    { target: "#zf-sellers", title: "셀러 찾기", desc: "장르 태그를 누르면 맞는 셀러만 남고 지도에 칠해집니다." },
+    { target: "#zf-map", title: "부스 지도", desc: "부스를 누르면 그 셀러가 열립니다." },
+    { target: "#zf-wish", title: "미리 담기", desc: "하트로 담은 진을 도는 순서대로 정리합니다." },
+  ],
   "landing-coding-camp": [
     { target: "#curriculum", title: "커리큘럼", desc: "주차를 누르면 그 주에 쌓을 블록이 보입니다." },
     { target: "#apply", title: "신청", desc: "학년을 고르면 맞는 반만 남습니다." },
