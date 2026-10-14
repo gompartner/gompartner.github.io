@@ -118,12 +118,6 @@ export default async function SamplePage({ params }: Props) {
             )}
           </div>
 
-          <div className="mt-6 md:hidden">
-            <Link href={p.demoUrl} prefetch={false} data-gtm-cta={`sample_open_${p.id}`} className={`${openButton} w-full`}>
-              <Play size={18} strokeWidth={2.5} aria-hidden />
-              샘플 열기
-            </Link>
-          </div>
 
           {/* 넣은 기능: 말풍선 */}
           <section aria-labelledby="features-title" className="mt-14">

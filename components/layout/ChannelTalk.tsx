@@ -39,8 +39,8 @@ export function ChannelTalk() {
   useEffect(() => {
     if (!PLUGIN_KEY) return;
     loadChannelIO();
-    // 휴대폰에서는 화면 아래 고정 상담 줄(MobileCtaBar)이 버튼 역할을 하니 채널톡 버튼을 숨긴다
-    window.ChannelIO?.("boot", { pluginKey: PLUGIN_KEY, hideChannelButtonOnBoot: window.innerWidth < 768 });
+    // 떠 있는 채널톡 버튼은 쓰지 않는다. PC는 머리글의 '채팅 상담', 휴대폰은 아래 고정 상담 줄(MobileCtaBar)이 연다
+    window.ChannelIO?.("boot", { pluginKey: PLUGIN_KEY, hideChannelButtonOnBoot: true });
     // 데모의 "채팅 상담"에서 넘어오면(/?chat=1&msg=…) 상담창을 바로 열고 본 샘플을 입력칸에 채운다
     const params = new URLSearchParams(window.location.search);
     if (params.get("chat") === "1") {
