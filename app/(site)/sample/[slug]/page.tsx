@@ -88,12 +88,14 @@ function SceneView({ s, slug, client, shotOk, cont }: { s: Scene; slug: string; 
     case "shot":
       if (!shotOk(s.step)) return s.text ? <Narration>{s.text}</Narration> : null;
       return (
-        <figure className="my-2 border-[3px] border-[#1d1d1f] bg-[radial-gradient(rgba(29,29,31,.12)_1.2px,transparent_1.3px)] bg-[length:12px_12px] px-4 py-6 md:px-8">
-          <div className="mx-auto max-w-[360px] rounded-[18px] border-[3px] border-[#1d1d1f] bg-white p-2.5 shadow-[4px_4px_0_#1d1d1f]">
-            {/* 화면 속 버튼·테두리가 먹선에 붙어 보이지 않게 안쪽 여백을 두고, 캡처는 옅은 선으로 따로 둘렀다 */}
-            <Image src={`/images/sample-cuts/${slug}-${s.step}.jpg`} alt={s.text ?? ""} width={780} height={1440} sizes="360px" className="h-auto w-full rounded-[10px] border border-[#1d1d1f]/15" />
+        <figure className="my-2 overflow-hidden border-[3px] border-[#1d1d1f] bg-[radial-gradient(rgba(29,29,31,.12)_1.2px,transparent_1.3px)] bg-[length:12px_12px] px-6 pb-6 pt-9 md:px-10">
+          {/* 실제 화면은 말풍선 틀에 넣지 않고, 테이프로 붙인 캡처 사진처럼 칸 안에 띄운다(먹선과 겹치지 않게) */}
+          <div className={`shot-print relative mx-auto max-w-[340px] bg-white p-2 pt-5 shadow-[0_14px_28px_rgba(29,29,31,.22)] ${s.step % 2 ? "[--tilt:1.6deg]" : "[--tilt:-1.6deg]"}`}>
+            <span aria-hidden className="absolute -top-3.5 left-6 h-6 w-16 -rotate-6 bg-[#ffe14d]/75 shadow-[0_1px_2px_rgba(0,0,0,.12)]" />
+            <span aria-hidden className="absolute -top-3.5 right-6 h-6 w-16 rotate-6 bg-[#ffe14d]/75 shadow-[0_1px_2px_rgba(0,0,0,.12)]" />
+            <Image src={`/images/sample-cuts/${slug}-${s.step}.jpg`} alt={s.text ?? ""} width={780} height={1440} sizes="340px" className="h-auto w-full" />
           </div>
-          {s.text && <figcaption className="mx-auto mt-4 w-fit max-w-full border-[3px] border-[#1d1d1f] bg-[#fff3b0] px-3.5 py-1.5 text-[15px] font-bold leading-[1.5] md:text-[16px]">{s.text}</figcaption>}
+          {s.text && <figcaption className="mx-auto mt-6 w-fit max-w-full border-[3px] border-[#1d1d1f] bg-[#fff3b0] px-3.5 py-1.5 text-[15px] font-bold leading-[1.5] md:text-[16px]">{s.text}</figcaption>}
         </figure>
       );
   }
