@@ -114,19 +114,19 @@ export function AdEpisode() {
         </Sfx>
       </Panel>
       <Gutter />
-      <Panel bg="#0f5e5a" className="px-5 py-8 md:px-10 md:py-10">
+      <Panel bg="#0f5e5a" className="px-3 py-6 sm:px-5 sm:py-8 md:px-10 md:py-10">
         <Narration className="mb-5">직접 신청해 보세요</Narration>
-        <form onSubmit={submit} className="rounded-[14px] bg-white p-5 md:p-6" aria-labelledby={`${id}-t`}>
-          <p id={`${id}-t`} className="text-[20px] font-bold leading-[1.35]">
+        <form onSubmit={submit} className="rounded-[14px] bg-white p-4 sm:p-5 md:p-6" aria-labelledby={`${id}-t`}>
+          <p id={`${id}-t`} className="text-[19px] font-bold leading-[1.35] sm:text-[20px]">
             정수기 렌탈 월 19,900원부터
           </p>
           <fieldset className="mt-4">
             <legend className="text-[14px] font-bold text-foreground-secondary">궁금한 제품</legend>
-            <div className="mt-2 flex flex-wrap gap-2">
+            <div className="mt-2 grid grid-cols-3 gap-1.5 sm:flex sm:gap-2">
               {["정수기", "비데", "공기청정기"].map((v) => (
-                <label key={v} className="cursor-pointer">
+                <label key={v} className="min-w-0 cursor-pointer">
                   <input type="radio" name={`${id}-item`} value={v} checked={item === v} onChange={() => setItem(v)} className="peer sr-only" />
-                  <span className="inline-flex h-10 items-center rounded-full border-2 border-border px-4 text-[15px] font-bold peer-checked:border-[#0f5e5a] peer-checked:bg-[#0f5e5a] peer-checked:text-white peer-focus-visible:outline peer-focus-visible:outline-2 peer-focus-visible:outline-offset-2 peer-focus-visible:outline-accent">
+                  <span className="flex h-10 items-center justify-center whitespace-nowrap rounded-full border-2 border-border px-1.5 text-[14px] font-bold sm:inline-flex sm:px-4 sm:text-[15px] peer-checked:border-[#0f5e5a] peer-checked:bg-[#0f5e5a] peer-checked:text-white peer-focus-visible:outline peer-focus-visible:outline-2 peer-focus-visible:outline-offset-2 peer-focus-visible:outline-accent">
                     {v}
                   </span>
                 </label>
