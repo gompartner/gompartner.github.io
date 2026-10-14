@@ -5,7 +5,7 @@ import Link from "next/link";
 import type { Project } from "@/lib/types";
 import { SMALL_IMAGE_HEIGHT, SMALL_IMAGE_WIDTH, smallImage } from "@/lib/images";
 import { estimateFor, manwon } from "@/data/pricing";
-import { productOf } from "@/components/landing/WorksGrid";
+import { productOf } from "@/lib/product";
 
 /** 샘플 목록 보기: 작은 썸네일과 분류·제목·예상 금액을 한 줄씩 */
 export function WorksList({ projects }: { projects: Project[] }) {

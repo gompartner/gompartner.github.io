@@ -7,6 +7,7 @@ import type { Project } from "@/lib/types";
 import { SMALL_IMAGE_HEIGHT, SMALL_IMAGE_WIDTH, smallImage } from "@/lib/images";
 import { useReducedMotionSafe } from "@/hooks/useReducedMotionSafe";
 import { estimateFor, manwon } from "@/data/pricing";
+import { KIND_STYLE, productOf } from "@/lib/product";
 
 const EASE_OUT = [0.23, 1, 0.32, 1] as const;
 const EASE_IN_OUT = [0.77, 0, 0.175, 1] as const;
@@ -18,16 +19,6 @@ const secondaryButton =
 // 조건이 바뀌면 빠지는 카드는 흐려지고, 남는 카드는 새 자리로 미끄러지고,
 // 새로 들어오는 카드는 위에서 아래로 인쇄되듯 드러난다.
 // 동작 줄이기 설정이면 자리 이동 없이 흐려지기만 한다.
-// 썸네일 위 라벨은 파는 상품 기준으로 나눈다. 견적이 없는 샘플은 업무 프로그램(별도 견적)이다.
-const KIND_STYLE = { 홈페이지: "bg-accent", 랜딩페이지: "bg-[#0f5e5a]", 유지보수: "bg-[#464c53]", "업무 프로그램": "bg-[#7a4dd8]" } as const;
-export function productOf(w: Project): keyof typeof KIND_STYLE {
-  if (w.category === "랜딩페이지") return "랜딩페이지";
-  if (w.id === "maintenance-dashboard" || w.id === "accessibility-review") return "유지보수";
-  const est = estimateFor(w.id);
-  if (!est) return "업무 프로그램";
-  return "홈페이지";
-}
-
 export function WorksGrid({ projects }: { projects: Project[] }) {
   const reduce = useReducedMotionSafe();
   const hidden = reduce ? { opacity: 0 } : { opacity: 0, clipPath: "inset(0% 0% 100% 0% round 10px)" };
