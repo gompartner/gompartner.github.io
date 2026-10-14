@@ -5,6 +5,7 @@ import Link from "next/link";
 import type { Project } from "@/lib/types";
 import { SMALL_IMAGE_HEIGHT, SMALL_IMAGE_WIDTH, smallImage } from "@/lib/images";
 import { estimateFor, manwon } from "@/data/pricing";
+import { productOf } from "@/components/landing/WorksGrid";
 
 /** 샘플 목록 보기: 작은 썸네일과 분류·제목·예상 금액을 한 줄씩 */
 export function WorksList({ projects }: { projects: Project[] }) {
@@ -25,7 +26,7 @@ export function WorksList({ projects }: { projects: Project[] }) {
               <div className="min-w-0 flex-1">
                 <p className="text-[14px] font-bold text-accent md:text-[15px]">
                   {w.category}·{w.layout}
-                  <span className="ml-2 font-normal text-foreground-secondary">{w.kind}</span>
+                  <span className="ml-2 font-normal text-foreground-secondary">{productOf(w)}</span>
                 </p>
                 <p className="mt-0.5 truncate text-[17px] font-bold group-hover:text-accent group-hover:underline group-hover:underline-offset-4">{w.title}</p>
               </div>

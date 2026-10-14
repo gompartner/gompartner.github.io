@@ -14,10 +14,20 @@ const EASE_IN_OUT = [0.77, 0, 0.175, 1] as const;
 const secondaryButton =
   "inline-flex h-12 items-center justify-center rounded-[6px] border-[2.5px] border-[#1d1d1f] bg-white px-6 text-[17px] font-bold text-foreground shadow-[3px_3px_0_#1d1d1f] transition-[transform,box-shadow,background-color] duration-150 hover:bg-[#fff3b0] active:translate-x-[3px] active:translate-y-[3px] active:shadow-none";
 
-// 신규 제작과 유지보수를 한 목록에 보여 주고, 구분은 썸네일 왼쪽 위 라벨로 표시한다.
+// 홈페이지, 랜딩페이지, 유지보수, 업무 프로그램을 한 목록에 보여 주고, 구분은 글자 칸 첫 줄 라벨로 표시한다(썸네일은 가리지 않게).
 // 조건이 바뀌면 빠지는 카드는 흐려지고, 남는 카드는 새 자리로 미끄러지고,
 // 새로 들어오는 카드는 위에서 아래로 인쇄되듯 드러난다.
 // 동작 줄이기 설정이면 자리 이동 없이 흐려지기만 한다.
+// 썸네일 위 라벨은 파는 상품 기준으로 나눈다. 견적이 없는 샘플은 업무 프로그램(별도 견적)이다.
+const KIND_STYLE = { 홈페이지: "bg-accent", 랜딩페이지: "bg-[#0f5e5a]", 유지보수: "bg-[#464c53]", "업무 프로그램": "bg-[#7a4dd8]" } as const;
+export function productOf(w: Project): keyof typeof KIND_STYLE {
+  if (w.category === "랜딩페이지") return "랜딩페이지";
+  if (w.id === "maintenance-dashboard" || w.id === "accessibility-review") return "유지보수";
+  const est = estimateFor(w.id);
+  if (!est) return "업무 프로그램";
+  return "홈페이지";
+}
+
 export function WorksGrid({ projects }: { projects: Project[] }) {
   const reduce = useReducedMotionSafe();
   const hidden = reduce ? { opacity: 0 } : { opacity: 0, clipPath: "inset(0% 0% 100% 0% round 10px)" };
@@ -44,16 +54,11 @@ export function WorksGrid({ projects }: { projects: Project[] }) {
                 height={SMALL_IMAGE_HEIGHT}
                 className="aspect-[16/10] h-auto w-full object-cover object-top"
               />
-              <span
-                className={`absolute top-3 left-3 rounded-[4px] px-2 py-0.5 text-[15px] font-bold leading-[1.5] text-white ${
-                  w.kind === "유지보수" ? "bg-[#464c53]" : "bg-accent"
-                }`}
-              >
-                {w.kind}
-              </span>
+
             </Link>
             <div className="flex flex-1 flex-col p-6">
-              <p className="text-[15px] font-bold leading-[1.5] text-accent">
+              <p className="flex flex-wrap items-center gap-x-2 gap-y-1 text-[15px] font-bold leading-[1.5] text-accent">
+                <span className={`rounded-[4px] px-2 py-0.5 text-[14px] text-white ${KIND_STYLE[productOf(w)]}`}>{productOf(w)}</span>
                 {w.category}·{w.layout}
               </p>
               <h3 className="mt-1 text-[19px] font-bold leading-[1.5]">{w.title}</h3>
