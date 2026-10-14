@@ -127,7 +127,7 @@ const PROGRAMS: Program[] = [
   },
 ];
 
-const FIELDS = ["IT·소프트웨어", "바이오·의료", "제조·기계", "문화·콘텐츠", "환경·에너지", "기타"];
+const FIELDS = ["IT, 소프트웨어", "바이오, 의료", "제조, 기계", "문화, 콘텐츠", "환경, 에너지", "기타"];
 
 const STATUSES: Status[] = ["접수완료", "서류검토", "선정", "탈락"];
 
@@ -347,7 +347,7 @@ function validate(step: number, f: FormData): Errors {
   }
   if (step === 3) {
     if (!f.files.length) e.files = "신청서는 필수 제출서류입니다.";
-    if (!f.agree) e.agree = "개인정보 수집·이용에 동의해야 신청할 수 있습니다.";
+    if (!f.agree) e.agree = "개인정보 수집 및 이용에 동의해야 신청할 수 있습니다.";
   }
   return e;
 }
@@ -593,7 +593,7 @@ function ApplicantView({ state, setState }: { state: ViewState; setState: (u: (s
                         onChange={(e) => set("agree", e.target.checked)}
                         className="h-6 w-6 shrink-0 accent-[#00745c]"
                       />
-                      개인정보 수집·이용에 동의합니다. (필수)
+                      개인정보 수집 및 이용에 동의합니다. (필수)
                     </label>
                     {errors.agree && <p className="mt-1 text-[15px] font-bold text-[#b3261e]">{errors.agree}</p>}
                   </div>

@@ -653,7 +653,7 @@ function SiteFooter() {
         <p>
           서울특별시 중구 세종대로 000 <Sep /> 학습지원센터 02-000-0000
         </p>
-        <p className="mt-3">© 곰파트너</p>
+        <p className="mt-3">Copyright 곰파트너</p>
       </div>
     </footer>
   );
@@ -3073,7 +3073,7 @@ function LessonStatsPage({ rows }: { rows: Row[] }) {
                   {x.n}명 ({x.rate}%)
                   {k === biggest && (
                     <span className="ml-1" style={{ color: C.warn }}>
-                      ▼{Math.round((rates[k - 1].rate - x.rate) * 10) / 10}%p
+                      -{Math.round((rates[k - 1].rate - x.rate) * 10) / 10}%p
                     </span>
                   )}
                 </span>
@@ -3103,7 +3103,7 @@ function LessonStatsPage({ rows }: { rows: Row[] }) {
               {clock(seg * (worst - 1))}~{clock(seg * worst)}
             </b>{" "}
             <span className="tabular-nums" style={{ color: C.muted }}>
-              (▼{drop[worst - 1] - drop[worst]}%p)
+              (-{drop[worst - 1] - drop[worst]}%p)
             </span>
           </p>
           <div className="mt-4 flex h-40 items-end gap-1.5" role="img" aria-label={`${lesson + 1}차시 구간별 시청 유지율: ${drop.join(", ")}%`}>

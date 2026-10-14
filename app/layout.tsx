@@ -52,7 +52,7 @@ export const metadata: Metadata = {
         url: "/og-image.png?v=20261014",
         width: 1200,
         height: 630,
-        alt: `${profile.name} 랜딩페이지·홈페이지·유지보수·업무 프로그램`,
+        alt: `${profile.name} 랜딩페이지, 홈페이지, 유지보수, 업무 프로그램`,
       },
     ],
   },

@@ -121,7 +121,7 @@ const MENU: { label: string; items: { id: Page; label: string }[] }[] = [
     ],
   },
   {
-    label: "소식·자료",
+    label: "소식, 자료",
     items: [
       { id: "notice", label: "공지사항" },
       { id: "gallery", label: "포토갤러리" },
@@ -223,7 +223,7 @@ const ZONES: Zone[] = [
     x: 640,
     y: 470,
     color: "#3a3f7a",
-    what: "금·토·일 야간에만 운영합니다.",
+    what: "금, 토, 일 야간에만 운영합니다.",
     best: "19:30 분수 공연",
     spot: "호수 쪽 데크 계단",
     walk: "30분",
@@ -276,7 +276,7 @@ const RESIDENT_RATE = 0.5;
 /* 추천 코스 */
 const WHO = [
   { id: "kids", label: "아이와 함께" },
-  { id: "couple", label: "연인·친구" },
+  { id: "couple", label: "연인, 친구" },
   { id: "parents", label: "부모님과" },
   { id: "solo", label: "혼자" },
 ] as const;
@@ -307,7 +307,7 @@ function makeCourse(when: WhenId, who: WhoId) {
   if (when === "weekday-night") {
     zones = zones.slice(0, 2);
     hours = "약 1시간 30분";
-    notes.push("야간 정원은 금·토·일에만 운영합니다. 평일은 17:00에 입장을 마감합니다.");
+    notes.push("야간 정원은 금, 토, 일에만 운영합니다. 평일은 17:00에 입장을 마감합니다.");
   } else if (when === "weekend-night") {
     zones = [...zones.filter((z) => z !== "hall").slice(0, 2), "night"];
     hours = "약 2시간";
@@ -316,7 +316,7 @@ function makeCourse(when: WhenId, who: WhoId) {
   notes.push(
     weekend
       ? "주말 11:00 ~ 15:00가 가장 혼잡합니다. 주차장이 붐비니 무료 셔틀버스를 이용해 주세요."
-      : "화·수요일 오전 10시대는 단체 관람객이 많습니다.",
+      : "화, 수요일 오전 10시대는 단체 관람객이 많습니다.",
   );
   notes.push(base.tip);
   return { zones, hours, notes };
@@ -486,7 +486,7 @@ function Header({ page, go }: { page: Page; go: Go }) {
     <header className="sticky top-0 z-40 border-b" style={{ background: C.cream, borderColor: C.line }}>
       <div className="hidden text-[13px] md:block" style={{ background: C.green, color: "#cfe3d5" }}>
         <Container className="flex h-8 items-center justify-between">
-          <span>주최 ㄴㄹ시 · 주관 꽃박람회 조직위원회</span>
+          <span>주최 ㄴㄹ시, 주관 꽃박람회 조직위원회</span>
           <span className="flex items-center gap-1">
             <Phone size={12} aria-hidden />
             관람 문의 {TEL}
@@ -622,7 +622,7 @@ function HoursBox() {
   const rows: [string, string][] = [
     ["낮 정원", "매일 09:00 ~ 18:00"],
     ["입장 마감", "17:00"],
-    ["야간 정원", "금·토·일 18:00 ~ 21:30"],
+    ["야간 정원", "금, 토, 일 18:00 ~ 21:30"],
     ["고객센터", "09:00 ~ 18:00"],
   ];
   return (
@@ -1053,7 +1053,7 @@ function OverviewPage() {
         rows={[
           ["행사명", EXPO],
           ["기간", `${PERIOD}, 17일간`],
-          ["운영시간", "09:00 ~ 18:00 (입장 마감 17:00), 야간 정원 금·토·일 18:00 ~ 21:30"],
+          ["운영시간", "09:00 ~ 18:00 (입장 마감 17:00), 야간 정원 금, 토, 일 18:00 ~ 21:30"],
           ["장소", `${PLACE} 일대 (야외 전시 6개 구역, 실내 전시관)`],
           ["주제", "호숫가 정원과 봄꽃"],
           ["규모", "튤립 52종 120만 송이, 덩굴장미 아치 600m, 수국 화분 3천 개"],
@@ -1069,7 +1069,7 @@ function OverviewPage() {
 function WayPage() {
   const items = [
     { icon: Bus, title: "무료 셔틀버스", body: "ㄴㄹ역 2번 출구 앞에서 08:40부터 10분 간격으로 출발합니다. 야간 개장일 막차는 21:50입니다." },
-    { icon: TrainFront, title: "지하철·시내버스", body: "ㄴㄹ선 ㅇㅅ공원역 3번 출구에서 도보 12분입니다. 시내버스 21, 37, 104번은 박람회 정문 정류장에 정차합니다." },
+    { icon: TrainFront, title: "지하철, 시내버스", body: "ㄴㄹ선 ㅇㅅ공원역 3번 출구에서 도보 12분입니다. 시내버스 21, 37, 104번은 박람회 정문 정류장에 정차합니다." },
     { icon: Car, title: "주차장", body: "제1~3 주차장 2,800면, 승용차 1일 4,000원입니다. 주말 오전 10시 전후 만차가 잦으니 셔틀버스를 이용해 주세요." },
   ];
   return (
@@ -1096,7 +1096,7 @@ function GuidePage() {
     { icon: Baby, title: "수유실", body: "실내 전시관 1층, 정문 종합안내소" },
     { icon: Accessibility, title: "유모차 및 휠체어", body: "정문 종합안내소 무료 대여, 신분증 예치" },
     { icon: Lock, title: "물품보관함", body: "정문 광장 120칸, 1회 2,000원" },
-    { icon: HeartPulse, title: "의료지원·자동심장충격기", body: "실내 전시관 1층 의무실, 구역별 자동심장충격기(AED)" },
+    { icon: HeartPulse, title: "의료지원, 자동심장충격기", body: "실내 전시관 1층 의무실, 구역별 자동심장충격기(AED)" },
   ];
   return (
     <div className="mx-auto grid max-w-[1000px] gap-12">
@@ -1106,7 +1106,7 @@ function GuidePage() {
           caption="관람시간"
           rows={[
             ["낮 정원", "매일 09:00 ~ 18:00 (입장 마감 17:00)"],
-            ["야간 정원", "금·토·일 18:00 ~ 21:30 (낮 입장권으로 이용)"],
+            ["야간 정원", "금, 토, 일 18:00 ~ 21:30 (낮 입장권으로 이용)"],
             ["실내 전시관", "매일 09:30 ~ 17:30"],
           ]}
         />
@@ -1116,10 +1116,10 @@ function GuidePage() {
         <div className="grid gap-6 lg:grid-cols-[1.1fr_1fr]">
           <div>
             <FeeTable />
-            <ul className="mt-4 space-y-1 text-[14px] leading-[1.6]" style={{ color: C.muted }}>
-              <li>※ 사전예매권은 일반권 기준 2,000원 할인되며 조기 소진될 수 있습니다.</li>
-              <li>※ 현장판매는 정문 매표소에서 09:00 ~ 17:00 운영합니다.</li>
-              <li>※ ㄴㄹ시민은 신분증 제시 시 50% 할인됩니다.</li>
+            <ul className="mt-4 list-disc space-y-1 pl-5 text-[14px] leading-[1.6]" style={{ color: C.muted }}>
+              <li>사전예매권은 일반권 기준 2,000원 할인되며 조기 소진될 수 있습니다.</li>
+              <li>현장판매는 정문 매표소에서 09:00 ~ 17:00 운영합니다.</li>
+              <li>ㄴㄹ시민은 신분증 제시 시 50% 할인됩니다.</li>
             </ul>
           </div>
           <div>
@@ -1320,7 +1320,7 @@ function CoursePage() {
             {course.notes.map((n) => (
               <li key={n} className="flex gap-2">
                 <span aria-hidden style={{ color: C.pinkText }}>
-                  ※
+                  *
                 </span>
                 {n}
               </li>
@@ -1401,7 +1401,7 @@ function BloomPage() {
         </tbody>
       </table>
       <p className="mt-4 text-[14px]" style={{ color: C.muted }}>
-        ※ 개막 전에는 지난해 개화 기록과 올해 기온을 바탕으로 한 예상이며, 개막 후에는 매일 09:00에 갱신합니다.
+        개막 전에는 지난해 개화 기록과 올해 기온을 바탕으로 한 예상이며, 개막 후에는 매일 09:00에 갱신합니다.
       </p>
     </div>
   );
@@ -1554,7 +1554,7 @@ function ProgramPage({ today }: { today: number }) {
         </tbody>
       </table>
       <p className="mt-4 text-[14px]" style={{ color: C.muted }}>
-        ※ 우천 시 야외 공연은 실내 전시관 2층으로 옮겨 진행합니다. 체험 프로그램은 현장 선착순 접수입니다.
+        우천 시 야외 공연은 실내 전시관 2층으로 옮겨 진행합니다. 체험 프로그램은 현장 선착순 접수입니다.
       </p>
     </div>
   );
@@ -1571,7 +1571,7 @@ function NoticePage({ openIndex, setOpenIndex }: { openIndex: number | null; set
         <header className="border-y-2 py-4" style={{ borderColor: C.green }}>
           <h2 className="text-[20px] font-bold leading-[1.45] md:text-[22px]">{n.title}</h2>
           <p className="mt-1 text-[14px]" style={{ color: C.muted }}>
-            작성자 조직위원회 · 등록일 {fmtDot(daysAgo(today, n.ago))}
+            작성자 조직위원회, 등록일 {fmtDot(daysAgo(today, n.ago))}
           </p>
         </header>
         <p className="min-h-[160px] border-b py-6 text-[16px] leading-[1.8]" style={{ borderColor: C.line }}>

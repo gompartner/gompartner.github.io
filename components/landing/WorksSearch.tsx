@@ -4,7 +4,7 @@ import { useEffect, useLayoutEffect, useRef, useState } from "react";
 import { AnimatePresence, motion } from "framer-motion";
 import { Check, ChevronDown, LayoutGrid, List, ListFilter, RotateCcw, Search, X } from "lucide-react";
 import type { Project } from "@/lib/types";
-import { capabilities, fields, fieldsById, type Capability, type Field } from "@/data/workFilters";
+import { capabilities, fieldLabel, fields, fieldsById, type Capability, type Field } from "@/data/workFilters";
 import { WorksGrid } from "./WorksGrid";
 import { WorksList } from "./WorksList";
 import { useReducedMotionSafe } from "@/hooks/useReducedMotionSafe";
@@ -26,7 +26,7 @@ const hasCap = (p: Project, c: Capability | null) => {
 
 // 검색어는 띄어쓰기와 대소문자를 무시하고, 업종 분류도 함께 찾는다("병원"이면 결과지 프로그램도 나온다)
 const normalize = (s: string) => s.toLowerCase().replace(/\s+/g, "");
-const searchText = (p: Project) => normalize([p.title, p.category, p.description, ...p.features, ...(fieldsById[p.id] ?? [])].join(" "));
+const searchText = (p: Project) => normalize([p.title, p.category, p.description, ...p.features, ...(fieldsById[p.id] ?? []).map((f) => fieldLabel[f])].join(" "));
 
 // 샘플은 기본으로 "[업종]에서 쓰는 [기능]을 갖춘 샘플 N개" 문장의 빈칸을 골라 거르고,
 // 원하면 검색어로 찾는 방식으로 바꿀 수 있다.
@@ -76,7 +76,7 @@ export function WorksSearch({ projects }: { projects: Project[] }) {
 
   const fieldOptions = [
     { value: null, label: "모든 업종", count: projects.filter((p) => hasCap(p, cap)).length },
-    ...fields.map((f) => ({ value: f, label: f, count: projects.filter((p) => hasField(p, f) && hasCap(p, cap)).length })),
+    ...fields.map((f) => ({ value: f, label: fieldLabel[f], count: projects.filter((p) => hasField(p, f) && hasCap(p, cap)).length })),
   ];
   const capOptions = [
     { value: null, label: "모든 기능", count: projects.filter((p) => hasField(p, field)).length },

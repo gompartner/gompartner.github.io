@@ -1,8 +1,8 @@
 "use client";
 
-import { useState } from "react";
+import { Fragment, useState } from "react";
 import { AnimatePresence, motion } from "framer-motion";
-import { Check, ChevronDown, CircleAlert, Copy } from "lucide-react";
+import { Check, ChevronDown, ChevronRight, CircleAlert, Copy } from "lucide-react";
 import { ChannelTalkButton } from "@/components/layout/ChannelTalk";
 import { useReducedMotionSafe } from "@/hooks/useReducedMotionSafe";
 
@@ -185,7 +185,16 @@ export function SearchPreview() {
                 <span className="block truncate text-[14px] text-[#202124]">{f.name || url.host}</span>
                 <span className="block truncate text-[12px] text-[#4d5156]">
                   {url.host}
-                  {url.path && ` › ${url.path.replace(/^\//, "").replace(/\//g, " › ")}`}
+                  {url.path &&
+                    url.path
+                      .replace(/^\//, "")
+                      .split("/")
+                      .map((seg, i) => (
+                        <Fragment key={i}>
+                          <ChevronRight size={12} aria-hidden className="mx-1 inline align-[-1px]" />
+                          {seg}
+                        </Fragment>
+                      ))}
                 </span>
               </span>
             </div>

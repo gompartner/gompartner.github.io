@@ -54,7 +54,7 @@ export function WorksGrid({ projects }: { projects: Project[] }) {
             </Link>
             <div className="flex flex-1 flex-col p-6">
               <p className="text-[15px] font-bold leading-[1.5] text-accent">
-                {w.category}·{w.layout}
+                {w.category}, {w.layout}
               </p>
               <h3 className="mt-1 text-[19px] font-bold leading-[1.5]">{w.title}</h3>
               <div className="mt-auto flex items-end justify-between gap-3 pt-6">

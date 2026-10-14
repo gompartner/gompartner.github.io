@@ -4,7 +4,7 @@ import { fitDescription } from "@/lib/seo";
 
 export const metadata: Metadata = {
   title: "자주 묻는 질문",
-  description: fitDescription("홈페이지 제작 수정 횟수, 결제 시점, 취소·환불, 도메인·호스팅, 완료 후 유지보수, 업무 프로그램 견적에 대한 답입니다."),
+  description: fitDescription("홈페이지 제작 수정 횟수, 결제 시점, 취소와 환불, 도메인과 호스팅, 완료 후 유지보수, 업무 프로그램 견적에 대한 답입니다."),
   alternates: { canonical: "/faq" },
 };
 

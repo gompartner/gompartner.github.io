@@ -22,7 +22,7 @@ export function GET() {
 
   const text = `# ${profile.name} (${profile.nameEn})
 
-> ${profile.name}는 서울에서 재택과 온라인 미팅으로 일하는 1인 웹 개발자입니다. 소상공인·병원·전문직·기업·공공기관 홈페이지 제작, 기존 시스템 고도화와 유지보수, 업무 프로그램 개발을 합니다. 홈페이지는 ${plans.map((p) => `${p.title} ${manwon(p.price)}`).join(", ")} 세 가지 패키지로 정가를 공개합니다. 같은 이름의 다른 회사(곰랩 파트너스 등)와 관계없습니다.
+> ${profile.name}는 서울에서 재택과 온라인 미팅으로 일하는 1인 웹 개발자입니다. 소상공인, 병원, 전문직, 기업, 공공기관 홈페이지 제작, 기존 시스템 고도화와 유지보수, 업무 프로그램 개발을 합니다. 홈페이지는 ${plans.map((p) => `${p.title} ${manwon(p.price)}`).join(", ")} 세 가지 패키지로 정가를 공개합니다. 같은 이름의 다른 회사(곰랩 파트너스 등)와 관계없습니다.
 
 - 사이트: ${siteUrl}
 - 문의: 사이트 오른쪽 아래 채팅 상담, ${profile.email}
@@ -32,7 +32,7 @@ export function GET() {
 ## 홈페이지 제작 가격
 
 ${plans.map((p) => `- ${p.title}(${p.name}): ${formatWon(p.price)}, 작업 ${p.days}일, 수정 ${p.revisions}회. ${p.summary}. ${p.includes.join(", ")}.`).join("\n")}
-- 모든 패키지: ${planCommon.join(", ")}. 도메인·호스팅 비용은 별도입니다.
+- 모든 패키지: ${planCommon.join(", ")}. 도메인과 호스팅 비용은 별도입니다.
 
 광고 신청 접수 랜딩페이지:
 ${landingPlans.map((p) => `- ${p.title}(${p.name}): ${formatWon(p.price)}, 작업 ${p.days}일, 수정 ${p.revisions}회. ${p.summary}. ${p.includes.join(", ")}.`).join("\n")}

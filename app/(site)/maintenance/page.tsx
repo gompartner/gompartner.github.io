@@ -51,7 +51,7 @@ export default function MaintenancePage() {
                     <span>
                       <span className="block text-[17px] font-bold md:text-[19px]">{asks[s.id]}</span>
                       <span className="block text-[13px] font-bold text-foreground-tertiary md:text-[14px]">
-                        {s.title} · {s.price.split(" · ")[0]}
+                        {s.title}, {s.price.split(", ")[0]}
                       </span>
                     </span>
                     <span aria-hidden className="grid h-8 w-8 shrink-0 place-items-center rounded-full border-[2.5px] border-[#1d1d1f] bg-accent text-white">

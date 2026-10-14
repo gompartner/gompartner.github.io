@@ -192,14 +192,14 @@ const KIND_GROUP: Record<Kind, Group> = {
 
 const GROUP_STYLE: Record<Group, { label: string; bar: string }> = {
   vat: { label: "부가가치세", bar: C.green },
-  income: { label: "소득세·법인세", bar: C.ink },
-  withhold: { label: "원천세·지급명세서", bar: "#9bb5a8" },
+  income: { label: "소득세, 법인세", bar: C.ink },
+  withhold: { label: "원천세, 지급명세서", bar: "#9bb5a8" },
 };
 
 const KIND_INFO: Record<Kind, { about: string; prep: string[]; topic: string }> = {
   vatFinal: {
-    about: "과세기간(6개월)의 매출·매입을 정리해 부가가치세를 확정신고·납부합니다.",
-    prep: ["매출·매입 세금계산서 합계", "카드 매출과 현금영수증 매출 내역", "사업용 카드 사용 내역", "수출이 있으면 수출 신고 필증", "예정고지나 예정신고로 이미 낸 세액"],
+    about: "과세기간(6개월)의 매출과 매입을 정리해 부가가치세를 확정신고하고 납부합니다.",
+    prep: ["매출, 매입 세금계산서 합계", "카드 매출과 현금영수증 매출 내역", "사업용 카드 사용 내역", "수출이 있으면 수출 신고 필증", "예정고지나 예정신고로 이미 낸 세액"],
     topic: "부가세",
   },
   vatPrepay: {
@@ -209,7 +209,7 @@ const KIND_INFO: Record<Kind, { about: string; prep: string[]; topic: string }> 
   },
   vatPrelim: {
     about: "법인은 분기마다 부가가치세를 신고합니다. 직전 과세기간 공급가액이 1억 5천만 원 미만이면 예정고지로 대신합니다.",
-    prep: ["3개월치 매출·매입 세금계산서", "법인카드 사용 내역", "카드 매출과 현금영수증 매출 내역", "수입이 있으면 수입 세금계산서"],
+    prep: ["3개월치 매출, 매입 세금계산서", "법인카드 사용 내역", "카드 매출과 현금영수증 매출 내역", "수입이 있으면 수입 세금계산서"],
     topic: "부가세",
   },
   vatSimple: {
@@ -223,8 +223,8 @@ const KIND_INFO: Record<Kind, { about: string; prep: string[]; topic: string }> 
     topic: "부가세",
   },
   income: {
-    about: "직전 연도의 사업소득 등 종합소득을 합산해 종합소득세를 신고·납부합니다. 지방소득세도 함께 신고합니다.",
-    prep: ["장부 또는 경비 증빙", "근로, 연금, 2천만 원 넘는 이자·배당 소득 내역", "노란우산공제, 연금저축 납입 증명", "부양가족 정보", "11월에 낸 중간예납 세액"],
+    about: "직전 연도의 사업소득 등 종합소득을 합산해 종합소득세를 신고하고 납부합니다. 지방소득세도 함께 신고합니다.",
+    prep: ["장부 또는 경비 증빙", "근로, 연금, 2천만 원 넘는 이자, 배당 소득 내역", "노란우산공제, 연금저축 납입 증명", "부양가족 정보", "11월에 낸 중간예납 세액"],
     topic: "종합소득세",
   },
   incomeSincere: {
@@ -238,12 +238,12 @@ const KIND_INFO: Record<Kind, { about: string; prep: string[]; topic: string }> 
     topic: "종합소득세",
   },
   corp: {
-    about: "직전 사업연도의 법인세를 신고·납부합니다. 납부세액이 1천만 원을 넘으면 분납할 수 있습니다.",
+    about: "직전 사업연도의 법인세를 신고하고 납부합니다. 납부세액이 1천만 원을 넘으면 분납할 수 있습니다.",
     prep: ["재무상태표와 손익계산서", "법인 통장 1년치 거래 내역", "법인카드 사용 내역", "주주 명부와 지분 변동 내역", "투자나 고용 증가로 받을 세액공제 자료"],
     topic: "법인세",
   },
   corpLocal: {
-    about: "법인세와 별도로 사업장 소재지 시·군·구에 법인지방소득세를 신고합니다.",
+    about: "법인세와 별도로 사업장 소재지 시군구에 법인지방소득세를 신고합니다.",
     prep: ["법인세 신고서 사본", "사업장이 여러 곳이면 사업장별 직원 수와 면적"],
     topic: "법인세",
   },
@@ -253,24 +253,24 @@ const KIND_INFO: Record<Kind, { about: string; prep: string[]; topic: string }> 
     topic: "법인세",
   },
   withhold: {
-    about: "전월 급여·사업소득 지급 시 원천징수한 세액을 신고·납부합니다.",
-    prep: ["지난달 급여 대장", "입사·퇴사한 직원 명단", "3.3%를 떼고 준 외주 지급 내역"],
-    topic: "원천세·인건비",
+    about: "전월 급여, 사업소득 지급 시 원천징수한 세액을 신고하고 납부합니다.",
+    prep: ["지난달 급여 대장", "입사, 퇴사한 직원 명단", "3.3%를 떼고 준 외주 지급 내역"],
+    topic: "원천세, 인건비",
   },
   withholdHalf: {
-    about: "반기납부 승인을 받은 사업장은 6개월분 원천세를 신고·납부합니다.",
-    prep: ["6개월치 급여 대장", "입사·퇴사한 직원 명단", "반기 동안의 외주 지급 내역"],
-    topic: "원천세·인건비",
+    about: "반기납부 승인을 받은 사업장은 6개월분 원천세를 신고하고 납부합니다.",
+    prep: ["6개월치 급여 대장", "입사, 퇴사한 직원 명단", "반기 동안의 외주 지급 내역"],
+    topic: "원천세, 인건비",
   },
   payStatement: {
     about: "직전 연도 근로소득 지급명세서를 연말정산 결과와 함께 제출합니다. 기한을 넘기면 가산세가 부과됩니다.",
     prep: ["직원별 연말정산 결과와 공제 증빙", "중도 퇴사자 정산 내역", "2월분 원천세 신고 자료"],
-    topic: "원천세·인건비",
+    topic: "원천세, 인건비",
   },
   simpleStatement: {
     about: "사업소득(3.3%)을 지급했다면 다음 달 말일까지 간이지급명세서를 제출합니다.",
     prep: ["지난달 외주 인력별 지급 금액", "받는 사람 이름과 주민등록번호"],
-    topic: "원천세·인건비",
+    topic: "원천세, 인건비",
   },
 };
 
@@ -395,7 +395,7 @@ const POSTS: Post[] = [
   { id: 10, board: "news", cat: "세법개정", ago: 40, title: "올해 세법 개정안에서 소상공인이 볼 부분", body: "고용증대 세액공제, 업무용 승용차, 간편장부 대상 기준 등 주요 개정 내용을 표로 정리했습니다." },
   { id: 9, board: "column", cat: "절세", ago: 63, title: "사업용 카드 홈택스 등록 안내", body: "사업용 신용카드를 홈택스에 등록하면 사용 내역이 자동으로 수집되어 매입세액공제를 받을 수 있습니다." },
   { id: 8, board: "news", cat: "신고일정", ago: 79, title: "간이과세자 부가세 예정부과 고지서 금액 확인", body: "직전 연도 납부세액의 50%가 고지됩니다. 상반기 매출이 크게 줄었다면 예정신고로 세액을 줄일 수 있습니다." },
-  { id: 7, board: "notice", cat: "사무소", ago: 98, title: "1월·5월 토요일 상담 운영 안내", body: "부가세 확정신고와 종합소득세 신고 기간인 1월, 5월에는 토요일 10:00~15:00에도 상담합니다." },
+  { id: 7, board: "notice", cat: "사무소", ago: 98, title: "1월, 5월 토요일 상담 운영 안내", body: "부가세 확정신고와 종합소득세 신고 기간인 1월, 5월에는 토요일 10:00~15:00에도 상담합니다." },
   { id: 6, board: "column", cat: "경비", ago: 114, title: "업무용 승용차, 운행기록부가 필요한 경우", body: "차량 관련 비용이 연 1,500만 원을 초과하면 운행기록부를 작성해야 초과분을 경비로 인정받을 수 있습니다. 성실신고확인대상자는 업무전용 자동차보험 가입 여부도 확인합니다." },
   { id: 5, board: "news", cat: "세법개정", ago: 150, title: "간이과세 기준금액 1억 400만 원 안내", body: "직전 연도 공급대가가 1억 400만 원 미만이면 간이과세 적용 대상입니다. 부동산임대업과 과세유흥장소는 4,800만 원 기준이 유지됩니다." },
   { id: 4, board: "notice", cat: "사무소", ago: 188, title: "ㄷㅅ구 소상공인 무료 세무 상담 참여 안내", body: "매월 둘째 주 수요일 오후 ㄷㅅ구 소상공인지원센터에서 김ㅅ우 세무사가 상담합니다. 예약은 센터로 문의해 주세요." },
@@ -409,13 +409,13 @@ const BOARD_TOTAL: Record<BoardId, number> = { news: 213, column: 86, notice: 41
 /* ---------- 업무분야 ---------- */
 
 const SERVICES: { name: string; desc: string; topic: string }[] = [
-  { name: "세무기장/신고", desc: "장부 작성, 부가가치세·원천세·종합소득세·법인세 신고", topic: "신규 기장" },
-  { name: "세무조정", desc: "결산 후 세무조정을 거쳐 법인세·종합소득세를 신고합니다.", topic: "법인세" },
-  { name: "양도소득세", desc: "부동산·주식 양도 전 예상 세액 검토 및 신고 대리", topic: "양도·상속·증여" },
-  { name: "상속세·증여세", desc: "재산 평가, 공제 검토, 신고, 분할 납부 신청", topic: "양도·상속·증여" },
-  { name: "법인설립·법인전환", desc: "법인전환 시기 검토, 법인설립 및 신고 지원", topic: "법인전환" },
+  { name: "세무기장/신고", desc: "장부 작성, 부가가치세, 원천세, 종합소득세, 법인세 신고", topic: "신규 기장" },
+  { name: "세무조정", desc: "결산 후 세무조정을 거쳐 법인세와 종합소득세를 신고합니다.", topic: "법인세" },
+  { name: "양도소득세", desc: "부동산, 주식 양도 전 예상 세액 검토 및 신고 대리", topic: "양도, 상속, 증여" },
+  { name: "상속세, 증여세", desc: "재산 평가, 공제 검토, 신고, 분할 납부 신청", topic: "양도, 상속, 증여" },
+  { name: "법인설립, 법인전환", desc: "법인전환 시기 검토, 법인설립 및 신고 지원", topic: "법인전환" },
   { name: "세무조사대응", desc: "세무조사 대응 및 조세불복 대리", topic: "세무조사대응" },
-  { name: "4대보험", desc: "직원 입사·퇴사 신고, 보수총액 신고, 두루누리 지원 신청", topic: "원천세·인건비" },
+  { name: "4대보험", desc: "직원 입사, 퇴사 신고, 보수총액 신고, 두루누리 지원 신청", topic: "원천세, 인건비" },
 ];
 
 const SHORTCUTS = [
@@ -857,7 +857,7 @@ function Home({
               {OFFICE}
             </h1>
             <p className="mt-1 text-[15px]" style={{ color: C.muted }}>
-              개인사업자·법인 세무기장, 신고대리 / 대표세무사 김ㅅ우
+              개인사업자, 법인 세무기장, 신고대리 / 대표세무사 김ㅅ우
             </p>
           </div>
           <div className="flex flex-wrap items-end gap-x-6 gap-y-3">
@@ -912,7 +912,7 @@ function Home({
                         기한
                       </th>
                       <th scope="col" className="py-2 text-left font-semibold">
-                        신고·납부
+                        신고, 납부
                       </th>
                       <th scope="col" className="w-[96px] py-2 text-right font-semibold">
                         비고
@@ -1455,8 +1455,8 @@ function FeeTable({ fee, setFee, onAsk }: { fee: FeePick; setFee: (f: FeePick) =
           <FeeGrid fee={fee} setFee={setFee} />
         </div>
         <ul className="mt-4 space-y-1 text-[14px]" style={{ color: C.muted }}>
-          <li>부가세·원천세 신고는 기장료에 포함됩니다.</li>
-          <li>종합소득세·법인세 신고 시 연 1회 세무조정료가 별도로 청구됩니다.</li>
+          <li>부가세와 원천세 신고는 기장료에 포함됩니다.</li>
+          <li>종합소득세, 법인세 신고 시 연 1회 세무조정료가 별도로 청구됩니다.</li>
           <li>신규사업자는 첫 3개월 기장료가 무료입니다. 모든 금액은 부가세 별도입니다.</li>
         </ul>
       </div>
@@ -1573,7 +1573,7 @@ function Board({ board, setBoard, postId, setPostId }: { board: BoardId; setBoar
                 {post.title}
               </h2>
               <p className="mt-1 text-[14px] tabular-nums" style={{ color: C.muted }}>
-                {postDate(post)} · {OFFICE}
+                {postDate(post)}, {OFFICE}
               </p>
             </div>
             <p className="px-5 py-6 md:px-7">{post.body}</p>
@@ -1634,7 +1634,7 @@ function Board({ board, setBoard, postId, setPostId }: { board: BoardId; setBoar
                       <button type="button" onClick={() => setPostId(p.id)} className="block w-full py-2 text-left font-semibold leading-[1.45] hover:underline">
                         {p.title}
                         <span className="block text-[13px] font-normal tabular-nums sm:hidden" style={{ color: C.muted }}>
-                          {p.cat} · {postDate(p)}
+                          {p.cat}, {postDate(p)}
                         </span>
                       </button>
                     </td>
@@ -1811,7 +1811,7 @@ function Location() {
 
 /* ---------- 상담신청 ---------- */
 
-const TOPICS = ["신규 기장", "세무대리인 변경", "부가세", "종합소득세", "법인세", "원천세·인건비", "양도·상속·증여", "법인전환", "세무조사대응"];
+const TOPICS = ["신규 기장", "세무대리인 변경", "부가세", "종합소득세", "법인세", "원천세, 인건비", "양도, 상속, 증여", "법인전환", "세무조사대응"];
 const TIMES = ["오전 9시 ~ 12시", "오후 1시 ~ 6시", "문자로 먼저 연락"];
 
 function Contact({ prefill, minute }: { prefill: Prefill; minute: number }) {
@@ -1845,7 +1845,7 @@ function ContactForm({ prefill }: { prefill: Prefill }) {
     if (phone.replace(/\D/g, "").length < 10) return setError("휴대전화 번호를 입력해 주세요.");
     if (!biz) return setError("사업자 형태를 선택해 주세요.");
     if (!time) return setError("통화 가능 시간을 선택해 주세요.");
-    if (!agree) return setError("개인정보 수집·이용에 동의해 주세요.");
+    if (!agree) return setError("개인정보 수집 및 이용에 동의해 주세요.");
     setError("");
     const n = new Date();
     const p2 = (v: number) => String(v).padStart(2, "0");
@@ -1951,7 +1951,7 @@ function ContactForm({ prefill }: { prefill: Prefill }) {
             <label className="flex min-h-11 cursor-pointer items-start gap-2.5 text-[15px] leading-[1.5] md:col-span-2">
               <input type="checkbox" checked={agree} onChange={(e) => setAgree(e.target.checked)} className="mt-0.5 h-5 w-5 shrink-0 accent-[#1f5c45]" />
               <span>
-                개인정보 수집·이용 동의 (필수)
+                개인정보 수집 및 이용 동의 (필수)
                 <span className="block text-[14px]" style={{ color: C.muted }}>
                   이름, 휴대전화를 상담 연락에만 쓰고 상담이 끝나면 1년 안에 파기합니다.
                 </span>

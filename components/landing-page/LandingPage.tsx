@@ -39,10 +39,10 @@ const FOR_WHOM = [
 const SAMPLE_IDS = ["landing-water-rental", "landing-coding-camp", "landing-move-clean"];
 
 const FAQ: [string, string][] = [
-  ["문자·카톡 알림 비용은 별도인가요?", "발송 비용은 건당 20원 내외이며 고객 부담입니다. 카카오 알림톡은 비즈니스 채널 인증과 템플릿 심사가 필요합니다. 메일 알림은 무료입니다."],
+  ["문자, 카톡 알림 비용은 별도인가요?", "발송 비용은 건당 20원 내외이며 고객 부담입니다. 카카오 알림톡은 비즈니스 채널 인증과 템플릿 심사가 필요합니다. 메일 알림은 무료입니다."],
   ["신청 내용은 어디에 저장되나요?", "고객 구글 계정의 구글 시트에 저장됩니다. 곰파트너는 신청 내용을 보관하지 않습니다."],
   ["월 비용이 있나요?", "무료 호스팅을 사용하여 월 비용은 없습니다. 도메인은 고객 명의로 직접 구매하며 연 2만 원 내외입니다."],
-  ["진행하지 않는 업종이 있나요?", "대부 중개 및 주식·코인 리딩 업종은 진행하지 않습니다."],
+  ["진행하지 않는 업종이 있나요?", "대부 중개 및 주식, 코인 리딩 업종은 진행하지 않습니다."],
   ["작업 기간은 얼마나 걸리나요?", `자료 전달일 기준 ${landingPlans.map((p) => `${p.title} ${p.days}일`).join(" / ")}입니다.`],
 ];
 
@@ -123,7 +123,7 @@ export function LandingPage() {
                 <span className="text-accent">랜딩페이지 제작</span>
               </motion.h1>
               <p className="mt-5 text-center text-[20px] font-bold tabular-nums md:text-[24px]">
-                {manwon(basic.price)}부터 · 작업 {basic.days}일
+                {manwon(basic.price)}부터, 작업 {basic.days}일
               </p>
               <div className="mt-5 flex flex-wrap justify-center gap-3">
                 <button type="button" onClick={toForm} className={`${pressable} flex h-14 items-center rounded-[6px] bg-accent px-7 text-[18px] font-bold text-white`} style={{ borderColor: ink }}>
@@ -187,10 +187,10 @@ export function LandingPage() {
               <Panel img="/images/webtoon/happy-ding.jpg" alt="새 신청 알림을 받고 놀란 사장님">
                 <div className="absolute inset-x-3 top-3 rounded-[16px] border-[3px] bg-white/95 px-4 py-3 md:inset-x-6" style={{ borderColor: ink }}>
                   <p className="flex items-center gap-1.5 text-[13px] font-bold text-foreground-tertiary">
-                    <BellRing size={15} aria-hidden /> 문자 · 지금
+                    <BellRing size={15} aria-hidden /> 문자 <span className="font-normal">지금</span>
                   </p>
                   <p className="mt-0.5 text-[16px] font-bold">[곰파트너 렌탈] 새 신청 1건</p>
-                  <p className="text-[15px] text-foreground-secondary">김ㅎ늘 · 010-1234-**** · 정수기 · 네이버 검색광고</p>
+                  <p className="text-[15px] text-foreground-secondary">김ㅎ늘, 010-1234-****, 정수기, 네이버 검색광고</p>
                 </div>
                 <Sfx className="bottom-6 left-5 text-[64px] md:text-[80px]" color="#ffd43b" rotate={-10} delay={0.3}>
                   띠링!
@@ -374,7 +374,7 @@ export function LandingPage() {
           >
             <div className="mx-auto flex h-14 max-w-[520px] items-center gap-3 rounded-[10px] border-[3px] bg-white pl-4 pr-2 shadow-[4px_4px_0_#1d1d1f]" style={{ borderColor: ink }}>
               <p className="min-w-0 flex-1 truncate text-[16px] font-bold tabular-nums">
-                {manwon(basic.price)}부터 · {basic.days}일
+                {manwon(basic.price)}부터, {basic.days}일
               </p>
               <button type="button" onClick={toForm} className="h-10 shrink-0 rounded-[6px] border-[2.5px] bg-accent px-5 text-[16px] font-bold text-white" style={{ borderColor: ink }}>
                 상담 신청
