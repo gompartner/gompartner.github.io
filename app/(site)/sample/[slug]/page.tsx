@@ -13,6 +13,8 @@ import { estimateFor, formatWon, manwon } from "@/data/pricing";
 import { samplePalettes } from "@/data/samplePalettes";
 import { scenarios, type Scene } from "@/data/scenes";
 import { fitDescription } from "@/lib/seo";
+import { productOf } from "@/components/landing/WorksGrid";
+import { maintenanceServices } from "@/data/maintenance";
 
 // 샘플 표지. 웹툰 한 편처럼 위에서 아래로 읽는다.
 // PC·휴대폰 미리보기 → 의뢰인과 곰의 대화로 기획 의도와 만드는 과정, 기능 화면 → 색 → 맨 아래 금액과 샘플 열기.
@@ -198,6 +200,20 @@ export default async function SamplePage({ params }: Props) {
                   <dd className="tabular-nums">-{formatWon(est.discount)}</dd>
                 </div>
               )}
+            </dl>
+          </>
+        ) : productOf(p) === "유지보수" ? (
+          <>
+            <h2 id="price-title" className="text-[15px] font-bold text-foreground-secondary">
+              유지보수
+            </h2>
+            <dl className="mt-3 divide-y divide-[#1d1d1f]/15 border-t-2 border-[#1d1d1f] text-[15px] md:text-[16px]">
+              {maintenanceServices.map((s) => (
+                <div key={s.id} className="flex justify-between gap-3 py-2">
+                  <dt>{s.title}</dt>
+                  <dd className="text-right font-bold text-accent">{s.price}</dd>
+                </div>
+              ))}
             </dl>
           </>
         ) : (
