@@ -7,7 +7,7 @@ import { Car, Check, ChevronRight, Heart, Minus, Plus, Search, ShoppingBag, Star
 import { daysAgo, fmtDot, useDemoToday } from "@/hooks/useDemoToday";
 import { useReducedMotionSafe } from "@/hooks/useReducedMotionSafe";
 
-/* 자사 쇼핑몰 데모: 가상의 곰파트너 도자기 공방. 카페24 쇼핑몰형 구성.
+/* 자사 쇼핑몰 데모: 가상의 도자기 공방(상호는 곰파트너). 카페24 쇼핑몰형 구성.
    상호, 대표자, 주소, 전화번호, 사업자 정보, 통신판매업 신고번호, 상품과 가격, 재고, 후기는 모두 가상이다.
 
    디자인: 미색 바탕(#f7f4ef)에 먹색 글자(#23201d), 테라코타(#b5562f), 흙빛(#d9c7b4).
@@ -23,7 +23,7 @@ import { useReducedMotionSafe } from "@/hooks/useReducedMotionSafe";
    AI 생성(Z-Image-Turbo, Apache 2.0) hero, detail, products/<상품>-<유약>.jpg */
 
 const IMG = "/images/demo-store";
-const SHOP = "곰파트너 도자기 공방";
+const SHOP = "곰파트너";
 const TEL = "02-000-0000";
 const ADDRESS = "ㅂㄹ시 ㄷㅅ구 ㅅㄴ로 12길 8 1층";
 
@@ -545,7 +545,7 @@ function Logo() {
       <img src="/images/logo.svg" alt="" aria-hidden width={28} height={28} className="h-7 w-7 shrink-0" />
       <span className="inline-flex items-baseline gap-1.5 whitespace-nowrap">
         <span className="text-[18px] font-bold tracking-[-0.02em] md:text-[20px]">곰파트너</span>
-        <span className="text-[11px] font-semibold opacity-80 md:text-[12px]">도자기 공방</span>
+        <span className="text-[11px] font-semibold opacity-80 md:text-[12px]">도자기 공방 샘플</span>
       </span>
     </span>
   );
@@ -2055,7 +2055,7 @@ function BrandView() {
         </div>
         <div>
           <p>
-            {SHOP}은 대표 김ㅈ우와 이ㅅ연 두 사람이 2019년부터 ㅈㄹ동 작업실에서 운영합니다. 한 번 가마를 땔 때 200점 남짓 나오며, 흠이 없는 것만 골라 판매합니다.
+            {SHOP}는 대표 김ㅈ우와 이ㅅ연 두 사람이 2019년부터 ㅈㄹ동 작업실에서 운영합니다. 한 번 가마를 땔 때 200점 남짓 나오며, 흠이 없는 것만 골라 판매합니다.
           </p>
           <div className="mt-6">
             <SpecTable
@@ -2332,7 +2332,7 @@ function Footer() {
           <Logo />
           <dl className="mt-4 grid gap-y-1 text-[13px]" style={{ color: "#b3a593" }}>
             {[
-              ["상호", "ㅎㄱ 도자기 공방"],
+              ["상호", SHOP],
               ["대표자", "김ㅈ우"],
               ["사업자등록번호", "000-00-00000"],
               ["통신판매업 신고번호", "제0000-ㅂㄹㄷㅅ-0000호"],

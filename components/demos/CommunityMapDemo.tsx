@@ -24,7 +24,7 @@ import type { LucideIcon } from "lucide-react";
 import { useLocalStorage } from "@/hooks/useLocalStorage";
 import { useReducedMotionSafe } from "@/hooks/useReducedMotionSafe";
 
-/* ㅇㅂ시 공유공간 지도 데모.
+/* 공유공간 지도 샘플 데모.
    지도가 화면을 채우고 목록은 지도 위 패널(데스크톱 왼쪽, 모바일 아래)로 띄운다.
    외부 지도 없이 손그림 느낌의 일러스트 지도(SVG, 1000×750 좌표)에 핀을 올린다.
    분류 색은 dataviz 검증 스크립트 통과 순서(녹·자·황·청·적)이며,
@@ -464,7 +464,12 @@ export function CommunityMapDemo() {
             <span className="flex h-9 w-9 items-center justify-center rounded-[10px] text-white" style={{ backgroundColor: LEAF }}>
               <MapPin size={20} strokeWidth={2.4} aria-hidden />
             </span>
-            <Brand className={`${jua.className} text-[22px] leading-[1.2]`}>ㅇㅂ시 공유공간</Brand>
+            <Brand className="flex flex-col whitespace-nowrap">
+              <span className={`${jua.className} text-[22px] leading-[1.1]`}>곰파트너</span>
+              <span className="text-[12px] font-semibold leading-[1.2]" style={{ color: INK_SOFT }}>
+                공유공간 지도 샘플
+              </span>
+            </Brand>
           </a>
           <form
             role="search"

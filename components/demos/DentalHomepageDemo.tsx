@@ -25,7 +25,7 @@ import { daysAgo, fmtDot, useDemoToday } from "@/hooks/useDemoToday";
    caries Katarzyna Zygnerska(rubu_NvklJE), scaling Quilia(y8fWicGsv4g), ct Quang Tri NGUYEN(VckdJzo7ig0) */
 
 const IMG = "/images/demo-dental";
-const CLINIC = "곰파트너치과의원";
+const CLINIC = "곰파트너";
 const TEL = "02-000-0000";
 const ADDRESS = "ㄷㅅ시 ㅎㄷ로 45 ㅅㅈ타워 3층";
 
@@ -647,7 +647,7 @@ export function DentalHomepageDemo() {
       what === "naver"
         ? "네이버 예약은 병원 네이버 플레이스와 연결됩니다."
         : what === "kakao"
-          ? `카카오톡 채널 ${CLINIC}과 연결됩니다.`
+          ? `카카오톡 채널 ${CLINIC}와 연결됩니다.`
           : "지도 앱에서 병원 위치를 엽니다.",
     );
 
@@ -1328,7 +1328,7 @@ function Greeting() {
     <div className="grid gap-8 lg:grid-cols-12">
       <div className="min-w-0 lg:col-span-7">
         <div className="space-y-4 text-[18px]" style={{ color: C.muted }}>
-          <p>{CLINIC}을 찾아 주셔서 감사합니다.</p>
+          <p>{CLINIC}를 찾아 주셔서 감사합니다.</p>
           <p>치료를 정하기 전에 엑스레이와 구강 사진을 같이 보면서 설명해 드립니다.</p>
           <p>화요일과 목요일은 21:00까지 진료합니다.</p>
         </div>
@@ -2144,7 +2144,7 @@ function SiteFooter({ go }: { go: Go }) {
         </p>
         <dl className="mt-4 flex flex-wrap gap-x-6 gap-y-1 text-[15px]">
           {[
-            ["상호", "ㅁㅇ치과의원"],
+            ["상호", "곰파트너"],
             ["대표자", "김ㅈ우"],
             ["주소", ADDRESS],
             ["전화", TEL],
@@ -2156,7 +2156,7 @@ function SiteFooter({ go }: { go: Go }) {
             </div>
           ))}
         </dl>
-        <p className="mt-6 text-[15px]">© ㅁㅇ치과의원</p>
+        <p className="mt-6 text-[15px]">© 곰파트너</p>
       </div>
     </footer>
   );
@@ -2170,7 +2170,7 @@ function BrandLogo() {
       <img src="/images/logo.svg" alt="" aria-hidden width={28} height={28} className="h-7 w-7 shrink-0" />
       <span className="flex items-baseline gap-1 whitespace-nowrap">
         <span className="text-[20px] font-bold tracking-[-0.03em]">곰파트너</span>
-        <span className="text-[12px] font-semibold opacity-75">치과의원</span>
+        <span className="text-[12px] font-semibold opacity-75">치과 샘플</span>
       </span>
     </span>
   );

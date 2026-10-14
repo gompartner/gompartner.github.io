@@ -22,7 +22,7 @@ const plex = IBM_Plex_Sans_KR({ preload: false, weight: ["400", "700"], subsets:
 
 const STORAGE_KEY = "gs-demo:application:v3";
 
-/* 지원사업 신청·심사 시스템 데모 (가상 기관 ㄴㅍ진흥원).
+/* 지원사업 신청·심사 시스템 데모 (지원사업 신청 샘플).
    신청자는 모집 공고에서 사업을 골라 3단계 신청서를 제출하고,
    관리자는 신청 목록을 검색·심사하고 통계와 엑셀 파일을 받는다.
 
@@ -249,9 +249,9 @@ export function ApplicationDemo() {
           <div className="flex items-center gap-2.5">
             <Emblem inverse={admin} />
             <div className="leading-[1.3]">
-              <h1 className="text-[19px] font-bold tracking-[-0.02em]">ㄴㅍ진흥원</h1>
-              <p className={`text-[15px] ${admin ? "text-[#c4cfca]" : "text-[#5b6862]"}`}>
-                {admin ? "지원사업 심사관리" : "지원사업 통합신청"}
+              <h1 className="whitespace-nowrap text-[19px] font-bold tracking-[-0.02em]">곰파트너</h1>
+              <p className={`whitespace-nowrap text-[13px] ${admin ? "text-[#c4cfca]" : "text-[#5b6862]"}`}>
+                {admin ? "지원사업 심사 샘플" : "지원사업 신청 샘플"}
               </p>
             </div>
           </div>
@@ -304,7 +304,7 @@ export function ApplicationDemo() {
   );
 }
 
-/** ㄴㅍ진흥원 상징: 초록 원 안의 새싹 모양 */
+/** 기관 상징: 초록 원 안의 새싹 모양 */
 function Emblem({ inverse }: { inverse: boolean }) {
   return (
     <svg width="36" height="36" viewBox="0 0 36 36" aria-hidden>

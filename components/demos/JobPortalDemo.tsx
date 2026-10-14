@@ -19,7 +19,7 @@ import {
 import { useLocalStorage } from "@/hooks/useLocalStorage";
 import { useReducedMotionSafe } from "@/hooks/useReducedMotionSafe";
 
-/* 채용 정보 포털 데모. 가상 서비스 "ㄴㄹ일자리".
+/* 채용 정보 포털 데모. 채용 포털 샘플.
    첫 화면은 큰 검색창과 많이 찾은 검색어 순위, 결과는 공공 채용 포털처럼 3열 표.
    공고 등록일과 마감일은 오늘 기준 상대값으로 두고, 화면이 뜬 뒤에만 계산한다. */
 
@@ -429,9 +429,14 @@ export function JobPortalDemo() {
               e.preventDefault();
               goMenu("채용정보");
             }}
-            className={`${display.className} text-[26px] leading-none tracking-[-0.01em]`}
+            className="flex shrink-0 items-center gap-2"
           >
-            ㄴㄹ<span className="rounded-[4px] bg-[#ffd23f] px-1">일자리</span>
+            {/* eslint-disable-next-line @next/next/no-img-element -- 메인 사이트와 같은 곰 로고 */}
+            <img src="/images/logo.svg" alt="" aria-hidden width={28} height={28} className="h-7 w-7 shrink-0" />
+            <span className="flex flex-col items-start whitespace-nowrap">
+              <span className={`${display.className} text-[22px] leading-none tracking-[-0.01em]`}>곰파트너</span>
+              <span className="mt-1 rounded-[3px] bg-[#ffd23f] px-1 text-[12px] font-semibold leading-[1.4] text-[#1b2a4a]">채용 포털 샘플</span>
+            </span>
           </a>
           <nav className="ml-8 hidden lg:block" aria-label="주메뉴">
             <MenuList current={nav.page} onGo={goMenu} />
@@ -723,7 +728,7 @@ export function JobPortalDemo() {
 
       <footer className="border-t border-[#dde2ea] bg-[#f4f6fa]">
         <div className="mx-auto max-w-[1200px] px-4 py-8 pb-28 text-[15px] leading-[1.7] text-[#3c4660] md:px-6">
-          <p className="font-bold text-[#1b2a4a]">ㄴㄹ일자리</p>
+          <p className="font-bold text-[#1b2a4a]">곰파트너</p>
           <p>구인·구직 문의 고객센터 1588-0000 (평일 09:00~18:00)</p>
         </div>
       </footer>
@@ -990,7 +995,7 @@ function JobDetail({
             <li>
               접수기간: {posted} ~ {deadline}
             </li>
-            <li>접수방법: ㄴㄹ일자리 온라인 입사지원</li>
+            <li>접수방법: 온라인 입사지원</li>
             <li>문의: 인사 담당자 02-000-0000</li>
           </ul>
         </Section>
@@ -1202,10 +1207,10 @@ const FAIRS = [
 ];
 
 const PROGRAMS = [
-  { name: "1:1 취업상담", target: "구직자 누구나", when: "평일 10:00 ~ 17:00", where: "ㄴㄹ일자리센터 상담실" },
+  { name: "1:1 취업상담", target: "구직자 누구나", when: "평일 10:00 ~ 17:00", where: "일자리센터 상담실" },
   { name: "직업심리검사", target: "구직자 누구나", when: "상시", where: "온라인" },
-  { name: "이력서·자기소개서 클리닉", target: "구직자 누구나", when: "매주 화요일 14:00", where: "ㄴㄹ일자리센터 교육실" },
-  { name: "모의면접", target: "구직자 누구나", when: "매주 목요일 14:00", where: "ㄴㄹ일자리센터 교육실" },
+  { name: "이력서·자기소개서 클리닉", target: "구직자 누구나", when: "매주 화요일 14:00", where: "일자리센터 교육실" },
+  { name: "모의면접", target: "구직자 누구나", when: "매주 목요일 14:00", where: "일자리센터 교육실" },
   { name: "취업특강", target: "청년 구직자", when: "매월 둘째 주 수요일 19:00", where: "ㅎㄴ구청 대강당" },
   { name: "면접정장 무료 대여", target: "만 18 ~ 39세 청년 구직자", when: "평일 10:00 ~ 19:00", where: "협력 대여점 12곳" },
 ];
@@ -1485,7 +1490,7 @@ function Programs() {
           );
         })}
       </ul>
-      <p className="mt-4 text-[15px] text-[#3c4660]">문의 ㄴㄹ일자리센터 02-000-1500 (평일 09:00 ~ 18:00)</p>
+      <p className="mt-4 text-[15px] text-[#3c4660]">문의 일자리센터 02-000-1500 (평일 09:00 ~ 18:00)</p>
     </div>
   );
 }

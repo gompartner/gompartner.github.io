@@ -7,7 +7,7 @@ import { Check, ChevronRight, Heart, Layers, LayoutGrid, Map as MapIcon, Menu, P
 import { useReducedMotionSafe } from "@/hooks/useReducedMotionSafe";
 import { daysAgo, useDemoToday } from "@/hooks/useDemoToday";
 
-/* 부동산 홈페이지 데모: 가상의 곰파트너 공인중개사사무소.
+/* 부동산 홈페이지 데모: 가상의 공인중개사사무소(상호는 곰파트너).
    상호, 대표 공인중개사, 등록번호, 주소, 전화번호, 사업자 정보, 매물과 거래 내역은 모두 가상이다.
 
    구조: 매물 솔루션형(검색 우선). 첫 화면에 사진과 소개 문단 없이 검색 필터 바와 매물 종류별 개수 줄을 두고,
@@ -30,7 +30,7 @@ import { daysAgo, useDemoToday } from "@/hooks/useDemoToday";
    AI 생성(Z-Image-Turbo, Apache 2.0) interior */
 
 const IMG = "/images/demo-realty";
-const OFFICE = "곰파트너 공인중개사사무소";
+const OFFICE = "곰파트너";
 const TEL = "02-000-0000";
 const ADDRESS = "ㅎㄷ시 ㅁㄹ구 ㅅㄴ로 120, ㅎㅅ아파트 상가 1층 105호";
 const REG_NO = "00000-0000-00000";
@@ -428,7 +428,7 @@ function Logo() {
       <img src="/images/logo.svg" alt="" aria-hidden width={28} height={28} className="h-7 w-7 shrink-0" />
       <span className="flex flex-col whitespace-nowrap leading-[1.15] md:flex-row md:items-baseline md:gap-1 md:leading-normal">
         <span className="text-[17px] font-bold tracking-[-0.02em] md:text-[19px]">곰파트너</span>
-        <span className="text-[11px] font-semibold opacity-75 md:text-[12px]">공인중개사사무소</span>
+        <span className="text-[11px] font-semibold opacity-75 md:text-[12px]">부동산 샘플</span>
       </span>
     </span>
   );
@@ -2112,7 +2112,7 @@ function About() {
           </h2>
           <dl className="mt-2 text-[15px]">
             {[
-              ["상호", "ㅅㄱ 공인중개사사무소"],
+              ["상호", OFFICE],
               ["대표 공인중개사", AGENT],
               ["중개사무소 등록번호", REG_NO],
               ["손해배상책임 보장", "ㅈㅅ공제 2억 원"],
@@ -2163,7 +2163,7 @@ function Footer() {
         </span>
         <dl className="mt-6 grid gap-x-8 gap-y-1.5 text-[14px] sm:grid-cols-2 md:grid-cols-3">
           {[
-            ["상호", "ㅅㄱ 공인중개사사무소"],
+            ["상호", OFFICE],
             ["대표 공인중개사", AGENT],
             ["중개사무소 등록번호", REG_NO],
             ["사업자등록번호", "000-00-00000"],

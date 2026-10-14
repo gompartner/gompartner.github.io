@@ -20,7 +20,7 @@ import { daysAgo, fmtDot, fmtKo, useDemoToday } from "@/hooks/useDemoToday";
    lobby Ishan Sharma(0EWVvxSyDE0), doctor-a·doctor-b AI 생성(Z-Image-Turbo, Apache 2.0) */
 
 const IMG = "/images/demo-clinic-homepage";
-const CLINIC = "곰파트너피부과의원";
+const CLINIC = "곰파트너";
 const TEL_MED = "02-000-0000";
 const TEL_COS = "02-000-0001";
 const ADDRESS = "ㅎㄷ시 ㅁㄹ로 123 ㅈㅇ빌딩 4층";
@@ -346,7 +346,7 @@ export function ClinicHomepageDemo() {
             </p>
             <dl className="mt-4 flex flex-wrap gap-x-6 gap-y-1 text-[15px]">
               {[
-                ["상호", "ㅅㅎ피부과의원"],
+                ["상호", "곰파트너"],
                 ["대표자", "김ㅈ우"],
                 ["주소", ADDRESS],
                 ["사업자등록번호", "000-00-00000"],
@@ -1145,7 +1145,7 @@ function BrandLogo() {
       <img src="/images/logo.svg" alt="" aria-hidden width={28} height={28} className="h-7 w-7 shrink-0" />
       <span className="flex items-baseline gap-1 whitespace-nowrap">
         <span className="text-[20px] font-semibold tracking-[-0.03em]">곰파트너</span>
-        <span className="text-[12px] font-medium opacity-75">피부과의원</span>
+        <span className="text-[12px] font-medium opacity-75">피부과 샘플</span>
       </span>
     </span>
   );

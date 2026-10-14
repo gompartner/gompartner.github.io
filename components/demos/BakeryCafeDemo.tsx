@@ -26,7 +26,7 @@ import { daysAgo, fmtDot, fmtKo, useDemoToday } from "@/hooks/useDemoToday";
    AI 생성(Z-Image-Turbo, Apache 2.0) hero, display, menu/*.jpg(빵마다 1장) */
 
 const IMG = "/images/demo-bakery";
-const BAKERY = "곰파트너 베이커리";
+const BAKERY = "곰파트너";
 const TEL = "02-000-0000";
 const ADDRESS = "ㅁㄹ시 ㅎㄷ로 5길 21 1층";
 
@@ -363,7 +363,7 @@ function Logo() {
       <img src="/images/logo.svg" alt="" aria-hidden width={28} height={28} className="h-7 w-7 shrink-0" />
       <span className="inline-flex items-baseline gap-1.5 whitespace-nowrap">
         <span className="text-[19px] font-bold tracking-[-0.02em]">곰파트너</span>
-        <span className="text-[12px] font-semibold opacity-80">베이커리</span>
+        <span className="text-[12px] font-semibold opacity-80">베이커리 샘플</span>
       </span>
     </span>
   );
@@ -1197,7 +1197,7 @@ const NOTICES: { no: number; title: string; ago: number; body: string[] | ((post
     body: (d) => [`${fmtKo(daysAgo(d, -14))} ~ ${fmtKo(daysAgo(d, -16))} 휴무`, `${fmtKo(daysAgo(d, -17))}부터 정상 영업`],
   },
   { no: 3, title: "단체주문 예약 안내", ago: 40, body: ["20개 이상 단체주문과 홀 케이크는 이틀 전까지 예약합니다.", "개별 포장 가능"] },
-  { no: 2, title: "곰파트너 베이커리는 천연 발효종을 사용합니다.", ago: 67, body: ["깜파뉴, 무화과 호두 깜파뉴는 천연 발효종으로 48시간 저온 숙성합니다."] },
+  { no: 2, title: "곰파트너는 천연 발효종을 사용합니다.", ago: 67, body: ["깜파뉴, 무화과 호두 깜파뉴는 천연 발효종으로 48시간 저온 숙성합니다."] },
   { no: 1, title: "홈페이지 오픈", ago: 84, body: ["빵 나오는 시간과 픽업 예약을 홈페이지에서 확인할 수 있습니다."] },
 ];
 
@@ -1820,7 +1820,7 @@ function Footer() {
         <Logo />
         <dl className="mt-6 grid gap-x-8 gap-y-1.5 text-[14px] sm:grid-cols-2 md:grid-cols-3" style={{ color: "#e2c8ad" }}>
           {[
-            ["상호", "ㅁㄷ 베이커리"],
+            ["상호", "곰파트너"],
             ["대표자", "이ㅅ연"],
             ["사업자등록번호", "000-00-00000"],
             ["주소", ADDRESS],

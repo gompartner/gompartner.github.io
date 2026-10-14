@@ -23,7 +23,7 @@ import {
 import { useReducedMotionSafe } from "@/hooks/useReducedMotionSafe";
 import { daysAgo, fmtDot, fmtKo, useDemoToday } from "@/hooks/useDemoToday";
 
-/* 꽃박람회 축제 안내 데모: 가상의 "2027 ㅇㅅ 꽃박람회".
+/* 꽃박람회 축제 안내 데모: 가상의 "2027 꽃박람회".
    개최지, 주최 기관, 입장료, 프로그램, 공지, 연락처는 모두 가상이다.
 
    구성은 실제 지역 꽃박람회 누리집의 안내형을 따른다.
@@ -40,7 +40,7 @@ import { daysAgo, fmtDot, fmtKo, useDemoToday } from "@/hooks/useDemoToday";
    AI 생성(Z-Image-Turbo, Apache 2.0) hero, tulip, rose, night */
 
 const IMG = "/images/demo-flower";
-const EXPO = "2027 ㅇㅅ 꽃박람회";
+const EXPO = "2027 꽃박람회";
 const TEL = "000-000-0000";
 const PLACE = "ㄴㄹ시 ㅇㅅ호수공원";
 const PERIOD = "2027. 4. 23.(금) ~ 5. 9.(일)";
@@ -358,7 +358,7 @@ function programsFor(i: number): Program[] {
 // ago: 오늘 기준 며칠 전 등록. 신청 마감처럼 날짜가 필요한 본문은 오늘 기준으로 계산한다.
 const NOTICES: { title: string; ago: number; isNew: boolean; body: string | ((t: Date) => string) }[] = [
   {
-    title: "2027 ㅇㅅ 꽃박람회 사전예매권 판매 안내",
+    title: "2027 꽃박람회 사전예매권 판매 안내",
     ago: 2,
     isNew: true,
     body: "사전예매권은 2026년 12월 1일부터 2027년 4월 22일까지 온라인으로 판매하며, 일반권 기준 2,000원 할인됩니다. 수량이 정해져 있어 조기 마감될 수 있습니다.",
@@ -382,10 +382,10 @@ const NOTICES: { title: string; ago: number; isNew: boolean; body: string | ((t:
     body: "행사 기간 중 ㄴㄹ역 2번 출구에서 박람회 정문까지 무료 셔틀버스를 10분 간격으로 운행합니다. 야간 개장일 막차는 21:50입니다.",
   },
   {
-    title: "2027 ㅇㅅ 꽃박람회 개최 일정 확정",
+    title: "2027 꽃박람회 개최 일정 확정",
     ago: 48,
     isNew: false,
-    body: `2027 ㅇㅅ 꽃박람회는 ${PERIOD} 17일간 ${PLACE} 일대에서 열립니다.`,
+    body: `2027 꽃박람회는 ${PERIOD} 17일간 ${PLACE} 일대에서 열립니다.`,
   },
 ];
 
@@ -486,7 +486,7 @@ function Header({ page, go }: { page: Page; go: Go }) {
     <header className="sticky top-0 z-40 border-b" style={{ background: C.cream, borderColor: C.line }}>
       <div className="hidden text-[13px] md:block" style={{ background: C.green, color: "#cfe3d5" }}>
         <Container className="flex h-8 items-center justify-between">
-          <span>주최 ㄴㄹ시 · 주관 ㅇㅅ꽃박람회 조직위원회</span>
+          <span>주최 ㄴㄹ시 · 주관 꽃박람회 조직위원회</span>
           <span className="flex items-center gap-1">
             <Phone size={12} aria-hidden />
             관람 문의 {TEL}
@@ -494,10 +494,15 @@ function Header({ page, go }: { page: Page; go: Go }) {
         </Container>
       </div>
       <Container className="flex h-16 items-center justify-between gap-3">
-        <button type="button" onClick={() => pick("home")} className="flex min-w-0 items-center gap-2" aria-label={`${EXPO} 메인으로`}>
+        <button type="button" onClick={() => pick("home")} className="flex min-w-0 items-center gap-2" aria-label="곰파트너 꽃박람회 샘플 메인으로">
           <Flower size={30} />
-          <span className="truncate text-[18px] font-bold leading-none tracking-[-0.03em] md:text-[20px]" style={{ color: C.green }}>
-            {EXPO}
+          <span className="flex items-baseline gap-1.5 whitespace-nowrap">
+            <span className="text-[18px] font-bold leading-none tracking-[-0.03em] md:text-[20px]" style={{ color: C.green }}>
+              곰파트너
+            </span>
+            <span className="text-[12px] font-semibold leading-none md:text-[13px]" style={{ color: C.ink, opacity: 0.65 }}>
+              꽃박람회 샘플
+            </span>
           </span>
         </button>
         <nav aria-label="주 메뉴" className="hidden lg:block">
@@ -603,7 +608,7 @@ function PosterBanner() {
         <div className="absolute inset-x-0 bottom-0 flex flex-col items-center px-6 pb-10 text-center text-white md:pb-14">
           <h1 id="poster-title" className="font-bold leading-[1.05] tracking-[-0.04em]" style={{ textShadow: "0 2px 18px rgba(0,0,0,0.25)" }}>
             <span className="block text-[30px] md:text-[44px]">2027</span>
-            <span className="mt-1 block text-[40px] sm:text-[52px] md:text-[80px]">ㅇㅅ 꽃박람회</span>
+            <span className="mt-1 block text-[40px] sm:text-[52px] md:text-[80px]">꽃박람회</span>
           </h1>
           <p className="mt-4 text-[17px] font-semibold md:text-[20px]">{PERIOD}</p>
           <p className="text-[16px] md:text-[18px]">{PLACE} 일대</p>
@@ -1053,7 +1058,7 @@ function OverviewPage() {
           ["주제", "호숫가 정원과 봄꽃"],
           ["규모", "튤립 52종 120만 송이, 덩굴장미 아치 600m, 수국 화분 3천 개"],
           ["주최", "ㄴㄹ시"],
-          ["주관", "ㅇㅅ꽃박람회 조직위원회"],
+          ["주관", "꽃박람회 조직위원회"],
           ["주요행사", "개막식, 야간 정원, 미디어 분수 공연, 정원 해설 투어, 체험 프로그램"],
         ]}
       />
@@ -1652,14 +1657,14 @@ function Footer() {
       <div className="border-b" style={{ borderColor: "rgba(255,255,255,0.15)" }}>
         <Container className="flex flex-wrap items-center justify-center gap-x-8 gap-y-2 py-5 text-[15px] font-semibold">
           <span>ㄴㄹ시</span>
-          <span>ㅇㅅ꽃박람회 조직위원회</span>
+          <span>꽃박람회 조직위원회</span>
           <span>ㄴㄹ시 관광공사</span>
           <span>ㄴㄹ시 농업기술센터</span>
         </Container>
       </div>
       <Container className="pb-28 pt-8 text-[14px] leading-[1.8]">
-        <p className="text-[18px] font-bold tracking-[-0.02em] text-white">{EXPO}</p>
-        <p className="mt-2">주최 ㄴㄹ시 | 주관 ㅇㅅ꽃박람회 조직위원회</p>
+        <p className="text-[18px] font-bold tracking-[-0.02em] text-white">곰파트너</p>
+        <p className="mt-2">주최 ㄴㄹ시 | 주관 꽃박람회 조직위원회</p>
         <p>ㄴㄹ시 ㄴㄹ로 200 ㅇㅅ호수공원 관리사무소 2층</p>
         <p>관람 문의 {TEL} (09:00 ~ 18:00)</p>
       </Container>

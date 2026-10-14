@@ -156,7 +156,7 @@ function Logo({ light = false }: { light?: boolean }) {
       <img src="/images/logo.svg" alt="" aria-hidden width={30} height={30} className="h-[30px] w-[30px] shrink-0" />
       <span className="inline-flex items-baseline gap-1.5 whitespace-nowrap">
         <span className="text-[22px] font-extrabold tracking-[-0.03em]">곰파트너</span>
-        <span className="text-[14px] font-semibold opacity-80">렌탈</span>
+        <span className="text-[14px] font-semibold opacity-80">렌탈 샘플</span>
       </span>
     </span>
   );
@@ -559,7 +559,7 @@ function ApplyForm({
                 다시 신청해 보기
               </button>
               <LeadReceivedPanel
-                business="곰파트너 렌탈"
+                business="곰파트너"
                 name={done.rawName}
                 phone={done.phone}
                 summary={`${PRODUCTS.filter((p) => picked.includes(p.id)).map((p) => p.name).join(", ")} · ${term}년`}
@@ -693,7 +693,7 @@ function Footer() {
     <footer className="px-5 pb-36 pt-10 md:px-8 md:pb-12" style={{ background: C.ink, color: "#b8c6c6" }}>
       <div className="mx-auto max-w-[1120px] text-[14px] leading-[1.8]">
         <Logo light />
-        <p className="mt-3">곰파트너 렌탈 · 대표 박ㅅ연 · 서울 ㅅㄷ구 ㅇㅇ로 00</p>
+        <p className="mt-3">곰파트너 · 대표 박ㅅ연 · 서울 ㅅㄷ구 ㅇㅇ로 00</p>
         <p>사업자등록번호 000-00-00000 · 통신판매업 신고 0000-서울ㅅㄷ-0000</p>
       </div>
     </footer>

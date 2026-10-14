@@ -97,7 +97,7 @@ function Logo() {
       <img src="/images/logo.svg" alt="" aria-hidden width={28} height={28} className="h-7 w-7 shrink-0" />
       <span className="inline-flex items-baseline gap-1.5 whitespace-nowrap">
         <span className="text-[19px] font-bold tracking-[-0.01em]">곰파트너</span>
-        <span className="text-[12px] font-semibold opacity-80">코딩교실</span>
+        <span className="text-[12px] font-semibold opacity-80">코딩교실 샘플</span>
       </span>
     </span>
   );
@@ -158,7 +158,7 @@ export function LandingCodingCampDemo() {
       />
 
       <footer className="mx-auto mt-16 max-w-[1080px] border-t-2 px-5 pt-6 text-[14px] leading-[1.8] md:px-8" style={{ borderColor: C.ink, color: C.muted }}>
-        <p className="font-bold" style={{ color: C.ink }}>곰파트너 코딩교실</p>
+        <p className="font-bold" style={{ color: C.ink }}>곰파트너</p>
         <p>ㅁㄹ시 ㅎㄷ로 88 ㅁㄹ프라자 4층 · 02-000-0000</p>
         <p>학원 등록번호 제0000-00호 · 교습과목 정보(소프트웨어)</p>
       </footer>
@@ -695,7 +695,7 @@ function ApplyForm({
                 다른 아이도 신청하기
               </button>
               <LeadReceivedPanel
-                business="곰파트너 코딩교실"
+                business="곰파트너"
                 name={done.parent}
                 phone={done.phone}
                 summary={`${done.grade} · ${done.cls.name}`}

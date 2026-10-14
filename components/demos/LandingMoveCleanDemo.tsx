@@ -21,7 +21,7 @@ import { daysAgo, fmtKo, useDemoToday } from "@/hooks/useDemoToday";
    사진(public/images/demo-landing-move-clean): before·after(같은 거실 청소 전후), kitchen. AI 생성. */
 
 const IMG = "/images/demo-landing-move-clean";
-const SHOP = "곰파트너 클린";
+const SHOP = "곰파트너";
 const TEL = "1600-0000";
 const OWNER = "정ㅁ석";
 const BIZ_NO = "000-00-00000";
@@ -143,7 +143,7 @@ export function LandingMoveCleanDemo() {
             <img src="/images/logo.svg" alt="" aria-hidden width={30} height={30} className="h-[30px] w-[30px] shrink-0" />
             <span className="inline-flex items-baseline gap-1.5 whitespace-nowrap">
               <span className="text-[22px] font-extrabold tracking-[-0.03em]">곰파트너</span>
-              <span className="text-[14px] font-semibold opacity-80">입주청소</span>
+              <span className="text-[14px] font-semibold opacity-80">입주청소 샘플</span>
             </span>
           </span>
           <a href={`tel:${TEL}`} className="inline-flex items-center gap-1.5 rounded-[6px] px-3 py-2 text-[15px] font-bold" style={{ background: C.lemon, color: C.ink }}>
@@ -723,7 +723,7 @@ function ApplyForm(p: { today: Date; type: HomeType; py: number; opts: OptId[]; 
           <RotateCcw size={16} aria-hidden /> 다시 신청해 보기
         </button>
         <LeadReceivedPanel
-          business="곰파트너 클린"
+          business={SHOP}
           name={name}
           phone={phone}
           summary={`${typeLabel} ${p.py}평${optLabels.length ? ` · ${optLabels.join(", ")}` : ""}${p.lived ? " · 짐 있음" : ""}`}

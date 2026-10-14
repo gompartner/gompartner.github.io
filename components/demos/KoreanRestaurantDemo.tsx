@@ -5,7 +5,7 @@ import Image from "next/image";
 import { Baby, Car, CreditCard, MapPin, Menu, Phone, ShoppingBag, Users, Wifi, X } from "lucide-react";
 import { useReducedMotionSafe } from "@/hooks/useReducedMotionSafe";
 
-/* 동네 한식당 홈페이지 데모: 가상의 곰파트너 한상.
+/* 동네 한식당 홈페이지 데모: 곰파트너 한식당 샘플.
    상호, 대표자, 주소, 전화번호, 사업자 정보, 메뉴와 가격은 모두 가상이다.
 
    29.9만 원 기본 패키지(소개 홈페이지) 범위로만 만든 샘플이다.
@@ -28,7 +28,7 @@ import { useReducedMotionSafe } from "@/hooks/useReducedMotionSafe";
    AI 생성(Z-Image-Turbo, Apache 2.0) hero, gukbap, baekban, suyuk, interior */
 
 const IMG = "/images/demo-hansik";
-const STORE = "곰파트너 한상";
+const STORE = "곰파트너";
 const TEL = "02-000-0000";
 const ADDRESS = "서울 ㅁㅍ구 ㅇㄴ동 ㅇㄴ로 3길 14 1층";
 
@@ -260,7 +260,7 @@ function Header({
           <LogoMark />
           <span className="inline-flex items-baseline gap-1.5 whitespace-nowrap">
             <span className="text-[18px] font-bold tracking-[-0.02em]">곰파트너</span>
-            <span className="text-[11px] font-semibold opacity-80">한상</span>
+            <span className="text-[11px] font-semibold opacity-80">한식당 샘플</span>
           </span>
         </button>
 

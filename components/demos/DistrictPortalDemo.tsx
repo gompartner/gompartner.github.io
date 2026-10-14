@@ -26,7 +26,7 @@ import {
 } from "lucide-react";
 import { useReducedMotionSafe } from "@/hooks/useReducedMotionSafe";
 
-// ㅎㄷ구청 대표 홈페이지 데모. 가상 자치구, 가상 데이터.
+// 구청 샘플 대표 홈페이지 데모. 가상 자치구, 가상 데이터.
 // 대표색은 저녁 하천빛 남색(#13233f)과 노을 주황(#e8562a). 주황은 그래픽·배경에만 쓰고
 // 흰 바탕 글자에는 대비 4.5:1 이상인 #b53d14를 쓴다.
 
@@ -863,13 +863,15 @@ export function DistrictPortalDemo() {
                   e.preventDefault();
                   goHome();
                 }}
-                className="flex items-center gap-2.5"
+                className="flex items-center gap-2.5 whitespace-nowrap"
               >
+                {/* eslint-disable-next-line @next/next/no-img-element -- 메인 사이트와 같은 곰 로고 */}
+                <img src="/images/logo.svg" alt="" aria-hidden width={28} height={28} className="h-7 w-7 shrink-0" />
                 <span className="text-[24px] font-bold tracking-[-0.05em]" style={{ color: NAVY }}>
-                  ㅎㄷ구
+                  곰파트너
                 </span>
                 <span className="h-5 w-px bg-[#b9c0cc]" aria-hidden />
-                <span className="text-[17px] font-bold text-[#3a4453]">구청 누리집</span>
+                <span className="text-[14px] font-semibold text-[#5a6473]">구청 샘플</span>
               </a>
             </Brand>
 
@@ -993,7 +995,7 @@ export function DistrictPortalDemo() {
                       </span>
                     ))}
                   </span>
-                  <span className="text-[18px] font-bold tracking-[-0.04em]">ㅎㄷ구</span>
+                  <span className="text-[18px] font-bold tracking-[-0.04em]">곰파트너</span>
                 </span>
               </a>
             </section>
@@ -1312,13 +1314,13 @@ export function DistrictPortalDemo() {
             </ul>
             <div className="mt-6 flex flex-wrap items-end justify-between gap-6">
               <address className="text-[15px] not-italic leading-[1.7]">
-                (00000) ㄱㅇ시 ㅎㄷ구 ㅎㄷ로 100 ㅎㄷ구청
+                (00000) ㄱㅇ시 ㅎㄷ구 ㅎㄷ로 100
                 <br />
                 대표전화 02-000-0000 (평일 09:00 ~ 18:00)
                 <br />
                 당직실(야간·공휴일) 02-000-0119
                 <br />
-                ㅎㄷ구청 홈페이지의 모든 콘텐츠는 저작권법의 보호를 받습니다.
+                곰파트너 홈페이지의 모든 콘텐츠는 저작권법의 보호를 받습니다.
               </address>
               <div className="flex h-14 w-32 items-center justify-center rounded-[6px] border border-[#3a4c6d] text-center text-[13px] leading-[1.3]">
                 웹 접근성
@@ -1730,7 +1732,7 @@ function MayorView() {
         </h2>
         <div className="mt-3 space-y-3 text-[17px] leading-[1.8]">
           <p>존경하는 ㅎㄷ구민 여러분, 반갑습니다.</p>
-          <p>ㅎㄷ구 누리집을 찾아주신 여러분을 진심으로 환영합니다.</p>
+          <p>누리집을 찾아주신 여러분을 진심으로 환영합니다.</p>
           <p>구민 여러분의 소중한 의견에 귀 기울이겠습니다.</p>
           <p>감사합니다.</p>
         </div>

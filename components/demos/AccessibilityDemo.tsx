@@ -17,7 +17,7 @@ import {
 import { daysAgo, fmtDot, useDemoToday } from "@/hooks/useDemoToday";
 
 // 웹접근성 개선 전후 비교 데모.
-// 같은 샘플 페이지(샘플시 문화재단)를 개선 전/개선 후로 바꿔 보여주고,
+// 같은 샘플 페이지(문화재단 샘플)를 개선 전/개선 후로 바꿔 보여주고,
 // 한국형 웹 콘텐츠 접근성 지침(KWCAG) 2.2 검사 항목별로 문제와 조치 내용을 짚어 준다.
 // 개선 전 화면은 일부러 대비·대체 텍스트·레이블 등을 어긴 상태다.
 
@@ -113,7 +113,7 @@ export function AccessibilityDemo() {
             </span>
             <div>
               <p className="text-[17px] font-bold leading-tight">웹접근성 점검</p>
-              <p className="text-[15px] leading-tight text-[#474c68]">ㄴㅇ시 문화재단 메인 페이지</p>
+              <p className="text-[15px] leading-tight text-[#474c68]">문화재단 샘플 메인 페이지</p>
             </div>
           </div>
 
@@ -318,7 +318,7 @@ function SamplePage({
         )}
         <div className="flex flex-wrap items-center gap-x-6 gap-y-2 border-b border-[#e3dfe6] px-4 py-3 md:px-6">
           {/* eslint-disable-next-line @next/next/no-img-element */}
-          <img src="/images/demo-a11y/logo.svg" alt={good ? "ㄴㅇ시 문화재단" : undefined} width={200} height={44} className="h-9 w-auto" />
+          <img src="/images/demo-a11y/logo.svg" alt={good ? "곰파트너 문화재단 샘플" : undefined} width={212} height={44} className="h-9 w-auto" />
           <nav aria-label={good ? "주 메뉴" : undefined} className="flex flex-wrap gap-x-4 gap-y-1 text-[15px] font-bold text-[#2b1a33]">
             {["재단소개", "공연·전시", "교육", "지원사업", "알림마당"].map((m) => (
               <a key={m} href="#sample-main" onClick={(e) => e.preventDefault()} className="rounded px-1 py-0.5 hover:text-[#6b2d8c]">
@@ -330,7 +330,7 @@ function SamplePage({
       </Region>
 
       <main id="sample-main" tabIndex={-1} className="focus:outline-none">
-        <h1 className="sr-only">ㄴㅇ시 문화재단 메인</h1>
+        <h1 className="sr-only">곰파트너 문화재단 샘플 메인</h1>
         <Region {...region("banner")}>
           <Banner good={good} reduced={reduced} />
         </Region>
@@ -423,9 +423,9 @@ function SamplePage({
       </main>
 
       <footer className="border-t border-[#e3dfe6] bg-[#2b1a33] px-4 pt-5 pb-24 text-[15px] text-[#e7dcec] md:px-6">
-        <p className="font-bold text-white">ㄴㅇ시 문화재단</p>
+        <p className="font-bold text-white">곰파트너</p>
         <p className="mt-1">ㄴㅇ시 ㄴㅇ로 45, 문화재단 빌딩 3층 | 대표전화 000-000-0000</p>
-        <p className="mt-1">© ㄴㅇ시 문화재단</p>
+        <p className="mt-1">© 곰파트너</p>
       </footer>
     </div>
   );
