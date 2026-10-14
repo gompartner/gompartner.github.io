@@ -28,7 +28,7 @@ const siteTitle = homeTitle;
 const siteDescription = homeDescription;
 
 // 브라우저 주소창·폰 바로가기 색
-export const viewport: Viewport = { themeColor: "#256ef4" };
+export const viewport: Viewport = { themeColor: "#f3ece0" };
 
 export const metadata: Metadata = {
   metadataBase: new URL(siteUrl),
