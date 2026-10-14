@@ -1009,12 +1009,14 @@ function CasesPage({
               <ChevronLeft size={18} aria-hidden />
             </button>
             {Array.from({ length: pages }, (_, i) => i + 1).map((n) => (
+            // 휴대폰은 지금 쪽 앞뒤 다섯 개만
+
               <button
                 key={n}
                 type="button"
                 onClick={() => setPg(n)}
                 aria-current={cur === n ? "page" : undefined}
-                className="inline-flex h-10 min-w-10 items-center justify-center rounded-[4px] px-2 text-[15px] font-semibold tabular-nums"
+                className={`inline-flex h-10 min-w-10 items-center justify-center rounded-[4px] px-2 text-[15px] font-semibold tabular-nums ${n >= Math.max(1, Math.min(cur - 2, pages - 4)) && n < Math.max(1, Math.min(cur - 2, pages - 4)) + 5 ? "" : "max-md:hidden"}`}
                 style={cur === n ? { background: C.ink, color: C.white } : undefined}
               >
                 {n}

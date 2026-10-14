@@ -2703,17 +2703,19 @@ function StatusPage({ rows, setState, notify, myProgress }: { rows: Row[]; setSt
             </tbody>
           </table>
         </div>
-        <nav aria-label="페이지" className="flex flex-wrap items-center justify-center gap-1 border-t p-3" style={{ borderColor: C.line }}>
+        <nav aria-label="페이지" className="flex flex-nowrap items-center justify-center gap-1 border-t p-3" style={{ borderColor: C.line }}>
           <button type="button" aria-label="이전 페이지" disabled={cur === 1} onClick={() => setPageNo(cur - 1)} className="grid size-9 place-items-center rounded-[4px] disabled:opacity-30">
             <ChevronLeft size={16} aria-hidden />
           </button>
           {Array.from({ length: pages }, (_, i) => i + 1).map((n) => (
+            // 휴대폰은 지금 쪽 앞뒤 다섯 개만
+
             <button
               key={n}
               type="button"
               aria-current={n === cur ? "page" : undefined}
               onClick={() => setPageNo(n)}
-              className="grid size-9 place-items-center rounded-[4px] text-[14px] tabular-nums"
+              className={`grid size-9 place-items-center rounded-[4px] text-[14px] tabular-nums ${n >= Math.max(1, Math.min(cur - 2, pages - 4)) && n < Math.max(1, Math.min(cur - 2, pages - 4)) + 5 ? "" : "max-md:hidden"}`}
               style={n === cur ? { background: C.brand, color: "#fff", fontWeight: 700 } : { color: C.text }}
             >
               {n}
