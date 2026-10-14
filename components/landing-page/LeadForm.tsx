@@ -12,12 +12,13 @@ const PHONE_RE = /^01[016789]-?\d{3,4}-?\d{4}$/;
 
 type Status = { kind: "idle" } | { kind: "sending" } | { kind: "error"; message: string } | { kind: "done"; id: string };
 
+// 웹툰 톤: 굵은 먹선 칸, 초점이 들어오면 파란 단단한 그림자. 격자 안에서 넘치지 않게 min-w-0.
 const field =
-  "h-12 w-full rounded-[6px] border border-border bg-background px-4 text-[17px] outline-none focus:border-accent focus:ring-2 focus:ring-accent/30";
+  "h-12 w-full min-w-0 rounded-[6px] border-2 border-[#1d1d1f] bg-white px-4 text-[17px] outline-none transition-shadow focus:shadow-[3px_3px_0_#256ef4] motion-reduce:transition-none";
 const label = "block text-[15px] font-bold";
 const chip = (on: boolean) =>
-  `inline-flex h-11 items-center gap-1.5 rounded-[6px] border px-4 text-[16px] font-bold transition-colors ${
-    on ? "border-accent bg-accent text-accent-foreground" : "border-border bg-background hover:border-accent"
+  `inline-flex h-11 items-center gap-1.5 rounded-full border-[2.5px] border-[#1d1d1f] px-4 text-[16px] font-bold transition-[background-color,box-shadow] duration-150 motion-reduce:transition-none ${
+    on ? "bg-accent text-white shadow-[2px_2px_0_#1d1d1f]" : "bg-white hover:bg-[#fff3b0]"
   }`;
 
 /** 이 페이지 자체의 상담 신청 폼. Apps Script 웹 앱으로 보내고, 응답의 접수 번호를 보여 준다. */
@@ -100,29 +101,29 @@ export const LeadForm = forwardRef<HTMLElement, { pkg: PackageName | ""; onPkg: 
   };
 
   return (
-    <section ref={ref} id="apply" aria-labelledby="apply-title" className="scroll-mt-6 bg-surface px-4 py-16 md:px-6 md:py-24">
-      <div className="mx-auto max-w-[720px]">
-        <h2 id="apply-title" className="text-[28px] font-bold leading-[1.35] tracking-[-0.02em] md:text-[36px]">
+    <section ref={ref} id="apply" aria-labelledby="apply-title" className="scroll-mt-6 px-4 pt-5 md:px-8">
+      <div>
+        <h2 id="apply-title" className="font-[family-name:var(--font-sfx)] text-[30px] font-normal leading-[1.25] md:text-[38px]">
           상담 신청
         </h2>
 
         {status.kind === "done" ? (
-          <div className="mt-8 rounded-[10px] border border-border bg-background p-6 md:p-8" role="status">
-            <p className="text-[15px] font-bold text-accent">접수 번호 {status.id}</p>
+          <div className="mt-6 border-[3px] border-[#1d1d1f] bg-[#fff3b0] p-6 shadow-[8px_8px_0_#1d1d1f] md:p-8" role="status">
+            <p className="text-[15px] font-bold tabular-nums text-accent">접수 번호 {status.id}</p>
             <p className="mt-2 text-[24px] font-bold leading-[1.4]">신청이 접수되었습니다.</p>
             <p className="mt-2 text-[17px] leading-[1.6] text-foreground-secondary">영업일 기준 1일 이내 연락드립니다.</p>
           </div>
         ) : (
-          <form onSubmit={submit} noValidate className="mt-8 space-y-6 rounded-[10px] border border-border bg-background p-5 md:p-8">
+          <form onSubmit={submit} noValidate className="mt-6 space-y-6 border-[3px] border-[#1d1d1f] bg-white p-4 shadow-[8px_8px_0_#1d1d1f] min-[360px]:p-5 md:p-8">
             <div className="grid gap-6 md:grid-cols-2">
-              <div>
+              <div className="min-w-0">
                 <label htmlFor="lp-name" className={label}>
                   이름
                 </label>
                 <input id="lp-name" value={name} onChange={(e) => setName(e.target.value)} autoComplete="name" className={`${field} mt-2`} aria-invalid={!!errors.name} aria-describedby={errors.name ? "lp-name-err" : undefined} />
                 {errors.name && <p id="lp-name-err" className="mt-1.5 text-[15px] text-[#d63d4a]">{errors.name}</p>}
               </div>
-              <div>
+              <div className="min-w-0">
                 <label htmlFor="lp-phone" className={label}>
                   휴대폰
                 </label>
@@ -186,7 +187,7 @@ export const LeadForm = forwardRef<HTMLElement, { pkg: PackageName | ""; onPkg: 
                   개인정보 수집·이용에 동의합니다.
                 </label>
               </div>
-              <details className="group mt-2 rounded-[6px] bg-surface px-4 py-3 text-[15px] leading-[1.6] text-foreground-secondary">
+              <details className="group mt-2 border-2 border-[#1d1d1f] bg-[#fffdf8] px-4 py-3 text-[15px] leading-[1.6] text-foreground-secondary">
                 <summary className="flex cursor-pointer list-none items-center gap-1 font-bold [&::-webkit-details-marker]:hidden">
                   자세히 보기
                   <ChevronDown size={16} className="transition-transform group-open:rotate-180" aria-hidden />
@@ -202,7 +203,7 @@ export const LeadForm = forwardRef<HTMLElement, { pkg: PackageName | ""; onPkg: 
             </div>
 
             {status.kind === "error" && (
-              <p role="alert" className="rounded-[6px] border border-[#d63d4a] px-4 py-3 text-[16px] text-[#d63d4a]">
+              <p role="alert" className="border-2 border-[#d63d4a] bg-white px-4 py-3 text-[16px] font-bold text-[#d63d4a]">
                 {status.message}
               </p>
             )}
@@ -210,7 +211,7 @@ export const LeadForm = forwardRef<HTMLElement, { pkg: PackageName | ""; onPkg: 
             <button
               type="submit"
               disabled={status.kind === "sending"}
-              className="flex h-14 w-full items-center justify-center rounded-[6px] bg-accent text-[18px] font-bold text-accent-foreground transition-colors hover:bg-accent-hover disabled:opacity-60"
+              className="flex h-14 w-full items-center justify-center rounded-[6px] border-[3px] border-[#1d1d1f] bg-accent text-[18px] font-bold text-white shadow-[4px_4px_0_#1d1d1f] transition-[transform,box-shadow,background-color] duration-150 hover:bg-accent-hover active:translate-x-1 active:translate-y-1 active:shadow-none disabled:opacity-60 motion-reduce:transition-none"
             >
               {status.kind === "sending" ? "접수 중" : "상담 신청하기"}
             </button>
