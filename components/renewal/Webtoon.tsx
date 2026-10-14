@@ -36,7 +36,7 @@ const episodes: Record<Key, () => React.ReactNode> = {
 const coverShots = [
   ["/images/webtoon/night-phone.jpg", -4],
   ["/images/webtoon/factory.jpg", 3],
-  ["/images/webtoon/cafe-broken-4.jpg", 2.5],
+  ["/images/webtoon/cafe-broken-5.jpg", 2.5],
   ["/images/webtoon/excel.jpg", -3],
 ] as const;
 
