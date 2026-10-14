@@ -36,7 +36,7 @@ const FOR_WHOM = [
   "홈페이지보다 신청 페이지가 먼저 필요한 경우",
 ];
 
-const SAMPLE_IDS = ["landing-water-rental", "landing-coding-camp", "landing-move-clean", "landing-popup-store", "landing-stamp-tour", "landing-zine-fair"];
+const SAMPLE_IDS = ["landing-water-rental", "landing-coding-camp", "landing-move-clean", "landing-popup-store", "landing-stamp-tour", "landing-zine-fair", "landing-leather-class"];
 
 const FAQ: [string, string][] = [
   ["문자·카톡 알림 비용은 별도인가요?", "발송 비용은 건당 20원 내외이며 고객 부담입니다. 카카오 알림톡은 비즈니스 채널 인증과 템플릿 심사가 필요합니다. 메일 알림은 무료입니다."],

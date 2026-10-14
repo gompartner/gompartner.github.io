@@ -138,6 +138,30 @@ export const part3: Record<string, SampleScenario> = {
     ],
   },
 
+  "landing-leather-class": {
+    client: "공방 사장님",
+    scenes: [
+      { t: "note", text: "첫 상담" },
+      { t: "client", text: "신청은 네이버폼, 입금은 통장, 변경은 카톡으로 받아요." },
+      { t: "client", text: "지난주엔 폼을 늦게 닫아서 여덟 자리에 아홉 분이 오셨어요." },
+      { t: "bear", text: "신청, 결제, 변경을 한 페이지로 합쳐 볼게요." },
+      { t: "note", text: "기획 의도" },
+      { t: "cut", img: "bear-think", text: "세 군데를 맞춰 보는 일이 제일 오래 걸려요." },
+      { t: "bear", text: "회차마다 남은 자리를 세고, 0이 되면 알아서 마감해요. 그다음 분은 대기 신청으로 받아요." },
+      { t: "client", text: "입금자명이 다른 건요? \"토요일2시\"로 들어온 적도 있어요." },
+      { t: "bear", text: "신청마다 전용 계좌를 드려요. 이름이 달라도 그 계좌로 들어오면 확인돼요." },
+      { t: "note", text: "만드는 중" },
+      { t: "cut", img: "bear-work", text: "날짜 변경은 수업 2일 전까지 한 번으로 화면에 정해 뒀어요." },
+      { t: "bear", text: "취소하면 환불 규정대로 금액이 바로 계산돼요. 자리가 나면 대기하신 분께 문자가 가고요." },
+      { t: "note", text: "이렇게 만들었어요" },
+      { t: "shot", step: 0, text: "회차를 고르면 남은 자리가 보여요. 결제까지 같은 화면에서 끝나요." },
+      { t: "shot", step: 1, text: "예약 번호와 휴대폰 뒷자리로 찾아서 날짜를 바꾸거나 취소해요." },
+      { t: "shot", step: 2, text: "사장님은 회차별 신청자와 결제 상태, 변경 이력을 한 표로 봐요." },
+      { t: "client", text: "밤 11시 전화는 이제 안 받아도 되겠네요." },
+      { t: "cut", img: "bear-point", text: "카톡으로 오던 변경 요청이 이 표에 쌓여요." },
+    ],
+  },
+
   "landing-popup-store": {
     client: "팝업 기획자님",
     scenes: [
