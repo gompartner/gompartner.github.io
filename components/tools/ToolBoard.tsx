@@ -2,86 +2,83 @@
 
 import Link from "next/link";
 import { useState } from "react";
-import { toolCategories, tools } from "@/data/tools";
+import { ChevronRight, Search } from "lucide-react";
+import { toolRoles, tools } from "@/data/tools";
 
-/** 자료실 목록: 분류 탭과 제목 검색이 있는 게시판형 목록 */
+type Role = (typeof toolRoles)[number];
+
+/** 자료실 목록: 누구인지 고르면 그 사람이 겪는 상황 말풍선이 나오고, 누르면 도구로 간다. 이름 검색은 아래에 따로 둔다. */
 export function ToolBoard() {
-  const [cat, setCat] = useState<string>("전체");
+  const [role, setRole] = useState<Role>("사장님");
   const [q, setQ] = useState("");
-  const list = tools.filter((t) => (cat === "전체" || t.category === cat) && (!q.trim() || t.title.includes(q.trim())));
-  const tabs = ["전체", ...toolCategories];
+  const word = q.trim();
+  const list = word
+    ? tools.filter((t) => t.title.includes(word) || t.need.includes(word))
+    : tools.filter((t) => (t.who as readonly string[]).includes(role));
 
   return (
     <div className="mt-8">
-      <div className="flex flex-wrap items-end justify-between gap-4">
-        <ul className="flex flex-wrap gap-x-5 gap-y-2 text-[16px]" role="list" aria-label="자료 분류">
-          {tabs.map((t) => (
-            <li key={t}>
-              <button
-                type="button"
-                aria-pressed={cat === t}
-                onClick={() => setCat(t)}
-                className={`border-b-2 pb-1.5 ${cat === t ? "border-foreground font-bold" : "border-transparent text-foreground-secondary hover:text-foreground"}`}
-              >
-                {t}
-              </button>
-            </li>
-          ))}
-        </ul>
-        <form role="search" onSubmit={(e) => e.preventDefault()} className="flex w-full max-w-[320px]">
-          <label htmlFor="tool-q" className="sr-only">
-            제목 검색
-          </label>
-          <input
-            id="tool-q"
-            value={q}
-            onChange={(e) => setQ(e.target.value)}
-            placeholder="제목 검색"
-            className="h-10 min-w-0 flex-1 rounded-l-[6px] border border-border px-3 text-[15px]"
-          />
-          <button type="submit" className="h-10 rounded-r-[6px] border border-l-0 border-border px-4 text-[15px] font-semibold">
-            검색
-          </button>
-        </form>
+      <p className="inline-block rounded-full border-[3px] border-[#1d1d1f] bg-accent px-5 py-2 text-[17px] font-bold text-white md:text-[19px]">어떤 게 필요하세요?</p>
+
+      <div className="mt-4 flex flex-wrap gap-2" role="group" aria-label="누구신가요">
+        {toolRoles.map((r) => {
+          const on = !word && r === role;
+          return (
+            <button
+              key={r}
+              type="button"
+              aria-pressed={on}
+              onClick={() => {
+                setRole(r);
+                setQ("");
+              }}
+              className={`h-10 rounded-full border-[2.5px] border-[#1d1d1f] px-4 text-[15px] font-bold transition-colors ${on ? "bg-[#1d1d1f] text-white" : "bg-white hover:bg-[#fff3b0]"}`}
+            >
+              {r}
+            </button>
+          );
+        })}
       </div>
 
-      <p className="mt-5 text-[16px] text-foreground-secondary">
-        총 <b className="text-foreground">{list.length}건</b>
-      </p>
-      <table className="mt-2 w-full border-t-2 border-foreground text-[16px]">
-        <caption className="sr-only">자료실 목록</caption>
-        <thead className="hidden md:table-header-group">
-          <tr className="border-b border-border text-[15px] text-foreground-secondary">
-            <th scope="col" className="w-16 py-3 font-medium">번호</th>
-            <th scope="col" className="w-32 py-3 font-medium">분류</th>
-            <th scope="col" className="py-3 text-left font-medium">제목</th>
-            <th scope="col" className="w-32 py-3 font-medium">등록일</th>
-          </tr>
-        </thead>
-        <tbody key={cat + q} className="soft-in">
-          {list.map((t) => (
-            <tr key={t.href} className="block border-b border-border py-3 md:table-row md:py-0">
-              <td className="hidden py-3.5 text-center tabular-nums text-foreground-secondary md:table-cell">{tools.length - tools.indexOf(t)}</td>
-              <td className="inline md:table-cell md:py-3.5 md:text-center">
-                <span className="text-[14px] text-foreground-secondary md:text-[15px]">{t.category}</span>
-              </td>
-              <td className="block md:table-cell md:py-3.5">
-                <Link href={t.href} className="font-medium hover:text-accent hover:underline hover:underline-offset-4">
-                  {t.title}
-                </Link>
-              </td>
-              <td className="block text-[14px] tabular-nums text-foreground-secondary md:table-cell md:py-3.5 md:text-center md:text-[15px]">{t.date}</td>
-            </tr>
-          ))}
-          {list.length === 0 && (
-            <tr>
-              <td colSpan={4} className="py-10 text-center text-foreground-secondary">
-                검색 결과가 없습니다.
-              </td>
-            </tr>
-          )}
-        </tbody>
-      </table>
+      <ul key={word || role} className="soft-in mt-5 grid gap-3 md:grid-cols-2 md:gap-4" role="list">
+        {list.map((t) => (
+          <li key={t.href}>
+            <Link
+              href={t.href}
+              className="group flex h-full items-center justify-between gap-3 rounded-[26px] rounded-bl-[6px] border-[3px] border-[#1d1d1f] bg-white py-3 pl-5 pr-3 shadow-[4px_4px_0_#1d1d1f] transition-[transform,box-shadow,background-color] duration-150 ease-out hover:-translate-x-0.5 hover:-translate-y-0.5 hover:bg-[#fff3b0] hover:shadow-[6px_6px_0_#1d1d1f] active:translate-x-1 active:translate-y-1 active:shadow-none"
+            >
+              <span className="min-w-0">
+                <span className="block text-[17px] font-bold leading-[1.4] md:text-[19px]">{t.need}</span>
+                <span className="mt-0.5 block text-[14px] font-bold text-foreground-tertiary">
+                  {t.title} · {t.for}
+                </span>
+              </span>
+              <span aria-hidden className="flex size-8 shrink-0 items-center justify-center rounded-full border-[2.5px] border-[#1d1d1f] bg-accent text-white transition-transform group-hover:translate-x-0.5">
+                <ChevronRight size={18} strokeWidth={3} />
+              </span>
+            </Link>
+          </li>
+        ))}
+      </ul>
+      {list.length === 0 && <p className="mt-5 text-[16px] text-foreground-secondary">찾는 도구가 없어요. 다른 말로 찾아보세요.</p>}
+
+      <form role="search" onSubmit={(e) => e.preventDefault()} className="mt-10 flex max-w-[420px] items-center gap-2 border-t-2 border-dashed border-[#1d1d1f]/30 pt-6">
+        <label htmlFor="tool-q" className="sr-only">
+          도구 이름으로 찾기
+        </label>
+        <span className="relative flex-1">
+          <Search size={18} strokeWidth={2.5} aria-hidden className="pointer-events-none absolute left-4 top-1/2 -translate-y-1/2 text-foreground-tertiary" />
+          <input
+            id="tool-q"
+            type="search"
+            value={q}
+            onChange={(e) => setQ(e.target.value)}
+            placeholder="도구 이름으로 찾기"
+            className="h-12 w-full rounded-full border-[2.5px] border-[#1d1d1f] bg-white pl-11 pr-4 text-[16px]"
+          />
+        </span>
+      </form>
+      <p className="mt-3 text-[14px] text-foreground-tertiary">무료 도구 {tools.length}개, 가입 없이 바로 씁니다.</p>
     </div>
   );
 }
