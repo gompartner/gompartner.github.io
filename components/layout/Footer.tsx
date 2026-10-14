@@ -101,7 +101,7 @@ export function Footer() {
         <div className="grid grid-cols-2 gap-x-6 gap-y-8 md:grid-cols-[1.4fr_1.4fr_1fr_1fr] md:gap-x-10">
           <div className="col-span-2 md:col-span-1">
             <p className="inline-flex items-center gap-2 font-[family-name:var(--font-sfx)] text-[20px] text-foreground">
-              <Image src="/images/logo.svg" alt="" width={24} height={24} className="h-6 w-6" />
+              <Image src="/images/bear-avatar.webp" alt="" width={32} height={32} className="h-8 w-8 rounded-full border-2 border-[#1d1d1f] bg-[#fffdf8] object-cover" />
               {profile.name}
             </p>
             <p className="mt-3">랜딩페이지 · 홈페이지 · 유지보수 · 업무 프로그램</p>
