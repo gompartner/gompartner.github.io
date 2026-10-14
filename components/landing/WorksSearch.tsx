@@ -5,7 +5,8 @@ import { AnimatePresence, motion } from "framer-motion";
 import { Check, ChevronDown, LayoutGrid, List, ListFilter, RotateCcw, Search, X } from "lucide-react";
 import type { Project } from "@/lib/types";
 import { capabilities, fields, fieldsById, type Capability, type Field } from "@/data/workFilters";
-import { WorksGrid } from "./WorksGrid";
+import { WorksGrid, productOf } from "./WorksGrid";
+import { estimateFor } from "@/data/pricing";
 import { WorksList } from "./WorksList";
 import { useReducedMotionSafe } from "@/hooks/useReducedMotionSafe";
 import { returningTo, saveList } from "@/lib/listReturn";
@@ -24,22 +25,64 @@ const hasCap = (p: Project, c: Capability | null) => {
   return capKeywords(c).some((k) => text.includes(k));
 };
 
+const products = ["홈페이지", "랜딩페이지", "유지보수", "업무 프로그램"] as const;
+type Product = (typeof products)[number];
+const hasProduct = (p: Project, k: Product | null) => !k || productOf(p) === k;
+
+// 가격대는 오픈 할인을 뺀 제공가로 나눈다. 견적이 없는 샘플은 별도 견적이다.
+const MAN = 10_000;
+const prices = [
+  { name: "30만 원 이하", min: 0, max: 30 * MAN },
+  { name: "30만~50만 원", min: 30 * MAN + 1, max: 50 * MAN },
+  { name: "50만~100만 원", min: 50 * MAN + 1, max: 100 * MAN },
+  { name: "100만 원 넘는", min: 100 * MAN + 1, max: Infinity },
+  { name: "별도 견적", min: null, max: null },
+] as const;
+type Price = (typeof prices)[number]["name"];
+const totalOf = (p: Project) => estimateFor(p.id)?.total ?? null;
+const hasPrice = (p: Project, name: Price | null) => {
+  const band = prices.find((b) => b.name === name);
+  if (!band) return true;
+  const total = totalOf(p);
+  if (band.min === null) return total === null;
+  return total !== null && total >= band.min && total <= band.max;
+};
+
 // 검색어는 띄어쓰기와 대소문자를 무시하고, 업종 분류도 함께 찾는다("병원"이면 결과지 프로그램도 나온다)
 const normalize = (s: string) => s.toLowerCase().replace(/\s+/g, "");
-const searchText = (p: Project) => normalize([p.title, p.category, p.description, ...p.features, ...(fieldsById[p.id] ?? [])].join(" "));
+const searchText = (p: Project) =>
+  normalize([p.title, p.category, productOf(p), p.description, ...p.features, ...(fieldsById[p.id] ?? [])].join(" "));
+// "50만", "50만 원"처럼 금액을 쓰면 그 돈 안에서 만들 수 있는 샘플을 찾는다
+const PRICE_WORD = /^(\d+)만원?$/;
+const matchTerm = (p: Project, t: string) => {
+  const won = t.match(PRICE_WORD);
+  if (won) {
+    const total = totalOf(p);
+    return total !== null && total <= Number(won[1]) * MAN;
+  }
+  return searchText(p).includes(t);
+};
+const splitTerms = (q: string) =>
+  q
+    .replace(/(\d+)\s*만\s*원?/g, "$1만")
+    .split(/\s+/)
+    .map(normalize)
+    .filter(Boolean);
 
-// 샘플은 기본으로 "[업종]에서 쓰는 [기능]을 갖춘 샘플 N개" 문장의 빈칸을 골라 거르고,
+// 샘플은 기본으로 "[상품] 가운데 [업종]에서 쓰는 [기능]을 갖춘 [가격대] 샘플 N개" 문장의 빈칸을 골라 거르고,
 // 원하면 검색어로 찾는 방식으로 바꿀 수 있다.
 // 빈칸에서 고를 수 있는 단어에는 지금 조건의 샘플 수를 붙이고, 0개가 되는 단어는 막아 결과가 비지 않게 한다.
 export function WorksSearch({ projects }: { projects: Project[] }) {
   const [mode, setMode] = useState<"pick" | "text">("pick");
   const [field, setField] = useState<Field | null>(null);
   const [cap, setCap] = useState<Capability | null>(null);
-  const [open, setOpen] = useState<"field" | "cap" | null>(null);
+  const [product, setProduct] = useState<Product | null>(null);
+  const [price, setPrice] = useState<Price | null>(null);
+  const [open, setOpen] = useState<"product" | "field" | "cap" | "price" | null>(null);
   const [query, setQuery] = useState("");
 
   // 샘플 화면에서 "다른 샘플"로 돌아오면 고른 조건을 되살린다
-  type Filters = { mode: "pick" | "text"; field: Field | null; cap: Capability | null; query: string };
+  type Filters = { mode: "pick" | "text"; field: Field | null; cap: Capability | null; product?: Product | null; price?: Price | null; query: string };
   const restored = useRef(false);
   useEffect(() => {
     const f = returningTo(window.location.pathname)?.filters as Filters | undefined;
@@ -48,6 +91,8 @@ export function WorksSearch({ projects }: { projects: Project[] }) {
         setMode(f.mode);
         setField(f.field);
         setCap(f.cap);
+        setProduct(f.product ?? null);
+        setPrice(f.price ?? null);
         setQuery(f.query);
       } else {
         // 새로 들어온 목록이면 예전에 고른 조건을 지운다
@@ -58,33 +103,43 @@ export function WorksSearch({ projects }: { projects: Project[] }) {
     return () => cancelAnimationFrame(frame);
   }, []);
   useEffect(() => {
-    if (restored.current) saveList({ path: window.location.pathname, filters: { mode, field, cap, query } satisfies Filters });
-  }, [mode, field, cap, query]);
+    if (restored.current) saveList({ path: window.location.pathname, filters: { mode, field, cap, product, price, query } satisfies Filters });
+  }, [mode, field, cap, product, price, query]);
 
-  const terms = query.split(/\s+/).map(normalize).filter(Boolean);
+  // 빈칸 하나의 단어별 샘플 수는 나머지 빈칸에서 고른 조건을 그대로 두고 센다
+  type Picks = { product: Product | null; field: Field | null; cap: Capability | null; price: Price | null };
+  const picks: Picks = { product, field, cap, price };
+  const matches = (p: Project, k: Picks) => hasProduct(p, k.product) && hasField(p, k.field) && hasCap(p, k.cap) && hasPrice(p, k.price);
+  const countWith = (patch: Partial<Picks>) => projects.filter((p) => matches(p, { ...picks, ...patch })).length;
+
+  const terms = splitTerms(query);
   const results =
-    mode === "pick"
-      ? projects.filter((p) => hasField(p, field) && hasCap(p, cap))
-      : projects.filter((p) => terms.every((t) => searchText(p).includes(t)));
-  const active = mode === "pick" ? Boolean(field || cap) : query !== "";
+    mode === "pick" ? projects.filter((p) => matches(p, picks)) : projects.filter((p) => terms.every((t) => matchTerm(p, t)));
+  const active = mode === "pick" ? Boolean(field || cap || product || price) : query !== "";
 
   const reset = () => {
     setField(null);
     setCap(null);
+    setProduct(null);
+    setPrice(null);
     setQuery("");
   };
 
+  const productOptions = [
+    { value: null, label: "모든 상품", count: countWith({ product: null }) },
+    ...products.map((k) => ({ value: k, label: k, count: countWith({ product: k }) })),
+  ];
   const fieldOptions = [
-    { value: null, label: "모든 업종", count: projects.filter((p) => hasCap(p, cap)).length },
-    ...fields.map((f) => ({ value: f, label: f, count: projects.filter((p) => hasField(p, f) && hasCap(p, cap)).length })),
+    { value: null, label: "모든 업종", count: countWith({ field: null }) },
+    ...fields.map((f) => ({ value: f, label: f, count: countWith({ field: f }) })),
   ];
   const capOptions = [
-    { value: null, label: "모든 기능", count: projects.filter((p) => hasField(p, field)).length },
-    ...capabilities.map((c) => ({
-      value: c.name,
-      label: `${c.name} 기능`,
-      count: projects.filter((p) => hasField(p, field) && hasCap(p, c.name)).length,
-    })),
+    { value: null, label: "모든 기능", count: countWith({ cap: null }) },
+    ...capabilities.map((c) => ({ value: c.name, label: `${c.name} 기능`, count: countWith({ cap: c.name }) })),
+  ];
+  const priceOptions = [
+    { value: null, label: "모든 가격대", count: countWith({ price: null }) },
+    ...prices.map((b) => ({ value: b.name, label: b.name, count: countWith({ price: b.name }) })),
   ];
 
   // 카드·목록 보기는 이 브라우저에만 기억한다
@@ -127,7 +182,7 @@ export function WorksSearch({ projects }: { projects: Project[] }) {
               setOpen(null);
               setMode(m);
             }}
-            className={`inline-flex h-9 items-center gap-1.5 rounded-full px-4 font-bold transition-colors duration-150 ${
+            className={`inline-flex h-9 items-center gap-1.5 whitespace-nowrap rounded-full px-3 font-bold min-[390px]:px-4 transition-colors duration-150 ${
               mode === m ? "bg-[#1d1d1f] text-white" : "text-foreground-secondary hover:bg-[#fff3b0] hover:text-foreground"
             }`}
           >
@@ -137,10 +192,22 @@ export function WorksSearch({ projects }: { projects: Project[] }) {
         ))}
       </div>
       <div className="relative z-10 flex flex-col gap-4 md:flex-row md:items-start md:justify-between md:gap-8">
-        <div className="relative min-h-[48px] flex-1 text-[17px] min-[390px]:text-[19px] font-bold leading-[1.8] tracking-[-0.01em] md:text-[26px]">
+        <div className="relative min-h-[48px] flex-1 text-[16px] min-[390px]:text-[19px] font-bold leading-[1.8] tracking-[-0.01em] md:text-[26px]">
           <AnimatePresence mode="wait" initial={false}>
             {mode === "pick" ? (
-              <motion.div key="pick" {...swap} className="whitespace-nowrap md:whitespace-normal">
+              <motion.div key="pick" {...swap}>
+                <span className="whitespace-nowrap">
+                  <WordPicker
+                    id="product"
+                    label="상품"
+                    options={productOptions}
+                    value={product}
+                    open={open === "product"}
+                    onOpenChange={(o) => setOpen(o ? "product" : null)}
+                    onChange={setProduct}
+                  />
+                  <span className="text-[13px] min-[390px]:text-[15px] md:text-[26px]"> 가운데</span>
+                </span>{" "}
                 <span className="whitespace-nowrap">
                   <WordPicker
                     id="field"
@@ -151,9 +218,8 @@ export function WorksSearch({ projects }: { projects: Project[] }) {
                     onOpenChange={(o) => setOpen(o ? "field" : null)}
                     onChange={setField}
                   />
-                  <span className="text-[13px] min-[390px]:text-[15px] md:text-[26px]">에서</span>
+                  <span className="text-[13px] min-[390px]:text-[15px] md:text-[26px]">에서 쓰는</span>
                 </span>{" "}
-                <span className="text-[13px] min-[390px]:text-[15px] md:text-[26px]">쓰는</span>{" "}
                 <span className="whitespace-nowrap">
                   <WordPicker
                     id="cap"
@@ -164,9 +230,20 @@ export function WorksSearch({ projects }: { projects: Project[] }) {
                     onOpenChange={(o) => setOpen(o ? "cap" : null)}
                     onChange={setCap}
                   />
-                  <span className="text-[13px] min-[390px]:text-[15px] md:text-[26px]">을</span>
+                  <span className="text-[13px] min-[390px]:text-[15px] md:text-[26px]">을 갖춘</span>
                 </span>{" "}
-                <span className="whitespace-nowrap text-[13px] min-[390px]:text-[15px] md:text-[26px]">갖춘 샘플</span>
+                <span className="whitespace-nowrap">
+                  <WordPicker
+                    id="price"
+                    label="가격대"
+                    options={priceOptions}
+                    value={price}
+                    open={open === "price"}
+                    onOpenChange={(o) => setOpen(o ? "price" : null)}
+                    onChange={setPrice}
+                  />
+                  <span className="text-[13px] min-[390px]:text-[15px] md:text-[26px]"> 샘플</span>
+                </span>
               </motion.div>
             ) : (
               <motion.div key="text" {...swap} className="flex flex-col gap-4">
@@ -381,7 +458,7 @@ function WordPicker<T extends string>({
         aria-controls={`works-${id}-list`}
         aria-label={`${label} 고르기, 지금 ${current.label}`}
         onClick={() => onOpenChange(!open)}
-        className={`mx-0.5 inline-flex items-center gap-1 rounded-[6px] border-b-[3px] border-[#1d1d1f] px-2 align-baseline transition-[background-color,transform] duration-150 active:scale-[0.97] motion-reduce:active:scale-100 ${
+        className={`mx-0.5 inline-flex items-center gap-0.5 rounded-[6px] border-b-[3px] border-[#1d1d1f] px-1.5 align-baseline min-[390px]:gap-1 min-[390px]:px-2 transition-[background-color,transform] duration-150 active:scale-[0.97] motion-reduce:active:scale-100 ${
           value ? "bg-[#fff3b0] text-foreground" : "text-foreground hover:bg-[#fff3b0]/70"
         }`}
       >
