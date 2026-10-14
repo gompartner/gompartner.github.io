@@ -7,10 +7,10 @@ const noopSubscribe = () => () => {};
 
 // 가상 신청 1건과 그 전에 쌓인 줄들. 곰파트너가 이 랜딩으로 받는 신청 모양 그대로다.
 const PAST: LeadRow[] = [
-  { at: "오늘 11:20", name: "박ㅅ연", digits: "01077310000", summary: "입주청소 · 상담 관리 랜딩", source: "메타 광고", status: "통화함" },
+  { at: "오늘 11:20", name: "박ㅅ연", digits: "01077310000", summary: "입주청소 · 랜딩 표준", source: "메타 광고", status: "통화함" },
   { at: "오늘 09:05", name: "이ㅈ민", digits: "01022900000", summary: "학원 모집 · 잘 모르겠음", source: "네이버 검색광고", status: "계약" },
-  { at: "어제 21:40", name: "이ㅈ민", digits: "01022900000", summary: "학원 모집 · 신청 접수 랜딩", source: "네이버 검색광고", status: "보류" },
-  { at: "어제 14:12", name: "최ㅇ준", digits: "01050160000", summary: "인테리어 · 광고 성과 랜딩", source: "블로그", status: "통화 전" },
+  { at: "어제 21:40", name: "이ㅈ민", digits: "01022900000", summary: "학원 모집 · 랜딩 기본", source: "네이버 검색광고", status: "보류" },
+  { at: "어제 14:12", name: "최ㅇ준", digits: "01050160000", summary: "인테리어 · 랜딩 고급", source: "블로그", status: "통화 전" },
 ];
 
 const THEME = { accent: "#256ef4", accentSoft: "#ecf2fe", ink: "#1e2124", muted: "#58616a", line: "#cdd1d5", paper: "#f4f5f6" };
@@ -29,11 +29,11 @@ export function OwnerPreview() {
         business="곰파트너"
         name="김하늘"
         phone="010-1234-5678"
-        summary="렌탈 · 상담 관리 랜딩"
+        summary="렌탈 · 랜딩 표준"
         lines={[
           ["업종", "정수기 렌탈"],
           ["광고", "네이버, 메타"],
-          ["관심 패키지", "상담 관리 랜딩"],
+          ["관심 패키지", "랜딩 표준"],
         ]}
         pastRows={PAST}
         theme={THEME}

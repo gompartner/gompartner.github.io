@@ -42,9 +42,9 @@ const FAQ: [string, string][] = [
 ];
 
 const PLAN_TO_PKG: Record<string, PackageName> = {
-  "landing-basic": "신청 접수 랜딩",
-  "landing-standard": "상담 관리 랜딩",
-  "landing-premium": "광고 성과 랜딩",
+  "landing-basic": "랜딩 기본",
+  "landing-standard": "랜딩 표준",
+  "landing-premium": "랜딩 고급",
 };
 
 export function LandingPage() {

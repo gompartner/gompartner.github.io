@@ -55,7 +55,7 @@ export const landingPlans: Plan[] = [
   {
     id: "landing-basic",
     name: "기본",
-    title: "신청 접수 랜딩",
+    title: "기본",
     price: 99_000,
     days: 4,
     revisions: 2,
@@ -65,7 +65,7 @@ export const landingPlans: Plan[] = [
   {
     id: "landing-standard",
     name: "표준",
-    title: "상담 관리 랜딩",
+    title: "표준",
     price: 149_000,
     days: 5,
     revisions: 2,
@@ -75,12 +75,12 @@ export const landingPlans: Plan[] = [
   {
     id: "landing-premium",
     name: "고급",
-    title: "광고 성과 랜딩",
+    title: "고급",
     price: 249_000,
     days: 7,
     revisions: 3,
-    summary: "광고 성과 집계 포함",
-    includes: ["섹션 10개 이내", "표준 구성 전부", "30분 미처리 신청 재알림", "광고별 신청·계약 주간 요약", "네이버·메타·구글 전환 추적", "견적 계산 같은 맞춤 기능 1개"],
+    summary: "광고별 신청·계약 정리 포함",
+    includes: ["섹션 10개 이내", "표준 구성 전부", "30분 넘게 연락 안 한 신청 다시 알림", "광고별 신청·계약 주간 요약", "네이버·메타·구글 광고별 신청 기록", "견적 계산 같은 맞춤 기능 1개"],
   },
 ];
 

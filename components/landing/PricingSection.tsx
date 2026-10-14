@@ -18,11 +18,14 @@ export function PricingSection({
   id = "pricing",
   heading: Heading = "h2",
   primary = "homepage",
+  crossRow = true,
 }: {
   id?: string;
   compact?: boolean;
   heading?: "h1" | "h2";
   primary?: "homepage" | "landing";
+  /** 다른 상품(랜딩↔홈페이지) 한 줄 소개. 가격 페이지처럼 상품을 따로 나눠 보여 줄 때는 끈다 */
+  crossRow?: boolean;
 }) {
   const landingFirst = primary === "landing";
   const cardPlans = landingFirst ? landingPlans : plans;
@@ -43,7 +46,8 @@ export function PricingSection({
                 <div className="flex items-center justify-between gap-3 border-b-[3px] border-[#1d1d1f] bg-[#fff3b0] px-5 py-3">
                   <p className="text-[17px] font-bold">{plan.title}</p>
                   <p className="shrink-0 text-[15px] font-bold">
-                    {plan.name} · {plan.days}일
+                    {plan.name !== plan.title && `${plan.name} · `}
+                    {plan.days}일
                   </p>
                 </div>
                 <div className="flex flex-1 flex-col p-5 md:p-6">
@@ -94,6 +98,7 @@ export function PricingSection({
           })}
         </ul>
 
+        {crossRow && (
         <div className="mt-8 flex flex-col gap-3 border-[3px] border-[#1d1d1f] bg-white px-5 py-4 md:flex-row md:items-center md:gap-8 md:px-6">
           <p className="shrink-0 text-[17px] font-bold">
             {landingFirst ? "회사·가게 홈페이지" : "광고 랜딩페이지"} <span className="tabular-nums text-accent">{manwon(rowPlans[0].price)}</span>부터
@@ -121,12 +126,15 @@ export function PricingSection({
             })}
           </ul>
         </div>
+        )}
+        {(crossRow || !landingFirst) && (
         <p className="mt-4 text-[15px] leading-[1.6] text-foreground-secondary md:text-[16px]">
           {runningCostNote}{" "}
           <Link href="/tools/hosting-cost" className="font-bold text-accent underline-offset-4 hover:underline">
             업체별 비교
           </Link>
         </p>
+        )}
       </div>
     </section>
   );
