@@ -190,7 +190,7 @@ export default async function SamplePage({ params }: Props) {
               ))}
               {est.discount > 0 && (
                 <div className="flex justify-between gap-3 py-2 font-bold text-accent">
-                  <dt>샘플 기능 재사용 할인</dt>
+                  <dt>오픈 할인</dt>
                   <dd className="tabular-nums">-{formatWon(est.discount)}</dd>
                 </div>
               )}

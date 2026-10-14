@@ -154,7 +154,7 @@ const estimateSource: Record<string, { plan: PlanId | LandingPlanId; extras: Ext
   "online-store": { plan: "premium", extras: [["cart"], ["pay"], ["member"]] }, // 유약 색·각인 미리보기
 };
 
-/** 샘플에 이미 있는 기능은 다시 쓰므로 추가 기능 금액을 절반만 받는다. */
+/** 오픈 할인: 샘플에 이미 있는 기능은 다시 쓰므로 추가 기능 금액을 절반만 받는다. */
 export const sampleReuseRate = 0.5;
 
 export interface Estimate {
@@ -162,7 +162,7 @@ export interface Estimate {
   lines: { name: string; amount: number }[];
   /** 패키지+추가 기능 정가 합계 */
   list: number;
-  /** 샘플 기능 재사용 할인 금액 */
+  /** 오픈 할인 금액 */
   discount: number;
   /** 실제 제공가(정가에서 할인을 뺀 값) */
   total: number;
