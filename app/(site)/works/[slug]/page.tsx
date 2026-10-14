@@ -11,6 +11,7 @@ import { industries } from "@/data/industries";
 import { projects } from "@/data/projects";
 import { fieldsById } from "@/data/workFilters";
 import { estimateFor, manwon } from "@/data/pricing";
+import { fitDescription } from "@/lib/seo";
 
 type Props = { params: Promise<{ slug: string }> };
 
@@ -30,7 +31,7 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
   const from = totals.length ? `${manwon(Math.min(...totals))}부터. ` : "";
   return {
     title: `${ind.title} 비용·샘플`,
-    description: from + ind.description,
+    description: fitDescription(from + ind.description),
     keywords: ind.keywords,
     alternates: { canonical: `/works/${slug}` },
   };

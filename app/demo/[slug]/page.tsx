@@ -4,6 +4,7 @@ import { notFound } from "next/navigation";
 import dynamic from "next/dynamic";
 import { projects } from "@/data/projects";
 import { estimateFor, manwon } from "@/data/pricing";
+import { fitDescription } from "@/lib/seo";
 
 // 데모를 각각 따로 불러와, 데모 하나를 열 때 다른 데모 코드까지 받지 않게 한다.
 const AccessibilityDemo = dynamic(() => import("@/components/demos/AccessibilityDemo").then((m) => m.AccessibilityDemo));
@@ -101,7 +102,7 @@ export async function generateMetadata({ params }: DemoPageProps): Promise<Metad
   // "치과 홈페이지 제작 샘플"처럼 사장님이 찾는 말로 제목을 짓고, 견적이 있으면 설명 끝에 비용을 붙인다.
   const title = `${demo.title}${/(홈페이지|쇼핑몰)$/.test(demo.title) ? " 제작" : ""} 샘플`;
   const est = estimateFor(demo.id);
-  const description = est ? `${demo.description} 이 샘플처럼 만들면 ${manwon(est.total)}, ${est.days}일.` : demo.description;
+  const description = fitDescription(est ? `이 샘플처럼 만들면 ${manwon(est.total)}, ${est.days}일. ${demo.description}` : demo.description);
   return {
     title,
     description,

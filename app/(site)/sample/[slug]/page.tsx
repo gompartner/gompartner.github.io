@@ -12,6 +12,7 @@ import { projects } from "@/data/projects";
 import { estimateFor, formatWon, manwon } from "@/data/pricing";
 import { samplePalettes } from "@/data/samplePalettes";
 import { scenarios, type Scene } from "@/data/scenes";
+import { fitDescription } from "@/lib/seo";
 
 // 샘플 표지. 웹툰 한 편처럼 위에서 아래로 읽는다.
 // PC·휴대폰 미리보기 → 의뢰인과 곰의 대화로 기획 의도와 만드는 과정, 기능 화면 → 색 → 맨 아래 금액과 샘플 열기.
@@ -33,7 +34,7 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
   const est = estimateFor(p.id);
   return {
     title: `${p.title} 샘플 소개`,
-    description: est ? `${p.description} 비슷하게 만들면 ${manwon(est.total)}, ${est.days}일.` : p.description,
+    description: fitDescription(est ? `비슷하게 만들면 ${manwon(est.total)}, ${est.days}일. ${p.description}` : p.description),
     alternates: { canonical: `/sample/${slug}` },
   };
 }
