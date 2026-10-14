@@ -84,7 +84,7 @@ export function LandingPage() {
       <header className="border-b-[3px] border-[#1d1d1f] bg-[#f3ece0]">
         <div className={`${container} flex h-16 items-center`}>
         <Link href="/" className="flex items-center gap-2 font-[family-name:var(--font-sfx)] text-[22px]">
-          <Image src="/images/logo.svg" alt="" width={26} height={26} className="h-[26px] w-[26px]" />
+          <Image src="/images/bear-avatar.webp" alt="" width={34} height={34} className="h-[34px] w-[34px] rounded-full border-2 border-[#1d1d1f] bg-[#fffdf8] object-cover" />
           {profile.name}
         </Link>
         </div>
