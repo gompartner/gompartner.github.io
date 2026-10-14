@@ -60,7 +60,7 @@ export function ToolBoard() {
           </li>
         ))}
       </ul>
-      {list.length === 0 && <p className="mt-5 text-[16px] text-foreground-secondary">찾는 도구가 없어요. 다른 말로 찾아보세요.</p>}
+      {list.length === 0 && <p className="mt-5 text-[16px] text-foreground-secondary">찾는 도구가 없어요.</p>}
 
       <form role="search" onSubmit={(e) => e.preventDefault()} className="mt-10 flex max-w-[420px] items-center gap-2 border-t-2 border-dashed border-[#1d1d1f]/30 pt-6">
         <label htmlFor="tool-q" className="sr-only">
@@ -78,7 +78,6 @@ export function ToolBoard() {
           />
         </span>
       </form>
-      <p className="mt-3 text-[14px] text-foreground-tertiary">무료 도구 {tools.length}개, 가입 없이 바로 씁니다.</p>
     </div>
   );
 }
