@@ -90,20 +90,20 @@ const DELAY_AGO = 18;
 const SSL_LEFT = 326;
 
 const SEED_REQUESTS: StoredRequest[] = [
-  { id: "r16", no: 16, date: 1, dept: "입학처", requester: "박서연", type: "콘텐츠 수정", title: "수시 모집 공지 메인 배너 교체", content: "메인 배너를 수시 모집 안내 이미지로 교체 요청합니다.", status: "접수", resolution: "" },
-  { id: "r15", no: 15, date: 3, dept: "정보전산원", requester: "정민호", type: "보안 조치", title: "관리자 페이지 접속 IP 제한 추가", content: "외부망에서 관리자 페이지 접속 차단을 요청합니다.", status: "처리중", resolution: "학내 IP 대역 목록 확인 중입니다." },
-  { id: "r14", no: 14, date: 5, dept: "체육학과", requester: "이도윤", type: "콘텐츠 수정", title: "학과 교수진 사진 변경", content: "신임 교수 2명 사진과 연구실 번호 반영을 요청합니다.", status: "처리완료", resolution: "교수진 페이지 사진과 연락처를 변경했습니다.", doneDate: 4 },
-  { id: "r13", no: 13, date: 7, dept: "학생지원처", requester: "최지우", type: "오류 수정", title: "장학 공지 게시판 첨부파일 다운로드 오류", content: "한글 파일명 첨부파일이 다운로드되지 않습니다.", status: "처리완료", resolution: "첨부파일 이름 인코딩 처리를 수정했습니다.", doneDate: 6 },
-  { id: "r12", no: 12, date: 10, dept: "홍보팀", requester: "한예린", type: "기능 개선", title: "보도자료 게시판 대표 이미지 표시", content: "게시판 목록에 대표 이미지 표시를 요청합니다.", status: "처리중", resolution: "목록 화면 수정 후 검토 요청 예정입니다." },
-  { id: "r11", no: 11, date: 12, dept: "정보전산원", requester: "정민호", type: "보안 조치", title: "보안 취약점 점검 결과 조치", content: "게시판 검색어 입력값 검증 취약점 2건 조치 요청입니다.", status: "처리완료", resolution: "입력값 필터를 적용하고 재점검 결과를 전달했습니다.", doneDate: 10 },
-  { id: "r10", no: 10, date: 14, dept: "교무처", requester: "김하늘", type: "콘텐츠 수정", title: "2학기 학사 일정 표 수정", content: "중간고사 기간 변경분 반영을 요청합니다.", status: "처리완료", resolution: "학사 일정 페이지 표를 수정했습니다.", doneDate: 14 },
-  { id: "r09", no: 9, date: 18, dept: "도서관", requester: "윤서아", type: "오류 수정", title: "모바일에서 운영 시간 표 깨짐", content: "모바일 화면에서 표가 화면 밖으로 넘어갑니다.", status: "처리완료", resolution: "표를 모바일에서 가로 스크롤되도록 수정했습니다.", doneDate: 17 },
-  { id: "r08", no: 8, date: 20, dept: "간호학과", requester: "오하준", type: "콘텐츠 수정", title: "실습 안내 자료 파일 교체", content: "실습 안내 PDF 파일 교체를 요청합니다.", status: "처리완료", resolution: "첨부파일을 교체했습니다.", doneDate: 20 },
-  { id: "r07", no: 7, date: 24, dept: "입학처", requester: "박서연", type: "기능 개선", title: "입학 상담 신청 항목 추가", content: "상담 신청 양식에 희망 학과 선택 항목 추가를 요청합니다.", status: "처리완료", resolution: "희망 학과 선택 항목과 관리자 목록 열을 추가했습니다.", doneDate: 19 },
-  { id: "r06", no: 6, date: 26, dept: "홍보팀", requester: "한예린", type: "콘텐츠 수정", title: "대학 소개 영상 교체", content: "메인 소개 영상을 올해 버전으로 교체 요청합니다.", status: "처리완료", resolution: "영상 링크와 썸네일을 교체했습니다.", doneDate: 25 },
-  { id: "r05", no: 5, date: 28, dept: "학생지원처", requester: "최지우", type: "오류 수정", title: "상담 예약 페이지 접속 오류", content: "상담 예약 페이지가 간헐적으로 열리지 않습니다.", status: "처리완료", resolution: "세션 설정을 수정하고 3일간 모니터링했습니다.", doneDate: 25 },
-  { id: "r04", no: 4, date: 33, dept: "교무처", requester: "김하늘", type: "콘텐츠 수정", title: "휴·복학 안내 문구 수정", content: "신청 기간 문구 수정을 요청합니다.", status: "처리완료", resolution: "안내 문구를 수정했습니다.", doneDate: 33 },
-  { id: "r03", no: 3, date: 40, dept: "정보전산원", requester: "정민호", type: "보안 조치", title: "SSL 인증서 갱신", content: "인증서 만료 전 갱신 요청입니다.", status: "처리완료", resolution: "인증서를 갱신하고 만료일을 확인했습니다.", doneDate: 39 },
+  { id: "r16", no: 16, date: 1, dept: "입학처", requester: "박ㅅ연", type: "콘텐츠 수정", title: "수시 모집 공지 메인 배너 교체", content: "메인 배너를 수시 모집 안내 이미지로 교체 요청합니다.", status: "접수", resolution: "" },
+  { id: "r15", no: 15, date: 3, dept: "정보전산원", requester: "정ㅁ호", type: "보안 조치", title: "관리자 페이지 접속 IP 제한 추가", content: "외부망에서 관리자 페이지 접속 차단을 요청합니다.", status: "처리중", resolution: "학내 IP 대역 목록 확인 중입니다." },
+  { id: "r14", no: 14, date: 5, dept: "체육학과", requester: "이ㄷ윤", type: "콘텐츠 수정", title: "학과 교수진 사진 변경", content: "신임 교수 2명 사진과 연구실 번호 반영을 요청합니다.", status: "처리완료", resolution: "교수진 페이지 사진과 연락처를 변경했습니다.", doneDate: 4 },
+  { id: "r13", no: 13, date: 7, dept: "학생지원처", requester: "최ㅈ우", type: "오류 수정", title: "장학 공지 게시판 첨부파일 다운로드 오류", content: "한글 파일명 첨부파일이 다운로드되지 않습니다.", status: "처리완료", resolution: "첨부파일 이름 인코딩 처리를 수정했습니다.", doneDate: 6 },
+  { id: "r12", no: 12, date: 10, dept: "홍보팀", requester: "한ㅇ린", type: "기능 개선", title: "보도자료 게시판 대표 이미지 표시", content: "게시판 목록에 대표 이미지 표시를 요청합니다.", status: "처리중", resolution: "목록 화면 수정 후 검토 요청 예정입니다." },
+  { id: "r11", no: 11, date: 12, dept: "정보전산원", requester: "정ㅁ호", type: "보안 조치", title: "보안 취약점 점검 결과 조치", content: "게시판 검색어 입력값 검증 취약점 2건 조치 요청입니다.", status: "처리완료", resolution: "입력값 필터를 적용하고 재점검 결과를 전달했습니다.", doneDate: 10 },
+  { id: "r10", no: 10, date: 14, dept: "교무처", requester: "김ㅎ늘", type: "콘텐츠 수정", title: "2학기 학사 일정 표 수정", content: "중간고사 기간 변경분 반영을 요청합니다.", status: "처리완료", resolution: "학사 일정 페이지 표를 수정했습니다.", doneDate: 14 },
+  { id: "r09", no: 9, date: 18, dept: "도서관", requester: "윤ㅅ아", type: "오류 수정", title: "모바일에서 운영 시간 표 깨짐", content: "모바일 화면에서 표가 화면 밖으로 넘어갑니다.", status: "처리완료", resolution: "표를 모바일에서 가로 스크롤되도록 수정했습니다.", doneDate: 17 },
+  { id: "r08", no: 8, date: 20, dept: "간호학과", requester: "오ㅎ준", type: "콘텐츠 수정", title: "실습 안내 자료 파일 교체", content: "실습 안내 PDF 파일 교체를 요청합니다.", status: "처리완료", resolution: "첨부파일을 교체했습니다.", doneDate: 20 },
+  { id: "r07", no: 7, date: 24, dept: "입학처", requester: "박ㅅ연", type: "기능 개선", title: "입학 상담 신청 항목 추가", content: "상담 신청 양식에 희망 학과 선택 항목 추가를 요청합니다.", status: "처리완료", resolution: "희망 학과 선택 항목과 관리자 목록 열을 추가했습니다.", doneDate: 19 },
+  { id: "r06", no: 6, date: 26, dept: "홍보팀", requester: "한ㅇ린", type: "콘텐츠 수정", title: "대학 소개 영상 교체", content: "메인 소개 영상을 올해 버전으로 교체 요청합니다.", status: "처리완료", resolution: "영상 링크와 썸네일을 교체했습니다.", doneDate: 25 },
+  { id: "r05", no: 5, date: 28, dept: "학생지원처", requester: "최ㅈ우", type: "오류 수정", title: "상담 예약 페이지 접속 오류", content: "상담 예약 페이지가 간헐적으로 열리지 않습니다.", status: "처리완료", resolution: "세션 설정을 수정하고 3일간 모니터링했습니다.", doneDate: 25 },
+  { id: "r04", no: 4, date: 33, dept: "교무처", requester: "김ㅎ늘", type: "콘텐츠 수정", title: "휴·복학 안내 문구 수정", content: "신청 기간 문구 수정을 요청합니다.", status: "처리완료", resolution: "안내 문구를 수정했습니다.", doneDate: 33 },
+  { id: "r03", no: 3, date: 40, dept: "정보전산원", requester: "정ㅁ호", type: "보안 조치", title: "SSL 인증서 갱신", content: "인증서 만료 전 갱신 요청입니다.", status: "처리완료", resolution: "인증서를 갱신하고 만료일을 확인했습니다.", doneDate: 39 },
 ];
 
 const SEED_CHECKS: CheckItem[] = [
@@ -258,7 +258,7 @@ export function MaintenanceDemo() {
       no,
       date: today,
       dept: form.dept,
-      requester: "홍길동",
+      requester: "홍ㄱ동",
       type: form.type,
       title: form.title.trim(),
       content: form.content.trim(),
