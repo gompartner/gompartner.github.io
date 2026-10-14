@@ -134,13 +134,13 @@ export function AdEpisode() {
             </div>
           </fieldset>
           <div className="mt-4 grid gap-3 sm:grid-cols-2">
-            <label className="grid gap-1 text-[14px] font-bold text-foreground-secondary">
+            <label className="grid min-w-0 gap-1 text-[14px] font-bold text-foreground-secondary">
               이름
-              <input value={name} onChange={(e) => setName(e.target.value)} required maxLength={10} className="h-12 rounded-[6px] border-2 border-border px-3 text-[16px] font-normal text-foreground" />
+              <input value={name} onChange={(e) => setName(e.target.value)} required maxLength={10} className="h-12 w-full min-w-0 rounded-[6px] border-2 border-border px-3 text-[16px] font-normal text-foreground" />
             </label>
-            <label className="grid gap-1 text-[14px] font-bold text-foreground-secondary">
+            <label className="grid min-w-0 gap-1 text-[14px] font-bold text-foreground-secondary">
               연락처
-              <input value={phone} onChange={(e) => setPhone(e.target.value)} required inputMode="tel" maxLength={13} className="h-12 rounded-[6px] border-2 border-border px-3 text-[16px] font-normal text-foreground" />
+              <input value={phone} onChange={(e) => setPhone(e.target.value)} required inputMode="tel" maxLength={13} className="h-12 w-full min-w-0 rounded-[6px] border-2 border-border px-3 text-[16px] font-normal text-foreground" />
             </label>
           </div>
           <button type="submit" className="mt-5 h-13 w-full rounded-[6px] bg-[#ffd43b] py-3.5 text-[17px] font-bold text-[#1d1d1f] transition-transform active:scale-[0.98]">
