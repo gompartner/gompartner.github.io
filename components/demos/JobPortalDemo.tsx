@@ -687,26 +687,31 @@ export function JobPortalDemo() {
             </table>
           )}
           {results.length > 0 && totalPages > 1 && (
-            <nav aria-label="페이지" className="mt-6 flex flex-wrap items-center justify-center gap-1">
+            <nav aria-label="페이지" className="mt-6 flex flex-nowrap items-center justify-center gap-1">
               {groupStart > 1 && (
-                <button type="button" onClick={() => goPage(groupStart - 1)} className="h-10 rounded-[4px] border border-[#dde2ea] px-3 text-[15px] hover:border-[#1b2a4a]">
-                  이전
+                <button type="button" onClick={() => goPage(groupStart - 1)} aria-label="이전 페이지 묶음" className="grid size-10 shrink-0 place-items-center rounded-[4px] border border-[#dde2ea] text-[18px] hover:border-[#1b2a4a]">
+                  ‹
                 </button>
               )}
-              {pageNums.map((n) => (
-                <button
-                  key={n}
-                  type="button"
-                  onClick={() => goPage(n)}
-                  aria-current={n === page ? "page" : undefined}
-                  className={`h-10 min-w-10 rounded-[4px] px-2 text-[15px] tabular-nums ${n === page ? "bg-[#1b2a4a] font-bold text-white" : "border border-[#dde2ea] hover:border-[#1b2a4a]"}`}
-                >
-                  {n}
-                </button>
-              ))}
+              {pageNums.map((n) => {
+                // 휴대폰은 지금 페이지 앞뒤로 다섯 개만 보여 한 줄을 넘지 않게 한다
+                const lo = Math.min(Math.max(page - 2, groupStart), Math.max(groupStart, pageNums[pageNums.length - 1] - 4));
+                const near = n >= lo && n < lo + 5;
+                return (
+                  <button
+                    key={n}
+                    type="button"
+                    onClick={() => goPage(n)}
+                    aria-current={n === page ? "page" : undefined}
+                    className={`h-10 min-w-10 shrink-0 rounded-[4px] px-2 text-[15px] tabular-nums ${near ? "" : "max-md:hidden"} ${n === page ? "bg-[#1b2a4a] font-bold text-white" : "border border-[#dde2ea] hover:border-[#1b2a4a]"}`}
+                  >
+                    {n}
+                  </button>
+                );
+              })}
               {groupStart + 9 < totalPages && (
-                <button type="button" onClick={() => goPage(groupStart + 10)} className="h-10 rounded-[4px] border border-[#dde2ea] px-3 text-[15px] hover:border-[#1b2a4a]">
-                  다음
+                <button type="button" onClick={() => goPage(groupStart + 10)} aria-label="다음 페이지 묶음" className="grid size-10 shrink-0 place-items-center rounded-[4px] border border-[#dde2ea] text-[18px] hover:border-[#1b2a4a]">
+                  ›
                 </button>
               )}
             </nav>
