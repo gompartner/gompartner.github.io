@@ -630,7 +630,7 @@ export function TermsGenerator() {
           </label>
           <label className={label}>
             사이트 주소
-            <input value={form.siteUrl} onChange={(e) => set("siteUrl", e.target.value)} inputMode="url" placeholder="https://www.gompartner.co.kr" className={input} />
+            <input value={form.siteUrl} onChange={(e) => set("siteUrl", e.target.value)} inputMode="url" placeholder="https://gompartner.co.kr" className={input} />
           </label>
           <label className={label}>
             고객 상담 연락처 <span className="text-[#b42318]">*</span>
