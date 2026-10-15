@@ -2,6 +2,7 @@ import type { Metadata, Viewport } from "next";
 import localFont from "next/font/local";
 import { Black_Han_Sans } from "next/font/google";
 import Script from "next/script";
+import { lookRedirectScript } from "@/lib/look";
 import "./globals.css";
 import { CtaTracker } from "@/components/analytics/CtaTracker";
 import { ThemeProvider } from "@/components/layout/ThemeProvider";
@@ -85,8 +86,8 @@ export default function RootLayout({
       suppressHydrationWarning
     >
       <body className="min-h-screen bg-background text-foreground antialiased">
-        {/* 클래식 보기를 골랐으면 첫 화면을 그리기 전에 표시해 웹툰 모양이 잠깐 비치지 않게 한다 */}
-        <script dangerouslySetInnerHTML={{ __html: `try{if(localStorage.getItem("look")==="classic")document.documentElement.dataset.look="classic"}catch(e){}` }} />
+        {/* 클래식 보기를 골랐으면 웹툰 화면을 그리기 전에 클래식 주소로 옮긴다 */}
+        <script dangerouslySetInnerHTML={{ __html: lookRedirectScript }} />
         <noscript>
           <iframe
             src={`https://www.googletagmanager.com/ns.html?id=${GTM_ID}`}

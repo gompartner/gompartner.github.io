@@ -1,5 +1,4 @@
 import type { Metadata } from "next";
-import { ClassicHome } from "@/components/classic/ClassicHome";
 import { Webtoon } from "@/components/renewal/Webtoon";
 import { homeDescription, homeTitle } from "@/data/seo";
 import { fitDescription } from "@/lib/seo";
@@ -13,13 +12,5 @@ export const metadata: Metadata = {
 };
 
 export default function HomePage() {
-  // 클래식 보기를 고르면 웹툰은 CSS로 숨기고 클래식 첫 화면을 그린다(검색에는 웹툰 첫 화면만 잡힌다)
-  return (
-    <>
-      <div className="look-webtoon">
-        <Webtoon />
-      </div>
-      <ClassicHome />
-    </>
-  );
+  return <Webtoon />;
 }

@@ -1,0 +1,59 @@
+// 샘플을 "○○에서 쓰는 ○○ 기능" 문장으로 고르기 위한 분류.
+// 새 샘플을 추가하면 fieldsById에 업종을 적는다. 기능은 기능 태그·제목·설명에서 keywords로 찾는다.
+
+export const fields = ["병원", "전문직·부동산", "학원·교육", "공공기관·학교", "가게·매장", "금융", "기업"] as const;
+export type Field = (typeof fields)[number];
+
+export const fieldsById: Record<string, Field[]> = {
+  "clinic-report": ["병원"],
+  "clinic-homepage": ["병원"],
+  "dental-homepage": ["병원"],
+  "hanok-cafe": ["가게·매장"],
+  "korean-restaurant": ["가게·매장"],
+  interior: ["가게·매장", "기업"],
+  academy: ["학원·교육"],
+  "pilates-studio": ["가게·매장", "학원·교육"],
+  "online-store": ["가게·매장", "기업"],
+  pension: ["가게·매장"],
+  company: ["기업"],
+  "cert-lab": ["기업"],
+  "law-firm": ["전문직·부동산"],
+  "tax-office": ["전문직·부동산", "금융"],
+  "real-estate": ["전문직·부동산"],
+  "bakery-cafe": ["가게·매장"],
+  "landing-coding-camp": ["학원·교육"],
+  "landing-water-rental": ["가게·매장"],
+  "landing-move-clean": ["가게·매장"],
+  "landing-popup-store": ["가게·매장"],
+  "landing-stamp-tour": ["공공기관·학교"],
+  "landing-zine-fair": ["가게·매장"],
+  "landing-leather-class": ["가게·매장", "학원·교육"],
+  pharmacy: ["병원", "가게·매장"],
+  "flower-expo": ["공공기관·학교"],
+  "community-map": ["공공기관·학교"],
+  "program-application": ["공공기관·학교"],
+  "private-gym": ["가게·매장"],
+  "shop-admin": ["가게·매장", "기업"],
+  "excel-automation": ["기업", "가게·매장"],
+  lms: ["학원·교육", "공공기관·학교", "기업"],
+  "maintenance-dashboard": ["공공기관·학교", "기업"],
+  "maintenance-urgent-fix": ["가게·매장"],
+  "district-portal": ["공공기관·학교"],
+  "job-portal": ["기업", "공공기관·학교"],
+  "retirement-calculator": ["금융"],
+  "accessibility-review": ["공공기관·학교"],
+};
+
+// keywords 중 하나라도 들어간 기능 태그에 형광펜을 긋는다
+export const capabilities = [
+  { name: "예약", keywords: ["예약"] },
+  { name: "결제", keywords: ["결제"] },
+  { name: "지도", keywords: ["지도"] },
+  { name: "신청·심사", keywords: ["신청", "심사"] },
+  { name: "검색", keywords: ["검색", "찾기", "필터"] },
+  { name: "통계·그래프", keywords: ["통계", "그래프", "차트", "비교"] },
+  { name: "인쇄·내려받기", keywords: ["인쇄", "PDF", "출력", "엑셀", "다운로드"] },
+  { name: "관리자", keywords: ["관리", "심사", "점검표"] },
+  { name: "웹접근성", keywords: ["접근성", "점검 항목", "멈춤"] },
+] as const;
+export type Capability = (typeof capabilities)[number]["name"];
