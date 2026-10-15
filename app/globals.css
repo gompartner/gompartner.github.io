@@ -187,3 +187,60 @@ body {
   from { opacity: 0; transform: translateY(36px) rotate(calc(var(--tilt, -1.6deg) * -3)) scale(0.94); }
   to { opacity: 1; transform: rotate(var(--tilt, -1.6deg)); }
 }
+
+/* ── 클래식 보기 ─────────────────────────────────────────────────────
+   머리글 전환 아이콘으로 고르면 html[data-look="classic"]이 붙는다.
+   내용은 그대로 두고 웹툰 꾸밈(먹선·밀린 그림자·크림 점무늬·만화 글꼴·기울인 캡처)만 KRDS 기본 모양으로 되돌린다. */
+html[data-look="classic"] .wt {
+  --background: #ffffff;
+  --foreground: #1e2124;
+  --foreground-secondary: #464c53;
+  --foreground-tertiary: #58616a;
+  --surface: #f4f5f6;
+  --surface-secondary: #e6e8ea;
+  --border: #cdd1d5;
+  --accent-surface: #ecf2fe;
+  background: #ffffff;
+}
+html[data-look="classic"] .wt h1,
+html[data-look="classic"] .wt [class*="font-sfx"] {
+  font-family: var(--font-pretendard), sans-serif;
+  font-weight: 700;
+  letter-spacing: -0.02em;
+}
+html[data-look="classic"] .wt [class*="border-[#1d1d1f]"],
+html[data-look="classic"] .wt .wt-card {
+  border-color: var(--border) !important;
+}
+html[data-look="classic"] .wt [class*="border-[3px]"],
+html[data-look="classic"] .wt [class*="border-[2.5px]"],
+html[data-look="classic"] .wt [class*="border-2 "],
+html[data-look="classic"] .wt .wt-card {
+  border-width: 1px !important;
+}
+html[data-look="classic"] .wt [class*="border-b-[3px]"] { border-bottom-width: 1px; }
+html[data-look="classic"] .wt [class*="border-t-[3px]"] { border-top-width: 1px; }
+html[data-look="classic"] .wt [class*="shadow-["],
+html[data-look="classic"] .wt .wt-card {
+  box-shadow: none !important;
+}
+html[data-look="classic"] .wt [class*="bg-[#f3ece0]"],
+html[data-look="classic"] .wt [class*="bg-[#fffdf8]"] {
+  background-color: #ffffff;
+}
+html[data-look="classic"] .wt [class*="bg-[#fff3b0]"]:not([class*="hover:bg-[#fff3b0]"]) {
+  background-color: var(--accent-surface);
+}
+html[data-look="classic"] .wt [class*="hover:bg-[#fff3b0]"]:hover {
+  background-color: var(--surface);
+}
+html[data-look="classic"] .wt [class*="bg-[radial-gradient"] {
+  background-image: none;
+}
+html[data-look="classic"] .wt [class*="bg-[#ffe14d]"] {
+  display: none;
+}
+html[data-look="classic"] .wt .shot-print {
+  transform: none;
+  animation: none;
+}

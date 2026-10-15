@@ -85,6 +85,8 @@ export default function RootLayout({
       suppressHydrationWarning
     >
       <body className="min-h-screen bg-background text-foreground antialiased">
+        {/* 클래식 보기를 골랐으면 첫 화면을 그리기 전에 표시해 웹툰 모양이 잠깐 비치지 않게 한다 */}
+        <script dangerouslySetInnerHTML={{ __html: `try{if(localStorage.getItem("look")==="classic")document.documentElement.dataset.look="classic"}catch(e){}` }} />
         <noscript>
           <iframe
             src={`https://www.googletagmanager.com/ns.html?id=${GTM_ID}`}
