@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import { ClassicFooter } from "@/components/classic/ClassicFooter";
 import { ClassicHeader } from "@/components/classic/ClassicHeader";
 import { ClassicMobileBar } from "@/components/classic/ClassicMobileBar";
+import { RememberClassic } from "@/components/classic/RememberClassic";
 import { ChannelTalk } from "@/components/layout/ChannelTalk";
 
 // 클래식 보기(웹 에이전시형 회사 홈페이지). 웹툰 페이지와 내용이 겹쳐 검색에는 내보내지 않는다.
@@ -18,6 +19,7 @@ export default function ClassicLayout({ children }: Readonly<{ children: React.R
       >
         본문 바로가기
       </a>
+      <RememberClassic />
       <ChannelTalk />
       <ClassicHeader />
       <main id="main" className="flex-1 pt-16 md:pt-[112px]">

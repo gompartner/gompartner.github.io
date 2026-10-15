@@ -8,9 +8,9 @@ import type { TourStep } from "@/data/tours";
 // 샘플 화면 위에는 메인으로 가는 집 아이콘과 '사용법 보기' 버튼만 띄운다. 금액·만든 이야기·다른 샘플은 샘플 표지(/sample/[slug])가 맡는다.
 // 사용법 가이드는 프라이빗 짐 데모(HomepageDemo)의 스포트라이트 가이드와 같은 방식이다.
 // 버튼은 PC에서 왼쪽 아래, 휴대폰에서 오른쪽 아래에 두고, 데모 자체의 하단 고정 바가 있으면 그 위로 올린다.
-// 곰파트너 쪽 버튼이라 업종 사이트와 섞이지 않게 웹툰 톤(크림 바탕·먹선·단단한 그림자)으로 둔다.
+// 곰파트너 쪽 버튼이라 업종 사이트와 섞이지 않게 반투명 검정 알약으로 둔다(웹툰 개편 전 모양).
 const pill =
-  "inline-flex h-10 items-center gap-2 rounded-full border-[2.5px] border-[#1d1d1f] bg-[#fffdf8] px-4 text-sm font-bold text-[#1d1d1f] shadow-[3px_3px_0_#1d1d1f] transition-[transform,box-shadow,background-color] duration-150 hover:bg-[#fff3b0] active:translate-x-[3px] active:translate-y-[3px] active:shadow-none";
+  "inline-flex h-10 items-center gap-2 rounded-full border border-white/20 bg-black/60 px-4 text-sm font-medium text-white shadow-lg backdrop-blur-md transition-colors hover:bg-black/75";
 
 type Rect = { top: number; left: number; width: number; height: number };
 
@@ -127,7 +127,7 @@ export function DemoDock({ projectId, tour }: { projectId: string; tour?: TourSt
             })()}
           />
           <div
-            className="absolute inset-x-0 bottom-6 mx-auto w-[min(92vw,380px)] rounded-[6px] border-[3px] border-[#1d1d1f] bg-[#fffdf8] p-5 text-[#1d1d1f] shadow-[5px_5px_0_#1d1d1f]"
+            className="absolute inset-x-0 bottom-6 mx-auto w-[min(92vw,380px)] rounded-2xl bg-white p-5 text-[#1d2327] shadow-2xl"
             onClick={(e) => e.stopPropagation()}
           >
             <div className="flex items-center justify-between">
@@ -168,7 +168,7 @@ export function DemoDock({ projectId, tour }: { projectId: string; tour?: TourSt
                   <button
                     type="button"
                     onClick={() => open(step! - 1)}
-                    className="rounded-[6px] border-[2.5px] border-[#1d1d1f] bg-white px-4 py-2 text-sm font-bold"
+                    className="rounded-lg border border-stone-200 px-4 py-2 text-sm font-semibold"
                   >
                     이전
                   </button>
@@ -177,7 +177,7 @@ export function DemoDock({ projectId, tour }: { projectId: string; tour?: TourSt
                   type="button"
                   autoFocus
                   onClick={() => (last ? close() : open(step! + 1))}
-                  className="rounded-[6px] border-[2.5px] border-[#1d1d1f] bg-[#256ef4] px-4 py-2 text-sm font-bold text-white"
+                  className="rounded-lg bg-[#111] px-4 py-2 text-sm font-bold text-white"
                 >
                   {last ? "시작하기" : "다음"}
                 </button>
@@ -212,6 +212,13 @@ function bottomBarHeight(own: HTMLElement | null): number {
 /** 메인으로 가는 집 아이콘과 사용법 보기 버튼. 사용법은 한 번도 열지 않았으면 초록으로 반짝인다. */
 function DockButtons({ guide, projectId }: { guide: { fresh: boolean; onClick: () => void } | null; projectId: string }) {
   const own = useRef<HTMLDivElement>(null);
+  // 클래식 보기를 고른 사람은 클래식 첫 화면으로 돌아간다(클라이언트 이동이라 루트의 자동 이동 스크립트가 돌지 않는다)
+  const [home, setHome] = useState("/");
+  useEffect(() => {
+    try {
+      if (localStorage.getItem("look") === "classic") setHome("/classic");
+    } catch {}
+  }, []);
   const [lift, setLift] = useState(0);
   useEffect(() => {
     let frame = 0;
@@ -236,7 +243,7 @@ function DockButtons({ guide, projectId }: { guide: { fresh: boolean; onClick: (
       style={{ bottom: `calc(${lift}px + 16px + env(safe-area-inset-bottom))` }}
       className="print:hidden fixed right-4 z-50 flex items-center gap-2 transition-[bottom] md:left-5 md:right-auto"
     >
-      <Link href="/" aria-label="곰파트너 메인으로" title="곰파트너 메인으로" data-gtm-cta={`demo_home_${projectId}`} className="grid h-10 w-10 place-items-center rounded-full border-[2.5px] border-[#1d1d1f] bg-[#fffdf8] text-[#1d1d1f] shadow-[3px_3px_0_#1d1d1f] transition-[transform,box-shadow,background-color] duration-150 hover:bg-[#fff3b0] active:translate-x-[3px] active:translate-y-[3px] active:shadow-none">
+      <Link href={home} aria-label="곰파트너 메인으로" title="곰파트너 메인으로" data-gtm-cta={`demo_home_${projectId}`} className={`${pill} w-10 justify-center !px-0`}>
         <House size={17} aria-hidden />
       </Link>
       {guide && (
@@ -244,9 +251,9 @@ function DockButtons({ guide, projectId }: { guide: { fresh: boolean; onClick: (
           type="button"
           onClick={guide.onClick}
           data-gtm-cta={`demo_guide_${projectId}`}
-          className={`${pill} relative ${guide.fresh ? "bg-[#d9f7e3]" : ""}`}
+          className={`${pill} relative ${guide.fresh ? "border-[#4ade80] bg-[#16A34A] hover:bg-[#15803d]" : ""}`}
         >
-          {guide.fresh && <span aria-hidden className="pointer-events-none absolute inset-0 rounded-full bg-[#4ade80] opacity-50 motion-safe:animate-ping" />}
+          {guide.fresh && <span aria-hidden className="pointer-events-none absolute inset-0 rounded-full bg-[#4ade80] opacity-60 motion-safe:animate-ping" />}
           <CircleHelp size={16} aria-hidden className="relative" />
           <span className="relative">사용법 보기</span>
         </button>
