@@ -5,7 +5,7 @@ import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { useEffect, useState } from "react";
 import { AnimatePresence, motion } from "framer-motion";
-import { Menu, X } from "lucide-react";
+import { BookOpen, Menu, Newspaper, X } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { profile } from "@/data/profile";
 import { ChannelTalkButton } from "@/components/layout/ChannelTalk";
@@ -69,6 +69,7 @@ export function Header() {
         </Link>
 
         <div className="flex items-center gap-2">
+          <LookToggle />
           <ul className="hidden items-center gap-1 md:flex" role="list">
             {navItems.map(({ href, label }) => (
               <li key={href}>
@@ -125,5 +126,35 @@ export function Header() {
         )}
       </AnimatePresence>
     </header>
+  );
+}
+
+/** 웹툰 꾸밈을 끄고 흰 바탕 기본 홈페이지 모양으로 보는 전환. 고른 모양은 이 브라우저에 기억한다. */
+function LookToggle() {
+  const [classic, setClassic] = useState(false);
+  useEffect(() => setClassic(document.documentElement.dataset.look === "classic"), []);
+  const toggle = () => {
+    const next = !classic;
+    setClassic(next);
+    if (next) document.documentElement.dataset.look = "classic";
+    else delete document.documentElement.dataset.look;
+    try {
+      if (next) localStorage.setItem("look", "classic");
+      else localStorage.removeItem("look");
+    } catch {}
+  };
+  const label = classic ? "웹툰으로 보기" : "클래식으로 보기";
+  return (
+    <button
+      type="button"
+      onClick={toggle}
+      aria-pressed={classic}
+      aria-label={label}
+      title={label}
+      data-gtm-cta={classic ? "look_webtoon" : "look_classic"}
+      className="inline-flex h-10 w-10 items-center justify-center rounded-[6px] border-[2.5px] border-[#1d1d1f] bg-white text-foreground transition-colors hover:bg-[#fff3b0]"
+    >
+      {classic ? <BookOpen size={19} aria-hidden /> : <Newspaper size={19} aria-hidden />}
+    </button>
   );
 }
