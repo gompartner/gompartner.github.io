@@ -1,5 +1,5 @@
 import type { Metadata } from "next";
-import { JwtParser } from "@/components/tools/JwtParser";
+import { JwtParser } from "@/components/classic/tools/JwtParser";
 import { fitDescription } from "@/lib/seo";
 import { ToolFrame } from "@/components/classic/support/ToolFrame";
 

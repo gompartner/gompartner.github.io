@@ -1,5 +1,5 @@
 import type { Metadata } from "next";
-import { CronExplainer } from "@/components/tools/CronExplainer";
+import { CronExplainer } from "@/components/classic/tools/CronExplainer";
 import { fitDescription } from "@/lib/seo";
 import { ToolFrame } from "@/components/classic/support/ToolFrame";
 

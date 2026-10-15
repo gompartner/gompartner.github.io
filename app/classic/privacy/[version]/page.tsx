@@ -1,7 +1,7 @@
 import type { Metadata } from "next";
 import { notFound } from "next/navigation";
 import { ClassicPrivacy } from "@/components/classic/support/ClassicPrivacy";
-import { privacyVersions } from "@/data/privacyPolicy";
+import { privacyVersions } from "@/data/classic/privacyPolicy";
 
 // 지난 버전 개인정보처리방침. 현재 버전은 /classic/privacy 에서 보여 준다.
 export function generateStaticParams() {

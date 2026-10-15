@@ -1,5 +1,5 @@
 import type { Metadata } from "next";
-import { AccessibilityChecker } from "@/components/tools/AccessibilityChecker";
+import { AccessibilityChecker } from "@/components/classic/tools/AccessibilityChecker";
 import { fitDescription } from "@/lib/seo";
 import { ToolFrame } from "@/components/classic/support/ToolFrame";
 

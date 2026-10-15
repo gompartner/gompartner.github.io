@@ -1,6 +1,6 @@
 import Link from "next/link";
 import { PageHead, wrap } from "@/components/classic/ui";
-import { privacyVersions, type PolicyVersion, type Table } from "@/data/privacyPolicy";
+import { privacyVersions, type PolicyVersion, type Table } from "@/data/classic/privacyPolicy";
 
 // 개인정보처리방침 본문(클래식 보기). 내용은 웹툰 쪽과 같은 data/privacyPolicy 를 쓴다.
 const hrefOf = (id: string) => (id === privacyVersions[0].id ? "/classic/privacy" : `/classic/privacy/${id}`);

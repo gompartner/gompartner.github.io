@@ -1,5 +1,5 @@
 import type { Metadata } from "next";
-import { UnixTimeConverter } from "@/components/tools/UnixTimeConverter";
+import { UnixTimeConverter } from "@/components/classic/tools/UnixTimeConverter";
 import { fitDescription } from "@/lib/seo";
 import { ToolFrame } from "@/components/classic/support/ToolFrame";
 

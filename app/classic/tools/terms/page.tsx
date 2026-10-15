@@ -1,5 +1,5 @@
 import type { Metadata } from "next";
-import { TermsGenerator } from "@/components/tools/TermsGenerator";
+import { TermsGenerator } from "@/components/classic/tools/TermsGenerator";
 import { fitDescription } from "@/lib/seo";
 import { ToolFrame } from "@/components/classic/support/ToolFrame";
 

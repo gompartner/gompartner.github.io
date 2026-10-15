@@ -1,7 +1,7 @@
 import type { Metadata } from "next";
 import { ClassicPrivacy } from "@/components/classic/support/ClassicPrivacy";
-import { privacyVersions } from "@/data/privacyPolicy";
-import { profile } from "@/data/profile";
+import { privacyVersions } from "@/data/classic/privacyPolicy";
+import { profile } from "@/data/classic/profile";
 import { fitDescription } from "@/lib/seo";
 
 export const metadata: Metadata = {
