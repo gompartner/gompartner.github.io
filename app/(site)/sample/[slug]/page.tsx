@@ -4,7 +4,7 @@ import type { Metadata } from "next";
 import Image from "next/image";
 import Link from "next/link";
 import { notFound } from "next/navigation";
-import { House, Play } from "lucide-react";
+import { House, MousePointerClick } from "lucide-react";
 import { ChannelTalkButton } from "@/components/layout/ChannelTalk";
 import { SampleBack } from "@/components/renewal/SampleBack";
 import { Bubble, Narration } from "@/components/renewal/ui";
@@ -161,8 +161,10 @@ export default async function SamplePage({ params }: Props) {
             <Image src={mobileShot} alt="" width={390} height={844} sizes="180px" className="aspect-[390/700] h-auto w-full object-cover object-top" />
           </span>
         )}
-        <span aria-hidden className="absolute left-1/2 top-[42%] grid h-16 w-16 -translate-x-1/2 -translate-y-1/2 scale-90 place-items-center rounded-full border-[3px] border-[#1d1d1f] bg-white opacity-0 shadow-[3px_3px_0_#1d1d1f] transition-[opacity,transform] duration-200 group-hover:scale-100 group-hover:opacity-100">
-          <Play size={26} strokeWidth={2.5} className="ml-1 text-accent" />
+        {/* 눌러서 샘플을 여는 그림이라는 걸 알리게 손가락 아이콘을 늘 보이고 둘레를 반짝인다 */}
+        <span aria-hidden className="absolute left-1/2 top-[42%] grid h-16 w-16 -translate-x-1/2 -translate-y-1/2 place-items-center rounded-full border-[3px] border-[#1d1d1f] bg-white shadow-[3px_3px_0_#1d1d1f] transition-transform duration-200 group-hover:scale-110">
+          <span className="pointer-events-none absolute inset-0 rounded-full bg-accent/40 motion-safe:animate-ping" />
+          <MousePointerClick size={26} strokeWidth={2.5} className="relative text-accent" />
         </span>
       </Link>
 
@@ -248,7 +250,7 @@ export default async function SamplePage({ params }: Props) {
         )}
         <div className="mt-6 hidden gap-3 md:flex">
           <Link href={p.demoUrl} prefetch={false} data-gtm-cta={`sample_open_${p.id}`} className={`${openButton} flex-1`}>
-            <Play size={18} strokeWidth={2.5} aria-hidden />
+            <MousePointerClick size={18} strokeWidth={2.5} aria-hidden />
             샘플 열기
           </Link>
           <ChannelTalkButton cta={`sample_chat_${p.id}`} message={`${p.title} 샘플을 보고 문의합니다.`} className={subButton}>

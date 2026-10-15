@@ -246,7 +246,7 @@ function DockButtons({ guide, projectId }: { guide: { fresh: boolean; onClick: (
           data-gtm-cta={`demo_guide_${projectId}`}
           className={`${pill} relative ${guide.fresh ? "bg-[#d9f7e3]" : ""}`}
         >
-          {guide.fresh && <span aria-hidden className="absolute inset-0 rounded-full bg-[#4ade80] opacity-50 motion-safe:animate-ping" />}
+          {guide.fresh && <span aria-hidden className="pointer-events-none absolute inset-0 rounded-full bg-[#4ade80] opacity-50 motion-safe:animate-ping" />}
           <CircleHelp size={16} aria-hidden className="relative" />
           <span className="relative">사용법 보기</span>
         </button>
