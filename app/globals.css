@@ -244,3 +244,16 @@ html[data-look="classic"] .wt .shot-print {
   transform: none;
   animation: none;
 }
+
+/* 클래식 보기에서는 웹툰 머리글과 웹툰 첫 화면을 숨기고 클래식 머리글 높이만큼 본문을 내린다 */
+html[data-look="classic"] .look-webtoon {
+  display: none;
+}
+html[data-look="classic"] #main {
+  padding-top: 64px;
+}
+@media (min-width: 768px) {
+  html[data-look="classic"] #main {
+    padding-top: 112px;
+  }
+}
