@@ -1,5 +1,5 @@
 import type { Metadata } from "next";
-import { PrivacyPolicyGenerator } from "@/components/tools/PrivacyPolicyGenerator";
+import { PrivacyPolicyGenerator } from "@/components/classic/tools/PrivacyPolicyGenerator";
 import { fitDescription } from "@/lib/seo";
 import { ToolFrame } from "@/components/classic/support/ToolFrame";
 

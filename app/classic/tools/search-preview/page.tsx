@@ -1,5 +1,5 @@
 import type { Metadata } from "next";
-import { SearchPreview } from "@/components/tools/SearchPreview";
+import { SearchPreview } from "@/components/classic/tools/SearchPreview";
 import { fitDescription } from "@/lib/seo";
 import { ToolFrame } from "@/components/classic/support/ToolFrame";
 

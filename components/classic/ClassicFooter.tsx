@@ -1,6 +1,6 @@
 import Image from "next/image";
 import Link from "next/link";
-import { profile } from "@/data/profile";
+import { profile } from "@/data/classic/profile";
 
 // 클래식 보기 바닥글. 사업자 정보는 재개업 전까지 두지 않는다.
 const menu = [

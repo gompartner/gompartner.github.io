@@ -1,5 +1,5 @@
 import type { Metadata } from "next";
-import { HostingCostCalculator } from "@/components/tools/HostingCostCalculator";
+import { HostingCostCalculator } from "@/components/classic/tools/HostingCostCalculator";
 import { fitDescription } from "@/lib/seo";
 import { ToolFrame } from "@/components/classic/support/ToolFrame";
 

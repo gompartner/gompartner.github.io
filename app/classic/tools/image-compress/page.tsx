@@ -1,5 +1,5 @@
 import type { Metadata } from "next";
-import { ImageCompressor } from "@/components/tools/ImageCompressor";
+import { ImageCompressor } from "@/components/classic/tools/ImageCompressor";
 import { fitDescription } from "@/lib/seo";
 import { ToolFrame } from "@/components/classic/support/ToolFrame";
 

@@ -1,5 +1,5 @@
 import type { Metadata } from "next";
-import { QrMaker } from "@/components/tools/QrMaker";
+import { QrMaker } from "@/components/classic/tools/QrMaker";
 import { fitDescription } from "@/lib/seo";
 import { ToolFrame } from "@/components/classic/support/ToolFrame";
 
