@@ -50,7 +50,7 @@ export default function ClassicFaqPage() {
               <MessageCircle size={18} aria-hidden />
               채팅 상담
             </ChannelTalkButton>
-            <Link href="/landing" data-gtm-cta="classic_faq_landing" className={btnLine}>
+            <Link href="/classic/contact" data-gtm-cta="classic_faq_contact" className={btnLine}>
               상담 신청
             </Link>
           </div>

@@ -37,10 +37,10 @@ const slides = [
 ].map((s) => ({ ...s, project: byId(s.id) }));
 
 const services = [
-  { href: "/landing", name: "광고 랜딩페이지", price: `${manwon(landingPlans[0].price)}부터`, what: "광고 보고 온 사람의 신청을 받는 한 페이지" },
+  { href: "/classic/landing", name: "광고 랜딩페이지", price: `${manwon(landingPlans[0].price)}부터`, what: "광고 보고 온 사람의 신청을 받는 한 페이지" },
   { href: "/classic/pricing", name: "홈페이지 제작", price: `${manwon(plans[0].price)}부터`, what: "회사와 가게 소개, 문의와 예약을 받는 홈페이지" },
   { href: "/classic/maintenance", name: "유지보수", price: "월 5만 원부터", what: "만든 홈페이지 수정과 오류 수정" },
-  { href: "/classic/works", name: "업무 프로그램", price: "별도 견적", what: "엑셀로 하던 일을 화면으로 옮기기" },
+  { href: "/classic/program", name: "업무 프로그램", price: "별도 견적", what: "엑셀로 하던 일을 화면으로 옮기기" },
 ];
 
 const h2 = "text-[30px] font-extrabold leading-[1.25] tracking-[-0.04em] md:text-[44px]";
@@ -357,7 +357,7 @@ function Band() {
           <ChannelTalkButton cta="classic_band_chat" className="inline-flex h-14 items-center rounded-md bg-white px-7 text-[17px] font-bold" >
             <span style={{ color: INK }}>채팅 상담</span>
           </ChannelTalkButton>
-          <Link href="/landing" data-gtm-cta="classic_band_landing" className="inline-flex h-14 items-center rounded-md border border-white/60 px-7 text-[17px] font-bold hover:bg-white/10">
+          <Link href="/classic/contact" data-gtm-cta="classic_band_contact" className="inline-flex h-14 items-center rounded-md border border-white/60 px-7 text-[17px] font-bold hover:bg-white/10">
             상담 신청
           </Link>
         </div>

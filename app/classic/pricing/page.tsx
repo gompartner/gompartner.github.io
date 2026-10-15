@@ -4,8 +4,7 @@ import { ChevronDown, ChevronRight } from "lucide-react";
 import { ClassicPriceCalculator } from "@/components/classic/pricing/ClassicPriceCalculator";
 import { PlanTable } from "@/components/classic/pricing/PlanTable";
 import { StepList } from "@/components/classic/pricing/StepList";
-import { serviceTabs } from "@/components/classic/pricing/tabs";
-import { PageHead, SubTabs, btnLine, btnPrimary, h2, more, wrap } from "@/components/classic/ui";
+import { PageHead, btnLine, btnPrimary, h2, more, wrap } from "@/components/classic/ui";
 import { ChannelTalkButton } from "@/components/layout/ChannelTalk";
 import { processSteps } from "@/data/classic/faq";
 import { maintenanceServices } from "@/data/classic/maintenance";
@@ -32,7 +31,6 @@ export default function ClassicPricingPage() {
   return (
     <>
       <PageHead title="가격" trail={[{ href: "/classic/pricing", label: "가격" }]} />
-      <SubTabs items={serviceTabs} current="/classic/pricing" />
 
       {/* 상품 바로가기 */}
       <nav aria-label="상품" className={`${wrap} pt-12 md:pt-16`}>
@@ -58,8 +56,8 @@ export default function ClassicPricingPage() {
             <h2 id="landing-title" className={h2}>
               광고 랜딩페이지
             </h2>
-            <Link href="/landing" className={more}>
-              상담 신청 페이지 <ChevronRight size={16} aria-hidden />
+            <Link href="/classic/landing" className={more}>
+              자세히 보기 <ChevronRight size={16} aria-hidden />
             </Link>
           </div>
           <PlanTable plans={landingPlans} product="광고 랜딩페이지" ctaPrefix="classic_pricing_chat" />
@@ -178,7 +176,7 @@ export default function ClassicPricingPage() {
             <ChannelTalkButton cta="classic_pricing_chat_program" message="업무 프로그램 견적을 받고 싶어요." className={btnPrimary}>
               업무 프로그램 상담
             </ChannelTalkButton>
-            <Link href="/classic/works" className={btnLine}>
+            <Link href="/classic/program" className={btnLine}>
               샘플 보기
             </Link>
           </div>
@@ -199,7 +197,7 @@ export default function ClassicPricingPage() {
             <ChannelTalkButton cta="classic_pricing_band_chat" className="inline-flex h-14 items-center rounded-md bg-white px-7 text-[17px] font-bold text-[#15171c] hover:bg-[#e8efff]">
               채팅 상담
             </ChannelTalkButton>
-            <Link href="/landing" data-gtm-cta="classic_pricing_band_landing" className="inline-flex h-14 items-center rounded-md border border-white/60 px-7 text-[17px] font-bold hover:bg-white/10">
+            <Link href="/classic/contact" data-gtm-cta="classic_pricing_band_contact" className="inline-flex h-14 items-center rounded-md border border-white/60 px-7 text-[17px] font-bold hover:bg-white/10">
               상담 신청
             </Link>
           </div>

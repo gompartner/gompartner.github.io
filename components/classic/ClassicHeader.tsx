@@ -13,30 +13,34 @@ import { cn } from "@/lib/utils";
 // 클래식 보기(/classic)의 머리글. 회사 홈페이지에서 흔히 쓰는 꼭대기 유틸 줄 + 내림 메뉴 구성.
 // 전화·카톡 창구는 없어서 유틸 줄에는 운영 중인 채널만 둔다.
 
+// match는 그 메뉴를 켜는 주소. 한 주소가 두 메뉴를 켜지 않게 겹치지 않게 둔다.
 export const classicMenu = [
   {
     label: "서비스",
-    href: "/classic/pricing",
+    href: "/classic/landing",
+    match: ["/classic/landing", "/classic/maintenance", "/classic/program"],
     items: [
-      { href: "/landing", label: "광고 랜딩페이지" },
-      { href: "/classic/pricing", label: "홈페이지 제작" },
+      { href: "/classic/landing", label: "광고 랜딩페이지" },
+      { href: "/classic/pricing#homepage", label: "홈페이지 제작" },
       { href: "/classic/maintenance", label: "유지보수" },
-      { href: "/classic/works", label: "업무 프로그램" },
+      { href: "/classic/program", label: "업무 프로그램" },
     ],
   },
   {
     label: "샘플",
     href: "/classic/works",
+    match: ["/classic/works", "/classic/sample"],
     items: [{ href: "/classic/works", label: "전체 샘플" }, ...industries.map((i) => ({ href: `/classic/works/${i.slug}`, label: i.label }))],
   },
-  { label: "가격", href: "/classic/pricing", items: [] },
+  { label: "가격", href: "/classic/pricing", match: ["/classic/pricing"], items: [] },
   {
     label: "고객지원",
     href: "/classic/faq",
+    match: ["/classic/faq", "/classic/tools", "/classic/privacy", "/classic/contact"],
     items: [
       { href: "/classic/faq", label: "자주 묻는 질문" },
       { href: "/classic/tools", label: "자료실" },
-      { href: "/landing", label: "상담 신청" },
+      { href: "/classic/contact", label: "상담 신청" },
     ],
   },
 ];
@@ -88,7 +92,7 @@ export function ClassicHeader() {
 
           <ul className="hidden h-full items-stretch md:flex" role="list">
             {classicMenu.map((m) => {
-              const active = m.items.some((i) => pathname.startsWith(i.href)) || pathname.startsWith(m.href);
+              const active = m.match.some((p) => pathname === p || pathname.startsWith(p + "/"));
               return (
                 <li key={m.label} className="group relative flex">
                   <Link

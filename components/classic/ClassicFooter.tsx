@@ -9,7 +9,7 @@ const menu = [
   { href: "/classic/maintenance", label: "유지보수" },
   { href: "/classic/faq", label: "자주 묻는 질문" },
   { href: "/classic/tools", label: "자료실" },
-  { href: "/landing", label: "상담 신청" },
+  { href: "/classic/contact", label: "상담 신청" },
 ];
 const channels = [
   { href: "https://blog.naver.com/gompartner", label: "네이버 블로그" },
