@@ -62,6 +62,11 @@ export function ClassicHeader() {
     setPrev(pathname);
     setOpen(false);
   }
+  // 메뉴를 눌러 이동한 뒤 초점이 메뉴에 남아 내림 메뉴가 열려 있지 않게 푼다
+  useEffect(() => {
+    const el = document.activeElement;
+    if (el instanceof HTMLElement && el.closest("header")) el.blur();
+  }, [pathname]);
   useEffect(() => {
     document.body.style.overflow = open ? "hidden" : "";
     return () => {
@@ -106,7 +111,7 @@ export function ClassicHeader() {
                     {m.items.length > 0 && <ChevronDown size={15} strokeWidth={2.5} aria-hidden className="text-[#8a929e]" />}
                   </Link>
                   {m.items.length > 0 && (
-                    <div className="invisible absolute left-1/2 top-full -translate-x-1/2 pt-px opacity-0 transition-opacity duration-150 group-hover:visible group-hover:opacity-100 group-focus-within:visible group-focus-within:opacity-100">
+                    <div className="invisible absolute left-1/2 top-full -translate-x-1/2 pt-px opacity-0 transition-opacity duration-150 group-hover:visible group-hover:opacity-100 group-has-[:focus-visible]:visible group-has-[:focus-visible]:opacity-100">
                       <ul className="min-w-[200px] border border-[#e6e9ee] border-t-2 border-t-[#256ef4] bg-white py-2 shadow-[0_12px_24px_rgba(21,23,28,.08)]" role="list">
                         {m.items.map((i) => (
                           <li key={i.label}>
