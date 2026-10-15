@@ -6,36 +6,36 @@ import { usePathname } from "next/navigation";
 import { useEffect, useState } from "react";
 import { ChevronDown, Menu, X } from "lucide-react";
 import { ChannelTalkButton } from "@/components/layout/ChannelTalk";
-import { LookToggle, useClassic } from "@/components/layout/LookToggle";
-import { industries } from "@/data/industries";
+import { LookToggle } from "@/components/layout/LookToggle";
+import { industries } from "@/data/classic/industries";
 import { cn } from "@/lib/utils";
 
-// 클래식 보기의 머리글. 회사 홈페이지에서 흔히 쓰는 꼭대기 유틸 줄 + 내림 메뉴 구성.
+// 클래식 보기(/classic)의 머리글. 회사 홈페이지에서 흔히 쓰는 꼭대기 유틸 줄 + 내림 메뉴 구성.
 // 전화·카톡 창구는 없어서 유틸 줄에는 운영 중인 채널만 둔다.
 
 export const classicMenu = [
   {
     label: "서비스",
-    href: "/pricing",
+    href: "/classic/pricing",
     items: [
       { href: "/landing", label: "광고 랜딩페이지" },
-      { href: "/pricing", label: "홈페이지 제작" },
-      { href: "/maintenance", label: "유지보수" },
-      { href: "/works", label: "업무 프로그램" },
+      { href: "/classic/pricing", label: "홈페이지 제작" },
+      { href: "/classic/maintenance", label: "유지보수" },
+      { href: "/classic/works", label: "업무 프로그램" },
     ],
   },
   {
     label: "샘플",
-    href: "/works",
-    items: [{ href: "/works", label: "전체 샘플" }, ...industries.map((i) => ({ href: `/works/${i.slug}`, label: i.label }))],
+    href: "/classic/works",
+    items: [{ href: "/classic/works", label: "전체 샘플" }, ...industries.map((i) => ({ href: `/classic/works/${i.slug}`, label: i.label }))],
   },
-  { label: "가격", href: "/pricing", items: [] },
+  { label: "가격", href: "/classic/pricing", items: [] },
   {
     label: "고객지원",
-    href: "/faq",
+    href: "/classic/faq",
     items: [
-      { href: "/faq", label: "자주 묻는 질문" },
-      { href: "/tools", label: "자료실" },
+      { href: "/classic/faq", label: "자주 묻는 질문" },
+      { href: "/classic/tools", label: "자료실" },
       { href: "/landing", label: "상담 신청" },
     ],
   },
@@ -51,7 +51,6 @@ const channels = [
 const toggle = "inline-flex h-10 w-10 items-center justify-center rounded-md border border-[#d9dee5] bg-white text-[#15171c] transition-colors hover:bg-[#eef1f5]";
 
 export function ClassicHeader() {
-  const classic = useClassic();
   const pathname = usePathname();
   const [open, setOpen] = useState(false);
   const [prev, setPrev] = useState(pathname);
@@ -65,8 +64,6 @@ export function ClassicHeader() {
       document.body.style.overflow = "";
     };
   }, [open]);
-
-  if (!classic) return null;
 
   return (
     <header className="fixed inset-x-0 top-0 z-50 bg-white">
@@ -84,7 +81,7 @@ export function ClassicHeader() {
 
       <div className="border-b border-[#e6e9ee]">
         <nav aria-label="주 메뉴" className="mx-auto flex h-16 w-full max-w-[1248px] items-center justify-between gap-6 px-4 md:h-[76px] md:px-6">
-          <Link href="/" className="flex items-center gap-2.5 text-[21px] font-extrabold tracking-[-0.04em] text-[#15171c]">
+          <Link href="/classic" className="flex items-center gap-2.5 text-[21px] font-extrabold tracking-[-0.04em] text-[#15171c]">
             <Image src="/images/bear-avatar.webp" alt="" width={32} height={32} className="h-8 w-8 rounded-full object-cover" />
             곰파트너
           </Link>

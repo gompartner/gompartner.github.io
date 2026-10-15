@@ -5,20 +5,19 @@ import Link from "next/link";
 import { useEffect, useState } from "react";
 import { ArrowUpRight, ChevronLeft, ChevronRight, Pause, Play, Plus } from "lucide-react";
 import { ChannelTalkButton } from "@/components/layout/ChannelTalk";
-import { useClassic } from "@/components/layout/LookToggle";
-import { industries } from "@/data/industries";
-import { processSteps } from "@/data/faq";
-import { projects } from "@/data/projects";
-import { blogPosts } from "@/data/stories";
-import { tools } from "@/data/tools";
-import { estimateFor, landingPlans, manwon, plans, previewDetail, previewPromise } from "@/data/pricing";
-import { fieldsById } from "@/data/workFilters";
+import { industries } from "@/data/classic/industries";
+import { processSteps } from "@/data/classic/faq";
+import { projects } from "@/data/classic/projects";
+import { blogPosts } from "@/data/classic/stories";
+import { tools } from "@/data/classic/tools";
+import { estimateFor, landingPlans, manwon, plans, previewDetail, previewPromise } from "@/data/classic/pricing";
+import { fieldsById } from "@/data/classic/workFilters";
 import { useReducedMotionSafe } from "@/hooks/useReducedMotionSafe";
 import { cn } from "@/lib/utils";
 
 // 클래식 보기의 첫 화면. 웹 에이전시형 회사 홈페이지 구성:
 // 큰 배너 슬라이드(실제 샘플 화면) → 서비스 → 업종별 샘플 → 진행 절차 → 제작 일지·자료실 → 문의 띠배너.
-// 내용은 웹툰 첫 화면과 같은 데이터(가격, 샘플, 절차)를 쓴다.
+// 내용은 클래식 전용 데이터(data/classic)를 쓴다. 웹툰 쪽과 따로 고친다.
 
 const INK = "#15171c";
 const NAVY = "#0f1b3d";
@@ -39,17 +38,15 @@ const slides = [
 
 const services = [
   { href: "/landing", name: "광고 랜딩페이지", price: `${manwon(landingPlans[0].price)}부터`, what: "광고 보고 온 사람의 신청을 받는 한 페이지" },
-  { href: "/pricing", name: "홈페이지 제작", price: `${manwon(plans[0].price)}부터`, what: "회사와 가게 소개, 문의와 예약을 받는 홈페이지" },
-  { href: "/maintenance", name: "유지보수", price: "월 5만 원부터", what: "만든 홈페이지 수정과 오류 수정" },
-  { href: "/works", name: "업무 프로그램", price: "별도 견적", what: "엑셀로 하던 일을 화면으로 옮기기" },
+  { href: "/classic/pricing", name: "홈페이지 제작", price: `${manwon(plans[0].price)}부터`, what: "회사와 가게 소개, 문의와 예약을 받는 홈페이지" },
+  { href: "/classic/maintenance", name: "유지보수", price: "월 5만 원부터", what: "만든 홈페이지 수정과 오류 수정" },
+  { href: "/classic/works", name: "업무 프로그램", price: "별도 견적", what: "엑셀로 하던 일을 화면으로 옮기기" },
 ];
 
 const h2 = "text-[30px] font-extrabold leading-[1.25] tracking-[-0.04em] md:text-[44px]";
 const more = "inline-flex items-center gap-1 text-[15px] font-bold text-[#5b6370] hover:text-[#15171c]";
 
 export function ClassicHome() {
-  const classic = useClassic();
-  if (!classic) return null;
   return (
     <div className="bg-white text-[#15171c]">
       <h1 className="sr-only">곰파트너 홈페이지 제작</h1>
@@ -100,7 +97,7 @@ function Hero() {
               {priceOf(s.id) && <p className="mt-5 text-[17px] text-[#c9d3e6] md:text-[19px]">{priceOf(s.id)}</p>}
               <div className="mt-8 flex flex-wrap gap-3">
                 <Link
-                  href={`/sample/${slugOf(s.project.demoUrl)}`}
+                  href={`/classic/sample/${slugOf(s.project.demoUrl)}`}
                   tabIndex={n === i ? 0 : -1}
                   data-gtm-cta={`classic_hero_${s.id}`}
                   className="inline-flex h-12 items-center rounded-md bg-white px-6 text-[16px] font-bold text-[#15171c] transition-colors hover:bg-[#e8efff]"
@@ -189,7 +186,7 @@ function Services() {
           <li key={s.name} className="border-b border-[#d9dee5]">
             <Link
               href={s.href}
-              data-gtm-cta={`classic_service_${s.href.slice(1)}`}
+              data-gtm-cta={`classic_service_${s.href.split("/").pop()}`}
               className="group grid grid-cols-[1fr_auto] items-center gap-x-6 gap-y-1 py-6 md:grid-cols-[minmax(0,360px)_1fr_auto_auto] md:py-8"
             >
               <span className="col-start-1 row-start-1 text-[24px] font-extrabold tracking-[-0.04em] transition-colors group-hover:text-[#256ef4] md:text-[34px]">{s.name}</span>
@@ -223,7 +220,7 @@ function Samples() {
           <h2 id="c-samples" className={h2}>
             샘플
           </h2>
-          <Link href={tab === "all" ? "/works" : `/works/${tab}`} className={more}>
+          <Link href={tab === "all" ? "/classic/works" : `/classic/works/${tab}`} className={more}>
             더보기 <Plus size={15} strokeWidth={2.5} aria-hidden />
           </Link>
         </div>
@@ -251,7 +248,7 @@ function Samples() {
             const est = estimateFor(p.id);
             return (
               <li key={p.id}>
-                <Link href={`/sample/${slugOf(p.demoUrl)}`} className="group block">
+                <Link href={`/classic/sample/${slugOf(p.demoUrl)}`} className="group block">
                   <span className="block overflow-hidden rounded-md border border-[#e1e5eb] bg-white">
                     <Image
                       src={`/images/demos/sm/${slugOf(p.demoUrl)}.jpg`}
@@ -326,7 +323,7 @@ function Boards() {
         <div>
           <div className="flex items-end justify-between border-b-2 border-[#15171c] pb-4">
             <h2 className="text-[24px] font-extrabold tracking-[-0.03em]">자료실</h2>
-            <Link href="/tools" className={more}>
+            <Link href="/classic/tools" className={more}>
               더보기 <Plus size={15} strokeWidth={2.5} aria-hidden />
             </Link>
           </div>

@@ -1,4 +1,3 @@
-import { ClassicHeader } from "@/components/classic/ClassicHeader";
 import { Header } from "@/components/layout/Header";
 import { ChannelTalk } from "@/components/layout/ChannelTalk";
 import { Footer } from "@/components/layout/Footer";
@@ -27,10 +26,7 @@ export default function SiteLayout({
       <ProfessionalServiceJsonLd />
       <WebSiteJsonLd />
       <ChannelTalk />
-      <div className="look-webtoon">
-        <Header />
-      </div>
-      <ClassicHeader />
+      <Header />
       <main id="main" className="flex-1 pt-16">
         {children}
       </main>
