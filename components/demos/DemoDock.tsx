@@ -1,10 +1,11 @@
 "use client";
 
+import Link from "next/link";
 import { useCallback, useEffect, useRef, useState } from "react";
-import { ArrowDown, ArrowUp, CircleHelp } from "lucide-react";
+import { ArrowDown, ArrowUp, CircleHelp, House } from "lucide-react";
 import type { TourStep } from "@/data/tours";
 
-// 샘플 화면 위에는 '사용법 보기' 버튼 하나만 띄운다. 금액·만든 이야기·다른 샘플은 샘플 표지(/sample/[slug])가 맡는다.
+// 샘플 화면 위에는 메인으로 가는 집 아이콘과 '사용법 보기' 버튼만 띄운다. 금액·만든 이야기·다른 샘플은 샘플 표지(/sample/[slug])가 맡는다.
 // 사용법 가이드는 프라이빗 짐 데모(HomepageDemo)의 스포트라이트 가이드와 같은 방식이다.
 // 버튼은 PC에서 왼쪽 아래, 휴대폰에서 오른쪽 아래에 두고, 데모 자체의 하단 고정 바가 있으면 그 위로 올린다.
 // 곰파트너 쪽 버튼이라 업종 사이트와 섞이지 않게 웹툰 톤(크림 바탕·먹선·단단한 그림자)으로 둔다.
@@ -102,7 +103,7 @@ export function DemoDock({ projectId, tour }: { projectId: string; tour?: TourSt
 
   return (
     <>
-      {tour?.length ? <GuideButton fresh={fresh} onClick={openGuide} projectId={projectId} /> : null}
+      <DockButtons guide={tour?.length ? { fresh, onClick: openGuide } : null} projectId={projectId} />
 
       {current && rect && (
         <div className="fixed inset-0 z-[70]" onClick={close} role="dialog" aria-modal="true" aria-label="사용법">
@@ -208,9 +209,9 @@ function bottomBarHeight(own: HTMLElement | null): number {
   return Math.max(vh - top, 0);
 }
 
-/** 사용법 보기 버튼. 한 번도 열지 않았으면 초록으로 반짝인다. */
-function GuideButton({ fresh, onClick, projectId }: { fresh: boolean; onClick: () => void; projectId: string }) {
-  const own = useRef<HTMLButtonElement>(null);
+/** 메인으로 가는 집 아이콘과 사용법 보기 버튼. 사용법은 한 번도 열지 않았으면 초록으로 반짝인다. */
+function DockButtons({ guide, projectId }: { guide: { fresh: boolean; onClick: () => void } | null; projectId: string }) {
+  const own = useRef<HTMLDivElement>(null);
   const [lift, setLift] = useState(0);
   useEffect(() => {
     let frame = 0;
@@ -230,17 +231,26 @@ function GuideButton({ fresh, onClick, projectId }: { fresh: boolean; onClick: (
     };
   }, []);
   return (
-    <button
+    <div
       ref={own}
-      type="button"
-      onClick={onClick}
-      data-gtm-cta={`demo_guide_${projectId}`}
       style={{ bottom: `calc(${lift}px + 16px + env(safe-area-inset-bottom))` }}
-      className={`${pill} print:hidden fixed right-4 z-50 transition-[bottom,transform,box-shadow,background-color] md:left-5 md:right-auto ${fresh ? "bg-[#d9f7e3]" : ""}`}
+      className="print:hidden fixed right-4 z-50 flex items-center gap-2 transition-[bottom] md:left-5 md:right-auto"
     >
-      {fresh && <span aria-hidden className="absolute inset-0 rounded-full bg-[#4ade80] opacity-50 motion-safe:animate-ping" />}
-      <CircleHelp size={16} aria-hidden className="relative" />
-      <span className="relative">사용법 보기</span>
-    </button>
+      <Link href="/" aria-label="곰파트너 메인으로" title="곰파트너 메인으로" data-gtm-cta={`demo_home_${projectId}`} className="grid h-10 w-10 place-items-center rounded-full border-[2.5px] border-[#1d1d1f] bg-[#fffdf8] text-[#1d1d1f] shadow-[3px_3px_0_#1d1d1f] transition-[transform,box-shadow,background-color] duration-150 hover:bg-[#fff3b0] active:translate-x-[3px] active:translate-y-[3px] active:shadow-none">
+        <House size={17} aria-hidden />
+      </Link>
+      {guide && (
+        <button
+          type="button"
+          onClick={guide.onClick}
+          data-gtm-cta={`demo_guide_${projectId}`}
+          className={`${pill} relative ${guide.fresh ? "bg-[#d9f7e3]" : ""}`}
+        >
+          {guide.fresh && <span aria-hidden className="absolute inset-0 rounded-full bg-[#4ade80] opacity-50 motion-safe:animate-ping" />}
+          <CircleHelp size={16} aria-hidden className="relative" />
+          <span className="relative">사용법 보기</span>
+        </button>
+      )}
+    </div>
   );
 }
