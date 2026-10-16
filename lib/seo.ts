@@ -2,6 +2,23 @@
 // 문장 단위로 앞에서부터 담고, 첫 문장부터 넘치면 쉼표나 띄어쓰기에서 끊는다.
 export const DESCRIPTION_MAX = 80;
 
+// 공유 미리보기 이미지. 루트 레이아웃과 페이지별 메타가 같이 쓴다.
+export const OG_IMAGE = { url: "/og-image.png?v=20261014", width: 1200, height: 630, alt: "곰파트너" };
+
+// 하위 페이지가 openGraph를 따로 정하지 않으면 홈 제목과 설명이 그대로 공유된다.
+// 페이지 제목과 설명으로 openGraph, twitter를 같이 채운다.
+export function pageMeta(opts: { title: string; description: string; path: string }) {
+  const description = fitDescription(opts.description);
+  const title = `${opts.title} | 곰파트너`;
+  return {
+    title: opts.title,
+    description,
+    alternates: { canonical: opts.path },
+    openGraph: { type: "website" as const, locale: "ko_KR", siteName: "곰파트너", url: opts.path, title, description, images: [OG_IMAGE] },
+    twitter: { card: "summary_large_image" as const, title, description, images: [OG_IMAGE.url] },
+  };
+}
+
 export function fitDescription(text: string, max = DESCRIPTION_MAX): string {
   const s = text.replace(/\s+/g, " ").trim();
   if (s.length <= max) return s;

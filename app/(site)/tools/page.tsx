@@ -1,11 +1,13 @@
 import type { Metadata } from "next";
 import { ToolBoard } from "@/components/tools/ToolBoard";
-import { fitDescription } from "@/lib/seo";
+import { pageMeta } from "@/lib/seo";
 
 export const metadata: Metadata = {
-  title: "자료실",
-  description: fitDescription("개인정보처리방침·이용약관 생성기, 웹접근성 점검표, QR코드, 이미지 용량 줄이기 같은 무료 도구입니다."),
-  alternates: { canonical: "/tools" },
+  ...pageMeta({
+    title: "자료실",
+    description: "개인정보처리방침·이용약관 생성기, 웹접근성 점검표, QR코드, 이미지 용량 줄이기 같은 무료 도구입니다.",
+    path: "/tools",
+  }),
 };
 
 export default function ToolsPage() {

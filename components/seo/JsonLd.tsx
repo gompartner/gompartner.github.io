@@ -1,5 +1,4 @@
 import { profile } from "@/data/profile";
-import { plans } from "@/data/pricing";
 import { siteUrl } from "@/lib/site";
 
 // 같은 이름의 다른 회사와 구분되도록 외부 프로필을 묶는다.
@@ -53,19 +52,6 @@ export function ProfessionalServiceJsonLd() {
     email: profile.email,
     areaServed: "KR",
     sameAs,
-    priceRange: `₩${plans[0].price.toLocaleString("ko-KR")}~₩${plans[plans.length - 1].price.toLocaleString("ko-KR")}`,
-    hasOfferCatalog: {
-      "@type": "OfferCatalog",
-      name: "홈페이지 제작 패키지",
-      itemListElement: plans.map((p) => ({
-        "@type": "Offer",
-        name: p.title,
-        description: `${p.summary}. ${p.includes.join(", ")}. 작업 ${p.days}일.`,
-        price: p.price,
-        priceCurrency: "KRW",
-        url: `${siteUrl}/pricing`,
-      })),
-    },
     address: {
       "@type": "PostalAddress",
       addressLocality: "서울",
@@ -96,6 +82,30 @@ export function WebSiteJsonLd() {
       "@type": "Person",
       name: profile.name,
     },
+  };
+
+  return (
+    <script
+      type="application/ld+json"
+      dangerouslySetInnerHTML={{ __html: JSON.stringify(schema) }}
+    />
+  );
+}
+
+// 구글 AI 개요가 "곰파트너"를 곰앤컴퍼니의 곰랩 파트너스로 설명해서, 브랜드 자체를 따로 밝힌다.
+export function OrganizationJsonLd() {
+  const schema = {
+    "@context": "https://schema.org",
+    "@type": "Organization",
+    name: profile.name,
+    alternateName: [profile.nameEn, "gompartner"],
+    url: siteUrl,
+    logo: `${siteUrl}/apple-icon.png`,
+    description: profile.bio,
+    disambiguatingDescription: "소상공인 홈페이지 제작과 유지보수를 하는 1인 웹 개발 브랜드. 곰앤컴퍼니의 곰랩 파트너스와 관계없음.",
+    email: profile.email,
+    areaServed: "KR",
+    sameAs,
   };
 
   return (

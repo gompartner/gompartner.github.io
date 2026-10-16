@@ -9,6 +9,7 @@ import { ThemeProvider } from "@/components/layout/ThemeProvider";
 import { profile } from "@/data/profile";
 import { homeDescription, homeTitle } from "@/data/seo";
 import { GTM_ID } from "@/lib/analytics";
+import { OG_IMAGE } from "@/lib/seo";
 import { siteUrl } from "@/lib/site";
 
 // 실사용 글리프만 담은 서브셋(152KB) — 원본 2MB는 assets/fonts에 보관,
@@ -38,7 +39,7 @@ export const metadata: Metadata = {
     template: `%s | ${profile.name}`,
   },
   description: siteDescription,
-  keywords: ["홈페이지 제작", "랜딩페이지 제작", "홈페이지 제작 비용", "홈페이지 유지보수", "업무 프로그램 개발", profile.name],
+  keywords: ["홈페이지 제작", "홈페이지 유지보수", "도메인 만료", "SSL 인증서", "랜딩페이지 제작", "업무 프로그램 개발", profile.name, "gompartner"],
   authors: [{ name: profile.name }],
   creator: profile.name,
   openGraph: {
@@ -48,20 +49,13 @@ export const metadata: Metadata = {
     siteName: profile.name,
     title: siteTitle,
     description: siteDescription,
-    images: [
-      {
-        url: "/og-image.png?v=20261014",
-        width: 1200,
-        height: 630,
-        alt: `${profile.name} 랜딩페이지·홈페이지·유지보수·업무 프로그램`,
-      },
-    ],
+    images: [{ ...OG_IMAGE, alt: `${profile.name}, 사장님 홈페이지와 IT 문제` }],
   },
   twitter: {
     card: "summary_large_image",
     title: siteTitle,
     description: siteDescription,
-    images: ["/og-image.png?v=20261014"],
+    images: [OG_IMAGE.url],
   },
   verification: {
     other: { "naver-site-verification": ["1c5242ef5ddbce4e807bad7225bb0770a1cb06c1", "184bef35395b609c58d44964bf16993e76c0dd50"] },

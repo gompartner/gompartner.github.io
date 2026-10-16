@@ -12,7 +12,7 @@ import { projects } from "@/data/projects";
 import { estimateFor, formatWon, manwon } from "@/data/pricing";
 import { samplePalettes } from "@/data/samplePalettes";
 import { scenarios, type Scene } from "@/data/scenes";
-import { fitDescription } from "@/lib/seo";
+import { pageMeta } from "@/lib/seo";
 import { productOf } from "@/lib/product";
 import { maintenanceServices } from "@/data/maintenance";
 
@@ -33,12 +33,7 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
   const { slug } = await params;
   const p = find(slug);
   if (!p) return {};
-  const est = estimateFor(p.id);
-  return {
-    title: `${p.title} 샘플 소개`,
-    description: fitDescription(est ? `비슷하게 만들면 ${manwon(est.total)}, ${est.days}일. ${p.description}` : p.description),
-    alternates: { canonical: `/sample/${slug}` },
-  };
+  return pageMeta({ title: `${p.title} 샘플 소개`, description: p.description, path: `/sample/${slug}` });
 }
 
 const openButton =
