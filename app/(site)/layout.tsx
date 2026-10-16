@@ -3,6 +3,7 @@ import { ChannelTalk } from "@/components/layout/ChannelTalk";
 import { Footer } from "@/components/layout/Footer";
 import { MobileCtaBar } from "@/components/layout/MobileCtaBar";
 import {
+  OrganizationJsonLd,
   PersonJsonLd,
   ProfessionalServiceJsonLd,
   WebSiteJsonLd,
@@ -22,6 +23,7 @@ export default function SiteLayout({
       >
         본문 바로가기
       </a>
+      <OrganizationJsonLd />
       <PersonJsonLd />
       <ProfessionalServiceJsonLd />
       <WebSiteJsonLd />

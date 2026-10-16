@@ -1,11 +1,7 @@
-import { landingPlans, manwon, plans } from "./pricing";
 import { profile } from "./profile";
 
-// 첫 화면 검색 제목·설명. 첫 화면이 서비스 네 갈래(광고 랜딩·회사 홈페이지·유지보수·업무 프로그램)를 고르는 웹툰이라 제목도 네 가지를 담는다.
-// 가격은 데이터에서 계산한다.
-const [basic] = plans;
-
-export const homeTitle = `랜딩페이지·홈페이지 제작, 유지보수, 업무 프로그램 | ${profile.name}`;
+// 첫 화면 검색 제목·설명. 유튜브, 인스타, 클립 소개와 같은 첫 문장을 쓴다.
+// 가격은 /pricing에만 둔다(검색 결과 설명에는 넣지 않음).
+export const homeTitle = `${profile.name} | 사장님 홈페이지와 IT 문제, 제작과 유지보수`;
 export const homeDescription =
-  `광고 신청 랜딩페이지 ${manwon(landingPlans[0].price)}부터, 회사·가게 홈페이지 ${manwon(basic.price)}부터. ` +
-  `유지보수와 업무 프로그램도 만듭니다. 샘플을 직접 눌러 보세요.`;
+  "사장님이 업체에 묻기 애매한 홈페이지와 IT 문제를 짧게 알려 드려요. 홈페이지 제작과 유지보수도 맡아요.";

@@ -3,7 +3,7 @@ import Image from "next/image";
 import { Check, ChevronDown, X } from "lucide-react";
 import { ChannelTalkButton } from "@/components/layout/ChannelTalk";
 import { ProcessSteps } from "@/components/landing/ProcessSteps";
-import { fitDescription } from "@/lib/seo";
+import { pageMeta } from "@/lib/seo";
 import {
   maintenanceServices,
   maintenanceSteps,
@@ -11,9 +11,11 @@ import {
 } from "@/data/maintenance";
 
 export const metadata: Metadata = {
-  title: "홈페이지 유지보수 비용 (월 관리, 오류 수정)",
-  description: fitDescription("월 유지보수 5만 원, 오류 수정 건당 5만 원부터, 다른 업체가 만든 홈페이지 인계 점검 10만 원. 하는 일과 맡지 않는 일을 적었습니다."),
-  alternates: { canonical: "/maintenance" },
+  ...pageMeta({
+    title: "홈페이지 유지보수 (월 관리, 오류 수정)",
+    description: "만든 홈페이지가 갑자기 안 열리거나 주소창에 경고가 뜰 때 무엇부터 볼지와, 월 관리로 맡는 일과 맡지 않는 일을 적었어요.",
+    path: "/maintenance",
+  }),
 };
 
 const h1 = "text-[32px] leading-[1.25] md:text-[44px]";

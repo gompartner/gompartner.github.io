@@ -7,12 +7,14 @@ import { ChannelTalkButton } from "@/components/layout/ChannelTalk";
 import { PriceCalculator } from "@/components/renewal/PriceCalculator";
 import { maintenanceServices } from "@/data/maintenance";
 import { landingPlans, manwon, plans } from "@/data/pricing";
-import { fitDescription } from "@/lib/seo";
+import { pageMeta } from "@/lib/seo";
 
 export const metadata: Metadata = {
-  title: "홈페이지 제작 비용·가격표",
-  description: fitDescription(`${plans.map((p) => `${p.title} ${manwon(p.price)}`).join(", ")}. 예약, 결제, 회원가입 같은 추가 기능 가격도 함께 적었습니다.`),
-  alternates: { canonical: "/pricing" },
+  ...pageMeta({
+    title: "홈페이지 제작 비용·가격표",
+    description: `${plans.map((p) => `${p.title} ${manwon(p.price)}`).join(", ")}. 예약, 결제, 회원가입 같은 추가 기능 가격도 함께 적었습니다.`,
+    path: "/pricing",
+  }),
 };
 
 const h2 = "text-[24px] font-bold leading-[1.5] tracking-[-0.01em] md:text-[32px]";
