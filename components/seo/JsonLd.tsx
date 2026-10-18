@@ -23,7 +23,6 @@ export function PersonJsonLd() {
     knowsAbout: [
       "홈페이지 구축",
       "홈페이지 유지보수",
-      "공공기관 홈페이지 개편",
       "웹접근성 개선",
       "레거시 시스템 고도화",
       "Java Spring",

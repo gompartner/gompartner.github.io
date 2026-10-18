@@ -11,7 +11,7 @@ import { pageMeta } from "@/lib/seo";
 export const metadata: Metadata = {
   ...pageMeta({
     title: "홈페이지 제작 샘플",
-    description: `쇼핑몰, 펜션, 회사, 병원, 학원, 카페, 공공기관 홈페이지와 업무 프로그램 샘플 ${projects.length}개. 샘플을 직접 눌러 볼 수 있어요.`,
+    description: `쇼핑몰, 펜션, 회사, 병원, 학원, 카페 홈페이지와 랜딩페이지 샘플 ${projects.length}개. 샘플을 직접 눌러 볼 수 있어요.`,
     path: "/works",
   }),
 };
