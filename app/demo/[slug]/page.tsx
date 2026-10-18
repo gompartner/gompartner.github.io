@@ -2,7 +2,7 @@ import type { Metadata } from "next";
 import type { ComponentType } from "react";
 import { notFound } from "next/navigation";
 import dynamic from "next/dynamic";
-import { projects } from "@/data/projects";
+import { allProjects as projects, hiddenIds } from "@/data/projects";
 import { estimateFor, manwon } from "@/data/pricing";
 import { fitDescription } from "@/lib/seo";
 
@@ -117,6 +117,7 @@ export async function generateMetadata({ params }: DemoPageProps): Promise<Metad
     title,
     description,
     alternates: { canonical: `/demo/${slug}` },
+    ...(hiddenIds.has(demo.id) && { robots: { index: false, follow: false } }),
     openGraph: {
       title,
       description,

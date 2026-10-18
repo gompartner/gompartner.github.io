@@ -1,8 +1,9 @@
 import type { Project } from "@/lib/types";
+import { hiddenIds } from "@/data/projects";
 
 // 모든 데모는 가상 기관·가상 데이터로 만든다. 실제 고객명은 쓰지 않는다.
 // 순서는 크몽 업종별 판매량 순(쇼핑몰, 숙박, 기업, 병원, 법률, 세무, 부동산, 가게, 업무 프로그램, 공공)이다.
-export const projects: Project[] = [
+const allProjects: Project[] = [
   {
     id: "online-store",
     kind: "신규 제작",
@@ -448,6 +449,9 @@ export const projects: Project[] = [
     demoUrl: "/demo/retirement-calculator",
   },
 ];
+
+// 내린 샘플은 data/projects.ts의 hiddenIds와 같다.
+export const projects = allProjects.filter((p) => !hiddenIds.has(p.id));
 
 // 실제 작업 이력: SW기술자 경력관리시스템에 기업 확인된 기술경력과 업무 메일 기준.
 // 부업으로 운영하므로 발주처·회사명은 쓰지 않고 업종과 기간만 쓴다.

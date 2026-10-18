@@ -1,5 +1,6 @@
 // 홈페이지 제작 패키지. 크몽 서비스(#796239)의 가격, 작업 기간과 같게 맞춘다.
 // 업무 프로그램(결과지, 관리자, 자동화, LMS 등)은 패키지 없이 별도 견적이다.
+import { hiddenIds } from "@/data/projects";
 
 export type PlanId = "basic" | "standard" | "premium";
 /** 한 쪽짜리 랜딩페이지. 크몽 랜딩페이지 서비스와 같게 맞춘다. */
@@ -97,7 +98,7 @@ export const runningCostNote =
 /** 이 패키지를 바탕으로 만든 샘플(견적 기준). 가격표 카드에 예시로 붙인다. */
 export function samplesForPlan(planId: PlanId | LandingPlanId) {
   return Object.entries(estimateSource)
-    .filter(([, src]) => src.plan === planId)
+    .filter(([id, src]) => src.plan === planId && !hiddenIds.has(id))
     .map(([id]) => ({ id, total: estimateFor(id)!.total }))
     .sort((a, b) => a.total - b.total);
 }

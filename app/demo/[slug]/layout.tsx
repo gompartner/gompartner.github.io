@@ -1,6 +1,6 @@
 import { DemoDock } from "@/components/demos/DemoDock";
 import { HideInFrame } from "@/components/demos/HideInFrame";
-import { projects } from "@/data/projects";
+import { allProjects as projects } from "@/data/projects";
 import { tours } from "@/data/tours";
 
 export default async function DemoLayout({
