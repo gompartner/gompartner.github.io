@@ -433,7 +433,7 @@ export function JobPortalDemo() {
             className="flex shrink-0 items-center gap-2"
           >
             {/* eslint-disable-next-line @next/next/no-img-element -- 메인 사이트와 같은 곰 로고 */}
-            <img src="/images/logo.svg" alt="" aria-hidden width={28} height={28} className="h-7 w-7 shrink-0" />
+            <img src="/images/logo-bear.png" alt="" aria-hidden width={28} height={28} className="h-7 w-7 shrink-0" />
             <span className="flex flex-col items-start whitespace-nowrap">
               <span className={`${display.className} text-[22px] leading-none tracking-[-0.01em]`}>곰파트너</span>
               <span className="mt-1 rounded-[3px] bg-[#ffd23f] px-1 text-[12px] font-semibold leading-[1.4] text-[#1b2a4a]">채용 포털 샘플</span>

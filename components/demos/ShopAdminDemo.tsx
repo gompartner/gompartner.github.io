@@ -228,7 +228,7 @@ export function ShopAdminDemo() {
       <aside className="fixed inset-y-0 left-0 hidden w-56 flex-col border-r px-4 py-5 lg:flex" style={{ background: C.text, borderColor: C.rule }}>
           <p className="flex items-center gap-2 px-2 text-white">
             {/* eslint-disable-next-line @next/next/no-img-element */}
-            <img src="/images/logo.svg" alt="" aria-hidden width={26} height={26} className="h-[26px] w-[26px] shrink-0" />
+            <img src="/images/logo-bear.png" alt="" aria-hidden width={26} height={26} className="h-[26px] w-[26px] shrink-0" />
             <span className="text-[16px] font-bold whitespace-nowrap">곰파트너</span>
           </p>
           <p className="px-2 text-[13px] whitespace-nowrap" style={{ color: "#9ca3af" }}>쇼핑몰 관리자 샘플</p>
@@ -255,7 +255,7 @@ export function ShopAdminDemo() {
           <div>
             <p className="flex items-center gap-1.5 lg:hidden" style={{ color: C.action }}>
               {/* eslint-disable-next-line @next/next/no-img-element */}
-              <img src="/images/logo.svg" alt="" aria-hidden width={24} height={24} className="h-6 w-6 shrink-0" />
+              <img src="/images/logo-bear.png" alt="" aria-hidden width={24} height={24} className="h-6 w-6 shrink-0" />
               <span className="sr-only">곰파트너 쇼핑몰 관리자 샘플</span>
               <span aria-hidden className="flex items-baseline gap-1 whitespace-nowrap">
                 <span className="text-[16px] font-bold">곰파트너</span>

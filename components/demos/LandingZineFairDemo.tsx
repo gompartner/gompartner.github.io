@@ -163,7 +163,7 @@ export function LandingZineFairDemo() {
       <header className="relative z-10 mx-auto flex max-w-[1200px] items-center justify-between gap-3 px-4 py-4 md:px-6">
         <span className="inline-flex min-w-0 items-center gap-2" style={{ color: C.black }}>
           {/* eslint-disable-next-line @next/next/no-img-element -- 메인 사이트와 같은 곰 로고 */}
-          <img src="/images/logo.svg" alt="" aria-hidden width={28} height={28} className="h-7 w-7 shrink-0" />
+          <img src="/images/logo-bear.png" alt="" aria-hidden width={28} height={28} className="h-7 w-7 shrink-0" />
           <span className="flex flex-col whitespace-nowrap leading-none">
             <span className="text-[22px]" style={dF}>
               {NAME}

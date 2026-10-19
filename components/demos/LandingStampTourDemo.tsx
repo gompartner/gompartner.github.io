@@ -176,7 +176,7 @@ export function LandingStampTourDemo() {
         <div className="flex items-center justify-between gap-3 border-b pb-2.5 text-[12px] font-semibold tracking-[0.08em] md:text-[13px]" style={{ borderColor: C.rule }}>
           <span className="inline-flex min-w-0 items-center gap-2 tracking-normal">
             {/* eslint-disable-next-line @next/next/no-img-element -- 메인 사이트와 같은 곰 로고 */}
-            <img src="/images/logo.svg" alt="" aria-hidden width={28} height={28} className="h-7 w-7 shrink-0" />
+            <img src="/images/logo-bear.png" alt="" aria-hidden width={28} height={28} className="h-7 w-7 shrink-0" />
             <span className="flex flex-col whitespace-nowrap leading-tight">
               <span className="text-[15px] font-bold" style={serifF}>
                 {ORG}

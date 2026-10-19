@@ -552,7 +552,7 @@ function Logo({ light = false }: { light?: boolean }) {
   return (
     <span className="inline-flex items-center gap-2.5">
       {/* eslint-disable-next-line @next/next/no-img-element -- 메인 사이트와 같은 곰 로고 */}
-      <img src="/images/logo.svg" alt="" aria-hidden width={32} height={32} className="h-8 w-8 shrink-0" />
+      <img src="/images/logo-bear.png" alt="" aria-hidden width={32} height={32} className="h-8 w-8 shrink-0" />
       <span className="flex flex-col whitespace-nowrap text-left leading-[1.15]" style={{ color: fg }}>
         <span className="text-[18px] font-bold tracking-[-0.02em] md:text-[19px]">곰파트너</span>
         <span className="text-[11px] font-bold opacity-75">법률사무소 샘플</span>

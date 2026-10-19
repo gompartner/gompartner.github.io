@@ -394,7 +394,7 @@ export function ExcelAutomationDemo() {
       <header className="print:hidden border-b" style={{ background: C.action, borderColor: C.action }}>
         <div className="flex flex-wrap items-center gap-3 px-4 py-3 text-white md:px-6">
           {/* eslint-disable-next-line @next/next/no-img-element */}
-          <img src="/images/logo.svg" alt="" aria-hidden width={28} height={28} className="h-7 w-7 shrink-0" />
+          <img src="/images/logo-bear.png" alt="" aria-hidden width={28} height={28} className="h-7 w-7 shrink-0" />
           <div className="mr-auto min-w-0">
             <p className="flex items-baseline gap-1 whitespace-nowrap">
               <span className="sr-only">곰파트너 주문취합 샘플</span>

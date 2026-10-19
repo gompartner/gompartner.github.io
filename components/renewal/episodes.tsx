@@ -356,7 +356,7 @@ export function MaintenanceEpisode() {
               transition={{ duration: 0.22, delay: i * 0.45 }}
               className={who === "me" ? "flex justify-end" : "flex items-end gap-2"}
             >
-              {who === "gom" && <Image src="/images/logo.svg" alt="곰파트너" width={30} height={30} className="h-[30px] w-[30px]" />}
+              {who === "gom" && <Image src="/images/logo-bear.png" alt="곰파트너" width={30} height={30} className="h-[30px] w-[30px]" />}
               <span className={who === "me" ? "max-w-[80%] rounded-[16px] rounded-br-[4px] bg-[#ffe45c] px-4 py-2.5 text-[15px] font-bold md:text-[16px]" : "max-w-[80%] rounded-[16px] rounded-bl-[4px] bg-white px-4 py-2.5 text-[15px] md:text-[16px]"}>
                 {text}
               </span>

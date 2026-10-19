@@ -253,7 +253,7 @@ function SiteHeader({ screen, go }: { screen: Screen; go: Go }) {
       <div className="mx-auto flex max-w-[1200px] flex-wrap items-center justify-between px-4 md:h-[72px] md:flex-nowrap md:px-6">
         <button type="button" onClick={() => go("home")} className="flex h-14 items-center gap-2.5 md:h-auto" aria-label="곰파트너 메인">
           {/* eslint-disable-next-line @next/next/no-img-element */}
-          <img src="/images/logo.svg" alt="" aria-hidden width={30} height={30} className="h-[30px] w-[30px] shrink-0" />
+          <img src="/images/logo-bear.png" alt="" aria-hidden width={30} height={30} className="h-[30px] w-[30px] shrink-0" />
           <span aria-hidden className="flex items-baseline gap-1 whitespace-nowrap">
             <span className="text-[18px] font-bold" style={{ color: NAVY }}>
               곰파트너

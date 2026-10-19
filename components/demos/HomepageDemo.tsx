@@ -608,7 +608,7 @@ export function HomepageDemo() {
         <div className="flex flex-wrap items-center justify-between gap-x-3 gap-y-3 px-4 py-5 text-white sm:flex-nowrap sm:px-8">
           <button type="button" onClick={() => goHome("top")} className="flex shrink-0 items-center gap-2" aria-label="곰파트너 홈">
             {/* eslint-disable-next-line @next/next/no-img-element */}
-            <img src="/images/logo.svg" alt="" aria-hidden width={28} height={28} className="h-7 w-7 shrink-0" />
+            <img src="/images/logo-bear.png" alt="" aria-hidden width={28} height={28} className="h-7 w-7 shrink-0" />
             <span className="inline-flex items-baseline gap-1.5 whitespace-nowrap">
               <span className="text-lg font-black tracking-wider">곰파트너</span>
               <span className="text-[11px] font-bold opacity-80">프라이빗 짐 샘플</span>
@@ -1352,7 +1352,7 @@ export function HomepageDemo() {
           <div>
             <p className="flex items-center gap-2 text-white">
               {/* eslint-disable-next-line @next/next/no-img-element */}
-              <img src="/images/logo.svg" alt="" aria-hidden width={24} height={24} className="h-6 w-6 shrink-0" />
+              <img src="/images/logo-bear.png" alt="" aria-hidden width={24} height={24} className="h-6 w-6 shrink-0" />
               <span className="inline-flex items-baseline gap-1.5">
                 <span className="font-black tracking-wider">곰파트너</span>
                 <span className="text-[10px] font-bold opacity-80">프라이빗 짐 샘플</span>

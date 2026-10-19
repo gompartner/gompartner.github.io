@@ -154,7 +154,7 @@ function Logo({ light = false }: { light?: boolean }) {
   return (
     <span className="inline-flex items-center gap-2" style={{ color: light ? C.white : C.ink }}>
       {/* eslint-disable-next-line @next/next/no-img-element */}
-      <img src="/images/logo.svg" alt="" aria-hidden width={30} height={30} className="h-[30px] w-[30px] shrink-0" />
+      <img src="/images/logo-bear.png" alt="" aria-hidden width={30} height={30} className="h-[30px] w-[30px] shrink-0" />
       <span className="inline-flex items-baseline gap-1.5 whitespace-nowrap">
         <span className="text-[22px] font-extrabold tracking-[-0.03em]">곰파트너</span>
         <span className="text-[14px] font-semibold opacity-80">렌탈 샘플</span>

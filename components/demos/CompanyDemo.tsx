@@ -402,7 +402,7 @@ function Logo() {
   return (
     <span className="inline-flex min-w-0 max-w-full items-center gap-2.5">
       {/* eslint-disable-next-line @next/next/no-img-element */}
-      <img src="/images/logo.svg" alt="" aria-hidden width={28} height={28} className="h-7 w-7 shrink-0" />
+      <img src="/images/logo-bear.png" alt="" aria-hidden width={28} height={28} className="h-7 w-7 shrink-0" />
       <span className="flex min-w-0 items-baseline gap-1.5 whitespace-nowrap">
         <span className="text-[18px] font-bold tracking-[-0.02em] sm:text-[20px]">{lang === "ko" ? "곰파트너" : "Gompartner"}</span>
         <span className="truncate text-[11px] font-bold sm:text-[12px]" style={{ opacity: 0.75 }}>
