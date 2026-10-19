@@ -26,6 +26,7 @@ import {
 } from "lucide-react";
 import { useLocalStorage } from "@/hooks/useLocalStorage";
 import { useDemoToday } from "@/hooks/useDemoToday";
+import { DemoMakerInfo } from "@/components/demos/DemoMakerInfo";
 
 const STORAGE_KEY = "gs-demo:homepage:v4";
 
@@ -1357,16 +1358,7 @@ export function HomepageDemo() {
                 <span className="text-[10px] font-bold opacity-80">프라이빗 짐 샘플</span>
               </span>
             </p>
-            <dl className="mt-3 grid grid-cols-[auto_1fr] gap-x-3 gap-y-1 text-xs">
-              <dt>상호</dt>
-              <dd className="text-stone-300">곰파트너</dd>
-              <dt>대표자</dt>
-              <dd className="text-stone-300">김ㅎ준</dd>
-              <dt>사업자등록번호</dt>
-              <dd className="text-stone-300">000-00-00000</dd>
-              <dt>고객센터</dt>
-              <dd className="text-stone-300">02-000-0000 (24시간)</dd>
-            </dl>
+            <DemoMakerInfo className="mt-3" />
           </div>
           <div className="flex flex-wrap items-center gap-5 text-xs">
             <a href="#top" className="hover:text-white">이용약관</a>

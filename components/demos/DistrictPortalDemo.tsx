@@ -25,6 +25,7 @@ import {
   X,
 } from "lucide-react";
 import { useReducedMotionSafe } from "@/hooks/useReducedMotionSafe";
+import { DemoMakerInfo } from "@/components/demos/DemoMakerInfo";
 
 // 구청 샘플 대표 홈페이지 데모. 가상 자치구, 가상 데이터.
 // 대표색은 저녁 하천빛 남색(#13233f)과 노을 주황(#e8562a). 주황은 그래픽·배경에만 쓰고
@@ -1313,15 +1314,7 @@ export function DistrictPortalDemo() {
               </li>
             </ul>
             <div className="mt-6 flex flex-wrap items-end justify-between gap-6">
-              <address className="text-[15px] not-italic leading-[1.7]">
-                (00000) ㄱㅇ시 ㅎㄷ구 ㅎㄷ로 100
-                <br />
-                대표전화 02-000-0000 (평일 09:00 ~ 18:00)
-                <br />
-                당직실(야간·공휴일) 02-000-0119
-                <br />
-                곰파트너 홈페이지의 모든 콘텐츠는 저작권법의 보호를 받습니다.
-              </address>
+              <DemoMakerInfo />
               <div className="flex h-14 w-32 items-center justify-center rounded-[6px] border border-[#3a4c6d] text-center text-[13px] leading-[1.3]">
                 웹 접근성
                 <br />

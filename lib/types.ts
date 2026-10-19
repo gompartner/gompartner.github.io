@@ -7,6 +7,7 @@ export interface Profile {
   bio: string;
   location: string;
   email: string;
+  phone: string;
   avatarUrl: string;
 }
 

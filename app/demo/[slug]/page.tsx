@@ -117,7 +117,8 @@ export async function generateMetadata({ params }: DemoPageProps): Promise<Metad
     title,
     description,
     alternates: { canonical: `/demo/${slug}` },
-    ...(hiddenIds.has(demo.id) && { robots: { index: false, follow: false } }),
+    // 데모는 가짜 상호가 든 화면이라 검색에서 빼고, 소개 페이지(/sample)로 검색 유입을 모은다.
+    robots: hiddenIds.has(demo.id) ? { index: false, follow: false } : { index: false, follow: true },
     openGraph: {
       title,
       description,

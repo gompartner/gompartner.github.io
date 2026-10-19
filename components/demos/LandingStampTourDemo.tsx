@@ -7,6 +7,7 @@ import { Check, ChevronDown, Lock, MapPin, Minus, Plus, RotateCcw } from "lucide
 import { useReducedMotionSafe } from "@/hooks/useReducedMotionSafe";
 import { maskName, maskPhone } from "@/components/demos/LeadReceivedPanel";
 import { useDemoToday } from "@/hooks/useDemoToday";
+import { DemoMakerInfo } from "@/components/demos/DemoMakerInfo";
 
 /* 광복절 기념 스탬프 투어 랜딩 샘플: 가상의 ㅇㅇ구 문화재단이 여는 "독립의 길" 스탬프 투어.
    기관, 동네, 장소, 해설사, 담당자 이름은 모두 가상이다. 실제 인물·건물을 사실처럼 적지 않는다.
@@ -321,7 +322,7 @@ export function LandingStampTourDemo() {
             <p className="text-[15px] font-bold" style={{ ...serifF, color: C.ink }}>
               {ORG}
             </p>
-            <p>서울 ㅇㅇ구 ㅇㅇ로 00 · 문화사업팀 {TEL} · 평일 9시~18시</p>
+            <DemoMakerInfo className="mt-1" />
           </div>
           <p className="md:self-end">
             {year}년 8월호 · 광복 {anniv}주년 독립의 길 스탬프 투어

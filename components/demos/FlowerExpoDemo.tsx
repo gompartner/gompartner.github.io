@@ -22,6 +22,7 @@ import {
 } from "lucide-react";
 import { useReducedMotionSafe } from "@/hooks/useReducedMotionSafe";
 import { daysAgo, fmtDot, fmtKo, useDemoToday } from "@/hooks/useDemoToday";
+import { DemoMakerInfo } from "@/components/demos/DemoMakerInfo";
 
 /* 꽃박람회 축제 안내 데모: 가상의 "2027 꽃박람회".
    개최지, 주최 기관, 입장료, 프로그램, 공지, 연락처는 모두 가상이다.
@@ -1664,9 +1665,7 @@ function Footer() {
       </div>
       <Container className="pb-28 pt-8 text-[14px] leading-[1.8]">
         <p className="text-[18px] font-bold tracking-[-0.02em] text-white">곰파트너</p>
-        <p className="mt-2">주최 ㄴㄹ시 | 주관 꽃박람회 조직위원회</p>
-        <p>ㄴㄹ시 ㄴㄹ로 200 ㅇㅅ호수공원 관리사무소 2층</p>
-        <p>관람 문의 {TEL} (09:00 ~ 18:00)</p>
+        <DemoMakerInfo className="mt-2" />
       </Container>
     </footer>
   );

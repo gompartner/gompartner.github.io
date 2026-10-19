@@ -27,6 +27,7 @@ import {
   X,
 } from "lucide-react";
 import { useReducedMotionSafe } from "@/hooks/useReducedMotionSafe";
+import { DemoMakerInfo } from "@/components/demos/DemoMakerInfo";
 
 /* 바다 펜션 홈페이지 데모: 가상의 바다 펜션(상호는 곰파트너, 객실 6개).
    상호, 대표자, 주소, 전화번호, 계좌, 신고번호, 객실 이름과 요금, 예약 현황은 모두 가상이다.
@@ -2150,25 +2151,7 @@ function Footer({ go }: { go: Go }) {
             ))}
           </ul>
         </div>
-        <dl className="mt-6 grid gap-x-8 gap-y-1.5 text-[14px] sm:grid-cols-2 md:grid-cols-3" style={{ color: "#9fb2c0" }}>
-          {[
-            ["상호", PENSION],
-            ["대표", OWNER],
-            ["농어촌민박 신고번호", "제0000-00호"],
-            ["사업자등록번호", "000-00-00000"],
-            ["주소", ADDRESS],
-            ["전화", TEL],
-            ["입금 계좌", `${BANK} (${OWNER})`],
-            ["이메일", "hello@example.com"],
-          ].map(([k, v]) => (
-            <div key={k} className="flex gap-2">
-              <dt className="shrink-0">{k}</dt>
-              <dd className="min-w-0 break-keep" style={{ color: "#fff" }}>
-                {v}
-              </dd>
-            </div>
-          ))}
-        </dl>
+        <DemoMakerInfo className="mt-6" />
       </div>
     </footer>
   );

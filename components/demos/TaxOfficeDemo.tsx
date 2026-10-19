@@ -20,6 +20,7 @@ import {
   X,
 } from "lucide-react";
 import { useReducedMotionSafe } from "@/hooks/useReducedMotionSafe";
+import { DemoMakerInfo } from "@/components/demos/DemoMakerInfo";
 
 /* 세무회계 사무소 홈페이지 데모: 가상의 세무회계 사무소(상호는 곰파트너).
    사무소 이름, 세무사 이름, 주소, 전화번호, 사업자 정보, 기장료는 모두 가상이다.
@@ -2045,26 +2046,7 @@ function Footer() {
     <footer className="px-4 pb-24 pt-12 md:px-6" style={{ background: C.greenDeep, color: "#e5eee9" }}>
       <div className="mx-auto max-w-[1200px]">
         <Logo />
-        <div className="mt-6 space-y-1 text-[15px]">
-          <p>
-            {ADDRESS} (ㅅㅈ역 3번 출구, ㅎㄴ은행 옆), 건물 지하 주차 1시간 무료
-          </p>
-          <p className="tabular-nums">상담 시간 평일 09:00 ~ 18:00 (점심 12:00 ~ 13:00), 1월과 5월은 토요일 10:00 ~ 15:00</p>
-        </div>
-        <dl className="mt-6 grid gap-x-8 gap-y-1.5 text-[14px] sm:grid-cols-2 md:grid-cols-3" style={{ color: "#a9c4b8" }}>
-          {[
-            ["상호", OFFICE],
-            ["대표세무사", "김ㅅ우"],
-            ["사업자등록번호", "000-00-00000"],
-            ["전화", TEL],
-            ["이메일", "hello@example.com"],
-          ].map(([k, v]) => (
-            <div key={k} className="flex gap-2">
-              <dt>{k}</dt>
-              <dd style={{ color: "#fff" }}>{v}</dd>
-            </div>
-          ))}
-        </dl>
+        <DemoMakerInfo className="mt-6" />
       </div>
     </footer>
   );

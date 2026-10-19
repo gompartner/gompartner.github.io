@@ -8,6 +8,7 @@ import { useReducedMotionSafe } from "@/hooks/useReducedMotionSafe";
 import { maskName, maskPhone } from "@/components/demos/LeadReceivedPanel";
 import { RealQr } from "@/components/demos/eventPrint";
 import { daysAgo, useDemoToday } from "@/hooks/useDemoToday";
+import { DemoMakerInfo } from "@/components/demos/DemoMakerInfo";
 
 /* 독립출판 북페어 사전 입장 등록 랜딩 샘플: 가상의 "얇은책 장터". 이틀 동안 창고 한 층에서 셀러 24팀이 진과 굿즈를 판다.
    행사명, 장소, 셀러, 책 제목, 담당자 이름은 모두 가상이다.
@@ -281,9 +282,7 @@ export function LandingZineFairDemo() {
           <p className="text-[20px]" style={{ ...dF, color: C.paper }}>
             {NAME}
           </p>
-          <p>
-            {PLACE} · {INSTA}
-          </p>
+          <DemoMakerInfo className="mt-1" />
         </div>
       </footer>
 

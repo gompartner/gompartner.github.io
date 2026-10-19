@@ -6,6 +6,7 @@ import { AnimatePresence, motion } from "framer-motion";
 import { Car, Check, ChevronRight, Clock3, Menu, Minus, Phone, Plus, ShoppingBag, TrainFront, Trash2, X } from "lucide-react";
 import { useReducedMotionSafe } from "@/hooks/useReducedMotionSafe";
 import { daysAgo, fmtDot, fmtKo, useDemoToday } from "@/hooks/useDemoToday";
+import { DemoMakerInfo } from "@/components/demos/DemoMakerInfo";
 
 /* 베이커리 카페 홈페이지 데모: 가상의 곰파트너 베이커리.
    상호, 대표자, 주소, 전화번호, 사업자 정보, 빵 이름과 가격은 모두 가상이다.
@@ -1818,21 +1819,7 @@ function Footer() {
     <footer className="px-4 pb-40 pt-12 md:px-6" style={{ background: C.crustDeep, color: "#fbeee0" }}>
       <div className="mx-auto max-w-[1200px]">
         <Logo />
-        <dl className="mt-6 grid gap-x-8 gap-y-1.5 text-[14px] sm:grid-cols-2 md:grid-cols-3" style={{ color: "#e2c8ad" }}>
-          {[
-            ["상호", "곰파트너"],
-            ["대표자", "이ㅅ연"],
-            ["사업자등록번호", "000-00-00000"],
-            ["주소", ADDRESS],
-            ["전화", TEL],
-            ["이메일", "hello@example.com"],
-          ].map(([k, v]) => (
-            <div key={k} className="flex gap-2">
-              <dt className="shrink-0">{k}</dt>
-              <dd style={{ color: "#fff" }}>{v}</dd>
-            </div>
-          ))}
-        </dl>
+        <DemoMakerInfo className="mt-6" />
       </div>
     </footer>
   );

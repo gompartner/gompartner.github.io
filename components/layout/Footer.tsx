@@ -106,6 +106,11 @@ export function Footer() {
             </p>
             <p className="mt-3">랜딩페이지 · 홈페이지 · 유지보수 · 업무 프로그램</p>
             <p className="mt-1">
+              <a href={`tel:${profile.phone.replace(/-/g, "")}`} data-gtm-cta="footer_tel" className={link}>
+                전화 {profile.phone}
+              </a>
+            </p>
+            <p className="mt-1">
               <a href={`mailto:${profile.email}`} data-gtm-cta="footer_email" className={link}>
                 {profile.email}
               </a>

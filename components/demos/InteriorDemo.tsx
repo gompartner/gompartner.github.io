@@ -32,6 +32,7 @@ import {
 } from "lucide-react";
 import { useReducedMotionSafe } from "@/hooks/useReducedMotionSafe";
 import { daysAgo, fmtDot, useDemoToday } from "@/hooks/useDemoToday";
+import { DemoMakerInfo } from "@/components/demos/DemoMakerInfo";
 
 /* 인테리어 시공 업체 홈페이지 데모: 곰파트너 인테리어 샘플(아파트 리모델링).
    상호, 대표자, 주소, 전화번호, 사업자 정보, 시공 사례, 공지는 모두 가상이다.
@@ -2483,25 +2484,9 @@ function Footer({ go }: { go: Go }) {
         <div className="mt-6 text-white">
           <Logo light />
         </div>
-        <dl className="mt-5 grid gap-x-8 gap-y-1.5 text-[14px] sm:grid-cols-2 lg:grid-cols-3">
-          {(
-            [
-              ["상호", SHOP],
-              ["대표", OWNER],
-              ["사업자등록번호", BIZ_NO],
-              ["면허", LICENSE],
-              ["주소", ADDRESS],
-              ["전화", TEL],
-            ] as const
-          ).map(([k, v]) => (
-            <div key={k} className="flex gap-2">
-              <dt className="shrink-0">{k}</dt>
-              <dd className="min-w-0 break-keep tabular-nums text-white">{v}</dd>
-            </div>
-          ))}
-        </dl>
+        <DemoMakerInfo className="mt-5" />
         <div className="mt-6 flex items-center justify-between gap-3 border-t pt-4 text-[13px]" style={{ borderColor: "#2e4a42" }}>
-          <span>© {SHOP}</span>
+          <span />
           <button id="it-admin-link" type="button" onClick={() => go("admin")} className="inline-flex h-9 items-center gap-1 font-semibold text-white underline-offset-2 hover:underline">
             관리자
           </button>

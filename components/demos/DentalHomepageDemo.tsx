@@ -6,6 +6,7 @@ import { AnimatePresence, motion } from "framer-motion";
 import { ArrowUp, CalendarCheck, ChevronDown, ChevronRight, Home, MapPin, Menu, MessageCircle, Moon, Phone, Plus, Receipt, X } from "lucide-react";
 import { useReducedMotionSafe } from "@/hooks/useReducedMotionSafe";
 import { daysAgo, fmtDot, useDemoToday } from "@/hooks/useDemoToday";
+import { DemoMakerInfo } from "@/components/demos/DemoMakerInfo";
 
 /* 치과 홈페이지 데모: 가상의 곰파트너치과의원.
    병원명, 의료진, 주소, 전화번호, 사업자 정보, 진료비는 모두 가상이다.
@@ -2142,21 +2143,7 @@ function SiteFooter({ go }: { go: Go }) {
         <p style={{ color: C.onInk }}>
           <BrandLogo />
         </p>
-        <dl className="mt-4 flex flex-wrap gap-x-6 gap-y-1 text-[15px]">
-          {[
-            ["상호", "곰파트너"],
-            ["대표자", "김ㅈ우"],
-            ["주소", ADDRESS],
-            ["전화", TEL],
-            ["사업자등록번호", "000-00-00000"],
-          ].map(([k, v]) => (
-            <div key={k} className="flex gap-2">
-              <dt>{k}</dt>
-              <dd style={{ color: C.onInk }}>{v}</dd>
-            </div>
-          ))}
-        </dl>
-        <p className="mt-6 text-[15px]">© 곰파트너</p>
+        <DemoMakerInfo className="mt-4" />
       </div>
     </footer>
   );

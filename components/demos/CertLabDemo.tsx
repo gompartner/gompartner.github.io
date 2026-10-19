@@ -36,6 +36,7 @@ import {
 } from "lucide-react";
 import { useReducedMotionSafe } from "@/hooks/useReducedMotionSafe";
 import { daysAgo, fmtDot, useDemoToday } from "@/hooks/useDemoToday";
+import { DemoMakerInfo } from "@/components/demos/DemoMakerInfo";
 
 /* 기업 홈페이지 데모: 가상의 (주)곰파트너시험인증원, 전자파·무선·전기안전 시험과 KC·해외 인증을 맡는 지정시험기관.
    회사명, 대표자, 주소, 전화번호, 사업자 정보, 지정 번호, 담당자, 의뢰사는 모두 가상이고 실제 기관 로고나 등록번호는 쓰지 않는다.
@@ -3447,24 +3448,7 @@ function Footer() {
         <div className="mt-6 text-white">
           <Logo />
         </div>
-        <dl className="mt-5 grid gap-x-8 gap-y-1.5 text-[14px] sm:grid-cols-2 md:grid-cols-3" style={{ color: "#a6acd6" }}>
-          {[
-            ["상호", "곰파트너"],
-            ["대표", "김ㅈ우"],
-            ["사업자등록번호", "000-00-00000"],
-            ["주소", ADDRESS],
-            ["전화", TEL],
-            ["팩스", FAX],
-            ["이메일", EMAIL],
-          ].map(([k, v]) => (
-            <div key={k} className="flex gap-2">
-              <dt className="shrink-0">{k}</dt>
-              <dd className="min-w-0 break-words tabular-nums" style={{ color: C.white }}>
-                {v}
-              </dd>
-            </div>
-          ))}
-        </dl>
+        <DemoMakerInfo className="mt-5" />
       </div>
     </footer>
   );

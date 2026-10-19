@@ -18,6 +18,7 @@ import {
 } from "lucide-react";
 import { useLocalStorage } from "@/hooks/useLocalStorage";
 import { useReducedMotionSafe } from "@/hooks/useReducedMotionSafe";
+import { DemoMakerInfo } from "@/components/demos/DemoMakerInfo";
 
 /* 채용 정보 포털 데모. 채용 포털 샘플.
    첫 화면은 큰 검색창과 많이 찾은 검색어 순위, 결과는 공공 채용 포털처럼 3열 표.
@@ -729,7 +730,7 @@ export function JobPortalDemo() {
       <footer className="border-t border-[#dde2ea] bg-[#f4f6fa]">
         <div className="mx-auto max-w-[1200px] px-4 py-8 pb-28 text-[15px] leading-[1.7] text-[#3c4660] md:px-6">
           <p className="font-bold text-[#1b2a4a]">곰파트너</p>
-          <p>구인·구직 문의 고객센터 1588-0000 (평일 09:00~18:00)</p>
+          <DemoMakerInfo className="mt-1" />
         </div>
       </footer>
 

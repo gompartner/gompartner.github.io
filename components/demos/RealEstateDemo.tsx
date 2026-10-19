@@ -6,6 +6,7 @@ import { AnimatePresence, motion } from "framer-motion";
 import { Check, ChevronRight, Heart, Layers, LayoutGrid, Map as MapIcon, Menu, Phone, Plus, RotateCcw, Search, X } from "lucide-react";
 import { useReducedMotionSafe } from "@/hooks/useReducedMotionSafe";
 import { daysAgo, useDemoToday } from "@/hooks/useDemoToday";
+import { DemoMakerInfo } from "@/components/demos/DemoMakerInfo";
 
 /* 부동산 홈페이지 데모: 가상의 공인중개사사무소(상호는 곰파트너).
    상호, 대표 공인중개사, 등록번호, 주소, 전화번호, 사업자 정보, 매물과 거래 내역은 모두 가상이다.
@@ -2161,21 +2162,7 @@ function Footer() {
         <span style={{ color: "#fff" }}>
           <Logo />
         </span>
-        <dl className="mt-6 grid gap-x-8 gap-y-1.5 text-[14px] sm:grid-cols-2 md:grid-cols-3">
-          {[
-            ["상호", OFFICE],
-            ["대표 공인중개사", AGENT],
-            ["중개사무소 등록번호", REG_NO],
-            ["사업자등록번호", "000-00-00000"],
-            ["주소", ADDRESS],
-            ["전화", TEL],
-          ].map(([k, v]) => (
-            <div key={k} className="flex gap-2">
-              <dt className="shrink-0">{k}</dt>
-              <dd style={{ color: "#fff" }}>{v}</dd>
-            </div>
-          ))}
-        </dl>
+        <DemoMakerInfo className="mt-6" />
       </div>
     </footer>
   );

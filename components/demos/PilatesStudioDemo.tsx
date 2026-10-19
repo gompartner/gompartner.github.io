@@ -6,6 +6,7 @@ import { AnimatePresence, motion } from "framer-motion";
 import { ArrowLeft, ChevronRight, List, Menu, MessageSquareText, Phone, RotateCcw, Search, X } from "lucide-react";
 import { useReducedMotionSafe } from "@/hooks/useReducedMotionSafe";
 import { daysAgo, fmtDot, fmtKo, useDemoToday } from "@/hooks/useDemoToday";
+import { DemoMakerInfo } from "@/components/demos/DemoMakerInfo";
 
 /* 필라테스 스튜디오 홈페이지 데모: 가상의 필라테스 스튜디오(상호는 곰파트너).
    스튜디오명, 강사, 주소, 전화번호, 사업자 정보, 수강료는 모두 가상이다.
@@ -2246,21 +2247,7 @@ function Footer() {
     <footer className="px-4 pb-24 pt-12 md:px-6" style={{ background: C.indigo, color: C.onIndigo }}>
       <div className="mx-auto max-w-[1200px]">
         <Logo />
-        <dl className="mt-6 grid gap-x-8 gap-y-1.5 text-[14px] sm:grid-cols-2 md:grid-cols-3" style={{ color: C.onIndigoMuted }}>
-          {[
-            ["상호", STUDIO],
-            ["대표자", "박ㅅ연"],
-            ["사업자등록번호", "000-00-00000"],
-            ["주소", ADDRESS],
-            ["전화", TEL],
-            ["이메일", "hello@example.com"],
-          ].map(([k, v]) => (
-            <div key={k} className="flex gap-2">
-              <dt>{k}</dt>
-              <dd style={{ color: C.onIndigo }}>{v}</dd>
-            </div>
-          ))}
-        </dl>
+        <DemoMakerInfo className="mt-6" />
       </div>
     </footer>
   );

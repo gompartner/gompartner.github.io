@@ -15,6 +15,7 @@ import {
   XCircle,
 } from "lucide-react";
 import { daysAgo, fmtDot, useDemoToday } from "@/hooks/useDemoToday";
+import { DemoMakerInfo } from "@/components/demos/DemoMakerInfo";
 
 // 웹접근성 개선 전후 비교 데모.
 // 같은 샘플 페이지(문화재단 샘플)를 개선 전/개선 후로 바꿔 보여주고,
@@ -424,8 +425,7 @@ function SamplePage({
 
       <footer className="border-t border-[#e3dfe6] bg-[#2b1a33] px-4 pt-5 pb-24 text-[15px] text-[#e7dcec] md:px-6">
         <p className="font-bold text-white">곰파트너</p>
-        <p className="mt-1">ㄴㅇ시 ㄴㅇ로 45, 문화재단 빌딩 3층 | 대표전화 000-000-0000</p>
-        <p className="mt-1">© 곰파트너</p>
+        <DemoMakerInfo className="mt-1" />
       </footer>
     </div>
   );

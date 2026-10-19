@@ -6,6 +6,7 @@ import { AnimatePresence, motion } from "framer-motion";
 import { Check, ChevronLeft, ChevronRight, List, Minus, Phone, Plus, RotateCcw } from "lucide-react";
 import { useReducedMotionSafe } from "@/hooks/useReducedMotionSafe";
 import { daysAgo, fmtDot, fmtKo, useDemoToday } from "@/hooks/useDemoToday";
+import { DemoMakerInfo } from "@/components/demos/DemoMakerInfo";
 
 /* 한옥 찻집 홈페이지 데모: 곰파트너 한옥 찻집 샘플.
    상호, 대표자, 주소, 전화번호, 사업자 정보, 메뉴와 가격은 모두 가상이다.
@@ -1925,9 +1926,7 @@ function Footer() {
             <span className="text-[11px] font-semibold opacity-80">한옥 찻집 샘플</span>
             </span>
           </p>
-          <p className="mt-2">
-            대표 김ㅈ우 | 사업자등록번호 000-00-00000 | {ADDRESS} | {TEL}
-          </p>
+          <DemoMakerInfo className="mt-2" />
         </div>
         <Seal lines={["곰파", "트너"]} size={52} className="rotate-3 self-start" />
       </div>

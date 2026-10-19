@@ -6,6 +6,7 @@ import { AnimatePresence, motion } from "framer-motion";
 import { Car, Check, ChevronRight, Heart, Minus, Plus, Search, ShoppingBag, Star, TrainFront, Trash2, X } from "lucide-react";
 import { daysAgo, fmtDot, useDemoToday } from "@/hooks/useDemoToday";
 import { useReducedMotionSafe } from "@/hooks/useReducedMotionSafe";
+import { DemoMakerInfo } from "@/components/demos/DemoMakerInfo";
 
 /* 자사 쇼핑몰 데모: 가상의 도자기 공방(상호는 곰파트너). 카페24 쇼핑몰형 구성.
    상호, 대표자, 주소, 전화번호, 사업자 정보, 통신판매업 신고번호, 상품과 가격, 재고, 후기는 모두 가상이다.
@@ -2304,52 +2305,10 @@ function VisitView({ minute }: { minute: number }) {
 function Footer() {
   return (
     <footer className="px-4 pb-28 pt-12 md:px-6" style={{ background: C.ink, color: C.claySoft }}>
-      <div className="mx-auto grid max-w-[1200px] gap-8 md:grid-cols-[1fr_1fr_1.4fr]">
-        <div>
-          <p className="text-[15px] font-bold" style={{ color: "#fff" }}>
-            고객센터
-          </p>
-          <p className="mt-2 text-[24px] font-bold tabular-nums" style={{ color: "#fff" }}>
-            {TEL}
-          </p>
-          <p className="mt-1 text-[14px] leading-[1.7]" style={{ color: "#b3a593" }}>
-            평일 10:00 ~ 17:00 (점심 12:00 ~ 13:00)
-            <br />
-            토·일·공휴일 휴무
-          </p>
-        </div>
-        <div>
-          <p className="text-[15px] font-bold" style={{ color: "#fff" }}>
-            입금계좌
-          </p>
-          <p className="mt-2 text-[14px] leading-[1.7]" style={{ color: "#b3a593" }}>
-            ㅁㄹ은행 000-000000-00-000
-            <br />
-            예금주 {SHOP}
-          </p>
-        </div>
-        <div>
-          <Logo />
-          <dl className="mt-4 grid gap-y-1 text-[13px]" style={{ color: "#b3a593" }}>
-            {[
-              ["상호", SHOP],
-              ["대표자", "김ㅈ우"],
-              ["사업자등록번호", "000-00-00000"],
-              ["통신판매업 신고번호", "제0000-ㅂㄹㄷㅅ-0000호"],
-              ["주소", ADDRESS],
-              ["개인정보 보호책임자", "이ㅅ연"],
-            ].map(([k, v]) => (
-              <div key={k} className="flex min-w-0 flex-wrap gap-x-2">
-                <dt>{k}</dt>
-                <dd style={{ color: "#fff" }}>{v}</dd>
-              </div>
-            ))}
-          </dl>
-        </div>
+      <div className="mx-auto max-w-[1200px]">
+        <Logo />
+        <DemoMakerInfo className="mt-4" />
       </div>
-      <p className="mx-auto mt-8 max-w-[1200px] text-[13px]" style={{ color: "#8f8273" }}>
-        결제대행 ㅈㅇ페이먼츠. 고객님의 안전거래를 위해 현금 등으로 결제 시 구매안전 서비스를 이용하실 수 있습니다.
-      </p>
     </footer>
   );
 }

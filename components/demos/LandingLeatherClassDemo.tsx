@@ -7,6 +7,7 @@ import { BellRing, CalendarDays, Check, Clock, CreditCard, Landmark, MapPin, Pho
 import { useReducedMotionSafe } from "@/hooks/useReducedMotionSafe";
 import { daysAgo, useDemoToday } from "@/hooks/useDemoToday";
 import { maskName } from "@/components/demos/LeadReceivedPanel";
+import { DemoMakerInfo } from "@/components/demos/DemoMakerInfo";
 
 /* 가죽 공방 원데이 클래스 신청 랜딩 샘플. 공방이 실제로 운영하는 수업 신청 페이지처럼 만든다.
    공방, 강사, 신청자, 계좌, 주소는 모두 가상이다. 머리글은 곰파트너와 "가죽 공방 샘플"만 적는다.
@@ -1083,9 +1084,8 @@ export function LandingLeatherClassDemo() {
             <p className="text-[17px] font-bold" style={{ ...serifF, color: C.ink }}>
               곰파트너
             </p>
-            <p>서울 ㅇㅇ구 ㅇㅇ로 00, 2층 · 수업 문의 02-000-0000 · 화요일 쉼</p>
+            <DemoMakerInfo className="mt-1" />
           </div>
-          <p>가죽 공방 샘플 · 수업, 이름, 계좌는 모두 가상입니다.</p>
         </div>
       </footer>
     </div>

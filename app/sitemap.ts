@@ -6,17 +6,9 @@ import { siteUrl } from "@/lib/site";
 
 export const dynamic = "force-static";
 
-// 첫 화면, 샘플, 자료실, 데모 페이지를 색인 대상으로 둔다.
+// 첫 화면, 샘플 소개, 자료실을 색인 대상으로 둔다. 데모(/demo)는 noindex라 넣지 않는다.
 export default function sitemap(): MetadataRoute.Sitemap {
   const lastModified = new Date();
-  const demos = projects
-    .filter((project) => project.demoUrl.startsWith("/demo/"))
-    .map((project) => ({
-      url: `${siteUrl}${project.demoUrl}`,
-      lastModified,
-      changeFrequency: "monthly" as const,
-      priority: 0.7,
-    }));
   const samples = projects
     .filter((project) => project.demoUrl.startsWith("/demo/"))
     .map((project) => ({
@@ -52,6 +44,5 @@ export default function sitemap(): MetadataRoute.Sitemap {
       priority: 0.8,
     })),
     ...samples,
-    ...demos,
   ];
 }

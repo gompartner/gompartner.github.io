@@ -7,6 +7,7 @@ import { Check, ChevronLeft, ChevronRight, Download, Lock, Pause, Play, Printer,
 import { daysAgo, fmtDash, fmtDot, fmtMD, useDemoToday } from "@/hooks/useDemoToday";
 import { useLocalStorage } from "@/hooks/useLocalStorage";
 import { useReducedMotionSafe } from "@/hooks/useReducedMotionSafe";
+import { DemoMakerInfo } from "@/components/demos/DemoMakerInfo";
 
 /* 사내·위탁 이러닝 LMS 데모. 구성은 국내 HRD 이러닝 사이트, 원격평생교육원, 대학 LMS를 따랐다
    (조사 자료 01_Work/03_Resource/benchmark/LMS.md). 화면 디자인은 요즘 플랫폼(패스트캠퍼스, 클래스101, 휴넷, 인프런)처럼
@@ -647,13 +648,7 @@ function SiteFooter() {
           <span>학습유의사항</span>
           <span>환불규정</span>
         </p>
-        <p className="mt-4">
-          곰파트너 <Sep /> 대표 김ㅈ우 <Sep /> 사업자등록번호 000-00-00000
-        </p>
-        <p>
-          서울특별시 중구 세종대로 000 <Sep /> 학습지원센터 02-000-0000
-        </p>
-        <p className="mt-3">© 곰파트너</p>
+        <DemoMakerInfo className="mt-4" />
       </div>
     </footer>
   );

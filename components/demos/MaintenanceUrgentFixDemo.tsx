@@ -7,6 +7,7 @@ import { Check, CircleDot, ImagePlus, MessageCircle, MousePointerClick, X } from
 import { maintenanceServices, maintenanceSteps, responseTime } from "@/data/maintenance";
 import { useReducedMotionSafe } from "@/hooks/useReducedMotionSafe";
 import { useDemoToday } from "@/hooks/useDemoToday";
+import { DemoMakerInfo } from "@/components/demos/DemoMakerInfo";
 
 /* 급한 오류 수정 샘플. 곰파트너가 직접 운영하는 "오류 수리 접수" 화면처럼 만든다. 장애 현황판(상태 표시, 접수 번호, 타임라인) 모양.
    꽃집, 주소, 사람은 모두 가상이다. 머리글은 곰파트너와 "유지보수 샘플"만 적는다.
@@ -729,7 +730,7 @@ export function MaintenanceUrgentFixDemo() {
             </p>
             <p>홈페이지 제작 · 유지보수</p>
           </div>
-          <p>유지보수 샘플 · 꽃집, 주소, 연락처는 모두 가상입니다.</p>
+          <DemoMakerInfo />
         </div>
       </footer>
     </div>
