@@ -468,7 +468,7 @@ export function LandingLeatherClassDemo() {
         <div className={`${wrap} flex h-16 items-center justify-between gap-3`}>
           <a href="#top" className={`inline-flex min-w-0 items-center gap-2 rounded-[4px] ${focusRing}`}>
             {/* eslint-disable-next-line @next/next/no-img-element -- 메인 사이트와 같은 곰 로고 */}
-            <img src="/images/logo.svg" alt="" aria-hidden width={30} height={30} className="h-[30px] w-[30px] shrink-0" />
+            <img src="/images/logo-bear.png" alt="" aria-hidden width={30} height={30} className="h-[30px] w-[30px] shrink-0" />
             <span className="inline-flex items-baseline gap-1.5 whitespace-nowrap">
               <span className="text-[20px] font-bold tracking-[-0.02em]" style={serifF}>
                 곰파트너

@@ -590,7 +590,7 @@ function Hero({
       <div className="mx-auto flex max-w-[1200px] flex-wrap items-center gap-3 px-4 pt-5 md:px-6">
         <p className="flex items-center gap-2 whitespace-nowrap">
           {/* eslint-disable-next-line @next/next/no-img-element -- 메인 사이트와 같은 곰 로고 */}
-          <img src="/images/logo.svg" alt="" aria-hidden width={28} height={28} className="h-7 w-7 shrink-0" />
+          <img src="/images/logo-bear.png" alt="" aria-hidden width={28} height={28} className="h-7 w-7 shrink-0" />
           <span className="flex items-baseline gap-1">
             <span className="text-[17px] font-bold">곰파트너</span>
             <span className="text-[11px] font-semibold text-white/75">피부과 샘플</span>

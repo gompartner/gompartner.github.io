@@ -153,7 +153,7 @@ function LogoMark() {
   return (
     <>
       {/* eslint-disable-next-line @next/next/no-img-element */}
-      <img src="/images/logo.svg" alt="" aria-hidden width={32} height={32} className="h-8 w-8 shrink-0" />
+      <img src="/images/logo-bear.png" alt="" aria-hidden width={32} height={32} className="h-8 w-8 shrink-0" />
     </>
   );
 }

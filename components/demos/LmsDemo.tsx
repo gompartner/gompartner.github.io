@@ -592,7 +592,7 @@ function SiteHeader({ route, loggedIn, go, onMy, onLogout, onAdmin, onReset }: {
       <div className={`${wrap} flex flex-wrap items-center gap-x-10`}>
         <button type="button" onClick={() => go({ name: "home" })} className="flex h-16 items-center gap-2" style={{ color: C.brand }}>
           {/* eslint-disable-next-line @next/next/no-img-element */}
-          <img src="/images/logo.svg" alt="" aria-hidden width={30} height={30} className="h-[30px] w-[30px] shrink-0" />
+          <img src="/images/logo-bear.png" alt="" aria-hidden width={30} height={30} className="h-[30px] w-[30px] shrink-0" />
           <span className="sr-only">곰파트너 이러닝 샘플</span>
           <span aria-hidden className="flex items-baseline gap-1 whitespace-nowrap">
             <span className="text-[20px] font-bold">곰파트너</span>
@@ -1342,7 +1342,7 @@ export function LmsDemo() {
             <div className="mx-auto flex max-w-[1200px] flex-wrap items-center gap-x-3 gap-y-2 px-4 py-3 md:px-6">
               <p className="mr-auto flex items-center gap-2" style={{ color: C.brand }}>
                 {/* eslint-disable-next-line @next/next/no-img-element */}
-                <img src="/images/logo.svg" alt="" aria-hidden width={28} height={28} className="h-7 w-7 shrink-0" />
+                <img src="/images/logo-bear.png" alt="" aria-hidden width={28} height={28} className="h-7 w-7 shrink-0" />
                 <span className="sr-only">곰파트너 이러닝 샘플 관리자</span>
                 <span aria-hidden className="flex items-baseline gap-1 whitespace-nowrap">
                   <span className="text-[18px] font-bold">곰파트너</span>

@@ -1117,7 +1117,7 @@ function BrandLogo() {
   return (
     <span className="inline-flex items-center gap-2">
       {/* eslint-disable-next-line @next/next/no-img-element -- 메인 사이트와 같은 곰 로고 */}
-      <img src="/images/logo.svg" alt="" aria-hidden width={28} height={28} className="h-7 w-7 shrink-0" />
+      <img src="/images/logo-bear.png" alt="" aria-hidden width={28} height={28} className="h-7 w-7 shrink-0" />
       <span className="flex items-baseline gap-1 whitespace-nowrap">
         <span className="text-[20px] font-semibold tracking-[-0.03em]">곰파트너</span>
         <span className="text-[12px] font-medium opacity-75">피부과 샘플</span>
