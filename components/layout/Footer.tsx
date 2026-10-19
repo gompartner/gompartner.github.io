@@ -112,7 +112,7 @@ export function Footer() {
             </p>
             <p className="mt-1">
               <a href={`mailto:${profile.email}`} data-gtm-cta="footer_email" className={link}>
-                {profile.email}
+                이메일 {profile.email}
               </a>
             </p>
           </div>

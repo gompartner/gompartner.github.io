@@ -12,7 +12,7 @@ export function DemoMakerInfo({ className = "" }: { className?: string }) {
           전화 {profile.phone}
         </a>
         <a href={`mailto:${profile.email}`} data-gtm-cta="demo_footer_email" className="underline-offset-4 hover:underline">
-          {profile.email}
+          이메일 {profile.email}
         </a>
         <Link href="/" data-gtm-cta="demo_footer_home" className="underline-offset-4 hover:underline">
           gompartner.co.kr
