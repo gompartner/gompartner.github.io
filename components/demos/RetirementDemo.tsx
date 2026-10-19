@@ -4,6 +4,7 @@ import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { IBM_Plex_Sans_KR } from "next/font/google";
 import { daysAgo, fmtDot, useDemoToday } from "@/hooks/useDemoToday";
 import { Calculator, CalendarClock, CheckCircle2, ChevronRight, CreditCard, FileSearch, Home, Landmark, PiggyBank, Phone, ReceiptText, TrendingUp, Wallet } from "lucide-react";
+import { DemoMakerInfo } from "@/components/demos/DemoMakerInfo";
 
 /* 노후준비 계산기 데모: 가상의 보험사(상호는 곰파트너).
    금액 단위는 모두 만 원. 적립 기간은 월 복리, 은퇴 후에는 연 2.5%로 운용하면서
@@ -295,10 +296,7 @@ function SiteFooter() {
   return (
     <footer className="border-t bg-white" style={{ borderColor: LINE }}>
       <div className="mx-auto flex max-w-[1200px] flex-col gap-1 px-4 pt-8 pb-24 text-[14px] md:flex-row md:justify-between md:px-6" style={{ color: INK_3 }}>
-        <p>
-          고객센터 <b className="tabular-nums" style={{ color: INK_2 }}>{TEL}</b> · 평일 09:00 ~ 18:00
-        </p>
-        <p>© 곰파트너</p>
+        <DemoMakerInfo />
       </div>
     </footer>
   );

@@ -7,6 +7,7 @@ import { Check, ChevronDown } from "lucide-react";
 import { useReducedMotionSafe } from "@/hooks/useReducedMotionSafe";
 import { LeadReceivedPanel, type LeadRow } from "@/components/demos/LeadReceivedPanel";
 import { fmtKo, useDemoToday } from "@/hooks/useDemoToday";
+import { DemoMakerInfo } from "@/components/demos/DemoMakerInfo";
 
 /* 랜딩페이지 데모(기본 패키지 예시): 가상의 곰파트너 렌탈 정수기·공기청정기 상담 신청.
    상호, 제품 이름, 렌탈료, 혜택은 모두 가상이다.
@@ -693,8 +694,7 @@ function Footer() {
     <footer className="px-5 pb-36 pt-10 md:px-8 md:pb-12" style={{ background: C.ink, color: "#b8c6c6" }}>
       <div className="mx-auto max-w-[1120px] text-[14px] leading-[1.8]">
         <Logo light />
-        <p className="mt-3">곰파트너 · 대표 박ㅅ연 · 서울 ㅅㄷ구 ㅇㅇ로 00</p>
-        <p>사업자등록번호 000-00-00000 · 통신판매업 신고 0000-서울ㅅㄷ-0000</p>
+        <DemoMakerInfo className="mt-3" />
       </div>
     </footer>
   );

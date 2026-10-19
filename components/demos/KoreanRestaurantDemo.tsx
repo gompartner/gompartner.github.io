@@ -4,6 +4,7 @@ import { useEffect, useState, useSyncExternalStore } from "react";
 import Image from "next/image";
 import { Baby, Car, CreditCard, MapPin, Menu, Phone, ShoppingBag, Users, Wifi, X } from "lucide-react";
 import { useReducedMotionSafe } from "@/hooks/useReducedMotionSafe";
+import { DemoMakerInfo } from "@/components/demos/DemoMakerInfo";
 
 /* 동네 한식당 홈페이지 데모: 곰파트너 한식당 샘플.
    상호, 대표자, 주소, 전화번호, 사업자 정보, 메뉴와 가격은 모두 가상이다.
@@ -759,16 +760,7 @@ function Footer() {
           <LogoMark />
           {STORE}
         </p>
-        <p className="mt-4 leading-[1.8]">
-          대표 김ㅎ늘
-          <span aria-hidden className="mx-2 opacity-50">|</span>
-          {ADDRESS}
-          <span aria-hidden className="mx-2 opacity-50">|</span>
-          전화 {TEL}
-        </p>
-        <p className="mt-6 text-[14px]" style={{ color: "#a39a8c" }}>
-          © {STORE}
-        </p>
+        <DemoMakerInfo className="mt-4" />
       </div>
     </footer>
   );

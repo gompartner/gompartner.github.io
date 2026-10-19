@@ -7,6 +7,7 @@ import { Check, ChevronDown, RotateCcw } from "lucide-react";
 import { useReducedMotionSafe } from "@/hooks/useReducedMotionSafe";
 import { LeadReceivedPanel, maskName, type LeadRow } from "@/components/demos/LeadReceivedPanel";
 import { daysAgo, fmtDot, fmtKo, useDemoToday } from "@/hooks/useDemoToday";
+import { DemoMakerInfo } from "@/components/demos/DemoMakerInfo";
 
 /* 랜딩페이지 데모(표준 패키지 예시): 가상의 곰파트너 코딩교실 겨울방학 특강 모집.
    교실 이름, 강사, 주소, 수업료, 학생 이름은 모두 가상이다.
@@ -159,8 +160,7 @@ export function LandingCodingCampDemo() {
 
       <footer className="mx-auto mt-16 max-w-[1080px] border-t-2 px-5 pt-6 text-[14px] leading-[1.8] md:px-8" style={{ borderColor: C.ink, color: C.muted }}>
         <p className="font-bold" style={{ color: C.ink }}>곰파트너</p>
-        <p>ㅁㄹ시 ㅎㄷ로 88 ㅁㄹ프라자 4층 · 02-000-0000</p>
-        <p>학원 등록번호 제0000-00호 · 교습과목 정보(소프트웨어)</p>
+        <DemoMakerInfo className="mt-1" />
       </footer>
 
       <StickyApply hidden={formVisible} left={totalLeft} onApply={goForm} />

@@ -6,6 +6,7 @@ import { AnimatePresence, motion } from "framer-motion";
 import { Bus, CalendarCheck, Check, ChevronDown, ChevronLeft, ChevronRight, Menu, Phone, RotateCcw, X } from "lucide-react";
 import { useReducedMotionSafe } from "@/hooks/useReducedMotionSafe";
 import { daysAgo, fmtDash, fmtDot, fmtKo, useDemoToday } from "@/hooks/useDemoToday";
+import { DemoMakerInfo } from "@/components/demos/DemoMakerInfo";
 
 /* 학원 홈페이지 데모: 가상의 곰파트너 수학·영어학원(초4~중3 보습학원).
    학원명, 강사, 주소, 전화번호, 등록번호, 교습비, 학교명, 정류장은 모두 가상이다.
@@ -1654,11 +1655,7 @@ function Footer() {
         <span style={{ color: C.onBoard }}>
           <Logo light />
         </span>
-        <p className="mt-4">
-          {ACADEMY} · 대표 김ㅎ늘 · {ADDRESS} · 전화 {TEL}
-        </p>
-        <p>학원 등록번호 제2026-00호(ㅁㄹ교육지원청) · 교습과목 보통교과(수학, 영어)</p>
-        <p className="mt-3">© 2026 {ACADEMY}</p>
+        <DemoMakerInfo className="mt-4" />
       </div>
     </footer>
   );

@@ -18,6 +18,7 @@ import {
 } from "lucide-react";
 import { useReducedMotionSafe } from "@/hooks/useReducedMotionSafe";
 import { daysAgo, fmtDot, useDemoToday } from "@/hooks/useDemoToday";
+import { DemoMakerInfo } from "@/components/demos/DemoMakerInfo";
 
 /* 법률사무소 홈페이지 데모: 곰파트너 법률사무소 샘플.
    사무소 이름, 변호사 이름, 경력, 주소, 전화번호, 사업자 정보, 성공사례는 모두 가상이다.
@@ -2068,21 +2069,7 @@ function Footer() {
         <div className="border-b pb-6" style={{ borderColor: "#2e3d61" }}>
           <Logo light />
         </div>
-        <dl className="mt-6 grid gap-x-8 gap-y-1.5 text-[14px] sm:grid-cols-2 md:grid-cols-3">
-          {[
-            ["상호", "곰파트너"],
-            ["대표변호사", "김ㅈ우"],
-            ["광고책임변호사", "김ㅈ우"],
-            ["사업자등록번호", "000-00-00000"],
-            ["주소", ADDRESS],
-            ["전화", TEL],
-          ].map(([k, v]) => (
-            <div key={k} className="flex gap-2">
-              <dt className="shrink-0">{k}</dt>
-              <dd style={{ color: C.ivory }}>{v}</dd>
-            </div>
-          ))}
-        </dl>
+        <DemoMakerInfo className="mt-6" />
       </div>
     </footer>
   );

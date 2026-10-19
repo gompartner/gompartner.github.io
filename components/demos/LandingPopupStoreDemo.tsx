@@ -8,6 +8,7 @@ import { useReducedMotionSafe } from "@/hooks/useReducedMotionSafe";
 import { maskName, maskPhone } from "@/components/demos/LeadReceivedPanel";
 import { Barcode, RealQr } from "@/components/demos/eventPrint";
 import { daysAgo, fmtKo, useDemoToday } from "@/hooks/useDemoToday";
+import { DemoMakerInfo } from "@/components/demos/DemoMakerInfo";
 
 /* 팝업스토어 사전예약 랜딩 샘플: 가상의 곰파트너 붕어빵 연구소, 성수에서 7일만 여는 팝업.
    상호, 주소, 직원, 손님 이름은 모두 가상이다.
@@ -215,9 +216,7 @@ export function LandingPopupStoreDemo() {
         <p className="text-[15px] font-bold" style={{ color: C.paper }}>
           {BRAND} 성수 팝업
         </p>
-        <p>
-          {ADDRESS} · {KAKAO}
-        </p>
+        <DemoMakerInfo className="mt-1" />
       </footer>
 
       {/* 첫 화면을 지나면 아래에 발권 버튼을 띄우고, 발권기가 보이면 숨긴다. 사용법 버튼과 겹치지 않게 위로 올린다. */}

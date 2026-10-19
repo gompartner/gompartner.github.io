@@ -20,6 +20,7 @@ export function PersonJsonLd() {
       addressCountry: "KR",
     },
     email: profile.email,
+    telephone: profile.phone,
     knowsAbout: [
       "홈페이지 구축",
       "홈페이지 유지보수",
@@ -49,6 +50,7 @@ export function ProfessionalServiceJsonLd() {
     description: profile.bio,
     url: siteUrl,
     email: profile.email,
+    telephone: profile.phone,
     areaServed: "KR",
     sameAs,
     address: {
@@ -103,6 +105,7 @@ export function OrganizationJsonLd() {
     description: profile.bio,
     disambiguatingDescription: "소상공인 홈페이지 제작과 유지보수를 하는 1인 웹 개발 브랜드. 곰앤컴퍼니의 곰랩 파트너스와 관계없음.",
     email: profile.email,
+    telephone: profile.phone,
     areaServed: "KR",
     sameAs,
   };

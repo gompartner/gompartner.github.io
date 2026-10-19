@@ -7,6 +7,7 @@ import { Check, ChevronDown, Clock, MoveHorizontal, Phone, RotateCcw, Users } fr
 import { useReducedMotionSafe } from "@/hooks/useReducedMotionSafe";
 import { LeadReceivedPanel, type LeadRow } from "@/components/demos/LeadReceivedPanel";
 import { daysAgo, fmtKo, useDemoToday } from "@/hooks/useDemoToday";
+import { DemoMakerInfo } from "@/components/demos/DemoMakerInfo";
 
 /* 입주·이사 청소 견적 랜딩 데모: 가상의 곰파트너 클린.
    상호, 대표자, 주소, 전화번호, 사업자 정보, 후기는 모두 가상이다.
@@ -23,9 +24,6 @@ import { daysAgo, fmtKo, useDemoToday } from "@/hooks/useDemoToday";
 const IMG = "/images/demo-landing-move-clean";
 const SHOP = "곰파트너";
 const TEL = "1600-0000";
-const OWNER = "정ㅁ석";
-const BIZ_NO = "000-00-00000";
-const ADDRESS = "경기도 ㅇㅇ시 ㅅㄷ로 00, 2층";
 
 const C = {
   ink: "#13161c",
@@ -300,12 +298,7 @@ export function LandingMoveCleanDemo() {
       <footer className="px-4 py-10 text-[14px] leading-[1.8] md:px-6" style={{ background: C.ink, color: "rgba(255,255,255,0.7)" }}>
         <div className="mx-auto max-w-[1200px]">
           <p className="text-[16px] font-bold text-white">{SHOP}</p>
-          <p>
-            대표 {OWNER} · 사업자등록번호 {BIZ_NO} · {ADDRESS}
-          </p>
-          <p>
-            전화 {TEL} · 상담 시간 매일 08:00 ~ 20:00
-          </p>
+          <DemoMakerInfo className="mt-1" />
         </div>
       </footer>
 

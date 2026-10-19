@@ -6,6 +6,7 @@ import { AnimatePresence, motion } from "framer-motion";
 import { Check, ChevronDown, ChevronRight, CircleAlert, FileUp, House, Menu, RotateCcw, Trash2, X } from "lucide-react";
 import { useReducedMotionSafe } from "@/hooks/useReducedMotionSafe";
 import { daysAgo, fmtDash, fmtKo, useDemoToday } from "@/hooks/useDemoToday";
+import { DemoMakerInfo } from "@/components/demos/DemoMakerInfo";
 
 /* 기업 홈페이지 데모: 가상의 (주)곰파트너정밀, CNC 정밀 가공 제조업체.
    회사명, 대표자, 주소, 전화번호, 사업자 정보, 설비 모델명, 제조사, 거래처, 인증 기관은 모두 가상이다.
@@ -2236,7 +2237,7 @@ function Quote() {
 /* ---------- 바닥글 ---------- */
 
 function Footer() {
-  const { x, s, go } = useCo();
+  const { s, go } = useCo();
   return (
     <footer className="px-4 pb-24 pt-10 md:px-6" style={{ background: C.steel, color: "#c9ced6" }}>
       <div className="mx-auto max-w-[1200px]">
@@ -2252,25 +2253,7 @@ function Footer() {
         <div className="mt-6 text-white">
           <Logo />
         </div>
-        <dl className="mt-5 grid gap-x-8 gap-y-1.5 text-[14px] sm:grid-cols-2 md:grid-cols-3" style={{ color: "#a9b0b9" }}>
-          {(
-            [
-              [x("상호", "Company"), x("곰파트너", "Gompartner")],
-              [x("대표", "CEO"), x("김ㅈ우", "Kim J.W.")],
-              [x("사업자등록번호", "Business reg. no."), "000-00-00000"],
-              [x("주소", "Address"), s(ADDRESS)],
-              [x("전화", "Tel"), TEL],
-              [x("팩스", "Fax"), FAX],
-            ] as const
-          ).map(([k, v]) => (
-            <div key={k} className="flex gap-2">
-              <dt className="shrink-0">{k}</dt>
-              <dd className="min-w-0 break-words tabular-nums" style={{ color: C.white }}>
-                {v}
-              </dd>
-            </div>
-          ))}
-        </dl>
+        <DemoMakerInfo className="mt-5" />
       </div>
     </footer>
   );

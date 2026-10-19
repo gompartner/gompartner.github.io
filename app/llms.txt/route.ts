@@ -25,7 +25,7 @@ export function GET() {
 > ${profile.name}는 사장님이 업체에 묻기 애매한 홈페이지와 IT 문제를 짧게 알려 드리는 채널이자, 소상공인 홈페이지 제작과 유지보수를 맡는 1인 웹 개발 브랜드입니다. 서울에서 재택과 온라인 미팅으로 일합니다. 곰앤컴퍼니의 곰랩 파트너스와 관계없습니다.
 
 - 사이트: ${siteUrl}
-- 문의: 사이트 오른쪽 아래 채팅 상담, ${profile.email}
+- 문의: 사이트 오른쪽 아래 채팅 상담, 전화 ${profile.phone}, ${profile.email}
 - 크몽 서비스: https://kmong.com/gig/796239
 - 평일 사장님 IT 숏츠: https://www.youtube.com/@gompartner, https://clip.naver.com/@gompartner, https://www.instagram.com/gompartner.co.kr
 - 블로그: https://blog.naver.com/gompartner (사장님 IT 정보), https://gompartner.tistory.com (제작 일지)

@@ -4,6 +4,7 @@ import { useEffect, useRef, useState } from "react";
 import Image from "next/image";
 import { ChevronRight, Menu, Phone, X } from "lucide-react";
 import { daysAgo, fmtDot, fmtKo, useDemoToday } from "@/hooks/useDemoToday";
+import { DemoMakerInfo } from "@/components/demos/DemoMakerInfo";
 
 /* 피부과 홈페이지 데모: 가상의 곰파트너피부과의원.
    병원명, 의료진, 주소, 전화번호, 사업자 정보, 진료비는 모두 가상이다.
@@ -344,19 +345,7 @@ export function ClinicHomepageDemo() {
             <p style={{ color: C.onInk }}>
               <BrandLogo />
             </p>
-            <dl className="mt-4 flex flex-wrap gap-x-6 gap-y-1 text-[15px]">
-              {[
-                ["상호", "곰파트너"],
-                ["대표자", "김ㅈ우"],
-                ["주소", ADDRESS],
-                ["사업자등록번호", "000-00-00000"],
-              ].map(([k, v]) => (
-                <div key={k} className="flex gap-2">
-                  <dt>{k}</dt>
-                  <dd style={{ color: C.onInk }}>{v}</dd>
-                </div>
-              ))}
-            </dl>
+            <DemoMakerInfo className="mt-4" />
             <ul className="mt-4 flex flex-wrap gap-x-5 text-[15px]">
               <li>
                 <button type="button" className="font-semibold hover:underline" style={{ color: C.onInk }}>
@@ -370,20 +359,6 @@ export function ClinicHomepageDemo() {
               </li>
             </ul>
           </div>
-          <dl className="grid content-start gap-2 md:justify-end">
-            <div className="flex items-baseline gap-3">
-              <dt className="w-16 text-[15px]">일반진료</dt>
-              <dd className="text-[22px] font-semibold tabular-nums" style={{ color: C.onInk }}>
-                {TEL_MED}
-              </dd>
-            </div>
-            <div className="flex items-baseline gap-3">
-              <dt className="w-16 text-[15px]">시술상담</dt>
-              <dd className="text-[22px] font-semibold tabular-nums" style={{ color: C.onInk }}>
-                {TEL_COS}
-              </dd>
-            </div>
-          </dl>
         </div>
       </footer>
     </div>
