@@ -34,6 +34,8 @@ export const viewport: Viewport = { themeColor: "#f3ece0" };
 
 export const metadata: Metadata = {
   metadataBase: new URL(siteUrl),
+  // 사업자등록번호 같은 숫자를 휴대폰이 전화번호로 잡지 않게 한다. 실제 전화는 tel: 링크로만 건다.
+  formatDetection: { telephone: false },
   title: {
     default: siteTitle,
     template: `%s | ${profile.name}`,
