@@ -1,6 +1,7 @@
 import Image from "next/image";
 import Link from "next/link";
 import { profile } from "@/data/classic/profile";
+import { LookLink } from "@/components/layout/LookToggle";
 
 // 클래식 보기 바닥글. 사업자 정보는 상호와 번호만 둔다(통신판매업 신고 전).
 const menu = [
@@ -49,6 +50,11 @@ export function ClassicFooter() {
                 </Link>
               </li>
             ))}
+            <li>
+              <LookLink to="webtoon" cta="footer_webtoon" className="hover:text-white">
+                곰파트너 이야기
+              </LookLink>
+            </li>
           </ul>
         </nav>
         <div>

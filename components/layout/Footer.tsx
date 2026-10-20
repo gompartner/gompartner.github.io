@@ -1,6 +1,7 @@
 import Image from "next/image";
 import Link from "next/link";
 import { profile } from "@/data/profile";
+import { LookLink } from "@/components/layout/LookToggle";
 
 const menu = [
   { href: "/works", label: "샘플" },
@@ -127,6 +128,11 @@ export function Footer() {
                   </Link>
                 </li>
               ))}
+              <li>
+                <LookLink to="classic" cta="footer_classic" className={link}>
+                  회사 소개서
+                </LookLink>
+              </li>
             </ul>
           </nav>
 
