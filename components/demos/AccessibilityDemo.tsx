@@ -1,6 +1,6 @@
 "use client";
 
-import { IBM_Plex_Sans_KR } from "next/font/google";
+import { IBM_Plex_Sans_KR } from "@/lib/local-fonts";
 import { useEffect, useMemo, useState } from "react";
 import {
   CalendarClock,
@@ -22,7 +22,7 @@ import { DemoMakerInfo } from "@/components/demos/DemoMakerInfo";
 // 한국형 웹 콘텐츠 접근성 지침(KWCAG) 2.2 검사 항목별로 문제와 조치 내용을 짚어 준다.
 // 개선 전 화면은 일부러 대비·대체 텍스트·레이블 등을 어긴 상태다.
 
-const plex = IBM_Plex_Sans_KR({ weight: ["400", "700"], subsets: ["latin"], display: "swap", preload: false });
+const plex = IBM_Plex_Sans_KR;
 
 type Mode = "before" | "after";
 type RegionId = "header" | "banner" | "notice" | "schedule" | "form";

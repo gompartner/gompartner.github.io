@@ -1,6 +1,6 @@
 "use client";
 
-import { Black_Han_Sans } from "next/font/google";
+import { Black_Han_Sans } from "@/lib/local-fonts";
 import { useEffect, useMemo, useState, useSyncExternalStore } from "react";
 import {
   Bookmark,
@@ -24,7 +24,7 @@ import { DemoMakerInfo } from "@/components/demos/DemoMakerInfo";
    첫 화면은 큰 검색창과 많이 찾은 검색어 순위, 결과는 공공 채용 포털처럼 3열 표.
    공고 등록일과 마감일은 오늘 기준 상대값으로 두고, 화면이 뜬 뒤에만 계산한다. */
 
-const display = Black_Han_Sans({ weight: "400", preload: false, display: "swap" });
+const display = Black_Han_Sans;
 
 const REGIONS = ["서울", "경기", "인천", "부산", "대구", "대전", "광주", "세종"] as const;
 const CATEGORIES = ["사무·행정", "IT·개발", "디자인", "영업·상담", "생산·기술", "보건·의료", "교육", "서비스"] as const;

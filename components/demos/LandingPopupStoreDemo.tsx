@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useRef, useState } from "react";
-import { Gasoek_One, Nanum_Gothic_Coding } from "next/font/google";
+import { Gasoek_One, Nanum_Gothic_Coding } from "@/lib/local-fonts";
 import { AnimatePresence, motion } from "framer-motion";
 import { Check, ChevronDown, Minus, Plus, RotateCcw, Scissors } from "lucide-react";
 import { useReducedMotionSafe } from "@/hooks/useReducedMotionSafe";
@@ -26,8 +26,8 @@ import { DemoMakerInfo } from "@/components/demos/DemoMakerInfo";
    3. 혜택: 구디백 남은 수량, SNS 인증 체크, 100% 당첨 돌림판(결과는 쿠폰).
    4. 메뉴 영수증, 오시는 길, 자주 묻는 질문. */
 
-const mono = Nanum_Gothic_Coding({ weight: ["400", "700"], preload: false, display: "swap" });
-const heavy = Gasoek_One({ weight: "400", preload: false, display: "swap" });
+const mono = Nanum_Gothic_Coding;
+const heavy = Gasoek_One;
 
 const BRAND = "곰파트너";
 const ADDRESS = "서울 성동구 ㅇㅇ길 00, 1층";

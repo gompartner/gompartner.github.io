@@ -1,6 +1,6 @@
 "use client";
 
-import { IBM_Plex_Sans_KR } from "next/font/google";
+import { IBM_Plex_Sans_KR } from "@/lib/local-fonts";
 import { useEffect, useMemo, useRef, useState } from "react";
 import {
   Baby,
@@ -31,7 +31,7 @@ import { DemoMakerInfo } from "@/components/demos/DemoMakerInfo";
 // 대표색은 저녁 하천빛 남색(#13233f)과 노을 주황(#e8562a). 주황은 그래픽·배경에만 쓰고
 // 흰 바탕 글자에는 대비 4.5:1 이상인 #b53d14를 쓴다.
 
-const plex = IBM_Plex_Sans_KR({ preload: false, weight: ["400", "700"], subsets: ["latin"], display: "swap" });
+const plex = IBM_Plex_Sans_KR;
 
 const NAVY = "#13233f";
 const SUNSET = "#e8562a";

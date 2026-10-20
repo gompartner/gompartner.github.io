@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useRef, useState } from "react";
-import { Noto_Serif_KR } from "next/font/google";
+import { Noto_Serif_KR } from "@/lib/local-fonts";
 import { motion } from "framer-motion";
 import { Check, ChevronDown, Lock, MapPin, Minus, Plus, RotateCcw } from "lucide-react";
 import { useReducedMotionSafe } from "@/hooks/useReducedMotionSafe";
@@ -25,7 +25,7 @@ import { DemoMakerInfo } from "@/components/demos/DemoMakerInfo";
    4. 완주 기념품 신청: 도장을 다 모으면 열린다. 이름, 휴대폰, 수령 방법. 접수 화면에 회신 예정일과 담당 창구.
    5. 8월 일정, 자주 묻는 질문. */
 
-const serif = Noto_Serif_KR({ weight: ["400", "700", "900"], preload: false, display: "swap" });
+const serif = Noto_Serif_KR;
 
 const ORG = "곰파트너";
 const DESK = "곰파트너 문화사업팀 이ㅅ영 주임";
