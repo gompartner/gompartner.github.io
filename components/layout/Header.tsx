@@ -6,7 +6,7 @@ import { usePathname } from "next/navigation";
 import { useEffect, useState } from "react";
 import { AnimatePresence, motion } from "framer-motion";
 import { Menu, X } from "lucide-react";
-import { LookToggle } from "@/components/layout/LookToggle";
+import { LookLink, LookToggle } from "@/components/layout/LookToggle";
 import { cn } from "@/lib/utils";
 import { profile } from "@/data/profile";
 import { ChannelTalkButton } from "@/components/layout/ChannelTalk";
@@ -82,6 +82,11 @@ export function Header() {
                 </Link>
               </li>
             ))}
+            <li>
+              <LookLink to="classic" cta="menu_classic" className="inline-flex h-10 items-center rounded-[6px] px-3 text-[17px] font-bold text-foreground-secondary transition-colors hover:bg-[#fff3b0]">
+                회사 소개서
+              </LookLink>
+            </li>
           </ul>
           <ChannelTalkButton
             cta="header_chat"
@@ -122,6 +127,11 @@ export function Header() {
                   </Link>
                 </li>
               ))}
+              <li>
+                <LookLink to="classic" cta="menu_classic" onClick={() => setMenuOpen(false)} className="flex h-12 items-center text-[17px] font-bold text-foreground">
+                  회사 소개서
+                </LookLink>
+              </li>
             </ul>
           </motion.div>
         )}

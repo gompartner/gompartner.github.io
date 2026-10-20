@@ -6,7 +6,7 @@ import { usePathname } from "next/navigation";
 import { useEffect, useState } from "react";
 import { ChevronDown, Menu, X } from "lucide-react";
 import { ChannelTalkButton } from "@/components/layout/ChannelTalk";
-import { LookToggle } from "@/components/layout/LookToggle";
+import { LookLink, LookToggle } from "@/components/layout/LookToggle";
 import { industries } from "@/data/classic/industries";
 import { cn } from "@/lib/utils";
 
@@ -126,6 +126,11 @@ export function ClassicHeader() {
                 </li>
               );
             })}
+            <li className="flex">
+              <LookLink to="webtoon" cta="menu_webtoon" className="flex items-center px-6 text-[17px] font-bold tracking-[-0.02em] text-[#15171c] transition-colors hover:text-[#256ef4]">
+                곰파트너 이야기
+              </LookLink>
+            </li>
           </ul>
 
           <div className="flex items-center gap-2">
@@ -170,6 +175,11 @@ export function ClassicHeader() {
               )}
             </section>
           ))}
+          <section className="border-b border-[#e6e9ee] py-4">
+            <LookLink to="webtoon" cta="menu_webtoon" onClick={() => setOpen(false)} className="text-[18px] font-extrabold tracking-[-0.02em] text-[#15171c]">
+              곰파트너 이야기
+            </LookLink>
+          </section>
           <ul className="mt-5 flex flex-wrap gap-x-4 gap-y-2 text-[14px] text-[#5b6370]" role="list">
             {channels.map((c) => (
               <li key={c.href}>
