@@ -139,7 +139,7 @@ export function Footer() {
             개인정보처리방침
           </Link>
           <p>
-            © {currentYear} {profile.name}
+            상호 {profile.name} | 사업자등록번호 725-40-01614 | © {currentYear} {profile.name}
           </p>
         </div>
       </div>
