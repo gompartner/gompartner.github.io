@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useMemo, useRef, useState } from "react";
-import { Gasoek_One } from "next/font/google";
+import { Gasoek_One } from "@/lib/local-fonts";
 import { AnimatePresence, motion } from "framer-motion";
 import { ChevronDown, Heart, Minus, Plus, RotateCcw, Search, X } from "lucide-react";
 import { useReducedMotionSafe } from "@/hooks/useReducedMotionSafe";
@@ -24,7 +24,7 @@ import { DemoMakerInfo } from "@/components/demos/DemoMakerInfo";
    4. 미리 담기: 사고 싶은 진을 담으면 부스 도는 순서대로 정리하고 합계를 낸다.
    5. 오시는 길, 자주 묻는 질문. */
 
-const display = Gasoek_One({ weight: "400", preload: false, display: "swap" });
+const display = Gasoek_One;
 
 const NAME = "곰파트너";
 const PLACE = "서울 마포구 ㅇㅇ로 00, ㅇㅇ창고 2층";

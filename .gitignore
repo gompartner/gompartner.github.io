@@ -47,3 +47,6 @@ next-env.d.ts
 /docs/
 AGENTS.md
 CLAUDE.md
+
+# 구글 폰트 원본(서브셋 재생성용)
+/.font-src/

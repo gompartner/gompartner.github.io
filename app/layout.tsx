@@ -1,6 +1,6 @@
 import type { Metadata, Viewport } from "next";
 import localFont from "next/font/local";
-import { Black_Han_Sans } from "next/font/google";
+import { Black_Han_Sans } from "@/lib/local-fonts";
 import Script from "next/script";
 import { lookRedirectScript } from "@/lib/look";
 import "./globals.css";
@@ -23,7 +23,7 @@ const pretendard = localFont({
 });
 
 // 웹툰 톤의 제목·효과음 글꼴. 본문은 Pretendard.
-const sfx = Black_Han_Sans({ weight: "400", subsets: ["latin"], variable: "--font-sfx", display: "swap" });
+const sfx = Black_Han_Sans;
 
 // 메인 첫 화면 문구와 맞춘 사이트 제목·설명
 const siteTitle = homeTitle;

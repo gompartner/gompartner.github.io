@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useRef, useState } from "react";
-import { JetBrains_Mono } from "next/font/google";
+import { JetBrains_Mono } from "@/lib/local-fonts";
 import { AnimatePresence, motion } from "framer-motion";
 import { Check, CircleDot, ImagePlus, MessageCircle, MousePointerClick, X } from "lucide-react";
 import { maintenanceServices, maintenanceSteps, responseTime } from "@/data/maintenance";
@@ -20,7 +20,7 @@ import { DemoMakerInfo } from "@/components/demos/DemoMakerInfo";
    3. 전후 비교: 고치기 전 화면은 예약 버튼을 눌러도 반응이 없고, 고친 뒤 화면은 눌린다.
    4. 수리 보고서: 단계가 끝나면 원인과 고친 내용이 채워진다. */
 
-const mono = JetBrains_Mono({ weight: ["400", "600"], subsets: ["latin"], preload: false, display: "swap" });
+const mono = JetBrains_Mono;
 const monoF = { fontFamily: `${mono.style.fontFamily}, ui-monospace, monospace` } as const;
 
 const fix = maintenanceServices.find((s) => s.id === "fix")!;

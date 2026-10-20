@@ -1,7 +1,7 @@
 "use client";
 
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
-import { IBM_Plex_Sans_KR } from "next/font/google";
+import { IBM_Plex_Sans_KR } from "@/lib/local-fonts";
 import { daysAgo, fmtDot, useDemoToday } from "@/hooks/useDemoToday";
 import { Calculator, CalendarClock, CheckCircle2, ChevronRight, CreditCard, FileSearch, Home, Landmark, PiggyBank, Phone, ReceiptText, TrendingUp, Wallet } from "lucide-react";
 import { DemoMakerInfo } from "@/components/demos/DemoMakerInfo";
@@ -10,7 +10,7 @@ import { DemoMakerInfo } from "@/components/demos/DemoMakerInfo";
    금액 단위는 모두 만 원. 적립 기간은 월 복리, 은퇴 후에는 연 2.5%로 운용하면서
    (희망 생활비 - 국민연금)을 매달 꺼내 쓴다고 계산한다. 물가상승률 반영 시 연 2%. */
 
-const plex = IBM_Plex_Sans_KR({ weight: ["400", "700"], subsets: ["latin"], display: "swap", preload: false });
+const plex = IBM_Plex_Sans_KR;
 
 // 검증 통과한 2계열 팔레트 (validate_palette.js, light): 예상 자산 / 필요 자산
 const C_PLAN = "#1a6fb8";

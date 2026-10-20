@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useMemo, useRef, useState } from "react";
-import { Gowun_Batang, Nanum_Pen_Script } from "next/font/google";
+import { Gowun_Batang, Nanum_Pen_Script } from "@/lib/local-fonts";
 import { AnimatePresence, motion } from "framer-motion";
 import { BellRing, CalendarDays, Check, Clock, CreditCard, Landmark, MapPin, Phone, RotateCcw, Users } from "lucide-react";
 import { useReducedMotionSafe } from "@/hooks/useReducedMotionSafe";
@@ -22,8 +22,8 @@ import { DemoMakerInfo } from "@/components/demos/DemoMakerInfo";
    4. 사장님 화면: 회차별 신청자 표(결제 상태, 변경 이력)와 알림 기록.
    5. 가죽 색 고르기: 첫 화면 카드지갑 그림 색이 바뀐다. */
 
-const serif = Gowun_Batang({ weight: ["400", "700"], preload: false, display: "swap" });
-const pen = Nanum_Pen_Script({ weight: "400", preload: false, display: "swap" });
+const serif = Gowun_Batang;
+const pen = Nanum_Pen_Script;
 const serifF = { fontFamily: `${serif.style.fontFamily}, "Nanum Myeongjo", serif` } as const;
 const penF = { fontFamily: `${pen.style.fontFamily}, cursive` } as const;
 

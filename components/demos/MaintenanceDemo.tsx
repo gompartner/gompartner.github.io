@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useMemo, useState } from "react";
-import { IBM_Plex_Sans_KR } from "next/font/google";
+import { IBM_Plex_Sans_KR } from "@/lib/local-fonts";
 import {
   Archive,
   CheckCircle2,
@@ -22,7 +22,7 @@ import {
 import { useLocalStorage } from "@/hooks/useLocalStorage";
 import { daysAgo, fmtDash, useDemoToday } from "@/hooks/useDemoToday";
 
-const plex = IBM_Plex_Sans_KR({ weight: ["400", "700"], subsets: ["latin"], preload: false, display: "swap" });
+const plex = IBM_Plex_Sans_KR;
 
 const STORAGE_KEY = "gs-demo:maintenance:v3";
 

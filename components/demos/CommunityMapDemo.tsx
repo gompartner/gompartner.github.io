@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useMemo, useRef, useState, useSyncExternalStore } from "react";
-import { Jua } from "next/font/google";
+import { Jua } from "@/lib/local-fonts";
 import {
   BookOpen,
   CheckCircle2,
@@ -30,7 +30,7 @@ import { useReducedMotionSafe } from "@/hooks/useReducedMotionSafe";
    분류 색은 dataviz 검증 스크립트 통과 순서(녹·자·황·청·적)이며,
    색만으로 구분하지 않도록 핀·목록·분류 버튼에 아이콘과 분류 이름을 함께 쓴다. */
 
-const jua = Jua({ weight: "400", preload: false, display: "swap" });
+const jua = Jua;
 
 type CategoryId = "meeting" | "studio" | "library" | "sports" | "community";
 
