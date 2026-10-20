@@ -17,6 +17,7 @@ export function DemoMakerInfo({ className = "" }: { className?: string }) {
         <Link href="/" data-gtm-cta="demo_footer_home" className="underline-offset-4 hover:underline">
           gompartner.co.kr
         </Link>
+        <span>사업자등록번호 {profile.bizNo}</span>
       </p>
     </div>
   );

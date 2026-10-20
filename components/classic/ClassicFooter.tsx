@@ -2,7 +2,7 @@ import Image from "next/image";
 import Link from "next/link";
 import { profile } from "@/data/classic/profile";
 
-// 클래식 보기 바닥글. 사업자 정보는 재개업 전까지 두지 않는다.
+// 클래식 보기 바닥글. 사업자 정보는 상호와 번호만 둔다(통신판매업 신고 전).
 const menu = [
   { href: "/classic/works", label: "샘플" },
   { href: "/classic/pricing", label: "가격" },
@@ -64,7 +64,9 @@ export function ClassicFooter() {
           <Link href="/classic/privacy" className="font-bold text-white hover:underline">
             개인정보처리방침
           </Link>
-          <p>© {new Date().getFullYear()} {profile.name}</p>
+          <p>
+            상호 {profile.name} | 사업자등록번호 {profile.bizNo} | © {new Date().getFullYear()} {profile.name}
+          </p>
         </div>
       </div>
     </footer>

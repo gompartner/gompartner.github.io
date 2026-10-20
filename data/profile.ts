@@ -8,5 +8,6 @@ export const profile: Profile = {
   location: "재택 · 온라인 미팅",
   email: "gompartner@gmail.com",
   phone: "0507-1398-4044",
+  bizNo: "725-40-01614",
   avatarUrl: "",
 };
