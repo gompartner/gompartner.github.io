@@ -8,6 +8,7 @@ export interface Profile {
   location: string;
   email: string;
   phone: string;
+  bizNo: string;
   avatarUrl: string;
 }
 
