@@ -29,8 +29,13 @@ export function ClassicFooter() {
             {profile.name}
           </p>
           <p className="mt-4">
+            <a href={`tel:${profile.phone.replace(/-/g, "")}`} data-gtm-cta="classic_footer_tel" className="hover:text-white">
+              전화 {profile.phone}
+            </a>
+          </p>
+          <p className="mt-1">
             <a href={`mailto:${profile.email}`} data-gtm-cta="classic_footer_email" className="hover:text-white">
-              {profile.email}
+              이메일 {profile.email}
             </a>
           </p>
         </div>
