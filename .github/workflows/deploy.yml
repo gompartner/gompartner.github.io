@@ -28,7 +28,14 @@ jobs:
           node-version: 22
           cache: npm
       - run: npm ci
-      - run: npm run build
+      # 구글 폰트 내려받기가 가끔 끊겨 빌드가 실패한다. 세 번까지 다시 시도한다.
+      - run: |
+          for i in 1 2 3; do
+            npm run build && exit 0
+            echo "빌드 실패, 30초 뒤 다시 시도 ($i/3)"
+            sleep 30
+          done
+          exit 1
       - uses: actions/upload-pages-artifact@v5
         with:
           path: out
