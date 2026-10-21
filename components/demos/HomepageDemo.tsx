@@ -27,6 +27,7 @@ import {
 import { useLocalStorage } from "@/hooks/useLocalStorage";
 import { useDemoToday } from "@/hooks/useDemoToday";
 import { DemoMakerInfo } from "@/components/demos/DemoMakerInfo";
+import { afterSettle, jumpTo } from "@/components/demos/guideScroll";
 
 const STORAGE_KEY = "gs-demo:homepage:v4";
 
@@ -360,9 +361,14 @@ export function HomepageDemo() {
   const openTutorial = (n: number) => {
     const el = document.getElementById(tutorialSteps[n].target);
     if (!el) return;
-    // 전역 scroll-behavior:smooth를 우회해 즉시 이동해야 측정 좌표가 정확하다
-    el.scrollIntoView({ block: "center", behavior: "instant" as ScrollBehavior });
-    setTutStep(n);
+    // 전역 scroll-behavior:smooth를 우회해 즉시 옮기고, 위치가 멈춘 뒤에 가이드를 띄운다
+    setTutRect(null);
+    jumpTo(el);
+    afterSettle(() => {
+      const r = el.getBoundingClientRect();
+      setTutRect({ top: r.top, left: r.left, width: r.width, height: r.height });
+      setTutStep(n);
+    });
   };
 
   // 가이드가 열려 있는 동안 대상 영역 좌표를 스크롤·리사이즈에 맞춰 동기화
@@ -1456,7 +1462,7 @@ export function HomepageDemo() {
             aria-label="예약 가이드"
           >
             <div
-              className="pointer-events-none absolute rounded-2xl border-2 border-[#16A34A] transition-all duration-300"
+              className="pointer-events-none absolute rounded-2xl border-2 border-[#16A34A]"
               style={(() => {
                 // 대상이 화면보다 크거나 가장자리에 붙어도 초록 테두리 4변이 항상 보이게 뷰포트 안쪽으로 클램프
                 const inset = 6;
