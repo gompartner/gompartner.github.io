@@ -634,7 +634,7 @@ export function TermsGenerator() {
           </label>
           <label className={label}>
             고객 상담 연락처 <span className="text-[#b42318]">*</span>
-            <input value={form.contact} onChange={(e) => set("contact", e.target.value)} placeholder="02-000-0000, help@gompartner.co.kr" className={input} />
+            <input value={form.contact} onChange={(e) => set("contact", e.target.value)} placeholder="02-000-0000, info@example.co.kr" className={input} />
           </label>
         </div>
 
