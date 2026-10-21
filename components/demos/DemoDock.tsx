@@ -24,6 +24,19 @@ function resolve(selector: string): HTMLElement | null {
   return el;
 }
 
+/** 안내 영역으로 바로 옮긴다. 사이트 전체의 부드러운 스크롤을 잠시 꺼서 휴대폰 사파리에서도 미끄러지지 않게 하고,
+ *  화면보다 큰 구역은 가운데 대신 머리글 아래에 윗부분을 맞춘다. */
+function jumpTo(el: HTMLElement) {
+  const root = document.documentElement;
+  const prev = root.style.scrollBehavior;
+  root.style.scrollBehavior = "auto";
+  const r = el.getBoundingClientRect();
+  const vh = window.innerHeight;
+  const top = r.height > vh * 0.6 ? window.scrollY + r.top - 80 : window.scrollY + r.top - (vh - r.height) / 2;
+  window.scrollTo(0, Math.max(top, 0));
+  root.style.scrollBehavior = prev;
+}
+
 export function DemoDock({ projectId, tour }: { projectId: string; tour?: TourStep[] }) {
   const [step, setStep] = useState<number | null>(null);
   const [rect, setRect] = useState<Rect | null>(null);
@@ -32,7 +45,7 @@ export function DemoDock({ projectId, tour }: { projectId: string; tour?: TourSt
   const open = (n: number, list = steps) => {
     const el = resolve(list[n].target);
     if (!el) return;
-    el.scrollIntoView({ block: "center", behavior: "instant" as ScrollBehavior });
+    jumpTo(el);
     setStep(n);
   };
 
@@ -47,7 +60,8 @@ export function DemoDock({ projectId, tour }: { projectId: string; tour?: TourSt
     const begin = () => {
       const list = (tour ?? []).filter((s) => resolve(s.target));
       if (!list.length) return false;
-      resolve(list[0].target)?.scrollIntoView({ block: "center", behavior: "instant" as ScrollBehavior });
+      const first = resolve(list[0].target);
+      if (first) jumpTo(first);
       setSteps(list);
       setStep(0);
       return true;
@@ -109,7 +123,7 @@ export function DemoDock({ projectId, tour }: { projectId: string; tour?: TourSt
         <div className="fixed inset-0 z-[70]" onClick={close} role="dialog" aria-modal="true" aria-label="사용법">
           <div
             aria-hidden
-            className="pointer-events-none absolute rounded-2xl border-2 border-[#16A34A] transition-all duration-300 motion-reduce:transition-none"
+            className="pointer-events-none absolute rounded-2xl border-2 border-[#16A34A]"
             style={(() => {
               // 영역이 화면보다 크거나 가장자리에 붙어도 테두리 네 변이 보이게 화면 안쪽으로 맞춘다
               const inset = 6;
