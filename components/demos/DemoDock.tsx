@@ -4,6 +4,7 @@ import Link from "next/link";
 import { useCallback, useEffect, useRef, useState } from "react";
 import { ArrowDown, ArrowUp, CircleHelp, House } from "lucide-react";
 import type { TourStep } from "@/data/tours";
+import { afterSettle, jumpTo } from "./guideScroll";
 
 // 샘플 화면 위에는 메인으로 가는 집 아이콘과 '사용법 보기' 버튼만 띄운다. 금액·만든 이야기·다른 샘플은 샘플 표지(/sample/[slug])가 맡는다.
 // 사용법 가이드는 프라이빗 짐 데모(HomepageDemo)의 스포트라이트 가이드와 같은 방식이다.
@@ -24,19 +25,6 @@ function resolve(selector: string): HTMLElement | null {
   return el;
 }
 
-/** 안내 영역으로 바로 옮긴다. 사이트 전체의 부드러운 스크롤을 잠시 꺼서 휴대폰 사파리에서도 미끄러지지 않게 하고,
- *  화면보다 큰 구역은 가운데 대신 머리글 아래에 윗부분을 맞춘다. */
-function jumpTo(el: HTMLElement) {
-  const root = document.documentElement;
-  const prev = root.style.scrollBehavior;
-  root.style.scrollBehavior = "auto";
-  const r = el.getBoundingClientRect();
-  const vh = window.innerHeight;
-  const top = r.height > vh * 0.6 ? window.scrollY + r.top - 80 : window.scrollY + r.top - (vh - r.height) / 2;
-  window.scrollTo(0, Math.max(top, 0));
-  root.style.scrollBehavior = prev;
-}
-
 export function DemoDock({ projectId, tour }: { projectId: string; tour?: TourStep[] }) {
   const [step, setStep] = useState<number | null>(null);
   const [rect, setRect] = useState<Rect | null>(null);
@@ -45,8 +33,13 @@ export function DemoDock({ projectId, tour }: { projectId: string; tour?: TourSt
   const open = (n: number, list = steps) => {
     const el = resolve(list[n].target);
     if (!el) return;
+    setRect(null);
     jumpTo(el);
-    setStep(n);
+    afterSettle(() => {
+      const r = el.getBoundingClientRect();
+      setRect({ top: r.top, left: r.left, width: r.width, height: r.height });
+      setStep(n);
+    });
   };
 
   const close = () => {
@@ -63,7 +56,7 @@ export function DemoDock({ projectId, tour }: { projectId: string; tour?: TourSt
       const first = resolve(list[0].target);
       if (first) jumpTo(first);
       setSteps(list);
-      setStep(0);
+      afterSettle(() => setStep(0));
       return true;
     };
     if (begin()) return;
