@@ -99,7 +99,32 @@ export function HostingCostCalculator() {
 
       <h2 className="mt-14 text-[24px] font-bold leading-[1.5]">업체별 요금</h2>
       <p className="mt-1 text-[15px] text-foreground-secondary">{checkedAt} 각 업체 공식 요금표 기준, 1년 결제 정가입니다.</p>
-      <div className="mt-4 overflow-x-auto rounded-[10px] border border-border">
+      {/* 휴대폰에서는 표 칸이 좁아 상품명이 세 줄로 접히고 오른쪽 칸이 가려져서, 상품마다 카드로 보여 준다 */}
+      <ul className="mt-4 divide-y divide-border rounded-[10px] border border-border sm:hidden">
+        {hostingPlans.map((p) => (
+          <li key={p.id} className="px-4 py-4">
+            <div className="flex items-baseline justify-between gap-3">
+              <p className="min-w-0 text-[15px] leading-[1.5]">
+                <span className="font-bold">{p.provider}</span> {p.product}
+              </p>
+              <p className="shrink-0 text-[16px] font-bold tabular-nums">{won(p.yearly)}</p>
+            </div>
+            <p className="mt-0.5 text-[14px] text-foreground-secondary">{p.kind}</p>
+            <dl className="mt-2 grid grid-cols-[4.5rem_1fr] gap-x-2 gap-y-1 text-[14px]">
+              <dt className="text-foreground-secondary">설치비</dt>
+              <dd className="tabular-nums">{p.setup ? won(p.setup) : "없음"}</dd>
+              <dt className="text-foreground-secondary">https</dt>
+              <dd>{p.ssl ? p.ssl.label : "확인 못 함"}</dd>
+              <dt className="text-foreground-secondary">용량</dt>
+              <dd>{p.storage}</dd>
+            </dl>
+            <a href={p.source} target="_blank" rel="noopener nofollow" className="mt-2 inline-flex items-center gap-1 text-[14px] text-accent hover:underline">
+              요금표 <ExternalLink size={13} aria-hidden />
+            </a>
+          </li>
+        ))}
+      </ul>
+      <div className="mt-4 hidden overflow-x-auto rounded-[10px] border border-border sm:block">
         <table className="w-full min-w-[760px] text-left text-[15px]">
           <thead className="bg-surface">
             <tr>
@@ -131,7 +156,23 @@ export function HostingCostCalculator() {
       </div>
 
       <h2 className="mt-14 text-[24px] font-bold leading-[1.5]">도메인 1년</h2>
-      <div className="mt-4 overflow-x-auto rounded-[10px] border border-border">
+      <ul className="mt-4 divide-y divide-border rounded-[10px] border border-border sm:hidden">
+        {domainPrices.map((d) => (
+          <li key={d.registrar} className="px-4 py-4">
+            <a href={d.source} target="_blank" rel="noopener nofollow" className="text-[15px] font-bold hover:text-accent hover:underline">{d.registrar}</a>
+            <dl className="mt-2 grid grid-cols-[4.5rem_1fr] gap-x-2 gap-y-1 text-[14px]">
+              {tlds.map((t) => (
+                <div key={t} className="contents">
+                  <dt className="text-foreground-secondary">{t}</dt>
+                  <dd className="tabular-nums">{won(d.prices[t])}</dd>
+                </div>
+              ))}
+            </dl>
+            {d.note && <p className="mt-2 text-[14px] text-foreground-secondary">{d.note}</p>}
+          </li>
+        ))}
+      </ul>
+      <div className="mt-4 hidden overflow-x-auto rounded-[10px] border border-border sm:block">
         <table className="w-full min-w-[560px] text-left text-[15px]">
           <thead className="bg-surface">
             <tr>
