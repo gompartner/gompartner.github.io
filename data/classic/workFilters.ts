@@ -32,18 +32,6 @@ export const fieldsById: Record<string, Field[]> = {
   "shop-admin": ["가게·매장", "기업"],
   "excel-automation": ["기업", "가게·매장"],
   "maintenance-urgent-fix": ["가게·매장"],
-  "roastery": ["가게·매장"],
-  "hair-salon": ["가게·매장"],
-  "optical": ["가게·매장"],
-  "furniture-workshop": ["가게·매장"],
-  "coworking": ["기업", "가게·매장"],
-  "campsite": ["가게·매장"],
-  "photo-studio": ["가게·매장"],
-  "nail-shop": ["가게·매장"],
-  "car-detailing": ["가게·매장"],
-  "lighting-shop": ["가게·매장"],
-  "liquor-shop": ["가게·매장"],
-  "small-wedding": ["가게·매장"],
 };
 
 // keywords 중 하나라도 들어간 기능 태그에 형광펜을 긋는다

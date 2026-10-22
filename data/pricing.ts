@@ -157,18 +157,6 @@ const estimateSource: Record<string, { plan: PlanId | LandingPlanId; extras: Ext
   "cert-lab": { plan: "premium", extras: [] }, // 시험진행현황 조회
   "flower-expo": { plan: "basic", extras: [["tool"]] }, // 한 페이지 안내+관람요금 계산
   "online-store": { plan: "premium", extras: [["cart"], ["pay"], ["member"]] }, // 유약 색·각인 미리보기
-  "roastery": { plan: "standard", extras: [["tool", 2], ["cart"]] }, // 구독 금액 계산, 분쇄도와 맛 노트 고르기, 원두 담기와 주문 접수
-  "hair-salon": { plan: "standard", extras: [["tool"]] }, // 디자이너별 소요시간 합산 예약 시간표
-  "optical": { plan: "standard", extras: [["tool", 2], ["map"]] }, // 테와 렌즈 가격 계산기, 시력검사 예약 접수가 tool, 오시는 길 지도가 map
-  "furniture-workshop": { plan: "standard", extras: [["tool"]] }, // 치수, 목재별 견적 계산과 도면 PNG 첨부 문의가 tool
-  "coworking": { plan: "standard", extras: [["tool", 2]] }, // 요금 계산, 더해서 실시간 좌석 평면도와 회의실 현황 조회
-  "campsite": { plan: "premium", extras: [["tool", 2]] }, // 사이트별 날짜 예약현황 달력, 장비 대여와 인원 추가 요금 합산
-  "photo-studio": { plan: "standard", extras: [["tool"]] }, // 패키지 옵션 합산과 시간대별 예약 접수가 tool
-  "nail-shop": { plan: "standard", extras: [["tool"]] }, // 손톱 컬러 시뮬레이터와 금액 계산, 예약 접수가 tool
-  "car-detailing": { plan: "standard", extras: [["tool", 2]] }, // 차종별 시공 견적 계산, 입고 예약과 픽업 접수
-  "lighting-shop": { plan: "standard", extras: [["tool"]] }, // 색온도와 밝기 조절, 제품을 방에 걸어 보는 체험 도구
-  "liquor-shop": { plan: "standard", extras: [["tool", 2]] }, // 도수 단맛 가격 조건으로 병 고르기와 선물 세트 합계가 하나, 시음회 회차 예약이 하나
-  "small-wedding": { plan: "standard", extras: [["tool", 2]] }, // 하객 수 배치도 + 패키지 견적 계산이 tool, 달력과 상담 폼은 기본
 };
 
 /** 오픈 할인: 샘플에 이미 있는 기능은 다시 쓰므로 추가 기능 금액을 절반만 받는다. */
