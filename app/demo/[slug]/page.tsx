@@ -44,40 +44,6 @@ const LandingLeatherClassDemo = dynamic(() => import("@/components/demos/Landing
 const MaintenanceUrgentFixDemo = dynamic(() => import("@/components/demos/MaintenanceUrgentFixDemo").then((m) => m.MaintenanceUrgentFixDemo));
 const LandingWaterRentalDemo = dynamic(() => import("@/components/demos/LandingWaterRentalDemo").then((m) => m.LandingWaterRentalDemo));
 const ShopAdminDemo = dynamic(() => import("@/components/demos/ShopAdminDemo").then((m) => m.ShopAdminDemo));
-const RoasteryDemo = dynamic(() => import("@/components/demos/RoasteryDemo").then((m) => m.RoasteryDemo));
-const HairSalonDemo = dynamic(() => import("@/components/demos/HairSalonDemo").then((m) => m.HairSalonDemo));
-const OpticalDemo = dynamic(() => import("@/components/demos/OpticalDemo").then((m) => m.OpticalDemo));
-const FurnitureWorkshopDemo = dynamic(() => import("@/components/demos/FurnitureWorkshopDemo").then((m) => m.FurnitureWorkshopDemo));
-const CoworkingDemo = dynamic(() => import("@/components/demos/CoworkingDemo").then((m) => m.CoworkingDemo));
-const CampsiteDemo = dynamic(() => import("@/components/demos/CampsiteDemo").then((m) => m.CampsiteDemo));
-const PhotoStudioDemo = dynamic(() => import("@/components/demos/PhotoStudioDemo").then((m) => m.PhotoStudioDemo));
-const NailShopDemo = dynamic(() => import("@/components/demos/NailShopDemo").then((m) => m.NailShopDemo));
-const CarDetailingDemo = dynamic(() => import("@/components/demos/CarDetailingDemo").then((m) => m.CarDetailingDemo));
-const LightingShopDemo = dynamic(() => import("@/components/demos/LightingShopDemo").then((m) => m.LightingShopDemo));
-const LiquorShopDemo = dynamic(() => import("@/components/demos/LiquorShopDemo").then((m) => m.LiquorShopDemo));
-const SmallWeddingDemo = dynamic(() => import("@/components/demos/SmallWeddingDemo").then((m) => m.SmallWeddingDemo));
-const KoreanMedicineDemo = dynamic(() => import("@/components/demos/KoreanMedicineDemo").then((m) => m.KoreanMedicineDemo));
-const OrthopedicsDemo = dynamic(() => import("@/components/demos/OrthopedicsDemo").then((m) => m.OrthopedicsDemo));
-const PediatricsDemo = dynamic(() => import("@/components/demos/PediatricsDemo").then((m) => m.PediatricsDemo));
-const EyeClinicDemo = dynamic(() => import("@/components/demos/EyeClinicDemo").then((m) => m.EyeClinicDemo));
-const AnimalHospitalDemo = dynamic(() => import("@/components/demos/AnimalHospitalDemo").then((m) => m.AnimalHospitalDemo));
-const NursingHospitalDemo = dynamic(() => import("@/components/demos/NursingHospitalDemo").then((m) => m.NursingHospitalDemo));
-const LaborFirmDemo = dynamic(() => import("@/components/demos/LaborFirmDemo").then((m) => m.LaborFirmDemo));
-const ScrivenerDemo = dynamic(() => import("@/components/demos/ScrivenerDemo").then((m) => m.ScrivenerDemo));
-const PatentOfficeDemo = dynamic(() => import("@/components/demos/PatentOfficeDemo").then((m) => m.PatentOfficeDemo));
-const FamilyLawDemo = dynamic(() => import("@/components/demos/FamilyLawDemo").then((m) => m.FamilyLawDemo));
-const VisaAgentDemo = dynamic(() => import("@/components/demos/VisaAgentDemo").then((m) => m.VisaAgentDemo));
-const ArchitectDemo = dynamic(() => import("@/components/demos/ArchitectDemo").then((m) => m.ArchitectDemo));
-const PresaleDemo = dynamic(() => import("@/components/demos/PresaleDemo").then((m) => m.PresaleDemo));
-const SaasDemo = dynamic(() => import("@/components/demos/SaasDemo").then((m) => m.SaasDemo));
-const LogisticsDemo = dynamic(() => import("@/components/demos/LogisticsDemo").then((m) => m.LogisticsDemo));
-const FoodOemDemo = dynamic(() => import("@/components/demos/FoodOemDemo").then((m) => m.FoodOemDemo));
-const PianoAcademyDemo = dynamic(() => import("@/components/demos/PianoAcademyDemo").then((m) => m.PianoAcademyDemo));
-const TaekwondoDemo = dynamic(() => import("@/components/demos/TaekwondoDemo").then((m) => m.TaekwondoDemo));
-const ArtAcademyDemo = dynamic(() => import("@/components/demos/ArtAcademyDemo").then((m) => m.ArtAcademyDemo));
-const EnglishTalkDemo = dynamic(() => import("@/components/demos/EnglishTalkDemo").then((m) => m.EnglishTalkDemo));
-const DrivingSchoolDemo = dynamic(() => import("@/components/demos/DrivingSchoolDemo").then((m) => m.DrivingSchoolDemo));
-const ReadingAcademyDemo = dynamic(() => import("@/components/demos/ReadingAcademyDemo").then((m) => m.ReadingAcademyDemo));
 
 interface DemoPageProps {
   params: Promise<{ slug: string }>;
@@ -121,40 +87,6 @@ const demoComponents: Record<string, ComponentType> = {
   "shop-admin": ShopAdminDemo,
   "excel-automation": ExcelAutomationDemo,
   lms: LmsDemo,
-  "roastery": RoasteryDemo,
-  "hair-salon": HairSalonDemo,
-  "optical": OpticalDemo,
-  "furniture-workshop": FurnitureWorkshopDemo,
-  "coworking": CoworkingDemo,
-  "campsite": CampsiteDemo,
-  "photo-studio": PhotoStudioDemo,
-  "nail-shop": NailShopDemo,
-  "car-detailing": CarDetailingDemo,
-  "lighting-shop": LightingShopDemo,
-  "liquor-shop": LiquorShopDemo,
-  "small-wedding": SmallWeddingDemo,
-  "korean-medicine": KoreanMedicineDemo,
-  "orthopedics": OrthopedicsDemo,
-  "pediatrics": PediatricsDemo,
-  "eye-clinic": EyeClinicDemo,
-  "animal-hospital": AnimalHospitalDemo,
-  "nursing-hospital": NursingHospitalDemo,
-  "labor-firm": LaborFirmDemo,
-  "scrivener": ScrivenerDemo,
-  "patent-office": PatentOfficeDemo,
-  "family-law": FamilyLawDemo,
-  "visa-agent": VisaAgentDemo,
-  "architect-office": ArchitectDemo,
-  "presale": PresaleDemo,
-  "saas-startup": SaasDemo,
-  "logistics": LogisticsDemo,
-  "food-oem": FoodOemDemo,
-  "piano-academy": PianoAcademyDemo,
-  "taekwondo": TaekwondoDemo,
-  "art-academy": ArtAcademyDemo,
-  "english-talk": EnglishTalkDemo,
-  "driving-school": DrivingSchoolDemo,
-  "reading-academy": ReadingAcademyDemo,
 };
 
 function findDemo(slug: string) {
