@@ -62,7 +62,7 @@ export function Header() {
         aria-label="주 메뉴"
       >
         <Link
-          href="/"
+          href="/story"
           className="flex items-center gap-2 font-[family-name:var(--font-sfx)] text-[22px] text-foreground"
           aria-label="맨 위로 이동"
         >

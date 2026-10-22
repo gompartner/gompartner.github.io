@@ -219,11 +219,11 @@ function bottomBarHeight(own: HTMLElement | null): number {
 /** 메인으로 가는 집 아이콘과 사용법 보기 버튼. 사용법은 한 번도 열지 않았으면 초록으로 반짝인다. */
 function DockButtons({ guide, projectId }: { guide: { fresh: boolean; onClick: () => void } | null; projectId: string }) {
   const own = useRef<HTMLDivElement>(null);
-  // 클래식 보기를 고른 사람은 클래식 첫 화면으로 돌아간다(클라이언트 이동이라 루트의 자동 이동 스크립트가 돌지 않는다)
+  // 웹툰 보기를 고른 사람은 곰파트너 이야기로 돌아간다(클라이언트 이동이라 루트의 자동 이동 스크립트가 돌지 않는다)
   const [home, setHome] = useState("/");
   useEffect(() => {
     try {
-      if (localStorage.getItem("look") === "classic") setHome("/classic");
+      if (localStorage.getItem("look") === "webtoon") setHome("/story");
     } catch {}
   }, []);
   const [lift, setLift] = useState(0);

@@ -25,7 +25,7 @@ export function PageHead({ title, trail = [] }: { title: string; trail?: { href:
         <nav aria-label="현재 위치">
           <ol className="flex flex-wrap items-center gap-1.5 text-[14px] text-[#aebbd6]">
             <li>
-              <Link href="/classic" aria-label="처음" className="inline-flex hover:text-white">
+              <Link href="/" aria-label="처음" className="inline-flex hover:text-white">
                 <Home size={15} aria-hidden />
               </Link>
             </li>

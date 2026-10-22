@@ -6,12 +6,13 @@ import { serviceTabs } from "@/components/classic/pricing/tabs";
 import { PageHead, SubTabs, btnPrimary, h2, h3, wrap } from "@/components/classic/ui";
 import { ChannelTalkButton } from "@/components/layout/ChannelTalk";
 import { maintenanceServices, maintenanceSteps, responseTime } from "@/data/classic/maintenance";
-import { fitDescription } from "@/lib/seo";
+import { pageMeta } from "@/lib/seo";
 
-export const metadata: Metadata = {
+export const metadata: Metadata = pageMeta({
   title: "홈페이지 유지보수 비용 (월 관리, 오류 수정)",
-  description: fitDescription("월 유지보수 5만 원, 오류 수정 건당 5만 원부터, 다른 업체가 만든 홈페이지 인계 점검 10만 원. 하는 일과 맡지 않는 일을 적었습니다."),
-};
+  description: "월 유지보수 5만 원, 오류 수정 건당 5만 원부터, 다른 업체가 만든 홈페이지 인계 점검 10만 원. 하는 일과 맡지 않는 일을 적었습니다.",
+  path: "/classic/maintenance",
+});
 
 const cellTh = "px-4 py-3.5 text-left text-[15px] font-bold text-[#3d4450] md:px-5";
 const cell = "px-4 py-3.5 text-[16px] md:px-5";

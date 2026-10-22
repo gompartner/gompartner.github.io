@@ -2,10 +2,13 @@ import type { Metadata } from "next";
 import { PageHead, SubTabs, h2, wrap } from "@/components/classic/ui";
 import { SampleGrid } from "@/components/classic/works/SampleGrid";
 import { demoProjects, worksTabs } from "@/components/classic/works/samples";
+import { pageMeta } from "@/lib/seo";
 
-export const metadata: Metadata = {
+export const metadata: Metadata = pageMeta({
   title: "홈페이지 제작 샘플",
-};
+  description: `쇼핑몰, 펜션, 회사, 병원, 학원, 카페 홈페이지와 랜딩페이지 샘플 ${demoProjects.length}개. 샘플을 직접 눌러 볼 수 있습니다.`,
+  path: "/classic/works",
+});
 
 export default function ClassicWorksPage() {
   return (

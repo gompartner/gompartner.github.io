@@ -9,6 +9,7 @@ import { SampleGrid } from "@/components/classic/works/SampleGrid";
 import { demoProjects, findBySlug, industryOf, isMaintenance, mobileShotOf, samplesIn, slugOf } from "@/components/classic/works/samples";
 import { estimateFor, formatWon, manwon } from "@/data/classic/pricing";
 import { maintenanceServices } from "@/data/classic/maintenance";
+import { pageMeta } from "@/lib/seo";
 
 type Props = { params: Promise<{ slug: string }> };
 
@@ -20,7 +21,7 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
   const { slug } = await params;
   const p = findBySlug(slug);
   if (!p) return {};
-  return { title: `${p.title} 샘플 소개` };
+  return pageMeta({ title: `${p.title} 샘플 소개`, description: p.description, path: `/classic/sample/${slug}` });
 }
 
 const row = "flex justify-between gap-4 border-b border-[#e6e9ee] py-3";

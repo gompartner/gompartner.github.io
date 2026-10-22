@@ -128,7 +128,7 @@ export default async function SamplePage({ params }: Props) {
     <div className="mx-auto w-full max-w-[760px] px-4 pb-16 pt-6 md:px-6 md:pt-10">
       <div className="flex items-center justify-between gap-3">
         <div className="flex items-center gap-2">
-          <Link href="/" aria-label="곰파트너 메인으로" title="곰파트너 메인으로" className="grid h-10 w-10 place-items-center rounded-full border-[2.5px] border-[#1d1d1f] bg-white hover:bg-[#fff3b0]">
+          <Link href="/story" aria-label="곰파트너 메인으로" title="곰파트너 메인으로" className="grid h-10 w-10 place-items-center rounded-full border-[2.5px] border-[#1d1d1f] bg-white hover:bg-[#fff3b0]">
             <House size={17} aria-hidden />
           </Link>
           <SampleBack className="inline-flex h-10 items-center gap-1.5 rounded-full border-[2.5px] border-[#1d1d1f] bg-white px-4 text-[15px] font-bold hover:bg-[#fff3b0]" />
