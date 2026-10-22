@@ -158,7 +158,7 @@ export function AdEpisode() {
                 initial={reduce ? false : { y: -90, opacity: 0 }}
                 animate={{ y: 0, opacity: 1 }}
                 transition={{ type: "spring", stiffness: 420, damping: 26, delay: 0.15 }}
-                className="absolute inset-x-3 top-3 rounded-[16px] border-[3px] bg-white/95 px-4 py-3 shadow-lg backdrop-blur md:inset-x-6"
+                className="absolute inset-x-3 top-3 rounded-[16px] border-[3px] bg-white px-4 py-3 shadow-lg md:inset-x-6"
                 style={{ borderColor: ink }}
               >
                 <p className="flex items-center gap-1.5 text-[13px] font-bold text-foreground-tertiary">

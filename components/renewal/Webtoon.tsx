@@ -160,15 +160,14 @@ export function Webtoon() {
                             {c.service} · {c.price}
                           </span>
                         </span>
-                        <motion.span
+                        {/* 화살표 까딱임은 CSS로 돌려 스크롤하는 동안 자바스크립트가 매 프레임 돌지 않게 한다 */}
+                        <span
                           aria-hidden
-                          animate={reduce || pick ? { x: 0 } : { x: [0, 5, 0] }}
-                          transition={{ duration: 0.6, ease: "easeInOut", repeat: reduce || pick ? 0 : Infinity, repeatDelay: 1.4, delay: 1 + i * 0.15 }}
-                          className={`flex h-8 w-8 shrink-0 items-center justify-center rounded-full border-[2.5px] ${on ? "bg-white text-accent" : "bg-accent text-white"}`}
-                          style={{ borderColor: ink }}
+                          className={`flex h-8 w-8 shrink-0 items-center justify-center rounded-full border-[2.5px] ${pick ? "" : "wt-nudge"} ${on ? "bg-white text-accent" : "bg-accent text-white"}`}
+                          style={{ borderColor: ink, animationDelay: `${1 + i * 0.15}s` }}
                         >
                           <ChevronRight size={18} strokeWidth={3} />
-                        </motion.span>
+                        </span>
                       </button>
                     </motion.li>
                   );
