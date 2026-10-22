@@ -44,6 +44,18 @@ const LandingLeatherClassDemo = dynamic(() => import("@/components/demos/Landing
 const MaintenanceUrgentFixDemo = dynamic(() => import("@/components/demos/MaintenanceUrgentFixDemo").then((m) => m.MaintenanceUrgentFixDemo));
 const LandingWaterRentalDemo = dynamic(() => import("@/components/demos/LandingWaterRentalDemo").then((m) => m.LandingWaterRentalDemo));
 const ShopAdminDemo = dynamic(() => import("@/components/demos/ShopAdminDemo").then((m) => m.ShopAdminDemo));
+const RoasteryDemo = dynamic(() => import("@/components/demos/RoasteryDemo").then((m) => m.RoasteryDemo));
+const HairSalonDemo = dynamic(() => import("@/components/demos/HairSalonDemo").then((m) => m.HairSalonDemo));
+const OpticalDemo = dynamic(() => import("@/components/demos/OpticalDemo").then((m) => m.OpticalDemo));
+const FurnitureWorkshopDemo = dynamic(() => import("@/components/demos/FurnitureWorkshopDemo").then((m) => m.FurnitureWorkshopDemo));
+const CoworkingDemo = dynamic(() => import("@/components/demos/CoworkingDemo").then((m) => m.CoworkingDemo));
+const CampsiteDemo = dynamic(() => import("@/components/demos/CampsiteDemo").then((m) => m.CampsiteDemo));
+const PhotoStudioDemo = dynamic(() => import("@/components/demos/PhotoStudioDemo").then((m) => m.PhotoStudioDemo));
+const NailShopDemo = dynamic(() => import("@/components/demos/NailShopDemo").then((m) => m.NailShopDemo));
+const CarDetailingDemo = dynamic(() => import("@/components/demos/CarDetailingDemo").then((m) => m.CarDetailingDemo));
+const LightingShopDemo = dynamic(() => import("@/components/demos/LightingShopDemo").then((m) => m.LightingShopDemo));
+const LiquorShopDemo = dynamic(() => import("@/components/demos/LiquorShopDemo").then((m) => m.LiquorShopDemo));
+const SmallWeddingDemo = dynamic(() => import("@/components/demos/SmallWeddingDemo").then((m) => m.SmallWeddingDemo));
 
 interface DemoPageProps {
   params: Promise<{ slug: string }>;
@@ -87,6 +99,18 @@ const demoComponents: Record<string, ComponentType> = {
   "shop-admin": ShopAdminDemo,
   "excel-automation": ExcelAutomationDemo,
   lms: LmsDemo,
+  "roastery": RoasteryDemo,
+  "hair-salon": HairSalonDemo,
+  "optical": OpticalDemo,
+  "furniture-workshop": FurnitureWorkshopDemo,
+  "coworking": CoworkingDemo,
+  "campsite": CampsiteDemo,
+  "photo-studio": PhotoStudioDemo,
+  "nail-shop": NailShopDemo,
+  "car-detailing": CarDetailingDemo,
+  "lighting-shop": LightingShopDemo,
+  "liquor-shop": LiquorShopDemo,
+  "small-wedding": SmallWeddingDemo,
 };
 
 function findDemo(slug: string) {
