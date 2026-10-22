@@ -172,6 +172,15 @@ body {
   outline: none;
 }
 
+/* 웹툰 첫 화면 답 말풍선의 화살표: 0.6초 까딱이고 1.4초 쉰다 */
+@media (prefers-reduced-motion: no-preference) {
+  .wt-nudge { animation: wt-nudge 2s ease-in-out infinite backwards; }
+}
+@keyframes wt-nudge {
+  0%, 30%, 100% { transform: none; }
+  15% { transform: translateX(5px); }
+}
+
 /* 샘플 소개의 실제 화면 캡처: 살짝 기울어진 사진. 스크롤로 들어올 때 떨어져 붙는다(지원 브라우저만, 동작 줄이기 설정이면 고정) */
 .shot-print { transform: rotate(var(--tilt, -1.6deg)); }
 @supports (animation-timeline: view()) {

@@ -1,7 +1,7 @@
 "use client";
 
 import { forwardRef, useEffect, useRef, useState } from "react";
-import { Check, ChevronDown } from "lucide-react";
+import { Check, ChevronDown, LoaderCircle } from "lucide-react";
 import { ChannelTalkButton } from "@/components/layout/ChannelTalk";
 import { btnLine, h2, wrap } from "@/components/classic/ui";
 import { LEAD_ENDPOINT } from "@/data/classic/leadEndpoint";
@@ -236,9 +236,17 @@ export const ClassicLeadForm = forwardRef<HTMLElement, { pkg: PackageName | ""; 
             <button
               type="submit"
               disabled={status.kind === "sending"}
+              aria-busy={status.kind === "sending"}
               className="flex h-14 w-full items-center justify-center rounded-md bg-[#256ef4] text-[18px] font-bold text-white transition-colors hover:bg-[#0b50d0] disabled:opacity-60 motion-reduce:transition-none"
             >
-              {status.kind === "sending" ? "접수 중" : "상담 신청하기"}
+              {status.kind === "sending" ? (
+                <>
+                  <LoaderCircle size={20} strokeWidth={3} className="mr-2 animate-spin motion-reduce:animate-none" aria-hidden />
+                  보내는 중이에요
+                </>
+              ) : (
+                "상담 신청하기"
+              )}
             </button>
           </form>
         )}

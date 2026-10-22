@@ -12,7 +12,7 @@ export function MobileCtaBar() {
   // 샘플 표지에서는 가격이 이미 보이므로 샘플을 바로 여는 버튼을 둔다
   const onSample = pathname.startsWith("/sample/");
   return (
-    <div className="fixed inset-x-0 bottom-0 z-40 grid grid-cols-2 gap-2 border-t-[3px] border-[#1d1d1f] bg-[#f3ece0]/95 px-4 pb-[calc(10px+env(safe-area-inset-bottom))] pt-2.5 backdrop-blur md:hidden print:hidden">
+    <div className="fixed inset-x-0 bottom-0 z-40 grid grid-cols-2 gap-2 border-t-[3px] border-[#1d1d1f] bg-[#f3ece0] px-4 pb-[calc(10px+env(safe-area-inset-bottom))] pt-2.5 md:hidden print:hidden">
       <Link
         href={onSample ? pathname.replace("/sample/", "/demo/") : onPricing ? "/works" : "/pricing"}
         prefetch={onSample ? false : undefined}
