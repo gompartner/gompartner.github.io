@@ -1,7 +1,7 @@
 "use client";
 
 import { forwardRef, useEffect, useRef, useState } from "react";
-import { Check, ChevronDown, LoaderCircle } from "lucide-react";
+import { Check, ChevronDown } from "lucide-react";
 import { LEAD_ENDPOINT } from "@/data/leadEndpoint";
 
 export const CHANNELS = ["네이버", "메타", "구글", "아직 안 함"] as const;
@@ -10,7 +10,8 @@ export type PackageName = (typeof PACKAGES)[number];
 
 const PHONE_RE = /^01[016789]-?\d{3,4}-?\d{4}$/;
 
-type Status = { kind: "idle" } | { kind: "sending" } | { kind: "error"; message: string } | { kind: "done"; id: string };
+// 누르면 바로 접수 화면으로 바꾸고 저장은 뒤에서 마친다(Apps Script 응답이 몇 초 걸려서). 번호는 답이 오면 채우고, 실패하면 폼으로 되돌린다.
+type Status = { kind: "idle" } | { kind: "error"; message: string } | { kind: "done"; id: string | null };
 
 // 웹툰 톤: 굵은 먹선 칸, 초점이 들어오면 파란 단단한 그림자. 격자 안에서 넘치지 않게 min-w-0.
 const field =
@@ -60,7 +61,7 @@ export const LeadForm = forwardRef<HTMLElement, { pkg: PackageName | ""; onPkg: 
 
   const submit = async (ev: React.FormEvent) => {
     ev.preventDefault();
-    if (status.kind === "sending") return;
+    if (status.kind === "done") return;
     if (!validate()) return;
     if (!LEAD_ENDPOINT) {
       console.warn("LEAD_ENDPOINT가 비어 있어 신청을 보내지 않았습니다. data/leadEndpoint.ts를 확인하세요.");
@@ -83,10 +84,11 @@ export const LeadForm = forwardRef<HTMLElement, { pkg: PackageName | ""; onPkg: 
       startedAt: startedAt.current,
       website,
     };
-    setStatus({ kind: "sending" });
+    setStatus({ kind: "done", id: null });
     try {
       // 헤더를 붙이지 않아 text/plain 단순 요청으로 간다(Apps Script는 사전 요청을 받지 못한다).
-      const res = await fetch(LEAD_ENDPOINT, { method: "POST", body: JSON.stringify(payload) });
+      // keepalive라 접수 화면을 보고 바로 창을 닫아도 요청은 끝까지 간다.
+      const res = await fetch(LEAD_ENDPOINT, { method: "POST", body: JSON.stringify(payload), keepalive: true });
       const data = (await res.json()) as { ok?: boolean; id?: string; error?: string };
       if (data.ok && data.id) {
         setStatus({ kind: "done", id: data.id });
@@ -109,7 +111,7 @@ export const LeadForm = forwardRef<HTMLElement, { pkg: PackageName | ""; onPkg: 
 
         {status.kind === "done" ? (
           <div className="mt-6 border-[3px] border-[#1d1d1f] bg-[#fff3b0] p-6 shadow-[8px_8px_0_#1d1d1f] md:p-8" role="status">
-            <p className="text-[15px] font-bold tabular-nums text-accent">접수 번호 {status.id}</p>
+            <p className={`text-[15px] font-bold tabular-nums ${status.id ? "" : "invisible"} text-accent`}>접수 번호 {status.id ?? "000000-000"}</p>
             <p className="mt-2 text-[24px] font-bold leading-[1.4]">신청이 접수되었습니다.</p>
             <p className="mt-2 text-[17px] leading-[1.6] text-foreground-secondary">영업일 기준 1일 이내 연락드립니다.</p>
           </div>
@@ -210,18 +212,9 @@ export const LeadForm = forwardRef<HTMLElement, { pkg: PackageName | ""; onPkg: 
 
             <button
               type="submit"
-              disabled={status.kind === "sending"}
-              aria-busy={status.kind === "sending"}
               className="flex h-14 w-full items-center justify-center rounded-[6px] border-[3px] border-[#1d1d1f] bg-accent text-[18px] font-bold text-white shadow-[4px_4px_0_#1d1d1f] transition-[transform,box-shadow,background-color] duration-150 hover:bg-accent-hover active:translate-x-1 active:translate-y-1 active:shadow-none disabled:opacity-60 motion-reduce:transition-none"
             >
-              {status.kind === "sending" ? (
-                <>
-                  <LoaderCircle size={20} strokeWidth={3} className="mr-2 animate-spin motion-reduce:animate-none" aria-hidden />
-                  보내는 중이에요
-                </>
-              ) : (
-                "상담 신청하기"
-              )}
+              상담 신청하기
             </button>
           </form>
         )}

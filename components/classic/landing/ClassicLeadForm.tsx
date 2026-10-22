@@ -1,7 +1,7 @@
 "use client";
 
 import { forwardRef, useEffect, useRef, useState } from "react";
-import { Check, ChevronDown, LoaderCircle } from "lucide-react";
+import { Check, ChevronDown } from "lucide-react";
 import { ChannelTalkButton } from "@/components/layout/ChannelTalk";
 import { btnLine, h2, wrap } from "@/components/classic/ui";
 import { LEAD_ENDPOINT } from "@/data/classic/leadEndpoint";
@@ -13,7 +13,8 @@ export type PackageName = (typeof PACKAGES)[number];
 
 const PHONE_RE = /^01[016789]-?\d{3,4}-?\d{4}$/;
 
-type Status = { kind: "idle" } | { kind: "sending" } | { kind: "error"; message: string } | { kind: "done"; id: string };
+// 누르면 바로 접수 화면으로 바꾸고 저장은 뒤에서 마친다(Apps Script 응답이 몇 초 걸려서). 번호는 답이 오면 채우고, 실패하면 폼으로 되돌린다.
+type Status = { kind: "idle" } | { kind: "error"; message: string } | { kind: "done"; id: string | null };
 
 // 얇은 회색 테두리, 초점이 들어오면 파란 테두리. 격자 안에서 넘치지 않게 min-w-0.
 const field =
@@ -64,7 +65,7 @@ export const ClassicLeadForm = forwardRef<HTMLElement, { pkg: PackageName | ""; 
 
   const submit = async (ev: React.FormEvent) => {
     ev.preventDefault();
-    if (status.kind === "sending") return;
+    if (status.kind === "done") return;
     if (!validate()) return;
     if (!LEAD_ENDPOINT) {
       console.warn("LEAD_ENDPOINT가 비어 있어 신청을 보내지 않았습니다. data/classic/leadEndpoint.ts를 확인하세요.");
@@ -87,10 +88,11 @@ export const ClassicLeadForm = forwardRef<HTMLElement, { pkg: PackageName | ""; 
       startedAt: startedAt.current,
       website,
     };
-    setStatus({ kind: "sending" });
+    setStatus({ kind: "done", id: null });
     try {
       // 헤더를 붙이지 않아 text/plain 단순 요청으로 간다(Apps Script는 사전 요청을 받지 못한다).
-      const res = await fetch(LEAD_ENDPOINT, { method: "POST", body: JSON.stringify(payload) });
+      // keepalive라 접수 화면을 보고 바로 창을 닫아도 요청은 끝까지 간다.
+      const res = await fetch(LEAD_ENDPOINT, { method: "POST", body: JSON.stringify(payload), keepalive: true });
       const data = (await res.json()) as { ok?: boolean; id?: string; error?: string };
       if (data.ok && data.id) {
         setStatus({ kind: "done", id: data.id });
@@ -118,7 +120,7 @@ export const ClassicLeadForm = forwardRef<HTMLElement, { pkg: PackageName | ""; 
 
         {status.kind === "done" ? (
           <div className="min-w-0 border-t-2 border-[#15171c] bg-white px-5 py-8 md:px-8 md:py-10" role="status">
-            <p className="text-[15px] font-bold tabular-nums text-[#256ef4]">접수 번호 {status.id}</p>
+            <p className={`text-[15px] font-bold tabular-nums ${status.id ? "" : "invisible"} text-[#256ef4]`}>접수 번호 {status.id ?? "000000-000"}</p>
             <p className="mt-2 text-[26px] font-extrabold leading-[1.35] tracking-[-0.03em]">신청이 접수되었습니다.</p>
             <p className="mt-2 text-[17px] leading-[1.6] text-[#5b6370]">영업일 기준 1일 이내 연락드립니다.</p>
           </div>
@@ -235,18 +237,9 @@ export const ClassicLeadForm = forwardRef<HTMLElement, { pkg: PackageName | ""; 
 
             <button
               type="submit"
-              disabled={status.kind === "sending"}
-              aria-busy={status.kind === "sending"}
               className="flex h-14 w-full items-center justify-center rounded-md bg-[#256ef4] text-[18px] font-bold text-white transition-colors hover:bg-[#0b50d0] disabled:opacity-60 motion-reduce:transition-none"
             >
-              {status.kind === "sending" ? (
-                <>
-                  <LoaderCircle size={20} strokeWidth={3} className="mr-2 animate-spin motion-reduce:animate-none" aria-hidden />
-                  보내는 중이에요
-                </>
-              ) : (
-                "상담 신청하기"
-              )}
+              상담 신청하기
             </button>
           </form>
         )}
