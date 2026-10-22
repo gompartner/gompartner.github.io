@@ -24,6 +24,9 @@ for (const { id, slug } of pairs) {
   const p = await ctx.newPage();
   await p.goto(`${BASE}/demo/${slug}`, { waitUntil: "networkidle" });
   await p.addStyleTag({ content: "[data-gtm-cta^='demo_guide'], .print\\:hidden.fixed { display: none !important }" });
+  // 성인 확인 창이 있는 샘플(술도가)은 확인을 누르고 찍는다
+  const gate = p.getByRole("button", { name: /19세 이상/ });
+  if (await gate.count()) await gate.first().click();
   await p.waitForTimeout(1200);
   await p.screenshot({ path: path.join(ROOT, `public/images/demos/m/${slug}.jpg`), type: "jpeg", quality: 82 });
   const targets = tours[id] ?? [];

@@ -1,0 +1,1394 @@
+"use client";
+
+import { useEffect, useMemo, useRef, useState } from "react";
+import { AnimatePresence, motion, useMotionValue, useScroll, useTransform, type MotionValue } from "framer-motion";
+import { Car, Check, Clock, Download, MapPin, MessageCircle, Paperclip, PencilRuler, Phone, TrainFront } from "lucide-react";
+import { Black_Han_Sans, Nanum_Gothic_Coding } from "@/lib/local-fonts";
+import { useReducedMotionSafe } from "@/hooks/useReducedMotionSafe";
+import { daysAgo, fmtKo, useDemoToday } from "@/hooks/useDemoToday";
+import { maskName, maskPhone } from "@/components/demos/LeadReceivedPanel";
+import { DemoMakerInfo } from "@/components/demos/DemoMakerInfo";
+
+/* 원목 가구 주문 제작 공방 샘플: 가상의 곰파트너목공방. 상호, 주소, 가격은 모두 가상이다.
+
+   국내 원목 공방 사이트 구성을 따랐다. 메뉴는 제작 가구, 주문 제작, 목재 안내, 작업 과정, 공방 소개, 오시는 길.
+   첫 화면에는 대표 가구와 "주문 제작 문의" 버튼, 치수와 목재를 고르는 주문 제작 안내가 온다.
+   공방들은 치수를 mm로 받고, 견적은 목재 종류와 판재 양으로 내고, 제작 기간은 4~6주, 방문은 예약제가 보통이다.
+   마감은 오일과 바니시 두 가지를 둔다.
+
+   핵심 모션은 도면 선 그리기다. 첫 화면에서 정면도와 측면도가 pathLength 0에서 1로 선마다 시차를 두고 그려지고(총 1.6초),
+   그려진 뒤 치수선이 가운데에서 양쪽으로 늘어나며 숫자가 나타난다. 치수 슬라이더를 움직이면 좌표를 다시 계산해
+   도면의 d 값이 바뀌고, 가구 종류를 바꾸면 처음부터 다시 그린다. 동작 줄이기면 모두 완성 상태로 바로 보인다.
+
+   상호작용(모두 브라우저 안에서만 돈다. 실제로 보내지 않는다)
+   1. 가구 종류: 테이블, 책장, 벤치, TV 선반. 고르면 도면이 그 가구로 다시 그려진다.
+   2. 치수: 폭, 깊이, 높이 슬라이더(10mm 단위). 도면과 치수선이 따라 바뀌고 판재 양에 따라 견적이 바뀐다.
+   3. 목재와 마감: 오크, 월넛, 애쉬, 레드파인. 도면 면 색이 그 목재 색으로 바뀌고 단가가 달라진다. 마감은 오일, 바니시.
+   4. 견적과 제작 문의: 합계, 제작 기간(오늘 기준 4~6주 뒤). 이름, 휴대폰을 넣고 보내면 접수번호, 도면 PNG 저장, 회신 예정일이 보인다.
+   5. 작업 과정: 재단, 조립, 샌딩, 마감 네 단계가 선 위의 점으로 그려지고 단계를 누르면 설명이 바뀐다. 공방 방문은 예약제.
+
+   포스터 첫 화면(fw-poster): 크라프트지 바탕에 도면 파랑 모눈, 큰 문장 "원하는 치수로 하나만 짜 드려요".
+   오른쪽(휴대폰은 아래)에 아이소메트릭 원목 의자. 부재 14개가 도면 선으로 먼저 그려지고(1초)
+   나뭇결 그라디언트가 바닥부터 차오른다(0.8초). 대패밥 몇 조각이 10초 넘는 주기로 천천히 떨어진다.
+   스크롤하면 의자가 부재 단위로 분해돼 흩어지고 아래 도면판 화면이 이어진다. */
+
+const SLUG = "furniture-workshop";
+const BRAND = "곰파트너목공방";
+const ADDRESS = "서울 ㅇㅇ구 ㅇㅇ로 00, 1층";
+const KAKAO = "카카오톡 채널 곰파트너";
+
+/* 모션 상수(ms). 선 그리기 전체 1.6초, 선 하나 0.55초, 나머지는 시차로 나눈다. */
+const DRAW_MS = 1600;
+const LINE_MS = 550;
+const DIM_MS = 450;
+const FILL_MS = 300;
+const MORPH_MS = 320;
+const EASE = [0.22, 1, 0.36, 1] as const;
+
+const mono = Nanum_Gothic_Coding;
+const monoF = { fontFamily: `${mono.style.fontFamily}, ui-monospace, monospace` } as const;
+
+const C = {
+  paper: "#f7f4ec",
+  sheet: "#fcfaf4",
+  ink: "#4a3b2f",
+  soft: "#6f5f51",
+  line: "#d8d0c0",
+  grid: "rgba(74,59,47,0.10)",
+  error: "#b42318",
+};
+
+const focusRing = "focus-visible:outline focus-visible:outline-[3px] focus-visible:outline-offset-2";
+const won = (n: number) => `${n.toLocaleString("ko-KR")}원`;
+const p2 = (n: number) => String(n).padStart(2, "0");
+
+/* ── 가구, 목재, 마감 ───────────────────────────────────── */
+
+type KindId = "table" | "shelf" | "bench" | "tv";
+type Range = { min: number; max: number; def: number };
+interface Kind {
+  id: KindId;
+  name: string;
+  w: Range;
+  d: Range;
+  h: Range;
+  /** 제작비(공임). 목재비는 판재 양으로 따로 센다. */
+  labor: number;
+}
+
+const KINDS: Kind[] = [
+  { id: "table", name: "테이블", w: { min: 1200, max: 2400, def: 1600 }, d: { min: 600, max: 1000, def: 800 }, h: { min: 700, max: 760, def: 720 }, labor: 250000 },
+  { id: "shelf", name: "책장", w: { min: 600, max: 1800, def: 1200 }, d: { min: 250, max: 400, def: 300 }, h: { min: 900, max: 2100, def: 1800 }, labor: 220000 },
+  { id: "bench", name: "벤치", w: { min: 1000, max: 2000, def: 1400 }, d: { min: 350, max: 500, def: 400 }, h: { min: 420, max: 480, def: 450 }, labor: 150000 },
+  { id: "tv", name: "TV 선반", w: { min: 1200, max: 2400, def: 1800 }, d: { min: 350, max: 500, def: 400 }, h: { min: 400, max: 600, def: 450 }, labor: 230000 },
+];
+
+type WoodId = "oak" | "walnut" | "ash" | "redpine";
+interface Wood {
+  id: WoodId;
+  name: string;
+  color: string;
+  /** 판재 30T 기준 m2당 목재비 */
+  rate: number;
+  hardness: string;
+  desc: string;
+}
+
+const WOODS: Wood[] = [
+  { id: "oak", name: "오크", color: "#c9a46b", rate: 520000, hardness: "단단함", desc: "결이 또렷하고 단단해요. 식탁 주문이 가장 많아요." },
+  { id: "walnut", name: "월넛", color: "#5c3e2a", rate: 780000, hardness: "단단함", desc: "짙은 갈색이에요. 햇빛을 받으면 조금씩 밝아져요." },
+  { id: "ash", name: "애쉬", color: "#e3d3b1", rate: 450000, hardness: "단단함", desc: "밝은 색에 결이 길어요. 오크보다 가벼워요." },
+  { id: "redpine", name: "레드파인", color: "#d9a06a", rate: 260000, hardness: "무름", desc: "소나무 계열이에요. 무른 대신 값이 좋아요. 책장, 선반에 맞아요." },
+];
+
+const FINISHES = [
+  { id: "oil", name: "오일", add: 0, desc: "기본 마감이에요. 결이 그대로 보이고 1년에 한 번 다시 발라요." },
+  { id: "varnish", name: "바니시", add: 80000, desc: "표면에 막을 만들어요. 물 자국에 강해요." },
+] as const;
+type FinishId = (typeof FINISHES)[number]["id"];
+
+type Dims = { w: number; d: number; h: number };
+
+/** 가구에 들어가는 판재 양(m2). 실제 공방은 재단표로 세지만 여기서는 부재별 면적을 더한다. */
+function boardArea(kind: KindId, { w, d, h }: Dims) {
+  const W = w / 1000;
+  const D = d / 1000;
+  const H = h / 1000;
+  switch (kind) {
+    case "table":
+      // 상판 + 에이프런 4면 + 다리 4개
+      return W * D + 0.16 * (W + D) + 0.3 * H;
+    case "shelf": {
+      const plates = shelfCount(h) + 2;
+      return 2 * D * H + plates * W * D;
+    }
+    case "bench":
+      return W * D + 2 * D * H + 0.1 * W;
+    case "tv":
+      return 2 * W * D + 2 * D * H + 2 * D * Math.max(0.1, H - 0.15) + 0.5 * W * H;
+  }
+}
+
+/** 책장 속 선반 수. 400mm 간격에 가깝게. */
+const shelfCount = (h: number) => Math.max(1, Math.round(h / 400) - 1);
+
+function quote(kind: Kind, dims: Dims, wood: Wood, finish: FinishId) {
+  const area = boardArea(kind.id, dims);
+  const material = Math.round((area * wood.rate) / 10000) * 10000;
+  const fin = FINISHES.find((f) => f.id === finish)?.add ?? 0;
+  return { area, material, labor: kind.labor, finish: fin, total: material + kind.labor + fin };
+}
+
+/* ── 도면 좌표 ─────────────────────────────────────────── */
+
+interface Board {
+  W: number;
+  H: number;
+  left: number;
+  right: number;
+  top: number;
+  floor: number;
+  gap: number;
+}
+/** 첫 화면 도면판. 왼쪽 여백에 높이 치수, 아래 여백에 폭과 깊이 치수가 온다. */
+const BOARD: Board = { W: 480, H: 300, left: 72, right: 444, top: 40, floor: 232, gap: 56 };
+const ICON_BOARD: Board = { W: 48, H: 36, left: 3, right: 45, top: 3, floor: 33, gap: 0 };
+
+interface Part {
+  id: string;
+  d: string;
+  /** 목재 색으로 채우는 면인지 */
+  face: boolean;
+}
+interface DimLineSpec {
+  x1: number;
+  y1: number;
+  x2: number;
+  y2: number;
+  tx: number;
+  ty: number;
+  value: number;
+  vertical: boolean;
+}
+interface Geo {
+  parts: Part[];
+  dims: { w: DimLineSpec; d: DimLineSpec; h: DimLineSpec } | null;
+  labels: { x: number; y: number; text: string }[];
+}
+
+const fx = (n: number) => n.toFixed(1);
+const R = (x: number, y: number, w: number, h: number) => `M${fx(x)},${fx(y)} L${fx(x + w)},${fx(y)} L${fx(x + w)},${fx(y + h)} L${fx(x)},${fx(y + h)} Z`;
+const P = (pts: [number, number][]) => `M${pts.map(([x, y]) => `${fx(x)},${fx(y)}`).join(" L")} Z`;
+
+/** 가구 종류와 치수(mm)로 정면도, 측면도의 부재 좌표를 만든다. 축척은 두 뷰가 같다. */
+function geometry(kind: KindId, { w, d, h }: Dims, b: Board, both: boolean): Geo {
+  const avail = both ? b.right - b.left - b.gap : b.right - b.left;
+  const s = Math.min(avail / (both ? w + d : w), (b.floor - b.top) / h);
+  const fw = w * s;
+  const fd = d * s;
+  const fh = h * s;
+  const total = both ? fw + b.gap + fd : fw;
+  const x0 = b.left + (b.right - b.left - total) / 2;
+  const y0 = b.floor - fh;
+  const sx = x0 + fw + b.gap;
+  const fl = b.floor;
+  const parts: Part[] = [];
+  const add = (id: string, dd: string, face = true) => parts.push({ id, d: dd, face });
+
+  if (kind === "table") {
+    const t = 40 * s;
+    const ins = 70 * s;
+    const lw = 70 * s;
+    const a = 80 * s;
+    add("top", R(x0, y0, fw, t));
+    add("legL", R(x0 + ins, y0 + t, lw, fh - t));
+    add("legR", R(x0 + fw - ins - lw, y0 + t, lw, fh - t));
+    add("apron", R(x0 + ins + lw, y0 + t, fw - 2 * (ins + lw), a));
+    if (both) {
+      add("sTop", R(sx, y0, fd, t));
+      add("sLegL", R(sx + ins, y0 + t, lw, fh - t));
+      add("sLegR", R(sx + fd - ins - lw, y0 + t, lw, fh - t));
+      add("sApron", R(sx + ins + lw, y0 + t, fd - 2 * (ins + lw), a));
+    }
+  } else if (kind === "shelf") {
+    const p = 25 * s;
+    const lift = 60 * s;
+    const n = shelfCount(h);
+    const innerTop = y0 + p;
+    const innerBottom = fl - lift - p;
+    add("sideL", R(x0, y0, p, fh - lift));
+    add("sideR", R(x0 + fw - p, y0, p, fh - lift));
+    add("plateT", R(x0 + p, y0, fw - 2 * p, p));
+    add("plateB", R(x0 + p, innerBottom, fw - 2 * p, p));
+    const gapY = (innerBottom - innerTop) / (n + 1);
+    for (let i = 0; i < n; i++) add(`shelf${i}`, R(x0 + p, innerTop + gapY * (i + 1) - p / 2, fw - 2 * p, p));
+    if (w >= 1300) add("divider", R(x0 + fw / 2 - p / 2, innerTop, p, innerBottom - innerTop));
+    if (both) {
+      add("sPanel", R(sx, y0, fd, fh - lift));
+      for (let i = 0; i < n; i++) add(`sShelf${i}`, R(sx, innerTop + gapY * (i + 1) - p / 2, fd, p), false);
+    }
+  } else if (kind === "bench") {
+    const t = 40 * s;
+    const topIn = 140 * s;
+    const botIn = 80 * s;
+    const lw = 60 * s;
+    add("top", R(x0, y0, fw, t));
+    add("legL", P([[x0 + topIn, y0 + t], [x0 + topIn + lw, y0 + t], [x0 + botIn + lw, fl], [x0 + botIn, fl]]));
+    add("legR", P([[x0 + fw - topIn - lw, y0 + t], [x0 + fw - topIn, y0 + t], [x0 + fw - botIn, fl], [x0 + fw - botIn - lw, fl]]));
+    add("stretcher", R(x0 + topIn + lw, fl - 150 * s, fw - 2 * (topIn + lw), 40 * s));
+    if (both) {
+      add("sTop", R(sx, y0, fd, t));
+      add("sLeg", R(sx + 40 * s, y0 + t, fd - 80 * s, fh - t));
+    }
+  } else {
+    const t = 30 * s;
+    const p = 25 * s;
+    const legH = 150 * s;
+    const lw = 50 * s;
+    const boxH = fh - legH;
+    add("top", R(x0, y0, fw, t));
+    add("bottom", R(x0, fl - legH - t, fw, t));
+    add("sideL", R(x0, y0 + t, p, boxH - 2 * t));
+    add("sideR", R(x0 + fw - p, y0 + t, p, boxH - 2 * t));
+    add("div1", R(x0 + fw / 3 - p / 2, y0 + t, p, boxH - 2 * t));
+    add("div2", R(x0 + (fw * 2) / 3 - p / 2, y0 + t, p, boxH - 2 * t));
+    add("legL", R(x0 + 60 * s, fl - legH, lw, legH));
+    add("legR", R(x0 + fw - 60 * s - lw, fl - legH, lw, legH));
+    if (both) {
+      add("sBox", R(sx, y0, fd, boxH));
+      add("sLeg", R(sx + 60 * s, fl - legH, lw, legH));
+    }
+  }
+
+  if (!both) return { parts, dims: null, labels: [] };
+  const dy = fl + 24;
+  return {
+    parts,
+    dims: {
+      w: { x1: x0, y1: dy, x2: x0 + fw, y2: dy, tx: x0 + fw / 2, ty: dy + 15, value: w, vertical: false },
+      d: { x1: sx, y1: dy, x2: sx + fd, y2: dy, tx: sx + fd / 2, ty: dy + 15, value: d, vertical: false },
+      h: { x1: x0 - 22, y1: y0, x2: x0 - 22, y2: fl, tx: x0 - 30, ty: (y0 + fl) / 2 + 4, value: h, vertical: true },
+    },
+    labels: [
+      { x: x0 + fw / 2, y: b.H - 10, text: "정면도" },
+      { x: sx + fd / 2, y: b.H - 10, text: "측면도" },
+    ],
+  };
+}
+
+/* ── 도면판 ───────────────────────────────────────────── */
+
+function DrawingBoard({ kind, dims, wood, finish, reduce, svgRef }: { kind: Kind; dims: Dims; wood: Wood; finish: FinishId; reduce: boolean; svgRef: React.RefObject<SVGSVGElement | null> }) {
+  const geo = useMemo(() => geometry(kind.id, dims, BOARD, true), [kind.id, dims]);
+  // 선 그리기가 끝난 가구. 끝난 뒤 생기는 선(책장 선반이 늘 때)은 시차 없이 바로 그린다.
+  const [drawnKind, setDrawnKind] = useState<KindId | null>(null);
+  useEffect(() => {
+    const id = window.setTimeout(() => setDrawnKind(kind.id), DRAW_MS + 100);
+    return () => window.clearTimeout(id);
+  }, [kind.id]);
+  const drawn = reduce || drawnKind === kind.id;
+
+  const n = geo.parts.length;
+  const stagger = n > 1 ? (DRAW_MS - LINE_MS) / (n - 1) / 1000 : 0;
+  const morph = { duration: MORPH_MS / 1000, ease: EASE };
+  const afterDraw = drawn ? 0 : DRAW_MS / 1000;
+  const finishName = FINISHES.find((f) => f.id === finish)?.name ?? "";
+
+  return (
+    <svg
+      ref={svgRef}
+      viewBox={`0 0 ${BOARD.W} ${BOARD.H}`}
+      role="img"
+      aria-label={`${kind.name} 도면. 폭 ${dims.w}, 깊이 ${dims.d}, 높이 ${dims.h} mm, ${wood.name} ${finishName} 마감`}
+      className="block h-auto w-full"
+      style={{ ...monoF, background: C.sheet }}
+    >
+      <defs>
+        <pattern id="fw-grid" width="12" height="12" patternUnits="userSpaceOnUse">
+          <path d="M12 0H0V12" fill="none" stroke={C.grid} strokeWidth="0.6" />
+        </pattern>
+      </defs>
+      <rect width={BOARD.W} height={BOARD.H} fill={C.sheet} />
+      <rect width={BOARD.W} height={BOARD.H} fill="url(#fw-grid)" />
+      <rect x="0.5" y="0.5" width={BOARD.W - 1} height={BOARD.H - 1} fill="none" stroke={C.ink} strokeWidth="1" />
+
+      {/* 표제란 */}
+      <text x="12" y="18" fontSize="11" fontWeight="700" fill={C.ink}>
+        {BRAND}
+      </text>
+      <text x="12" y="30" fontSize="9" fill={C.soft}>
+        {kind.name} {dims.w} x {dims.d} x {dims.h}
+      </text>
+      <text x={BOARD.W - 12} y="18" fontSize="9" textAnchor="end" fill={C.soft}>
+        단위 mm
+      </text>
+      <text x={BOARD.W - 12} y="30" fontSize="9" textAnchor="end" fill={C.soft}>
+        {wood.name} {finishName} 마감
+      </text>
+
+      {/* 가구가 바뀌면 통째로 다시 그린다 */}
+      <g key={kind.id}>
+        {geo.parts
+          .filter((p) => p.face)
+          .map((p) => (
+            <motion.path
+              key={p.id}
+              d={p.d}
+              initial={reduce ? false : { d: p.d, opacity: 0 }}
+              animate={{ d: p.d, fill: wood.color, opacity: 1 }}
+              transition={{ d: morph, fill: { duration: FILL_MS / 1000 }, opacity: { duration: 0.4, delay: afterDraw } }}
+              fillOpacity={0.55}
+              stroke="none"
+            />
+          ))}
+        {geo.parts.map((p, i) => (
+          <motion.path
+            key={p.id}
+            d={p.d}
+            initial={reduce ? false : { d: p.d, pathLength: 0 }}
+            animate={{ d: p.d, pathLength: 1 }}
+            transition={drawn ? { d: morph, pathLength: { duration: 0.3, ease: EASE } } : { d: morph, pathLength: { duration: LINE_MS / 1000, delay: i * stagger, ease: EASE } }}
+            fill="none"
+            stroke={C.ink}
+            strokeWidth="1.4"
+            strokeLinejoin="round"
+          />
+        ))}
+        {geo.dims && (
+          <>
+            <DimLine spec={geo.dims.w} delay={afterDraw} reduce={reduce} />
+            <DimLine spec={geo.dims.d} delay={afterDraw + 0.1} reduce={reduce} />
+            <DimLine spec={geo.dims.h} delay={afterDraw + 0.2} reduce={reduce} />
+          </>
+        )}
+        {geo.labels.map((l) => (
+          <motion.text
+            key={l.text}
+            initial={reduce ? false : { opacity: 0 }}
+            animate={{ x: l.x, y: l.y, opacity: 1 }}
+            transition={{ opacity: { duration: 0.3, delay: afterDraw + 0.3 }, default: morph }}
+            fontSize="10"
+            textAnchor="middle"
+            fill={C.soft}
+          >
+            {l.text}
+          </motion.text>
+        ))}
+      </g>
+    </svg>
+  );
+}
+
+/** 치수선. 가운데에서 양쪽 끝으로 늘어나고, 끝에 짧은 빗금, 가운데에 숫자. 치수가 바뀌면 좌표가 따라 움직인다. */
+function DimLine({ spec, delay, reduce }: { spec: DimLineSpec; delay: number; reduce: boolean }) {
+  const mx = (spec.x1 + spec.x2) / 2;
+  const my = (spec.y1 + spec.y2) / 2;
+  const grow = { duration: DIM_MS / 1000, delay, ease: EASE };
+  const morph = { duration: MORPH_MS / 1000, ease: EASE };
+  const tick = (x: number, y: number) => `M${fx(x - 4)},${fx(y + 4)} L${fx(x + 4)},${fx(y - 4)}`;
+  const half = (x: number, y: number) => `M${fx(mx)},${fx(my)} L${fx(x)},${fx(y)}`;
+  const line = { fill: "none", stroke: C.ink, strokeWidth: 1 };
+  return (
+    <g>
+      <motion.path d={half(spec.x1, spec.y1)} initial={reduce ? false : { d: half(spec.x1, spec.y1), pathLength: 0 }} animate={{ d: half(spec.x1, spec.y1), pathLength: 1 }} transition={{ d: morph, pathLength: grow }} {...line} />
+      <motion.path d={half(spec.x2, spec.y2)} initial={reduce ? false : { d: half(spec.x2, spec.y2), pathLength: 0 }} animate={{ d: half(spec.x2, spec.y2), pathLength: 1 }} transition={{ d: morph, pathLength: grow }} {...line} />
+      <motion.path d={tick(spec.x1, spec.y1)} initial={reduce ? false : { d: tick(spec.x1, spec.y1), opacity: 0 }} animate={{ d: tick(spec.x1, spec.y1), opacity: 1 }} transition={{ d: morph, opacity: { duration: 0.2, delay: delay + DIM_MS / 1000 } }} {...line} />
+      <motion.path d={tick(spec.x2, spec.y2)} initial={reduce ? false : { d: tick(spec.x2, spec.y2), opacity: 0 }} animate={{ d: tick(spec.x2, spec.y2), opacity: 1 }} transition={{ d: morph, opacity: { duration: 0.2, delay: delay + DIM_MS / 1000 } }} {...line} />
+      <motion.text
+        initial={reduce ? false : { opacity: 0 }}
+        animate={{ x: spec.tx, y: spec.ty, opacity: 1 }}
+        transition={{ opacity: { duration: 0.25, delay: delay + 0.2 }, default: morph }}
+        fontSize="13"
+        fontWeight="700"
+        textAnchor={spec.vertical ? "end" : "middle"}
+        fill={C.ink}
+      >
+        {spec.value}
+      </motion.text>
+    </g>
+  );
+}
+
+/** 가구 종류 버튼의 작은 정면도 */
+function KindIcon({ kind, selected }: { kind: Kind; selected: boolean }) {
+  const geo = useMemo(() => geometry(kind.id, { w: kind.w.def, d: kind.d.def, h: kind.h.def }, ICON_BOARD, false), [kind]);
+  return (
+    <svg viewBox={`0 0 ${ICON_BOARD.W} ${ICON_BOARD.H}`} width="48" height="36" aria-hidden className="flex-none">
+      {geo.parts.map((p) => (
+        <path key={p.id} d={p.d} fill={selected ? C.ink : "none"} fillOpacity={0.12} stroke={C.ink} strokeWidth="1.2" strokeLinejoin="round" />
+      ))}
+    </svg>
+  );
+}
+
+/** 도면 SVG를 캔버스에 그려 PNG로 내려받는다. 그리기 도중의 dasharray는 지우고 완성 상태로 저장한다. */
+async function savePng(svg: SVGSVGElement, filename: string) {
+  const W = 1440;
+  const H = 900;
+  const clone = svg.cloneNode(true) as SVGSVGElement;
+  clone.setAttribute("xmlns", "http://www.w3.org/2000/svg");
+  clone.setAttribute("width", String(W));
+  clone.setAttribute("height", String(H));
+  clone.style.fontFamily = "Menlo, Consolas, 'Nanum Gothic Coding', monospace";
+  clone.querySelectorAll<SVGElement>("path, text").forEach((el) => {
+    el.removeAttribute("stroke-dasharray");
+    el.removeAttribute("stroke-dashoffset");
+    el.removeAttribute("pathLength");
+    el.removeAttribute("opacity");
+    el.style.opacity = "";
+  });
+  const xml = new XMLSerializer().serializeToString(clone);
+  const url = URL.createObjectURL(new Blob([xml], { type: "image/svg+xml;charset=utf-8" }));
+  try {
+    const img = new Image();
+    await new Promise<void>((res, rej) => {
+      img.onload = () => res();
+      img.onerror = () => rej(new Error("svg load"));
+      img.src = url;
+    });
+    const canvas = document.createElement("canvas");
+    canvas.width = W;
+    canvas.height = H;
+    const ctx = canvas.getContext("2d");
+    if (!ctx) return;
+    ctx.fillStyle = C.sheet;
+    ctx.fillRect(0, 0, W, H);
+    ctx.drawImage(img, 0, 0, W, H);
+    const a = document.createElement("a");
+    a.download = filename;
+    a.href = canvas.toDataURL("image/png");
+    a.click();
+  } finally {
+    URL.revokeObjectURL(url);
+  }
+}
+
+/* ── 포스터 첫 화면 ─────────────────────────────────────── */
+
+const PZ = {
+  kraft: "#e9dbbf",
+  blue: "#1b3f75",
+  line: "#1f4e8c",
+  wood: "#a8693a",
+};
+const poster = { fontFamily: `${Black_Han_Sans.style.fontFamily}, sans-serif` } as const;
+
+/* 포스터 모션(ms). 선 그리기 1000 안에 부재 14개(선 하나 500, 나머지는 시차), 900부터 나뭇결 800. 합계 1.7초.
+   스크롤 분해는 포스터 진행률 0~0.42(sticky 가 풀리기 직전)까지. 대패밥은 한 바퀴 10~15초. */
+const PZ_DRAW_MS = 1000;
+const PZ_LINE_MS = 500;
+const PZ_FILL_DELAY_MS = 900;
+const PZ_FILL_MS = 800;
+const PZ_EXPLODE_END = 0.42;
+
+const COS30 = 0.866;
+type V3 = [number, number, number];
+/** 아이소메트릭 투영. x는 오른쪽 아래, y는 왼쪽 아래, z는 위. 단위 mm = viewBox 1. */
+const iso = (x: number, y: number, z: number): [number, number] => [(x - y) * COS30, (x + y) * 0.5 - z];
+const poly = (pts: V3[]) => `M${pts.map((p) => iso(...p).map(fx).join(",")).join(" L")} Z`;
+const seg = (a: V3, b: V3) => `M${iso(...a).map(fx).join(",")} L${iso(...b).map(fx).join(",")}`;
+
+type Grain = "x" | "y" | "v";
+interface ChairPart {
+  id: string;
+  at: V3;
+  size: V3;
+  grain: Grain;
+  /** 분해될 때 날아가는 거리(x, y)와 회전(도) */
+  fly: V3;
+  /** 하이라이트 줄을 넣을 앞 위 모서리 */
+  shine?: boolean;
+}
+
+/* 그리는 순서가 곧 앞뒤 순서다(먼 것부터). 의자 정면은 y가 큰 쪽, 등받이는 y=0 쪽. */
+const CHAIR: ChairPart[] = [
+  { id: "legBL", at: [0, 0, 0], size: [40, 40, 420], grain: "v", fly: [-250, 40, -28] },
+  { id: "strB", at: [40, 10, 150], size: [360, 20, 30], grain: "x", fly: [-40, -150, 14] },
+  { id: "strL", at: [10, 40, 150], size: [20, 340, 30], grain: "y", fly: [-300, -60, 32] },
+  { id: "legBR", at: [400, 0, 0], size: [40, 40, 420], grain: "v", fly: [260, -30, 22] },
+  { id: "legFL", at: [0, 380, 0], size: [40, 40, 420], grain: "v", fly: [-190, 230, -34] },
+  { id: "strR", at: [410, 40, 150], size: [20, 340, 30], grain: "y", fly: [290, 90, -22] },
+  { id: "strF", at: [40, 390, 190], size: [360, 20, 30], grain: "x", fly: [50, 260, 12] },
+  { id: "legFR", at: [400, 380, 0], size: [40, 40, 420], grain: "v", fly: [230, 270, 30] },
+  { id: "seat", at: [-10, 0, 420], size: [460, 440, 30], grain: "x", fly: [20, -110, -9], shine: true },
+  { id: "legBLu", at: [0, 0, 450], size: [40, 40, 450], grain: "v", fly: [-290, -210, -20] },
+  { id: "railLow", at: [40, 12, 560], size: [360, 16, 60], grain: "x", fly: [-140, -260, 10] },
+  { id: "slat1", at: [130, 16, 620], size: [36, 10, 160], grain: "v", fly: [-90, -330, -16] },
+  { id: "slat2", at: [202, 16, 620], size: [36, 10, 160], grain: "v", fly: [10, -360, 8] },
+  { id: "slat3", at: [274, 16, 620], size: [36, 10, 160], grain: "v", fly: [110, -330, 20] },
+  { id: "railTop", at: [40, 8, 780], size: [360, 24, 90], grain: "x", fly: [70, -420, -12], shine: true },
+  { id: "legBRu", at: [400, 0, 450], size: [40, 40, 450], grain: "v", fly: [310, -250, 24] },
+];
+
+/** 상자 하나의 보이는 세 면: 윗면, 왼쪽 앞면(y 최대), 오른쪽 앞면(x 최대) */
+function boxFaces({ at: [x0, y0, z0], size: [dx, dy, dz] }: ChairPart) {
+  const x1 = x0 + dx;
+  const y1 = y0 + dy;
+  const z1 = z0 + dz;
+  const top = poly([[x0, y0, z1], [x1, y0, z1], [x1, y1, z1], [x0, y1, z1]]);
+  const left = poly([[x0, y1, z1], [x1, y1, z1], [x1, y1, z0], [x0, y1, z0]]);
+  const right = poly([[x1, y0, z1], [x1, y1, z1], [x1, y1, z0], [x1, y0, z0]]);
+  const shine = seg([x0 + 4, y1, z1], [x1 - 4, y1, z1]);
+  return { top, left, right, shine, outline: `${top} ${left} ${right}` };
+}
+
+/* viewBox: 의자와 양쪽 치수선이 들어가는 크기 */
+const VB = { x: -470, y: -960, w: 940, h: 1480 };
+
+const SHAVINGS = [
+  { left: "8%", size: 34, dur: 13, delay: 0.4, sway: 26, spin: 300, rest: "62%" },
+  { left: "27%", size: 24, dur: 15, delay: 4.5, sway: -18, spin: -260, rest: "84%" },
+  { left: "46%", size: 30, dur: 11, delay: 2.2, sway: 22, spin: 340, rest: "91%" },
+  { left: "63%", size: 38, dur: 14, delay: 6.8, sway: -30, spin: -320, rest: "12%" },
+  { left: "78%", size: 26, dur: 12, delay: 1.2, sway: 18, spin: 280, rest: "88%" },
+  { left: "92%", size: 32, dur: 16, delay: 8.6, sway: -22, spin: -300, rest: "40%" },
+];
+
+function Shaving({ size }: { size: number }) {
+  return (
+    <svg width={size * 1.3} height={size * 1.3} viewBox="0 0 40 40" aria-hidden className="block">
+      <path d="M4 22 C6 8 26 4 33 14 C39 23 30 34 20 32 C12 30 12 20 19 18 C24 17 26 22 23 25" fill="none" stroke="url(#fw-pz-shave)" strokeWidth="5" strokeLinecap="round" />
+      <path d="M6 20 C9 10 24 7 30 14" fill="none" stroke="#fff6e4" strokeOpacity="0.7" strokeWidth="1.2" strokeLinecap="round" />
+    </svg>
+  );
+}
+
+function Poster({ reduce, onCta }: { reduce: boolean; onCta: () => void }) {
+  const wrapRef = useRef<HTMLElement>(null);
+  const { scrollYProgress } = useScroll({ target: wrapRef, offset: ["start start", "end start"] });
+  const live = useTransform(scrollYProgress, [0.02, PZ_EXPLODE_END], [0, 1], { clamp: true });
+  const still = useMotionValue(0);
+  const prog = reduce ? still : live;
+  const textY = useTransform(prog, [0, 1], [0, -90]);
+  const textO = useTransform(prog, [0.15, 1], [1, 0]);
+  const dimO = useTransform(prog, [0, 0.35], [1, 0]);
+  const shadowO = useTransform(prog, [0, 0.5], [1, 0]);
+
+  return (
+    <section id="fw-poster" ref={wrapRef} aria-labelledby="fw-poster-title" className="relative h-[180svh]">
+      <div
+        className="sticky top-0 h-svh overflow-hidden"
+        style={{
+          background: PZ.kraft,
+          backgroundImage: `radial-gradient(ellipse 70% 60% at 72% 45%, rgba(255,250,238,0.55), transparent 70%), linear-gradient(rgba(31,78,140,0.16) 1px, transparent 1px), linear-gradient(90deg, rgba(31,78,140,0.16) 1px, transparent 1px), linear-gradient(rgba(31,78,140,0.07) 1px, transparent 1px), linear-gradient(90deg, rgba(31,78,140,0.07) 1px, transparent 1px)`,
+          backgroundSize: "100% 100%, 160px 160px, 160px 160px, 32px 32px, 32px 32px",
+          color: PZ.blue,
+        }}
+      >
+        {/* 대패밥. 공용 그라디언트는 여기 한 번만 둔다 */}
+        <svg width="0" height="0" aria-hidden className="absolute">
+          <defs>
+            <linearGradient id="fw-pz-shave" x1="0" y1="0" x2="1" y2="1">
+              <stop offset="0" stopColor="#f3d6a6" />
+              <stop offset="1" stopColor="#c48a52" />
+            </linearGradient>
+          </defs>
+        </svg>
+        <div aria-hidden className="pointer-events-none absolute inset-0">
+          {SHAVINGS.map((s) =>
+            reduce ? (
+              <span key={s.left} className="absolute" style={{ left: s.left, top: s.rest, transform: `rotate(${s.spin / 6}deg)` }}>
+                <Shaving size={s.size} />
+              </span>
+            ) : (
+              <motion.span
+                key={s.left}
+                className="absolute top-0"
+                style={{ left: s.left }}
+                initial={{ y: "-12vh", x: 0, rotate: 0 }}
+                animate={{ y: ["-12vh", "108vh"], x: [0, s.sway, -s.sway / 2, 0], rotate: [0, s.spin] }}
+                transition={{ duration: s.dur, delay: s.delay, repeat: Infinity, ease: "linear" }}
+              >
+                <Shaving size={s.size} />
+              </motion.span>
+            ),
+          )}
+        </div>
+
+        {/* 왼쪽 위 상호, 오른쪽 위 문의 버튼 하나 */}
+        <div className="absolute inset-x-0 top-0 z-20 mx-auto flex max-w-[1440px] items-center justify-between px-4 pt-4 lg:px-16 lg:pt-7">
+          <span className="inline-flex items-center gap-2 text-[17px] font-bold leading-none" style={monoF}>
+            <Logo color={PZ.blue} size={24} />
+            {BRAND}
+          </span>
+          <button
+            type="button"
+            onClick={onCta}
+            aria-label="제작 문의"
+            data-gtm-cta={`${SLUG}_poster_cta`}
+            className={`grid h-[52px] w-[52px] place-items-center rounded-full text-white transition-transform duration-150 hover:-rotate-12 active:scale-95 ${focusRing}`}
+            style={{ background: PZ.blue, outlineColor: PZ.blue }}
+          >
+            <PencilRuler size={22} aria-hidden />
+          </button>
+        </div>
+
+        <div className="relative mx-auto flex h-full max-w-[1440px] flex-col px-4 pb-4 pt-[88px] lg:flex-row lg:items-center lg:gap-8 lg:px-16 lg:pb-0 lg:pt-0">
+          <motion.div className="relative z-10 lg:flex-1" style={{ y: textY, opacity: textO }}>
+            <h1
+              id="fw-poster-title"
+              className="text-[clamp(52px,16vw,104px)] leading-[1.04] tracking-[-0.01em] lg:text-[clamp(88px,9.6vw,190px)]"
+              style={{ ...poster, wordBreak: "keep-all" }}
+            >
+              <span className="block">원하는 치수로</span>
+              <span className="block">하나만</span>
+              <span className="block">짜 드려요</span>
+            </h1>
+            <p className="mt-4 text-[15px] font-bold lg:mt-7 lg:text-[18px]" style={monoF}>
+              {BRAND}, 제작 기간 4~6주
+            </p>
+          </motion.div>
+
+          <div className="relative min-h-0 flex-1 lg:h-[74svh] lg:w-[47svh] lg:flex-none">
+            <IsoChair reduce={reduce} prog={prog} dimO={dimO} shadowO={shadowO} />
+          </div>
+        </div>
+      </div>
+    </section>
+  );
+}
+
+function IsoChair({ reduce, prog, dimO, shadowO }: { reduce: boolean; prog: MotionValue<number>; dimO: MotionValue<number>; shadowO: MotionValue<number> }) {
+  const n = CHAIR.length;
+  const stagger = (PZ_DRAW_MS - PZ_LINE_MS) / (n - 1) / 1000;
+  const [sx, sy] = iso(220, 220, 0);
+  const dimA = { x: iso(0, 470, 0), top: iso(0, 470, 450) };
+  const dimB = { x: iso(490, 0, 0), top: iso(490, 0, 900) };
+  const draw = (delay: number) => (reduce ? undefined : { pathLength: { duration: PZ_LINE_MS / 1000, delay, ease: EASE } });
+
+  return (
+    <svg
+      viewBox={`${VB.x} ${VB.y} ${VB.w} ${VB.h}`}
+      role="img"
+      aria-label="원목 의자 도면. 좌판 높이 450, 전체 높이 900 mm"
+      className="absolute inset-0 h-full w-full overflow-visible"
+      style={monoF}
+    >
+      <defs>
+        <linearGradient id="fw-pz-top" x1="0" y1="0" x2="1" y2="1">
+          <stop offset="0" stopColor="#ebbd86" />
+          <stop offset="1" stopColor="#c98d52" />
+        </linearGradient>
+        <linearGradient id="fw-pz-left" x1="0" y1="0" x2="0" y2="1">
+          <stop offset="0" stopColor="#bd7d45" />
+          <stop offset="1" stopColor="#8c5228" />
+        </linearGradient>
+        <linearGradient id="fw-pz-right" x1="0" y1="0" x2="0" y2="1">
+          <stop offset="0" stopColor="#8a542c" />
+          <stop offset="1" stopColor="#5b3318" />
+        </linearGradient>
+        <radialGradient id="fw-pz-sheen" cx="0.35" cy="0.3" r="0.7">
+          <stop offset="0" stopColor="#fff4e0" stopOpacity="0.55" />
+          <stop offset="1" stopColor="#fff4e0" stopOpacity="0" />
+        </radialGradient>
+        <radialGradient id="fw-pz-floor" cx="0.5" cy="0.5" r="0.5">
+          <stop offset="0" stopColor="#4a2c14" stopOpacity="0.42" />
+          <stop offset="0.6" stopColor="#4a2c14" stopOpacity="0.14" />
+          <stop offset="1" stopColor="#4a2c14" stopOpacity="0" />
+        </radialGradient>
+        {(["x", "y", "v"] as Grain[]).map((g) => (
+          <pattern key={g} id={`fw-pz-grain-${g}`} width="60" height="16" patternUnits="userSpaceOnUse" patternTransform={g === "x" ? "rotate(30)" : g === "y" ? "rotate(-30)" : "rotate(90)"}>
+            <path d="M0 5 Q15 2 30 5 T60 5" fill="none" stroke="#3e220e" strokeOpacity="0.32" strokeWidth="1.6" />
+            <path d="M0 12 Q15 13.5 30 11 T60 12" fill="none" stroke="#3e220e" strokeOpacity="0.18" strokeWidth="1" />
+          </pattern>
+        ))}
+        <clipPath id="fw-pz-fill" clipPathUnits="userSpaceOnUse">
+          <motion.rect
+            x={-1400}
+            width={2800}
+            initial={reduce ? false : { attrY: 560, height: 0 }}
+            animate={{ attrY: -1400, height: 1960 }}
+            transition={{ duration: PZ_FILL_MS / 1000, delay: PZ_FILL_DELAY_MS / 1000, ease: [0.45, 0, 0.25, 1] }}
+          />
+        </clipPath>
+      </defs>
+
+      {/* 바닥 그림자와 바닥 자리 */}
+      <motion.g style={{ opacity: shadowO }}>
+        <ellipse cx={sx} cy={sy + 20} rx="400" ry="170" fill="url(#fw-pz-floor)" />
+        <path d={poly([[-40, -40, 0], [480, -40, 0], [480, 480, 0], [-40, 480, 0]])} fill="none" stroke={PZ.line} strokeOpacity="0.45" strokeWidth="2" strokeDasharray="10 8" />
+      </motion.g>
+
+      {CHAIR.map((part, i) => (
+        <ExplodingPart key={part.id} part={part} prog={prog}>
+          <PartBody part={part} reduce={reduce} delay={i * stagger} />
+        </ExplodingPart>
+      ))}
+
+      {/* 치수선: 좌판 높이, 전체 높이 */}
+      <motion.g style={{ opacity: dimO }} fill="none" stroke={PZ.line} strokeWidth="2.4">
+        <motion.path d={`M${fx(dimA.x[0])},${fx(dimA.x[1])} V${fx(dimA.top[1])}`} initial={reduce ? false : { pathLength: 0 }} animate={{ pathLength: 1 }} transition={draw(0.5)} />
+        <motion.path d={`M${fx(dimB.x[0])},${fx(dimB.x[1])} V${fx(dimB.top[1])}`} initial={reduce ? false : { pathLength: 0 }} animate={{ pathLength: 1 }} transition={draw(0.6)} />
+        {[dimA.x, dimA.top, dimB.x, dimB.top].map(([x, y], k) => (
+          <path key={k} d={`M${fx(x - 12)},${fx(y + 12)} L${fx(x + 12)},${fx(y - 12)}`} />
+        ))}
+        <text x={dimA.x[0] - 18} y={(dimA.x[1] + dimA.top[1]) / 2} fontSize="40" fontWeight="700" textAnchor="end" fill={PZ.blue} stroke="none">
+          450
+        </text>
+        <text x={dimB.x[0] + 18} y={(dimB.x[1] + dimB.top[1]) / 2} fontSize="40" fontWeight="700" fill={PZ.blue} stroke="none">
+          900
+        </text>
+      </motion.g>
+    </svg>
+  );
+}
+
+function ExplodingPart({ part, prog, children }: { part: ChairPart; prog: MotionValue<number>; children: React.ReactNode }) {
+  const x = useTransform(prog, [0, 1], [0, part.fly[0]]);
+  const y = useTransform(prog, [0, 1], [0, part.fly[1]]);
+  const rotate = useTransform(prog, [0, 1], [0, part.fly[2]]);
+  return <motion.g style={{ x, y, rotate }}>{children}</motion.g>;
+}
+
+function PartBody({ part, reduce, delay }: { part: ChairPart; reduce: boolean; delay: number }) {
+  const f = useMemo(() => boxFaces(part), [part]);
+  const grain = `url(#fw-pz-grain-${part.grain})`;
+  return (
+    <>
+      <g clipPath="url(#fw-pz-fill)">
+        <path d={f.top} fill="url(#fw-pz-top)" />
+        <path d={f.left} fill="url(#fw-pz-left)" />
+        <path d={f.right} fill="url(#fw-pz-right)" />
+        <path d={f.top} fill={grain} />
+        <path d={f.left} fill={grain} />
+        <path d={f.right} fill={grain} />
+        {part.id === "seat" && <path d={f.top} fill="url(#fw-pz-sheen)" />}
+        {part.shine && <path d={f.shine} stroke="#fff3dc" strokeOpacity="0.85" strokeWidth="3.5" strokeLinecap="round" fill="none" />}
+      </g>
+      <motion.path
+        d={f.outline}
+        fill="none"
+        stroke={PZ.line}
+        strokeWidth="2.6"
+        strokeLinejoin="round"
+        initial={reduce ? false : { pathLength: 0 }}
+        animate={{ pathLength: 1 }}
+        transition={reduce ? undefined : { duration: PZ_LINE_MS / 1000, delay, ease: EASE }}
+      />
+    </>
+  );
+}
+
+/* ── 화면 ─────────────────────────────────────────────── */
+
+const NAV = [
+  ["제작 가구", "fw-kind"],
+  ["주문 제작", "fw-size"],
+  ["목재 안내", "fw-wood-guide"],
+  ["작업 과정", "fw-process"],
+  ["공방 소개", "fw-about"],
+  ["오시는 길", "fw-map"],
+] as const;
+
+export function FurnitureWorkshopDemo() {
+  const today = useDemoToday();
+  const reduce = useReducedMotionSafe();
+  const svgRef = useRef<SVGSVGElement>(null);
+
+  const [kind, setKind] = useState<Kind>(KINDS[0]);
+  const [dims, setDims] = useState<Dims>({ w: KINDS[0].w.def, d: KINDS[0].d.def, h: KINDS[0].h.def });
+  const [wood, setWood] = useState<Wood>(WOODS[0]);
+  const [finish, setFinish] = useState<FinishId>("oil");
+  const [receipt, setReceipt] = useState<{ no: number; name: string; phone: string } | null>(null);
+
+  const q = useMemo(() => quote(kind, dims, wood, finish), [kind, dims, wood, finish]);
+  const from = daysAgo(today, -28);
+  const to = daysAgo(today, -42);
+
+  const pickKind = (k: Kind) => {
+    setKind(k);
+    setDims({ w: k.w.def, d: k.d.def, h: k.h.def });
+  };
+
+  useEffect(() => {
+    const f = () => window.scrollTo({ top: 0 });
+    window.addEventListener("demo:go-home", f);
+    return () => window.removeEventListener("demo:go-home", f);
+  }, []);
+
+  const go = (id: string) => document.getElementById(id)?.scrollIntoView({ behavior: reduce ? "auto" : "smooth", block: "start" });
+
+  return (
+    <div className="min-h-screen overflow-x-clip" style={{ background: C.paper, color: C.ink }}>
+      <Poster reduce={reduce} onCta={() => go("fw-quote")} />
+
+      <header className="mx-auto flex max-w-[1200px] items-center justify-between gap-4 px-4 py-4 md:px-6">
+        <a href="#fw-drawing" onClick={(e) => { e.preventDefault(); window.scrollTo({ top: 0, behavior: reduce ? "auto" : "smooth" }); }} className={`inline-flex items-center gap-2 rounded-[4px] ${focusRing}`} style={{ outlineColor: C.ink }}>
+          <Logo />
+          <span className="text-[18px] font-bold leading-none" style={monoF}>
+            {BRAND}
+          </span>
+        </a>
+        <nav aria-label="주요 메뉴" className="hidden items-center gap-5 text-[15px] lg:flex">
+          {NAV.map(([label, id]) => (
+            <a key={id} href={`#${id}`} onClick={(e) => { e.preventDefault(); go(id); }} className={`rounded-[3px] underline-offset-4 hover:underline ${focusRing}`} style={{ outlineColor: C.ink }}>
+              {label}
+            </a>
+          ))}
+        </nav>
+        <button type="button" onClick={() => go("fw-quote")} className={`flex-none rounded-[4px] px-4 py-2 text-[15px] font-bold text-white ${focusRing}`} style={{ background: C.ink, outlineColor: C.ink }}>
+          제작 문의
+        </button>
+      </header>
+
+      {/* 첫 화면: 도면판과 치수, 오른쪽에 목재와 견적 */}
+      <main className="mx-auto grid max-w-[1200px] gap-8 px-4 pb-16 pt-2 md:px-6 lg:grid-cols-[minmax(0,1fr)_380px] lg:items-start lg:gap-10 lg:pt-6">
+        <div className="min-w-0">
+          <h2 className="text-[28px] font-bold leading-[1.2] md:text-[34px]" style={monoF}>
+            원목 가구 주문 제작
+          </h2>
+          <p className="mt-2 text-[16px] leading-[1.6]" style={{ color: C.soft }}>
+            치수를 mm로 넣으면 도면과 견적이 바로 나와요. 한 번에 두세 점만 받습니다.
+          </p>
+
+          <div id="fw-drawing" className="mt-5 scroll-mt-4 rounded-[4px] border" style={{ borderColor: C.line, boxShadow: `0 0 0 6px ${C.sheet}` }}>
+            <DrawingBoard kind={kind} dims={dims} wood={wood} finish={finish} reduce={reduce} svgRef={svgRef} />
+          </div>
+
+          {/* 1. 가구 종류 */}
+          <section id="fw-kind" aria-labelledby="fw-kind-title" className="mt-8 scroll-mt-4">
+            <h2 id="fw-kind-title" className="text-[20px] font-bold" style={monoF}>
+              제작 가구
+            </h2>
+            <div role="radiogroup" aria-labelledby="fw-kind-title" className="mt-3 grid grid-cols-2 gap-2 sm:grid-cols-4">
+              {KINDS.map((k) => {
+                const on = k.id === kind.id;
+                return (
+                  <button
+                    key={k.id}
+                    type="button"
+                    role="radio"
+                    aria-checked={on}
+                    onClick={() => pickKind(k)}
+                    className={`flex items-center gap-3 rounded-[4px] border px-3 py-2.5 text-left text-[15px] ${on ? "font-bold" : ""} ${focusRing}`}
+                    style={{ borderColor: on ? C.ink : C.line, background: on ? C.sheet : "transparent", boxShadow: on ? `inset 0 0 0 1px ${C.ink}` : "none", outlineColor: C.ink }}
+                  >
+                    <KindIcon kind={k} selected={on} />
+                    <span>
+                      {k.name}
+                      <span className="block text-[12px] font-normal" style={{ ...monoF, color: C.soft }}>
+                        {k.w.min}~{k.w.max}
+                      </span>
+                    </span>
+                  </button>
+                );
+              })}
+            </div>
+          </section>
+
+          {/* 2. 치수 */}
+          <section id="fw-size" aria-labelledby="fw-size-title" className="mt-8 scroll-mt-4">
+            <div className="flex flex-wrap items-baseline justify-between gap-2">
+              <h2 id="fw-size-title" className="text-[20px] font-bold" style={monoF}>
+                주문 제작 치수
+              </h2>
+              <button type="button" onClick={() => pickKind(kind)} className={`rounded-[3px] text-[14px] underline underline-offset-4 ${focusRing}`} style={{ color: C.soft, outlineColor: C.ink }}>
+                기본 치수로
+              </button>
+            </div>
+            <div className="mt-3 grid gap-4 sm:grid-cols-3">
+              <SizeSlider id="fw-w" label="폭" range={kind.w} value={dims.w} onChange={(v) => setDims((s) => ({ ...s, w: v }))} />
+              <SizeSlider id="fw-d" label="깊이" range={kind.d} value={dims.d} onChange={(v) => setDims((s) => ({ ...s, d: v }))} />
+              <SizeSlider id="fw-h" label="높이" range={kind.h} value={dims.h} onChange={(v) => setDims((s) => ({ ...s, h: v }))} />
+            </div>
+            <p className="mt-3 text-[14px] leading-[1.6]" style={{ color: C.soft }}>
+              범위 밖 치수와 둥근 상판, 서랍은 문의 때 적어 주세요.
+            </p>
+          </section>
+        </div>
+
+        {/* 오른쪽: 목재, 마감, 견적, 문의 */}
+        <aside className="min-w-0 lg:sticky lg:top-6">
+          <section id="fw-wood" aria-labelledby="fw-wood-title" className="scroll-mt-4 rounded-[4px] border p-4 md:p-5" style={{ borderColor: C.line, background: C.sheet }}>
+            <h2 id="fw-wood-title" className="text-[18px] font-bold" style={monoF}>
+              목재
+            </h2>
+            <div role="radiogroup" aria-labelledby="fw-wood-title" className="mt-3 grid grid-cols-4 gap-2">
+              {WOODS.map((w) => {
+                const on = w.id === wood.id;
+                return (
+                  <button
+                    key={w.id}
+                    type="button"
+                    role="radio"
+                    aria-checked={on}
+                    onClick={() => setWood(w)}
+                    className={`rounded-[4px] border p-1.5 text-center text-[13px] ${on ? "font-bold" : ""} ${focusRing}`}
+                    style={{ borderColor: on ? C.ink : C.line, boxShadow: on ? `inset 0 0 0 1px ${C.ink}` : "none", outlineColor: C.ink }}
+                  >
+                    <WoodSwatch color={w.color} className="h-10 w-full rounded-[2px]" />
+                    <span className="mt-1.5 block leading-none">{w.name}</span>
+                  </button>
+                );
+              })}
+            </div>
+            <p className="mt-2 text-[14px] leading-[1.6]" style={{ color: C.soft }}>
+              {wood.desc}
+            </p>
+
+            <h3 className="mt-4 text-[15px] font-bold">마감</h3>
+            <div role="radiogroup" aria-label="마감" className="mt-2 grid grid-cols-2 gap-2">
+              {FINISHES.map((f) => {
+                const on = f.id === finish;
+                return (
+                  <button
+                    key={f.id}
+                    type="button"
+                    role="radio"
+                    aria-checked={on}
+                    onClick={() => setFinish(f.id)}
+                    className={`flex items-center justify-between gap-2 rounded-[4px] border px-3 py-2 text-left text-[15px] ${on ? "font-bold" : ""} ${focusRing}`}
+                    style={{ borderColor: on ? C.ink : C.line, boxShadow: on ? `inset 0 0 0 1px ${C.ink}` : "none", outlineColor: C.ink }}
+                  >
+                    <span>{f.name}</span>
+                    <span className="text-[13px] tabular-nums" style={{ ...monoF, color: C.soft }}>
+                      {f.add ? `+${won(f.add)}` : "기본"}
+                    </span>
+                  </button>
+                );
+              })}
+            </div>
+            <p className="mt-2 text-[14px] leading-[1.6]" style={{ color: C.soft }}>
+              {FINISHES.find((f) => f.id === finish)?.desc}
+            </p>
+          </section>
+
+          <section id="fw-quote" aria-labelledby="fw-quote-title" className="mt-4 scroll-mt-4 rounded-[4px] border p-4 md:p-5" style={{ borderColor: C.ink, background: C.sheet }}>
+            <h2 id="fw-quote-title" className="text-[18px] font-bold" style={monoF}>
+              견적
+            </h2>
+            <dl className="mt-3 grid grid-cols-[1fr_auto] gap-x-4 gap-y-1.5 text-[15px]" style={monoF}>
+              <dt style={{ color: C.soft }}>
+                {kind.name} {dims.w} x {dims.d} x {dims.h}
+              </dt>
+              <dd className="text-right tabular-nums">{q.area.toFixed(2)} m2</dd>
+              <dt style={{ color: C.soft }}>목재비 {wood.name}</dt>
+              <dd className="text-right tabular-nums">{won(q.material)}</dd>
+              <dt style={{ color: C.soft }}>제작비</dt>
+              <dd className="text-right tabular-nums">{won(q.labor)}</dd>
+              <dt style={{ color: C.soft }}>마감 {FINISHES.find((f) => f.id === finish)?.name}</dt>
+              <dd className="text-right tabular-nums">{q.finish ? won(q.finish) : "포함"}</dd>
+            </dl>
+            <div className="mt-3 flex items-baseline justify-between gap-3 border-t pt-3" style={{ borderColor: C.ink }}>
+              <span className="text-[15px] font-bold">합계</span>
+              <output aria-live="polite" className="text-[26px] font-bold tabular-nums" style={monoF}>
+                {won(q.total)}
+              </output>
+            </div>
+            <p className="mt-1 text-[13px]" style={{ color: C.soft }}>
+              부가세 포함, 서울 배송 포함. 상담 후 확정.
+            </p>
+            <p className="mt-3 flex items-start gap-2 text-[15px] leading-[1.5]">
+              <Clock size={18} aria-hidden className="mt-0.5 flex-none" />
+              <span>
+                제작 기간 4~6주
+                <span className="block text-[14px]" style={{ color: C.soft }}>
+                  {fmtKo(from)} ~ {fmtKo(to)} 완성
+                </span>
+              </span>
+            </p>
+
+            <AnimatePresence mode="wait" initial={false}>
+              {receipt ? (
+                <motion.div key="done" initial={reduce ? false : { opacity: 0, y: 8 }} animate={{ opacity: 1, y: 0 }} exit={reduce ? { opacity: 0 } : { opacity: 0, y: -8 }} transition={{ duration: 0.25, ease: EASE }}>
+                  <Receipt receipt={receipt} today={today} kind={kind} dims={dims} wood={wood} finish={finish} total={q.total} svgRef={svgRef} onReset={() => setReceipt(null)} />
+                </motion.div>
+              ) : (
+                <motion.div key="form" initial={reduce ? false : { opacity: 0, y: 8 }} animate={{ opacity: 1, y: 0 }} exit={reduce ? { opacity: 0 } : { opacity: 0, y: -8 }} transition={{ duration: 0.25, ease: EASE }}>
+                  <InquiryForm today={today} spec={`${kind.name} ${dims.w}x${dims.d}x${dims.h} ${wood.name}`} onDone={(r) => setReceipt(r)} />
+                </motion.div>
+              )}
+            </AnimatePresence>
+          </section>
+        </aside>
+      </main>
+
+      {/* 목재 안내 */}
+      <section id="fw-wood-guide" aria-labelledby="fw-wood-guide-title" className="mx-auto max-w-[1200px] scroll-mt-4 border-t px-4 pt-12 md:px-6 md:pt-16" style={{ borderColor: C.line }}>
+        <h2 id="fw-wood-guide-title" className="text-[24px] font-bold md:text-[28px]" style={monoF}>
+          목재 안내
+        </h2>
+        <p className="mt-2 text-[16px] leading-[1.6]" style={{ color: C.soft }}>
+          네 가지만 씁니다. 전부 건조가 끝난 판재예요. 누르면 위 도면에 바로 입혀 봐요.
+        </p>
+        <div className="mt-6 grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
+          {WOODS.map((w) => {
+            const on = w.id === wood.id;
+            return (
+              <button
+                key={w.id}
+                type="button"
+                aria-pressed={on}
+                onClick={() => {
+                  setWood(w);
+                  go("fw-drawing");
+                }}
+                className={`rounded-[4px] border text-left ${focusRing}`}
+                style={{ borderColor: on ? C.ink : C.line, background: C.sheet, boxShadow: on ? `inset 0 0 0 1px ${C.ink}` : "none", outlineColor: C.ink }}
+              >
+                <WoodSwatch color={w.color} className="h-28 w-full rounded-t-[3px]" />
+                <div className="p-4">
+                  <p className="flex items-baseline justify-between gap-2">
+                    <b className="text-[18px]" style={monoF}>
+                      {w.name}
+                    </b>
+                    <span className="text-[13px]" style={{ color: C.soft }}>
+                      {w.hardness}
+                    </span>
+                  </p>
+                  <p className="mt-1.5 text-[15px] leading-[1.6]">{w.desc}</p>
+                  <p className="mt-2 text-[14px] tabular-nums" style={{ ...monoF, color: C.soft }}>
+                    30T 판재 m2당 {won(w.rate)}
+                  </p>
+                  {on && (
+                    <p className="mt-2 inline-flex items-center gap-1 text-[13px] font-bold">
+                      <Check size={14} aria-hidden /> 도면에 적용 중
+                    </p>
+                  )}
+                </div>
+              </button>
+            );
+          })}
+        </div>
+      </section>
+
+      {/* 5. 작업 과정 */}
+      <section id="fw-process" aria-labelledby="fw-process-title" className="mx-auto max-w-[1200px] scroll-mt-4 px-4 pt-12 md:px-6 md:pt-16">
+        <h2 id="fw-process-title" className="text-[24px] font-bold md:text-[28px]" style={monoF}>
+          작업 과정
+        </h2>
+        <ProcessLine reduce={reduce} />
+      </section>
+
+      {/* 공방 소개, 오시는 길 */}
+      <section id="fw-about" aria-labelledby="fw-about-title" className="mx-auto grid max-w-[1200px] gap-8 scroll-mt-4 px-4 pt-12 md:grid-cols-2 md:px-6 md:pt-16">
+        <div>
+          <h2 id="fw-about-title" className="text-[24px] font-bold md:text-[28px]" style={monoF}>
+            공방 소개
+          </h2>
+          <p className="mt-3 text-[16px] leading-[1.75]">
+            둘이서 하는 공방이에요. 집성판 대신 원목 판재를 짜서 만듭니다. 한 달에 두세 점만 받고, 한 점이 끝나야 다음 점을 시작해요. 도면은 주문마다 새로 그리고 확인을 받은 뒤에 재단합니다.
+          </p>
+          <ul className="mt-4 grid gap-2 text-[15px]">
+            {["원목 판재 30T 이상만 사용", "도면 확인 뒤 재단", "무상 보수 1년(갈라짐, 휨)", "오일 마감 리터치 방문 가능"].map((t) => (
+              <li key={t} className="flex items-start gap-2">
+                <Check size={16} aria-hidden className="mt-1 flex-none" />
+                {t}
+              </li>
+            ))}
+          </ul>
+        </div>
+        <div id="fw-map" className="scroll-mt-4">
+          <h2 className="text-[24px] font-bold md:text-[28px]" style={monoF}>
+            오시는 길
+          </h2>
+          <div className="mt-3 overflow-hidden rounded-[4px] border" style={{ borderColor: C.line, background: C.sheet }}>
+            <MapSketch />
+          </div>
+          <ul className="mt-3 grid gap-2 text-[15px] leading-[1.6]">
+            <li className="flex items-start gap-2">
+              <MapPin size={18} aria-hidden className="mt-0.5 flex-none" />
+              {ADDRESS}
+            </li>
+            <li className="flex items-start gap-2">
+              <TrainFront size={18} aria-hidden className="mt-0.5 flex-none" />
+              ㅇㅇ역 3번 출구 도보 8분
+            </li>
+            <li className="flex items-start gap-2">
+              <Clock size={18} aria-hidden className="mt-0.5 flex-none" />
+              10:00~18:00, 일요일과 공휴일 휴무
+            </li>
+            <li className="flex items-start gap-2">
+              <Car size={18} aria-hidden className="mt-0.5 flex-none" />
+              주차 2대, 예약 때 말씀해 주세요
+            </li>
+            <li className="flex items-start gap-2 font-bold">
+              <MessageCircle size={18} aria-hidden className="mt-0.5 flex-none" />
+              공방 방문은 예약제. {KAKAO}로 날짜를 잡아 주세요
+            </li>
+          </ul>
+        </div>
+      </section>
+
+      <footer className="mx-auto mt-16 max-w-[1200px] border-t px-4 pb-24 pt-8 text-[14px] leading-[1.8] md:px-6" style={{ borderColor: C.line, color: C.soft }}>
+        <p className="text-[15px] font-bold" style={{ ...monoF, color: C.ink }}>
+          {BRAND}
+        </p>
+        <p>{ADDRESS}</p>
+        <DemoMakerInfo className="mt-6" />
+      </footer>
+    </div>
+  );
+}
+
+/* ── 조각 ─────────────────────────────────────────────── */
+
+function Logo({ color = C.ink, size = 30 }: { color?: string; size?: number }) {
+  return (
+    <svg width={size} height={size} viewBox="0 0 30 30" aria-hidden className="flex-none">
+      <rect x="2" y="7" width="26" height="4" fill={color} />
+      <rect x="5" y="11" width="3" height="13" fill={color} />
+      <rect x="22" y="11" width="3" height="13" fill={color} />
+      <path d="M8 16h14" stroke={color} strokeWidth="2" />
+    </svg>
+  );
+}
+
+/** 나무 결. 색 위에 가느다란 결 줄을 겹친다. */
+function WoodSwatch({ color, className = "" }: { color: string; className?: string }) {
+  return (
+    <span
+      aria-hidden
+      className={`block ${className}`}
+      style={{
+        background: `repeating-linear-gradient(100deg, rgba(0,0,0,0.08) 0 1px, transparent 1px 7px, rgba(255,255,255,0.10) 7px 8px, transparent 8px 15px), ${color}`,
+      }}
+    />
+  );
+}
+
+function SizeSlider({ id, label, range, value, onChange }: { id: string; label: string; range: Range; value: number; onChange: (v: number) => void }) {
+  return (
+    <div>
+      <label htmlFor={id} className="flex items-baseline justify-between text-[15px]">
+        <span className="font-bold">{label}</span>
+        <output htmlFor={id} className="text-[17px] font-bold tabular-nums" style={monoF}>
+          {value} <span className="text-[13px] font-normal">mm</span>
+        </output>
+      </label>
+      <input
+        id={id}
+        type="range"
+        min={range.min}
+        max={range.max}
+        step={10}
+        value={value}
+        onChange={(e) => onChange(Number(e.target.value))}
+        className={`mt-1 h-7 w-full cursor-pointer rounded-[3px] ${focusRing}`}
+        style={{ accentColor: C.ink, outlineColor: C.ink }}
+      />
+      <p className="flex justify-between text-[12px] tabular-nums" style={{ ...monoF, color: C.soft }}>
+        <span>{range.min}</span>
+        <span>{range.max}</span>
+      </p>
+    </div>
+  );
+}
+
+/* ── 4. 제작 문의 ──────────────────────────────────────── */
+
+type Lead = { no: number; name: string; phone: string };
+
+function InquiryForm({ today, spec, onDone }: { today: Date; spec: string; onDone: (r: Lead) => void }) {
+  const [name, setName] = useState("");
+  const [phone, setPhone] = useState("");
+  const [memo, setMemo] = useState("");
+  const [err, setErr] = useState<string | null>(null);
+
+  const submit = (e: React.FormEvent) => {
+    e.preventDefault();
+    if (name.trim().length < 2) return setErr("이름을 두 글자 이상 넣어 주세요.");
+    const digits = phone.replace(/\D/g, "");
+    if (digits.length < 10 || digits.length > 11) return setErr("휴대폰 번호를 다시 확인해 주세요.");
+    setErr(null);
+    onDone({ no: 100 + ((today.getDate() * 7 + today.getMonth()) % 80), name: name.trim(), phone });
+  };
+
+  const field = `mt-1 w-full rounded-[4px] border bg-white px-3 py-2.5 text-[16px] ${focusRing}`;
+
+  return (
+    <form onSubmit={submit} noValidate className="mt-5 border-t pt-4" style={{ borderColor: C.line }}>
+      <h3 className="text-[16px] font-bold">제작 문의</h3>
+      <p className="mt-2 flex items-center gap-1.5 rounded-[4px] px-3 py-2 text-[14px]" style={{ background: C.paper }}>
+        <Paperclip size={15} aria-hidden className="flex-none" />
+        <span className="min-w-0 truncate">도면 PNG 자동 첨부: {spec}</span>
+      </p>
+      <label className="mt-3 block text-[14px] font-bold">
+        이름
+        <input value={name} onChange={(e) => setName(e.target.value)} autoComplete="name" className={field} style={{ borderColor: C.line, outlineColor: C.ink }} />
+      </label>
+      <label className="mt-3 block text-[14px] font-bold">
+        휴대폰
+        <input value={phone} onChange={(e) => setPhone(e.target.value)} inputMode="numeric" autoComplete="tel" placeholder="010-0000-0000" className={field} style={{ borderColor: C.line, outlineColor: C.ink }} />
+      </label>
+      <label className="mt-3 block text-[14px] font-bold">
+        요청 사항
+        <textarea value={memo} onChange={(e) => setMemo(e.target.value)} rows={2} placeholder="모서리 둥글게, 서랍 하나" className={`${field} resize-none`} style={{ borderColor: C.line, outlineColor: C.ink }} />
+      </label>
+      {err && (
+        <p role="alert" className="mt-2 text-[14px] font-bold" style={{ color: C.error }}>
+          {err}
+        </p>
+      )}
+      <button type="submit" data-gtm-cta={`${SLUG}_inquiry`} className={`mt-4 w-full rounded-[4px] py-3 text-[16px] font-bold text-white transition-transform duration-100 active:translate-y-[1px] ${focusRing}`} style={{ background: C.ink, outlineColor: C.ink }}>
+        도면과 함께 문의 보내기
+      </button>
+    </form>
+  );
+}
+
+function Receipt({ receipt, today, kind, dims, wood, finish, total, svgRef, onReset }: { receipt: Lead; today: Date; kind: Kind; dims: Dims; wood: Wood; finish: FinishId; total: number; svgRef: React.RefObject<SVGSVGElement | null>; onReset: () => void }) {
+  const [saving, setSaving] = useState<"idle" | "busy" | "done" | "fail">("idle");
+  const no = `FW-${today.getFullYear()}${p2(today.getMonth() + 1)}${p2(today.getDate())}-${receipt.no}`;
+  const reply = daysAgo(today, -2);
+  const finishName = FINISHES.find((f) => f.id === finish)?.name ?? "";
+
+  const save = async () => {
+    const svg = svgRef.current;
+    if (!svg) return;
+    setSaving("busy");
+    try {
+      await savePng(svg, `${BRAND}-도면-${kind.name}-${dims.w}x${dims.d}x${dims.h}.png`);
+      setSaving("done");
+    } catch {
+      setSaving("fail");
+    }
+  };
+
+  return (
+    <div className="mt-5 border-t pt-4" style={{ borderColor: C.line }} aria-live="polite">
+      <h3 className="flex items-center gap-2 text-[16px] font-bold">
+        <Check size={18} aria-hidden /> 문의 접수
+      </h3>
+      <dl className="mt-3 grid grid-cols-[auto_1fr] gap-x-4 gap-y-1.5 text-[15px]">
+        <dt style={{ color: C.soft }}>접수번호</dt>
+        <dd className="font-bold tabular-nums" style={monoF}>
+          {no}
+        </dd>
+        <dt style={{ color: C.soft }}>이름</dt>
+        <dd>{maskName(receipt.name)}</dd>
+        <dt style={{ color: C.soft }}>휴대폰</dt>
+        <dd className="tabular-nums">{maskPhone(receipt.phone)}</dd>
+        <dt style={{ color: C.soft }}>내용</dt>
+        <dd>
+          {kind.name} {dims.w} x {dims.d} x {dims.h}, {wood.name} {finishName} 마감, {won(total)}
+        </dd>
+        <dt style={{ color: C.soft }}>회신 예정</dt>
+        <dd className="font-bold">{fmtKo(reply)}까지</dd>
+        <dt style={{ color: C.soft }}>담당 창구</dt>
+        <dd>
+          {KAKAO}
+          <span className="block text-[14px]" style={{ color: C.soft }}>
+            <Phone size={13} aria-hidden className="mr-1 inline" />
+            전화 상담은 운영시간 10:00~18:00
+          </span>
+        </dd>
+      </dl>
+      <button type="button" onClick={save} disabled={saving === "busy"} data-gtm-cta={`${SLUG}_png`} className={`mt-4 inline-flex w-full items-center justify-center gap-2 rounded-[4px] border-2 py-2.5 text-[15px] font-bold ${focusRing}`} style={{ borderColor: C.ink, background: C.paper, outlineColor: C.ink }}>
+        <Download size={17} aria-hidden />
+        {saving === "busy" ? "만드는 중" : saving === "done" ? "도면 PNG 저장됨" : saving === "fail" ? "저장 실패, 다시 시도" : "도면 PNG 저장"}
+      </button>
+      <button type="button" onClick={onReset} className={`mt-2 w-full rounded-[3px] py-1.5 text-[14px] underline underline-offset-4 ${focusRing}`} style={{ color: C.soft, outlineColor: C.ink }}>
+        다른 가구로 다시 문의
+      </button>
+    </div>
+  );
+}
+
+/* ── 5. 작업 과정 ──────────────────────────────────────── */
+
+const STEPS = [
+  { name: "재단", days: "2~3일", desc: "도면대로 판재를 자르고 폭을 맞춰요. 결 방향을 보고 어느 판을 어디에 쓸지 짝을 정해요." },
+  { name: "조립", days: "3~4일", desc: "짜맞춤과 목심으로 붙여요. 접착한 뒤 하루 동안 눌러 두고, 다음 날 직각을 다시 봐요." },
+  { name: "샌딩", days: "2일", desc: "120방부터 320방까지 네 번 갈아요. 모서리는 손으로 둥글려 손에 걸리는 곳이 없게 해요." },
+  { name: "마감", days: "1주", desc: "오일은 세 번 바르고 사이마다 하루 말려요. 바니시는 두 번. 다 마른 뒤 사진을 보내 드려요." },
+];
+/** 선 1.2초, 점은 선이 지나간 뒤 차례로 */
+const LINE_DRAW_MS = 1200;
+
+function ProcessLine({ reduce }: { reduce: boolean }) {
+  const [active, setActive] = useState(0);
+  const step = STEPS[active];
+  const once = { once: true, amount: 0.6 } as const;
+  return (
+    <div className="mt-6">
+      <div className="relative">
+        <motion.div
+          aria-hidden
+          className="absolute left-[12.5%] right-[12.5%] top-[14px] h-[2px] origin-left"
+          style={{ background: C.ink }}
+          initial={reduce ? false : { scaleX: 0 }}
+          whileInView={{ scaleX: 1 }}
+          viewport={once}
+          transition={{ duration: LINE_DRAW_MS / 1000, ease: EASE }}
+        />
+        <div role="tablist" aria-label="작업 단계" className="relative grid grid-cols-4">
+          {STEPS.map((s, i) => {
+            const on = i === active;
+            return (
+              <button
+                key={s.name}
+                type="button"
+                role="tab"
+                id={`fw-step-${i}`}
+                aria-selected={on}
+                aria-controls="fw-step-panel"
+                onClick={() => setActive(i)}
+                className={`group flex flex-col items-center gap-2 rounded-[4px] py-0.5 text-[15px] ${on ? "font-bold" : ""} ${focusRing}`}
+                style={{ outlineColor: C.ink }}
+              >
+                <motion.span
+                  aria-hidden
+                  className="block h-[28px] w-[28px] rounded-full border-2"
+                  style={{ borderColor: C.ink, background: on ? C.ink : C.paper }}
+                  initial={reduce ? false : { scale: 0 }}
+                  whileInView={{ scale: 1 }}
+                  viewport={once}
+                  transition={{ duration: 0.3, delay: (LINE_DRAW_MS / 1000) * ((i + 0.5) / 4), ease: EASE }}
+                />
+                <span className="leading-none">{s.name}</span>
+                <span className="text-[12px] leading-none tabular-nums" style={{ ...monoF, color: C.soft }}>
+                  {s.days}
+                </span>
+              </button>
+            );
+          })}
+        </div>
+      </div>
+      <div id="fw-step-panel" role="tabpanel" aria-labelledby={`fw-step-${active}`} className="mt-5 rounded-[4px] border p-4 md:p-5" style={{ borderColor: C.line, background: C.sheet }}>
+        <AnimatePresence mode="wait" initial={false}>
+          <motion.p key={active} initial={reduce ? false : { opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} transition={{ duration: 0.18 }} className="text-[16px] leading-[1.7]">
+            <b style={monoF}>{step.name}</b> {step.desc}
+          </motion.p>
+        </AnimatePresence>
+      </div>
+      <p className="mt-3 text-[15px] leading-[1.6]" style={{ color: C.soft }}>
+        목재 수급과 건조 대기까지 합쳐 4~6주예요. 작업 중 사진은 단계마다 한 번 보내 드려요.
+      </p>
+    </div>
+  );
+}
+
+/** 오시는 길 약도. 큰길, 골목, 역, 공방 자리만 그린다. */
+function MapSketch() {
+  return (
+    <svg viewBox="0 0 480 220" role="img" aria-label="약도: ㅇㅇ역 3번 출구에서 큰길을 따라 걷다 두 번째 골목 안쪽에 공방" className="block h-auto w-full" style={monoF}>
+      <rect width="480" height="220" fill="url(#fw-grid)" />
+      <path d="M0 150 H480" stroke={C.ink} strokeWidth="14" fill="none" opacity="0.18" />
+      <path d="M0 150 H480" stroke={C.sheet} strokeWidth="2" strokeDasharray="10 8" fill="none" />
+      <path d="M120 150 V40 M300 150 V20" stroke={C.ink} strokeWidth="6" fill="none" opacity="0.18" />
+      <path d="M300 90 H420" stroke={C.ink} strokeWidth="6" fill="none" opacity="0.18" />
+      <rect x="40" y="160" width="60" height="26" rx="2" fill={C.ink} />
+      <text x="70" y="178" fontSize="12" fontWeight="700" textAnchor="middle" fill={C.sheet}>
+        ㅇㅇ역
+      </text>
+      <text x="70" y="202" fontSize="11" textAnchor="middle" fill={C.soft}>
+        3번 출구
+      </text>
+      <path d="M100 150 H300 V90 H360" stroke={C.ink} strokeWidth="2" strokeDasharray="4 4" fill="none" />
+      <text x="200" y="138" fontSize="11" textAnchor="middle" fill={C.soft}>
+        도보 8분
+      </text>
+      <rect x="360" y="66" width="80" height="48" rx="2" fill={C.sheet} stroke={C.ink} strokeWidth="2" />
+      <text x="400" y="86" fontSize="12" fontWeight="700" textAnchor="middle" fill={C.ink}>
+        {BRAND}
+      </text>
+      <text x="400" y="103" fontSize="10" textAnchor="middle" fill={C.soft}>
+        1층, 주차 2대
+      </text>
+      <text x="130" y="60" fontSize="11" fill={C.soft}>
+        ㅇㅇ로
+      </text>
+    </svg>
+  );
+}
