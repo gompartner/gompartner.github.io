@@ -58,16 +58,27 @@ const toggle = "inline-flex h-10 w-10 items-center justify-center rounded-md bor
 export function ClassicHeader() {
   const pathname = usePathname();
   const [open, setOpen] = useState(false);
+  // 터치 기기는 hover가 없어서, 하위 메뉴가 있는 메뉴는 첫 탭에 내림 메뉴를 열고 두 번째 탭에 이동한다
+  const [drop, setDrop] = useState<string | null>(null);
   const [prev, setPrev] = useState(pathname);
   if (prev !== pathname) {
     setPrev(pathname);
     setOpen(false);
+    setDrop(null);
   }
   // 메뉴를 눌러 이동한 뒤 초점이 메뉴에 남아 내림 메뉴가 열려 있지 않게 푼다
   useEffect(() => {
     const el = document.activeElement;
     if (el instanceof HTMLElement && el.closest("header")) el.blur();
   }, [pathname]);
+  useEffect(() => {
+    if (!drop) return;
+    const close = (e: PointerEvent) => {
+      if (!(e.target instanceof Element && e.target.closest("[data-drop]"))) setDrop(null);
+    };
+    document.addEventListener("pointerdown", close);
+    return () => document.removeEventListener("pointerdown", close);
+  }, [drop]);
   useEffect(() => {
     document.body.style.overflow = open ? "hidden" : "";
     return () => {
@@ -96,13 +107,19 @@ export function ClassicHeader() {
             곰파트너
           </Link>
 
-          <ul className="hidden h-full items-stretch md:flex" role="list">
+          <ul className="hidden h-full items-stretch lg:flex" role="list">
             {classicMenu.map((m) => {
               const active = m.match.some((p) => pathname === p || pathname.startsWith(p + "/"));
               return (
-                <li key={m.label} className="group relative flex">
+                <li key={m.label} data-drop className="group relative flex">
                   <Link
                     href={m.href}
+                    onClick={(e) => {
+                      if (m.items.length === 0 || drop === m.label || !window.matchMedia("(hover: none)").matches) return;
+                      e.preventDefault();
+                      setDrop(m.label);
+                    }}
+                    aria-expanded={m.items.length > 0 ? drop === m.label : undefined}
                     className={cn(
                       "flex items-center gap-1 px-6 text-[17px] font-bold tracking-[-0.02em] transition-colors hover:text-[#256ef4]",
                       active ? "text-[#256ef4]" : "text-[#15171c]"
@@ -112,7 +129,12 @@ export function ClassicHeader() {
                     {m.items.length > 0 && <ChevronDown size={15} strokeWidth={2.5} aria-hidden className="text-[#8a929e]" />}
                   </Link>
                   {m.items.length > 0 && (
-                    <div className="invisible absolute left-1/2 top-full -translate-x-1/2 pt-px opacity-0 transition-opacity duration-150 group-hover:visible group-hover:opacity-100 group-has-[:focus-visible]:visible group-has-[:focus-visible]:opacity-100">
+                    <div
+                      className={cn(
+                        "absolute left-1/2 top-full -translate-x-1/2 pt-px transition-opacity duration-150 group-hover:visible group-hover:opacity-100 group-has-[:focus-visible]:visible group-has-[:focus-visible]:opacity-100",
+                        drop === m.label ? "visible opacity-100" : "invisible opacity-0"
+                      )}
+                    >
                       <ul className="min-w-[200px] border border-[#e6e9ee] border-t-2 border-t-[#256ef4] bg-white py-2 shadow-[0_12px_24px_rgba(21,23,28,.08)]" role="list">
                         {m.items.map((i) => (
                           <li key={i.label}>
@@ -148,7 +170,7 @@ export function ClassicHeader() {
               aria-expanded={open}
               aria-controls="classic-menu"
               aria-label={open ? "메뉴 닫기" : "메뉴 열기"}
-              className={cn(toggle, "md:hidden")}
+              className={cn(toggle, "lg:hidden")}
             >
               {open ? <X size={20} aria-hidden /> : <Menu size={20} aria-hidden />}
             </button>
@@ -157,7 +179,7 @@ export function ClassicHeader() {
       </div>
 
       {open && (
-        <div id="classic-menu" className="fixed inset-x-0 bottom-0 top-16 overflow-y-auto bg-white px-4 pb-10 md:hidden">
+        <div id="classic-menu" className="fixed inset-x-0 bottom-0 top-16 overflow-y-auto bg-white px-4 pb-10 md:top-[113px] lg:hidden">
           {classicMenu.map((m) => (
             <section key={m.label} className="border-b border-[#e6e9ee] py-4">
               <Link href={m.href} className="text-[18px] font-extrabold tracking-[-0.02em] text-[#15171c]">
