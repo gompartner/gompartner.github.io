@@ -7,6 +7,7 @@ const menu = [
   { href: "/works", label: "샘플" },
   { href: "/pricing", label: "가격" },
   { href: "/maintenance", label: "유지보수" },
+  { href: "/guide", label: "가이드" },
   { href: "/faq", label: "자주 묻는 질문" },
   { href: "/tools", label: "자료실" },
 ];

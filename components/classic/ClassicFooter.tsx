@@ -9,6 +9,7 @@ const menu = [
   { href: "/classic/pricing", label: "가격" },
   { href: "/classic/maintenance", label: "유지보수" },
   { href: "/classic/faq", label: "자주 묻는 질문" },
+  { href: "/classic/guide", label: "가이드" },
   { href: "/classic/tools", label: "자료실" },
   { href: "/classic/contact", label: "상담 신청" },
 ];
