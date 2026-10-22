@@ -13,7 +13,7 @@ export async function generateMetadata({ params }: { params: Promise<{ version: 
   const v = privacyVersions.find((x) => x.id === version);
   return {
     title: `개인정보처리방침 ${v?.id ?? ""}번째 버전`,
-    alternates: { canonical: `/privacy/${version}` },
+    alternates: { canonical: `/classic/privacy/${version}` },
     robots: { index: false },
   };
 }

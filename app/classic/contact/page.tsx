@@ -4,10 +4,13 @@ import { ContactForm } from "@/components/classic/contact/ContactForm";
 import { PageHead, btnLine, wrap } from "@/components/classic/ui";
 import { ChannelTalkButton } from "@/components/layout/ChannelTalk";
 import { processSteps } from "@/data/classic/faq";
+import { pageMeta } from "@/lib/seo";
 
-export const metadata: Metadata = {
+export const metadata: Metadata = pageMeta({
   title: "상담 신청",
-};
+  description: "만들고 싶은 홈페이지나 고칠 곳을 적어 주시면 확인하고 연락드립니다.",
+  path: "/classic/contact",
+});
 
 export default function ClassicContactPage() {
   return (

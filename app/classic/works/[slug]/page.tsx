@@ -5,6 +5,7 @@ import { PageHead, SubTabs, h2, wrap } from "@/components/classic/ui";
 import { SampleGrid } from "@/components/classic/works/SampleGrid";
 import { samplesIn, worksTabs } from "@/components/classic/works/samples";
 import { industries } from "@/data/classic/industries";
+import { pageMeta } from "@/lib/seo";
 
 type Props = { params: Promise<{ slug: string }> };
 
@@ -16,7 +17,7 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
   const { slug } = await params;
   const ind = industries.find((i) => i.slug === slug);
   if (!ind) return {};
-  return { title: `${ind.title} 비용과 샘플` };
+  return { ...pageMeta({ title: `${ind.title} 비용과 샘플`, description: ind.description, path: `/classic/works/${slug}` }), keywords: ind.keywords };
 }
 
 export default async function ClassicIndustryPage({ params }: Props) {

@@ -102,7 +102,7 @@ export function ClassicHeader() {
 
       <div className="border-b border-[#e6e9ee]">
         <nav aria-label="주 메뉴" className="mx-auto flex h-16 w-full max-w-[1248px] items-center justify-between gap-6 px-4 md:h-[76px] md:px-6">
-          <Link href="/classic" className="flex items-center gap-2.5 text-[21px] font-extrabold tracking-[-0.04em] text-[#15171c]">
+          <Link href="/" className="flex items-center gap-2.5 text-[21px] font-extrabold tracking-[-0.04em] text-[#15171c]">
             <Image src="/images/bear-avatar.webp" alt="" width={32} height={32} className="h-8 w-8 rounded-full object-cover" />
             곰파트너
           </Link>

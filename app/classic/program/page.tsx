@@ -8,15 +8,16 @@ import { demoProjects, isMaintenance, slugOf } from "@/components/classic/works/
 import { ChannelTalkButton } from "@/components/layout/ChannelTalk";
 import { processSteps } from "@/data/classic/faq";
 import { estimateFor } from "@/data/classic/pricing";
-import { fitDescription } from "@/lib/seo";
+import { pageMeta } from "@/lib/seo";
 
 // 업무 프로그램 샘플: 견적표가 없고, 유지보수와 랜딩페이지가 아닌 샘플.
 const programs = demoProjects.filter((p) => !estimateFor(p.id) && !isMaintenance(p) && p.category !== "랜딩페이지");
 
-export const metadata: Metadata = {
+export const metadata: Metadata = pageMeta({
   title: "업무 프로그램 제작",
-  description: fitDescription(`업무 프로그램 제작은 별도 견적입니다. ${programs.map((p) => p.category).join(", ")} 샘플을 직접 써 볼 수 있습니다.`),
-};
+  description: `업무 프로그램 제작은 별도 견적입니다. ${programs.map((p) => p.category).join(", ")} 샘플을 직접 써 볼 수 있습니다.`,
+  path: "/classic/program",
+});
 
 const section = "scroll-mt-20 border-t border-[#e6e9ee] md:scroll-mt-32";
 

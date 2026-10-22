@@ -95,7 +95,7 @@ export function LandingPage() {
       <div className="md:px-4 md:py-8">
         <div className="mx-auto max-w-[720px] bg-[#fffdf8] pb-20 shadow-[0_0_0_3px_#1d1d1f] md:pb-24">
           <header className={`${strip} flex h-16 items-center border-b-[3px]`} style={{ borderColor: ink }}>
-            <Link href="/" className="flex items-center gap-2 font-[family-name:var(--font-sfx)] text-[22px]">
+            <Link href="/story" className="flex items-center gap-2 font-[family-name:var(--font-sfx)] text-[22px]">
               <Image src="/images/bear-avatar.webp" alt="" width={34} height={34} className="h-[34px] w-[34px] rounded-full border-2 border-[#1d1d1f] bg-[#fffdf8] object-cover" />
               {profile.name}
             </Link>

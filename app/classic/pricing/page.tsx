@@ -9,12 +9,13 @@ import { ChannelTalkButton } from "@/components/layout/ChannelTalk";
 import { processSteps } from "@/data/classic/faq";
 import { maintenanceServices } from "@/data/classic/maintenance";
 import { addons, formatWon, landingPlans, manwon, plans, previewDetail, previewPromise, runningCostNote } from "@/data/classic/pricing";
-import { fitDescription } from "@/lib/seo";
+import { pageMeta } from "@/lib/seo";
 
-export const metadata: Metadata = {
+export const metadata: Metadata = pageMeta({
   title: "홈페이지 제작 비용·가격표",
-  description: fitDescription(`${plans.map((p) => `${p.title} ${manwon(p.price)}`).join(", ")}. 예약, 결제, 회원가입 같은 추가 기능 가격도 함께 적었습니다.`),
-};
+  description: `${plans.map((p) => `${p.title} ${manwon(p.price)}`).join(", ")}. 예약, 결제, 회원가입 같은 추가 기능 가격도 함께 적었습니다.`,
+  path: "/classic/pricing",
+});
 
 const products = [
   { href: "#landing", name: "광고 랜딩페이지", price: `${manwon(landingPlans[0].price)}부터`, what: "광고 보고 온 사람의 신청을 받는 한 페이지" },
