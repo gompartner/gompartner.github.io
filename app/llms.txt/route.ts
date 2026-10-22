@@ -1,4 +1,5 @@
 import { faq } from "@/data/faq";
+import { guides } from "@/data/guides";
 import { maintenanceServices } from "@/data/maintenance";
 import { industries } from "@/data/industries";
 import { addons, estimateFor, formatWon, landingPlans, manwon, planCommon, plans } from "@/data/pricing";
@@ -60,6 +61,10 @@ ${projects.filter((p) => p.demoUrl.startsWith("/demo/")).map(demoLine).join("\n"
 ## 자주 묻는 질문
 
 ${faq.map((f) => `- ${f.q} ${f.a}`).join("\n")}
+
+## 가이드
+
+${guides.map((g) => `- [${g.title}](${url(`/guide/${g.slug}`)}): ${g.description}`).join("\n")}
 
 ## 무료 도구
 
