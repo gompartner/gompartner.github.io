@@ -5,6 +5,7 @@ import { industries } from "@/data/classic/industries";
 import { projects } from "@/data/classic/projects";
 import { estimateFor, manwon } from "@/data/classic/pricing";
 import { fieldsById } from "@/data/classic/workFilters";
+import { PROGRAM_IDS } from "@/data/classic/programIds";
 
 // 클래식 샘플 페이지 공용 계산. 서버에서만 쓴다(파일 존재 확인).
 
@@ -35,9 +36,19 @@ export function priceLine(p: Project) {
 }
 
 export const isLanding = (p: Project) => p.category === "랜딩페이지" || p.id.startsWith("landing-");
+export const isProgram = (p: Project) => PROGRAM_IDS.includes(p.id);
 
 /** 업종 홈페이지와 섞이지 않게 따로 묶는 샘플 묶음. 탭 주소는 /classic/works/<slug> */
 export const groups: { slug: string; label: string; title: string; description: string; keywords: string[]; needs: string[]; match: (p: Project) => boolean }[] = [
+  {
+    slug: "program",
+    label: "업무 프로그램",
+    title: "업무 프로그램 제작",
+    description: "엑셀로 하던 주문 취합, 쇼핑몰 관리, 결과지 출력, 강의 운영처럼 매일 반복하는 일을 줄이는 프로그램 샘플. 실제 화면을 직접 눌러 볼 수 있습니다.",
+    keywords: ["업무 프로그램 제작", "관리자 페이지 제작", "업무 자동화 프로그램", "엑셀 자동화"],
+    needs: ["엑셀 업로드와 취합", "관리자 화면", "결과지, 문서 출력", "권한별 화면"],
+    match: isProgram,
+  },
   {
     slug: "landing",
     label: "랜딩페이지",

@@ -4,14 +4,13 @@ import { Check, MessageCircle } from "lucide-react";
 import { StepList } from "@/components/classic/pricing/StepList";
 import { PageHead, btnLine, btnPrimary, h2, wrap } from "@/components/classic/ui";
 import { SampleGrid } from "@/components/classic/works/SampleGrid";
-import { demoProjects, isMaintenance, slugOf } from "@/components/classic/works/samples";
+import { demoProjects, isProgram, slugOf } from "@/components/classic/works/samples";
 import { ChannelTalkButton } from "@/components/layout/ChannelTalk";
 import { processSteps } from "@/data/classic/faq";
-import { estimateFor } from "@/data/classic/pricing";
 import { pageMeta } from "@/lib/seo";
 
 // 업무 프로그램 샘플: 견적표가 없고, 유지보수와 랜딩페이지가 아닌 샘플.
-const programs = demoProjects.filter((p) => !estimateFor(p.id) && !isMaintenance(p) && p.category !== "랜딩페이지");
+const programs = demoProjects.filter(isProgram);
 
 export const metadata: Metadata = pageMeta({
   title: "업무 프로그램 제작",

@@ -12,6 +12,7 @@ import { blogPosts } from "@/data/classic/stories";
 import { tools } from "@/data/classic/tools";
 import { estimateFor, landingPlans, manwon, plans, previewDetail, previewPromise } from "@/data/classic/pricing";
 import { fieldsById } from "@/data/classic/workFilters";
+import { PROGRAM_IDS } from "@/data/classic/programIds";
 import { useReducedMotionSafe } from "@/hooks/useReducedMotionSafe";
 import { cn } from "@/lib/utils";
 
@@ -208,16 +209,23 @@ function Services() {
 function Samples() {
   const [tab, setTab] = useState<string>("all");
   const field = industries.find((x) => x.slug === tab)?.field;
-  // 랜딩과 유지보수는 업종 홈페이지와 섞지 않고 탭을 따로 둔다(works/samples.ts groups 와 같은 기준)
+  // 업무 프로그램, 랜딩, 유지보수는 업종 홈페이지와 섞지 않고 탭을 따로 둔다(works/samples.ts groups 와 같은 기준)
   const groupOf = (p: (typeof projects)[number]) =>
-    p.category === "랜딩페이지" || p.id.startsWith("landing-") ? "landing" : p.kind === "유지보수" || ["maintenance-dashboard", "maintenance-urgent-fix", "accessibility-review"].includes(p.id) ? "maintenance" : null;
+    p.category === "랜딩페이지" || p.id.startsWith("landing-")
+      ? "landing"
+      : p.kind === "유지보수" || ["maintenance-dashboard", "maintenance-urgent-fix", "accessibility-review"].includes(p.id)
+        ? "maintenance"
+        : PROGRAM_IDS.includes(p.id)
+          ? "program"
+          : null;
   const list = projects
     .filter((p) => p.demoUrl.startsWith("/demo/"))
-    .filter((p) => (tab === "landing" || tab === "maintenance" ? groupOf(p) === tab : !groupOf(p) && (!field || fieldsById[p.id]?.includes(field))))
+    .filter((p) => (tab === "program" || tab === "landing" || tab === "maintenance" ? groupOf(p) === tab : !groupOf(p) && (!field || fieldsById[p.id]?.includes(field))))
     .slice(0, 8);
   const tabs = [
     { slug: "all", label: "전체" },
     ...industries.map((x) => ({ slug: x.slug, label: x.label })),
+    { slug: "program", label: "업무 프로그램" },
     { slug: "landing", label: "랜딩페이지" },
     { slug: "maintenance", label: "유지보수" },
   ];

@@ -10,7 +10,7 @@ import { DemoMakerInfo } from "@/components/demos/DemoMakerInfo";
 
 /* 네일샵 홈페이지 샘플: 가상의 곰파트너 네일샵. 젤네일, 패디, 케어, 아트.
    상호, 주소, 직원 이름은 모두 가상이다.
-   첫 화면 사진 출처: Pexels 사진 2281695
+   첫 화면 사진과 칠해 보기 손 사진은 AI 생성(Z-Image-Turbo)
 
    국내 네일샵 홈페이지와 네이버 예약의 공통 구성을 따랐다.
    메뉴는 디자인 둘러보기, 시술 메뉴와 가격, 예약하기, 오시는 길 네 개.
@@ -594,12 +594,12 @@ function Poster({ reduce, onCta }: { reduce: boolean; onCta: () => void }) {
           {/* eslint-disable-next-line @next/next/no-img-element -- 정적 export 라 next/image 최적화를 쓰지 않는다 */}
           <img
             src={`${IMG}/hero.jpg`}
-            srcSet={`${IMG}/hero-sm.jpg 960w, ${IMG}/hero.jpg 1920w`}
+            srcSet={`${IMG}/hero-sm.jpg 960w, ${IMG}/hero.jpg 1344w`}
             sizes="100vw"
-            alt="누드 핑크 젤네일을 바른 손이 매니큐어 두 병을 들고 있는 사진"
+            alt="분홍 실크 위에 누드 핑크 젤네일을 한 손을 올린 사진"
             fetchPriority="high"
             className="absolute inset-0 h-full w-full object-cover"
-            style={{ objectPosition: "50% 35%" }}
+            style={{ objectPosition: "70% 50%" }}
           />
         </motion.div>
       </motion.div>
