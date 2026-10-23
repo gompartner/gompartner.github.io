@@ -10,7 +10,7 @@ import { maskName, maskPhone } from "@/components/demos/LeadReceivedPanel";
 import { DemoMakerInfo } from "@/components/demos/DemoMakerInfo";
 
 /* 전통주 보틀숍 샘플: 가상의 전통주 보틀숍 곰파트너. 상호, 주소, 술 이름은 모두 가상이다.
-   첫 화면 사진 출처: AI 생성(Z-Image-Turbo, Apache 2.0)
+   첫 화면과 병 사진 출처: AI 생성(Z-Image-Turbo, Apache 2.0)
 
    국내 전통주 보틀숍과 전통주 쇼핑몰은 첫 진입에 성인 인증 창(만 19세 이상이십니까)을 먼저 띄운다.
    메뉴는 막걸리, 약주, 청주, 증류주, 과실주로 종류별 분류, 첫 화면에 추천과 선물 세트, 시음회 안내,
@@ -71,12 +71,10 @@ const C = {
 
 type Kind = "막걸리" | "약주" | "청주" | "증류주" | "과실주";
 type Sweet = "드라이" | "보통" | "달콤";
-type Shape = "wide" | "long" | "square" | "round";
 
 const KINDS: Kind[] = ["막걸리", "약주", "청주", "증류주", "과실주"];
 const SWEETS: Sweet[] = ["드라이", "보통", "달콤"];
 
-const KIND_SHAPE: Record<Kind, Shape> = { 막걸리: "wide", 약주: "long", 청주: "long", 증류주: "square", 과실주: "round" };
 
 const PRICE_BANDS = ["1만원 이하", "1~3만원", "3~5만원", "5만원 이상"] as const;
 type PriceBand = (typeof PRICE_BANDS)[number];
@@ -635,26 +633,21 @@ function DualRange({ value, onChange }: { value: [number, number]; onChange: (v:
 
 /* ── 병 그림 ──────────────────────────────────────────── */
 
-/** 무채색 병 실루엣 4종. 막걸리는 어깨 넓은 병, 약주와 청주는 목 긴 병, 증류주는 각진 병, 과실주는 둥근 병.
-    실제 사이트라면 이 자리에 상품 사진이 들어간다. */
+/** 병 사진. 흰 바탕 사진이라 곱하기 섞기로 카드와 선물 상자 위에 바탕 없이 얹힌다 */
 function BottleArt({ b, height = 120, className = "" }: { b: Bottle; height?: number; className?: string }) {
-  const shape = KIND_SHAPE[b.kind];
-  const body =
-    shape === "wide"
-      ? "M22 14h16v8c0 4 12 10 12 22v98c0 6-4 10-10 10H20c-6 0-10-4-10-10V44c0-12 12-18 12-22z"
-      : shape === "long"
-        ? "M25 10h10v46c0 4 11 8 11 18v70c0 6-3 8-8 8H22c-5 0-8-2-8-8V74c0-10 11-14 11-18z"
-        : shape === "square"
-          ? "M24 12h12v26c0 3 12 5 12 12v96c0 4-2 6-6 6H18c-4 0-6-2-6-6V50c0-7 12-9 12-12z"
-          : "M25 10h10v40c0 3 17 8 17 36v34c0 14-10 30-22 30S8 134 8 120V86c0-28 17-33 17-36z";
-  const labelY = shape === "wide" ? 78 : shape === "long" ? 92 : shape === "square" ? 76 : 86;
-  const labelH = shape === "long" ? 46 : 54;
   return (
-    <svg width={height * 0.375} height={height} viewBox="0 0 60 160" aria-hidden className={`flex-none ${className}`}>
-      <path d={body} fill="#c9c9c7" />
-      <rect x={shape === "wide" ? 20 : 23} y="4" width={shape === "wide" ? 20 : 14} height="11" rx="2" fill="#a8a8a6" />
-      <rect x="15" y={labelY} width="30" height={labelH} rx="1" fill="#efefed" />
-    </svg>
+    // eslint-disable-next-line @next/next/no-img-element -- 정적 export 라 next/image 최적화를 쓰지 않는다
+    <img
+      src={`${IMG}/bottles/${b.id}.jpg`}
+      alt=""
+      aria-hidden
+      loading="lazy"
+      draggable={false}
+      width={Math.round(height * 0.389)}
+      height={height}
+      className={`flex-none object-contain ${className}`}
+      style={{ width: Math.round(height * 0.389), height, mixBlendMode: "multiply" }}
+    />
   );
 }
 
