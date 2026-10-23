@@ -117,7 +117,7 @@ export const tours: Record<string, TourStep[]> = {
   "landing-leather-class": [
     { target: "#lc-apply", title: "수업 신청", desc: "회차를 고르세요. 남은 자리가 0이면 대기 신청으로 바뀝니다." },
     { target: "#lc-change", title: "예약 확인과 변경", desc: "예약 번호로 찾아 날짜를 바꾸거나 취소해 보세요. 환불 금액이 같이 나옵니다." },
-    { target: "#lc-owner", title: "사장님 화면", desc: "회차를 누르면 신청자와 결제 상태, 변경 이력이 보입니다." },
+    { target: "#lc-owner", title: "관리자 화면", desc: "회차를 누르면 신청자와 결제 상태, 변경 이력이 보입니다." },
   ],
   "landing-coding-camp": [
     { target: "#curriculum", title: "커리큘럼", desc: "주차를 누르면 그 주에 쌓을 블록이 보입니다." },
@@ -181,12 +181,12 @@ export const tours: Record<string, TourStep[]> = {
     { target: "#hs-designers", title: "디자이너 선택", desc: "디자이너를 고르세요. 메뉴 단가가 바뀝니다." },
     { target: "#hs-menu", title: "시술 담기", desc: "시술을 여러 개 담으면 시간과 금액이 합산됩니다." },
     { target: "#hs-reserve", title: "예약 시간표", desc: "빈 칸을 누르면 소요시간만큼 잡힙니다." },
-    { target: "#hs-stylebook", title: "스타일북", desc: "스타일 이름을 누르면 어울리는 시술 조합이 나옵니다." },
+    { target: "#hs-stylebook", title: "스타일북", desc: "스타일 이름을 누르면 시술 사진과 조합, 맡길 디자이너가 나옵니다." },
   ],
   "optical": [
-    { target: "#op-stage", title: "3D 안경", desc: "마우스를 움직여 테를 이리저리 돌려 보세요." },
-    { target: "#op-frame", title: "테 고르기", desc: "모양과 소재를 눌러 가운데 안경을 바꿔 보세요." },
-    { target: "#op-lens", title: "렌즈 옵션", desc: "굴절률과 기능을 켜고 합계가 바뀌는 걸 보세요." },
+    { target: "#op-wear", title: "착용 사진", desc: "테 모양을 고르면 그 테를 쓴 사진으로 바뀝니다." },
+    { target: "#op-frame", title: "테 고르기", desc: "모양과 소재를 눌러 착용 사진을 바꿔 보세요." },
+    { target: "#op-lens", title: "렌즈 옵션", desc: "굴절률과 기능을 켜면 렌즈 두께와 색, 예상 금액이 바뀝니다." },
     { target: "#op-book", title: "검사 예약", desc: "날짜와 시간을 고르고 예약해 보세요." },
   ],
   "furniture-workshop": [

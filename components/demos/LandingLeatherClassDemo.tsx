@@ -26,7 +26,7 @@ import { DemoMakerInfo } from "@/components/demos/DemoMakerInfo";
    1. 회차 신청: 남은 자리가 실시간으로 줄고, 0이 되면 그 회차는 마감되고 대기 신청으로 바뀐다.
    2. 결제: 같은 흐름 안에서 카드 또는 이 신청 전용 계좌. 실제 결제는 일어나지 않는다(카드 번호를 받지 않는다).
    3. 예약 확인/변경: 예약 번호와 휴대폰 뒷자리로 찾아 날짜를 바꾸거나 취소한다. 환불 규정대로 금액이 계산된다.
-   4. 사장님 화면: 회차별 신청자 표(결제 상태, 변경 이력)와 알림 기록.
+   4. 관리자 화면(손님 메뉴에는 없고 별도 관리자 페이지 창으로 보여 준다): 회차별 신청자 표(결제 상태, 변경 이력)와 알림 기록.
    5. 가죽 색 고르기: 신청서에서 색 칩을 고르면 각인 미리보기 색이 바뀐다. */
 
 const IMG = "/images/demo-landing-leather-class";
@@ -257,7 +257,7 @@ export function LandingLeatherClassDemo() {
   const [agree, setAgree] = useState(false);
   const [done, setDoneRaw] = useState<Booking | null>(null);
   const [ownerSid, setOwnerSid] = useState("s1");
-  // 신청이 바뀌면 사장님 화면도 그 회차를 연다
+  // 신청이 바뀌면 관리자 화면도 그 회차를 연다
   const setDone = (b: Booking | null) => {
     setDoneRaw(b);
     if (b) setOwnerSid(b.session);
@@ -371,7 +371,7 @@ export function LandingLeatherClassDemo() {
   const canMove = !!cur && counts(cur) && daysLeft >= 2 && !cur.changed;
   const canCancel = !!cur && (counts(cur) || cur.status === "대기");
 
-  /* 사장님 화면 */
+  /* 관리자 화면 */
   const rows = bookings.filter((b) => b.session === ownerSid);
   const confirmed = rows.filter(counts).reduce((s, b) => s + b.qty, 0);
   const waiting = rows.filter((b) => b.status === "입금 대기").length;
@@ -419,7 +419,6 @@ export function LandingLeatherClassDemo() {
                 ["수업 소개", "lc-about"],
                 ["일정/신청", "lc-apply"],
                 ["예약 확인", "lc-change"],
-                ["사장님 화면", "lc-owner"],
               ].map(([t, id]) => (
                 <a key={id} href={`#${id}`} className={`rounded-[4px] underline-offset-[6px] hover:underline ${focusRing}`}>
                   {t}
@@ -872,11 +871,23 @@ export function LandingLeatherClassDemo() {
           </div>
         </section>
 
-        {/* 사장님 화면 */}
+        {/* 관리자 화면: 실제로는 /admin 별도 페이지. 샘플에서는 신청이 바로 쌓이는 걸 보이려고 창 모양으로 아래에 둔다 */}
         <section id="lc-owner" aria-labelledby="lc-owner-title" className="scroll-mt-4 py-14 md:py-20" style={{ background: C.soft }}>
           <div className={wrap}>
+            <div className="overflow-hidden rounded-[8px] border bg-white shadow-[0_8px_30px_rgba(0,0,0,0.08)]" style={{ borderColor: C.line }}>
+            <div className="flex items-center gap-3 border-b px-4 py-2.5" style={{ borderColor: C.line, background: "#f3f3f3" }} aria-hidden>
+              <span className="flex gap-1.5">
+                <span className="h-2.5 w-2.5 rounded-full bg-[#d9d9d9]" />
+                <span className="h-2.5 w-2.5 rounded-full bg-[#d9d9d9]" />
+                <span className="h-2.5 w-2.5 rounded-full bg-[#d9d9d9]" />
+              </span>
+              <span className="min-w-0 flex-1 truncate rounded-[4px] bg-white px-3 py-1 text-[13px] tabular-nums" style={{ color: C.muted }}>
+                gompartner-leather.kr/admin
+              </span>
+            </div>
+            <div className="p-4 md:p-6">
             <div className="flex flex-wrap items-end justify-between gap-2">
-              <SectionHead id="lc-owner-title" title="사장님 화면" />
+              <SectionHead id="lc-owner-title" title="관리자" />
               <span className="text-[14px]" style={{ color: C.muted }}>
                 회차별 신청자 표
               </span>
@@ -985,6 +996,8 @@ export function LandingLeatherClassDemo() {
                   ))}
                 </ul>
               </div>
+            </div>
+            </div>
             </div>
           </div>
         </section>
