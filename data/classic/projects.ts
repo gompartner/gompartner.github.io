@@ -541,7 +541,7 @@ const allProjects: Project[] = [
     description: "식당 재고 관리 앱을 만드는 IT 회사 홈페이지. 앱 화면 카드가 떠오르는 첫 화면, 월 결제와 연 결제 요금제, 다른 점만 보는 기능 비교표, 매장 수로 요금 계산, 도입 문의 접수까지 한 화면에 담았다.",
     features: ["요금제 전환", "기능 비교표", "매장 수 계산", "도입 문의"],
     imageUrl: "/images/demos/saas-startup.jpg",
-    imageAlt: "사람 없는 업소용 주방 사진 위에 재고 관리 안내 문장",
+    imageAlt: "식당 창고 선반 앞에서 태블릿으로 재고를 확인하는 사진 위에 재고 관리 안내 문장",
     demoUrl: "/demo/saas-startup",
   },
   {
