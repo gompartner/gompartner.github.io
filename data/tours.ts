@@ -208,8 +208,8 @@ export const tours: Record<string, TourStep[]> = {
     { target: "#cp-book", title: "예약 신청", desc: "이름과 휴대폰을 넣고 예약 신청을 누르세요." },
   ],
   "photo-studio": [
-    { target: "#ps-gallery", title: "가로 갤러리", desc: "아래로 스크롤해 사진을 옆으로 넘겨 보세요." },
-    { target: "#ps-backdrop", title: "배경지 색", desc: "배경지를 골라 첫 카드와 옷 색 안내를 확인하세요." },
+    { target: "#ps-gallery", title: "갤러리", desc: "컨셉을 눌러 그 촬영 사진만 모아 보세요." },
+    { target: "#ps-backdrop", title: "배경지 색", desc: "배경지를 고르면 그 색으로 찍은 사진과 어울리는 옷 색이 나와요." },
     { target: "#ps-price", title: "패키지 비교", desc: "패키지와 추가 옵션을 골라 금액을 확인하세요." },
     { target: "#ps-book", title: "촬영 예약", desc: "날짜와 시간대를 골라 예약을 접수하세요." },
   ],
