@@ -154,8 +154,8 @@ const LISTINGS: Listing[] = [
   { id: "b2", no: "21749", similar: 7, zone: "B", name: "ㄷㅅ파크아파트 203동", dong: "ㅈㄹ2동", kind: "apt", deal: "jeonse", price: 63000, area: 84.95, supply: 110.7, floor: 9, total: 25, rooms: 3, baths: 2, dir: "남서향", approved: "2015.06.30", moveIn: { m: 2, part: "중순" }, fee: 29, parking: "총 980대(세대당 1.5대)", walk: 8, x: 592, y: 378, badges: ["급매"], tags: ["시스템 에어컨", "공원 앞"] },
   { id: "c1", no: "21740", similar: 15, zone: "C", name: "ㅂㄹ오피스텔 A동", dong: "ㅈㄹ동", kind: "officetel", deal: "monthly", price: 1000, rent: 68, area: 24.5, supply: 48.6, floor: 11, total: 15, rooms: 1, baths: 1, dir: "동향", approved: "2019.03.14", moveIn: "즉시입주", fee: 12, parking: "총 180대(세대당 0.6대)", walk: 2, x: 466, y: 160, badges: ["신규"], tags: ["가전 포함", "역 도보 2분"] },
   { id: "c2", no: "21467", similar: 11, zone: "C", name: "ㅂㄹ오피스텔 B동", dong: "ㅈㄹ동", kind: "officetel", deal: "jeonse", price: 21000, area: 33.1, supply: 62.3, floor: 8, total: 15, rooms: 2, baths: 1, dir: "남향", approved: "2019.03.14", moveIn: { m: 1, part: "초순" }, fee: 15, parking: "총 180대(세대당 0.6대)", walk: 3, x: 548, y: 212, badges: [], tags: ["방 2개", "전세대출 가능"] },
-  { id: "d1", no: "21390", similar: 16, zone: "D", name: "ㅈㅇ빌라", dong: "ㅈㄹ동", kind: "villa", deal: "sale", price: 29000, area: 49.6, supply: 62.1, floor: 3, total: 4, rooms: 2, baths: 1, dir: "남향", approved: "2019.08.02", moveIn: "즉시입주", fee: 5, feeNote: "수도·전기 사용료 별도", parking: "총 8대(세대당 1대)", walk: 8, x: 365, y: 345, badges: ["급매"], tags: ["엘리베이터", "초등학교 옆"] },
-  { id: "e1", no: "20981", similar: 13, zone: "E", name: "ㄷㄹ하우스", dong: "ㅈㄹ동", kind: "villa", deal: "jeonse", price: 24000, area: 56.2, supply: 70.8, floor: 2, total: 5, rooms: 3, baths: 1, dir: "동남향", approved: "2012.04.25", moveIn: { m: 2, part: "하순" }, fee: 6, feeNote: "수도·전기 사용료 별도", parking: "총 6대(세대당 0.6대)", walk: 12, x: 75, y: 220, badges: [], tags: ["방 3개", "전세보증보험 가입 가능"] },
+  { id: "d1", no: "21390", similar: 16, zone: "D", name: "ㅈㅇ빌라", dong: "ㅈㄹ동", kind: "villa", deal: "sale", price: 29000, area: 49.6, supply: 62.1, floor: 3, total: 4, rooms: 2, baths: 1, dir: "남향", approved: "2019.08.02", moveIn: "즉시입주", fee: 5, feeNote: "수도, 전기 사용료 별도", parking: "총 8대(세대당 1대)", walk: 8, x: 365, y: 345, badges: ["급매"], tags: ["엘리베이터", "초등학교 옆"] },
+  { id: "e1", no: "20981", similar: 13, zone: "E", name: "ㄷㄹ하우스", dong: "ㅈㄹ동", kind: "villa", deal: "jeonse", price: 24000, area: 56.2, supply: 70.8, floor: 2, total: 5, rooms: 3, baths: 1, dir: "동남향", approved: "2012.04.25", moveIn: { m: 2, part: "하순" }, fee: 6, feeNote: "수도, 전기 사용료 별도", parking: "총 6대(세대당 0.6대)", walk: 12, x: 75, y: 220, badges: [], tags: ["방 3개", "전세보증보험 가입 가능"] },
   { id: "g1", no: "20746", similar: 12, zone: "G", name: "ㄴㄹ빌라 2차", dong: "ㅈㄹ2동", kind: "villa", deal: "monthly", price: 500, rent: 45, area: 36.4, supply: 46, floor: 4, total: 4, rooms: 1, baths: 1, dir: "서향", approved: "2004.10.11", moveIn: "즉시입주", fee: 4, feeNote: "수도 사용료 포함", parking: "주차 불가", walk: 14, x: 735, y: 330, badges: [], tags: ["원룸", "옥상 사용"] },
   { id: "f1", no: "21768", similar: 7, zone: "F", name: "ㅁㅅ시장 상가 1층", dong: "ㅈㄹ동", kind: "store", deal: "monthly", price: 3000, rent: 250, area: 43.2, supply: 66, floor: 1, total: 3, rooms: 0, baths: 1, dir: "남향", approved: "1998.05.18", moveIn: "즉시입주", fee: 18, parking: "공영 주차장 이용", walk: 9, x: 330, y: 482, badges: ["추천"], tags: ["1층 모퉁이", "무권리"] },
   { id: "f2", no: "20315", similar: 5, zone: "F", name: "ㅎㄴ프라자 2층", dong: "ㅈㄹ동", kind: "store", deal: "sale", price: 75000, area: 66.8, supply: 118, floor: 2, total: 5, rooms: 0, baths: 1, dir: "동향", approved: "2006.09.07", moveIn: { m: 8, part: "하순" }, fee: 32, parking: "총 3대", walk: 10, x: 522, y: 482, badges: [], tags: ["임차인 승계", "학원 자리"] },
@@ -556,7 +556,7 @@ function SubPage({ title, children }: { title: string; children: React.ReactNode
             {title}
           </h1>
           <p className="text-[14px]" style={{ color: C.muted }}>
-            {OFFICE} · 중개사무소 등록번호 {REG_NO}
+            {OFFICE}, 중개사무소 등록번호 {REG_NO}
           </p>
         </div>
         <div className="pt-8">{children}</div>
@@ -661,7 +661,7 @@ function SearchPage({
               </label>
               <label className="block min-w-0">
                 <span className="mb-1 block text-[13px] font-semibold" style={{ color: C.muted }}>
-                  매매가·보증금
+                  매매가, 보증금
                 </span>
                 <select value={draft.price} onChange={(e) => setDraft({ ...draft, price: Number(e.target.value) })} className={selectCls} style={{ borderColor: C.line }}>
                   {PRICE_RANGES.map((p, i) => (
@@ -890,11 +890,11 @@ function ListingCard({ l, selected, saved, full, onPick, onToggle }: { l: Listin
           {l.name} {l.floor}층
         </span>
         <span className="mt-1 block text-[14px] leading-[1.6]" style={{ color: C.muted }}>
-          {l.dong} · {KIND_LABEL[l.kind]}
+          {l.dong}, {KIND_LABEL[l.kind]}
           <br />
           전용 {areaText(l.area)}
           <br />
-          {l.kind === "store" ? `화장실 ${l.baths}개` : `방 ${l.rooms}개 / 욕실 ${l.baths}개`} · {l.dir}
+          {l.kind === "store" ? `화장실 ${l.baths}개` : `방 ${l.rooms}개 / 욕실 ${l.baths}개`}, {l.dir}
         </span>
       </button>
       <HeartButton saved={saved} full={full} name={l.name} onToggle={onToggle} className="absolute right-2 top-2" />
@@ -1181,7 +1181,7 @@ function MapSearch({
                   )}
                 </span>
                 <span className="block text-[14px]" style={{ color: C.muted }}>
-                  전용 {areaText(l.area)} · {l.floor}/{l.total}층 · 역 도보 {l.walk}분
+                  전용 {areaText(l.area)}, {l.floor}/{l.total}층, 역 도보 {l.walk}분
                 </span>
               </button>
               <HeartButton saved={saved} full={full} name={l.name} onToggle={() => onToggle(l.id)} className="absolute right-2 top-1/2 -translate-y-1/2" />
@@ -1238,7 +1238,7 @@ function Detail({ listing: l, basket, onToggle, onTour, onCalc }: { listing: Lis
     ["해당층/총층", `${l.floor}층 / ${l.total}층`],
     ["사용승인일", l.approved],
     ["방향", `${l.dir} (${l.kind === "store" ? "주 출입구" : "거실"} 기준)`],
-    [l.kind === "store" ? "화장실" : "방·욕실 수", l.kind === "store" ? `${l.baths}개` : `방 ${l.rooms}개 / 욕실 ${l.baths}개`],
+    [l.kind === "store" ? "화장실" : "방, 욕실 수", l.kind === "store" ? `${l.baths}개` : `방 ${l.rooms}개 / 욕실 ${l.baths}개`],
     ["입주가능일", moveInText(l.moveIn, today)],
     ["주차대수", l.parking],
     ["관리비", `월 ${l.fee}만 원${l.feeNote ? ` (${l.feeNote})` : ""}`],
@@ -1490,7 +1490,7 @@ function FeeCalculator() {
           options={[
             { v: "apt", label: "주택" },
             { v: "officetel", label: "오피스텔(주거용)" },
-            { v: "store", label: "주택 외(상가·토지 등)" },
+            { v: "store", label: "주택 외(상가, 토지 등)" },
           ]}
         />
         <Radios
@@ -1499,7 +1499,7 @@ function FeeCalculator() {
           value={deal}
           onPick={setDeal}
           options={[
-            { v: "sale", label: "매매·교환" },
+            { v: "sale", label: "매매, 교환" },
             { v: "jeonse", label: "전세" },
             { v: "monthly", label: "월세" },
           ]}
@@ -1680,7 +1680,7 @@ function RequestForm() {
     if (!moveText()) return setError("입주가능일을 입력해 주세요.");
     if (name.trim().length < 2) return setError("이름을 입력해 주세요.");
     if (phone.replace(/\D/g, "").length < 10) return setError("휴대전화 번호를 입력해 주세요.");
-    if (!agree) return setError("개인정보 수집·이용에 동의해 주세요.");
+    if (!agree) return setError("개인정보 수집, 이용에 동의해 주세요.");
     setError("");
     const n = new Date();
     const p2 = (v: number) => String(v).padStart(2, "0");
@@ -1801,7 +1801,7 @@ function RequestForm() {
                     [
                       ["now", "즉시입주"],
                       ["date", "날짜 지정"],
-                      ["period", "월 초순·중순·하순"],
+                      ["period", "월 초순, 중순, 하순"],
                     ] as const
                   ).map(([v, label]) => (
                     <label
@@ -1849,7 +1849,7 @@ function RequestForm() {
               <label className="flex min-h-11 cursor-pointer items-start gap-2.5 text-[15px] leading-[1.5]">
                 <input type="checkbox" checked={agree} onChange={(e) => setAgree(e.target.checked)} className="mt-0.5 h-5 w-5 shrink-0 accent-[#1e5bb8]" />
                 <span>
-                  개인정보 수집·이용 동의 (필수)
+                  개인정보 수집, 이용 동의 (필수)
                   <span className="block text-[14px]" style={{ color: C.muted }}>
                     이름, 휴대전화를 매물 확인 연락에만 쓰고 의뢰가 끝나면 파기합니다.
                   </span>
@@ -1877,7 +1877,7 @@ function RequestForm() {
             ["접수 확인", "담당 중개사가 전화로 매물 정보를 확인합니다."],
             ["권리 확인", "등기부등본과 소유자 신분을 확인합니다. 소유자가 아니면 위임장이 필요합니다."],
             ["현장 확인", "현장을 방문해 사진 촬영과 면적, 방향, 관리비를 확인합니다."],
-            ["광고 게시", "표시·광고 명시사항에 맞춰 매물을 등록하고, 거래 완료 시 바로 삭제합니다."],
+            ["광고 게시", "표시, 광고 명시사항에 맞춰 매물을 등록하고, 거래 완료 시 바로 삭제합니다."],
           ].map(([t, d]) => (
             <div key={t}>
               <dt className="font-semibold">{t}</dt>
@@ -1938,7 +1938,7 @@ function Tour({ selectedId, basket, onToggle, onClear, onMore }: { selectedId: s
                   </span>
                   <span className="block font-semibold">{l.name}</span>
                   <span className="block text-[14px] tabular-nums" style={{ color: C.muted }}>
-                    {priceText(l)} · {l.floor}층 · 입주 {moveInText(l.moveIn, today)}
+                    {priceText(l)}, {l.floor}층, 입주 {moveInText(l.moveIn, today)}
                   </span>
                 </span>
                 {fromBasket && (

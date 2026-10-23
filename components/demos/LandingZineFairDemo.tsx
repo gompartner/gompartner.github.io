@@ -83,7 +83,7 @@ type Item = { id: string; title: string; price: number };
 type Seller = { booth: string; name: string; tags: Genre[]; items: Item[] };
 
 const RAW: [string, string, Genre[], [string, number][]][] = [
-  ["A1", "고양이 세탁소", ["만화", "굿즈"], [["세탁기 속 고양이 1·2권", 6000], ["양말 스티커", 3000]]],
+  ["A1", "고양이 세탁소", ["만화", "굿즈"], [["세탁기 속 고양이 1, 2권", 6000], ["양말 스티커", 3000]]],
   ["A2", "밤의 영수증", ["에세이"], [["야근 영수증 모음", 8000]]],
   ["A3", "두부 출판", ["요리", "에세이"], [["두부만 먹은 일주일", 9000]]],
   ["A4", "방구석 리소", ["리소 인쇄", "일러스트"], [["리소 포스터 A3", 12000], ["엽서 6종", 7000]]],
@@ -427,7 +427,7 @@ function EntryForm({ days, reduce }: { days: Date[]; reduce: boolean }) {
                 </dd>
                 <dt className="font-extrabold">등록자</dt>
                 <dd>
-                  {maskName(done.name)} · {maskPhone(done.phone)}
+                  {maskName(done.name)}, {maskPhone(done.phone)}
                 </dd>
                 <dt className="font-extrabold">입구</dt>
                 <dd>사전 등록 줄에서 QR을 보여 주면 팔찌로 바꿔 드려요. 회차 시작 20분 뒤까지 들어오면 돼요.</dd>
@@ -761,7 +761,7 @@ function BoothMap({ hit, filtering, open, wishBooths, onPick }: { hit: Set<strin
         </text>
         <rect x="396" y="300" width="130" height="36" rx="8" fill="none" stroke={C.black} strokeWidth="2" strokeDasharray="4 4" />
         <text x="461" y="323" textAnchor="middle" fontSize="13" fontWeight="800" fill={C.black}>
-          쉼터 · 물
+          쉼터, 물
         </text>
         <rect x="230" y="334" width="100" height="20" fill={C.black} />
         <text x="280" y="349" textAnchor="middle" fontSize="13" fontWeight="800" fill={C.paper}>
@@ -787,7 +787,7 @@ function WishList({ wish, toggleWish, setWish, onOpen }: { wish: string[]; toggl
           미리 담기
         </h3>
         <p className="text-[15px] font-extrabold tabular-nums" aria-live="polite">
-          {items.length}권 · {won(total)}
+          {items.length}권, {won(total)}
         </p>
       </div>
       {items.length === 0 ? (
@@ -808,7 +808,7 @@ function WishList({ wish, toggleWish, setWish, onOpen }: { wish: string[]; toggl
                 <button type="button" onClick={() => onOpen(it.seller.booth)} className={`min-w-0 flex-1 text-left ${focusRing}`} style={{ outlineColor: C.blue }}>
                   <span className="block truncate text-[15px] font-bold">{it.title}</span>
                   <span className="block text-[13px]" style={{ color: C.muted }}>
-                    {it.seller.booth} {it.seller.name} · {won(it.price)}
+                    {it.seller.booth} {it.seller.name}, {won(it.price)}
                   </span>
                 </button>
                 <button type="button" onClick={() => toggleWish(it.id)} aria-label={`${it.title} 빼기`} className={`grid h-9 w-9 flex-none place-items-center rounded-full ${focusRing}`} style={{ outlineColor: C.blue }}>

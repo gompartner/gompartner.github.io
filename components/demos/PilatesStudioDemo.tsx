@@ -77,7 +77,7 @@ function useNowMinute() {
 const HOURS = [
   { label: "평일", days: [1, 2, 3, 4, 5], time: "07:00 ~ 22:00", open: [420, 1320] },
   { label: "토요일", days: [6], time: "09:00 ~ 15:00", open: [540, 900] },
-  { label: "일요일·공휴일", days: [0], time: "휴무", open: null },
+  { label: "일요일, 공휴일", days: [0], time: "휴무", open: null },
 ] as const;
 
 const DAY_NAMES = ["일", "월", "화", "수", "목", "금", "토"];
@@ -146,7 +146,7 @@ type Pref = "solo" | "group";
 
 const PART_OPTIONS: { id: Part; label: string }[] = [
   { id: "back", label: "허리" },
-  { id: "shoulder", label: "목·어깨" },
+  { id: "shoulder", label: "목, 어깨" },
   { id: "knee", label: "무릎" },
   { id: "none", label: "없음" },
 ];
@@ -343,7 +343,7 @@ const GROUPS: { id: string; label: string; items: (Target & { label: string })[]
   },
   {
     id: "schedule",
-    label: "시간표·수강료",
+    label: "시간표, 수강료",
     items: [
       { page: "schedule", label: "그룹 시간표" },
       { page: "price", label: "수강료 안내" },
@@ -751,7 +751,7 @@ function Intro({ onConsult }: { onConsult: () => void }) {
               {STUDIO}
             </h1>
             <p className="mt-3 max-w-[40em]" style={{ color: C.muted }}>
-              ㅈㅇ역 3번 출구 도보 3분 · 건물 주차 2시간 무료
+              ㅈㅇ역 3번 출구 도보 3분, 건물 주차 2시간 무료
             </p>
           </div>
           <div className="flex flex-wrap items-center gap-x-6 gap-y-3">
@@ -975,7 +975,7 @@ function Schedule({
         </div>
 
         <p className="mt-4 text-[14px]" style={{ color: C.muted }}>
-          레슨 시간은 각 50분입니다. 개인·듀엣레슨은 시간표와 별도로 예약합니다.
+          레슨 시간은 각 50분입니다. 개인, 듀엣레슨은 시간표와 별도로 예약합니다.
         </p>
       </div>
     </section>
@@ -1793,12 +1793,12 @@ function PricePage({ onConsult }: { onConsult: () => void }) {
     <div className="space-y-14">
       <Pricing bare />
       <section aria-labelledby="pay-title">
-        <SubTitle id="pay-title">결제·환불 안내</SubTitle>
+        <SubTitle id="pay-title">결제, 환불 안내</SubTitle>
         <ul className="mt-4 space-y-2">
           {[
             "카드/현금 동일가격입니다.",
             "수강료는 등록 횟수와 기간에 따라 달라지므로 방문상담 시 확인해 주시기 바랍니다.",
-            "수강료 환불은 「체육시설의 설치·이용에 관한 법률」 기준에 따릅니다.",
+            "수강료 환불은 「체육시설의 설치, 이용에 관한 법률」 기준에 따릅니다.",
           ].map((t) => (
             <li key={t} className="flex gap-2.5">
               <span className="mt-[0.7em] inline-block h-1.5 w-1.5 shrink-0 rounded-full" style={{ background: C.indigo }} aria-hidden />
@@ -2085,7 +2085,7 @@ function BookingDrawer({ target, onClose }: { target: BookingTarget | null; onCl
     const digits = phone.replace(/\D/g, "");
     if (name.trim().length < 2) return setError("이름을 입력해 주십시오.");
     if (!/^01\d{8,9}$/.test(digits)) return setError("휴대전화 번호를 확인해 주십시오. 예: 010-1234-5678");
-    if (!agree) return setError("개인정보 수집·이용에 동의해 주십시오.");
+    if (!agree) return setError("개인정보 수집, 이용에 동의해 주십시오.");
     setError("");
     const who = `${maskName(name)} 님`;
     setDone(
@@ -2213,7 +2213,7 @@ function BookingDrawer({ target, onClose }: { target: BookingTarget | null; onCl
                   <select id={ids.part} className={field} style={{ borderColor: C.line }} value={part} onChange={(e) => setPart(e.target.value)}>
                     <option value="">선택 안 함</option>
                     <option>허리</option>
-                    <option>목·어깨</option>
+                    <option>목, 어깨</option>
                     <option>골반</option>
                     <option>무릎</option>
                     <option>출산 후 회복</option>
@@ -2221,7 +2221,7 @@ function BookingDrawer({ target, onClose }: { target: BookingTarget | null; onCl
                 </div>
                 <label className="flex items-start gap-2.5 text-[15px]">
                   <input type="checkbox" checked={agree} onChange={(e) => setAgree(e.target.checked)} className="mt-1 h-5 w-5 shrink-0 accent-[#24365a]" />
-                  <span>개인정보 수집·이용 동의 (수집 항목: 이름, 휴대전화 / 보관 기간: 상담 후 3개월)</span>
+                  <span>개인정보 수집, 이용 동의 (수집 항목: 이름, 휴대전화 / 보관 기간: 상담 후 3개월)</span>
                 </label>
                 {error && (
                   <p role="alert" className="text-[15px] font-semibold" style={{ color: "#a33a2a" }}>

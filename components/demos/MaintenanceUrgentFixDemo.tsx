@@ -153,7 +153,7 @@ function ShopPhone({ fixed, interactive = false, small = false }: { fixed: boole
       <AnimatePresence>
         {interactive && !fixed && taps > 0 && (
           <motion.p key={taps} initial={reduce ? false : { opacity: 0, y: 8 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0 }} className="absolute inset-x-0 top-[46%] mx-auto w-fit rounded-full bg-[#15181d] px-3 py-1 text-[13px] font-semibold text-white" role="status">
-            눌러도 그대로 · {taps}번
+            눌러도 그대로, {taps}번
           </motion.p>
         )}
         {interactive && fixed && sheet && (
@@ -482,7 +482,7 @@ export function MaintenanceUrgentFixDemo() {
                 </p>
               )}
               <button type="submit" disabled={stage > 0} className={`${btnPrimary} mt-6 h-13 w-full py-3.5 text-[17px]`}>
-                {stage > 0 ? `접수됨 · ${ticketNo}` : "수리 접수"}
+                {stage > 0 ? `접수됨, ${ticketNo}` : "수리 접수"}
               </button>
               <p className="mt-2.5 text-[14px]" style={{ color: C.muted }}>
                 {responseTime}
@@ -529,7 +529,7 @@ export function MaintenanceUrgentFixDemo() {
                     진행 상황
                   </h2>
                   <p className="text-[14px]" style={{ ...monoF, color: C.muted }}>
-                    {stage > 0 ? `${ticketNo} · ${url.replace(/^https?:\/\//, "")}` : "접수하면 여기에 단계가 쌓여요"}
+                    {stage > 0 ? `${ticketNo}, ${url.replace(/^https?:\/\//, "")}` : "접수하면 여기에 단계가 쌓여요"}
                   </p>
                 </div>
                 <Pill tone={pillTone} pulse={stage > 0 && !done}>
@@ -652,7 +652,7 @@ export function MaintenanceUrgentFixDemo() {
                     수리 보고서
                   </h2>
                   <p className="text-[14px]" style={{ ...monoF, color: C.muted }}>
-                    {ticketNo} · {today.getFullYear()}.{p2(today.getMonth() + 1)}.{p2(today.getDate())}
+                    {ticketNo}, {today.getFullYear()}.{p2(today.getMonth() + 1)}.{p2(today.getDate())}
                   </p>
                 </div>
                 <Pill tone={done ? "ok" : "idle"}>{done ? "확인 완료" : "작성 중"}</Pill>
@@ -728,7 +728,7 @@ export function MaintenanceUrgentFixDemo() {
             <p className="text-[17px] font-extrabold" style={{ color: C.ink }}>
               곰파트너
             </p>
-            <p>홈페이지 제작 · 유지보수</p>
+            <p>홈페이지 제작, 유지보수</p>
           </div>
           <DemoMakerInfo />
         </div>

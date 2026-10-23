@@ -761,7 +761,7 @@ function Booking({ today, reduce, area, setArea }: { today: Date; reduce: boolea
 
               <div className="rounded-[6px] border p-3 text-[15px]" style={{ borderColor: C.line }}>
                 <p className="flex items-center justify-between gap-3">
-                  <span style={{ color: C.muted }}>고른 시간</span>
+                  <span style={{ color: C.muted }}>선택한 시간</span>
                   <span className="font-bold tabular-nums">{picked === null ? "아직 안 고름" : `${fmtKo(day)} ${hm(picked)}`}</span>
                 </p>
                 <p className="mt-1 flex items-center justify-between gap-3">

@@ -55,9 +55,9 @@ const NAV: { id: Exclude<Page, "home">; label: string; track?: Track }[] = [
 /* ---------- 피부질환 진료 ---------- */
 
 const DISEASES = [
-  { title: "습진 · 알레르기", items: "아토피 피부염, 접촉성 피부염, 두드러기, 건선", body: "원인과 악화 요인을 확인한 뒤 바르는 약, 먹는 약, 광선치료를 병행합니다." },
+  { title: "습진, 알레르기", items: "아토피 피부염, 접촉성 피부염, 두드러기, 건선", body: "원인과 악화 요인을 확인한 뒤 바르는 약, 먹는 약, 광선치료를 병행합니다." },
   { title: "바이러스 질환", items: "사마귀, 대상포진, 단순포진", body: "대상포진은 발진 후 72시간 안에 항바이러스제를 시작해야 신경통을 줄일 수 있습니다." },
-  { title: "손발 · 손발톱", items: "티눈, 굳은살, 내성발톱, 손발톱진균증, 무좀", body: "진균 검사로 무좀과 습진을 구분해 치료합니다. 내성발톱은 당일 교정 가능합니다." },
+  { title: "손발, 손발톱", items: "티눈, 굳은살, 내성발톱, 손발톱진균증, 무좀", body: "진균 검사로 무좀과 습진을 구분해 치료합니다. 내성발톱은 당일 교정 가능합니다." },
   { title: "기타 피부질환", items: "지루성 피부염, 백반증, 화상, 피부 양성종양", body: "백반증, 건선은 엑시머 레이저 광선치료를 시행합니다. 혹과 점은 조직 검사 후 제거합니다." },
 ];
 
@@ -65,10 +65,10 @@ const DISEASES = [
 
 type Cat = "pigment" | "lifting" | "botox" | "hair";
 const CATS: { id: Cat; label: string; img: string; intro: string }[] = [
-  { id: "pigment", label: "색소 · 여드름 · 미백", img: "pigment", intro: "기미, 잡티, 여드름, 흉터를 피부 상태에 맞는 레이저와 관리로 치료합니다." },
-  { id: "lifting", label: "주름 · 탄력 리프팅", img: "lifting", intro: "고주파, 초음파 장비와 스킨부스터로 처진 피부와 잔주름을 개선합니다." },
-  { id: "botox", label: "보톡스 · 필러", img: "pores", intro: "표정 주름, 사각턱, 꺼진 부위를 진료 후 꼭 필요한 만큼만 시술합니다." },
-  { id: "hair", label: "탈모 · 제모", img: "hair", intro: "부위별 레이저 제모, 탈모 진단 및 두피 주사 치료를 시행합니다." },
+  { id: "pigment", label: "색소, 여드름, 미백", img: "pigment", intro: "기미, 잡티, 여드름, 흉터를 피부 상태에 맞는 레이저와 관리로 치료합니다." },
+  { id: "lifting", label: "주름, 탄력 리프팅", img: "lifting", intro: "고주파, 초음파 장비와 스킨부스터로 처진 피부와 잔주름을 개선합니다." },
+  { id: "botox", label: "보톡스, 필러", img: "pores", intro: "표정 주름, 사각턱, 꺼진 부위를 진료 후 꼭 필요한 만큼만 시술합니다." },
+  { id: "hair", label: "탈모, 제모", img: "hair", intro: "부위별 레이저 제모, 탈모 진단 및 두피 주사 치료를 시행합니다." },
 ];
 
 interface Procedure {
@@ -80,7 +80,7 @@ interface Procedure {
 }
 
 const PROCEDURES: Procedure[] = [
-  { cat: "pigment", name: "레이저 토닝 (얼굴 전체)", once: 50000, pack: "10회 45만 원", note: "기미 · 잡티" },
+  { cat: "pigment", name: "레이저 토닝 (얼굴 전체)", once: 50000, pack: "10회 45만 원", note: "기미, 잡티" },
   { cat: "pigment", name: "피코 레이저", once: 150000, pack: "3회 40만 원", note: "얼굴 전체" },
   { cat: "pigment", name: "여드름 압출 관리", once: 30000, pack: "5회 13만 원" },
   { cat: "pigment", name: "여드름 흉터 레이저", once: 150000, pack: "3회 40만 원", note: "흉터 범위에 따라 다름" },
@@ -130,7 +130,7 @@ const EQUIP: { id: EquipTab; label: string; items: { name: string; body: string 
   },
   {
     id: "photo",
-    label: "백반증 · 건선",
+    label: "백반증, 건선",
     items: [
       { name: "엑시머 레이저", body: "백반증, 건선 부위 광선치료" },
       { name: "전신 자외선 치료기", body: "넓은 부위 건선, 아토피 피부염" },
@@ -145,7 +145,7 @@ const DOCTORS = [
     name: "김ㅈ우",
     role: "대표원장",
     photo: "doctor-a.jpg",
-    field: "피부질환, 여드름 · 색소",
+    field: "피부질환, 여드름, 색소",
     career: ["피부과 전문의", "ㄴㄹ대학교병원 피부과 전공의 수료", "대한피부과학회 정회원"],
   },
   {
@@ -167,7 +167,7 @@ const HOURS = [
   { short: "목", label: "목요일", day: 4, start: "09:30", end: "19:00", open: [570, 1140] },
   { short: "금", label: "금요일", day: 5, start: "09:30", end: "19:00", open: [570, 1140] },
   { short: "토", label: "토요일", day: 6, start: "09:30", end: "14:00", open: [570, 840] },
-  { short: "일", label: "일요일 · 공휴일", day: 0, start: "", end: "", open: null },
+  { short: "일", label: "일요일, 공휴일", day: 0, start: "", end: "", open: null },
 ] as const;
 
 type Now = { day: number; minutes: number };
@@ -1020,11 +1020,11 @@ function AboutPage({ now }: { now: Now | null }) {
             </h2>
             <ul className="mt-6 border-t" style={{ borderColor: C.line }}>
               {[
-                ["대기실", "접수 · 수납, 서류 발급"],
+                ["대기실", "접수, 수납, 서류 발급"],
                 ["진료실", "원장 진료실 2곳"],
-                ["레이저실", "레이저 · 리프팅 시술"],
+                ["레이저실", "레이저, 리프팅 시술"],
                 ["관리실", "스킨케어, 시술 후 진정"],
-                ["광선치료실", "백반증 · 건선 광선치료"],
+                ["광선치료실", "백반증, 건선 광선치료"],
               ].map(([k, v]) => (
                 <li key={k} className="grid grid-cols-[104px_1fr] gap-3 border-b py-3" style={{ borderColor: C.line }}>
                   <span className="font-semibold">{k}</span>

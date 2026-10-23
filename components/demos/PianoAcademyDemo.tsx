@@ -592,7 +592,7 @@ function TimetableSection({
         type="button"
         disabled={full}
         onClick={() => onPick(dow, time)}
-        aria-label={`${DOW[dow]}요일 ${time}, ${full ? "마감" : `남은 자리 ${n}`}${picked ? ", 고른 시간" : ""}`}
+        aria-label={`${DOW[dow]}요일 ${time}, ${full ? "마감" : `남은 자리 ${n}`}${picked ? ", 선택" : ""}`}
         data-gtm-cta={`${SLUG}_timetable_pick`}
         className={`${wide ? "w-full" : "min-w-[112px]"} h-11 rounded-[4px] border px-2 text-[14px] font-bold tabular-nums transition-colors ${focusRing} disabled:cursor-not-allowed`}
         style={{
@@ -603,7 +603,7 @@ function TimetableSection({
           textDecoration: full ? "line-through" : undefined,
         }}
       >
-        {full ? "마감" : picked ? "고른 시간" : `자리 ${n}`}
+        {full ? "마감" : picked ? "선택" : `자리 ${n}`}
       </button>
     );
   };

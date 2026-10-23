@@ -261,7 +261,7 @@ export function LeadReceivedPanel({
 
         {/* 3. 광고별 신청과 계약 */}
         <div className={card} style={{ borderColor: theme.ink, background: "#fff" }}>
-          <p className="text-[15px] font-bold">광고별 신청·계약 (이번 주)</p>
+          <p className="text-[15px] font-bold">광고별 신청, 계약 (이번 주)</p>
           <ul className="mt-3 grid gap-3">
             {bars.map(({ s, mine, n, won }) => (
               <li key={s} className="text-[14px]">
@@ -270,7 +270,7 @@ export function LeadReceivedPanel({
                     {s}
                   </span>
                   <span className="tabular-nums">
-                    신청 <b>{n}</b> · 계약 <b style={{ color: theme.accent }}>{won}</b>
+                    신청 <b>{n}</b>, 계약 <b style={{ color: theme.accent }}>{won}</b>
                   </span>
                 </div>
                 <div className="mt-1 grid gap-0.5" aria-hidden>

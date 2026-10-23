@@ -231,7 +231,7 @@ export function LandingPopupStoreDemo() {
             style={{ bottom: "calc(76px + env(safe-area-inset-bottom, 0px))" }}
           >
             <div className="mx-auto flex max-w-[520px] items-center justify-between gap-3 px-4 py-3 shadow-[0_8px_24px_rgba(0,0,0,0.45)]" style={{ background: C.paper, ...monoF }}>
-              <p className="min-w-0 truncate text-[15px] font-bold">대기 {queue}팀 · 예약은 줄 없음</p>
+              <p className="min-w-0 truncate text-[15px] font-bold">대기 {queue}팀, 예약은 줄 없음</p>
               <button type="button" onClick={() => go("rc-reserve")} className={`${redBtn} flex-none rounded-[3px] px-4 py-2 text-[16px] text-white`} style={{ background: C.red, outlineColor: C.ink, fontFamily: "var(--font-pretendard)" }}>
                 발권하기
               </button>
@@ -328,7 +328,7 @@ function HeroReceipt({ start, end, queue, no, onPick, onReserve, onWait }: { sta
         {BRAND}
       </h1>
       <p className="mt-2 text-center text-[13px]">
-        서울 성동구 ㅇㅇ길 00 · {start.getMonth() + 1}.{start.getDate()}~{end.getMonth() + 1}.{end.getDate()}
+        서울 성동구 ㅇㅇ길 00, {start.getMonth() + 1}.{start.getDate()}~{end.getMonth() + 1}.{end.getDate()}
       </p>
       <Dash />
       <Row k="영업" v="11:00 - 20:00" />
@@ -352,7 +352,7 @@ function HeroReceipt({ start, end, queue, no, onPick, onReserve, onWait }: { sta
               className={`border-[1.5px] py-1.5 text-center text-[13px] tabular-nums transition-colors hover:bg-[#1c1c1c] hover:text-[#fbfaf6] disabled:cursor-not-allowed disabled:hover:bg-[#1c1c1c] ${focusRing}`}
               style={{ borderColor: C.ink, background: full ? C.ink : "transparent", color: full ? C.paper : C.ink, outlineColor: C.red }}
             >
-              {t} · {full ? "마감" : l}
+              {t}, {full ? "마감" : l}
             </button>
           );
         })}
@@ -684,7 +684,7 @@ function WaitingBoard({ reduce, queue, ticket, setTicket }: { reduce: boolean; q
             <span className="text-[64px] font-bold leading-none tabular-nums md:text-[76px]" style={{ color: "#ff5a43", textShadow: "0 0 12px rgba(255,90,67,0.55)" }}>
               {p2(queue)}
             </span>
-            <span className="text-[18px] font-bold">팀 · 약 {queue * TEAM_MIN}분</span>
+            <span className="text-[18px] font-bold">팀, 약 {queue * TEAM_MIN}분</span>
           </p>
         </div>
         <p className="mt-4 text-[14px] leading-[1.65]" style={{ color: "rgba(251,250,246,0.8)" }}>
@@ -752,7 +752,7 @@ function WaitTicketView({ ticket, total, onCancel }: { ticket: WaitTicket; total
           <span>현장 대기</span>
         </p>
         <p className="mt-3 text-[13px]" style={{ color: C.faint }}>
-          내 번호 · {ticket.people}명
+          내 번호, {ticket.people}명
         </p>
         <p className="text-[84px] leading-none tabular-nums" style={heavyF}>
           {ticket.no}
@@ -1023,7 +1023,7 @@ function MenuReceipt() {
         </tbody>
       </table>
       <Dash />
-      <Row k="결제" v="카드 · 간편결제 · 현금" />
+      <Row k="결제" v="카드, 간편결제, 현금" />
       <Row k="포장" v="종이봉투 무료" />
     </>
   );

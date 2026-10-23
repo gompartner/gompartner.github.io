@@ -51,7 +51,7 @@ const DEFAULTS: Inputs = {
 };
 
 const PRESETS = [
-  { id: "safe", label: "안정추구형", rate: 2.5, note: "예금·채권 중심" },
+  { id: "safe", label: "안정추구형", rate: 2.5, note: "예금, 채권 중심" },
   { id: "base", label: "위험중립형", rate: 4, note: "혼합형" },
   { id: "bold", label: "적극투자형", rate: 6, note: "주식 비중 높음" },
 ] as const;
@@ -316,27 +316,27 @@ const SERVICES = [
 const PRODUCT_TABS = [
   {
     id: "pension",
-    label: "연금·저축",
+    label: "연금, 저축",
     items: [
       { name: "곰파트너 연금보험", desc: "10년 확정이율, 유지보너스 지급", age: "15 ~ 70세", term: "종신 연금" },
       { name: "곰파트너 연금저축보험", desc: "연말정산 세액공제", age: "19 ~ 65세", term: "55세 이후 연금 개시" },
-      { name: "곰파트너 바로받는 연금보험", desc: "목돈 넣고 다음 달부터 연금 수령", age: "45 ~ 80세", term: "10 · 20년 확정 또는 종신" },
+      { name: "곰파트너 바로받는 연금보험", desc: "목돈 넣고 다음 달부터 연금 수령", age: "45 ~ 80세", term: "10, 20년 확정 또는 종신" },
     ],
   },
   {
     id: "life",
-    label: "종신·정기",
+    label: "종신, 정기",
     items: [
       { name: "곰파트너 종신보험", desc: "평생 사망보장", age: "15 ~ 65세", term: "종신" },
-      { name: "곰파트너 정기보험", desc: "필요한 기간에 집중한 사망보장", age: "19 ~ 60세", term: "60 · 70 · 80세 만기" },
+      { name: "곰파트너 정기보험", desc: "필요한 기간에 집중한 사망보장", age: "19 ~ 60세", term: "60, 70, 80세 만기" },
     ],
   },
   {
     id: "health",
-    label: "건강·암",
+    label: "건강, 암",
     items: [
-      { name: "곰파트너 암보험(비갱신형)", desc: "첫 보험료 그대로, 재진단암 보장(특약)", age: "15 ~ 65세", term: "90 · 100세 만기" },
-      { name: "곰파트너 건강보험", desc: "뇌혈관 · 심장질환, 입원 · 간병비 보장(특약)", age: "15 ~ 70세", term: "100세 만기" },
+      { name: "곰파트너 암보험(비갱신형)", desc: "첫 보험료 그대로, 재진단암 보장(특약)", age: "15 ~ 65세", term: "90, 100세 만기" },
+      { name: "곰파트너 건강보험", desc: "뇌혈관, 심장질환, 입원, 간병비 보장(특약)", age: "15 ~ 70세", term: "100세 만기" },
     ],
   },
 ] as const;
