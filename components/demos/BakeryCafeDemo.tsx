@@ -106,7 +106,7 @@ type Cat = "meal" | "pastry" | "sweet" | "baked";
 
 const CATS: { id: Cat | "all"; label: string }[] = [
   { id: "all", label: "전체" },
-  { id: "meal", label: "식빵·깜파뉴" },
+  { id: "meal", label: "식빵, 깜파뉴" },
   { id: "pastry", label: "페이스트리" },
   { id: "sweet", label: "단과자빵" },
   { id: "baked", label: "구움과자" },
@@ -199,9 +199,9 @@ function stateText(s: BatchState) {
     case "closed":
       return "오늘 휴무";
     case "soon":
-      return "나올 예정";
+      return s.diff < 60 ? `${s.diff}분 뒤 나와요` : `${Math.floor(s.diff / 60)}시간${s.diff % 60 ? ` ${s.diff % 60}분` : ""} 뒤 나와요`;
     case "out":
-      return s.left > 0 ? `판매 중 · ${s.left}개 남음` : "품절";
+      return s.left > 0 ? `판매 중, ${s.left}개 남음` : "품절";
   }
 }
 
@@ -501,7 +501,7 @@ function Banner({ onGo }: { onGo: (target: string) => void }) {
           <h1 id="bakery-name" className="text-[38px] font-bold leading-[1.2] tracking-[-0.03em] text-white md:text-[56px]">
             {BAKERY}
           </h1>
-          <p className="mt-2 text-[16px] text-[#f3e9da] md:text-[18px]">08:00 ~ 17:00 빵 나오는 시간 안내 · 픽업 예약 가능</p>
+          <p className="mt-2 text-[16px] text-[#f3e9da] md:text-[18px]">08:00 ~ 17:00 빵 나오는 시간 안내, 픽업 예약 가능</p>
           <div className="mt-6 flex flex-wrap justify-center gap-2.5">
             <a href="#oven" className="inline-flex h-12 items-center rounded-[6px] px-6 font-semibold" style={{ background: C.butter, color: C.ink }}>
               빵 나오는 시간
@@ -728,7 +728,7 @@ function Oven({ clock: realClock, onAdd }: { clock: Clock; onAdd: (id: string) =
               <img src={breadImg(bread.id)} alt={bread.name} loading="lazy" className="h-[88px] w-[88px] shrink-0 rounded-[6px] object-cover" />
               <div className="min-w-0 flex-1">
                 <p className="text-[14px] font-semibold tabular-nums" style={{ color: C.crust }}>
-                  {hhmm(sel.at)} · {sel.qty}개
+                  {hhmm(sel.at)}, {sel.qty}개
                 </p>
                 <p className="text-[21px] font-bold tracking-[-0.02em]">{bread.name}</p>
                 <p className="mt-1 text-[15px]" style={{ color: C.muted }}>
@@ -793,9 +793,9 @@ function nowBadge(s: BreadNow): { text: string; color: string; bg: string } | nu
 function nowLine(s: BreadNow) {
   switch (s.kind) {
     case "sale":
-      return `판매 중 · ${s.left}개 남음`;
+      return `판매 중, ${s.left}개 남음`;
     case "soon":
-      return `${hhmm(s.at)} 나옴`;
+      return `${hhmm(s.at)}에 나와요`;
     case "closed":
       return s.text;
     default:
@@ -833,7 +833,7 @@ function MenuGrid({
                 [
                   ["all", "전체"],
                   ["sale", "판매 중"],
-                  ["soon", "나올 예정"],
+                  ["soon", "곧 나와요"],
                 ] as const
               ).map(([v, label]) => (
                 <button
@@ -885,7 +885,7 @@ function MenuGrid({
                 <p className="mt-2.5 font-bold leading-[1.35]">{b.name}</p>
                 <p className="text-[15px] font-semibold tabular-nums">{won(b.price)}</p>
                 <p className="text-[13px] leading-[1.5]" style={{ color: C.muted }}>
-                  {allergyTags(b).join(" · ")}
+                  {allergyTags(b).join(", ")}
                 </p>
                 <p className="min-h-[20px] text-[13px] font-semibold tabular-nums" style={{ color: s.kind === "sale" ? C.green : C.muted }}>
                   {nowLine(s)}
@@ -1139,7 +1139,7 @@ function MenuAllPage({ clock, cart, onAdd }: { clock: Clock; cart: Cart; onAdd: 
                       {b.desc}
                     </p>
                     <p className="mt-1 text-[13px]" style={{ color: C.muted }}>
-                      {allergyTags(b).join(" · ")} · 첫 출고 {hhmm(FIRST_AT[b.id])}
+                      {allergyTags(b).join(", ")}, 첫 출고 {hhmm(FIRST_AT[b.id])}
                     </p>
                     <div className="mt-2 flex items-center justify-between gap-3">
                       <span className="text-[13px] font-semibold tabular-nums" style={{ color: s.kind === "sale" ? C.green : C.muted }}>
@@ -1337,7 +1337,7 @@ function PickupOrder({
                     <span className="min-w-0 flex-1">
                       <span className="block truncate font-semibold">{b.name}</span>
                       <span className="block text-[14px] tabular-nums" style={{ color: C.muted }}>
-                        {won(b.price * n)} · {hhmm(FIRST_AT[id])}부터
+                        {won(b.price * n)}, {hhmm(FIRST_AT[id])}부터
                       </span>
                     </span>
                     <span className="flex items-center gap-1">
@@ -1541,7 +1541,7 @@ function GroupOrder({ minute }: { minute: number }) {
         </select>
       </label>
       <label className="block sm:col-span-2">
-        <span className="block text-[15px] font-bold">품목·요청 사항</span>
+        <span className="block text-[15px] font-bold">품목과 요청 사항</span>
         <textarea
           value={memo}
           onChange={(e) => setMemo(e.target.value)}
@@ -1676,12 +1676,12 @@ function AboutPage() {
       <div className="relative aspect-[16/9] overflow-hidden rounded-[8px] md:aspect-[21/8]">
         <Image src={`${IMG}/display.jpg`} alt="크루아상, 깜파뉴, 크림빵, 과일 타르트가 놓인 진열대" fill sizes="(min-width: 1200px) 1200px, 100vw" className="object-cover" />
       </div>
-      <p className="mt-8 text-[22px] font-bold tracking-[-0.02em] md:text-[26px]">당일 생산 · 당일 판매</p>
+      <p className="mt-8 text-[22px] font-bold tracking-[-0.02em] md:text-[26px]">당일 생산, 당일 판매</p>
       <dl className="mt-5 grid gap-5 md:grid-cols-3 md:gap-8">
         {[
           ["04:00", "반죽 시작. 깜파뉴 반죽은 이틀 전에 미리 준비합니다."],
           ["17:00", "마지막 소금빵이 나옵니다. 이후에는 남은 빵만 판매합니다."],
-          ["19:00", "남은 빵 30% 할인. 당일 생산·당일 판매를 원칙으로 하며, 남은 빵은 ㅅㄴ동 지역아동센터에 기부합니다."],
+          ["19:00", "남은 빵 30% 할인. 당일 생산, 당일 판매를 원칙으로 하며, 남은 빵은 ㅅㄴ동 지역아동센터에 기부합니다."],
         ].map(([t, d]) => (
           <div key={t} className="border-t pt-4" style={{ borderColor: C.kraftDeep }}>
             <dt className="text-[20px] font-bold tabular-nums" style={{ color: C.crust }}>
