@@ -1,8 +1,8 @@
 "use client";
 
-import { useCallback, useEffect, useLayoutEffect, useRef, useState } from "react";
-import { AnimatePresence, motion, useMotionTemplate, useMotionValue, useScroll, useTransform, type MotionValue } from "framer-motion";
-import { AlertCircle, CalendarCheck, Camera, Car, Check, ChevronDown, Clock, MapPin, MessageCircle, Minus, Plus, Shirt } from "lucide-react";
+import { useEffect, useRef, useState } from "react";
+import { AnimatePresence, motion, useScroll, useTransform } from "framer-motion";
+import { AlertCircle, CalendarCheck, Camera, Car, Check, Clock, MapPin, MessageCircle, Minus, Plus, Shirt } from "lucide-react";
 import { useReducedMotionSafe } from "@/hooks/useReducedMotionSafe";
 import { daysAgo, fmtKo, useDemoToday } from "@/hooks/useDemoToday";
 import { maskName, maskPhone } from "@/components/demos/LeadReceivedPanel";
@@ -10,7 +10,7 @@ import { DemoMakerInfo } from "@/components/demos/DemoMakerInfo";
 
 /* 사진관 홈페이지 샘플: 가상의 곰파트너 사진관. 증명사진, 프로필, 가족사진, 우정사진, 반려동물 촬영.
    상호, 주소, 손님 이름은 모두 가상이다.
-   첫 화면 사진 출처: Pexels 사진 30332804
+   첫 화면 사진 출처: Pexels 사진 30332804. 갤러리와 배경지 사진은 AI 생성(Z-Image-Turbo)
 
    국내 사진관 사이트 구성(벤치마킹 메모)
    - 메뉴는 갤러리, 상품 안내(가격표), 예약, 촬영 안내, 오시는 길. 첫 화면은 큰 사진 갤러리.
@@ -27,13 +27,12 @@ import { DemoMakerInfo } from "@/components/demos/DemoMakerInfo";
    상호작용(모두 브라우저 안에서만 돈다. 실제로 보내지 않는다)
    1. 컨셉 필터: 증명, 프로필, 가족, 우정, 반려동물. 고르면 갤러리에 그 컨셉만 남는다.
    2. 패키지 비교: 기본, 스탠다드, 프리미엄 표와 추가 옵션 합산.
-   3. 배경지 색: 6색. 고르면 갤러리 첫 카드 배경이 바뀌고 어울리는 옷 색 한 줄.
+   3. 배경지 색: 6색. 고르면 그 색으로 찍은 같은 사람 사진과 어울리는 옷 색 한 줄.
    4. 촬영 예약: 날짜(오늘부터 14일), 시간대(30분 단위, 마감 표시), 인원, 이름, 휴대폰. 완료 화면에 예약번호, 수령 예정일, 담당 창구.
    5. 촬영 안내와 오시는 길: 준비물, 복장, 주차 탭. 영업시간에 오늘 요일 진하게. */
 
 const IMG = "/images/demo-photo-studio";
 
-const BRAND = "곰파트너";
 const ADDRESS = "서울 ㅇㅇ구 ㅇㅇ로 00, 2층";
 const KAKAO = "카카오톡 채널 곰파트너";
 
@@ -53,8 +52,6 @@ const C = {
 const EASE = [0.22, 1, 0.36, 1] as const;
 const DUR_CARD = 0.45; // 카드 재배열 450ms
 const DUR_UI = 0.22; // 칩, 탭 220ms
-const FOCUS_SCALE = 1.04; // 가운데 카드 확대 비율
-const SLIDE_PX = 1; // 세로 스크롤 1px당 가로 이동 px
 
 const focusRing = "focus-visible:outline focus-visible:outline-[3px] focus-visible:outline-offset-2 focus-visible:outline-[#b8956a]";
 const won = (n: number) => `${n.toLocaleString("ko-KR")}원`;
@@ -135,156 +132,10 @@ function rgb(hex: string): [number, number, number] {
   const n = parseInt(hex.slice(1), 16);
   return [(n >> 16) & 255, (n >> 8) & 255, n & 255];
 }
-const mix = (hex: string, to: [number, number, number], t: number) => {
-  const a = rgb(hex);
-  return `rgb(${a.map((v, i) => Math.round(v + (to[i] - v) * t)).join(",")})`;
-};
 const isDark = (hex: string) => {
   const [r, g, b] = rgb(hex);
   return (0.2126 * r + 0.7152 * g + 0.0722 * b) / 255 < 0.42;
 };
-/** 배경지 종이. 위는 조금 밝고 아래로 조금 어두워진다. */
-const paper = (hex: string) => `linear-gradient(180deg, ${mix(hex, [255, 255, 255], 0.06)} 0%, ${hex} 45%, ${mix(hex, [0, 0, 0], 0.16)} 100%)`;
-
-/* 촬영 컨셉 실루엣(무채색) */
-function Person({ cx, s, fill, stroke }: { cx: number; s: number; fill: string; stroke?: string }) {
-  const base = 100;
-  const headR = 8.5 * s;
-  const headY = base - 44 * s;
-  const sh = base - 30 * s;
-  const d = `M ${cx - 24 * s} ${base} L ${cx - 23 * s} ${base - 19 * s} C ${cx - 22 * s} ${sh} ${cx - 13 * s} ${sh - 2 * s} ${cx - 5 * s} ${sh - 3 * s} L ${cx + 5 * s} ${sh - 3 * s} C ${cx + 13 * s} ${sh - 2 * s} ${cx + 22 * s} ${sh} ${cx + 23 * s} ${base - 19 * s} L ${cx + 24 * s} ${base} Z`;
-  return (
-    <g fill={fill} stroke={stroke} strokeWidth={stroke ? 1 : 0} strokeLinejoin="round">
-      <rect x={cx - 4.2 * s} y={headY + 5 * s} width={8.4 * s} height={11 * s} />
-      <circle cx={cx} cy={headY} r={headR} />
-      <path d={d} />
-    </g>
-  );
-}
-
-function Dog({ cx, s, fill, stroke }: { cx: number; s: number; fill: string; stroke?: string }) {
-  const base = 100;
-  return (
-    <g fill={fill} stroke={stroke} strokeWidth={stroke ? 1 : 0} strokeLinejoin="round">
-      <ellipse cx={cx} cy={base - 14 * s} rx={15 * s} ry={13 * s} />
-      <rect x={cx - 13 * s} y={base - 14 * s} width={26 * s} height={14 * s} />
-      <circle cx={cx + 4 * s} cy={base - 36 * s} r={9.5 * s} />
-      <ellipse cx={cx - 4 * s} cy={base - 38 * s} rx={3.2 * s} ry={7 * s} transform={`rotate(18 ${cx - 4 * s} ${base - 38 * s})`} />
-      <ellipse cx={cx + 12 * s} cy={base - 38 * s} rx={3.2 * s} ry={7 * s} transform={`rotate(-18 ${cx + 12 * s} ${base - 38 * s})`} />
-      <path d={`M ${cx - 14 * s} ${base - 16 * s} C ${cx - 22 * s} ${base - 20 * s} ${cx - 24 * s} ${base - 28 * s} ${cx - 19 * s} ${base - 31 * s}`} fill="none" strokeWidth={2.6 * s} stroke={fill} strokeLinecap="round" />
-    </g>
-  );
-}
-
-function Figure({ fig, dark }: { fig: Fig; dark: boolean }) {
-  const fill = dark ? "#101010" : "#2a2a2a";
-  const stroke = dark ? "rgba(255,255,255,0.28)" : undefined;
-  const p = { fill, stroke };
-  return (
-    <svg viewBox="0 0 100 100" preserveAspectRatio="xMidYMax meet" className="absolute inset-x-0 bottom-0 h-[80%] w-full" aria-hidden>
-      {fig === "one" && <Person cx={50} s={1.35} {...p} />}
-      {fig === "two" && (
-        <>
-          <Person cx={36} s={1.1} {...p} />
-          <Person cx={66} s={1.05} {...p} />
-        </>
-      )}
-      {fig === "family" && (
-        <>
-          <Person cx={22} s={1.0} {...p} />
-          <Person cx={78} s={1.05} {...p} />
-          <Person cx={40} s={0.62} {...p} />
-          <Person cx={60} s={0.7} {...p} />
-        </>
-      )}
-      {fig === "family3" && (
-        <>
-          <Person cx={34} s={1.05} {...p} />
-          <Person cx={68} s={1.1} {...p} />
-          <Person cx={51} s={0.5} {...p} />
-        </>
-      )}
-      {fig === "dog" && <Dog cx={50} s={1.45} {...p} />}
-      {fig === "familydog" && (
-        <>
-          <Person cx={32} s={1.05} {...p} />
-          <Person cx={64} s={1.1} {...p} />
-          <Dog cx={50} s={0.75} {...p} />
-        </>
-      )}
-    </svg>
-  );
-}
-
-type Box = { left: number; width: number };
-
-/* 갤러리 카드 한 장. 가운데 올수록 focus가 1에 가까워진다. */
-function GalleryCard({
-  card,
-  bg,
-  first,
-  x,
-  tick,
-  boxes,
-  viewW,
-  reduce,
-}: {
-  card: Card;
-  bg: string;
-  first: boolean;
-  x: MotionValue<number>;
-  tick: MotionValue<number>;
-  boxes: React.RefObject<Record<string, Box>>;
-  viewW: React.RefObject<number>;
-  reduce: boolean;
-}) {
-  const focus = useTransform(() => {
-    if (reduce) return 1;
-    tick.get();
-    const b = boxes.current[card.id];
-    const vw = viewW.current;
-    // 측정 전(서버 렌더 포함)에는 첫 카드가 가운데 있다
-    if (!b || !vw) return first ? 1 : 0;
-    const center = b.left + b.width / 2 + x.get();
-    const d = Math.abs(center - vw / 2);
-    return Math.max(0, Math.min(1, 1 - d / (b.width * 0.7)));
-  });
-  const scale = useTransform(focus, [0, 1], [1, FOCUS_SCALE]);
-  const capOpacity = useTransform(focus, [0.5, 0.88], [0, 1]);
-  const capY = useTransform(focus, [0.5, 0.88], [10, 0]);
-  const capTransform = useMotionTemplate`translateY(${capY}px)`;
-  const dark = isDark(bg);
-
-  return (
-    <motion.div
-      layout={reduce ? false : "position"}
-      data-id={card.id}
-      initial={reduce ? false : { opacity: 0 }}
-      animate={{ opacity: 1 }}
-      exit={reduce ? { opacity: 0, transition: { duration: 0 } } : { opacity: 0, transition: { duration: DUR_UI } }}
-      transition={{ duration: reduce ? 0 : DUR_CARD, ease: EASE }}
-      className="relative shrink-0 snap-center"
-      style={{ height: "var(--ps-h)", aspectRatio: String(card.ratio) }}
-    >
-      <motion.div className="absolute inset-0 overflow-hidden rounded-[4px]" style={{ scale, background: paper(bg) }}>
-        <Figure fig={card.fig} dark={dark} />
-        <motion.figcaption
-          className="absolute inset-x-0 bottom-0 px-4 pb-4 pt-10 text-left"
-          style={{ opacity: capOpacity, transform: capTransform, background: "linear-gradient(180deg, transparent, rgba(14,14,14,0.86))", color: C.text }}
-        >
-          <span className="text-[13px] font-semibold" style={{ color: C.accent }}>
-            {card.concept}
-          </span>
-          <span className="mt-1 block text-[18px] font-bold leading-tight">{card.name}</span>
-          <span className="mt-0.5 block text-[13px]" style={{ color: C.muted }}>
-            조명 {card.light}
-          </span>
-        </motion.figcaption>
-      </motion.div>
-    </motion.div>
-  );
-}
-
 /* 배경지 색 버튼 */
 function Roll({ b, on, onPick }: { b: (typeof BACKDROPS)[number]; on: boolean; onPick: () => void }) {
   return (
@@ -424,49 +275,7 @@ export function PhotoStudioDemo() {
   const [concept, setConcept] = useState<Concept | "전체">("전체");
   const [backdrop, setBackdrop] = useState<BackdropId>("white");
   const visible = concept === "전체" ? CARDS : CARDS.filter((c) => c.concept === concept);
-  const firstId = visible[0]?.id;
 
-  /* 가로 갤러리 스크롤 연동 */
-  const wrapRef = useRef<HTMLDivElement>(null);
-  const viewRef = useRef<HTMLDivElement>(null);
-  const trackRef = useRef<HTMLDivElement>(null);
-  const boxes = useRef<Record<string, Box>>({});
-  const viewW = useRef(0);
-  const tick = useMotionValue(0);
-  const maxShift = useMotionValue(0);
-  const [shiftPx, setShiftPx] = useState(0);
-  const { scrollYProgress } = useScroll({ target: wrapRef, offset: ["start start", "end end"] });
-  const x = useTransform(() => -scrollYProgress.get() * maxShift.get());
-  const count = useTransform(() => Math.min(visible.length, Math.round(scrollYProgress.get() * (visible.length - 1)) + 1));
-  const counter = useMotionTemplate`${count} / ${visible.length}`;
-
-  const measure = useCallback(() => {
-    const view = viewRef.current;
-    const track = trackRef.current;
-    if (!view || !track) return;
-    viewW.current = view.clientWidth;
-    const next: Record<string, Box> = {};
-    for (const el of Array.from(track.children) as HTMLElement[]) {
-      const id = el.dataset.id;
-      if (id) next[id] = { left: el.offsetLeft, width: el.offsetWidth };
-    }
-    boxes.current = next;
-    const shift = Math.max(0, track.offsetWidth - view.clientWidth);
-    maxShift.set(shift);
-    setShiftPx(shift);
-    tick.set(tick.get() + 1);
-  }, [maxShift, tick]);
-
-  useLayoutEffect(() => {
-    measure();
-    const view = viewRef.current;
-    const track = trackRef.current;
-    if (!view || !track) return;
-    const ro = new ResizeObserver(measure);
-    ro.observe(view);
-    ro.observe(track);
-    return () => ro.disconnect();
-  }, [measure, visible.length]);
 
   useEffect(() => {
     const f = () => window.scrollTo({ top: 0 });
@@ -476,21 +285,8 @@ export function PhotoStudioDemo() {
 
   const go = (id: string) => document.getElementById(id)?.scrollIntoView({ behavior: reduce ? "auto" : "smooth", block: "start" });
 
-  /** 갤러리 처음(첫 카드 가운데)으로. 필터나 배경지를 바꾸면 첫 카드가 보여야 한다. */
-  const toGalleryStart = () => {
-    const wrap = wrapRef.current;
-    if (reduce || !wrap) return;
-    const top = wrap.getBoundingClientRect().top + window.scrollY;
-    if (window.scrollY > top + 1) window.scrollTo({ top, behavior: "smooth" });
-  };
-  const pickConcept = (c: Concept | "전체") => {
-    setConcept(c);
-    toGalleryStart();
-  };
-  const pickBackdrop = (id: BackdropId) => {
-    setBackdrop(id);
-    toGalleryStart();
-  };
+  const pickConcept = (c: Concept | "전체") => setConcept(c);
+  const pickBackdrop = (id: BackdropId) => setBackdrop(id);
 
   /* 2. 패키지 */
   const [pkg, setPkg] = useState<PkgId>("standard");
@@ -570,69 +366,79 @@ export function PhotoStudioDemo() {
         </button>
       </header>
 
-      {/* 첫 화면: 세로 스크롤을 가로 갤러리로 바꾸는 sticky 구간. 동작 줄이기면 보통 가로 스크롤 */}
-      <div ref={wrapRef} id="ps-gallery" className="relative scroll-mt-2" style={{ height: reduce ? "auto" : `calc(100svh + ${shiftPx * SLIDE_PX}px)` }}>
-        <div className={`${reduce ? "" : "sticky top-0 h-[100svh]"} flex flex-col justify-between gap-3 py-3 [--ps-h:min(88vw,380px,46svh)]`}>
-          <div className="mx-auto w-full max-w-[1200px] px-4 md:px-6">
-            <h2 className="text-[28px] font-bold leading-tight tracking-[-0.02em] md:text-[40px]">
-              {BRAND}
-            </h2>
-            <div id="ps-filter" role="group" aria-label="촬영 컨셉" className="mt-3 flex flex-wrap gap-2">
-              {(["전체", ...CONCEPTS] as const).map((c) => (
-                <button key={c} type="button" aria-pressed={concept === c} onClick={() => pickConcept(c)} className={chip(concept === c)} style={chipStyle(concept === c)}>
-                  {c}
-                </button>
+      {/* 1. 갤러리: 보통 세로 스크롤 격자. 컨셉을 고르면 그 컨셉 사진만 남고 나머지는 자리를 옮긴다 */}
+      <section id="ps-gallery" aria-labelledby="ps-gallery-title" className="mx-auto max-w-[1200px] scroll-mt-4 px-4 pt-12 md:px-6 md:pt-16">
+        <Title id="ps-gallery-title">갤러리</Title>
+        <div id="ps-filter" role="group" aria-label="촬영 컨셉" className="mt-4 flex flex-wrap gap-2">
+          {(["전체", ...CONCEPTS] as const).map((c) => (
+            <button key={c} type="button" aria-pressed={concept === c} onClick={() => pickConcept(c)} className={chip(concept === c)} style={chipStyle(concept === c)}>
+              {c}
+            </button>
+          ))}
+        </div>
+        <motion.ul layout={!reduce} className="mt-6 grid grid-cols-2 gap-3 md:grid-cols-3 md:gap-5 lg:grid-cols-4">
+          <AnimatePresence initial={false} mode="popLayout">
+            {visible.map((card) => (
+              <motion.li
+                key={card.id}
+                layout={reduce ? false : "position"}
+                initial={reduce ? false : { opacity: 0, scale: 0.97 }}
+                animate={{ opacity: 1, scale: 1 }}
+                exit={reduce ? { opacity: 0, transition: { duration: 0 } } : { opacity: 0, scale: 0.97, transition: { duration: DUR_UI } }}
+                transition={{ duration: reduce ? 0 : DUR_CARD, ease: EASE }}
+              >
+                <figure>
+                  <div className="aspect-[4/5] overflow-hidden rounded-[4px]" style={{ background: card.bg }}>
+                    {/* eslint-disable-next-line @next/next/no-img-element -- 정적 export 라 next/image 최적화를 쓰지 않는다 */}
+                    <img src={`${IMG}/${card.id}.jpg`} alt={`${card.name} 촬영 예시`} loading="lazy" width={640} height={800} className="h-full w-full object-cover transition-transform duration-500 hover:scale-[1.03]" />
+                  </div>
+                  <figcaption className="mt-2">
+                    <span className="text-[13px] font-semibold" style={{ color: C.accent }}>
+                      {card.concept}
+                    </span>
+                    <span className="block text-[16px] font-bold leading-snug md:text-[17px]">{card.name}</span>
+                    <span className="block text-[13px]" style={{ color: C.muted }}>
+                      조명 {card.light}
+                    </span>
+                  </figcaption>
+                </figure>
+              </motion.li>
+            ))}
+          </AnimatePresence>
+        </motion.ul>
+
+        {/* 배경지: 고른 색으로 찍은 같은 사람 사진과 어울리는 옷 색 안내 */}
+        <div id="ps-backdrop" className="mt-12 grid gap-6 rounded-[6px] border p-4 md:grid-cols-[260px_minmax(0,1fr)] md:items-center md:gap-8 md:p-6" style={{ borderColor: C.line, background: C.panel2 }}>
+          <div className="relative mx-auto aspect-[4/5] w-full max-w-[260px] overflow-hidden rounded-[4px]" style={{ background: backdropHex(backdrop) }}>
+            <AnimatePresence initial={false}>
+              <motion.img
+                key={backdrop}
+                src={`${IMG}/bd-${backdrop}.jpg`}
+                alt={`${BACKDROPS.find((b) => b.id === backdrop)!.name} 배경지로 찍은 프로필 예시`}
+                width={640}
+                height={800}
+                className="absolute inset-0 h-full w-full object-cover"
+                initial={reduce ? false : { opacity: 0 }}
+                animate={{ opacity: 1 }}
+                exit={{ opacity: 0 }}
+                transition={{ duration: reduce ? 0 : 0.3 }}
+              />
+            </AnimatePresence>
+          </div>
+          <div>
+            <h3 className="text-[20px] font-bold md:text-[22px]">배경지 색</h3>
+            <div role="group" aria-label="배경지 색" className="mt-3 flex flex-wrap gap-1">
+              {BACKDROPS.map((b) => (
+                <Roll key={b.id} b={b} on={backdrop === b.id} onPick={() => pickBackdrop(b.id)} />
               ))}
             </div>
-          </div>
-
-          <div ref={viewRef} className={`relative w-full ${reduce ? "snap-x snap-mandatory overflow-x-auto pb-3" : "overflow-hidden"}`}>
-            <motion.div
-              ref={trackRef}
-              className="relative flex w-max items-center gap-4 md:gap-6"
-              style={{
-                x: reduce ? 0 : x,
-                paddingLeft: `calc(50% - var(--ps-h) * ${visible[0]?.ratio ?? 1} / 2)`,
-                paddingRight: `calc(50% - var(--ps-h) * ${visible[visible.length - 1]?.ratio ?? 1} / 2)`,
-              }}
-            >
-              <AnimatePresence initial={false} mode="popLayout">
-                {visible.map((card) => (
-                  <GalleryCard key={card.id} card={card} bg={card.id === firstId ? backdropHex(backdrop) : card.bg} first={card.id === firstId} x={x} tick={tick} boxes={boxes} viewW={viewW} reduce={reduce} />
-                ))}
-              </AnimatePresence>
-            </motion.div>
-          </div>
-
-          <div className="mx-auto w-full max-w-[1200px] px-4 md:px-6">
-            <div className="flex flex-wrap items-end justify-between gap-x-6 gap-y-3">
-              <div id="ps-backdrop">
-                <p className="text-[13px] font-bold" style={{ color: C.muted }}>
-                  배경지
-                </p>
-                <div role="group" aria-label="배경지 색" className="mt-1 flex flex-wrap gap-1">
-                  {BACKDROPS.map((b) => (
-                    <Roll key={b.id} b={b} on={backdrop === b.id} onPick={() => pickBackdrop(b.id)} />
-                  ))}
-                </div>
-                <p className="mt-2 max-w-[640px] text-[14px] leading-[1.6]" style={{ color: C.text }} aria-live="polite">
-                  <Shirt size={15} aria-hidden className="mr-1.5 inline-block align-[-2px]" style={{ color: C.accent }} />
-                  {BACKDROPS.find((b) => b.id === backdrop)!.tip}
-                </p>
-              </div>
-              {!reduce && (
-                <div className="flex items-center gap-3 text-[14px] tabular-nums" style={{ color: C.muted }}>
-                  <ChevronDown size={16} aria-hidden />
-                  <motion.span aria-hidden>{counter}</motion.span>
-                  <span className="relative block h-[2px] w-24 overflow-hidden rounded-full" style={{ background: C.line }} aria-hidden>
-                    <motion.span className="absolute inset-0 origin-left rounded-full" style={{ scaleX: scrollYProgress, background: C.accent }} />
-                  </span>
-                </div>
-              )}
-            </div>
+            <p className="mt-3 max-w-[560px] text-[15px] leading-[1.7]" style={{ color: C.text }} aria-live="polite">
+              <Shirt size={16} aria-hidden className="mr-1.5 inline-block align-[-3px]" style={{ color: C.accent }} />
+              {BACKDROPS.find((b) => b.id === backdrop)!.tip}
+            </p>
           </div>
         </div>
-      </div>
+      </section>
 
       {/* 2. 상품 안내와 가격 */}
       <section id="ps-price" aria-labelledby="ps-price-title" className="mx-auto mt-16 max-w-[1200px] scroll-mt-4 px-4 md:mt-24 md:px-6">
