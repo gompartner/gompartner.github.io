@@ -652,9 +652,15 @@ function OvenClock({ clock, selected, onSelect }: { clock: Clock; selected: numb
   );
 }
 
+/** 영업시간 밖(휴무, 개점 전, 마감 뒤)에 처음 보여 줄 시각. 판매 중, 품절, 곧 나올 빵이 고루 섞이는 오전 11:20 */
+const SHOWCASE_M = 680;
+
 function Oven({ clock: realClock, onAdd }: { clock: Clock; onAdd: (id: string) => void }) {
   const [preview, setPreview] = useState<number | null>(null);
-  const clock: Clock = preview === null ? realClock : { day: realClock && realClock.day !== 1 ? realClock.day : 2, m: preview };
+  // 밤에 열면 빵이 전부 품절로 보여 시계가 멈춘 것 같으니 영업 중인 시각으로 보여 준다
+  const closedNow = !!realClock && (realClock.day === 1 || realClock.m < OPEN || realClock.m >= CLOSE - 10);
+  const viewM = preview ?? (closedNow ? SHOWCASE_M : null);
+  const clock: Clock = viewM === null ? realClock : { day: realClock && realClock.day !== 1 ? realClock.day : 2, m: viewM };
   const next = nextBatch(clock);
   const [picked, setPicked] = useState<number | null>(null);
   const selected = picked ?? (next ? BATCHES.indexOf(next) : 0);
@@ -685,7 +691,7 @@ function Oven({ clock: realClock, onAdd }: { clock: Clock; onAdd: (id: string) =
                   <span className="font-bold tabular-nums" style={{ color: C.crust }}>
                     {clock ? hhmm(clock.m) : ""}
                   </span>
-                  {preview !== null && (
+                  {preview !== null && !closedNow && (
                     <button type="button" onClick={() => setPreview(null)} className="h-9 rounded-[6px] border px-3 text-[14px] font-semibold" style={{ borderColor: C.line, background: C.paper }}>
                       현재 시각
                     </button>
@@ -709,9 +715,9 @@ function Oven({ clock: realClock, onAdd }: { clock: Clock; onAdd: (id: string) =
             </div>
             <ul className="mt-3 flex flex-wrap justify-center gap-x-5 gap-y-1 text-[14px]" style={{ color: C.muted }} aria-label="범례">
               {[
-                ["나온 빵", { background: C.crust }],
-                ["다음 빵", { background: C.butter }],
-                ["나올 빵", { background: C.paper, border: `2px solid ${C.crustDeep}` }],
+                ["판매 중", { background: C.crust }],
+                ["곧 나와요", { background: C.butter }],
+                ["나오기 전", { background: C.paper, border: `2px solid ${C.crustDeep}` }],
                 ["품절", { background: C.kraftDeep }],
               ].map(([label, style]) => (
                 <li key={label as string} className="inline-flex items-center gap-1.5">
