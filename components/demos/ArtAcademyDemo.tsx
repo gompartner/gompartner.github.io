@@ -208,6 +208,12 @@ interface Work {
   objs: Obj[];
 }
 
+const TEACHERS = [
+  { id: "1", name: "윤재희", role: "원장", cls: "입시반 소묘, 수채화", career: "서양화 전공, 입시 지도 14년" },
+  { id: "2", name: "박도윤", role: "선생님", cls: "취미반 성인", career: "회화 전공, 개인전 3회" },
+  { id: "3", name: "이수아", role: "선생님", cls: "초등반", career: "미술교육 전공, 아동미술 8년" },
+];
+
 const WORKS: Work[] = [
   {
     id: "w1",
@@ -237,7 +243,7 @@ const WORKS: Work[] = [
     id: "w3",
     medium: "소묘",
     cls: "취미반 성인",
-    paper: "켄트지 8절, 연필",
+    paper: "켄트지 8절, 색연필",
     hours: "3시간씩 2회",
     objs: [
       { t: "box", x: 125, y: 305, s: 1.1 },
@@ -408,6 +414,28 @@ export function ArtAcademyDemo() {
       <section id="aa-gallery" aria-labelledby="aa-gallery-title" className="mx-auto mt-16 max-w-[1200px] scroll-mt-4 px-4 md:mt-24 md:px-6">
         <SectionTitle id="aa-gallery-title" title="수업 작품" />
         <Gallery reduce={reduce} />
+      </section>
+
+      {/* 선생님 */}
+      <section id="aa-teachers" aria-labelledby="aa-teachers-title" className="mx-auto mt-16 max-w-[1200px] scroll-mt-4 px-4 md:mt-24 md:px-6">
+        <SectionTitle id="aa-teachers-title" title="선생님" />
+        <ul className="grid gap-8 sm:grid-cols-3 md:gap-6">
+          {TEACHERS.map((t) => (
+            <li key={t.id}>
+              {/* eslint-disable-next-line @next/next/no-img-element -- 정적 export 라 next/image 최적화를 쓰지 않는다 */}
+              <img src={`${IMG}/teacher-${t.id}.jpg`} alt={`${t.name} ${t.role}`} className="block aspect-[4/5] w-full rounded-[6px] object-cover" />
+              <p className="mt-3 text-[18px] font-bold">
+                {t.name} <span className="text-[15px] font-semibold" style={{ color: C.muted }}>{t.role}</span>
+              </p>
+              <p className="mt-1 text-[15px] font-semibold" style={{ color: C.orangeInk }}>
+                {t.cls}
+              </p>
+              <p className="mt-1 text-[15px] leading-[1.6]" style={{ color: C.muted }}>
+                {t.career}
+              </p>
+            </li>
+          ))}
+        </ul>
       </section>
 
       {/* 3. 실기 시간표 */}
@@ -673,49 +701,10 @@ function ClassPicker({ reduce, cls, setCls, onConsult }: { reduce: boolean; cls:
 
 /* ---------- 정물 그림(수업 작품) ---------- */
 
-const OBJ_PATH: Record<ObjType, string> = {
-  apple: "M0 -60 C22 -72 40 -54 38 -30 C36 -6 20 2 2 0 C-2 -1 -6 -1 -10 0 C-28 2 -40 -10 -38 -32 C-36 -56 -18 -68 0 -60 Z",
-  lemon: "M-38 -18 C-36 -38 34 -40 38 -20 C42 -2 -40 4 -38 -18 Z",
-  bottle: "M-9 -170 L-9 -120 C-9 -100 -32 -92 -32 -72 L-32 -4 C-32 3 32 3 32 -4 L32 -72 C32 -92 9 -100 9 -120 L9 -170 Z",
-  cup: "M-30 -58 L-26 -6 C-25 1 25 1 26 -6 L30 -58 Z",
-  jar: "M-22 -96 C-22 -86 -46 -78 -46 -46 C-46 -12 -30 0 0 0 C30 0 46 -12 46 -46 C46 -78 22 -86 22 -96 Z",
-  box: "M-40 -50 L20 -50 L40 -66 L40 -16 L20 0 L-40 0 Z",
-};
-/** 그림마다 덧그리는 선(꼭지, 손잡이, 입구) */
-const OBJ_EXTRA: Record<ObjType, string> = {
-  apple: "M0 -60 C-1 -70 2 -78 7 -82",
-  lemon: "M38 -20 L44 -21 M-38 -18 L-44 -17",
-  bottle: "M-12 -170 C-12 -176 12 -176 12 -170",
-  cup: "M-30 -58 C-30 -64 30 -64 30 -58 C30 -52 -30 -52 -30 -58 M30 -46 C46 -46 46 -20 27 -18",
-  jar: "M-22 -96 C-22 -102 22 -102 22 -96 C22 -90 -22 -90 -22 -96",
-  box: "M-40 -50 L-20 -66 L40 -66 M20 -50 L20 0",
-};
-/** 수채화는 채도를 낮춘 단색, 소묘는 회색 실루엣 */
-const WATER: Record<ObjType, string> = {
-  apple: "#b98a7e",
-  lemon: "#cfc199",
-  bottle: "#94a59a",
-  cup: "#c5cad0",
-  jar: "#b59f8a",
-  box: "#c9bca6",
-};
-const CHAR_FILL = "#b9b9b9";
-
 function StillLife({ work }: { work: Work }) {
-  const water = work.medium === "수채화";
   return (
-    <svg viewBox="0 0 300 400" className="block h-auto w-full" role="img" aria-label={`${work.cls} ${water ? "정물 수채화" : "정물 소묘"}`}>
-      <rect width="300" height="400" fill="#f7f7f5" />
-      <path d="M0 290 L300 286 L300 400 L0 400 Z" fill="#ececea" />
-      {work.objs.map((o, i) => (
-        <g key={i} transform={`translate(${o.x} ${o.y}) scale(${o.s})`}>
-          <ellipse cx="26" cy="-2" rx="44" ry="7" fill="#000" opacity="0.08" />
-          <path d={OBJ_PATH[o.t]} fill={water ? WATER[o.t] : CHAR_FILL} />
-          <path d={OBJ_PATH[o.t]} fill="none" stroke="#6b6b6b" strokeWidth="1" vectorEffect="non-scaling-stroke" opacity={water ? 0.4 : 0.8} />
-          <path d={OBJ_EXTRA[o.t]} fill="none" stroke="#6b6b6b" strokeWidth="1" strokeLinecap="round" vectorEffect="non-scaling-stroke" />
-        </g>
-      ))}
-    </svg>
+    // eslint-disable-next-line @next/next/no-img-element -- 정적 export 라 next/image 최적화를 쓰지 않는다
+    <img src={`${IMG}/work-${work.id}.jpg`} alt={`${work.cls} ${work.medium === "수채화" ? "정물 수채화" : "정물 소묘"}`} className="block aspect-[3/4] h-auto w-full object-cover" />
   );
 }
 
