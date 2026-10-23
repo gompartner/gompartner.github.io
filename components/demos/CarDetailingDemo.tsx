@@ -9,7 +9,7 @@ import { maskName, maskPhone } from "@/components/demos/LeadReceivedPanel";
 import { DemoMakerInfo } from "@/components/demos/DemoMakerInfo";
 
 /* 자동차 디테일링 샵 홈페이지 샘플: 가상의 곰파트너 디테일링 샵. 상호, 주소, 가격은 모두 가상이다.
-   첫 화면 사진 출처: Pexels 사진 20131971
+   첫 화면 사진 출처: Pexels 사진 20131971. 차종별 차 사진은 AI 생성(Z-Image-Turbo), 비포는 같은 사진을 가공
 
    국내 디테일링 샵 홈페이지는 대개 이렇게 짜여 있다.
    메뉴: 시공 메뉴(유리막 코팅, 광택, 실내 클리닉, 썬팅, 언더코팅), 시공 과정, 시공 사례(비포 애프터), 예약, 오시는 길, 보증 안내.
@@ -52,7 +52,6 @@ const C = {
 
 /* 모션 상수. 차종 바꿀 때 윤곽 모핑 450ms, 진행 바 1400ms, 공통 ease. */
 const EASE = [0.22, 1, 0.36, 1] as const;
-const MORPH_MS = 450;
 const BAR_MS = 1400;
 
 const focusRing = "focus-visible:outline focus-visible:outline-[3px] focus-visible:outline-offset-2";
@@ -65,69 +64,6 @@ const DOW = ["일", "월", "화", "수", "목", "금", "토"];
 const CAR_TYPES = ["경차", "준중형", "중형", "SUV", "대형"] as const;
 type CarType = (typeof CAR_TYPES)[number];
 
-/** 측면도 좌표. viewBox 800x340, 바닥 y=300, 앞이 왼쪽. 다섯 차종이 같은 명령 구조라 d 를 그대로 보간한다. */
-type CarSpec = {
-  x0: number;
-  x1: number;
-  yBot: number;
-  yBelt: number;
-  yHood: number;
-  yNose: number;
-  yRoof: number;
-  xA: number;
-  xRoofF: number;
-  xRoofR: number;
-  xC: number;
-  yTrunk: number;
-  xTail: number;
-  r: number;
-  wxF: number;
-  wxR: number;
-};
-
-const GROUND = 300;
-
-const SPECS: Record<CarType, CarSpec> = {
-  경차: { x0: 140, x1: 660, yBot: 258, yBelt: 190, yHood: 180, yNose: 198, yRoof: 104, xA: 270, xRoofF: 330, xRoofR: 578, xC: 630, yTrunk: 146, xTail: 640, r: 40, wxF: 240, wxR: 560 },
-  준중형: { x0: 90, x1: 710, yBot: 256, yBelt: 190, yHood: 180, yNose: 194, yRoof: 110, xA: 280, xRoofF: 355, xRoofR: 525, xC: 605, yTrunk: 168, xTail: 672, r: 42, wxF: 210, wxR: 590 },
-  중형: { x0: 60, x1: 740, yBot: 254, yBelt: 190, yHood: 178, yNose: 192, yRoof: 112, xA: 270, xRoofF: 350, xRoofR: 520, xC: 610, yTrunk: 172, xTail: 700, r: 44, wxF: 190, wxR: 610 },
-  SUV: { x0: 70, x1: 730, yBot: 232, yBelt: 168, yHood: 150, yNose: 160, yRoof: 82, xA: 260, xRoofF: 330, xRoofR: 628, xC: 690, yTrunk: 100, xTail: 706, r: 50, wxF: 200, wxR: 600 },
-  대형: { x0: 30, x1: 770, yBot: 252, yBelt: 188, yHood: 174, yNose: 188, yRoof: 108, xA: 290, xRoofF: 375, xRoofR: 560, xC: 650, yTrunk: 168, xTail: 732, r: 46, wxF: 170, wxR: 640 },
-};
-
-function bodyPath(s: CarSpec) {
-  const { x0, x1, yBot, yHood, yNose, yRoof, xA, xRoofF, xRoofR, xC, yTrunk, xTail, r, wxF, wxR } = s;
-  const aw = r + 6;
-  const ar = r + 7;
-  return [
-    `M${x0 + 8} ${yBot}`,
-    `C${x0 - 2} ${yBot - 28} ${x0 - 2} ${yNose + 40} ${x0 + 6} ${yNose + 14}`,
-    `C${x0 + 10} ${yNose + 2} ${x0 + 24} ${yNose} ${x0 + 40} ${yNose}`,
-    `L${xA} ${yHood}`,
-    `C${xA + (xRoofF - xA) * 0.35} ${yHood - (yHood - yRoof) * 0.4} ${xRoofF - 22} ${yRoof + 3} ${xRoofF} ${yRoof}`,
-    `L${xRoofR} ${yRoof}`,
-    `C${xRoofR + (xC - xRoofR) * 0.35} ${yRoof + 3} ${xC - 24} ${yTrunk - (yTrunk - yRoof) * 0.3} ${xC} ${yTrunk}`,
-    `L${xTail} ${yTrunk + 2}`,
-    `C${xTail + 18} ${yTrunk + 6} ${x1} ${yTrunk + 30} ${x1 - 2} ${yTrunk + 60}`,
-    `C${x1} ${yBot - 30} ${x1 - 4} ${yBot - 10} ${x1 - 10} ${yBot}`,
-    `L${wxR + aw} ${yBot}`,
-    `A${ar} ${ar} 0 0 0 ${wxR - aw} ${yBot}`,
-    `L${wxF + aw} ${yBot}`,
-    `A${ar} ${ar} 0 0 0 ${wxF - aw} ${yBot}`,
-    "Z",
-  ].join(" ");
-}
-
-function windshieldPath(s: CarSpec) {
-  const { yBelt, yRoof, xA, xRoofF } = s;
-  return `M${xA + 16} ${yBelt} C${xA + 16 + (xRoofF - xA) * 0.3} ${yBelt - (yBelt - yRoof - 10) * 0.45} ${xRoofF - 14} ${yRoof + 12} ${xRoofF + 4} ${yRoof + 10} L${xRoofF + 28} ${yRoof + 10} L${xA + 52} ${yBelt} Z`;
-}
-
-function sideGlassPath(s: CarSpec) {
-  const { yBelt, yRoof, xA, xRoofF, xRoofR, xC } = s;
-  return `M${xA + 62} ${yBelt} L${xRoofF + 38} ${yRoof + 10} L${xRoofR - 4} ${yRoof + 10} C${xRoofR - 4 + (xC - xRoofR) * 0.35} ${yRoof + 12} ${xC - 34} ${yBelt - (yBelt - yRoof) * 0.3} ${xC - 24} ${yBelt} Z`;
-}
-
 /** 애프터 쪽에 어떤 시공이 들어갔는지. 비포는 전부 false. */
 type Look = {
   after: boolean;
@@ -139,171 +75,8 @@ type Look = {
   under: boolean;
 };
 
-const BEFORE: Look = { after: false, gloss: false, polish: false, interior: false, tintFront: false, tintSide: false, under: false };
 const SHOWROOM: Look = { after: true, gloss: true, polish: true, interior: true, tintFront: false, tintSide: false, under: false };
 
-function CarSvg({ uid, type, look, reduce, className = "" }: { uid: string; type: CarType; look: Look; reduce: boolean; className?: string }) {
-  const s = SPECS[type];
-  const body = bodyPath(s);
-  const glassF = windshieldPath(s);
-  const glassS = sideGlassPath(s);
-  const t = { duration: reduce ? 0 : MORPH_MS / 1000, ease: EASE } as const;
-  const cy = GROUND - s.r;
-  const xB = s.xRoofF + (s.xRoofR - s.xRoofF) * 0.45;
-  const paint = look.after ? `url(#${uid}-paint)` : "#5b646d";
-  const glassBase = look.after ? (look.interior ? "#d8cbb0" : "#4a4744") : "#596067";
-  const clipId = `${uid}-clip`;
-  const swirlOpacity = look.after ? (look.polish ? 0 : 0.16) : 0.26;
-  const seatFill = look.after ? (look.interior ? "#8a7a60" : "#3b3634") : "#3a3c3f";
-
-  return (
-    <svg viewBox="0 0 800 340" className={className} aria-hidden focusable="false">
-      <defs>
-        <linearGradient id={`${uid}-paint`} x1="0" y1="0" x2="0" y2="1">
-          <stop offset="0" stopColor="#6f8db5" />
-          <stop offset="0.45" stopColor={C.paint} />
-          <stop offset="1" stopColor="#1c2c45" />
-        </linearGradient>
-        <linearGradient id={`${uid}-shine`} x1="0" y1="0" x2="1" y2="0">
-          <stop offset="0" stopColor="#fff" stopOpacity="0" />
-          <stop offset="0.35" stopColor="#fff" stopOpacity="0.55" />
-          <stop offset="0.7" stopColor="#fff" stopOpacity="0.2" />
-          <stop offset="1" stopColor="#fff" stopOpacity="0" />
-        </linearGradient>
-        <linearGradient id={`${uid}-glass`} x1="0" y1="0" x2="1" y2="1">
-          <stop offset="0" stopColor="#dff0ff" stopOpacity="0.55" />
-          <stop offset="0.5" stopColor="#8fb6e0" stopOpacity="0.25" />
-          <stop offset="1" stopColor="#dff0ff" stopOpacity="0.5" />
-        </linearGradient>
-        <radialGradient id={`${uid}-rim`} cx="0.4" cy="0.35" r="0.8">
-          <stop offset="0" stopColor={look.after ? "#f2f5f8" : "#8b9096"} />
-          <stop offset="1" stopColor={look.after ? "#7f8a96" : "#4f555b"} />
-        </radialGradient>
-        <clipPath id={clipId}>
-          <motion.path initial={false} animate={{ d: body }} transition={t} />
-        </clipPath>
-      </defs>
-
-      {/* 바닥 그림자 */}
-      <motion.ellipse initial={false} animate={{ cx: (s.x0 + s.x1) / 2, rx: (s.x1 - s.x0) / 2 }} transition={t} cy={GROUND + 6} ry={11} fill="rgba(0,0,0,0.55)" />
-
-      {/* 차체 */}
-      <motion.path initial={false} animate={{ d: body }} transition={t} fill={paint} />
-
-      <g clipPath={`url(#${clipId})`}>
-        {/* 광택: 위는 하늘 반사, 아래는 어둡게. 경계가 또렷한 게 코팅 광택이다. */}
-        {look.after && look.gloss && (
-          <>
-            <motion.rect initial={false} animate={{ y: s.yHood - 2, height: s.yBelt + 34 - (s.yHood - 2) }} transition={t} x={0} width={800} fill="rgba(255,255,255,0.13)" />
-            <motion.rect initial={false} animate={{ y: s.yBelt + 34 }} transition={t} x={0} width={800} height={160} fill="rgba(0,0,0,0.28)" />
-            <motion.rect initial={false} animate={{ x: s.x0 + 40, y: s.yBelt + 6, width: s.x1 - s.x0 - 90 }} transition={t} height={14} fill={`url(#${uid}-shine)`} />
-          </>
-        )}
-        {/* 세차만 한 애프터는 색은 살아나되 반사는 약하다 */}
-        {look.after && !look.gloss && <motion.rect initial={false} animate={{ y: s.yBelt + 6 }} transition={t} x={0} width={800} height={10} fill="rgba(255,255,255,0.08)" />}
-
-        {/* 비포: 바랜 클리어, 흙탕 자국 */}
-        {!look.after && (
-          <>
-            <motion.ellipse initial={false} animate={{ cx: s.xRoofF + 70, cy: s.yRoof + 2 }} transition={t} rx={70} ry={10} fill="rgba(190,195,200,0.35)" />
-            <motion.ellipse initial={false} animate={{ cx: s.xA - 60, cy: s.yHood + 4 }} transition={t} rx={60} ry={8} fill="rgba(190,195,200,0.28)" />
-            {[0, 1, 2, 3, 4, 5].map((i) => (
-              <motion.ellipse
-                key={i}
-                initial={false}
-                animate={{ cx: s.x0 + 60 + ((s.x1 - s.x0 - 120) / 5) * i, cy: s.yBot - 14 - (i % 2) * 6 }}
-                transition={t}
-                rx={34 + (i % 3) * 8}
-                ry={9}
-                fill="rgba(96,76,52,0.5)"
-              />
-            ))}
-            {[0, 1, 2, 3, 4, 5, 6, 7].map((i) => (
-              <motion.circle key={`d${i}`} initial={false} animate={{ cx: s.wxR - 80 + i * 14, cy: s.yBot - 30 - (i % 3) * 7 }} transition={t} r={2.2} fill="rgba(96,76,52,0.6)" />
-            ))}
-          </>
-        )}
-
-        {/* 잔기스 소용돌이. 광택을 고르면 사라진다. */}
-        {swirlOpacity > 0 &&
-          [0, 1, 2, 3, 4, 5].map((i) => (
-            <motion.path
-              key={`s${i}`}
-              initial={false}
-              animate={{ d: `M${xB - 150 + i * 56} ${s.yBelt + 26 + (i % 2) * 14} a 18 18 0 1 1 36 0` }}
-              transition={t}
-              fill="none"
-              stroke="#fff"
-              strokeOpacity={swirlOpacity}
-              strokeWidth={1.3}
-            />
-          ))}
-
-        {/* 언더코팅: 아랫단 무광 검정 */}
-        {look.after && look.under && <motion.rect initial={false} animate={{ x: s.x0 + 20, y: s.yBot - 11, width: s.x1 - s.x0 - 40 }} transition={t} height={12} fill="rgba(0,0,0,0.5)" />}
-
-        {/* 문 이음선과 손잡이 */}
-        <motion.path initial={false} animate={{ d: `M${xB} ${s.yBelt} L${xB} ${s.yBot - 6}` }} transition={t} stroke="rgba(0,0,0,0.38)" strokeWidth={2} fill="none" />
-        <motion.rect initial={false} animate={{ x: xB - 62, y: s.yBelt + 16 }} transition={t} width={26} height={6} rx={3} fill="rgba(0,0,0,0.4)" />
-        <motion.rect initial={false} animate={{ x: xB + 30, y: s.yBelt + 16 }} transition={t} width={26} height={6} rx={3} fill="rgba(0,0,0,0.4)" />
-      </g>
-
-      {/* 창문: 안쪽 색, 좌석, 유리 반사, 썬팅 */}
-      <g>
-        <motion.path initial={false} animate={{ d: glassS }} transition={t} fill={glassBase} />
-        <motion.path initial={false} animate={{ d: glassF }} transition={t} fill={glassBase} />
-        <motion.rect initial={false} animate={{ x: s.xRoofF + 62, y: s.yRoof + 26, height: s.yBelt - s.yRoof - 26 }} transition={t} width={22} rx={6} fill={seatFill} />
-        <motion.rect initial={false} animate={{ x: s.xRoofR - 70, y: s.yRoof + 26, height: s.yBelt - s.yRoof - 26 }} transition={t} width={22} rx={6} fill={seatFill} />
-        {look.after && (
-          <>
-            <motion.path initial={false} animate={{ d: glassS }} transition={t} fill={`url(#${uid}-glass)`} />
-            <motion.path initial={false} animate={{ d: glassF }} transition={t} fill={`url(#${uid}-glass)`} />
-          </>
-        )}
-        {!look.after && (
-          <>
-            <motion.path initial={false} animate={{ d: glassS }} transition={t} fill="rgba(200,200,200,0.16)" />
-            <motion.path initial={false} animate={{ d: glassF }} transition={t} fill="rgba(200,200,200,0.16)" />
-          </>
-        )}
-        {look.after && look.tintSide && <motion.path initial={false} animate={{ d: glassS }} transition={t} fill="rgba(8,12,18,0.8)" />}
-        {look.after && look.tintFront && <motion.path initial={false} animate={{ d: glassF }} transition={t} fill="rgba(8,12,18,0.42)" />}
-        {/* B필러 */}
-        <motion.rect initial={false} animate={{ x: xB - 5, y: s.yRoof + 8, height: s.yBelt - s.yRoof - 6 }} transition={t} width={10} fill={paint} />
-      </g>
-
-      {/* 사이드미러, 헤드라이트, 테일램프 */}
-      <motion.rect initial={false} animate={{ x: s.xA + 2, y: s.yBelt - 12 }} transition={t} width={18} height={11} rx={4} fill={paint} />
-      <motion.ellipse initial={false} animate={{ cx: s.x0 + 32, cy: s.yNose + 14 }} transition={t} rx={20} ry={7} fill={look.after ? "#eaf6ff" : "#c3c7cb"} />
-      <motion.rect initial={false} animate={{ x: s.x1 - 24, y: s.yTrunk + 16 }} transition={t} width={14} height={14} rx={3} fill={look.after ? "#c4705f" : "#8f5a50"} />
-
-      {/* 바퀴 */}
-      {[s.wxF, s.wxR].map((wx, i) => (
-        <g key={i}>
-          <motion.circle initial={false} animate={{ cx: wx, cy, r: s.r }} transition={t} fill="#0d0f11" stroke="#2a2d31" strokeWidth={2} />
-          <motion.circle initial={false} animate={{ cx: wx, cy, r: s.r * 0.62 }} transition={t} fill={`url(#${uid}-rim)`} />
-          {[0, 1, 2, 3, 4].map((k) => (
-            <motion.line
-              key={k}
-              initial={false}
-              animate={{
-                x1: wx + Math.cos((k / 5) * Math.PI * 2) * s.r * 0.18,
-                y1: cy + Math.sin((k / 5) * Math.PI * 2) * s.r * 0.18,
-                x2: wx + Math.cos((k / 5) * Math.PI * 2) * s.r * 0.56,
-                y2: cy + Math.sin((k / 5) * Math.PI * 2) * s.r * 0.56,
-              }}
-              transition={t}
-              stroke={look.after ? "#4b535b" : "#3a3f44"}
-              strokeWidth={5}
-              strokeLinecap="round"
-            />
-          ))}
-          <motion.circle initial={false} animate={{ cx: wx, cy, r: s.r * 0.15 }} transition={t} fill="#2a2d31" />
-        </g>
-      ))}
-    </svg>
-  );
-}
 
 /* ---------- 시공 메뉴와 가격 ---------- */
 
@@ -712,10 +485,10 @@ function Hero({ type, setType, reduce, todayHours, onBook }: { type: CarType; se
         </div>
 
         <div className="relative mt-3 overflow-hidden rounded-[8px] md:mt-5" style={{ background: `radial-gradient(ellipse at 50% 100%, ${C.panel2} 0%, ${C.bg} 70%)` }}>
-          <div className="relative aspect-[800/340] w-full">
-            <CarSvg uid="hero-b" type={type} look={BEFORE} reduce={reduce} className="absolute inset-0 h-full w-full" />
+          <div className="relative aspect-[1344/576] w-full">
+            <CarPhoto type={type} before className="absolute inset-0" />
             <motion.div className="absolute inset-0" style={{ clipPath: reduce ? "inset(0 0 0 0)" : clip }}>
-              <CarSvg uid="hero-a" type={type} look={SHOWROOM} reduce={reduce} className="absolute inset-0 h-full w-full" />
+              <CarPhoto type={type} look={SHOWROOM} className="absolute inset-0" />
             </motion.div>
             {!reduce && (
               <>
@@ -775,6 +548,34 @@ function Hero({ type, setType, reduce, todayHours, onBook }: { type: CarType; se
   );
 }
 
+/* ---------- 차 사진 ---------- */
+
+/** 차종별 옆모습 사진. 비포(-before)는 같은 사진에 바랜 도장, 물때, 흙먼지를 입혀 만들어 슬라이더로 밀어도 차 위치가 맞는다 */
+const CAR_FILE: Record<CarType, string> = { 경차: "light", 준중형: "compact", 중형: "mid", SUV: "suv", 대형: "large" };
+
+/** 고른 시공에 따라 애프터 사진 느낌을 조금씩 바꾼다. 세차만 하면 살짝 덜 선명하게, 코팅이면 더 진하고 반짝이게 */
+function lookFilter(l: Look) {
+  if (l.gloss) return "contrast(1.08) saturate(1.15) brightness(1.03)";
+  if (l.polish) return "none";
+  return "contrast(0.95) saturate(0.9)";
+}
+
+function CarPhoto({ type, before, look, className = "" }: { type: CarType; before?: boolean; look?: Look; className?: string }) {
+  const file = `${IMG}/car-${CAR_FILE[type]}${before ? "-before" : ""}.jpg`;
+  return (
+    // eslint-disable-next-line @next/next/no-img-element -- 정적 export 라 next/image 최적화를 쓰지 않는다
+    <img
+      src={file}
+      alt={`${type} 차량 ${before ? "시공 전, 바랜 도장과 물때" : "시공 뒤, 광택이 살아난 도장"}`}
+      width={1344}
+      height={576}
+      draggable={false}
+      className={`h-full w-full object-cover ${className}`}
+      style={{ filter: !before && look ? lookFilter(look) : undefined }}
+    />
+  );
+}
+
 /* ---------- 3. 비포 애프터 슬라이더 ---------- */
 
 function CompareSlider({ type, look, reduce }: { type: CarType; look: Look; reduce: boolean }) {
@@ -827,10 +628,10 @@ function CompareSlider({ type, look, reduce }: { type: CarType; look: Look; redu
           dragging.current = false;
         }}
       >
-        <div className="relative aspect-[800/340] w-full">
-          <CarSvg uid="cmp-b" type={type} look={BEFORE} reduce={reduce} className="absolute inset-0 h-full w-full" />
+        <div className="relative aspect-[1344/576] w-full">
+          <CarPhoto type={type} before className="absolute inset-0" />
           <motion.div className="absolute inset-0" style={{ clipPath: clip }}>
-            <CarSvg uid="cmp-a" type={type} look={look} reduce={reduce} className="absolute inset-0 h-full w-full" />
+            <CarPhoto type={type} look={look} className="absolute inset-0" />
           </motion.div>
           <span className="pointer-events-none absolute left-3 top-3 rounded-[4px] px-2 py-0.5 text-[12px] font-semibold md:left-4 md:top-4 md:text-[13px]" style={{ background: "rgba(21,23,26,0.8)", color: C.text }}>
             비포
