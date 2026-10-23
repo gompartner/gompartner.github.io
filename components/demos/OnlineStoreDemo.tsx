@@ -72,7 +72,7 @@ type Region = "metro" | "local" | "island";
 const REGIONS: { id: Region; label: string; days: number; extra: number }[] = [
   { id: "metro", label: "수도권", days: 1, extra: 0 },
   { id: "local", label: "지방", days: 2, extra: 0 },
-  { id: "island", label: "제주·도서산간", days: 3, extra: 3_000 },
+  { id: "island", label: "제주, 도서산간", days: 3, extra: 3_000 },
 ];
 
 const REGION_BY_ID = Object.fromEntries(REGIONS.map((r) => [r.id, r])) as Record<Region, (typeof REGIONS)[number]>;
@@ -164,8 +164,8 @@ const PRODUCTS: Product[] = [
     cat: "cup",
     glazes: ALL_GLAZES,
     sizes: [
-      { id: "s", label: "300ml", spec: "지름 8cm · 높이 9cm · 용량 300ml", add: 0 },
-      { id: "l", label: "400ml", spec: "지름 9cm · 높이 10cm · 용량 400ml", add: 4_000 },
+      { id: "s", label: "300ml", spec: "지름 8cm, 높이 9cm, 용량 300ml", add: 0 },
+      { id: "l", label: "400ml", spec: "지름 9cm, 높이 10cm, 용량 400ml", add: 4_000 },
     ],
     added: "2026-09-18",
     desc: "손잡이가 도톰해서 손가락 세 개를 넣어도 편하게 잡을 수 있어요.",
@@ -176,7 +176,7 @@ const PRODUCTS: Product[] = [
     price: 18_000,
     cat: "cup",
     glazes: ALL_GLAZES,
-    sizes: [{ id: "s", label: "120ml", spec: "지름 7.5cm · 높이 6cm · 용량 120ml", add: 0 }],
+    sizes: [{ id: "s", label: "120ml", spec: "지름 7.5cm, 높이 6cm, 용량 120ml", add: 0 }],
     added: "2026-06-02",
     desc: "입에 닿는 부분이 얇아서 차 마실 때 부드러워요.",
   },
@@ -187,8 +187,8 @@ const PRODUCTS: Product[] = [
     cat: "bowl",
     glazes: ALL_GLAZES,
     sizes: [
-      { id: "s", label: "지름 11cm", spec: "지름 11cm · 높이 6cm · 용량 300ml", add: 0 },
-      { id: "l", label: "지름 12.5cm", spec: "지름 12.5cm · 높이 6.5cm · 용량 380ml", add: 3_000 },
+      { id: "s", label: "지름 11cm", spec: "지름 11cm, 높이 6cm, 용량 300ml", add: 0 },
+      { id: "l", label: "지름 12.5cm", spec: "지름 12.5cm, 높이 6.5cm, 용량 380ml", add: 3_000 },
     ],
     added: "2026-03-10",
     desc: "굽이 높아서 뜨거운 밥을 담아도 손이 덜 뜨거워요.",
@@ -200,8 +200,8 @@ const PRODUCTS: Product[] = [
     cat: "bowl",
     glazes: ALL_GLAZES,
     sizes: [
-      { id: "m", label: "지름 17cm", spec: "지름 17cm · 높이 7cm · 용량 800ml", add: 0 },
-      { id: "l", label: "지름 19cm", spec: "지름 19cm · 높이 7.5cm · 용량 1,000ml", add: 5_000 },
+      { id: "m", label: "지름 17cm", spec: "지름 17cm, 높이 7cm, 용량 800ml", add: 0 },
+      { id: "l", label: "지름 19cm", spec: "지름 19cm, 높이 7.5cm, 용량 1,000ml", add: 5_000 },
     ],
     added: "2026-08-25",
     desc: "국수, 덮밥, 샐러드 담기에 좋은 크기의 볼입니다.",
@@ -213,8 +213,8 @@ const PRODUCTS: Product[] = [
     cat: "plate",
     glazes: ALL_GLAZES,
     sizes: [
-      { id: "m", label: "지름 21cm", spec: "지름 21cm · 높이 2.5cm", add: 0 },
-      { id: "l", label: "지름 25cm", spec: "지름 25cm · 높이 3cm", add: 8_000 },
+      { id: "m", label: "지름 21cm", spec: "지름 21cm, 높이 2.5cm", add: 0 },
+      { id: "l", label: "지름 25cm", spec: "지름 25cm, 높이 3cm", add: 8_000 },
     ],
     added: "2026-05-14",
     desc: "가장자리가 살짝 올라와 있어서 국물 있는 반찬도 넘치지 않아요.",
@@ -225,7 +225,7 @@ const PRODUCTS: Product[] = [
     price: 14_000,
     cat: "plate",
     glazes: ALL_GLAZES,
-    sizes: [{ id: "s", label: "지름 10cm", spec: "지름 10cm · 높이 3.5cm", add: 0 }],
+    sizes: [{ id: "s", label: "지름 10cm", spec: "지름 10cm, 높이 3.5cm", add: 0 }],
     added: "2026-02-20",
     desc: "김치, 나물, 장 종지로 쓰기 좋은 작은 그릇입니다.",
   },
@@ -236,8 +236,8 @@ const PRODUCTS: Product[] = [
     cat: "etc",
     glazes: ALL_GLAZES,
     sizes: [
-      { id: "s", label: "높이 15cm", spec: "지름 9cm · 높이 15cm", add: 0 },
-      { id: "l", label: "높이 20cm", spec: "지름 12cm · 높이 20cm", add: 12_000 },
+      { id: "s", label: "높이 15cm", spec: "지름 9cm, 높이 15cm", add: 0 },
+      { id: "l", label: "높이 20cm", spec: "지름 12cm, 높이 20cm", add: 12_000 },
     ],
     added: "2026-09-26",
     gift: true,
@@ -249,7 +249,7 @@ const PRODUCTS: Product[] = [
     price: 68_000,
     cat: "etc",
     glazes: ["white", "celadon", "black"],
-    sizes: [{ id: "m", label: "300ml", spec: "지름 11cm · 높이 9cm · 용량 300ml", add: 0 }],
+    sizes: [{ id: "m", label: "300ml", spec: "지름 11cm, 높이 9cm, 용량 300ml", add: 0 }],
     added: "2026-07-08",
     gift: true,
     desc: "안쪽에 거름망 구멍이 있어서 찻잎이 따라 나오지 않아요.",
@@ -266,10 +266,10 @@ type CatId = Cat | "all";
 
 const CATS: { id: CatId; label: string }[] = [
   { id: "all", label: "전체상품" },
-  { id: "cup", label: "컵·찻잔" },
-  { id: "bowl", label: "그릇·면기" },
-  { id: "plate", label: "접시·찬기" },
-  { id: "etc", label: "화병·다관" },
+  { id: "cup", label: "컵, 찻잔" },
+  { id: "bowl", label: "그릇, 면기" },
+  { id: "plate", label: "접시, 찬기" },
+  { id: "etc", label: "화병, 다관" },
 ];
 
 const CAT_LABEL = Object.fromEntries(CATS.map((c) => [c.id, c.label])) as Record<CatId, string>;
@@ -534,7 +534,7 @@ export function OnlineStoreDemo() {
 function TopBanner() {
   return (
     <p id="top-banner" className="px-4 py-2 text-center text-[14px] font-semibold md:px-6" style={{ background: C.ink, color: C.claySoft }}>
-      50,000원 이상 무료배송 · 평일 오후 2시 이전 주문 당일 출고
+      50,000원 이상 무료배송, 평일 오후 2시 이전 주문 당일 출고
     </p>
   );
 }
@@ -943,7 +943,7 @@ function Home({ go }: { go: Go }) {
             <span className="flex flex-col justify-center p-4 md:p-6">
               <span className="text-[18px] font-bold">시험성적서와 안전 포장</span>
               <span className="mt-1 text-[14px] leading-[1.55]" style={{ color: C.muted }}>
-                납·카드뮴 불검출 시험 완료, 에어캡과 완충재 이중 포장
+                납, 카드뮴 불검출 시험 완료, 에어캡과 완충재 이중 포장
               </span>
             </span>
           </button>
@@ -951,7 +951,7 @@ function Home({ go }: { go: Go }) {
             <span className="text-[18px] font-bold" style={{ color: "#fff" }}>
               물레 체험 원데이 클래스
             </span>
-            <span className="mt-1 text-[14px] leading-[1.55]">토요일 14:00, 16:00 · 1인 45,000원 · 전화 예약</span>
+            <span className="mt-1 text-[14px] leading-[1.55]">토요일 14:00, 16:00, 1인 45,000원, 전화 예약</span>
             <span className="mt-3 inline-flex items-center gap-0.5 text-[14px] font-semibold" style={{ color: C.clay }}>
               오시는 길
               <ChevronRight size={15} aria-hidden />
@@ -984,7 +984,7 @@ function Home({ go }: { go: Go }) {
                 </button>
                 <p className="mt-3 text-[15px] leading-[1.65]">{r.text}</p>
                 <p className="mt-2 text-[13px]" style={{ color: C.muted }}>
-                  {r.name} · {fmtDot(daysAgo(today, r.ago))}
+                  {r.name}, {fmtDot(daysAgo(today, r.ago))}
                 </p>
               </li>
             ))}
@@ -1250,7 +1250,7 @@ function Detail({
               aria-describedby="engrave-help"
             />
             <span id="engrave-help" className="mt-1 block text-[13px]" style={{ color: C.muted }}>
-              {engrave.length}/{ENGRAVE_MAX}자. 각인 상품은 출고가 하루 늦어지며 단순 변심 교환·반품이 불가합니다.
+              {engrave.length}/{ENGRAVE_MAX}자. 각인 상품은 출고가 하루 늦어지며 단순 변심 교환, 반품이 불가합니다.
             </span>
           </label>
 
@@ -1531,9 +1531,9 @@ function ShipTab({ minute, region, onRegion }: { minute: number; region: Region;
         rows={[
           ["배송 방법", "택배 (ㅎㄴ택배)"],
           ["배송 비용", `${won(FREE_SHIP)} 이상 무료배송, 미만 ${won(SHIP_FEE)}`],
-          ["추가 배송비", `제주·도서산간 ${won(3_000)}`],
+          ["추가 배송비", `제주, 도서산간 ${won(3_000)}`],
           ["당일 출고", "평일 오후 2시 이전 주문 건 당일 출고 (각인 상품 제외)"],
-          ["배송 기간", "출고 후 수도권 1일, 지방 1~2일, 제주·도서산간 2~3일"],
+          ["배송 기간", "출고 후 수도권 1일, 지방 1~2일, 제주, 도서산간 2~3일"],
           ["포장", "에어캡, 완충재, 전용 박스 이중 포장"],
         ]}
       />
@@ -1551,7 +1551,7 @@ function ReturnTab() {
           ["신청 기간", "상품 수령 후 7일 이내"],
           ["파손 상품", "수령 후 24시간 이내 사진과 함께 접수 시 무상 교환"],
           ["단순 변심", "왕복 배송비 7,000원 고객 부담"],
-          ["교환·반품 불가", "각인 상품, 사용 흔적이 있는 상품, 수작업 특성(색상, 유약 흐름, 크기 차이)에 따른 요청"],
+          ["교환, 반품 불가", "각인 상품, 사용 흔적이 있는 상품, 수작업 특성(색상, 유약 흐름, 크기 차이)에 따른 요청"],
           ["접수", `고객센터 ${TEL}, 평일 10:00 ~ 17:00`],
         ]}
       />
@@ -2065,7 +2065,7 @@ function BrandView() {
                 ["흙", "ㅎㅅ 지역 백토에 옹기토를 섞어 단단하게 만듭니다."],
                 ["굽기", "800도 초벌 후 유약을 입혀 1,250도에서 재벌합니다."],
                 ["유약", "백자, 청자, 흑유, 분청 네 가지를 작업실에서 직접 배합합니다."],
-                ["안전성", "납·카드뮴 용출 시험 불검출 (시험성적서 보유)"],
+                ["안전성", "납, 카드뮴 용출 시험 불검출 (시험성적서 보유)"],
                 ["사용", "식기세척기, 전자레인지 사용 가능. 첫 사용 전 쌀뜨물에 한 번 끓여 주세요."],
               ]}
             />
@@ -2082,13 +2082,13 @@ const NOTICES = [
   { title: "명절 연휴 배송 안내", ago: 12, body: "연휴 기간 주문은 연휴가 끝난 뒤 첫 영업일부터 순서대로 출고합니다. 연휴 전 마지막 출고는 연휴 전날 오후 2시 주문 건까지입니다." },
   { title: "흑유 머그 400ml 재입고 안내", ago: 19, body: "흑유 머그 400ml 재입고되었습니다. 수량이 많지 않아 조기 품절될 수 있습니다." },
   { title: "물레 체험 일정 안내", ago: 27, body: "매주 토요일 14:00, 16:00 두 차례 운영합니다. 예약은 전화로 받습니다." },
-  { title: "각인 상품 출고 일정 안내", ago: 38, body: "각인 상품은 주문 다음 영업일에 출고되며, 단순 변심 교환·반품이 불가합니다." },
+  { title: "각인 상품 출고 일정 안내", ago: 38, body: "각인 상품은 주문 다음 영업일에 출고되며, 단순 변심 교환, 반품이 불가합니다." },
 ];
 
 const FAQS = [
   { q: "교환이나 반품은 어떻게 하나요?", a: "상품 수령 후 7일 이내 고객센터로 접수해 주세요. 단순 변심은 왕복 배송비 7,000원을 부담하셔야 하며, 배송 중 파손은 수령 후 24시간 이내 사진과 함께 접수하시면 무상 교환해 드립니다." },
   { q: "각인 상품도 반품되나요?", a: "각인 상품은 다른 고객에게 판매할 수 없어 단순 변심 반품이 불가합니다. 배송 중 파손된 경우에는 같은 문구로 다시 제작해 보내 드립니다." },
-  { q: "배송은 얼마나 걸리나요?", a: "평일 오후 2시 이전 주문은 당일 출고하며, 이후 주문은 다음 영업일에 출고합니다. 출고 후 수도권 1일, 지방 1~2일, 제주·도서산간 2~3일이 걸립니다." },
+  { q: "배송은 얼마나 걸리나요?", a: "평일 오후 2시 이전 주문은 당일 출고하며, 이후 주문은 다음 영업일에 출고합니다. 출고 후 수도권 1일, 지방 1~2일, 제주, 도서산간 2~3일이 걸립니다." },
   { q: "사진과 색이 조금 다릅니다.", a: "수작업 제품 특성상 가마 안 위치에 따라 색상과 유약 흐름이 조금씩 다릅니다. 불량이 아니므로 이 사유로는 교환이 어렵습니다." },
   { q: "식기세척기에 넣어도 되나요?", a: "사용 가능합니다. 흑유는 거친 수세미를 쓰면 광택이 줄어드니 부드러운 면으로 세척해 주세요." },
 ];

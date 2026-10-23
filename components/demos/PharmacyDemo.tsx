@@ -166,18 +166,18 @@ function statusAt(minute: number): Status | null {
   y.setDate(now.getDate() - 1);
   const yp = planFor(y);
   if (yp.open && yp.to > 1440 && m < yp.to - 1440) {
-    return { state: "open", label: "영업중", sub: `공공심야약국 운영 · ${hhmm(yp.to - 1440)}까지`, late: true, duty: false, now: m, to: yp.to - 1440, next: nextOpen(0) };
+    return { state: "open", label: "영업중", sub: `공공심야약국 운영, ${hhmm(yp.to - 1440)}까지`, late: true, duty: false, now: m, to: yp.to - 1440, next: nextOpen(0) };
   }
   if (today.open && m >= today.from && m < today.to) {
     const late = !!today.late && m >= LATE_FROM;
-    const sub = late ? `공공심야약국 운영 · ${fmt(today.to)}까지` : today.duty ? `휴일지킴이약국 운영 · ${hhmm(today.to)}까지` : `오늘 ${rangeText(today)}`;
+    const sub = late ? `공공심야약국 운영, ${fmt(today.to)}까지` : today.duty ? `휴일지킴이약국 운영, ${hhmm(today.to)}까지` : `오늘 ${rangeText(today)}`;
     return { state: "open", label: "영업중", sub, late, duty: !!today.duty, now: m, to: today.to, next: nextOpen(1) };
   }
   if (today.open && m < today.from) {
     return { state: "before", label: "영업 전", sub: `오늘 ${hhmm(today.from)} 영업 시작`, late: false, duty: !!today.duty, now: m, to: today.to, next: { day: "오늘", from: today.from, to: today.to } };
   }
   const n = nextOpen(1);
-  const why = !today.open && today.note ? `${today.note} · ` : "";
+  const why = !today.open && today.note ? `${today.note}, ` : "";
   return { state: today.open ? "closed" : "off", label: today.open ? "영업 종료" : "휴무", sub: `${why}${n.day} ${hhmm(n.from)} 영업 시작`, late: false, duty: false, now: m, to: 0, next: n };
 }
 
@@ -580,7 +580,7 @@ function HoursPage({ minute }: { minute: number }) {
   const rows: [string, string][] = [
     ["평일 운영시간", "09:00 ~ 익일 01:00"],
     ["토요일 운영시간", "09:00 ~ 18:00"],
-    ["일요일 운영시간", "휴무 (둘째·넷째 일요일 10:00 ~ 18:00)"],
+    ["일요일 운영시간", "휴무 (둘째, 넷째 일요일 10:00 ~ 18:00)"],
     ["공휴일 운영시간", "휴무"],
     ["공공심야약국", "평일 22:00 ~ 익일 01:00"],
     ["정기휴무", "매주 일요일, 공휴일"],
@@ -688,7 +688,7 @@ const WEEK_ROWS: { label: string; days: number[]; time: string; note?: string }[
   { label: "목요일", days: [4], time: "09:00 ~ 익일 01:00", note: "22:00 이후 공공심야약국" },
   { label: "금요일", days: [5], time: "09:00 ~ 익일 01:00", note: "22:00 이후 공공심야약국" },
   { label: "토요일", days: [6], time: "09:00 ~ 18:00" },
-  { label: "일요일", days: [0], time: "휴무", note: "둘째·넷째 일요일 휴일지킴이약국 10:00 ~ 18:00" },
+  { label: "일요일", days: [0], time: "휴무", note: "둘째, 넷째 일요일 휴일지킴이약국 10:00 ~ 18:00" },
 ];
 
 function Hours({ minute }: { minute: number }) {
@@ -817,7 +817,7 @@ function Location() {
     ["전화번호", [TEL, "팩스 02-000-0001"]],
     ["주차", ["건물 지하 주차장 30분 무료 (약 수령 시 주차권 제공)"]],
     ["지하철", ["ㅎㅅ역 1번 출구에서 ㅅㄴ의원 방향 50m"]],
-    ["버스", ["ㅅㄴ의원 앞 정류장 하차, 간선 000 · 지선 0000"]],
+    ["버스", ["ㅅㄴ의원 앞 정류장 하차, 간선 000, 지선 0000"]],
   ];
   return (
     <Panel id="location" title="오시는 길" className="print:hidden">
@@ -1052,7 +1052,7 @@ function Prescription({ status }: { status: Status | null }) {
                   <p className="text-[15px] opacity-90">조제 번호</p>
                   <p className="text-[60px] font-bold leading-none tabular-nums">{ticket.no}</p>
                   <p className="mt-2 text-[15px] opacity-90">
-                    {ticket.name}님 · 수령 {ticket.at}
+                    {ticket.name}님, 수령 {ticket.at}
                   </p>
                 </div>
                 <div className="px-5 py-5">
@@ -1125,11 +1125,11 @@ const KINDS: { id: Kind; label: string }[] = [
 
 const CATS: { id: Cat | "all"; label: string }[] = [
   { id: "all", label: "전체" },
-  { id: "pain", label: "열·통증" },
+  { id: "pain", label: "열, 통증" },
   { id: "cold", label: "감기" },
   { id: "stomach", label: "소화" },
-  { id: "skin", label: "상처·피부" },
-  { id: "eyenose", label: "눈·코" },
+  { id: "skin", label: "상처, 피부" },
+  { id: "eyenose", label: "눈, 코" },
   { id: "etc", label: "기타" },
 ];
 
@@ -1249,7 +1249,7 @@ function Stock() {
               <span className="min-w-0 flex-1">
                 <span className="block font-semibold leading-[1.4]">{s.name}</span>
                 <span className="block text-[14px]" style={{ color: C.muted }}>
-                  {q && `${kindLabel(s.kind)} · `}
+                  {q && `${kindLabel(s.kind)}, `}
                   {s.use}
                 </span>
               </span>

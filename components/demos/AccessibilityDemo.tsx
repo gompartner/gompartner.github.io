@@ -39,13 +39,13 @@ interface Issue {
 
 const ISSUES: Issue[] = [
   { id: 1, item: "적절한 대체 텍스트 제공", region: "banner", problem: "로고와 배너 이미지에 대체 텍스트가 없어 화면낭독기가 파일명을 읽습니다.", fix: "이미지별로 의미를 전달하는 대체 텍스트를 제공했습니다." },
-  { id: 2, item: "정지 기능 제공", region: "banner", problem: "배너가 3초마다 자동으로 넘어가고 멈출 방법이 없습니다.", fix: "정지·재생, 이전·다음 버튼을 제공하고, 동작 줄이기 설정 시 자동 전환을 중지했습니다." },
+  { id: 2, item: "정지 기능 제공", region: "banner", problem: "배너가 3초마다 자동으로 넘어가고 멈출 방법이 없습니다.", fix: "정지, 재생, 이전, 다음 버튼을 제공하고, 동작 줄이기 설정 시 자동 전환을 중지했습니다." },
   { id: 3, item: "반복 영역 건너뛰기", region: "header", problem: "키보드 사용 시 페이지마다 메뉴 전체를 거쳐야 본문으로 이동할 수 있습니다.", fix: "페이지 첫 부분에 본문 바로가기 링크를 제공했습니다." },
-  { id: 4, item: "초점 이동과 표시", region: "header", problem: "키보드 초점 표시가 제거되어 현재 초점 위치를 알 수 없습니다.", fix: "링크·버튼·입력란에 초점 테두리를 표시했습니다." },
+  { id: 4, item: "초점 이동과 표시", region: "header", problem: "키보드 초점 표시가 제거되어 현재 초점 위치를 알 수 없습니다.", fix: "링크, 버튼, 입력란에 초점 테두리를 표시했습니다." },
   { id: 5, item: "텍스트 콘텐츠의 명도 대비", region: "notice", problem: "공지 제목과 날짜가 연한 회색으로 명도 대비가 2:1 수준입니다.", fix: "글자와 배경의 명도 대비를 4.5:1 이상으로 높였습니다." },
   { id: 6, item: "적절한 링크 텍스트", region: "notice", problem: "링크 문구가 '여기를 클릭'이라 어디로 가는지 알 수 없습니다.", fix: "링크 목적을 알 수 있는 문구('공지사항 전체 보기')로 수정했습니다." },
-  { id: 7, item: "표의 구성", region: "schedule", problem: "행사 일정 표에 표 제목과 제목 셀이 없습니다.", fix: "표 제목과 행·열 제목 셀을 지정했습니다." },
-  { id: 8, item: "색에 무관한 콘텐츠 인식", region: "schedule", problem: "접수 상태를 초록·빨강 점으로만 구분합니다.", fix: "상태를 글자와 아이콘으로 함께 표시했습니다." },
+  { id: 7, item: "표의 구성", region: "schedule", problem: "행사 일정 표에 표 제목과 제목 셀이 없습니다.", fix: "표 제목과 행, 열 제목 셀을 지정했습니다." },
+  { id: 8, item: "색에 무관한 콘텐츠 인식", region: "schedule", problem: "접수 상태를 초록, 빨강 점으로만 구분합니다.", fix: "상태를 글자와 아이콘으로 함께 표시했습니다." },
   { id: 9, item: "레이블 제공", region: "form", problem: "입력란에 레이블 없이 placeholder만 있어 입력 시 항목명이 사라집니다.", fix: "모든 입력란에 레이블을 연결했습니다." },
   { id: 10, item: "오류 정정", region: "form", problem: "필수 항목 누락 시 오류 안내 없이 신청이 처리되지 않습니다.", fix: "누락 항목을 입력란 아래와 오류 요약에 표시하고, 첫 번째 오류 항목으로 초점을 옮겼습니다." },
   { id: 11, item: "제목 제공", region: "header", alreadyOk: true, problem: "페이지와 영역마다 제목이 있습니다.", fix: "기존 구조를 유지했습니다." },
@@ -321,7 +321,7 @@ function SamplePage({
           {/* eslint-disable-next-line @next/next/no-img-element */}
           <img src="/images/demo-a11y/logo.svg" alt={good ? "곰파트너 문화재단 샘플" : undefined} width={212} height={44} className="h-9 w-auto" />
           <nav aria-label={good ? "주 메뉴" : undefined} className="flex flex-wrap gap-x-4 gap-y-1 text-[15px] font-bold text-[#2b1a33]">
-            {["재단소개", "공연·전시", "교육", "지원사업", "알림마당"].map((m) => (
+            {["재단소개", "공연, 전시", "교육", "지원사업", "알림마당"].map((m) => (
               <a key={m} href="#sample-main" onClick={(e) => e.preventDefault()} className="rounded px-1 py-0.5 hover:text-[#6b2d8c]">
                 {m}
               </a>
@@ -507,7 +507,7 @@ function ApplyForm({ good }: { good: boolean }) {
     if (!values.name.trim()) next.name = "성명은 필수 입력 항목입니다.";
     if (!/^01\d-?\d{3,4}-?\d{4}$/.test(values.phone.trim())) next.phone = "연락처 형식이 올바르지 않습니다. (예: 010-0000-0000)";
     if (!values.event) next.event = "행사명은 필수 선택 항목입니다.";
-    if (!values.agree) next.agree = "개인정보 수집·이용에 동의해야 신청할 수 있습니다.";
+    if (!values.agree) next.agree = "개인정보 수집, 이용에 동의해야 신청할 수 있습니다.";
     setErrors(next);
     const first = (Object.keys(next) as (keyof FormErrors)[])[0];
     if (first) {
@@ -561,7 +561,7 @@ function ApplyForm({ good }: { good: boolean }) {
             <div className="sm:col-span-2">
               <label className="flex items-center gap-2 text-[15px]">
                 <input id="f-agree" type="checkbox" checked={values.agree} onChange={(e) => setValues((v) => ({ ...v, agree: e.target.checked }))} aria-invalid={Boolean(errors.agree)} className="h-5 w-5" />
-                개인정보 수집·이용에 동의합니다. (필수)
+                개인정보 수집, 이용에 동의합니다. (필수)
               </label>
               {errors.agree && <p className="mt-1 text-[15px] text-[#8c1a10]">{errors.agree}</p>}
             </div>

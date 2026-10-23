@@ -55,7 +55,7 @@ const PRODUCTS: {
     id: "direct",
     name: "직수 정수기 S",
     short: "정수기",
-    kind: "정수·냉수",
+    kind: "정수, 냉수",
     price: { 3: 25900, 5: 21900 },
     visit: "4개월마다 방문",
     points: ["물통 없이 바로 나오는 직수형", "폭 17cm, 싱크대 옆에 들어가는 크기"],
@@ -64,10 +64,10 @@ const PRODUCTS: {
     id: "hotcold",
     name: "냉온정수기 M",
     short: "냉온정수기",
-    kind: "정수·냉수·온수",
+    kind: "정수, 냉수, 온수",
     price: { 3: 32900, 5: 27900 },
     visit: "4개월마다 방문",
-    points: ["온수 잠금 버튼", "40·70·85도 온수 온도 선택"],
+    points: ["온수 잠금 버튼", "40, 70, 85도 온수 온도 선택"],
   },
   {
     id: "air",
@@ -184,7 +184,7 @@ function Hero({
         <div className="mt-8 grid items-center gap-10 md:mt-12 md:grid-cols-[1.15fr_1fr]">
           <div>
             <p className="inline-flex items-center gap-2 rounded-full px-3 py-1 text-[14px] font-bold" style={{ background: C.sun, color: C.ink }}>
-              설치비 0원 · 이번 달 신청
+              설치비 0원, 이번 달 신청
             </p>
             <h1 id="wr-hero-title" className="mt-5 text-[40px] font-black leading-[1.12] tracking-[-0.04em] md:text-[64px]">
               정수기 렌탈
@@ -473,10 +473,10 @@ function VisitRow({ label, every }: { label: string; every: number }) {
 
 /* 신청 완료 뒤 사장님 시트에 미리 쌓여 있는 가상 접수. */
 const PAST_LEADS: LeadRow[] = [
-  { at: "오늘 13:05", name: "정ㅁ석", digits: "01039184406", summary: "냉온정수기 M · 5년", source: "네이버 검색광고", status: "통화함" },
-  { at: "오늘 10:41", name: "박ㅅ연", digits: "01072615503", summary: "직수 정수기 S · 3년", source: "메타 광고", status: "통화 전" },
-  { at: "어제 19:22", name: "박ㅅ연", digits: "01072615503", summary: "직수 정수기 S · 5년", source: "메타 광고", status: "보류" },
-  { at: "어제 11:58", name: "김ㅎ늘", digits: "01088420917", summary: "공기청정기 A · 5년", source: "블로그", status: "계약" },
+  { at: "오늘 13:05", name: "정ㅁ석", digits: "01039184406", summary: "냉온정수기 M, 5년", source: "네이버 검색광고", status: "통화함" },
+  { at: "오늘 10:41", name: "박ㅅ연", digits: "01072615503", summary: "직수 정수기 S, 3년", source: "메타 광고", status: "통화 전" },
+  { at: "어제 19:22", name: "박ㅅ연", digits: "01072615503", summary: "직수 정수기 S, 5년", source: "메타 광고", status: "보류" },
+  { at: "어제 11:58", name: "김ㅎ늘", digits: "01088420917", summary: "공기청정기 A, 5년", source: "블로그", status: "계약" },
 ];
 
 function ApplyForm({
@@ -563,7 +563,7 @@ function ApplyForm({
                 business="곰파트너"
                 name={done.rawName}
                 phone={done.phone}
-                summary={`${PRODUCTS.filter((p) => picked.includes(p.id)).map((p) => p.name).join(", ")} · ${term}년`}
+                summary={`${PRODUCTS.filter((p) => picked.includes(p.id)).map((p) => p.name).join(", ")}, ${term}년`}
                 lines={[
                   ["관심 제품", PRODUCTS.filter((p) => picked.includes(p.id)).map((p) => p.name).join(", ")],
                   ["통화 시간", time],

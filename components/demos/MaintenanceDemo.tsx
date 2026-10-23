@@ -102,14 +102,14 @@ const SEED_REQUESTS: StoredRequest[] = [
   { id: "r07", no: 7, date: 24, dept: "입학처", requester: "박ㅅ연", type: "기능 개선", title: "입학 상담 신청 항목 추가", content: "상담 신청 양식에 희망 학과 선택 항목 추가를 요청합니다.", status: "처리완료", resolution: "희망 학과 선택 항목과 관리자 목록 열을 추가했습니다.", doneDate: 19 },
   { id: "r06", no: 6, date: 26, dept: "홍보팀", requester: "한ㅇ린", type: "콘텐츠 수정", title: "대학 소개 영상 교체", content: "메인 소개 영상을 올해 버전으로 교체 요청합니다.", status: "처리완료", resolution: "영상 링크와 썸네일을 교체했습니다.", doneDate: 25 },
   { id: "r05", no: 5, date: 28, dept: "학생지원처", requester: "최ㅈ우", type: "오류 수정", title: "상담 예약 페이지 접속 오류", content: "상담 예약 페이지가 간헐적으로 열리지 않습니다.", status: "처리완료", resolution: "세션 설정을 수정하고 3일간 모니터링했습니다.", doneDate: 25 },
-  { id: "r04", no: 4, date: 33, dept: "교무처", requester: "김ㅎ늘", type: "콘텐츠 수정", title: "휴·복학 안내 문구 수정", content: "신청 기간 문구 수정을 요청합니다.", status: "처리완료", resolution: "안내 문구를 수정했습니다.", doneDate: 33 },
+  { id: "r04", no: 4, date: 33, dept: "교무처", requester: "김ㅎ늘", type: "콘텐츠 수정", title: "휴, 복학 안내 문구 수정", content: "신청 기간 문구 수정을 요청합니다.", status: "처리완료", resolution: "안내 문구를 수정했습니다.", doneDate: 33 },
   { id: "r03", no: 3, date: 40, dept: "정보전산원", requester: "정ㅁ호", type: "보안 조치", title: "SSL 인증서 갱신", content: "인증서 만료 전 갱신 요청입니다.", status: "처리완료", resolution: "인증서를 갱신하고 만료일을 확인했습니다.", doneDate: 39 },
 ];
 
 const SEED_CHECKS: CheckItem[] = [
   { id: "server", label: "서버 가동 상태", result: "정상", note: "가동률 99.97%, 12분 지연 1회" },
   { id: "links", label: "링크 오류 점검", result: "조치 필요", note: "학과 페이지 외부 링크 3건 수정 예정" },
-  { id: "patch", label: "보안 패치 적용", result: "정상", note: "웹 서버·CMS 최신 보안 패치 적용" },
+  { id: "patch", label: "보안 패치 적용", result: "정상", note: "웹 서버, CMS 최신 보안 패치 적용" },
   { id: "backup", label: "백업 상태", result: "정상", note: "일일 백업 30회 성공, 복원 테스트 완료" },
   { id: "ssl", label: "SSL 인증서 만료일", result: "정상", note: "1년 인증서 갱신 완료" },
   { id: "a11y", label: "웹 접근성 점검", result: "조치 필요", note: "이미지 대체 텍스트 누락 5건" },
@@ -669,7 +669,7 @@ export function MaintenanceDemo() {
                   <h2 className="text-[22px] font-bold">월간 점검 보고서</h2>
                   <button type="button" onClick={() => window.print()} className={`${primaryBtn} ml-auto`}>
                     <Printer size={18} aria-hidden />
-                    인쇄·PDF 저장
+                    인쇄, PDF 저장
                   </button>
                 </div>
                 <div className="mx-auto w-full max-w-[794px] [container-type:inline-size]">

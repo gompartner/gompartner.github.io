@@ -1014,7 +1014,7 @@ function ReserveSection({
               )}
 
               <p className="mt-6 text-[16px]">
-                <span style={{ color: C.muted }}>고른 시간 </span>
+                <span style={{ color: C.muted }}>선택한 시간 </span>
                 <strong className="tabular-nums">{slot == null ? "-" : `${fmtKo(day)} ${hm(slot)}`}</strong>
               </p>
               {err && (

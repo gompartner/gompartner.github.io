@@ -82,7 +82,7 @@ const EASE = [0.22, 1, 0.36, 1] as const;
 const HOURS: [string, string][] = [
   ["평일", "09:00~18:00"],
   ["토요일", "09:00~13:00"],
-  ["일요일·공휴일", "휴무"],
+  ["일요일, 공휴일", "휴무"],
 ];
 
 /* ---------- 메뉴 ---------- */
@@ -113,8 +113,8 @@ const SIZES: { id: Size | "all"; label: string }[] = [
 const WORKS: { id: Work | "all"; label: string }[] = [
   { id: "all", label: "전체 공사" },
   { id: "full", label: "전체 리모델링" },
-  { id: "part", label: "욕실·주방" },
-  { id: "paper", label: "도배·바닥" },
+  { id: "part", label: "욕실, 주방" },
+  { id: "paper", label: "도배, 바닥" },
 ];
 
 const workLabel = (w: Work) => WORKS.find((v) => v.id === w)!.label;
@@ -163,7 +163,7 @@ const CASES: Case[] = [
     title: "24평 욕실 리모델링",
     img: `${IMG}/case3.jpg`,
     days: 5,
-    scope: ["욕실 철거", "방수 2회", "벽·바닥 타일", "젠다이", "도기·수전 교체", "천장재"],
+    scope: ["욕실 철거", "방수 2회", "벽, 바닥 타일", "젠다이", "도기, 수전 교체", "천장재"],
     body: "욕조를 빼고 샤워 공간으로 바꿨습니다. 방수는 두 번 바르고 하루 담수 시험을 한 뒤 타일을 붙였습니다.",
     ago: 9,
     views: 64,
@@ -202,7 +202,7 @@ const CASES: Case[] = [
     apt: "ㅍㄹ빌라",
     pyeong: 18,
     work: "paper",
-    title: "18평 도배·장판",
+    title: "18평 도배, 장판",
     img: `${IMG}/case1.jpg`,
     pos: "20% 50%",
     days: 2,
@@ -232,7 +232,7 @@ const CASES: Case[] = [
     apt: "ㄹㄷ아파트",
     pyeong: 33,
     work: "paper",
-    title: "33평 도배·강마루",
+    title: "33평 도배, 강마루",
     img: `${IMG}/hero.jpg`,
     pos: "30% 60%",
     days: 4,
@@ -331,10 +331,10 @@ const NOTICES: Notice[] = [
 
 /* ---------- 견적문의 선택지 ---------- */
 
-const HOUSE_TYPES = ["아파트", "빌라", "단독주택", "상가·기타"];
+const HOUSE_TYPES = ["아파트", "빌라", "단독주택", "상가, 기타"];
 const PYEONGS = ["20평 미만", "20평대", "30평대", "40평대", "50평 이상"];
 const LIVING = ["빈집", "거주 중"];
-const WORK_ITEMS = ["전체 리모델링", "철거", "샷시·발코니 확장", "목공(몰딩·중문)", "도배", "바닥(마루·장판·타일)", "욕실", "주방(싱크대)", "전기·조명", "붙박이장·수납"];
+const WORK_ITEMS = ["전체 리모델링", "철거", "샷시, 발코니 확장", "목공(몰딩, 중문)", "도배", "바닥(마루, 장판, 타일)", "욕실", "주방(싱크대)", "전기, 조명", "붙박이장, 수납"];
 const WHEN = ["1개월 안", "1~3개월 안", "3~6개월 안", "날짜 미정"];
 const BUDGETS = ["1천만 원 미만", "1천~3천만 원", "3천~5천만 원", "5천~7천만 원", "7천만 원 이상", "상담 후 정하겠습니다"];
 const CALL_TIMES = ["언제든", "오전", "오후", "저녁 6시 이후"];
@@ -666,7 +666,7 @@ function Home({ ctx }: { ctx: Ctx }) {
         <div className="flex items-center px-4 py-10 md:px-10 lg:order-1 lg:py-14" style={{ background: C.paper }}>
           <div className="max-w-[460px] lg:ml-auto lg:mr-4">
             <p className="text-[15px] font-semibold" style={{ color: C.wood }}>
-              ㅅㅍ구 아파트·빌라 리모델링
+              ㅅㅍ구 아파트, 빌라 리모델링
             </p>
             <h1 id="it-title" tabIndex={-1} className="mt-3 text-[32px] font-bold leading-[1.3] tracking-[-0.03em] outline-none md:text-[42px]">
               도배 한 칸부터
@@ -726,8 +726,8 @@ function Home({ ctx }: { ctx: Ctx }) {
             {(
               [
                 { w: "full", icon: Hammer, name: "전체 리모델링", what: "철거, 샷시, 목공, 전기, 욕실, 주방, 도배, 바닥", term: "30평대 4~5주" },
-                { w: "part", icon: Bath, name: "욕실·주방", what: "욕실 방수·타일·도기, 싱크대·상판·주방 타일", term: "욕실 1곳 4~5일, 주방 3~4일" },
-                { w: "paper", icon: PaintRoller, name: "도배·바닥", what: "실크·합지 도배, 강마루, 장판, 포세린 타일", term: "30평대 2~4일" },
+                { w: "part", icon: Bath, name: "욕실, 주방", what: "욕실 방수, 타일, 도기, 싱크대, 상판, 주방 타일", term: "욕실 1곳 4~5일, 주방 3~4일" },
+                { w: "paper", icon: PaintRoller, name: "도배, 바닥", what: "실크, 합지 도배, 강마루, 장판, 포세린 타일", term: "30평대 2~4일" },
               ] as const
             ).map(({ w, icon: Icon, name, what, term }) => (
               <li key={w} style={{ borderColor: C.line }}>
@@ -1098,7 +1098,7 @@ function CaseModal({ item, today, onClose }: { item: Case | null; today: Date; o
             <div className="sticky top-0 z-10 flex items-start justify-between gap-3 border-b bg-white px-5 py-4 md:px-7" style={{ borderColor: C.line }}>
               <div className="min-w-0">
                 <p className="text-[14px] font-semibold" style={{ color: C.wood }}>
-                  {workLabel(item.work)} · {item.town}
+                  {workLabel(item.work)}, {item.town}
                 </p>
                 <h2 id="it-case-title" className="text-[20px] font-bold leading-[1.4] md:text-[24px]">
                   {item.apt} {item.title}
@@ -1211,7 +1211,7 @@ function AboutPage({ go }: { go: Go }) {
                   ["설비, 방수, 욕실 타일", "10년 넘게 함께한 전문팀"],
                   ["전기, 조명", "전기공사업 등록 업체"],
                   ["샷시", "제조사 대리점 시공"],
-                  ["도배, 마루, 장판", "전문 도배·바닥팀"],
+                  ["도배, 마루, 장판", "전문 도배, 바닥팀"],
                   ["싱크대, 붙박이장", "제작 공장 직접 발주"],
                 ] as const
               ).map(([a, b]) => (
@@ -1262,25 +1262,25 @@ function AboutPage({ go }: { go: Go }) {
 /* ---------- 시공과정, A/S ---------- */
 
 const STEPS: { name: string; when: string; what: string }[] = [
-  { name: "상담 문의", when: "전화·견적문의", what: "평형과 원하는 공사를 여쭙고 실측 날짜를 잡습니다." },
+  { name: "상담 문의", when: "전화, 견적문의", what: "평형과 원하는 공사를 여쭙고 실측 날짜를 잡습니다." },
   { name: "현장 실측", when: "문의 후 2~3일 안", what: "대표가 방문해 치수를 재고 배관, 전기, 샷시 상태를 봅니다." },
-  { name: "견적·계약", when: "실측 후 3일 안", what: "공정별 견적서를 드리고, 조정이 끝나면 계약서를 씁니다." },
+  { name: "견적, 계약", when: "실측 후 3일 안", what: "공정별 견적서를 드리고, 조정이 끝나면 계약서를 씁니다." },
   { name: "자재 선정", when: "착공 2주 전", what: "쇼룸에서 타일, 마루, 벽지, 도기 샘플을 같이 고릅니다." },
   { name: "공사 진행", when: "착공일부터", what: "관리사무소 신고와 보양을 하고, 공정마다 사진을 보내 드립니다." },
-  { name: "준공·A/S", when: "공사 마지막 날", what: "같이 둘러보며 손볼 곳을 적고, A/S 보증서를 드립니다." },
+  { name: "준공, A/S", when: "공사 마지막 날", what: "같이 둘러보며 손볼 곳을 적고, A/S 보증서를 드립니다." },
 ];
 
 const WEEKS = ["1주", "2주", "3주", "4주", "5주"];
 const GANTT: { work: string; from: number; to: number }[] = [
-  { work: "철거·폐기물", from: 0, to: 0.4 },
-  { work: "설비·방수", from: 0.3, to: 1.2 },
+  { work: "철거, 폐기물", from: 0, to: 0.4 },
+  { work: "설비, 방수", from: 0.3, to: 1.2 },
   { work: "샷시", from: 0.6, to: 1.0 },
-  { work: "목공·전기", from: 1.0, to: 2.2 },
+  { work: "목공, 전기", from: 1.0, to: 2.2 },
   { work: "욕실 타일", from: 1.6, to: 2.6 },
-  { work: "도장·필름", from: 2.2, to: 3.0 },
+  { work: "도장, 필름", from: 2.2, to: 3.0 },
   { work: "도배", from: 3.0, to: 3.5 },
   { work: "바닥", from: 3.4, to: 3.9 },
-  { work: "가구·조명", from: 3.8, to: 4.4 },
+  { work: "가구, 조명", from: 3.8, to: 4.4 },
   { work: "입주청소", from: 4.4, to: 4.6 },
 ];
 
@@ -1505,7 +1505,7 @@ function QuotePage({ today, onSubmit, count }: { today: Date; onSubmit: (q: Inqu
     if (!f.pyeong) er.pyeong = "평형을 골라 주세요.";
     if (!f.works.length) er.works = "공사 종류를 하나 이상 골라 주세요.";
     if (!f.when) er.when = "희망 시기를 골라 주세요.";
-    if (!f.agree) er.agree = "개인정보 수집·이용에 동의해 주세요.";
+    if (!f.agree) er.agree = "개인정보 수집, 이용에 동의해 주세요.";
     setErrors(er);
     const first = FIELD_ORDER.find((k) => er[k]);
     if (first) {
@@ -1622,7 +1622,7 @@ ${done.name} ${done.phone}
 ${done.town} ${done.pyeong} ${done.living}
 ${done.works.join(", ")}
 희망 ${done.when} / 예산 ${done.budget}
-사진 ${done.photos}장 · 통화 ${f.callTime}`}
+사진 ${done.photos}장, 통화 ${f.callTime}`}
                       </p>
                     </div>
                     <div className="rounded-[10px] border p-4" style={{ borderColor: C.line }}>
@@ -1886,7 +1886,7 @@ ${done.works.join(", ")}
                     <label className="flex cursor-pointer items-start gap-2.5 text-[16px] font-semibold">
                       <input id="q-agree" type="checkbox" checked={f.agree} onChange={(e) => set("agree", e.target.checked)} className="mt-1 h-5 w-5 shrink-0 accent-[#24433b]" {...aria("agree")} />
                       <span>
-                        개인정보 수집·이용에 동의합니다.
+                        개인정보 수집, 이용에 동의합니다.
                         <Req />
                       </span>
                     </label>
@@ -1897,7 +1897,7 @@ ${done.works.join(", ")}
                   {showTerms && (
                     <dl id="q-terms" className="mt-3 grid grid-cols-[88px_1fr] gap-x-3 gap-y-1.5 border-t pt-3 text-[14px]" style={{ borderColor: C.line, color: C.muted }}>
                       <dt className="font-semibold">수집 항목</dt>
-                      <dd>성명, 연락처, 시공 주소(동·단지), 현장 사진</dd>
+                      <dd>성명, 연락처, 시공 주소(동, 단지), 현장 사진</dd>
                       <dt className="font-semibold">이용 목적</dt>
                       <dd>견적 상담, 현장 실측 일정 안내</dd>
                       <dt className="font-semibold">보관 기간</dt>
@@ -2023,7 +2023,7 @@ function NoticePage({ ctx, anchor }: { ctx: Ctx; anchor?: string }) {
                       </span>
                       <span className="text-[14px] tabular-nums md:text-center" style={{ color: C.muted }}>
                         {fmtDot(daysAgo(today, n.ago))}
-                        <span className="md:hidden"> · 조회 {n.views + (views[n.id] ?? 0)}</span>
+                        <span className="md:hidden">, 조회 {n.views + (views[n.id] ?? 0)}</span>
                       </span>
                       <span className="hidden text-center text-[14px] tabular-nums md:block" style={{ color: C.muted }}>
                         {n.views + (views[n.id] ?? 0)}
@@ -2275,11 +2275,11 @@ function AdminInbox({ inquiries }: { inquiries: Inquiry[] }) {
               {q.phone}
             </span>
             <span className="ml-auto text-[14px] tabular-nums" style={{ color: q.ago === 0 ? C.forest : C.muted }}>
-              {q.ago === 0 ? "방금 접수" : `${q.ago}일 전`} · {q.no}
+              {q.ago === 0 ? "방금 접수" : `${q.ago}일 전`}, {q.no}
             </span>
           </div>
           <p className="mt-1.5 break-keep text-[15px]">
-            {q.town} · {q.house} {q.pyeong} · {q.living}
+            {q.town}, {q.house} {q.pyeong}, {q.living}
           </p>
           <p className="break-keep text-[15px]" style={{ color: C.muted }}>
             {q.works.join(", ")} / 희망 {q.when} / 예산 {q.budget} / 사진 {q.photos}장
@@ -2341,7 +2341,7 @@ function CaseWriter({ nextId, onDone }: { nextId: number; onDone: (c: Case) => v
     <form onSubmit={submit} noValidate className="grid gap-5 sm:grid-cols-2">
       <div>
         <label htmlFor="a-town" className="font-bold">
-          구·동
+          구, 동
         </label>
         <input id="a-town" value={town} onChange={(e) => setTown(e.target.value)} placeholder="ㅅㅍ구 ㄱㄷ동" className={inp} style={{ borderColor: C.lineDark }} />
       </div>

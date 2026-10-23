@@ -128,7 +128,7 @@ const MENUS: { id: MenuId; label: L; subs: { id: string; label: L }[] }[] = [
       { id: "semi", label: l("반도체 장비", "Semiconductor") },
       { id: "medical", label: l("의료기기", "Medical") },
       { id: "battery", label: l("2차전지 장비", "Battery Equipment") },
-      { id: "robot", label: l("로봇·자동화", "Robotics") },
+      { id: "robot", label: l("로봇, 자동화", "Robotics") },
     ],
   },
   {
@@ -143,7 +143,7 @@ const MENUS: { id: MenuId; label: L; subs: { id: string; label: L }[] }[] = [
 
 const COMPANY = l("곰파트너", "Gompartner");
 const ADDRESS = l("ㅎㄷ시 ㅁㄹ구 ㅅㄴ산단로 00", "00 SN-sandan-ro, MR-gu, HD-si");
-const HOURS = l("평일 08:30 ~ 17:30, 토·일·공휴일 휴무", "Weekdays 08:30 to 17:30, closed on weekends and holidays");
+const HOURS = l("평일 08:30 ~ 17:30, 토, 일, 공휴일 휴무", "Weekdays 08:30 to 17:30, closed on weekends and holidays");
 
 /* ---------- 도우미 ---------- */
 
@@ -208,7 +208,7 @@ const MACHINES: Machine[] = [
 
 const MEASURES: { name: L; maker: L; range: L; acc: L; count: number; year: number }[] = [
   { name: l("3차원 측정기 CMM-7106", "CMM 7106"), maker: l("ㄴㄹ (독일)", "NR (Germany)"), range: l("X700 × Y1,000 × Z600 mm", "X700 × Y1,000 × Z600 mm"), acc: l("1.9 + L/300 µm", "1.9 + L/300 µm"), count: 1, year: 2022 },
-  { name: l("윤곽·표면 거칠기 측정기", "Contour and roughness tester"), maker: l("ㅈㅇ (일본)", "JY (Japan)"), range: l("측정 길이 100 mm", "Stroke 100 mm"), acc: l("Ra 0.01 µm까지", "Down to Ra 0.01 µm"), count: 1, year: 2022 },
+  { name: l("윤곽, 표면 거칠기 측정기", "Contour and roughness tester"), maker: l("ㅈㅇ (일본)", "JY (Japan)"), range: l("측정 길이 100 mm", "Stroke 100 mm"), acc: l("Ra 0.01 µm까지", "Down to Ra 0.01 µm"), count: 1, year: 2022 },
   { name: l("비접촉 영상 측정기", "Vision measuring system"), maker: l("ㄷㄹ (국내)", "DR (Korea)"), range: l("X300 × Y200 mm", "X300 × Y200 mm"), acc: l("±2.5 µm", "±2.5 µm"), count: 1, year: 2023 },
   { name: l("하이트 게이지", "Height gauge"), maker: l("ㅈㅇ (일본)", "JY (Japan)"), range: l("높이 600 mm", "Height 600 mm"), acc: l("±1.1 µm", "±1.1 µm"), count: 2, year: 2017 },
 ];
@@ -230,7 +230,7 @@ const PR_CATS: Record<PrCat, L> = {
   semi: l("반도체 장비", "Semiconductor"),
   medical: l("의료기기", "Medical"),
   battery: l("2차전지 장비", "Battery equipment"),
-  robot: l("로봇·자동화", "Robotics"),
+  robot: l("로봇, 자동화", "Robotics"),
 };
 
 const HISTORY: { year: number; items: L[] }[] = [
@@ -1068,7 +1068,7 @@ function Overview() {
     [x("설립", "Founded"), x("2009년 3월 (2012년 법인 전환)", "March 2009 (incorporated 2012)")],
     [x("직원", "Employees"), x("46명", "46")],
     [x("주요 사업", "Business"), x("CNC 선반, MCT, 5축 정밀부품 가공", "CNC turning, MCT and 5-axis precision machining")],
-    [x("주요 고객 산업", "Industries"), x("반도체 장비, 의료기기, 2차전지 장비, 로봇·자동화", "Semiconductor equipment, medical devices, battery equipment, robotics")],
+    [x("주요 고객 산업", "Industries"), x("반도체 장비, 의료기기, 2차전지 장비, 로봇, 자동화", "Semiconductor equipment, medical devices, battery equipment, robotics")],
     [x("보유 설비", "Equipment"), x(`가공 설비 ${MACHINE_TOTAL}대, 측정 설비 ${MEASURES.reduce((n, v) => n + v.count, 0)}대`, `${MACHINE_TOTAL} machines, ${MEASURES.reduce((n, v) => n + v.count, 0)} measuring instruments`)],
     [x("사업장", "Plant"), x("대지 3,300㎡, 건물 2,150㎡ (항온 가공실, 3차원 측정실)", "Site 3,300 m², building 2,150 m² (temperature-controlled room, CMM room)")],
     [x("인증", "Certifications"), "ISO 9001, ISO 14001, ISO 13485"],
@@ -1140,7 +1140,7 @@ function Location() {
   const dock: [string, string, string][] = [
     [x("평일", "Weekdays"), "08:30 ~ 17:00", x("점심 12:00 ~ 13:00 하역 쉼", "No unloading 12:00 to 13:00")],
     [x("토요일", "Saturday"), "09:00 ~ 12:00", x("전날까지 예약한 차량만", "Booked by the day before only")],
-    [x("일요일·공휴일", "Sun, holidays"), x("하역 없음", "Closed"), ""],
+    [x("일요일, 공휴일", "Sun, holidays"), x("하역 없음", "Closed"), ""],
   ];
 
   return (
@@ -1974,7 +1974,7 @@ function Quote() {
     if (due && new Date(`${due}T00:00:00`) < tomorrow) next.due = x("희망 납기는 내일 이후 날짜로 선택해 주십시오.", "Choose a date from tomorrow onward.");
     if (memo.trim().length < 10) next.content = x("문의내용을 입력해 주십시오.", "Enter at least 10 characters.");
     if (errors.file) next.file = errors.file;
-    if (!agree) next.agree = x("개인정보 수집·이용에 동의해 주십시오.", "Please agree to the collection of personal data.");
+    if (!agree) next.agree = x("개인정보 수집, 이용에 동의해 주십시오.", "Please agree to the collection of personal data.");
     setErrors(next);
     const order: Field[] = ["company", "person", "phone", "email", "subject", "due", "content", "file", "agree"];
     const first = order.find((f) => next[f]);
@@ -2192,7 +2192,7 @@ function Quote() {
                   </p>
                   <label className="mt-2 flex cursor-pointer items-start gap-2.5 text-[15px]">
                     <input id="q-agree" type="checkbox" checked={agree} onChange={(e) => setAgree(e.target.checked)} className="mt-1 h-5 w-5 shrink-0 accent-[#1e2329]" {...aria("agree")} />
-                    <span>{x("개인정보 수집·이용에 동의합니다.", "I agree to the collection and use of personal data.")}</span>
+                    <span>{x("개인정보 수집, 이용에 동의합니다.", "I agree to the collection and use of personal data.")}</span>
                   </label>
                   {errText("agree")}
                 </div>
