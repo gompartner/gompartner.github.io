@@ -18,7 +18,7 @@ import { DemoMakerInfo } from "@/components/demos/DemoMakerInfo";
 
    첫 화면의 지점 사진 자리에 실시간 좌석 평면도를 둔다. 좌석 점유가 몇 초마다 한두 자리씩 바뀌고
    옆 "지금 빈 자리" 숫자가 세로로 굴러 바뀐다. 롤링 숫자는 이 숫자판 한 곳에만 쓰고 요금은 바로 바뀐다.
-   빈 자리는 테두리만, 찬 자리는 채움으로 색과 모양을 같이 구분한다.
+   빈 자리는 테두리만, 찬 자리는 남색 채움, 고른 유형의 빈 자리는 노랑 채움으로 구분한다.
 
    상호작용(모두 브라우저 안에서만 돈다. 실제로 보내지 않는다)
    1. 좌석 유형 고르기: 자유석, 지정석, 1인실, 4인실 중 하나를 누르거나 평면도의 자리를 직접 누르면 그 유형만 밝아진다.
@@ -59,6 +59,10 @@ const C = {
   edge: "#d0d0d0",
   paper: "#f7f7f5",
   error: "#b42318",
+  /** 고른 유형의 빈 자리. 사용 중(남색 채움)과 헷갈리지 않게 따뜻한 노랑 */
+  pick: "#ffe08a",
+  pickEdge: "#a86b00",
+  pickSoft: "#fff6d9",
 };
 
 const focusRing = "focus-visible:outline focus-visible:outline-[3px] focus-visible:outline-offset-2";
@@ -320,6 +324,12 @@ export function CoworkingDemo() {
                 <span aria-hidden className="inline-block h-3.5 w-3.5 rounded-[3px]" style={{ background: C.accent }} />
                 사용 중
               </span>
+              {selected && (
+                <span className="inline-flex items-center gap-1.5" style={{ color: C.ink }}>
+                  <span aria-hidden className="inline-block h-3.5 w-3.5 rounded-[3px] border" style={{ background: C.pick, borderColor: C.pickEdge }} />
+                  고른 {selected} 빈 자리
+                </span>
+              )}
               <span className="ml-auto">
                 {fmtKo(today)} 평일 09:00~21:00
               </span>
@@ -347,10 +357,10 @@ export function CoworkingDemo() {
                       aria-pressed={on}
                       onClick={() => pickType(t)}
                       className={`flex w-full items-center justify-between gap-3 rounded-[4px] px-2 py-2.5 text-left transition-colors duration-150 ${focusRing}`}
-                      style={{ background: on ? C.inkSoft : "transparent", color: on ? C.accent : C.text, outlineColor: C.accent }}
+                      style={{ background: on ? C.pickSoft : "transparent", color: on ? C.ink : C.text, outlineColor: C.accent }}
                     >
                       <span className="inline-flex items-center gap-2 text-[16px] font-bold">
-                        <span aria-hidden className="inline-block h-2.5 w-2.5 rounded-[2px]" style={{ background: on ? C.accent : "transparent", border: `1.5px solid ${C.accent}` }} />
+                        <span aria-hidden className="inline-block h-2.5 w-2.5 rounded-[2px]" style={{ background: on ? C.pick : "transparent", border: `1.5px solid ${on ? C.pickEdge : C.accent}` }} />
                         {t}
                       </span>
                       <span className="inline-flex items-baseline gap-1 text-[18px]">
@@ -547,7 +557,8 @@ function FloorPlan({
     </g>
   );
 
-  const seatFill = (on: boolean) => (on ? C.accent : "#fff");
+  const seatFill = (on: boolean, t: SeatType) => (on ? C.accent : selected === t ? C.pick : "#fff");
+  const seatEdge = (on: boolean, t: SeatType) => (!on && selected === t ? C.pickEdge : C.accent);
 
   return (
     <svg viewBox="0 0 720 450" className="block h-auto w-full" role="group" aria-label="지점 평면도. 자리를 누르면 그 유형이 선택됩니다">
@@ -573,7 +584,7 @@ function FloorPlan({
         <rect x="44" y="72" width="272" height="22" rx="4" fill={C.inkSoft} />
         <rect x="44" y="154" width="272" height="22" rx="4" fill={C.inkSoft} />
         {byType("자유석").map(({ u, i }) =>
-          unitGroup(u, i, <rect x={u.x} y={u.y} width={u.w} height={u.h} rx="4" fill={seatFill(occ[i])} stroke={C.accent} strokeWidth="1.5" style={{ transition: fillT }} />, u),
+          unitGroup(u, i, <rect x={u.x} y={u.y} width={u.w} height={u.h} rx="4" fill={seatFill(occ[i], u.type)} stroke={seatEdge(occ[i], u.type)} strokeWidth="1.5" style={{ transition: fillT }} />, u),
         )}
       </g>
 
@@ -587,8 +598,8 @@ function FloorPlan({
             u,
             i,
             <>
-              <rect x={u.x} y={u.y} width={u.w} height={u.h} rx="4" fill={seatFill(occ[i])} stroke={C.accent} strokeWidth="1.5" style={{ transition: fillT }} />
-              <rect x={u.x + 20} y={u.y + u.h + 3} width="16" height="6" rx="2" fill={occ[i] ? C.accent : "#fff"} stroke={C.accent} strokeWidth="1.2" style={{ transition: fillT }} />
+              <rect x={u.x} y={u.y} width={u.w} height={u.h} rx="4" fill={seatFill(occ[i], u.type)} stroke={seatEdge(occ[i], u.type)} strokeWidth="1.5" style={{ transition: fillT }} />
+              <rect x={u.x + 20} y={u.y + u.h + 3} width="16" height="6" rx="2" fill={seatFill(occ[i], u.type)} stroke={seatEdge(occ[i], u.type)} strokeWidth="1.2" style={{ transition: fillT }} />
             </>,
             { x: u.x, y: u.y, w: u.w, h: u.h + 9 },
           ),
@@ -607,7 +618,7 @@ function FloorPlan({
             <>
               <rect x={u.x} y={u.y} width={u.w} height={u.h} fill={occ[i] ? C.inkSoft : "#fff"} stroke={C.accent} strokeWidth="1.2" style={{ transition: fillT }} />
               <line x1={u.x + 8} y1={u.y + u.h} x2={u.x + 22} y2={u.y + u.h} stroke="#fff" strokeWidth="3" />
-              <rect x={u.x + 9} y={u.y + 14} width="28" height="34" rx="3" fill={seatFill(occ[i])} stroke={C.accent} strokeWidth="1.5" style={{ transition: fillT }} />
+              <rect x={u.x + 9} y={u.y + 14} width="28" height="34" rx="3" fill={seatFill(occ[i], u.type)} stroke={seatEdge(occ[i], u.type)} strokeWidth="1.5" style={{ transition: fillT }} />
               <text x={u.x + u.w / 2} y={u.y + 66} fontSize="10" fill={occ[i] ? C.ink : C.muted} textAnchor="middle">
                 {u.n}
               </text>
@@ -629,14 +640,14 @@ function FloorPlan({
             <>
               <rect x={u.x} y={u.y} width={u.w} height={u.h} fill={occ[i] ? C.inkSoft : "#fff"} stroke={C.accent} strokeWidth="1.2" style={{ transition: fillT }} />
               <line x1={u.x + 10} y1={u.y + u.h} x2={u.x + 26} y2={u.y + u.h} stroke="#fff" strokeWidth="3" />
-              <rect x={u.x + 18} y={u.y + 32} width="36" height="36" rx="6" fill={seatFill(occ[i])} stroke={C.accent} strokeWidth="1.5" style={{ transition: fillT }} />
+              <rect x={u.x + 18} y={u.y + 32} width="36" height="36" rx="6" fill={seatFill(occ[i], u.type)} stroke={seatEdge(occ[i], u.type)} strokeWidth="1.5" style={{ transition: fillT }} />
               {[
                 [u.x + 36, u.y + 20],
                 [u.x + 36, u.y + 80],
                 [u.x + 8, u.y + 50],
                 [u.x + 64, u.y + 50],
               ].map(([cx, cy], k) => (
-                <circle key={k} cx={cx} cy={cy} r="5" fill={seatFill(occ[i])} stroke={C.accent} strokeWidth="1.5" style={{ transition: fillT }} />
+                <circle key={k} cx={cx} cy={cy} r="5" fill={seatFill(occ[i], u.type)} stroke={seatEdge(occ[i], u.type)} strokeWidth="1.5" style={{ transition: fillT }} />
               ))}
               <text x={u.x + u.w / 2} y={u.y + 96} fontSize="10" fill={occ[i] ? C.ink : C.muted} textAnchor="middle">
                 {u.n}
