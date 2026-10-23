@@ -9,7 +9,7 @@ import { maskName, maskPhone } from "@/components/demos/LeadReceivedPanel";
 import { DemoMakerInfo } from "@/components/demos/DemoMakerInfo";
 
 /* 조명 가게 홈페이지 샘플: 가상의 조명 가게 곰파트너. 상호, 주소, 전화는 모두 가상이다.
-   첫 화면 사진 출처: Pexels 사진 14680170
+   첫 화면 사진 출처: Pexels 사진 14680170. 상품 사진은 AI 생성(Z-Image-Turbo)
 
    국내 조명 가게와 조명 쇼핑몰 공통 구성: 상단 분류(펜던트, 스탠드, 레일, 벽등, 간접조명), 공간별 조명 추천,
    색온도 안내(전구색 2700K~3000K, 주백색 4000K, 주광색 6500K), 전구 별매와 LED 일체형 표기, 레일 1m 포함 같은 구성 표기,
@@ -357,7 +357,8 @@ export function LightingShopDemo() {
             return (
               <li key={p.id} className="flex flex-col rounded-[8px] border p-3 md:p-4" style={{ borderColor: inRoom ? C.amber : C.line, background: C.panel }}>
                 <div className="relative aspect-[4/3] overflow-hidden rounded-[6px]" style={{ background: "#101010" }}>
-                  <ProductThumb shape={p.shape} color={kel.color} />
+                  {/* eslint-disable-next-line @next/next/no-img-element -- 정적 export 라 next/image 최적화를 쓰지 않는다 */}
+                  <img src={`${IMG}/products/${p.id}.jpg`} alt={`${p.name} 켜 둔 모습`} loading="lazy" width={600} height={600} className="h-full w-full object-cover" />
                   {inRoom && (
                     <span className="absolute left-2 top-2 rounded-[4px] px-1.5 py-0.5 text-[12px] font-bold" style={{ background: C.amber, color: C.ink }}>
                       방에 걸려 있음
@@ -982,48 +983,7 @@ function fixture(shape: Shape, P: Paint) {
   }
 }
 
-/** 제품 카드의 작은 그림. 어두운 바탕에 기구와 빛 색만 */
-function ProductThumb({ shape, color }: { shape: Shape; color: string }) {
-  const g = GEO[shape];
-  const box = thumbBox(shape);
-  return (
-    <svg viewBox={box} preserveAspectRatio="xMidYMid meet" className="h-full w-full" aria-hidden focusable="false">
-      <defs>
-        <radialGradient id={`ls-th-${shape}`}>
-          <stop offset="0" stopColor={color} stopOpacity="0.55" />
-          <stop offset="1" stopColor={color} stopOpacity="0" />
-        </radialGradient>
-      </defs>
-      <ellipse cx={g.glow.cx} cy={g.glow.cy} rx={g.glow.rx * 0.6} ry={g.glow.ry * 0.6} fill={`url(#ls-th-${shape})`} />
-      <g>{fixture(shape, { body: "#4a4a4a", brass: "#8a8a8a", shade: "#d6d6d6", cord: "#5a5a5a" })}</g>
-    </svg>
-  );
-}
 
-/** 모양별로 보여 줄 범위(viewBox) */
-function thumbBox(shape: Shape) {
-  switch (shape) {
-    case "dome":
-    case "globe":
-    case "rattan":
-    case "triple":
-      return "215 40 280 210";
-    case "spot3":
-    case "cyl2":
-    case "railPendant":
-      return "500 10 400 300";
-    case "arc":
-      return "600 140 280 210";
-    case "tripod":
-    case "drum":
-      return "680 150 240 180";
-    case "sconce":
-    case "roundWall":
-      return "132 130 200 150";
-    case "ledBar":
-      return "112 250 240 180";
-  }
-}
 
 /* ---------------- 견적과 상담 ---------------- */
 
