@@ -716,7 +716,7 @@ function Oven({ clock: realClock, onAdd }: { clock: Clock; onAdd: (id: string) =
             <ul className="mt-3 flex flex-wrap justify-center gap-x-5 gap-y-1 text-[14px]" style={{ color: C.muted }} aria-label="범례">
               {[
                 ["판매 중", { background: C.crust }],
-                ["곧 나와요", { background: C.butter }],
+                ["다음 출고", { background: C.butter }],
                 ["준비 중", { background: C.paper, border: `2px solid ${C.crustDeep}` }],
                 ["품절", { background: C.kraftDeep }],
               ].map(([label, style]) => (
