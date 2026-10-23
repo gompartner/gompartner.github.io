@@ -111,12 +111,12 @@ function makeUnits(): Unit[] {
   const u: Unit[] = [];
   // 자유석: 긴 테이블 두 개, 위아래 4자리씩
   [
-    [58, 116],
-    [134, 192],
+    [50, 98],
+    [132, 180],
   ].forEach(([top, bottom], t) => {
     for (let i = 0; i < 4; i++) {
-      u.push({ id: `free-${t * 8 + i + 1}`, type: "자유석", n: t * 8 + i + 1, x: 58 + i * 68, y: top, w: 24, h: 20 });
-      u.push({ id: `free-${t * 8 + i + 5}`, type: "자유석", n: t * 8 + i + 5, x: 58 + i * 68, y: bottom, w: 24, h: 20 });
+      u.push({ id: `free-${t * 8 + i + 1}`, type: "자유석", n: t * 8 + i + 1, x: 58 + i * 68, y: top, w: 24, h: 18 });
+      u.push({ id: `free-${t * 8 + i + 5}`, type: "자유석", n: t * 8 + i + 5, x: 58 + i * 68, y: bottom, w: 24, h: 18 });
     }
   });
   // 지정석: 3줄 x 4개 책상
@@ -570,8 +570,8 @@ function FloorPlan({
         <text x="28" y="42" fontSize="13" fontWeight="700" fill={C.ink}>
           자유석
         </text>
-        <rect x="44" y="84" width="272" height="26" rx="4" fill={C.inkSoft} />
-        <rect x="44" y="160" width="272" height="26" rx="4" fill={C.inkSoft} />
+        <rect x="44" y="72" width="272" height="22" rx="4" fill={C.inkSoft} />
+        <rect x="44" y="154" width="272" height="22" rx="4" fill={C.inkSoft} />
         {byType("자유석").map(({ u, i }) =>
           unitGroup(u, i, <rect x={u.x} y={u.y} width={u.w} height={u.h} rx="4" fill={seatFill(occ[i])} stroke={C.accent} strokeWidth="1.5" style={{ transition: fillT }} />, u),
         )}
