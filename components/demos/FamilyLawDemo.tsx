@@ -38,7 +38,7 @@ import { DemoMakerInfo } from "@/components/demos/DemoMakerInfo";
       전화, 화상은 겹치지만 않으면 된다. 연락을 전화로만 받기(문자 안 받기)를 고를 수 있다.
    4. 자주 묻는 질문.
 
-   사진 출처: AI 생성(Z-Image-Turbo, Apache 2.0).
+   사진 출처: AI 생성(Z-Image-Turbo, Apache 2.0). 직원 사진은 AI 생성(Z-Image-Turbo).
 
    첫 화면(fl-poster): 조용한 상담실 사진 한 장이 화면을 채운다. 둥근 원목 탁자에 물 한 잔과 서류철, 뒤로 밝은 창과 법률 서가.
    아래쪽 어두운 막 위에 문장 "상담은 다른 분과 마주치지 않게 잡아요"를 왼쪽 정렬로 둔다.
@@ -841,8 +841,8 @@ const HOURS = [
 ];
 
 const LAWYERS = [
-  { name: "김ㅎ늘", role: "대표 변호사", note: "대한변협 등록 전문분야 가사법", cases: "이혼소송, 양육권, 재산분할" },
-  { name: "박ㅅ연", role: "변호사", note: "가사, 상속 사건 담당", cases: "협의이혼, 양육비, 면접교섭" },
+  { name: "김ㅎ늘", role: "대표 변호사", note: "대한변협 등록 전문분야 가사법", cases: "이혼소송, 양육권, 재산분할", photo: `${IMG}/staff-1.jpg` },
+  { name: "박ㅅ연", role: "변호사", note: "가사, 상속 사건 담당", cases: "협의이혼, 양육비, 면접교섭", photo: `${IMG}/staff-2.jpg` },
 ];
 
 export function FamilyLawDemo() {
@@ -927,6 +927,16 @@ export function FamilyLawDemo() {
         <div className="mt-6 grid gap-4 md:grid-cols-[1fr_1fr_1.1fr]">
           {LAWYERS.map((l) => (
             <article key={l.name} className="rounded-[8px] border p-5" style={{ borderColor: C.line, background: C.alt }}>
+              {/* eslint-disable-next-line @next/next/no-img-element -- 정적 export 라 next/image 최적화를 쓰지 않는다 */}
+              <img
+                src={l.photo}
+                alt={`${l.role} ${l.name}`}
+                width={80}
+                height={96}
+                loading="lazy"
+                className="mb-4 h-24 w-20 rounded-[6px] object-cover"
+                style={{ objectPosition: "50% 20%", background: C.line }}
+              />
               <p className="text-[14px] font-bold" style={{ color: C.accent }}>
                 {l.role}
               </p>

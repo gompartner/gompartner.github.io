@@ -25,7 +25,7 @@ import { maskName, maskPhone } from "@/components/demos/LeadReceivedPanel";
 import { DemoMakerInfo } from "@/components/demos/DemoMakerInfo";
 
 /* 소아청소년과 홈페이지 샘플: 가상의 소아청소년과 의원 곰파트너.
-   병원명, 의료진, 주소, 전화번호, 진료비는 모두 가상이다. 첫 화면 사진 출처: Pexels 사진 39192342
+   병원명, 의료진, 주소, 전화번호, 진료비는 모두 가상이다. 첫 화면 사진 출처: Pexels 사진 39192342, 직원 사진은 AI 생성(Z-Image-Turbo)
    의료법 광고 규칙에 맞춰 치료 효과, 후기, 할인 문구는 넣지 않는다.
 
    국내 동네 소아청소년과 사이트 공통 구성(참고): 메뉴는 병원소개, 진료안내(진료시간, 의료진), 진료과목, 예방접종,
@@ -370,13 +370,20 @@ export function PediatricsDemo() {
         <div className="mt-6 grid gap-6 md:grid-cols-[minmax(0,1fr)_minmax(0,1.3fr)]">
           <ul className="grid content-start gap-3">
             {[
-              ["대표원장", "김ㅎ늘"],
-              ["원장", "박ㅅ윤"],
-            ].map(([role, name]) => (
+              ["대표원장", "김ㅎ늘", `${IMG}/staff-1.jpg`],
+              ["원장", "박ㅅ윤", `${IMG}/staff-2.jpg`],
+            ].map(([role, name, photo]) => (
               <li key={name} className="flex items-center gap-4 rounded-[6px] border px-4 py-4" style={{ borderColor: C.line, background: "#fff" }}>
-                <span className="inline-flex h-12 w-12 shrink-0 items-center justify-center rounded-full" style={{ background: C.greenTint, color: C.greenDeep }}>
-                  <Stethoscope size={22} aria-hidden />
-                </span>
+                {/* eslint-disable-next-line @next/next/no-img-element -- 정적 export 라 next/image 최적화를 쓰지 않는다 */}
+                <img
+                  src={photo}
+                  alt={`${role} ${name}`}
+                  width={56}
+                  height={56}
+                  loading="lazy"
+                  className="h-14 w-14 shrink-0 rounded-full object-cover"
+                  style={{ objectPosition: "50% 20%", background: C.greenTint }}
+                />
                 <span>
                   <span className="block text-[18px] font-bold">
                     {role} {name}

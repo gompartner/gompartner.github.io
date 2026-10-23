@@ -42,7 +42,7 @@ import { DemoMakerInfo } from "@/components/demos/DemoMakerInfo";
    2025년 10월 23일부터는 재직 중 밀린 임금도 정기 지급일 다음 날부터 같은 지연이자가 붙는다.
    퇴직금은 1년 이상 일했을 때 평균임금 30일분 x 근속 연수다. 계산기는 월급으로 바꿔 개략만 보여 준다.
 
-   사진 출처: Pexels 사진 6814526
+   사진 출처: Pexels 사진 6814526, 직원 사진은 AI 생성(Z-Image-Turbo)
 
    첫 화면(lf-poster): 서류를 검토하는 손 사진 한 장이 한 화면을 채우고 아래 왼쪽에 문장 "해고된 날부터 3개월 안에 신청해요".
    들어오면 사진이 1.6초 동안 천천히 다가오고(1.06배에서 1배), 문장은 0.3초 늦게 아래에서 올라온다(CSS keyframes, JS 없이도 보인다).
@@ -263,13 +263,20 @@ export function LaborFirmDemo() {
         <SectionTitle id="lf-people-title" icon={<Scale size={24} aria-hidden />} title="노무사 소개" />
         <ul className="mt-6 grid gap-4 md:grid-cols-2">
           {[
-            { name: "김ㅎ늘", role: "대표 공인노무사", areas: "부당해고, 직장 내 괴롭힘, 징계 자문" },
-            { name: "박ㅈ민", role: "공인노무사", areas: "임금체불, 산재, 급여 아웃소싱" },
+            { name: "김ㅎ늘", role: "대표 공인노무사", areas: "부당해고, 직장 내 괴롭힘, 징계 자문", photo: `${IMG}/staff-1.jpg` },
+            { name: "박ㅈ민", role: "공인노무사", areas: "임금체불, 산재, 급여 아웃소싱", photo: `${IMG}/staff-2.jpg` },
           ].map((p) => (
             <li key={p.name} className="flex items-center gap-4 rounded-[6px] border p-5" style={{ borderColor: C.line, background: C.card }}>
-              <span className="grid h-14 w-14 flex-none place-items-center rounded-[4px] text-[22px] font-bold" style={{ background: C.soft, color: C.accent }} aria-hidden>
-                {p.name[0]}
-              </span>
+              {/* eslint-disable-next-line @next/next/no-img-element -- 정적 export 라 next/image 최적화를 쓰지 않는다 */}
+              <img
+                src={p.photo}
+                alt={`${p.name} ${p.role}`}
+                width={64}
+                height={77}
+                loading="lazy"
+                className="h-[77px] w-16 flex-none rounded-[4px] object-cover"
+                style={{ objectPosition: "50% 20%", background: C.soft }}
+              />
               <div className="min-w-0">
                 <p className="text-[18px] font-bold">
                   {p.name} <span className="text-[15px] font-semibold" style={{ color: C.muted }}>{p.role}</span>

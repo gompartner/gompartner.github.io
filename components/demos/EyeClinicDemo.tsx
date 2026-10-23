@@ -2,7 +2,7 @@
 
 import { useEffect, useMemo, useRef, useState } from "react";
 import { AnimatePresence, motion, useScroll, useTransform } from "framer-motion";
-import { AlertCircle, CalendarCheck, Car, Check, Clock, Eye, MapPin, MessageCircle, Phone, RotateCcw } from "lucide-react";
+import { AlertCircle, CalendarCheck, Car, Check, Clock, MapPin, MessageCircle, Phone, RotateCcw } from "lucide-react";
 import { useReducedMotionSafe } from "@/hooks/useReducedMotionSafe";
 import { daysAgo, fmtKo, useDemoToday } from "@/hooks/useDemoToday";
 import { maskName, maskPhone } from "@/components/demos/LeadReceivedPanel";
@@ -16,7 +16,7 @@ import { DemoMakerInfo } from "@/components/demos/DemoMakerInfo";
    렌즈 착용 중단 기간, 산동 검사 뒤 운전 자제, 대중교통 이용 문구가 늘 붙는다. 백내장은 단초점 렌즈 건강보험 적용, 다초점 렌즈 비급여로 나눠 적는다.
    의료법 광고 규정에 맞춰 효과 보장, 최고, 유일, 수술 전후 사진, 환자 후기, 할인 강조는 넣지 않는다. 진료비는 비급여 진료비 안내 표로만 공개한다.
 
-   사진 출처: Pexels 사진 5752267
+   사진 출처: Pexels 사진 5752267, 직원 사진은 AI 생성(Z-Image-Turbo)
 
    첫 화면(ec-poster): 시험테 사진 한 장이 한 화면을 채우고 아래 왼쪽에 문장 "수술 전 검사만 받아 봐도 돼요".
    들어오면 사진이 1.6초 동안 천천히 다가오고(1.06배에서 1배), 문장은 0.3초 늦게 아래에서 올라온다(CSS keyframes, JS 없이도 보인다).
@@ -193,8 +193,8 @@ const HOURS: { dow: number; label: string; open: string }[] = [
 ];
 
 const DOCTORS = [
-  { name: "김ㅎ늘", role: "대표원장", field: "시력교정, 백내장" },
-  { name: "이ㅅ우", role: "원장", field: "망막, 녹내장" },
+  { name: "김ㅎ늘", role: "대표원장", field: "시력교정, 백내장", photo: `${IMG}/staff-1.jpg` },
+  { name: "이ㅅ우", role: "원장", field: "망막, 녹내장", photo: `${IMG}/staff-2.jpg` },
 ];
 
 /* ---------- 4. 상담 예약 ---------- */
@@ -907,9 +907,16 @@ function HoursAndMap({ today }: { today: Date }) {
       <div className="grid content-start gap-3">
         {DOCTORS.map((d) => (
           <div key={d.name} className="flex items-center gap-4 rounded-[8px] border p-4" style={{ background: C.card, borderColor: C.line }}>
-            <span aria-hidden className="inline-flex h-12 w-12 flex-none items-center justify-center rounded-full" style={{ background: C.tealSoft, color: C.teal }}>
-              <Eye size={22} />
-            </span>
+            {/* eslint-disable-next-line @next/next/no-img-element -- 정적 export 라 next/image 최적화를 쓰지 않는다 */}
+            <img
+              src={d.photo}
+              alt={`${d.name} ${d.role}`}
+              width={56}
+              height={56}
+              loading="lazy"
+              className="h-14 w-14 flex-none rounded-full object-cover"
+              style={{ objectPosition: "50% 20%", background: C.tealSoft }}
+            />
             <div>
               <p className="text-[18px] font-bold">
                 {d.name} <span className="text-[15px] font-normal">{d.role}</span>
