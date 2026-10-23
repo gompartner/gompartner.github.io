@@ -30,6 +30,7 @@ const mono = Nanum_Gothic_Coding;
 const heavy = Gasoek_One;
 
 const BRAND = "곰파트너";
+const IMG = "/images/demo-popup";
 const ADDRESS = "서울 성동구 ㅇㅇ길 00, 1층";
 const KAKAO = "카카오톡 채널 곰파트너";
 const CAP = 12;
@@ -152,6 +153,16 @@ export function LandingPopupStoreDemo() {
           회차 예약
         </button>
       </header>
+
+      <div className="mx-auto max-w-[1200px] px-4 md:px-6">
+        <figure className="relative overflow-hidden rounded-[4px]">
+          {/* eslint-disable-next-line @next/next/no-img-element -- 정적 export 라 next/image 최적화를 쓰지 않는다 */}
+          <img src={`${IMG}/store.jpg`} alt="성수동 골목 붉은 팝업 매장 앞에 줄 선 손님들" className="block aspect-[4/3] w-full object-cover sm:aspect-[21/9]" />
+          <figcaption className="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-black/70 to-transparent px-4 pb-3 pt-10 text-[14px] font-bold text-white md:px-6 md:pb-5 md:text-[16px]" style={monoF}>
+            성수동 붕어빵 팝업, 매장에서 바로 구워요
+          </figcaption>
+        </figure>
+      </div>
 
       {/* 첫 화면: 왼쪽 영수증(기본 정보와 오늘 회차), 오른쪽 발권기 */}
       <div className="mx-auto grid max-w-[1200px] gap-8 px-4 pt-2 md:px-6 lg:grid-cols-[420px_minmax(0,1fr)] lg:items-start lg:gap-10 lg:pt-6">
@@ -981,12 +992,12 @@ function Roulette({ reduce }: { reduce: boolean }) {
 /* ── 4. 메뉴, 오시는 길 ───────────────────────────────── */
 
 const MENU = [
-  { name: "팥 붕어빵", unit: "3마리", price: 3000 },
-  { name: "슈크림", unit: "3마리", price: 3500 },
-  { name: "고구마 치즈", unit: "2마리", price: 4000 },
-  { name: "흑임자 크림", unit: "2마리", price: 4500, note: "하루 200마리" },
-  { name: "붕어 키링", unit: "1개", price: 12000 },
-  { name: "곰파트너 에코백", unit: "1개", price: 18000 },
+  { id: "red-bean", name: "팥 붕어빵", unit: "3마리", price: 3000 },
+  { id: "custard", name: "슈크림", unit: "3마리", price: 3500 },
+  { id: "potato", name: "고구마 치즈", unit: "2마리", price: 4000 },
+  { id: "sesame", name: "흑임자 크림", unit: "2마리", price: 4500, note: "하루 200마리" },
+  { id: "keyring", name: "붕어 키링", unit: "1개", price: 12000 },
+  { id: "ecobag", name: "곰파트너 에코백", unit: "1개", price: 18000 },
 ];
 
 function MenuReceipt() {
@@ -1009,12 +1020,18 @@ function MenuReceipt() {
           {MENU.map((m) => (
             <tr key={m.name}>
               <td className="py-1.5 pr-2">
-                <span className="font-bold">{m.name}</span>
-                {m.note && (
-                  <span className="block text-[12px]" style={{ color: C.red }}>
-                    {m.note}
+                <span className="flex items-center gap-3">
+                  {/* eslint-disable-next-line @next/next/no-img-element -- 정적 export 라 next/image 최적화를 쓰지 않는다 */}
+                  <img src={`${IMG}/menu-${m.id}.jpg`} alt="" className="h-12 w-12 flex-none rounded-[3px] object-cover" />
+                  <span>
+                    <span className="font-bold">{m.name}</span>
+                    {m.note && (
+                      <span className="block text-[12px]" style={{ color: C.red }}>
+                        {m.note}
+                      </span>
+                    )}
                   </span>
-                )}
+                </span>
               </td>
               <td className="py-1.5 text-right tabular-nums">{m.unit}</td>
               <td className="py-1.5 text-right font-bold tabular-nums">{won(m.price)}</td>

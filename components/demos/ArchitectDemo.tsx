@@ -452,6 +452,7 @@ function MassPreview({ result, reduce }: { result: CalcResult; reduce: boolean }
 
 type Kind = "단독주택" | "근린생활시설";
 type Work = {
+  id: string;
   name: string;
   kind: Kind;
   site: number;
@@ -465,41 +466,23 @@ type Work = {
 };
 
 const WORKS: Work[] = [
-  { name: "ㅇㅇ동 단독주택", kind: "단독주택", site: 198, gross: 172, scale: "지상 2층", structure: "철근콘크리트", state: "준공", note: "마당을 가운데 둔 ㄱ자 집", mass: [[-38, -20, 76, 34, 0, 1], [-38, -20, 34, 58, 0, 1], [-38, -20, 76, 34, 1, 1]] },
-  { name: "ㅂㅈ리 주말주택", kind: "단독주택", site: 330, gross: 99, scale: "지상 1층, 다락", structure: "경량목구조", state: "준공", note: "주말에 쓰는 작은 집", mass: [[-40, -14, 80, 30, 0, 1], [-40, -14, 34, 30, 1, 0.6]] },
-  { name: "ㅅㄱ동 상가주택", kind: "근린생활시설", site: 165, gross: 380, scale: "지상 4층", structure: "철근콘크리트", state: "시공 중", note: "1층 상가, 2~4층 주택", mass: [[-26, -26, 52, 52, 0, 1], [-26, -26, 52, 52, 1, 1], [-26, -26, 52, 40, 2, 1], [-26, -26, 36, 40, 3, 1]] },
-  { name: "ㅁㅇ동 근린생활시설", kind: "근린생활시설", site: 230, gross: 520, scale: "지상 5층", structure: "철근콘크리트", state: "인허가 중", note: "모퉁이 땅, 저층 상가", mass: [[-24, -28, 48, 56, 0, 1], [-24, -28, 48, 56, 1, 1], [-24, -28, 48, 56, 2, 1], [-24, -28, 48, 44, 3, 1], [-24, -28, 34, 44, 4, 1]] },
-  { name: "ㅎㄴ리 단독주택", kind: "단독주택", site: 450, gross: 145, scale: "지상 2층", structure: "경량목구조", state: "설계 중", note: "어긋나게 놓은 두 동", mass: [[-42, -26, 44, 30, 0, 1], [-4, -6, 46, 30, 0, 1], [-4, -6, 46, 30, 1, 1]] },
-  { name: "ㄷㅅ동 의원 건물", kind: "근린생활시설", site: 280, gross: 690, scale: "지하 1층, 지상 5층", structure: "철근콘크리트", state: "준공", note: "엘리베이터와 진료실 층", mass: [[-30, -28, 60, 56, 0, 1], [-30, -28, 60, 56, 1, 1], [-30, -28, 60, 56, 2, 1], [-30, -28, 60, 56, 3, 1], [-30, -28, 44, 56, 4, 1]] },
-  { name: "ㄱㅍ동 두 가구 주택", kind: "단독주택", site: 210, gross: 230, scale: "지상 3층", structure: "철근콘크리트", state: "준공", note: "부모님과 나눠 사는 집", mass: [[-30, -24, 60, 48, 0, 1], [-30, -24, 60, 48, 1, 1], [-30, -24, 38, 48, 2, 1]] },
-  { name: "ㅇㄹ동 카페 건물", kind: "근린생활시설", site: 140, gross: 160, scale: "지상 2층", structure: "철골조", state: "준공", note: "1층 전면 통창", mass: [[-30, -22, 60, 44, 0, 1], [-30, -22, 44, 44, 1, 1]] },
+  { id: "w1", name: "ㅇㅇ동 단독주택", kind: "단독주택", site: 198, gross: 172, scale: "지상 2층", structure: "철근콘크리트", state: "준공", note: "마당을 가운데 둔 ㄱ자 집", mass: [[-38, -20, 76, 34, 0, 1], [-38, -20, 34, 58, 0, 1], [-38, -20, 76, 34, 1, 1]] },
+  { id: "w2", name: "ㅂㅈ리 주말주택", kind: "단독주택", site: 330, gross: 99, scale: "지상 1층, 다락", structure: "경량목구조", state: "준공", note: "주말에 쓰는 작은 집", mass: [[-40, -14, 80, 30, 0, 1], [-40, -14, 34, 30, 1, 0.6]] },
+  { id: "w3", name: "ㅅㄱ동 상가주택", kind: "근린생활시설", site: 165, gross: 380, scale: "지상 4층", structure: "철근콘크리트", state: "시공 중", note: "1층 상가, 2~4층 주택", mass: [[-26, -26, 52, 52, 0, 1], [-26, -26, 52, 52, 1, 1], [-26, -26, 52, 40, 2, 1], [-26, -26, 36, 40, 3, 1]] },
+  { id: "w4", name: "ㅁㅇ동 근린생활시설", kind: "근린생활시설", site: 230, gross: 520, scale: "지상 5층", structure: "철근콘크리트", state: "인허가 중", note: "모퉁이 땅, 저층 상가", mass: [[-24, -28, 48, 56, 0, 1], [-24, -28, 48, 56, 1, 1], [-24, -28, 48, 56, 2, 1], [-24, -28, 48, 44, 3, 1], [-24, -28, 34, 44, 4, 1]] },
+  { id: "w5", name: "ㅎㄴ리 단독주택", kind: "단독주택", site: 450, gross: 145, scale: "지상 2층", structure: "경량목구조", state: "설계 중", note: "어긋나게 놓은 두 동", mass: [[-42, -26, 44, 30, 0, 1], [-4, -6, 46, 30, 0, 1], [-4, -6, 46, 30, 1, 1]] },
+  { id: "w6", name: "ㄷㅅ동 의원 건물", kind: "근린생활시설", site: 280, gross: 690, scale: "지하 1층, 지상 5층", structure: "철근콘크리트", state: "준공", note: "엘리베이터와 진료실 층", mass: [[-30, -28, 60, 56, 0, 1], [-30, -28, 60, 56, 1, 1], [-30, -28, 60, 56, 2, 1], [-30, -28, 60, 56, 3, 1], [-30, -28, 44, 56, 4, 1]] },
+  { id: "w7", name: "ㄱㅍ동 두 가구 주택", kind: "단독주택", site: 210, gross: 230, scale: "지상 3층", structure: "철근콘크리트", state: "준공", note: "부모님과 나눠 사는 집", mass: [[-30, -24, 60, 48, 0, 1], [-30, -24, 60, 48, 1, 1], [-30, -24, 38, 48, 2, 1]] },
+  { id: "w8", name: "ㅇㄹ동 카페 건물", kind: "근린생활시설", site: 140, gross: 160, scale: "지상 2층", structure: "철골조", state: "준공", note: "1층 전면 통창", mass: [[-30, -22, 60, 44, 0, 1], [-30, -22, 44, 44, 1, 1]] },
 ];
 
 const FILTERS: ("전체" | Kind)[] = ["전체", "단독주택", "근린생활시설"];
-const W_LH = 16;
-const P_WORK = makeIso(150, 150, 1.3);
-const WORK_LEFT = wallShade(Math.sin(2.2));
-const WORK_RIGHT = wallShade(Math.cos(2.2));
 
 function WorkMass({ work }: { work: Work }) {
-  const boxes: Box[] = work.mass.map(([x, y, w, d, z, h], i) => ({ x, y, w, d, z: z * W_LH, h: h * W_LH, lv: i }));
-  const shadow = shadowD(boxes, 2.2, (36 * Math.PI) / 180, P_WORK);
-  const ground = polyD([P_WORK(-62, -62, 0), P_WORK(62, -62, 0), P_WORK(62, 62, 0), P_WORK(-62, 62, 0)]);
+  const wip = work.state !== "준공";
   return (
-    <svg viewBox="0 0 300 236" className="block h-auto w-full" aria-hidden>
-      <path d={ground} fill="#ececec" />
-      <path d={shadow} fill="rgba(17,17,17,0.2)" />
-      {boxes.map((b) => {
-        const f = boxFaces(b, P_WORK);
-        return (
-          <g key={b.lv}>
-            <path d={f.left} fill={WORK_LEFT} stroke="rgba(17,17,17,0.2)" strokeWidth="0.7" />
-            <path d={f.right} fill={WORK_RIGHT} stroke="rgba(17,17,17,0.2)" strokeWidth="0.7" />
-            <path d={f.top} fill="#fafafa" stroke="rgba(17,17,17,0.15)" strokeWidth="0.7" />
-          </g>
-        );
-      })}
-    </svg>
+    // eslint-disable-next-line @next/next/no-img-element -- 정적 export 라 next/image 최적화를 쓰지 않는다
+    <img src={`${IMG}/work-${work.id}.jpg`} alt={`${work.name} ${wip ? "설계 투시도" : "준공 사진"}`} className="block aspect-[4/3] h-auto w-full rounded-[4px] object-cover" />
   );
 }
 

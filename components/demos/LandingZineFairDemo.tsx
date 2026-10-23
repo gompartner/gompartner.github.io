@@ -313,45 +313,8 @@ export function LandingZineFairDemo() {
 /** 스테이플러로 찍은 진 세 권을 분홍·파랑 망점으로 그린 그림 */
 function ZineArt() {
   return (
-    <svg viewBox="0 0 420 440" className="block h-auto w-full" role="img" aria-label="분홍과 파랑으로 찍은 얇은 책 세 권이 겹쳐 놓인 그림">
-      <defs>
-        <pattern id="zf-dot-pink" width="7" height="7" patternUnits="userSpaceOnUse" patternTransform="rotate(15)">
-          <circle cx="3.5" cy="3.5" r="2.3" fill={C.pink} />
-        </pattern>
-        <pattern id="zf-dot-blue" width="6" height="6" patternUnits="userSpaceOnUse" patternTransform="rotate(45)">
-          <circle cx="3" cy="3" r="1.7" fill={C.blue} />
-        </pattern>
-        <pattern id="zf-line-blue" width="8" height="8" patternUnits="userSpaceOnUse" patternTransform="rotate(-30)">
-          <path d="M0 4H8" stroke={C.blue} strokeWidth="2.2" />
-        </pattern>
-      </defs>
-      <g style={{ mixBlendMode: "multiply" }}>
-        {/* 맨 아래 책 */}
-        <g transform="translate(40 150) rotate(-14)">
-          <rect width="230" height="250" fill="url(#zf-line-blue)" />
-          <rect width="230" height="250" fill="none" stroke={C.blue} strokeWidth="4" />
-        </g>
-        {/* 가운데 책 */}
-        <g transform="translate(150 70) rotate(9)">
-          <rect width="220" height="290" fill={C.pink} opacity="0.92" />
-          <circle cx="110" cy="120" r="64" fill="url(#zf-dot-blue)" />
-          {[60, 160].map((y) => (
-            <rect key={y} x="-3" y={y} width="10" height="22" fill={C.black} />
-          ))}
-        </g>
-        {/* 맨 위 책 */}
-        <g transform="translate(70 110) rotate(-3)">
-          <rect width="200" height="270" fill="url(#zf-dot-pink)" />
-          <rect x="6" y="-4" width="200" height="270" fill="none" stroke={C.blue} strokeWidth="5" />
-          <path d="M40 160 Q100 240 160 160" fill="none" stroke={C.blue} strokeWidth="10" strokeLinecap="round" />
-          <circle cx="70" cy="90" r="20" fill={C.blue} />
-          <circle cx="140" cy="80" r="14" fill={C.blue} />
-          {[70, 180].map((y) => (
-            <rect key={y} x="-2" y={y} width="9" height="20" fill={C.black} />
-          ))}
-        </g>
-      </g>
-    </svg>
+    // eslint-disable-next-line @next/next/no-img-element -- 정적 export 라 next/image 최적화를 쓰지 않는다
+    <img src="/images/demo-zine-fair/hero.jpg" alt="분홍과 파랑 리소 인쇄 독립출판물이 펼쳐진 북페어 테이블" className="block aspect-[4/5] h-auto w-full rounded-[4px] object-cover" style={{ boxShadow: `8px 8px 0 ${C.blue}` }} />
   );
 }
 
