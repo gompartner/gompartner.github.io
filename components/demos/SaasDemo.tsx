@@ -10,7 +10,7 @@ import { DemoMakerInfo } from "@/components/demos/DemoMakerInfo";
 
 /* 식당 재고 관리 서비스 홈페이지 샘플: 가상의 IT 회사가 만드는 곰파트너 재고 앱.
    상호, 주소, 전화번호, 담당자 이름은 모두 가상이다. 고객사 로고, 투자, 매출, 이용 매장 수 같은 숫자는 넣지 않는다.
-   첫 화면 사진 출처: Pexels 사진 6375553
+   첫 화면 사진 출처: AI 생성(Z-Image-Turbo, Apache 2.0)
 
    국내 외식업 SaaS 사이트 공통 구성(참고): 메뉴는 기능 소개, 요금 안내, 자주 묻는 질문, 도입 문의, 로그인.
    첫 화면 버튼은 "무료로 시작하기", "도입 문의". 요금제는 카드 세 장에 월 결제와 연 결제 전환, "연 결제 시 20% 할인",
@@ -329,7 +329,7 @@ function Poster({ reduce, onCta }: { reduce: boolean; onCta: () => void }) {
             alt="사람 없는 식당 주방의 스테인리스 조리대와 냄비, 뒤쪽 흰 타일 벽과 선반"
             fetchPriority="high"
             className="absolute inset-0 h-full w-full object-cover"
-            style={{ objectPosition: "50% 55%" }}
+            style={{ objectPosition: "65% 50%" }}
           />
         </div>
       </motion.div>
