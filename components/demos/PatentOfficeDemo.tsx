@@ -21,7 +21,7 @@ import { DemoMakerInfo } from "@/components/demos/DemoMakerInfo";
    상표 설정등록료 10년분 1상품류 201,000원(특허료 등의 징수규칙 제5조). 사무소 수수료는 이 샘플이 정한 개략 금액이다.
    특허 심사 기간은 심사청구 뒤 1차 결과까지 1년 안팎, 우선심사는 결정 뒤 몇 달 안으로 잡은 개략이다.
 
-   사진 출처: Pexels 사진 6615086
+   사진 출처: Pexels 사진 6615086, 직원 사진은 AI 생성(Z-Image-Turbo)
    첫 화면(po-poster): 도면 위에 컴퍼스를 세운 사진 한 장이 한 화면을 채운다. 아래 왼쪽에 문장 "상표는 먼저 낸 사람이 가져가요".
    핵심 모션: 들어올 때 사진이 1.06배에서 1배로 1.6초 동안 천천히 다가오고, 문장과 정보 줄은 0.3초 늦게 12px 아래에서 올라온다(CSS).
    스크롤하면 사진만 조금 느리게 내려간다(0 ~ 8%). 동작 줄이기면 모두 멈춘 상태로 보인다.
@@ -761,11 +761,17 @@ function Office() {
   return (
     <div className="grid gap-8 md:grid-cols-[minmax(0,1fr)_minmax(0,1fr)] md:gap-12">
       <div className="flex gap-5">
-        <div className="relative h-[132px] w-[108px] flex-none overflow-hidden rounded-[6px] border" style={{ borderColor: C.line, background: C.soft }} aria-hidden>
-          <svg viewBox="0 0 108 132" className="h-full w-full">
-            <circle cx="54" cy="50" r="22" fill="#cfcfcb" />
-            <path d="M14 132 C16 100 34 84 54 84 C74 84 92 100 94 132 Z" fill="#cfcfcb" />
-          </svg>
+        <div className="relative h-[132px] w-[108px] flex-none overflow-hidden rounded-[6px] border" style={{ borderColor: C.line, background: C.soft }}>
+          {/* eslint-disable-next-line @next/next/no-img-element -- 정적 export 라 next/image 최적화를 쓰지 않는다 */}
+          <img
+            src={`${IMG}/staff-1.jpg`}
+            alt="대표 변리사 김ㅎ늘"
+            width={108}
+            height={132}
+            loading="lazy"
+            className="h-full w-full object-cover"
+            style={{ objectPosition: "50% 20%" }}
+          />
         </div>
         <div>
           <p className="text-[14px] font-bold" style={{ color: C.red }}>

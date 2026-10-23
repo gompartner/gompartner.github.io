@@ -22,7 +22,7 @@ import { DemoMakerInfo } from "@/components/demos/DemoMakerInfo";
    3. 이번 주 식단표: 요일을 고르면 아침, 점심, 저녁, 간식. 일반식과 죽식을 바꿔 볼 수 있다.
    4. 입원 상담 신청: 환자 나이, 현재 상태, 희망 시기, 병실, 보호자 연락처. 완료하면 접수 번호, 담당 창구, 회신 예정일.
 
-   사진 출처: AI 생성(Z-Image-Turbo, Apache 2.0)
+   사진 출처: AI 생성(Z-Image-Turbo, Apache 2.0), 직원 사진은 AI 생성(Z-Image-Turbo)
 
    첫 화면(nh-poster): 침대 위 어르신 손을 보호사가 감싸 쥔 사진 한 장이 한 화면을 채우고, 흰 막 위에 문장 "면회는 매일 오후에 돼요".
    들어오면 사진이 1.6초 동안 천천히 다가오고(1.06배에서 1배), 문장은 0.3초 늦게 아래에서 올라온다(CSS keyframes, JS 없이도 보인다).
@@ -820,8 +820,18 @@ function Doctors() {
     <section aria-labelledby="nh-doctor-title" className="mx-auto mt-16 max-w-[1200px] px-4 md:mt-24 md:px-6">
       <SectionHead id="nh-doctor-title" title="의료진" />
       <ul className="grid gap-px overflow-hidden rounded-[8px] border sm:grid-cols-3" style={{ borderColor: C.line, background: C.line }}>
-        {list.map(([name, role, spec, area]) => (
+        {list.map(([name, role, spec, area], i) => (
           <li key={name} className="p-5" style={{ background: C.card }}>
+            {/* eslint-disable-next-line @next/next/no-img-element -- 정적 export 라 next/image 최적화를 쓰지 않는다 */}
+            <img
+              src={`${IMG}/staff-${i + 1}.jpg`}
+              alt={`${role} ${name}`}
+              width={72}
+              height={86}
+              loading="lazy"
+              className="mb-4 h-[86px] w-[72px] rounded-[6px] object-cover"
+              style={{ objectPosition: "50% 20%", background: C.line }}
+            />
             <p className="inline-flex items-center gap-1.5 text-[14px] font-semibold" style={{ color: C.muted }}>
               <Stethoscope size={16} aria-hidden />
               {role}

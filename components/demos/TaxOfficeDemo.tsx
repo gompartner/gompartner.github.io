@@ -42,7 +42,7 @@ import { DemoMakerInfo } from "@/components/demos/DemoMakerInfo";
    고른 조건은 상담신청서 문의 내용에 채워 넘긴다. 접수 화면에는 이름과 번호를 가려 보여 준다.
 
    사진 출처(public/images/demo-tax):
-   AI 생성(Z-Image-Turbo, Apache 2.0) office */
+   AI 생성(Z-Image-Turbo, Apache 2.0) office, 직원 사진은 AI 생성(Z-Image-Turbo) staff-1 ~ staff-3 */
 
 const IMG = "/images/demo-tax";
 const OFFICE = "곰파트너";
@@ -1707,8 +1707,18 @@ function About() {
             { name: "김ㅅ우", role: "대표세무사", area: "개인사업자 기장, 종합소득세, 세무조사대응", career: ["세무사 등록 2012년", "ㅂㄹ세무서 개인납세과 8년", "ㄷㅅ구 소상공인지원센터 세무 상담 위원"] },
             { name: "이ㄷ현", role: "세무사", area: "법인 신고, 법인전환, 양도소득세", career: ["세무사 등록 2017년", "ㅈㅇ회계법인 세무본부"] },
             { name: "박ㅇ진", role: "실장", area: "기장, 4대보험, 인건비 신고", career: ["전산세무 1급", "세무사무소 실무 11년"] },
-          ].map((m) => (
+          ].map((m, i) => (
             <li key={m.name} className="rounded-[10px] border bg-white p-5" style={{ borderColor: C.line }}>
+              {/* eslint-disable-next-line @next/next/no-img-element -- 정적 export 라 next/image 최적화를 쓰지 않는다 */}
+              <img
+                src={`${IMG}/staff-${i + 1}.jpg`}
+                alt={`${m.role} ${m.name}`}
+                width={80}
+                height={96}
+                loading="lazy"
+                className="mb-4 h-24 w-20 rounded-[10px] object-cover"
+                style={{ objectPosition: "50% 20%", background: C.line }}
+              />
               <p className="text-[14px] font-semibold" style={{ color: C.green }}>
                 {m.role}
               </p>

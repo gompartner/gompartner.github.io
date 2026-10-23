@@ -555,14 +555,28 @@ const PHARMACISTS = [
 function PharmacistsPage() {
   return (
     <div className="grid gap-5 md:grid-cols-2 md:gap-6">
-      {PHARMACISTS.map((p) => (
+      {PHARMACISTS.map((p, i) => (
         <section key={p.name} aria-labelledby={`ph-${p.name}`} className="min-w-0 rounded-[10px] border bg-white p-4 md:p-6" style={{ borderColor: C.line }}>
-          <p className="text-[15px] font-semibold" style={{ color: C.mint }}>
-            {p.role}
-          </p>
-          <h2 id={`ph-${p.name}`} className="text-[24px] font-bold tracking-[-0.02em]">
-            {p.name}
-          </h2>
+          <div className="flex items-center gap-4">
+            {/* eslint-disable-next-line @next/next/no-img-element -- 정적 export 라 next/image 최적화를 쓰지 않는다 */}
+            <img
+              src={`${IMG}/staff-${i + 1}.jpg`}
+              alt={`${p.role} ${p.name}`}
+              width={80}
+              height={96}
+              loading="lazy"
+              className="h-24 w-20 flex-none rounded-[10px] object-cover"
+              style={{ objectPosition: "50% 20%", background: C.line }}
+            />
+            <div className="min-w-0">
+              <p className="text-[15px] font-semibold" style={{ color: C.mint }}>
+                {p.role}
+              </p>
+              <h2 id={`ph-${p.name}`} className="text-[24px] font-bold tracking-[-0.02em]">
+                {p.name}
+              </h2>
+            </div>
+          </div>
           <ul className="mt-3 border-t" style={{ borderColor: C.line }}>
             {p.career.map((c) => (
               <li key={c} className="border-b py-2.5 text-[16px]" style={{ borderColor: C.line }}>
