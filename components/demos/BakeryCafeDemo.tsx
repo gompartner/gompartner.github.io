@@ -192,6 +192,9 @@ function batchState(batch: Batch, clock: Clock): BatchState {
   return { kind: "out", left: Math.max(0, batch.qty - sold) };
 }
 
+/** 영업시간 밖에 다음 날을 미리 보여 줄 때는 "몇 분 뒤"가 맞지 않아 준비 중으로만 적는다 */
+const stateTextFor = (s: BatchState, closedView: boolean) => (closedView && s.kind === "soon" ? "준비 중" : stateText(s));
+
 function stateText(s: BatchState) {
   switch (s.kind) {
     case "unknown":
@@ -544,8 +547,9 @@ function SectionTitle({ id, title, aside }: { id: string; title: string; aside?:
 const CX = 170;
 const CY = 170;
 
+/** 벽시계와 같은 12시간 문자판. 12가 맨 위, 08:00은 8시 자리. 영업이 12시간이라 한 바퀴가 영업 시간 전체다 */
 function polar(m: number, r: number) {
-  const a = ((m - OPEN) / (CLOSE - OPEN)) * Math.PI * 2 - Math.PI / 2;
+  const a = ((m % 720) / 720) * Math.PI * 2 - Math.PI / 2;
   // 서버와 브라우저의 소수점 끝자리 차이로 하이드레이션이 어긋나지 않게 반올림한다
   return { x: Math.round((CX + Math.cos(a) * r) * 100) / 100, y: Math.round((CY + Math.sin(a) * r) * 100) / 100 };
 }
@@ -557,7 +561,7 @@ function describeArc(from: number, to: number, r: number) {
   return `M${a.x} ${a.y} A${r} ${r} 0 ${large} 1 ${b.x} ${b.y}`;
 }
 
-function OvenClock({ clock, selected, onSelect }: { clock: Clock; selected: number; onSelect: (i: number) => void }) {
+function OvenClock({ clock, selected, onSelect, rest, closedView }: { clock: Clock; selected: number; onSelect: (i: number) => void; rest: Rest | null; closedView: boolean }) {
   const reduce = useReducedMotionSafe();
   const next = nextBatch(clock);
   const showHand = clock && clock.day !== 1 && clock.m >= OPEN && clock.m < CLOSE;
@@ -568,12 +572,36 @@ function OvenClock({ clock, selected, onSelect }: { clock: Clock; selected: numb
   return (
     <svg id="oven-clock" viewBox="0 0 340 340" className="mx-auto h-auto w-full max-w-[420px]" role="group" aria-label="오늘 빵 나오는 시간 시계">
       <circle cx={CX} cy={CY} r="160" fill={C.paper} stroke={C.line} />
+      {/* 가운데에 고른 빵 사진. 글자가 읽히게 어두운 막을 덮는다 */}
+      <defs>
+        <clipPath id="oven-face">
+          <circle cx={CX} cy={CY} r="119" />
+        </clipPath>
+      </defs>
+      <g clipPath="url(#oven-face)" aria-hidden>
+        <AnimatePresence initial={false}>
+          <motion.image
+            key={rest ? rest.img : sel.bread}
+            href={rest ? rest.img : breadImg(sel.bread)}
+            x={CX - 119}
+            y={CY - 119}
+            width="238"
+            height="238"
+            preserveAspectRatio="xMidYMid slice"
+            initial={reduce ? false : { opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            transition={{ duration: reduce ? 0 : 0.35 }}
+          />
+        </AnimatePresence>
+        <circle cx={CX} cy={CY} r="119" fill="rgba(36,24,14,0.5)" />
+      </g>
       <circle cx={CX} cy={CY} r="128" fill="none" stroke={C.kraft} strokeWidth="18" />
       {showHand && clock && <path d={describeArc(OPEN, clock.m, 128)} fill="none" stroke={C.butterSoft} strokeWidth="18" strokeLinecap="butt" />}
-      {Array.from({ length: 12 }, (_, i) => OPEN + i * 60).map((m) => {
+      {Array.from({ length: 12 }, (_, i) => (i + 1) * 60).map((m) => {
         const p = polar(m, 150);
         return (
-          <text key={m} x={p.x} y={Math.round((p.y + 4) * 100) / 100} fontSize="11" textAnchor="middle" fill={C.muted} fontWeight={600} aria-hidden>
+          <text key={m} x={p.x} y={Math.round((p.y + 4) * 100) / 100} fontSize="12" textAnchor="middle" fill={C.muted} fontWeight={600} aria-hidden>
             {m / 60}
           </text>
         );
@@ -585,7 +613,7 @@ function OvenClock({ clock, selected, onSelect }: { clock: Clock; selected: numb
         const isNext = next === b;
         const done = s.kind === "out";
         const soldOut = s.kind === "out" && s.left === 0;
-        const label = `${hhmm(b.at)} ${BREAD_BY_ID[b.bread].name}${stateText(s) ? `, ${stateText(s)}` : ""}`;
+        const label = `${hhmm(b.at)} ${BREAD_BY_ID[b.bread].name}${stateTextFor(s, closedView) ? `, ${stateTextFor(s, closedView)}` : ""}`;
         return (
           <g
             key={b.at}
@@ -637,14 +665,14 @@ function OvenClock({ clock, selected, onSelect }: { clock: Clock; selected: numb
 
       <foreignObject x={CX - 78} y={CY - 52} width="156" height="104">
         <div className="flex h-full flex-col items-center justify-center text-center" aria-live="polite">
-          <span className="text-[12px] font-semibold tabular-nums" style={{ color: C.crust }}>
-            {hhmm(sel.at)}
+          <span className="text-[13px] font-semibold tabular-nums" style={{ color: "#ffe2a8" }}>
+            {rest ? rest.title : hhmm(sel.at)}
           </span>
-          <span className="text-[17px] font-bold leading-[1.3] tracking-[-0.02em]" style={{ color: C.ink }}>
-            {BREAD_BY_ID[sel.bread].name}
+          <span className="text-[19px] font-bold leading-[1.3] tracking-[-0.02em]" style={{ color: "#fff" }}>
+            {rest ? rest.sub : BREAD_BY_ID[sel.bread].name}
           </span>
-          <span className="mt-0.5 text-[12px] leading-[1.4]" style={{ color: C.muted }}>
-            {stateText(selState) || `${sel.qty}개`}
+          <span className="mt-0.5 text-[13px] font-semibold leading-[1.4]" style={{ color: "rgba(255,255,255,0.88)" }}>
+            {rest ? `${BREAD_BY_ID[sel.bread].name}부터 나와요` : stateTextFor(selState, closedView) || `${sel.qty}개`}
           </span>
         </div>
       </foreignObject>
@@ -652,17 +680,26 @@ function OvenClock({ clock, selected, onSelect }: { clock: Clock; selected: numb
   );
 }
 
-/** 영업시간 밖(휴무, 개점 전, 마감 뒤)에 처음 보여 줄 시각. 판매 중, 품절, 곧 나올 빵이 고루 섞이는 오전 11:20 */
-const SHOWCASE_M = 680;
+/** 영업시간 밖에 시계 가운데에 띄우는 장면. 개점 전은 반죽하는 손, 마감 뒤와 휴무일은 불 하나 켜 둔 빈 매장 */
+type Rest = { img: string; title: string; sub: string };
 
 function Oven({ clock: realClock, onAdd }: { clock: Clock; onAdd: (id: string) => void }) {
   const [preview, setPreview] = useState<number | null>(null);
-  // 밤에 열면 빵이 전부 품절로 보여 시계가 멈춘 것 같으니 영업 중인 시각으로 보여 준다
+  // 영업시간 밖에는 다음 영업일 첫 출고 전 상태로 보여 주고, 가운데에 준비하거나 쉬는 장면을 띄운다
   const closedNow = !!realClock && (realClock.day === 1 || realClock.m < OPEN || realClock.m >= CLOSE - 10);
-  const viewM = preview ?? (closedNow ? SHOWCASE_M : null);
+  const beforeOpen = !!realClock && realClock.day !== 1 && realClock.m < OPEN;
+  const first = hhmm(BATCHES[0].at);
+  const viewM = preview ?? (closedNow ? OPEN - 10 : null);
   const clock: Clock = viewM === null ? realClock : { day: realClock && realClock.day !== 1 ? realClock.day : 2, m: viewM };
   const next = nextBatch(clock);
   const [picked, setPicked] = useState<number | null>(null);
+  const closedView = preview === null && closedNow;
+  const rest: Rest | null =
+    closedView && picked === null && realClock
+      ? beforeOpen
+        ? { img: `${IMG}/clock-prep.jpg`, title: "영업 전", sub: `${first} 첫 출고` }
+        : { img: `${IMG}/clock-rest.jpg`, title: realClock.day === 1 ? "오늘 휴무" : "오늘 영업 끝", sub: `내일 ${first} 첫 출고` }
+      : null;
   const selected = picked ?? (next ? BATCHES.indexOf(next) : 0);
   const [added, setAdded] = useState<string | null>(null);
 
@@ -681,7 +718,7 @@ function Oven({ clock: realClock, onAdd }: { clock: Clock; onAdd: (id: string) =
         <SectionTitle id="oven-title" title="오늘 빵 나오는 시간" />
         <div className="mt-8 grid items-start gap-8 md:grid-cols-[1fr_1fr] md:gap-12">
           <div>
-            <OvenClock clock={clock} selected={selected} onSelect={setPicked} />
+            <OvenClock clock={clock} selected={selected} onSelect={setPicked} rest={rest} closedView={closedView} />
             <div className="mx-auto mt-4 max-w-[420px]">
               <div className="flex items-center justify-between text-[15px]">
                 <label htmlFor="oven-time" className="font-semibold">
@@ -689,7 +726,7 @@ function Oven({ clock: realClock, onAdd }: { clock: Clock; onAdd: (id: string) =
                 </label>
                 <span className="flex items-center gap-2">
                   <span className="font-bold tabular-nums" style={{ color: C.crust }}>
-                    {clock ? hhmm(clock.m) : ""}
+                    {closedView && realClock ? hhmm(realClock.m) : clock ? hhmm(clock.m) : ""}
                   </span>
                   {preview !== null && !closedNow && (
                     <button type="button" onClick={() => setPreview(null)} className="h-9 rounded-[6px] border px-3 text-[14px] font-semibold" style={{ borderColor: C.line, background: C.paper }}>
@@ -775,7 +812,7 @@ function Oven({ clock: realClock, onAdd }: { clock: Clock; onAdd: (id: string) =
                       </span>
                       <span className="min-w-0 flex-1 truncate font-semibold">{BREAD_BY_ID[b.bread].name}</span>
                       <span className="shrink-0 text-[14px]" style={{ color: s.kind === "out" && s.left > 0 ? C.green : C.muted }}>
-                        {stateText(s)}
+                        {stateTextFor(s, closedView)}
                       </span>
                     </button>
                   </li>
