@@ -238,6 +238,12 @@ function DockButtons({ guide, projectId }: { guide: { fresh: boolean; onClick: (
     const sync = () => {
       cancelAnimationFrame(frame);
       frame = requestAnimationFrame(() => {
+        // 태블릿과 PC에서는 버튼을 절대 옮기지 않는다(아이패드 사파리에서 바닥 감지가 흔들려 버튼이 오르내렸다).
+        // 샘플의 하단 바는 휴대폰에서만 화면 폭을 채우므로 휴대폰에서만 피한다
+        if (window.innerWidth >= 768) {
+          setLift(0);
+          return;
+        }
         const h = bottomBarHeight(own.current);
         if (h !== seen) {
           seen = h;
@@ -265,7 +271,7 @@ function DockButtons({ guide, projectId }: { guide: { fresh: boolean; onClick: (
     <div
       ref={own}
       style={{ bottom: `calc(${lift}px + 16px + env(safe-area-inset-bottom))` }}
-      className="print:hidden fixed right-4 z-50 flex items-center gap-2 transition-[bottom] md:left-5 md:right-auto"
+      className="print:hidden fixed right-4 z-50 flex items-center gap-2 md:left-5 md:right-auto"
     >
       <Link href={home} aria-label="곰파트너 메인으로" title="곰파트너 메인으로" data-gtm-cta={`demo_home_${projectId}`} className={`${pill} w-10 justify-center !px-0`}>
         <House size={17} aria-hidden />
