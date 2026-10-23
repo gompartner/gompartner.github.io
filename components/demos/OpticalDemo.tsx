@@ -15,7 +15,7 @@ import { DemoMakerInfo } from "@/components/demos/DemoMakerInfo";
    예약 버튼이 있고 가격은 상담 때 알려 준다. 이 샘플은 그 자리에 테를 직접 골라 보는 3D 안경을 두고
    테와 렌즈 가격을 바로 더해 준다. 얼굴형별 추천 문구는 안경원 상담에서 흔히 쓰는 말을 그대로 썼다.
 
-   사진 출처: Pexels 사진 5202049
+   사진 출처: 첫 화면과 착용 사진 모두 AI 생성(Z-Image-Turbo)
 
    핵심 모션: 첫 화면은 진열대 안경 사진 한 장이다. 들어올 때 사진이 1.06배에서 천천히 제자리로 오고, 문장은 0.3초 늦게
    아래에서 올라온다(CSS keyframes). 스크롤하면 사진만 조금 느리게 움직인다. 테 고르기 무대의 안경은 마우스 위치를 따라
@@ -250,11 +250,11 @@ export function OpticalDemo() {
         </button>
       </header>
 
-      {/* 첫 화면: 왼쪽에 3D 안경(고정), 오른쪽에 얼굴형, 테, 렌즈 선택. 휴대폰에서는 안경이 위에 붙어 따라온다 */}
+      {/* 왼쪽에 고른 테를 쓴 사진(고정), 오른쪽에 얼굴형, 테, 렌즈 선택. 휴대폰에서는 사진이 위에 붙어 따라온다. 렌즈 두께와 색은 렌즈 칸의 안경 그림으로 */}
       <main className="mx-auto max-w-[1200px] px-4 md:px-6">
         <div className="lg:grid lg:grid-cols-[minmax(0,1fr)_440px] lg:items-start lg:gap-10">
           <div className="sticky top-0 z-20 -mx-4 px-4 pb-2 pt-2 md:static md:mx-0 md:px-0 lg:sticky lg:top-4" style={{ background: C.bg }}>
-            <Stage reduce={reduce} shape={S} material={M} idx={idx} opts={opts} />
+            <WearPhoto reduce={reduce} shape={S} material={M} />
             <Summary shape={S} material={M} idx={idx} opts={opts} framePrice={framePrice} lensPrice={lensPrice} total={total} reduce={reduce} onBook={() => go("op-book")} />
           </div>
 
@@ -377,6 +377,9 @@ export function OpticalDemo() {
               <SectionTitle id="op-lens-title" sub="굴절률이 높을수록 같은 도수에서 얇아져요. 가격은 렌즈 한 쌍 기준">
                 렌즈
               </SectionTitle>
+              <div className="mt-4">
+                <Stage reduce={reduce} shape={S} material={M} idx={idx} opts={opts} />
+              </div>
               <div className="mt-4 grid grid-cols-4 gap-2">
                 {INDEXES.map((x, i) => {
                   const sel = idx === i;
@@ -554,12 +557,12 @@ function Poster({ reduce, onBook }: { reduce: boolean; onBook: () => void }) {
         {/* eslint-disable-next-line @next/next/no-img-element -- 정적 export 라 next/image 최적화를 쓰지 않는다 */}
         <img
           src={`${IMG}/hero.jpg`}
-          srcSet={`${IMG}/hero-sm.jpg 960w, ${IMG}/hero.jpg 1920w`}
+          srcSet={`${IMG}/hero-sm.jpg 960w, ${IMG}/hero.jpg 1344w`}
           sizes="100vw"
-          alt="유리 진열대 위에 놓인 빨간 뿔테 안경 두 개"
+          alt="밝은 나무 선반에 안경테가 줄지어 놓인 매장 벽"
           fetchPriority="high"
           className="absolute inset-0 h-full w-full object-cover"
-          style={{ objectPosition: "58% 60%" }}
+          style={{ objectPosition: "78% 50%" }}
         />
       </motion.div>
       {/* 밝은 사진이라 흰 막을 깔고 먹색 글자를 쓴다. 휴대폰은 위에서, PC는 왼쪽에서 */}
@@ -597,7 +600,25 @@ function Poster({ reduce, onBook }: { reduce: boolean; onBook: () => void }) {
   );
 }
 
-/* 3D 안경 무대 */
+/* 고른 테를 쓴 사진. 테 모양마다 착용 사진 한 장 */
+
+function WearPhoto({ reduce, shape, material }: { reduce: boolean; shape: Shape; material: Material }) {
+  return (
+    <div id="op-wear" className="relative aspect-[16/10] max-h-[36svh] w-full overflow-hidden rounded-[8px] md:aspect-[4/3] md:max-h-none" style={{ background: C.steelSoft }}>
+      <AnimatePresence initial={false}>
+        <motion.div key={shape.id} className="absolute inset-0" initial={reduce ? false : { opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} transition={{ duration: reduce ? 0 : 0.3, ease: EASE }}>
+          {/* eslint-disable-next-line @next/next/no-img-element -- 정적 export 라 next/image 최적화를 쓰지 않는다 */}
+          <img src={`${IMG}/wear-${shape.id}.jpg`} alt={`${shape.name} 안경을 쓴 모습`} width={675} height={900} className="h-full w-full object-cover" style={{ objectPosition: "50% 32%" }} />
+        </motion.div>
+      </AnimatePresence>
+      <p className="absolute bottom-3 left-3 z-10 rounded-[4px] px-2.5 py-1 text-[14px] font-semibold text-white" style={{ background: "rgba(17,17,17,0.72)" }}>
+        {shape.name}, {material.name}
+      </p>
+    </div>
+  );
+}
+
+/* 렌즈 무대: 굴절률별 두께와 기능성 렌즈 색을 보여 주는 안경 그림 */
 
 function Stage({ reduce, shape, material, idx, opts }: { reduce: boolean; shape: Shape; material: Material; idx: number; opts: Opts }) {
   const touch = useTouch();
@@ -732,7 +753,7 @@ function Stage({ reduce, shape, material, idx, opts }: { reduce: boolean; shape:
         perspective: 900,
       }}
     >
-      <div className="h-[168px] md:h-[300px] lg:h-[380px]" />
+      <div className="h-[168px] md:h-[240px] lg:h-[200px]" />
       {/* 바닥 그림자 */}
       <motion.div
         aria-hidden
@@ -818,13 +839,13 @@ function Summary({
       </dl>
       <div className="flex items-end gap-4 md:flex-col md:items-end md:gap-2">
         <p className="text-[13px] font-bold" style={{ color: C.muted }}>
-          테 + 렌즈 합계
+          예상 금액, 검사 뒤 확정
         </p>
         <p aria-live="polite" className="font-bold text-[30px] leading-none" style={{ color: C.ink }}>
           <Rolling value={total} reduce={reduce} />
         </p>
         <button type="button" onClick={onBook} data-gtm-cta="optical_book_summary" className={`rounded-md px-4 py-2 text-[14px] font-semibold text-white ${focusRing}`} style={{ background: C.navy, outlineColor: C.navy }}>
-          이 안경으로 검사 예약
+          이 테 꺼내 두고 검사 예약
         </button>
       </div>
     </div>

@@ -2,7 +2,7 @@
 
 import { useEffect, useRef, useState } from "react";
 import { AnimatePresence, animate, motion, type MotionValue, useMotionValue, useMotionValueEvent, useScroll, useTransform } from "framer-motion";
-import { AlertCircle, Bell, Check, Clock, Coffee, Flame, MapPin, MessageCircle, Minus, Plus, ShoppingBag, Store, Truck, X } from "lucide-react";
+import { AlertCircle, Bell, Check, ChevronDown, Clock, Coffee, Flame, MapPin, MessageCircle, Minus, Plus, ShoppingBag, Store, Truck, X } from "lucide-react";
 import { useReducedMotionSafe } from "@/hooks/useReducedMotionSafe";
 import { daysAgo, fmtKo, useDemoToday } from "@/hooks/useDemoToday";
 import { maskName, maskPhone } from "@/components/demos/LeadReceivedPanel";
@@ -82,7 +82,7 @@ const PHOTO_STAGES = [
     alt: "볶기 전 연둣빛 생두",
   },
   {
-    from: 0.5,
+    from: 0.3,
     src: "stage-light.jpg",
     name: "라이트",
     temp: 200,
@@ -90,7 +90,7 @@ const PHOTO_STAGES = [
     alt: "밝은 갈색으로 볶은 라이트 로스트 원두",
   },
   {
-    from: 0.65,
+    from: 0.5,
     src: "stage-medium.jpg",
     name: "미디엄",
     temp: 210,
@@ -98,7 +98,7 @@ const PHOTO_STAGES = [
     alt: "고른 갈색의 미디엄 로스트 원두",
   },
   {
-    from: 0.8,
+    from: 0.7,
     src: "stage-dark.jpg",
     name: "다크",
     temp: 236,
@@ -108,16 +108,16 @@ const PHOTO_STAGES = [
 ];
 
 /** 진행도별 원두 온도(도). 생두 25도에서 시작해 1차 크랙 196도, 2차 크랙 224도를 지난다 */
-const TEMP_STOPS = [0, 0.5, 0.65, 0.8, 0.92, 1];
+const TEMP_STOPS = [0, 0.3, 0.5, 0.7, 0.88, 1];
 const TEMPS = [25, 196, 210, 224, 230, 236];
 
 /** 단계 이름과 시작 진행도 */
 const STAGES = [
   { from: 0, name: "생두", note: "수분이 빠지며 색이 노랗게 변해요" },
-  { from: 0.5, name: "1차 크랙", note: "탁 소리와 함께 알이 부풀어요" },
-  { from: 0.65, name: "미디엄", note: "단맛과 산미가 균형을 잡아요" },
-  { from: 0.8, name: "2차 크랙", note: "표면에 기름이 돌기 시작해요" },
-  { from: 0.92, name: "다크", note: "쓴맛과 바디가 올라와요" },
+  { from: 0.3, name: "1차 크랙", note: "탁 소리와 함께 알이 부풀어요" },
+  { from: 0.5, name: "미디엄", note: "단맛과 산미가 균형을 잡아요" },
+  { from: 0.7, name: "2차 크랙", note: "표면에 기름이 돌기 시작해요" },
+  { from: 0.88, name: "다크", note: "쓴맛과 바디가 올라와요" },
 ];
 const stageOf = (v: number) => {
   let i = 0;
@@ -147,8 +147,8 @@ const CURVE_FRACS = (() => {
   const total = seg[seg.length - 1];
   return seg.map((s) => s / total);
 })();
-/** 진행도별로 그려야 할 곡선 길이. 1차 크랙(0.5)은 네 번째 점, 미디엄은 다섯 번째, 2차 크랙은 여섯 번째 점에 맞춘다 */
-const LEN_STOPS = [0, 0.5, 0.65, 0.8, 1];
+/** 진행도별로 그려야 할 곡선 길이. 1차 크랙(0.3)은 네 번째 점, 미디엄은 다섯 번째, 2차 크랙은 여섯 번째 점에 맞춘다 */
+const LEN_STOPS = [0, 0.3, 0.5, 0.7, 1];
 const LEN_OUT = [0, CURVE_FRACS[3], CURVE_FRACS[4], CURVE_FRACS[5], 1];
 
 /** 곡선 위 길이 비율 f 지점의 좌표 */
@@ -593,7 +593,9 @@ function Poster({ reduce, onCta }: { reduce: boolean; onCta: () => void }) {
       <style>{`
         @keyframes rs-rise { from { opacity: 0; transform: translateY(12px); } to { opacity: 1; transform: none; } }
         .rs-rise { animation: rs-rise 0.7s cubic-bezier(0.22, 1, 0.36, 1) 0.3s both; }
-        @media (prefers-reduced-motion: reduce) { .rs-rise { animation: none; } }
+        @keyframes rs-bob { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(6px); } }
+        .rs-bob { animation: rs-bob 1.4s ease-in-out infinite; }
+        @media (prefers-reduced-motion: reduce) { .rs-rise, .rs-bob { animation: none; } }
       `}</style>
       <motion.div className="absolute inset-0" style={{ y: photoY }} initial={reduce ? false : { scale: 1.06 }} animate={{ scale: 1 }} transition={{ duration: reduce ? 0 : 1.6, ease: EASE }}>
         {/* eslint-disable-next-line @next/next/no-img-element -- 정적 export 라 next/image 최적화를 쓰지 않는다 */}
@@ -662,9 +664,13 @@ function RoastScene({ reduce }: { reduce: boolean }) {
   const pathLen = useTransform(progress, LEN_STOPS, LEN_OUT);
   const dotX = useTransform(pathLen, (f) => pointAt(f)[0]);
   const dotY = useTransform(pathLen, (f) => pointAt(f)[1]);
-  const crack1 = useTransform(progress, (v) => Math.min(1, Math.max(0, (v - 0.49) / 0.03)));
-  const crack2 = useTransform(progress, (v) => Math.min(1, Math.max(0, (v - 0.79) / 0.03)));
+  const crack1 = useTransform(progress, (v) => Math.min(1, Math.max(0, (v - 0.29) / 0.03)));
+  const crack2 = useTransform(progress, (v) => Math.min(1, Math.max(0, (v - 0.69) / 0.03)));
   const photoLabel = useTransform(progress, (v) => PHOTO_STAGES[photoIndexOf(v)].name);
+  // 사진이 바뀌기 전에도 스크롤에 따라 천천히 다가와 움직임이 보이게
+  const photoScale = useTransform(progress, [0, 1], [1, 1.12]);
+  // 처음에만 아래 화살표를 보여 스크롤해야 한다는 걸 알린다
+  const hintOpacity = useTransform(progress, [0, 0.06], [1, 0]);
 
   const [scrolled, setScrolled] = useState(0);
   useMotionValueEvent(progress, "change", (v) => {
@@ -773,9 +779,11 @@ function RoastScene({ reduce }: { reduce: boolean }) {
         <div className="mx-auto grid h-full max-w-[1200px] grid-rows-[minmax(0,1fr)_auto] gap-4 px-4 pb-5 pt-4 md:grid-cols-[minmax(0,1.1fr)_minmax(0,1fr)] md:grid-rows-1 md:items-center md:gap-12 md:px-6 md:py-10">
           {/* 단계별 원두 사진. 뒤 단계 사진이 앞 사진 위로 겹쳐 나타난다 */}
           <div className="relative h-full min-h-0 w-full overflow-hidden rounded-[6px] md:h-[min(78dvh,680px)]" style={{ background: C.paperDeep }}>
-            {PHOTO_STAGES.map((p, i) => (
-              <StagePhoto key={p.src} index={i} progress={progress} />
-            ))}
+            <motion.div className="absolute inset-0" style={{ scale: photoScale }}>
+              {PHOTO_STAGES.map((p, i) => (
+                <StagePhoto key={p.src} index={i} progress={progress} />
+              ))}
+            </motion.div>
             <p className="absolute bottom-3 left-3 rounded-[4px] px-2.5 py-1 text-[14px] font-semibold text-white" style={{ background: "rgba(17,17,17,0.72)" }}>
               <motion.span>{photoLabel}</motion.span>
             </p>
@@ -783,6 +791,11 @@ function RoastScene({ reduce }: { reduce: boolean }) {
 
           {info}
         </div>
+        <motion.div aria-hidden className="pointer-events-none absolute inset-x-0 bottom-3 flex justify-center md:bottom-6" style={{ opacity: hintOpacity }}>
+          <span className="rs-bob flex h-11 w-11 items-center justify-center rounded-full" style={{ background: C.ink, color: "#fff" }}>
+            <ChevronDown size={24} />
+          </span>
+        </motion.div>
       </div>
     </div>
   );

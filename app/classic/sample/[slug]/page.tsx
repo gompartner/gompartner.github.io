@@ -6,7 +6,7 @@ import { Check, Plus } from "lucide-react";
 import { ChannelTalkButton } from "@/components/layout/ChannelTalk";
 import { PageHead, btnLine, btnPrimary, h2, h3, more, wrap } from "@/components/classic/ui";
 import { SampleGrid } from "@/components/classic/works/SampleGrid";
-import { demoProjects, findBySlug, industryOf, isMaintenance, mobileShotOf, samplesIn, slugOf } from "@/components/classic/works/samples";
+import { demoProjects, findBySlug, groupOf, industryOf, isMaintenance, mobileShotOf, samplesIn, slugOf } from "@/components/classic/works/samples";
 import { estimateFor, formatWon, manwon } from "@/data/classic/pricing";
 import { maintenanceServices } from "@/data/classic/maintenance";
 import { pageMeta } from "@/lib/seo";
@@ -33,7 +33,8 @@ export default async function ClassicSamplePage({ params }: Props) {
   const est = estimateFor(p.id);
   const mobileShot = mobileShotOf(p);
   const ind = industryOf(p);
-  const others = (ind ? samplesIn(ind.slug) : demoProjects).filter((x) => x.id !== p.id).slice(0, 4);
+  const grp = groupOf(p);
+  const others = (grp ? samplesIn(grp.slug) : ind ? samplesIn(ind.slug) : demoProjects).filter((x) => x.id !== p.id).slice(0, 4);
 
   return (
     <>

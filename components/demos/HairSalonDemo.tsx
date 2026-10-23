@@ -17,7 +17,7 @@ import { DemoMakerInfo } from "@/components/demos/DemoMakerInfo";
    - 예약은 디자이너를 먼저 고르고 시술을 담은 뒤 날짜와 시간을 고른다. 소요시간만큼 칸이 잡힌다.
    - 관용 문구: 예약하기, 당일 예약 가능, 월요일 정기휴무, 주차 가능, 예약 변경은 하루 전까지.
 
-   사진 출처: Pexels 사진 7195805
+   사진 출처: 첫 화면 Pexels 사진 7195805, 디자이너와 스타일북 사진은 AI 생성(Z-Image-Turbo)
 
    핵심 모션: 첫 화면은 매장 사진 한 장이다. 들어올 때 사진이 1.06배에서 천천히 제자리로 오고, 문장은 0.3초 늦게
    아래에서 올라온다(CSS keyframes). 스크롤하면 사진만 조금 느리게 움직인다. 합계 금액은 숫자 자리마다 굴러서 바뀐다.
@@ -85,12 +85,14 @@ interface Designer {
   extra: number;
   good: string;
   can: ServiceId[];
+  /** 대표 스타일(Style.key). 카드에 작업 사진으로 보인다 */
+  styles: string[];
 }
 const DESIGNERS: Designer[] = [
-  { id: "kim", name: "김ㅎ늘", role: "원장", extra: 0.4, good: "매직, 손상모 펌", can: ["cut", "perm", "color", "clinic", "magic", "dry"] },
-  { id: "lee", name: "이ㅅ아", role: "수석 디자이너", extra: 0.15, good: "레이어드컷, 열펌", can: ["cut", "perm", "color", "clinic", "magic", "dry"] },
-  { id: "park", name: "박ㅈ우", role: "디자이너", extra: 0, good: "염색, 발레아쥬", can: ["cut", "perm", "color", "clinic", "dry"] },
-  { id: "choi", name: "최ㅁ영", role: "디자이너", extra: 0, good: "남성 컷, 다운펌", can: ["cut", "perm", "color", "dry"] },
+  { id: "kim", name: "김ㅎ늘", role: "원장", extra: 0.4, good: "매직, 손상모 펌", can: ["cut", "perm", "color", "clinic", "magic", "dry"], styles: ["volmagic", "ccurl"] },
+  { id: "lee", name: "이ㅅ아", role: "수석 디자이너", extra: 0.15, good: "레이어드컷, 열펌", can: ["cut", "perm", "color", "clinic", "magic", "dry"], styles: ["layered", "build"] },
+  { id: "park", name: "박ㅈ우", role: "디자이너", extra: 0, good: "염색, 발레아쥬", can: ["cut", "perm", "color", "clinic", "dry"], styles: ["balayage", "ashbrown"] },
+  { id: "choi", name: "최ㅁ영", role: "디자이너", extra: 0, good: "남성 컷, 다운펌", can: ["cut", "perm", "color", "dry"], styles: ["down", "parting"] },
 ];
 
 /** 디자이너 단가. 추가 요금을 붙여 천 원 단위로 올린다. */
@@ -118,23 +120,25 @@ function taken(designerIdx: number, dayIdx: number, slot: number) {
 
 /* 스타일북. 조합은 시술 id 목록. */
 interface Style {
+  /** 사진 파일 style-<key>.jpg */
+  key: string;
   name: string;
   combo: ServiceId[];
   note: string;
 }
 const STYLES: Style[] = [
-  { name: "허쉬컷", combo: ["cut", "dry"], note: "층을 많이 내고 끝을 가볍게 쳐요." },
-  { name: "레이어드컷", combo: ["cut"], note: "얼굴 옆 층으로 자연스럽게 흘러요." },
-  { name: "히피펌", combo: ["cut", "perm"], note: "뿌리부터 잔잔하게 말아요. 두 달쯤 가요." },
-  { name: "빌드펌", combo: ["cut", "perm"], note: "볼륨을 아래로 쌓는 굵은 웨이브예요." },
-  { name: "애즈펌", combo: ["perm", "clinic"], note: "열펌이라 클리닉을 같이 해요." },
-  { name: "글램펌", combo: ["cut", "perm", "clinic"], note: "긴 머리 웨이브. 기장 추가 요금이 있어요." },
-  { name: "C컬 매직", combo: ["magic", "cut"], note: "끝만 안으로 말리는 매직이에요." },
-  { name: "볼륨매직", combo: ["magic", "clinic"], note: "뿌리 볼륨을 살리고 열 손상은 클리닉으로 잡아요." },
-  { name: "발레아쥬", combo: ["color", "clinic"], note: "손으로 그려 넣는 그라데이션 염색이에요." },
-  { name: "애쉬브라운", combo: ["color"], note: "붉은 기 없는 갈색. 탈색 없이 가능해요." },
-  { name: "가르마펌", combo: ["cut", "perm"], note: "남성 앞머리 방향을 잡아 줘요." },
-  { name: "다운펌", combo: ["cut", "perm"], note: "옆머리 뜨는 걸 눌러요. 30분이면 돼요." },
+  { key: "hush", name: "허쉬컷", combo: ["cut", "dry"], note: "층을 많이 내고 끝을 가볍게 쳐요." },
+  { key: "layered", name: "레이어드컷", combo: ["cut"], note: "얼굴 옆 층으로 자연스럽게 흘러요." },
+  { key: "hippie", name: "히피펌", combo: ["cut", "perm"], note: "뿌리부터 잔잔하게 말아요. 두 달쯤 가요." },
+  { key: "build", name: "빌드펌", combo: ["cut", "perm"], note: "볼륨을 아래로 쌓는 굵은 웨이브예요." },
+  { key: "as", name: "애즈펌", combo: ["perm", "clinic"], note: "열펌이라 클리닉을 같이 해요." },
+  { key: "glam", name: "글램펌", combo: ["cut", "perm", "clinic"], note: "긴 머리 웨이브. 기장 추가 요금이 있어요." },
+  { key: "ccurl", name: "C컬 매직", combo: ["magic", "cut"], note: "끝만 안으로 말리는 매직이에요." },
+  { key: "volmagic", name: "볼륨매직", combo: ["magic", "clinic"], note: "뿌리 볼륨을 살리고 열 손상은 클리닉으로 잡아요." },
+  { key: "balayage", name: "발레아쥬", combo: ["color", "clinic"], note: "손으로 그려 넣는 그라데이션 염색이에요." },
+  { key: "ashbrown", name: "애쉬브라운", combo: ["color"], note: "붉은 기 없는 갈색. 탈색 없이 가능해요." },
+  { key: "parting", name: "가르마펌", combo: ["cut", "perm"], note: "남성 앞머리 방향을 잡아 줘요." },
+  { key: "down", name: "다운펌", combo: ["cut", "perm"], note: "옆머리 뜨는 걸 눌러요. 30분이면 돼요." },
 ];
 
 const sum = (ids: ServiceId[], d: Designer) => ids.reduce((a, id) => ({ price: a.price + priceOf(SERVICE_BY_ID[id], d), min: a.min + SERVICE_BY_ID[id].min }), { price: 0, min: 0 });
@@ -262,19 +266,35 @@ export function HairSalonDemo() {
                 className={`group relative flex flex-col items-start rounded-[6px] border p-4 text-left transition-[border-color,background-color] duration-200 ${focusRing}`}
                 style={{ borderColor: on ? ACCENT : C.line, background: on ? C.paper : "transparent", outlineColor: ACCENT }}
               >
-                <span className="flex min-h-[18px] w-full items-center justify-end">
+                <span className="relative block aspect-[4/5] w-full overflow-hidden rounded-[4px]" style={{ background: C.soft }}>
+                  {/* eslint-disable-next-line @next/next/no-img-element -- 정적 export 라 next/image 최적화를 쓰지 않는다 */}
+                  <img src={`${IMG}/designer-${d.id}.jpg`} alt={`${d.role} ${d.name}`} loading="lazy" width={600} height={800} className="h-full w-full object-cover transition-transform duration-300 group-hover:scale-[1.03]" style={{ objectPosition: "50% 20%" }} />
                   {on && (
-                    <span className="inline-flex items-center gap-1 text-[13px] font-bold" style={{ color: ACCENT }}>
+                    <span className="absolute right-2 top-2 inline-flex items-center gap-1 rounded-[4px] px-2 py-1 text-[13px] font-bold text-white" style={{ background: ACCENT }}>
                       <Check size={14} aria-hidden /> 선택
                     </span>
                   )}
                 </span>
-                <span className="mt-1 text-[24px] font-bold leading-none" style={{ color: on ? ACCENT : C.ink }}>
+                <span className="mt-4 text-[24px] font-bold leading-none" style={{ color: on ? ACCENT : C.ink }}>
                   {d.name}
                 </span>
                 <span className="mt-1 text-[15px] font-bold">{d.role}</span>
                 <span className="mt-2 text-[14px]" style={{ color: C.muted }}>
                   잘하는 것 {d.good}
+                </span>
+                <span className="mt-3 grid w-full grid-cols-2 gap-1.5" aria-label="대표 스타일">
+                  {d.styles.map((k) => {
+                    const st = STYLES.find((x) => x.key === k)!;
+                    return (
+                      <span key={k} className="relative block aspect-square overflow-hidden rounded-[4px]">
+                        {/* eslint-disable-next-line @next/next/no-img-element -- 정적 export 라 next/image 최적화를 쓰지 않는다 */}
+                        <img src={`${IMG}/style-${k}.jpg`} alt="" loading="lazy" width={300} height={300} className="h-full w-full object-cover" style={{ objectPosition: "50% 25%" }} />
+                        <span className="absolute inset-x-0 bottom-0 px-2 py-1 text-[12px] font-bold text-white" style={{ background: "linear-gradient(to top, rgba(0,0,0,0.65), rgba(0,0,0,0))" }}>
+                          {st.name}
+                        </span>
+                      </span>
+                    );
+                  })}
                 </span>
                 <span className="mt-3 flex flex-wrap gap-1" aria-label="가능한 시술">
                   {SERVICES.map((s) => {
@@ -808,7 +828,7 @@ function DoneCard({ done, today, nowMin, onReset }: { done: { no: string; name: 
 /* ── 스타일북 ─────────────────────────────────────────── */
 
 function StyleBook({ designer, reduce, onCombo }: { designer: Designer; reduce: boolean; onCombo: (ids: ServiceId[]) => void }) {
-  const [sel, setSel] = useState<number | null>(null);
+  const [sel, setSel] = useState<number | null>(0);
   const style = sel === null ? null : STYLES[sel];
   const who = style ? DESIGNERS.filter((d) => style.combo.every((id) => d.can.includes(id))) : [];
   const total = style ? sum(style.combo, who.includes(designer) ? designer : who[0]) : null;
@@ -843,7 +863,14 @@ function StyleBook({ designer, reduce, onCombo }: { designer: Designer; reduce: 
 
         <div className="min-h-[220px] rounded-[6px] border p-5 md:min-h-[300px] md:p-7" style={{ borderColor: C.line, background: style ? C.paper : "transparent" }} aria-live="polite">
           {style && total ? (
-            <>
+            <div className="grid gap-5 sm:grid-cols-[minmax(0,0.8fr)_minmax(0,1fr)]">
+              <AnimatePresence mode="popLayout" initial={false}>
+                <motion.div key={style.key} className="relative aspect-[4/5] overflow-hidden rounded-[4px]" style={{ background: C.soft }} initial={reduce ? false : { opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} transition={{ duration: reduce ? 0 : 0.25 }}>
+                  {/* eslint-disable-next-line @next/next/no-img-element -- 정적 export 라 next/image 최적화를 쓰지 않는다 */}
+                  <img src={`${IMG}/style-${style.key}.jpg`} alt={`${style.name} 시술 뒤 모습`} width={600} height={800} className="h-full w-full object-cover" style={{ objectPosition: "50% 25%" }} />
+                </motion.div>
+              </AnimatePresence>
+              <div className="min-w-0">
               <motion.p layoutId={`hs-style-${style.name}`} transition={layoutT} className="inline-block text-[40px] font-bold leading-[1.15] tracking-[-0.03em] md:text-[56px]" style={{ color: C.ink }}>
                 {style.name}
               </motion.p>
@@ -869,15 +896,22 @@ function StyleBook({ designer, reduce, onCombo }: { designer: Designer; reduce: 
                       {who.includes(designer) ? `${designer.role} ${designer.name} 기준` : `${who[0].role} ${who[0].name} 기준`}
                     </span>
                   </p>
-                  <p className="mt-1 text-[14px]" style={{ color: C.muted }}>
-                    가능한 디자이너 {who.map((d) => d.name).join(", ")}
-                  </p>
+                  <ul className="mt-2 flex flex-wrap gap-2" aria-label="가능한 디자이너">
+                    {who.map((d) => (
+                      <li key={d.id} className="flex items-center gap-1.5 text-[14px]" style={{ color: C.body }}>
+                        {/* eslint-disable-next-line @next/next/no-img-element -- 정적 export 라 next/image 최적화를 쓰지 않는다 */}
+                        <img src={`${IMG}/designer-${d.id}.jpg`} alt="" loading="lazy" width={28} height={28} className="h-7 w-7 rounded-full object-cover" style={{ objectPosition: "50% 20%" }} />
+                        {d.name}
+                      </li>
+                    ))}
+                  </ul>
                   <button type="button" data-gtm-cta="hair-salon_style-add" onClick={() => onCombo(style.combo)} className={`mt-4 rounded-[4px] px-4 py-2.5 text-[15px] font-bold text-white ${focusRing}`} style={{ background: ACCENT, outlineColor: C.ink }}>
                     이 조합으로 예약하기
                   </button>
                 </motion.div>
               </AnimatePresence>
-            </>
+              </div>
+            </div>
           ) : (
             <p className="text-[18px] font-bold" style={{ color: C.muted }}>
               스타일 이름을 눌러 보세요
