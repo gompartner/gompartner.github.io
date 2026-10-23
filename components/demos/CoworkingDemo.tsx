@@ -865,6 +865,10 @@ function RoomBoard({ today }: { today: Date }) {
             <span aria-hidden className="inline-block h-3.5 w-3.5 rounded-[2px] border bg-white" style={{ borderColor: C.edge }} />
             빈 시간
           </span>
+          <span className="inline-flex items-center gap-1.5" style={{ color: C.ink }}>
+            <span aria-hidden className="inline-block h-3.5 w-3.5 rounded-[2px] border" style={{ background: C.pick, borderColor: C.pickEdge }} />
+            고른 시간
+          </span>
         </p>
       </div>
 
@@ -893,8 +897,8 @@ function RoomBoard({ today }: { today: Date }) {
                     aria-pressed={on}
                     aria-label={`${range} 빈 시간`}
                     onClick={() => setPick(on ? null : { room: ri, hour: h })}
-                    className={`h-11 rounded-[3px] border transition-colors duration-150 hover:bg-[#eaeff0] ${focusRing}`}
-                    style={{ borderColor: on ? C.accent : C.edge, background: on ? C.accent : "#fff", outlineColor: C.accent }}
+                    className={`h-11 rounded-[3px] border transition-colors duration-150 ${on ? "" : "hover:bg-[#fff6d9]"} ${focusRing}`}
+                    style={{ borderColor: on ? C.pickEdge : C.edge, background: on ? C.pick : "#fff", outlineColor: C.accent }}
                   />
                 );
               })}
@@ -910,7 +914,7 @@ function RoomBoard({ today }: { today: Date }) {
         ))}
       </div>
 
-      <div className="mt-5 rounded-[6px] border px-4 py-3 text-[15px] leading-[1.6]" style={{ borderColor: pick ? C.accent : C.line, background: pick ? C.inkSoft : "#fff" }} aria-live="polite">
+      <div className="mt-5 rounded-[6px] border px-4 py-3 text-[15px] leading-[1.6]" style={{ borderColor: pick ? C.pickEdge : C.line, background: pick ? C.pickSoft : "#fff" }} aria-live="polite">
         {pick && picked ? (
           <>
             <p className="font-bold" style={{ color: C.ink }}>
