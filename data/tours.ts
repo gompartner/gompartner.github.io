@@ -198,7 +198,7 @@ export const tours: Record<string, TourStep[]> = {
   "coworking": [
     { target: "#cw-plan", title: "좌석 평면도", desc: "자리나 유형을 눌러 보세요. 빈 자리 숫자가 굴러가요." },
     { target: "#cw-price", title: "요금 계산", desc: "기간과 인원, 옵션을 고르세요." },
-    { target: "#cw-rooms", title: "회의실 현황", desc: "빈 시간을 누르세요." },
+    { target: "#cw-rooms", title: "회의실 현황", desc: "예약 가능한 시간을 눌러 보세요." },
     { target: "#cw-tour", title: "투어 신청", desc: "평일 날짜와 시간을 고르고 신청하세요." },
   ],
   "campsite": [

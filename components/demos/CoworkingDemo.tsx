@@ -23,7 +23,7 @@ import { DemoMakerInfo } from "@/components/demos/DemoMakerInfo";
    상호작용(모두 브라우저 안에서만 돈다. 실제로 보내지 않는다)
    1. 좌석 유형 고르기: 자유석, 지정석, 1인실, 4인실 중 하나를 누르거나 평면도의 자리를 직접 누르면 그 유형만 밝아진다.
    2. 요금 계산: 기간(1, 3, 6, 12개월), 인원, 추가 옵션을 고르면 월 요금과 총액이 바로 바뀐다.
-   3. 회의실 예약 현황: 회의실 2곳의 오늘 시간대 막대(09~21시). 빈 시간을 누르면 예약 가능 표시.
+   3. 회의실 예약 현황: 회의실 2곳의 오늘 시간대 막대(09~21시). 예약 가능한 시간을 누르면 선택 표시.
    4. 투어 신청: 날짜(오늘부터 7일, 평일만), 시간, 이름, 휴대폰, 인원. 접수 완료 화면에 접수번호, 담당 창구, 회신 예정일.
    5. 입주 혜택과 오시는 길: 역에서 걷는 시간, 주차, 운영시간. 오늘 요일 진하게.
 
@@ -327,7 +327,7 @@ export function CoworkingDemo() {
               {selected && (
                 <span className="inline-flex items-center gap-1.5" style={{ color: C.ink }}>
                   <span aria-hidden className="inline-block h-3.5 w-3.5 rounded-[3px] border" style={{ background: C.pick, borderColor: C.pickEdge }} />
-                  고른 {selected} 빈 자리
+                  선택한 {selected}
                 </span>
               )}
               <span className="ml-auto">
@@ -859,15 +859,15 @@ function RoomBoard({ today }: { today: Date }) {
         <p className="flex items-center gap-4">
           <span className="inline-flex items-center gap-1.5">
             <span aria-hidden className="inline-block h-3.5 w-3.5 rounded-[2px]" style={{ background: C.accent }} />
-            예약됨
+            예약 마감
           </span>
           <span className="inline-flex items-center gap-1.5">
             <span aria-hidden className="inline-block h-3.5 w-3.5 rounded-[2px] border bg-white" style={{ borderColor: C.edge }} />
-            빈 시간
+            예약 가능
           </span>
           <span className="inline-flex items-center gap-1.5" style={{ color: C.ink }}>
             <span aria-hidden className="inline-block h-3.5 w-3.5 rounded-[2px] border" style={{ background: C.pick, borderColor: C.pickEdge }} />
-            고른 시간
+            선택
           </span>
         </p>
       </div>
@@ -880,7 +880,7 @@ function RoomBoard({ today }: { today: Date }) {
                 {r.name} <span style={{ color: C.muted }}>{r.cap}인</span>
               </h3>
               <p className="text-[13px]" style={{ color: C.muted }}>
-                빈 시간 {HOURS.filter((h) => !roomTaken(ri, h)).length}시간
+                예약 가능 {HOURS.filter((h) => !roomTaken(ri, h)).length}시간
               </p>
             </div>
             <div role="group" aria-label={`${r.name} 오늘 예약 현황`} className="mt-2 grid grid-cols-12 gap-[3px]">
@@ -889,13 +889,13 @@ function RoomBoard({ today }: { today: Date }) {
                 const on = pick?.room === ri && pick.hour === h;
                 const range = `${p2(h)}:00~${p2(h + 1)}:00`;
                 return taken ? (
-                  <span key={h} role="img" aria-label={`${range} 예약됨`} className="h-11 rounded-[3px]" style={{ background: C.accent }} />
+                  <span key={h} role="img" aria-label={`${range} 예약 마감`} className="h-11 rounded-[3px]" style={{ background: C.accent }} />
                 ) : (
                   <button
                     key={h}
                     type="button"
                     aria-pressed={on}
-                    aria-label={`${range} 빈 시간`}
+                    aria-label={`${range} 예약 가능`}
                     onClick={() => setPick(on ? null : { room: ri, hour: h })}
                     className={`h-11 rounded-[3px] border transition-colors duration-150 ${on ? "" : "hover:bg-[#fff6d9]"} ${focusRing}`}
                     style={{ borderColor: on ? C.pickEdge : C.edge, background: on ? C.pick : "#fff", outlineColor: C.accent }}
