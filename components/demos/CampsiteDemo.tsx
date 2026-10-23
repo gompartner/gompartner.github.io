@@ -22,7 +22,7 @@ import { DemoMakerInfo } from "@/components/demos/DemoMakerInfo";
    스크롤하면 사진만 조금 느리게 움직인다. 불꽃, 불티 같은 반복 움직임은 두지 않는다. 동작 줄이기면 모두 멈춘 상태.
    그 아래 먹색 띠(상호, 사이트 구성, 요금 요약)가 이어진다.
 
-   사진 출처: Pexels 사진 2526025
+   사진 출처: 첫 화면 Pexels 사진 2526025, 구역 사진은 AI 생성(Z-Image-Turbo)
 
    상호작용(모두 브라우저 안에서만 돈다. 실제로 보내지 않는다)
    1. 사이트 배치도: A, B, C 구역 사이트 22면과 글램핑 2동. 누르면 크기, 전기, 그늘, 화장실 거리가 나온다.
@@ -579,15 +579,17 @@ function SiteCard({ site, reduce }: { site: Site; reduce: boolean }) {
       initial={reduce ? false : { opacity: 0 }}
       animate={{ opacity: 1 }}
       transition={{ duration: PANEL_MS / 1000, ease: EASE }}
-      className="mt-5 grid gap-4 rounded-[8px] border bg-white p-4 sm:grid-cols-[150px_minmax(0,1fr)]"
+      className="mt-5 grid gap-4 rounded-[8px] border bg-white p-4 sm:grid-cols-[200px_minmax(0,1fr)] lg:grid-cols-1 lg:gap-5 lg:p-5"
       style={{ borderColor: C.line }}
       aria-live="polite"
     >
-      <div className="flex h-[96px] items-end justify-between rounded-[6px] p-3 sm:h-full" style={{ background: C.paperDim }} aria-hidden>
-        <span className="text-[30px] font-bold leading-none" style={{ color: C.ink }}>
+      {/* 구역 사진. 휴대폰은 위에 넓게, 태블릿은 왼쪽 작은 칸, PC는 오른쪽 예약 칸 높이에 맞춰 크게 */}
+      <div className="relative aspect-[16/10] overflow-hidden rounded-[6px] sm:aspect-auto sm:h-full sm:min-h-[150px] lg:aspect-[16/9] lg:h-auto" style={{ background: C.paperDim }}>
+        {/* eslint-disable-next-line @next/next/no-img-element -- 정적 export 라 next/image 최적화를 쓰지 않는다 */}
+        <img src={`${IMG}/zone-${site.zone}.jpg`} alt={`${zone.name} 사이트 모습`} loading="lazy" width={1344} height={768} className="absolute inset-0 h-full w-full object-cover" />
+        <span className="absolute bottom-2 left-2 rounded-[4px] px-2.5 py-1 text-[20px] font-bold leading-none text-white lg:bottom-3 lg:left-3 lg:text-[26px]" style={{ background: "rgba(20,20,20,0.7)" }}>
           {site.id}
         </span>
-        <Tent size={22} style={{ color: C.muted }} />
       </div>
       <div>
         <p className="text-[20px] font-bold">
