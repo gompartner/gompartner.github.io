@@ -132,28 +132,28 @@ function booked(dayIdx: number, hour: number, staff: number) {
 /* 손 모양 */
 
 const VB = { w: 340, h: 420 };
-type Finger = { name: string; cx: number; top: number; w: number; len: number; rot: number; pivot: [number, number]; nailH: number };
+/** 손 사진(hand.jpg, 520x642를 viewBox 340x420에 맞춤) 위 손톱 자리. cx와 top은 손톱 가운데 위쪽 끝, rot은 손톱 가운데를 기준으로 돌린 각도 */
+type Finger = { name: string; cx: number; top: number; w: number; h: number; rot: number; pivot: [number, number] };
 const FINGERS: Finger[] = [
-  { name: "엄지", cx: 110, top: 200, w: 50, len: 150, rot: -32, pivot: [110, 345], nailH: 36 },
-  { name: "검지", cx: 136, top: 92, w: 46, len: 194, rot: 0, pivot: [0, 0], nailH: 40 },
-  { name: "중지", cx: 188, top: 58, w: 48, len: 228, rot: 0, pivot: [0, 0], nailH: 42 },
-  { name: "약지", cx: 240, top: 80, w: 46, len: 206, rot: 0, pivot: [0, 0], nailH: 40 },
-  { name: "소지", cx: 288, top: 134, w: 40, len: 156, rot: 0, pivot: [0, 0], nailH: 34 },
+  { name: "엄지", cx: 44.5, top: 201.4, w: 19.6, h: 28.8, rot: -28, pivot: [44.5, 215.8] },
+  { name: "검지", cx: 132.4, top: 49.7, w: 22.9, h: 32, rot: 0, pivot: [0, 0] },
+  { name: "중지", cx: 190.3, top: 31.4, w: 27.5, h: 34, rot: 0, pivot: [0, 0] },
+  { name: "약지", cx: 234.1, top: 62.1, w: 24.2, h: 32.7, rot: 0, pivot: [0, 0] },
+  { name: "소지", cx: 289.6, top: 127.5, w: 18.3, h: 26.2, rot: 3, pivot: [289.6, 140.6] },
 ];
 
 function nailGeo(f: Finger) {
-  const w = f.w - 16;
-  const h = f.nailH;
-  const top = f.top + 9;
-  return { cx: f.cx, w, h, top };
+  return { cx: f.cx, w: f.w, h: f.h, top: f.top };
 }
 
+/** 위는 반원(손톱 끝), 아래는 완만한 호(큐티클 선) */
 function nailPath(cx: number, top: number, w: number, h: number) {
   const l = cx - w / 2;
   const r = cx + w / 2;
   const b = top + h;
   const rt = w / 2;
-  return `M${l} ${top + rt} A${rt} ${rt} 0 0 1 ${r} ${top + rt} L${r} ${b - 7} Q${r} ${b} ${r - 7} ${b} L${l + 7} ${b} Q${l} ${b} ${l} ${b - 7} Z`;
+  const rb = w * 0.32;
+  return `M${l} ${top + rt} A${rt} ${rt} 0 0 1 ${r} ${top + rt} L${r} ${b - rb} A${rt} ${rb} 0 0 1 ${l} ${b - rb} Z`;
 }
 
 /** 점 (px, py)를 (cx, cy) 기준으로 deg 만큼 돌린다 */
@@ -284,8 +284,13 @@ export function NailShopDemo() {
       cv.height = VB.h * 2;
       const ctx = cv.getContext("2d");
       if (!ctx) return;
-      ctx.fillStyle = C.bg;
-      ctx.fillRect(0, 0, cv.width, cv.height);
+      const hand = await new Promise<HTMLImageElement>((ok, no) => {
+        const im = new Image();
+        im.onload = () => ok(im);
+        im.onerror = () => no(new Error("hand"));
+        im.src = `${IMG}/hand.jpg`;
+      });
+      ctx.drawImage(hand, 0, 0, cv.width, cv.height);
       ctx.drawImage(img, 0, 0, cv.width, cv.height);
       ctx.fillStyle = C.plum;
       ctx.font = "bold 22px Pretendard, sans-serif";
@@ -352,7 +357,7 @@ export function NailShopDemo() {
             </button>
           </div>
 
-          <div className="relative mx-auto mt-3 w-full max-w-[380px]" style={{ aspectRatio: `${VB.w} / ${VB.h}` }}>
+          <div className="relative mx-auto mt-3 w-full max-w-[440px] overflow-hidden rounded-[8px]" style={{ aspectRatio: `${VB.w} / ${VB.h}` }}>
             <HandSvg ref={svgRef} uid={uid} nails={nails} target={target} onPick={(i) => setTarget((t) => (t === i ? null : i))} reduce={reduce} />
             {/* 날아온 칩이 손톱 위에 내려앉는 자리 */}
             <AnimatePresence>
@@ -646,7 +651,7 @@ function Poster({ reduce, onCta }: { reduce: boolean; onCta: () => void }) {
 function HandSvg({ ref, uid, nails, target, onPick, reduce }: { ref: React.RefObject<SVGSVGElement | null>; uid: string; nails: Nail[]; target: number | null; onPick: (i: number) => void; reduce: boolean }) {
   const dur = reduce ? 0 : DUR;
   return (
-    <svg ref={ref} viewBox={`0 0 ${VB.w} ${VB.h}`} className="absolute inset-0 h-full w-full" role="img" aria-label="손 그림. 손톱을 누르면 그 손톱만 고를 수 있어요">
+    <svg ref={ref} viewBox={`0 0 ${VB.w} ${VB.h}`} className="absolute inset-0 h-full w-full" role="img" aria-label="손 사진. 손톱을 누르면 그 손톱만 고를 수 있어요">
       <defs>
         <pattern id={`glit-${uid}`} patternUnits="userSpaceOnUse" width="9" height="9">
           <circle cx="2" cy="2" r="1.1" fill="#fff" opacity="0.95" />
@@ -667,10 +672,16 @@ function HandSvg({ ref, uid, nails, target, onPick, reduce }: { ref: React.RefOb
           <stop offset="0.56" stopColor="#fff" stopOpacity="0.85" />
           <stop offset="0.75" stopColor="#fff" stopOpacity="0" />
         </linearGradient>
-        <linearGradient id={`gloss-${uid}`} x1="0" y1="0" x2="0" y2="1">
-          <stop offset="0" stopColor="#fff" stopOpacity="0.55" />
-          <stop offset="0.6" stopColor="#fff" stopOpacity="0" />
+        <linearGradient id={`gloss-${uid}`} x1="0" y1="0" x2="1" y2="0">
+          <stop offset="0.18" stopColor="#fff" stopOpacity="0" />
+          <stop offset="0.3" stopColor="#fff" stopOpacity="0.5" />
+          <stop offset="0.42" stopColor="#fff" stopOpacity="0" />
         </linearGradient>
+        {/* 손톱이 둥글게 보이도록 가장자리를 조금 어둡게 */}
+        <radialGradient id={`shade-${uid}`} cx="0.5" cy="0.45" r="0.62">
+          <stop offset="0.55" stopColor="#000" stopOpacity="0" />
+          <stop offset="1" stopColor="#000" stopOpacity="0.28" />
+        </radialGradient>
         {FINGERS.map((f, i) => {
           const g = nailGeo(f);
           return (
@@ -681,16 +692,8 @@ function HandSvg({ ref, uid, nails, target, onPick, reduce }: { ref: React.RefOb
         })}
       </defs>
 
-      {/* 손바닥 */}
-      <path d="M118 290 Q118 262 140 262 L300 262 Q322 264 322 290 L322 364 Q322 418 268 418 L170 418 Q118 418 118 364 Z" fill={C.skin} stroke={C.skinLine} strokeWidth="2.5" />
-      {/* 손가락 */}
-      {FINGERS.map((f) => (
-        <g key={f.name} transform={f.rot ? `rotate(${f.rot} ${f.pivot[0]} ${f.pivot[1]})` : undefined}>
-          <rect x={f.cx - f.w / 2} y={f.top} width={f.w} height={f.len} rx={f.w / 2} fill={C.skin} stroke={C.skinLine} strokeWidth="2.5" />
-        </g>
-      ))}
-      {/* 손가락 밑동 선을 덮어 손바닥과 이어 보이게 */}
-      <rect x="120" y="264" width="200" height="40" fill={C.skin} />
+      {/* 실제 손 사진. 저장할 때는 캔버스에 먼저 그리고 SVG에서는 뺀다(SVG를 그림으로 바꾸면 바깥 사진을 못 불러온다) */}
+      <image href={`${IMG}/hand.jpg`} x="0" y="0" width={VB.w} height={VB.h} preserveAspectRatio="xMidYMid slice" data-skip-export="" />
       {/* 손톱 */}
       {FINGERS.map((f, i) => {
         const g = nailGeo(f);
@@ -708,9 +711,10 @@ function HandSvg({ ref, uid, nails, target, onPick, reduce }: { ref: React.RefOb
                   </motion.g>
                 )}
               </AnimatePresence>
+              <path d={d} fill={`url(#shade-${uid})`} pointerEvents="none" />
               <path d={d} fill={`url(#gloss-${uid})`} pointerEvents="none" />
             </g>
-            <path d={d} fill="none" stroke={on ? C.plum : C.skinLine} strokeWidth={on ? 3 : 1.5} strokeDasharray={on ? "5 3" : undefined} data-skip-export={on ? "" : undefined} />
+            <path d={d} fill="none" stroke={on ? C.plum : "rgba(120,80,60,0.35)"} strokeWidth={on ? 2.5 : 0.8} strokeDasharray={on ? "5 3" : undefined} data-skip-export={on ? "" : undefined} />
             <path
               d={d}
               fill="transparent"
