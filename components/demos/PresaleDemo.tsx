@@ -1,25 +1,26 @@
 "use client";
 
 import { useEffect, useMemo, useRef, useState } from "react";
-import { AnimatePresence, animate, motion, useMotionValue, useScroll, useTransform, type MotionValue } from "framer-motion";
-import { Building2, CalendarCheck, Check, CircleAlert, GraduationCap, MapPin, MessageCircle, Minus, Phone, Plus, ShoppingCart, TrainFront, Trees } from "lucide-react";
-import { JetBrains_Mono, Noto_Serif_KR } from "@/lib/local-fonts";
+import { AnimatePresence, motion, useScroll, useTransform } from "framer-motion";
+import { CalendarCheck, Check, CircleAlert, GraduationCap, MapPin, MessageCircle, Minus, Phone, Plus, ShoppingCart, TrainFront, Trees } from "lucide-react";
+import { Noto_Serif_KR } from "@/lib/local-fonts";
 import { useReducedMotionSafe } from "@/hooks/useReducedMotionSafe";
 import { daysAgo, fmtKo, useDemoToday } from "@/hooks/useDemoToday";
 import { maskName, maskPhone } from "@/components/demos/LeadReceivedPanel";
 import { DemoMakerInfo } from "@/components/demos/DemoMakerInfo";
 
-/* 아파트 분양 홍보관 샘플: 가상의 곰파트너아파트(ㅎㄷ시). 사업지, 견본주택 주소, 분양가, 손님 이름은 모두 가상이다.
+/* 아파트 분양 홍보관 샘플: 가상의 곰파트너 아파트(ㅎㄷ시). 사업지, 견본주택 주소, 분양가, 손님 이름은 모두 가상이다.
+   첫 화면 사진 출처: Pexels 사진 28456460
 
    국내 분양 홈페이지 공통 구성(참고): 메뉴는 사업개요, 입지환경, 단지안내, 세대안내(타입별 평면도), 분양안내(분양 일정,
    입주자모집공고, 분양가), 견본주택(방문예약, 오시는 길), 관심고객등록. 첫 화면은 큰 조감도와 "견본주택 오픈" 문구,
    아래에 대표번호와 방문예약 버튼이 붙어 다닌다. 관용 문구는 주택형, 전용면적, 공급면적, 계약금 10%, 중도금 60% 이자후불제,
    잔금 30%, 발코니 확장 별도, "견본주택 방문은 사전 예약제로 운영됩니다", "이해를 돕기 위한 것으로 실제와 다를 수 있습니다".
 
-   포스터 첫 화면(pv-poster): 짙은 녹색 바탕에 큰 문장 "84타입 견본주택, 주말에도 열어요" 하나만 둔다.
-   오른쪽(휴대폰은 아래)에 84타입 평면도가 아이소메트릭으로 놓인다. 금색 선으로 벽 자리가 먼저 그려지고, 벽이 위로 솟아
-   입체 평면이 된 뒤 방마다 하나씩 불이 켜진다. 스크롤하면 모형이 위로 들려 사라지고 바닥 그림자만 남았다가 흐려진다.
-   동작 줄이기면 벽이 다 선 채 불이 모두 켜진 상태로 고정하고 스크롤 퇴장도 없다.
+   핵심 모션: 첫 화면(pv-poster)은 밝은 복층 거실 사진 한 장이 화면을 채운다. 들어올 때 사진이 1.6초 동안 천천히 다가오고
+   (scale 1.06 -> 1), 문장과 정보 줄은 0.3초 늦게 아래에서 올라온다(CSS keyframes, 끝 상태가 기본값이라 JS 없이도 보인다).
+   스크롤하면 사진만 조금 느리게 움직인다(y 0 -> 8%). 본문에서는 타입을 바꿀 때 평면도 벽선이 다시 그려지는 것 하나만 남겼다.
+   동작 줄이기면 모두 멈춘 완성 상태다. 제목(h1, h2)만 명조, 나머지는 기본 고딕.
 
    상호작용(모두 브라우저 안에서만 돈다. 실제로 보내지 않는다)
    1. 타입 고르기: 59, 84, 109 를 누르면 평면도 벽선이 다시 그려지고 전용, 공급면적과 방 구성이 바뀐다.
@@ -27,10 +28,12 @@ import { DemoMakerInfo } from "@/components/demos/DemoMakerInfo";
    3. 견본주택 방문예약: 날짜, 시간(남은 팀 수), 관심 타입, 인원, 이름, 휴대폰. 완료하면 예약 번호와 담당 창구, 확인 연락일.
    4. 입지환경: 그린 지도에서 교통, 교육, 생활, 자연을 고르면 사업지에서 이어지는 점선과 거리가 나온다. */
 
+/** 명조는 h1, h2 에만 쓴다 */
 const serifF = { fontFamily: `${Noto_Serif_KR.style.fontFamily}, serif` } as const;
-const monoF = { fontFamily: `${JetBrains_Mono.style.fontFamily}, ui-monospace, monospace` } as const;
 
-const BRAND = "곰파트너아파트";
+const IMG = "/images/demo-presale";
+
+const BRAND = "곰파트너";
 const GALLERY = `${BRAND} 견본주택`;
 const GALLERY_ADDR = "ㅎㄷ시 ㅇㅇ구 ㅇㅇ로 00 (ㅎㄷ역 2번 출구 앞)";
 const SITE_ADDR = "ㅎㄷ시 ㅇㅇ구 ㅇㅇ동 일원";
@@ -38,39 +41,26 @@ const TEL = "1600-0000";
 const KAKAO = "카카오톡 채널 곰파트너";
 
 const C = {
-  green: "#123b2c",
-  greenDeep: "#0b2a1f",
-  greenMid: "#1f5641",
-  gold: "#d8c08a",
-  goldDeep: "#7d5f26",
-  cream: "#f3ead6",
-  ivory: "#f7f4ec",
-  ivoryDeep: "#ede7d8",
-  ink: "#1b2420",
-  muted: "#56625c",
-  line: "#d6cfbd",
+  paper: "#ffffff",
+  soft: "#f7f7f5",
+  ink: "#111111",
+  body: "#4b4b4b",
+  muted: "#767676",
+  line: "#e5e5e5",
+  /** 입력칸, 버튼 테두리 */
+  field: "#c4c4c4",
+  /** 강조색 하나. 짙은 숲색 */
+  accent: "#1f3d33",
   error: "#b42318",
 };
 
 /* 모션 상수. 시간은 초, 이징은 cubic-bezier */
 const EASE = [0.22, 1, 0.36, 1] as const;
-/** 포스터: 벽 자리 선 긋기 시작과 길이 */
-const LINE_AT = 0.1;
-const LINE_DUR = 0.6;
-/** 포스터: 벽이 솟는 시작과 길이 */
-const RISE_AT = 0.55;
-const RISE_DUR = 0.7;
-/** 포스터: 첫 방 불이 켜지는 시점과 방 사이 간격, 켜지는 시간. 마지막 방이 1.9초 안에 켜진다 */
-const LIGHT_AT = 1.1;
-const LIGHT_GAP = 0.06;
-const LIGHT_DUR = 0.22;
-/** 포스터 퇴장이 끝나는 스크롤 진행도(래퍼 기준) */
-const EXIT_END = 0.8;
+/** 첫 화면 사진이 다가오는 시간 */
+const HERO_IN = 1.6;
 /** 평면도 벽선 다시 그리기 */
 const PLAN_DUR = 0.6;
 const PLAN_STAGGER = 0.035;
-/** 숫자, 패널 전환 */
-const DUR = 0.35;
 
 const focusRing = "focus-visible:outline focus-visible:outline-[3px] focus-visible:outline-offset-2";
 const p2 = (n: number) => String(n).padStart(2, "0");
@@ -210,59 +200,6 @@ const TYPES: UnitType[] = [
 const typeById = (id: TypeId) => TYPES.find((t) => t.id === id) ?? TYPES[1];
 const TOTAL_HOUSEHOLDS = TYPES.reduce((a, t) => a + t.households, 0);
 
-/* ---------- 포스터 아이소메트릭 ---------- */
-
-const COS30 = Math.cos(Math.PI / 6);
-/** 1m 가 몇 svg 단위인지 */
-const ISO_U = 34;
-const ISO_OX = 340;
-const ISO_OY = 60;
-/** 벽 높이(m 단위가 아니라 모형 비율) */
-const WALL_H = 1.3;
-const iso = (x: number, y: number, z = 0): [number, number] => [ISO_OX + (x - y) * COS30 * ISO_U, ISO_OY + (x + y) * 0.5 * ISO_U - z * ISO_U];
-const pathOf = (ps: [number, number][], close = true) => `M${ps.map(([a, b]) => `${a.toFixed(1)} ${b.toFixed(1)}`).join(" L")}${close ? " Z" : ""}`;
-
-interface Wall {
-  a: [number, number];
-  b: [number, number];
-  glass?: boolean;
-  /** 벽 높이 배율 */
-  hh?: number;
-}
-/** 84타입 벽. 문 자리는 비운다. 앞쪽(y=9)과 오른쪽(x=14) 바깥벽은 안이 보이게 유리로 둔다 */
-const WALLS_84: Wall[] = [
-  { a: [0, 0], b: [14, 0] },
-  { a: [0, 0], b: [0, 9] },
-  { a: [2.9, 2.6], b: [6, 2.6] },
-  { a: [0, 4.6], b: [2.2, 4.6] },
-  { a: [3, 4.6], b: [5.2, 4.6] },
-  { a: [10.9, 3.4], b: [12.2, 3.4] },
-  { a: [12.9, 3.4], b: [14, 3.4] },
-  { a: [2.2, 0], b: [2.2, 2.6] },
-  { a: [4.4, 0], b: [4.4, 2.6] },
-  { a: [6, 0], b: [6, 2.6] },
-  { a: [6, 4.6], b: [6, 9] },
-  { a: [3, 4.6], b: [3, 9] },
-  { a: [10.2, 0], b: [10.2, 3.4] },
-  { a: [10.2, 4.4], b: [10.2, 9] },
-  { a: [12.2, 0], b: [12.2, 3.4] },
-  { a: [0, 9], b: [14, 9], glass: true },
-  { a: [14, 0], b: [14, 9], glass: true },
-  { a: [0, 10.4], b: [14, 10.4], glass: true, hh: 0.35 },
-];
-/** 불 켜는 순서(84타입 방 이름) */
-const LIGHT_ORDER = ["거실", "주방", "안방", "침실2", "침실3", "드레스룸", "욕실2", "욕실1", "현관", "팬트리", ""];
-
-const wallFace = (w: Wall, v: number) => {
-  const h = WALL_H * (w.hh ?? 1) * v;
-  return pathOf([iso(w.a[0], w.a[1]), iso(w.b[0], w.b[1]), iso(w.b[0], w.b[1], h), iso(w.a[0], w.a[1], h)]);
-};
-const wallTop = (w: Wall, v: number) => {
-  const h = WALL_H * (w.hh ?? 1) * v;
-  return pathOf([iso(w.a[0], w.a[1], h), iso(w.b[0], w.b[1], h)], false);
-};
-const roomPoly = (r: Room["r"], z = 0) => pathOf([iso(r[0], r[1], z), iso(r[2], r[1], z), iso(r[2], r[3], z), iso(r[0], r[3], z)]);
-
 /* ---------- 분양 일정, 층, 납부 ---------- */
 
 const FLOORS = [
@@ -349,14 +286,13 @@ export function PresaleDemo() {
   const navBtn = `rounded-[4px] px-2.5 py-1.5 text-[15px] font-medium underline-offset-4 hover:underline ${focusRing}`;
 
   return (
-    <div className="min-h-screen overflow-x-clip" style={{ background: C.ivory, color: C.ink }}>
+    <div className="min-h-screen overflow-x-clip" style={{ background: C.paper, color: C.ink }}>
       <Poster reduce={reduce} onCta={() => go("pv-visit")} />
 
       <header className="border-b" style={{ borderColor: C.line }}>
         <div className="mx-auto flex max-w-[1200px] flex-wrap items-center justify-between gap-x-4 gap-y-2 px-4 py-4 md:px-6">
-          <h2 className="inline-flex items-center gap-2 text-[21px] font-bold leading-none" style={{ ...serifF, color: C.green }}>
-            <Building2 size={22} aria-hidden style={{ color: C.goldDeep }} />
-            {BRAND}
+          <h2 className="inline-flex items-center gap-2 text-[21px] font-bold leading-none">
+            <SampleLogo />
           </h2>
           <nav aria-label="주요 메뉴" className="-mx-2 flex flex-wrap items-center">
             {[
@@ -366,11 +302,11 @@ export function PresaleDemo() {
               ["pv-visit", "견본주택"],
               ["pv-map", "입지환경"],
             ].map(([id, label]) => (
-              <button key={id} type="button" onClick={() => go(id)} className={navBtn} style={{ outlineColor: C.green }}>
+              <button key={id} type="button" onClick={() => go(id)} className={navBtn} style={{ outlineColor: C.accent }}>
                 {label}
               </button>
             ))}
-            <a href={`tel:${TEL.replace(/-/g, "")}`} className={`ml-1 inline-flex items-center gap-1.5 rounded-[4px] px-3 py-1.5 text-[15px] font-bold ${focusRing}`} style={{ background: C.green, color: C.cream, outlineColor: C.green }}>
+            <a href={`tel:${TEL.replace(/-/g, "")}`} className={`ml-1 inline-flex items-center gap-1.5 rounded-[4px] px-3 py-1.5 text-[15px] font-semibold text-white ${focusRing}`} style={{ background: C.accent, outlineColor: C.accent }}>
               <Phone size={16} aria-hidden />
               {TEL}
             </a>
@@ -387,12 +323,12 @@ export function PresaleDemo() {
 
       <section id="pv-price" aria-labelledby="pv-price-title" className="mx-auto mt-16 max-w-[1200px] scroll-mt-4 px-4 md:mt-24 md:px-6">
         <SectionTitle id="pv-price-title" title="분양가와 납부 일정" />
-        <PriceCalc reduce={reduce} today={today} typeId={typeId} setTypeId={setTypeId} />
+        <PriceCalc today={today} typeId={typeId} setTypeId={setTypeId} />
       </section>
 
-      <section id="pv-visit" aria-labelledby="pv-visit-title" className="mt-16 scroll-mt-4 md:mt-24" style={{ background: C.green, color: C.cream }}>
+      <section id="pv-visit" aria-labelledby="pv-visit-title" className="mt-16 scroll-mt-4 md:mt-24" style={{ background: C.soft, color: C.ink }}>
         <div className="mx-auto max-w-[1200px] px-4 py-12 md:px-6 md:py-16">
-          <SectionTitle id="pv-visit-title" title="견본주택 방문예약" light />
+          <SectionTitle id="pv-visit-title" title="견본주택 방문예약" />
           <VisitForm reduce={reduce} today={today} typeId={typeId} />
         </div>
       </section>
@@ -404,11 +340,11 @@ export function PresaleDemo() {
 
       <footer className="mt-16 border-t md:mt-24" style={{ borderColor: C.line }}>
         <div className="mx-auto max-w-[1200px] px-4 py-8 text-[14px] leading-[1.8] md:px-6" style={{ color: C.muted }}>
-          <p className="text-[16px] font-bold" style={{ ...serifF, color: C.green }}>
-            {GALLERY}
+          <p className="text-[16px] font-bold" style={{ color: C.ink }}>
+            <SampleLogo size={18} />
           </p>
           <p>
-            {GALLERY_ADDR}, 분양 문의 {TEL}, 매일 10:00 ~ 18:00
+            {GALLERY} {GALLERY_ADDR}, 분양 문의 {TEL}, 매일 10:00 ~ 18:00
           </p>
           <p>평면도와 그림은 이해를 돕기 위한 것으로 실제와 다를 수 있습니다. 분양가와 일정은 입주자모집공고를 따릅니다.</p>
           <div style={{ color: C.ink }}>
@@ -420,191 +356,85 @@ export function PresaleDemo() {
   );
 }
 
-function SectionTitle({ id, title, light = false }: { id: string; title: string; light?: boolean }) {
+function SectionTitle({ id, title }: { id: string; title: string }) {
   return (
     <div className="mb-7 flex items-center gap-4">
-      <h2 id={id} className="flex-none text-[27px] font-bold leading-tight tracking-[-0.02em] md:text-[34px]" style={{ ...serifF, color: light ? C.cream : C.green }}>
+      <h2 id={id} className="flex-none text-[27px] font-bold leading-tight tracking-[-0.02em] md:text-[34px]" style={{ ...serifF, color: C.ink }}>
         {title}
       </h2>
-      <span aria-hidden className="h-px flex-1" style={{ background: light ? "rgba(216,192,138,0.5)" : C.gold }} />
+      <span aria-hidden className="h-px flex-1" style={{ background: C.line }} />
     </div>
   );
 }
 
-/* ---------- 포스터 ---------- */
+/* ---------- 첫 화면 ---------- */
+
+/** 문장 등장. 끝 상태가 기본값이라 JS 가 없어도 보인다 */
+const RISE_CSS = `@keyframes pv-rise{from{opacity:0;transform:translateY(12px)}to{opacity:1;transform:none}}
+.pv-rise{animation:pv-rise 0.7s cubic-bezier(0.22,1,0.36,1) 0.3s both}
+@media (prefers-reduced-motion: reduce){.pv-rise{animation:none}}`;
 
 function Poster({ reduce, onCta }: { reduce: boolean; onCta: () => void }) {
   const ref = useRef<HTMLElement>(null);
   const { scrollYProgress } = useScroll({ target: ref, offset: ["start start", "end start"] });
-  const p = useTransform(scrollYProgress, (v) => (reduce ? 0 : Math.min(1, v / EXIT_END)));
-  // 모형은 위로 들려 사라지고, 바닥 그림자는 남아서 작아지다 흐려진다
-  const modelY = useTransform(p, (v) => `${-v * v * 75}svh`);
-  const modelR = useTransform(p, (v) => -v * 5);
-  const modelO = useTransform(p, (v) => 1 - Math.min(1, Math.max(0, (v - 0.15) / 0.45)));
-  const shadowS = useTransform(p, (v) => 1 - v * 0.55);
-  const shadowO = useTransform(p, (v) => 1 - v);
-  const textY = useTransform(p, (v) => `${-v * 30}svh`);
-  const textO = useTransform(p, (v) => 1 - Math.max(0, (v - 0.25) / 0.6));
-
-  // 벽 높이. 동작 줄이기면 바로 다 선 상태
-  const h = useMotionValue(0);
-  useEffect(() => {
-    if (reduce) {
-      h.set(1);
-      return;
-    }
-    const c = animate(h, 1, { duration: RISE_DUR, delay: RISE_AT, ease: EASE });
-    return () => c.stop();
-  }, [reduce, h]);
-
-  const t84 = typeById("84");
-  // 먼 벽부터 그린다
-  const walls = useMemo(() => [...WALLS_84].sort((a, b) => Number(!!a.glass) - Number(!!b.glass) || a.a[0] + a.a[1] + a.b[0] + a.b[1] - (b.a[0] + b.a[1] + b.b[0] + b.b[1])), []);
-  const lit = useMemo(() => t84.plan.filter((r) => r.kind !== "bal").sort((a, b) => LIGHT_ORDER.indexOf(a.n) - LIGHT_ORDER.indexOf(b.n)), [t84]);
-  const bal = t84.plan.find((r) => r.kind === "bal");
+  const photoY = useTransform(scrollYProgress, (v) => (reduce ? "0%" : `${v * 8}%`));
 
   return (
-    <section id="pv-poster" ref={ref} aria-labelledby="pv-poster-title" className="relative" style={{ height: reduce ? undefined : "180svh", background: C.green }}>
+    <section id="pv-poster" ref={ref} aria-labelledby="pv-poster-title" className="relative flex min-h-[100svh] flex-col overflow-hidden" style={{ background: C.soft, color: C.ink }}>
+      <style>{RISE_CSS}</style>
+      <motion.div className="absolute inset-0" style={{ y: photoY }}>
+        <motion.div className="absolute inset-0" initial={reduce ? false : { scale: 1.06 }} animate={{ scale: 1 }} transition={{ duration: reduce ? 0 : HERO_IN, ease: EASE }}>
+          {/* eslint-disable-next-line @next/next/no-img-element -- 정적 export 라 next/image 최적화를 쓰지 않는다 */}
+          <img
+            src={`${IMG}/hero.jpg`}
+            srcSet={`${IMG}/hero-sm.jpg 960w, ${IMG}/hero.jpg 1920w`}
+            sizes="100vw"
+            alt="천장이 높은 복층 세대 내부. 위층 거실 난간 아래로 주방과 식탁이 보인다"
+            fetchPriority="high"
+            className="absolute inset-0 h-full w-full object-cover"
+            style={{ objectPosition: "55% 35%" }}
+          />
+        </motion.div>
+      </motion.div>
       <div
-        className={`${reduce ? "relative min-h-svh" : "sticky top-0 h-svh"} overflow-hidden`}
-        style={{ background: `radial-gradient(110% 80% at 72% 88%, ${C.greenMid} 0%, ${C.green} 50%, ${C.greenDeep} 100%)`, color: C.cream }}
-      >
-        {/* 아이소메트릭 평면 모형 */}
-        <div className="pointer-events-none absolute inset-x-0 bottom-[4svh] flex h-[40svh] items-end justify-center md:bottom-[5svh] md:left-auto md:right-[3vw] md:h-[54svh] md:w-[min(58vw,860px)]">
-          <motion.div aria-hidden className="absolute bottom-0 left-1/2 h-[12%] w-[80%] -translate-x-1/2 rounded-[50%]" style={{ background: "radial-gradient(closest-side, rgba(0,0,0,0.55), rgba(0,0,0,0))", scale: shadowS, opacity: shadowO }} />
-          <motion.svg viewBox="0 0 790 520" className="relative h-full w-auto max-w-full" style={{ y: modelY, rotate: modelR, opacity: modelO }} role="img" aria-label="84타입 평면도가 벽을 세운 입체 모형으로 놓이고 방마다 불이 켜진 그림">
-            <defs>
-              <linearGradient id="pv-p-floor" x1="0" y1="0" x2="1" y2="1">
-                <stop offset="0" stopColor="#1d4d3a" />
-                <stop offset="1" stopColor="#123a2b" />
-              </linearGradient>
-              <linearGradient id="pv-p-slab-f" x1="0" y1="0" x2="0" y2="1">
-                <stop offset="0" stopColor="#c9b07a" />
-                <stop offset="1" stopColor="#8e7745" />
-              </linearGradient>
-              <linearGradient id="pv-p-slab-r" x1="0" y1="0" x2="0" y2="1">
-                <stop offset="0" stopColor="#a68c55" />
-                <stop offset="1" stopColor="#6d5a32" />
-              </linearGradient>
-              <linearGradient id="pv-p-wall-x" x1="0" y1="0" x2="0" y2="1">
-                <stop offset="0" stopColor="#f6ecd2" />
-                <stop offset="1" stopColor="#d2b97f" />
-              </linearGradient>
-              <linearGradient id="pv-p-wall-y" x1="0" y1="0" x2="0" y2="1">
-                <stop offset="0" stopColor="#cdb47c" />
-                <stop offset="1" stopColor="#957c48" />
-              </linearGradient>
-              <radialGradient id="pv-p-light" cx="0.5" cy="0.5" r="0.62">
-                <stop offset="0" stopColor="#ffe6a8" stopOpacity="0.95" />
-                <stop offset="0.6" stopColor="#f2cf7e" stopOpacity="0.62" />
-                <stop offset="1" stopColor="#d8a94e" stopOpacity="0.35" />
-              </radialGradient>
-              <radialGradient id="pv-p-glow" cx="0.5" cy="0.5" r="0.5">
-                <stop offset="0" stopColor={C.gold} stopOpacity="0.22" />
-                <stop offset="1" stopColor={C.gold} stopOpacity="0" />
-              </radialGradient>
-            </defs>
+        aria-hidden
+        className="absolute inset-0"
+        style={{ background: "linear-gradient(to bottom, rgba(255,255,255,0.55), rgba(255,255,255,0) 22%), linear-gradient(to top, rgba(255,255,255,0.95), rgba(255,255,255,0.8) 38%, rgba(255,255,255,0.1) 72%)" }}
+      />
 
-            <ellipse cx="395" cy="290" rx="380" ry="230" fill="url(#pv-p-glow)" />
+      {/* 로고와 핵심 행동 하나 */}
+      <div className="relative z-10 flex items-center justify-between gap-3 px-4 pt-4 md:px-12 md:pt-7">
+        <p className="inline-flex items-center gap-2 text-[17px] font-bold leading-none">
+          <SampleLogo size={18} />
+        </p>
+        <button
+          type="button"
+          onClick={onCta}
+          data-gtm-cta="presale_poster_cta"
+          className={`inline-flex h-11 flex-none items-center gap-1.5 rounded-[6px] px-4 text-[15px] font-semibold text-white ${focusRing}`}
+          style={{ background: C.accent, outlineColor: C.accent }}
+        >
+          <CalendarCheck size={18} aria-hidden />
+          방문예약
+        </button>
+      </div>
 
-            {/* 바닥판과 두께 */}
-            <path d={pathOf([iso(0, 10.4), iso(14, 10.4), iso(14, 10.4, -0.5), iso(0, 10.4, -0.5)])} fill="url(#pv-p-slab-f)" />
-            <path d={pathOf([iso(14, 0), iso(14, 10.4), iso(14, 10.4, -0.5), iso(14, 0, -0.5)])} fill="url(#pv-p-slab-r)" />
-            <path d={roomPoly([0, 0, 14, 10.4])} fill="url(#pv-p-floor)" />
-            {bal && <path d={roomPoly(bal.r)} fill="#2a5a46" />}
-            <path d={pathOf([iso(0, 10.4), iso(14, 10.4), iso(14, 0)], false)} fill="none" stroke="#f7e8c4" strokeOpacity="0.7" strokeWidth="1.5" />
-
-            {/* 방마다 켜지는 불 */}
-            {lit.map((room, i) => (
-              <motion.path
-                key={`${room.n}-${i}`}
-                d={roomPoly(room.r)}
-                fill="url(#pv-p-light)"
-                initial={reduce ? false : { opacity: 0 }}
-                animate={{ opacity: room.kind === "etc" ? 0.7 : 1 }}
-                transition={{ duration: reduce ? 0 : LIGHT_DUR, delay: reduce ? 0 : LIGHT_AT + i * LIGHT_GAP, ease: "easeOut" }}
-              />
-            ))}
-
-            {/* 벽 자리 선 */}
-            {walls.map((w, i) => (
-              <motion.path
-                key={`l${i}`}
-                d={pathOf([iso(w.a[0], w.a[1]), iso(w.b[0], w.b[1])], false)}
-                fill="none"
-                stroke={C.gold}
-                strokeWidth="2.2"
-                strokeLinecap="round"
-                initial={reduce ? false : { pathLength: 0 }}
-                animate={{ pathLength: 1 }}
-                transition={{ duration: reduce ? 0 : LINE_DUR, delay: reduce ? 0 : LINE_AT + i * 0.015, ease: EASE }}
-              />
-            ))}
-
-            {/* 솟는 벽 */}
-            {walls.map((w, i) => (
-              <IsoWall key={`w${i}`} w={w} h={h} />
-            ))}
-          </motion.svg>
-        </div>
-
-        {/* 로고와 핵심 행동 하나 */}
-        <motion.div className="absolute inset-x-0 top-0 z-10 flex items-center justify-between px-4 pt-4 md:px-12 md:pt-7" style={{ y: textY }}>
-          <p className="inline-flex items-center gap-2 text-[17px] font-bold leading-none" style={serifF}>
-            <Building2 size={19} aria-hidden style={{ color: C.gold }} />
-            {BRAND}
-          </p>
-          <button
-            type="button"
-            onClick={onCta}
-            aria-label="견본주택 방문예약"
-            title="견본주택 방문예약"
-            data-gtm-cta="presale_poster_cta"
-            className={`inline-flex h-12 w-12 items-center justify-center rounded-full ${focusRing}`}
-            style={{ background: C.gold, color: C.greenDeep, outlineColor: C.cream }}
-          >
-            <CalendarCheck size={22} aria-hidden />
-          </button>
-        </motion.div>
-
-        {/* 큰 문장 */}
-        <motion.div className="relative z-[1] px-4 pt-[13svh] md:px-12 md:pt-[14svh]" style={{ y: textY, opacity: textO }}>
-          <h1 id="pv-poster-title" className="text-[clamp(52px,17vw,72px)] font-bold leading-[1.08] tracking-[-0.035em] md:text-[clamp(84px,8.6vw,170px)] md:leading-[1.06]" style={{ ...serifF, wordBreak: "keep-all" }}>
-            <span className="block">
-              84타입
-              <br className="md:hidden" /> 견본주택,
-            </span>
-            <span className="block" style={{ color: C.gold }}>
-              주말에도
-              <br className="md:hidden" /> 열어요
-            </span>
-          </h1>
-        </motion.div>
-        <motion.p className="absolute bottom-[45svh] left-4 z-[1] text-[15px] md:bottom-[6svh] md:left-12 md:text-[18px]" style={{ y: textY, opacity: textO, color: "#d9d2bf" }}>
+      {/* 문장 */}
+      <div className={`relative z-[1] mt-auto max-w-[1200px] px-4 pb-[10svh] md:px-12 ${reduce ? "" : "pv-rise"}`}>
+        <h1
+          id="pv-poster-title"
+          className="text-[36px] font-bold md:text-[clamp(40px,5vw,72px)]"
+          style={{ ...serifF, letterSpacing: "-0.03em", lineHeight: 1.2, wordBreak: "keep-all" }}
+        >
+          84타입 견본주택,
+          <br />
+          주말에도 열어요
+        </h1>
+        <p className="mt-4 text-[16px] md:mt-5 md:text-[18px]" style={{ color: C.body }}>
           {GALLERY}, 매일 10:00 ~ 18:00
-        </motion.p>
+        </p>
       </div>
     </section>
-  );
-}
-
-function IsoWall({ w, h }: { w: Wall; h: MotionValue<number> }) {
-  const face = useTransform(h, (v) => wallFace(w, v));
-  const top = useTransform(h, (v) => wallTop(w, v));
-  const alongX = w.a[1] === w.b[1];
-  if (w.glass) {
-    return (
-      <g>
-        <motion.path d={face} fill="#e9d9a8" fillOpacity="0.16" stroke={C.gold} strokeOpacity="0.55" strokeWidth="1.2" />
-        <motion.path d={top} fill="none" stroke="#fff3d2" strokeOpacity="0.8" strokeWidth="1.6" />
-      </g>
-    );
-  }
-  return (
-    <g>
-      <motion.path d={face} fill={alongX ? "url(#pv-p-wall-x)" : "url(#pv-p-wall-y)"} stroke="#6f5c33" strokeOpacity="0.35" strokeWidth="0.8" />
-      <motion.path d={top} fill="none" stroke="#fff8e6" strokeWidth="2.2" strokeLinecap="round" />
-    </g>
   );
 }
 
@@ -623,10 +453,10 @@ function Overview({ today }: { today: Date }) {
     <section id="pv-overview" aria-labelledby="pv-overview-title" className="mx-auto mt-12 grid max-w-[1200px] scroll-mt-4 gap-10 px-4 md:mt-16 md:grid-cols-[minmax(0,1.15fr)_minmax(0,1fr)] md:px-6">
       <div>
         <SectionTitle id="pv-overview-title" title="사업개요" />
-        <dl className="grid grid-cols-[88px_minmax(0,1fr)] border-t text-[16px] md:grid-cols-[110px_minmax(0,1fr)]" style={{ borderColor: C.green }}>
+        <dl className="grid grid-cols-[88px_minmax(0,1fr)] border-t text-[16px] md:grid-cols-[110px_minmax(0,1fr)]" style={{ borderColor: C.ink }}>
           {rows.map(([k, v]) => (
             <div key={k} className="contents">
-              <dt className="border-b py-3 font-bold" style={{ borderColor: C.line, color: C.green }}>
+              <dt className="border-b py-3 font-semibold" style={{ borderColor: C.line, color: C.ink }}>
                 {k}
               </dt>
               <dd className="border-b py-3" style={{ borderColor: C.line }}>
@@ -637,10 +467,10 @@ function Overview({ today }: { today: Date }) {
         </dl>
       </div>
       <div>
-        <h3 className="mb-7 text-[22px] font-bold leading-[42px] md:text-[26px] md:leading-[51px]" style={{ ...serifF, color: C.green }}>
+        <h3 className="mb-7 text-[22px] font-bold leading-[42px] md:text-[26px] md:leading-[51px]" style={{ color: C.ink }}>
           분양 일정
         </h3>
-        <ol className="border-t" style={{ borderColor: C.green }}>
+        <ol className="border-t" style={{ borderColor: C.ink }}>
           {SCHEDULE.map(([name, from, to]) => {
             const d1 = daysAgo(today, -from);
             const done = from < 0;
@@ -650,12 +480,12 @@ function Overview({ today }: { today: Date }) {
                 <span className="inline-flex items-center gap-2 font-bold">
                   {name}
                   {done && (
-                    <span className="rounded-[3px] px-1.5 py-0.5 text-[12px] font-bold" style={{ background: C.ivoryDeep, color: C.muted }}>
+                    <span className="rounded-[3px] px-1.5 py-0.5 text-[12px] font-bold" style={{ background: C.soft, color: C.muted }}>
                       완료
                     </span>
                   )}
                 </span>
-                <span className="text-right text-[15px]" style={monoF}>
+                <span className="text-right text-[15px] tabular-nums">
                   {label}
                 </span>
               </li>
@@ -670,11 +500,11 @@ function Overview({ today }: { today: Date }) {
 /* ---------- 1. 타입 고르기와 평면도 ---------- */
 
 const ROOM_FILL: Record<Room["kind"], string> = {
-  live: "#f1e6c8",
-  bed: "#e7ece2",
-  wet: "#dde6e3",
-  etc: "#f5f1e6",
-  bal: "#ebe6d7",
+  live: "#f3f2ee",
+  bed: "#eef0ee",
+  wet: "#e9eced",
+  etc: "#f7f7f5",
+  bal: "#efefed",
 };
 const PLAN_U = 40;
 
@@ -692,13 +522,13 @@ function TypePicker({ reduce, typeId, setTypeId }: { reduce: boolean; typeId: Ty
               aria-pressed={on}
               onClick={() => setTypeId(x.id)}
               className={`flex flex-col items-start rounded-[6px] border px-3 py-2.5 text-left transition-colors duration-150 md:px-4 ${focusRing}`}
-              style={{ background: on ? C.green : "#fff", color: on ? C.cream : C.ink, borderColor: on ? C.green : C.line, outlineColor: C.green }}
+              style={{ background: on ? C.accent : "#fff", color: on ? "#fff" : C.ink, borderColor: on ? C.accent : C.field, outlineColor: C.accent }}
             >
-              <span className="text-[26px] font-bold leading-none md:text-[32px]" style={serifF}>
+              <span className="text-[26px] font-bold leading-none tabular-nums md:text-[32px]">
                 {x.id}
                 <span className="ml-0.5 text-[15px] md:text-[17px]">타입</span>
               </span>
-              <span className="mt-1.5 text-[13px] md:text-[14px]" style={{ color: on ? C.gold : C.muted }}>
+              <span className="mt-1.5 text-[13px] md:text-[14px]" style={{ color: on ? "rgba(255,255,255,0.8)" : C.muted }}>
                 {x.households}세대
               </span>
             </button>
@@ -711,10 +541,10 @@ function TypePicker({ reduce, typeId, setTypeId }: { reduce: boolean; typeId: Ty
           <FloorPlan key={t.id} t={t} reduce={reduce} />
         </div>
         <div>
-          <p className="text-[15px] font-bold" style={{ color: C.goldDeep }}>
+          <p className="text-[15px] font-semibold" style={{ color: C.accent }}>
             {t.id}타입, {t.pyeong}평형
           </p>
-          <dl className="mt-3 border-t text-[16px]" style={{ borderColor: C.green }}>
+          <dl className="mt-3 border-t text-[16px]" style={{ borderColor: C.ink }}>
             {(
               [
                 ["전용면적", t.excl],
@@ -724,7 +554,7 @@ function TypePicker({ reduce, typeId, setTypeId }: { reduce: boolean; typeId: Ty
             ).map(([k, v]) => (
               <div key={k} className="flex items-baseline justify-between border-b py-3" style={{ borderColor: C.line }}>
                 <dt>{k}</dt>
-                <dd className="text-[18px] font-bold" style={monoF}>
+                <dd className="text-[18px] font-bold tabular-nums">
                   {v.toFixed(2)}
                   <M2 />
                 </dd>
@@ -743,7 +573,7 @@ function TypePicker({ reduce, typeId, setTypeId }: { reduce: boolean; typeId: Ty
           </dl>
           <ul className="mt-4 flex flex-wrap gap-2">
             {t.tags.map((g) => (
-              <li key={g} className="rounded-[4px] border px-2.5 py-1 text-[14px]" style={{ borderColor: C.gold, color: C.green }}>
+              <li key={g} className="rounded-[4px] border px-2.5 py-1 text-[14px]" style={{ borderColor: C.line, color: C.body }}>
                 {g}
               </li>
             ))}
@@ -777,7 +607,7 @@ function FloorPlan({ t, reduce }: { t: UnitType; reduce: boolean }) {
             <motion.path
               d={d}
               fill="none"
-              stroke={room.kind === "bal" ? C.goldDeep : C.green}
+              stroke={room.kind === "bal" ? C.muted : "#333333"}
               strokeWidth={room.kind === "bal" ? 1.5 : 4}
               strokeDasharray={room.kind === "bal" ? "6 5" : undefined}
               strokeLinejoin="miter"
@@ -786,7 +616,7 @@ function FloorPlan({ t, reduce }: { t: UnitType; reduce: boolean }) {
               transition={{ duration: reduce ? 0 : PLAN_DUR, delay: reduce ? 0 : i * PLAN_STAGGER, ease: EASE }}
             />
             {room.n && (
-              <text x={x0 + w / 2} y={y0 + hgt / 2} textAnchor="middle" dominantBaseline="central" fontSize={fs} fontWeight={700} fill={room.kind === "bal" ? C.goldDeep : C.green}>
+              <text x={x0 + w / 2} y={y0 + hgt / 2} textAnchor="middle" dominantBaseline="central" fontSize={fs} fontWeight={700} fill={room.kind === "bal" ? C.muted : C.ink}>
                 {room.n}
               </text>
             )}
@@ -799,7 +629,7 @@ function FloorPlan({ t, reduce }: { t: UnitType; reduce: boolean }) {
 
 /* ---------- 2. 분양가와 납부 일정 ---------- */
 
-function PriceCalc({ reduce, today, typeId, setTypeId }: { reduce: boolean; today: Date; typeId: TypeId; setTypeId: (t: TypeId) => void }) {
+function PriceCalc({ today, typeId, setTypeId }: { today: Date; typeId: TypeId; setTypeId: (t: TypeId) => void }) {
   const [floor, setFloor] = useState<FloorId>("std");
   const [ext, setExt] = useState(true);
   const t = typeById(typeId);
@@ -818,8 +648,8 @@ function PriceCalc({ reduce, today, typeId, setTypeId }: { reduce: boolean; toda
     { name: "잔금", when: `${ym(moveIn)} 입주 지정기간`, amount: rest },
   ];
 
-  const chip = `rounded-[4px] border px-3 py-2 text-[15px] font-bold transition-colors duration-150 ${focusRing}`;
-  const chipStyle = (on: boolean) => ({ background: on ? C.green : "#fff", color: on ? C.cream : C.ink, borderColor: on ? C.green : C.line, outlineColor: C.green });
+  const chip = `rounded-[4px] border px-3 py-2 text-[15px] font-semibold transition-colors duration-150 ${focusRing}`;
+  const chipStyle = (on: boolean) => ({ background: on ? C.accent : "#fff", color: on ? "#fff" : C.ink, borderColor: on ? C.accent : C.field, outlineColor: C.accent });
 
   return (
     <div className="grid gap-8 md:grid-cols-[minmax(0,1fr)_minmax(0,1.25fr)] md:items-start">
@@ -845,52 +675,48 @@ function PriceCalc({ reduce, today, typeId, setTypeId }: { reduce: boolean; toda
           </div>
         </fieldset>
         <label className="flex cursor-pointer items-center gap-3 text-[16px]">
-          <input type="checkbox" checked={ext} onChange={(e) => setExt(e.target.checked)} className="h-5 w-5 accent-[#123b2c]" />
+          <input type="checkbox" checked={ext} onChange={(e) => setExt(e.target.checked)} className="h-5 w-5 accent-[#1f3d33]" />
           발코니 확장
           <span className="text-[15px]" style={{ color: C.muted }}>
             ({eok(t.balcony)}, 별도 계약)
           </span>
         </label>
 
-        <div className="rounded-[6px] p-5" style={{ background: C.green, color: C.cream }}>
-          <p className="text-[15px]" style={{ color: C.gold }}>
+        <div className="rounded-[6px] border p-5" style={{ background: C.soft, borderColor: C.line, color: C.ink }}>
+          <p className="text-[15px]" style={{ color: C.muted }}>
             {t.id}타입 {FLOORS.find((f) => f.id === floor)?.label} 분양가
           </p>
-          <p className="mt-1 overflow-hidden text-[34px] font-bold leading-tight md:text-[40px]" style={serifF} aria-live="polite">
-            <AnimatePresence mode="popLayout" initial={false}>
-              <motion.span key={price} className="block" initial={reduce ? false : { y: "70%", opacity: 0 }} animate={{ y: 0, opacity: 1 }} exit={reduce ? { opacity: 0 } : { y: "-70%", opacity: 0 }} transition={{ duration: reduce ? 0 : DUR, ease: EASE }}>
-                {eok(price)}
-              </motion.span>
-            </AnimatePresence>
+          <p className="mt-1 text-[34px] font-bold leading-tight tabular-nums md:text-[40px]" aria-live="polite">
+            {eok(price)}
           </p>
           {ext && (
-            <p className="mt-2 text-[15px]" style={{ color: "#d9d2bf" }}>
+            <p className="mt-2 text-[15px]" style={{ color: C.body }}>
               발코니 확장 포함 {eok(price + t.balcony)}
             </p>
           )}
           {/* 계약금, 중도금, 잔금 비율 띠 */}
           <div className="mt-5 flex h-9 overflow-hidden rounded-[3px] text-[13px] font-bold" aria-hidden>
-            <span className="flex w-[10%] items-center justify-center" style={{ background: C.gold, color: C.greenDeep }}>
+            <span className="flex w-[10%] items-center justify-center text-white" style={{ background: C.accent }}>
               10%
             </span>
-            <span className="flex w-[60%] items-center justify-center border-x" style={{ background: "#2c6650", borderColor: C.green }}>
+            <span className="flex w-[60%] items-center justify-center border-x" style={{ background: "#dcdcda", borderColor: C.soft }}>
               중도금 60%
             </span>
-            <span className="flex w-[30%] items-center justify-center" style={{ background: "#f3ead6", color: C.green }}>
+            <span className="flex w-[30%] items-center justify-center" style={{ background: "#ececea" }}>
               잔금 30%
             </span>
           </div>
-          <p className="mt-3 text-[14px]" style={{ color: "#d9d2bf" }}>
+          <p className="mt-3 text-[14px]" style={{ color: C.body }}>
             계약금 10%, 중도금 60% 이자후불제, 잔금 30%
           </p>
         </div>
       </div>
 
       <div>
-        <h3 className="mb-3 text-[18px] font-bold" style={{ color: C.green }}>
+        <h3 className="mb-3 text-[18px] font-bold">
           납부 일정
         </h3>
-        <ol className="border-t" style={{ borderColor: C.green }}>
+        <ol className="border-t" style={{ borderColor: C.ink }}>
           {rows.map((r) => (
             <li key={r.name} className="grid grid-cols-[minmax(0,1fr)_auto] items-baseline gap-x-3 border-b py-2.5" style={{ borderColor: C.line }}>
               <span className="text-[16px] font-bold">
@@ -899,7 +725,7 @@ function PriceCalc({ reduce, today, typeId, setTypeId }: { reduce: boolean; toda
                   {r.when}
                 </span>
               </span>
-              <span className="text-right text-[16px] font-bold" style={monoF}>
+              <span className="text-right text-[16px] font-bold tabular-nums">
                 {eok(r.amount)}
               </span>
               {r.note && (
@@ -917,7 +743,7 @@ function PriceCalc({ reduce, today, typeId, setTypeId }: { reduce: boolean; toda
                   계약 시 10%, 입주 시 90%
                 </span>
               </span>
-              <span className="text-right text-[16px] font-bold" style={monoF}>
+              <span className="text-right text-[16px] font-bold tabular-nums">
                 {eok(t.balcony)}
               </span>
             </li>
@@ -964,21 +790,21 @@ function VisitForm({ reduce, today, typeId }: { reduce: boolean; today: Date; ty
   };
 
   const input = `w-full rounded-[4px] border px-3 py-2.5 text-[16px] ${focusRing}`;
-  const inputStyle = { background: C.greenDeep, borderColor: "rgba(216,192,138,0.45)", color: C.cream, outlineColor: C.gold };
+  const inputStyle = { background: "#fff", borderColor: C.field, color: C.ink, outlineColor: C.accent };
   const chipStyle = (on: boolean, disabled = false) => ({
-    background: on ? C.gold : "transparent",
-    color: on ? C.greenDeep : disabled ? "rgba(243,234,214,0.45)" : C.cream,
-    borderColor: on ? C.gold : "rgba(216,192,138,0.45)",
-    outlineColor: C.gold,
+    background: on ? C.accent : disabled ? C.soft : "#fff",
+    color: on ? "#fff" : disabled ? C.muted : C.ink,
+    borderColor: on ? C.accent : disabled ? C.line : C.field,
+    outlineColor: C.accent,
   });
 
   return (
     <div className="grid gap-8 md:grid-cols-[minmax(0,1fr)_minmax(0,1.4fr)]">
       <div className="text-[16px] leading-[1.8]">
-        <p className="text-[19px] font-bold" style={serifF}>
+        <p className="text-[19px] font-bold">
           견본주택 방문은 사전 예약제로 운영됩니다
         </p>
-        <ul className="mt-3 space-y-1" style={{ color: "#d9d2bf" }}>
+        <ul className="mt-3 space-y-1" style={{ color: C.body }}>
           <li>매일 10:00 ~ 18:00, 입장 마감 17:00</li>
           <li>한 시간에 {CAP}팀, 한 팀 4명까지</li>
           <li>84타입 유니트는 주말에도 열어요</li>
@@ -991,21 +817,21 @@ function VisitForm({ reduce, today, typeId }: { reduce: boolean; today: Date; ty
         {done ? (
           <motion.div
             key="done"
-            initial={reduce ? false : { clipPath: "inset(0 0 100% 0)" }}
-            animate={{ clipPath: "inset(0 0 0% 0)" }}
+            initial={reduce ? false : { opacity: 0 }}
+            animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
             transition={{ duration: reduce ? 0 : 0.45, ease: EASE }}
-            className="min-w-0 rounded-[6px] p-5 md:p-7"
-            style={{ background: C.cream, color: C.ink }}
+            className="min-w-0 rounded-[6px] border p-5 md:p-7"
+            style={{ background: "#fff", borderColor: C.line, color: C.ink }}
             role="status"
           >
-            <p className="inline-flex items-center gap-2 text-[20px] font-bold" style={{ ...serifF, color: C.green }}>
-              <Check size={22} aria-hidden />
+            <p className="inline-flex items-center gap-2 text-[20px] font-bold">
+              <Check size={22} aria-hidden style={{ color: C.accent }} />
               방문예약이 접수됐어요
             </p>
             <dl className="mt-4 grid grid-cols-[96px_minmax(0,1fr)] gap-y-2 text-[16px]">
               <dt style={{ color: C.muted }}>예약 번호</dt>
-              <dd className="font-bold" style={monoF}>
+              <dd className="font-bold tabular-nums">
                 {done.no}
               </dd>
               <dt style={{ color: C.muted }}>방문 일시</dt>
@@ -1018,7 +844,7 @@ function VisitForm({ reduce, today, typeId }: { reduce: boolean; today: Date; ty
               </dd>
               <dt style={{ color: C.muted }}>예약자</dt>
               <dd>
-                {maskName(done.name)} <span style={monoF}>{maskPhone(done.phone)}</span>
+                {maskName(done.name)} <span className="tabular-nums">{maskPhone(done.phone)}</span>
               </dd>
               <dt style={{ color: C.muted }}>담당 창구</dt>
               <dd>
@@ -1027,7 +853,7 @@ function VisitForm({ reduce, today, typeId }: { reduce: boolean; today: Date; ty
               <dt style={{ color: C.muted }}>확인 연락</dt>
               <dd>{fmtKo(today)} 중 확인 문자, 방문 전날 안내 문자</dd>
             </dl>
-            <button type="button" onClick={() => setDone(null)} className={`mt-5 rounded-[4px] border px-4 py-2 text-[15px] font-bold ${focusRing}`} style={{ borderColor: C.green, color: C.green, outlineColor: C.green }}>
+            <button type="button" onClick={() => setDone(null)} className={`mt-5 rounded-[4px] border px-4 py-2 text-[15px] font-semibold ${focusRing}`} style={{ borderColor: C.field, color: C.ink, outlineColor: C.accent }}>
               다른 날로 다시 예약
             </button>
           </motion.div>
@@ -1049,7 +875,7 @@ function VisitForm({ reduce, today, typeId }: { reduce: boolean; today: Date; ty
                     style={chipStyle(i === day)}
                   >
                     <span className="text-[13px]">{i === 0 ? "오늘" : DOW[d.getDay()]}</span>
-                    <span className="text-[18px] font-bold" style={monoF}>
+                    <span className="text-[18px] font-bold tabular-nums">
                       {d.getMonth() + 1}.{d.getDate()}
                     </span>
                     {weekend(d) && <span className="text-[12px] font-bold">주말</span>}
@@ -1074,7 +900,7 @@ function VisitForm({ reduce, today, typeId }: { reduce: boolean; today: Date; ty
                       className={`flex flex-col items-center rounded-[4px] border px-1 py-2 disabled:cursor-not-allowed ${focusRing}`}
                       style={chipStyle(slot === i, full)}
                     >
-                      <span className="text-[16px] font-bold" style={monoF}>
+                      <span className="text-[16px] font-bold tabular-nums">
                         {s}
                       </span>
                       <span className="text-[12px]">{full ? "마감" : `${n}팀 남음`}</span>
@@ -1089,7 +915,7 @@ function VisitForm({ reduce, today, typeId }: { reduce: boolean; today: Date; ty
                 <legend className="mb-2 text-[15px] font-bold">관심 타입</legend>
                 <div className="flex gap-2">
                   {TYPES.map((x) => (
-                    <button key={x.id} type="button" aria-pressed={type === x.id} onClick={() => setType(x.id)} className={`flex-1 rounded-[4px] border px-2 py-2 text-[15px] font-bold ${focusRing}`} style={chipStyle(type === x.id)}>
+                    <button key={x.id} type="button" aria-pressed={type === x.id} onClick={() => setType(x.id)} className={`flex-1 rounded-[4px] border px-2 py-2 text-[15px] font-semibold ${focusRing}`} style={chipStyle(type === x.id)}>
                       {x.id}
                     </button>
                   ))}
@@ -1123,18 +949,18 @@ function VisitForm({ reduce, today, typeId }: { reduce: boolean; today: Date; ty
             </div>
 
             <label className="flex cursor-pointer items-start gap-3 text-[15px]">
-              <input type="checkbox" checked={agree} onChange={(e) => setAgree(e.target.checked)} className="mt-1 h-5 w-5 flex-none accent-[#d8c08a]" />
+              <input type="checkbox" checked={agree} onChange={(e) => setAgree(e.target.checked)} className="mt-1 h-5 w-5 flex-none accent-[#1f3d33]" />
               <span>개인정보 수집, 이용 동의(이름, 휴대폰, 방문 확인 후 6개월 보관)</span>
             </label>
 
             {err && (
-              <p className="inline-flex items-center gap-2 rounded-[4px] px-3 py-2 text-[15px] font-bold" style={{ background: C.cream, color: C.error }} role="alert">
+              <p className="inline-flex items-center gap-2 rounded-[4px] px-3 py-2 text-[15px] font-bold" style={{ background: "#fff", color: C.error }} role="alert">
                 <CircleAlert size={18} aria-hidden />
                 {err}
               </p>
             )}
 
-            <button type="submit" data-gtm-cta="presale_visit_submit" className={`inline-flex w-full items-center justify-center gap-2 rounded-[4px] px-5 py-3.5 text-[17px] font-bold sm:w-auto ${focusRing}`} style={{ background: C.gold, color: C.greenDeep, outlineColor: C.cream }}>
+            <button type="submit" data-gtm-cta="presale_visit_submit" className={`inline-flex w-full items-center justify-center gap-2 rounded-[4px] px-5 py-3.5 text-[17px] font-semibold text-white sm:w-auto ${focusRing}`} style={{ background: C.accent, outlineColor: C.accent }}>
               <CalendarCheck size={20} aria-hidden />
               방문예약 하기
             </button>
@@ -1154,7 +980,7 @@ function LocationMap({ reduce }: { reduce: boolean }) {
     <div className="grid gap-6 md:grid-cols-[minmax(0,1.6fr)_minmax(0,1fr)] md:items-start">
       <div className="overflow-hidden rounded-[6px] border" style={{ borderColor: C.line }}>
         <svg viewBox="0 0 640 420" className="block h-auto w-full" role="img" aria-label={`사업지 주변 지도. ${cat}: ${places.map((p) => `${p.n} ${p.t}`).join(", ")}`}>
-          <rect width="640" height="420" fill="#ece6d6" />
+          <rect width="640" height="420" fill="#f0f0ee" />
           {/* 블록 */}
           {[
             [20, 20, 150, 110],
@@ -1166,34 +992,34 @@ function LocationMap({ reduce }: { reduce: boolean }) {
             [520, 280, 110, 70],
             [400, 20, 100, 70],
           ].map(([x, y, w, h], i) => (
-            <rect key={i} x={x} y={y} width={w} height={h} rx="4" fill="#e1d9c5" />
+            <rect key={i} x={x} y={y} width={w} height={h} rx="4" fill="#e4e4e2" />
           ))}
           {/* 공원과 하천 */}
-          <path d="M50 300 L180 292 L196 362 L60 372 Z" fill="#c8d6bb" />
-          <path d="M0 392 C120 368 220 404 340 386 C460 368 540 404 640 378 L640 420 L0 420 Z" fill="#c9d9d6" />
+          <path d="M50 300 L180 292 L196 362 L60 372 Z" fill="#dce3d8" />
+          <path d="M0 392 C120 368 220 404 340 386 C460 368 540 404 640 378 L640 420 L0 420 Z" fill="#d9e0e2" />
           {/* 길 */}
           <g fill="none" strokeLinecap="round">
             <path d="M0 150 H640" stroke="#fff" strokeWidth="22" />
             <path d="M360 0 V385" stroke="#fff" strokeWidth="18" />
-            <path d="M360 150 L640 40" stroke="#f3dfa6" strokeWidth="16" />
+            <path d="M360 150 L640 40" stroke="#fff" strokeWidth="16" />
             <path d="M175 150 V385" stroke="#fff" strokeWidth="10" />
             <path d="M0 280 H640" stroke="#fff" strokeWidth="10" />
             <path d="M500 150 V385" stroke="#fff" strokeWidth="10" />
           </g>
           {/* 지하철 */}
-          <path d="M0 60 L640 140" stroke="#3d6d57" strokeWidth="6" fill="none" />
+          <path d="M0 60 L640 140" stroke="#9a9a9a" strokeWidth="6" fill="none" />
           <path d="M0 60 L640 140" stroke="#fff" strokeWidth="2" strokeDasharray="10 14" fill="none" />
 
           {/* 사업지 */}
-          <rect x="196" y="172" width="118" height="88" rx="4" fill={C.gold} stroke={C.goldDeep} strokeWidth="2.5" />
-          <text x="255" y="216" textAnchor="middle" dominantBaseline="central" fontSize="20" fontWeight="700" fill={C.greenDeep}>
+          <rect x="196" y="172" width="118" height="88" rx="4" fill={C.accent} />
+          <text x="255" y="216" textAnchor="middle" dominantBaseline="central" fontSize="20" fontWeight="700" fill="#fff">
             사업지
           </text>
 
           {/* 견본주택 */}
           <g transform="translate(468 186)">
-            <path d="M0 -14 L14 0 L0 14 L-14 0 Z" fill={C.green} stroke="#fff" strokeWidth="2" />
-            <text x="20" y="1" dominantBaseline="central" fontSize="20" fontWeight="700" fill={C.green}>
+            <path d="M0 -14 L14 0 L0 14 L-14 0 Z" fill={C.ink} stroke="#fff" strokeWidth="2" />
+            <text x="20" y="1" dominantBaseline="central" fontSize="20" fontWeight="700" fill={C.ink}>
               견본주택
             </text>
           </g>
@@ -1202,21 +1028,11 @@ function LocationMap({ reduce }: { reduce: boolean }) {
           <AnimatePresence initial={false}>
             {places.map((p) => (
               <motion.g key={`${cat}-${p.n}`} initial={reduce ? false : { opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} transition={{ duration: reduce ? 0 : 0.2 }}>
-                <motion.path
-                  d={`M${SITE_C[0]} ${SITE_C[1]} L${p.x} ${p.y}`}
-                  stroke={C.green}
-                  strokeWidth="2.5"
-                  strokeDasharray="2 7"
-                  strokeLinecap="round"
-                  fill="none"
-                  initial={reduce ? false : { pathLength: 0 }}
-                  animate={{ pathLength: 1 }}
-                  transition={{ duration: reduce ? 0 : 0.6, ease: EASE }}
-                />
-                <circle cx={p.x} cy={p.y} r="11" fill={C.green} stroke="#fff" strokeWidth="3" />
+                <path d={`M${SITE_C[0]} ${SITE_C[1]} L${p.x} ${p.y}`} stroke={C.accent} strokeWidth="2.5" strokeDasharray="2 7" strokeLinecap="round" fill="none" />
+                <circle cx={p.x} cy={p.y} r="11" fill={C.accent} stroke="#fff" strokeWidth="3" />
                 <g transform={`translate(${p.x} ${p.y - 30})`}>
-                  <rect x={-(p.n.length * 10.5 + 10)} y="-17" width={p.n.length * 21 + 20} height="32" rx="3" fill="#fff" stroke={C.green} strokeWidth="1.5" />
-                  <text textAnchor="middle" dominantBaseline="central" y="-1" fontSize="19" fontWeight="700" fill={C.green}>
+                  <rect x={-(p.n.length * 10.5 + 10)} y="-17" width={p.n.length * 21 + 20} height="32" rx="3" fill="#fff" stroke={C.field} strokeWidth="1" />
+                  <text textAnchor="middle" dominantBaseline="central" y="-1" fontSize="19" fontWeight="700" fill={C.ink}>
                     {p.n}
                   </text>
                 </g>
@@ -1236,8 +1052,8 @@ function LocationMap({ reduce }: { reduce: boolean }) {
                 type="button"
                 aria-pressed={on}
                 onClick={() => setCat(id)}
-                className={`flex flex-col items-center gap-1 rounded-[6px] border px-1 py-2.5 text-[15px] font-bold ${focusRing}`}
-                style={{ background: on ? C.green : "#fff", color: on ? C.cream : C.ink, borderColor: on ? C.green : C.line, outlineColor: C.green }}
+                className={`flex flex-col items-center gap-1 rounded-[6px] border px-1 py-2.5 text-[15px] font-semibold ${focusRing}`}
+                style={{ background: on ? C.accent : "#fff", color: on ? "#fff" : C.ink, borderColor: on ? C.accent : C.field, outlineColor: C.accent }}
               >
                 <Icon size={20} aria-hidden />
                 {id}
@@ -1245,24 +1061,24 @@ function LocationMap({ reduce }: { reduce: boolean }) {
             );
           })}
         </div>
-        <ul className="mt-4 border-t" style={{ borderColor: C.green }}>
+        <ul className="mt-4 border-t" style={{ borderColor: C.ink }}>
           {places.map((p) => (
             <li key={p.n} className="flex items-center justify-between border-b py-3 text-[16px]" style={{ borderColor: C.line }}>
               <span className="inline-flex items-center gap-2 font-bold">
-                <MapPin size={17} aria-hidden style={{ color: C.goldDeep }} />
+                <MapPin size={17} aria-hidden style={{ color: C.accent }} />
                 {p.n}
               </span>
               <span>{p.t}</span>
             </li>
           ))}
         </ul>
-        <div className="mt-5 rounded-[6px] p-4 text-[15px] leading-[1.75]" style={{ background: C.ivoryDeep }}>
-          <p className="font-bold" style={{ color: C.green }}>
+        <div className="mt-5 rounded-[6px] p-4 text-[15px] leading-[1.75]" style={{ background: C.soft }}>
+          <p className="font-bold">
             견본주택 오시는 길
           </p>
           <p>{GALLERY_ADDR}</p>
           <p className="mt-2 flex flex-wrap gap-x-4 gap-y-1">
-            <a href={`tel:${TEL.replace(/-/g, "")}`} className={`inline-flex items-center gap-1.5 font-bold underline-offset-4 hover:underline ${focusRing}`} style={{ color: C.green, outlineColor: C.green }}>
+            <a href={`tel:${TEL.replace(/-/g, "")}`} className={`inline-flex items-center gap-1.5 font-bold underline-offset-4 hover:underline ${focusRing}`} style={{ color: C.accent, outlineColor: C.accent }}>
               <Phone size={16} aria-hidden />
               분양 문의 {TEL}
             </a>
@@ -1274,5 +1090,20 @@ function LocationMap({ reduce }: { reduce: boolean }) {
         </div>
       </div>
     </div>
+  );
+}
+
+function SampleLogo({ light, size = 20 }: { light?: boolean; size?: number }) {
+  return (
+    <span className="inline-flex items-center gap-2" style={{ color: light ? "#fff" : "#111" }}>
+      {/* eslint-disable-next-line @next/next/no-img-element -- 메인 사이트와 같은 곰 로고 */}
+      <img src="/images/logo-bear.png" alt="" aria-hidden width={28} height={28} className="h-7 w-7 shrink-0" />
+      <span className="flex items-baseline gap-1 whitespace-nowrap">
+        <span className="font-bold tracking-[-0.03em]" style={{ fontSize: size }}>
+          곰파트너
+        </span>
+        <span className="text-[12px] font-semibold opacity-75">분양 홍보관 샘플</span>
+      </span>
+    </span>
   );
 }

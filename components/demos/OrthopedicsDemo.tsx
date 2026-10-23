@@ -1,15 +1,14 @@
 "use client";
 
 import { useEffect, useMemo, useRef, useState } from "react";
-import { AnimatePresence, motion, useScroll, useTransform, type MotionValue } from "framer-motion";
-import { AlertCircle, Bone, CalendarCheck, Clock, MapPin, MessageCircle, Phone, ReceiptText, Search, Stethoscope, Users, X } from "lucide-react";
-import { JetBrains_Mono } from "@/lib/local-fonts";
+import { AnimatePresence, motion, useScroll, useTransform } from "framer-motion";
+import { AlertCircle, CalendarCheck, Clock, MapPin, MessageCircle, Phone, ReceiptText, Search, Stethoscope, Users, X } from "lucide-react";
 import { useReducedMotionSafe } from "@/hooks/useReducedMotionSafe";
 import { daysAgo, fmtDot, fmtKo, useDemoToday } from "@/hooks/useDemoToday";
 import { maskName, maskPhone } from "@/components/demos/LeadReceivedPanel";
 import { DemoMakerInfo } from "@/components/demos/DemoMakerInfo";
 
-/* 정형외과 홈페이지 샘플: 가상의 곰파트너정형외과. 동네 의원급, 원장 2명, 물리치료실과 도수치료실이 있다.
+/* 정형외과 홈페이지 샘플: 가상의 정형외과 곰파트너. 동네 의원급, 원장 2명, 물리치료실과 도수치료실이 있다.
    병원명, 의료진, 주소, 전화번호, 진료비는 모두 가상이다.
 
    국내 동네 정형외과 사이트 공통 구성(참고): 메뉴는 병원소개, 진료과목(척추, 관절, 도수치료, 체외충격파, 물리치료),
@@ -24,70 +23,56 @@ import { DemoMakerInfo } from "@/components/demos/DemoMakerInfo";
    3. 비급여 진료비 안내 표 검색: 분류 탭과 검색어로 거른다. 맞는 글자는 칠해 보인다.
    4. 예약: 날짜, 시간, 부위, 초진 재진, 이름, 휴대폰. 완료하면 접수 번호, 담당 창구, 회신 예정일을 보여 준다.
 
-   포스터 첫 화면(os-poster): 흰 바탕에 진한 파랑. 큰 문장 "토요일 오후 2시까지 진료해요" 하나만 둔다.
-   오른쪽(휴대폰은 아래)에 반투명 광택 척추 뼈 마디 다섯 개가 아래부터 하나씩 떨어져 쌓이고, 다 쌓이면 삐뚤던 마디가 곧게 선다.
-   다 선 뒤에는 빛 한 줄이 8초마다 아래에서 위로 마디를 훑고 지나간다(반복 움직임은 이것 하나).
-   스크롤하면 마디 사이가 벌어지며 문장과 같이 빠진다. 동작 줄이기면 곧게 선 척추로 고정하고 스크롤 퇴장도 없다. */
+   사진 출처: AI 생성(Z-Image-Turbo, Apache 2.0)
 
-const monoF = { fontFamily: `${JetBrains_Mono.style.fontFamily}, ui-monospace, monospace` } as const;
+   첫 화면(os-poster): 밝은 물리치료실 사진 한 장이 한 화면을 채우고, 왼쪽 흰 막 위에 문장 "토요일 오후 2시까지 진료해요".
+   들어오면 사진이 1.6초 동안 천천히 다가오고(1.06배에서 1배), 문장은 0.3초 늦게 아래에서 올라온다(CSS keyframes, JS 없이도 보인다).
+   스크롤하면 사진만 조금 느리게 움직인다. 동작 줄이기면 전부 멈춘다.
+   본문에서 움직이는 것은 실시간 대기 숫자가 굴러 바뀌는 것 하나다. */
 
-const BRAND = "곰파트너정형외과";
+const IMG = "/images/demo-orthopedics";
 const ADDRESS = "서울 ㅇㅇ구 ㅇㅇ로 00, 3층";
 const TEL = "02-000-0000";
 const KAKAO = "카카오톡 채널 곰파트너";
 
+/* 로고: 메인 사이트와 같은 곰 로고 + 곰파트너(크게) + 업종(작게) */
+function SampleLogo({ light, small }: { light?: boolean; small?: boolean }) {
+  return (
+    <span className="inline-flex items-center gap-2" style={{ color: light ? "#ffffff" : "#111111" }}>
+      {/* eslint-disable-next-line @next/next/no-img-element -- 메인 사이트와 같은 곰 로고 */}
+      <img src="/images/logo-bear.png" alt="" aria-hidden width={28} height={28} className={small ? "h-6 w-6 shrink-0" : "h-7 w-7 shrink-0"} />
+      <span className="flex items-baseline gap-1 whitespace-nowrap">
+        <span className={`${small ? "text-[18px]" : "text-[20px]"} font-bold tracking-[-0.03em]`}>곰파트너</span>
+        <span className="text-[12px] font-semibold opacity-75">정형외과 샘플</span>
+      </span>
+    </span>
+  );
+}
+
 const C = {
   white: "#ffffff",
-  paper: "#f4f7fc",
-  ink: "#0f1f3d",
-  blue: "#123b9c",
-  blueDeep: "#0b2470",
-  mid: "#2f63e0",
-  sky: "#dce7fb",
-  muted: "#4a5872",
-  line: "#d6deec",
+  paper: "#f7f7f5",
+  ink: "#111111",
+  /** 강조색 하나. 차분한 남색 */
+  blue: "#2b4170",
+  /** 선택된 칩, 오늘 표시 같은 옅은 바탕 */
+  sky: "#eef0f4",
+  muted: "#4b4b4b",
+  sub: "#767676",
+  line: "#e5e5e5",
   error: "#b42318",
 };
 
 /* 모션 상수. 시간은 초, 이징은 cubic-bezier */
 const EASE = [0.22, 1, 0.36, 1] as const;
-/** 마디가 떨어져 닿을 때 살짝 눌렸다 서는 느낌 */
-const EASE_LAND = [0.34, 1.32, 0.64, 1] as const;
-/** 첫 마디가 떨어지기 시작하는 때 */
-const ENTER_START = 0.15;
-/** 마디 사이 간격 */
-const ENTER_GAP = 0.2;
-/** 한 마디가 떨어지는 시간 */
-const ENTER_FALL = 0.55;
-/** 다 쌓인 뒤 삐뚠 마디가 곧게 서는 때와 걸리는 시간. 1.9초 안에 끝난다 */
-const STRAIGHTEN_AT = ENTER_START + 4 * ENTER_GAP + ENTER_FALL;
-const STRAIGHTEN_DUR = 0.4;
-/** 빛 한 줄이 마디를 훑는 주기와 한 번 지나가는 시간 */
-const SHEEN_LOOP = 8;
-const SHEEN_PASS = 1.4;
-/** 포스터 스크롤 진행도 중 퇴장이 끝나는 지점 */
-const EXIT_END = 0.6;
+/** 첫 화면 사진이 다가오는 시간 */
+const PHOTO_IN = 1.6;
 /** 칩, 패널, 숫자 전환 */
 const DUR = 0.32;
 
 const focusRing = "focus-visible:outline focus-visible:outline-[3px] focus-visible:outline-offset-2";
 const won = (n: number) => `${n.toLocaleString("ko-KR")}원`;
 const p2 = (n: number) => String(n).padStart(2, "0");
-
-/* ---------- 포스터 척추 마디 ---------- */
-
-/** 아래(0)부터 위(4)까지. y는 마디 가운데, s는 크기(위로 갈수록 작다), dx와 r은 떨어질 때 삐뚠 정도 */
-const VERTS = [
-  { y: 700, s: 1, dx: -16, r: -5 },
-  { y: 586, s: 0.94, dx: 18, r: 6 },
-  { y: 479, s: 0.88, dx: -22, r: -7 },
-  { y: 379, s: 0.82, dx: 14, r: 5 },
-  { y: 286, s: 0.76, dx: -10, r: -4 },
-];
-const V_BODY = "M-70 -34 C-70 -50 70 -50 70 -34 Q62 0 70 34 C70 50 -70 50 -70 34 Q-62 0 -70 -34 Z";
-const V_WING = "M-60 -18 C-84 -26 -112 -40 -134 -44 C-149 -46 -152 -30 -142 -21 C-122 -5 -90 5 -60 12 Z";
-const V_SPINE = "M-15 30 L15 30 L9 66 Q0 75 -9 66 Z";
-const V_DISC = "M-64 50 C-64 41 64 41 64 50 L64 58 C64 68 -64 68 -64 58 Z";
 
 /* ---------- 부위별 증상 ---------- */
 
@@ -292,9 +277,8 @@ export function OrthopedicsDemo() {
 
       <header className="sticky top-0 z-30 border-b bg-white/95" style={{ borderColor: C.line }}>
         <div className="mx-auto flex max-w-[1200px] flex-wrap items-center justify-between gap-x-4 gap-y-1 px-4 py-3 md:px-6">
-          <h2 className="inline-flex items-center gap-2 text-[19px] font-extrabold leading-none tracking-[-0.02em]" style={{ color: C.blue }}>
-            <Bone size={22} aria-hidden />
-            {BRAND}
+          <h2 className="leading-none">
+            <SampleLogo />
           </h2>
           <nav aria-label="주요 메뉴" className="-mx-2 hidden flex-wrap items-center md:flex">
             {[
@@ -310,14 +294,14 @@ export function OrthopedicsDemo() {
             ))}
           </nav>
           <div className="flex items-center gap-2">
-            <a href={`tel:${TEL.replace(/-/g, "")}`} aria-label={`전화 ${TEL}`} className={`inline-flex h-10 w-10 items-center justify-center rounded-full border ${focusRing}`} style={{ borderColor: C.line, color: C.blue, outlineColor: C.blue }}>
+            <a href={`tel:${TEL.replace(/-/g, "")}`} aria-label={`전화 ${TEL}`} className={`inline-flex h-10 w-10 items-center justify-center rounded-[6px] border ${focusRing}`} style={{ borderColor: C.line, color: C.blue, outlineColor: C.blue }}>
               <Phone size={18} aria-hidden />
             </a>
             <button
               type="button"
               onClick={() => go("os-reserve")}
               data-gtm-cta="orthopedics_header_reserve"
-              className={`inline-flex h-10 items-center gap-1.5 rounded-full px-4 text-[15px] font-bold text-white ${focusRing}`}
+              className={`inline-flex h-10 items-center gap-1.5 rounded-[6px] px-4 text-[15px] font-semibold text-white ${focusRing}`}
               style={{ background: C.blue, outlineColor: C.blue }}
             >
               <CalendarCheck size={17} aria-hidden />
@@ -364,8 +348,8 @@ export function OrthopedicsDemo() {
       </section>
 
       <footer className="mx-auto mt-16 max-w-[1200px] border-t px-4 pt-8 text-[14px] leading-[1.8] md:px-6" style={{ borderColor: C.line, color: C.muted }}>
-        <p className="text-[16px] font-bold" style={{ color: C.blue }}>
-          {BRAND}
+        <p>
+          <SampleLogo />
         </p>
         <p>
           {ADDRESS} / 대표전화 {TEL} / {KAKAO}
@@ -378,7 +362,7 @@ export function OrthopedicsDemo() {
 
 function SectionTitle({ id, icon, title }: { id: string; icon: React.ReactNode; title: string }) {
   return (
-    <h2 id={id} className="flex items-center gap-2.5 border-b-2 pb-3 text-[26px] font-extrabold tracking-[-0.03em] md:text-[32px]" style={{ borderColor: C.blue, color: C.ink }}>
+    <h2 id={id} className="flex items-center gap-2.5 border-b pb-3 text-[26px] font-bold tracking-[-0.03em] md:text-[32px]" style={{ borderColor: C.line, color: C.ink }}>
       <span style={{ color: C.blue }}>{icon}</span>
       {title}
     </h2>
@@ -390,159 +374,60 @@ function SectionTitle({ id, icon, title }: { id: string; icon: React.ReactNode; 
 function Poster({ reduce, onCta }: { reduce: boolean; onCta: () => void }) {
   const ref = useRef<HTMLElement>(null);
   const { scrollYProgress } = useScroll({ target: ref, offset: ["start start", "end start"] });
-  const p = useTransform(scrollYProgress, (v) => (reduce ? 0 : Math.min(1, v / EXIT_END)));
-  // 문장은 위로 빠지고, 척추는 마디 사이가 벌어진 뒤 흐려진다
-  const textY = useTransform(p, (v) => `${-v * 42}svh`);
-  const textO = useTransform(p, [0.3, 1], [1, 0]);
-  const spineO = useTransform(p, [0.55, 1], [1, 0]);
-  const spineScale = useTransform(p, [0, 1], [1, 1.06]);
+  // 스크롤하면 사진만 조금 느리게 내려간다
+  const photoY = useTransform(scrollYProgress, (v) => (reduce ? "0%" : `${v * 8}%`));
 
   return (
-    <section id="os-poster" ref={ref} aria-labelledby="os-poster-title" className="relative" style={{ height: reduce ? undefined : "180svh", background: C.white }}>
-      <div
-        className={`${reduce ? "relative min-h-svh" : "sticky top-0 h-svh"} overflow-hidden`}
-        style={{ background: `radial-gradient(70% 60% at 76% 62%, #eaf0fc 0%, #f6f8fd 46%, ${C.white} 78%)`, color: C.blue }}
-      >
-        {/* 척추 */}
-        <div className="pointer-events-none absolute inset-x-0 bottom-0 flex h-[58svh] justify-center pb-[2svh] md:pb-0 md:inset-y-0 md:left-auto md:right-[7vw] md:h-full md:items-center">
-          <motion.svg
-            viewBox="0 200 400 620"
-            className="h-full w-auto overflow-visible md:h-[82svh]"
-            style={{ opacity: spineO, scale: spineScale }}
-            role="img"
-            aria-label="반투명한 파란 척추 뼈 마디 다섯 개가 아래부터 쌓여 곧게 선 모습"
-          >
-            <defs>
-              <linearGradient id="os-v-body" x1="0" y1="0" x2="1" y2="0">
-                <stop offset="0" stopColor="#0e2f86" stopOpacity="0.94" />
-                <stop offset="0.26" stopColor="#3a6ff0" stopOpacity="0.8" />
-                <stop offset="0.48" stopColor="#b4cdff" stopOpacity="0.66" />
-                <stop offset="0.7" stopColor="#3a6ff0" stopOpacity="0.8" />
-                <stop offset="1" stopColor="#0b2470" stopOpacity="0.96" />
-              </linearGradient>
-              <radialGradient id="os-v-top" cx="0.42" cy="0.4" r="0.7">
-                <stop offset="0" stopColor="#f2f6ff" stopOpacity="0.96" />
-                <stop offset="0.6" stopColor="#9ab8fa" stopOpacity="0.85" />
-                <stop offset="1" stopColor="#4d7ae8" stopOpacity="0.85" />
-              </radialGradient>
-              <linearGradient id="os-v-wing" x1="0" y1="0" x2="0" y2="1">
-                <stop offset="0" stopColor="#7aa2f6" stopOpacity="0.72" />
-                <stop offset="1" stopColor="#173d9c" stopOpacity="0.88" />
-              </linearGradient>
-              <linearGradient id="os-v-disc" x1="0" y1="0" x2="0" y2="1">
-                <stop offset="0" stopColor="#ffffff" stopOpacity="0.96" />
-                <stop offset="0.55" stopColor="#e3ecfd" stopOpacity="0.94" />
-                <stop offset="1" stopColor="#a9c2f2" stopOpacity="0.9" />
-              </linearGradient>
-              <linearGradient id="os-v-sheen" x1="0" y1="1" x2="0" y2="0">
-                <stop offset="0" stopColor="#ffffff" stopOpacity="0" />
-                <stop offset="0.5" stopColor="#ffffff" stopOpacity="0.7" />
-                <stop offset="1" stopColor="#ffffff" stopOpacity="0" />
-              </linearGradient>
-              <radialGradient id="os-v-floor" cx="0.5" cy="0.5" r="0.5">
-                <stop offset="0" stopColor="#0b2470" stopOpacity="0.28" />
-                <stop offset="1" stopColor="#0b2470" stopOpacity="0" />
-              </radialGradient>
-              <clipPath id="os-v-clip">
-                <path d={V_BODY} />
-              </clipPath>
-            </defs>
-
-            {/* 바닥 그림자 */}
-            <ellipse cx="200" cy="792" rx="150" ry="20" fill="url(#os-v-floor)" />
-
-            {VERTS.map((_, i) => (
-              <Vertebra key={i} i={i} p={p} reduce={reduce} />
-            ))}
-          </motion.svg>
-        </div>
-
-        {/* 로고와 예약 버튼. 문장과 같이 위로 빠진다 */}
-        <motion.div className="absolute inset-x-0 top-0 z-10 flex items-center justify-between px-4 pt-4 md:px-12 md:pt-7" style={{ y: textY }}>
-          <p className="inline-flex items-center gap-2 text-[17px] font-extrabold leading-none tracking-[-0.02em]">
-            <Bone size={20} aria-hidden />
-            {BRAND}
-          </p>
-          <button
-            type="button"
-            onClick={onCta}
-            aria-label="예약하기"
-            title="예약하기"
-            data-gtm-cta="orthopedics_poster_cta"
-            className={`inline-flex h-12 w-12 items-center justify-center rounded-full text-white ${focusRing}`}
-            style={{ background: C.blue, outlineColor: C.blue }}
-          >
-            <CalendarCheck size={22} aria-hidden />
-          </button>
+    <section id="os-poster" ref={ref} aria-labelledby="os-poster-title" className="relative flex min-h-[100svh] flex-col overflow-hidden" style={{ background: C.paper, color: C.ink }}>
+      <style>{`@keyframes os-rise{from{opacity:0;transform:translateY(12px)}to{opacity:1;transform:none}}.os-rise{animation:os-rise 0.7s cubic-bezier(0.22,1,0.36,1) 0.3s both}@media (prefers-reduced-motion: reduce){.os-rise{animation:none}}`}</style>
+      <motion.div className="absolute inset-x-0 top-[-10%] h-[110%]" style={{ y: photoY }}>
+        <motion.div className="h-full w-full" initial={reduce ? false : { scale: 1.06 }} animate={{ scale: 1 }} transition={{ duration: reduce ? 0 : PHOTO_IN, ease: EASE }}>
+          {/* eslint-disable-next-line @next/next/no-img-element -- 정적 export 라 next/image 최적화를 쓰지 않는다 */}
+          <img
+            src={`${IMG}/hero.jpg`}
+            srcSet={`${IMG}/hero-sm.jpg 960w, ${IMG}/hero.jpg 1920w`}
+            sizes="100vw"
+            alt="창가 옆에 흰 치료 침대 두 대가 놓인 밝은 물리치료실"
+            fetchPriority="high"
+            className="absolute inset-0 h-full w-full object-cover"
+            style={{ objectPosition: "62% 55%" }}
+          />
         </motion.div>
+      </motion.div>
+      {/* 글자 대비를 위한 흰 막. 휴대폰은 아래쪽, PC는 왼쪽 */}
+      <div aria-hidden className="pointer-events-none absolute inset-0 md:hidden" style={{ background: "linear-gradient(to top, rgba(255,255,255,0.94) 0%, rgba(255,255,255,0.86) 38%, rgba(255,255,255,0.2) 64%, rgba(255,255,255,0.1) 82%, rgba(255,255,255,0.7) 100%)" }} />
+      <div aria-hidden className="pointer-events-none absolute inset-0 hidden md:block" style={{ background: "linear-gradient(to right, rgba(255,255,255,0.93) 0%, rgba(255,255,255,0.82) 34%, rgba(255,255,255,0.25) 60%, rgba(255,255,255,0) 75%)" }} />
+      <div aria-hidden className="pointer-events-none absolute inset-x-0 top-0 hidden h-28 md:block" style={{ background: "linear-gradient(to bottom, rgba(255,255,255,0.6), rgba(255,255,255,0))" }} />
 
-        {/* 큰 문장 */}
-        <motion.div className="relative z-[1] flex h-full flex-col px-4 pt-[12svh] md:justify-center md:px-12 md:pb-[4svh] md:pt-0" style={{ y: textY, opacity: textO }}>
-          <h1
-            id="os-poster-title"
-            className="text-[clamp(52px,15vw,68px)] font-extrabold leading-[1.08] tracking-[-0.045em] md:text-[clamp(96px,10.2vw,184px)] md:leading-[1.02]"
-            style={{ wordBreak: "keep-all", color: C.blueDeep }}
-          >
-            <span className="block">토요일</span>
-            <span className="block" style={{ color: C.mid }}>
-              오후 2시까지
-            </span>
-            <span className="block">진료해요</span>
-          </h1>
-          <p className="mt-5 text-[16px] font-medium md:mt-8 md:text-[19px]" style={{ color: C.muted }}>
-            토요일 09:00 ~ 14:00, 점심시간 없이
-          </p>
-        </motion.div>
+      <div className="relative z-[1] flex items-center justify-between gap-3 px-4 pt-4 md:px-12 md:pt-7">
+        <p className="leading-none">
+          <SampleLogo small />
+        </p>
+        <button
+          type="button"
+          onClick={onCta}
+          data-gtm-cta="orthopedics_poster_cta"
+          className={`inline-flex min-h-11 items-center gap-1.5 rounded-[6px] px-4 text-[15px] font-semibold text-white ${focusRing}`}
+          style={{ background: C.blue, outlineColor: C.blue }}
+        >
+          <CalendarCheck size={17} aria-hidden />
+          예약하기
+        </button>
+      </div>
+
+      <div className={`relative z-[1] mt-auto px-4 pb-14 md:my-auto md:px-12 md:pb-0 ${reduce ? "" : "os-rise"}`}>
+        <h1
+          id="os-poster-title"
+          className="max-w-[9em] text-[38px] font-bold md:text-[clamp(40px,5vw,72px)]"
+          style={{ letterSpacing: "-0.03em", lineHeight: 1.2, wordBreak: "keep-all", color: C.ink }}
+        >
+          토요일 오후 2시까지 진료해요
+        </h1>
+        <p className="mt-4 text-[16px] md:mt-6 md:text-[18px] tabular-nums" style={{ color: C.muted }}>
+          토요일 09:00 ~ 14:00, 점심시간 없이
+        </p>
       </div>
     </section>
-  );
-}
-
-/** 척추 마디 하나. 떨어져 쌓이는 등장과, 스크롤에 따라 마디 사이가 벌어지는 퇴장을 따로 겹친다 */
-function Vertebra({ i, p, reduce }: { i: number; p: MotionValue<number>; reduce: boolean }) {
-  const v = VERTS[i];
-  // 가운데 마디(2)를 기준으로 위 마디는 위로, 아래 마디는 아래로 벌어진다
-  const spread = useTransform(p, (t) => (2 - i) * t * 96);
-  const fall = { duration: ENTER_FALL, delay: ENTER_START + i * ENTER_GAP, ease: EASE_LAND };
-  const straight = { duration: STRAIGHTEN_DUR, delay: STRAIGHTEN_AT, ease: EASE };
-
-  return (
-    <motion.g style={{ y: spread }}>
-      <g transform={`translate(200 ${v.y}) scale(${v.s})`}>
-        <motion.g
-          initial={reduce ? false : { y: -240, x: v.dx, rotate: v.r }}
-          animate={{ y: 0, x: 0, rotate: 0 }}
-          transition={reduce ? { duration: 0 } : { y: fall, x: straight, rotate: straight }}
-        >
-          {/* 아래쪽 디스크. 맨 아래 마디는 바닥이라 없다 */}
-          {i > 0 && <path d={V_DISC} fill="url(#os-v-disc)" stroke="#8fb0ee" strokeOpacity="0.6" strokeWidth="1.5" />}
-          {/* 가시돌기와 가로돌기 */}
-          <path d={V_SPINE} fill="url(#os-v-wing)" />
-          <path d={V_WING} fill="url(#os-v-wing)" stroke={C.blueDeep} strokeOpacity="0.3" strokeWidth="1.5" />
-          <path d={V_WING} transform="scale(-1 1)" fill="url(#os-v-wing)" stroke={C.blueDeep} strokeOpacity="0.3" strokeWidth="1.5" />
-          {/* 몸통 */}
-          <path d={V_BODY} fill="url(#os-v-body)" stroke={C.blueDeep} strokeOpacity="0.35" strokeWidth="1.5" />
-          <ellipse cx="0" cy="-34" rx="69" ry="14" fill="url(#os-v-top)" />
-          {/* 빛 한 줄. 다 선 뒤 아래 마디부터 차례로 훑는다 */}
-          {!reduce && (
-            <g clipPath="url(#os-v-clip)">
-              <motion.rect
-                x="-80"
-                width="160"
-                height="34"
-                initial={{ y: 60 }}
-                animate={{ y: [60, -100] }}
-                transition={{ duration: SHEEN_PASS, delay: STRAIGHTEN_AT + STRAIGHTEN_DUR + i * 0.16, repeat: Infinity, repeatDelay: SHEEN_LOOP - SHEEN_PASS, ease: "easeInOut" }}
-                fill="url(#os-v-sheen)"
-              />
-            </g>
-          )}
-          {/* 하이라이트 */}
-          <path d="M-50 -22 Q-56 0 -50 26" fill="none" stroke="#ffffff" strokeOpacity="0.75" strokeWidth="5" strokeLinecap="round" />
-          <path d="M-40 -40 Q0 -47 34 -42" fill="none" stroke="#ffffff" strokeOpacity="0.85" strokeWidth="3" strokeLinecap="round" />
-        </motion.g>
-      </g>
-    </motion.g>
   );
 }
 
@@ -561,13 +446,13 @@ function PartPicker({ reduce, part, setPart, onFee }: { reduce: boolean; part: P
         <svg viewBox="0 0 200 400" className="block h-auto w-full" aria-hidden>
           <defs>
             <radialGradient id="os-fig-glow" cx="0.5" cy="0.5" r="0.5">
-              <stop offset="0" stopColor={C.mid} stopOpacity="0.5" />
-              <stop offset="1" stopColor={C.mid} stopOpacity="0" />
+              <stop offset="0" stopColor={C.blue} stopOpacity="0.35" />
+              <stop offset="1" stopColor={C.blue} stopOpacity="0" />
             </radialGradient>
             <linearGradient id="os-fig-body" x1="0" y1="0" x2="1" y2="0">
-              <stop offset="0" stopColor="#c9d8f6" />
-              <stop offset="0.5" stopColor="#e6eefc" />
-              <stop offset="1" stopColor="#c9d8f6" />
+              <stop offset="0" stopColor="#e2e2df" />
+              <stop offset="0.5" stopColor="#ecece9" />
+              <stop offset="1" stopColor="#e2e2df" />
             </linearGradient>
           </defs>
           <g fill="url(#os-fig-body)" stroke="url(#os-fig-body)" strokeLinecap="round">
@@ -596,7 +481,7 @@ function PartPicker({ reduce, part, setPart, onFee }: { reduce: boolean; part: P
                 setPart(pt.id);
                 setSym(0);
               }}
-              className={`absolute inline-flex -translate-x-1/2 -translate-y-1/2 items-center gap-1.5 rounded-full border-2 py-1 pl-1.5 pr-3 text-[15px] font-bold ${focusRing}`}
+              className={`absolute inline-flex -translate-x-1/2 -translate-y-1/2 items-center gap-1.5 rounded-[6px] border py-1 pl-1.5 pr-3 text-[15px] font-semibold ${focusRing}`}
               style={{
                 left: `${(pt.at[0] / 200) * 100}%`,
                 top: `${(pt.at[1] / 400) * 100}%`,
@@ -606,7 +491,7 @@ function PartPicker({ reduce, part, setPart, onFee }: { reduce: boolean; part: P
                 outlineColor: C.blue,
               }}
             >
-              <span className="inline-block h-3 w-3 rounded-full border-2" style={{ borderColor: on ? C.white : C.blue, background: on ? C.white : "transparent" }} aria-hidden />
+              <span className="inline-block h-2.5 w-2.5 rounded-full border" style={{ borderColor: on ? C.white : C.blue, background: on ? C.white : "transparent" }} aria-hidden />
               {pt.name}
             </button>
           );
@@ -614,7 +499,7 @@ function PartPicker({ reduce, part, setPart, onFee }: { reduce: boolean; part: P
       </div>
 
       <div className="min-w-0">
-        <p className="text-[15px] font-bold" style={{ color: C.mid }}>
+        <p className="text-[15px] font-semibold" style={{ color: C.sub }}>
           {cur.name} 증상
         </p>
         <div className="mt-3 flex flex-wrap gap-2" role="group" aria-label={`${cur.name} 증상 고르기`}>
@@ -627,7 +512,7 @@ function PartPicker({ reduce, part, setPart, onFee }: { reduce: boolean; part: P
                 aria-pressed={on}
                 onClick={() => setSym(k)}
                 className={`rounded-[6px] border px-3.5 py-2 text-left text-[15px] ${focusRing}`}
-                style={{ borderColor: on ? C.blue : C.line, background: on ? C.sky : C.white, color: C.ink, fontWeight: on ? 700 : 500, outlineColor: C.blue }}
+                style={{ borderColor: on ? C.blue : C.line, background: on ? C.sky : C.white, color: C.ink, fontWeight: on ? 600 : 500, outlineColor: C.blue }}
               >
                 {x.label}
               </button>
@@ -658,7 +543,7 @@ function PartPicker({ reduce, part, setPart, onFee }: { reduce: boolean; part: P
                 const info = TX_INFO[name];
                 return (
                   <li key={name} className="flex flex-col rounded-[8px] border p-4" style={{ borderColor: C.line }}>
-                    <p className="text-[17px] font-extrabold" style={{ color: C.blue }}>
+                    <p className="text-[17px] font-bold" style={{ color: C.ink }}>
                       {name}
                     </p>
                     <p className="mt-1.5 flex-1 text-[15px] leading-[1.6]" style={{ color: C.muted }}>
@@ -669,7 +554,7 @@ function PartPicker({ reduce, part, setPart, onFee }: { reduce: boolean; part: P
                         type="button"
                         onClick={() => onFee(info.fee!)}
                         className={`mt-3 inline-flex items-center gap-1 self-start rounded-[4px] text-[14px] font-bold underline underline-offset-4 ${focusRing}`}
-                        style={{ color: C.mid, outlineColor: C.blue }}
+                        style={{ color: C.blue, outlineColor: C.blue }}
                       >
                         <ReceiptText size={15} aria-hidden />
                         비용 보기
@@ -718,24 +603,24 @@ function WaitBoard({ reduce, today }: { reduce: boolean; today: Date }) {
   const close = dow === 6 ? "13:30" : dow === 0 ? null : "18:30";
 
   return (
-    <div className="mt-8 overflow-hidden rounded-[12px]" style={{ background: C.blueDeep, color: C.white }}>
-      <div className="flex flex-wrap items-center justify-between gap-x-6 gap-y-1 border-b px-5 py-3.5 text-[15px] md:px-7" style={{ borderColor: "rgba(255,255,255,0.16)" }}>
+    <div className="mt-8 overflow-hidden rounded-[8px] border" style={{ background: C.white, borderColor: C.line, color: C.ink }}>
+      <div className="flex flex-wrap items-center justify-between gap-x-6 gap-y-1 border-b px-5 py-3.5 text-[15px] md:px-7" style={{ borderColor: C.line, background: C.paper }}>
         <p className="font-bold">
-          <span style={monoF}>{clock ?? "--:--"}</span> 기준
+          <span className="tabular-nums">{clock ?? "--:--"}</span> 기준
         </p>
-        <p style={{ color: "#c8d6f5" }}>{close ? `오늘 접수 마감 ${close}` : "오늘은 휴진이에요"}</p>
+        <p style={{ color: C.muted }}>{close ? `오늘 접수 마감 ${close}` : "오늘은 휴진이에요"}</p>
       </div>
       <ul className="grid sm:grid-cols-2 lg:grid-cols-4">
         {ROOMS.map((r, k) => {
           const n = counts[r.id];
           return (
-            <li key={r.id} className={`px-5 py-6 md:px-7 ${k > 0 ? "border-t sm:border-t-0" : ""} ${k % 2 === 1 ? "sm:border-l" : ""} ${k >= 2 ? "sm:border-t lg:border-t-0" : ""} ${k > 0 ? "lg:border-l" : ""}`} style={{ borderColor: "rgba(255,255,255,0.16)" }}>
+            <li key={r.id} className={`px-5 py-6 md:px-7 ${k > 0 ? "border-t sm:border-t-0" : ""} ${k % 2 === 1 ? "sm:border-l" : ""} ${k >= 2 ? "sm:border-t lg:border-t-0" : ""} ${k > 0 ? "lg:border-l" : ""}`} style={{ borderColor: C.line }}>
               <p className="text-[17px] font-bold">{r.name}</p>
-              <p className="mt-0.5 text-[14px]" style={{ color: "#c8d6f5" }}>
+              <p className="mt-0.5 text-[14px]" style={{ color: C.sub }}>
                 {r.who}
               </p>
               <p className="mt-4 flex items-end gap-1.5" aria-live="polite">
-                <span className="relative inline-flex h-[64px] overflow-hidden text-[60px] font-semibold leading-[64px]" style={monoF}>
+                <span className="relative inline-flex h-[64px] overflow-hidden text-[60px] font-semibold leading-[64px] tabular-nums">
                   <AnimatePresence mode="popLayout" initial={false}>
                     <motion.span key={n} initial={reduce ? false : { y: "100%" }} animate={{ y: "0%" }} exit={reduce ? undefined : { y: "-100%" }} transition={{ duration: reduce ? 0 : DUR, ease: EASE }} className="block">
                       {n}
@@ -744,8 +629,8 @@ function WaitBoard({ reduce, today }: { reduce: boolean; today: Date }) {
                 </span>
                 <span className="pb-2 text-[18px] font-bold">명 대기</span>
               </p>
-              <p className="mt-2 text-[15px]" style={{ color: "#dfe7fa" }}>
-                예상 <span style={monoF}>{n * r.per}</span>분
+              <p className="mt-2 text-[15px]" style={{ color: C.muted }}>
+                예상 <span className="tabular-nums">{n * r.per}</span>분
               </p>
             </li>
           );
@@ -764,7 +649,7 @@ function Mark({ text, q }: { text: string; q: string }) {
   return (
     <>
       {text.slice(0, at)}
-      <mark className="rounded-[2px] px-0.5" style={{ background: C.sky, color: C.blueDeep }}>
+      <mark className="rounded-[2px] px-0.5" style={{ background: "#e3e8f2", color: C.ink }}>
         {text.slice(at, at + q.length)}
       </mark>
       {text.slice(at + q.length)}
@@ -807,8 +692,8 @@ function FeeTable({
                 type="button"
                 aria-pressed={on}
                 onClick={() => setCat(c)}
-                className={`rounded-full border px-3.5 py-1.5 text-[15px] ${focusRing}`}
-                style={{ borderColor: on ? C.blue : C.line, background: on ? C.blue : C.white, color: on ? C.white : C.ink, fontWeight: on ? 700 : 500, outlineColor: C.blue }}
+                className={`rounded-[6px] border px-3.5 py-1.5 text-[15px] ${focusRing}`}
+                style={{ borderColor: on ? C.blue : C.line, background: on ? C.blue : C.white, color: on ? C.white : C.ink, fontWeight: on ? 600 : 500, outlineColor: C.blue }}
               >
                 {c}
               </button>
@@ -884,7 +769,7 @@ function FeeTable({
                     )}
                   </td>
                   <td className="hidden px-4 py-3 md:table-cell">{f.unit}</td>
-                  <td className="whitespace-nowrap px-4 py-3 text-right font-bold" style={{ ...monoF, color: C.blueDeep }}>
+                  <td className="whitespace-nowrap px-4 py-3 text-right font-semibold tabular-nums" style={{ color: C.ink }}>
                     {won(f.price)}
                   </td>
                 </motion.tr>
@@ -988,14 +873,14 @@ function Reserve({ reduce, today, part }: { reduce: boolean; today: Date; part: 
         initial={reduce ? false : { clipPath: "inset(0 0 100% 0)" }}
         animate={{ clipPath: "inset(0 0 0% 0)" }}
         transition={{ duration: reduce ? 0 : 0.5, ease: EASE }}
-        className="mt-8 rounded-[12px] border-2 p-6 md:p-8"
+        className="mt-8 rounded-[8px] border p-6 md:p-8"
         style={{ borderColor: C.blue }}
         role="status"
       >
-        <p className="text-[15px] font-bold" style={{ color: C.mid }}>
+        <p className="text-[15px] font-semibold" style={{ color: C.blue }}>
           예약 신청이 접수됐어요
         </p>
-        <p className="mt-1 text-[30px] font-extrabold tracking-[-0.02em]" style={{ ...monoF, color: C.blueDeep }}>
+        <p className="mt-1 text-[30px] font-bold tracking-[-0.02em] tabular-nums" style={{ color: C.ink }}>
           {done.no}
         </p>
         <dl className="mt-5 grid gap-x-6 gap-y-2.5 border-t pt-5 text-[16px] sm:grid-cols-[110px_minmax(0,1fr)]" style={{ borderColor: C.line }}>
@@ -1031,7 +916,7 @@ function Reserve({ reduce, today, part }: { reduce: boolean; today: Date; part: 
         <p className="mt-5 text-[15px]" style={{ color: C.muted }}>
           초진이면 신분증을 챙겨 10분 먼저 와 주세요.
         </p>
-        <button type="button" onClick={reset} className={`mt-6 rounded-full border px-5 py-2.5 text-[15px] font-bold ${focusRing}`} style={{ borderColor: C.blue, color: C.blue, outlineColor: C.blue }}>
+        <button type="button" onClick={reset} className={`mt-6 rounded-[6px] border px-5 py-2.5 text-[15px] font-semibold ${focusRing}`} style={{ borderColor: C.blue, color: C.blue, outlineColor: C.blue }}>
           다른 날짜로 예약하기
         </button>
       </motion.div>
@@ -1062,7 +947,7 @@ function Reserve({ reduce, today, part }: { reduce: boolean; today: Date; part: 
                   {["일", "월", "화", "수", "목", "금", "토"][d.getDay()]}
                   {sat ? " ~14시" : ""}
                 </span>
-                <span className="block text-[18px] font-bold" style={monoF}>
+                <span className="block text-[18px] font-bold tabular-nums">
                   {d.getMonth() + 1}.{d.getDate()}
                 </span>
               </button>
@@ -1085,12 +970,11 @@ function Reserve({ reduce, today, part }: { reduce: boolean; today: Date; part: 
                 aria-pressed={on}
                 aria-label={taken ? `${sl} 마감` : sl}
                 onClick={() => setSlot(sl)}
-                className={`h-11 rounded-[6px] border text-[15px] disabled:cursor-not-allowed ${focusRing}`}
+                className={`h-11 rounded-[6px] border text-[15px] tabular-nums disabled:cursor-not-allowed ${focusRing}`}
                 style={{
-                  ...monoF,
                   borderColor: on ? C.blue : C.line,
                   background: on ? C.blue : taken ? C.paper : C.white,
-                  color: on ? C.white : taken ? "#8c96a8" : C.ink,
+                  color: on ? C.white : taken ? C.sub : C.ink,
                   textDecoration: taken ? "line-through" : undefined,
                   outlineColor: C.blue,
                 }}
@@ -1145,7 +1029,7 @@ function Reserve({ reduce, today, part }: { reduce: boolean; today: Date; part: 
 
       <div>
         <label className="inline-flex cursor-pointer items-start gap-2.5 text-[15px]">
-          <input type="checkbox" checked={agree} onChange={(e) => setAgree(e.target.checked)} className={`mt-0.5 h-5 w-5 flex-none accent-[#123b9c] ${focusRing}`} style={{ outlineColor: C.blue }} />
+          <input type="checkbox" checked={agree} onChange={(e) => setAgree(e.target.checked)} className={`mt-0.5 h-5 w-5 flex-none accent-[#2b4170] ${focusRing}`} style={{ outlineColor: C.blue }} />
           <span>예약 안내를 위한 개인정보(이름, 휴대폰) 수집에 동의합니다. 진료가 끝나면 1년 뒤 지워요.</span>
         </label>
         <div>{err(errs.agree)}</div>
@@ -1154,7 +1038,7 @@ function Reserve({ reduce, today, part }: { reduce: boolean; today: Date; part: 
       <button
         type="submit"
         data-gtm-cta="orthopedics_reserve"
-        className={`inline-flex h-14 items-center justify-center gap-2 rounded-full text-[17px] font-bold text-white ${focusRing}`}
+        className={`inline-flex h-14 items-center justify-center gap-2 rounded-[6px] text-[17px] font-semibold text-white ${focusRing}`}
         style={{ background: C.blue, outlineColor: C.blue }}
       >
         <CalendarCheck size={20} aria-hidden />
@@ -1189,7 +1073,7 @@ function Hours({ today }: { today: Date }) {
                     </span>
                   )}
                 </th>
-                <td className="px-3 py-3 font-bold" style={{ ...monoF, fontWeight: isToday ? 700 : 500 }}>
+                <td className="px-3 py-3 tabular-nums" style={{ fontWeight: isToday ? 700 : 500 }}>
                   {h.time}
                 </td>
                 <td className="px-3 py-3 text-right text-[14px]" style={{ color: C.muted }}>
@@ -1226,7 +1110,7 @@ function Visit() {
       <svg viewBox="0 0 520 300" className="h-auto w-full rounded-[8px]" role="img" aria-label="ㅇㅇ역 2번 출구에서 큰길을 따라 150미터 걸으면 오른쪽 건물 3층에 병원이 있는 약도" style={{ background: C.paper }}>
         <rect x="0" y="128" width="520" height="44" fill="#ffffff" />
         <rect x="236" y="0" width="40" height="300" fill="#ffffff" />
-        <g fill={C.sky}>
+        <g fill="#e6e6e2">
           <rect x="24" y="24" width="180" height="84" rx="4" />
           <rect x="300" y="24" width="90" height="84" rx="4" />
           <rect x="24" y="192" width="180" height="84" rx="4" />
@@ -1239,14 +1123,14 @@ function Visit() {
         <text x="345" y="250" textAnchor="middle" fontSize="13" fill="#ffffff">
           정형외과 3층
         </text>
-        <circle cx="120" cy="150" r="16" fill={C.mid} />
+        <circle cx="120" cy="150" r="16" fill={C.blue} />
         <text x="120" y="155" textAnchor="middle" fontSize="13" fontWeight="700" fill="#ffffff">
           2
         </text>
         <text x="120" y="100" textAnchor="middle" fontSize="14" fill={C.ink}>
           ㅇㅇ역
         </text>
-        <path d="M138 150 L330 150 L345 186" fill="none" stroke={C.mid} strokeWidth="4" strokeDasharray="8 7" strokeLinecap="round" />
+        <path d="M138 150 L330 150 L345 186" fill="none" stroke={C.blue} strokeWidth="3" strokeDasharray="8 7" strokeLinecap="round" />
         <text x="430" y="154" fontSize="13" fill={C.muted}>
           ㅇㅇ로
         </text>

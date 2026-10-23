@@ -1,76 +1,60 @@
 "use client";
 
 import { useEffect, useMemo, useRef, useState } from "react";
-import { AnimatePresence, animate, motion, useMotionValue, useScroll, useTransform, type MotionValue } from "framer-motion";
-import { AlertCircle, Calculator, Check, Clock, MapPin, MessageCircle, Phone, RotateCcw } from "lucide-react";
-import { IBM_Plex_Sans_KR, JetBrains_Mono } from "@/lib/local-fonts";
+import { AnimatePresence, motion, useScroll, useTransform } from "framer-motion";
+import { AlertCircle, Check, Clock, MapPin, MessageCircle, Phone, RotateCcw } from "lucide-react";
 import { useReducedMotionSafe } from "@/hooks/useReducedMotionSafe";
 import { daysAgo, fmtKo, useDemoToday } from "@/hooks/useDemoToday";
 import { maskName, maskPhone } from "@/components/demos/LeadReceivedPanel";
 import { DemoMakerInfo } from "@/components/demos/DemoMakerInfo";
 
-/* 건축사사무소 홈페이지 샘플: 가상의 곰파트너건축사사무소. 단독주택과 근린생활시설(상가주택, 의원 건물, 카페 건물) 설계.
+/* 건축사사무소 홈페이지 샘플: 가상의 곰파트너 건축사사무소. 단독주택과 근린생활시설(상가주택, 의원 건물, 카페 건물) 설계.
    상호, 주소, 작업 목록, 손님 이름은 모두 가상이다.
+   첫 화면 사진 출처: Pexels 사진 16911118
 
    국내 소규모 건축사사무소 사이트 공통 구성(참고): 메뉴는 사무소 소개, 작업(Works, 프로젝트), 설계 과정, 문의(상담신청), 오시는 길.
    작업은 단독주택, 근린생활시설, 공동주택 같은 용도별 필터와 대지 위치, 대지 면적, 연면적, 규모, 구조, 진행 상태를 적는다.
    상담 폼은 건축주 이름, 연락처, 대지 위치, 건물 용도, 예산과 일정 정도를 받는다. "규모 검토", "대지 분석", "건축주",
    "계획설계, 기본설계, 실시설계, 인허가" 같은 말을 그대로 쓴다. 용도지역은 토지이음에서 주소로 확인한다고 안내하는 곳이 많다.
 
-   핵심 모션: 첫 화면이 일조 연구 모형이다. 흰 매스 모형 위로 해가 돌고 바닥 그림자가 따라 돈다(그림자는 매 프레임 해 방향으로
-   모형 꼭짓점을 바닥에 투영한 볼록 껍질). 벽 두 면의 밝기도 해 방향에 따라 바뀐다. 규모 검토 계산기도 같은 모형 그리기로
-   용도지역을 바꾸면 층이 쌓이거나 빠진다.
-
-   포스터 첫 화면(ar-poster): 짙은 콘크리트 회색 바탕에 큰 문장 "땅 주소만 있어도 몇 층까지 되는지 봐 드려요" 하나.
-   오른쪽(휴대폰은 아래)에 흰 매스 모형이 대지 판 위에 서 있다. 들어올 때 층이 아래부터 차례로 내려앉고(1.6초),
-   이어 주황 해가 궤도를 따라 16초에 한 바퀴 돌며 그림자가 바닥을 돈다(반복 움직임은 이것 하나).
-   스크롤하면 매스가 층별로 위아래로 벌어지고 문장은 위로 빠진다. 동작 줄이기면 해와 그림자를 한 자리에 멈춘 완성 상태로 둔다.
+   핵심 모션: 첫 화면(ar-poster)은 도시 모형 사진 한 장이 화면을 채운다. 들어올 때 사진이 1.6초 동안 천천히 다가오고(scale 1.06 -> 1),
+   문장과 정보 줄은 0.3초 늦게 아래에서 올라온다(CSS keyframes, 끝 상태가 기본값이라 JS 없이도 보인다).
+   스크롤하면 사진만 조금 느리게 움직인다(y 0 -> 8%). 규모 검토 계산기는 같은 흰 매스 모형 그림으로
+   용도지역을 바꾸면 층이 쌓이거나 빠진다(본문에 남긴 움직임은 이것 하나). 동작 줄이기면 모두 멈춘 완성 상태다.
 
    상호작용(모두 브라우저 안에서만 돈다. 실제로 보내지 않는다)
    1. 규모 검토: 대지 면적과 용도지역을 넣으면 건폐율, 용적률(국토계획법 시행령 상한)로 최대 건축면적, 최대 연면적, 개략 층수.
-   2. 작업 목록: 전체, 단독주택, 근린생활시설 필터. 카드마다 매스 모형 그림.
+   2. 작업 목록: 전체, 단독주택, 근린생활시설 필터. 카드마다 무채색 매스 모형 그림.
    3. 설계 과정과 기간: 단계를 누르면 하는 일, 받는 도면, 주 단위 기간 막대가 바뀐다.
    4. 상담신청: 이름, 휴대폰, 건물 용도, 대지 위치, 규모 검토 결과 첨부. 완료 화면에 접수 번호, 담당 창구, 회신 예정일. */
 
-const plexF = { fontFamily: `${IBM_Plex_Sans_KR.style.fontFamily}, sans-serif` } as const;
-const monoF = { fontFamily: `${JetBrains_Mono.style.fontFamily}, ui-monospace, monospace` } as const;
+const IMG = "/images/demo-architect-office";
 
-const BRAND = "곰파트너건축사사무소";
 const ADDRESS = "서울 ㅇㅇ구 ㅇㅇ로 00, 3층";
 const TEL = "02-000-0000";
 const KAKAO = "카카오톡 채널 곰파트너";
 
 const C = {
-  concrete: "#363532",
-  concreteHi: "#4a4844",
-  cream: "#f2f0eb",
-  sub: "#c9c6bf",
-  orange: "#ff7d2e",
-  paper: "#ecebe7",
-  paperDeep: "#e1dfda",
-  card: "#f7f6f3",
-  ink: "#232220",
-  muted: "#5c5a55",
-  line: "#c4c1ba",
-  accent: "#b8430a",
+  paper: "#ffffff",
+  soft: "#f7f7f5",
+  card: "#f7f7f5",
+  ink: "#111111",
+  body: "#4b4b4b",
+  muted: "#767676",
+  line: "#e5e5e5",
+  /** 입력칸, 버튼 테두리 */
+  field: "#c4c4c4",
+  /** 강조색 하나. 벽돌빛 주황을 낮춘 갈색 */
+  accent: "#8a4a26",
   error: "#b42318",
 };
 
 /* 모션 상수. 시간은 초, 이징은 cubic-bezier */
 const EASE = [0.22, 1, 0.36, 1] as const;
-/** 층이 내려앉을 때. 끝에서 살짝 눌리듯 멈춘다 */
-const EASE_DROP = [0.33, 1, 0.68, 1] as const;
-/** 층 하나가 내려앉는 시간과 층 사이 간격. 다섯 층이 1.6초 안에 끝난다 */
-const DROP_DUR = 0.7;
-const DROP_GAP = 0.17;
-/** 해가 궤도를 한 바퀴 도는 시간(반복 움직임) */
-const SUN_LOOP = 16;
-/** 칩, 막대, 패널 전환 */
+/** 첫 화면 사진이 다가오는 시간 */
+const HERO_IN = 1.6;
+/** 칩, 패널 전환 */
 const DUR = 0.35;
-/** 포스터 래퍼(180svh) 스크롤 중 퇴장이 끝나는 지점. 고정 구간 80svh / 180svh */
-const EXIT_END = 0.44;
-/** 퇴장 때 층 사이가 벌어지는 거리(그림 좌표) */
-const SPREAD = 64;
 
 const focusRing = "focus-visible:outline focus-visible:outline-[3px] focus-visible:outline-offset-2";
 const p2 = (n: number) => String(n).padStart(2, "0");
@@ -86,10 +70,10 @@ function M2() {
   );
 }
 
-/* ---------- 아이소메트릭 그리기 ---------- */
+/* ---------- 아이소메트릭 그리기(규모 검토, 작업 카드) ---------- */
 
 type Pt = [number, number];
-/** 바닥 좌표(x, y), 높이 z, 가로 w, 세로 d, 높이 h. lv 는 층 번호(퇴장 때 벌어지는 단위) */
+/** 바닥 좌표(x, y), 높이 z, 가로 w, 세로 d, 높이 h. lv 는 층 번호 */
 type Box = { x: number; y: number; w: number; d: number; z: number; h: number; lv: number };
 
 const COS30 = Math.cos(Math.PI / 6);
@@ -110,8 +94,6 @@ function boxFaces(b: Box, P: Iso) {
     top: polyD([P(b.x, b.y, z1), P(x1, b.y, z1), P(x1, y1, z1), P(b.x, y1, z1)]),
     right: polyD([P(x1, b.y, b.z), P(x1, y1, b.z), P(x1, y1, z1), P(x1, b.y, z1)]),
     left: polyD([P(b.x, y1, b.z), P(x1, y1, b.z), P(x1, y1, z1), P(b.x, y1, z1)]),
-    /** 앞쪽 윗모서리 하이라이트 한 줄 */
-    edge: `M${P(b.x, y1, z1).map((v) => v.toFixed(1)).join(" ")}L${P(x1, y1, z1).map((v) => v.toFixed(1)).join(" ")}L${P(x1, b.y, z1).map((v) => v.toFixed(1)).join(" ")}`,
   };
 }
 
@@ -157,231 +139,76 @@ function shadowD(boxes: Box[], theta: number, phi: number, P: Iso) {
     .join("");
 }
 
-/** 벽 밝기. c 는 면 방향과 해 방향의 수평 내적(-1~1) */
-const wallShade = (c: number) => `hsl(40 6% ${Math.round(57 + 38 * Math.max(0, c))}%)`;
+/** 벽 밝기(무채색). c 는 면 방향과 해 방향의 수평 내적(-1~1) */
+const wallShade = (c: number) => `hsl(0 0% ${Math.round(62 + 34 * Math.max(0, c))}%)`;
 
-/* ---------- 포스터 모형 ---------- */
+/* ---------- 첫 화면 ---------- */
 
-const FL = 26;
-const POSTER_BOXES: Box[] = [
-  { x: -70, y: -55, w: 120, d: 110, z: 0, h: FL, lv: 0 },
-  { x: 50, y: -5, w: 40, d: 60, z: 0, h: FL, lv: 0 },
-  { x: -70, y: -55, w: 120, d: 110, z: FL, h: FL, lv: 1 },
-  { x: -70, y: -55, w: 100, d: 90, z: FL * 2, h: FL, lv: 2 },
-  { x: -70, y: -55, w: 70, d: 65, z: FL * 3, h: FL, lv: 3 },
-  { x: -40, y: -55, w: 40, d: 35, z: FL * 4, h: FL, lv: 4 },
-];
-const LEVELS = [0, 1, 2, 3, 4];
-const BOARD = 110;
-const P_POSTER = makeIso(360, 430, 1.55);
-/** 해 고도 38도 고정. 궤도는 모형 오른쪽 위에 작게 */
-const PHI = (38 * Math.PI) / 180;
-const ORB = { cx: 517, cy: 70, rx: 150, ry: 50 };
-/** 동작 줄이기와 첫 화면의 해 방향: 왼쪽 앞에서 비춰 그림자가 오른쪽 뒤로 */
-const THETA0 = 2.05;
-
-const BOARD_TOP = polyD([P_POSTER(-BOARD, -BOARD, 0), P_POSTER(BOARD, -BOARD, 0), P_POSTER(BOARD, BOARD, 0), P_POSTER(-BOARD, BOARD, 0)]);
-const BOARD_RIGHT = polyD([P_POSTER(BOARD, -BOARD, 0), P_POSTER(BOARD, BOARD, 0), P_POSTER(BOARD, BOARD, -12), P_POSTER(BOARD, -BOARD, -12)]);
-const BOARD_LEFT = polyD([P_POSTER(-BOARD, BOARD, 0), P_POSTER(BOARD, BOARD, 0), P_POSTER(BOARD, BOARD, -12), P_POSTER(-BOARD, BOARD, -12)]);
-/** 대지 판 위 필지 선 */
-const BOARD_GRID = [-66, -22, 22, 66]
-  .flatMap((v) => [
-    `M${P_POSTER(v, -BOARD, 0).join(" ")}L${P_POSTER(v, BOARD, 0).join(" ")}`,
-    `M${P_POSTER(-BOARD, v, 0).join(" ")}L${P_POSTER(BOARD, v, 0).join(" ")}`,
-  ])
-  .join("");
+/** 문장 등장. 끝 상태가 기본값이라 JS 가 없어도 보인다 */
+const RISE_CSS = `@keyframes ar-rise{from{opacity:0;transform:translateY(12px)}to{opacity:1;transform:none}}
+.ar-rise{animation:ar-rise 0.7s cubic-bezier(0.22,1,0.36,1) 0.3s both}
+@media (prefers-reduced-motion: reduce){.ar-rise{animation:none}}`;
 
 function Poster({ reduce, onCta }: { reduce: boolean; onCta: () => void }) {
   const ref = useRef<HTMLElement>(null);
   const { scrollYProgress } = useScroll({ target: ref, offset: ["start start", "end start"] });
-  const p = useTransform(scrollYProgress, (v) => (reduce ? 0 : Math.min(1, v / EXIT_END)));
-  const textY = useTransform(p, (v) => `${-v * 45}svh`);
-  const textO = useTransform(p, (v) => 1 - Math.min(1, Math.max(0, (v - 0.3) / 0.6)));
-  const shadowO = useTransform(p, (v) => Math.max(0, 1 - v * 2.4));
-  const modelY = useTransform(p, (v) => `${v * 6}svh`);
-  const modelO = useTransform(p, (v) => 1 - Math.min(1, Math.max(0, (v - 0.75) / 0.25)));
-
-  // 해 방향. 동작 줄이기면 THETA0 에 멈춘다
-  const theta = useMotionValue(THETA0);
-  useEffect(() => {
-    if (reduce) {
-      theta.set(THETA0);
-      return;
-    }
-    const c = animate(theta, [THETA0, THETA0 + Math.PI * 2], {
-      duration: SUN_LOOP,
-      ease: "linear",
-      repeat: Infinity,
-      delay: DROP_GAP * LEVELS.length + DROP_DUR * 0.6,
-    });
-    return () => c.stop();
-  }, [reduce, theta]);
-
-  const shadow = useTransform(theta, (t) => shadowD(POSTER_BOXES, t, PHI, P_POSTER));
-  const rightFill = useTransform(theta, (t) => wallShade(Math.cos(t)));
-  const leftFill = useTransform(theta, (t) => wallShade(Math.sin(t)));
-  const sunX = useTransform(theta, (t) => ORB.cx + (ORB.rx * (Math.cos(t) - Math.sin(t))) / Math.SQRT2);
-  const sunY = useTransform(theta, (t) => ORB.cy + (ORB.ry * (Math.cos(t) + Math.sin(t))) / Math.SQRT2);
+  const photoY = useTransform(scrollYProgress, (v) => (reduce ? "0%" : `${v * 8}%`));
 
   return (
-    <section id="ar-poster" ref={ref} aria-labelledby="ar-poster-title" className="relative" style={{ height: reduce ? undefined : "180svh", background: C.concrete }}>
+    <section id="ar-poster" ref={ref} aria-labelledby="ar-poster-title" className="relative flex min-h-[100svh] flex-col overflow-hidden" style={{ background: "#141414", color: "#fff" }}>
+      <style>{RISE_CSS}</style>
+      <motion.div className="absolute inset-0" style={{ y: photoY }}>
+        <motion.div className="absolute inset-0" initial={reduce ? false : { scale: 1.06 }} animate={{ scale: 1 }} transition={{ duration: reduce ? 0 : HERO_IN, ease: EASE }}>
+          {/* eslint-disable-next-line @next/next/no-img-element -- 정적 export 라 next/image 최적화를 쓰지 않는다 */}
+          <img
+            src={`${IMG}/hero.jpg`}
+            srcSet={`${IMG}/hero-sm.jpg 960w, ${IMG}/hero.jpg 1920w`}
+            sizes="100vw"
+            alt="저녁 햇빛을 받은 도시 모형. 흰 건물 모형과 둥근 나무 모형이 물가를 따라 놓여 있다"
+            fetchPriority="high"
+            className="absolute inset-0 h-full w-full object-cover"
+            style={{ objectPosition: "60% 40%" }}
+          />
+        </motion.div>
+      </motion.div>
       <div
-        className={`${reduce ? "relative min-h-svh" : "sticky top-0 h-svh"} overflow-hidden`}
-        style={{
-          color: C.cream,
-          backgroundColor: C.concrete,
-          // 콘크리트 기공과 거푸집 이음 자국
-          backgroundImage: `radial-gradient(rgba(0,0,0,0.22) 1px, transparent 1.6px), radial-gradient(rgba(255,255,255,0.05) 1px, transparent 1.4px), linear-gradient(to bottom, transparent calc(50% - 1px), rgba(0,0,0,0.12) 50%, transparent calc(50% + 1px)), radial-gradient(90% 70% at 78% 70%, ${C.concreteHi} 0%, ${C.concrete} 62%)`,
-          backgroundSize: "23px 19px, 31px 27px, 100% 50svh, 100% 100%",
-          backgroundPosition: "0 0, 11px 7px, 0 0, 0 0",
-        }}
-      >
-        {/* 모형 */}
-        <div className="pointer-events-none absolute bottom-[-8svh] left-1/2 aspect-square w-[min(118vw,64svh)] -translate-x-1/2 lg:bottom-[-10svh] lg:left-auto lg:right-[1vw] lg:w-[min(96svh,62vw)] lg:translate-x-0">
-          <motion.svg viewBox="0 0 720 720" className="h-full w-full overflow-visible" style={{ y: modelY, opacity: modelO }} role="img" aria-label="대지 판 위 흰 매스 모형과 주위를 도는 해, 해를 따라 돌아가는 바닥 그림자">
-            <defs>
-              <radialGradient id="ar-p-sun" cx="0.38" cy="0.35" r="0.7">
-                <stop offset="0" stopColor="#ffd2a8" />
-                <stop offset="0.45" stopColor={C.orange} />
-                <stop offset="1" stopColor="#d9530f" />
-              </radialGradient>
-              <radialGradient id="ar-p-glow" cx="0.5" cy="0.5" r="0.5">
-                <stop offset="0" stopColor={C.orange} stopOpacity="0.38" />
-                <stop offset="1" stopColor={C.orange} stopOpacity="0" />
-              </radialGradient>
-              <radialGradient id="ar-p-floor" cx="0.5" cy="0.5" r="0.5">
-                <stop offset="0" stopColor="#000" stopOpacity="0.55" />
-                <stop offset="1" stopColor="#000" stopOpacity="0" />
-              </radialGradient>
-              <linearGradient id="ar-p-board" x1="0" y1="0" x2="1" y2="1">
-                <stop offset="0" stopColor="#ebe8e1" />
-                <stop offset="1" stopColor="#d7d3ca" />
-              </linearGradient>
-              <linearGradient id="ar-p-roof" x1="0" y1="0" x2="1" y2="1">
-                <stop offset="0" stopColor="#fbfaf7" />
-                <stop offset="1" stopColor="#ebe9e3" />
-              </linearGradient>
-              <clipPath id="ar-p-clip">
-                <path d={BOARD_TOP} />
-              </clipPath>
-            </defs>
+        aria-hidden
+        className="absolute inset-0"
+        style={{ background: "linear-gradient(to bottom, rgba(0,0,0,0.4), rgba(0,0,0,0) 22%), linear-gradient(to top, rgba(0,0,0,0.72), rgba(0,0,0,0.3) 55%, rgba(0,0,0,0.08))" }}
+      />
 
-            {/* 해 궤도와 해. 모형보다 뒤에 둔다(멀리 있는 해) */}
-            <ellipse cx={ORB.cx} cy={ORB.cy} rx={ORB.rx} ry={ORB.ry} fill="none" stroke="rgba(242,240,235,0.28)" strokeWidth="1.5" strokeDasharray="3 7" />
-            <motion.g initial={reduce ? false : { opacity: 0 }} animate={{ opacity: 1 }} transition={{ duration: reduce ? 0 : 0.6, delay: reduce ? 0 : 1.1 }}>
-              <motion.circle cx={sunX} cy={sunY} r="64" fill="url(#ar-p-glow)" />
-              <motion.circle cx={sunX} cy={sunY} r="24" fill="url(#ar-p-sun)" />
-            </motion.g>
+      {/* 로고와 핵심 행동 하나 */}
+      <div className="relative z-10 flex items-center justify-between gap-3 px-4 pt-4 md:px-12 md:pt-7">
+        <p className="inline-flex items-center gap-2 text-[17px] font-bold leading-none">
+          <SampleLogo light size={18} />
+        </p>
+        <button
+          type="button"
+          onClick={onCta}
+          data-gtm-cta="architect-office_poster_cta"
+          className={`inline-flex h-11 flex-none items-center rounded-[6px] bg-white px-4 text-[15px] font-semibold ${focusRing}`}
+          style={{ color: C.ink, outlineColor: "#fff" }}
+        >
+          규모 검토
+        </button>
+      </div>
 
-            {/* 바닥 그림자와 대지 판 */}
-            <ellipse cx="360" cy="628" rx="330" ry="46" fill="url(#ar-p-floor)" />
-            <path d={BOARD_LEFT} fill="#bdb8ae" />
-            <path d={BOARD_RIGHT} fill="#a6a197" />
-            <path d={BOARD_TOP} fill="url(#ar-p-board)" />
-            <path d={BOARD_GRID} stroke="rgba(54,53,50,0.1)" strokeWidth="1" fill="none" />
-            {/* 북쪽 표시 */}
-            <g transform={`translate(${P_POSTER(88, -92, 0).join(" ")})`}>
-              <path d="M0 -14 L7 6 L0 2 L-7 6 Z" fill={C.accent} />
-              <text x="0" y="22" textAnchor="middle" fontSize="13" fontWeight="700" fill="#6b675f" style={monoF}>
-                N
-              </text>
-            </g>
-
-            {/* 해를 따라 도는 그림자. 대지 판 밖으로는 잘린다 */}
-            <motion.g style={{ opacity: shadowO }} clipPath="url(#ar-p-clip)">
-              <motion.g initial={reduce ? false : { opacity: 0 }} animate={{ opacity: 1 }} transition={{ duration: reduce ? 0 : 0.8, delay: reduce ? 0 : 0.9 }}>
-                <motion.path d={shadow} fill="rgba(40,36,30,0.42)" />
-              </motion.g>
-            </motion.g>
-
-            {/* 층별 매스. 아래층부터 그린다 */}
-            {LEVELS.map((lv) => (
-              <PosterLevel key={lv} lv={lv} p={p} reduce={reduce}>
-                {POSTER_BOXES.filter((b) => b.lv === lv).map((b, i) => {
-                  const f = boxFaces(b, P_POSTER);
-                  return (
-                    <g key={i} strokeLinejoin="round">
-                      <motion.path d={f.left} style={{ fill: leftFill }} stroke="rgba(54,53,50,0.18)" strokeWidth="0.8" />
-                      <motion.path d={f.right} style={{ fill: rightFill }} stroke="rgba(54,53,50,0.18)" strokeWidth="0.8" />
-                      <path d={f.top} fill="url(#ar-p-roof)" stroke="rgba(54,53,50,0.14)" strokeWidth="0.8" />
-                      <path d={f.edge} fill="none" stroke="rgba(255,255,255,0.9)" strokeWidth="1.4" strokeLinecap="round" />
-                    </g>
-                  );
-                })}
-              </PosterLevel>
-            ))}
-          </motion.svg>
-        </div>
-
-        {/* 로고와 핵심 행동 하나 */}
-        <motion.div className="absolute inset-x-0 top-0 z-10 flex items-center justify-between px-4 pt-4 md:px-12 md:pt-7" style={{ y: textY }}>
-          <p className="inline-flex items-center gap-2 text-[17px] font-bold leading-none" style={plexF}>
-            <CubeMark size={20} />
-            {BRAND}
-          </p>
-          <button
-            type="button"
-            onClick={onCta}
-            aria-label="규모 검토하기"
-            title="규모 검토하기"
-            data-gtm-cta="architect-office_poster_cta"
-            className={`inline-flex h-12 w-12 items-center justify-center rounded-full ${focusRing}`}
-            style={{ background: C.orange, color: C.concrete, outlineColor: C.cream }}
-          >
-            <Calculator size={22} aria-hidden />
-          </button>
-        </motion.div>
-
-        {/* 큰 문장 */}
-        <motion.div className="relative z-[1] px-4 pt-[12svh] md:px-12 lg:pt-[13svh]" style={{ y: textY, opacity: textO }}>
-          <h1
-            id="ar-poster-title"
-            className="text-[clamp(52px,14vw,72px)] font-bold leading-[1.06] tracking-[-0.04em] md:text-[clamp(72px,8.4vw,170px)] md:leading-[1.02]"
-            style={{ ...plexF, wordBreak: "keep-all" }}
-          >
-            <span className="block">
-              땅 주소만
-              <br className="md:hidden" /> 있어도
-            </span>
-            <span className="block">
-              <span style={{ color: C.orange }}>몇 층까지</span>
-              <br className="md:hidden" /> 되는지
-            </span>
-            <span className="block">봐 드려요</span>
-          </h1>
-          <p className="mt-4 text-[16px] md:mt-7 md:text-[19px]" style={{ color: C.sub }}>
-            단독주택, 근린생활시설 설계
-          </p>
-        </motion.div>
+      {/* 문장 */}
+      <div className={`relative z-[1] mt-auto max-w-[1200px] px-4 pb-[10svh] md:px-12 ${reduce ? "" : "ar-rise"}`}>
+        <h1
+          id="ar-poster-title"
+          className="text-[36px] font-bold md:text-[clamp(40px,5vw,72px)]"
+          style={{ letterSpacing: "-0.03em", lineHeight: 1.2, wordBreak: "keep-all" }}
+        >
+          땅 주소만 있어도
+          <br />
+          몇 층까지 되는지 봐 드려요
+        </h1>
+        <p className="mt-4 text-[16px] md:mt-5 md:text-[18px]" style={{ color: "rgba(255,255,255,0.85)" }}>
+          단독주택, 근린생활시설 설계
+        </p>
       </div>
     </section>
-  );
-}
-
-/** 층 하나: 들어올 때 위에서 내려앉고, 스크롤하면 층 번호만큼 위로 벌어진다 */
-function PosterLevel({ lv, p, reduce, children }: { lv: number; p: MotionValue<number>; reduce: boolean; children: React.ReactNode }) {
-  const y = useTransform(p, (v) => -lv * SPREAD * v * (0.6 + 0.4 * v));
-  return (
-    <motion.g style={{ y }}>
-      <motion.g
-        initial={reduce ? false : { y: -(80 + lv * 40) }}
-        animate={{ y: 0 }}
-        transition={{ duration: reduce ? 0 : DROP_DUR, delay: reduce ? 0 : 0.1 + lv * DROP_GAP, ease: EASE_DROP }}
-      >
-        {children}
-      </motion.g>
-    </motion.g>
-  );
-}
-
-/** 상호 로고: 흰 상자 하나와 주황 윗면 */
-function CubeMark({ size = 20 }: { size?: number }) {
-  return (
-    <svg width={size} height={size} viewBox="0 0 20 20" aria-hidden>
-      <path d="M10 1.5 L18 6 L10 10.5 L2 6 Z" fill={C.orange} />
-      <path d="M2 6 L10 10.5 L10 18.5 L2 14 Z" fill="currentColor" opacity="0.9" />
-      <path d="M18 6 L10 10.5 L10 18.5 L18 14 Z" fill="currentColor" opacity="0.6" />
-    </svg>
   );
 }
 
@@ -435,7 +262,7 @@ function ScaleCheck({ reduce, result, setResult }: { reduce: boolean; result: Ca
       <div>
         <div className="flex flex-wrap items-end gap-3">
           <label className="block min-w-0 flex-1">
-            <span className="mb-2 block text-[15px] font-bold">대지 면적</span>
+            <span className="mb-2 block text-[15px] font-semibold">대지 면적</span>
             <input
               inputMode="decimal"
               value={raw}
@@ -445,11 +272,11 @@ function ScaleCheck({ reduce, result, setResult }: { reduce: boolean; result: Ca
               }}
               aria-invalid={!valid}
               aria-describedby="ar-area-help"
-              className={`h-14 w-full rounded-[4px] border-2 bg-white px-4 text-[22px] font-semibold tabular-nums ${focusRing}`}
-              style={{ ...monoF, borderColor: valid ? C.ink : C.error, outlineColor: C.accent }}
+              className={`h-14 w-full rounded-[4px] border bg-white px-4 text-[22px] font-semibold tabular-nums ${focusRing}`}
+              style={{ borderColor: valid ? C.field : C.error, outlineColor: C.accent }}
             />
           </label>
-          <div role="radiogroup" aria-label="면적 단위" className="flex h-14 overflow-hidden rounded-[4px] border-2" style={{ borderColor: C.ink }}>
+          <div role="radiogroup" aria-label="면적 단위" className="flex h-14 overflow-hidden rounded-[4px] border" style={{ borderColor: C.field }}>
             {(["m2", "py"] as const).map((u) => (
               <button
                 key={u}
@@ -465,7 +292,7 @@ function ScaleCheck({ reduce, result, setResult }: { reduce: boolean; result: Ca
                   setRaw(s);
                   update(s, result.zone, u);
                 }}
-                className={`w-16 text-[16px] font-bold ${focusRing}`}
+                className={`w-16 text-[16px] font-semibold ${focusRing}`}
                 style={{ background: unit === u ? C.ink : "transparent", color: unit === u ? C.paper : C.ink, outlineColor: C.accent }}
               >
                 {u === "m2" ? <M2 /> : "평"}
@@ -484,7 +311,7 @@ function ScaleCheck({ reduce, result, setResult }: { reduce: boolean; result: Ca
         </p>
 
         <fieldset className="mt-7">
-          <legend className="mb-3 text-[15px] font-bold">용도지역</legend>
+          <legend className="mb-3 text-[15px] font-semibold">용도지역</legend>
           <div className="grid grid-cols-2 gap-2 sm:grid-cols-4">
             {ZONES.map((z) => {
               const on = z.id === result.zone.id;
@@ -494,11 +321,11 @@ function ScaleCheck({ reduce, result, setResult }: { reduce: boolean; result: Ca
                   type="button"
                   aria-pressed={on}
                   onClick={() => update(raw, z, unit)}
-                  className={`flex min-h-[56px] flex-col items-start justify-center rounded-[4px] border-2 px-3 py-2 text-left ${focusRing}`}
+                  className={`flex min-h-[56px] flex-col items-start justify-center rounded-[4px] border px-3 py-2 text-left ${focusRing}`}
                   style={{ borderColor: on ? C.accent : C.line, background: on ? "#fff" : "transparent", outlineColor: C.accent }}
                 >
                   <span className="text-[14px] font-bold leading-tight">{z.name}</span>
-                  <span className="mt-0.5 text-[12px] tabular-nums" style={{ ...monoF, color: C.muted }}>
+                  <span className="mt-0.5 text-[12px] tabular-nums" style={{ color: C.muted }}>
                     {z.bcr}% / {z.far}%
                   </span>
                 </button>
@@ -511,17 +338,17 @@ function ScaleCheck({ reduce, result, setResult }: { reduce: boolean; result: Ca
         </p>
       </div>
 
-      <div className="rounded-[6px] border-2 p-5 md:p-7" style={{ borderColor: C.ink, background: C.card }}>
+      <div className="rounded-[6px] border p-5 md:p-7" style={{ borderColor: C.line, background: C.card }}>
         <MassPreview result={result} reduce={reduce} />
-        <dl className="mt-2 grid grid-cols-2 gap-x-6 gap-y-4 border-t-2 pt-5" style={{ borderColor: C.ink }}>
-          <Stat label={`건축면적 (건폐율 ${result.zone.bcr}%)`} value={<>{n1(result.footprint)}<M2 /></>} sub={`${n1(result.footprint / PYEONG)}평`} reduce={reduce} k={`f${result.footprint}`} />
-          <Stat label={`연면적 (용적률 ${result.zone.far}%)`} value={<>{n1(result.gross)}<M2 /></>} sub={`${n1(result.gross / PYEONG)}평`} reduce={reduce} k={`g${result.gross}`} />
+        <dl className="mt-2 grid grid-cols-2 gap-x-6 gap-y-4 border-t pt-5" style={{ borderColor: C.line }}>
+          <Stat label={`건축면적 (건폐율 ${result.zone.bcr}%)`} value={<>{n1(result.footprint)}<M2 /></>} sub={`${n1(result.footprint / PYEONG)}평`} />
+          <Stat label={`연면적 (용적률 ${result.zone.far}%)`} value={<>{n1(result.gross)}<M2 /></>} sub={`${n1(result.gross / PYEONG)}평`} />
           <div className="col-span-2">
             <dt className="text-[14px]" style={{ color: C.muted }}>
               개략 층수
             </dt>
             <dd className="mt-1 flex flex-wrap items-baseline gap-x-3">
-              <span className="text-[40px] font-bold leading-none tabular-nums" style={{ ...plexF, color: C.accent }}>
+              <span className="text-[40px] font-bold leading-none tabular-nums" style={{ color: C.accent }}>
                 지상 약 {result.floors}층
               </span>
               {result.zone.maxFloors && <span className="text-[14px] font-bold">{result.zone.maxFloors}층 이하 지역</span>}
@@ -536,26 +363,14 @@ function ScaleCheck({ reduce, result, setResult }: { reduce: boolean; result: Ca
   );
 }
 
-function Stat({ label, value, sub, reduce, k }: { label: string; value: React.ReactNode; sub: string; reduce: boolean; k: string }) {
+function Stat({ label, value, sub }: { label: string; value: React.ReactNode; sub: string }) {
   return (
     <div className="min-w-0">
       <dt className="text-[14px]" style={{ color: C.muted }}>
         {label}
       </dt>
-      <dd className="mt-1 overflow-hidden">
-        <AnimatePresence mode="popLayout" initial={false}>
-          <motion.span
-            key={k}
-            className="block text-[24px] font-bold tabular-nums md:text-[28px]"
-            style={monoF}
-            initial={reduce ? false : { y: "-100%" }}
-            animate={{ y: 0 }}
-            exit={reduce ? undefined : { y: "100%" }}
-            transition={{ duration: reduce ? 0 : DUR, ease: EASE }}
-          >
-            {value}
-          </motion.span>
-        </AnimatePresence>
+      <dd className="mt-1">
+        <span className="block text-[24px] font-bold tabular-nums md:text-[28px]">{value}</span>
         <span className="block text-[14px] tabular-nums" style={{ color: C.muted }}>
           {sub}
         </span>
@@ -599,11 +414,11 @@ function MassPreview({ result, reduce }: { result: CalcResult; reduce: boolean }
           <path d={PREV_BOARD.top} />
         </clipPath>
       </defs>
-      <path d={PREV_BOARD.left} fill="#c9c5bc" />
-      <path d={PREV_BOARD.right} fill="#b3aea4" />
-      <path d={PREV_BOARD.top} fill="#e6e3dc" />
+      <path d={PREV_BOARD.left} fill="#d4d4d4" />
+      <path d={PREV_BOARD.right} fill="#bfbfbf" />
+      <path d={PREV_BOARD.top} fill="#ececec" />
       <g clipPath="url(#ar-c-clip)">
-        <motion.path initial={{ d: shadow }} animate={{ d: shadow }} transition={t} fill="rgba(40,36,30,0.22)" />
+        <motion.path initial={{ d: shadow }} animate={{ d: shadow }} transition={t} fill="rgba(17,17,17,0.22)" />
       </g>
       <AnimatePresence initial={false}>
         {boxes.map((b) => {
@@ -616,16 +431,16 @@ function MassPreview({ result, reduce }: { result: CalcResult; reduce: boolean }
               exit={reduce ? { opacity: 0, transition: { duration: 0 } } : { y: -36, opacity: 0 }}
               transition={{ ...t, delay: reduce ? 0 : b.lv * 0.035 }}
             >
-              <motion.path initial={{ d: f.left }} animate={{ d: f.left }} transition={t} fill={PREV_LEFT} stroke="rgba(54,53,50,0.2)" strokeWidth="0.8" />
-              <motion.path initial={{ d: f.right }} animate={{ d: f.right }} transition={t} fill={PREV_RIGHT} stroke="rgba(54,53,50,0.2)" strokeWidth="0.8" />
-              <motion.path initial={{ d: f.top }} animate={{ d: f.top }} transition={t} fill="#faf9f6" stroke="rgba(54,53,50,0.16)" strokeWidth="0.8" />
+              <motion.path initial={{ d: f.left }} animate={{ d: f.left }} transition={t} fill={PREV_LEFT} stroke="rgba(17,17,17,0.2)" strokeWidth="0.8" />
+              <motion.path initial={{ d: f.right }} animate={{ d: f.right }} transition={t} fill={PREV_RIGHT} stroke="rgba(17,17,17,0.2)" strokeWidth="0.8" />
+              <motion.path initial={{ d: f.top }} animate={{ d: f.top }} transition={t} fill="#fafafa" stroke="rgba(17,17,17,0.16)" strokeWidth="0.8" />
             </motion.g>
           );
         })}
       </AnimatePresence>
       <motion.g initial={false} animate={{ x: label[0], y: label[1] }} transition={t}>
         <line x1="4" y1="0" x2="40" y2="-18" stroke={C.accent} strokeWidth="1.5" />
-        <text x="44" y="-14" fontSize="15" fontWeight="700" fill={C.accent} style={plexF}>
+        <text x="44" y="-14" fontSize="15" fontWeight="700" fill={C.accent}>
           {n}층
         </text>
       </motion.g>
@@ -666,28 +481,22 @@ const P_WORK = makeIso(150, 150, 1.3);
 const WORK_LEFT = wallShade(Math.sin(2.2));
 const WORK_RIGHT = wallShade(Math.cos(2.2));
 
-function WorkMass({ work, reduce }: { work: Work; reduce: boolean }) {
+function WorkMass({ work }: { work: Work }) {
   const boxes: Box[] = work.mass.map(([x, y, w, d, z, h], i) => ({ x, y, w, d, z: z * W_LH, h: h * W_LH, lv: i }));
   const shadow = shadowD(boxes, 2.2, (36 * Math.PI) / 180, P_WORK);
   const ground = polyD([P_WORK(-62, -62, 0), P_WORK(62, -62, 0), P_WORK(62, 62, 0), P_WORK(-62, 62, 0)]);
   return (
     <svg viewBox="0 0 300 236" className="block h-auto w-full" aria-hidden>
-      <path d={ground} fill="#e3e0d9" />
-      <path d={shadow} fill="rgba(40,36,30,0.2)" />
+      <path d={ground} fill="#ececec" />
+      <path d={shadow} fill="rgba(17,17,17,0.2)" />
       {boxes.map((b) => {
         const f = boxFaces(b, P_WORK);
         return (
-          <motion.g
-            key={b.lv}
-            initial={reduce ? false : { y: -24 }}
-            whileInView={{ y: 0 }}
-            viewport={{ once: true, amount: 0.6 }}
-            transition={{ duration: reduce ? 0 : 0.5, delay: reduce ? 0 : 0.08 * (b.z / W_LH), ease: EASE_DROP }}
-          >
-            <path d={f.left} fill={WORK_LEFT} stroke="rgba(54,53,50,0.2)" strokeWidth="0.7" />
-            <path d={f.right} fill={WORK_RIGHT} stroke="rgba(54,53,50,0.2)" strokeWidth="0.7" />
-            <path d={f.top} fill="#faf9f6" stroke="rgba(54,53,50,0.15)" strokeWidth="0.7" />
-          </motion.g>
+          <g key={b.lv}>
+            <path d={f.left} fill={WORK_LEFT} stroke="rgba(17,17,17,0.2)" strokeWidth="0.7" />
+            <path d={f.right} fill={WORK_RIGHT} stroke="rgba(17,17,17,0.2)" strokeWidth="0.7" />
+            <path d={f.top} fill="#fafafa" stroke="rgba(17,17,17,0.15)" strokeWidth="0.7" />
+          </g>
         );
       })}
     </svg>
@@ -711,11 +520,11 @@ function Works({ reduce }: { reduce: boolean }) {
               role="tab"
               aria-selected={on}
               onClick={() => setFilter(f)}
-              className={`inline-flex h-11 items-center gap-2 rounded-full border-2 px-4 text-[15px] font-bold ${focusRing}`}
-              style={{ borderColor: C.ink, background: on ? C.ink : "transparent", color: on ? C.paper : C.ink, outlineColor: C.accent }}
+              className={`inline-flex h-11 items-center gap-2 rounded-full border px-4 text-[15px] font-semibold ${focusRing}`}
+              style={{ borderColor: C.field, background: on ? C.ink : "transparent", color: on ? C.paper : C.ink, outlineColor: C.accent }}
             >
               {f}
-              <span className="text-[13px] tabular-nums" style={{ ...monoF, opacity: 0.75 }}>
+              <span className="text-[13px] tabular-nums" style={{ opacity: 0.75 }}>
                 {count(f)}
               </span>
             </button>
@@ -728,26 +537,26 @@ function Works({ reduce }: { reduce: boolean }) {
             <motion.li
               key={w.name}
               layout={!reduce}
-              initial={reduce ? false : { clipPath: "inset(100% 0 0 0)" }}
-              animate={{ clipPath: "inset(0% 0 0 0)" }}
-              exit={reduce ? { opacity: 0, transition: { duration: 0 } } : { clipPath: "inset(0 0 100% 0)" }}
+              initial={reduce ? false : { opacity: 0 }}
+              animate={{ opacity: 1 }}
+              exit={{ opacity: 0, transition: { duration: reduce ? 0 : 0.2 } }}
               transition={{ duration: reduce ? 0 : DUR, ease: EASE }}
               className="min-w-0"
             >
               <article>
                 <div className="relative rounded-[4px] border" style={{ borderColor: C.line, background: C.card }}>
-                  <WorkMass work={w} reduce={reduce} />
+                  <WorkMass work={w} />
                   <span className="absolute left-3 top-3 rounded-[3px] px-2 py-0.5 text-[12px] font-bold" style={{ background: w.state === "준공" ? C.ink : C.accent, color: "#fff" }}>
                     {w.state}
                   </span>
                 </div>
-                <h3 className="mt-3 text-[18px] font-bold" style={plexF}>
+                <h3 className="mt-3 text-[18px] font-bold">
                   {w.name}
                 </h3>
                 <p className="text-[14px]" style={{ color: C.muted }}>
                   {w.note}
                 </p>
-                <dl className="mt-2 grid grid-cols-[auto_1fr] gap-x-3 text-[14px] leading-[1.75]" style={monoF}>
+                <dl className="mt-2 grid grid-cols-[auto_1fr] gap-x-3 text-[14px] leading-[1.75]">
                   <dt style={{ color: C.muted }}>대지</dt>
                   <dd className="tabular-nums">
                     {w.site}
@@ -803,16 +612,16 @@ function Process({ reduce }: { reduce: boolean }) {
                 type="button"
                 aria-pressed={on}
                 onClick={() => setSel(i)}
-                className={`flex w-full items-center justify-between gap-3 rounded-[4px] border-2 px-4 py-3 text-left ${focusRing}`}
+                className={`flex w-full items-center justify-between gap-3 rounded-[4px] border px-4 py-3 text-left ${focusRing}`}
                 style={{ borderColor: on ? C.accent : C.line, background: on ? "#fff" : "transparent", outlineColor: C.accent }}
               >
                 <span className="flex items-center gap-3">
-                  <span className="inline-flex h-7 w-7 flex-none items-center justify-center rounded-full text-[13px] font-bold tabular-nums" style={{ ...monoF, background: on ? C.accent : C.paperDeep, color: on ? "#fff" : C.ink }}>
+                  <span className="inline-flex h-7 w-7 flex-none items-center justify-center rounded-full text-[13px] font-bold tabular-nums" style={{ background: on ? C.accent : C.line, color: on ? "#fff" : C.ink }}>
                     {i + 1}
                   </span>
                   <span className="text-[16px] font-bold">{s.name}</span>
                 </span>
-                <span className="flex-none text-[14px] tabular-nums" style={{ ...monoF, color: C.muted }}>
+                <span className="flex-none text-[14px] tabular-nums" style={{ color: C.muted }}>
                   {s.weeks ? `${s.weeks[0]}~${s.weeks[1]}주` : "공사 기간"}
                 </span>
               </button>
@@ -822,16 +631,16 @@ function Process({ reduce }: { reduce: boolean }) {
       </ol>
 
       <div className="min-w-0">
-        <div className="overflow-hidden rounded-[6px] border-2 p-5 md:p-7" style={{ borderColor: C.ink, background: C.card }}>
+        <div className="overflow-hidden rounded-[6px] border p-5 md:p-7" style={{ borderColor: C.line, background: C.card }}>
           <AnimatePresence mode="wait" initial={false}>
             <motion.div
               key={sel}
-              initial={reduce ? false : { clipPath: "inset(0 100% 0 0)" }}
-              animate={{ clipPath: "inset(0 0% 0 0)" }}
-              exit={reduce ? undefined : { clipPath: "inset(0 0 0 100%)" }}
+              initial={reduce ? false : { opacity: 0 }}
+              animate={{ opacity: 1 }}
+              exit={reduce ? undefined : { opacity: 0 }}
               transition={{ duration: reduce ? 0 : DUR, ease: EASE }}
             >
-              <h3 className="text-[24px] font-bold" style={plexF}>
+              <h3 className="text-[24px] font-bold">
                 {step.name}
               </h3>
               <p className="mt-3 text-[16px] leading-[1.7]">{step.desc}</p>
@@ -856,7 +665,7 @@ function Process({ reduce }: { reduce: boolean }) {
                     <motion.div
                       className="absolute inset-y-0 rounded-[2px]"
                       initial={false}
-                      animate={{ backgroundColor: on ? C.accent : "#8d8981" }}
+                      animate={{ backgroundColor: on ? C.accent : "#bdbdbd" }}
                       transition={{ duration: reduce ? 0 : 0.2 }}
                       style={{ left: `${(b.start / TOTAL_MAX) * 100}%`, width: `${(w[0] / TOTAL_MAX) * 100}%` }}
                     />
@@ -865,14 +674,14 @@ function Process({ reduce }: { reduce: boolean }) {
                       style={{
                         left: `${((b.start + w[0]) / TOTAL_MAX) * 100}%`,
                         width: `${((w[1] - w[0]) / TOTAL_MAX) * 100}%`,
-                        backgroundImage: `repeating-linear-gradient(135deg, ${on ? C.accent : "#8d8981"} 0 2px, transparent 2px 6px)`,
+                        backgroundImage: `repeating-linear-gradient(135deg, ${on ? C.accent : "#bdbdbd"} 0 2px, transparent 2px 6px)`,
                       }}
                     />
                   </div>
                 );
               })}
           </div>
-          <div className="mt-2 flex justify-between text-[13px] tabular-nums" style={{ ...monoF, color: C.muted }}>
+          <div className="mt-2 flex justify-between text-[13px] tabular-nums" style={{ color: C.muted }}>
             <span>0주</span>
             <span>{TOTAL_MAX}주</span>
           </div>
@@ -934,27 +743,27 @@ function Contact({ today, result, reduce }: { today: Date; result: CalcResult; r
     });
   };
 
-  const field = `h-12 w-full rounded-[4px] border-2 bg-white px-3 text-[16px] ${focusRing}`;
+  const field = `h-12 w-full rounded-[4px] border bg-white px-3 text-[16px] ${focusRing}`;
 
   if (sent) {
     return (
       <motion.div
-        initial={reduce ? false : { clipPath: "inset(0 0 100% 0)" }}
-        animate={{ clipPath: "inset(0 0 0% 0)" }}
+        initial={reduce ? false : { opacity: 0 }}
+        animate={{ opacity: 1 }}
         transition={{ duration: reduce ? 0 : 0.5, ease: EASE }}
-        className="rounded-[6px] border-2 p-6 md:p-8"
-        style={{ borderColor: C.ink, background: C.card }}
+        className="rounded-[6px] border p-6 md:p-8"
+        style={{ borderColor: C.line, background: C.card }}
         role="status"
       >
         <p className="inline-flex items-center gap-2 text-[15px] font-bold" style={{ color: C.accent }}>
           <Check size={18} aria-hidden /> 상담신청 접수
         </p>
-        <p className="mt-2 text-[26px] font-bold" style={plexF}>
+        <p className="mt-2 text-[26px] font-bold">
           {maskName(sent.name)}님, 접수됐어요
         </p>
         <dl className="mt-5 grid grid-cols-[auto_1fr] gap-x-5 gap-y-2 text-[16px]">
           <dt style={{ color: C.muted }}>접수 번호</dt>
-          <dd className="font-bold tabular-nums" style={monoF}>
+          <dd className="font-bold tabular-nums">
             {sent.no}
           </dd>
           <dt style={{ color: C.muted }}>연락처</dt>
@@ -985,8 +794,8 @@ function Contact({ today, result, reduce }: { today: Date; result: CalcResult; r
             setSent(null);
             setTried(false);
           }}
-          className={`mt-6 inline-flex h-11 items-center gap-2 rounded-[4px] border-2 px-4 text-[15px] font-bold ${focusRing}`}
-          style={{ borderColor: C.ink, outlineColor: C.accent }}
+          className={`mt-6 inline-flex h-11 items-center gap-2 rounded-[4px] border px-4 text-[15px] font-semibold ${focusRing}`}
+          style={{ borderColor: C.field, outlineColor: C.accent }}
         >
           <RotateCcw size={16} aria-hidden /> 다시 쓰기
         </button>
@@ -995,36 +804,36 @@ function Contact({ today, result, reduce }: { today: Date; result: CalcResult; r
   }
 
   return (
-    <form onSubmit={submit} noValidate className="grid gap-5 rounded-[6px] border-2 p-5 md:grid-cols-2 md:p-8" style={{ borderColor: C.ink, background: C.card }}>
+    <form onSubmit={submit} noValidate className="grid gap-5 rounded-[6px] border p-5 md:grid-cols-2 md:p-8" style={{ borderColor: C.line, background: C.card }}>
       <label className="block">
-        <span className="mb-1.5 block text-[15px] font-bold">이름</span>
-        <input value={name} onChange={(e) => setName(e.target.value)} autoComplete="name" aria-invalid={tried && !!errs.name} className={field} style={{ borderColor: tried && errs.name ? C.error : C.line, outlineColor: C.accent }} />
+        <span className="mb-1.5 block text-[15px] font-semibold">이름</span>
+        <input value={name} onChange={(e) => setName(e.target.value)} autoComplete="name" aria-invalid={tried && !!errs.name} className={field} style={{ borderColor: tried && errs.name ? C.error : C.field, outlineColor: C.accent }} />
         {tried && errs.name && <Err>{errs.name}</Err>}
       </label>
       <label className="block">
-        <span className="mb-1.5 block text-[15px] font-bold">휴대폰</span>
-        <input value={phone} onChange={(e) => setPhone(e.target.value)} inputMode="tel" autoComplete="tel" placeholder="010-0000-0000" aria-invalid={tried && !!errs.phone} className={field} style={{ borderColor: tried && errs.phone ? C.error : C.line, outlineColor: C.accent }} />
+        <span className="mb-1.5 block text-[15px] font-semibold">휴대폰</span>
+        <input value={phone} onChange={(e) => setPhone(e.target.value)} inputMode="tel" autoComplete="tel" placeholder="010-0000-0000" aria-invalid={tried && !!errs.phone} className={field} style={{ borderColor: tried && errs.phone ? C.error : C.field, outlineColor: C.accent }} />
         {tried && errs.phone && <Err>{errs.phone}</Err>}
       </label>
 
       <fieldset className="md:col-span-2">
-        <legend className="mb-2 text-[15px] font-bold">건물 용도</legend>
+        <legend className="mb-2 text-[15px] font-semibold">건물 용도</legend>
         <Choice options={USES} value={use} onChange={setUse} name="ar-use" />
       </fieldset>
 
       <label className="block md:col-span-2">
-        <span className="mb-1.5 block text-[15px] font-bold">대지 위치 (선택)</span>
-        <input value={addr} onChange={(e) => setAddr(e.target.value)} placeholder="지번이나 도로명 주소" className={field} style={{ borderColor: C.line, outlineColor: C.accent }} />
+        <span className="mb-1.5 block text-[15px] font-semibold">대지 위치 (선택)</span>
+        <input value={addr} onChange={(e) => setAddr(e.target.value)} placeholder="지번이나 도로명 주소" className={field} style={{ borderColor: C.field, outlineColor: C.accent }} />
       </label>
 
       <fieldset className="md:col-span-2">
-        <legend className="mb-2 text-[15px] font-bold">상담 방식</legend>
+        <legend className="mb-2 text-[15px] font-semibold">상담 방식</legend>
         <Choice options={WAYS} value={way} onChange={setWay} name="ar-way" />
       </fieldset>
 
       <label className="block md:col-span-2">
-        <span className="mb-1.5 block text-[15px] font-bold">문의 내용 (선택)</span>
-        <textarea value={memo} onChange={(e) => setMemo(e.target.value)} rows={3} placeholder="예산, 원하는 입주 시기, 가족 구성" className={`w-full rounded-[4px] border-2 bg-white px-3 py-2 text-[16px] ${focusRing}`} style={{ borderColor: C.line, outlineColor: C.accent }} />
+        <span className="mb-1.5 block text-[15px] font-semibold">문의 내용 (선택)</span>
+        <textarea value={memo} onChange={(e) => setMemo(e.target.value)} rows={3} placeholder="예산, 원하는 입주 시기, 가족 구성" className={`w-full rounded-[4px] border bg-white px-3 py-2 text-[16px] ${focusRing}`} style={{ borderColor: C.field, outlineColor: C.accent }} />
       </label>
 
       <label className="flex items-start gap-3 md:col-span-2">
@@ -1055,7 +864,7 @@ function Contact({ today, result, reduce }: { today: Date; result: CalcResult; r
         <button
           type="submit"
           data-gtm-cta="architect-office_contact_submit"
-          className={`inline-flex h-14 w-full items-center justify-center gap-2 rounded-[4px] text-[17px] font-bold text-white md:w-auto md:px-10 ${focusRing}`}
+          className={`inline-flex h-14 w-full items-center justify-center gap-2 rounded-[4px] text-[17px] font-semibold text-white md:w-auto md:px-10 ${focusRing}`}
           style={{ background: C.accent, outlineColor: C.ink }}
         >
           <MessageCircle size={19} aria-hidden /> 상담신청
@@ -1082,7 +891,7 @@ function Choice<T extends string>({ options, value, onChange, name }: { options:
           <label key={o} className="relative cursor-pointer">
             <input type="radio" name={name} value={o} checked={on} onChange={() => onChange(o)} className="peer sr-only" />
             <span
-              className="inline-flex h-11 items-center gap-1.5 rounded-[4px] border-2 px-4 text-[15px] font-bold peer-focus-visible:outline peer-focus-visible:outline-[3px] peer-focus-visible:outline-offset-2"
+              className="inline-flex h-11 items-center gap-1.5 rounded-[4px] border px-4 text-[15px] font-semibold peer-focus-visible:outline peer-focus-visible:outline-[3px] peer-focus-visible:outline-offset-2"
               style={{ borderColor: on ? C.accent : C.line, background: on ? "#fff" : "transparent", color: C.ink, outlineColor: C.accent }}
             >
               {on && <Check size={15} aria-hidden style={{ color: C.accent }} />}
@@ -1131,15 +940,14 @@ export function ArchitectDemo() {
     <div className="min-h-screen overflow-x-clip" style={{ background: C.paper, color: C.ink }}>
       <Poster reduce={reduce} onCta={() => go("ar-calc")} />
 
-      <header className="border-b-2" style={{ borderColor: C.ink }}>
+      <header className="border-b" style={{ borderColor: C.line }}>
         <div className="mx-auto flex max-w-[1200px] items-center justify-between gap-4 px-4 py-4 md:px-6">
-          <p className="inline-flex items-center gap-2 text-[17px] font-bold" style={plexF}>
-            <CubeMark size={22} />
-            {BRAND}
+          <p className="inline-flex items-center gap-2 text-[17px] font-bold">
+            <SampleLogo />
           </p>
           <nav aria-label="주요 메뉴" className="hidden items-center gap-6 md:flex">
             {NAV.map(([id, label]) => (
-              <button key={id} type="button" onClick={() => go(id)} className={`text-[15px] font-bold underline-offset-[6px] hover:underline ${focusRing}`} style={{ outlineColor: C.accent }}>
+              <button key={id} type="button" onClick={() => go(id)} className={`text-[15px] font-semibold underline-offset-[6px] hover:underline ${focusRing}`} style={{ outlineColor: C.accent }}>
                 {label}
               </button>
             ))}
@@ -1148,7 +956,7 @@ export function ArchitectDemo() {
             type="button"
             onClick={() => go("ar-contact")}
             data-gtm-cta="architect-office_header_contact"
-            className={`inline-flex h-11 flex-none items-center rounded-[4px] px-4 text-[15px] font-bold text-white ${focusRing}`}
+            className={`inline-flex h-11 flex-none items-center rounded-[4px] px-4 text-[15px] font-semibold text-white ${focusRing}`}
             style={{ background: C.accent, outlineColor: C.ink }}
           >
             상담신청
@@ -1158,7 +966,7 @@ export function ArchitectDemo() {
 
       <div className="mx-auto max-w-[1200px] px-4 md:px-6">
         <div className="flex flex-col gap-3 border-b py-8 md:flex-row md:items-end md:justify-between md:py-12" style={{ borderColor: C.line }}>
-          <h2 className="text-[30px] font-bold leading-[1.2] md:text-[44px]" style={plexF}>
+          <h2 className="text-[30px] font-bold leading-[1.2] md:text-[44px]">
             단독주택과 근린생활시설을
             <br /> 설계해요
           </h2>
@@ -1170,35 +978,35 @@ export function ArchitectDemo() {
         </div>
 
         <section id="ar-calc" aria-labelledby="ar-calc-title" className="scroll-mt-4 py-12 md:py-16">
-          <h2 id="ar-calc-title" className="mb-8 text-[28px] font-bold md:text-[36px]" style={plexF}>
+          <h2 id="ar-calc-title" className="mb-8 text-[28px] font-bold md:text-[36px]">
             규모 검토
           </h2>
           <ScaleCheck reduce={reduce} result={result} setResult={setResult} />
         </section>
 
-        <section id="ar-works" aria-labelledby="ar-works-title" className="scroll-mt-4 border-t-2 py-12 md:py-16" style={{ borderColor: C.ink }}>
-          <h2 id="ar-works-title" className="mb-6 text-[28px] font-bold md:text-[36px]" style={plexF}>
+        <section id="ar-works" aria-labelledby="ar-works-title" className="scroll-mt-4 border-t py-12 md:py-16" style={{ borderColor: C.line }}>
+          <h2 id="ar-works-title" className="mb-6 text-[28px] font-bold md:text-[36px]">
             작업
           </h2>
           <Works reduce={reduce} />
         </section>
 
-        <section id="ar-process" aria-labelledby="ar-process-title" className="scroll-mt-4 border-t-2 py-12 md:py-16" style={{ borderColor: C.ink }}>
-          <h2 id="ar-process-title" className="mb-8 text-[28px] font-bold md:text-[36px]" style={plexF}>
+        <section id="ar-process" aria-labelledby="ar-process-title" className="scroll-mt-4 border-t py-12 md:py-16" style={{ borderColor: C.line }}>
+          <h2 id="ar-process-title" className="mb-8 text-[28px] font-bold md:text-[36px]">
             설계 과정과 기간
           </h2>
           <Process reduce={reduce} />
         </section>
 
-        <section id="ar-contact" aria-labelledby="ar-contact-title" className="scroll-mt-4 border-t-2 py-12 md:py-16" style={{ borderColor: C.ink }}>
-          <h2 id="ar-contact-title" className="mb-8 text-[28px] font-bold md:text-[36px]" style={plexF}>
+        <section id="ar-contact" aria-labelledby="ar-contact-title" className="scroll-mt-4 border-t py-12 md:py-16" style={{ borderColor: C.line }}>
+          <h2 id="ar-contact-title" className="mb-8 text-[28px] font-bold md:text-[36px]">
             상담신청
           </h2>
           <Contact today={today} result={result} reduce={reduce} />
         </section>
 
-        <section id="ar-visit" aria-labelledby="ar-visit-title" className="scroll-mt-4 border-t-2 py-12 md:py-16" style={{ borderColor: C.ink }}>
-          <h2 id="ar-visit-title" className="mb-8 text-[28px] font-bold md:text-[36px]" style={plexF}>
+        <section id="ar-visit" aria-labelledby="ar-visit-title" className="scroll-mt-4 border-t py-12 md:py-16" style={{ borderColor: C.line }}>
+          <h2 id="ar-visit-title" className="mb-8 text-[28px] font-bold md:text-[36px]">
             오시는 길
           </h2>
           <div className="grid gap-8 md:grid-cols-[minmax(0,1.2fr)_minmax(0,1fr)]">
@@ -1233,7 +1041,7 @@ export function ArchitectDemo() {
                           {d}
                           {i === todayRow && <span className="ml-1.5 text-[13px]" style={{ color: C.accent }}>오늘</span>}
                         </th>
-                        <td className="tabular-nums" style={monoF}>
+                        <td className="tabular-nums">
                           {h}
                         </td>
                       </tr>
@@ -1246,11 +1054,10 @@ export function ArchitectDemo() {
         </section>
       </div>
 
-      <footer className="mt-4" style={{ background: C.concrete, color: C.sub }}>
+      <footer className="mt-4" style={{ background: C.soft, color: C.muted }}>
         <div className="mx-auto max-w-[1200px] px-4 py-10 md:px-6">
-          <p className="inline-flex items-center gap-2 text-[16px] font-bold" style={{ ...plexF, color: C.cream }}>
-            <CubeMark size={18} />
-            {BRAND}
+          <p className="inline-flex items-center gap-2 text-[16px] font-bold" style={{ color: C.ink }}>
+            <SampleLogo size={18} />
           </p>
           <p className="mt-2 text-[14px]">{ADDRESS}</p>
           <DemoMakerInfo className="mt-6" />
@@ -1266,15 +1073,15 @@ function SiteMap() {
     <svg viewBox="0 0 520 300" className="block h-auto w-full rounded-[4px] border" style={{ borderColor: C.line, background: C.card }} role="img" aria-label="ㅇㅇ역 2번 출구에서 사무소까지 가는 약도">
       <defs>
         <pattern id="ar-m-grid" width="20" height="20" patternUnits="userSpaceOnUse">
-          <path d="M20 0H0V20" fill="none" stroke="rgba(54,53,50,0.07)" strokeWidth="1" />
+          <path d="M20 0H0V20" fill="none" stroke="rgba(17,17,17,0.07)" strokeWidth="1" />
         </pattern>
       </defs>
       <rect width="520" height="300" fill="url(#ar-m-grid)" />
       {/* 큰길과 골목 */}
-      <path d="M0 196H520" stroke="#cfcbc3" strokeWidth="26" />
+      <path d="M0 196H520" stroke="#dedede" strokeWidth="26" />
       <path d="M0 196H520" stroke="#fff" strokeWidth="1.5" strokeDasharray="10 10" />
-      <path d="M318 0V300" stroke="#dcd8d0" strokeWidth="14" />
-      <path d="M318 196 V60 H470" fill="none" stroke="#dcd8d0" strokeWidth="10" />
+      <path d="M318 0V300" stroke="#e8e8e8" strokeWidth="14" />
+      <path d="M318 196 V60 H470" fill="none" stroke="#e8e8e8" strokeWidth="10" />
       {/* 블록 */}
       {[
         [30, 40, 120, 120],
@@ -1283,14 +1090,14 @@ function SiteMap() {
         [340, 220, 150, 60],
         [340, 80, 60, 90],
       ].map(([x, y, w, h], i) => (
-        <rect key={i} x={x} y={y} width={w} height={h} fill="none" stroke="rgba(54,53,50,0.28)" strokeWidth="1.2" />
+        <rect key={i} x={x} y={y} width={w} height={h} fill="none" stroke="rgba(17,17,17,0.28)" strokeWidth="1.2" />
       ))}
       {/* 역 출구 */}
       <rect x="120" y="178" width="34" height="18" fill={C.ink} />
-      <text x="137" y="191" textAnchor="middle" fontSize="11" fontWeight="700" fill="#fff" style={monoF}>
+      <text x="137" y="191" textAnchor="middle" fontSize="11" fontWeight="700" fill="#fff">
         2
       </text>
-      <text x="137" y="170" textAnchor="middle" fontSize="13" fontWeight="700" fill={C.ink} style={plexF}>
+      <text x="137" y="170" textAnchor="middle" fontSize="13" fontWeight="700" fill={C.ink}>
         ㅇㅇ역
       </text>
       {/* 걷는 길 */}
@@ -1298,13 +1105,28 @@ function SiteMap() {
       {/* 사무소 */}
       <g transform="translate(420 30)">
         <rect x="0" y="0" width="70" height="44" fill={C.accent} />
-        <text x="35" y="27" textAnchor="middle" fontSize="13" fontWeight="700" fill="#fff" style={plexF}>
+        <text x="35" y="27" textAnchor="middle" fontSize="13" fontWeight="700" fill="#fff">
           사무소
         </text>
       </g>
-      <text x="324" y="290" fontSize="12" fill={C.muted} style={plexF}>
+      <text x="324" y="290" fontSize="12" fill={C.muted}>
         ㅇㅇ로
       </text>
     </svg>
+  );
+}
+
+function SampleLogo({ light, size = 20 }: { light?: boolean; size?: number }) {
+  return (
+    <span className="inline-flex items-center gap-2" style={{ color: light ? "#fff" : "#111" }}>
+      {/* eslint-disable-next-line @next/next/no-img-element -- 메인 사이트와 같은 곰 로고 */}
+      <img src="/images/logo-bear.png" alt="" aria-hidden width={28} height={28} className="h-7 w-7 shrink-0" />
+      <span className="flex items-baseline gap-1 whitespace-nowrap">
+        <span className="font-bold tracking-[-0.03em]" style={{ fontSize: size }}>
+          곰파트너
+        </span>
+        <span className="text-[12px] font-semibold opacity-75">건축사사무소 샘플</span>
+      </span>
+    </span>
   );
 }

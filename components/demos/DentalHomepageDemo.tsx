@@ -15,7 +15,7 @@ import { DemoMakerInfo } from "@/components/demos/DemoMakerInfo";
    대메뉴 6개에 마우스를 올리거나 초점을 주면 하위 메뉴 전체가 한 번에 펼쳐지는 펼침 메뉴,
    넓은 화면 오른쪽에 고정 퀵메뉴(네이버 예약, 카카오톡 상담, 전화 상담, 비급여 안내, 오시는 길, TOP),
    좁은 화면에는 아래쪽 빠른 메뉴 막대(예약, 카카오톡, 길찾기, 전화)를 둔다.
-   메인은 배너, 진료과목 이름 띠, 공지사항과 진료시간, 상담 전화 줄, 증상 자가체크(치아 지도), 의료진 순서.
+   메인은 배너, 진료과목 이름 띠, 공지사항과 진료시간, 상담 전화 줄, 증상 자가체크(치아 차트), 의료진 순서.
    하위 페이지는 라우트를 늘리지 않고 상태로 화면을 바꾼다.
 
    디자인: 흰 바탕에 짙은 청록 잉크(#10302f)와 청록 강조색(#0b6664), 옅은 민트(#e3f1ef).
@@ -38,9 +38,7 @@ const C = {
   muted: "#4f6261",
   accent: "#0b6664",
   line: "#d9e5e3",
-  tooth: "#ffffff",
   toothLine: "#b9cfcc",
-  gum: "#f2d9d6",
   onInk: "#eef6f5",
   onInkMuted: "#a9c3c0",
   error: "#b3261e",
@@ -59,9 +57,9 @@ const TREATMENT_NAME: Record<TreatmentId, string> = {
   endo: "신경치료",
   gum: "잇몸치료",
   wisdom: "사랑니 발치",
-  scaling: "스케일링 · 예방",
+  scaling: "스케일링, 예방",
   whitening: "치아미백",
-  check: "검진 · 상담",
+  check: "검진, 상담",
 };
 
 const TREATMENT_ORDER: TreatmentId[] = ["implant", "ortho", "caries", "endo", "gum", "wisdom", "scaling", "whitening"];
@@ -160,7 +158,7 @@ const MENUS: { id: MenuId; label: string; subs: SubMenu[] }[] = [
       { id: "greeting", label: "인사말" },
       { id: "doctors", label: "의료진 소개" },
       { id: "tour", label: "병원 둘러보기" },
-      { id: "location", label: "진료시간·오시는 길" },
+      { id: "location", label: "진료시간, 오시는 길" },
     ],
   },
   { id: "treat", label: "진료과목", subs: TREATMENT_ORDER.map((id) => ({ id, label: TREATMENT_NAME[id] })) },
@@ -349,53 +347,42 @@ interface Preset {
   index: number;
 }
 
-/* ---------- 치아 배열 ---------- */
+/* ---------- 치아 차트(FDI) ---------- */
 
-interface Tooth {
-  fdi: number;
-  upper: boolean;
-  /** 배열 안 왼쪽부터의 순서(0~15), 퍼져 나가는 순서를 계산할 때 쓴다 */
-  col: number;
-  x: number;
-  y: number;
-  angle: number;
-  w: number;
-  h: number;
-}
+type ToothShape = "incisor" | "canine" | "premolar" | "molar";
 
-const TOOTH_SIZE: Record<number, [number, number]> = {
-  1: [17, 22],
-  2: [15, 20],
-  3: [16, 22],
-  4: [18, 19],
-  5: [18, 19],
-  6: [24, 22],
-  7: [23, 21],
-  8: [21, 19],
+/** 정면에서 본 치아 선화. 위턱 기준(뿌리가 위, 머리가 아래), 세로 64. 아래턱은 뒤집어 그린다 */
+const TOOTH_SHAPE: Record<ToothShape, { w: number; crown: string; roots: string[] }> = {
+  incisor: {
+    w: 18,
+    crown: "M4.5 30 L3 54 Q3 59 9 59 Q15 59 15 54 L13.5 30 Z",
+    roots: ["M5 31 L7.6 5 Q9 2.5 10.4 5 L13 31"],
+  },
+  canine: {
+    w: 19,
+    crown: "M4.5 30 L3 48 Q5 54 9.5 60 Q14 54 16 48 L14.5 30 Z",
+    roots: ["M5 31 L8 2.5 Q9.5 0.5 11 2.5 L14 31"],
+  },
+  premolar: {
+    w: 20,
+    crown: "M4.5 30 L3 51 Q3 58 10 58 Q17 58 17 51 L15.5 30 Z",
+    roots: ["M5.5 31 L8.6 7 Q10 5 11.4 7 L14.5 31"],
+  },
+  molar: {
+    w: 28,
+    crown: "M4 30 L2.5 52 Q2.5 58 7.5 58 Q11 58 14 55.5 Q17 58 20.5 58 Q25.5 58 25.5 52 L24 30 Z",
+    roots: ["M4.5 31 L6.5 9 Q8 6.5 9.5 9 L12.5 31", "M15.5 31 L18.5 9 Q20 6.5 21.5 9 L23.5 31"],
+  },
 };
 
-function buildArch(): Tooth[] {
-  const teeth: Tooth[] = [];
-  const cx = 180;
-  // 서버와 브라우저의 소수점 차이로 하이드레이션이 어긋나지 않게 반올림한다
-  const r = (n: number) => Math.round(n * 100) / 100;
-  for (const upper of [true, false]) {
-    const cy = upper ? 168 : 206;
-    for (let i = 0; i < 16; i++) {
-      const theta = (Math.PI * (i + 0.5)) / 16;
-      const x = cx - Math.cos(theta) * 116;
-      const y = upper ? cy - Math.sin(theta) * 140 : cy + Math.sin(theta) * 132;
-      const digit = i < 8 ? 8 - i : i - 7;
-      const quadrant = upper ? (i < 8 ? 1 : 2) : i < 8 ? 4 : 3;
-      const [w, h] = TOOTH_SIZE[digit];
-      const angle = ((theta * 180) / Math.PI - 90) * (upper ? 1 : -1);
-      teeth.push({ fdi: quadrant * 10 + digit, upper, col: i, x: r(x), y: r(y), angle: r(angle), w, h });
-    }
-  }
-  return teeth;
-}
+const shapeOf = (fdi: number): ToothShape => {
+  const d = fdi % 10;
+  return d <= 2 ? "incisor" : d === 3 ? "canine" : d <= 5 ? "premolar" : "molar";
+};
 
-const ARCH = buildArch();
+/** 환자를 마주 본 차트: 그림의 왼쪽이 환자의 오른쪽 */
+const CHART_UPPER = [18, 17, 16, 15, 14, 13, 12, 11, 21, 22, 23, 24, 25, 26, 27, 28];
+const CHART_LOWER = [48, 47, 46, 45, 44, 43, 42, 41, 31, 32, 33, 34, 35, 36, 37, 38];
 
 /* ---------- 의료진 ---------- */
 
@@ -428,16 +415,16 @@ const HOURS = [
   { label: "목요일", day: 4, time: "09:30 ~ 21:00", open: [570, 1260], night: true },
   { label: "금요일", day: 5, time: "09:30 ~ 18:30", open: [570, 1110] },
   { label: "토요일", day: 6, time: "09:30 ~ 14:00", open: [570, 840] },
-  { label: "일요일·공휴일", day: 0, time: "휴진", open: null },
+  { label: "일요일, 공휴일", day: 0, time: "휴진", open: null },
 ] as const;
 const LUNCH = [780, 840]; // 평일 13:00 ~ 14:00
 
 /** 메인 진료시간 상자: 실제 의원처럼 요일을 묶어 적는다 */
 const HOURS_GROUPED = [
-  { label: "월 · 수 · 금", days: [1, 3, 5], time: "09:30 ~ 18:30" },
-  { label: "화 · 목", days: [2, 4], time: "09:30 ~ 21:00", night: true },
+  { label: "월, 수, 금", days: [1, 3, 5], time: "09:30 ~ 18:30" },
+  { label: "화, 목", days: [2, 4], time: "09:30 ~ 21:00", night: true },
   { label: "토요일", days: [6], time: "09:30 ~ 14:00" },
-  { label: "일요일 · 공휴일", days: [0], time: "휴진" },
+  { label: "일요일, 공휴일", days: [0], time: "휴진" },
 ];
 
 function useNow() {
@@ -516,7 +503,7 @@ const FEE_FAQ = [
 ];
 
 const FAQ = [
-  { q: "야간진료 시간에도 모든 진료가 가능한가요?", a: "화·목 야간진료 시간에도 모든 진료가 가능합니다. 단, 임플란트 수술은 19:00 이전 예약을 권해 드립니다." },
+  { q: "야간진료 시간에도 모든 진료가 가능한가요?", a: "화, 목 야간진료 시간에도 모든 진료가 가능합니다. 단, 임플란트 수술은 19:00 이전 예약을 권해 드립니다." },
   { q: "주차가 가능한가요?", a: "건물 지하 2~4층 주차장을 이용하실 수 있으며, 진료 시 2시간 무료입니다. 접수 시 차량 번호를 말씀해 주세요." },
   { q: "첫 방문 시 준비물이 있나요?", a: "신분증을 지참해 주세요. 다른 치과에서 촬영한 사진이나 복용 중인 약이 있으면 함께 알려 주세요." },
   { q: "어린이 진료도 하나요?", a: "충치 치료, 불소 도포, 실란트(홈메우기)를 진료합니다. 만 12세 이하 영구치 레진 치료는 건강보험이 적용됩니다." },
@@ -545,7 +532,7 @@ const makeNotices = (today: Date) => {
     { no: 133, ago: 39, title: "금 인레이 비용 변경 안내", body: `금 시세 상승으로 ${mdKo(goldFrom)}부터 금 인레이 비용이 40만 원에서 45만 원으로 변경됩니다. ${mdKo(after(goldFrom, -1))}까지 치료를 시작하신 분은 기존 금액으로 진행합니다.` },
     { no: 132, ago: 56, title: "지하 주차장 도색 공사 기간 주차 안내", body: `지하 주차장 도색 공사로 ${mdKo(paintFrom)}~${mdKo(after(paintFrom, 2))}에는 지하 3층만 이용 가능합니다. 공영주차장 이용 시 영수증을 가져오시면 1시간 주차비를 지원해 드립니다.` },
     { no: 131, ago: 71, title: "휴가 기간 없이 정상 진료", body: "올해는 별도 휴가 기간 없이 정상 진료합니다. 방학 기간 학생 교정 상담은 오전 예약을 권해 드립니다." },
-    { no: 130, ago: 96, title: "만 65세 이상 보험임플란트 상담 일정 안내", body: "만 65세 이상은 평생 2개까지 건강보험 임플란트를 받으실 수 있습니다. 화·목 오전에 별도 상담 시간을 운영합니다." },
+    { no: 130, ago: 96, title: "만 65세 이상 보험임플란트 상담 일정 안내", body: "만 65세 이상은 평생 2개까지 건강보험 임플란트를 받으실 수 있습니다. 화, 목 오전에 별도 상담 시간을 운영합니다." },
   ].map((n) => ({ ...n, date: fmtDot(at(n.ago)) }));
 };
 
@@ -742,7 +729,7 @@ function SiteHeader({ view, go }: { view: View; go: Go }) {
         <div className={`${container} flex h-9 items-center justify-between text-[14px]`} style={{ color: C.muted }}>
           <p className="flex items-center gap-1.5">
             <Moon size={14} aria-hidden style={{ color: C.accent }} />
-            화 · 목 야간진료 21:00까지, 토요일 14:00까지 진료
+            화, 목 야간진료 21:00까지, 토요일 14:00까지 진료
           </p>
           <a href={`tel:${TEL}`} className="font-bold tabular-nums hover:underline">
             대표전화 {TEL}
@@ -821,7 +808,7 @@ function SiteHeader({ view, go }: { view: View; go: Go }) {
             <p className="mt-2 text-[14px]" style={{ color: C.muted }}>
               평일 09:30 ~ 18:30
               <br />
-              화 · 목 09:30 ~ 21:00
+              화, 목 09:30 ~ 21:00
             </p>
           </div>
           <div className="grid flex-1 grid-cols-6">
@@ -1027,13 +1014,13 @@ function HomePage({ go, reserve, linkOut }: { go: Go; reserve: (id: TreatmentId)
         <div className="absolute inset-0 -z-10" style={{ background: "linear-gradient(90deg, rgba(16,48,47,0.86) 0%, rgba(16,48,47,0.6) 50%, rgba(16,48,47,0.15) 100%)" }} aria-hidden />
         <div className={`${container} pb-14 pt-14 text-white md:pb-20 md:pt-20`}>
           <p className="text-[17px] font-bold" style={{ color: C.onInkMuted }}>
-            통합치의학과 · 치과교정과 전문의 진료
+            통합치의학과, 치과교정과 전문의 진료
           </p>
           <h1 id="main-title" className="mt-2 text-[40px] font-bold leading-[1.15] tracking-[-0.045em] md:text-[56px]">
             {CLINIC}
           </h1>
           <p className="mt-4 text-[18px] md:text-[20px]" style={{ color: C.onInk }}>
-            화 · 목 야간진료 21:00까지
+            화, 목 야간진료 21:00까지
             <br className="sm:hidden" />
             <span className="hidden sm:inline">, </span>
             토요일 14:00까지 진료합니다.
@@ -1063,7 +1050,7 @@ function HomePage({ go, reserve, linkOut }: { go: Go; reserve: (id: TreatmentId)
         </div>
       </section>
 
-      {/* 공지사항 · 진료시간 */}
+      {/* 공지사항, 진료시간 */}
       <section className={`${container} grid gap-x-10 gap-y-8 pb-4 pt-10 md:pt-14 lg:grid-cols-12`} aria-label="병원 소식과 진료시간">
         <div className="min-w-0 lg:col-span-7">
           <div className="flex items-center justify-between border-b-2 pb-3" style={{ borderColor: C.ink }}>
@@ -1344,9 +1331,9 @@ function Greeting() {
 
 function Tour() {
   const photos = [
-    { img: "lobby", label: "접수 · 대기 공간" },
+    { img: "lobby", label: "접수, 대기 공간" },
     { img: "hero", label: "진료실" },
-    { img: "ct", label: "파노라마 · CT 촬영실" },
+    { img: "ct", label: "파노라마, CT 촬영실" },
   ];
   return (
     <ul className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
@@ -1720,7 +1707,7 @@ function ToothMap({ preset, onReserve }: { preset: Preset; onReserve: (id: Treat
         <p className="text-center text-[15px] font-bold" style={{ color: C.muted }}>
           부위 선택
         </p>
-        <ArchMap selected={selected} missing={!!symptom.missing} onSelect={select} reduce={reduce} />
+        <ToothChart selected={selected} missing={!!symptom.missing} onSelect={select} reduce={reduce} />
 
         <div className="mt-2 flex flex-wrap items-center justify-center gap-2" role="group" aria-label="부위 바로 선택">
           {QUICK.map((q) => {
@@ -1819,88 +1806,94 @@ function ToothMap({ preset, onReserve }: { preset: Preset; onReserve: (id: Treat
   );
 }
 
-/** 위아래 치아 32개. 고른 치아는 진하게, 같은 종류 치아는 고른 자리에서 퍼져 나가듯 옅게 칠한다 */
-function ArchMap({ selected, missing, onSelect, reduce }: { selected: Selection; missing: boolean; onSelect: (s: Selection) => void; reduce: boolean }) {
+/** 위턱 한 줄, 아래턱 한 줄의 치과 차트. 고른 치아만 주색으로 채운다 */
+function ToothChart({ selected, missing, onSelect, reduce }: { selected: Selection; missing: boolean; onSelect: (s: Selection) => void; reduce: boolean }) {
   const gum = selected === "gum";
-  const sel = gum ? null : ARCH.find((t) => t.fdi === selected)!;
-  const ease = "cubic-bezier(0.22,1,0.36,1)";
+  const label = "#767676";
+
+  const row = (teeth: number[], upper: boolean) => (
+    <div className="flex">
+      {[teeth.slice(0, 8), teeth.slice(8)].map((half, h) => (
+        <div key={h} className={`flex min-w-0 flex-1 ${h === 0 ? "border-r" : ""}`} style={{ borderColor: "#c9c9c9" }}>
+          {half.map((fdi) => {
+            const shape = TOOTH_SHAPE[shapeOf(fdi)];
+            const isSel = selected === fdi;
+            const empty = isSel && missing;
+            const stroke = isSel ? C.accent : "#c9c9c9";
+            const hover = isSel ? "" : "group-hover:fill-[#ececec]";
+            const tr = reduce ? "none" : "fill 150ms ease-out, stroke 150ms ease-out";
+            const num = (
+              <span
+                className={`block text-[11px] leading-none tabular-nums ${upper ? "mt-1" : "mb-1"}`}
+                style={{ color: isSel ? C.ink : label, fontWeight: isSel ? 700 : 400 }}
+              >
+                {fdi}
+              </span>
+            );
+            return (
+              <button
+                key={fdi}
+                type="button"
+                onClick={() => onSelect(fdi)}
+                aria-pressed={isSel}
+                aria-label={`${toothLabel(fdi)}, ${fdi}번`}
+                className="group flex min-w-0 cursor-pointer flex-col items-center rounded-[2px] py-1 focus-visible:outline-2 focus-visible:outline-offset-0 focus-visible:outline-[#10302f]"
+                style={{ flex: `${shape.w} 1 0` }}
+              >
+                {!upper && num}
+                <svg viewBox={`0 0 ${shape.w} 64`} className="block h-auto w-full" aria-hidden>
+                  <g transform={upper ? undefined : "matrix(1 0 0 -1 0 64)"}>
+                    {shape.roots.map((d) => (
+                      <path
+                        key={d}
+                        d={d}
+                        fill={empty ? "none" : isSel ? C.accent : "#fff"}
+                        fillOpacity={isSel ? 0.35 : 1}
+                        stroke={isSel ? C.accent : "#dedede"}
+                        strokeWidth={1}
+                        strokeDasharray={empty ? "3 2" : undefined}
+                        vectorEffect="non-scaling-stroke"
+                        className={hover}
+                        style={{ transition: tr }}
+                      />
+                    ))}
+                    <path
+                      d={shape.crown}
+                      fill={empty ? "none" : isSel ? C.accent : "#fff"}
+                      stroke={stroke}
+                      strokeWidth={1}
+                      strokeDasharray={empty ? "3 2" : undefined}
+                      vectorEffect="non-scaling-stroke"
+                      className={hover}
+                      style={{ transition: tr }}
+                    />
+                    {gum && <line x1="0" x2={shape.w} y1="30" y2="30" stroke={C.accent} strokeWidth={2} vectorEffect="non-scaling-stroke" />}
+                  </g>
+                </svg>
+                {upper && num}
+              </button>
+            );
+          })}
+        </div>
+      ))}
+    </div>
+  );
 
   return (
-    <figure id="tooth-map" className="mx-auto mt-2 max-w-[280px] sm:max-w-[360px] lg:max-w-[380px]">
-      <svg viewBox="0 0 360 370" className="h-auto w-full touch-manipulation" role="group" aria-label="치아 배열 그림">
-        {[true, false].map((upper) => (
-          <path
-            key={String(upper)}
-            d={upper ? "M64 168 A116 140 0 0 1 296 168" : "M64 206 A116 132 0 0 0 296 206"}
-            fill="none"
-            stroke={gum ? "#e39a92" : C.gum}
-            strokeWidth="36"
-            strokeLinecap="round"
-            className="cursor-pointer"
-            onClick={() => onSelect("gum")}
-            style={{ transition: reduce ? "none" : `stroke 320ms ${ease}` }}
-          />
-        ))}
-        {ARCH.map((t) => {
-          const isSel = sel?.fdi === t.fdi;
-          const sameKind = !!sel && !isSel && kindOf(t.fdi) === kindOf(sel.fdi);
-          // 고른 치아에서 배열을 따라 멀어질수록 늦게 칠한다
-          const distance = sel ? Math.abs(t.col - sel.col) + (t.upper === sel.upper ? 0 : 2) : 0;
-          const empty = isSel && missing;
-          const fill = empty ? "transparent" : isSel ? C.accent : sameKind ? "#bfe0db" : C.tooth;
-          return (
-            <g
-              key={t.fdi}
-              transform={`translate(${t.x} ${t.y}) rotate(${t.angle})`}
-              role="button"
-              tabIndex={0}
-              aria-label={`${toothLabel(t.fdi)}, ${t.fdi}번`}
-              aria-pressed={isSel}
-              onClick={() => onSelect(t.fdi)}
-              onKeyDown={(e) => {
-                if (e.key === "Enter" || e.key === " ") {
-                  e.preventDefault();
-                  onSelect(t.fdi);
-                }
-              }}
-              className="group cursor-pointer outline-none"
-            >
-              {/* 손가락으로 누르기 쉽게 넓힌 영역 */}
-              <circle r="16" fill="transparent" />
-              <rect
-                x={-t.w / 2}
-                y={-t.h / 2}
-                width={t.w}
-                height={t.h}
-                rx={Math.round((t.w / 2.6) * 100) / 100}
-                fill={fill}
-                stroke={isSel || empty ? C.accent : C.toothLine}
-                strokeWidth={empty ? 2 : isSel ? 2 : 1.2}
-                strokeDasharray={empty ? "4 3" : undefined}
-                className="group-hover:stroke-[#0b6664] group-focus-visible:stroke-[#10302f] group-focus-visible:[stroke-width:3]"
-                style={{
-                  transformBox: "fill-box",
-                  transformOrigin: "center",
-                  transform: isSel && !empty ? "scale(1.18)" : "scale(1)",
-                  transition: reduce ? "none" : `fill 240ms ${ease} ${sameKind ? 60 + distance * 28 : 0}ms, transform 220ms ${ease}, stroke 160ms`,
-                }}
-              />
-            </g>
-          );
-        })}
-        <text x="180" y="150" textAnchor="middle" fontSize="13" fill={C.muted}>
-          위턱
-        </text>
-        <text x="180" y="236" textAnchor="middle" fontSize="13" fill={C.muted}>
-          아래턱
-        </text>
-        <text x="10" y="192" fontSize="12" fill={C.muted}>
-          오른쪽
-        </text>
-        <text x="350" y="192" fontSize="12" fill={C.muted} textAnchor="end">
-          왼쪽
-        </text>
-      </svg>
+    <figure id="tooth-map" className="mx-auto mt-3 w-full max-w-[540px]">
+      <div className="flex items-end justify-between text-[12px]" style={{ color: label }} aria-hidden>
+        <span>오른쪽</span>
+        <span>위턱</span>
+        <span>왼쪽</span>
+      </div>
+      <div className="mt-1 touch-manipulation" role="group" aria-label="치아 차트">
+        {row(CHART_UPPER, true)}
+        <div className="border-t" style={{ borderColor: "#c9c9c9" }} />
+        {row(CHART_LOWER, false)}
+      </div>
+      <p className="mt-1 text-center text-[12px]" style={{ color: label }} aria-hidden>
+        아래턱
+      </p>
       <figcaption className="sr-only">환자 기준 좌우입니다. 그림의 왼쪽이 환자의 오른쪽입니다.</figcaption>
     </figure>
   );

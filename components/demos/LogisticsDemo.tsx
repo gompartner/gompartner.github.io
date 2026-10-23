@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useRef, useState, type FormEvent } from "react";
-import { AnimatePresence, motion, useMotionValue, useMotionValueEvent, useScroll, useTime, useTransform, type MotionValue } from "framer-motion";
+import { AnimatePresence, motion, useScroll, useTransform } from "framer-motion";
 import {
   Calculator,
   Check,
@@ -20,13 +20,12 @@ import {
   Undo2,
   Warehouse,
 } from "lucide-react";
-import { Black_Han_Sans, JetBrains_Mono } from "@/lib/local-fonts";
 import { useReducedMotionSafe } from "@/hooks/useReducedMotionSafe";
 import { daysAgo, fmtDash, fmtKo, useDemoToday } from "@/hooks/useDemoToday";
 import { maskName, maskPhone } from "@/components/demos/LeadReceivedPanel";
 import { DemoMakerInfo } from "@/components/demos/DemoMakerInfo";
 
-/* 물류 대행(3PL) 회사 홈페이지 샘플: 가상의 곰파트너물류. 온라인 쇼핑몰 상품을 맡아 보관하고, 주문이 들어오면 포장해 택배로 보낸다.
+/* 물류 대행(3PL) 회사 홈페이지 샘플: 가상의 물류 회사 곰파트너. 온라인 쇼핑몰 상품을 맡아 보관하고, 주문이 들어오면 포장해 택배로 보낸다.
    상호, 주소, 전화번호, 손님 이름은 모두 가상이다.
 
    국내 풀필먼트, 3PL 사이트 공통 구성(참고): 메뉴는 서비스 소개, 이용 요금, 물류센터, 입점 절차, 견적 문의.
@@ -34,13 +33,12 @@ import { DemoMakerInfo } from "@/components/demos/DemoMakerInfo";
    요금은 보관비(팔레트당 월), 입고비, 출고 작업비(건당, 물량 구간별), 택배비(크기별), 합포장 추가 요금으로 나눠 표로 공개하고,
    "부가세 별도", "포장재 실비"를 적는다. 상온 팔레트 월 25,000~40,000원, 출고 작업비 건당 800~1,200원, 극소형 택배 2,000원대가 흔하다.
    고객사 로고, 출고량 같은 실적 숫자는 넣지 않는다.
+   첫 화면 사진 출처: AI 생성(Z-Image-Turbo, Apache 2.0)
 
-   포스터 첫 화면(lg-poster): 노란 바탕에 큰 문장 "오후 2시 전 주문은 오늘 나가요" 하나만 둔다. 메뉴, 카드, 표는 없다.
-   아래쪽에 컨베이어 벨트가 화면을 가로지르고, 골판지 상자(앞, 윗면, 옆면 세 면과 테이프)가 벨트 위로 지나간다.
-   오른쪽의 송장 부착기 머리가 내려올 때마다 지나가는 상자 앞면에 송장이 착 붙는다. 들어올 때 상자들이 벨트 위로 툭 떨어지고(등장),
-   그 뒤에는 벨트가 계속 돈다(반복 움직임은 이것 하나, 상자 하나가 6초마다 부착기 아래를 지난다).
-   스크롤하면 벨트가 빨라지며 상자들이 오른쪽 화면 밖으로 빠져나가고 문장은 위로 빠진다.
-   동작 줄이기면 송장이 붙은 상자가 부착기 아래 멈춘 장면으로 고정하고, 떨어짐, 벨트, 스크롤 퇴장이 없다.
+   핵심 모션: 첫 화면(lg-poster)은 물류센터 통로 사진 한 장이 화면을 채운다. 들어올 때 사진이 1.6초 동안 천천히 다가오고
+   (scale 1.06 -> 1), 문장과 정보 줄은 0.3초 늦게 아래에서 올라온다(CSS keyframes, 끝 상태가 기본값이라 JS 없이도 보인다).
+   스크롤하면 사진만 조금 느리게 움직인다(y 0 -> 8%). 본문에서는 견적 막대가 금액 비율만큼 늘어나는 것과 센터 지도가 옮겨 가는 것만 남겼다.
+   동작 줄이기면 모두 멈춘 완성 상태다.
 
    상호작용(모두 브라우저 안에서만 돈다. 실제로 보내지 않는다)
    1. 견적 계산: 월 출고 건수, 보관 팔레트 수, 택배 크기를 고르면 보관비, 출고 작업비, 택배비와 월 합계, 건당 평균이 나온다.
@@ -48,93 +46,32 @@ import { DemoMakerInfo } from "@/components/demos/DemoMakerInfo";
    3. 물류센터 안내: 그린 지도에서 1센터(상온), 2센터(냉장, 냉동)를 고르면 지도가 그 센터로 옮겨 가고 입고 시간, 화물차 진입을 바꿔 보여 준다.
    4. 도입 상담 신청: 견적 조건을 이어 받아 쇼핑몰, 담당자, 판매 채널, 상품 종류를 받는다. 완료 화면에 접수 번호, 담당 창구, 회신 예정일. */
 
-const sfxF = { fontFamily: `${Black_Han_Sans.style.fontFamily}, var(--font-sfx), sans-serif`, fontWeight: 400 } as const;
-const monoF = { fontFamily: `${JetBrains_Mono.style.fontFamily}, ui-monospace, monospace` } as const;
+const IMG = "/images/demo-logistics";
 
-const BRAND = "곰파트너물류";
 const ADDRESS = "경기 ㅇㅊ시 ㅇㅇ면 ㅇㅇ로 00";
 const TEL = "031-000-0000";
 const KAKAO = "카카오톡 채널 곰파트너";
 
 const C = {
-  yellow: "#ffcd00",
-  yellowDeep: "#e9b800",
-  black: "#141414",
-  ink: "#1b1b1a",
-  paper: "#f6f4ee",
-  paperDeep: "#ebe7dc",
-  white: "#ffffff",
-  kraft: "#b9874e",
-  kraftDeep: "#8a5c2e",
-  muted: "#5c5a55",
-  line: "#d6d1c4",
+  paper: "#ffffff",
+  soft: "#f7f7f5",
+  ink: "#111111",
+  body: "#4b4b4b",
+  muted: "#767676",
+  line: "#e5e5e5",
+  /** 입력칸, 버튼 테두리 */
+  field: "#c4c4c4",
+  /** 강조색 하나. 노란 안전색을 낮춘 짙은 황토 */
+  accent: "#7a5a10",
   error: "#b42318",
 };
 
 /* 모션 상수. 시간은 초, 이징은 cubic-bezier */
 const EASE = [0.22, 1, 0.36, 1] as const;
-/** 상자가 벨트에 떨어질 때 살짝 튀는 곡선 */
-const EASE_DROP = [0.34, 1.45, 0.64, 1] as const;
-/** 상자 떨어지는 시간 */
-const DROP_DUR = 0.6;
-/** 상자마다 떨어지는 시각 */
-const DROP_DELAY = [0.2, 0, 0.32, 0.4, 0.4, 0.12];
+/** 첫 화면 사진이 다가오는 시간 */
+const HERO_IN = 1.6;
 /** 막대, 지도, 패널 전환 */
 const DUR = 0.45;
-/** 포스터 퇴장이 끝나는 스크롤 진행도(포스터 래퍼 180svh 기준, 고정이 풀리는 0.44 직전) */
-const EXIT_END = 0.42;
-
-/* ---------- 포스터 장면 좌표(SVG 단위) ---------- */
-
-/** 상자 사이 거리 */
-const GAP = 700;
-/** 벨트 속도. 6초마다 상자 하나가 부착기 아래를 지난다 */
-const BELT_V = GAP / 6;
-const BOXES = 6;
-const LOOP = GAP * BOXES;
-const LOOP_START = -1300;
-/** 송장 부착기 가운데 */
-const HIT_X = 1150;
-/** 첫 송장이 붙는 시각 */
-const FIRST_HIT = 1.4;
-const PHASE = (((HIT_X - LOOP_START - FIRST_HIT * BELT_V - GAP) % LOOP) + LOOP) % LOOP;
-/** 동작 줄이기 때 멈춰 둘 시각. 두 번째 상자가 송장을 붙이고 부착기 바로 아래 있다 */
-const T_FIXED = FIRST_HIT + 0.45;
-/** 송장이 머리에서 상자 앞면까지 내려가는 시간 */
-const SLAP = 0.12;
-/** 벨트 위 상자 바닥 */
-const BELT_Y = 410;
-/** 상자 앞면 크기와 깊이 방향 */
-const BW = 340;
-const BH = 240;
-const DX = 80;
-const DY = -50;
-const BOX_SCALE = [1, 0.86, 0.94, 0.9, 1, 0.84];
-/** 부착기 머리 바닥 높이(대기) */
-const HEAD_IDLE = 150;
-const HEAD_H = 70;
-/** 벨트 고무 돌기 간격 */
-const RIB = 44;
-
-const mod = (a: number, n: number) => ((a % n) + n) % n;
-const baseX = (i: number, t: number) => mod(t * BELT_V + i * GAP + PHASE, LOOP) + LOOP_START;
-/** 부착기 아래를 지난 뒤 흐른 시간(초). 음수면 아직 오는 중 */
-const sinceHit = (i: number, t: number) => (baseX(i, t) - HIT_X) / BELT_V;
-/** 머리가 내려간 정도 0~1. 0.35초 전부터 내려가고, 붙인 뒤 0.33초에 걸쳐 올라온다 */
-const press = (ts: number) => {
-  if (ts < -0.35 || ts > 0.45) return 0;
-  if (ts < 0) return 1 - (-ts / 0.35) ** 2;
-  if (ts < SLAP) return 1;
-  return 1 - (ts - SLAP) / 0.33;
-};
-const headBottom = (t: number) => {
-  let y = HEAD_IDLE;
-  for (let i = 0; i < BOXES; i++) {
-    const f = press(sinceHit(i, t));
-    if (f > 0) y = Math.max(y, HEAD_IDLE + (BELT_Y - BH * BOX_SCALE[i] - 2 - HEAD_IDLE) * f);
-  }
-  return y;
-};
 
 /* ---------- 요금 ---------- */
 
@@ -236,9 +173,8 @@ export function LogisticsDemo() {
       <Poster reduce={reduce} onCta={() => go("lg-quote")} />
 
       <header className="mx-auto flex max-w-[1200px] flex-wrap items-center justify-between gap-x-4 gap-y-2 px-4 py-4 md:px-6">
-        <p className="inline-flex items-center gap-2 text-[22px] leading-none" style={sfxF}>
-          <BoxMark size={26} />
-          {BRAND}
+        <p>
+          <SampleLogo />
         </p>
         <nav aria-label="주요 메뉴" className="-mx-2 flex flex-wrap items-center">
           {[
@@ -247,7 +183,7 @@ export function LogisticsDemo() {
             ["lg-center", "물류센터"],
             ["lg-contact", "도입 상담"],
           ].map(([id, label]) => (
-            <button key={id} type="button" onClick={() => go(id)} className={navBtn} style={{ outlineColor: C.black }}>
+            <button key={id} type="button" onClick={() => go(id)} className={navBtn} style={{ outlineColor: C.accent }}>
               {label}
             </button>
           ))}
@@ -257,14 +193,14 @@ export function LogisticsDemo() {
       {/* 하는 일과 오늘 출고 마감 */}
       <section aria-labelledby="lg-hero-title" className="mx-auto grid max-w-[1200px] gap-8 px-4 pt-4 md:px-6 lg:grid-cols-[minmax(0,1fr)_minmax(0,1.05fr)] lg:items-center lg:gap-12 lg:pt-10">
         <div>
-          <h2 id="lg-hero-title" className="text-[34px] leading-[1.2] md:text-[52px]" style={{ ...sfxF, wordBreak: "keep-all" }}>
+          <h2 id="lg-hero-title" className="text-[32px] font-bold leading-[1.25] tracking-[-0.02em] md:text-[44px]" style={{ wordBreak: "keep-all" }}>
             쇼핑몰 상품 보관, 포장,
             <br />
             택배 출고 대행
           </h2>
           <ul className="mt-6 flex flex-wrap gap-2 text-[15px]" aria-label="주문 자동 연동 채널">
             {["스마트스토어", "쿠팡", "카페24", "자사몰"].map((c) => (
-              <li key={c} className="rounded-[4px] border-2 px-3 py-1 font-semibold" style={{ borderColor: C.black }}>
+              <li key={c} className="rounded-[4px] border px-3 py-1 font-medium" style={{ borderColor: C.field }}>
                 {c}
               </li>
             ))}
@@ -276,8 +212,8 @@ export function LogisticsDemo() {
             <button
               type="button"
               onClick={() => go("lg-quote")}
-              className={`inline-flex items-center gap-2 rounded-[6px] px-5 py-3 text-[16px] font-bold ${focusRing}`}
-              style={{ background: C.yellow, color: C.black, outlineColor: C.black, boxShadow: `inset 0 0 0 2px ${C.black}` }}
+              className={`inline-flex items-center gap-2 rounded-[6px] border bg-white px-5 py-3 text-[16px] font-semibold ${focusRing}`}
+              style={{ borderColor: C.field, color: C.ink, outlineColor: C.accent }}
             >
               <Calculator size={18} aria-hidden />
               견적 계산
@@ -286,15 +222,15 @@ export function LogisticsDemo() {
               type="button"
               data-gtm-cta="logistics_header_cta"
               onClick={() => go("lg-contact")}
-              className={`inline-flex items-center gap-2 rounded-[6px] px-5 py-3 text-[16px] font-bold text-white ${focusRing}`}
-              style={{ background: C.black, outlineColor: C.black }}
+              className={`inline-flex items-center gap-2 rounded-[6px] px-5 py-3 text-[16px] font-semibold text-white ${focusRing}`}
+              style={{ background: C.accent, outlineColor: C.accent }}
             >
               <MessageCircle size={18} aria-hidden />
               도입 상담
             </button>
           </div>
         </div>
-        <CutoffBoard reduce={reduce} />
+        <CutoffBoard />
       </section>
 
       {/* 서비스 */}
@@ -327,374 +263,112 @@ export function LogisticsDemo() {
         <Contact key={prefill ? `${prefill.orders}-${prefill.pallets}-${prefill.size}` : "blank"} prefill={prefill} today={today} reduce={reduce} />
       </section>
 
-      <footer className="mt-20 px-4 pb-10 pt-10 text-[14px] leading-[1.8] md:px-6" style={{ background: C.black, color: "rgba(255,255,255,0.78)" }}>
+      <footer className="mt-20 px-4 pb-10 pt-10 text-[14px] leading-[1.8] md:px-6" style={{ background: C.soft, color: C.muted }}>
         <div className="mx-auto max-w-[1200px]">
-          <p className="inline-flex items-center gap-2 text-[20px] leading-none text-white" style={sfxF}>
-            <BoxMark size={22} />
-            {BRAND}
+          <p>
+            <SampleLogo size={18} />
           </p>
           <p className="mt-3">
-            {ADDRESS} / 대표전화 <span style={monoF}>{TEL}</span> / {KAKAO}
+            {ADDRESS} / 대표전화 <span className="tabular-nums">{TEL}</span> / {KAKAO}
           </p>
           <p>평일 09:00 ~ 18:00, 출고 마감 오후 2시, 토요일, 일요일, 공휴일 휴무</p>
-          <DemoMakerInfo className="mt-6 text-white" />
+          <DemoMakerInfo className="mt-6" />
         </div>
       </footer>
     </div>
   );
 }
 
-/* ---------- 포스터 ---------- */
+/* ---------- 첫 화면 ---------- */
+
+/** 문장 등장. 끝 상태가 기본값이라 JS 가 없어도 보인다 */
+const RISE_CSS = `@keyframes lg-rise{from{opacity:0;transform:translateY(12px)}to{opacity:1;transform:none}}
+.lg-rise{animation:lg-rise 0.7s cubic-bezier(0.22,1,0.36,1) 0.3s both}
+@media (prefers-reduced-motion: reduce){.lg-rise{animation:none}}`;
 
 function Poster({ reduce, onCta }: { reduce: boolean; onCta: () => void }) {
   const ref = useRef<HTMLElement>(null);
   const { scrollYProgress } = useScroll({ target: ref, offset: ["start start", "end start"] });
-  const p = useTransform(scrollYProgress, (v) => (reduce ? 0 : Math.min(1, v / EXIT_END)));
-  // 문장은 위로 빠진다
-  const textY = useTransform(p, (v) => `${-v * 42}svh`);
-  const textO = useTransform(p, (v) => 1 - Math.max(0, (v - 0.3) / 0.7));
-  // 상자들은 점점 빨라지며 오른쪽으로 빠져나간다
-  const extra = useTransform(p, (v) => v ** 1.6 * 2900);
-
-  // 벨트 시계. 스크롤하는 동안은 멈춰 두고(상자가 새로 들어오지 않게), 돌아오면 멈춘 자리에서 다시 돈다
-  const time = useTime();
-  const frozenAt = useMotionValue(-1);
-  const pausedFor = useMotionValue(0);
-  // 멈추는 순간 화면 왼쪽 밖에 있던 상자는 퇴장 때 따라 들어오지 않게 숨긴다(벨트 좌표 기준 경계)
-  const hideBelow = useMotionValue(-1e9);
-  const svgBox = useRef<HTMLDivElement>(null);
-  useMotionValueEvent(p, "change", (v) => {
-    if (v > 0.001) {
-      if (frozenAt.get() < 0) {
-        frozenAt.set(time.get());
-        const r = svgBox.current?.getBoundingClientRect();
-        if (r && r.height) hideBelow.set(-r.left / (r.height / 600) - (BW / 2 + DX + 20));
-      }
-    } else if (frozenAt.get() >= 0) {
-      pausedFor.set(pausedFor.get() + time.get() - frozenAt.get());
-      frozenAt.set(-1);
-    }
-  });
-  const te = useTransform([time, frozenAt, pausedFor], ([t, f, off]) => {
-    if (reduce) return T_FIXED;
-    const ms = (f as number) >= 0 ? (f as number) : (t as number);
-    return (ms - (off as number)) / 1000;
-  });
-
-  const ribX = useTransform([te, extra], ([t, e]) => mod((t as number) * BELT_V + (e as number), RIB) - RIB);
-  const headY = useTransform(te, (t) => headBottom(t) - HEAD_IDLE);
-  const lamp = useTransform(te, (t) => {
-    let f = 0;
-    for (let i = 0; i < BOXES; i++) f = Math.max(f, press(sinceHit(i, t)));
-    return 0.25 + f * 0.75;
-  });
+  const photoY = useTransform(scrollYProgress, (v) => (reduce ? "0%" : `${v * 8}%`));
 
   return (
-    <section id="lg-poster" ref={ref} aria-labelledby="lg-poster-title" className="relative" style={{ height: reduce ? undefined : "180svh", background: C.yellow }}>
+    <section id="lg-poster" ref={ref} aria-labelledby="lg-poster-title" className="relative flex min-h-[100svh] flex-col overflow-hidden" style={{ background: "#141414", color: "#fff" }}>
+      <style>{RISE_CSS}</style>
+      <motion.div className="absolute inset-0" style={{ y: photoY }}>
+        <motion.div className="absolute inset-0" initial={reduce ? false : { scale: 1.06 }} animate={{ scale: 1 }} transition={{ duration: reduce ? 0 : HERO_IN, ease: EASE }}>
+          {/* eslint-disable-next-line @next/next/no-img-element -- 정적 export 라 next/image 최적화를 쓰지 않는다 */}
+          <img
+            src={`${IMG}/hero.jpg`}
+            srcSet={`${IMG}/hero-sm.jpg 960w, ${IMG}/hero.jpg 1920w`}
+            sizes="100vw"
+            alt="물류센터 랙 사이 통로에서 직원 두 명이 상자를 들고 걸어오는 모습"
+            fetchPriority="high"
+            className="absolute inset-0 h-full w-full object-cover"
+            style={{ objectPosition: "50% 45%" }}
+          />
+        </motion.div>
+      </motion.div>
       <div
-        className={`${reduce ? "relative min-h-svh" : "sticky top-0 h-svh"} overflow-hidden [--hx:56%] [--ph:46svh] md:[--hx:72%] md:[--ph:62svh]`}
-        style={{ background: `linear-gradient(180deg, ${C.yellow} 0%, ${C.yellow} 62%, ${C.yellowDeep} 100%)`, color: C.black }}
-      >
-        {/* 컨베이어 장면. 부착기가 가로 --hx 지점에 오도록 SVG를 옮긴다 */}
-        <div
-          ref={svgBox}
-          className="pointer-events-none absolute bottom-0"
-          style={{ height: "var(--ph)", width: "calc(var(--ph) * 2.6667)", left: `calc(var(--hx) - var(--ph) * ${(HIT_X / 600).toFixed(4)})` }}
+        aria-hidden
+        className="absolute inset-0"
+        style={{ background: "linear-gradient(to bottom, rgba(0,0,0,0.45), rgba(0,0,0,0) 22%), linear-gradient(to top, rgba(0,0,0,0.78), rgba(0,0,0,0.4) 50%, rgba(0,0,0,0.1))" }}
+      />
+
+      {/* 로고와 핵심 행동 하나 */}
+      <div className="relative z-10 flex items-center justify-between gap-3 px-4 pt-4 md:px-12 md:pt-7">
+        <p>
+          <SampleLogo light size={18} />
+        </p>
+        <button
+          type="button"
+          onClick={onCta}
+          data-gtm-cta="logistics_poster_cta"
+          className={`inline-flex h-11 flex-none items-center rounded-[6px] bg-white px-4 text-[15px] font-semibold ${focusRing}`}
+          style={{ color: C.ink, outlineColor: "#fff" }}
         >
-          <svg viewBox="0 0 1600 600" className="h-full w-full overflow-visible" role="img" aria-label="컨베이어 벨트 위로 골판지 상자가 지나가고 송장 부착기가 상자마다 송장을 붙이는 장면">
-            <PosterDefs />
+          견적 계산
+        </button>
+      </div>
 
-            {/* 바닥 그림자 */}
-            <ellipse cx="800" cy="596" rx="2600" ry="26" fill="url(#lg-floor)" />
-
-            {/* 부착기 기둥(벨트 뒤) */}
-            {[HIT_X - 215, HIT_X + 215].map((x) => (
-              <g key={x}>
-                <rect x={x - 17} y="40" width="34" height="440" fill="url(#lg-post)" />
-                <rect x={x - 17} y="40" width="4" height="440" fill="rgba(255,255,255,0.18)" />
-              </g>
-            ))}
-
-            {/* 벨트 윗면 */}
-            <path d="M-1700 352 H3300 V420 H-1700 Z" fill="url(#lg-rubber)" />
-            <clipPath id="lg-belt-clip">
-              <path d="M-1700 352 H3300 V420 H-1700 Z" />
-            </clipPath>
-            <g clipPath="url(#lg-belt-clip)">
-              <motion.g style={{ x: ribX }}>
-                <rect x="-1760" y="352" width="5120" height="68" fill="url(#lg-ribs)" />
-              </motion.g>
-            </g>
-            <rect x="-1700" y="350" width="5000" height="3" fill="rgba(0,0,0,0.5)" />
-
-            {/* 상자들 */}
-            {Array.from({ length: BOXES }, (_, i) => (
-              <PosterBox key={i} i={i} te={te} extra={extra} hideBelow={hideBelow} reduce={reduce} />
-            ))}
-
-            {/* 벨트 앞 레일, 경고 띠, 볼트 */}
-            <rect x="-1700" y="418" width="5000" height="8" fill="#0b0b0b" />
-            <rect x="-1700" y="426" width="5000" height="48" fill="url(#lg-rail)" />
-            <rect x="-1700" y="427" width="5000" height="2" fill="rgba(255,255,255,0.28)" />
-            <rect x="-1700" y="452" width="5000" height="14" fill="url(#lg-hazard)" />
-            {Array.from({ length: 42 }, (_, k) => -1650 + k * 120).map((x) => (
-              <circle key={x} cx={x} cy="439" r="4.5" fill="url(#lg-bolt)" />
-            ))}
-
-            {/* 다리와 가새 */}
-            {Array.from({ length: 17 }, (_, k) => -1600 + k * 300).map((x) => (
-              <g key={x}>
-                <rect x={x} y="474" width="26" height="118" fill="url(#lg-post)" />
-                <rect x={x - 8} y="586" width="42" height="8" rx="2" fill="#0d0d0d" />
-              </g>
-            ))}
-            <path d={Array.from({ length: 16 }, (_, k) => `M${-1574 + k * 300} 490 L${-1600 + (k + 1) * 300} 570`).join(" ")} stroke="#262626" strokeWidth="7" />
-
-            {/* 송장 부착기 */}
-            <g>
-              <rect x={HIT_X - 240} y="28" width="480" height="48" fill="url(#lg-rail)" />
-              <rect x={HIT_X - 240} y="56" width="480" height="12" fill="url(#lg-hazard)" />
-              <rect x={HIT_X - 240} y="29" width="480" height="2" fill="rgba(255,255,255,0.3)" />
-              <rect x={HIT_X - 9} y="76" width="18" height="70" fill="url(#lg-chrome)" />
-              <motion.g style={{ y: headY }}>
-                {/* 송장 두루마리 */}
-                <circle cx={HIT_X + 104} cy={HEAD_IDLE - HEAD_H / 2} r="30" fill="url(#lg-roll)" />
-                <circle cx={HIT_X + 104} cy={HEAD_IDLE - HEAD_H / 2} r="10" fill="#2a2a2a" />
-                <rect x={HIT_X - 82} y={HEAD_IDLE - HEAD_H} width="164" height={HEAD_H} rx="6" fill="url(#lg-head)" />
-                <rect x={HIT_X - 82} y={HEAD_IDLE - HEAD_H + 2} width="164" height="3" rx="1.5" fill="rgba(255,255,255,0.3)" />
-                <rect x={HIT_X - 70} y={HEAD_IDLE - 20} width="140" height="10" fill="url(#lg-hazard)" />
-                <motion.circle cx={HIT_X - 56} cy={HEAD_IDLE - HEAD_H + 22} r="7" fill={C.yellow} style={{ opacity: lamp }} />
-                <rect x={HIT_X - 66} y={HEAD_IDLE - 6} width="132" height="6" fill="#050505" />
-              </motion.g>
-            </g>
-          </svg>
-        </div>
-
-        {/* 로고와 핵심 행동 하나 */}
-        <motion.div className="absolute inset-x-0 top-0 z-10 flex items-center justify-between px-4 pt-4 md:px-12 md:pt-7" style={{ y: textY }}>
-          <p className="inline-flex items-center gap-2 text-[17px] leading-none" style={sfxF}>
-            <BoxMark size={20} />
-            {BRAND}
-          </p>
-          <button
-            type="button"
-            onClick={onCta}
-            aria-label="견적 계산하기"
-            title="견적 계산하기"
-            data-gtm-cta="logistics_poster_cta"
-            className={`inline-flex h-12 w-12 items-center justify-center rounded-full ${focusRing}`}
-            style={{ background: C.black, color: C.yellow, outlineColor: C.black }}
-          >
-            <Calculator size={22} aria-hidden />
-          </button>
-        </motion.div>
-
-        {/* 큰 문장 */}
-        <motion.div className="relative z-[1] px-4 pt-[13svh] md:px-12 md:pt-[11svh]" style={{ y: textY, opacity: textO }}>
-          <h1 id="lg-poster-title" className="text-[clamp(52px,15vw,72px)] leading-[1.12] tracking-[-0.02em] md:text-[clamp(96px,9.2vw,180px)] md:leading-[1.06]" style={{ ...sfxF, wordBreak: "keep-all" }}>
-            <span className="block">
-              오후 2시 전<span className="md:hidden">
-                <br />
-              </span>{" "}
-              주문은
-            </span>
-            <span className="mt-2 inline-block px-[0.12em] pb-[0.04em] md:mt-3" style={{ background: C.black, color: C.yellow }}>
-              오늘 나가요
-            </span>
-          </h1>
-          <p className="mt-5 text-[16px] font-semibold md:mt-7 md:text-[19px]">경기 ㅇㅊ 물류센터, 평일 출고</p>
-        </motion.div>
+      {/* 문장 */}
+      <div className={`relative z-[1] mt-auto max-w-[1200px] px-4 pb-[10svh] md:px-12 ${reduce ? "" : "lg-rise"}`}>
+        <h1
+          id="lg-poster-title"
+          className="text-[36px] font-bold md:text-[clamp(40px,5vw,72px)]"
+          style={{ letterSpacing: "-0.03em", lineHeight: 1.2, wordBreak: "keep-all" }}
+        >
+          오후 2시 전 주문은
+          <br />
+          오늘 나가요
+        </h1>
+        <p className="mt-4 text-[16px] md:mt-5 md:text-[18px]" style={{ color: "rgba(255,255,255,0.85)" }}>
+          경기 ㅇㅊ 물류센터, 평일 출고
+        </p>
       </div>
     </section>
   );
 }
 
-function PosterBox({ i, te, extra, hideBelow, reduce }: { i: number; te: MotionValue<number>; extra: MotionValue<number>; hideBelow: MotionValue<number>; reduce: boolean }) {
-  const s = BOX_SCALE[i];
-  const base = useTransform(te, (t) => baseX(i, t));
-  const x = useTransform([base, extra], ([b, e]) => (b as number) + (e as number));
-  const shown = useTransform([base, extra, hideBelow], ([b, e, h]) => ((e as number) > 0 && (b as number) < (h as number) ? 0 : 1));
-  const ts = useTransform(base, (b) => (b - HIT_X) / BELT_V);
-  // 송장: 부착기 머리에서 앞면까지 내려와 착 붙고, 붙는 순간 살짝 눌린다
-  const labelY = useTransform(ts, (v) => (v < 0 ? -70 : v < SLAP ? -70 * (1 - v / SLAP) ** 2 : 0));
-  const labelO = useTransform(ts, (v) => (v < 0 ? 0 : 1));
-  const labelSy = useTransform(ts, (v) => (v >= SLAP && v < SLAP + 0.1 ? 0.92 + 0.08 * ((v - SLAP) / 0.1) : 1));
-  const burst = useTransform(ts, (v) => (reduce ? 0 : v >= SLAP && v < SLAP + 0.35 ? 1 - (v - SLAP) / 0.35 : 0));
-
+/* 로고: 메인 사이트와 같은 곰 로고 + 곰파트너(크게) + 업종(작게) */
+function SampleLogo({ light, size = 20 }: { light?: boolean; size?: number }) {
+  const mark = size + 8;
   return (
-    <motion.g style={{ x, opacity: shown }}>
-      <g transform={`translate(0 ${BELT_Y})`}>
-        <motion.g initial={reduce ? false : { y: -620 }} animate={{ y: 0 }} transition={{ duration: reduce ? 0 : DROP_DUR, delay: reduce ? 0 : DROP_DELAY[i], ease: EASE_DROP }}>
-          <g transform={`scale(${s})`}>
-            <BoxArt />
-            <motion.g style={{ y: labelY, opacity: labelO, scaleY: labelSy, transformBox: "fill-box", transformOrigin: "50% 0%" }}>
-              <ShippingLabel />
-            </motion.g>
-            <motion.g style={{ opacity: burst }} stroke={C.black} strokeWidth="5" strokeLinecap="round">
-              <path d={`M-92 ${-BH + 70} l-26 -14 M-96 ${-BH + 110} l-30 0 M92 ${-BH + 70} l26 -14 M96 ${-BH + 110} l30 0`} />
-            </motion.g>
-          </g>
-        </motion.g>
-      </g>
-    </motion.g>
-  );
-}
-
-/** 골판지 상자. 앞면 아래 가운데가 (0, 0) */
-function BoxArt() {
-  const L = -BW / 2;
-  const R = BW / 2;
-  const T = -BH;
-  return (
-    <g>
-      {/* 벨트 위 그림자 */}
-      <path d={`M${L - 4} 4 L${R + 10} 4 L${R + DX + 26} ${DY + 2} L${L + DX} ${DY + 2} Z`} fill="rgba(0,0,0,0.42)" />
-      {/* 옆면 */}
-      <path d={`M${R} 0 L${R} ${T} L${R + DX} ${T + DY} L${R + DX} ${DY} Z`} fill="url(#lg-k-side)" />
-      {/* 윗면 */}
-      <path d={`M${L} ${T} L${R} ${T} L${R + DX} ${T + DY} L${L + DX} ${T + DY} Z`} fill="url(#lg-k-top)" />
-      {/* 윗면 날개 이음새와 테이프 */}
-      <path d={`M-26 ${T} L26 ${T} L${26 + DX} ${T + DY} L${-26 + DX} ${T + DY} Z`} fill="url(#lg-tape)" />
-      <path d={`M0 ${T} L${DX} ${T + DY}`} stroke="rgba(90,55,20,0.45)" strokeWidth="2" />
-      {/* 앞면 */}
-      <rect x={L} y={T} width={BW} height={BH} fill="url(#lg-k-front)" />
-      <rect x={L} y={T} width={BW} height={BH} fill="url(#lg-k-ao)" />
-      {/* 앞면 테이프 */}
-      <rect x="-26" y={T} width="52" height="58" fill="url(#lg-tape)" />
-      <rect x="-26" y={T + 56} width="52" height="3" fill="rgba(90,55,20,0.25)" />
-      <rect x="-14" y={T + 4} width="5" height="50" fill="rgba(255,255,255,0.35)" />
-      {/* 모서리 빛과 그늘 */}
-      <path d={`M${L} ${T + 1} H${R}`} stroke="rgba(255,236,200,0.75)" strokeWidth="2.5" />
-      <path d={`M${R} ${T} V0`} stroke="rgba(60,35,10,0.35)" strokeWidth="2" />
-      <path d={`M${L + 1} ${T} V0`} stroke="rgba(255,236,200,0.3)" strokeWidth="2" />
-      {/* 위 방향 표시(인쇄) */}
-      <g fill="none" stroke="rgba(70,40,15,0.55)" strokeWidth="5" strokeLinecap="round" strokeLinejoin="round">
-        <path d={`M${L + 34} ${T + 70} V${T + 34} M${L + 22} ${T + 46} L${L + 34} ${T + 34} L${L + 46} ${T + 46}`} />
-        <path d={`M${L + 62} ${T + 70} V${T + 34} M${L + 50} ${T + 46} L${L + 62} ${T + 34} L${L + 74} ${T + 46}`} />
-        <path d={`M${L + 18} ${T + 80} H${L + 78}`} />
-      </g>
-    </g>
-  );
-}
-
-/** 송장 바코드 막대(x, 폭) */
-const BARS = [3, 1, 2, 1, 3, 2, 1, 1, 3, 1, 2, 2, 1, 3, 1, 2, 1, 1, 2, 3, 1, 2].reduce<[number, number][]>((acc, w) => {
-  const prev = acc[acc.length - 1];
-  acc.push([prev ? prev[0] + prev[1] + 1.9 : -54, w * 1.6]);
-  return acc;
-}, []);
-
-/** 송장 스티커. 상자 앞면 가운데, 테이프 아래 */
-function ShippingLabel() {
-  const top = -BH + 70;
-  return (
-    <g>
-      <rect x="-68" y={top + 3} width="140" height="104" rx="3" fill="rgba(60,35,10,0.25)" />
-      <rect x="-70" y={top} width="140" height="104" rx="3" fill="url(#lg-paper)" />
-      <rect x="-70" y={top} width="140" height="18" rx="3" fill={C.black} />
-      <rect x="-60" y={top + 6} width="44" height="6" fill={C.yellow} />
-      <rect x="34" y={top + 4} width="28" height="10" fill="#fff" />
-      <rect x="-58" y={top + 26} width="70" height="6" fill="#3a3a3a" />
-      <rect x="-58" y={top + 37} width="96" height="5" fill="#9a9a9a" />
-      <rect x="-58" y={top + 47} width="82" height="5" fill="#9a9a9a" />
-      <rect x="34" y={top + 24} width="26" height="28" fill="none" stroke={C.black} strokeWidth="4" />
-      {BARS.map(([x, w]) => (
-        <rect key={x} x={x} y={top + 62} width={w} height="30" fill={C.black} />
-      ))}
-    </g>
-  );
-}
-
-function PosterDefs() {
-  return (
-    <defs>
-      <linearGradient id="lg-k-front" x1="0" y1="0" x2="1" y2="1">
-        <stop offset="0" stopColor="#d4a066" />
-        <stop offset="0.55" stopColor="#bf8b50" />
-        <stop offset="1" stopColor="#a5713d" />
-      </linearGradient>
-      <linearGradient id="lg-k-ao" x1="0" y1="0" x2="0" y2="1">
-        <stop offset="0.7" stopColor="#000" stopOpacity="0" />
-        <stop offset="1" stopColor="#000" stopOpacity="0.2" />
-      </linearGradient>
-      <linearGradient id="lg-k-top" x1="0" y1="1" x2="1" y2="0">
-        <stop offset="0" stopColor="#e2b77c" />
-        <stop offset="1" stopColor="#cfa067" />
-      </linearGradient>
-      <linearGradient id="lg-k-side" x1="0" y1="0" x2="1" y2="1">
-        <stop offset="0" stopColor="#94622f" />
-        <stop offset="1" stopColor="#6f4721" />
-      </linearGradient>
-      <linearGradient id="lg-tape" x1="0" y1="0" x2="1" y2="0">
-        <stop offset="0" stopColor="#c9a46c" stopOpacity="0.9" />
-        <stop offset="0.35" stopColor="#f1d9a8" stopOpacity="0.95" />
-        <stop offset="0.5" stopColor="#fff2d4" stopOpacity="0.95" />
-        <stop offset="1" stopColor="#caa36a" stopOpacity="0.9" />
-      </linearGradient>
-      <linearGradient id="lg-paper" x1="0" y1="0" x2="1" y2="1">
-        <stop offset="0" stopColor="#ffffff" />
-        <stop offset="1" stopColor="#e9e7e1" />
-      </linearGradient>
-      <linearGradient id="lg-rubber" x1="0" y1="0" x2="0" y2="1">
-        <stop offset="0" stopColor="#151515" />
-        <stop offset="1" stopColor="#2e2e2e" />
-      </linearGradient>
-      <pattern id="lg-ribs" width={RIB} height="68" patternUnits="userSpaceOnUse" patternTransform="skewX(-58)">
-        <rect x="0" y="0" width="5" height="68" fill="#3d3d3d" />
-        <rect x="5" y="0" width="2" height="68" fill="#0c0c0c" />
-      </pattern>
-      <linearGradient id="lg-rail" x1="0" y1="0" x2="0" y2="1">
-        <stop offset="0" stopColor="#3a3a3a" />
-        <stop offset="0.5" stopColor="#1e1e1e" />
-        <stop offset="1" stopColor="#0f0f0f" />
-      </linearGradient>
-      <pattern id="lg-hazard" width="28" height="28" patternUnits="userSpaceOnUse" patternTransform="rotate(45)">
-        <rect width="14" height="28" fill={C.yellow} />
-        <rect x="14" width="14" height="28" fill="#111" />
-      </pattern>
-      <radialGradient id="lg-bolt" cx="0.35" cy="0.35" r="0.7">
-        <stop offset="0" stopColor="#bdbdbd" />
-        <stop offset="1" stopColor="#3a3a3a" />
-      </radialGradient>
-      <linearGradient id="lg-post" x1="0" y1="0" x2="1" y2="0">
-        <stop offset="0" stopColor="#3b3b3b" />
-        <stop offset="0.4" stopColor="#222" />
-        <stop offset="1" stopColor="#0e0e0e" />
-      </linearGradient>
-      <linearGradient id="lg-chrome" x1="0" y1="0" x2="1" y2="0">
-        <stop offset="0" stopColor="#6d6d6d" />
-        <stop offset="0.35" stopColor="#e6e6e6" />
-        <stop offset="1" stopColor="#4a4a4a" />
-      </linearGradient>
-      <linearGradient id="lg-head" x1="0" y1="0" x2="1" y2="1">
-        <stop offset="0" stopColor="#3a3a3a" />
-        <stop offset="1" stopColor="#0d0d0d" />
-      </linearGradient>
-      <radialGradient id="lg-roll" cx="0.38" cy="0.35" r="0.75">
-        <stop offset="0" stopColor="#ffffff" />
-        <stop offset="0.7" stopColor="#dedbd3" />
-        <stop offset="1" stopColor="#a9a59b" />
-      </radialGradient>
-      <radialGradient id="lg-floor" cx="0.5" cy="0.5" r="0.5">
-        <stop offset="0" stopColor="#000" stopOpacity="0.28" />
-        <stop offset="1" stopColor="#000" stopOpacity="0" />
-      </radialGradient>
-    </defs>
-  );
-}
-
-function BoxMark({ size }: { size: number }) {
-  return (
-    <span className="inline-flex flex-none items-center justify-center rounded-[4px]" style={{ width: size, height: size, background: C.black, color: C.yellow }}>
-      <Package size={Math.round(size * 0.68)} strokeWidth={2.4} aria-hidden />
+    <span className="inline-flex items-center gap-2 leading-none" style={{ color: light ? "#fff" : "#111" }}>
+      {/* eslint-disable-next-line @next/next/no-img-element -- 메인 사이트와 같은 곰 로고 */}
+      <img src="/images/logo-bear.png" alt="" aria-hidden width={mark} height={mark} className="shrink-0" style={{ width: mark, height: mark }} />
+      <span className="flex items-baseline gap-1 whitespace-nowrap">
+        <span className="font-bold tracking-[-0.03em]" style={{ fontSize: size }}>
+          곰파트너
+        </span>
+        <span className="text-[12px] font-semibold opacity-75">물류 샘플</span>
+      </span>
     </span>
   );
 }
 
 function SectionTitle({ id, title }: { id: string; title: string }) {
   return (
-    <h2 id={id} className="flex items-center gap-3 text-[28px] leading-tight md:text-[36px]" style={sfxF}>
-      <span aria-hidden className="inline-block h-[0.8em] w-[0.8em] flex-none" style={{ background: `repeating-linear-gradient(45deg, ${C.black} 0 6px, ${C.yellow} 6px 12px)` }} />
+    <h2 id={id} className="text-[28px] font-bold leading-tight tracking-[-0.02em] md:text-[36px]">
       {title}
     </h2>
   );
@@ -702,7 +376,7 @@ function SectionTitle({ id, title }: { id: string; title: string }) {
 
 /* ---------- 2. 출고 마감 시계 ---------- */
 
-function CutoffBoard({ reduce }: { reduce: boolean }) {
+function CutoffBoard() {
   const [now, setNow] = useState<Date | null>(null);
   useEffect(() => {
     const tick = () => setNow(new Date());
@@ -735,12 +409,12 @@ function CutoffBoard({ reduce }: { reduce: boolean }) {
   const pos = (h: number) => ((h - DAY_FROM) / (DAY_TO - DAY_FROM)) * 100;
 
   return (
-    <div id="lg-cutoff" className="scroll-mt-4 rounded-[10px] p-5 md:p-7" style={{ background: C.black, color: "#fff" }} aria-labelledby="lg-cutoff-title">
-      <p id="lg-cutoff-title" className="inline-flex items-center gap-2 text-[16px] font-bold" style={{ color: C.yellow }}>
+    <div id="lg-cutoff" className="scroll-mt-4 rounded-[8px] border p-5 md:p-7" style={{ background: C.soft, borderColor: C.line, color: C.ink }} aria-labelledby="lg-cutoff-title">
+      <p id="lg-cutoff-title" className="inline-flex items-center gap-2 text-[16px] font-bold" style={{ color: C.body }}>
         <Clock size={18} aria-hidden />
         {cut && !cut.today ? "다음 출고 마감까지" : "오늘 출고 마감까지"}
       </p>
-      <p className="mt-2 flex items-baseline gap-3 text-[48px] font-semibold leading-none tracking-[-0.02em] tabular-nums md:text-[72px]" style={{ ...monoF, color: C.yellow }} aria-live="off">
+      <p className="mt-2 flex items-baseline gap-3 text-[48px] font-semibold leading-none tracking-[-0.02em] tabular-nums md:text-[72px]" style={{ color: C.accent }} aria-live="off">
         {days > 0 && <span className="text-[26px] md:text-[34px]">{days}일</span>}
         <span>{timer}</span>
       </p>
@@ -750,36 +424,30 @@ function CutoffBoard({ reduce }: { reduce: boolean }) {
 
       {/* 하루 흐름 */}
       <div className="relative mt-8 pb-12" aria-label="하루 출고 흐름">
-        <div className="relative h-[6px] rounded-full" style={{ background: "#3a3a3a" }}>
-          <div className="absolute inset-y-0 left-0 rounded-full" style={{ width: `${pos(CUTOFF_H)}%`, background: C.yellow }} />
+        <div className="relative h-[6px] rounded-full" style={{ background: "#dcdcda" }}>
+          <div className="absolute inset-y-0 left-0 rounded-full" style={{ width: `${pos(CUTOFF_H)}%`, background: C.accent }} />
         </div>
         {DAY_MARKS.map((m) => (
           <div key={m.h} className="absolute top-[-5px] -translate-x-1/2 text-center" style={{ left: `${pos(m.h)}%` }}>
-            <span className="mx-auto block h-4 w-4 rounded-full border-[3px]" style={{ borderColor: m.h === CUTOFF_H ? C.yellow : "#8a8a8a", background: C.black }} />
-            <span className="mt-2 block whitespace-nowrap text-[13px] leading-tight" style={{ color: m.h === CUTOFF_H ? C.yellow : "#cfcfcf" }}>
-              <span className="block" style={monoF}>
+            <span className="mx-auto block h-4 w-4 rounded-full border-[3px]" style={{ borderColor: m.h === CUTOFF_H ? C.accent : "#9a9a9a", background: C.soft }} />
+            <span className="mt-2 block whitespace-nowrap text-[13px] leading-tight" style={{ color: m.h === CUTOFF_H ? C.accent : C.muted }}>
+              <span className="block tabular-nums">
                 {p2(m.h)}:00
               </span>
               {m.label}
             </span>
           </div>
         ))}
-        <span className="absolute right-0 top-[18px] text-[13px]" style={{ color: "#cfcfcf" }}>
+        <span className="absolute right-0 top-[18px] text-[13px]" style={{ color: C.muted }}>
           다음 날 도착
         </span>
         {showNow && (
-          <motion.span
-            className="absolute top-[-30px] -translate-x-1/2"
-            style={{ left: `${pos(hourNow)}%` }}
-            initial={reduce ? false : { y: -6 }}
-            animate={{ y: 0 }}
-            transition={{ duration: reduce ? 0 : DUR, ease: EASE }}
-          >
-            <span className="flex items-center gap-1 whitespace-nowrap rounded-[4px] px-1.5 py-0.5 text-[12px] font-bold" style={{ background: C.yellow, color: C.black }}>
+          <span className="absolute top-[-30px] -translate-x-1/2" style={{ left: `${pos(hourNow)}%` }}>
+            <span className="flex items-center gap-1 whitespace-nowrap rounded-[4px] px-1.5 py-0.5 text-[12px] font-bold text-white" style={{ background: C.ink }}>
               <Package size={13} aria-hidden />
               지금
             </span>
-          </motion.span>
+          </span>
         )}
       </div>
     </div>
@@ -797,23 +465,23 @@ const SERVICES = [
 
 function ServiceLine() {
   return (
-    <ol className="mt-6 grid overflow-hidden rounded-[10px] border-2 md:grid-cols-4" style={{ borderColor: C.black }}>
+    <ol className="mt-6 grid rounded-[8px] border md:grid-cols-4" style={{ borderColor: C.line }}>
       {SERVICES.map((s, k) => {
         const Icon = s.icon;
         return (
-          <li key={s.name} className={`relative p-5 md:p-6 ${k > 0 ? "border-t-2 md:border-l-2 md:border-t-0" : ""}`} style={{ borderColor: C.black, background: k === 2 ? C.yellow : C.white }}>
-            <p className="flex items-center gap-2 text-[22px]" style={sfxF}>
-              <Icon size={24} aria-hidden />
+          <li key={s.name} className={`relative p-5 md:p-6 ${k > 0 ? "border-t md:border-l md:border-t-0" : ""}`} style={{ borderColor: C.line, background: k === 2 ? C.soft : C.paper }}>
+            <p className="flex items-center gap-2 text-[20px] font-bold">
+              <Icon size={22} aria-hidden style={{ color: C.accent }} />
               {s.name}
             </p>
-            <p className="mt-2 text-[16px] leading-[1.6]" style={{ wordBreak: "keep-all" }}>
+            <p className="mt-2 text-[16px] leading-[1.6]" style={{ wordBreak: "keep-all", color: C.body }}>
               {s.desc}
             </p>
             {k < SERVICES.length - 1 && (
               <span
                 aria-hidden
                 className="absolute bottom-[-15px] left-1/2 z-[1] flex h-7 w-7 -translate-x-1/2 rotate-90 items-center justify-center rounded-full md:bottom-auto md:left-auto md:right-[-15px] md:top-1/2 md:-translate-y-1/2 md:translate-x-0 md:rotate-0"
-                style={{ background: C.black, color: C.yellow }}
+                style={{ background: C.paper, color: C.ink, border: `1px solid ${C.line}` }}
               >
                 <ChevronRight size={18} />
               </span>
@@ -838,15 +506,15 @@ function Quote({ reduce, onApply }: { reduce: boolean; onApply: (v: { orders: nu
   const total = storage + work + parcel;
   const per = orders ? total / orders : 0;
   const parts = [
-    { key: "보관비", v: storage, bg: C.black, pattern: "" },
-    { key: "출고 작업비", v: work, bg: C.kraft, pattern: "repeating-linear-gradient(90deg, rgba(0,0,0,0.18) 0 2px, transparent 2px 8px)" },
-    { key: "택배비", v: parcel, bg: C.yellow, pattern: "repeating-linear-gradient(45deg, rgba(0,0,0,0.16) 0 2px, transparent 2px 9px)" },
+    { key: "보관비", v: storage, bg: "#3a3a3a", pattern: "" },
+    { key: "출고 작업비", v: work, bg: "#a8a8a6", pattern: "repeating-linear-gradient(90deg, rgba(0,0,0,0.18) 0 2px, transparent 2px 8px)" },
+    { key: "택배비", v: parcel, bg: C.accent, pattern: "repeating-linear-gradient(45deg, rgba(255,255,255,0.22) 0 2px, transparent 2px 9px)" },
   ];
   const t = { duration: reduce ? 0 : DUR, ease: EASE };
 
   return (
     <div className="mt-6 grid gap-6 lg:grid-cols-[minmax(0,1fr)_minmax(0,1fr)] lg:gap-10">
-      <div className="rounded-[10px] border-2 p-5 md:p-7" style={{ borderColor: C.black, background: C.white }}>
+      <div className="rounded-[8px] border p-5 md:p-7" style={{ borderColor: C.line, background: C.paper }}>
         <RangeField
           id="lg-q-orders"
           label="월 출고 건수"
@@ -869,10 +537,10 @@ function Quote({ reduce, onApply }: { reduce: boolean; onApply: (v: { orders: nu
                   type="button"
                   aria-pressed={on}
                   onClick={() => setSize(k)}
-                  className={`rounded-[6px] border-2 px-2 py-2.5 text-left ${focusRing}`}
-                  style={{ borderColor: C.black, background: on ? C.black : C.white, color: on ? C.yellow : C.ink, outlineColor: C.black }}
+                  className={`rounded-[6px] border px-2 py-2.5 text-left ${focusRing}`}
+                  style={{ borderColor: on ? C.accent : C.field, background: on ? C.accent : C.paper, color: on ? "#fff" : C.ink, outlineColor: C.accent }}
                 >
-                  <span className="flex items-center gap-1 text-[16px] font-bold">
+                  <span className="flex items-center gap-1 text-[16px] font-semibold">
                     {on && <Check size={16} aria-hidden />}
                     {k}
                   </span>
@@ -885,22 +553,22 @@ function Quote({ reduce, onApply }: { reduce: boolean; onApply: (v: { orders: nu
       </div>
 
       {/* 결과: 송장처럼 */}
-      <div className="flex flex-col rounded-[10px] border-2 p-5 md:p-7" style={{ borderColor: C.black, background: C.white }} aria-live="polite">
+      <div className="flex flex-col rounded-[8px] border p-5 md:p-7" style={{ borderColor: C.line, background: C.paper }} aria-live="polite">
         <p className="flex items-center justify-between gap-3 text-[15px] font-bold">
           <span>월 예상 비용</span>
-          <span className="rounded-[3px] px-2 py-0.5 text-[12px]" style={{ background: C.black, color: C.yellow }}>
+          <span className="rounded-[3px] px-2 py-0.5 text-[12px]" style={{ background: C.soft, color: C.body }}>
             개략, 부가세 별도
           </span>
         </p>
-        <p className="mt-2 text-[44px] font-semibold leading-none tracking-[-0.03em] tabular-nums md:text-[56px]" style={monoF}>
+        <p className="mt-2 text-[44px] font-semibold leading-none tracking-[-0.03em] tabular-nums md:text-[56px]">
           {won(total)}
         </p>
         <p className="mt-2 text-[15px]" style={{ color: C.muted }}>
-          주문 1건당 평균 <b style={{ ...monoF, color: C.ink }}>{won(per)}</b>
+          주문 1건당 평균 <b className="tabular-nums" style={{ color: C.ink }}>{won(per)}</b>
         </p>
 
         {/* 쌓인 막대: 겹친 띠를 누적 비율만큼 가로로 늘린다 */}
-        <div className="relative mt-6 h-9 overflow-hidden rounded-[4px] border-2" style={{ borderColor: C.black }} aria-hidden>
+        <div className="relative mt-6 h-9 overflow-hidden rounded-[4px]" style={{ background: C.soft }} aria-hidden>
           {[...parts].reverse().map((part, k) => {
             const upto = parts.slice(0, parts.length - k).reduce((a, b) => a + b.v, 0);
             return (
@@ -920,7 +588,7 @@ function Quote({ reduce, onApply }: { reduce: boolean; onApply: (v: { orders: nu
           {parts.map((part) => (
             <div key={part.key} className="flex items-center justify-between gap-3 border-b border-dashed pb-2.5" style={{ borderColor: C.line }}>
               <dt className="inline-flex items-center gap-2">
-                <span className="inline-block h-3.5 w-3.5 flex-none rounded-[2px] border" style={{ borderColor: C.black, background: part.pattern ? `${part.pattern}, ${part.bg}` : part.bg }} aria-hidden />
+                <span className="inline-block h-3.5 w-3.5 flex-none rounded-[2px]" style={{ background: part.pattern ? `${part.pattern}, ${part.bg}` : part.bg }} aria-hidden />
                 {part.key}
                 <span className="text-[13px]" style={{ color: C.muted }}>
                   {part.key === "보관비" && `${pallets}개 x ${won(PALLET_FEE)}`}
@@ -928,7 +596,7 @@ function Quote({ reduce, onApply }: { reduce: boolean; onApply: (v: { orders: nu
                   {part.key === "택배비" && `${num(orders)}건 x ${won(PARCEL[size].fee)}`}
                 </span>
               </dt>
-              <dd className="tabular-nums" style={monoF}>
+              <dd className="tabular-nums">
                 {won(part.v)}
               </dd>
             </div>
@@ -939,8 +607,8 @@ function Quote({ reduce, onApply }: { reduce: boolean; onApply: (v: { orders: nu
           type="button"
           data-gtm-cta="logistics_quote_to_contact"
           onClick={() => onApply({ orders, pallets, size })}
-          className={`mt-6 inline-flex items-center justify-center gap-2 rounded-[6px] px-5 py-3.5 text-[16px] font-bold ${focusRing}`}
-          style={{ background: C.yellow, color: C.black, outlineColor: C.black, boxShadow: `inset 0 0 0 2px ${C.black}` }}
+          className={`mt-6 inline-flex items-center justify-center gap-2 rounded-[6px] px-5 py-3.5 text-[16px] font-semibold text-white ${focusRing}`}
+          style={{ background: C.accent, outlineColor: C.accent }}
         >
           이 조건으로 상담 신청
           <ChevronRight size={18} aria-hidden />
@@ -952,7 +620,7 @@ function Quote({ reduce, onApply }: { reduce: boolean; onApply: (v: { orders: nu
         <table className="w-full min-w-[560px] border-collapse text-left text-[15px]">
           <caption className="pb-3 text-left text-[17px] font-bold">요금 기준</caption>
           <thead>
-            <tr style={{ background: C.black, color: "#fff" }}>
+            <tr className="border-b" style={{ background: C.soft, borderColor: C.field }}>
               <th scope="col" className="px-4 py-2.5 font-semibold">
                 항목
               </th>
@@ -973,12 +641,12 @@ function Quote({ reduce, onApply }: { reduce: boolean; onApply: (v: { orders: nu
               ...(Object.keys(PARCEL) as ParcelSize[]).map((k) => [`택배비 ${k}`, PARCEL[k].spec, won(PARCEL[k].fee)]),
               ["포장재", "박스, 완충재, 테이프", "실비"],
             ].map(([a, b, c], k) => (
-              <tr key={k} className="border-b" style={{ borderColor: C.line, background: k % 2 ? C.paper : C.white }}>
+              <tr key={k} className="border-b" style={{ borderColor: C.line, background: C.paper }}>
                 <th scope="row" className="whitespace-nowrap px-4 py-2.5 font-semibold">
                   {a}
                 </th>
                 <td className="px-4 py-2.5">{b}</td>
-                <td className="whitespace-nowrap px-4 py-2.5 text-right tabular-nums" style={monoF}>
+                <td className="whitespace-nowrap px-4 py-2.5 text-right tabular-nums">
                   {c}
                 </td>
               </tr>
@@ -1015,7 +683,7 @@ function RangeField({
         <label htmlFor={id} className="text-[16px] font-bold">
           {label}
         </label>
-        <span className="text-[26px] font-semibold tabular-nums" style={monoF}>
+        <span className="text-[26px] font-semibold tabular-nums">
           {num(value)}
           <span className="ml-1 text-[15px]">{unit}</span>
         </span>
@@ -1030,7 +698,7 @@ function RangeField({
         aria-valuetext={`${num(value)}${unit}`}
         onChange={(e) => onChange(Number(e.target.value))}
         className={`mt-2 h-8 w-full cursor-pointer ${focusRing}`}
-        style={{ accentColor: C.black, outlineColor: C.black }}
+        style={{ accentColor: C.accent, outlineColor: C.accent }}
       />
       <div className="flex justify-between text-[13px]" style={{ color: C.muted }}>
         <span>
@@ -1057,34 +725,34 @@ function CenterMap({ reduce }: { reduce: boolean }) {
 
   return (
     <div className="mt-6 grid gap-6 lg:grid-cols-[minmax(0,1.3fr)_minmax(0,1fr)] lg:gap-10">
-      <div className="relative overflow-hidden rounded-[10px] border-2" style={{ borderColor: C.black, background: "#efece3" }}>
+      <div className="relative overflow-hidden rounded-[8px] border" style={{ borderColor: C.line, background: "#f2f2f0" }}>
         <svg viewBox="0 0 640 420" className="block h-auto w-full" role="img" aria-label={`${c.name} 위치를 보여 주는 그린 지도`}>
           <defs>
             <pattern id="lg-map-grid" width="32" height="32" patternUnits="userSpaceOnUse">
-              <path d="M32 0 H0 V32" fill="none" stroke="#e0dccf" strokeWidth="1" />
+              <path d="M32 0 H0 V32" fill="none" stroke="#e6e6e4" strokeWidth="1" />
             </pattern>
           </defs>
           <motion.g initial={false} animate={cam} transition={{ duration: reduce ? 0 : 0.8, ease: EASE }} style={{ transformOrigin: "0 0" }}>
             <rect x="-400" y="-300" width="1440" height="1020" fill="url(#lg-map-grid)" />
             {/* 논밭과 산 */}
-            <path d="M-200 40 C40 10 110 90 60 160 C20 220 -80 230 -200 210 Z" fill="#d9dfc6" />
-            <path d="M560 -60 C700 -40 760 80 700 140 C640 190 560 120 540 60 Z" fill="#d9dfc6" />
-            <path d="M120 300 h120 v70 h-120 Z M260 320 h90 v60 h-90 Z" fill="#e4e6cf" />
+            <path d="M-200 40 C40 10 110 90 60 160 C20 220 -80 230 -200 210 Z" fill="#dfe3d8" />
+            <path d="M560 -60 C700 -40 760 80 700 140 C640 190 560 120 540 60 Z" fill="#dfe3d8" />
+            <path d="M120 300 h120 v70 h-120 Z M260 320 h90 v60 h-90 Z" fill="#e7e9e1" />
             {/* 하천 */}
-            <path d="M-200 340 C40 300 160 400 320 370 C480 340 560 420 840 380" fill="none" stroke="#bcd3dc" strokeWidth="22" strokeLinecap="round" />
+            <path d="M-200 340 C40 300 160 400 320 370 C480 340 560 420 840 380" fill="none" stroke="#cfdbe0" strokeWidth="22" strokeLinecap="round" />
             {/* 지방도 */}
             <g fill="none" strokeLinecap="round">
-              <path d="M372 168 L372 -100 M372 168 L478 300 L478 520 M478 300 L760 300" stroke="#b9b4a5" strokeWidth="13" />
+              <path d="M372 168 L372 -100 M372 168 L478 300 L478 520 M478 300 L760 300" stroke="#c4c4c4" strokeWidth="13" />
               <path d="M372 168 L372 -100 M372 168 L478 300 L478 520 M478 300 L760 300" stroke="#fff" strokeWidth="8" />
             </g>
             {/* 고속도로 */}
             <g fill="none" strokeLinecap="round">
-              <path d="M-200 110 C120 120 260 90 420 110 C560 128 680 160 860 150" stroke={C.black} strokeWidth="20" />
-              <path d="M-200 110 C120 120 260 90 420 110 C560 128 680 160 860 150" stroke={C.yellow} strokeWidth="12" />
+              <path d="M-200 110 C120 120 260 90 420 110 C560 128 680 160 860 150" stroke="#9a9a9a" strokeWidth="20" />
+              <path d="M-200 110 C120 120 260 90 420 110 C560 128 680 160 860 150" stroke="#f2f2f0" strokeWidth="12" />
             </g>
             <g>
-              <rect x="336" y="74" width="72" height="26" rx="4" fill={C.black} />
-              <text x="372" y="92" textAnchor="middle" fontSize="14" fontWeight="700" fill={C.yellow}>
+              <rect x="336" y="74" width="72" height="26" rx="4" fill={C.ink} />
+              <text x="372" y="92" textAnchor="middle" fontSize="14" fontWeight="700" fill="#fff">
                 ㅇㅊ IC
               </text>
             </g>
@@ -1094,9 +762,8 @@ function CenterMap({ reduce }: { reduce: boolean }) {
               const on = id === sel;
               return (
                 <g key={id} transform={`translate(${x} ${y})`}>
-                  <ellipse cx="0" cy="4" rx="16" ry="5" fill="rgba(0,0,0,0.25)" />
-                  <path d="M0 0 C-14 -16 -20 -26 -20 -36 A20 20 0 1 1 20 -36 C20 -26 14 -16 0 0 Z" fill={on ? C.black : "#fff"} stroke={C.black} strokeWidth="3" />
-                  <text x="0" y="-30" textAnchor="middle" fontSize="17" fontWeight="800" fill={on ? C.yellow : C.black}>
+                  <path d="M0 0 C-14 -16 -20 -26 -20 -36 A20 20 0 1 1 20 -36 C20 -26 14 -16 0 0 Z" fill={on ? C.accent : "#fff"} stroke={on ? C.accent : C.ink} strokeWidth="1.5" />
+                  <text x="0" y="-30" textAnchor="middle" fontSize="17" fontWeight="700" fill={on ? "#fff" : C.ink}>
                     {id === "c1" ? "1" : "2"}
                   </text>
                 </g>
@@ -1113,8 +780,8 @@ function CenterMap({ reduce }: { reduce: boolean }) {
                 type="button"
                 aria-pressed={on}
                 onClick={() => setSel(id)}
-                className={`rounded-[6px] border-2 px-3 py-1.5 text-[14px] font-bold md:text-[15px] ${focusRing}`}
-                style={{ borderColor: C.black, background: on ? C.black : C.white, color: on ? C.yellow : C.ink, outlineColor: C.black }}
+                className={`rounded-[6px] border px-3 py-1.5 text-[14px] font-semibold md:text-[15px] ${focusRing}`}
+                style={{ borderColor: on ? C.accent : C.field, background: on ? C.accent : C.paper, color: on ? "#fff" : C.ink, outlineColor: C.accent }}
               >
                 {id === "c1" ? "1센터" : "2센터"} {CENTERS[id].kind}
               </button>
@@ -1127,15 +794,15 @@ function CenterMap({ reduce }: { reduce: boolean }) {
         <AnimatePresence mode="wait" initial={false}>
           <motion.div
             key={sel}
-            initial={reduce ? false : { clipPath: "inset(0 100% 0 0)" }}
-            animate={{ clipPath: "inset(0 0% 0 0)" }}
-            exit={reduce ? { opacity: 0 } : { clipPath: "inset(0 0 0 100%)" }}
+            initial={reduce ? false : { opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
             transition={{ duration: reduce ? 0 : 0.35, ease: EASE }}
           >
-            <p className="flex items-center gap-2 text-[26px]" style={sfxF}>
-              <c.icon size={26} aria-hidden />
+            <p className="flex flex-wrap items-center gap-2 text-[24px] font-bold">
+              <c.icon size={24} aria-hidden style={{ color: C.accent }} />
               {c.name}
-              <span className="rounded-[4px] px-2 py-0.5 text-[15px]" style={{ background: C.yellow, color: C.black, fontFamily: "inherit" }}>
+              <span className="rounded-[4px] border px-2 py-0.5 text-[14px] font-medium" style={{ borderColor: C.line, color: C.body }}>
                 {c.kind}
               </span>
             </p>
@@ -1151,7 +818,7 @@ function CenterMap({ reduce }: { reduce: boolean }) {
             </dl>
           </motion.div>
         </AnimatePresence>
-        <p className="mt-6 flex items-start gap-2 rounded-[8px] p-4 text-[15px] leading-[1.6]" style={{ background: C.paperDeep }}>
+        <p className="mt-6 flex items-start gap-2 rounded-[8px] p-4 text-[15px] leading-[1.6]" style={{ background: C.soft }}>
           <Truck size={18} className="mt-0.5 flex-none" aria-hidden />
           택배사 집하는 평일 오후 5시예요. 센터 견학은 상담 때 날짜를 잡아 드려요.
         </p>
@@ -1209,8 +876,8 @@ function Contact({ prefill, today, reduce }: { prefill: Prefill; today: Date; re
     setAgree(false);
   };
 
-  const input = `mt-1.5 w-full rounded-[6px] border-2 bg-white px-3 py-2.5 text-[16px] ${focusRing}`;
-  const label = "block text-[15px] font-bold";
+  const input = `mt-1.5 w-full rounded-[6px] border bg-white px-3 py-2.5 text-[16px] ${focusRing}`;
+  const label = "block text-[15px] font-semibold";
   const errText = (k: string) =>
     err[k] ? (
       <p id={`lg-e-${k}`} className="mt-1 text-[14px] font-semibold" style={{ color: C.error }}>
@@ -1219,26 +886,26 @@ function Contact({ prefill, today, reduce }: { prefill: Prefill; today: Date; re
     ) : null;
 
   return (
-    <div className="mt-6 overflow-hidden rounded-[10px] border-2" style={{ borderColor: C.black, background: C.white }}>
+    <div className="mt-6 overflow-hidden rounded-[8px] border" style={{ borderColor: C.line, background: C.paper }}>
       <AnimatePresence mode="wait" initial={false}>
         {done ? (
           <motion.div
             key="done"
             className="grid gap-6 p-5 md:grid-cols-[auto_1fr] md:items-start md:p-8"
-            initial={reduce ? false : { clipPath: "inset(0 0 100% 0)" }}
-            animate={{ clipPath: "inset(0 0 0% 0)" }}
+            initial={reduce ? false : { opacity: 0 }}
+            animate={{ opacity: 1 }}
             transition={{ duration: reduce ? 0 : 0.5, ease: EASE }}
           >
-            <span className="flex h-16 w-16 items-center justify-center rounded-full" style={{ background: C.yellow, color: C.black }}>
-              <Check size={34} strokeWidth={3} aria-hidden />
+            <span className="flex h-16 w-16 items-center justify-center rounded-full" style={{ background: C.accent, color: "#fff" }}>
+              <Check size={34} strokeWidth={2.5} aria-hidden />
             </span>
             <div>
-              <p className="text-[26px]" style={sfxF} role="status">
+              <p className="text-[26px] font-bold" role="status">
                 상담 신청이 접수됐어요
               </p>
               <dl className="mt-5 grid gap-x-6 gap-y-2.5 text-[16px] sm:grid-cols-[auto_1fr]">
                 <dt className="font-bold">접수 번호</dt>
-                <dd style={monoF}>{done.no}</dd>
+                <dd className="tabular-nums">{done.no}</dd>
                 <dt className="font-bold">쇼핑몰</dt>
                 <dd>{done.shop}</dd>
                 <dt className="font-bold">담당자</dt>
@@ -1247,7 +914,7 @@ function Contact({ prefill, today, reduce }: { prefill: Prefill; today: Date; re
                 </dd>
                 <dt className="font-bold">담당 창구</dt>
                 <dd>
-                  영업팀 전화 <span style={monoF}>{TEL}</span>, {KAKAO}
+                  영업팀 전화 <span className="tabular-nums">{TEL}</span>, {KAKAO}
                 </dd>
                 <dt className="font-bold">회신 예정일</dt>
                 <dd>{fmtKo(done.reply)} 오전 중 전화</dd>
@@ -1255,8 +922,8 @@ function Contact({ prefill, today, reduce }: { prefill: Prefill; today: Date; re
               <button
                 type="button"
                 onClick={reset}
-                className={`mt-6 inline-flex items-center gap-2 rounded-[6px] border-2 px-4 py-2 text-[15px] font-bold ${focusRing}`}
-                style={{ borderColor: C.black, outlineColor: C.black }}
+                className={`mt-6 inline-flex items-center gap-2 rounded-[6px] border px-4 py-2 text-[15px] font-semibold ${focusRing}`}
+                style={{ borderColor: C.field, outlineColor: C.accent }}
               >
                 <RotateCcw size={16} aria-hidden />
                 새로 작성
@@ -1269,28 +936,28 @@ function Contact({ prefill, today, reduce }: { prefill: Prefill; today: Date; re
               <label htmlFor="lg-f-shop" className={label}>
                 쇼핑몰 이름
               </label>
-              <input id="lg-f-shop" value={shop} onChange={(e) => setShop(e.target.value)} className={input} style={{ borderColor: err.shop ? C.error : C.black, outlineColor: C.black }} aria-invalid={!!err.shop} aria-describedby={err.shop ? "lg-e-shop" : undefined} autoComplete="organization" />
+              <input id="lg-f-shop" value={shop} onChange={(e) => setShop(e.target.value)} className={input} style={{ borderColor: err.shop ? C.error : C.field, outlineColor: C.accent }} aria-invalid={!!err.shop} aria-describedby={err.shop ? "lg-e-shop" : undefined} autoComplete="organization" />
               {errText("shop")}
             </div>
             <div>
               <label htmlFor="lg-f-name" className={label}>
                 담당자 이름
               </label>
-              <input id="lg-f-name" value={name} onChange={(e) => setName(e.target.value)} className={input} style={{ borderColor: err.name ? C.error : C.black, outlineColor: C.black }} aria-invalid={!!err.name} aria-describedby={err.name ? "lg-e-name" : undefined} autoComplete="name" />
+              <input id="lg-f-name" value={name} onChange={(e) => setName(e.target.value)} className={input} style={{ borderColor: err.name ? C.error : C.field, outlineColor: C.accent }} aria-invalid={!!err.name} aria-describedby={err.name ? "lg-e-name" : undefined} autoComplete="name" />
               {errText("name")}
             </div>
             <div>
               <label htmlFor="lg-f-phone" className={label}>
                 휴대폰
               </label>
-              <input id="lg-f-phone" type="tel" inputMode="numeric" placeholder="010-0000-0000" value={phone} onChange={(e) => setPhone(e.target.value)} className={input} style={{ borderColor: err.phone ? C.error : C.black, outlineColor: C.black }} aria-invalid={!!err.phone} aria-describedby={err.phone ? "lg-e-phone" : undefined} autoComplete="tel" />
+              <input id="lg-f-phone" type="tel" inputMode="numeric" placeholder="010-0000-0000" value={phone} onChange={(e) => setPhone(e.target.value)} className={input} style={{ borderColor: err.phone ? C.error : C.field, outlineColor: C.accent }} aria-invalid={!!err.phone} aria-describedby={err.phone ? "lg-e-phone" : undefined} autoComplete="tel" />
               {errText("phone")}
             </div>
             <div>
               <label htmlFor="lg-f-orders" className={label}>
                 월 출고 건수
               </label>
-              <input id="lg-f-orders" inputMode="numeric" placeholder="예: 1500" value={orders} onChange={(e) => setOrders(e.target.value.replace(/\D/g, ""))} className={input} style={{ borderColor: C.black, outlineColor: C.black }} />
+              <input id="lg-f-orders" inputMode="numeric" placeholder="예: 1500" value={orders} onChange={(e) => setOrders(e.target.value.replace(/\D/g, ""))} className={input} style={{ borderColor: C.field, outlineColor: C.accent }} />
             </div>
             <fieldset className="md:col-span-2">
               <legend className={label}>판매 채널</legend>
@@ -1304,8 +971,8 @@ function Contact({ prefill, today, reduce }: { prefill: Prefill; today: Date; re
                       type="button"
                       aria-pressed={on}
                       onClick={() => setChannels((cs) => (on ? cs.filter((x) => x !== ch) : [...cs, ch]))}
-                      className={`inline-flex items-center gap-1.5 rounded-[6px] border-2 px-3.5 py-2 text-[15px] font-semibold ${focusRing}`}
-                      style={{ borderColor: err.channels ? C.error : C.black, background: on ? C.black : C.white, color: on ? C.yellow : C.ink, outlineColor: C.black }}
+                      className={`inline-flex items-center gap-1.5 rounded-[6px] border px-3.5 py-2 text-[15px] font-semibold ${focusRing}`}
+                      style={{ borderColor: err.channels ? C.error : on ? C.accent : C.field, background: on ? C.accent : C.paper, color: on ? "#fff" : C.ink, outlineColor: C.accent }}
                     >
                       {on && <Check size={15} aria-hidden />}
                       {ch}
@@ -1319,7 +986,7 @@ function Contact({ prefill, today, reduce }: { prefill: Prefill; today: Date; re
               <label htmlFor="lg-f-goods" className={label}>
                 상품 종류
               </label>
-              <select id="lg-f-goods" value={goods} onChange={(e) => setGoods(e.target.value)} className={input} style={{ borderColor: C.black, outlineColor: C.black }}>
+              <select id="lg-f-goods" value={goods} onChange={(e) => setGoods(e.target.value)} className={input} style={{ borderColor: C.field, outlineColor: C.accent }}>
                 {GOODS.map((g) => (
                   <option key={g}>{g}</option>
                 ))}
@@ -1329,7 +996,7 @@ function Contact({ prefill, today, reduce }: { prefill: Prefill; today: Date; re
               <label htmlFor="lg-f-start" className={label}>
                 시작 희망 시기
               </label>
-              <select id="lg-f-start" value={start} onChange={(e) => setStart(e.target.value)} className={input} style={{ borderColor: C.black, outlineColor: C.black }}>
+              <select id="lg-f-start" value={start} onChange={(e) => setStart(e.target.value)} className={input} style={{ borderColor: C.field, outlineColor: C.accent }}>
                 {STARTS.map((g) => (
                   <option key={g}>{g}</option>
                 ))}
@@ -1339,12 +1006,12 @@ function Contact({ prefill, today, reduce }: { prefill: Prefill; today: Date; re
               <label htmlFor="lg-f-memo" className={label}>
                 문의 내용 <span className="font-normal" style={{ color: C.muted }}>(선택)</span>
               </label>
-              <textarea id="lg-f-memo" rows={3} value={memo} onChange={(e) => setMemo(e.target.value)} className={`${input} resize-y`} style={{ borderColor: C.black, outlineColor: C.black }} />
+              <textarea id="lg-f-memo" rows={3} value={memo} onChange={(e) => setMemo(e.target.value)} className={`${input} resize-y`} style={{ borderColor: C.field, outlineColor: C.accent }} />
             </div>
             <div className="flex flex-col gap-4 md:col-span-2 md:flex-row md:items-center md:justify-between">
               <div>
                 <label className="inline-flex cursor-pointer items-center gap-2 text-[15px]">
-                  <input id="lg-f-agree" type="checkbox" checked={agree} onChange={(e) => setAgree(e.target.checked)} className={`h-5 w-5 ${focusRing}`} style={{ accentColor: C.black, outlineColor: C.black }} aria-describedby={err.agree ? "lg-e-agree" : undefined} />
+                  <input id="lg-f-agree" type="checkbox" checked={agree} onChange={(e) => setAgree(e.target.checked)} className={`h-5 w-5 ${focusRing}`} style={{ accentColor: C.accent, outlineColor: C.accent }} aria-describedby={err.agree ? "lg-e-agree" : undefined} />
                   개인정보 수집, 이용 동의(상담 회신용, 1년 보관)
                 </label>
                 {errText("agree")}
@@ -1352,8 +1019,8 @@ function Contact({ prefill, today, reduce }: { prefill: Prefill; today: Date; re
               <button
                 type="submit"
                 data-gtm-cta="logistics_submit"
-                className={`inline-flex items-center justify-center gap-2 rounded-[6px] px-6 py-3.5 text-[16px] font-bold text-white ${focusRing}`}
-                style={{ background: C.black, outlineColor: C.black }}
+                className={`inline-flex items-center justify-center gap-2 rounded-[6px] px-6 py-3.5 text-[16px] font-semibold text-white ${focusRing}`}
+                style={{ background: C.accent, outlineColor: C.accent }}
               >
                 <MessageCircle size={18} aria-hidden />
                 상담 신청
@@ -1362,7 +1029,7 @@ function Contact({ prefill, today, reduce }: { prefill: Prefill; today: Date; re
             <p className="flex flex-wrap items-center gap-x-4 gap-y-1 text-[14px] md:col-span-2" style={{ color: C.muted }}>
               <span className="inline-flex items-center gap-1.5">
                 <Phone size={15} aria-hidden />
-                대표전화 <span style={monoF}>{TEL}</span>
+                대표전화 <span className="tabular-nums">{TEL}</span>
               </span>
               <span className="inline-flex items-center gap-1.5">
                 <MapPin size={15} aria-hidden />

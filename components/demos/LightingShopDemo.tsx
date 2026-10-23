@@ -1,21 +1,22 @@
 "use client";
 
 import { useCallback, useEffect, useRef, useState } from "react";
-import { animate, AnimatePresence, motion, MotionValue, useMotionTemplate, useMotionValue, useScroll, useSpring, useTransform } from "framer-motion";
-import { Car, Check, Clock, Lightbulb, LightbulbOff, MapPin, Minus, Plus, Power, RotateCcw, Trash2, Train, Wrench } from "lucide-react";
-import { Gowun_Batang } from "@/lib/local-fonts";
+import { animate, AnimatePresence, motion, MotionValue, useMotionTemplate, useMotionValue, useScroll, useTransform } from "framer-motion";
+import { Car, Check, Clock, Lightbulb, LightbulbOff, MapPin, Minus, Plus, Power, RotateCcw, Trash2, Train } from "lucide-react";
 import { useReducedMotionSafe } from "@/hooks/useReducedMotionSafe";
 import { daysAgo, fmtKo, useDemoToday } from "@/hooks/useDemoToday";
 import { maskName, maskPhone } from "@/components/demos/LeadReceivedPanel";
 import { DemoMakerInfo } from "@/components/demos/DemoMakerInfo";
 
-/* 조명 가게 홈페이지 샘플: 가상의 곰파트너조명. 상호, 주소, 전화는 모두 가상이다.
+/* 조명 가게 홈페이지 샘플: 가상의 조명 가게 곰파트너. 상호, 주소, 전화는 모두 가상이다.
+   첫 화면 사진 출처: Pexels 사진 14680170
 
    국내 조명 가게와 조명 쇼핑몰 공통 구성: 상단 분류(펜던트, 스탠드, 레일, 벽등, 간접조명), 공간별 조명 추천,
    색온도 안내(전구색 2700K~3000K, 주백색 4000K, 주광색 6500K), 전구 별매와 LED 일체형 표기, 레일 1m 포함 같은 구성 표기,
    시공 안내(레일 설치비 별도, 전기 공사 별도), 매장 전시장 안내와 오시는 길, 주차 안내, 상담신청.
 
-   핵심 모션: 커서 스포트라이트. 첫 화면은 불 꺼진 방 그림이고 포인터가 비추는 곳만 보인다(mask-image radial-gradient,
+   핵심 모션: 첫 화면은 펜던트 조명 사진 한 장이 1.6초 동안 천천히 다가오고(scale 1.06 -> 1) 문장은 0.3초 늦게 올라온다.
+   스크롤하면 사진만 조금 느리게 움직인다. 본문의 커서 스포트라이트는 그대로 둔다. 방 화면은 불 꺼진 방 그림이고 포인터가 비추는 곳만 보인다(mask-image radial-gradient,
    useMotionValue + useMotionTemplate, 지연 없이 따라감). 조명 스위치를 누르면 그 조명이 켜져 주변이 밝게 남는다(마스크에 타원 추가,
    켜질 때 120ms 번쩍 뒤 안정). 색온도 슬라이더는 켜진 빛 색(multiply 겹층), 밝기 슬라이더는 빛 세기와 비추는 범위.
    터치 기기는 탭한 자리를 비춘다. 동작 줄이기면 전부 켜진 상태로 시작하고 스포트라이트는 쓰지 않는다.
@@ -27,27 +28,37 @@ import { DemoMakerInfo } from "@/components/demos/DemoMakerInfo";
    4. 견적 담기와 시공 상담: 담은 제품 합계, 시공 여부, 상담신청과 접수 완료 화면.
    5. 매장 안내와 오시는 길: 영업시간(오늘 요일 진하게), 주차, 전시장 안내.
 
-   포스터 첫 화면(ls-poster): 거의 검정 바탕에 돔 펜던트가 줄에 매달려 내려오며 감쇠 진동으로 흔들리다 멈춘다.
-   멈추는 순간 불이 깜빡이며 켜지고 원뿔 빛 안에서만 큰 문장이 보인다(같은 문장 두 겹, 위 겹에 radial mask).
-   PC는 포인터 쪽으로 조명과 빛이 살짝 기운다. 스크롤하면 빛이 넓어져 화면이 밝아졌다가 기존 방 화면으로 넘어간다.
-   등장은 CSS keyframes라 JS 전에도 끝 상태가 보이고, 동작 줄이기면 처음부터 켜진 정지 포스터다. */
+   포스터 첫 화면(ls-poster): 사진 위에 아래와 왼쪽을 어둡게 하는 막을 깔고 왼쪽 아래에 문장을 둔다.
+   등장은 CSS keyframes라 JS 전에도 끝 상태가 보이고, 동작 줄이기면 처음부터 정지 화면이다. */
 
-const serif = { fontFamily: `${Gowun_Batang.style.fontFamily}, serif` } as const;
-
-const BRAND = "곰파트너조명";
+const BRAND = "곰파트너";
 const ADDRESS = "서울 ㅇㅇ구 ㅇㅇ로 00, 1층";
 const TEL = "02-000-0000";
-const KAKAO = "카카오톡 채널 곰파트너조명";
+const KAKAO = "카카오톡 채널 곰파트너";
+
+/* 로고: 메인 사이트와 같은 곰 로고 + 곰파트너(크게) + 업종(작게) */
+function SampleLogo({ light, small }: { light?: boolean; small?: boolean }) {
+  return (
+    <span className="inline-flex items-center gap-2" style={{ color: light ? "#ffffff" : "#111111" }}>
+      {/* eslint-disable-next-line @next/next/no-img-element -- 메인 사이트와 같은 곰 로고 */}
+      <img src="/images/logo-bear.png" alt="" aria-hidden width={28} height={28} className={small ? "h-6 w-6 shrink-0" : "h-7 w-7 shrink-0"} />
+      <span className="flex items-baseline gap-1 whitespace-nowrap">
+        <span className={`${small ? "text-[18px]" : "text-[20px]"} font-bold tracking-[-0.03em]`}>곰파트너</span>
+        <span className="text-[12px] font-semibold opacity-75">조명 샘플</span>
+      </span>
+    </span>
+  );
+}
+const IMG = "/images/demo-lighting-shop";
 
 const C = {
-  bg: "#0f0d0b",
-  panel: "#17140f",
-  line: "#2a241c",
-  cream: "#f4e8d2",
-  creamDim: "rgba(244,232,210,0.72)",
-  amber: "#f0a53a",
-  brass: "#a67c3d",
-  ink: "#1a1410",
+  bg: "#141414",
+  panel: "#1b1b1b",
+  line: "#2e2e2e",
+  cream: "#f2f2f2",
+  creamDim: "#a8a8a8",
+  amber: "#c8a165",
+  ink: "#141414",
   error: "#ff8f7a",
 };
 
@@ -231,12 +242,7 @@ export function LightingShopDemo() {
     <div className="min-h-screen overflow-x-clip pb-24" style={{ background: C.bg, color: C.cream }}>
       <Poster reduce={reduce} onCta={() => go("ls-quote")} />
       <header className="mx-auto flex max-w-[1200px] items-center justify-between gap-3 px-4 py-4 md:px-6">
-        <span className="inline-flex items-center gap-2">
-          <Lightbulb size={22} aria-hidden style={{ color: C.amber }} />
-          <span className="text-[21px] font-bold" style={serif}>
-            {BRAND}
-          </span>
-        </span>
+        <SampleLogo light />
         <nav aria-label="주요 메뉴" className="hidden items-center gap-1 md:flex" style={{ color: C.creamDim }}>
           <button type="button" onClick={() => go("ls-products")} className={navCls} style={{ outlineColor: C.amber }}>
             제품
@@ -259,8 +265,8 @@ export function LightingShopDemo() {
           <DarkRoom reduce={reduce} shapes={shapes} lit={lit} onMv={onMv} setLamp={setLamp} kelvinColor={kel.color} bright={bright} allOn={allOn} toggleAll={toggleAll} tried={tried ? byId(tried) : null} />
         </section>
 
-        <section id="ls-control" aria-labelledby="ls-control-title" className="scroll-mt-4 rounded-[10px] border p-5" style={{ borderColor: C.line, background: C.panel }}>
-          <h2 id="ls-control-title" className="text-[20px] font-bold" style={serif}>
+        <section id="ls-control" aria-labelledby="ls-control-title" className="scroll-mt-4 rounded-[8px] border p-5" style={{ borderColor: C.line, background: C.panel }}>
+          <h2 id="ls-control-title" className="text-[20px] font-bold">
             색온도와 밝기
           </h2>
           <label className="mt-5 block">
@@ -270,7 +276,7 @@ export function LightingShopDemo() {
                 {kel.k}K {kel.name}
               </output>
             </span>
-            <input type="range" min={0} max={KELVIN.length - 1} step={1} value={kelvinIdx} onChange={(e) => setKelvinIdx(Number(e.target.value))} aria-valuetext={`${kel.k}K ${kel.name}`} className={`mt-2 w-full accent-[#f0a53a] ${focusRing}`} style={{ outlineColor: C.amber }} />
+            <input type="range" min={0} max={KELVIN.length - 1} step={1} value={kelvinIdx} onChange={(e) => setKelvinIdx(Number(e.target.value))} aria-valuetext={`${kel.k}K ${kel.name}`} className={`mt-2 w-full accent-[#c8a165] ${focusRing}`} style={{ outlineColor: C.amber }} />
             <span aria-hidden className="mt-1 flex justify-between text-[12px] tabular-nums" style={{ color: C.creamDim }}>
               {KELVIN.map((t) => (
                 <span key={t.k}>{t.k}K</span>
@@ -286,7 +292,7 @@ export function LightingShopDemo() {
                 {bright}%
               </output>
             </span>
-            <input type="range" min={20} max={100} step={5} value={bright} onChange={(e) => setBright(Number(e.target.value))} aria-valuetext={`${bright}%`} className={`mt-2 w-full accent-[#f0a53a] ${focusRing}`} style={{ outlineColor: C.amber }} />
+            <input type="range" min={20} max={100} step={5} value={bright} onChange={(e) => setBright(Number(e.target.value))} aria-valuetext={`${bright}%`} className={`mt-2 w-full accent-[#c8a165] ${focusRing}`} style={{ outlineColor: C.amber }} />
           </label>
 
           <p className="mt-6 text-[15px] font-bold">공간별 추천</p>
@@ -300,7 +306,7 @@ export function LightingShopDemo() {
                     aria-pressed={sel}
                     onClick={() => setKelvinIdx(r.idx)}
                     className={`flex w-full items-center justify-between gap-3 rounded-[6px] border px-3 py-2 text-left text-[14px] ${focusRing}`}
-                    style={{ borderColor: sel ? C.amber : C.line, background: sel ? "rgba(240,165,58,0.12)" : "transparent", outlineColor: C.amber }}
+                    style={{ borderColor: sel ? C.amber : C.line, background: sel ? "rgba(200,161,101,0.12)" : "transparent", outlineColor: C.amber }}
                   >
                     <span>
                       <b>{r.room}</b> <span className="tabular-nums" style={{ color: C.creamDim }}>{KELVIN[r.idx].k}K</span>
@@ -319,7 +325,7 @@ export function LightingShopDemo() {
       {/* 제품 */}
       <section id="ls-products" aria-labelledby="ls-products-title" className="mx-auto mt-16 max-w-[1200px] scroll-mt-4 px-4 md:mt-20 md:px-6">
         <div className="flex flex-wrap items-end justify-between gap-3">
-          <h2 id="ls-products-title" className="text-[26px] font-bold" style={serif}>
+          <h2 id="ls-products-title" className="text-[26px] font-bold">
             제품
           </h2>
           <p className="text-[14px]" style={{ color: C.creamDim }}>
@@ -336,7 +342,7 @@ export function LightingShopDemo() {
                 aria-selected={sel}
                 type="button"
                 onClick={() => setCat(c)}
-                className={`flex-none rounded-full border px-4 py-1.5 text-[15px] ${sel ? "font-bold" : ""} ${focusRing}`}
+                className={`flex-none rounded-[6px] border px-4 py-1.5 text-[15px] ${sel ? "font-bold" : ""} ${focusRing}`}
                 style={{ borderColor: sel ? C.amber : C.line, background: sel ? C.amber : "transparent", color: sel ? C.ink : C.cream, outlineColor: C.amber }}
               >
                 {c}
@@ -349,8 +355,8 @@ export function LightingShopDemo() {
             const inRoom = shapes[SLOT_OF[p.cat]] === p.shape && (tried === p.id || tried === null);
             const qty = cart[p.id] ?? 0;
             return (
-              <li key={p.id} className="flex flex-col rounded-[10px] border p-3 md:p-4" style={{ borderColor: inRoom ? C.amber : C.line, background: C.panel }}>
-                <div className="relative aspect-[4/3] overflow-hidden rounded-[6px]" style={{ background: "#0b0a08" }}>
+              <li key={p.id} className="flex flex-col rounded-[8px] border p-3 md:p-4" style={{ borderColor: inRoom ? C.amber : C.line, background: C.panel }}>
+                <div className="relative aspect-[4/3] overflow-hidden rounded-[6px]" style={{ background: "#101010" }}>
                   <ProductThumb shape={p.shape} color={kel.color} />
                   {inRoom && (
                     <span className="absolute left-2 top-2 rounded-[4px] px-1.5 py-0.5 text-[12px] font-bold" style={{ background: C.amber, color: C.ink }}>
@@ -382,7 +388,7 @@ export function LightingShopDemo() {
 
       {/* 견적과 시공 상담 */}
       <section id="ls-quote" aria-labelledby="ls-quote-title" className="mx-auto mt-16 max-w-[1200px] scroll-mt-4 px-4 md:mt-20 md:px-6">
-        <h2 id="ls-quote-title" className="text-[26px] font-bold" style={serif}>
+        <h2 id="ls-quote-title" className="text-[26px] font-bold">
           견적과 시공 상담
         </h2>
         <QuotePanel today={today} reduce={reduce} rows={cartRows} total={total} setQty={setQty} />
@@ -390,15 +396,15 @@ export function LightingShopDemo() {
 
       {/* 매장 안내 */}
       <section id="ls-store" aria-labelledby="ls-store-title" className="mx-auto mt-16 max-w-[1200px] scroll-mt-4 px-4 md:mt-20 md:px-6">
-        <h2 id="ls-store-title" className="text-[26px] font-bold" style={serif}>
+        <h2 id="ls-store-title" className="text-[26px] font-bold">
           매장 안내
         </h2>
         <StoreInfo today={today} />
       </section>
 
       <footer className="mx-auto mt-16 max-w-[1200px] border-t px-4 pt-8 text-[14px] leading-[1.8] md:px-6" style={{ borderColor: C.line, color: C.creamDim }}>
-        <p className="text-[16px] font-bold" style={{ ...serif, color: C.cream }}>
-          {BRAND}
+        <p>
+          <SampleLogo light />
         </p>
         <p>
           {ADDRESS} / 전화 {TEL} / {KAKAO}
@@ -412,259 +418,77 @@ export function LightingShopDemo() {
 /* ---------------- 포스터 첫 화면 ---------------- */
 
 /* 포스터 모션 상수
-   내려오며 흔들림 1450ms(감쇠 진동, 각 구간 ease-in-out), 불 켜짐 400ms(1450ms 뒤 시작, 두 번 깜빡),
-   멈춘 뒤 은은한 흔들림 9000ms 주기(±0.7도), 포인터 기울기 최대 3도(스프링). */
-const DROP_MS = 1450;
-const ON_MS = 400;
-const SWAY_MS = 9000;
-const TILT_DEG = 3;
-const TILT_SPRING = { stiffness: 60, damping: 14, mass: 0.8 } as const;
+   사진 다가오기 1600ms(scale 1.06 -> 1), 문장 등장 700ms(300ms 늦게, 아래 12px 에서), 스크롤하면 사진만 y 0 -> 8%. */
+const HERO_MS = 1600;
+const RISE_MS = 700;
+const RISE_DELAY_MS = 300;
 
-const POSTER_CSS = `
-@keyframes ls-drop {
-  0% { transform: translateY(-62%) rotate(0deg); animation-timing-function: cubic-bezier(0.3, 0, 0.2, 1); }
-  34% { transform: translateY(0) rotate(9deg); animation-timing-function: ease-in-out; }
-  52% { transform: translateY(0) rotate(-6deg); animation-timing-function: ease-in-out; }
-  68% { transform: translateY(0) rotate(3.5deg); animation-timing-function: ease-in-out; }
-  82% { transform: translateY(0) rotate(-1.6deg); animation-timing-function: ease-in-out; }
-  92% { transform: translateY(0) rotate(0.6deg); animation-timing-function: ease-in-out; }
-  100% { transform: translateY(0) rotate(0deg); }
+const HERO_CSS = `
+@keyframes ls-rise {
+  from { opacity: 0; transform: translateY(12px); }
+  to { opacity: 1; transform: none; }
 }
-@keyframes ls-on {
-  0% { opacity: 0; }
-  18% { opacity: 0.85; }
-  30% { opacity: 0.2; }
-  46% { opacity: 1; }
-  58% { opacity: 0.65; }
-  100% { opacity: 1; }
-}
-@keyframes ls-sway {
-  0%, 100% { transform: rotate(0.7deg); }
-  50% { transform: rotate(-0.7deg); }
-}
-.ls-drop { transform-origin: 50% 0; animation: ls-drop ${DROP_MS}ms both; }
-.ls-on { animation: ls-on ${ON_MS}ms linear ${DROP_MS}ms both; }
-.ls-sway { transform-origin: 50% 0; animation: ls-sway ${SWAY_MS}ms ease-in-out ${DROP_MS + ON_MS}ms infinite; }
+.ls-rise { animation: ls-rise ${RISE_MS}ms cubic-bezier(0.22, 1, 0.36, 1) ${RISE_DELAY_MS}ms both; }
 @media (prefers-reduced-motion: reduce) {
-  .ls-drop, .ls-on, .ls-sway { animation: none; }
+  .ls-rise { animation: none; }
 }
 `;
 
-/** 거의 검정 바탕. 불 켜진 문장과 대비 15:1 안팎 */
-const POSTER_BG = "#070605";
-const POSTER_TEXT = "#fbeedb";
-const POSTER_DIM = "#17130f";
-
-const ramp = (v: number, a: number, b: number) => Math.min(1, Math.max(0, (v - a) / (b - a)));
-
-function PosterLines() {
-  return (
-    <>
-      <span className="block">
-        <span className="block md:inline">사시면</span> <span className="block md:inline">기사님이</span>
-      </span>
-      <span className="block">달아 드려요</span>
-    </>
-  );
-}
-
 function Poster({ reduce, onCta }: { reduce: boolean; onCta: () => void }) {
-  const wrapRef = useRef<HTMLDivElement>(null);
+  const wrapRef = useRef<HTMLElement>(null);
   const { scrollYProgress: p } = useScroll({ target: wrapRef, offset: ["start start", "end start"] });
-
-  /* 스크롤 퇴장: 빛 웅덩이가 넓어져 화면을 채우고, 끝에서 기존 화면 바탕색으로 가라앉는다.
-     sticky가 풀리는 시점은 전체의 약 0.44 (180svh 중 80svh) */
-  const floodScale = useTransform(p, [0, 0.36], [0.5, 4.2]);
-  /* opacity는 함수형으로 계산한다. 배열형은 framer가 ViewTimeline으로 가속하면서 구간이 어긋났다. */
-  const floodOpacity = useTransform(p, (v) => (v < 0.04 ? ramp(v, 0, 0.04) * 0.35 : 0.35 + ramp(v, 0.04, 0.32) * 0.65));
-  const settleOpacity = useTransform(p, (v) => ramp(v, 0.34, 0.44));
-  const textScale = useTransform(p, [0, 0.36], [1, 1.08]);
-
-  /* 포인터 기울기 */
-  const tiltRaw = useMotionValue(0);
-  const tilt = useSpring(tiltRaw, TILT_SPRING);
-  const lightX = useTransform(tilt, (t) => 50 - (t / TILT_DEG) * 9);
-  const textMask = useMotionTemplate`radial-gradient(ellipse 64% 62% at ${lightX}% 58%, #000 0%, #000 50%, rgba(0,0,0,0.45) 76%, transparent 100%)`;
-
-  const move = (e: React.PointerEvent<HTMLDivElement>) => {
-    if (reduce || e.pointerType !== "mouse") return;
-    const r = e.currentTarget.getBoundingClientRect();
-    const nx = Math.max(-1, Math.min(1, ((e.clientX - r.left) / r.width - 0.5) * 2));
-    /* rotate가 음수면 아래쪽이 오른쪽으로 간다 */
-    tiltRaw.set(-nx * TILT_DEG);
-  };
-  const leave = () => tiltRaw.set(0);
-
-  const titleStyle = {
-    ...serif,
-    fontSize: "clamp(56px, min(10.6vw, 16.5svh), 196px)",
-    lineHeight: 1.08,
-    letterSpacing: "-0.02em",
-    wordBreak: "keep-all" as const,
-  };
-
-  const lines = "flex flex-col items-center px-4 pb-[11svh] text-center font-bold md:pb-[9svh]";
+  const photoY = useTransform(p, (v) => `${(v * 8).toFixed(2)}%`);
 
   return (
-    <section id="ls-poster" aria-labelledby="ls-poster-title" ref={wrapRef} className={reduce ? "relative min-h-svh" : "relative h-[180svh]"} style={{ background: POSTER_BG }}>
-      <style>{POSTER_CSS}</style>
-      <div onPointerMove={move} onPointerLeave={leave} className={`${reduce ? "relative min-h-svh" : "sticky top-0 h-svh"} overflow-hidden`} style={{ background: POSTER_BG }}>
-        {/* 벽에 번지는 빛 */}
-        <div aria-hidden className="ls-on absolute inset-0" style={{ background: "radial-gradient(ellipse 70% 60% at 50% 46%, rgba(240,165,58,0.16), rgba(240,165,58,0.05) 55%, transparent 80%)" }} />
+    <section id="ls-poster" aria-labelledby="ls-poster-title" ref={wrapRef} className="relative min-h-[100svh] overflow-hidden" style={{ background: C.bg }}>
+      <style>{HERO_CSS}</style>
+      <motion.div
+        className="absolute inset-0"
+        initial={reduce ? false : { scale: 1.06 }}
+        animate={{ scale: 1 }}
+        transition={{ duration: reduce ? 0 : HERO_MS / 1000, ease: EASE }}
+        style={reduce ? undefined : { y: photoY }}
+      >
+        {/* eslint-disable-next-line @next/next/no-img-element -- 정적 export 라 next/image 최적화를 쓰지 않는다 */}
+        <img
+          src={`${IMG}/hero.jpg`}
+          srcSet={`${IMG}/hero-sm.jpg 960w, ${IMG}/hero.jpg 1920w`}
+          sizes="100vw"
+          alt="창가에 매달린 붉은 원뿔 펜던트 조명 세 개"
+          fetchPriority="high"
+          className="absolute inset-0 h-full w-full object-cover"
+          style={{ objectPosition: "62% 40%" }}
+        />
+      </motion.div>
+      {/* 글자 대비용 막: 왼쪽과 아래를 어둡게 */}
+      <div aria-hidden className="absolute inset-0" style={{ background: "linear-gradient(to top, rgba(0,0,0,0.72), rgba(0,0,0,0.25) 55%, rgba(0,0,0,0.1)), linear-gradient(to right, rgba(0,0,0,0.45), rgba(0,0,0,0) 60%)" }} />
 
-        {/* 불 꺼진 문장: 윤곽만 아주 희미하게 */}
-        <div aria-hidden className={`absolute inset-0 flex flex-col justify-end ${lines}`} style={{ ...titleStyle, color: POSTER_DIM }}>
-          <PosterLines />
-          <span className="mt-[2.2svh] block text-[15px] font-normal md:text-[17px]" style={{ fontFamily: "inherit", letterSpacing: 0, lineHeight: 1.5 }}>
-            &nbsp;
-          </span>
-        </div>
-
-        {/* 조명 */}
-        <motion.div aria-hidden className="absolute left-1/2 top-0 h-full -translate-x-1/2" style={reduce ? { aspectRatio: "400 / 1000" } : { aspectRatio: "400 / 1000", rotate: tilt, originX: 0.5, originY: 0 }}>
-          <div className="ls-sway h-full w-full">
-            <div className="ls-drop h-full w-full">
-              <PendantSvg />
-            </div>
-          </div>
-        </motion.div>
-
-        {/* 불 켜진 문장: 원뿔 빛 안에서만 보인다 */}
-        <motion.div
-          className={`ls-on absolute inset-0 flex flex-col justify-end ${lines}`}
-          style={reduce ? { color: POSTER_TEXT } : { color: POSTER_TEXT, WebkitMaskImage: textMask, maskImage: textMask, scale: textScale, originY: 1 }}
-        >
-          <h1 id="ls-poster-title" style={{ ...titleStyle, textShadow: "0 0 40px rgba(240,165,58,0.25)" }}>
-            <PosterLines />
-          </h1>
-          <p className="mt-[2.2svh] text-[15px] md:text-[17px]" style={{ lineHeight: 1.5, color: "rgba(251,238,219,0.8)" }}>
-            {BRAND} 전시장, 서울 ㅇㅇ구
-          </p>
-        </motion.div>
-
-        {/* 스크롤하면 넓어지는 빛 */}
-        {!reduce && (
-          <>
-            <motion.div
-              aria-hidden
-              className="pointer-events-none absolute left-1/2 top-[40%] h-[110vmax] w-[110vmax] -translate-x-1/2 -translate-y-1/2 rounded-full"
-              style={{ scale: floodScale, opacity: floodOpacity, background: "radial-gradient(circle, #fff3dd 0%, #ffd79a 22%, rgba(240,165,58,0.75) 46%, rgba(240,165,58,0) 70%)" }}
-            />
-            <motion.div aria-hidden className="pointer-events-none absolute inset-0" style={{ opacity: settleOpacity, background: C.bg }} />
-          </>
-        )}
-
-        {/* 상호와 상담 버튼 */}
-        <div className="absolute inset-x-0 top-0 flex items-center justify-between px-4 py-4 md:px-6">
-          <span className="inline-flex items-center gap-1.5 text-[17px] font-bold" style={{ ...serif, color: C.cream }}>
-            <Lightbulb size={17} aria-hidden style={{ color: C.amber }} />
-            {BRAND}
-          </span>
+      <div className="relative mx-auto flex min-h-[100svh] max-w-[1200px] flex-col px-4 md:px-6">
+        <div className="flex items-center justify-between gap-3 py-4">
+          <SampleLogo light small />
           <button
             type="button"
             onClick={onCta}
-            aria-label="상담신청"
             data-gtm-cta="lighting-shop_poster_cta"
-            className={`grid h-12 w-12 place-items-center rounded-full border ${focusRing}`}
-            style={{ borderColor: "rgba(240,165,58,0.7)", color: C.amber, background: "rgba(7,6,5,0.6)", outlineColor: C.cream }}
+            className={`rounded-[6px] px-4 py-2 text-[15px] font-semibold ${focusRing}`}
+            style={{ background: C.amber, color: C.ink, outlineColor: "#ffffff" }}
           >
-            <Wrench size={20} aria-hidden />
+            상담신청
           </button>
+        </div>
+
+        <div className={`mt-auto pb-[10svh] ${reduce ? "" : "ls-rise"}`}>
+          <h1 id="ls-poster-title" className="text-[36px] font-bold md:text-[clamp(40px,5vw,72px)]" style={{ color: "#ffffff", letterSpacing: "-0.03em", lineHeight: 1.2, wordBreak: "keep-all" }}>
+            사시면 기사님이
+            <br />
+            달아 드려요
+          </h1>
+          <p className="mt-4 text-[15px] md:text-[17px]" style={{ color: "rgba(255,255,255,0.86)", lineHeight: 1.5 }}>
+            {BRAND} 전시장, 서울 ㅇㅇ구
+          </p>
         </div>
       </div>
     </section>
-  );
-}
-
-/** 돔 펜던트. 그림 좌표 400x1000, 위 끝이 천장. 빛 원뿔과 바닥 빛 웅덩이까지 한 장에 그린다. */
-function PendantSvg() {
-  return (
-    <svg viewBox="0 0 400 1000" className="h-full w-full" style={{ overflow: "visible" }} aria-hidden>
-      <defs>
-        <linearGradient id="lsp-metal" x1="0" y1="0" x2="1" y2="0">
-          <stop offset="0" stopColor="#120f0c" />
-          <stop offset="0.22" stopColor="#3e352d" />
-          <stop offset="0.34" stopColor="#5a4d40" />
-          <stop offset="0.5" stopColor="#2a231d" />
-          <stop offset="0.82" stopColor="#15110e" />
-          <stop offset="1" stopColor="#0a0807" />
-        </linearGradient>
-        <radialGradient id="lsp-spec" cx="0.3" cy="0.3" r="0.5">
-          <stop offset="0" stopColor="#fff2dc" stopOpacity="0.32" />
-          <stop offset="1" stopColor="#fff2dc" stopOpacity="0" />
-        </radialGradient>
-        <linearGradient id="lsp-brass" x1="0" y1="0" x2="1" y2="0">
-          <stop offset="0" stopColor="#5b4220" />
-          <stop offset="0.3" stopColor="#d8b06a" />
-          <stop offset="0.45" stopColor="#f5dca4" />
-          <stop offset="0.7" stopColor="#a67c3d" />
-          <stop offset="1" stopColor="#4a3519" />
-        </linearGradient>
-        <radialGradient id="lsp-inner" cx="0.5" cy="0.35" r="0.65">
-          <stop offset="0" stopColor="#fffaf0" />
-          <stop offset="0.35" stopColor="#ffd894" />
-          <stop offset="0.8" stopColor="#e39a3c" />
-          <stop offset="1" stopColor="#9a5f1c" />
-        </radialGradient>
-        <radialGradient id="lsp-bulb" cx="0.45" cy="0.4" r="0.6">
-          <stop offset="0" stopColor="#ffffff" />
-          <stop offset="0.5" stopColor="#fff1cf" />
-          <stop offset="1" stopColor="#ffc771" />
-        </radialGradient>
-        <linearGradient id="lsp-cone" x1="0" y1="0" x2="0" y2="1">
-          <stop offset="0" stopColor="#ffc46e" stopOpacity="0.34" />
-          <stop offset="0.45" stopColor="#f0a53a" stopOpacity="0.12" />
-          <stop offset="1" stopColor="#f0a53a" stopOpacity="0" />
-        </linearGradient>
-        <radialGradient id="lsp-halo" cx="0.5" cy="0.5" r="0.5">
-          <stop offset="0" stopColor="#ffe2ac" stopOpacity="0.7" />
-          <stop offset="0.4" stopColor="#f0a53a" stopOpacity="0.22" />
-          <stop offset="1" stopColor="#f0a53a" stopOpacity="0" />
-        </radialGradient>
-        <radialGradient id="lsp-pool" cx="0.5" cy="0.5" r="0.5">
-          <stop offset="0" stopColor="#f0a53a" stopOpacity="0.32" />
-          <stop offset="0.6" stopColor="#f0a53a" stopOpacity="0.08" />
-          <stop offset="1" stopColor="#f0a53a" stopOpacity="0" />
-        </radialGradient>
-        <linearGradient id="lsp-cord" x1="0" y1="0" x2="1" y2="0">
-          <stop offset="0" stopColor="#0d0b09" />
-          <stop offset="0.5" stopColor="#3a322a" />
-          <stop offset="1" stopColor="#0d0b09" />
-        </linearGradient>
-      </defs>
-
-      {/* 빛: 원뿔, 바닥 웅덩이, 테 주변 번짐 */}
-      <g className="ls-on">
-        <path d="M70 380 L330 380 L940 1000 L-540 1000 Z" fill="url(#lsp-cone)" />
-        <ellipse cx="200" cy="990" rx="560" ry="70" fill="url(#lsp-pool)" />
-        <ellipse cx="200" cy="384" rx="230" ry="70" fill="url(#lsp-halo)" />
-      </g>
-
-      {/* 천장 받침 */}
-      <path d="M160 0 L240 0 L232 14 Q200 20 168 14 Z" fill="url(#lsp-brass)" />
-      {/* 전선 */}
-      <rect x="198" y="14" width="4" height="220" fill="url(#lsp-cord)" />
-      {/* 소켓 덮개 */}
-      <path d="M186 228 L214 228 L218 262 L182 262 Z" fill="url(#lsp-brass)" />
-      <rect x="190" y="230" width="3" height="30" rx="1.5" fill="#fff4dc" opacity="0.45" />
-
-      {/* 갓: 돔 */}
-      <path d="M182 258 C120 266 66 306 52 378 L348 378 C334 306 280 266 218 258 Z" fill="url(#lsp-metal)" />
-      <path d="M182 258 C120 266 66 306 52 378 L348 378 C334 306 280 266 218 258 Z" fill="url(#lsp-spec)" />
-      {/* 하이라이트 한 줄 */}
-      <path d="M170 266 C120 280 86 314 72 360" fill="none" stroke="#fff3df" strokeOpacity="0.55" strokeWidth="3" strokeLinecap="round" />
-      {/* 갓 테 */}
-      <ellipse cx="200" cy="378" rx="148" ry="15" fill="url(#lsp-brass)" />
-
-      {/* 갓 안쪽: 꺼지면 어둡고 켜지면 빛난다 */}
-      <ellipse cx="200" cy="380" rx="140" ry="11" fill="#0b0908" />
-      <g className="ls-on">
-        <ellipse cx="200" cy="380" rx="140" ry="11" fill="url(#lsp-inner)" />
-        <ellipse cx="200" cy="384" rx="34" ry="16" fill="url(#lsp-bulb)" />
-        {/* 갓 바깥에 비친 따뜻한 반사 */}
-        <path d="M60 370 C70 330 100 300 140 284" fill="none" stroke="#f0a53a" strokeOpacity="0.35" strokeWidth="2" strokeLinecap="round" />
-      </g>
-    </svg>
   );
 }
 
@@ -754,7 +578,7 @@ function DarkRoom({
   const litCount = SLOTS.filter((x) => lit[x]).length;
 
   return (
-    <div ref={ref} onPointerMove={move} onPointerLeave={leave} onPointerDown={down} className="relative aspect-[5/4] w-full overflow-hidden rounded-[12px] border md:aspect-[1000/560]" style={{ borderColor: C.line, background: "#070605", touchAction: "pan-y" }}>
+    <div ref={ref} onPointerMove={move} onPointerLeave={leave} onPointerDown={down} className="relative aspect-[5/4] w-full overflow-hidden rounded-[8px] border md:aspect-[1000/560]" style={{ borderColor: C.line, background: "#0c0c0c", touchAction: "pan-y" }}>
       {/* 꺼진 방: 윤곽만 희미하게 */}
       <div aria-hidden className="absolute inset-0" style={{ opacity: reduce ? 0.3 : 0.1 }}>
         <RoomSvg shapes={shapes} ghost />
@@ -788,12 +612,12 @@ function DarkRoom({
           >
             <span
               aria-hidden
-              className="grid h-6 w-6 place-items-center rounded-full border-2"
+              className="grid h-6 w-6 place-items-center rounded-full border"
               style={{
-                borderColor: on ? C.amber : "rgba(240,165,58,0.55)",
+                borderColor: on ? C.amber : "rgba(200,161,101,0.55)",
                 background: on ? C.amber : "rgba(15,13,11,0.7)",
                 color: on ? C.ink : C.amber,
-                boxShadow: on ? "0 0 0 4px rgba(240,165,58,0.25)" : "none",
+                boxShadow: on ? "0 0 0 4px rgba(200,161,101,0.25)" : "none",
                 transition: reduce ? "none" : `background-color ${FLASH_MS}ms, box-shadow ${FLASH_MS}ms`,
               }}
             >
@@ -805,14 +629,14 @@ function DarkRoom({
 
       {/* 상호와 전체 스위치 */}
       <div className="pointer-events-none absolute inset-x-0 top-0 flex items-start justify-between gap-3 p-4 md:p-5">
-        <h2 className="text-[26px] font-bold leading-[1.2] md:text-[34px]" style={{ ...serif, textShadow: "0 1px 2px rgba(0,0,0,0.9), 0 0 16px rgba(0,0,0,0.5)" }}>
+        <h2 className="text-[26px] font-bold leading-[1.2] md:text-[34px]" style={{ textShadow: "0 1px 2px rgba(0,0,0,0.9), 0 0 16px rgba(0,0,0,0.5)" }}>
           {BRAND}
         </h2>
         <button
           type="button"
           onClick={toggleAll}
           aria-pressed={allOn}
-          className={`pointer-events-auto inline-flex flex-none items-center gap-1.5 rounded-full border px-3 py-1.5 text-[14px] font-bold ${focusRing}`}
+          className={`pointer-events-auto inline-flex flex-none items-center gap-1.5 rounded-[6px] border px-3 py-1.5 text-[14px] font-bold ${focusRing}`}
           style={{ borderColor: C.amber, background: allOn ? C.amber : "rgba(15,13,11,0.75)", color: allOn ? C.ink : C.amber, outlineColor: C.cream }}
         >
           {allOn ? <LightbulbOff size={15} aria-hidden /> : <Lightbulb size={15} aria-hidden />}
@@ -840,7 +664,7 @@ function DarkRoom({
 
 type Paint = { body: string; brass: string; shade: string; cord: string; stroke?: string };
 const LIT_PAINT: Paint = { body: "#2b2622", brass: "#c9a15c", shade: "#f1e6d2", cord: "#3a332c" };
-const GHOST_PAINT: Paint = { body: "#1a1512", brass: "#2e2416", shade: "#1d1814", cord: "#1a1512", stroke: "rgba(240,165,58,0.6)" };
+const GHOST_PAINT: Paint = { body: "#1a1512", brass: "#2e2416", shade: "#1d1814", cord: "#1a1512", stroke: "rgba(200,161,101,0.6)" };
 
 function RoomSvg({ shapes, onMv, ghost = false, fixturesOnly = false }: { shapes: Record<Slot, Shape>; onMv?: Record<Slot, MotionValue<number>>; ghost?: boolean; fixturesOnly?: boolean }) {
   const P = ghost ? GHOST_PAINT : LIT_PAINT;
@@ -1171,7 +995,7 @@ function ProductThumb({ shape, color }: { shape: Shape; color: string }) {
         </radialGradient>
       </defs>
       <ellipse cx={g.glow.cx} cy={g.glow.cy} rx={g.glow.rx * 0.6} ry={g.glow.ry * 0.6} fill={`url(#ls-th-${shape})`} />
-      <g>{fixture(shape, { body: "#3b342d", brass: "#c9a15c", shade: "#f1e6d2", cord: "#5a5048" })}</g>
+      <g>{fixture(shape, { body: "#4a4a4a", brass: "#8a8a8a", shade: "#d6d6d6", cord: "#5a5a5a" })}</g>
     </svg>
   );
 }
@@ -1270,15 +1094,15 @@ function QuotePanel({ today, reduce, rows, total, setQty }: { today: Date; reduc
     ) : null;
 
   const inputCls = `mt-2 w-full rounded-[6px] border px-3 py-2.5 text-[16px] ${focusRing}`;
-  const inputStyle = { borderColor: C.line, background: "#0b0a08", color: C.cream, outlineColor: C.amber } as const;
-  const card = "rounded-[10px] border p-5";
+  const inputStyle = { borderColor: C.line, background: "#101010", color: C.cream, outlineColor: C.amber } as const;
+  const card = "rounded-[8px] border p-5";
 
   return (
     <div className="mt-5 grid gap-5 lg:grid-cols-2">
       {/* 담은 제품과 시공 */}
       <div className="grid gap-5">
         <div className={card} style={{ borderColor: C.line, background: C.panel }}>
-          <h3 className="text-[18px] font-bold" style={serif}>
+          <h3 className="text-[18px] font-bold">
             담은 제품
           </h3>
           {rows.length === 0 ? (
@@ -1320,7 +1144,7 @@ function QuotePanel({ today, reduce, rows, total, setQty }: { today: Date; reduc
         </div>
 
         <div className={card} style={{ borderColor: C.line, background: C.panel }}>
-          <h3 className="text-[18px] font-bold" style={serif}>
+          <h3 className="text-[18px] font-bold">
             시공 안내
           </h3>
           <fieldset className="mt-3">
@@ -1332,8 +1156,8 @@ function QuotePanel({ today, reduce, rows, total, setQty }: { today: Date; reduc
               ].map((o) => {
                 const sel = install === o.v;
                 return (
-                  <label key={o.label} className={`flex cursor-pointer items-center justify-center gap-2 rounded-[6px] border px-3 py-2.5 text-[15px] ${sel ? "font-bold" : ""}`} style={{ borderColor: sel ? C.amber : C.line, background: sel ? "rgba(240,165,58,0.12)" : "transparent" }}>
-                    <input type="radio" name="ls-install" checked={sel} onChange={() => setInstall(o.v)} className="accent-[#f0a53a]" />
+                  <label key={o.label} className={`flex cursor-pointer items-center justify-center gap-2 rounded-[6px] border px-3 py-2.5 text-[15px] ${sel ? "font-bold" : ""}`} style={{ borderColor: sel ? C.amber : C.line, background: sel ? "rgba(200,161,101,0.12)" : "transparent" }}>
+                    <input type="radio" name="ls-install" checked={sel} onChange={() => setInstall(o.v)} className="accent-[#c8a165]" />
                     {o.label}
                   </label>
                 );
@@ -1379,7 +1203,7 @@ function QuotePanel({ today, reduce, rows, total, setQty }: { today: Date; reduc
           <DoneView ref={doneRef} done={done} today={today} reduce={reduce} rows={rows} onAgain={reset} />
         ) : (
           <form onSubmit={submit} noValidate>
-            <h3 className="text-[18px] font-bold" style={serif}>
+            <h3 className="text-[18px] font-bold">
               상담신청
             </h3>
             <p className="mt-1 text-[14px]" style={{ color: C.creamDim }}>
@@ -1430,7 +1254,7 @@ function QuotePanel({ today, reduce, rows, total, setQty }: { today: Date; reduc
               {err("day")}
             </fieldset>
             <label className="mt-4 flex items-start gap-2 text-[14px]">
-              <input type="checkbox" checked={agree} onChange={(e) => setAgree(e.target.checked)} className="mt-1 accent-[#f0a53a]" />
+              <input type="checkbox" checked={agree} onChange={(e) => setAgree(e.target.checked)} className="mt-1 accent-[#c8a165]" />
               <span>상담 연락을 위한 개인정보 수집에 동의합니다. 상담 뒤 3개월이 지나면 지워요.</span>
             </label>
             {err("agree")}
@@ -1455,7 +1279,7 @@ function DoneView({ ref, done, today, reduce, rows, onAgain }: { ref: React.Ref<
   );
   return (
     <motion.div ref={ref} initial={reduce ? false : { opacity: 0 }} animate={{ opacity: 1 }} transition={{ duration: 0.3 }} className="scroll-mt-4" role="status">
-      <p className="inline-flex items-center gap-2 text-[18px] font-bold" style={serif}>
+      <p className="inline-flex items-center gap-2 text-[18px] font-bold">
         <Check size={20} aria-hidden style={{ color: C.amber }} /> 상담 접수 완료
       </p>
       <p className="mt-3 text-[28px] font-bold tabular-nums" style={{ color: C.amber }}>
@@ -1494,12 +1318,12 @@ const HOURS = [
 
 function StoreInfo({ today }: { today: Date }) {
   const dow = today.getDay();
-  const card = "rounded-[10px] border p-5";
+  const card = "rounded-[8px] border p-5";
   const h3 = "inline-flex items-center gap-2 text-[18px] font-bold";
   return (
     <div className="mt-5 grid gap-5 lg:grid-cols-3">
       <div className={card} style={{ borderColor: C.line, background: C.panel }}>
-        <h3 className={h3} style={serif}>
+        <h3 className={h3}>
           <Clock size={18} aria-hidden style={{ color: C.amber }} /> 영업시간
         </h3>
         <ul className="mt-3 grid gap-2 text-[15px]">
@@ -1526,7 +1350,7 @@ function StoreInfo({ today }: { today: Date }) {
       </div>
 
       <div className={card} style={{ borderColor: C.line, background: C.panel }}>
-        <h3 className={h3} style={serif}>
+        <h3 className={h3}>
           <Car size={18} aria-hidden style={{ color: C.amber }} /> 주차와 전시장
         </h3>
         <dl className="mt-3 grid gap-3 text-[15px] leading-[1.6]">
@@ -1550,14 +1374,14 @@ function StoreInfo({ today }: { today: Date }) {
       </div>
 
       <div className={card} style={{ borderColor: C.line, background: C.panel }}>
-        <h3 className={h3} style={serif}>
+        <h3 className={h3}>
           <MapPin size={18} aria-hidden style={{ color: C.amber }} /> 오시는 길
         </h3>
         <p className="mt-3 text-[15px] font-bold">{ADDRESS}</p>
         <p className="mt-1 inline-flex items-center gap-1.5 text-[14px]" style={{ color: C.creamDim }}>
           <Train size={15} aria-hidden /> ㅇㅇ역 3번 출구 도보 5분
         </p>
-        <svg viewBox="0 0 300 160" className="mt-3 w-full rounded-[6px]" role="img" aria-label="역에서 매장까지 가는 약도" style={{ background: "#0b0a08" }}>
+        <svg viewBox="0 0 300 160" className="mt-3 w-full rounded-[6px]" role="img" aria-label="역에서 매장까지 가는 약도" style={{ background: "#101010" }}>
           <path d="M0 110 H300" stroke="#2a241c" strokeWidth="18" />
           <path d="M70 0 V160" stroke="#2a241c" strokeWidth="14" />
           <path d="M200 0 V160" stroke="#2a241c" strokeWidth="10" />
@@ -1568,7 +1392,7 @@ function StoreInfo({ today }: { today: Date }) {
           </text>
           <rect x="210" y="34" width="60" height="30" rx="4" fill={C.amber} />
           <text x="240" y="54" textAnchor="middle" fontSize="12" fontWeight="700" fill={C.ink}>
-            곰파트너조명
+            곰파트너
           </text>
           <text x="248" y="80" textAnchor="middle" fontSize="11" fill={C.creamDim}>
             1층

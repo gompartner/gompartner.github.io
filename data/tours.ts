@@ -116,7 +116,7 @@ export const tours: Record<string, TourStep[]> = {
   ],
   "landing-leather-class": [
     { target: "#lc-apply", title: "수업 신청", desc: "회차를 고르세요. 남은 자리가 0이면 대기 신청으로 바뀝니다." },
-    { target: "#lc-change", title: "예약 확인·변경", desc: "예약 번호로 찾아 날짜를 바꾸거나 취소해 보세요. 환불 금액이 같이 나옵니다." },
+    { target: "#lc-change", title: "예약 확인과 변경", desc: "예약 번호로 찾아 날짜를 바꾸거나 취소해 보세요. 환불 금액이 같이 나옵니다." },
     { target: "#lc-owner", title: "사장님 화면", desc: "회차를 누르면 신청자와 결제 상태, 변경 이력이 보입니다." },
   ],
   "landing-coding-camp": [
@@ -169,16 +169,16 @@ export const tours: Record<string, TourStep[]> = {
   ],
   "retirement-calculator": [
     { target: "#input-title", title: "내 정보", desc: "나이, 저축액, 생활비를 바꾸세요." },
-    { target: '[aria-label="투자 성향"]', title: "투자 성향", desc: "성향을 바꾸면 부족·여유 금액이 다시 계산됩니다." },
+    { target: '[aria-label="투자 성향"]', title: "투자 성향", desc: "성향을 바꾸면 부족, 여유 금액이 다시 계산됩니다." },
   ],
   "roastery": [
     { target: "#rs-roast", title: "로스팅 장면", desc: "스크롤을 내리며 원두 색과 온도가 바뀌는 걸 보세요." },
     { target: "#rs-notes", title: "로스팅 포인트", desc: "단계를 누르면 맛 노트와 추천 원두가 바뀝니다." },
-    { target: "#rs-grind", title: "분쇄 선택", desc: "용도를 누르면 입자 굵기가 바뀝니다." },
+    { target: "#rs-grind", title: "분쇄 선택", desc: "용도를 누르면 사진과 굵기 설명이 바뀝니다." },
     { target: "#rs-subscribe", title: "구독 계산", desc: "주기와 용량, 봉수를 골라 회당 금액을 보세요." },
   ],
   "hair-salon": [
-    { target: "#hs-designers", title: "디자이너 선택", desc: "디자이너를 고르세요. 화면 색과 단가가 바뀝니다." },
+    { target: "#hs-designers", title: "디자이너 선택", desc: "디자이너를 고르세요. 메뉴 단가가 바뀝니다." },
     { target: "#hs-menu", title: "시술 담기", desc: "시술을 여러 개 담으면 시간과 금액이 합산됩니다." },
     { target: "#hs-reserve", title: "예약 시간표", desc: "빈 칸을 누르면 소요시간만큼 잡힙니다." },
     { target: "#hs-stylebook", title: "스타일북", desc: "스타일 이름을 누르면 어울리는 시술 조합이 나옵니다." },

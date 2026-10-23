@@ -3,13 +3,12 @@
 import { useEffect, useMemo, useRef, useState, type ReactNode } from "react";
 import { AnimatePresence, motion, useScroll, useTransform } from "framer-motion";
 import { AlertCircle, Bus, CalendarCheck, Car, Check, ChevronLeft, ChevronRight, Clock, MapPin, Phone, RotateCcw, TrainFront, X } from "lucide-react";
-import { Black_Han_Sans, Nanum_Pen_Script } from "@/lib/local-fonts";
 import { useReducedMotionSafe } from "@/hooks/useReducedMotionSafe";
 import { daysAgo, fmtKo, useDemoToday } from "@/hooks/useDemoToday";
 import { maskName, maskPhone } from "@/components/demos/LeadReceivedPanel";
 import { DemoMakerInfo } from "@/components/demos/DemoMakerInfo";
 
-/* 입시 미술학원 홈페이지 샘플: 가상의 곰파트너미술학원. 입시반(고1 ~ 재수), 성인 취미반, 초등반을 같이 운영한다.
+/* 입시 미술학원 홈페이지 샘플: 가상의 미술학원 곰파트너. 입시반(고1 ~ 재수), 성인 취미반, 초등반을 같이 운영한다.
    상호, 주소, 전화번호는 모두 가상이다. 학생 이름과 합격 실적은 넣지 않는다.
 
    국내 입시 미술학원 사이트 공통 구성(참고): 메뉴는 학원 소개, 입시반(기초디자인, 사고의 전환, 소묘, 정물수채화),
@@ -17,10 +16,11 @@ import { DemoMakerInfo } from "@/components/demos/DemoMakerInfo";
    첫 화면에는 모집 중인 반과 상담 예약 버튼을 둔다. 교습비는 교육청 신고 교습비처럼 "월 교습비"와 기타경비(재료비)를 표로 공개한다.
    관용 문구: 방문 상담, 상담 예약, 실기 시간표, 평일반, 주말반, 재료비 별도, 수업 작품.
 
-   포스터 첫 화면(aa-poster): 종이 흰색 바탕에 큰 문장 "연필 깎는 법부터 같이 해요" 하나만 둔다. 메뉴, 카드, 가격은 없다.
-   오른쪽(휴대폰은 아래)에 목탄 선이 천, 병, 사과 정물 소묘를 그려 나가고, 이어 명암이 깔리고 해칭이 쌓인다.
-   사과에만 주황 파스텔 몇 획, 앞에는 깎아 둔 주황 연필과 연필밥. 스크롤하면 스케치북 한 장이 위로 넘어가며 아래 화면이 나온다.
-   동작 줄이기면 다 그려진 그림으로 고정하고 넘김도 없다.
+   첫 화면(aa-poster): 연필로 인체 소묘를 그리는 사진 한 장을 화면 가득 깔고 왼쪽 아래에 문장 "연필 깎는 법부터 같이 해요"를 둔다.
+   사진이 밝아서 흰 막을 깔고 글자는 먹색으로 쓴다.
+   핵심 모션: 들어올 때 사진이 1.6초 동안 천천히 다가오고(scale 1.06 에서 1), 문장은 0.3초 늦게 아래 12px 에서 올라온다(CSS).
+   스크롤하면 사진만 조금 느리게 내려간다(y 0 에서 8%). 동작 줄이기면 전부 멈춘 상태로 둔다.
+   사진 출처: Pexels 사진 7171387
 
    상호작용(모두 브라우저 안에서만 돈다. 실제로 보내지 않는다)
    1. 반 안내: 입시반, 취미반, 초등반 탭과 주 횟수 칩. 고르면 과목, 수업 시간, 정원, 월 교습비가 바뀐다.
@@ -28,69 +28,40 @@ import { DemoMakerInfo } from "@/components/demos/DemoMakerInfo";
    3. 실기 시간표: 반을 고르면 그 반 줄만 진하게, 오늘 요일 열을 표시한다.
    4. 상담 신청: 학년, 관심 반, 방문 날짜와 시간, 이름과 연락처. 접수 번호, 담당 창구, 회신 예정일이 찍힌 접수증을 보여 준다. */
 
-const heavyF = {
-  fontFamily: `${Black_Han_Sans.style.fontFamily}, sans-serif`,
-  fontWeight: 400,
-} as const;
-const penF = {
-  fontFamily: `${Nanum_Pen_Script.style.fontFamily}, cursive`,
-} as const;
-
-const BRAND = "곰파트너미술학원";
 const ADDRESS = "서울 ㅇㅇ구 ㅇㅇ로 00, 3층";
 const TEL = "02-000-0000";
 const KAKAO = "카카오톡 채널 곰파트너";
 
 const C = {
-  paper: "#f6f3ec",
-  sheet: "#fbf9f4",
-  under: "#e6dfd0",
-  ink: "#1f1d1a",
-  char: "#3a3733",
-  muted: "#5d5852",
-  line: "#d8d1c3",
-  orange: "#e2621b",
-  orangeInk: "#b8470f",
-  orangeTint: "#fbe6d8",
+  paper: "#ffffff",
+  sheet: "#ffffff",
+  /** 구역 구분 옅은 회색 */
+  soft: "#f7f7f5",
+  ink: "#111111",
+  char: "#4b4b4b",
+  muted: "#707070",
+  line: "#e5e5e5",
+  /** 강조색 하나: 채도를 낮춘 주황(연필 색) */
+  orange: "#9a4a1c",
+  orangeInk: "#9a4a1c",
+  orangeTint: "#f7f7f5",
   error: "#b42318",
 };
 
 /* 모션 상수. 시간은 초, 이징은 cubic-bezier */
 const EASE = [0.22, 1, 0.36, 1] as const;
-/** 목탄 선 한 획이 그려지는 시간과 획 사이 간격 */
-const LINE_DUR = 0.7;
-const LINE_GAP = 0.07;
-/** 명암 칠이 올라오는 시작과 길이 */
-const TONE_AT = 0.8;
-const TONE_DUR = 0.6;
-/** 해칭이 쌓이는 시작과 길이 */
-const HATCH_AT = 1.0;
-const HATCH_DUR = 0.8;
-/** 주황 파스텔과 문장 밑줄 */
-const ORANGE_AT = 1.35;
-const ORANGE_DUR = 0.5;
-/** 스케치북 넘김이 끝나는 스크롤 진행도(포스터 래퍼 기준). 고정이 풀리기 전에 끝낸다 */
-const FLIP_END = 0.42;
+/** 첫 화면 사진이 다가오는 시간 */
+const PHOTO_IN = 1.6;
+/** 사진 위 흰 막. 밝은 사진이라 왼쪽 아래를 하얗게 덮고 먹색 글자를 올린다 */
+const SCRIM = "linear-gradient(to top, rgba(255,255,255,0.9), rgba(255,255,255,0.55) 45%, rgba(255,255,255,0.1) 80%), linear-gradient(to right, rgba(255,255,255,0.6), rgba(255,255,255,0) 60%)";
+const POSTER_CSS = `@keyframes aa-rise{from{opacity:0;transform:translateY(12px)}}.aa-rise{animation:aa-rise .7s cubic-bezier(0.22,1,0.36,1) .3s both}@media (prefers-reduced-motion:reduce){.aa-rise{animation:none}}`;
+const IMG = "/images/demo-art-academy";
 /** 탭 패널이 왼쪽부터 쓸리며 바뀌는 시간 */
 const WIPE = 0.45;
 
 const focusRing = "focus-visible:outline focus-visible:outline-[3px] focus-visible:outline-offset-2";
 const won = (n: number) => `${n.toLocaleString("ko-KR")}원`;
 const p2 = (n: number) => String(n).padStart(2, "0");
-
-/** 종이 결. 정지 이미지라 필터 비용은 한 번뿐이다 */
-const GRAIN = `url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='180' height='180'><filter id='n'><feTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='2' stitchTiles='stitch'/><feColorMatrix values='0 0 0 0 0.12  0 0 0 0 0.11  0 0 0 0 0.1  0 0 0 0.1 0'/></filter><rect width='100%' height='100%' filter='url(%23n)'/></svg>")`;
-
-/** 사각 영역에 45도 사선 해칭을 긋는 path. dir 이 -1 이면 반대 방향 */
-function hatchD(x0: number, y0: number, x1: number, y1: number, gap: number, dir: 1 | -1 = 1) {
-  const h = y1 - y0;
-  const out: string[] = [];
-  for (let c = x0 - h; c < x1; c += gap) {
-    if (dir === 1) out.push(`M${c.toFixed(1)} ${y1}L${(c + h).toFixed(1)} ${y0}`);
-    else out.push(`M${c.toFixed(1)} ${y0}L${(c + h).toFixed(1)} ${y1}`);
-  }
-  return out.join("");
-}
 
 /* ---------- 반과 교습비 ---------- */
 
@@ -389,9 +360,8 @@ export function ArtAcademyDemo() {
       <Poster reduce={reduce} onCta={() => go("aa-consult")} />
 
       <header className="mx-auto flex max-w-[1200px] flex-wrap items-center justify-between gap-x-4 gap-y-2 px-4 py-4 md:px-6">
-        <h2 className="inline-flex items-center gap-2 text-[22px] leading-none" style={heavyF}>
-          <PencilMark size={24} />
-          {BRAND}
+        <h2>
+          <SampleLogo />
         </h2>
         <nav aria-label="주요 메뉴" className="-mx-2 flex flex-wrap items-center">
           {[
@@ -464,10 +434,10 @@ export function ArtAcademyDemo() {
         <Visit dow={dow} />
       </section>
 
-      <footer className="mt-20 border-t px-4 pb-24 pt-8 text-[14px] leading-[1.8] md:px-6" style={{ borderColor: C.line, color: C.muted, background: C.sheet }}>
+      <footer className="mt-20 border-t px-4 pb-24 pt-8 text-[14px] leading-[1.8] md:px-6" style={{ borderColor: C.line, color: C.muted, background: C.soft }}>
         <div className="mx-auto max-w-[1200px]">
-          <p className="text-[16px] font-bold" style={{ color: C.ink }}>
-            {BRAND}
+          <p>
+            <SampleLogo size={18} />
           </p>
           <p>
             {ADDRESS} | 전화 {TEL} | {KAKAO}
@@ -484,29 +454,11 @@ export function ArtAcademyDemo() {
 
 function SectionTitle({ id, title }: { id: string; title: string }) {
   return (
-    <div className="mb-6 flex items-end gap-4">
-      <h2 id={id} className="text-[30px] leading-none md:text-[40px]" style={heavyF}>
+    <div className="mb-6 border-b pb-3" style={{ borderColor: C.line }}>
+      <h2 id={id} className="text-[28px] font-bold leading-tight tracking-[-0.03em] md:text-[36px]">
         {title}
       </h2>
-      {/* 목탄으로 그은 듯한 가로줄 */}
-      <svg aria-hidden viewBox="0 0 400 12" preserveAspectRatio="none" className="mb-1 h-3 min-w-0 flex-1">
-        <path d="M2 7 C80 4 160 9 240 6 C300 4 360 8 398 5" fill="none" stroke={C.char} strokeWidth="2.2" strokeLinecap="round" opacity="0.55" />
-        <path d="M6 9 C90 7 170 10 250 8" fill="none" stroke={C.char} strokeWidth="1" strokeLinecap="round" opacity="0.35" />
-      </svg>
     </div>
-  );
-}
-
-function PencilMark({ size = 20 }: { size?: number }) {
-  return (
-    <svg width={size} height={size} viewBox="0 0 24 24" aria-hidden>
-      <g transform="rotate(-45 12 12)">
-        <rect x="1" y="9" width="15" height="6" fill={C.orange} />
-        <rect x="1" y="9" width="15" height="2" fill="#f2915a" />
-        <path d="M16 9 L21 12 L16 15 Z" fill="#e9c9a0" />
-        <path d="M19.6 11.2 L22.4 12 L19.6 12.8 Z" fill={C.ink} />
-      </g>
-    </svg>
   );
 }
 
@@ -519,9 +471,9 @@ function Chip({ on, onClick, children, gtm, noCheck }: { on: boolean; onClick: (
       data-gtm-cta={gtm}
       className={`inline-flex min-h-[40px] items-center gap-1.5 rounded-[4px] border px-3.5 text-[15px] font-semibold transition-colors duration-150 ${focusRing}`}
       style={{
-        borderColor: on ? C.ink : C.line,
-        background: on ? C.ink : C.sheet,
-        color: on ? C.sheet : C.ink,
+        borderColor: on ? C.orangeInk : "#c8c8c8",
+        background: on ? C.orangeInk : C.sheet,
+        color: on ? "#fff" : C.ink,
         outlineColor: C.orangeInk,
       }}
     >
@@ -533,381 +485,68 @@ function Chip({ on, onClick, children, gtm, noCheck }: { on: boolean; onClick: (
 
 /* ---------- 포스터 ---------- */
 
-/** 포스터 그림 좌표(viewBox 640 x 720) */
-const BOTTLE_D = "M284 116 L284 228 C284 262 236 278 236 318 L236 556 C236 572 364 572 364 556 L364 318 C364 278 316 262 316 228 L316 116 Z";
-const APPLE_D = "M450 452 C488 432 532 458 530 512 C528 566 492 594 454 590 C444 588 438 584 428 586 C390 592 372 556 374 512 C376 462 414 436 450 452 Z";
-const SHADOW_D = "M364 546 C430 538 530 534 610 540 C580 556 440 566 364 568 Z";
-
-/** 그려지는 순서대로 목탄 윤곽선. [d, 굵기] */
-const OUTLINES: [string, number][] = [
-  ["M18 566 C180 560 420 556 622 552", 2.4],
-  ["M70 150 C150 140 200 160 236 150", 2],
-  ["M70 150 C96 250 84 380 112 470 C122 510 104 540 96 566", 2.4],
-  ["M150 160 C160 260 140 380 170 520 C176 545 168 556 162 566", 1.6],
-  [BOTTLE_D, 2.8],
-  ["M278 110 C278 99 322 99 322 110 C322 121 278 121 278 110 Z", 2],
-  ["M284 134 C292 139 308 139 316 134", 1.6],
-  [APPLE_D, 2.8],
-  ["M450 454 C448 436 452 420 462 410", 3],
-  ["M456 440 C470 418 498 418 506 426 C494 440 474 446 456 440 Z", 2],
-  ["M40 640 C140 600 230 618 330 600 C420 584 520 612 610 590", 1.8],
-  ["M120 712 C150 662 200 640 250 622", 1.4],
-];
-
-/** 해칭 묶음. [clip id 접미사, d, 진하기] */
-const HATCHES: [string, string, number][] = [
-  ["bg", hatchD(372, 150, 630, 548, 9), 0.32],
-  ["bottle", hatchD(304, 270, 366, 572, 7), 0.6],
-  ["bottle", hatchD(330, 300, 366, 560, 7, -1), 0.45],
-  ["apple", hatchD(440, 486, 534, 594, 6), 0.55],
-  ["shadow", hatchD(364, 530, 612, 600, 6, -1), 0.6],
-  ["table", hatchD(18, 566, 630, 720, 11), 0.22],
-];
-
-/** 사과 위 주황 파스텔 */
-const PASTEL = [...[0, 1, 2, 3, 4, 5].map((i) => `M${384 + i * 14} ${536 - (i % 2) * 14 - i * 2} L${404 + i * 14} ${478 + (i % 3) * 6 - i * 3}`), "M500 468 C524 490 526 532 506 560"];
-
-/** 연필밥 가장자리. 물결진 고리 */
-function ruffle(cx: number, cy: number, r: number, n: number, amp: number) {
-  const pts: string[] = [];
-  for (let i = 0; i <= n * 2; i++) {
-    const a = (i / (n * 2)) * Math.PI * 2;
-    const rr = r + (i % 2 === 0 ? amp : -amp);
-    pts.push(`${i === 0 ? "M" : "L"}${(cx + Math.cos(a) * rr).toFixed(1)} ${(cy + Math.sin(a) * rr * 0.62).toFixed(1)}`);
-  }
-  return pts.join(" ") + " Z";
-}
-
 function Poster({ reduce, onCta }: { reduce: boolean; onCta: () => void }) {
   const ref = useRef<HTMLElement>(null);
-  const { scrollYProgress } = useScroll({
-    target: ref,
-    offset: ["start start", "end start"],
-  });
-  const p = useTransform(scrollYProgress, (v) => (reduce ? 0 : Math.min(1, v / FLIP_END)));
-  // 스케치북 한 장이 윗변을 축으로 들려 넘어간다
-  const rotateX = useTransform(p, (v) => v * v * 104);
-  const pageShade = useTransform(p, (v) => v * 0.3);
-  const pageO = useTransform(p, (v) => (v > 0.97 ? 0 : 1));
-
-  const lineT = (i: number) => ({
-    duration: reduce ? 0 : LINE_DUR,
-    delay: reduce ? 0 : 0.15 + i * LINE_GAP,
-    ease: EASE,
-  });
-  const drawInit = reduce ? false : { pathLength: 0 };
+  const { scrollYProgress } = useScroll({ target: ref, offset: ["start start", "end start"] });
+  const photoY = useTransform(scrollYProgress, (v) => (reduce ? "0%" : `${v * 8}%`));
 
   return (
-    <section id="aa-poster" ref={ref} aria-labelledby="aa-poster-title" className="relative" style={{ height: reduce ? undefined : "180svh", background: C.under }}>
-      <div className={`${reduce ? "relative min-h-svh" : "sticky top-0 h-svh"} overflow-hidden`} style={{ backgroundColor: C.under, backgroundImage: GRAIN }}>
-        {/* 넘어가는 한 장 */}
+    <section id="aa-poster" ref={ref} aria-labelledby="aa-poster-title" className="relative flex min-h-[100svh] flex-col overflow-hidden" style={{ background: C.soft, color: C.ink }}>
+      <style>{POSTER_CSS}</style>
+      <motion.div className="absolute inset-0" style={{ y: photoY }}>
         <motion.div
           className="absolute inset-0"
-          style={{
-            rotateX,
-            opacity: pageO,
-            transformOrigin: "50% 0%",
-            transformPerspective: 1500,
-            backfaceVisibility: "hidden",
-            backgroundColor: C.sheet,
-            backgroundImage: GRAIN,
-            color: C.ink,
-          }}
+          initial={reduce ? false : { scale: 1.06 }}
+          animate={{ scale: 1 }}
+          transition={{ duration: reduce ? 0 : PHOTO_IN, ease: EASE }}
         >
-          {/* 정물 소묘 */}
-          <div className="pointer-events-none absolute inset-x-0 bottom-0 flex h-[56svh] justify-center lg:inset-x-auto lg:bottom-[2svh] lg:right-[3vw] lg:h-auto lg:w-[min(46vw,80svh)]">
-            <svg viewBox="0 0 640 720" className="h-full w-auto lg:h-auto lg:w-full" role="img" aria-label="목탄으로 그린 천, 병, 사과 정물 소묘와 그 앞에 깎아 둔 주황 연필과 연필밥">
-              <defs>
-                <clipPath id="aa-p-c-bottle">
-                  <path d={BOTTLE_D} />
-                </clipPath>
-                <clipPath id="aa-p-c-apple">
-                  <path d={APPLE_D} />
-                </clipPath>
-                <clipPath id="aa-p-c-shadow">
-                  <path d={SHADOW_D} />
-                  <ellipse cx="482" cy="592" rx="80" ry="13" />
-                </clipPath>
-                <clipPath id="aa-p-c-bg">
-                  <path d="M372 548 L372 196 C450 166 560 176 630 150 L630 548 Z" />
-                </clipPath>
-                <clipPath id="aa-p-c-table">
-                  <path d="M18 566 C180 560 420 556 622 552 L630 720 L18 720 Z" />
-                </clipPath>
-                <linearGradient id="aa-p-bottle" x1="0" y1="0" x2="1" y2="0">
-                  <stop offset="0" stopColor="#57524c" />
-                  <stop offset="0.14" stopColor="#d9d3c8" />
-                  <stop offset="0.26" stopColor="#6a655e" />
-                  <stop offset="0.7" stopColor="#2c2a27" />
-                  <stop offset="0.9" stopColor="#4a4640" />
-                  <stop offset="1" stopColor="#6b665f" />
-                </linearGradient>
-                <radialGradient id="aa-p-apple" cx="0.34" cy="0.3" r="0.82">
-                  <stop offset="0" stopColor="#f3eee5" />
-                  <stop offset="0.35" stopColor="#bdb6aa" />
-                  <stop offset="0.8" stopColor="#5f5a53" />
-                  <stop offset="1" stopColor="#3b3834" />
-                </radialGradient>
-                <linearGradient id="aa-p-drape" x1="0" y1="0" x2="1" y2="0.3">
-                  <stop offset="0" stopColor="#8d877e" stopOpacity="0.5" />
-                  <stop offset="0.5" stopColor="#c9c2b6" stopOpacity="0.25" />
-                  <stop offset="1" stopColor="#8d877e" stopOpacity="0.45" />
-                </linearGradient>
-                <radialGradient id="aa-p-cast" cx="0.3" cy="0.5" r="0.7">
-                  <stop offset="0" stopColor="#2a2724" stopOpacity="0.55" />
-                  <stop offset="1" stopColor="#2a2724" stopOpacity="0.08" />
-                </radialGradient>
-                <linearGradient id="aa-p-pencil" x1="0" y1="0" x2="0" y2="1">
-                  <stop offset="0" stopColor="#f6a271" />
-                  <stop offset="0.34" stopColor="#f6a271" />
-                  <stop offset="0.35" stopColor={C.orange} />
-                  <stop offset="0.66" stopColor={C.orange} />
-                  <stop offset="0.67" stopColor="#a8430f" />
-                  <stop offset="1" stopColor="#8c360b" />
-                </linearGradient>
-                <linearGradient id="aa-p-wood" x1="0" y1="0" x2="0" y2="1">
-                  <stop offset="0" stopColor="#f4dcb8" />
-                  <stop offset="0.6" stopColor="#d9b282" />
-                  <stop offset="1" stopColor="#a87d4e" />
-                </linearGradient>
-                <linearGradient id="aa-p-lead" x1="0" y1="0" x2="0" y2="1">
-                  <stop offset="0" stopColor="#77736d" />
-                  <stop offset="0.5" stopColor="#2b2926" />
-                  <stop offset="1" stopColor="#141312" />
-                </linearGradient>
-                <linearGradient id="aa-p-fade-bg" gradientUnits="userSpaceOnUse" x1="372" y1="0" x2="520" y2="0">
-                  <stop offset="0" stopColor="#000" />
-                  <stop offset="1" stopColor="#fff" />
-                </linearGradient>
-                <radialGradient id="aa-p-fade-table" gradientUnits="userSpaceOnUse" cx="380" cy="600" r="250">
-                  <stop offset="0.45" stopColor="#fff" />
-                  <stop offset="1" stopColor="#000" />
-                </radialGradient>
-                <mask id="aa-p-m-bg" maskUnits="userSpaceOnUse" x="0" y="0" width="640" height="720">
-                  <rect width="640" height="720" fill="url(#aa-p-fade-bg)" />
-                </mask>
-                <mask id="aa-p-m-table" maskUnits="userSpaceOnUse" x="0" y="0" width="640" height="720">
-                  <rect width="640" height="720" fill="url(#aa-p-fade-table)" />
-                </mask>
-                <radialGradient id="aa-p-floor" cx="0.5" cy="0.5" r="0.5">
-                  <stop offset="0" stopColor="#1f1d1a" stopOpacity="0.35" />
-                  <stop offset="1" stopColor="#1f1d1a" stopOpacity="0" />
-                </radialGradient>
-              </defs>
-
-              {/* 명암 칠: 천, 병, 사과, 그림자 */}
-              <motion.g
-                initial={reduce ? false : { opacity: 0.3 }}
-                animate={{ opacity: 1 }}
-                transition={{
-                  duration: reduce ? 0 : TONE_DUR,
-                  delay: reduce ? 0 : TONE_AT,
-                  ease: "easeOut",
-                }}
-              >
-                <path d="M70 150 C150 140 200 160 236 150 L236 566 L96 566 C104 540 122 510 112 470 C84 380 96 250 70 150 Z" fill="url(#aa-p-drape)" />
-                <path d={SHADOW_D} fill="url(#aa-p-cast)" />
-                <ellipse cx="482" cy="592" rx="80" ry="13" fill="url(#aa-p-cast)" />
-                <path d={BOTTLE_D} fill="url(#aa-p-bottle)" opacity="0.92" />
-                <path d={APPLE_D} fill="url(#aa-p-apple)" />
-              </motion.g>
-
-              {/* 해칭 */}
-              {HATCHES.map(([clip, d, o], i) => (
-                <g key={i} clipPath={`url(#aa-p-c-${clip})`} mask={clip === "bg" || clip === "table" ? `url(#aa-p-m-${clip})` : undefined}>
-                  <motion.path
-                    d={d}
-                    fill="none"
-                    stroke={C.char}
-                    strokeWidth="1.3"
-                    strokeLinecap="round"
-                    opacity={o}
-                    initial={drawInit}
-                    animate={{ pathLength: 1 }}
-                    transition={{
-                      duration: reduce ? 0 : HATCH_DUR,
-                      delay: reduce ? 0 : HATCH_AT + i * 0.08,
-                      ease: "linear",
-                    }}
-                  />
-                </g>
-              ))}
-
-              {/* 윤곽선 */}
-              {OUTLINES.map(([d, w], i) => (
-                <motion.path
-                  key={i}
-                  d={d}
-                  fill="none"
-                  stroke={C.ink}
-                  strokeWidth={w}
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  opacity="0.88"
-                  initial={drawInit}
-                  animate={{ pathLength: 1 }}
-                  transition={lineT(i)}
-                />
-              ))}
-
-              {/* 지우개로 뺀 빛 */}
-              <motion.g
-                initial={reduce ? false : { opacity: 0 }}
-                animate={{ opacity: 0.9 }}
-                transition={{
-                  duration: reduce ? 0 : 0.4,
-                  delay: reduce ? 0 : HATCH_AT + 0.4,
-                }}
-                stroke={C.sheet}
-                strokeLinecap="round"
-                fill="none"
-              >
-                <path d="M254 332 L254 540" strokeWidth="7" />
-                <path d="M292 142 L292 222" strokeWidth="3.5" />
-                <path d="M408 488 C412 476 420 470 430 468" strokeWidth="6" />
-              </motion.g>
-
-              {/* 주황 파스텔. 사과 안쪽에만 색연필처럼 긋는다 */}
-              <g clipPath="url(#aa-p-c-apple)">
-                {PASTEL.map((d, i) => (
-                  <motion.path
-                    key={d}
-                    d={d}
-                    fill="none"
-                    stroke={C.orange}
-                    strokeWidth={i === PASTEL.length - 1 ? 7 : 4}
-                    strokeLinecap="round"
-                    opacity="0.62"
-                    style={{ mixBlendMode: "multiply" }}
-                    initial={drawInit}
-                    animate={{ pathLength: 1 }}
-                    transition={{
-                      duration: reduce ? 0 : ORANGE_DUR * 0.5,
-                      delay: reduce ? 0 : ORANGE_AT + i * 0.05,
-                      ease: EASE,
-                    }}
-                  />
-                ))}
-              </g>
-
-              {/* 깎아 둔 연필과 연필밥 */}
-              <ellipse cx="350" cy="690" rx="230" ry="12" fill="url(#aa-p-floor)" />
-              <motion.g
-                initial={reduce ? false : { x: 120, rotate: 6 }}
-                animate={{ x: 0, rotate: 0 }}
-                transition={{
-                  duration: reduce ? 0 : 1.1,
-                  delay: reduce ? 0 : 0.2,
-                  ease: EASE,
-                }}
-                style={{ transformBox: "fill-box", transformOrigin: "50% 50%" }}
-              >
-                <g transform="translate(340 662) rotate(-7)">
-                  <rect x="-200" y="-14" width="346" height="28" fill="url(#aa-p-pencil)" />
-                  <ellipse cx="-200" cy="0" rx="5" ry="14" fill="#d9b282" stroke="#8c360b" strokeWidth="2" />
-                  <path d="M146 -14 L198 -3 L198 3 L146 14 Z" fill="url(#aa-p-wood)" />
-                  <path d="M146 -14 C152 -9 148 -5 153 0 C148 5 152 9 146 14" fill="none" stroke={C.orange} strokeWidth="3" />
-                  <path d="M196 -3.4 L218 0 L196 3.4 Z" fill="url(#aa-p-lead)" />
-                  <path d="M-196 -9 L142 -9" stroke="#ffd8bf" strokeWidth="1.6" opacity="0.8" />
-                </g>
-              </motion.g>
-              {[
-                [574, 690, 20],
-                [604, 664, 15],
-              ].map(([x, y, r]) => (
-                <g key={x}>
-                  <path d={ruffle(x, y, r, 9, 3)} fill="url(#aa-p-wood)" stroke={C.orange} strokeWidth="3" strokeLinejoin="round" />
-                  <ellipse cx={x} cy={y} rx={r * 0.38} ry={r * 0.22} fill="#8a6640" />
-                </g>
-              ))}
-            </svg>
-          </div>
-
-          {/* 로고와 핵심 행동 하나 */}
-          <div className="absolute inset-x-0 top-0 z-10 flex items-center justify-between px-4 pt-9 md:px-12 md:pt-11">
-            <p className="inline-flex items-center gap-2 text-[17px] leading-none" style={heavyF}>
-              <PencilMark size={20} />
-              {BRAND}
-            </p>
-            <button
-              type="button"
-              onClick={onCta}
-              aria-label="상담 예약"
-              title="상담 예약"
-              data-gtm-cta="art-academy_poster_cta"
-              className={`inline-flex h-12 w-12 items-center justify-center rounded-full ${focusRing}`}
-              style={{
-                background: C.orangeInk,
-                color: "#fff",
-                outlineColor: C.ink,
-              }}
-            >
-              <CalendarCheck size={22} aria-hidden />
-            </button>
-          </div>
-
-          {/* 큰 문장 */}
-          <div className="relative z-[1] flex h-full flex-col px-4 pt-[13svh] md:px-12 lg:justify-center lg:pb-[4svh] lg:pt-0">
-            <h1
-              id="aa-poster-title"
-              className="text-[clamp(54px,16vw,96px)] leading-[1.06] tracking-[-0.02em] lg:text-[clamp(100px,9.6vw,176px)] lg:leading-[1.04]"
-              style={{ ...heavyF, wordBreak: "keep-all" }}
-            >
-              <span className="block">연필 깎는</span>
-              <span className="block">법부터</span>
-              <span className="relative inline-block">
-                {/* 주황 파스텔 밑줄 */}
-                <svg aria-hidden viewBox="0 0 400 40" preserveAspectRatio="none" className="absolute -bottom-[0.06em] left-[-0.04em] h-[0.34em] w-[104%]" style={{ zIndex: -1 }}>
-                  <motion.path
-                    d="M6 26 C90 14 200 20 300 16 C340 14 370 18 394 14"
-                    fill="none"
-                    stroke={C.orange}
-                    strokeWidth="18"
-                    strokeLinecap="round"
-                    opacity="0.85"
-                    initial={drawInit}
-                    animate={{ pathLength: 1 }}
-                    transition={{
-                      duration: reduce ? 0 : ORANGE_DUR + 0.1,
-                      delay: reduce ? 0 : ORANGE_AT - 0.1,
-                      ease: EASE,
-                    }}
-                  />
-                </svg>
-                같이 해요
-              </span>
-            </h1>
-            <p className="mt-5 text-[16px] md:mt-8 md:text-[19px]" style={{ color: C.muted }}>
-              입시반, 취미반, 초등반 모집
-            </p>
-          </div>
-
-          <motion.div aria-hidden className="pointer-events-none absolute inset-0 z-20 bg-black" style={{ opacity: pageShade }} />
+          {/* eslint-disable-next-line @next/next/no-img-element -- 정적 export 라 next/image 최적화를 쓰지 않는다 */}
+          <img
+            src={`${IMG}/hero.jpg`}
+            srcSet={`${IMG}/hero-sm.jpg 960w, ${IMG}/hero.jpg 1920w`}
+            sizes="100vw"
+            alt="스케치북에 연필로 사람 얼굴 소묘를 그리는 손"
+            fetchPriority="high"
+            className="absolute inset-0 h-full w-full object-cover"
+            style={{ objectPosition: "60% center" }}
+          />
         </motion.div>
+      </motion.div>
+      <div className="absolute inset-0" style={{ background: SCRIM }} aria-hidden />
 
-        {/* 스프링 고리. 넘어가는 장을 붙잡고 제자리에 남는다 */}
-        <SpiralRings />
+      {/* 로고와 핵심 행동 하나 */}
+      <div className="relative z-10 mx-auto flex w-full max-w-[1200px] items-center justify-between gap-4 px-4 pt-4 md:px-6 md:pt-6">
+        <p className="rounded-[6px] px-2 py-1.5" style={{ background: "rgba(255,255,255,0.85)" }}>
+          <SampleLogo size={18} />
+        </p>
+        <button
+          type="button"
+          onClick={onCta}
+          data-gtm-cta="art-academy_poster_cta"
+          className={`inline-flex h-11 flex-none items-center gap-1.5 rounded-[6px] px-4 text-[15px] font-semibold text-white ${focusRing}`}
+          style={{ background: C.orangeInk, outlineColor: C.ink }}
+        >
+          <CalendarCheck size={17} aria-hidden />
+          상담 예약
+        </button>
+      </div>
+
+      {/* 문장 */}
+      <div className={`${reduce ? "" : "aa-rise"} relative z-10 mx-auto mt-auto w-full max-w-[1200px] px-4 pb-[12svh] md:px-6`}>
+        <h1
+          id="aa-poster-title"
+          className="text-[36px] font-bold md:text-[clamp(40px,5vw,72px)]"
+          style={{ wordBreak: "keep-all", letterSpacing: "-0.03em", lineHeight: 1.2 }}
+        >
+          연필 깎는 법부터
+          <br />
+          같이 해요
+        </h1>
+        <p className="mt-4 text-[16px] font-medium md:mt-6 md:text-[18px]" style={{ color: C.char }}>
+          입시반, 취미반, 초등반 모집
+        </p>
       </div>
     </section>
-  );
-}
-
-function SpiralRings() {
-  return (
-    <svg aria-hidden className="pointer-events-none absolute inset-x-0 top-0 z-30 h-[26px] w-full">
-      <defs>
-        <linearGradient id="aa-ring" x1="0" y1="0" x2="1" y2="0">
-          <stop offset="0" stopColor="#7c7c7c" />
-          <stop offset="0.45" stopColor="#f2f2f2" />
-          <stop offset="1" stopColor="#6d6d6d" />
-        </linearGradient>
-        <pattern id="aa-rings" width="34" height="26" patternUnits="userSpaceOnUse">
-          <ellipse cx="17" cy="19" rx="4.2" ry="3.4" fill="#2a2724" opacity="0.75" />
-          <path d="M14 19 C14 6 20 2 22 -2" fill="none" stroke="url(#aa-ring)" strokeWidth="3.4" strokeLinecap="round" />
-        </pattern>
-      </defs>
-      <rect width="100%" height="26" fill="url(#aa-rings)" />
-    </svg>
   );
 }
 
@@ -935,9 +574,8 @@ function ClassPicker({ reduce, cls, setCls, onConsult }: { reduce: boolean; cls:
                 setCls(k);
                 setPlanIdx(0);
               }}
-              className={`relative -mb-px px-4 pb-3 pt-2 text-[18px] md:px-6 md:text-[22px] ${focusRing}`}
+              className={`relative -mb-px px-4 pb-3 pt-2 text-[18px] font-bold md:px-6 md:text-[20px] ${focusRing}`}
               style={{
-                ...heavyF,
                 color: on ? C.ink : C.muted,
                 outlineColor: C.orangeInk,
               }}
@@ -946,7 +584,7 @@ function ClassPicker({ reduce, cls, setCls, onConsult }: { reduce: boolean; cls:
               {on && (
                 <motion.span
                   layoutId={reduce ? undefined : "aa-tab-line"}
-                  className="absolute inset-x-2 bottom-0 h-[5px] rounded-full"
+                  className="absolute inset-x-2 bottom-0 h-[2px]"
                   style={{ background: C.orange }}
                   transition={{ duration: 0.3, ease: EASE }}
                 />
@@ -1000,7 +638,7 @@ function ClassPicker({ reduce, cls, setCls, onConsult }: { reduce: boolean; cls:
               <p className="text-[14px]" style={{ color: C.muted }}>
                 월 교습비
               </p>
-              <p className="text-[32px] leading-tight md:text-[38px]" style={heavyF}>
+              <p className="text-[32px] font-bold leading-tight tracking-[-0.02em] tabular-nums md:text-[36px]">
                 {won(plan.fee)}
               </p>
               <p className="text-[14px]" style={{ color: C.muted }}>
@@ -1011,7 +649,7 @@ function ClassPicker({ reduce, cls, setCls, onConsult }: { reduce: boolean; cls:
               type="button"
               onClick={onConsult}
               data-gtm-cta="art-academy_class_consult"
-              className={`inline-flex min-h-[48px] items-center gap-2 rounded-[4px] px-5 text-[16px] font-bold text-white ${focusRing}`}
+              className={`inline-flex min-h-[48px] items-center gap-2 rounded-[6px] px-5 text-[16px] font-semibold text-white ${focusRing}`}
               style={{ background: C.orangeInk, outlineColor: C.ink }}
             >
               <CalendarCheck size={18} aria-hidden />
@@ -1022,29 +660,14 @@ function ClassPicker({ reduce, cls, setCls, onConsult }: { reduce: boolean; cls:
 
         <figure className="flex w-full flex-col md:max-w-[360px] md:justify-self-end">
           <div className="relative border p-3" style={{ borderColor: C.line, background: "#fff" }}>
-            <Tape className="-top-3 left-6 -rotate-6" />
-            <Tape className="-top-3 right-6 rotate-3" />
-            <StillLife work={cls === "입시반" ? WORKS[0] : cls === "취미반" ? WORKS[7] : WORKS[3]} uid={`cls-${cls}`} />
+            <StillLife work={cls === "입시반" ? WORKS[0] : cls === "취미반" ? WORKS[7] : WORKS[3]} />
           </div>
-          <figcaption className="mt-3 text-[22px] leading-snug" style={{ ...penF, color: C.char }}>
+          <figcaption className="mt-3 text-[15px] leading-[1.6]" style={{ color: C.char }}>
             {info.note}
           </figcaption>
         </figure>
       </motion.div>
     </div>
-  );
-}
-
-function Tape({ className = "" }: { className?: string }) {
-  return (
-    <span
-      aria-hidden
-      className={`absolute z-[1] h-6 w-16 ${className}`}
-      style={{
-        background: "rgba(236,222,190,0.82)",
-        boxShadow: "inset 0 0 0 1px rgba(160,140,100,0.25)",
-      }}
-    />
   );
 }
 
@@ -1067,67 +690,31 @@ const OBJ_EXTRA: Record<ObjType, string> = {
   jar: "M-22 -96 C-22 -102 22 -102 22 -96 C22 -90 -22 -90 -22 -96",
   box: "M-40 -50 L-20 -66 L40 -66 M20 -50 L20 0",
 };
-/** 수채화 색 [밝은 쪽, 중간, 그늘] */
-const WATER: Record<ObjType, [string, string, string]> = {
-  apple: ["#f6a27c", "#d4472b", "#7f2618"],
-  lemon: ["#fff4b0", "#f0c834", "#a9801a"],
-  bottle: ["#c4dccb", "#4f7f68", "#213f36"],
-  cup: ["#ffffff", "#d6dee8", "#7d90a6"],
-  jar: ["#ecc196", "#a86a3d", "#5a3418"],
-  box: ["#f2dfbd", "#c9a573", "#86663f"],
+/** 수채화는 채도를 낮춘 단색, 소묘는 회색 실루엣 */
+const WATER: Record<ObjType, string> = {
+  apple: "#b98a7e",
+  lemon: "#cfc199",
+  bottle: "#94a59a",
+  cup: "#c5cad0",
+  jar: "#b59f8a",
+  box: "#c9bca6",
 };
-const CHAR: [string, string, string] = ["#f1ece3", "#a39c91", "#3d3a35"];
+const CHAR_FILL = "#b9b9b9";
 
-function StillLife({ work, uid }: { work: Work; uid: string }) {
+function StillLife({ work }: { work: Work }) {
   const water = work.medium === "수채화";
-  const id = (s: string) => `aa-${uid}-${s}`;
-  const types = Array.from(new Set(work.objs.map((o) => o.t)));
   return (
     <svg viewBox="0 0 300 400" className="block h-auto w-full" role="img" aria-label={`${work.cls} ${water ? "정물 수채화" : "정물 소묘"}`}>
-      <defs>
-        {types.map((t) => {
-          const [a, b, c] = water ? WATER[t] : CHAR;
-          return (
-            <radialGradient key={t} id={id(t)} cx="0.32" cy="0.3" r="0.85">
-              <stop offset="0" stopColor={a} />
-              <stop offset="0.45" stopColor={b} />
-              <stop offset="1" stopColor={c} />
-            </radialGradient>
-          );
-        })}
-        <linearGradient id={id("wall")} x1="0" y1="0" x2="0" y2="1">
-          <stop offset="0" stopColor={water ? "#9fb1c2" : "#8e887f"} stopOpacity={water ? 0.55 : 0.6} />
-          <stop offset="1" stopColor={water ? "#dfe6ea" : "#e4ded3"} stopOpacity="0.3" />
-        </linearGradient>
-        <linearGradient id={id("table")} x1="0" y1="0" x2="0" y2="1">
-          <stop offset="0" stopColor={water ? "#e7cfaa" : "#cfc8bc"} />
-          <stop offset="1" stopColor={water ? "#c39a6a" : "#8f897f"} />
-        </linearGradient>
-        <clipPath id={id("bgclip")}>
-          <rect x="0" y="0" width="300" height="290" />
-        </clipPath>
-        {water && (
-          <filter id={id("bleed")} x="-5%" y="-5%" width="110%" height="110%">
-            <feTurbulence type="fractalNoise" baseFrequency="0.035" numOctaves="2" seed={work.id.length * 7} />
-            <feDisplacementMap in="SourceGraphic" scale="5" />
-          </filter>
-        )}
-      </defs>
-      <rect width="300" height="400" fill={water ? "#fdfcf8" : "#f4f1ea"} />
-      <rect width="300" height="290" fill={`url(#${id("wall")})`} />
-      <path d="M0 290 L300 284 L300 400 L0 400 Z" fill={`url(#${id("table")})`} opacity={water ? 0.75 : 0.55} />
-      {!water && <path d={hatchD(0, 0, 300, 290, 7)} stroke="#3a3733" strokeWidth="0.7" opacity="0.28" clipPath={`url(#${id("bgclip")})`} />}
-      <g filter={water ? `url(#${id("bleed")})` : undefined}>
-        {work.objs.map((o, i) => (
-          <g key={i} transform={`translate(${o.x} ${o.y}) scale(${o.s})`}>
-            <ellipse cx="26" cy="-2" rx="44" ry="7" fill={water ? "#5a6f86" : "#2a2724"} opacity={water ? 0.35 : 0.45} />
-            <path d={OBJ_PATH[o.t]} fill={`url(#${id(o.t)})`} opacity={water ? 0.9 : 1} />
-            {water && <path d={OBJ_PATH[o.t]} fill={WATER[o.t][1]} opacity="0.18" transform="translate(2 1.5)" />}
-            {!water && <path d={OBJ_PATH[o.t]} fill="none" stroke="#2a2724" strokeWidth="1.3" vectorEffect="non-scaling-stroke" />}
-            <path d={OBJ_EXTRA[o.t]} fill="none" stroke={water ? "#5d4a3a" : "#2a2724"} strokeWidth="1.2" strokeLinecap="round" opacity={water ? 0.7 : 0.9} vectorEffect="non-scaling-stroke" />
-          </g>
-        ))}
-      </g>
+      <rect width="300" height="400" fill="#f7f7f5" />
+      <path d="M0 290 L300 286 L300 400 L0 400 Z" fill="#ececea" />
+      {work.objs.map((o, i) => (
+        <g key={i} transform={`translate(${o.x} ${o.y}) scale(${o.s})`}>
+          <ellipse cx="26" cy="-2" rx="44" ry="7" fill="#000" opacity="0.08" />
+          <path d={OBJ_PATH[o.t]} fill={water ? WATER[o.t] : CHAR_FILL} />
+          <path d={OBJ_PATH[o.t]} fill="none" stroke="#6b6b6b" strokeWidth="1" vectorEffect="non-scaling-stroke" opacity={water ? 0.4 : 0.8} />
+          <path d={OBJ_EXTRA[o.t]} fill="none" stroke="#6b6b6b" strokeWidth="1" strokeLinecap="round" vectorEffect="non-scaling-stroke" />
+        </g>
+      ))}
     </svg>
   );
 }
@@ -1159,7 +746,7 @@ function Gallery({ reduce }: { reduce: boolean }) {
 
       <ul className="mt-6 grid grid-cols-2 gap-x-4 gap-y-8 md:grid-cols-4 md:gap-x-6">
         {list.map((w, i) => (
-          <motion.li key={w.id} layout={!reduce} transition={{ duration: 0.3, ease: EASE }} style={{ rotate: (i % 3) - 1 }}>
+          <motion.li key={w.id} layout={!reduce} transition={{ duration: 0.3, ease: EASE }}>
             <button
               type="button"
               onClick={(e) => {
@@ -1167,11 +754,10 @@ function Gallery({ reduce }: { reduce: boolean }) {
                 setOpen(i);
               }}
               aria-label={`${w.cls} ${w.medium === "소묘" ? "정물 소묘" : "정물 수채화"} 크게 보기`}
-              className={`relative block w-full border bg-white p-2 text-left ${focusRing}`}
+              className={`relative block w-full overflow-hidden rounded-[6px] border bg-white text-left ${focusRing}`}
               style={{ borderColor: C.line, outlineColor: C.orangeInk }}
             >
-              <Tape className="-top-3 left-1/2 -translate-x-1/2 rotate-2" />
-              <StillLife work={w} uid={`g-${w.id}`} />
+              <StillLife work={w} />
             </button>
             <p className="mt-2 text-[15px] font-semibold">{w.cls}</p>
             <p className="text-[14px]" style={{ color: C.muted }}>
@@ -1233,14 +819,14 @@ function Lightbox({ reduce, work, index, total, onMove, onClose }: { reduce: boo
     >
       <motion.div
         key={work.id}
-        className="w-full max-w-[460px] p-4"
+        className="w-full max-w-[460px] rounded-[8px] p-4"
         style={{ background: C.sheet }}
         initial={reduce ? false : { clipPath: "inset(0 0 100% 0)" }}
         animate={{ clipPath: "inset(0 0 0% 0)" }}
         transition={{ duration: reduce ? 0 : 0.35, ease: EASE }}
       >
         <div className="max-h-[62svh] overflow-hidden">
-          <StillLife work={work} uid={`lb-${work.id}`} />
+          <StillLife work={work} />
         </div>
         <div className="mt-3 flex items-start justify-between gap-3">
           <div>
@@ -1264,7 +850,7 @@ function Lightbox({ reduce, work, index, total, onMove, onClose }: { reduce: boo
               <ChevronRight size={20} aria-hidden />
             </button>
           </div>
-          <button ref={closeRef} type="button" aria-label="닫기" onClick={onClose} className={navBtn} style={{ borderColor: C.ink, outlineColor: C.orangeInk }}>
+          <button ref={closeRef} type="button" aria-label="닫기" onClick={onClose} className={navBtn} style={{ borderColor: C.line, outlineColor: C.orangeInk }}>
             <X size={20} aria-hidden />
           </button>
         </div>
@@ -1340,14 +926,14 @@ function Timetable({ dow, initial }: { dow: number; initial: ClassKey }) {
                         className="border-b px-2 py-3 text-center tabular-nums"
                         style={{
                           borderColor: C.line,
-                          background: d.dow === dow ? "rgba(251,230,216,0.55)" : undefined,
+                          background: d.dow === dow ? C.soft : undefined,
                         }}
                       >
                         {t ? (
                           <span
                             className="inline-block rounded-[3px] border px-1.5 py-1 text-[13px] font-semibold"
                             style={{
-                              borderColor: on && pick !== "전체" ? C.ink : C.line,
+                              borderColor: on && pick !== "전체" ? C.orangeInk : C.line,
                               background: "#fff",
                             }}
                           >
@@ -1380,9 +966,9 @@ function FeeTable() {
       <table className="w-full min-w-[640px] border-collapse text-[15px]">
         <caption className="sr-only">교습과정별 월 교습비와 기타경비</caption>
         <thead>
-          <tr style={{ background: C.ink, color: C.sheet }}>
+          <tr style={{ background: C.soft, color: C.ink }}>
             {["교습과정", "대상", "수업", "정원", "월 교습비", "기타경비"].map((h) => (
-              <th key={h} scope="col" className="px-3 py-3 text-left font-bold">
+              <th key={h} scope="col" className="border-b px-3 py-3 text-left font-bold" style={{ borderColor: C.line }}>
                 {h}
               </th>
             ))}
@@ -1496,7 +1082,7 @@ function ConsultForm({ today, reduce, preset }: { today: Date; reduce: boolean; 
   return (
     <div className="grid gap-6 md:grid-cols-[minmax(0,1fr)_minmax(0,1.6fr)] md:gap-10">
       <div className="text-[16px] leading-[1.75]">
-        <p className="text-[24px] leading-snug" style={heavyF}>
+        <p className="text-[22px] font-bold leading-snug">
           방문 상담은 30분 정도 걸려요
         </p>
         <p className="mt-3" style={{ color: C.muted }}>
@@ -1518,7 +1104,7 @@ function ConsultForm({ today, reduce, preset }: { today: Date; reduce: boolean; 
         </ul>
       </div>
 
-      <div className="relative border p-5 md:p-7" style={{ borderColor: C.ink, background: C.sheet }}>
+      <div className="relative rounded-[8px] border p-5 md:p-7" style={{ borderColor: C.line, background: C.sheet }}>
         <AnimatePresence mode="wait" initial={false}>
           {done ? (
             <motion.div
@@ -1529,7 +1115,7 @@ function ConsultForm({ today, reduce, preset }: { today: Date; reduce: boolean; 
               transition={{ duration: reduce ? 0 : 0.5, ease: EASE }}
               role="status"
             >
-              <p className="text-[26px]" style={heavyF}>
+              <p className="text-[24px] font-bold">
                 상담 신청이 접수됐어요
               </p>
               <dl className="mt-5 grid grid-cols-[96px_minmax(0,1fr)] gap-y-2.5 text-[16px]">
@@ -1558,7 +1144,7 @@ function ConsultForm({ today, reduce, preset }: { today: Date; reduce: boolean; 
                 type="button"
                 onClick={reset}
                 className={`mt-6 inline-flex min-h-[44px] items-center gap-2 rounded-[4px] border px-4 text-[15px] font-semibold ${focusRing}`}
-                style={{ borderColor: C.ink, outlineColor: C.orangeInk }}
+                style={{ borderColor: "#c8c8c8", outlineColor: C.orangeInk }}
               >
                 <RotateCcw size={16} aria-hidden />
                 다시 신청하기
@@ -1631,9 +1217,9 @@ function ConsultForm({ today, reduce, preset }: { today: Date; reduce: boolean; 
                         onClick={() => setTime(t)}
                         className={`inline-flex min-h-[40px] items-center rounded-[4px] border px-3.5 text-[15px] font-semibold tabular-nums disabled:cursor-not-allowed ${focusRing}`}
                         style={{
-                          borderColor: time === t ? C.ink : C.line,
-                          background: time === t ? C.ink : full ? "transparent" : C.sheet,
-                          color: time === t ? C.sheet : full ? C.muted : C.ink,
+                          borderColor: time === t ? C.orangeInk : full ? C.line : "#c8c8c8",
+                          background: time === t ? C.orangeInk : full ? "transparent" : C.sheet,
+                          color: time === t ? "#fff" : full ? C.muted : C.ink,
                           textDecoration: full ? "line-through" : undefined,
                           outlineColor: C.orangeInk,
                         }}
@@ -1661,7 +1247,7 @@ function ConsultForm({ today, reduce, preset }: { today: Date; reduce: boolean; 
                     aria-describedby={tried && errors.name ? "aa-err-name" : undefined}
                     className={`mt-2 block h-12 w-full rounded-[4px] border bg-white px-3 text-[16px] ${focusRing}`}
                     style={{
-                      borderColor: tried && errors.name ? C.error : C.line,
+                      borderColor: tried && errors.name ? C.error : "#c8c8c8",
                       outlineColor: C.orangeInk,
                     }}
                   />
@@ -1683,7 +1269,7 @@ function ConsultForm({ today, reduce, preset }: { today: Date; reduce: boolean; 
                     aria-describedby={tried && errors.phone ? "aa-err-phone" : undefined}
                     className={`mt-2 block h-12 w-full rounded-[4px] border bg-white px-3 text-[16px] ${focusRing}`}
                     style={{
-                      borderColor: tried && errors.phone ? C.error : C.line,
+                      borderColor: tried && errors.phone ? C.error : "#c8c8c8",
                       outlineColor: C.orangeInk,
                     }}
                   />
@@ -1700,7 +1286,7 @@ function ConsultForm({ today, reduce, preset }: { today: Date; reduce: boolean; 
               <button
                 type="submit"
                 data-gtm-cta="art-academy_consult_submit"
-                className={`mt-6 inline-flex min-h-[52px] w-full items-center justify-center gap-2 rounded-[4px] text-[17px] font-bold text-white ${focusRing}`}
+                className={`mt-6 inline-flex min-h-[52px] w-full items-center justify-center gap-2 rounded-[6px] text-[17px] font-semibold text-white ${focusRing}`}
                 style={{ background: C.orangeInk, outlineColor: C.ink }}
               >
                 <CalendarCheck size={19} aria-hidden />
@@ -1725,34 +1311,25 @@ const HOURS = [
 function Visit({ dow }: { dow: number }) {
   return (
     <div className="grid gap-6 md:grid-cols-[minmax(0,1.2fr)_minmax(0,1fr)] md:gap-10">
-      {/* 연필로 그린 약도 */}
-      <div className="border p-3" style={{ borderColor: C.line, background: "#fff" }}>
+      {/* 약도 */}
+      <div className="overflow-hidden rounded-[8px] border" style={{ borderColor: C.line, background: "#fff" }}>
         <svg viewBox="0 0 520 320" className="block h-auto w-full" role="img" aria-label="ㅇㅇ역 2번 출구에서 큰길을 따라 걸어 두 번째 골목 모퉁이 건물 3층에 있는 학원 약도">
-          <rect width="520" height="320" fill="#fbf9f4" />
-          <g stroke={C.char} strokeLinecap="round" fill="none" opacity="0.85">
-            <path d="M0 150 C120 146 300 154 520 148" strokeWidth="2.2" />
-            <path d="M0 190 C120 186 300 194 520 188" strokeWidth="2.2" />
-            <path d="M330 0 C326 60 334 110 330 150" strokeWidth="1.8" />
-            <path d="M370 0 C366 60 374 110 370 150" strokeWidth="1.8" />
-            <path d="M330 190 C334 240 326 290 330 320" strokeWidth="1.8" />
-            <path d="M370 190 C374 240 366 290 370 320" strokeWidth="1.8" />
-            <path d="M140 190 L140 320 M170 190 L170 320" strokeWidth="1.4" opacity="0.6" />
+          <rect width="520" height="320" fill={C.soft} />
+          <g fill="#ffffff" stroke="#dcdcdc" strokeWidth="1">
+            <rect x="-2" y="150" width="524" height="40" />
+            <rect x="330" y="-2" width="40" height="152" />
+            <rect x="330" y="190" width="40" height="132" />
+            <rect x="140" y="190" width="30" height="132" />
           </g>
-          <path d={hatchD(380, 60, 470, 140, 6)} stroke={C.char} strokeWidth="0.9" opacity="0.25" clipPath="url(#aa-map-b)" />
-          <defs>
-            <clipPath id="aa-map-b">
-              <rect x="380" y="60" width="90" height="80" />
-            </clipPath>
-          </defs>
-          <rect x="380" y="60" width="90" height="80" fill={C.orangeInk} />
+          <rect x="380" y="60" width="90" height="80" rx="4" fill={C.orangeInk} />
           <text x="425" y="106" textAnchor="middle" fontSize="15" fontWeight="700" fill="#fff">
             학원 3층
           </text>
-          <rect x="60" y="200" width="70" height="40" rx="4" fill="none" stroke={C.ink} strokeWidth="2" />
+          <rect x="60" y="200" width="70" height="40" rx="4" fill="#fff" stroke={C.ink} strokeWidth="1" />
           <text x="95" y="225" textAnchor="middle" fontSize="13" fontWeight="700" fill={C.ink}>
             ㅇㅇ역 2번
           </text>
-          <path d="M120 170 C200 166 290 172 360 168" stroke={C.orange} strokeWidth="4" strokeDasharray="2 9" strokeLinecap="round" fill="none" />
+          <path d="M120 170 L360 170" stroke={C.orangeInk} strokeWidth="3" strokeDasharray="2 8" strokeLinecap="round" fill="none" />
           <text x="230" y="140" textAnchor="middle" fontSize="13" fill={C.muted}>
             ㅇㅇ로
           </text>
@@ -1803,5 +1380,22 @@ function Visit({ dow }: { dow: number }) {
         </table>
       </div>
     </div>
+  );
+}
+
+/* 로고: 메인 사이트와 같은 곰 로고 + 곰파트너(크게) + 업종(작게) */
+function SampleLogo({ light, size = 20 }: { light?: boolean; size?: number }) {
+  const mark = size + 8;
+  return (
+    <span className="inline-flex items-center gap-2 leading-none" style={{ color: light ? "#fff" : "#111" }}>
+      {/* eslint-disable-next-line @next/next/no-img-element -- 메인 사이트와 같은 곰 로고 */}
+      <img src="/images/logo-bear.png" alt="" aria-hidden width={mark} height={mark} className="shrink-0" style={{ width: mark, height: mark }} />
+      <span className="flex items-baseline gap-1 whitespace-nowrap">
+        <span className="font-bold tracking-[-0.03em]" style={{ fontSize: size }}>
+          곰파트너
+        </span>
+        <span className="text-[12px] font-semibold opacity-75">미술학원 샘플</span>
+      </span>
+    </span>
   );
 }

@@ -9,7 +9,7 @@ import { daysAgo, fmtKo, useDemoToday } from "@/hooks/useDemoToday";
 import { maskName, maskPhone } from "@/components/demos/LeadReceivedPanel";
 import { DemoMakerInfo } from "@/components/demos/DemoMakerInfo";
 
-/* 한의원 홈페이지 샘플: 가상의 곰파트너한의원. 동네 한의원(통증, 교통사고, 한약)이다.
+/* 한의원 홈페이지 샘플: 가상의 한의원 곰파트너. 동네 한의원(통증, 교통사고, 한약)이다.
    상호, 주소, 전화, 의료진 이름은 모두 가상이다.
 
    국내 한의원 사이트 공통 구성(참고): 메뉴는 한의원 소개, 의료진 소개, 진료 과목(통증 클리닉, 교통사고 클리닉, 한방 다이어트,
@@ -20,94 +20,62 @@ import { DemoMakerInfo } from "@/components/demos/DemoMakerInfo";
 
    상호작용(모두 브라우저 안에서만 돈다. 실제로 보내지 않는다)
    1. 아픈 부위 고르기: 사람 몸 실루엣(얼굴 없음)에서 머리, 목, 어깨, 허리, 손목, 무릎을 고르면
-      흔한 증상과 주로 받는 진료(침, 추나, 약침, 한약)가 바뀌고, 고른 자리에 붓으로 그린 동그라미가 그려진다.
-   2. 교통사고 진료: 자동차보험 접수번호를 넣으면 진료비 계산서의 본인 부담이 0원으로 바뀌고 주홍 도장이 찍힌다.
-   3. 진료 시간표: 요일별 진료 시간 막대. 야간 진료(화, 목 밤 9시까지)는 주홍으로, 오늘 줄과 지금 진료 중 여부를 표시한다.
+      흔한 증상과 주로 받는 진료(침, 추나, 약침, 한약)가 바뀌고, 고른 자리에 동그라미가 표시된다.
+   2. 교통사고 진료: 자동차보험 접수번호를 넣으면 진료비 계산서의 본인 부담이 0원으로 바뀌고 자동차보험 도장이 찍힌다.
+   3. 진료 시간표: 요일별 진료 시간 막대. 야간 진료(화, 목 밤 9시까지)는 강조색으로, 오늘 줄과 지금 진료 중 여부를 표시한다.
    4. 예약: 진료 구분, 날짜, 시간, 이름, 휴대폰. 완료하면 예약 번호, 담당 창구, 확정 문자 보낼 날을 보여 준다.
 
-   포스터 첫 화면(km-poster): 한지 미색 바탕에 먹색 큰 문장 "교통사고 진료, 본인 부담 없어요" 하나만 둔다.
-   오른쪽(휴대폰은 아래)에 백자 약탕기가 있고, 감초, 대추, 계피 조각이 하나씩 천천히 떨어져 달인 물 위에 뜬다(등장 연출).
-   약탕기에서 김 세 줄이 7초 주기로 오른다(반복 움직임은 이것 하나). 스크롤하면 김 덩어리가 부풀어 화면을 덮고 본문으로 넘어간다.
-   동작 줄이기면 약재가 이미 떠 있는 완성 상태, 멈춘 김, 스크롤 퇴장 없음으로 고정한다. */
+   첫 화면(km-poster): 한지 창, 약재 서랍장, 탁자 위 청자 그릇 사진 한 장이 화면을 채운다. 사진 출처: AI 생성(Z-Image-Turbo, Apache 2.0).
+   왼쪽 위 상호, 오른쪽 위 예약하기 버튼, 아래쪽에 큰 문장 "교통사고 진료, 본인 부담 없어요"와 야간 진료 한 줄.
+   핵심 모션: 들어오면 사진이 1.6초 동안 천천히 다가오고(1.06배에서 1배), 문장은 0.3초 늦게 아래에서 올라온다(CSS keyframes, JS 없이도 보인다).
+   스크롤하면 사진만 조금 느리게 움직인다. 본문에서 남긴 움직임은 접수번호를 넣으면 찍히는 자동차보험 도장 하나다.
+   동작 줄이기면 전부 멈춘다. */
 
 const serifF = { fontFamily: `${Noto_Serif_KR.style.fontFamily}, serif` } as const;
 
-const BRAND = "곰파트너한의원";
+const IMG = "/images/demo-korean-medicine";
 const ADDRESS = "서울 ㅇㅇ구 ㅇㅇ로 00, 3층";
 const TEL = "02-000-0000";
 const KAKAO = "카카오톡 채널 곰파트너";
 
+/* 로고: 메인 사이트와 같은 곰 로고 + 곰파트너(크게) + 업종(작게) */
+function SampleLogo({ light, small }: { light?: boolean; small?: boolean }) {
+  return (
+    <span className="inline-flex items-center gap-2" style={{ color: light ? "#ffffff" : "#111111" }}>
+      {/* eslint-disable-next-line @next/next/no-img-element -- 메인 사이트와 같은 곰 로고 */}
+      <img src="/images/logo-bear.png" alt="" aria-hidden width={28} height={28} className={small ? "h-6 w-6 shrink-0" : "h-7 w-7 shrink-0"} />
+      <span className="flex items-baseline gap-1 whitespace-nowrap">
+        <span className={`${small ? "text-[18px]" : "text-[20px]"} font-bold tracking-[-0.03em]`}>곰파트너</span>
+        <span className="text-[12px] font-semibold opacity-75">한의원 샘플</span>
+      </span>
+    </span>
+  );
+}
+
 const C = {
-  paper: "#f7f1e5",
-  paperDeep: "#ede3d0",
-  hanji: "#efe4cf",
-  hanjiDeep: "#e2d3b5",
-  ink: "#23201c",
-  inkSoft: "#3d3832",
-  muted: "#6b6255",
-  line: "#d9ccb4",
-  red: "#b23a22",
-  redSoft: "#f4dcd2",
+  paper: "#ffffff",
+  soft: "#f7f7f5",
+  bar: "#ececea",
+  ink: "#111111",
+  inkSoft: "#4b4b4b",
+  muted: "#767676",
+  line: "#e5e5e5",
+  field: "#d4d4d4",
+  red: "#8f3b2b",
   error: "#9f1d1d",
 };
 
 /* 모션 상수. 시간은 초, 이징은 cubic-bezier */
 const EASE = [0.22, 1, 0.36, 1] as const;
-/** 약재가 떨어지는 곡선. 처음엔 느리게, 물에 닿기 직전 빨라진다 */
-const EASE_FALL = [0.45, 0, 0.75, 1] as const;
-/** 칩, 패널, 도장 전환 */
-const DUR = 0.35;
-/** 첫 약재가 떨어지기 시작하는 때 */
-const HERB_START = 0.2;
-/** 약재 사이 간격 */
-const HERB_GAP = 0.2;
-/** 약재 한 조각이 떨어지는 시간. 마지막 조각까지 약 2초 안에 끝난다 */
-const HERB_FALL = 0.95;
-/** 김 한 줄이 올라갔다 사라지는 주기 */
-const STEAM_LOOP = 7;
-/** 포스터 래퍼 스크롤 진행도 중 퇴장이 끝나는 지점(래퍼 180svh 중 고정이 풀리는 80svh) */
-const EXIT_END = 0.44;
+/** 첫 화면 사진이 다가오는 시간 */
+const PHOTO_IN = 1.6;
+/** 패널 전환 */
+const DUR = 0.3;
 
 const focusRing = "focus-visible:outline focus-visible:outline-[3px] focus-visible:outline-offset-2";
 const won = (n: number) => `${n.toLocaleString("ko-KR")}원`;
 const p2 = (n: number) => String(n).padStart(2, "0");
 const DOW = ["일", "월", "화", "수", "목", "금", "토"];
-
-/* ---------- 포스터 그림 데이터 ---------- */
-
-type HerbKind = "gamcho" | "daechu" | "gyepi";
-/** 약재: 종류, 떠 있을 자리 x, y, 마지막 기울기, 떨어지기 시작할 때 x 차이 */
-const HERBS: { kind: HerbKind; x: number; y: number; rot: number; dx: number }[] = [
-  { kind: "gamcho", x: 250, y: 298, rot: -18, dx: -16 },
-  { kind: "daechu", x: 300, y: 304, rot: 24, dx: 12 },
-  { kind: "gyepi", x: 346, y: 296, rot: -12, dx: -10 },
-  { kind: "daechu", x: 384, y: 302, rot: -30, dx: 14 },
-  { kind: "gamcho", x: 214, y: 304, rot: 32, dx: 8 },
-];
-const herbLand = (i: number) => HERB_START + i * HERB_GAP + HERB_FALL * 0.86;
-
-/** 한지 섬유. 같은 그림이 나오게 씨앗 고정 */
-const FIBERS = (() => {
-  let seed = 4127;
-  const rnd = () => {
-    seed = (seed * 1103515245 + 12345) & 0x7fffffff;
-    return seed / 0x7fffffff;
-  };
-  return Array.from({ length: 34 }, () => {
-    const x = Math.round(rnd() * 1000);
-    const y = Math.round(rnd() * 1000);
-    const l = 40 + rnd() * 90;
-    const a = rnd() * Math.PI;
-    const bx = Math.round(x + Math.cos(a) * l);
-    const by = Math.round(y + Math.sin(a) * l);
-    const cx = Math.round((x + bx) / 2 + (rnd() - 0.5) * 40);
-    const cy = Math.round((y + by) / 2 + (rnd() - 0.5) * 40);
-    return `M${x} ${y} Q${cx} ${cy} ${bx} ${by}`;
-  });
-})();
-
-const POT_D = "M162 300 C126 346 92 406 96 478 C100 570 186 636 232 642 L368 642 C414 636 500 570 504 478 C508 406 474 346 438 300 Z";
-const LIP_FRONT_D = "M162 300 A138 30 0 0 0 438 300 L424 302 A124 22 0 0 1 176 302 Z";
 
 /* ---------- 아픈 부위와 진료 ---------- */
 
@@ -131,9 +99,6 @@ const PARTS: { id: PartId; label: string; x: number; y: number; signs: string[];
 
 const BODY_D =
   "M106 86 L134 86 L137 104 C160 108 184 114 192 132 C199 154 200 196 202 226 C204 254 208 282 214 300 L198 306 C190 284 184 254 180 226 L174 168 C172 196 170 222 172 250 C174 272 178 292 178 314 L170 470 L136 470 L126 326 L114 326 L104 470 L70 470 L62 314 C62 292 66 272 68 250 C70 222 68 196 66 168 L60 226 C56 254 50 284 42 306 L26 300 C32 282 36 254 38 226 C40 196 41 154 48 132 C56 114 80 108 103 104 Z";
-
-/** 붓으로 한 번에 그린 동그라미(한 바퀴가 다 닫히지 않는다) */
-const ENSO_D = "M-4 -24 C14 -26 26 -12 24 4 C22 20 6 27 -9 23 C-22 19 -27 3 -21 -10 C-17 -19 -8 -23 2 -22";
 
 /* ---------- 비급여 진료비 ---------- */
 
@@ -258,9 +223,8 @@ export function KoreanMedicineDemo() {
       <Poster reduce={reduce} onCta={() => go("km-reserve")} />
 
       <header className="mx-auto flex max-w-[1200px] flex-wrap items-center justify-between gap-x-4 gap-y-2 px-4 py-4 md:px-6">
-        <h2 className="inline-flex items-center gap-2 text-[22px] font-bold leading-none" style={serifF}>
-          <Seal size={26} />
-          {BRAND}
+        <h2 className="leading-none">
+          <SampleLogo />
         </h2>
         <nav aria-label="주요 메뉴" className="-mx-2 flex flex-wrap items-center">
           {[
@@ -282,7 +246,7 @@ export function KoreanMedicineDemo() {
       </header>
 
       {/* 교통사고 띠 */}
-      <div className="border-y" style={{ borderColor: C.line, background: C.paperDeep }}>
+      <div className="border-y" style={{ borderColor: C.line, background: C.soft }}>
         <p className="mx-auto flex max-w-[1200px] flex-wrap items-center gap-x-3 gap-y-1 px-4 py-3 text-[16px] md:px-6">
           <Car size={20} aria-hidden style={{ color: C.red }} />
           <strong>교통사고 환자</strong>
@@ -299,13 +263,12 @@ export function KoreanMedicineDemo() {
       <ReserveSection reduce={reduce} today={today} nowMin={nowMin} kind={kind} setKind={setKind} accident={accident} />
       <VisitSection />
 
-      <footer className="mt-20 px-4 py-10 md:px-6" style={{ background: C.ink, color: C.paper }}>
+      <footer className="mt-20 px-4 py-10 md:px-6" style={{ background: "#141414", color: "#ffffff" }}>
         <div className="mx-auto max-w-[1200px]">
-          <p className="inline-flex items-center gap-2 text-[18px] font-bold" style={serifF}>
-            <Seal size={22} />
-            {BRAND}
+          <p>
+            <SampleLogo light />
           </p>
-          <p className="mt-2 text-[15px] leading-[1.7]" style={{ color: "#d8cfbf" }}>
+          <p className="mt-2 text-[15px] leading-[1.7]" style={{ color: "#bdbdbd" }}>
             {ADDRESS}, 전화 {TEL}
             <br />
             평일 09:30 ~ 19:00, 화, 목 21:00까지, 토 09:30 ~ 14:00, 일요일 공휴일 휴진
@@ -321,296 +284,73 @@ export function KoreanMedicineDemo() {
 
 function Seal({ size }: { size: number }) {
   return (
-    <span aria-hidden className="inline-flex shrink-0 items-center justify-center rounded-[3px] font-bold leading-none" style={{ width: size, height: size, background: C.red, color: C.paper, fontSize: size * 0.56, ...serifF }}>
+    <span aria-hidden className="inline-flex shrink-0 items-center justify-center rounded-[4px] font-bold leading-none" style={{ width: size, height: size, background: C.red, color: "#ffffff", fontSize: size * 0.56 }}>
       곰
     </span>
   );
 }
 
-/* ---------- 포스터 ---------- */
+/* ---------- 첫 화면 ---------- */
 
 function Poster({ reduce, onCta }: { reduce: boolean; onCta: () => void }) {
   const ref = useRef<HTMLElement>(null);
   const { scrollYProgress } = useScroll({ target: ref, offset: ["start start", "end start"] });
-  const p = useTransform(scrollYProgress, (v) => (reduce ? 0 : Math.min(1, v / EXIT_END)));
-  // 김 덩어리가 약탕기에서 부풀어 올라 화면을 덮는다
-  const cloudS = useTransform(p, [0, 1], [0.15, 3.2]);
-  const cloudY = useTransform(p, [0, 1], ["0svh", "-34svh"]);
-  const cloudO = useTransform(p, [0, 0.08, 1], [0, 0.9, 1]);
-  const coverO = useTransform(p, [0.55, 0.95], [0, 1]);
-  const textY = useTransform(p, (v) => `${-v * 16}svh`);
-  const textO = useTransform(p, [0.3, 0.75], [1, 0]);
+  // 스크롤하면 사진만 조금 느리게 내려간다
+  const photoY = useTransform(scrollYProgress, (v) => (reduce ? "0%" : `${v * 8}%`));
 
   return (
-    <section id="km-poster" ref={ref} aria-labelledby="km-poster-title" className="relative" style={{ height: reduce ? undefined : "180svh", background: C.hanji }}>
-      <div
-        className={`${reduce ? "relative min-h-svh" : "sticky top-0 h-svh"} overflow-hidden`}
-        style={{ background: `radial-gradient(110% 80% at 72% 62%, #f6eedd 0%, ${C.hanji} 48%, ${C.hanjiDeep} 100%)`, color: C.ink }}
-      >
-        {/* 한지 섬유 */}
-        <svg aria-hidden className="pointer-events-none absolute inset-0 h-full w-full" viewBox="0 0 1000 1000" preserveAspectRatio="none">
-          <g fill="none" stroke="#b9a684" strokeWidth="1" strokeLinecap="round" opacity="0.2">
-            {FIBERS.map((d) => (
-              <path key={d} d={d} />
-            ))}
-          </g>
-        </svg>
-
-        {/* 약탕기 */}
-        <div className="pointer-events-none absolute inset-x-0 bottom-0 flex h-[52svh] justify-center md:inset-y-0 md:left-auto md:right-[3vw] md:h-full md:items-end md:justify-end">
-          <svg viewBox="0 0 620 760" className="h-full w-auto md:h-[90svh]" role="img" aria-label="감초, 대추, 계피 조각이 떨어져 뜬 백자 약탕기와 위로 오르는 김">
-            <PotDefs />
-
-            {/* 바닥 그림자 */}
-            <ellipse cx="300" cy="650" rx="250" ry="26" fill="url(#km-floor)" />
-
-            {/* 김 세 줄 */}
-            {[
-              ["M262 290 C236 236 290 196 262 140 C240 96 280 62 262 20", 0],
-              ["M314 286 C292 228 340 190 316 128 C298 82 334 50 318 4", STEAM_LOOP / 3],
-              ["M364 292 C344 240 392 206 368 150 C350 108 384 80 368 40", (STEAM_LOOP * 2) / 3],
-            ].map(([d, delay]) => (
-              <motion.path
-                key={d as string}
-                d={d as string}
-                fill="none"
-                stroke="url(#km-steam)"
-                strokeWidth="18"
-                strokeLinecap="round"
-                initial={reduce ? false : { opacity: 0, y: 0 }}
-                animate={reduce ? { opacity: 0.7, y: 0 } : { opacity: [0, 0.95, 0], y: [16, -40, -96] }}
-                transition={reduce ? { duration: 0 } : { duration: STEAM_LOOP, delay: 1.2 + (delay as number), repeat: Infinity, ease: "easeInOut", times: [0, 0.4, 1] }}
-              />
-            ))}
-
-            {/* 손잡이 */}
-            <path d="M478 396 L588 346 C596 343 604 360 598 368 L494 436 Z" fill="url(#km-handle)" />
-            <ellipse cx="593" cy="357" rx="9" ry="14" transform="rotate(-24 593 357)" fill="#d9d8d1" stroke="#b9b8b0" strokeWidth="2" />
-            <ellipse cx="593" cy="357" rx="4.5" ry="8" transform="rotate(-24 593 357)" fill="#8e8a80" />
-
-            {/* 몸통 */}
-            <path d={POT_D} fill="url(#km-porcelain)" />
-            <path d={POT_D} fill="url(#km-pot-side)" />
-            {/* 굽 */}
-            <path d="M232 642 L368 642 L360 654 L240 654 Z" fill="#c9c6bc" />
-            {/* 하이라이트 */}
-            <path d="M150 372 C124 414 118 470 132 528" fill="none" stroke="#ffffff" strokeWidth="12" strokeLinecap="round" opacity="0.9" />
-            <path d="M178 344 C170 352 164 360 158 368" fill="none" stroke="#ffffff" strokeWidth="6" strokeLinecap="round" opacity="0.8" />
-
-            {/* 입구와 달인 물 */}
-            <ellipse cx="300" cy="300" rx="138" ry="30" fill="url(#km-rim)" />
-            <ellipse cx="300" cy="302" rx="124" ry="22" fill="url(#km-brew)" />
-            <ellipse cx="262" cy="296" rx="40" ry="5" fill="#8a5a33" opacity="0.5" />
-
-            {/* 물에 닿을 때 번지는 물결 */}
-            {!reduce &&
-              HERBS.map((h, i) => (
-                <motion.ellipse
-                  key={`r${i}`}
-                  cx={h.x}
-                  cy={h.y + 3}
-                  rx="30"
-                  ry="6"
-                  fill="none"
-                  stroke="#c9a06c"
-                  strokeWidth="2"
-                  style={{ transformBox: "fill-box", transformOrigin: "50% 50%" }}
-                  initial={{ opacity: 0, scale: 0.3 }}
-                  animate={{ opacity: [0, 0.8, 0], scale: [0.3, 1, 1.5] }}
-                  transition={{ duration: 0.9, delay: herbLand(i), ease: "easeOut" }}
-                />
-              ))}
-
-            {/* 약재 */}
-            {HERBS.map((h, i) => (
-              <g key={i} transform={`translate(${h.x} ${h.y})`}>
-                <motion.g
-                  initial={reduce ? false : { x: h.dx, y: -300, rotate: h.rot - 140, scale: 1.35, opacity: 0 }}
-                  animate={{ x: 0, y: [-300, 7, 0], rotate: h.rot, scale: [1.35, 0.9, 0.9], opacity: [0, 1, 1] }}
-                  transition={
-                    reduce
-                      ? { duration: 0 }
-                      : {
-                          duration: HERB_FALL,
-                          delay: HERB_START + i * HERB_GAP,
-                          ease: EASE_FALL,
-                          times: [0, 0.86, 1],
-                          opacity: { duration: 0.2, delay: HERB_START + i * HERB_GAP },
-                          rotate: { duration: HERB_FALL, delay: HERB_START + i * HERB_GAP, ease: EASE },
-                        }
-                  }
-                >
-                  <Herb kind={h.kind} />
-                </motion.g>
-              </g>
-            ))}
-
-            {/* 입구 앞쪽 테두리. 뜬 약재 아랫부분을 가린다 */}
-            <path d={LIP_FRONT_D} fill="url(#km-lip)" />
-            <path d="M166 304 A136 28 0 0 0 434 304" fill="none" stroke="#ffffff" strokeWidth="3" opacity="0.8" />
-          </svg>
-        </div>
-
-        {/* 퇴장: 김 덩어리 */}
-        {!reduce && (
-          <motion.div aria-hidden className="pointer-events-none absolute left-1/2 top-[62svh] z-[2] md:left-[70%] md:top-[44svh]" style={{ y: cloudY, opacity: cloudO }}>
-            {[
-              [-0.5, -0.5, 1],
-              [-0.95, -0.25, 0.75],
-              [-0.05, -0.2, 0.8],
-              [-0.6, -0.95, 0.7],
-            ].map(([x, y, s], i) => (
-              <motion.div
-                key={i}
-                className="absolute h-[70vmax] w-[70vmax] rounded-full"
-                style={{
-                  left: `${x * 70}vmax`,
-                  top: `${y * 70}vmax`,
-                  scale: cloudS,
-                  background: `radial-gradient(closest-side, ${C.paper} 0%, ${C.paper} ${Math.round(40 * s)}%, rgba(247,241,229,0) 100%)`,
-                }}
-              />
-            ))}
-          </motion.div>
-        )}
-        {!reduce && <motion.div aria-hidden className="pointer-events-none absolute inset-0 z-[3]" style={{ background: C.paper, opacity: coverO }} />}
-
-        {/* 로고와 예약 버튼 */}
-        <motion.div className="absolute inset-x-0 top-0 z-10 flex items-center justify-between px-4 pt-4 md:px-12 md:pt-7" style={{ y: textY, opacity: textO }}>
-          <p className="inline-flex items-center gap-2 text-[17px] font-bold leading-none" style={serifF}>
-            <Seal size={20} />
-            {BRAND}
-          </p>
-          <button
-            type="button"
-            onClick={onCta}
-            aria-label="예약하기"
-            title="예약하기"
-            data-gtm-cta="korean-medicine_poster_cta"
-            className={`inline-flex h-12 w-12 items-center justify-center rounded-full ${focusRing}`}
-            style={{ background: C.red, color: C.paper, outlineColor: C.ink }}
-          >
-            <CalendarCheck size={22} aria-hidden />
-          </button>
+    <section id="km-poster" ref={ref} aria-labelledby="km-poster-title" className="relative flex min-h-[100svh] flex-col overflow-hidden" style={{ background: "#2a2622", color: "#ffffff" }}>
+      <style>{`@keyframes km-rise{from{opacity:0;transform:translateY(12px)}to{opacity:1;transform:none}}.km-rise{animation:km-rise 0.7s cubic-bezier(0.22,1,0.36,1) 0.3s both}@media (prefers-reduced-motion: reduce){.km-rise{animation:none}}`}</style>
+      <motion.div className="absolute inset-x-0 top-[-10%] h-[110%]" style={{ y: photoY }}>
+        <motion.div className="h-full w-full" initial={reduce ? false : { scale: 1.06 }} animate={{ scale: 1 }} transition={{ duration: reduce ? 0 : PHOTO_IN, ease: EASE }}>
+          {/* eslint-disable-next-line @next/next/no-img-element -- 정적 export 라 next/image 최적화를 쓰지 않는다 */}
+          <img
+            src={`${IMG}/hero.jpg`}
+            srcSet={`${IMG}/hero-sm.jpg 960w, ${IMG}/hero.jpg 1920w`}
+            sizes="100vw"
+            alt="한지 창 옆 약재 서랍장 앞 탁자에 대추와 감초를 담은 청자 그릇 두 개가 놓인 진료실"
+            fetchPriority="high"
+            className="absolute inset-0 h-full w-full object-cover"
+            style={{ objectPosition: "52% 62%" }}
+          />
         </motion.div>
+      </motion.div>
+      {/* 글자 대비를 위한 막. 위는 상호 자리(밝은 창), 아래는 문장 자리 */}
+      <div aria-hidden className="pointer-events-none absolute inset-0" style={{ background: "linear-gradient(to top, rgba(0,0,0,0.74), rgba(0,0,0,0.34) 50%, rgba(0,0,0,0.12) 72%, rgba(0,0,0,0.5))" }} />
+      <div aria-hidden className="pointer-events-none absolute inset-0 hidden md:block" style={{ background: "linear-gradient(90deg, rgba(0,0,0,0.42), rgba(0,0,0,0) 58%)" }} />
 
-        {/* 큰 문장 */}
-        <motion.div className="relative z-[1] flex h-full flex-col px-4 pt-[13svh] md:px-12 md:pt-[14svh]" style={{ y: textY, opacity: textO }}>
-          <h1
-            id="km-poster-title"
-            className="text-[clamp(52px,15.5vw,68px)] font-black leading-[1.12] tracking-[-0.04em] md:text-[clamp(96px,9.4vw,184px)] md:leading-[1.08]"
-            style={{ ...serifF, wordBreak: "keep-all" }}
-          >
-            <span className="block">
-              교통사고
-              <br className="md:hidden" /> 진료,
-            </span>
-            <span className="block" style={{ color: C.red }}>
-              본인 부담
-            </span>
-            <span className="block">없어요</span>
-          </h1>
-          <p className="mt-4 inline-flex items-center gap-2 text-[16px] md:mt-8 md:text-[19px]" style={{ color: C.inkSoft }}>
-            <Moon size={18} aria-hidden style={{ color: C.red }} />화, 목 밤 9시까지 진료
-          </p>
-        </motion.div>
+      <div className="relative z-[1] flex items-center justify-between gap-3 px-4 pt-4 md:px-12 md:pt-7">
+        <p className="leading-none">
+          <SampleLogo light small />
+        </p>
+        <button
+          type="button"
+          onClick={onCta}
+          data-gtm-cta="korean-medicine_poster_cta"
+          className={`inline-flex min-h-11 items-center gap-1.5 rounded-[6px] px-4 text-[15px] font-semibold ${focusRing}`}
+          style={{ background: C.red, color: "#ffffff", outlineColor: "#ffffff" }}
+        >
+          <CalendarCheck size={17} aria-hidden />
+          예약하기
+        </button>
+      </div>
+
+      <div className={`relative z-[1] mt-auto px-4 pb-14 md:px-12 md:pb-20 ${reduce ? "" : "km-rise"}`}>
+        <h1
+          id="km-poster-title"
+          className="max-w-[12em] text-[36px] font-bold md:text-[clamp(40px,5vw,72px)]"
+          style={{ ...serifF, letterSpacing: "-0.03em", lineHeight: 1.2, wordBreak: "keep-all" }}
+        >
+          교통사고 진료,
+          <br />
+          본인 부담 없어요
+        </h1>
+        <p className="mt-4 inline-flex items-center gap-2 text-[16px] md:mt-6 md:text-[18px]" style={{ color: "rgba(255,255,255,0.88)" }}>
+          <Moon size={18} aria-hidden />
+          화, 목 밤 9시까지 진료
+        </p>
       </div>
     </section>
-  );
-}
-
-function PotDefs() {
-  return (
-    <defs>
-      {/* 백자: 살짝 푸른 기가 도는 흰색, 왼쪽 위에서 빛 */}
-      <radialGradient id="km-porcelain" cx="0.34" cy="0.3" r="0.85">
-        <stop offset="0" stopColor="#ffffff" />
-        <stop offset="0.45" stopColor="#f4f3ee" />
-        <stop offset="0.8" stopColor="#d9dad4" />
-        <stop offset="1" stopColor="#b9bbb5" />
-      </radialGradient>
-      <linearGradient id="km-pot-side" x1="0" y1="0" x2="1" y2="0">
-        <stop offset="0.55" stopColor="#6d6457" stopOpacity="0" />
-        <stop offset="1" stopColor="#6d6457" stopOpacity="0.32" />
-      </linearGradient>
-      <linearGradient id="km-handle" x1="0" y1="0" x2="0" y2="1">
-        <stop offset="0" stopColor="#fbfbf8" />
-        <stop offset="0.6" stopColor="#d6d6cf" />
-        <stop offset="1" stopColor="#a9aaa3" />
-      </linearGradient>
-      <linearGradient id="km-rim" x1="0" y1="0" x2="0" y2="1">
-        <stop offset="0" stopColor="#d4d3cc" />
-        <stop offset="1" stopColor="#fbfbf8" />
-      </linearGradient>
-      <linearGradient id="km-lip" x1="0" y1="0" x2="0" y2="1">
-        <stop offset="0" stopColor="#f8f8f4" />
-        <stop offset="1" stopColor="#dcdcd5" />
-      </linearGradient>
-      <radialGradient id="km-brew" cx="0.42" cy="0.35" r="0.7">
-        <stop offset="0" stopColor="#6b4022" />
-        <stop offset="0.6" stopColor="#3f2312" />
-        <stop offset="1" stopColor="#24140a" />
-      </radialGradient>
-      <radialGradient id="km-floor" cx="0.5" cy="0.5" r="0.5">
-        <stop offset="0" stopColor="#5a4a33" stopOpacity="0.45" />
-        <stop offset="1" stopColor="#5a4a33" stopOpacity="0" />
-      </radialGradient>
-      <linearGradient id="km-steam" x1="0" y1="1" x2="0" y2="0">
-        <stop offset="0" stopColor="#ffffff" stopOpacity="0" />
-        <stop offset="0.3" stopColor="#ffffff" stopOpacity="0.95" />
-        <stop offset="1" stopColor="#ffffff" stopOpacity="0" />
-      </linearGradient>
-      {/* 감초: 노란 속살과 갈색 껍질 */}
-      <radialGradient id="km-gamcho" cx="0.42" cy="0.38" r="0.7">
-        <stop offset="0" stopColor="#f6e2a4" />
-        <stop offset="0.65" stopColor="#dcb565" />
-        <stop offset="1" stopColor="#b58635" />
-      </radialGradient>
-      {/* 대추: 붉은 갈색, 왼쪽 위 광택 */}
-      <radialGradient id="km-daechu" cx="0.35" cy="0.3" r="0.75">
-        <stop offset="0" stopColor="#c8523a" />
-        <stop offset="0.55" stopColor="#8a2516" />
-        <stop offset="1" stopColor="#4c120a" />
-      </radialGradient>
-      {/* 계피: 말린 껍질 */}
-      <linearGradient id="km-gyepi" x1="0" y1="0" x2="0" y2="1">
-        <stop offset="0" stopColor="#b56a37" />
-        <stop offset="0.45" stopColor="#8a4520" />
-        <stop offset="1" stopColor="#4a220d" />
-      </linearGradient>
-    </defs>
-  );
-}
-
-function Herb({ kind }: { kind: HerbKind }) {
-  if (kind === "gamcho")
-    return (
-      <g>
-        <ellipse cx="0" cy="2" rx="27" ry="19" fill="#7a5326" />
-        <ellipse cx="0" cy="0" rx="25" ry="17" fill="url(#km-gamcho)" stroke="#8a5d2a" strokeWidth="3" />
-        <ellipse cx="0" cy="0" rx="15" ry="10" fill="none" stroke="#b1873f" strokeWidth="1.5" opacity="0.8" />
-        <ellipse cx="0" cy="0" rx="7" ry="4.5" fill="none" stroke="#b1873f" strokeWidth="1.2" opacity="0.8" />
-        <path d="M0 0 L18 -6 M0 0 L-17 8 M0 0 L-6 -15 M0 0 L8 14" stroke="#a67b36" strokeWidth="1" opacity="0.7" />
-        <path d="M-16 -9 C-10 -14 0 -15 8 -13" fill="none" stroke="#fff6d8" strokeWidth="2.5" strokeLinecap="round" opacity="0.8" />
-      </g>
-    );
-  if (kind === "daechu")
-    return (
-      <g>
-        <ellipse cx="0" cy="0" rx="17" ry="23" fill="url(#km-daechu)" />
-        <path d="M-9 -14 C-4 -6 -12 4 -6 14 M3 -18 C8 -8 0 2 6 16 M10 -10 C13 -3 9 6 12 12" fill="none" stroke="#3e0e07" strokeWidth="1.6" strokeLinecap="round" opacity="0.65" />
-        <ellipse cx="-6" cy="-10" rx="4" ry="7" fill="#ffd7c6" opacity="0.55" transform="rotate(20 -6 -10)" />
-        <circle cx="0" cy="-22" r="2.6" fill="#5b3a1a" />
-      </g>
-    );
-  return (
-    <g>
-      <rect x="-34" y="-9" width="66" height="18" rx="8" fill="url(#km-gyepi)" />
-      <path d="M-30 -5 L28 -5" stroke="#d08a52" strokeWidth="2" strokeLinecap="round" opacity="0.8" />
-      <path d="M-26 4 L22 5 M-12 -1 L14 0" stroke="#3a1a09" strokeWidth="1.2" opacity="0.5" />
-      <ellipse cx="32" cy="0" rx="5" ry="9" fill="#5a2c12" />
-      <path d="M32 -6 C36 -4 36 4 31 5 C28 5 28 0 31 -1" fill="none" stroke="#c98a55" strokeWidth="1.6" />
-    </g>
   );
 }
 
@@ -618,8 +358,8 @@ function Herb({ kind }: { kind: HerbKind }) {
 
 function SectionTitle({ id, title, aside }: { id: string; title: string; aside?: React.ReactNode }) {
   return (
-    <div className="flex flex-wrap items-end justify-between gap-3 border-b-2 pb-3" style={{ borderColor: C.ink }}>
-      <h2 id={id} className="text-[28px] font-bold leading-tight md:text-[36px]" style={serifF}>
+    <div className="flex flex-wrap items-end justify-between gap-3 border-b pb-3" style={{ borderColor: C.line }}>
+      <h2 id={id} className="text-[28px] font-bold leading-tight tracking-[-0.02em] md:text-[34px]" style={{ ...serifF, color: C.ink }}>
         {title}
       </h2>
       {aside}
@@ -643,27 +383,26 @@ function BodySection({ reduce, onCar }: { reduce: boolean; onCar: () => void }) 
           <svg viewBox="0 0 240 480" className="h-auto w-full" role="img" aria-label={`사람 몸 그림, ${cur.label} 표시`}>
             <defs>
               <linearGradient id="km-body-wash" x1="0" y1="0" x2="1" y2="1">
-                <stop offset="0" stopColor="#e9dcc3" />
-                <stop offset="1" stopColor="#d6c4a3" />
+                <stop offset="0" stopColor="#f2f2f0" />
+                <stop offset="1" stopColor="#e6e6e3" />
               </linearGradient>
             </defs>
-            <ellipse cx="120" cy="472" rx="70" ry="7" fill="#cdbd9e" opacity="0.6" />
-            <ellipse cx="120" cy="50" rx="28" ry="34" fill="url(#km-body-wash)" stroke={C.inkSoft} strokeWidth="2" />
-            <path d={BODY_D} fill="url(#km-body-wash)" stroke={C.inkSoft} strokeWidth="2" strokeLinejoin="round" />
+            <ellipse cx="120" cy="472" rx="70" ry="7" fill="#e5e5e5" />
+            <ellipse cx="120" cy="50" rx="28" ry="34" fill="url(#km-body-wash)" stroke="#9a9a9a" strokeWidth="1.5" />
+            <path d={BODY_D} fill="url(#km-body-wash)" stroke="#9a9a9a" strokeWidth="1.5" strokeLinejoin="round" />
             {PARTS.map((x) => (
               <circle key={x.id} cx={x.x} cy={x.y} r="5" fill={x.id === part ? C.red : C.muted} opacity={x.id === part ? 1 : 0.55} />
             ))}
             <g transform={`translate(${cur.x} ${cur.y})`}>
-              <motion.path
+              <motion.circle
                 key={part}
-                d={ENSO_D}
+                r="20"
                 fill="none"
                 stroke={C.red}
-                strokeWidth="4.5"
-                strokeLinecap="round"
-                initial={reduce ? false : { pathLength: 0, rotate: -40 }}
-                animate={{ pathLength: 1, rotate: 0 }}
-                transition={{ duration: reduce ? 0 : 0.55, ease: EASE }}
+                strokeWidth="2.5"
+                initial={reduce ? false : { opacity: 0 }}
+                animate={{ opacity: 1 }}
+                transition={{ duration: reduce ? 0 : DUR, ease: EASE }}
               />
             </g>
           </svg>
@@ -692,8 +431,8 @@ function BodySection({ reduce, onCar }: { reduce: boolean; onCar: () => void }) 
                   role="radio"
                   aria-checked={on}
                   onClick={() => setPart(x.id)}
-                  className={`min-h-11 rounded-full border-2 px-5 text-[17px] font-bold transition-colors ${focusRing}`}
-                  style={{ borderColor: on ? C.red : C.line, background: on ? C.red : "transparent", color: on ? C.paper : C.ink, outlineColor: C.ink }}
+                  className={`min-h-11 rounded-full border px-5 text-[17px] font-semibold transition-colors ${focusRing}`}
+                  style={{ borderColor: on ? C.red : C.field, background: on ? C.red : C.paper, color: on ? "#ffffff" : C.ink, outlineColor: C.ink }}
                 >
                   {x.label}
                 </button>
@@ -704,9 +443,9 @@ function BodySection({ reduce, onCar }: { reduce: boolean; onCar: () => void }) 
           <AnimatePresence mode="wait" initial={false}>
             <motion.div
               key={part}
-              initial={reduce ? false : { clipPath: "inset(0 100% 0 0)" }}
-              animate={{ clipPath: "inset(0 0% 0 0)" }}
-              exit={reduce ? undefined : { clipPath: "inset(0 0 0 100%)" }}
+              initial={reduce ? false : { opacity: 0 }}
+              animate={{ opacity: 1 }}
+              exit={reduce ? undefined : { opacity: 0 }}
               transition={{ duration: reduce ? 0 : DUR, ease: EASE }}
               className="mt-6"
               aria-live="polite"
@@ -714,7 +453,7 @@ function BodySection({ reduce, onCar }: { reduce: boolean; onCar: () => void }) 
               <p className="text-[15px] font-bold" style={{ color: C.muted }}>
                 {cur.label}, 이럴 때 오세요
               </p>
-              <ul className="mt-2 space-y-1 text-[19px] leading-snug" style={serifF}>
+              <ul className="mt-2 space-y-1 text-[19px] font-medium leading-snug">
                 {cur.signs.map((s) => (
                   <li key={s}>{s}</li>
                 ))}
@@ -730,10 +469,10 @@ function BodySection({ reduce, onCar }: { reduce: boolean; onCar: () => void }) 
                     <li
                       key={c.name}
                       className="rounded-[6px] border p-4"
-                      style={{ borderColor: on ? C.ink : C.line, background: on ? "#fffaf0" : "transparent", opacity: on ? 1 : 0.7 }}
+                      style={{ borderColor: on ? C.red : C.line, background: on ? C.paper : C.soft, opacity: on ? 1 : 0.75 }}
                     >
                       <p className="flex items-center justify-between gap-2">
-                        <span className="inline-flex items-center gap-1.5 text-[19px] font-bold" style={serifF}>
+                        <span className="inline-flex items-center gap-1.5 text-[18px] font-bold">
                           {on && <Check size={18} aria-hidden style={{ color: C.red }} />}
                           {c.name}
                           <span className="sr-only">{on ? "(이 부위에 주로 받는 진료)" : ""}</span>
@@ -763,13 +502,13 @@ function BodySection({ reduce, onCar }: { reduce: boolean; onCar: () => void }) 
 
       {/* 비급여 진료비 안내 */}
       <div className="mt-12">
-        <h3 className="text-[20px] font-bold" style={serifF}>
+        <h3 className="text-[20px] font-bold">
           비급여 진료비 안내
         </h3>
         <div className="mt-3 overflow-x-auto">
           <table className="w-full min-w-[340px] border-collapse text-left text-[16px]">
             <thead>
-              <tr className="border-b" style={{ borderColor: C.ink }}>
+              <tr className="border-b" style={{ borderColor: C.field }}>
                 <th scope="col" className="py-2 pr-3 font-bold">
                   항목
                 </th>
@@ -817,10 +556,10 @@ function CarSection({ reduce, value, setValue, onReserve }: { reduce: boolean; v
           <ol className="space-y-0">
             {CAR_STEPS.map((s, i) => (
               <li key={s} className="flex items-start gap-4 border-b py-4" style={{ borderColor: C.line }}>
-                <span className="inline-flex h-9 w-9 shrink-0 items-center justify-center rounded-full border-2 text-[16px] font-bold" style={{ borderColor: C.ink, ...serifF }}>
+                <span className="inline-flex h-9 w-9 shrink-0 items-center justify-center rounded-full border text-[16px] font-semibold tabular-nums" style={{ borderColor: C.field, color: C.inkSoft }}>
                   {i + 1}
                 </span>
-                <span className="pt-1 text-[19px] font-bold" style={serifF}>
+                <span className="pt-1 text-[18px] font-semibold">
                   {s}
                 </span>
               </li>
@@ -834,7 +573,7 @@ function CarSection({ reduce, value, setValue, onReserve }: { reduce: boolean; v
         </div>
 
         {/* 진료비 계산서 */}
-        <div className="relative rounded-[6px] border-2 p-5 md:p-6" style={{ borderColor: C.ink, background: "#fffaf0" }}>
+        <div className="relative rounded-[8px] border p-5 md:p-6" style={{ borderColor: C.line, background: C.soft }}>
           <label htmlFor="km-accident" className="block text-[16px] font-bold">
             자동차보험 접수번호
           </label>
@@ -845,14 +584,14 @@ function CarSection({ reduce, value, setValue, onReserve }: { reduce: boolean; v
             value={value}
             onChange={(e) => setValue(e.target.value.replace(/[^\d-]/g, "").slice(0, 16))}
             placeholder="예: 2610-1234567"
-            className={`mt-2 h-12 w-full rounded-[4px] border-2 bg-white px-3 text-[18px] tabular-nums ${focusRing}`}
-            style={{ borderColor: C.line, outlineColor: C.red }}
+            className={`mt-2 h-12 w-full rounded-[4px] border bg-white px-3 text-[18px] tabular-nums ${focusRing}`}
+            style={{ borderColor: C.field, outlineColor: C.red }}
           />
 
           <table className="mt-5 w-full border-collapse text-[16px]">
             <caption className="sr-only">교통사고 진료비 예시</caption>
             <thead>
-              <tr className="border-b" style={{ borderColor: C.ink }}>
+              <tr className="border-b" style={{ borderColor: C.field }}>
                 <th scope="col" className="py-2 text-left font-bold">
                   항목
                 </th>
@@ -878,7 +617,7 @@ function CarSection({ reduce, value, setValue, onReserve }: { reduce: boolean; v
           </table>
           <p className="mt-4 flex items-baseline justify-between gap-3">
             <span className="text-[16px] font-bold">본인 부담 합계</span>
-            <span className="text-[30px] font-black tabular-nums" style={{ ...serifF, color: ok ? C.red : C.muted }} aria-live="polite">
+            <span className="text-[30px] font-bold tabular-nums" style={{ color: ok ? C.red : C.muted }} aria-live="polite">
               {ok ? "0원" : won(total)}
             </span>
           </p>
@@ -891,12 +630,12 @@ function CarSection({ reduce, value, setValue, onReserve }: { reduce: boolean; v
               <motion.div
                 aria-hidden
                 className="pointer-events-none absolute -right-2 -top-7 md:-right-4"
-                initial={reduce ? false : { scale: 2.2, opacity: 0, rotate: -24 }}
-                animate={{ scale: 1, opacity: 1, rotate: -12 }}
+                initial={reduce ? false : { scale: 1.4, opacity: 0, rotate: -14 }}
+                animate={{ scale: 1, opacity: 1, rotate: -8 }}
                 exit={reduce ? undefined : { opacity: 0 }}
                 transition={{ duration: reduce ? 0 : 0.28, ease: [0.5, 0, 0.75, 0] }}
               >
-                <span className="inline-flex h-[76px] w-[76px] flex-col items-center justify-center rounded-[6px] border-[3px] text-[15px] font-black leading-tight" style={{ borderColor: C.red, color: C.red, background: "rgba(255,250,240,0.85)", ...serifF }}>
+                <span className="inline-flex h-[76px] w-[76px] flex-col items-center justify-center rounded-[6px] border text-[15px] font-bold leading-tight" style={{ borderColor: C.red, color: C.red, background: "rgba(255,255,255,0.92)" }}>
                   자동차
                   <br />
                   보험
@@ -910,7 +649,7 @@ function CarSection({ reduce, value, setValue, onReserve }: { reduce: boolean; v
             onClick={onReserve}
             data-gtm-cta="korean-medicine_car_reserve"
             className={`mt-5 inline-flex h-12 w-full items-center justify-center gap-2 rounded-[4px] text-[17px] font-bold ${focusRing}`}
-            style={{ background: C.ink, color: C.paper, outlineColor: C.red }}
+            style={{ background: C.ink, color: "#ffffff", outlineColor: C.red }}
           >
             <Car size={19} aria-hidden />
             교통사고 진료 예약
@@ -968,9 +707,9 @@ function HoursSection({ today, nowMin }: { today: Date; nowMin: number | null })
               <li
                 key={d}
                 className="grid grid-cols-[52px_minmax(0,1fr)] items-center gap-3 border-b py-3 md:grid-cols-[72px_minmax(0,1fr)_200px]"
-                style={{ borderColor: C.line, background: isToday ? "#fffaf0" : undefined }}
+                style={{ borderColor: C.line, background: isToday ? C.soft : undefined }}
               >
-                <span className="pl-1 text-[18px] font-bold" style={serifF}>
+                <span className="pl-1 text-[17px] font-semibold">
                   {DOW[d]}
                   {isToday && (
                     <span className="ml-1 align-middle text-[12px]" style={{ color: C.red }}>
@@ -978,12 +717,12 @@ function HoursSection({ today, nowMin }: { today: Date; nowMin: number | null })
                     </span>
                   )}
                 </span>
-                <div className="relative h-7 rounded-[2px]" style={{ background: C.paperDeep }} aria-hidden>
+                <div className="relative h-7 rounded-[2px]" style={{ background: C.soft }} aria-hidden>
                   {h && (
                     <>
-                      <span className="absolute inset-y-0 rounded-[2px]" style={{ left: pct(h[0]), width: `calc(${pct(Math.min(h[1], NIGHT_FROM))} - ${pct(h[0])})`, background: C.ink }} />
+                      <span className="absolute inset-y-0 rounded-[2px]" style={{ left: pct(h[0]), width: `calc(${pct(Math.min(h[1], NIGHT_FROM))} - ${pct(h[0])})`, background: "#3a3a3a" }} />
                       {night && (
-                        <span className="absolute inset-y-0 inline-flex items-center justify-center rounded-[2px]" style={{ left: pct(NIGHT_FROM), width: `calc(${pct(h[1])} - ${pct(NIGHT_FROM)})`, background: C.red, color: C.paper }}>
+                        <span className="absolute inset-y-0 inline-flex items-center justify-center rounded-[2px]" style={{ left: pct(NIGHT_FROM), width: `calc(${pct(h[1])} - ${pct(NIGHT_FROM)})`, background: C.red, color: "#ffffff" }}>
                           <Moon size={14} />
                         </span>
                       )}
@@ -993,7 +732,7 @@ function HoursSection({ today, nowMin }: { today: Date; nowMin: number | null })
                           style={{
                             left: pct(LUNCH[0]),
                             width: `calc(${pct(LUNCH[1])} - ${pct(LUNCH[0])})`,
-                            background: `repeating-linear-gradient(135deg, ${C.paperDeep} 0 4px, #c9b99a 4px 6px)`,
+                            background: `repeating-linear-gradient(135deg, ${C.bar} 0 4px, #c4c4c0 4px 6px)`,
                           }}
                         />
                       )}
@@ -1086,11 +825,11 @@ function ReserveSection({
   };
 
   const chip = (on: boolean, disabled = false) =>
-    `min-h-11 rounded-[4px] border-2 px-3 text-[16px] font-bold transition-colors ${focusRing} ${disabled ? "cursor-not-allowed line-through" : ""}`;
+    `min-h-11 rounded-[4px] border px-3 text-[16px] font-semibold transition-colors ${focusRing} ${disabled ? "cursor-not-allowed line-through" : ""}`;
   const chipStyle = (on: boolean, disabled = false) => ({
-    borderColor: on ? C.ink : C.line,
-    background: on ? C.ink : disabled ? C.paperDeep : "#fffaf0",
-    color: on ? C.paper : disabled ? "#8f8678" : C.ink,
+    borderColor: on ? C.red : disabled ? C.line : C.field,
+    background: on ? C.red : disabled ? C.soft : C.paper,
+    color: on ? "#ffffff" : disabled ? "#9a9a9a" : C.ink,
     outlineColor: C.red,
   });
 
@@ -1111,11 +850,11 @@ function ReserveSection({
         {done ? (
           <motion.div
             key="done"
-            initial={reduce ? false : { clipPath: "inset(0 0 100% 0)" }}
-            animate={{ clipPath: "inset(0 0 0% 0)" }}
-            transition={{ duration: reduce ? 0 : 0.5, ease: EASE }}
-            className="mt-6 rounded-[6px] border-2 p-6 md:p-8"
-            style={{ borderColor: C.ink, background: "#fffaf0" }}
+            initial={reduce ? false : { opacity: 0 }}
+            animate={{ opacity: 1 }}
+            transition={{ duration: reduce ? 0 : DUR, ease: EASE }}
+            className="mt-6 rounded-[8px] border p-6 md:p-8"
+            style={{ borderColor: C.line, background: C.soft }}
             role="status"
           >
             <div className="flex items-start justify-between gap-4">
@@ -1123,11 +862,11 @@ function ReserveSection({
                 <p className="text-[15px] font-bold" style={{ color: C.red }}>
                   예약 접수 완료
                 </p>
-                <p className="mt-1 text-[30px] font-black tabular-nums md:text-[36px]" style={serifF}>
+                <p className="mt-1 text-[30px] font-bold tabular-nums md:text-[36px]">
                   {done.no}
                 </p>
               </div>
-              <Seal size={52} />
+              <Seal size={44} />
             </div>
             <dl className="mt-6 grid gap-x-8 gap-y-3 text-[16px] sm:grid-cols-2">
               {[
@@ -1152,8 +891,8 @@ function ReserveSection({
                 setDone(null);
                 setSlot(null);
               }}
-              className={`mt-6 inline-flex h-11 items-center gap-1.5 rounded-[4px] border-2 px-4 text-[15px] font-bold ${focusRing}`}
-              style={{ borderColor: C.ink, outlineColor: C.red }}
+              className={`mt-6 inline-flex h-11 items-center gap-1.5 rounded-[4px] border bg-white px-4 text-[15px] font-semibold ${focusRing}`}
+              style={{ borderColor: C.field, outlineColor: C.red }}
             >
               <X size={16} aria-hidden />
               다른 시간으로 다시 예약
@@ -1217,7 +956,7 @@ function ReserveSection({
                         aria-label={`${hm(m)}${off ? " 마감" : ""}${isNight ? " 야간" : ""}`}
                         onClick={() => setSlot(m)}
                         className={`${chip(on, off)} tabular-nums`}
-                        style={{ ...chipStyle(on, off), ...(isNight && !on && !off ? { borderColor: C.red, color: C.red } : null) }}
+                        style={{ ...chipStyle(on, off), ...(isNight && !on && !off ? { color: C.red } : null) }}
                       >
                         {hm(m)}
                       </button>
@@ -1242,8 +981,8 @@ function ReserveSection({
                 value={name}
                 onChange={(e) => setName(e.target.value.slice(0, 20))}
                 autoComplete="name"
-                className={`mt-2 h-12 w-full rounded-[4px] border-2 bg-white px-3 text-[17px] ${focusRing}`}
-                style={{ borderColor: C.line, outlineColor: C.red }}
+                className={`mt-2 h-12 w-full rounded-[4px] border bg-white px-3 text-[17px] ${focusRing}`}
+                style={{ borderColor: C.field, outlineColor: C.red }}
               />
               <label htmlFor="km-phone" className="mt-5 block text-[16px] font-bold">
                 휴대폰
@@ -1255,8 +994,8 @@ function ReserveSection({
                 inputMode="tel"
                 autoComplete="tel"
                 placeholder="010-0000-0000"
-                className={`mt-2 h-12 w-full rounded-[4px] border-2 bg-white px-3 text-[17px] tabular-nums ${focusRing}`}
-                style={{ borderColor: C.line, outlineColor: C.red }}
+                className={`mt-2 h-12 w-full rounded-[4px] border bg-white px-3 text-[17px] tabular-nums ${focusRing}`}
+                style={{ borderColor: C.field, outlineColor: C.red }}
               />
               {kind === "교통사고" && (
                 <>
@@ -1268,8 +1007,8 @@ function ReserveSection({
                     value={accVal}
                     onChange={(e) => setAccNo(e.target.value.replace(/[^\d-]/g, "").slice(0, 16))}
                     inputMode="numeric"
-                    className={`mt-2 h-12 w-full rounded-[4px] border-2 bg-white px-3 text-[17px] tabular-nums ${focusRing}`}
-                    style={{ borderColor: C.line, outlineColor: C.red }}
+                    className={`mt-2 h-12 w-full rounded-[4px] border bg-white px-3 text-[17px] tabular-nums ${focusRing}`}
+                    style={{ borderColor: C.field, outlineColor: C.red }}
                   />
                 </>
               )}
@@ -1287,8 +1026,8 @@ function ReserveSection({
               <button
                 type="submit"
                 data-gtm-cta="korean-medicine_reserve"
-                className={`mt-4 inline-flex h-14 w-full items-center justify-center gap-2 rounded-[4px] text-[18px] font-bold ${focusRing}`}
-                style={{ background: C.red, color: C.paper, outlineColor: C.ink }}
+                className={`mt-4 inline-flex h-14 w-full items-center justify-center gap-2 rounded-[4px] text-[18px] font-semibold ${focusRing}`}
+                style={{ background: C.red, color: "#ffffff", outlineColor: C.ink }}
               >
                 <CalendarCheck size={20} aria-hidden />
                 예약하기
@@ -1311,27 +1050,27 @@ function VisitSection() {
     <section id="km-visit" aria-labelledby="km-visit-title" className="mx-auto mt-16 max-w-[1200px] scroll-mt-4 px-4 md:mt-24 md:px-6">
       <SectionTitle id="km-visit-title" title="오시는 길" />
       <div className="mt-6 grid gap-8 md:grid-cols-[minmax(0,1.1fr)_minmax(0,0.9fr)] md:gap-12">
-        {/* 먹으로 그린 약도 */}
-        <svg viewBox="0 0 520 300" className="h-auto w-full rounded-[6px] border-2" style={{ borderColor: C.ink, background: "#fffaf0" }} role="img" aria-label="ㅇㅇ역 2번 출구에서 큰길을 따라 걸어 두 번째 건물 3층에 있는 한의원 약도">
-          <g stroke={C.line} strokeWidth="1">
+        {/* 약도 */}
+        <svg viewBox="0 0 520 300" className="h-auto w-full rounded-[8px] border" style={{ borderColor: C.line, background: C.soft }} role="img" aria-label="ㅇㅇ역 2번 출구에서 큰길을 따라 걸어 두 번째 건물 3층에 있는 한의원 약도">
+          <g stroke="#ececea" strokeWidth="1">
             {Array.from({ length: 12 }, (_, i) => (
               <path key={`v${i}`} d={`M${i * 44 + 20} 0 V300`} />
             ))}
           </g>
-          <path d="M0 190 H520" stroke="#cbbd9f" strokeWidth="34" />
-          <path d="M300 0 V300" stroke="#cbbd9f" strokeWidth="26" />
-          <path d="M0 190 H520 M300 0 V300" stroke="#fffaf0" strokeWidth="2" strokeDasharray="10 10" />
-          <rect x="70" y="214" width="80" height="34" rx="4" fill={C.ink} />
-          <text x="110" y="236" textAnchor="middle" fontSize="15" fontWeight="700" fill={C.paper}>
+          <path d="M0 190 H520" stroke="#dcdcd8" strokeWidth="34" />
+          <path d="M300 0 V300" stroke="#dcdcd8" strokeWidth="26" />
+          <path d="M0 190 H520 M300 0 V300" stroke="#ffffff" strokeWidth="2" strokeDasharray="10 10" />
+          <rect x="70" y="214" width="80" height="34" rx="4" fill="#3a3a3a" />
+          <text x="110" y="236" textAnchor="middle" fontSize="15" fontWeight="700" fill="#ffffff">
             ㅇㅇ역
           </text>
           <text x="160" y="268" fontSize="13" fill={C.inkSoft}>
             2번 출구
           </text>
-          <path d="M150 172 C200 170 330 172 380 150" fill="none" stroke={C.red} strokeWidth="4" strokeDasharray="2 9" strokeLinecap="round" />
-          <rect x="350" y="96" width="92" height="64" rx="3" fill="#e6d8bc" stroke={C.ink} strokeWidth="2" />
+          <path d="M150 172 C200 170 330 172 380 150" fill="none" stroke={C.red} strokeWidth="3" strokeDasharray="2 8" strokeLinecap="round" />
+          <rect x="350" y="96" width="92" height="64" rx="3" fill="#ffffff" stroke="#9a9a9a" strokeWidth="1" />
           <rect x="378" y="66" width="36" height="36" rx="3" fill={C.red} />
-          <text x="396" y="91" textAnchor="middle" fontSize="20" fontWeight="700" fill={C.paper}>
+          <text x="396" y="91" textAnchor="middle" fontSize="20" fontWeight="700" fill="#ffffff">
             곰
           </text>
           <text x="396" y="136" textAnchor="middle" fontSize="13" fontWeight="700" fill={C.ink}>
@@ -1363,7 +1102,7 @@ function VisitSection() {
           </p>
 
           <div className="border-t pt-5" style={{ borderColor: C.line }}>
-            <h3 className="text-[20px] font-bold" style={serifF}>
+            <h3 className="text-[20px] font-bold">
               의료진
             </h3>
             <ul className="mt-3 space-y-2">

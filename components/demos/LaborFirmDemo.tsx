@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useId, useRef, useState } from "react";
-import { AnimatePresence, motion, useScroll, useTransform, type MotionValue } from "framer-motion";
+import { AnimatePresence, motion, useScroll, useTransform } from "framer-motion";
 import {
   AlertTriangle,
   Briefcase,
@@ -22,13 +22,12 @@ import {
   Users,
   Wallet,
 } from "lucide-react";
-import { Black_Han_Sans, JetBrains_Mono } from "@/lib/local-fonts";
 import { useReducedMotionSafe } from "@/hooks/useReducedMotionSafe";
 import { daysAgo, fmtDash, fmtKo, useDemoToday } from "@/hooks/useDemoToday";
 import { maskName, maskPhone } from "@/components/demos/LeadReceivedPanel";
 import { DemoMakerInfo } from "@/components/demos/DemoMakerInfo";
 
-/* 노무법인 홈페이지 샘플: 가상의 곰파트너노무법인. 근로자 사건(부당해고, 임금체불, 산재)과 사업장 노무 자문을 함께 한다.
+/* 노무법인 홈페이지 샘플: 가상의 곰파트너 노무법인. 근로자 사건(부당해고, 임금체불, 산재)과 사업장 노무 자문을 함께 한다.
    상호, 노무사 이름, 주소, 전화번호, 손님 이름은 모두 가상이다.
 
    국내 노무법인 사이트 공통 구성(참고): 메뉴는 법인소개, 업무분야(부당해고 구제신청, 임금체불 진정, 산재 신청,
@@ -43,11 +42,11 @@ import { DemoMakerInfo } from "@/components/demos/DemoMakerInfo";
    2025년 10월 23일부터는 재직 중 밀린 임금도 정기 지급일 다음 날부터 같은 지연이자가 붙는다.
    퇴직금은 1년 이상 일했을 때 평균임금 30일분 x 근속 연수다. 계산기는 월급으로 바꿔 개략만 보여 준다.
 
-   포스터 첫 화면(lf-poster): 진회색 바탕에 큰 문장 "해고된 날부터 3개월 안에 신청해요" 하나만 둔다.
-   오른쪽(휴대폰은 아래)에 벽에 걸린 큰 일력이 있고, 들어오면 맨 위 장부터 한 장씩 찢겨 날아가며 남은 날 숫자가 줄어든다.
-   찢고 난 뒤에는 맨 위 장 아래 끝이 바람에 살짝 들리는 움직임 하나만 7초 주기로 반복한다.
-   스크롤하면 남은 장이 위로 한꺼번에 넘어가며 숫자가 빠르게 줄고, 문장은 위로 빠진다.
-   동작 줄이기면 찢는 장 없이 마지막 장으로 고정하고, 들림과 스크롤 넘김도 없다.
+   사진 출처: Pexels 사진 6814526
+
+   첫 화면(lf-poster): 서류를 검토하는 손 사진 한 장이 한 화면을 채우고 아래 왼쪽에 문장 "해고된 날부터 3개월 안에 신청해요".
+   들어오면 사진이 1.6초 동안 천천히 다가오고(1.06배에서 1배), 문장은 0.3초 늦게 아래에서 올라온다(CSS keyframes, JS 없이도 보인다).
+   스크롤하면 사진만 조금 느리게 움직인다. 동작 줄이기면 전부 멈춘다. 본문에서 움직이는 숫자는 기한 계산의 남은 날 하나뿐이다.
 
    상호작용(모두 브라우저 안에서만 돈다. 실제로 보내지 않는다)
    1. 부당해고 구제신청 기한 계산: 해고일을 넣으면 신청 마감일과 남은 날, 3개월 막대 위 오늘 위치가 나온다.
@@ -55,56 +54,32 @@ import { DemoMakerInfo } from "@/components/demos/DemoMakerInfo";
    3. 노무 자문 요금: 직원 수를 움직이면 해당 구간 월 자문료와 연간 금액이 나온다.
    4. 상담신청: 분야, 방법, 희망일, 시간대, 이름, 연락처. 완료 화면에 접수 번호, 담당 창구, 회신 예정일. */
 
-const sfxF = { fontFamily: `${Black_Han_Sans.style.fontFamily}, var(--font-sfx), sans-serif`, fontWeight: 400 } as const;
-const monoF = { fontFamily: `${JetBrains_Mono.style.fontFamily}, ui-monospace, monospace` } as const;
-
-const BRAND = "곰파트너노무법인";
+const IMG = "/images/demo-labor-firm";
 const TEL = "02-000-0000";
 const KAKAO = "카카오톡 채널 곰파트너";
 const ADDRESS = "서울 ㅇㅇ구 ㅇㅇ로 00, 5층";
 
-/* 포스터 색 */
-const P = {
-  bg: "#2a2c30",
-  bgDeep: "#1c1d20",
-  yellow: "#f5c400",
-  yellowDeep: "#c99a00",
-  paper: "#f6f3ea",
-  paperEdge: "#ddd7c8",
-  ink: "#1f2124",
-  sub: "#cfccc4",
-};
-
 /* 본문 색 */
 const C = {
-  bg: "#f2f1ec",
+  bg: "#ffffff",
+  soft: "#f7f7f5",
   card: "#ffffff",
-  ink: "#24262a",
-  gray: "#2a2c30",
-  yellow: "#f5c400",
-  yellowSoft: "#fff3bf",
-  yellowDeep: "#b58a00",
-  muted: "#5b5e64",
-  line: "#d9d7cf",
+  ink: "#111111",
+  body: "#4b4b4b",
+  /** 고른 칩, 보조 버튼에 쓰는 먹색 */
+  gray: "#222222",
+  /** 강조색 하나. 채도를 낮춘 황토색 */
+  accent: "#7a6223",
+  accentSoft: "#f5f1e6",
+  muted: "#767676",
+  line: "#e5e5e5",
   error: "#b42318",
 };
 
 /* 모션 상수. 시간은 초, 이징은 cubic-bezier */
 const EASE = [0.22, 1, 0.36, 1] as const;
-/** 찢긴 장이 날아갈 때. 처음엔 천천히 당겨지다 확 뜯긴다 */
-const EASE_TEAR = [0.55, 0, 0.75, 0.3] as const;
-/** 첫 장을 찢기 시작하는 시각 */
-const TEAR_START = 0.3;
-/** 장과 장 사이 간격 */
-const TEAR_GAP = 0.2;
-/** 한 장이 뜯겨 사라지는 시간 */
-const TEAR_DUR = 0.6;
-/** 종이 아래 끝이 보는 사람 쪽으로 들리는 rotateX 부호 */
-const LIFT = -1;
-/** 맨 위 장 아래 끝이 들렸다 내려오는 주기 */
-const SWAY_LOOP = 7;
-/** 포스터 스크롤 진행도 중 퇴장이 끝나는 지점 */
-const EXIT_END = 0.8;
+/** 첫 화면 사진이 다가오는 시간 */
+const PHOTO_IN = 1.6;
 /** 결과 숫자, 막대 전환 */
 const DUR = 0.4;
 
@@ -112,16 +87,6 @@ const focusRing = "focus-visible:outline focus-visible:outline-[3px] focus-visib
 const won = (n: number) => `${Math.round(n).toLocaleString("ko-KR")}원`;
 const md = (d: Date) => `${d.getMonth() + 1}.${d.getDate()}`;
 const clamp01 = (v: number) => Math.min(1, Math.max(0, v));
-
-/* ---------- 일력 숫자 ---------- */
-
-/** 들어올 때 찢겨 나가는 장(맨 위부터) */
-const TORN = [92, 91, 90, 89, 88, 87];
-/** 찢고 남은 장. 스크롤하면 위에서부터 차례로 넘어간다 */
-const STACK = [86, 85, 84, 83, 82, 81, 80, 79, 78, 77];
-/** 스크롤 넘김에서 장과 장 사이 진행도 간격, 한 장이 넘어가는 진행도 길이 */
-const FLIP_STEP = 0.05;
-const FLIP_LEN = 0.22;
 
 /* ---------- 날짜 ---------- */
 
@@ -227,13 +192,12 @@ export function LaborFirmDemo() {
     <div className="min-h-screen overflow-x-clip" style={{ background: C.bg, color: C.ink }}>
       <Poster reduce={reduce} onCta={() => go("lf-consult")} />
 
-      <header className="border-b" style={{ background: C.gray, borderColor: "#3a3d42" }}>
+      <header className="border-b" style={{ background: C.card, borderColor: C.line }}>
         <div className="mx-auto flex max-w-[1200px] flex-wrap items-center justify-between gap-x-4 gap-y-2 px-4 py-4 md:px-6">
-          <h2 className="inline-flex items-center gap-2 text-[22px] leading-none text-white" style={sfxF}>
-            <PageMark size={24} />
-            {BRAND}
+          <h2 className="inline-flex items-center gap-2 text-[22px] font-bold leading-none" style={{ color: C.ink }}>
+            <SampleLogo />
           </h2>
-          <nav aria-label="주요 메뉴" className="-mx-2 flex flex-wrap items-center text-white">
+          <nav aria-label="주요 메뉴" className="-mx-2 flex flex-wrap items-center">
             {[
               ["lf-deadline", "부당해고"],
               ["lf-wage", "임금체불"],
@@ -242,7 +206,7 @@ export function LaborFirmDemo() {
               ["lf-consult", "상담신청"],
               ["lf-visit", "오시는 길"],
             ].map(([id, label]) => (
-              <button key={id} type="button" onClick={() => go(id)} className={navBtn} style={{ outlineColor: P.yellow }}>
+              <button key={id} type="button" onClick={() => go(id)} className={navBtn} style={{ outlineColor: C.accent }}>
                 {label}
               </button>
             ))}
@@ -253,16 +217,16 @@ export function LaborFirmDemo() {
       {/* 업무분야 */}
       <section aria-labelledby="lf-areas-title" className="mx-auto max-w-[1200px] px-4 pt-10 md:px-6 md:pt-14">
         <div className="flex flex-wrap items-end justify-between gap-3">
-          <h2 id="lf-areas-title" className="text-[26px] leading-tight md:text-[32px]" style={sfxF}>
+          <h2 id="lf-areas-title" className="text-[26px] leading-tight md:text-[32px] font-bold">
             업무분야
           </h2>
           <a
             href={`tel:${TEL.replace(/-/g, "")}`}
             className={`inline-flex items-center gap-2 rounded-[4px] px-4 py-2.5 text-[16px] font-bold ${focusRing}`}
-            style={{ background: C.yellow, color: C.ink, outlineColor: C.ink }}
+            style={{ background: C.accent, color: "#ffffff", outlineColor: C.accent }}
           >
             <Phone size={18} aria-hidden />
-            대표번호 <span style={monoF}>{TEL}</span>
+            대표번호 <span className="tabular-nums">{TEL}</span>
           </a>
         </div>
         <ul className="mt-6 grid border-t sm:grid-cols-2 lg:grid-cols-3" style={{ borderColor: C.ink }}>
@@ -303,7 +267,7 @@ export function LaborFirmDemo() {
             { name: "박ㅈ민", role: "공인노무사", areas: "임금체불, 산재, 급여 아웃소싱" },
           ].map((p) => (
             <li key={p.name} className="flex items-center gap-4 rounded-[6px] border p-5" style={{ borderColor: C.line, background: C.card }}>
-              <span className="grid h-14 w-14 flex-none place-items-center rounded-[4px] text-[22px]" style={{ ...sfxF, background: C.gray, color: P.yellow }} aria-hidden>
+              <span className="grid h-14 w-14 flex-none place-items-center rounded-[4px] text-[22px] font-bold" style={{ background: C.soft, color: C.accent }} aria-hidden>
                 {p.name[0]}
               </span>
               <div className="min-w-0">
@@ -340,7 +304,7 @@ export function LaborFirmDemo() {
                 {HOURS.map((h) => (
                   <li key={h.label}>
                     <span className="inline-block w-[7.5em] font-semibold">{h.label}</span>
-                    <span style={monoF}>{h.time}</span>
+                    <span className="tabular-nums">{h.time}</span>
                   </li>
                 ))}
               </ul>
@@ -353,7 +317,7 @@ export function LaborFirmDemo() {
             {NOTICES.map((n) => (
               <li key={n.t} className="flex items-baseline justify-between gap-4 border-b py-3 text-[16px]" style={{ borderColor: C.line }}>
                 <span className="min-w-0">{n.t}</span>
-                <span className="flex-none text-[14px]" style={{ ...monoF, color: C.muted }}>
+                <span className="flex-none text-[14px]" style={{ color: C.muted }}>
                   {fmtDash(daysAgo(today, n.d))}
                 </span>
               </li>
@@ -362,15 +326,15 @@ export function LaborFirmDemo() {
         </section>
       </div>
 
-      <footer className="mt-16 px-4 pb-28 pt-10 text-[14px] leading-[1.8] md:px-6" style={{ background: C.gray, color: P.sub }}>
+      <footer className="mt-16 px-4 pb-28 pt-10 text-[14px] leading-[1.8] md:px-6" style={{ background: C.soft, color: C.muted, borderTop: `1px solid ${C.line}` }}>
         <div className="mx-auto max-w-[1200px]">
-          <p className="text-[17px] text-white" style={sfxF}>
-            {BRAND}
+          <p className="text-[17px] font-bold" style={{ color: C.ink }}>
+            <SampleLogo size={18} />
           </p>
           <p>
             {ADDRESS} / 대표번호 {TEL} / {KAKAO}
           </p>
-          <DemoMakerInfo className="mt-6 text-white" />
+          <DemoMakerInfo className="mt-6" />
         </div>
       </footer>
     </div>
@@ -381,23 +345,12 @@ export function LaborFirmDemo() {
 
 function SectionTitle({ id, icon, title }: { id: string; icon: React.ReactNode; title: string }) {
   return (
-    <h2 id={id} className="flex items-center gap-2.5 text-[26px] leading-tight md:text-[32px]" style={sfxF}>
-      <span className="grid h-10 w-10 flex-none place-items-center rounded-[4px]" style={{ background: C.yellow, color: C.ink }}>
+    <h2 id={id} className="flex items-center gap-2.5 text-[26px] font-bold leading-tight tracking-[-0.02em] md:text-[32px]">
+      <span className="flex-none" style={{ color: C.accent }}>
         {icon}
       </span>
       {title}
     </h2>
-  );
-}
-
-/** 작은 상호 표시. 일력 한 장 */
-function PageMark({ size = 20 }: { size?: number }) {
-  return (
-    <svg width={size} height={size} viewBox="0 0 24 24" aria-hidden>
-      <rect x="3" y="2" width="18" height="6" rx="1.5" fill={P.yellow} />
-      <rect x="4" y="7" width="16" height="15" rx="1" fill={P.paper} />
-      <rect x="8" y="11" width="8" height="7" rx="1" fill={P.ink} />
-    </svg>
   );
 }
 
@@ -410,7 +363,7 @@ function Stepper({ label, value, set, min, max, unit }: { label: string; value: 
         <button type="button" className={btn} style={{ borderColor: C.line, background: C.card, outlineColor: C.ink }} onClick={() => set(Math.max(min, value - 1))} disabled={value <= min} aria-label={`${label} 줄이기`}>
           <Minus size={18} aria-hidden />
         </button>
-        <output className="min-w-[4.5em] text-center text-[20px] font-bold" aria-live="polite" style={monoF}>
+        <output className="min-w-[4.5em] text-center text-[20px] font-bold tabular-nums" aria-live="polite">
           {value}
           <span className="ml-0.5 text-[15px]" style={{ fontFamily: "inherit" }}>
             {unit}
@@ -444,218 +397,58 @@ function ConsultLink({ onClick, cta, children }: { onClick: () => void; cta: str
 function Poster({ reduce, onCta }: { reduce: boolean; onCta: () => void }) {
   const ref = useRef<HTMLElement>(null);
   const { scrollYProgress } = useScroll({ target: ref, offset: ["start start", "end start"] });
-  const p = useTransform(scrollYProgress, (v) => (reduce ? 0 : clamp01(v / EXIT_END)));
-  // 문장은 위로 빠지고 일력은 조금 늦게 따라 올라간다
-  const textY = useTransform(p, (v) => `${-v * 42}svh`);
-  const textO = useTransform(p, (v) => 1 - clamp01((v - 0.3) / 0.6));
-  const calY = useTransform(p, (v) => `${-Math.max(0, v - 0.55) * 60}svh`);
+  // 스크롤하면 사진만 조금 느리게 내려간다
+  const photoY = useTransform(scrollYProgress, (v) => (reduce ? "0%" : `${v * 8}%`));
 
   return (
-    <section id="lf-poster" ref={ref} aria-labelledby="lf-poster-title" className="relative" style={{ height: reduce ? undefined : "180svh", background: P.bg }}>
-      <div
-        className={`${reduce ? "relative min-h-svh" : "sticky top-0 h-svh"} overflow-hidden`}
-        style={{ background: `radial-gradient(90% 70% at 72% 40%, #34363b 0%, ${P.bg} 55%, ${P.bgDeep} 100%)`, color: "#fff" }}
-      >
-        {/* 벽 결. 아주 옅은 세로 줄 */}
-        <div aria-hidden className="pointer-events-none absolute inset-0 opacity-[0.06]" style={{ backgroundImage: "repeating-linear-gradient(90deg, #fff 0 1px, transparent 1px 7px)" }} />
+    <section id="lf-poster" ref={ref} aria-labelledby="lf-poster-title" className="relative flex min-h-[100svh] flex-col overflow-hidden" style={{ background: "#141414", color: "#ffffff" }}>
+      <style>{`@keyframes lf-rise{from{opacity:0;transform:translateY(12px)}to{opacity:1;transform:none}}.lf-rise{animation:lf-rise 0.7s cubic-bezier(0.22,1,0.36,1) 0.3s both}@media (prefers-reduced-motion: reduce){.lf-rise{animation:none}}`}</style>
+      <motion.div aria-hidden={false} className="absolute inset-x-0 top-[-10%] h-[110%]" style={{ y: photoY }}>
+        <motion.div className="h-full w-full" initial={reduce ? false : { scale: 1.06 }} animate={{ scale: 1 }} transition={{ duration: reduce ? 0 : PHOTO_IN, ease: EASE }}>
+          {/* eslint-disable-next-line @next/next/no-img-element -- 정적 export 라 next/image 최적화를 쓰지 않는다 */}
+          <img
+            src={`${IMG}/hero.jpg`}
+            srcSet={`${IMG}/hero-sm.jpg 960w, ${IMG}/hero.jpg 1920w`}
+            sizes="100vw"
+            alt="회의 탁자에서 펜을 든 손으로 서류를 검토하는 모습"
+            fetchPriority="high"
+            className="absolute inset-0 h-full w-full object-cover"
+            style={{ objectPosition: "62% 50%" }}
+          />
+        </motion.div>
+      </motion.div>
+      {/* 글자 대비를 위한 막. 위는 상호, 아래는 문장 */}
+      <div aria-hidden className="pointer-events-none absolute inset-0" style={{ background: "linear-gradient(to top, rgba(0,0,0,0.78), rgba(0,0,0,0.4) 50%, rgba(0,0,0,0.2) 80%, rgba(0,0,0,0.45))" }} />
 
-        {/* 일력 */}
-        <motion.div
-          className="pointer-events-none absolute inset-x-0 bottom-[5svh] flex justify-center lg:inset-y-0 lg:left-auto lg:right-[6vw] lg:items-center lg:pt-[4svh]"
-          style={{ y: calY }}
+      <div className="relative z-[1] flex items-center justify-between gap-3 px-4 pt-4 md:px-12 md:pt-7">
+        <p className="inline-flex items-center gap-2 text-[17px] font-bold leading-none">
+          <SampleLogo light size={18} />
+        </p>
+        <button
+          type="button"
+          onClick={onCta}
+          data-gtm-cta="labor-firm_poster_cta"
+          className={`inline-flex min-h-11 items-center gap-1.5 rounded-[6px] px-4 text-[15px] font-semibold ${focusRing}`}
+          style={{ background: C.accent, color: "#ffffff", outlineColor: "#ffffff" }}
         >
-          <TearCalendar reduce={reduce} p={p} />
-        </motion.div>
+          <CalendarCheck size={17} aria-hidden />
+          상담신청
+        </button>
+      </div>
 
-        {/* 로고와 핵심 행동 하나 */}
-        <motion.div className="absolute inset-x-0 top-0 z-10 flex items-center justify-between px-4 pt-4 md:px-12 md:pt-7" style={{ y: textY }}>
-          <p className="inline-flex items-center gap-2 text-[17px] leading-none" style={sfxF}>
-            <PageMark size={20} />
-            {BRAND}
-          </p>
-          <button
-            type="button"
-            onClick={onCta}
-            aria-label="상담신청"
-            title="상담신청"
-            data-gtm-cta="labor-firm_poster_cta"
-            className={`pointer-events-auto inline-flex h-12 w-12 items-center justify-center rounded-full ${focusRing}`}
-            style={{ background: P.yellow, color: P.ink, outlineColor: "#fff" }}
-          >
-            <CalendarCheck size={22} aria-hidden />
-          </button>
-        </motion.div>
-
-        {/* 큰 문장 */}
-        <motion.div className="relative z-[1] flex h-full flex-col px-4 pt-[13svh] md:px-12 lg:justify-center lg:pb-[4svh] lg:pt-0" style={{ y: textY, opacity: textO }}>
-          <h1
-            id="lf-poster-title"
-            className="text-[clamp(48px,13.5vw,96px)] leading-[1.12] tracking-[-0.02em] lg:text-[clamp(88px,8.4vw,176px)] lg:leading-[1.06]"
-            style={{ ...sfxF, wordBreak: "keep-all" }}
-          >
-            <span className="block">해고된 날부터</span>
-            <span className="block" style={{ color: P.yellow }}>
-              3개월 안에
-            </span>
-            <span className="block">신청해요</span>
-          </h1>
-          <p className="mt-5 text-[16px] md:mt-8 md:text-[19px]" style={{ color: P.sub }}>
-            부당해고 구제신청, 지방노동위원회
-          </p>
-        </motion.div>
+      <div className={`relative z-[1] mt-auto px-4 pb-14 md:px-12 md:pb-20 ${reduce ? "" : "lf-rise"}`}>
+        <h1
+          id="lf-poster-title"
+          className="max-w-[13em] text-[36px] font-bold md:text-[clamp(40px,5vw,72px)]"
+          style={{ letterSpacing: "-0.03em", lineHeight: 1.2, wordBreak: "keep-all" }}
+        >
+          해고된 날부터 3개월 안에 신청해요
+        </h1>
+        <p className="mt-4 text-[16px] md:mt-6 md:text-[18px]" style={{ color: "rgba(255,255,255,0.86)" }}>
+          부당해고 구제신청, 지방노동위원회
+        </p>
       </div>
     </section>
-  );
-}
-
-/** 벽에 걸린 일력. 위는 노란 광고판, 아래는 종이 묶음 */
-function TearCalendar({ reduce, p }: { reduce: boolean; p: MotionValue<number> }) {
-  const gid = useId().replace(/:/g, "");
-  return (
-    <div className="relative w-[min(66vw,29svh)] lg:w-[min(32vw,50svh)]" style={{ containerType: "inline-size" }} role="img" aria-label="벽에 걸린 일력. 한 장씩 찢겨 나가며 남은 날 숫자가 줄어든다">
-      {/* 벽에 진 그림자 */}
-      <div aria-hidden className="absolute left-[6%] top-[8%] h-[100%] w-[100%] rounded-[3cqw]" style={{ background: "rgba(0,0,0,0.45)", filter: "blur(18px)" }} />
-
-      {/* 못과 끈 */}
-      <svg aria-hidden viewBox="0 0 100 30" className="absolute left-1/2 top-[-9cqw] w-[30cqw] -translate-x-1/2 overflow-visible">
-        <defs>
-          <radialGradient id={`${gid}-nail`} cx="0.35" cy="0.3" r="0.75">
-            <stop offset="0" stopColor="#ffffff" />
-            <stop offset="0.35" stopColor="#c9ccd1" />
-            <stop offset="1" stopColor="#4a4d52" />
-          </radialGradient>
-        </defs>
-        <path d="M18 30 L50 6 L82 30" fill="none" stroke="#141517" strokeWidth="2.2" strokeLinecap="round" />
-        <ellipse cx="53" cy="10" rx="8" ry="3" fill="rgba(0,0,0,0.5)" />
-        <circle cx="50" cy="6" r="6" fill={`url(#${gid}-nail)`} />
-      </svg>
-
-      {/* 판 */}
-      <div className="relative rounded-[2.5cqw] p-[5cqw] pb-[6cqw]" style={{ background: `linear-gradient(180deg, #ffd83a 0%, ${P.yellow} 30%, ${P.yellowDeep} 100%)`, boxShadow: "inset 0 1.2cqw 0 rgba(255,255,255,0.45), inset 0 -1cqw 0 rgba(0,0,0,0.18)" }}>
-        {/* 판에 인쇄된 상호 */}
-        <div className="flex items-center justify-between px-[1cqw] pb-[3.5cqw] pt-[1cqw]" style={{ color: P.ink }}>
-          <span className="text-[6.4cqw] leading-none" style={sfxF}>
-            {BRAND}
-          </span>
-          <span className="text-[3.6cqw] font-bold leading-none" style={monoF}>
-            {TEL}
-          </span>
-        </div>
-
-        {/* 종이 묶음 */}
-        <div className="relative" style={{ perspective: "1400px" }}>
-          {/* 묶음 두께. 아래로 갈수록 어두운 종이 단면 */}
-          {[5, 4, 3, 2, 1].map((k) => (
-            <div key={k} aria-hidden className="absolute inset-x-[0.4cqw] top-0 h-full rounded-b-[1.2cqw]" style={{ transform: `translateY(${k * 0.9}cqw)`, background: k % 2 ? "#d8d1bf" : "#e9e3d4", boxShadow: "0 0.3cqw 0 rgba(0,0,0,0.12)" }} />
-          ))}
-
-          {/* 바닥 장: 마지막 숫자. 묶음 크기를 잡는다 */}
-          <div className="relative aspect-[1/1.02]">
-            <Sheet n={STACK[STACK.length - 1] - 1} />
-          </div>
-
-          {/* 스크롤하면 넘어가는 장(아래 장부터 깐다) */}
-          {[...STACK].reverse().map((n, ri) => {
-            const i = STACK.length - 1 - ri;
-            return <FlipSheet key={n} n={n} i={i} p={p} reduce={reduce} sway={i === 0} />;
-          })}
-
-          {/* 들어올 때 찢겨 나가는 장 */}
-          {!reduce &&
-            [...TORN].reverse().map((n, ri) => {
-              const i = TORN.length - 1 - ri;
-              const t = { duration: TEAR_DUR, delay: TEAR_START + i * TEAR_GAP, ease: EASE_TEAR };
-              const side = i % 2 ? 1 : -1;
-              return (
-                <motion.div
-                  key={n}
-                  className="absolute inset-0"
-                  style={{ transformOrigin: "50% 0%" }}
-                  initial={{ rotateX: 0, rotateZ: 0, x: "0cqw", y: "0cqw", opacity: 1 }}
-                  animate={{
-                    rotateX: [0, LIFT * 28, LIFT * 55],
-                    rotateZ: [0, side * 3, side * 34],
-                    x: ["0cqw", `${side * 4}cqw`, `${side * 95}cqw`],
-                    y: ["0cqw", "10cqw", "70cqw"],
-                    opacity: [1, 1, 0],
-                  }}
-                  transition={{ ...t, times: [0, 0.35, 1] }}
-                >
-                  <Sheet n={n} />
-                </motion.div>
-              );
-            })}
-
-          {/* 묶음 위쪽 제본 띠와 찢고 남은 종이 자국 */}
-          <div aria-hidden className="absolute inset-x-0 top-0 z-20 h-[7cqw] rounded-t-[1cqw]" style={{ background: "linear-gradient(180deg, #3a3d42 0%, #1d1f22 100%)", boxShadow: "0 0.8cqw 1.2cqw rgba(0,0,0,0.35)" }}>
-            {[22, 78].map((x) => (
-              <span key={x} className="absolute top-[2.2cqw] h-[2.6cqw] w-[9cqw] -translate-x-1/2 rounded-[0.6cqw]" style={{ left: `${x}%`, background: "linear-gradient(180deg, #f2f3f5 0%, #9a9ea6 60%, #5d6168 100%)" }} />
-            ))}
-          </div>
-          <svg aria-hidden viewBox="0 0 100 6" preserveAspectRatio="none" className="absolute inset-x-0 top-[6.8cqw] z-20 h-[2.4cqw] w-full">
-            <path d="M0 0 H100 V2 L96 4 L92 2.5 L88 5 L83 2 L79 4.5 L74 2.5 L70 5.5 L65 2 L61 4 L56 2.5 L52 5 L47 2 L43 4.5 L38 2.5 L34 5 L29 2 L25 4 L20 2.5 L16 5.5 L11 2 L7 4 L3 2.5 L0 4 Z" fill="#efeadd" />
-          </svg>
-        </div>
-      </div>
-    </div>
-  );
-}
-
-/** 일력 한 장. 남은 날 숫자 */
-function Sheet({ n }: { n: number }) {
-  return (
-    <div
-      className="absolute inset-0 overflow-hidden rounded-b-[1.2cqw]"
-      style={{
-        background: `linear-gradient(180deg, #fbf9f3 0%, ${P.paper} 45%, #ebe5d6 100%)`,
-        boxShadow: "inset 0 -0.6cqw 0 rgba(0,0,0,0.06)",
-        backfaceVisibility: "hidden",
-        color: P.ink,
-      }}
-    >
-      {/* 왼쪽 위에서 비치는 빛 */}
-      <div aria-hidden className="absolute inset-0" style={{ background: "radial-gradient(80% 60% at 20% 20%, rgba(255,255,255,0.7), transparent 70%)" }} />
-      {/* 절취선 */}
-      <div aria-hidden className="absolute inset-x-[3cqw] top-[11cqw] border-t-[0.5cqw] border-dotted" style={{ borderColor: "#bdb6a4" }} />
-      <div className="relative flex h-full flex-col items-center pt-[14cqw]">
-        <span className="text-[5cqw] font-bold tracking-[0.2em]" style={{ ...monoF, color: "#5b5e64" }}>
-          남은 날
-        </span>
-        <span className="my-auto pb-[4cqw] text-[52cqw] leading-[0.9] tracking-[-0.04em]" style={sfxF}>
-          {n}
-        </span>
-        <span className="w-full px-[5cqw] pb-[4cqw] text-right text-[4.2cqw] font-bold" style={{ ...monoF, color: "#5b5e64" }}>
-          구제신청 기한까지
-        </span>
-      </div>
-    </div>
-  );
-}
-
-/** 스크롤에 묶여 위로 넘어가는 장. 맨 위 장은 아래 끝이 바람에 살짝 들린다 */
-function FlipSheet({ n, i, p, reduce, sway }: { n: number; i: number; p: MotionValue<number>; reduce: boolean; sway: boolean }) {
-  const prog = useTransform(p, (v) => clamp01((v - i * FLIP_STEP) / FLIP_LEN));
-  const rotateX = useTransform(prog, (t) => LIFT * t * 168);
-  const opacity = useTransform(prog, (t) => (t > 0.97 ? 0 : 1));
-  const swayDelay = TEAR_START + (TORN.length - 1) * TEAR_GAP + TEAR_DUR + 0.6;
-  return (
-    <motion.div className="absolute inset-0" style={{ transformOrigin: "50% 0%", rotateX, opacity, transformStyle: "preserve-3d" }}>
-      <motion.div
-        className="absolute inset-0"
-        style={{ transformOrigin: "50% 0%", transformStyle: "preserve-3d" }}
-        initial={false}
-        animate={sway && !reduce ? { rotateX: [0, LIFT * 7, 0, LIFT * 3, 0] } : { rotateX: 0 }}
-        transition={sway && !reduce ? { duration: SWAY_LOOP, delay: swayDelay, repeat: Infinity, ease: "easeInOut", times: [0, 0.18, 0.4, 0.55, 0.75] } : { duration: 0 }}
-      >
-        <Sheet n={n} />
-        {/* 종이 뒷면. 넘어가면 숫자 대신 빈 종이가 보인다 */}
-        <div
-          aria-hidden
-          className="absolute inset-0 rounded-t-[1.2cqw]"
-          style={{ transform: "rotateX(180deg)", backfaceVisibility: "hidden", background: "linear-gradient(0deg, #f1ede2 0%, #e2dccb 100%)", boxShadow: "inset 0 0 3cqw rgba(0,0,0,0.08)" }}
-        />
-      </motion.div>
-    </motion.div>
   );
 }
 
@@ -695,7 +488,7 @@ function DeadlineCalc({ today, reduce, onConsult }: { today: Date; reduce: boole
           value={value}
           onChange={(e) => setInput(e.target.value)}
           className={`mt-2 block h-12 w-full rounded-[4px] border px-3 text-[18px] ${focusRing}`}
-          style={{ ...monoF, borderColor: C.ink, outlineColor: C.ink }}
+          style={{ borderColor: C.ink, outlineColor: C.ink }}
         />
         <p className="mt-2 text-[15px]" style={{ color: C.muted }}>
           해고 통지서에 적힌 해고 날짜
@@ -722,7 +515,7 @@ function DeadlineCalc({ today, reduce, onConsult }: { today: Date; reduce: boole
                 <p className="text-[15px] font-bold" style={{ color: C.muted }}>
                   신청 마감일
                 </p>
-                <p className="mt-1 text-[30px] leading-tight md:text-[36px]" style={sfxF}>
+                <p className="mt-1 text-[30px] leading-tight md:text-[36px] font-bold">
                   {fmtKo(res.end)}
                 </p>
                 {res.moved && (
@@ -733,10 +526,10 @@ function DeadlineCalc({ today, reduce, onConsult }: { today: Date; reduce: boole
               </div>
               <div
                 className="rounded-[4px] px-4 py-2 text-right"
-                style={{ background: tone === "over" ? C.error : tone === "soon" ? C.yellow : C.gray, color: tone === "soon" ? C.ink : "#fff" }}
+                style={{ background: tone === "over" ? C.error : tone === "soon" ? C.accent : C.gray, color: "#fff" }}
               >
                 <p className="text-[13px] font-bold">{tone === "over" ? "기한 지남" : "남은 날"}</p>
-                <motion.p key={left} initial={reduce ? false : { y: -10, opacity: 0 }} animate={{ y: 0, opacity: 1 }} transition={{ duration: reduce ? 0 : DUR, ease: EASE }} className="text-[34px] leading-none" style={sfxF}>
+                <motion.p key={left} initial={reduce ? false : { y: -10, opacity: 0 }} animate={{ y: 0, opacity: 1 }} transition={{ duration: reduce ? 0 : DUR, ease: EASE }} className="text-[34px] leading-none font-bold">
                   {left < 0 ? `${-left}일 지남` : left === 0 ? "오늘까지" : `${left}일`}
                 </motion.p>
               </div>
@@ -744,14 +537,14 @@ function DeadlineCalc({ today, reduce, onConsult }: { today: Date; reduce: boole
 
             {/* 3개월 막대 */}
             <div className="mt-7">
-              <div className="relative h-5 text-[13px] font-bold" style={{ ...monoF, color: C.muted }}>
+              <div className="relative h-5 text-[13px] font-bold" style={{ color: C.muted }}>
                 {marks.map((m) => (
                   <span key={m.k} className="absolute bottom-0 -translate-x-1/2 whitespace-nowrap" style={{ left: `${m.f * 100}%` }}>
                     {m.k}개월
                   </span>
                 ))}
               </div>
-              <div className="relative mt-1 h-4 rounded-[2px]" style={{ background: "#e7e4db" }}>
+              <div className="relative mt-1 h-4 rounded-[2px]" style={{ background: "#ececea" }}>
                 <motion.div
                   className="absolute inset-y-0 left-0 w-full origin-left rounded-[2px]"
                   style={{ background: tone === "over" ? C.error : C.gray }}
@@ -760,10 +553,10 @@ function DeadlineCalc({ today, reduce, onConsult }: { today: Date; reduce: boole
                   transition={{ duration: reduce ? 0 : DUR, ease: EASE }}
                 />
                 {marks.map((m) => (
-                  <span key={m.k} aria-hidden className="absolute inset-y-[-4px] w-[2px]" style={{ left: `${m.f * 100}%`, background: C.yellowDeep }} />
+                  <span key={m.k} aria-hidden className="absolute inset-y-[-4px] w-[2px]" style={{ left: `${m.f * 100}%`, background: C.accent }} />
                 ))}
               </div>
-              <div className="mt-2 flex justify-between gap-3 text-[14px]" style={{ ...monoF, color: C.muted }}>
+              <div className="mt-2 flex justify-between gap-3 text-[14px]" style={{ color: C.muted }}>
                 <span className="whitespace-nowrap">해고 {md(fired)}</span>
                 {!future && tone !== "over" && <span className="whitespace-nowrap font-bold" style={{ color: C.ink }}>{Math.round(passed * 100)}% 지남</span>}
                 <span className="whitespace-nowrap">마감 {md(res.end)}</span>
@@ -837,7 +630,7 @@ function WageCalc({ reduce, onConsult }: { reduce: boolean; onConsult: () => voi
                 setPayText(d ? Number(d).toLocaleString("ko-KR") : "");
               }}
               className={`h-12 w-full rounded-[4px] border px-3 text-right text-[19px] font-bold ${focusRing}`}
-              style={{ ...monoF, borderColor: C.ink, outlineColor: C.ink }}
+              style={{ borderColor: C.ink, outlineColor: C.ink }}
             />
             <span className="text-[16px] font-bold">원</span>
           </div>
@@ -866,40 +659,40 @@ function WageCalc({ reduce, onConsult }: { reduce: boolean; onConsult: () => voi
         {quit && <Stepper label="일한 기간" value={years} set={setYears} min={0} max={30} unit="년" />}
       </div>
 
-      <div className="rounded-[6px] p-5 text-white md:p-6" style={{ background: C.gray }} aria-live="polite">
+      <div className="rounded-[6px] p-5 md:p-6" style={{ background: C.soft, color: C.ink }} aria-live="polite">
         <dl className="space-y-3 text-[16px]">
           <div className="flex justify-between gap-4">
             <dt>밀린 임금</dt>
-            <dd className="font-bold" style={monoF}>
+            <dd className="font-bold tabular-nums">
               {won(unpaid)}
             </dd>
           </div>
           <div className="flex justify-between gap-4">
             <dt>퇴직금(개략)</dt>
-            <dd className="font-bold" style={monoF}>
+            <dd className="font-bold tabular-nums">
               {quit ? (years >= 1 ? won(severance) : "1년 미만이라 없음") : "퇴직 때 계산"}
             </dd>
           </div>
-          <div className="flex items-end justify-between gap-4 border-t pt-4" style={{ borderColor: "#4a4d52" }}>
+          <div className="flex items-end justify-between gap-4 border-t pt-4" style={{ borderColor: C.line }}>
             <dt className="font-bold">받을 돈 합계(개략)</dt>
-            <dd className="text-[28px] leading-none md:text-[34px]" style={{ ...sfxF, color: P.yellow }}>
+            <dd className="text-[28px] leading-none md:text-[34px]" style={{ color: C.accent }}>
               {won(sum)}
             </dd>
           </div>
         </dl>
-        <div className="mt-4 flex h-8 overflow-hidden rounded-[3px]" style={{ background: "#3a3d42" }} aria-hidden>
-          {seg("u", "임금", unpaid, P.yellow, P.ink)}
-          {seg("s", "퇴직금", severance, P.paper, P.ink)}
+        <div className="mt-4 flex h-8 overflow-hidden rounded-[3px]" style={{ background: C.line }} aria-hidden>
+          {seg("u", "임금", unpaid, C.accent, "#ffffff")}
+          {seg("s", "퇴직금", severance, "#d6d3ca", C.ink)}
         </div>
-        <p className="mt-4 text-[14px] leading-[1.7]" style={{ color: P.sub }}>
+        <p className="mt-4 text-[14px] leading-[1.7]" style={{ color: C.body }}>
           퇴직금은 평균임금 30일분에 근속 연수를 곱해요. 여기서는 월급으로 바꿔 계산했어요.
           {quit ? " 퇴직하고 14일이 지나도 못 받았다면 그다음 날부터 연 20% 지연이자가 붙어요." : " 일하는 중이라도 월급날을 넘기면 그다음 날부터 연 20% 지연이자가 붙어요."}
         </p>
 
         <ol className="mt-5 grid gap-2 text-[15px] sm:grid-cols-2">
           {["노동청 진정", "근로감독관 조사", "체불 확인서 발급", "대지급금 신청"].map((s, i) => (
-            <li key={s} className="flex items-center gap-2 rounded-[3px] px-3 py-2" style={{ background: "#35373c" }}>
-              <span className="grid h-6 w-6 flex-none place-items-center rounded-full text-[13px] font-bold" style={{ background: P.yellow, color: P.ink }}>
+            <li key={s} className="flex items-center gap-2 rounded-[3px] px-3 py-2" style={{ background: C.card, border: `1px solid ${C.line}` }}>
+              <span className="grid h-6 w-6 flex-none place-items-center rounded-full text-[13px] font-bold" style={{ background: C.accent, color: "#ffffff" }}>
                 {i + 1}
               </span>
               {s}
@@ -912,7 +705,7 @@ function WageCalc({ reduce, onConsult }: { reduce: boolean; onConsult: () => voi
             onClick={onConsult}
             data-gtm-cta="labor-firm_wage_consult"
             className={`inline-flex items-center gap-1.5 rounded-[4px] px-4 py-2.5 text-[16px] font-bold ${focusRing}`}
-            style={{ background: P.yellow, color: P.ink, outlineColor: "#fff" }}
+            style={{ background: C.accent, color: "#ffffff", outlineColor: C.accent }}
           >
             임금체불 상담신청
             <ChevronRight size={18} aria-hidden />
@@ -938,7 +731,7 @@ function Advisory({ reduce, onConsult }: { reduce: boolean; onConsult: () => voi
           <label htmlFor={rangeId} className="text-[16px] font-bold">
             직원 수
           </label>
-          <output htmlFor={rangeId} className="text-[30px] leading-none" style={sfxF}>
+          <output htmlFor={rangeId} className="text-[30px] leading-none font-bold">
             {staff >= 300 ? "300명 이상" : `${staff}명`}
           </output>
         </div>
@@ -952,7 +745,7 @@ function Advisory({ reduce, onConsult }: { reduce: boolean; onConsult: () => voi
           className={`mt-4 w-full ${focusRing}`}
           style={{ accentColor: C.gray, outlineColor: C.ink }}
         />
-        <div className="mt-1 flex justify-between text-[13px]" style={{ ...monoF, color: C.muted }}>
+        <div className="mt-1 flex justify-between text-[13px]" style={{ color: C.muted }}>
           <span>1</span>
           <span>300</span>
         </div>
@@ -974,7 +767,7 @@ function Advisory({ reduce, onConsult }: { reduce: boolean; onConsult: () => voi
               <tr
                 key={t.label}
                 className="border-b transition-colors"
-                style={{ borderColor: C.line, background: i === idx ? C.yellowSoft : undefined, transitionDuration: reduce ? "0ms" : "200ms" }}
+                style={{ borderColor: C.line, background: i === idx ? C.accentSoft : undefined, transitionDuration: reduce ? "0ms" : "200ms" }}
                 aria-current={i === idx ? "true" : undefined}
               >
                 <td className="py-2.5 pl-2">
@@ -983,7 +776,7 @@ function Advisory({ reduce, onConsult }: { reduce: boolean; onConsult: () => voi
                     {t.label}
                   </span>
                 </td>
-                <td className="py-2.5 pr-2 text-right font-bold" style={monoF}>
+                <td className="py-2.5 pr-2 text-right font-bold tabular-nums">
                   {t.fee ? won(t.fee) : "별도 협의"}
                 </td>
               </tr>
@@ -995,16 +788,16 @@ function Advisory({ reduce, onConsult }: { reduce: boolean; onConsult: () => voi
         </p>
       </div>
 
-      <div className="flex flex-col rounded-[6px] border-2 p-5 md:p-6" style={{ borderColor: C.ink, background: C.card }} aria-live="polite">
+      <div className="flex flex-col rounded-[6px] border p-5 md:p-6" style={{ borderColor: C.line, background: C.card }} aria-live="polite">
         <p className="text-[15px] font-bold" style={{ color: C.muted }}>
           {tier.label} 사업장
         </p>
         <AnimatePresence mode="wait" initial={false}>
-          <motion.div key={idx} initial={reduce ? false : { y: 12, opacity: 0 }} animate={{ y: 0, opacity: 1 }} exit={reduce ? { opacity: 0 } : { y: -12, opacity: 0 }} transition={{ duration: reduce ? 0 : 0.25, ease: EASE }}>
-            <p className="mt-1 text-[38px] leading-tight md:text-[44px]" style={sfxF}>
+          <motion.div key={idx} initial={reduce ? false : { opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} transition={{ duration: reduce ? 0 : 0.25, ease: EASE }}>
+            <p className="mt-1 text-[38px] leading-tight md:text-[44px] font-bold">
               {tier.fee ? `월 ${won(tier.fee)}` : "별도 협의"}
             </p>
-            <p className="text-[15px]" style={{ ...monoF, color: C.muted }}>
+            <p className="text-[15px]" style={{ color: C.muted }}>
               {tier.fee ? `연 ${won(tier.fee * 12)}` : "현장 방문 후 견적"}
             </p>
           </motion.div>
@@ -1087,18 +880,18 @@ function ConsultForm({ today, reduce, topic, setTopic }: { today: Date; reduce: 
       <AnimatePresence mode="wait" initial={false}>
         {done ? (
           <motion.div key="done" initial={reduce ? false : { opacity: 0, y: 12 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0 }} transition={{ duration: reduce ? 0 : 0.3, ease: EASE }} role="status">
-            <p className="inline-flex items-center gap-2 text-[22px]" style={sfxF}>
-              <span className="grid h-9 w-9 place-items-center rounded-full" style={{ background: C.yellow, color: C.ink }}>
+            <p className="inline-flex items-center gap-2 text-[22px] font-bold">
+              <span className="grid h-9 w-9 place-items-center rounded-full" style={{ background: C.accent, color: "#ffffff" }}>
                 <Check size={20} aria-hidden />
               </span>
               상담신청이 접수됐어요
             </p>
             <dl className="mt-5 grid gap-x-6 gap-y-2.5 text-[16px] sm:grid-cols-[auto_1fr]">
               <dt className="font-bold">접수 번호</dt>
-              <dd style={monoF}>{done.no}</dd>
+              <dd className="tabular-nums">{done.no}</dd>
               <dt className="font-bold">신청인</dt>
               <dd>
-                {done.name} / <span style={monoF}>{done.phone}</span>
+                {done.name} / <span className="tabular-nums">{done.phone}</span>
               </dd>
               <dt className="font-bold">상담 내용</dt>
               <dd>
@@ -1111,7 +904,7 @@ function ConsultForm({ today, reduce, topic, setTopic }: { today: Date; reduce: 
               <dt className="font-bold">담당 창구</dt>
               <dd>
                 {KAKAO} 또는 전화{" "}
-                <span className="whitespace-nowrap" style={monoF}>
+                <span className="whitespace-nowrap tabular-nums">
                   {TEL}
                 </span>
               </dd>
@@ -1156,7 +949,7 @@ function ConsultForm({ today, reduce, topic, setTopic }: { today: Date; reduce: 
               <legend className="text-[16px] font-bold">시간대</legend>
               <div className="mt-2 flex flex-wrap gap-2">
                 {SLOTS.map((s) => (
-                  <button key={s} type="button" aria-pressed={slot === s} onClick={() => setSlot(s)} className={chip} style={{ ...chipStyle(slot === s), ...monoF }}>
+                  <button key={s} type="button" aria-pressed={slot === s} onClick={() => setSlot(s)} className={chip} style={{ ...chipStyle(slot === s) }}>
                     {s}
                   </button>
                 ))}
@@ -1168,7 +961,7 @@ function ConsultForm({ today, reduce, topic, setTopic }: { today: Date; reduce: 
                 {days.map((d, i) => (
                   <button key={d.getTime()} type="button" aria-pressed={day === i} onClick={() => setDay(i)} className={`rounded-[4px] border py-2.5 text-center ${focusRing}`} style={chipStyle(day === i)}>
                     <span className="block text-[13px] font-semibold">{DOW[d.getDay()]}</span>
-                    <span className="block text-[15px] font-bold sm:text-[18px]" style={monoF}>
+                    <span className="block text-[15px] font-bold sm:text-[18px] tabular-nums">
                       {d.getMonth() + 1}.{d.getDate()}
                     </span>
                   </button>
@@ -1190,7 +983,7 @@ function ConsultForm({ today, reduce, topic, setTopic }: { today: Date; reduce: 
               <label htmlFor={phoneId} className="text-[16px] font-bold">
                 연락처
               </label>
-              <input id={phoneId} value={phone} onChange={(e) => setPhone(e.target.value)} inputMode="tel" autoComplete="tel" placeholder="010-0000-0000" className={field} style={{ ...monoF, borderColor: tried && !phoneOk ? C.error : C.line, outlineColor: C.ink }} aria-invalid={tried && !phoneOk} />
+              <input id={phoneId} value={phone} onChange={(e) => setPhone(e.target.value)} inputMode="tel" autoComplete="tel" placeholder="010-0000-0000" className={field} style={{ borderColor: tried && !phoneOk ? C.error : C.line, outlineColor: C.ink }} aria-invalid={tried && !phoneOk} />
               {tried && !phoneOk && (
                 <p className="mt-1 text-[14px] font-semibold" style={{ color: C.error }}>
                   휴대폰 번호를 확인해 주세요.
@@ -1217,7 +1010,7 @@ function ConsultForm({ today, reduce, topic, setTopic }: { today: Date; reduce: 
                 type="submit"
                 data-gtm-cta="labor-firm_consult_submit"
                 className={`inline-flex items-center gap-2 rounded-[4px] px-6 py-3 text-[17px] font-bold ${focusRing}`}
-                style={{ background: C.yellow, color: C.ink, outlineColor: C.ink }}
+                style={{ background: C.accent, color: "#ffffff", outlineColor: C.accent }}
               >
                 <CalendarCheck size={20} aria-hidden />
                 상담신청
@@ -1230,5 +1023,20 @@ function ConsultForm({ today, reduce, topic, setTopic }: { today: Date; reduce: 
         )}
       </AnimatePresence>
     </div>
+  );
+}
+
+function SampleLogo({ light, size = 20 }: { light?: boolean; size?: number }) {
+  return (
+    <span className="inline-flex items-center gap-2" style={{ color: light ? "#fff" : "#111" }}>
+      {/* eslint-disable-next-line @next/next/no-img-element -- 메인 사이트와 같은 곰 로고 */}
+      <img src="/images/logo-bear.png" alt="" aria-hidden width={28} height={28} className="h-7 w-7 shrink-0" />
+      <span className="flex items-baseline gap-1 whitespace-nowrap">
+        <span className="font-bold tracking-[-0.03em]" style={{ fontSize: size }}>
+          곰파트너
+        </span>
+        <span className="text-[12px] font-semibold opacity-75">노무법인 샘플</span>
+      </span>
+    </span>
   );
 }

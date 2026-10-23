@@ -1,40 +1,39 @@
 "use client";
 
 import { useCallback, useEffect, useId, useMemo, useRef, useState } from "react";
-import { Black_Han_Sans, Jua } from "@/lib/local-fonts";
-import { AnimatePresence, animate, motion, useMotionValue, useScroll, useTransform } from "framer-motion";
+import { AnimatePresence, motion, useScroll, useTransform } from "framer-motion";
 import { CalendarCheck, Car, Check, CircleAlert, Clock, Download, MapPin, Paperclip, RotateCcw } from "lucide-react";
 import { useReducedMotionSafe } from "@/hooks/useReducedMotionSafe";
 import { maskName, maskPhone } from "@/components/demos/LeadReceivedPanel";
 import { daysAgo, fmtKo, useDemoToday } from "@/hooks/useDemoToday";
 import { DemoMakerInfo } from "@/components/demos/DemoMakerInfo";
 
-/* 네일샵 홈페이지 샘플: 가상의 곰파트너네일. 젤네일, 패디, 케어, 아트.
+/* 네일샵 홈페이지 샘플: 가상의 곰파트너 네일샵. 젤네일, 패디, 케어, 아트.
    상호, 주소, 직원 이름은 모두 가상이다.
+   첫 화면 사진 출처: Pexels 사진 2281695
 
    국내 네일샵 홈페이지와 네이버 예약의 공통 구성을 따랐다.
    메뉴는 디자인 둘러보기, 시술 메뉴와 가격, 예약하기, 오시는 길 네 개.
    첫 화면에는 디자인 사진과 가격표, 예약 버튼이 같이 있고, 시술 메뉴는 젤 제거, 케어, 원컬러, 아트(손톱당), 패디로 나뉜다.
    예약은 날짜, 시간, 담당 디자이너를 고르고 이름과 휴대폰을 남긴다. 변경과 취소는 하루 전까지가 관용 문구다.
 
-   핵심 모션: 공유 레이아웃 전환(layoutId)과 색 모프.
-   컬러칩을 누르면 칩이 손톱 자리까지 날아가 붙고 손톱 색이 320ms 동안 그 색으로 바뀐다.
-   선택 테두리 링도 layoutId 로 칩 사이를 옮겨 다닌다. 아트는 손톱 위 패턴 레이어가 교차 전환한다.
-   동작 줄이기가 켜져 있으면 전부 즉시 바뀐다.
+   핵심 모션
+   - 첫 화면(ns-poster): 젤네일 손 사진 한 장이 화면을 채운다. 들어올 때 사진이 1.06배에서 1.6초 동안 천천히 다가오고,
+     문장과 정보 줄은 0.3초 늦게 12px 아래에서 올라온다(CSS 키프레임, 끝 상태가 기본값). 스크롤하면 사진만 8% 느리게 움직인다.
+   - 컬러칩을 누르면 칩이 손톱 자리까지 날아가 붙고(layoutId) 손톱 색이 320ms 동안 그 색으로 바뀐다.
+     선택 테두리 링도 layoutId 로 칩 사이를 옮겨 다닌다. 아트는 손톱 위 패턴 레이어가 교차 전환한다.
+   동작 줄이기가 켜져 있으면 첫 화면은 멈춘 사진, 나머지는 전부 즉시 바뀐다.
 
    상호작용(모두 브라우저 안에서만 돈다. 실제로 보내지 않는다)
    1. 컬러칩과 손톱 색 입히기: 전체 또는 손톱 하나씩. 되돌리기.
    2. 아트와 시술 메뉴: 베이스(젤 원컬러, 젤 그라데이션)와 아트 개수로 시술 시간과 금액 합산. 케어, 젤 제거 포함 여부.
    3. 디자인 저장: 손 그림을 PNG 로 내려받고 예약에 첨부된 것으로 표시.
    4. 예약: 날짜(오늘부터 7일), 시간, 담당, 이름, 휴대폰. 접수 완료 화면.
-   5. 샵 안내와 오시는 길: 영업시간(오늘 요일 진하게), 주차, 예약제.
+   5. 샵 안내와 오시는 길: 영업시간(오늘 요일 진하게), 주차, 예약제. */
 
-   포스터 첫 화면: 연분홍 바탕에 큰 문장 한 줄과 체리색 매니큐어 병 하나만 둔다. 메뉴, 카드는 스크롤 아래로.
-   들어올 때 뚜껑 붓이 병에서 빠지고 병이 기울며 붓 끝에서 방울이 떨어지면 문장 글자 안이 아래부터 체리색으로 차오른다(1.8초).
-   그 뒤에는 붓 끝에 7초마다 방울이 맺혀 떨어진다. 스크롤하면 뚜껑이 닫히며 병이 바로 서고, 글자 색이 빠져 손톱 모양으로 모인다.
-   동작 줄이기가 켜져 있으면 병은 열린 채 기울어 있고 글자는 다 칠해진 상태로 멈춰 있다. */
+const IMG = "/images/demo-nail-shop";
 
-const BRAND = "곰파트너네일";
+const BRAND = "곰파트너";
 const ADDRESS = "서울 ㅇㅇ구 ㅇㅇ로 00, 3층";
 const KAKAO = "카카오톡 채널 곰파트너";
 
@@ -42,20 +41,20 @@ const KAKAO = "카카오톡 채널 곰파트너";
 const DUR = 0.32;
 const EASE = [0.22, 1, 0.36, 1] as const;
 
+/** plum 은 글자색(먹색), accent 는 버튼과 선택 표시에만 쓰는 차분한 로즈 */
 const C = {
-  bg: "#fff4f7",
+  bg: "#f7f7f5",
   paper: "#ffffff",
-  plum: "#4a1a33",
-  plumSoft: "#7a4a62",
-  rose: "#d4668a",
-  roseSoft: "#f6d9e3",
-  line: "#eccbd6",
-  skin: "#f6dccb",
-  skinLine: "#dcae95",
+  plum: "#111111",
+  plumSoft: "#767676",
+  accent: "#9a5b6a",
+  rose: "#c98d9b",
+  roseSoft: "#f4eef0",
+  line: "#e5e5e5",
+  skin: "#f1ddd0",
+  skinLine: "#d6bcab",
   error: "#b42318",
 };
-
-const titleF = { fontFamily: `${Jua.style.fontFamily}, sans-serif`, fontWeight: 400 } as const;
 const focusRing = "focus-visible:outline focus-visible:outline-[3px] focus-visible:outline-offset-2";
 const won = (n: number) => `${n.toLocaleString("ko-KR")}원`;
 const p2 = (n: number) => String(n).padStart(2, "0");
@@ -294,7 +293,7 @@ export function NailShopDemo() {
       const png = cv.toDataURL("image/png");
       const a = document.createElement("a");
       a.href = png;
-      a.download = "곰파트너네일-내-디자인.png";
+      a.download = "곰파트너-내-디자인.png";
       a.click();
       const d = new Date();
       setSaved({ url: png, at: `${p2(d.getHours())}:${p2(d.getMinutes())}` });
@@ -319,10 +318,7 @@ export function NailShopDemo() {
       <Poster reduce={reduce} onCta={() => go("ns-reserve")} />
       <header className="mx-auto flex max-w-[1200px] items-center justify-between gap-3 px-4 py-4 md:px-6">
         <a href="#ns-design" onClick={(e) => { e.preventDefault(); go("ns-design"); }} className={`flex items-center gap-2 rounded-[6px] ${focusRing}`} style={{ outlineColor: C.plum }}>
-          <PawMark size={30} />
-          <span className="text-[24px] leading-none" style={titleF}>
-            {BRAND}
-          </span>
+          <SampleLogo />
         </a>
         <nav aria-label="메뉴" className="hidden items-center gap-1 text-[15px] font-bold md:flex">
           {[
@@ -336,7 +332,7 @@ export function NailShopDemo() {
             </button>
           ))}
         </nav>
-        <button type="button" onClick={() => go("ns-reserve")} data-gtm-cta="nail-shop_go_reserve" className={`flex-none rounded-full px-4 py-2 text-[15px] font-bold text-white ${focusRing}`} style={{ background: C.plum, outlineColor: C.plum }}>
+        <button type="button" onClick={() => go("ns-reserve")} data-gtm-cta="nail-shop_go_reserve" className={`flex-none rounded-[6px] px-4 py-2 text-[15px] font-semibold text-white ${focusRing}`} style={{ background: C.accent, outlineColor: C.plum }}>
           예약하기
         </button>
       </header>
@@ -344,14 +340,14 @@ export function NailShopDemo() {
       {/* 첫 화면: 왼쪽 손, 오른쪽 컬러칩과 아트 */}
       <section id="ns-design" aria-labelledby="ns-design-title" className="mx-auto grid max-w-[1200px] gap-8 px-4 pt-4 md:px-6 lg:grid-cols-[minmax(0,460px)_minmax(0,1fr)] lg:gap-12 lg:pt-8">
         <div>
-          <h2 id="ns-design-title" className="text-[34px] leading-[1.15] md:text-[44px]" style={titleF}>
+          <h2 id="ns-design-title" className="font-bold tracking-[-0.02em] text-[30px] leading-[1.2] md:text-[40px]">
             내 손에 먼저 올려 보는 젤네일
           </h2>
           <div className="mt-5 flex items-center justify-between gap-3">
             <p className="text-[15px] font-bold" aria-live="polite">
               {targetName}에 칠해요
             </p>
-            <button type="button" onClick={undo} disabled={!hist.length} aria-label="되돌리기" className={`inline-flex h-10 w-10 items-center justify-center rounded-full border-2 disabled:opacity-35 ${focusRing}`} style={{ borderColor: C.plum, outlineColor: C.plum }}>
+            <button type="button" onClick={undo} disabled={!hist.length} aria-label="되돌리기" className={`inline-flex h-10 w-10 items-center justify-center rounded-[6px] border disabled:opacity-35 ${focusRing}`} style={{ borderColor: C.line, outlineColor: C.plum }}>
               <RotateCcw size={18} aria-hidden />
             </button>
           </div>
@@ -397,7 +393,7 @@ export function NailShopDemo() {
           </div>
 
           <div className="mt-5 flex flex-wrap items-center gap-3">
-            <button type="button" onClick={savePng} data-gtm-cta="nail-shop_save_png" className={`inline-flex items-center gap-2 rounded-full px-5 py-3 text-[15px] font-bold text-white ${focusRing}`} style={{ background: C.rose, outlineColor: C.plum }}>
+            <button type="button" onClick={savePng} data-gtm-cta="nail-shop_save_png" className={`inline-flex items-center gap-2 rounded-[6px] px-5 py-3 text-[15px] font-semibold text-white ${focusRing}`} style={{ background: C.accent, outlineColor: C.plum }}>
               <Download size={18} aria-hidden />
               내 디자인 저장
             </button>
@@ -411,9 +407,9 @@ export function NailShopDemo() {
         </div>
 
         <div>
-          <div id="ns-chips" className="rounded-[12px] border p-4 md:p-5" style={{ background: C.paper, borderColor: C.line }}>
+          <div id="ns-chips" className="rounded-[8px] border p-4 md:p-5" style={{ background: C.paper, borderColor: C.line }}>
             <div className="flex items-baseline justify-between gap-3">
-              <h2 className="text-[24px]" style={titleF}>
+              <h2 className="font-bold tracking-[-0.02em] text-[24px]">
                 컬러칩 24색
               </h2>
               <p className="text-[14px] font-bold" style={{ color: C.plumSoft }}>
@@ -433,10 +429,10 @@ export function NailShopDemo() {
                     title={c.name}
                     onClick={() => paint(i)}
                     className={`relative aspect-square w-full rounded-full ${focusRing}`}
-                    style={{ background: c.hex, outlineColor: C.plum, boxShadow: `inset 0 0 0 1px rgba(74,26,51,0.18)` }}
+                    style={{ background: c.hex, outlineColor: C.plum, boxShadow: `inset 0 0 0 1px rgba(17,17,17,0.14)` }}
                   >
                     {on && (
-                      <motion.span layoutId={`ns-ring-${uid}`} transition={spring} aria-hidden className="pointer-events-none absolute -inset-[5px] rounded-full border-[3px]" style={{ borderColor: C.plum }} />
+                      <motion.span layoutId={`ns-ring-${uid}`} transition={spring} aria-hidden className="pointer-events-none absolute -inset-[5px] rounded-full border-2" style={{ borderColor: C.plum }} />
                     )}
                     {fly && fly.phase === "chip" && fly.chip === i && (
                       <motion.span layoutId={`ns-flyer-${uid}`} transition={spring} aria-hidden className="pointer-events-none absolute inset-0 block rounded-full" style={{ background: fly.color, borderRadius: "50%" }} />
@@ -448,8 +444,8 @@ export function NailShopDemo() {
             </div>
           </div>
 
-          <div id="ns-art" className="mt-4 rounded-[12px] border p-4 md:p-5" style={{ background: C.paper, borderColor: C.line }}>
-            <h2 className="text-[24px]" style={titleF}>
+          <div id="ns-art" className="mt-4 rounded-[8px] border p-4 md:p-5" style={{ background: C.paper, borderColor: C.line }}>
+            <h2 className="font-bold tracking-[-0.02em] text-[24px]">
               아트
             </h2>
             <div role="radiogroup" aria-label="아트" className="mt-3 flex flex-wrap gap-2">
@@ -463,8 +459,8 @@ export function NailShopDemo() {
                     role="radio"
                     aria-checked={on}
                     onClick={() => setArt(a.id)}
-                    className={`inline-flex items-center gap-2 rounded-full border-2 px-3 py-2 text-[14px] font-bold ${focusRing}`}
-                    style={{ borderColor: on ? C.plum : C.line, background: on ? C.plum : "transparent", color: on ? "#fff" : C.plum, outlineColor: C.plum }}
+                    className={`inline-flex items-center gap-2 rounded-[6px] border px-3 py-2 text-[14px] font-bold ${focusRing}`}
+                    style={{ borderColor: on ? C.accent : C.line, background: on ? C.accent : "transparent", color: on ? "#fff" : C.plum, outlineColor: C.plum }}
                   >
                     <ArtSwatch art={a.id} />
                     {a.label}
@@ -478,15 +474,15 @@ export function NailShopDemo() {
             </p>
           </div>
 
-          <div id="ns-menu" className="mt-4 rounded-[12px] border p-4 md:p-5" style={{ background: C.paper, borderColor: C.line }}>
-            <h2 className="text-[24px]" style={titleF}>
+          <div id="ns-menu" className="mt-4 rounded-[8px] border p-4 md:p-5" style={{ background: C.paper, borderColor: C.line }}>
+            <h2 className="font-bold tracking-[-0.02em] text-[24px]">
               이 디자인 시술 금액
             </h2>
             <div role="radiogroup" aria-label="베이스" className="mt-3 grid grid-cols-2 gap-2">
               {BASES.map((b) => {
                 const on = base === b.id;
                 return (
-                  <button key={b.id} type="button" role="radio" aria-checked={on} onClick={() => pickBase(b.id)} className={`rounded-[10px] border-2 px-3 py-2.5 text-left ${focusRing}`} style={{ borderColor: on ? C.plum : C.line, background: on ? C.roseSoft : "transparent", outlineColor: C.plum }}>
+                  <button key={b.id} type="button" role="radio" aria-checked={on} onClick={() => pickBase(b.id)} className={`rounded-[8px] border px-3 py-2.5 text-left ${focusRing}`} style={{ borderColor: on ? C.accent : C.line, background: on ? C.roseSoft : "transparent", outlineColor: C.plum }}>
                     <span className="block text-[15px] font-bold">{b.label}</span>
                     <span className="block text-[13px]" style={{ color: C.plumSoft }}>
                       {won(b.price)}, {b.min}분
@@ -508,12 +504,12 @@ export function NailShopDemo() {
                 <dt className="inline-flex items-center gap-2 text-[16px] font-bold">
                   <Clock size={18} aria-hidden />약 {bill.min}분
                 </dt>
-                <dd className="font-black tabular-nums" aria-live="polite">
+                <dd className="font-bold tabular-nums" aria-live="polite">
                   {won(bill.price)}
                 </dd>
               </div>
             </dl>
-            <button type="button" onClick={() => go("ns-reserve")} data-gtm-cta="nail-shop_design_to_reserve" className={`mt-4 w-full rounded-full px-5 py-3 text-[16px] font-bold text-white ${focusRing}`} style={{ background: C.plum, outlineColor: C.plum }}>
+            <button type="button" onClick={() => go("ns-reserve")} data-gtm-cta="nail-shop_design_to_reserve" className={`mt-4 w-full rounded-[6px] px-5 py-3 text-[16px] font-semibold text-white ${focusRing}`} style={{ background: C.accent, outlineColor: C.plum }}>
               이 디자인으로 예약하기
             </button>
           </div>
@@ -522,13 +518,13 @@ export function NailShopDemo() {
 
       {/* 시술 메뉴 전체 */}
       <section aria-labelledby="ns-price-title" className="mx-auto mt-16 max-w-[1200px] px-4 md:mt-24 md:px-6">
-        <h2 id="ns-price-title" className="text-[30px] md:text-[38px]" style={titleF}>
+        <h2 id="ns-price-title" className="font-bold tracking-[-0.02em] text-[30px] md:text-[38px]">
           시술 메뉴와 가격
         </h2>
         <div className="mt-5 grid gap-4 md:grid-cols-2">
           {MENU.map((m) => (
-            <div key={m.group} className="rounded-[12px] border p-5" style={{ background: C.paper, borderColor: C.line }}>
-              <h3 className="text-[20px]" style={titleF}>
+            <div key={m.group} className="rounded-[8px] border p-5" style={{ background: C.paper, borderColor: C.line }}>
+              <h3 className="font-bold tracking-[-0.02em] text-[20px]">
                 {m.group}
               </h3>
               <dl className="mt-2 text-[16px] leading-[2]">
@@ -546,7 +542,7 @@ export function NailShopDemo() {
 
       {/* 예약 */}
       <section id="ns-reserve" aria-labelledby="ns-reserve-title" className="mx-auto mt-16 max-w-[1200px] scroll-mt-4 px-4 md:mt-24 md:px-6">
-        <h2 id="ns-reserve-title" className="text-[30px] md:text-[38px]" style={titleF}>
+        <h2 id="ns-reserve-title" className="font-bold tracking-[-0.02em] text-[30px] md:text-[38px]">
           예약하기
         </h2>
         <ReserveForm today={today} reduce={reduce} saved={saved} bill={bill} />
@@ -554,15 +550,15 @@ export function NailShopDemo() {
 
       {/* 샵 안내와 오시는 길 */}
       <section id="ns-info" aria-labelledby="ns-info-title" className="mx-auto mt-16 max-w-[1200px] scroll-mt-4 px-4 md:mt-24 md:px-6">
-        <h2 id="ns-info-title" className="text-[30px] md:text-[38px]" style={titleF}>
+        <h2 id="ns-info-title" className="font-bold tracking-[-0.02em] text-[30px] md:text-[38px]">
           오시는 길
         </h2>
         <ShopInfo today={today} />
       </section>
 
       <footer className="mx-auto mt-16 max-w-[1200px] border-t px-4 pb-28 pt-8 text-[14px] leading-[1.8] md:px-6" style={{ borderColor: C.line, color: C.plumSoft }}>
-        <p className="text-[16px] font-bold" style={{ color: C.plum }}>
-          {BRAND}
+        <p>
+          <SampleLogo />
         </p>
         <p>{ADDRESS}</p>
         <DemoMakerInfo className="mt-6" />
@@ -571,319 +567,77 @@ export function NailShopDemo() {
   );
 }
 
-/* 포스터 첫 화면 */
+/* 첫 화면 */
 
-/** 포스터 색. 문장 체리색과 바탕 대비는 약 5.8:1 */
-const P = {
-  bg: "#fde3ea",
-  cherry: "#b8142f",
-  deep: "#7d0a1f",
-  pale: "#f2b3c2",
-  ink: "#5c0a1c",
-};
-const posterF = { fontFamily: `${Black_Han_Sans.style.fontFamily}, sans-serif`, fontWeight: 400 } as const;
-/** 등장 1.8초. 0~0.38 병이 열리고 기울기, 0.24~0.52 방울, 0.5~1 글자 채움 */
-const INTRO_S = 1.8;
-/** 붓 끝 방울 반복 7초 */
-const DRIP_S = 7;
-/** 뚜껑이 열렸을 때 자리(병 그림 좌표). 붓 끝은 (481, 398) 근처로 온다 */
-const CAP_OPEN = { x: 150, y: -50, rot: -28 };
-const TILT = -8;
-const TIP = { x: 481, y: 398 };
-const FLOOR_Y = 557;
-
-const seg = (v: number, a: number, b: number) => Math.min(1, Math.max(0, (v - a) / (b - a)));
-const easeOut = (x: number) => 1 - (1 - x) ** 3;
-const easeInOut = (x: number) => (x < 0.5 ? 4 * x * x * x : 1 - (-2 * x + 2) ** 3 / 2);
-
-const LINES = ["젤네일", "한 번이면", "3주 가요"];
+/* 문장과 정보 줄 등장: 0.3초 뒤 0.7초 동안 12px 아래에서 올라온다. 끝 상태가 기본값이라 JS 없이도 보인다. */
+const POSTER_CSS = `
+@keyframes ns-rise { from { opacity: 0; transform: translateY(12px); } }
+.ns-rise { animation: ns-rise 0.7s cubic-bezier(0.22, 1, 0.36, 1) 0.3s both; }
+@media (prefers-reduced-motion: reduce) { .ns-rise { animation: none !important; } }
+`;
 
 function Poster({ reduce, onCta }: { reduce: boolean; onCta: () => void }) {
   const wrap = useRef<HTMLElement>(null);
   const { scrollYProgress } = useScroll({ target: wrap, offset: ["start start", "end start"] });
-  const t = useMotionValue(0);
-  const off = useMotionValue(0); // 1 이면 스크롤 퇴장을 쓰지 않는다
-
-  useEffect(() => {
-    off.set(reduce ? 1 : 0);
-    if (reduce) {
-      t.set(1);
-      return;
-    }
-    t.set(0);
-    const c = animate(t, 1, { duration: INTRO_S, ease: "linear" });
-    return () => c.stop();
-  }, [reduce, t, off]);
-
-  // 함수형 useTransform 은 처음 읽은 값만 구독하므로 두 값을 늘 같이 읽는다
-  const sp = () => {
-    const v = scrollYProgress.get();
-    return off.get() ? 0 : v;
-  };
-  const pose = useTransform(() => easeInOut(seg(t.get(), 0, 0.38)) * (1 - easeInOut(seg(sp(), 0, 0.28))));
-  const tilt = useTransform(() => TILT * pose.get());
-  const counter = useTransform(() => -TILT * pose.get());
-  const capX = useTransform(() => CAP_OPEN.x * pose.get());
-  const capY = useTransform(() => CAP_OPEN.y * pose.get());
-  const capR = useTransform(() => CAP_OPEN.rot * pose.get());
-
-  const dropY = useTransform(() => seg(t.get(), 0.36, 0.52) ** 2 * (FLOOR_Y - TIP.y - 6));
-  const dropS = useTransform(() => easeOut(seg(t.get(), 0.24, 0.36)));
-  const dropO = useTransform(() => {
-    const v = t.get();
-    return v > 0.24 && v < 0.53 ? 1 : 0;
-  });
-  const puddleS = useTransform(() => easeOut(seg(t.get(), 0.52, 0.68)) * (1 - seg(sp(), 0, 0.24)));
-  const dripO = useTransform(() => {
-    const s = sp();
-    return t.get() >= 1 ? 1 - seg(s, 0, 0.04) : 0;
-  });
-
-  const fill = useTransform(() => `inset(${(1 - easeOut(seg(t.get(), 0.5, 1))) * 100}% 0 0 0)`);
-  const drain = useTransform(() => `inset(${easeInOut(seg(sp(), 0, 0.26)) * 100}% 0 0 0)`);
-  const textO = useTransform(() => 1 - seg(sp(), 0.14, 0.3));
-  const textY = useTransform(() => -60 * easeInOut(seg(sp(), 0, 0.3)));
-  const nailS = useTransform(() => 0.15 + 0.85 * easeOut(seg(sp(), 0.06, 0.34)));
-  const nailO = useTransform(() => seg(sp(), 0.05, 0.12));
-  const bg = useTransform(() => {
-    const k = seg(sp(), 0.22, 0.44);
-    return k <= 0 ? P.bg : k >= 1 ? C.bg : mixHex(P.bg, C.bg, k);
-  });
-
-  const lines = (
-    <>
-      {LINES.map((l) => (
-        <span key={l} className="block">
-          {l}
-        </span>
-      ))}
-    </>
-  );
+  const photoY = useTransform(scrollYProgress, (v) => `${v * 8}%`);
 
   return (
-    <section ref={wrap} id="ns-poster" aria-labelledby="ns-poster-title" className={reduce ? "relative" : "relative h-[180svh]"}>
-      <motion.div className={`${reduce ? "relative min-h-svh" : "sticky top-0 h-svh"} overflow-hidden`} style={{ background: bg }}>
-        {/* 상호와 예약 버튼 하나 */}
-        <div className="absolute inset-x-0 top-0 z-20 flex items-center justify-between px-5 pt-5 md:px-[5vw] md:pt-7">
-          <p className="flex items-center gap-2 text-[17px] font-bold" style={{ color: P.ink }}>
-            <PawMark size={22} />
-            {BRAND}
-          </p>
-          <button
-            type="button"
-            onClick={onCta}
-            aria-label="예약하기"
-            data-gtm-cta="nail-shop_poster_cta"
-            className={`inline-flex h-12 w-12 items-center justify-center rounded-full text-white ${focusRing}`}
-            style={{ background: P.cherry, outlineColor: P.deep }}
-          >
-            <CalendarCheck size={22} aria-hidden />
-          </button>
-        </div>
-
-        {/* 매니큐어 병 */}
-        <div className="pointer-events-none absolute bottom-[3svh] left-1/2 aspect-[520/620] h-[50svh] -translate-x-1/2 md:left-auto md:right-[4vw] md:h-[50svh] md:translate-x-0 lg:h-[68svh] xl:h-[80svh]">
-          <svg viewBox="0 0 520 620" className="h-full w-full overflow-visible" role="img" aria-label="뚜껑 붓을 들어 올린 체리색 젤네일 병">
-            <PolishDefs />
-            <ellipse cx="230" cy={FLOOR_Y} rx="172" ry="18" fill="url(#ns-p-floor)" />
-            <ellipse cx="272" cy={FLOOR_Y + 3} rx="120" ry="9" fill="#d42a46" opacity="0.2" />
-            <motion.ellipse cx={TIP.x} cy={FLOOR_Y} rx="36" ry="8" fill="url(#ns-p-puddle)" style={{ scale: puddleS }} />
-            <motion.ellipse cx={TIP.x - 10} cy={FLOOR_Y - 2} rx="12" ry="2.4" fill="#fff" style={{ scale: puddleS, opacity: 0.55 }} />
-
-            {/* 병. 바닥 가운데를 축으로 기운다 */}
-            <motion.g style={{ rotate: tilt, originX: 0.5, originY: 1 }}>
-              <rect x="192" y="234" width="76" height="48" rx="8" fill="url(#ns-p-glass)" stroke="#fff" strokeOpacity="0.85" strokeWidth="2" />
-              <path d="M196 248 H264 M196 258 H264 M196 268 H264" stroke="#fff" strokeOpacity="0.45" strokeWidth="2" />
-              <ellipse cx="230" cy="235" rx="37" ry="5" fill="#fff" opacity="0.55" />
-              <rect x="110" y="272" width="240" height="282" rx="52" fill="#f4b8c6" opacity="0.35" />
-              <g clipPath="url(#ns-p-inner)">
-                {/* 병이 기울어도 액체 면은 수평에 가깝게 */}
-                <motion.g style={{ rotate: counter, originX: 0.5, originY: 0.5 }}>
-                  <rect x="20" y="328" width="420" height="320" fill="url(#ns-p-liq)" />
-                  <rect x="20" y="328" width="420" height="320" fill="url(#ns-p-liqv)" />
-                  <ellipse cx="230" cy="328" rx="210" ry="7" fill="#e65a73" opacity="0.9" />
-                </motion.g>
-                <rect x="124" y="510" width="212" height="30" fill="#fff" opacity="0.16" />
-              </g>
-              <rect x="110" y="272" width="240" height="282" rx="52" fill="url(#ns-p-glass)" stroke="#fff" strokeOpacity="0.9" strokeWidth="3" />
-              <rect x="108.5" y="270.5" width="243" height="285" rx="53.5" fill="none" stroke={P.deep} strokeOpacity="0.28" strokeWidth="1.5" />
-              <rect x="138" y="302" width="18" height="206" rx="9" fill="url(#ns-p-hl)" />
-              <rect x="316" y="320" width="7" height="150" rx="3.5" fill="#fff" opacity="0.4" />
-              <path d="M150 290 Q230 274 310 290" fill="none" stroke="#fff" strokeOpacity="0.75" strokeWidth="3" strokeLinecap="round" />
-              <circle cx="150" cy="300" r="4" fill="#fff" />
-              <path d="M140 530 Q230 546 320 530" fill="none" stroke="#fff" strokeOpacity="0.5" strokeWidth="2.5" strokeLinecap="round" />
-            </motion.g>
-
-            {/* 뚜껑과 붓 */}
-            <motion.g style={{ x: capX, y: capY, rotate: capR, originX: 0.5, originY: 0.5 }}>
-              <rect x="224" y="232" width="12" height="186" rx="6" fill="#2a0c19" />
-              <path d="M219 410 L241 410 Q247 446 234 472 Q230 478 226 472 Q213 446 219 410 Z" fill="url(#ns-p-bristle)" />
-              <path d="M225 418 Q223 444 229 466" fill="none" stroke="#fff" strokeOpacity="0.55" strokeWidth="2" strokeLinecap="round" />
-              <rect x="186" y="214" width="88" height="24" rx="4" fill="url(#ns-p-collar)" />
-              <rect x="190" y="40" width="80" height="180" rx="18" fill="url(#ns-p-cap)" />
-              <rect x="203" y="54" width="10" height="150" rx="5" fill="#fff" opacity="0.32" />
-              <rect x="252" y="62" width="4" height="130" rx="2" fill="#fff" opacity="0.12" />
-              <ellipse cx="230" cy="50" rx="28" ry="5" fill="#fff" opacity="0.2" />
-            </motion.g>
-
-            {/* 처음 한 방울 */}
-            <g transform={`translate(${TIP.x} ${TIP.y})`}>
-              <motion.g style={{ y: dropY, scale: dropS, opacity: dropO, originX: 0.5, originY: 0 }}>
-                <Drop />
-              </motion.g>
-            </g>
-            {/* 그 뒤 붓 끝에 맺혀 떨어지는 방울 */}
-            {!reduce && (
-              <motion.g style={{ opacity: dripO }}>
-                <g transform={`translate(${TIP.x} ${TIP.y})`}>
-                  <motion.g
-                    initial={{ opacity: 0, scale: 0, y: 0 }}
-                    animate={{ opacity: [0, 1, 1, 1, 0], scale: [0, 0.7, 1, 1, 0.4], y: [0, 0, 0, FLOOR_Y - TIP.y - 8, FLOOR_Y - TIP.y - 4] }}
-                    transition={{ duration: DRIP_S, times: [0, 0.6, 0.86, 0.97, 1], ease: "easeIn", repeat: Infinity, delay: INTRO_S + 0.6 }}
-                    style={{ originX: 0.5, originY: 0 }}
-                  >
-                    <Drop />
-                  </motion.g>
-                </g>
-              </motion.g>
-            )}
-          </svg>
-        </div>
-
-        {/* 스크롤하면 글자 색이 모이는 손톱 */}
-        {!reduce && (
-          <div aria-hidden className="pointer-events-none absolute inset-0 flex items-start justify-center pt-[16svh] lg:items-center lg:pt-0">
-            <motion.svg viewBox="0 0 200 260" className="h-[30svh] w-auto lg:h-[44svh]" style={{ scale: nailS, opacity: nailO }}>
-              <defs>
-                <linearGradient id="ns-p-nail" x1="0" y1="0" x2="1" y2="0">
-                  <stop offset="0" stopColor="#6e0718" />
-                  <stop offset="0.3" stopColor="#c41a36" />
-                  <stop offset="0.55" stopColor="#d23552" />
-                  <stop offset="1" stopColor="#7d0a1f" />
-                </linearGradient>
-              </defs>
-              <path d="M100 8 C152 8 184 54 184 122 L184 212 Q184 252 146 252 L54 252 Q16 252 16 212 L16 122 C16 54 48 8 100 8 Z" fill="url(#ns-p-nail)" />
-              <path d="M50 70 Q60 34 96 24" fill="none" stroke="#fff" strokeOpacity="0.75" strokeWidth="9" strokeLinecap="round" />
-              <path d="M44 100 L44 196" stroke="#fff" strokeOpacity="0.3" strokeWidth="6" strokeLinecap="round" />
-              <path d="M30 236 Q100 222 170 236" fill="none" stroke="#fff" strokeOpacity="0.35" strokeWidth="3" strokeLinecap="round" />
-            </motion.svg>
-          </div>
-        )}
-
-        {/* 큰 문장 */}
-        <div className="absolute inset-x-0 top-0 z-10 px-5 pt-[92px] md:px-[5vw] md:pt-[124px] lg:inset-y-0 lg:flex lg:flex-col lg:justify-center lg:pt-0">
-          <motion.div style={{ opacity: textO, y: textY }}>
-            <h1
-              id="ns-poster-title"
-              className="relative text-[clamp(60px,19vw,96px)] leading-[1.04] md:text-[clamp(96px,11.5vw,184px)]"
-              style={{ ...posterF, color: P.pale, wordBreak: "keep-all" }}
-            >
-              {lines}
-              <motion.span aria-hidden className="absolute inset-0 block" style={{ clipPath: drain }}>
-                <motion.span
-                  className="block"
-                  style={{
-                    clipPath: fill,
-                    color: "transparent",
-                    backgroundImage: `linear-gradient(180deg, #c41a36 0%, #dc4a63 16%, ${P.cherry} 30%, ${P.cherry} 70%, #990d27 100%)`,
-                    backgroundSize: "100% 1.04em",
-                    WebkitBackgroundClip: "text",
-                    backgroundClip: "text",
-                  }}
-                >
-                  {lines}
-                </motion.span>
-              </motion.span>
-            </h1>
-            <p className="mt-5 text-[16px] font-bold md:mt-7 md:text-[18px]" style={{ color: P.ink }}>
-              {BRAND}, 100% 예약제
-            </p>
-          </motion.div>
-        </div>
+    <section ref={wrap} id="ns-poster" aria-labelledby="ns-poster-title" className="relative min-h-[100svh] overflow-hidden" style={{ background: C.bg }}>
+      <style>{POSTER_CSS}</style>
+      <motion.div className="absolute inset-0" style={reduce ? undefined : { y: photoY }}>
+        <motion.div className="absolute inset-0" initial={reduce ? false : { scale: 1.06 }} animate={{ scale: 1 }} transition={{ duration: reduce ? 0 : 1.6, ease: EASE }}>
+          {/* eslint-disable-next-line @next/next/no-img-element -- 정적 export 라 next/image 최적화를 쓰지 않는다 */}
+          <img
+            src={`${IMG}/hero.jpg`}
+            srcSet={`${IMG}/hero-sm.jpg 960w, ${IMG}/hero.jpg 1920w`}
+            sizes="100vw"
+            alt="누드 핑크 젤네일을 바른 손이 매니큐어 두 병을 들고 있는 사진"
+            fetchPriority="high"
+            className="absolute inset-0 h-full w-full object-cover"
+            style={{ objectPosition: "50% 35%" }}
+          />
+        </motion.div>
       </motion.div>
+      <div
+        className="absolute inset-0"
+        style={{ background: "linear-gradient(to top, rgba(255,255,255,0.88), rgba(255,255,255,0.4) 40%, rgba(255,255,255,0) 65%)" }}
+        aria-hidden
+      />
+
+      {/* 상호와 예약 버튼 */}
+      <div className="absolute inset-x-0 top-0 z-10 mx-auto flex max-w-[1200px] items-center justify-between px-4 pt-4 md:px-6 md:pt-6">
+        <p>
+          <SampleLogo small />
+        </p>
+        <button
+          type="button"
+          onClick={onCta}
+          data-gtm-cta="nail-shop_poster_cta"
+          className={`inline-flex items-center gap-1.5 rounded-[6px] px-4 py-2.5 text-[15px] font-semibold text-white ${focusRing}`}
+          style={{ background: C.accent, outlineColor: C.plum }}
+        >
+          <CalendarCheck size={17} aria-hidden />
+          예약하기
+        </button>
+      </div>
+
+      <div className="relative z-10 mx-auto flex min-h-[100svh] max-w-[1200px] flex-col justify-end px-4 pb-14 pt-28 md:px-6 md:pb-20">
+        <div className={reduce ? undefined : "ns-rise"}>
+          <h1
+            id="ns-poster-title"
+            className="text-[36px] font-bold leading-[1.2] tracking-[-0.03em] [word-break:keep-all] md:text-[clamp(40px,5vw,72px)]"
+            style={{ color: C.plum }}
+          >
+            젤네일 한 번이면
+            <br />
+            3주 가요
+          </h1>
+          <p className="mt-4 text-[16px] font-medium md:mt-5 md:text-[18px]" style={{ color: "#4b4b4b" }}>
+            {BRAND}, 100% 예약제
+          </p>
+        </div>
+      </div>
     </section>
-  );
-}
-
-/** 두 색 사이를 k(0~1)만큼 섞는다 */
-function mixHex(a: string, b: string, k: number) {
-  const x = parseInt(a.slice(1), 16);
-  const y = parseInt(b.slice(1), 16);
-  const ch = (sh: number) => Math.round(((x >> sh) & 255) * (1 - k) + ((y >> sh) & 255) * k);
-  return `rgb(${ch(16)}, ${ch(8)}, ${ch(0)})`;
-}
-
-function Drop() {
-  return (
-    <>
-      <path d="M0 0 Q9 12 9 18 A9 9 0 0 1 -9 18 Q-9 12 0 0 Z" fill="url(#ns-p-drop)" />
-      <circle cx="-3" cy="15" r="2.2" fill="#fff" opacity="0.8" />
-    </>
-  );
-}
-
-function PolishDefs() {
-  return (
-    <defs>
-      <linearGradient id="ns-p-liq" x1="0" y1="0" x2="1" y2="0">
-        <stop offset="0" stopColor="#4a020f" />
-        <stop offset="0.24" stopColor="#8e0a24" />
-        <stop offset="0.38" stopColor="#d01f3e" />
-        <stop offset="0.5" stopColor="#b8142f" />
-        <stop offset="0.7" stopColor="#7e0820" />
-        <stop offset="1" stopColor="#3f010c" />
-      </linearGradient>
-      <linearGradient id="ns-p-liqv" x1="0" y1="0" x2="0" y2="1">
-        <stop offset="0" stopColor="#ff8aa0" stopOpacity="0.35" />
-        <stop offset="0.12" stopColor="#fff" stopOpacity="0" />
-        <stop offset="1" stopColor="#000" stopOpacity="0.38" />
-      </linearGradient>
-      <linearGradient id="ns-p-glass" x1="0" y1="0" x2="1" y2="0">
-        <stop offset="0" stopColor="#fff" stopOpacity="0.6" />
-        <stop offset="0.12" stopColor="#fff" stopOpacity="0.12" />
-        <stop offset="0.3" stopColor="#fff" stopOpacity="0" />
-        <stop offset="0.86" stopColor="#fff" stopOpacity="0.03" />
-        <stop offset="1" stopColor="#fff" stopOpacity="0.45" />
-      </linearGradient>
-      <linearGradient id="ns-p-hl" x1="0" y1="0" x2="0" y2="1">
-        <stop offset="0" stopColor="#fff" stopOpacity="0.95" />
-        <stop offset="1" stopColor="#fff" stopOpacity="0" />
-      </linearGradient>
-      <linearGradient id="ns-p-cap" x1="0" y1="0" x2="1" y2="0">
-        <stop offset="0" stopColor="#12060b" />
-        <stop offset="0.22" stopColor="#3d1426" />
-        <stop offset="0.38" stopColor="#5e2544" />
-        <stop offset="0.58" stopColor="#2b0d1a" />
-        <stop offset="1" stopColor="#0d0408" />
-      </linearGradient>
-      <linearGradient id="ns-p-collar" x1="0" y1="0" x2="1" y2="0">
-        <stop offset="0" stopColor="#6b5a62" />
-        <stop offset="0.35" stopColor="#efe6ea" />
-        <stop offset="0.6" stopColor="#b9a8b0" />
-        <stop offset="1" stopColor="#4f4047" />
-      </linearGradient>
-      <linearGradient id="ns-p-bristle" x1="0" y1="0" x2="1" y2="0">
-        <stop offset="0" stopColor="#7d0a1f" />
-        <stop offset="0.45" stopColor="#d23552" />
-        <stop offset="1" stopColor="#7d0a1f" />
-      </linearGradient>
-      <radialGradient id="ns-p-floor" cx="0.5" cy="0.5" r="0.5">
-        <stop offset="0" stopColor="#7d0a1f" stopOpacity="0.38" />
-        <stop offset="1" stopColor="#7d0a1f" stopOpacity="0" />
-      </radialGradient>
-      <radialGradient id="ns-p-puddle" cx="0.42" cy="0.4" r="0.6">
-        <stop offset="0" stopColor="#d6405a" />
-        <stop offset="1" stopColor="#8a0c22" />
-      </radialGradient>
-      <radialGradient id="ns-p-drop" cx="0.35" cy="0.65" r="0.7">
-        <stop offset="0" stopColor="#f06a82" />
-        <stop offset="0.55" stopColor={P.cherry} />
-        <stop offset="1" stopColor="#6e0718" />
-      </radialGradient>
-      <clipPath id="ns-p-inner">
-        <rect x="124" y="290" width="212" height="250" rx="40" />
-      </clipPath>
-    </defs>
   );
 }
 
@@ -998,12 +752,12 @@ function ArtSwatch({ art }: { art: ArtId }) {
     check: `linear-gradient(90deg, rgba(255,255,255,0.5) 50%, transparent 50%) 0 0/8px 8px, linear-gradient(180deg, rgba(255,255,255,0.5) 50%, transparent 50%) 0 0/8px 8px, ${C.rose}`,
     magnet: `linear-gradient(135deg, ${C.rose} 30%, #fff 50%, ${C.rose} 70%)`,
   };
-  return <span aria-hidden className="inline-block h-5 w-4 rounded-[50%_50%_30%_30%/55%_55%_20%_20%] border" style={{ background: bg[art], borderColor: "rgba(74,26,51,0.3)" }} />;
+  return <span aria-hidden className="inline-block h-5 w-4 rounded-[50%_50%_30%_30%/55%_55%_20%_20%] border" style={{ background: bg[art], borderColor: "rgba(17,17,17,0.25)" }} />;
 }
 
 function NailTab({ active, onClick, children }: { active: boolean; onClick: () => void; children: React.ReactNode }) {
   return (
-    <button type="button" aria-pressed={active} onClick={onClick} className={`rounded-full border-2 px-3 py-1.5 text-[14px] font-bold ${focusRing}`} style={{ borderColor: active ? C.plum : C.line, background: active ? C.plum : "transparent", color: active ? "#fff" : C.plum, outlineColor: C.plum }}>
+    <button type="button" aria-pressed={active} onClick={onClick} className={`rounded-[6px] border px-3 py-1.5 text-[14px] font-semibold ${focusRing}`} style={{ borderColor: active ? C.accent : C.line, background: active ? C.accent : "transparent", color: active ? "#fff" : C.plum, outlineColor: C.plum }}>
       {children}
     </button>
   );
@@ -1012,7 +766,7 @@ function NailTab({ active, onClick, children }: { active: boolean; onClick: () =
 function Toggle({ checked, onChange, label }: { checked: boolean; onChange: (v: boolean) => void; label: string }) {
   return (
     <label className="inline-flex cursor-pointer items-center gap-2">
-      <input type="checkbox" checked={checked} onChange={(e) => onChange(e.target.checked)} className="h-5 w-5 accent-[#4a1a33]" />
+      <input type="checkbox" checked={checked} onChange={(e) => onChange(e.target.checked)} className="h-5 w-5 accent-[#9a5b6a]" />
       <span>{label}</span>
     </label>
   );
@@ -1024,18 +778,6 @@ function Row({ k, v }: { k: string; v: string }) {
       <dt>{k}</dt>
       <dd className="font-bold tabular-nums">{v}</dd>
     </div>
-  );
-}
-
-function PawMark({ size = 28 }: { size?: number }) {
-  return (
-    <svg width={size} height={size} viewBox="0 0 32 32" aria-hidden className="flex-none">
-      <circle cx="16" cy="19" r="8" fill={C.rose} />
-      <circle cx="7" cy="13" r="3.4" fill={C.plum} />
-      <circle cx="12.5" cy="7" r="3.4" fill={C.plum} />
-      <circle cx="19.5" cy="7" r="3.4" fill={C.plum} />
-      <circle cx="25" cy="13" r="3.4" fill={C.plum} />
-    </svg>
   );
 }
 
@@ -1085,11 +827,11 @@ function ReserveForm({ today, reduce, saved, bill }: { today: Date; reduce: bool
   const fade = reduce ? { duration: 0 } : { duration: DUR, ease: EASE };
 
   return (
-    <div className="mt-5 rounded-[12px] border p-4 md:p-6" style={{ background: C.paper, borderColor: C.line }}>
+    <div className="mt-5 rounded-[8px] border p-4 md:p-6" style={{ background: C.paper, borderColor: C.line }}>
       <AnimatePresence mode="wait" initial={false}>
         {done ? (
           <motion.div key="done" initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} transition={fade} aria-live="polite">
-            <p className="inline-flex items-center gap-2 text-[26px]" style={titleF}>
+            <p className="inline-flex items-center gap-2 text-[26px] font-bold">
               <Check size={26} aria-hidden />
               예약이 접수됐어요
             </p>
@@ -1122,12 +864,12 @@ function ReserveForm({ today, reduce, saved, bill }: { today: Date; reduce: bool
                 </>
               )}
             </dl>
-            <div className="mt-5 rounded-[10px] p-4 text-[15px] leading-[1.8]" style={{ background: C.roseSoft }}>
+            <div className="mt-5 rounded-[8px] p-4 text-[15px] leading-[1.8]" style={{ background: C.roseSoft }}>
               <p>예약 확정 문자는 오늘 영업시간 안에 보내 드려요.</p>
               <p>변경과 취소는 예약 하루 전까지 {KAKAO} 또는 전화로 알려 주세요.</p>
               <p>디자인 상담은 방문 10분 전에 와 주시면 함께 봐요.</p>
             </div>
-            <button type="button" onClick={() => setDone(null)} className={`mt-5 rounded-full border-2 px-5 py-2.5 text-[15px] font-bold ${focusRing}`} style={{ borderColor: C.plum, outlineColor: C.plum }}>
+            <button type="button" onClick={() => setDone(null)} className={`mt-5 rounded-[6px] border px-5 py-2.5 text-[15px] font-semibold ${focusRing}`} style={{ borderColor: C.line, outlineColor: C.plum }}>
               다른 예약 넣기
             </button>
           </motion.div>
@@ -1150,8 +892,8 @@ function ReserveForm({ today, reduce, saved, bill }: { today: Date; reduce: bool
                           setDay(i);
                           setHour(null);
                         }}
-                        className={`rounded-[10px] border-2 px-1 py-2 text-center disabled:opacity-40 ${focusRing}`}
-                        style={{ borderColor: on ? C.plum : C.line, background: on ? C.plum : "transparent", color: on ? "#fff" : C.plum, outlineColor: C.plum }}
+                        className={`rounded-[8px] border px-1 py-2 text-center disabled:opacity-40 ${focusRing}`}
+                        style={{ borderColor: on ? C.accent : C.line, background: on ? C.accent : "transparent", color: on ? "#fff" : C.plum, outlineColor: C.plum }}
                       >
                         <span className="block text-[12px]">{i === 0 ? "오늘" : DOW[d.getDay()]}</span>
                         <span className="block text-[18px] font-bold tabular-nums">{d.getDate()}</span>
@@ -1176,8 +918,8 @@ function ReserveForm({ today, reduce, saved, bill }: { today: Date; reduce: bool
                           setStaff(i);
                           setHour(null);
                         }}
-                        className={`rounded-[10px] border-2 px-2 py-2.5 ${focusRing}`}
-                        style={{ borderColor: on ? C.plum : C.line, background: on ? C.roseSoft : "transparent", outlineColor: C.plum }}
+                        className={`rounded-[8px] border px-2 py-2.5 ${focusRing}`}
+                        style={{ borderColor: on ? C.accent : C.line, background: on ? C.roseSoft : "transparent", outlineColor: C.plum }}
                       >
                         <span className="block text-[13px]" style={{ color: C.plumSoft }}>
                           {s.role}
@@ -1207,8 +949,8 @@ function ReserveForm({ today, reduce, saved, bill }: { today: Date; reduce: bool
                         disabled={off}
                         aria-pressed={on}
                         onClick={() => setHour(h)}
-                        className={`rounded-[8px] border-2 px-1 py-2 text-[14px] tabular-nums disabled:opacity-40 ${focusRing}`}
-                        style={{ borderColor: on ? C.plum : C.line, background: on ? C.plum : "transparent", color: on ? "#fff" : C.plum, outlineColor: C.plum, textDecoration: full ? "line-through" : undefined }}
+                        className={`rounded-[8px] border px-1 py-2 text-[14px] tabular-nums disabled:opacity-40 ${focusRing}`}
+                        style={{ borderColor: on ? C.accent : C.line, background: on ? C.accent : "transparent", color: on ? "#fff" : C.plum, outlineColor: C.plum, textDecoration: full ? "line-through" : undefined }}
                       >
                         {p2(h)}:00
                         {full && <span className="block text-[11px]">마감</span>}
@@ -1224,17 +966,17 @@ function ReserveForm({ today, reduce, saved, bill }: { today: Date; reduce: bool
               <label className="block text-[16px] font-bold" htmlFor={`ns-name`}>
                 이름
               </label>
-              <input id="ns-name" value={name} onChange={(e) => setName(e.target.value)} autoComplete="name" className={`mt-1 w-full rounded-[8px] border-2 px-3 py-2.5 text-[16px] ${focusRing}`} style={{ borderColor: C.line, outlineColor: C.plum, background: C.bg }} />
+              <input id="ns-name" value={name} onChange={(e) => setName(e.target.value)} autoComplete="name" className={`mt-1 w-full rounded-[8px] border px-3 py-2.5 text-[16px] ${focusRing}`} style={{ borderColor: C.line, outlineColor: C.plum, background: C.bg }} />
               <label className="mt-4 block text-[16px] font-bold" htmlFor="ns-phone">
                 휴대폰
               </label>
-              <input id="ns-phone" value={phone} onChange={(e) => setPhone(e.target.value)} inputMode="numeric" autoComplete="tel" placeholder="010-0000-0000" className={`mt-1 w-full rounded-[8px] border-2 px-3 py-2.5 text-[16px] ${focusRing}`} style={{ borderColor: C.line, outlineColor: C.plum, background: C.bg }} />
+              <input id="ns-phone" value={phone} onChange={(e) => setPhone(e.target.value)} inputMode="numeric" autoComplete="tel" placeholder="010-0000-0000" className={`mt-1 w-full rounded-[8px] border px-3 py-2.5 text-[16px] ${focusRing}`} style={{ borderColor: C.line, outlineColor: C.plum, background: C.bg }} />
               <label className="mt-4 block text-[16px] font-bold" htmlFor="ns-memo">
                 요청사항
               </label>
-              <textarea id="ns-memo" value={memo} onChange={(e) => setMemo(e.target.value)} rows={3} placeholder="손톱 길이, 보수할 손톱 등" className={`mt-1 w-full rounded-[8px] border-2 px-3 py-2.5 text-[16px] ${focusRing}`} style={{ borderColor: C.line, outlineColor: C.plum, background: C.bg }} />
+              <textarea id="ns-memo" value={memo} onChange={(e) => setMemo(e.target.value)} rows={3} placeholder="손톱 길이, 보수할 손톱 등" className={`mt-1 w-full rounded-[8px] border px-3 py-2.5 text-[16px] ${focusRing}`} style={{ borderColor: C.line, outlineColor: C.plum, background: C.bg }} />
 
-              <div className="mt-4 rounded-[10px] border p-3 text-[14px] leading-[1.7]" style={{ borderColor: C.line }}>
+              <div className="mt-4 rounded-[8px] border p-3 text-[14px] leading-[1.7]" style={{ borderColor: C.line }}>
                 <p className="font-bold">
                   {bill.baseLabel}, 아트 {bill.artNails}개
                 </p>
@@ -1253,7 +995,7 @@ function ReserveForm({ today, reduce, saved, bill }: { today: Date; reduce: bool
                   {err}
                 </p>
               )}
-              <button type="submit" data-gtm-cta="nail-shop_reserve_submit" className={`mt-4 w-full rounded-full px-5 py-3 text-[16px] font-bold text-white ${focusRing}`} style={{ background: C.plum, outlineColor: C.plum }}>
+              <button type="submit" data-gtm-cta="nail-shop_reserve_submit" className={`mt-4 w-full rounded-[6px] px-5 py-3 text-[16px] font-semibold text-white ${focusRing}`} style={{ background: C.accent, outlineColor: C.plum }}>
                 예약 접수
               </button>
               <p className="mt-2 text-[13px]" style={{ color: C.plumSoft }}>
@@ -1280,8 +1022,8 @@ function ShopInfo({ today }: { today: Date }) {
   return (
     <div className="mt-5 grid gap-4 md:grid-cols-[minmax(0,1fr)_minmax(0,1fr)]">
       <div className="grid gap-4">
-        <div className="rounded-[12px] border p-5" style={{ background: C.paper, borderColor: C.line }}>
-          <h3 className="inline-flex items-center gap-2 text-[20px]" style={titleF}>
+        <div className="rounded-[8px] border p-5" style={{ background: C.paper, borderColor: C.line }}>
+          <h3 className="font-bold tracking-[-0.02em] inline-flex items-center gap-2 text-[20px]">
             <Clock size={20} aria-hidden />
             영업시간
           </h3>
@@ -1289,10 +1031,10 @@ function ShopInfo({ today }: { today: Date }) {
             {rows.map(([k, v], i) => {
               const on = i === todayRow;
               return (
-                <div key={k} className={`flex items-baseline justify-between gap-4 ${on ? "font-black" : ""}`}>
+                <div key={k} className={`flex items-baseline justify-between gap-4 ${on ? "font-bold" : ""}`}>
                   <dt>
                     {k}
-                    {on && <span className="ml-2 rounded-full px-2 py-0.5 text-[12px]" style={{ background: C.plum, color: "#fff" }}>오늘</span>}
+                    {on && <span className="ml-2 rounded-[6px] px-2 py-0.5 text-[12px]" style={{ background: C.accent, color: "#fff" }}>오늘</span>}
                   </dt>
                   <dd className="tabular-nums">{v}</dd>
                 </div>
@@ -1303,8 +1045,8 @@ function ShopInfo({ today }: { today: Date }) {
             마지막 예약은 마감 1시간 전. 공휴일은 휴무.
           </p>
         </div>
-        <div className="rounded-[12px] border p-5 text-[16px] leading-[1.8]" style={{ background: C.paper, borderColor: C.line }}>
-          <h3 className="inline-flex items-center gap-2 text-[20px]" style={titleF}>
+        <div className="rounded-[8px] border p-5 text-[16px] leading-[1.8]" style={{ background: C.paper, borderColor: C.line }}>
+          <h3 className="font-bold tracking-[-0.02em] inline-flex items-center gap-2 text-[20px]">
             <Car size={20} aria-hidden />
             주차와 예약제
           </h3>
@@ -1313,8 +1055,8 @@ function ShopInfo({ today }: { today: Date }) {
           <p>10분 넘게 늦으면 시술 범위가 줄어들 수 있어요.</p>
         </div>
       </div>
-      <div className="rounded-[12px] border p-5" style={{ background: C.paper, borderColor: C.line }}>
-        <h3 className="inline-flex items-center gap-2 text-[20px]" style={titleF}>
+      <div className="rounded-[8px] border p-5" style={{ background: C.paper, borderColor: C.line }}>
+        <h3 className="font-bold tracking-[-0.02em] inline-flex items-center gap-2 text-[20px]">
           <MapPin size={20} aria-hidden />
           찾아오기
         </h3>
@@ -1342,10 +1084,10 @@ function MiniMap() {
       <text x="64" y="150" textAnchor="middle" fontSize="13" fontWeight="700" fill={C.plum} fontFamily="Pretendard, sans-serif">
         ㅇㅇ역 2번 출구
       </text>
-      <path d="M84 110 H236 V60 H300" fill="none" stroke={C.rose} strokeWidth="4" strokeLinecap="round" strokeDasharray="2 8" />
-      <rect x="300" y="24" width="72" height="56" rx="4" fill={C.roseSoft} stroke={C.plum} strokeWidth="2" />
+      <path d="M84 110 H236 V60 H300" fill="none" stroke={C.accent} strokeWidth="3" strokeLinecap="round" strokeDasharray="2 8" />
+      <rect x="300" y="24" width="72" height="56" rx="4" fill={C.roseSoft} stroke={C.accent} strokeWidth="1.5" />
       <text x="336" y="48" textAnchor="middle" fontSize="13" fontWeight="700" fill={C.plum} fontFamily="Pretendard, sans-serif">
-        곰파트너네일
+        곰파트너
       </text>
       <text x="336" y="66" textAnchor="middle" fontSize="12" fill={C.plumSoft} fontFamily="Pretendard, sans-serif">
         3층 (1층 약국)
@@ -1354,5 +1096,19 @@ function MiniMap() {
         큰길 따라 도보 4분
       </text>
     </svg>
+  );
+}
+
+/* 로고: 메인 사이트와 같은 곰 로고 + 곰파트너(크게) + 업종(작게) */
+function SampleLogo({ light, small }: { light?: boolean; small?: boolean }) {
+  return (
+    <span className="inline-flex items-center gap-2" style={{ color: light ? "#ffffff" : "#111111" }}>
+      {/* eslint-disable-next-line @next/next/no-img-element -- 메인 사이트와 같은 곰 로고 */}
+      <img src="/images/logo-bear.png" alt="" aria-hidden width={28} height={28} className={small ? "h-6 w-6 shrink-0" : "h-7 w-7 shrink-0"} />
+      <span className="flex items-baseline gap-1 whitespace-nowrap">
+        <span className={`${small ? "text-[18px]" : "text-[20px]"} font-bold leading-none tracking-[-0.03em]`}>곰파트너</span>
+        <span className="text-[12px] font-semibold leading-none opacity-75">네일샵 샘플</span>
+      </span>
+    </span>
   );
 }

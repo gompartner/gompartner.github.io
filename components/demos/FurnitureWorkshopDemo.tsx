@@ -1,15 +1,14 @@
 "use client";
 
 import { useEffect, useMemo, useRef, useState } from "react";
-import { AnimatePresence, motion, useMotionValue, useScroll, useTransform, type MotionValue } from "framer-motion";
-import { Car, Check, Clock, Download, MapPin, MessageCircle, Paperclip, PencilRuler, Phone, TrainFront } from "lucide-react";
-import { Black_Han_Sans, Nanum_Gothic_Coding } from "@/lib/local-fonts";
+import { AnimatePresence, motion, useScroll, useTransform } from "framer-motion";
+import { Car, Check, Clock, Download, MapPin, MessageCircle, Paperclip, Phone, TrainFront } from "lucide-react";
 import { useReducedMotionSafe } from "@/hooks/useReducedMotionSafe";
 import { daysAgo, fmtKo, useDemoToday } from "@/hooks/useDemoToday";
 import { maskName, maskPhone } from "@/components/demos/LeadReceivedPanel";
 import { DemoMakerInfo } from "@/components/demos/DemoMakerInfo";
 
-/* 원목 가구 주문 제작 공방 샘플: 가상의 곰파트너목공방. 상호, 주소, 가격은 모두 가상이다.
+/* 원목 가구 주문 제작 공방 샘플: 가상의 곰파트너 가구 공방. 상호, 주소, 가격은 모두 가상이다.
 
    국내 원목 공방 사이트 구성을 따랐다. 메뉴는 제작 가구, 주문 제작, 목재 안내, 작업 과정, 공방 소개, 오시는 길.
    첫 화면에는 대표 가구와 "주문 제작 문의" 버튼, 치수와 목재를 고르는 주문 제작 안내가 온다.
@@ -25,15 +24,16 @@ import { DemoMakerInfo } from "@/components/demos/DemoMakerInfo";
    2. 치수: 폭, 깊이, 높이 슬라이더(10mm 단위). 도면과 치수선이 따라 바뀌고 판재 양에 따라 견적이 바뀐다.
    3. 목재와 마감: 오크, 월넛, 애쉬, 레드파인. 도면 면 색이 그 목재 색으로 바뀌고 단가가 달라진다. 마감은 오일, 바니시.
    4. 견적과 제작 문의: 합계, 제작 기간(오늘 기준 4~6주 뒤). 이름, 휴대폰을 넣고 보내면 접수번호, 도면 PNG 저장, 회신 예정일이 보인다.
-   5. 작업 과정: 재단, 조립, 샌딩, 마감 네 단계가 선 위의 점으로 그려지고 단계를 누르면 설명이 바뀐다. 공방 방문은 예약제.
+   5. 작업 과정: 재단, 조립, 샌딩, 마감 네 단계를 선 위의 점으로 두고 단계를 누르면 설명이 바뀐다. 공방 방문은 예약제.
 
-   포스터 첫 화면(fw-poster): 크라프트지 바탕에 도면 파랑 모눈, 큰 문장 "원하는 치수로 하나만 짜 드려요".
-   오른쪽(휴대폰은 아래)에 아이소메트릭 원목 의자. 부재 14개가 도면 선으로 먼저 그려지고(1초)
-   나뭇결 그라디언트가 바닥부터 차오른다(0.8초). 대패밥 몇 조각이 10초 넘는 주기로 천천히 떨어진다.
-   스크롤하면 의자가 부재 단위로 분해돼 흩어지고 아래 도면판 화면이 이어진다. */
+   포스터 첫 화면(fw-poster): 작업대에서 판재를 다듬는 사진 한 장이 화면을 채우고, 아래 왼쪽에 문장 "원하는 치수로 하나만 짜 드려요".
+   들어올 때 사진이 1.06배에서 1배로 1.6초 동안 다가오고, 문장은 0.3초 뒤 12px 아래에서 올라온다(CSS keyframes).
+   스크롤하면 사진만 조금 느리게 움직인다. 작업 과정의 점은 움직이지 않고, 움직임은 도면 선 그리기에 모았다.
+
+   사진 출처: Pexels 사진 5974285 */
 
 const SLUG = "furniture-workshop";
-const BRAND = "곰파트너목공방";
+const BRAND = "곰파트너";
 const ADDRESS = "서울 ㅇㅇ구 ㅇㅇ로 00, 1층";
 const KAKAO = "카카오톡 채널 곰파트너";
 
@@ -45,16 +45,16 @@ const FILL_MS = 300;
 const MORPH_MS = 320;
 const EASE = [0.22, 1, 0.36, 1] as const;
 
-const mono = Nanum_Gothic_Coding;
-const monoF = { fontFamily: `${mono.style.fontFamily}, ui-monospace, monospace` } as const;
-
+/* 색: 바탕 흰색과 옅은 회색을 번갈아 쓰고, 강조색은 짙은 호두나무 갈색 하나만 버튼과 선택 칩에 쓴다. */
 const C = {
-  paper: "#f7f4ec",
-  sheet: "#fcfaf4",
-  ink: "#4a3b2f",
-  soft: "#6f5f51",
-  line: "#d8d0c0",
-  grid: "rgba(74,59,47,0.10)",
+  paper: "#f7f7f5",
+  sheet: "#ffffff",
+  ink: "#111111",
+  body: "#4b4b4b",
+  soft: "#767676",
+  line: "#e5e5e5",
+  accent: "#6b4a2e",
+  grid: "rgba(0,0,0,0.05)",
   error: "#b42318",
 };
 
@@ -301,7 +301,7 @@ function DrawingBoard({ kind, dims, wood, finish, reduce, svgRef }: { kind: Kind
       role="img"
       aria-label={`${kind.name} 도면. 폭 ${dims.w}, 깊이 ${dims.d}, 높이 ${dims.h} mm, ${wood.name} ${finishName} 마감`}
       className="block h-auto w-full"
-      style={{ ...monoF, background: C.sheet }}
+      style={{ background: C.sheet }}
     >
       <defs>
         <pattern id="fw-grid" width="12" height="12" patternUnits="userSpaceOnUse">
@@ -415,7 +415,7 @@ function KindIcon({ kind, selected }: { kind: Kind; selected: boolean }) {
   return (
     <svg viewBox={`0 0 ${ICON_BOARD.W} ${ICON_BOARD.H}`} width="48" height="36" aria-hidden className="flex-none">
       {geo.parts.map((p) => (
-        <path key={p.id} d={p.d} fill={selected ? C.ink : "none"} fillOpacity={0.12} stroke={C.ink} strokeWidth="1.2" strokeLinejoin="round" />
+        <path key={p.id} d={p.d} fill={selected ? C.accent : "none"} fillOpacity={0.15} stroke={selected ? C.accent : C.ink} strokeWidth="1.2" strokeLinejoin="round" />
       ))}
     </svg>
   );
@@ -429,7 +429,7 @@ async function savePng(svg: SVGSVGElement, filename: string) {
   clone.setAttribute("xmlns", "http://www.w3.org/2000/svg");
   clone.setAttribute("width", String(W));
   clone.setAttribute("height", String(H));
-  clone.style.fontFamily = "Menlo, Consolas, 'Nanum Gothic Coding', monospace";
+  clone.style.fontFamily = "Pretendard, 'Apple SD Gothic Neo', sans-serif";
   clone.querySelectorAll<SVGElement>("path, text").forEach((el) => {
     el.removeAttribute("stroke-dasharray");
     el.removeAttribute("stroke-dashoffset");
@@ -465,307 +465,71 @@ async function savePng(svg: SVGSVGElement, filename: string) {
 
 /* ── 포스터 첫 화면 ─────────────────────────────────────── */
 
-const PZ = {
-  kraft: "#e9dbbf",
-  blue: "#1b3f75",
-  line: "#1f4e8c",
-  wood: "#a8693a",
-};
-const poster = { fontFamily: `${Black_Han_Sans.style.fontFamily}, sans-serif` } as const;
+const IMG = "/images/demo-furniture-workshop";
 
-/* 포스터 모션(ms). 선 그리기 1000 안에 부재 14개(선 하나 500, 나머지는 시차), 900부터 나뭇결 800. 합계 1.7초.
-   스크롤 분해는 포스터 진행률 0~0.42(sticky 가 풀리기 직전)까지. 대패밥은 한 바퀴 10~15초. */
-const PZ_DRAW_MS = 1000;
-const PZ_LINE_MS = 500;
-const PZ_FILL_DELAY_MS = 900;
-const PZ_FILL_MS = 800;
-const PZ_EXPLODE_END = 0.42;
+/* 포스터 모션(ms). 사진 다가오기 1600, 문장은 300 늦게 700 동안 12px 올라오며 나타난다(CSS keyframes, 끝 상태가 기본값).
+   스크롤하면 사진만 포스터 높이의 8%까지 느리게 내려간다. 동작 줄이기면 모두 끈다. */
+const HERO_IN_MS = 1600;
+const HERO_TEXT_DELAY_MS = 300;
+const HERO_TEXT_MS = 700;
+const HERO_PARALLAX = 8;
+const EASE_CSS = `cubic-bezier(${EASE.join(",")})`;
 
-const COS30 = 0.866;
-type V3 = [number, number, number];
-/** 아이소메트릭 투영. x는 오른쪽 아래, y는 왼쪽 아래, z는 위. 단위 mm = viewBox 1. */
-const iso = (x: number, y: number, z: number): [number, number] => [(x - y) * COS30, (x + y) * 0.5 - z];
-const poly = (pts: V3[]) => `M${pts.map((p) => iso(...p).map(fx).join(",")).join(" L")} Z`;
-const seg = (a: V3, b: V3) => `M${iso(...a).map(fx).join(",")} L${iso(...b).map(fx).join(",")}`;
-
-type Grain = "x" | "y" | "v";
-interface ChairPart {
-  id: string;
-  at: V3;
-  size: V3;
-  grain: Grain;
-  /** 분해될 때 날아가는 거리(x, y)와 회전(도) */
-  fly: V3;
-  /** 하이라이트 줄을 넣을 앞 위 모서리 */
-  shine?: boolean;
-}
-
-/* 그리는 순서가 곧 앞뒤 순서다(먼 것부터). 의자 정면은 y가 큰 쪽, 등받이는 y=0 쪽. */
-const CHAIR: ChairPart[] = [
-  { id: "legBL", at: [0, 0, 0], size: [40, 40, 420], grain: "v", fly: [-250, 40, -28] },
-  { id: "strB", at: [40, 10, 150], size: [360, 20, 30], grain: "x", fly: [-40, -150, 14] },
-  { id: "strL", at: [10, 40, 150], size: [20, 340, 30], grain: "y", fly: [-300, -60, 32] },
-  { id: "legBR", at: [400, 0, 0], size: [40, 40, 420], grain: "v", fly: [260, -30, 22] },
-  { id: "legFL", at: [0, 380, 0], size: [40, 40, 420], grain: "v", fly: [-190, 230, -34] },
-  { id: "strR", at: [410, 40, 150], size: [20, 340, 30], grain: "y", fly: [290, 90, -22] },
-  { id: "strF", at: [40, 390, 190], size: [360, 20, 30], grain: "x", fly: [50, 260, 12] },
-  { id: "legFR", at: [400, 380, 0], size: [40, 40, 420], grain: "v", fly: [230, 270, 30] },
-  { id: "seat", at: [-10, 0, 420], size: [460, 440, 30], grain: "x", fly: [20, -110, -9], shine: true },
-  { id: "legBLu", at: [0, 0, 450], size: [40, 40, 450], grain: "v", fly: [-290, -210, -20] },
-  { id: "railLow", at: [40, 12, 560], size: [360, 16, 60], grain: "x", fly: [-140, -260, 10] },
-  { id: "slat1", at: [130, 16, 620], size: [36, 10, 160], grain: "v", fly: [-90, -330, -16] },
-  { id: "slat2", at: [202, 16, 620], size: [36, 10, 160], grain: "v", fly: [10, -360, 8] },
-  { id: "slat3", at: [274, 16, 620], size: [36, 10, 160], grain: "v", fly: [110, -330, 20] },
-  { id: "railTop", at: [40, 8, 780], size: [360, 24, 90], grain: "x", fly: [70, -420, -12], shine: true },
-  { id: "legBRu", at: [400, 0, 450], size: [40, 40, 450], grain: "v", fly: [310, -250, 24] },
-];
-
-/** 상자 하나의 보이는 세 면: 윗면, 왼쪽 앞면(y 최대), 오른쪽 앞면(x 최대) */
-function boxFaces({ at: [x0, y0, z0], size: [dx, dy, dz] }: ChairPart) {
-  const x1 = x0 + dx;
-  const y1 = y0 + dy;
-  const z1 = z0 + dz;
-  const top = poly([[x0, y0, z1], [x1, y0, z1], [x1, y1, z1], [x0, y1, z1]]);
-  const left = poly([[x0, y1, z1], [x1, y1, z1], [x1, y1, z0], [x0, y1, z0]]);
-  const right = poly([[x1, y0, z1], [x1, y1, z1], [x1, y1, z0], [x1, y0, z0]]);
-  const shine = seg([x0 + 4, y1, z1], [x1 - 4, y1, z1]);
-  return { top, left, right, shine, outline: `${top} ${left} ${right}` };
-}
-
-/* viewBox: 의자와 양쪽 치수선이 들어가는 크기 */
-const VB = { x: -470, y: -960, w: 940, h: 1480 };
-
-const SHAVINGS = [
-  { left: "8%", size: 34, dur: 13, delay: 0.4, sway: 26, spin: 300, rest: "62%" },
-  { left: "27%", size: 24, dur: 15, delay: 4.5, sway: -18, spin: -260, rest: "84%" },
-  { left: "46%", size: 30, dur: 11, delay: 2.2, sway: 22, spin: 340, rest: "91%" },
-  { left: "63%", size: 38, dur: 14, delay: 6.8, sway: -30, spin: -320, rest: "12%" },
-  { left: "78%", size: 26, dur: 12, delay: 1.2, sway: 18, spin: 280, rest: "88%" },
-  { left: "92%", size: 32, dur: 16, delay: 8.6, sway: -22, spin: -300, rest: "40%" },
-];
-
-function Shaving({ size }: { size: number }) {
-  return (
-    <svg width={size * 1.3} height={size * 1.3} viewBox="0 0 40 40" aria-hidden className="block">
-      <path d="M4 22 C6 8 26 4 33 14 C39 23 30 34 20 32 C12 30 12 20 19 18 C24 17 26 22 23 25" fill="none" stroke="url(#fw-pz-shave)" strokeWidth="5" strokeLinecap="round" />
-      <path d="M6 20 C9 10 24 7 30 14" fill="none" stroke="#fff6e4" strokeOpacity="0.7" strokeWidth="1.2" strokeLinecap="round" />
-    </svg>
-  );
-}
+const HERO_CSS = `
+@keyframes fw-hero-in { from { transform: scale(1.06); } }
+@keyframes fw-hero-rise { from { opacity: 0; transform: translateY(12px); } }
+.fw-hero-photo { animation: fw-hero-in ${HERO_IN_MS}ms ${EASE_CSS} both; }
+.fw-hero-rise { animation: fw-hero-rise ${HERO_TEXT_MS}ms ${EASE_CSS} ${HERO_TEXT_DELAY_MS}ms both; }
+@media (prefers-reduced-motion: reduce) { .fw-hero-photo, .fw-hero-rise { animation: none; } }
+`;
 
 function Poster({ reduce, onCta }: { reduce: boolean; onCta: () => void }) {
   const wrapRef = useRef<HTMLElement>(null);
   const { scrollYProgress } = useScroll({ target: wrapRef, offset: ["start start", "end start"] });
-  const live = useTransform(scrollYProgress, [0.02, PZ_EXPLODE_END], [0, 1], { clamp: true });
-  const still = useMotionValue(0);
-  const prog = reduce ? still : live;
-  const textY = useTransform(prog, [0, 1], [0, -90]);
-  const textO = useTransform(prog, [0.15, 1], [1, 0]);
-  const dimO = useTransform(prog, [0, 0.35], [1, 0]);
-  const shadowO = useTransform(prog, [0, 0.5], [1, 0]);
+  const photoY = useTransform(scrollYProgress, (v) => `${v * HERO_PARALLAX}%`);
 
   return (
-    <section id="fw-poster" ref={wrapRef} aria-labelledby="fw-poster-title" className="relative h-[180svh]">
-      <div
-        className="sticky top-0 h-svh overflow-hidden"
-        style={{
-          background: PZ.kraft,
-          backgroundImage: `radial-gradient(ellipse 70% 60% at 72% 45%, rgba(255,250,238,0.55), transparent 70%), linear-gradient(rgba(31,78,140,0.16) 1px, transparent 1px), linear-gradient(90deg, rgba(31,78,140,0.16) 1px, transparent 1px), linear-gradient(rgba(31,78,140,0.07) 1px, transparent 1px), linear-gradient(90deg, rgba(31,78,140,0.07) 1px, transparent 1px)`,
-          backgroundSize: "100% 100%, 160px 160px, 160px 160px, 32px 32px, 32px 32px",
-          color: PZ.blue,
-        }}
-      >
-        {/* 대패밥. 공용 그라디언트는 여기 한 번만 둔다 */}
-        <svg width="0" height="0" aria-hidden className="absolute">
-          <defs>
-            <linearGradient id="fw-pz-shave" x1="0" y1="0" x2="1" y2="1">
-              <stop offset="0" stopColor="#f3d6a6" />
-              <stop offset="1" stopColor="#c48a52" />
-            </linearGradient>
-          </defs>
-        </svg>
-        <div aria-hidden className="pointer-events-none absolute inset-0">
-          {SHAVINGS.map((s) =>
-            reduce ? (
-              <span key={s.left} className="absolute" style={{ left: s.left, top: s.rest, transform: `rotate(${s.spin / 6}deg)` }}>
-                <Shaving size={s.size} />
-              </span>
-            ) : (
-              <motion.span
-                key={s.left}
-                className="absolute top-0"
-                style={{ left: s.left }}
-                initial={{ y: "-12vh", x: 0, rotate: 0 }}
-                animate={{ y: ["-12vh", "108vh"], x: [0, s.sway, -s.sway / 2, 0], rotate: [0, s.spin] }}
-                transition={{ duration: s.dur, delay: s.delay, repeat: Infinity, ease: "linear" }}
-              >
-                <Shaving size={s.size} />
-              </motion.span>
-            ),
-          )}
+    <section id="fw-poster" ref={wrapRef} aria-labelledby="fw-poster-title" className="relative flex min-h-[100svh] flex-col overflow-hidden text-white" style={{ background: "#141414" }}>
+      <style>{HERO_CSS}</style>
+      <motion.div aria-hidden className="absolute inset-0" style={{ y: reduce ? 0 : photoY }}>
+        <div className={`absolute inset-0 ${reduce ? "" : "fw-hero-photo"}`}>
+          {/* eslint-disable-next-line @next/next/no-img-element -- 정적 export 라 next/image 최적화를 쓰지 않는다 */}
+          <img
+            src={`${IMG}/hero.jpg`}
+            srcSet={`${IMG}/hero-sm.jpg 960w, ${IMG}/hero.jpg 1920w`}
+            sizes="100vw"
+            alt="작업대 위에서 원목 판재를 대패로 다듬는 손과 흩어진 대패밥"
+            fetchPriority="high"
+            className="absolute inset-0 h-full w-full object-cover"
+            style={{ objectPosition: "45% 40%" }}
+          />
         </div>
+      </motion.div>
+      <div aria-hidden className="absolute inset-0" style={{ background: "linear-gradient(to top, rgba(0,0,0,0.68), rgba(0,0,0,0.2) 55%, rgba(0,0,0,0.1) 78%, rgba(0,0,0,0.45))" }} />
 
-        {/* 왼쪽 위 상호, 오른쪽 위 문의 버튼 하나 */}
-        <div className="absolute inset-x-0 top-0 z-20 mx-auto flex max-w-[1440px] items-center justify-between px-4 pt-4 lg:px-16 lg:pt-7">
-          <span className="inline-flex items-center gap-2 text-[17px] font-bold leading-none" style={monoF}>
-            <Logo color={PZ.blue} size={24} />
-            {BRAND}
-          </span>
-          <button
-            type="button"
-            onClick={onCta}
-            aria-label="제작 문의"
-            data-gtm-cta={`${SLUG}_poster_cta`}
-            className={`grid h-[52px] w-[52px] place-items-center rounded-full text-white transition-transform duration-150 hover:-rotate-12 active:scale-95 ${focusRing}`}
-            style={{ background: PZ.blue, outlineColor: PZ.blue }}
-          >
-            <PencilRuler size={22} aria-hidden />
-          </button>
-        </div>
+      {/* 왼쪽 위 상호, 오른쪽 위 문의 버튼 하나 */}
+      <div className="relative z-10 mx-auto flex w-full max-w-[1200px] items-center justify-between px-4 pt-4 md:px-6 lg:pt-7">
+        <SampleLogo light small />
+        <button
+          type="button"
+          onClick={onCta}
+          data-gtm-cta={`${SLUG}_poster_cta`}
+          className={`rounded-[6px] bg-white px-4 py-2.5 text-[15px] font-semibold transition-colors duration-150 hover:bg-[#f0f0f0] ${focusRing}`}
+          style={{ color: C.ink, outlineColor: "#ffffff" }}
+        >
+          제작 문의
+        </button>
+      </div>
 
-        <div className="relative mx-auto flex h-full max-w-[1440px] flex-col px-4 pb-4 pt-[88px] lg:flex-row lg:items-center lg:gap-8 lg:px-16 lg:pb-0 lg:pt-0">
-          <motion.div className="relative z-10 lg:flex-1" style={{ y: textY, opacity: textO }}>
-            <h1
-              id="fw-poster-title"
-              className="text-[clamp(52px,16vw,104px)] leading-[1.04] tracking-[-0.01em] lg:text-[clamp(88px,9.6vw,190px)]"
-              style={{ ...poster, wordBreak: "keep-all" }}
-            >
-              <span className="block">원하는 치수로</span>
-              <span className="block">하나만</span>
-              <span className="block">짜 드려요</span>
-            </h1>
-            <p className="mt-4 text-[15px] font-bold lg:mt-7 lg:text-[18px]" style={monoF}>
-              {BRAND}, 제작 기간 4~6주
-            </p>
-          </motion.div>
-
-          <div className="relative min-h-0 flex-1 lg:h-[74svh] lg:w-[47svh] lg:flex-none">
-            <IsoChair reduce={reduce} prog={prog} dimO={dimO} shadowO={shadowO} />
-          </div>
+      <div className="relative z-10 mx-auto mt-auto w-full max-w-[1200px] px-4 pb-14 md:px-6 md:pb-20">
+        <div className={reduce ? "" : "fw-hero-rise"}>
+          <h1 id="fw-poster-title" className="max-w-[14em] text-[36px] font-bold md:text-[clamp(40px,5vw,72px)]" style={{ letterSpacing: "-0.03em", lineHeight: 1.2, wordBreak: "keep-all" }}>
+            원하는 치수로 하나만 짜 드려요
+          </h1>
+          <p className="mt-4 text-[16px] font-medium text-white/90 md:text-[18px]">{BRAND}, 제작 기간 4~6주</p>
         </div>
       </div>
     </section>
-  );
-}
-
-function IsoChair({ reduce, prog, dimO, shadowO }: { reduce: boolean; prog: MotionValue<number>; dimO: MotionValue<number>; shadowO: MotionValue<number> }) {
-  const n = CHAIR.length;
-  const stagger = (PZ_DRAW_MS - PZ_LINE_MS) / (n - 1) / 1000;
-  const [sx, sy] = iso(220, 220, 0);
-  const dimA = { x: iso(0, 470, 0), top: iso(0, 470, 450) };
-  const dimB = { x: iso(490, 0, 0), top: iso(490, 0, 900) };
-  const draw = (delay: number) => (reduce ? undefined : { pathLength: { duration: PZ_LINE_MS / 1000, delay, ease: EASE } });
-
-  return (
-    <svg
-      viewBox={`${VB.x} ${VB.y} ${VB.w} ${VB.h}`}
-      role="img"
-      aria-label="원목 의자 도면. 좌판 높이 450, 전체 높이 900 mm"
-      className="absolute inset-0 h-full w-full overflow-visible"
-      style={monoF}
-    >
-      <defs>
-        <linearGradient id="fw-pz-top" x1="0" y1="0" x2="1" y2="1">
-          <stop offset="0" stopColor="#ebbd86" />
-          <stop offset="1" stopColor="#c98d52" />
-        </linearGradient>
-        <linearGradient id="fw-pz-left" x1="0" y1="0" x2="0" y2="1">
-          <stop offset="0" stopColor="#bd7d45" />
-          <stop offset="1" stopColor="#8c5228" />
-        </linearGradient>
-        <linearGradient id="fw-pz-right" x1="0" y1="0" x2="0" y2="1">
-          <stop offset="0" stopColor="#8a542c" />
-          <stop offset="1" stopColor="#5b3318" />
-        </linearGradient>
-        <radialGradient id="fw-pz-sheen" cx="0.35" cy="0.3" r="0.7">
-          <stop offset="0" stopColor="#fff4e0" stopOpacity="0.55" />
-          <stop offset="1" stopColor="#fff4e0" stopOpacity="0" />
-        </radialGradient>
-        <radialGradient id="fw-pz-floor" cx="0.5" cy="0.5" r="0.5">
-          <stop offset="0" stopColor="#4a2c14" stopOpacity="0.42" />
-          <stop offset="0.6" stopColor="#4a2c14" stopOpacity="0.14" />
-          <stop offset="1" stopColor="#4a2c14" stopOpacity="0" />
-        </radialGradient>
-        {(["x", "y", "v"] as Grain[]).map((g) => (
-          <pattern key={g} id={`fw-pz-grain-${g}`} width="60" height="16" patternUnits="userSpaceOnUse" patternTransform={g === "x" ? "rotate(30)" : g === "y" ? "rotate(-30)" : "rotate(90)"}>
-            <path d="M0 5 Q15 2 30 5 T60 5" fill="none" stroke="#3e220e" strokeOpacity="0.32" strokeWidth="1.6" />
-            <path d="M0 12 Q15 13.5 30 11 T60 12" fill="none" stroke="#3e220e" strokeOpacity="0.18" strokeWidth="1" />
-          </pattern>
-        ))}
-        <clipPath id="fw-pz-fill" clipPathUnits="userSpaceOnUse">
-          <motion.rect
-            x={-1400}
-            width={2800}
-            initial={reduce ? false : { attrY: 560, height: 0 }}
-            animate={{ attrY: -1400, height: 1960 }}
-            transition={{ duration: PZ_FILL_MS / 1000, delay: PZ_FILL_DELAY_MS / 1000, ease: [0.45, 0, 0.25, 1] }}
-          />
-        </clipPath>
-      </defs>
-
-      {/* 바닥 그림자와 바닥 자리 */}
-      <motion.g style={{ opacity: shadowO }}>
-        <ellipse cx={sx} cy={sy + 20} rx="400" ry="170" fill="url(#fw-pz-floor)" />
-        <path d={poly([[-40, -40, 0], [480, -40, 0], [480, 480, 0], [-40, 480, 0]])} fill="none" stroke={PZ.line} strokeOpacity="0.45" strokeWidth="2" strokeDasharray="10 8" />
-      </motion.g>
-
-      {CHAIR.map((part, i) => (
-        <ExplodingPart key={part.id} part={part} prog={prog}>
-          <PartBody part={part} reduce={reduce} delay={i * stagger} />
-        </ExplodingPart>
-      ))}
-
-      {/* 치수선: 좌판 높이, 전체 높이 */}
-      <motion.g style={{ opacity: dimO }} fill="none" stroke={PZ.line} strokeWidth="2.4">
-        <motion.path d={`M${fx(dimA.x[0])},${fx(dimA.x[1])} V${fx(dimA.top[1])}`} initial={reduce ? false : { pathLength: 0 }} animate={{ pathLength: 1 }} transition={draw(0.5)} />
-        <motion.path d={`M${fx(dimB.x[0])},${fx(dimB.x[1])} V${fx(dimB.top[1])}`} initial={reduce ? false : { pathLength: 0 }} animate={{ pathLength: 1 }} transition={draw(0.6)} />
-        {[dimA.x, dimA.top, dimB.x, dimB.top].map(([x, y], k) => (
-          <path key={k} d={`M${fx(x - 12)},${fx(y + 12)} L${fx(x + 12)},${fx(y - 12)}`} />
-        ))}
-        <text x={dimA.x[0] - 18} y={(dimA.x[1] + dimA.top[1]) / 2} fontSize="40" fontWeight="700" textAnchor="end" fill={PZ.blue} stroke="none">
-          450
-        </text>
-        <text x={dimB.x[0] + 18} y={(dimB.x[1] + dimB.top[1]) / 2} fontSize="40" fontWeight="700" fill={PZ.blue} stroke="none">
-          900
-        </text>
-      </motion.g>
-    </svg>
-  );
-}
-
-function ExplodingPart({ part, prog, children }: { part: ChairPart; prog: MotionValue<number>; children: React.ReactNode }) {
-  const x = useTransform(prog, [0, 1], [0, part.fly[0]]);
-  const y = useTransform(prog, [0, 1], [0, part.fly[1]]);
-  const rotate = useTransform(prog, [0, 1], [0, part.fly[2]]);
-  return <motion.g style={{ x, y, rotate }}>{children}</motion.g>;
-}
-
-function PartBody({ part, reduce, delay }: { part: ChairPart; reduce: boolean; delay: number }) {
-  const f = useMemo(() => boxFaces(part), [part]);
-  const grain = `url(#fw-pz-grain-${part.grain})`;
-  return (
-    <>
-      <g clipPath="url(#fw-pz-fill)">
-        <path d={f.top} fill="url(#fw-pz-top)" />
-        <path d={f.left} fill="url(#fw-pz-left)" />
-        <path d={f.right} fill="url(#fw-pz-right)" />
-        <path d={f.top} fill={grain} />
-        <path d={f.left} fill={grain} />
-        <path d={f.right} fill={grain} />
-        {part.id === "seat" && <path d={f.top} fill="url(#fw-pz-sheen)" />}
-        {part.shine && <path d={f.shine} stroke="#fff3dc" strokeOpacity="0.85" strokeWidth="3.5" strokeLinecap="round" fill="none" />}
-      </g>
-      <motion.path
-        d={f.outline}
-        fill="none"
-        stroke={PZ.line}
-        strokeWidth="2.6"
-        strokeLinejoin="round"
-        initial={reduce ? false : { pathLength: 0 }}
-        animate={{ pathLength: 1 }}
-        transition={reduce ? undefined : { duration: PZ_LINE_MS / 1000, delay, ease: EASE }}
-      />
-    </>
   );
 }
 
@@ -809,24 +573,21 @@ export function FurnitureWorkshopDemo() {
   const go = (id: string) => document.getElementById(id)?.scrollIntoView({ behavior: reduce ? "auto" : "smooth", block: "start" });
 
   return (
-    <div className="min-h-screen overflow-x-clip" style={{ background: C.paper, color: C.ink }}>
+    <div className="min-h-screen overflow-x-clip [&_h2]:text-[#111111] [&_h3]:text-[#111111]" style={{ background: C.paper, color: C.body }}>
       <Poster reduce={reduce} onCta={() => go("fw-quote")} />
 
       <header className="mx-auto flex max-w-[1200px] items-center justify-between gap-4 px-4 py-4 md:px-6">
-        <a href="#fw-drawing" onClick={(e) => { e.preventDefault(); window.scrollTo({ top: 0, behavior: reduce ? "auto" : "smooth" }); }} className={`inline-flex items-center gap-2 rounded-[4px] ${focusRing}`} style={{ outlineColor: C.ink }}>
-          <Logo />
-          <span className="text-[18px] font-bold leading-none" style={monoF}>
-            {BRAND}
-          </span>
+        <a href="#fw-drawing" onClick={(e) => { e.preventDefault(); window.scrollTo({ top: 0, behavior: reduce ? "auto" : "smooth" }); }} className={`inline-flex items-center gap-2 rounded-[4px] ${focusRing}`} style={{ outlineColor: C.accent }}>
+          <SampleLogo />
         </a>
         <nav aria-label="주요 메뉴" className="hidden items-center gap-5 text-[15px] lg:flex">
           {NAV.map(([label, id]) => (
-            <a key={id} href={`#${id}`} onClick={(e) => { e.preventDefault(); go(id); }} className={`rounded-[3px] underline-offset-4 hover:underline ${focusRing}`} style={{ outlineColor: C.ink }}>
+            <a key={id} href={`#${id}`} onClick={(e) => { e.preventDefault(); go(id); }} className={`rounded-[3px] underline-offset-4 hover:underline ${focusRing}`} style={{ outlineColor: C.accent }}>
               {label}
             </a>
           ))}
         </nav>
-        <button type="button" onClick={() => go("fw-quote")} className={`flex-none rounded-[4px] px-4 py-2 text-[15px] font-bold text-white ${focusRing}`} style={{ background: C.ink, outlineColor: C.ink }}>
+        <button type="button" onClick={() => go("fw-quote")} className={`flex-none rounded-[6px] px-4 py-2 text-[15px] font-semibold text-white ${focusRing}`} style={{ background: C.accent, outlineColor: C.accent }}>
           제작 문의
         </button>
       </header>
@@ -834,20 +595,20 @@ export function FurnitureWorkshopDemo() {
       {/* 첫 화면: 도면판과 치수, 오른쪽에 목재와 견적 */}
       <main className="mx-auto grid max-w-[1200px] gap-8 px-4 pb-16 pt-2 md:px-6 lg:grid-cols-[minmax(0,1fr)_380px] lg:items-start lg:gap-10 lg:pt-6">
         <div className="min-w-0">
-          <h2 className="text-[28px] font-bold leading-[1.2] md:text-[34px]" style={monoF}>
+          <h2 className="text-[28px] font-bold leading-[1.2] md:text-[34px]">
             원목 가구 주문 제작
           </h2>
           <p className="mt-2 text-[16px] leading-[1.6]" style={{ color: C.soft }}>
             치수를 mm로 넣으면 도면과 견적이 바로 나와요. 한 번에 두세 점만 받습니다.
           </p>
 
-          <div id="fw-drawing" className="mt-5 scroll-mt-4 rounded-[4px] border" style={{ borderColor: C.line, boxShadow: `0 0 0 6px ${C.sheet}` }}>
+          <div id="fw-drawing" className="mt-5 scroll-mt-4 rounded-[4px] border" style={{ borderColor: C.line }}>
             <DrawingBoard kind={kind} dims={dims} wood={wood} finish={finish} reduce={reduce} svgRef={svgRef} />
           </div>
 
           {/* 1. 가구 종류 */}
           <section id="fw-kind" aria-labelledby="fw-kind-title" className="mt-8 scroll-mt-4">
-            <h2 id="fw-kind-title" className="text-[20px] font-bold" style={monoF}>
+            <h2 id="fw-kind-title" className="text-[20px] font-bold">
               제작 가구
             </h2>
             <div role="radiogroup" aria-labelledby="fw-kind-title" className="mt-3 grid grid-cols-2 gap-2 sm:grid-cols-4">
@@ -861,12 +622,12 @@ export function FurnitureWorkshopDemo() {
                     aria-checked={on}
                     onClick={() => pickKind(k)}
                     className={`flex items-center gap-3 rounded-[4px] border px-3 py-2.5 text-left text-[15px] ${on ? "font-bold" : ""} ${focusRing}`}
-                    style={{ borderColor: on ? C.ink : C.line, background: on ? C.sheet : "transparent", boxShadow: on ? `inset 0 0 0 1px ${C.ink}` : "none", outlineColor: C.ink }}
+                    style={{ borderColor: on ? C.accent : C.line, background: on ? C.sheet : "transparent", boxShadow: on ? `inset 0 0 0 1px ${C.accent}` : "none", outlineColor: C.accent }}
                   >
                     <KindIcon kind={k} selected={on} />
                     <span>
                       {k.name}
-                      <span className="block text-[12px] font-normal" style={{ ...monoF, color: C.soft }}>
+                      <span className="block text-[12px] font-normal" style={{ color: C.soft }}>
                         {k.w.min}~{k.w.max}
                       </span>
                     </span>
@@ -879,10 +640,10 @@ export function FurnitureWorkshopDemo() {
           {/* 2. 치수 */}
           <section id="fw-size" aria-labelledby="fw-size-title" className="mt-8 scroll-mt-4">
             <div className="flex flex-wrap items-baseline justify-between gap-2">
-              <h2 id="fw-size-title" className="text-[20px] font-bold" style={monoF}>
+              <h2 id="fw-size-title" className="text-[20px] font-bold">
                 주문 제작 치수
               </h2>
-              <button type="button" onClick={() => pickKind(kind)} className={`rounded-[3px] text-[14px] underline underline-offset-4 ${focusRing}`} style={{ color: C.soft, outlineColor: C.ink }}>
+              <button type="button" onClick={() => pickKind(kind)} className={`rounded-[3px] text-[14px] underline underline-offset-4 ${focusRing}`} style={{ color: C.soft, outlineColor: C.accent }}>
                 기본 치수로
               </button>
             </div>
@@ -900,7 +661,7 @@ export function FurnitureWorkshopDemo() {
         {/* 오른쪽: 목재, 마감, 견적, 문의 */}
         <aside className="min-w-0 lg:sticky lg:top-6">
           <section id="fw-wood" aria-labelledby="fw-wood-title" className="scroll-mt-4 rounded-[4px] border p-4 md:p-5" style={{ borderColor: C.line, background: C.sheet }}>
-            <h2 id="fw-wood-title" className="text-[18px] font-bold" style={monoF}>
+            <h2 id="fw-wood-title" className="text-[18px] font-bold">
               목재
             </h2>
             <div role="radiogroup" aria-labelledby="fw-wood-title" className="mt-3 grid grid-cols-4 gap-2">
@@ -914,7 +675,7 @@ export function FurnitureWorkshopDemo() {
                     aria-checked={on}
                     onClick={() => setWood(w)}
                     className={`rounded-[4px] border p-1.5 text-center text-[13px] ${on ? "font-bold" : ""} ${focusRing}`}
-                    style={{ borderColor: on ? C.ink : C.line, boxShadow: on ? `inset 0 0 0 1px ${C.ink}` : "none", outlineColor: C.ink }}
+                    style={{ borderColor: on ? C.accent : C.line, boxShadow: on ? `inset 0 0 0 1px ${C.accent}` : "none", outlineColor: C.accent }}
                   >
                     <WoodSwatch color={w.color} className="h-10 w-full rounded-[2px]" />
                     <span className="mt-1.5 block leading-none">{w.name}</span>
@@ -938,10 +699,10 @@ export function FurnitureWorkshopDemo() {
                     aria-checked={on}
                     onClick={() => setFinish(f.id)}
                     className={`flex items-center justify-between gap-2 rounded-[4px] border px-3 py-2 text-left text-[15px] ${on ? "font-bold" : ""} ${focusRing}`}
-                    style={{ borderColor: on ? C.ink : C.line, boxShadow: on ? `inset 0 0 0 1px ${C.ink}` : "none", outlineColor: C.ink }}
+                    style={{ borderColor: on ? C.accent : C.line, boxShadow: on ? `inset 0 0 0 1px ${C.accent}` : "none", outlineColor: C.accent }}
                   >
                     <span>{f.name}</span>
-                    <span className="text-[13px] tabular-nums" style={{ ...monoF, color: C.soft }}>
+                    <span className="text-[13px] tabular-nums" style={{ color: C.soft }}>
                       {f.add ? `+${won(f.add)}` : "기본"}
                     </span>
                   </button>
@@ -953,11 +714,11 @@ export function FurnitureWorkshopDemo() {
             </p>
           </section>
 
-          <section id="fw-quote" aria-labelledby="fw-quote-title" className="mt-4 scroll-mt-4 rounded-[4px] border p-4 md:p-5" style={{ borderColor: C.ink, background: C.sheet }}>
-            <h2 id="fw-quote-title" className="text-[18px] font-bold" style={monoF}>
+          <section id="fw-quote" aria-labelledby="fw-quote-title" className="mt-4 scroll-mt-4 rounded-[4px] border p-4 md:p-5" style={{ borderColor: C.line, background: C.sheet }}>
+            <h2 id="fw-quote-title" className="text-[18px] font-bold">
               견적
             </h2>
-            <dl className="mt-3 grid grid-cols-[1fr_auto] gap-x-4 gap-y-1.5 text-[15px]" style={monoF}>
+            <dl className="mt-3 grid grid-cols-[1fr_auto] gap-x-4 gap-y-1.5 text-[15px]">
               <dt style={{ color: C.soft }}>
                 {kind.name} {dims.w} x {dims.d} x {dims.h}
               </dt>
@@ -969,9 +730,9 @@ export function FurnitureWorkshopDemo() {
               <dt style={{ color: C.soft }}>마감 {FINISHES.find((f) => f.id === finish)?.name}</dt>
               <dd className="text-right tabular-nums">{q.finish ? won(q.finish) : "포함"}</dd>
             </dl>
-            <div className="mt-3 flex items-baseline justify-between gap-3 border-t pt-3" style={{ borderColor: C.ink }}>
+            <div className="mt-3 flex items-baseline justify-between gap-3 border-t pt-3" style={{ borderColor: C.line }}>
               <span className="text-[15px] font-bold">합계</span>
-              <output aria-live="polite" className="text-[26px] font-bold tabular-nums" style={monoF}>
+              <output aria-live="polite" className="text-[26px] font-bold tabular-nums" style={{ color: C.ink }}>
                 {won(q.total)}
               </output>
             </div>
@@ -1005,7 +766,7 @@ export function FurnitureWorkshopDemo() {
 
       {/* 목재 안내 */}
       <section id="fw-wood-guide" aria-labelledby="fw-wood-guide-title" className="mx-auto max-w-[1200px] scroll-mt-4 border-t px-4 pt-12 md:px-6 md:pt-16" style={{ borderColor: C.line }}>
-        <h2 id="fw-wood-guide-title" className="text-[24px] font-bold md:text-[28px]" style={monoF}>
+        <h2 id="fw-wood-guide-title" className="text-[24px] font-bold md:text-[28px]">
           목재 안내
         </h2>
         <p className="mt-2 text-[16px] leading-[1.6]" style={{ color: C.soft }}>
@@ -1024,12 +785,12 @@ export function FurnitureWorkshopDemo() {
                   go("fw-drawing");
                 }}
                 className={`rounded-[4px] border text-left ${focusRing}`}
-                style={{ borderColor: on ? C.ink : C.line, background: C.sheet, boxShadow: on ? `inset 0 0 0 1px ${C.ink}` : "none", outlineColor: C.ink }}
+                style={{ borderColor: on ? C.accent : C.line, background: C.sheet, boxShadow: on ? `inset 0 0 0 1px ${C.accent}` : "none", outlineColor: C.accent }}
               >
                 <WoodSwatch color={w.color} className="h-28 w-full rounded-t-[3px]" />
                 <div className="p-4">
                   <p className="flex items-baseline justify-between gap-2">
-                    <b className="text-[18px]" style={monoF}>
+                    <b className="text-[18px]">
                       {w.name}
                     </b>
                     <span className="text-[13px]" style={{ color: C.soft }}>
@@ -1037,7 +798,7 @@ export function FurnitureWorkshopDemo() {
                     </span>
                   </p>
                   <p className="mt-1.5 text-[15px] leading-[1.6]">{w.desc}</p>
-                  <p className="mt-2 text-[14px] tabular-nums" style={{ ...monoF, color: C.soft }}>
+                  <p className="mt-2 text-[14px] tabular-nums" style={{ color: C.soft }}>
                     30T 판재 m2당 {won(w.rate)}
                   </p>
                   {on && (
@@ -1054,7 +815,7 @@ export function FurnitureWorkshopDemo() {
 
       {/* 5. 작업 과정 */}
       <section id="fw-process" aria-labelledby="fw-process-title" className="mx-auto max-w-[1200px] scroll-mt-4 px-4 pt-12 md:px-6 md:pt-16">
-        <h2 id="fw-process-title" className="text-[24px] font-bold md:text-[28px]" style={monoF}>
+        <h2 id="fw-process-title" className="text-[24px] font-bold md:text-[28px]">
           작업 과정
         </h2>
         <ProcessLine reduce={reduce} />
@@ -1063,7 +824,7 @@ export function FurnitureWorkshopDemo() {
       {/* 공방 소개, 오시는 길 */}
       <section id="fw-about" aria-labelledby="fw-about-title" className="mx-auto grid max-w-[1200px] gap-8 scroll-mt-4 px-4 pt-12 md:grid-cols-2 md:px-6 md:pt-16">
         <div>
-          <h2 id="fw-about-title" className="text-[24px] font-bold md:text-[28px]" style={monoF}>
+          <h2 id="fw-about-title" className="text-[24px] font-bold md:text-[28px]">
             공방 소개
           </h2>
           <p className="mt-3 text-[16px] leading-[1.75]">
@@ -1079,7 +840,7 @@ export function FurnitureWorkshopDemo() {
           </ul>
         </div>
         <div id="fw-map" className="scroll-mt-4">
-          <h2 className="text-[24px] font-bold md:text-[28px]" style={monoF}>
+          <h2 className="text-[24px] font-bold md:text-[28px]">
             오시는 길
           </h2>
           <div className="mt-3 overflow-hidden rounded-[4px] border" style={{ borderColor: C.line, background: C.sheet }}>
@@ -1111,8 +872,8 @@ export function FurnitureWorkshopDemo() {
       </section>
 
       <footer className="mx-auto mt-16 max-w-[1200px] border-t px-4 pb-24 pt-8 text-[14px] leading-[1.8] md:px-6" style={{ borderColor: C.line, color: C.soft }}>
-        <p className="text-[15px] font-bold" style={{ ...monoF, color: C.ink }}>
-          {BRAND}
+        <p>
+          <SampleLogo />
         </p>
         <p>{ADDRESS}</p>
         <DemoMakerInfo className="mt-6" />
@@ -1122,17 +883,6 @@ export function FurnitureWorkshopDemo() {
 }
 
 /* ── 조각 ─────────────────────────────────────────────── */
-
-function Logo({ color = C.ink, size = 30 }: { color?: string; size?: number }) {
-  return (
-    <svg width={size} height={size} viewBox="0 0 30 30" aria-hidden className="flex-none">
-      <rect x="2" y="7" width="26" height="4" fill={color} />
-      <rect x="5" y="11" width="3" height="13" fill={color} />
-      <rect x="22" y="11" width="3" height="13" fill={color} />
-      <path d="M8 16h14" stroke={color} strokeWidth="2" />
-    </svg>
-  );
-}
 
 /** 나무 결. 색 위에 가느다란 결 줄을 겹친다. */
 function WoodSwatch({ color, className = "" }: { color: string; className?: string }) {
@@ -1152,7 +902,7 @@ function SizeSlider({ id, label, range, value, onChange }: { id: string; label: 
     <div>
       <label htmlFor={id} className="flex items-baseline justify-between text-[15px]">
         <span className="font-bold">{label}</span>
-        <output htmlFor={id} className="text-[17px] font-bold tabular-nums" style={monoF}>
+        <output htmlFor={id} className="text-[17px] font-bold tabular-nums">
           {value} <span className="text-[13px] font-normal">mm</span>
         </output>
       </label>
@@ -1165,9 +915,9 @@ function SizeSlider({ id, label, range, value, onChange }: { id: string; label: 
         value={value}
         onChange={(e) => onChange(Number(e.target.value))}
         className={`mt-1 h-7 w-full cursor-pointer rounded-[3px] ${focusRing}`}
-        style={{ accentColor: C.ink, outlineColor: C.ink }}
+        style={{ accentColor: C.accent, outlineColor: C.accent }}
       />
-      <p className="flex justify-between text-[12px] tabular-nums" style={{ ...monoF, color: C.soft }}>
+      <p className="flex justify-between text-[12px] tabular-nums" style={{ color: C.soft }}>
         <span>{range.min}</span>
         <span>{range.max}</span>
       </p>
@@ -1205,22 +955,22 @@ function InquiryForm({ today, spec, onDone }: { today: Date; spec: string; onDon
       </p>
       <label className="mt-3 block text-[14px] font-bold">
         이름
-        <input value={name} onChange={(e) => setName(e.target.value)} autoComplete="name" className={field} style={{ borderColor: C.line, outlineColor: C.ink }} />
+        <input value={name} onChange={(e) => setName(e.target.value)} autoComplete="name" className={field} style={{ borderColor: C.line, outlineColor: C.accent }} />
       </label>
       <label className="mt-3 block text-[14px] font-bold">
         휴대폰
-        <input value={phone} onChange={(e) => setPhone(e.target.value)} inputMode="numeric" autoComplete="tel" placeholder="010-0000-0000" className={field} style={{ borderColor: C.line, outlineColor: C.ink }} />
+        <input value={phone} onChange={(e) => setPhone(e.target.value)} inputMode="numeric" autoComplete="tel" placeholder="010-0000-0000" className={field} style={{ borderColor: C.line, outlineColor: C.accent }} />
       </label>
       <label className="mt-3 block text-[14px] font-bold">
         요청 사항
-        <textarea value={memo} onChange={(e) => setMemo(e.target.value)} rows={2} placeholder="모서리 둥글게, 서랍 하나" className={`${field} resize-none`} style={{ borderColor: C.line, outlineColor: C.ink }} />
+        <textarea value={memo} onChange={(e) => setMemo(e.target.value)} rows={2} placeholder="모서리 둥글게, 서랍 하나" className={`${field} resize-none`} style={{ borderColor: C.line, outlineColor: C.accent }} />
       </label>
       {err && (
         <p role="alert" className="mt-2 text-[14px] font-bold" style={{ color: C.error }}>
           {err}
         </p>
       )}
-      <button type="submit" data-gtm-cta={`${SLUG}_inquiry`} className={`mt-4 w-full rounded-[4px] py-3 text-[16px] font-bold text-white transition-transform duration-100 active:translate-y-[1px] ${focusRing}`} style={{ background: C.ink, outlineColor: C.ink }}>
+      <button type="submit" data-gtm-cta={`${SLUG}_inquiry`} className={`mt-4 w-full rounded-[6px] py-3 text-[16px] font-semibold text-white transition-transform duration-100 active:translate-y-[1px] ${focusRing}`} style={{ background: C.accent, outlineColor: C.accent }}>
         도면과 함께 문의 보내기
       </button>
     </form>
@@ -1252,7 +1002,7 @@ function Receipt({ receipt, today, kind, dims, wood, finish, total, svgRef, onRe
       </h3>
       <dl className="mt-3 grid grid-cols-[auto_1fr] gap-x-4 gap-y-1.5 text-[15px]">
         <dt style={{ color: C.soft }}>접수번호</dt>
-        <dd className="font-bold tabular-nums" style={monoF}>
+        <dd className="font-bold tabular-nums">
           {no}
         </dd>
         <dt style={{ color: C.soft }}>이름</dt>
@@ -1274,11 +1024,11 @@ function Receipt({ receipt, today, kind, dims, wood, finish, total, svgRef, onRe
           </span>
         </dd>
       </dl>
-      <button type="button" onClick={save} disabled={saving === "busy"} data-gtm-cta={`${SLUG}_png`} className={`mt-4 inline-flex w-full items-center justify-center gap-2 rounded-[4px] border-2 py-2.5 text-[15px] font-bold ${focusRing}`} style={{ borderColor: C.ink, background: C.paper, outlineColor: C.ink }}>
+      <button type="button" onClick={save} disabled={saving === "busy"} data-gtm-cta={`${SLUG}_png`} className={`mt-4 inline-flex w-full items-center justify-center gap-2 rounded-[6px] border py-2.5 text-[15px] font-semibold ${focusRing}`} style={{ borderColor: C.accent, color: C.accent, background: C.sheet, outlineColor: C.accent }}>
         <Download size={17} aria-hidden />
         {saving === "busy" ? "만드는 중" : saving === "done" ? "도면 PNG 저장됨" : saving === "fail" ? "저장 실패, 다시 시도" : "도면 PNG 저장"}
       </button>
-      <button type="button" onClick={onReset} className={`mt-2 w-full rounded-[3px] py-1.5 text-[14px] underline underline-offset-4 ${focusRing}`} style={{ color: C.soft, outlineColor: C.ink }}>
+      <button type="button" onClick={onReset} className={`mt-2 w-full rounded-[3px] py-1.5 text-[14px] underline underline-offset-4 ${focusRing}`} style={{ color: C.soft, outlineColor: C.accent }}>
         다른 가구로 다시 문의
       </button>
     </div>
@@ -1293,25 +1043,14 @@ const STEPS = [
   { name: "샌딩", days: "2일", desc: "120방부터 320방까지 네 번 갈아요. 모서리는 손으로 둥글려 손에 걸리는 곳이 없게 해요." },
   { name: "마감", days: "1주", desc: "오일은 세 번 바르고 사이마다 하루 말려요. 바니시는 두 번. 다 마른 뒤 사진을 보내 드려요." },
 ];
-/** 선 1.2초, 점은 선이 지나간 뒤 차례로 */
-const LINE_DRAW_MS = 1200;
 
 function ProcessLine({ reduce }: { reduce: boolean }) {
   const [active, setActive] = useState(0);
   const step = STEPS[active];
-  const once = { once: true, amount: 0.6 } as const;
   return (
     <div className="mt-6">
       <div className="relative">
-        <motion.div
-          aria-hidden
-          className="absolute left-[12.5%] right-[12.5%] top-[14px] h-[2px] origin-left"
-          style={{ background: C.ink }}
-          initial={reduce ? false : { scaleX: 0 }}
-          whileInView={{ scaleX: 1 }}
-          viewport={once}
-          transition={{ duration: LINE_DRAW_MS / 1000, ease: EASE }}
-        />
+        <div aria-hidden className="absolute left-[12.5%] right-[12.5%] top-[14px] h-px" style={{ background: C.line }} />
         <div role="tablist" aria-label="작업 단계" className="relative grid grid-cols-4">
           {STEPS.map((s, i) => {
             const on = i === active;
@@ -1325,19 +1064,11 @@ function ProcessLine({ reduce }: { reduce: boolean }) {
                 aria-controls="fw-step-panel"
                 onClick={() => setActive(i)}
                 className={`group flex flex-col items-center gap-2 rounded-[4px] py-0.5 text-[15px] ${on ? "font-bold" : ""} ${focusRing}`}
-                style={{ outlineColor: C.ink }}
+                style={{ outlineColor: C.accent }}
               >
-                <motion.span
-                  aria-hidden
-                  className="block h-[28px] w-[28px] rounded-full border-2"
-                  style={{ borderColor: C.ink, background: on ? C.ink : C.paper }}
-                  initial={reduce ? false : { scale: 0 }}
-                  whileInView={{ scale: 1 }}
-                  viewport={once}
-                  transition={{ duration: 0.3, delay: (LINE_DRAW_MS / 1000) * ((i + 0.5) / 4), ease: EASE }}
-                />
+                <span aria-hidden className="block h-[28px] w-[28px] rounded-full border" style={{ borderColor: on ? C.accent : "#cfcfcf", background: on ? C.accent : C.sheet }} />
                 <span className="leading-none">{s.name}</span>
-                <span className="text-[12px] leading-none tabular-nums" style={{ ...monoF, color: C.soft }}>
+                <span className="text-[12px] leading-none tabular-nums" style={{ color: C.soft }}>
                   {s.days}
                 </span>
               </button>
@@ -1348,7 +1079,7 @@ function ProcessLine({ reduce }: { reduce: boolean }) {
       <div id="fw-step-panel" role="tabpanel" aria-labelledby={`fw-step-${active}`} className="mt-5 rounded-[4px] border p-4 md:p-5" style={{ borderColor: C.line, background: C.sheet }}>
         <AnimatePresence mode="wait" initial={false}>
           <motion.p key={active} initial={reduce ? false : { opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} transition={{ duration: 0.18 }} className="text-[16px] leading-[1.7]">
-            <b style={monoF}>{step.name}</b> {step.desc}
+            <b>{step.name}</b> {step.desc}
           </motion.p>
         </AnimatePresence>
       </div>
@@ -1362,7 +1093,7 @@ function ProcessLine({ reduce }: { reduce: boolean }) {
 /** 오시는 길 약도. 큰길, 골목, 역, 공방 자리만 그린다. */
 function MapSketch() {
   return (
-    <svg viewBox="0 0 480 220" role="img" aria-label="약도: ㅇㅇ역 3번 출구에서 큰길을 따라 걷다 두 번째 골목 안쪽에 공방" className="block h-auto w-full" style={monoF}>
+    <svg viewBox="0 0 480 220" role="img" aria-label="약도: ㅇㅇ역 3번 출구에서 큰길을 따라 걷다 두 번째 골목 안쪽에 공방" className="block h-auto w-full">
       <rect width="480" height="220" fill="url(#fw-grid)" />
       <path d="M0 150 H480" stroke={C.ink} strokeWidth="14" fill="none" opacity="0.18" />
       <path d="M0 150 H480" stroke={C.sheet} strokeWidth="2" strokeDasharray="10 8" fill="none" />
@@ -1390,5 +1121,19 @@ function MapSketch() {
         ㅇㅇ로
       </text>
     </svg>
+  );
+}
+
+/* 로고: 메인 사이트와 같은 곰 로고 + 곰파트너(크게) + 업종(작게) */
+function SampleLogo({ light, small }: { light?: boolean; small?: boolean }) {
+  return (
+    <span className="inline-flex items-center gap-2" style={{ color: light ? "#ffffff" : "#111111" }}>
+      {/* eslint-disable-next-line @next/next/no-img-element -- 메인 사이트와 같은 곰 로고 */}
+      <img src="/images/logo-bear.png" alt="" aria-hidden width={28} height={28} className={small ? "h-6 w-6 shrink-0" : "h-7 w-7 shrink-0"} />
+      <span className="flex items-baseline gap-1 whitespace-nowrap">
+        <span className={`${small ? "text-[18px]" : "text-[20px]"} font-bold leading-none tracking-[-0.03em]`}>곰파트너</span>
+        <span className="text-[12px] font-semibold leading-none opacity-75">가구 공방 샘플</span>
+      </span>
+    </span>
   );
 }

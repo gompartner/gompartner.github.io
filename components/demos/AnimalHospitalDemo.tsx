@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useRef, useState, type Dispatch, type FormEvent, type ReactNode, type SetStateAction } from "react";
-import { AnimatePresence, motion, useScroll, useTransform, type MotionValue } from "framer-motion";
+import { AnimatePresence, motion, useScroll, useTransform } from "framer-motion";
 import {
   BedDouble,
   Bus,
@@ -26,13 +26,12 @@ import {
   Sun,
   Syringe,
 } from "lucide-react";
-import { Jua } from "@/lib/local-fonts";
 import { useReducedMotionSafe } from "@/hooks/useReducedMotionSafe";
 import { daysAgo, fmtKo, useDemoToday } from "@/hooks/useDemoToday";
 import { maskName, maskPhone } from "@/components/demos/LeadReceivedPanel";
 import { DemoMakerInfo } from "@/components/demos/DemoMakerInfo";
 
-/* 24시 동물병원 홈페이지 샘플: 가상의 곰파트너동물병원. 365일 24시간 진료하고 입원실이 있다.
+/* 24시 동물병원 홈페이지 샘플: 가상의 동물병원 곰파트너. 365일 24시간 진료하고 입원실이 있다.
    상호, 주소, 수의사, 보호자 이름은 모두 가상이다.
 
    국내 24시 동물병원 사이트 공통 구성(참고): 메뉴는 병원소개, 의료진, 진료과목, 건강검진, 입원실, 예약안내, 오시는 길.
@@ -48,58 +47,50 @@ import { DemoMakerInfo } from "@/components/demos/DemoMakerInfo";
    4. 예약: 보호자, 휴대폰, 반려동물 종, 나이, 진료 과목, 날짜, 시간. 접수하면 접수 번호, 담당 창구, 회신 예정일을 보여 준다.
    5. 입원 면회 시간: 지금 시각 기준 면회 가능 여부와 다음 면회 시각을 시간 막대에 표시한다.
 
-   포스터 첫 화면(ah-poster): 깊은 청록 바탕에 큰 문장 "밤 12시에도 문 열어 있어요" 하나. 메뉴, 카드, 표는 없다.
-   들어오면 발자국이 화면을 가로질러 하나씩 찍히고, 오른쪽 위에서 큰 청진기(금속 귀꽂이, 주황 고무관, 은색 집음부)가
-   내려와 줄에 매달린 듯 흔들리다 멈춘다. 그 뒤에는 8초 주기로 아주 조금씩 흔들린다(반복 움직임은 이것 하나).
-   스크롤하면 문장과 청진기는 위로 빠지고, 발자국이 아래로 몇 걸음 더 찍히며 기존 화면 쪽으로 이어진다.
-   동작 줄이기면 발자국이 다 찍히고 청진기가 멈춘 완성 상태로 고정하고 스크롤 퇴장도 없다. */
+   사진 출처: AI 생성(Z-Image-Turbo, Apache 2.0)
 
-const juaF = { fontFamily: `${Jua.style.fontFamily}, sans-serif` } as const;
+   첫 화면(ah-poster): 수의사가 개를 살피는 사진 한 장이 한 화면을 채우고 아래 왼쪽에 문장 "밤 12시에도 문 열어 있어요".
+   들어오면 사진이 1.6초 동안 천천히 다가오고(1.06배에서 1배), 문장은 0.3초 늦게 아래에서 올라온다(CSS keyframes, JS 없이도 보인다).
+   스크롤하면 사진만 조금 느리게 움직인다. 동작 줄이기면 전부 멈춘다. */
 
-const BRAND = "곰파트너동물병원";
+const IMG = "/images/demo-animal-hospital";
 const TEL = "02-000-0000";
 const ADDRESS = "서울 ㅇㅇ구 ㅇㅇ로 00, 1~2층";
 const KAKAO = "카카오톡 채널 곰파트너";
 
-const C = {
-  paper: "#fbf7f1",
-  ink: "#1d2b2a",
-  muted: "#53625f",
-  line: "#d8e2df",
-  teal: "#0f5c5a",
-  tealDeep: "#0b4341",
-  tealSoft: "#e3f0ee",
-  orange: "#e8742a",
-  orangeText: "#b0491a",
-  orangeSoft: "#fde9da",
-  error: "#b42318",
-};
+/* 로고: 메인 사이트와 같은 곰 로고 + 곰파트너(크게) + 업종(작게) */
+function SampleLogo({ light, small }: { light?: boolean; small?: boolean }) {
+  return (
+    <span className="inline-flex items-center gap-2" style={{ color: light ? "#ffffff" : "#111111" }}>
+      {/* eslint-disable-next-line @next/next/no-img-element -- 메인 사이트와 같은 곰 로고 */}
+      <img src="/images/logo-bear.png" alt="" aria-hidden width={28} height={28} className={small ? "h-6 w-6 shrink-0" : "h-7 w-7 shrink-0"} />
+      <span className="flex items-baseline gap-1 whitespace-nowrap">
+        <span className={`${small ? "text-[18px]" : "text-[20px]"} font-bold tracking-[-0.03em]`}>곰파트너</span>
+        <span className="text-[12px] font-semibold opacity-75">동물병원 샘플</span>
+      </span>
+    </span>
+  );
+}
 
-/** 포스터 색 */
-const P = {
-  bg: "#0b4341",
-  bgDeep: "#072f2e",
-  cream: "#fbf3e8",
-  sub: "#bfe0da",
-  orange: "#ff9d55",
+const C = {
+  paper: "#ffffff",
+  soft: "#f7f7f5",
+  ink: "#111111",
+  body: "#4b4b4b",
+  muted: "#767676",
+  line: "#e5e5e5",
+  /** 강조색 하나. 차분한 청록 */
+  teal: "#2f5b57",
+  tealSoft: "#eef3f2",
+  error: "#b42318",
 };
 
 /* 모션 상수. 시간은 초, 이징은 cubic-bezier */
 const EASE = [0.22, 1, 0.36, 1] as const;
 /** 탭, 표 강조, 접수 화면 전환 */
 const DUR = 0.35;
-/** 첫 발자국이 찍히는 시각 */
-const PAW_START = 0.2;
-/** 발자국 사이 간격 */
-const PAW_GAP = 0.13;
-/** 발자국 하나가 도장처럼 눌리는 시간 */
-const PAW_STAMP = 0.22;
-/** 청진기가 내려와 흔들리다 멈추기까지 */
-const STETH_DROP = 1.8;
-/** 멈춘 뒤 은은하게 흔들리는 한 주기 */
-const SWAY_LOOP = 8;
-/** 포스터 스크롤 진행도 중 퇴장이 끝나는 지점(고정 구간 60svh / 전체 160svh) */
-const EXIT_END = 0.375;
+/** 첫 화면 사진이 다가오는 시간 */
+const PHOTO_IN = 1.6;
 
 const focusRing = "focus-visible:outline focus-visible:outline-[3px] focus-visible:outline-offset-2";
 const won = (n: number) => `${n.toLocaleString("ko-KR")}원`;
@@ -128,74 +119,6 @@ const DAY_TO = 21;
 const isNight = (d: Date) => d.getHours() >= DAY_TO || d.getHours() < DAY_FROM;
 const hhmm = (d: Date) => `${p2(d.getHours())}:${p2(d.getMinutes())}`;
 const korTime = (h: number, m = 0) => `${h < 12 ? "오전" : "오후"} ${h % 12 === 0 ? 12 : h % 12}시${m ? ` ${m}분` : ""}`;
-
-/* ---------- 포스터 발자국 ---------- */
-
-type Paw = { x: number; y: number; rot: number };
-
-/** 걸음 중심선(화면 % 좌표)을 따라 왼발, 오른발을 번갈아 놓는다. 각도는 화면 비율(W, H)로 계산 */
-function buildTrail(center: [number, number][], W: number, H: number, side: number): Paw[] {
-  return center.map(([x, y], i) => {
-    const a = center[Math.max(0, i - 1)];
-    const b = center[Math.min(center.length - 1, i + 1)];
-    const dx = ((b[0] - a[0]) / 100) * W;
-    const dy = ((b[1] - a[1]) / 100) * H;
-    const len = Math.hypot(dx, dy) || 1;
-    const s = i % 2 === 0 ? 1 : -1;
-    // 진행 방향의 수직으로 발 간격만큼 비켜 놓는다
-    const ox = ((-dy / len) * side * s * 100) / W;
-    const oy = ((dx / len) * side * s * 100) / H;
-    // 서버와 브라우저의 소수 표기가 달라 하이드레이션이 어긋나지 않게 반올림한다
-    const r2 = (v: number) => Math.round(v * 100) / 100;
-    return { x: r2(x + ox), y: r2(y + oy), rot: Math.round((Math.atan2(dy, dx) * 180) / Math.PI + 90) };
-  });
-}
-
-/** PC: 왼쪽 아래에서 오른쪽으로 걷다가 아래로 꺾인다. 앞 9걸음은 등장, 뒤 5걸음은 스크롤 */
-const PAWS_PC = buildTrail(
-  [
-    [-2, 92],
-    [6, 89],
-    [14, 87.5],
-    [22, 86],
-    [30, 85],
-    [38, 85],
-    [46, 86],
-    [53, 88],
-    [59, 91],
-    [63, 96],
-    [65, 102],
-    [66, 109],
-    [66, 116],
-    [65, 123],
-  ],
-  1440,
-  900,
-  16,
-);
-const PAWS_PC_ENTER = 9;
-
-/** 휴대폰: 왼쪽 위에서 비스듬히 내려와 문장 쪽으로 이어진다 */
-const PAWS_MO = buildTrail(
-  [
-    [-4, 17],
-    [6, 21],
-    [15, 25.5],
-    [22, 30.5],
-    [28, 36],
-    [32, 42],
-    [34, 48],
-    [35, 54],
-    [35, 60],
-    [34, 66],
-    [33, 72],
-    [32, 78],
-  ],
-  390,
-  844,
-  9,
-);
-const PAWS_MO_ENTER = 7;
 
 /* ---------- 진료 과목 ---------- */
 
@@ -345,9 +268,8 @@ export function AnimalHospitalDemo() {
       <Poster reduce={reduce} onCta={() => go("ah-reserve")} />
 
       <header className="mx-auto flex max-w-[1200px] flex-wrap items-center justify-between gap-x-4 gap-y-2 px-4 py-4 md:px-6">
-        <p className="inline-flex items-center gap-2 text-[22px] leading-none" style={{ ...juaF, color: C.tealDeep }}>
-          <PawPrint size={24} aria-hidden style={{ color: C.orange }} />
-          {BRAND}
+        <p className="leading-none">
+          <SampleLogo />
         </p>
         <nav aria-label="주요 메뉴" className="-mx-2 flex flex-wrap items-center" style={{ outlineColor: C.teal }}>
           {[
@@ -407,11 +329,10 @@ export function AnimalHospitalDemo() {
         <MapBlock />
       </section>
 
-      <footer className="mt-20 px-4 py-10 md:px-6" style={{ background: C.tealDeep, color: "rgba(251,247,241,0.85)" }}>
+      <footer className="mt-20 border-t px-4 py-10 md:px-6" style={{ background: C.soft, color: C.muted, borderColor: C.line }}>
         <div className="mx-auto max-w-[1200px]">
-          <p className="inline-flex items-center gap-2 text-[18px]" style={{ ...juaF, color: C.paper }}>
-            <PawPrint size={18} aria-hidden style={{ color: P.orange }} />
-            {BRAND}
+          <p>
+            <SampleLogo />
           </p>
           <p className="mt-2 text-[14px]">
             {ADDRESS}, 대표 전화 {TEL}, 365일 24시간 진료
@@ -425,290 +346,72 @@ export function AnimalHospitalDemo() {
 
 function SectionTitle({ id, icon, title }: { id: string; icon: ReactNode; title: string }) {
   return (
-    <h2 id={id} className="mb-6 inline-flex items-center gap-2.5 text-[28px] leading-tight md:text-[34px]" style={{ ...juaF, color: C.tealDeep }}>
-      <span style={{ color: C.orange }}>{icon}</span>
+    <h2 id={id} className="mb-6 inline-flex items-center gap-2.5 text-[28px] font-bold leading-tight tracking-[-0.02em] md:text-[34px]" style={{ color: C.ink }}>
+      <span style={{ color: C.teal }}>{icon}</span>
       {title}
     </h2>
   );
 }
 
-/* ---------- 포스터 ---------- */
+/* ---------- 첫 화면 ---------- */
 
 function Poster({ reduce, onCta }: { reduce: boolean; onCta: () => void }) {
   const ref = useRef<HTMLElement>(null);
   const { scrollYProgress } = useScroll({ target: ref, offset: ["start start", "end start"] });
-  const p = useTransform(scrollYProgress, (v) => (reduce ? 0 : Math.min(1, v / EXIT_END)));
-  // 문장은 위로 빠지고, 청진기는 줄에 끌려 올라가고, 발자국 바닥은 천천히 올라오며 아래로 이어진다
-  const textY = useTransform(p, (v) => `${-v * 50}svh`);
-  const textO = useTransform(p, (v) => (v < 0.12 ? 1 : Math.max(0, 1 - (v - 0.12) / 0.3)));
-  const stethY = useTransform(p, (v) => `${-v * v * 80}svh`);
-  const floorY = useTransform(p, (v) => `${-v * 38}svh`);
+  // 스크롤하면 사진만 조금 느리게 내려간다
+  const photoY = useTransform(scrollYProgress, (v) => (reduce ? "0%" : `${v * 8}%`));
 
   return (
-    <section id="ah-poster" ref={ref} aria-labelledby="ah-poster-title" className="relative" style={{ height: reduce ? undefined : "160svh", background: P.bg }}>
-      <div
-        className={`${reduce ? "relative min-h-svh" : "sticky top-0 h-svh"} overflow-hidden`}
-        style={{ background: `radial-gradient(70% 90% at 82% 30%, #11605d 0%, ${P.bg} 52%, ${P.bgDeep} 100%)`, color: P.cream }}
-      >
-        <PawDefs />
-
-        {/* 바닥 쪽 어둠. 발자국이 바닥에 찍힌 느낌을 준다 */}
-        <div aria-hidden className="pointer-events-none absolute inset-x-0 bottom-0 h-[34svh]" style={{ background: `linear-gradient(to bottom, transparent, rgba(4,26,25,0.45))` }} />
-
-        {/* 발자국 */}
-        <motion.div aria-hidden className="pointer-events-none absolute inset-0" style={{ y: floorY }}>
-          <div className="hidden md:block">
-            {PAWS_PC.map((paw, i) =>
-              i < PAWS_PC_ENTER ? <EnterPaw key={i} paw={paw} i={i} reduce={reduce} size={56} /> : <ScrollPaw key={i} paw={paw} k={i - PAWS_PC_ENTER} n={PAWS_PC.length - PAWS_PC_ENTER} p={p} reduce={reduce} size={56} />,
-            )}
-          </div>
-          <div className="md:hidden">
-            {PAWS_MO.map((paw, i) =>
-              i < PAWS_MO_ENTER ? <EnterPaw key={i} paw={paw} i={i} reduce={reduce} size={38} /> : <ScrollPaw key={i} paw={paw} k={i - PAWS_MO_ENTER} n={PAWS_MO.length - PAWS_MO_ENTER} p={p} reduce={reduce} size={38} />,
-            )}
-          </div>
+    <section id="ah-poster" ref={ref} aria-labelledby="ah-poster-title" className="relative flex min-h-[100svh] flex-col overflow-hidden" style={{ background: "#141414", color: "#ffffff" }}>
+      <style>{`@keyframes ah-rise{from{opacity:0;transform:translateY(12px)}to{opacity:1;transform:none}}.ah-rise{animation:ah-rise 0.7s cubic-bezier(0.22,1,0.36,1) 0.3s both}@media (prefers-reduced-motion: reduce){.ah-rise{animation:none}}`}</style>
+      <motion.div className="absolute inset-x-0 top-[-10%] h-[110%]" style={{ y: photoY }}>
+        <motion.div className="h-full w-full" initial={reduce ? false : { scale: 1.06 }} animate={{ scale: 1 }} transition={{ duration: reduce ? 0 : PHOTO_IN, ease: EASE }}>
+          {/* eslint-disable-next-line @next/next/no-img-element -- 정적 export 라 next/image 최적화를 쓰지 않는다 */}
+          <img
+            src={`${IMG}/hero.jpg`}
+            srcSet={`${IMG}/hero-sm.jpg 960w, ${IMG}/hero.jpg 1920w`}
+            sizes="100vw"
+            alt="수의사가 마스크를 쓰고 큰 개의 눈을 살펴보는 모습"
+            fetchPriority="high"
+            className="absolute inset-0 h-full w-full object-cover"
+            style={{ objectPosition: "60% 35%" }}
+          />
         </motion.div>
+      </motion.div>
+      {/* 글자 대비를 위한 막. 휴대폰은 아래, PC는 왼쪽을 더 어둡게 */}
+      <div aria-hidden className="pointer-events-none absolute inset-0" style={{ background: "linear-gradient(to top, rgba(0,0,0,0.72), rgba(0,0,0,0.3) 55%, rgba(0,0,0,0.35))" }} />
+      <div aria-hidden className="pointer-events-none absolute inset-0 hidden md:block" style={{ background: "linear-gradient(90deg, rgba(0,0,0,0.45), rgba(0,0,0,0) 60%)" }} />
 
-        {/* 청진기 아래 바닥 그림자 */}
-        <div
-          aria-hidden
-          className="pointer-events-none absolute bottom-[6svh] hidden h-[5svh] md:block md:right-[6vw] md:w-[26vw]"
-          style={{ background: "radial-gradient(closest-side, rgba(2,18,17,0.55), rgba(2,18,17,0))" }}
-        />
-
-        {/* 청진기 */}
-        <motion.div className="pointer-events-none absolute right-[-2vw] top-[9svh] h-[48svh] md:right-[6vw] md:top-0 md:h-[80svh]" style={{ y: stethY }}>
-          <motion.div
-            className="h-full"
-            style={{ transformOrigin: "50% 0%" }}
-            initial={reduce ? false : { y: "-42%", rotate: 12 }}
-            animate={{ y: "0%", rotate: reduce ? 0 : [12, -8, 5, -2.6, 1.2, 0] }}
-            transition={reduce ? { duration: 0 } : { y: { duration: 0.9, ease: EASE }, rotate: { duration: STETH_DROP, ease: "easeOut", times: [0, 0.3, 0.52, 0.7, 0.86, 1] } }}
-          >
-            <motion.div
-              className="h-full"
-              style={{ transformOrigin: "50% 0%" }}
-              animate={reduce ? { rotate: 0 } : { rotate: [0, 1.4, 0, -1.4, 0] }}
-              transition={reduce ? { duration: 0 } : { duration: SWAY_LOOP, delay: STETH_DROP, repeat: Infinity, ease: "easeInOut" }}
-            >
-              <StethoscopeArt />
-            </motion.div>
-          </motion.div>
-        </motion.div>
-
-        {/* 로고와 핵심 행동 하나 */}
-        <motion.div className="absolute inset-x-0 top-0 z-10 flex items-center justify-between px-4 pt-4 md:px-12 md:pt-7" style={{ y: textY }}>
-          <p className="inline-flex items-center gap-2 text-[17px] leading-none" style={juaF}>
-            <PawPrint size={19} aria-hidden style={{ color: P.orange }} />
-            {BRAND}
-          </p>
-          <button
-            type="button"
-            onClick={onCta}
-            aria-label="예약하기"
-            title="예약하기"
-            data-gtm-cta="animal-hospital_poster_cta"
-            className={`inline-flex h-12 w-12 items-center justify-center rounded-full ${focusRing}`}
-            style={{ background: P.orange, color: P.bgDeep, outlineColor: P.cream }}
-          >
-            <CalendarCheck size={22} aria-hidden />
-          </button>
-        </motion.div>
-
-        {/* 큰 문장 */}
-        <motion.div
-          className="relative z-[1] flex h-full min-h-svh flex-col justify-end px-4 pb-[10svh] md:justify-center md:px-12 md:pb-[4svh]"
-          style={{ y: textY, opacity: textO }}
+      <div className="relative z-[1] flex items-center justify-between gap-3 px-4 pt-4 md:px-12 md:pt-7">
+        <p className="leading-none">
+          <SampleLogo light small />
+        </p>
+        <button
+          type="button"
+          onClick={onCta}
+          data-gtm-cta="animal-hospital_poster_cta"
+          className={`inline-flex min-h-11 items-center gap-1.5 rounded-[6px] px-4 text-[15px] font-semibold ${focusRing}`}
+          style={{ background: C.teal, color: "#ffffff", outlineColor: "#ffffff" }}
         >
-          <h1
-            id="ah-poster-title"
-            className="text-[clamp(56px,16.5vw,72px)] leading-[1.08] tracking-[-0.02em] md:text-[clamp(110px,10.4vw,176px)] md:leading-[1.02]"
-            style={{ ...juaF, wordBreak: "keep-all" }}
-          >
-            <span className="block">
-              밤 <span style={{ color: P.orange }}>12시</span>에도
-            </span>
-            <span className="block md:hidden">문 열어</span>
-            <span className="block md:hidden">있어요</span>
-            <span className="hidden md:block">문 열어 있어요</span>
-          </h1>
-          <p className="mt-5 inline-flex items-center gap-2 text-[16px] md:mt-8 md:text-[19px]" style={{ color: P.sub }}>
-            <Moon size={18} aria-hidden />
-            365일 24시간 진료, 응급 전화 {TEL}
-          </p>
-        </motion.div>
+          <CalendarCheck size={17} aria-hidden />
+          예약하기
+        </button>
+      </div>
 
+      <div className={`relative z-[1] mt-auto px-4 pb-14 md:px-12 md:pb-20 ${reduce ? "" : "ah-rise"}`}>
+        <h1
+          id="ah-poster-title"
+          className="max-w-[12em] text-[36px] font-bold md:text-[clamp(40px,5vw,72px)]"
+          style={{ letterSpacing: "-0.03em", lineHeight: 1.2, wordBreak: "keep-all" }}
+        >
+          밤 12시에도 문 열어 있어요
+        </h1>
+        <p className="mt-4 inline-flex items-center gap-2 text-[16px] md:mt-6 md:text-[18px]" style={{ color: "rgba(255,255,255,0.86)" }}>
+          <Moon size={18} aria-hidden />
+          365일 24시간 진료, 응급 전화 <span className="tabular-nums">{TEL}</span>
+        </p>
       </div>
     </section>
-  );
-}
-
-/** 발자국 그라디언트. 여러 svg 가 같은 id 를 참조한다 */
-function PawDefs() {
-  return (
-    <svg aria-hidden width="0" height="0" className="absolute">
-      <defs>
-        <radialGradient id="ah-paw-g" cx="0.4" cy="0.32" r="0.75">
-          <stop offset="0" stopColor="#fff8ef" />
-          <stop offset="0.55" stopColor="#f6dcc0" />
-          <stop offset="1" stopColor="#d9a67c" />
-        </radialGradient>
-      </defs>
-    </svg>
-  );
-}
-
-/** 발자국 하나. 위쪽이 발가락 */
-function PawShape() {
-  const toes: [number, number, number, number, number][] = [
-    [-26, -16, 9, 12, -24],
-    [-10, -30, 9.5, 13, -8],
-    [10, -30, 9.5, 13, 8],
-    [26, -16, 9, 12, 24],
-  ];
-  const pad = "M0 -6 C14 -6 30 8 30 22 C30 34 20 38 12 36 C6 34 -6 34 -12 36 C-20 38 -30 34 -30 22 C-30 8 -14 -6 0 -6 Z";
-  return (
-    <svg viewBox="-50 -50 100 100" className="h-full w-full overflow-visible">
-      {/* 바닥에 눌린 그림자 */}
-      <g transform="translate(2.5 3.5)" fill="rgba(2,20,19,0.55)">
-        <path d={pad} />
-        {toes.map(([x, y, rx, ry, r], i) => (
-          <ellipse key={i} cx={x} cy={y} rx={rx} ry={ry} transform={`rotate(${r} ${x} ${y})`} />
-        ))}
-      </g>
-      <g fill="url(#ah-paw-g)">
-        <path d={pad} />
-        {toes.map(([x, y, rx, ry, r], i) => (
-          <ellipse key={i} cx={x} cy={y} rx={rx} ry={ry} transform={`rotate(${r} ${x} ${y})`} />
-        ))}
-      </g>
-      {/* 하이라이트 한 줄 */}
-      <path d="M-16 6 C-10 0 -2 -1 6 0" fill="none" stroke="rgba(255,255,255,0.85)" strokeWidth="3" strokeLinecap="round" />
-    </svg>
-  );
-}
-
-function EnterPaw({ paw, i, reduce, size }: { paw: Paw; i: number; reduce: boolean; size: number }) {
-  // 앞 두 걸음은 서버 렌더에서도 보이게 둔다
-  const still = reduce || i < 2;
-  return (
-    <motion.div
-      className="absolute"
-      style={{ left: `${paw.x}%`, top: `${paw.y}%`, width: size, height: size, x: "-50%", y: "-50%", rotate: paw.rot }}
-      initial={still ? false : { opacity: 0, scale: 1.35 }}
-      animate={{ opacity: 1, scale: 1 }}
-      transition={{ duration: still ? 0 : PAW_STAMP, delay: still ? 0 : PAW_START + i * PAW_GAP, ease: EASE }}
-    >
-      <PawShape />
-    </motion.div>
-  );
-}
-
-/** 스크롤하면 한 걸음씩 더 찍힌다. 동작 줄이기면 스크롤 퇴장이 없으므로 그리지 않는다(문장과 겹치지 않게) */
-function ScrollPaw({ paw, k, n, p, reduce, size }: { paw: Paw; k: number; n: number; p: MotionValue<number>; reduce: boolean; size: number }) {
-  // 문장이 거의 빠진 뒤부터 찍혀 글자와 겹쳐 보이지 않는다
-  const at = 0.4 + (k / n) * 0.5;
-  const opacity = useTransform(p, (v) => (reduce ? 0 : Math.min(1, Math.max(0, (v - at) / 0.06))));
-  const scale = useTransform(p, (v) => (reduce ? 1 : v < at ? 1.35 : Math.max(1, 1.35 - ((v - at) / 0.06) * 0.35)));
-  return (
-    <motion.div className="absolute" style={{ left: `${paw.x}%`, top: `${paw.y}%`, width: size, height: size, x: "-50%", y: "-50%", rotate: paw.rot, opacity, scale }}>
-      <PawShape />
-    </motion.div>
-  );
-}
-
-/** 매달린 청진기. 귀꽂이가 위, 집음부가 아래. viewBox 400x900 */
-function StethoscopeArt() {
-  const earL = "M128 62 C118 120 148 176 168 250";
-  const earR = "M272 62 C282 120 252 176 232 250";
-  const spring = "M142 150 Q200 168 258 150";
-  const tubeL = "M168 250 C168 322 196 352 200 410";
-  const tubeR = "M232 250 C232 322 204 352 200 410";
-  const tubeMain = "M200 410 C200 520 116 556 138 650 C152 712 200 690 200 730";
-  const rubber = [tubeL, tubeR, tubeMain];
-  const metal = [earL, earR, spring];
-  return (
-    <svg viewBox="0 0 400 900" className="h-full w-auto overflow-visible" role="img" aria-label="위에서 내려와 흔들리는 주황색 고무관 청진기">
-      <defs>
-        <radialGradient id="ah-st-chest" cx="0.36" cy="0.3" r="0.78">
-          <stop offset="0" stopColor="#ffffff" />
-          <stop offset="0.22" stopColor="#e3eaeb" />
-          <stop offset="0.58" stopColor="#9aa7a9" />
-          <stop offset="0.88" stopColor="#56626a" />
-          <stop offset="1" stopColor="#384247" />
-        </radialGradient>
-        <radialGradient id="ah-st-dia" cx="0.42" cy="0.36" r="0.7">
-          <stop offset="0" stopColor="#f4f8f8" />
-          <stop offset="0.6" stopColor="#c3cdcf" />
-          <stop offset="1" stopColor="#7c898c" />
-        </radialGradient>
-        <linearGradient id="ah-st-ring" x1="0" y1="0" x2="1" y2="1">
-          <stop offset="0" stopColor="#ffb27a" />
-          <stop offset="0.5" stopColor="#e8742a" />
-          <stop offset="1" stopColor="#9c4313" />
-        </linearGradient>
-        <radialGradient id="ah-st-tip" cx="0.35" cy="0.3" r="0.8">
-          <stop offset="0" stopColor="#6b7378" />
-          <stop offset="0.6" stopColor="#2c3134" />
-          <stop offset="1" stopColor="#15191b" />
-        </radialGradient>
-      </defs>
-
-      {/* 벽에 진 그림자 */}
-      <g transform="translate(16 18)" fill="none" stroke="rgba(2,20,19,0.42)" strokeLinecap="round">
-        {metal.map((d) => (
-          <path key={d} d={d} strokeWidth="9" />
-        ))}
-        {rubber.map((d) => (
-          <path key={d} d={d} strokeWidth="19" />
-        ))}
-        <circle cx="200" cy="812" r="74" fill="rgba(2,20,19,0.42)" stroke="none" />
-      </g>
-
-      {/* 금속 귀꽂이 관과 스프링 */}
-      <g fill="none" strokeLinecap="round">
-        {metal.map((d) => (
-          <g key={d}>
-            <path d={d} stroke="#4f5a60" strokeWidth="10" />
-            <path d={d} stroke="#c9d2d4" strokeWidth="6" />
-            <path d={d} stroke="#ffffff" strokeWidth="2" transform="translate(-2 0)" opacity="0.9" />
-          </g>
-        ))}
-      </g>
-
-      {/* 귀꽂이 고무 */}
-      {[128, 272].map((x) => (
-        <g key={x}>
-          <ellipse cx={x} cy="54" rx="16" ry="18" fill="url(#ah-st-tip)" />
-          <ellipse cx={x - 5} cy="47" rx="5" ry="4" fill="rgba(255,255,255,0.5)" />
-        </g>
-      ))}
-
-      {/* 주황 고무관. 어두운 바탕, 몸통, 하이라이트 세 겹 */}
-      <g fill="none" strokeLinecap="round">
-        {rubber.map((d) => (
-          <g key={d}>
-            <path d={d} stroke="#9c4313" strokeWidth="19" />
-            <path d={d} stroke="#e8742a" strokeWidth="13" />
-            <path d={d} stroke="#ffc08f" strokeWidth="4" transform="translate(-4 -1)" opacity="0.85" />
-          </g>
-        ))}
-      </g>
-
-      {/* Y자 이음쇠 */}
-      <ellipse cx="200" cy="410" rx="12" ry="16" fill="url(#ah-st-chest)" />
-
-      {/* 집음부 목 */}
-      <rect x="190" y="720" width="20" height="30" rx="6" fill="url(#ah-st-chest)" />
-
-      {/* 집음부 */}
-      <circle cx="200" cy="812" r="74" fill="url(#ah-st-chest)" />
-      <circle cx="200" cy="812" r="64" fill="none" stroke="url(#ah-st-ring)" strokeWidth="11" />
-      <circle cx="200" cy="812" r="52" fill="url(#ah-st-dia)" />
-      <circle cx="200" cy="812" r="52" fill="none" stroke="rgba(40,48,52,0.35)" strokeWidth="2" />
-      <path d="M156 790 A50 50 0 0 1 196 762" fill="none" stroke="rgba(255,255,255,0.9)" strokeWidth="4" strokeLinecap="round" />
-      <ellipse cx="170" cy="776" rx="9" ry="5" fill="rgba(255,255,255,0.75)" transform="rotate(-35 170 776)" />
-    </svg>
   );
 }
 
@@ -719,26 +422,26 @@ function ErBoard({ now }: { now: Date | null }) {
   const night = now ? isNight(now) : false;
   const mins = now ? now.getHours() * 60 + now.getMinutes() : null;
   return (
-    <div className="grid gap-6 rounded-[10px] p-5 md:grid-cols-[300px_minmax(0,1fr)] md:gap-10 md:p-8" style={{ background: C.tealDeep, color: C.paper }}>
+    <div className="grid gap-6 rounded-[8px] p-5 md:grid-cols-[300px_minmax(0,1fr)] md:gap-10 md:p-8" style={{ background: C.soft, color: C.ink }}>
       <div>
         <DayDial mins={mins} />
-        <p className="mt-3 flex flex-wrap justify-center gap-x-4 gap-y-1 text-[14px]" style={{ color: P.sub }}>
+        <p className="mt-3 flex flex-wrap justify-center gap-x-4 gap-y-1 text-[14px]" style={{ color: C.body }}>
           <span className="inline-flex items-center gap-1.5">
-            <span aria-hidden className="h-3 w-5 rounded-[2px]" style={{ background: "#7fbfb8" }} />
+            <span aria-hidden className="h-3 w-5 rounded-[2px]" style={{ background: "#d4d4d0" }} />
             주간 09~21시
           </span>
           <span className="inline-flex items-center gap-1.5">
-            <span aria-hidden className="h-3 w-5 rounded-[2px]" style={{ background: P.orange }} />
+            <span aria-hidden className="h-3 w-5 rounded-[2px]" style={{ background: C.teal }} />
             야간 21~09시
           </span>
         </p>
       </div>
       <div className="min-w-0">
-        <h2 id="ah-er-title" className="text-[28px] leading-tight md:text-[36px]" style={juaF}>
+        <h2 id="ah-er-title" className="text-[28px] font-bold leading-tight tracking-[-0.02em] md:text-[36px]">
           24시 응급 진료
         </h2>
         <p className="mt-3 inline-flex flex-wrap items-center gap-2 text-[17px] font-bold" aria-live="polite">
-          <span className="inline-flex items-center gap-1.5 rounded-[4px] px-2.5 py-1 text-[15px]" style={{ background: P.orange, color: C.tealDeep }}>
+          <span className="inline-flex items-center gap-1.5 rounded-[4px] px-2.5 py-1 text-[15px]" style={{ background: C.teal, color: "#ffffff" }}>
             <Siren size={16} aria-hidden />
             진료 중
           </span>
@@ -751,28 +454,28 @@ function ErBoard({ now }: { now: Date | null }) {
           )}
         </p>
         <dl className="mt-5 grid gap-x-6 gap-y-2 text-[16px] sm:grid-cols-[auto_minmax(0,1fr)]">
-          <dt className="inline-flex items-center gap-1.5 font-bold" style={{ color: P.sub }}>
+          <dt className="inline-flex items-center gap-1.5 font-bold" style={{ color: C.body }}>
             <Sun size={16} aria-hidden />
             주간 진료
           </dt>
           <dd>매일 09:00~21:00, 예약 우선</dd>
-          <dt className="inline-flex items-center gap-1.5 font-bold" style={{ color: P.sub }}>
+          <dt className="inline-flex items-center gap-1.5 font-bold" style={{ color: C.body }}>
             <Moon size={16} aria-hidden />
             야간 응급 진료
           </dt>
           <dd>매일 21:00~09:00, 일요일과 공휴일은 종일. 야간 진찰료가 붙어요</dd>
-          <dt className="inline-flex items-center gap-1.5 font-bold" style={{ color: P.sub }}>
+          <dt className="inline-flex items-center gap-1.5 font-bold" style={{ color: C.body }}>
             <Stethoscope size={16} aria-hidden />
             야간 당직
           </dt>
           <dd>수의사 2명, 동물보건사 2명</dd>
         </dl>
-        <div className="mt-6 rounded-[6px] p-4" style={{ background: "rgba(251,247,241,0.08)" }}>
+        <div className="mt-6 rounded-[6px] p-4" style={{ background: C.paper, border: `1px solid ${C.line}` }}>
           <p className="font-bold">이럴 땐 바로 오세요</p>
           <ul className="mt-2 grid gap-x-6 gap-y-1 text-[15px] sm:grid-cols-2">
             {["숨을 헐떡이고 잇몸이 파래요", "이물질이나 초콜릿을 먹었어요", "경련을 해요", "차에 부딪혔거나 높은 데서 떨어졌어요", "구토를 계속 해요", "고양이가 소변을 못 봐요"].map((t) => (
               <li key={t} className="flex items-start gap-2">
-                <Minus size={14} aria-hidden className="mt-[5px] flex-none" style={{ color: P.orange }} />
+                <Minus size={14} aria-hidden className="mt-[5px] flex-none" style={{ color: C.teal }} />
                 {t}
               </li>
             ))}
@@ -782,13 +485,13 @@ function ErBoard({ now }: { now: Date | null }) {
           <a
             href={`tel:${TEL.replace(/-/g, "")}`}
             data-gtm-cta="animal-hospital_er_call"
-            className={`inline-flex items-center gap-2 rounded-[6px] px-5 py-3 text-[17px] font-extrabold ${focusRing}`}
-            style={{ background: P.orange, color: C.tealDeep, outlineColor: C.paper }}
+            className={`inline-flex items-center gap-2 rounded-[6px] px-5 py-3 text-[17px] font-bold ${focusRing}`}
+            style={{ background: C.teal, color: "#ffffff", outlineColor: C.teal }}
           >
             <Phone size={18} aria-hidden />
             응급 전화 {TEL}
           </a>
-          <p className="text-[15px]" style={{ color: P.sub }}>
+          <p className="text-[15px]" style={{ color: C.body }}>
             오시기 전에 전화 주시면 처치실을 준비해 둘게요.
           </p>
         </div>
@@ -811,29 +514,29 @@ function DayDial({ mins }: { mins: number | null }) {
   const hand = mins === null ? null : mins / 60;
   return (
     <svg viewBox="0 0 300 300" className="mx-auto w-full max-w-[280px]" role="img" aria-label={hand === null ? "24시간 진료 시계" : `24시간 시계, 지금 ${p2(Math.floor(hand))}시 ${p2(mins! % 60)}분`}>
-      <circle cx="150" cy="150" r="140" fill="rgba(251,247,241,0.06)" />
-      <path d={arc(DAY_FROM, DAY_TO, R)} fill="none" stroke="#7fbfb8" strokeWidth="22" />
-      <path d={arc(DAY_TO, DAY_FROM, R)} fill="none" stroke={P.orange} strokeWidth="22" />
+      <circle cx="150" cy="150" r="140" fill="#ffffff" />
+      <path d={arc(DAY_FROM, DAY_TO, R)} fill="none" stroke="#d4d4d0" strokeWidth="22" />
+      <path d={arc(DAY_TO, DAY_FROM, R)} fill="none" stroke={C.teal} strokeWidth="22" />
       {Array.from({ length: 24 }, (_, h) => {
         const [x1, y1] = pt(h, 98);
         const [x2, y2] = pt(h, h % 6 === 0 ? 86 : 92);
-        return <line key={h} x1={x1} y1={y1} x2={x2} y2={y2} stroke="rgba(251,247,241,0.6)" strokeWidth={h % 6 === 0 ? 3 : 1.5} />;
+        return <line key={h} x1={x1} y1={y1} x2={x2} y2={y2} stroke="#9a9a9a" strokeWidth={h % 6 === 0 ? 3 : 1.5} />;
       })}
       {[0, 6, 12, 18].map((h) => {
         const [x, y] = pt(h, 70);
         return (
-          <text key={h} x={x} y={y + 6} textAnchor="middle" fontSize="17" fontWeight="700" fill={C.paper}>
+          <text key={h} x={x} y={y + 6} textAnchor="middle" fontSize="17" fontWeight="700" fill={C.ink}>
             {h}
           </text>
         );
       })}
       {hand !== null && (
         <g>
-          <line x1="150" y1="150" x2={pt(hand, 112)[0]} y2={pt(hand, 112)[1]} stroke={C.paper} strokeWidth="5" strokeLinecap="round" />
-          <circle cx={pt(hand, 118)[0]} cy={pt(hand, 118)[1]} r="9" fill={C.paper} stroke={C.tealDeep} strokeWidth="3" />
+          <line x1="150" y1="150" x2={pt(hand, 112)[0]} y2={pt(hand, 112)[1]} stroke={C.ink} strokeWidth="4" strokeLinecap="round" />
+          <circle cx={pt(hand, 118)[0]} cy={pt(hand, 118)[1]} r="9" fill={C.ink} stroke="#ffffff" strokeWidth="3" />
         </g>
       )}
-      <circle cx="150" cy="150" r="8" fill={C.paper} />
+      <circle cx="150" cy="150" r="7" fill={C.ink} />
     </svg>
   );
 }
@@ -877,25 +580,25 @@ function DeptPicker({ reduce, dept, setDept }: { reduce: boolean; dept: DeptId; 
           animate={{ clipPath: "inset(0 0 0% 0)" }}
           exit={reduce ? undefined : { clipPath: "inset(100% 0 0 0)" }}
           transition={{ duration: reduce ? 0 : DUR, ease: EASE }}
-          className="grid gap-5 rounded-[10px] border p-5 sm:grid-cols-2 md:p-7"
+          className="grid gap-5 rounded-[8px] border p-5 sm:grid-cols-2 md:p-7"
           style={{ borderColor: C.line, background: "#fff" }}
           aria-live="polite"
         >
           <div>
-            <h3 className="text-[22px]" style={{ ...juaF, color: C.tealDeep }}>
+            <h3 className="text-[22px]" style={{ color: C.ink }}>
               이럴 때 오세요
             </h3>
             <ul className="mt-3 grid gap-2 text-[16px]">
               {d.when.map((t) => (
                 <li key={t} className="flex items-start gap-2">
-                  <PawPrint size={15} aria-hidden className="mt-[4px] flex-none" style={{ color: C.orange }} />
+                  <PawPrint size={15} aria-hidden className="mt-[4px] flex-none" style={{ color: C.teal }} />
                   {t}
                 </li>
               ))}
             </ul>
           </div>
           <div>
-            <h3 className="text-[22px]" style={{ ...juaF, color: C.tealDeep }}>
+            <h3 className="text-[22px]" style={{ color: C.ink }}>
               검사와 처치
             </h3>
             <ul className="mt-3 grid gap-2 text-[16px]">
@@ -924,7 +627,7 @@ function FeeTable() {
       <table className="w-full max-w-[760px] border-collapse text-[16px]">
         <caption className="sr-only">주요 진료비</caption>
         <thead>
-          <tr className="border-b-2" style={{ borderColor: C.tealDeep }}>
+          <tr className="border-b" style={{ borderColor: C.ink }}>
             <th scope="col" className="py-2 pr-3 text-left">
               항목
             </th>
@@ -972,8 +675,8 @@ function Checkup({ reduce, age, setAge, onReserve }: { reduce: boolean; age: num
               type="button"
               aria-pressed={on}
               onClick={() => setAge(i)}
-              className={`rounded-full border-2 px-4 py-2 text-[16px] font-bold ${focusRing}`}
-              style={{ borderColor: on ? C.orange : C.line, background: on ? C.orangeSoft : "#fff", color: on ? C.orangeText : C.ink, outlineColor: C.teal }}
+              className={`rounded-[6px] border px-4 py-2 text-[16px] font-bold ${focusRing}`}
+              style={{ borderColor: on ? C.teal : C.line, background: on ? C.tealSoft : "#fff", color: on ? C.teal : C.ink, outlineColor: C.teal }}
             >
               {a.label}
             </button>
@@ -984,7 +687,7 @@ function Checkup({ reduce, age, setAge, onReserve }: { reduce: boolean; age: num
         {AGES[age].tip}
       </p>
 
-      <div className="mt-5 overflow-hidden rounded-[10px] border" style={{ borderColor: C.line, background: "#fff" }}>
+      <div className="mt-5 overflow-hidden rounded-[8px] border" style={{ borderColor: C.line, background: "#fff" }}>
         <table className="w-full table-fixed border-collapse text-[14px] sm:text-[16px]">
           <caption className="sr-only">건강검진 패키지 비교</caption>
           <colgroup>
@@ -1005,16 +708,16 @@ function Checkup({ reduce, age, setAge, onReserve }: { reduce: boolean; age: num
                       layoutId="ah-pack-on"
                       aria-hidden
                       className="absolute inset-x-0 top-0 h-[5px]"
-                      style={{ background: C.orange }}
+                      style={{ background: C.teal }}
                       transition={{ duration: reduce ? 0 : DUR, ease: EASE }}
                     />
                   )}
                   {i === rec && (
-                    <span className="mb-1 block text-[13px] font-extrabold" style={{ color: C.orangeText }}>
+                    <span className="mb-1 block text-[13px] font-bold" style={{ color: C.teal }}>
                       추천
                     </span>
                   )}
-                  <span className="block text-[17px] sm:text-[20px]" style={{ ...juaF, color: C.tealDeep }}>
+                  <span className="block text-[17px] sm:text-[20px]" style={{ color: C.ink }}>
                     {pk.name}
                   </span>
                   <span className="mt-1 block whitespace-nowrap text-[12px] font-bold tabular-nums sm:text-[15px]">{won(pk.price)}</span>
@@ -1029,8 +732,8 @@ function Checkup({ reduce, age, setAge, onReserve }: { reduce: boolean; age: num
                   {name}
                 </th>
                 {cells.map((v, i) => (
-                  <td key={i} className="p-2 text-center sm:p-3" style={{ background: i === rec ? C.orangeSoft : undefined, transition: reduce ? undefined : "background-color 0.35s" }}>
-                    {v === true ? <Check size={18} aria-label="포함" className="mx-auto" style={{ color: C.teal }} /> : v === false ? <Minus size={16} aria-label="없음" className="mx-auto" style={{ color: "#a3b0ad" }} /> : <span className="font-bold">{v}</span>}
+                  <td key={i} className="p-2 text-center sm:p-3" style={{ background: i === rec ? C.tealSoft : undefined, transition: reduce ? undefined : "background-color 0.35s" }}>
+                    {v === true ? <Check size={18} aria-label="포함" className="mx-auto" style={{ color: C.teal }} /> : v === false ? <Minus size={16} aria-label="없음" className="mx-auto" style={{ color: "#bdbdbd" }} /> : <span className="font-bold">{v}</span>}
                   </td>
                 ))}
               </tr>
@@ -1040,7 +743,7 @@ function Checkup({ reduce, age, setAge, onReserve }: { reduce: boolean; age: num
                 소요 시간
               </th>
               {PACKS.map((pk, i) => (
-                <td key={pk.name} className="p-2 text-center sm:p-3" style={{ background: i === rec ? C.orangeSoft : undefined }}>
+                <td key={pk.name} className="p-2 text-center sm:p-3" style={{ background: i === rec ? C.tealSoft : undefined }}>
                   {pk.time}
                 </td>
               ))}
@@ -1056,8 +759,8 @@ function Checkup({ reduce, age, setAge, onReserve }: { reduce: boolean; age: num
           type="button"
           onClick={onReserve}
           data-gtm-cta="animal-hospital_checkup_reserve"
-          className={`inline-flex items-center gap-2 rounded-[6px] px-5 py-3 text-[16px] font-extrabold ${focusRing}`}
-          style={{ background: C.orange, color: C.ink, outlineColor: C.teal }}
+          className={`inline-flex items-center gap-2 rounded-[6px] px-5 py-3 text-[16px] font-bold ${focusRing}`}
+          style={{ background: C.teal, color: C.ink, outlineColor: C.teal }}
         >
           <CalendarCheck size={18} aria-hidden />
           {PACKS[rec].name} 검진 예약
@@ -1079,8 +782,8 @@ function VisitHours({ now }: { now: Date | null }) {
   }
   const pct = (v: number) => `${(v / 24) * 100}%`;
   return (
-    <div className="rounded-[10px] border p-5 md:p-7" style={{ borderColor: C.line, background: "#fff" }}>
-      <p className="inline-flex items-center gap-2 text-[20px] font-extrabold" aria-live="polite" style={{ color: C.tealDeep }}>
+    <div className="rounded-[8px] border p-5 md:p-7" style={{ borderColor: C.line, background: "#fff" }}>
+      <p className="inline-flex items-center gap-2 text-[20px] font-bold" aria-live="polite" style={{ color: C.ink }}>
         <Clock size={20} aria-hidden />
         {status}
       </p>
@@ -1090,8 +793,8 @@ function VisitHours({ now }: { now: Date | null }) {
           <div key={a} className="absolute top-3 h-4 rounded-[3px]" style={{ left: pct(a), width: pct(b - a), background: C.teal }} />
         ))}
         {h !== null && (
-          <div className="absolute -top-1 h-12 w-[3px] -translate-x-1/2 rounded-full" style={{ left: pct(h), background: C.orange }}>
-            <span className="absolute -top-6 left-1/2 -translate-x-1/2 whitespace-nowrap text-[13px] font-bold" style={{ color: C.orangeText }}>
+          <div className="absolute -top-1 h-12 w-[3px] -translate-x-1/2 rounded-full" style={{ left: pct(h), background: C.teal }}>
+            <span className="absolute -top-6 left-1/2 -translate-x-1/2 whitespace-nowrap text-[13px] font-bold" style={{ color: C.teal }}>
               지금
             </span>
           </div>
@@ -1112,7 +815,7 @@ function VisitHours({ now }: { now: Date | null }) {
           "간식이나 장난감은 미리 말씀해 주세요",
         ].map((t) => (
           <li key={t} className="flex items-start gap-2">
-            <PawPrint size={15} aria-hidden className="mt-[4px] flex-none" style={{ color: C.orange }} />
+            <PawPrint size={15} aria-hidden className="mt-[4px] flex-none" style={{ color: C.teal }} />
             {t}
           </li>
         ))}
@@ -1170,9 +873,9 @@ function Reserve({
     });
   };
 
-  const field = `w-full rounded-[6px] border-2 bg-white px-3 py-2.5 text-[16px] ${focusRing}`;
+  const field = `w-full rounded-[6px] border bg-white px-3 py-2.5 text-[16px] ${focusRing}`;
   const chip = (on: boolean, off = false) =>
-    `rounded-[6px] border-2 px-3 py-2 text-[15px] font-bold ${focusRing} ${off ? "cursor-not-allowed line-through" : ""} ${on ? "shadow-[inset_0_0_0_1px_currentColor]" : ""}`;
+    `rounded-[6px] border px-3 py-2 text-[15px] font-bold ${focusRing} ${off ? "cursor-not-allowed line-through" : ""} ${on ? "shadow-[inset_0_0_0_1px_currentColor]" : ""}`;
 
   return (
     <div className="grid grid-cols-[minmax(0,1fr)] gap-6 md:grid-cols-[minmax(0,1fr)_320px] md:gap-10">
@@ -1183,17 +886,17 @@ function Reserve({
             initial={reduce ? false : { clipPath: "inset(0 0 100% 0)" }}
             animate={{ clipPath: "inset(0 0 0% 0)" }}
             transition={{ duration: reduce ? 0 : 0.5, ease: EASE }}
-            className="rounded-[10px] border-2 p-5 md:p-7"
+            className="rounded-[8px] border p-5 md:p-7"
             style={{ borderColor: C.teal, background: "#fff" }}
             role="status"
           >
-            <p className="inline-flex items-center gap-2 text-[24px]" style={{ ...juaF, color: C.tealDeep }}>
+            <p className="inline-flex items-center gap-2 text-[24px]" style={{ color: C.ink }}>
               <Check size={24} aria-hidden style={{ color: C.teal }} />
               예약 신청이 접수됐어요
             </p>
             <dl className="mt-5 grid grid-cols-[96px_minmax(0,1fr)] gap-y-2 text-[16px]">
               <dt style={{ color: C.muted }}>접수 번호</dt>
-              <dd className="font-extrabold tabular-nums">{done.no}</dd>
+              <dd className="font-bold tabular-nums">{done.no}</dd>
               <dt style={{ color: C.muted }}>보호자</dt>
               <dd>
                 {done.name}, {done.phone}
@@ -1221,14 +924,14 @@ function Reserve({
                 setDone(null);
                 setForm((f) => ({ ...f, slot: null, memo: "" }));
               }}
-              className={`mt-6 rounded-[6px] border-2 px-4 py-2 text-[15px] font-bold ${focusRing}`}
+              className={`mt-6 rounded-[6px] border px-4 py-2 text-[15px] font-bold ${focusRing}`}
               style={{ borderColor: C.line, outlineColor: C.teal }}
             >
               새로 예약하기
             </button>
           </motion.div>
         ) : (
-          <motion.form key="form" onSubmit={submit} noValidate className="grid min-w-0 grid-cols-[minmax(0,1fr)] gap-5 rounded-[10px] border p-5 md:p-7" style={{ borderColor: C.line, background: "#fff" }}>
+          <motion.form key="form" onSubmit={submit} noValidate className="grid min-w-0 grid-cols-[minmax(0,1fr)] gap-5 rounded-[8px] border p-5 md:p-7" style={{ borderColor: C.line, background: "#fff" }}>
             <div className="grid gap-4 sm:grid-cols-2">
               <label className="grid gap-1.5">
                 <span className="text-[15px] font-bold">보호자 이름</span>
@@ -1321,7 +1024,7 @@ function Reserve({
                       type="button"
                       aria-pressed={on}
                       onClick={() => setForm((f) => ({ ...f, day: i, slot: null }))}
-                      className={`flex-none rounded-[6px] border-2 px-3 py-2 text-center text-[14px] font-bold leading-tight ${focusRing}`}
+                      className={`flex-none rounded-[6px] border px-3 py-2 text-center text-[14px] font-bold leading-tight ${focusRing}`}
                       style={{ borderColor: on ? C.teal : C.line, background: on ? C.teal : "#fff", color: on ? C.paper : C.ink, outlineColor: C.teal }}
                     >
                       <span className="block">{i === 0 ? "오늘" : i === 1 ? "내일" : `${d.getMonth() + 1}.${d.getDate()}`}</span>
@@ -1348,9 +1051,9 @@ function Reserve({
                       onClick={() => set("slot", i)}
                       className={`${chip(on, off)} tabular-nums`}
                       style={{
-                        borderColor: on ? C.orange : C.line,
-                        background: on ? C.orangeSoft : off ? "#f1f3f2" : "#fff",
-                        color: on ? C.orangeText : off ? "#8a9592" : C.ink,
+                        borderColor: on ? C.teal : C.line,
+                        background: on ? C.tealSoft : off ? C.soft : "#fff",
+                        color: on ? C.teal : off ? C.muted : C.ink,
                         outlineColor: C.teal,
                       }}
                     >
@@ -1374,8 +1077,8 @@ function Reserve({
             <button
               type="submit"
               data-gtm-cta="animal-hospital_reserve_submit"
-              className={`inline-flex items-center justify-center gap-2 rounded-[6px] px-5 py-3.5 text-[17px] font-extrabold ${focusRing}`}
-              style={{ background: C.teal, color: C.paper, outlineColor: C.orange }}
+              className={`inline-flex items-center justify-center gap-2 rounded-[6px] px-5 py-3.5 text-[17px] font-bold ${focusRing}`}
+              style={{ background: C.teal, color: C.paper, outlineColor: C.teal }}
             >
               <CalendarCheck size={19} aria-hidden />
               예약 신청
@@ -1385,23 +1088,23 @@ function Reserve({
       </AnimatePresence>
 
       <aside className="grid content-start gap-4 text-[15px]">
-        <div className="rounded-[10px] p-5" style={{ background: C.tealSoft }}>
-          <p className="inline-flex items-center gap-2 font-extrabold" style={{ color: C.tealDeep }}>
+        <div className="rounded-[8px] p-5" style={{ background: C.tealSoft }}>
+          <p className="inline-flex items-center gap-2 font-bold" style={{ color: C.ink }}>
             <Siren size={17} aria-hidden />
             응급이면 예약 없이 오세요
           </p>
           <p className="mt-2">야간에도 바로 진료해요. 오시는 길에 전화 주시면 더 빨라요.</p>
-          <a href={`tel:${TEL.replace(/-/g, "")}`} className={`mt-3 inline-flex items-center gap-1.5 font-extrabold underline underline-offset-4 ${focusRing}`} style={{ color: C.tealDeep, outlineColor: C.teal }}>
+          <a href={`tel:${TEL.replace(/-/g, "")}`} className={`mt-3 inline-flex items-center gap-1.5 font-bold underline underline-offset-4 ${focusRing}`} style={{ color: C.ink, outlineColor: C.teal }}>
             <Phone size={16} aria-hidden />
             {TEL}
           </a>
         </div>
-        <div className="rounded-[10px] border p-5" style={{ borderColor: C.line, background: "#fff" }}>
-          <p className="font-extrabold">처음 오시면</p>
+        <div className="rounded-[8px] border p-5" style={{ borderColor: C.line, background: "#fff" }}>
+          <p className="font-bold">처음 오시면</p>
           <ul className="mt-2 grid gap-1.5">
             {["예방접종 수첩이나 지난 검사 결과를 가져와 주세요", "고양이는 이동장에 담아 오세요", "강아지는 목줄을 해 주세요"].map((t) => (
               <li key={t} className="flex items-start gap-2">
-                <Minus size={14} aria-hidden className="mt-[5px] flex-none" style={{ color: C.orange }} />
+                <Minus size={14} aria-hidden className="mt-[5px] flex-none" style={{ color: C.teal }} />
                 {t}
               </li>
             ))}
@@ -1417,29 +1120,29 @@ function Reserve({
 function MapBlock() {
   return (
     <div className="grid gap-6 md:grid-cols-[minmax(0,1.2fr)_minmax(0,1fr)] md:gap-10">
-      <svg viewBox="0 0 560 340" className="h-auto w-full rounded-[10px]" role="img" aria-label="큰길 사거리 모퉁이에 있는 병원 위치 약도" style={{ background: "#eef3f1" }}>
+      <svg viewBox="0 0 560 340" className="h-auto w-full rounded-[8px]" role="img" aria-label="큰길 사거리 모퉁이에 있는 병원 위치 약도" style={{ background: "#f3f3f1" }}>
         <rect x="0" y="150" width="560" height="44" fill="#fff" />
         <rect x="300" y="0" width="40" height="340" fill="#fff" />
-        <line x1="0" y1="172" x2="560" y2="172" stroke="#d3ddd9" strokeWidth="2" strokeDasharray="14 10" />
-        <line x1="320" y1="0" x2="320" y2="340" stroke="#d3ddd9" strokeWidth="2" strokeDasharray="14 10" />
+        <line x1="0" y1="172" x2="560" y2="172" stroke="#dcdcd8" strokeWidth="2" strokeDasharray="14 10" />
+        <line x1="320" y1="0" x2="320" y2="340" stroke="#dcdcd8" strokeWidth="2" strokeDasharray="14 10" />
         {[
           [40, 40, 110, 80],
           [170, 40, 100, 80],
           [40, 220, 230, 90],
           [370, 230, 150, 80],
         ].map(([x, y, w, h]) => (
-          <rect key={`${x}-${y}`} x={x} y={y} width={w} height={h} rx="6" fill="#dbe5e2" />
+          <rect key={`${x}-${y}`} x={x} y={y} width={w} height={h} rx="6" fill="#e3e3df" />
         ))}
         <rect x="370" y="40" width="150" height="90" rx="8" fill={C.teal} />
-        <text x="445" y="92" textAnchor="middle" fontSize="18" fontWeight="800" fill={C.paper}>
+        <text x="445" y="92" textAnchor="middle" fontSize="18" fontWeight="700" fill={C.paper}>
           동물병원
         </text>
-        <rect x="430" y="132" width="60" height="16" rx="3" fill={C.orange} />
-        <text x="460" y="145" textAnchor="middle" fontSize="12" fontWeight="800" fill={C.ink}>
+        <rect x="430" y="132" width="60" height="16" rx="3" fill={C.teal} />
+        <text x="460" y="145" textAnchor="middle" fontSize="12" fontWeight="700" fill={C.ink}>
           P 주차
         </text>
         <circle cx="250" cy="196" r="13" fill={C.ink} />
-        <text x="250" y="201" textAnchor="middle" fontSize="13" fontWeight="800" fill="#fff">
+        <text x="250" y="201" textAnchor="middle" fontSize="13" fontWeight="700" fill="#fff">
           2
         </text>
         <text x="190" y="140" fontSize="14" fontWeight="700" fill={C.muted}>
@@ -1448,30 +1151,30 @@ function MapBlock() {
       </svg>
       <dl className="grid content-start gap-4 text-[16px]">
         <div className="flex items-start gap-3">
-          <MapPin size={20} aria-hidden className="mt-0.5 flex-none" style={{ color: C.orange }} />
+          <MapPin size={20} aria-hidden className="mt-0.5 flex-none" style={{ color: C.teal }} />
           <div>
-            <dt className="font-extrabold">주소</dt>
+            <dt className="font-bold">주소</dt>
             <dd>{ADDRESS}</dd>
           </div>
         </div>
         <div className="flex items-start gap-3">
-          <Bus size={20} aria-hidden className="mt-0.5 flex-none" style={{ color: C.orange }} />
+          <Bus size={20} aria-hidden className="mt-0.5 flex-none" style={{ color: C.teal }} />
           <div>
-            <dt className="font-extrabold">대중교통</dt>
+            <dt className="font-bold">대중교통</dt>
             <dd>ㅇㅇ역 2번 출구에서 걸어서 4분</dd>
           </div>
         </div>
         <div className="flex items-start gap-3">
-          <Car size={20} aria-hidden className="mt-0.5 flex-none" style={{ color: C.orange }} />
+          <Car size={20} aria-hidden className="mt-0.5 flex-none" style={{ color: C.teal }} />
           <div>
-            <dt className="font-extrabold">주차</dt>
+            <dt className="font-bold">주차</dt>
             <dd>건물 뒤 전용 주차장 8대, 주차 가능</dd>
           </div>
         </div>
         <div className="flex items-start gap-3">
-          <Phone size={20} aria-hidden className="mt-0.5 flex-none" style={{ color: C.orange }} />
+          <Phone size={20} aria-hidden className="mt-0.5 flex-none" style={{ color: C.teal }} />
           <div>
-            <dt className="font-extrabold">전화</dt>
+            <dt className="font-bold">전화</dt>
             <dd>{TEL}, 24시간 받아요</dd>
           </div>
         </div>
