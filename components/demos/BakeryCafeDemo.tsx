@@ -717,7 +717,7 @@ function Oven({ clock: realClock, onAdd }: { clock: Clock; onAdd: (id: string) =
               {[
                 ["판매 중", { background: C.crust }],
                 ["곧 나와요", { background: C.butter }],
-                ["나오기 전", { background: C.paper, border: `2px solid ${C.crustDeep}` }],
+                ["준비 중", { background: C.paper, border: `2px solid ${C.crustDeep}` }],
                 ["품절", { background: C.kraftDeep }],
               ].map(([label, style]) => (
                 <li key={label as string} className="inline-flex items-center gap-1.5">
@@ -839,7 +839,7 @@ function MenuGrid({
                 [
                   ["all", "전체"],
                   ["sale", "판매 중"],
-                  ["soon", "곧 나와요"],
+                  ["soon", "준비 중"],
                 ] as const
               ).map(([v, label]) => (
                 <button
