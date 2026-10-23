@@ -3,13 +3,12 @@
 import { useEffect, useMemo, useRef, useState } from "react";
 import { AnimatePresence, motion, useScroll, useTransform } from "framer-motion";
 import { AlertCircle, CalendarCheck, Car, Check, Clock, Eye, MapPin, MessageCircle, Phone, RotateCcw } from "lucide-react";
-import { IBM_Plex_Sans_KR, JetBrains_Mono } from "@/lib/local-fonts";
 import { useReducedMotionSafe } from "@/hooks/useReducedMotionSafe";
 import { daysAgo, fmtKo, useDemoToday } from "@/hooks/useDemoToday";
 import { maskName, maskPhone } from "@/components/demos/LeadReceivedPanel";
 import { DemoMakerInfo } from "@/components/demos/DemoMakerInfo";
 
-/* 안과 홈페이지 샘플: 가상의 곰파트너안과의원. 시력교정과 백내장을 주로 보는 동네 안과.
+/* 안과 홈페이지 샘플: 가상의 안과 의원 곰파트너. 시력교정과 백내장을 주로 보는 동네 안과.
    병원명, 의료진, 주소, 전화번호, 진료비는 모두 가상이다.
 
    국내 안과 사이트 공통 구성(참고): 메뉴는 병원소개, 시력교정(라식, 라섹, 스마일라식), 백내장, 노안, 망막, 진료안내(진료시간, 오시는 길),
@@ -17,10 +16,11 @@ import { DemoMakerInfo } from "@/components/demos/DemoMakerInfo";
    렌즈 착용 중단 기간, 산동 검사 뒤 운전 자제, 대중교통 이용 문구가 늘 붙는다. 백내장은 단초점 렌즈 건강보험 적용, 다초점 렌즈 비급여로 나눠 적는다.
    의료법 광고 규정에 맞춰 효과 보장, 최고, 유일, 수술 전후 사진, 환자 후기, 할인 강조는 넣지 않는다. 진료비는 비급여 진료비 안내 표로만 공개한다.
 
-   포스터 첫 화면(ec-poster): 검정 바탕 화면 가득 홍채 하나와 큰 문장 "수술 전 검사만 받아 봐도 돼요".
-   들어오면 동공 가장자리에서 바깥으로 홍채 무늬 선 수백 개가 그려지고 뒤따라 청록과 호박색이 차오른다(1.8초 안에 끝남).
-   그 뒤 동공이 빛에 맞춰 8초 주기로 천천히 줄었다 커진다(각막 반사가 밝아질 때 동공이 작아진다).
-   스크롤하면 동공이 커지며 화면을 덮고 그 안으로 들어가듯 어두운 머리글로 이어진다. 동작 줄이기면 다 그려진 홍채로 고정한다.
+   사진 출처: Pexels 사진 5752267
+
+   첫 화면(ec-poster): 시험테 사진 한 장이 한 화면을 채우고 아래 왼쪽에 문장 "수술 전 검사만 받아 봐도 돼요".
+   들어오면 사진이 1.6초 동안 천천히 다가오고(1.06배에서 1배), 문장은 0.3초 늦게 아래에서 올라온다(CSS keyframes, JS 없이도 보인다).
+   스크롤하면 사진만 조금 느리게 움직인다. 동작 줄이기면 전부 멈춘다.
 
    본문 핵심 모션: 수술을 고르면 각막 단면 그림에서 라식은 절편이 열리고, 라섹은 상피가 벗겨지고, 스마일은 작은 절개로 조직이 빠진다.
    정밀검사 단계를 고르면 눈 그림 둘레에 누적 시간이 차고, 산동 검사에서 동공이 커진다.
@@ -31,45 +31,45 @@ import { DemoMakerInfo } from "@/components/demos/DemoMakerInfo";
    3. 백내장 진료 안내: 백내장 있을 때, 단초점 렌즈, 다초점 렌즈를 고르면 거리별로 보이는 예시 그림이 바뀐다.
    4. 상담 예약: 진료 분야, 날짜, 시간, 이름, 휴대폰. 완료하면 예약번호, 담당 창구, 회신 예정일을 보여 준다. */
 
-const plexF = { fontFamily: `${IBM_Plex_Sans_KR.style.fontFamily}, sans-serif` } as const;
-const monoF = { fontFamily: `${JetBrains_Mono.style.fontFamily}, ui-monospace, monospace` } as const;
-
-const BRAND = "곰파트너안과";
-const FULL = "곰파트너안과의원";
+const IMG = "/images/demo-eye-clinic";
+const BRAND = "곰파트너";
 const TEL = "02-000-0000";
 const ADDRESS = "서울 ㅇㅇ구 ㅇㅇ로 00, 5층";
 const KAKAO = "카카오톡 채널 곰파트너";
 
+/* 로고: 메인 사이트와 같은 곰 로고 + 곰파트너(크게) + 업종(작게) */
+function SampleLogo({ light, small }: { light?: boolean; small?: boolean }) {
+  return (
+    <span className="inline-flex items-center gap-2" style={{ color: light ? "#ffffff" : "#111111" }}>
+      {/* eslint-disable-next-line @next/next/no-img-element -- 메인 사이트와 같은 곰 로고 */}
+      <img src="/images/logo-bear.png" alt="" aria-hidden width={28} height={28} className={small ? "h-6 w-6 shrink-0" : "h-7 w-7 shrink-0"} />
+      <span className="flex items-baseline gap-1 whitespace-nowrap">
+        <span className={`${small ? "text-[18px]" : "text-[20px]"} font-bold tracking-[-0.03em]`}>곰파트너</span>
+        <span className="text-[12px] font-semibold opacity-75">안과 샘플</span>
+      </span>
+    </span>
+  );
+}
+
 const C = {
-  night: "#050909",
-  nightLine: "#1c2a2a",
-  paper: "#f4f7f6",
+  paper: "#f7f7f5",
   card: "#ffffff",
-  line: "#d3dedc",
-  text: "#122120",
-  muted: "#4b5b59",
-  teal: "#0a6c67",
-  tealBright: "#38d4c4",
-  tealSoft: "#dcefec",
-  amber: "#d99a2b",
-  amberSoft: "#f7ead2",
-  onNight: "#e8f1ef",
-  onNightMuted: "#9fb3b0",
+  line: "#e5e5e5",
+  text: "#111111",
+  body: "#4b4b4b",
+  muted: "#767676",
+  /** 강조색 하나. 차분한 청록 */
+  teal: "#2c5f5b",
+  tealSoft: "#edf2f1",
+  /** 그림 안에서만 쓰는 옅은 청록 */
+  tealMid: "#a9c2be",
   error: "#b42318",
 };
 
 /* 모션 상수. 시간은 초, 이징은 cubic-bezier */
 const EASE = [0.22, 1, 0.36, 1] as const;
-/** 홍채 무늬 선이 동공에서 바깥으로 그려지는 시간과 시작 */
-const DRAW_DELAY = 0.15;
-const DRAW_DUR = 1.3;
-/** 무늬 선 뒤로 색이 차오르는 시간과 시작. 1.75초에 끝난다 */
-const FILL_DELAY = 0.45;
-const FILL_DUR = 1.3;
-/** 동공이 줄었다 커지는 한 주기 */
-const BREATH = 8;
-/** 포스터 래퍼 스크롤 진행도 중 퇴장이 끝나는 지점(160svh 중 고정 구간 60svh) */
-const EXIT_END = 0.375;
+/** 첫 화면 사진이 다가오는 시간 */
+const PHOTO_IN = 1.6;
 /** 칩, 막대, 그림 전환 */
 const DUR = 0.45;
 /** 패널 전환 */
@@ -78,74 +78,6 @@ const DUR_FAST = 0.2;
 const focusRing = "focus-visible:outline focus-visible:outline-[3px] focus-visible:outline-offset-2";
 const p2 = (n: number) => String(n).padStart(2, "0");
 const won = (n: number) => `${n.toLocaleString("ko-KR")}원`;
-
-/* ---------- 포스터 홍채 ---------- */
-
-/** viewBox -500 -500 1000 1000 기준. 동공 반지름과 홍채 반지름 */
-const PUPIL_R = 135;
-const IRIS_R = 470;
-
-/** 같은 그림이 나오도록 씨앗값 있는 난수 */
-function seeded(seed: number) {
-  let s = seed;
-  return () => {
-    s = (s * 1103515245 + 12345) & 0x7fffffff;
-    return s / 0x7fffffff;
-  };
-}
-const r1 = (n: number) => Math.round(n * 10) / 10;
-
-/** 홍채 무늬 선. 색 묶음 네 개로 나눠 path 네 개로 그린다(선 하나하나를 요소로 만들지 않는다) */
-const FIBERS = (() => {
-  const rnd = seeded(20261023);
-  const groups = ["", "", "", ""];
-  const N = 340;
-  for (let i = 0; i < N; i++) {
-    const a = (i / N) * Math.PI * 2 + (rnd() - 0.5) * 0.02;
-    const g = i % 7 === 0 ? 3 : i % 3 === 0 ? 2 : i % 2 === 0 ? 1 : 0;
-    const start = PUPIL_R + 4 + rnd() * 16;
-    const end = g === 3 ? 215 + rnd() * 45 : 300 + rnd() * (IRIS_R - 305);
-    const bend = (rnd() - 0.5) * 0.09;
-    const mid = (start + end) / 2;
-    const x0 = Math.cos(a) * start;
-    const y0 = Math.sin(a) * start;
-    const cx = Math.cos(a + bend) * mid;
-    const cy = Math.sin(a + bend) * mid;
-    const x1 = Math.cos(a + bend * 0.4) * end;
-    const y1 = Math.sin(a + bend * 0.4) * end;
-    groups[g] += `M${r1(x0)} ${r1(y0)}Q${r1(cx)} ${r1(cy)} ${r1(x1)} ${r1(y1)}`;
-  }
-  return groups;
-})();
-const FIBER_STYLE: { stroke: string; width: number; opacity: number }[] = [
-  { stroke: "#5fe6d5", width: 1.6, opacity: 0.7 },
-  { stroke: "#1aa596", width: 2.4, opacity: 0.6 },
-  { stroke: "#032826", width: 3.2, opacity: 0.55 },
-  { stroke: "#f0b54a", width: 2, opacity: 0.75 },
-];
-
-/** 동공 둘레 톱니 고리(홍채 주름) */
-const COLLARETTE = (() => {
-  const rnd = seeded(4242);
-  const n = 110;
-  let d = "";
-  for (let i = 0; i < n; i++) {
-    const a = (i / n) * Math.PI * 2;
-    const r = (i % 2 === 0 ? 220 : 238) + (rnd() - 0.5) * 22;
-    d += `${i === 0 ? "M" : "L"}${r1(Math.cos(a) * r)} ${r1(Math.sin(a) * r)}`;
-  }
-  return d + "Z";
-})();
-
-/** 홍채 오목한 홈 */
-const CRYPTS = (() => {
-  const rnd = seeded(777);
-  return Array.from({ length: 26 }, () => {
-    const a = rnd() * Math.PI * 2;
-    const r = 255 + rnd() * 170;
-    return { x: r1(Math.cos(a) * r), y: r1(Math.sin(a) * r), rot: r1((a * 180) / Math.PI), rx: r1(9 + rnd() * 12), ry: r1(3 + rnd() * 4) };
-  });
-})();
 
 /* ---------- 1. 시력교정 수술 비교 ---------- */
 
@@ -308,15 +240,14 @@ export function EyeClinicDemo() {
   const navBtn = `rounded-[4px] px-2.5 py-1.5 text-[15px] underline-offset-4 hover:underline ${focusRing}`;
 
   return (
-    <div className="min-h-screen overflow-x-clip" style={{ background: C.paper, color: C.text }}>
+    <div className="min-h-screen overflow-x-clip" style={{ background: C.card, color: C.text }}>
       <Poster reduce={reduce} onCta={() => go("ec-book")} />
 
       {/* 동공 안으로 들어온 뒤 이어지는 어두운 머리글 */}
-      <header style={{ background: C.night, color: C.onNight }}>
+      <header className="border-b" style={{ background: C.card, color: C.text, borderColor: C.line }}>
         <div className="mx-auto flex max-w-[1200px] flex-wrap items-center justify-between gap-x-4 gap-y-2 px-4 pb-3 pt-6 md:px-6">
-          <h2 className="inline-flex items-center gap-2 text-[22px] font-bold leading-none" style={plexF}>
-            <Eye size={24} aria-hidden style={{ color: C.tealBright }} />
-            {FULL}
+          <h2 className="leading-none">
+            <SampleLogo />
           </h2>
           <nav aria-label="주요 메뉴" className="-mx-2 flex flex-wrap items-center">
             {[
@@ -327,22 +258,22 @@ export function EyeClinicDemo() {
               ["ec-hours", "진료안내"],
               ["ec-book", "상담예약"],
             ].map(([id, label]) => (
-              <button key={id} type="button" onClick={() => go(id)} className={navBtn} style={{ outlineColor: C.tealBright }}>
+              <button key={id} type="button" onClick={() => go(id)} className={navBtn} style={{ outlineColor: C.teal }}>
                 {label}
               </button>
             ))}
           </nav>
         </div>
-        <div className="border-t" style={{ borderColor: C.nightLine }}>
-          <div className="mx-auto flex max-w-[1200px] flex-wrap items-center gap-x-6 gap-y-2 px-4 py-3 text-[15px] md:px-6" style={{ color: C.onNightMuted }}>
+        <div className="border-t" style={{ borderColor: C.line }}>
+          <div className="mx-auto flex max-w-[1200px] flex-wrap items-center gap-x-6 gap-y-2 px-4 py-3 text-[15px] md:px-6" style={{ color: C.body }}>
             <span className="inline-flex items-center gap-1.5">
-              <Clock size={16} aria-hidden style={{ color: C.tealBright }} />
-              오늘 진료 <b style={{ color: C.onNight }}>{todayHours.open}</b>
+              <Clock size={16} aria-hidden style={{ color: C.teal }} />
+              오늘 진료 <b style={{ color: C.text }}>{todayHours.open}</b>
             </span>
             <span>점심시간 13:00 ~ 14:00</span>
-            <a href={`tel:${TEL.replace(/-/g, "")}`} data-gtm-cta="eye-clinic_tel" className={`inline-flex items-center gap-1.5 rounded-[4px] ${focusRing}`} style={{ outlineColor: C.tealBright }}>
-              <Phone size={16} aria-hidden style={{ color: C.tealBright }} />
-              <span style={{ ...monoF, color: C.onNight }}>{TEL}</span>
+            <a href={`tel:${TEL.replace(/-/g, "")}`} data-gtm-cta="eye-clinic_tel" className={`inline-flex items-center gap-1.5 rounded-[4px] ${focusRing}`} style={{ outlineColor: C.teal }}>
+              <Phone size={16} aria-hidden style={{ color: C.teal }} />
+              <span className="tabular-nums" style={{ color: C.text }}>{TEL}</span>
             </a>
           </div>
         </div>
@@ -378,10 +309,10 @@ export function EyeClinicDemo() {
         <Booking today={today} reduce={reduce} />
       </section>
 
-      <footer className="mt-20 md:mt-28" style={{ background: C.night, color: C.onNightMuted }}>
+      <footer className="mt-20 border-t md:mt-28" style={{ background: C.card, color: C.muted, borderColor: C.line }}>
         <div className="mx-auto max-w-[1200px] px-4 py-10 text-[14px] leading-[1.8] md:px-6">
-          <p className="text-[16px] font-bold" style={{ color: C.onNight }}>
-            {FULL}
+          <p>
+            <SampleLogo />
           </p>
           <p>
             {ADDRESS} | 전화 {TEL} | {KAKAO}
@@ -395,7 +326,7 @@ export function EyeClinicDemo() {
 
 function SectionTitle({ id, title }: { id: string; title: string }) {
   return (
-    <h2 id={id} className="mb-6 text-[28px] font-bold leading-tight tracking-[-0.02em] md:mb-8 md:text-[36px]" style={plexF}>
+    <h2 id={id} className="mb-6 text-[28px] font-bold leading-tight tracking-[-0.02em] md:mb-8 md:text-[36px]">
       {title}
     </h2>
   );
@@ -406,155 +337,56 @@ function SectionTitle({ id, title }: { id: string; title: string }) {
 function Poster({ reduce, onCta }: { reduce: boolean; onCta: () => void }) {
   const ref = useRef<HTMLElement>(null);
   const { scrollYProgress } = useScroll({ target: ref, offset: ["start start", "end start"] });
-  const q = useTransform(scrollYProgress, (v) => (reduce ? 0 : Math.min(1, v / EXIT_END)));
-  // 홍채는 조금 다가오며 흐려지고, 동공은 끝으로 갈수록 빠르게 커져 화면을 덮는다
-  const irisScale = useTransform(q, (v) => 1 + v * v * 2.2);
-  const irisO = useTransform(q, (v) => 1 - Math.max(0, (v - 0.7) / 0.3));
-  const pupilScale = useTransform(q, (v) => 1 + v * v * v * 2.6);
-  const textY = useTransform(q, (v) => `${-v * 30}svh`);
-  const textO = useTransform(q, (v) => 1 - Math.min(1, v / 0.5));
-
-  const drawT = { duration: reduce ? 0 : DRAW_DUR, delay: reduce ? 0 : DRAW_DELAY, ease: EASE };
-  const fillT = { duration: reduce ? 0 : FILL_DUR, delay: reduce ? 0 : FILL_DELAY, ease: EASE };
-  const loopStart = FILL_DELAY + FILL_DUR;
+  // 스크롤하면 사진만 조금 느리게 내려간다
+  const photoY = useTransform(scrollYProgress, (v) => (reduce ? "0%" : `${v * 8}%`));
 
   return (
-    <section id="ec-poster" ref={ref} aria-labelledby="ec-poster-title" className="relative" style={{ height: reduce ? undefined : "160svh", background: C.night }}>
-      <div className={`${reduce ? "relative min-h-svh" : "sticky top-0 h-svh"} overflow-hidden`} style={{ background: C.night, color: C.onNight }}>
-        {/* 홍채. 휴대폰은 아래 가운데, PC는 오른쪽에 화면 높이보다 크게 */}
-        <div className="pointer-events-none absolute left-1/2 top-[76%] h-[132vw] w-[132vw] -translate-x-1/2 -translate-y-1/2 md:left-[72%] md:top-1/2 md:h-[122svh] md:w-[122svh]">
-          <motion.div className="relative h-full w-full" style={{ scale: irisScale }}>
-            <motion.svg viewBox="-500 -500 1000 1000" className="absolute inset-0 h-full w-full" style={{ opacity: irisO }} role="img" aria-label="동공에서 바깥으로 무늬 선이 그려지며 청록색으로 물드는 큰 홍채">
-              <defs>
-                <radialGradient id="ec-iris-fill" cx="0" cy="0" r="480" gradientUnits="userSpaceOnUse">
-                  <stop offset="0" stopColor="#6b4a16" />
-                  <stop offset="0.3" stopColor="#b97d22" />
-                  <stop offset="0.44" stopColor="#1a8a80" />
-                  <stop offset="0.72" stopColor="#0f6560" />
-                  <stop offset="0.9" stopColor="#073836" />
-                  <stop offset="1" stopColor="#020b0b" />
-                </radialGradient>
-                <radialGradient id="ec-iris-shade" cx="0.62" cy="0.7" r="0.7">
-                  <stop offset="0" stopColor="#000" stopOpacity="0" />
-                  <stop offset="0.7" stopColor="#000" stopOpacity="0.15" />
-                  <stop offset="1" stopColor="#000" stopOpacity="0.55" />
-                </radialGradient>
-                <radialGradient id="ec-sclera" cx="0" cy="0" r="500" gradientUnits="userSpaceOnUse">
-                  <stop offset="0.86" stopColor="#38d4c4" stopOpacity="0.16" />
-                  <stop offset="0.95" stopColor="#38d4c4" stopOpacity="0.04" />
-                  <stop offset="1" stopColor="#38d4c4" stopOpacity="0" />
-                </radialGradient>
-                <mask id="ec-draw" maskUnits="userSpaceOnUse" x="-500" y="-500" width="1000" height="1000">
-                  <motion.circle cx="0" cy="0" r={IRIS_R + 10} fill="#fff" initial={reduce ? false : { scale: 0.28 }} animate={{ scale: 1 }} transition={drawT} />
-                </mask>
-                <mask id="ec-fill" maskUnits="userSpaceOnUse" x="-500" y="-500" width="1000" height="1000">
-                  <motion.circle cx="0" cy="0" r={IRIS_R + 10} fill="#fff" initial={reduce ? false : { scale: 0.2 }} animate={{ scale: 1 }} transition={fillT} />
-                </mask>
-              </defs>
-
-              {/* 흰자 쪽으로 번지는 옅은 빛과 홍채 바깥 그림자 */}
-              <circle r="500" fill="url(#ec-sclera)" />
-
-              {/* 색이 차오르는 바탕 */}
-              <g mask="url(#ec-fill)">
-                <circle r={IRIS_R} fill="url(#ec-iris-fill)" />
-                <path d={COLLARETTE} fill="none" stroke="#e7a83c" strokeOpacity="0.32" strokeWidth="3" strokeLinejoin="round" />
-              </g>
-
-              {/* 무늬 선 */}
-              <g mask="url(#ec-draw)" fill="none" strokeLinecap="round">
-                {FIBERS.map((d, i) => (
-                  <path key={i} d={d} stroke={FIBER_STYLE[i].stroke} strokeWidth={FIBER_STYLE[i].width} strokeOpacity={FIBER_STYLE[i].opacity} />
-                ))}
-                {CRYPTS.map((c, i) => (
-                  <ellipse key={i} cx={c.x} cy={c.y} rx={c.rx} ry={c.ry} transform={`rotate(${c.rot} ${c.x} ${c.y})`} fill="#021716" fillOpacity="0.5" stroke="none" />
-                ))}
-                {/* 홍채 바깥 테두리 */}
-                <circle r={IRIS_R - 8} stroke="#010606" strokeWidth="22" strokeOpacity="0.85" />
-              </g>
-
-              {/* 둥근 눈알 입체감 */}
-              <circle r={IRIS_R} fill="url(#ec-iris-shade)" />
-            </motion.svg>
-
-            {/* 동공. 바깥은 스크롤로 커지고, 안쪽은 8초 주기로 줄었다 커진다 */}
-            <motion.div className="absolute left-1/2 top-1/2 h-[27%] w-[27%] -translate-x-1/2 -translate-y-1/2" style={{ scale: pupilScale }}>
-              <motion.div
-                className="h-full w-full rounded-full"
-                style={{ background: "radial-gradient(circle at 50% 50%, #000 0 62%, #021010 86%, #06302c 100%)" }}
-                initial={false}
-                animate={reduce ? { scale: 1 } : { scale: [1, 0.72, 1] }}
-                transition={reduce ? { duration: 0 } : { duration: BREATH, delay: loopStart, repeat: Infinity, ease: "easeInOut" }}
-              />
-            </motion.div>
-
-            {/* 각막 반사. 밝아질 때 동공이 작아진다 */}
-            <motion.svg viewBox="-500 -500 1000 1000" className="absolute inset-0 h-full w-full" style={{ opacity: irisO }} aria-hidden>
-              <defs>
-                <radialGradient id="ec-glint" cx="0.5" cy="0.5" r="0.5">
-                  <stop offset="0" stopColor="#fff" stopOpacity="0.95" />
-                  <stop offset="0.5" stopColor="#e9fffb" stopOpacity="0.35" />
-                  <stop offset="1" stopColor="#e9fffb" stopOpacity="0" />
-                </radialGradient>
-                <linearGradient id="ec-rim" x1="0" y1="0" x2="1" y2="1">
-                  <stop offset="0" stopColor="#fff" stopOpacity="0.55" />
-                  <stop offset="0.5" stopColor="#fff" stopOpacity="0" />
-                </linearGradient>
-              </defs>
-              <motion.g
-                initial={false}
-                animate={reduce ? { opacity: 0.6 } : { opacity: [0.45, 0.95, 0.45] }}
-                transition={reduce ? { duration: 0 } : { duration: BREATH, delay: loopStart, repeat: Infinity, ease: "easeInOut" }}
-              >
-                <ellipse cx="-150" cy="-170" rx="78" ry="54" transform="rotate(-32 -150 -170)" fill="url(#ec-glint)" />
-                <circle cx="-88" cy="-226" r="14" fill="#fff" fillOpacity="0.85" />
-              </motion.g>
-              {/* 각막 위 가는 하이라이트 한 줄 */}
-              <path d="M-380 -170 A 415 415 0 0 1 -170 -380" fill="none" stroke="url(#ec-rim)" strokeWidth="7" strokeLinecap="round" />
-            </motion.svg>
-          </motion.div>
-        </div>
-
-        {/* 문장 쪽을 어둡게 눌러 대비를 지킨다 */}
-        <div aria-hidden className="pointer-events-none absolute inset-0 hidden md:block" style={{ background: "linear-gradient(90deg, rgba(5,9,9,0.94) 0%, rgba(5,9,9,0.78) 36%, rgba(5,9,9,0) 60%)" }} />
-        <div aria-hidden className="pointer-events-none absolute inset-0 md:hidden" style={{ background: "linear-gradient(180deg, rgba(5,9,9,0.94) 0%, rgba(5,9,9,0.8) 42%, rgba(5,9,9,0) 62%)" }} />
-
-        {/* 로고와 핵심 행동 하나 */}
-        <motion.div className="absolute inset-x-0 top-0 z-10 flex items-center justify-between px-4 pt-4 md:px-12 md:pt-7" style={{ y: textY, opacity: textO }}>
-          <p className="inline-flex items-center gap-2 text-[17px] font-bold leading-none" style={plexF}>
-            <Eye size={20} aria-hidden style={{ color: C.tealBright }} />
-            {BRAND}
-          </p>
-          <button
-            type="button"
-            onClick={onCta}
-            aria-label="상담 예약"
-            title="상담 예약"
-            data-gtm-cta="eye-clinic_poster_cta"
-            className={`inline-flex h-12 w-12 items-center justify-center rounded-full ${focusRing}`}
-            style={{ background: C.tealBright, color: C.night, outlineColor: C.onNight }}
-          >
-            <CalendarCheck size={22} aria-hidden />
-          </button>
+    <section id="ec-poster" ref={ref} aria-labelledby="ec-poster-title" className="relative flex min-h-[100svh] flex-col overflow-hidden" style={{ background: "#141414", color: "#ffffff" }}>
+      <style>{`@keyframes ec-rise{from{opacity:0;transform:translateY(12px)}to{opacity:1;transform:none}}.ec-rise{animation:ec-rise 0.7s cubic-bezier(0.22,1,0.36,1) 0.3s both}@media (prefers-reduced-motion: reduce){.ec-rise{animation:none}}`}</style>
+      <motion.div className="absolute inset-x-0 top-[-10%] h-[110%]" style={{ y: photoY }}>
+        <motion.div className="h-full w-full" initial={reduce ? false : { scale: 1.06 }} animate={{ scale: 1 }} transition={{ duration: reduce ? 0 : PHOTO_IN, ease: EASE }}>
+          {/* eslint-disable-next-line @next/next/no-img-element -- 정적 export 라 next/image 최적화를 쓰지 않는다 */}
+          <img
+            src={`${IMG}/hero.jpg`}
+            srcSet={`${IMG}/hero-sm.jpg 960w, ${IMG}/hero.jpg 1920w`}
+            sizes="100vw"
+            alt="검안 상자 위에 놓인 시력 검사용 시험테와 렌즈"
+            fetchPriority="high"
+            className="absolute inset-0 h-full w-full object-cover"
+            style={{ objectPosition: "40% 50%" }}
+          />
         </motion.div>
+      </motion.div>
+      {/* 글자 대비를 위한 막. 위는 상호, 아래는 문장 */}
+      <div aria-hidden className="pointer-events-none absolute inset-0" style={{ background: "linear-gradient(to top, rgba(0,0,0,0.78), rgba(0,0,0,0.42) 50%, rgba(0,0,0,0.3) 80%, rgba(0,0,0,0.5))" }} />
 
-        {/* 큰 문장 */}
-        <motion.div className="relative z-[1] flex h-full flex-col px-4 pt-[13svh] md:justify-center md:px-12 md:pb-[4svh] md:pt-0" style={{ y: textY, opacity: textO }}>
-          <h1 id="ec-poster-title" className="text-[clamp(52px,15.5vw,68px)] font-bold leading-[1.08] tracking-[-0.04em] md:text-[clamp(92px,8.8vw,168px)] md:leading-[1.02]" style={{ ...plexF, wordBreak: "keep-all" }}>
-            <span className="block">
-              <span className="block md:inline">수술 전</span>
-              <span className="hidden md:inline"> </span>
-              <span className="block md:inline" style={{ color: C.tealBright }}>
-                검사만
-              </span>
-            </span>
-            <span className="block">받아 봐도</span>
-            <span className="block">돼요</span>
-          </h1>
-          <p className="mt-5 text-[16px] md:mt-8 md:text-[19px]" style={{ color: C.onNightMuted }}>
-            {FULL}, 정밀검사 약 {hm(EXAM_TOTAL)}
-          </p>
-        </motion.div>
+      <div className="relative z-[1] flex items-center justify-between gap-3 px-4 pt-4 md:px-12 md:pt-7">
+        <p className="leading-none">
+          <SampleLogo light small />
+        </p>
+        <button
+          type="button"
+          onClick={onCta}
+          data-gtm-cta="eye-clinic_poster_cta"
+          className={`inline-flex min-h-11 items-center gap-1.5 rounded-[6px] px-4 text-[15px] font-semibold ${focusRing}`}
+          style={{ background: C.teal, color: "#ffffff", outlineColor: "#ffffff" }}
+        >
+          <CalendarCheck size={17} aria-hidden />
+          상담 예약
+        </button>
+      </div>
+
+      <div className={`relative z-[1] mt-auto px-4 pb-14 md:px-12 md:pb-20 ${reduce ? "" : "ec-rise"}`}>
+        <h1
+          id="ec-poster-title"
+          className="max-w-[12em] text-[36px] font-bold md:text-[clamp(40px,5vw,72px)]"
+          style={{ letterSpacing: "-0.03em", lineHeight: 1.2, wordBreak: "keep-all" }}
+        >
+          수술 전 검사만 받아 봐도 돼요
+        </h1>
+        <p className="mt-4 text-[16px] md:mt-6 md:text-[18px]" style={{ color: "rgba(255,255,255,0.86)" }}>
+          {BRAND}, 정밀검사 약 {hm(EXAM_TOTAL)}
+        </p>
       </div>
     </section>
   );
@@ -581,7 +413,7 @@ function Compare({ reduce }: { reduce: boolean }) {
                 type="button"
                 aria-pressed={on}
                 onClick={() => setPick(x.id)}
-                className={`min-h-11 rounded-full border px-5 text-[16px] font-bold transition-colors ${focusRing}`}
+                className={`min-h-11 rounded-[6px] border px-5 text-[16px] font-bold transition-colors ${focusRing}`}
                 style={{ background: on ? C.teal : C.card, color: on ? "#fff" : C.text, borderColor: on ? C.teal : C.line, outlineColor: C.teal }}
               >
                 {x.name}
@@ -590,7 +422,7 @@ function Compare({ reduce }: { reduce: boolean }) {
           })}
         </div>
 
-        <div className="mt-5 rounded-[10px] border p-4 md:p-6" style={{ background: C.card, borderColor: C.line }}>
+        <div className="mt-5 rounded-[8px] border p-4 md:p-6" style={{ background: C.card, borderColor: C.line }}>
           <CorneaDiagram key={pick} kind={pick} reduce={reduce} />
           <p className="mt-3 text-[16px] leading-[1.7]">
             <b>{s.name}</b> {s.how}
@@ -603,7 +435,7 @@ function Compare({ reduce }: { reduce: boolean }) {
             <div className="absolute inset-x-0 top-[10px] h-[10px] rounded-full" style={{ background: C.tealSoft }} />
             <motion.div
               className="absolute left-0 top-[10px] h-[10px] w-full rounded-full"
-              style={{ background: "#7fcfc6", originX: 0 }}
+              style={{ background: C.tealMid, originX: 0 }}
               initial={false}
               animate={{ scaleX: axisPos(rec.stable) }}
               transition={t}
@@ -626,7 +458,7 @@ function Compare({ reduce }: { reduce: boolean }) {
               <dd className="font-bold">{COMPARE_ROWS[2].v[idx]}</dd>
             </div>
             <div className="inline-flex items-center gap-2">
-              <span aria-hidden className="inline-block h-3 w-6 rounded-full" style={{ background: "#7fcfc6" }} />
+              <span aria-hidden className="inline-block h-3 w-6 rounded-full" style={{ background: C.tealMid }} />
               <dt>시력 안정</dt>
               <dd className="font-bold">{COMPARE_ROWS[3].v[idx]}</dd>
             </div>
@@ -635,7 +467,7 @@ function Compare({ reduce }: { reduce: boolean }) {
       </div>
 
       <div>
-        <div className="overflow-hidden rounded-[10px] border" style={{ background: C.card, borderColor: C.line }}>
+        <div className="overflow-hidden rounded-[8px] border" style={{ background: C.card, borderColor: C.line }}>
           <table className="w-full table-fixed border-collapse text-[13px] md:text-[15px]">
             <caption className="sr-only">라식, 라섹, 스마일라식 비교표</caption>
             <colgroup>
@@ -698,12 +530,12 @@ function CorneaDiagram({ kind, reduce }: { kind: Surgery; reduce: boolean }) {
     <svg viewBox="0 0 320 170" className="mx-auto block h-auto w-full max-w-[460px]" role="img" aria-label={label}>
       <defs>
         <linearGradient id="ec-stroma" x1="0" y1="0" x2="0" y2="1">
-          <stop offset="0" stopColor="#bfe7e1" />
-          <stop offset="1" stopColor="#7cc4ba" />
+          <stop offset="0" stopColor="#e3ebea" />
+          <stop offset="1" stopColor="#bccfcc" />
         </linearGradient>
         <linearGradient id="ec-beam" x1="0" y1="0" x2="0" y2="1">
-          <stop offset="0" stopColor={C.amber} stopOpacity="0" />
-          <stop offset="1" stopColor={C.amber} stopOpacity="0.75" />
+          <stop offset="0" stopColor={C.teal} stopOpacity="0" />
+          <stop offset="1" stopColor={C.teal} stopOpacity="0.45" />
         </linearGradient>
       </defs>
       <ellipse cx="160" cy="164" rx="130" ry="5" fill="#000" fillOpacity="0.08" />
@@ -711,7 +543,7 @@ function CorneaDiagram({ kind, reduce }: { kind: Surgery; reduce: boolean }) {
       <path d="M20 140 Q160 10 300 140 L296 158 Q160 50 24 158 Z" fill="url(#ec-stroma)" />
       <path d="M40 128 Q160 30 280 128" fill="none" stroke="#fff" strokeOpacity="0.6" strokeWidth="1.5" />
       {/* 양 끝 상피 */}
-      <path d="M20 140 Q45.2 116.6 70.4 101.6 M249.6 101.6 Q274.8 116.6 300 140" fill="none" stroke="#e8b866" strokeWidth="4" />
+      <path d="M20 140 Q45.2 116.6 70.4 101.6 M249.6 101.6 Q274.8 116.6 300 140" fill="none" stroke="#b9b4a8" strokeWidth="4" />
       <text x="292" y="120" fontSize="10" textAnchor="end" fill={C.muted}>
         상피
       </text>
@@ -722,10 +554,10 @@ function CorneaDiagram({ kind, reduce }: { kind: Surgery; reduce: boolean }) {
       {kind === "lasik" && (
         <>
           <motion.path d="M100 78 L160 84 L220 78" fill="none" stroke={C.teal} strokeWidth="1.5" strokeDasharray="3 3" initial={reduce ? false : { opacity: 0 }} animate={{ opacity: 1 }} transition={t(0.3, 0.9)} />
-          <motion.polygon points="160,0 128,80 192,80" fill="url(#ec-beam)" initial={reduce ? false : { opacity: 0 }} animate={{ opacity: reduce ? 0.8 : [0, 0.9, 0.6] }} transition={t(0.8, 0.9)} />
+          <motion.polygon points="160,0 128,80 192,80" fill="url(#ec-beam)" initial={reduce ? false : { opacity: 0 }} animate={{ opacity: 0.7 }} transition={t(0.8, 0.9)} />
           <motion.g style={{ originX: 0, originY: 1 }} initial={reduce ? false : { rotate: 0 }} animate={{ rotate: -26 }} transition={t(0.8, 0.15)}>
-            <path d="M70.4 106 Q160 53 249.6 106" fill="none" stroke="#a8ddd5" strokeWidth="8" strokeLinecap="round" />
-            <path d={CENTER} fill="none" stroke="#e8b866" strokeWidth="4" />
+            <path d="M70.4 106 Q160 53 249.6 106" fill="none" stroke="#cbdad8" strokeWidth="8" strokeLinecap="round" />
+            <path d={CENTER} fill="none" stroke="#b9b4a8" strokeWidth="4" />
           </motion.g>
           <text x="66" y="122" fontSize="10" textAnchor="middle" fill={C.text}>
             절편
@@ -735,14 +567,14 @@ function CorneaDiagram({ kind, reduce }: { kind: Surgery; reduce: boolean }) {
 
       {kind === "lasek" && (
         <>
-          <motion.polygon points="160,0 128,80 192,80" fill="url(#ec-beam)" initial={reduce ? false : { opacity: 0 }} animate={{ opacity: reduce ? 0.8 : [0, 0.9, 0.6] }} transition={t(0.8, 0.8)} />
-          <motion.path d={CENTER} fill="none" stroke="#e8b866" strokeWidth="4" initial={reduce ? false : { y: 0, opacity: 1 }} animate={{ y: -28, opacity: 0 }} transition={t(0.8, 0.15)} />
+          <motion.polygon points="160,0 128,80 192,80" fill="url(#ec-beam)" initial={reduce ? false : { opacity: 0 }} animate={{ opacity: 0.7 }} transition={t(0.8, 0.8)} />
+          <motion.path d={CENTER} fill="none" stroke="#b9b4a8" strokeWidth="4" initial={reduce ? false : { y: 0, opacity: 1 }} animate={{ y: -28, opacity: 0 }} transition={t(0.8, 0.15)} />
         </>
       )}
 
       {kind === "smile" && (
         <>
-          <path d={CENTER} fill="none" stroke="#e8b866" strokeWidth="4" />
+          <path d={CENTER} fill="none" stroke="#b9b4a8" strokeWidth="4" />
           <path d="M236 95 L246 106" stroke={C.text} strokeWidth="2" strokeLinecap="round" />
           {/* 조직이 빠진 자리 */}
           <path d="M118 92 Q160 77 202 92 Q160 103 118 92 Z" fill="none" stroke={C.teal} strokeWidth="1.2" strokeDasharray="3 3" />
@@ -751,9 +583,9 @@ function CorneaDiagram({ kind, reduce }: { kind: Surgery; reduce: boolean }) {
           </text>
           <motion.path
             d="M118 92 Q160 77 202 92 Q160 103 118 92 Z"
-            fill={C.amber}
-            fillOpacity="0.85"
-            stroke="#8a5a12"
+            fill={C.teal}
+            fillOpacity="0.55"
+            stroke={C.teal}
             strokeWidth="1"
             initial={reduce ? false : { x: 0, y: 0, opacity: 1 }}
             animate={reduce ? { x: 0, y: 0, opacity: 0.35 } : { x: [0, 0, 80], y: [0, 0, 16], opacity: [1, 1, 0] }}
@@ -792,12 +624,12 @@ function ExamSteps({ reduce, onBook }: { reduce: boolean; onBook: () => void }) 
               >
                 <span
                   className="inline-flex h-7 w-7 flex-none items-center justify-center rounded-full text-[13px] font-bold"
-                  style={{ ...monoF, background: on ? "#fff" : i < step ? C.tealSoft : C.paper, color: C.teal }}
+                  style={{ background: on ? "#fff" : i < step ? C.tealSoft : C.paper, color: C.teal }}
                 >
                   {i < step ? <Check size={15} aria-label="지난 단계" /> : i + 1}
                 </span>
                 <span className="min-w-0 flex-1 text-[16px] font-bold">{s.name}</span>
-                <span className="flex-none text-[14px]" style={{ ...monoF, opacity: 0.85 }}>
+                <span className="flex-none text-[14px]" style={{ opacity: 0.85 }}>
                   {s.min}분
                 </span>
               </button>
@@ -806,14 +638,14 @@ function ExamSteps({ reduce, onBook }: { reduce: boolean; onBook: () => void }) 
         })}
       </ol>
 
-      <div className="rounded-[10px] border p-5 md:p-7" style={{ background: C.card, borderColor: C.line }}>
+      <div className="rounded-[8px] border p-5 md:p-7" style={{ background: C.card, borderColor: C.line }}>
         <div className="flex flex-wrap items-center gap-6">
           <svg viewBox="0 0 160 160" className="h-[150px] w-[150px] flex-none" role="img" aria-label={`검사 시작 후 ${hm(done)} 지점, ${dilated ? "동공을 키운 상태" : "평소 동공"}`}>
             <defs>
               <radialGradient id="ec-mini-iris" cx="0.45" cy="0.42" r="0.6">
-                <stop offset="0" stopColor="#c48a2a" />
-                <stop offset="0.45" stopColor="#1a8a80" />
-                <stop offset="1" stopColor="#063a37" />
+                <stop offset="0" stopColor="#8f8a7e" />
+                <stop offset="0.45" stopColor="#56706d" />
+                <stop offset="1" stopColor="#2d3d3b" />
               </radialGradient>
             </defs>
             <circle cx="80" cy="80" r={R} fill="none" stroke={C.tealSoft} strokeWidth="9" />
@@ -832,14 +664,14 @@ function ExamSteps({ reduce, onBook }: { reduce: boolean; onBook: () => void }) 
               transition={t}
             />
             <circle cx="80" cy="80" r="44" fill="url(#ec-mini-iris)" />
-            <motion.circle cx="80" cy="80" fill="#050909" initial={false} animate={{ r: dilated ? 30 : 14 }} transition={{ duration: reduce ? 0 : 1.1, ease: EASE }} />
+            <motion.circle cx="80" cy="80" fill="#111111" initial={false} animate={{ r: dilated ? 30 : 14 }} transition={{ duration: reduce ? 0 : 1.1, ease: EASE }} />
             <ellipse cx="66" cy="64" rx="8" ry="5" fill="#fff" fillOpacity="0.8" transform="rotate(-30 66 64)" />
           </svg>
           <div className="min-w-0">
             <p className="text-[14px]" style={{ color: C.muted }}>
               시작 후
             </p>
-            <p className="text-[30px] font-bold leading-tight" style={{ ...monoF, color: C.teal }}>
+            <p className="text-[30px] font-bold leading-tight" style={{ color: C.teal }}>
               {hm(done)}
             </p>
             <p className="text-[14px]" style={{ color: C.muted }}>
@@ -850,7 +682,7 @@ function ExamSteps({ reduce, onBook }: { reduce: boolean; onBook: () => void }) 
 
         <AnimatePresence mode="wait" initial={false}>
           <motion.div key={step} initial={reduce ? false : { opacity: 0 }} animate={{ opacity: 1 }} exit={reduce ? { opacity: 1 } : { opacity: 0 }} transition={{ duration: reduce ? 0 : DUR_FAST }} className="mt-5">
-            <h3 className="text-[20px] font-bold" style={plexF}>
+            <h3 className="text-[20px] font-bold">
               {step + 1}. {EXAM_STEPS[step].name}
               <span className="ml-2 text-[14px] font-normal" style={{ color: C.muted }}>
                 {startAt === 0 ? "도착하면 바로" : `${hm(startAt)} 지나서`}
@@ -860,9 +692,9 @@ function ExamSteps({ reduce, onBook }: { reduce: boolean; onBook: () => void }) 
           </motion.div>
         </AnimatePresence>
 
-        <div className="mt-6 rounded-[8px] p-4" style={{ background: C.amberSoft }}>
+        <div className="mt-6 rounded-[8px] p-4" style={{ background: C.paper }}>
           <p className="inline-flex items-center gap-1.5 text-[15px] font-bold">
-            <AlertCircle size={17} aria-hidden style={{ color: "#8a5a12" }} />
+            <AlertCircle size={17} aria-hidden style={{ color: C.teal }} />
             검사 전 렌즈 빼는 시기
           </p>
           <dl className="mt-2 grid gap-1 text-[15px]">
@@ -914,7 +746,7 @@ function Cataract({ reduce }: { reduce: boolean }) {
                 type="button"
                 aria-pressed={on}
                 onClick={() => setLens(l.id)}
-                className={`min-h-11 rounded-full border px-4 text-[15px] font-bold transition-colors md:px-5 md:text-[16px] ${focusRing}`}
+                className={`min-h-11 rounded-[6px] border px-4 text-[15px] font-bold transition-colors md:px-5 md:text-[16px] ${focusRing}`}
                 style={{ background: on ? C.teal : C.card, color: on ? "#fff" : C.text, borderColor: on ? C.teal : C.line, outlineColor: C.teal }}
               >
                 {l.name}
@@ -925,12 +757,12 @@ function Cataract({ reduce }: { reduce: boolean }) {
 
         <div className="mt-5 grid grid-cols-3 gap-2 md:gap-3" aria-live="polite">
           {DISTANCES.map((d, i) => (
-            <figure key={d} className="relative overflow-hidden rounded-[10px] border" style={{ background: "#eef3f2", borderColor: C.line }}>
+            <figure key={d} className="relative overflow-hidden rounded-[8px] border" style={{ background: "#eef3f2", borderColor: C.line }}>
               <motion.div initial={false} animate={{ filter: `blur(${v.blur[i]}px)` }} transition={t} className="aspect-[3/4]">
                 <VisionThing i={i} />
               </motion.div>
               <motion.div aria-hidden className="pointer-events-none absolute inset-0" style={{ background: "#e9dcb4" }} initial={false} animate={{ opacity: v.haze }} transition={t} />
-              <figcaption className="relative border-t px-2 py-2 text-center text-[13px] md:text-[14px]" style={{ background: C.card, borderColor: C.line, ...monoF }}>
+              <figcaption className="relative border-t px-2 py-2 text-center text-[13px] md:text-[14px]" style={{ background: C.card, borderColor: C.line }}>
                 {d}
               </figcaption>
             </figure>
@@ -945,8 +777,8 @@ function Cataract({ reduce }: { reduce: boolean }) {
       </div>
 
       <div className="grid content-start gap-5">
-        <div className="rounded-[10px] border p-5" style={{ background: C.card, borderColor: C.line }}>
-          <h3 className="text-[18px] font-bold" style={plexF}>
+        <div className="rounded-[8px] border p-5" style={{ background: C.card, borderColor: C.line }}>
+          <h3 className="text-[18px] font-bold">
             이럴 때 검사 받아 보세요
           </h3>
           <ul className="mt-3 grid gap-2 text-[15px]">
@@ -958,7 +790,7 @@ function Cataract({ reduce }: { reduce: boolean }) {
             ))}
           </ul>
         </div>
-        <dl className="grid grid-cols-2 gap-px overflow-hidden rounded-[10px] border text-[15px]" style={{ background: C.line, borderColor: C.line }}>
+        <dl className="grid grid-cols-2 gap-px overflow-hidden rounded-[8px] border text-[15px]" style={{ background: C.line, borderColor: C.line }}>
           {[
             ["수술 시간", "한쪽 눈 15~20분"],
             ["입원", "없이 당일 귀가"],
@@ -981,7 +813,7 @@ function VisionThing({ i }: { i: number }) {
   if (i === 0)
     return (
       <svg viewBox="0 0 120 160" className="h-full w-full" aria-hidden>
-        <rect x="26" y="14" width="68" height="132" rx="10" fill="#1d2a2a" />
+        <rect x="26" y="14" width="68" height="132" rx="10" fill="#2a2a2a" />
         <rect x="31" y="22" width="58" height="116" rx="4" fill="#f9fbfb" />
         <rect x="36" y="32" width="38" height="12" rx="6" fill={C.tealSoft} />
         <rect x="46" y="50" width="38" height="12" rx="6" fill={C.teal} />
@@ -997,7 +829,7 @@ function VisionThing({ i }: { i: number }) {
   if (i === 1)
     return (
       <svg viewBox="0 0 120 160" className="h-full w-full" aria-hidden>
-        <rect x="12" y="40" width="96" height="66" rx="5" fill="#1d2a2a" />
+        <rect x="12" y="40" width="96" height="66" rx="5" fill="#2a2a2a" />
         <rect x="17" y="45" width="86" height="56" rx="2" fill="#f9fbfb" />
         {Array.from({ length: 15 }, (_, k) => (
           <text key={k} x={26 + (k % 5) * 17} y={60 + Math.floor(k / 5) * 15} fontSize="9" textAnchor="middle" fill={k === 7 ? C.teal : C.text} fontWeight={k === 7 ? 700 : 400}>
@@ -1027,7 +859,7 @@ function VisionThing({ i }: { i: number }) {
 
 function Fees() {
   return (
-    <div className="overflow-hidden rounded-[10px] border" style={{ background: C.card, borderColor: C.line }}>
+    <div className="overflow-hidden rounded-[8px] border" style={{ background: C.card, borderColor: C.line }}>
       <table className="w-full border-collapse text-[15px]">
         <caption className="sr-only">비급여 진료비 목록</caption>
         <thead style={{ background: C.tealSoft }}>
@@ -1052,7 +884,7 @@ function Fees() {
               <td className="whitespace-nowrap px-2 py-3" style={{ color: C.muted }}>
                 {f.unit}
               </td>
-              <td className="px-3 py-3 text-right font-bold md:px-5" style={monoF}>
+              <td className="px-3 py-3 text-right font-bold tabular-nums md:px-5">
                 {f.price}
               </td>
             </tr>
@@ -1074,12 +906,12 @@ function HoursAndMap({ today }: { today: Date }) {
     <div className="grid gap-6 lg:grid-cols-3">
       <div className="grid content-start gap-3">
         {DOCTORS.map((d) => (
-          <div key={d.name} className="flex items-center gap-4 rounded-[10px] border p-4" style={{ background: C.card, borderColor: C.line }}>
+          <div key={d.name} className="flex items-center gap-4 rounded-[8px] border p-4" style={{ background: C.card, borderColor: C.line }}>
             <span aria-hidden className="inline-flex h-12 w-12 flex-none items-center justify-center rounded-full" style={{ background: C.tealSoft, color: C.teal }}>
               <Eye size={22} />
             </span>
             <div>
-              <p className="text-[18px] font-bold" style={plexF}>
+              <p className="text-[18px] font-bold">
                 {d.name} <span className="text-[15px] font-normal">{d.role}</span>
               </p>
               <p className="text-[14px]" style={{ color: C.muted }}>
@@ -1090,8 +922,8 @@ function HoursAndMap({ today }: { today: Date }) {
         ))}
       </div>
 
-      <div className="rounded-[10px] border p-5" style={{ background: C.card, borderColor: C.line }}>
-        <h3 className="inline-flex items-center gap-1.5 text-[18px] font-bold" style={plexF}>
+      <div className="rounded-[8px] border p-5" style={{ background: C.card, borderColor: C.line }}>
+        <h3 className="inline-flex items-center gap-1.5 text-[18px] font-bold">
           <Clock size={18} aria-hidden style={{ color: C.teal }} />
           진료시간
         </h3>
@@ -1104,7 +936,7 @@ function HoursAndMap({ today }: { today: Date }) {
                   {h.label}
                   {on && <span className="ml-1.5 text-[13px]" style={{ color: C.teal }}>오늘</span>}
                 </span>
-                <span style={monoF}>{h.open}</span>
+                <span className="tabular-nums">{h.open}</span>
               </li>
             );
           })}
@@ -1114,9 +946,9 @@ function HoursAndMap({ today }: { today: Date }) {
         </p>
       </div>
 
-      <div className="overflow-hidden rounded-[10px] border" style={{ background: C.card, borderColor: C.line }}>
+      <div className="overflow-hidden rounded-[8px] border" style={{ background: C.card, borderColor: C.line }}>
         <svg viewBox="0 0 300 170" className="block h-auto w-full" role="img" aria-label="ㅇㅇ역 2번 출구에서 큰길을 따라 걸어 두 번째 건물에 있는 병원 위치 약도">
-          <rect width="300" height="170" fill="#e7eeec" />
+          <rect width="300" height="170" fill="#f1f1ef" />
           <rect x="0" y="74" width="300" height="22" fill="#fff" />
           <rect x="132" y="0" width="18" height="170" fill="#fff" />
           {[
@@ -1126,12 +958,12 @@ function HoursAndMap({ today }: { today: Date }) {
             [236, 14, 50, 48],
             [164, 108, 122, 50],
           ].map(([x, y, w, h], k) => (
-            <rect key={k} x={x} y={y} width={w} height={h} rx="3" fill={k === 3 ? C.teal : "#cfdad8"} />
+            <rect key={k} x={x} y={y} width={w} height={h} rx="3" fill={k === 3 ? C.teal : "#dcdcd8"} />
           ))}
           <text x="261" y="42" fontSize="11" textAnchor="middle" fill="#fff" fontWeight="700">
             병원
           </text>
-          <circle cx="120" cy="85" r="8" fill={C.amber} />
+          <circle cx="120" cy="85" r="8" fill={C.text} />
           <text x="120" y="88.5" fontSize="9" textAnchor="middle" fill="#fff" fontWeight="700">
             2
           </text>
@@ -1222,7 +1054,7 @@ function Booking({ today, reduce }: { today: Date; reduce: boolean }) {
   const input = `mt-1.5 block min-h-12 w-full rounded-[8px] border px-3 text-[16px] ${focusRing}`;
 
   return (
-    <div className="overflow-hidden rounded-[12px] border" style={{ background: C.card, borderColor: C.line }}>
+    <div className="overflow-hidden rounded-[8px] border" style={{ background: C.card, borderColor: C.line }}>
       <AnimatePresence mode="wait" initial={false}>
         {done ? (
           <motion.div key="done" initial={reduce ? false : { opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} transition={{ duration: reduce ? 0 : DUR_FAST }} className="grid gap-6 p-5 md:grid-cols-[auto_1fr] md:p-8" role="status">
@@ -1230,12 +1062,12 @@ function Booking({ today, reduce }: { today: Date; reduce: boolean }) {
               <Check size={28} aria-hidden />
             </span>
             <div>
-              <h3 className="text-[24px] font-bold" style={plexF}>
+              <h3 className="text-[24px] font-bold">
                 예약 신청이 접수됐어요
               </h3>
               <dl className="mt-4 grid gap-x-8 gap-y-2 text-[16px] sm:grid-cols-[auto_1fr]">
                 <dt style={{ color: C.muted }}>예약번호</dt>
-                <dd className="font-bold" style={monoF}>
+                <dd className="font-bold tabular-nums">
                   {done.no}
                 </dd>
                 <dt style={{ color: C.muted }}>예약 내용</dt>
@@ -1254,7 +1086,7 @@ function Booking({ today, reduce }: { today: Date; reduce: boolean }) {
                 <dd>{fmtKo(today.getDay() === 0 ? nextBizDay(today) : today)} 진료시간 안에 확인 문자를 보내 드려요</dd>
               </dl>
               {done.field === "시력교정 정밀검사" && (
-                <p className="mt-4 rounded-[8px] p-3 text-[15px] leading-[1.6]" style={{ background: C.amberSoft }}>
+                <p className="mt-4 rounded-[8px] p-3 text-[15px] leading-[1.6]" style={{ background: C.paper }}>
                   소프트렌즈는 검사 1주 전부터 빼 주세요. 산동 검사가 있어 차는 두고 오시는 게 좋아요.
                 </p>
               )}
@@ -1273,7 +1105,7 @@ function Booking({ today, reduce }: { today: Date; reduce: boolean }) {
                   {FIELDS.map((f) => {
                     const on = f === field;
                     return (
-                      <label key={f} className={`inline-flex min-h-11 cursor-pointer items-center gap-2 rounded-full border px-4 text-[15px] has-[:focus-visible]:outline has-[:focus-visible]:outline-[3px] has-[:focus-visible]:outline-offset-2`} style={{ background: on ? C.teal : C.card, color: on ? "#fff" : C.text, borderColor: on ? C.teal : C.line, outlineColor: C.teal }}>
+                      <label key={f} className={`inline-flex min-h-11 cursor-pointer items-center gap-2 rounded-[6px] border px-4 text-[15px] has-[:focus-visible]:outline has-[:focus-visible]:outline-[3px] has-[:focus-visible]:outline-offset-2`} style={{ background: on ? C.teal : C.card, color: on ? "#fff" : C.text, borderColor: on ? C.teal : C.line, outlineColor: C.teal }}>
                         <input type="radio" name="ec-field" value={f} checked={on} onChange={() => setField(f)} className="sr-only" />
                         {on && <Check size={15} aria-hidden />}
                         {f}
@@ -1300,7 +1132,7 @@ function Booking({ today, reduce }: { today: Date; reduce: boolean }) {
                         className={`flex min-h-14 flex-col items-center justify-center rounded-[8px] border text-[14px] leading-tight ${focusRing}`}
                         style={{ background: on ? C.teal : C.card, color: on ? "#fff" : C.text, borderColor: on ? C.teal : C.line, outlineColor: C.teal }}
                       >
-                        <span style={monoF}>
+                        <span className="tabular-nums">
                           {d.getMonth() + 1}.{d.getDate()}
                         </span>
                         <span className={d.getDay() === 6 ? "font-bold" : ""}>{"일월화수목금토"[d.getDay()]}</span>
@@ -1328,9 +1160,8 @@ function Booking({ today, reduce }: { today: Date; reduce: boolean }) {
                         onClick={() => setTime(s)}
                         className={`min-h-11 rounded-[8px] border text-[14px] disabled:cursor-not-allowed ${focusRing}`}
                         style={{
-                          ...monoF,
                           background: on ? C.teal : full ? C.paper : C.card,
-                          color: on ? "#fff" : full ? "#7c8a88" : C.text,
+                          color: on ? "#fff" : full ? C.muted : C.text,
                           borderColor: on ? C.teal : C.line,
                           textDecoration: full ? "line-through" : undefined,
                           outlineColor: C.teal,
@@ -1362,7 +1193,7 @@ function Booking({ today, reduce }: { today: Date; reduce: boolean }) {
                   aria-invalid={tried && !!errors.phone}
                   aria-describedby={tried && errors.phone ? "ec-err-phone" : undefined}
                   className={input}
-                  style={{ ...monoF, borderColor: C.line, outlineColor: C.teal }}
+                  style={{ borderColor: C.line, outlineColor: C.teal }}
                 />
               </label>
               {err("phone")}
@@ -1374,7 +1205,7 @@ function Booking({ today, reduce }: { today: Date; reduce: boolean }) {
 
               <div className="rounded-[8px] p-4 text-[15px]" style={{ background: C.paper }}>
                 <p className="font-bold">{time ? `${fmtKo(day)} ${time}` : "시간을 고르면 여기에 표시돼요"}</p>
-                <p className="mt-1" style={{ color: C.muted }}>
+                <p className="mt-1" style={{ color: C.body }}>
                   {field}
                   {field === "시력교정 정밀검사" ? `, 약 ${hm(EXAM_TOTAL)}` : ""}
                 </p>

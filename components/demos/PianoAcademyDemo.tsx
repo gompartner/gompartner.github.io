@@ -2,14 +2,13 @@
 
 import { useEffect, useMemo, useRef, useState, type CSSProperties, type FormEvent } from "react";
 import { AnimatePresence, motion, useScroll, useTransform } from "framer-motion";
-import { CalendarCheck, Car, Check, ChevronDown, Clock, MapPin, MessageCircle, Music, Phone, Piano, RotateCcw } from "lucide-react";
-import { Noto_Serif_KR } from "@/lib/local-fonts";
+import { CalendarCheck, Car, Check, ChevronDown, Clock, MapPin, MessageCircle, Phone, RotateCcw } from "lucide-react";
 import { useReducedMotionSafe } from "@/hooks/useReducedMotionSafe";
 import { daysAgo, fmtDot, fmtKo, useDemoToday } from "@/hooks/useDemoToday";
 import { maskName, maskPhone } from "@/components/demos/LeadReceivedPanel";
 import { DemoMakerInfo } from "@/components/demos/DemoMakerInfo";
 
-/* 피아노 학원 홈페이지 샘플: 가상의 곰파트너피아노학원(유초등 개인 레슨과 성인 취미반).
+/* 피아노 학원 홈페이지 샘플: 가상의 피아노 학원 곰파트너(유초등 개인 레슨과 성인 취미반).
    학원명, 주소, 전화번호, 교습비, 공연장은 모두 가상이다. 합격 실적, 콩쿠르 수상, 학생 이름은 넣지 않는다.
 
    국내 동네 피아노 학원 사이트 공통 구성(참고): 메뉴는 학원소개, 교육과정(바이엘, 체르니 100, 30, 40, 소나티네,
@@ -24,48 +23,39 @@ import { DemoMakerInfo } from "@/components/demos/DemoMakerInfo";
    3. 체험 레슨 신청: 과정, 나이, 날짜, 시간, 이름, 연락처. 완료하면 접수 번호, 담당 창구, 회신 예정일.
    4. 연주회 소식: 다음 정기 연주회 날짜와 남은 날, 공지 펼쳐 보기, 과정별 연주곡.
 
-   포스터 첫 화면(pa-poster): 검정 바탕에 크림색 큰 문장 "체험 레슨 한 번 받아 보고 정해요" 하나만 둔다.
-   아래에 큰 건반이 원근으로 놓인다(뒤쪽은 검은 래커 건반 뚜껑, 빨간 펠트 띠). 들어올 때 건반이 오른쪽에서
-   미끄러져 들어오며 글리산도처럼 차례로 눌리고, 이어 8.4초 주기로 열두 개 건반이 하나씩 눌리며 음표가 떠올라 흩어진다.
-   스크롤하면 건반이 왼쪽으로 길게 미끄러져 빠지고 문장은 위로 빠진다. 등장과 반복은 CSS 키프레임이라
-   스크립트 없이도 건반과 문장이 보인다. 동작 줄이기면 음표가 떠 있는 완성 상태로 멈춘다. */
+   첫 화면(pa-poster): 피아노 건반 위 손 사진 한 장을 화면 가득 깔고 왼쪽 아래에 문장 "체험 레슨 한 번 받아 보고 정해요"를 둔다.
+   핵심 모션: 들어올 때 사진이 1.6초 동안 천천히 다가오고(scale 1.06 에서 1), 문장은 0.3초 늦게 아래 12px 에서 올라온다(CSS).
+   스크롤하면 사진만 조금 느리게 내려간다(y 0 에서 8%). 동작 줄이기면 전부 멈춘 상태로 둔다.
+   사진 출처: Pexels 사진 34767574 */
 
-const serif = Noto_Serif_KR;
-const serifF = { fontFamily: `${serif.style.fontFamily}, serif` } as const;
-
-const BRAND = "곰파트너피아노학원";
 const TEL = "02-000-0000";
 const ADDRESS = "서울 ㅇㅇ구 ㅇㅇ로 00, 2층";
 const KAKAO = "카카오톡 채널 곰파트너";
 const SLUG = "piano-academy";
 
 const C = {
-  paper: "#f6efe0",
-  paperDeep: "#ece2cc",
-  card: "#fffaf0",
-  ink: "#17140f",
-  muted: "#5a5246",
-  line: "#d9cdb3",
-  felt: "#a3302a",
-  feltSoft: "#f5dcd6",
-  night: "#12100d",
-  cream: "#f3ead7",
-  creamMuted: "#c4b89f",
+  paper: "#ffffff",
+  /** 구역 구분 옅은 회색 */
+  paperDeep: "#f7f7f5",
+  card: "#ffffff",
+  ink: "#111111",
+  body: "#4b4b4b",
+  muted: "#707070",
+  line: "#e5e5e5",
+  /** 강조색 하나: 피아노 몸통 색에 맞춘 차분한 적갈색 */
+  felt: "#8a3a2c",
+  feltSoft: "#f1e7e4",
   error: "#b42318",
 };
 
-/* 모션 상수. 시간은 ms, 이징은 cubic-bezier */
+/* 모션 상수. 이징은 cubic-bezier */
 const EASE = [0.22, 1, 0.36, 1] as const;
-/** 건반이 오른쪽에서 미끄러져 들어오는 시간 */
-const SLIDE_MS = 1600;
-/** 글리산도: 건반 하나 눌림 시간과 건반 사이 간격. 22개라 약 1.6초에 끝난다 */
-const GLISS_MS = 300;
-const GLISS_GAP_MS = 60;
-/** 반복 선율이 시작되는 시각과 한 음 간격. 12음이라 한 바퀴 8.4초 */
-const LOOP_START_MS = 1800;
-const NOTE_GAP_MS = 700;
-/** 포스터 스크롤 진행도 중 퇴장이 끝나는 지점 */
-const EXIT_END = 0.6;
+/** 첫 화면 사진이 다가오는 시간(초) */
+const PHOTO_IN = 1.6;
+/** 사진 위 막. 왼쪽 아래를 어둡게 해 흰 글자 대비를 맞춘다 */
+const SCRIM = "linear-gradient(to top, rgba(0,0,0,0.72), rgba(0,0,0,0.3) 55%, rgba(0,0,0,0.15)), linear-gradient(to right, rgba(0,0,0,0.35), rgba(0,0,0,0) 65%)";
+const POSTER_CSS = `@keyframes pa-rise{from{opacity:0;transform:translateY(12px)}}.pa-rise{animation:pa-rise .7s cubic-bezier(0.22,1,0.36,1) .3s both}@media (prefers-reduced-motion:reduce){.pa-rise{animation:none}}`;
+const IMG = "/images/demo-piano-academy";
 /** 과정 바꿀 때 오선 위 선이 이어지는 시간(초) */
 const STAFF_DUR = 0.7;
 
@@ -223,102 +213,6 @@ const PROGRAM: { course: string; piece: string }[] = [
   { course: "성인 취미반", piece: "쇼팽 녹턴 Op.9 No.2" },
 ];
 
-/* ---------- 포스터 건반 ---------- */
-
-type Pt = [number, number];
-/** viewBox 1600x640. 바닥 평면 위 건반을 소실점 하나로 투영한다 */
-const KB = { cx: 900, hz: 40, front: 540, span: 2500, k: 0.9, n: 22, face: 24, lift: 22 };
-const sAt = (d: number) => 1 / (1 + KB.k * d);
-/** u: 건반 가로 위치(0~1), d: 깊이(0 앞, 1 뒤), lift: 위로 솟은 높이 */
-function pt(u: number, d: number, lift = 0): Pt {
-  const s = sAt(d);
-  return [KB.cx + (u - 0.5) * KB.span * s, KB.hz + (KB.front - KB.hz) * s - lift * s];
-}
-const f1 = (n: number) => n.toFixed(1);
-const poly = (ps: Pt[]) => `M${ps.map(([x, y]) => `${f1(x)} ${f1(y)}`).join(" L")} Z`;
-const line = (a: Pt, b: Pt) => `M${f1(a[0])} ${f1(a[1])} L${f1(b[0])} ${f1(b[1])}`;
-const GAP = 0.0011;
-const FACE_Y = KB.front + KB.face;
-/** 검은 건반 앞쪽 끝 깊이 */
-const D0 = 0.37;
-/** 건반 뚜껑(래커 판) 깊이와 높이 */
-const FB_D = 1.035;
-const FB_H = 210;
-
-const WHITE = Array.from({ length: KB.n }, (_, i) => {
-  const u0 = i / KB.n + GAP;
-  const u1 = (i + 1) / KB.n - GAP;
-  const a = pt(u0, 0);
-  const b = pt(u1, 0);
-  return {
-    i,
-    top: poly([a, b, pt(u1, 1), pt(u0, 1)]),
-    face: poly([a, b, [b[0], FACE_Y], [a[0], FACE_Y]]),
-    edge: line(a, pt(u0, 0.985)),
-    lip: line([a[0] + 2, a[1] + 1], [b[0] - 2, b[1] + 1]),
-    reflect: poly([pt(u0, FB_D, 14), pt(u1, FB_D, 14), pt(u1, FB_D, 120), pt(u0, FB_D, 120)]),
-  };
-});
-
-const BLACK = [0, 1, 2].flatMap((o) =>
-  [1, 2, 4, 5, 6].map((off) => {
-    const b = o * 7 + off;
-    const uc = b / KB.n;
-    const hw = 0.3 / KB.n;
-    const ul = uc - hw;
-    const ur = uc + hw;
-    const L = KB.lift;
-    // 소실점 왼쪽 건반은 오른쪽 옆면이, 오른쪽 건반은 왼쪽 옆면이 보인다
-    const su = pt(uc, 0.5)[0] < KB.cx ? ur : ul;
-    return {
-      b,
-      shadow: poly([pt(ul - 0.004, D0 - 0.07), pt(ur + 0.006, D0 - 0.07), pt(ur + 0.006, 1), pt(ul - 0.004, 1)]),
-      side: poly([pt(su, D0, L), pt(su, 1, L), pt(su, 1, 0), pt(su, D0, 0)]),
-      front: poly([pt(ul, D0, L), pt(ur, D0, L), pt(ur, D0, 0), pt(ul, D0, 0)]),
-      top: poly([pt(ul, D0, L), pt(ur, D0, L), pt(ur, 1, L), pt(ul, 1, L)]),
-      sheen: poly([pt(uc - 0.08 / KB.n, D0 + 0.03, L), pt(uc + 0.05 / KB.n, D0 + 0.03, L), pt(uc + 0.05 / KB.n, 0.97, L), pt(uc - 0.08 / KB.n, 0.97, L)]),
-      lip: line(pt(ul, D0, L), pt(ur, D0, L)),
-    };
-  }),
-);
-const FELT = poly([pt(-0.06, 1, 0), pt(1.06, 1, 0), pt(1.06, 1, 11), pt(-0.06, 1, 11)]);
-const FALLBOARD = poly([pt(-0.06, FB_D, 11), pt(1.06, FB_D, 11), pt(1.06, FB_D, FB_H), pt(-0.06, FB_D, FB_H)]);
-const FB_TOP = line(pt(-0.06, FB_D, FB_H), pt(1.06, FB_D, FB_H));
-
-/** 반복 선율로 눌리는 흰 건반 순서(서로 다른 건반 12개) */
-const MELODY = [7, 9, 11, 14, 12, 10, 8, 13, 15, 17, 16, 6];
-type Glyph = "quarter" | "eighth" | "beam";
-/** 음표마다 [가로 이동, 세로 이동, 회전, 모양, 빨강 여부] */
-const DRIFT: [number, number, number, Glyph, boolean][] = [
-  [-80, -300, -18, "eighth", false],
-  [50, -340, 20, "quarter", false],
-  [-30, -380, -10, "beam", true],
-  [110, -320, 26, "eighth", false],
-  [-120, -280, -24, "quarter", false],
-  [70, -360, 14, "beam", false],
-  [-60, -330, -30, "eighth", true],
-  [30, -300, 12, "quarter", false],
-  [120, -370, 24, "eighth", false],
-  [-90, -350, -16, "beam", false],
-  [60, -290, 30, "quarter", true],
-  [-40, -320, -20, "eighth", false],
-];
-const NOTES = MELODY.map((k, j) => {
-  const [x, y] = pt((k + 0.5) / KB.n, 0.78);
-  const [dx, dy, r, glyph, red] = DRIFT[j];
-  return { k, j, x, y: y - 16, dx, dy, r, glyph, red };
-});
-/** 동작 줄이기일 때 음표마다 멈춰 있는 높이(떠오르는 거리 비율) */
-const STILL_K = [0.35, 0.8, 0.55, 0.95, 0.25, 0.7, 0.45, 0.9];
-const melodyIndex = (i: number) => MELODY.indexOf(i);
-
-const P = {
-  bg: "#0f0d0b",
-  cream: "#f3ead7",
-  sub: "#c2b6a0",
-  felt: "#a3302a",
-};
-
 export function PianoAcademyDemo() {
   const today = useDemoToday();
   const reduce = useReducedMotionSafe();
@@ -352,9 +246,8 @@ export function PianoAcademyDemo() {
       <Poster reduce={reduce} onCta={() => go("pa-trial")} />
 
       <header className="mx-auto flex max-w-[1200px] flex-wrap items-center justify-between gap-x-4 gap-y-2 px-4 py-5 md:px-6">
-        <h2 className="inline-flex items-center gap-2 text-[22px] font-bold leading-none" style={serifF}>
-          <Piano size={24} aria-hidden style={{ color: C.felt }} />
-          {BRAND}
+        <h2>
+          <SampleLogo />
         </h2>
         <nav aria-label="주요 메뉴" className="-mx-2 flex flex-wrap items-center">
           {[
@@ -391,8 +284,8 @@ export function PianoAcademyDemo() {
 
       <footer className="mt-20 border-t px-4 pb-14 pt-8 md:px-6" style={{ borderColor: C.line, color: C.muted }}>
         <div className="mx-auto max-w-[1200px] text-[14px] leading-[1.8]">
-          <p className="text-[16px] font-bold" style={{ ...serifF, color: C.ink }}>
-            {BRAND}
+          <p>
+            <SampleLogo size={18} />
           </p>
           <p>
             {ADDRESS}, 전화 <span className="whitespace-nowrap">{TEL}</span>
@@ -409,256 +302,76 @@ export function PianoAcademyDemo() {
 function Poster({ reduce, onCta }: { reduce: boolean; onCta: () => void }) {
   const ref = useRef<HTMLElement>(null);
   const { scrollYProgress } = useScroll({ target: ref, offset: ["start start", "end start"] });
-  const p = useTransform(scrollYProgress, (v) => (reduce ? 0 : Math.min(1, v / EXIT_END)));
-  // 건반은 왼쪽으로 길게 미끄러져 빠지고, 문장은 위로 빠진다
-  const kbX = useTransform(p, (v) => `${-v * v * 80}%`);
-  const kbO = useTransform(p, (v) => 1 - Math.max(0, v - 0.7) / 0.3);
-  const textY = useTransform(p, (v) => `${-v * 34}svh`);
-  const textO = useTransform(p, (v) => Math.max(0, 1 - Math.max(0, v - 0.25) / 0.55));
+  const photoY = useTransform(scrollYProgress, (v) => (reduce ? "0%" : `${v * 8}%`));
 
   return (
-    <section id="pa-poster" ref={ref} aria-labelledby="pa-poster-title" className="relative" style={{ height: reduce ? undefined : "180svh", background: P.bg }}>
-      <style>{`
-        @keyframes pa-slide { from { transform: translateX(24%); } to { transform: translateX(0); } }
-        .pa-slide { animation: pa-slide ${SLIDE_MS}ms cubic-bezier(0.22, 1, 0.36, 1) both; }
-        @keyframes pa-gliss { 0%, 100% { transform: translateY(0); } 35% { transform: translateY(6px); } }
-        .pa-gliss { animation: pa-gliss ${GLISS_MS}ms ease-out both; }
-        @keyframes pa-press {
-          0% { transform: translateY(0); } 2% { transform: translateY(7px); } 8% { transform: translateY(7px); }
-          11% { transform: translateY(0); } 100% { transform: translateY(0); }
-        }
-        @keyframes pa-shade { 0% { opacity: 0; } 2% { opacity: 1; } 8% { opacity: 1; } 11% { opacity: 0; } 100% { opacity: 0; } }
-        .pa-press { animation: pa-press ${NOTE_GAP_MS * MELODY.length}ms linear infinite backwards; }
-        .pa-shade { opacity: 0; animation: pa-shade ${NOTE_GAP_MS * MELODY.length}ms linear infinite backwards; }
-        @keyframes pa-float {
-          0% { opacity: 0; transform: translate(0px, 0px) rotate(0deg) scale(0.55); }
-          4% { opacity: 1; }
-          30% { opacity: 0.95; }
-          42% { opacity: 0; transform: translate(var(--dx), var(--dy)) rotate(var(--r)) scale(1); }
-          100% { opacity: 0; transform: translate(var(--dx), var(--dy)) rotate(var(--r)) scale(1); }
-        }
-        .pa-note { transform-box: fill-box; transform-origin: center; opacity: 0; animation: pa-float ${NOTE_GAP_MS * MELODY.length}ms cubic-bezier(0.22, 1, 0.36, 1) infinite backwards; }
-        .pa-still .pa-slide, .pa-still .pa-gliss, .pa-still .pa-press, .pa-still .pa-shade { animation: none; }
-        .pa-still .pa-shade { opacity: 0; }
-        .pa-still .pa-note { animation: none; opacity: 0.92; transform: translate(calc(var(--dx) * var(--k)), calc(var(--dy) * var(--k))) rotate(calc(var(--r) * var(--k))); }
-        @media (prefers-reduced-motion: reduce) {
-          .pa-slide, .pa-gliss, .pa-press, .pa-shade { animation: none; }
-          .pa-note { animation: none; opacity: 0.92; transform: translate(calc(var(--dx) * var(--k)), calc(var(--dy) * var(--k))) rotate(calc(var(--r) * var(--k))); }
-        }
-      `}</style>
-      <div
-        className={`${reduce ? "pa-still relative min-h-svh" : "sticky top-0 h-svh"} overflow-hidden`}
-        style={{ background: `radial-gradient(70% 55% at 56% 100%, #2b241d 0%, ${P.bg} 70%), ${P.bg}`, color: P.cream }}
-      >
-        {/* 건반. 휴대폰은 1000px 폭으로 그려 소실점 근처만 보이게 자른다 */}
-        <motion.div className="pointer-events-none absolute bottom-0 left-1/2 w-[1000px] -translate-x-[56.25%] md:left-0 md:w-full md:translate-x-0" style={{ x: kbX, opacity: kbO }}>
-          <div className="pa-slide">
-            <Keyboard />
-          </div>
+    <section id="pa-poster" ref={ref} aria-labelledby="pa-poster-title" className="relative flex min-h-[100svh] flex-col overflow-hidden" style={{ background: "#141414", color: "#fff" }}>
+      <style>{POSTER_CSS}</style>
+      <motion.div className="absolute inset-0" style={{ y: photoY }}>
+        <motion.div
+          className="absolute inset-0"
+          initial={reduce ? false : { scale: 1.06 }}
+          animate={{ scale: 1 }}
+          transition={{ duration: reduce ? 0 : PHOTO_IN, ease: EASE }}
+        >
+          {/* eslint-disable-next-line @next/next/no-img-element -- 정적 export 라 next/image 최적화를 쓰지 않는다 */}
+          <img
+            src={`${IMG}/hero.jpg`}
+            srcSet={`${IMG}/hero-sm.jpg 960w, ${IMG}/hero.jpg 1920w`}
+            sizes="100vw"
+            alt="갈색 업라이트 피아노 건반 위에 오른손을 올린 모습"
+            fetchPriority="high"
+            className="absolute inset-0 h-full w-full object-cover"
+            style={{ objectPosition: "58% center" }}
+          />
         </motion.div>
+      </motion.div>
+      <div className="absolute inset-0" style={{ background: SCRIM }} aria-hidden />
 
-        {/* 로고와 핵심 행동 하나 */}
-        <motion.div className="absolute inset-x-0 top-0 z-10 flex items-center justify-between px-4 pt-4 md:px-12 md:pt-7" style={{ y: textY }}>
-          <p className="inline-flex items-center gap-2 text-[17px] font-bold leading-none" style={serifF}>
-            <Piano size={19} aria-hidden />
-            {BRAND}
-          </p>
-          <button
-            type="button"
-            onClick={onCta}
-            aria-label="체험 레슨 신청"
-            title="체험 레슨 신청"
-            data-gtm-cta={`${SLUG}_poster_cta`}
-            className={`inline-flex h-12 w-12 items-center justify-center rounded-full transition-transform duration-150 active:scale-95 ${focusRing}`}
-            style={{ background: P.cream, color: P.bg, outlineColor: P.cream }}
-          >
-            <CalendarCheck size={22} aria-hidden />
-          </button>
-        </motion.div>
+      {/* 로고와 핵심 행동 하나 */}
+      <div className="relative z-10 mx-auto flex w-full max-w-[1200px] items-center justify-between gap-4 px-4 pt-4 md:px-6 md:pt-6">
+        <p>
+          <SampleLogo light size={18} />
+        </p>
+        <button
+          type="button"
+          onClick={onCta}
+          data-gtm-cta={`${SLUG}_poster_cta`}
+          className={`inline-flex h-11 flex-none items-center gap-1.5 rounded-[6px] px-4 text-[15px] font-semibold ${focusRing}`}
+          style={{ background: C.felt, color: "#fff", outlineColor: "#fff" }}
+        >
+          <CalendarCheck size={17} aria-hidden />
+          체험 레슨
+        </button>
+      </div>
 
-        {/* 큰 문장 */}
-        <motion.div className="relative z-[2] flex h-full flex-col px-4 pt-[15svh] md:px-12 md:pt-[12svh]" style={{ y: textY, opacity: textO }}>
-          <h1
-            id="pa-poster-title"
-            className="text-[clamp(44px,13.2vw,64px)] leading-[1.2] tracking-[-0.035em] md:text-[clamp(88px,10.2vw,184px)] md:leading-[1.1]"
-            style={{ ...serifF, fontWeight: 800, wordBreak: "keep-all" }}
-          >
-            <span className="md:hidden">
-              <span className="block">체험 레슨</span>
-              <span className="block">한 번 받아 보고</span>
-              <span className="block">정해요</span>
-            </span>
-            <span className="hidden md:inline">
-              <span className="block">체험 레슨 한 번</span>
-              <span className="block">받아 보고 정해요</span>
-            </span>
-          </h1>
-          <p className="mt-5 text-[16px] md:mt-7 md:text-[19px]" style={{ color: P.sub }}>
-            평일 13:00~21:30, 토요일 10:00~14:00
-          </p>
-        </motion.div>
+      {/* 문장 */}
+      <div className={`${reduce ? "" : "pa-rise"} relative z-10 mx-auto mt-auto w-full max-w-[1200px] px-4 pb-[12svh] md:px-6`}>
+        <h1
+          id="pa-poster-title"
+          className="text-[36px] font-bold md:text-[clamp(40px,5vw,72px)]"
+          style={{ wordBreak: "keep-all", letterSpacing: "-0.03em", lineHeight: 1.2 }}
+        >
+          체험 레슨 한 번
+          <br />
+          받아 보고 정해요
+        </h1>
+        <p className="mt-4 text-[16px] font-medium tabular-nums md:mt-6 md:text-[18px]" style={{ color: "rgba(255,255,255,0.88)" }}>
+          평일 13:00~21:30, 토요일 10:00~14:00
+        </p>
       </div>
     </section>
   );
 }
 
-function Keyboard() {
-  return (
-    <svg viewBox="0 0 1600 640" className="block h-auto w-full overflow-visible" role="img" aria-label="원근으로 놓인 피아노 건반이 차례로 눌리며 음표가 떠오르는 그림">
-      <defs>
-        <linearGradient id="pa-ivory" gradientUnits="userSpaceOnUse" x1="0" y1={KB.front} x2="0" y2="300">
-          <stop offset="0" stopColor="#fbf6ea" />
-          <stop offset="0.6" stopColor="#ece2cd" />
-          <stop offset="1" stopColor="#cfc2a6" />
-        </linearGradient>
-        <linearGradient id="pa-ivory-face" x1="0" y1="0" x2="0" y2="1">
-          <stop offset="0" stopColor="#e4d8bf" />
-          <stop offset="1" stopColor="#a8987a" />
-        </linearGradient>
-        <linearGradient id="pa-ebony" x1="0" y1="1" x2="0" y2="0">
-          <stop offset="0" stopColor="#3b3631" />
-          <stop offset="0.5" stopColor="#1a1714" />
-          <stop offset="1" stopColor="#0b0a09" />
-        </linearGradient>
-        <linearGradient id="pa-ebony-front" x1="0" y1="0" x2="0" y2="1">
-          <stop offset="0" stopColor="#2a2622" />
-          <stop offset="1" stopColor="#060505" />
-        </linearGradient>
-        <linearGradient id="pa-lacquer" x1="0" y1="0" x2="0" y2="1">
-          <stop offset="0" stopColor="#24201c" />
-          <stop offset="0.12" stopColor="#0d0b0a" />
-          <stop offset="1" stopColor="#050404" />
-        </linearGradient>
-        <linearGradient id="pa-rail" gradientUnits="userSpaceOnUse" x1="0" y1={FACE_Y} x2="0" y2="640">
-          <stop offset="0" stopColor="#2c2724" />
-          <stop offset="0.18" stopColor="#100e0c" />
-          <stop offset="1" stopColor="#060505" />
-        </linearGradient>
-        <linearGradient id="pa-felt" x1="0" y1="0" x2="0" y2="1">
-          <stop offset="0" stopColor="#c2453b" />
-          <stop offset="1" stopColor="#6e1c17" />
-        </linearGradient>
-        <linearGradient id="pa-reflect" x1="0" y1="1" x2="0" y2="0">
-          <stop offset="0" stopColor="#f3ead7" stopOpacity="0.22" />
-          <stop offset="1" stopColor="#f3ead7" stopOpacity="0" />
-        </linearGradient>
-        <radialGradient id="pa-vignette" gradientUnits="userSpaceOnUse" cx={KB.cx} cy="430" r="980" gradientTransform={`translate(${KB.cx} 430) scale(1 0.55) translate(${-KB.cx} -430)`}>
-          <stop offset="0.45" stopColor={P.bg} stopOpacity="0" />
-          <stop offset="1" stopColor={P.bg} stopOpacity="0.96" />
-        </radialGradient>
-        <radialGradient id="pa-floor" cx="0.5" cy="0.5" r="0.5">
-          <stop offset="0" stopColor="#000" stopOpacity="0.7" />
-          <stop offset="1" stopColor="#000" stopOpacity="0" />
-        </radialGradient>
-        <radialGradient id="pa-note-cream" cx="0.35" cy="0.3" r="0.8">
-          <stop offset="0" stopColor="#fffaf0" />
-          <stop offset="1" stopColor="#d9c9a8" />
-        </radialGradient>
-        <radialGradient id="pa-note-red" cx="0.35" cy="0.3" r="0.8">
-          <stop offset="0" stopColor="#d8584c" />
-          <stop offset="1" stopColor="#86231d" />
-        </radialGradient>
-      </defs>
-
-      {/* 건반 뚜껑(래커 판)과 비친 흰 건반 */}
-      <path d={FALLBOARD} fill="url(#pa-lacquer)" />
-      {WHITE.map((w) => (
-        <path key={w.i} d={w.reflect} fill="url(#pa-reflect)" />
-      ))}
-      <path d={FB_TOP} stroke="rgba(255,240,220,0.4)" strokeWidth="1.6" />
-      <path d={FELT} fill="url(#pa-felt)" />
-
-      {/* 흰 건반 */}
-      {WHITE.map((w) => {
-        const m = melodyIndex(w.i);
-        const loopDelay = `${LOOP_START_MS + m * NOTE_GAP_MS}ms`;
-        return (
-          <g key={w.i} className="pa-gliss" style={{ animationDelay: `${SLIDE_MS * 0.12 + w.i * GLISS_GAP_MS}ms` }}>
-            <g className={m >= 0 ? "pa-press" : undefined} style={m >= 0 ? { animationDelay: loopDelay } : undefined}>
-              <path d={w.face} fill="url(#pa-ivory-face)" />
-              <path d={w.top} fill="url(#pa-ivory)" />
-              <path d={w.edge} stroke="rgba(255,255,255,0.75)" strokeWidth="1.4" />
-              <path d={w.lip} stroke="rgba(255,255,255,0.9)" strokeWidth="2" strokeLinecap="round" />
-              {m >= 0 && <path className="pa-shade" d={w.top} fill="rgba(120,88,40,0.3)" style={{ animationDelay: loopDelay }} />}
-            </g>
-          </g>
-        );
-      })}
-
-      {/* 검은 건반 */}
-      {BLACK.map((b) => (
-        <path key={`s${b.b}`} d={b.shadow} fill="rgba(40,26,10,0.28)" />
-      ))}
-      {BLACK.map((b) => (
-        <g key={b.b}>
-          <path d={b.side} fill="#050404" />
-          <path d={b.front} fill="url(#pa-ebony-front)" />
-          <path d={b.top} fill="url(#pa-ebony)" />
-          <path d={b.sheen} fill="rgba(255,244,226,0.13)" />
-          <path d={b.lip} stroke="rgba(255,244,226,0.5)" strokeWidth="1.6" strokeLinecap="round" />
-        </g>
-      ))}
-
-      {/* 앞 레일과 바닥 그림자 */}
-      <rect x="-900" y={FACE_Y} width="3800" height={612 - FACE_Y} fill="url(#pa-rail)" />
-      <path d={`M-900 ${FACE_Y + 1.5} L2900 ${FACE_Y + 1.5}`} stroke="rgba(255,240,220,0.32)" strokeWidth="1.5" />
-      <ellipse cx={KB.cx} cy="626" rx="980" ry="20" fill="url(#pa-floor)" />
-
-      <rect x="-900" y="0" width="3800" height="640" fill="url(#pa-vignette)" />
-
-      {/* 떠오르는 음표 */}
-      {NOTES.map((n) => (
-        <g key={n.j} transform={`translate(${f1(n.x)} ${f1(n.y)})`}>
-          <g className="pa-note" style={{ "--dx": `${n.dx}px`, "--dy": `${n.dy}px`, "--r": `${n.r}deg`, "--k": STILL_K[n.j % STILL_K.length], animationDelay: `${LOOP_START_MS + n.j * NOTE_GAP_MS}ms` } as CSSProperties}>
-            <NoteGlyph kind={n.glyph} fill={n.red ? "url(#pa-note-red)" : "url(#pa-note-cream)"} />
-          </g>
-        </g>
-      ))}
-    </svg>
-  );
-}
-
-function NoteGlyph({ kind, fill }: { kind: Glyph; fill: string }) {
-  const head = (cx: number, cy: number) => (
-    <>
-      <ellipse cx={cx} cy={cy} rx="13" ry="9.5" transform={`rotate(-22 ${cx} ${cy})`} fill={fill} />
-      <ellipse cx={cx - 4} cy={cy - 3.5} rx="4" ry="2" transform={`rotate(-22 ${cx - 4} ${cy - 3.5})`} fill="rgba(255,255,255,0.7)" />
-    </>
-  );
-  if (kind === "beam") {
-    return (
-      <g>
-        <rect x="-8" y="-54" width="4.5" height="56" rx="1.5" fill={fill} />
-        <rect x="31" y="-62" width="4.5" height="56" rx="1.5" fill={fill} />
-        <path d="M-8 -54 L35.5 -62 L35.5 -51 L-8 -43 Z" fill={fill} />
-        {head(-17, 2)}
-        {head(22, -6)}
-      </g>
-    );
-  }
-  return (
-    <g>
-      <rect x="8" y="-58" width="4.5" height="58" rx="1.5" fill={fill} />
-      {kind === "eighth" && <path d="M10 -58 C14 -42 34 -40 28 -14 C30 -30 20 -36 10 -40 Z" fill={fill} />}
-      {head(0, 0)}
-    </g>
-  );
-}
-
 /* ---------- 공용 ---------- */
 
-function SectionTitle({ id, title, dark = false }: { id: string; title: string; dark?: boolean }) {
+function SectionTitle({ id, title }: { id: string; title: string }) {
   return (
-    <div className="flex items-end gap-5">
-      <h2 id={id} className="flex-none text-[28px] font-bold leading-tight md:text-[36px]" style={serifF}>
+    <div className="border-b pb-3" style={{ borderColor: C.line }}>
+      <h2 id={id} className="text-[28px] font-bold leading-tight tracking-[-0.03em] md:text-[36px]" style={{ color: C.ink }}>
         {title}
       </h2>
-      {/* 오선 다섯 줄 */}
-      <svg aria-hidden viewBox="0 0 100 17" preserveAspectRatio="none" className="mb-2 hidden h-[17px] flex-1 sm:block">
-        {[0.5, 4.5, 8.5, 12.5, 16.5].map((y) => (
-          <line key={y} x1="0" x2="100" y1={y} y2={y} stroke={dark ? "rgba(243,234,215,0.35)" : "rgba(23,20,15,0.3)"} strokeWidth="1" vectorEffect="non-scaling-stroke" />
-        ))}
-      </svg>
     </div>
   );
 }
@@ -675,7 +388,7 @@ function CourseSection({ reduce, course, setCourseId, onTrial }: { reduce: boole
       <div className="mt-7 grid gap-8 lg:grid-cols-[minmax(0,5fr)_minmax(0,7fr)] lg:gap-10">
         {/* 건반 버튼 */}
         <div>
-          <div role="group" aria-label="과정 고르기" className="relative flex gap-[3px] rounded-b-[8px] px-[6px] pb-[10px] pt-[10px]" style={{ background: C.night }}>
+          <div role="group" aria-label="과정 고르기" className="relative flex gap-px overflow-hidden rounded-[6px] border" style={{ background: C.line, borderColor: C.line }}>
             {COURSES.map((c) => {
               const on = c.id === course.id;
               return (
@@ -684,16 +397,16 @@ function CourseSection({ reduce, course, setCourseId, onTrial }: { reduce: boole
                   type="button"
                   aria-pressed={on}
                   onClick={() => setCourseId(c.id)}
-                  className={`relative flex h-[184px] flex-1 flex-col items-center justify-end rounded-b-[6px] px-1 pb-4 text-center transition-[transform,box-shadow] duration-100 md:h-[230px] ${focusRing}`}
+                  className={`relative flex h-[184px] flex-1 flex-col items-center justify-end px-1 pb-4 text-center transition-colors duration-150 md:h-[220px] ${focusRing}`}
                   style={{
-                    background: on ? "linear-gradient(180deg, #e3d7bd 0%, #f3ead7 40%, #efe4cc 100%)" : "linear-gradient(180deg, #f1e8d4 0%, #fffaf0 55%, #f6efe0 100%)",
-                    transform: on ? "translateY(5px)" : "translateY(0)",
-                    boxShadow: on ? "inset 0 8px 12px rgba(60,40,10,0.22)" : "inset 0 -7px 0 #d6c8a8, 0 2px 0 #000",
+                    background: on ? C.paperDeep : "#ffffff",
+                    boxShadow: on ? `inset 0 -3px 0 ${C.felt}` : undefined,
                     outlineColor: C.felt,
+                    outlineOffset: -3,
                     color: C.ink,
                   }}
                 >
-                  <span className="text-[16px] font-bold leading-tight md:text-[18px]" style={serifF}>
+                  <span className="text-[16px] font-bold leading-tight md:text-[18px]">
                     {c.name}
                   </span>
                   <span className="mt-1 text-[12px] leading-tight md:text-[13px]" style={{ color: C.muted }}>
@@ -705,32 +418,16 @@ function CourseSection({ reduce, course, setCourseId, onTrial }: { reduce: boole
                       선택
                     </span>
                   )}
-                  {/* 누르면 음표 하나가 떠오른다 */}
-                  <AnimatePresence>
-                    {on && !reduce && (
-                      <motion.span
-                        key={`n-${c.id}`}
-                        aria-hidden
-                        className="pointer-events-none absolute left-1/2 top-[38%] -ml-2"
-                        initial={{ y: 0, opacity: 1, rotate: 0 }}
-                        animate={{ y: -70, opacity: 0, rotate: 18 }}
-                        transition={{ duration: 0.9, ease: EASE }}
-                        style={{ color: C.felt }}
-                      >
-                        <Music size={20} />
-                      </motion.span>
-                    )}
-                  </AnimatePresence>
                 </button>
               );
             })}
-            {/* 건반 사이 검은 건반. 장식 */}
+            {/* 건반 사이 검은 건반 */}
             {[25, 50, 75].map((x) => (
               <span
                 key={x}
                 aria-hidden
-                className="pointer-events-none absolute top-[10px] h-[44%] w-[9%] -translate-x-1/2 rounded-b-[4px]"
-                style={{ left: `${x}%`, background: "linear-gradient(180deg, #0b0a09 0%, #2b2622 88%, #3b3631 100%)", boxShadow: "0 3px 0 #000" }}
+                className="pointer-events-none absolute top-0 h-[40%] w-[9%] -translate-x-1/2 rounded-b-[3px]"
+                style={{ left: `${x}%`, background: "#222222" }}
               />
             ))}
           </div>
@@ -744,13 +441,13 @@ function CourseSection({ reduce, course, setCourseId, onTrial }: { reduce: boole
           <p className="text-[15px] font-bold" style={{ color: C.felt }}>
             {course.target}
           </p>
-          <h3 className="mt-1 text-[24px] font-bold md:text-[28px]" style={serifF}>
+          <h3 className="mt-1 text-[24px] font-bold md:text-[28px]">
             {course.name} 과정 진도
           </h3>
           <Staff key={course.id} course={course} reduce={reduce} />
 
           <h4 className="mt-7 text-[17px] font-bold">한 번 수업 {total}분</h4>
-          <div className="mt-3 flex h-12 overflow-hidden rounded-[4px] border" style={{ borderColor: C.ink }} aria-hidden>
+          <div className="mt-3 flex h-12 overflow-hidden rounded-[4px] border" style={{ borderColor: C.line }} aria-hidden>
             {course.parts.map((x, i) => (
               <span
                 key={x.label}
@@ -758,9 +455,9 @@ function CourseSection({ reduce, course, setCourseId, onTrial }: { reduce: boole
                 style={{
                   flexGrow: x.min,
                   flexBasis: 0,
-                  background: i === 0 ? C.ink : i === 1 ? C.card : C.feltSoft,
-                  color: i === 0 ? C.cream : C.ink,
-                  borderLeft: i > 0 ? `1px solid ${C.ink}` : undefined,
+                  background: i === 0 ? C.felt : i === 1 ? C.card : C.feltSoft,
+                  color: i === 0 ? "#fff" : C.ink,
+                  borderLeft: i > 0 ? `1px solid ${C.line}` : undefined,
                 }}
               >
                 {x.min}분
@@ -770,7 +467,7 @@ function CourseSection({ reduce, course, setCourseId, onTrial }: { reduce: boole
           <ul className="mt-3 flex flex-wrap gap-x-5 gap-y-1 text-[15px]">
             {course.parts.map((x, i) => (
               <li key={x.label} className="inline-flex items-center gap-2">
-                <span aria-hidden className="h-3 w-3 rounded-[2px] border" style={{ borderColor: C.ink, background: i === 0 ? C.ink : i === 1 ? C.card : C.feltSoft }} />
+                <span aria-hidden className="h-3 w-3 rounded-[2px] border" style={{ borderColor: i === 0 ? C.felt : "#b5b5b5", background: i === 0 ? C.felt : i === 1 ? C.card : C.feltSoft }} />
                 {x.label} {x.min}분
               </li>
             ))}
@@ -786,7 +483,7 @@ function CourseSection({ reduce, course, setCourseId, onTrial }: { reduce: boole
                   <dt className="text-[14px]" style={{ color: C.muted }}>
                     월 교습비 {f.times}
                   </dt>
-                  <dd className="text-[22px] font-bold tabular-nums" style={serifF}>
+                  <dd className="text-[22px] font-bold tabular-nums">
                     {won(f.price)}
                   </dd>
                 </div>
@@ -796,7 +493,7 @@ function CourseSection({ reduce, course, setCourseId, onTrial }: { reduce: boole
               type="button"
               onClick={onTrial}
               data-gtm-cta={`${SLUG}_course_trial`}
-              className={`inline-flex h-12 items-center gap-2 rounded-[4px] px-5 text-[16px] font-bold ${focusRing}`}
+              className={`inline-flex h-12 items-center gap-2 rounded-[6px] px-5 text-[16px] font-semibold ${focusRing}`}
               style={{ background: C.felt, color: "#fff", outlineColor: C.ink }}
             >
               <CalendarCheck size={18} aria-hidden />
@@ -819,7 +516,7 @@ function Staff({ course, reduce }: { course: Course; reduce: boolean }) {
     <div className="mt-3">
       <svg viewBox="0 0 600 120" className="block h-auto w-full" role="img" aria-label={`${course.name} 과정 진도: ${course.steps.map((s) => s.book).join(", ")}`}>
         {[38, 50, 62, 74, 86].map((y) => (
-          <line key={y} x1="10" x2="590" y1={y} y2={y} stroke="rgba(23,20,15,0.35)" strokeWidth="1.2" />
+          <line key={y} x1="10" x2="590" y1={y} y2={y} stroke="#d4d4d4" strokeWidth="1.2" />
         ))}
         <line x1="10" x2="10" y1="38" y2="86" stroke={C.ink} strokeWidth="2" />
         <line x1="584" x2="584" y1="38" y2="86" stroke={C.ink} strokeWidth="2" />
@@ -884,7 +581,7 @@ function TimetableSection({
   const setWho = (w: Who) => {
     if (w !== who) setCourseId(w === "adult" ? "adult" : "beyer");
   };
-  const tab = `h-11 rounded-[4px] px-4 text-[15px] font-bold border ${focusRing}`;
+  const tab = `h-11 rounded-[6px] px-4 text-[15px] font-semibold border ${focusRing}`;
 
   const cell = (dow: number, time: string, wide: boolean) => {
     const n = left(dow, time);
@@ -899,9 +596,9 @@ function TimetableSection({
         data-gtm-cta={`${SLUG}_timetable_pick`}
         className={`${wide ? "w-full" : "min-w-[112px]"} h-11 rounded-[4px] border px-2 text-[14px] font-bold tabular-nums transition-colors ${focusRing} disabled:cursor-not-allowed`}
         style={{
-          borderColor: full ? C.line : C.ink,
-          background: picked ? C.ink : full ? "transparent" : C.card,
-          color: picked ? C.cream : full ? C.muted : C.ink,
+          borderColor: picked ? C.felt : full ? C.line : "#c8c8c8",
+          background: picked ? C.felt : full ? "transparent" : C.card,
+          color: picked ? "#fff" : full ? C.muted : C.ink,
           outlineColor: C.felt,
           textDecoration: full ? "line-through" : undefined,
         }}
@@ -922,7 +619,7 @@ function TimetableSection({
             aria-pressed={who === w}
             onClick={() => setWho(w)}
             className={tab}
-            style={{ borderColor: C.ink, background: who === w ? C.ink : "transparent", color: who === w ? C.cream : C.ink, outlineColor: C.felt }}
+            style={{ borderColor: who === w ? C.felt : "#c8c8c8", background: who === w ? C.felt : "transparent", color: who === w ? "#fff" : C.ink, outlineColor: C.felt }}
           >
             {w === "kid" ? "유초등 과정" : "성인 취미"}
           </button>
@@ -960,7 +657,7 @@ function TimetableSection({
                   {t}
                 </th>
                 {OPEN_DAYS.map((d) => (
-                  <td key={d} className="px-2 py-2 text-center" style={{ background: d === todayDow ? "rgba(163,48,42,0.05)" : undefined }}>
+                  <td key={d} className="px-2 py-2 text-center" style={{ background: d === todayDow ? C.paperDeep : undefined }}>
                     {slotsFor(d, who).includes(t) ? cell(d, t, true) : <span className="sr-only">수업 없음</span>}
                   </td>
                 ))}
@@ -980,7 +677,7 @@ function TimetableSection({
               aria-pressed={mobileDow === d}
               onClick={() => setMDow(d)}
               className={`h-11 rounded-[4px] border text-[15px] font-bold ${focusRing}`}
-              style={{ borderColor: C.ink, background: mobileDow === d ? C.ink : C.card, color: mobileDow === d ? C.cream : C.ink, outlineColor: C.felt }}
+              style={{ borderColor: mobileDow === d ? C.felt : "#c8c8c8", background: mobileDow === d ? C.felt : C.card, color: mobileDow === d ? "#fff" : C.ink, outlineColor: C.felt }}
             >
               {DOW[d]}
             </button>
@@ -1138,11 +835,11 @@ function TrialSection({
     setPickDow(null);
   };
 
-  const chip = `min-h-11 rounded-[4px] border px-3 text-[15px] font-bold ${focusRing}`;
+  const chip = `min-h-11 rounded-[6px] border px-3 text-[15px] font-semibold ${focusRing}`;
   const chipStyle = (on: boolean, disabled = false): CSSProperties => ({
-    borderColor: disabled ? C.line : C.ink,
-    background: on ? C.ink : disabled ? "transparent" : C.card,
-    color: on ? C.cream : disabled ? C.muted : C.ink,
+    borderColor: on ? C.felt : disabled ? C.line : "#c8c8c8",
+    background: on ? C.felt : disabled ? "transparent" : C.card,
+    color: on ? "#fff" : disabled ? C.muted : C.ink,
     outlineColor: C.felt,
   });
   const label = "block text-[15px] font-bold";
@@ -1160,7 +857,7 @@ function TrialSection({
         <SectionTitle id="pa-trial-title" title="체험 레슨 신청" />
         <div className="mt-6 grid gap-8 lg:grid-cols-[minmax(0,4fr)_minmax(0,7fr)] lg:gap-12">
           <div className="text-[16px] leading-[1.75]">
-            <p className="text-[20px] font-bold" style={serifF}>
+            <p className="text-[20px] font-bold">
               30분, 교습비 없이 받아 보세요
             </p>
             <ul className="mt-4 space-y-2">
@@ -1192,7 +889,7 @@ function TrialSection({
                     <Check size={18} aria-hidden />
                     체험 레슨 신청 접수
                   </p>
-                  <p className="mt-2 text-[26px] font-bold tabular-nums" style={serifF}>
+                  <p className="mt-2 text-[26px] font-bold tabular-nums">
                     {done.no}
                   </p>
                   <dl className="mt-5 grid grid-cols-[96px_minmax(0,1fr)] gap-y-2.5 text-[16px]">
@@ -1214,8 +911,8 @@ function TrialSection({
                   <button
                     type="button"
                     onClick={reset}
-                    className={`mt-6 inline-flex h-11 items-center gap-2 rounded-[4px] border px-4 text-[15px] font-bold ${focusRing}`}
-                    style={{ borderColor: C.ink, outlineColor: C.felt }}
+                    className={`mt-6 inline-flex h-11 items-center gap-2 rounded-[6px] border px-4 text-[15px] font-semibold ${focusRing}`}
+                    style={{ borderColor: "#c8c8c8", outlineColor: C.felt }}
                   >
                     <RotateCcw size={16} aria-hidden />
                     다른 시간 신청
@@ -1296,7 +993,7 @@ function TrialSection({
                       <label htmlFor="pa-age" className={label}>
                         나이
                       </label>
-                      <select id="pa-age" value={age} onChange={(e) => setAge(e.target.value)} className={input} style={{ borderColor: C.ink, background: "#fff", outlineColor: C.felt }}>
+                      <select id="pa-age" value={age} onChange={(e) => setAge(e.target.value)} className={input} style={{ borderColor: "#c8c8c8", background: "#fff", outlineColor: C.felt }}>
                         {AGES.filter((a) => (adult ? a === "성인" || a === "중고등" : a !== "성인")).map((a) => (
                           <option key={a}>{a}</option>
                         ))}
@@ -1306,7 +1003,7 @@ function TrialSection({
                       <label htmlFor="pa-exp" className={label}>
                         피아노 경험
                       </label>
-                      <select id="pa-exp" value={exp} onChange={(e) => setExp(e.target.value)} className={input} style={{ borderColor: C.ink, background: "#fff", outlineColor: C.felt }}>
+                      <select id="pa-exp" value={exp} onChange={(e) => setExp(e.target.value)} className={input} style={{ borderColor: "#c8c8c8", background: "#fff", outlineColor: C.felt }}>
                         {EXPS.map((a) => (
                           <option key={a}>{a}</option>
                         ))}
@@ -1324,7 +1021,7 @@ function TrialSection({
                         aria-invalid={tried && !!errs.name}
                         aria-describedby={tried && errs.name ? "pa-err-name" : undefined}
                         className={input}
-                        style={{ borderColor: tried && errs.name ? C.error : C.ink, background: "#fff", outlineColor: C.felt }}
+                        style={{ borderColor: tried && errs.name ? C.error : "#c8c8c8", background: "#fff", outlineColor: C.felt }}
                       />
                       {errText(errs.name, "pa-err-name")}
                     </div>
@@ -1342,7 +1039,7 @@ function TrialSection({
                         aria-invalid={tried && !!errs.phone}
                         aria-describedby={tried && errs.phone ? "pa-err-phone" : undefined}
                         className={input}
-                        style={{ borderColor: tried && errs.phone ? C.error : C.ink, background: "#fff", outlineColor: C.felt }}
+                        style={{ borderColor: tried && errs.phone ? C.error : "#c8c8c8", background: "#fff", outlineColor: C.felt }}
                       />
                       {errText(errs.phone, "pa-err-phone")}
                     </div>
@@ -1366,7 +1063,7 @@ function TrialSection({
                   <button
                     type="submit"
                     data-gtm-cta={`${SLUG}_trial_submit`}
-                    className={`inline-flex h-13 w-full items-center justify-center gap-2 rounded-[4px] py-3.5 text-[17px] font-bold sm:w-auto sm:px-8 ${focusRing}`}
+                    className={`inline-flex h-13 w-full items-center justify-center gap-2 rounded-[6px] py-3.5 text-[17px] font-semibold sm:w-auto sm:px-8 ${focusRing}`}
                     style={{ background: C.felt, color: "#fff", outlineColor: C.ink }}
                   >
                     <CalendarCheck size={19} aria-hidden />
@@ -1418,18 +1115,18 @@ function ConcertSection({ today }: { today: Date }) {
   const [open, setOpen] = useState<number | null>(0);
 
   return (
-    <section id="pa-concert" aria-labelledby="pa-concert-title" className="scroll-mt-4" style={{ background: C.night, color: C.cream }}>
-      <div className="mx-auto max-w-[1200px] px-4 py-16 md:px-6 md:py-20">
-        <SectionTitle id="pa-concert-title" title="연주회 소식" dark />
+    <section id="pa-concert" aria-labelledby="pa-concert-title" className="scroll-mt-4" style={{ color: C.ink }}>
+      <div className="mx-auto max-w-[1200px] px-4 pt-16 md:px-6 md:pt-20">
+        <SectionTitle id="pa-concert-title" title="연주회 소식" />
         <div className="mt-8 grid gap-10 lg:grid-cols-[minmax(0,5fr)_minmax(0,7fr)] lg:gap-14">
           <div>
-            <p className="text-[15px]" style={{ color: C.creamMuted }}>
+            <p className="text-[15px]" style={{ color: C.muted }}>
               정기 연주회
             </p>
-            <p className="mt-2 text-[34px] font-bold leading-tight md:text-[44px]" style={serifF}>
+            <p className="mt-2 text-[34px] font-bold leading-tight md:text-[44px]">
               {day.getMonth() + 1}월 {day.getDate()}일 {DOW[day.getDay()]}요일
             </p>
-            <p className="mt-1 text-[20px]" style={serifF}>
+            <p className="mt-1 text-[20px]">
               오후 3시, ㅇㅇ구민회관 소공연장
             </p>
             <p className="mt-5 inline-flex items-center gap-2 rounded-[4px] px-3 py-1.5 text-[16px] font-bold tabular-nums" style={{ background: C.felt, color: "#fff" }}>
@@ -1438,10 +1135,10 @@ function ConcertSection({ today }: { today: Date }) {
             </p>
 
             <h3 className="mt-10 text-[17px] font-bold">과정별 연주곡</h3>
-            <ul className="mt-3 divide-y" style={{ borderColor: "rgba(243,234,215,0.18)" }}>
+            <ul className="mt-3 divide-y" style={{ borderColor: C.line }}>
               {PROGRAM.map((x) => (
-                <li key={x.course} className="flex flex-col gap-0.5 py-3 sm:flex-row sm:gap-4" style={{ borderColor: "rgba(243,234,215,0.18)" }}>
-                  <span className="w-[100px] flex-none text-[15px]" style={{ color: C.creamMuted }}>
+                <li key={x.course} className="flex flex-col gap-0.5 py-3 sm:flex-row sm:gap-4" style={{ borderColor: C.line }}>
+                  <span className="w-[100px] flex-none text-[15px]" style={{ color: C.muted }}>
                     {x.course}
                   </span>
                   <span className="text-[16px]">{x.piece}</span>
@@ -1452,11 +1149,11 @@ function ConcertSection({ today }: { today: Date }) {
 
           <div>
             <h3 className="text-[17px] font-bold">공지사항</h3>
-            <ul className="mt-3 border-t" style={{ borderColor: "rgba(243,234,215,0.3)" }}>
+            <ul className="mt-3 border-t" style={{ borderColor: C.line }}>
               {notices.map((n, i) => {
                 const on = open === i;
                 return (
-                  <li key={n.title} className="border-b" style={{ borderColor: "rgba(243,234,215,0.3)" }}>
+                  <li key={n.title} className="border-b" style={{ borderColor: C.line }}>
                     <h4>
                       <button
                         type="button"
@@ -1464,16 +1161,16 @@ function ConcertSection({ today }: { today: Date }) {
                         aria-controls={`pa-notice-${i}`}
                         onClick={() => setOpen(on ? null : i)}
                         className={`flex w-full items-center justify-between gap-4 py-4 text-left ${focusRing}`}
-                        style={{ outlineColor: C.cream }}
+                        style={{ outlineColor: C.felt }}
                       >
                         <span className="text-[17px] font-bold">{n.title}</span>
-                        <span className="flex flex-none items-center gap-3 text-[14px] tabular-nums" style={{ color: C.creamMuted }}>
+                        <span className="flex flex-none items-center gap-3 text-[14px] tabular-nums" style={{ color: C.muted }}>
                           {fmtDot(n.date)}
                           <ChevronDown size={18} aria-hidden className="transition-transform duration-200" style={{ transform: on ? "rotate(180deg)" : undefined }} />
                         </span>
                       </button>
                     </h4>
-                    <div id={`pa-notice-${i}`} hidden={!on} className="pb-5 text-[16px] leading-[1.75]" style={{ color: "#e4dac4" }}>
+                    <div id={`pa-notice-${i}`} hidden={!on} className="pb-5 text-[16px] leading-[1.75]" style={{ color: C.body }}>
                       {n.body.map((b) => (
                         <p key={b}>{b}</p>
                       ))}
@@ -1516,5 +1213,22 @@ function VisitSection() {
         ))}
       </dl>
     </section>
+  );
+}
+
+/* 로고: 메인 사이트와 같은 곰 로고 + 곰파트너(크게) + 업종(작게) */
+function SampleLogo({ light, size = 20 }: { light?: boolean; size?: number }) {
+  const mark = size + 8;
+  return (
+    <span className="inline-flex items-center gap-2 leading-none" style={{ color: light ? "#fff" : "#111" }}>
+      {/* eslint-disable-next-line @next/next/no-img-element -- 메인 사이트와 같은 곰 로고 */}
+      <img src="/images/logo-bear.png" alt="" aria-hidden width={mark} height={mark} className="shrink-0" style={{ width: mark, height: mark }} />
+      <span className="flex items-baseline gap-1 whitespace-nowrap">
+        <span className="font-bold tracking-[-0.03em]" style={{ fontSize: size }}>
+          곰파트너
+        </span>
+        <span className="text-[12px] font-semibold opacity-75">피아노 학원 샘플</span>
+      </span>
+    </span>
   );
 }

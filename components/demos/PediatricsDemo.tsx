@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useMemo, useRef, useState } from "react";
-import { AnimatePresence, motion, useMotionTemplate, useScroll, useTransform, type MotionValue } from "framer-motion";
+import { AnimatePresence, motion, useScroll, useTransform } from "framer-motion";
 import {
   AlertCircle,
   Baby,
@@ -19,14 +19,14 @@ import {
   Syringe,
   Users,
 } from "lucide-react";
-import { Jua } from "@/lib/local-fonts";
 import { useReducedMotionSafe } from "@/hooks/useReducedMotionSafe";
 import { daysAgo, fmtDash, fmtDot, fmtKo, useDemoToday } from "@/hooks/useDemoToday";
 import { maskName, maskPhone } from "@/components/demos/LeadReceivedPanel";
 import { DemoMakerInfo } from "@/components/demos/DemoMakerInfo";
 
-/* 소아청소년과 홈페이지 샘플: 가상의 곰파트너소아청소년과의원.
-   병원명, 의료진, 주소, 전화번호, 진료비는 모두 가상이다. 의료법 광고 규칙에 맞춰 치료 효과, 후기, 할인 문구는 넣지 않는다.
+/* 소아청소년과 홈페이지 샘플: 가상의 소아청소년과 의원 곰파트너.
+   병원명, 의료진, 주소, 전화번호, 진료비는 모두 가상이다. 첫 화면 사진 출처: Pexels 사진 39192342
+   의료법 광고 규칙에 맞춰 치료 효과, 후기, 할인 문구는 넣지 않는다.
 
    국내 동네 소아청소년과 사이트 공통 구성(참고): 메뉴는 병원소개, 진료안내(진료시간, 의료진), 진료과목, 예방접종,
    영유아검진, 비급여 진료비 안내, 오시는 길. 첫 화면에는 진료시간(점심시간, 토요일, 야간진료 요일)과 모바일 접수,
@@ -40,30 +40,40 @@ import { DemoMakerInfo } from "@/components/demos/DemoMakerInfo";
    3. 영유아 건강검진 시기: 같은 생년월일로 1차~8차 검진 기간을 날짜로 바꿔 지금 받을 차수를 표시한다. 차수를 누르면 내용.
    4. 진료 시간표: 요일별 진료와 접수 마감, 오늘 요일과 야간진료 요일 강조.
 
-   포스터 첫 화면(pd-poster): 해바라기 노랑 바탕에 큰 문장 "지금 대기 3명이에요" 하나만 둔다. 숫자는 대기 인원 상태와 연결된다.
-   원목 블록(나뭇결, 모서리 하이라이트)이 하나씩 떨어져 탑으로 쌓이고 맨 위에 대기 숫자가 적힌 블록이 올라간다.
-   등장은 CSS 키프레임이라 스크립트 없이도 탑이 완성되어 보인다. 스크롤하면 블록마다 다른 방향으로 기울며 탑이 무너진다.
-   동작 줄이기면 쌓인 탑으로 고정하고 스크롤 무너짐도 없다. */
+   포스터 첫 화면(pd-poster): 청진기 진료 사진 한 장 위에 큰 문장 "지금 대기 3명이에요" 하나만 둔다. 숫자는 대기 인원 상태와 연결된다.
+   핵심 모션: 사진이 1.6초 동안 scale 1.06 -> 1 로 천천히 다가오고, 문장과 정보 줄은 0.3초 늦게 아래 12px 에서 올라온다
+   (CSS 키프레임이라 스크립트 없이도 끝 상태가 보인다). 스크롤하면 사진만 조금 느리게 움직인다(y 0 -> 8%).
+   본문은 흰색과 #f7f7f5 바탕, 강조색은 짙은 초록 하나. 동작 줄이기면 전부 정지 상태다. */
 
-const juaF = { fontFamily: `${Jua.style.fontFamily}, sans-serif` } as const;
-
-const BRAND = "곰파트너소아청소년과의원";
 const TEL = "02-000-0000";
 const ADDRESS = "서울 ㅇㅇ구 ㅇㅇ로 00, 3층";
 const KAKAO = "카카오톡 채널 곰파트너";
 
+/* 로고: 메인 사이트와 같은 곰 로고 + 곰파트너(크게) + 업종(작게) */
+function SampleLogo({ light, small }: { light?: boolean; small?: boolean }) {
+  return (
+    <span className="inline-flex items-center gap-2" style={{ color: light ? "#ffffff" : "#111111" }}>
+      {/* eslint-disable-next-line @next/next/no-img-element -- 메인 사이트와 같은 곰 로고 */}
+      <img src="/images/logo-bear.png" alt="" aria-hidden width={28} height={28} className={small ? "h-6 w-6 shrink-0" : "h-7 w-7 shrink-0"} />
+      <span className="flex items-baseline gap-1 whitespace-nowrap">
+        <span className={`${small ? "text-[18px]" : "text-[20px]"} font-bold tracking-[-0.03em]`}>곰파트너</span>
+        <span className="text-[12px] font-semibold opacity-75">소아청소년과 샘플</span>
+      </span>
+    </span>
+  );
+}
+const IMG = "/images/demo-pediatrics";
+
 const C = {
-  paper: "#fffbf0",
-  paperDeep: "#fdf1cf",
-  ink: "#1f2a22",
-  green: "#2d6a3e",
-  greenDeep: "#1f5a33",
-  greenTint: "#e3efe2",
-  sun: "#f6c33b",
-  sunSoft: "#fbe4a0",
-  wood: "#c8955a",
-  muted: "#5b6459",
-  line: "#e8dfc4",
+  paper: "#ffffff",
+  paperDeep: "#f7f7f5",
+  ink: "#111111",
+  body: "#4b4b4b",
+  green: "#2f5e46",
+  greenDeep: "#2f5e46",
+  greenTint: "#edf2ee",
+  muted: "#6b6b6b",
+  line: "#e5e5e5",
   error: "#b42318",
 };
 
@@ -71,12 +81,11 @@ const C = {
 const EASE = [0.22, 1, 0.36, 1] as const;
 /** 칩, 숫자, 표시 전환 */
 const DUR = 0.35;
-/** 블록 하나가 떨어지는 시간(ms). 착지 뒤 작게 한 번 튄다 */
-const DROP_MS = 620;
-/** 블록 사이 떨어지는 간격(ms). 6개라 마지막 착지는 약 1.6초 */
-const DROP_GAP_MS = 190;
-/** 포스터 스크롤 진행도 중 무너짐이 끝나는 지점 */
-const EXIT_END = 0.62;
+/** 첫 화면 사진이 scale 1.06 -> 1 로 다가오는 시간(ms) */
+const HERO_MS = 1600;
+/** 문장과 정보 줄이 아래 12px 에서 올라오는 시간과 지연(ms) */
+const RISE_MS = 700;
+const RISE_DELAY_MS = 300;
 /** 대기 인원이 바뀌는 간격(ms) */
 const WAIT_TICK_MS = 25000;
 /** 한 명 진료에 드는 평균 분 */
@@ -218,53 +227,6 @@ const DEPTS: { name: string; desc: string }[] = [
   { name: "성장 상담", desc: "키, 몸무게 측정과 성장 곡선" },
 ];
 
-/* ---------- 포스터 블록 ---------- */
-
-type Kind = "maple" | "walnut" | "green" | "number";
-interface BlockDef {
-  x: number;
-  y: number;
-  w: number;
-  h: number;
-  kind: Kind;
-  /** 무너질 때 [가로 이동, 세로 이동, 회전] */
-  fall: [number, number, number];
-}
-/** viewBox 600x860, 바닥은 y=800. 아래에서 위로 쌓는 순서 */
-const BLOCKS: BlockDef[] = [
-  { x: 96, y: 716, w: 352, h: 84, kind: "maple", fall: [-30, 40, -6] },
-  { x: 128, y: 590, w: 126, h: 126, kind: "green", fall: [-170, 150, -38] },
-  { x: 292, y: 590, w: 126, h: 126, kind: "walnut", fall: [150, 130, 30] },
-  { x: 470, y: 736, w: 64, h: 64, kind: "maple", fall: [70, 20, 24] },
-  { x: 150, y: 516, w: 268, h: 74, kind: "maple", fall: [-60, 250, -52] },
-  { x: 210, y: 366, w: 150, h: 150, kind: "number", fall: [190, 380, 78] },
-];
-/** 블록 옆면과 윗면 깊이 */
-const DX = 24;
-const DY = -18;
-
-const FACE: Record<Exclude<Kind, "number">, [string, string, string]> = {
-  maple: ["url(#pd-maple-front)", "url(#pd-maple-top)", "url(#pd-maple-side)"],
-  walnut: ["url(#pd-walnut-front)", "url(#pd-walnut-top)", "url(#pd-walnut-side)"],
-  green: ["url(#pd-green-front)", "url(#pd-green-top)", "url(#pd-green-side)"],
-};
-
-/** 앞면 나뭇결. 블록 크기에 맞춰 늘린다 */
-const grain = (w: number, h: number) => [
-  `M0 ${h * 0.22} C${w * 0.3} ${h * 0.14} ${w * 0.62} ${h * 0.32} ${w} ${h * 0.24}`,
-  `M0 ${h * 0.46} C${w * 0.22} ${h * 0.4} ${w * 0.5} ${h * 0.56} ${w} ${h * 0.47}`,
-  `M0 ${h * 0.7} C${w * 0.34} ${h * 0.62} ${w * 0.66} ${h * 0.8} ${w} ${h * 0.72}`,
-  `M${w * 0.06} ${h * 0.9} C${w * 0.4} ${h * 0.86} ${w * 0.7} ${h * 0.96} ${w * 0.94} ${h * 0.9}`,
-];
-
-const P = {
-  bg: "#f6c33b",
-  bgDeep: "#eeb21c",
-  ink: "#22301f",
-  green: "#1f5a33",
-  sub: "#3d4a33",
-};
-
 export function PediatricsDemo() {
   const today = useDemoToday();
   const reduce = useReducedMotionSafe();
@@ -322,9 +284,8 @@ export function PediatricsDemo() {
       <Poster reduce={reduce} wait={wait} lastCall={lastCall} onCta={() => go("pd-queue")} />
 
       <header className="mx-auto flex max-w-[1200px] flex-wrap items-center justify-between gap-x-4 gap-y-2 px-4 py-4 md:px-6">
-        <h2 className="inline-flex items-center gap-2 text-[22px] leading-none" style={juaF}>
-          <BlockMark size={26} />
-          {BRAND}
+        <h2 className="leading-none">
+          <SampleLogo />
         </h2>
         <nav aria-label="주요 메뉴" className="-mx-2 flex flex-wrap items-center">
           {[
@@ -356,7 +317,7 @@ export function PediatricsDemo() {
         <SectionTitle id="pd-dept-title" icon={<Stethoscope size={22} aria-hidden />} title="진료과목" />
         <ul className="mt-6 grid gap-x-6 gap-y-4 sm:grid-cols-2 lg:grid-cols-5">
           {DEPTS.map((d) => (
-            <li key={d.name} className="border-t-[3px] pt-3" style={{ borderColor: C.green }}>
+            <li key={d.name} className="border-t pt-3" style={{ borderColor: C.line }}>
               <p className="text-[17px] font-bold">{d.name}</p>
               <p className="mt-1 text-[15px]" style={{ color: C.muted }}>
                 {d.desc}
@@ -458,11 +419,10 @@ export function PediatricsDemo() {
         </div>
       </section>
 
-      <footer className="mt-20 px-4 py-10 md:px-6" style={{ background: C.greenDeep, color: "#f3f1e4" }}>
+      <footer className="mt-20 border-t px-4 py-10 md:px-6" style={{ background: C.paperDeep, borderColor: C.line, color: C.body }}>
         <div className="mx-auto max-w-[1200px]">
-          <p className="inline-flex items-center gap-2 text-[19px]" style={juaF}>
-            <BlockMark size={22} />
-            {BRAND}
+          <p>
+            <SampleLogo />
           </p>
           <p className="mt-2 text-[15px] leading-[1.7]">
             {ADDRESS}, 전화 {TEL}
@@ -480,223 +440,83 @@ export function PediatricsDemo() {
 
 function SectionTitle({ id, icon, title }: { id: string; icon: React.ReactNode; title: string }) {
   return (
-    <h2 id={id} className="inline-flex items-center gap-2.5 text-[26px] leading-tight md:text-[30px]" style={{ ...juaF, color: C.ink }}>
+    <h2 id={id} className="inline-flex items-center gap-2.5 text-[26px] font-bold leading-tight md:text-[30px]" style={{ color: C.ink, letterSpacing: "-0.02em" }}>
       <span style={{ color: C.green }}>{icon}</span>
       {title}
     </h2>
   );
 }
 
-/** 작은 원목 블록 로고 */
-function BlockMark({ size }: { size: number }) {
-  return (
-    <svg width={size} height={size} viewBox="0 0 32 32" aria-hidden>
-      <path d="M6 12 L12 6 L28 6 L22 12 Z" fill="#f3d39a" />
-      <path d="M22 12 L28 6 L28 22 L22 28 Z" fill="#a8703c" />
-      <rect x="6" y="12" width="16" height="16" rx="1.5" fill="#d9a865" />
-      <rect x="9" y="15" width="10" height="10" rx="1" fill="none" stroke={C.green} strokeWidth="2" />
-    </svg>
-  );
-}
-
 /* ---------- 포스터 ---------- */
+
+const HERO_CSS = `
+@keyframes pd-rise {
+  from { opacity: 0; transform: translateY(12px); }
+  to { opacity: 1; transform: none; }
+}
+.pd-rise { animation: pd-rise ${RISE_MS}ms cubic-bezier(0.22, 1, 0.36, 1) ${RISE_DELAY_MS}ms both; }
+@media (prefers-reduced-motion: reduce) {
+  .pd-rise { animation: none; }
+}
+`;
 
 function Poster({ reduce, wait, lastCall, onCta }: { reduce: boolean; wait: number; lastCall: number | null; onCta: () => void }) {
   const ref = useRef<HTMLElement>(null);
-  const { scrollYProgress } = useScroll({ target: ref, offset: ["start start", "end start"] });
-  const p = useTransform(scrollYProgress, (v) => (reduce ? 0 : Math.min(1, v / EXIT_END)));
-  const textY = useTransform(p, (v) => `${-v * 40}svh`);
-  const textO = useTransform(p, (v) => Math.max(0, 1 - Math.max(0, v - 0.3) / 0.6));
-  // 무너질수록 바닥 그림자가 옆으로 퍼진다
-  const shadowSx = useTransform(p, (v) => 1 + v * 0.6);
-  const shadowO = useTransform(p, (v) => 1 - v * 0.5);
-  const shadowT = useMotionTemplate`scale(${shadowSx}, 1)`;
+  const { scrollYProgress: p } = useScroll({ target: ref, offset: ["start start", "end start"] });
+  const photoY = useTransform(p, (v) => `${(v * 8).toFixed(2)}%`);
 
   return (
-    <section id="pd-poster" ref={ref} aria-labelledby="pd-poster-title" className="relative" style={{ height: reduce ? undefined : "180svh", background: P.bg }}>
-      <style>{`
-        @keyframes pd-drop {
-          0% { transform: translateY(-1000px); animation-timing-function: cubic-bezier(0.55, 0, 1, 0.45); }
-          62% { transform: translateY(0); animation-timing-function: cubic-bezier(0.22, 1, 0.36, 1); }
-          80% { transform: translateY(-16px); animation-timing-function: cubic-bezier(0.55, 0, 1, 0.45); }
-          100% { transform: translateY(0); }
-        }
-        .pd-drop { animation: pd-drop ${DROP_MS}ms both; }
-        .pd-still .pd-drop { animation: none; }
-        @media (prefers-reduced-motion: reduce) { .pd-drop { animation: none; } }
-      `}</style>
-      <div
-        className={`${reduce ? "pd-still relative min-h-svh" : "sticky top-0 h-svh"} overflow-hidden`}
-        style={{ background: `radial-gradient(110% 80% at 72% 96%, #fbd664 0%, ${P.bg} 50%, ${P.bgDeep} 100%)`, color: P.ink }}
+    <section id="pd-poster" ref={ref} aria-labelledby="pd-poster-title" className="relative min-h-[100svh] overflow-hidden" style={{ background: "#2b2b2b" }}>
+      <style>{HERO_CSS}</style>
+      <motion.div
+        className="absolute inset-0"
+        initial={reduce ? false : { scale: 1.06 }}
+        animate={{ scale: 1 }}
+        transition={{ duration: reduce ? 0 : HERO_MS / 1000, ease: EASE }}
+        style={reduce ? undefined : { y: photoY }}
       >
-        {/* 블록 탑 */}
-        <div className="pointer-events-none absolute inset-x-0 bottom-0 flex h-[52svh] items-end justify-center md:inset-y-0 md:left-auto md:right-[2vw] md:h-full md:pb-[3svh]">
-          <svg viewBox="50 290 560 560" className="h-auto w-full max-w-[440px] overflow-visible md:h-[86svh] md:w-auto md:max-w-none" role="img" aria-label={`원목 블록이 탑으로 쌓이고 맨 위에 숫자 ${wait}이 적힌 블록이 올라간 그림`}>
-            <BlockDefs />
-            <motion.ellipse cx="300" cy="812" rx="260" ry="26" fill="url(#pd-floor)" style={{ opacity: shadowO, transform: shadowT, transformBox: "fill-box", transformOrigin: "50% 50%" }} />
-            {BLOCKS.map((b, i) => (
-              <WoodBlock key={i} b={b} i={i} p={p} wait={wait} reduce={reduce} />
-            ))}
-          </svg>
-        </div>
+        {/* eslint-disable-next-line @next/next/no-img-element -- 정적 export 라 next/image 최적화를 쓰지 않는다 */}
+        <img
+          src={`${IMG}/hero.jpg`}
+          srcSet={`${IMG}/hero-sm.jpg 960w, ${IMG}/hero.jpg 1920w`}
+          sizes="100vw"
+          alt="의사가 청진기로 아이의 가슴 소리를 듣는 모습"
+          fetchPriority="high"
+          className="absolute inset-0 h-full w-full object-cover"
+          style={{ objectPosition: "62% 40%" }}
+        />
+      </motion.div>
+      {/* 글자 대비용 막. 피부가 밝아서 아래와 왼쪽을 진하게 덮는다 */}
+      <div aria-hidden className="absolute inset-0" style={{ background: "linear-gradient(to top, rgba(0,0,0,0.72), rgba(0,0,0,0.3) 55%, rgba(0,0,0,0.12)), linear-gradient(to right, rgba(0,0,0,0.35), rgba(0,0,0,0) 60%)" }} />
 
-        {/* 로고와 핵심 행동 하나 */}
-        <motion.div className="absolute inset-x-0 top-0 z-10 flex items-center justify-between px-4 pt-4 md:px-12 md:pt-7" style={{ y: textY }}>
-          <p className="inline-flex items-center gap-2 text-[17px] leading-none" style={juaF}>
-            <BlockMark size={20} />
-            {BRAND}
+      <div className="relative mx-auto flex min-h-[100svh] max-w-[1200px] flex-col px-4 md:px-6">
+        <div className="flex items-center justify-between gap-3 py-4">
+          <p className="leading-none">
+            <SampleLogo light small />
           </p>
           <button
             type="button"
             onClick={onCta}
-            aria-label="진료 접수"
-            title="진료 접수"
             data-gtm-cta="pediatrics_poster_cta"
-            className={`inline-flex h-12 w-12 items-center justify-center rounded-full ${focusRing}`}
-            style={{ background: P.green, color: "#fff7dc", outlineColor: P.ink }}
+            className={`flex-none rounded-[6px] px-4 py-2 text-[15px] font-semibold ${focusRing}`}
+            style={{ background: C.green, color: "#ffffff", outlineColor: "#ffffff" }}
           >
-            <ClipboardCheck size={22} aria-hidden />
+            진료 접수
           </button>
-        </motion.div>
+        </div>
 
-        {/* 큰 문장 */}
-        <motion.div className="relative z-[1] flex h-full flex-col px-4 pt-[14svh] md:justify-center md:px-12 md:pb-[8svh] md:pt-0" style={{ y: textY, opacity: textO }}>
-          <h1 id="pd-poster-title" className="text-[clamp(56px,16.5vw,72px)] leading-[1.12] tracking-[-0.02em] md:text-[clamp(88px,9.6vw,176px)] md:leading-[1.06]" style={{ ...juaF, wordBreak: "keep-all" }}>
-            <span className="block">지금 대기</span>
-            <span className="block">
-              <span className="relative inline-block tabular-nums" style={{ color: P.green }}>
-                <AnimatePresence mode="popLayout" initial={false}>
-                  <motion.span
-                    key={wait}
-                    className="inline-block"
-                    initial={reduce ? false : { y: "-0.6em", opacity: 0 }}
-                    animate={{ y: 0, opacity: 1 }}
-                    exit={reduce ? { opacity: 0, transition: { duration: 0 } } : { y: "0.6em", opacity: 0 }}
-                    transition={{ duration: reduce ? 0 : DUR, ease: EASE }}
-                  >
-                    {wait}
-                  </motion.span>
-                </AnimatePresence>
-              </span>
-              명이에요
-            </span>
+        <div className={`mt-auto pb-[10svh] ${reduce ? "" : "pd-rise"}`}>
+          <h1 id="pd-poster-title" className="text-[36px] font-bold md:text-[clamp(40px,5vw,72px)]" style={{ color: "#ffffff", letterSpacing: "-0.03em", lineHeight: 1.2, wordBreak: "keep-all" }}>
+            지금 대기
+            <br />
+            <span className="tabular-nums">{wait}</span>명이에요
           </h1>
-          <p className="mt-5 text-[16px] md:mt-8 md:text-[19px]" style={{ color: P.sub }}>
+          <p className="mt-4 text-[15px] md:text-[17px]" style={{ color: "rgba(255,255,255,0.86)", lineHeight: 1.5 }}>
             {lastCall !== null ? `오늘 접수 마감 ${hm(lastCall)}` : "일요일, 공휴일 휴진"}
           </p>
-        </motion.div>
+        </div>
       </div>
     </section>
-  );
-}
-
-function BlockDefs() {
-  return (
-    <defs>
-      <linearGradient id="pd-maple-front" x1="0" y1="0" x2="1" y2="1">
-        <stop offset="0" stopColor="#f2d29c" />
-        <stop offset="0.55" stopColor="#deb072" />
-        <stop offset="1" stopColor="#c58f55" />
-      </linearGradient>
-      <linearGradient id="pd-maple-top" x1="0" y1="1" x2="1" y2="0">
-        <stop offset="0" stopColor="#f6dcab" />
-        <stop offset="1" stopColor="#fbecc8" />
-      </linearGradient>
-      <linearGradient id="pd-maple-side" x1="0" y1="0" x2="0" y2="1">
-        <stop offset="0" stopColor="#b47c45" />
-        <stop offset="1" stopColor="#8c5a2e" />
-      </linearGradient>
-      <linearGradient id="pd-walnut-front" x1="0" y1="0" x2="1" y2="1">
-        <stop offset="0" stopColor="#a8703f" />
-        <stop offset="0.6" stopColor="#8a562c" />
-        <stop offset="1" stopColor="#6c4120" />
-      </linearGradient>
-      <linearGradient id="pd-walnut-top" x1="0" y1="1" x2="1" y2="0">
-        <stop offset="0" stopColor="#bd8550" />
-        <stop offset="1" stopColor="#d29c66" />
-      </linearGradient>
-      <linearGradient id="pd-walnut-side" x1="0" y1="0" x2="0" y2="1">
-        <stop offset="0" stopColor="#5e3819" />
-        <stop offset="1" stopColor="#452812" />
-      </linearGradient>
-      <linearGradient id="pd-green-front" x1="0" y1="0" x2="1" y2="1">
-        <stop offset="0" stopColor="#4c9a60" />
-        <stop offset="0.6" stopColor="#2f7043" />
-        <stop offset="1" stopColor="#225a33" />
-      </linearGradient>
-      <linearGradient id="pd-green-top" x1="0" y1="1" x2="1" y2="0">
-        <stop offset="0" stopColor="#62ad74" />
-        <stop offset="1" stopColor="#80c18e" />
-      </linearGradient>
-      <linearGradient id="pd-green-side" x1="0" y1="0" x2="0" y2="1">
-        <stop offset="0" stopColor="#1f5130" />
-        <stop offset="1" stopColor="#163d23" />
-      </linearGradient>
-      <radialGradient id="pd-floor" cx="0.5" cy="0.5" r="0.5">
-        <stop offset="0" stopColor="#5a3d07" stopOpacity="0.42" />
-        <stop offset="1" stopColor="#5a3d07" stopOpacity="0" />
-      </radialGradient>
-      {/* 앞면 위쪽으로 빛이 닿는 느낌 */}
-      <linearGradient id="pd-sheen" x1="0" y1="0" x2="0" y2="1">
-        <stop offset="0" stopColor="#fff8e6" stopOpacity="0.38" />
-        <stop offset="0.35" stopColor="#fff8e6" stopOpacity="0" />
-        <stop offset="1" stopColor="#3a2208" stopOpacity="0.14" />
-      </linearGradient>
-    </defs>
-  );
-}
-
-const ease2 = (v: number) => v * v;
-
-function WoodBlock({ b, i, p, wait, reduce }: { b: BlockDef; i: number; p: MotionValue<number>; wait: number; reduce: boolean }) {
-  const x = useTransform(p, (v) => b.fall[0] * ease2(v));
-  const y = useTransform(p, (v) => b.fall[1] * ease2(v));
-  const rotate = useTransform(p, (v) => b.fall[2] * ease2(v));
-  const faces = b.kind === "number" ? FACE.maple : FACE[b.kind];
-  const lines = grain(b.w, b.h);
-  const grainColor = b.kind === "green" ? "rgba(10,40,20,0.22)" : b.kind === "walnut" ? "rgba(40,20,6,0.35)" : "rgba(130,80,30,0.3)";
-  return (
-    <motion.g style={{ x, y, rotate, transformBox: "fill-box", transformOrigin: "50% 100%" }}>
-      <g className="pd-drop" style={{ animationDelay: `${i * DROP_GAP_MS}ms` }}>
-        <g transform={`translate(${b.x} ${b.y})`}>
-          {/* 윗면, 옆면, 앞면 */}
-          <path d={`M0 0 L${DX} ${DY} L${b.w + DX} ${DY} L${b.w} 0 Z`} fill={faces[1]} />
-          <path d={`M${b.w} 0 L${b.w + DX} ${DY} L${b.w + DX} ${b.h + DY} L${b.w} ${b.h} Z`} fill={faces[2]} />
-          <rect width={b.w} height={b.h} rx="3" fill={faces[0]} />
-          {lines.map((d) => (
-            <path key={d} d={d} fill="none" stroke={grainColor} strokeWidth="1.6" strokeLinecap="round" />
-          ))}
-          {b.kind !== "green" && b.w > 200 && <ellipse cx={b.w * 0.72} cy={b.h * 0.5} rx="9" ry="4" fill="none" stroke={grainColor} strokeWidth="1.6" />}
-          <rect width={b.w} height={b.h} rx="3" fill="url(#pd-sheen)" />
-          {/* 모서리 하이라이트 */}
-          <path d={`M2 1.2 L${b.w - 2} 1.2`} stroke="rgba(255,250,236,0.9)" strokeWidth="2.4" strokeLinecap="round" />
-          <path d={`M1.2 3 L1.2 ${b.h - 4}`} stroke="rgba(255,250,236,0.4)" strokeWidth="1.6" strokeLinecap="round" />
-          <path d={`M${b.w + 1} 1 L${b.w + DX - 1} ${DY + 1}`} stroke="rgba(255,250,236,0.55)" strokeWidth="1.6" strokeLinecap="round" />
-          {b.kind === "number" && (
-            <>
-              <rect x="14" y="14" width={b.w - 28} height={b.h - 28} rx="10" fill="none" stroke={P.green} strokeWidth="7" />
-              <AnimatePresence mode="popLayout" initial={false}>
-                <motion.text
-                  key={wait}
-                  x={b.w / 2}
-                  y={b.h / 2 + 34}
-                  textAnchor="middle"
-                  fontSize="98"
-                  fill={P.green}
-                  style={juaF}
-                  initial={reduce ? false : { opacity: 0, y: -24 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  exit={reduce ? { opacity: 0, transition: { duration: 0 } } : { opacity: 0, y: 24 }}
-                  transition={{ duration: reduce ? 0 : DUR, ease: EASE }}
-                >
-                  {wait}
-                </motion.text>
-              </AnimatePresence>
-            </>
-          )}
-        </g>
-      </g>
-    </motion.g>
   );
 }
 
@@ -762,13 +582,13 @@ function QueuePanel({
   const input = `w-full rounded-[6px] border px-3 py-2.5 text-[16px] ${focusRing}`;
 
   return (
-    <section id="pd-queue" aria-labelledby="pd-queue-title" className="scroll-mt-4 rounded-[10px] p-5 md:p-7" style={{ background: C.sun, color: C.ink }}>
+    <section id="pd-queue" aria-labelledby="pd-queue-title" className="scroll-mt-4 rounded-[8px] border p-5 md:p-7" style={{ background: C.paperDeep, borderColor: C.line, color: C.ink }}>
       <div className="flex flex-wrap items-start justify-between gap-3">
-        <h2 id="pd-queue-title" className="inline-flex items-center gap-2 text-[24px]" style={juaF}>
+        <h2 id="pd-queue-title" className="inline-flex items-center gap-2 text-[24px] font-bold">
           <Users size={22} aria-hidden />
           실시간 대기
         </h2>
-        <span className="inline-flex items-center gap-1.5 rounded-full px-3 py-1 text-[14px] font-bold" style={{ background: C.ink, color: C.sun }}>
+        <span className="inline-flex items-center gap-1.5 rounded-[4px] px-3 py-1 text-[14px] font-bold" style={{ background: C.ink, color: "#ffffff" }}>
           <Clock size={15} aria-hidden />
           {status}
         </span>
@@ -777,10 +597,10 @@ function QueuePanel({
       <div className="mt-4 flex flex-wrap items-end gap-x-6 gap-y-3" aria-live="polite">
         <p className="leading-none">
           <span className="text-[15px] font-bold">진료 대기</span>
-          <span className="ml-2 text-[64px] tabular-nums md:text-[76px]" style={{ ...juaF, color: C.greenDeep }}>
+          <span className="ml-2 text-[56px] font-bold tabular-nums md:text-[68px]" style={{ color: C.ink, letterSpacing: "-0.03em" }}>
             {wait}
           </span>
-          <span className="ml-1 text-[22px]" style={juaF}>
+          <span className="ml-1 text-[22px] font-bold">
             명
           </span>
         </p>
@@ -813,9 +633,9 @@ function QueuePanel({
                 transition={{ duration: reduce ? 0 : DUR, ease: EASE }}
                 className="inline-flex h-10 min-w-10 items-center justify-center rounded-[4px] px-2 text-[13px] font-bold"
                 style={{
-                  background: isMine ? C.greenDeep : "linear-gradient(135deg, #f2d29c, #c58f55)",
-                  color: isMine ? "#fff" : "#5a3a17",
-                  boxShadow: "inset 0 2px 0 rgba(255,250,236,0.7), inset -3px -3px 0 rgba(90,58,23,0.18)",
+                  background: isMine ? C.green : C.paper,
+                  border: `1px solid ${isMine ? C.green : C.line}`,
+                  color: isMine ? "#fff" : C.body,
                 }}
               >
                 {isMine ? "내 차례" : k + 1}
@@ -825,7 +645,7 @@ function QueuePanel({
         </AnimatePresence>
       </ol>
 
-      <div className="mt-3 flex flex-wrap items-center gap-x-3 gap-y-1 text-[14px]" style={{ color: "#3d3a22" }}>
+      <div className="mt-3 flex flex-wrap items-center gap-x-3 gap-y-1 text-[14px]" style={{ color: C.body }}>
         <span>{updated !== null ? `${hm(updated)} 기준` : "불러오는 중"}</span>
         <button type="button" onClick={onRefresh} className={`inline-flex items-center gap-1 rounded-[4px] px-1.5 py-1 font-bold underline underline-offset-4 ${focusRing}`} style={{ outlineColor: C.ink }}>
           <RotateCw size={14} aria-hidden />
@@ -842,7 +662,7 @@ function QueuePanel({
             exit={{ opacity: 0, transition: { duration: reduce ? 0 : 0.15 } }}
             transition={{ duration: reduce ? 0 : DUR, ease: EASE }}
             className="mt-5 rounded-[8px] p-4 md:p-5"
-            style={{ background: "#fffaf0" }}
+            style={{ background: C.paper, border: `1px solid ${C.line}` }}
             role="status"
           >
             <p className="inline-flex items-center gap-2 text-[18px] font-bold" style={{ color: C.greenDeep }}>
@@ -883,7 +703,7 @@ function QueuePanel({
             exit={{ opacity: 0, transition: { duration: reduce ? 0 : 0.15 } }}
             transition={{ duration: reduce ? 0 : DUR, ease: EASE }}
             className="mt-5 grid gap-3 rounded-[8px] p-4 md:p-5"
-            style={{ background: "#fffaf0" }}
+            style={{ background: C.paper, border: `1px solid ${C.line}` }}
           >
             <fieldset>
               <legend className="mb-2 text-[15px] font-bold">진료 구분</legend>
@@ -892,7 +712,7 @@ function QueuePanel({
                   <label key={t} className="cursor-pointer">
                     <input type="radio" name="pd-type" value={t} checked={type === t} onChange={() => setType(t)} className="peer sr-only" />
                     <span
-                      className="inline-flex items-center gap-1 rounded-full border px-3 py-1.5 text-[15px] peer-focus-visible:outline peer-focus-visible:outline-[3px] peer-focus-visible:outline-offset-2"
+                      className="inline-flex items-center gap-1 rounded-[6px] border px-3 py-1.5 text-[15px] peer-focus-visible:outline peer-focus-visible:outline-[3px] peer-focus-visible:outline-offset-2"
                       style={{ borderColor: type === t ? C.greenDeep : C.line, background: type === t ? C.greenDeep : "#fff", color: type === t ? "#fff" : C.ink, outlineColor: C.green }}
                     >
                       {type === t && <Check size={14} aria-hidden />}
@@ -953,8 +773,8 @@ function HoursPanel({ today, nowMin }: { today: Date; nowMin: number }) {
   const dow = today.getDay();
   const order = [1, 2, 3, 4, 5, 6, 0];
   return (
-    <section id="pd-hours" aria-labelledby="pd-hours-title" className="scroll-mt-4 rounded-[10px] border p-5 md:p-7" style={{ borderColor: C.line, background: "#fff" }}>
-      <h2 id="pd-hours-title" className="inline-flex items-center gap-2 text-[24px]" style={juaF}>
+    <section id="pd-hours" aria-labelledby="pd-hours-title" className="scroll-mt-4 rounded-[8px] border p-5 md:p-7" style={{ borderColor: C.line, background: "#fff" }}>
+      <h2 id="pd-hours-title" className="inline-flex items-center gap-2 text-[24px] font-bold">
         <Clock size={22} aria-hidden style={{ color: C.green }} />
         진료시간
       </h2>
@@ -979,10 +799,10 @@ function HoursPanel({ today, nowMin }: { today: Date; nowMin: number }) {
             const isToday = d === dow;
             const closed = h.open === undefined || h.close === undefined;
             return (
-              <tr key={d} className="border-t" style={{ borderColor: C.line, background: isToday ? C.sunSoft : undefined, fontWeight: isToday ? 700 : 400 }}>
+              <tr key={d} className="border-t" style={{ borderColor: C.line, background: isToday ? C.greenTint : undefined, fontWeight: isToday ? 700 : 400 }}>
                 <th scope="row" className="py-2.5 pl-2 pr-2 text-left">
                   {h.label}
-                  {isToday && <span className="ml-1.5 rounded-[3px] px-1.5 py-0.5 text-[12px]" style={{ background: C.ink, color: C.sun }}>오늘</span>}
+                  {isToday && <span className="ml-1.5 rounded-[3px] px-1.5 py-0.5 text-[12px]" style={{ background: C.green, color: "#ffffff" }}>오늘</span>}
                 </th>
                 <td className="py-2.5 pr-2">
                   {closed ? (
@@ -1054,7 +874,7 @@ function VaccineSection({ reduce, today, birthInput, setBirth }: { reduce: boole
             />
           </label>
 
-          <div className="mt-5 rounded-[10px] p-5 md:p-6" style={{ background: C.greenDeep, color: "#fff8e6" }} aria-live="polite">
+          <div className="mt-5 rounded-[8px] border p-5 md:p-6" style={{ background: C.paperDeep, borderColor: C.line, color: C.ink }} aria-live="polite">
             {error ? (
               <p className="inline-flex items-center gap-2 text-[16px]">
                 <AlertCircle size={18} aria-hidden />
@@ -1062,7 +882,7 @@ function VaccineSection({ reduce, today, birthInput, setBirth }: { reduce: boole
               </p>
             ) : next ? (
               <>
-                <p className="text-[15px]" style={{ color: "#d7e8d6" }}>
+                <p className="text-[15px]" style={{ color: C.muted }}>
                   다음 접종
                 </p>
                 <AnimatePresence mode="wait" initial={false}>
@@ -1073,7 +893,7 @@ function VaccineSection({ reduce, today, birthInput, setBirth }: { reduce: boole
                     exit={{ opacity: 0, x: reduce ? 0 : -16, transition: { duration: reduce ? 0 : 0.15 } }}
                     transition={{ duration: reduce ? 0 : DUR, ease: EASE }}
                   >
-                    <p className="mt-1 text-[28px] leading-tight md:text-[32px]" style={juaF}>
+                    <p className="mt-1 text-[26px] font-bold leading-tight md:text-[30px]" style={{ letterSpacing: "-0.02em" }}>
                       {next.v.items.join(", ")}
                     </p>
                     <p className="mt-3 flex flex-wrap items-center gap-x-3 gap-y-1 text-[17px]">
@@ -1081,11 +901,11 @@ function VaccineSection({ reduce, today, birthInput, setBirth }: { reduce: boole
                         <CalendarDays size={18} aria-hidden />
                         {next.v.days === 28 ? `${fmtKo(next.date)}까지` : `${fmtKo(next.date)}부터`}
                       </span>
-                      <span className="rounded-[4px] px-2 py-0.5 text-[15px] font-bold" style={{ background: C.sun, color: C.ink }}>
+                      <span className="rounded-[4px] px-2 py-0.5 text-[15px] font-bold" style={{ background: C.green, color: "#ffffff" }}>
                         {dleft === 0 ? "오늘" : `D-${dleft}`}
                       </span>
                     </p>
-                    <p className="mt-2 text-[15px]" style={{ color: "#d7e8d6" }}>
+                    <p className="mt-2 text-[15px]" style={{ color: C.muted }}>
                       {next.v.label}
                     </p>
                   </motion.div>
@@ -1110,9 +930,9 @@ function VaccineSection({ reduce, today, birthInput, setBirth }: { reduce: boole
                   <span className="relative flex justify-center pt-1" aria-hidden>
                     <span className="absolute bottom-[-16px] top-6 w-[2px]" style={{ background: C.line }} />
                     {state === "다음" ? (
-                      <motion.span layoutId={reduce ? undefined : "pd-next-mark"} className="relative h-5 w-5 rounded-[3px]" style={{ background: C.sun, boxShadow: `inset 0 2px 0 rgba(255,250,236,0.8), 0 0 0 3px ${C.greenDeep}` }} />
+                      <motion.span layoutId={reduce ? undefined : "pd-next-mark"} className="relative h-5 w-5 rounded-[3px]" style={{ background: C.green }} />
                     ) : (
-                      <span className="relative h-4 w-4 rounded-[3px]" style={{ background: state === "지남" ? C.line : "linear-gradient(135deg, #f2d29c, #c58f55)" }} />
+                      <span className="relative h-4 w-4 rounded-[3px]" style={{ background: state === "지남" ? C.line : C.paper, border: `1px solid ${state === "지남" ? C.line : "#bdbdbd"}` }} />
                     )}
                   </span>
                   <div style={{ opacity: state === "지남" ? 0.62 : 1 }}>
@@ -1181,9 +1001,10 @@ function CheckupSection({ reduce, today, birthInput }: { reduce: boolean; today:
               className={`relative flex h-[92px] flex-col justify-end rounded-[6px] px-2 pb-2 pt-3 text-left md:h-[var(--pd-h)] ${focusRing}`}
               style={{
                 ["--pd-h" as string]: `${84 + i * 9}px`,
-                background: isNow || isNext ? C.sun : past ? "#efe8d6" : "linear-gradient(135deg, #f2d29c, #d4a165)",
+                background: isNow || isNext ? C.greenTint : past ? C.paperDeep : C.paper,
+                border: `1px solid ${active ? C.green : C.line}`,
                 color: C.ink,
-                boxShadow: active ? `0 0 0 3px ${C.greenDeep}` : "inset 0 2px 0 rgba(255,250,236,0.75), inset -4px -4px 0 rgba(90,58,23,0.14)",
+                boxShadow: active ? `inset 0 0 0 1px ${C.green}` : "none",
                 outlineColor: C.green,
               }}
             >
@@ -1192,7 +1013,7 @@ function CheckupSection({ reduce, today, birthInput }: { reduce: boolean; today:
                   {isNow ? "지금" : "다음"}
                 </span>
               )}
-              <span className="text-[22px] leading-none" style={juaF}>
+              <span className="text-[20px] font-bold leading-none">
                 {k.n}차
               </span>
               <span className="mt-1 text-[12px] leading-tight md:text-[13px]">{k.unit === "day" ? `${k.range[0]}~${k.range[1]}일` : `${k.range[0]}~${k.range[1]}개월`}</span>
@@ -1210,11 +1031,11 @@ function CheckupSection({ reduce, today, birthInput }: { reduce: boolean; today:
           animate={{ opacity: 1, y: 0 }}
           exit={{ opacity: 0, transition: { duration: reduce ? 0 : 0.12 } }}
           transition={{ duration: reduce ? 0 : DUR, ease: EASE }}
-          className="mt-5 grid gap-4 rounded-[10px] border p-5 md:grid-cols-[minmax(0,1fr)_minmax(0,1.4fr)] md:p-6"
+          className="mt-5 grid gap-4 rounded-[8px] border p-5 md:grid-cols-[minmax(0,1fr)_minmax(0,1.4fr)] md:p-6"
           style={{ borderColor: C.line, background: "#fff" }}
         >
           <div>
-            <p className="text-[24px]" style={juaF}>
+            <p className="text-[22px] font-bold">
               {c.n}차 검진
             </p>
             <p className="mt-1 text-[15px]" style={{ color: C.muted }}>
@@ -1260,12 +1081,12 @@ function CheckupSection({ reduce, today, birthInput }: { reduce: boolean; today:
 
 function MiniMap() {
   return (
-    <svg viewBox="0 0 320 220" className="h-auto w-full rounded-[8px]" role="img" aria-label="ㅇㅇ역 2번 출구에서 도보 5분, 큰길 모퉁이 건물 3층 약도" style={{ background: "#f4eedc" }}>
+    <svg viewBox="0 0 320 220" className="h-auto w-full rounded-[8px]" role="img" aria-label="ㅇㅇ역 2번 출구에서 도보 5분, 큰길 모퉁이 건물 3층 약도" style={{ background: "#f3f3f1" }}>
       <rect x="0" y="92" width="320" height="34" fill="#fff" />
       <rect x="196" y="0" width="30" height="220" fill="#fff" />
       <path d="M0 109 H320 M211 0 V220" stroke={C.line} strokeWidth="2" strokeDasharray="8 8" />
-      <rect x="236" y="34" width="62" height="48" rx="4" fill={C.sun} stroke={C.ink} strokeWidth="2" />
-      <text x="267" y="63" textAnchor="middle" fontSize="13" fontWeight="700" fill={C.ink}>
+      <rect x="236" y="34" width="62" height="48" rx="4" fill={C.green} />
+      <text x="267" y="63" textAnchor="middle" fontSize="13" fontWeight="700" fill="#ffffff">
         3층
       </text>
       <rect x="40" y="136" width="58" height="34" rx="4" fill={C.greenDeep} />

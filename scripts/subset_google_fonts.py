@@ -88,7 +88,7 @@ def user_chars(marker: str) -> set[str]:
             if dep:
                 stack.append(dep)
     if not users:
-        sys.exit(f"{marker} 를 쓰는 파일을 찾지 못했습니다.")
+        print(f"{marker} 를 쓰는 파일이 없어 기본 글자만 담습니다.")
     return chars
 
 

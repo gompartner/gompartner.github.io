@@ -3,13 +3,12 @@
 import { useEffect, useId, useRef, useState, useSyncExternalStore, type CSSProperties } from "react";
 import { AnimatePresence, motion, useInView, useScroll, useTransform } from "framer-motion";
 import { BookOpen, CalendarCheck, Check, Clock, FileText, MessageCircle, MessagesSquare, PenLine, RotateCcw, Wallet } from "lucide-react";
-import { Gowun_Batang, Nanum_Pen_Script } from "@/lib/local-fonts";
 import { useReducedMotionSafe } from "@/hooks/useReducedMotionSafe";
 import { daysAgo, fmtDash, fmtKo, useDemoToday } from "@/hooks/useDemoToday";
 import { maskName, maskPhone } from "@/components/demos/LeadReceivedPanel";
 import { DemoMakerInfo } from "@/components/demos/DemoMakerInfo";
 
-/* 독서 논술 학원 홈페이지 샘플: 가상의 곰파트너독서논술. 초등 1학년부터 중학교 3학년까지 주 1회 90분 수업.
+/* 독서 논술 학원 홈페이지 샘플: 가상의 독서 논술 학원 곰파트너. 초등 1학년부터 중학교 3학년까지 주 1회 90분 수업.
    상호, 원장 이름, 주소, 전화번호, 손님 이름은 모두 가상이다. 책 목록은 실제로 많이 읽히는 책이다.
 
    국내 독서 논술 학원 사이트 공통 구성(참고): 메뉴는 학원 소개, 교육 과정, 이달의 도서(학년별 필독서),
@@ -17,11 +16,12 @@ import { DemoMakerInfo } from "@/components/demos/DemoMakerInfo";
    수업은 읽기, 토론, 쓰기 순서가 많고, 첨삭한 원고지를 사진으로 보호자에게 보내 주는 곳이 많다.
    교습비는 교육청 신고 교습비처럼 반별 "월 교습비"로 적고 교재비는 따로 적는다. 합격 실적, 학생 실명은 쓰지 않는다.
 
-   포스터 첫 화면(ra-poster): 화면 전체가 연두 줄 원고지다. 큰 문장 "책 한 권 읽고 한 장 써요"가 원고지 칸에 맞춰
-   놓이고, 칸마다 흐린 따라쓰기 글자 위로 진한 글자가 한 칸씩 채워진다. 이어 종이 위에 누워 있던 빨간 펜이
-   일어나 "한 권"에 밑줄, "한 장"에 동그라미, 끝에 확인 표시를 긋고 다시 눕는다.
-   스크롤하면 원고지 윗부분이 가운데 선을 따라 앞으로 접혀 내려오고, 접힌 종이가 위로 들려 나가며 본문이 이어진다.
-   동작 줄이기면 글자와 표시가 다 그려진 상태로 고정하고 접힘도 없다.
+   첫 화면(ra-poster): 두 손으로 책 네 권을 들어 올린 사진 한 장이 화면을 채우고, 왼쪽 아래에 문장 "책 한 권 읽고 한 장 써요".
+   사진 출처: Pexels 사진 8762862
+
+   핵심 모션: 들어올 때 사진이 1600ms 동안 scale 1.06 -> 1 로 다가오고, 문장과 정보 줄은 300ms 늦게
+   아래 12px 에서 700ms 동안 올라온다(CSS keyframes, JS 없이도 보인다). 스크롤하면 사진만 y 0 -> 8% 로 느리게 움직인다.
+   본문에서 움직이는 곳은 첨삭 예시의 빨간 펜 표시 하나다. 동작 줄이기면 모두 없음.
 
    상호작용(모두 브라우저 안에서만 돈다. 실제로 보내지 않는다)
    1. 이번 달 읽는 책: 학년을 고르면 주차별 책 네 권과 쓰기 질문, 이번 달 쓰기 분량이 나온다.
@@ -29,65 +29,59 @@ import { DemoMakerInfo } from "@/components/demos/DemoMakerInfo";
    3. 첨삭 예시: 원고지 글 위에 빨간 펜 첨삭이 차례로 그려진다. 고침 설명을 누르면 그 표시만 진하게 보인다.
    4. 상담 신청: 학년, 방법, 희망일, 시간, 보호자 이름, 연락처. 완료 화면에 접수 번호, 담당 창구, 회신 예정일. */
 
-const batangF = { fontFamily: `${Gowun_Batang.style.fontFamily}, serif`, fontWeight: 700 } as const;
-const penF = { fontFamily: `${Nanum_Pen_Script.style.fontFamily}, cursive` } as const;
-
-const BRAND = "곰파트너독서논술";
 const TEL = "02-000-0000";
 const KAKAO = "카카오톡 채널 곰파트너";
 const ADDRESS = "서울 ㅇㅇ구 ㅇㅇ로 00, 3층";
 
-/* 포스터 색: 연두 줄 원고지, 연필 글자, 빨간 펜 */
+const IMG = "/images/demo-reading-academy";
+
+/* 첨삭 예시 원고지 색. 빨강은 첨삭 표시에만 쓴다 */
 const P = {
-  paper: "#f4f8e7",
-  line: "#93c25e",
-  guide: "#c9dbab",
-  ink: "#1c2615",
-  red: "#c81e32",
-  back: "#e4ecd0",
-  desk: "#dfe6cf",
+  paper: "#fcfcfa",
+  line: "#c3ccb8",
+  ink: "#111111",
+  red: "#9b2c2c",
 };
 
-/* 본문 색 */
+/* 색: 바탕 흰색과 옅은 회색, 강조색은 짙은 초록 하나 */
 const C = {
-  bg: "#f6f8ef",
+  bg: "#f7f7f5",
   card: "#ffffff",
-  ink: "#1f2a1a",
-  green: "#3f6b25",
-  soft: "#e7f0d4",
-  line: "#93c25e",
-  red: "#c81e32",
-  muted: "#55604d",
-  border: "#d5ddc5",
+  ink: "#111111",
+  body: "#4b4b4b",
+  accent: "#3d5a2e",
+  soft: "#eef1ea",
+  red: "#9b2c2c",
+  muted: "#767676",
+  border: "#e5e5e5",
+  dark: "#1c1c1c",
   error: "#b42318",
 };
 
 /* 모션 상수. 시간은 초, 이징은 cubic-bezier */
 const EASE = [0.22, 1, 0.36, 1] as const;
-/** 원고지 줄 사이 띠 높이(칸 한 변 대비) */
-const G = 0.32;
-/** 첫 글자를 쓰기 시작하는 시각, 글자 사이 간격, 한 글자를 채우는 시간 */
-const TYPE_START = 0.15;
-const TYPE_STEP = 0.06;
-const TYPE_DUR = 0.14;
-/** 펜이 일어나 움직이기 시작하는 시각 */
-const PEN_START = 0.6;
-/** 표시와 표시 사이를 옮겨 가는 시간, 다 긋고 다시 눕는 시간 */
-const PEN_MOVE = 0.12;
-const PEN_BACK = 0.25;
-/** 펜 각도. 누워 있을 때와 쓸 때(도) */
-const REST_ROT = -16;
-const WRITE_ROT = -52;
-/** 포스터 스크롤 진행도 중 퇴장이 끝나는 지점, 그중 접힘이 끝나는 비율 */
-const EXIT_END = 0.55;
-const FOLD_END = 0.55;
+/** 첫 화면 사진이 다가오는 시간 */
+const HERO_DUR = 1.6;
+/** 문장 등장 시간과 늦춤(ms) */
+const RISE_MS = 700;
+const RISE_DELAY_MS = 300;
 /** 첨삭 예시 표시 하나를 긋는 시간과 표시 사이 간격 */
 const MARK_DUR = 0.45;
 const MARK_GAP = 0.55;
 
+const HERO_CSS = `
+@keyframes ra-rise {
+  from { opacity: 0; transform: translateY(12px); }
+  to { opacity: 1; transform: none; }
+}
+.ra-rise { animation: ra-rise ${RISE_MS}ms cubic-bezier(0.22, 1, 0.36, 1) ${RISE_DELAY_MS}ms both; }
+@media (prefers-reduced-motion: reduce) {
+  .ra-rise { animation: none; }
+}
+`;
+
 const focusRing = "focus-visible:outline focus-visible:outline-[3px] focus-visible:outline-offset-2";
 const won = (n: number) => `${n.toLocaleString("ko-KR")}원`;
-const clamp01 = (v: number) => Math.min(1, Math.max(0, v));
 
 /* ---------- 원고지 무늬 ---------- */
 
@@ -99,17 +93,9 @@ function gridBg(w: string, h: string, cellH: string, line: string, paper: string
   return { backgroundColor: paper, backgroundImage: `${hLines}, ${band}, ${vLines}`, backgroundSize: `${w} ${h}` };
 }
 
-/* ---------- 포스터 펜 경로 ---------- */
+/* ---------- 첨삭 표시 도형 ---------- */
 
 type Pt = [number, number];
-type Layout = {
-  rows: string[];
-  cols: number;
-  marks: { pts: Pt[]; dur: number }[];
-  rest: Pt;
-  /** 펜 길이(칸 한 변 대비) */
-  penL: number;
-};
 
 function ellipsePts(cx: number, cy: number, rx: number, ry: number): Pt[] {
   const out: Pt[] = [];
@@ -124,76 +110,7 @@ function ellipsePts(cx: number, cy: number, rx: number, ry: number): Pt[] {
   return out;
 }
 
-const R = 1 + G;
-
-const PC: Layout = {
-  rows: ["책 한 권 읽고", "한 장 써요"],
-  cols: 8,
-  marks: [
-    { pts: [[2.05, 1.1], [3.5, 1.08], [4.95, 1.05]], dur: 0.25 },
-    { pts: ellipsePts(1.5, R + 0.47, 1.72, 0.56), dur: 0.38 },
-    { pts: [[6.2, R + 0.45], [6.45, R + 0.86], [7.08, R - 0.02]], dur: 0.16 },
-  ],
-  rest: [4.6, 2 * R + 0.55],
-  penL: 3.7,
-};
-
-const MOBILE: Layout = {
-  rows: ["책 한 권", "읽고", "한 장", "써요"],
-  cols: 5,
-  marks: [
-    { pts: [[2.05, 1.1], [3.5, 1.08], [4.95, 1.05]], dur: 0.25 },
-    { pts: ellipsePts(1.5, 2 * R + 0.5, 1.68, 0.66), dur: 0.38 },
-    { pts: [[2.25, 3 * R + 0.45], [2.5, 3 * R + 0.86], [3.1, 3 * R - 0.02]], dur: 0.16 },
-  ],
-  rest: [0.3, 4 * R + 2.3],
-  penL: 4.6,
-};
-
 const ptsToD = (pts: Pt[]) => pts.map((p, i) => `${i ? "L" : "M"}${p[0].toFixed(3)} ${p[1].toFixed(3)}`).join(" ");
-const segLen = (a: Pt, b: Pt) => Math.hypot(b[0] - a[0], b[1] - a[1]);
-
-/** 펜 끝이 지나갈 점들을 시간에 맞춰 늘어놓는다. 그리는 구간은 길이에 비례해 시간을 나눈다 */
-function buildPen(layout: Layout) {
-  const h = layout.rows.length * R;
-  const segs: { pts: Pt[]; dur: number; draw: boolean }[] = [];
-  let cur = layout.rest;
-  for (const m of layout.marks) {
-    segs.push({ pts: [cur, m.pts[0]], dur: PEN_MOVE, draw: false });
-    segs.push({ pts: m.pts, dur: m.dur, draw: true });
-    cur = m.pts[m.pts.length - 1];
-  }
-  segs.push({ pts: [cur, layout.rest], dur: PEN_BACK, draw: false });
-  const total = segs.reduce((s, x) => s + x.dur, 0);
-  const pts: Pt[] = [layout.rest];
-  const times = [0];
-  const rot = [REST_ROT];
-  const markTimes: { delay: number; dur: number }[] = [];
-  let t = 0;
-  segs.forEach((seg, si) => {
-    const cum = [0];
-    for (let j = 1; j < seg.pts.length; j++) cum.push(cum[j - 1] + segLen(seg.pts[j - 1], seg.pts[j]));
-    const len = cum[cum.length - 1] || 1;
-    if (seg.draw) markTimes.push({ delay: PEN_START + t, dur: seg.dur });
-    for (let j = 1; j < seg.pts.length; j++) {
-      pts.push(seg.pts[j]);
-      times.push((t + (seg.dur * cum[j]) / len) / total);
-      rot.push(si === segs.length - 1 ? REST_ROT : WRITE_ROT);
-    }
-    t += seg.dur;
-  });
-  return {
-    x: pts.map((p) => `${(p[0] / layout.cols) * 100}%`),
-    y: pts.map((p) => `${(p[1] / h) * 100}%`),
-    rot,
-    times,
-    total,
-    markTimes,
-  };
-}
-
-const PC_PEN = buildPen(PC);
-const MOBILE_PEN = buildPen(MOBILE);
 
 /* ---------- 이번 달 읽는 책 ---------- */
 
@@ -240,13 +157,8 @@ const GRADES: { label: string; amount: string; books: Book[] }[] = [
     ],
   },
 ];
-/** 책 표지 색. 짙은 초록, 미색, 빨강, 먹색 차례 */
-const COVERS = [
-  { bg: "#3f6b25", fg: "#f4f8e7" },
-  { bg: "#efe7cf", fg: "#1f2a1a" },
-  { bg: "#b51b2d", fg: "#fff6f0" },
-  { bg: "#26301f", fg: "#e7f0d4" },
-];
+/** 책 표지 자리 색. 사진이 들어갈 자리라 무채색 두 가지를 번갈아 쓴다 */
+const COVERS = ["#efeeea", "#e6e5e0"];
 
 /* ---------- 수업 과정 ---------- */
 
@@ -362,9 +274,8 @@ export function ReadingAcademyDemo() {
 
       <header className="border-b" style={{ background: C.card, borderColor: C.border }}>
         <div className="mx-auto flex max-w-[1200px] flex-wrap items-center justify-between gap-x-4 gap-y-2 px-4 py-4 md:px-6">
-          <h2 className="inline-flex items-center gap-2 text-[22px] leading-none" style={batangF}>
-            <CellMark size={24} />
-            {BRAND}
+          <h2>
+            <SampleLogo />
           </h2>
           <nav aria-label="주요 메뉴" className="-mx-2 flex flex-wrap items-center">
             {[
@@ -375,7 +286,7 @@ export function ReadingAcademyDemo() {
               ["ra-consult", "상담 신청"],
               ["ra-visit", "오시는 길"],
             ].map(([id, label]) => (
-              <button key={id} type="button" onClick={() => go(id)} className={navBtn} style={{ outlineColor: C.green }}>
+              <button key={id} type="button" onClick={() => go(id)} className={navBtn} style={{ outlineColor: C.accent }}>
                 {label}
               </button>
             ))}
@@ -385,7 +296,7 @@ export function ReadingAcademyDemo() {
 
       <section id="ra-books" aria-labelledby="ra-books-title" className="mx-auto max-w-[1200px] scroll-mt-4 px-4 pt-10 md:px-6 md:pt-14">
         <CellTitle id="ra-books-title" text={`${month}월 읽는 책`} />
-        <Books reduce={reduce} />
+        <Books />
       </section>
 
       <section id="ra-course" aria-labelledby="ra-course-title" className="mx-auto mt-14 max-w-[1200px] scroll-mt-4 px-4 md:mt-20 md:px-6">
@@ -450,10 +361,10 @@ export function ReadingAcademyDemo() {
         </section>
       </div>
 
-      <footer className="mt-16 px-4 pb-28 pt-10 text-[14px] leading-[1.8] md:px-6" style={{ background: C.green, color: "#e7f0d4" }}>
+      <footer className="mt-16 px-4 pb-28 pt-10 text-[14px] leading-[1.8] md:px-6" style={{ background: C.dark, color: "#c8c8c8" }}>
         <div className="mx-auto max-w-[1200px]">
-          <p className="text-[18px] text-white" style={batangF}>
-            {BRAND}
+          <p>
+            <SampleLogo light size={18} />
           </p>
           <p>
             {ADDRESS} / 전화 {TEL} / {KAKAO}
@@ -467,311 +378,104 @@ export function ReadingAcademyDemo() {
 
 /* ---------- 공용 조각 ---------- */
 
-/** 원고지 칸에 한 글자씩 넣은 구역 제목 */
+/** 구역 제목 */
 function CellTitle({ id, text }: { id: string; text: string }) {
   return (
-    <h2 id={id} className="flex flex-wrap" style={batangF}>
-      <span className="sr-only">{text}</span>
-      {[...text].map((ch, i) => (
-        <span
-          key={i}
-          aria-hidden
-          className="-ml-[1.5px] grid h-10 w-10 place-items-center border-[1.5px] text-[23px] leading-none first:ml-0 md:h-12 md:w-12 md:text-[28px]"
-          style={{ borderColor: C.line, background: C.card }}
-        >
-          {ch === " " ? "" : ch}
-        </span>
-      ))}
+    <h2 id={id} className="text-[26px] font-bold leading-tight md:text-[32px]" style={{ letterSpacing: "-0.02em" }}>
+      {text}
     </h2>
   );
 }
 
-/** 작은 상호 표시. 원고지 한 칸에 빨간 밑줄 */
-function CellMark({ size = 20 }: { size?: number }) {
+/* 로고: 메인 사이트와 같은 곰 로고 + 곰파트너(크게) + 업종(작게) */
+function SampleLogo({ light, size = 20 }: { light?: boolean; size?: number }) {
+  const mark = size + 8;
   return (
-    <svg width={size} height={size} viewBox="0 0 24 24" aria-hidden>
-      <rect x="1.5" y="3" width="10.5" height="12" fill={P.paper} stroke={P.line} strokeWidth="1.8" />
-      <rect x="12" y="3" width="10.5" height="12" fill={P.paper} stroke={P.line} strokeWidth="1.8" />
-      <path d="M2.5 19.5 Q12 17 21.5 19" stroke={P.red} strokeWidth="2.6" fill="none" strokeLinecap="round" />
-    </svg>
+    <span className="inline-flex items-center gap-2 leading-none" style={{ color: light ? "#fff" : "#111" }}>
+      {/* eslint-disable-next-line @next/next/no-img-element -- 메인 사이트와 같은 곰 로고 */}
+      <img src="/images/logo-bear.png" alt="" aria-hidden width={mark} height={mark} className="shrink-0" style={{ width: mark, height: mark }} />
+      <span className="flex items-baseline gap-1 whitespace-nowrap">
+        <span className="font-bold tracking-[-0.03em]" style={{ fontSize: size }}>
+          곰파트너
+        </span>
+        <span className="text-[12px] font-semibold opacity-75">독서 논술 샘플</span>
+      </span>
+    </span>
   );
 }
 
-/* ---------- 포스터 ---------- */
+/* ---------- 첫 화면 ---------- */
 
 function Poster({ reduce, onCta }: { reduce: boolean; onCta: () => void }) {
   const ref = useRef<HTMLElement>(null);
   const { scrollYProgress } = useScroll({ target: ref, offset: ["start start", "end start"] });
-  const p = useTransform(scrollYProgress, (v) => (reduce ? 0 : clamp01(v / EXIT_END)));
-  // 윗부분이 가운데 선을 따라 앞으로 접혀 내려오고, 다 접히면 종이째 위로 들려 나간다
-  const fold = useTransform(p, (v) => clamp01(v / FOLD_END));
-  const lift = useTransform(p, (v) => clamp01((v - FOLD_END) / (1 - FOLD_END)));
-  const flapRot = useTransform(fold, (t) => -t * 180);
-  const frontShade = useTransform(fold, (t) => Math.min(0.5, t * 0.9));
-  const backShade = useTransform(fold, (t) => Math.max(0, (1 - t) * 0.9));
-  const underShade = useTransform(fold, (t) => Math.sin(Math.PI * t) * 0.3);
-  const groupY = useTransform(lift, (l) => `${-l * 115}svh`);
-  const groupRot = useTransform(lift, (l) => -l * 5);
-  const barO = useTransform(fold, (t) => 1 - clamp01(t * 2.5));
-
-  const topBar = (
-    <motion.div className="absolute inset-x-0 top-0 z-30 flex items-center justify-between px-4 pt-4 md:px-12 md:pt-7" style={reduce ? undefined : { y: groupY, opacity: barO }}>
-      <p className="inline-flex items-center gap-2 rounded-[4px] px-1.5 py-1 text-[17px] leading-none" style={{ ...batangF, background: P.paper, color: P.ink }}>
-        <CellMark size={20} />
-        {BRAND}
-      </p>
-      <button
-        type="button"
-        onClick={onCta}
-        aria-label="상담 신청"
-        title="상담 신청"
-        data-gtm-cta="reading-academy_poster_cta"
-        className={`inline-flex h-12 w-12 items-center justify-center rounded-full ${focusRing}`}
-        style={{ background: P.red, color: "#fff", outlineColor: P.ink, boxShadow: "inset 0 2px 0 rgba(255,255,255,0.25), 0 3px 8px rgba(80,20,20,0.25)" }}
-      >
-        <CalendarCheck size={22} aria-hidden />
-      </button>
-    </motion.div>
-  );
+  // 스크롤하면 사진만 조금 느리게 내려간다
+  const photoY = useTransform(scrollYProgress, (v) => `${(v * 8).toFixed(2)}%`);
 
   return (
-    <section id="ra-poster" ref={ref} aria-labelledby="ra-poster-title" className="relative" style={{ height: reduce ? undefined : "165svh", background: C.bg }}>
-      <div className={`${reduce ? "relative min-h-svh" : "sticky top-0 h-svh"} overflow-hidden`} style={{ perspective: "2200px", background: C.bg }}>
-        {reduce ? (
-          <div className="relative min-h-svh">
-            <PosterSheet key="r" reduce copy={false} />
-          </div>
-        ) : (
-          <motion.div key="m" className="absolute inset-0" style={{ y: groupY, rotate: groupRot, transformStyle: "preserve-3d" }}>
-            {/* 아랫부분. 진짜 문장이 들어 있다 */}
-            <div className="absolute inset-0" style={{ clipPath: "inset(50% 0 0 0)" }}>
-              <PosterSheet reduce={false} copy={false} />
-              <motion.div aria-hidden className="pointer-events-none absolute inset-0" style={{ opacity: underShade, background: "linear-gradient(180deg, rgba(30,45,20,0.9) 50%, rgba(30,45,20,0) 85%)" }} />
-            </div>
-            {/* 접혀 내려오는 윗부분 */}
-            <motion.div aria-hidden className="absolute inset-0" style={{ rotateX: flapRot, transformOrigin: "50% 50%", transformStyle: "preserve-3d" }}>
-              <div className="absolute inset-0" style={{ clipPath: "inset(0 0 calc(50% - 1px) 0)", backfaceVisibility: "hidden" }}>
-                <PosterSheet reduce={false} copy />
-                <motion.div className="pointer-events-none absolute inset-0" style={{ opacity: frontShade, background: "linear-gradient(0deg, rgba(30,45,20,0.75) 50%, rgba(30,45,20,0.2) 0%)" }} />
-              </div>
-              {/* 종이 뒷면 */}
-              <div
-                className="absolute inset-x-0 top-0 h-1/2"
-                style={{
-                  transform: "rotateX(180deg)",
-                  backfaceVisibility: "hidden",
-                  background: `linear-gradient(0deg, ${P.back} 0%, #edf2de 70%, #f2f6e6 100%)`,
-                  boxShadow: "inset 0 -10px 18px rgba(60,80,40,0.12)",
-                }}
-              >
-                <motion.div className="absolute inset-0" style={{ opacity: backShade, background: "rgba(30,45,20,0.8)" }} />
-              </div>
-            </motion.div>
-          </motion.div>
-        )}
-        {topBar}
+    <section id="ra-poster" ref={ref} aria-labelledby="ra-poster-title" className="relative min-h-[100svh] overflow-hidden" style={{ background: "#e9e6e4", color: C.ink }}>
+      <style>{HERO_CSS}</style>
+      <motion.div
+        className="absolute inset-0"
+        initial={reduce ? false : { scale: 1.06 }}
+        animate={{ scale: 1 }}
+        transition={{ duration: reduce ? 0 : HERO_DUR, ease: EASE }}
+        style={reduce ? undefined : { y: photoY }}
+      >
+        {/* eslint-disable-next-line @next/next/no-img-element -- 정적 export 라 next/image 최적화를 쓰지 않는다 */}
+        <img
+          src={`${IMG}/hero.jpg`}
+          srcSet={`${IMG}/hero-sm.jpg 960w, ${IMG}/hero.jpg 1920w`}
+          sizes="100vw"
+          alt="흰 벽 앞에서 두 손으로 책 네 권을 들어 올린 모습"
+          fetchPriority="high"
+          className="absolute inset-0 h-full w-full object-cover"
+          style={{ objectPosition: "48% 40%" }}
+        />
+      </motion.div>
+      {/* 글자 대비용 흰 막: 아래와 왼쪽을 밝게 */}
+      <div
+        aria-hidden
+        className="absolute inset-0"
+        style={{
+          background: "linear-gradient(to top, rgba(247,247,245,0.9), rgba(247,247,245,0.45) 40%, rgba(247,247,245,0) 65%), linear-gradient(to right, rgba(247,247,245,0.6), rgba(247,247,245,0) 55%)",
+        }}
+      />
+
+      <div className="relative mx-auto flex min-h-[100svh] max-w-[1200px] flex-col px-4 md:px-6">
+        <div className="flex items-center justify-between gap-3 py-4 md:py-6">
+          <p>
+            <SampleLogo size={18} />
+          </p>
+          <button
+            type="button"
+            onClick={onCta}
+            data-gtm-cta="reading-academy_poster_cta"
+            className={`rounded-[6px] px-4 py-2.5 text-[15px] font-semibold ${focusRing}`}
+            style={{ background: C.accent, color: "#fff", outlineColor: C.ink }}
+          >
+            상담 신청
+          </button>
+        </div>
+
+        <div className={`mt-auto pb-[10svh] ${reduce ? "" : "ra-rise"}`}>
+          <h1 id="ra-poster-title" className="text-[36px] font-bold md:text-[clamp(40px,5vw,72px)]" style={{ letterSpacing: "-0.03em", lineHeight: 1.2, wordBreak: "keep-all" }}>
+            책 한 권 읽고
+            <br />한 장 써요
+          </h1>
+          <p className="mt-4 text-[15px] font-medium md:text-[17px]" style={{ color: C.body, lineHeight: 1.5 }}>
+            초등 1학년 ~ 중학교 3학년, 주 1회 90분
+          </p>
+        </div>
       </div>
     </section>
   );
 }
 
-/** 원고지 한 장. copy 면 접히는 윗부분에 쓰는 복사본이라 제목 태그와 id 를 두지 않는다 */
-function PosterSheet({ reduce, copy }: { reduce: boolean; copy: boolean }) {
-  const Tag = copy ? "div" : "h1";
-  return (
-    <div className="absolute inset-0 overflow-hidden [--c:min(17.5vw,76px)] md:[--c:clamp(88px,11vw,170px)]" style={{ background: P.paper }} inert={copy || undefined}>
-      <div className="relative h-full px-4 pt-[15svh] md:pt-[17svh]">
-        <Tag id={copy ? undefined : "ra-poster-title"} className="relative m-0">
-          {!copy && <span className="sr-only">책 한 권 읽고 한 장 써요</span>}
-          <div aria-hidden className="md:hidden">
-            <Board layout={MOBILE} pen={MOBILE_PEN} reduce={reduce} />
-          </div>
-          <div aria-hidden className="hidden md:block">
-            <Board layout={PC} pen={PC_PEN} reduce={reduce} />
-          </div>
-        </Tag>
-      </div>
-      {/* 종이에 비치는 빛과 가장자리 그늘 */}
-      <div
-        aria-hidden
-        className="pointer-events-none absolute inset-0"
-        style={{ background: "radial-gradient(120% 90% at 18% 12%, rgba(255,255,255,0.14) 0%, rgba(255,255,255,0) 55%), radial-gradient(140% 120% at 50% 40%, rgba(0,0,0,0) 60%, rgba(60,85,30,0.12) 100%)" }}
-      />
-    </div>
-  );
-}
-
-/** 원고지 칸에 놓인 큰 문장, 빨간 펜 표시, 펜 */
-function Board({ layout, pen, reduce }: { layout: Layout; pen: ReturnType<typeof buildPen>; reduce: boolean }) {
-  const { rows, cols, marks, penL } = layout;
-  const h = rows.length * R;
-  /** 글자 칸마다 쓰는 차례(빈칸 제외) */
-  const order = rows.map((row, r) => [...row].map((ch, c) => (ch === " " ? -1 : rows.slice(0, r).join("").replace(/ /g, "").length + row.slice(0, c).replace(/ /g, "").length)));
-  return (
-    <div className="relative mx-auto" style={{ width: `calc(var(--c) * ${cols})`, height: `calc(var(--c) * ${h})` }}>
-      {/* 화면 전체 원고지 무늬. 이 판의 칸과 같은 자리에서 시작하도록 칸 크기의 정수배만큼 밖으로 늘린다 */}
-      <div
-        className="absolute"
-        style={{
-          left: "calc(var(--c) * -20)",
-          top: `calc(var(--c) * ${-10 * R})`,
-          width: "calc(var(--c) * 60)",
-          height: `calc(var(--c) * ${30 * R})`,
-          ...gridBg("var(--c)", `calc(var(--c) * ${R})`, "var(--c)", P.line, P.paper),
-        }}
-      />
-
-      {/* 글자 칸 */}
-      {rows.map((row, r) =>
-        [...row].map((ch, c) => {
-          if (ch === " ") return null;
-          const i = order[r][c];
-          const pos: CSSProperties = {
-            left: `calc(var(--c) * ${c})`,
-            top: `calc(var(--c) * ${r * R})`,
-            width: "var(--c)",
-            height: "var(--c)",
-            fontSize: "calc(var(--c) * 0.8)",
-            lineHeight: "var(--c)",
-            ...batangF,
-          };
-          return (
-            <span key={`${r}-${c}`} className="absolute text-center" style={pos}>
-              {/* 흐린 따라쓰기 글자 */}
-              <span className="absolute inset-0" style={{ color: P.guide }}>
-                {ch}
-              </span>
-              {/* 진한 글자. 왼쪽부터 채워진다 */}
-              <motion.span
-                className="absolute inset-0"
-                style={{ color: P.ink }}
-                initial={reduce ? false : { clipPath: "inset(0 100% 0 0)" }}
-                animate={{ clipPath: "inset(0 0% 0 0)" }}
-                transition={{ duration: reduce ? 0 : TYPE_DUR, delay: reduce ? 0 : TYPE_START + i * TYPE_STEP, ease: "easeOut" }}
-              >
-                {ch}
-              </motion.span>
-            </span>
-          );
-        }),
-      )}
-
-      {/* 문장 아래 띠에 적은 정보 한 줄 */}
-      <p
-        className="absolute left-0 flex items-center whitespace-nowrap text-[15px] font-semibold md:text-[19px]"
-        style={{ top: `calc(var(--c) * ${h - G})`, height: `calc(var(--c) * ${G})`, color: "#3f5a2a" }}
-      >
-        초등 1학년 ~ 중학교 3학년, 주 1회 90분
-      </p>
-
-      {/* 빨간 펜 표시 */}
-      <svg className="pointer-events-none absolute inset-0 h-full w-full overflow-visible" viewBox={`0 0 ${cols} ${h}`} preserveAspectRatio="none">
-        {marks.map((m, k) => {
-          const t = pen.markTimes[k];
-          return (
-            <motion.path
-              key={k}
-              d={ptsToD(m.pts)}
-              fill="none"
-              stroke={P.red}
-              strokeWidth={cols > 6 ? 0.075 : 0.09}
-              strokeLinecap="round"
-              strokeLinejoin="round"
-              initial={reduce ? false : { pathLength: 0, opacity: 0 }}
-              animate={{ pathLength: 1, opacity: 1 }}
-              transition={reduce ? { duration: 0 } : { pathLength: { delay: t.delay, duration: t.dur, ease: "linear" }, opacity: { delay: t.delay, duration: 0.01 } }}
-            />
-          );
-        })}
-      </svg>
-
-      {/* 펜. 바깥 판은 이 판 크기만큼 움직이는 기준이고, 펜 끝이 판의 왼쪽 위 모서리에 놓인다 */}
-      <motion.div
-        className="pointer-events-none absolute inset-0"
-        animate={reduce ? { x: pen.x[0], y: pen.y[0] } : { x: pen.x, y: pen.y }}
-        transition={reduce ? { duration: 0 } : { duration: pen.total, delay: PEN_START, times: pen.times, ease: "linear" }}
-        style={{ x: pen.x[0], y: pen.y[0] }}
-      >
-        <motion.div
-          className="absolute left-0"
-          style={{
-            top: `calc(var(--c) * ${-penL * 0.04})`,
-            width: `calc(var(--c) * ${penL})`,
-            height: `calc(var(--c) * ${penL * 0.08})`,
-            transformOrigin: "0% 50%",
-            rotate: REST_ROT,
-          }}
-          animate={reduce ? { rotate: REST_ROT } : { rotate: pen.rot }}
-          transition={reduce ? { duration: 0 } : { duration: pen.total, delay: PEN_START, times: pen.times, ease: "easeInOut" }}
-        >
-          <RedPen />
-        </motion.div>
-      </motion.div>
-    </div>
-  );
-}
-
-/** 빨간 펜. 펜 끝이 왼쪽 가운데(0, 24)에 있고 몸통이 오른쪽으로 뻗는다 */
-function RedPen() {
-  const id = useId().replace(/:/g, "");
-  return (
-    <svg viewBox="0 0 600 48" className="h-full w-full overflow-visible" aria-hidden>
-      <defs>
-        <linearGradient id={`${id}-barrel`} x1="0" y1="0" x2="0" y2="1">
-          <stop offset="0" stopColor="#6e0c16" />
-          <stop offset="0.16" stopColor="#b31b2c" />
-          <stop offset="0.32" stopColor="#ef5a69" />
-          <stop offset="0.46" stopColor="#d22a3c" />
-          <stop offset="0.82" stopColor="#9c1424" />
-          <stop offset="1" stopColor="#5a0911" />
-        </linearGradient>
-        <linearGradient id={`${id}-grip`} x1="0" y1="0" x2="0" y2="1">
-          <stop offset="0" stopColor="#3a0a10" />
-          <stop offset="0.3" stopColor="#8c1a26" />
-          <stop offset="0.45" stopColor="#c4485a" />
-          <stop offset="1" stopColor="#2e070c" />
-        </linearGradient>
-        <linearGradient id={`${id}-metal`} x1="0" y1="0" x2="0" y2="1">
-          <stop offset="0" stopColor="#fdfdfd" />
-          <stop offset="0.35" stopColor="#c9ccd0" />
-          <stop offset="0.6" stopColor="#8d9298" />
-          <stop offset="1" stopColor="#4a4e54" />
-        </linearGradient>
-        <filter id={`${id}-soft`} x="-10%" y="-100%" width="120%" height="300%">
-          <feGaussianBlur stdDeviation="5" />
-        </filter>
-      </defs>
-      {/* 종이에 진 그림자. 펜 끝에서 모이고 몸통 쪽으로 퍼진다 */}
-      <path d="M2 28 L150 44 L600 52 L600 70 L150 58 Z" fill="#1d2a10" opacity="0.22" filter={`url(#${id}-soft)`} />
-      {/* 펜 끝 */}
-      <path d="M2 24 L32 14 L32 34 Z" fill={`url(#${id}-metal)`} />
-      <circle cx="2.5" cy="24" r="2.4" fill="#2a2a2a" />
-      {/* 손잡이 */}
-      <rect x="30" y="11" width="122" height="26" rx="5" fill={`url(#${id}-grip)`} />
-      {Array.from({ length: 10 }, (_, i) => (
-        <rect key={i} x={40 + i * 11} y="12" width="2" height="24" fill="rgba(0,0,0,0.28)" />
-      ))}
-      <rect x="150" y="7" width="15" height="34" fill={`url(#${id}-metal)`} />
-      {/* 몸통 */}
-      <rect x="164" y="5" width="304" height="38" fill={`url(#${id}-barrel)`} />
-      {/* 뚜껑과 클립 */}
-      <rect x="462" y="3.5" width="132" height="41" rx="9" fill={`url(#${id}-barrel)`} />
-      <rect x="462" y="3.5" width="8" height="41" fill={`url(#${id}-metal)`} />
-      <rect x="478" y="-3" width="108" height="8" rx="3.5" fill={`url(#${id}-metal)`} />
-      <circle cx="582" cy="1" r="5" fill={`url(#${id}-metal)`} />
-      {/* 반짝이는 한 줄 */}
-      <rect x="172" y="12" width="286" height="3" rx="1.5" fill="#fff" opacity="0.55" />
-      <rect x="476" y="11" width="108" height="3" rx="1.5" fill="#fff" opacity="0.45" />
-      <rect x="40" y="16" width="104" height="2" rx="1" fill="#fff" opacity="0.25" />
-    </svg>
-  );
-}
-
 /* ---------- 1. 이번 달 읽는 책 ---------- */
 
-function Books({ reduce }: { reduce: boolean }) {
+function Books() {
   const [g, setG] = useState(1);
-  const [changed, setChanged] = useState(false);
   const tabsId = useId();
   const grade = GRADES[g];
 
@@ -786,12 +490,9 @@ function Books({ reduce }: { reduce: boolean }) {
             id={`${tabsId}-tab-${i}`}
             aria-selected={g === i}
             aria-controls={`${tabsId}-panel`}
-            onClick={() => {
-              setG(i);
-              setChanged(true);
-            }}
-            className={`rounded-[4px] border-[1.5px] px-4 py-2 text-[16px] font-bold ${focusRing}`}
-            style={{ borderColor: g === i ? C.green : C.border, background: g === i ? C.green : C.card, color: g === i ? "#fff" : C.ink, outlineColor: C.green }}
+            onClick={() => setG(i)}
+            className={`rounded-[4px] border px-4 py-2 text-[16px] font-bold ${focusRing}`}
+            style={{ borderColor: g === i ? C.accent : C.border, background: g === i ? C.accent : C.card, color: g === i ? "#fff" : C.ink, outlineColor: C.accent }}
           >
             {x.label}
           </button>
@@ -803,27 +504,19 @@ function Books({ reduce }: { reduce: boolean }) {
         </p>
         <ol className="mt-4 grid grid-cols-2 gap-x-4 gap-y-8 md:grid-cols-4 md:gap-x-6">
           {grade.books.map((b, i) => {
-            const cv = COVERS[i % COVERS.length];
             return (
-              <motion.li
-                key={`${g}-${b.t}`}
-                initial={reduce || !changed ? false : { rotateY: -80 }}
-                animate={{ rotateY: 0 }}
-                transition={{ duration: reduce ? 0 : 0.55, delay: reduce ? 0 : i * 0.07, ease: EASE }}
-                style={{ transformOrigin: "0% 50%", transformPerspective: 900 }}
-              >
-                {/* 표지. 왼쪽이 책등 */}
-                <div
-                  className="relative flex aspect-[3/4] flex-col justify-between overflow-hidden rounded-[2px_6px_6px_2px] p-4 pl-6"
-                  style={{ background: cv.bg, color: cv.fg, boxShadow: "0 1px 0 rgba(0,0,0,0.1), 6px 8px 0 -2px rgba(31,42,26,0.12)" }}
-                >
-                  <div aria-hidden className="absolute inset-y-0 left-0 w-[14%]" style={{ background: "linear-gradient(90deg, rgba(0,0,0,0.3), rgba(255,255,255,0.14) 45%, rgba(0,0,0,0.08) 70%, transparent)" }} />
-                  <div aria-hidden className="absolute inset-0" style={{ background: "linear-gradient(120deg, rgba(255,255,255,0.18), transparent 40%)" }} />
-                  <span className="relative text-[14px] font-bold tabular-nums opacity-90">{i + 1}주</span>
-                  <span className="relative text-[19px] leading-[1.3] md:text-[22px]" style={{ ...batangF, wordBreak: "keep-all" }}>
+              <li key={`${g}-${b.t}`}>
+                {/* 표지 자리 */}
+                <div className="flex aspect-[3/4] flex-col justify-between rounded-[6px] p-4" style={{ background: COVERS[i % COVERS.length], color: C.ink }}>
+                  <span className="text-[14px] font-semibold tabular-nums" style={{ color: C.muted }}>
+                    {i + 1}주
+                  </span>
+                  <span className="text-[18px] font-bold leading-[1.3] md:text-[20px]" style={{ wordBreak: "keep-all" }}>
                     {b.t}
                   </span>
-                  <span className="relative text-[13px] opacity-90">{b.a}</span>
+                  <span className="text-[13px]" style={{ color: C.body }}>
+                    {b.a}
+                  </span>
                 </div>
                 <p className="mt-3 text-[14px] font-semibold" style={{ color: C.muted }}>
                   {b.kind}
@@ -831,7 +524,7 @@ function Books({ reduce }: { reduce: boolean }) {
                 <p className="mt-1 text-[16px] font-bold leading-[1.45]" style={{ wordBreak: "keep-all" }}>
                   {b.q}
                 </p>
-              </motion.li>
+              </li>
             );
           })}
         </ol>
@@ -849,7 +542,7 @@ function Course({ reduce }: { reduce: boolean }) {
   return (
     <div className="mt-6 rounded-[6px] border p-5 md:p-8" style={{ borderColor: C.border, background: C.card }}>
       <p className="text-[16px] font-bold">한 번 수업 {TOTAL_MIN}분</p>
-      <div className="mt-3 flex overflow-hidden rounded-[4px] border-[1.5px]" style={{ borderColor: C.ink }}>
+      <div className="mt-3 flex overflow-hidden rounded-[6px] border" style={{ borderColor: C.border }}>
         {STEPS.map((x, i) => {
           const on = s === i;
           const from = STEP_FROM[i];
@@ -860,9 +553,9 @@ function Course({ reduce }: { reduce: boolean }) {
               aria-pressed={on}
               onClick={() => setS(i)}
               className={`relative flex min-w-0 flex-col items-start px-3 py-3 text-left md:px-4 ${focusRing}`}
-              style={{ flexGrow: x.min, flexBasis: 0, borderLeft: i ? `1.5px solid ${C.ink}` : undefined, outlineColor: C.green, outlineOffset: -4 }}
+              style={{ flexGrow: x.min, flexBasis: 0, borderLeft: i ? `1px solid ${C.border}` : undefined, outlineColor: C.accent, outlineOffset: -4 }}
             >
-              {on && <motion.span layoutId="ra-step-on" aria-hidden className="absolute inset-0" style={{ background: C.red }} transition={{ duration: reduce ? 0 : 0.35, ease: EASE }} />}
+              {on && <motion.span layoutId="ra-step-on" aria-hidden className="absolute inset-0" style={{ background: C.accent }} transition={{ duration: reduce ? 0 : 0.35, ease: EASE }} />}
               <span className="relative text-[17px] font-bold md:text-[19px]" style={{ color: on ? "#fff" : C.ink }}>
                 {x.label}
               </span>
@@ -888,13 +581,13 @@ function Course({ reduce }: { reduce: boolean }) {
         >
           <div>
             <p className="inline-flex items-center gap-2 text-[18px] font-bold">
-              <Icon size={22} aria-hidden style={{ color: C.green }} />
+              <Icon size={22} aria-hidden style={{ color: C.accent }} />
               수업에서
             </p>
             <ul className="mt-3 grid gap-2 text-[16px] leading-[1.6]">
               {step.inClass.map((t) => (
                 <li key={t} className="flex gap-2">
-                  <Check size={18} className="mt-[3px] flex-none" aria-hidden style={{ color: C.green }} />
+                  <Check size={18} className="mt-[3px] flex-none" aria-hidden style={{ color: C.accent }} />
                   {t}
                 </li>
               ))}
@@ -956,13 +649,23 @@ function buildMarks(cells: ECell[], n: number): EMark[] {
   const su = cellAt(at("품을수", 2));
   const x1 = su.c === 0 ? 0.05 : su.c;
   const t1 = top(su);
-  const m1 = { d: ptsToD([[x1 - 0.22, t1 - 0.36], [x1, t1 + 0.06], [x1 + 0.22, t1 - 0.36]]), badge: [badgeX(x1 + 0.5), t1 - 0.24] as Pt };
+  const m1 = {
+    d: ptsToD([
+      [x1 - 0.22, t1 - 0.36],
+      [x1, t1 + 0.06],
+      [x1 + 0.22, t1 - 0.36],
+    ]),
+    badge: [badgeX(x1 + 0.5), t1 - 0.24] as Pt,
+  };
 
   // 2. "됬"에 사선을 긋고 위 띠에 "됐"
   const dw = cellAt(at("됬"));
   const t2 = top(dw);
   const m2 = {
-    d: ptsToD([[dw.c + 0.12, t2 + 0.88], [dw.c + 0.88, t2 + 0.12]]),
+    d: ptsToD([
+      [dw.c + 0.12, t2 + 0.88],
+      [dw.c + 0.88, t2 + 0.12],
+    ]),
     badge: [badgeX(dw.c + 1.25), t2 - 0.24] as Pt,
     fix: { x: dw.c + 0.5, y: t2 - 0.06, ch: "됐" },
   };
@@ -1023,7 +726,7 @@ function Correction({ reduce }: { reduce: boolean }) {
         <p className="text-[15px] font-semibold" style={{ color: C.muted }}>
           초등 3~4학년반, 마당을 나온 암탉 쓰기 질문
         </p>
-        <div ref={ref} className="relative mt-3 rounded-[4px] p-3 md:p-5" style={{ background: P.paper, boxShadow: "0 1px 0 rgba(0,0,0,0.06), 0 10px 24px -14px rgba(40,60,20,0.45)" }}>
+        <div ref={ref} className="relative mt-3 rounded-[4px] p-3 md:p-5" style={{ background: P.paper, border: `1px solid ${C.border}` }}>
           <div
             className="relative w-full"
             style={{
@@ -1035,9 +738,7 @@ function Correction({ reduce }: { reduce: boolean }) {
             role="img"
             aria-label={`원고지에 쓴 글. 제목 ${ESSAY_TITLE}. ${ESSAY} 빨간 펜으로 띄어쓰기, 맞춤법, 빠진 주어를 고치고 마지막 문장에 물결 밑줄을 그었다.`}
           >
-            {[...ESSAY_TITLE].map((ch, k) =>
-              ch === " " ? null : <Glyph key={`t${k}`} ch={ch} r={0} c={titleStart + k} n={n} rows={rows} style={fs} />,
-            )}
+            {[...ESSAY_TITLE].map((ch, k) => (ch === " " ? null : <Glyph key={`t${k}`} ch={ch} r={0} c={titleStart + k} n={n} rows={rows} style={fs} />))}
             {[...ESSAY_GRADE].map((ch, k) => (
               <Glyph key={`g${k}`} ch={ch} r={1} c={n - 1 - ESSAY_GRADE.length + k} n={n} rows={rows} style={fs} />
             ))}
@@ -1069,7 +770,7 @@ function Correction({ reduce }: { reduce: boolean }) {
                         {k + 1}
                       </text>
                       {m.fix && (
-                        <text x={m.fix.x} y={m.fix.y} textAnchor="middle" fontSize={0.5} fill={P.red} style={penF}>
+                        <text x={m.fix.x} y={m.fix.y} textAnchor="middle" fontSize={0.5} fill={P.red} fontWeight={700}>
                           {m.fix.ch}
                         </text>
                       )}
@@ -1081,8 +782,8 @@ function Correction({ reduce }: { reduce: boolean }) {
           </div>
           <motion.p
             key={`f${play}`}
-            className="mt-4 text-[22px] leading-[1.35] md:text-[26px]"
-            style={{ ...penF, color: P.red }}
+            className="mt-4 text-[16px] font-semibold leading-[1.5] md:text-[17px]"
+            style={{ color: P.red }}
             initial={reduce ? false : { clipPath: "inset(0 100% 0 0)" }}
             animate={{ clipPath: run ? "inset(0 0% 0 0)" : "inset(0 100% 0 0)" }}
             transition={reduce ? { duration: 0 } : { delay: finalDelay, duration: 1.1, ease: "linear" }}
@@ -1101,8 +802,8 @@ function Correction({ reduce }: { reduce: boolean }) {
               setActive(null);
               setPlay((x) => x + 1);
             }}
-            className={`inline-flex items-center gap-1.5 rounded-[4px] border-[1.5px] px-3 py-2 text-[15px] font-bold ${focusRing}`}
-            style={{ borderColor: C.ink, outlineColor: C.green }}
+            className={`inline-flex items-center gap-1.5 rounded-[4px] border px-3 py-2 text-[15px] font-bold ${focusRing}`}
+            style={{ borderColor: C.ink, outlineColor: C.accent }}
           >
             <RotateCcw size={16} aria-hidden />
             다시 그리기
@@ -1117,8 +818,8 @@ function Correction({ reduce }: { reduce: boolean }) {
                   type="button"
                   aria-pressed={on}
                   onClick={() => setActive(on ? null : k)}
-                  className={`flex w-full gap-3 rounded-[4px] border-[1.5px] p-3 text-left ${focusRing}`}
-                  style={{ borderColor: on ? C.red : C.border, background: on ? "#fff4f4" : C.card, outlineColor: C.green }}
+                  className={`flex w-full gap-3 rounded-[4px] border p-3 text-left ${focusRing}`}
+                  style={{ borderColor: on ? C.red : C.border, background: on ? "#f8f1f0" : C.card, outlineColor: C.accent }}
                 >
                   <span className="grid h-7 w-7 flex-none place-items-center rounded-full text-[14px] font-bold text-white" style={{ background: P.red }}>
                     {k + 1}
@@ -1160,7 +861,7 @@ function Glyph({ ch, r, c, n, rows, style }: { ch: string; r: number; c: number;
 function FeeTable({ onConsult }: { onConsult: () => void }) {
   return (
     <div className="mt-6">
-      <ul className="border-t-[1.5px]" style={{ borderColor: C.ink }}>
+      <ul className="border-t" style={{ borderColor: C.ink }}>
         <li className="hidden grid-cols-[1.1fr_0.7fr_2fr_1fr] gap-4 border-b py-3 text-[14px] font-bold md:grid" style={{ borderColor: C.border, color: C.muted }}>
           <span>반</span>
           <span>대상</span>
@@ -1186,17 +887,15 @@ function FeeTable({ onConsult }: { onConsult: () => void }) {
       </ul>
       <div className="mt-4 flex flex-wrap items-center justify-between gap-4">
         <p className="inline-flex items-center gap-2 text-[15px]" style={{ color: C.muted }}>
-          <Wallet size={17} aria-hidden />
-          주 1회 90분, 교재비 월 15,000원 별도, 교육청 신고 교습비
+          <Wallet size={17} aria-hidden />주 1회 90분, 교재비 월 15,000원 별도, 교육청 신고 교습비
         </p>
         <button
           type="button"
           onClick={onConsult}
-          className={`inline-flex items-center gap-2 rounded-[4px] border-[1.5px] px-4 py-2.5 text-[15px] font-bold ${focusRing}`}
-          style={{ borderColor: C.green, color: C.green, outlineColor: C.green }}
+          className={`inline-flex items-center gap-2 rounded-[4px] border px-4 py-2.5 text-[15px] font-bold ${focusRing}`}
+          style={{ borderColor: C.accent, color: C.accent, outlineColor: C.accent }}
         >
-          <MessageCircle size={18} aria-hidden />
-          반 배정 상담
+          <MessageCircle size={18} aria-hidden />반 배정 상담
         </button>
       </div>
     </div>
@@ -1244,17 +943,24 @@ function ConsultForm({ today, reduce, grade, setGrade }: { today: Date; reduce: 
     });
   };
 
-  const chip = `rounded-[4px] border-[1.5px] px-3.5 py-2 text-[15px] font-semibold ${focusRing}`;
-  const chipStyle = (on: boolean) => ({ borderColor: on ? C.green : C.border, background: on ? C.green : C.card, color: on ? "#fff" : C.ink, outlineColor: C.green });
-  const field = `mt-2 block h-12 w-full rounded-[4px] border-[1.5px] px-3 text-[17px] ${focusRing}`;
+  const chip = `rounded-[4px] border px-3.5 py-2 text-[15px] font-semibold ${focusRing}`;
+  const chipStyle = (on: boolean) => ({ borderColor: on ? C.accent : C.border, background: on ? C.accent : C.card, color: on ? "#fff" : C.ink, outlineColor: C.accent });
+  const field = `mt-2 block h-12 w-full rounded-[4px] border px-3 text-[17px] ${focusRing}`;
 
   return (
     <div className="mt-6 rounded-[6px] border p-5 md:p-8" style={{ borderColor: C.border, background: C.card }}>
       <AnimatePresence mode="wait" initial={false}>
         {done ? (
-          <motion.div key="done" initial={reduce ? false : { opacity: 0, x: 14 }} animate={{ opacity: 1, x: 0 }} exit={{ opacity: 0 }} transition={{ duration: reduce ? 0 : 0.3, ease: EASE }} role="status">
-            <p className="inline-flex items-center gap-2 text-[22px]" style={batangF}>
-              <span className="grid h-9 w-9 place-items-center rounded-full" style={{ background: C.red, color: "#fff" }}>
+          <motion.div
+            key="done"
+            initial={reduce ? false : { opacity: 0, x: 14 }}
+            animate={{ opacity: 1, x: 0 }}
+            exit={{ opacity: 0 }}
+            transition={{ duration: reduce ? 0 : 0.3, ease: EASE }}
+            role="status"
+          >
+            <p className="inline-flex items-center gap-2 text-[22px] font-bold">
+              <span className="grid h-9 w-9 place-items-center rounded-full" style={{ background: C.accent, color: "#fff" }}>
                 <Check size={20} aria-hidden />
               </span>
               상담 신청이 접수됐어요
@@ -1290,8 +996,8 @@ function ConsultForm({ today, reduce, grade, setGrade }: { today: Date; reduce: 
                 setDone(null);
                 setTried(false);
               }}
-              className={`mt-6 rounded-[4px] border-[1.5px] px-4 py-2.5 text-[15px] font-bold ${focusRing}`}
-              style={{ borderColor: C.ink, outlineColor: C.green }}
+              className={`mt-6 rounded-[4px] border px-4 py-2.5 text-[15px] font-bold ${focusRing}`}
+              style={{ borderColor: C.ink, outlineColor: C.accent }}
             >
               새로 신청하기
             </button>
@@ -1332,7 +1038,14 @@ function ConsultForm({ today, reduce, grade, setGrade }: { today: Date; reduce: 
               <legend className="text-[16px] font-bold">희망일</legend>
               <div className="mt-2 grid grid-cols-3 gap-2 sm:grid-cols-6">
                 {days.map((d, i) => (
-                  <button key={d.getTime()} type="button" aria-pressed={day === i} onClick={() => setDay(i)} className={`rounded-[4px] border-[1.5px] py-2.5 text-center ${focusRing}`} style={chipStyle(day === i)}>
+                  <button
+                    key={d.getTime()}
+                    type="button"
+                    aria-pressed={day === i}
+                    onClick={() => setDay(i)}
+                    className={`rounded-[4px] border py-2.5 text-center ${focusRing}`}
+                    style={chipStyle(day === i)}
+                  >
                     <span className="block text-[13px] font-semibold">{DOW[d.getDay()]}</span>
                     <span className="block text-[17px] font-bold tabular-nums">
                       {d.getMonth() + 1}.{d.getDate()}
@@ -1345,7 +1058,15 @@ function ConsultForm({ today, reduce, grade, setGrade }: { today: Date; reduce: 
               <label htmlFor={nameId} className="text-[16px] font-bold">
                 보호자 이름
               </label>
-              <input id={nameId} value={name} onChange={(e) => setName(e.target.value)} autoComplete="name" className={field} style={{ borderColor: tried && !nameOk ? C.error : C.border, outlineColor: C.green }} aria-invalid={tried && !nameOk} />
+              <input
+                id={nameId}
+                value={name}
+                onChange={(e) => setName(e.target.value)}
+                autoComplete="name"
+                className={field}
+                style={{ borderColor: tried && !nameOk ? C.error : C.border, outlineColor: C.accent }}
+                aria-invalid={tried && !nameOk}
+              />
               {tried && !nameOk && (
                 <p className="mt-1 text-[14px] font-semibold" style={{ color: C.error }}>
                   이름을 두 글자 이상 넣어 주세요.
@@ -1356,7 +1077,17 @@ function ConsultForm({ today, reduce, grade, setGrade }: { today: Date; reduce: 
               <label htmlFor={phoneId} className="text-[16px] font-bold">
                 연락처
               </label>
-              <input id={phoneId} value={phone} onChange={(e) => setPhone(e.target.value)} inputMode="tel" autoComplete="tel" placeholder="010-0000-0000" className={`${field} tabular-nums`} style={{ borderColor: tried && !phoneOk ? C.error : C.border, outlineColor: C.green }} aria-invalid={tried && !phoneOk} />
+              <input
+                id={phoneId}
+                value={phone}
+                onChange={(e) => setPhone(e.target.value)}
+                inputMode="tel"
+                autoComplete="tel"
+                placeholder="010-0000-0000"
+                className={`${field} tabular-nums`}
+                style={{ borderColor: tried && !phoneOk ? C.error : C.border, outlineColor: C.accent }}
+                aria-invalid={tried && !phoneOk}
+              />
               {tried && !phoneOk && (
                 <p className="mt-1 text-[14px] font-semibold" style={{ color: C.error }}>
                   휴대폰 번호를 확인해 주세요.
@@ -1367,11 +1098,25 @@ function ConsultForm({ today, reduce, grade, setGrade }: { today: Date; reduce: 
               <label htmlFor={memoId} className="text-[16px] font-bold">
                 아이가 좋아하는 책(선택)
               </label>
-              <textarea id={memoId} value={memo} onChange={(e) => setMemo(e.target.value)} rows={2} className={`mt-2 block w-full rounded-[4px] border-[1.5px] px-3 py-2.5 text-[16px] ${focusRing}`} style={{ borderColor: C.border, outlineColor: C.green }} />
+              <textarea
+                id={memoId}
+                value={memo}
+                onChange={(e) => setMemo(e.target.value)}
+                rows={2}
+                className={`mt-2 block w-full rounded-[4px] border px-3 py-2.5 text-[16px] ${focusRing}`}
+                style={{ borderColor: C.border, outlineColor: C.accent }}
+              />
             </div>
             <div className="flex flex-wrap items-center justify-between gap-4 md:col-span-2">
               <label htmlFor={agreeId} className="inline-flex cursor-pointer flex-wrap items-center gap-2 text-[15px]">
-                <input id={agreeId} type="checkbox" checked={agree} onChange={(e) => setAgree(e.target.checked)} className={`h-5 w-5 ${focusRing}`} style={{ accentColor: C.green, outlineColor: C.green }} />
+                <input
+                  id={agreeId}
+                  type="checkbox"
+                  checked={agree}
+                  onChange={(e) => setAgree(e.target.checked)}
+                  className={`h-5 w-5 ${focusRing}`}
+                  style={{ accentColor: C.accent, outlineColor: C.accent }}
+                />
                 개인정보 수집 및 이용 동의(필수)
                 {tried && !agree && (
                   <span className="font-semibold" style={{ color: C.error }}>
@@ -1383,15 +1128,14 @@ function ConsultForm({ today, reduce, grade, setGrade }: { today: Date; reduce: 
                 type="submit"
                 data-gtm-cta="reading-academy_consult_submit"
                 className={`inline-flex items-center gap-2 rounded-[4px] px-6 py-3 text-[17px] font-bold ${focusRing}`}
-                style={{ background: C.red, color: "#fff", outlineColor: C.ink }}
+                style={{ background: C.accent, color: "#fff", outlineColor: C.ink }}
               >
                 <CalendarCheck size={20} aria-hidden />
                 상담 신청
               </button>
             </div>
             <p className="inline-flex items-center gap-2 text-[14px] md:col-span-2" style={{ color: C.muted }}>
-              <FileText size={16} aria-hidden />
-              첫 상담 때 짧은 글쓰기 진단을 같이 해요. 20분 걸려요.
+              <FileText size={16} aria-hidden />첫 상담 때 짧은 글쓰기 진단을 같이 해요. 20분 걸려요.
             </p>
           </motion.form>
         )}
@@ -1399,4 +1143,3 @@ function ConsultForm({ today, reduce, grade, setGrade }: { today: Date; reduce: 
     </div>
   );
 }
-

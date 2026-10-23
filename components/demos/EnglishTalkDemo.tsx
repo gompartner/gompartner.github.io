@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useMemo, useRef, useState, type FormEvent, type ReactNode } from "react";
-import { AnimatePresence, motion, useScroll, useTransform, type MotionValue } from "framer-motion";
+import { AnimatePresence, motion, useScroll, useTransform } from "framer-motion";
 import {
   BookOpen,
   CalendarCheck,
@@ -19,14 +19,14 @@ import {
   TrainFront,
   Users,
 } from "lucide-react";
-import { Black_Han_Sans, JetBrains_Mono } from "@/lib/local-fonts";
 import { useReducedMotionSafe } from "@/hooks/useReducedMotionSafe";
 import { daysAgo, fmtKo, fmtMD, useDemoToday } from "@/hooks/useDemoToday";
 import { maskName, maskPhone } from "@/components/demos/LeadReceivedPanel";
 import { DemoMakerInfo } from "@/components/demos/DemoMakerInfo";
 
-/* 성인 영어회화 학원 홈페이지 샘플: 가상의 곰파트너영어회화.
+/* 성인 영어회화 학원 홈페이지 샘플: 가상의 영어회화 학원 곰파트너.
    학원명, 강사, 주소, 전화번호, 교습비는 모두 가상이다. 합격, 점수 실적, 수강생 실명과 후기는 넣지 않는다.
+   첫 화면 사진 출처: AI 생성(Z-Image-Turbo, Apache 2.0)
 
    국내 성인 회화 학원 사이트 공통 구성(참고): 메뉴는 학원소개, 강좌안내, 레벨테스트, 시간표, 수강료,
    무료 체험수업, 오시는 길. 첫 화면에는 직장인 새벽반, 저녁반, 주말반 시간과 레벨테스트 바로가기를 크게 둔다.
@@ -34,34 +34,33 @@ import { DemoMakerInfo } from "@/components/demos/DemoMakerInfo";
    교습비는 교육지원청에 신고한 월 교습비로 게시하고 환불은 학원법 시행령 기준을 따른다고 적는 게 보통이다.
 
    상호작용(모두 브라우저 안에서만 돈다. 실제로 보내지 않는다)
-   1. 레벨테스트 5문항: 대화창처럼 문제가 말풍선으로 나오고 고른 답이 내 말풍선으로 붙는다. 끝나면 레벨과 맞는 반.
+   1. 레벨테스트 5문항: 대화창처럼 문제 카드가 나오고 고른 답이 오른쪽 카드로 붙는다. 끝나면 레벨과 맞는 반.
    2. 시간표: 새벽반, 저녁반, 주말반 탭과 레벨 칩. 반을 고르면 수강료와 체험 신청에 그대로 이어진다.
    3. 월 수강료: 주 횟수별 월 교습비 표. 고른 반의 줄이 표시되고 개월 수를 바꾸면 합계가 나온다.
    4. 무료 체험 신청: 이름, 휴대폰, 체험 반, 그 반이 열리는 가까운 날짜 3개 중 하나. 접수 번호와 회신 예정일.
 
-   포스터 첫 화면(et-poster): 빨강 바탕에 크림색 큰 문장 "출근 전 7시 반, 50분 회화" 하나만 둔다.
-   오른쪽(휴대폰은 아래)에 입체 말풍선 다섯 개가 좌우 번갈아 튀어 올라 쌓이고 안에 짧은 영어 문장이 한 글자씩 찍힌다.
-   말풍선은 앞면 그라디언트, 두께 면, 바닥 그림자, 윗가장자리 하이라이트로 입체감을 준다. 등장 뒤에는 7초 주기로 살짝 뜬다.
-   스크롤하면 말풍선이 서로 다른 속도로 위로 흘러가고 문장도 위로 빠진다. 동작 줄이기면 다 찍힌 대화로 고정한다. */
+   핵심 모션, 첫 화면(et-poster): 학원 교실에서 직장인 두 명이 원탁에 앉아 회화하는 사진 한 장이 화면을 채운다.
+   들어올 때 사진이 1.6초 동안 1.06배에서 제자리로 천천히 다가오고, 문장 "출근 전 7시 반, 50분 회화"와 정보 줄은
+   0.3초 늦게 아래에서 올라온다(CSS keyframes, 끝 상태가 기본값이라 JS 없이도 보인다).
+   스크롤하면 사진만 조금 느리게 내려간다(y 0~8%). 동작 줄이기면 모두 멈춘 채로 둔다. */
 
-const sfx = { fontFamily: `${Black_Han_Sans.style.fontFamily}, sans-serif` } as const;
-const mono = { fontFamily: `${JetBrains_Mono.style.fontFamily}, ui-monospace, monospace` } as const;
-
-const BRAND = "곰파트너영어회화";
+const BRAND = "곰파트너";
 const TEL = "02-000-0000";
 const ADDRESS = "서울 ㅇㅇ구 ㅇㅇ로 00, 5층";
 const KAKAO = "카카오톡 채널 곰파트너";
+const IMG = "/images/demo-english-talk";
 
 const C = {
-  red: "#c8202f",
-  redDeep: "#9e1622",
-  redTint: "#f6d9d3",
-  cream: "#fbf1e1",
-  paper: "#f8efdf",
-  card: "#fffaf1",
-  ink: "#2b1a17",
-  muted: "#6a5650",
-  line: "#e6d6bd",
+  accent: "#9b2c2c",
+  accentDeep: "#7f2323",
+  tint: "#f6eeee",
+  bg: "#ffffff",
+  alt: "#f7f7f5",
+  ink: "#111111",
+  body: "#4b4b4b",
+  muted: "#767676",
+  line: "#e5e5e5",
+  dark: "#141414",
   error: "#a3141f",
 };
 
@@ -69,18 +68,6 @@ const C = {
 /** 화면 안 전환(탭, 결과, 숫자) */
 const EASE = [0.22, 1, 0.36, 1] as const;
 const DUR = 0.32;
-/** 말풍선이 튀어나올 때 살짝 넘쳤다 돌아오는 곡선 */
-const EASE_POP = [0.34, 1.56, 0.64, 1] as const;
-/** 포스터 말풍선 하나가 튀어 오르는 시간 */
-const POP_MS = 420;
-/** 말풍선 사이 간격. 다섯 개라 마지막은 1.12초에 나온다 */
-const BUBBLE_GAP_MS = 280;
-/** 한 글자 찍히는 시간. 가장 긴 문장도 0.6초 안에 끝나 전체 등장은 2초 안쪽 */
-const TYPE_MS = 24;
-/** 등장 뒤 말풍선이 떠 있는 주기 */
-const FLOAT_MS = 7200;
-/** 포스터 스크롤 진행도 중 퇴장이 끝나는 지점 */
-const EXIT_END = 0.7;
 
 const focusRing = "focus-visible:outline focus-visible:outline-[3px] focus-visible:outline-offset-2";
 const won = (n: number) => `${n.toLocaleString("ko-KR")}원`;
@@ -180,47 +167,6 @@ const FEES: Fee[] = [
 const feeOf = (c: Klass) => FEES.find((f) => (c.slot === "weekend" ? f.weekend : !f.weekend && f.per === c.days.length)) ?? FEES[1];
 const BOOK = "교재비 별도(권당 18,000~22,000원)";
 
-/* ---------- 포스터 말풍선 ---------- */
-
-interface BubbleDef {
-  side: "L" | "R";
-  text: string;
-  time: string;
-}
-const BUBBLES: BubbleDef[] = [
-  { side: "L", text: "Morning! Ready?", time: "07:30" },
-  { side: "R", text: "Coffee first, please.", time: "07:30" },
-  { side: "L", text: "How was your weekend?", time: "07:31" },
-  { side: "R", text: "I finally went hiking.", time: "07:31" },
-  { side: "L", text: "See you tomorrow, 7:30!", time: "08:20" },
-];
-/** viewBox 600x820. 글자 크기 26, 고정폭 글꼴 한 글자 약 15.6 */
-const B_FONT = 26;
-const B_CHAR = 15.8;
-const B_PAD = 32;
-const B_H = 80;
-const B_STEP = 138;
-const B_TOP = 70;
-const B_DEPTH: [number, number] = [9, 11];
-/** 퇴장할 때 말풍선마다 다른 위로 흐르는 거리(viewBox 단위) */
-const B_RISE = [520, 640, 760, 880, 1000];
-
-const bubbleW = (t: string) => Math.round(t.length * B_CHAR + B_PAD * 2);
-
-/** 꼬리가 왼쪽 아래에 달린 둥근 말풍선. 오른쪽 말풍선은 뒤집어 쓴다 */
-function bubblePath(w: number, h: number) {
-  const r = h / 2;
-  return [
-    `M${r} 0 H${w - r}`,
-    `A${r} ${r} 0 0 1 ${w} ${r}`,
-    `A${r} ${r} 0 0 1 ${w - r} ${h}`,
-    `H62`,
-    `C48 ${h} 30 ${h + 14} 6 ${h + 20}`,
-    `C16 ${h + 8} 8 ${h - 4} 4 ${h - 14}`,
-    `A${r} ${r} 0 0 1 ${r} 0 Z`,
-  ].join(" ");
-}
-
 /* ---------- 체험 신청 ---------- */
 
 interface Receipt {
@@ -279,74 +225,74 @@ export function EnglishTalkDemo() {
   const navBtn = `rounded-[4px] px-2.5 py-1.5 text-[15px] underline-offset-4 hover:underline ${focusRing}`;
 
   return (
-    <div className="min-h-screen overflow-x-clip" style={{ background: C.paper, color: C.ink }}>
+    <div className="min-h-screen overflow-x-clip" style={{ background: C.bg, color: C.ink }}>
       <Poster reduce={reduce} onCta={() => go("et-trial")} />
 
-      <header className="mx-auto flex max-w-[1200px] flex-wrap items-center justify-between gap-x-4 gap-y-2 px-4 py-4 md:px-6">
-        <h2 className="inline-flex items-center gap-2 text-[22px] leading-none" style={sfx}>
-          <BrandMark size={26} />
-          {BRAND}
-        </h2>
-        <nav aria-label="주요 메뉴" className="-mx-2 flex flex-wrap items-center">
-          {[
-            ["et-test", "레벨테스트"],
-            ["et-schedule", "시간표"],
-            ["et-fee", "수강료"],
-            ["et-trial", "무료 체험"],
-            ["et-location", "오시는 길"],
-          ].map(([id, label]) => (
-            <button key={id} type="button" onClick={() => go(id)} className={navBtn} style={{ outlineColor: C.red }}>
-              {label}
-            </button>
-          ))}
-          <a
-            href={`tel:${TEL.replace(/-/g, "")}`}
-            data-gtm-cta="english-talk_tel"
-            className={`ml-1 inline-flex items-center gap-1.5 rounded-full px-3.5 py-2 text-[15px] font-bold ${focusRing}`}
-            style={{ background: C.ink, color: C.cream, outlineColor: C.red }}
-          >
-            <Phone size={16} aria-hidden />
-            {TEL}
-          </a>
-        </nav>
-      </header>
-
-      {/* 짧은 소개 띠 */}
-      <section className="mx-auto max-w-[1200px] px-4 pb-4 pt-6 md:px-6 md:pt-10">
-        <div className="grid gap-6 md:grid-cols-[1.2fr_1fr] md:items-end">
-          <div>
-            <h2 className="text-[34px] leading-[1.18] md:text-[52px]" style={{ ...sfx, wordBreak: "keep-all" }}>
-              직장인 영어회화
-              <br />
-              <span style={{ color: C.red }}>한 반 6명</span>
-            </h2>
-            <p className="mt-4 text-[17px] leading-[1.6]" style={{ color: C.muted }}>
-              레벨테스트 후 반 배정, 수업은 50분 회화만 해요.
-            </p>
-          </div>
-          <ul className="grid grid-cols-3 gap-2 text-[15px]">
-            {SLOTS.map((s) => (
-              <li key={s.key}>
-                <button
-                  type="button"
-                  onClick={() => {
-                    setSlot(s.key);
-                    go("et-schedule");
-                  }}
-                  className={`flex h-full w-full flex-col items-start gap-1 rounded-[10px] border px-3 py-3 text-left ${focusRing}`}
-                  style={{ borderColor: C.line, background: C.card, outlineColor: C.red }}
-                >
-                  <s.Icon size={20} aria-hidden style={{ color: C.red }} />
-                  <span className="font-bold">{s.label}</span>
-                  <span className="text-[14px]" style={{ color: C.muted }}>
-                    {s.time}
-                  </span>
-                </button>
-              </li>
+      <div style={{ background: C.alt }}>
+        <header className="mx-auto flex max-w-[1200px] flex-wrap items-center justify-between gap-x-4 gap-y-2 px-4 py-4 md:px-6">
+          <h2>
+            <SampleLogo />
+          </h2>
+          <nav aria-label="주요 메뉴" className="-mx-2 flex flex-wrap items-center">
+            {[
+              ["et-test", "레벨테스트"],
+              ["et-schedule", "시간표"],
+              ["et-fee", "수강료"],
+              ["et-trial", "무료 체험"],
+              ["et-location", "오시는 길"],
+            ].map(([id, label]) => (
+              <button key={id} type="button" onClick={() => go(id)} className={navBtn} style={{ color: C.body, outlineColor: C.accent }}>
+                {label}
+              </button>
             ))}
-          </ul>
-        </div>
-      </section>
+            <a
+              href={`tel:${TEL.replace(/-/g, "")}`}
+              data-gtm-cta="english-talk_tel"
+              className={`ml-1 inline-flex items-center gap-1.5 rounded-[6px] px-3.5 py-2 text-[15px] font-semibold tabular-nums ${focusRing}`}
+              style={{ background: C.ink, color: "#fff", outlineColor: C.accent }}
+            >
+              <Phone size={16} aria-hidden />
+              {TEL}
+            </a>
+          </nav>
+        </header>
+
+        {/* 짧은 소개 띠 */}
+        <section className="mx-auto max-w-[1200px] px-4 pb-10 pt-6 md:px-6 md:pb-14 md:pt-10">
+          <div className="grid gap-6 md:grid-cols-[1.2fr_1fr] md:items-end">
+            <div>
+              <h2 className="text-[30px] font-bold leading-[1.25] tracking-[-0.03em] md:text-[44px]" style={{ wordBreak: "keep-all" }}>
+                직장인 영어회화
+                <br />한 반 6명
+              </h2>
+              <p className="mt-4 text-[17px] leading-[1.6]" style={{ color: C.body }}>
+                레벨테스트 후 반 배정, 수업은 50분 회화만 해요.
+              </p>
+            </div>
+            <ul className="grid grid-cols-3 gap-2 text-[15px]">
+              {SLOTS.map((s) => (
+                <li key={s.key}>
+                  <button
+                    type="button"
+                    onClick={() => {
+                      setSlot(s.key);
+                      go("et-schedule");
+                    }}
+                    className={`flex h-full w-full flex-col items-start gap-1 rounded-[8px] border px-3 py-3 text-left hover:border-[#bdbdbd] ${focusRing}`}
+                    style={{ borderColor: C.line, background: "#fff", outlineColor: C.accent }}
+                  >
+                    <s.Icon size={20} aria-hidden style={{ color: C.accent }} />
+                    <span className="font-semibold">{s.label}</span>
+                    <span className="text-[14px] tabular-nums" style={{ color: C.muted }}>
+                      {s.time}
+                    </span>
+                  </button>
+                </li>
+              ))}
+            </ul>
+          </div>
+        </section>
+      </div>
 
       <main className="mx-auto max-w-[1200px] px-4 md:px-6">
         <LevelTest reduce={reduce} result={result} onDone={setResult} onShow={showLevel} />
@@ -366,13 +312,12 @@ export function EnglishTalkDemo() {
         <Location />
       </main>
 
-      <footer className="mt-16" style={{ background: C.ink, color: C.cream }}>
+      <footer className="mt-16" style={{ background: C.dark, color: "#ededed" }}>
         <div className="mx-auto max-w-[1200px] px-4 py-10 md:px-6">
-          <p className="inline-flex items-center gap-2 text-[20px]" style={sfx}>
-            <BrandMark size={22} back={C.cream} />
-            {BRAND}
+          <p>
+            <SampleLogo light size={18} />
           </p>
-          <p className="mt-3 text-[15px] leading-[1.7]">
+          <p className="mt-3 text-[15px] leading-[1.7]" style={{ color: "#bdbdbd" }}>
             {ADDRESS}, 전화 {TEL}
             <br />
             상담 평일 07:00~21:30, 토 09:30~15:00, 일 09:30~12:00
@@ -388,12 +333,20 @@ export function EnglishTalkDemo() {
 
 /* ---------- 상호 표시 ---------- */
 
-function BrandMark({ size, back = C.ink }: { size: number; back?: string }) {
+/* 로고: 메인 사이트와 같은 곰 로고 + 곰파트너(크게) + 업종(작게) */
+function SampleLogo({ light, size = 20 }: { light?: boolean; size?: number }) {
+  const mark = size + 8;
   return (
-    <svg width={size} height={size} viewBox="0 0 32 32" aria-hidden>
-      <path d="M4 6 H20 A4 4 0 0 1 24 10 V16 A4 4 0 0 1 20 20 H11 L6 24 V20 H8 A4 4 0 0 1 4 16 Z" fill={C.red} />
-      <path d="M14 13 H26 A3 3 0 0 1 29 16 V22 A3 3 0 0 1 26 25 H25 V28 L21 25 H17 A3 3 0 0 1 14 22 Z" fill={back} />
-    </svg>
+    <span className="inline-flex items-center gap-2 leading-none" style={{ color: light ? "#fff" : "#111" }}>
+      {/* eslint-disable-next-line @next/next/no-img-element -- 메인 사이트와 같은 곰 로고 */}
+      <img src="/images/logo-bear.png" alt="" aria-hidden width={mark} height={mark} className="shrink-0" style={{ width: mark, height: mark }} />
+      <span className="flex items-baseline gap-1 whitespace-nowrap">
+        <span className="font-bold tracking-[-0.03em]" style={{ fontSize: size }}>
+          곰파트너
+        </span>
+        <span className="text-[12px] font-semibold opacity-75">영어회화 샘플</span>
+      </span>
+    </span>
   );
 }
 
@@ -402,194 +355,74 @@ function BrandMark({ size, back = C.ink }: { size: number; back?: string }) {
 function Poster({ reduce, onCta }: { reduce: boolean; onCta: () => void }) {
   const ref = useRef<HTMLElement>(null);
   const { scrollYProgress } = useScroll({ target: ref, offset: ["start start", "end start"] });
-  const p = useTransform(scrollYProgress, (v) => (reduce ? 0 : Math.min(1, v / EXIT_END)));
-  const textY = useTransform(p, (v) => `${-v * 46}svh`);
-  const textO = useTransform(p, (v) => Math.max(0, 1 - Math.max(0, v - 0.25) / 0.55));
+  const photoY = useTransform(scrollYProgress, (v) => (reduce ? "0%" : `${v * 8}%`));
 
   return (
-    <section id="et-poster" ref={ref} aria-labelledby="et-poster-title" className="relative" style={{ height: reduce ? undefined : "180svh", background: C.red }}>
+    <section id="et-poster" ref={ref} aria-labelledby="et-poster-title" className="relative min-h-[100svh] overflow-hidden" style={{ background: C.dark }}>
       <style>{`
-        @keyframes et-pop {
-          0% { transform: translateY(40px) scale(0.3); opacity: 0; }
-          55% { transform: translateY(-6px) scale(1.05); opacity: 1; }
-          80% { transform: translateY(2px) scale(0.985); }
-          100% { transform: none; opacity: 1; }
-        }
-        @keyframes et-type {
-          from { clip-path: inset(-20% 100% -20% 0); }
-          to { clip-path: inset(-20% 0 -20% 0); }
-        }
-        @keyframes et-float {
-          0%, 100% { transform: translateY(0); }
-          50% { transform: translateY(-10px); }
-        }
-        @media (prefers-reduced-motion: reduce) { .et-anim { animation: none !important; } }
+        @keyframes et-photo-in { from { transform: scale(1.06); } to { transform: none; } }
+        @keyframes et-rise { from { opacity: 0; transform: translateY(12px); } to { opacity: 1; transform: none; } }
+        .et-photo-in { animation: et-photo-in 1.6s cubic-bezier(0.22, 1, 0.36, 1) both; }
+        .et-rise { animation: et-rise 0.7s cubic-bezier(0.22, 1, 0.36, 1) 0.3s backwards; }
+        @media (prefers-reduced-motion: reduce) { .et-photo-in, .et-rise { animation: none; } }
       `}</style>
-      <div
-        className={`${reduce ? "relative min-h-svh" : "sticky top-0 h-svh"} overflow-hidden`}
-        style={{ background: `radial-gradient(90% 70% at 78% 60%, #d93a45 0%, ${C.red} 48%, #ad1826 100%)`, color: C.cream }}
-      >
-        {/* 말풍선 대화 */}
-        <div className="pointer-events-none absolute inset-x-0 bottom-0 flex h-[50svh] items-end justify-center px-3 pb-[2svh] md:inset-y-0 md:left-auto md:right-[3vw] md:h-full md:items-center md:pb-0">
-          <svg
-            viewBox="0 0 600 820"
-            className="h-full w-auto max-w-full overflow-visible md:h-[84svh] md:max-w-[44vw]"
-            role="img"
-            aria-label="영어 문장이 적힌 말풍선 다섯 개가 대화처럼 좌우로 번갈아 쌓인 그림"
-          >
-            <BubbleDefs />
-            {BUBBLES.map((b, i) => (
-              <Bubble key={i} b={b} i={i} p={p} reduce={reduce} />
-            ))}
-          </svg>
-        </div>
 
+      <motion.div className="absolute inset-0" style={{ y: photoY }}>
+        {/* eslint-disable-next-line @next/next/no-img-element -- 정적 export 라 next/image 최적화를 쓰지 않는다 */}
+        <img
+          src={`${IMG}/hero.jpg`}
+          srcSet={`${IMG}/hero-sm.jpg 960w, ${IMG}/hero.jpg 1920w`}
+          sizes="100vw"
+          alt="밝은 학원 교실 원탁에서 정장 차림 직장인 두 명이 노트와 커피를 두고 영어로 대화하는 모습"
+          fetchPriority="high"
+          className={`absolute inset-0 h-full w-full object-cover ${reduce ? "" : "et-photo-in"}`}
+          style={{ objectPosition: "40% 45%" }}
+        />
+      </motion.div>
+      {/* 위는 밝은 벽이라 흰 막에 어두운 글씨, 아래는 어두운 막에 흰 글씨 */}
+      <div
+        aria-hidden
+        className="pointer-events-none absolute inset-0"
+        style={{
+          background:
+            "linear-gradient(to bottom, rgba(255,255,255,0.78), rgba(255,255,255,0) 20%), linear-gradient(to top, rgba(0,0,0,0.8) 0%, rgba(0,0,0,0.62) 32%, rgba(0,0,0,0.12) 62%, rgba(0,0,0,0) 78%)",
+        }}
+      />
+
+      <div className="relative z-10 flex min-h-[100svh] flex-col justify-between px-4 pb-10 pt-4 md:px-12 md:pb-16 md:pt-7">
         {/* 로고와 핵심 행동 하나 */}
-        <motion.div className="absolute inset-x-0 top-0 z-10 flex items-center justify-between px-4 pt-4 md:px-12 md:pt-7" style={{ y: textY }}>
-          <p className="inline-flex items-center gap-2 text-[17px] leading-none" style={sfx}>
-            <svg width="20" height="20" viewBox="0 0 32 32" aria-hidden>
-              <path d="M4 6 H20 A4 4 0 0 1 24 10 V16 A4 4 0 0 1 20 20 H11 L6 24 V20 H8 A4 4 0 0 1 4 16 Z" fill={C.cream} />
-              <path d="M14 13 H26 A3 3 0 0 1 29 16 V22 A3 3 0 0 1 26 25 H25 V28 L21 25 H17 A3 3 0 0 1 14 22 Z" fill={C.ink} />
-            </svg>
-            {BRAND}
+        <div className="flex items-center justify-between gap-3">
+          <p>
+            <SampleLogo size={18} />
           </p>
           <button
             type="button"
             onClick={onCta}
-            aria-label="무료 체험 신청"
-            title="무료 체험 신청"
             data-gtm-cta="english-talk_poster_cta"
-            className={`pointer-events-auto inline-flex h-12 w-12 items-center justify-center rounded-full ${focusRing}`}
-            style={{ background: C.cream, color: C.red, outlineColor: C.cream }}
+            className={`inline-flex items-center gap-1.5 rounded-[6px] px-4 py-2.5 text-[15px] font-semibold ${focusRing}`}
+            style={{ background: C.accent, color: "#fff", outlineColor: C.ink }}
           >
-            <CalendarCheck size={22} aria-hidden />
+            <CalendarCheck size={17} aria-hidden />
+            무료 체험 신청
           </button>
-        </motion.div>
+        </div>
 
         {/* 큰 문장 */}
-        <motion.div
-          className="relative z-[1] flex h-full flex-col px-4 pt-[13svh] md:justify-center md:px-12 md:pb-[6svh] md:pt-0"
-          style={{ y: textY, opacity: textO }}
-        >
+        <div className={`max-w-[820px] text-white ${reduce ? "" : "et-rise"}`}>
           <h1
             id="et-poster-title"
-            className="text-[clamp(52px,16vw,72px)] leading-[1.1] tracking-[-0.01em] md:text-[clamp(96px,9.2vw,170px)] md:leading-[1.04]"
-            style={{ ...sfx, wordBreak: "keep-all" }}
+            className="text-[36px] font-bold leading-[1.2] tracking-[-0.03em] md:text-[clamp(40px,5vw,72px)]"
+            style={{ wordBreak: "keep-all" }}
           >
-            <span className="block">출근 전</span>
-            <span className="block">7시 반,</span>
+            <span className="block">출근 전 7시 반,</span>
             <span className="block">50분 회화</span>
           </h1>
-          <p className="mt-5 text-[16px] md:mt-8 md:text-[19px]">{BRAND}, 평일 새벽반 07:30~08:20</p>
-        </motion.div>
+          <p className="mt-4 text-[16px] tabular-nums md:mt-5 md:text-[19px]" style={{ color: "rgba(255,255,255,0.88)" }}>
+            {BRAND}, 평일 새벽반 07:30~08:20
+          </p>
+        </div>
       </div>
     </section>
-  );
-}
-
-function BubbleDefs() {
-  return (
-    <defs>
-      {/* 크림 말풍선: 위에서 빛이 닿고 아래로 갈수록 종이색이 짙어진다 */}
-      <linearGradient id="et-cream-face" x1="0" y1="0" x2="0.35" y2="1">
-        <stop offset="0" stopColor="#fffdf6" />
-        <stop offset="0.55" stopColor="#f8ecd6" />
-        <stop offset="1" stopColor="#ecd9b8" />
-      </linearGradient>
-      <linearGradient id="et-cream-side" x1="0" y1="0" x2="0" y2="1">
-        <stop offset="0" stopColor="#c9ac83" />
-        <stop offset="1" stopColor="#a68660" />
-      </linearGradient>
-      {/* 먹색 말풍선 */}
-      <linearGradient id="et-ink-face" x1="0" y1="0" x2="0.35" y2="1">
-        <stop offset="0" stopColor="#4a302a" />
-        <stop offset="0.6" stopColor="#2f1d19" />
-        <stop offset="1" stopColor="#1f1210" />
-      </linearGradient>
-      <linearGradient id="et-ink-side" x1="0" y1="0" x2="0" y2="1">
-        <stop offset="0" stopColor="#150b09" />
-        <stop offset="1" stopColor="#0b0504" />
-      </linearGradient>
-      <radialGradient id="et-floor" cx="0.5" cy="0.5" r="0.5">
-        <stop offset="0" stopColor="#4a050c" stopOpacity="0.5" />
-        <stop offset="1" stopColor="#4a050c" stopOpacity="0" />
-      </radialGradient>
-    </defs>
-  );
-}
-
-function Bubble({ b, i, p, reduce }: { b: BubbleDef; i: number; p: MotionValue<number>; reduce: boolean }) {
-  const w = bubbleW(b.text);
-  const x = b.side === "L" ? 26 : 600 - 26 - w - B_DEPTH[0];
-  const top = B_TOP + i * B_STEP;
-  const y = useTransform(p, (v) => -B_RISE[i] * Math.pow(v, 1.25));
-  const o = useTransform(p, (v) => Math.max(0, 1 - Math.max(0, v - 0.35 - i * 0.04) / 0.4));
-
-  const delay = i * BUBBLE_GAP_MS;
-  const typeDelay = delay + POP_MS * 0.55;
-  const isL = b.side === "L";
-  const d = bubblePath(w, B_H);
-  const flip = isL ? undefined : `translate(${w} 0) scale(-1 1)`;
-
-  return (
-    <motion.g style={{ y, opacity: o }}>
-      <g transform={`translate(${x} ${top})`}>
-        <g
-          className="et-anim"
-          style={reduce ? undefined : { animation: `et-float ${FLOAT_MS}ms ease-in-out ${2000 + i * 650}ms infinite`, transformBox: "fill-box" }}
-        >
-          <g
-            className="et-anim"
-            style={{
-              transformBox: "fill-box",
-              transformOrigin: isL ? "0% 100%" : "100% 100%",
-              animation: reduce ? undefined : `et-pop ${POP_MS}ms cubic-bezier(0.22, 1, 0.36, 1) ${delay}ms both`,
-            }}
-          >
-            {/* 바닥에 떨어진 그림자 */}
-            <ellipse cx={w / 2 + 14} cy={B_H + 30} rx={w * 0.46} ry="12" fill="url(#et-floor)" />
-            <g transform={flip}>
-              {/* 두께 면 */}
-              <path d={d} transform={`translate(${B_DEPTH[0]} ${B_DEPTH[1]})`} fill={isL ? "url(#et-cream-side)" : "url(#et-ink-side)"} />
-              {/* 앞면 */}
-              <path d={d} fill={isL ? "url(#et-cream-face)" : "url(#et-ink-face)"} />
-              {/* 윗가장자리 하이라이트 */}
-              <path
-                d={`M${B_H / 2 - 6} 5 H${w - B_H / 2 - 4}`}
-                stroke={isL ? "rgba(255,255,255,0.95)" : "rgba(255,226,214,0.32)"}
-                strokeWidth="3"
-                strokeLinecap="round"
-                fill="none"
-              />
-              <path
-                d={`M8 ${B_H / 2 - 4} A${B_H / 2 - 6} ${B_H / 2 - 6} 0 0 1 ${B_H / 2 - 6} 6`}
-                stroke={isL ? "rgba(255,255,255,0.7)" : "rgba(255,226,214,0.22)"}
-                strokeWidth="2.4"
-                strokeLinecap="round"
-                fill="none"
-              />
-            </g>
-            <text
-              className="et-anim"
-              x={B_PAD}
-              y={B_H / 2 + B_FONT * 0.36}
-              fontSize={B_FONT}
-              fontWeight="600"
-              fill={isL ? C.ink : C.cream}
-              style={{
-                ...mono,
-                animation: reduce ? undefined : `et-type ${b.text.length * TYPE_MS}ms steps(${b.text.length}, end) ${typeDelay}ms both`,
-              }}
-            >
-              {b.text}
-            </text>
-            <text x={isL ? w + 22 : -14} y={B_H - 6} fontSize="18" textAnchor={isL ? "start" : "end"} fill="rgba(251,241,225,0.82)" style={mono}>
-              {b.time}
-            </text>
-          </g>
-        </g>
-      </g>
-    </motion.g>
   );
 }
 
@@ -598,7 +431,7 @@ function Bubble({ b, i, p, reduce }: { b: BubbleDef; i: number; p: MotionValue<n
 function SectionHead({ id, title, children }: { id: string; title: string; children?: ReactNode }) {
   return (
     <div className="flex flex-wrap items-end justify-between gap-3">
-      <h2 id={`${id}-title`} className="text-[28px] leading-tight md:text-[36px]" style={sfx}>
+      <h2 id={`${id}-title`} className="text-[26px] font-bold leading-tight tracking-[-0.03em] md:text-[34px]">
         {title}
       </h2>
       {children}
@@ -637,13 +470,13 @@ function LevelTest({
     if (el) el.scrollTo({ top: el.scrollHeight, behavior: reduce ? "auto" : "smooth" });
   }, [answers.length, reduce]);
 
-  const pop = () =>
+  const appear = () =>
     reduce
       ? { initial: false as const }
       : {
-          initial: { opacity: 0, scale: 0.6, y: 14 },
-          animate: { opacity: 1, scale: 1, y: 0 },
-          transition: { duration: 0.38, ease: EASE_POP },
+          initial: { opacity: 0, y: 6 },
+          animate: { opacity: 1, y: 0 },
+          transition: { duration: 0.24, ease: EASE },
         };
 
   return (
@@ -655,42 +488,40 @@ function LevelTest({
       </SectionHead>
 
       <div className="mt-5 grid gap-5 md:grid-cols-[1.25fr_1fr]">
-        <div className="rounded-[12px] border" style={{ borderColor: C.line, background: C.card }}>
+        <div className="rounded-[8px] border" style={{ borderColor: C.line, background: "#fff" }}>
           <div className="flex items-center justify-between border-b px-4 py-3 text-[15px]" style={{ borderColor: C.line }}>
-            <span className="inline-flex items-center gap-2 font-bold">
-              <MessagesSquare size={18} aria-hidden style={{ color: C.red }} />
+            <span className="inline-flex items-center gap-2 font-semibold">
+              <MessagesSquare size={18} aria-hidden style={{ color: C.accent }} />
               테스트 담당 강사
             </span>
-            <span aria-live="polite" style={{ color: C.muted }}>
+            <span aria-live="polite" className="tabular-nums" style={{ color: C.muted }}>
               {done ? "끝" : `${idx + 1} / ${QUESTIONS.length}`}
             </span>
           </div>
-          <div className="h-1.5 w-full" style={{ background: C.line }} aria-hidden>
+          <div className="h-1 w-full" style={{ background: C.line }} aria-hidden>
             <motion.div
               className="h-full origin-left"
-              style={{ background: C.red }}
+              style={{ background: C.accent }}
               initial={false}
               animate={{ scaleX: idx / QUESTIONS.length }}
               transition={{ duration: reduce ? 0 : DUR, ease: EASE }}
             />
           </div>
 
-          <div ref={logRef} className="flex max-h-[440px] min-h-[300px] flex-col gap-3 overflow-y-auto px-4 py-5" role="log" aria-label="레벨테스트 대화">
+          <div ref={logRef} className="flex max-h-[440px] min-h-[300px] flex-col gap-3 overflow-y-auto px-4 py-5" style={{ background: C.alt }} role="log" aria-label="레벨테스트 대화">
             {QUESTIONS.slice(0, Math.min(idx + 1, QUESTIONS.length)).map((q, i) => (
               <div key={i} className="flex flex-col gap-3">
-                <motion.div {...pop()} className="max-w-[88%] self-start rounded-[18px] rounded-bl-[4px] px-4 py-3" style={{ background: C.redTint, transformOrigin: "0% 100%" }}>
-                  <p className="text-[13px] font-bold" style={{ color: C.redDeep }}>
+                <motion.div {...appear()} className="max-w-[88%] self-start rounded-[8px] border px-4 py-3" style={{ background: "#fff", borderColor: C.line }}>
+                  <p className="text-[13px] font-semibold" style={{ color: C.muted }}>
                     문제 {i + 1}, {q.hint}
                   </p>
-                  <p className="mt-1 whitespace-pre-line text-[17px] leading-[1.5]" style={/[A-Za-z]/.test(q.ask) ? mono : undefined}>
-                    {q.ask}
-                  </p>
+                  <p className="mt-1 whitespace-pre-line text-[17px] leading-[1.5]">{q.ask}</p>
                 </motion.div>
                 {answers[i] !== undefined && (
                   <motion.p
-                    {...pop()}
-                    className="max-w-[80%] self-end rounded-[18px] rounded-br-[4px] px-4 py-3 text-[16px]"
-                    style={{ background: C.ink, color: C.cream, transformOrigin: "100% 100%" }}
+                    {...appear()}
+                    className="max-w-[80%] self-end rounded-[8px] px-4 py-3 text-[16px]"
+                    style={{ background: C.ink, color: "#fff" }}
                   >
                     {q.choices[answers[i]]}
                   </motion.p>
@@ -698,12 +529,16 @@ function LevelTest({
               </div>
             ))}
             {done && (
-              <motion.div {...pop()} className="max-w-[92%] self-start rounded-[18px] rounded-bl-[4px] px-4 py-4" style={{ background: C.red, color: C.cream, transformOrigin: "0% 100%" }}>
-                <p className="text-[15px]">5문항 중 {score}개 맞혔어요</p>
-                <p className="mt-1 text-[26px] leading-tight" style={sfx}>
+              <motion.div {...appear()} className="max-w-[92%] self-start rounded-[8px] border px-4 py-4" style={{ background: "#fff", borderColor: C.accent }}>
+                <p className="text-[15px]" style={{ color: C.body }}>
+                  5문항 중 {score}개 맞혔어요
+                </p>
+                <p className="mt-1 text-[24px] font-bold leading-tight tracking-[-0.02em]" style={{ color: C.accent }}>
                   {lv.name} {lv.ko}
                 </p>
-                <p className="mt-1 text-[15px]">{lv.can}부터 시작해요.</p>
+                <p className="mt-1 text-[15px]" style={{ color: C.body }}>
+                  {lv.can}부터 시작해요.
+                </p>
               </motion.div>
             )}
           </div>
@@ -716,8 +551,8 @@ function LevelTest({
                     key={`${idx}-${k}`}
                     type="button"
                     onClick={() => choose(k)}
-                    className={`rounded-[10px] border px-4 py-3 text-left text-[16px] hover:border-current ${focusRing}`}
-                    style={{ borderColor: C.line, background: "#fff", outlineColor: C.red, ...(/[A-Za-z]/.test(c) ? mono : {}) }}
+                    className={`rounded-[6px] border px-4 py-3 text-left text-[16px] hover:border-[#9a9a9a] ${focusRing}`}
+                    style={{ borderColor: C.line, background: "#fff", outlineColor: C.accent }}
                   >
                     {c}
                   </button>
@@ -729,8 +564,8 @@ function LevelTest({
                   type="button"
                   onClick={() => onShow(lv.key)}
                   data-gtm-cta="english-talk_test_result"
-                  className={`inline-flex items-center gap-2 rounded-full px-5 py-3 text-[16px] font-bold ${focusRing}`}
-                  style={{ background: C.red, color: C.cream, outlineColor: C.ink }}
+                  className={`inline-flex items-center gap-2 rounded-[6px] px-5 py-3 text-[16px] font-semibold ${focusRing}`}
+                  style={{ background: C.accent, color: "#fff", outlineColor: C.ink }}
                 >
                   <CalendarCheck size={18} aria-hidden />
                   {lv.name} 반 시간표 보기
@@ -738,8 +573,8 @@ function LevelTest({
                 <button
                   type="button"
                   onClick={() => setAnswers([])}
-                  className={`inline-flex items-center gap-2 rounded-full border px-5 py-3 text-[16px] ${focusRing}`}
-                  style={{ borderColor: C.ink, outlineColor: C.red }}
+                  className={`inline-flex items-center gap-2 rounded-[6px] border px-5 py-3 text-[16px] font-semibold ${focusRing}`}
+                  style={{ borderColor: "#cfcfcf", outlineColor: C.accent }}
                 >
                   <RotateCcw size={17} aria-hidden />
                   다시 풀기
@@ -756,16 +591,17 @@ function LevelTest({
             return (
               <li
                 key={l.key}
-                className="flex items-start gap-3 rounded-[10px] border px-4 py-3"
-                style={{ borderColor: on ? C.red : C.line, background: on ? C.redTint : C.card, borderWidth: on ? 2 : 1 }}
+                className="flex items-start gap-3 rounded-[8px] border px-4 py-3"
+                style={{ borderColor: on ? C.accent : C.line, background: on ? C.tint : "#fff" }}
               >
-                <span className="mt-0.5 w-[116px] shrink-0 whitespace-nowrap text-[15px] font-bold md:w-[128px] md:text-[17px]" style={mono}>
-                  {l.name}
-                </span>
-                <span className="text-[15px] leading-[1.55]">
-                  <span className="font-bold">{l.ko}</span> {l.can}
+                <span className="mt-0.5 w-[116px] shrink-0 whitespace-nowrap text-[15px] font-bold md:w-[128px] md:text-[17px]">{l.name}</span>
+                <span className="text-[15px] leading-[1.55]" style={{ color: C.body }}>
+                  <span className="font-semibold" style={{ color: C.ink }}>
+                    {l.ko}
+                  </span>{" "}
+                  {l.can}
                   {on && (
-                    <span className="ml-2 inline-flex items-center gap-1 text-[14px] font-bold" style={{ color: C.redDeep }}>
+                    <span className="ml-2 inline-flex items-center gap-1 text-[14px] font-semibold" style={{ color: C.accent }}>
                       <Check size={14} aria-hidden />내 레벨
                     </span>
                   )}
@@ -781,6 +617,7 @@ function LevelTest({
     </section>
   );
 }
+
 
 /* ---------- 2. 시간표 ---------- */
 
@@ -826,8 +663,8 @@ function Schedule({
               role="tab"
               aria-selected={on}
               onClick={() => setSlot(s.key)}
-              className={`inline-flex items-center gap-2 rounded-full border px-4 py-2.5 text-[16px] ${on ? "font-bold" : ""} ${focusRing}`}
-              style={{ borderColor: on ? C.ink : C.line, background: on ? C.ink : C.card, color: on ? C.cream : C.ink, outlineColor: C.red }}
+              className={`inline-flex items-center gap-2 rounded-[6px] border px-4 py-2.5 text-[16px] ${on ? "font-semibold" : ""} ${focusRing}`}
+              style={{ borderColor: on ? C.ink : C.line, background: on ? C.ink : "#fff", color: on ? "#fff" : C.ink, outlineColor: C.accent }}
             >
               <s.Icon size={17} aria-hidden />
               {s.label}
@@ -846,7 +683,7 @@ function Schedule({
               aria-pressed={on}
               onClick={() => setLevelFilter(k)}
               className={`rounded-[6px] border px-3 py-1.5 text-[15px] ${focusRing}`}
-              style={{ borderColor: on ? C.red : C.line, color: on ? C.redDeep : C.ink, fontWeight: on ? 700 : 400, background: on ? C.redTint : "transparent", outlineColor: C.red }}
+              style={{ borderColor: on ? C.accent : C.line, color: on ? C.accent : C.body, fontWeight: on ? 600 : 400, background: on ? C.tint : "#fff", outlineColor: C.accent }}
             >
               {k === "all" ? "전체 레벨" : levelOf(k).name}
             </button>
@@ -856,7 +693,7 @@ function Schedule({
 
       <div className="mt-5 grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
         <AnimatePresence mode="popLayout" initial={false}>
-          {list.map((c, i) => {
+          {list.map((c) => {
             const on = c.id === selected;
             const full = c.seats === 0;
             return (
@@ -867,30 +704,29 @@ function Schedule({
                 aria-pressed={on}
                 disabled={full}
                 onClick={() => onPick(c.id)}
-                initial={reduce ? false : { opacity: 0, rotate: i % 2 ? 3 : -3, scale: 0.85 }}
-                animate={{ opacity: 1, rotate: 0, scale: 1 }}
-                exit={reduce ? { opacity: 0, transition: { duration: 0 } } : { opacity: 0, scale: 0.85, transition: { duration: 0.18 } }}
-                transition={{ duration: reduce ? 0 : 0.34, ease: EASE_POP }}
-                className={`relative flex flex-col items-start rounded-[14px] rounded-bl-[4px] border px-4 pb-4 pt-3.5 text-left disabled:cursor-not-allowed ${focusRing}`}
+                initial={reduce ? false : { opacity: 0 }}
+                animate={{ opacity: 1 }}
+                exit={reduce ? { opacity: 0, transition: { duration: 0 } } : { opacity: 0, transition: { duration: 0.16 } }}
+                transition={{ duration: reduce ? 0 : 0.24, ease: EASE }}
+                className={`relative flex flex-col items-start rounded-[8px] border px-4 pb-4 pt-3.5 text-left disabled:cursor-not-allowed ${focusRing}`}
                 style={{
-                  borderColor: on ? C.red : C.line,
-                  borderWidth: on ? 2 : 1,
-                  background: full ? "#efe6d6" : on ? C.card : "#fff",
-                  outlineColor: C.red,
+                  borderColor: on ? C.accent : C.line,
+                                    background: full ? C.alt : on ? C.tint : "#fff",
+                  outlineColor: C.accent,
                 }}
               >
                 <span className="flex w-full items-center justify-between gap-2">
-                  <span className="text-[19px] font-bold" style={mono}>
+                  <span className="text-[19px] font-bold">
                     {levelOf(c.level).name}
                   </span>
                   {result === c.level && (
-                    <span className="rounded-[4px] px-1.5 py-0.5 text-[13px] font-bold" style={{ background: C.red, color: C.cream }}>
+                    <span className="rounded-[4px] px-1.5 py-0.5 text-[13px] font-semibold" style={{ background: C.accent, color: "#fff" }}>
                       추천
                     </span>
                   )}
                 </span>
                 <span className="mt-2 inline-flex items-center gap-1.5 text-[16px]">
-                  <Clock size={15} aria-hidden style={{ color: C.red }} />
+                  <Clock size={15} aria-hidden style={{ color: C.accent }} />
                   <span className="tabular-nums">{c.time}</span>
                 </span>
                 <span className="mt-2 flex gap-1" aria-label={`수업 요일 ${daysText(c.days)}`}>
@@ -901,7 +737,7 @@ function Schedule({
                         key={d}
                         aria-hidden
                         className="inline-flex h-7 w-7 items-center justify-center rounded-full text-[13px]"
-                        style={{ background: has ? C.ink : "transparent", color: has ? C.cream : "#a8988a", fontWeight: has ? 700 : 400, border: has ? "none" : `1px solid ${C.line}` }}
+                        style={{ background: has ? C.ink : "transparent", color: has ? "#fff" : C.muted, fontWeight: has ? 700 : 400, border: has ? "none" : `1px solid ${C.line}` }}
                       >
                         {DOW[d]}
                       </span>
@@ -916,7 +752,7 @@ function Schedule({
                   </span>
                 </span>
                 {on && (
-                  <span className="mt-3 inline-flex items-center gap-1 text-[14px] font-bold" style={{ color: C.redDeep }}>
+                  <span className="mt-3 inline-flex items-center gap-1 text-[14px] font-bold" style={{ color: C.accent }}>
                     <Check size={15} aria-hidden />
                     고른 반
                   </span>
@@ -926,21 +762,21 @@ function Schedule({
           })}
         </AnimatePresence>
         {list.length === 0 && (
-          <p className="rounded-[10px] border px-4 py-5 text-[15px] sm:col-span-2" style={{ borderColor: C.line, color: C.muted }}>
+          <p className="rounded-[8px] border px-4 py-5 text-[15px] sm:col-span-2" style={{ borderColor: C.line, color: C.muted }}>
             {slotOf(slot).label}에는 이 레벨 반이 없어요. 다른 시간대를 눌러 보세요.
           </p>
         )}
       </div>
 
-      <div className="mt-5 flex flex-wrap items-center justify-between gap-3 rounded-[10px] px-4 py-3" style={{ background: C.ink, color: C.cream }}>
+      <div className="mt-5 flex flex-wrap items-center justify-between gap-3 rounded-[8px] px-4 py-3" style={{ background: C.ink, color: "#fff" }}>
         <p className="text-[16px]">
           <span className="font-bold">{classLabel(sel)}</span> {daysText(sel.days)} {sel.time}
         </p>
         <button
           type="button"
           onClick={onTrial}
-          className={`inline-flex items-center gap-2 rounded-full px-4 py-2 text-[15px] font-bold ${focusRing}`}
-          style={{ background: C.cream, color: C.red, outlineColor: C.cream }}
+          className={`inline-flex items-center gap-2 rounded-[6px] px-4 py-2 text-[15px] font-semibold ${focusRing}`}
+          style={{ background: "#fff", color: C.accent, outlineColor: "#fff" }}
         >
           <CalendarCheck size={16} aria-hidden />이 반 무료 체험
         </button>
@@ -961,7 +797,7 @@ function Fees({ reduce, selected }: { reduce: boolean; selected: Klass }) {
       <SectionHead id="et-fee" title="월 수강료" />
 
       <div className="mt-5 grid gap-5 md:grid-cols-[1.3fr_1fr]">
-        <div className="overflow-x-auto rounded-[12px] border" style={{ borderColor: C.line, background: C.card }}>
+        <div className="overflow-x-auto rounded-[8px] border" style={{ borderColor: C.line, background: "#fff" }}>
           <table className="w-full min-w-[340px] text-left text-[16px]">
             <caption className="px-4 pt-3 text-left text-[14px]" style={{ color: C.muted }}>
               ㅇㅇ교육지원청 신고 월 교습비, 반 정원 {CAP}명
@@ -983,11 +819,11 @@ function Fees({ reduce, selected }: { reduce: boolean; selected: Klass }) {
               {FEES.map((f) => {
                 const on = f.key === fee.key;
                 return (
-                  <tr key={f.key} className="border-b last:border-b-0" style={{ borderColor: C.line, background: on ? C.redTint : undefined }}>
+                  <tr key={f.key} className="border-b last:border-b-0" style={{ borderColor: C.line, background: on ? C.tint : undefined }}>
                     <th scope="row" className="px-4 py-3.5 font-bold">
                       {f.label}
                       {on && (
-                        <span className="ml-2 inline-flex items-center gap-1 text-[13px]" style={{ color: C.redDeep }}>
+                        <span className="ml-2 inline-flex items-center gap-1 text-[13px]" style={{ color: C.accent }}>
                           <Check size={13} aria-hidden />
                           고른 반
                         </span>
@@ -1008,18 +844,22 @@ function Fees({ reduce, selected }: { reduce: boolean; selected: Klass }) {
           </p>
         </div>
 
-        <div className="rounded-[12px] px-5 py-5" style={{ background: C.red, color: C.cream }}>
-          <p className="text-[15px]">고른 반</p>
-          <p className="mt-1 text-[22px] leading-snug" style={sfx}>
+        <div className="rounded-[8px] border px-5 py-5" style={{ background: C.alt, borderColor: C.line }}>
+          <p className="text-[15px]" style={{ color: C.muted }}>
+            고른 반
+          </p>
+          <p className="mt-1 text-[22px] font-bold leading-snug tracking-[-0.02em]">
             {classLabel(selected)}
           </p>
-          <p className="mt-1 text-[15px]">
+          <p className="mt-1 text-[15px] tabular-nums" style={{ color: C.body }}>
             {daysText(selected.days)} {selected.time}, {fee.label}
           </p>
 
           <div className="mt-5 flex items-center justify-between gap-3">
-            <span className="text-[15px]">등록 개월</span>
-            <div className="flex overflow-hidden rounded-full border" style={{ borderColor: "rgba(251,241,225,0.6)" }} role="group" aria-label="등록 개월 수">
+            <span className="text-[15px]" style={{ color: C.body }}>
+              등록 개월
+            </span>
+            <div className="flex overflow-hidden rounded-[6px] border" style={{ borderColor: C.line, background: "#fff" }} role="group" aria-label="등록 개월 수">
               {[1, 2, 3].map((m) => (
                 <button
                   key={m}
@@ -1027,7 +867,7 @@ function Fees({ reduce, selected }: { reduce: boolean; selected: Klass }) {
                   aria-pressed={months === m}
                   onClick={() => setMonths(m)}
                   className={`px-4 py-2 text-[15px] ${focusRing}`}
-                  style={{ background: months === m ? C.cream : "transparent", color: months === m ? C.red : C.cream, fontWeight: months === m ? 700 : 400, outlineColor: C.cream }}
+                  style={{ background: months === m ? C.accent : "transparent", color: months === m ? "#fff" : C.body, fontWeight: months === m ? 600 : 400, outlineColor: C.accent }}
                 >
                   {m}개월
                 </button>
@@ -1035,13 +875,14 @@ function Fees({ reduce, selected }: { reduce: boolean; selected: Klass }) {
             </div>
           </div>
 
-          <div className="mt-5 border-t pt-4" style={{ borderColor: "rgba(251,241,225,0.4)" }}>
-            <p className="text-[15px]">교습비 합계</p>
+          <div className="mt-5 border-t pt-4" style={{ borderColor: C.line }}>
+            <p className="text-[15px]" style={{ color: C.muted }}>
+              교습비 합계
+            </p>
             <AnimatePresence mode="popLayout" initial={false}>
               <motion.p
                 key={total}
-                className="text-[38px] leading-tight tabular-nums"
-                style={sfx}
+                className="text-[36px] font-bold leading-tight tracking-[-0.02em] tabular-nums"
                 initial={reduce ? false : { y: "-40%", opacity: 0 }}
                 animate={{ y: 0, opacity: 1 }}
                 exit={reduce ? { opacity: 0, transition: { duration: 0 } } : { y: "40%", opacity: 0 }}
@@ -1050,7 +891,9 @@ function Fees({ reduce, selected }: { reduce: boolean; selected: Klass }) {
                 {won(total)}
               </motion.p>
             </AnimatePresence>
-            <p className="mt-1 text-[14px]">{BOOK}</p>
+            <p className="mt-1 text-[14px]" style={{ color: C.muted }}>
+              {BOOK}
+            </p>
           </div>
         </div>
       </div>
@@ -1123,28 +966,28 @@ function Trial({
         </p>
       </SectionHead>
 
-      <div className="mt-5 rounded-[12px] border" style={{ borderColor: C.line, background: C.card }}>
+      <div className="mt-5 rounded-[8px] border" style={{ borderColor: C.line, background: "#fff" }}>
         <AnimatePresence mode="wait" initial={false}>
           {receipt ? (
             <motion.div
               key="done"
               className="px-5 py-6 md:px-8 md:py-8"
-              initial={reduce ? false : { opacity: 0, scale: 0.96, y: 10 }}
-              animate={{ opacity: 1, scale: 1, y: 0 }}
+              initial={reduce ? false : { opacity: 0, y: 8 }}
+              animate={{ opacity: 1, y: 0 }}
               exit={reduce ? { opacity: 0, transition: { duration: 0 } } : { opacity: 0 }}
-              transition={{ duration: reduce ? 0 : 0.36, ease: EASE_POP }}
+              transition={{ duration: reduce ? 0 : 0.3, ease: EASE }}
               role="status"
             >
-              <p className="inline-flex items-center gap-2 text-[15px] font-bold" style={{ color: C.redDeep }}>
+              <p className="inline-flex items-center gap-2 text-[15px] font-semibold" style={{ color: C.accent }}>
                 <Check size={18} aria-hidden />
                 체험 신청이 접수됐어요
               </p>
-              <p className="mt-2 text-[26px] leading-tight md:text-[32px]" style={sfx}>
+              <p className="mt-2 text-[26px] font-bold leading-tight tracking-[-0.02em] md:text-[32px]">
                 {fmtKo(receipt.date)} {receipt.klass.time.split("~")[0]}
               </p>
               <dl className="mt-5 grid gap-x-6 gap-y-2.5 text-[16px] sm:grid-cols-[120px_1fr]">
                 <dt style={{ color: C.muted }}>접수 번호</dt>
-                <dd className="font-bold tabular-nums" style={mono}>
+                <dd className="font-semibold tabular-nums">
                   {receipt.no}
                 </dd>
                 <dt style={{ color: C.muted }}>신청자</dt>
@@ -1165,8 +1008,8 @@ function Trial({
               <button
                 type="button"
                 onClick={reset}
-                className={`mt-6 inline-flex items-center gap-2 rounded-full border px-5 py-2.5 text-[15px] ${focusRing}`}
-                style={{ borderColor: C.ink, outlineColor: C.red }}
+                className={`mt-6 inline-flex items-center gap-2 rounded-[6px] border px-5 py-2.5 text-[15px] font-semibold ${focusRing}`}
+                style={{ borderColor: "#cfcfcf", outlineColor: C.accent }}
               >
                 <RotateCcw size={16} aria-hidden />
                 새로 신청
@@ -1181,11 +1024,11 @@ function Trial({
               initial={false}
               exit={reduce ? { opacity: 0, transition: { duration: 0 } } : { opacity: 0, transition: { duration: 0.16 } }}
             >
-              <label className="block text-[15px] font-bold">
+              <label className="block text-[15px] font-semibold">
                 이름
-                <input value={name} onChange={(e) => setName(e.target.value)} autoComplete="name" className={field} style={{ borderColor: C.line, background: "#fff", outlineColor: C.red }} />
+                <input value={name} onChange={(e) => setName(e.target.value)} autoComplete="name" className={field} style={{ borderColor: C.line, background: "#fff", outlineColor: C.accent }} />
               </label>
-              <label className="block text-[15px] font-bold">
+              <label className="block text-[15px] font-semibold">
                 휴대폰
                 <input
                   value={phone}
@@ -1194,10 +1037,10 @@ function Trial({
                   autoComplete="tel"
                   placeholder="010-0000-0000"
                   className={field}
-                  style={{ borderColor: C.line, background: "#fff", outlineColor: C.red }}
+                  style={{ borderColor: C.line, background: "#fff", outlineColor: C.accent }}
                 />
               </label>
-              <label className="block text-[15px] font-bold">
+              <label className="block text-[15px] font-semibold">
                 체험할 반
                 <select
                   value={selected.id}
@@ -1206,7 +1049,7 @@ function Trial({
                     setDateIdx(0);
                   }}
                   className={field}
-                  style={{ borderColor: C.line, background: "#fff", outlineColor: C.red }}
+                  style={{ borderColor: C.line, background: "#fff", outlineColor: C.accent }}
                 >
                   {open.map((c) => (
                     <option key={c.id} value={c.id}>
@@ -1221,7 +1064,7 @@ function Trial({
                 )}
               </label>
               <fieldset>
-                <legend className="text-[15px] font-bold">체험 날짜</legend>
+                <legend className="text-[15px] font-semibold">체험 날짜</legend>
                 <div className="mt-1.5 grid grid-cols-3 gap-2">
                   {dates.map((d, k) => {
                     const on = k === Math.min(dateIdx, dates.length - 1);
@@ -1232,7 +1075,7 @@ function Trial({
                         aria-pressed={on}
                         onClick={() => setDateIdx(k)}
                         className={`rounded-[8px] border px-2 py-2.5 text-center text-[15px] ${focusRing}`}
-                        style={{ borderColor: on ? C.red : C.line, background: on ? C.redTint : "#fff", fontWeight: on ? 700 : 400, outlineColor: C.red }}
+                        style={{ borderColor: on ? C.accent : C.line, background: on ? C.tint : "#fff", fontWeight: on ? 700 : 400, outlineColor: C.accent }}
                       >
                         {fmtKo(d)}
                       </button>
@@ -1242,7 +1085,7 @@ function Trial({
               </fieldset>
               <div className="md:col-span-2">
                 <label className="inline-flex cursor-pointer items-start gap-2.5 text-[15px]">
-                  <input type="checkbox" checked={agree} onChange={(e) => setAgree(e.target.checked)} className="mt-1 h-[18px] w-[18px] accent-[#c8202f]" />
+                  <input type="checkbox" checked={agree} onChange={(e) => setAgree(e.target.checked)} className="mt-1 h-[18px] w-[18px] accent-[#9b2c2c]" />
                   <span>
                     개인정보 수집, 이용 동의(필수)
                     <span className="block text-[14px]" style={{ color: C.muted }}>
@@ -1255,8 +1098,8 @@ function Trial({
                 <button
                   type="submit"
                   data-gtm-cta="english-talk_trial_submit"
-                  className={`inline-flex items-center gap-2 rounded-full px-6 py-3.5 text-[17px] font-bold ${focusRing}`}
-                  style={{ background: C.red, color: C.cream, outlineColor: C.ink }}
+                  className={`inline-flex items-center gap-2 rounded-[6px] px-6 py-3.5 text-[17px] font-semibold ${focusRing}`}
+                  style={{ background: C.accent, color: "#fff", outlineColor: C.ink }}
                 >
                   <CalendarCheck size={19} aria-hidden />
                   무료 체험 신청하기
@@ -1280,11 +1123,11 @@ function Location() {
     <section id="et-location" aria-labelledby="et-location-title" className="scroll-mt-4 pt-16">
       <SectionHead id="et-location" title="오시는 길" />
       <div className="mt-5 grid gap-5 md:grid-cols-[1.2fr_1fr]">
-        <svg viewBox="0 0 520 300" className="h-auto w-full rounded-[12px]" role="img" aria-label="ㅇㅇ역 2번 출구에서 큰길을 따라 걸어 3분 거리에 학원 건물이 있는 약도">
-          <rect width="520" height="300" fill="#efe3cd" />
-          <rect x="0" y="128" width="520" height="44" fill="#fffaf1" />
-          <rect x="300" y="0" width="34" height="300" fill="#fffaf1" />
-          <path d="M0 150 H520 M317 0 V300" stroke="#e1cfb0" strokeWidth="2" strokeDasharray="10 10" />
+        <svg viewBox="0 0 520 300" className="h-auto w-full rounded-[8px] border" style={{ borderColor: C.line }} role="img" aria-label="ㅇㅇ역 2번 출구에서 큰길을 따라 걸어 3분 거리에 학원 건물이 있는 약도">
+          <rect width="520" height="300" fill="#f2f2f0" />
+          <rect x="0" y="128" width="520" height="44" fill="#ffffff" />
+          <rect x="300" y="0" width="34" height="300" fill="#ffffff" />
+          <path d="M0 150 H520 M317 0 V300" stroke="#dedede" strokeWidth="2" strokeDasharray="10 10" />
           {[
             [30, 30, 110, 76],
             [160, 26, 110, 80],
@@ -1293,19 +1136,19 @@ function Location() {
             [364, 196, 130, 82],
             [364, 24, 60, 82],
           ].map(([x, y, w, h], k) => (
-            <rect key={k} x={x} y={y} width={w} height={h} rx="4" fill="#e3d4b9" />
+            <rect key={k} x={x} y={y} width={w} height={h} rx="4" fill="#e4e4e2" />
           ))}
           {/* 학원 건물 */}
-          <rect x="436" y="24" width="64" height="82" rx="4" fill={C.red} />
-          <text x="468" y="72" textAnchor="middle" fontSize="15" fill={C.cream} fontWeight="700">
+          <rect x="436" y="24" width="64" height="82" rx="4" fill={C.accent} />
+          <text x="468" y="72" textAnchor="middle" fontSize="15" fill={"#fff"} fontWeight="700">
             5층
           </text>
           {/* 역 출구 */}
           <circle cx="96" cy="150" r="17" fill={C.ink} />
-          <text x="96" y="156" textAnchor="middle" fontSize="16" fill={C.cream} fontWeight="700">
+          <text x="96" y="156" textAnchor="middle" fontSize="16" fill={"#fff"} fontWeight="700">
             2
           </text>
-          <path d="M118 150 H450 V112" fill="none" stroke={C.red} strokeWidth="4" strokeDasharray="2 9" strokeLinecap="round" />
+          <path d="M118 150 H450 V112" fill="none" stroke={C.accent} strokeWidth="4" strokeDasharray="2 9" strokeLinecap="round" />
           <text x="96" y="194" textAnchor="middle" fontSize="15" fill={C.ink}>
             ㅇㅇ역
           </text>
@@ -1315,23 +1158,23 @@ function Location() {
         </svg>
         <ul className="grid content-start gap-3 text-[16px] leading-[1.6]">
           <li className="flex gap-2.5">
-            <MapPin size={19} aria-hidden className="mt-0.5 shrink-0" style={{ color: C.red }} />
+            <MapPin size={19} aria-hidden className="mt-0.5 shrink-0" style={{ color: C.accent }} />
             {ADDRESS}
           </li>
           <li className="flex gap-2.5">
-            <TrainFront size={19} aria-hidden className="mt-0.5 shrink-0" style={{ color: C.red }} />
+            <TrainFront size={19} aria-hidden className="mt-0.5 shrink-0" style={{ color: C.accent }} />
             ㅇㅇ역 2번 출구 도보 3분
           </li>
           <li className="flex gap-2.5">
-            <Car size={19} aria-hidden className="mt-0.5 shrink-0" style={{ color: C.red }} />
+            <Car size={19} aria-hidden className="mt-0.5 shrink-0" style={{ color: C.accent }} />
             건물 주차 1시간 지원(새벽반은 07:00부터 입차)
           </li>
           <li className="flex gap-2.5">
-            <Clock size={19} aria-hidden className="mt-0.5 shrink-0" style={{ color: C.red }} />
+            <Clock size={19} aria-hidden className="mt-0.5 shrink-0" style={{ color: C.accent }} />
             상담 평일 07:00~21:30, 토 09:30~15:00, 일 09:30~12:00
           </li>
           <li className="flex gap-2.5">
-            <MessageCircle size={19} aria-hidden className="mt-0.5 shrink-0" style={{ color: C.red }} />
+            <MessageCircle size={19} aria-hidden className="mt-0.5 shrink-0" style={{ color: C.accent }} />
             {KAKAO}
           </li>
         </ul>

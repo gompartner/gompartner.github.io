@@ -1,24 +1,26 @@
 "use client";
 
 import { useEffect, useId, useRef, useState, useSyncExternalStore, type FormEvent } from "react";
-import { AnimatePresence, animate, motion, useMotionValue, useMotionValueEvent, useScroll, useSpring, useTransform, type MotionValue } from "framer-motion";
-import { CalendarCheck, Car, Check, Clock, Contact, Eye, Glasses, MapPin, MessageCircle, Phone, RotateCcw, TrainFront } from "lucide-react";
-import { IBM_Plex_Sans_KR } from "@/lib/local-fonts";
+import { AnimatePresence, motion, useMotionValue, useMotionValueEvent, useScroll, useSpring, useTransform } from "framer-motion";
+import { CalendarCheck, Car, Check, Clock, Contact, Eye, MapPin, MessageCircle, Phone, RotateCcw, TrainFront } from "lucide-react";
 import { useReducedMotionSafe } from "@/hooks/useReducedMotionSafe";
 import { maskName, maskPhone } from "@/components/demos/LeadReceivedPanel";
 import { daysAgo, fmtKo, useDemoToday } from "@/hooks/useDemoToday";
 import { DemoMakerInfo } from "@/components/demos/DemoMakerInfo";
 
-/* 안경원 홈페이지 샘플: 가상의 곰파트너안경. 상호, 주소, 전화는 모두 가상이다.
+/* 안경원 홈페이지 샘플: 가상의 곰파트너 안경원. 상호, 주소, 전화는 모두 가상이다.
 
    국내 안경원 사이트는 메뉴가 거의 같다. 안경테(브랜드, 소재), 렌즈(굴절률, 기능성 렌즈), 콘택트렌즈,
    시력검사(예약, 소요시간, 렌즈 착용자는 미리 빼고 오기), 오시는 길(주차, 영업시간). 첫 화면엔 보통 매장 사진과
    예약 버튼이 있고 가격은 상담 때 알려 준다. 이 샘플은 그 자리에 테를 직접 골라 보는 3D 안경을 두고
    테와 렌즈 가격을 바로 더해 준다. 얼굴형별 추천 문구는 안경원 상담에서 흔히 쓰는 말을 그대로 썼다.
 
-   핵심 모션: 가운데 안경이 마우스 위치를 따라 기울고(useMotionValue + useSpring), 렌즈 반사광은 포인터
-   반대쪽으로 움직인다. 터치 기기는 좌우로 천천히 흔들리고, 동작 줄이기면 멈춘다. 테를 바꾸면 모양이 겹치며
-   바뀐다(AnimatePresence, 180ms).
+   사진 출처: Pexels 사진 5202049
+
+   핵심 모션: 첫 화면은 진열대 안경 사진 한 장이다. 들어올 때 사진이 1.06배에서 천천히 제자리로 오고, 문장은 0.3초 늦게
+   아래에서 올라온다(CSS keyframes). 스크롤하면 사진만 조금 느리게 움직인다. 테 고르기 무대의 안경은 마우스 위치를 따라
+   기울고(useMotionValue + useSpring) 렌즈 반사광은 포인터 반대쪽으로 움직인다. 테를 바꾸면 모양이 겹치며 바뀐다
+   (AnimatePresence, 180ms). 동작 줄이기면 모두 멈춘다.
 
    상호작용(모두 브라우저 안에서만 돈다. 실제로 보내지 않는다)
    1. 얼굴형 고르기: 둥근형, 각진형, 긴형, 역삼각형. 고르면 맞는 테에 추천 표시와 이유 한 줄.
@@ -27,31 +29,25 @@ import { DemoMakerInfo } from "@/components/demos/DemoMakerInfo";
    4. 시력검사 예약: 날짜(오늘부터 7일), 시간, 이름, 휴대폰. 완료 화면에 예약번호와 담당 창구.
    5. 오시는 길과 영업시간: 오늘 요일 진하게, 주차 안내.
 
-   첫 화면 포스터: 밝은 회색 바탕에 남색 뿔테 안경이 화면을 덮는다. 문장은 바탕에 흐리게 깔리고(블러 고정)
-   렌즈 안에서만 선명하다(같은 문장 두 겹, 렌즈 모양 clip-path). 들어올 때 안경이 오른쪽에서 문장을 훑으며
-   가운데로 온다. PC는 포인터를 천천히 따라가고 터치 기기는 좌우로 떠다닌다. 스크롤하면 안경이 왼쪽 렌즈를
-   중심으로 커지며 렌즈 안으로 들어가고 렌즈 속 바탕색이 그대로 아래 화면으로 이어진다. */
+   첫 화면 포스터(op-poster): 한 화면 높이의 밝은 사진 위에 흰 막을 깔고 왼쪽 위 상호, 오른쪽 위 시력검사 예약 버튼,
+   문장 "검사부터 맞춤까지 30분이면 돼요"와 영업시간 한 줄. 글꼴은 Pretendard 한 벌, 강조색은 남색 하나. */
 
-const head = IBM_Plex_Sans_KR;
-const headF = { fontFamily: `${head.style.fontFamily}, sans-serif`, fontWeight: 700 } as const;
-
-const BRAND = "곰파트너안경";
+const BRAND = "곰파트너";
 const ADDRESS = "서울 ㅇㅇ구 ㅇㅇ로 00, 1층";
 const TEL = "02-000-0000";
 const KAKAO = "카카오톡 채널 곰파트너";
 
+/** 옅은 회색 바탕에 흰 판, 먹색 글자. 강조색은 차분한 남색(navy) 하나 */
 const C = {
-  bg: "#f5f6f8",
+  bg: "#f7f7f5",
   panel: "#ffffff",
-  navy: "#1b2a4a",
-  navySoft: "#2e4064",
-  steel: "#8a929c",
-  steelLine: "#d3d8de",
-  steelSoft: "#eceff3",
-  copper: "#a8521a",
-  copperSoft: "#fbeee4",
-  ink: "#1d2330",
-  muted: "#5c6572",
+  navy: "#24365a",
+  steel: "#8a8a8a",
+  steelLine: "#e5e5e5",
+  steelSoft: "#efefec",
+  ink: "#111111",
+  body: "#4b4b4b",
+  muted: "#767676",
   error: "#b42318",
 };
 
@@ -59,7 +55,6 @@ const C = {
 const TILT_SPRING = { stiffness: 120, damping: 18 } as const;
 const SWAP_MS = 180;
 const TINT_MS = 400;
-const SWAY_S = 7;
 const EASE = [0.22, 1, 0.36, 1] as const;
 
 const focusRing = "focus-visible:outline focus-visible:outline-[3px] focus-visible:outline-offset-2";
@@ -226,21 +221,20 @@ export function OpticalDemo() {
       <Poster reduce={reduce} onBook={() => go("op-book")} />
 
       <header className="mx-auto flex max-w-[1200px] items-center justify-between gap-3 px-4 py-4 md:px-6">
-        <h2 className="inline-flex items-center gap-2 text-[22px] leading-none" style={{ ...headF, color: C.navy }}>
-          <Glasses size={28} strokeWidth={2.2} aria-hidden />
-          {BRAND}
+        <h2>
+          <SampleLogo />
         </h2>
-        <nav aria-label="페이지 안 이동" className="hidden items-center gap-1 lg:flex" style={{ color: C.navySoft }}>
-          <button type="button" className={navBtn} style={{ outlineColor: C.copper }} onClick={() => go("op-frame")}>
+        <nav aria-label="페이지 안 이동" className="hidden items-center gap-1 lg:flex" style={{ color: C.body }}>
+          <button type="button" className={navBtn} style={{ outlineColor: C.navy }} onClick={() => go("op-frame")}>
             안경테
           </button>
-          <button type="button" className={navBtn} style={{ outlineColor: C.copper }} onClick={() => go("op-lens")}>
+          <button type="button" className={navBtn} style={{ outlineColor: C.navy }} onClick={() => go("op-lens")}>
             렌즈
           </button>
-          <button type="button" className={navBtn} style={{ outlineColor: C.copper }} onClick={() => go("op-contact")}>
+          <button type="button" className={navBtn} style={{ outlineColor: C.navy }} onClick={() => go("op-contact")}>
             콘택트렌즈
           </button>
-          <button type="button" className={navBtn} style={{ outlineColor: C.copper }} onClick={() => go("op-map")}>
+          <button type="button" className={navBtn} style={{ outlineColor: C.navy }} onClick={() => go("op-map")}>
             오시는 길
           </button>
         </nav>
@@ -249,7 +243,7 @@ export function OpticalDemo() {
           onClick={() => go("op-book")}
           data-gtm-cta="optical_book_top"
           className={`inline-flex flex-none items-center gap-1.5 rounded-md px-4 py-2.5 text-[15px] font-bold text-white transition-transform duration-100 active:translate-y-px ${focusRing}`}
-          style={{ background: C.navy, outlineColor: C.copper }}
+          style={{ background: C.navy, outlineColor: C.navy }}
         >
           <Eye size={18} aria-hidden />
           시력검사 예약
@@ -277,8 +271,8 @@ export function OpticalDemo() {
                       type="button"
                       aria-pressed={sel}
                       onClick={() => setFace(sel ? null : f.id)}
-                      className={`flex flex-col items-center gap-1.5 rounded-lg border-2 px-1 py-3 text-[14px] font-bold transition-colors ${focusRing}`}
-                      style={{ borderColor: sel ? C.navy : C.steelLine, background: sel ? C.navy : C.panel, color: sel ? "#fff" : C.ink, outlineColor: C.copper }}
+                      className={`flex flex-col items-center gap-1.5 rounded-lg border px-1 py-3 text-[14px] font-bold transition-colors ${focusRing}`}
+                      style={{ borderColor: sel ? C.navy : C.steelLine, background: sel ? C.navy : C.panel, color: sel ? "#fff" : C.ink, outlineColor: C.navy }}
                     >
                       <FaceIcon id={f.id} color={sel ? "#fff" : C.navy} />
                       {f.name}
@@ -295,10 +289,10 @@ export function OpticalDemo() {
                       animate={{ opacity: 1, y: 0 }}
                       exit={reduce ? { opacity: 0 } : { opacity: 0, y: -4 }}
                       transition={{ duration: reduce ? 0 : 0.18, ease: EASE }}
-                      className="rounded-lg px-4 py-3 text-[15px] leading-[1.6]"
-                      style={{ background: C.copperSoft, color: C.ink }}
+                      className="rounded-lg border px-4 py-3 text-[15px] leading-[1.6]"
+                      style={{ background: C.panel, borderColor: C.steelLine, color: C.ink }}
                     >
-                      <strong style={{ color: C.copper }}>{rec.rec.map((id) => SHAPES.find((s) => s.id === id)!.name).join(", ")}</strong> 추천. {rec.why}
+                      <strong style={{ color: C.navy }}>{rec.rec.map((id) => SHAPES.find((s) => s.id === id)!.name).join(", ")}</strong> 추천. {rec.why}
                     </motion.p>
                   )}
                 </AnimatePresence>
@@ -318,16 +312,16 @@ export function OpticalDemo() {
                       type="button"
                       aria-pressed={sel}
                       onClick={() => pickShape(s.id)}
-                      className={`relative flex flex-col items-start gap-1 rounded-lg border-2 px-3 pb-3 pt-3 text-left transition-colors ${focusRing}`}
+                      className={`relative flex flex-col items-start gap-1 rounded-lg border px-3 pb-3 pt-3 text-left transition-colors ${focusRing}`}
                       style={{
-                        borderColor: sel ? C.navy : isRec ? C.copper : C.steelLine,
+                        borderColor: sel ? C.navy : isRec ? C.navy : C.steelLine,
                         background: sel ? C.navy : C.panel,
                         color: sel ? "#fff" : C.ink,
-                        outlineColor: C.copper,
+                        outlineColor: C.navy,
                       }}
                     >
                       {isRec && (
-                        <span className="absolute right-2 top-2 rounded px-1.5 py-0.5 text-[12px] font-bold" style={{ background: sel ? "#fff" : C.copper, color: sel ? C.copper : "#fff" }}>
+                        <span className="absolute right-2 top-2 rounded px-1.5 py-0.5 text-[12px] font-bold" style={{ background: sel ? "#fff" : C.navy, color: sel ? C.navy : "#fff" }}>
                           추천
                         </span>
                       )}
@@ -336,7 +330,7 @@ export function OpticalDemo() {
                       <span className="text-[13px] leading-[1.4]" style={{ color: sel ? "rgba(255,255,255,0.8)" : C.muted }}>
                         {s.note}
                       </span>
-                      <span className="text-[14px] font-bold tabular-nums" style={{ color: sel ? "#fff" : C.navySoft }}>
+                      <span className="text-[14px] font-bold tabular-nums" style={{ color: sel ? "#fff" : C.body }}>
                         {won(s.base)}부터
                       </span>
                     </button>
@@ -356,8 +350,8 @@ export function OpticalDemo() {
                       aria-pressed={sel}
                       disabled={off}
                       onClick={() => setMaterial(m.id)}
-                      className={`flex flex-col items-start rounded-lg border-2 px-3 py-3 text-left transition-colors disabled:cursor-not-allowed disabled:opacity-45 ${focusRing}`}
-                      style={{ borderColor: sel ? C.navy : C.steelLine, background: sel ? C.navy : C.panel, color: sel ? "#fff" : C.ink, outlineColor: C.copper }}
+                      className={`flex flex-col items-start rounded-lg border px-3 py-3 text-left transition-colors disabled:cursor-not-allowed disabled:opacity-45 ${focusRing}`}
+                      style={{ borderColor: sel ? C.navy : C.steelLine, background: sel ? C.navy : C.panel, color: sel ? "#fff" : C.ink, outlineColor: C.navy }}
                     >
                       <span className="flex w-full items-center justify-between gap-2">
                         <span className="text-[15px] font-bold">{m.name}</span>
@@ -392,10 +386,10 @@ export function OpticalDemo() {
                       type="button"
                       aria-pressed={sel}
                       onClick={() => setIdx(i)}
-                      className={`flex flex-col items-center gap-1 rounded-lg border-2 px-1 py-3 transition-colors ${focusRing}`}
-                      style={{ borderColor: sel ? C.navy : C.steelLine, background: sel ? C.navy : C.panel, color: sel ? "#fff" : C.ink, outlineColor: C.copper }}
+                      className={`flex flex-col items-center gap-1 rounded-lg border px-1 py-3 transition-colors ${focusRing}`}
+                      style={{ borderColor: sel ? C.navy : C.steelLine, background: sel ? C.navy : C.panel, color: sel ? "#fff" : C.ink, outlineColor: C.navy }}
                     >
-                      <span className="text-[18px] font-bold tabular-nums" style={headF}>
+                      <span className="text-[18px] font-bold tabular-nums">
                         {x.v}
                       </span>
                       <ThicknessBar mm={x.mm} color={sel ? "#fff" : C.steel} />
@@ -421,8 +415,8 @@ export function OpticalDemo() {
                         role="switch"
                         aria-checked={on}
                         onClick={() => setOpts((v) => ({ ...v, [o.id]: !v[o.id] }))}
-                        className={`flex w-full items-center gap-3 rounded-lg border-2 px-3 py-3 text-left transition-colors ${focusRing}`}
-                        style={{ borderColor: on ? C.navy : C.steelLine, background: C.panel, outlineColor: C.copper }}
+                        className={`flex w-full items-center gap-3 rounded-lg border px-3 py-3 text-left transition-colors ${focusRing}`}
+                        style={{ borderColor: on ? C.navy : C.steelLine, background: C.panel, outlineColor: C.navy }}
                       >
                         <span aria-hidden className="relative h-6 w-11 flex-none rounded-full transition-colors" style={{ background: on ? C.navy : C.steelLine }}>
                           <motion.span
@@ -439,7 +433,7 @@ export function OpticalDemo() {
                             {o.desc}
                           </span>
                         </span>
-                        <span className="text-[14px] font-bold tabular-nums" style={{ color: C.navySoft }}>
+                        <span className="text-[14px] font-bold tabular-nums" style={{ color: C.body }}>
                           +{won(o.price)}
                         </span>
                       </button>
@@ -465,10 +459,10 @@ export function OpticalDemo() {
             ].map((c) => (
               <li key={c.n} className="rounded-lg border px-4 py-4" style={{ borderColor: C.steelLine, background: C.panel }}>
                 <p className="flex items-center gap-2 text-[16px] font-bold">
-                  <Contact size={18} aria-hidden style={{ color: C.copper }} />
+                  <Contact size={18} aria-hidden style={{ color: C.navy }} />
                   {c.n}
                 </p>
-                <p className="mt-1 text-[15px] font-bold tabular-nums" style={{ color: C.navySoft }}>
+                <p className="mt-1 text-[15px] font-bold tabular-nums" style={{ color: C.body }}>
                   {c.p}
                 </p>
                 <p className="mt-1 text-[14px]" style={{ color: C.muted }}>
@@ -495,8 +489,8 @@ export function OpticalDemo() {
       </main>
 
       <footer className="mx-auto mt-16 max-w-[1200px] border-t px-4 pb-10 pt-8 text-[14px] leading-[1.8] md:px-6" style={{ borderColor: C.steelLine, color: C.muted }}>
-        <p className="text-[16px]" style={{ ...headF, color: C.navy }}>
-          {BRAND}
+        <p>
+          <SampleLogo />
         </p>
         <p>
           {ADDRESS}, 전화 {TEL}
@@ -522,7 +516,7 @@ export function OpticalDemo() {
             onClick={() => go("op-book")}
             data-gtm-cta="optical_book_bar"
             className={`rounded-md px-5 py-3 text-[15px] font-bold text-white ${focusRing}`}
-            style={{ background: C.navy, outlineColor: C.copper }}
+            style={{ background: C.navy, outlineColor: C.navy }}
           >
             시력검사 예약
           </button>
@@ -535,341 +529,69 @@ export function OpticalDemo() {
 /* ====================================================================== */
 /* ---------- 첫 화면 포스터 ---------- */
 
-/* 포스터 모션 상수
-   등장: 안경이 오른쪽(화면 폭의 42%)에서 가운데로 1600ms, EASE, 150ms 뒤 시작.
-   포인터 추적: 스프링 stiffness 28, damping 16, mass 1.4. 최대 이동은 폭 7%, 높이 6%.
-   터치 기기 떠다님: 좌우 11초, 위아래 14초 주기.
-   렌즈 반사 띠: 9초마다 한 번 렌즈를 가로지른다.
-   퇴장: 스크롤 진행 0 ~ 0.42 동안 왼쪽 렌즈 중심으로 확대, 렌즈 속 문장은 0.08 ~ 0.3 에 흐려진다. */
-const POSTER_BG = "#e2e5ea";
-const ENTER_MS = 1600;
-const ENTER_DELAY_MS = 150;
-const ENTER_FROM = 0.42;
-const FOLLOW_SPRING = { stiffness: 28, damping: 16, mass: 1.4 } as const;
-const FLOAT_X_S = 11;
-const FLOAT_Y_S = 14;
-const GLARE_S = 9;
-const ZOOM_END = 0.42;
-
-/** 화면 크기에서 안경 크기와 위치를 정한다. 렌즈 테두리 경로와 clip-path 가 같은 값을 쓴다 */
-function posterGeo(w: number, h: number) {
-  const mobile = w < 768;
-  const L = mobile ? w * 0.56 : Math.min(w * 0.33, h * 0.6);
-  const H = L * (mobile ? 0.84 : 0.74);
-  const B = L * (mobile ? 0.14 : 0.22);
-  const T = mobile ? Math.max(10, L * 0.07) : L * 0.055;
-  const cx = w / 2;
-  const cy = h * 0.48;
-  const lx = cx - B / 2 - L / 2;
-  const rx = cx + B / 2 + L / 2;
-  const top = cy - H / 2;
-  const r1 = H * 0.2;
-  const r2 = H * 0.44;
-  // 왼쪽 렌즈 안쪽이 화면을 다 덮을 만큼의 배율
-  const dx = Math.max(lx, w - lx);
-  const dy = Math.max(cy, h - cy);
-  const zoom = Math.max(dx / (0.3 * (L - T)), dy / (0.3 * (H - T)));
-  return { mobile, L, H, B, T, cx, cy, lx, rx, top, r1, r2, zoom };
-}
-
-type Geo = ReturnType<typeof posterGeo>;
-
-const n1 = (v: number) => v.toFixed(1);
-
-/** 위 모서리는 덜 둥글고 아래가 더 둥근 웰링턴형 렌즈 */
-function lensD(x0: number, y0: number, L: number, H: number, r1: number, r2: number) {
-  return [
-    `M${n1(x0 + r1)} ${n1(y0)}`,
-    `H${n1(x0 + L - r1)}`,
-    `A${n1(r1)} ${n1(r1)} 0 0 1 ${n1(x0 + L)} ${n1(y0 + r1)}`,
-    `V${n1(y0 + H - r2)}`,
-    `A${n1(r2)} ${n1(r2)} 0 0 1 ${n1(x0 + L - r2)} ${n1(y0 + H)}`,
-    `H${n1(x0 + r2)}`,
-    `A${n1(r2)} ${n1(r2)} 0 0 1 ${n1(x0)} ${n1(y0 + H - r2)}`,
-    `V${n1(y0 + r1)}`,
-    `A${n1(r1)} ${n1(r1)} 0 0 1 ${n1(x0 + r1)} ${n1(y0)}`,
-    "Z",
-  ].join(" ");
-}
-
-const posterText =
-  "absolute inset-0 flex flex-col items-center justify-center px-4 pb-[4svh] text-center leading-[1.04] tracking-[-0.02em] [word-break:keep-all] text-[clamp(52px,18vw,72px)] md:text-[clamp(72px,10.2vw,190px)]";
-
-function PosterLines() {
-  return (
-    <>
-      <span className="block">
-        검사부터
-        <br className="md:hidden" /> 맞춤까지
-      </span>
-      <span className="block">
-        30분이면
-        <br className="md:hidden" /> 돼요
-      </span>
-    </>
-  );
-}
+const IMG = "/images/demo-optical";
 
 function Poster({ reduce, onBook }: { reduce: boolean; onBook: () => void }) {
-  const touch = useTouch();
-  const wrapRef = useRef<HTMLElement>(null);
-  const stickyRef = useRef<HTMLDivElement>(null);
-  const [size, setSize] = useState({ w: 1440, h: 900 });
-
-  const wMV = useMotionValue(1440);
-  const hMV = useMotionValue(900);
-  const zoomMV = useMotionValue(posterGeo(1440, 900).zoom);
-
-  useEffect(() => {
-    const el = stickyRef.current;
-    if (!el) return;
-    const ro = new ResizeObserver(([e]) => {
-      const w = Math.round(e.contentRect.width);
-      const h = Math.round(e.contentRect.height);
-      setSize((s) => (s.w === w && s.h === h ? s : { w, h }));
-      wMV.set(w);
-      hMV.set(h);
-      zoomMV.set(posterGeo(w, h).zoom);
-    });
-    ro.observe(el);
-    return () => ro.disconnect();
-  }, [wMV, hMV, zoomMV]);
-
-  const g: Geo = posterGeo(size.w, size.h);
-
-  // 등장: 1 이면 오른쪽, 0 이면 가운데
-  const enterP = useMotionValue(1);
-  useEffect(() => {
-    if (reduce) {
-      enterP.set(0);
-      return;
-    }
-    const ctrl = animate(enterP, 0, { duration: ENTER_MS / 1000, delay: ENTER_DELAY_MS / 1000, ease: EASE });
-    return () => ctrl.stop();
-  }, [reduce, enterP]);
-
-  // 포인터 -1 ~ 1
-  const mx = useMotionValue(0);
-  const my = useMotionValue(0);
-  const sx = useSpring(mx, FOLLOW_SPRING);
-  const sy = useSpring(my, FOLLOW_SPRING);
-
-  // 터치 기기는 좌우로 천천히 떠다닌다
-  useEffect(() => {
-    if (!touch || reduce) {
-      mx.set(0);
-      my.set(0);
-      return;
-    }
-    const a = animate(mx, [0, 0.8, 0, -0.8, 0], { duration: FLOAT_X_S, repeat: Infinity, ease: "easeInOut" });
-    const b = animate(my, [0, 0.35, 0, -0.35, 0], { duration: FLOAT_Y_S, repeat: Infinity, ease: "easeInOut" });
-    return () => {
-      a.stop();
-      b.stop();
-    };
-  }, [touch, reduce, mx, my]);
-
-  const onMove = (e: React.PointerEvent<HTMLDivElement>) => {
-    if (touch || reduce || e.pointerType !== "mouse") return;
-    const r = e.currentTarget.getBoundingClientRect();
-    mx.set(((e.clientX - r.left) / r.width) * 2 - 1);
-    my.set(((e.clientY - r.top) / r.height) * 2 - 1);
-  };
-
-  const { scrollYProgress } = useScroll({ target: wrapRef, offset: ["start start", "end start"] });
-
-  // 스크롤이 시작되면 포인터 이동은 줄어든다(확대 중심이 흔들리지 않게)
-  const tx = useTransform([enterP, sx, scrollYProgress, wMV] as MotionValue<number>[], ([e, x, p, w]: number[]) => {
-    const calm = 1 - Math.min(1, p / 0.25);
-    return e * w * ENTER_FROM + x * w * 0.07 * calm;
-  });
-  const ty = useTransform([sy, scrollYProgress, hMV] as MotionValue<number>[], ([y, p, h]: number[]) => y * h * 0.06 * (1 - Math.min(1, p / 0.25)));
-  const ntx = useTransform(tx, (v) => -v);
-  const nty = useTransform(ty, (v) => -v);
-
-  const zoomP = useTransform(scrollYProgress, [0, ZOOM_END], [0, 1], { clamp: true });
-  // 처음엔 천천히, 끝에서 빨라진다
-  const scale = useTransform([zoomP, zoomMV] as MotionValue<number>[], ([p, z]: number[]) => 1 + (z - 1) * p * p * p);
-  // 함수형으로 둔다. 범위형 opacity 는 브라우저 스크롤 타임라인으로 넘어가며 target 구간을 놓쳤다
-  const sharpOpacity = useTransform(scrollYProgress, (p: number) => 1 - Math.min(1, Math.max(0, (p - 0.08) / 0.22)));
-  const chromeOpacity = useTransform(scrollYProgress, (p: number) => 1 - Math.min(1, p / 0.12));
-
-  const uid = useId().replace(/:/g, "");
-  const leftX = g.lx - g.L / 2;
-  const rightX = g.rx - g.L / 2;
-  const dL = lensD(leftX, g.top, g.L, g.H, g.r1, g.r2);
-  const dR = lensD(rightX, g.top, g.L, g.H, g.r1, g.r2);
-  const clip = `path("${dL} ${dR}")`;
-
-  // 코다리: 두 렌즈 안쪽 위를 잇는 활 모양
-  const by = g.top + g.H * 0.2;
-  const bridge = `M${n1(g.lx + g.L / 2 - g.T * 0.3)} ${n1(by)}C${n1(g.cx - g.B * 0.3)} ${n1(by - g.H * 0.1)} ${n1(g.cx + g.B * 0.3)} ${n1(by - g.H * 0.1)} ${n1(g.rx - g.L / 2 + g.T * 0.3)} ${n1(by)}`;
-
-  // 다리: 바깥 위 모서리에서 뒤로 넘어가며 가늘어지는 모양
-  const hingeY = g.top + g.H * 0.16;
-  const temple = (side: -1 | 1) => {
-    const x0 = side === -1 ? leftX : rightX + g.L;
-    const len = g.L * (g.mobile ? 0.3 : 0.36);
-    const xe = x0 + side * len;
-    const th = g.T * 0.9;
-    return `M${n1(x0)} ${n1(hingeY - th / 2)}L${n1(xe)} ${n1(hingeY + g.H * 0.05 - th * 0.2)}L${n1(xe)} ${n1(hingeY + g.H * 0.05 + th * 0.2)}L${n1(x0)} ${n1(hingeY + th / 2)}Z`;
-  };
-
-  // 테 위쪽 하이라이트 한 줄
-  const hiL = `M${n1(leftX + g.r1 * 0.5)} ${n1(g.top - g.T * 0.22)}L${n1(leftX + g.L * 0.62)} ${n1(g.top - g.T * 0.22)}`;
-  const hiR = `M${n1(rightX + g.r1 * 0.5)} ${n1(g.top - g.T * 0.22)}L${n1(rightX + g.L * 0.62)} ${n1(g.top - g.T * 0.22)}`;
-
-  const rims = [
-    { key: "L", d: dL, x0: leftX },
-    { key: "R", d: dR, x0: rightX },
-  ];
+  const ref = useRef<HTMLElement>(null);
+  const { scrollYProgress } = useScroll({ target: ref, offset: ["start start", "end start"] });
+  // 스크롤하면 사진만 조금 느리게 내려간다
+  const photoY = useTransform(scrollYProgress, (v) => (reduce ? "0%" : `${v * 8}%`));
 
   return (
-    <section ref={wrapRef} id="op-poster" aria-labelledby="op-poster-title" className={`relative ${reduce ? "min-h-svh" : "h-[180svh]"}`}>
-      <div ref={stickyRef} onPointerMove={onMove} className="sticky top-0 h-svh overflow-hidden" style={{ background: POSTER_BG, color: C.navy }}>
-        <motion.div
-          className="absolute inset-0"
-          style={reduce ? undefined : { scale, originX: g.lx / size.w, originY: g.cy / size.h }}
+    <section ref={ref} id="op-poster" aria-labelledby="op-poster-title" className="relative flex min-h-[100svh] flex-col overflow-hidden" style={{ background: "#f7f7f5", color: C.ink }}>
+      <style>{`
+        @keyframes op-rise { from { opacity: 0; transform: translateY(12px); } to { opacity: 1; transform: none; } }
+        .op-rise { animation: op-rise 0.7s cubic-bezier(0.22, 1, 0.36, 1) 0.3s both; }
+        @media (prefers-reduced-motion: reduce) { .op-rise { animation: none; } }
+      `}</style>
+      <motion.div
+        className="absolute inset-0"
+        style={{ y: photoY }}
+        initial={reduce ? false : { scale: 1.06 }}
+        animate={{ scale: 1 }}
+        transition={{ duration: reduce ? 0 : 1.6, ease: EASE }}
+      >
+        {/* eslint-disable-next-line @next/next/no-img-element -- 정적 export 라 next/image 최적화를 쓰지 않는다 */}
+        <img
+          src={`${IMG}/hero.jpg`}
+          srcSet={`${IMG}/hero-sm.jpg 960w, ${IMG}/hero.jpg 1920w`}
+          sizes="100vw"
+          alt="유리 진열대 위에 놓인 빨간 뿔테 안경 두 개"
+          fetchPriority="high"
+          className="absolute inset-0 h-full w-full object-cover"
+          style={{ objectPosition: "58% 60%" }}
+        />
+      </motion.div>
+      {/* 밝은 사진이라 흰 막을 깔고 먹색 글자를 쓴다. 휴대폰은 위에서, PC는 왼쪽에서 */}
+      <div aria-hidden className="absolute inset-0 md:hidden" style={{ background: "linear-gradient(to bottom, rgba(255,255,255,0.94), rgba(255,255,255,0.7) 45%, rgba(255,255,255,0) 72%)" }} />
+      <div aria-hidden className="absolute inset-0 hidden md:block" style={{ background: "linear-gradient(to right, rgba(255,255,255,0.94), rgba(255,255,255,0.7) 38%, rgba(255,255,255,0) 66%)" }} />
+
+      {/* 상호와 핵심 행동 하나 */}
+      <div className="relative z-10 flex items-center justify-between gap-3 px-4 pt-4 md:px-12 md:pt-7">
+        <p>
+          <SampleLogo small />
+        </p>
+        <button
+          type="button"
+          onClick={onBook}
+          data-gtm-cta="optical_poster_cta"
+          className={`inline-flex h-11 items-center gap-1.5 rounded-[6px] px-4 text-[15px] font-semibold text-white ${focusRing}`}
+          style={{ background: C.navy, outlineColor: C.navy }}
         >
-          {/* 바탕에 흐리게 깔린 문장. 블러는 고정값이다 */}
-          <h1 id="op-poster-title" className={`${posterText} blur-[2px] md:blur-[3.5px] opacity-80`} style={{ ...headF, color: C.navy }}>
-            <PosterLines />
-          </h1>
+          <CalendarCheck size={18} aria-hidden />
+          시력검사 예약
+        </button>
+      </div>
 
-          <motion.div className="pointer-events-none absolute inset-0" style={reduce ? undefined : { x: tx, y: ty }}>
-            {/* 바닥 그림자와 테가 떨어뜨리는 그림자 */}
-            <svg aria-hidden className="absolute inset-0 h-full w-full overflow-visible" viewBox={`0 0 ${size.w} ${size.h}`} preserveAspectRatio="none">
-              <defs>
-                <filter id={`${uid}-soft`} x="-20%" y="-20%" width="140%" height="140%">
-                  <feGaussianBlur stdDeviation={g.T * 0.9} />
-                </filter>
-                <radialGradient id={`${uid}-floor`}>
-                  <stop offset="0" stopColor={C.navy} stopOpacity="0.28" />
-                  <stop offset="1" stopColor={C.navy} stopOpacity="0" />
-                </radialGradient>
-              </defs>
-              <ellipse cx={g.cx + g.T} cy={g.top + g.H * 1.32} rx={g.L + g.B * 0.6} ry={g.H * 0.09} fill={`url(#${uid}-floor)`} />
-              {rims.map((r) => (
-                <g key={r.key} transform={`translate(${n1(g.T * 0.8)} ${n1(g.T * 1.6)})`} filter={`url(#${uid}-soft)`}>
-                  <path d={r.d} fill="none" stroke={C.navy} strokeOpacity="0.2" strokeWidth={g.T * 1.3} />
-                </g>
-              ))}
-            </svg>
-
-            {/* 렌즈 안에서만 선명한 문장 */}
-            <div className="absolute inset-0" style={{ clipPath: clip, background: C.bg }}>
-              <motion.p aria-hidden className={posterText} style={reduce ? { ...headF, color: C.navy } : { ...headF, color: C.navy, x: ntx, y: nty, opacity: sharpOpacity }}>
-                <PosterLines />
-              </motion.p>
-            </div>
-
-            {/* 렌즈 유리, 반사, 뿔테 */}
-            <svg aria-hidden className="absolute inset-0 h-full w-full overflow-visible" viewBox={`0 0 ${size.w} ${size.h}`} preserveAspectRatio="none">
-              <defs>
-                <linearGradient id={`${uid}-horn`} x1="0" y1="0" x2="1" y2="1">
-                  <stop offset="0" stopColor="#2b3f6b" />
-                  <stop offset="0.22" stopColor="#14203d" />
-                  <stop offset="0.4" stopColor="#3a5285" />
-                  <stop offset="0.58" stopColor="#1b2a4a" />
-                  <stop offset="0.8" stopColor="#0d1630" />
-                  <stop offset="1" stopColor="#24365e" />
-                </linearGradient>
-                <pattern id={`${uid}-spots`} width="54" height="38" patternUnits="userSpaceOnUse" patternTransform="rotate(-24)">
-                  <ellipse cx="12" cy="10" rx="11" ry="5" fill="#7d93c2" fillOpacity="0.2" />
-                  <ellipse cx="38" cy="26" rx="14" ry="6" fill="#070d1e" fillOpacity="0.35" />
-                  <ellipse cx="44" cy="6" rx="6" ry="3" fill="#9fb2db" fillOpacity="0.16" />
-                </pattern>
-                <radialGradient id={`${uid}-glass`} cx="0.42" cy="0.38" r="0.7">
-                  <stop offset="0.55" stopColor="#ffffff" stopOpacity="0" />
-                  <stop offset="1" stopColor={C.navy} stopOpacity="0.13" />
-                </radialGradient>
-                <linearGradient id={`${uid}-pin`} x1="0" y1="0" x2="1" y2="1">
-                  <stop offset="0" stopColor="#f1f3f6" />
-                  <stop offset="0.5" stopColor="#9aa3ad" />
-                  <stop offset="1" stopColor="#5d6670" />
-                </linearGradient>
-                {rims.map((r) => (
-                  <clipPath key={r.key} id={`${uid}-lens-${r.key}`}>
-                    <path d={r.d} />
-                  </clipPath>
-                ))}
-              </defs>
-
-              {/* 다리와 경첩 */}
-              {([-1, 1] as const).map((side) => (
-                <g key={side}>
-                  <path d={temple(side)} fill={`url(#${uid}-horn)`} />
-                  <path d={temple(side)} fill={`url(#${uid}-spots)`} />
-                  <circle cx={side === -1 ? leftX - g.T * 0.15 : rightX + g.L + g.T * 0.15} cy={hingeY} r={g.T * 0.32} fill={`url(#${uid}-pin)`} />
-                </g>
-              ))}
-
-              {rims.map((r) => (
-                <g key={r.key}>
-                  {/* 유리 가장자리가 살짝 어둡다 */}
-                  <path d={r.d} fill={`url(#${uid}-glass)`} />
-                  {/* 고정 반사 한 줄과 렌즈를 지나가는 반사 띠 */}
-                  <g clipPath={`url(#${uid}-lens-${r.key})`}>
-                    <path
-                      d={`M${n1(r.x0 + g.L * 0.1)} ${n1(g.top + g.H * 0.42)}L${n1(r.x0 + g.L * 0.34)} ${n1(g.top + g.H * 0.08)}`}
-                      stroke="#ffffff"
-                      strokeOpacity="0.55"
-                      strokeWidth={g.T * 0.5}
-                      strokeLinecap="round"
-                    />
-                    <motion.g
-                      initial={false}
-                      animate={reduce ? { x: 0 } : { x: [0, g.L * 1.9] }}
-                      transition={reduce ? { duration: 0 } : { duration: GLARE_S, repeat: Infinity, ease: "easeInOut", times: [0, 1] }}
-                    >
-                      <polygon
-                        points={`${n1(r.x0 - g.L * 0.5)},${n1(g.top + g.H)} ${n1(r.x0 - g.L * 0.32)},${n1(g.top + g.H)} ${n1(r.x0 - g.L * 0.02)},${n1(g.top)} ${n1(r.x0 - g.L * 0.2)},${n1(g.top)}`}
-                        fill="#ffffff"
-                        fillOpacity="0.22"
-                      />
-                    </motion.g>
-                  </g>
-                  {/* 뿔테: 그라디언트 위에 무늬를 한 번 더 */}
-                  <path d={r.d} fill="none" stroke={`url(#${uid}-horn)`} strokeWidth={g.T} />
-                  <path d={r.d} fill="none" stroke={`url(#${uid}-spots)`} strokeWidth={g.T} />
-                  {/* 안쪽 모서리 빛과 바깥 모서리 그늘 */}
-                  <path d={r.d} fill="none" stroke="#ffffff" strokeOpacity="0.16" strokeWidth={Math.max(1, g.T * 0.08)} transform={`translate(0 ${n1(g.T * 0.25)})`} />
-                </g>
-              ))}
-
-              {/* 코다리 */}
-              <path d={bridge} fill="none" stroke={`url(#${uid}-horn)`} strokeWidth={g.T * 0.95} strokeLinecap="round" />
-              <path d={bridge} fill="none" stroke="#ffffff" strokeOpacity="0.35" strokeWidth={Math.max(1, g.T * 0.12)} strokeLinecap="round" transform={`translate(0 ${n1(-g.T * 0.25)})`} />
-              {/* 위쪽 하이라이트 한 줄 */}
-              <path d={hiL} stroke="#ffffff" strokeOpacity="0.6" strokeWidth={Math.max(1.5, g.T * 0.12)} strokeLinecap="round" />
-              <path d={hiR} stroke="#ffffff" strokeOpacity="0.6" strokeWidth={Math.max(1.5, g.T * 0.12)} strokeLinecap="round" />
-            </svg>
-          </motion.div>
-        </motion.div>
-
-        {/* 상호, 예약 버튼, 영업시간 한 줄 */}
-        <motion.div className="pointer-events-none absolute inset-x-0 top-0 flex items-center justify-between px-4 pt-4 md:px-8 md:pt-6" style={reduce ? undefined : { opacity: chromeOpacity }}>
-          <p className="inline-flex items-center gap-2 text-[17px] leading-none" style={{ ...headF, color: C.navy }}>
-            <Glasses size={22} strokeWidth={2.2} aria-hidden />
-            {BRAND}
-          </p>
-          <button
-            type="button"
-            onClick={onBook}
-            aria-label="시력검사 예약"
-            data-gtm-cta="optical_poster_cta"
-            className={`pointer-events-auto inline-flex h-12 w-12 items-center justify-center rounded-full text-white transition-transform duration-100 active:scale-95 ${focusRing}`}
-            style={{ background: C.navy, outlineColor: C.copper }}
-          >
-            <CalendarCheck size={22} aria-hidden />
-          </button>
-        </motion.div>
-        <motion.p
-          className="absolute bottom-0 left-0 px-4 pb-5 text-[15px] font-bold tabular-nums md:left-auto md:right-0 md:px-8 md:pb-7"
-          style={reduce ? { color: C.navy } : { color: C.navy, opacity: chromeOpacity }}
-        >
+      {/* 문장 */}
+      <div className={`relative z-10 px-4 pt-[9svh] md:my-auto md:px-12 md:pb-[6svh] md:pt-0 ${reduce ? "" : "op-rise"}`}>
+        <h1 id="op-poster-title" className="text-[36px] font-bold leading-[1.2] tracking-[-0.03em] md:text-[clamp(40px,5vw,72px)]" style={{ wordBreak: "keep-all" }}>
+          <span className="block">검사부터 맞춤까지</span>
+          <span className="block">30분이면 돼요</span>
+        </h1>
+        <p className="mt-4 text-[16px] font-medium tabular-nums md:text-[18px]" style={{ color: C.body }}>
           평일 10:30 ~ 20:00, 토요일 19:00까지
-        </motion.p>
+        </p>
       </div>
     </section>
   );
@@ -895,17 +617,6 @@ function Stage({ reduce, shape, material, idx, opts }: { reduce: boolean; shape:
   // 바닥 그림자는 기울어진 쪽으로 밀린다
   const shadowX = useTransform(sx, [-1, 1], [-22, 22]);
   const shadowScale = useTransform(sy, [-1, 1], [1.06, 0.94]);
-
-  // 터치 기기: 좌우로 천천히 흔들린다. 동작 줄이기면 멈춘다
-  useEffect(() => {
-    if (!touch || reduce) {
-      mx.set(0);
-      my.set(0);
-      return;
-    }
-    const ctrl = animate(mx, [-0.7, 0.7, -0.7], { duration: SWAY_S, repeat: Infinity, ease: "easeInOut" });
-    return () => ctrl.stop();
-  }, [touch, reduce, mx, my]);
 
   const onMove = (e: React.PointerEvent<HTMLDivElement>) => {
     if (touch || reduce) return;
@@ -1014,9 +725,10 @@ function Stage({ reduce, shape, material, idx, opts }: { reduce: boolean; shape:
       id="op-stage"
       onPointerMove={onMove}
       onPointerLeave={onLeave}
-      className="relative mx-auto w-full max-w-[720px] touch-pan-y select-none overflow-hidden rounded-2xl"
+      className="relative mx-auto w-full max-w-[720px] touch-pan-y select-none overflow-hidden rounded-[8px] border"
       style={{
-        background: "radial-gradient(ellipse 70% 60% at 50% 42%, #ffffff 0%, #e8ebf0 70%, #dde1e7 100%)",
+        background: C.panel,
+        borderColor: C.steelLine,
         perspective: 900,
       }}
     >
@@ -1025,7 +737,7 @@ function Stage({ reduce, shape, material, idx, opts }: { reduce: boolean; shape:
       <motion.div
         aria-hidden
         className="absolute left-1/2 top-[72%] h-[10%] w-[62%] -translate-x-1/2 rounded-full"
-        style={{ background: "radial-gradient(ellipse at center, rgba(27,42,74,0.22), rgba(27,42,74,0) 70%)", x: reduce ? 0 : shadowX, scaleX: reduce ? 1 : shadowScale }}
+        style={{ background: "radial-gradient(ellipse at center, rgba(0,0,0,0.12), rgba(0,0,0,0) 70%)", x: reduce ? 0 : shadowX, scaleX: reduce ? 1 : shadowScale }}
       />
       <motion.div className="absolute inset-0 flex items-center justify-center" style={reduce ? undefined : { rotateX, rotateY, transformStyle: "preserve-3d" }}>
         <svg viewBox="-270 -100 540 200" className="h-full w-full px-3" role="img" aria-label={`${shape.name} ${material.name} 테, 굴절률 ${x.v} 렌즈`}>
@@ -1086,7 +798,7 @@ function Summary({
 }) {
   const on = OPTIONS.filter((o) => opts[o.id]);
   return (
-    <div id="op-total" className="mx-auto mt-3 hidden w-full max-w-[720px] gap-3 rounded-xl border px-4 py-4 md:grid md:grid-cols-[1fr_auto] md:items-end" style={{ borderColor: C.steelLine, background: C.panel }}>
+    <div id="op-total" className="mx-auto mt-3 hidden w-full max-w-[720px] gap-3 rounded-[8px] border px-4 py-4 md:grid md:grid-cols-[1fr_auto] md:items-end" style={{ borderColor: C.steelLine, background: C.panel }}>
       <dl className="grid grid-cols-[auto_1fr_auto] gap-x-3 gap-y-1 text-[15px]">
         <dt className="font-bold" style={{ color: C.muted }}>
           테
@@ -1108,10 +820,10 @@ function Summary({
         <p className="text-[13px] font-bold" style={{ color: C.muted }}>
           테 + 렌즈 합계
         </p>
-        <p aria-live="polite" className="text-[30px] leading-none" style={{ ...headF, color: C.navy }}>
+        <p aria-live="polite" className="font-bold text-[30px] leading-none" style={{ color: C.ink }}>
           <Rolling value={total} reduce={reduce} />
         </p>
-        <button type="button" onClick={onBook} data-gtm-cta="optical_book_summary" className={`rounded-md px-4 py-2 text-[14px] font-bold text-white ${focusRing}`} style={{ background: C.copper, outlineColor: C.navy }}>
+        <button type="button" onClick={onBook} data-gtm-cta="optical_book_summary" className={`rounded-md px-4 py-2 text-[14px] font-semibold text-white ${focusRing}`} style={{ background: C.navy, outlineColor: C.navy }}>
           이 안경으로 검사 예약
         </button>
       </div>
@@ -1161,7 +873,7 @@ function Digit({ d, reduce }: { d: number; reduce: boolean }) {
 function SectionTitle({ id, sub, children }: { id: string; sub?: string; children: React.ReactNode }) {
   return (
     <div>
-      <h2 id={id} className="text-[24px] leading-tight md:text-[28px]" style={{ ...headF, color: C.navy }}>
+      <h2 id={id} className="font-bold text-[24px] leading-tight md:text-[28px]" style={{ color: C.ink }}>
         {children}
       </h2>
       {sub && (
@@ -1303,11 +1015,11 @@ function Booking({ today, reduce }: { today: Date; reduce: boolean }) {
 
   if (done) return <BookingDone ref={doneRef} done={done} today={today} reduce={reduce} onAgain={reset} />;
 
-  const inputCls = `mt-2 w-full rounded-md border-2 bg-white px-3 py-3 text-[17px] ${focusRing}`;
-  const inputStyle = { borderColor: C.steelLine, outlineColor: C.copper } as const;
+  const inputCls = `mt-2 w-full rounded-md border bg-white px-3 py-3 text-[17px] ${focusRing}`;
+  const inputStyle = { borderColor: C.steelLine, outlineColor: C.navy } as const;
 
   return (
-    <form onSubmit={submit} noValidate className="mt-5 grid gap-8 rounded-xl border px-4 py-6 md:grid-cols-2 md:px-6" style={{ borderColor: C.steelLine, background: C.panel }}>
+    <form onSubmit={submit} noValidate className="mt-5 grid gap-8 rounded-[8px] border px-4 py-6 md:grid-cols-2 md:px-6" style={{ borderColor: C.steelLine, background: C.panel }}>
       <div>
         <fieldset>
           <legend className="text-[16px] font-bold">날짜</legend>
@@ -1326,8 +1038,8 @@ function Booking({ today, reduce }: { today: Date; reduce: boolean }) {
                     setDay(i);
                     setSlot(null);
                   }}
-                  className={`rounded-md border-2 py-2 text-center tabular-nums disabled:cursor-not-allowed disabled:opacity-40 ${focusRing}`}
-                  style={{ borderColor: sel ? C.navy : C.steelLine, background: sel ? C.navy : "transparent", color: sel ? "#fff" : C.ink, outlineColor: C.copper }}
+                  className={`rounded-md border py-2 text-center tabular-nums disabled:cursor-not-allowed disabled:opacity-40 ${focusRing}`}
+                  style={{ borderColor: sel ? C.navy : C.steelLine, background: sel ? C.navy : "transparent", color: sel ? "#fff" : C.ink, outlineColor: C.navy }}
                 >
                   <span className="block text-[12px]">{i === 0 ? "오늘" : DOW[d.getDay()]}</span>
                   <span className="block text-[16px] font-bold">{d.getDate()}</span>
@@ -1354,10 +1066,10 @@ function Booking({ today, reduce }: { today: Date; reduce: boolean }) {
                   disabled={full}
                   aria-label={`${t}${full ? ", 마감" : ""}`}
                   onClick={() => setSlot(s)}
-                  className={`rounded-md border-2 py-2.5 text-[15px] font-bold tabular-nums disabled:cursor-not-allowed ${focusRing}`}
+                  className={`rounded-md border py-2.5 text-[15px] font-bold tabular-nums disabled:cursor-not-allowed ${focusRing}`}
                   style={{
-                    borderColor: sel ? C.copper : full ? C.steelSoft : C.steelLine,
-                    background: sel ? C.copper : full ? C.steelSoft : "transparent",
+                    borderColor: sel ? C.navy : full ? C.steelSoft : C.steelLine,
+                    background: sel ? C.navy : full ? C.steelSoft : "transparent",
                     color: sel ? "#fff" : full ? C.steel : C.ink,
                     textDecoration: full ? "line-through" : "none",
                     outlineColor: C.navy,
@@ -1388,15 +1100,15 @@ function Booking({ today, reduce }: { today: Date; reduce: boolean }) {
           <input value={note} onChange={(e) => setNote(e.target.value)} placeholder="지금 쓰는 안경 도수, 렌즈 착용 여부" className={inputCls} style={inputStyle} />
         </label>
         <label className="mt-5 flex items-start gap-2 text-[15px]">
-          <input type="checkbox" checked={agree} onChange={(e) => setAgree(e.target.checked)} className={`mt-1 h-5 w-5 ${focusRing}`} style={{ accentColor: C.navy, outlineColor: C.copper }} />
+          <input type="checkbox" checked={agree} onChange={(e) => setAgree(e.target.checked)} className={`mt-1 h-5 w-5 ${focusRing}`} style={{ accentColor: C.navy, outlineColor: C.navy }} />
           <span>예약 확인 연락을 위한 개인정보 수집에 동의해요. 검사 뒤 바로 지워요.</span>
         </label>
         {err("agree")}
         <button
           type="submit"
           data-gtm-cta="optical_book_submit"
-          className={`mt-6 inline-flex w-full items-center justify-center gap-2 rounded-md px-5 py-3.5 text-[17px] font-bold text-white transition-transform duration-100 active:translate-y-px ${focusRing}`}
-          style={{ background: C.navy, outlineColor: C.copper }}
+          className={`mt-6 inline-flex w-full items-center justify-center gap-2 rounded-md px-5 py-3.5 text-[17px] font-semibold text-white transition-transform duration-100 active:translate-y-px ${focusRing}`}
+          style={{ background: C.navy, outlineColor: C.navy }}
         >
           <Eye size={20} aria-hidden />
           예약하기
@@ -1421,12 +1133,12 @@ function BookingDone({ ref, done, today, reduce, onAgain }: { ref: React.Ref<HTM
       initial={reduce ? false : { opacity: 0, y: 8 }}
       animate={{ opacity: 1, y: 0 }}
       transition={{ duration: reduce ? 0 : 0.3, ease: EASE }}
-      className="mt-5 scroll-mt-4 rounded-xl border px-4 py-6 md:px-6"
+      className="mt-5 scroll-mt-4 rounded-[8px] border px-4 py-6 md:px-6"
       style={{ borderColor: C.navy, background: C.panel }}
       role="status"
     >
-      <p className="inline-flex items-center gap-2 text-[22px]" style={{ ...headF, color: C.navy }}>
-        <Check size={24} strokeWidth={3} aria-hidden style={{ color: C.copper }} />
+      <p className="font-bold inline-flex items-center gap-2 text-[22px]" style={{ color: C.ink }}>
+        <Check size={24} strokeWidth={3} aria-hidden style={{ color: C.navy }} />
         시력검사 예약이 접수됐어요
       </p>
       <dl className="mt-4 grid gap-y-2 text-[16px] sm:grid-cols-[120px_1fr]">
@@ -1445,15 +1157,15 @@ function BookingDone({ ref, done, today, reduce, onAgain }: { ref: React.Ref<HTM
         <li>지금 쓰는 안경이 있으면 챙겨 오세요. 도수 비교에 써요.</li>
       </ul>
       <div className="mt-6 flex flex-wrap gap-2">
-        <a href={`tel:${TEL.replace(/-/g, "")}`} className={`inline-flex items-center gap-1.5 rounded-md border-2 px-4 py-2.5 text-[15px] font-bold ${focusRing}`} style={{ borderColor: C.navy, color: C.navy, outlineColor: C.copper }}>
+        <a href={`tel:${TEL.replace(/-/g, "")}`} className={`inline-flex items-center gap-1.5 rounded-md border px-4 py-2.5 text-[15px] font-bold ${focusRing}`} style={{ borderColor: C.navy, color: C.navy, outlineColor: C.navy }}>
           <Phone size={16} aria-hidden />
           전화 {TEL}
         </a>
-        <span className="inline-flex items-center gap-1.5 rounded-md border-2 px-4 py-2.5 text-[15px] font-bold" style={{ borderColor: C.steelLine, color: C.ink }}>
+        <span className="inline-flex items-center gap-1.5 rounded-md border px-4 py-2.5 text-[15px] font-bold" style={{ borderColor: C.steelLine, color: C.ink }}>
           <MessageCircle size={16} aria-hidden />
           {KAKAO}
         </span>
-        <button type="button" onClick={onAgain} className={`inline-flex items-center gap-1.5 rounded-md px-4 py-2.5 text-[15px] font-bold ${focusRing}`} style={{ color: C.muted, outlineColor: C.copper }}>
+        <button type="button" onClick={onAgain} className={`inline-flex items-center gap-1.5 rounded-md px-4 py-2.5 text-[15px] font-semibold ${focusRing}`} style={{ color: C.muted, outlineColor: C.navy }}>
           <RotateCcw size={16} aria-hidden />
           다른 시간으로
         </button>
@@ -1470,7 +1182,7 @@ function Directions({ today }: { today: Date }) {
   return (
     <div className="mt-5 grid gap-6 md:grid-cols-[minmax(0,1fr)_380px]">
       {/* 약도. 실제 사이트에는 네이버 지도나 카카오맵을 넣는다 */}
-      <div className="overflow-hidden rounded-xl border" style={{ borderColor: C.steelLine, background: C.panel }}>
+      <div className="overflow-hidden rounded-[8px] border" style={{ borderColor: C.steelLine, background: C.panel }}>
         <svg viewBox="0 0 600 320" className="h-auto w-full" role="img" aria-label="약도. ㅇㅇ역 3번 출구에서 큰길 따라 걸어오면 왼쪽 첫 건물 1층">
           <rect width="600" height="320" fill="#f1f3f6" />
           <g stroke="#ffffff" strokeWidth="26" strokeLinecap="round">
@@ -1498,10 +1210,10 @@ function Directions({ today }: { today: Date }) {
             </text>
           </g>
           {/* 걷는 길 */}
-          <path d="M160 170C190 170 200 150 240 150" fill="none" stroke={C.copper} strokeWidth="4" strokeDasharray="8 7" strokeLinecap="round" />
+          <path d="M160 170C190 170 200 150 240 150" fill="none" stroke={C.navy} strokeWidth="4" strokeDasharray="8 7" strokeLinecap="round" />
           {/* 매장 */}
           <g transform="translate(240 118)">
-            <rect x="-46" y="-26" width="92" height="52" rx="6" fill={C.copper} />
+            <rect x="-46" y="-26" width="92" height="52" rx="6" fill={C.navy} />
             <text x="0" y="-3" textAnchor="middle" fontSize="13" fontWeight="700" fill="#fff">
               {BRAND}
             </text>
@@ -1525,30 +1237,30 @@ function Directions({ today }: { today: Date }) {
         </svg>
       </div>
 
-      <div className="flex flex-col gap-5 rounded-xl border px-5 py-5" style={{ borderColor: C.steelLine, background: C.panel }}>
+      <div className="flex flex-col gap-5 rounded-[8px] border px-5 py-5" style={{ borderColor: C.steelLine, background: C.panel }}>
         <div className="flex items-start gap-3">
-          <MapPin size={20} aria-hidden className="mt-0.5 flex-none" style={{ color: C.copper }} />
+          <MapPin size={20} aria-hidden className="mt-0.5 flex-none" style={{ color: C.navy }} />
           <div className="text-[15px] leading-[1.6]">
             <p className="font-bold">{ADDRESS}</p>
             <p style={{ color: C.muted }}>1층 길가 매장, 간판에 곰 그림</p>
           </div>
         </div>
         <div className="flex items-start gap-3">
-          <TrainFront size={20} aria-hidden className="mt-0.5 flex-none" style={{ color: C.copper }} />
+          <TrainFront size={20} aria-hidden className="mt-0.5 flex-none" style={{ color: C.navy }} />
           <div className="text-[15px] leading-[1.6]">
             <p className="font-bold">ㅇㅇ역 3번 출구 도보 3분</p>
             <p style={{ color: C.muted }}>출구 나와서 큰길 따라 직진, 왼쪽 첫 건물</p>
           </div>
         </div>
         <div className="flex items-start gap-3">
-          <Car size={20} aria-hidden className="mt-0.5 flex-none" style={{ color: C.copper }} />
+          <Car size={20} aria-hidden className="mt-0.5 flex-none" style={{ color: C.navy }} />
           <div className="text-[15px] leading-[1.6]">
             <p className="font-bold">건물 뒤 주차 2대, 1시간 무료</p>
             <p style={{ color: C.muted }}>자리가 없으면 옆 건물 공영주차장, 주차권 드려요</p>
           </div>
         </div>
         <div className="flex items-start gap-3">
-          <Clock size={20} aria-hidden className="mt-0.5 flex-none" style={{ color: C.copper }} />
+          <Clock size={20} aria-hidden className="mt-0.5 flex-none" style={{ color: C.navy }} />
           <div className="min-w-0 flex-1">
             <p className="text-[15px] font-bold">영업시간</p>
             <table className="mt-1 w-full text-[15px]" style={{ color: C.ink }}>
@@ -1556,7 +1268,7 @@ function Directions({ today }: { today: Date }) {
                 {HOURS.map((h) => {
                   const isToday = h.dow === dow;
                   return (
-                    <tr key={h.label} style={{ background: isToday ? C.copperSoft : "transparent", fontWeight: isToday ? 700 : 400 }}>
+                    <tr key={h.label} style={{ background: isToday ? C.bg : "transparent", fontWeight: isToday ? 700 : 400 }}>
                       <th scope="row" className="rounded-l-md py-1 pl-2 pr-3 text-left" style={{ fontWeight: "inherit" }}>
                         {h.label}
                         {isToday && <span className="sr-only">, 오늘</span>}
@@ -1574,5 +1286,19 @@ function Directions({ today }: { today: Date }) {
         </div>
       </div>
     </div>
+  );
+}
+
+/* 로고: 메인 사이트와 같은 곰 로고 + 곰파트너(크게) + 업종(작게) */
+function SampleLogo({ light, small }: { light?: boolean; small?: boolean }) {
+  return (
+    <span className="inline-flex items-center gap-2" style={{ color: light ? "#ffffff" : "#111111" }}>
+      {/* eslint-disable-next-line @next/next/no-img-element -- 메인 사이트와 같은 곰 로고 */}
+      <img src="/images/logo-bear.png" alt="" aria-hidden width={28} height={28} className={small ? "h-6 w-6 shrink-0" : "h-7 w-7 shrink-0"} />
+      <span className="flex items-baseline gap-1 whitespace-nowrap">
+        <span className={`${small ? "text-[18px]" : "text-[20px]"} font-bold leading-none tracking-[-0.03em]`}>곰파트너</span>
+        <span className="text-[12px] font-semibold leading-none opacity-75">안경원 샘플</span>
+      </span>
+    </span>
   );
 }

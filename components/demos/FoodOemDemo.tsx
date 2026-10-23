@@ -1,13 +1,12 @@
 "use client";
 
 import { useEffect, useRef, useState, type FormEvent, type ReactNode } from "react";
-import { AnimatePresence, motion, useScroll, useTransform, type MotionValue } from "framer-motion";
+import { AnimatePresence, motion, useScroll, useTransform } from "framer-motion";
 import {
   AlertCircle,
   Check,
   ChevronDown,
   Clock,
-  CookingPot,
   Factory,
   MapPin,
   MessageCircle,
@@ -17,13 +16,12 @@ import {
   ShieldCheck,
   Truck,
 } from "lucide-react";
-import { JetBrains_Mono } from "@/lib/local-fonts";
 import { useReducedMotionSafe } from "@/hooks/useReducedMotionSafe";
 import { daysAgo, fmtKo, useDemoToday } from "@/hooks/useDemoToday";
 import { maskName, maskPhone } from "@/components/demos/LeadReceivedPanel";
 import { DemoMakerInfo } from "@/components/demos/DemoMakerInfo";
 
-/* 소스, 드레싱 OEM 식품 제조사 홈페이지 샘플: 가상의 곰파트너식품. HACCP 인증을 받은 소스 공장 한 곳을 운영한다.
+/* 소스, 드레싱 OEM 식품 제조사 홈페이지 샘플: 가상의 식품 제조사 곰파트너. HACCP 인증을 받은 소스 공장 한 곳을 운영한다.
    회사명, 주소, 전화번호, 단가, 관리 기준은 모두 가상이다.
 
    국내 소스 OEM 업체 사이트 공통 구성(참고): 메뉴는 회사소개, OEM/ODM, 제조 품목, 생산 공정, 인증현황, 고객문의.
@@ -34,57 +32,40 @@ import { DemoMakerInfo } from "@/components/demos/DemoMakerInfo";
    상호작용(모두 브라우저 안에서만 돈다. 실제로 보내지 않는다)
    1. 제조 가능 품목: 포장 형태를 고르면 그 포장으로 만드는 품목과 최소 주문 수량만 남는다. 품목에서 단가 계산으로 넘어간다.
    2. 개당 단가 개략 계산: 포장, 수량, 원료 지정을 고르면 개당 단가 범위와 총액, 수량 구간별 막대가 바뀐다.
-   3. 생산 공정: 공정 칸을 누르면 작은 파우치가 그 칸으로 옮겨 가고 관리 기준(CCP 포함)이 나온다.
+   3. 생산 공정: 공정 칸을 누르면 표시가 그 칸으로 옮겨 가고 관리 기준(CCP 포함)이 나온다.
    4. 샘플 의뢰 신청: 업체명, 담당자, 휴대폰, 품목, 포장, 예상 수량. 완료하면 접수 번호, 담당 창구, 회신 예정일을 보여 준다.
 
-   포스터 첫 화면(fo-poster): 크림 바탕에 토마토 빨강. 큰 문장 "소스 한 가지, 1,000개부터 만들어요" 하나만 둔다.
-   오른쪽(휴대폰은 아래)에서 투명 스탠딩 파우치가 생산 라인 위로 내려와 서고, 노즐이 내려와 소스를 채운 뒤 올라가면
-   윗부분을 실링 바가 양쪽에서 물어 열봉합하며 번쩍인다. 다 끝난 뒤에는 필름 위로 빛 한 줄이 7초마다 지나간다(반복은 이것 하나).
-   스크롤하면 컨베이어가 돌며 다른 소스 파우치들이 줄지어 지나가고 문장은 위로 빠진다. 동작 줄이기면 봉합된 파우치로 고정한다. */
+   첫 화면(fo-poster): 소스 숙성 창고의 나무 통 사진 한 장을 화면 가득 깔고 아래쪽에 문장 "소스 한 가지, 1,000개부터 만들어요"를 둔다.
+   핵심 모션: 들어올 때 사진이 1.6초 동안 천천히 다가오고(scale 1.06 에서 1), 문장은 0.3초 늦게 아래 12px 에서 올라온다(CSS).
+   스크롤하면 사진만 조금 느리게 내려간다(y 0 에서 8%). 동작 줄이기면 전부 멈춘 상태로 둔다.
+   사진 출처: Pexels 사진 6711641 */
 
-const monoF = { fontFamily: `${JetBrains_Mono.style.fontFamily}, ui-monospace, monospace` } as const;
-
-const BRAND = "곰파트너식품";
 const ADDRESS = "충북 ㅇㅇ군 ㅇㅇ면 ㅇㅇ로 00";
 const TEL = "043-000-0000";
 const KAKAO = "카카오톡 채널 곰파트너";
 
 const C = {
-  cream: "#f8efdc",
-  paper: "#fffaf1",
-  ink: "#2b1711",
-  tomato: "#d23a1e",
-  tomatoDeep: "#9c2410",
-  mustard: "#e2a128",
-  muted: "#6a5045",
-  line: "#e5d3b6",
+  /** 구역 구분 옅은 회색 */
+  cream: "#f7f7f5",
+  paper: "#ffffff",
+  ink: "#111111",
+  body: "#4b4b4b",
+  /** 강조색 하나: 채도를 낮춘 토마토 */
+  tomato: "#9a3324",
+  tomatoDeep: "#7f2a1d",
+  muted: "#707070",
+  line: "#e5e5e5",
   error: "#b42318",
 };
 
 /* 모션 상수. 시간은 초, 이징은 cubic-bezier */
 const EASE = [0.22, 1, 0.36, 1] as const;
-/** 파우치가 라인에 닿을 때 살짝 눌렸다 서는 느낌 */
-const EASE_LAND = [0.34, 1.3, 0.64, 1] as const;
-/** 파우치가 내려오는 때와 시간 */
-const DROP_AT = 0.1;
-const DROP_DUR = 0.5;
-/** 노즐이 내려와 채우고 올라가는 구간 */
-const NOZZLE_DOWN = 0.55;
-const FILL_AT = 0.72;
-const FILL_DUR = 0.7;
-const NOZZLE_UP = FILL_AT + FILL_DUR;
-/** 실링 바가 물고, 번쩍이고, 벌어지는 때. 2초 안에 끝난다 */
-const SEAL_AT = NOZZLE_UP + 0.08;
-const SEAL_DUR = 0.16;
-const FLASH_AT = SEAL_AT + SEAL_DUR;
-const FLASH_DUR = 0.22;
-/** 필름 위 빛 한 줄의 주기와 한 번 지나가는 시간 */
-const SHEEN_LOOP = 7;
-const SHEEN_PASS = 1.3;
-/** 포스터 스크롤 진행도 중 퇴장이 끝나는 지점 */
-const EXIT_END = 0.45;
-/** 파우치 사이 간격(SVG 단위). 스크롤하면 이만큼씩 줄지어 지나간다 */
-const POUCH_GAP = 400;
+/** 첫 화면 사진이 다가오는 시간 */
+const PHOTO_IN = 1.6;
+/** 사진 위 막. 아래와 왼쪽을 어둡게 해 흰 글자 대비를 맞춘다 */
+const SCRIM = "linear-gradient(to top, rgba(0,0,0,0.72), rgba(0,0,0,0.25) 55%, rgba(0,0,0,0.12)), linear-gradient(to right, rgba(0,0,0,0.35), rgba(0,0,0,0) 60%)";
+const POSTER_CSS = `@keyframes fo-rise{from{opacity:0;transform:translateY(12px)}}.fo-rise{animation:fo-rise .7s cubic-bezier(0.22,1,0.36,1) .3s both}@media (prefers-reduced-motion:reduce){.fo-rise{animation:none}}`;
+const IMG = "/images/demo-food-oem";
 /** 칩, 패널, 숫자 전환 */
 const DUR = 0.3;
 
@@ -92,31 +73,6 @@ const focusRing = "focus-visible:outline focus-visible:outline-[3px] focus-visib
 const won = (n: number) => `${n.toLocaleString("ko-KR")}원`;
 const num = (n: number) => n.toLocaleString("ko-KR");
 const p2 = (n: number) => String(n).padStart(2, "0");
-
-/* ---------- 포스터 파우치 ---------- */
-
-type SauceId = "tomato" | "bbq" | "mustard" | "sesame";
-const SAUCE: Record<SauceId, { name: string; edge: string; mid: string; hi: string; fleck: string }> = {
-  tomato: { name: "토마토 바베큐 소스", edge: "#7e170a", mid: "#d2361a", hi: "#f0643a", fleck: "#5a1206" },
-  bbq: { name: "스모크 바베큐 소스", edge: "#2e1208", mid: "#6b2a12", hi: "#9a4a24", fleck: "#1d0a04" },
-  mustard: { name: "허니 머스터드", edge: "#9a6a08", mid: "#e0a524", hi: "#f6cd5a", fleck: "#7a4e04" },
-  sesame: { name: "참깨 드레싱", edge: "#a07a4c", mid: "#dcbf92", hi: "#f2e2c4", fleck: "#5a3a1c" },
-};
-/** 스크롤하면 뒤따라 들어오는 파우치들 */
-const TRAIN: SauceId[] = ["bbq", "mustard", "sesame", "tomato"];
-
-const POUCH = "M100 140 L300 140 C306 230 324 330 322 430 C321 470 312 498 296 506 C240 520 160 520 104 506 C88 498 79 470 78 430 C76 330 94 230 100 140 Z";
-const SURFACE = "M60 204 C110 196 150 212 200 204 C250 196 290 212 340 204 L340 540 L60 540 Z";
-const FLECKS: [number, number, number][] = [
-  [128, 260, 4],
-  [262, 238, 3],
-  [170, 352, 3.5],
-  [236, 418, 4],
-  [118, 448, 3],
-  [286, 470, 3.5],
-  [198, 482, 3],
-  [150, 226, 2.5],
-];
 
 /* ---------- 1. 제조 가능 품목 ---------- */
 
@@ -252,11 +208,10 @@ export function FoodOemDemo() {
     <div className="min-h-screen overflow-x-clip pb-24" style={{ background: C.paper, color: C.ink }}>
       <Poster reduce={reduce} onCta={() => go("fo-sample")} />
 
-      <header className="sticky top-0 z-30 border-b" style={{ borderColor: C.line, background: "rgba(255,250,241,0.96)" }}>
+      <header className="sticky top-0 z-30 border-b" style={{ borderColor: C.line, background: "rgba(255,255,255,0.96)" }}>
         <div className="mx-auto flex max-w-[1200px] items-center justify-between gap-4 px-4 py-3 md:px-6">
-          <h2 className="inline-flex items-center gap-2 text-[19px] font-extrabold leading-none tracking-[-0.02em]" style={{ color: C.tomatoDeep }}>
-            <CookingPot size={22} aria-hidden />
-            {BRAND}
+          <h2>
+            <SampleLogo />
           </h2>
           <nav aria-label="주요 메뉴" className="-mx-2 hidden items-center lg:flex">
             {[
@@ -284,7 +239,7 @@ export function FoodOemDemo() {
               type="button"
               onClick={() => go("fo-sample")}
               data-gtm-cta="food-oem_header_sample"
-              className={`inline-flex h-10 items-center gap-1.5 rounded-full px-4 text-[15px] font-bold text-white ${focusRing}`}
+              className={`inline-flex h-10 items-center gap-1.5 rounded-[6px] px-4 text-[15px] font-semibold text-white ${focusRing}`}
               style={{ background: C.tomato, outlineColor: C.tomatoDeep }}
             >
               <PackageOpen size={17} aria-hidden />
@@ -343,8 +298,8 @@ export function FoodOemDemo() {
       </section>
 
       <footer className="mx-auto mt-16 max-w-[1200px] border-t px-4 pt-8 text-[14px] leading-[1.8] md:px-6" style={{ borderColor: C.line, color: C.muted }}>
-        <p className="text-[16px] font-bold" style={{ color: C.tomatoDeep }}>
-          {BRAND}
+        <p>
+          <SampleLogo size={18} />
         </p>
         <p>
           {ADDRESS} / 대표전화 {TEL} / {KAKAO}
@@ -357,12 +312,12 @@ export function FoodOemDemo() {
 
 function SectionTitle({ id, title, badge }: { id: string; title: string; badge?: string }) {
   return (
-    <div className="flex flex-wrap items-end justify-between gap-3 border-b-[3px] pb-3" style={{ borderColor: C.ink }}>
-      <h2 id={id} className="text-[28px] font-extrabold tracking-[-0.035em] md:text-[36px]" style={{ color: C.ink }}>
+    <div className="flex flex-wrap items-end justify-between gap-3 border-b pb-3" style={{ borderColor: C.line }}>
+      <h2 id={id} className="text-[28px] font-bold tracking-[-0.035em] md:text-[36px]" style={{ color: C.ink }}>
         {title}
       </h2>
       {badge && (
-        <span className="inline-flex items-center gap-1.5 rounded-full px-3 py-1 text-[14px] font-bold text-white" style={{ background: C.tomatoDeep }}>
+        <span className="inline-flex items-center gap-1.5 rounded-[4px] border px-2.5 py-1 text-[14px] font-semibold" style={{ borderColor: C.line, color: C.tomatoDeep }}>
           <ShieldCheck size={16} aria-hidden />
           {badge}
         </span>
@@ -376,328 +331,65 @@ function SectionTitle({ id, title, badge }: { id: string; title: string; badge?:
 function Poster({ reduce, onCta }: { reduce: boolean; onCta: () => void }) {
   const ref = useRef<HTMLElement>(null);
   const { scrollYProgress } = useScroll({ target: ref, offset: ["start start", "end start"] });
-  const p = useTransform(scrollYProgress, (v) => (reduce ? 0 : Math.min(1, v / EXIT_END)));
-  // 문장과 로고는 위로 빠지고, 파우치 줄은 왼쪽으로 지나간다
-  const textY = useTransform(p, (v) => `${-v * 55}svh`);
-  const textO = useTransform(p, (v) => (v < 0.12 ? 1 : Math.max(0, 1 - (v - 0.12) / 0.4)));
-  const rowX = useTransform(p, (v) => -v * POUCH_GAP * TRAIN.length);
-  // 벨트 무늬는 파우치와 같은 속도로 흐르되 한 칸(40) 안에서 되풀이한다
-  const beltX = useTransform(p, (v) => -((v * POUCH_GAP * TRAIN.length) % 40));
-  const lineO = useTransform(p, (v) => (v > 0.85 ? Math.max(0, 1 - (v - 0.85) / 0.15) : 1));
+  const photoY = useTransform(scrollYProgress, (v) => (reduce ? "0%" : `${v * 8}%`));
 
   return (
-    <section id="fo-poster" ref={ref} aria-labelledby="fo-poster-title" className="relative" style={{ height: reduce ? undefined : "165svh", background: C.cream }}>
-      <div
-        className={`${reduce ? "relative min-h-svh" : "sticky top-0 h-svh"} overflow-hidden`}
-        style={{ background: `radial-gradient(60% 55% at 74% 64%, #fff7e8 0%, ${C.cream} 58%, #f1e2c6 100%)`, color: C.ink }}
-      >
-        {/* 생산 라인과 파우치 */}
+    <section id="fo-poster" ref={ref} aria-labelledby="fo-poster-title" className="relative flex min-h-[100svh] flex-col overflow-hidden" style={{ background: "#141414", color: "#fff" }}>
+      <style>{POSTER_CSS}</style>
+      <motion.div className="absolute inset-0" style={{ y: photoY }}>
         <motion.div
-          className="pointer-events-none absolute inset-x-0 bottom-0 flex h-[56svh] justify-center md:inset-y-0 md:left-auto md:right-[5vw] md:h-full md:items-end md:pb-[6svh]"
-          style={{ opacity: lineO }}
+          className="absolute inset-0"
+          initial={reduce ? false : { scale: 1.06 }}
+          animate={{ scale: 1 }}
+          transition={{ duration: reduce ? 0 : PHOTO_IN, ease: EASE }}
         >
-          <svg viewBox="0 -40 400 640" className="h-full w-auto overflow-visible md:h-[86svh]" role="img" aria-label="생산 라인 위 투명 스탠딩 파우치에 토마토 소스가 가득 차고 윗부분이 봉합된 모습">
-            <PosterDefs />
-
-            {/* 컨베이어 벨트 */}
-            <g>
-              <rect x="-1600" y="528" width="3600" height="30" rx="15" fill="url(#fo-belt)" />
-              <clipPath id="fo-belt-clip">
-                <rect x="-1600" y="528" width="3600" height="30" rx="15" />
-              </clipPath>
-              <g clipPath="url(#fo-belt-clip)">
-                <motion.g style={{ x: beltX }}>
-                  {Array.from({ length: 92 }, (_, i) => (
-                    <rect key={i} x={-1600 + i * 40} y="530" width="3" height="26" fill="#000" opacity="0.18" />
-                  ))}
-                </motion.g>
-              </g>
-              <rect x="-1600" y="530" width="3600" height="3" fill="#fff" opacity="0.35" />
-              <rect x="-1600" y="558" width="3600" height="22" fill="url(#fo-frame)" />
-            </g>
-
-            {/* 파우치 줄. 맨 앞이 방금 채운 파우치 */}
-            <motion.g style={{ x: rowX }}>
-              <ellipse cx="200" cy="524" rx="132" ry="10" fill="url(#fo-floor)" />
-              <motion.g
-                initial={reduce ? false : { y: -700 }}
-                animate={{ y: 0 }}
-                transition={reduce ? { duration: 0 } : { duration: DROP_DUR, delay: DROP_AT, ease: EASE_LAND }}
-              >
-                <Pouch sauce="tomato" reduce={reduce} live />
-              </motion.g>
-              {TRAIN.map((s, i) => (
-                <g key={i} transform={`translate(${(i + 1) * POUCH_GAP} 0)`}>
-                  <ellipse cx="200" cy="524" rx="132" ry="10" fill="url(#fo-floor)" />
-                  <Pouch sauce={s} reduce />
-                </g>
-              ))}
-            </motion.g>
-
-            {/* 충전 노즐. 라인 위에 고정돼 있고 채울 때만 내려온다 */}
-            <Nozzle reduce={reduce} />
-            {/* 실링 바 */}
-            <SealBars reduce={reduce} p={p} />
-          </svg>
+          {/* eslint-disable-next-line @next/next/no-img-element -- 정적 export 라 next/image 최적화를 쓰지 않는다 */}
+          <img
+            src={`${IMG}/hero.jpg`}
+            srcSet={`${IMG}/hero-sm.jpg 960w, ${IMG}/hero.jpg 1920w`}
+            sizes="100vw"
+            alt="숙성 창고에 줄지어 선 큰 나무 통"
+            fetchPriority="high"
+            className="absolute inset-0 h-full w-full object-cover"
+            style={{ objectPosition: "55% center" }}
+          />
         </motion.div>
+      </motion.div>
+      <div className="absolute inset-0" style={{ background: SCRIM }} aria-hidden />
 
-        {/* 로고와 샘플 의뢰 버튼 */}
-        <motion.div className="absolute inset-x-0 top-0 z-10 flex items-center justify-between px-4 pt-4 md:px-12 md:pt-7" style={{ y: textY }}>
-          <p className="inline-flex items-center gap-2 text-[17px] font-extrabold leading-none tracking-[-0.02em]" style={{ color: C.tomatoDeep }}>
-            <CookingPot size={20} aria-hidden />
-            {BRAND}
-          </p>
-          <button
-            type="button"
-            onClick={onCta}
-            aria-label="샘플 의뢰하기"
-            title="샘플 의뢰하기"
-            data-gtm-cta="food-oem_poster_cta"
-            className={`pointer-events-auto inline-flex h-12 w-12 items-center justify-center rounded-full text-white ${focusRing}`}
-            style={{ background: C.tomato, outlineColor: C.tomatoDeep }}
-          >
-            <PackageOpen size={22} aria-hidden />
-          </button>
-        </motion.div>
+      {/* 로고와 샘플 의뢰 버튼 */}
+      <div className="relative z-10 mx-auto flex w-full max-w-[1200px] items-center justify-between gap-4 px-4 pt-4 md:px-6 md:pt-6">
+        <p>
+          <SampleLogo light size={18} />
+        </p>
+        <button
+          type="button"
+          onClick={onCta}
+          data-gtm-cta="food-oem_poster_cta"
+          className={`inline-flex h-11 items-center gap-1.5 rounded-[6px] px-4 text-[15px] font-semibold text-white ${focusRing}`}
+          style={{ background: C.tomato, outlineColor: "#fff" }}
+        >
+          <PackageOpen size={17} aria-hidden />
+          샘플 의뢰
+        </button>
+      </div>
 
-        {/* 큰 문장 */}
-        <motion.div className="relative z-[1] flex h-full flex-col px-4 pt-[12svh] md:justify-center md:px-12 md:pb-[6svh] md:pt-0" style={{ y: textY, opacity: textO }}>
-          <h1
-            id="fo-poster-title"
-            className="text-[clamp(50px,14.6vw,68px)] font-black leading-[1.06] tracking-[-0.05em] md:text-[clamp(96px,10.4vw,180px)] md:leading-[1.0]"
-            style={{ wordBreak: "keep-all", color: C.ink }}
-          >
-            <span className="block">소스 한 가지,</span>
-            <span className="block" style={{ color: C.tomato }}>
-              1,000개부터
-            </span>
-            <span className="block">만들어요</span>
-          </h1>
-          <p className="mt-5 text-[16px] font-semibold md:mt-8 md:text-[19px]" style={{ color: C.muted }}>
-            소스, 드레싱 OEM 제조. HACCP 인증 공장
-          </p>
-        </motion.div>
+      {/* 문장 */}
+      <div className={`${reduce ? "" : "fo-rise"} relative z-10 mx-auto mt-auto w-full max-w-[1200px] px-4 pb-[12svh] md:px-6`}>
+        <h1
+          id="fo-poster-title"
+          className="text-[36px] font-bold md:text-[clamp(40px,5vw,72px)]"
+          style={{ wordBreak: "keep-all", letterSpacing: "-0.03em", lineHeight: 1.2 }}
+        >
+          소스 한 가지,
+          <br />
+          1,000개부터 만들어요
+        </h1>
+        <p className="mt-4 text-[16px] font-medium md:mt-6 md:text-[18px]" style={{ color: "rgba(255,255,255,0.88)" }}>
+          소스, 드레싱 OEM 제조. HACCP 인증 공장
+        </p>
       </div>
     </section>
-  );
-}
-
-function PosterDefs() {
-  return (
-    <defs>
-      {/* 투명 필름: 가장자리는 어둡고 가운데는 비친다 */}
-      <linearGradient id="fo-film" x1="0" y1="0" x2="1" y2="0">
-        <stop offset="0" stopColor="#8a7a66" stopOpacity="0.42" />
-        <stop offset="0.12" stopColor="#ffffff" stopOpacity="0.1" />
-        <stop offset="0.3" stopColor="#ffffff" stopOpacity="0.38" />
-        <stop offset="0.42" stopColor="#ffffff" stopOpacity="0.06" />
-        <stop offset="0.8" stopColor="#ffffff" stopOpacity="0.04" />
-        <stop offset="1" stopColor="#6e5e4c" stopOpacity="0.46" />
-      </linearGradient>
-      <linearGradient id="fo-film-back" x1="0" y1="0" x2="0" y2="1">
-        <stop offset="0" stopColor="#f6efe2" stopOpacity="0.55" />
-        <stop offset="1" stopColor="#e6dccb" stopOpacity="0.7" />
-      </linearGradient>
-      <linearGradient id="fo-seal" x1="0" y1="0" x2="0" y2="1">
-        <stop offset="0" stopColor="#ffffff" stopOpacity="0.9" />
-        <stop offset="0.5" stopColor="#e9e1d2" stopOpacity="0.85" />
-        <stop offset="1" stopColor="#c9bca6" stopOpacity="0.85" />
-      </linearGradient>
-      {(Object.keys(SAUCE) as SauceId[]).map((s) => (
-        <linearGradient key={s} id={`fo-sauce-${s}`} x1="0" y1="0" x2="1" y2="0">
-          <stop offset="0" stopColor={SAUCE[s].edge} />
-          <stop offset="0.3" stopColor={SAUCE[s].hi} />
-          <stop offset="0.55" stopColor={SAUCE[s].mid} />
-          <stop offset="1" stopColor={SAUCE[s].edge} />
-        </linearGradient>
-      ))}
-      <linearGradient id="fo-sheen" x1="0" y1="0" x2="1" y2="0">
-        <stop offset="0" stopColor="#ffffff" stopOpacity="0" />
-        <stop offset="0.5" stopColor="#ffffff" stopOpacity="0.55" />
-        <stop offset="1" stopColor="#ffffff" stopOpacity="0" />
-      </linearGradient>
-      <linearGradient id="fo-steel" x1="0" y1="0" x2="1" y2="0">
-        <stop offset="0" stopColor="#5b6168" />
-        <stop offset="0.28" stopColor="#e9edf1" />
-        <stop offset="0.5" stopColor="#a8afb7" />
-        <stop offset="0.78" stopColor="#d6dbe0" />
-        <stop offset="1" stopColor="#4c5258" />
-      </linearGradient>
-      <linearGradient id="fo-steel-h" x1="0" y1="0" x2="0" y2="1">
-        <stop offset="0" stopColor="#eef1f4" />
-        <stop offset="0.45" stopColor="#a3aab2" />
-        <stop offset="1" stopColor="#585e65" />
-      </linearGradient>
-      <linearGradient id="fo-belt" x1="0" y1="0" x2="0" y2="1">
-        <stop offset="0" stopColor="#4a4440" />
-        <stop offset="1" stopColor="#24201d" />
-      </linearGradient>
-      <linearGradient id="fo-frame" x1="0" y1="0" x2="0" y2="1">
-        <stop offset="0" stopColor="#c6ccd2" />
-        <stop offset="1" stopColor="#8d949b" />
-      </linearGradient>
-      <radialGradient id="fo-floor" cx="0.5" cy="0.5" r="0.5">
-        <stop offset="0" stopColor="#2b1711" stopOpacity="0.4" />
-        <stop offset="1" stopColor="#2b1711" stopOpacity="0" />
-      </radialGradient>
-      <radialGradient id="fo-flash" cx="0.5" cy="0.5" r="0.5">
-        <stop offset="0" stopColor="#ffffff" stopOpacity="1" />
-        <stop offset="0.35" stopColor="#fff2c2" stopOpacity="0.85" />
-        <stop offset="1" stopColor="#ffd36b" stopOpacity="0" />
-      </radialGradient>
-      <clipPath id="fo-pouch-clip">
-        <path d={POUCH} />
-      </clipPath>
-    </defs>
-  );
-}
-
-/** 스탠딩 파우치 한 개. live 면 소스가 차오르고 봉합 자국이 나중에 생긴다 */
-function Pouch({ sauce, reduce, live = false }: { sauce: SauceId; reduce: boolean; live?: boolean }) {
-  const s = SAUCE[sauce];
-  const anim = live && !reduce;
-  return (
-    <g>
-      {/* 뒤판 필름 */}
-      <path d={POUCH} fill="url(#fo-film-back)" />
-      {/* 소스 */}
-      <g clipPath="url(#fo-pouch-clip)">
-        <motion.g
-          initial={anim ? { y: 330 } : false}
-          animate={{ y: 0 }}
-          transition={anim ? { duration: FILL_DUR, delay: FILL_AT, ease: [0.4, 0, 0.3, 1] } : { duration: 0 }}
-        >
-          <path d={SURFACE} fill={`url(#fo-sauce-${sauce})`} />
-          <path d="M60 204 C110 196 150 212 200 204 C250 196 290 212 340 204" fill="none" stroke={s.hi} strokeWidth="5" strokeOpacity="0.8" />
-          {FLECKS.map(([x, y, r], i) => (
-            <circle key={i} cx={x} cy={y} r={r} fill={s.fleck} opacity="0.5" />
-          ))}
-        </motion.g>
-      </g>
-      {/* 라벨 */}
-      <g>
-        <rect x="118" y="262" width="164" height="92" rx="10" fill="#fffaf1" />
-        <rect x="118" y="262" width="164" height="92" rx="10" fill="none" stroke="#2b1711" strokeOpacity="0.12" strokeWidth="2" />
-        <rect x="118" y="262" width="164" height="22" rx="10" fill={sauce === "sesame" ? "#8a6a3c" : s.mid} />
-        <rect x="118" y="274" width="164" height="10" fill={sauce === "sesame" ? "#8a6a3c" : s.mid} />
-        <text x="200" y="278" textAnchor="middle" fontSize="13" fontWeight="800" fill="#fffaf1" letterSpacing="1">
-          곰파트너
-        </text>
-        <text x="200" y="314" textAnchor="middle" fontSize="16" fontWeight="800" fill="#2b1711">
-          {s.name}
-        </text>
-        <text x="200" y="338" textAnchor="middle" fontSize="13" fontWeight="600" fill="#6a5045">
-          200g
-        </text>
-      </g>
-      {/* 앞판 필름 광택 */}
-      <path d={POUCH} fill="url(#fo-film)" />
-      {/* 아래 접힘(거싯) */}
-      <path d="M90 474 C140 492 260 492 310 474" fill="none" stroke="#ffffff" strokeOpacity="0.55" strokeWidth="3" />
-      <path d="M94 482 C150 500 250 500 306 482" fill="none" stroke="#5a4a3a" strokeOpacity="0.25" strokeWidth="2" />
-      {/* 윗부분 봉합 띠 */}
-      <rect x="100" y="140" width="200" height="38" fill="url(#fo-seal)" />
-      <motion.g
-        initial={anim ? { opacity: 0 } : false}
-        animate={{ opacity: 1 }}
-        transition={anim ? { duration: 0.12, delay: FLASH_AT } : { duration: 0 }}
-      >
-        {Array.from({ length: 33 }, (_, i) => (
-          <rect key={i} x={104 + i * 6} y="146" width="2" height="26" fill="#8b7d68" opacity="0.45" />
-        ))}
-      </motion.g>
-      {/* 뜯는 홈 */}
-      <path d="M302 190 L292 196 L303 202 Z" fill={C.cream} />
-      {/* 하이라이트 */}
-      <path d="M118 196 C112 280 108 380 112 468" fill="none" stroke="#ffffff" strokeOpacity="0.8" strokeWidth="6" strokeLinecap="round" />
-      <path d="M136 200 C132 240 130 262 130 280" fill="none" stroke="#ffffff" strokeOpacity="0.6" strokeWidth="3" strokeLinecap="round" />
-      {/* 빛 한 줄. 봉합이 끝난 뒤 필름 위를 지나간다 */}
-      {anim && (
-        <g clipPath="url(#fo-pouch-clip)">
-          <motion.rect
-            y="120"
-            width="70"
-            height="420"
-            fill="url(#fo-sheen)"
-            initial={{ x: -40 }}
-            animate={{ x: [-40, 380] }}
-            transition={{ duration: SHEEN_PASS, delay: FLASH_AT + 0.6, repeat: Infinity, repeatDelay: SHEEN_LOOP - SHEEN_PASS, ease: "easeInOut" }}
-            style={{ skewX: -14 }}
-          />
-        </g>
-      )}
-      {/* 테두리 */}
-      <path d={POUCH} fill="none" stroke="#5a4a3a" strokeOpacity="0.4" strokeWidth="2" />
-    </g>
-  );
-}
-
-/** 충전 노즐과 소스 줄기 */
-function Nozzle({ reduce }: { reduce: boolean }) {
-  if (reduce) return null;
-  return (
-    <motion.g
-      initial={{ y: -900 }}
-      animate={{ y: [-900, 0, 0, -900] }}
-      transition={{ duration: NOZZLE_UP + 0.2 - NOZZLE_DOWN, delay: NOZZLE_DOWN, times: [0, 0.18, 0.84, 1], ease: EASE }}
-    >
-      {/* 소스 줄기 */}
-      <motion.rect
-        x="194"
-        y="104"
-        width="12"
-        height="330"
-        fill="url(#fo-sauce-tomato)"
-        style={{ originY: 0 }}
-        initial={{ scaleY: 0 }}
-        animate={{ scaleY: [0, 1, 1, 0] }}
-        transition={{ duration: FILL_DUR + 0.04, delay: FILL_AT - 0.04, times: [0, 0.2, 0.86, 1], ease: "linear" }}
-      />
-      <NozzleBody />
-    </motion.g>
-  );
-}
-
-function NozzleBody() {
-  return (
-    <g>
-      <rect x="178" y="-400" width="44" height="470" fill="url(#fo-steel)" />
-      <rect x="172" y="40" width="56" height="14" rx="3" fill="url(#fo-steel-h)" />
-      <path d="M178 70 L222 70 L210 106 L190 106 Z" fill="url(#fo-steel)" />
-      <rect x="186" y="-400" width="5" height="470" fill="#ffffff" opacity="0.5" />
-    </g>
-  );
-}
-
-/** 양쪽에서 들어와 봉합 띠를 무는 실링 바와 번쩍임 */
-function SealBars({ reduce, p }: { reduce: boolean; p: MotionValue<number> }) {
-  const away = useTransform(p, (v) => (v > 0.02 ? 0 : 1));
-  if (reduce) return null;
-  const clamp = { duration: NOZZLE_UP + 0.5 - SEAL_AT, delay: SEAL_AT, times: [0, 0.27, 0.62, 1], ease: EASE };
-  return (
-    <motion.g style={{ opacity: away }}>
-      <motion.g initial={{ x: -700, opacity: 0 }} animate={{ x: [-700, 0, 0, -700], opacity: [0, 1, 1, 0] }} transition={clamp}>
-        <rect x="-60" y="134" width="262" height="50" rx="6" fill="url(#fo-steel-h)" />
-        <rect x="-60" y="138" width="262" height="6" fill="#ffffff" opacity="0.6" />
-        <rect x="188" y="140" width="14" height="38" fill={C.tomato} opacity="0.85" />
-      </motion.g>
-      <motion.g initial={{ x: 700, opacity: 0 }} animate={{ x: [700, 0, 0, 700], opacity: [0, 1, 1, 0] }} transition={clamp}>
-        <rect x="198" y="134" width="262" height="50" rx="6" fill="url(#fo-steel-h)" />
-        <rect x="198" y="138" width="262" height="6" fill="#ffffff" opacity="0.6" />
-        <rect x="198" y="140" width="14" height="38" fill={C.tomato} opacity="0.85" />
-      </motion.g>
-      {/* 번쩍임 */}
-      <motion.ellipse
-        cx="200"
-        cy="159"
-        rx="220"
-        ry="80"
-        fill="url(#fo-flash)"
-        initial={{ opacity: 0, scale: 0.4 }}
-        animate={{ opacity: [0, 1, 0], scale: [0.4, 1.15, 1.4] }}
-        transition={{ duration: FLASH_DUR, delay: FLASH_AT, ease: "easeOut" }}
-      />
-    </motion.g>
   );
 }
 
@@ -720,8 +412,8 @@ function Items({ reduce, onCalc }: { reduce: boolean; onCalc: (item: string, pac
               role="radio"
               aria-checked={on}
               onClick={() => setKind(k)}
-              className={`rounded-full border-2 px-4 py-2 text-[15px] font-bold transition-colors ${focusRing}`}
-              style={{ borderColor: on ? C.ink : C.line, background: on ? C.ink : "transparent", color: on ? C.paper : C.ink, outlineColor: C.tomato }}
+              className={`rounded-[6px] border px-4 py-2 text-[15px] font-semibold transition-colors ${focusRing}`}
+              style={{ borderColor: on ? C.tomato : C.line, background: on ? C.tomato : "transparent", color: on ? "#fff" : C.ink, outlineColor: C.tomato }}
             >
               {k}
             </button>
@@ -743,7 +435,7 @@ function Items({ reduce, onCalc }: { reduce: boolean; onCalc: (item: string, pac
             {kindPacks.map((p) => (
               <p key={p.id} className="rounded-[8px] px-4 py-3 text-[15px] leading-[1.6]" style={{ background: C.cream }}>
                 <b>{p.label}</b> 최소 주문{" "}
-                <b style={{ ...monoF, color: C.tomatoDeep }}>{num(p.moq)}개</b>
+                <b className="tabular-nums" style={{ color: C.tomatoDeep }}>{num(p.moq)}개</b>
                 <span className="block" style={{ color: C.muted }}>
                   {p.why}
                 </span>
@@ -758,7 +450,7 @@ function Items({ reduce, onCalc }: { reduce: boolean; onCalc: (item: string, pac
           const rows = ITEMS.filter((it) => it.group === g && shown(it.packs).length > 0);
           return (
             <div key={g}>
-              <h3 className="flex items-baseline justify-between border-b pb-2 text-[19px] font-extrabold" style={{ borderColor: C.ink }}>
+              <h3 className="flex items-baseline justify-between border-b pb-2 text-[19px] font-bold" style={{ borderColor: C.ink }}>
                 {g}
                 <span className="text-[14px] font-semibold" style={{ color: C.muted }}>
                   {rows.length}개 품목
@@ -793,7 +485,7 @@ function Items({ reduce, onCalc }: { reduce: boolean; onCalc: (item: string, pac
                                 style={{ borderColor: C.line, outlineColor: C.tomato }}
                               >
                                 {pk.label.replace("스탠딩 ", "").replace("업소용 파우치", "업소용")}
-                                <span style={{ ...monoF, color: C.tomatoDeep }}>{num(pk.moq)}~</span>
+                                <span className="tabular-nums" style={{ color: C.tomatoDeep }}>{num(pk.moq)}~</span>
                               </button>
                             );
                           })}
@@ -869,8 +561,8 @@ function PriceCalc({
                   type="button"
                   aria-pressed={on}
                   onClick={() => pickPack(p.id)}
-                  className={`rounded-[8px] border-2 px-3 py-2.5 text-left text-[14px] font-bold leading-[1.35] ${focusRing}`}
-                  style={{ borderColor: on ? C.tomato : C.line, background: on ? "#fde9e3" : "transparent", outlineColor: C.tomato }}
+                  className={`rounded-[8px] border px-3 py-2.5 text-left text-[14px] font-bold leading-[1.35] ${focusRing}`}
+                  style={{ borderColor: on ? C.tomato : C.line, background: on ? C.cream : "transparent", outlineColor: C.tomato }}
                 >
                   {p.label}
                   <span className="mt-0.5 block text-[12px] font-semibold" style={{ color: C.muted }}>
@@ -893,8 +585,8 @@ function PriceCalc({
             onChange={(e) => setQtyRaw(e.target.value.replace(/\D/g, "").slice(0, 6))}
             aria-describedby="fo-qty-help"
             aria-invalid={under}
-            className={`h-12 w-40 rounded-[8px] border-2 px-3 text-right text-[18px] font-bold ${focusRing}`}
-            style={{ ...monoF, borderColor: under ? C.error : C.line, background: "#fff", outlineColor: C.tomato }}
+            className={`h-12 w-40 rounded-[8px] border px-3 text-right text-[18px] font-bold tabular-nums ${focusRing}`}
+            style={{ borderColor: under ? C.error : C.line, background: "#fff", outlineColor: C.tomato }}
           />
           <span className="text-[16px] font-bold">개</span>
         </div>
@@ -904,8 +596,8 @@ function PriceCalc({
               key={q}
               type="button"
               onClick={() => setQtyRaw(String(q))}
-              className={`rounded-full border px-3 py-1 text-[13px] font-semibold ${focusRing}`}
-              style={{ ...monoF, borderColor: qty === q ? C.ink : C.line, background: qty === q ? C.ink : "transparent", color: qty === q ? C.paper : C.ink, outlineColor: C.tomato }}
+              className={`rounded-[6px] border px-3 py-1 text-[13px] font-semibold tabular-nums ${focusRing}`}
+              style={{ borderColor: qty === q ? C.tomato : C.line, background: qty === q ? C.tomato : "transparent", color: qty === q ? "#fff" : C.ink, outlineColor: C.tomato }}
             >
               {num(q)}
             </button>
@@ -917,15 +609,15 @@ function PriceCalc({
         </p>
 
         <label className="mt-6 flex cursor-pointer items-center gap-3 text-[16px] font-bold">
-          <input type="checkbox" checked={local} onChange={(e) => setLocal(e.target.checked)} className={`h-5 w-5 accent-[#d23a1e] ${focusRing}`} />
+          <input type="checkbox" checked={local} onChange={(e) => setLocal(e.target.checked)} className={`h-5 w-5 accent-[#9a3324] ${focusRing}`} />
           국산 원료로 지정
         </label>
       </div>
 
       {/* 결과 */}
-      <div className="rounded-[14px] p-5 md:p-7" style={{ background: C.ink, color: C.paper }} aria-live="polite">
+      <div className="rounded-[8px] p-5 md:p-7" style={{ background: C.ink, color: C.paper }} aria-live="polite">
         <p className="text-[15px] font-semibold opacity-80">개당 단가 개략</p>
-        <p className="mt-1 text-[34px] font-bold leading-tight tracking-[-0.03em] md:text-[42px]" style={monoF}>
+        <p className="mt-1 text-[34px] font-bold leading-tight tracking-[-0.03em] md:text-[42px] tabular-nums">
           {num(r.lo)} ~ {num(r.hi)}
           <span className="ml-1 text-[20px]">원</span>
         </p>
@@ -933,24 +625,24 @@ function PriceCalc({
           {num(Math.max(qty, pk.moq))}개 총액 {won(r.lo * Math.max(qty, pk.moq))} ~ {won(r.hi * Math.max(qty, pk.moq))}
         </p>
         {nextTier && nextGain > 0 && (
-          <p className="mt-1 text-[14px] font-semibold" style={{ color: "#ffc8b4" }}>
+          <p className="mt-1 text-[14px] font-semibold" style={{ color: "#e9b8ab" }}>
             {num(nextTier.from)}개부터는 개당 약 {num(round10(nextGain / 2))}원 내려가요
           </p>
         )}
 
         {/* 수량 구간별 막대. 막대 높이는 scaleY 로 바꾼다 */}
-        <div className="mt-6 flex h-[150px] items-end gap-2 border-b pb-0" style={{ borderColor: "rgba(255,250,241,0.25)" }} aria-hidden>
+        <div className="mt-6 flex h-[150px] items-end gap-2 border-b pb-0" style={{ borderColor: "rgba(255,255,255,0.25)" }} aria-hidden>
           {tiers.map((q) => {
             const u = unitRange(pk, q, local).hi;
             const on = tierK(Math.max(qty, pk.moq)) === tierK(q);
             return (
               <div key={q} className="flex h-full min-w-0 flex-1 flex-col items-center justify-end">
-                <span className="mb-1 text-[11px] font-semibold sm:text-[12px]" style={{ ...monoF, color: on ? "#ffc8b4" : "rgba(255,250,241,0.7)" }}>
+                <span className="mb-1 text-[11px] font-semibold tabular-nums sm:text-[12px]" style={{ color: on ? "#e9b8ab" : "rgba(255,255,255,0.7)" }}>
                   {num(u)}
                 </span>
                 <motion.div
                   className="w-full rounded-t-[4px]"
-                  style={{ height: "100%", originY: 1, background: on ? C.tomato : "rgba(255,250,241,0.22)" }}
+                  style={{ height: "100%", originY: 1, background: on ? "#c4705f" : "rgba(255,255,255,0.22)" }}
                   initial={false}
                   animate={{ scaleY: Math.max(0.08, (u / maxUnit) * 0.86) }}
                   transition={{ duration: reduce ? 0 : 0.45, ease: EASE }}
@@ -961,7 +653,7 @@ function PriceCalc({
         </div>
         <div className="mt-1.5 flex gap-2" aria-hidden>
           {tiers.map((q) => (
-            <span key={q} className="min-w-0 flex-1 text-center text-[11px] opacity-75 sm:text-[12px]" style={monoF}>
+            <span key={q} className="min-w-0 flex-1 text-center text-[11px] opacity-75 tabular-nums sm:text-[12px]">
               {q >= 10000 ? `${q / 10000}만` : num(q)}
             </span>
           ))}
@@ -983,8 +675,8 @@ function PriceCalc({
           type="button"
           onClick={() => onSample(Math.max(qty, pk.moq))}
           data-gtm-cta="food-oem_calc_sample"
-          className={`mt-6 inline-flex h-12 w-full items-center justify-center gap-2 rounded-full text-[16px] font-bold text-white ${focusRing}`}
-          style={{ background: C.tomato, outlineColor: C.paper }}
+          className={`mt-6 inline-flex h-12 w-full items-center justify-center gap-2 rounded-[6px] text-[16px] font-semibold text-white ${focusRing}`}
+          style={{ background: "#ffffff", color: C.ink, outlineColor: "#ffffff" }}
         >
           <PackageOpen size={18} aria-hidden />이 조건으로 샘플 의뢰
         </button>
@@ -1004,7 +696,7 @@ function Process({ reduce }: { reduce: boolean }) {
     <div className="mt-8">
       {/* 공정 라인. 고른 칸 위로 파우치 표시가 옮겨 간다 */}
       <div className="relative">
-        <div className="absolute inset-x-2 top-[52px] hidden h-[10px] rounded-full md:block" style={{ background: `repeating-linear-gradient(90deg, ${C.ink} 0 22px, #4a3a32 22px 26px)` }} aria-hidden />
+        <div className="absolute inset-x-2 top-[57px] hidden h-px md:block" style={{ background: C.line }} aria-hidden />
         <ol className="relative grid grid-cols-2 gap-2 sm:grid-cols-4 md:grid-cols-7 md:gap-1.5">
           {STEPS.map((st, i) => {
             const on = i === idx;
@@ -1014,24 +706,24 @@ function Process({ reduce }: { reduce: boolean }) {
                   type="button"
                   aria-pressed={on}
                   onClick={() => setIdx(i)}
-                  className={`relative flex w-full flex-col items-center rounded-[10px] px-1 pb-3 pt-2 text-center ${focusRing}`}
+                  className={`relative flex w-full flex-col items-center rounded-[8px] px-1 pb-3 pt-2 text-center ${focusRing}`}
                   style={{ outlineColor: C.tomato, background: on ? C.cream : "transparent" }}
                 >
                   <span className="relative flex h-[46px] w-full items-end justify-center">
                     {on && (
                       <motion.span layoutId="fo-proc-pouch" transition={t} className="block" aria-hidden>
-                        <MiniPouch />
+                        <PackageOpen size={22} style={{ color: C.tomato }} />
                       </motion.span>
                     )}
                   </span>
                   <span
-                    className="relative z-[1] mt-1.5 inline-flex h-[22px] w-[22px] items-center justify-center rounded-full border-[3px]"
-                    style={{ borderColor: C.ink, background: on ? C.tomato : C.paper }}
+                    className="relative z-[1] mt-1.5 inline-flex h-[14px] w-[14px] items-center justify-center rounded-full border"
+                    style={{ borderColor: on ? C.tomato : "#b5b5b5", background: on ? C.tomato : C.paper }}
                     aria-hidden
                   />
                   <span className="mt-2 text-[15px] font-bold leading-tight">{st.name}</span>
                   {st.ccp && (
-                    <span className="mt-1 rounded-[4px] px-1.5 text-[12px] font-bold text-white" style={{ ...monoF, background: C.tomatoDeep }}>
+                    <span className="mt-1 rounded-[4px] border px-1.5 text-[12px] font-semibold" style={{ borderColor: C.line, color: C.tomatoDeep }}>
                       {st.ccp}
                     </span>
                   )}
@@ -1049,22 +741,22 @@ function Process({ reduce }: { reduce: boolean }) {
           animate={{ clipPath: "inset(0 0 0% 0)" }}
           exit={reduce ? { opacity: 0 } : { clipPath: "inset(100% 0 0 0)" }}
           transition={{ duration: reduce ? 0 : DUR, ease: EASE }}
-          className="mt-6 grid gap-5 rounded-[14px] border-2 p-5 md:grid-cols-[minmax(0,1.2fr)_minmax(0,1fr)] md:p-7"
-          style={{ borderColor: C.ink }}
+          className="mt-6 grid gap-5 rounded-[8px] border p-5 md:grid-cols-[minmax(0,1.2fr)_minmax(0,1fr)] md:p-7"
+          style={{ borderColor: C.line }}
           aria-live="polite"
         >
           <div>
-            <h3 className="flex flex-wrap items-center gap-2 text-[22px] font-extrabold">
+            <h3 className="flex flex-wrap items-center gap-2 text-[22px] font-bold">
               {s.name}
               {s.ccp && (
-                <span className="rounded-[4px] px-2 py-0.5 text-[13px] font-bold text-white" style={{ ...monoF, background: C.tomatoDeep }}>
+                <span className="rounded-[4px] border px-2 py-0.5 text-[13px] font-semibold" style={{ borderColor: C.line, color: C.tomatoDeep }}>
                   {s.ccp} 중요관리점
                 </span>
               )}
             </h3>
             <p className="mt-3 text-[16px] leading-[1.7]">{s.what}</p>
           </div>
-          <div className="rounded-[10px] p-4" style={{ background: C.cream }}>
+          <div className="rounded-[8px] p-4" style={{ background: C.cream }}>
             <p className="text-[14px] font-bold" style={{ color: C.tomatoDeep }}>
               관리 기준
             </p>
@@ -1083,16 +775,6 @@ function Process({ reduce }: { reduce: boolean }) {
         공정마다 작업 일지와 온도 기록을 남겨요. 거래처에는 제조번호별 기록을 보여 드려요.
       </p>
     </div>
-  );
-}
-
-function MiniPouch() {
-  return (
-    <svg width="30" height="40" viewBox="0 0 30 40" aria-hidden>
-      <path d="M6 3 L24 3 C25 12 27 22 27 30 C27 36 24 38 15 38 C6 38 3 36 3 30 C3 22 5 12 6 3 Z" fill={C.tomato} stroke={C.ink} strokeWidth="2" />
-      <rect x="6" y="3" width="18" height="6" fill={C.paper} stroke={C.ink} strokeWidth="2" />
-      <path d="M8 13 C7 20 7 26 8 32" stroke="#fff" strokeOpacity="0.7" strokeWidth="2" fill="none" strokeLinecap="round" />
-    </svg>
   );
 }
 
@@ -1157,7 +839,7 @@ function SampleForm({ reduce, today, prefill }: { reduce: boolean; today: Date; 
     "aria-invalid": tried && !!errs[key],
     "aria-describedby": tried && errs[key] ? `fo-f-${key}-err` : undefined,
   });
-  const inputCls = `mt-1.5 h-12 w-full rounded-[8px] border-2 bg-white px-3 text-[16px] ${focusRing}`;
+  const inputCls = `mt-1.5 h-12 w-full rounded-[8px] border bg-white px-3 text-[16px] ${focusRing}`;
   const border = (key: keyof typeof errs) => ({ borderColor: tried && errs[key] ? C.error : C.line, outlineColor: C.tomato });
   const err = (k: keyof typeof errs) =>
     tried && errs[k] ? (
@@ -1173,17 +855,17 @@ function SampleForm({ reduce, today, prefill }: { reduce: boolean; today: Date; 
         initial={reduce ? false : { clipPath: "inset(0 0 100% 0)" }}
         animate={{ clipPath: "inset(0 0 0% 0)" }}
         transition={{ duration: reduce ? 0 : 0.5, ease: EASE }}
-        className="rounded-[14px] border-2 p-5 md:p-7"
-        style={{ borderColor: C.ink, background: "#fff" }}
+        className="rounded-[8px] border p-5 md:p-7"
+        style={{ borderColor: C.line, background: "#fff" }}
         role="status"
       >
-        <p className="inline-flex items-center gap-2 text-[22px] font-extrabold">
+        <p className="inline-flex items-center gap-2 text-[22px] font-bold">
           <Check size={24} style={{ color: C.tomatoDeep }} aria-hidden />
           샘플 의뢰가 접수됐어요
         </p>
         <dl className="mt-5 grid grid-cols-[110px_minmax(0,1fr)] gap-y-2.5 text-[16px]">
           <dt style={{ color: C.muted }}>접수 번호</dt>
-          <dd className="font-bold" style={monoF}>
+          <dd className="font-bold tabular-nums">
             {done.no}
           </dd>
           <dt style={{ color: C.muted }}>업체</dt>
@@ -1302,8 +984,8 @@ function SampleForm({ reduce, today, prefill }: { reduce: boolean; today: Date; 
                 type="button"
                 aria-pressed={on}
                 onClick={() => setPlan(on ? "" : q)}
-                className={`rounded-full border-2 px-3.5 py-1.5 text-[14px] font-bold ${focusRing}`}
-                style={{ borderColor: on ? C.ink : C.line, background: on ? C.ink : "transparent", color: on ? C.paper : C.ink, outlineColor: C.tomato }}
+                className={`rounded-[6px] border px-3.5 py-1.5 text-[14px] font-semibold ${focusRing}`}
+                style={{ borderColor: on ? C.tomato : C.line, background: on ? C.tomato : "transparent", color: on ? "#fff" : C.ink, outlineColor: C.tomato }}
               >
                 {q}
               </button>
@@ -1321,12 +1003,12 @@ function SampleForm({ reduce, today, prefill }: { reduce: boolean; today: Date; 
           onChange={(e) => setMemo(e.target.value)}
           rows={3}
           placeholder="예: 지금 매장에서 쓰는 소스 맛 그대로, 조금 덜 달게"
-          className={`mt-1.5 w-full rounded-[8px] border-2 bg-white px-3 py-2.5 text-[16px] ${focusRing}`}
+          className={`mt-1.5 w-full rounded-[8px] border bg-white px-3 py-2.5 text-[16px] ${focusRing}`}
           style={{ borderColor: C.line, outlineColor: C.tomato }}
         />
       </div>
       <label className="flex cursor-pointer items-start gap-3 text-[15px] sm:col-span-2">
-        <input type="checkbox" checked={sendRef} onChange={(e) => setSendRef(e.target.checked)} className={`mt-0.5 h-5 w-5 flex-none accent-[#d23a1e] ${focusRing}`} />
+        <input type="checkbox" checked={sendRef} onChange={(e) => setSendRef(e.target.checked)} className={`mt-0.5 h-5 w-5 flex-none accent-[#9a3324] ${focusRing}`} />
         지금 쓰는 소스를 보내서 맞춰 보고 싶어요
       </label>
       <div className="sm:col-span-2">
@@ -1336,7 +1018,7 @@ function SampleForm({ reduce, today, prefill }: { reduce: boolean; today: Date; 
             type="checkbox"
             checked={agree}
             onChange={(e) => setAgree(e.target.checked)}
-            className={`mt-0.5 h-5 w-5 flex-none accent-[#d23a1e] ${focusRing}`}
+            className={`mt-0.5 h-5 w-5 flex-none accent-[#9a3324] ${focusRing}`}
           />
           <span>
             개인정보 수집, 이용 동의 <span style={{ color: C.muted }}>(업체명, 이름, 휴대폰. 상담 뒤 1년 보관)</span>
@@ -1347,7 +1029,7 @@ function SampleForm({ reduce, today, prefill }: { reduce: boolean; today: Date; 
       <button
         type="submit"
         data-gtm-cta="food-oem_sample_submit"
-        className={`inline-flex h-14 items-center justify-center gap-2 rounded-full text-[17px] font-bold text-white sm:col-span-2 ${focusRing}`}
+        className={`inline-flex h-14 items-center justify-center gap-2 rounded-[6px] text-[17px] font-semibold text-white sm:col-span-2 ${focusRing}`}
         style={{ background: C.tomato, outlineColor: C.tomatoDeep }}
       >
         <PackageOpen size={19} aria-hidden />
@@ -1368,8 +1050,8 @@ function Flow() {
     ["생산, 출고", "검사 성적 첨부해 출고", "3~5일"],
   ];
   return (
-    <aside aria-labelledby="fo-flow-title" className="rounded-[14px] p-5 md:p-7" style={{ background: C.cream }}>
-      <h3 id="fo-flow-title" className="flex items-center gap-2 text-[20px] font-extrabold">
+    <aside aria-labelledby="fo-flow-title" className="rounded-[8px] p-5 md:p-7" style={{ background: C.cream }}>
+      <h3 id="fo-flow-title" className="flex items-center gap-2 text-[20px] font-bold">
         <Factory size={21} aria-hidden style={{ color: C.tomatoDeep }} />
         의뢰부터 첫 출고까지
       </h3>
@@ -1377,13 +1059,13 @@ function Flow() {
         {rows.map(([a, b, d], i) => (
           <li key={a} className="relative flex gap-3 pb-4 pl-1 last:pb-0">
             <span className="relative flex flex-col items-center" aria-hidden>
-              <span className="mt-1.5 h-3 w-3 rounded-full border-[3px]" style={{ borderColor: C.tomatoDeep, background: i === 0 ? C.tomatoDeep : C.paper }} />
+              <span className="mt-1.5 h-3 w-3 rounded-full border" style={{ borderColor: C.tomatoDeep, background: i === 0 ? C.tomatoDeep : C.paper }} />
               {i < rows.length - 1 && <span className="mt-1 w-[2px] flex-1" style={{ background: C.line }} />}
             </span>
             <span className="min-w-0 flex-1">
               <span className="flex flex-wrap items-baseline justify-between gap-x-3">
                 <b className="text-[16px]">{a}</b>
-                <span className="text-[14px] font-semibold" style={{ ...monoF, color: C.tomatoDeep }}>
+                <span className="text-[14px] font-semibold tabular-nums" style={{ color: C.tomatoDeep }}>
                   {d}
                 </span>
               </span>
@@ -1454,8 +1136,8 @@ function Visit() {
           </div>
         ))}
       </dl>
-      <div className="rounded-[14px] p-5 text-[15px] leading-[1.7]" style={{ background: C.cream }}>
-        <p className="flex items-center gap-2 text-[17px] font-extrabold">
+      <div className="rounded-[8px] p-5 text-[15px] leading-[1.7]" style={{ background: C.cream }}>
+        <p className="flex items-center gap-2 text-[17px] font-bold">
           <Factory size={19} aria-hidden style={{ color: C.tomatoDeep }} />
           공장 방문
         </p>
@@ -1463,5 +1145,22 @@ function Visit() {
         <p className="mt-2">승용차는 정문 옆 방문객 주차장에 세우시면 돼요.</p>
       </div>
     </div>
+  );
+}
+
+/* 로고: 메인 사이트와 같은 곰 로고 + 곰파트너(크게) + 업종(작게) */
+function SampleLogo({ light, size = 20 }: { light?: boolean; size?: number }) {
+  const mark = size + 8;
+  return (
+    <span className="inline-flex items-center gap-2 leading-none" style={{ color: light ? "#fff" : "#111" }}>
+      {/* eslint-disable-next-line @next/next/no-img-element -- 메인 사이트와 같은 곰 로고 */}
+      <img src="/images/logo-bear.png" alt="" aria-hidden width={mark} height={mark} className="shrink-0" style={{ width: mark, height: mark }} />
+      <span className="flex items-baseline gap-1 whitespace-nowrap">
+        <span className="font-bold tracking-[-0.03em]" style={{ fontSize: size }}>
+          곰파트너
+        </span>
+        <span className="text-[12px] font-semibold opacity-75">식품 제조 샘플</span>
+      </span>
+    </span>
   );
 }

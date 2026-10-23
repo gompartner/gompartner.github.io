@@ -13,7 +13,6 @@ import {
   MessageCircle,
   Phone,
   PhoneOff,
-  Scale,
   ShieldCheck,
   Video,
 } from "lucide-react";
@@ -23,7 +22,7 @@ import { daysAgo, fmtKo, useDemoToday } from "@/hooks/useDemoToday";
 import { maskName, maskPhone } from "@/components/demos/LeadReceivedPanel";
 import { DemoMakerInfo } from "@/components/demos/DemoMakerInfo";
 
-/* 이혼, 가사 사건 법률사무소 홈페이지 샘플: 곰파트너법률사무소.
+/* 이혼, 가사 사건 법률사무소 홈페이지 샘플: 곰파트너 법률사무소.
    사무소 이름, 변호사 이름, 주소, 전화번호, 예약 현황은 모두 가상이다.
    변호사 광고 규정에 맞춰 승소율, 성공 사례 숫자, 결과 보장, 최고 같은 표현은 쓰지 않는다.
    "전문"은 대한변협 등록 전문분야 표기에만 쓴다.
@@ -39,320 +38,99 @@ import { DemoMakerInfo } from "@/components/demos/DemoMakerInfo";
       전화, 화상은 겹치지만 않으면 된다. 연락을 전화로만 받기(문자 안 받기)를 고를 수 있다.
    4. 자주 묻는 질문.
 
-   포스터 첫 화면(fl-poster): 크림 바탕에 와인색 큰 문장 "상담은 다른 분과 마주치지 않게 잡아요".
-   오른쪽(휴대폰은 아래)에 문틀 너머 긴 복도를 원근으로 그린다. 양옆 방문 여섯 개가 열린 채 불빛이 새다가
-   가까운 문부터 하나씩 조용히 닫히고, 복도 끝 문 하나만 살짝 열린 채 빛이 남는다(빛은 8초 주기로 숨 쉬듯).
-   스크롤하면 그 문이 열리며 복도 끝으로 다가가고, 문 안 빛이 화면을 덮어 아래 화면으로 넘어간다. */
+   사진 출처: AI 생성(Z-Image-Turbo, Apache 2.0).
+
+   첫 화면(fl-poster): 조용한 상담실 사진 한 장이 화면을 채운다. 둥근 원목 탁자에 물 한 잔과 서류철, 뒤로 밝은 창과 법률 서가.
+   아래쪽 어두운 막 위에 문장 "상담은 다른 분과 마주치지 않게 잡아요"를 왼쪽 정렬로 둔다.
+   핵심 모션: 들어올 때 사진이 1.06배에서 1배로 1.6초 동안 천천히 다가오고, 문장은 0.3초 뒤 아래에서 올라온다.
+   스크롤하면 사진만 조금 느리게 움직인다. 동작 줄이기 설정이면 모두 멈춘다. */
 
 const serif = Noto_Serif_KR;
+/** h1, h2 에만 쓰는 명조 */
 const serifF = { fontFamily: `${serif.style.fontFamily}, serif` } as const;
 
 const SLUG = "family-law";
-const BRAND = "곰파트너법률사무소";
 const TEL = "02-000-0000";
 const KAKAO = "카카오톡 채널 곰파트너";
 const ADDRESS = "서울 ㅇㅇ구 ㅇㅇ로 00, 7층";
+const IMG = "/images/demo-family-law";
 
 const C = {
-  cream: "#f5ede1",
-  paper: "#fbf7f0",
-  creamDeep: "#ebdfcc",
-  wine: "#6d1a2e",
-  wineDeep: "#4a0f1e",
-  wineSoft: "#f1e0dc",
-  amber: "#f2b84b",
-  ink: "#2a1a1e",
-  muted: "#665457",
-  line: "#dccdb8",
+  bg: "#ffffff",
+  alt: "#f7f7f5",
+  accent: "#5e2a35",
+  accentSoft: "#f4eeef",
+  booked: "#ececea",
+  ink: "#111111",
+  body: "#4b4b4b",
+  muted: "#767676",
+  line: "#e5e5e5",
   error: "#b3261e",
 };
 
-/* 모션 값. 들어올 때 문 닫힘은 0.25초부터 문마다 0.17초 간격, 한 문에 0.55초. 끝 문 빛은 8초 주기. */
+/* 모션 값 */
 const EASE = [0.22, 1, 0.36, 1] as const;
-const DOOR_START = 0.25; // 초
-const DOOR_GAP = 0.17; // 초
-const DOOR_DUR = 0.55; // 초
-const GLOW_LOOP = 8; // 초
-const STEP_DUR = 0.42; // 절차 단계 펼침, 초
+const PHOTO_IN = 1.6; // 사진이 다가오는 시간, 초
 const NUM_DUR = 0.6; // 양육비 숫자 굴림, 초
-/** 포스터 래퍼 스크롤 진행 중 퇴장 연출이 끝나는 지점(래퍼 180svh 기준 sticky 가 풀리기 직전) */
-const EXIT_END = 0.42;
 
 const focusRing = "focus-visible:outline focus-visible:outline-[3px] focus-visible:outline-offset-2";
 const won = (n: number) => `${n.toLocaleString("ko-KR")}원`;
 const p2 = (n: number) => String(n).padStart(2, "0");
 const hm = (m: number) => `${p2(Math.floor(m / 60))}:${p2(m % 60)}`;
 
-/* ---------- 포스터 복도 원근 계산 ----------
-   눈높이를 원점으로 둔 3D 좌표(x 좌우, y 아래, z 깊이)를 600x800 화면에 한 점 투시로 옮긴다. */
-const VX = 300;
-const VY = 360;
-const FOCAL = 200;
-const HALF_W = 1.5;
-const CEIL = -1.8;
-const FLOOR = 2.2;
-const BACK = 3.2;
-const DOOR_TOP = -0.7;
-
-type Pt = [number, number];
-const P = (x: number, y: number, z: number): Pt => [VX + (FOCAL * x) / z, VY + (FOCAL * y) / z];
-const fmt = ([a, b]: Pt) => `${a.toFixed(1)} ${b.toFixed(1)}`;
-const poly = (pts: Pt[]) => `M${pts.map(fmt).join(" L")} Z`;
-
-/** 양옆 방문. side -1 왼쪽 벽, 1 오른쪽 벽. 경첩은 가까운 쪽 */
-const DOORS = [
-  { side: -1, za: 1.2, zb: 1.72 },
-  { side: 1, za: 1.38, zb: 1.88 },
-  { side: -1, za: 2.0, zb: 2.38 },
-  { side: 1, za: 2.12, zb: 2.48 },
-  { side: -1, za: 2.62, zb: 2.9 },
-  { side: 1, za: 2.7, zb: 2.97 },
-] as const;
-/** 문짝 열린 각도 키프레임(도). 마지막 0이 닫힘 */
-const ANGLES = [62, 44, 20, 0];
-
-function leafPts(side: number, za: number, zb: number, deg: number) {
-  const xh = side * HALF_W;
-  const d = zb - za;
-  const t = (deg * Math.PI) / 180;
-  const xf = xh - side * d * Math.sin(t);
-  const zf = za + d * Math.cos(t);
-  return { xh, xf, zf, d, t };
-}
-function leafD(side: number, za: number, zb: number, deg: number) {
-  const { xh, xf, zf } = leafPts(side, za, zb, deg);
-  return poly([P(xh, DOOR_TOP, za), P(xf, DOOR_TOP, zf), P(xf, FLOOR, zf), P(xh, FLOOR, za)]);
-}
-function knob(side: number, za: number, zb: number, deg: number): Pt {
-  const { xh, d, t } = leafPts(side, za, zb, deg);
-  return P(xh - side * 0.82 * d * Math.sin(t), 0.9, za + 0.82 * d * Math.cos(t));
-}
-function spillD(side: number, za: number, zb: number) {
-  const xh = side * HALF_W;
-  return poly([P(xh, FLOOR, za), P(xh, FLOOR, zb), P(xh - side * 1.15, FLOOR, zb + 0.4), P(xh - side * 0.9, FLOOR, za + 0.06)]);
-}
-
-const WALL_L = poly([P(-HALF_W, CEIL, 1), P(-HALF_W, CEIL, BACK), P(-HALF_W, FLOOR, BACK), P(-HALF_W, FLOOR, 1)]);
-const WALL_R = poly([P(HALF_W, CEIL, 1), P(HALF_W, CEIL, BACK), P(HALF_W, FLOOR, BACK), P(HALF_W, FLOOR, 1)]);
-const CEILING = poly([P(-HALF_W, CEIL, 1), P(HALF_W, CEIL, 1), P(HALF_W, CEIL, BACK), P(-HALF_W, CEIL, BACK)]);
-const FLOOR_D = poly([P(-HALF_W, FLOOR, 1), P(HALF_W, FLOOR, 1), P(HALF_W, FLOOR, BACK), P(-HALF_W, FLOOR, BACK)]);
-const [BW_L, BW_T] = P(-HALF_W, CEIL, BACK);
-const [BW_R, BW_B] = P(HALF_W, FLOOR, BACK);
-/** 복도 끝 문(정면). 오른쪽으로 살짝 열려 빛이 샌다 */
-const [BD_L, BD_T] = P(-0.5, DOOR_TOP, BACK);
-const [BD_R, BD_B] = P(0.5, FLOOR, BACK);
-const BD_W = BD_R - BD_L;
-const BD_H = BD_B - BD_T;
-/** 확대 기준점: 끝 문 가운데. viewBox -40 -40 680 940 안의 비율 */
-const ZOOM_ORIGIN = `${(((BD_L + BD_R) / 2 + 40) / 680) * 100}% ${(((BD_T + BD_B) / 2 + 40) / 940) * 100}%`;
-
 function Poster({ reduce, onCta }: { reduce: boolean; onCta: () => void }) {
   const ref = useRef<HTMLElement>(null);
   const { scrollYProgress } = useScroll({ target: ref, offset: ["start start", "end start"] });
-  const p = useTransform(scrollYProgress, (v) => (reduce ? 0 : Math.min(1, v / EXIT_END)));
-  // 복도 끝 문으로 다가가며 문이 열리고, 문 안 빛이 화면을 덮는다
-  const zoom = useTransform(p, (v) => 1 + 7 * Math.pow(v, 2.2));
-  const leaf = useTransform(p, (v) => Math.max(0.04, 1 - v * 1.7));
-  const textY = useTransform(p, (v) => `${-v * 40}svh`);
-  const textO = useTransform(p, (v) => Math.max(0, 1 - v * 1.8));
-  const wash = useTransform(p, (v) => Math.max(0, Math.min(1, (v - 0.55) / 0.4)));
+  // 스크롤하면 사진만 조금 느리게 내려간다
+  const photoY = useTransform(scrollYProgress, (v) => (reduce ? "0%" : `${v * 8}%`));
 
   return (
-    <section id="fl-poster" ref={ref} aria-labelledby="fl-poster-title" className="relative" style={{ height: reduce ? undefined : "180svh", background: C.cream }}>
-      <div
-        className={`${reduce ? "relative min-h-svh" : "sticky top-0 h-svh"} overflow-hidden`}
-        style={{ background: `radial-gradient(90% 70% at 76% 55%, #f9f3ea 0%, ${C.cream} 60%, #efe4d3 100%)`, color: C.ink }}
-      >
-        {/* 복도 그림 */}
-        <div className="pointer-events-none absolute inset-x-0 bottom-[2svh] flex h-[52svh] justify-center md:inset-y-0 md:bottom-auto md:left-auto md:right-[4vw] md:h-full md:items-center">
-          <motion.svg
-            viewBox="-40 -40 680 940"
-            className="h-full w-auto md:h-[86svh]"
-            style={{ scale: zoom, transformOrigin: ZOOM_ORIGIN }}
-            role="img"
-            aria-label="문틀 너머 긴 복도. 양옆 방문이 하나씩 닫히고 복도 끝 문 하나만 살짝 열려 빛이 새어 나온다"
-          >
-            <defs>
-              <linearGradient id="fl-p-wallL" gradientUnits="userSpaceOnUse" x1="0" y1="0" x2={BW_L} y2="0">
-                <stop offset="0" stopColor="#ecdfca" />
-                <stop offset="1" stopColor="#b79b7a" />
-              </linearGradient>
-              <linearGradient id="fl-p-wallR" gradientUnits="userSpaceOnUse" x1="600" y1="0" x2={BW_R} y2="0">
-                <stop offset="0" stopColor="#e4d5bd" />
-                <stop offset="1" stopColor="#ad9070" />
-              </linearGradient>
-              <linearGradient id="fl-p-ceil" gradientUnits="userSpaceOnUse" x1="0" y1="0" x2="0" y2={BW_T}>
-                <stop offset="0" stopColor="#ddcdb3" />
-                <stop offset="1" stopColor="#a5896a" />
-              </linearGradient>
-              <linearGradient id="fl-p-floor" gradientUnits="userSpaceOnUse" x1="0" y1="800" x2="0" y2={BW_B}>
-                <stop offset="0" stopColor="#5a1828" />
-                <stop offset="1" stopColor="#2a0a12" />
-              </linearGradient>
-              <linearGradient id="fl-p-room" x1="0" y1="0" x2="0" y2="1">
-                <stop offset="0" stopColor="#fbe3ad" />
-                <stop offset="1" stopColor="#e8a748" />
-              </linearGradient>
-              <linearGradient id="fl-p-leaf" x1="0" y1="0" x2="1" y2="1">
-                <stop offset="0" stopColor="#8a2a40" />
-                <stop offset="0.55" stopColor={C.wine} />
-                <stop offset="1" stopColor="#3f0c18" />
-              </linearGradient>
-              <linearGradient id="fl-p-frame" x1="0" y1="0" x2="1" y2="1">
-                <stop offset="0" stopColor="#8d2c43" />
-                <stop offset="0.5" stopColor={C.wine} />
-                <stop offset="1" stopColor="#3a0b16" />
-              </linearGradient>
-              <linearGradient id="fl-p-spill" gradientUnits="userSpaceOnUse" x1="0" y1={BD_B} x2="0" y2="800">
-                <stop offset="0" stopColor="#ffd88a" stopOpacity="0.5" />
-                <stop offset="1" stopColor="#ffd88a" stopOpacity="0" />
-              </linearGradient>
-              <radialGradient id="fl-p-glow" cx="0.5" cy="0.5" r="0.5">
-                <stop offset="0" stopColor="#ffe2a6" stopOpacity="0.8" />
-                <stop offset="1" stopColor="#ffe2a6" stopOpacity="0" />
-              </radialGradient>
-              <radialGradient id="fl-p-shadow" cx="0.5" cy="0.5" r="0.5">
-                <stop offset="0" stopColor="#3a1a14" stopOpacity="0.38" />
-                <stop offset="1" stopColor="#3a1a14" stopOpacity="0" />
-              </radialGradient>
-              <clipPath id="fl-p-clip">
-                <rect x="0" y="0" width="600" height="800" />
-              </clipPath>
-            </defs>
-
-            {/* 문틀 아래 바닥 그림자 */}
-            <ellipse cx="300" cy="866" rx="340" ry="26" fill="url(#fl-p-shadow)" />
-
-            <g clipPath="url(#fl-p-clip)">
-              <path d={CEILING} fill="url(#fl-p-ceil)" />
-              <path d={FLOOR_D} fill="url(#fl-p-floor)" />
-              <path d={WALL_L} fill="url(#fl-p-wallL)" />
-              <path d={WALL_R} fill="url(#fl-p-wallR)" />
-              <rect x={BW_L} y={BW_T} width={BW_R - BW_L} height={BW_B - BW_T} fill="#a98c6c" />
-
-              {/* 마루 줄눈과 걸레받이 */}
-              {[-1, -0.5, 0, 0.5, 1].map((x) => (
-                <line key={x} x1={P(x, FLOOR, 1)[0]} y1={800} x2={P(x, FLOOR, BACK)[0]} y2={BW_B} stroke="#000" strokeOpacity="0.2" strokeWidth="1.5" />
-              ))}
-              {[-1, 1].map((s) => (
-                <g key={s}>
-                  <path d={`M${fmt(P(s * HALF_W, FLOOR, 1))} L${fmt(P(s * HALF_W, FLOOR, BACK))}`} stroke="#f7eedf" strokeOpacity="0.55" strokeWidth="3" />
-                  <path d={`M${fmt(P(s * HALF_W, CEIL, 1))} L${fmt(P(s * HALF_W, CEIL, BACK))}`} stroke="#f7eedf" strokeOpacity="0.35" strokeWidth="2" />
-                </g>
-              ))}
-
-              {/* 천장 등. 꺼져 있다 */}
-              {[1.5, 2.3].map((z) => {
-                const [cx, cy] = P(0, CEIL, z);
-                return <ellipse key={z} cx={cx} cy={cy + 4} rx={(FOCAL * 0.32) / z} ry={(FOCAL * 0.07) / z} fill="#efe3cf" opacity="0.7" />;
-              })}
-
-              {/* 복도 끝 문: 문 뒤 빛, 바닥으로 번지는 빛 */}
-              <motion.g
-                initial={false}
-                animate={reduce ? { opacity: 1 } : { opacity: [1, 0.78, 1] }}
-                transition={reduce ? { duration: 0 } : { duration: GLOW_LOOP, repeat: Infinity, ease: "easeInOut", delay: DOOR_START + 5 * DOOR_GAP + DOOR_DUR }}
-              >
-                <ellipse cx={(BD_L + BD_R) / 2} cy={(BD_T + BD_B) / 2} rx="150" ry="170" fill="url(#fl-p-glow)" />
-                <path d={`M${BD_R - 6} ${BD_B} L${BD_R} ${BD_B} L${BD_R + 120} 800 L${BD_R + 20} 800 Z`} fill="url(#fl-p-spill)" />
-                <ellipse cx={(BD_L + BD_R) / 2} cy={BD_B + 2} rx={BD_W * 0.75} ry="5" fill="#ffd88a" opacity="0.8" />
-              </motion.g>
-              <rect x={BD_L} y={BD_T} width={BD_W} height={BD_H} fill="url(#fl-p-room)" />
-              <motion.g style={{ scaleX: leaf, originX: 0, transformBox: "fill-box" }}>
-                <rect x={BD_L} y={BD_T} width={BD_W - 6} height={BD_H - 3} fill="url(#fl-p-leaf)" />
-                <rect x={BD_L + 7} y={BD_T + 10} width={BD_W - 20} height={BD_H * 0.38} fill="none" stroke="#2c0811" strokeOpacity="0.5" strokeWidth="2" />
-                <rect x={BD_L + 7} y={BD_T + BD_H * 0.5} width={BD_W - 20} height={BD_H * 0.42} fill="none" stroke="#2c0811" strokeOpacity="0.5" strokeWidth="2" />
-                <line x1={BD_L + 1.5} y1={BD_T + 2} x2={BD_L + 1.5} y2={BD_B - 4} stroke="#ffe8ec" strokeOpacity="0.35" strokeWidth="2" />
-                <circle cx={BD_R - 13} cy={BD_T + BD_H * 0.5} r="3" fill="#e9c27a" />
-              </motion.g>
-              <rect x={BD_L - 3} y={BD_T - 3} width={BD_W + 6} height={BD_H + 3} fill="none" stroke="#f3e7d3" strokeOpacity="0.7" strokeWidth="3" />
-
-              {/* 양옆 방문. 먼 문부터 그려야 가까운 문짝이 위에 온다 */}
-              {[...DOORS.map((d, i) => ({ ...d, i }))].reverse().map(({ side, za, zb, i }) => {
-                const delay = DOOR_START + i * DOOR_GAP;
-                const t = { duration: DOOR_DUR, delay, ease: "easeInOut" as const, times: [0, 0.35, 0.7, 1] };
-                const hole = leafD(side, za, zb, 0);
-                const open = leafD(side, za, zb, ANGLES[0]);
-                const ks = ANGLES.map((a) => knob(side, za, zb, a));
-                return (
-                  <g key={i}>
-                    <path d={hole} fill="url(#fl-p-room)" />
-                    <motion.path
-                      d={spillD(side, za, zb)}
-                      fill="#ffd88a"
-                      initial={reduce ? false : { opacity: 0.28 }}
-                      animate={{ opacity: 0 }}
-                      transition={reduce ? { duration: 0 } : { ...t, times: undefined }}
-                    />
-                    <motion.path
-                      initial={reduce ? false : { d: open }}
-                      animate={{ d: reduce ? hole : ANGLES.map((a) => leafD(side, za, zb, a)) }}
-                      transition={reduce ? { duration: 0 } : t}
-                      fill="url(#fl-p-leaf)"
-                      stroke="#ffe8ec"
-                      strokeOpacity="0.25"
-                      strokeWidth="1.5"
-                    />
-                    <motion.circle
-                      r={Math.max(1.6, 5 / za)}
-                      fill="#e9c27a"
-                      initial={reduce ? false : { cx: ks[0][0], cy: ks[0][1] }}
-                      animate={reduce ? { cx: ks[3][0], cy: ks[3][1] } : { cx: ks.map((k) => k[0]), cy: ks.map((k) => k[1]) }}
-                      transition={reduce ? { duration: 0 } : t}
-                    />
-                    <path d={hole} fill="none" stroke="#f3e7d3" strokeOpacity="0.6" strokeWidth={Math.max(1.5, 4 / za)} />
-                  </g>
-                );
-              })}
-            </g>
-
-            {/* 앞 문틀 */}
-            <path d="M-26 -26 H626 V826 H-26 Z M0 0 V800 H600 V0 Z" fill="url(#fl-p-frame)" fillRule="evenodd" />
-            <path d="M-24 824 V-24 H624" fill="none" stroke="#ffe8ec" strokeOpacity="0.35" strokeWidth="2" />
-            <path d="M0 800 V0 H600" fill="none" stroke="#2a0710" strokeOpacity="0.45" strokeWidth="3" />
-          </motion.svg>
-        </div>
-
-        {/* 문 안 빛이 화면을 덮는다 */}
-        {!reduce && <motion.div aria-hidden className="pointer-events-none absolute inset-0 z-20" style={{ opacity: wash, background: `radial-gradient(circle at 70% 50%, #fff6e3 0%, ${C.cream} 70%)` }} />}
-
-        {/* 로고와 상담 예약 버튼 */}
-        <motion.div className="absolute inset-x-0 top-0 z-10 flex items-center justify-between px-4 pt-4 md:px-12 md:pt-7" style={{ y: textY }}>
-          <p className="inline-flex items-center gap-2 text-[17px] font-bold leading-none" style={{ ...serifF, color: C.wine }}>
-            <Scale size={18} aria-hidden />
-            {BRAND}
-          </p>
-          <button
-            type="button"
-            onClick={onCta}
-            aria-label="상담 예약"
-            title="상담 예약"
-            data-gtm-cta={`${SLUG}_poster_cta`}
-            className={`inline-flex h-12 w-12 items-center justify-center rounded-full ${focusRing}`}
-            style={{ background: C.wine, color: C.cream, outlineColor: C.wine }}
-          >
-            <CalendarCheck size={22} aria-hidden />
-          </button>
+    <section id="fl-poster" ref={ref} aria-labelledby="fl-poster-title" className="relative flex min-h-[100svh] flex-col overflow-hidden" style={{ background: "#141414", color: "#ffffff" }}>
+      <style>{`@keyframes fl-rise{from{opacity:0;transform:translateY(12px)}to{opacity:1;transform:none}}.fl-rise{animation:fl-rise 0.7s cubic-bezier(0.22,1,0.36,1) 0.3s both}@media (prefers-reduced-motion: reduce){.fl-rise{animation:none}}`}</style>
+      <motion.div className="absolute inset-x-0 top-[-10%] h-[110%]" style={{ y: photoY }}>
+        <motion.div className="h-full w-full" initial={reduce ? false : { scale: 1.06 }} animate={{ scale: 1 }} transition={{ duration: reduce ? 0 : PHOTO_IN, ease: EASE }}>
+          {/* eslint-disable-next-line @next/next/no-img-element -- 정적 export 라 next/image 최적화를 쓰지 않는다 */}
+          <img
+            src={`${IMG}/hero.jpg`}
+            srcSet={`${IMG}/hero-sm.jpg 960w, ${IMG}/hero.jpg 1920w`}
+            sizes="100vw"
+            alt="밝은 창과 법률 서가 앞, 물 한 잔과 서류철이 놓인 둥근 원목 탁자가 있는 상담실"
+            fetchPriority="high"
+            className="absolute inset-0 h-full w-full object-cover"
+            style={{ objectPosition: "50% 55%" }}
+          />
         </motion.div>
+      </motion.div>
+      {/* 글자 대비를 위한 막. 위는 상호, 아래는 문장 */}
+      <div aria-hidden className="pointer-events-none absolute inset-0" style={{ background: "linear-gradient(to top, rgba(0,0,0,0.78), rgba(0,0,0,0.45) 45%, rgba(0,0,0,0.12) 72%, rgba(0,0,0,0.42))" }} />
 
-        {/* 큰 문장 */}
-        <motion.div className="relative z-[1] flex h-full min-h-svh flex-col px-4 pt-[14svh] md:justify-center md:px-12 md:pb-[4svh] md:pt-0" style={{ y: textY, opacity: textO }}>
-          <h1
-            id="fl-poster-title"
-            className="text-[clamp(50px,13.6vw,72px)] font-bold leading-[1.1] tracking-[-0.04em] md:text-[clamp(84px,8.2vw,150px)] md:leading-[1.06]"
-            style={{ ...serifF, wordBreak: "keep-all" }}
-          >
-            <span className="block">상담은</span>
-            <span className="block">다른 분과</span>
-            <span className="block" style={{ color: C.wine }}>
-              마주치지 않게
-            </span>
-            <span className="block">잡아요</span>
-          </h1>
-          <p className="mt-4 text-[16px] md:mt-8 md:text-[19px]" style={{ color: C.muted }}>
-            이혼, 가사 사건 상담 평일 밤 9시까지
-          </p>
-        </motion.div>
+      <div className="relative z-[1] flex items-center justify-between gap-3 px-4 pt-4 md:px-12 md:pt-7">
+        <p className="inline-flex items-center gap-2 text-[17px] font-bold leading-none">
+          <SampleLogo light size={18} />
+        </p>
+        <button
+          type="button"
+          onClick={onCta}
+          data-gtm-cta={`${SLUG}_poster_cta`}
+          className={`inline-flex min-h-11 items-center gap-1.5 rounded-[6px] px-4 text-[15px] font-semibold ${focusRing}`}
+          style={{ background: C.accent, color: "#ffffff", outlineColor: "#ffffff" }}
+        >
+          <CalendarCheck size={17} aria-hidden />
+          상담 예약
+        </button>
+      </div>
+
+      <div className={`relative z-[1] mt-auto px-4 pb-14 md:px-12 md:pb-20 ${reduce ? "" : "fl-rise"}`}>
+        <h1
+          id="fl-poster-title"
+          className="max-w-[12em] text-[36px] font-bold md:text-[clamp(40px,5vw,72px)]"
+          style={{ ...serifF, letterSpacing: "-0.03em", lineHeight: 1.2, wordBreak: "keep-all" }}
+        >
+          상담은 다른 분과 마주치지 않게 잡아요
+        </h1>
+        <p className="mt-4 text-[16px] md:mt-6 md:text-[18px]" style={{ color: "rgba(255,255,255,0.86)" }}>
+          이혼, 가사 사건 상담 평일 밤 9시까지
+        </p>
       </div>
     </section>
   );
@@ -417,7 +195,7 @@ const AREAS: Record<Area, { sub: string; period: string; steps: [string, string]
   },
 };
 
-function AreaPicker({ reduce, area, setArea, onBook }: { reduce: boolean; area: Area; setArea: (a: Area) => void; onBook: () => void }) {
+function AreaPicker({ area, setArea, onBook }: { area: Area; setArea: (a: Area) => void; onBook: () => void }) {
   const a = AREAS[area];
   return (
     <div className="mt-6 grid gap-6 lg:grid-cols-[320px_minmax(0,1fr)] lg:gap-10">
@@ -431,13 +209,13 @@ function AreaPicker({ reduce, area, setArea, onBook }: { reduce: boolean; area: 
               aria-pressed={on}
               onClick={() => setArea(k)}
               className={`group flex items-center justify-between gap-2 rounded-[6px] border px-4 py-3 text-left transition-colors duration-150 ${focusRing}`}
-              style={{ borderColor: on ? C.wine : C.line, background: on ? C.wine : C.paper, color: on ? C.cream : C.ink, outlineColor: C.wine }}
+              style={{ borderColor: on ? C.accent : C.line, background: on ? C.accent : C.bg, color: on ? "#ffffff" : C.ink, outlineColor: C.accent }}
             >
               <span className="min-w-0">
-                <span className="block text-[18px] font-bold" style={serifF}>
+                <span className="block text-[17px] font-semibold">
                   {k}
                 </span>
-                <span className="mt-0.5 block text-[13px] leading-[1.4]" style={{ color: on ? "#f1dcd6" : C.muted }}>
+                <span className="mt-0.5 block text-[13px] leading-[1.4]" style={{ color: on ? "#eadde0" : C.muted }}>
                   {AREAS[k].sub}
                 </span>
               </span>
@@ -447,9 +225,9 @@ function AreaPicker({ reduce, area, setArea, onBook }: { reduce: boolean; area: 
         })}
       </div>
 
-      <div className="min-w-0 rounded-[10px] border p-5 md:p-7" style={{ borderColor: C.line, background: C.paper }}>
+      <div className="min-w-0 rounded-[8px] border p-5 md:p-7" style={{ borderColor: C.line, background: C.alt }}>
         <div className="flex flex-wrap items-baseline justify-between gap-x-4 gap-y-1">
-          <h3 className="text-[22px] font-bold" style={{ ...serifF, color: C.wine }}>
+          <h3 className="text-[21px] font-bold" style={{ color: C.ink }}>
             {area} 절차
           </h3>
           <p className="inline-flex items-center gap-1.5 text-[15px] font-bold" style={{ color: C.ink }}>
@@ -459,32 +237,19 @@ function AreaPicker({ reduce, area, setArea, onBook }: { reduce: boolean; area: 
         </div>
 
         <ol key={area} className="relative mt-5 grid gap-0">
-          <motion.span
-            aria-hidden
-            className="absolute bottom-3 left-[13px] top-3 w-[2px] origin-top"
-            style={{ background: C.wine, opacity: 0.35 }}
-            initial={reduce ? false : { scaleY: 0 }}
-            animate={{ scaleY: 1 }}
-            transition={{ duration: reduce ? 0 : a.steps.length * 0.08 + STEP_DUR, ease: EASE }}
-          />
+          <span aria-hidden className="absolute bottom-3 left-[13px] top-3 w-px" style={{ background: C.line }} />
           {a.steps.map(([title, desc], i) => (
-            <motion.li
-              key={title}
-              className="relative grid grid-cols-[28px_minmax(0,1fr)] gap-3 py-2.5"
-              initial={reduce ? false : { clipPath: "inset(0 100% 0 0)" }}
-              animate={{ clipPath: "inset(0 0% 0 0)" }}
-              transition={{ duration: reduce ? 0 : STEP_DUR, delay: reduce ? 0 : i * 0.08, ease: EASE }}
-            >
-              <span className="relative z-[1] inline-flex h-7 w-7 items-center justify-center rounded-full text-[14px] font-bold" style={{ background: C.wine, color: C.cream }}>
+            <li key={title} className="relative grid grid-cols-[28px_minmax(0,1fr)] gap-3 py-2.5">
+              <span className="relative z-[1] inline-flex h-7 w-7 items-center justify-center rounded-full border text-[14px] font-semibold tabular-nums" style={{ borderColor: C.accent, background: C.bg, color: C.accent }}>
                 {i + 1}
               </span>
               <span className="min-w-0">
                 <span className="block text-[17px] font-bold">{title}</span>
-                <span className="mt-0.5 block text-[15px] leading-[1.55]" style={{ color: C.muted }}>
+                <span className="mt-0.5 block text-[15px] leading-[1.55]" style={{ color: C.body }}>
                   {desc}
                 </span>
               </span>
-            </motion.li>
+            </li>
           ))}
         </ol>
 
@@ -493,7 +258,7 @@ function AreaPicker({ reduce, area, setArea, onBook }: { reduce: boolean; area: 
           <ul className="mt-2 grid gap-1.5 text-[15px]">
             {a.docs.map((d) => (
               <li key={d} className="flex gap-2">
-                <Check size={16} aria-hidden className="mt-[3px] flex-none" style={{ color: C.wine }} />
+                <Check size={16} aria-hidden className="mt-[3px] flex-none" style={{ color: C.accent }} />
                 {d}
               </li>
             ))}
@@ -504,8 +269,8 @@ function AreaPicker({ reduce, area, setArea, onBook }: { reduce: boolean; area: 
           type="button"
           onClick={onBook}
           data-gtm-cta={`${SLUG}_area_book`}
-          className={`mt-6 inline-flex items-center gap-2 rounded-[6px] px-5 py-3 text-[16px] font-bold ${focusRing}`}
-          style={{ background: C.wine, color: C.cream, outlineColor: C.wine }}
+          className={`mt-6 inline-flex items-center gap-2 rounded-[6px] px-5 py-3 text-[16px] font-semibold ${focusRing}`}
+          style={{ background: C.accent, color: "#ffffff", outlineColor: C.accent }}
         >
           <CalendarCheck size={18} aria-hidden />
           {area} 상담 예약
@@ -555,7 +320,7 @@ function IncomeSlider({ id, label, value, setValue }: { id: string; label: strin
         <label htmlFor={id} className="text-[15px] font-bold">
           {label}
         </label>
-        <span className="text-[17px] font-bold tabular-nums" style={{ color: C.wine }}>
+        <span className="text-[17px] font-bold tabular-nums" style={{ color: C.accent }}>
           월 {value.toLocaleString("ko-KR")}만 원
         </span>
       </div>
@@ -568,7 +333,7 @@ function IncomeSlider({ id, label, value, setValue }: { id: string; label: strin
         value={value}
         onChange={(e) => setValue(Number(e.target.value))}
         className={`mt-2 w-full ${focusRing}`}
-        style={{ accentColor: C.wine, outlineColor: C.wine }}
+        style={{ accentColor: C.accent, outlineColor: C.accent }}
       />
     </div>
   );
@@ -585,7 +350,7 @@ function ChildSupport({ reduce }: { reduce: boolean }) {
   const pay = Math.round((standard * ratio) / 10000) * 10000;
 
   return (
-    <div className="mt-6 grid gap-6 rounded-[10px] border p-5 md:grid-cols-[minmax(0,1fr)_minmax(0,0.9fr)] md:gap-10 md:p-7" style={{ borderColor: C.line, background: C.paper }}>
+    <div className="mt-6 grid gap-6 rounded-[8px] border p-5 md:grid-cols-[minmax(0,1fr)_minmax(0,0.9fr)] md:gap-10 md:p-7" style={{ borderColor: C.line, background: C.alt }}>
       <div className="grid content-start gap-6">
         <IncomeSlider id="fl-inc-mine" label="아이를 키우는 부모 소득(세전)" value={mine} setValue={setMine} />
         <IncomeSlider id="fl-inc-other" label="아이를 키우지 않는 부모 소득(세전)" value={other} setValue={setOther} />
@@ -600,8 +365,8 @@ function ChildSupport({ reduce }: { reduce: boolean }) {
                   type="button"
                   aria-pressed={on}
                   onClick={() => setAge(i)}
-                  className={`rounded-[6px] border px-2 py-2 text-[14px] font-bold tabular-nums ${focusRing}`}
-                  style={{ borderColor: on ? C.wine : C.line, background: on ? C.wine : "transparent", color: on ? C.cream : C.ink, outlineColor: C.wine }}
+                  className={`rounded-[6px] border px-2 py-2 text-[14px] font-semibold tabular-nums ${focusRing}`}
+                  style={{ borderColor: on ? C.accent : C.line, background: on ? C.accent : "transparent", color: on ? "#ffffff" : C.ink, outlineColor: C.accent }}
                 >
                   {b}
                 </button>
@@ -611,30 +376,30 @@ function ChildSupport({ reduce }: { reduce: boolean }) {
         </fieldset>
       </div>
 
-      <div className="flex min-w-0 flex-col rounded-[8px] p-5" style={{ background: C.wine, color: C.cream }} aria-live="polite">
-        <p className="text-[15px]">매달 보내는 양육비 개략</p>
-        <p className="mt-1 text-[clamp(34px,9vw,48px)] font-bold leading-[1.15] tabular-nums" style={serifF}>
+      <div className="flex min-w-0 flex-col rounded-[8px] border p-5" style={{ borderColor: C.line, background: C.bg, color: C.ink }} aria-live="polite">
+        <p className="text-[15px]" style={{ color: C.body }}>매달 보내는 양육비 개략</p>
+        <p className="mt-1 text-[clamp(34px,9vw,48px)] font-bold leading-[1.15] tracking-[-0.02em] tabular-nums">
           <RollingWon value={pay} reduce={reduce} />
         </p>
-        <dl className="mt-5 grid grid-cols-[auto_minmax(0,1fr)] gap-x-4 gap-y-2 border-t pt-4 text-[15px]" style={{ borderColor: "rgba(245,237,225,0.3)" }}>
-          <dt style={{ color: "#ecd3cd" }}>합산 소득</dt>
+        <dl className="mt-5 grid grid-cols-[auto_minmax(0,1fr)] gap-x-4 gap-y-2 border-t pt-4 text-[15px]" style={{ borderColor: C.line }}>
+          <dt style={{ color: C.muted }}>합산 소득</dt>
           <dd className="text-right font-bold tabular-nums">{band.label}</dd>
-          <dt style={{ color: "#ecd3cd" }}>표준양육비</dt>
+          <dt style={{ color: C.muted }}>표준양육비</dt>
           <dd className="text-right font-bold tabular-nums">{won(standard)}</dd>
-          <dt style={{ color: "#ecd3cd" }}>분담 비율</dt>
+          <dt style={{ color: C.muted }}>분담 비율</dt>
           <dd className="text-right font-bold tabular-nums">{Math.round(ratio * 100)}%</dd>
         </dl>
         {/* 분담 비율 막대: 글자와 함께 보여 색에만 기대지 않는다 */}
-        <div className="mt-4 h-2.5 overflow-hidden rounded-full" style={{ background: "rgba(245,237,225,0.25)" }} aria-hidden>
+        <div className="mt-4 h-2.5 overflow-hidden rounded-full" style={{ background: C.line }} aria-hidden>
           <motion.div
             className="h-full origin-left rounded-full"
-            style={{ background: C.amber }}
+            style={{ background: C.accent }}
             initial={false}
             animate={{ scaleX: ratio }}
             transition={{ duration: reduce ? 0 : NUM_DUR, ease: EASE }}
           />
         </div>
-        <p className="mt-auto pt-5 text-[13px] leading-[1.6]" style={{ color: "#ecd3cd" }}>
+        <p className="mt-auto pt-5 text-[13px] leading-[1.6]" style={{ color: C.muted }}>
           서울가정법원 양육비 산정기준표(2021) 기준, 자녀 한 명. 재산과 양육 환경에 따라 법원이 더하거나 뺄 수 있어요.
         </p>
       </div>
@@ -754,23 +519,23 @@ function Booking({ today, reduce, area, setArea }: { today: Date; reduce: boolea
   };
 
   return (
-    <div className="mt-6 rounded-[10px] border" style={{ borderColor: C.line, background: C.paper }}>
+    <div className="mt-6 rounded-[8px] border" style={{ borderColor: C.line, background: C.alt }}>
       <AnimatePresence mode="wait" initial={false}>
         {done ? (
           <motion.div
             key="done"
             className="p-5 md:p-8"
-            initial={reduce ? false : { clipPath: "inset(0 50% 0 50%)" }}
-            animate={{ clipPath: "inset(0 0% 0 0%)" }}
-            exit={reduce ? { opacity: 0 } : { clipPath: "inset(0 50% 0 50%)" }}
-            transition={{ duration: reduce ? 0 : 0.5, ease: EASE }}
+            initial={reduce ? false : { opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            transition={{ duration: reduce ? 0 : 0.25, ease: EASE }}
             role="status"
           >
-            <p className="inline-flex items-center gap-2 text-[15px] font-bold" style={{ color: C.wine }}>
+            <p className="inline-flex items-center gap-2 text-[15px] font-bold" style={{ color: C.accent }}>
               <ShieldCheck size={18} aria-hidden />
               상담 예약 접수
             </p>
-            <h3 className="mt-2 text-[26px] font-bold" style={serifF}>
+            <h3 className="mt-2 text-[24px] font-bold">
               접수 번호 <span className="tabular-nums">{done.no}</span>
             </h3>
             <dl className="mt-5 grid gap-x-6 gap-y-2.5 text-[16px] sm:grid-cols-[120px_minmax(0,1fr)]">
@@ -804,17 +569,17 @@ function Booking({ today, reduce, area, setArea }: { today: Date; reduce: boolea
               </dd>
             </dl>
             {done.method === "방문 상담" && (
-              <p className="mt-5 flex gap-2 rounded-[6px] p-3 text-[15px] leading-[1.6]" style={{ background: C.wineSoft }}>
-                <Car size={18} aria-hidden className="mt-[3px] flex-none" style={{ color: C.wine }} />
+              <p className="mt-5 flex gap-2 rounded-[6px] p-3 text-[15px] leading-[1.6]" style={{ background: C.accentSoft }}>
+                <Car size={18} aria-hidden className="mt-[3px] flex-none" style={{ color: C.accent }} />
                 건물 뒤편 주차장 쪽 엘리베이터로 7층에 오시면 대기실을 거치지 않고 바로 상담실로 들어가요.
               </p>
             )}
-            <button type="button" onClick={reset} className={`mt-6 rounded-[6px] border px-4 py-2.5 text-[15px] font-bold ${focusRing}`} style={{ borderColor: C.wine, color: C.wine, outlineColor: C.wine }}>
+            <button type="button" onClick={reset} className={`mt-6 rounded-[6px] border px-4 py-2.5 text-[15px] font-semibold ${focusRing}`} style={{ borderColor: C.accent, color: C.accent, outlineColor: C.accent }}>
               다른 시간 예약
             </button>
           </motion.div>
         ) : (
-          <motion.form key="form" onSubmit={submit} noValidate className="grid gap-7 p-5 md:p-8 lg:grid-cols-[minmax(0,1.25fr)_minmax(0,1fr)] lg:gap-10" exit={reduce ? { opacity: 0 } : { opacity: 0 }} transition={{ duration: 0.15 }}>
+          <motion.form key="form" onSubmit={submit} noValidate className="grid gap-7 p-5 md:p-8 lg:grid-cols-[minmax(0,1.25fr)_minmax(0,1fr)] lg:gap-10" exit={{ opacity: 0 }} transition={{ duration: reduce ? 0 : 0.15 }}>
             <div className="min-w-0">
               <fieldset>
                 <legend className="text-[15px] font-bold">상담 방식</legend>
@@ -828,11 +593,11 @@ function Booking({ today, reduce, area, setArea }: { today: Date; reduce: boolea
                         aria-pressed={on}
                         onClick={() => setMethod(id)}
                         className={`flex flex-col items-start gap-1 rounded-[6px] border px-3 py-2.5 text-left ${focusRing}`}
-                        style={{ borderColor: on ? C.wine : C.line, background: on ? C.wine : "transparent", color: on ? C.cream : C.ink, outlineColor: C.wine }}
+                        style={{ borderColor: on ? C.accent : C.line, background: on ? C.accent : "transparent", color: on ? "#ffffff" : C.ink, outlineColor: C.accent }}
                       >
                         <Icon size={18} aria-hidden />
                         <span className="text-[15px] font-bold">{label}</span>
-                        <span className="text-[13px] tabular-nums" style={{ color: on ? "#f1dcd6" : C.muted }}>
+                        <span className="text-[13px] tabular-nums" style={{ color: on ? "#eadde0" : C.muted }}>
                           {mins}분 {won(fee)}
                         </span>
                       </button>
@@ -853,7 +618,7 @@ function Booking({ today, reduce, area, setArea }: { today: Date; reduce: boolea
                         aria-pressed={on}
                         onClick={() => setDayIdx(i)}
                         className={`flex w-[58px] flex-none flex-col items-center rounded-[6px] border py-2 ${focusRing}`}
-                        style={{ borderColor: on ? C.wine : C.line, background: on ? C.wine : "transparent", color: on ? C.cream : C.ink, outlineColor: C.wine }}
+                        style={{ borderColor: on ? C.accent : C.line, background: on ? C.accent : "transparent", color: on ? "#ffffff" : C.ink, outlineColor: C.accent }}
                       >
                         <span className="text-[13px]">{DOW[d.getDay()]}</span>
                         <span className="text-[19px] font-bold tabular-nums">{d.getDate()}</span>
@@ -871,7 +636,7 @@ function Booking({ today, reduce, area, setArea }: { today: Date; reduce: boolea
                     예약 가능
                   </li>
                   <li className="inline-flex items-center gap-1.5">
-                    <span className="inline-block h-3 w-3 rounded-[2px]" style={{ background: C.creamDeep }} aria-hidden />
+                    <span className="inline-block h-3 w-3 rounded-[2px]" style={{ background: C.booked }} aria-hidden />
                     예약 있음
                   </li>
                   <li className="inline-flex items-center gap-1.5">
@@ -894,11 +659,11 @@ function Booking({ today, reduce, area, setArea }: { today: Date; reduce: boolea
                         onClick={() => setSlot(s)}
                         className={`relative flex flex-col items-center rounded-[6px] border py-2 tabular-nums transition-colors duration-150 disabled:cursor-not-allowed ${focusRing}`}
                         style={{
-                          borderColor: on ? C.wine : blocked ? "transparent" : C.line,
-                          backgroundColor: on ? C.wine : st === "booked" ? C.creamDeep : "transparent",
+                          borderColor: on ? C.accent : blocked ? "transparent" : C.line,
+                          backgroundColor: on ? C.accent : st === "booked" ? C.booked : "transparent",
                           backgroundImage: st === "gap" ? `repeating-linear-gradient(135deg, ${C.line} 0 2px, transparent 2px 6px)` : undefined,
-                          color: on ? C.cream : blocked ? C.muted : C.ink,
-                          outlineColor: C.wine,
+                          color: on ? "#ffffff" : blocked ? C.muted : C.ink,
+                          outlineColor: C.accent,
                         }}
                       >
                         <span className={`text-[16px] font-bold ${blocked ? "line-through" : ""}`}>{hm(s)}</span>
@@ -923,7 +688,7 @@ function Booking({ today, reduce, area, setArea }: { today: Date; reduce: boolea
                   value={area}
                   onChange={(e) => setArea(e.target.value as Area)}
                   className={`mt-1.5 w-full rounded-[6px] border bg-transparent px-3 py-2.5 text-[16px] ${focusRing}`}
-                  style={{ borderColor: C.line, outlineColor: C.wine }}
+                  style={{ borderColor: C.line, outlineColor: C.accent }}
                 >
                   {AREA_LIST.map((a) => (
                     <option key={a}>{a}</option>
@@ -941,7 +706,7 @@ function Booking({ today, reduce, area, setArea }: { today: Date; reduce: boolea
                   autoComplete="name"
                   placeholder="가명도 괜찮아요"
                   className={`mt-1.5 w-full rounded-[6px] border bg-transparent px-3 py-2.5 text-[16px] ${focusRing}`}
-                  style={{ borderColor: C.line, outlineColor: C.wine }}
+                  style={{ borderColor: C.line, outlineColor: C.accent }}
                 />
               </div>
               <div>
@@ -956,7 +721,7 @@ function Booking({ today, reduce, area, setArea }: { today: Date; reduce: boolea
                   autoComplete="tel"
                   placeholder="010-0000-0000"
                   className={`mt-1.5 w-full rounded-[6px] border bg-transparent px-3 py-2.5 text-[16px] tabular-nums ${focusRing}`}
-                  style={{ borderColor: C.line, outlineColor: C.wine }}
+                  style={{ borderColor: C.line, outlineColor: C.accent }}
                 />
               </div>
               <fieldset>
@@ -975,9 +740,9 @@ function Booking({ today, reduce, area, setArea }: { today: Date; reduce: boolea
                         aria-pressed={on}
                         onClick={() => setCallOnly(v as boolean)}
                         className={`flex items-start gap-2 rounded-[6px] border px-3 py-2.5 text-left ${focusRing}`}
-                        style={{ borderColor: on ? C.wine : C.line, background: on ? C.wineSoft : "transparent", outlineColor: C.wine }}
+                        style={{ borderColor: on ? C.accent : C.line, background: on ? C.accentSoft : "transparent", outlineColor: C.accent }}
                       >
-                        <I size={17} aria-hidden className="mt-[2px] flex-none" style={{ color: C.wine }} />
+                        <I size={17} aria-hidden className="mt-[2px] flex-none" style={{ color: C.accent }} />
                         <span>
                           <span className="block text-[15px] font-bold">{label as string}</span>
                           <span className="block text-[13px]" style={{ color: C.muted }}>
@@ -990,7 +755,7 @@ function Booking({ today, reduce, area, setArea }: { today: Date; reduce: boolea
                 </div>
               </fieldset>
               <label className="flex items-start gap-2 text-[14px] leading-[1.5]">
-                <input type="checkbox" checked={agree} onChange={(e) => setAgree(e.target.checked)} className={`mt-[3px] h-4 w-4 flex-none ${focusRing}`} style={{ accentColor: C.wine, outlineColor: C.wine }} />
+                <input type="checkbox" checked={agree} onChange={(e) => setAgree(e.target.checked)} className={`mt-[3px] h-4 w-4 flex-none ${focusRing}`} style={{ accentColor: C.accent, outlineColor: C.accent }} />
                 <span>개인정보 수집, 이용 동의(이름, 연락처는 상담 일정 안내에만 쓰고 상담이 끝나면 지워요)</span>
               </label>
 
@@ -1011,8 +776,8 @@ function Booking({ today, reduce, area, setArea }: { today: Date; reduce: boolea
               <button
                 type="submit"
                 data-gtm-cta={`${SLUG}_booking_submit`}
-                className={`inline-flex items-center justify-center gap-2 rounded-[6px] px-5 py-3.5 text-[17px] font-bold ${focusRing}`}
-                style={{ background: C.wine, color: C.cream, outlineColor: C.wine }}
+                className={`inline-flex items-center justify-center gap-2 rounded-[6px] px-5 py-3.5 text-[17px] font-semibold ${focusRing}`}
+                style={{ background: C.accent, color: "#ffffff", outlineColor: C.accent }}
               >
                 <CalendarCheck size={19} aria-hidden />
                 상담 예약하기
@@ -1051,10 +816,10 @@ function Faq() {
                 aria-controls={`fl-faq-${i}`}
                 onClick={() => setOpen(on ? null : i)}
                 className={`flex w-full items-center justify-between gap-4 py-4 text-left text-[17px] font-bold ${focusRing}`}
-                style={{ outlineColor: C.wine }}
+                style={{ outlineColor: C.accent }}
               >
                 {q}
-                <ChevronDown size={20} aria-hidden className="flex-none transition-transform duration-200" style={{ transform: on ? "rotate(180deg)" : undefined, color: C.wine }} />
+                <ChevronDown size={20} aria-hidden className="flex-none transition-transform duration-200" style={{ transform: on ? "rotate(180deg)" : undefined, color: C.accent }} />
               </button>
             </h3>
             <div id={`fl-faq-${i}`} hidden={!on} className="pb-4 text-[16px] leading-[1.65]" style={{ color: C.muted }}>
@@ -1095,13 +860,12 @@ export function FamilyLawDemo() {
   const navBtn = `rounded-[4px] px-2.5 py-1.5 text-[15px] underline-offset-4 hover:underline ${focusRing}`;
 
   return (
-    <div className="min-h-screen overflow-x-clip pb-24" style={{ background: C.cream, color: C.ink }}>
+    <div className="min-h-screen overflow-x-clip pb-24" style={{ background: C.bg, color: C.ink }}>
       <Poster reduce={reduce} onCta={() => go("fl-booking")} />
 
       <header className="mx-auto flex max-w-[1200px] flex-wrap items-center justify-between gap-x-4 gap-y-2 px-4 py-4 md:px-6">
-        <h2 className="inline-flex items-center gap-2 text-[21px] font-bold leading-none" style={{ ...serifF, color: C.wine }}>
-          <Scale size={22} aria-hidden />
-          {BRAND}
+        <h2 className="inline-flex items-center gap-2 text-[21px] font-bold leading-none">
+          <SampleLogo />
         </h2>
         <nav aria-label="주요 메뉴" className="-mx-2 flex flex-wrap items-center">
           {[
@@ -1112,7 +876,7 @@ export function FamilyLawDemo() {
             ["fl-faq", "자주 묻는 질문"],
             ["fl-visit", "오시는 길"],
           ].map(([id, label]) => (
-            <button key={id} type="button" onClick={() => go(id)} className={navBtn} style={{ outlineColor: C.wine }}>
+            <button key={id} type="button" onClick={() => go(id)} className={navBtn} style={{ outlineColor: C.accent }}>
               {label}
             </button>
           ))}
@@ -1121,7 +885,7 @@ export function FamilyLawDemo() {
 
       {/* 약속 세 가지 */}
       <div className="mx-auto max-w-[1200px] px-4 md:px-6">
-        <ul className="grid gap-px overflow-hidden rounded-[10px] border sm:grid-cols-3" style={{ borderColor: C.line, background: C.line }}>
+        <ul className="grid gap-px overflow-hidden rounded-[8px] border sm:grid-cols-3" style={{ borderColor: C.line, background: C.line }}>
           {[
             [ShieldCheck, "변호사가 직접 상담", "처음부터 끝까지 같은 변호사가 맡아요."],
             [DoorClosed, "따로 쓰는 출입구", "주차장 쪽 엘리베이터로 상담실에 바로 와요."],
@@ -1129,8 +893,8 @@ export function FamilyLawDemo() {
           ].map(([Icon, t, d]) => {
             const I = Icon as typeof Phone;
             return (
-              <li key={t as string} className="flex gap-3 p-4 md:p-5" style={{ background: C.paper }}>
-                <I size={22} aria-hidden className="mt-[2px] flex-none" style={{ color: C.wine }} />
+              <li key={t as string} className="flex gap-3 p-4 md:p-5" style={{ background: C.alt }}>
+                <I size={22} aria-hidden className="mt-[2px] flex-none" style={{ color: C.accent }} />
                 <span>
                   <span className="block text-[17px] font-bold">{t as string}</span>
                   <span className="mt-0.5 block text-[15px] leading-[1.5]" style={{ color: C.muted }}>
@@ -1145,7 +909,7 @@ export function FamilyLawDemo() {
 
       <section id="fl-areas" aria-labelledby="fl-areas-title" className="mx-auto mt-14 max-w-[1200px] scroll-mt-4 px-4 md:mt-20 md:px-6">
         <SectionTitle id="fl-areas-title" title="업무분야" />
-        <AreaPicker reduce={reduce} area={area} setArea={setArea} onBook={() => go("fl-booking")} />
+        <AreaPicker area={area} setArea={setArea} onBook={() => go("fl-booking")} />
       </section>
 
       <section id="fl-support" aria-labelledby="fl-support-title" className="mx-auto mt-14 max-w-[1200px] scroll-mt-4 px-4 md:mt-20 md:px-6">
@@ -1162,11 +926,11 @@ export function FamilyLawDemo() {
         <SectionTitle id="fl-lawyers-title" title="변호사 소개" />
         <div className="mt-6 grid gap-4 md:grid-cols-[1fr_1fr_1.1fr]">
           {LAWYERS.map((l) => (
-            <article key={l.name} className="rounded-[10px] border p-5" style={{ borderColor: C.line, background: C.paper }}>
-              <p className="text-[14px] font-bold" style={{ color: C.wine }}>
+            <article key={l.name} className="rounded-[8px] border p-5" style={{ borderColor: C.line, background: C.alt }}>
+              <p className="text-[14px] font-bold" style={{ color: C.accent }}>
                 {l.role}
               </p>
-              <h3 className="mt-1 text-[24px] font-bold" style={serifF}>
+              <h3 className="mt-1 text-[22px] font-bold">
                 {l.name} 변호사
               </h3>
               <p className="mt-3 text-[15px]">{l.note}</p>
@@ -1175,8 +939,8 @@ export function FamilyLawDemo() {
               </p>
             </article>
           ))}
-          <div className="rounded-[10px] p-5" style={{ background: C.wine, color: C.cream }}>
-            <h3 className="text-[18px] font-bold" style={serifF}>
+          <div className="rounded-[8px] border p-5" style={{ borderColor: C.line, background: C.alt, color: C.ink }}>
+            <h3 className="text-[18px] font-bold">
               상담료
             </h3>
             <dl className="mt-3 grid grid-cols-[minmax(0,1fr)_auto] gap-y-2 text-[15px] tabular-nums">
@@ -1189,7 +953,7 @@ export function FamilyLawDemo() {
                 </div>
               ))}
             </dl>
-            <p className="mt-4 text-[14px] leading-[1.6]" style={{ color: "#ecd3cd" }}>
+            <p className="mt-4 text-[14px] leading-[1.6]" style={{ color: C.muted }}>
               사건을 맡기시면 상담료는 착수금에서 빼 드려요.
             </p>
           </div>
@@ -1206,21 +970,21 @@ export function FamilyLawDemo() {
         <div className="mt-6 grid gap-6 md:grid-cols-2">
           <dl className="grid content-start gap-x-6 gap-y-3 text-[16px] sm:grid-cols-[110px_minmax(0,1fr)]">
             <dt className="inline-flex items-center gap-1.5 font-bold">
-              <MapPin size={17} aria-hidden style={{ color: C.wine }} />
+              <MapPin size={17} aria-hidden style={{ color: C.accent }} />
               주소
             </dt>
             <dd>{ADDRESS}</dd>
             <dt className="inline-flex items-center gap-1.5 font-bold">
-              <Car size={17} aria-hidden style={{ color: C.wine }} />
+              <Car size={17} aria-hidden style={{ color: C.accent }} />
               주차
             </dt>
             <dd>건물 뒤편 주차장 2시간 무료, 주차장 쪽 엘리베이터가 7층 상담실로 바로 이어져요.</dd>
             <dt className="inline-flex items-center gap-1.5 font-bold">
-              <Phone size={17} aria-hidden style={{ color: C.wine }} />
+              <Phone size={17} aria-hidden style={{ color: C.accent }} />
               전화
             </dt>
             <dd>
-              <a href={`tel:${TEL.replace(/-/g, "")}`} className={`underline underline-offset-4 ${focusRing}`} style={{ outlineColor: C.wine }}>
+              <a href={`tel:${TEL.replace(/-/g, "")}`} className={`underline underline-offset-4 ${focusRing}`} style={{ outlineColor: C.accent }}>
                 {TEL}
               </a>
               , {KAKAO}
@@ -1246,8 +1010,8 @@ export function FamilyLawDemo() {
       </section>
 
       <footer className="mx-auto mt-16 max-w-[1200px] border-t px-4 pt-8 text-[14px] leading-[1.8] md:px-6" style={{ borderColor: C.line, color: C.muted }}>
-        <p className="text-[16px] font-bold" style={{ ...serifF, color: C.ink }}>
-          {BRAND}
+        <p className="text-[16px] font-bold" style={{ color: C.ink }}>
+          <SampleLogo size={18} />
         </p>
         <p>
           {ADDRESS} / 전화 {TEL} / {KAKAO}
@@ -1260,8 +1024,23 @@ export function FamilyLawDemo() {
 
 function SectionTitle({ id, title }: { id: string; title: string }) {
   return (
-    <h2 id={id} className="border-b pb-3 text-[26px] font-bold tracking-[-0.02em] md:text-[32px]" style={{ ...serifF, borderColor: C.wine, color: C.ink }}>
+    <h2 id={id} className="border-b pb-3 text-[26px] font-bold tracking-[-0.02em] md:text-[32px]" style={{ ...serifF, borderColor: C.line, color: C.ink }}>
       {title}
     </h2>
+  );
+}
+
+function SampleLogo({ light, size = 20 }: { light?: boolean; size?: number }) {
+  return (
+    <span className="inline-flex items-center gap-2" style={{ color: light ? "#fff" : "#111" }}>
+      {/* eslint-disable-next-line @next/next/no-img-element -- 메인 사이트와 같은 곰 로고 */}
+      <img src="/images/logo-bear.png" alt="" aria-hidden width={28} height={28} className="h-7 w-7 shrink-0" />
+      <span className="flex items-baseline gap-1 whitespace-nowrap">
+        <span className="font-bold tracking-[-0.03em]" style={{ fontSize: size }}>
+          곰파트너
+        </span>
+        <span className="text-[12px] font-semibold opacity-75">법률사무소 샘플</span>
+      </span>
+    </span>
   );
 }

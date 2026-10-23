@@ -3,14 +3,14 @@
 import { useCallback, useEffect, useLayoutEffect, useRef, useState } from "react";
 import { AnimatePresence, motion, useMotionTemplate, useMotionValue, useScroll, useTransform, type MotionValue } from "framer-motion";
 import { AlertCircle, CalendarCheck, Camera, Car, Check, ChevronDown, Clock, MapPin, MessageCircle, Minus, Plus, Shirt } from "lucide-react";
-import { Noto_Serif_KR } from "@/lib/local-fonts";
 import { useReducedMotionSafe } from "@/hooks/useReducedMotionSafe";
 import { daysAgo, fmtKo, useDemoToday } from "@/hooks/useDemoToday";
 import { maskName, maskPhone } from "@/components/demos/LeadReceivedPanel";
 import { DemoMakerInfo } from "@/components/demos/DemoMakerInfo";
 
-/* 사진관 홈페이지 샘플: 가상의 곰파트너스튜디오. 증명사진, 프로필, 가족사진, 우정사진, 반려동물 촬영.
+/* 사진관 홈페이지 샘플: 가상의 곰파트너 사진관. 증명사진, 프로필, 가족사진, 우정사진, 반려동물 촬영.
    상호, 주소, 손님 이름은 모두 가상이다.
+   첫 화면 사진 출처: Pexels 사진 30332804
 
    국내 사진관 사이트 구성(벤치마킹 메모)
    - 메뉴는 갤러리, 상품 안내(가격표), 예약, 촬영 안내, 오시는 길. 첫 화면은 큰 사진 갤러리.
@@ -18,59 +18,57 @@ import { DemoMakerInfo } from "@/components/demos/DemoMakerInfo";
    - 예약은 네이버 예약이나 카카오톡 채널. 30분 단위 시간표에 마감 표시. 당일 예약은 전화 문의.
    - 촬영 안내에 준비물(여권 규격, 안경), 복장(단색 상의, 배경지 색과 겹치지 않게), 주차. 영업시간에 정기 휴무.
 
-   핵심 모션: 첫 화면 갤러리가 세로 스크롤에 맞춰 가로로 흐른다(sticky 구간 + useScroll). 가운데 온 카드만 살짝 커지고 캡션이 뜬다.
-   동작 줄이기면 보통 가로 스크롤(scroll-snap)로 바뀐다.
+   핵심 모션
+   - 첫 화면(ps-poster): 스튜디오 사진 한 장이 화면을 채운다. 들어올 때 사진이 1.06배에서 1.6초 동안 천천히 다가오고,
+     문장과 정보 줄은 0.3초 늦게 12px 아래에서 올라온다(CSS 키프레임, 끝 상태가 기본값). 스크롤하면 사진만 8% 느리게 움직인다.
+   - 갤러리: 세로 스크롤에 맞춰 가로로 흐른다(sticky 구간 + useScroll). 가운데 온 카드만 살짝 커지고 캡션이 뜬다.
+   동작 줄이기면 첫 화면은 멈춘 사진, 갤러리는 보통 가로 스크롤(scroll-snap)로 바뀐다.
 
    상호작용(모두 브라우저 안에서만 돈다. 실제로 보내지 않는다)
    1. 컨셉 필터: 증명, 프로필, 가족, 우정, 반려동물. 고르면 갤러리에 그 컨셉만 남는다.
    2. 패키지 비교: 기본, 스탠다드, 프리미엄 표와 추가 옵션 합산.
-   3. 배경지 색: 6색 롤. 고르면 갤러리 첫 카드 배경이 바뀌고 어울리는 옷 색 한 줄.
+   3. 배경지 색: 6색. 고르면 갤러리 첫 카드 배경이 바뀌고 어울리는 옷 색 한 줄.
    4. 촬영 예약: 날짜(오늘부터 14일), 시간대(30분 단위, 마감 표시), 인원, 이름, 휴대폰. 완료 화면에 예약번호, 수령 예정일, 담당 창구.
-   5. 촬영 안내와 오시는 길: 준비물, 복장, 주차 탭. 영업시간에 오늘 요일 진하게.
+   5. 촬영 안내와 오시는 길: 준비물, 복장, 주차 탭. 영업시간에 오늘 요일 진하게. */
 
-   포스터 첫 화면(ps-poster): 검정 바탕에 큰 문장 하나와 인화지 한 장. 메뉴, 카드, 가격표는 스크롤 아래로.
-   - 등장: 카메라 조리개 날개 6장(금속 그라디언트)이 닫혀 있다가 촬칵 열리며 문장이 드러나고, 같은 순간 화면이 150ms 하얗게 번쩍.
-   - 오른쪽에 걸린 증명사진 인화지(사람은 실루엣만)가 회색에서 칸마다 차례로 현상된다. 그 뒤로는 집게에 매달려 7초 주기로 살짝 흔들린다.
-   - 스크롤하면 조리개가 다시 닫히며 기존 화면으로 넘어간다. 등장 연출은 CSS 키프레임이라 JS 없이도 끝 상태가 보이고, 동작 줄이기면 열린 상태로 고정. */
+const IMG = "/images/demo-photo-studio";
 
-const serifF = { fontFamily: `${Noto_Serif_KR.style.fontFamily}, serif` } as const;
-
-const BRAND = "곰파트너스튜디오";
+const BRAND = "곰파트너";
 const ADDRESS = "서울 ㅇㅇ구 ㅇㅇ로 00, 2층";
 const KAKAO = "카카오톡 채널 곰파트너";
 
 const C = {
-  bg: "#18181a",
-  panel: "#222226",
-  panel2: "#2a2a2f",
-  line: "#3a3a40",
-  text: "#f5f3ee",
-  muted: "#b8b4ac",
-  amber: "#e9b872",
-  amberInk: "#1c1710",
-  error: "#ffb4ab",
+  bg: "#141414",
+  panel: "#1b1b1b",
+  panel2: "#242424",
+  line: "#2e2e2e",
+  text: "#f2f2f2",
+  muted: "#a3a3a3",
+  accent: "#b8956a",
+  accentInk: "#141414",
+  error: "#f0a39a",
 };
 
 /* 모션 상수 */
 const EASE = [0.22, 1, 0.36, 1] as const;
 const DUR_CARD = 0.45; // 카드 재배열 450ms
-const DUR_UI = 0.22; // 칩, 금액, 탭 220ms
+const DUR_UI = 0.22; // 칩, 탭 220ms
 const FOCUS_SCALE = 1.04; // 가운데 카드 확대 비율
 const SLIDE_PX = 1; // 세로 스크롤 1px당 가로 이동 px
 
-const focusRing = "focus-visible:outline focus-visible:outline-[3px] focus-visible:outline-offset-2 focus-visible:outline-[#e9b872]";
+const focusRing = "focus-visible:outline focus-visible:outline-[3px] focus-visible:outline-offset-2 focus-visible:outline-[#b8956a]";
 const won = (n: number) => `${n.toLocaleString("ko-KR")}원`;
 const p2 = (n: number) => String(n).padStart(2, "0");
 const DOW = ["일", "월", "화", "수", "목", "금", "토"];
 
-/* 배경지 6색. ink는 롤 라벨 글자색. tip은 사진관이 손님에게 하는 옷 색 안내 */
+/* 배경지 6색. tip은 사진관이 손님에게 하는 옷 색 안내 */
 const BACKDROPS = [
-  { id: "white", name: "화이트", hex: "#f2efe8", tip: "흰 배경에는 검정, 네이비처럼 진한 상의가 또렷하게 나와요. 흰 옷은 배경에 묻혀요." },
-  { id: "cobalt", name: "코발트", hex: "#1f4fd1", tip: "파란 배경에는 흰색, 베이지 상의가 잘 받아요. 파란 계열 옷은 피해 주세요." },
-  { id: "lemon", name: "레몬", hex: "#f5c828", tip: "노란 배경에는 흰색, 데님 상의가 산뜻해요. 노란 옷은 피해 주세요." },
-  { id: "coral", name: "코랄", hex: "#ef6a4f", tip: "코랄 배경에는 흰색, 아이보리 상의가 화사해요. 빨간 계열은 피해 주세요." },
-  { id: "mint", name: "민트", hex: "#3fb79a", tip: "민트 배경에는 흰색, 연한 베이지 상의가 어울려요. 초록 옷은 묻혀요." },
-  { id: "lilac", name: "라일락", hex: "#8e6fd6", tip: "라일락 배경에는 흰색, 차콜 상의가 차분해요. 보라 계열 옷은 피해 주세요." },
+  { id: "white", name: "화이트", hex: "#efede8", tip: "흰 배경에는 검정, 네이비처럼 진한 상의가 또렷하게 나와요. 흰 옷은 배경에 묻혀요." },
+  { id: "cobalt", name: "코발트", hex: "#3d5683", tip: "파란 배경에는 흰색, 베이지 상의가 잘 받아요. 파란 계열 옷은 피해 주세요." },
+  { id: "lemon", name: "레몬", hex: "#d4b45a", tip: "노란 배경에는 흰색, 데님 상의가 산뜻해요. 노란 옷은 피해 주세요." },
+  { id: "coral", name: "코랄", hex: "#c47c66", tip: "코랄 배경에는 흰색, 아이보리 상의가 화사해요. 빨간 계열은 피해 주세요." },
+  { id: "mint", name: "민트", hex: "#7aa396", tip: "민트 배경에는 흰색, 연한 베이지 상의가 어울려요. 초록 옷은 묻혀요." },
+  { id: "lilac", name: "라일락", hex: "#8a7fa6", tip: "라일락 배경에는 흰색, 차콜 상의가 차분해요. 보라 계열 옷은 피해 주세요." },
 ] as const;
 type BackdropId = (typeof BACKDROPS)[number]["id"];
 const backdropHex = (id: BackdropId) => BACKDROPS.find((b) => b.id === id)!.hex;
@@ -82,18 +80,18 @@ type Fig = "one" | "two" | "family" | "family3" | "dog" | "familydog";
 type Card = { id: string; concept: Concept; ratio: number; name: string; light: string; bg: string; fig: Fig };
 /* 비율은 가로/세로. 4:5 = 0.8, 1:1 = 1, 3:4 = 0.75 */
 const CARDS: Card[] = [
-  { id: "id-passport", concept: "증명", ratio: 0.8, name: "여권, 비자 증명", light: "정면 소프트박스 2등", bg: "#f2efe8", fig: "one" },
-  { id: "id-resume", concept: "증명", ratio: 0.75, name: "이력서 증명", light: "소프트박스 1등 + 반사판", bg: "#cfd3d8", fig: "one" },
-  { id: "pf-biz", concept: "프로필", ratio: 0.8, name: "비즈니스 프로필", light: "옥타박스 1등 + 림라이트", bg: "#2b2b30", fig: "one" },
-  { id: "pf-color", concept: "프로필", ratio: 1, name: "컬러 프로필", light: "뷰티디쉬 위에서", bg: "#f5c828", fig: "one" },
-  { id: "pf-actor", concept: "프로필", ratio: 0.75, name: "배우 프로필", light: "하드라이트 1등, 그림자 살림", bg: "#3a3a40", fig: "one" },
-  { id: "fm-four", concept: "가족", ratio: 1, name: "네 식구 가족사진", light: "옥타박스 2등 균일", bg: "#d8c9b2", fig: "family" },
-  { id: "fm-baby", concept: "가족", ratio: 0.8, name: "백일, 첫돌 가족", light: "창가 자연광 + 반사판", bg: "#f2efe8", fig: "family3" },
-  { id: "fm-grand", concept: "가족", ratio: 0.75, name: "부모님 칠순 가족", light: "소프트박스 3등", bg: "#cfd3d8", fig: "family" },
-  { id: "fr-two", concept: "우정", ratio: 0.8, name: "우정사진 둘", light: "스트립박스 좌우", bg: "#ef6a4f", fig: "two" },
-  { id: "fr-grad", concept: "우정", ratio: 1, name: "졸업 우정사진", light: "탑라이트 + 배경등", bg: "#1f4fd1", fig: "two" },
-  { id: "pet-dog", concept: "반려동물", ratio: 1, name: "강아지 단독", light: "소프트박스 2등, 낮게", bg: "#8e6fd6", fig: "dog" },
-  { id: "pet-family", concept: "반려동물", ratio: 0.8, name: "반려동물과 가족", light: "옥타박스 1등 + 반사판", bg: "#3fb79a", fig: "familydog" },
+  { id: "id-passport", concept: "증명", ratio: 0.8, name: "여권, 비자 증명", light: "정면 소프트박스 2등", bg: "#efede8", fig: "one" },
+  { id: "id-resume", concept: "증명", ratio: 0.75, name: "이력서 증명", light: "소프트박스 1등 + 반사판", bg: "#c9ccd0", fig: "one" },
+  { id: "pf-biz", concept: "프로필", ratio: 0.8, name: "비즈니스 프로필", light: "옥타박스 1등 + 림라이트", bg: "#2b2b2b", fig: "one" },
+  { id: "pf-color", concept: "프로필", ratio: 1, name: "컬러 프로필", light: "뷰티디쉬 위에서", bg: "#d4b45a", fig: "one" },
+  { id: "pf-actor", concept: "프로필", ratio: 0.75, name: "배우 프로필", light: "하드라이트 1등, 그림자 살림", bg: "#3a3a3a", fig: "one" },
+  { id: "fm-four", concept: "가족", ratio: 1, name: "네 식구 가족사진", light: "옥타박스 2등 균일", bg: "#d3c6b2", fig: "family" },
+  { id: "fm-baby", concept: "가족", ratio: 0.8, name: "백일, 첫돌 가족", light: "창가 자연광 + 반사판", bg: "#efede8", fig: "family3" },
+  { id: "fm-grand", concept: "가족", ratio: 0.75, name: "부모님 칠순 가족", light: "소프트박스 3등", bg: "#c9ccd0", fig: "family" },
+  { id: "fr-two", concept: "우정", ratio: 0.8, name: "우정사진 둘", light: "스트립박스 좌우", bg: "#c47c66", fig: "two" },
+  { id: "fr-grad", concept: "우정", ratio: 1, name: "졸업 우정사진", light: "탑라이트 + 배경등", bg: "#3d5683", fig: "two" },
+  { id: "pet-dog", concept: "반려동물", ratio: 1, name: "강아지 단독", light: "소프트박스 2등, 낮게", bg: "#8a7fa6", fig: "dog" },
+  { id: "pet-family", concept: "반려동물", ratio: 0.8, name: "반려동물과 가족", light: "옥타박스 1등 + 반사판", bg: "#7aa396", fig: "familydog" },
 ];
 
 /* 가격. 증명사진 25,000원 선, 프로필 패키지 10만~30만원대 시세 */
@@ -145,10 +143,10 @@ const isDark = (hex: string) => {
   const [r, g, b] = rgb(hex);
   return (0.2126 * r + 0.7152 * g + 0.0722 * b) / 255 < 0.42;
 };
-/** 배경지 종이. 위는 조명 받아 밝고 아래로 어두워진다. */
-const paper = (hex: string) => `linear-gradient(180deg, ${mix(hex, [255, 255, 255], 0.14)} 0%, ${hex} 42%, ${mix(hex, [0, 0, 0], 0.3)} 100%)`;
+/** 배경지 종이. 위는 조금 밝고 아래로 조금 어두워진다. */
+const paper = (hex: string) => `linear-gradient(180deg, ${mix(hex, [255, 255, 255], 0.06)} 0%, ${hex} 45%, ${mix(hex, [0, 0, 0], 0.16)} 100%)`;
 
-/* 조명 세팅 그림(실루엣) */
+/* 촬영 컨셉 실루엣(무채색) */
 function Person({ cx, s, fill, stroke }: { cx: number; s: number; fill: string; stroke?: string }) {
   const base = 100;
   const headR = 8.5 * s;
@@ -156,7 +154,7 @@ function Person({ cx, s, fill, stroke }: { cx: number; s: number; fill: string; 
   const sh = base - 30 * s;
   const d = `M ${cx - 24 * s} ${base} L ${cx - 23 * s} ${base - 19 * s} C ${cx - 22 * s} ${sh} ${cx - 13 * s} ${sh - 2 * s} ${cx - 5 * s} ${sh - 3 * s} L ${cx + 5 * s} ${sh - 3 * s} C ${cx + 13 * s} ${sh - 2 * s} ${cx + 22 * s} ${sh} ${cx + 23 * s} ${base - 19 * s} L ${cx + 24 * s} ${base} Z`;
   return (
-    <g fill={fill} stroke={stroke} strokeWidth={stroke ? 1.1 : 0} strokeLinejoin="round">
+    <g fill={fill} stroke={stroke} strokeWidth={stroke ? 1 : 0} strokeLinejoin="round">
       <rect x={cx - 4.2 * s} y={headY + 5 * s} width={8.4 * s} height={11 * s} />
       <circle cx={cx} cy={headY} r={headR} />
       <path d={d} />
@@ -167,7 +165,7 @@ function Person({ cx, s, fill, stroke }: { cx: number; s: number; fill: string; 
 function Dog({ cx, s, fill, stroke }: { cx: number; s: number; fill: string; stroke?: string }) {
   const base = 100;
   return (
-    <g fill={fill} stroke={stroke} strokeWidth={stroke ? 1.1 : 0} strokeLinejoin="round">
+    <g fill={fill} stroke={stroke} strokeWidth={stroke ? 1 : 0} strokeLinejoin="round">
       <ellipse cx={cx} cy={base - 14 * s} rx={15 * s} ry={13 * s} />
       <rect x={cx - 13 * s} y={base - 14 * s} width={26 * s} height={14 * s} />
       <circle cx={cx + 4 * s} cy={base - 36 * s} r={9.5 * s} />
@@ -179,8 +177,8 @@ function Dog({ cx, s, fill, stroke }: { cx: number; s: number; fill: string; str
 }
 
 function Figure({ fig, dark }: { fig: Fig; dark: boolean }) {
-  const fill = dark ? "#0c0c0f" : "#1b1b1f";
-  const stroke = dark ? "rgba(255,255,255,0.42)" : undefined;
+  const fill = dark ? "#101010" : "#2a2a2a";
+  const stroke = dark ? "rgba(255,255,255,0.28)" : undefined;
   const p = { fill, stroke };
   return (
     <svg viewBox="0 0 100 100" preserveAspectRatio="xMidYMax meet" className="absolute inset-x-0 bottom-0 h-[80%] w-full" aria-hidden>
@@ -268,25 +266,16 @@ function GalleryCard({
       className="relative shrink-0 snap-center"
       style={{ height: "var(--ps-h)", aspectRatio: String(card.ratio) }}
     >
-      <motion.div className="absolute inset-0 overflow-hidden rounded-[4px]" style={{ scale, background: paper(bg), boxShadow: "0 18px 40px rgba(0,0,0,0.45)" }}>
-        {/* 배경지 롤 */}
-        <div className="absolute inset-x-0 top-0 h-[5%] rounded-b-[2px]" style={{ background: "linear-gradient(180deg, #4e4e55, #1c1c20)" }} aria-hidden />
-        {/* 소프트박스 빛 */}
-        <div className="absolute inset-0" style={{ background: "radial-gradient(ellipse 70% 55% at 22% 12%, rgba(255,243,220,0.42), transparent 70%)" }} aria-hidden />
-        {dark && <div className="absolute inset-0" style={{ background: "radial-gradient(ellipse 45% 70% at 88% 45%, rgba(255,255,255,0.16), transparent 70%)" }} aria-hidden />}
+      <motion.div className="absolute inset-0 overflow-hidden rounded-[4px]" style={{ scale, background: paper(bg) }}>
         <Figure fig={card.fig} dark={dark} />
-        {/* 바닥 그림자 */}
-        <div className="absolute inset-x-0 bottom-0 h-[30%]" style={{ background: "radial-gradient(ellipse 60% 70% at 50% 100%, rgba(0,0,0,0.32), transparent 70%)" }} aria-hidden />
         <motion.figcaption
           className="absolute inset-x-0 bottom-0 px-4 pb-4 pt-10 text-left"
-          style={{ opacity: capOpacity, transform: capTransform, background: "linear-gradient(180deg, transparent, rgba(12,12,14,0.86))", color: C.text }}
+          style={{ opacity: capOpacity, transform: capTransform, background: "linear-gradient(180deg, transparent, rgba(14,14,14,0.86))", color: C.text }}
         >
-          <span className="inline-block rounded-[2px] px-1.5 py-0.5 text-[12px] font-bold" style={{ background: C.amber, color: C.amberInk }}>
+          <span className="text-[13px] font-semibold" style={{ color: C.accent }}>
             {card.concept}
           </span>
-          <span className="mt-1.5 block text-[19px] leading-tight" style={serifF}>
-            {card.name}
-          </span>
+          <span className="mt-1 block text-[18px] font-bold leading-tight">{card.name}</span>
           <span className="mt-0.5 block text-[13px]" style={{ color: C.muted }}>
             조명 {card.light}
           </span>
@@ -296,25 +285,24 @@ function GalleryCard({
   );
 }
 
-/* 배경지 롤 버튼 */
+/* 배경지 색 버튼 */
 function Roll({ b, on, onPick }: { b: (typeof BACKDROPS)[number]; on: boolean; onPick: () => void }) {
   return (
     <button
       type="button"
       onClick={onPick}
       aria-pressed={on}
-      className={`group flex flex-col items-center gap-1 rounded-[6px] px-1.5 pb-1 pt-1.5 ${focusRing}`}
+      className={`flex flex-col items-center gap-1 rounded-[6px] px-1.5 pb-1 pt-1.5 ${focusRing}`}
       style={{ background: on ? C.panel2 : "transparent" }}
     >
-      <span className="block h-[7px] w-10 rounded-full" style={{ background: "linear-gradient(180deg, #6a6a72, #2a2a2f)" }} aria-hidden />
-      <span className="relative block h-7 w-8 rounded-b-[2px]" style={{ background: paper(b.hex), marginTop: -3 }} aria-hidden>
+      <span className="relative block h-7 w-8 rounded-[4px] border" style={{ background: b.hex, borderColor: on ? C.accent : C.line }} aria-hidden>
         {on && (
-          <span className="absolute inset-0 flex items-center justify-center" style={{ color: isDark(b.hex) ? "#fff" : "#1c1c1e" }}>
-            <Check size={14} strokeWidth={3} />
+          <span className="absolute inset-0 flex items-center justify-center" style={{ color: isDark(b.hex) ? "#fff" : "#1c1c1c" }}>
+            <Check size={14} strokeWidth={2.5} />
           </span>
         )}
       </span>
-      <span className="text-[12px] font-bold" style={{ color: on ? C.text : C.muted }}>
+      <span className="text-[12px] font-medium" style={{ color: on ? C.text : C.muted }}>
         {b.name}
       </span>
     </button>
@@ -324,7 +312,7 @@ function Roll({ b, on, onPick }: { b: (typeof BACKDROPS)[number]; on: boolean; o
 /* 하위 섹션 제목 */
 function Title({ id, children }: { id: string; children: React.ReactNode }) {
   return (
-    <h2 id={id} className="text-[26px] leading-tight md:text-[32px]" style={{ ...serifF, color: C.text }}>
+    <h2 id={id} className="text-[26px] font-bold leading-tight tracking-[-0.02em] md:text-[32px]" style={{ color: C.text }}>
       {children}
     </h2>
   );
@@ -337,7 +325,7 @@ function Stepper({ value, min, max, onChange, label }: { value: number; min: num
       <button type="button" className={btn} style={{ borderColor: C.line }} disabled={value <= min} onClick={() => onChange(value - 1)} aria-label={`${label} 줄이기`}>
         <Minus size={16} />
       </button>
-      <span className="min-w-[2ch] text-center text-[17px] font-bold tabular-nums" aria-live="polite">
+      <span className="min-w-[2ch] text-center text-[17px] font-semibold tabular-nums" aria-live="polite">
         {value}
       </span>
       <button type="button" className={btn} style={{ borderColor: C.line }} disabled={value >= max} onClick={() => onChange(value + 1)} aria-label={`${label} 늘리기`}>
@@ -347,278 +335,84 @@ function Stepper({ value, min, max, onChange, label }: { value: number; min: num
   );
 }
 
-/* ---------- 포스터 첫 화면 ---------- */
+/* ---------- 첫 화면 ---------- */
 
-/* 포스터 모션 상수(CSS 키프레임)
-   - 닫힌 채 350ms 머문 뒤 450ms 동안 열린다. cubic-bezier(0.2, 0.9, 0.25, 1) 빠르게 열리고 끝에서 멈춤
-   - 열리는 순간 흰 번쩍임 150ms
-   - 현상: 칸마다 120ms 간격, 1000ms 동안 회색이 걷힌다(마지막 칸 2.0초에 끝)
-   - 흔들림: 7초 주기, 2.1초 뒤 시작 */
-const IRIS_HOLD_MS = 350;
-const IRIS_OPEN_MS = 450;
-const IRIS_EASE = "cubic-bezier(0.2, 0.9, 0.25, 1)";
-const FLASH_MS = 150;
-const DEV_START_MS = 640;
-const DEV_STEP_MS = 120;
-const DEV_MS = 1000;
-const SWAY_S = 7;
-/* 스크롤 퇴장: 포스터 래퍼 진행률 0.03~0.36 사이에 조리개가 닫히고, 0.34~0.44 에 아래 화면 바탕색으로 덮인다(sticky 끝은 0.44) */
-const CLOSE_RANGE = [0.03, 0.36] as const;
-const FADE_RANGE = [0.34, 0.44] as const;
-
-const P = {
-  bg: "#0b0b0c",
-  text: "#f5f3ee",
-  muted: "#b8b4ac",
-};
-
-/* 조리개 기하. viewBox 중심이 원점. 열린 구멍은 변 중심까지 거리 IRIS_R 인 정육각형.
-   날개 i 는 꼭짓점에서 시작하는 60도 쐐기라서 날개끼리 겹치지 않고, 꼭짓점을 원점으로 모으면 화면을 다 덮는다. */
-const IRIS_R = 620;
-const IRIS_A0 = 15;
-const IRIS_L = 3200;
-const rad = (d: number) => (d * Math.PI) / 180;
-const r2 = (n: number) => Math.round(n * 100) / 100;
-const BLADES = Array.from({ length: 6 }, (_, i) => {
-  const a = rad(IRIS_A0 + 60 * i);
-  const ap = rad(IRIS_A0 + 60 * (i - 1));
-  const n = [Math.cos(a), Math.sin(a)];
-  const t = [-Math.sin(a), Math.cos(a)];
-  const tp = [-Math.sin(ap), Math.cos(ap)];
-  const d = IRIS_R / Math.cos(rad(30));
-  const L = IRIS_L;
-  /* 왼쪽 위에서 빛이 온다고 보고 날개마다 밝기를 다르게 */
-  const k = 0.5 + 0.5 * Math.cos(a - rad(-125));
-  return {
-    i,
-    vx: r2(d * Math.cos(a - rad(30))),
-    vy: r2(d * Math.sin(a - rad(30))),
-    pts: [
-      [0, 0],
-      [L * t[0], L * t[1]],
-      [L * (t[0] + tp[0]), L * (t[1] + tp[1])],
-      [L * tp[0], L * tp[1]],
-    ]
-      .map(([x, y]) => `${r2(x)},${r2(y)}`)
-      .join(" "),
-    n: [r2(n[0]), r2(n[1])],
-    t: [r2(t[0]), r2(t[1])],
-    hi: mix("#6a6f78", [236, 239, 243], 0.25 + k * 0.55),
-    mid: mix("#3a3d44", [190, 195, 202], k * 0.3),
-    band: mix("#2c2f35", [170, 175, 184], 0.1 + k * 0.28),
-  };
-});
-type BladeGeo = (typeof BLADES)[number];
-
+/* 문장과 정보 줄 등장: 0.3초 뒤 0.7초 동안 12px 아래에서 올라온다. 끝 상태가 기본값이라 JS 없이도 보인다. */
 const POSTER_CSS = `
-@keyframes ps-iris-open { from { transform: translate(0px, 0px); } }
-@keyframes ps-iris-turn { from { transform: rotate(-38deg); } }
-@keyframes ps-flash { 0% { opacity: 0; } 22% { opacity: 0.94; } 100% { opacity: 0; } }
-@keyframes ps-develop { from { opacity: 1; } to { opacity: 0; } }
-@keyframes ps-sway { 0%, 100% { transform: rotate(0deg); } 25% { transform: rotate(1.3deg); } 75% { transform: rotate(-1.3deg); } }
-.ps-blade { animation: ps-iris-open ${IRIS_OPEN_MS}ms ${IRIS_EASE} ${IRIS_HOLD_MS}ms both; }
-.ps-iris { transform-box: view-box; transform-origin: 0 0; animation: ps-iris-turn ${IRIS_OPEN_MS}ms ${IRIS_EASE} ${IRIS_HOLD_MS}ms both; }
-.ps-flash { opacity: 0; animation: ps-flash ${FLASH_MS}ms linear ${IRIS_HOLD_MS}ms both; }
-.ps-dev { opacity: 0; animation: ps-develop ${DEV_MS}ms cubic-bezier(0.45, 0, 0.55, 1) both; }
-.ps-sway { transform-origin: 50% 2%; animation: ps-sway ${SWAY_S}s ease-in-out ${DEV_START_MS + DEV_STEP_MS * 3 + DEV_MS + 100}ms infinite; }
-@media (prefers-reduced-motion: reduce) {
-  .ps-blade, .ps-iris, .ps-flash, .ps-dev, .ps-sway { animation: none !important; }
-}
+@keyframes ps-rise { from { opacity: 0; transform: translateY(12px); } }
+.ps-rise { animation: ps-rise 0.7s cubic-bezier(0.22, 1, 0.36, 1) 0.3s both; }
+@media (prefers-reduced-motion: reduce) { .ps-rise { animation: none !important; } }
 `;
-
-/* 날개 한 장. 바깥 g 는 스크롤로 닫히고, 안쪽 g 는 CSS 로 열린다. */
-function Blade({ b, close, reduce }: { b: BladeGeo; close: MotionValue<number>; reduce: boolean }) {
-  const x = useTransform(close, (c) => -b.vx * c);
-  const y = useTransform(close, (c) => -b.vy * c);
-  const [nx, ny] = b.n;
-  const [tx, ty] = b.t;
-  const L = IRIS_L;
-  return (
-    <motion.g style={reduce ? undefined : { x, y }}>
-      <g className="ps-blade" style={{ transform: `translate(${b.vx}px, ${b.vy}px)` }}>
-        <defs>
-          <linearGradient id={`ps-bl-${b.i}`} gradientUnits="userSpaceOnUse" x1={0} y1={0} x2={nx * 900} y2={ny * 900}>
-            <stop offset="0" stopColor={b.hi} />
-            <stop offset="0.035" stopColor={b.mid} />
-            <stop offset="0.22" stopColor="#202227" />
-            <stop offset="0.5" stopColor={b.band} />
-            <stop offset="0.78" stopColor="#141518" />
-            <stop offset="1" stopColor="#0d0e10" />
-          </linearGradient>
-        </defs>
-        <polygon points={b.pts} fill={`url(#ps-bl-${b.i})`} stroke="#121316" strokeWidth={3} strokeLinejoin="round" />
-        {/* 날 끝 두께: 안쪽 그늘 한 줄 + 하이라이트 한 줄 */}
-        <line x1={nx * 9} y1={ny * 9} x2={nx * 9 + tx * L} y2={ny * 9 + ty * L} stroke="#000" strokeOpacity={0.35} strokeWidth={8} />
-        <line x1={nx * 1.6} y1={ny * 1.6} x2={nx * 1.6 + tx * L} y2={ny * 1.6 + ty * L} stroke="#fff" strokeOpacity={0.62} strokeWidth={2.4} />
-      </g>
-    </motion.g>
-  );
-}
-
-/* 증명사진 한 칸(100 x 133). 사람은 실루엣만 */
-function IdCell({ x, y, n }: { x: number; y: number; n: number }) {
-  return (
-    <g transform={`translate(${x} ${y})`}>
-      <rect width={100} height={133} fill="url(#ps-pr-bg)" />
-      <rect width={100} height={133} fill="url(#ps-pr-light)" />
-      <rect x={43} y={70} width={14} height={20} fill="#1c1d21" />
-      <ellipse cx={50} cy={56} rx={18.5} ry={22.5} fill="url(#ps-pr-head)" />
-      <path d="M 30 58 C 28 36 38 28 50 28 C 63 28 72 36 70 58 C 68 46 62 40 50 40 C 39 40 32 46 30 58 Z" fill="#111214" />
-      <path d="M 2 133 C 3 109 14 99 32 94 C 40 91 45 87 50 87 C 55 87 60 91 68 94 C 86 99 97 109 98 133 Z" fill="url(#ps-pr-body)" />
-      <path d="M 41 92 L 50 113 L 59 92 L 55 90 L 50 102 L 45 90 Z" fill="#efece6" />
-      <rect className="ps-dev" width={100} height={133} fill="#8f8c86" style={{ animationDelay: `${DEV_START_MS + DEV_STEP_MS * n}ms` }} />
-    </g>
-  );
-}
-
-/* 인화지 한 장(5x7, 증명사진 4컷). 집게에 매달려 있다. */
-function PrintSheet() {
-  return (
-    <svg viewBox="0 -34 250 392" className="block h-auto w-full overflow-visible" role="img" aria-label="집게에 걸린 증명사진 인화지, 같은 사진 네 컷">
-      <defs>
-        <linearGradient id="ps-pr-paper" x1="0" y1="0" x2="1" y2="1">
-          <stop offset="0" stopColor="#fbf9f4" />
-          <stop offset="0.6" stopColor="#efebe3" />
-          <stop offset="1" stopColor="#d9d4ca" />
-        </linearGradient>
-        <linearGradient id="ps-pr-bg" x1="0" y1="0" x2="0" y2="1">
-          <stop offset="0" stopColor="#e6ebf1" />
-          <stop offset="1" stopColor="#b3bdc9" />
-        </linearGradient>
-        <radialGradient id="ps-pr-light" cx="0.28" cy="0.18" r="0.8">
-          <stop offset="0" stopColor="#fff" stopOpacity="0.55" />
-          <stop offset="1" stopColor="#fff" stopOpacity="0" />
-        </radialGradient>
-        <radialGradient id="ps-pr-head" cx="0.36" cy="0.3" r="0.8">
-          <stop offset="0" stopColor="#4d515a" />
-          <stop offset="1" stopColor="#17181b" />
-        </radialGradient>
-        <linearGradient id="ps-pr-body" x1="0" y1="0" x2="1" y2="1">
-          <stop offset="0" stopColor="#3e424a" />
-          <stop offset="1" stopColor="#141518" />
-        </linearGradient>
-        <linearGradient id="ps-pr-gloss" x1="0" y1="0" x2="1" y2="1">
-          <stop offset="0.3" stopColor="#fff" stopOpacity="0" />
-          <stop offset="0.42" stopColor="#fff" stopOpacity="0.26" />
-          <stop offset="0.5" stopColor="#fff" stopOpacity="0" />
-        </linearGradient>
-        <linearGradient id="ps-clip" x1="0" y1="0" x2="1" y2="0">
-          <stop offset="0" stopColor="#4a4e55" />
-          <stop offset="0.3" stopColor="#dfe2e7" />
-          <stop offset="0.55" stopColor="#8d929b" />
-          <stop offset="1" stopColor="#3b3e44" />
-        </linearGradient>
-      </defs>
-      {/* 종이 */}
-      <path d="M 6 14 H 244 V 344 Q 186 352 125 350 Q 64 352 6 345 Z" fill="url(#ps-pr-paper)" />
-      <IdCell x={20} y={30} n={0} />
-      <IdCell x={130} y={30} n={1} />
-      <IdCell x={20} y={173} n={2} />
-      <IdCell x={130} y={173} n={3} />
-      {/* 광택 하이라이트 한 줄과 윗변 빛 */}
-      <path d="M 6 14 H 244 V 344 Q 186 352 125 350 Q 64 352 6 345 Z" fill="url(#ps-pr-gloss)" />
-      <line x1={6} y1={14.5} x2={244} y2={14.5} stroke="#fff" strokeOpacity={0.9} strokeWidth={1.2} />
-      {/* 집게 */}
-      <path d="M 104 -30 C 96 -10 100 4 108 8 M 146 -30 C 154 -10 150 4 142 8" fill="none" stroke="#b9bdc4" strokeWidth={2.6} strokeLinecap="round" />
-      <path d="M 100 0 H 150 L 156 26 H 94 Z" fill="url(#ps-clip)" />
-      <line x1={101} y1={1} x2={149} y2={1} stroke="#fff" strokeOpacity={0.8} strokeWidth={1.2} />
-      <rect x={94} y={24} width={62} height={4} rx={1} fill="#26282d" />
-    </svg>
-  );
-}
 
 function Poster({ reduce, onCta }: { reduce: boolean; onCta: () => void }) {
   const ref = useRef<HTMLElement>(null);
   const { scrollYProgress } = useScroll({ target: ref, offset: ["start start", "end start"] });
-  const close = useTransform(scrollYProgress, [...CLOSE_RANGE], [0, 1]);
-  const cover = useTransform(scrollYProgress, [...FADE_RANGE], [0, 1]);
+  const photoY = useTransform(scrollYProgress, (v) => `${v * 8}%`);
 
   return (
-    <section ref={ref} id="ps-poster" aria-labelledby="ps-poster-title" className={reduce ? "relative" : "relative h-[180svh]"} style={{ background: P.bg }}>
+    <section ref={ref} id="ps-poster" aria-labelledby="ps-poster-title" className="relative min-h-[100svh] overflow-hidden" style={{ background: C.bg }}>
       <style>{POSTER_CSS}</style>
-      <div className={`${reduce ? "relative" : "sticky top-0"} h-svh min-h-[560px] overflow-hidden`} style={{ background: P.bg }}>
-        {/* 인화지 뒤 벽에 비친 암실 등 */}
-        <div
+      <motion.div className="absolute inset-0" style={reduce ? undefined : { y: photoY }}>
+        <motion.div
           className="absolute inset-0"
-          style={{ background: "radial-gradient(ellipse 46% 62% at 76% 54%, rgba(233,184,114,0.2), rgba(233,184,114,0.05) 55%, transparent 75%)" }}
-          aria-hidden
-        />
-
-        <div className="relative mx-auto flex h-full max-w-[1320px] flex-col justify-between gap-6 px-4 pb-10 pt-[96px] md:flex-row md:items-center md:justify-between md:gap-10 md:px-10 md:pb-10 md:pt-24">
-          <div className="relative z-10 md:flex-1">
-            <h1
-              id="ps-poster-title"
-              className="text-[clamp(56px,16vw,92px)] font-black leading-[1.04] tracking-[-0.02em] [word-break:keep-all] md:text-[clamp(80px,11.4vw,172px)]"
-              style={{ ...serifF, color: P.text }}
-            >
-              <span className="block">증명사진,</span>
-              <span className="block">
-                <span style={{ color: C.amber }}>20분</span>이면
-              </span>
-              <span className="block">찾아가요</span>
-            </h1>
-            <p className="mt-5 inline-flex items-center gap-1.5 text-[15px] md:mt-8 md:text-[17px]" style={{ color: P.muted }}>
-              <MapPin size={16} aria-hidden style={{ color: C.amber }} />
-              ㅇㅇ역 2번 출구 도보 5분
-            </p>
-          </div>
-
-          {/* 인화지: 줄은 고정, 종이만 흔들린다 */}
-          <div className="relative self-end md:self-center">
-            <span className="absolute left-[-30%] right-[-60vw] top-[1.4%] h-px" style={{ background: "linear-gradient(90deg, transparent, #55575d 25%)" }} aria-hidden />
-            <div className="relative mr-2 w-[min(70vw,31svh)] -rotate-[3deg] md:mr-0 md:w-[min(32vw,42svh)] md:rotate-[2deg]">
-              <div className="ps-sway">
-                <PrintSheet />
-              </div>
-              <span
-                className="absolute -bottom-[9%] left-[8%] right-[8%] h-[7%] rounded-[50%]"
-                style={{ background: "radial-gradient(ellipse at center, rgba(0,0,0,0.75), transparent 70%)" }}
-                aria-hidden
-              />
-            </div>
-          </div>
-        </div>
-
-        {/* 조리개 */}
-        <svg
-          viewBox="-1000 -1000 2000 2000"
-          className="pointer-events-none absolute left-1/2 top-1/2 z-20 h-[150vmax] w-[150vmax] -translate-x-1/2 -translate-y-1/2"
-          aria-hidden
+          initial={reduce ? false : { scale: 1.06 }}
+          animate={{ scale: 1 }}
+          transition={{ duration: reduce ? 0 : 1.6, ease: EASE }}
         >
-          <g className="ps-iris">
-            {BLADES.map((b) => (
-              <Blade key={b.i} b={b} close={close} reduce={reduce} />
-            ))}
-          </g>
-        </svg>
+          {/* eslint-disable-next-line @next/next/no-img-element -- 정적 export 라 next/image 최적화를 쓰지 않는다 */}
+          <img
+            src={`${IMG}/hero.jpg`}
+            srcSet={`${IMG}/hero-sm.jpg 960w, ${IMG}/hero.jpg 1920w`}
+            sizes="100vw"
+            alt="양쪽에 소프트박스 조명을 세운 사진 스튜디오와 가운데 내려진 배경지"
+            fetchPriority="high"
+            className="absolute inset-0 h-full w-full object-cover"
+            style={{ objectPosition: "50% 45%" }}
+          />
+        </motion.div>
+      </motion.div>
+      <div
+        className="absolute inset-0"
+        style={{ background: "linear-gradient(to top, rgba(0,0,0,0.72), rgba(0,0,0,0.3) 55%, rgba(0,0,0,0.25))" }}
+        aria-hidden
+      />
 
-        {/* 촬칵 번쩍임 */}
-        <div className="ps-flash pointer-events-none absolute inset-0 z-30 bg-white" aria-hidden />
+      {/* 상호와 예약 버튼 */}
+      <div className="absolute inset-x-0 top-0 z-10 mx-auto flex max-w-[1200px] items-center justify-between px-4 pt-4 md:px-6 md:pt-6">
+        <SampleLogo light small />
+        <button
+          type="button"
+          onClick={onCta}
+          data-gtm-cta="photo-studio_poster_cta"
+          className={`inline-flex items-center gap-1.5 rounded-[6px] px-4 py-2.5 text-[15px] font-semibold ${focusRing}`}
+          style={{ background: C.accent, color: C.accentInk }}
+        >
+          <CalendarCheck size={17} aria-hidden />
+          예약하기
+        </button>
+      </div>
 
-        {/* 다 닫히면 아래 화면 바탕색으로 덮어 이어지게 */}
-        {!reduce && <motion.div className="pointer-events-none absolute inset-0 z-50" style={{ opacity: cover, background: C.bg }} aria-hidden />}
-
-        {/* 로고와 예약 버튼 */}
-        <div className="absolute inset-x-0 top-0 z-40 mx-auto flex max-w-[1320px] items-center justify-between px-4 pt-4 md:px-10 md:pt-6">
-          <span className="inline-flex items-center gap-2 text-[17px]" style={{ ...serifF, color: P.text, textShadow: "0 1px 6px rgba(0,0,0,0.8)" }}>
-            <Camera size={18} aria-hidden style={{ color: C.amber }} />
-            {BRAND}
-          </span>
-          <button
-            type="button"
-            onClick={onCta}
-            aria-label="예약하기"
-            data-gtm-cta="photo-studio_poster_cta"
-            className={`inline-flex h-12 w-12 items-center justify-center rounded-full transition-transform duration-100 active:scale-95 ${focusRing}`}
-            style={{ background: C.amber, color: C.amberInk }}
+      <div className="relative z-10 mx-auto flex min-h-[100svh] max-w-[1200px] flex-col justify-end px-4 pb-14 pt-28 md:px-6 md:pb-20">
+        <div className={reduce ? undefined : "ps-rise"}>
+          <h1
+            id="ps-poster-title"
+            className="text-[36px] font-bold leading-[1.2] tracking-[-0.03em] [word-break:keep-all] md:text-[clamp(40px,5vw,72px)]"
+            style={{ color: C.text }}
           >
-            <CalendarCheck size={22} aria-hidden />
-          </button>
+            증명사진,
+            <br />
+            20분이면 찾아가요
+          </h1>
+          <p className="mt-4 inline-flex items-center gap-1.5 text-[15px] md:mt-5 md:text-[17px]" style={{ color: "#d6d6d6" }}>
+            <MapPin size={16} aria-hidden />
+            ㅇㅇ역 2번 출구 도보 5분
+          </p>
         </div>
       </div>
     </section>
   );
 }
+
 
 type Booking = { no: number; day: Date; slot: string; people: number; name: string; phone: string; pkg: PkgId };
 
@@ -743,11 +537,11 @@ export function PhotoStudioDemo() {
   const [guide, setGuide] = useState<"prep" | "dress" | "parking">("prep");
 
   const chip = (on: boolean) =>
-    `rounded-full border px-3.5 py-1.5 text-[14px] font-bold transition-colors duration-200 ${focusRing} ${on ? "" : "hover:border-[#6a6a72]"}`;
+    `rounded-[6px] border px-3.5 py-1.5 text-[14px] font-semibold transition-colors duration-200 ${focusRing} ${on ? "" : "hover:border-[#555555]"}`;
   const chipStyle = (on: boolean) => (on ? { background: C.text, color: C.bg, borderColor: C.text } : { background: "transparent", color: C.text, borderColor: C.line });
   const input = `w-full rounded-[4px] border bg-transparent px-3 py-2.5 text-[16px] ${focusRing}`;
   const inputStyle = { borderColor: C.line, color: C.text } as const;
-  const amberBtn = `inline-flex items-center justify-center gap-1.5 rounded-[4px] px-5 py-3 text-[16px] font-extrabold transition-transform duration-100 active:translate-y-[1px] ${focusRing}`;
+  const accentBtn = `inline-flex items-center justify-center gap-1.5 rounded-[4px] px-5 py-3 text-[16px] font-semibold transition-transform duration-100 active:translate-y-[1px] ${focusRing}`;
 
   const todayDow = today.getDay();
   const replyDay = todayDow === CLOSED_DOW ? daysAgo(today, -1) : today;
@@ -757,12 +551,7 @@ export function PhotoStudioDemo() {
       <Poster reduce={reduce} onCta={() => go("ps-book")} />
 
       <header className="mx-auto flex max-w-[1200px] items-center justify-between gap-3 px-4 py-4 md:px-6">
-        <span className="inline-flex items-center gap-2">
-          <Camera size={22} aria-hidden style={{ color: C.amber }} />
-          <span className="text-[20px]" style={serifF}>
-            {BRAND}
-          </span>
-        </span>
+        <SampleLogo light />
         <nav aria-label="메뉴" className="hidden items-center gap-6 text-[15px] md:flex" style={{ color: C.muted }}>
           {[
             ["ps-gallery", "갤러리"],
@@ -771,12 +560,12 @@ export function PhotoStudioDemo() {
             ["ps-guide", "촬영 안내"],
             ["ps-map", "오시는 길"],
           ].map(([id, label]) => (
-            <button key={id} type="button" onClick={() => go(id)} className={`rounded-[2px] hover:text-white ${focusRing}`}>
+            <button key={id} type="button" onClick={() => go(id)} className={`rounded-[2px] hover:text-[#f2f2f2] ${focusRing}`}>
               {label}
             </button>
           ))}
         </nav>
-        <button type="button" onClick={() => go("ps-book")} data-gtm-cta="photo-studio_go_book" className={`${amberBtn} px-4 py-2 text-[15px]`} style={{ background: C.amber, color: C.amberInk }}>
+        <button type="button" onClick={() => go("ps-book")} data-gtm-cta="photo-studio_go_book" className={`${accentBtn} px-4 py-2 text-[15px]`} style={{ background: C.accent, color: C.accentInk }}>
           예약하기
         </button>
       </header>
@@ -785,7 +574,7 @@ export function PhotoStudioDemo() {
       <div ref={wrapRef} id="ps-gallery" className="relative scroll-mt-2" style={{ height: reduce ? "auto" : `calc(100svh + ${shiftPx * SLIDE_PX}px)` }}>
         <div className={`${reduce ? "" : "sticky top-0 h-[100svh]"} flex flex-col justify-between gap-3 py-3 [--ps-h:min(88vw,380px,46svh)]`}>
           <div className="mx-auto w-full max-w-[1200px] px-4 md:px-6">
-            <h2 className="text-[30px] leading-tight md:text-[44px]" style={serifF}>
+            <h2 className="text-[28px] font-bold leading-tight tracking-[-0.02em] md:text-[40px]">
               {BRAND}
             </h2>
             <div id="ps-filter" role="group" aria-label="촬영 컨셉" className="mt-3 flex flex-wrap gap-2">
@@ -827,7 +616,7 @@ export function PhotoStudioDemo() {
                   ))}
                 </div>
                 <p className="mt-2 max-w-[640px] text-[14px] leading-[1.6]" style={{ color: C.text }} aria-live="polite">
-                  <Shirt size={15} aria-hidden className="mr-1.5 inline-block align-[-2px]" style={{ color: C.amber }} />
+                  <Shirt size={15} aria-hidden className="mr-1.5 inline-block align-[-2px]" style={{ color: C.accent }} />
                   {BACKDROPS.find((b) => b.id === backdrop)!.tip}
                 </p>
               </div>
@@ -836,7 +625,7 @@ export function PhotoStudioDemo() {
                   <ChevronDown size={16} aria-hidden />
                   <motion.span aria-hidden>{counter}</motion.span>
                   <span className="relative block h-[2px] w-24 overflow-hidden rounded-full" style={{ background: C.line }} aria-hidden>
-                    <motion.span className="absolute inset-0 origin-left rounded-full" style={{ scaleX: scrollYProgress, background: C.amber }} />
+                    <motion.span className="absolute inset-0 origin-left rounded-full" style={{ scaleX: scrollYProgress, background: C.accent }} />
                   </span>
                 </div>
               )}
@@ -863,7 +652,7 @@ export function PhotoStudioDemo() {
           ))}
         </ul>
 
-        <h3 className="mt-10 text-[20px]" style={serifF}>
+        <h3 className="mt-10 text-[20px] font-bold">
           프로필, 가족, 우정 패키지
         </h3>
         <div className="mt-3 overflow-x-auto rounded-[6px] border" style={{ borderColor: C.line }}>
@@ -882,13 +671,13 @@ export function PhotoStudioDemo() {
                         onClick={() => setPkg(p.id)}
                         aria-pressed={on}
                         className={`flex w-full flex-col items-start gap-0.5 rounded-[4px] border px-3 py-2 text-left transition-colors duration-200 ${focusRing}`}
-                        style={{ borderColor: on ? C.amber : C.line, color: C.text }}
+                        style={{ borderColor: on ? C.accent : C.line, color: C.text }}
                       >
-                        <span className="inline-flex items-center gap-1.5 text-[16px] font-extrabold">
-                          {on && <Check size={15} strokeWidth={3} aria-hidden style={{ color: C.amber }} />}
+                        <span className="inline-flex items-center gap-1.5 text-[16px] font-semibold">
+                          {on && <Check size={15} strokeWidth={3} aria-hidden style={{ color: C.accent }} />}
                           {p.name}
                         </span>
-                        <span className="text-[15px] tabular-nums" style={{ color: on ? C.amber : C.muted }}>
+                        <span className="text-[15px] tabular-nums" style={{ color: on ? C.accent : C.muted }}>
                           {won(p.price)}
                         </span>
                       </button>
@@ -933,7 +722,7 @@ export function PhotoStudioDemo() {
                 <li key={id}>
                   <label className="flex cursor-pointer items-center justify-between gap-4">
                     <span className="inline-flex items-center gap-2.5">
-                      <input type="checkbox" checked={on} onChange={(e) => set(e.target.checked)} className="h-5 w-5 accent-[#e9b872]" />
+                      <input type="checkbox" checked={on} onChange={(e) => set(e.target.checked)} className="h-5 w-5 accent-[#b8956a]" />
                       {label}
                     </span>
                     <span className="tabular-nums" style={{ color: C.muted }}>
@@ -945,7 +734,7 @@ export function PhotoStudioDemo() {
             </ul>
           </div>
 
-          <div className="flex flex-col justify-between rounded-[6px] border p-4 md:p-5" style={{ borderColor: C.amber, background: C.panel }}>
+          <div className="flex flex-col justify-between rounded-[6px] border p-4 md:p-5" style={{ borderColor: C.accent, background: C.panel }}>
             <div>
               <p className="text-[14px] font-bold" style={{ color: C.muted }}>
                 {pkgInfo.name} 패키지
@@ -953,25 +742,14 @@ export function PhotoStudioDemo() {
                 {frame && " + 액자"}
                 {makeup && " + 헤어메이크업"}
               </p>
-              <p className="mt-1 overflow-hidden text-[32px] font-extrabold tabular-nums" aria-live="polite" aria-atomic="true">
-                <AnimatePresence mode="popLayout" initial={false}>
-                  <motion.span
-                    key={total}
-                    className="inline-block"
-                    initial={reduce ? false : { y: 18, opacity: 0 }}
-                    animate={{ y: 0, opacity: 1 }}
-                    exit={reduce ? { opacity: 0, transition: { duration: 0 } } : { y: -18, opacity: 0 }}
-                    transition={{ duration: reduce ? 0 : DUR_UI, ease: EASE }}
-                  >
-                    {won(total)}
-                  </motion.span>
-                </AnimatePresence>
+              <p className="mt-1 text-[32px] font-bold tabular-nums" aria-live="polite" aria-atomic="true">
+                {won(total)}
               </p>
               <p className="text-[13px]" style={{ color: C.muted }}>
                 부가세 포함
               </p>
             </div>
-            <button type="button" onClick={() => go("ps-book")} data-gtm-cta="photo-studio_pkg_book" className={`${amberBtn} mt-4 w-full`} style={{ background: C.amber, color: C.amberInk }}>
+            <button type="button" onClick={() => go("ps-book")} data-gtm-cta="photo-studio_pkg_book" className={`${accentBtn} mt-4 w-full`} style={{ background: C.accent, color: C.accentInk }}>
               이 패키지로 예약
             </button>
           </div>
@@ -990,11 +768,11 @@ export function PhotoStudioDemo() {
               exit={{ opacity: 0, transition: { duration: reduce ? 0 : 0.15 } }}
               transition={{ duration: reduce ? 0 : 0.3, ease: EASE }}
               className="mt-6 rounded-[6px] border p-5 md:p-7"
-              style={{ borderColor: C.amber, background: C.panel }}
+              style={{ borderColor: C.accent, background: C.panel }}
               role="status"
             >
-              <p className="inline-flex items-center gap-2 text-[22px]" style={serifF}>
-                <Check size={22} strokeWidth={3} aria-hidden style={{ color: C.amber }} />
+              <p className="inline-flex items-center gap-2 text-[22px] font-bold">
+                <Check size={22} strokeWidth={3} aria-hidden style={{ color: C.accent }} />
                 예약 접수
               </p>
               <dl className="mt-4 grid grid-cols-[auto_1fr] gap-x-6 gap-y-2 text-[16px]">
@@ -1021,14 +799,14 @@ export function PhotoStudioDemo() {
                 <dt style={{ color: C.muted }}>담당 창구</dt>
                 <dd>
                   <span className="inline-flex items-center gap-1.5">
-                    <MessageCircle size={16} aria-hidden style={{ color: C.amber }} />
+                    <MessageCircle size={16} aria-hidden style={{ color: C.accent }} />
                     {KAKAO}
                   </span>
                 </dd>
                 <dt style={{ color: C.muted }}>예약 확인 연락</dt>
                 <dd>{fmtKo(replyDay)} 영업시간 내 카카오톡</dd>
               </dl>
-              <button type="button" onClick={resetBooking} className={`mt-6 rounded-[4px] border px-4 py-2 text-[15px] font-bold ${focusRing}`} style={{ borderColor: C.line }}>
+              <button type="button" onClick={resetBooking} className={`mt-6 rounded-[4px] border px-4 py-2 text-[15px] font-semibold ${focusRing}`} style={{ borderColor: C.line }}>
                 다른 날짜로 예약
               </button>
             </motion.div>
@@ -1062,9 +840,9 @@ export function PhotoStudioDemo() {
                           disabled={closed}
                           onClick={() => pickDay(i)}
                           className={`flex w-[62px] flex-col items-center rounded-[6px] border py-2 text-[14px] leading-tight disabled:opacity-40 ${focusRing}`}
-                          style={{ borderColor: on ? C.amber : C.line, background: on ? C.panel2 : "transparent", color: d.getDay() === 0 ? "#ff9b9b" : C.text }}
+                          style={{ borderColor: on ? C.accent : C.line, background: on ? C.panel2 : "transparent", color: d.getDay() === 0 ? "#e39a92" : C.text }}
                         >
-                          <span className="text-[12px]" style={{ color: d.getDay() === 0 ? "#ff9b9b" : C.muted }}>
+                          <span className="text-[12px]" style={{ color: d.getDay() === 0 ? "#e39a92" : C.muted }}>
                             {isToday ? "오늘" : DOW[d.getDay()]}
                           </span>
                           <span className="mt-0.5 text-[18px] font-bold tabular-nums">{d.getDate()}</span>
@@ -1101,7 +879,7 @@ export function PhotoStudioDemo() {
                             setErr(null);
                           }}
                           className={`rounded-[4px] border px-2 py-2 text-[15px] tabular-nums disabled:line-through disabled:opacity-40 ${focusRing}`}
-                          style={{ borderColor: on ? C.amber : C.line, background: on ? C.amber : "transparent", color: on ? C.amberInk : C.text, fontWeight: on ? 800 : 400 }}
+                          style={{ borderColor: on ? C.accent : C.line, background: on ? C.accent : "transparent", color: on ? C.accentInk : C.text, fontWeight: on ? 600 : 400 }}
                         >
                           {t}
                           {full && <span className="sr-only"> 마감</span>}
@@ -1148,7 +926,7 @@ export function PhotoStudioDemo() {
                 <p className="text-[14px]" style={{ color: C.muted }}>
                   {dayIdx === 0 ? "" : `${fmtKo(day)}${slot !== null ? ` ${SLOTS[slot]}` : ""}, ${pkgInfo.name} ${won(pkgInfo.price)}`}
                 </p>
-                <button type="submit" data-gtm-cta="photo-studio_book" className={`${amberBtn} w-full`} style={{ background: C.amber, color: C.amberInk }} disabled={(dayIdx ?? firstOpen) === 0}>
+                <button type="submit" data-gtm-cta="photo-studio_book" className={`${accentBtn} w-full`} style={{ background: C.accent, color: C.accentInk }} disabled={(dayIdx ?? firstOpen) === 0}>
                   예약 접수
                 </button>
               </div>
@@ -1180,12 +958,12 @@ export function PhotoStudioDemo() {
                     aria-controls={`ps-guide-${id}`}
                     id={`ps-tab-${id}`}
                     onClick={() => setGuide(id)}
-                    className={`relative inline-flex flex-1 items-center justify-center gap-1.5 px-3 py-3 text-[15px] font-bold ${focusRing}`}
+                    className={`relative inline-flex flex-1 items-center justify-center gap-1.5 px-3 py-3 text-[15px] font-semibold ${focusRing}`}
                     style={{ color: on ? C.text : C.muted }}
                   >
                     <Icon size={16} aria-hidden />
                     {label}
-                    {on && <motion.span layoutId={reduce ? undefined : "ps-tab-line"} className="absolute inset-x-3 bottom-0 h-[3px] rounded-full" style={{ background: C.amber }} transition={{ duration: DUR_UI, ease: EASE }} />}
+                    {on && <motion.span layoutId={reduce ? undefined : "ps-tab-line"} className="absolute inset-x-3 bottom-0 h-[3px] rounded-full" style={{ background: C.accent }} transition={{ duration: DUR_UI, ease: EASE }} />}
                   </button>
                 );
               })}
@@ -1205,7 +983,7 @@ export function PhotoStudioDemo() {
                 >
                   {GUIDE[guide].map((line) => (
                     <li key={line} className="flex gap-2.5">
-                      <Check size={18} aria-hidden className="mt-1 shrink-0" style={{ color: C.amber }} />
+                      <Check size={18} aria-hidden className="mt-1 shrink-0" style={{ color: C.accent }} />
                       <span>{line}</span>
                     </li>
                   ))}
@@ -1216,17 +994,17 @@ export function PhotoStudioDemo() {
 
           <div className="rounded-[6px] border p-4 md:p-5" style={{ borderColor: C.line, background: C.panel }}>
             <p className="inline-flex items-center gap-1.5 text-[16px] font-bold">
-              <Clock size={16} aria-hidden style={{ color: C.amber }} /> 영업시간
+              <Clock size={16} aria-hidden style={{ color: C.accent }} /> 영업시간
             </p>
             <ul className="mt-3 grid gap-1.5 text-[15px]">
               {HOURS.map(([dows, time]) => {
                 const mine = dows.includes(todayDow);
                 return (
-                  <li key={time + dows.join()} className="flex items-center justify-between gap-3 rounded-[4px] px-2 py-1" style={{ background: mine ? C.panel2 : "transparent", fontWeight: mine ? 800 : 400, color: mine ? C.text : C.muted }}>
+                  <li key={time + dows.join()} className="flex items-center justify-between gap-3 rounded-[4px] px-2 py-1" style={{ background: mine ? C.panel2 : "transparent", fontWeight: mine ? 700 : 400, color: mine ? C.text : C.muted }}>
                     <span>
                       {dows.map((d) => DOW[d]).join(", ")}
                       {mine && (
-                        <span className="ml-2 rounded-[2px] px-1.5 py-0.5 text-[12px]" style={{ background: C.amber, color: C.amberInk }}>
+                        <span className="ml-2 rounded-[2px] px-1.5 py-0.5 text-[12px]" style={{ background: C.accent, color: C.accentInk }}>
                           오늘
                         </span>
                       )}
@@ -1249,7 +1027,7 @@ export function PhotoStudioDemo() {
           <StudioMap />
           <dl className="grid content-start gap-x-6 gap-y-3 text-[16px] leading-[1.6] sm:grid-cols-[auto_1fr]">
             <dt className="inline-flex items-center gap-1.5 font-bold" style={{ color: C.muted }}>
-              <MapPin size={16} aria-hidden style={{ color: C.amber }} /> 주소
+              <MapPin size={16} aria-hidden style={{ color: C.accent }} /> 주소
             </dt>
             <dd>
               {ADDRESS}
@@ -1257,11 +1035,11 @@ export function PhotoStudioDemo() {
               ㅇㅇ역 2번 출구 도보 5분, 1층 약국 건물
             </dd>
             <dt className="inline-flex items-center gap-1.5 font-bold" style={{ color: C.muted }}>
-              <Car size={16} aria-hidden style={{ color: C.amber }} /> 주차
+              <Car size={16} aria-hidden style={{ color: C.accent }} /> 주차
             </dt>
             <dd>건물 지하 1층 주차 가능. 촬영 손님 1시간 무료, 출차 전 데스크에서 등록.</dd>
             <dt className="inline-flex items-center gap-1.5 font-bold" style={{ color: C.muted }}>
-              <MessageCircle size={16} aria-hidden style={{ color: C.amber }} /> 문의
+              <MessageCircle size={16} aria-hidden style={{ color: C.accent }} /> 문의
             </dt>
             <dd>{KAKAO}. 영업시간 내 답변.</dd>
           </dl>
@@ -1269,8 +1047,8 @@ export function PhotoStudioDemo() {
       </section>
 
       <footer className="mx-auto mt-16 max-w-[1200px] border-t px-4 pb-28 pt-8 text-[14px] leading-[1.8] md:px-6" style={{ borderColor: C.line, color: C.muted }}>
-        <p className="text-[16px]" style={{ ...serifF, color: C.text }}>
-          {BRAND}
+        <p>
+          <SampleLogo light />
         </p>
         <p>{ADDRESS}</p>
         <DemoMakerInfo className="mt-6" />
@@ -1313,51 +1091,65 @@ function StudioMap() {
     <svg viewBox="0 0 400 260" role="img" aria-label="약도. ㅇㅇ역 2번 출구에서 큰길 따라 스튜디오까지" className="w-full rounded-[6px] border" style={{ borderColor: C.line, background: C.panel }}>
       <defs>
         <pattern id="ps-grid" width="20" height="20" patternUnits="userSpaceOnUse">
-          <path d="M20 0H0V20" fill="none" stroke="#2c2c31" strokeWidth="1" />
+          <path d="M20 0H0V20" fill="none" stroke="#1f1f1f" strokeWidth="1" />
         </pattern>
       </defs>
       <rect width="400" height="260" fill="url(#ps-grid)" />
-      <rect x="0" y="118" width="400" height="34" fill="#3a3a40" />
-      <line x1="0" y1="135" x2="400" y2="135" stroke="#5a5a62" strokeWidth="2" strokeDasharray="12 10" />
-      <rect x="236" y="0" width="26" height="260" fill="#3a3a40" />
-      <rect x="40" y="40" width="130" height="54" rx="3" fill="#2a2a2f" stroke="#4a4a52" />
-      <rect x="40" y="176" width="130" height="54" rx="3" fill="#2a2a2f" stroke="#4a4a52" />
-      <rect x="290" y="176" width="90" height="54" rx="3" fill="#2a2a2f" stroke="#4a4a52" />
-      <rect x="290" y="40" width="90" height="54" rx="3" fill="#2a2a2f" stroke="#4a4a52" />
-      <text x="105" y="208" textAnchor="middle" fill="#9a968e" fontSize="12">
+      <rect x="0" y="118" width="400" height="34" fill="#2e2e2e" />
+      <line x1="0" y1="135" x2="400" y2="135" stroke="#444444" strokeWidth="2" strokeDasharray="12 10" />
+      <rect x="236" y="0" width="26" height="260" fill="#2e2e2e" />
+      <rect x="40" y="40" width="130" height="54" rx="3" fill="#222222" stroke="#363636" />
+      <rect x="40" y="176" width="130" height="54" rx="3" fill="#222222" stroke="#363636" />
+      <rect x="290" y="176" width="90" height="54" rx="3" fill="#222222" stroke="#363636" />
+      <rect x="290" y="40" width="90" height="54" rx="3" fill="#222222" stroke="#363636" />
+      <text x="105" y="208" textAnchor="middle" fill="#8f8f8f" fontSize="12">
         편의점
       </text>
-      <text x="335" y="208" textAnchor="middle" fill="#9a968e" fontSize="12">
+      <text x="335" y="208" textAnchor="middle" fill="#8f8f8f" fontSize="12">
         카페
       </text>
-      <text x="335" y="71" textAnchor="middle" fill="#9a968e" fontSize="12">
+      <text x="335" y="71" textAnchor="middle" fill="#8f8f8f" fontSize="12">
         은행
       </text>
-      <rect x="60" y="150" width="34" height="12" rx="2" fill={C.amber} />
-      <text x="77" y="160" textAnchor="middle" fill={C.amberInk} fontSize="9" fontWeight="700">
+      <rect x="60" y="150" width="34" height="12" rx="2" fill={C.accent} />
+      <text x="77" y="160" textAnchor="middle" fill={C.accentInk} fontSize="9" fontWeight="700">
         2번
       </text>
       <text x="106" y="112" textAnchor="middle" fill={C.text} fontSize="13" fontWeight="700">
         ㅇㅇ역
       </text>
-      <path d="M77 150 V 105 H 236" fill="none" stroke={C.amber} strokeWidth="3" strokeDasharray="6 6" />
+      <path d="M77 150 V 105 H 236" fill="none" stroke={C.accent} strokeWidth="3" strokeDasharray="6 6" />
       <g transform="translate(205 45)">
-        <rect x="-50" y="0" width="60" height="50" rx="3" fill="#2a2a2f" stroke={C.amber} strokeWidth="2" />
+        <rect x="-50" y="0" width="60" height="50" rx="3" fill="#222222" stroke={C.accent} strokeWidth="1.5" />
         <text x="-20" y="22" textAnchor="middle" fill={C.text} fontSize="12" fontWeight="700">
           스튜디오
         </text>
         <text x="-20" y="38" textAnchor="middle" fill={C.muted} fontSize="11">
           2층
         </text>
-        <circle cx="-20" cy="-6" r="9" fill={C.amber} />
-        <circle cx="-20" cy="-6" r="3.5" fill={C.amberInk} />
+        <circle cx="-20" cy="-6" r="9" fill={C.accent} />
+        <circle cx="-20" cy="-6" r="3.5" fill={C.accentInk} />
       </g>
-      <text x="200" y="250" textAnchor="middle" fill="#9a968e" fontSize="12">
+      <text x="200" y="250" textAnchor="middle" fill="#8f8f8f" fontSize="12">
         ㅇㅇ로
       </text>
-      <text x="249" y="22" textAnchor="middle" fill="#9a968e" fontSize="11" transform="rotate(90 249 22)">
+      <text x="249" y="22" textAnchor="middle" fill="#8f8f8f" fontSize="11" transform="rotate(90 249 22)">
         ㅇㅇ로 00길
       </text>
     </svg>
+  );
+}
+
+/* 로고: 메인 사이트와 같은 곰 로고 + 곰파트너(크게) + 업종(작게) */
+function SampleLogo({ light, small }: { light?: boolean; small?: boolean }) {
+  return (
+    <span className="inline-flex items-center gap-2" style={{ color: light ? "#ffffff" : "#111111" }}>
+      {/* eslint-disable-next-line @next/next/no-img-element -- 메인 사이트와 같은 곰 로고 */}
+      <img src="/images/logo-bear.png" alt="" aria-hidden width={28} height={28} className={small ? "h-6 w-6 shrink-0" : "h-7 w-7 shrink-0"} />
+      <span className="flex items-baseline gap-1 whitespace-nowrap">
+        <span className={`${small ? "text-[18px]" : "text-[20px]"} font-bold leading-none tracking-[-0.03em]`}>곰파트너</span>
+        <span className="text-[12px] font-semibold leading-none opacity-75">사진관 샘플</span>
+      </span>
+    </span>
   );
 }

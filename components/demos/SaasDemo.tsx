@@ -1,16 +1,16 @@
 "use client";
 
 import { useEffect, useRef, useState, type FormEvent } from "react";
-import { AnimatePresence, motion, useMotionTemplate, useScroll, useTransform, type MotionValue } from "framer-motion";
-import { AlertCircle, Boxes, Check, Minus, MessageSquareText, Plus, RotateCcw } from "lucide-react";
-import { JetBrains_Mono } from "@/lib/local-fonts";
+import { AnimatePresence, motion, useScroll, useTransform } from "framer-motion";
+import { AlertCircle, Check, Minus, Plus, RotateCcw } from "lucide-react";
 import { useReducedMotionSafe } from "@/hooks/useReducedMotionSafe";
 import { daysAgo, fmtKo, useDemoToday } from "@/hooks/useDemoToday";
 import { maskName, maskPhone } from "@/components/demos/LeadReceivedPanel";
 import { DemoMakerInfo } from "@/components/demos/DemoMakerInfo";
 
-/* 식당 재고 관리 서비스 홈페이지 샘플: 가상의 IT 회사가 만드는 곰파트너재고 앱.
+/* 식당 재고 관리 서비스 홈페이지 샘플: 가상의 IT 회사가 만드는 곰파트너 재고 앱.
    상호, 주소, 전화번호, 담당자 이름은 모두 가상이다. 고객사 로고, 투자, 매출, 이용 매장 수 같은 숫자는 넣지 않는다.
+   첫 화면 사진 출처: Pexels 사진 6375553
 
    국내 외식업 SaaS 사이트 공통 구성(참고): 메뉴는 기능 소개, 요금 안내, 자주 묻는 질문, 도입 문의, 로그인.
    첫 화면 버튼은 "무료로 시작하기", "도입 문의". 요금제는 카드 세 장에 월 결제와 연 결제 전환, "연 결제 시 20% 할인",
@@ -24,44 +24,33 @@ import { DemoMakerInfo } from "@/components/demos/DemoMakerInfo";
    4. 도입 문의: 문의 유형, 상호, 담당자, 휴대폰, 매장 수. 접수하면 접수 번호, 담당 창구, 회신 예정일을 보여 준다.
    5. 자주 묻는 질문(접고 펴기).
 
-   포스터 첫 화면(ss-poster): 흰 바탕에 큰 문장 "재고 세는 데 하루 10분이면 돼요" 하나와 앱 화면 카드 세 장만 둔다.
-   카드 세 장은 바닥에 포개져 있다가 아이소메트릭 공중으로 높이를 달리해 떠오른다(등장 1.6초). 그 뒤 카드 안 재고 막대가
-   8초 주기로 줄었다가 입고되듯 다시 채워진다(반복 움직임은 이것 하나). 스크롤하면 기울기가 풀리며 카드가 옆으로 펼쳐져
-   아래 기능 구역의 카드 배치로 이어진다. 동작 줄이기면 떠오른 상태로 고정하고 막대와 스크롤 퇴장도 멈춘다. */
+   핵심 모션: 첫 화면(ss-poster)은 사람 없는 업소용 주방 사진 한 장. 들어올 때 사진이 1.06배에서 1배로 1.6초 동안 다가오고,
+   문장과 정보 줄은 0.3초 늦게 12px 아래에서 올라온다(CSS keyframes, 끝 상태가 기본값이라 JS 없이도 보인다).
+   스크롤하면 사진만 포스터 높이의 8%까지 느리게 움직인다. 숫자가 굴러 바뀌는 효과는 매장 수 계산 합계 한 곳에만 둔다.
+   동작 줄이기면 모두 끈다. */
 
-const monoF = { fontFamily: `${JetBrains_Mono.style.fontFamily}, ui-monospace, monospace` } as const;
-
-const BRAND = "곰파트너재고";
 const ADDRESS = "서울 ㅇㅇ구 ㅇㅇ로 00, 0층";
 const TEL = "02-000-0000";
 const KAKAO = "카카오톡 채널 곰파트너";
 const SLUG = "saas-startup";
+const IMG = "/images/demo-saas-startup";
 
 const C = {
   bg: "#ffffff",
-  ink: "#0b1410",
-  muted: "#55615a",
-  line: "#e2e8e4",
-  soft: "#f4f7f5",
-  green: "#19e27a",
-  greenEdge: "#0fa85a",
-  greenDeep: "#08743a",
-  mint: "#e5fbef",
+  soft: "#f7f7f5",
+  ink: "#111111",
+  body: "#4b4b4b",
+  muted: "#767676",
+  line: "#e5e5e5",
+  accent: "#2f5d4a",
   error: "#b42318",
 };
 
 /* 모션 상수. 시간은 초, 이징은 cubic-bezier */
 const EASE = [0.22, 1, 0.36, 1] as const;
-/** 카드가 떠오르는 시간과 카드 사이 간격. 0.9 + 0.25 x 2 + 여유 = 1.6초 안에 끝난다 */
-const RISE = 0.9;
-const RISE_GAP = 0.25;
-const RISE_START = 0.2;
-/** 재고 막대가 줄었다 채워지는 한 바퀴 */
-const BAR_LOOP = 8;
-/** 가격 숫자, 줄 전환 */
+const EASE_CSS = "cubic-bezier(0.22, 1, 0.36, 1)";
+/** 합계 숫자 전환 */
 const DUR = 0.32;
-/** 포스터 바깥 높이 180svh 중 고정 구간(80svh)이 끝나는 진행도 */
-const EXIT_END = 0.44;
 
 const focusRing = "focus-visible:outline focus-visible:outline-[3px] focus-visible:outline-offset-2";
 const won = (n: number) => `${n.toLocaleString("ko-KR")}원`;
@@ -142,10 +131,9 @@ const COMPARE: { group: string; rows: [string, Cell, Cell, Cell][] }[] = [
 /* ---------- 앱 화면 카드 데이터 ---------- */
 
 type CardKind = "count" | "order" | "cost";
-/** 카드 크기(px). 포스터와 기능 구역이 같은 크기를 쓴다 */
+/** 기능 소개 카드 크기(px) */
 const CW = 210;
 const CH = 280;
-const GAP = 24;
 
 const STOCK: [string, string, number][] = [
   ["양파", "12kg", 0.8],
@@ -159,13 +147,6 @@ const COST: [string, number][] = [
   ["제육볶음", 36],
   ["된장찌개", 27],
   ["계란말이", 21],
-];
-
-/** 포스터 카드: 뒤에서부터 흰색(원가), 초록(발주), 검정(재고). 기울어진 바닥 위 위치와 떠오르는 높이 */
-const POSTER_CARDS: { kind: CardKind; x: number; y: number; z: number; flatX: number; edge: string }[] = [
-  { kind: "cost", x: 40, y: 40, z: 20, flatX: CW + GAP, edge: "#c9d3cd" },
-  { kind: "order", x: 0, y: 0, z: 120, flatX: 0, edge: C.greenEdge },
-  { kind: "count", x: -40, y: -40, z: 220, flatX: -(CW + GAP), edge: "#26332c" },
 ];
 
 /* ---------- 날짜 ---------- */
@@ -205,9 +186,8 @@ export function SaasDemo() {
       <Poster reduce={reduce} onCta={() => go("ss-contact")} />
 
       <header className="mx-auto flex max-w-[1200px] flex-wrap items-center justify-between gap-x-4 gap-y-2 px-4 py-4 md:px-6">
-        <p className="inline-flex items-center gap-2 text-[20px] font-extrabold tracking-[-0.02em]">
-          <BrandMark size={24} />
-          {BRAND}
+        <p>
+          <SampleLogo />
         </p>
         <nav aria-label="주요 메뉴" className="-mx-2 flex flex-wrap items-center" style={{ outlineColor: C.ink }}>
           {[
@@ -224,20 +204,20 @@ export function SaasDemo() {
             type="button"
             onClick={() => ask({ type: "도입 문의", plan: "standard", stores: 1 })}
             data-gtm-cta={`${SLUG}_header_contact`}
-            className={`ml-2 rounded-[6px] px-3.5 py-2 text-[15px] font-bold ${focusRing}`}
-            style={{ background: C.ink, color: "#fff", outlineColor: C.greenDeep }}
+            className={`ml-2 rounded-[6px] px-3.5 py-2 text-[15px] font-semibold ${focusRing}`}
+            style={{ background: C.accent, color: "#fff", outlineColor: C.accent }}
           >
             도입 문의
           </button>
         </nav>
       </header>
 
-      {/* 기능 구역: 포스터에서 펼쳐진 카드 세 장이 그대로 이어진다 */}
+      {/* 기능 구역: 앱 화면 카드 세 장 */}
       <section id="ss-features" aria-labelledby="ss-features-title" className="mx-auto max-w-[1200px] scroll-mt-4 px-4 pt-8 md:px-6 md:pt-14">
-        <h2 id="ss-features-title" className="text-[30px] font-extrabold leading-[1.25] tracking-[-0.03em] md:text-[44px]" style={{ wordBreak: "keep-all" }}>
+        <h2 id="ss-features-title" className="text-[30px] font-bold leading-[1.25] tracking-[-0.03em] md:text-[44px]" style={{ wordBreak: "keep-all" }}>
           식당 재고 관리 앱
         </h2>
-        <p className="mt-3 text-[17px] leading-[1.6]" style={{ color: C.muted }}>
+        <p className="mt-3 text-[17px] leading-[1.6]" style={{ color: C.body }}>
           카드 등록 없이 14일 무료로 써 볼 수 있어요.
         </p>
         <div className="mt-10 grid gap-10 md:grid-cols-3 md:gap-6">
@@ -248,12 +228,12 @@ export function SaasDemo() {
               ["cost", "메뉴 원가", "메뉴마다 들어가는 재료를 넣어 두면 입고 단가가 바뀔 때 원가율도 같이 바뀌어요."],
             ] as [CardKind, string, string][]
           ).map(([kind, title, body]) => (
-            <article key={kind} className="flex flex-col items-center md:items-start">
-              <div className="rounded-[16px] p-5" style={{ background: C.soft }}>
-                <AppCard kind={kind} live={false} reduce />
+            <article key={kind} className="flex flex-col">
+              <div className="flex justify-center rounded-[8px] py-6" style={{ background: C.soft }}>
+                <AppCard kind={kind} />
               </div>
-              <h3 className="mt-5 w-full text-[21px] font-bold tracking-[-0.02em]">{title}</h3>
-              <p className="mt-2 w-full text-[16px] leading-[1.65]" style={{ color: C.muted, wordBreak: "keep-all" }}>
+              <h3 className="mt-5 w-full text-[20px] font-bold tracking-[-0.02em]">{title}</h3>
+              <p className="mt-2 w-full text-[16px] leading-[1.65]" style={{ color: C.body, wordBreak: "keep-all" }}>
                 {body}
               </p>
             </article>
@@ -261,27 +241,27 @@ export function SaasDemo() {
         </div>
       </section>
 
-      <Plans billing={billing} setBilling={setBilling} reduce={reduce} onTrial={(plan) => ask({ type: "무료 체험", plan, stores: 1 })} />
+      <Plans billing={billing} setBilling={setBilling} onTrial={(plan) => ask({ type: "무료 체험", plan, stores: 1 })} />
       <Compare />
       <Calculator billing={billing} setBilling={setBilling} reduce={reduce} onAsk={(plan, stores) => ask({ type: stores >= MULTI_FROM ? "다매장 견적" : "도입 문의", plan, stores })} />
 
       <section id="ss-contact" aria-labelledby="ss-contact-title" className="mx-auto mt-20 max-w-[1200px] scroll-mt-4 px-4 md:mt-28 md:px-6">
         <div className="grid gap-8 md:grid-cols-[minmax(0,0.8fr)_minmax(0,1.2fr)] md:gap-12">
           <div>
-            <h2 id="ss-contact-title" className="text-[28px] font-extrabold tracking-[-0.03em] md:text-[36px]">
+            <h2 id="ss-contact-title" className="text-[28px] font-bold tracking-[-0.03em] md:text-[36px]">
               도입 문의
             </h2>
             <dl className="mt-6 space-y-4 text-[16px] leading-[1.6]">
               <div>
-                <dt className="font-bold">상담 시간</dt>
+                <dt className="font-semibold">상담 시간</dt>
                 <dd style={{ color: C.muted }}>평일 10:00~18:00, 점심 12:00~13:00</dd>
               </div>
               <div>
-                <dt className="font-bold">전화</dt>
+                <dt className="font-semibold">전화</dt>
                 <dd style={{ color: C.muted }}>{TEL}</dd>
               </div>
               <div>
-                <dt className="font-bold">채팅</dt>
+                <dt className="font-semibold">채팅</dt>
                 <dd style={{ color: C.muted }}>{KAKAO}</dd>
               </div>
             </dl>
@@ -294,9 +274,8 @@ export function SaasDemo() {
 
       <footer className="mt-20 border-t md:mt-28" style={{ borderColor: C.line, background: C.soft }}>
         <div className="mx-auto max-w-[1200px] px-4 py-10 text-[14px] leading-[1.8] md:px-6" style={{ color: C.muted }}>
-          <p className="inline-flex items-center gap-2 text-[16px] font-extrabold" style={{ color: C.ink }}>
-            <BrandMark size={18} />
-            {BRAND}
+          <p>
+            <SampleLogo size={18} />
           </p>
           <p className="mt-2">주소 {ADDRESS}</p>
           <p>
@@ -317,153 +296,94 @@ export function SaasDemo() {
 
 /* ---------- 포스터 ---------- */
 
+/* 포스터 모션(ms). 사진 다가오기 1600, 문장은 300 늦게 700 동안 12px 올라오며 나타난다(CSS keyframes, 끝 상태가 기본값).
+   스크롤하면 사진만 포스터 높이의 8%까지 느리게 움직인다. 동작 줄이기면 모두 끈다. */
+const HERO_IN_MS = 1600;
+const HERO_TEXT_DELAY_MS = 300;
+const HERO_TEXT_MS = 700;
+const HERO_PARALLAX = 8;
+
+const HERO_CSS = `
+@keyframes ss-hero-in { from { transform: scale(1.06); } }
+@keyframes ss-hero-rise { from { opacity: 0; transform: translateY(12px); } }
+.ss-hero-photo { animation: ss-hero-in ${HERO_IN_MS}ms ${EASE_CSS} both; }
+.ss-hero-rise { animation: ss-hero-rise ${HERO_TEXT_MS}ms ${EASE_CSS} ${HERO_TEXT_DELAY_MS}ms both; }
+@media (prefers-reduced-motion: reduce) { .ss-hero-photo, .ss-hero-rise { animation: none; } }
+`;
+
 function Poster({ reduce, onCta }: { reduce: boolean; onCta: () => void }) {
   const ref = useRef<HTMLElement>(null);
   const { scrollYProgress } = useScroll({ target: ref, offset: ["start start", "end start"] });
-  const p = useTransform(scrollYProgress, (v) => (reduce ? 0 : Math.min(1, v / EXIT_END)));
-  // 기울기가 풀리며 카드가 앞을 보고, 무대는 화면 가운데로 모이며 조금 작아진다
-  const e = useTransform(p, (v) => 1 - (1 - v) * (1 - v));
-  const rx = useTransform(e, (v) => 55 * (1 - v));
-  const rz = useTransform(e, (v) => -45 * (1 - v));
-  const sc = useTransform(e, (v) => 1 - 0.4 * v);
-  const stage = useMotionTemplate`translate(calc(var(--ss-sx) * ${e}), calc(var(--ss-sy) * ${e})) scale(${sc}) rotateX(${rx}deg) rotateZ(${rz}deg)`;
-  const textY = useTransform(p, (v) => `${-v * 40}svh`);
-  const textO = useTransform(p, (v) => Math.max(0, 1 - v * 1.6));
-  const shadowO = useTransform(e, (v) => 1 - v);
+  const photoY = useTransform(scrollYProgress, (v) => `${v * HERO_PARALLAX}%`);
 
   return (
-    <section id="ss-poster" ref={ref} aria-labelledby="ss-poster-title" className="relative" style={{ height: reduce ? undefined : "180svh", background: C.bg }}>
-      <div
-        className={`${reduce ? "relative min-h-svh" : "sticky top-0 h-svh"} overflow-hidden`}
-        style={{ background: `radial-gradient(80% 50% at 74% 58%, ${C.mint} 0%, rgba(229,251,239,0) 70%), ${C.bg}`, color: C.ink }}
-      >
-        {/* 앱 화면 카드 무대 */}
-        <div
-          className="pointer-events-none absolute inset-x-0 bottom-[3svh] flex h-[50svh] items-center justify-center [--ss-sx:0vw] [--ss-sy:-18svh] lg:inset-y-0 lg:left-[50%] lg:right-0 lg:bottom-0 lg:h-auto lg:pt-[10svh] lg:[--ss-sx:-25vw] lg:[--ss-sy:0svh]"
-          role="img"
-          aria-label="재고, 발주, 원가 앱 화면 카드 세 장이 비스듬히 떠 있고 카드 안 재고 막대가 줄었다 채워지는 그림"
-        >
-          <div className="scale-[0.8] sm:scale-100 lg:scale-100 xl:scale-[1.4]">
-            <motion.div className="relative" style={{ width: CW, height: CH, transform: stage, transformStyle: "preserve-3d" }}>
-              {/* 바닥 그림자: 카드가 떠오르면 넓고 옅어진다 */}
-              <motion.div
-                aria-hidden
-                className="absolute"
-                style={{
-                  left: -90,
-                  top: -80,
-                  width: CW + 180,
-                  height: CH + 160,
-                  borderRadius: 40,
-                  background: "radial-gradient(closest-side, rgba(8,60,32,0.26), rgba(8,60,32,0.1) 55%, rgba(8,60,32,0) 100%)",
-                  opacity: shadowO,
-                }}
-                initial={reduce ? false : { scale: 0.7 }}
-                animate={{ scale: 1 }}
-                transition={{ duration: reduce ? 0 : RISE + RISE_GAP * 2, delay: reduce ? 0 : RISE_START, ease: EASE }}
-              />
-              {POSTER_CARDS.map((c, i) => (
-                <PosterCard key={c.kind} card={c} index={i} e={e} reduce={reduce} />
-              ))}
-            </motion.div>
-          </div>
+    <section id="ss-poster" ref={ref} aria-labelledby="ss-poster-title" className="relative flex min-h-[100svh] flex-col overflow-hidden text-white" style={{ background: "#141414" }}>
+      <style>{HERO_CSS}</style>
+      <motion.div aria-hidden className="absolute inset-0" style={{ y: reduce ? 0 : photoY }}>
+        <div className={`absolute inset-0 ${reduce ? "" : "ss-hero-photo"}`}>
+          {/* eslint-disable-next-line @next/next/no-img-element -- 정적 export 라 next/image 최적화를 쓰지 않는다 */}
+          <img
+            src={`${IMG}/hero.jpg`}
+            srcSet={`${IMG}/hero-sm.jpg 960w, ${IMG}/hero.jpg 1920w`}
+            sizes="100vw"
+            alt="사람 없는 식당 주방의 스테인리스 조리대와 냄비, 뒤쪽 흰 타일 벽과 선반"
+            fetchPriority="high"
+            className="absolute inset-0 h-full w-full object-cover"
+            style={{ objectPosition: "50% 55%" }}
+          />
         </div>
+      </motion.div>
+      <div aria-hidden className="absolute inset-0" style={{ background: "linear-gradient(to top, rgba(0,0,0,0.76), rgba(0,0,0,0.4) 50%, rgba(0,0,0,0.25) 78%, rgba(0,0,0,0.5))" }} />
 
-        {/* 로고와 핵심 행동 하나 */}
-        <motion.div className="absolute inset-x-0 top-0 z-10 flex items-center justify-between px-4 pt-4 md:px-12 md:pt-7" style={{ y: textY }}>
-          <p className="inline-flex items-center gap-2 text-[17px] font-extrabold leading-none tracking-[-0.02em]">
-            <BrandMark size={20} />
-            {BRAND}
-          </p>
-          <button
-            type="button"
-            onClick={onCta}
-            aria-label="도입 문의"
-            title="도입 문의"
-            data-gtm-cta={`${SLUG}_poster_cta`}
-            className={`inline-flex h-12 w-12 items-center justify-center rounded-full transition-transform duration-150 active:scale-95 ${focusRing}`}
-            style={{ background: C.ink, color: C.green, outlineColor: C.greenDeep }}
-          >
-            <MessageSquareText size={22} aria-hidden />
-          </button>
-        </motion.div>
+      {/* 왼쪽 위 상호, 오른쪽 위 도입 문의 */}
+      <div className="relative z-10 mx-auto flex w-full max-w-[1200px] items-center justify-between gap-3 px-4 pt-4 md:px-6 lg:pt-7">
+        <p>
+          <SampleLogo light size={18} />
+        </p>
+        <button
+          type="button"
+          onClick={onCta}
+          data-gtm-cta={`${SLUG}_poster_cta`}
+          className={`flex-none rounded-[6px] bg-white px-4 py-2.5 text-[15px] font-semibold transition-colors duration-150 hover:bg-[#f0f0f0] ${focusRing}`}
+          style={{ color: C.ink, outlineColor: "#ffffff" }}
+        >
+          도입 문의
+        </button>
+      </div>
 
-        {/* 큰 문장 */}
-        <motion.div className="relative z-[1] flex h-full flex-col px-4 pt-[13svh] lg:justify-center lg:px-12 lg:pb-[4svh] lg:pt-0" style={{ y: textY, opacity: textO }}>
-          <h1
-            id="ss-poster-title"
-            className="text-[clamp(48px,14.4vw,76px)] font-extrabold leading-[1.08] tracking-[-0.045em] lg:text-[clamp(80px,8.2vw,168px)] lg:leading-[1.02]"
-            style={{ wordBreak: "keep-all" }}
-          >
-            <span className="block">재고 세는 데</span>
-            <span className="block">
-              하루{" "}
-              <span className="px-[0.04em]" style={{ background: `linear-gradient(transparent 52%, ${C.green} 52%, ${C.green} 92%, transparent 92%)` }}>
-                10분
-              </span>
-              이면
-            </span>
-            <span className="block">돼요</span>
+      <div className="relative z-10 mx-auto mt-auto w-full max-w-[1200px] px-4 pb-14 md:px-6 md:pb-20">
+        <div className={reduce ? "" : "ss-hero-rise"}>
+          <h1 id="ss-poster-title" className="max-w-[14em] text-[36px] font-bold md:text-[clamp(40px,5vw,72px)]" style={{ letterSpacing: "-0.03em", lineHeight: 1.2, wordBreak: "keep-all" }}>
+            재고 세는 데 하루 10분이면 돼요
           </h1>
-          <p className="mt-5 text-[16px] font-semibold lg:mt-8 lg:text-[19px]" style={{ color: C.muted }}>
-            식당 재고 관리 앱, 14일 무료 체험
-          </p>
-        </motion.div>
+          <p className="mt-4 text-[16px] font-medium text-white/90 md:text-[18px]">식당 재고 관리 앱, 14일 무료 체험</p>
+        </div>
       </div>
     </section>
   );
 }
 
-function PosterCard({ card, index, e, reduce }: { card: (typeof POSTER_CARDS)[number]; index: number; e: MotionValue<number>; reduce: boolean }) {
-  // 기울어진 바닥 위 겹친 자리에서 펼친 자리(가로 한 줄)로
-  const x = useTransform(e, (v) => card.x + (card.flatX - card.x) * v);
-  const y = useTransform(e, (v) => card.y * (1 - v));
-  return (
-    <motion.div
-      className="absolute inset-0"
-      style={{ x, y, transformStyle: "preserve-3d" }}
-      initial={reduce ? false : { z: 0 }}
-      animate={{ z: card.z }}
-      transition={{ duration: reduce ? 0 : RISE, delay: reduce ? 0 : RISE_START + index * RISE_GAP, ease: EASE }}
-    >
-      {/* 카드 두께: 같은 모양 판을 아래로 세 장 겹친다 */}
-      {[9, 6, 3].map((d) => (
-        <div key={d} aria-hidden className="absolute inset-0 rounded-[18px]" style={{ background: card.edge, transform: `translateZ(${-d}px)` }} />
-      ))}
-      <AppCard kind={card.kind} live={!reduce} reduce={reduce} delay={RISE_START + RISE + index * RISE_GAP + index * 0.9} />
-    </motion.div>
-  );
-}
-
 /* ---------- 앱 화면 카드 ---------- */
 
-function AppCard({ kind, live, reduce, delay = 0 }: { kind: CardKind; live: boolean; reduce: boolean; delay?: number }) {
-  const face =
-    kind === "count"
-      ? { background: `linear-gradient(160deg, #1b2620 0%, ${C.ink} 60%)`, color: "#fff" }
-      : kind === "order"
-        ? { background: `linear-gradient(160deg, #5cf0a2 0%, ${C.green} 45%, #12cf6d 100%)`, color: C.ink }
-        : { background: "linear-gradient(160deg, #ffffff 0%, #f1f5f2 100%)", color: C.ink, boxShadow: `inset 0 0 0 1px ${C.line}` };
-
+/** 기능 소개용 앱 화면. 흰 카드에 1px 선, 막대는 고정 */
+function AppCard({ kind }: { kind: CardKind }) {
   return (
-    <div aria-hidden className="relative overflow-hidden rounded-[18px] p-4 text-left" style={{ width: CW, height: CH, ...face }}>
-      {/* 윗면 하이라이트 한 줄 */}
-      <div className="absolute inset-x-4 top-0 h-px" style={{ background: "linear-gradient(90deg, rgba(255,255,255,0), rgba(255,255,255,0.85), rgba(255,255,255,0))" }} />
-      <div className="flex items-center justify-between text-[11px] font-bold opacity-80">
+    <div aria-hidden className="relative overflow-hidden rounded-[8px] bg-white p-4 text-left" style={{ width: CW, height: CH, color: C.ink, boxShadow: `inset 0 0 0 1px ${C.line}` }}>
+      <div className="flex items-center justify-between text-[11px] font-semibold" style={{ color: C.muted }}>
         <span>{kind === "count" ? "재고 세기" : kind === "order" ? "발주 알림" : "메뉴 원가"}</span>
-        <span style={monoF}>{kind === "count" ? "21:40" : kind === "order" ? "09:10" : "10월"}</span>
+        <span className="tabular-nums">{kind === "count" ? "21:40" : kind === "order" ? "09:10" : "10월"}</span>
       </div>
 
       {kind === "count" && (
         <ul className="mt-3 space-y-[9px]">
           {STOCK.map(([name, qty, v], i) => (
             <li key={name}>
-              <div className="flex items-baseline justify-between text-[12.5px] font-semibold">
+              <div className="flex items-baseline justify-between text-[12.5px] font-medium">
                 <span>{name}</span>
-                <span style={monoF}>{qty}</span>
+                <span className="tabular-nums">{qty}</span>
               </div>
-              <div className="mt-1 h-[6px] rounded-full" style={{ background: "rgba(255,255,255,0.14)" }}>
-                <Bar v={v} color={i === 1 ? "#fff" : C.green} live={live} reduce={reduce} delay={delay + i * 0.35} />
+              <div className="mt-1 h-[6px] rounded-full" style={{ background: C.soft }}>
+                <Bar v={v} color={i === 1 ? C.accent : "#bdbdbd"} />
               </div>
             </li>
           ))}
@@ -472,25 +392,27 @@ function AppCard({ kind, live, reduce, delay = 0 }: { kind: CardKind; live: bool
 
       {kind === "order" && (
         <div className="mt-4">
-          <p className="text-[22px] font-extrabold leading-[1.2] tracking-[-0.03em]">
+          <p className="text-[20px] font-bold leading-[1.25] tracking-[-0.03em]">
             대파
             <br />2단 남았어요
           </p>
-          <div className="mt-4 h-[10px] rounded-full" style={{ background: "rgba(11,20,16,0.14)" }}>
-            <Bar v={0.25} color={C.ink} live={live} reduce={reduce} delay={delay} />
+          <div className="mt-4 h-[8px] rounded-full" style={{ background: C.soft }}>
+            <Bar v={0.25} color={C.accent} />
           </div>
-          <p className="mt-2 text-[11.5px] font-semibold opacity-80">적정 재고 8단</p>
-          <div className="mt-5 space-y-1.5 text-[11.5px] font-semibold">
+          <p className="mt-2 text-[11.5px] font-medium" style={{ color: C.muted }}>
+            적정 재고 8단
+          </p>
+          <div className="mt-5 space-y-1.5 text-[11.5px] font-medium">
             <p className="flex justify-between">
-              <span>거래처</span>
+              <span style={{ color: C.muted }}>거래처</span>
               <span>ㅇㅇ청과</span>
             </p>
             <p className="flex justify-between">
-              <span>발주량</span>
-              <span style={monoF}>6단</span>
+              <span style={{ color: C.muted }}>발주량</span>
+              <span className="tabular-nums">6단</span>
             </p>
           </div>
-          <div className="mt-4 rounded-[10px] py-2 text-center text-[12.5px] font-bold" style={{ background: C.ink, color: "#fff" }}>
+          <div className="mt-4 rounded-[6px] py-2 text-center text-[12.5px] font-semibold" style={{ background: C.accent, color: "#fff" }}>
             발주서 보내기
           </div>
         </div>
@@ -498,18 +420,18 @@ function AppCard({ kind, live, reduce, delay = 0 }: { kind: CardKind; live: bool
 
       {kind === "cost" && (
         <ul className="mt-4 space-y-3">
-          {COST.map(([name, pct], i) => (
+          {COST.map(([name, pct]) => (
             <li key={name}>
-              <div className="flex items-baseline justify-between text-[12.5px] font-semibold">
+              <div className="flex items-baseline justify-between text-[12.5px] font-medium">
                 <span>{name}</span>
-                <span style={monoF}>{pct}%</span>
+                <span className="tabular-nums">{pct}%</span>
               </div>
-              <div className="mt-1 h-[6px] rounded-full" style={{ background: C.line }}>
-                <Bar v={pct / 45} color={C.greenDeep} live={live} reduce={reduce} delay={delay + i * 0.35} soft />
+              <div className="mt-1 h-[6px] rounded-full" style={{ background: C.soft }}>
+                <Bar v={pct / 45} color={pct > 35 ? C.accent : "#bdbdbd"} />
               </div>
             </li>
           ))}
-          <li className="pt-2 text-[11.5px] font-semibold" style={{ color: C.muted }}>
+          <li className="pt-2 text-[11.5px] font-medium" style={{ color: C.muted }}>
             목표 원가율 35%
           </li>
         </ul>
@@ -518,25 +440,23 @@ function AppCard({ kind, live, reduce, delay = 0 }: { kind: CardKind; live: bool
   );
 }
 
-/** 재고 막대. 포스터에서는 8초마다 줄었다가 입고되듯 다시 찬다. 원가 막대(soft)는 조금만 흔들린다 */
-function Bar({ v, color, live, reduce, delay, soft = false }: { v: number; color: string; live: boolean; reduce: boolean; delay: number; soft?: boolean }) {
-  const low = soft ? v * 0.82 : Math.max(0.06, v * 0.3);
-  if (!live || reduce) return <div className="h-full rounded-full" style={{ background: color, transform: `scaleX(${v})`, transformOrigin: "0 50%" }} />;
-  return (
-    <motion.div
-      className="h-full rounded-full"
-      style={{ background: color, originX: 0 }}
-      initial={{ scaleX: v }}
-      animate={{ scaleX: [v, low, low, v] }}
-      transition={{ duration: BAR_LOOP, delay, repeat: Infinity, ease: "easeInOut", times: [0, 0.45, 0.7, 0.82] }}
-    />
-  );
+function Bar({ v, color }: { v: number; color: string }) {
+  return <div className="h-full rounded-full" style={{ background: color, transform: `scaleX(${v})`, transformOrigin: "0 50%" }} />;
 }
 
-function BrandMark({ size }: { size: number }) {
+/* 로고: 메인 사이트와 같은 곰 로고 + 곰파트너(크게) + 업종(작게) */
+function SampleLogo({ light, size = 20 }: { light?: boolean; size?: number }) {
+  const mark = size + 8;
   return (
-    <span className="inline-flex items-center justify-center rounded-[6px]" style={{ width: size + 6, height: size + 6, background: C.green, color: C.ink }}>
-      <Boxes size={size * 0.72} aria-hidden strokeWidth={2.4} />
+    <span className="inline-flex items-center gap-2 leading-none" style={{ color: light ? "#fff" : "#111" }}>
+      {/* eslint-disable-next-line @next/next/no-img-element -- 메인 사이트와 같은 곰 로고 */}
+      <img src="/images/logo-bear.png" alt="" aria-hidden width={mark} height={mark} className="shrink-0" style={{ width: mark, height: mark }} />
+      <span className="flex items-baseline gap-1 whitespace-nowrap">
+        <span className="font-bold tracking-[-0.03em]" style={{ fontSize: size }}>
+          곰파트너
+        </span>
+        <span className="text-[12px] font-semibold opacity-75">재고 관리 서비스 샘플</span>
+      </span>
     </span>
   );
 }
@@ -545,7 +465,7 @@ function BrandMark({ size }: { size: number }) {
 
 function BillingToggle({ billing, setBilling, label }: { billing: Billing; setBilling: (b: Billing) => void; label: string }) {
   return (
-    <div role="group" aria-label={label} className="inline-flex rounded-[10px] p-1" style={{ background: C.soft, boxShadow: `inset 0 0 0 1px ${C.line}` }}>
+    <div role="group" aria-label={label} className="inline-flex rounded-[8px] p-1" style={{ background: C.soft, boxShadow: `inset 0 0 0 1px ${C.line}` }}>
       {(
         [
           ["month", "월 결제"],
@@ -559,8 +479,8 @@ function BillingToggle({ billing, setBilling, label }: { billing: Billing; setBi
             type="button"
             aria-pressed={on}
             onClick={() => setBilling(id)}
-            className={`rounded-[7px] px-3.5 py-2 text-[15px] font-bold transition-colors duration-150 ${focusRing}`}
-            style={{ background: on ? C.ink : "transparent", color: on ? "#fff" : C.muted, outlineColor: C.greenDeep }}
+            className={`rounded-[6px] px-3.5 py-2 text-[15px] font-semibold transition-colors duration-150 ${focusRing}`}
+            style={{ background: on ? C.accent : "transparent", color: on ? "#fff" : C.body, outlineColor: C.accent }}
           >
             {text}
           </button>
@@ -570,7 +490,7 @@ function BillingToggle({ billing, setBilling, label }: { billing: Billing; setBi
   );
 }
 
-/** 숫자가 바뀌면 아래에서 위로 굴러 바뀐다 */
+/** 숫자가 바뀌면 아래에서 위로 굴러 바뀐다. 매장 수 계산 합계에만 쓴다 */
 function Rolling({ text, reduce, className = "" }: { text: string; reduce: boolean; className?: string }) {
   return (
     <span className={`relative inline-flex overflow-hidden align-bottom ${className}`}>
@@ -590,11 +510,11 @@ function Rolling({ text, reduce, className = "" }: { text: string; reduce: boole
   );
 }
 
-function Plans({ billing, setBilling, reduce, onTrial }: { billing: Billing; setBilling: (b: Billing) => void; reduce: boolean; onTrial: (plan: PlanId) => void }) {
+function Plans({ billing, setBilling, onTrial }: { billing: Billing; setBilling: (b: Billing) => void; onTrial: (plan: PlanId) => void }) {
   return (
     <section id="ss-plans" aria-labelledby="ss-plans-title" className="mx-auto mt-20 max-w-[1200px] scroll-mt-4 px-4 md:mt-28 md:px-6">
       <div className="flex flex-wrap items-end justify-between gap-4">
-        <h2 id="ss-plans-title" className="text-[28px] font-extrabold tracking-[-0.03em] md:text-[36px]">
+        <h2 id="ss-plans-title" className="text-[28px] font-bold tracking-[-0.03em] md:text-[36px]">
           요금 안내
         </h2>
         <BillingToggle billing={billing} setBilling={setBilling} label="결제 주기" />
@@ -606,32 +526,32 @@ function Plans({ billing, setBilling, reduce, onTrial }: { billing: Billing; set
           return (
             <article
               key={plan.id}
-              className="flex flex-col rounded-[14px] p-6"
-              style={pick ? { background: C.ink, color: "#fff" } : { background: C.bg, boxShadow: `inset 0 0 0 1px ${C.line}` }}
+              className="flex flex-col rounded-[8px] p-6"
+              style={{ background: C.bg, boxShadow: `inset 0 0 0 1px ${pick ? C.accent : C.line}` }}
             >
               <div className="flex items-center justify-between gap-2">
-                <h3 className="text-[20px] font-extrabold">{plan.name}</h3>
+                <h3 className="text-[20px] font-bold">{plan.name}</h3>
                 {pick && (
-                  <span className="rounded-[4px] px-2 py-0.5 text-[13px] font-bold" style={{ background: C.green, color: C.ink }}>
+                  <span className="rounded-[4px] px-2 py-0.5 text-[13px] font-semibold" style={{ background: C.accent, color: "#fff" }}>
                     추천
                   </span>
                 )}
               </div>
-              <p className="mt-1 text-[15px]" style={{ color: pick ? "rgba(255,255,255,0.75)" : C.muted }}>
+              <p className="mt-1 text-[15px]" style={{ color: C.body }}>
                 {plan.who}
               </p>
               <p className="mt-5 flex items-baseline gap-1.5">
                 <span className="text-[15px] font-semibold">매장당 월</span>
-                <Rolling text={m.toLocaleString("ko-KR")} reduce={reduce} className="text-[38px] font-extrabold tracking-[-0.03em] tabular-nums" />
+                <span className="text-[38px] font-bold tracking-[-0.03em] tabular-nums">{m.toLocaleString("ko-KR")}</span>
                 <span className="text-[17px] font-bold">원</span>
               </p>
-              <p className="mt-1 h-[22px] text-[14px]" style={{ color: pick ? "rgba(255,255,255,0.75)" : C.muted }}>
+              <p className="mt-1 h-[22px] text-[14px]" style={{ color: C.muted }}>
                 {billing === "year" ? `연 ${won(m * 12)} 한 번에 결제, 부가세 별도` : "부가세 별도"}
               </p>
-              <ul className="mt-5 flex-1 space-y-2 text-[15px]">
+              <ul className="mt-5 flex-1 space-y-2 text-[15px]" style={{ color: C.body }}>
                 {plan.points.map((pt) => (
                   <li key={pt} className="flex items-start gap-2">
-                    <Check size={17} aria-hidden className="mt-[3px] flex-none" style={{ color: pick ? C.green : C.greenDeep }} />
+                    <Check size={17} aria-hidden className="mt-[3px] flex-none" style={{ color: C.accent }} />
                     <span>{pt}</span>
                   </li>
                 ))}
@@ -640,8 +560,8 @@ function Plans({ billing, setBilling, reduce, onTrial }: { billing: Billing; set
                 type="button"
                 onClick={() => onTrial(plan.id)}
                 data-gtm-cta={`${SLUG}_plan_trial`}
-                className={`mt-6 rounded-[8px] py-3 text-[16px] font-bold transition-transform duration-100 active:translate-y-[1px] ${focusRing}`}
-                style={pick ? { background: C.green, color: C.ink, outlineColor: C.green } : { background: C.ink, color: "#fff", outlineColor: C.greenDeep }}
+                className={`mt-6 rounded-[6px] py-3 text-[16px] font-semibold transition-transform duration-100 active:translate-y-[1px] ${focusRing}`}
+                style={pick ? { background: C.accent, color: "#fff", outlineColor: C.accent } : { background: C.bg, color: C.ink, boxShadow: `inset 0 0 0 1px ${C.ink}`, outlineColor: C.accent }}
               >
                 14일 무료 체험
               </button>
@@ -655,17 +575,17 @@ function Plans({ billing, setBilling, reduce, onTrial }: { billing: Billing; set
 
 /* ---------- 2. 기능 비교표 ---------- */
 
-function CellView({ v, dark }: { v: Cell; dark?: boolean }) {
+function CellView({ v }: { v: Cell }) {
   if (typeof v === "string") return <span className="text-[14px] font-semibold md:text-[15px]">{v}</span>;
   if (v)
     return (
-      <span className="inline-flex justify-center" style={{ color: dark ? C.ink : C.greenDeep }}>
+      <span className="inline-flex justify-center" style={{ color: C.accent }}>
         <Check size={19} aria-hidden strokeWidth={2.6} />
         <span className="sr-only">포함</span>
       </span>
     );
   return (
-    <span className="inline-flex justify-center" style={{ color: "#a3ada7" }}>
+    <span className="inline-flex justify-center" style={{ color: "#b0b0b0" }}>
       <Minus size={17} aria-hidden />
       <span className="sr-only">없음</span>
     </span>
@@ -679,18 +599,18 @@ function Compare() {
   return (
     <section id="ss-compare" aria-labelledby="ss-compare-title" className="mx-auto mt-16 max-w-[1200px] scroll-mt-4 px-4 md:mt-20 md:px-6">
       <div className="flex flex-wrap items-center justify-between gap-3">
-        <h2 id="ss-compare-title" className="text-[24px] font-extrabold tracking-[-0.03em] md:text-[28px]">
+        <h2 id="ss-compare-title" className="text-[24px] font-bold tracking-[-0.03em] md:text-[28px]">
           요금제별 기능 비교
         </h2>
         <button
           type="button"
           aria-pressed={diffOnly}
           onClick={() => setDiffOnly((d) => !d)}
-          className={`inline-flex items-center gap-2 rounded-[8px] px-3.5 py-2 text-[15px] font-bold ${focusRing}`}
-          style={{ background: diffOnly ? C.green : C.soft, color: C.ink, boxShadow: `inset 0 0 0 1px ${diffOnly ? C.greenEdge : C.line}`, outlineColor: C.greenDeep }}
+          className={`inline-flex items-center gap-2 rounded-[6px] px-3.5 py-2 text-[15px] font-semibold ${focusRing}`}
+          style={{ background: C.bg, color: C.ink, boxShadow: `inset 0 0 0 1px ${diffOnly ? C.accent : C.line}`, outlineColor: C.accent }}
         >
-          <span className="inline-flex h-[18px] w-[18px] items-center justify-center rounded-[4px]" style={{ background: diffOnly ? C.ink : "#fff", boxShadow: `inset 0 0 0 1.5px ${C.ink}` }}>
-            {diffOnly && <Check size={13} aria-hidden strokeWidth={3} color={C.green} />}
+          <span className="inline-flex h-[18px] w-[18px] items-center justify-center rounded-[4px]" style={{ background: diffOnly ? C.accent : "#fff", boxShadow: diffOnly ? undefined : `inset 0 0 0 1.5px ${C.muted}` }}>
+            {diffOnly && <Check size={13} aria-hidden strokeWidth={3} color="#ffffff" />}
           </span>
           다른 점만 보기
         </button>
@@ -710,7 +630,7 @@ function Compare() {
               기능
             </th>
             {PLANS.map((p) => (
-              <th key={p.id} scope="col" className="py-3 text-center font-extrabold" style={p.id === "standard" ? { background: C.mint } : undefined}>
+              <th key={p.id} scope="col" className="py-3 text-center font-bold" style={p.id === "standard" ? { background: C.soft } : undefined}>
                 {p.name}
               </th>
             ))}
@@ -719,7 +639,7 @@ function Compare() {
         {groups.map((g) => (
           <tbody key={g.group}>
             <tr>
-              <th colSpan={4} scope="colgroup" className="pb-2 pt-6 text-[13px] font-bold md:text-[14px]" style={{ color: C.greenDeep, borderBottom: `2px solid ${C.ink}` }}>
+              <th colSpan={4} scope="colgroup" className="pb-2 pt-6 text-[13px] font-bold md:text-[14px]" style={{ color: C.muted, borderBottom: `1px solid ${C.ink}` }}>
                 {g.group}
               </th>
             </tr>
@@ -731,8 +651,8 @@ function Compare() {
                 <td className="py-3 text-center">
                   <CellView v={a} />
                 </td>
-                <td className="py-3 text-center" style={{ background: C.mint }}>
-                  <CellView v={b} dark />
+                <td className="py-3 text-center" style={{ background: C.soft }}>
+                  <CellView v={b} />
                 </td>
                 <td className="py-3 text-center">
                   <CellView v={c} />
@@ -772,13 +692,13 @@ function Calculator({
   const total = per * n;
 
   const set = (v: number) => setStores(Math.max(1, Math.min(STORE_MAX, Math.round(v) || 1)));
-  const stepBtn = `inline-flex h-11 w-11 items-center justify-center rounded-[8px] disabled:opacity-40 ${focusRing}`;
+  const stepBtn = `inline-flex h-11 w-11 items-center justify-center rounded-[6px] disabled:opacity-40 ${focusRing}`;
 
   return (
     <section id="ss-calc" aria-labelledby="ss-calc-title" className="mx-auto mt-20 max-w-[1200px] scroll-mt-4 px-4 md:mt-28 md:px-6">
-      <div className="grid overflow-hidden rounded-[18px] md:grid-cols-[minmax(0,1.1fr)_minmax(0,0.9fr)]" style={{ boxShadow: `inset 0 0 0 1px ${C.line}` }}>
+      <div className="grid overflow-hidden rounded-[8px] md:grid-cols-[minmax(0,1.1fr)_minmax(0,0.9fr)]" style={{ boxShadow: `inset 0 0 0 1px ${C.line}` }}>
         <div className="p-5 md:p-8">
-          <h2 id="ss-calc-title" className="text-[24px] font-extrabold tracking-[-0.03em] md:text-[28px]">
+          <h2 id="ss-calc-title" className="text-[24px] font-bold tracking-[-0.03em] md:text-[28px]">
             매장 수로 요금 계산
           </h2>
 
@@ -787,7 +707,7 @@ function Calculator({
               매장 수
             </label>
             <div className="mt-2 flex items-center gap-2">
-              <button type="button" aria-label="매장 하나 빼기" disabled={n <= 1} onClick={() => set(n - 1)} className={stepBtn} style={{ background: C.soft, outlineColor: C.greenDeep }}>
+              <button type="button" aria-label="매장 하나 빼기" disabled={n <= 1} onClick={() => set(n - 1)} className={stepBtn} style={{ background: C.bg, boxShadow: `inset 0 0 0 1px ${C.line}`, outlineColor: C.accent }}>
                 <Minus size={18} aria-hidden />
               </button>
               <input
@@ -799,9 +719,9 @@ function Calculator({
                 value={n}
                 onChange={(ev) => set(Number(ev.target.value))}
                 className={`h-11 w-20 rounded-[8px] text-center text-[20px] font-bold tabular-nums ${focusRing}`}
-                style={{ boxShadow: `inset 0 0 0 1px ${C.line}`, outlineColor: C.greenDeep, ...monoF }}
+                style={{ boxShadow: `inset 0 0 0 1px ${C.line}`, outlineColor: C.accent }}
               />
-              <button type="button" aria-label="매장 하나 더하기" disabled={n >= STORE_MAX} onClick={() => set(n + 1)} className={stepBtn} style={{ background: C.soft, outlineColor: C.greenDeep }}>
+              <button type="button" aria-label="매장 하나 더하기" disabled={n >= STORE_MAX} onClick={() => set(n + 1)} className={stepBtn} style={{ background: C.bg, boxShadow: `inset 0 0 0 1px ${C.line}`, outlineColor: C.accent }}>
                 <Plus size={18} aria-hidden />
               </button>
               <span className="text-[16px] font-semibold">곳</span>
@@ -814,7 +734,7 @@ function Calculator({
               value={n}
               onChange={(ev) => set(Number(ev.target.value))}
               className={`mt-4 w-full ${focusRing}`}
-              style={{ accentColor: C.greenDeep, outlineColor: C.greenDeep }}
+              style={{ accentColor: C.accent, outlineColor: C.accent }}
             />
           </div>
 
@@ -827,8 +747,8 @@ function Calculator({
                 return (
                   <label
                     key={p.id}
-                    className={`inline-flex items-center gap-2 rounded-[8px] px-3.5 py-2 text-[15px] font-bold has-[:focus-visible]:outline has-[:focus-visible]:outline-[3px] has-[:focus-visible]:outline-offset-2 ${ok ? "cursor-pointer" : "cursor-not-allowed opacity-45"}`}
-                    style={{ background: on ? C.ink : C.soft, color: on ? "#fff" : C.ink, outlineColor: C.greenDeep }}
+                    className={`inline-flex items-center gap-2 rounded-[6px] px-3.5 py-2 text-[15px] font-semibold has-[:focus-visible]:outline has-[:focus-visible]:outline-[3px] has-[:focus-visible]:outline-offset-2 ${ok ? "cursor-pointer" : "cursor-not-allowed opacity-45"}`}
+                    style={{ background: on ? C.accent : C.bg, color: on ? "#fff" : C.ink, boxShadow: on ? undefined : `inset 0 0 0 1px ${C.line}`, outlineColor: C.accent }}
                   >
                     <input type="radio" name="ss-calc-plan" className="sr-only" checked={on} disabled={!ok} onChange={() => setPlan(p.id)} />
                     {p.name}
@@ -844,46 +764,46 @@ function Calculator({
           </div>
         </div>
 
-        <div className="flex flex-col p-5 md:p-8" style={{ background: C.ink, color: "#fff" }} aria-live="polite">
+        <div className="flex flex-col p-5 md:p-8" style={{ background: C.soft, color: C.ink }} aria-live="polite">
           {quote ? (
             <>
-              <p className="text-[15px] font-semibold" style={{ color: "rgba(255,255,255,0.75)" }}>
+              <p className="text-[15px] font-semibold" style={{ color: C.body }}>
                 매장 {n}곳
               </p>
-              <p className="mt-2 text-[28px] font-extrabold leading-[1.3] tracking-[-0.03em]" style={{ wordBreak: "keep-all" }}>
+              <p className="mt-2 text-[28px] font-bold leading-[1.3] tracking-[-0.03em]" style={{ wordBreak: "keep-all" }}>
                 20곳 이상은 따로 견적을 드려요
               </p>
-              <p className="mt-3 text-[15px] leading-[1.6]" style={{ color: "rgba(255,255,255,0.75)" }}>
+              <p className="mt-3 text-[15px] leading-[1.6]" style={{ color: C.body }}>
                 본사 계정, 매장별 권한, POS 연동 범위를 듣고 금액을 맞춰요.
               </p>
             </>
           ) : (
             <>
-              <p className="text-[15px] font-semibold" style={{ color: "rgba(255,255,255,0.75)" }}>
+              <p className="text-[15px] font-semibold" style={{ color: C.body }}>
                 {planById(active).name}, 매장 {n}곳, {billing === "year" ? "연 결제" : "월 결제"}
               </p>
               <p className="mt-2 flex items-baseline gap-1.5">
                 <span className="text-[16px] font-semibold">월</span>
-                <Rolling text={total.toLocaleString("ko-KR")} reduce={reduce} className="text-[44px] font-extrabold tracking-[-0.03em] tabular-nums md:text-[52px]" />
+                <Rolling text={total.toLocaleString("ko-KR")} reduce={reduce} className="text-[44px] font-bold tracking-[-0.03em] tabular-nums md:text-[52px]" />
                 <span className="text-[18px] font-bold">원</span>
               </p>
               <dl className="mt-4 space-y-1.5 text-[15px]">
                 <div className="flex justify-between gap-3">
-                  <dt style={{ color: "rgba(255,255,255,0.75)" }}>매장당 월</dt>
+                  <dt style={{ color: C.body }}>매장당 월</dt>
                   <dd className="font-bold tabular-nums">{won(per)}</dd>
                 </div>
                 <div className="flex justify-between gap-3">
-                  <dt style={{ color: "rgba(255,255,255,0.75)" }}>다매장 할인</dt>
+                  <dt style={{ color: C.body }}>다매장 할인</dt>
                   <dd className="font-bold">{multi ? "10% 적용" : `${MULTI_FROM}곳부터 10%`}</dd>
                 </div>
                 {billing === "year" && (
                   <div className="flex justify-between gap-3">
-                    <dt style={{ color: "rgba(255,255,255,0.75)" }}>연 결제 금액</dt>
+                    <dt style={{ color: C.body }}>연 결제 금액</dt>
                     <dd className="font-bold tabular-nums">{won(total * 12)}</dd>
                   </div>
                 )}
               </dl>
-              <p className="mt-3 text-[13px]" style={{ color: "rgba(255,255,255,0.65)" }}>
+              <p className="mt-3 text-[13px]" style={{ color: C.muted }}>
                 부가세 별도
               </p>
             </>
@@ -892,8 +812,8 @@ function Calculator({
             type="button"
             onClick={() => onAsk(active, n)}
             data-gtm-cta={`${SLUG}_calc_contact`}
-            className={`mt-6 rounded-[8px] py-3 text-[16px] font-bold transition-transform duration-100 active:translate-y-[1px] md:mt-auto ${focusRing}`}
-            style={{ background: C.green, color: C.ink, outlineColor: C.green }}
+            className={`mt-6 rounded-[6px] py-3 text-[16px] font-semibold transition-transform duration-100 active:translate-y-[1px] md:mt-auto ${focusRing}`}
+            style={{ background: C.accent, color: "#fff", outlineColor: C.accent }}
           >
             이 조건으로 문의하기
           </button>
@@ -943,8 +863,8 @@ function ContactForm({ prefill, today, reduce }: { prefill: Prefill; today: Date
     });
   };
 
-  const field = `mt-1.5 w-full rounded-[8px] px-3.5 py-3 text-[16px] ${focusRing}`;
-  const fieldStyle = (bad?: string) => ({ boxShadow: `inset 0 0 0 ${bad ? 2 : 1}px ${bad ? C.error : "#c5cec9"}`, outlineColor: C.greenDeep, background: "#fff" });
+  const field = `mt-1.5 w-full rounded-[6px] px-3.5 py-3 text-[16px] ${focusRing}`;
+  const fieldStyle = (bad?: string) => ({ boxShadow: `inset 0 0 0 ${bad ? 2 : 1}px ${bad ? C.error : "#cfcfcf"}`, outlineColor: C.accent, background: "#fff" });
   const err = (k: string) =>
     errors[k] ? (
       <p id={`ss-f-${k}-err`} className="mt-1.5 flex items-center gap-1.5 text-[14px] font-semibold" style={{ color: C.error }}>
@@ -960,39 +880,39 @@ function ContactForm({ prefill, today, reduce }: { prefill: Prefill; today: Date
         initial={reduce ? false : { clipPath: "inset(0 0 100% 0)" }}
         animate={{ clipPath: "inset(0 0 0% 0)" }}
         transition={{ duration: reduce ? 0 : 0.5, ease: EASE }}
-        className="rounded-[16px] p-6 md:p-8"
-        style={{ background: C.mint, boxShadow: `inset 0 0 0 1px ${C.greenEdge}` }}
+        className="rounded-[6px] p-6 md:p-8"
+        style={{ background: C.soft, boxShadow: `inset 0 0 0 1px ${C.line}` }}
       >
-        <p className="inline-flex items-center gap-2 text-[15px] font-bold" style={{ color: C.greenDeep }}>
+        <p className="inline-flex items-center gap-2 text-[15px] font-semibold" style={{ color: C.accent }}>
           <Check size={18} aria-hidden strokeWidth={2.8} />
           {done.type} 접수 완료
         </p>
-        <p className="mt-2 text-[24px] font-extrabold tracking-[-0.02em] md:text-[28px]">
+        <p className="mt-2 text-[24px] font-bold tracking-[-0.02em] md:text-[28px]">
           {fmtKo(done.reply)}까지 연락드릴게요
         </p>
         <dl className="mt-6 grid gap-x-6 gap-y-3 text-[15px] sm:grid-cols-[auto_1fr]">
-          <dt className="font-bold">접수 번호</dt>
-          <dd className="tabular-nums" style={monoF}>
+          <dt className="font-semibold">접수 번호</dt>
+          <dd className="tabular-nums">
             {done.no}
           </dd>
-          <dt className="font-bold">상호</dt>
+          <dt className="font-semibold">상호</dt>
           <dd>{done.store}</dd>
-          <dt className="font-bold">담당자</dt>
+          <dt className="font-semibold">담당자</dt>
           <dd>
             {done.name}, {done.phone}
           </dd>
-          <dt className="font-bold">담당 창구</dt>
+          <dt className="font-semibold">담당 창구</dt>
           <dd>
             도입 상담팀, {KAKAO} 또는 전화 {TEL}
           </dd>
-          <dt className="font-bold">회신 예정일</dt>
+          <dt className="font-semibold">회신 예정일</dt>
           <dd>{fmtKo(done.reply)} 오후 6시 전</dd>
         </dl>
         <button
           type="button"
           onClick={() => setDone(null)}
-          className={`mt-6 inline-flex items-center gap-1.5 rounded-[8px] px-3.5 py-2 text-[15px] font-bold ${focusRing}`}
-          style={{ background: "#fff", boxShadow: `inset 0 0 0 1px ${C.line}`, outlineColor: C.greenDeep }}
+          className={`mt-6 inline-flex items-center gap-1.5 rounded-[6px] px-3.5 py-2 text-[15px] font-semibold ${focusRing}`}
+          style={{ background: "#fff", boxShadow: `inset 0 0 0 1px ${C.line}`, outlineColor: C.accent }}
         >
           <RotateCcw size={15} aria-hidden />
           다시 쓰기
@@ -1001,17 +921,17 @@ function ContactForm({ prefill, today, reduce }: { prefill: Prefill; today: Date
     );
 
   return (
-    <form onSubmit={submit} noValidate className="rounded-[16px] p-5 md:p-8" style={{ background: C.soft }}>
+    <form onSubmit={submit} noValidate className="rounded-[6px] p-5 md:p-8" style={{ background: C.soft }}>
       <fieldset>
-        <legend className="text-[15px] font-bold">문의 유형</legend>
+        <legend className="text-[15px] font-semibold">문의 유형</legend>
         <div className="mt-2 flex flex-wrap gap-2">
           {(["도입 문의", "무료 체험", "다매장 견적"] as InquiryType[]).map((t) => {
             const on = type === t;
             return (
               <label
                 key={t}
-                className="inline-flex cursor-pointer items-center rounded-[8px] px-3.5 py-2 text-[15px] font-bold has-[:focus-visible]:outline has-[:focus-visible]:outline-[3px] has-[:focus-visible]:outline-offset-2"
-                style={{ background: on ? C.ink : "#fff", color: on ? "#fff" : C.ink, boxShadow: on ? undefined : `inset 0 0 0 1px ${C.line}`, outlineColor: C.greenDeep }}
+                className="inline-flex cursor-pointer items-center rounded-[6px] px-3.5 py-2 text-[15px] font-semibold has-[:focus-visible]:outline has-[:focus-visible]:outline-[3px] has-[:focus-visible]:outline-offset-2"
+                style={{ background: on ? C.accent : "#fff", color: on ? "#fff" : C.ink, boxShadow: on ? undefined : `inset 0 0 0 1px ${C.line}`, outlineColor: C.accent }}
               >
                 <input type="radio" name="ss-type" className="sr-only" checked={on} onChange={() => setType(t)} />
                 {t}
@@ -1023,21 +943,21 @@ function ContactForm({ prefill, today, reduce }: { prefill: Prefill; today: Date
 
       <div className="mt-5 grid gap-4 sm:grid-cols-2">
         <div>
-          <label htmlFor="ss-f-store" className="text-[15px] font-bold">
+          <label htmlFor="ss-f-store" className="text-[15px] font-semibold">
             상호
           </label>
           <input id="ss-f-store" value={store} onChange={(ev) => setStore(ev.target.value)} placeholder="예: ㅇㅇ식당 ㅇㅇ점" aria-invalid={!!errors.store} aria-describedby={errors.store ? "ss-f-store-err" : undefined} className={field} style={fieldStyle(errors.store)} />
           {err("store")}
         </div>
         <div>
-          <label htmlFor="ss-f-name" className="text-[15px] font-bold">
+          <label htmlFor="ss-f-name" className="text-[15px] font-semibold">
             담당자 이름
           </label>
           <input id="ss-f-name" value={name} onChange={(ev) => setName(ev.target.value)} autoComplete="name" aria-invalid={!!errors.name} aria-describedby={errors.name ? "ss-f-name-err" : undefined} className={field} style={fieldStyle(errors.name)} />
           {err("name")}
         </div>
         <div>
-          <label htmlFor="ss-f-phone" className="text-[15px] font-bold">
+          <label htmlFor="ss-f-phone" className="text-[15px] font-semibold">
             휴대폰
           </label>
           <input id="ss-f-phone" type="tel" inputMode="tel" value={phone} onChange={(ev) => setPhone(ev.target.value)} placeholder="010-0000-0000" autoComplete="tel" aria-invalid={!!errors.phone} aria-describedby={errors.phone ? "ss-f-phone-err" : undefined} className={field} style={fieldStyle(errors.phone)} />
@@ -1045,13 +965,13 @@ function ContactForm({ prefill, today, reduce }: { prefill: Prefill; today: Date
         </div>
         <div className="grid grid-cols-[5.5rem_minmax(0,1fr)] gap-3">
           <div>
-            <label htmlFor="ss-f-stores" className="text-[15px] font-bold">
+            <label htmlFor="ss-f-stores" className="text-[15px] font-semibold">
               매장 수
             </label>
             <input id="ss-f-stores" type="number" inputMode="numeric" min={1} value={stores} onChange={(ev) => setStores(ev.target.value)} className={field} style={fieldStyle()} />
           </div>
           <div>
-            <label htmlFor="ss-f-plan" className="text-[15px] font-bold">
+            <label htmlFor="ss-f-plan" className="text-[15px] font-semibold">
               관심 요금제
             </label>
             <select id="ss-f-plan" value={plan} onChange={(ev) => setPlan(ev.target.value as PlanId)} className={field} style={fieldStyle()}>
@@ -1066,7 +986,7 @@ function ContactForm({ prefill, today, reduce }: { prefill: Prefill; today: Date
       </div>
 
       <div className="mt-4">
-        <label htmlFor="ss-f-memo" className="text-[15px] font-bold">
+        <label htmlFor="ss-f-memo" className="text-[15px] font-semibold">
           문의 내용 <span className="font-medium" style={{ color: C.muted }}>(선택)</span>
         </label>
         <textarea id="ss-f-memo" rows={3} value={memo} onChange={(ev) => setMemo(ev.target.value)} placeholder="쓰는 POS, 거래처 수, 궁금한 점" className={`${field} resize-y`} style={fieldStyle()} />
@@ -1082,7 +1002,7 @@ function ContactForm({ prefill, today, reduce }: { prefill: Prefill; today: Date
             aria-invalid={!!errors.agree}
             aria-describedby={errors.agree ? "ss-f-agree-err" : undefined}
             className={`mt-[3px] h-[18px] w-[18px] flex-none ${focusRing}`}
-            style={{ accentColor: C.greenDeep, outlineColor: C.greenDeep }}
+            style={{ accentColor: C.accent, outlineColor: C.accent }}
           />
           <span>
             개인정보 수집, 이용 동의 (필수)
@@ -1097,8 +1017,8 @@ function ContactForm({ prefill, today, reduce }: { prefill: Prefill; today: Date
       <button
         type="submit"
         data-gtm-cta={`${SLUG}_contact_submit`}
-        className={`mt-6 w-full rounded-[8px] py-3.5 text-[17px] font-bold transition-transform duration-100 active:translate-y-[1px] ${focusRing}`}
-        style={{ background: C.ink, color: "#fff", outlineColor: C.greenDeep }}
+        className={`mt-6 w-full rounded-[6px] py-3.5 text-[17px] font-semibold transition-transform duration-100 active:translate-y-[1px] ${focusRing}`}
+        style={{ background: C.accent, color: "#fff", outlineColor: C.accent }}
       >
         문의 접수
       </button>
@@ -1119,17 +1039,17 @@ const FAQS: [string, string][] = [
 function Faq() {
   return (
     <section id="ss-faq" aria-labelledby="ss-faq-title" className="mx-auto mt-20 max-w-[1200px] scroll-mt-4 px-4 md:mt-28 md:px-6">
-      <h2 id="ss-faq-title" className="text-[24px] font-extrabold tracking-[-0.03em] md:text-[28px]">
+      <h2 id="ss-faq-title" className="text-[24px] font-bold tracking-[-0.03em] md:text-[28px]">
         자주 묻는 질문
       </h2>
-      <div className="mt-5" style={{ borderTop: `2px solid ${C.ink}` }}>
+      <div className="mt-5" style={{ borderTop: `1px solid ${C.ink}` }}>
         {FAQS.map(([q, a]) => (
           <details key={q} className="group" style={{ borderBottom: `1px solid ${C.line}` }}>
-            <summary className={`flex cursor-pointer list-none items-center justify-between gap-3 py-4 text-[16px] font-bold md:text-[17px] [&::-webkit-details-marker]:hidden ${focusRing}`} style={{ outlineColor: C.greenDeep }}>
+            <summary className={`flex cursor-pointer list-none items-center justify-between gap-3 py-4 text-[16px] font-semibold md:text-[17px] [&::-webkit-details-marker]:hidden ${focusRing}`} style={{ outlineColor: C.accent }}>
               {q}
               <Plus size={18} aria-hidden className="flex-none transition-transform duration-200 group-open:rotate-45" />
             </summary>
-            <p className="pb-5 pr-8 text-[16px] leading-[1.7]" style={{ color: C.muted }}>
+            <p className="pb-5 pr-8 text-[16px] leading-[1.7]" style={{ color: C.body }}>
               {a}
             </p>
           </details>

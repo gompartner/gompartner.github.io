@@ -2,53 +2,52 @@
 
 import { useEffect, useMemo, useRef, useState, type FormEvent, type KeyboardEvent, type ReactNode } from "react";
 import { motion, useMotionTemplate, useMotionValue, useMotionValueEvent, useScroll, useTransform } from "framer-motion";
-import { Armchair, CalendarCheck, Car, Check, ChevronsLeftRight, ChevronsRight, Clock, Coffee, MapPin, MessageCircle, Phone, ShieldCheck, SquareParking, TrainFront, Truck } from "lucide-react";
-import { Black_Han_Sans } from "@/lib/local-fonts";
+import { Armchair, CalendarCheck, Check, ChevronsLeftRight, ChevronsRight, Clock, Coffee, MapPin, MessageCircle, Phone, ShieldCheck, SquareParking, TrainFront, Truck } from "lucide-react";
 import { useReducedMotionSafe } from "@/hooks/useReducedMotionSafe";
 import { daysAgo, fmtKo, useDemoToday } from "@/hooks/useDemoToday";
 import { maskName, maskPhone } from "@/components/demos/LeadReceivedPanel";
 import { DemoMakerInfo } from "@/components/demos/DemoMakerInfo";
 
-/* 자동차 디테일링 샵 홈페이지 샘플: 가상의 곰파트너디테일링. 상호, 주소, 가격은 모두 가상이다.
+/* 자동차 디테일링 샵 홈페이지 샘플: 가상의 곰파트너 디테일링 샵. 상호, 주소, 가격은 모두 가상이다.
+   첫 화면 사진 출처: Pexels 사진 20131971
 
    국내 디테일링 샵 홈페이지는 대개 이렇게 짜여 있다.
    메뉴: 시공 메뉴(유리막 코팅, 광택, 실내 클리닉, 썬팅, 언더코팅), 시공 과정, 시공 사례(비포 애프터), 예약, 오시는 길, 보증 안내.
    첫 화면은 차 사진 한 장과 전화, 카카오톡 채널, 네이버 예약 버튼. 가격은 차종(경차, 준중형, 중형, SUV, 대형)별 표.
    관용 문구: 당일 예약 가능, 픽업 서비스, 보증서 발급, 입고 전날 확인 문자, 시공 중 차량 보관.
 
-   핵심 모션: 첫 화면의 큰 차가 스크롤에 따라 왼쪽부터 광택 입은 차로 바뀌고(clip-path), 바뀌는 자리에 빛줄기가 스친다.
-   아래 비교 구역은 손으로 밀어 보는 비포 애프터 슬라이더.
+   핵심 모션
+   - 첫 화면(cd-poster): 광택 낸 차 사진 한 장이 화면을 채운다. 들어올 때 사진이 1.06배에서 1.6초 동안 천천히 다가오고,
+     문장과 정보 줄은 0.3초 늦게 12px 아래에서 올라온다(CSS 키프레임, 끝 상태가 기본값). 스크롤하면 사진만 8% 느리게 움직인다.
+   - 그 아래 차 그림이 스크롤에 따라 왼쪽부터 광택 입은 차로 바뀌고(clip-path), 바뀌는 자리에 빛줄기 하나가 지나간다.
+   - 비교 구역은 손으로 밀어 보는 비포 애프터 슬라이더.
+   동작 줄이기면 첫 화면은 멈춘 사진, 차 그림은 애프터 상태로 고정.
 
    상호작용(모두 브라우저 안에서만 돈다. 실제로 보내지 않는다)
    1. 차종 고르기: 경차, 준중형, 중형, SUV, 대형. 차 윤곽과 요금 기준이 바뀐다.
    2. 시공 메뉴 고르기: 여러 개 고르면 합계와 소요 시간(당일, 1박 2일)이 바뀐다.
    3. 비포 애프터 슬라이더: 드래그, 터치, 키보드 좌우. 고른 메뉴에 따라 애프터 쪽이 달라진다.
    4. 예약과 픽업: 날짜, 입고 시간, 픽업 서비스, 이름, 휴대폰, 차량 번호. 접수 완료 화면.
-   5. 시공 과정 진행 바와 오시는 길. 영업시간은 오늘 요일이 진하다.
+   5. 시공 과정 진행 바와 오시는 길. 영업시간은 오늘 요일이 진하다. */
 
-   포스터 첫 화면: 흑연 회색 바탕에 화면 가득 보닛 곡면(광택 그라디언트, 하늘 반사 한 줄, 접힌 선).
-   물방울 30개가 위에서부터 맺히고, 그중 8개가 곡면을 따라 굴러 떨어진다. 청록 반사 띠가 8초 주기로 지나간다.
-   큰 문장은 코팅한 차에 손님이 실제로 보게 되는 장면 하나. 메뉴, 가격은 포스터 아래 기존 화면에 그대로 있다.
-   스크롤하면 와이퍼가 왼쪽 아래를 축으로 대각선으로 쓸고 지나가며 아래 화면 바탕만 남긴다. */
+const IMG = "/images/demo-car-detailing";
 
-const heavyF = { fontFamily: `${Black_Han_Sans.style.fontFamily}, var(--font-sfx), sans-serif`, fontWeight: 400 } as const;
-
-const BRAND = "곰파트너디테일링";
+const BRAND = "곰파트너";
 const ADDRESS = "서울 ㅇㅇ구 ㅇㅇ로 00, 1층";
 const KAKAO = "카카오톡 채널 곰파트너";
 const TEL = "02-000-0000";
 
 const C = {
-  bg: "#15171a",
-  panel: "#1f2227",
-  panel2: "#272b31",
-  line: "#3a3f47",
-  text: "#f4f5f7",
-  muted: "#a7adb6",
-  accent: "#3cc9bf",
-  accentInk: "#0f1416",
-  paint: "#2457a8",
-  error: "#ffb4ab",
+  bg: "#141414",
+  panel: "#1b1b1b",
+  panel2: "#232323",
+  line: "#2e2e2e",
+  text: "#f2f2f2",
+  muted: "#a3a3a3",
+  accent: "#6fa8a2",
+  accentInk: "#141414",
+  paint: "#33507a",
+  error: "#f0a39a",
 };
 
 /* 모션 상수. 차종 바꿀 때 윤곽 모핑 450ms, 진행 바 1400ms, 공통 ease. */
@@ -161,9 +160,9 @@ function CarSvg({ uid, type, look, reduce, className = "" }: { uid: string; type
     <svg viewBox="0 0 800 340" className={className} aria-hidden focusable="false">
       <defs>
         <linearGradient id={`${uid}-paint`} x1="0" y1="0" x2="0" y2="1">
-          <stop offset="0" stopColor="#5a97ee" />
+          <stop offset="0" stopColor="#6f8db5" />
           <stop offset="0.45" stopColor={C.paint} />
-          <stop offset="1" stopColor="#132f66" />
+          <stop offset="1" stopColor="#1c2c45" />
         </linearGradient>
         <linearGradient id={`${uid}-shine`} x1="0" y1="0" x2="1" y2="0">
           <stop offset="0" stopColor="#fff" stopOpacity="0" />
@@ -276,7 +275,7 @@ function CarSvg({ uid, type, look, reduce, className = "" }: { uid: string; type
       {/* 사이드미러, 헤드라이트, 테일램프 */}
       <motion.rect initial={false} animate={{ x: s.xA + 2, y: s.yBelt - 12 }} transition={t} width={18} height={11} rx={4} fill={paint} />
       <motion.ellipse initial={false} animate={{ cx: s.x0 + 32, cy: s.yNose + 14 }} transition={t} rx={20} ry={7} fill={look.after ? "#eaf6ff" : "#c3c7cb"} />
-      <motion.rect initial={false} animate={{ x: s.x1 - 24, y: s.yTrunk + 16 }} transition={t} width={14} height={14} rx={3} fill={look.after ? "#ff6a52" : "#a8574c"} />
+      <motion.rect initial={false} animate={{ x: s.x1 - 24, y: s.yTrunk + 16 }} transition={t} width={14} height={14} rx={3} fill={look.after ? "#c4705f" : "#8f5a50"} />
 
       {/* 바퀴 */}
       {[s.wxF, s.wxR].map((wx, i) => (
@@ -432,10 +431,7 @@ export function CarDetailingDemo() {
 
       <header className="mx-auto flex max-w-[1200px] items-center justify-between gap-3 px-4 py-4 md:px-6">
         <a href="#cd-hero" onClick={(e) => { e.preventDefault(); window.scrollTo({ top: 0, behavior: reduce ? "auto" : "smooth" }); }} className={`inline-flex items-center gap-2 rounded-[4px] ${focusRing}`} style={{ outlineColor: C.accent }}>
-          <Car size={26} aria-hidden style={{ color: C.accent }} />
-          <span className="text-[20px] leading-none" style={heavyF}>
-            {BRAND}
-          </span>
+          <SampleLogo light />
         </a>
         <nav aria-label="주요 메뉴" className="hidden items-center gap-5 text-[15px] font-bold md:flex" style={{ color: C.muted }}>
           {[
@@ -444,7 +440,7 @@ export function CarDetailingDemo() {
             ["cd-process", "시공 과정"],
             ["cd-way", "오시는 길"],
           ].map(([id, label]) => (
-            <button key={id} type="button" onClick={() => go(id)} className={`rounded-[4px] px-1 py-1 hover:text-white ${focusRing}`} style={{ outlineColor: C.accent }}>
+            <button key={id} type="button" onClick={() => go(id)} className={`rounded-[4px] px-1 py-1 hover:text-[#f2f2f2] ${focusRing}`} style={{ outlineColor: C.accent }}>
               {label}
             </button>
           ))}
@@ -453,7 +449,7 @@ export function CarDetailingDemo() {
           type="button"
           onClick={() => go("cd-book")}
           data-gtm-cta="car-detailing_go_book"
-          className={`inline-flex flex-none items-center gap-1.5 rounded-[6px] px-4 py-2 text-[15px] font-extrabold ${focusRing}`}
+          className={`inline-flex flex-none items-center gap-1.5 rounded-[6px] px-4 py-2 text-[15px] font-semibold ${focusRing}`}
           style={{ background: C.accent, color: C.accentInk, outlineColor: C.text }}
         >
           예약하기
@@ -480,7 +476,7 @@ export function CarDetailingDemo() {
                     className={`flex w-full items-start gap-3 rounded-[8px] border px-4 py-3 text-left transition-colors duration-150 ${focusRing} ${included ? "cursor-default" : ""}`}
                     style={{
                       borderColor: on ? C.accent : C.line,
-                      background: on ? "rgba(60,201,191,0.08)" : C.panel,
+                      background: on ? "rgba(111,168,162,0.08)" : C.panel,
                       color: included ? C.muted : C.text,
                       outlineColor: C.accent,
                     }}
@@ -506,11 +502,11 @@ export function CarDetailingDemo() {
             })}
           </ul>
 
-          <aside aria-live="polite" className="rounded-[10px] border p-5 lg:sticky lg:top-4" style={{ borderColor: C.line, background: C.panel2 }}>
+          <aside aria-live="polite" className="rounded-[8px] border p-5 lg:sticky lg:top-4" style={{ borderColor: C.line, background: C.panel2 }}>
             <p className="text-[14px] font-bold" style={{ color: C.muted }}>
               {type} 견적
             </p>
-            <p className="mt-1 text-[34px] leading-none tabular-nums" style={heavyF}>
+            <p className="mt-1 text-[32px] font-bold leading-none tabular-nums">
               {won(sum.total)}
             </p>
             <dl className="mt-4 grid grid-cols-[auto_1fr] gap-x-4 gap-y-1.5 text-[15px]">
@@ -523,7 +519,7 @@ export function CarDetailingDemo() {
               type="button"
               onClick={() => go("cd-book")}
               data-gtm-cta="car-detailing_menu_book"
-              className={`mt-5 inline-flex w-full items-center justify-center gap-1.5 rounded-[6px] px-4 py-3 text-[16px] font-extrabold ${focusRing}`}
+              className={`mt-5 inline-flex w-full items-center justify-center gap-1.5 rounded-[6px] px-4 py-3 text-[16px] font-semibold ${focusRing}`}
               style={{ background: C.accent, color: C.accentInk, outlineColor: C.text }}
             >
               이 메뉴로 예약하기
@@ -582,8 +578,8 @@ export function CarDetailingDemo() {
       </section>
 
       <footer className="mx-auto mt-16 max-w-[1200px] border-t px-4 pb-24 pt-8 text-[14px] leading-[1.8] md:px-6" style={{ borderColor: C.line, color: C.muted }}>
-        <p className="text-[18px]" style={{ ...heavyF, color: C.text }}>
-          {BRAND}
+        <p>
+          <SampleLogo light />
         </p>
         <p>
           {ADDRESS}. 전화 {TEL}. {KAKAO}.
@@ -598,7 +594,7 @@ export function CarDetailingDemo() {
 function SectionTitle({ id, title, side }: { id: string; title: string; side?: string }) {
   return (
     <div className="flex flex-wrap items-baseline justify-between gap-x-4 gap-y-1 border-b pb-3" style={{ borderColor: C.line }}>
-      <h2 id={id} className="text-[28px] leading-none md:text-[34px]" style={heavyF}>
+      <h2 id={id} className="text-[26px] font-bold leading-tight tracking-[-0.02em] md:text-[32px]">
         {title}
       </h2>
       {side && (
@@ -610,249 +606,82 @@ function SectionTitle({ id, title, side }: { id: string; title: string; side?: s
   );
 }
 
-/* ---------- 0. 포스터: 보닛 위 물방울 ---------- */
+/* ---------- 0. 첫 화면: 사진 한 장 ---------- */
 
-/** 보닛 그림 viewBox 1600x620. 뒤쪽 가장자리(앞유리 쪽)가 위로 볼록한 곡선이다. */
-const HOOD_W = 1600;
-const HOOD_H = 620;
-const hoodTop = (x: number) => 100 + 90 * ((x - 800) / 840) ** 2;
-
-type Drop = { x: number; y: number; r: number; order: number; roll: null | { dx: number; dy: number; dur: number; delay: number } };
-
-/** 물방울 30개. 시드 고정 난수라 서버와 브라우저가 같은 자리를 그린다. 휴대폰에서 보이는 가운데에 3분의 2를 둔다. */
-const DROPS: Drop[] = (() => {
-  let seed = 20261023;
-  const rnd = () => {
-    seed = (seed * 1664525 + 1013904223) % 4294967296;
-    return seed / 4294967296;
-  };
-  const out: Drop[] = [];
-  let guard = 0;
-  while (out.length < 30 && guard < 3000) {
-    guard += 1;
-    const wide = out.length % 3 === 0;
-    const x = 800 + (rnd() - 0.5) * (wide ? 1480 : 500);
-    const top = hoodTop(x) + 34;
-    const y = top + rnd() * (600 - top);
-    const depth = (y - top) / (600 - top);
-    const r = 7 + depth * 20 + rnd() * 5;
-    if (out.some((d) => Math.hypot(d.x - x, d.y - y) < (d.r + r) * 2.1)) continue;
-    out.push({ x, y, r, order: 0, roll: null });
-  }
-  // 위에서부터 맺히는 순서
-  [...out].sort((a, b) => a.y - b.y).forEach((d, i) => (d.order = i));
-  // 8개는 곡면을 따라 굴러 떨어진다. 가운데서 멀수록 바깥으로 흐른다.
-  let k = 0;
-  out.forEach((d, i) => {
-    if (i % 4 !== 1 || k >= 8) return;
-    d.roll = { dx: (d.x - 800) * 0.18, dy: HOOD_H + 60 - d.y, dur: 9 + (k % 3) * 1.6, delay: 1.6 + k * 1.2 };
-    k += 1;
-  });
-  return out;
-})();
-
-/* 포스터 모션 상수
-   물방울 맺힘: 위에서부터 40ms 간격, 한 방울 380ms, 살짝 넘쳤다 돌아오는 곡선. 전체 1.6초 안에 끝난다.
-   반사 띠: 6초 동안 지나가고 2초 쉰다(8초 주기).
-   와이퍼: 스크롤 진행 0.04~0.43 에서 왼쪽 아래를 축으로 0도에서 -90도까지 돈다. */
-const BEAD_GAP = 0.04;
-const BEAD_S = 0.38;
-const BEAD_EASE = [0.34, 1.56, 0.64, 1] as const;
-const BAND_S = 6;
-const BAND_REST = 2;
-const ROLL_EASE = [0.55, 0, 0.9, 0.55] as const;
-
-function HoodSvg({ reduce }: { reduce: boolean }) {
-  const hood = `M-40 190 C300 70 1300 70 1640 190 L1640 ${HOOD_H} L-40 ${HOOD_H} Z`;
-  return (
-    <svg viewBox={`0 0 ${HOOD_W} ${HOOD_H}`} preserveAspectRatio="xMidYMin slice" className="absolute inset-0 h-full w-full" aria-hidden focusable="false">
-      <defs>
-        <linearGradient id="cdp-paint" x1="0" y1="0" x2="0" y2={HOOD_H} gradientUnits="userSpaceOnUse">
-          <stop offset="0.12" stopColor="#b8c3cc" />
-          <stop offset="0.2" stopColor="#6b7681" />
-          <stop offset="0.34" stopColor="#353c44" />
-          <stop offset="0.7" stopColor="#1a1e23" />
-          <stop offset="1" stopColor="#0c0e10" />
-        </linearGradient>
-        <radialGradient id="cdp-side" cx="800" cy="120" r="980" gradientUnits="userSpaceOnUse" gradientTransform="matrix(1 0 0 0.62 0 46)">
-          <stop offset="0.45" stopColor="#000" stopOpacity="0" />
-          <stop offset="1" stopColor="#000" stopOpacity="0.62" />
-        </radialGradient>
-        <linearGradient id="cdp-glass" x1="0" y1="0" x2="0" y2="1">
-          <stop offset="0" stopColor="#0b0d10" />
-          <stop offset="0.7" stopColor="#1d2329" />
-          <stop offset="1" stopColor="#2c343b" />
-        </linearGradient>
-        <linearGradient id="cdp-band" x1="0" y1="0" x2="1" y2="0">
-          <stop offset="0" stopColor="#3cc9bf" stopOpacity="0" />
-          <stop offset="0.45" stopColor="#bff3ee" stopOpacity="0.36" />
-          <stop offset="0.55" stopColor="#ffffff" stopOpacity="0.44" />
-          <stop offset="1" stopColor="#3cc9bf" stopOpacity="0" />
-        </linearGradient>
-        <radialGradient id="cdp-shadow" cx="0.5" cy="0.5" r="0.5">
-          <stop offset="0" stopColor="#000" stopOpacity="0.55" />
-          <stop offset="1" stopColor="#000" stopOpacity="0" />
-        </radialGradient>
-        {/* 물방울: 가장자리는 어둡고 아래쪽은 빛이 모여 밝다 */}
-        <radialGradient id="cdp-drop" cx="0.5" cy="0.62" r="0.62" fx="0.5" fy="0.82">
-          <stop offset="0" stopColor="#c4f1ec" stopOpacity="0.7" />
-          <stop offset="0.5" stopColor="#4d6068" stopOpacity="0.5" />
-          <stop offset="1" stopColor="#05080a" stopOpacity="0.9" />
-        </radialGradient>
-        <clipPath id="cdp-clip">
-          <path d={hood} />
-        </clipPath>
-      </defs>
-
-      {/* 바닥 그림자: 보닛 뒤 가장자리 아래로 깔리는 어둠 */}
-      <ellipse cx={800} cy={120} rx={980} ry={150} fill="url(#cdp-shadow)" />
-
-      {/* 앞유리 아랫단과 누워 있는 와이퍼 */}
-      <path d="M-40 190 C300 70 1300 70 1640 190 L1640 110 C1300 -10 300 -10 -40 110 Z" fill="url(#cdp-glass)" />
-      <path d="M360 102 C520 70 640 60 760 58" stroke="#07090b" strokeWidth={9} strokeLinecap="round" fill="none" />
-      <path d="M860 58 C980 60 1100 70 1250 100" stroke="#07090b" strokeWidth={9} strokeLinecap="round" fill="none" />
-      <path d="M362 98 C520 66 640 56 760 54" stroke="#5c666f" strokeWidth={1.5} strokeLinecap="round" fill="none" />
-
-      {/* 보닛 */}
-      <path d={hood} fill="url(#cdp-paint)" />
-      <g clipPath="url(#cdp-clip)">
-        <rect x={-40} y={0} width={1680} height={HOOD_H} fill="url(#cdp-side)" />
-
-        {/* 가운데 볼록한 면과 양쪽 접힌 선. 밝은 선 옆에 어두운 선을 붙여 꺾인 면을 만든다. */}
-        <path d="M560 130 C520 300 460 460 380 640" stroke="#000" strokeOpacity={0.4} strokeWidth={10} fill="none" />
-        <path d="M553 130 C513 300 453 460 373 640" stroke="#fff" strokeOpacity={0.2} strokeWidth={2} fill="none" />
-        <path d="M1040 130 C1080 300 1140 460 1220 640" stroke="#000" strokeOpacity={0.4} strokeWidth={10} fill="none" />
-        <path d="M1047 130 C1087 300 1147 460 1227 640" stroke="#fff" strokeOpacity={0.2} strokeWidth={2} fill="none" />
-
-        {/* 하늘이 비친 하이라이트 한 줄 */}
-        <path d="M-40 262 C300 150 1300 150 1640 262" stroke="#fff" strokeOpacity={0.12} strokeWidth={22} fill="none" />
-        <path d="M-40 262 C300 150 1300 150 1640 262" stroke="#fff" strokeOpacity={0.6} strokeWidth={2.5} fill="none" />
-
-        {/* 천천히 지나가는 반사 띠 */}
-        <motion.g
-          initial={reduce ? false : { x: -420 }}
-          animate={{ x: reduce ? 640 : 1980 }}
-          transition={reduce ? { duration: 0 } : { duration: BAND_S, ease: "linear", repeat: Infinity, repeatDelay: BAND_REST, delay: 0.4 }}
-        >
-          <polygon points="0,60 220,60 -100,640 -380,640" fill="url(#cdp-band)" />
-          <polygon points="200,60 230,60 -20,640 -60,640" fill="#fff" fillOpacity={0.08} />
-        </motion.g>
-
-        {/* 물방울 */}
-        {DROPS.map((d, i) => (
-          <motion.g
-            key={i}
-            initial={reduce ? false : { scale: 0, opacity: 0 }}
-            animate={{ scale: 1, opacity: 1 }}
-            transition={{ duration: reduce ? 0 : BEAD_S, delay: reduce ? 0 : 0.15 + d.order * BEAD_GAP, ease: BEAD_EASE }}
-            style={{ transformOrigin: `${d.x}px ${d.y}px`, transformBox: "view-box" }}
-          >
-            {d.roll && !reduce && (
-              <motion.path
-                d={`M${d.x} ${d.y} L${d.x + d.roll.dx} ${d.y + d.roll.dy}`}
-                stroke="#a9e6e1"
-                strokeWidth={d.r * 0.45}
-                strokeLinecap="round"
-                fill="none"
-                initial={{ pathLength: 0, opacity: 0 }}
-                animate={{ pathLength: [0, 0, 1, 1, 1, 1, 0], opacity: [0, 0, 0.16, 0.12, 0.05, 0, 0] }}
-                transition={{ duration: d.roll.dur, delay: d.roll.delay, repeat: Infinity, times: [0, 0.3, 0.58, 0.6, 0.61, 0.72, 1], ease: [ROLL_EASE, "linear", "linear", "linear", "linear", "linear"] }}
-              />
-            )}
-            <motion.g
-              initial={{ x: 0, y: 0, opacity: 1, scale: 1 }}
-              animate={
-                d.roll && !reduce
-                  ? { x: [0, 0, d.roll.dx, d.roll.dx, 0, 0, 0], y: [0, 0, d.roll.dy, d.roll.dy, 0, 0, 0], opacity: [1, 1, 1, 0, 0, 0, 1], scale: [1, 1, 1.25, 1.25, 0, 0, 1] }
-                  : { x: 0, y: 0, opacity: 1, scale: 1 }
-              }
-              transition={
-                d.roll && !reduce
-                  ? { duration: d.roll.dur, delay: d.roll.delay, repeat: Infinity, times: [0, 0.3, 0.58, 0.6, 0.61, 0.72, 1], ease: ["linear", ROLL_EASE, "linear", "linear", "linear", BEAD_EASE] }
-                  : { duration: 0 }
-              }
-              style={{ transformOrigin: `${d.x}px ${d.y}px`, transformBox: "view-box" }}
-            >
-              <ellipse cx={d.x + d.r * 0.3} cy={d.y + d.r * 0.6} rx={d.r * 1.05} ry={d.r * 0.5} fill="#000" fillOpacity={0.45} />
-              <ellipse cx={d.x} cy={d.y} rx={d.r} ry={d.r * 0.84} fill="url(#cdp-drop)" />
-              <ellipse cx={d.x} cy={d.y + d.r * 0.46} rx={d.r * 0.56} ry={d.r * 0.2} fill="#7fe3d9" fillOpacity={0.55} />
-              <ellipse cx={d.x - d.r * 0.36} cy={d.y - d.r * 0.34} rx={d.r * 0.3} ry={d.r * 0.17} fill="#fff" fillOpacity={0.95} transform={`rotate(-28 ${d.x - d.r * 0.36} ${d.y - d.r * 0.34})`} />
-            </motion.g>
-          </motion.g>
-        ))}
-      </g>
-    </svg>
-  );
-}
+/* 문장과 정보 줄 등장: 0.3초 뒤 0.7초 동안 12px 아래에서 올라온다. 끝 상태가 기본값이라 JS 없이도 보인다. */
+const POSTER_CSS = `
+@keyframes cd-rise { from { opacity: 0; transform: translateY(12px); } }
+.cd-rise { animation: cd-rise 0.7s cubic-bezier(0.22, 1, 0.36, 1) 0.3s both; }
+@media (prefers-reduced-motion: reduce) { .cd-rise { animation: none !important; } }
+`;
 
 function Poster({ reduce, todayHours, onBook }: { reduce: boolean; todayHours: { open: string }; onBook: () => void }) {
   const wrapRef = useRef<HTMLElement>(null);
   const { scrollYProgress } = useScroll({ target: wrapRef, offset: ["start start", "end start"] });
-  // 래퍼 180svh 중 앞 80svh 가 고정 구간(진행 0~0.44). 그 안에서 와이퍼가 다 쓸고 지나간다.
-  const wiper = useTransform(scrollYProgress, [0.04, 0.43], [0, -90]);
-  const wiperT = useMotionTemplate`rotate(${wiper}deg)`;
-  // 다 쓸고 나면 블레이드 뒤 물기 자국을 지운다
-  const sheen = useTransform(wiper, [-72, -90], [1, 0]);
+  const photoY = useTransform(scrollYProgress, (v) => `${v * 8}%`);
 
   return (
-    <section ref={wrapRef} id="cd-poster" aria-labelledby="cd-poster-title" className={reduce ? "relative" : "relative h-[180svh]"}>
+    <section ref={wrapRef} id="cd-poster" aria-labelledby="cd-poster-title" className="relative min-h-[100svh] overflow-hidden" style={{ background: C.bg }}>
+      <style>{POSTER_CSS}</style>
+      <motion.div className="absolute inset-0" style={reduce ? undefined : { y: photoY }}>
+        <motion.div className="absolute inset-0" initial={reduce ? false : { scale: 1.06 }} animate={{ scale: 1 }} transition={{ duration: reduce ? 0 : 1.6, ease: EASE }}>
+          {/* eslint-disable-next-line @next/next/no-img-element -- 정적 export 라 next/image 최적화를 쓰지 않는다 */}
+          <img
+            src={`${IMG}/hero.jpg`}
+            srcSet={`${IMG}/hero-sm.jpg 960w, ${IMG}/hero.jpg 1920w`}
+            sizes="100vw"
+            alt="조명 아래 보닛에 천장 불빛이 비치는 검정 스포츠카 정면"
+            fetchPriority="high"
+            className="absolute inset-0 h-full w-full object-cover"
+            style={{ objectPosition: "50% 68%" }}
+          />
+        </motion.div>
+      </motion.div>
       <div
-        className={`${reduce ? "relative min-h-svh" : "sticky top-0 h-svh"} overflow-hidden`}
-        style={{ background: "radial-gradient(120% 75% at 50% 0%, #3d434a 0%, #2c3036 55%, #25292e 100%)" }}
-      >
-        <div className="absolute inset-x-0 bottom-0 h-[56%] md:h-[54%]">
-          <HoodSvg reduce={reduce} />
-        </div>
+        className="absolute inset-0"
+        style={{ background: "linear-gradient(to bottom, rgba(0,0,0,0.55), rgba(0,0,0,0.15) 25%, rgba(0,0,0,0.2) 50%, rgba(0,0,0,0.8))" }}
+        aria-hidden
+      />
 
-        <div className="relative mx-auto flex max-w-[1440px] items-center justify-between px-4 pt-4 md:px-10 md:pt-7">
-          <p className="inline-flex items-center gap-2 text-[17px] leading-none" style={heavyF}>
-            <Car size={20} aria-hidden style={{ color: C.accent }} />
-            {BRAND}
-          </p>
-          <button
-            type="button"
-            onClick={onBook}
-            aria-label="예약하기"
-            data-gtm-cta="car-detailing_poster_cta"
-            className={`inline-flex h-12 w-12 items-center justify-center rounded-full ${focusRing}`}
-            style={{ background: C.accent, color: C.accentInk, outlineColor: C.text }}
-          >
-            <CalendarCheck size={22} aria-hidden />
-          </button>
-        </div>
+      {/* 상호와 예약 버튼 */}
+      <div className="absolute inset-x-0 top-0 z-10 mx-auto flex max-w-[1200px] items-center justify-between px-4 pt-4 md:px-6 md:pt-6">
+        <p>
+          <SampleLogo light small />
+        </p>
+        <button
+          type="button"
+          onClick={onBook}
+          data-gtm-cta="car-detailing_poster_cta"
+          className={`inline-flex items-center gap-1.5 rounded-[6px] px-4 py-2.5 text-[15px] font-semibold ${focusRing}`}
+          style={{ background: C.accent, color: C.accentInk, outlineColor: C.text }}
+        >
+          <CalendarCheck size={17} aria-hidden />
+          예약하기
+        </button>
+      </div>
 
-        <div className="relative mx-auto max-w-[1440px] px-4 pt-[9svh] md:px-10 md:pt-[5svh]">
+      <div className="relative z-10 mx-auto flex min-h-[100svh] max-w-[1200px] flex-col justify-end px-4 pb-14 pt-28 md:px-6 md:pb-20">
+        <div className={reduce ? undefined : "cd-rise"}>
           <h1
             id="cd-poster-title"
-            className="text-[clamp(52px,14.2vw,64px)] leading-[1.04] tracking-[-0.01em] md:text-[clamp(64px,9.2vw,176px)] md:leading-[1]"
-            style={{ ...heavyF, wordBreak: "keep-all", color: C.text }}
+            className="text-[36px] font-bold leading-[1.2] tracking-[-0.03em] [word-break:keep-all] md:text-[clamp(40px,5vw,72px)]"
+            style={{ color: C.text }}
           >
-            <span className="block">
-              <span className="block md:inline">비 오는 날</span> <span className="block md:inline">물방울이</span>
-            </span>
-            <span className="block" style={{ color: C.accent }}>
-              굴러 떨어져요
-            </span>
+            비 오는 날
+            <br />
+            물방울이 굴러 떨어져요
           </h1>
-          <p className="mt-4 inline-flex items-center gap-1.5 text-[15px] font-bold md:mt-6 md:text-[17px]" style={{ color: "#b7bdc5" }}>
-            <Clock size={16} aria-hidden style={{ color: C.accent }} />
+          <p className="mt-4 inline-flex items-center gap-1.5 text-[15px] font-medium md:mt-5 md:text-[17px]" style={{ color: "#d6d6d6" }}>
+            <Clock size={16} aria-hidden />
             오늘 {todayHours.open === "휴무" ? "휴무" : `${todayHours.open} 영업`}
           </p>
         </div>
-
-        {/* 와이퍼: 왼쪽 아래를 축으로 돌며 포스터를 쓸어 내고 아래 화면 바탕색만 남긴다 */}
-        {!reduce && (
-          <motion.div aria-hidden className="pointer-events-none absolute left-0 top-[calc(100%+16px)] h-[300vmax] w-[300vmax]" style={{ transform: wiperT, transformOrigin: "0 0", background: C.bg }}>
-            <motion.div className="absolute inset-x-0 top-0 h-[90px]" style={{ opacity: sheen, background: "linear-gradient(to bottom, rgba(60,201,191,0.22), rgba(60,201,191,0))" }} />
-            <motion.div className="absolute left-0 top-[-10px] h-[12px] w-[300vmax] rounded-full" style={{ background: "linear-gradient(to bottom, #59636d 0%, #1b1f23 45%, #050607 100%)", opacity: sheen }} />
-          </motion.div>
-        )}
       </div>
     </section>
   );
 }
 
-/* ---------- 1. 첫 화면: 스크롤 광택 와이프 ---------- */
+/* ---------- 1. 스크롤 광택 와이프 ---------- */
 
 function Hero({ type, setType, reduce, todayHours, onBook }: { type: CarType; setType: (t: CarType) => void; reduce: boolean; todayHours: { label: string; open: string }; onBook: () => void }) {
   const sceneRef = useRef<HTMLDivElement>(null);
@@ -863,20 +692,17 @@ function Hero({ type, setType, reduce, todayHours, onBook }: { type: CarType; se
   const rest = useTransform(wipe, (v) => 100 - v);
   const clip = useMotionTemplate`inset(0 ${rest}% 0 0)`;
   const beamLeft = useMotionTemplate`${wipe}%`;
-  const beamOp = useTransform(wipe, [0, 2, 96, 100], [0, 1, 1, 0]);
-  // 다 바뀐 뒤 빛줄기가 한 번 더 스친다.
-  const sweep = useTransform(scrollYProgress, [0.84, 1], [-12, 112]);
-  const sweepLeft = useMotionTemplate`${sweep}%`;
-  const sweepOp = useTransform(scrollYProgress, [0.84, 0.88, 0.97, 1], [0, 0.9, 0.9, 0]);
-  const hint = useTransform(wipe, [0, 8], [1, 0]);
-  const afterLabelOp = useTransform(wipe, [0, 30], [0, 1]);
-  const beforeLabelOp = useTransform(wipe, [70, 100], [1, 0]);
+  const beamOp = useTransform(wipe, (v) => (v <= 0 || v >= 100 ? 0 : Math.min(1, v / 2, (100 - v) / 4)));
+  const clamp01 = (v: number) => Math.max(0, Math.min(1, v));
+  const hint = useTransform(wipe, (v) => clamp01(1 - v / 8));
+  const afterLabelOp = useTransform(wipe, (v) => clamp01(v / 30));
+  const beforeLabelOp = useTransform(wipe, (v) => clamp01((100 - v) / 30));
 
   return (
     <div ref={sceneRef} id="cd-hero" className={reduce ? "" : "h-[220vh]"}>
       <div className={`${reduce ? "" : "sticky top-0 min-h-[100svh]"} mx-auto flex max-w-[1200px] flex-col justify-start px-4 pb-6 pt-3 md:justify-center md:px-6`}>
         <div className="flex flex-wrap items-end justify-between gap-x-6 gap-y-2">
-          <h2 className="text-[40px] leading-[1.05] md:text-[64px]" style={heavyF}>
+          <h2 className="text-[30px] font-bold leading-[1.15] tracking-[-0.02em] md:text-[44px]">
             {BRAND}
           </h2>
           <p className="inline-flex items-center gap-1.5 text-[15px] font-bold" style={{ color: C.muted }}>
@@ -885,7 +711,7 @@ function Hero({ type, setType, reduce, todayHours, onBook }: { type: CarType; se
           </p>
         </div>
 
-        <div className="relative mt-3 overflow-hidden rounded-[12px] md:mt-5" style={{ background: `radial-gradient(ellipse at 50% 100%, ${C.panel2} 0%, ${C.bg} 70%)` }}>
+        <div className="relative mt-3 overflow-hidden rounded-[8px] md:mt-5" style={{ background: `radial-gradient(ellipse at 50% 100%, ${C.panel2} 0%, ${C.bg} 70%)` }}>
           <div className="relative aspect-[800/340] w-full">
             <CarSvg uid="hero-b" type={type} look={BEFORE} reduce={reduce} className="absolute inset-0 h-full w-full" />
             <motion.div className="absolute inset-0" style={{ clipPath: reduce ? "inset(0 0 0 0)" : clip }}>
@@ -898,17 +724,12 @@ function Hero({ type, setType, reduce, todayHours, onBook }: { type: CarType; se
                   className="pointer-events-none absolute inset-y-0 w-[5%] -translate-x-1/2 -skew-x-[14deg]"
                   style={{ left: beamLeft, opacity: beamOp, background: "linear-gradient(90deg, rgba(255,255,255,0) 0%, rgba(255,255,255,0.6) 50%, rgba(255,255,255,0) 100%)", mixBlendMode: "screen" }}
                 />
-                <motion.div
-                  aria-hidden
-                  className="pointer-events-none absolute inset-y-0 w-[12%] -translate-x-1/2 -skew-x-[22deg]"
-                  style={{ left: sweepLeft, opacity: sweepOp, background: "linear-gradient(90deg, rgba(60,201,191,0) 0%, rgba(255,255,255,0.65) 50%, rgba(60,201,191,0) 100%)", mixBlendMode: "screen" }}
-                />
               </>
             )}
-            <motion.div className="absolute left-3 top-3 text-[12px] font-extrabold tracking-wide md:left-4 md:top-4 md:text-[13px]" style={{ color: C.muted, opacity: reduce ? 0 : beforeLabelOp }}>
+            <motion.div className="absolute left-3 top-3 text-[12px] font-semibold tracking-wide md:left-4 md:top-4 md:text-[13px]" style={{ color: C.muted, opacity: reduce ? 0 : beforeLabelOp }}>
               비포
             </motion.div>
-            <motion.div className="absolute right-3 top-3 text-[12px] font-extrabold tracking-wide md:right-4 md:top-4 md:text-[13px]" style={{ color: C.accent, opacity: reduce ? 1 : afterLabelOp }}>
+            <motion.div className="absolute right-3 top-3 text-[12px] font-semibold tracking-wide md:right-4 md:top-4 md:text-[13px]" style={{ color: C.accent, opacity: reduce ? 1 : afterLabelOp }}>
               애프터
             </motion.div>
           </div>
@@ -929,7 +750,7 @@ function Hero({ type, setType, reduce, todayHours, onBook }: { type: CarType; se
                   type="button"
                   aria-pressed={on}
                   onClick={() => setType(t)}
-                  className={`rounded-full border px-3.5 py-1.5 text-[15px] font-bold transition-colors duration-150 ${focusRing}`}
+                  className={`rounded-[6px] border px-3.5 py-1.5 text-[15px] font-semibold transition-colors duration-150 ${focusRing}`}
                   style={{ borderColor: on ? C.accent : C.line, background: on ? C.accent : "transparent", color: on ? C.accentInk : C.text, outlineColor: C.accent }}
                 >
                   {t}
@@ -944,7 +765,7 @@ function Hero({ type, setType, reduce, todayHours, onBook }: { type: CarType; se
             <button type="button" className={`inline-flex items-center gap-1.5 rounded-[6px] border px-4 py-2.5 text-[15px] font-bold ${focusRing}`} style={{ borderColor: C.line, outlineColor: C.accent }} data-gtm-cta="car-detailing_kakao">
               <MessageCircle size={16} aria-hidden /> 카카오톡 채널
             </button>
-            <button type="button" onClick={onBook} data-gtm-cta="car-detailing_hero_book" className={`inline-flex items-center gap-1.5 rounded-[6px] px-4 py-2.5 text-[15px] font-extrabold ${focusRing}`} style={{ background: C.accent, color: C.accentInk, outlineColor: C.text }}>
+            <button type="button" onClick={onBook} data-gtm-cta="car-detailing_hero_book" className={`inline-flex items-center gap-1.5 rounded-[6px] px-4 py-2.5 text-[15px] font-semibold ${focusRing}`} style={{ background: C.accent, color: C.accentInk, outlineColor: C.text }}>
               예약하기
             </button>
           </div>
@@ -989,7 +810,7 @@ function CompareSlider({ type, look, reduce }: { type: CarType; look: Look; redu
     <div className="mt-5">
       <div
         ref={boxRef}
-        className="relative select-none overflow-hidden rounded-[12px]"
+        className="relative select-none overflow-hidden rounded-[8px]"
         style={{ background: `radial-gradient(ellipse at 50% 100%, ${C.panel2} 0%, ${C.bg} 70%)`, touchAction: "pan-y" }}
         onPointerDown={(e) => {
           dragging.current = true;
@@ -1011,10 +832,10 @@ function CompareSlider({ type, look, reduce }: { type: CarType; look: Look; redu
           <motion.div className="absolute inset-0" style={{ clipPath: clip }}>
             <CarSvg uid="cmp-a" type={type} look={look} reduce={reduce} className="absolute inset-0 h-full w-full" />
           </motion.div>
-          <span className="pointer-events-none absolute left-3 top-3 rounded-[4px] px-2 py-0.5 text-[12px] font-extrabold md:left-4 md:top-4 md:text-[13px]" style={{ background: "rgba(21,23,26,0.8)", color: C.text }}>
+          <span className="pointer-events-none absolute left-3 top-3 rounded-[4px] px-2 py-0.5 text-[12px] font-semibold md:left-4 md:top-4 md:text-[13px]" style={{ background: "rgba(21,23,26,0.8)", color: C.text }}>
             비포
           </span>
-          <span className="pointer-events-none absolute right-3 top-3 rounded-[4px] px-2 py-0.5 text-[12px] font-extrabold md:right-4 md:top-4 md:text-[13px]" style={{ background: C.accent, color: C.accentInk }}>
+          <span className="pointer-events-none absolute right-3 top-3 rounded-[4px] px-2 py-0.5 text-[12px] font-semibold md:right-4 md:top-4 md:text-[13px]" style={{ background: C.accent, color: C.accentInk }}>
             애프터
           </span>
           {/* 핸들: 세로 선과 둥근 손잡이. 키보드 좌우로도 움직인다. */}
@@ -1030,7 +851,7 @@ function CompareSlider({ type, look, reduce }: { type: CarType; look: Look; redu
               aria-valuenow={50}
               aria-valuetext="왼쪽이 비포, 오른쪽이 애프터"
               onKeyDown={onKey}
-              className={`absolute left-1/2 top-1/2 flex h-12 w-12 -translate-x-1/2 -translate-y-1/2 cursor-ew-resize items-center justify-center rounded-full border-2 ${focusRing}`}
+              className={`absolute left-1/2 top-1/2 flex h-12 w-12 -translate-x-1/2 -translate-y-1/2 cursor-ew-resize items-center justify-center rounded-full border ${focusRing}`}
               style={{ background: C.bg, borderColor: C.text, color: C.text, outlineColor: C.accent }}
             >
               <ChevronsLeftRight size={22} aria-hidden />
@@ -1125,14 +946,14 @@ function BookingForm({ today, reduce, type, sum }: { today: Date; reduce: boolea
         initial={reduce ? false : { opacity: 0, y: 8 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.3, ease: EASE }}
-        className="mt-5 rounded-[12px] border p-5 md:p-7"
+        className="mt-5 rounded-[8px] border p-5 md:p-7"
         style={{ borderColor: C.accent, background: C.panel }}
         role="status"
       >
         <p className="text-[14px] font-bold" style={{ color: C.accent }}>
           예약 접수 완료
         </p>
-        <p className="mt-1 text-[30px] leading-none tabular-nums md:text-[36px]" style={heavyF}>
+        <p className="mt-1 text-[30px] font-bold leading-none tabular-nums md:text-[34px]">
           {done.no}
         </p>
         <dl className="mt-5 grid grid-cols-[auto_1fr] gap-x-5 gap-y-2 text-[15px] md:grid-cols-[auto_1fr_auto_1fr]">
@@ -1278,7 +1099,7 @@ function BookingForm({ today, reduce, type, sum }: { today: Date; reduce: boolea
           <div>
             <span className={label}>픽업 서비스</span>
             <label className="mt-1.5 flex cursor-pointer items-center gap-2.5 rounded-[6px] border px-3 py-2.5 text-[15px]" style={{ borderColor: pickup ? C.accent : C.line, background: C.panel }}>
-              <input type="checkbox" checked={pickup} onChange={(e) => setPickup(e.target.checked)} className={`h-5 w-5 accent-[#3cc9bf] ${focusRing}`} style={{ outlineColor: C.accent }} />
+              <input type="checkbox" checked={pickup} onChange={(e) => setPickup(e.target.checked)} className={`h-5 w-5 accent-[#6fa8a2] ${focusRing}`} style={{ outlineColor: C.accent }} />
               <Truck size={18} aria-hidden style={{ color: C.accent }} />
               ㅇㅇ구 안 무료 픽업
             </label>
@@ -1295,7 +1116,7 @@ function BookingForm({ today, reduce, type, sum }: { today: Date; reduce: boolea
         </div>
       </div>
 
-      <aside className="rounded-[10px] border p-5" style={{ borderColor: C.line, background: C.panel2 }}>
+      <aside className="rounded-[8px] border p-5" style={{ borderColor: C.line, background: C.panel2 }}>
         <p className="text-[14px] font-bold" style={{ color: C.muted }}>
           예약 내용
         </p>
@@ -1313,7 +1134,7 @@ function BookingForm({ today, reduce, type, sum }: { today: Date; reduce: boolea
             {fmtKo(day)} {slot !== null ? SLOTS[slot] : ""}
           </dd>
         </dl>
-        <button type="submit" data-gtm-cta="car-detailing_reserve" className={`mt-5 inline-flex w-full items-center justify-center rounded-[6px] px-4 py-3 text-[16px] font-extrabold ${focusRing}`} style={{ background: C.accent, color: C.accentInk, outlineColor: C.text }}>
+        <button type="submit" data-gtm-cta="car-detailing_reserve" className={`mt-5 inline-flex w-full items-center justify-center rounded-[6px] px-4 py-3 text-[16px] font-semibold ${focusRing}`} style={{ background: C.accent, color: C.accentInk, outlineColor: C.text }}>
           예약 접수
         </button>
         <p className="mt-3 text-[13px] leading-[1.6]" style={{ color: C.muted }}>
@@ -1356,20 +1177,16 @@ function ProcessBar({ reduce }: { reduce: boolean }) {
             const on = i === active;
             return (
               <li key={s.name} className="flex flex-col items-center">
-                <motion.button
+                <button
                   type="button"
                   aria-pressed={on}
                   aria-label={`${i + 1}단계 ${s.name}`}
                   onClick={() => setActive(i)}
-                  className={`flex h-8 w-8 items-center justify-center rounded-full border-2 text-[13px] font-extrabold ${focusRing}`}
+                  className={`flex h-8 w-8 items-center justify-center rounded-full border text-[13px] font-semibold ${focusRing}`}
                   style={{ borderColor: on ? C.accent : C.line, background: on ? C.accent : C.bg, color: on ? C.accentInk : C.text, outlineColor: C.accent }}
-                  initial={reduce ? false : { scale: 0.6, opacity: 0.4 }}
-                  whileInView={{ scale: 1, opacity: 1 }}
-                  viewport={{ once: true, amount: 0.6 }}
-                  transition={{ duration: reduce ? 0 : 0.3, delay: reduce ? 0 : (BAR_MS / 1000) * (i / 5) + 0.05, ease: EASE }}
                 >
                   {i + 1}
-                </motion.button>
+                </button>
                 <span className="mt-2 text-center text-[13px] font-bold leading-tight sm:text-[15px]" style={{ color: on ? C.text : C.muted }}>
                   {s.name}
                 </span>
@@ -1381,7 +1198,7 @@ function ProcessBar({ reduce }: { reduce: boolean }) {
           })}
         </ol>
       </div>
-      <div className="mt-5 rounded-[10px] border p-5" style={{ borderColor: C.line, background: C.panel }} aria-live="polite">
+      <div className="mt-5 rounded-[8px] border p-5" style={{ borderColor: C.line, background: C.panel }} aria-live="polite">
         <p className="text-[18px] font-bold">
           {active + 1}단계 {step.name} <span style={{ color: C.accent }}>{step.time}</span>
         </p>
@@ -1400,7 +1217,7 @@ function WayAndHours({ today }: { today: Date }) {
   return (
     <div className="mt-5 grid gap-6 lg:grid-cols-[minmax(0,1fr)_380px]">
       {/* 약도: 큰길, 역, 매장 */}
-      <div className="overflow-hidden rounded-[12px] border" style={{ borderColor: C.line, background: C.panel }}>
+      <div className="overflow-hidden rounded-[8px] border" style={{ borderColor: C.line, background: C.panel }}>
         <svg viewBox="0 0 640 300" className="h-auto w-full" role="img" aria-label="약도. ㅇㅇ역 3번 출구에서 큰길을 따라 걸어오면 왼쪽에 매장이 있다.">
           <rect width="640" height="300" fill={C.panel} />
           <path d="M0 200 L640 160" stroke={C.line} strokeWidth="34" />
@@ -1418,7 +1235,7 @@ function WayAndHours({ today }: { today: Date }) {
             3번 출구
           </text>
           <rect x="190" y="112" width="120" height="56" rx="6" fill={C.accent} />
-          <text x="250" y="137" fill={C.accentInk} fontSize="15" fontWeight="800" textAnchor="middle">
+          <text x="250" y="137" fill={C.accentInk} fontSize="15" fontWeight="700" textAnchor="middle">
             {BRAND}
           </text>
           <text x="250" y="156" fill={C.accentInk} fontSize="12" fontWeight="700" textAnchor="middle">
@@ -1452,7 +1269,7 @@ function WayAndHours({ today }: { today: Date }) {
         </ul>
       </div>
 
-      <div className="rounded-[12px] border p-5" style={{ borderColor: C.line, background: C.panel2 }}>
+      <div className="rounded-[8px] border p-5" style={{ borderColor: C.line, background: C.panel2 }}>
         <p className="inline-flex items-center gap-1.5 text-[16px] font-bold">
           <Clock size={18} aria-hidden style={{ color: C.accent }} /> 영업시간
         </p>
@@ -1461,11 +1278,11 @@ function WayAndHours({ today }: { today: Date }) {
             {HOURS.map((h) => {
               const isToday = h.days.includes(dow);
               return (
-                <tr key={h.label} className="border-t" style={{ borderColor: C.line, color: isToday ? C.text : C.muted, fontWeight: isToday ? 800 : 400 }}>
+                <tr key={h.label} className="border-t" style={{ borderColor: C.line, color: isToday ? C.text : C.muted, fontWeight: isToday ? 700 : 400 }}>
                   <th scope="row" className="py-2.5 text-left font-[inherit]">
                     {h.label}
                     {isToday && (
-                      <span className="ml-2 rounded-[4px] px-1.5 py-0.5 text-[12px] font-extrabold" style={{ background: C.accent, color: C.accentInk }}>
+                      <span className="ml-2 rounded-[4px] px-1.5 py-0.5 text-[12px] font-semibold" style={{ background: C.accent, color: C.accentInk }}>
                         오늘
                       </span>
                     )}
@@ -1483,11 +1300,25 @@ function WayAndHours({ today }: { today: Date }) {
           <a href={`tel:${TEL.replace(/-/g, "")}`} className={`inline-flex items-center justify-center gap-1.5 rounded-[6px] border px-4 py-2.5 text-[15px] font-bold ${focusRing}`} style={{ borderColor: C.line, outlineColor: C.accent }}>
             <Phone size={16} aria-hidden /> {TEL}
           </a>
-          <button type="button" data-gtm-cta="car-detailing_kakao_way" className={`inline-flex items-center justify-center gap-1.5 rounded-[6px] px-4 py-2.5 text-[15px] font-extrabold ${focusRing}`} style={{ background: C.accent, color: C.accentInk, outlineColor: C.text }}>
+          <button type="button" data-gtm-cta="car-detailing_kakao_way" className={`inline-flex items-center justify-center gap-1.5 rounded-[6px] px-4 py-2.5 text-[15px] font-semibold ${focusRing}`} style={{ background: C.accent, color: C.accentInk, outlineColor: C.text }}>
             <MessageCircle size={16} aria-hidden /> {KAKAO}
           </button>
         </div>
       </div>
     </div>
+  );
+}
+
+/* 로고: 메인 사이트와 같은 곰 로고 + 곰파트너(크게) + 업종(작게) */
+function SampleLogo({ light, small }: { light?: boolean; small?: boolean }) {
+  return (
+    <span className="inline-flex items-center gap-2" style={{ color: light ? "#ffffff" : "#111111" }}>
+      {/* eslint-disable-next-line @next/next/no-img-element -- 메인 사이트와 같은 곰 로고 */}
+      <img src="/images/logo-bear.png" alt="" aria-hidden width={28} height={28} className={small ? "h-6 w-6 shrink-0" : "h-7 w-7 shrink-0"} />
+      <span className="flex items-baseline gap-1 whitespace-nowrap">
+        <span className={`${small ? "text-[18px]" : "text-[20px]"} font-bold leading-none tracking-[-0.03em]`}>곰파트너</span>
+        <span className="text-[12px] font-semibold leading-none opacity-75">디테일링 샘플</span>
+      </span>
+    </span>
   );
 }
