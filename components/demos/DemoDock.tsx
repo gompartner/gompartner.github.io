@@ -206,6 +206,8 @@ function bottomBarHeight(own: HTMLElement | null): number {
       if (own?.contains(el)) continue;
       for (let n: HTMLElement | null = el as HTMLElement; n && n !== document.body; n = n.parentElement) {
         if (getComputedStyle(n).position !== "fixed") continue;
+        // 담기 알림 같은 잠깐 뜨는 띠는 피하지 않는다
+        if (n.closest('[role="status"], [role="alert"], [aria-live]')) break;
         // 화면 아래에 붙은 넓은 바만 친다(떠 있는 작은 버튼, 표의 고정 칸은 빼고)
         const r = n.getBoundingClientRect();
         if (r.bottom >= vh - 40 && r.width >= window.innerWidth * 0.6) top = Math.min(top, r.top);
@@ -229,9 +231,23 @@ function DockButtons({ guide, projectId }: { guide: { fresh: boolean; onClick: (
   const [lift, setLift] = useState(0);
   useEffect(() => {
     let frame = 0;
+    // 하단 바 높이가 0.8초 넘게 그대로일 때만 버튼을 옮긴다. 알림이 잠깐 떴다 사라질 때 버튼이 오르내리지 않게
+    let seen = -1;
+    let since = 0;
+    let settle = 0;
     const sync = () => {
       cancelAnimationFrame(frame);
-      frame = requestAnimationFrame(() => setLift(bottomBarHeight(own.current)));
+      frame = requestAnimationFrame(() => {
+        const h = bottomBarHeight(own.current);
+        if (h !== seen) {
+          seen = h;
+          since = performance.now();
+          window.clearTimeout(settle);
+          settle = window.setTimeout(sync, 850);
+          return;
+        }
+        if (performance.now() - since >= 800) setLift(h);
+      });
     };
     sync();
     const timer = window.setInterval(sync, 1000);
@@ -239,6 +255,7 @@ function DockButtons({ guide, projectId }: { guide: { fresh: boolean; onClick: (
     window.addEventListener("resize", sync);
     return () => {
       cancelAnimationFrame(frame);
+      window.clearTimeout(settle);
       window.clearInterval(timer);
       window.removeEventListener("scroll", sync);
       window.removeEventListener("resize", sync);
