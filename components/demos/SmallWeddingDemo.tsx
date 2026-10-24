@@ -26,7 +26,7 @@ import { DemoMakerInfo } from "@/components/demos/DemoMakerInfo";
    핵심 모션: 섹션 와이프(다음 섹션이 아래에서 clip-path로 덮으며 올라옴, 앞 섹션은 sticky로 뒤에 남음), D-day 숫자 롤링.
 
    상호작용(모두 브라우저 안에서만 돈다. 실제로 보내지 않는다)
-   1. 날짜와 시간 고르기: 12개월 달력(토, 일 예약, 마감 표시)과 시간대 4개. 고르면 D-day가 롤링하고 홀 그림의 햇빛 방향이 바뀐다.
+   1. 날짜와 시간 고르기: 12개월 달력(토, 일 예약, 마감 표시)과 시간대 4개. 고르면 D-day가 롤링하고 그 시간대의 홀 사진으로 바뀐다.
    2. 하객 수에 따른 홀 배치: 슬라이더(30~120)에 맞춰 8인 원형 테이블이 평면도에 늘고 줄며, 야외 정원 사용을 켤 수 있다.
    3. 패키지 견적: 대관(시간대별), 식사(코스 또는 뷔페 x 하객 수), 꽃장식(기본, 풍성), 음향과 사진 추가. 합계 표시.
    4. 상담신청과 방문 예약: 두 사람 이름, 휴대폰, 희망 예식일, 방문 희망일. 완료 화면에 접수번호, 담당 창구, 회신 예정일.
@@ -77,16 +77,16 @@ const HERO_MS = 1600; // 사진이 scale 1.06 -> 1 로 다가오는 시간
 const RISE_MS = 700; // 문장과 정보 줄이 아래 12px 에서 올라오는 시간
 const RISE_DELAY_MS = 300; // 문장 등장 지연
 const ROLL_MS = 650; // 숫자 롤링
-const LIGHT_MS = 800; // 홀 그림의 햇빛 방향 전환
+const LIGHT_MS = 800; // 홀 사진의 시간대 전환
 const TABLE_MS = 320; // 테이블 하나 등장
 const TABLE_STAGGER_MS = 60; // 테이블 등장 간격
 const WIPE_RADIUS = 8; // 와이프 윗모서리 둥글기(px)
 
 const SLOTS = [
-  { time: "11:00", rent: 2200000, note: "오전 햇빛" },
-  { time: "13:00", rent: 3000000, note: "가장 먼저 마감" },
-  { time: "15:00", rent: 2600000, note: "오후 햇빛" },
-  { time: "17:00", rent: 1500000, note: "노을과 조명" },
+  { time: "11:00", rent: 2200000, note: "오전 햇빛", img: "hall-1100" },
+  { time: "13:00", rent: 3000000, note: "가장 먼저 마감", img: "hall-1300" },
+  { time: "15:00", rent: 2600000, note: "오후 햇빛", img: "hall-1500" },
+  { time: "17:00", rent: 1500000, note: "노을과 조명", img: "hall-1700" },
 ];
 const MEALS = [
   { id: "course", name: "코스", price: 85000, desc: "전채, 수프, 메인, 디저트 4코스" },
@@ -101,14 +101,6 @@ const EXTRAS = [
   { id: "photo", name: "본식 스냅 사진", price: 800000 },
 ];
 const GARDEN_FEE = 300000;
-
-/* 시간대별 햇빛. shift는 창에서 바닥으로 뻗는 빛의 가로 이동, spread는 바닥에서 퍼지는 폭 */
-const LIGHT = [
-  { shift: 70, spread: 24, color: "#fff6d2", alpha: 0.5, glass: "#dfe9ee" },
-  { shift: 12, spread: 10, color: "#fffbea", alpha: 0.42, glass: "#d9e6f0" },
-  { shift: -50, spread: 24, color: "#ffeec4", alpha: 0.5, glass: "#e6e1cf" },
-  { shift: -120, spread: 60, color: "#f6c58f", alpha: 0.66, glass: "#efb77d" },
-];
 
 const DAY_MS = 86400000;
 const DOW = ["일", "월", "화", "수", "목", "금", "토"];
@@ -503,46 +495,25 @@ function Roll({ text, reduce }: { text: string; reduce: boolean }) {
   );
 }
 
-/* 홀 그림. 뒤쪽 창 세 개로 들어오는 빛이 시간대에 따라 방향과 색을 바꾼다 */
+/* 홀 사진. 같은 홀을 시간대마다 찍은 사진 네 장을 겹쳐 두고 고른 시간대만 보인다 */
 function HallScene({ slot, reduce }: { slot: number; reduce: boolean }) {
-  const L = LIGHT[slot];
-  const tr = reduce ? { duration: 0 } : { duration: LIGHT_MS / 1000, ease: EASE };
-  const windows = [60, 200, 340];
-  const beam = (x: number) => `${x},200 ${x + 80},200 ${x + 80 + L.shift + L.spread},298 ${x + L.shift - L.spread},298`;
   return (
     <figure className="mt-6">
-      <svg viewBox="0 0 480 300" role="img" aria-label={`${SLOTS[slot].time} 예식 때 홀에 드는 빛`} className="block w-full rounded-[6px] border" style={{ borderColor: C.line }}>
-        <rect width="480" height="210" fill="#f1f0ec" />
-        <rect y="210" width="480" height="90" fill="#e4e2dc" />
-        <rect y="208" width="480" height="3" fill="#cfcbc2" />
-        {windows.map((x) => (
-          <g key={x}>
-            <path d={`M${x},200 V90 a40,40 0 0 1 80,0 V200 Z`} fill="#cfcbc2" />
-            <motion.path d={`M${x + 6},200 V92 a34,34 0 0 1 68,0 V200 Z`} initial={false} animate={{ fill: L.glass }} transition={tr} />
-            <line x1={x + 40} y1="60" x2={x + 40} y2="200" stroke="#cfcbc2" strokeWidth="3" />
-            <line x1={x + 6} y1="130" x2={x + 74} y2="130" stroke="#cfcbc2" strokeWidth="3" />
-          </g>
+      <div className="relative aspect-[16/10] overflow-hidden rounded-[6px] border" style={{ borderColor: C.line, background: C.ivoryDeep }}>
+        {SLOTS.map((s, i) => (
+          <div key={s.time}>
+            {/* eslint-disable-next-line @next/next/no-img-element -- 정적 export 라 next/image 최적화를 쓰지 않는다 */}
+            <img
+              src={`${IMG}/${s.img}.jpg`}
+              alt={i === slot ? `${s.time} 예식 때 아치창으로 빛이 드는 홀` : ""}
+              aria-hidden={i !== slot}
+              loading="lazy"
+              className="absolute inset-0 h-full w-full object-cover"
+              style={{ opacity: i === slot ? 1 : 0, transition: reduce ? "none" : `opacity ${LIGHT_MS}ms ease` }}
+            />
+          </div>
         ))}
-        {windows.map((x) => (
-          <motion.polygon key={`b${x}`} initial={false} animate={{ points: beam(x), fill: L.color, fillOpacity: L.alpha }} transition={tr} />
-        ))}
-        {/* 단상 아치와 꽃 */}
-        <path d="M200,200 V120 a40,40 0 0 1 80,0 V200" fill="none" stroke={C.olive} strokeWidth="5" strokeLinecap="round" />
-        {[196, 212, 232, 248, 268, 284].map((cx, i) => (
-          <circle key={cx} cx={cx} cy={[150, 116, 92, 92, 116, 150][i]} r="7" fill={C.paper} stroke={C.sage} strokeWidth="2" />
-        ))}
-        <rect x="170" y="196" width="140" height="10" rx="2" fill="#bdb8ad" />
-        {/* 테이블 */}
-        {[70, 150, 330, 410].map((cx) => (
-          <g key={cx}>
-            <ellipse cx={cx} cy="252" rx="34" ry="12" fill={C.paper} stroke="#cfcbc2" />
-            <ellipse cx={cx} cy="246" rx="5" ry="3" fill={C.sage} />
-          </g>
-        ))}
-        {/* 샹들리에 */}
-        <line x1="240" y1="0" x2="240" y2="34" stroke="#bdb8ad" strokeWidth="2" />
-        <path d="M212,46 a28,14 0 0 0 56,0 Z" fill="#bdb8ad" />
-      </svg>
+      </div>
       <figcaption className="mt-2 text-[14px]" style={{ color: C.muted }}>
         {SLOTS[slot].time} 예식, {SLOTS[slot].note}. 창은 남서쪽이라 오후에 빛이 깊게 들어와요.
       </figcaption>

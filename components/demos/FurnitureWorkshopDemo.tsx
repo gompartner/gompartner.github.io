@@ -30,7 +30,7 @@ import { DemoMakerInfo } from "@/components/demos/DemoMakerInfo";
    들어올 때 사진이 1.06배에서 1배로 1.6초 동안 다가오고, 문장은 0.3초 뒤 12px 아래에서 올라온다(CSS keyframes).
    스크롤하면 사진만 조금 느리게 움직인다. 작업 과정의 점은 움직이지 않고, 움직임은 도면 선 그리기에 모았다.
 
-   사진 출처: Pexels 사진 5974285 */
+   사진 출처: Pexels 사진 5974285, 완성한 가구 piece-(가구 id)는 AI 생성(Z-Image-Turbo) */
 
 const SLUG = "furniture-workshop";
 const BRAND = "곰파트너";
@@ -108,6 +108,14 @@ const FINISHES = [
 type FinishId = (typeof FINISHES)[number]["id"];
 
 type Dims = { w: number; d: number; h: number };
+
+/** 완성한 가구 사진. 사진 파일은 piece-(가구 id).jpg */
+const PIECES: { kind: KindId; wood: WoodId; finish: FinishId; dims: Dims; alt: string }[] = [
+  { kind: "table", wood: "oak", finish: "oil", dims: { w: 1800, d: 850, h: 720 }, alt: "창가 거실에 놓인 오크 원목 식탁과 의자" },
+  { kind: "shelf", wood: "redpine", finish: "oil", dims: { w: 1200, d: 300, h: 1800 }, alt: "책과 화분을 올린 레드파인 원목 책장" },
+  { kind: "bench", wood: "walnut", finish: "oil", dims: { w: 1400, d: 400, h: 450 }, alt: "현관 옆에 둔 월넛 원목 벤치" },
+  { kind: "tv", wood: "ash", finish: "varnish", dims: { w: 2000, d: 400, h: 450 }, alt: "거실 벽 앞에 놓인 애쉬 원목 TV 선반" },
+];
 
 /** 가구에 들어가는 판재 양(m2). 실제 공방은 재단표로 세지만 여기서는 부재별 면적을 더한다. */
 function boardArea(kind: KindId, { w, d, h }: Dims) {
@@ -764,8 +772,32 @@ export function FurnitureWorkshopDemo() {
         </aside>
       </main>
 
+      {/* 완성한 가구 */}
+      <section id="fw-pieces" aria-labelledby="fw-pieces-title" className="mx-auto max-w-[1200px] scroll-mt-4 border-t px-4 pt-12 md:px-6 md:pt-16" style={{ borderColor: C.line }}>
+        <h2 id="fw-pieces-title" className="text-[24px] font-bold md:text-[28px]">
+          완성한 가구
+        </h2>
+        <ul className="mt-6 grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
+          {PIECES.map((p) => (
+            <li key={p.kind}>
+              <div className="aspect-[4/5] overflow-hidden rounded-[4px]" style={{ background: C.paper }}>
+                {/* eslint-disable-next-line @next/next/no-img-element -- 정적 export 라 next/image 최적화를 쓰지 않는다 */}
+                <img src={`${IMG}/piece-${p.kind}.jpg`} alt={p.alt} loading="lazy" className="h-full w-full object-cover" />
+              </div>
+              <p className="mt-3 text-[18px] font-bold">{KINDS.find((k) => k.id === p.kind)?.name}</p>
+              <p className="mt-1 text-[15px]">
+                {WOODS.find((w) => w.id === p.wood)?.name}, {FINISHES.find((f) => f.id === p.finish)?.name} 마감
+              </p>
+              <p className="mt-0.5 text-[14px] tabular-nums" style={{ color: C.soft }}>
+                폭 {p.dims.w} 깊이 {p.dims.d} 높이 {p.dims.h}mm
+              </p>
+            </li>
+          ))}
+        </ul>
+      </section>
+
       {/* 목재 안내 */}
-      <section id="fw-wood-guide" aria-labelledby="fw-wood-guide-title" className="mx-auto max-w-[1200px] scroll-mt-4 border-t px-4 pt-12 md:px-6 md:pt-16" style={{ borderColor: C.line }}>
+      <section id="fw-wood-guide" aria-labelledby="fw-wood-guide-title" className="mx-auto max-w-[1200px] scroll-mt-4 px-4 pt-12 md:px-6 md:pt-16">
         <h2 id="fw-wood-guide-title" className="text-[24px] font-bold md:text-[28px]">
           목재 안내
         </h2>

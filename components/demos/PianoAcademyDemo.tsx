@@ -33,6 +33,12 @@ const ADDRESS = "서울 ㅇㅇ구 ㅇㅇ로 00, 2층";
 const KAKAO = "카카오톡 채널 곰파트너";
 const SLUG = "piano-academy";
 
+const TEACHERS = [
+  { id: "1", name: "서ㅇ진", role: "원장", note: "피아노 전공, 독주회 2회, 지도 15년" },
+  { id: "2", name: "강ㅎ린", role: "선생님", note: "피아노 전공, 바이엘, 체르니반 담당" },
+  { id: "3", name: "문ㅈ호", role: "선생님", note: "작곡 전공, 성인반, 반주법 담당" },
+];
+
 const C = {
   paper: "#ffffff",
   /** 구역 구분 옅은 회색 */
@@ -266,6 +272,23 @@ export function PianoAcademyDemo() {
       </header>
 
       <CourseSection reduce={reduce} course={course} setCourseId={setCourseId} onTrial={() => go("pa-trial")} />
+      <section id="pa-teachers" aria-labelledby="pa-teachers-title" className="mx-auto mt-20 max-w-[1200px] scroll-mt-4 px-4 md:mt-24 md:px-6">
+        <SectionTitle id="pa-teachers-title" title="선생님" />
+        <ul className="grid gap-8 sm:grid-cols-3 md:gap-6">
+          {TEACHERS.map((t) => (
+            <li key={t.id}>
+              {/* eslint-disable-next-line @next/next/no-img-element -- 정적 export 라 next/image 최적화를 쓰지 않는다 */}
+              <img src={`${IMG}/staff-${t.id}.jpg`} alt={`${t.role} ${t.name}`} className="block aspect-[4/5] w-full rounded-[8px] object-cover" />
+              <p className="mt-3 text-[18px] font-bold" style={{ color: C.ink }}>
+                {t.name} <span className="text-[15px] font-semibold" style={{ color: C.muted }}>{t.role}</span>
+              </p>
+              <p className="mt-1 text-[15px] leading-[1.6]" style={{ color: C.muted }}>
+                {t.note}
+              </p>
+            </li>
+          ))}
+        </ul>
+      </section>
       <TimetableSection today={today} course={course} setCourseId={setCourseId} pickDow={pickDow} pickTime={pickTime} onPick={pickSlot} />
       <FeeSection today={today} />
       <TrialSection

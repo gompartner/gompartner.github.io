@@ -99,24 +99,25 @@ type PackKind = (typeof PACK_KINDS)[number];
 
 type Group = "고기 소스" | "볶음, 조림 소스" | "드레싱" | "디핑 소스";
 interface Item {
+  id: string;
   name: string;
   group: Group;
   note: string;
   packs: PackId[];
 }
 const ITEMS: Item[] = [
-  { name: "바베큐 소스", group: "고기 소스", note: "토마토, 훈연 향", packs: ["pouch200", "pouch500", "pet300", "bulk2kg"] },
-  { name: "불고기 양념", group: "고기 소스", note: "간장, 배즙", packs: ["pouch500", "pet300", "bulk2kg"] },
-  { name: "스테이크 소스", group: "고기 소스", note: "데미글라스", packs: ["pouch200", "pet300", "cup30"] },
-  { name: "떡볶이 소스", group: "볶음, 조림 소스", note: "고추장, 물엿", packs: ["pouch200", "pouch500", "bulk2kg"] },
-  { name: "마라 소스", group: "볶음, 조림 소스", note: "화자오, 고추기름", packs: ["pouch200", "bulk2kg"] },
-  { name: "간장 조림 소스", group: "볶음, 조림 소스", note: "닭강정, 찜닭용", packs: ["pouch500", "bulk2kg"] },
-  { name: "오리엔탈 드레싱", group: "드레싱", note: "간장, 식초", packs: ["pet300", "bulk2kg", "cup30"] },
-  { name: "참깨 드레싱", group: "드레싱", note: "볶은 참깨, 마요", packs: ["pet300", "bulk2kg", "cup30"] },
-  { name: "발사믹 드레싱", group: "드레싱", note: "발사믹 식초, 올리브유", packs: ["pet300", "cup30"] },
-  { name: "허니 머스터드", group: "디핑 소스", note: "꿀, 홀그레인", packs: ["pouch200", "cup30", "bulk2kg"] },
-  { name: "스위트 칠리", group: "디핑 소스", note: "고추, 마늘", packs: ["pouch200", "cup30"] },
-  { name: "갈릭 마요", group: "디핑 소스", note: "구운 마늘", packs: ["cup30", "bulk2kg"] },
+  { id: "bbq", name: "바베큐 소스", group: "고기 소스", note: "토마토, 훈연 향", packs: ["pouch200", "pouch500", "pet300", "bulk2kg"] },
+  { id: "bulgogi", name: "불고기 양념", group: "고기 소스", note: "간장, 배즙", packs: ["pouch500", "pet300", "bulk2kg"] },
+  { id: "steak", name: "스테이크 소스", group: "고기 소스", note: "데미글라스", packs: ["pouch200", "pet300", "cup30"] },
+  { id: "tteokbokki", name: "떡볶이 소스", group: "볶음, 조림 소스", note: "고추장, 물엿", packs: ["pouch200", "pouch500", "bulk2kg"] },
+  { id: "mala", name: "마라 소스", group: "볶음, 조림 소스", note: "화자오, 고추기름", packs: ["pouch200", "bulk2kg"] },
+  { id: "soy-glaze", name: "간장 조림 소스", group: "볶음, 조림 소스", note: "닭강정, 찜닭용", packs: ["pouch500", "bulk2kg"] },
+  { id: "oriental", name: "오리엔탈 드레싱", group: "드레싱", note: "간장, 식초", packs: ["pet300", "bulk2kg", "cup30"] },
+  { id: "sesame", name: "참깨 드레싱", group: "드레싱", note: "볶은 참깨, 마요", packs: ["pet300", "bulk2kg", "cup30"] },
+  { id: "balsamic", name: "발사믹 드레싱", group: "드레싱", note: "발사믹 식초, 올리브유", packs: ["pet300", "cup30"] },
+  { id: "honey-mustard", name: "허니 머스터드", group: "디핑 소스", note: "꿀, 홀그레인", packs: ["pouch200", "cup30", "bulk2kg"] },
+  { id: "sweet-chili", name: "스위트 칠리", group: "디핑 소스", note: "고추, 마늘", packs: ["pouch200", "cup30"] },
+  { id: "garlic-mayo", name: "갈릭 마요", group: "디핑 소스", note: "구운 마늘", packs: ["cup30", "bulk2kg"] },
 ];
 const GROUPS: Group[] = ["고기 소스", "볶음, 조림 소스", "드레싱", "디핑 소스"];
 
@@ -466,11 +467,15 @@ function Items({ reduce, onCalc }: { reduce: boolean; onCalc: (item: string, pac
                     const packs = shown(it.packs);
                     return (
                       <li key={it.name} className="flex flex-wrap items-center justify-between gap-x-4 gap-y-2 border-b py-3" style={{ borderColor: C.line }}>
-                        <div className="min-w-0">
-                          <p className="text-[17px] font-bold">{it.name}</p>
-                          <p className="text-[14px]" style={{ color: C.muted }}>
-                            {it.note}
-                          </p>
+                        <div className="flex min-w-0 items-center gap-3">
+                          {/* eslint-disable-next-line @next/next/no-img-element -- 정적 export 라 next/image 최적화를 쓰지 않는다 */}
+                          <img src={`${IMG}/item-${it.id}.jpg`} alt="" className="h-14 w-14 flex-none rounded-[6px] object-cover" />
+                          <div className="min-w-0">
+                            <p className="text-[17px] font-bold">{it.name}</p>
+                            <p className="text-[14px]" style={{ color: C.muted }}>
+                              {it.note}
+                            </p>
+                          </div>
                         </div>
                         <div className="flex flex-wrap gap-1.5">
                           {packs.map((id) => {

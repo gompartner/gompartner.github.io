@@ -209,9 +209,9 @@ interface Work {
 }
 
 const TEACHERS = [
-  { id: "1", name: "윤재희", role: "원장", cls: "입시반 소묘, 수채화", career: "서양화 전공, 입시 지도 14년" },
-  { id: "2", name: "박도윤", role: "선생님", cls: "취미반 성인", career: "회화 전공, 개인전 3회" },
-  { id: "3", name: "이수아", role: "선생님", cls: "초등반", career: "미술교육 전공, 아동미술 8년" },
+  { id: "1", name: "윤ㅈ희", role: "원장", cls: "입시반 소묘, 수채화", career: "서양화 전공, 입시 지도 14년" },
+  { id: "2", name: "박ㄷ윤", role: "선생님", cls: "취미반 성인", career: "회화 전공, 개인전 3회" },
+  { id: "3", name: "이ㅅ아", role: "선생님", cls: "초등반", career: "미술교육 전공, 아동미술 8년" },
 ];
 
 const WORKS: Work[] = [

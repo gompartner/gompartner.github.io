@@ -28,7 +28,7 @@ import { DemoMakerInfo } from "@/components/demos/DemoMakerInfo";
    부동산 계산기에는 중개보수 계산과 전월세 비교(보증금, 월세, 대출 금리, 예금 금리로 한 달 비용 막대 비교)가 있다.
 
    사진 출처(public/images/demo-realty):
-   AI 생성(Z-Image-Turbo, Apache 2.0) interior */
+   AI 생성(Z-Image-Turbo, Apache 2.0) listing-(매물 id) */
 
 const IMG = "/images/demo-realty";
 const OFFICE = "곰파트너";
@@ -869,6 +869,8 @@ function HeartButton({ saved, full, name, onToggle, className = "" }: { saved: b
   );
 }
 
+const PHOTO_ALT: Record<Kind, string> = { apt: "거실", officetel: "실내", villa: "거실", store: "매장 내부" };
+
 function ListingCard({ l, selected, saved, full, onPick, onToggle }: { l: Listing; selected: boolean; saved: boolean; full: boolean; onPick: () => void; onToggle: () => void }) {
   return (
     <li className="relative">
@@ -876,28 +878,34 @@ function ListingCard({ l, selected, saved, full, onPick, onToggle }: { l: Listin
         type="button"
         aria-pressed={selected}
         onClick={onPick}
-        className="block h-full w-full rounded-[6px] border bg-white p-4 pr-14 text-left transition-colors hover:border-[#222529]"
+        className="block h-full w-full overflow-hidden rounded-[6px] border bg-white text-left transition-colors hover:border-[#222529]"
         style={{ borderColor: selected ? C.ink : C.line, boxShadow: selected ? `inset 0 0 0 1px ${C.ink}` : undefined }}
       >
-        <span className="flex flex-wrap items-center gap-1.5">
-          <span className="text-[13px] tabular-nums" style={{ color: C.muted }}>
-            매물번호 {l.no}
+        <span className="block aspect-[4/3] overflow-hidden" style={{ background: C.gray }}>
+          {/* eslint-disable-next-line @next/next/no-img-element -- 정적 export 라 next/image 최적화를 쓰지 않는다 */}
+          <img src={`${IMG}/listing-${l.id}.jpg`} alt="" loading="lazy" className="h-full w-full object-cover" />
+        </span>
+        <span className="block p-4">
+          <span className="flex flex-wrap items-center gap-1.5">
+            <span className="text-[13px] tabular-nums" style={{ color: C.muted }}>
+              매물번호 {l.no}
+            </span>
+            <BadgeList badges={l.badges} />
           </span>
-          <BadgeList badges={l.badges} />
-        </span>
-        <span className="mt-1 block text-[20px] font-bold tabular-nums tracking-[-0.02em]">{priceText(l)}</span>
-        <span className="block font-semibold">
-          {l.name} {l.floor}층
-        </span>
-        <span className="mt-1 block text-[14px] leading-[1.6]" style={{ color: C.muted }}>
-          {l.dong}, {KIND_LABEL[l.kind]}
-          <br />
-          전용 {areaText(l.area)}
-          <br />
-          {l.kind === "store" ? `화장실 ${l.baths}개` : `방 ${l.rooms}개 / 욕실 ${l.baths}개`}, {l.dir}
+          <span className="mt-1 block text-[20px] font-bold tabular-nums tracking-[-0.02em]">{priceText(l)}</span>
+          <span className="block font-semibold">
+            {l.name} {l.floor}층
+          </span>
+          <span className="mt-1 block text-[14px] leading-[1.6]" style={{ color: C.muted }}>
+            {l.dong}, {KIND_LABEL[l.kind]}
+            <br />
+            전용 {areaText(l.area)}
+            <br />
+            {l.kind === "store" ? `화장실 ${l.baths}개` : `방 ${l.rooms}개 / 욕실 ${l.baths}개`}, {l.dir}
+          </span>
         </span>
       </button>
-      <HeartButton saved={saved} full={full} name={l.name} onToggle={onToggle} className="absolute right-2 top-2" />
+      <HeartButton saved={saved} full={full} name={l.name} onToggle={onToggle} className="absolute right-2 top-2 bg-white/90 shadow-sm" />
     </li>
   );
 }
@@ -1261,7 +1269,7 @@ function Detail({ listing: l, basket, onToggle, onTour, onCalc }: { listing: Lis
             {l.kind === "store" ? (
               <StorePlan />
             ) : (
-              <Image src={`${IMG}/interior.jpg`} alt="햇빛이 드는 비어 있는 아파트 거실" fill sizes="(min-width: 1024px) 40vw, 100vw" className="object-cover" />
+              <Image src={`${IMG}/listing-${l.id}.jpg`} alt={`${l.name} ${PHOTO_ALT[l.kind]}`} fill sizes="(min-width: 1024px) 40vw, 100vw" className="object-cover" />
             )}
           </div>
 

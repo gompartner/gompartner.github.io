@@ -745,7 +745,11 @@ function Schedule({
                   })}
                 </span>
                 <span className="mt-3 flex w-full items-center justify-between text-[15px]" style={{ color: C.muted }}>
-                  <span>{c.teacher} 강사</span>
+                  <span className="inline-flex items-center gap-2">
+                    {/* eslint-disable-next-line @next/next/no-img-element -- 정적 export 라 next/image 최적화를 쓰지 않는다 */}
+                    <img src={`${IMG}/teacher-${c.teacher === "원어민" ? "native" : "korean"}.jpg`} alt="" className="h-9 w-9 flex-none rounded-full object-cover" />
+                    {c.teacher} 강사
+                  </span>
                   <span className="inline-flex items-center gap-1 font-bold" style={{ color: full ? C.muted : C.ink }}>
                     <Users size={14} aria-hidden />
                     {full ? "마감" : `남은 자리 ${c.seats}`}

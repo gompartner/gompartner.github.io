@@ -81,17 +81,6 @@ const card = "rounded-[12px] border bg-white";
 
 /* ── 꽃집 휴대폰 화면 ─────────────────────────────── */
 
-function Carnation({ x, y, s = 1 }: { x: number; y: number; s?: number }) {
-  return (
-    <g transform={`translate(${x} ${y}) scale(${s})`}>
-      {[0, 60, 120, 180, 240, 300].map((r) => (
-        <ellipse key={r} cx="0" cy="-7" rx="6" ry="8" fill="#e8435a" stroke="#b8243b" strokeWidth="1" transform={`rotate(${r})`} />
-      ))}
-      <circle r="4" fill="#c22a42" />
-    </g>
-  );
-}
-
 /** 휴대폰 속 꽃집 상품 화면. fixed가 아니면 상담 띠가 예약 버튼을 덮어 눌러도 반응이 없다. 전후를 바꿀 때는 key로 새로 그린다. */
 function ShopPhone({ fixed, interactive = false, small = false }: { fixed: boolean; interactive?: boolean; small?: boolean }) {
   const reduce = useReducedMotionSafe();
@@ -113,15 +102,8 @@ function ShopPhone({ fixed, interactive = false, small = false }: { fixed: boole
       </div>
       <div className={small ? "px-2.5 pb-3 pt-2" : "px-3 pb-4 pt-2.5"}>
         <p className={`font-bold ${small ? "text-[11px]" : "text-[13px]"}`}>어버이날 꽃바구니</p>
-        <svg viewBox="0 0 200 120" className="mt-1.5 w-full rounded-[10px] bg-[#fdeef0]" aria-hidden>
-          <path d="M45 70 Q100 120 155 70 L148 100 Q100 118 52 100 Z" fill="#c9965f" stroke="#9a6a3a" strokeWidth="1.5" />
-          <path d="M60 72 Q100 20 140 72" fill="none" stroke="#9a6a3a" strokeWidth="2.5" />
-          <Carnation x={75} y={66} />
-          <Carnation x={100} y={58} s={1.15} />
-          <Carnation x={125} y={66} />
-          <Carnation x={88} y={74} s={0.9} />
-          <Carnation x={113} y={74} s={0.9} />
-        </svg>
+        {/* eslint-disable-next-line @next/next/no-img-element -- 정적 export 라 next/image 최적화를 쓰지 않는다 */}
+        <img src="/images/demo-urgent-fix/basket.jpg" alt="" className="mt-1.5 block aspect-[5/3] w-full rounded-[10px] object-cover" />
         <p className={`mt-2 font-bold tabular-nums ${small ? "text-[12px]" : "text-[15px]"}`}>카네이션 꽃바구니 39,000원</p>
         <p className={`text-[#5a626d] ${small ? "text-[10px]" : "text-[12px]"}`}>내일 오전 배송 마감 임박</p>
         <div className="relative mt-3">

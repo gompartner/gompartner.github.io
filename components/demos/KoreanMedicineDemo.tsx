@@ -1105,12 +1105,20 @@ function VisitSection() {
             <h3 className="text-[20px] font-bold">
               의료진
             </h3>
-            <ul className="mt-3 space-y-2">
-              <li>
-                <strong>대표원장 김ㅎ늘</strong> <span style={{ color: C.inkSoft }}>한방재활의학과 전문의</span>
+            <ul className="mt-3 grid gap-4 sm:grid-cols-2">
+              <li className="flex items-center gap-4">
+                {/* eslint-disable-next-line @next/next/no-img-element -- 정적 export 라 next/image 최적화를 쓰지 않는다 */}
+                <img src={`${IMG}/staff-1.jpg`} alt="대표원장 김ㅎ늘" className="h-24 w-20 flex-none rounded-[8px] object-cover" />
+                <span>
+                  <strong className="block text-[17px]">대표원장 김ㅎ늘</strong> <span style={{ color: C.inkSoft }}>한방재활의학과 전문의</span>
+                </span>
               </li>
-              <li>
-                <strong>원장 이ㅅ윤</strong> <span style={{ color: C.inkSoft }}>한의사</span>
+              <li className="flex items-center gap-4">
+                {/* eslint-disable-next-line @next/next/no-img-element -- 정적 export 라 next/image 최적화를 쓰지 않는다 */}
+                <img src={`${IMG}/staff-2.jpg`} alt="원장 이ㅅ윤" className="h-24 w-20 flex-none rounded-[8px] object-cover" />
+                <span>
+                  <strong className="block text-[17px]">원장 이ㅅ윤</strong> <span style={{ color: C.inkSoft }}>한의사</span>
+                </span>
               </li>
             </ul>
           </div>
