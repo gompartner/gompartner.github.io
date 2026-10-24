@@ -373,7 +373,7 @@ const allProjects: Project[] = [
     description: "스몰웨딩 홀 홈페이지. 예식일과 시간대를 고르면 D-day가 롤링하고 홀 그림의 햇빛이 바뀝니다. 하객 수 슬라이더로 테이블 배치를 보고, 식사와 꽃장식 패키지 견적, 상담신청과 오시는 길까지 한 페이지에 담았습니다.",
     features: ["예약 현황 달력", "D-day 롤링", "하객 수 배치도", "패키지 견적", "상담신청"],
     imageUrl: "/images/demos/small-wedding.jpg",
-    imageAlt: "꽃으로 꾸민 예식 테이블 사진 위에 하객 50명 예식 안내 문장",
+    imageAlt: "꽃으로 꾸민 예식 테이블 사진 위에 하객 수와 홀 안내 문장",
     demoUrl: "/demo/small-wedding",
   },
   {

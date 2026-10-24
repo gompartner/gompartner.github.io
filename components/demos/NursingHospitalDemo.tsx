@@ -24,7 +24,7 @@ import { DemoMakerInfo } from "@/components/demos/DemoMakerInfo";
 
    사진 출처: AI 생성(Z-Image-Turbo, Apache 2.0), 직원 사진은 AI 생성(Z-Image-Turbo)
 
-   첫 화면(nh-poster): 침대 위 어르신 손을 보호사가 감싸 쥔 사진 한 장이 한 화면을 채우고, 흰 막 위에 문장 "매일 오후 면회 가능".
+   첫 화면(nh-poster): 침대 위 어르신 손을 보호사가 감싸 쥔 사진 한 장이 한 화면을 채우고, 흰 막 위에 문장 "병실별 월 비용을 간병비까지 공개합니다".
    들어오면 사진이 1.6초 동안 천천히 다가오고(1.06배에서 1배), 문장은 0.3초 늦게 아래에서 올라온다(CSS keyframes, JS 없이도 보인다).
    스크롤하면 사진만 조금 느리게 움직인다. 동작 줄이기면 전부 멈춘다. */
 
@@ -295,10 +295,12 @@ function Poster({ reduce, onCta }: { reduce: boolean; onCta: () => void }) {
       <div className={`relative z-[1] mt-auto px-4 pb-14 md:my-auto md:px-12 md:pb-0 ${reduce ? "" : "nh-rise"}`}>
         <h1
           id="nh-poster-title"
-          className="max-w-[9em] text-[38px] font-bold md:text-[clamp(40px,5vw,72px)]"
+          className="max-w-[12em] text-[38px] font-bold md:text-[clamp(40px,5vw,72px)]"
           style={{ letterSpacing: "-0.03em", lineHeight: 1.2, wordBreak: "keep-all", color: C.ink }}
         >
-          매일 오후 면회 가능
+          병실별 월 비용을
+          <br />
+          간병비까지 공개합니다
         </h1>
         <p className="mt-4 text-[16px] tabular-nums md:mt-6 md:text-[18px]" style={{ color: C.muted }}>
           면회 시간 매일 14:00~18:00
