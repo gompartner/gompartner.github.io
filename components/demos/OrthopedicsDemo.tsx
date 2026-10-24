@@ -25,7 +25,7 @@ import { DemoMakerInfo } from "@/components/demos/DemoMakerInfo";
 
    사진 출처: AI 생성(Z-Image-Turbo, Apache 2.0)
 
-   첫 화면(os-poster): 밝은 물리치료실 사진 한 장이 한 화면을 채우고, 왼쪽 흰 막 위에 문장 "토요일 오후 2시까지 진료".
+   첫 화면(os-poster): 밝은 물리치료실 사진 한 장이 한 화면을 채우고, 왼쪽 흰 막 위에 문장 "척추, 관절 진료와 도수치료".
    들어오면 사진이 1.6초 동안 천천히 다가오고(1.06배에서 1배), 문장은 0.3초 늦게 아래에서 올라온다(CSS keyframes, JS 없이도 보인다).
    스크롤하면 사진만 조금 느리게 움직인다. 동작 줄이기면 전부 멈춘다.
    본문에서 움직이는 것은 실시간 대기 숫자가 굴러 바뀌는 것 하나다. */
@@ -421,7 +421,9 @@ function Poster({ reduce, onCta }: { reduce: boolean; onCta: () => void }) {
           className="max-w-[9em] text-[38px] font-bold md:text-[clamp(40px,5vw,72px)]"
           style={{ letterSpacing: "-0.03em", lineHeight: 1.2, wordBreak: "keep-all", color: C.ink }}
         >
-          토요일 오후 2시까지 진료
+          척추, 관절 진료와
+          <br />
+          도수치료
         </h1>
         <p className="mt-4 text-[16px] md:mt-6 md:text-[18px] tabular-nums" style={{ color: C.muted }}>
           토요일 09:00 ~ 14:00, 점심시간 없이

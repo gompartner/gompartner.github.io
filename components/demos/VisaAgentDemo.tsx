@@ -914,7 +914,7 @@ function Poster({ reduce, lang, onCta }: { reduce: boolean; lang: Lang; onCta: (
   const ref = useRef<HTMLElement>(null);
   const { scrollYProgress } = useScroll({ target: ref, offset: ["start start", "end start"] });
   const photoY = useTransform(scrollYProgress, (v) => (reduce ? "0%" : `${v * PARALLAX}%`));
-  const lines = lang === "ko" ? ["체류 기간 연장,", "만료 4개월 전부터 신청"] : ["Visa extension opens", "4 months before expiry"];
+  const lines = lang === "ko" ? ["체류 연장, 자격 변경, 영주권", "출입국 업무 대행"] : ["Visa extension, status change,", "permanent residency"];
 
   return (
     <section id="va-poster" ref={ref} aria-labelledby="va-poster-title" className="relative flex min-h-[100svh] flex-col overflow-hidden" style={{ background: "#141414", color: "#fff" }}>

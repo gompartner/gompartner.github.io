@@ -200,9 +200,9 @@ function Poster({ reduce, onCta }: { reduce: boolean; onCta: () => void }) {
           className="text-[36px] font-bold md:text-[clamp(40px,5vw,72px)]"
           style={{ letterSpacing: "-0.03em", lineHeight: 1.2, wordBreak: "keep-all" }}
         >
-          주소 하나로
+          단독주택과 근린생활시설
           <br />
-          건축 가능 규모를 검토합니다
+          설계 사무소
         </h1>
         <p className="mt-4 text-[16px] md:mt-5 md:text-[18px]" style={{ color: "rgba(255,255,255,0.85)" }}>
           단독주택, 근린생활시설 설계

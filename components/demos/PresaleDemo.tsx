@@ -425,9 +425,9 @@ function Poster({ reduce, onCta }: { reduce: boolean; onCta: () => void }) {
           className="text-[36px] font-bold md:text-[clamp(40px,5vw,72px)]"
           style={{ ...serifF, letterSpacing: "-0.03em", lineHeight: 1.2, wordBreak: "keep-all" }}
         >
-          84타입 견본주택,
+          ㅎㄷ역 도보 6분,
           <br />
-          주말 관람 가능
+          초등학교 도보 4분
         </h1>
         <p className="mt-4 text-[16px] md:mt-5 md:text-[18px]" style={{ color: C.body }}>
           {GALLERY}, 매일 10:00 ~ 18:00
