@@ -3,7 +3,6 @@
 import { useEffect, useMemo, useRef, useState } from "react";
 import { AnimatePresence, motion, useScroll, useTransform } from "framer-motion";
 import { Car, ChevronLeft, ChevronRight, Clock, MapPin, Package, RotateCcw, Truck, X } from "lucide-react";
-import { Noto_Serif_KR } from "@/lib/local-fonts";
 import { useReducedMotionSafe } from "@/hooks/useReducedMotionSafe";
 import { daysAgo, fmtKo, useDemoToday } from "@/hooks/useDemoToday";
 import { maskName, maskPhone } from "@/components/demos/LeadReceivedPanel";
@@ -142,8 +141,8 @@ const HOURS: { day: string; time: string }[] = [
 ];
 const DOW_IDX = [1, 2, 3, 4, 5, 6, 0];
 
-/* 명조는 h1, h2 에만 */
-const serifF = { fontFamily: `${Noto_Serif_KR.style.fontFamily}, serif`, fontWeight: 700 } as const;
+/* 제목은 본문과 같은 Pretendard, 굵게 */
+const serifF = { fontWeight: 700 } as const;
 const won = (n: number) => `${n.toLocaleString("ko-KR")}원`;
 const p2 = (n: number) => String(n).padStart(2, "0");
 const focusRing = "focus-visible:outline focus-visible:outline-[3px] focus-visible:outline-offset-2 focus-visible:outline-[#111111]";

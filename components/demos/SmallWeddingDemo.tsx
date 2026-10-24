@@ -3,7 +3,6 @@
 import { useEffect, useRef, useState } from "react";
 import { AnimatePresence, motion, useMotionValue, useScroll, useTransform } from "framer-motion";
 import { Bus, Car, ChevronLeft, ChevronRight, DoorOpen, Flower2, MessageCircle, TrainFront, Trees } from "lucide-react";
-import { Noto_Serif_KR } from "@/lib/local-fonts";
 import { useReducedMotionSafe } from "@/hooks/useReducedMotionSafe";
 import { daysAgo, fmtDash, fmtKo, useDemoToday } from "@/hooks/useDemoToday";
 import { maskName, maskPhone } from "@/components/demos/LeadReceivedPanel";
@@ -21,7 +20,7 @@ import { DemoMakerInfo } from "@/components/demos/DemoMakerInfo";
    첫 화면 포스터: 꽃으로 꾸민 예식 테이블 사진 한 장이 화면을 채운다. 사진은 1.6초 동안 scale 1.06 -> 1 로 천천히 다가오고
    문장 "하객 50명 규모의 소규모 예식"과 정보 줄은 0.3초 늦게 아래 12px 에서 올라온다(CSS 키프레임, 스크립트 없이도 끝 상태가 보임).
    스크롤하면 사진만 조금 느리게 움직인다(y 0 -> 8%). 동작 줄이기에서는 처음부터 정지 화면이다.
-   글꼴은 Pretendard, h1 과 h2 만 Noto Serif KR. 바탕은 흰색과 #f7f7f5 를 번갈아 쓰고 강조색은 올리브 하나.
+   글꼴은 Pretendard, h1 과 h2 는 굵게. 바탕은 흰색과 #f7f7f5 를 번갈아 쓰고 강조색은 올리브 하나.
 
    핵심 모션: 섹션 와이프(다음 섹션이 아래에서 clip-path로 덮으며 올라옴, 앞 섹션은 sticky로 뒤에 남음), D-day 숫자 롤링.
 
@@ -69,7 +68,8 @@ const C = {
   error: "#b42318",
 };
 
-const serif = { fontFamily: `${Noto_Serif_KR.style.fontFamily}, serif` } as const;
+/* 제목은 본문과 같은 Pretendard, 굵게 */
+const serif = { fontWeight: 700 } as const;
 
 /* 모션 값(ms). 모두 reduce면 0 */
 const EASE = [0.22, 1, 0.36, 1] as const;

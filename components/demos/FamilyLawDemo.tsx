@@ -16,7 +16,6 @@ import {
   ShieldCheck,
   Video,
 } from "lucide-react";
-import { Noto_Serif_KR } from "@/lib/local-fonts";
 import { useReducedMotionSafe } from "@/hooks/useReducedMotionSafe";
 import { daysAgo, fmtKo, useDemoToday } from "@/hooks/useDemoToday";
 import { maskName, maskPhone } from "@/components/demos/LeadReceivedPanel";
@@ -45,9 +44,8 @@ import { DemoMakerInfo } from "@/components/demos/DemoMakerInfo";
    핵심 모션: 들어올 때 사진이 1.06배에서 1배로 1.6초 동안 천천히 다가오고, 문장은 0.3초 뒤 아래에서 올라온다.
    스크롤하면 사진만 조금 느리게 움직인다. 동작 줄이기 설정이면 모두 멈춘다. */
 
-const serif = Noto_Serif_KR;
-/** h1, h2 에만 쓰는 명조 */
-const serifF = { fontFamily: `${serif.style.fontFamily}, serif` } as const;
+/* 제목은 본문과 같은 Pretendard, 굵게 */
+const serifF = { fontWeight: 700 } as const;
 
 const SLUG = "family-law";
 const TEL = "02-000-0000";

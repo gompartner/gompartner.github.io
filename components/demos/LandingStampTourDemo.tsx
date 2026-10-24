@@ -1,7 +1,6 @@
 "use client";
 
 import { useEffect, useRef, useState } from "react";
-import { Noto_Serif_KR } from "@/lib/local-fonts";
 import { motion } from "framer-motion";
 import { Check, ChevronDown, Lock, MapPin, Minus, Plus, RotateCcw } from "lucide-react";
 import { useReducedMotionSafe } from "@/hooks/useReducedMotionSafe";
@@ -14,7 +13,7 @@ import { DemoMakerInfo } from "@/components/demos/DemoMakerInfo";
    옛 사진을 흉내 내지 않고 글자, 선, 그림 지도로만 만든다.
 
    크몽 랜딩페이지 고급 패키지("랜딩 고급") 범위. 맞춤 기능은 스탬프 투어.
-   잡지 지면처럼 짠다. 머리글(발행처·호수), 큰 명조 제목, 넓은 여백, 가는 선, 사진 설명 같은 작은 글, 인용문. 강조색은 빨강 하나.
+   잡지 지면처럼 짠다. 머리글(발행처·호수), 큰 제목, 넓은 여백, 가는 선, 사진 설명 같은 작은 글, 인용문. 강조색은 빨강 하나.
 
    행사 연도는 올해로 잡는다(1월 1일에 바뀐다). 주년은 연도에서 1945를 뺀다(2026년이 81주년).
 
@@ -25,7 +24,6 @@ import { DemoMakerInfo } from "@/components/demos/DemoMakerInfo";
    4. 완주 기념품 신청: 도장을 다 모으면 열린다. 이름, 휴대폰, 수령 방법. 접수 화면에 회신 예정일과 담당 창구.
    5. 8월 일정, 자주 묻는 질문. */
 
-const serif = Noto_Serif_KR;
 
 const ORG = "곰파트너";
 const DESK = "곰파트너 문화사업팀 이ㅅ영 주임";
@@ -42,7 +40,8 @@ const C = {
   error: "#b42318",
 };
 
-const serifF = { fontFamily: `${serif.style.fontFamily}, "Nanum Myeongjo", serif` } as const;
+/* 본문과 같은 Pretendard */
+const serifF = {} as const;
 const focusRing = "focus-visible:outline focus-visible:outline-[3px] focus-visible:outline-offset-2";
 const btnSolid = `inline-flex items-center justify-center gap-2 border-[1.5px] px-5 py-3.5 text-[16px] font-semibold tracking-[0.02em] transition-colors ${focusRing}`;
 
