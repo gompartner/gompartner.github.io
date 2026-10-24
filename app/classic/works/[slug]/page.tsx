@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import { notFound } from "next/navigation";
-import { Check } from "lucide-react";
+import Link from "next/link";
+import { Check, ChevronRight } from "lucide-react";
 import { PageHead, SubTabs, h2, wrap } from "@/components/classic/ui";
 import { SampleGrid } from "@/components/classic/works/SampleGrid";
 import { groups, samplesIn, worksTabs } from "@/components/classic/works/samples";
@@ -26,6 +27,8 @@ export default async function ClassicIndustryPage({ params }: Props) {
   if (!ind) notFound();
   const list = samplesIn(slug);
   const href = `/classic/works/${slug}`;
+  // 아래쪽에 붙이는 다른 분류. 분류마다 4개만 보여 주고 나머지는 그 분류 페이지로
+  const others = [...industries, ...groups].filter((c) => c.slug !== slug).map((c) => ({ slug: c.slug, label: c.label, items: samplesIn(c.slug) })).filter((c) => c.items.length > 0);
 
   return (
     <>
@@ -70,6 +73,28 @@ export default async function ClassicIndustryPage({ params }: Props) {
             <SampleGrid items={list} />
           </div>
         </div>
+      </section>
+
+      <section aria-labelledby="c-ind-more" className={`${wrap} py-14 md:py-20`}>
+        <h2 id="c-ind-more" className={h2}>
+          다른 분야 샘플
+        </h2>
+        {others.map((c) => (
+          <div key={c.slug} className="mt-12 first-of-type:mt-8 md:mt-16">
+            <div className="flex items-baseline justify-between gap-3 border-b-2 border-[#15171c] pb-4">
+              <h3 className="text-[20px] font-extrabold tracking-[-0.02em] md:text-[24px]">
+                {c.label} <span className="ml-1 text-[15px] font-bold tabular-nums text-[#5b6370] md:text-[17px]">{c.items.length}개</span>
+              </h3>
+              <Link href={`/classic/works/${c.slug}`} className="inline-flex shrink-0 items-center gap-0.5 text-[15px] font-bold text-[#256ef4] hover:underline md:text-[16px]">
+                전체 보기
+                <ChevronRight size={16} strokeWidth={2.5} aria-hidden />
+              </Link>
+            </div>
+            <div className="mt-6 md:mt-8">
+              <SampleGrid items={c.items.slice(0, 4)} />
+            </div>
+          </div>
+        ))}
       </section>
     </>
   );
