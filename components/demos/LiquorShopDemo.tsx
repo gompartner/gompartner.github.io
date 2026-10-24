@@ -870,7 +870,8 @@ function GiftBox({ bottles, pack, setPack, sum, onRemove, reduce }: { bottles: B
   const total = sum + packInfo.price;
   const ready = bottles.length >= 2;
   const t = reduce ? { duration: 0 } : { duration: DUR, ease: EASE };
-  const slots = [18, 50, 82]; // 상자 안 병 자리(%)
+  const slots = [33, 50, 67]; // 상자 안 병 자리(%)
+  const box = pack === "box";
   return (
     <div id="ls-gift" className="scroll-mt-4 rounded-[8px] border p-4 md:p-5" style={{ borderColor: C.line, background: C.white }}>
       <p className="text-[18px] font-bold">
@@ -880,33 +881,24 @@ function GiftBox({ bottles, pack, setPack, sum, onRemove, reduce }: { bottles: B
         병 2~3개를 담아 주세요.
       </p>
 
-      {/* 상자 그림. 병은 카드에서 이 자리로 옮겨 온다. */}
-      <div className="relative mx-auto mt-4 h-[170px] w-full max-w-[300px]">
-        <svg viewBox="0 0 300 170" className="absolute inset-0 h-full w-full" aria-hidden>
-          {pack === "box" ? (
-            <>
-              <rect x="22" y="70" width="256" height="92" rx="2" fill="#efefed" stroke="#cfcfcf" strokeWidth="1" />
-              <rect x="14" y="56" width="272" height="20" rx="2" fill="#f7f7f5" stroke="#cfcfcf" strokeWidth="1" />
-            </>
-          ) : (
-            <>
-              <path d="M150 20 L292 110 L150 168 L8 110 Z" fill="#e7e5e1" stroke="#cfcfcf" strokeWidth="1" strokeLinejoin="round" />
-              <path d="M8 110 L150 60 L292 110" fill="none" stroke="#cfcfcf" strokeWidth="1" />
-              <path d="M136 22c-10-10-26-6-22 6 3 8 12 10 18 4M164 22c10-10 26-6 22 6-3 8-12 10-18 4" fill="#e7e5e1" stroke="#cfcfcf" strokeWidth="1" />
-            </>
-          )}
-        </svg>
+      {/* 포장 사진. 병은 카드에서 이 자리로 옮겨 온다. 상자는 같은 사진의 앞면만 병 위에 한 번 더 깔아 병 아래가 상자 안에 들어간 것처럼 보이게 한다 */}
+      <div className="relative mx-auto mt-4 aspect-[16/9] w-full max-w-[380px] overflow-hidden rounded-[6px]">
+        {/* eslint-disable-next-line @next/next/no-img-element -- 정적 export 라 next/image 최적화를 쓰지 않는다 */}
+        <img src={`${IMG}/pack-${pack}.jpg`} alt={box ? "뚜껑을 연 한지 선물 상자" : "바닥에 펼친 보자기"} className="absolute inset-0 h-full w-full object-cover" />
         <ul className="absolute inset-0 m-0 list-none p-0">
           {bottles.map((b, i) => (
-            <li key={b.id} className="absolute bottom-[14px] -translate-x-1/2" style={{ left: `${slots[i]}%` }}>
-              <motion.div layoutId={`art-${b.id}`} transition={t}>
-                <BottleArt b={b} height={112} />
-              </motion.div>
+            <li key={b.id} className="absolute" style={{ left: `${slots[i]}%`, bottom: box ? "19%" : "15%" }}>
+              {/* 병 사진의 흰 바탕이 포장 사진에 섞이도록 곱하기 합성은 변형이 없는 바깥 칸에 둔다 */}
+              <div className="absolute bottom-0 left-0 w-max -translate-x-1/2" style={{ mixBlendMode: "multiply" }}>
+                <motion.div layoutId={`art-${b.id}`} transition={t}>
+                  <BottleArt b={b} height={104} />
+                </motion.div>
+              </div>
               <button
                 type="button"
                 onClick={() => onRemove(b.id)}
                 aria-label={`${b.name} 상자에서 빼기`}
-                className={`absolute -right-2 -top-2 inline-flex h-7 w-7 items-center justify-center rounded-full border ${focusRing}`}
+                className={`absolute bottom-[90px] left-[6px] inline-flex h-7 w-7 items-center justify-center rounded-full border ${focusRing}`}
                 style={{ background: C.white, borderColor: C.line }}
               >
                 <X size={14} aria-hidden />
@@ -914,11 +906,17 @@ function GiftBox({ bottles, pack, setPack, sum, onRemove, reduce }: { bottles: B
             </li>
           ))}
           {bottles.length === 0 && (
-            <li className="absolute inset-x-0 bottom-[60px] text-center text-[14px]" style={{ color: C.muted }}>
-              {pack === "box" ? "상자가 비어 있어요" : "보자기가 비어 있어요"}
+            <li className="absolute inset-x-0 top-[42%] text-center text-[14px]" style={{ color: C.muted }}>
+              {box ? "상자가 비어 있어요" : "보자기가 비어 있어요"}
             </li>
           )}
         </ul>
+        {box && (
+          <>
+            {/* eslint-disable-next-line @next/next/no-img-element -- 정적 export 라 next/image 최적화를 쓰지 않는다 */}
+            <img src={`${IMG}/pack-box.jpg`} alt="" aria-hidden className="pointer-events-none absolute inset-0 h-full w-full object-cover" style={{ clipPath: "inset(69.5% 0 0 0)" }} />
+          </>
+        )}
       </div>
 
       <fieldset className="mt-4">

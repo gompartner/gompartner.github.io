@@ -89,16 +89,13 @@ const CARES: { name: Care; desc: string; pay: string }[] = [
 
 type PartId = "head" | "neck" | "shoulder" | "waist" | "wrist" | "knee";
 const PARTS: { id: PartId; label: string; x: number; y: number; signs: string[]; care: Care[] }[] = [
-  { id: "head", label: "머리", x: 120, y: 48, signs: ["두통이 자주 와요", "어지럽고 잠을 설쳐요"], care: ["침", "한약"] },
-  { id: "neck", label: "목", x: 120, y: 98, signs: ["고개를 돌리기 힘들어요", "자고 나면 목에 담이 와요"], care: ["침", "추나", "약침"] },
-  { id: "shoulder", label: "어깨", x: 168, y: 122, signs: ["팔이 위로 안 올라가요", "밤에 어깨가 쑤셔요"], care: ["침", "약침", "추나"] },
-  { id: "waist", label: "허리", x: 120, y: 232, signs: ["오래 앉으면 허리가 뻐근해요", "다리가 저려요"], care: ["추나", "침", "약침"] },
-  { id: "wrist", label: "손목", x: 204, y: 290, signs: ["손목이 시큰거려요", "손가락이 저려요"], care: ["침", "약침"] },
-  { id: "knee", label: "무릎", x: 152, y: 382, signs: ["계단 내려갈 때 아파요", "무릎이 붓고 뻣뻣해요"], care: ["침", "약침", "한약"] },
+  { id: "head", label: "머리", x: 124, y: 36, signs: ["두통이 자주 와요", "어지럽고 잠을 설쳐요"], care: ["침", "한약"] },
+  { id: "neck", label: "목", x: 124, y: 80, signs: ["고개를 돌리기 힘들어요", "자고 나면 목에 담이 와요"], care: ["침", "추나", "약침"] },
+  { id: "shoulder", label: "어깨", x: 168, y: 112, signs: ["팔이 위로 안 올라가요", "밤에 어깨가 쑤셔요"], care: ["침", "약침", "추나"] },
+  { id: "waist", label: "허리", x: 124, y: 232, signs: ["오래 앉으면 허리가 뻐근해요", "다리가 저려요"], care: ["추나", "침", "약침"] },
+  { id: "wrist", label: "손목", x: 172, y: 276, signs: ["손목이 시큰거려요", "손가락이 저려요"], care: ["침", "약침"] },
+  { id: "knee", label: "무릎", x: 148, y: 352, signs: ["계단 내려갈 때 아파요", "무릎이 붓고 뻣뻣해요"], care: ["침", "약침", "한약"] },
 ];
-
-const BODY_D =
-  "M106 86 L134 86 L137 104 C160 108 184 114 192 132 C199 154 200 196 202 226 C204 254 208 282 214 300 L198 306 C190 284 184 254 180 226 L174 168 C172 196 170 222 172 250 C174 272 178 292 178 314 L170 470 L136 470 L126 326 L114 326 L104 470 L70 470 L62 314 C62 292 66 272 68 250 C70 222 68 196 66 168 L60 226 C56 254 50 284 42 306 L26 300 C32 282 36 254 38 226 C40 196 41 154 48 132 C56 114 80 108 103 104 Z";
 
 /* ---------- 비급여 진료비 ---------- */
 
@@ -378,26 +375,19 @@ function BodySection({ reduce, onCar }: { reduce: boolean; onCar: () => void }) 
       <SectionTitle id="km-body-title" title="어디가 아프세요" />
 
       <div className="mt-6 grid gap-6 md:grid-cols-[minmax(0,0.8fr)_minmax(0,1.2fr)] md:gap-10">
-        {/* 몸 실루엣 */}
+        {/* 몸 사진, 위에 부위 점 */}
         <div className="relative mx-auto w-full max-w-[230px] md:max-w-[300px]">
-          <svg viewBox="0 0 240 480" className="h-auto w-full" role="img" aria-label={`사람 몸 그림, ${cur.label} 표시`}>
-            <defs>
-              <linearGradient id="km-body-wash" x1="0" y1="0" x2="1" y2="1">
-                <stop offset="0" stopColor="#f2f2f0" />
-                <stop offset="1" stopColor="#e6e6e3" />
-              </linearGradient>
-            </defs>
-            <ellipse cx="120" cy="472" rx="70" ry="7" fill="#e5e5e5" />
-            <ellipse cx="120" cy="50" rx="28" ry="34" fill="url(#km-body-wash)" stroke="#9a9a9a" strokeWidth="1.5" />
-            <path d={BODY_D} fill="url(#km-body-wash)" stroke="#9a9a9a" strokeWidth="1.5" strokeLinejoin="round" />
+          {/* eslint-disable-next-line @next/next/no-img-element -- 정적 export 라 next/image 최적화를 쓰지 않는다 */}
+          <img src={`${IMG}/body.jpg`} alt={`뒤에서 본 사람 몸, ${cur.label} 표시`} className="block aspect-[1/2] h-auto w-full rounded-[8px] object-cover" />
+          <svg viewBox="0 0 240 480" className="absolute inset-0 h-full w-full" aria-hidden>
             {PARTS.map((x) => (
-              <circle key={x.id} cx={x.x} cy={x.y} r="5" fill={x.id === part ? C.red : C.muted} opacity={x.id === part ? 1 : 0.55} />
+              <circle key={x.id} cx={x.x} cy={x.y} r="5" fill={x.id === part ? C.red : "#ffffff"} stroke={x.id === part ? "#ffffff" : C.muted} strokeWidth="1.5" opacity={x.id === part ? 1 : 0.9} />
             ))}
             <g transform={`translate(${cur.x} ${cur.y})`}>
               <motion.circle
                 key={part}
                 r="20"
-                fill="none"
+                fill="rgba(255,255,255,0.18)"
                 stroke={C.red}
                 strokeWidth="2.5"
                 initial={reduce ? false : { opacity: 0 }}
