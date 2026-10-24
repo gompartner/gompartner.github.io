@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useMemo, useRef, useState, type FormEvent, type KeyboardEvent, type ReactNode } from "react";
-import { motion, useMotionTemplate, useMotionValue, useMotionValueEvent, useScroll, useTransform } from "framer-motion";
+import { animate, motion, useInView, useMotionTemplate, useMotionValue, useMotionValueEvent, useScroll, useTransform } from "framer-motion";
 import { Armchair, CalendarCheck, Check, ChevronsLeftRight, ChevronsRight, Clock, Coffee, MapPin, MessageCircle, Phone, ShieldCheck, SquareParking, TrainFront, Truck } from "lucide-react";
 import { useReducedMotionSafe } from "@/hooks/useReducedMotionSafe";
 import { daysAgo, fmtKo, useDemoToday } from "@/hooks/useDemoToday";
@@ -460,8 +460,25 @@ function Hero({ type, setType, reduce, todayHours, onBook }: { type: CarType; se
   const sceneRef = useRef<HTMLDivElement>(null);
   // 장면 높이 220vh. 꼭대기가 화면 위에 닿을 때 0, 바닥이 화면 아래에 닿을 때 1.
   const { scrollYProgress } = useScroll({ target: sceneRef, offset: ["start start", "end end"] });
-  // 진행 0.05~0.8 사이에 왼쪽부터 오른쪽으로 애프터가 덧씌워진다.
-  const wipe = useTransform(scrollYProgress, [0.05, 0.8], [0, 100]);
+  // PC: 진행 0.05~0.8 사이에 왼쪽부터 오른쪽으로 애프터가 덧씌워진다.
+  // 휴대폰: 고정 스크롤 장면을 두지 않고, 화면에 들어오면 2.4초 동안 저절로 덧씌운다(장면 아래가 비어 보이지 않게).
+  const [desk, setDesk] = useState(true);
+  useEffect(() => {
+    const m = window.matchMedia("(min-width: 768px)");
+    const sync = () => setDesk(m.matches);
+    sync();
+    m.addEventListener("change", sync);
+    return () => m.removeEventListener("change", sync);
+  }, []);
+  const scrollWipe = useTransform(scrollYProgress, [0.05, 0.8], [0, 100]);
+  const autoWipe = useMotionValue(0);
+  const inView = useInView(sceneRef, { once: true, amount: 0.6 });
+  useEffect(() => {
+    if (desk || reduce || !inView) return;
+    const c = animate(autoWipe, 100, { duration: 2.4, delay: 0.4, ease: "easeInOut" });
+    return () => c.stop();
+  }, [desk, reduce, inView, autoWipe]);
+  const wipe = useTransform<number, number>([scrollWipe, autoWipe], ([sv, av]) => (desk ? sv : av));
   const rest = useTransform(wipe, (v) => 100 - v);
   const clip = useMotionTemplate`inset(0 ${rest}% 0 0)`;
   const beamLeft = useMotionTemplate`${wipe}%`;
@@ -472,8 +489,8 @@ function Hero({ type, setType, reduce, todayHours, onBook }: { type: CarType; se
   const beforeLabelOp = useTransform(wipe, (v) => clamp01((100 - v) / 30));
 
   return (
-    <div ref={sceneRef} id="cd-hero" className={reduce ? "" : "h-[220vh]"}>
-      <div className={`${reduce ? "" : "sticky top-0 min-h-[100svh]"} mx-auto flex max-w-[1200px] flex-col justify-start px-4 pb-6 pt-3 md:justify-center md:px-6`}>
+    <div ref={sceneRef} id="cd-hero" className={reduce ? "" : "md:h-[220vh]"}>
+      <div className={`${reduce ? "" : "md:sticky md:top-0 md:min-h-[100svh]"} mx-auto flex max-w-[1200px] flex-col justify-start px-4 pb-6 pt-3 md:justify-center md:px-6`}>
         <div className="flex flex-wrap items-end justify-between gap-x-6 gap-y-2">
           <h2 className="text-[30px] font-bold leading-[1.15] tracking-[-0.02em] md:text-[44px]">
             {BRAND}
@@ -507,7 +524,7 @@ function Hero({ type, setType, reduce, todayHours, onBook }: { type: CarType; se
             </motion.div>
           </div>
         </div>
-        {!reduce && (
+        {!reduce && desk && (
           <motion.p aria-hidden className="pointer-events-none mt-2 h-5 text-center text-[13px] font-bold" style={{ color: C.muted, opacity: hint }}>
             아래로 내리면 광택이 올라와요
           </motion.p>
