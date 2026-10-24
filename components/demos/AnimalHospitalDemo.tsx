@@ -766,7 +766,7 @@ function Checkup({ reduce, age, setAge, onReserve }: { reduce: boolean; age: num
           onClick={onReserve}
           data-gtm-cta="animal-hospital_checkup_reserve"
           className={`inline-flex items-center gap-2 rounded-[6px] px-5 py-3 text-[16px] font-bold ${focusRing}`}
-          style={{ background: C.teal, color: C.ink, outlineColor: C.teal }}
+          style={{ background: C.teal, color: "#ffffff", outlineColor: C.teal }}
         >
           <CalendarCheck size={18} aria-hidden />
           {PACKS[rec].name} 검진 예약

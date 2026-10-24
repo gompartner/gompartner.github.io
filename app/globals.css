@@ -212,3 +212,11 @@ input[type="time"]::-webkit-date-and-time-value {
   text-align: left;
   line-height: 1.4;
 }
+/* appearance:none 이면 아이폰 사파리가 날짜 글자를 칸 위쪽에 붙인다. 아이폰에서만 세로 가운데로 */
+@supports (-webkit-touch-callout: none) {
+  input[type="date"],
+  input[type="time"] {
+    display: flex;
+    align-items: center;
+  }
+}

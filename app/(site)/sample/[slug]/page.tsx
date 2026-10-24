@@ -153,7 +153,7 @@ export default async function SamplePage({ params }: Props) {
         </span>
         {exists(mobileShot) && (
           <span className="absolute bottom-0 right-0 block w-[30%] max-w-[180px] overflow-hidden rounded-[18px] border-[3px] border-[#1d1d1f] bg-white shadow-[5px_5px_0_#1d1d1f] md:rounded-[22px]">
-            <Image src={mobileShot} alt="" width={390} height={844} sizes="180px" className="aspect-[390/700] h-auto w-full object-cover object-top" />
+            <Image src={mobileShot} alt="" width={390} height={736} sizes="180px" className="aspect-[9/17] h-auto w-full object-cover object-top" />
           </span>
         )}
         {/* 눌러서 샘플을 여는 그림이라는 걸 휴대폰에서도 알 수 있게 손가락 아이콘과 글자를 늘 보이고 둘레를 반짝인다 */}
