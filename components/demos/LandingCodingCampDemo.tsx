@@ -180,13 +180,12 @@ function Hero({ deadline, start, totalLeft, totalCap, onApply }: { deadline: Dat
         <h1 className="mt-5 text-[44px] font-black leading-[1.12] tracking-[-0.035em] md:text-[64px]">
           4주 동안
           <br />
+          직접 만드는
+          <br />
           <span className="relative inline-block">
-            <span className="relative z-10">내 게임</span>
+            <span className="relative z-10">게임</span>
             <span aria-hidden className="absolute inset-x-[-4px] bottom-[6px] z-0 h-[18px] md:h-[24px]" style={{ background: C.yellow }} />
           </span>
-          을
-          <br />
-          만들어요
         </h1>
         <p className="mt-5 max-w-[30em] text-[17px] leading-[1.7]" style={{ color: C.muted }}>
           초등 2학년부터 6학년까지. 한 반 8명이 블록을 맞춰 게임을 만들고, 마지막 날 가족 앞에서 직접 발표합니다.

@@ -49,7 +49,7 @@ import { DemoMakerInfo } from "@/components/demos/DemoMakerInfo";
 
    사진 출처: AI 생성(Z-Image-Turbo, Apache 2.0)
 
-   첫 화면(ah-poster): 수의사가 개를 살피는 사진 한 장이 한 화면을 채우고 아래 왼쪽에 문장 "밤 12시에도 문 열어 있어요".
+   첫 화면(ah-poster): 수의사가 개를 살피는 사진 한 장이 한 화면을 채우고 아래 왼쪽에 문장 "365일 24시간 진료".
    들어오면 사진이 1.6초 동안 천천히 다가오고(1.06배에서 1배), 문장은 0.3초 늦게 아래에서 올라온다(CSS keyframes, JS 없이도 보인다).
    스크롤하면 사진만 조금 느리게 움직인다. 동작 줄이기면 전부 멈춘다. */
 
@@ -406,11 +406,11 @@ function Poster({ reduce, onCta }: { reduce: boolean; onCta: () => void }) {
           className="max-w-[12em] text-[36px] font-bold md:text-[clamp(40px,5vw,72px)]"
           style={{ letterSpacing: "-0.03em", lineHeight: 1.2, wordBreak: "keep-all" }}
         >
-          밤 12시에도 문 열어 있어요
+          365일 24시간 진료
         </h1>
         <p className="mt-4 inline-flex items-center gap-2 text-[16px] md:mt-6 md:text-[18px]" style={{ color: "rgba(255,255,255,0.86)" }}>
           <Moon size={18} aria-hidden />
-          365일 24시간 진료, 응급 전화 <span className="tabular-nums">{TEL}</span>
+          밤 12시 이후에도 응급 진료, 응급 전화 <span className="tabular-nums">{TEL}</span>
         </p>
       </div>
     </section>
@@ -452,7 +452,7 @@ function ErBoard({ now }: { now: Date | null }) {
               지금 {hhmm(now)}, {night ? "야간 응급 진료 시간이에요" : sunday ? "일요일 진료 시간이에요" : "주간 진료 시간이에요"}
             </span>
           ) : (
-            <span>365일 24시간 문 열어 있어요</span>
+            <span>365일 24시간 진료</span>
           )}
         </p>
         <dl className="mt-5 grid gap-x-6 gap-y-2 text-[16px] sm:grid-cols-[auto_minmax(0,1fr)]">

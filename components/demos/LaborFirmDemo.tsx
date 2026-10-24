@@ -44,7 +44,7 @@ import { DemoMakerInfo } from "@/components/demos/DemoMakerInfo";
 
    사진 출처: Pexels 사진 6814526, 직원 사진은 AI 생성(Z-Image-Turbo)
 
-   첫 화면(lf-poster): 서류를 검토하는 손 사진 한 장이 한 화면을 채우고 아래 왼쪽에 문장 "해고된 날부터 3개월 안에 신청해요".
+   첫 화면(lf-poster): 서류를 검토하는 손 사진 한 장이 한 화면을 채우고 아래 왼쪽에 문장 "부당해고 구제신청, 해고일로부터 3개월".
    들어오면 사진이 1.6초 동안 천천히 다가오고(1.06배에서 1배), 문장은 0.3초 늦게 아래에서 올라온다(CSS keyframes, JS 없이도 보인다).
    스크롤하면 사진만 조금 느리게 움직인다. 동작 줄이기면 전부 멈춘다. 본문에서 움직이는 숫자는 기한 계산의 남은 날 하나뿐이다.
 
@@ -449,7 +449,7 @@ function Poster({ reduce, onCta }: { reduce: boolean; onCta: () => void }) {
           className="max-w-[13em] text-[36px] font-bold md:text-[clamp(40px,5vw,72px)]"
           style={{ letterSpacing: "-0.03em", lineHeight: 1.2, wordBreak: "keep-all" }}
         >
-          해고된 날부터 3개월 안에 신청해요
+          부당해고 구제신청, 해고일로부터 3개월
         </h1>
         <p className="mt-4 text-[16px] md:mt-6 md:text-[18px]" style={{ color: "rgba(255,255,255,0.86)" }}>
           부당해고 구제신청, 지방노동위원회

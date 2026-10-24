@@ -18,7 +18,7 @@ import { DemoMakerInfo } from "@/components/demos/DemoMakerInfo";
 
    사진 출처: Pexels 사진 5752267, 직원 사진은 AI 생성(Z-Image-Turbo)
 
-   첫 화면(ec-poster): 시험테 사진 한 장이 한 화면을 채우고 아래 왼쪽에 문장 "수술 전 검사만 받아 봐도 돼요".
+   첫 화면(ec-poster): 시험테 사진 한 장이 한 화면을 채우고 아래 왼쪽에 문장 "시력교정, 정밀검사부터 시작합니다".
    들어오면 사진이 1.6초 동안 천천히 다가오고(1.06배에서 1배), 문장은 0.3초 늦게 아래에서 올라온다(CSS keyframes, JS 없이도 보인다).
    스크롤하면 사진만 조금 느리게 움직인다. 동작 줄이기면 전부 멈춘다.
 
@@ -382,7 +382,7 @@ function Poster({ reduce, onCta }: { reduce: boolean; onCta: () => void }) {
           className="max-w-[12em] text-[36px] font-bold md:text-[clamp(40px,5vw,72px)]"
           style={{ letterSpacing: "-0.03em", lineHeight: 1.2, wordBreak: "keep-all" }}
         >
-          수술 전 검사만 받아 봐도 돼요
+          시력교정, 정밀검사부터 시작합니다
         </h1>
         <p className="mt-4 text-[16px] md:mt-6 md:text-[18px]" style={{ color: "rgba(255,255,255,0.86)" }}>
           {BRAND}, 정밀검사 약 {hm(EXAM_TOTAL)}

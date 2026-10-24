@@ -31,7 +31,7 @@ import { DemoMakerInfo } from "@/components/demos/DemoMakerInfo";
    5. 오시는 길과 영업시간: 월요일 휴무, 오늘 요일 진하게.
 
    포스터 첫 화면(hs-poster): 한 화면 높이의 매장 사진 위에 왼쪽 위 상호, 오른쪽 위 예약하기 버튼,
-   아래쪽 문장 "오늘 저녁에도 자리 있어요"와 영업시간 한 줄. 글꼴은 Pretendard 한 벌, 강조색은 남색 하나. */
+   아래쪽 문장 "디자이너를 보고 고르는 헤어 살롱"와 영업시간 한 줄. 글꼴은 Pretendard 한 벌, 강조색은 남색 하나. */
 
 const BRAND = "곰파트너";
 const ADDRESS = "서울 ㅇㅇ구 ㅇㅇ로 00, 2층";
@@ -525,8 +525,8 @@ function Poster({ reduce, onCta }: { reduce: boolean; onCta: () => void }) {
       {/* 문장 */}
       <div className={`relative z-10 mt-auto px-4 pb-14 md:px-12 md:pb-20 ${reduce ? "" : "hs-rise"}`}>
         <h1 id="hs-poster-title" className="text-[36px] font-bold leading-[1.2] tracking-[-0.03em] md:text-[clamp(40px,5vw,72px)]" style={{ wordBreak: "keep-all" }}>
-          <span className="block">오늘 저녁에도</span>
-          <span className="block">자리 있어요</span>
+          <span className="block">디자이너를 보고 고르는</span>
+          <span className="block">헤어 살롱</span>
         </h1>
         <p className="mt-4 text-[16px] md:text-[18px]" style={{ color: "rgba(255,255,255,0.85)" }}>
           화~일 {OPEN_H}:00 ~ {CLOSE_H}:00, 당일 예약 가능

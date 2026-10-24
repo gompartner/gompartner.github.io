@@ -30,7 +30,7 @@ import { DemoMakerInfo } from "@/components/demos/DemoMakerInfo";
    4. 원두 담기: 카드에서 담으면 하단 바에 봉수와 합계가 뜨고, 주문하기에서 이름과 휴대폰을 받아 접수 완료 화면을 보여 준다.
    5. 오시는 길과 영업시간: 오늘 요일을 진하게 표시한다.
 
-   포스터 첫 화면(rs-poster): 한 화면 높이의 사진 위에 왼쪽 위 상호, 오른쪽 위 원두 고르기 버튼, 아래쪽 문장 "오늘 볶아서 내일 보내요"와
+   포스터 첫 화면(rs-poster): 한 화면 높이의 사진 위에 왼쪽 위 상호, 오른쪽 위 원두 고르기 버튼, 아래쪽 문장 "볶은 다음 날 발송하는 원두"와
    로스팅 요일 한 줄. 글꼴은 Pretendard 한 벌, 바탕은 흰색, 정보 판은 옅은 회색. */
 
 const BRAND = "곰파트너";
@@ -637,8 +637,8 @@ function Poster({ reduce, onCta }: { reduce: boolean; onCta: () => void }) {
       {/* 문장 */}
       <div className={`relative z-10 mt-auto px-4 pb-14 md:px-12 md:pb-20 ${reduce ? "" : "rs-rise"}`}>
         <h1 id="rs-poster-title" className="text-[36px] font-bold leading-[1.2] tracking-[-0.03em] md:text-[clamp(40px,5vw,72px)]" style={{ wordBreak: "keep-all" }}>
-          <span className="block">오늘 볶아서</span>
-          <span className="block">내일 보내요</span>
+          <span className="block">볶은 다음 날</span>
+          <span className="block">발송하는 원두</span>
         </h1>
         <p className="mt-4 text-[16px] md:text-[18px]" style={{ color: "rgba(255,255,255,0.82)" }}>
           로스팅 요일 화, 금

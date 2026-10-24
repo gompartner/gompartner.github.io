@@ -16,7 +16,7 @@ import { DemoMakerInfo } from "@/components/demos/DemoMakerInfo";
    수업은 읽기, 토론, 쓰기 순서가 많고, 첨삭한 원고지를 사진으로 보호자에게 보내 주는 곳이 많다.
    교습비는 교육청 신고 교습비처럼 반별 "월 교습비"로 적고 교재비는 따로 적는다. 합격 실적, 학생 실명은 쓰지 않는다.
 
-   첫 화면(ra-poster): 두 손으로 책 네 권을 들어 올린 사진 한 장이 화면을 채우고, 왼쪽 아래에 문장 "책 한 권 읽고 한 장 써요".
+   첫 화면(ra-poster): 두 손으로 책 네 권을 들어 올린 사진 한 장이 화면을 채우고, 왼쪽 아래에 문장 "읽고 토론하고 쓰는 90분".
    사진 출처: Pexels 사진 8762862, 책 사진 book-(id)는 AI 생성(Z-Image-Turbo)
 
    핵심 모션: 들어올 때 사진이 1600ms 동안 scale 1.06 -> 1 로 다가오고, 문장과 정보 줄은 300ms 늦게
@@ -458,11 +458,12 @@ function Poster({ reduce, onCta }: { reduce: boolean; onCta: () => void }) {
 
         <div className={`mt-auto pb-[10svh] ${reduce ? "" : "ra-rise"}`}>
           <h1 id="ra-poster-title" className="text-[36px] font-bold md:text-[clamp(40px,5vw,72px)]" style={{ letterSpacing: "-0.03em", lineHeight: 1.2, wordBreak: "keep-all" }}>
-            책 한 권 읽고
-            <br />한 장 써요
+            읽고 토론하고 쓰는
+            <br />
+            90분
           </h1>
           <p className="mt-4 text-[15px] font-medium md:text-[17px]" style={{ color: C.body, lineHeight: 1.5 }}>
-            초등 1학년 ~ 중학교 3학년, 주 1회 90분
+            초등 1학년 ~ 중학교 3학년, 주 1회
           </p>
         </div>
       </div>

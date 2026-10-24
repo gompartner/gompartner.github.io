@@ -17,7 +17,7 @@ import { DemoMakerInfo } from "@/components/demos/DemoMakerInfo";
    이용 안내에는 입실 14시, 퇴실 11시, 매너타임, 화기 규정(화로대 사용, 바닥 직화 금지), 반려동물, 환불 규정표가 있다.
    오시는 길은 역이 아니라 고속도로 나들목 기준으로 적는다.
 
-   첫 화면 포스터(cp-poster): 별이 뜬 밤 캠핑장 사진 한 장이 화면을 채우고, 숲 그림자 위에 문장 "장작은 저희가 패 둘게요".
+   첫 화면 포스터(cp-poster): 별이 뜬 밤 캠핑장 사진 한 장이 화면을 채우고, 숲 그림자 위에 문장 "장작과 화로를 갖춘 숲속 오토캠핑장".
    들어올 때 사진이 1.06배에서 1배로 1.6초 동안 다가오고, 문장은 0.3초 뒤 12px 아래에서 올라온다(CSS keyframes).
    스크롤하면 사진만 조금 느리게 움직인다. 불꽃, 불티 같은 반복 움직임은 두지 않는다. 동작 줄이기면 모두 멈춘 상태.
    그 아래 먹색 띠(상호, 사이트 구성, 요금 요약)가 이어진다.
@@ -457,9 +457,11 @@ function Poster({ reduce, onCta }: { reduce: boolean; onCta: () => void }) {
       <div className="relative z-10 mx-auto flex w-full max-w-[1200px] flex-1 items-center px-4 pb-[16svh] md:px-6">
         <div className={reduce ? "" : "cp-hero-rise"}>
           <h1 id="cp-poster-title" className="max-w-[14em] text-[36px] font-bold md:text-[clamp(40px,5vw,72px)]" style={{ letterSpacing: "-0.03em", lineHeight: 1.2, wordBreak: "keep-all" }}>
-            장작은 저희가 패 둘게요
+            장작과 화로를 갖춘
+            <br />
+            숲속 오토캠핑장
           </h1>
-          <p className="mt-4 text-[16px] font-medium text-white/90 md:text-[18px]">강원 ㅍㅊ군 오토캠핑장, 입실 14시</p>
+          <p className="mt-4 text-[16px] font-medium text-white/90 md:text-[18px]">강원 ㅍㅊ군, 입실 14시</p>
         </div>
       </div>
     </section>

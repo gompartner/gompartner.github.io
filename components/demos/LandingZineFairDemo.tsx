@@ -201,7 +201,7 @@ export function LandingZineFairDemo() {
           </dl>
           <div className="mt-8 flex flex-wrap gap-3">
             <button type="button" onClick={() => go("zf-entry")} className={`${pill} min-w-[220px] px-8 py-4 text-[20px] text-white`} style={{ background: C.blue, boxShadow: `5px 5px 0 ${C.pink}`, outlineColor: C.black }}>
-              줄 말고 등록
+              사전 등록
             </button>
             <button type="button" onClick={() => go("zf-sellers")} className={`${pill} border-[3px] px-6 py-3.5 text-[17px]`} style={{ borderColor: C.black, color: C.black, outlineColor: C.blue }}>
               셀러 24팀 보기
@@ -217,9 +217,9 @@ export function LandingZineFairDemo() {
           </Sticker>
           <Sticker className="absolute -top-2 right-0 text-[15px] md:right-2" color={C.pink} rotate={10} size={96}>
             <span className="text-white">
-              이틀만
+              이틀간
               <br />
-              엽니다
+              열립니다
             </span>
           </Sticker>
         </div>

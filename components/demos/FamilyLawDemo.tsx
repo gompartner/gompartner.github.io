@@ -41,7 +41,7 @@ import { DemoMakerInfo } from "@/components/demos/DemoMakerInfo";
    사진 출처: AI 생성(Z-Image-Turbo, Apache 2.0). 직원 사진은 AI 생성(Z-Image-Turbo).
 
    첫 화면(fl-poster): 조용한 상담실 사진 한 장이 화면을 채운다. 둥근 원목 탁자에 물 한 잔과 서류철, 뒤로 밝은 창과 법률 서가.
-   아래쪽 어두운 막 위에 문장 "상담은 다른 분과 마주치지 않게 잡아요"를 왼쪽 정렬로 둔다.
+   아래쪽 어두운 막 위에 문장 "다른 의뢰인과 마주치지 않는 상담"를 왼쪽 정렬로 둔다.
    핵심 모션: 들어올 때 사진이 1.06배에서 1배로 1.6초 동안 천천히 다가오고, 문장은 0.3초 뒤 아래에서 올라온다.
    스크롤하면 사진만 조금 느리게 움직인다. 동작 줄이기 설정이면 모두 멈춘다. */
 
@@ -126,7 +126,7 @@ function Poster({ reduce, onCta }: { reduce: boolean; onCta: () => void }) {
           className="max-w-[12em] text-[36px] font-bold md:text-[clamp(40px,5vw,72px)]"
           style={{ ...serifF, letterSpacing: "-0.03em", lineHeight: 1.2, wordBreak: "keep-all" }}
         >
-          상담은 다른 분과 마주치지 않게 잡아요
+          다른 의뢰인과 마주치지 않는 상담
         </h1>
         <p className="mt-4 text-[16px] md:mt-6 md:text-[18px]" style={{ color: "rgba(255,255,255,0.86)" }}>
           이혼, 가사 사건 상담 평일 밤 9시까지

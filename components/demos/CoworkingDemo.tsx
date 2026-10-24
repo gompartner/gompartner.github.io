@@ -27,7 +27,7 @@ import { DemoMakerInfo } from "@/components/demos/DemoMakerInfo";
    4. 투어 신청: 날짜(오늘부터 7일, 평일만), 시간, 이름, 휴대폰, 인원. 접수 완료 화면에 접수번호, 담당 창구, 회신 예정일.
    5. 입주 혜택과 오시는 길: 역에서 걷는 시간, 주차, 운영시간. 오늘 요일 진하게.
 
-   포스터 첫 화면(cw-poster): 공유오피스 라운지 사진 한 장이 화면을 채우고, 아래 왼쪽에 문장 "오늘 하루만 앉아도 돼요".
+   포스터 첫 화면(cw-poster): 공유오피스 라운지 사진 한 장이 화면을 채우고, 아래 왼쪽에 문장 "하루 이용권부터 전용 데스크까지".
    들어올 때 사진이 1.06배에서 1배로 1.6초 동안 다가오고, 문장은 0.3초 뒤 12px 아래에서 올라온다(CSS keyframes).
    스크롤하면 사진만 조금 느리게 움직인다. 좌석이 바뀔 때 튀던 효과는 빼고 색만 천천히 바뀐다.
 
@@ -494,7 +494,7 @@ function Poster({ reduce, onCta }: { reduce: boolean; onCta: () => void }) {
       <div className="relative z-10 mx-auto mt-auto w-full max-w-[1200px] px-4 pb-14 md:px-6 md:pb-20">
         <div className={reduce ? "" : "cw-hero-rise"}>
           <h1 id="cw-poster-title" className="max-w-[14em] text-[36px] font-bold md:text-[clamp(40px,5vw,72px)]" style={{ letterSpacing: "-0.03em", lineHeight: 1.2, wordBreak: "keep-all" }}>
-            오늘 하루만 앉아도 돼요
+            하루 이용권부터 전용 데스크까지
           </h1>
           <p className="mt-4 text-[16px] font-medium text-white/90 md:text-[18px]">
             {BRAND} {BRANCH}, 평일 09:00~21:00
