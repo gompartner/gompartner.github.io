@@ -2,7 +2,7 @@
 
 import { useEffect, useId, useRef, useState } from "react";
 import { AnimatePresence, motion, useScroll, useTransform } from "framer-motion";
-import { Award, Bus, CalendarCheck, Check, Clock, MapPin, MessageCircle, Phone, ShieldCheck } from "lucide-react";
+import { Award, Bus, CalendarCheck, Check, Clock, MapPin, MessageCircle, Phone, ShieldCheck, Users } from "lucide-react";
 import { useReducedMotionSafe } from "@/hooks/useReducedMotionSafe";
 import { daysAgo, fmtKo, useDemoToday } from "@/hooks/useDemoToday";
 import { maskName, maskPhone } from "@/components/demos/LeadReceivedPanel";
@@ -35,6 +35,12 @@ const ADDRESS = "서울 ㅇㅇ구 ㅇㅇ로 00, 2층";
 const IMG = "/images/demo-taekwondo";
 
 /* 색. 바탕은 흰색과 옅은 회색을 번갈아 쓰고 강조색은 짙은 빨강 하나 */
+const STAFF = [
+  { id: "1", name: "정ㄷ현", role: "관장", note: "공인 6단, 국기원 사범 자격, 지도 18년" },
+  { id: "2", name: "한ㅅ우", role: "사범", note: "공인 4단, 초등부 담당, 차량 운행 동승" },
+  { id: "3", name: "오ㅈ민", role: "사범", note: "공인 4단, 품새 선수 출신, 유치부 담당" },
+];
+
 const C = {
   bg: "#ffffff",
   paper: "#f7f7f5",
@@ -213,6 +219,27 @@ export function TaekwondoDemo() {
           </nav>
         </div>
       </header>
+
+      {/* 관장, 사범 */}
+      <section id="tk-staff" aria-labelledby="tk-staff-title" className="scroll-mt-0 py-14 md:py-20" style={{ background: C.paper }}>
+        <div className="mx-auto max-w-[1200px] px-4 md:px-6">
+          <SectionTitle id="tk-staff-title" icon={<Users size={24} aria-hidden />} title="관장, 사범" />
+          <ul className="grid gap-8 sm:grid-cols-3 md:gap-6">
+            {STAFF.map((t) => (
+              <li key={t.id}>
+                {/* eslint-disable-next-line @next/next/no-img-element -- 정적 export 라 next/image 최적화를 쓰지 않는다 */}
+                <img src={`${IMG}/staff-${t.id}.jpg`} alt={`${t.role} ${t.name}`} className="block aspect-[4/5] w-full rounded-[8px] object-cover" />
+                <p className="mt-3 text-[18px] font-bold" style={{ color: C.ink }}>
+                  {t.name} <span className="text-[15px] font-semibold" style={{ color: C.muted }}>{t.role}</span>
+                </p>
+                <p className="mt-1 text-[15px] leading-[1.6]" style={{ color: C.muted }}>
+                  {t.note}
+                </p>
+              </li>
+            ))}
+          </ul>
+        </div>
+      </section>
 
       {/* 차량 운행 */}
       <section id="tk-bus" aria-labelledby="tk-bus-title" className="scroll-mt-0 py-14 md:py-20" style={{ background: C.bg }}>

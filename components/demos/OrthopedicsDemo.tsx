@@ -1090,12 +1090,22 @@ function Hours({ today }: { today: Date }) {
       </ul>
       <div className="mt-6 grid gap-2">
         <p className="text-[15px] font-bold">의료진</p>
-        <p className="text-[16px]">
-          대표원장 김ㅎ늘 <span style={{ color: C.muted }}>정형외과 전문의</span>
-        </p>
-        <p className="text-[16px]">
-          원장 박ㅈ원 <span style={{ color: C.muted }}>정형외과 전문의</span>
-        </p>
+        <ul className="grid gap-4 sm:grid-cols-2">
+          <li className="flex items-center gap-4">
+            {/* eslint-disable-next-line @next/next/no-img-element -- 정적 export 라 next/image 최적화를 쓰지 않는다 */}
+            <img src={`${IMG}/staff-1.jpg`} alt="대표원장 김ㅎ늘" className="h-24 w-20 flex-none rounded-[8px] object-cover" />
+            <span>
+              <strong className="block text-[17px]">대표원장 김ㅎ늘</strong> <span style={{ color: C.muted }}>정형외과 전문의</span>
+            </span>
+          </li>
+          <li className="flex items-center gap-4">
+            {/* eslint-disable-next-line @next/next/no-img-element -- 정적 export 라 next/image 최적화를 쓰지 않는다 */}
+            <img src={`${IMG}/staff-2.jpg`} alt="원장 박ㅈ원" className="h-24 w-20 flex-none rounded-[8px] object-cover" />
+            <span>
+              <strong className="block text-[17px]">원장 박ㅈ원</strong> <span style={{ color: C.muted }}>정형외과 전문의</span>
+            </span>
+          </li>
+        </ul>
       </div>
     </div>
   );

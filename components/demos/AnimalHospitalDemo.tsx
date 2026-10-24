@@ -123,6 +123,8 @@ const korTime = (h: number, m = 0) => `${h < 12 ? "오전" : "오후"} ${h % 12 
 /* ---------- 진료 과목 ---------- */
 
 type DeptId = "내과" | "외과" | "영상의학과" | "치과" | "안과" | "피부과" | "고양이 진료";
+const VET_PHOTO: Record<string, number> = { 김하늘: 1, 박준우: 2, 이서아: 3, 최도현: 4 };
+
 const DEPTS: { id: DeptId; Icon: typeof Stethoscope; when: string[]; care: string[]; vet: string }[] = [
   {
     id: "내과",
@@ -468,7 +470,7 @@ function ErBoard({ now }: { now: Date | null }) {
             <Stethoscope size={16} aria-hidden />
             야간 당직
           </dt>
-          <dd>수의사 2명, 동물보건사 2명</dd>
+          <dd>수의사 4명, 동물보건사 2명</dd>
         </dl>
         <div className="mt-6 rounded-[6px] p-4" style={{ background: C.paper, border: `1px solid ${C.line}` }}>
           <p className="font-bold">이럴 땐 바로 오세요</p>
@@ -610,8 +612,12 @@ function DeptPicker({ reduce, dept, setDept }: { reduce: boolean; dept: DeptId; 
               ))}
             </ul>
           </div>
-          <p className="border-t pt-4 text-[15px] sm:col-span-2" style={{ borderColor: C.line, color: C.muted }}>
-            담당 {maskName(d.vet)} 수의사
+          <p className="flex items-center gap-3 border-t pt-4 text-[15px] sm:col-span-2" style={{ borderColor: C.line, color: C.muted }}>
+            {/* eslint-disable-next-line @next/next/no-img-element -- 정적 export 라 next/image 최적화를 쓰지 않는다 */}
+            <img src={`${IMG}/vet-${VET_PHOTO[d.vet]}.jpg`} alt="" className="h-16 w-16 flex-none rounded-full object-cover" />
+            <span>
+              담당 <strong style={{ color: C.ink }}>{maskName(d.vet)}</strong> 수의사
+            </span>
           </p>
         </motion.div>
       </AnimatePresence>

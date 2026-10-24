@@ -23,7 +23,7 @@ import { DemoMakerInfo } from "@/components/demos/DemoMakerInfo";
    4. 신청 폼: 학년을 고르면 들을 수 있는 반만 남고, 반마다 남은 자리가 보인다.
    5. 신청 완료 화면: 접수 번호와 회신 예정일, 남은 자리가 하나 줄어든다.
 
-   사진(public/images/demo-landing-coding-camp): hero, teacher */
+   사진(public/images/demo-landing-coding-camp): hero, teacher, work-maze, work-runner, work-robot */
 
 const IMG = "/images/demo-landing-coding-camp";
 
@@ -368,56 +368,10 @@ function Curriculum() {
 
 /* ---------- 4. 결과물 예시 ---------- */
 
-function MazeArt() {
-  return (
-    <svg viewBox="0 0 160 110" className="h-full w-full" aria-hidden>
-      <rect width="160" height="110" fill="#fff7dc" />
-      {[
-        "M10 10H150V100H10Z",
-        "M10 40H60M90 40H150M40 70H120M40 70V100M120 10V40",
-      ].map((d) => (
-        <path key={d} d={d} fill="none" stroke={C.ink} strokeWidth="4" />
-      ))}
-      <circle cx="25" cy="25" r="8" fill={C.orange} stroke={C.ink} strokeWidth="2" />
-      <rect x="128" y="78" width="14" height="14" fill={C.green} stroke={C.ink} strokeWidth="2" />
-    </svg>
-  );
-}
-function RunnerArt() {
-  return (
-    <svg viewBox="0 0 160 110" className="h-full w-full" aria-hidden>
-      <rect width="160" height="110" fill="#dfe8ff" />
-      <rect y="86" width="160" height="24" fill={C.green} />
-      <rect x="22" y="60" width="18" height="26" rx="4" fill={C.pink} stroke={C.ink} strokeWidth="2" />
-      <rect x="92" y="70" width="14" height="16" fill={C.ink} />
-      {[60, 118, 140].map((x, i) => (
-        <path key={x} d={`M${x} ${30 + i * 8}l4 8 9 1-7 6 2 9-8-5-8 5 2-9-7-6 9-1z`} fill={C.yellow} stroke={C.ink} strokeWidth="1.5" />
-      ))}
-      <text x="150" y="18" textAnchor="end" fontSize="12" fontWeight="800" fill={C.ink}>
-        점수 7
-      </text>
-    </svg>
-  );
-}
-function RobotArt() {
-  return (
-    <svg viewBox="0 0 160 110" className="h-full w-full" aria-hidden>
-      <rect width="160" height="110" fill="#e6f5ec" />
-      {Array.from({ length: 6 }).map((_, i) => (
-        <path key={i} d={`M${10 + i * 28} 10V100`} stroke="#c3dccd" strokeWidth="1.5" />
-      ))}
-      <path d="M24 88H80V40H136" fill="none" stroke={C.blue} strokeWidth="4" strokeDasharray="6 5" />
-      <circle cx="24" cy="88" r="12" fill={C.white} stroke={C.ink} strokeWidth="2.5" />
-      <circle cx="24" cy="84" r="3" fill={C.ink} />
-      <rect x="128" y="30" width="18" height="18" fill={C.orange} stroke={C.ink} strokeWidth="2" />
-    </svg>
-  );
-}
-
 const WORKS = [
-  { title: "고양이 미로 탈출", who: "초3 이ㅅ아", note: "방향키 4개와 벽 판정만으로 만든 첫 게임", art: <MazeArt /> },
-  { title: "별 모으기 달리기", who: "초5 박ㄷ현", note: "장애물을 넘으며 별을 모아 10점이면 다음 판", art: <RunnerArt /> },
-  { title: "로봇 청소기 길 찾기", who: "초6 최ㅇ준", note: "바닥 그림을 따라가다 상자를 만나면 멈추는 로봇", art: <RobotArt /> },
+  { title: "고양이 미로 탈출", who: "초3 이ㅅ아", note: "방향키 4개와 벽 판정만으로 만든 첫 게임", img: "work-maze", alt: "노트북 화면에 띄운 미로 게임" },
+  { title: "별 모으기 달리기", who: "초5 박ㄷ현", note: "장애물을 넘으며 별을 모아 10점이면 다음 판", img: "work-runner", alt: "태블릿으로 달리기 게임을 하는 아이 손" },
+  { title: "로봇 청소기 길 찾기", who: "초6 최ㅇ준", note: "바닥 그림을 따라가다 상자를 만나면 멈추는 로봇", img: "work-robot", alt: "종이 위 검은 선을 따라가는 작은 바퀴 로봇" },
 ];
 
 function Showcase() {
@@ -431,8 +385,9 @@ function Showcase() {
             className="overflow-hidden rounded-[12px] border-2"
             style={{ borderColor: C.ink, background: C.white, transform: `rotate(${[-1, 0.6, -0.4][i]}deg)` }}
           >
-            <div className="aspect-[16/11] border-b-2" style={{ borderColor: C.ink }}>
-              {w.art}
+            <div className="aspect-[16/11] overflow-hidden border-b-2" style={{ borderColor: C.ink }}>
+              {/* eslint-disable-next-line @next/next/no-img-element -- 정적 export 라 next/image 최적화를 쓰지 않는다 */}
+              <img src={`${IMG}/${w.img}.jpg`} alt={w.alt} loading="lazy" className="h-full w-full object-cover" />
             </div>
             <div className="p-4">
               <h3 className="text-[19px] font-black">{w.title}</h3>

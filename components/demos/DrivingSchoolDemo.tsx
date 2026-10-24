@@ -37,6 +37,12 @@ const ADDRESS = "서울 ㅇㅇ구 ㅇㅇ로 00";
 const IMG = "/images/demo-driving-school";
 
 /* 색: 바탕 흰색과 옅은 회색, 강조색은 짙은 머스터드 하나 */
+const STAFF = [
+  { id: "1", name: "윤ㅂ석", role: "기능 강사", note: "1종 대형, 기능교육 12년" },
+  { id: "2", name: "김ㅁ지", role: "도로주행 강사", note: "장롱면허 연수, 여성 수강생 담당" },
+  { id: "3", name: "이ㅈ훈", role: "도로주행 강사", note: "2종 자동, 야간 도로주행 담당" },
+];
+
 const C = {
   bg: "#f7f7f5",
   card: "#ffffff",
@@ -300,6 +306,24 @@ export function DrivingSchoolDemo() {
             go("dr-reserve");
           }}
         />
+      </section>
+
+      <section id="dr-staff" aria-labelledby="dr-staff-title" className="mx-auto mt-16 max-w-[1200px] scroll-mt-4 px-4 md:mt-24 md:px-6">
+        <SectionTitle id="dr-staff-title" title="강사" />
+        <ul className="grid gap-8 sm:grid-cols-3 md:gap-6">
+          {STAFF.map((t) => (
+            <li key={t.id}>
+              {/* eslint-disable-next-line @next/next/no-img-element -- 정적 export 라 next/image 최적화를 쓰지 않는다 */}
+              <img src={`${IMG}/staff-${t.id}.jpg`} alt={`${t.role} ${t.name}`} className="block aspect-[4/5] w-full rounded-[8px] object-cover" />
+              <p className="mt-3 text-[18px] font-bold" style={{ color: C.ink }}>
+                {t.name} <span className="text-[15px] font-semibold" style={{ color: C.muted }}>{t.role}</span>
+              </p>
+              <p className="mt-1 text-[15px] leading-[1.6]" style={{ color: C.muted }}>
+                {t.note}
+              </p>
+            </li>
+          ))}
+        </ul>
       </section>
 
       <section id="dr-shuttle" aria-labelledby="dr-shuttle-title" className="mx-auto mt-16 max-w-[1200px] scroll-mt-4 px-4 md:mt-24 md:px-6">

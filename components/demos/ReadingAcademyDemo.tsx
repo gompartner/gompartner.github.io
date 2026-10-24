@@ -17,7 +17,7 @@ import { DemoMakerInfo } from "@/components/demos/DemoMakerInfo";
    교습비는 교육청 신고 교습비처럼 반별 "월 교습비"로 적고 교재비는 따로 적는다. 합격 실적, 학생 실명은 쓰지 않는다.
 
    첫 화면(ra-poster): 두 손으로 책 네 권을 들어 올린 사진 한 장이 화면을 채우고, 왼쪽 아래에 문장 "책 한 권 읽고 한 장 써요".
-   사진 출처: Pexels 사진 8762862
+   사진 출처: Pexels 사진 8762862, 책 사진 book-(id)는 AI 생성(Z-Image-Turbo)
 
    핵심 모션: 들어올 때 사진이 1600ms 동안 scale 1.06 -> 1 로 다가오고, 문장과 정보 줄은 300ms 늦게
    아래 12px 에서 700ms 동안 올라온다(CSS keyframes, JS 없이도 보인다). 스크롤하면 사진만 y 0 -> 8% 로 느리게 움직인다.
@@ -114,51 +114,49 @@ const ptsToD = (pts: Pt[]) => pts.map((p, i) => `${i ? "L" : "M"}${p[0].toFixed(
 
 /* ---------- 이번 달 읽는 책 ---------- */
 
-type Book = { t: string; a: string; kind: string; q: string };
+type Book = { id: string; t: string; a: string; kind: string; q: string };
 const GRADES: { label: string; amount: string; books: Book[] }[] = [
   {
     label: "초등 1~2학년",
     amount: "원고지 반 장(100자)",
     books: [
-      { t: "강아지똥", a: "권정생 글, 정승각 그림", kind: "그림책", q: "나도 쓸모 있다고 느낀 때가 있나요?" },
-      { t: "구름빵", a: "백희나", kind: "그림책", q: "구름빵을 먹으면 어디에 가고 싶나요?" },
-      { t: "알사탕", a: "백희나", kind: "그림책", q: "알사탕으로 누구 마음을 듣고 싶나요?" },
-      { t: "줄무늬가 생겼어요", a: "데이빗 섀논", kind: "그림책", q: "남과 달라서 걱정한 적이 있나요?" },
+      { id: "gangaji", t: "강아지똥", a: "권정생 글, 정승각 그림", kind: "그림책", q: "나도 쓸모 있다고 느낀 때가 있나요?" },
+      { id: "gureumppang", t: "구름빵", a: "백희나", kind: "그림책", q: "구름빵을 먹으면 어디에 가고 싶나요?" },
+      { id: "alsatang", t: "알사탕", a: "백희나", kind: "그림책", q: "알사탕으로 누구 마음을 듣고 싶나요?" },
+      { id: "stripes", t: "줄무늬가 생겼어요", a: "데이빗 섀논", kind: "그림책", q: "남과 달라서 걱정한 적이 있나요?" },
     ],
   },
   {
     label: "초등 3~4학년",
     amount: "원고지 한 장(200자)",
     books: [
-      { t: "마당을 나온 암탉", a: "황선미", kind: "동화", q: "잎싹은 왜 마당을 나왔을까?" },
-      { t: "만복이네 떡집", a: "김리리", kind: "동화", q: "말 한마디로 친구 마음이 바뀐 적 있나요?" },
-      { t: "프린들 주세요", a: "앤드루 클레먼츠", kind: "동화", q: "낱말은 누가 정할까?" },
-      { t: "샬롯의 거미줄", a: "E. B. 화이트", kind: "동화", q: "친구를 위해 내가 할 수 있는 일은?" },
+      { id: "hen", t: "마당을 나온 암탉", a: "황선미", kind: "동화", q: "잎싹은 왜 마당을 나왔을까?" },
+      { id: "tteokjip", t: "만복이네 떡집", a: "김리리", kind: "동화", q: "말 한마디로 친구 마음이 바뀐 적 있나요?" },
+      { id: "frindle", t: "프린들 주세요", a: "앤드루 클레먼츠", kind: "동화", q: "낱말은 누가 정할까?" },
+      { id: "charlotte", t: "샬롯의 거미줄", a: "E. B. 화이트", kind: "동화", q: "친구를 위해 내가 할 수 있는 일은?" },
     ],
   },
   {
     label: "초등 5~6학년",
     amount: "원고지 한 장(400자)",
     books: [
-      { t: "몽실 언니", a: "권정생", kind: "소설", q: "몽실이는 왜 끝까지 동생을 업었을까?" },
-      { t: "책과 노니는 집", a: "이영서", kind: "역사 동화", q: "책을 베껴 쓰는 일은 왜 위험했을까?" },
-      { t: "어린 왕자", a: "생텍쥐페리", kind: "고전", q: "길들인다는 건 무슨 뜻일까?" },
-      { t: "아름다운 아이", a: "R. J. 팔라시오", kind: "소설", q: "친절과 옳은 일 중 하나를 고른다면?" },
+      { id: "mongsil", t: "몽실 언니", a: "권정생", kind: "소설", q: "몽실이는 왜 끝까지 동생을 업었을까?" },
+      { id: "bookhouse", t: "책과 노니는 집", a: "이영서", kind: "역사 동화", q: "책을 베껴 쓰는 일은 왜 위험했을까?" },
+      { id: "prince", t: "어린 왕자", a: "생텍쥐페리", kind: "고전", q: "길들인다는 건 무슨 뜻일까?" },
+      { id: "wonder", t: "아름다운 아이", a: "R. J. 팔라시오", kind: "소설", q: "친절과 옳은 일 중 하나를 고른다면?" },
     ],
   },
   {
     label: "중학생",
     amount: "원고지 두 장(800자)",
     books: [
-      { t: "아몬드", a: "손원평", kind: "소설", q: "공감은 배워서 생길까?" },
-      { t: "동물농장", a: "조지 오웰", kind: "고전", q: "규칙은 누가 바꿀 수 있을까?" },
-      { t: "완득이", a: "김려령", kind: "소설", q: "어른이 도와준다는 건 어떤 모습일까?" },
-      { t: "나의 라임오렌지나무", a: "J. M. 바스콘셀로스", kind: "고전", q: "어른이 아이 마음을 모를 때는?" },
+      { id: "almond", t: "아몬드", a: "손원평", kind: "소설", q: "공감은 배워서 생길까?" },
+      { id: "animalfarm", t: "동물농장", a: "조지 오웰", kind: "고전", q: "규칙은 누가 바꿀 수 있을까?" },
+      { id: "wandeuk", t: "완득이", a: "김려령", kind: "소설", q: "어른이 도와준다는 건 어떤 모습일까?" },
+      { id: "orange", t: "나의 라임오렌지나무", a: "J. M. 바스콘셀로스", kind: "고전", q: "어른이 아이 마음을 모를 때는?" },
     ],
   },
 ];
-/** 책 표지 자리 색. 사진이 들어갈 자리라 무채색 두 가지를 번갈아 쓴다 */
-const COVERS = ["#efeeea", "#e6e5e0"];
 
 /* ---------- 수업 과정 ---------- */
 
@@ -506,19 +504,20 @@ function Books() {
           {grade.books.map((b, i) => {
             return (
               <li key={`${g}-${b.t}`}>
-                {/* 표지 자리 */}
-                <div className="flex aspect-[3/4] flex-col justify-between rounded-[6px] p-4" style={{ background: COVERS[i % COVERS.length], color: C.ink }}>
-                  <span className="text-[14px] font-semibold tabular-nums" style={{ color: C.muted }}>
+                <div className="relative aspect-[3/4] overflow-hidden rounded-[6px]" style={{ background: "#efeeea" }}>
+                  {/* eslint-disable-next-line @next/next/no-img-element -- 정적 export 라 next/image 최적화를 쓰지 않는다 */}
+                  <img src={`${IMG}/book-${b.id}.jpg`} alt={`책상 위에 놓인 ${b.t} 책`} loading="lazy" className="h-full w-full object-cover" />
+                  <span className="absolute left-2 top-2 rounded-[4px] bg-white/90 px-2 py-0.5 text-[13px] font-semibold tabular-nums" style={{ color: C.ink }}>
                     {i + 1}주
                   </span>
-                  <span className="text-[18px] font-bold leading-[1.3] md:text-[20px]" style={{ wordBreak: "keep-all" }}>
-                    {b.t}
-                  </span>
-                  <span className="text-[13px]" style={{ color: C.body }}>
-                    {b.a}
-                  </span>
                 </div>
-                <p className="mt-3 text-[14px] font-semibold" style={{ color: C.muted }}>
+                <p className="mt-3 text-[18px] font-bold leading-[1.3]" style={{ wordBreak: "keep-all" }}>
+                  {b.t}
+                </p>
+                <p className="mt-0.5 text-[13px]" style={{ color: C.body }}>
+                  {b.a}
+                </p>
+                <p className="mt-2 text-[14px] font-semibold" style={{ color: C.muted }}>
                   {b.kind}
                 </p>
                 <p className="mt-1 text-[16px] font-bold leading-[1.45]" style={{ wordBreak: "keep-all" }}>

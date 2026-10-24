@@ -23,7 +23,7 @@ import { DemoMakerInfo } from "@/components/demos/DemoMakerInfo";
    4. 상담 신청 폼과 완료 화면(접수 번호, 전화 예정 시간).
    5. 아래 고정 상담 신청 바: 첫 화면을 지나면 뜨고, 폼이 보이면 숨는다.
 
-   사진(public/images/demo-landing-water-rental): hero (원본 03_Resource/ai-image/output/렌탈-첫화면-21350.png) */
+   사진(public/images/demo-landing-water-rental): hero (원본 03_Resource/ai-image/output/렌탈-첫화면-21350.png), product-(제품 id) */
 
 const IMG = "/images/demo-landing-water-rental";
 
@@ -301,6 +301,10 @@ function Compare({ term, setTerm, onPick }: { term: Term; setTerm: (t: Term) => 
         <ul className="mt-8 grid gap-4 md:grid-cols-3">
           {PRODUCTS.map((p) => (
             <li key={p.id} className="flex flex-col rounded-[16px] border-2 bg-white p-6" style={{ borderColor: C.line }}>
+              <div className="-mx-2 -mt-2 mb-5 aspect-[4/3] overflow-hidden rounded-[12px]" style={{ background: C.foam }}>
+                {/* eslint-disable-next-line @next/next/no-img-element -- 정적 export 라 next/image 최적화를 쓰지 않는다 */}
+                <img src={`${IMG}/product-${p.id}.jpg`} alt="" loading="lazy" className="h-full w-full object-cover" />
+              </div>
               <p className="text-[14px] font-bold" style={{ color: C.sea }}>
                 {p.kind}
               </p>

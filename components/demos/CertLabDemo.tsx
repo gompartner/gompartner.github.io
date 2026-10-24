@@ -59,7 +59,7 @@ import { DemoMakerInfo } from "@/components/demos/DemoMakerInfo";
    시료 접수 안내(오시는 길 화면 안)는 받는 주소 복사와 상자에 넣을 것 목록을 둔다.
 
    사진 출처(public/images/demo-certlab):
-   AI 생성(Z-Image-Turbo, Apache 2.0) hero, lab */
+   AI 생성(Z-Image-Turbo, Apache 2.0) hero, lab, facility-(chamber, shield, conducted, safety) */
 
 const IMG = "/images/demo-certlab";
 const COMPANY = "곰파트너";
@@ -1096,7 +1096,8 @@ const FACILITIES = [
       ["주파수", "30MHz ~ 18GHz"],
       ["턴테이블 하중", "1.2톤"],
     ],
-    draw: "chamber" as const,
+    kind: "chamber",
+    alt: "벽과 천장을 전파 흡수체로 덮은 전파무향실과 안테나",
   },
   {
     name: "차폐실",
@@ -1106,7 +1107,8 @@ const FACILITIES = [
       ["정전기 방전", "±30kV까지"],
       ["서지", "6kV까지"],
     ],
-    draw: "shield" as const,
+    kind: "shield",
+    alt: "금속판으로 둘러싼 차폐실 안의 시험대",
   },
   {
     name: "전도 시험 설비",
@@ -1116,7 +1118,8 @@ const FACILITIES = [
       ["전원", "단상, 삼상 100A"],
       ["통신선", "ISN 8선"],
     ],
-    draw: "conducted" as const,
+    kind: "conducted",
+    alt: "시험대 위 의사 전원망과 연결된 전원선",
   },
   {
     name: "안전 시험실",
@@ -1126,60 +1129,20 @@ const FACILITIES = [
       ["온도 기록", "60채널"],
       ["항온항습", "-40 ~ 150°C"],
     ],
-    draw: "safety" as const,
+    kind: "safety",
+    alt: "내전압 시험기와 항온항습 챔버가 있는 안전 시험실",
   },
 ];
-
-function FacilityIcon({ kind }: { kind: (typeof FACILITIES)[number]["draw"] }) {
-  const s = { fill: "none", stroke: C.indigo, strokeWidth: 1.6, strokeLinejoin: "round" as const, strokeLinecap: "round" as const };
-  return (
-    <svg viewBox="0 0 120 64" className="h-16 w-full" aria-hidden>
-      <rect x="0.5" y="0.5" width="119" height="63" rx="6" fill={C.paper} stroke={C.line} />
-      {kind === "chamber" && (
-        <>
-          {Array.from({ length: 9 }, (_, i) => (
-            <path key={i} d={`M${12 + i * 11} 14 l5 -7 l5 7`} {...s} stroke={C.cyan} />
-          ))}
-          <ellipse cx="44" cy="50" rx="18" ry="4" {...s} />
-          <rect x="38" y="36" width="12" height="10" rx="1.5" {...s} />
-          <path d="M92 52 V24 M86 24 H98 M88 28 H96" {...s} />
-        </>
-      )}
-      {kind === "shield" && (
-        <>
-          <rect x="16" y="12" width="88" height="42" rx="3" {...s} strokeDasharray="4 3" />
-          <path d="M44 20 l-8 14 h10 l-6 14" {...s} stroke={C.cyan} />
-          <rect x="62" y="34" width="26" height="14" rx="2" {...s} />
-        </>
-      )}
-      {kind === "conducted" && (
-        <>
-          <path d="M10 40 H38 M70 40 H110" {...s} />
-          <rect x="38" y="30" width="32" height="20" rx="2" {...s} />
-          <path d="M42 22 C48 12 54 32 60 18 S66 24 70 18" {...s} stroke={C.cyan} />
-          <text x="54" y="44" textAnchor="middle" fontSize="8" fill={C.indigo} fontWeight={700}>
-            LISN
-          </text>
-        </>
-      )}
-      {kind === "safety" && (
-        <>
-          <rect x="18" y="16" width="34" height="34" rx="3" {...s} />
-          <path d="M37 22 l-7 12 h8 l-5 10" {...s} stroke={C.cyan} />
-          <path d="M70 48 V18 M70 48 a6 6 0 1 0 0.01 0" {...s} />
-          <path d="M84 20 H100 M84 30 H96 M84 40 H100" {...s} strokeDasharray="2 3" />
-        </>
-      )}
-    </svg>
-  );
-}
 
 function Facilities() {
   return (
     <ul className="grid gap-4 md:grid-cols-2">
       {FACILITIES.map((f) => (
         <li key={f.name} className="flex flex-col rounded-[10px] border bg-white p-5" style={{ borderColor: C.line }}>
-          <FacilityIcon kind={f.draw} />
+          <div className="aspect-[16/9] overflow-hidden rounded-[6px]" style={{ background: C.paper }}>
+            {/* eslint-disable-next-line @next/next/no-img-element -- 정적 export 라 next/image 최적화를 쓰지 않는다 */}
+            <img src={`${IMG}/facility-${f.kind}.jpg`} alt={f.alt} loading="lazy" className="h-full w-full object-cover" />
+          </div>
           <h3 className="mt-4 text-[19px] font-bold tracking-[-0.02em]">{f.name}</h3>
           <p className="mt-1.5 text-[15px]" style={{ color: C.muted }}>
             {f.body}

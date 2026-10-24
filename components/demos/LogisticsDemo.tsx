@@ -470,6 +470,8 @@ function ServiceLine() {
         const Icon = s.icon;
         return (
           <li key={s.name} className={`relative p-5 md:p-6 ${k > 0 ? "border-t md:border-l md:border-t-0" : ""}`} style={{ borderColor: C.line, background: k === 2 ? C.soft : C.paper }}>
+            {/* eslint-disable-next-line @next/next/no-img-element -- 정적 export 라 next/image 최적화를 쓰지 않는다 */}
+            <img src={`${IMG}/service-${k + 1}.jpg`} alt="" className="mb-4 block aspect-[4/3] w-full rounded-[6px] object-cover" />
             <p className="flex items-center gap-2 text-[20px] font-bold">
               <Icon size={22} aria-hidden style={{ color: C.accent }} />
               {s.name}
