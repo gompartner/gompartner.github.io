@@ -115,7 +115,7 @@ function Hero({ onApply }: { onApply: () => void }) {
             <Image src={shot.imageUrl} alt={shot.imageAlt} width={1440} height={900} priority sizes="(min-width: 768px) 600px, 90vw" className="aspect-[16/10] w-full object-cover object-top" />
           </div>
           <div className="absolute bottom-0 right-0 w-[27%] overflow-hidden rounded-[18px] border-[5px] border-[#1c2a52] bg-white shadow-[0_24px_48px_rgba(0,0,0,.4)]">
-            <Image src={`/images/demos/m/${slug}.jpg`} alt="" width={390} height={844} sizes="180px" className="aspect-[9/17] w-full object-cover object-top" />
+            <Image src={`/images/demos/m/${slug}.jpg`} alt="" width={390} height={736} sizes="180px" className="aspect-[9/17] w-full object-cover object-top" />
           </div>
           <div className="absolute bottom-[6%] left-[4%] w-[62%] max-w-[300px] rounded-lg bg-white px-3 py-2.5 text-[#15171c] shadow-[0_16px_32px_rgba(0,0,0,.3)] md:px-4 md:py-3">
             <p className="flex items-center gap-1.5 text-[12px] font-bold text-[#5b6370] md:text-[13px]">

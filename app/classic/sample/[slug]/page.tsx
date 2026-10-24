@@ -69,7 +69,7 @@ export default async function ClassicSamplePage({ params }: Props) {
             </span>
             {mobileShot && (
               <span className="absolute bottom-0 right-0 block w-[25%] max-w-[230px] overflow-hidden rounded-[14px] border-[4px] border-[#15171c] bg-white shadow-[0_16px_32px_rgba(21,23,28,.18)] md:rounded-[24px] md:border-[6px]">
-                <Image src={mobileShot} alt="" width={390} height={844} sizes="(min-width: 768px) 230px, 25vw" className="aspect-[9/17] w-full object-cover object-top" />
+                <Image src={mobileShot} alt="" width={390} height={736} sizes="(min-width: 768px) 230px, 25vw" className="aspect-[9/17] w-full object-cover object-top" />
               </span>
             )}
           </Link>

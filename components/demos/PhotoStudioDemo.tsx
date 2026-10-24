@@ -625,7 +625,7 @@ export function PhotoStudioDemo() {
               animate={{ opacity: 1 }}
               exit={{ opacity: 0, transition: { duration: reduce ? 0 : 0.15 } }}
               transition={{ duration: reduce ? 0 : 0.3 }}
-              className="mt-6 grid gap-8 lg:grid-cols-[1fr_380px]"
+              className="mt-6 grid grid-cols-1 gap-8 lg:grid-cols-[minmax(0,1fr)_380px]"
             >
               <div>
                 <p className="text-[15px] font-bold" style={{ color: C.muted }}>

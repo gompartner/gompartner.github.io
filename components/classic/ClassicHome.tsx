@@ -137,7 +137,7 @@ function Hero() {
                 <Image src={s.project.imageUrl} alt="" width={1440} height={900} priority={n === 0} sizes="(min-width: 768px) 600px, 90vw" className="aspect-[16/10] w-full object-cover object-top" />
               </div>
               <div className="absolute bottom-0 right-0 w-[27%] overflow-hidden rounded-[18px] border-[5px] border-[#1c2a52] bg-white shadow-[0_24px_48px_rgba(0,0,0,.4)]">
-                <Image src={`/images/demos/m/${slugOf(s.project.demoUrl)}.jpg`} alt="" width={390} height={844} sizes="180px" className="aspect-[9/17] w-full object-cover object-top" />
+                <Image src={`/images/demos/m/${slugOf(s.project.demoUrl)}.jpg`} alt="" width={390} height={736} sizes="180px" className="aspect-[9/17] w-full object-cover object-top" />
               </div>
             </div>
           ))}

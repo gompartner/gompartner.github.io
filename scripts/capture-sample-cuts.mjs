@@ -1,4 +1,4 @@
-// 샘플 표지용 캡처: 휴대폰 첫 화면(public/images/demos/m/<slug>.jpg)과
+// 샘플 표지용 캡처: 휴대폰 첫 화면(public/images/demos/m/<slug>.jpg, 390x736, 사이트의 9:17 칸과 같은 비율)과
 // 사용법 단계(tours)마다 그 영역 화면(public/images/sample-cuts/<slug>-<n>.jpg).
 // 사용: npm run build 후 out 폴더를 띄우고(예: npx serve@14.2.4 out -l 5055) node scripts/capture-sample-cuts.mjs [slug]
 import { chromium } from "playwright";
@@ -18,7 +18,7 @@ for (const m of src.matchAll(/^  "?([\w-]+)"?: \[([\s\S]*?)^  \],/gm)) {
 }
 const only = process.argv[2];
 const b = await chromium.launch({ channel: "chrome" });
-const ctx = await b.newContext({ viewport: { width: 390, height: 844 }, deviceScaleFactor: 2, reducedMotion: "reduce" });
+const ctx = await b.newContext({ viewport: { width: 390, height: 736 }, deviceScaleFactor: 2, reducedMotion: "reduce" });
 for (const { id, slug } of pairs) {
   if (only && only !== slug) continue;
   const p = await ctx.newPage();
