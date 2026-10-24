@@ -16,7 +16,7 @@ import { DemoMakerInfo } from "@/components/demos/DemoMakerInfo";
    "평일 야간, 주말 교육", "등록 예약" 버튼과 대표번호를 크게 둔다. 교육 시간은 학과 3시간, 장내기능 4시간,
    도로주행 6시간(2종 소형은 학과 3시간, 장내기능 10시간, 도로교통법 시행규칙 별표 32)으로 안내하고, 교육비와 검정료를 나눠 적는 곳이 많다. 합격 보장, 합격률 숫자는 쓰지 않는다.
 
-   첫 화면(dr-poster): 운전석에서 핸들을 잡은 사진 한 장이 화면을 채우고, 왼쪽 아래에 문장 "평일 저녁에도 도로 연수해요".
+   첫 화면(dr-poster): 운전석에서 핸들을 잡은 사진 한 장이 화면을 채우고, 왼쪽 아래에 문장 "평일 밤 9시까지 도로 연수".
    사진 출처: Pexels 사진 9195126
 
    핵심 모션: 들어올 때 사진이 1600ms 동안 scale 1.06 -> 1 로 다가오고, 문장과 정보 줄은 300ms 늦게
@@ -537,12 +537,12 @@ const Poster = memo(function Poster({ reduce, onCta }: { reduce: boolean; onCta:
               wordBreak: "keep-all",
             }}
           >
-            평일 저녁에도
+            평일 밤 9시까지
             <br />
-            도로 연수해요
+            도로 연수
           </h1>
           <p className="mt-4 text-[15px] md:text-[17px]" style={{ color: "rgba(255,255,255,0.86)", lineHeight: 1.5 }}>
-            도로주행 평일 밤 9시까지, {BRAND}
+            {BRAND}, 1종 보통, 2종 보통, 2종 소형
           </p>
         </div>
       </div>

@@ -19,7 +19,7 @@ import { DemoMakerInfo } from "@/components/demos/DemoMakerInfo";
    하객 주차 2시간 무료, 신부 대기실, 지하철역 셔틀 운행은 거의 모든 홀이 적는 관용 문구다.
 
    첫 화면 포스터: 꽃으로 꾸민 예식 테이블 사진 한 장이 화면을 채운다. 사진은 1.6초 동안 scale 1.06 -> 1 로 천천히 다가오고
-   문장 "하객 50명, 우리끼리 하는 예식"과 정보 줄은 0.3초 늦게 아래 12px 에서 올라온다(CSS 키프레임, 스크립트 없이도 끝 상태가 보임).
+   문장 "하객 50명 규모의 소규모 예식"과 정보 줄은 0.3초 늦게 아래 12px 에서 올라온다(CSS 키프레임, 스크립트 없이도 끝 상태가 보임).
    스크롤하면 사진만 조금 느리게 움직인다(y 0 -> 8%). 동작 줄이기에서는 처음부터 정지 화면이다.
    글꼴은 Pretendard, h1 과 h2 만 Noto Serif KR. 바탕은 흰색과 #f7f7f5 를 번갈아 쓰고 강조색은 올리브 하나.
 
@@ -398,9 +398,9 @@ function Poster({ reduce, onCta }: { reduce: boolean; onCta: () => void }) {
             className="text-[36px] md:text-[clamp(40px,5vw,72px)]"
             style={{ ...serif, fontWeight: 700, color: "#ffffff", letterSpacing: "-0.03em", lineHeight: 1.2, wordBreak: "keep-all" }}
           >
-            하객 50명,
+            하객 50명 규모의
             <br />
-            우리끼리 하는 예식
+            소규모 예식
           </h1>
           <p className="mt-4 text-[15px] md:text-[17px]" style={{ color: "rgba(255,255,255,0.86)", lineHeight: 1.5 }}>
             {BRAND}, ㅇㅇ역 3번 출구 걸어서 5분

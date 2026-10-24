@@ -22,7 +22,7 @@ import { DemoMakerInfo } from "@/components/demos/DemoMakerInfo";
    특허 심사 기간은 심사청구 뒤 1차 결과까지 1년 안팎, 우선심사는 결정 뒤 몇 달 안으로 잡은 개략이다.
 
    사진 출처: Pexels 사진 6615086, 직원 사진은 AI 생성(Z-Image-Turbo)
-   첫 화면(po-poster): 도면 위에 컴퍼스를 세운 사진 한 장이 한 화면을 채운다. 아래 왼쪽에 문장 "상표는 먼저 낸 사람이 가져가요".
+   첫 화면(po-poster): 도면 위에 컴퍼스를 세운 사진 한 장이 한 화면을 채운다. 아래 왼쪽에 문장 "상표는 먼저 출원한 사람의 권리입니다".
    핵심 모션: 들어올 때 사진이 1.06배에서 1배로 1.6초 동안 천천히 다가오고, 문장과 정보 줄은 0.3초 늦게 12px 아래에서 올라온다(CSS).
    스크롤하면 사진만 조금 느리게 내려간다(0 ~ 8%). 동작 줄이기면 모두 멈춘 상태로 보인다.
    본문에서 움직임은 상표 검색 결과를 훑는 선 하나와 기간 막대 전환만 남겼다.
@@ -373,9 +373,9 @@ function Poster({ reduce, onCta }: { reduce: boolean; onCta: () => void }) {
           className={`${reduce ? "" : "po-rise "}text-[36px] font-bold md:text-[clamp(40px,5vw,72px)]`}
           style={{ letterSpacing: "-0.03em", lineHeight: 1.2, wordBreak: "keep-all" }}
         >
-          상표는 먼저 낸 사람이
+          상표는 먼저 출원한
           <br />
-          가져가요
+          사람의 권리입니다
         </h1>
         <p className={`${reduce ? "" : "po-rise "}mt-4 text-[16px] md:mt-6 md:text-[18px]`} style={{ color: "rgba(255,255,255,0.86)" }}>
           특허, 상표, 디자인 출원 / 평일 09:00 ~ 18:00

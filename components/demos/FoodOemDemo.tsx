@@ -35,7 +35,7 @@ import { DemoMakerInfo } from "@/components/demos/DemoMakerInfo";
    3. 생산 공정: 공정 칸을 누르면 표시가 그 칸으로 옮겨 가고 관리 기준(CCP 포함)이 나온다.
    4. 샘플 의뢰 신청: 업체명, 담당자, 휴대폰, 품목, 포장, 예상 수량. 완료하면 접수 번호, 담당 창구, 회신 예정일을 보여 준다.
 
-   첫 화면(fo-poster): 소스 숙성 창고의 나무 통 사진 한 장을 화면 가득 깔고 아래쪽에 문장 "소스 한 가지, 1,000개부터 만들어요"를 둔다.
+   첫 화면(fo-poster): 소스 숙성 창고의 나무 통 사진 한 장을 화면 가득 깔고 아래쪽에 문장 "소스 OEM, 1,000개부터 생산"를 둔다.
    핵심 모션: 들어올 때 사진이 1.6초 동안 천천히 다가오고(scale 1.06 에서 1), 문장은 0.3초 늦게 아래 12px 에서 올라온다(CSS).
    스크롤하면 사진만 조금 느리게 내려간다(y 0 에서 8%). 동작 줄이기면 전부 멈춘 상태로 둔다.
    사진 출처: Pexels 사진 6711641 */
@@ -382,9 +382,9 @@ function Poster({ reduce, onCta }: { reduce: boolean; onCta: () => void }) {
           className="text-[36px] font-bold md:text-[clamp(40px,5vw,72px)]"
           style={{ wordBreak: "keep-all", letterSpacing: "-0.03em", lineHeight: 1.2 }}
         >
-          소스 한 가지,
+          소스 OEM,
           <br />
-          1,000개부터 만들어요
+          1,000개부터 생산
         </h1>
         <p className="mt-4 text-[16px] font-medium md:mt-6 md:text-[18px]" style={{ color: "rgba(255,255,255,0.88)" }}>
           소스, 드레싱 OEM 제조. HACCP 인증 공장

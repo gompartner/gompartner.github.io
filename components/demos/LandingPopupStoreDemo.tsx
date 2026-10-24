@@ -190,7 +190,7 @@ export function LandingPopupStoreDemo() {
 
       {/* 현장 웨이팅 */}
       <section id="rc-wait" aria-labelledby="rc-wait-title" className="mx-auto mt-16 max-w-[1200px] scroll-mt-4 px-4 md:mt-24 md:px-6">
-        <TableHead id="rc-wait-title" title="예약을 놓쳤다면" desc="번호표만 뽑고 근처에 계세요. 앞 팀이 3팀 남으면 문자로 불러요." />
+        <TableHead id="rc-wait-title" title="현장 대기" desc="번호표를 받은 뒤 앞 대기가 3팀 남으면 문자로 안내합니다." />
         <WaitingBoard reduce={reduce} queue={queue} ticket={ticket} setTicket={setTicket} />
       </section>
 
@@ -370,10 +370,10 @@ function HeroReceipt({ start, end, queue, no, onPick, onReserve, onWait }: { sta
       </div>
       <Dash />
       <div aria-live="polite" className="relative">
-        <RubberStamp className="left-[22%] top-[-6px] md:left-[24%]">줄 서지 마세요</RubberStamp>
+        <RubberStamp className="left-[22%] top-[-6px] md:left-[24%]">사전 예약제</RubberStamp>
         <Row big k="대기" v={`${queue}팀`} />
         <p className="mt-1 text-right text-[13px]" style={{ color: C.faint }}>
-          지금 줄 서면 약 {queue * TEAM_MIN}분
+          현재 예상 대기 약 {queue * TEAM_MIN}분
         </p>
       </div>
       <div className="mt-4">
@@ -385,7 +385,7 @@ function HeroReceipt({ start, end, queue, no, onPick, onReserve, onWait }: { sta
           회차 고르고 발권하기
         </button>
         <button type="button" onClick={onWait} className={`${redBtn} w-full border-2 py-3 text-[16px]`} style={{ borderColor: C.ink, outlineColor: C.red, fontFamily: "var(--font-pretendard)" }}>
-          오늘 바로 가요. 번호표 뽑기
+          현장 대기 번호표 받기
         </button>
       </div>
     </>
@@ -724,7 +724,7 @@ function WaitingBoard({ reduce, queue, ticket, setTicket }: { reduce: boolean; q
               </p>
             )}
             <button type="submit" className={`${redBtn} w-full py-3.5 text-[18px] text-white`} style={{ background: C.red, outlineColor: C.paper, fontFamily: "var(--font-pretendard)" }}>
-              {queue + 1}번째로 번호표 뽑기
+              {queue + 1}번째 번호표 받기
             </button>
             <p className="text-center text-[13px]" style={{ color: "rgba(251,250,246,0.65)" }}>
               캐치테이블 웨이팅과 같은 줄이에요. 어디서 뽑아도 순서는 하나예요.

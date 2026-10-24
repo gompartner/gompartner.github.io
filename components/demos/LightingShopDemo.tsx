@@ -480,9 +480,9 @@ function Poster({ reduce, onCta }: { reduce: boolean; onCta: () => void }) {
 
         <div className={`mt-auto pb-[10svh] ${reduce ? "" : "ls-rise"}`}>
           <h1 id="ls-poster-title" className="text-[36px] font-bold md:text-[clamp(40px,5vw,72px)]" style={{ color: "#ffffff", letterSpacing: "-0.03em", lineHeight: 1.2, wordBreak: "keep-all" }}>
-            사시면 기사님이
+            구매한 조명,
             <br />
-            달아 드려요
+            설치까지 해 드립니다
           </h1>
           <p className="mt-4 text-[15px] md:text-[17px]" style={{ color: "rgba(255,255,255,0.86)", lineHeight: 1.5 }}>
             {BRAND} 전시장, 서울 ㅇㅇ구

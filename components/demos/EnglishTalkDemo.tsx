@@ -40,7 +40,7 @@ import { DemoMakerInfo } from "@/components/demos/DemoMakerInfo";
    4. 무료 체험 신청: 이름, 휴대폰, 체험 반, 그 반이 열리는 가까운 날짜 3개 중 하나. 접수 번호와 회신 예정일.
 
    핵심 모션, 첫 화면(et-poster): 학원 교실에서 직장인 두 명이 원탁에 앉아 회화하는 사진 한 장이 화면을 채운다.
-   들어올 때 사진이 1.6초 동안 1.06배에서 제자리로 천천히 다가오고, 문장 "출근 전 7시 반, 50분 회화"와 정보 줄은
+   들어올 때 사진이 1.6초 동안 1.06배에서 제자리로 천천히 다가오고, 문장 "출근 전 50분, 새벽 회화반"와 정보 줄은
    0.3초 늦게 아래에서 올라온다(CSS keyframes, 끝 상태가 기본값이라 JS 없이도 보인다).
    스크롤하면 사진만 조금 느리게 내려간다(y 0~8%). 동작 줄이기면 모두 멈춘 채로 둔다. */
 
@@ -414,11 +414,11 @@ function Poster({ reduce, onCta }: { reduce: boolean; onCta: () => void }) {
             className="text-[36px] font-bold leading-[1.2] tracking-[-0.03em] md:text-[clamp(40px,5vw,72px)]"
             style={{ wordBreak: "keep-all" }}
           >
-            <span className="block">출근 전 7시 반,</span>
-            <span className="block">50분 회화</span>
+            <span className="block">출근 전 50분,</span>
+            <span className="block">새벽 회화반</span>
           </h1>
           <p className="mt-4 text-[16px] tabular-nums md:mt-5 md:text-[19px]" style={{ color: "rgba(255,255,255,0.88)" }}>
-            {BRAND}, 평일 새벽반 07:30~08:20
+            {BRAND}, 평일 07:30~08:20
           </p>
         </div>
       </div>

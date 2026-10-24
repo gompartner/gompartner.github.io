@@ -26,7 +26,7 @@ import { DemoMakerInfo } from "@/components/demos/DemoMakerInfo";
    4. 예약: 진료 구분, 날짜, 시간, 이름, 휴대폰. 완료하면 예약 번호, 담당 창구, 확정 문자 보낼 날을 보여 준다.
 
    첫 화면(km-poster): 한지 창, 약재 서랍장, 탁자 위 청자 그릇 사진 한 장이 화면을 채운다. 사진 출처: AI 생성(Z-Image-Turbo, Apache 2.0).
-   왼쪽 위 상호, 오른쪽 위 예약하기 버튼, 아래쪽에 큰 문장 "교통사고 진료, 본인 부담 없어요"와 야간 진료 한 줄.
+   왼쪽 위 상호, 오른쪽 위 예약하기 버튼, 아래쪽에 큰 문장 "교통사고 치료, 본인 부담금 없음"와 야간 진료 한 줄.
    핵심 모션: 들어오면 사진이 1.6초 동안 천천히 다가오고(1.06배에서 1배), 문장은 0.3초 늦게 아래에서 올라온다(CSS keyframes, JS 없이도 보인다).
    스크롤하면 사진만 조금 느리게 움직인다. 본문에서 남긴 움직임은 접수번호를 넣으면 찍히는 자동차보험 도장 하나다.
    동작 줄이기면 전부 멈춘다. */
@@ -341,9 +341,9 @@ function Poster({ reduce, onCta }: { reduce: boolean; onCta: () => void }) {
           className="max-w-[12em] text-[36px] font-bold md:text-[clamp(40px,5vw,72px)]"
           style={{ ...serifF, letterSpacing: "-0.03em", lineHeight: 1.2, wordBreak: "keep-all" }}
         >
-          교통사고 진료,
+          교통사고 치료,
           <br />
-          본인 부담 없어요
+          본인 부담금 없음
         </h1>
         <p className="mt-4 inline-flex items-center gap-2 text-[16px] md:mt-6 md:text-[18px]" style={{ color: "rgba(255,255,255,0.88)" }}>
           <Moon size={18} aria-hidden />

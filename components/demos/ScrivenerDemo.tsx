@@ -34,7 +34,7 @@ import { DemoMakerInfo } from "@/components/demos/DemoMakerInfo";
    법무사 광고 규정에 맞춰 성공 사례 수, 최저가, 100% 같은 표현은 쓰지 않는다.
 
    사진 출처: Pexels 사진 31424880
-   첫 화면(js-poster): 집 모형 앞에 놓인 열쇠 꾸러미 사진 한 장이 한 화면을 채운다. 아래 왼쪽에 문장 "잔금 치르는 날, 등기도 같이 해요".
+   첫 화면(js-poster): 집 모형 앞에 놓인 열쇠 꾸러미 사진 한 장이 한 화면을 채운다. 아래 왼쪽에 문장 "잔금일 출장 등기".
    핵심 모션: 들어올 때 사진이 1.06배에서 1배로 1.6초 동안 천천히 다가오고, 문장과 정보 줄은 0.3초 늦게 12px 아래에서 올라온다(CSS).
    스크롤하면 사진만 조금 느리게 내려간다(0 ~ 8%). 동작 줄이기면 모두 멈춘 상태로 보인다.
 
@@ -400,12 +400,10 @@ function Poster({ reduce, onCta }: { reduce: boolean; onCta: () => void }) {
           className={`${reduce ? "" : "js-rise "}text-[36px] font-bold md:text-[clamp(40px,5vw,72px)]`}
           style={{ ...serifF, letterSpacing: "-0.03em", lineHeight: 1.2, wordBreak: "keep-all" }}
         >
-          잔금 치르는 날,
-          <br />
-          등기도 같이 해요
+          잔금일 출장 등기
         </h1>
         <p className={`${reduce ? "" : "js-rise "}mt-4 text-[16px] md:mt-6 md:text-[18px]`} style={{ color: "rgba(255,255,255,0.86)" }}>
-          평일 09:00 ~ 18:00, 잔금일 출장 등기
+          평일 09:00 ~ 18:00
         </p>
       </div>
     </section>

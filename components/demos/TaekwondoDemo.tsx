@@ -18,7 +18,7 @@ import { DemoMakerInfo } from "@/components/demos/DemoMakerInfo";
    어린이 통학버스 신고와 보호자 동승, 체험 수업 1회 무료 같은 문구를 그대로 쓴다.
 
    핵심 모션: 첫 화면(tk-poster)은 흰 도복에 검은 띠를 맨 수련생 사진 한 장이 화면을 채운다.
-   들어올 때 사진이 1.06배에서 1배로 천천히 다가오고, 문장 "학교 앞까지 차로 데리러 가요"와 정보 줄이 조금 늦게
+   들어올 때 사진이 1.06배에서 1배로 천천히 다가오고, 문장 "학교 앞까지 차량 운행"와 정보 줄이 조금 늦게
    아래에서 올라온다(CSS keyframes). 스크롤하면 사진만 조금 느리게 움직인다.
    본문에서는 정류장을 고르면 차 표시가 그 자리로 미끄러져 간다. 동작 줄이기면 모두 바로 바뀐다.
 
@@ -422,7 +422,7 @@ function Poster({ reduce, onCta }: { reduce: boolean; onCta: () => void }) {
       <div className={`relative z-10 mt-auto px-4 pb-14 md:px-12 md:pb-20 ${reduce ? "" : "tk-rise"}`}>
         <h1 id="tk-poster-title" className="text-[36px] font-bold leading-[1.2] tracking-[-0.03em] md:text-[clamp(40px,5vw,72px)]" style={{ wordBreak: "keep-all" }}>
           <span className="block">학교 앞까지</span>
-          <span className="block">차로 데리러 가요</span>
+          <span className="block">차량 운행</span>
         </h1>
         <p className="mt-4 inline-flex items-center gap-2 text-[16px] md:text-[18px]" style={{ color: "rgba(255,255,255,0.88)" }}>
           <Bus size={18} aria-hidden />

@@ -354,9 +354,9 @@ function Poster({ reduce, onCta }: { reduce: boolean; onCta: () => void }) {
       <div className="relative z-10 mx-auto mt-auto w-full max-w-[1200px] px-4 pb-14 md:px-6 md:pb-20">
         <div className={reduce ? "" : "ss-hero-rise"}>
           <h1 id="ss-poster-title" className="max-w-[14em] text-[36px] font-bold md:text-[clamp(40px,5vw,72px)]" style={{ letterSpacing: "-0.03em", lineHeight: 1.2, wordBreak: "keep-all" }}>
-            재고 세는 데 하루 10분이면 돼요
+            식당 재고 관리, 하루 10분
           </h1>
-          <p className="mt-4 text-[16px] font-medium text-white/90 md:text-[18px]">식당 재고 관리 앱, 14일 무료 체험</p>
+          <p className="mt-4 text-[16px] font-medium text-white/90 md:text-[18px]">14일 무료 체험</p>
         </div>
       </div>
     </section>

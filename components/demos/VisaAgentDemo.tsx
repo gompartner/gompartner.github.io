@@ -26,7 +26,7 @@ import { DemoMakerInfo } from "@/components/demos/DemoMakerInfo";
    5. 상담신청: 이름, 연락처, 국적, 현재 체류자격, 상담 내용, 상담 방법. 완료 화면은 접수 번호와 회신 예정일이 찍힌 사증 모양.
 
    사진 출처: Pexels 사진 32081456
-   첫 화면(va-poster): 여권 몇 권을 겹쳐 놓은 사진 한 장이 한 화면을 채운다. 아래 왼쪽에 문장 "체류 기간 연장, 만료 4개월 전부터 돼요".
+   첫 화면(va-poster): 여권 몇 권을 겹쳐 놓은 사진 한 장이 한 화면을 채운다. 아래 왼쪽에 문장 "체류 기간 연장, 만료 4개월 전부터 신청".
    핵심 모션: 들어올 때 사진이 1.06배에서 1배로 1.6초 동안 천천히 다가오고, 문장과 정보 줄은 0.3초 늦게 12px 아래에서 올라온다(CSS).
    스크롤하면 사진만 조금 느리게 내려간다(0 ~ 8%). 동작 줄이기면 모두 멈춘 상태로 보인다. */
 
@@ -914,7 +914,7 @@ function Poster({ reduce, lang, onCta }: { reduce: boolean; lang: Lang; onCta: (
   const ref = useRef<HTMLElement>(null);
   const { scrollYProgress } = useScroll({ target: ref, offset: ["start start", "end start"] });
   const photoY = useTransform(scrollYProgress, (v) => (reduce ? "0%" : `${v * PARALLAX}%`));
-  const lines = lang === "ko" ? ["체류 기간 연장,", "만료 4개월 전부터 돼요"] : ["Visa extension opens", "4 months before expiry"];
+  const lines = lang === "ko" ? ["체류 기간 연장,", "만료 4개월 전부터 신청"] : ["Visa extension opens", "4 months before expiry"];
 
   return (
     <section id="va-poster" ref={ref} aria-labelledby="va-poster-title" className="relative flex min-h-[100svh] flex-col overflow-hidden" style={{ background: "#141414", color: "#fff" }}>

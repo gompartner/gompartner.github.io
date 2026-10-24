@@ -410,11 +410,11 @@ function Poster({ ready, reduce, onCta }: { ready: boolean; reduce: boolean; onC
           className="m-0 text-[36px] font-bold leading-[1.2] tracking-[-0.03em] md:text-[clamp(40px,5vw,72px)]"
           style={{ ...serifF, wordBreak: "keep-all" }}
         >
-          <span className="block">양조장 술을</span>
-          <span className="block">한 병씩 골라 담아요</span>
+          <span className="block">전국 양조장 전통주를</span>
+          <span className="block">한 병씩</span>
         </h1>
         <p className="mt-4 text-[15px] md:mt-5 md:text-[18px]" style={{ color: "rgba(255,255,255,0.86)" }}>
-          전국 양조장 전통주, 화요일 ~ 일요일 영업
+          화요일 ~ 일요일 영업
         </p>
       </div>
     </section>

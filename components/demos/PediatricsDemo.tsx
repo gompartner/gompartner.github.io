@@ -40,7 +40,7 @@ import { DemoMakerInfo } from "@/components/demos/DemoMakerInfo";
    3. 영유아 건강검진 시기: 같은 생년월일로 1차~8차 검진 기간을 날짜로 바꿔 지금 받을 차수를 표시한다. 차수를 누르면 내용.
    4. 진료 시간표: 요일별 진료와 접수 마감, 오늘 요일과 야간진료 요일 강조.
 
-   포스터 첫 화면(pd-poster): 청진기 진료 사진 한 장 위에 큰 문장 "지금 대기 3명이에요" 하나만 둔다. 숫자는 대기 인원 상태와 연결된다.
+   포스터 첫 화면(pd-poster): 청진기 진료 사진 한 장 위에 큰 문장 "지금 대기 3명" 하나만 둔다. 숫자는 대기 인원 상태와 연결된다.
    핵심 모션: 사진이 1.6초 동안 scale 1.06 -> 1 로 천천히 다가오고, 문장과 정보 줄은 0.3초 늦게 아래 12px 에서 올라온다
    (CSS 키프레임이라 스크립트 없이도 끝 상태가 보인다). 스크롤하면 사진만 조금 느리게 움직인다(y 0 -> 8%).
    본문은 흰색과 #f7f7f5 바탕, 강조색은 짙은 초록 하나. 동작 줄이기면 전부 정지 상태다. */
@@ -516,7 +516,7 @@ function Poster({ reduce, wait, lastCall, onCta }: { reduce: boolean; wait: numb
           <h1 id="pd-poster-title" className="text-[36px] font-bold md:text-[clamp(40px,5vw,72px)]" style={{ color: "#ffffff", letterSpacing: "-0.03em", lineHeight: 1.2, wordBreak: "keep-all" }}>
             지금 대기
             <br />
-            <span className="tabular-nums">{wait}</span>명이에요
+            <span className="tabular-nums">{wait}</span>명
           </h1>
           <p className="mt-4 text-[15px] md:text-[17px]" style={{ color: "rgba(255,255,255,0.86)", lineHeight: 1.5 }}>
             {lastCall !== null ? `오늘 접수 마감 ${hm(lastCall)}` : "일요일, 공휴일 휴진"}

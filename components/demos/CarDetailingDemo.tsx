@@ -440,9 +440,9 @@ function Poster({ reduce, todayHours, onBook }: { reduce: boolean; todayHours: {
             className="text-[36px] font-bold leading-[1.2] tracking-[-0.03em] [word-break:keep-all] md:text-[clamp(40px,5vw,72px)]"
             style={{ color: C.text }}
           >
-            비 오는 날
+            유리막 코팅부터
             <br />
-            물방울이 굴러 떨어져요
+            실내 세차까지
           </h1>
           <p className="mt-4 inline-flex items-center gap-1.5 text-[15px] font-medium md:mt-5 md:text-[17px]" style={{ color: "#d6d6d6" }}>
             <Clock size={16} aria-hidden />

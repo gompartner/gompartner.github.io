@@ -23,7 +23,7 @@ import { DemoMakerInfo } from "@/components/demos/DemoMakerInfo";
    3. 체험 레슨 신청: 과정, 나이, 날짜, 시간, 이름, 연락처. 완료하면 접수 번호, 담당 창구, 회신 예정일.
    4. 연주회 소식: 다음 정기 연주회 날짜와 남은 날, 공지 펼쳐 보기, 과정별 연주곡.
 
-   첫 화면(pa-poster): 피아노 건반 위 손 사진 한 장을 화면 가득 깔고 왼쪽 아래에 문장 "체험 레슨 한 번 받아 보고 정해요"를 둔다.
+   첫 화면(pa-poster): 피아노 건반 위 손 사진 한 장을 화면 가득 깔고 왼쪽 아래에 문장 "체험 레슨 후 등록을 결정하세요"를 둔다.
    핵심 모션: 들어올 때 사진이 1.6초 동안 천천히 다가오고(scale 1.06 에서 1), 문장은 0.3초 늦게 아래 12px 에서 올라온다(CSS).
    스크롤하면 사진만 조금 느리게 내려간다(y 0 에서 8%). 동작 줄이기면 전부 멈춘 상태로 둔다.
    사진 출처: Pexels 사진 34767574 */
@@ -375,9 +375,9 @@ function Poster({ reduce, onCta }: { reduce: boolean; onCta: () => void }) {
           className="text-[36px] font-bold md:text-[clamp(40px,5vw,72px)]"
           style={{ wordBreak: "keep-all", letterSpacing: "-0.03em", lineHeight: 1.2 }}
         >
-          체험 레슨 한 번
+          체험 레슨 후
           <br />
-          받아 보고 정해요
+          등록을 결정하세요
         </h1>
         <p className="mt-4 text-[16px] font-medium tabular-nums md:mt-6 md:text-[18px]" style={{ color: "rgba(255,255,255,0.88)" }}>
           평일 13:00~21:30, 토요일 10:00~14:00

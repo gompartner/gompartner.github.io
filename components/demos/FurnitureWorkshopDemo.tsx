@@ -26,7 +26,7 @@ import { DemoMakerInfo } from "@/components/demos/DemoMakerInfo";
    4. 견적과 제작 문의: 합계, 제작 기간(오늘 기준 4~6주 뒤). 이름, 휴대폰을 넣고 보내면 접수번호, 도면 PNG 저장, 회신 예정일이 보인다.
    5. 작업 과정: 재단, 조립, 샌딩, 마감 네 단계를 선 위의 점으로 두고 단계를 누르면 설명이 바뀐다. 공방 방문은 예약제.
 
-   포스터 첫 화면(fw-poster): 작업대에서 판재를 다듬는 사진 한 장이 화면을 채우고, 아래 왼쪽에 문장 "원하는 치수로 하나만 짜 드려요".
+   포스터 첫 화면(fw-poster): 작업대에서 판재를 다듬는 사진 한 장이 화면을 채우고, 아래 왼쪽에 문장 "원하는 치수로 한 점씩 제작합니다".
    들어올 때 사진이 1.06배에서 1배로 1.6초 동안 다가오고, 문장은 0.3초 뒤 12px 아래에서 올라온다(CSS keyframes).
    스크롤하면 사진만 조금 느리게 움직인다. 작업 과정의 점은 움직이지 않고, 움직임은 도면 선 그리기에 모았다.
 
@@ -532,7 +532,9 @@ function Poster({ reduce, onCta }: { reduce: boolean; onCta: () => void }) {
       <div className="relative z-10 mx-auto mt-auto w-full max-w-[1200px] px-4 pb-14 md:px-6 md:pb-20">
         <div className={reduce ? "" : "fw-hero-rise"}>
           <h1 id="fw-poster-title" className="max-w-[14em] text-[36px] font-bold md:text-[clamp(40px,5vw,72px)]" style={{ letterSpacing: "-0.03em", lineHeight: 1.2, wordBreak: "keep-all" }}>
-            원하는 치수로 하나만 짜 드려요
+            원하는 치수로
+            <br />
+            한 점씩 제작합니다
           </h1>
           <p className="mt-4 text-[16px] font-medium text-white/90 md:text-[18px]">{BRAND}, 제작 기간 4~6주</p>
         </div>

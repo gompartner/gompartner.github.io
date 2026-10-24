@@ -337,9 +337,9 @@ function Poster({ reduce, onCta }: { reduce: boolean; onCta: () => void }) {
           className="text-[36px] font-bold md:text-[clamp(40px,5vw,72px)]"
           style={{ letterSpacing: "-0.03em", lineHeight: 1.2, wordBreak: "keep-all" }}
         >
-          오후 2시 전 주문은
+          오후 2시 주문까지
           <br />
-          오늘 나가요
+          당일 출고
         </h1>
         <p className="mt-4 text-[16px] md:mt-5 md:text-[18px]" style={{ color: "rgba(255,255,255,0.85)" }}>
           경기 ㅇㅊ 물류센터, 평일 출고

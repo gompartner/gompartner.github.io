@@ -250,9 +250,9 @@ function Poster({ reduce, onCta }: { reduce: boolean; onCta: () => void }) {
             className="text-[36px] font-bold leading-[1.2] tracking-[-0.03em] [word-break:keep-all] md:text-[clamp(40px,5vw,72px)]"
             style={{ color: C.text }}
           >
-            증명사진,
+            증명사진
             <br />
-            20분이면 찾아가요
+            20분 완성
           </h1>
           <p className="mt-4 inline-flex items-center gap-1.5 text-[15px] md:mt-5 md:text-[17px]" style={{ color: "#d6d6d6" }}>
             <MapPin size={16} aria-hidden />

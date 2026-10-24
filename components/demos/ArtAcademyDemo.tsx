@@ -16,7 +16,7 @@ import { DemoMakerInfo } from "@/components/demos/DemoMakerInfo";
    첫 화면에는 모집 중인 반과 상담 예약 버튼을 둔다. 교습비는 교육청 신고 교습비처럼 "월 교습비"와 기타경비(재료비)를 표로 공개한다.
    관용 문구: 방문 상담, 상담 예약, 실기 시간표, 평일반, 주말반, 재료비 별도, 수업 작품.
 
-   첫 화면(aa-poster): 연필로 인체 소묘를 그리는 사진 한 장을 화면 가득 깔고 왼쪽 아래에 문장 "연필 깎는 법부터 같이 해요"를 둔다.
+   첫 화면(aa-poster): 연필로 인체 소묘를 그리는 사진 한 장을 화면 가득 깔고 왼쪽 아래에 문장 "기초 소묘부터 입시 실기까지"를 둔다.
    사진이 밝아서 흰 막을 깔고 글자는 먹색으로 쓴다.
    핵심 모션: 들어올 때 사진이 1.6초 동안 천천히 다가오고(scale 1.06 에서 1), 문장은 0.3초 늦게 아래 12px 에서 올라온다(CSS).
    스크롤하면 사진만 조금 느리게 내려간다(y 0 에서 8%). 동작 줄이기면 전부 멈춘 상태로 둔다.
@@ -566,9 +566,9 @@ function Poster({ reduce, onCta }: { reduce: boolean; onCta: () => void }) {
           className="text-[36px] font-bold md:text-[clamp(40px,5vw,72px)]"
           style={{ wordBreak: "keep-all", letterSpacing: "-0.03em", lineHeight: 1.2 }}
         >
-          연필 깎는 법부터
+          기초 소묘부터
           <br />
-          같이 해요
+          입시 실기까지
         </h1>
         <p className="mt-4 text-[16px] font-medium md:mt-6 md:text-[18px]" style={{ color: C.char }}>
           입시반, 취미반, 초등반 모집

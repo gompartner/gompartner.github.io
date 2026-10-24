@@ -428,7 +428,7 @@ function Poster({ reduce, onCta }: { reduce: boolean; onCta: () => void }) {
         >
           84타입 견본주택,
           <br />
-          주말에도 열어요
+          주말 관람 가능
         </h1>
         <p className="mt-4 text-[16px] md:mt-5 md:text-[18px]" style={{ color: C.body }}>
           {GALLERY}, 매일 10:00 ~ 18:00

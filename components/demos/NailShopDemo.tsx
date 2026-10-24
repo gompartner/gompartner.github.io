@@ -633,9 +633,9 @@ function Poster({ reduce, onCta }: { reduce: boolean; onCta: () => void }) {
             className="text-[36px] font-bold leading-[1.2] tracking-[-0.03em] [word-break:keep-all] md:text-[clamp(40px,5vw,72px)]"
             style={{ color: C.plum }}
           >
-            젤네일 한 번이면
+            3주 유지되는
             <br />
-            3주 가요
+            젤네일
           </h1>
           <p className="mt-4 text-[16px] font-medium md:mt-5 md:text-[18px]" style={{ color: "#4b4b4b" }}>
             {BRAND}, 100% 예약제

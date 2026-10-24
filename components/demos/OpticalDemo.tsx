@@ -30,7 +30,7 @@ import { DemoMakerInfo } from "@/components/demos/DemoMakerInfo";
    5. 오시는 길과 영업시간: 오늘 요일 진하게, 주차 안내.
 
    첫 화면 포스터(op-poster): 한 화면 높이의 밝은 사진 위에 흰 막을 깔고 왼쪽 위 상호, 오른쪽 위 시력검사 예약 버튼,
-   문장 "검사부터 맞춤까지 30분이면 돼요"와 영업시간 한 줄. 글꼴은 Pretendard 한 벌, 강조색은 남색 하나. */
+   문장 "검사부터 맞춤까지 30분"와 영업시간 한 줄. 글꼴은 Pretendard 한 벌, 강조색은 남색 하나. */
 
 const BRAND = "곰파트너";
 const ADDRESS = "서울 ㅇㅇ구 ㅇㅇ로 00, 1층";
@@ -590,7 +590,7 @@ function Poster({ reduce, onBook }: { reduce: boolean; onBook: () => void }) {
       <div className={`relative z-10 px-4 pt-[9svh] md:my-auto md:px-12 md:pb-[6svh] md:pt-0 ${reduce ? "" : "op-rise"}`}>
         <h1 id="op-poster-title" className="text-[36px] font-bold leading-[1.2] tracking-[-0.03em] md:text-[clamp(40px,5vw,72px)]" style={{ wordBreak: "keep-all" }}>
           <span className="block">검사부터 맞춤까지</span>
-          <span className="block">30분이면 돼요</span>
+          <span className="block">30분</span>
         </h1>
         <p className="mt-4 text-[16px] font-medium tabular-nums md:text-[18px]" style={{ color: C.body }}>
           평일 10:30 ~ 20:00, 토요일 19:00까지
