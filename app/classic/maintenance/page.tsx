@@ -1,9 +1,9 @@
 import type { Metadata } from "next";
-import Link from "next/link";
 import { Check, Clock, X } from "lucide-react";
 import { StepList } from "@/components/classic/pricing/StepList";
 import { serviceTabs } from "@/components/classic/pricing/tabs";
-import { PageHead, SubTabs, btnPrimary, h2, h3, wrap } from "@/components/classic/ui";
+import { MaintenanceForm } from "@/components/classic/maintenance/MaintenanceForm";
+import { PageHead, SubTabs, btnLine, btnPrimary, h3, wrap } from "@/components/classic/ui";
 import { ChannelTalkButton } from "@/components/layout/ChannelTalk";
 import { maintenanceServices, maintenanceSteps, responseTime } from "@/data/classic/maintenance";
 import { pageMeta } from "@/lib/seo";
@@ -136,9 +136,14 @@ export default function ClassicMaintenancePage() {
                   </div>
                 ))}
               </dl>
-              <ChannelTalkButton cta={`classic_maintenance_chat_${s.id}`} message={`${s.title} 상담받고 싶어요.`} className={`${btnPrimary} mt-8`}>
-                {s.title} 상담
-              </ChannelTalkButton>
+              <div className="mt-8 flex flex-wrap gap-3">
+                <a href={`#apply-${s.id}`} className={btnPrimary}>
+                  {s.title} 접수
+                </a>
+                <ChannelTalkButton cta={`classic_maintenance_chat_${s.id}`} message={`${s.title} 상담받고 싶어요.`} className={btnLine}>
+                  채팅 상담
+                </ChannelTalkButton>
+              </div>
             </div>
           </section>
         );
@@ -146,21 +151,7 @@ export default function ClassicMaintenancePage() {
 
       <StepList steps={maintenanceSteps} title="유지보수 진행 절차" id="maintenance-process" />
 
-      <section aria-labelledby="m-band" className="text-white" style={{ backgroundColor: "#256ef4" }}>
-        <div className={`${wrap} flex flex-col gap-8 py-16 md:flex-row md:items-center md:justify-between md:py-20`}>
-          <h2 id="m-band" className={h2}>
-            유지보수 문의
-          </h2>
-          <div className="flex shrink-0 flex-wrap gap-3">
-            <ChannelTalkButton cta="classic_maintenance_band_chat" message="유지보수 상담받고 싶어요." className="inline-flex h-14 items-center rounded-md bg-white px-7 text-[17px] font-bold text-[#15171c] hover:bg-[#e8efff]">
-              채팅 상담
-            </ChannelTalkButton>
-            <Link href="/classic/pricing" className="inline-flex h-14 items-center rounded-md border border-white/60 px-7 text-[17px] font-bold hover:bg-white/10">
-              제작 가격 보기
-            </Link>
-          </div>
-        </div>
-      </section>
+      <MaintenanceForm />
     </>
   );
 }
