@@ -3,7 +3,6 @@
 import { useEffect, useMemo, useRef, useState } from "react";
 import { AnimatePresence, motion, useScroll, useTransform } from "framer-motion";
 import { AlertCircle, CalendarCheck, Car, Check, Clock, MapPin, MessageCircle, Moon, Phone, X } from "lucide-react";
-import { Noto_Serif_KR } from "@/lib/local-fonts";
 import { useReducedMotionSafe } from "@/hooks/useReducedMotionSafe";
 import { daysAgo, fmtKo, useDemoToday } from "@/hooks/useDemoToday";
 import { maskName, maskPhone } from "@/components/demos/LeadReceivedPanel";
@@ -31,7 +30,8 @@ import { DemoMakerInfo } from "@/components/demos/DemoMakerInfo";
    스크롤하면 사진만 조금 느리게 움직인다. 본문에서 남긴 움직임은 접수번호를 넣으면 찍히는 자동차보험 도장 하나다.
    동작 줄이기면 전부 멈춘다. */
 
-const serifF = { fontFamily: `${Noto_Serif_KR.style.fontFamily}, serif` } as const;
+/* 제목은 본문과 같은 Pretendard, 굵게 */
+const serifF = { fontWeight: 700 } as const;
 
 const IMG = "/images/demo-korean-medicine";
 const ADDRESS = "서울 ㅇㅇ구 ㅇㅇ로 00, 3층";

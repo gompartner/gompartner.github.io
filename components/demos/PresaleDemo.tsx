@@ -3,7 +3,6 @@
 import { useEffect, useMemo, useRef, useState } from "react";
 import { AnimatePresence, motion, useScroll, useTransform } from "framer-motion";
 import { CalendarCheck, Check, CircleAlert, GraduationCap, MapPin, MessageCircle, Minus, Phone, Plus, ShoppingCart, TrainFront, Trees } from "lucide-react";
-import { Noto_Serif_KR } from "@/lib/local-fonts";
 import { useReducedMotionSafe } from "@/hooks/useReducedMotionSafe";
 import { daysAgo, fmtKo, useDemoToday } from "@/hooks/useDemoToday";
 import { maskName, maskPhone } from "@/components/demos/LeadReceivedPanel";
@@ -20,7 +19,7 @@ import { DemoMakerInfo } from "@/components/demos/DemoMakerInfo";
    핵심 모션: 첫 화면(pv-poster)은 밝은 복층 거실 사진 한 장이 화면을 채운다. 들어올 때 사진이 1.6초 동안 천천히 다가오고
    (scale 1.06 -> 1), 문장과 정보 줄은 0.3초 늦게 아래에서 올라온다(CSS keyframes, 끝 상태가 기본값이라 JS 없이도 보인다).
    스크롤하면 사진만 조금 느리게 움직인다(y 0 -> 8%). 본문에서는 타입을 바꿀 때 평면도 벽선이 다시 그려지는 것 하나만 남겼다.
-   동작 줄이기면 모두 멈춘 완성 상태다. 제목(h1, h2)만 명조, 나머지는 기본 고딕.
+   동작 줄이기면 모두 멈춘 완성 상태다. 제목(h1, h2)은 굵게, 글꼴은 모두 Pretendard.
 
    상호작용(모두 브라우저 안에서만 돈다. 실제로 보내지 않는다)
    1. 타입 고르기: 59, 84, 109 를 누르면 평면도 벽선이 다시 그려지고 전용, 공급면적과 방 구성이 바뀐다.
@@ -28,8 +27,8 @@ import { DemoMakerInfo } from "@/components/demos/DemoMakerInfo";
    3. 견본주택 방문예약: 날짜, 시간(남은 팀 수), 관심 타입, 인원, 이름, 휴대폰. 완료하면 예약 번호와 담당 창구, 확인 연락일.
    4. 입지환경: 그린 지도에서 교통, 교육, 생활, 자연을 고르면 사업지에서 이어지는 점선과 거리가 나온다. */
 
-/** 명조는 h1, h2 에만 쓴다 */
-const serifF = { fontFamily: `${Noto_Serif_KR.style.fontFamily}, serif` } as const;
+/* 제목은 본문과 같은 Pretendard, 굵게 */
+const serifF = { fontWeight: 700 } as const;
 
 const IMG = "/images/demo-presale";
 

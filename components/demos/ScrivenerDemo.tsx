@@ -19,7 +19,6 @@ import {
   Train,
   Users,
 } from "lucide-react";
-import { Noto_Serif_KR } from "@/lib/local-fonts";
 import { useReducedMotionSafe } from "@/hooks/useReducedMotionSafe";
 import { daysAgo, fmtDash, fmtKo, useDemoToday } from "@/hooks/useDemoToday";
 import { maskName, maskPhone } from "@/components/demos/LeadReceivedPanel";
@@ -45,7 +44,8 @@ import { DemoMakerInfo } from "@/components/demos/DemoMakerInfo";
    3. 개인회생 상담 안내: 신청 자격과 5단계 진행 순서. 단계를 누르면 기간과 할 일이 바뀐다.
    4. 상담신청: 분야, 상담 방법, 이름, 휴대폰. 부동산 등기를 고르면 잔금일을 받는다. 완료 화면에 접수 번호, 담당 창구, 회신 예정일. */
 
-const serifF = { fontFamily: `${Noto_Serif_KR.style.fontFamily}, serif` } as const;
+/* 제목은 본문과 같은 Pretendard, 굵게 */
+const serifF = { fontWeight: 700 } as const;
 
 const ADDRESS = "서울 ㅇㅇ구 ㅇㅇ로 00, 5층";
 const TEL = "02-000-0000";
