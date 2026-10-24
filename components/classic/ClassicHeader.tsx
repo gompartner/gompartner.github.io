@@ -30,7 +30,13 @@ export const classicMenu = [
     label: "샘플",
     href: "/classic/works",
     match: ["/classic/works", "/classic/sample"],
-    items: [{ href: "/classic/works", label: "전체 샘플" }, ...industries.map((i) => ({ href: `/classic/works/${i.slug}`, label: i.label }))],
+    items: [
+      { href: "/classic/works", label: "전체 샘플" },
+      ...industries.map((i) => ({ href: `/classic/works/${i.slug}`, label: i.label })),
+      { href: "/classic/works/landing", label: "랜딩페이지" },
+      { href: "/classic/works/maintenance", label: "유지보수" },
+      { href: "/classic/works/program", label: "업무 프로그램" },
+    ],
   },
   { label: "가격", href: "/classic/pricing", match: ["/classic/pricing"], items: [] },
   {
