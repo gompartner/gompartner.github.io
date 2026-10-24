@@ -196,3 +196,19 @@ body {
   from { opacity: 0; transform: translateY(36px) rotate(calc(var(--tilt, -1.6deg) * -3)) scale(0.94); }
   to { opacity: 1; transform: rotate(var(--tilt, -1.6deg)); }
 }
+
+/* 아이폰 사파리 날짜 입력칸: 기본 모양이 w-full을 무시하고 칸 밖으로 넘치며 글자가 위로 붙는다 */
+input[type="date"],
+input[type="time"] {
+  -webkit-appearance: none;
+  appearance: none;
+  min-width: 0;
+  max-width: 100%;
+  box-sizing: border-box;
+}
+input[type="date"]::-webkit-date-and-time-value,
+input[type="time"]::-webkit-date-and-time-value {
+  margin: 0;
+  text-align: left;
+  line-height: 1.4;
+}

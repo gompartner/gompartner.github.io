@@ -106,7 +106,7 @@ const PARTS: Part[] = [
   {
     id: "neck",
     name: "목",
-    at: [100, 70],
+    at: [103, 67],
     often: "거북목 증후군, 목 디스크, 근막통증 증후군",
     symptoms: [
       { label: "뒷목이 뻐근하고 고개 돌리기 힘들어요", exams: ["X-ray"], tx: ["물리치료", "도수치료", "약물치료"] },
@@ -117,7 +117,7 @@ const PARTS: Part[] = [
   {
     id: "shoulder",
     name: "어깨",
-    at: [142, 92],
+    at: [140, 93],
     often: "오십견, 회전근개 질환, 석회성 건염",
     symptoms: [
       { label: "팔이 머리 위로 안 올라가요", exams: ["X-ray", "근골격계 초음파"], tx: ["도수치료", "주사치료", "운동치료"] },
@@ -128,7 +128,7 @@ const PARTS: Part[] = [
   {
     id: "back",
     name: "허리",
-    at: [100, 182],
+    at: [103, 193],
     often: "요추 염좌, 허리 디스크, 척추관 협착증",
     symptoms: [
       { label: "물건 들다가 삐끗했어요", exams: ["X-ray"], tx: ["약물치료", "물리치료", "주사치료"] },
@@ -139,7 +139,7 @@ const PARTS: Part[] = [
   {
     id: "knee",
     name: "무릎",
-    at: [79, 300],
+    at: [87, 300],
     often: "퇴행성 관절염, 반월상 연골 손상, 슬개건염",
     symptoms: [
       { label: "계단 내려갈 때 시큰해요", exams: ["X-ray", "근골격계 초음파"], tx: ["주사치료", "운동치료", "물리치료"] },
@@ -441,33 +441,17 @@ function PartPicker({ reduce, part, setPart, onFee }: { reduce: boolean; part: P
 
   return (
     <div className="mt-8 grid gap-8 md:grid-cols-[260px_minmax(0,1fr)] md:gap-12">
-      {/* 몸 실루엣. 뒤에서 본 모습이라 얼굴이 없다 */}
+      {/* 뒤에서 본 사람 사진 위에 부위 버튼 */}
       <div className="relative mx-auto w-[220px] md:w-[260px]">
-        <svg viewBox="0 0 200 400" className="block h-auto w-full" aria-hidden>
+        {/* eslint-disable-next-line @next/next/no-img-element -- 정적 export 라 next/image 최적화를 쓰지 않는다 */}
+        <img src={`${IMG}/body.jpg`} alt="" className="block aspect-[1/2] h-auto w-full rounded-[8px] object-cover" />
+        <svg viewBox="0 0 200 400" className="absolute inset-0 h-full w-full" aria-hidden>
           <defs>
             <radialGradient id="os-fig-glow" cx="0.5" cy="0.5" r="0.5">
-              <stop offset="0" stopColor={C.blue} stopOpacity="0.35" />
+              <stop offset="0" stopColor={C.blue} stopOpacity="0.45" />
               <stop offset="1" stopColor={C.blue} stopOpacity="0" />
             </radialGradient>
-            <linearGradient id="os-fig-body" x1="0" y1="0" x2="1" y2="0">
-              <stop offset="0" stopColor="#e2e2df" />
-              <stop offset="0.5" stopColor="#ecece9" />
-              <stop offset="1" stopColor="#e2e2df" />
-            </linearGradient>
           </defs>
-          <g fill="url(#os-fig-body)" stroke="url(#os-fig-body)" strokeLinecap="round">
-            <circle cx="100" cy="38" r="24" stroke="none" />
-            <rect x="89" y="56" width="22" height="28" rx="8" stroke="none" />
-            <path d="M58 88 Q100 74 142 88 L150 180 Q148 202 140 216 L60 216 Q52 202 50 180 Z" stroke="none" />
-            <path d="M62 94 C42 106 38 150 34 220" fill="none" strokeWidth="20" />
-            <path d="M138 94 C158 106 162 150 166 220" fill="none" strokeWidth="20" />
-            <path d="M82 206 L78 300 L76 384" fill="none" strokeWidth="30" />
-            <path d="M118 206 L122 300 L124 384" fill="none" strokeWidth="30" />
-          </g>
-          {/* 척추 마디 */}
-          {Array.from({ length: 14 }, (_, k) => (
-            <rect key={k} x="95" y={66 + k * 10} width="10" height="7" rx="2" fill={C.blue} opacity={0.28 + (k % 2) * 0.08} />
-          ))}
           <motion.circle r="34" fill="url(#os-fig-glow)" initial={{ cx: cur.at[0], cy: cur.at[1] }} animate={{ cx: cur.at[0], cy: cur.at[1] }} transition={t} />
         </svg>
         {PARTS.map((pt) => {
