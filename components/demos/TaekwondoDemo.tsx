@@ -1,8 +1,8 @@
 "use client";
 
-import { useEffect, useId, useRef, useState } from "react";
-import { AnimatePresence, motion, useScroll, useTransform } from "framer-motion";
-import { Award, Bus, CalendarCheck, Check, Clock, MapPin, MessageCircle, Phone, ShieldCheck, Users } from "lucide-react";
+import { useEffect, useId, useState } from "react";
+import { AnimatePresence, motion } from "framer-motion";
+import { Award, Bus, CalendarCheck, Check, Clock, MapPin, Menu, MessageCircle, Phone, ShieldCheck, Users, X } from "lucide-react";
 import { useReducedMotionSafe } from "@/hooks/useReducedMotionSafe";
 import { daysAgo, fmtKo, useDemoToday } from "@/hooks/useDemoToday";
 import { maskName, maskPhone } from "@/components/demos/LeadReceivedPanel";
@@ -184,6 +184,8 @@ export function TaekwondoDemo() {
   const reduce = useReducedMotionSafe();
   const [busPick, setBusPick] = useState<BusPick>(null);
   const [part, setPart] = useState<Part>("초등부");
+  const [routeId, setRouteId] = useState(ROUTES[0].id);
+  const [stopIdx, setStopIdx] = useState(0);
 
   useEffect(() => {
     const f = () => window.scrollTo({ top: 0 });
@@ -193,32 +195,22 @@ export function TaekwondoDemo() {
 
   const go = (id: string) => document.getElementById(id)?.scrollIntoView({ behavior: reduce ? "auto" : "smooth", block: "start" });
 
-  const navBtn = `rounded-[4px] px-2.5 py-1.5 text-[15px] font-semibold underline-offset-4 hover:underline ${focusRing}`;
-
   return (
     <div className="min-h-screen overflow-x-clip" style={{ background: C.bg, color: C.ink }}>
-      <Poster reduce={reduce} onCta={() => go("tk-consult")} />
-
-      <header className="border-b" style={{ background: C.bg, borderColor: C.line }}>
-        <div className="mx-auto flex max-w-[1200px] flex-wrap items-center justify-between gap-x-4 gap-y-2 px-4 py-4 md:px-6">
-          <h2>
-            <SampleLogo />
-          </h2>
-          <nav aria-label="주요 메뉴" className="-mx-2 flex flex-wrap items-center">
-            {[
-              ["tk-bus", "차량 운행"],
-              ["tk-time", "수련 시간표"],
-              ["tk-belt", "승급 심사"],
-              ["tk-consult", "상담 문의"],
-              ["tk-visit", "오시는 길"],
-            ].map(([id, label]) => (
-              <button key={id} type="button" onClick={() => go(id)} className={navBtn} style={{ color: C.body, outlineColor: C.ink }}>
-                {label}
-              </button>
-            ))}
-          </nav>
-        </div>
-      </header>
+      <Poster
+        reduce={reduce}
+        today={today}
+        go={go}
+        onPart={(p) => {
+          setPart(p);
+          go("tk-time");
+        }}
+        onStop={(r, i) => {
+          setRouteId(r);
+          setStopIdx(i);
+          go("tk-bus");
+        }}
+      />
 
       {/* 관장, 사범 */}
       <section id="tk-staff" aria-labelledby="tk-staff-title" className="scroll-mt-0 py-14 md:py-20" style={{ background: C.paper }}>
@@ -247,6 +239,10 @@ export function TaekwondoDemo() {
           <SectionTitle id="tk-bus-title" icon={<Bus size={24} aria-hidden />} title="차량 운행" />
           <BusRoute
             reduce={reduce}
+            routeId={routeId}
+            setRouteId={setRouteId}
+            stopIdx={stopIdx}
+            setStopIdx={setStopIdx}
             onConsult={(pick) => {
               setBusPick(pick);
               setPart("초등부");
@@ -299,7 +295,7 @@ export function TaekwondoDemo() {
             </dd>
           </dl>
         </section>
-        <section aria-labelledby="tk-notice-title">
+        <section id="tk-notice" aria-labelledby="tk-notice-title" className="scroll-mt-4">
           <SectionTitle id="tk-notice-title" icon={<CalendarCheck size={24} aria-hidden />} title="공지사항" />
           <ul className="divide-y border-y" style={{ borderColor: C.line }}>
             {[
@@ -366,69 +362,260 @@ function chipStyle(on: boolean) {
 }
 const chip = `inline-flex min-h-[44px] items-center gap-1.5 rounded-[6px] border px-3.5 text-[15px] font-semibold ${focusRing}`;
 
-/* ---------- 포스터 ---------- */
+/* ---------- 첫 화면: 오늘 시간표와 차량 정류장 학부모 보드 ---------- */
 
-function Poster({ reduce, onCta }: { reduce: boolean; onCta: () => void }) {
-  const ref = useRef<HTMLElement>(null);
-  const { scrollYProgress } = useScroll({ target: ref, offset: ["start start", "end start"] });
-  // 스크롤하면 사진만 조금 느리게 내려간다
-  const photoY = useTransform(scrollYProgress, (v) => (reduce ? "0%" : `${v * 8}%`));
+const NAV: [string, string][] = [
+  ["tk-staff", "도장 소개"],
+  ["tk-time", "수련 시간표"],
+  ["tk-bus", "차량 안내"],
+  ["tk-belt", "승급 심사"],
+  ["tk-notice", "학부모 공지"],
+  ["tk-consult", "상담 문의"],
+];
+
+/** "13:30 ~ 14:20" 을 시작, 끝 분으로 */
+const span = (t: string) => {
+  const [a, b] = t.split("~").map((x) => x.trim().split(":").map(Number));
+  return [a[0] * 60 + a[1], b[0] * 60 + b[1]] as const;
+};
+
+/** 지금 시각(분). 서버 렌더와 첫 화면은 null, 브라우저에서 채우고 1분마다 갱신 */
+function useNowMinutes() {
+  const [now, setNow] = useState<number | null>(null);
+  useEffect(() => {
+    const read = () => {
+      const d = new Date();
+      setNow(d.getHours() * 60 + d.getMinutes());
+    };
+    const frame = requestAnimationFrame(read);
+    const id = window.setInterval(read, 60_000);
+    return () => {
+      cancelAnimationFrame(frame);
+      window.clearInterval(id);
+    };
+  }, []);
+  return now;
+}
+
+function Poster({
+  reduce,
+  today,
+  go,
+  onPart,
+  onStop,
+}: {
+  reduce: boolean;
+  today: Date;
+  go: (id: string) => void;
+  onPart: (p: Part) => void;
+  onStop: (routeId: string, stopIdx: number) => void;
+}) {
+  const [menu, setMenu] = useState(false);
+  const now = useNowMinutes();
+  const dow = today.getDay();
+  // 주말에는 다음 월요일 시간표를 보여 준다
+  const isToday = dow >= 1 && dow <= 5;
+  const boardDay = isToday ? today : daysAgo(today, -(dow === 6 ? 2 : 1));
+  const col = boardDay.getDay() - 1;
+  const rows = ROWS.filter((r) => r.week[col]);
+  const live = isToday && now !== null ? rows.findIndex((r) => now >= span(r.time)[0] && now < span(r.time)[1]) : -1;
+  const next = isToday && now !== null ? rows.findIndex((r) => now < span(r.time)[0]) : -1;
+
+  const navTo = (id: string) => {
+    setMenu(false);
+    // 메뉴가 닫혀 높이가 줄어든 뒤에 이동한다
+    requestAnimationFrame(() => go(id));
+  };
 
   return (
-    <section ref={ref} id="tk-poster" aria-labelledby="tk-poster-title" className="relative flex min-h-[100svh] flex-col overflow-hidden" style={{ background: C.dark, color: "#fff" }}>
+    <section id="tk-poster" aria-labelledby="tk-poster-title" style={{ background: C.bg }}>
       <style>{`
-        @keyframes tk-rise { from { opacity: 0; transform: translateY(12px); } to { opacity: 1; transform: none; } }
-        .tk-rise { animation: tk-rise 0.7s cubic-bezier(0.22, 1, 0.36, 1) 0.3s both; }
-        @media (prefers-reduced-motion: reduce) { .tk-rise { animation: none; } }
+        @keyframes tk-in { from { transform: scale(1.06); } to { transform: none; } }
+        .tk-in { animation: tk-in 1.6s cubic-bezier(0.22, 1, 0.36, 1) both; }
+        @media (prefers-reduced-motion: reduce) { .tk-in { animation: none; } }
       `}</style>
-      <motion.div
-        className="absolute inset-0"
-        style={{ y: photoY }}
-        initial={reduce ? false : { scale: 1.06 }}
-        animate={{ scale: 1 }}
-        transition={{ duration: reduce ? 0 : 1.6, ease: EASE }}
+
+      {/* 상단 메뉴 */}
+      <header className="border-b" style={{ borderColor: C.line }}>
+        <div className="mx-auto flex h-16 max-w-[1440px] items-center justify-between gap-4 px-4 md:px-6">
+          <p>
+            <SampleLogo size={18} />
+          </p>
+          <nav aria-label="주요 메뉴" className="hidden items-center lg:flex">
+            {NAV.map(([id, label]) => (
+              <button
+                key={id}
+                type="button"
+                onClick={() => navTo(id)}
+                className={`min-h-[44px] rounded-[4px] px-3 text-[16px] font-semibold underline-offset-4 hover:underline ${focusRing}`}
+                style={{ color: C.ink, outlineColor: C.ink }}
+              >
+                {label}
+              </button>
+            ))}
+          </nav>
+          <a
+            href={`tel:${TEL.replace(/-/g, "")}`}
+            className={`hidden min-h-[44px] items-center gap-1.5 rounded-[6px] px-3 text-[16px] font-bold tabular-nums lg:inline-flex ${focusRing}`}
+            style={{ color: C.ink, outlineColor: C.ink }}
+          >
+            <Phone size={17} aria-hidden />
+            {TEL}
+          </a>
+          <button
+            type="button"
+            aria-expanded={menu}
+            aria-controls="tk-menu"
+            aria-label={menu ? "전체 메뉴 닫기" : "전체 메뉴 열기"}
+            onClick={() => setMenu((m) => !m)}
+            className={`inline-flex h-11 w-11 items-center justify-center rounded-[6px] border lg:hidden ${focusRing}`}
+            style={{ borderColor: C.line, outlineColor: C.ink }}
+          >
+            {menu ? <X size={22} aria-hidden /> : <Menu size={22} aria-hidden />}
+          </button>
+        </div>
+        {menu && (
+          <nav id="tk-menu" aria-label="전체 메뉴" className="border-t lg:hidden" style={{ borderColor: C.line }}>
+            <ul className="mx-auto grid max-w-[1440px] grid-cols-2 gap-1 px-4 py-3 md:grid-cols-3 md:px-6">
+              {NAV.map(([id, label]) => (
+                <li key={id}>
+                  <button
+                    type="button"
+                    onClick={() => navTo(id)}
+                    className={`flex min-h-[48px] w-full items-center rounded-[6px] px-3 text-left text-[16px] font-semibold ${focusRing}`}
+                    style={{ background: C.paper, outlineColor: C.ink }}
+                  >
+                    {label}
+                  </button>
+                </li>
+              ))}
+            </ul>
+          </nav>
+        )}
+      </header>
+
+      <div className="mx-auto grid max-w-[1440px] lg:min-h-[calc(100svh-64px)] lg:grid-cols-[minmax(0,2fr)_minmax(0,3fr)]">
+        {/* 세로 수련 사진 */}
+        <div className="relative h-[30svh] min-h-[200px] overflow-hidden lg:h-auto" style={{ background: C.dark }}>
+          {/* eslint-disable-next-line @next/next/no-img-element -- 정적 export 라 next/image 최적화를 쓰지 않는다 */}
+          <img
+            src={`${IMG}/hero.jpg`}
+            srcSet={`${IMG}/hero-sm.jpg 960w, ${IMG}/hero.jpg 1920w`}
+            sizes="(min-width: 1024px) 40vw, 100vw"
+            alt="흰 도복에 검은 띠를 맨 수련생과 뒤로 보이는 파랑, 빨강 도장 매트"
+            fetchPriority="high"
+            className={`absolute inset-0 h-full w-full object-cover ${reduce ? "" : "tk-in"}`}
+            style={{ objectPosition: "50% 35%" }}
+          />
+        </div>
+
+        {/* 학부모 보드 */}
+        <div className="px-4 pb-10 pt-6 md:px-8 md:pt-8 lg:px-12 lg:pb-12 lg:pt-10">
+          <h1 id="tk-poster-title" className="text-[30px] font-bold leading-[1.25] tracking-[-0.03em] md:text-[40px]" style={{ wordBreak: "keep-all" }}>
+            학교 앞까지 차량 운행
+          </h1>
+          <p className="mt-2 text-[16px]" style={{ color: C.body }}>
+            1호차, 2호차 평일 매일 운행
+          </p>
+
+          <div className="mt-6 rounded-[8px] border" style={{ borderColor: C.line }}>
+            <div className="flex items-center justify-between gap-3 border-b px-4 py-3" style={{ borderColor: C.line, background: C.paper }}>
+              <h2 className="text-[17px] font-bold">{fmtKo(boardDay)} 수련</h2>
+              <span className="text-[14px]" style={{ color: C.muted }}>
+                {isToday ? "오늘" : "다음 수련일"}
+              </span>
+            </div>
+            <ul className="divide-y" style={{ borderColor: C.line }}>
+              {rows.map((r, i) => {
+                const st = i === live ? "수련 중" : i === next && live === -1 ? "다음" : null;
+                return (
+                  <li key={r.label} style={{ borderColor: C.line }}>
+                    <button
+                      type="button"
+                      onClick={() => onPart(r.part)}
+                      className={`grid min-h-[48px] w-full grid-cols-[minmax(0,1fr)_auto] items-center gap-3 px-4 py-2 text-left md:grid-cols-[200px_minmax(0,1fr)_auto] ${focusRing}`}
+                      style={{ background: st === "수련 중" ? C.accentSoft : "transparent", outlineColor: C.ink }}
+                    >
+                      <span className="min-w-0">
+                        <span className="flex items-center gap-2 text-[16px] font-bold">
+                          {r.label}
+                          {st && (
+                            <span className="rounded-[4px] px-1.5 py-0.5 text-[13px] font-bold" style={st === "수련 중" ? { background: C.accent, color: "#fff" } : { background: C.paper, color: C.accent }}>
+                              {st}
+                            </span>
+                          )}
+                        </span>
+                        <span className="block text-[14px] tabular-nums md:hidden" style={{ color: C.body }}>
+                          {r.time}
+                        </span>
+                      </span>
+                      <span className="hidden text-[15px] tabular-nums md:block" style={{ color: C.body }}>
+                        {r.time}
+                      </span>
+                      <span className="text-[15px] font-semibold">{r.week[col]}</span>
+                    </button>
+                  </li>
+                );
+              })}
+            </ul>
+          </div>
+
+          <div className="mt-6">
+            <h2 className="flex items-center gap-2 text-[17px] font-bold">
+              <Bus size={19} aria-hidden />
+              차량 정류장
+            </h2>
+            {ROUTES.map((r) => (
+              <div key={r.id} className="mt-3 flex flex-wrap items-center gap-2">
+                <span className="w-[52px] flex-none text-[14px] font-bold" style={{ color: C.muted }}>
+                  {r.label}
+                </span>
+                {r.stops.slice(0, -1).map((s, i) => (
+                  <button key={s.name} type="button" onClick={() => onStop(r.id, i)} className={chip} style={chipStyle(false)}>
+                    <MapPin size={15} aria-hidden />
+                    {s.name}
+                  </button>
+                ))}
+              </div>
+            ))}
+          </div>
+
+          <button
+            type="button"
+            onClick={() => go("tk-consult")}
+            data-gtm-cta="taekwondo_poster_cta"
+            className={`mt-7 inline-flex min-h-[48px] items-center gap-2 rounded-[6px] px-5 text-[16px] font-bold ${focusRing}`}
+            style={{ background: C.accent, color: "#fff", outlineColor: C.ink }}
+          >
+            <CalendarCheck size={19} aria-hidden />
+            체험 수업 신청
+          </button>
+        </div>
+      </div>
+
+      {/* 휴대폰 하단 고정 탭 */}
+      <nav
+        aria-label="바로가기"
+        className="fixed inset-x-0 bottom-0 z-40 grid grid-cols-4 border-t md:hidden"
+        style={{ background: "#fff", borderColor: C.line, paddingBottom: "env(safe-area-inset-bottom)" }}
       >
-        {/* eslint-disable-next-line @next/next/no-img-element -- 정적 export 라 next/image 최적화를 쓰지 않는다 */}
-        <img
-          src={`${IMG}/hero.jpg`}
-          srcSet={`${IMG}/hero-sm.jpg 960w, ${IMG}/hero.jpg 1920w`}
-          sizes="100vw"
-          alt="흰 도복에 검은 띠를 맨 수련생과 뒤로 보이는 파랑, 빨강 도장 매트"
-          fetchPriority="high"
-          className="absolute inset-0 h-full w-full object-cover"
-          style={{ objectPosition: "50% 40%" }}
-        />
-      </motion.div>
-      <div aria-hidden className="absolute inset-0" style={{ background: "linear-gradient(to top, rgba(0,0,0,0.78), rgba(0,0,0,0.32) 55%, rgba(0,0,0,0.4))" }} />
-
-      {/* 상호와 핵심 행동 하나 */}
-      <div className="relative z-10 flex items-center justify-between gap-3 px-4 pt-4 md:px-12 md:pt-7">
-        <p>
-          <SampleLogo light size={18} />
-        </p>
-        <button
-          type="button"
-          onClick={onCta}
-          data-gtm-cta="taekwondo_poster_cta"
-          className={`inline-flex h-11 items-center gap-1.5 rounded-[6px] px-4 text-[15px] font-semibold ${focusRing}`}
-          style={{ background: "#fff", color: C.ink, outlineColor: "#fff" }}
-        >
-          <CalendarCheck size={18} aria-hidden />
-          상담 신청
-        </button>
-      </div>
-
-      {/* 문장 */}
-      <div className={`relative z-10 mt-auto px-4 pb-14 md:px-12 md:pb-20 ${reduce ? "" : "tk-rise"}`}>
-        <h1 id="tk-poster-title" className="text-[36px] font-bold leading-[1.2] tracking-[-0.03em] md:text-[clamp(40px,5vw,72px)]" style={{ wordBreak: "keep-all" }}>
-          <span className="block">학교 앞까지</span>
-          <span className="block">차량 운행</span>
-        </h1>
-        <p className="mt-4 inline-flex items-center gap-2 text-[16px] md:text-[18px]" style={{ color: "rgba(255,255,255,0.88)" }}>
-          <Bus size={18} aria-hidden />
-          1호차, 2호차 평일 매일 운행
-        </p>
-      </div>
+        <a href={`tel:${TEL.replace(/-/g, "")}`} className={`flex min-h-[56px] flex-col items-center justify-center gap-0.5 text-[13px] font-semibold ${focusRing}`} style={{ outlineColor: C.ink }}>
+          <Phone size={20} aria-hidden />
+          전화
+        </a>
+        {(
+          [
+            ["tk-time", "시간표", Clock],
+            ["tk-bus", "차량", Bus],
+            ["tk-consult", "상담", MessageCircle],
+          ] as const
+        ).map(([id, label, Icon]) => (
+          <button key={id} type="button" onClick={() => go(id)} className={`flex min-h-[56px] flex-col items-center justify-center gap-0.5 text-[13px] font-semibold ${focusRing}`} style={{ outlineColor: C.ink }}>
+            <Icon size={20} aria-hidden />
+            {label}
+          </button>
+        ))}
+      </nav>
     </section>
   );
 }
@@ -436,10 +623,22 @@ function Poster({ reduce, onCta }: { reduce: boolean; onCta: () => void }) {
 
 /* ---------- 1. 차량 운행 ---------- */
 
-function BusRoute({ reduce, onConsult }: { reduce: boolean; onConsult: (pick: { route: string; stop: string }) => void }) {
-  const [routeId, setRouteId] = useState(ROUTES[0].id);
+function BusRoute({
+  reduce,
+  routeId,
+  setRouteId,
+  stopIdx,
+  setStopIdx,
+  onConsult,
+}: {
+  reduce: boolean;
+  routeId: string;
+  setRouteId: (id: string) => void;
+  stopIdx: number;
+  setStopIdx: (i: number) => void;
+  onConsult: (pick: { route: string; stop: string }) => void;
+}) {
   const [classId, setClassId] = useState(BUS_CLASSES[1].id);
-  const [stopIdx, setStopIdx] = useState(0);
   const route = ROUTES.find((r) => r.id === routeId) ?? ROUTES[0];
   const cls = BUS_CLASSES.find((c) => c.id === classId) ?? BUS_CLASSES[0];
   const total = route.stops[route.stops.length - 1].off;
