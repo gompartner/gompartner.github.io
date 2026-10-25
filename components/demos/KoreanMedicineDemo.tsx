@@ -1,8 +1,8 @@
 "use client";
 
-import { useEffect, useMemo, useRef, useState } from "react";
-import { AnimatePresence, motion, useScroll, useTransform } from "framer-motion";
-import { AlertCircle, CalendarCheck, Car, Check, Clock, MapPin, MessageCircle, Moon, Phone, X } from "lucide-react";
+import { useEffect, useMemo, useState } from "react";
+import { AnimatePresence, motion } from "framer-motion";
+import { AlertCircle, CalendarCheck, Car, Check, Clock, MapPin, Menu, MessageCircle, Moon, Phone, X } from "lucide-react";
 import { useReducedMotionSafe } from "@/hooks/useReducedMotionSafe";
 import { daysAgo, fmtKo, useDemoToday } from "@/hooks/useDemoToday";
 import { maskName, maskPhone } from "@/components/demos/LeadReceivedPanel";
@@ -24,10 +24,12 @@ import { DemoMakerInfo } from "@/components/demos/DemoMakerInfo";
    3. 진료 시간표: 요일별 진료 시간 막대. 야간 진료(화, 목 밤 9시까지)는 강조색으로, 오늘 줄과 지금 진료 중 여부를 표시한다.
    4. 예약: 진료 구분, 날짜, 시간, 이름, 휴대폰. 완료하면 예약 번호, 담당 창구, 확정 문자 보낼 날을 보여 준다.
 
-   첫 화면(km-poster): 한지 창, 약재 서랍장, 탁자 위 청자 그릇 사진 한 장이 화면을 채운다. 사진 출처: AI 생성(Z-Image-Turbo, Apache 2.0).
-   왼쪽 위 상호, 오른쪽 위 예약하기 버튼, 아래쪽에 큰 문장 "교통사고 치료, 본인 부담금 없음"와 야간 진료 한 줄.
-   핵심 모션: 들어오면 사진이 1.6초 동안 천천히 다가오고(1.06배에서 1배), 문장은 0.3초 늦게 아래에서 올라온다(CSS keyframes, JS 없이도 보인다).
-   스크롤하면 사진만 조금 느리게 움직인다. 본문에서 남긴 움직임은 접수번호를 넣으면 찍히는 자동차보험 도장 하나다.
+   첫 화면(km-poster): 위에 메뉴 줄(진료 과목, 교통사고, 진료 시간, 온라인 예약, 오시는 길, 휴대폰은 햄버거).
+   아래는 5:7 좌우 분할. 왼쪽은 원장 반신 사진(막 없음)과 원장 고르기 탭 2개, 오른쪽은 큰 문장, 원장 이름과 과목, 약력 3줄,
+   "어디가 불편하세요" 바로가기 4개(허리, 목 어깨, 무릎은 부위 구간을 그 부위로 열고, 교통사고는 교통사고 구간으로),
+   오늘 진료 시간과 지금 상태, 예약하기. 휴대폰은 사진이 위(56svh), 글이 아래로 쌓인다.
+   핵심 모션: 사진이 천천히 다가오고(1.04배에서 1배), 원장을 바꾸면 사진이 짧게 교차한다.
+   본문에서 남긴 움직임은 접수번호를 넣으면 찍히는 자동차보험 도장 하나다.
    동작 줄이기면 전부 멈춘다. */
 
 /* 제목은 본문과 같은 Pretendard, 굵게 */
@@ -204,6 +206,7 @@ export function KoreanMedicineDemo() {
 
   const [kind, setKind] = useState<Kind>("일반 진료");
   const [accident, setAccident] = useState("");
+  const [part, setPart] = useState<PartId>("waist");
 
   useEffect(() => {
     const f = () => window.scrollTo({ top: 0 });
@@ -213,34 +216,9 @@ export function KoreanMedicineDemo() {
 
   const go = (id: string) => document.getElementById(id)?.scrollIntoView({ behavior: reduce ? "auto" : "smooth", block: "start" });
 
-  const navBtn = `rounded-[4px] px-2.5 py-1.5 text-[15px] underline-offset-4 hover:underline ${focusRing}`;
-
   return (
     <div className="min-h-screen overflow-x-clip" style={{ background: C.paper, color: C.ink }}>
-      <Poster reduce={reduce} onCta={() => go("km-reserve")} />
-
-      <header className="mx-auto flex max-w-[1200px] flex-wrap items-center justify-between gap-x-4 gap-y-2 px-4 py-4 md:px-6">
-        <h2 className="leading-none">
-          <SampleLogo />
-        </h2>
-        <nav aria-label="주요 메뉴" className="-mx-2 flex flex-wrap items-center">
-          {[
-            ["km-body", "진료 과목"],
-            ["km-car", "교통사고"],
-            ["km-hours", "진료 시간"],
-            ["km-reserve", "온라인 예약"],
-            ["km-visit", "오시는 길"],
-          ].map(([id, label]) => (
-            <button key={id} type="button" onClick={() => go(id)} className={navBtn} style={{ outlineColor: C.red }}>
-              {label}
-            </button>
-          ))}
-        </nav>
-        <a href={`tel:${TEL.replace(/-/g, "")}`} className={`hidden items-center gap-1.5 text-[17px] font-bold md:inline-flex ${focusRing}`} style={{ outlineColor: C.red }}>
-          <Phone size={18} aria-hidden />
-          {TEL}
-        </a>
-      </header>
+      <Poster reduce={reduce} today={today} nowMin={nowMin} go={go} onPart={(p) => { setPart(p); go("km-body"); }} />
 
       {/* 교통사고 띠 */}
       <div className="border-y" style={{ borderColor: C.line, background: C.soft }}>
@@ -254,7 +232,7 @@ export function KoreanMedicineDemo() {
         </p>
       </div>
 
-      <BodySection reduce={reduce} onCar={() => go("km-car")} />
+      <BodySection reduce={reduce} part={part} setPart={setPart} onCar={() => go("km-car")} />
       <CarSection reduce={reduce} value={accident} setValue={setAccident} onReserve={() => { setKind("교통사고"); go("km-reserve"); }} />
       <HoursSection today={today} nowMin={nowMin} />
       <ReserveSection reduce={reduce} today={today} nowMin={nowMin} kind={kind} setKind={setKind} accident={accident} />
@@ -289,63 +267,215 @@ function Seal({ size }: { size: number }) {
 
 /* ---------- 첫 화면 ---------- */
 
-function Poster({ reduce, onCta }: { reduce: boolean; onCta: () => void }) {
-  const ref = useRef<HTMLElement>(null);
-  const { scrollYProgress } = useScroll({ target: ref, offset: ["start start", "end start"] });
-  // 스크롤하면 사진만 조금 느리게 내려간다
-  const photoY = useTransform(scrollYProgress, (v) => (reduce ? "0%" : `${v * 8}%`));
+/* 첫 화면: 원장 반신 사진(왼쪽 5) + 이름, 과목, 약력, 아픈 곳 바로가기(오른쪽 7). 위에는 메뉴 */
+const DOCTORS = [
+  { id: "kim", name: "김ㅎ늘", role: "대표원장", major: "한방재활의학과 전문의", photo: "staff-1.jpg", career: ["침, 추나, 약침 진료", "교통사고 진료 담당", "화, 목 야간 진료"] },
+  { id: "lee", name: "이ㅅ윤", role: "원장", major: "한의사", photo: "staff-2.jpg", career: ["한약 상담 담당", "두통, 어지럼 진료", "토요일 진료"] },
+] as const;
+
+const NAV: [string, string][] = [
+  ["km-body", "진료 과목"],
+  ["km-car", "교통사고"],
+  ["km-hours", "진료 시간"],
+  ["km-reserve", "온라인 예약"],
+  ["km-visit", "오시는 길"],
+];
+
+/** 아픈 곳 바로가기. part 가 있으면 부위 구간을 그 부위로 열고, 없으면 교통사고 구간 */
+const QUICK: { label: string; part?: PartId }[] = [
+  { label: "허리", part: "waist" },
+  { label: "목, 어깨", part: "neck" },
+  { label: "무릎", part: "knee" },
+  { label: "교통사고" },
+];
+
+function Poster({
+  reduce,
+  today,
+  nowMin,
+  go,
+  onPart,
+}: {
+  reduce: boolean;
+  today: Date;
+  nowMin: number | null;
+  go: (id: string) => void;
+  onPart: (p: PartId) => void;
+}) {
+  const [doc, setDoc] = useState(0);
+  const [menu, setMenu] = useState(false);
+  const d = DOCTORS[doc];
+  const dow = today.getDay();
+  const h = HOURS[dow];
+  const status = nowMin === null ? null : statusAt(dow, nowMin);
+  const move = (id: string) => {
+    setMenu(false);
+    go(id);
+  };
 
   return (
-    <section id="km-poster" ref={ref} aria-labelledby="km-poster-title" className="relative flex min-h-[100svh] flex-col overflow-hidden" style={{ background: "#2a2622", color: "#ffffff" }}>
-      <style>{`@keyframes km-rise{from{opacity:0;transform:translateY(12px)}to{opacity:1;transform:none}}.km-rise{animation:km-rise 0.7s cubic-bezier(0.22,1,0.36,1) 0.3s both}@media (prefers-reduced-motion: reduce){.km-rise{animation:none}}`}</style>
-      <motion.div className="absolute inset-x-0 top-[-10%] h-[110%]" style={{ y: photoY }}>
-        <motion.div className="h-full w-full" initial={reduce ? false : { scale: 1.06 }} animate={{ scale: 1 }} transition={{ duration: reduce ? 0 : PHOTO_IN, ease: EASE }}>
-          {/* eslint-disable-next-line @next/next/no-img-element -- 정적 export 라 next/image 최적화를 쓰지 않는다 */}
-          <img
-            src={`${IMG}/hero.jpg`}
-            srcSet={`${IMG}/hero-sm.jpg 960w, ${IMG}/hero.jpg 1920w`}
-            sizes="100vw"
-            alt="한지 창 옆 약재 서랍장 앞 탁자에 대추와 감초를 담은 청자 그릇 두 개가 놓인 진료실"
-            fetchPriority="high"
-            className="absolute inset-0 h-full w-full object-cover"
-            style={{ objectPosition: "52% 62%" }}
-          />
-        </motion.div>
-      </motion.div>
-      {/* 글자 대비를 위한 막. 위는 상호 자리(밝은 창), 아래는 문장 자리 */}
-      <div aria-hidden className="pointer-events-none absolute inset-0" style={{ background: "linear-gradient(to top, rgba(0,0,0,0.74), rgba(0,0,0,0.34) 50%, rgba(0,0,0,0.12) 72%, rgba(0,0,0,0.5))" }} />
-      <div aria-hidden className="pointer-events-none absolute inset-0 hidden md:block" style={{ background: "linear-gradient(90deg, rgba(0,0,0,0.42), rgba(0,0,0,0) 58%)" }} />
+    <section id="km-poster" aria-labelledby="km-poster-title" style={{ background: C.paper, color: C.ink }}>
+      {/* 메뉴 줄 */}
+      <header className="relative z-[2] border-b" style={{ borderColor: C.line }}>
+        <div className="mx-auto flex max-w-[1200px] items-center justify-between gap-3 px-4 py-2.5 md:px-6">
+          <p className="leading-none">
+            <SampleLogo small />
+          </p>
+          <nav aria-label="주요 메뉴" className="hidden items-center lg:flex">
+            {NAV.map(([id, label]) => (
+              <button key={id} type="button" onClick={() => move(id)} className={`min-h-11 rounded-[4px] px-3 text-[16px] font-semibold underline-offset-4 hover:underline ${focusRing}`} style={{ outlineColor: C.red }}>
+                {label}
+              </button>
+            ))}
+          </nav>
+          <div className="flex items-center gap-1">
+            <a href={`tel:${TEL.replace(/-/g, "")}`} className={`hidden min-h-11 items-center gap-1.5 px-2 text-[17px] font-bold md:inline-flex ${focusRing}`} style={{ outlineColor: C.red }}>
+              <Phone size={18} aria-hidden />
+              {TEL}
+            </a>
+            <button
+              type="button"
+              onClick={() => setMenu((v) => !v)}
+              aria-expanded={menu}
+              aria-controls="km-menu"
+              aria-label={menu ? "메뉴 닫기" : "메뉴 열기"}
+              className={`inline-flex h-11 w-11 items-center justify-center rounded-[6px] lg:hidden ${focusRing}`}
+              style={{ outlineColor: C.red }}
+            >
+              {menu ? <X size={24} aria-hidden /> : <Menu size={24} aria-hidden />}
+            </button>
+          </div>
+        </div>
+        {menu && (
+          <nav id="km-menu" aria-label="주요 메뉴" className="absolute inset-x-0 top-full border-b lg:hidden" style={{ background: C.paper, borderColor: C.line }}>
+            <ul className="mx-auto max-w-[1200px] px-4 py-2 md:px-6">
+              {NAV.map(([id, label]) => (
+                <li key={id}>
+                  <button type="button" onClick={() => move(id)} className={`flex min-h-12 w-full items-center border-b text-left text-[17px] font-semibold ${focusRing}`} style={{ borderColor: C.line, outlineColor: C.red }}>
+                    {label}
+                  </button>
+                </li>
+              ))}
+            </ul>
+          </nav>
+        )}
+      </header>
 
-      <div className="relative z-[1] flex items-center justify-between gap-3 px-4 pt-4 md:px-12 md:pt-7">
-        <p className="leading-none">
-          <SampleLogo light small />
-        </p>
-        <button
-          type="button"
-          onClick={onCta}
-          data-gtm-cta="korean-medicine_poster_cta"
-          className={`inline-flex min-h-11 items-center gap-1.5 rounded-[6px] px-4 text-[15px] font-semibold ${focusRing}`}
-          style={{ background: C.red, color: "#ffffff", outlineColor: "#ffffff" }}
-        >
-          <CalendarCheck size={17} aria-hidden />
-          예약하기
-        </button>
-      </div>
+      <div className="grid lg:min-h-[calc(100svh-65px)] md:grid-cols-[minmax(0,5fr)_minmax(0,7fr)]">
+        {/* 원장 사진. 막 없이 화면 끝까지 */}
+        <div className="relative flex flex-col" style={{ background: "#e9e9e6" }}>
+          {/* 원장 고르기 */}
+          <div role="tablist" aria-label="의료진" className="grid grid-cols-2 border-b" style={{ borderColor: C.line, background: C.paper }}>
+            {DOCTORS.map((x, i) => {
+              const on = i === doc;
+              return (
+                <button
+                  key={x.id}
+                  type="button"
+                  role="tab"
+                  aria-selected={on}
+                  onClick={() => setDoc(i)}
+                  className={`min-h-14 px-3 text-[16px] font-semibold ${focusRing}`}
+                  style={{ background: on ? C.ink : C.paper, color: on ? "#ffffff" : C.inkSoft, outlineColor: C.red, outlineOffset: -4 }}
+                >
+                  {x.role} {x.name}
+                </button>
+              );
+            })}
+          </div>
+          <div className="relative h-[56svh] overflow-hidden md:h-auto md:flex-1">
+            <AnimatePresence initial={false} mode="popLayout">
+              <motion.div
+                key={d.id}
+                className="absolute inset-0"
+                initial={reduce ? false : { opacity: 0 }}
+                animate={{ opacity: 1 }}
+                exit={reduce ? undefined : { opacity: 0 }}
+                transition={{ duration: reduce ? 0 : DUR, ease: EASE }}
+              >
+                <motion.div className="h-full w-full" initial={reduce ? false : { scale: 1.04 }} animate={{ scale: 1 }} transition={{ duration: reduce ? 0 : PHOTO_IN, ease: EASE }}>
+                  {/* eslint-disable-next-line @next/next/no-img-element -- 정적 export 라 next/image 최적화를 쓰지 않는다 */}
+                  <img
+                    src={`${IMG}/${d.photo}`}
+                    alt={`${d.role} ${d.name}, 흰 가운을 입은 반신 사진`}
+                    fetchPriority={doc === 0 ? "high" : undefined}
+                    className="absolute inset-0 h-full w-full object-cover"
+                    style={{ objectPosition: "50% 18%" }}
+                  />
+                </motion.div>
+              </motion.div>
+            </AnimatePresence>
+          </div>
+        </div>
 
-      <div className={`relative z-[1] mt-auto px-4 pb-14 md:px-12 md:pb-20 ${reduce ? "" : "km-rise"}`}>
-        <h1
-          id="km-poster-title"
-          className="max-w-[12em] text-[36px] font-bold md:text-[clamp(40px,5vw,72px)]"
-          style={{ ...serifF, letterSpacing: "-0.03em", lineHeight: 1.2, wordBreak: "keep-all" }}
-        >
-          교통사고 치료,
-          <br />
-          본인 부담금 없음
-        </h1>
-        <p className="mt-4 inline-flex items-center gap-2 text-[16px] md:mt-6 md:text-[18px]" style={{ color: "rgba(255,255,255,0.88)" }}>
-          <Moon size={18} aria-hidden />
-          화, 목 밤 9시까지 진료
-        </p>
+        {/* 글 */}
+        <div className="flex flex-col justify-center px-4 py-8 md:px-10 md:py-10 lg:px-16">
+          <h1 id="km-poster-title" className="text-[30px] font-bold md:text-[clamp(32px,3.4vw,48px)]" style={{ ...serifF, letterSpacing: "-0.03em", lineHeight: 1.22, wordBreak: "keep-all" }}>
+            교통사고 치료,
+            <br />
+            본인 부담금 없음
+          </h1>
+
+          <div className="mt-7 border-t pt-6" style={{ borderColor: C.line }} aria-live="polite">
+            <p className="flex flex-wrap items-baseline gap-x-3 gap-y-1">
+              <strong className="text-[26px] font-bold tracking-[-0.02em] md:text-[30px]">{d.name}</strong>
+              <span className="text-[16px] font-semibold" style={{ color: C.red }}>
+                {d.role}, {d.major}
+              </span>
+            </p>
+            <ul className="mt-3 space-y-1 text-[16px] leading-[1.6]" style={{ color: C.inkSoft }}>
+              {d.career.map((c) => (
+                <li key={c}>{c}</li>
+              ))}
+            </ul>
+          </div>
+
+          <div className="mt-7">
+            <h2 className="text-[15px] font-semibold" style={{ color: C.muted }}>
+              어디가 불편하세요
+            </h2>
+            <ul className="mt-2 grid grid-cols-2 gap-2 md:grid-cols-1 md:gap-0 md:border-t" style={{ borderColor: C.line }}>
+              {QUICK.map((q) => (
+                <li key={q.label}>
+                  <button
+                    type="button"
+                    onClick={() => (q.part ? onPart(q.part) : go("km-car"))}
+                    className={`flex min-h-12 w-full items-center justify-between gap-2 rounded-[6px] border px-4 text-left text-[17px] font-semibold md:rounded-none md:border-x-0 md:border-t-0 md:px-1 md:hover:bg-[#f7f7f5] ${focusRing}`}
+                    style={{ borderColor: C.line, outlineColor: C.red }}
+                  >
+                    {q.label}
+                    <span className="text-[14px] font-normal" style={{ color: C.muted }}>
+                      {q.part ? "진료 보기" : "접수 방법"}
+                    </span>
+                  </button>
+                </li>
+              ))}
+            </ul>
+          </div>
+
+          <div className="mt-7 flex flex-wrap items-center justify-between gap-3 rounded-[6px] px-4 py-3" style={{ background: C.soft }}>
+            <p className="flex flex-wrap items-center gap-x-2 text-[16px]">
+              <Clock size={18} aria-hidden style={{ color: C.red }} />
+              <span>오늘({DOW[dow]})</span>
+              <strong>{h ? `${hm(h[0])} ~ ${hm(h[1])}` : "휴진"}</strong>
+              {h && status && (
+                <span className="rounded-[4px] px-2 py-0.5 text-[14px] font-semibold" style={status === "진료 중" ? { background: C.red, color: "#ffffff" } : { background: C.bar, color: C.inkSoft }}>
+                  {status}
+                </span>
+              )}
+            </p>
+            <button
+              type="button"
+              onClick={() => go("km-reserve")}
+              data-gtm-cta="korean-medicine_poster_cta"
+              className={`inline-flex min-h-11 items-center gap-1.5 rounded-[6px] px-4 text-[16px] font-semibold ${focusRing}`}
+              style={{ background: C.red, color: "#ffffff", outlineColor: C.ink }}
+            >
+              <CalendarCheck size={17} aria-hidden />
+              예약하기
+            </button>
+          </div>
+        </div>
       </div>
     </section>
   );
@@ -366,8 +496,7 @@ function SectionTitle({ id, title, aside }: { id: string; title: string; aside?:
 
 /* ---------- 1. 아픈 부위 고르기 ---------- */
 
-function BodySection({ reduce, onCar }: { reduce: boolean; onCar: () => void }) {
-  const [part, setPart] = useState<PartId>("waist");
+function BodySection({ reduce, part, setPart, onCar }: { reduce: boolean; part: PartId; setPart: (p: PartId) => void; onCar: () => void }) {
   const cur = PARTS.find((x) => x.id === part) ?? PARTS[0];
 
   return (

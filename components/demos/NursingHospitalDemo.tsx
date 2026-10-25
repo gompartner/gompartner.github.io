@@ -1,8 +1,8 @@
 "use client";
 
-import { useEffect, useMemo, useRef, useState } from "react";
-import { AnimatePresence, motion, useScroll, useTransform } from "framer-motion";
-import { AlertCircle, BedDouble, CalendarCheck, Car, Check, Clock, MapPin, MessageCircle, Phone, Soup, Stethoscope, Train, Users } from "lucide-react";
+import { useEffect, useMemo, useState } from "react";
+import { AnimatePresence, motion } from "framer-motion";
+import { AlertCircle, BedDouble, Car, Check, Clock, MapPin, MessageCircle, Phone, Soup, Stethoscope, Train, Users } from "lucide-react";
 import { useReducedMotionSafe } from "@/hooks/useReducedMotionSafe";
 import { daysAgo, fmtKo, useDemoToday } from "@/hooks/useDemoToday";
 import { maskName, maskPhone } from "@/components/demos/LeadReceivedPanel";
@@ -24,9 +24,11 @@ import { DemoMakerInfo } from "@/components/demos/DemoMakerInfo";
 
    사진 출처: AI 생성(Z-Image-Turbo, Apache 2.0), 직원 사진은 AI 생성(Z-Image-Turbo)
 
-   첫 화면(nh-poster): 침대 위 어르신 손을 보호사가 감싸 쥔 사진 한 장이 한 화면을 채우고, 흰 막 위에 문장 "병실별 월 비용을 간병비까지 공개합니다".
-   들어오면 사진이 1.6초 동안 천천히 다가오고(1.06배에서 1배), 문장은 0.3초 늦게 아래에서 올라온다(CSS keyframes, JS 없이도 보인다).
-   스크롤하면 사진만 조금 느리게 움직인다. 동작 줄이기면 전부 멈춘다. */
+   첫 화면(nh-poster): 맨 위 초록 정보 줄(주소, 입원상담 시간, 입원상담 전화, 휴대폰은 전화만), 그 아래 메뉴(병실안내, 면회예약,
+   주간 식단표, 입원상담, 오시는길). 왼쪽은 큰 문장과 "어르신은 지금 어떤 상태인가요?" 상태 5개 세로 목록, 오른쪽은 고른 상태에 맞는
+   사진 한 장(담당 의료진 또는 간병 장면)과 맞는 병실, 받는 진료, 담당, 월 예상 비용. "이 상태로 입원 상담"은 아래 상담 신청에
+   그 상태와 병실을 채운 채로, "병실 보기"는 병실 안내를 그 병실로 열고 내려간다. 처음엔 첫 상태가 골라져 있다.
+   휴대폰은 고른 상태 바로 아래에 사진과 설명이 펼쳐진다(한 번에 하나). 사진은 짧게 교차하고 천천히 다가온다. 동작 줄이기면 멈춘다. */
 
 const IMG = "/images/demo-nursing-hospital";
 const BRAND = "곰파트너";
@@ -141,6 +143,8 @@ export function NursingHospitalDemo() {
   const today = useDemoToday();
   const reduce = useReducedMotionSafe();
   const [room, setRoom] = useState<RoomId>("6");
+  const [conds, setConds] = useState<string[]>([]);
+  const [consultKey, setConsultKey] = useState(0);
 
   useEffect(() => {
     const f = () => window.scrollTo({ top: 0 });
@@ -152,32 +156,20 @@ export function NursingHospitalDemo() {
 
   return (
     <div className="min-h-screen overflow-x-clip" style={{ background: C.paper, color: C.ink }}>
-      <Poster reduce={reduce} onCta={() => go("nh-visit")} />
-
-      <header className="border-b" style={{ borderColor: C.line, background: C.paper }}>
-        <div className="mx-auto flex max-w-[1200px] flex-wrap items-center justify-between gap-3 px-4 py-4 md:px-6">
-          <p className="inline-flex items-center gap-2 text-[18px] font-bold" style={{ color: C.ink }}>
-            <SampleLogo />
-          </p>
-          <nav aria-label="주요 메뉴" className="order-3 -mx-1 flex w-full gap-1 overflow-x-auto text-[15px] font-semibold md:order-none md:w-auto">
-            {[
-              ["병실 안내", "nh-room"],
-              ["면회 예약", "nh-visit"],
-              ["식단표", "nh-meal"],
-              ["입원상담", "nh-consult"],
-              ["오시는 길", "nh-map"],
-            ].map(([label, id]) => (
-              <button key={id} type="button" onClick={() => go(id)} className={`flex-none rounded-[6px] px-3 py-2 hover:bg-black/5 ${focusRing}`} style={{ outlineColor: C.green }}>
-                {label}
-              </button>
-            ))}
-          </nav>
-          <a href={`tel:${TEL.replace(/-/g, "")}`} data-gtm-cta={`${SLUG}_tel`} className={`inline-flex items-center gap-1.5 rounded-[6px] px-4 py-2 text-[15px] font-semibold text-white ${focusRing}`} style={{ background: C.green, outlineColor: C.green }}>
-            <Phone size={16} aria-hidden />
-            입원상담 {TEL}
-          </a>
-        </div>
-      </header>
+      <Poster
+        reduce={reduce}
+        go={go}
+        onRoom={(r) => {
+          setRoom(r);
+          go("nh-room");
+        }}
+        onConsult={(cond, r) => {
+          setRoom(r);
+          setConds([cond]);
+          setConsultKey((k) => k + 1);
+          go("nh-consult");
+        }}
+      />
 
       {/* 병원 첫 소개: 진료과목, 면회 시간, 상담 시간 */}
       <section aria-labelledby="nh-intro-title" className="mx-auto max-w-[1200px] px-4 pt-10 md:px-6 md:pt-14">
@@ -228,7 +220,7 @@ export function NursingHospitalDemo() {
       <VisitSection today={today} reduce={reduce} />
       <MealSection today={today} />
       <Doctors />
-      <ConsultSection today={today} room={room} reduce={reduce} />
+      <ConsultSection key={consultKey} today={today} room={room} reduce={reduce} initConds={conds} />
       <MapSection />
 
       <footer className="mt-20 border-t" style={{ borderColor: C.line, background: C.beige }}>
@@ -248,63 +240,150 @@ export function NursingHospitalDemo() {
 
 /* ---------- 포스터 ---------- */
 
-function Poster({ reduce, onCta }: { reduce: boolean; onCta: () => void }) {
-  const ref = useRef<HTMLElement>(null);
-  const { scrollYProgress } = useScroll({ target: ref, offset: ["start start", "end start"] });
-  // 스크롤하면 사진만 조금 느리게 내려간다
-  const photoY = useTransform(scrollYProgress, (v) => (reduce ? "0%" : `${v * 8}%`));
+const NAV: [string, string][] = [
+  ["nh-room", "병실안내"],
+  ["nh-visit", "면회예약"],
+  ["nh-meal", "주간 식단표"],
+  ["nh-consult", "입원상담"],
+  ["nh-map", "오시는길"],
+];
 
+/** 첫 화면 상태 목록. 고르면 맞는 병실, 진료, 간병 방식과 월 예상 비용이 바뀐다 */
+const STATES: { cond: (typeof CONDITIONS)[number]; room: RoomId; care: string; who: string; photo: string; alt: string }[] = [
+  { cond: "뇌졸중 후 재활", room: "4", care: "재활의학과 진료, 하루 두 번 재활치료", who: "박ㅈ우 진료과장, 재활의학과 전문의", photo: "staff-2.jpg", alt: "재활의학과 박ㅈ우 진료과장" },
+  { cond: "치매 증상", room: "6", care: "내과 진료, 낙상 예방과 투약 관리", who: "김ㅎ늘 병원장, 내과 전문의", photo: "staff-1.jpg", alt: "내과 김ㅎ늘 병원장" },
+  { cond: "수술 후 회복", room: "4", care: "재활의학과 진료, 통증 조절과 보행 연습", who: "박ㅈ우 진료과장, 재활의학과 전문의", photo: "staff-2.jpg", alt: "재활의학과 박ㅈ우 진료과장" },
+  { cond: "욕창 관리", room: "2", care: "가정의학과 진료, 두 시간마다 자세 바꾸기", who: "이ㅅ연 진료과장, 가정의학과 전문의", photo: "staff-3.jpg", alt: "가정의학과 이ㅅ연 진료과장" },
+  { cond: "거동이 불편해요", room: "6", care: "내과 진료, 식사와 이동 도움", who: "병동 간호사, 요양보호사", photo: "hero.jpg", alt: "병상 위 어르신 손을 보호사가 두 손으로 감싸 쥔 모습" },
+];
+const monthOf = (r: Room) => 30 * (BASE_DAY.stay + BASE_DAY.meal + r.diff + (r.careDay ?? 0));
+
+function StatePanel({ s, reduce, onRoom, onConsult, compact }: { s: (typeof STATES)[number]; reduce: boolean; onRoom: () => void; onConsult: () => void; compact?: boolean }) {
+  const r = ROOMS.find((x) => x.id === s.room) ?? ROOMS[0];
   return (
-    <section id="nh-poster" ref={ref} aria-labelledby="nh-poster-title" className="relative flex min-h-[100svh] flex-col overflow-hidden" style={{ background: C.beige, color: C.ink }}>
-      <style>{`@keyframes nh-rise{from{opacity:0;transform:translateY(12px)}to{opacity:1;transform:none}}.nh-rise{animation:nh-rise 0.7s cubic-bezier(0.22,1,0.36,1) 0.3s both}@media (prefers-reduced-motion: reduce){.nh-rise{animation:none}}`}</style>
-      <motion.div className="absolute inset-x-0 top-[-10%] h-[110%]" style={{ y: photoY }}>
-        <motion.div className="h-full w-full" initial={reduce ? false : { scale: 1.06 }} animate={{ scale: 1 }} transition={{ duration: reduce ? 0 : PHOTO_IN, ease: EASE }}>
-          {/* eslint-disable-next-line @next/next/no-img-element -- 정적 export 라 next/image 최적화를 쓰지 않는다 */}
-          <img
-            src={`${IMG}/hero.jpg`}
-            srcSet={`${IMG}/hero-sm.jpg 960w, ${IMG}/hero.jpg 1920w`}
-            sizes="100vw"
-            alt="병상 위에 놓인 어르신 손을 보호사가 두 손으로 감싸 쥔 모습, 뒤로 밝은 창과 화분"
-            fetchPriority="high"
-            className="absolute inset-0 h-full w-full object-cover"
-            style={{ objectPosition: "57% 50%" }}
-          />
-        </motion.div>
-      </motion.div>
-      {/* 글자 대비를 위한 흰 막. 휴대폰은 아래쪽, PC는 왼쪽 */}
-      <div aria-hidden className="pointer-events-none absolute inset-0 md:hidden" style={{ background: "linear-gradient(to top, rgba(255,255,255,0.94) 0%, rgba(255,255,255,0.86) 30%, rgba(255,255,255,0.15) 55%, rgba(255,255,255,0.05) 82%, rgba(255,255,255,0.7) 100%)" }} />
-      <div aria-hidden className="pointer-events-none absolute inset-0 hidden md:block" style={{ background: "linear-gradient(to right, rgba(255,255,255,0.93) 0%, rgba(255,255,255,0.82) 32%, rgba(255,255,255,0.2) 56%, rgba(255,255,255,0) 70%)" }} />
-      <div aria-hidden className="pointer-events-none absolute inset-x-0 top-0 hidden h-28 md:block" style={{ background: "linear-gradient(to bottom, rgba(255,255,255,0.6), rgba(255,255,255,0))" }} />
-
-      <div className="relative z-[1] flex items-center justify-between gap-3 px-4 pt-4 md:px-12 md:pt-7">
-        <p className="inline-flex items-center gap-2 text-[17px] font-bold leading-none">
-          <SampleLogo size={18} />
-        </p>
-        <button
-          type="button"
-          onClick={onCta}
-          data-gtm-cta={`${SLUG}_poster_cta`}
-          className={`inline-flex min-h-11 items-center gap-1.5 rounded-[6px] px-4 text-[15px] font-semibold text-white ${focusRing}`}
-          style={{ background: C.green, outlineColor: C.green }}
-        >
-          <CalendarCheck size={17} aria-hidden />
-          면회 예약
+    <div className={compact ? "pb-4 pt-1" : "flex h-full flex-col"}>
+      <div className={`relative overflow-hidden rounded-[8px] ${compact ? "h-[180px]" : "min-h-[260px] flex-1"}`} style={{ background: C.line }}>
+        <AnimatePresence initial={false}>
+          <motion.div key={s.photo} className="absolute inset-0" initial={reduce ? false : { opacity: 0 }} animate={{ opacity: 1 }} exit={reduce ? undefined : { opacity: 0 }} transition={{ duration: reduce ? 0 : DUR, ease: EASE }}>
+            <motion.div className="h-full w-full" initial={reduce ? false : { scale: 1.05 }} animate={{ scale: 1 }} transition={{ duration: reduce ? 0 : PHOTO_IN, ease: EASE }}>
+              {/* eslint-disable-next-line @next/next/no-img-element -- 정적 export 라 next/image 최적화를 쓰지 않는다 */}
+              <img
+                src={`${IMG}/${s.photo}`}
+                srcSet={s.photo === "hero.jpg" ? `${IMG}/hero-sm.jpg 960w, ${IMG}/hero.jpg 1920w` : undefined}
+                sizes="(min-width: 768px) 45vw, 100vw"
+                alt={s.alt}
+                className="absolute inset-0 h-full w-full object-cover"
+                style={{ objectPosition: s.photo === "hero.jpg" ? "57% 50%" : "50% 22%" }}
+              />
+            </motion.div>
+          </motion.div>
+        </AnimatePresence>
+      </div>
+      <dl className="mt-4 grid grid-cols-[5.5em_minmax(0,1fr)] gap-x-3 gap-y-2 text-[16px]">
+        <dt className="font-semibold" style={{ color: C.sub }}>
+          맞는 병실
+        </dt>
+        <dd className="font-bold">
+          {r.label}, {r.care}
+        </dd>
+        <dt className="font-semibold" style={{ color: C.sub }}>
+          받는 진료
+        </dt>
+        <dd>{s.care}</dd>
+        <dt className="font-semibold" style={{ color: C.sub }}>
+          담당
+        </dt>
+        <dd>{s.who}</dd>
+        <dt className="font-semibold" style={{ color: C.sub }}>
+          월 예상
+        </dt>
+        <dd>
+          <b className="tabular-nums" style={{ color: C.green }}>
+            약 {won(monthOf(r))}
+          </b>{" "}
+          <span className="text-[14px]" style={{ color: C.sub }}>
+            {r.careDay ? "간병비 포함" : "개인간병 별도"}
+          </span>
+        </dd>
+      </dl>
+      <div className="mt-4 flex flex-wrap gap-2">
+        <button type="button" onClick={onConsult} data-gtm-cta={`${SLUG}_poster_cta`} className={`min-h-11 rounded-[6px] px-4 text-[16px] font-semibold text-white ${focusRing}`} style={{ background: C.green, outlineColor: C.green }}>
+          이 상태로 입원 상담
+        </button>
+        <button type="button" onClick={onRoom} className={`min-h-11 rounded-[6px] border px-4 text-[16px] font-semibold ${focusRing}`} style={{ borderColor: C.green, color: C.green, background: C.card, outlineColor: C.green }}>
+          {r.label} 보기
         </button>
       </div>
+    </div>
+  );
+}
 
-      <div className={`relative z-[1] mt-auto px-4 pb-14 md:my-auto md:px-12 md:pb-0 ${reduce ? "" : "nh-rise"}`}>
-        <h1
-          id="nh-poster-title"
-          className="max-w-[12em] text-[38px] font-bold md:text-[clamp(40px,5vw,72px)]"
-          style={{ letterSpacing: "-0.03em", lineHeight: 1.2, wordBreak: "keep-all", color: C.ink }}
-        >
-          병실별 월 비용을
-          <br />
-          간병비까지 공개합니다
-        </h1>
-        <p className="mt-4 text-[16px] tabular-nums md:mt-6 md:text-[18px]" style={{ color: C.muted }}>
-          면회 시간 매일 14:00~18:00
-        </p>
+function Poster({ reduce, go, onRoom, onConsult }: { reduce: boolean; go: (id: string) => void; onRoom: (r: RoomId) => void; onConsult: (cond: string, r: RoomId) => void }) {
+  const [pick, setPick] = useState(0);
+  const s = STATES[pick];
+  const panel = (compact?: boolean) => <StatePanel s={s} reduce={reduce} compact={compact} onRoom={() => onRoom(s.room)} onConsult={() => onConsult(s.cond, s.room)} />;
+
+  return (
+    <section id="nh-poster" aria-labelledby="nh-poster-title" style={{ background: C.paper, color: C.ink }}>
+      {/* 맨 위 정보 줄 */}
+      <div style={{ background: C.green, color: "#ffffff" }}>
+        <div className="mx-auto flex max-w-[1200px] flex-wrap items-center justify-between gap-x-6 gap-y-1 px-4 py-2 text-[14px] md:px-6">
+          <span className="hidden md:inline">{ADDRESS}</span>
+          <span className="hidden md:inline">입원상담 평일 09:00~18:00, 토요일 09:00~13:00</span>
+          <a href={`tel:${TEL.replace(/-/g, "")}`} data-gtm-cta={`${SLUG}_tel`} className={`inline-flex min-h-11 items-center gap-1.5 text-[16px] font-bold md:min-h-0 ${focusRing}`} style={{ outlineColor: "#ffffff" }}>
+            <Phone size={16} aria-hidden />
+            입원상담 {TEL}
+          </a>
+        </div>
+      </div>
+      <header className="border-b" style={{ borderColor: C.line }}>
+        <div className="mx-auto flex max-w-[1200px] flex-wrap items-center justify-between gap-x-3 px-4 pt-3 md:px-6 md:py-2.5">
+          <p className="inline-flex items-center gap-2 leading-none">
+            <SampleLogo size={18} />
+          </p>
+          <nav aria-label="주요 메뉴" className="-mx-1 flex w-full overflow-x-auto pt-1 md:w-auto md:pt-0" style={{ scrollbarWidth: "none" }}>
+            {NAV.map(([id, label]) => (
+              <button key={id} type="button" onClick={() => go(id)} className={`min-h-11 flex-none rounded-[6px] px-3 text-[16px] font-semibold hover:bg-black/5 ${focusRing}`} style={{ outlineColor: C.green }}>
+                {label}
+              </button>
+            ))}
+          </nav>
+        </div>
+      </header>
+
+      <div className="mx-auto grid max-w-[1200px] gap-8 px-4 pb-10 pt-6 md:grid-cols-[minmax(0,1fr)_minmax(0,1fr)] md:gap-10 md:px-6 md:pt-10">
+        <div className="min-w-0">
+          <h1 id="nh-poster-title" className="text-[28px] font-bold md:text-[clamp(30px,3vw,42px)]" style={{ letterSpacing: "-0.03em", lineHeight: 1.22, wordBreak: "keep-all" }}>
+            병실별 월 비용을
+            <br />
+            간병비까지 공개합니다
+          </h1>
+          <h2 className="mt-7 text-[19px] font-bold md:mt-9 md:text-[21px]">어르신은 지금 어떤 상태인가요?</h2>
+          <ul className="mt-3 border-t" style={{ borderColor: C.line }}>
+            {STATES.map((x, i) => {
+              const on = i === pick;
+              return (
+                <li key={x.cond} className="border-b" style={{ borderColor: C.line }}>
+                  <button
+                    type="button"
+                    onClick={() => setPick(i)}
+                    aria-expanded={on}
+                    className={`flex min-h-14 w-full items-center gap-3 px-3 text-left text-[17px] md:text-[18px] ${focusRing}`}
+                    style={{ background: on ? C.green : "transparent", color: on ? "#ffffff" : C.ink, fontWeight: on ? 700 : 500, outlineColor: C.green, outlineOffset: -3 }}
+                  >
+                    <span aria-hidden className="inline-flex h-5 w-5 flex-none items-center justify-center rounded-full border-2" style={{ borderColor: on ? "#ffffff" : C.sub }}>
+                      {on && <span className="h-2 w-2 rounded-full" style={{ background: "#ffffff" }} />}
+                    </span>
+                    {x.cond}
+                  </button>
+                  {/* 휴대폰: 고른 상태 바로 아래 펼침 */}
+                  {on && <div className="md:hidden">{panel(true)}</div>}
+                </li>
+              );
+            })}
+          </ul>
+        </div>
+        <div className="hidden min-w-0 md:block">{panel()}</div>
       </div>
     </section>
   );
@@ -614,7 +693,7 @@ function VisitSection({ today, reduce }: { today: Date; reduce: boolean }) {
         ) : (
           <motion.form key="form" onSubmit={submit} noValidate initial={reduce ? false : { opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} transition={{ duration: reduce ? 0 : DUR }} className="grid grid-cols-1 gap-6 lg:grid-cols-[minmax(0,1.2fr)_minmax(0,1fr)]">
             <div>
-              <fieldset>
+              <fieldset className="min-w-0">
                 <legend className="text-[15px] font-semibold">날짜</legend>
                 <div className="-mx-1 mt-2 flex gap-2 overflow-x-auto px-1 pb-1">
                   {dates.map((x, i) => {
@@ -640,7 +719,7 @@ function VisitSection({ today, reduce }: { today: Date; reduce: boolean }) {
                 </div>
               </fieldset>
 
-              <fieldset className="mt-5">
+              <fieldset className="mt-5 min-w-0">
                 <legend className="text-[15px] font-semibold">
                   {fmtKo(d)} 시간
                 </legend>
@@ -690,7 +769,7 @@ function VisitSection({ today, reduce }: { today: Date; reduce: boolean }) {
                 <Field label="휴대폰 번호" error={err.phone}>
                   <input className={inputCls} style={inputStyle} value={form.phone} onChange={(e) => setForm({ ...form, phone: e.target.value })} inputMode="tel" autoComplete="tel" placeholder="010-0000-0000" />
                 </Field>
-                <fieldset>
+                <fieldset className="min-w-0">
                   <legend className="text-[15px] font-semibold">방문 인원</legend>
                   <div className="mt-1.5 flex gap-2">
                     {([1, 2] as const).map((n) => (
@@ -750,7 +829,7 @@ function MealSection({ today }: { today: Date }) {
                 role="tab"
                 aria-selected={on}
                 onClick={() => setPick(i)}
-                className={`flex-none rounded-[6px] px-3 py-2 text-[15px] font-semibold ${focusRing}`}
+                className={`relative flex-none rounded-[6px] px-3 py-2 text-[15px] font-semibold ${focusRing}`}
                 style={{ background: on ? C.green : "transparent", color: on ? C.paper : C.ink, outlineColor: C.green, boxShadow: i === todayIdx && !on ? `inset 0 -3px 0 ${C.sage}` : undefined }}
               >
                 {DOW[w.getDay()]} {w.getDate()}
@@ -856,8 +935,8 @@ function Doctors() {
 
 type ConsultForm = { age: string; conds: string[]; when: string; room: RoomId; name: string; phone: string };
 
-function ConsultSection({ today, room, reduce }: { today: Date; room: RoomId; reduce: boolean }) {
-  const [form, setForm] = useState<ConsultForm>({ age: "80대", conds: [], when: "2주 안", room, name: "", phone: "" });
+function ConsultSection({ today, room, reduce, initConds }: { today: Date; room: RoomId; reduce: boolean; initConds: string[] }) {
+  const [form, setForm] = useState<ConsultForm>({ age: "80대", conds: initConds, when: "2주 안", room, name: "", phone: "" });
   const [roomTouched, setRoomTouched] = useState(false);
   const [err, setErr] = useState<{ name?: string; phone?: string }>({});
   const [done, setDone] = useState<{ no: string; form: ConsultForm } | null>(null);
@@ -909,7 +988,7 @@ function ConsultSection({ today, room, reduce }: { today: Date; room: RoomId; re
             </motion.div>
           ) : (
             <motion.form key="form" onSubmit={submit} noValidate initial={reduce ? false : { opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} transition={{ duration: reduce ? 0 : DUR }} className="grid gap-5 rounded-[8px] border p-5 md:p-6" style={{ borderColor: C.line, background: C.card }}>
-              <fieldset>
+              <fieldset className="min-w-0">
                 <legend className="text-[15px] font-semibold">환자 나이</legend>
                 <div className="mt-2 flex flex-wrap gap-2">
                   {AGES.map((a) => (
@@ -919,7 +998,7 @@ function ConsultSection({ today, room, reduce }: { today: Date; room: RoomId; re
                   ))}
                 </div>
               </fieldset>
-              <fieldset>
+              <fieldset className="min-w-0">
                 <legend className="text-[15px] font-semibold">지금 상태(여러 개 고를 수 있어요)</legend>
                 <div className="mt-2 flex flex-wrap gap-2">
                   {CONDITIONS.map((c) => {

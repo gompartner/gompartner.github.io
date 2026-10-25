@@ -1,7 +1,7 @@
 "use client";
 
-import { useEffect, useMemo, useRef, useState } from "react";
-import { AnimatePresence, motion, useScroll, useTransform } from "framer-motion";
+import { useEffect, useMemo, useState } from "react";
+import { AnimatePresence, motion } from "framer-motion";
 import { AlertCircle, CalendarCheck, Clock, MapPin, MessageCircle, Phone, ReceiptText, Search, Stethoscope, Users, X } from "lucide-react";
 import { useReducedMotionSafe } from "@/hooks/useReducedMotionSafe";
 import { daysAgo, fmtDot, fmtKo, useDemoToday } from "@/hooks/useDemoToday";
@@ -25,9 +25,10 @@ import { DemoMakerInfo } from "@/components/demos/DemoMakerInfo";
 
    사진 출처: AI 생성(Z-Image-Turbo, Apache 2.0)
 
-   첫 화면(os-poster): 밝은 물리치료실 사진 한 장이 한 화면을 채우고, 왼쪽 흰 막 위에 문장 "척추, 관절 진료와 도수치료".
-   들어오면 사진이 1.6초 동안 천천히 다가오고(1.06배에서 1배), 문장은 0.3초 늦게 아래에서 올라온다(CSS keyframes, JS 없이도 보인다).
-   스크롤하면 사진만 조금 느리게 움직인다. 동작 줄이기면 전부 멈춘다.
+   첫 화면(os-poster): 맨 위에 붙는 메뉴 줄(진료과목, 실시간 대기, 비급여진료, 진료시간, 오시는길, 휴대폰은 가로로 미는 메뉴).
+   제목 줄 오른쪽에 오늘 진료시간과 진료실별 원장. 아래는 도수치료실 사진(왼쪽 5)과 부위 타일 2x2(오른쪽 7, 허리, 목, 어깨, 무릎).
+   타일을 누르면 부위 구간이 그 부위로 열린다. 휴대폰은 타일이 먼저, 사진은 아래 가로 띠.
+   사진은 들어올 때 1.6초 동안 천천히 다가오고, 타일은 마우스를 올리면 바탕만 옅어진다. 동작 줄이기면 멈춘다.
    본문에서 움직이는 것은 실시간 대기 숫자가 굴러 바뀌는 것 하나다. */
 
 const IMG = "/images/demo-orthopedics";
@@ -247,6 +248,14 @@ const nextOpenDay = (d: Date) => {
   return n;
 };
 
+const NAV: [string, string][] = [
+  ["os-parts", "진료과목"],
+  ["os-wait", "실시간 대기"],
+  ["os-fees", "비급여진료"],
+  ["os-hours", "진료시간"],
+  ["os-visit", "오시는길"],
+];
+
 export function OrthopedicsDemo() {
   const today = useDemoToday();
   const reduce = useReducedMotionSafe();
@@ -269,39 +278,31 @@ export function OrthopedicsDemo() {
     go("os-fees");
   };
 
-  const navBtn = `rounded-[4px] px-2.5 py-1.5 text-[15px] font-medium hover:underline underline-offset-4 ${focusRing}`;
+  const navBtn = `min-h-11 rounded-[4px] px-2.5 py-1.5 text-[15px] font-medium hover:underline underline-offset-4 ${focusRing}`;
 
   return (
     <div className="min-h-screen overflow-x-clip pb-24" style={{ background: C.white, color: C.ink }}>
-      <Poster reduce={reduce} onCta={() => go("os-reserve")} />
-
       <header className="sticky top-0 z-30 border-b bg-white/95" style={{ borderColor: C.line }}>
         <div className="mx-auto flex max-w-[1200px] flex-wrap items-center justify-between gap-x-4 gap-y-1 px-4 py-3 md:px-6">
           <h2 className="leading-none">
             <SampleLogo />
           </h2>
           <nav aria-label="주요 메뉴" className="-mx-2 hidden flex-wrap items-center md:flex">
-            {[
-              ["os-parts", "진료과목"],
-              ["os-wait", "실시간 대기"],
-              ["os-fees", "비급여 진료비"],
-              ["os-hours", "진료시간"],
-              ["os-visit", "오시는 길"],
-            ].map(([id, label]) => (
+            {NAV.map(([id, label]) => (
               <button key={id} type="button" onClick={() => go(id)} className={navBtn} style={{ outlineColor: C.blue }}>
                 {label}
               </button>
             ))}
           </nav>
           <div className="flex items-center gap-2">
-            <a href={`tel:${TEL.replace(/-/g, "")}`} aria-label={`전화 ${TEL}`} className={`inline-flex h-10 w-10 items-center justify-center rounded-[6px] border ${focusRing}`} style={{ borderColor: C.line, color: C.blue, outlineColor: C.blue }}>
+            <a href={`tel:${TEL.replace(/-/g, "")}`} aria-label={`전화 ${TEL}`} className={`inline-flex h-11 w-11 items-center justify-center rounded-[6px] border ${focusRing}`} style={{ borderColor: C.line, color: C.blue, outlineColor: C.blue }}>
               <Phone size={18} aria-hidden />
             </a>
             <button
               type="button"
               onClick={() => go("os-reserve")}
               data-gtm-cta="orthopedics_header_reserve"
-              className={`inline-flex h-10 items-center gap-1.5 rounded-[6px] px-4 text-[15px] font-semibold text-white ${focusRing}`}
+              className={`inline-flex h-11 items-center gap-1.5 rounded-[6px] px-4 text-[15px] font-semibold text-white ${focusRing}`}
               style={{ background: C.blue, outlineColor: C.blue }}
             >
               <CalendarCheck size={17} aria-hidden />
@@ -309,7 +310,17 @@ export function OrthopedicsDemo() {
             </button>
           </div>
         </div>
+        {/* 휴대폰은 메뉴를 가로로 밀어 본다 */}
+        <nav aria-label="주요 메뉴" className="flex overflow-x-auto border-t px-2 md:hidden" style={{ borderColor: C.line, scrollbarWidth: "none" }}>
+          {NAV.map(([id, label]) => (
+            <button key={id} type="button" onClick={() => go(id)} className={`min-h-11 shrink-0 whitespace-nowrap px-3 text-[15px] font-semibold ${focusRing}`} style={{ outlineColor: C.blue, outlineOffset: -3 }}>
+              {label}
+            </button>
+          ))}
+        </nav>
       </header>
+
+      <Poster reduce={reduce} today={today} onPart={(p) => { setPart(p); go("os-parts"); }} />
 
       {/* 1. 부위별 증상 */}
       <section id="os-parts" aria-labelledby="os-parts-title" className="mx-auto max-w-[1200px] scroll-mt-20 px-4 pt-14 md:px-6 md:pt-20">
@@ -371,63 +382,99 @@ function SectionTitle({ id, icon, title }: { id: string; icon: React.ReactNode; 
 
 /* ---------- 포스터 ---------- */
 
-function Poster({ reduce, onCta }: { reduce: boolean; onCta: () => void }) {
-  const ref = useRef<HTMLElement>(null);
-  const { scrollYProgress } = useScroll({ target: ref, offset: ["start start", "end start"] });
-  // 스크롤하면 사진만 조금 느리게 내려간다
-  const photoY = useTransform(scrollYProgress, (v) => (reduce ? "0%" : `${v * 8}%`));
+/** 첫 화면 부위 타일. 대표 치료 2개는 아래 부위 구간의 치료에서 고른다 */
+const TILES: { id: PartId; tx: [Tx, Tx] }[] = [
+  { id: "back", tx: ["주사치료", "도수치료"] },
+  { id: "neck", tx: ["도수치료", "물리치료"] },
+  { id: "shoulder", tx: ["체외충격파", "주사치료"] },
+  { id: "knee", tx: ["주사치료", "운동치료"] },
+];
+
+const DOCS = [
+  { name: "김ㅎ늘", room: "1진료실", photo: "staff-1.jpg" },
+  { name: "박ㅈ원", room: "2진료실", photo: "staff-2.jpg" },
+] as const;
+
+function Poster({ reduce, today, onPart }: { reduce: boolean; today: Date; onPart: (p: PartId) => void }) {
+  const h = HOURS.find((x) => x.dow === today.getDay()) ?? HOURS[0];
+  const closed = h.time === "휴진";
 
   return (
-    <section id="os-poster" ref={ref} aria-labelledby="os-poster-title" className="relative flex min-h-[100svh] flex-col overflow-hidden" style={{ background: C.paper, color: C.ink }}>
-      <style>{`@keyframes os-rise{from{opacity:0;transform:translateY(12px)}to{opacity:1;transform:none}}.os-rise{animation:os-rise 0.7s cubic-bezier(0.22,1,0.36,1) 0.3s both}@media (prefers-reduced-motion: reduce){.os-rise{animation:none}}`}</style>
-      <motion.div className="absolute inset-x-0 top-[-10%] h-[110%]" style={{ y: photoY }}>
-        <motion.div className="h-full w-full" initial={reduce ? false : { scale: 1.06 }} animate={{ scale: 1 }} transition={{ duration: reduce ? 0 : PHOTO_IN, ease: EASE }}>
-          {/* eslint-disable-next-line @next/next/no-img-element -- 정적 export 라 next/image 최적화를 쓰지 않는다 */}
-          <img
-            src={`${IMG}/hero.jpg`}
-            srcSet={`${IMG}/hero-sm.jpg 960w, ${IMG}/hero.jpg 1920w`}
-            sizes="100vw"
-            alt="창가 옆에 흰 치료 침대 두 대가 놓인 밝은 물리치료실"
-            fetchPriority="high"
-            className="absolute inset-0 h-full w-full object-cover"
-            style={{ objectPosition: "62% 55%" }}
-          />
-        </motion.div>
-      </motion.div>
-      {/* 글자 대비를 위한 흰 막. 휴대폰은 아래쪽, PC는 왼쪽 */}
-      <div aria-hidden className="pointer-events-none absolute inset-0 md:hidden" style={{ background: "linear-gradient(to top, rgba(255,255,255,0.94) 0%, rgba(255,255,255,0.86) 38%, rgba(255,255,255,0.2) 64%, rgba(255,255,255,0.1) 82%, rgba(255,255,255,0.7) 100%)" }} />
-      <div aria-hidden className="pointer-events-none absolute inset-0 hidden md:block" style={{ background: "linear-gradient(to right, rgba(255,255,255,0.93) 0%, rgba(255,255,255,0.82) 34%, rgba(255,255,255,0.25) 60%, rgba(255,255,255,0) 75%)" }} />
-      <div aria-hidden className="pointer-events-none absolute inset-x-0 top-0 hidden h-28 md:block" style={{ background: "linear-gradient(to bottom, rgba(255,255,255,0.6), rgba(255,255,255,0))" }} />
+    <section id="os-poster" aria-labelledby="os-poster-title" className="flex flex-col lg:min-h-[calc(100svh-65px)]" style={{ background: C.white, color: C.ink }}>
+      <div className="mx-auto flex w-full max-w-[1200px] flex-1 flex-col px-4 pb-8 pt-6 md:px-6 md:pt-8">
+        {/* 제목 줄과 오늘 진료 원장 */}
+        <div className="flex flex-col gap-5 md:flex-row md:items-end md:justify-between">
+          <h1 id="os-poster-title" className="text-[30px] font-bold md:text-[clamp(32px,3.6vw,48px)]" style={{ letterSpacing: "-0.03em", lineHeight: 1.2, wordBreak: "keep-all" }}>
+            척추, 관절 진료와
+            <br />
+            도수치료
+          </h1>
+          <div className="flex flex-wrap items-center gap-x-5 gap-y-3 rounded-[8px] border px-4 py-3" style={{ borderColor: C.line }}>
+            <p className="w-full text-[15px] md:w-auto" style={{ color: C.muted }}>
+              <strong style={{ color: C.ink }}>오늘({h.label})</strong> <span className="tabular-nums">{h.time}</span>
+            </p>
+            {DOCS.map((d) => (
+              <p key={d.name} className="flex items-center gap-2.5">
+                {/* eslint-disable-next-line @next/next/no-img-element -- 정적 export 라 next/image 최적화를 쓰지 않는다 */}
+                <img src={`${IMG}/${d.photo}`} alt="" className="h-11 w-11 flex-none rounded-full object-cover" style={{ objectPosition: "50% 20%" }} />
+                <span className="text-[15px] leading-tight">
+                  <strong className="block text-[16px]">{d.name} 원장</strong>
+                  <span style={{ color: C.muted }}>
+                    {d.room}{closed ? ", 휴진" : ""}
+                  </span>
+                </span>
+              </p>
+            ))}
+          </div>
+        </div>
 
-      <div className="relative z-[1] flex items-center justify-between gap-3 px-4 pt-4 md:px-12 md:pt-7">
-        <p className="leading-none">
-          <SampleLogo small />
-        </p>
-        <button
-          type="button"
-          onClick={onCta}
-          data-gtm-cta="orthopedics_poster_cta"
-          className={`inline-flex min-h-11 items-center gap-1.5 rounded-[6px] px-4 text-[15px] font-semibold text-white ${focusRing}`}
-          style={{ background: C.blue, outlineColor: C.blue }}
-        >
-          <CalendarCheck size={17} aria-hidden />
-          예약하기
-        </button>
-      </div>
+        {/* 사진과 부위 타일 */}
+        <div className="mt-6 grid flex-1 gap-3 md:mt-8 md:grid-cols-[minmax(0,5fr)_minmax(0,7fr)]">
+          <div className="relative order-2 h-[200px] overflow-hidden rounded-[8px] md:order-1 md:h-auto md:min-h-[360px]">
+            <motion.div className="absolute inset-0" initial={reduce ? false : { scale: 1.06 }} animate={{ scale: 1 }} transition={{ duration: reduce ? 0 : PHOTO_IN, ease: EASE }}>
+              {/* eslint-disable-next-line @next/next/no-img-element -- 정적 export 라 next/image 최적화를 쓰지 않는다 */}
+              <img
+                src={`${IMG}/hero.jpg`}
+                srcSet={`${IMG}/hero-sm.jpg 960w, ${IMG}/hero.jpg 1920w`}
+                sizes="(min-width: 768px) 40vw, 100vw"
+                alt="창가 햇빛이 드는 도수치료실, 흰 시트를 깐 치료 침대 두 대"
+                fetchPriority="high"
+                className="absolute inset-0 h-full w-full object-cover"
+                style={{ objectPosition: "60% 60%" }}
+              />
+            </motion.div>
+          </div>
 
-      <div className={`relative z-[1] mt-auto px-4 pb-14 md:my-auto md:px-12 md:pb-0 ${reduce ? "" : "os-rise"}`}>
-        <h1
-          id="os-poster-title"
-          className="max-w-[9em] text-[38px] font-bold md:text-[clamp(40px,5vw,72px)]"
-          style={{ letterSpacing: "-0.03em", lineHeight: 1.2, wordBreak: "keep-all", color: C.ink }}
-        >
-          척추, 관절 진료와
-          <br />
-          도수치료
-        </h1>
-        <p className="mt-4 text-[16px] md:mt-6 md:text-[18px] tabular-nums" style={{ color: C.muted }}>
-          토요일 09:00 ~ 14:00, 점심시간 없이
-        </p>
+          <ul aria-label="아픈 부위" className="order-1 grid grid-cols-2 gap-3 md:order-2">
+            {TILES.map((t) => {
+              const p = partById(t.id);
+              return (
+                <li key={t.id} className="min-w-0">
+                  <button
+                    type="button"
+                    onClick={() => onPart(t.id)}
+                    className={`group flex h-full min-h-[148px] w-full flex-col justify-between rounded-[8px] border p-4 text-left transition-colors duration-200 hover:bg-[#eef0f4] md:min-h-[180px] md:p-6 ${focusRing}`}
+                    style={{ background: C.paper, borderColor: C.line, outlineColor: C.blue }}
+                  >
+                    <span>
+                      <span className="block text-[26px] font-bold tracking-[-0.03em] md:text-[34px]">{p.name}</span>
+                      <span className="mt-1 block text-[14px] leading-[1.5] md:text-[15px]" style={{ color: C.muted, wordBreak: "keep-all" }}>
+                        {p.often}
+                      </span>
+                    </span>
+                    <span className="mt-3 flex flex-wrap gap-1.5">
+                      {t.tx.map((x) => (
+                        <span key={x} className="rounded-[4px] px-2 py-0.5 text-[13px] font-semibold md:text-[14px]" style={{ background: C.white, color: C.blue, border: `1px solid ${C.line}` }}>
+                          {x}
+                        </span>
+                      ))}
+                    </span>
+                  </button>
+                </li>
+              );
+            })}
+          </ul>
+        </div>
       </div>
     </section>
   );

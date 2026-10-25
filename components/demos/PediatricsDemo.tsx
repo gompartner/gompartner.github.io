@@ -1,13 +1,15 @@
 "use client";
 
-import { useEffect, useMemo, useRef, useState } from "react";
-import { AnimatePresence, motion, useScroll, useTransform } from "framer-motion";
+import { useEffect, useMemo, useState } from "react";
+import { AnimatePresence, motion } from "framer-motion";
 import {
   AlertCircle,
   Baby,
   CalendarDays,
   Car,
   Check,
+  ChevronLeft,
+  ChevronRight,
   ClipboardCheck,
   Clock,
   MapPin,
@@ -40,9 +42,11 @@ import { DemoMakerInfo } from "@/components/demos/DemoMakerInfo";
    3. 영유아 건강검진 시기: 같은 생년월일로 1차~8차 검진 기간을 날짜로 바꿔 지금 받을 차수를 표시한다. 차수를 누르면 내용.
    4. 진료 시간표: 요일별 진료와 접수 마감, 오늘 요일과 야간진료 요일 강조.
 
-   포스터 첫 화면(pd-poster): 청진기 진료 사진 한 장 위에 큰 문장 "지금 대기 3명" 하나만 둔다. 숫자는 대기 인원 상태와 연결된다.
-   핵심 모션: 사진이 1.6초 동안 scale 1.06 -> 1 로 천천히 다가오고, 문장과 정보 줄은 0.3초 늦게 아래 12px 에서 올라온다
-   (CSS 키프레임이라 스크립트 없이도 끝 상태가 보인다). 스크롤하면 사진만 조금 느리게 움직인다(y 0 -> 8%).
+   포스터 첫 화면(pd-poster): 위에 메뉴(진료시간표, 예방접종, 영유아검진, 실시간 대기, 비급여항목, 오시는길, 휴대폰은 3칸 2줄).
+   사진을 배경으로 깔지 않고 왼쪽 2/3을 오늘 진료판으로 쓴다. 큰 문장 "지금 대기 3명"(대기 인원 상태와 연결), 날짜와 앞뒤 버튼,
+   시간대 줄(오전, 오후, 화 목 야간)마다 진료 시간, 원장, 접수 마감 시각, 지금 상태(접수 중, 접수 마감, 진료 끝).
+   지금 시간대 줄만 초록 바탕. 판 아래 접수 방식 한 줄과 진료 접수, 접종 검진 예약 버튼. 오른쪽 1/3은 세로 사진 한 장(막 없음).
+   휴대폰은 사진이 판 위 120px 띠로 줄어든다. 모션은 사진이 천천히 다가오고 문장이 0.3초 늦게 올라오는 것뿐, 동작 줄이기면 정지.
    본문은 흰색과 #f7f7f5 바탕, 강조색은 짙은 초록 하나. 동작 줄이기면 전부 정지 상태다. */
 
 const TEL = "02-000-0000";
@@ -274,34 +278,10 @@ export function PediatricsDemo() {
 
   const go = (id: string) => document.getElementById(id)?.scrollIntoView({ behavior: reduce ? "auto" : "smooth", block: "start" });
 
-  const h = hoursOf(today.getDay());
-  const lastCall = h.close !== undefined ? h.close - LAST_CALL : null;
-
-  const navBtn = `rounded-[4px] px-2.5 py-1.5 text-[15px] hover:underline underline-offset-4 ${focusRing}`;
 
   return (
     <div className="min-h-screen overflow-x-clip" style={{ background: C.paper, color: C.ink }}>
-      <Poster reduce={reduce} wait={wait} lastCall={lastCall} onCta={() => go("pd-queue")} />
-
-      <header className="mx-auto flex max-w-[1200px] flex-wrap items-center justify-between gap-x-4 gap-y-2 px-4 py-4 md:px-6">
-        <h2 className="leading-none">
-          <SampleLogo />
-        </h2>
-        <nav aria-label="주요 메뉴" className="-mx-2 flex flex-wrap items-center">
-          {[
-            ["pd-hours", "진료시간"],
-            ["pd-queue", "실시간 대기"],
-            ["pd-vaccine", "예방접종"],
-            ["pd-checkup", "영유아검진"],
-            ["pd-fees", "비급여 진료비"],
-            ["pd-visit", "오시는 길"],
-          ].map(([id, label]) => (
-            <button key={id} type="button" onClick={() => go(id)} className={navBtn} style={{ outlineColor: C.green }}>
-              {label}
-            </button>
-          ))}
-        </nav>
-      </header>
+      <Poster reduce={reduce} today={today} nowMin={nowMin} wait={wait} go={go} />
 
       {/* 대기와 진료시간 */}
       <div className="mx-auto grid max-w-[1200px] gap-5 px-4 md:grid-cols-[minmax(0,1.15fr)_minmax(0,1fr)] md:items-start md:gap-6 md:px-6">
@@ -467,60 +447,218 @@ const HERO_CSS = `
 }
 `;
 
-function Poster({ reduce, wait, lastCall, onCta }: { reduce: boolean; wait: number; lastCall: number | null; onCta: () => void }) {
-  const ref = useRef<HTMLElement>(null);
-  const { scrollYProgress: p } = useScroll({ target: ref, offset: ["start start", "end start"] });
-  const photoY = useTransform(p, (v) => `${(v * 8).toFixed(2)}%`);
+/** 위쪽 메뉴. 휴대폰은 3칸 2줄 */
+const NAV: [string, string][] = [
+  ["pd-hours", "진료시간표"],
+  ["pd-vaccine", "예방접종"],
+  ["pd-checkup", "영유아검진"],
+  ["pd-queue", "실시간 대기"],
+  ["pd-fees", "비급여항목"],
+  ["pd-visit", "오시는길"],
+];
+
+interface Slot {
+  label: string;
+  from: number;
+  to: number;
+  who: string;
+}
+/** 그 요일 시간대 줄(오전, 오후, 야간)과 진료 원장 */
+function slotsOf(dow: number): Slot[] {
+  const h = hoursOf(dow);
+  if (h.open === undefined || h.close === undefined) return [];
+  if (!h.lunch) return [{ label: "오전", from: h.open, to: h.close, who: "김ㅎ늘, 박ㅅ윤" }];
+  const out: Slot[] = [
+    { label: "오전", from: h.open, to: LUNCH[0], who: "김ㅎ늘, 박ㅅ윤" },
+    { label: "오후", from: LUNCH[1], to: Math.min(h.close, 1140), who: "김ㅎ늘, 박ㅅ윤" },
+  ];
+  if (h.night) out.push({ label: "야간", from: 1140, to: h.close, who: dow === 2 ? "김ㅎ늘" : "박ㅅ윤" });
+  return out;
+}
+type SlotState = "진료 전" | "접수 중" | "접수 마감" | "진료 끝";
+function slotState(s: Slot, now: number): SlotState {
+  if (now < s.from) return "진료 전";
+  if (now >= s.to) return "진료 끝";
+  if (now >= s.to - LAST_CALL) return "접수 마감";
+  return "접수 중";
+}
+const BOARD_DAYS = 7;
+
+function Poster({
+  reduce,
+  today,
+  nowMin,
+  wait,
+  go,
+}: {
+  reduce: boolean;
+  today: Date;
+  nowMin: number;
+  wait: number;
+  go: (id: string) => void;
+}) {
+  const [off, setOff] = useState(0);
+  const day = daysAgo(today, -off);
+  const dow = day.getDay();
+  const slots = slotsOf(dow);
+  const isToday = off === 0;
+  const navBtn = `min-h-11 rounded-[4px] px-2.5 text-[15px] font-semibold hover:underline underline-offset-4 ${focusRing}`;
+  const arrowBtn = `inline-flex h-11 w-11 items-center justify-center rounded-[6px] border disabled:opacity-35 ${focusRing}`;
 
   return (
-    <section id="pd-poster" ref={ref} aria-labelledby="pd-poster-title" className="relative min-h-[100svh] overflow-hidden" style={{ background: "#2b2b2b" }}>
+    <section id="pd-poster" aria-labelledby="pd-poster-title" style={{ background: C.paper, color: C.ink }}>
       <style>{HERO_CSS}</style>
-      <motion.div
-        className="absolute inset-0"
-        initial={reduce ? false : { scale: 1.06 }}
-        animate={{ scale: 1 }}
-        transition={{ duration: reduce ? 0 : HERO_MS / 1000, ease: EASE }}
-        style={reduce ? undefined : { y: photoY }}
-      >
-        {/* eslint-disable-next-line @next/next/no-img-element -- 정적 export 라 next/image 최적화를 쓰지 않는다 */}
-        <img
-          src={`${IMG}/hero.jpg`}
-          srcSet={`${IMG}/hero-sm.jpg 960w, ${IMG}/hero.jpg 1920w`}
-          sizes="100vw"
-          alt="의사가 청진기로 아이의 가슴 소리를 듣는 모습"
-          fetchPriority="high"
-          className="absolute inset-0 h-full w-full object-cover"
-          style={{ objectPosition: "62% 40%" }}
-        />
-      </motion.div>
-      {/* 글자 대비용 막. 피부가 밝아서 아래와 왼쪽을 진하게 덮는다 */}
-      <div aria-hidden className="absolute inset-0" style={{ background: "linear-gradient(to top, rgba(0,0,0,0.72), rgba(0,0,0,0.3) 55%, rgba(0,0,0,0.12)), linear-gradient(to right, rgba(0,0,0,0.35), rgba(0,0,0,0) 60%)" }} />
-
-      <div className="relative mx-auto flex min-h-[100svh] max-w-[1200px] flex-col px-4 md:px-6">
-        <div className="flex items-center justify-between gap-3 py-4">
-          <p className="leading-none">
-            <SampleLogo light small />
-          </p>
+      <header className="mx-auto flex max-w-[1200px] flex-wrap items-center justify-between gap-x-4 gap-y-2 px-4 pt-3 md:px-6 md:py-3">
+        <p className="leading-none">
+          <SampleLogo small />
+        </p>
+        <nav aria-label="주요 메뉴" className="hidden items-center md:flex">
+          {NAV.map(([id, label]) => (
+            <button key={id} type="button" onClick={() => go(id)} className={navBtn} style={{ outlineColor: C.green }}>
+              {label}
+            </button>
+          ))}
+        </nav>
+      </header>
+      {/* 휴대폰 메뉴: 3칸 2줄 */}
+      <nav aria-label="주요 메뉴" className="mx-4 mt-3 grid grid-cols-3 overflow-hidden rounded-[6px] border md:hidden" style={{ borderColor: C.line }}>
+        {NAV.map(([id, label], i) => (
           <button
+            key={id}
             type="button"
-            onClick={onCta}
-            data-gtm-cta="pediatrics_poster_cta"
-            className={`flex-none rounded-[6px] px-4 py-2 text-[15px] font-semibold ${focusRing}`}
-            style={{ background: C.green, color: "#ffffff", outlineColor: "#ffffff" }}
+            onClick={() => go(id)}
+            className={`min-h-11 px-1 text-[14px] font-semibold ${i % 3 !== 2 ? "border-r" : ""} ${i < 3 ? "border-b" : ""} ${focusRing}`}
+            style={{ borderColor: C.line, outlineColor: C.green, outlineOffset: -3 }}
           >
-            진료 접수
+            {label}
           </button>
+        ))}
+      </nav>
+
+      <div className="mx-auto grid max-w-[1200px] gap-5 px-4 pb-10 pt-4 md:grid-cols-[minmax(0,2fr)_minmax(0,1fr)] md:gap-6 md:px-6 md:pt-6">
+        {/* 진료판 */}
+        <div className="order-2 flex flex-col justify-center md:order-1">
+          <div className="flex flex-wrap items-end justify-between gap-3">
+            <h1 id="pd-poster-title" className={`text-[30px] font-bold md:text-[clamp(32px,3.4vw,46px)] ${reduce ? "" : "pd-rise"}`} style={{ letterSpacing: "-0.03em", lineHeight: 1.2 }}>
+              지금 대기 <span className="tabular-nums">{wait}</span>명
+            </h1>
+            <p className="pb-1 text-[15px]" style={{ color: C.muted }}>
+              접수는 시간대마다 끝나기 {LAST_CALL}분 전에 마감
+            </p>
+          </div>
+
+          <div className="mt-4 rounded-[8px] border" style={{ borderColor: C.line }}>
+            <div className="flex items-center justify-between gap-2 border-b px-3 py-2 md:px-5" style={{ borderColor: C.line, background: C.paperDeep }}>
+              <button type="button" className={arrowBtn} style={{ borderColor: C.line, background: "#fff", outlineColor: C.green }} onClick={() => setOff((v) => Math.max(0, v - 1))} disabled={off === 0} aria-label="앞 날짜">
+                <ChevronLeft size={20} aria-hidden />
+              </button>
+              <p className="text-center text-[17px] font-bold md:text-[19px]" aria-live="polite">
+                {fmtKo(day)}
+                {isToday && (
+                  <span className="ml-2 rounded-[4px] px-2 py-0.5 align-middle text-[13px] font-semibold" style={{ background: C.green, color: "#fff" }}>
+                    오늘
+                  </span>
+                )}
+              </p>
+              <button type="button" className={arrowBtn} style={{ borderColor: C.line, background: "#fff", outlineColor: C.green }} onClick={() => setOff((v) => Math.min(BOARD_DAYS - 1, v + 1))} disabled={off === BOARD_DAYS - 1} aria-label="다음 날짜">
+                <ChevronRight size={20} aria-hidden />
+              </button>
+            </div>
+
+            {slots.length === 0 ? (
+              <div className="flex flex-col items-center gap-3 px-4 py-8 md:px-5">
+                <p className="text-[18px] font-semibold" style={{ color: C.muted }}>
+                  일요일, 공휴일 휴진
+                </p>
+                {off < BOARD_DAYS - 1 && (
+                  <button type="button" onClick={() => setOff((v) => v + 1)} className={`min-h-11 rounded-[6px] border px-4 text-[15px] font-semibold ${focusRing}`} style={{ borderColor: C.line, background: "#fff", outlineColor: C.green }}>
+                    {fmtKo(daysAgo(day, -1))} 진료 보기
+                  </button>
+                )}
+              </div>
+            ) : (
+              <ul>
+                {slots.map((s) => {
+                  const st = isToday ? slotState(s, nowMin) : null;
+                  const live = st === "접수 중" || st === "접수 마감";
+                  return (
+                    <li
+                      key={s.label}
+                      className="grid grid-cols-[3.2em_minmax(0,1fr)_auto] items-center gap-x-3 border-b px-4 py-4 last:border-b-0 md:grid-cols-[4em_minmax(0,1fr)_minmax(0,1fr)_auto] md:px-5 md:py-5"
+                      style={{ borderColor: C.line, background: live ? C.greenTint : "transparent", opacity: st === "진료 끝" ? 0.55 : 1 }}
+                    >
+                      <span className="text-[18px] font-bold md:text-[20px]">{s.label}</span>
+                      <span className="min-w-0">
+                        <span className="block text-[17px] font-semibold tabular-nums md:text-[18px]">
+                          {hm(s.from)} ~ {hm(s.to)}
+                        </span>
+                        <span className="block text-[14px] md:hidden" style={{ color: C.muted }}>
+                          {s.who} 원장
+                        </span>
+                        <span className="block text-[14px] tabular-nums" style={{ color: C.muted }}>
+                          접수 마감 {hm(s.to - LAST_CALL)}
+                        </span>
+                      </span>
+                      <span className="hidden text-[16px] md:block">{s.who} 원장</span>
+                      <span
+                        className="rounded-[4px] px-2 py-1 text-[14px] font-semibold"
+                        style={
+                          st === "접수 중"
+                            ? { background: C.green, color: "#fff" }
+                            : st === "접수 마감"
+                              ? { background: "#fff", color: C.error, border: `1px solid ${C.error}` }
+                              : { background: C.paperDeep, color: C.body }
+                        }
+                      >
+                        {st ?? "진료"}
+                      </span>
+                    </li>
+                  );
+                })}
+              </ul>
+            )}
+          </div>
+
+          <div className="mt-4 flex flex-wrap items-center justify-between gap-3">
+            <p className="text-[15px]" style={{ color: C.body }}>
+              일반 진료는 실시간 접수, 예방접종과 검진은 예약
+            </p>
+            <div className="flex flex-wrap gap-2">
+              <button
+                type="button"
+                onClick={() => go("pd-queue")}
+                data-gtm-cta="pediatrics_poster_cta"
+                className={`inline-flex min-h-11 items-center rounded-[6px] px-4 text-[16px] font-semibold ${focusRing}`}
+                style={{ background: C.green, color: "#ffffff", outlineColor: C.green }}
+              >
+                진료 접수
+              </button>
+              <button
+                type="button"
+                onClick={() => go("pd-vaccine")}
+                className={`inline-flex min-h-11 items-center rounded-[6px] border px-4 text-[16px] font-semibold ${focusRing}`}
+                style={{ borderColor: C.green, color: C.green, background: "#fff", outlineColor: C.green }}
+              >
+                접종, 검진 예약
+              </button>
+            </div>
+          </div>
         </div>
 
-        <div className={`mt-auto pb-[10svh] ${reduce ? "" : "pd-rise"}`}>
-          <h1 id="pd-poster-title" className="text-[36px] font-bold md:text-[clamp(40px,5vw,72px)]" style={{ color: "#ffffff", letterSpacing: "-0.03em", lineHeight: 1.2, wordBreak: "keep-all" }}>
-            지금 대기
-            <br />
-            <span className="tabular-nums">{wait}</span>명
-          </h1>
-          <p className="mt-4 text-[15px] md:text-[17px]" style={{ color: "rgba(255,255,255,0.86)", lineHeight: 1.5 }}>
-            {lastCall !== null ? `오늘 접수 마감 ${hm(lastCall)}` : "일요일, 공휴일 휴진"}
-          </p>
+        {/* 세로 사진 한 장, 막 없이 액자처럼 */}
+        <div className="relative order-1 h-[120px] overflow-hidden rounded-[6px] md:order-2 md:h-auto md:min-h-[420px]">
+          <motion.div className="absolute inset-0" initial={reduce ? false : { scale: 1.06 }} animate={{ scale: 1 }} transition={{ duration: reduce ? 0 : HERO_MS / 1000, ease: EASE }}>
+            {/* eslint-disable-next-line @next/next/no-img-element -- 정적 export 라 next/image 최적화를 쓰지 않는다 */}
+            <img
+              src={`${IMG}/hero.jpg`}
+              srcSet={`${IMG}/hero-sm.jpg 960w, ${IMG}/hero.jpg 1920w`}
+              sizes="(min-width: 768px) 34vw, 100vw"
+              alt="의사가 청진기로 아이의 가슴 소리를 듣는 모습"
+              fetchPriority="high"
+              className="absolute inset-0 h-full w-full object-cover"
+              style={{ objectPosition: "40% 45%" }}
+            />
+          </motion.div>
         </div>
       </div>
     </section>
