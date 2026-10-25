@@ -1,8 +1,8 @@
 "use client";
 
-import { useEffect, useMemo, useRef, useState } from "react";
-import { AnimatePresence, motion, useScroll, useTransform } from "framer-motion";
-import { AlertCircle, CalendarCheck, Car, Check, Clock, MapPin, MessageCircle, Phone, RotateCcw } from "lucide-react";
+import { useEffect, useMemo, useState } from "react";
+import { AnimatePresence, motion } from "framer-motion";
+import { AlertCircle, CalendarCheck, Car, Check, Clock, MapPin, MessageCircle, RotateCcw } from "lucide-react";
 import { useReducedMotionSafe } from "@/hooks/useReducedMotionSafe";
 import { daysAgo, fmtKo, useDemoToday } from "@/hooks/useDemoToday";
 import { maskName, maskPhone } from "@/components/demos/LeadReceivedPanel";
@@ -18,9 +18,11 @@ import { DemoMakerInfo } from "@/components/demos/DemoMakerInfo";
 
    사진 출처: Pexels 사진 5752267, 직원 사진은 AI 생성(Z-Image-Turbo)
 
-   첫 화면(ec-poster): 시험테 사진 한 장이 한 화면을 채우고 아래 왼쪽에 문장 "시력교정과 백내장, 대표원장 직접 수술".
-   들어오면 사진이 1.6초 동안 천천히 다가오고(1.06배에서 1배), 문장은 0.3초 늦게 아래에서 올라온다(CSS keyframes, JS 없이도 보인다).
-   스크롤하면 사진만 조금 느리게 움직인다. 동작 줄이기면 전부 멈춘다.
+   첫 화면(ec-poster): 위에 메뉴(시력교정, 정밀검사, 백내장, 비급여 진료비, 진료안내, 상담예약, 휴대폰은 메뉴 버튼으로 펼침).
+   제목 아래 수술 탭 4개(라식, 라섹, 스마일라식, 백내장). 탭 판은 왼쪽 글(수술 이름, 설명, 숫자 3칸), 오른쪽 사진(시력교정은 시험테,
+   백내장은 대표원장). 판 아래 붙은 빠른 상담 줄(이름, 연락처, 상담 분야)은 탭에 맞춰 분야가 미리 채워지고, 신청하면 아래 상담 예약에
+   같은 값이 들어간 채로 내려간다. 비교표 링크는 그 수술이 골라진 비교 구간으로 내려간다.
+   탭을 바꾸면 글과 사진만 짧게 교차한다. 사진은 들어올 때 천천히 다가온다. 동작 줄이기면 즉시 바뀐다.
 
    본문 핵심 모션: 수술을 고르면 각막 단면 그림에서 라식은 절편이 열리고, 라섹은 상피가 벗겨지고, 스마일은 작은 절개로 조직이 빠진다.
    정밀검사 단계를 고르면 눈 그림 둘레에 누적 시간이 차고, 산동 검사에서 동공이 커진다.
@@ -32,7 +34,6 @@ import { DemoMakerInfo } from "@/components/demos/DemoMakerInfo";
    4. 상담 예약: 진료 분야, 날짜, 시간, 이름, 휴대폰. 완료하면 예약번호, 담당 창구, 회신 예정일을 보여 준다. */
 
 const IMG = "/images/demo-eye-clinic";
-const BRAND = "곰파트너";
 const TEL = "02-000-0000";
 const ADDRESS = "서울 ㅇㅇ구 ㅇㅇ로 00, 5층";
 const KAKAO = "카카오톡 채널 곰파트너";
@@ -236,52 +237,30 @@ export function EyeClinicDemo() {
   }, []);
 
   const go = (id: string) => document.getElementById(id)?.scrollIntoView({ behavior: reduce ? "auto" : "smooth", block: "start" });
-  const todayHours = HOURS.find((h) => h.dow === today.getDay()) ?? HOURS[0];
-  const navBtn = `rounded-[4px] px-2.5 py-1.5 text-[15px] underline-offset-4 hover:underline ${focusRing}`;
+  const [pick, setPick] = useState<Surgery>("lasik");
+  const [prefill, setPrefill] = useState<Prefill | null>(null);
+  const [prefillKey, setPrefillKey] = useState(0);
 
   return (
     <div className="min-h-screen overflow-x-clip" style={{ background: C.card, color: C.text }}>
-      <Poster reduce={reduce} onCta={() => go("ec-book")} />
-
-      {/* 동공 안으로 들어온 뒤 이어지는 어두운 머리글 */}
-      <header className="border-b" style={{ background: C.card, color: C.text, borderColor: C.line }}>
-        <div className="mx-auto flex max-w-[1200px] flex-wrap items-center justify-between gap-x-4 gap-y-2 px-4 pb-3 pt-6 md:px-6">
-          <h2 className="leading-none">
-            <SampleLogo />
-          </h2>
-          <nav aria-label="주요 메뉴" className="-mx-2 flex flex-wrap items-center">
-            {[
-              ["ec-compare", "시력교정"],
-              ["ec-exam", "정밀검사"],
-              ["ec-cataract", "백내장"],
-              ["ec-fees", "비급여 진료비"],
-              ["ec-hours", "진료안내"],
-              ["ec-book", "상담예약"],
-            ].map(([id, label]) => (
-              <button key={id} type="button" onClick={() => go(id)} className={navBtn} style={{ outlineColor: C.teal }}>
-                {label}
-              </button>
-            ))}
-          </nav>
-        </div>
-        <div className="border-t" style={{ borderColor: C.line }}>
-          <div className="mx-auto flex max-w-[1200px] flex-wrap items-center gap-x-6 gap-y-2 px-4 py-3 text-[15px] md:px-6" style={{ color: C.body }}>
-            <span className="inline-flex items-center gap-1.5">
-              <Clock size={16} aria-hidden style={{ color: C.teal }} />
-              오늘 진료 <b style={{ color: C.text }}>{todayHours.open}</b>
-            </span>
-            <span>점심시간 13:00 ~ 14:00</span>
-            <a href={`tel:${TEL.replace(/-/g, "")}`} data-gtm-cta="eye-clinic_tel" className={`inline-flex items-center gap-1.5 rounded-[4px] ${focusRing}`} style={{ outlineColor: C.teal }}>
-              <Phone size={16} aria-hidden style={{ color: C.teal }} />
-              <span className="tabular-nums" style={{ color: C.text }}>{TEL}</span>
-            </a>
-          </div>
-        </div>
-      </header>
+      <Poster
+        reduce={reduce}
+        today={today}
+        go={go}
+        onCompare={(s) => {
+          setPick(s);
+          go("ec-compare");
+        }}
+        onConsult={(p) => {
+          setPrefill(p);
+          setPrefillKey((k) => k + 1);
+          go("ec-book");
+        }}
+      />
 
       <section id="ec-compare" aria-labelledby="ec-compare-title" className="mx-auto mt-14 max-w-[1200px] scroll-mt-4 px-4 md:mt-20 md:px-6">
         <SectionTitle id="ec-compare-title" title="시력교정 수술 비교" />
-        <Compare reduce={reduce} />
+        <Compare reduce={reduce} pick={pick} setPick={setPick} />
       </section>
 
       <section id="ec-exam" aria-labelledby="ec-exam-title" className="mx-auto mt-16 max-w-[1200px] scroll-mt-4 px-4 md:mt-24 md:px-6">
@@ -306,7 +285,7 @@ export function EyeClinicDemo() {
 
       <section id="ec-book" aria-labelledby="ec-book-title" className="mx-auto mt-16 max-w-[1200px] scroll-mt-4 px-4 md:mt-24 md:px-6">
         <SectionTitle id="ec-book-title" title="상담 예약" />
-        <Booking today={today} reduce={reduce} />
+        <Booking key={prefillKey} today={today} reduce={reduce} init={prefill} />
       </section>
 
       <footer className="mt-20 border-t md:mt-28" style={{ background: C.card, color: C.muted, borderColor: C.line }}>
@@ -334,61 +313,255 @@ function SectionTitle({ id, title }: { id: string; title: string }) {
 
 /* ---------- 포스터 ---------- */
 
-function Poster({ reduce, onCta }: { reduce: boolean; onCta: () => void }) {
-  const ref = useRef<HTMLElement>(null);
-  const { scrollYProgress } = useScroll({ target: ref, offset: ["start start", "end start"] });
-  // 스크롤하면 사진만 조금 느리게 내려간다
-  const photoY = useTransform(scrollYProgress, (v) => (reduce ? "0%" : `${v * 8}%`));
+const NAV: [string, string][] = [
+  ["ec-compare", "시력교정"],
+  ["ec-exam", "정밀검사"],
+  ["ec-cataract", "백내장"],
+  ["ec-fees", "비급여 진료비"],
+  ["ec-hours", "진료안내"],
+  ["ec-book", "상담예약"],
+];
+
+type Tab = Surgery | "cataract";
+const rowOf = (label: string, s: Surgery) => COMPARE_ROWS.find((r) => r.label === label)?.v[SURGERIES.findIndex((x) => x.id === s)] ?? "";
+const TABS: { id: Tab; name: string; desc: string; nums: [string, string][]; field: Field }[] = [
+  ...SURGERIES.map((s) => ({
+    id: s.id as Tab,
+    name: s.name,
+    desc: s.how,
+    nums: [
+      ["일상생활", rowOf("일상생활", s.id)],
+      ["시력 안정", rowOf("시력 안정", s.id)],
+      ["정밀검사", `약 ${hm(EXAM_TOTAL)}`],
+    ] as [string, string][],
+    field: "시력교정 정밀검사" as Field,
+  })),
+  {
+    id: "cataract",
+    name: "백내장",
+    desc: "뿌옇게 흐려진 수정체를 빼고 인공수정체를 넣어요. 렌즈 종류에 따라 보이는 거리가 달라요.",
+    nums: [
+      ["단초점 렌즈", "건강보험"],
+      ["다초점 렌즈", "비급여"],
+      ["수술", "대표원장"],
+    ],
+    field: "백내장 상담",
+  },
+];
+
+interface Prefill {
+  name: string;
+  phone: string;
+  field: Field;
+}
+
+function Poster({
+  reduce,
+  today,
+  go,
+  onCompare,
+  onConsult,
+}: {
+  reduce: boolean;
+  today: Date;
+  go: (id: string) => void;
+  onCompare: (s: Surgery) => void;
+  onConsult: (p: Prefill) => void;
+}) {
+  const [tab, setTab] = useState<Tab>("smile");
+  const [menu, setMenu] = useState(false);
+  const [name, setName] = useState("");
+  const [phone, setPhone] = useState("");
+  const [field, setField] = useState<Field>("시력교정 정밀검사");
+  const cur = TABS.find((x) => x.id === tab) ?? TABS[0];
+  const todayHours = HOURS.find((h) => h.dow === today.getDay()) ?? HOURS[0];
+  const pickTab = (id: Tab) => {
+    setTab(id);
+    setField(TABS.find((x) => x.id === id)?.field ?? "시력교정 정밀검사");
+  };
+  const move = (id: string) => {
+    setMenu(false);
+    go(id);
+  };
+  const t = { duration: reduce ? 0 : DUR_FAST, ease: EASE };
+  const field_ = `min-h-12 w-full rounded-[6px] border px-3 text-[16px] ${focusRing}`;
 
   return (
-    <section id="ec-poster" ref={ref} aria-labelledby="ec-poster-title" className="relative flex min-h-[100svh] flex-col overflow-hidden" style={{ background: "#141414", color: "#ffffff" }}>
-      <style>{`@keyframes ec-rise{from{opacity:0;transform:translateY(12px)}to{opacity:1;transform:none}}.ec-rise{animation:ec-rise 0.7s cubic-bezier(0.22,1,0.36,1) 0.3s both}@media (prefers-reduced-motion: reduce){.ec-rise{animation:none}}`}</style>
-      <motion.div className="absolute inset-x-0 top-[-10%] h-[110%]" style={{ y: photoY }}>
-        <motion.div className="h-full w-full" initial={reduce ? false : { scale: 1.06 }} animate={{ scale: 1 }} transition={{ duration: reduce ? 0 : PHOTO_IN, ease: EASE }}>
-          {/* eslint-disable-next-line @next/next/no-img-element -- 정적 export 라 next/image 최적화를 쓰지 않는다 */}
-          <img
-            src={`${IMG}/hero.jpg`}
-            srcSet={`${IMG}/hero-sm.jpg 960w, ${IMG}/hero.jpg 1920w`}
-            sizes="100vw"
-            alt="검안 상자 위에 놓인 시력 검사용 시험테와 렌즈"
-            fetchPriority="high"
-            className="absolute inset-0 h-full w-full object-cover"
-            style={{ objectPosition: "40% 50%" }}
-          />
-        </motion.div>
-      </motion.div>
-      {/* 글자 대비를 위한 막. 위는 상호, 아래는 문장 */}
-      <div aria-hidden className="pointer-events-none absolute inset-0" style={{ background: "linear-gradient(to top, rgba(0,0,0,0.78), rgba(0,0,0,0.42) 50%, rgba(0,0,0,0.3) 80%, rgba(0,0,0,0.5))" }} />
+    <section id="ec-poster" aria-labelledby="ec-poster-title" style={{ background: C.paper, color: C.text }}>
+      <header className="relative z-[2] border-b" style={{ background: C.card, borderColor: C.line }}>
+        <div className="mx-auto flex max-w-[1200px] items-center justify-between gap-3 px-4 py-2.5 md:px-6">
+          <p className="leading-none">
+            <SampleLogo small />
+          </p>
+          <nav aria-label="주요 메뉴" className="hidden items-center lg:flex">
+            {NAV.map(([id, label]) => (
+              <button key={id} type="button" onClick={() => move(id)} className={`min-h-11 rounded-[4px] px-3 text-[16px] font-semibold underline-offset-4 hover:underline ${focusRing}`} style={{ outlineColor: C.teal }}>
+                {label}
+              </button>
+            ))}
+          </nav>
+          <div className="flex items-center gap-2">
+            <span className="hidden text-[15px] md:inline" style={{ color: C.body }}>
+              오늘 <b style={{ color: C.text }}>{todayHours.open}</b>
+            </span>
+            <button
+              type="button"
+              onClick={() => setMenu((v) => !v)}
+              aria-expanded={menu}
+              aria-controls="ec-menu"
+              className={`min-h-11 rounded-[6px] border px-4 text-[15px] font-semibold lg:hidden ${focusRing}`}
+              style={{ borderColor: C.line, outlineColor: C.teal }}
+            >
+              {menu ? "닫기" : "메뉴"}
+            </button>
+          </div>
+        </div>
+        {menu && (
+          <nav id="ec-menu" aria-label="주요 메뉴" className="absolute inset-x-0 top-full border-b lg:hidden" style={{ background: C.card, borderColor: C.line }}>
+            <ul className="mx-auto grid max-w-[1200px] grid-cols-2 gap-2 px-4 py-3 md:grid-cols-3 md:px-6">
+              {NAV.map(([id, label]) => (
+                <li key={id}>
+                  <button type="button" onClick={() => move(id)} className={`min-h-12 w-full rounded-[6px] border px-3 text-left text-[16px] font-semibold ${focusRing}`} style={{ borderColor: C.line, outlineColor: C.teal }}>
+                    {label}
+                  </button>
+                </li>
+              ))}
+            </ul>
+          </nav>
+        )}
+      </header>
 
-      <div className="relative z-[1] flex items-center justify-between gap-3 px-4 pt-4 md:px-12 md:pt-7">
-        <p className="leading-none">
-          <SampleLogo light small />
-        </p>
-        <button
-          type="button"
-          onClick={onCta}
-          data-gtm-cta="eye-clinic_poster_cta"
-          className={`inline-flex min-h-11 items-center gap-1.5 rounded-[6px] px-4 text-[15px] font-semibold ${focusRing}`}
-          style={{ background: C.teal, color: "#ffffff", outlineColor: "#ffffff" }}
-        >
-          <CalendarCheck size={17} aria-hidden />
-          상담 예약
-        </button>
-      </div>
-
-      <div className={`relative z-[1] mt-auto px-4 pb-14 md:px-12 md:pb-20 ${reduce ? "" : "ec-rise"}`}>
-        <h1
-          id="ec-poster-title"
-          className="max-w-[12em] text-[36px] font-bold md:text-[clamp(40px,5vw,72px)]"
-          style={{ letterSpacing: "-0.03em", lineHeight: 1.2, wordBreak: "keep-all" }}
-        >
+      <div className="mx-auto max-w-[1200px] px-4 pb-10 pt-6 md:px-6 md:pt-8">
+        <h1 id="ec-poster-title" className="text-[28px] font-bold md:text-[clamp(30px,3vw,42px)]" style={{ letterSpacing: "-0.03em", lineHeight: 1.22, wordBreak: "keep-all" }}>
           시력교정과 백내장,
-          <br />
-          대표원장 직접 수술
+          <br className="md:hidden" /> 대표원장 직접 수술
         </h1>
-        <p className="mt-4 text-[16px] md:mt-6 md:text-[18px]" style={{ color: "rgba(255,255,255,0.86)" }}>
-          {BRAND}, 정밀검사 약 {hm(EXAM_TOTAL)}
-        </p>
+
+        {/* 수술 탭 */}
+        <div role="tablist" aria-label="수술" className="-mx-4 mt-5 flex overflow-x-auto border-b px-4 md:mx-0 md:px-0" style={{ borderColor: C.line, scrollbarWidth: "none" }}>
+          {TABS.map((x) => {
+            const on = x.id === tab;
+            return (
+              <button
+                key={x.id}
+                type="button"
+                role="tab"
+                id={`ec-tab-${x.id}`}
+                aria-selected={on}
+                aria-controls="ec-tab-panel"
+                onClick={() => pickTab(x.id)}
+                className={`relative min-h-12 shrink-0 whitespace-nowrap px-4 text-[17px] md:px-6 md:text-[18px] ${focusRing}`}
+                style={{ color: on ? C.teal : C.body, fontWeight: on ? 700 : 500, outlineColor: C.teal, outlineOffset: -3 }}
+              >
+                {x.name}
+                <span aria-hidden className="absolute inset-x-2 bottom-[-1px] h-[3px] rounded-[2px]" style={{ background: on ? C.teal : "transparent" }} />
+              </button>
+            );
+          })}
+        </div>
+
+        {/* 탭 판: 왼쪽 글, 오른쪽 사진 */}
+        <div id="ec-tab-panel" role="tabpanel" aria-labelledby={`ec-tab-${tab}`} className="grid overflow-hidden rounded-b-[8px] border border-t-0 md:grid-cols-[minmax(0,1fr)_minmax(0,1fr)]" style={{ background: C.card, borderColor: C.line }}>
+          <div className="order-2 flex flex-col p-5 md:order-1 md:p-8">
+            <AnimatePresence mode="wait" initial={false}>
+              <motion.div key={tab} initial={reduce ? false : { opacity: 0 }} animate={{ opacity: 1 }} exit={reduce ? undefined : { opacity: 0 }} transition={t}>
+                <p className="text-[26px] font-bold tracking-[-0.02em] md:text-[32px]">{cur.name}</p>
+                <p className="mt-2 text-[16px] leading-[1.6]" style={{ color: C.body, wordBreak: "keep-all" }}>
+                  {cur.desc}
+                </p>
+                <dl className="mt-5 grid grid-cols-3 gap-2">
+                  {cur.nums.map(([k, v]) => (
+                    <div key={k} className="min-w-0 rounded-[6px] px-3 py-3" style={{ background: C.tealSoft }}>
+                      <dt className="text-[13px] md:text-[14px]" style={{ color: C.body }}>
+                        {k}
+                      </dt>
+                      <dd className="mt-1 text-[16px] font-bold md:text-[18px]" style={{ wordBreak: "keep-all" }}>
+                        {v}
+                      </dd>
+                    </div>
+                  ))}
+                </dl>
+              </motion.div>
+            </AnimatePresence>
+            <div className="mt-5 flex flex-wrap gap-x-5 gap-y-1">
+              {tab === "cataract" ? (
+                <button type="button" onClick={() => go("ec-cataract")} className={`min-h-11 text-[16px] font-semibold underline underline-offset-4 ${focusRing}`} style={{ color: C.teal, outlineColor: C.teal }}>
+                  렌즈별로 보이는 모습
+                </button>
+              ) : (
+                <button type="button" onClick={() => onCompare(tab)} className={`min-h-11 text-[16px] font-semibold underline underline-offset-4 ${focusRing}`} style={{ color: C.teal, outlineColor: C.teal }}>
+                  라식, 라섹, 스마일라식 비교표
+                </button>
+              )}
+              <button type="button" onClick={() => go("ec-exam")} className={`min-h-11 text-[16px] font-semibold underline underline-offset-4 ${focusRing}`} style={{ color: C.teal, outlineColor: C.teal }}>
+                검사 전 렌즈 빼는 기간
+              </button>
+            </div>
+          </div>
+
+          <div className="relative order-1 aspect-[16/10] overflow-hidden md:order-2 md:aspect-auto md:min-h-[340px]" style={{ background: "#2a2a2a" }}>
+            <AnimatePresence initial={false}>
+              <motion.div
+                key={tab === "cataract" ? "doc" : "frame"}
+                className="absolute inset-0"
+                initial={reduce ? false : { opacity: 0 }}
+                animate={{ opacity: 1 }}
+                exit={reduce ? undefined : { opacity: 0 }}
+                transition={t}
+              >
+                <motion.div className="h-full w-full" initial={reduce ? false : { scale: 1.06 }} animate={{ scale: 1 }} transition={{ duration: reduce ? 0 : PHOTO_IN, ease: EASE }}>
+                  {/* eslint-disable-next-line @next/next/no-img-element -- 정적 export 라 next/image 최적화를 쓰지 않는다 */}
+                  <img
+                    src={tab === "cataract" ? DOCTORS[0].photo : `${IMG}/hero.jpg`}
+                    srcSet={tab === "cataract" ? undefined : `${IMG}/hero-sm.jpg 960w, ${IMG}/hero.jpg 1920w`}
+                    sizes="(min-width: 768px) 50vw, 100vw"
+                    alt={tab === "cataract" ? `${DOCTORS[0].role} ${DOCTORS[0].name}` : "검안 상자 위에 놓인 시력 검사용 시험테와 렌즈"}
+                    fetchPriority="high"
+                    className="absolute inset-0 h-full w-full object-cover"
+                    style={{ objectPosition: tab === "cataract" ? "50% 22%" : "40% 50%" }}
+                  />
+                </motion.div>
+              </motion.div>
+            </AnimatePresence>
+            {tab === "cataract" && (
+              <p className="absolute bottom-3 left-3 rounded-[4px] px-2.5 py-1 text-[14px] font-semibold" style={{ background: C.card, color: C.text }}>
+                {DOCTORS[0].role} {DOCTORS[0].name}, {DOCTORS[0].field}
+              </p>
+            )}
+          </div>
+        </div>
+
+        {/* 판 아래 붙은 상담 줄. 수술 값은 지금 탭으로 미리 채운다 */}
+        <form
+          className="mt-3 grid gap-2 rounded-[8px] p-3 md:grid-cols-[auto_minmax(0,1fr)_minmax(0,1fr)_minmax(0,1.2fr)_auto] md:items-center md:gap-3 md:px-5"
+          style={{ background: C.teal, color: "#ffffff" }}
+          onSubmit={(e) => {
+            e.preventDefault();
+            onConsult({ name, phone, field });
+          }}
+        >
+          <p className="text-[16px] font-bold">빠른 상담</p>
+          <label className="sr-only" htmlFor="ec-q-name">
+            이름
+          </label>
+          <input id="ec-q-name" value={name} onChange={(e) => setName(e.target.value)} placeholder="이름" autoComplete="name" className={field_} style={{ borderColor: "transparent", background: "#fff", color: C.text, outlineColor: "#ffffff" }} />
+          <label className="sr-only" htmlFor="ec-q-phone">
+            연락처
+          </label>
+          <input id="ec-q-phone" value={phone} onChange={(e) => setPhone(e.target.value)} placeholder="연락처" inputMode="tel" autoComplete="tel" className={field_} style={{ borderColor: "transparent", background: "#fff", color: C.text, outlineColor: "#ffffff" }} />
+          <label className="sr-only" htmlFor="ec-q-field">
+            상담 분야
+          </label>
+          <select id="ec-q-field" value={field} onChange={(e) => setField(e.target.value as Field)} className={field_} style={{ borderColor: "transparent", background: "#fff", color: C.text, outlineColor: "#ffffff" }}>
+            {FIELDS.map((f) => (
+              <option key={f}>{f}</option>
+            ))}
+          </select>
+          <button type="submit" data-gtm-cta="eye-clinic_poster_cta" className={`inline-flex min-h-12 items-center justify-center gap-1.5 rounded-[6px] px-5 text-[16px] font-bold ${focusRing}`} style={{ background: "#ffffff", color: C.teal, outlineColor: "#ffffff" }}>
+            <CalendarCheck size={18} aria-hidden />
+            상담 신청
+          </button>
+        </form>
       </div>
     </section>
   );
@@ -396,8 +569,7 @@ function Poster({ reduce, onCta }: { reduce: boolean; onCta: () => void }) {
 
 /* ---------- 1. 시력교정 수술 비교 ---------- */
 
-function Compare({ reduce }: { reduce: boolean }) {
-  const [pick, setPick] = useState<Surgery>("lasik");
+function Compare({ reduce, pick, setPick }: { reduce: boolean; pick: Surgery; setPick: (s: Surgery) => void }) {
   const idx = SURGERIES.findIndex((s) => s.id === pick);
   const s = SURGERIES[idx];
   const rec = RECOVERY[pick];
@@ -1000,7 +1172,7 @@ function HoursAndMap({ today }: { today: Date }) {
 
 type Done = { no: string; name: string; phone: string; field: Field; date: Date; time: string };
 
-function Booking({ today, reduce }: { today: Date; reduce: boolean }) {
+function Booking({ today, reduce, init }: { today: Date; reduce: boolean; init: Prefill | null }) {
   const days = useMemo(() => {
     const out: Date[] = [];
     for (let k = 1; out.length < 12; k++) {
@@ -1010,11 +1182,11 @@ function Booking({ today, reduce }: { today: Date; reduce: boolean }) {
     return out;
   }, [today]);
 
-  const [field, setField] = useState<Field>("시력교정 정밀검사");
+  const [field, setField] = useState<Field>(init?.field ?? "시력교정 정밀검사");
   const [dayIdx, setDayIdx] = useState(0);
   const [time, setTime] = useState<string | null>(null);
-  const [name, setName] = useState("");
-  const [phone, setPhone] = useState("");
+  const [name, setName] = useState(init?.name ?? "");
+  const [phone, setPhone] = useState(init?.phone ?? "");
   const [agree, setAgree] = useState(false);
   const [tried, setTried] = useState(false);
   const [done, setDone] = useState<Done | null>(null);

@@ -1,7 +1,7 @@
 "use client";
 
-import { useEffect, useRef, useState, type Dispatch, type FormEvent, type ReactNode, type SetStateAction } from "react";
-import { AnimatePresence, motion, useScroll, useTransform } from "framer-motion";
+import { useEffect, useState, type Dispatch, type FormEvent, type ReactNode, type SetStateAction } from "react";
+import { AnimatePresence, motion } from "framer-motion";
 import {
   BedDouble,
   Bus,
@@ -49,9 +49,11 @@ import { DemoMakerInfo } from "@/components/demos/DemoMakerInfo";
 
    사진 출처: AI 생성(Z-Image-Turbo, Apache 2.0)
 
-   첫 화면(ah-poster): 수의사가 개를 살피는 사진 한 장이 한 화면을 채우고 아래 왼쪽에 문장 "365일 24시간 진료".
-   들어오면 사진이 1.6초 동안 천천히 다가오고(1.06배에서 1배), 문장은 0.3초 늦게 아래에서 올라온다(CSS keyframes, JS 없이도 보인다).
-   스크롤하면 사진만 조금 느리게 움직인다. 동작 줄이기면 전부 멈춘다. */
+   첫 화면(ah-poster): 위에 메뉴(응급 진료, 진료과목, 건강검진, 입원 면회, 예약하기, 오시는 길, 휴대폰은 가로로 미는 메뉴).
+   위 칸은 지금 시간대 띠. 밤(21~09시)에는 진한 남색 판에 야간 응급 시간과 응급 증상 버튼, 낮에는 옅은 청록 판에 예약 버튼.
+   오른쪽은 "오기 전에 전화로 알려 주세요" 문장형 선택(동물, 증상, 도착 예정)과 전화 버튼. 아래 칸은 사진 3장(진료실, 수의사 둘),
+   글씨는 사진 밖 캡션. 휴대폰은 지금 시간대 줄과 전화 버튼이 화면 맨 위에 계속 남고, 사진은 가로로 민다.
+   사진이 천천히 다가오는 것 말고는 움직임이 없다. 동작 줄이기면 멈춘다. */
 
 const IMG = "/images/demo-animal-hospital";
 const TEL = "02-000-0000";
@@ -263,37 +265,17 @@ export function AnimalHospitalDemo() {
 
   const go = (id: string) => document.getElementById(id)?.scrollIntoView({ behavior: reduce ? "auto" : "smooth", block: "start" });
 
-  const navBtn = `rounded-[4px] px-2.5 py-1.5 text-[15px] font-semibold underline-offset-4 hover:underline ${focusRing}`;
 
   return (
     <div className="min-h-screen overflow-x-clip pb-24" style={{ background: C.paper, color: C.ink }}>
-      <Poster reduce={reduce} onCta={() => go("ah-reserve")} />
+      <NowBar now={now} />
+      <Poster reduce={reduce} now={now} go={go} />
 
-      <header className="mx-auto flex max-w-[1200px] flex-wrap items-center justify-between gap-x-4 gap-y-2 px-4 py-4 md:px-6">
-        <p className="leading-none">
-          <SampleLogo />
-        </p>
-        <nav aria-label="주요 메뉴" className="-mx-2 flex flex-wrap items-center" style={{ outlineColor: C.teal }}>
-          {[
-            ["ah-er", "응급 진료"],
-            ["ah-dept", "진료과목"],
-            ["ah-checkup", "건강검진"],
-            ["ah-visit", "입원 면회"],
-            ["ah-reserve", "예약하기"],
-            ["ah-map", "오시는 길"],
-          ].map(([id, label]) => (
-            <button key={id} type="button" onClick={() => go(id)} className={navBtn} style={{ outlineColor: C.teal }}>
-              {label}
-            </button>
-          ))}
-        </nav>
-      </header>
-
-      <section id="ah-er" aria-labelledby="ah-er-title" className="mx-auto max-w-[1200px] scroll-mt-4 px-4 md:px-6">
+      <section id="ah-er" aria-labelledby="ah-er-title" className="mx-auto mt-6 max-w-[1200px] scroll-mt-[72px] md:scroll-mt-4 px-4 md:px-6">
         <ErBoard now={now} />
       </section>
 
-      <section id="ah-dept" aria-labelledby="ah-dept-title" className="mx-auto mt-16 max-w-[1200px] scroll-mt-4 px-4 md:mt-24 md:px-6">
+      <section id="ah-dept" aria-labelledby="ah-dept-title" className="mx-auto mt-16 max-w-[1200px] scroll-mt-[72px] md:scroll-mt-4 px-4 md:mt-24 md:px-6">
         <SectionTitle id="ah-dept-title" icon={<Stethoscope size={22} aria-hidden />} title="진료과목" />
         <DeptPicker reduce={reduce} dept={dept} setDept={setDept} />
       </section>
@@ -303,7 +285,7 @@ export function AnimalHospitalDemo() {
         <FeeTable />
       </section>
 
-      <section id="ah-checkup" aria-labelledby="ah-checkup-title" className="mx-auto mt-16 max-w-[1200px] scroll-mt-4 px-4 md:mt-24 md:px-6">
+      <section id="ah-checkup" aria-labelledby="ah-checkup-title" className="mx-auto mt-16 max-w-[1200px] scroll-mt-[72px] md:scroll-mt-4 px-4 md:mt-24 md:px-6">
         <SectionTitle id="ah-checkup-title" icon={<HeartPulse size={22} aria-hidden />} title="건강검진 패키지" />
         <Checkup
           reduce={reduce}
@@ -316,17 +298,17 @@ export function AnimalHospitalDemo() {
         />
       </section>
 
-      <section id="ah-visit" aria-labelledby="ah-visit-title" className="mx-auto mt-16 max-w-[1200px] scroll-mt-4 px-4 md:mt-24 md:px-6">
+      <section id="ah-visit" aria-labelledby="ah-visit-title" className="mx-auto mt-16 max-w-[1200px] scroll-mt-[72px] md:scroll-mt-4 px-4 md:mt-24 md:px-6">
         <SectionTitle id="ah-visit-title" icon={<BedDouble size={22} aria-hidden />} title="입원 면회 시간" />
         <VisitHours now={now} />
       </section>
 
-      <section id="ah-reserve" aria-labelledby="ah-reserve-title" className="mx-auto mt-16 max-w-[1200px] scroll-mt-4 px-4 md:mt-24 md:px-6">
+      <section id="ah-reserve" aria-labelledby="ah-reserve-title" className="mx-auto mt-16 max-w-[1200px] scroll-mt-[72px] md:scroll-mt-4 px-4 md:mt-24 md:px-6">
         <SectionTitle id="ah-reserve-title" icon={<CalendarCheck size={22} aria-hidden />} title="진료 예약" />
         <Reserve reduce={reduce} today={today} now={now} form={form} setForm={setForm} />
       </section>
 
-      <section id="ah-map" aria-labelledby="ah-map-title" className="mx-auto mt-16 max-w-[1200px] scroll-mt-4 px-4 md:mt-24 md:px-6">
+      <section id="ah-map" aria-labelledby="ah-map-title" className="mx-auto mt-16 max-w-[1200px] scroll-mt-[72px] md:scroll-mt-4 px-4 md:mt-24 md:px-6">
         <SectionTitle id="ah-map-title" icon={<MapPin size={22} aria-hidden />} title="오시는 길" />
         <MapBlock />
       </section>
@@ -357,61 +339,193 @@ function SectionTitle({ id, icon, title }: { id: string; icon: ReactNode; title:
 
 /* ---------- 첫 화면 ---------- */
 
-function Poster({ reduce, onCta }: { reduce: boolean; onCta: () => void }) {
-  const ref = useRef<HTMLElement>(null);
-  const { scrollYProgress } = useScroll({ target: ref, offset: ["start start", "end start"] });
-  // 스크롤하면 사진만 조금 느리게 내려간다
-  const photoY = useTransform(scrollYProgress, (v) => (reduce ? "0%" : `${v * 8}%`));
+const NAV: [string, string][] = [
+  ["ah-er", "응급 진료"],
+  ["ah-dept", "진료과목"],
+  ["ah-checkup", "건강검진"],
+  ["ah-visit", "입원 면회"],
+  ["ah-reserve", "예약하기"],
+  ["ah-map", "오시는 길"],
+];
+
+/** 오기 전에 알려 줄 세 가지. 고르면 그대로 통화할 문장이 된다 */
+const PETS = ["소형견", "중형견", "대형견", "고양이", "그 밖의 동물"] as const;
+const SIGNS = ["구토", "경련", "호흡 곤란", "이물 삼킴", "다침", "배뇨 곤란"] as const;
+const ARRIVE = ["10분 안", "30분 안", "1시간 안"] as const;
+
+const PHOTOS = [
+  { src: "hero.jpg", alt: "수의사가 진료대 위 큰 개를 살펴보는 진료실", cap: "진료실" },
+  { src: "vet-1.jpg", alt: "청록 진료복을 입은 수의사가 흰 강아지를 안은 모습", cap: "내과 김ㅎ늘 수의사" },
+  { src: "vet-3.jpg", alt: "회색 진료복을 입은 수의사가 고양이를 안은 모습", cap: "영상의학과, 안과 이ㅅ아 수의사" },
+] as const;
+
+/** 휴대폰에서만 맨 위에 남는 지금 시간대 줄과 전화 */
+function NowBar({ now }: { now: Date | null }) {
+  const night = now ? isNight(now) : false;
+  const bg = night ? "#1f2a33" : C.tealSoft;
+  const fg = night ? "#ffffff" : C.ink;
+  return (
+  <div className="sticky top-0 z-20 md:hidden" style={{ background: bg, color: fg }}>
+    <div className="flex items-center justify-between gap-2 px-4 py-2">
+      <p className="min-w-0 text-[15px] font-bold" aria-live="polite">
+        {night ? "야간 응급 진료 중" : "주간 진료 중"}
+      </p>
+      <a
+        href={`tel:${TEL.replace(/-/g, "")}`}
+        className={`inline-flex min-h-11 shrink-0 items-center gap-1.5 rounded-[6px] px-3 text-[15px] font-bold ${focusRing}`}
+        style={night ? { background: "#ffffff", color: "#1f2a33", outlineColor: "#ffffff" } : { background: C.teal, color: "#ffffff", outlineColor: C.teal }}
+      >
+        <Phone size={16} aria-hidden />
+        전화
+      </a>
+    </div>
+  </div>
+  );
+}
+
+function Poster({ reduce, now, go }: { reduce: boolean; now: Date | null; go: (id: string) => void }) {
+  const [pet, setPet] = useState<(typeof PETS)[number]>("소형견");
+  const [sign, setSign] = useState<(typeof SIGNS)[number]>("구토");
+  const [arrive, setArrive] = useState<(typeof ARRIVE)[number]>("30분 안");
+  const night = now ? isNight(now) : false;
+  const bg = night ? "#1f2a33" : C.tealSoft;
+  const fg = night ? "#ffffff" : C.ink;
+  const sub = night ? "rgba(255,255,255,0.8)" : C.body;
+  const sel = `min-h-11 max-w-full rounded-[6px] border-2 px-2 text-[17px] font-bold ${focusRing}`;
+  const selStyle = { borderColor: night ? "#ffffff" : C.teal, background: night ? "#2b3945" : "#ffffff", color: fg, outlineColor: night ? "#ffffff" : C.teal };
+
+  const call = (
+    <a
+      href={`tel:${TEL.replace(/-/g, "")}`}
+      data-gtm-cta="animal-hospital_poster_cta"
+      className={`inline-flex min-h-12 items-center justify-center gap-2 rounded-[6px] px-5 text-[18px] font-bold ${focusRing}`}
+      style={night ? { background: "#ffffff", color: "#1f2a33", outlineColor: "#ffffff" } : { background: C.teal, color: "#ffffff", outlineColor: C.teal }}
+    >
+      <Phone size={19} aria-hidden />
+      전화 {TEL}
+    </a>
+  );
 
   return (
-    <section id="ah-poster" ref={ref} aria-labelledby="ah-poster-title" className="relative flex min-h-[100svh] flex-col overflow-hidden" style={{ background: "#141414", color: "#ffffff" }}>
-      <style>{`@keyframes ah-rise{from{opacity:0;transform:translateY(12px)}to{opacity:1;transform:none}}.ah-rise{animation:ah-rise 0.7s cubic-bezier(0.22,1,0.36,1) 0.3s both}@media (prefers-reduced-motion: reduce){.ah-rise{animation:none}}`}</style>
-      <motion.div className="absolute inset-x-0 top-[-10%] h-[110%]" style={{ y: photoY }}>
-        <motion.div className="h-full w-full" initial={reduce ? false : { scale: 1.06 }} animate={{ scale: 1 }} transition={{ duration: reduce ? 0 : PHOTO_IN, ease: EASE }}>
-          {/* eslint-disable-next-line @next/next/no-img-element -- 정적 export 라 next/image 최적화를 쓰지 않는다 */}
-          <img
-            src={`${IMG}/hero.jpg`}
-            srcSet={`${IMG}/hero-sm.jpg 960w, ${IMG}/hero.jpg 1920w`}
-            sizes="100vw"
-            alt="수의사가 마스크를 쓰고 큰 개의 눈을 살펴보는 모습"
-            fetchPriority="high"
-            className="absolute inset-0 h-full w-full object-cover"
-            style={{ objectPosition: "60% 35%" }}
-          />
-        </motion.div>
-      </motion.div>
-      {/* 글자 대비를 위한 막. 휴대폰은 아래, PC는 왼쪽을 더 어둡게 */}
-      <div aria-hidden className="pointer-events-none absolute inset-0" style={{ background: "linear-gradient(to top, rgba(0,0,0,0.72), rgba(0,0,0,0.3) 55%, rgba(0,0,0,0.35))" }} />
-      <div aria-hidden className="pointer-events-none absolute inset-0 hidden md:block" style={{ background: "linear-gradient(90deg, rgba(0,0,0,0.45), rgba(0,0,0,0) 60%)" }} />
+    <section id="ah-poster" aria-labelledby="ah-poster-title" style={{ background: C.paper, color: C.ink }}>
+      <header className="border-b" style={{ borderColor: C.line }}>
+        <div className="mx-auto flex max-w-[1200px] items-center justify-between gap-3 px-4 py-2.5 md:px-6">
+          <p className="leading-none">
+            <SampleLogo small />
+          </p>
+          <nav aria-label="주요 메뉴" className="hidden items-center lg:flex">
+            {NAV.map(([id, label]) => (
+              <button key={id} type="button" onClick={() => go(id)} className={`min-h-11 rounded-[4px] px-3 text-[16px] font-semibold underline-offset-4 hover:underline ${focusRing}`} style={{ outlineColor: C.teal }}>
+                {label}
+              </button>
+            ))}
+          </nav>
+        </div>
+        <nav aria-label="주요 메뉴" className="flex overflow-x-auto border-t px-2 lg:hidden" style={{ borderColor: C.line, scrollbarWidth: "none" }}>
+          {NAV.map(([id, label]) => (
+            <button key={id} type="button" onClick={() => go(id)} className={`min-h-11 shrink-0 whitespace-nowrap px-3 text-[15px] font-semibold ${focusRing}`} style={{ outlineColor: C.teal, outlineOffset: -3 }}>
+              {label}
+            </button>
+          ))}
+        </nav>
+      </header>
 
-      <div className="relative z-[1] flex items-center justify-between gap-3 px-4 pt-4 md:px-12 md:pt-7">
-        <p className="leading-none">
-          <SampleLogo light small />
-        </p>
-        <button
-          type="button"
-          onClick={onCta}
-          data-gtm-cta="animal-hospital_poster_cta"
-          className={`inline-flex min-h-11 items-center gap-1.5 rounded-[6px] px-4 text-[15px] font-semibold ${focusRing}`}
-          style={{ background: C.teal, color: "#ffffff", outlineColor: "#ffffff" }}
-        >
-          <CalendarCheck size={17} aria-hidden />
-          예약하기
-        </button>
+      <div className="transition-colors duration-300" style={{ background: bg, color: fg }}>
+        <div className="mx-auto grid max-w-[1200px] gap-6 px-4 py-7 md:grid-cols-[minmax(0,1fr)_minmax(0,1fr)] md:gap-10 md:px-6 md:py-10">
+          <div className="min-w-0">
+            <p className="inline-flex items-center gap-1.5 rounded-[4px] px-2.5 py-1 text-[15px] font-bold" style={night ? { background: "#ffffff", color: "#1f2a33" } : { background: C.teal, color: "#ffffff" }}>
+              {night ? <Moon size={16} aria-hidden /> : <Sun size={16} aria-hidden />}
+              <span className="tabular-nums">{`${night ? "야간 응급 진료" : "주간 진료"}${now ? `, 지금 ${hhmm(now)}` : ""}`}</span>
+            </p>
+            <h1 id="ah-poster-title" className="mt-4 text-[32px] font-bold md:text-[clamp(36px,3.8vw,52px)]" style={{ letterSpacing: "-0.03em", lineHeight: 1.18 }}>
+              365일 24시간 진료
+            </h1>
+            <p className="mt-3 text-[17px] font-semibold tabular-nums" style={{ color: sub }}>
+              {night ? `야간 응급 ${p2(DAY_TO)}:00 ~ 다음 날 ${p2(DAY_FROM)}:00` : `주간 진료 ${p2(DAY_FROM)}:00 ~ ${p2(DAY_TO)}:00, 예약 우선`}
+            </p>
+            <p className="mt-4 text-[15px] leading-[1.6]" style={{ color: sub }}>
+              응급 시간에는 급한 아이부터 진료, 야간 진찰료 추가
+            </p>
+            <div className="mt-5 flex flex-wrap gap-2">
+              {night ? (
+                <button type="button" onClick={() => go("ah-er")} className={`min-h-11 rounded-[6px] border px-4 text-[16px] font-semibold ${focusRing}`} style={{ borderColor: "rgba(255,255,255,0.6)", color: "#ffffff", outlineColor: "#ffffff" }}>
+                  응급 증상 보기
+                </button>
+              ) : (
+                <>
+                  <button type="button" onClick={() => go("ah-reserve")} className={`min-h-11 rounded-[6px] px-4 text-[16px] font-semibold ${focusRing}`} style={{ background: C.teal, color: "#ffffff", outlineColor: C.teal }}>
+                    진료 예약
+                  </button>
+                  <button type="button" onClick={() => go("ah-dept")} className={`min-h-11 rounded-[6px] border px-4 text-[16px] font-semibold ${focusRing}`} style={{ borderColor: C.teal, color: C.teal, background: "#ffffff", outlineColor: C.teal }}>
+                    오늘 진료과목
+                  </button>
+                </>
+              )}
+            </div>
+          </div>
+
+          {/* 오기 전에 알려 줄 것: 고른 값이 곧 통화할 문장 */}
+          <div className="min-w-0 rounded-[8px] p-4 md:p-6" style={{ background: night ? "#26333e" : "#ffffff", border: `1px solid ${night ? "rgba(255,255,255,0.18)" : C.line}` }}>
+            <h2 className="text-[17px] font-bold">오기 전에 전화로 알려 주세요</h2>
+            <p className="mt-3 text-[18px] leading-[2.4] md:text-[20px]" style={{ wordBreak: "keep-all" }}>
+              <label className="sr-only" htmlFor="ah-q-pet">
+                동물
+              </label>
+              <select id="ah-q-pet" value={pet} onChange={(e) => setPet(e.target.value as typeof pet)} className={sel} style={selStyle}>
+                {PETS.map((x) => (
+                  <option key={x}>{x}</option>
+                ))}
+              </select>{" "}
+              이고{" "}
+              <label className="sr-only" htmlFor="ah-q-sign">
+                증상
+              </label>
+              <select id="ah-q-sign" value={sign} onChange={(e) => setSign(e.target.value as typeof sign)} className={sel} style={selStyle}>
+                {SIGNS.map((x) => (
+                  <option key={x}>{x}</option>
+                ))}
+              </select>{" "}
+              증상이에요.{" "}
+              <label className="sr-only" htmlFor="ah-q-arrive">
+                도착 예정
+              </label>
+              <select id="ah-q-arrive" value={arrive} onChange={(e) => setArrive(e.target.value as typeof arrive)} className={sel} style={selStyle}>
+                {ARRIVE.map((x) => (
+                  <option key={x}>{x}</option>
+                ))}
+              </select>{" "}
+              에 도착해요.
+            </p>
+            <div className="mt-4 flex flex-col gap-2 sm:flex-row sm:items-center">{call}</div>
+          </div>
+        </div>
       </div>
 
-      <div className={`relative z-[1] mt-auto px-4 pb-14 md:px-12 md:pb-20 ${reduce ? "" : "ah-rise"}`}>
-        <h1
-          id="ah-poster-title"
-          className="max-w-[12em] text-[36px] font-bold md:text-[clamp(40px,5vw,72px)]"
-          style={{ letterSpacing: "-0.03em", lineHeight: 1.2, wordBreak: "keep-all" }}
-        >
-          365일 24시간 진료
-        </h1>
-        <p className="mt-4 inline-flex items-center gap-2 text-[16px] md:mt-6 md:text-[18px]" style={{ color: "rgba(255,255,255,0.86)" }}>
-          <Moon size={18} aria-hidden />
-          밤 12시 이후에도 응급 진료, 응급 전화 <span className="tabular-nums">{TEL}</span>
-        </p>
+      {/* 아래 칸: 사진 3장, 글씨는 사진 밖 */}
+      <div className="mx-auto max-w-[1200px] px-4 pb-10 pt-6 md:px-6">
+        <ul className="-mx-4 flex snap-x scroll-px-4 gap-3 overflow-x-auto px-4 md:mx-0 md:grid md:grid-cols-3 md:overflow-visible md:px-0" style={{ scrollbarWidth: "none" }}>
+          {PHOTOS.map((ph, i) => (
+            <li key={ph.src} className="w-[72%] shrink-0 snap-start md:w-auto">
+              <div className="relative h-[180px] overflow-hidden rounded-[8px] md:h-[min(30svh,300px)]">
+                <motion.div className="absolute inset-0" initial={reduce ? false : { scale: 1.06 }} animate={{ scale: 1 }} transition={{ duration: reduce ? 0 : PHOTO_IN, ease: EASE, delay: reduce ? 0 : i * 0.08 }}>
+                  {/* eslint-disable-next-line @next/next/no-img-element -- 정적 export 라 next/image 최적화를 쓰지 않는다 */}
+                  <img
+                    src={`${IMG}/${ph.src}`}
+                    srcSet={ph.src === "hero.jpg" ? `${IMG}/hero-sm.jpg 960w, ${IMG}/hero.jpg 1920w` : undefined}
+                    sizes="(min-width: 768px) 33vw, 72vw"
+                    alt={ph.alt}
+                    fetchPriority={i === 0 ? "high" : undefined}
+                    className="absolute inset-0 h-full w-full object-cover"
+                    style={{ objectPosition: ph.src === "hero.jpg" ? "55% 40%" : "50% 30%" }}
+                  />
+                </motion.div>
+              </div>
+              <p className="mt-2 text-[15px] font-semibold" style={{ color: C.body }}>
+                {ph.cap}
+              </p>
+            </li>
+          ))}
+        </ul>
       </div>
     </section>
   );
