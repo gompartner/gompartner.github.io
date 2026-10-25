@@ -393,7 +393,7 @@ const GNB: [string, string][] = [
 ];
 const NIGHT_OPTIONS = 14;
 const sizeText = (sites: Site[]) => {
-  const set = [...new Set(sites.map((s) => `${s.size[0]}x${s.size[1]}m`))];
+  const set = [...new Set(sites.map((s) => `${s.size[0]} x ${s.size[1]}m`))];
   return set.join(", ");
 };
 
