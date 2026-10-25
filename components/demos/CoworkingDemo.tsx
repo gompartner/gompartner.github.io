@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useRef, useState, type CSSProperties, type KeyboardEvent, type ReactNode } from "react";
-import { motion, useScroll, useTransform } from "framer-motion";
+import { AnimatePresence, motion, useInView } from "framer-motion";
 import { Building2, Car, Check, Clock, Coffee, Mail, Minus, Plus, Printer, TrainFront, Users, Wifi } from "lucide-react";
 import { useReducedMotionSafe } from "@/hooks/useReducedMotionSafe";
 import { daysAgo, fmtKo, useDemoToday } from "@/hooks/useDemoToday";
@@ -266,42 +266,20 @@ export function CoworkingDemo() {
   const pickType = (t: SeatType) => setSelected((s) => (s === t ? null : t));
   const go = (id: string) => document.getElementById(id)?.scrollIntoView({ behavior: reduce ? "auto" : "smooth", block: "start" });
 
-  const NAV = [
-    ["cw-plan", "공간 소개"],
-    ["cw-price", "멤버십 요금"],
-    ["cw-rooms", "회의실"],
-    ["cw-perks", "입주 혜택"],
-    ["cw-tour", "투어 신청"],
-    ["cw-map", "오시는 길"],
-  ] as const;
-
   return (
     <div className="min-h-screen overflow-x-clip bg-white" style={{ color: C.text }}>
-      <Poster reduce={reduce} onCta={() => go("cw-tour")} />
+      <Poster
+        reduce={reduce}
+        free={free}
+        selected={selected}
+        go={go}
+        onType={(t) => {
+          setSelected(t);
+          go("cw-plan");
+        }}
+      />
 
-      <header className="sticky top-0 z-30 border-b bg-white/95 backdrop-blur-[2px]" style={{ borderColor: C.line }}>
-        <div className="mx-auto flex max-w-[1200px] items-center justify-between gap-4 px-4 py-3 md:px-6">
-          <a href="#cw-plan" onClick={(e) => (e.preventDefault(), go("cw-plan"))} className={`inline-flex items-center gap-2 rounded-[4px] ${focusRing}`} style={{ color: C.ink, outlineColor: C.accent }}>
-            <SampleLogo />
-          </a>
-          <nav aria-label="페이지 안 이동" className="-mx-4 min-w-0 flex-1 overflow-x-auto px-4 md:mx-0 md:flex md:justify-end md:px-0">
-            <ul className="flex gap-1 whitespace-nowrap text-[14px] font-bold">
-              {NAV.map(([id, label]) => (
-                <li key={id}>
-                  <button type="button" onClick={() => go(id)} className={`rounded-[4px] px-2.5 py-1.5 hover:underline hover:underline-offset-4 ${focusRing}`} style={{ color: C.ink, outlineColor: C.accent }}>
-                    {label}
-                  </button>
-                </li>
-              ))}
-            </ul>
-          </nav>
-          <button type="button" onClick={() => go("cw-tour")} className={`hidden flex-none rounded-[4px] px-4 py-2 text-[14px] font-semibold text-white md:inline-flex ${focusRing}`} style={{ background: C.accent, outlineColor: C.accent }}>
-            투어 신청
-          </button>
-        </div>
-      </header>
-
-      {/* 첫 화면: 실시간 좌석 평면도와 빈 자리 숫자판 */}
+      {/* 실시간 좌석 평면도와 빈 자리 숫자판 */}
       <section id="cw-plan" aria-labelledby="cw-title" className="mx-auto max-w-[1200px] scroll-mt-16 px-4 pt-8 md:px-6 md:pt-12">
         <div className="flex flex-wrap items-end justify-between gap-x-6 gap-y-2">
           <h2 className="text-[30px] font-bold leading-[1.2] md:text-[40px]" style={{ color: C.ink }} id="cw-title">
@@ -436,12 +414,10 @@ export function CoworkingDemo() {
 
 const IMG = "/images/demo-coworking";
 
-/* 포스터 모션(ms). 사진 다가오기 1600, 문장은 300 늦게 700 동안 12px 올라오며 나타난다(CSS keyframes, 끝 상태가 기본값).
-   스크롤하면 사진만 포스터 높이의 8%까지 느리게 내려간다. 동작 줄이기면 모두 끈다. */
+/* 첫 화면 모션(ms). 사진이 1.06배에서 1600 동안 제자리로 온다(CSS keyframes, 끝 상태가 기본값). 동작 줄이기면 끈다. */
 const HERO_IN_MS = 1600;
 const HERO_TEXT_DELAY_MS = 300;
 const HERO_TEXT_MS = 700;
-const HERO_PARALLAX = 8;
 
 const HERO_CSS = `
 @keyframes cw-hero-in { from { transform: scale(1.06); } }
@@ -451,59 +427,213 @@ const HERO_CSS = `
 @media (prefers-reduced-motion: reduce) { .cw-hero-photo, .cw-hero-rise { animation: none; } }
 `;
 
-function Poster({ reduce, onCta }: { reduce: boolean; onCta: () => void }) {
-  const wrapRef = useRef<HTMLElement>(null);
-  const { scrollYProgress } = useScroll({ target: wrapRef, offset: ["start start", "end start"] });
-  const photoY = useTransform(scrollYProgress, (v) => `${v * HERO_PARALLAX}%`);
+/** 첫 화면 검색 바의 이용 방식 */
+const USES: { label: string; types: SeatType[] }[] = [
+  { label: "전체", types: TYPES },
+  { label: "좌석", types: ["자유석", "지정석"] },
+  { label: "사무실", types: ["1인실", "4인실"] },
+];
+const GNB: [string, string][] = [
+  ["cw-map", "지점"],
+  ["cw-price", "요금"],
+  ["cw-plan", "좌석 종류"],
+];
+
+function Poster({
+  reduce,
+  free,
+  selected,
+  go,
+  onType,
+}: {
+  reduce: boolean;
+  free: Record<SeatType, number>;
+  selected: SeatType | null;
+  go: (id: string) => void;
+  onType: (t: SeatType) => void;
+}) {
+  const ref = useRef<HTMLElement>(null);
+  const inView = useInView(ref, { amount: 0.3 });
+  const [use, setUse] = useState(0);
+  const [people, setPeople] = useState(1);
+  const [termIdx, setTermIdx] = useState(1);
+  const term = TERMS[termIdx];
+  const list = USES[use].types.filter((t) => MAX_PEOPLE[t] >= people);
+
+  const seg = (on: boolean): CSSProperties => ({ background: on ? C.accent : "#fff", color: on ? "#fff" : C.ink, borderColor: on ? C.accent : C.edge, outlineColor: C.accent });
+  const segCls = `h-11 min-w-0 rounded-[4px] border px-2 text-[15px] font-semibold ${focusRing}`;
+  const label = "text-[14px] font-bold";
 
   return (
-    <section id="cw-poster" ref={wrapRef} aria-labelledby="cw-poster-title" className="relative flex min-h-[100svh] flex-col overflow-hidden text-white" style={{ background: "#141414" }}>
-      <style>{HERO_CSS}</style>
-      <motion.div aria-hidden className="absolute inset-0" style={{ y: reduce ? 0 : photoY }}>
-        <div className={`absolute inset-0 ${reduce ? "" : "cw-hero-photo"}`}>
-          {/* eslint-disable-next-line @next/next/no-img-element -- 정적 export 라 next/image 최적화를 쓰지 않는다 */}
-          <img
-            src={`${IMG}/hero.jpg`}
-            srcSet={`${IMG}/hero-sm.jpg 960w, ${IMG}/hero.jpg 1920w`}
-            sizes="100vw"
-            alt="조명이 켜진 공유오피스 라운지와 창가 좌석이 흐리게 보이는 사진"
-            fetchPriority="high"
-            className="absolute inset-0 h-full w-full object-cover"
-            style={{ objectPosition: "50% 45%" }}
-          />
-        </div>
-      </motion.div>
-      <div aria-hidden className="absolute inset-0" style={{ background: "linear-gradient(to top, rgba(0,0,0,0.74), rgba(0,0,0,0.38) 50%, rgba(0,0,0,0.3) 80%, rgba(0,0,0,0.5))" }} />
-
-      {/* 왼쪽 위 상호, 오른쪽 위 투어 신청 */}
-      <div className="relative z-10 mx-auto flex w-full max-w-[1200px] items-center justify-between px-4 pt-4 md:px-6 lg:pt-7">
-        <p>
-          <SampleLogo light small />
-        </p>
-        <button
-          type="button"
-          onClick={onCta}
-          data-gtm-cta="coworking_poster_cta"
-          className={`rounded-[6px] bg-white px-4 py-2.5 text-[15px] font-semibold transition-colors duration-150 hover:bg-[#f0f0f0] ${focusRing}`}
-          style={{ color: C.ink, outlineColor: "#ffffff" }}
-        >
-          투어 신청
-        </button>
-      </div>
-
-      <div className="relative z-10 mx-auto mt-auto w-full max-w-[1200px] px-4 pb-14 md:px-6 md:pb-20">
-        <div className={reduce ? "" : "cw-hero-rise"}>
-          <h1 id="cw-poster-title" className="max-w-[14em] text-[36px] font-bold md:text-[clamp(40px,5vw,72px)]" style={{ letterSpacing: "-0.03em", lineHeight: 1.2, wordBreak: "keep-all" }}>
-            ㅇㅇ역 3번 출구
-            <br />
-            도보 4분 공유오피스
-          </h1>
-          <p className="mt-4 text-[16px] font-medium text-white/90 md:text-[18px]">
-            {BRAND} {BRANCH}, 평일 09:00~21:00
+    <>
+      {/* GNB. 페이지 내내 위에 붙는다. 휴대폰은 가로로 밀어 보는 메뉴 */}
+      <header className="sticky top-0 z-30 border-b bg-white" style={{ borderColor: C.line }}>
+        <div className="mx-auto flex max-w-[1200px] items-center justify-between gap-4 px-4 py-2 md:px-6">
+          <p className="shrink-0" style={{ color: C.ink }}>
+            <SampleLogo />
           </p>
+          <nav aria-label="주요 메뉴" className="-mr-4 min-w-0 overflow-x-auto pr-4 md:mr-0 md:pr-0">
+            <ul className="flex items-center gap-1 whitespace-nowrap">
+              {GNB.map(([id, label]) => (
+                <li key={id}>
+                  <button type="button" onClick={() => go(id)} className={`h-11 rounded-[4px] px-2.5 text-[15px] font-bold hover:underline hover:underline-offset-4 md:px-3 md:text-[16px] ${focusRing}`} style={{ color: C.ink, outlineColor: C.accent }}>
+                    {label}
+                  </button>
+                </li>
+              ))}
+              <li className="hidden md:block">
+                <button type="button" onClick={() => go("cw-tour")} data-gtm-cta="coworking_poster_cta" className={`ml-2 h-11 rounded-[4px] px-4 text-[16px] font-semibold text-white ${focusRing}`} style={{ background: C.accent, outlineColor: C.accent }}>
+                  투어 신청
+                </button>
+              </li>
+            </ul>
+          </nav>
         </div>
-      </div>
-    </section>
+      </header>
+
+      <section id="cw-poster" ref={ref} aria-labelledby="cw-poster-title">
+        <style>{HERO_CSS}</style>
+        {/* 라운지 사진 */}
+        <div className="relative h-[26svh] min-h-[190px] overflow-hidden md:h-[55svh] md:min-h-[360px]" style={{ background: "#141414" }}>
+          <div className={`absolute inset-0 ${reduce ? "" : "cw-hero-photo"}`}>
+            {/* eslint-disable-next-line @next/next/no-img-element -- 정적 export 라 next/image 최적화를 쓰지 않는다 */}
+            <img
+              src={`${IMG}/hero.jpg`}
+              srcSet={`${IMG}/hero-sm.jpg 960w, ${IMG}/hero.jpg 1920w`}
+              sizes="100vw"
+              alt="조명이 켜진 공유오피스 라운지와 창가 좌석이 흐리게 보이는 사진"
+              fetchPriority="high"
+              className="absolute inset-0 h-full w-full object-cover"
+              style={{ objectPosition: "50% 45%" }}
+            />
+          </div>
+        </div>
+
+        <div className="mx-auto max-w-[1200px] px-4 pb-12 md:px-6">
+          {/* 사진 아래 끝에 걸친 검색 바 */}
+          <form
+            role="search"
+            aria-label="좌석 찾기"
+            onSubmit={(e) => e.preventDefault()}
+            className="relative z-10 -mt-10 grid grid-cols-[minmax(0,1fr)_auto] gap-x-3 gap-y-4 rounded-[8px] border bg-white p-4 md:-mt-14 md:grid-cols-[minmax(0,1.2fr)_auto_minmax(0,1.6fr)] md:items-end md:gap-6 md:p-5"
+            style={{ borderColor: C.edge }}
+          >
+            <fieldset className="min-w-0">
+              <legend className={label} style={{ color: C.muted }}>
+                이용 방식
+              </legend>
+              <div className="mt-2 grid grid-cols-3 gap-1.5">
+                {USES.map((u, i) => (
+                  <button key={u.label} type="button" aria-pressed={use === i} onClick={() => setUse(i)} className={segCls} style={seg(use === i)}>
+                    {u.label}
+                  </button>
+                ))}
+              </div>
+            </fieldset>
+            <div>
+              <p id="cw-poster-people" className={label} style={{ color: C.muted }}>
+                인원
+              </p>
+              <div role="group" aria-labelledby="cw-poster-people" className="mt-2 inline-flex items-center rounded-[4px] border" style={{ borderColor: C.edge }}>
+                <button type="button" aria-label="한 명 빼기" disabled={people <= 1} onClick={() => setPeople((n) => Math.max(1, n - 1))} className={`inline-flex h-11 w-10 items-center justify-center disabled:opacity-40 md:w-11 ${focusRing}`} style={{ color: C.ink, outlineColor: C.accent }}>
+                  <Minus size={16} aria-hidden />
+                </button>
+                <span className="min-w-[2.8em] text-center text-[16px] font-bold tabular-nums md:min-w-[3.5em]" style={{ color: C.ink }} aria-live="polite">
+                  {people}명
+                </span>
+                <button type="button" aria-label="한 명 더" disabled={people >= 6} onClick={() => setPeople((n) => Math.min(6, n + 1))} className={`inline-flex h-11 w-10 items-center justify-center disabled:opacity-40 md:w-11 ${focusRing}`} style={{ color: C.ink, outlineColor: C.accent }}>
+                  <Plus size={16} aria-hidden />
+                </button>
+              </div>
+            </div>
+            <fieldset className="col-span-2 min-w-0 md:col-span-1">
+              <legend className={label} style={{ color: C.muted }}>
+                계약 기간
+              </legend>
+              <div className="mt-2 grid grid-cols-4 gap-1.5">
+                {TERMS.map((t, i) => (
+                  <button key={t.months} type="button" aria-pressed={termIdx === i} onClick={() => setTermIdx(i)} className={segCls} style={seg(termIdx === i)}>
+                    {t.months}개월
+                  </button>
+                ))}
+              </div>
+            </fieldset>
+          </form>
+
+          <div className="mt-7 flex flex-wrap items-end justify-between gap-x-6 gap-y-1">
+            <h1 id="cw-poster-title" className="text-[24px] font-bold leading-[1.3] md:text-[30px]" style={{ color: C.ink, letterSpacing: "-0.03em", wordBreak: "keep-all" }}>
+              ㅇㅇ역 3번 출구 도보 4분 공유오피스
+            </h1>
+            <p className="text-[15px]" style={{ color: C.muted }}>
+              {BRAND} {BRANCH}, 평일 09:00~21:00, 부가세 별도
+            </p>
+          </div>
+
+          {/* 검색 결과: 좌석 종류 카드 */}
+          <ul aria-label="찾은 좌석 종류" aria-live="polite" className="mt-4 grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
+            {list.map((t) => {
+              const head = Math.min(people, MAX_PEOPLE[t]);
+              const seat = PER_PERSON[t] ? PRICE[t] * head : PRICE[t];
+              const monthly = seat - Math.round((seat * term.off) / 1000) * 1000;
+              const left = free[t];
+              const on = selected === t;
+              return (
+                <li key={t} className="min-w-0">
+                  <button
+                    type="button"
+                    aria-pressed={on}
+                    onClick={() => onType(t)}
+                    className={`flex h-full w-full flex-col items-start rounded-[6px] border p-4 text-left transition-colors duration-150 ${focusRing}`}
+                    style={{ borderColor: on ? C.pickEdge : C.line, background: on ? C.pickSoft : "#fff", outlineColor: C.accent }}
+                  >
+                    <span className="flex w-full items-center justify-between gap-2">
+                      <span className="text-[18px] font-bold" style={{ color: C.ink }}>
+                        {t}
+                      </span>
+                      <span className="rounded-[3px] px-2 py-0.5 text-[13px] font-bold tabular-nums" style={left > 0 ? { background: C.inkSoft, color: C.accent } : { background: C.paper, color: C.muted }}>
+                        {left > 0 ? `빈 자리 ${left}` : "만석"}
+                      </span>
+                    </span>
+                    <span className="mt-1.5 text-[14px] leading-[1.5]" style={{ color: C.text }}>
+                      {TYPE_NOTE[t]}
+                    </span>
+                    <span className="mt-auto pt-3 text-[17px] font-bold tabular-nums" style={{ color: C.ink }}>
+                      월 {won(monthly)}
+                      <span className="ml-1.5 text-[13px] font-normal" style={{ color: C.muted }}>
+                        {PER_PERSON[t] ? `${head}명` : `${MAX_PEOPLE[t]}명까지`}, {term.months}개월
+                      </span>
+                    </span>
+                  </button>
+                </li>
+              );
+            })}
+            {list.length === 0 && (
+              <li className="rounded-[6px] border p-4 text-[15px] sm:col-span-2 lg:col-span-4" style={{ borderColor: C.line, color: C.muted }}>
+                맞는 좌석 없음
+              </li>
+            )}
+          </ul>
+        </div>
+
+        {/* 휴대폰 하단 고정 투어 신청. 첫 화면이 보일 때만 */}
+        <AnimatePresence>
+          {inView && (
+            <motion.div
+              initial={reduce ? false : { y: 16, opacity: 0 }}
+              animate={{ y: 0, opacity: 1 }}
+              exit={reduce ? { opacity: 0, transition: { duration: 0 } } : { y: 16, opacity: 0 }}
+              transition={{ duration: 0.2, ease: EASE }}
+              className="fixed inset-x-0 bottom-0 z-40 border-t bg-white px-4 py-3 md:hidden"
+              style={{ borderColor: C.line }}
+            >
+              <button type="button" onClick={() => go("cw-tour")} data-gtm-cta="coworking_poster_cta" className={`flex h-12 w-full items-center justify-center rounded-[6px] text-[17px] font-semibold text-white ${focusRing}`} style={{ background: C.accent, outlineColor: C.accent }}>
+                투어 신청
+              </button>
+            </motion.div>
+          )}
+        </AnimatePresence>
+      </section>
+    </>
   );
 }
 

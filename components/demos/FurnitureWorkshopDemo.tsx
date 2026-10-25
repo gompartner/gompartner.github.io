@@ -1,8 +1,8 @@
 "use client";
 
 import { useEffect, useMemo, useRef, useState } from "react";
-import { AnimatePresence, motion, useScroll, useTransform } from "framer-motion";
-import { Car, Check, Clock, Download, MapPin, MessageCircle, Paperclip, Phone, TrainFront } from "lucide-react";
+import { AnimatePresence, motion } from "framer-motion";
+import { Car, Check, Clock, Download, MapPin, Menu, MessageCircle, Paperclip, Phone, TrainFront, X } from "lucide-react";
 import { useReducedMotionSafe } from "@/hooks/useReducedMotionSafe";
 import { daysAgo, fmtKo, useDemoToday } from "@/hooks/useDemoToday";
 import { maskName, maskPhone } from "@/components/demos/LeadReceivedPanel";
@@ -475,12 +475,10 @@ async function savePng(svg: SVGSVGElement, filename: string) {
 
 const IMG = "/images/demo-furniture-workshop";
 
-/* 포스터 모션(ms). 사진 다가오기 1600, 문장은 300 늦게 700 동안 12px 올라오며 나타난다(CSS keyframes, 끝 상태가 기본값).
-   스크롤하면 사진만 포스터 높이의 8%까지 느리게 내려간다. 동작 줄이기면 모두 끈다. */
+/* 첫 화면 모션(ms). 상품 사진이 1.06배에서 1600 동안 제자리로 온다(CSS keyframes, 끝 상태가 기본값). 동작 줄이기면 끈다. */
 const HERO_IN_MS = 1600;
 const HERO_TEXT_DELAY_MS = 300;
 const HERO_TEXT_MS = 700;
-const HERO_PARALLAX = 8;
 const EASE_CSS = `cubic-bezier(${EASE.join(",")})`;
 
 const HERO_CSS = `
@@ -491,68 +489,187 @@ const HERO_CSS = `
 @media (prefers-reduced-motion: reduce) { .fw-hero-photo, .fw-hero-rise { animation: none; } }
 `;
 
-function Poster({ reduce, onCta }: { reduce: boolean; onCta: () => void }) {
-  const wrapRef = useRef<HTMLElement>(null);
-  const { scrollYProgress } = useScroll({ target: wrapRef, offset: ["start start", "end start"] });
-  const photoY = useTransform(scrollYProgress, (v) => `${v * HERO_PARALLAX}%`);
+/* 첫 화면: 모델 번호가 붙은 상품 격자. 칸마다 수종 칩을 누르면 그 칸 가격만 바뀐다(사진은 가구마다 한 장) */
+const MODEL: Record<KindId, string> = { table: "T-01", shelf: "S-01", bench: "B-01", tv: "TV-01" };
+/** 칸마다 수종 칩 3개. 첫 칩은 사진 속 가구의 수종 */
+const cardWoods = (photo: WoodId): WoodId[] => [photo, ...(["oak", "walnut", "ash"] as WoodId[]).filter((w) => w !== photo)].slice(0, 3);
+const PHOTO_POS: Record<KindId, string> = { table: "50% 60%", shelf: "50% 35%", bench: "50% 62%", tv: "50% 62%" };
+
+const GNB: { label: string; kind?: KindId; id: string }[] = [
+  { label: "테이블", kind: "table", id: "fw-drawing" },
+  { label: "수납", kind: "shelf", id: "fw-drawing" },
+  { label: "의자", kind: "bench", id: "fw-drawing" },
+  { label: "주문제작", id: "fw-size" },
+  { label: "공방", id: "fw-about" },
+];
+
+function Poster({ reduce, go, onKind, onPiece }: { reduce: boolean; go: (id: string) => void; onKind: (k: KindId) => void; onPiece: (kind: KindId, wood: WoodId, dims: Dims) => void }) {
+  const [menu, setMenu] = useState(false);
+  const [woods, setWoods] = useState<Record<KindId, WoodId>>(() => Object.fromEntries(PIECES.map((p) => [p.kind, p.wood])) as Record<KindId, WoodId>);
+
+  useEffect(() => {
+    if (!menu) return;
+    const f = (e: KeyboardEvent) => e.key === "Escape" && setMenu(false);
+    window.addEventListener("keydown", f);
+    return () => window.removeEventListener("keydown", f);
+  }, [menu]);
+
+  const pick = (g: (typeof GNB)[number]) => {
+    setMenu(false);
+    if (g.kind) onKind(g.kind);
+    go(g.id);
+  };
 
   return (
-    <section id="fw-poster" ref={wrapRef} aria-labelledby="fw-poster-title" className="relative flex min-h-[100svh] flex-col overflow-hidden text-white" style={{ background: "#141414" }}>
+    <section id="fw-poster" aria-labelledby="fw-poster-title" style={{ background: C.sheet }}>
       <style>{HERO_CSS}</style>
-      <motion.div aria-hidden className="absolute inset-0" style={{ y: reduce ? 0 : photoY }}>
-        <div className={`absolute inset-0 ${reduce ? "" : "fw-hero-photo"}`}>
-          {/* eslint-disable-next-line @next/next/no-img-element -- 정적 export 라 next/image 최적화를 쓰지 않는다 */}
-          <img
-            src={`${IMG}/hero.jpg`}
-            srcSet={`${IMG}/hero-sm.jpg 960w, ${IMG}/hero.jpg 1920w`}
-            sizes="100vw"
-            alt="작업대 위에서 원목 판재를 대패로 다듬는 손과 흩어진 대패밥"
-            fetchPriority="high"
-            className="absolute inset-0 h-full w-full object-cover"
-            style={{ objectPosition: "45% 40%" }}
-          />
+      {/* GNB. 휴대폰은 햄버거 */}
+      <header className="relative border-b" style={{ borderColor: C.line }}>
+        <div className="mx-auto flex h-16 max-w-[1200px] items-center justify-between gap-4 px-4 md:px-6">
+          <SampleLogo />
+          <nav aria-label="주요 메뉴" className="hidden items-center gap-1 md:flex">
+            {GNB.map((g) => (
+              <button key={g.label} type="button" onClick={() => pick(g)} className={`h-11 rounded-[4px] px-3 text-[16px] font-semibold underline-offset-4 hover:underline ${focusRing}`} style={{ color: C.ink, outlineColor: C.accent }}>
+                {g.label}
+              </button>
+            ))}
+          </nav>
+          <button
+            type="button"
+            onClick={() => setMenu((m) => !m)}
+            aria-expanded={menu}
+            aria-controls="fw-menu-panel"
+            aria-label={menu ? "메뉴 닫기" : "메뉴 열기"}
+            className={`inline-flex h-11 w-11 items-center justify-center rounded-[4px] md:hidden ${focusRing}`}
+            style={{ color: C.ink, outlineColor: C.accent }}
+          >
+            {menu ? <X size={24} aria-hidden /> : <Menu size={24} aria-hidden />}
+          </button>
         </div>
-      </motion.div>
-      <div aria-hidden className="absolute inset-0" style={{ background: "linear-gradient(to top, rgba(0,0,0,0.68), rgba(0,0,0,0.2) 55%, rgba(0,0,0,0.1) 78%, rgba(0,0,0,0.45))" }} />
+        <AnimatePresence>
+          {menu && (
+            <motion.nav
+              id="fw-menu-panel"
+              aria-label="메뉴 펼침"
+              initial={reduce ? false : { opacity: 0, y: -6 }}
+              animate={{ opacity: 1, y: 0 }}
+              exit={reduce ? { opacity: 0, transition: { duration: 0 } } : { opacity: 0, y: -6 }}
+              transition={{ duration: 0.18, ease: EASE }}
+              className="absolute inset-x-0 top-full z-30 grid grid-cols-2 gap-2 border-b p-4 md:hidden"
+              style={{ borderColor: C.line, background: C.sheet }}
+            >
+              {GNB.map((g) => (
+                <button key={g.label} type="button" onClick={() => pick(g)} className={`h-12 rounded-[4px] border text-[16px] font-semibold ${focusRing}`} style={{ borderColor: C.line, color: C.ink, outlineColor: C.accent }}>
+                  {g.label}
+                </button>
+              ))}
+            </motion.nav>
+          )}
+        </AnimatePresence>
+      </header>
 
-      {/* 왼쪽 위 상호, 오른쪽 위 문의 버튼 하나 */}
-      <div className="relative z-10 mx-auto flex w-full max-w-[1200px] items-center justify-between px-4 pt-4 md:px-6 lg:pt-7">
-        <SampleLogo light small />
-        <button
-          type="button"
-          onClick={onCta}
-          data-gtm-cta={`${SLUG}_poster_cta`}
-          className={`rounded-[6px] bg-white px-4 py-2.5 text-[15px] font-semibold transition-colors duration-150 hover:bg-[#f0f0f0] ${focusRing}`}
-          style={{ color: C.ink, outlineColor: "#ffffff" }}
-        >
-          제작 문의
-        </button>
+      {/* 얇은 띠 한 줄: 문장과 견적 버튼 */}
+      <div className="border-b" style={{ borderColor: C.line, background: C.paper }}>
+        <div className="mx-auto flex max-w-[1200px] flex-wrap items-center justify-between gap-x-6 gap-y-2 px-4 py-3 md:px-6">
+          <div className="flex flex-wrap items-baseline gap-x-3 gap-y-0.5">
+            <h1 id="fw-poster-title" className="text-[20px] font-bold leading-[1.3] md:text-[24px]" style={{ color: C.ink, letterSpacing: "-0.03em", wordBreak: "keep-all" }}>
+              원하는 치수로 한 점씩 제작합니다
+            </h1>
+            <p className="text-[15px]" style={{ color: C.soft }}>
+              제작 기간 4~6주
+            </p>
+          </div>
+          <button
+            type="button"
+            onClick={() => go("fw-quote")}
+            data-gtm-cta={`${SLUG}_poster_cta`}
+            className={`inline-flex h-11 items-center rounded-[6px] px-4 text-[15px] font-semibold text-white ${focusRing}`}
+            style={{ background: C.accent, outlineColor: C.accent }}
+          >
+            주문제작 견적
+          </button>
+        </div>
       </div>
 
-      <div className="relative z-10 mx-auto mt-auto w-full max-w-[1200px] px-4 pb-14 md:px-6 md:pb-20">
-        <div className={reduce ? "" : "fw-hero-rise"}>
-          <h1 id="fw-poster-title" className="max-w-[14em] text-[36px] font-bold md:text-[clamp(40px,5vw,72px)]" style={{ letterSpacing: "-0.03em", lineHeight: 1.2, wordBreak: "keep-all" }}>
-            원하는 치수로
-            <br />
-            한 점씩 제작합니다
-          </h1>
-          <p className="mt-4 text-[16px] font-medium text-white/90 md:text-[18px]">{BRAND}, 제작 기간 4~6주</p>
-        </div>
-      </div>
+      {/* 상품 격자 */}
+      <ul className="mx-auto grid max-w-[1200px] gap-x-6 gap-y-8 px-4 pb-12 pt-6 md:grid-cols-2 md:px-6 md:pt-8">
+        {PIECES.map((p, i) => {
+          const k = KINDS.find((x) => x.id === p.kind)!;
+          const w = WOODS.find((x) => x.id === woods[p.kind])!;
+          const price = quote(k, p.dims, w, "oil").total;
+          return (
+            <li key={p.kind} id={`fw-p-${p.kind}`} className="min-w-0">
+              <div className="relative aspect-[4/3] overflow-hidden rounded-[4px]" style={{ background: C.paper }}>
+                {woods[p.kind] !== p.wood && (
+                  <span className="absolute left-2 top-2 z-10 rounded-[3px] px-2 py-1 text-[13px] font-semibold" style={{ background: C.sheet, color: C.ink }}>
+                    사진 {WOODS.find((x) => x.id === p.wood)!.name}
+                  </span>
+                )}
+                {/* eslint-disable-next-line @next/next/no-img-element -- 정적 export 라 next/image 최적화를 쓰지 않는다 */}
+                <img
+                  src={`${IMG}/piece-${p.kind}.jpg`}
+                  alt={p.alt}
+                  width={720}
+                  height={900}
+                  loading={i < 2 ? "eager" : "lazy"}
+                  fetchPriority={i === 0 ? "high" : undefined}
+                  className={`h-full w-full object-cover ${reduce ? "" : "fw-hero-photo"}`}
+                  style={{ objectPosition: PHOTO_POS[p.kind] }}
+                />
+              </div>
+              <div className="mt-3 flex flex-wrap items-baseline justify-between gap-x-4 gap-y-1">
+                <p className="text-[19px] font-bold" style={{ color: C.ink }}>
+                  <span className="mr-2 tabular-nums" style={{ color: C.soft }}>
+                    {MODEL[p.kind]}
+                  </span>
+                  원목 {k.name}
+                </p>
+                <p className="text-[18px] font-bold tabular-nums" style={{ color: C.ink }}>
+                  {won(price)}
+                </p>
+              </div>
+              <p className="mt-1 text-[14px] tabular-nums" style={{ color: C.soft }}>
+                폭 {p.dims.w} 깊이 {p.dims.d} 높이 {p.dims.h}mm, 오일 마감
+              </p>
+              <div className="mt-3 flex flex-wrap items-center gap-2">
+                <div role="radiogroup" aria-label={`${MODEL[p.kind]} 수종`} className="flex gap-1.5">
+                  {cardWoods(p.wood).map((id) => {
+                    const wd = WOODS.find((x) => x.id === id)!;
+                    const on = woods[p.kind] === id;
+                    return (
+                      <button
+                        key={id}
+                        type="button"
+                        role="radio"
+                        aria-checked={on}
+                        onClick={() => setWoods((s) => ({ ...s, [p.kind]: id }))}
+                        className={`inline-flex h-11 items-center gap-1.5 rounded-[4px] border px-3 text-[15px] ${on ? "font-bold" : ""} ${focusRing}`}
+                        style={{ borderColor: on ? C.accent : C.line, background: on ? C.accent : C.sheet, color: on ? "#fff" : C.ink, outlineColor: C.accent }}
+                      >
+                        <span aria-hidden className="inline-block h-3.5 w-3.5 rounded-full border" style={{ background: wd.color, borderColor: on ? "rgba(255,255,255,0.7)" : C.line }} />
+                        {wd.name}
+                      </button>
+                    );
+                  })}
+                </div>
+                <button
+                  type="button"
+                  onClick={() => onPiece(p.kind, woods[p.kind], p.dims)}
+                  className={`ml-auto inline-flex h-11 items-center rounded-[4px] px-1 text-[15px] font-semibold underline underline-offset-4 ${focusRing}`}
+                  style={{ color: C.ink, outlineColor: C.accent }}
+                >
+                  치수 바꾸기
+                </button>
+              </div>
+            </li>
+          );
+        })}
+      </ul>
     </section>
   );
 }
 
 /* ── 화면 ─────────────────────────────────────────────── */
-
-const NAV = [
-  ["제작 가구", "fw-kind"],
-  ["주문 제작", "fw-size"],
-  ["목재 안내", "fw-wood-guide"],
-  ["작업 과정", "fw-process"],
-  ["공방 소개", "fw-about"],
-  ["오시는 길", "fw-map"],
-] as const;
 
 export function FurnitureWorkshopDemo() {
   const today = useDemoToday();
@@ -584,23 +701,18 @@ export function FurnitureWorkshopDemo() {
 
   return (
     <div className="min-h-screen overflow-x-clip [&_h2]:text-[#111111] [&_h3]:text-[#111111]" style={{ background: C.paper, color: C.body }}>
-      <Poster reduce={reduce} onCta={() => go("fw-quote")} />
-
-      <header className="mx-auto flex max-w-[1200px] items-center justify-between gap-4 px-4 py-4 md:px-6">
-        <a href="#fw-drawing" onClick={(e) => { e.preventDefault(); window.scrollTo({ top: 0, behavior: reduce ? "auto" : "smooth" }); }} className={`inline-flex items-center gap-2 rounded-[4px] ${focusRing}`} style={{ outlineColor: C.accent }}>
-          <SampleLogo />
-        </a>
-        <nav aria-label="주요 메뉴" className="hidden items-center gap-5 text-[15px] lg:flex">
-          {NAV.map(([label, id]) => (
-            <a key={id} href={`#${id}`} onClick={(e) => { e.preventDefault(); go(id); }} className={`rounded-[3px] underline-offset-4 hover:underline ${focusRing}`} style={{ outlineColor: C.accent }}>
-              {label}
-            </a>
-          ))}
-        </nav>
-        <button type="button" onClick={() => go("fw-quote")} className={`flex-none rounded-[6px] px-4 py-2 text-[15px] font-semibold text-white ${focusRing}`} style={{ background: C.accent, outlineColor: C.accent }}>
-          제작 문의
-        </button>
-      </header>
+      <Poster
+        reduce={reduce}
+        go={go}
+        onKind={(id) => pickKind(KINDS.find((k) => k.id === id)!)}
+        onPiece={(id, w, d) => {
+          setKind(KINDS.find((k) => k.id === id)!);
+          setDims(d);
+          setWood(WOODS.find((x) => x.id === w)!);
+          setFinish("oil");
+          go("fw-drawing");
+        }}
+      />
 
       {/* 첫 화면: 도면판과 치수, 오른쪽에 목재와 견적 */}
       <main className="mx-auto grid max-w-[1200px] gap-8 px-4 pb-16 pt-2 md:px-6 lg:grid-cols-[minmax(0,1fr)_380px] lg:items-start lg:gap-10 lg:pt-6">
@@ -773,30 +885,6 @@ export function FurnitureWorkshopDemo() {
           </section>
         </aside>
       </main>
-
-      {/* 완성한 가구 */}
-      <section id="fw-pieces" aria-labelledby="fw-pieces-title" className="mx-auto max-w-[1200px] scroll-mt-4 border-t px-4 pt-12 md:px-6 md:pt-16" style={{ borderColor: C.line }}>
-        <h2 id="fw-pieces-title" className="text-[24px] font-bold md:text-[28px]">
-          완성한 가구
-        </h2>
-        <ul className="mt-6 grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
-          {PIECES.map((p) => (
-            <li key={p.kind}>
-              <div className="aspect-[4/5] overflow-hidden rounded-[4px]" style={{ background: C.paper }}>
-                {/* eslint-disable-next-line @next/next/no-img-element -- 정적 export 라 next/image 최적화를 쓰지 않는다 */}
-                <img src={`${IMG}/piece-${p.kind}.jpg`} alt={p.alt} loading="lazy" className="h-full w-full object-cover" />
-              </div>
-              <p className="mt-3 text-[18px] font-bold">{KINDS.find((k) => k.id === p.kind)?.name}</p>
-              <p className="mt-1 text-[15px]">
-                {WOODS.find((w) => w.id === p.wood)?.name}, {FINISHES.find((f) => f.id === p.finish)?.name} 마감
-              </p>
-              <p className="mt-0.5 text-[14px] tabular-nums" style={{ color: C.soft }}>
-                폭 {p.dims.w} 깊이 {p.dims.d} 높이 {p.dims.h}mm
-              </p>
-            </li>
-          ))}
-        </ul>
-      </section>
 
       {/* 목재 안내 */}
       <section id="fw-wood-guide" aria-labelledby="fw-wood-guide-title" className="mx-auto max-w-[1200px] scroll-mt-4 px-4 pt-12 md:px-6 md:pt-16">

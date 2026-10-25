@@ -1,8 +1,8 @@
 "use client";
 
 import { useEffect, useMemo, useRef, useState } from "react";
-import { AnimatePresence, LayoutGroup, motion, useScroll, useTransform } from "framer-motion";
-import { CalendarCheck, Car, Check, Clock, MapPin, Minus, Plus, TrainFront } from "lucide-react";
+import { AnimatePresence, LayoutGroup, motion, useInView } from "framer-motion";
+import { CalendarCheck, Car, Check, Clock, MapPin, Menu, Minus, Plus, TrainFront, X } from "lucide-react";
 import { useReducedMotionSafe } from "@/hooks/useReducedMotionSafe";
 import { daysAgo, fmtKo, useDemoToday } from "@/hooks/useDemoToday";
 import { maskName, maskPhone } from "@/components/demos/LeadReceivedPanel";
@@ -33,7 +33,6 @@ import { DemoMakerInfo } from "@/components/demos/DemoMakerInfo";
    포스터 첫 화면(hs-poster): 한 화면 높이의 매장 사진 위에 왼쪽 위 상호, 오른쪽 위 예약하기 버튼,
    아래쪽 문장 "커트, 펌, 염색 디자이너 지정 예약"와 영업시간 한 줄. 글꼴은 Pretendard 한 벌, 강조색은 남색 하나. */
 
-const BRAND = "곰파트너";
 const ADDRESS = "서울 ㅇㅇ구 ㅇㅇ로 00, 2층";
 const KAKAO = "카카오톡 채널 곰파트너";
 const TEL = "02-000-0000";
@@ -195,7 +194,6 @@ export function HairSalonDemo() {
   const total = sum(cart, designer);
   const need = Math.ceil(total.min / 30);
   const todayDow = today.getDay();
-  const openToday = todayDow !== 1;
 
   const accent = ACCENT;
   const pageStyle = {
@@ -211,45 +209,26 @@ export function HairSalonDemo() {
         .hs-accent-text { color: var(--hs-accent); }
       `}</style>
 
-      <Poster reduce={reduce} onCta={() => go("hs-reserve")} />
+      <Poster
+        reduce={reduce}
+        today={today}
+        nowMin={nowMin}
+        cart={cart}
+        dIdx={dIdx}
+        go={go}
+        onPick={(i, slot) => {
+          setDIdx(i);
+          setCart((c) => {
+            const f = c.filter((id) => DESIGNERS[i].can.includes(id));
+            return f.length ? f : ["cut"];
+          });
+          setPicked(slot);
+          setDone(null);
+          go("hs-reserve");
+        }}
+      />
 
       <div>
-      <header className="mx-auto flex max-w-[1200px] items-center justify-between gap-3 px-4 py-4 md:px-6">
-        <a href="#hs-hero" className={`inline-flex items-center gap-2 rounded-[4px] ${focusRing}`} style={{ outlineColor: C.ink }}>
-          <SampleLogo />
-        </a>
-        <nav aria-label="메뉴" className="hidden items-center gap-1 text-[15px] font-bold md:flex">
-          {[
-            ["hs-designers", "디자이너"],
-            ["hs-menu", "시술 메뉴"],
-            ["hs-reserve", "예약"],
-            ["hs-stylebook", "스타일북"],
-            ["hs-location", "오시는 길"],
-          ].map(([id, label]) => (
-            <button key={id} type="button" onClick={() => go(id)} className={`rounded-[4px] px-3 py-2 hover:underline hover:underline-offset-4 ${focusRing}`} style={{ outlineColor: C.ink }}>
-              {label}
-            </button>
-          ))}
-        </nav>
-        <button type="button" onClick={() => go("hs-reserve")} className={`hs-accent-bg flex-none rounded-[4px] px-4 py-2 text-[15px] font-bold text-white ${focusRing}`} style={{ outlineColor: C.ink }}>
-          예약하기
-        </button>
-      </header>
-
-      {/* 상호와 오늘 영업 */}
-      <section id="hs-hero" aria-labelledby="hs-title" className="mx-auto max-w-[1200px] px-4 pt-4 md:px-6 md:pt-8">
-        <h2 id="hs-title" className="text-[28px] font-bold leading-[1.2] tracking-[-0.02em] md:text-[36px]">
-          {BRAND}
-        </h2>
-        <p className="mt-3 flex flex-wrap items-center gap-x-3 gap-y-1 text-[16px] font-medium">
-          <span className="inline-flex items-center gap-1.5">
-            <Clock size={17} aria-hidden />
-            {openToday ? `오늘 ${OPEN_H}:00 ~ ${CLOSE_H}:00` : "오늘 정기휴무"}
-          </span>
-          <span style={{ color: C.muted }}>{openToday ? "당일 예약 가능" : "화요일부터 예약 가능"}</span>
-        </p>
-      </section>
-
       {/* 1. 디자이너 */}
       <section id="hs-designers" aria-labelledby="hs-designers-title" className="mx-auto mt-14 max-w-[1200px] scroll-mt-4 px-4 md:mt-20 md:px-6">
         <SectionTitle id="hs-designers-title">디자이너</SectionTitle>
@@ -472,66 +451,253 @@ export function HairSalonDemo() {
 
 const IMG = "/images/demo-hair-salon";
 
-function Poster({ reduce, onCta }: { reduce: boolean; onCta: () => void }) {
+/** 첫 화면 길이 칩. 칩을 누르면 왼쪽 큰 사진만 바뀐다 */
+const LENGTHS: { label: string; key: string }[] = [
+  { label: "숏", key: "down" },
+  { label: "단발", key: "ccurl" },
+  { label: "미디움", key: "hush" },
+  { label: "롱", key: "glam" },
+];
+const GNB: [string, string][] = [
+  ["hs-stylebook", "스타일"],
+  ["hs-designers", "디자이너"],
+  ["hs-menu", "가격"],
+];
+
+/** 디자이너별로 가장 가까운 영업일의 예약 가능 시작 칸(최대 3개). 시간표와 같은 규칙(찬 칸, 지난 시각, 월요일 휴무) */
+function openStarts(dI: number, need: number, today: Date, nowMin: number): { day: number; slots: number[] } {
+  for (let day = 0; day < DAYS; day++) {
+    if (daysAgo(today, -day).getDay() === 1) continue;
+    const slots: number[] = [];
+    for (let s = 0; s + need <= SLOTS && slots.length < 3; s++) {
+      if (day === 0 && OPEN_H * 60 + s * 30 <= nowMin) continue;
+      let ok = true;
+      for (let k = 0; k < need; k++) if (taken(dI, day, s + k)) ok = false;
+      if (ok) slots.push(s);
+    }
+    if (slots.length) return { day, slots };
+  }
+  return { day: 0, slots: [] };
+}
+
+function Poster({
+  reduce,
+  today,
+  nowMin,
+  cart,
+  dIdx,
+  go,
+  onPick,
+}: {
+  reduce: boolean;
+  today: Date;
+  nowMin: number;
+  cart: ServiceId[];
+  dIdx: number;
+  go: (id: string) => void;
+  onPick: (designerIdx: number, slot: Slot) => void;
+}) {
   const ref = useRef<HTMLElement>(null);
-  const { scrollYProgress } = useScroll({ target: ref, offset: ["start start", "end start"] });
-  // 스크롤하면 사진만 조금 느리게 내려간다
-  const photoY = useTransform(scrollYProgress, (v) => (reduce ? "0%" : `${v * 8}%`));
+  const inView = useInView(ref, { amount: 0.25 });
+  const [len, setLen] = useState(2);
+  const [menu, setMenu] = useState(false);
+  const style = STYLES.find((x) => x.key === LENGTHS[len].key)!;
+  const openToday = today.getDay() !== 1;
+
+  useEffect(() => {
+    if (!menu) return;
+    const f = (e: KeyboardEvent) => e.key === "Escape" && setMenu(false);
+    window.addEventListener("keydown", f);
+    return () => window.removeEventListener("keydown", f);
+  }, [menu]);
+
+  const jump = (id: string) => {
+    setMenu(false);
+    go(id);
+  };
 
   return (
-    <section ref={ref} id="hs-poster" aria-labelledby="hs-poster-title" className="relative flex min-h-[100svh] flex-col overflow-hidden" style={{ background: "#141414", color: "#fff" }}>
-      <style>{`
-        @keyframes hs-rise { from { opacity: 0; transform: translateY(12px); } to { opacity: 1; transform: none; } }
-        .hs-rise { animation: hs-rise 0.7s cubic-bezier(0.22, 1, 0.36, 1) 0.3s both; }
-        @media (prefers-reduced-motion: reduce) { .hs-rise { animation: none; } }
-      `}</style>
-      <motion.div
-        className="absolute inset-0"
-        style={{ y: photoY }}
-        initial={reduce ? false : { scale: 1.06 }}
-        animate={{ scale: 1 }}
-        transition={{ duration: reduce ? 0 : 1.6, ease: EASE }}
-      >
-        {/* eslint-disable-next-line @next/next/no-img-element -- 정적 export 라 next/image 최적화를 쓰지 않는다 */}
-        <img
-          src={`${IMG}/hero.jpg`}
-          srcSet={`${IMG}/hero-sm.jpg 960w, ${IMG}/hero.jpg 1920w`}
-          sizes="100vw"
-          alt="샴푸 의자 세 대와 시술 의자가 놓인 미용실 매장 안"
-          fetchPriority="high"
-          className="absolute inset-0 h-full w-full object-cover"
-          style={{ objectPosition: "55% 55%" }}
-        />
-      </motion.div>
-      <div aria-hidden className="absolute inset-0" style={{ background: "linear-gradient(to top, rgba(0,0,0,0.78), rgba(0,0,0,0.3) 55%, rgba(0,0,0,0.4))" }} />
+    <section ref={ref} id="hs-poster" aria-labelledby="hs-poster-title" style={{ background: C.bg }}>
+      {/* GNB. 휴대폰은 햄버거 */}
+      <header className="relative border-b" style={{ borderColor: C.line, background: C.paper }}>
+        <div className="mx-auto flex h-16 max-w-[1200px] items-center justify-between gap-3 px-4 md:px-6">
+          <p>
+            <SampleLogo />
+          </p>
+          <nav aria-label="메뉴" className="hidden items-center gap-2 md:flex">
+            {GNB.map(([id, label]) => (
+              <button key={id} type="button" onClick={() => go(id)} className={`h-11 rounded-[4px] px-3 text-[16px] font-bold hover:underline hover:underline-offset-4 ${focusRing}`} style={{ outlineColor: C.ink }}>
+                {label}
+              </button>
+            ))}
+            <button type="button" data-gtm-cta="hair-salon_poster_cta" onClick={() => go("hs-reserve")} className={`hs-accent-bg ml-2 inline-flex h-11 items-center gap-1.5 rounded-[4px] px-4 text-[16px] font-bold text-white ${focusRing}`} style={{ outlineColor: C.ink }}>
+              <CalendarCheck size={18} aria-hidden />
+              예약
+            </button>
+          </nav>
+          <button
+            type="button"
+            onClick={() => setMenu((m) => !m)}
+            aria-expanded={menu}
+            aria-controls="hs-menu-panel"
+            aria-label={menu ? "메뉴 닫기" : "메뉴 열기"}
+            className={`inline-flex h-11 w-11 items-center justify-center rounded-[4px] md:hidden ${focusRing}`}
+            style={{ outlineColor: C.ink }}
+          >
+            {menu ? <X size={24} aria-hidden /> : <Menu size={24} aria-hidden />}
+          </button>
+        </div>
+        <AnimatePresence>
+          {menu && (
+            <motion.nav
+              id="hs-menu-panel"
+              aria-label="메뉴 펼침"
+              initial={reduce ? false : { opacity: 0, y: -6 }}
+              animate={{ opacity: 1, y: 0 }}
+              exit={reduce ? { opacity: 0, transition: { duration: 0 } } : { opacity: 0, y: -6 }}
+              transition={{ duration: 0.18, ease: EASE }}
+              className="absolute inset-x-0 top-full z-30 border-b px-4 pb-3 md:hidden"
+              style={{ borderColor: C.line, background: C.paper }}
+            >
+              {[...GNB, ["hs-reserve", "예약"], ["hs-location", "오시는 길"]].map(([id, label]) => (
+                <button key={id} type="button" onClick={() => jump(id)} className={`flex h-12 w-full items-center border-b text-left text-[17px] font-bold last:border-b-0 ${focusRing}`} style={{ borderColor: C.line, outlineColor: C.ink }}>
+                  {label}
+                </button>
+              ))}
+            </motion.nav>
+          )}
+        </AnimatePresence>
+      </header>
 
-      {/* 상호와 핵심 행동 하나 */}
-      <div className="relative z-10 flex items-center justify-between gap-3 px-4 pt-4 md:px-12 md:pt-7">
-        <p>
-          <SampleLogo light small />
-        </p>
-        <button
-          type="button"
-          data-gtm-cta="hair-salon_poster_cta"
-          onClick={onCta}
-          className={`inline-flex h-11 items-center gap-1.5 rounded-[6px] px-4 text-[15px] font-semibold ${focusRing}`}
-          style={{ background: "#fff", color: C.ink, outlineColor: "#fff" }}
-        >
-          <CalendarCheck size={18} aria-hidden />
-          예약하기
-        </button>
+      <div className="mx-auto grid max-w-[1200px] gap-x-10 gap-y-5 px-4 pb-10 pt-5 md:grid-cols-[minmax(0,3fr)_minmax(0,2fr)] md:grid-rows-[auto_minmax(0,1fr)] md:px-6 md:pt-8">
+        {/* 제목과 오늘 영업 */}
+        <div className="md:col-start-2 md:row-start-1">
+          <h1 id="hs-poster-title" className="text-[28px] font-bold leading-[1.25] tracking-[-0.03em] md:text-[32px] lg:text-[36px]" style={{ wordBreak: "keep-all" }}>
+            <span className="block">커트, 펌, 염색</span>
+            <span className="block">디자이너 지정 예약</span>
+          </h1>
+          <p className="mt-2 inline-flex flex-wrap items-center gap-x-2 text-[15px] font-medium" style={{ color: C.body }}>
+            <Clock size={16} aria-hidden />
+            {openToday ? `오늘 ${OPEN_H}:00 ~ ${CLOSE_H}:00, 당일 예약 가능` : "오늘 정기휴무, 화요일부터 예약 가능"}
+          </p>
+        </div>
+
+        {/* 이번 시즌 스타일 사진과 길이 칩 */}
+        <div className="md:col-start-1 md:row-span-2 md:row-start-1">
+          <div className="relative aspect-square w-full overflow-hidden rounded-[6px] sm:aspect-[4/3] md:aspect-auto md:h-[min(calc(100svh-190px),660px)] md:min-h-[440px]" style={{ background: C.soft }}>
+            <motion.div className="absolute inset-0" initial={reduce ? false : { scale: 1.05 }} animate={{ scale: 1 }} transition={{ duration: reduce ? 0 : 1.6, ease: EASE }}>
+              <AnimatePresence initial={false}>
+                <motion.img
+                  key={style.key}
+                  src={`${IMG}/style-${style.key}.jpg`}
+                  alt={`${LENGTHS[len].label} 기장 ${style.name}`}
+                  fetchPriority="high"
+                  initial={reduce ? false : { opacity: 0 }}
+                  animate={{ opacity: 1 }}
+                  exit={reduce ? { opacity: 0, transition: { duration: 0 } } : { opacity: 0 }}
+                  transition={{ duration: reduce ? 0 : 0.35 }}
+                  className="absolute inset-0 h-full w-full object-cover"
+                  style={{ objectPosition: "50% 22%", scale: 1.12 }}
+                />
+              </AnimatePresence>
+            </motion.div>
+            <p className="absolute bottom-3 left-3 rounded-[4px] px-2.5 py-1.5 text-[15px] font-bold" style={{ background: C.paper, color: C.ink }}>
+              {style.name}
+            </p>
+          </div>
+          <div role="radiogroup" aria-label="머리 길이" className="mt-3 grid grid-cols-4 gap-2">
+            {LENGTHS.map((l, i) => {
+              const on = i === len;
+              return (
+                <button
+                  key={l.label}
+                  type="button"
+                  role="radio"
+                  aria-checked={on}
+                  onClick={() => setLen(i)}
+                  className={`h-11 rounded-[4px] border text-[16px] font-bold ${focusRing}`}
+                  style={{ borderColor: on ? ACCENT : C.line, background: on ? ACCENT : C.paper, color: on ? "#fff" : C.ink, outlineColor: ACCENT }}
+                >
+                  {l.label}
+                </button>
+              );
+            })}
+          </div>
+        </div>
+
+        {/* 디자이너와 남은 시간 */}
+        <div className="min-w-0 md:col-start-2 md:row-start-2">
+          <ul aria-label="디자이너 예약 가능 시간" className="-mx-4 flex snap-x snap-mandatory gap-3 overflow-x-auto px-4 pb-1 md:mx-0 md:grid md:gap-0 md:overflow-visible md:border-t md:px-0" style={{ borderColor: C.line }}>
+            {DESIGNERS.map((d, i) => {
+              const own = cart.filter((id) => d.can.includes(id));
+              const need = Math.ceil(sum(own.length ? own : ["cut"], d).min / 30);
+              const { day, slots } = openStarts(i, need, today, nowMin);
+              const dayLabel = day === 0 ? "오늘" : day === 1 ? "내일" : `${DOW[daysAgo(today, -day).getDay()]}요일`;
+              return (
+                <li key={d.id} className="w-[76%] shrink-0 snap-start rounded-[6px] border p-3 md:w-auto md:rounded-none md:border-x-0 md:border-t-0 md:px-0 md:py-3" style={{ borderColor: C.line, background: C.paper }}>
+                  <div className="flex items-center gap-3">
+                    {/* eslint-disable-next-line @next/next/no-img-element -- 정적 export 라 next/image 최적화를 쓰지 않는다 */}
+                    <img src={`${IMG}/designer-${d.id}.jpg`} alt="" width={56} height={56} className="h-14 w-14 shrink-0 rounded-full object-cover" style={{ objectPosition: "50% 20%" }} />
+                    <div className="min-w-0">
+                      <p className="text-[17px] font-bold leading-tight">
+                        <span className="mr-1.5 text-[14px] font-semibold" style={{ color: C.muted }}>
+                          {d.role}
+                        </span>
+                        {d.name}
+                        {i === dIdx && (
+                          <span className="ml-1.5 inline-flex items-center gap-0.5 rounded-[3px] px-1.5 py-0.5 align-middle text-[12px] font-bold text-white" style={{ background: ACCENT }}>
+                            <Check size={12} aria-hidden /> 선택
+                          </span>
+                        )}
+                      </p>
+                      <p className="mt-0.5 truncate text-[14px]" style={{ color: C.body }}>
+                        {d.good}
+                      </p>
+                    </div>
+                  </div>
+                  <div className="mt-2.5 flex flex-wrap items-center gap-1.5">
+                    <span className="w-full text-[13px] font-semibold md:w-auto md:pr-1" style={{ color: C.muted }}>
+                      {slots.length ? `${dayLabel} 예약 가능` : "예약 마감"}
+                    </span>
+                    {slots.map((s) => (
+                      <button
+                        key={s}
+                        type="button"
+                        data-gtm-cta="hair-salon_poster_slot"
+                        onClick={() => onPick(i, { day, slot: s })}
+                        aria-label={`${d.name} ${dayLabel} ${slotLabel(s)} 예약`}
+                        className={`h-11 min-w-[64px] rounded-[4px] border px-2.5 text-[15px] font-bold tabular-nums hover:bg-[var(--hs-accent)] hover:text-white ${focusRing}`}
+                        style={{ borderColor: ACCENT, color: ACCENT, outlineColor: ACCENT }}
+                      >
+                        {slotLabel(s)}
+                      </button>
+                    ))}
+                  </div>
+                </li>
+              );
+            })}
+          </ul>
+        </div>
       </div>
 
-      {/* 문장 */}
-      <div className={`relative z-10 mt-auto px-4 pb-14 md:px-12 md:pb-20 ${reduce ? "" : "hs-rise"}`}>
-        <h1 id="hs-poster-title" className="text-[36px] font-bold leading-[1.2] tracking-[-0.03em] md:text-[clamp(40px,5vw,72px)]" style={{ wordBreak: "keep-all" }}>
-          <span className="block">커트, 펌, 염색</span>
-          <span className="block">디자이너 지정 예약</span>
-        </h1>
-        <p className="mt-4 text-[16px] md:text-[18px]" style={{ color: "rgba(255,255,255,0.85)" }}>
-          화~일 {OPEN_H}:00 ~ {CLOSE_H}:00, 당일 예약 가능
-        </p>
-      </div>
+      {/* 휴대폰 하단 고정 예약 버튼. 첫 화면이 보일 때만 */}
+      <AnimatePresence>
+        {inView && (
+          <motion.div
+            initial={reduce ? false : { y: 16, opacity: 0 }}
+            animate={{ y: 0, opacity: 1 }}
+            exit={reduce ? { opacity: 0, transition: { duration: 0 } } : { y: 16, opacity: 0 }}
+            transition={{ duration: 0.2, ease: EASE }}
+            className="fixed inset-x-0 bottom-0 z-40 border-t px-4 py-3 md:hidden"
+            style={{ borderColor: C.line, background: C.paper }}
+          >
+            <button type="button" data-gtm-cta="hair-salon_poster_cta" onClick={() => go("hs-reserve")} className={`hs-accent-bg flex h-12 w-full items-center justify-center gap-1.5 rounded-[6px] text-[17px] font-bold text-white ${focusRing}`} style={{ outlineColor: C.ink }}>
+              <CalendarCheck size={18} aria-hidden />
+              예약
+            </button>
+          </motion.div>
+        )}
+      </AnimatePresence>
     </section>
   );
 }

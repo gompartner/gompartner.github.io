@@ -1,8 +1,8 @@
 "use client";
 
 import { useEffect, useMemo, useRef, useState, type FormEvent } from "react";
-import { motion, useScroll, useTransform } from "framer-motion";
-import { Car, Check, Clock, Dog, Flame, MapPin, Minus, Phone, Plus, Tent, Toilet, Trees, Users, Zap } from "lucide-react";
+import { AnimatePresence, motion, useInView } from "framer-motion";
+import { Car, Check, Clock, Dog, Flame, MapPin, Menu, Minus, Phone, Plus, Tent, Toilet, Trees, Users, X, Zap } from "lucide-react";
 import { useReducedMotionSafe } from "@/hooks/useReducedMotionSafe";
 import { maskName, maskPhone } from "@/components/demos/LeadReceivedPanel";
 import { daysAgo, fmtKo, useDemoToday } from "@/hooks/useDemoToday";
@@ -31,7 +31,6 @@ import { DemoMakerInfo } from "@/components/demos/DemoMakerInfo";
    4. 예약 신청: 이름, 휴대폰, 인원, 차량 수. 접수 완료 화면에 예약번호와 입금 안내가 나온다.
    5. 이용 안내와 오시는 길: 입퇴실 시간, 매너타임, 화기 규정, 반려동물, 환불 규정, 나들목 기준 길 안내. */
 
-const BRAND = "곰파트너";
 const TEL = "033-000-0000";
 const ADDRESS = "강원 ㅍㅊ군 ㅇㅇ면 ㅇㅇ로 00";
 const BANK = "ㄱㅁ은행 000-000000-00-000 (예금주 곰파트너)";
@@ -199,10 +198,8 @@ export function CampsiteDemo() {
 
   const go = (id: string) => document.getElementById(id)?.scrollIntoView({ behavior: reduce ? "auto" : "smooth", block: "start" });
 
-  // 이번 주말(다가오는 토요일 밤) 빈 데크 수. 첫 화면 띠에 보인다.
+  // 첫 화면 입실일 기본값: 다가오는 토요일
   const satIdx = (6 - today.getDay() + 7) % 7 || 7;
-  const satDate = daysAgo(today, -satIdx);
-  const freeDecks = SITES.filter((s, i) => s.type === "deck" && !isFull(i, satIdx, satDate)).length;
 
   const nights = useMemo(() => {
     const from = range.in;
@@ -235,69 +232,19 @@ export function CampsiteDemo() {
         .cp-hatch { background-image: repeating-linear-gradient(135deg, rgba(17,17,17,0.14) 0 3px, transparent 3px 8px); }
       `}</style>
 
-      <Poster reduce={reduce} onCta={() => go("cp-calendar")} />
-
-      <header className="sticky top-0 z-30" style={{ background: C.nightDeep, color: C.paper }}>
-        <div className="mx-auto flex max-w-[1200px] items-center justify-between gap-3 px-4 py-3 md:px-6">
-          <a href="#cp-hero" onClick={(e) => { e.preventDefault(); window.scrollTo({ top: 0, behavior: reduce ? "auto" : "smooth" }); }} className={`inline-flex items-center gap-2 ${focusRing}`} style={{ outlineColor: C.paper }}>
-            <SampleLogo light />
-          </a>
-          <nav aria-label="메뉴" className="hidden items-center gap-5 text-[15px] md:flex">
-            {[
-              ["cp-map", "사이트 안내"],
-              ["cp-price", "요금 안내"],
-              ["cp-calendar", "실시간 예약"],
-              ["cp-info", "이용 안내"],
-              ["cp-way", "오시는 길"],
-            ].map(([id, label]) => (
-              <a key={id} href={`#${id}`} onClick={(e) => { e.preventDefault(); go(id); }} className={`rounded px-1 py-1 underline-offset-4 hover:underline ${focusRing}`} style={{ outlineColor: C.paper }}>
-                {label}
-              </a>
-            ))}
-          </nav>
-          <button type="button" onClick={() => go("cp-calendar")} data-gtm-cta="campsite_reserve_top" className={`${btn} rounded-[6px] px-4 py-2 text-[15px]`} style={{ background: C.fire, color: "#fff", outlineColor: C.paper }}>
-            예약하기
-          </button>
-        </div>
-      </header>
-
-      {/* 원래 첫 화면: 상호와 사이트 구성, 요금 요약. 밤 장면은 포스터가 맡아서 정지 띠로 둔다 */}
-      <section id="cp-hero" aria-labelledby="cp-hero-title" style={{ background: C.night, color: C.paper }}>
-        <div className="mx-auto max-w-[1200px] px-4 py-12 md:px-6 md:py-16">
-          <h2 id="cp-hero-title" className="text-[34px] font-bold leading-[1.2] md:text-[48px]" style={{ color: C.paper }}>
-            {BRAND}
-          </h2>
-          <p className="mt-3 max-w-[560px] text-[17px] leading-[1.6] md:text-[20px]" style={{ color: C.paper }}>
-            강가 데크 8면, 숲속 데크 8면, 잔디 오토 사이트 6면, 글램핑 2동. 입실 14시, 퇴실 11시.
-          </p>
-          <div className="mt-6 flex flex-wrap gap-2">
-            <button type="button" onClick={() => go("cp-calendar")} data-gtm-cta="campsite_reserve_hero" className={`${btn} rounded-[8px] px-5 py-3 text-[17px]`} style={{ background: C.fire, color: "#fff", outlineColor: C.paper }}>
-              실시간 예약
-            </button>
-            <button type="button" onClick={() => go("cp-map")} className={`${btn} rounded-[8px] border px-5 py-3 text-[17px]`} style={{ borderColor: "rgba(255,255,255,0.6)", color: C.paper, outlineColor: C.paper }}>
-              사이트 안내
-            </button>
-          </div>
-          <dl className="mt-8 grid max-w-[640px] grid-cols-2 gap-x-6 gap-y-3 border-t pt-4 text-[15px] md:grid-cols-4" style={{ borderColor: "rgba(246,243,234,0.2)", color: C.paper }}>
-            <div>
-              <dt className="text-[13px] opacity-80">데크 평일</dt>
-              <dd className="font-bold tabular-nums">{won(RATE.deck.weekday)}</dd>
-            </div>
-            <div>
-              <dt className="text-[13px] opacity-80">데크 주말</dt>
-              <dd className="font-bold tabular-nums">{won(RATE.deck.weekend)}</dd>
-            </div>
-            <div>
-              <dt className="text-[13px] opacity-80">글램핑</dt>
-              <dd className="font-bold tabular-nums">{won(RATE.glamp.weekday)}~</dd>
-            </div>
-            <div>
-              <dt className="text-[13px] opacity-80">{satDate.getMonth() + 1}월 {satDate.getDate()}일(토) 빈 데크</dt>
-              <dd className="font-bold tabular-nums">{freeDecks}면</dd>
-            </div>
-          </dl>
-        </div>
-      </section>
+      <Poster
+        reduce={reduce}
+        today={today}
+        defaultDay={satIdx}
+        go={go}
+        onZone={(id, d) => {
+          const inD = daysAgo(today, -d);
+          setSiteId(id);
+          setRange({ in: inD, out: daysAgo(inD, -1) });
+          setBooking(null);
+          go("cp-map");
+        }}
+      />
 
       {/* 실시간 예약: 왼쪽 배치도, 오른쪽 달력과 대여, 신청 */}
       <section aria-labelledby="cp-reserve-title" className="mx-auto max-w-[1200px] px-4 pt-12 md:px-6 md:pt-16">
@@ -405,12 +352,10 @@ export function CampsiteDemo() {
 
 const IMG = "/images/demo-campsite";
 
-/* 포스터 모션(ms). 사진 다가오기 1600, 문장은 300 늦게 700 동안 12px 올라오며 나타난다(CSS keyframes, 끝 상태가 기본값).
-   스크롤하면 사진만 포스터 높이의 8%까지 느리게 내려간다. 동작 줄이기면 모두 끈다. */
+/* 첫 화면 모션(ms). 사진이 1.06배에서 1600 동안 제자리로 온다(CSS keyframes, 끝 상태가 기본값). 동작 줄이기면 끈다. */
 const HERO_IN_MS = 1600;
 const HERO_TEXT_DELAY_MS = 300;
 const HERO_TEXT_MS = 700;
-const HERO_PARALLAX = 8;
 const EASE_CSS = `cubic-bezier(${EASE.join(",")})`;
 
 const HERO_CSS = `
@@ -421,50 +366,266 @@ const HERO_CSS = `
 @media (prefers-reduced-motion: reduce) { .cp-hero-photo, .cp-hero-rise { animation: none; } }
 `;
 
-function Poster({ reduce, onCta }: { reduce: boolean; onCta: () => void }) {
-  const wrapRef = useRef<HTMLElement>(null);
-  const { scrollYProgress } = useScroll({ target: wrapRef, offset: ["start start", "end start"] });
-  const photoY = useTransform(scrollYProgress, (v) => `${v * HERO_PARALLAX}%`);
+/** 첫 화면 구역 목록. 사진은 구역마다 한 장 */
+const ZONE_ROWS: { zone: Zone; photo: string; alt: string }[] = [
+  { zone: "A", photo: "zone-A.jpg", alt: "강가에 놓인 나무 데크와 텐트" },
+  { zone: "B", photo: "zone-B.jpg", alt: "잣나무 숲 안 나무 데크 위 텐트" },
+  { zone: "C", photo: "zone-C.jpg", alt: "잔디 사이트 옆에 차를 댄 오토캠핑 텐트" },
+  { zone: "G", photo: "zone-G.jpg", alt: "데크 위에 세운 글램핑 벨텐트" },
+];
+const GNB: [string, string][] = [
+  ["cp-price", "사이트 안내"],
+  ["cp-map", "배치도"],
+  ["cp-info", "이용 규칙"],
+  ["cp-way", "오시는 길"],
+];
+const NIGHT_OPTIONS = 14;
+const sizeText = (sites: Site[]) => {
+  const set = [...new Set(sites.map((s) => `${s.size[0]}x${s.size[1]}m`))];
+  return set.join(", ");
+};
+
+function Poster({
+  reduce,
+  today,
+  defaultDay,
+  go,
+  onZone,
+}: {
+  reduce: boolean;
+  today: Date;
+  defaultDay: number;
+  go: (id: string) => void;
+  onZone: (siteId: string, dayIdx: number) => void;
+}) {
+  const ref = useRef<HTMLElement>(null);
+  const inView = useInView(ref, { amount: 0.3 });
+  const [menu, setMenu] = useState(false);
+  const [day, setDay] = useState<number | null>(null);
+  const [hover, setHover] = useState<Zone | null>(null);
+  const dayIdx = day ?? defaultDay;
+  const date = daysAgo(today, -dayIdx);
+  const row = hover ? ZONE_ROWS.find((r) => r.zone === hover)! : null;
+
+  useEffect(() => {
+    if (!menu) return;
+    const f = (e: KeyboardEvent) => e.key === "Escape" && setMenu(false);
+    window.addEventListener("keydown", f);
+    return () => window.removeEventListener("keydown", f);
+  }, [menu]);
+
+  const jump = (id: string) => {
+    setMenu(false);
+    go(id);
+  };
 
   return (
-    <section id="cp-poster" ref={wrapRef} aria-labelledby="cp-poster-title" className="relative flex min-h-[100svh] flex-col overflow-hidden text-white" style={{ background: C.night }}>
-      <style>{HERO_CSS}</style>
-      <motion.div aria-hidden className="absolute inset-0" style={{ y: reduce ? 0 : photoY }}>
-        <div className={`absolute inset-0 ${reduce ? "" : "cp-hero-photo"}`}>
-          {/* eslint-disable-next-line @next/next/no-img-element -- 정적 export 라 next/image 최적화를 쓰지 않는다 */}
-          <img
-            src={`${IMG}/hero.jpg`}
-            srcSet={`${IMG}/hero-sm.jpg 960w, ${IMG}/hero.jpg 1920w`}
-            sizes="100vw"
-            alt="별이 뜬 밤 숲 아래 불빛이 켜진 텐트 두 동이 있는 캠핑장 잔디밭"
-            fetchPriority="high"
-            className="absolute inset-0 h-full w-full object-cover"
-            style={{ objectPosition: "35% 55%" }}
-          />
+    <>
+      {/* GNB. 먹색 띠로 페이지 내내 위에 붙는다. 휴대폰은 햄버거 */}
+      <header className="sticky top-0 z-30" style={{ background: C.nightDeep, color: C.paper }}>
+        <div className="mx-auto flex h-16 max-w-[1200px] items-center justify-between gap-3 px-4 md:px-6">
+          <SampleLogo light />
+          <nav aria-label="메뉴" className="hidden items-center gap-1 md:flex">
+            {GNB.map(([id, label]) => (
+              <button key={id} type="button" onClick={() => go(id)} className={`h-11 rounded px-3 text-[16px] font-semibold underline-offset-4 hover:underline ${focusRing}`} style={{ outlineColor: C.paper }}>
+                {label}
+              </button>
+            ))}
+            <button type="button" onClick={() => go("cp-calendar")} data-gtm-cta="campsite_poster_cta" className={`${btn} ml-2 h-11 rounded-[6px] px-4 text-[16px]`} style={{ background: C.fire, color: "#fff", outlineColor: C.paper }}>
+              예약
+            </button>
+          </nav>
+          <button
+            type="button"
+            onClick={() => setMenu((m) => !m)}
+            aria-expanded={menu}
+            aria-controls="cp-menu-panel"
+            aria-label={menu ? "메뉴 닫기" : "메뉴 열기"}
+            className={`inline-flex h-11 w-11 items-center justify-center rounded md:hidden ${focusRing}`}
+            style={{ outlineColor: C.paper }}
+          >
+            {menu ? <X size={24} aria-hidden /> : <Menu size={24} aria-hidden />}
+          </button>
         </div>
-      </motion.div>
-      <div aria-hidden className="absolute inset-0" style={{ background: "linear-gradient(to bottom, rgba(0,0,0,0.5), rgba(0,0,0,0.2) 28%, rgba(0,0,0,0.25) 62%, rgba(0,0,0,0.45))" }} />
+        <AnimatePresence>
+          {menu && (
+            <motion.nav
+              id="cp-menu-panel"
+              aria-label="메뉴 펼침"
+              initial={reduce ? false : { opacity: 0, y: -6 }}
+              animate={{ opacity: 1, y: 0 }}
+              exit={reduce ? { opacity: 0, transition: { duration: 0 } } : { opacity: 0, y: -6 }}
+              transition={{ duration: 0.18, ease: EASE }}
+              className="absolute inset-x-0 top-full px-4 pb-3 md:hidden"
+              style={{ background: C.nightDeep }}
+            >
+              {[...GNB, ["cp-calendar", "예약"]].map(([id, label]) => (
+                <button key={id} type="button" onClick={() => jump(id)} className={`flex h-12 w-full items-center border-t text-left text-[17px] font-semibold ${focusRing}`} style={{ borderColor: "rgba(255,255,255,0.15)", outlineColor: C.paper }}>
+                  {label}
+                </button>
+              ))}
+            </motion.nav>
+          )}
+        </AnimatePresence>
+      </header>
 
-      {/* 왼쪽 위 상호, 오른쪽 위 예약하기 */}
-      <div className="relative z-10 mx-auto flex w-full max-w-[1200px] items-center justify-between px-4 pt-4 md:px-6 md:pt-7">
-        <SampleLogo light small />
-        <button type="button" onClick={onCta} data-gtm-cta="campsite_poster_cta" className={`${btn} rounded-[6px] bg-white px-4 py-2.5 text-[15px] hover:bg-[#f0f0f0]`} style={{ color: C.ink, outlineColor: "#ffffff" }}>
-          예약하기
-        </button>
-      </div>
+      <section id="cp-poster" ref={ref} aria-labelledby="cp-poster-title" style={{ background: C.paper }}>
+        <style>{HERO_CSS}</style>
+        <div className="mx-auto grid max-w-[1200px] gap-5 px-4 pb-8 pt-5 md:grid-cols-[minmax(0,3fr)_minmax(0,2fr)] md:gap-8 md:px-6 md:pt-8">
+          {/* 왼쪽: 캠핑장 사진. 구역에 마우스를 올리면 그 구역 사진과 번호로 바뀐다 */}
+          <div className="relative aspect-[4/3] overflow-hidden rounded-[8px] md:aspect-auto md:h-[min(calc(100svh-200px),620px)] md:min-h-[420px]" style={{ background: C.night }}>
+            <div className={`absolute inset-0 ${reduce ? "" : "cp-hero-photo"}`}>
+              <AnimatePresence initial={false}>
+                <motion.img
+                  key={row ? row.zone : "hero"}
+                  src={row ? `${IMG}/${row.photo}` : `${IMG}/hero.jpg`}
+                  srcSet={row ? undefined : `${IMG}/hero-sm.jpg 960w, ${IMG}/hero.jpg 1920w`}
+                  sizes="(min-width: 768px) 60vw, 100vw"
+                  alt={row ? row.alt : "별이 뜬 밤 숲 아래 불빛이 켜진 텐트 두 동이 있는 캠핑장 잔디밭"}
+                  fetchPriority={row ? undefined : "high"}
+                  initial={reduce ? false : { opacity: 0 }}
+                  animate={{ opacity: 1 }}
+                  exit={reduce ? { opacity: 0, transition: { duration: 0 } } : { opacity: 0 }}
+                  transition={{ duration: reduce ? 0 : 0.35 }}
+                  className="absolute inset-0 h-full w-full object-cover"
+                  style={{ objectPosition: row ? "50% 55%" : "35% 60%" }}
+                />
+              </AnimatePresence>
+            </div>
+            {/* 구역 번호 라벨 */}
+            <ul aria-label="구역 번호" className="absolute bottom-3 left-3 right-3 flex flex-wrap gap-1.5">
+              {ZONE_ROWS.map((r) => {
+                const ids = SITES.filter((s) => s.zone === r.zone).map((s) => s.id);
+                const on = hover === r.zone;
+                return (
+                  <li key={r.zone}>
+                    <button
+                      type="button"
+                      onClick={() => {
+                        setHover(r.zone);
+                        document.getElementById(`cp-zone-${r.zone}`)?.scrollIntoView({ behavior: reduce ? "auto" : "smooth", block: "nearest" });
+                      }}
+                      className={`h-11 rounded-[4px] px-2.5 text-[14px] font-bold tabular-nums ${focusRing}`}
+                      style={{ background: on ? C.fire : "rgba(255,255,255,0.94)", color: on ? "#fff" : C.ink, outlineColor: "#fff" }}
+                    >
+                      {r.zone === "G" ? `${ids[0]}, ${ids[ids.length - 1]}` : `${ids[0]}~${ids[ids.length - 1]}`}
+                    </button>
+                  </li>
+                );
+              })}
+            </ul>
+          </div>
 
-      {/* 문장은 숲 그림자 위(사진 가운데 높이)에 둔다. 아래쪽 텐트 불빛과 겹치지 않게 */}
-      <div className="relative z-10 mx-auto flex w-full max-w-[1200px] flex-1 items-center px-4 pb-[16svh] md:px-6">
-        <div className={reduce ? "" : "cp-hero-rise"}>
-          <h1 id="cp-poster-title" className="max-w-[14em] text-[36px] font-bold md:text-[clamp(40px,5vw,72px)]" style={{ letterSpacing: "-0.03em", lineHeight: 1.2, wordBreak: "keep-all" }}>
-            장작과 화로를 갖춘
-            <br />
-            숲속 오토캠핑장
-          </h1>
-          <p className="mt-4 text-[16px] font-medium text-white/90 md:text-[18px]">강원 ㅍㅊ군, 입실 14시</p>
+          {/* 오른쪽: 날짜 한 칸과 구역 목록 */}
+          <div className="flex min-w-0 flex-col">
+            <h1 id="cp-poster-title" className="text-[26px] font-bold leading-[1.25] md:text-[30px]" style={{ color: C.night, letterSpacing: "-0.03em", wordBreak: "keep-all" }}>
+              장작과 화로를 갖춘
+              <br />
+              숲속 오토캠핑장
+            </h1>
+            <label className="mt-4 block">
+              <span className="text-[14px] font-bold" style={{ color: C.muted }}>
+                입실일
+              </span>
+              <select
+                value={dayIdx}
+                onChange={(e) => setDay(Number(e.target.value))}
+                className={`mt-1.5 block h-12 w-full rounded-[6px] border bg-white px-3 text-[16px] font-semibold tabular-nums ${focusRing}`}
+                style={{ borderColor: C.edge, color: C.ink, outlineColor: C.fire }}
+              >
+                {Array.from({ length: NIGHT_OPTIONS }, (_, i) => {
+                  const d = daysAgo(today, -i);
+                  return (
+                    <option key={i} value={i}>
+                      {fmtKo(d)} 1박{isPeakNight(d) ? ", 주말 요금" : ""}
+                    </option>
+                  );
+                })}
+              </select>
+            </label>
+            <ul aria-label="구역별 남은 자리" className="mt-3 border-t" style={{ borderColor: C.line }} onMouseLeave={() => setHover(null)}>
+              {ZONE_ROWS.map((r) => {
+                const sites = SITES.filter((s) => s.zone === r.zone);
+                const freeIds = sites.filter((s) => !isFull(SITES.indexOf(s), dayIdx, date)).map((s) => s.id);
+                const rate = RATE[sites[0].type];
+                const power = sites.filter((s) => s.power).length;
+                const left = freeIds.length;
+                return (
+                  <li key={r.zone} id={`cp-zone-${r.zone}`} className="border-b" style={{ borderColor: C.line }}>
+                    <button
+                      type="button"
+                      disabled={left === 0}
+                      onMouseEnter={() => setHover(r.zone)}
+                      onFocus={() => setHover(r.zone)}
+                      onClick={() => onZone(freeIds[0], dayIdx)}
+                      className={`grid w-full grid-cols-[minmax(0,1fr)_auto] items-center gap-x-3 px-2 py-3 text-left disabled:cursor-not-allowed ${focusRing}`}
+                      style={{ background: hover === r.zone ? C.fireSoft : "transparent", outlineColor: C.fire }}
+                    >
+                      <span className="min-w-0">
+                        <span className="block text-[17px] font-bold" style={{ color: left ? C.night : C.muted }}>
+                          {ZONES[r.zone].name}
+                        </span>
+                        <span className="mt-0.5 block text-[14px] tabular-nums" style={{ color: C.body }}>
+                          {sizeText(sites)}, 기준 {rate.base}명 최대 {MAX_PEOPLE}명, 전기 {power === sites.length ? "전 사이트" : `${power}면`}
+                        </span>
+                      </span>
+                      <span className="text-right">
+                        <span className="block text-[13px] font-bold" style={{ color: left ? C.fireText : C.muted }}>
+                          {left ? "예약 가능" : "예약 마감"}
+                        </span>
+                        <span className="block text-[17px] font-bold tabular-nums" style={{ color: left ? C.ink : C.muted }}>
+                          {left}
+                          <span className="text-[13px] font-normal" style={{ color: C.muted }}>
+                            /{sites.length}
+                            {r.zone === "G" ? "동" : "면"}
+                          </span>
+                        </span>
+                      </span>
+                    </button>
+                  </li>
+                );
+              })}
+            </ul>
+          </div>
         </div>
-      </div>
-    </section>
+
+        {/* 이용 규칙 한 줄 띠 */}
+        <div style={{ background: C.paperDim }}>
+          <ul aria-label="이용 규칙" className="mx-auto flex max-w-[1200px] flex-wrap gap-x-6 gap-y-1.5 px-4 py-3 text-[15px] md:px-6" style={{ color: C.body }}>
+            <li className="inline-flex items-center gap-1.5">
+              <Clock size={16} aria-hidden style={{ color: C.fireDeep }} /> 매너타임 22:00~07:00
+            </li>
+            <li className="inline-flex items-center gap-1.5">
+              <Dog size={16} aria-hidden style={{ color: C.fireDeep }} /> 반려동물 C구역만
+            </li>
+            <li className="inline-flex items-center gap-1.5">
+              <Flame size={16} aria-hidden style={{ color: C.fireDeep }} /> 화로대 위에서만, 바닥 직화 금지
+            </li>
+            <li className="inline-flex items-center gap-1.5">
+              <Tent size={16} aria-hidden style={{ color: C.fireDeep }} /> 입실 14:00, 퇴실 11:00
+            </li>
+          </ul>
+        </div>
+
+        {/* 휴대폰 하단 고정 예약 버튼. 첫 화면이 보일 때만 */}
+        <AnimatePresence>
+          {inView && (
+            <motion.div
+              initial={reduce ? false : { y: 16, opacity: 0 }}
+              animate={{ y: 0, opacity: 1 }}
+              exit={reduce ? { opacity: 0, transition: { duration: 0 } } : { y: 16, opacity: 0 }}
+              transition={{ duration: 0.2, ease: EASE }}
+              className="fixed inset-x-0 bottom-0 z-40 border-t bg-white px-4 py-3 md:hidden"
+              style={{ borderColor: C.line }}
+            >
+              <button type="button" onClick={() => go("cp-calendar")} data-gtm-cta="campsite_poster_cta" className={`${btn} h-12 w-full rounded-[6px] text-[17px]`} style={{ background: C.fire, color: "#fff", outlineColor: C.fire }}>
+                날짜 고르고 예약
+              </button>
+            </motion.div>
+          )}
+        </AnimatePresence>
+      </section>
+    </>
   );
 }
 

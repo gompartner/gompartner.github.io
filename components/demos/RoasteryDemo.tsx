@@ -384,31 +384,10 @@ export function RoasteryDemo() {
       return next;
     });
 
-  const navBtn = `rounded-[4px] px-2.5 py-1.5 text-[15px] hover:underline underline-offset-4 ${focusRing}`;
 
   return (
     <div className="min-h-screen overflow-x-clip pb-24" style={{ background: C.paper, color: C.ink }}>
-      <Poster reduce={reduce} onCta={() => go("rs-beans")} />
-
-      <header className="mx-auto flex max-w-[1200px] flex-wrap items-center justify-between gap-x-4 gap-y-2 px-4 py-4 md:px-6">
-        <h2 className="leading-none">
-          <BrandLogo />
-        </h2>
-        <nav aria-label="주요 메뉴" className="-mx-2 flex flex-wrap items-center" style={{ outlineColor: C.ink }}>
-          {[
-            ["rs-beans", "원두"],
-            ["rs-notes", "로스팅 포인트"],
-            ["rs-subscribe", "정기 구독"],
-            ["rs-wholesale", "도매 문의"],
-            ["rs-visit", "오시는 길"],
-            ["rs-notice", "공지"],
-          ].map(([id, label]) => (
-            <button key={id} type="button" onClick={() => go(id)} className={navBtn} style={{ outlineColor: C.ink }}>
-              {label}
-            </button>
-          ))}
-        </nav>
-      </header>
+      <Poster reduce={reduce} today={today} cart={cart} bags={bags} onAdd={add} go={go} />
 
       <RoastScene reduce={reduce} />
 
@@ -579,72 +558,201 @@ function BrandLogo() {
 
 /* ---------- 0. 포스터 첫 화면 ---------- */
 
-function Poster({ reduce, onCta }: { reduce: boolean; onCta: () => void }) {
-  const ref = useRef<HTMLElement>(null);
-  const { scrollYProgress } = useScroll({
-    target: ref,
-    offset: ["start start", "end start"],
-  });
-  // 스크롤하면 사진만 조금 느리게 내려간다
-  const photoY = useTransform(scrollYProgress, (v) => (reduce ? "0%" : `${v * 8}%`));
+/** 첫 화면 표에 올리는 이번 주 원두 5종(배전이 고르게 섞이게) */
+const POSTER_BEANS = ["yirg", "huila", "morning", "guate", "mandheling"].map(beanById);
+const GNB: [string, string][] = [
+  ["rs-beans", "원두"],
+  ["rs-subscribe", "구독"],
+  ["rs-wholesale", "도매"],
+  ["rs-visit", "매장"],
+];
+/** 오늘이나 그 전 가장 가까운 로스팅 날(화, 금) */
+const lastRoastDay = (d: Date) => {
+  for (let n = 0; n < 7; n++) {
+    const x = daysAgo(d, n);
+    if (x.getDay() === 2 || x.getDay() === 5) return x;
+  }
+  return d;
+};
+
+function Poster({
+  reduce,
+  today,
+  cart,
+  bags,
+  onAdd,
+  go,
+}: {
+  reduce: boolean;
+  today: Date;
+  cart: Cart;
+  bags: number;
+  onAdd: (id: string, d: number) => void;
+  go: (id: string) => void;
+}) {
+  // 표 행에 마우스를 올리거나 포커스하면 위 사진 띠가 그 원두의 배전 사진으로 바뀐다
+  const [hover, setHover] = useState<Roast | null>(null);
+  const photo = hover
+    ? { src: `${IMG}/${ROAST_PHOTO[hover]}`, alt: `${hover} 로스트 원두`, pos: "50% 50%" }
+    : { src: `${IMG}/hero.jpg`, alt: "로스터 냉각판 위에서 식고 있는 갓 볶은 원두", pos: "45% 50%" };
+  const roastDay = lastRoastDay(today);
+  const navBtn = `inline-flex h-11 shrink-0 items-center rounded-[4px] px-3 text-[16px] font-semibold hover:underline underline-offset-4 ${focusRing}`;
 
   return (
-    <section id="rs-poster" ref={ref} aria-labelledby="rs-poster-title" className="relative flex min-h-[100svh] flex-col overflow-hidden" style={{ background: "#141414", color: "#fff" }}>
-      <style>{`
-        @keyframes rs-rise { from { opacity: 0; transform: translateY(12px); } to { opacity: 1; transform: none; } }
-        .rs-rise { animation: rs-rise 0.7s cubic-bezier(0.22, 1, 0.36, 1) 0.3s both; }
-        @keyframes rs-bob { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(6px); } }
-        .rs-bob { animation: rs-bob 1.4s ease-in-out infinite; }
-        @media (prefers-reduced-motion: reduce) { .rs-rise, .rs-bob { animation: none; } }
-      `}</style>
-      <motion.div className="absolute inset-0" style={{ y: photoY }} initial={reduce ? false : { scale: 1.06 }} animate={{ scale: 1 }} transition={{ duration: reduce ? 0 : 1.6, ease: EASE }}>
-        {/* eslint-disable-next-line @next/next/no-img-element -- 정적 export 라 next/image 최적화를 쓰지 않는다 */}
-        <img
-          src={`${IMG}/hero.jpg`}
-          srcSet={`${IMG}/hero-sm.jpg 960w, ${IMG}/hero.jpg 1920w`}
-          sizes="100vw"
-          alt="로스터 냉각판 위에서 식고 있는 갓 볶은 원두"
-          fetchPriority="high"
-          className="absolute inset-0 h-full w-full object-cover"
-          style={{ objectPosition: "45% 50%" }}
-        />
-      </motion.div>
-      <div
-        aria-hidden
-        className="absolute inset-0"
-        style={{
-          background: "linear-gradient(to top, rgba(0,0,0,0.72), rgba(0,0,0,0.2) 55%, rgba(0,0,0,0.35))",
-        }}
-      />
+    <section id="rs-poster" aria-labelledby="rs-poster-title" style={{ background: C.paper, color: C.ink }}>
+      {/* GNB */}
+      <header className="border-b" style={{ borderColor: C.line }}>
+        <div className="mx-auto flex max-w-[1200px] flex-wrap items-center justify-between gap-x-4 px-4 pt-3 md:flex-nowrap md:px-6 md:py-3">
+          <p className="leading-none">
+            <BrandLogo />
+          </p>
+          <nav aria-label="주요 메뉴" className="order-3 -mx-3 flex w-full gap-1 overflow-x-auto md:order-2 md:mx-0 md:w-auto md:gap-4">
+            {GNB.map(([id, label]) => (
+              <button key={id} type="button" onClick={() => go(id)} className={navBtn} style={{ outlineColor: C.ink }}>
+                {label}
+              </button>
+            ))}
+          </nav>
+          <button
+            type="button"
+            onClick={() => go("rs-beans")}
+            aria-label={`장바구니 ${bags}봉`}
+            className={`relative order-2 inline-flex h-11 w-11 items-center justify-center rounded-[6px] md:order-3 ${focusRing}`}
+            style={{ outlineColor: C.ink }}
+          >
+            <ShoppingBag size={22} aria-hidden />
+            {bags > 0 && (
+              <span className="absolute right-0.5 top-0.5 inline-flex h-5 min-w-5 items-center justify-center rounded-full px-1 text-[12px] font-bold tabular-nums text-white" style={{ background: C.accent }}>
+                {bags}
+              </span>
+            )}
+          </button>
+        </div>
+      </header>
 
-      {/* 로고와 핵심 행동 하나 */}
-      <div className="relative z-10 flex items-center justify-between gap-3 px-4 pt-4 md:px-12 md:pt-7">
-        <p className="leading-none" style={{ color: "#fff" }}>
-          <BrandLogo />
-        </p>
-        <button
-          type="button"
-          onClick={onCta}
-          data-gtm-cta="roastery_poster_cta"
-          className={`inline-flex h-11 items-center gap-1.5 rounded-[6px] px-4 text-[15px] font-semibold ${focusRing}`}
-          style={{ background: "#fff", color: C.ink, outlineColor: "#fff" }}
-        >
-          <ShoppingBag size={18} aria-hidden />
-          원두 고르기
-        </button>
+      {/* 로스팅실 사진 띠 */}
+      <div className="relative aspect-[16/9] w-full overflow-hidden md:aspect-auto md:h-[40svh] md:min-h-[260px]" style={{ background: "#141414" }}>
+        <motion.div className="absolute inset-0" initial={reduce ? false : { scale: 1.06 }} animate={{ scale: 1 }} transition={{ duration: reduce ? 0 : 1.6, ease: EASE }}>
+          <AnimatePresence initial={false}>
+            <motion.img
+              key={photo.src}
+              src={photo.src}
+              srcSet={hover ? undefined : `${IMG}/hero-sm.jpg 960w, ${IMG}/hero.jpg 1920w`}
+              sizes="100vw"
+              alt={photo.alt}
+              fetchPriority={hover ? undefined : "high"}
+              initial={reduce ? false : { opacity: 0 }}
+              animate={{ opacity: 1 }}
+              exit={reduce ? { opacity: 0, transition: { duration: 0 } } : { opacity: 0 }}
+              transition={{ duration: reduce ? 0 : DUR }}
+              className="absolute inset-0 h-full w-full object-cover"
+              style={{ objectPosition: photo.pos }}
+            />
+          </AnimatePresence>
+        </motion.div>
       </div>
 
-      {/* 문장 */}
-      <div className={`relative z-10 mt-auto px-4 pb-14 md:px-12 md:pb-20 ${reduce ? "" : "rs-rise"}`}>
-        <h1 id="rs-poster-title" className="text-[36px] font-bold leading-[1.2] tracking-[-0.03em] md:text-[clamp(40px,5vw,72px)]" style={{ wordBreak: "keep-all" }}>
-          <span className="block">볶은 다음 날</span>
-          <span className="block">발송하는 원두</span>
-        </h1>
-        <p className="mt-4 text-[16px] md:text-[18px]" style={{ color: "rgba(255,255,255,0.82)" }}>
-          로스팅 요일 화, 금
-        </p>
+      {/* 이번 주 로스팅 표 */}
+      <div className="mx-auto max-w-[1200px] px-4 pb-10 pt-6 md:px-6 md:pt-8">
+        <div className="flex flex-wrap items-end justify-between gap-x-6 gap-y-2">
+          <h1 id="rs-poster-title" className="text-[28px] font-bold leading-[1.25] tracking-[-0.03em] md:text-[36px]" style={{ wordBreak: "keep-all" }}>
+            볶은 다음 날 발송하는 원두
+          </h1>
+          <p className="text-[15px]" style={{ color: C.body }}>
+            로스팅 요일 화, 금 <span style={{ color: C.muted }}>/</span> 이번 로스팅 {fmtKo(roastDay)}
+          </p>
+        </div>
+
+        <div className="mt-5 border-t-2" style={{ borderColor: C.ink }}>
+          <div
+            className="hidden gap-4 border-b py-2.5 text-[14px] font-semibold md:grid md:grid-cols-[minmax(0,2.2fr)_minmax(0,1fr)_minmax(0,1fr)_minmax(0,1.8fr)_minmax(0,1.1fr)_auto]"
+            style={{ borderColor: C.line, color: C.muted }}
+            aria-hidden
+          >
+            <span>원두</span>
+            <span>구분</span>
+            <span>배전</span>
+            <span>맛</span>
+            <span>로스팅일</span>
+            <span className="w-[92px] text-right">200g</span>
+          </div>
+          <ul>
+            {POSTER_BEANS.map((b, i) => {
+              const count = cart[b.id] ?? 0;
+              return (
+                <li
+                  key={b.id}
+                  onMouseEnter={() => setHover(b.roast)}
+                  onMouseLeave={() => setHover(null)}
+                  onFocus={() => setHover(b.roast)}
+                  onBlur={() => setHover(null)}
+                  className={`${i >= 3 ? "hidden md:grid" : "grid"} grid-cols-[minmax(0,1fr)_auto] items-center gap-x-3 gap-y-1 border-b py-3 md:grid-cols-[minmax(0,2.2fr)_minmax(0,1fr)_minmax(0,1fr)_minmax(0,1.8fr)_minmax(0,1.1fr)_auto] md:gap-4`}
+                  style={{ borderColor: C.line, background: hover === b.roast ? C.paperDeep : undefined }}
+                >
+                  <p className="flex min-w-0 flex-wrap items-center gap-x-2 gap-y-1 md:contents">
+                    <span className="text-[17px] font-bold leading-snug">{b.name}</span>
+                    <span className="hidden text-[15px] md:block" style={{ color: C.body }}>
+                      {b.origin}
+                    </span>
+                    <span className="inline-flex shrink-0 items-center gap-1.5 text-[14px] font-semibold md:text-[15px]">
+                      <span className="inline-block h-3 w-3 rounded-full" style={{ background: ROAST_TONE[b.roast] }} aria-hidden />
+                      {b.roast}
+                    </span>
+                  </p>
+                  <div className="row-span-2 md:order-last md:row-span-1">
+                    <PosterAdd name={b.name} price={b.price} count={count} onAdd={(d) => onAdd(b.id, d)} />
+                  </div>
+                  <p className="flex min-w-0 flex-wrap gap-x-3 text-[14px] md:contents md:text-[15px]" style={{ color: C.body }}>
+                    <span>{b.cup}</span>
+                    <span className="tabular-nums" style={{ color: C.muted }}>
+                      <span className="md:hidden">로스팅 </span>
+                      {fmtKo(roastDay)}
+                    </span>
+                  </p>
+                </li>
+              );
+            })}
+          </ul>
+          <button
+            type="button"
+            onClick={() => go("rs-beans")}
+            className={`mt-3 inline-flex h-11 items-center gap-1 rounded-[6px] px-1 text-[15px] font-semibold underline underline-offset-4 ${focusRing}`}
+            style={{ outlineColor: C.ink }}
+          >
+            원두 전체 보기 {BEANS.length}종
+          </button>
+        </div>
       </div>
     </section>
+  );
+}
+
+/** 표 행 오른쪽 담기. 담은 행은 갈색으로 채워 담지 않은 행과 구분한다 */
+function PosterAdd({ name, price, count, onAdd }: { name: string; price: number; count: number; onAdd: (d: number) => void }) {
+  if (count === 0)
+    return (
+      <button
+        type="button"
+        data-gtm-cta="roastery_poster_add"
+        onClick={() => onAdd(1)}
+        aria-label={`${name} 담기`}
+        className={`inline-flex h-11 min-w-11 items-center justify-center gap-1 rounded-[6px] border px-2.5 text-[15px] font-semibold tabular-nums md:w-[92px] ${focusRing}`}
+        style={{ borderColor: C.ink, color: C.ink, outlineColor: C.ink }}
+      >
+        <Plus size={16} aria-hidden />
+        <span className="hidden md:inline">{won(price)}</span>
+      </button>
+    );
+  return (
+    <div className="inline-flex h-11 items-center overflow-hidden rounded-[6px] text-white md:w-[92px]" style={{ background: C.accent }} role="group" aria-label={`${name} ${count}봉 담음`}>
+      <button type="button" onClick={() => onAdd(-1)} aria-label="한 봉 빼기" className={`inline-flex h-11 w-8 items-center justify-center ${focusRing}`} style={{ outlineColor: C.ink }}>
+        <Minus size={14} aria-hidden />
+      </button>
+      <span className="min-w-[2.5ch] flex-1 text-center text-[15px] font-bold tabular-nums">{count}봉</span>
+      <button type="button" onClick={() => onAdd(1)} aria-label="한 봉 더" className={`inline-flex h-11 w-8 items-center justify-center ${focusRing}`} style={{ outlineColor: C.ink }}>
+        <Plus size={14} aria-hidden />
+      </button>
+    </div>
   );
 }
 
@@ -775,6 +883,11 @@ function RoastScene({ reduce }: { reduce: boolean }) {
 
   return (
     <div id="rs-roast" ref={ref} className="relative scroll-mt-4" style={{ height: `${SCENE_VH}vh` }}>
+      <style>{`
+        @keyframes rs-bob { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(6px); } }
+        .rs-bob { animation: rs-bob 1.4s ease-in-out infinite; }
+        @media (prefers-reduced-motion: reduce) { .rs-bob { animation: none; } }
+      `}</style>
       <div className="sticky top-0 h-[100dvh]">
         <div className="mx-auto grid h-full max-w-[1200px] grid-rows-[minmax(0,1fr)_auto] gap-4 px-4 pb-5 pt-4 md:grid-cols-[minmax(0,1.1fr)_minmax(0,1fr)] md:grid-rows-1 md:items-center md:gap-12 md:px-6 md:py-10">
           {/* 단계별 원두 사진. 뒤 단계 사진이 앞 사진 위로 겹쳐 나타난다 */}
