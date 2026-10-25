@@ -1,7 +1,7 @@
 "use client";
 
-import { useEffect, useId, useRef, useState } from "react";
-import { AnimatePresence, motion, useScroll, useTransform } from "framer-motion";
+import { useEffect, useId, useState } from "react";
+import { AnimatePresence, motion } from "framer-motion";
 import {
   AlertTriangle,
   Briefcase,
@@ -44,9 +44,11 @@ import { DemoMakerInfo } from "@/components/demos/DemoMakerInfo";
 
    사진 출처: Pexels 사진 6814526, 직원 사진은 AI 생성(Z-Image-Turbo)
 
-   첫 화면(lf-poster): 서류를 검토하는 손 사진 한 장이 한 화면을 채우고 아래 왼쪽에 문장 "해고, 임금체불, 산재 공인노무사 상담".
-   들어오면 사진이 1.6초 동안 천천히 다가오고(1.06배에서 1배), 문장은 0.3초 늦게 아래에서 올라온다(CSS keyframes, JS 없이도 보인다).
-   스크롤하면 사진만 조금 느리게 움직인다. 동작 줄이기면 전부 멈춘다. 본문에서 움직이는 숫자는 기한 계산의 남은 날 하나뿐이다.
+   첫 화면(lf-poster): 상단 메뉴(휴대폰은 가로로 미는 메뉴) 아래 사업주, 근로자 두 갈래 입구. 칸마다 위에 사진, 아래 업무 5줄과
+   갈래별 상담신청 버튼. PC는 마우스를 올리거나 누른 칸이 넓어지고, 휴대폰은 위에 붙는 전환 버튼으로 한 갈래만 보인다.
+   업무 줄은 아래 구간으로 이어진다(부당해고는 기한 계산, 임금체불과 퇴직금은 체불 계산, 사업주 업무는 자문 요금, 산재와 괴롭힘은
+   상담신청 분야 미리 선택). 실제 노무법인 사이트(사업주, 근로자 상담 분리, 개인/기업 첫 칸)의 방식을 따랐다.
+   모션: 사진이 1.06배에서 1배로 1.6초 동안 다가오고, 칸 넓이는 0.4초 전환. 동작 줄이기면 전부 멈춘다.
 
    상호작용(모두 브라우저 안에서만 돈다. 실제로 보내지 않는다)
    1. 부당해고 구제신청 기한 계산: 해고일을 넣으면 신청 마감일과 남은 날, 3개월 막대 위 오늘 위치가 나온다.
@@ -186,49 +188,16 @@ export function LaborFirmDemo() {
     go("lf-consult");
   };
 
-  const navBtn = `rounded-[4px] px-2.5 py-1.5 text-[15px] font-semibold underline-offset-4 hover:underline ${focusRing}`;
-
   return (
     <div className="min-h-screen overflow-x-clip" style={{ background: C.bg, color: C.ink }}>
-      <Poster reduce={reduce} onCta={() => go("lf-consult")} />
+      <Poster reduce={reduce} go={go} consult={consult} />
 
-      <header className="border-b" style={{ background: C.card, borderColor: C.line }}>
-        <div className="mx-auto flex max-w-[1200px] flex-wrap items-center justify-between gap-x-4 gap-y-2 px-4 py-4 md:px-6">
-          <h2 className="inline-flex items-center gap-2 text-[22px] font-bold leading-none" style={{ color: C.ink }}>
-            <SampleLogo />
-          </h2>
-          <nav aria-label="주요 메뉴" className="-mx-2 flex flex-wrap items-center">
-            {[
-              ["lf-deadline", "부당해고"],
-              ["lf-wage", "임금체불"],
-              ["lf-advisory", "노무 자문"],
-              ["lf-people", "노무사 소개"],
-              ["lf-consult", "상담신청"],
-              ["lf-visit", "오시는 길"],
-            ].map(([id, label]) => (
-              <button key={id} type="button" onClick={() => go(id)} className={navBtn} style={{ outlineColor: C.accent }}>
-                {label}
-              </button>
-            ))}
-          </nav>
-        </div>
-      </header>
 
       {/* 업무분야 */}
-      <section aria-labelledby="lf-areas-title" className="mx-auto max-w-[1200px] px-4 pt-10 md:px-6 md:pt-14">
-        <div className="flex flex-wrap items-end justify-between gap-3">
-          <h2 id="lf-areas-title" className="text-[26px] leading-tight md:text-[32px] font-bold">
-            업무분야
-          </h2>
-          <a
-            href={`tel:${TEL.replace(/-/g, "")}`}
-            className={`inline-flex items-center gap-2 rounded-[4px] px-4 py-2.5 text-[16px] font-bold ${focusRing}`}
-            style={{ background: C.accent, color: "#ffffff", outlineColor: C.accent }}
-          >
-            <Phone size={18} aria-hidden />
-            대표번호 <span className="tabular-nums">{TEL}</span>
-          </a>
-        </div>
+      <section id="lf-areas" aria-labelledby="lf-areas-title" className="mx-auto max-w-[1200px] scroll-mt-4 px-4 pt-10 md:px-6 md:pt-14">
+        <h2 id="lf-areas-title" className="text-[26px] font-bold leading-tight md:text-[32px]">
+          업무분야
+        </h2>
         <ul className="mt-6 grid border-t sm:grid-cols-2 lg:grid-cols-3" style={{ borderColor: C.ink }}>
           {AREAS.map(({ icon: Icon, name, desc }) => (
             <li key={name} className="flex gap-3 border-b py-4 sm:pr-6" style={{ borderColor: C.line }}>
@@ -399,63 +368,210 @@ function ConsultLink({ onClick, cta, children }: { onClick: () => void; cta: str
   );
 }
 
-/* ---------- 포스터 ---------- */
+/* ---------- 첫 화면: 사업주, 근로자 두 갈래 ---------- */
 
-function Poster({ reduce, onCta }: { reduce: boolean; onCta: () => void }) {
-  const ref = useRef<HTMLElement>(null);
-  const { scrollYProgress } = useScroll({ target: ref, offset: ["start start", "end start"] });
-  // 스크롤하면 사진만 조금 느리게 내려간다
-  const photoY = useTransform(scrollYProgress, (v) => (reduce ? "0%" : `${v * 8}%`));
+type Branch = "biz" | "worker";
+type Topic = (typeof TOPICS)[number];
+type Row = { name: string; meta?: string; to: string; topic?: Topic };
+
+const BRANCHES: Record<Branch, { label: string; sub: string; photo: string; srcSet?: string; alt: string; pos: string; caption: string; cta: Topic; rows: Row[] }> = {
+  biz: {
+    label: "사업주",
+    sub: "사업장 노무 자문",
+    photo: `${IMG}/hero.jpg`,
+    srcSet: `${IMG}/hero-sm.jpg 960w, ${IMG}/hero.jpg 1920w`,
+    alt: "회의 탁자에서 펜을 든 손으로 서류를 검토하는 모습",
+    pos: "62% 50%",
+    caption: "담당 김ㅎ늘 대표 공인노무사",
+    cta: "노무 자문",
+    rows: [
+      { name: "인사노무 자문", meta: "월 150,000원부터", to: "lf-advisory" },
+      { name: "급여 아웃소싱", to: "lf-advisory" },
+      { name: "4대보험 관리", to: "lf-advisory" },
+      { name: "취업규칙 정비", to: "lf-advisory" },
+      { name: "근로감독 대응", to: "lf-advisory" },
+    ],
+  },
+  worker: {
+    label: "근로자",
+    sub: "근로자 사건",
+    photo: `${IMG}/staff-2.jpg`,
+    alt: "박ㅈ민 공인노무사",
+    pos: "50% 22%",
+    caption: "담당 박ㅈ민 공인노무사",
+    cta: "부당해고",
+    rows: [
+      { name: "부당해고", meta: "해고일부터 3개월", to: "lf-deadline" },
+      { name: "임금체불", meta: "퇴직 후 14일", to: "lf-wage" },
+      { name: "산업재해", to: "lf-consult", topic: "산재" },
+      { name: "직장 내 괴롭힘", to: "lf-consult", topic: "직장 내 괴롭힘" },
+      { name: "퇴직금", meta: "1년 이상 근무", to: "lf-wage" },
+    ],
+  },
+};
+
+const MENU: [string, string][] = [
+  ["lf-areas", "업무분야"],
+  ["lf-people", "구성원"],
+  ["lf-advisory", "노무 자문"],
+  ["lf-consult", "상담신청"],
+  ["lf-visit", "오시는 길"],
+];
+
+function Poster({ reduce, go, consult }: { reduce: boolean; go: (id: string) => void; consult: (t: Topic) => void }) {
+  // 누른 갈래는 남고, 마우스를 올린 갈래는 잠시 넓어진다. 휴대폰은 고른 갈래 하나만 보인다
+  const [picked, setPicked] = useState<Branch | null>(null);
+  const [hover, setHover] = useState<Branch | null>(null);
+  const wide = hover ?? picked;
+  const mobile = picked ?? "worker";
+
+  const open = (r: Row) => (r.topic ? consult(r.topic) : go(r.to));
+  const grow = (b: Branch) => (wide === null ? 1 : wide === b ? 1.5 : 1);
 
   return (
-    <section id="lf-poster" ref={ref} aria-labelledby="lf-poster-title" className="relative flex min-h-[100svh] flex-col overflow-hidden" style={{ background: "#141414", color: "#ffffff" }}>
-      <style>{`@keyframes lf-rise{from{opacity:0;transform:translateY(12px)}to{opacity:1;transform:none}}.lf-rise{animation:lf-rise 0.7s cubic-bezier(0.22,1,0.36,1) 0.3s both}@media (prefers-reduced-motion: reduce){.lf-rise{animation:none}}`}</style>
-      <motion.div aria-hidden={false} className="absolute inset-x-0 top-[-10%] h-[110%]" style={{ y: photoY }}>
-        <motion.div className="h-full w-full" initial={reduce ? false : { scale: 1.06 }} animate={{ scale: 1 }} transition={{ duration: reduce ? 0 : PHOTO_IN, ease: EASE }}>
-          {/* eslint-disable-next-line @next/next/no-img-element -- 정적 export 라 next/image 최적화를 쓰지 않는다 */}
-          <img
-            src={`${IMG}/hero.jpg`}
-            srcSet={`${IMG}/hero-sm.jpg 960w, ${IMG}/hero.jpg 1920w`}
-            sizes="100vw"
-            alt="회의 탁자에서 펜을 든 손으로 서류를 검토하는 모습"
-            fetchPriority="high"
-            className="absolute inset-0 h-full w-full object-cover"
-            style={{ objectPosition: "62% 50%" }}
-          />
-        </motion.div>
-      </motion.div>
-      {/* 글자 대비를 위한 막. 위는 상호, 아래는 문장 */}
-      <div aria-hidden className="pointer-events-none absolute inset-0" style={{ background: "linear-gradient(to top, rgba(0,0,0,0.78), rgba(0,0,0,0.4) 50%, rgba(0,0,0,0.2) 80%, rgba(0,0,0,0.45))" }} />
+    <section id="lf-poster" aria-labelledby="lf-poster-title" style={{ background: C.bg, color: C.ink }}>
+      {/* 상단 메뉴 */}
+      <header className="border-b" style={{ borderColor: C.line }}>
+        <div className="mx-auto flex max-w-[1200px] items-center justify-between gap-4 px-4 py-2 md:px-6 md:py-3">
+          <p className="inline-flex min-h-11 items-center text-[20px] font-bold leading-none">
+            <SampleLogo />
+          </p>
+          <nav aria-label="주요 메뉴" className="hidden items-center lg:flex">
+            {MENU.map(([id, label]) => (
+              <button key={id} type="button" onClick={() => go(id)} className={`min-h-11 rounded-[4px] px-3 text-[16px] font-semibold underline-offset-4 hover:underline ${focusRing}`} style={{ outlineColor: C.accent }}>
+                {label}
+              </button>
+            ))}
+          </nav>
+          <a
+            href={`tel:${TEL.replace(/-/g, "")}`}
+            data-gtm-cta="labor-firm_gnb_tel"
+            aria-label={`대표번호 ${TEL}`}
+            className={`inline-flex min-h-11 min-w-11 flex-none items-center justify-center gap-2 rounded-[4px] px-3 text-[16px] font-bold tabular-nums ${focusRing}`}
+            style={{ background: C.accent, color: "#fff", outlineColor: C.accent }}
+          >
+            <Phone size={18} aria-hidden />
+            <span className="hidden sm:inline">{TEL}</span>
+          </a>
+        </div>
+        {/* 휴대폰, 태블릿 메뉴는 가로로 밀어 본다 */}
+        <nav aria-label="주요 메뉴" className="flex overflow-x-auto border-t px-2 lg:hidden" style={{ borderColor: C.line, scrollbarWidth: "none" }}>
+          {MENU.map(([id, label]) => (
+            <button key={id} type="button" onClick={() => go(id)} className={`min-h-11 flex-none whitespace-nowrap px-3 text-[15px] font-semibold ${focusRing}`} style={{ outlineColor: C.accent }}>
+              {label}
+            </button>
+          ))}
+        </nav>
+      </header>
 
-      <div className="relative z-[1] flex items-center justify-between gap-3 px-4 pt-4 md:px-12 md:pt-7">
-        <p className="inline-flex items-center gap-2 text-[17px] font-bold leading-none">
-          <SampleLogo light size={18} />
-        </p>
-        <button
-          type="button"
-          onClick={onCta}
-          data-gtm-cta="labor-firm_poster_cta"
-          className={`inline-flex min-h-11 items-center gap-1.5 rounded-[6px] px-4 text-[15px] font-semibold ${focusRing}`}
-          style={{ background: C.accent, color: "#ffffff", outlineColor: "#ffffff" }}
-        >
-          <CalendarCheck size={17} aria-hidden />
-          상담신청
-        </button>
-      </div>
+      <div className="mx-auto max-w-[1200px] px-4 pb-10 pt-6 md:px-6 md:pb-14 md:pt-8">
+        <div className="flex flex-wrap items-end justify-between gap-x-6 gap-y-2">
+          <h1 id="lf-poster-title" className="text-[28px] font-bold md:text-[40px]" style={{ letterSpacing: "-0.03em", lineHeight: 1.25, wordBreak: "keep-all" }}>
+            해고, 임금체불, 산재 공인노무사 상담
+          </h1>
+          <p className="text-[16px]" style={{ color: C.muted }}>
+            부당해고 구제신청, 지방노동위원회
+          </p>
+        </div>
 
-      <div className={`relative z-[1] mt-auto px-4 pb-14 md:px-12 md:pb-20 ${reduce ? "" : "lf-rise"}`}>
-        <h1
-          id="lf-poster-title"
-          className="max-w-[13em] text-[36px] font-bold md:text-[clamp(40px,5vw,72px)]"
-          style={{ letterSpacing: "-0.03em", lineHeight: 1.2, wordBreak: "keep-all" }}
-        >
-          해고, 임금체불, 산재
-          <br />
-          공인노무사 상담
-        </h1>
-        <p className="mt-4 text-[16px] md:mt-6 md:text-[18px]" style={{ color: "rgba(255,255,255,0.86)" }}>
-          부당해고 구제신청, 지방노동위원회
-        </p>
+        {/* 휴대폰: 갈래 전환 버튼이 스크롤해도 위에 붙는다 */}
+        <div role="tablist" aria-label="상담 갈래" className="sticky top-0 z-10 -mx-4 mt-4 grid grid-cols-2 gap-2 px-4 py-2 md:hidden" style={{ background: C.bg }}>
+          {(["biz", "worker"] as Branch[]).map((b) => {
+            const on = mobile === b;
+            return (
+              <button
+                key={b}
+                type="button"
+                role="tab"
+                aria-selected={on}
+                onClick={() => setPicked(b)}
+                className={`min-h-12 rounded-[4px] border text-[17px] font-bold ${focusRing}`}
+                style={{ borderColor: on ? C.gray : C.line, background: on ? C.gray : C.card, color: on ? "#fff" : C.ink, outlineColor: C.ink }}
+              >
+                {BRANCHES[b].label}
+              </button>
+            );
+          })}
+        </div>
+
+        <div className="mt-2 flex gap-4 md:mt-8 lg:gap-6">
+          {(["biz", "worker"] as Branch[]).map((b) => {
+            const d = BRANCHES[b];
+            const on = picked === b;
+            return (
+              <motion.div
+                key={b}
+                onMouseEnter={() => setHover(b)}
+                onMouseLeave={() => setHover(null)}
+                initial={false}
+                animate={{ flexGrow: grow(b) }}
+                transition={{ duration: reduce ? 0 : DUR, ease: EASE }}
+                className={`${mobile === b ? "flex" : "hidden"} min-w-0 basis-0 flex-col overflow-hidden rounded-[6px] md:flex`}
+                style={{ border: `${on ? 2 : 1}px solid ${on ? C.gray : C.line}` }}
+              >
+                <div className="relative aspect-[4/3] overflow-hidden md:aspect-auto md:h-[clamp(170px,24vh,250px)]" style={{ background: C.soft }}>
+                  <motion.div className="h-full w-full" initial={reduce ? false : { scale: 1.06 }} animate={{ scale: 1 }} transition={{ duration: reduce ? 0 : PHOTO_IN, ease: EASE }}>
+                    {/* eslint-disable-next-line @next/next/no-img-element -- 정적 export 라 next/image 최적화를 쓰지 않는다 */}
+                    <img
+                      src={d.photo}
+                      srcSet={d.srcSet}
+                      sizes="(min-width: 768px) 50vw, 100vw"
+                      alt={d.alt}
+                      fetchPriority={b === "biz" ? "high" : undefined}
+                      className="h-full w-full object-cover"
+                      style={{ objectPosition: d.pos }}
+                    />
+                  </motion.div>
+                </div>
+                <div className="flex flex-1 flex-col p-4 md:p-6">
+                  <button
+                    type="button"
+                    onClick={() => setPicked(b)}
+                    aria-pressed={on}
+                    className={`hidden min-h-11 items-center justify-between gap-3 rounded-[4px] text-left md:flex ${focusRing}`}
+                    style={{ outlineColor: C.ink }}
+                  >
+                    <span className="text-[24px] font-bold tracking-[-0.02em]">{d.label}</span>
+                    <span className="text-[15px] font-semibold" style={{ color: on ? C.accent : C.muted }}>
+                      {on ? "선택" : d.sub}
+                    </span>
+                  </button>
+                  <p className="text-[14px]" style={{ color: C.muted }}>
+                    {d.caption}
+                  </p>
+                  <ul className="mt-3 border-t" style={{ borderColor: C.ink }}>
+                    {d.rows.map((r) => (
+                      <li key={r.name} className="border-b" style={{ borderColor: C.line }}>
+                        <button
+                          type="button"
+                          onClick={() => open(r)}
+                          className={`flex min-h-12 w-full items-center justify-between gap-3 py-2 text-left hover:bg-[#f7f7f5] ${focusRing}`}
+                          style={{ outlineColor: C.ink }}
+                        >
+                          <span className="min-w-0 text-[17px] font-semibold">{r.name}</span>
+                          <span className="inline-flex flex-none items-center gap-1 text-[14px]" style={{ color: C.muted }}>
+                            {r.meta}
+                            <ChevronRight size={17} aria-hidden />
+                          </span>
+                        </button>
+                      </li>
+                    ))}
+                  </ul>
+                  <button
+                    type="button"
+                    onClick={() => consult(d.cta)}
+                    data-gtm-cta={`labor-firm_poster_${b}`}
+                    className={`mt-5 inline-flex min-h-12 items-center justify-center gap-2 rounded-[4px] px-4 text-[16px] font-bold text-white ${focusRing}`}
+                    style={{ background: b === "biz" ? C.gray : C.accent, outlineColor: C.ink }}
+                  >
+                    <CalendarCheck size={18} aria-hidden />
+                    {d.label} 상담신청
+                  </button>
+                </div>
+              </motion.div>
+            );
+          })}
+        </div>
       </div>
     </section>
   );

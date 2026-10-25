@@ -1,7 +1,7 @@
 "use client";
 
-import { useEffect, useRef, useState, type ReactNode } from "react";
-import { motion, useScroll, useTransform } from "framer-motion";
+import { useEffect, useState, type ReactNode } from "react";
+import { motion } from "framer-motion";
 import { BookOpen, CalendarCheck, Check, CircleAlert, Clock, FileCheck2, Languages, MapPin, MessageCircle, RotateCcw, Search, Stamp } from "lucide-react";
 import { useReducedMotionSafe } from "@/hooks/useReducedMotionSafe";
 import { daysAgo, fmtDot, useDemoToday } from "@/hooks/useDemoToday";
@@ -26,9 +26,10 @@ import { DemoMakerInfo } from "@/components/demos/DemoMakerInfo";
    5. 상담신청: 이름, 연락처, 국적, 현재 체류자격, 상담 내용, 상담 방법. 완료 화면은 접수 번호와 회신 예정일이 찍힌 사증 모양.
 
    사진 출처: Pexels 사진 32081456
-   첫 화면(va-poster): 여권 몇 권을 겹쳐 놓은 사진 한 장이 한 화면을 채운다. 아래 왼쪽에 문장 "체류 기간 연장, 만료 4개월 전부터 신청".
-   핵심 모션: 들어올 때 사진이 1.06배에서 1배로 1.6초 동안 천천히 다가오고, 문장과 정보 줄은 0.3초 늦게 12px 아래에서 올라온다(CSS).
-   스크롤하면 사진만 조금 느리게 내려간다(0 ~ 8%). 동작 줄이기면 모두 멈춘 상태로 보인다. */
+   첫 화면(va-poster): 맨 위 언어 줄(한국어, English)을 크게 두고, 상단 메뉴 아래 왼쪽 1/3 은 여권 사진, 오른쪽 2/3 은 체류자격 코드판.
+   코드 칸을 고르면 아래에 대상, 취업, 체류기간 상한, 연장 수수료가 바뀌고, 고른 코드가 필요 서류 탭에도 그대로 선택된다.
+   휴대폰에서는 언어 버튼 두 개를 균등 폭으로, 메뉴는 가로로 밀고, 사진은 코드판 아래 16:9 한 장.
+   핵심 모션: 들어올 때 사진이 1.06배에서 1배로 1.6초 동안 천천히 다가온다. 동작 줄이기면 멈춘 상태로 보인다. */
 
 const IMG = "/images/demo-visa-agent";
 
@@ -58,11 +59,6 @@ const EASE = [0.22, 1, 0.36, 1] as const;
 /** 첫 화면 사진이 다가오는 시간과 시작 배율 */
 const ZOOM = 1.6;
 const ZOOM_FROM = 1.06;
-/** 문장이 올라오는 시간과 늦춤 */
-const RISE = 0.7;
-const RISE_DELAY = 0.3;
-/** 스크롤할 때 사진이 내려가는 정도(%) */
-const PARALLAX = 8;
 /** 본문 전환 */
 const DUR = 0.25;
 
@@ -229,40 +225,17 @@ export function VisaAgentDemo() {
   }, []);
 
   const go = (id: string) => document.getElementById(id)?.scrollIntoView({ behavior: reduce ? "auto" : "smooth", block: "start" });
-  const navBtn = `rounded-[4px] px-2.5 py-1.5 text-[15px] underline-offset-4 hover:underline ${focusRing}`;
 
   return (
     <div lang={lang} className="min-h-screen overflow-x-clip pb-16" style={{ background: C.paper, color: C.ink }}>
-      <Poster reduce={reduce} lang={lang} onCta={() => go("va-consult")} />
-
-      <header className="mx-auto flex max-w-[1200px] flex-wrap items-center justify-between gap-x-4 gap-y-3 px-4 py-4 md:px-6">
-        <p className="inline-flex items-center gap-2 text-[20px] font-bold leading-none">
-          <SampleLogo />
-        </p>
-        <div className="flex flex-wrap items-center gap-x-2 gap-y-2">
-          <nav aria-label={tx(lang, "주요 메뉴", "Main menu")} className="-mx-2 flex flex-wrap items-center">
-            {[
-              ["va-finder", tx(lang, "체류자격 찾기", "Find your visa")],
-              ["va-extend", tx(lang, "연장 신청일", "Extension date")],
-              ["va-docs", tx(lang, "필요 서류", "Documents")],
-              ["va-consult", tx(lang, "상담신청", "Consultation")],
-              ["va-visit", tx(lang, "오시는 길", "Location")],
-            ].map(([id, label]) => (
-              <button key={id} type="button" onClick={() => go(id)} className={navBtn} style={{ outlineColor: C.ink }}>
-                {label}
-              </button>
-            ))}
-          </nav>
-          <LangSwitch lang={lang} setLang={setLang} />
-        </div>
-      </header>
+      <Poster reduce={reduce} lang={lang} setLang={setLang} code={docCode} setCode={setDocCode} go={go} />
 
       {/* 업무 안내 */}
-      <section aria-labelledby="va-hero-title" className="mx-auto max-w-[1200px] px-4 pt-4 md:px-6 md:pt-8">
+      <section id="va-services" aria-labelledby="va-hero-title" className="mx-auto max-w-[1200px] scroll-mt-4 px-4 pt-4 md:px-6 md:pt-8">
         <div className="grid gap-8 border-y py-8 md:grid-cols-[minmax(0,1fr)_minmax(0,1.15fr)] md:gap-12 md:py-12" style={{ borderColor: C.line }}>
           <div>
-            <h2 id="va-hero-title" className="text-[34px] font-bold leading-[1.25] md:text-[46px]" style={{ wordBreak: "keep-all" }}>
-              {tx(lang, "외국인 비자, 체류 업무 대행", "Visa and stay permits for foreigners")}
+            <h2 id="va-hero-title" className="text-[26px] font-bold leading-tight md:text-[32px]" style={{ wordBreak: "keep-all" }}>
+              {tx(lang, "업무 분야", "Services")}
             </h2>
             <dl className="mt-6 grid gap-2 text-[16px]">
               {[
@@ -343,33 +316,6 @@ function Section({ id, icon, title, children }: { id: string; icon: ReactNode; t
 
 /** 카드 바탕 */
 const paperBg = { backgroundColor: C.soft } as const;
-
-function LangSwitch({ lang, setLang }: { lang: Lang; setLang: (l: Lang) => void }) {
-  return (
-    <div id="va-lang" role="group" aria-label="언어 Language" className="inline-flex items-center rounded-full border p-1" style={{ borderColor: C.field }}>
-      <Languages size={18} aria-hidden className="mx-1.5" />
-      {(
-        [
-          ["ko", "한국어"],
-          ["en", "English"],
-        ] as const
-      ).map(([l, label]) => (
-        <button
-          key={l}
-          type="button"
-          lang={l}
-          aria-pressed={lang === l}
-          onClick={() => setLang(l)}
-          data-gtm-cta={`visa-agent_lang_${l}`}
-          className={`rounded-full px-3 py-1 text-[14px] font-semibold transition-colors duration-150 ${focusRing}`}
-          style={{ background: lang === l ? C.accent : "transparent", color: lang === l ? "#fff" : C.ink, outlineColor: C.ink }}
-        >
-          {label}
-        </button>
-      ))}
-    </div>
-  );
-}
 
 const choiceBtn = `min-h-[48px] rounded-[6px] border px-4 py-2.5 text-left text-[16px] font-semibold transition-colors duration-150 hover:bg-[#f7f7f5] ${focusRing}`;
 
@@ -908,79 +854,221 @@ function Visit({ lang, today }: { lang: Lang; today: Date }) {
   );
 }
 
-/* ---------- 포스터 ---------- */
+/* ---------- 첫 화면 ---------- */
 
-function Poster({ reduce, lang, onCta }: { reduce: boolean; lang: Lang; onCta: () => void }) {
-  const ref = useRef<HTMLElement>(null);
-  const { scrollYProgress } = useScroll({ target: ref, offset: ["start start", "end start"] });
-  const photoY = useTransform(scrollYProgress, (v) => (reduce ? "0%" : `${v * PARALLAX}%`));
-  const lines = lang === "ko" ? ["체류 연장, 자격 변경, 영주권", "출입국 업무 대행"] : ["Visa extension, status change,", "permanent residency"];
+/** 상단 메뉴. 출입국 행정사 사이트 표준 메뉴 이름을 기존 구간에 잇는다 */
+const MENU: { id: string; label: Tx }[] = [
+  { id: "va-services", label: { ko: "업무 분야", en: "Services" } },
+  { id: "va-finder", label: { ko: "비자 종류", en: "Visa types" } },
+  { id: "va-extend", label: { ko: "연장 신청", en: "Extension" } },
+  { id: "va-docs", label: { ko: "필요 서류", en: "Documents" } },
+  { id: "va-visit", label: { ko: "오시는 길", en: "Location" } },
+];
+
+/** 연장 수수료(출입국관리법 시행규칙 제72조) */
+const feeOf = (code: Code, lang: Lang) => (code === "F-6" ? tx(lang, "30,000원", "30,000 won") : tx(lang, "60,000원", "60,000 won"));
+
+function Poster({
+  reduce,
+  lang,
+  setLang,
+  code,
+  setCode,
+  go,
+}: {
+  reduce: boolean;
+  lang: Lang;
+  setLang: (l: Lang) => void;
+  code: Code;
+  setCode: (c: Code) => void;
+  go: (id: string) => void;
+}) {
+  const v = VISAS[code];
+  const docCount = docsFor(code).length;
+  const tile = `flex min-h-[96px] flex-col items-start justify-between rounded-[6px] border p-3.5 text-left transition-colors duration-150 md:min-h-[108px] md:p-4 ${focusRing}`;
 
   return (
-    <section id="va-poster" ref={ref} aria-labelledby="va-poster-title" className="relative flex min-h-[100svh] flex-col overflow-hidden" style={{ background: "#141414", color: "#fff" }}>
-      <style>{`
-        @keyframes va-rise { from { opacity: 0; transform: translateY(12px); } to { opacity: 1; transform: none; } }
-        .va-rise { animation: va-rise ${RISE}s cubic-bezier(${EASE.join(",")}) ${RISE_DELAY}s both; }
-        @media (prefers-reduced-motion: reduce) { .va-rise { animation: none; } }
-      `}</style>
-      <motion.div className="absolute inset-0" style={{ y: photoY }}>
-        <motion.div
-          className="absolute inset-0"
-          initial={reduce ? false : { scale: ZOOM_FROM }}
-          animate={{ scale: 1 }}
-          transition={reduce ? { duration: 0 } : { duration: ZOOM, ease: EASE }}
-        >
-          {/* eslint-disable-next-line @next/next/no-img-element -- 정적 export 라 next/image 최적화를 쓰지 않는다 */}
-          <img
-            src={`${IMG}/hero.jpg`}
-            srcSet={`${IMG}/hero-sm.jpg 960w, ${IMG}/hero.jpg 1920w`}
-            sizes="100vw"
-            alt={tx(lang, "회색 탁자 위에 겹쳐 놓은 붉은 여권 세 권과 신분증", "Three red passports and ID cards on a grey table")}
-            fetchPriority="high"
-            className="absolute inset-0 h-full w-full object-cover"
-            style={{ objectPosition: "40% 45%" }}
-          />
-        </motion.div>
-      </motion.div>
-      <div
-        aria-hidden
-        className="pointer-events-none absolute inset-0"
-        style={{ background: "linear-gradient(to top, rgba(0,0,0,0.78), rgba(0,0,0,0.4) 55%, rgba(0,0,0,0.2))" }}
-      />
-
-      {/* 로고와 핵심 행동 하나 */}
-      <div className="relative z-10 flex items-center justify-between gap-3 px-4 pt-4 md:px-12 md:pt-7">
-        <p className="inline-flex items-center gap-2 text-[17px] font-bold leading-none">
-          <SampleLogo light size={18} />
-        </p>
-        <button
-          type="button"
-          onClick={onCta}
-          data-gtm-cta="visa-agent_poster_cta"
-          className={`inline-flex flex-none items-center gap-2 rounded-[6px] px-4 py-2.5 text-[15px] font-semibold ${focusRing}`}
-          style={{ background: "#fff", color: C.ink, outlineColor: "#fff" }}
-        >
-          <CalendarCheck size={18} aria-hidden />
-          {tx(lang, "상담신청", "Consultation")}
-        </button>
+    <section id="va-poster" aria-labelledby="va-poster-title" style={{ background: C.paper, color: C.ink }}>
+      {/* 언어 줄. 다른 업종보다 크게 둔다 */}
+      <div className="border-b" style={{ background: C.soft, borderColor: C.line }}>
+        <div className="mx-auto flex max-w-[1200px] items-center gap-4 px-4 py-2.5 md:px-6">
+          <p className="hidden items-center gap-2 text-[15px] font-semibold md:inline-flex" style={{ color: C.body }}>
+            <Languages size={18} aria-hidden />
+            언어 Language
+          </p>
+          <div id="va-lang" role="group" aria-label="언어 Language" className="grid flex-1 grid-cols-2 gap-2 md:flex md:flex-none">
+            {(
+              [
+                ["ko", "한국어"],
+                ["en", "English"],
+              ] as const
+            ).map(([l, label]) => (
+              <button
+                key={l}
+                type="button"
+                lang={l}
+                aria-pressed={lang === l}
+                onClick={() => setLang(l)}
+                data-gtm-cta={`visa-agent_lang_${l}`}
+                className={`inline-flex min-h-11 items-center justify-center gap-1.5 rounded-[6px] border px-5 text-[16px] font-semibold transition-colors duration-150 md:min-w-[132px] ${focusRing}`}
+                style={{ background: lang === l ? C.accent : C.paper, borderColor: lang === l ? C.accent : C.field, color: lang === l ? "#fff" : C.ink, outlineColor: C.ink }}
+              >
+                {lang === l && <Check size={17} aria-hidden />}
+                {label}
+              </button>
+            ))}
+          </div>
+        </div>
       </div>
 
-      {/* 문장 */}
-      <div className="relative z-[1] mt-auto max-w-[1200px] px-4 pb-14 md:px-12 md:pb-20">
-        <h1
-          id="va-poster-title"
-          className={`${reduce ? "" : "va-rise "}text-[34px] font-bold md:text-[clamp(40px,5vw,72px)]`}
-          style={{ letterSpacing: "-0.03em", lineHeight: 1.2, wordBreak: "keep-all" }}
-        >
-          {lines.map((l) => (
-            <span key={l} className="block">
-              {l}
-            </span>
-          ))}
-        </h1>
-        <p className={`${reduce ? "" : "va-rise "}mt-4 text-[16px] md:mt-6 md:text-[18px]`} style={{ color: "rgba(255,255,255,0.86)" }}>
-          {tx(lang, "출입국 업무 대행, 한국어와 English 상담", "Immigration filings, in Korean and English")}
-        </p>
+      {/* 상단 메뉴. 휴대폰에서는 아래 줄에서 가로로 민다 */}
+      <header className="border-b" style={{ borderColor: C.line }}>
+        <div className="mx-auto flex max-w-[1200px] flex-wrap items-center justify-between gap-x-6 gap-y-1 px-4 pt-3 md:flex-nowrap md:px-6 md:py-3">
+          <p className="inline-flex items-center gap-2 text-[20px] font-bold leading-none">
+            <SampleLogo />
+          </p>
+          <nav aria-label={tx(lang, "주요 메뉴", "Main menu")} className="order-3 -mx-4 w-[calc(100%+32px)] overflow-x-auto md:order-none md:mx-0 md:w-auto md:flex-1 md:overflow-visible">
+            <ul className="flex whitespace-nowrap px-2 md:justify-center md:px-0">
+              {MENU.map((m) => (
+                <li key={m.id}>
+                  <button
+                    type="button"
+                    onClick={() => go(m.id)}
+                    className={`inline-flex min-h-11 items-center rounded-[4px] px-2.5 text-[15px] font-semibold underline-offset-[6px] hover:underline md:px-3 md:text-[16px] ${focusRing}`}
+                    style={{ outlineColor: C.ink }}
+                  >
+                    {m.label[lang]}
+                  </button>
+                </li>
+              ))}
+            </ul>
+          </nav>
+          <button
+            type="button"
+            onClick={() => go("va-consult")}
+            data-gtm-cta="visa-agent_poster_cta"
+            className={`inline-flex min-h-11 flex-none items-center gap-1.5 rounded-[6px] px-4 text-[15px] font-semibold ${focusRing}`}
+            style={{ background: C.accent, color: "#fff", outlineColor: C.ink }}
+          >
+            <CalendarCheck size={17} aria-hidden />
+            {tx(lang, "상담신청", "Consultation")}
+          </button>
+        </div>
+      </header>
+
+      <div className="mx-auto grid max-w-[1200px] grid-cols-[minmax(0,1fr)] gap-6 px-4 pb-10 pt-6 md:grid-cols-[minmax(0,1fr)_minmax(0,2fr)] md:gap-10 md:px-6 md:pb-14 md:pt-10">
+        {/* 사진. 휴대폰에서는 코드판 아래로. 위치 줄은 왼쪽 아래 고정 버튼과 겹치지 않게 사진 위에 */}
+        <figure className="order-2 flex min-w-0 flex-col md:order-none">
+          <div className="relative aspect-[16/9] overflow-hidden rounded-[6px] md:aspect-auto md:min-h-[420px] md:flex-1" style={{ background: C.soft }}>
+            <motion.div className="absolute inset-0" initial={reduce ? false : { scale: ZOOM_FROM }} animate={{ scale: 1 }} transition={reduce ? { duration: 0 } : { duration: ZOOM, ease: EASE }}>
+              {/* eslint-disable-next-line @next/next/no-img-element -- 정적 export 라 next/image 최적화를 쓰지 않는다 */}
+              <img
+                src={`${IMG}/hero.jpg`}
+                srcSet={`${IMG}/hero-sm.jpg 960w, ${IMG}/hero.jpg 1920w`}
+                sizes="(min-width: 768px) 400px, 100vw"
+                alt={tx(lang, "회색 탁자 위에 겹쳐 놓은 붉은 여권 세 권과 신분증", "Three red passports and ID cards on a grey table")}
+                fetchPriority="high"
+                className="absolute inset-0 h-full w-full object-cover"
+                style={{ objectPosition: "40% 45%" }}
+              />
+            </motion.div>
+          </div>
+          <figcaption className="order-first mb-3 inline-flex items-start gap-1.5 text-[15px] leading-[1.5]" style={{ color: C.body, wordBreak: "keep-all" }}>
+            <MapPin size={17} aria-hidden className="mt-0.5 flex-none" style={{ color: C.accent }} />
+            {tx(lang, "ㅇㅇ출입국외국인사무소에서 걸어서 5분", "5 minutes walk from the ㅇㅇ immigration office")}
+          </figcaption>
+        </figure>
+
+        <div className="min-w-0">
+          <h1 id="va-poster-title" className="text-[28px] font-bold md:text-[40px]" style={{ letterSpacing: "-0.03em", lineHeight: 1.25, wordBreak: "keep-all" }}>
+            {(lang === "ko" ? ["체류 연장, 자격 변경, 영주권", "출입국 업무 대행"] : ["Visa extension, status change,", "permanent residency"]).map((l) => (
+              <span key={l} className="block">
+                {l}
+              </span>
+            ))}
+          </h1>
+
+          <p className="mt-6 text-[15px] font-bold md:mt-8" style={{ color: C.muted }}>
+            {tx(lang, "체류자격", "Visa type")}
+          </p>
+          <div className="mt-2 grid grid-cols-[repeat(2,minmax(0,1fr))] gap-2 sm:grid-cols-[repeat(3,minmax(0,1fr))]">
+            {CODES.map((c) => {
+              const on = c === code;
+              return (
+                <button
+                  key={c}
+                  type="button"
+                  aria-pressed={on}
+                  onClick={() => setCode(c)}
+                  data-gtm-cta={`visa-agent_poster_code_${c}`}
+                  className={tile}
+                  style={{ background: on ? C.accent : C.paper, borderColor: on ? C.accent : C.field, color: on ? "#fff" : C.ink, outlineColor: C.ink }}
+                >
+                  <span className="text-[28px] font-bold leading-none tracking-[-0.02em] tabular-nums md:text-[34px]">{c}</span>
+                  <span className="mt-2 text-[15px] font-semibold leading-tight" style={{ color: on ? "#fff" : C.body }}>
+                    {VISAS[c].name[lang]}
+                  </span>
+                </button>
+              );
+            })}
+            <button type="button" onClick={() => go("va-finder")} className={tile} style={{ background: C.soft, borderColor: C.line, color: C.ink, outlineColor: C.ink }}>
+              <Search size={26} aria-hidden style={{ color: C.accent }} />
+              <span className="mt-2 text-[15px] font-semibold leading-tight">{tx(lang, "체류자격 찾기", "Find your visa")}</span>
+            </button>
+          </div>
+
+          {/* 고른 체류자격 */}
+          <motion.div
+            key={`${code}-${lang}`}
+            aria-live="polite"
+            initial={reduce ? false : { opacity: 0, y: 6 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: reduce ? 0 : DUR, ease: EASE }}
+            className="mt-4 rounded-[6px] border p-4 md:p-5"
+            style={{ borderColor: C.line, background: C.soft }}
+          >
+            <p className="text-[18px] font-bold">
+              <span className="tabular-nums">{code}</span> {v.name[lang]}
+            </p>
+            <dl className="mt-3 grid gap-1.5 text-[15px] leading-[1.5]">
+              {[
+                [tx(lang, "대상", "Who"), v.who[lang]],
+                [tx(lang, "취업", "Work"), v.work[lang]],
+                [tx(lang, "1회 체류기간 상한", "Max stay per grant"), v.max[lang]],
+                [tx(lang, "연장 수수료", "Extension fee"), feeOf(code, lang)],
+                [tx(lang, "상담 언어", "Languages"), tx(lang, "한국어, English", "Korean, English")],
+              ].map(([k, val]) => (
+                <div key={k} className="grid grid-cols-[112px_minmax(0,1fr)] gap-3 md:grid-cols-[140px_minmax(0,1fr)]">
+                  <dt style={{ color: C.muted }}>{k}</dt>
+                  <dd className="font-medium" style={{ wordBreak: "keep-all" }}>
+                    {val}
+                  </dd>
+                </div>
+              ))}
+            </dl>
+            <div className="mt-4 flex flex-wrap gap-2">
+              <button
+                type="button"
+                onClick={() => go("va-docs")}
+                data-gtm-cta="visa-agent_poster_docs"
+                className={`inline-flex min-h-11 items-center gap-1.5 rounded-[6px] border px-4 text-[15px] font-semibold ${focusRing}`}
+                style={{ background: C.paper, borderColor: C.field, outlineColor: C.ink }}
+              >
+                <FileCheck2 size={17} aria-hidden />
+                {tx(lang, `연장 서류 ${docCount}종`, `${docCount} documents`)}
+              </button>
+              <button
+                type="button"
+                onClick={() => go("va-consult")}
+                className={`inline-flex min-h-11 items-center gap-1.5 rounded-[6px] px-4 text-[15px] font-semibold ${focusRing}`}
+                style={{ background: C.accent, color: "#fff", outlineColor: C.ink }}
+              >
+                <MessageCircle size={17} aria-hidden />
+                {tx(lang, "상담신청", "Consultation")}
+              </button>
+            </div>
+          </motion.div>
+        </div>
       </div>
     </section>
   );

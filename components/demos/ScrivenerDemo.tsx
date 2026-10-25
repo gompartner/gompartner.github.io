@@ -1,23 +1,28 @@
 "use client";
 
-import { useEffect, useId, useMemo, useRef, useState } from "react";
-import { AnimatePresence, motion, useScroll, useTransform } from "framer-motion";
+import { Fragment, useEffect, useId, useMemo, useState } from "react";
+import { AnimatePresence, motion } from "framer-motion";
 import {
   AlertCircle,
   Building2,
   Calculator,
   Check,
+  ChevronDown,
+  ChevronRight,
   Clock,
   FileText,
   Home,
   Landmark,
   MapPin,
+  Menu,
   MessageCircle,
   Phone,
   RotateCcw,
   Scale,
+  Search,
   Train,
   Users,
+  X,
 } from "lucide-react";
 import { useReducedMotionSafe } from "@/hooks/useReducedMotionSafe";
 import { daysAgo, fmtDash, fmtKo, useDemoToday } from "@/hooks/useDemoToday";
@@ -33,9 +38,11 @@ import { DemoMakerInfo } from "@/components/demos/DemoMakerInfo";
    법무사 광고 규정에 맞춰 성공 사례 수, 최저가, 100% 같은 표현은 쓰지 않는다.
 
    사진 출처: Pexels 사진 31424880
-   첫 화면(js-poster): 집 모형 앞에 놓인 열쇠 꾸러미 사진 한 장이 한 화면을 채운다. 아래 왼쪽에 문장 "잔금일 출장 등기".
-   핵심 모션: 들어올 때 사진이 1.06배에서 1배로 1.6초 동안 천천히 다가오고, 문장과 정보 줄은 0.3초 늦게 12px 아래에서 올라온다(CSS).
-   스크롤하면 사진만 조금 느리게 내려간다(0 ~ 8%). 동작 줄이기면 모두 멈춘 상태로 보인다.
+   첫 화면(js-poster): 상단 메뉴(휴대폰은 햄버거) 아래 흰 바탕의 "상황으로 찾기". 왼쪽 2/3는 검색칸과 상황 문장 8줄
+   (상황, 업무, 처리 기간), 오른쪽 1/3은 세로 사진과 사무소 정보(휴대폰은 가로 명함). 검색어로 줄을 거르고, 줄을 누르면
+   진행 순서 3단계, 준비 서류, 처리 기간이 펼쳐진다. 펼친 줄의 버튼은 아래 구간으로 이어진다(비용 계산, 매도인 서류 탭,
+   개인회생 단계, 상담신청 분야 미리 선택). 실제 법무사 사이트(이안, 등기로, 리젠)의 검색창과 상황 문장 방식을 따랐다.
+   모션: 사진이 1.06배에서 1배로 1.6초 동안 다가오고, 줄이 펼쳐질 때 0.28초 높이 전환. 동작 줄이기면 모두 멈춘다.
 
    상호작용(모두 브라우저 안에서만 돈다. 실제로 보내지 않는다)
    1. 소유권 이전 등기 비용 개략 계산: 매매가, 이번 집 포함 주택 수, 조정대상지역, 전용 85제곱미터 초과를 넣으면
@@ -69,11 +76,6 @@ const EASE = [0.22, 1, 0.36, 1] as const;
 /** 첫 화면 사진이 다가오는 시간과 시작 배율 */
 const ZOOM = 1.6;
 const ZOOM_FROM = 1.06;
-/** 문장이 올라오는 시간과 늦춤 */
-const RISE = 0.7;
-const RISE_DELAY = 0.3;
-/** 스크롤할 때 사진이 내려가는 정도(%) */
-const PARALLAX = 8;
 /** 칩, 패널 전환 */
 const DUR = 0.28;
 
@@ -182,6 +184,7 @@ export function ScrivenerDemo() {
   const today = useDemoToday();
   const reduce = useReducedMotionSafe();
   const [field, setField] = useState<Field>("부동산 등기");
+  const [docSide, setDocSide] = useState<Side>("buyer");
 
   useEffect(() => {
     const f = () => window.scrollTo({ top: 0 });
@@ -191,62 +194,15 @@ export function ScrivenerDemo() {
 
   const go = (id: string) => document.getElementById(id)?.scrollIntoView({ behavior: reduce ? "auto" : "smooth", block: "start" });
 
-  const navBtn = `rounded-[4px] px-2.5 py-1.5 text-[15px] underline-offset-4 hover:underline ${focusRing}`;
-
   return (
     <div className="min-h-screen overflow-x-clip pb-24" style={{ background: C.paper, color: C.ink }}>
-      <Poster reduce={reduce} onCta={() => go("js-cost")} />
-
-      <header className="border-b" style={{ borderColor: C.line, background: C.paper }}>
-        <div className="mx-auto flex max-w-[1200px] flex-wrap items-center justify-between gap-x-4 gap-y-2 px-4 py-4 md:px-6">
-          <p className="inline-flex items-center gap-2 text-[20px] font-bold leading-none" style={{ color: C.ink }}>
-            <SampleLogo />
-          </p>
-          <nav aria-label="주요 메뉴" className="-mx-2 flex flex-wrap items-center">
-            {[
-              ["js-work", "업무 안내"],
-              ["js-cost", "등기 비용"],
-              ["js-docs", "준비 서류"],
-              ["js-rehab", "개인회생"],
-              ["js-apply", "상담신청"],
-              ["js-visit", "오시는 길"],
-            ].map(([id, label]) => (
-              <button key={id} type="button" onClick={() => go(id)} className={navBtn} style={{ outlineColor: C.navy }}>
-                {label}
-              </button>
-            ))}
-          </nav>
-        </div>
-      </header>
+      <Poster reduce={reduce} go={go} onPick={setField} onSide={setDocSide} />
 
       {/* 하는 일 한 줄과 바로 연락 */}
       <section id="js-work" aria-labelledby="js-work-title" className="mx-auto max-w-[1200px] scroll-mt-4 px-4 pt-10 md:px-6 md:pt-14">
-        <div className="flex flex-wrap items-end justify-between gap-4">
-          <h2 id="js-work-title" className="text-[28px] font-bold leading-[1.3] md:text-[36px]" style={{ ...serifF, color: C.ink, wordBreak: "keep-all" }}>
-            부동산 등기, 상속, 법인 등기, 개인회생
-          </h2>
-          <div className="flex flex-wrap gap-2">
-            <a
-              href={`tel:${TEL.replace(/-/g, "")}`}
-              data-gtm-cta="scrivener_tel"
-              className={`inline-flex items-center gap-2 rounded-[4px] px-4 py-2.5 text-[15px] font-semibold text-white ${focusRing}`}
-              style={{ background: C.navy, outlineColor: C.navy }}
-            >
-              <Phone size={17} aria-hidden />
-              {TEL}
-            </a>
-            <button
-              type="button"
-              onClick={() => go("js-apply")}
-              data-gtm-cta="scrivener_top_apply"
-              className={`inline-flex items-center gap-2 rounded-[4px] border px-4 py-2.5 text-[15px] font-semibold ${focusRing}`}
-              style={{ borderColor: C.navy, color: C.navy, outlineColor: C.navy }}
-            >
-              <MessageCircle size={17} aria-hidden />
-              상담신청
-            </button>
-          </div>
-        </div>
+        <h2 id="js-work-title" className="text-[28px] font-bold leading-[1.3] md:text-[36px]" style={{ ...serifF, color: C.ink, wordBreak: "keep-all" }}>
+          부동산 등기, 상속, 법인 등기, 개인회생
+        </h2>
 
         <ul className="mt-8 grid border-l border-t sm:grid-cols-2 lg:grid-cols-3" style={{ borderColor: C.line }}>
           {[
@@ -289,7 +245,7 @@ export function ScrivenerDemo() {
 
       <section id="js-docs" aria-labelledby="js-docs-title" className="mx-auto mt-16 max-w-[1200px] scroll-mt-4 px-4 md:mt-24 md:px-6">
         <SectionTitle id="js-docs-title" icon={<FileText size={22} aria-hidden />} title="잔금일 준비 서류" />
-        <DocChecklist reduce={reduce} />
+        <DocChecklist reduce={reduce} side={docSide} setSide={setDocSide} />
       </section>
 
       <section id="js-rehab" aria-labelledby="js-rehab-title" className="mx-auto mt-16 max-w-[1200px] scroll-mt-4 px-4 md:mt-24 md:px-6">
@@ -337,74 +293,365 @@ function SectionTitle({ id, icon, title }: { id: string; icon: React.ReactNode; 
   );
 }
 
-/* ---------- 포스터 ---------- */
+/* ---------- 첫 화면: 상황으로 찾기 ---------- */
 
-function Poster({ reduce, onCta }: { reduce: boolean; onCta: () => void }) {
-  const ref = useRef<HTMLElement>(null);
-  const { scrollYProgress } = useScroll({ target: ref, offset: ["start start", "end start"] });
-  const photoY = useTransform(scrollYProgress, (v) => (reduce ? "0%" : `${v * PARALLAX}%`));
+type Situation = {
+  id: string;
+  text: string;
+  work: string;
+  period: string;
+  words: string;
+  steps: [string, string, string];
+  docs: string[];
+  field: Field;
+  /** 펼친 줄 아래 버튼이 여는 구간 */
+  to: { id: string; label: string; side?: Side };
+};
+
+const SITUATIONS: Situation[] = [
+  {
+    id: "buy",
+    text: "집을 사서 잔금일이 다가와요",
+    work: "소유권 이전 등기",
+    period: "잔금일 당일 접수",
+    words: "매매 매수 아파트 잔금 취득세",
+    steps: ["계약서로 등기 비용 견적", "잔금일 은행, 중개사무소로 출장", "그날 바로 등기 접수"],
+    docs: ["신분증", "도장", "주민등록등본", "매매계약서 원본"],
+    field: "부동산 등기",
+    to: { id: "js-cost", label: "등기 비용 계산" },
+  },
+  {
+    id: "sell",
+    text: "집을 팔고 매수인에게 넘겨요",
+    work: "매도인 서류 준비",
+    period: "잔금일 당일",
+    words: "매도 매각 인감 등기권리증",
+    steps: ["매도용 인감증명서 발급", "등기권리증 확인", "잔금일 서류 전달"],
+    docs: ["등기권리증", "부동산 매도용 인감증명서", "인감도장", "주민등록초본"],
+    field: "부동산 등기",
+    to: { id: "js-docs", label: "매도인 서류 확인", side: "seller" },
+  },
+  {
+    id: "mortgage",
+    text: "대출을 다 갚았는데 근저당이 남아 있어요",
+    work: "근저당 말소 등기",
+    period: "상환 후 1주 안팎",
+    words: "대출 상환 근저당 말소 은행",
+    steps: ["은행 상환 영수증 확인", "말소 서류 받기", "등기소 접수"],
+    docs: ["대출 상환 영수증", "신분증", "등기권리증"],
+    field: "부동산 등기",
+    to: { id: "js-apply", label: "상담신청" },
+  },
+  {
+    id: "inherit",
+    text: "부모님이 돌아가시고 집이 남았어요",
+    work: "상속 등기",
+    period: "서류 준비 후 1~2주",
+    words: "상속 사망 부모 협의분할 유증",
+    steps: ["상속인 확인", "상속재산 협의분할서 작성", "상속 등기 접수"],
+    docs: ["가족관계증명서", "기본증명서", "제적등본", "상속인 인감증명서"],
+    field: "상속 등기",
+    to: { id: "js-apply", label: "상속 등기 상담신청" },
+  },
+  {
+    id: "officer",
+    text: "회사 대표나 임원이 바뀌었어요",
+    work: "임원 변경 등기",
+    period: "접수 후 3일 안팎",
+    words: "법인 회사 대표 이사 임원 변경",
+    steps: ["주주총회, 이사회 의사록 작성", "취임 승낙서 받기", "법인 등기 접수"],
+    docs: ["법인 인감", "의사록", "취임 승낙서", "새 임원 인감증명서"],
+    field: "법인 등기",
+    to: { id: "js-apply", label: "법인 등기 상담신청" },
+  },
+  {
+    id: "found",
+    text: "회사를 새로 세우려고 해요",
+    work: "법인 설립 등기",
+    period: "서류 준비 후 1주 안팎",
+    words: "법인 설립 창업 주식회사 정관",
+    steps: ["상호, 목적, 자본금 정하기", "정관 작성과 잔고 증명", "설립 등기 접수"],
+    docs: ["발기인 신분증", "인감증명서", "주금 납입 잔고증명서"],
+    field: "법인 등기",
+    to: { id: "js-apply", label: "법인 등기 상담신청" },
+  },
+  {
+    id: "debt",
+    text: "빚을 갚기 어렵고 독촉 전화가 와요",
+    work: "개인회생 신청",
+    period: "개시결정까지 1개월 안팎",
+    words: "빚 채무 독촉 회생 파산 대출",
+    steps: ["빚과 소득으로 자격 확인", "소득, 재산, 채권자 목록 준비", "회생법원 신청과 금지명령"],
+    docs: ["소득 증빙", "재산 목록", "채권자 목록"],
+    field: "개인회생",
+    to: { id: "js-rehab", label: "개인회생 단계 보기" },
+  },
+  {
+    id: "lend",
+    text: "빌려준 돈이나 보증금을 못 받고 있어요",
+    work: "내용증명, 지급명령",
+    period: "법원 결정 후 확정",
+    words: "대여금 보증금 전세 돈 지급명령 내용증명",
+    steps: ["내용증명으로 반환 요청", "지급명령 신청서 작성", "법원 결정 뒤 강제집행 검토"],
+    docs: ["차용증 또는 계약서", "송금 내역", "상대방 주소"],
+    field: "기타",
+    to: { id: "js-apply", label: "상담신청" },
+  },
+];
+
+const MENU: [string, string][] = [
+  ["js-work", "업무 분야"],
+  ["js-cost", "비용안내"],
+  ["js-docs", "준비 서류"],
+  ["js-rehab", "개인회생"],
+  ["js-apply", "상담신청"],
+  ["js-visit", "오시는 길"],
+];
+
+function Poster({ reduce, go, onPick, onSide }: { reduce: boolean; go: (id: string) => void; onPick: (f: Field) => void; onSide: (s: Side) => void }) {
+  const [q, setQ] = useState("");
+  const [open, setOpen] = useState<string | null>("buy");
+  const [menu, setMenu] = useState(false);
+  const searchId = useId();
+  const menuId = useId();
+
+  const words = q.trim().split(/\s+/).filter(Boolean);
+  const list = SITUATIONS.filter((s) => words.every((w) => `${s.text} ${s.work} ${s.words}`.includes(w)));
+
+  const move = (s: Situation) => {
+    onPick(s.field);
+    if (s.to.side) onSide(s.to.side);
+    go(s.to.id);
+  };
+  const menuGo = (id: string) => {
+    // 메뉴 칸이 접혀 높이가 바뀐 뒤에 이동해야 목적지가 어긋나지 않는다
+    setMenu(false);
+    requestAnimationFrame(() => requestAnimationFrame(() => go(id)));
+  };
 
   return (
-    <section id="js-poster" ref={ref} aria-labelledby="js-poster-title" className="relative flex min-h-[100svh] flex-col overflow-hidden" style={{ background: "#141414", color: "#fff" }}>
-      <style>{`
-        @keyframes js-rise { from { opacity: 0; transform: translateY(12px); } to { opacity: 1; transform: none; } }
-        .js-rise { animation: js-rise ${RISE}s cubic-bezier(${EASE.join(",")}) ${RISE_DELAY}s both; }
-        @media (prefers-reduced-motion: reduce) { .js-rise { animation: none; } }
-      `}</style>
-      <motion.div className="absolute inset-0" style={{ y: photoY }}>
-        <motion.div
-          className="absolute inset-0"
-          initial={reduce ? false : { scale: ZOOM_FROM }}
-          animate={{ scale: 1 }}
-          transition={reduce ? { duration: 0 } : { duration: ZOOM, ease: EASE }}
-        >
-          {/* eslint-disable-next-line @next/next/no-img-element -- 정적 export 라 next/image 최적화를 쓰지 않는다 */}
-          <img
-            src={`${IMG}/hero.jpg`}
-            srcSet={`${IMG}/hero-sm.jpg 960w, ${IMG}/hero.jpg 1920w`}
-            sizes="100vw"
-            alt="짙은 회색 바닥 위 작은 집 모형들 앞에 놓인 현관 열쇠 꾸러미"
-            fetchPriority="high"
-            className="absolute inset-0 h-full w-full object-cover"
-            style={{ objectPosition: "60% 50%" }}
-          />
-        </motion.div>
-      </motion.div>
-      <div
-        aria-hidden
-        className="pointer-events-none absolute inset-0"
-        style={{ background: "linear-gradient(to top, rgba(0,0,0,0.72), rgba(0,0,0,0.28) 55%, rgba(0,0,0,0.12))" }}
-      />
+    <section id="js-poster" aria-labelledby="js-poster-title" style={{ background: C.paper, color: C.ink }}>
+      {/* 상단 메뉴. 휴대폰은 햄버거 */}
+      <header className="border-b" style={{ borderColor: C.line }}>
+        <div className="mx-auto flex max-w-[1200px] items-center justify-between gap-3 px-4 py-2 md:px-6 md:py-3">
+          <p className="inline-flex min-h-11 items-center text-[20px] font-bold leading-none">
+            <SampleLogo />
+          </p>
+          <nav aria-label="주요 메뉴" className="hidden items-center lg:flex">
+            {MENU.map(([id, label]) => (
+              <button key={id} type="button" onClick={() => go(id)} className={`min-h-11 rounded-[4px] px-3 text-[16px] font-semibold underline-offset-4 hover:underline ${focusRing}`} style={{ outlineColor: C.navy }}>
+                {label}
+              </button>
+            ))}
+          </nav>
+          <div className="flex items-center gap-2">
+            <a
+              href={`tel:${TEL.replace(/-/g, "")}`}
+              data-gtm-cta="scrivener_tel"
+              aria-label={`전화 ${TEL}`}
+              className={`inline-flex min-h-11 min-w-11 items-center justify-center gap-2 rounded-[4px] px-3 text-[16px] font-bold tabular-nums text-white ${focusRing}`}
+              style={{ background: C.navy, outlineColor: C.navy }}
+            >
+              <Phone size={18} aria-hidden />
+              <span className="hidden sm:inline">{TEL}</span>
+            </a>
+            <button
+              type="button"
+              onClick={() => setMenu((v) => !v)}
+              aria-expanded={menu}
+              aria-controls={menuId}
+              aria-label="메뉴"
+              className={`grid h-11 w-11 place-items-center rounded-[4px] border lg:hidden ${focusRing}`}
+              style={{ borderColor: C.line, outlineColor: C.navy }}
+            >
+              {menu ? <X size={20} aria-hidden /> : <Menu size={20} aria-hidden />}
+            </button>
+          </div>
+        </div>
+        {menu && (
+          <nav id={menuId} aria-label="주요 메뉴" className="border-t lg:hidden" style={{ borderColor: C.line }}>
+            <ul className="mx-auto grid max-w-[1200px] grid-cols-2 px-2 py-2 sm:grid-cols-3">
+              {MENU.map(([id, label]) => (
+                <li key={id}>
+                  <button type="button" onClick={() => menuGo(id)} className={`min-h-12 w-full rounded-[4px] px-3 text-left text-[16px] font-semibold ${focusRing}`} style={{ outlineColor: C.navy }}>
+                    {label}
+                  </button>
+                </li>
+              ))}
+            </ul>
+          </nav>
+        )}
+      </header>
 
-      {/* 로고와 핵심 행동 하나 */}
-      <div className="relative z-10 flex items-center justify-between gap-3 px-4 pt-4 md:px-12 md:pt-7">
-        <p className="inline-flex items-center gap-2 text-[17px] font-bold leading-none">
-          <SampleLogo light size={18} />
-        </p>
-        <button
-          type="button"
-          onClick={onCta}
-          data-gtm-cta="scrivener_poster_cta"
-          className={`inline-flex items-center gap-2 rounded-[6px] px-4 py-2.5 text-[15px] font-semibold ${focusRing}`}
-          style={{ background: "#fff", color: C.ink, outlineColor: "#fff" }}
-        >
-          <Calculator size={18} aria-hidden />
-          등기 비용 계산
-        </button>
-      </div>
+      <div className="mx-auto grid max-w-[1200px] gap-8 px-4 pb-12 pt-6 md:px-6 md:pt-10 lg:grid-cols-[minmax(0,2fr)_minmax(0,1fr)] lg:gap-12">
+        <div className="min-w-0">
+          <div className="flex flex-wrap items-baseline justify-between gap-x-6 gap-y-1">
+            <h1 id="js-poster-title" className="text-[32px] font-bold md:text-[44px]" style={{ ...serifF, letterSpacing: "-0.03em", lineHeight: 1.2, wordBreak: "keep-all" }}>
+              잔금일 출장 등기
+            </h1>
+            <p className="text-[16px] tabular-nums" style={{ color: C.muted }}>
+              평일 09:00 ~ 18:00
+            </p>
+          </div>
 
-      {/* 문장 */}
-      <div className="relative z-[1] mt-auto max-w-[1200px] px-4 pb-14 md:px-12 md:pb-20">
-        <h1
-          id="js-poster-title"
-          className={`${reduce ? "" : "js-rise "}text-[36px] font-bold md:text-[clamp(40px,5vw,72px)]`}
-          style={{ ...serifF, letterSpacing: "-0.03em", lineHeight: 1.2, wordBreak: "keep-all" }}
-        >
-          잔금일 출장 등기
-        </h1>
-        <p className={`${reduce ? "" : "js-rise "}mt-4 text-[16px] md:mt-6 md:text-[18px]`} style={{ color: "rgba(255,255,255,0.86)" }}>
-          평일 09:00 ~ 18:00
-        </p>
+          {/* 휴대폰에서는 검색칸이 위에 붙는다 */}
+          <div className="sticky top-0 z-10 -mx-4 mt-6 px-4 py-2 lg:static lg:mx-0 lg:px-0" style={{ background: C.paper }}>
+            <h2 className="text-[18px] font-bold" style={{ color: C.navy }}>
+              <label htmlFor={searchId}>상황으로 찾기</label>
+            </h2>
+            <div className="relative mt-2">
+              <Search size={20} aria-hidden className="pointer-events-none absolute left-3 top-1/2 -translate-y-1/2" style={{ color: C.muted }} />
+              <input
+                id={searchId}
+                type="search"
+                value={q}
+                onChange={(e) => setQ(e.target.value)}
+                placeholder="상속, 근저당, 법인, 보증금"
+                className={`block h-12 w-full rounded-[4px] border pl-10 pr-3 text-[17px] ${focusRing}`}
+                style={{ borderColor: C.ink, background: C.paper, outlineColor: C.navy }}
+              />
+            </div>
+          </div>
+
+          <div className="mt-3 hidden grid-cols-[minmax(0,1.5fr)_minmax(0,1fr)_minmax(0,0.9fr)] gap-4 border-b px-1 pb-2 text-[14px] font-semibold md:grid" style={{ borderColor: C.ink, color: C.muted }}>
+            <span>상황</span>
+            <span>업무</span>
+            <span className="text-right">처리 기간</span>
+          </div>
+          <ul className="border-t md:border-t-0" style={{ borderColor: C.ink }} aria-live="polite">
+            {list.map((s) => {
+              const on = open === s.id;
+              const panelId = `js-sit-${s.id}`;
+              return (
+                <li key={s.id} className="border-b" style={{ borderColor: C.line }}>
+                  <button
+                    type="button"
+                    onClick={() => setOpen(on ? null : s.id)}
+                    aria-expanded={on}
+                    aria-controls={panelId}
+                    className={`grid min-h-14 w-full grid-cols-[minmax(0,1fr)_auto] items-center gap-x-3 px-1 py-3 text-left md:grid-cols-[minmax(0,1.5fr)_minmax(0,1fr)_minmax(0,0.9fr)] md:gap-x-4 ${focusRing}`}
+                    style={{ background: on ? C.paperDeep : "transparent", outlineColor: C.navy }}
+                  >
+                    <span className="min-w-0">
+                      <span className="block text-[17px] font-semibold" style={{ color: on ? C.navy : C.ink, wordBreak: "keep-all" }}>
+                        {s.text}
+                      </span>
+                      <span className="mt-0.5 block text-[14px] md:hidden" style={{ color: C.muted }}>
+                        {s.work}
+                      </span>
+                    </span>
+                    <span className="hidden text-[16px] md:block" style={{ color: C.body }}>
+                      {s.work}
+                    </span>
+                    <span className="inline-flex items-center justify-end gap-1 text-right text-[14px] md:text-[15px]" style={{ color: C.muted }}>
+                      <span className="hidden sm:inline">{s.period}</span>
+                      <ChevronDown size={18} aria-hidden className="flex-none" style={{ transform: on ? "rotate(180deg)" : "none", transition: reduce ? "none" : `transform ${DUR}s` }} />
+                    </span>
+                  </button>
+                  <AnimatePresence initial={false}>
+                    {on && (
+                      <motion.div
+                        id={panelId}
+                        key="panel"
+                        initial={reduce ? false : { height: 0, opacity: 0 }}
+                        animate={{ height: "auto", opacity: 1 }}
+                        exit={reduce ? { opacity: 0, transition: { duration: 0 } } : { height: 0, opacity: 0 }}
+                        transition={{ duration: reduce ? 0 : DUR, ease: EASE }}
+                        className="overflow-hidden"
+                        style={{ background: C.paperDeep }}
+                      >
+                        <div className="grid gap-5 px-3 pb-5 pt-1 md:grid-cols-[minmax(0,1.2fr)_minmax(0,1fr)] md:px-4">
+                          <div>
+                            <h3 className="text-[14px] font-bold" style={{ color: C.muted }}>
+                              진행 순서
+                            </h3>
+                            <ol className="mt-2 space-y-2">
+                              {s.steps.map((t, i) => (
+                                <li key={t} className="flex gap-2.5 text-[16px]">
+                                  <span className="grid h-6 w-6 flex-none place-items-center rounded-full text-[13px] font-bold text-white" style={{ background: C.navy }}>
+                                    {i + 1}
+                                  </span>
+                                  <span className="min-w-0">{t}</span>
+                                </li>
+                              ))}
+                            </ol>
+                            <p className="mt-3 text-[15px]">
+                              <span className="font-bold">처리 기간</span> <span style={{ color: C.body }}>{s.period}</span>
+                            </p>
+                          </div>
+                          <div>
+                            <h3 className="text-[14px] font-bold" style={{ color: C.muted }}>
+                              준비 서류
+                            </h3>
+                            <ul className="mt-2 space-y-1.5">
+                              {s.docs.map((d) => (
+                                <li key={d} className="flex gap-2 text-[16px]">
+                                  <Check size={17} aria-hidden className="mt-1 flex-none" style={{ color: C.navy }} />
+                                  {d}
+                                </li>
+                              ))}
+                            </ul>
+                            <button
+                              type="button"
+                              onClick={() => move(s)}
+                              data-gtm-cta={`scrivener_poster_${s.id}`}
+                              className={`mt-4 inline-flex min-h-11 items-center gap-1.5 rounded-[4px] px-4 text-[16px] font-bold text-white ${focusRing}`}
+                              style={{ background: C.navy, outlineColor: C.navy }}
+                            >
+                              {s.to.label}
+                              <ChevronRight size={18} aria-hidden />
+                            </button>
+                          </div>
+                        </div>
+                      </motion.div>
+                    )}
+                  </AnimatePresence>
+                </li>
+              );
+            })}
+          </ul>
+          {list.length === 0 && (
+            <p className="border-b px-1 py-5 text-[16px]" style={{ borderColor: C.line, color: C.body }}>
+              맞는 상황이 없으면 전화 상담 <a href={`tel:${TEL.replace(/-/g, "")}`} className={`font-bold underline underline-offset-4 ${focusRing}`} style={{ color: C.navy, outlineColor: C.navy }}>{TEL}</a>
+            </p>
+          )}
+        </div>
+
+        {/* 사무소 정보. PC는 세로 사진, 휴대폰은 가로 명함 */}
+        <aside aria-label="사무소 정보" className="flex min-w-0 gap-4 rounded-[6px] border p-3 lg:block lg:self-start lg:border-0 lg:p-0" style={{ borderColor: C.line }}>
+          <div className="h-24 w-24 flex-none overflow-hidden rounded-[4px] lg:aspect-[3/4] lg:h-auto lg:w-full" style={{ background: C.paperDeep }}>
+            <motion.div className="h-full w-full" initial={reduce ? false : { scale: ZOOM_FROM }} animate={{ scale: 1 }} transition={{ duration: reduce ? 0 : ZOOM, ease: EASE }}>
+              {/* eslint-disable-next-line @next/next/no-img-element -- 정적 export 라 next/image 최적화를 쓰지 않는다 */}
+              <img
+                src={`${IMG}/hero.jpg`}
+                srcSet={`${IMG}/hero-sm.jpg 960w, ${IMG}/hero.jpg 1920w`}
+                sizes="(min-width: 1024px) 400px, 96px"
+                alt="짙은 회색 바닥 위 작은 집 모형들 앞에 놓인 현관 열쇠 꾸러미"
+                fetchPriority="high"
+                className="h-full w-full object-cover"
+                style={{ objectPosition: "60% 50%" }}
+              />
+            </motion.div>
+          </div>
+          <div className="min-w-0 lg:mt-4">
+            <p className="text-[17px] font-bold">곰파트너 법무사사무소</p>
+            <p className="mt-1 text-[15px]" style={{ color: C.body }}>
+              ㅇㅇ등기소 건너편, ㅇㅇ역 2번 출구
+            </p>
+            <a href={`tel:${TEL.replace(/-/g, "")}`} className={`mt-1 inline-flex min-h-11 items-center gap-1.5 text-[17px] font-bold tabular-nums ${focusRing}`} style={{ color: C.navy, outlineColor: C.navy }}>
+              <Phone size={17} aria-hidden />
+              {TEL}
+            </a>
+            <dl className="mt-2 hidden gap-x-3 gap-y-1 border-t pt-3 text-[15px] lg:grid lg:grid-cols-[auto_minmax(0,1fr)]" style={{ borderColor: C.line }}>
+              {HOURS.map((h) => (
+                <Fragment key={h.label}>
+                  <dt className="font-semibold">{h.label}</dt>
+                  <dd style={{ color: C.body }}>{h.open}</dd>
+                </Fragment>
+              ))}
+            </dl>
+          </div>
+        </aside>
       </div>
     </section>
   );
@@ -589,8 +836,7 @@ function CheckRow({ checked, onChange, label }: { checked: boolean; onChange: (v
 
 /* ---------- 2. 필요 서류 ---------- */
 
-function DocChecklist({ reduce }: { reduce: boolean }) {
-  const [side, setSide] = useState<Side>("buyer");
+function DocChecklist({ reduce, side, setSide }: { reduce: boolean; side: Side; setSide: (s: Side) => void }) {
   const [got, setGot] = useState<Record<string, boolean>>({});
   const list = DOCS[side];
   const done = list.filter((d) => got[d.id]).length;
