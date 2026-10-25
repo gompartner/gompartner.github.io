@@ -257,7 +257,6 @@ export function SmallWeddingDemo() {
         today={today}
         date={date}
         slot={slot}
-        onSlot={(i) => setPick({ date, slot: i })}
         onOpenDate={(d, i) => {
           setPick({ date: d, slot: i });
           go("sw-consult");
@@ -288,6 +287,26 @@ export function SmallWeddingDemo() {
             </p>
           </div>
 
+          {/* 홀 사진은 고른 시간대의 빛으로 바뀐다 */}
+          <div className="relative mt-4 aspect-[16/9] overflow-hidden rounded-[4px]" style={{ background: C.ivoryDeep }}>
+            {SLOTS.map((s, i) => (
+              // eslint-disable-next-line @next/next/no-img-element -- 정적 export 라 next/image 최적화를 쓰지 않는다
+              <img
+                key={s.img}
+                src={`${IMG}/${s.img}.jpg`}
+                alt={i === slot ? `${s.time} 예식 때 아치창으로 빛이 드는 홀` : ""}
+                aria-hidden={i !== slot}
+                loading="lazy"
+                decoding="async"
+                sizes="(min-width: 1024px) 580px, 100vw"
+                className="absolute inset-0 h-full w-full object-cover"
+                style={{ objectPosition: "55% 45%", opacity: i === slot ? 1 : 0, transition: reduce ? "none" : `opacity ${LIGHT_MS}ms ease` }}
+              />
+            ))}
+          </div>
+          <p className="mt-2 text-[14px]" style={{ color: C.body }} aria-live="polite">
+            홀 {SLOTS[slot].time}, {SLOTS[slot].note}
+          </p>
         </div>
 
         <div id="sw-date" className="min-w-0 rounded-[6px] border p-4 md:p-6" style={{ borderColor: C.line, background: C.paper }}>
@@ -370,15 +389,19 @@ export function SmallWeddingDemo() {
   );
 }
 
-/* 첫 화면: 큰 공간 사진 + 아래 썸네일 투어 + 오른쪽 위 남은 날짜 상자.
+/* 첫 화면: 큰 공간 사진 + 아래 공간 썸네일(테이블, 가든, 신부대기실, 연회장, 포토존) + 오른쪽 위 남은 날짜 상자.
    실제 스몰웨딩 홀 사이트의 공간별 썸네일 홀 투어와 잔여 타임 공지를 한 화면에 모았다.
-   썸네일을 누르면 큰 사진이 그 장면으로 바뀌고(0.8초 교차), 홀 시간대 사진이면 아래 예약 현황의 시간대도 그 시간으로 맞춘다(그 날 비어 있을 때).
+   썸네일을 누르면 큰 사진이 그 공간으로 바뀌고(0.8초 교차) 썸네일 아래에 수용 인원 한 줄이 바뀐다.
+   홀의 시간대별 사진은 아래 예약 현황에서 시간대를 고를 때 바뀐다.
    남은 날짜를 누르면 날짜와 시간대가 고른 값으로 바뀌고 방문 상담 신청으로 내려가 희망 예식일이 채워진다.
    휴대폰은 사진 4:3, 남은 날짜는 썸네일 아래 가로로 넘기는 칩, 첫 화면이 보이는 동안 하단에 방문 상담 버튼을 고정한다.
    모션: 사진만 1.04배에서 1.6초 동안 천천히 다가온다. 동작 줄이기면 멈춘 사진, 교차 없이 바로 바뀐다. */
 const VIEWS = [
-  { key: "table", img: "hero", label: "예식 테이블", line: "8인 원형 테이블, 꽃장식 기본 포함", slot: null as number | null },
-  ...SLOTS.map((s, i) => ({ key: s.img, img: s.img, label: `홀 ${s.time}`, line: `하객 ${HALL_MIN}명부터 ${HALL_MAX}명, ${s.note}`, slot: i as number | null })),
+  { key: "table", img: "hero", sm: "hero-sm", label: "테이블", line: "기본 꽃장식, 테이블 센터피스 포함", alt: "분홍 장미와 유칼립투스로 꾸민 예식 테이블과 하객 의자", pos: "55% 45%" },
+  { key: "garden", img: "garden", sm: "garden", label: "가든", line: "야외 의자 40석, 식전 음료와 사진 촬영", alt: "잔디 위 흰 꽃 아치와 접이식 흰 의자 줄", pos: "45% 55%" },
+  { key: "bride", img: "bride-room", sm: "bride-room", label: "신부대기실", line: "2실, 가족 대기 소파와 다과", alt: "흰 커튼 창 앞 아이보리 소파와 흰 장미 꽃병", pos: "50% 60%" },
+  { key: "banquet", img: "banquet", sm: "banquet", label: "연회장", line: `${SEAT}인 원형 테이블, 하객 ${HALL_MAX}명까지`, alt: "흰 테이블보를 씌운 원형 테이블과 작은 꽃 센터피스", pos: "50% 50%" },
+  { key: "photozone", img: "photozone", sm: "photozone", label: "포토존", line: "생화 아치와 원목 벤치, 창가 자연광", alt: "흰 벽 앞 초록 잎과 흰 꽃 아치, 원목 벤치", pos: "50% 50%" },
 ];
 
 function Poster({
@@ -386,7 +409,6 @@ function Poster({
   today,
   date,
   slot,
-  onSlot,
   onOpenDate,
   go,
 }: {
@@ -394,7 +416,6 @@ function Poster({
   today: Date;
   date: Date;
   slot: number;
-  onSlot: (i: number) => void;
   onOpenDate: (d: Date, i: number) => void;
   go: (id: string) => void;
 }) {
@@ -453,12 +474,12 @@ function Poster({
                 src={`${IMG}/${x.img}.jpg`}
                 srcSet={x.img === "hero" ? `${IMG}/hero-sm.jpg 960w, ${IMG}/hero.jpg 1920w` : undefined}
                 sizes="(min-width: 1200px) 1150px, 100vw"
-                alt={i === view ? (x.slot === null ? "분홍 장미와 유칼립투스로 꾸민 예식 테이블과 하객 의자" : `${SLOTS[x.slot].time} 예식 때 아치창으로 빛이 드는 홀`) : ""}
+                alt={i === view ? x.alt : ""}
                 aria-hidden={i !== view}
                 fetchPriority={i === 0 ? "high" : undefined}
                 loading={i === 0 ? undefined : "lazy"}
                 className="absolute inset-0 h-full w-full object-cover"
-                style={{ objectPosition: "55% 45%", opacity: i === view ? 1 : 0, transition: reduce ? "none" : `opacity ${LIGHT_MS}ms ease` }}
+                style={{ objectPosition: x.pos, opacity: i === view ? 1 : 0, transition: reduce ? "none" : `opacity ${LIGHT_MS}ms ease` }}
               />
             ))}
           </motion.div>
@@ -472,7 +493,7 @@ function Poster({
         </div>
 
         {/* 썸네일 투어 */}
-        <div role="group" aria-label="공간 사진" className="mt-3 grid grid-cols-5 gap-2 md:grid-cols-[repeat(5,minmax(0,168px))] md:gap-3">
+        <div role="group" aria-label="공간 사진" className="mt-3 grid grid-cols-5 gap-1.5 md:grid-cols-[repeat(5,minmax(0,168px))] md:gap-3">
           {VIEWS.map((x, i) => {
             const on = i === view;
             return (
@@ -480,16 +501,13 @@ function Poster({
                 key={x.key}
                 type="button"
                 aria-pressed={on}
-                onClick={() => {
-                  setView(i);
-                  if (x.slot !== null && !slotTaken(today, date, x.slot)) onSlot(x.slot);
-                }}
+                onClick={() => setView(i)}
                 className={`${focusRing} min-w-0 text-left`}
                 style={{ outlineColor: C.olive }}
               >
                 <span className="relative block aspect-[4/3] overflow-hidden rounded-[4px] border-2" style={{ borderColor: on ? C.olive : "transparent" }}>
                   {/* eslint-disable-next-line @next/next/no-img-element -- 정적 export 라 next/image 최적화를 쓰지 않는다 */}
-                  <img src={`${IMG}/${x.img === "hero" ? "hero-sm" : x.img}.jpg`} alt="" aria-hidden loading="lazy" className="h-full w-full object-cover" />
+                  <img src={`${IMG}/${x.sm}.jpg`} alt="" aria-hidden loading="lazy" decoding="async" sizes="(min-width: 768px) 168px, 20vw" className="h-full w-full object-cover" style={{ objectPosition: x.pos }} />
                 </span>
                 <span className="mt-1 block truncate text-[13px] md:text-[15px]" style={{ fontWeight: on ? 700 : 400, color: on ? C.ink : C.body }}>
                   {x.label}

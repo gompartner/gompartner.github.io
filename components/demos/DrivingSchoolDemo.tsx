@@ -521,7 +521,7 @@ const Poster = memo(function Poster({
                 src={`${IMG}/hero.jpg`}
                 srcSet={`${IMG}/hero-sm.jpg 960w, ${IMG}/hero.jpg 1920w`}
                 sizes="(min-width: 768px) 55vw, 100vw"
-                alt="운전석에서 한 손으로 핸들을 잡고 있는 모습"
+                alt="운전석에서 두 손으로 핸들을 잡고 장내 코스를 보는 수강생"
                 fetchPriority="high"
                 className="absolute inset-0 h-full w-full object-cover"
                 style={{ objectPosition: "62% 50%" }}
@@ -600,35 +600,63 @@ const Poster = memo(function Poster({
           </div>
         </div>
 
-        {/* 큰 타일 셋 */}
-        <ul className="mt-6 grid gap-3 px-4 pb-10 sm:grid-cols-3 md:px-0 md:pb-12">
+        {/* 큰 타일 셋. 시험 일정은 기능 코스 사진 타일 */}
+        <div className="mt-6 grid gap-3 px-4 pb-10 sm:grid-cols-[minmax(0,1fr)_minmax(0,1fr)] md:gap-x-6 md:px-0 md:pb-12 lg:grid-cols-[minmax(0,11fr)_minmax(0,9fr)]">
+          <button
+            type="button"
+            onClick={() => go("dr-exam")}
+            className={`group flex flex-col overflow-hidden rounded-[8px] border text-left hover:border-[#bdbdbd] sm:row-span-2 ${focusRing}`}
+            style={{ background: C.card, borderColor: C.line, outlineColor: C.ink }}
+          >
+            <span className="relative block h-[150px] overflow-hidden sm:h-auto sm:min-h-[96px] sm:flex-1">
+              {/* eslint-disable-next-line @next/next/no-img-element -- 정적 export 라 next/image 최적화를 쓰지 않는다 */}
+              <img
+                src={`${IMG}/course.jpg`}
+                alt="흰 선과 노란 선을 그은 빈 장내기능 코스, 뒤로 아파트 단지"
+                sizes="(min-width: 1440px) 760px, (min-width: 640px) 55vw, 100vw"
+                loading="lazy"
+                decoding="async"
+                className={`absolute inset-0 h-full w-full object-cover ${reduce ? "" : "transition-transform duration-500 group-hover:scale-[1.03]"}`}
+                style={{ objectPosition: "50% 32%" }}
+              />
+            </span>
+            <span className="flex min-h-[76px] items-center gap-4 px-5 py-4">
+              <span className="flex h-11 w-11 flex-none items-center justify-center rounded-[6px]" style={{ background: C.accentSoft, color: C.accent }}>
+                <CalendarCheck size={22} aria-hidden />
+              </span>
+              <span className="min-w-0">
+                <span className="block text-[18px] font-bold">시험 일정</span>
+                <span className="block text-[14px]" style={{ color: C.muted }}>
+                  장내기능, 도로주행 검정일
+                </span>
+              </span>
+            </span>
+          </button>
           {(
             [
               { id: "dr-course", title: "수강료", sub: "교육비와 검정료, 추가 교육", Icon: FileText },
               { id: "dr-shuttle", title: "셔틀 노선", sub: `무료 셔틀 ${ROUTES.length}개 노선`, Icon: Bus },
-              { id: "dr-exam", title: "시험 일정", sub: "장내기능, 도로주행 검정일", Icon: CalendarCheck },
             ] as const
           ).map((t) => (
-            <li key={t.id}>
-              <button
-                type="button"
-                onClick={() => go(t.id)}
-                className={`flex min-h-[76px] w-full items-center gap-4 rounded-[8px] border px-5 py-4 text-left hover:border-[#bdbdbd] ${focusRing}`}
-                style={{ background: C.card, borderColor: C.line, outlineColor: C.ink }}
-              >
-                <span className="flex h-11 w-11 flex-none items-center justify-center rounded-[6px]" style={{ background: C.accentSoft, color: C.accent }}>
-                  <t.Icon size={22} aria-hidden />
+            <button
+              key={t.id}
+              type="button"
+              onClick={() => go(t.id)}
+              className={`flex min-h-[76px] w-full items-center gap-4 rounded-[8px] border px-5 py-4 text-left hover:border-[#bdbdbd] sm:min-h-[110px] ${focusRing}`}
+              style={{ background: C.card, borderColor: C.line, outlineColor: C.ink }}
+            >
+              <span className="flex h-11 w-11 flex-none items-center justify-center rounded-[6px]" style={{ background: C.accentSoft, color: C.accent }}>
+                <t.Icon size={22} aria-hidden />
+              </span>
+              <span className="min-w-0">
+                <span className="block text-[18px] font-bold">{t.title}</span>
+                <span className="block text-[14px]" style={{ color: C.muted }}>
+                  {t.sub}
                 </span>
-                <span className="min-w-0">
-                  <span className="block text-[18px] font-bold">{t.title}</span>
-                  <span className="block text-[14px]" style={{ color: C.muted }}>
-                    {t.sub}
-                  </span>
-                </span>
-              </button>
-            </li>
+              </span>
+            </button>
           ))}
-        </ul>
+        </div>
       </div>
 
       {/* 휴대폰 하단 고정 줄: 전화, 문자 상담 */}

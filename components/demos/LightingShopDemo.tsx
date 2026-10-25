@@ -247,7 +247,7 @@ export function LightingShopDemo() {
         }}
         onTry={tryProduct}
         onAdd={addCart}
-        inCart={cart[HERO_PRODUCT] ?? 0}
+        cart={cart}
       />
 
       {/* 첫 화면: 불 꺼진 방 + 디머 패널 */}
@@ -409,11 +409,18 @@ export function LightingShopDemo() {
 
 /* ---------------- 첫 화면: 사진 속 제품 점 ---------------- */
 
-/* 실제 조명 매장 사이트처럼 상단에 형태별 분류 메뉴를 두고, 첫 화면은 화면 폭 실내 사진 한 장.
-   사진 속 조명 위의 작은 점을 누르면 옆에 제품 카드(품명, 구성, 가격, 방에 걸어 보기, 견적 담기)가 열린다.
-   사진 아래에는 제목과 전시장 영업시간 한 줄, 형태별 분류 줄(대표 제품 사진 + 이름). 분류를 누르면 아래 제품 목록이 그 분류로 열린다.
-   모션: 사진만 1.04배에서 1.6초 동안 천천히 다가오고, 카드는 0.18초 동안 나타난다. 동작 줄이기면 둘 다 바로. */
-const HERO_PRODUCT = "p-triple";
+/* 실제 조명 매장 사이트처럼 상단에 형태별 분류 메뉴를 두고, 첫 화면은 조명 셋이 켜진 거실 사진 한 장.
+   사진 속 조명마다 작은 점이 있고, 점을 누르면 그 조명과 형태가 같은 제품 카드(품명, 구성, 가격, 방에 걸어 보기, 견적 담기)로 바뀐다.
+   사진은 원본 비율(3:2) 그대로 두어 점이 화면 폭과 상관없이 조명 위에 머문다.
+   PC는 사진 오른쪽에 제목, 영업시간, 제품 카드. 휴대폰은 사진 바로 아래 카드, 그 아래 제목.
+   사진 아래에는 형태별 분류 줄(대표 제품 사진 + 이름). 분류를 누르면 아래 제품 목록이 그 분류로 열린다.
+   모션: 사진만 1.04배에서 1.6초 동안 천천히 다가오고, 카드는 0.18초 동안 바뀐다. 동작 줄이기면 둘 다 바로. */
+/** 사진 속 조명 위치(사진 기준 %)와 형태가 같은 제품 */
+const SPOTS: { id: string; x: number; y: number; where: string }[] = [
+  { id: "p-dome", x: 34, y: 25, where: "식탁 위" },
+  { id: "s-arc", x: 32.5, y: 45, where: "소파 옆" },
+  { id: "w-sconce", x: 91.3, y: 55, where: "소파 뒤 벽" },
+];
 /** 분류마다 대표 제품 사진 */
 const CAT_COVER: Record<Category, string> = { 펜던트: "p-dome", 스탠드: "s-arc", 레일: "r-spot3", 벽등: "w-sconce", "간접 LED 바": "l-bar1" };
 
@@ -424,7 +431,7 @@ function Poster({
   onCat,
   onTry,
   onAdd,
-  inCart,
+  cart,
 }: {
   reduce: boolean;
   today: Date;
@@ -432,11 +439,13 @@ function Poster({
   onCat: (c: Category) => void;
   onTry: (p: Product) => void;
   onAdd: (id: string) => void;
-  inCart: number;
+  cart: Record<string, number>;
 }) {
-  const [open, setOpen] = useState(true);
+  const [spot, setSpot] = useState(SPOTS[0].id);
   const [menu, setMenu] = useState(false);
-  const p = byId(HERO_PRODUCT);
+  const p = byId(spot);
+  const inCart = cart[p.id] ?? 0;
+  const where = SPOTS.find((x) => x.id === spot)!.where;
   const todayHours = HOURS.find((h) => h.days.includes(today.getDay()))!;
   const nav = (fn: () => void) => {
     setMenu(false);
@@ -447,30 +456,6 @@ function Poster({
     ["시공 안내", () => go("ls-quote")],
     ["매장 안내", () => go("ls-store")],
   ];
-
-  const card = (
-    <div className="w-full rounded-[6px] border p-4 md:w-[280px]" style={{ background: C.panel, borderColor: C.line }}>
-      <p className="text-[13px]" style={{ color: C.creamDim }}>
-        {p.cat}
-      </p>
-      <p className="mt-0.5 text-[17px] font-bold leading-[1.35]">{p.name}</p>
-      <p className="mt-1 text-[14px]" style={{ color: C.creamDim }}>
-        {p.spec}
-      </p>
-      <p className="mt-2 text-[19px] font-bold tabular-nums" style={{ color: C.amber }}>
-        {won(p.price)}
-      </p>
-      <div className="mt-3 grid grid-cols-2 gap-2">
-        <button type="button" onClick={() => onTry(p)} data-gtm-cta="lighting-shop_hero_try" className={`min-h-11 rounded-[4px] border px-2 text-[14px] font-bold ${focusRing}`} style={{ borderColor: C.amber, color: C.amber, outlineColor: C.cream }}>
-          방에 걸어 보기
-        </button>
-        <button type="button" onClick={() => onAdd(p.id)} data-gtm-cta="lighting-shop_hero_cart" className={`inline-flex min-h-11 items-center justify-center gap-1 rounded-[4px] px-2 text-[14px] font-bold ${focusRing}`} style={{ background: C.cream, color: C.ink, outlineColor: C.amber }}>
-          {inCart > 0 ? <Check size={15} aria-hidden /> : <Plus size={15} aria-hidden />}
-          {inCart > 0 ? `견적에 ${inCart}개` : "견적 담기"}
-        </button>
-      </div>
-    </div>
-  );
 
   return (
     <section id="ls-poster" aria-labelledby="ls-poster-title" style={{ background: C.bg }}>
@@ -516,68 +501,102 @@ function Poster({
         )}
       </header>
 
-      {/* 실내 사진 + 제품 점. 휴대폰 1:1, PC 16:9 */}
-      <div className="mx-auto max-w-[1440px] md:px-6">
-        <div className="relative aspect-square overflow-hidden md:aspect-[16/9] md:max-h-[calc(100svh-260px)] md:min-h-[420px] md:w-full md:rounded-b-[6px]" style={{ background: "#101010" }}>
+      {/* 실내 사진 + 제품 점 | 제목, 영업시간, 제품 카드 */}
+      <div className="mx-auto max-w-[1200px] md:px-6 md:pt-6 lg:grid lg:grid-cols-[minmax(0,2fr)_minmax(0,1fr)] lg:gap-6">
+        <div className="relative aspect-[3/2] overflow-hidden md:rounded-[6px]" style={{ background: "#101010" }}>
           <motion.div className="absolute inset-0" initial={reduce ? false : { scale: 1.04 }} animate={{ scale: 1 }} transition={{ duration: reduce ? 0 : 1.6, ease: EASE }}>
             {/* eslint-disable-next-line @next/next/no-img-element -- 정적 export 라 next/image 최적화를 쓰지 않는다 */}
             <img
-              src={`${IMG}/hero.jpg`}
-              srcSet={`${IMG}/hero-sm.jpg 960w, ${IMG}/hero.jpg 1920w`}
-              sizes="100vw"
-              alt="창가에 매달린 붉은 원뿔 펜던트 조명 세 개"
+              src={`${IMG}/room.jpg`}
+              sizes="(min-width: 1200px) 760px, (min-width: 1024px) 64vw, 100vw"
+              width={1200}
+              height={799}
+              alt="식탁 위 흰 돔 펜던트, 소파 옆 검은 아치 스탠드, 벽 브래킷과 작은 테이블 램프가 켜진 거실"
               fetchPriority="high"
-              className="h-full w-full object-cover [object-position:48%_50%] md:[object-position:50%_40%]"
+              className="h-full w-full object-cover"
             />
           </motion.div>
-          {/* 가운데 펜던트 위 제품 점 */}
-          <div className="absolute left-[50%] top-[45%] md:left-[49.5%] md:top-[46%]">
-            <button
-              type="button"
-              aria-expanded={open}
-              aria-controls="ls-hero-card"
-              aria-label={`${p.name} 제품 정보 ${open ? "닫기" : "열기"}`}
-              onClick={() => setOpen((v) => !v)}
-              className={`relative -ml-[22px] -mt-[22px] flex h-11 w-11 items-center justify-center rounded-full ${focusRing}`}
-              style={{ outlineColor: C.cream }}
-            >
-              <span aria-hidden className="flex h-7 w-7 items-center justify-center rounded-full border-2" style={{ borderColor: C.cream, background: open ? C.amber : "rgba(20,20,20,0.7)", color: open ? C.ink : C.cream }}>
-                {open ? <Minus size={14} strokeWidth={3} /> : <Plus size={14} strokeWidth={3} />}
-              </span>
-            </button>
-            {/* PC: 점 오른쪽에 카드 */}
-            <AnimatePresence>
-              {open && (
-                <motion.div
-                  id="ls-hero-card"
-                  initial={reduce ? false : { opacity: 0, x: -6 }}
-                  animate={{ opacity: 1, x: 0 }}
-                  exit={reduce ? { opacity: 0, transition: { duration: 0 } } : { opacity: 0, transition: { duration: 0.12 } }}
-                  transition={{ duration: reduce ? 0 : 0.18, ease: EASE }}
-                  className="absolute left-[34px] top-[-22px] hidden md:block"
-                >
-                  {card}
-                </motion.div>
-              )}
-            </AnimatePresence>
-          </div>
+          <ul aria-label="사진 속 조명" className="absolute inset-0">
+            {SPOTS.map((s) => {
+              const on = s.id === spot;
+              const sp = byId(s.id);
+              return (
+                <li key={s.id} className="absolute" style={{ left: `${s.x}%`, top: `${s.y}%` }}>
+                  <button
+                    type="button"
+                    aria-pressed={on}
+                    aria-controls="ls-hero-card"
+                    aria-label={`${s.where} ${sp.name}`}
+                    onClick={() => setSpot(s.id)}
+                    className={`relative -ml-[22px] -mt-[22px] flex h-11 w-11 items-center justify-center rounded-full ${focusRing}`}
+                    style={{ outlineColor: C.cream }}
+                  >
+                    <span aria-hidden className="flex h-7 w-7 items-center justify-center rounded-full border-2" style={{ borderColor: C.cream, background: on ? C.amber : "rgba(20,20,20,0.72)", color: on ? C.ink : C.cream }}>
+                      {on ? <Check size={14} strokeWidth={3} /> : <Plus size={14} strokeWidth={3} />}
+                    </span>
+                  </button>
+                </li>
+              );
+            })}
+          </ul>
         </div>
-        {/* 휴대폰: 카드는 사진 바로 아래 */}
-        {open && <div className="px-4 pt-3 md:hidden">{card}</div>}
+
+        <div className="flex flex-col gap-4 px-4 pt-4 md:px-0 lg:pt-0">
+          <div className="order-2 lg:order-1">
+            <h1 id="ls-poster-title" className="text-[24px] font-bold leading-[1.3] tracking-[-0.03em] [word-break:keep-all] md:text-[30px]">
+              설치 시공까지 하는 조명 매장
+            </h1>
+            <p className="mt-2 inline-flex items-center gap-1.5 text-[15px]" style={{ color: C.creamDim }}>
+              <Clock size={16} aria-hidden style={{ color: C.amber }} />
+              전시장 오늘 {todayHours.time === "휴무" ? "휴무" : todayHours.time}, 평일 10:00~19:00
+            </p>
+          </div>
+
+          <AnimatePresence mode="wait" initial={false}>
+            <motion.div
+              key={p.id}
+              id="ls-hero-card"
+              aria-live="polite"
+              initial={reduce ? false : { opacity: 0, y: 4 }}
+              animate={{ opacity: 1, y: 0 }}
+              exit={reduce ? { opacity: 0, transition: { duration: 0 } } : { opacity: 0, transition: { duration: 0.12 } }}
+              transition={{ duration: reduce ? 0 : 0.18, ease: EASE }}
+              className="order-1 rounded-[6px] border p-4 lg:order-2"
+              style={{ background: C.panel, borderColor: C.line }}
+            >
+              <div className="flex gap-3">
+                {/* eslint-disable-next-line @next/next/no-img-element -- 정적 export 라 next/image 최적화를 쓰지 않는다 */}
+                <img src={`${IMG}/products/${p.id}.jpg`} alt="" aria-hidden width={72} height={72} className="h-[72px] w-[72px] flex-none rounded-[4px] object-cover" />
+                <div className="min-w-0">
+                  <p className="text-[13px]" style={{ color: C.creamDim }}>
+                    {where}, {p.cat}
+                  </p>
+                  <p className="mt-0.5 text-[17px] font-bold leading-[1.35]">{p.name}</p>
+                  <p className="mt-1 text-[14px]" style={{ color: C.creamDim }}>
+                    {p.spec}
+                  </p>
+                </div>
+              </div>
+              <p className="mt-3 text-[19px] font-bold tabular-nums" style={{ color: C.amber }}>
+                {won(p.price)}
+              </p>
+              <div className="mt-3 grid grid-cols-2 gap-2">
+                <button type="button" onClick={() => onTry(p)} data-gtm-cta="lighting-shop_hero_try" className={`min-h-11 rounded-[4px] border px-2 text-[14px] font-bold ${focusRing}`} style={{ borderColor: C.amber, color: C.amber, outlineColor: C.cream }}>
+                  방에 걸어 보기
+                </button>
+                <button type="button" onClick={() => onAdd(p.id)} data-gtm-cta="lighting-shop_hero_cart" className={`inline-flex min-h-11 items-center justify-center gap-1 rounded-[4px] px-2 text-[14px] font-bold ${focusRing}`} style={{ background: C.cream, color: C.ink, outlineColor: C.amber }}>
+                  {inCart > 0 ? <Check size={15} aria-hidden /> : <Plus size={15} aria-hidden />}
+                  {inCart > 0 ? `견적에 ${inCart}개` : "견적 담기"}
+                </button>
+              </div>
+            </motion.div>
+          </AnimatePresence>
+        </div>
       </div>
 
-      {/* 제목, 영업시간, 형태별 분류 */}
+      {/* 형태별 분류 */}
       <div className="mx-auto max-w-[1200px] px-4 pb-10 pt-5 md:px-6 md:pb-12 md:pt-6">
-        <div className="flex flex-wrap items-baseline justify-between gap-x-6 gap-y-2">
-          <h1 id="ls-poster-title" className="text-[24px] font-bold leading-[1.3] tracking-[-0.03em] [word-break:keep-all] md:text-[30px]">
-            설치 시공까지 하는 조명 매장
-          </h1>
-          <p className="inline-flex items-center gap-1.5 text-[15px]" style={{ color: C.creamDim }}>
-            <Clock size={16} aria-hidden style={{ color: C.amber }} />
-            전시장 오늘 {todayHours.time === "휴무" ? "휴무" : todayHours.time}, 평일 10:00~19:00
-          </p>
-        </div>
-        <ul aria-label="형태별 분류" className="-mx-4 mt-4 flex gap-2 overflow-x-auto px-4 pb-1 md:mx-0 md:grid md:grid-cols-5 md:gap-3 md:overflow-visible md:px-0">
+        <ul aria-label="형태별 분류" className="-mx-4 flex gap-2 overflow-x-auto px-4 pb-1 md:mx-0 md:grid md:grid-cols-5 md:gap-3 md:overflow-visible md:px-0">
           {CATEGORIES.map((c) => (
             <li key={c} className="w-[132px] flex-none md:w-auto">
               <button type="button" onClick={() => onCat(c)} className={`flex w-full items-center gap-3 rounded-[6px] border p-2 text-left ${focusRing}`} style={{ borderColor: C.line, background: C.panel, outlineColor: C.amber }}>

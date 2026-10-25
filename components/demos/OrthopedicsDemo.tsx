@@ -383,11 +383,11 @@ function SectionTitle({ id, icon, title }: { id: string; icon: React.ReactNode; 
 /* ---------- 포스터 ---------- */
 
 /** 첫 화면 부위 타일. 대표 치료 2개는 아래 부위 구간의 치료에서 고른다 */
-const TILES: { id: PartId; tx: [Tx, Tx] }[] = [
-  { id: "back", tx: ["주사치료", "도수치료"] },
-  { id: "neck", tx: ["도수치료", "물리치료"] },
-  { id: "shoulder", tx: ["체외충격파", "주사치료"] },
-  { id: "knee", tx: ["주사치료", "운동치료"] },
+const TILES: { id: PartId; tx: [Tx, Tx]; photo: string; pos: string; alt: string }[] = [
+  { id: "back", tx: ["주사치료", "도수치료"], photo: "part-back.jpg", pos: "45% 62%", alt: "엎드린 환자의 등을 두 손으로 눌러 보는 치료사" },
+  { id: "neck", tx: ["도수치료", "물리치료"], photo: "part-neck.jpg", pos: "55% 72%", alt: "누운 환자의 목 뒤를 받쳐 잡은 치료사" },
+  { id: "shoulder", tx: ["체외충격파", "주사치료"], photo: "part-shoulder.jpg", pos: "50% 45%", alt: "팔을 위로 든 환자의 어깨를 짚어 보는 치료사" },
+  { id: "knee", tx: ["주사치료", "운동치료"], photo: "part-knee.jpg", pos: "50% 62%", alt: "침대에 앉은 환자의 무릎을 손으로 감싸 보는 치료사" },
 ];
 
 const DOCS = [
@@ -453,21 +453,35 @@ function Poster({ reduce, today, onPart }: { reduce: boolean; today: Date; onPar
                   <button
                     type="button"
                     onClick={() => onPart(t.id)}
-                    className={`group flex h-full min-h-[148px] w-full flex-col justify-between rounded-[8px] border p-4 text-left transition-colors duration-200 hover:bg-[#eef0f4] md:min-h-[180px] md:p-6 ${focusRing}`}
+                    className={`group flex h-full w-full flex-col overflow-hidden rounded-[8px] border text-left transition-colors duration-200 hover:bg-[#eef0f4] ${focusRing}`}
                     style={{ background: C.paper, borderColor: C.line, outlineColor: C.blue }}
                   >
-                    <span>
-                      <span className="block text-[26px] font-bold tracking-[-0.03em] md:text-[34px]">{p.name}</span>
-                      <span className="mt-1 block text-[14px] leading-[1.5] md:text-[15px]" style={{ color: C.muted, wordBreak: "keep-all" }}>
-                        {p.often}
-                      </span>
+                    <span className="relative block h-[112px] flex-none overflow-hidden md:h-auto md:min-h-[140px] md:flex-1">
+                      {/* eslint-disable-next-line @next/next/no-img-element -- 정적 export 라 next/image 최적화를 쓰지 않는다 */}
+                      <img
+                        src={`${IMG}/${t.photo}`}
+                        alt={t.alt}
+                        sizes="(min-width: 1200px) 340px, (min-width: 768px) 28vw, 50vw"
+                        loading="lazy"
+                        decoding="async"
+                        className={`absolute inset-0 h-full w-full object-cover ${reduce ? "" : "transition-transform duration-500 group-hover:scale-[1.03]"}`}
+                        style={{ objectPosition: t.pos }}
+                      />
                     </span>
-                    <span className="mt-3 flex flex-wrap gap-1.5">
-                      {t.tx.map((x) => (
-                        <span key={x} className="rounded-[4px] px-2 py-0.5 text-[13px] font-semibold md:text-[14px]" style={{ background: C.white, color: C.blue, border: `1px solid ${C.line}` }}>
-                          {x}
+                    <span className="flex flex-1 flex-col justify-between p-4 md:flex-none md:p-5">
+                      <span>
+                        <span className="block text-[24px] font-bold tracking-[-0.03em] md:text-[30px]">{p.name}</span>
+                        <span className="mt-1 block text-[14px] leading-[1.5] md:text-[15px]" style={{ color: C.muted, wordBreak: "keep-all" }}>
+                          {p.often}
                         </span>
-                      ))}
+                      </span>
+                      <span className="mt-3 flex flex-wrap gap-1.5">
+                        {t.tx.map((x) => (
+                          <span key={x} className="rounded-[4px] px-2 py-0.5 text-[13px] font-semibold md:text-[14px]" style={{ background: C.white, color: C.blue, border: `1px solid ${C.line}` }}>
+                            {x}
+                          </span>
+                        ))}
+                      </span>
                     </span>
                   </button>
                 </li>
