@@ -1,8 +1,8 @@
 "use client";
 
 import { useEffect, useId, useRef, useState, useSyncExternalStore, type CSSProperties } from "react";
-import { AnimatePresence, motion, useInView, useScroll, useTransform } from "framer-motion";
-import { BookOpen, CalendarCheck, Check, Clock, FileText, MessageCircle, MessagesSquare, PenLine, RotateCcw, Wallet } from "lucide-react";
+import { AnimatePresence, motion, useInView } from "framer-motion";
+import { BookOpen, CalendarCheck, Check, ChevronLeft, Clock, FileText, MessageCircle, MessagesSquare, PenLine, RotateCcw, Wallet } from "lucide-react";
 import { useReducedMotionSafe } from "@/hooks/useReducedMotionSafe";
 import { daysAgo, fmtDash, fmtKo, useDemoToday } from "@/hooks/useDemoToday";
 import { maskName, maskPhone } from "@/components/demos/LeadReceivedPanel";
@@ -16,12 +16,13 @@ import { DemoMakerInfo } from "@/components/demos/DemoMakerInfo";
    수업은 읽기, 토론, 쓰기 순서가 많고, 첨삭한 원고지를 사진으로 보호자에게 보내 주는 곳이 많다.
    교습비는 교육청 신고 교습비처럼 반별 "월 교습비"로 적고 교재비는 따로 적는다. 합격 실적, 학생 실명은 쓰지 않는다.
 
-   첫 화면(ra-poster): 두 손으로 책 네 권을 들어 올린 사진 한 장이 화면을 채우고, 왼쪽 아래에 문장 "읽고 토론하고 쓰는 90분".
+   첫 화면(ra-poster): 상단 메뉴(휴대폰은 둥근 메뉴 줄을 옆으로 민다) 아래 왼쪽은 책 네 권을 든 사진, 오른쪽은 문장 "읽고 토론하고 쓰는 90분"과
+   독서 습관 진단 카드. 학년을 고르고 읽기, 토론, 쓰기 문항 셋에 하나씩 답하면 카드가 결과로 바뀐다(추천 반, 시간, 먼저 챙길 부분, 이달의 책 두 권).
+   결과의 버튼은 아래 상담 신청(학년 채움), 수업 과정(그 단계 열림), 이달의 책(그 학년 열림)으로 이어진다. 휴대폰은 결과가 나오면 하단에 체험 수업 신청 버튼을 고정한다.
    사진 출처: Pexels 사진 8762862, 책 사진 book-(id)는 AI 생성(Z-Image-Turbo)
 
-   핵심 모션: 들어올 때 사진이 1600ms 동안 scale 1.06 -> 1 로 다가오고, 문장과 정보 줄은 300ms 늦게
-   아래 12px 에서 700ms 동안 올라온다(CSS keyframes, JS 없이도 보인다). 스크롤하면 사진만 y 0 -> 8% 로 느리게 움직인다.
-   본문에서 움직이는 곳은 첨삭 예시의 빨간 펜 표시 하나다. 동작 줄이기면 모두 없음.
+   모션: 들어올 때 사진이 1600ms 동안 scale 1.06 -> 1 로 다가오고, 오른쪽 글은 300ms 늦게 아래 12px 에서 올라온다.
+   진단 카드는 문항이 바뀔 때 200ms 옆으로 짧게 넘어간다. 본문에서 움직이는 곳은 첨삭 예시의 빨간 펜 표시 하나다. 동작 줄이기면 모두 없음.
 
    상호작용(모두 브라우저 안에서만 돈다. 실제로 보내지 않는다)
    1. 이번 달 읽는 책: 학년을 고르면 주차별 책 네 권과 쓰기 질문, 이번 달 쓰기 분량이 나온다.
@@ -253,6 +254,8 @@ export function ReadingAcademyDemo() {
   const today = useDemoToday();
   const reduce = useReducedMotionSafe();
   const [grade, setGrade] = useState<(typeof GRADE_OPTS)[number]>("초3");
+  const [bookGrade, setBookGrade] = useState(1);
+  const [courseStep, setCourseStep] = useState(0);
 
   useEffect(() => {
     const f = () => window.scrollTo({ top: 0 });
@@ -264,42 +267,33 @@ export function ReadingAcademyDemo() {
   const month = today.getMonth() + 1;
   const nextMonth = (month % 12) + 1;
 
-  const navBtn = `rounded-[4px] px-2.5 py-1.5 text-[15px] font-semibold underline-offset-4 hover:underline ${focusRing}`;
-
   return (
     <div className="min-h-screen overflow-x-clip" style={{ background: C.bg, color: C.ink }}>
-      <Poster reduce={reduce} onCta={() => go("ra-consult")} />
-
-      <header className="border-b" style={{ background: C.card, borderColor: C.border }}>
-        <div className="mx-auto flex max-w-[1200px] flex-wrap items-center justify-between gap-x-4 gap-y-2 px-4 py-4 md:px-6">
-          <h2>
-            <SampleLogo />
-          </h2>
-          <nav aria-label="주요 메뉴" className="-mx-2 flex flex-wrap items-center">
-            {[
-              ["ra-books", "이달의 도서"],
-              ["ra-course", "수업 과정"],
-              ["ra-correct", "첨삭 예시"],
-              ["ra-fee", "교습비"],
-              ["ra-consult", "상담 신청"],
-              ["ra-visit", "오시는 길"],
-            ].map(([id, label]) => (
-              <button key={id} type="button" onClick={() => go(id)} className={navBtn} style={{ outlineColor: C.accent }}>
-                {label}
-              </button>
-            ))}
-          </nav>
-        </div>
-      </header>
+      <Poster
+        reduce={reduce}
+        go={go}
+        onConsult={(g) => {
+          setGrade(g);
+          go("ra-consult");
+        }}
+        onBooks={(gi) => {
+          setBookGrade(gi);
+          go("ra-books");
+        }}
+        onStep={(si) => {
+          setCourseStep(si);
+          go("ra-course");
+        }}
+      />
 
       <section id="ra-books" aria-labelledby="ra-books-title" className="mx-auto max-w-[1200px] scroll-mt-4 px-4 pt-10 md:px-6 md:pt-14">
         <CellTitle id="ra-books-title" text={`${month}월 읽는 책`} />
-        <Books />
+        <Books g={bookGrade} setG={setBookGrade} />
       </section>
 
       <section id="ra-course" aria-labelledby="ra-course-title" className="mx-auto mt-14 max-w-[1200px] scroll-mt-4 px-4 md:mt-20 md:px-6">
         <CellTitle id="ra-course-title" text="수업 과정" />
-        <Course reduce={reduce} />
+        <Course reduce={reduce} s={courseStep} setS={setCourseStep} />
       </section>
 
       <section id="ra-correct" aria-labelledby="ra-correct-title" className="mx-auto mt-14 max-w-[1200px] scroll-mt-4 px-4 md:mt-20 md:px-6">
@@ -402,79 +396,255 @@ function SampleLogo({ light, size = 20 }: { light?: boolean; size?: number }) {
   );
 }
 
-/* ---------- 첫 화면 ---------- */
+/* ---------- 첫 화면: 세 문항 진단 카드 ---------- */
 
-function Poster({ reduce, onCta }: { reduce: boolean; onCta: () => void }) {
-  const ref = useRef<HTMLElement>(null);
-  const { scrollYProgress } = useScroll({ target: ref, offset: ["start start", "end start"] });
-  // 스크롤하면 사진만 조금 느리게 내려간다
-  const photoY = useTransform(scrollYProgress, (v) => `${(v * 8).toFixed(2)}%`);
+const NAV: [string, string][] = [
+  ["ra-course", "수업 안내"],
+  ["ra-books", "이달의 책"],
+  ["ra-correct", "첨삭 예시"],
+  ["ra-fee", "교습비"],
+  ["ra-consult", "상담 신청"],
+  ["ra-visit", "오시는 길"],
+];
+/** 진단 학년 묶음. 순서는 GRADES, CLASSES 와 같다 */
+const DX_GRADES = [
+  { label: "초1~2", consult: "초1" },
+  { label: "초3~4", consult: "초3" },
+  { label: "초5~6", consult: "초5" },
+  { label: "중등", consult: "중1" },
+] as const;
+/** 문항 하나가 수업 단계 하나(읽기, 토론, 쓰기)에 맞춰진다 */
+const DX_QUESTIONS = ["책 한 권을 끝까지 혼자 읽나요?", "읽은 책 줄거리를 말로 설명하나요?", "생각을 원고지 반 장 넘게 쓰나요?"];
+const DX_ANSWERS = ["잘해요", "가끔", "어려워요"];
+
+function Poster({
+  reduce,
+  go,
+  onConsult,
+  onBooks,
+  onStep,
+}: {
+  reduce: boolean;
+  go: (id: string) => void;
+  onConsult: (g: (typeof GRADE_OPTS)[number]) => void;
+  onBooks: (gi: number) => void;
+  onStep: (si: number) => void;
+}) {
+  const [gi, setGi] = useState<number | null>(null);
+  const [answers, setAnswers] = useState<number[]>([]);
+  const step = gi === null ? 0 : answers.length + 1; // 0 학년, 1~3 문항, 4 결과
+  const done = step === 4;
+  // 가장 어렵다고 고른 단계. 같으면 뒤쪽(쓰기)을 먼저 챙긴다
+  const weak = done ? answers.reduce((w, a, i) => (a >= answers[w] ? i : w), 0) : 0;
+  const cls = gi === null ? null : CLASSES[gi];
+  const reset = () => {
+    setGi(null);
+    setAnswers([]);
+  };
+  const back = () => (answers.length ? setAnswers((a) => a.slice(0, -1)) : setGi(null));
+  const slide = reduce ? {} : { initial: { opacity: 0, x: 16 }, animate: { opacity: 1, x: 0 }, exit: { opacity: 0, x: -16 }, transition: { duration: 0.2, ease: EASE } };
+  const answerBtn = `flex min-h-[52px] w-full items-center justify-center rounded-[6px] border text-[17px] font-bold ${focusRing}`;
 
   return (
-    <section id="ra-poster" ref={ref} aria-labelledby="ra-poster-title" className="relative min-h-[100svh] overflow-hidden" style={{ background: "#e9e6e4", color: C.ink }}>
+    <section id="ra-poster" aria-labelledby="ra-poster-title" style={{ background: C.bg, color: C.ink }}>
       <style>{HERO_CSS}</style>
-      <motion.div
-        className="absolute inset-0"
-        initial={reduce ? false : { scale: 1.06 }}
-        animate={{ scale: 1 }}
-        transition={{ duration: reduce ? 0 : HERO_DUR, ease: EASE }}
-        style={reduce ? undefined : { y: photoY }}
-      >
-        {/* eslint-disable-next-line @next/next/no-img-element -- 정적 export 라 next/image 최적화를 쓰지 않는다 */}
-        <img
-          src={`${IMG}/hero.jpg`}
-          srcSet={`${IMG}/hero-sm.jpg 960w, ${IMG}/hero.jpg 1920w`}
-          sizes="100vw"
-          alt="흰 벽 앞에서 두 손으로 책 네 권을 들어 올린 모습"
-          fetchPriority="high"
-          className="absolute inset-0 h-full w-full object-cover"
-          style={{ objectPosition: "48% 40%" }}
-        />
-      </motion.div>
-      {/* 글자 대비용 흰 막: 아래와 왼쪽을 밝게 */}
-      <div
-        aria-hidden
-        className="absolute inset-0"
-        style={{
-          background: "linear-gradient(to top, rgba(247,247,245,0.9), rgba(247,247,245,0.45) 40%, rgba(247,247,245,0) 65%), linear-gradient(to right, rgba(247,247,245,0.6), rgba(247,247,245,0) 55%)",
-        }}
-      />
 
-      <div className="relative mx-auto flex min-h-[100svh] max-w-[1200px] flex-col px-4 md:px-6">
-        <div className="flex items-center justify-between gap-3 py-4 md:py-6">
+      {/* 상단 메뉴. 휴대폰은 둥근 메뉴 줄을 옆으로 민다 */}
+      <header className="border-b" style={{ background: C.card, borderColor: C.border }}>
+        <div className="mx-auto flex h-16 max-w-[1280px] items-center justify-between gap-4 px-4 md:px-6">
           <p>
             <SampleLogo size={18} />
           </p>
-          <button
-            type="button"
-            onClick={onCta}
-            data-gtm-cta="reading-academy_poster_cta"
-            className={`rounded-[6px] px-4 py-2.5 text-[15px] font-semibold ${focusRing}`}
-            style={{ background: C.accent, color: "#fff", outlineColor: C.ink }}
-          >
-            상담 신청
-          </button>
+          <nav aria-label="주요 메뉴" className="hidden items-center lg:flex">
+            {NAV.map(([id, label]) => (
+              <button
+                key={id}
+                type="button"
+                onClick={() => go(id)}
+                className={`min-h-[44px] rounded-[4px] px-3 text-[16px] font-semibold underline-offset-4 hover:underline ${focusRing}`}
+                style={{ outlineColor: C.accent }}
+              >
+                {label}
+              </button>
+            ))}
+          </nav>
+        </div>
+        <nav aria-label="주요 메뉴" className="overflow-x-auto pb-3 lg:hidden">
+          <ul className="flex w-max gap-2 px-4 md:px-6">
+            {NAV.map(([id, label]) => (
+              <li key={id}>
+                <button
+                  type="button"
+                  onClick={() => go(id)}
+                  className={`min-h-[44px] whitespace-nowrap rounded-full border px-4 text-[15px] font-semibold ${focusRing}`}
+                  style={{ borderColor: C.border, outlineColor: C.accent }}
+                >
+                  {label}
+                </button>
+              </li>
+            ))}
+          </ul>
+        </nav>
+      </header>
+
+      <div className="mx-auto grid max-w-[1280px] gap-0 md:grid-cols-[minmax(0,9fr)_minmax(0,11fr)] md:gap-8 md:px-6 md:py-8 lg:min-h-[calc(100svh-64px)] lg:items-center">
+        {/* 책 사진 */}
+        <div className="relative h-[24svh] min-h-[160px] overflow-hidden md:h-full md:min-h-[560px] md:rounded-[8px]" style={{ background: "#e9e6e4" }}>
+          <motion.div className="absolute inset-0" initial={reduce ? false : { scale: 1.06 }} animate={{ scale: 1 }} transition={{ duration: reduce ? 0 : HERO_DUR, ease: EASE }}>
+            {/* eslint-disable-next-line @next/next/no-img-element -- 정적 export 라 next/image 최적화를 쓰지 않는다 */}
+            <img
+              src={`${IMG}/hero.jpg`}
+              srcSet={`${IMG}/hero-sm.jpg 960w, ${IMG}/hero.jpg 1920w`}
+              sizes="(min-width: 768px) 45vw, 100vw"
+              alt="흰 벽 앞에서 두 손으로 책 네 권을 들어 올린 모습"
+              fetchPriority="high"
+              className="absolute inset-0 h-full w-full object-cover"
+              style={{ objectPosition: "48% 40%" }}
+            />
+          </motion.div>
         </div>
 
-        <div className={`mt-auto pb-[10svh] ${reduce ? "" : "ra-rise"}`}>
-          <h1 id="ra-poster-title" className="text-[36px] font-bold md:text-[clamp(40px,5vw,72px)]" style={{ letterSpacing: "-0.03em", lineHeight: 1.2, wordBreak: "keep-all" }}>
-            읽고 토론하고 쓰는
-            <br />
-            90분
+        {/* 진단 카드 */}
+        <div className={`px-4 pb-10 pt-6 md:px-0 md:pb-0 md:pt-0 ${reduce ? "" : "ra-rise"}`}>
+          <h1 id="ra-poster-title" className="text-[30px] font-bold md:text-[38px]" style={{ letterSpacing: "-0.03em", lineHeight: 1.2, wordBreak: "keep-all" }}>
+            읽고 토론하고 쓰는 90분
           </h1>
-          <p className="mt-4 text-[15px] font-medium md:text-[17px]" style={{ color: C.body, lineHeight: 1.5 }}>
+          <p className="mt-2 text-[16px]" style={{ color: C.body }}>
             초등 1학년 ~ 중학교 3학년, 주 1회
           </p>
+
+          <div className="mt-6 overflow-hidden rounded-[8px] border" style={{ borderColor: C.border, background: C.card }}>
+            <div className="flex items-center justify-between gap-3 border-b px-5 py-3" style={{ borderColor: C.border }}>
+              <h2 className="text-[17px] font-bold">독서 습관 진단</h2>
+              <div className="flex items-center gap-1.5" role="img" aria-label={done ? "진단 결과" : `4단계 중 ${step + 1}단계`}>
+                {[0, 1, 2, 3].map((i) => (
+                  <span key={i} aria-hidden className="h-2 w-6 rounded-full" style={{ background: i < step || done ? C.accent : i === step ? C.ink : C.border }} />
+                ))}
+              </div>
+            </div>
+
+            <div className="min-h-[300px] p-5 md:p-6" aria-live="polite">
+              <AnimatePresence mode="wait" initial={false}>
+                {step === 0 && (
+                  <motion.div key="grade" {...slide}>
+                    <p className="text-[18px] font-bold">학년</p>
+                    <div className="mt-4 grid grid-cols-2 gap-2">
+                      {DX_GRADES.map((g, i) => (
+                        <button key={g.label} type="button" onClick={() => setGi(i)} className={answerBtn} style={{ borderColor: C.border, outlineColor: C.accent }}>
+                          {g.label}
+                        </button>
+                      ))}
+                    </div>
+                  </motion.div>
+                )}
+
+                {step >= 1 && step <= 3 && (
+                  <motion.div key={`q${step}`} {...slide}>
+                    <p className="text-[14px] font-bold" style={{ color: C.accent }}>
+                      {DX_GRADES[gi ?? 0].label}, {STEPS[step - 1].label} {step} / 3
+                    </p>
+                    <p className="mt-2 text-[20px] font-bold leading-[1.4] md:text-[22px]" style={{ wordBreak: "keep-all" }}>
+                      {DX_QUESTIONS[step - 1]}
+                    </p>
+                    <div className="mt-5 grid gap-2 md:grid-cols-3">
+                      {DX_ANSWERS.map((a, i) => (
+                        <button key={a} type="button" onClick={() => setAnswers((x) => [...x, i])} className={answerBtn} style={{ borderColor: C.border, outlineColor: C.accent }}>
+                          {a}
+                        </button>
+                      ))}
+                    </div>
+                    <button type="button" onClick={back} className={`mt-4 inline-flex min-h-[44px] items-center gap-1 rounded-[4px] px-1 text-[15px] font-semibold ${focusRing}`} style={{ color: C.body, outlineColor: C.accent }}>
+                      <ChevronLeft size={18} aria-hidden />
+                      이전
+                    </button>
+                  </motion.div>
+                )}
+
+                {done && cls && gi !== null && (
+                  <motion.div key="result" {...slide}>
+                    <p className="text-[14px] font-bold" style={{ color: C.accent }}>
+                      추천 반
+                    </p>
+                    <p className="mt-1 text-[24px] font-bold leading-tight">
+                      {cls.name} <span className="text-[16px] font-semibold" style={{ color: C.muted }}>{cls.who}</span>
+                    </p>
+                    <p className="mt-1 text-[15px]" style={{ color: C.body }}>
+                      {cls.time}, 월 {won(cls.fee)}
+                    </p>
+                    <button
+                      type="button"
+                      onClick={() => onStep(weak)}
+                      className={`mt-3 inline-flex min-h-[44px] items-center gap-2 rounded-[6px] px-3 text-[15px] font-semibold ${focusRing}`}
+                      style={{ background: C.soft, color: C.accent, outlineColor: C.accent }}
+                    >
+                      <PenLine size={16} aria-hidden />
+                      먼저 챙길 부분: {STEPS[weak].label}
+                    </button>
+                    <div className="mt-4 grid grid-cols-2 gap-3">
+                      {GRADES[gi].books.slice(0, 2).map((b) => (
+                        <button key={b.id} type="button" onClick={() => onBooks(gi)} className={`flex items-center gap-3 rounded-[6px] border p-2 text-left ${focusRing}`} style={{ borderColor: C.border, outlineColor: C.accent }}>
+                          {/* eslint-disable-next-line @next/next/no-img-element -- 정적 export 라 next/image 최적화를 쓰지 않는다 */}
+                          <img src={`${IMG}/book-${b.id}.jpg`} alt="" className="h-16 w-12 flex-none rounded-[4px] object-cover" />
+                          <span className="min-w-0">
+                            <span className="block text-[13px] font-semibold" style={{ color: C.muted }}>
+                              이달의 책
+                            </span>
+                            <span className="block text-[15px] font-bold leading-snug" style={{ wordBreak: "keep-all" }}>
+                              {b.t}
+                            </span>
+                          </span>
+                        </button>
+                      ))}
+                    </div>
+                    <div className="mt-5 flex flex-wrap items-center gap-2">
+                      <button
+                        type="button"
+                        onClick={() => onConsult(DX_GRADES[gi].consult)}
+                        data-gtm-cta="reading-academy_poster_cta"
+                        className={`inline-flex min-h-[48px] items-center gap-2 rounded-[6px] px-5 text-[16px] font-bold ${focusRing}`}
+                        style={{ background: C.accent, color: "#fff", outlineColor: C.ink }}
+                      >
+                        <CalendarCheck size={18} aria-hidden />
+                        무료 체험 수업 신청
+                      </button>
+                      <button type="button" onClick={reset} className={`inline-flex min-h-[48px] items-center gap-1.5 rounded-[6px] px-3 text-[15px] font-semibold ${focusRing}`} style={{ color: C.body, outlineColor: C.accent }}>
+                        <RotateCcw size={16} aria-hidden />
+                        다시 하기
+                      </button>
+                    </div>
+                  </motion.div>
+                )}
+              </AnimatePresence>
+            </div>
+          </div>
+          <button type="button" onClick={() => go("ra-fee")} className={`mt-3 inline-flex min-h-[44px] items-center rounded-[4px] px-1 text-[15px] font-semibold underline underline-offset-4 ${focusRing}`} style={{ color: C.body, outlineColor: C.accent }}>
+            반 목록 바로 보기
+          </button>
         </div>
       </div>
+
+      {/* 휴대폰: 결과가 나오면 하단 고정 버튼 */}
+      {done && gi !== null && (
+        <div className="fixed inset-x-0 bottom-0 z-40 border-t p-2 md:hidden" style={{ background: C.card, borderColor: C.border, paddingBottom: "calc(8px + env(safe-area-inset-bottom))" }}>
+          <button
+            type="button"
+            onClick={() => onConsult(DX_GRADES[gi].consult)}
+            className={`flex min-h-[48px] w-full items-center justify-center gap-2 rounded-[6px] text-[16px] font-bold ${focusRing}`}
+            style={{ background: C.accent, color: "#fff", outlineColor: C.ink }}
+          >
+            <CalendarCheck size={18} aria-hidden />
+            체험 수업 신청
+          </button>
+        </div>
+      )}
     </section>
   );
 }
 
+
 /* ---------- 1. 이번 달 읽는 책 ---------- */
 
-function Books() {
-  const [g, setG] = useState(1);
+function Books({ g, setG }: { g: number; setG: (i: number) => void }) {
   const tabsId = useId();
   const grade = GRADES[g];
 
@@ -535,8 +705,7 @@ function Books() {
 
 /* ---------- 2. 수업 과정 ---------- */
 
-function Course({ reduce }: { reduce: boolean }) {
-  const [s, setS] = useState(0);
+function Course({ reduce, s, setS }: { reduce: boolean; s: number; setS: (i: number) => void }) {
   const step = STEPS[s];
   const Icon = step.icon;
   return (

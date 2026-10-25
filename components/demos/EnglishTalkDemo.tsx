@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useMemo, useRef, useState, type FormEvent, type ReactNode } from "react";
-import { AnimatePresence, motion, useScroll, useTransform } from "framer-motion";
+import { AnimatePresence, motion } from "framer-motion";
 import {
   BookOpen,
   CalendarCheck,
@@ -9,6 +9,7 @@ import {
   Check,
   Clock,
   MapPin,
+  Menu,
   MessageCircle,
   MessagesSquare,
   Moon,
@@ -18,6 +19,7 @@ import {
   Sunrise,
   TrainFront,
   Users,
+  X,
 } from "lucide-react";
 import { useReducedMotionSafe } from "@/hooks/useReducedMotionSafe";
 import { daysAgo, fmtKo, fmtMD, useDemoToday } from "@/hooks/useDemoToday";
@@ -39,12 +41,11 @@ import { DemoMakerInfo } from "@/components/demos/DemoMakerInfo";
    3. 월 수강료: 주 횟수별 월 교습비 표. 고른 반의 줄이 표시되고 개월 수를 바꾸면 합계가 나온다.
    4. 무료 체험 신청: 이름, 휴대폰, 체험 반, 그 반이 열리는 가까운 날짜 3개 중 하나. 접수 번호와 회신 예정일.
 
-   핵심 모션, 첫 화면(et-poster): 학원 교실에서 직장인 두 명이 원탁에 앉아 회화하는 사진 한 장이 화면을 채운다.
-   들어올 때 사진이 1.6초 동안 1.06배에서 제자리로 천천히 다가오고, 문장 "출근 전 50분, 새벽 회화반"와 정보 줄은
-   0.3초 늦게 아래에서 올라온다(CSS keyframes, 끝 상태가 기본값이라 JS 없이도 보인다).
-   스크롤하면 사진만 조금 느리게 내려간다(y 0~8%). 동작 줄이기면 모두 멈춘 채로 둔다. */
+   첫 화면(et-poster): 상단 메뉴, 역 출구와 다음 개강일 한 줄, 문장 "출근 전 50분, 새벽 회화반"과 시간대 칩(새벽반, 저녁반, 주말반).
+   그 아래 원어민 강사, 한국인 강사 얼굴 카드에 맡은 반이 줄로 붙고, 고른 시간대가 아닌 반은 흐려진다. 반을 누르면 아래 시간표가 그 반으로 열린다.
+   오른쪽 끝 칸은 수업 장면 사진과 레벨테스트, 무료 체험 버튼. 휴대폰에서는 카드가 옆으로 넘어간다(한 장 85% 폭).
+   모션은 수업 장면 사진이 1.6초 동안 1.06배에서 제자리로 다가오는 것과 흐려짐 전환뿐. 동작 줄이기면 없음. */
 
-const BRAND = "곰파트너";
 const TEL = "02-000-0000";
 const ADDRESS = "서울 ㅇㅇ구 ㅇㅇ로 00, 5층";
 const KAKAO = "카카오톡 채널 곰파트너";
@@ -222,77 +223,19 @@ export function EnglishTalkDemo() {
     go("et-schedule");
   };
 
-  const navBtn = `rounded-[4px] px-2.5 py-1.5 text-[15px] underline-offset-4 hover:underline ${focusRing}`;
-
   return (
     <div className="min-h-screen overflow-x-clip" style={{ background: C.bg, color: C.ink }}>
-      <Poster reduce={reduce} onCta={() => go("et-trial")} />
-
-      <div style={{ background: C.alt }}>
-        <header className="mx-auto flex max-w-[1200px] flex-wrap items-center justify-between gap-x-4 gap-y-2 px-4 py-4 md:px-6">
-          <h2>
-            <SampleLogo />
-          </h2>
-          <nav aria-label="주요 메뉴" className="-mx-2 flex flex-wrap items-center">
-            {[
-              ["et-test", "레벨테스트"],
-              ["et-schedule", "시간표"],
-              ["et-fee", "수강료"],
-              ["et-trial", "무료 체험"],
-              ["et-location", "오시는 길"],
-            ].map(([id, label]) => (
-              <button key={id} type="button" onClick={() => go(id)} className={navBtn} style={{ color: C.body, outlineColor: C.accent }}>
-                {label}
-              </button>
-            ))}
-            <a
-              href={`tel:${TEL.replace(/-/g, "")}`}
-              data-gtm-cta="english-talk_tel"
-              className={`ml-1 inline-flex items-center gap-1.5 rounded-[6px] px-3.5 py-2 text-[15px] font-semibold tabular-nums ${focusRing}`}
-              style={{ background: C.ink, color: "#fff", outlineColor: C.accent }}
-            >
-              <Phone size={16} aria-hidden />
-              {TEL}
-            </a>
-          </nav>
-        </header>
-
-        {/* 짧은 소개 띠 */}
-        <section className="mx-auto max-w-[1200px] px-4 pb-10 pt-6 md:px-6 md:pb-14 md:pt-10">
-          <div className="grid gap-6 md:grid-cols-[1.2fr_1fr] md:items-end">
-            <div>
-              <h2 className="text-[30px] font-bold leading-[1.25] tracking-[-0.03em] md:text-[44px]" style={{ wordBreak: "keep-all" }}>
-                직장인 영어회화
-                <br />한 반 6명
-              </h2>
-              <p className="mt-4 text-[17px] leading-[1.6]" style={{ color: C.body }}>
-                레벨테스트 후 반 배정, 수업은 50분 회화만 해요.
-              </p>
-            </div>
-            <ul className="grid grid-cols-3 gap-2 text-[15px]">
-              {SLOTS.map((s) => (
-                <li key={s.key}>
-                  <button
-                    type="button"
-                    onClick={() => {
-                      setSlot(s.key);
-                      go("et-schedule");
-                    }}
-                    className={`flex h-full w-full flex-col items-start gap-1 rounded-[8px] border px-3 py-3 text-left hover:border-[#bdbdbd] ${focusRing}`}
-                    style={{ borderColor: C.line, background: "#fff", outlineColor: C.accent }}
-                  >
-                    <s.Icon size={20} aria-hidden style={{ color: C.accent }} />
-                    <span className="font-semibold">{s.label}</span>
-                    <span className="text-[14px] tabular-nums" style={{ color: C.muted }}>
-                      {s.time}
-                    </span>
-                  </button>
-                </li>
-              ))}
-            </ul>
-          </div>
-        </section>
-      </div>
+      <Poster
+        reduce={reduce}
+        today={today}
+        slot={slot}
+        setSlot={setSlot}
+        go={go}
+        onPick={(id) => {
+          pick(id);
+          go("et-schedule");
+        }}
+      />
 
       <main className="mx-auto max-w-[1200px] px-4 md:px-6">
         <LevelTest reduce={reduce} result={result} onDone={setResult} onShow={showLevel} />
@@ -350,81 +293,267 @@ function SampleLogo({ light, size = 20 }: { light?: boolean; size?: number }) {
   );
 }
 
-/* ---------- 포스터 ---------- */
+/* ---------- 첫 화면: 강사 얼굴 카드와 시간대 칩 ---------- */
 
-function Poster({ reduce, onCta }: { reduce: boolean; onCta: () => void }) {
-  const ref = useRef<HTMLElement>(null);
-  const { scrollYProgress } = useScroll({ target: ref, offset: ["start start", "end start"] });
-  const photoY = useTransform(scrollYProgress, (v) => (reduce ? "0%" : `${v * 8}%`));
+const NAV: [string, string][] = [
+  ["et-schedule", "회화 과정"],
+  ["et-test", "레벨테스트"],
+  ["et-fee", "수강료"],
+  ["et-trial", "무료 체험"],
+  ["et-location", "오시는 길"],
+];
+
+const TEACHERS: { key: Klass["teacher"]; title: string; note: string; img: string }[] = [
+  { key: "원어민", title: "원어민 강사", note: "Basic 이상 반, 영어로만 진행", img: "native" },
+  { key: "한국인", title: "한국인 강사", note: "Starter 반, 막히는 표현은 한국어로", img: "korean" },
+];
+
+/** 다음 달 첫 평일 */
+function nextOpening(today: Date) {
+  let d = new Date(today.getFullYear(), today.getMonth() + 1, 1);
+  while (d.getDay() === 0 || d.getDay() === 6) d = daysAgo(d, -1);
+  return d;
+}
+
+function Poster({
+  reduce,
+  today,
+  slot,
+  setSlot,
+  go,
+  onPick,
+}: {
+  reduce: boolean;
+  today: Date;
+  slot: Slot;
+  setSlot: (s: Slot) => void;
+  go: (id: string) => void;
+  onPick: (id: string) => void;
+}) {
+  const [menu, setMenu] = useState(false);
+  const navTo = (id: string) => {
+    setMenu(false);
+    // 메뉴가 닫혀 높이가 줄어든 뒤에 이동한다
+    requestAnimationFrame(() => go(id));
+  };
 
   return (
-    <section id="et-poster" ref={ref} aria-labelledby="et-poster-title" className="relative min-h-[100svh] overflow-hidden" style={{ background: C.dark }}>
+    <section id="et-poster" aria-labelledby="et-poster-title" style={{ background: C.bg }}>
       <style>{`
         @keyframes et-photo-in { from { transform: scale(1.06); } to { transform: none; } }
-        @keyframes et-rise { from { opacity: 0; transform: translateY(12px); } to { opacity: 1; transform: none; } }
         .et-photo-in { animation: et-photo-in 1.6s cubic-bezier(0.22, 1, 0.36, 1) both; }
-        .et-rise { animation: et-rise 0.7s cubic-bezier(0.22, 1, 0.36, 1) 0.3s backwards; }
-        @media (prefers-reduced-motion: reduce) { .et-photo-in, .et-rise { animation: none; } }
+        @media (prefers-reduced-motion: reduce) { .et-photo-in { animation: none; } }
       `}</style>
 
-      <motion.div className="absolute inset-0" style={{ y: photoY }}>
-        {/* eslint-disable-next-line @next/next/no-img-element -- 정적 export 라 next/image 최적화를 쓰지 않는다 */}
-        <img
-          src={`${IMG}/hero.jpg`}
-          srcSet={`${IMG}/hero-sm.jpg 960w, ${IMG}/hero.jpg 1920w`}
-          sizes="100vw"
-          alt="밝은 학원 교실 원탁에서 정장 차림 직장인 두 명이 노트와 커피를 두고 영어로 대화하는 모습"
-          fetchPriority="high"
-          className={`absolute inset-0 h-full w-full object-cover ${reduce ? "" : "et-photo-in"}`}
-          style={{ objectPosition: "40% 45%" }}
-        />
-      </motion.div>
-      {/* 위는 밝은 벽이라 흰 막에 어두운 글씨, 아래는 어두운 막에 흰 글씨 */}
-      <div
-        aria-hidden
-        className="pointer-events-none absolute inset-0"
-        style={{
-          background:
-            "linear-gradient(to bottom, rgba(255,255,255,0.78), rgba(255,255,255,0) 20%), linear-gradient(to top, rgba(0,0,0,0.8) 0%, rgba(0,0,0,0.62) 32%, rgba(0,0,0,0.12) 62%, rgba(0,0,0,0) 78%)",
-        }}
-      />
-
-      <div className="relative z-10 flex min-h-[100svh] flex-col justify-between px-4 pb-10 pt-4 md:px-12 md:pb-16 md:pt-7">
-        {/* 로고와 핵심 행동 하나 */}
-        <div className="flex items-center justify-between gap-3">
+      {/* 상단 메뉴 */}
+      <header className="border-b" style={{ borderColor: C.line }}>
+        <div className="mx-auto flex h-16 max-w-[1280px] items-center justify-between gap-4 px-4 md:px-6">
           <p>
             <SampleLogo size={18} />
           </p>
+          <nav aria-label="주요 메뉴" className="hidden items-center md:flex">
+            {NAV.map(([id, label]) => (
+              <button
+                key={id}
+                type="button"
+                onClick={() => navTo(id)}
+                className={`min-h-[44px] rounded-[4px] px-3 text-[16px] font-semibold underline-offset-4 hover:underline ${focusRing}`}
+                style={{ color: C.ink, outlineColor: C.accent }}
+              >
+                {label}
+              </button>
+            ))}
+            <a
+              href={`tel:${TEL.replace(/-/g, "")}`}
+              data-gtm-cta="english-talk_tel"
+              className={`ml-2 inline-flex min-h-[44px] items-center gap-1.5 rounded-[6px] px-3.5 text-[15px] font-semibold tabular-nums ${focusRing}`}
+              style={{ background: C.ink, color: "#fff", outlineColor: C.accent }}
+            >
+              <Phone size={16} aria-hidden />
+              {TEL}
+            </a>
+          </nav>
           <button
             type="button"
-            onClick={onCta}
-            data-gtm-cta="english-talk_poster_cta"
-            className={`inline-flex items-center gap-1.5 rounded-[6px] px-4 py-2.5 text-[15px] font-semibold ${focusRing}`}
-            style={{ background: C.accent, color: "#fff", outlineColor: C.ink }}
+            aria-expanded={menu}
+            aria-controls="et-menu"
+            aria-label={menu ? "메뉴 닫기" : "메뉴 열기"}
+            onClick={() => setMenu((m) => !m)}
+            className={`inline-flex h-11 w-11 items-center justify-center rounded-[6px] md:hidden ${focusRing}`}
+            style={{ outlineColor: C.accent }}
           >
-            <CalendarCheck size={17} aria-hidden />
-            무료 체험 신청
+            {menu ? <X size={24} aria-hidden /> : <Menu size={24} aria-hidden />}
           </button>
         </div>
+        {menu && (
+          <nav id="et-menu" aria-label="메뉴" className="border-t md:hidden" style={{ borderColor: C.line }}>
+            <ul className="px-4 py-2">
+              {NAV.map(([id, label]) => (
+                <li key={id} className="border-b last:border-b-0" style={{ borderColor: C.line }}>
+                  <button type="button" onClick={() => navTo(id)} className={`flex min-h-[52px] w-full items-center text-left text-[17px] font-semibold ${focusRing}`} style={{ outlineColor: C.accent }}>
+                    {label}
+                  </button>
+                </li>
+              ))}
+              <li>
+                <a href={`tel:${TEL.replace(/-/g, "")}`} className={`flex min-h-[52px] items-center gap-2 text-[17px] font-semibold tabular-nums ${focusRing}`} style={{ outlineColor: C.accent }}>
+                  <Phone size={18} aria-hidden />
+                  {TEL}
+                </a>
+              </li>
+            </ul>
+          </nav>
+        )}
+      </header>
 
-        {/* 큰 문장 */}
-        <div className={`max-w-[820px] text-white ${reduce ? "" : "et-rise"}`}>
-          <h1
-            id="et-poster-title"
-            className="text-[36px] font-bold leading-[1.2] tracking-[-0.03em] md:text-[clamp(40px,5vw,72px)]"
-            style={{ wordBreak: "keep-all" }}
-          >
-            <span className="block">출근 전 50분,</span>
-            <span className="block">새벽 회화반</span>
+      {/* 위치와 개강 한 줄 */}
+      <div className="border-b" style={{ background: C.alt, borderColor: C.line }}>
+        <p className="mx-auto flex max-w-[1280px] flex-wrap items-center gap-x-5 gap-y-1 px-4 py-2.5 text-[15px] md:px-6">
+          <span className="inline-flex items-center gap-1.5">
+            <TrainFront size={16} aria-hidden style={{ color: C.accent }} />
+            ㅇㅇ역 2번 출구 도보 3분
+          </span>
+          <span className="inline-flex items-center gap-1.5">
+            <CalendarCheck size={16} aria-hidden style={{ color: C.accent }} />
+            다음 개강 {fmtKo(nextOpening(today))}
+          </span>
+          <span className="inline-flex items-center gap-1.5">
+            <Users size={16} aria-hidden style={{ color: C.accent }} />한 반 {CAP}명
+          </span>
+        </p>
+      </div>
+
+      <div className="mx-auto max-w-[1280px] px-4 pb-12 pt-7 md:px-6 md:pt-9">
+        <div className="flex flex-wrap items-end justify-between gap-x-8 gap-y-5">
+          <h1 id="et-poster-title" className="text-[32px] font-bold leading-[1.2] tracking-[-0.03em] md:text-[44px]" style={{ wordBreak: "keep-all" }}>
+            출근 전 50분, 새벽 회화반
           </h1>
-          <p className="mt-4 text-[16px] tabular-nums md:mt-5 md:text-[19px]" style={{ color: "rgba(255,255,255,0.88)" }}>
-            {BRAND}, 평일 07:30~08:20
-          </p>
+          {/* 시간대 칩 */}
+          <div className="-mx-4 w-[calc(100%+32px)] overflow-x-auto px-4 md:mx-0 md:w-auto md:px-0" role="group" aria-label="시간대">
+            <div className="flex w-max gap-2">
+              {SLOTS.map((s) => {
+                const on = s.key === slot;
+                return (
+                  <button
+                    key={s.key}
+                    type="button"
+                    aria-pressed={on}
+                    onClick={() => setSlot(s.key)}
+                    className={`inline-flex min-h-[48px] items-center gap-2 rounded-full border px-4 text-[15px] font-semibold ${focusRing}`}
+                    style={{ borderColor: on ? C.ink : C.line, background: on ? C.ink : "#fff", color: on ? "#fff" : C.ink, outlineColor: C.accent }}
+                  >
+                    <s.Icon size={17} aria-hidden />
+                    {s.label}
+                    <span className="text-[13px] font-medium tabular-nums" style={{ color: on ? "rgba(255,255,255,0.8)" : C.muted }}>
+                      {s.time}
+                    </span>
+                  </button>
+                );
+              })}
+            </div>
+          </div>
+        </div>
+
+        {/* 강사 카드 열. 휴대폰은 옆으로 넘긴다 */}
+        <div className="-mx-4 mt-6 flex snap-x snap-mandatory gap-4 overflow-x-auto px-4 pb-2 md:mx-0 md:grid md:grid-cols-[minmax(0,1fr)_minmax(0,1fr)_minmax(0,0.9fr)] md:overflow-visible md:px-0 md:pb-0">
+          {TEACHERS.map((t) => {
+            // 고른 시간대 반을 위로, 나머지는 흐리게 채워 네 줄까지
+            const mine = CLASSES.filter((c) => c.teacher === t.key);
+            const list = [...mine.filter((c) => c.slot === slot), ...mine.filter((c) => c.slot !== slot)].slice(0, 4);
+            return (
+              <article key={t.key} className="w-[85%] flex-none snap-start overflow-hidden rounded-[8px] border md:w-auto" style={{ borderColor: C.line }}>
+                <div className="relative aspect-[4/3] overflow-hidden md:aspect-[16/10]" style={{ background: C.alt }}>
+                  {/* eslint-disable-next-line @next/next/no-img-element -- 정적 export 라 next/image 최적화를 쓰지 않는다 */}
+                  <img src={`${IMG}/teacher-${t.img}.jpg`} alt={`${t.title} 교실 사진`} className="absolute inset-0 h-full w-full object-cover" style={{ objectPosition: "50% 25%" }} />
+                </div>
+                <div className="p-4">
+                  <h2 className="text-[19px] font-bold">{t.title}</h2>
+                  <p className="mt-0.5 text-[15px]" style={{ color: C.body }}>
+                    {t.note}
+                  </p>
+                  <ul className="mt-3 divide-y border-t" style={{ borderColor: C.line }}>
+                    {list.map((c) => {
+                      const match = c.slot === slot;
+                      const full = c.seats === 0;
+                      return (
+                        <li key={c.id} style={{ borderColor: C.line, opacity: match ? 1 : 0.38, transition: reduce ? undefined : "opacity 200ms" }}>
+                          <button
+                            type="button"
+                            onClick={() => onPick(c.id)}
+                            disabled={full}
+                            className={`grid min-h-[48px] w-full grid-cols-[minmax(0,1fr)_auto] items-center gap-3 py-2 text-left disabled:cursor-not-allowed ${focusRing}`}
+                            style={{ outlineColor: C.accent }}
+                          >
+                            <span className="min-w-0">
+                              <span className="block text-[15px] font-semibold">
+                                {slotOf(c.slot).label} {levelOf(c.level).name}
+                              </span>
+                              <span className="block text-[14px] tabular-nums" style={{ color: C.muted }}>
+                                {daysText(c.days)} {c.time}
+                              </span>
+                            </span>
+                            <span
+                              className="rounded-[4px] px-2 py-1 text-[13px] font-bold tabular-nums"
+                              style={full ? { background: C.alt, color: C.muted } : { background: C.tint, color: C.accentDeep }}
+                            >
+                              {full ? "마감" : `남은 자리 ${c.seats}`}
+                            </span>
+                          </button>
+                        </li>
+                      );
+                    })}
+                  </ul>
+                </div>
+              </article>
+            );
+          })}
+
+          {/* 수업 장면과 레벨테스트 */}
+          <aside className="w-[85%] flex-none snap-start overflow-hidden rounded-[8px] md:w-auto" style={{ background: C.dark, color: "#fff" }}>
+            <div className="relative aspect-[4/3] overflow-hidden md:aspect-[16/10]">
+              {/* eslint-disable-next-line @next/next/no-img-element -- 정적 export 라 next/image 최적화를 쓰지 않는다 */}
+              <img
+                src={`${IMG}/hero-sm.jpg`}
+                srcSet={`${IMG}/hero-sm.jpg 960w, ${IMG}/hero.jpg 1920w`}
+                sizes="(min-width: 768px) 30vw, 85vw"
+                alt="밝은 학원 교실 원탁에서 정장 차림 직장인 두 명이 노트와 커피를 두고 영어로 대화하는 모습"
+                fetchPriority="high"
+                className={`absolute inset-0 h-full w-full object-cover ${reduce ? "" : "et-photo-in"}`}
+                style={{ objectPosition: "40% 45%" }}
+              />
+            </div>
+            <div className="p-5">
+              <h2 className="text-[19px] font-bold">레벨테스트</h2>
+              <p className="mt-1 text-[15px] leading-[1.6]" style={{ color: "#d0d0d0" }}>
+                {QUESTIONS.length}문항, 레벨테스트 후 반 배정
+              </p>
+              <button
+                type="button"
+                onClick={() => go("et-test")}
+                data-gtm-cta="english-talk_poster_cta"
+                className={`mt-4 inline-flex min-h-[48px] w-full items-center justify-center gap-2 rounded-[6px] text-[16px] font-bold ${focusRing}`}
+                style={{ background: C.accent, color: "#fff", outlineColor: "#fff" }}
+              >
+                <BookOpen size={18} aria-hidden />
+                레벨테스트 시작
+              </button>
+              <button
+                type="button"
+                onClick={() => go("et-trial")}
+                className={`mt-2 inline-flex min-h-[48px] w-full items-center justify-center gap-2 rounded-[6px] border text-[16px] font-semibold ${focusRing}`}
+                style={{ borderColor: "rgba(255,255,255,0.4)", color: "#fff", outlineColor: "#fff" }}
+              >
+                <CalendarCheck size={18} aria-hidden />
+                무료 체험 신청
+              </button>
+            </div>
+          </aside>
         </div>
       </div>
     </section>
   );
 }
+
 
 /* ---------- 구역 제목 ---------- */
 

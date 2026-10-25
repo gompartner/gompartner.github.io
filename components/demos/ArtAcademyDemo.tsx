@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useMemo, useRef, useState, type ReactNode } from "react";
-import { AnimatePresence, motion, useScroll, useTransform } from "framer-motion";
+import { AnimatePresence, motion } from "framer-motion";
 import { AlertCircle, Bus, CalendarCheck, Car, Check, ChevronLeft, ChevronRight, Clock, MapPin, Phone, RotateCcw, TrainFront, X } from "lucide-react";
 import { useReducedMotionSafe } from "@/hooks/useReducedMotionSafe";
 import { daysAgo, fmtKo, useDemoToday } from "@/hooks/useDemoToday";
@@ -16,10 +16,10 @@ import { DemoMakerInfo } from "@/components/demos/DemoMakerInfo";
    첫 화면에는 모집 중인 반과 상담 예약 버튼을 둔다. 교습비는 교육청 신고 교습비처럼 "월 교습비"와 기타경비(재료비)를 표로 공개한다.
    관용 문구: 방문 상담, 상담 예약, 실기 시간표, 평일반, 주말반, 재료비 별도, 수업 작품.
 
-   첫 화면(aa-poster): 연필로 인체 소묘를 그리는 사진 한 장을 화면 가득 깔고 왼쪽 아래에 문장 "기초 소묘부터 입시 실기까지"를 둔다.
-   사진이 밝아서 흰 막을 깔고 글자는 먹색으로 쓴다.
-   핵심 모션: 들어올 때 사진이 1.6초 동안 천천히 다가오고(scale 1.06 에서 1), 문장은 0.3초 늦게 아래 12px 에서 올라온다(CSS).
-   스크롤하면 사진만 조금 느리게 내려간다(y 0 에서 8%). 동작 줄이기면 전부 멈춘 상태로 둔다.
+   첫 화면(aa-poster): 상단 메뉴 아래 왼쪽 2/3는 수업 작품 벽(큰 그림 하나와 작은 그림 여섯), 오른쪽 1/3은 문장
+   "기초 소묘부터 입시 실기까지"와 모집 중인 반 세로 판. 작품을 누르면 크게 보기가 열리고, 반을 누르면 아래 반 안내가 그 반으로 열린다.
+   실제 입시 미술학원이 첫 화면에 재현작과 명단을 거는 방식을 따르되 합격 실적은 넣지 않는다.
+   모션은 문장이 0.3초 늦게 아래 12px 에서 올라오는 것과 작품에 마우스를 올리면 살짝 커지는 것뿐. 동작 줄이기면 없음.
    사진 출처: Pexels 사진 7171387
 
    상호작용(모두 브라우저 안에서만 돈다. 실제로 보내지 않는다)
@@ -50,10 +50,6 @@ const C = {
 
 /* 모션 상수. 시간은 초, 이징은 cubic-bezier */
 const EASE = [0.22, 1, 0.36, 1] as const;
-/** 첫 화면 사진이 다가오는 시간 */
-const PHOTO_IN = 1.6;
-/** 사진 위 흰 막. 밝은 사진이라 왼쪽 아래를 하얗게 덮고 먹색 글자를 올린다 */
-const SCRIM = "linear-gradient(to top, rgba(255,255,255,0.9), rgba(255,255,255,0.55) 45%, rgba(255,255,255,0.1) 80%), linear-gradient(to right, rgba(255,255,255,0.6), rgba(255,255,255,0) 60%)";
 const POSTER_CSS = `@keyframes aa-rise{from{opacity:0;transform:translateY(12px)}}.aa-rise{animation:aa-rise .7s cubic-bezier(0.22,1,0.36,1) .3s both}@media (prefers-reduced-motion:reduce){.aa-rise{animation:none}}`;
 const IMG = "/images/demo-art-academy";
 /** 탭 패널이 왼쪽부터 쓸리며 바뀌는 시간 */
@@ -363,31 +359,18 @@ export function ArtAcademyDemo() {
 
   return (
     <div className="min-h-screen overflow-x-clip" style={{ background: C.paper, color: C.ink }}>
-      <Poster reduce={reduce} onCta={() => go("aa-consult")} />
-
-      <header className="mx-auto flex max-w-[1200px] flex-wrap items-center justify-between gap-x-4 gap-y-2 px-4 py-4 md:px-6">
-        <h2>
-          <SampleLogo />
-        </h2>
-        <nav aria-label="주요 메뉴" className="-mx-2 flex flex-wrap items-center">
-          {[
-            ["aa-classes", "반 안내"],
-            ["aa-gallery", "수업 작품"],
-            ["aa-timetable", "실기 시간표"],
-            ["aa-fee", "교습비"],
-            ["aa-consult", "상담 신청"],
-            ["aa-visit", "오시는 길"],
-          ].map(([id, label]) => (
-            <button key={id} type="button" onClick={() => go(id)} className={`rounded-[4px] px-2.5 py-1.5 text-[15px] underline-offset-4 hover:underline ${focusRing}`} style={{ outlineColor: C.ink }}>
-              {label}
-            </button>
-          ))}
-        </nav>
-      </header>
+      <Poster
+        reduce={reduce}
+        go={go}
+        onClass={(c) => {
+          setCls(c);
+          go("aa-classes");
+        }}
+      />
 
       {/* 오늘 실기 */}
       <div className="mx-auto max-w-[1200px] px-4 md:px-6">
-        <div className="flex flex-wrap items-center gap-x-5 gap-y-2 border-y py-3 text-[15px]" style={{ borderColor: C.line }}>
+        <div className="mt-8 flex flex-wrap items-center gap-x-5 gap-y-2 border-y py-3 text-[15px]" style={{ borderColor: C.line }}>
           <span className="inline-flex items-center gap-1.5 font-bold">
             <Clock size={17} aria-hidden />
             {fmtKo(today)} 실기
@@ -511,72 +494,175 @@ function Chip({ on, onClick, children, gtm, noCheck }: { on: boolean; onClick: (
   );
 }
 
-/* ---------- 포스터 ---------- */
+/* ---------- 첫 화면: 수업 작품 벽과 모집 반 세로 판 ---------- */
 
-function Poster({ reduce, onCta }: { reduce: boolean; onCta: () => void }) {
-  const ref = useRef<HTMLElement>(null);
-  const { scrollYProgress } = useScroll({ target: ref, offset: ["start start", "end start"] });
-  const photoY = useTransform(scrollYProgress, (v) => (reduce ? "0%" : `${v * 8}%`));
+const NAV: [string, string][] = [
+  ["aa-teachers", "학원 소개"],
+  ["aa-classes", "수업 안내"],
+  ["aa-gallery", "작품 갤러리"],
+  ["aa-timetable", "실기 시간표"],
+  ["aa-fee", "교습비 안내"],
+  ["aa-visit", "오시는 길"],
+];
+/** 작품 벽에 거는 그림. 첫 장은 크게 */
+const WALL = WORKS.slice(0, 7);
+const mediumName = (w: Work) => (w.medium === "소묘" ? "정물 소묘" : "정물 수채화");
+
+function Poster({ reduce, go, onClass }: { reduce: boolean; go: (id: string) => void; onClass: (c: ClassKey) => void }) {
+  const [open, setOpen] = useState<number | null>(null);
+  const lastBtn = useRef<HTMLButtonElement | null>(null);
 
   return (
-    <section id="aa-poster" ref={ref} aria-labelledby="aa-poster-title" className="relative flex min-h-[100svh] flex-col overflow-hidden" style={{ background: C.soft, color: C.ink }}>
+    <section id="aa-poster" aria-labelledby="aa-poster-title" style={{ background: C.soft, color: C.ink }}>
       <style>{POSTER_CSS}</style>
-      <motion.div className="absolute inset-0" style={{ y: photoY }}>
-        <motion.div
-          className="absolute inset-0"
-          initial={reduce ? false : { scale: 1.06 }}
-          animate={{ scale: 1 }}
-          transition={{ duration: reduce ? 0 : PHOTO_IN, ease: EASE }}
-        >
-          {/* eslint-disable-next-line @next/next/no-img-element -- 정적 export 라 next/image 최적화를 쓰지 않는다 */}
-          <img
-            src={`${IMG}/hero.jpg`}
-            srcSet={`${IMG}/hero-sm.jpg 960w, ${IMG}/hero.jpg 1920w`}
-            sizes="100vw"
-            alt="스케치북에 연필로 사람 얼굴 소묘를 그리는 손"
-            fetchPriority="high"
-            className="absolute inset-0 h-full w-full object-cover"
-            style={{ objectPosition: "60% center" }}
+
+      {/* 상단 메뉴. 휴대폰은 메뉴 줄을 옆으로 민다 */}
+      <header className="border-b" style={{ background: C.paper, borderColor: C.line }}>
+        <div className="mx-auto flex max-w-[1440px] items-center justify-between gap-4 px-4 py-3 md:px-6">
+          <p>
+            <SampleLogo size={18} />
+          </p>
+          <nav aria-label="주요 메뉴" className="hidden items-center lg:flex">
+            {NAV.map(([id, label]) => (
+              <button
+                key={id}
+                type="button"
+                onClick={() => go(id)}
+                className={`min-h-[44px] rounded-[4px] px-3 text-[16px] font-semibold underline-offset-4 hover:underline ${focusRing}`}
+                style={{ outlineColor: C.ink }}
+              >
+                {label}
+              </button>
+            ))}
+          </nav>
+          <button
+            type="button"
+            onClick={() => go("aa-consult")}
+            data-gtm-cta="art-academy_poster_cta"
+            className={`inline-flex h-11 flex-none items-center gap-1.5 rounded-[6px] px-4 text-[15px] font-semibold text-white ${focusRing}`}
+            style={{ background: C.orangeInk, outlineColor: C.ink }}
+          >
+            <CalendarCheck size={17} aria-hidden />
+            상담 예약
+          </button>
+        </div>
+        <nav aria-label="주요 메뉴" className="overflow-x-auto border-t lg:hidden" style={{ borderColor: C.line }}>
+          <ul className="flex w-max gap-1 px-2">
+            {NAV.map(([id, label]) => (
+              <li key={id}>
+                <button type="button" onClick={() => go(id)} className={`min-h-[44px] whitespace-nowrap rounded-[4px] px-3 text-[15px] font-semibold ${focusRing}`} style={{ outlineColor: C.ink }}>
+                  {label}
+                </button>
+              </li>
+            ))}
+          </ul>
+        </nav>
+      </header>
+
+      <div className="mx-auto grid max-w-[1440px] gap-5 px-4 pb-10 pt-6 md:px-6 lg:min-h-[calc(100svh-69px)] lg:grid-cols-[minmax(0,2fr)_minmax(0,1fr)] lg:grid-rows-[auto_minmax(0,1fr)] lg:gap-x-8 lg:gap-y-6 lg:pb-24 lg:pt-6">
+        {/* 문장 */}
+        <div className={`lg:col-start-2 lg:row-start-1 ${reduce ? "" : "aa-rise"}`}>
+          <h1 id="aa-poster-title" className="text-[32px] font-bold md:text-[40px]" style={{ wordBreak: "keep-all", letterSpacing: "-0.03em", lineHeight: 1.2 }}>
+            기초 소묘부터
+            <br />
+            입시 실기까지
+          </h1>
+          <p className="mt-3 text-[16px] font-medium" style={{ color: C.char }}>
+            입시반, 취미반, 초등반 모집
+          </p>
+        </div>
+
+        {/* 작품 벽 */}
+        <ul className="grid grid-cols-2 gap-3 md:grid-cols-3 lg:col-start-1 lg:row-span-2 lg:row-start-1 lg:grid-cols-5 lg:grid-rows-2">
+          {WALL.map((w, i) => (
+            <li key={w.id} className={`${i === 0 ? "lg:col-span-2 lg:row-span-2" : ""} ${i >= 4 && i < 6 ? "hidden md:block" : ""} ${i >= 6 ? "hidden lg:block" : ""} min-h-0`}>
+              <button
+                type="button"
+                onClick={(e) => {
+                  lastBtn.current = e.currentTarget;
+                  setOpen(i);
+                }}
+                aria-label={`${w.cls} ${mediumName(w)} 크게 보기`}
+                className={`group relative block aspect-[3/4] w-full overflow-hidden rounded-[6px] border bg-white lg:aspect-auto lg:h-full ${focusRing}`}
+                style={{ borderColor: C.line, outlineColor: C.orangeInk }}
+              >
+                {/* eslint-disable-next-line @next/next/no-img-element -- 정적 export 라 next/image 최적화를 쓰지 않는다 */}
+                <img
+                  src={`${IMG}/work-${w.id}.jpg`}
+                  alt=""
+                  fetchPriority={i === 0 ? "high" : undefined}
+                  className={`absolute inset-0 h-full w-full object-cover ${reduce ? "" : "transition-transform duration-500 group-hover:scale-[1.03]"}`}
+                />
+                <span className="absolute bottom-2 left-2 rounded-[4px] px-2 py-1 text-left text-[13px] font-semibold leading-tight" style={{ background: "rgba(255,255,255,0.92)", color: C.ink }}>
+                  {w.cls}, {mediumName(w)}
+                </span>
+              </button>
+            </li>
+          ))}
+        </ul>
+
+        {/* 모집 반 세로 판 */}
+        <div className="flex flex-col self-start rounded-[8px] border lg:col-start-2 lg:row-start-2" style={{ background: C.sheet, borderColor: C.line }}>
+          <h2 className="border-b px-5 py-3 text-[17px] font-bold" style={{ borderColor: C.line }}>
+            모집 중인 반
+          </h2>
+          <ul className="divide-y" style={{ borderColor: C.line }}>
+            {CLASSES.map((c) => (
+              <li key={c.key} style={{ borderColor: C.line }}>
+                <button type="button" onClick={() => onClass(c.key)} className={`block w-full px-5 py-3.5 text-left hover:bg-[#f7f7f5] ${focusRing}`} style={{ outlineColor: C.orangeInk }}>
+                  <span className="flex items-baseline justify-between gap-3">
+                    <span className="text-[17px] font-bold">{c.key}</span>
+                    <span className="text-[14px] tabular-nums" style={{ color: C.muted }}>
+                      정원 {c.cap}명
+                    </span>
+                  </span>
+                  <span className="mt-0.5 block text-[15px]" style={{ color: C.char }}>
+                    {c.who}
+                  </span>
+                  <span className="mt-0.5 block text-[14px]" style={{ color: C.muted, wordBreak: "keep-all" }}>
+                    {c.subjects.join(", ")}
+                  </span>
+                  <span className="mt-1.5 block text-[15px] font-semibold tabular-nums">
+                    월 {won(Math.min(...c.plans.map((x) => x.fee)))}
+                    {c.plans.length > 1 ? "부터" : ""}
+                  </span>
+                </button>
+              </li>
+            ))}
+          </ul>
+          <div className="border-t p-4" style={{ borderColor: C.line }}>
+            <button
+              type="button"
+              onClick={() => go("aa-consult")}
+              className={`inline-flex min-h-[48px] w-full items-center justify-center gap-2 rounded-[6px] text-[16px] font-bold text-white ${focusRing}`}
+              style={{ background: C.orangeInk, outlineColor: C.ink }}
+            >
+              <CalendarCheck size={18} aria-hidden />
+              방문 상담 예약
+            </button>
+          </div>
+        </div>
+      </div>
+
+      <AnimatePresence>
+        {open !== null && WALL[open] && (
+          <Lightbox
+            reduce={reduce}
+            work={WALL[open]}
+            index={open}
+            total={WALL.length}
+            onMove={(d) => setOpen((o) => (o === null ? o : (o + d + WALL.length) % WALL.length))}
+            onClose={() => {
+              setOpen(null);
+              lastBtn.current?.focus();
+            }}
           />
-        </motion.div>
-      </motion.div>
-      <div className="absolute inset-0" style={{ background: SCRIM }} aria-hidden />
-
-      {/* 로고와 핵심 행동 하나 */}
-      <div className="relative z-10 mx-auto flex w-full max-w-[1200px] items-center justify-between gap-4 px-4 pt-4 md:px-6 md:pt-6">
-        <p className="rounded-[6px] px-2 py-1.5" style={{ background: "rgba(255,255,255,0.85)" }}>
-          <SampleLogo size={18} />
-        </p>
-        <button
-          type="button"
-          onClick={onCta}
-          data-gtm-cta="art-academy_poster_cta"
-          className={`inline-flex h-11 flex-none items-center gap-1.5 rounded-[6px] px-4 text-[15px] font-semibold text-white ${focusRing}`}
-          style={{ background: C.orangeInk, outlineColor: C.ink }}
-        >
-          <CalendarCheck size={17} aria-hidden />
-          상담 예약
-        </button>
-      </div>
-
-      {/* 문장 */}
-      <div className={`${reduce ? "" : "aa-rise"} relative z-10 mx-auto mt-auto w-full max-w-[1200px] px-4 pb-[12svh] md:px-6`}>
-        <h1
-          id="aa-poster-title"
-          className="text-[36px] font-bold md:text-[clamp(40px,5vw,72px)]"
-          style={{ wordBreak: "keep-all", letterSpacing: "-0.03em", lineHeight: 1.2 }}
-        >
-          기초 소묘부터
-          <br />
-          입시 실기까지
-        </h1>
-        <p className="mt-4 text-[16px] font-medium md:mt-6 md:text-[18px]" style={{ color: C.char }}>
-          입시반, 취미반, 초등반 모집
-        </p>
-      </div>
+        )}
+      </AnimatePresence>
     </section>
   );
 }
+
 
 /* ---------- 1. 반 안내 ---------- */
 

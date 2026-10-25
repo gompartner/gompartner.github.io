@@ -1,8 +1,8 @@
 "use client";
 
-import { memo, useCallback, useEffect, useId, useMemo, useRef, useState } from "react";
-import { AnimatePresence, motion, useScroll, useTransform } from "framer-motion";
-import { Bus, CalendarCheck, Car, Check, ChevronLeft, ChevronRight, Clock, FileText, MapPin, Minus, Phone, Plus } from "lucide-react";
+import { memo, useCallback, useEffect, useId, useMemo, useState } from "react";
+import { AnimatePresence, motion } from "framer-motion";
+import { Bus, CalendarCheck, Car, Check, ChevronLeft, ChevronRight, FileText, MapPin, MessageSquare, Minus, Phone, Plus } from "lucide-react";
 import { useReducedMotionSafe } from "@/hooks/useReducedMotionSafe";
 import { daysAgo, fmtDash, fmtKo, useDemoToday } from "@/hooks/useDemoToday";
 import { maskName, maskPhone } from "@/components/demos/LeadReceivedPanel";
@@ -16,11 +16,13 @@ import { DemoMakerInfo } from "@/components/demos/DemoMakerInfo";
    "평일 야간, 주말 교육", "등록 예약" 버튼과 대표번호를 크게 둔다. 교육 시간은 학과 3시간, 장내기능 4시간,
    도로주행 6시간(2종 소형은 학과 3시간, 장내기능 10시간, 도로교통법 시행규칙 별표 32)으로 안내하고, 교육비와 검정료를 나눠 적는 곳이 많다. 합격 보장, 합격률 숫자는 쓰지 않는다.
 
-   첫 화면(dr-poster): 운전석에서 핸들을 잡은 사진 한 장이 화면을 채우고, 왼쪽 아래에 문장 "평일 밤 9시까지 도로 연수".
+   첫 화면(dr-poster): 맨 위 어두운 띠에 큰 대표번호와 상담 시간, 그 아래 상단 메뉴(휴대폰은 아이콘 빠른 메뉴를 옆으로 민다).
+   본문 왼쪽은 운전석 사진, 오른쪽은 문장 "평일 밤 9시까지 도로 연수"와 면허 종류 탭, 취득 순서 세로 타임라인(학과, 장내기능, 도로주행, 면허 발급).
+   탭을 바꾸면 단계별 교육 시간과 합계, 교육비 개략이 바뀌고 아래 면허 종류별 교육도 같은 면허로 맞춰진다. 그 아래 큰 타일 셋(수강료, 셔틀 노선, 시험 일정).
+   휴대폰은 사진을 짧은 띠로 줄이고 화면 맨 아래에 전화 상담, 문자 상담 두 버튼을 고정한다. 팝업은 쓰지 않는다.
    사진 출처: Pexels 사진 9195126
 
-   핵심 모션: 들어올 때 사진이 1600ms 동안 scale 1.06 -> 1 로 다가오고, 문장과 정보 줄은 300ms 늦게
-   아래 12px 에서 700ms 동안 올라온다(CSS keyframes, JS 없이도 보인다). 스크롤하면 사진만 y 0 -> 8% 로 느리게 움직인다.
+   모션: 들어올 때 사진이 1.6초 동안 scale 1.06 에서 1 로 다가오고, 오른쪽 글은 300ms 늦게 아래 12px 에서 700ms 동안 올라온다.
    동작 줄이기면 모두 없음.
 
    상호작용(모두 브라우저 안에서만 돈다. 실제로 보내지 않는다)
@@ -247,56 +249,12 @@ export function DrivingSchoolDemo() {
       }),
     [reduce],
   );
-  const toReserve = useCallback(() => go("dr-reserve"), [go]);
-
-  const navBtn = `rounded-[4px] px-2.5 py-1.5 text-[15px] font-semibold underline-offset-4 hover:underline ${focusRing}`;
 
   return (
     <div className="min-h-screen overflow-x-clip" style={{ background: C.bg, color: C.ink }}>
-      <Poster reduce={reduce} onCta={toReserve} />
+      <Poster reduce={reduce} license={license} setLicense={setLicense} go={go} />
 
-      <header className="border-b" style={{ background: C.card, borderColor: C.line }}>
-        <div className="mx-auto flex max-w-[1200px] flex-wrap items-center justify-between gap-x-4 gap-y-2 px-4 py-4 md:px-6">
-          <h2>
-            <SampleLogo />
-          </h2>
-          <nav aria-label="주요 메뉴" className="-mx-2 flex flex-wrap items-center" style={{ color: C.body }}>
-            {[
-              ["dr-course", "교육안내"],
-              ["dr-shuttle", "셔틀버스"],
-              ["dr-exam", "시험일정"],
-              ["dr-reserve", "등록 예약"],
-              ["dr-visit", "오시는 길"],
-            ].map(([id, label]) => (
-              <button key={id} type="button" onClick={() => go(id)} className={navBtn} style={{ outlineColor: C.ink }}>
-                {label}
-              </button>
-            ))}
-          </nav>
-        </div>
-      </header>
-
-      {/* 오늘 운영 한 줄 */}
-      <div className="mx-auto flex max-w-[1200px] flex-wrap items-center justify-between gap-3 px-4 pt-8 md:px-6 md:pt-10">
-        <p className="flex flex-wrap items-center gap-x-5 gap-y-1 text-[16px]">
-          <span className="inline-flex items-center gap-1.5 font-bold">
-            <Clock size={18} aria-hidden /> 평일 09:00 ~ 21:00
-          </span>
-          <span className="inline-flex items-center gap-1.5">
-            <Bus size={18} aria-hidden /> 무료 셔틀버스 3개 노선
-          </span>
-        </p>
-        <a
-          href={`tel:${TEL.replace(/-/g, "")}`}
-          className={`inline-flex items-center gap-2 rounded-[4px] px-4 py-2.5 text-[16px] font-bold ${focusRing}`}
-          style={{ background: C.accent, color: "#fff", outlineColor: C.ink }}
-        >
-          <Phone size={18} aria-hidden />
-          대표번호 <span className="tabular-nums">{TEL}</span>
-        </a>
-      </div>
-
-      <section id="dr-course" aria-labelledby="dr-course-title" className="mx-auto mt-10 max-w-[1200px] scroll-mt-4 px-4 md:mt-14 md:px-6">
+      <section id="dr-course" aria-labelledby="dr-course-title" className="mx-auto mt-6 max-w-[1200px] scroll-mt-4 px-4 md:mt-14 md:px-6">
         <SectionTitle id="dr-course-title" title="면허 종류별 교육" />
         <CoursePicker
           reduce={reduce}
@@ -466,89 +424,228 @@ function Stepper({ label, value, set, min, max, unit }: { label: string; value: 
   );
 }
 
-/* ---------- 첫 화면 ---------- */
+/* ---------- 첫 화면: 큰 전화 띠, 면허 종류 탭과 취득 순서 타임라인 ---------- */
 
-const Poster = memo(function Poster({ reduce, onCta }: { reduce: boolean; onCta: () => void }) {
-  const ref = useRef<HTMLElement>(null);
-  const { scrollYProgress } = useScroll({
-    target: ref,
-    offset: ["start start", "end start"],
-  });
-  // 스크롤하면 사진만 조금 느리게 내려간다
-  const photoY = useTransform(scrollYProgress, (v) => `${(v * 8).toFixed(2)}%`);
+const NAV: { id: string; label: string; Icon: typeof Car }[] = [
+  { id: "dr-course", label: "수강료", Icon: FileText },
+  { id: "dr-shuttle", label: "셔틀 노선", Icon: Bus },
+  { id: "dr-exam", label: "시험 일정", Icon: CalendarCheck },
+  { id: "dr-staff", label: "강사 소개", Icon: Car },
+  { id: "dr-reserve", label: "등록 예약", Icon: Check },
+  { id: "dr-visit", label: "오시는 길", Icon: MapPin },
+];
+
+const Poster = memo(function Poster({
+  reduce,
+  license,
+  setLicense,
+  go,
+}: {
+  reduce: boolean;
+  license: LicenseId;
+  setLicense: (l: LicenseId) => void;
+  go: (id: string) => void;
+}) {
+  const lic = LICENSES.find((l) => l.id === license) ?? LICENSES[1];
+  const total = lic.hours.reduce<number>((s, h) => s + h, 0);
+  const tel = TEL.replace(/-/g, "");
+  const steps = [
+    { name: "학과 교육", h: lic.hours[0], test: "학과시험" },
+    { name: "장내기능 교육", h: lic.hours[1], test: "장내기능 검정" },
+    { name: "도로주행 교육", h: lic.hours[2], test: "도로주행 검정" },
+  ].filter((s) => s.h > 0);
 
   return (
-    <section id="dr-poster" ref={ref} aria-labelledby="dr-poster-title" className="relative min-h-[100svh] overflow-hidden" style={{ background: "#141414", color: "#fff" }}>
+    <section id="dr-poster" aria-labelledby="dr-poster-title" style={{ background: C.bg }}>
       <style>{HERO_CSS}</style>
-      <motion.div
-        className="absolute inset-0"
-        initial={reduce ? false : { scale: 1.06 }}
-        animate={{ scale: 1 }}
-        transition={{ duration: reduce ? 0 : HERO_DUR, ease: EASE }}
-        style={reduce ? undefined : { y: photoY }}
-      >
-        {/* eslint-disable-next-line @next/next/no-img-element -- 정적 export 라 next/image 최적화를 쓰지 않는다 */}
-        <img
-          src={`${IMG}/hero.jpg`}
-          srcSet={`${IMG}/hero-sm.jpg 960w, ${IMG}/hero.jpg 1920w`}
-          sizes="100vw"
-          alt="운전석에서 한 손으로 핸들을 잡고 있는 모습"
-          fetchPriority="high"
-          className="absolute inset-0 h-full w-full object-cover"
-          style={{ objectPosition: "62% 50%" }}
-        />
-      </motion.div>
-      {/* 글자 대비용 막: 아래와 위를 어둡게 */}
-      <div
-        aria-hidden
-        className="absolute inset-0"
-        style={{
-          background: "linear-gradient(to top, rgba(0,0,0,0.72), rgba(0,0,0,0.25) 55%, rgba(0,0,0,0.1)), linear-gradient(to bottom, rgba(0,0,0,0.4), rgba(0,0,0,0) 28%)",
-        }}
-      />
 
-      <div className="relative mx-auto flex min-h-[100svh] max-w-[1200px] flex-col px-4 md:px-6">
-        <div className="flex items-center justify-between gap-3 py-4 md:py-6">
+      {/* 큰 전화 띠 */}
+      <div style={{ background: C.dark, color: "#fff" }}>
+        <div className="mx-auto flex max-w-[1440px] flex-wrap items-center justify-between gap-x-6 gap-y-1 px-4 py-2 md:px-6">
+          <a href={`tel:${tel}`} className={`inline-flex min-h-[44px] items-center gap-2 text-[22px] font-bold tabular-nums md:text-[26px] ${focusRing}`} style={{ color: C.accentOnDark, outlineColor: "#fff" }}>
+            <Phone size={22} aria-hidden />
+            {TEL}
+          </a>
+          <p className="text-[14px] md:text-[15px]" style={{ color: C.sub }}>
+            상담 평일 09:00 ~ 21:00, 토요일 09:00 ~ 17:00
+          </p>
+        </div>
+      </div>
+
+      {/* 상단 메뉴. 휴대폰은 아이콘 빠른 메뉴를 옆으로 민다 */}
+      <header className="border-b" style={{ background: C.card, borderColor: C.line }}>
+        <div className="mx-auto flex max-w-[1440px] items-center justify-between gap-4 px-4 py-3 md:px-6">
           <p>
-            <SampleLogo light size={18} />
+            <SampleLogo size={18} />
           </p>
-          <button
-            type="button"
-            onClick={onCta}
-            data-gtm-cta="driving-school_poster_cta"
-            className={`rounded-[6px] px-4 py-2.5 text-[15px] font-semibold ${focusRing}`}
-            style={{
-              background: C.accent,
-              color: "#fff",
-              outlineColor: "#fff",
-            }}
-          >
-            등록 예약
-          </button>
+          <nav aria-label="주요 메뉴" className="hidden items-center lg:flex">
+            {NAV.map((n) => (
+              <button
+                key={n.id}
+                type="button"
+                onClick={() => go(n.id)}
+                className={`min-h-[44px] rounded-[4px] px-3 text-[16px] font-semibold underline-offset-4 hover:underline ${focusRing}`}
+                style={{ outlineColor: C.ink }}
+              >
+                {n.label}
+              </button>
+            ))}
+          </nav>
+        </div>
+        <nav aria-label="빠른 메뉴" className="overflow-x-auto border-t lg:hidden" style={{ borderColor: C.line }}>
+          <ul className="flex w-max px-2">
+            {NAV.map((n) => (
+              <li key={n.id}>
+                <button
+                  type="button"
+                  onClick={() => go(n.id)}
+                  className={`flex min-h-[60px] w-[76px] flex-col items-center justify-center gap-1 rounded-[4px] text-[13px] font-semibold ${focusRing}`}
+                  style={{ outlineColor: C.ink }}
+                >
+                  <n.Icon size={20} aria-hidden style={{ color: C.accent }} />
+                  {n.label}
+                </button>
+              </li>
+            ))}
+          </ul>
+        </nav>
+      </header>
+
+      <div className="mx-auto max-w-[1440px] md:px-6 md:pt-6">
+        <div className="grid md:grid-cols-[minmax(0,1fr)_minmax(0,1fr)] lg:grid-cols-[minmax(0,11fr)_minmax(0,9fr)] md:gap-6">
+          {/* 교육 사진 */}
+          <div className="relative h-[22svh] min-h-[150px] overflow-hidden md:h-auto md:min-h-[520px] md:rounded-[8px]" style={{ background: "#141414" }}>
+            <motion.div className="absolute inset-0" initial={reduce ? false : { scale: 1.06 }} animate={{ scale: 1 }} transition={{ duration: reduce ? 0 : HERO_DUR, ease: EASE }}>
+              {/* eslint-disable-next-line @next/next/no-img-element -- 정적 export 라 next/image 최적화를 쓰지 않는다 */}
+              <img
+                src={`${IMG}/hero.jpg`}
+                srcSet={`${IMG}/hero-sm.jpg 960w, ${IMG}/hero.jpg 1920w`}
+                sizes="(min-width: 768px) 55vw, 100vw"
+                alt="운전석에서 한 손으로 핸들을 잡고 있는 모습"
+                fetchPriority="high"
+                className="absolute inset-0 h-full w-full object-cover"
+                style={{ objectPosition: "62% 50%" }}
+              />
+            </motion.div>
+          </div>
+
+          {/* 면허 탭과 타임라인 */}
+          <div className={`px-4 pt-6 md:px-0 md:pt-2 ${reduce ? "" : "dr-rise"}`}>
+            <h1 id="dr-poster-title" className="text-[30px] font-bold md:text-[38px]" style={{ letterSpacing: "-0.03em", lineHeight: 1.2, wordBreak: "keep-all" }}>
+              평일 밤 9시까지 도로 연수
+            </h1>
+            <p className="mt-2 text-[16px]" style={{ color: C.body }}>
+              {BRAND}, 1종 보통, 2종 보통, 2종 소형
+            </p>
+
+            <div role="tablist" aria-label="면허 종류" className="mt-5 grid grid-cols-3 border-b" style={{ borderColor: C.line }}>
+              {LICENSES.map((l) => {
+                const on = l.id === license;
+                return (
+                  <button
+                    key={l.id}
+                    type="button"
+                    role="tab"
+                    aria-selected={on}
+                    aria-controls="dr-poster-steps"
+                    onClick={() => setLicense(l.id)}
+                    className={`-mb-px min-h-[48px] border-b-[3px] text-[16px] font-bold md:text-[17px] ${focusRing}`}
+                    style={{ borderColor: on ? C.accent : "transparent", color: on ? C.ink : C.muted, outlineColor: C.ink }}
+                  >
+                    {l.id}
+                  </button>
+                );
+              })}
+            </div>
+
+            <div id="dr-poster-steps" role="tabpanel" aria-label={`${license} 취득 순서`} className="mt-5">
+              <ol className="relative">
+                <span aria-hidden className="absolute bottom-5 left-[15px] top-5 w-[2px]" style={{ background: C.line }} />
+                {steps.map((s, i) => (
+                  <li key={s.name} className="relative grid grid-cols-[32px_minmax(0,1fr)_auto] items-start gap-3 pb-4">
+                    <span className="relative z-[1] flex h-8 w-8 items-center justify-center rounded-full text-[15px] font-bold tabular-nums" style={{ background: C.accent, color: "#fff" }}>
+                      {i + 1}
+                    </span>
+                    <span className="min-w-0 pt-0.5">
+                      <span className="block text-[17px] font-bold">{s.name}</span>
+                      <span className="block text-[15px]" style={{ color: C.muted }}>
+                        {s.test}
+                      </span>
+                    </span>
+                    <span className="pt-0.5 text-[17px] font-bold tabular-nums">{s.h}시간</span>
+                  </li>
+                ))}
+                <li className="relative grid grid-cols-[32px_minmax(0,1fr)] items-center gap-3">
+                  <span className="relative z-[1] flex h-8 w-8 items-center justify-center rounded-full border-2" style={{ borderColor: C.accent, background: C.card, color: C.accent }}>
+                    <Check size={16} aria-hidden />
+                  </span>
+                  <span className="text-[17px] font-bold">면허 발급</span>
+                </li>
+              </ol>
+              <dl className="mt-5 grid grid-cols-2 gap-3 rounded-[6px] p-4" style={{ background: C.card }}>
+                <div>
+                  <dt className="text-[14px] font-semibold" style={{ color: C.muted }}>
+                    교육 시간 합계
+                  </dt>
+                  <dd className="mt-0.5 text-[22px] font-bold tabular-nums">{total}시간</dd>
+                </div>
+                <div>
+                  <dt className="text-[14px] font-semibold" style={{ color: C.muted }}>
+                    교육비 개략
+                  </dt>
+                  <dd className="mt-0.5 text-[22px] font-bold tabular-nums">{won(lic.fee)}</dd>
+                </div>
+              </dl>
+            </div>
+          </div>
         </div>
 
-        <div className={`mt-auto pb-[10svh] ${reduce ? "" : "dr-rise"}`}>
-          <h1
-            id="dr-poster-title"
-            className="text-[36px] font-bold md:text-[clamp(40px,5vw,72px)]"
-            style={{
-              letterSpacing: "-0.03em",
-              lineHeight: 1.2,
-              wordBreak: "keep-all",
-            }}
-          >
-            평일 밤 9시까지
-            <br />
-            도로 연수
-          </h1>
-          <p className="mt-4 text-[15px] md:text-[17px]" style={{ color: "rgba(255,255,255,0.86)", lineHeight: 1.5 }}>
-            {BRAND}, 1종 보통, 2종 보통, 2종 소형
-          </p>
-        </div>
+        {/* 큰 타일 셋 */}
+        <ul className="mt-6 grid gap-3 px-4 pb-10 sm:grid-cols-3 md:px-0 md:pb-12">
+          {(
+            [
+              { id: "dr-course", title: "수강료", sub: "교육비와 검정료, 추가 교육", Icon: FileText },
+              { id: "dr-shuttle", title: "셔틀 노선", sub: `무료 셔틀 ${ROUTES.length}개 노선`, Icon: Bus },
+              { id: "dr-exam", title: "시험 일정", sub: "장내기능, 도로주행 검정일", Icon: CalendarCheck },
+            ] as const
+          ).map((t) => (
+            <li key={t.id}>
+              <button
+                type="button"
+                onClick={() => go(t.id)}
+                className={`flex min-h-[76px] w-full items-center gap-4 rounded-[8px] border px-5 py-4 text-left hover:border-[#bdbdbd] ${focusRing}`}
+                style={{ background: C.card, borderColor: C.line, outlineColor: C.ink }}
+              >
+                <span className="flex h-11 w-11 flex-none items-center justify-center rounded-[6px]" style={{ background: C.accentSoft, color: C.accent }}>
+                  <t.Icon size={22} aria-hidden />
+                </span>
+                <span className="min-w-0">
+                  <span className="block text-[18px] font-bold">{t.title}</span>
+                  <span className="block text-[14px]" style={{ color: C.muted }}>
+                    {t.sub}
+                  </span>
+                </span>
+              </button>
+            </li>
+          ))}
+        </ul>
+      </div>
+
+      {/* 휴대폰 하단 고정 줄: 전화, 문자 상담 */}
+      <div className="fixed inset-x-0 bottom-0 z-40 grid grid-cols-2 gap-2 border-t p-2 md:hidden" style={{ background: C.card, borderColor: C.line, paddingBottom: "calc(8px + env(safe-area-inset-bottom))" }}>
+        <a href={`tel:${tel}`} className={`flex min-h-[48px] items-center justify-center gap-2 rounded-[6px] text-[16px] font-bold ${focusRing}`} style={{ background: C.accent, color: "#fff", outlineColor: C.ink }}>
+          <Phone size={18} aria-hidden />
+          전화 상담
+        </a>
+        <a href={`sms:${tel}`} className={`flex min-h-[48px] items-center justify-center gap-2 rounded-[6px] border text-[16px] font-bold ${focusRing}`} style={{ borderColor: C.ink, color: C.ink, outlineColor: C.ink }}>
+          <MessageSquare size={18} aria-hidden />
+          문자 상담
+        </a>
       </div>
     </section>
   );
 });
+
 
 /* ---------- 1. 면허 종류별 교육 ---------- */
 
