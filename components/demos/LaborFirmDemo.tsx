@@ -42,7 +42,7 @@ import { DemoMakerInfo } from "@/components/demos/DemoMakerInfo";
    2025년 10월 23일부터는 재직 중 밀린 임금도 정기 지급일 다음 날부터 같은 지연이자가 붙는다.
    퇴직금은 1년 이상 일했을 때 평균임금 30일분 x 근속 연수다. 계산기는 월급으로 바꿔 개략만 보여 준다.
 
-   사진 출처: Pexels 사진 6814526, 직원 사진은 AI 생성(Z-Image-Turbo)
+   사진 출처: Pexels 사진 6814526, 직원 사진과 근로자 칸 현장 사진은 AI 생성(Z-Image-Turbo)
 
    첫 화면(lf-poster): 상단 메뉴(휴대폰은 가로로 미는 메뉴) 아래 사업주, 근로자 두 갈래 입구. 칸마다 위에 사진, 아래 업무 5줄과
    갈래별 상담신청 버튼. PC는 마우스를 올리거나 누른 칸이 넓어지고, 휴대폰은 위에 붙는 전환 버튼으로 한 갈래만 보인다.
@@ -395,9 +395,9 @@ const BRANCHES: Record<Branch, { label: string; sub: string; photo: string; srcS
   worker: {
     label: "근로자",
     sub: "근로자 사건",
-    photo: `${IMG}/staff-2.jpg`,
-    alt: "박ㅈ민 공인노무사",
-    pos: "50% 22%",
+    photo: `${IMG}/worker.jpg`,
+    alt: "공장 안에서 흰 안전모와 회색 작업복을 입은 근로자",
+    pos: "60% 30%",
     caption: "담당 박ㅈ민 공인노무사",
     cta: "부당해고",
     rows: [

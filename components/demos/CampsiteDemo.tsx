@@ -17,12 +17,13 @@ import { DemoMakerInfo } from "@/components/demos/DemoMakerInfo";
    이용 안내에는 입실 14시, 퇴실 11시, 매너타임, 화기 규정(화로대 사용, 바닥 직화 금지), 반려동물, 환불 규정표가 있다.
    오시는 길은 역이 아니라 고속도로 나들목 기준으로 적는다.
 
-   첫 화면 포스터(cp-poster): 별이 뜬 밤 캠핑장 사진 한 장이 화면을 채우고, 숲 그림자 위에 문장 "장작과 화로를 갖춘 숲속 오토캠핑장".
-   들어올 때 사진이 1.06배에서 1배로 1.6초 동안 다가오고, 문장은 0.3초 뒤 12px 아래에서 올라온다(CSS keyframes).
-   스크롤하면 사진만 조금 느리게 움직인다. 불꽃, 불티 같은 반복 움직임은 두지 않는다. 동작 줄이기면 모두 멈춘 상태.
-   그 아래 먹색 띠(상호, 사이트 구성, 요금 요약)가 이어진다.
+   첫 화면(cp-poster): 상단 메뉴 + 좌우 분할. 왼쪽은 캠핑장 전경 항공 사진 위에 사진 속 데크 자리마다 사이트 번호 라벨
+   (고른 날짜에 찬 자리는 회색 빗금), 오른쪽은 입실일 한 칸과 구역 목록. 목록에 마우스를 올리면 사진 위 그 구역 번호가 강조되고,
+   사진 밖인 C구역과 글램핑은 구역 사진으로 바뀐다. 번호를 누르면 그 구역 행이 그 번호로 예약하도록 바뀐다.
+   들어올 때 사진이 1.06배에서 1배로 1.6초 동안 다가온다(CSS keyframes). 동작 줄이기면 멈춘 상태.
+   그 아래 이용 규칙 한 줄 띠가 이어진다.
 
-   사진 출처: 첫 화면 Pexels 사진 2526025, 구역 사진은 AI 생성(Z-Image-Turbo)
+   사진 출처: 항공 사진과 구역 사진은 AI 생성(Z-Image-Turbo)
 
    상호작용(모두 브라우저 안에서만 돈다. 실제로 보내지 않는다)
    1. 사이트 배치도: A, B, C 구역 사이트 22면과 글램핑 2동. 누르면 크기, 전기, 그늘, 화장실 거리가 나온다.
@@ -373,6 +374,17 @@ const ZONE_ROWS: { zone: Zone; photo: string; alt: string }[] = [
   { zone: "C", photo: "zone-C.jpg", alt: "잔디 사이트 옆에 차를 댄 오토캠핑 텐트" },
   { zone: "G", photo: "zone-G.jpg", alt: "데크 위에 세운 글램핑 벨텐트" },
 ];
+/** 항공 사진(aerial.jpg) 속 데크 자리(%). 길 왼쪽 볕 드는 잔디가 A구역, 숲 가장자리가 B구역. 나머지 번호는 사진 밖 */
+const DECK_PINS: { id: string; x: number; y: number }[] = [
+  { id: "A1", x: 28.8, y: 47.6 },
+  { id: "A2", x: 36.1, y: 59.8 },
+  { id: "A3", x: 44.0, y: 70.7 },
+  { id: "A4", x: 54.6, y: 82.0 },
+  { id: "B1", x: 50.0, y: 27.8 },
+  { id: "B2", x: 58.8, y: 36.3 },
+  { id: "B3", x: 67.7, y: 46.3 },
+  { id: "B4", x: 77.9, y: 58.2 },
+];
 const GNB: [string, string][] = [
   ["cp-price", "사이트 안내"],
   ["cp-map", "배치도"],
@@ -403,9 +415,11 @@ function Poster({
   const [menu, setMenu] = useState(false);
   const [day, setDay] = useState<number | null>(null);
   const [hover, setHover] = useState<Zone | null>(null);
+  const [picked, setPicked] = useState<string | null>(null);
   const dayIdx = day ?? defaultDay;
   const date = daysAgo(today, -dayIdx);
-  const row = hover ? ZONE_ROWS.find((r) => r.zone === hover)! : null;
+  // A, B는 항공 사진 위에서 강조하고, 사진 밖인 C, G만 구역 사진으로 바꾼다
+  const photoRow = hover === "C" || hover === "G" ? ZONE_ROWS.find((r) => r.zone === hover)! : null;
 
   useEffect(() => {
     if (!menu) return;
@@ -472,48 +486,68 @@ function Poster({
       <section id="cp-poster" ref={ref} aria-labelledby="cp-poster-title" style={{ background: C.paper }}>
         <style>{HERO_CSS}</style>
         <div className="mx-auto grid max-w-[1200px] gap-5 px-4 pb-8 pt-5 md:grid-cols-[minmax(0,3fr)_minmax(0,2fr)] md:gap-8 md:px-6 md:pt-8">
-          {/* 왼쪽: 캠핑장 사진. 구역에 마우스를 올리면 그 구역 사진과 번호로 바뀐다 */}
-          <div className="relative aspect-[4/3] overflow-hidden rounded-[8px] md:aspect-auto md:h-[min(calc(100svh-200px),620px)] md:min-h-[420px]" style={{ background: C.night }}>
+          {/* 왼쪽: 캠핑장 전경 항공 사진 위 데크 번호. A, B는 사진 속 데크 자리에 번호, C와 G는 사진 밖이라 구역 사진으로 바꿔 보여 준다 */}
+          <div className="relative aspect-[3/2] overflow-hidden rounded-[8px]" style={{ background: C.night }}>
             <div className={`absolute inset-0 ${reduce ? "" : "cp-hero-photo"}`}>
               <AnimatePresence initial={false}>
                 <motion.img
-                  key={row ? row.zone : "hero"}
-                  src={row ? `${IMG}/${row.photo}` : `${IMG}/hero.jpg`}
-                  srcSet={row ? undefined : `${IMG}/hero-sm.jpg 960w, ${IMG}/hero.jpg 1920w`}
+                  key={photoRow ? photoRow.zone : "aerial"}
+                  src={photoRow ? `${IMG}/${photoRow.photo}` : `${IMG}/aerial.jpg`}
                   sizes="(min-width: 768px) 60vw, 100vw"
-                  alt={row ? row.alt : "별이 뜬 밤 숲 아래 불빛이 켜진 텐트 두 동이 있는 캠핑장 잔디밭"}
-                  fetchPriority={row ? undefined : "high"}
+                  alt={photoRow ? photoRow.alt : "숲 사이 자갈길 양옆으로 나무 데크 사이트가 놓인 캠핑장을 위에서 찍은 사진"}
+                  fetchPriority={photoRow ? undefined : "high"}
                   initial={reduce ? false : { opacity: 0 }}
                   animate={{ opacity: 1 }}
                   exit={reduce ? { opacity: 0, transition: { duration: 0 } } : { opacity: 0 }}
                   transition={{ duration: reduce ? 0 : 0.35 }}
                   className="absolute inset-0 h-full w-full object-cover"
-                  style={{ objectPosition: row ? "50% 55%" : "35% 60%" }}
+                  style={{ objectPosition: photoRow ? "50% 55%" : "50% 50%" }}
                 />
               </AnimatePresence>
             </div>
-            {/* 구역 번호 라벨 */}
-            <ul aria-label="구역 번호" className="absolute bottom-3 left-3 right-3 flex flex-wrap gap-1.5">
-              {ZONE_ROWS.map((r) => {
-                const ids = SITES.filter((s) => s.zone === r.zone).map((s) => s.id);
-                const on = hover === r.zone;
-                return (
-                  <li key={r.zone}>
-                    <button
-                      type="button"
-                      onClick={() => {
-                        setHover(r.zone);
-                        document.getElementById(`cp-zone-${r.zone}`)?.scrollIntoView({ behavior: reduce ? "auto" : "smooth", block: "nearest" });
-                      }}
-                      className={`h-11 rounded-[4px] px-2.5 text-[14px] font-bold tabular-nums ${focusRing}`}
-                      style={{ background: on ? C.fire : "rgba(255,255,255,0.94)", color: on ? "#fff" : C.ink, outlineColor: "#fff" }}
-                    >
-                      {r.zone === "G" ? `${ids[0]}, ${ids[ids.length - 1]}` : `${ids[0]}~${ids[ids.length - 1]}`}
-                    </button>
-                  </li>
-                );
-              })}
-            </ul>
+            {/* 데크 번호. 위치는 aerial.jpg(1200x799) 속 데크 가운데 */}
+            {!photoRow && (
+              <ul aria-label="사진 속 사이트 번호">
+                <li className="pointer-events-none absolute -translate-x-1/2 -translate-y-1/2" style={{ left: "32.8%", top: "8.5%" }}>
+                  <span className="block rounded-[4px] px-1.5 py-0.5 text-[12px] font-semibold" style={{ background: "rgba(20,20,20,0.78)", color: "#fff" }}>
+                    관리동
+                  </span>
+                </li>
+                {DECK_PINS.map((pin) => {
+                  const s = siteOf(pin.id);
+                  const full = isFull(SITES.indexOf(s), dayIdx, date);
+                  const on = picked === pin.id;
+                  const zoneOn = hover === s.zone;
+                  return (
+                    <li key={pin.id} className="absolute -translate-x-1/2 -translate-y-1/2" style={{ left: `${pin.x}%`, top: `${pin.y}%` }}>
+                      <button
+                        type="button"
+                        onClick={() => {
+                          setPicked(pin.id);
+                          setHover(s.zone);
+                          document.getElementById(`cp-zone-${s.zone}`)?.scrollIntoView({ behavior: reduce ? "auto" : "smooth", block: "nearest" });
+                        }}
+                        aria-pressed={on}
+                        aria-label={`${pin.id} ${full ? "예약 마감" : "예약 가능"}`}
+                        className={`flex h-11 w-11 items-center justify-center rounded-[4px] ${focusRing}`}
+                        style={{ outlineColor: "#fff" }}
+                      >
+                        <span
+                          className={`block rounded-[4px] border px-1.5 py-0.5 text-[12px] font-bold tabular-nums md:text-[13px] ${full ? "cp-hatch line-through" : ""}`}
+                          style={{
+                            background: on ? C.fire : full ? "rgba(225,225,225,0.95)" : zoneOn ? C.fireSoft : "rgba(255,255,255,0.95)",
+                            borderColor: on ? C.fire : zoneOn ? C.fire : "transparent",
+                            color: on ? "#fff" : full ? C.muted : C.ink,
+                          }}
+                        >
+                          {pin.id}
+                        </span>
+                      </button>
+                    </li>
+                  );
+                })}
+              </ul>
+            )}
           </div>
 
           {/* 오른쪽: 날짜 한 칸과 구역 목록 */}
@@ -557,7 +591,7 @@ function Poster({
                       disabled={left === 0}
                       onMouseEnter={() => setHover(r.zone)}
                       onFocus={() => setHover(r.zone)}
-                      onClick={() => onZone(freeIds[0], dayIdx)}
+                      onClick={() => onZone(picked && freeIds.includes(picked) ? picked : freeIds[0], dayIdx)}
                       className={`grid w-full grid-cols-[minmax(0,1fr)_auto] items-center gap-x-3 px-2 py-3 text-left disabled:cursor-not-allowed ${focusRing}`}
                       style={{ background: hover === r.zone ? C.fireSoft : "transparent", outlineColor: C.fire }}
                     >
@@ -571,7 +605,7 @@ function Poster({
                       </span>
                       <span className="text-right">
                         <span className="block text-[13px] font-bold" style={{ color: left ? C.fireText : C.muted }}>
-                          {left ? "예약 가능" : "예약 마감"}
+                          {left ? (picked && siteOf(picked).zone === r.zone && freeIds.includes(picked) ? `${picked} 선택` : "예약 가능") : "예약 마감"}
                         </span>
                         <span className="block text-[17px] font-bold tabular-nums" style={{ color: left ? C.ink : C.muted }}>
                           {left}
