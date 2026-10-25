@@ -623,13 +623,12 @@ function Poster({ reduce, go, onPick, onSide }: { reduce: boolean; go: (id: stri
             <motion.div className="h-full w-full" initial={reduce ? false : { scale: ZOOM_FROM }} animate={{ scale: 1 }} transition={{ duration: reduce ? 0 : ZOOM, ease: EASE }}>
               {/* eslint-disable-next-line @next/next/no-img-element -- 정적 export 라 next/image 최적화를 쓰지 않는다 */}
               <img
-                src={`${IMG}/hero.jpg`}
-                srcSet={`${IMG}/hero-sm.jpg 960w, ${IMG}/hero.jpg 1920w`}
-                sizes="(min-width: 1024px) 400px, 96px"
-                alt="짙은 회색 바닥 위 작은 집 모형들 앞에 놓인 현관 열쇠 꾸러미"
-                fetchPriority="high"
+                src={`${IMG}/office.jpg`}
+                width={900}
+                height={1200}
+                alt="서류 묶음이 놓인 나무 상담 책상과 창가 의자 두 개가 있는 상담실"
                 className="h-full w-full object-cover"
-                style={{ objectPosition: "60% 50%" }}
+                style={{ objectPosition: "50% 62%" }}
               />
             </motion.div>
           </div>

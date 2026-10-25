@@ -42,9 +42,9 @@ import { DemoMakerInfo } from "@/components/demos/DemoMakerInfo";
    4. 무료 체험 신청: 이름, 휴대폰, 체험 반, 그 반이 열리는 가까운 날짜 3개 중 하나. 접수 번호와 회신 예정일.
 
    첫 화면(et-poster): 상단 메뉴, 역 출구와 다음 개강일 한 줄, 문장 "출근 전 50분, 새벽 회화반"과 시간대 칩(새벽반, 저녁반, 주말반).
-   그 아래 원어민 강사, 한국인 강사 얼굴 카드에 맡은 반이 줄로 붙고, 고른 시간대가 아닌 반은 흐려진다. 반을 누르면 아래 시간표가 그 반으로 열린다.
-   오른쪽 끝 칸은 수업 장면 사진과 레벨테스트, 무료 체험 버튼. 휴대폰에서는 카드가 옆으로 넘어간다(한 장 85% 폭).
-   모션은 수업 장면 사진이 1.6초 동안 1.06배에서 제자리로 다가오는 것과 흐려짐 전환뿐. 동작 줄이기면 없음. */
+   그 아래 강사 4명(원어민 2, 한국인 2) 얼굴 카드에 맡은 반이 줄로 붙고, 고른 시간대가 아닌 반은 흐려지며 그 시간대 반이 없는 강사 카드는 통째로 흐려진다.
+   반을 누르면 아래 시간표가 그 반으로 열린다. 제목 오른쪽에 레벨테스트 예약, 무료 체험 버튼. 휴대폰에서는 카드가 옆으로 넘어간다(한 장 85% 폭).
+   모션은 강사 사진이 1.6초 동안 1.06배에서 제자리로 다가오는 것과 흐려짐 전환뿐. 동작 줄이기면 없음. */
 
 const TEL = "02-000-0000";
 const ADDRESS = "서울 ㅇㅇ구 ㅇㅇ로 00, 5층";
@@ -119,29 +119,46 @@ const SLOTS: { key: Slot; label: string; time: string; Icon: typeof Sunrise }[] 
   { key: "weekend", label: "주말반", time: "토, 일 100분", Icon: Sun },
 ];
 
+type TeacherId = "daniel" | "emma" | "kim" | "park";
+interface Teacher {
+  id: TeacherId;
+  name: string;
+  kind: "원어민" | "한국인";
+  note: string;
+  img: string;
+  alt: string;
+}
+const TEACHER_LIST: Teacher[] = [
+  { id: "daniel", name: "Daniel R.", kind: "원어민", note: "Basic, Intermediate 반, 영어로만 진행", img: "teacher-native.jpg", alt: "교실 칠판 앞에서 웃고 있는 남색 니트 차림의 원어민 남성 강사" },
+  { id: "emma", name: "Emma K.", kind: "원어민", note: "Intermediate, Upper 반, 회의와 발표 표현", img: "teacher-native-2.jpg", alt: "밝은 회색 벽 앞에서 웃고 있는 하늘색 니트 차림의 원어민 여성 강사" },
+  { id: "kim", name: "김ㅎ늘", kind: "한국인", note: "Starter 반, 막히는 표현은 한국어로", img: "teacher-korean.jpg", alt: "교실에서 웃고 있는 흰 블라우스 차림의 한국인 여성 강사" },
+  { id: "park", name: "박ㅈ우", kind: "한국인", note: "Starter, Basic 반, 문법 설명은 한국어로", img: "teacher-korean-2.jpg", alt: "회색 벽 앞에서 웃고 있는 남색 카디건 차림의 한국인 남성 강사" },
+];
+const teacherOf = (id: TeacherId) => TEACHER_LIST.find((t) => t.id === id) ?? TEACHER_LIST[0];
+
 interface Klass {
   id: string;
   slot: Slot;
   level: Level;
   days: number[];
   time: string;
-  teacher: "원어민" | "한국인";
+  teacher: TeacherId;
   /** 정원 6명 중 남은 자리 */
   seats: number;
 }
 const CAP = 6;
 const CLASSES: Klass[] = [
-  { id: "d-st", slot: "dawn", level: "starter", days: [1, 2, 3, 4, 5], time: "07:30~08:20", teacher: "한국인", seats: 3 },
-  { id: "d-ba", slot: "dawn", level: "basic", days: [1, 3, 5], time: "07:30~08:20", teacher: "원어민", seats: 2 },
-  { id: "d-in", slot: "dawn", level: "inter", days: [2, 4], time: "07:30~08:20", teacher: "원어민", seats: 1 },
-  { id: "d-up", slot: "dawn", level: "upper", days: [1, 3, 5], time: "07:30~08:20", teacher: "원어민", seats: 0 },
-  { id: "e-st", slot: "evening", level: "starter", days: [1, 3], time: "19:00~19:50", teacher: "한국인", seats: 4 },
-  { id: "e-ba", slot: "evening", level: "basic", days: [2, 4], time: "19:00~19:50", teacher: "원어민", seats: 1 },
-  { id: "e-in", slot: "evening", level: "inter", days: [1, 3, 5], time: "20:10~21:00", teacher: "원어민", seats: 2 },
-  { id: "e-up", slot: "evening", level: "upper", days: [2, 4], time: "20:10~21:00", teacher: "원어민", seats: 3 },
-  { id: "w-st", slot: "weekend", level: "starter", days: [0], time: "10:00~11:40", teacher: "한국인", seats: 5 },
-  { id: "w-ba", slot: "weekend", level: "basic", days: [6], time: "10:00~11:40", teacher: "원어민", seats: 3 },
-  { id: "w-in", slot: "weekend", level: "inter", days: [6], time: "13:00~14:40", teacher: "원어민", seats: 2 },
+  { id: "d-st", slot: "dawn", level: "starter", days: [1, 2, 3, 4, 5], time: "07:30~08:20", teacher: "kim", seats: 3 },
+  { id: "d-ba", slot: "dawn", level: "basic", days: [1, 3, 5], time: "07:30~08:20", teacher: "daniel", seats: 2 },
+  { id: "d-in", slot: "dawn", level: "inter", days: [2, 4], time: "07:30~08:20", teacher: "daniel", seats: 1 },
+  { id: "d-up", slot: "dawn", level: "upper", days: [1, 3, 5], time: "07:30~08:20", teacher: "emma", seats: 0 },
+  { id: "e-st", slot: "evening", level: "starter", days: [1, 3], time: "19:00~19:50", teacher: "park", seats: 4 },
+  { id: "e-ba", slot: "evening", level: "basic", days: [2, 4], time: "19:00~19:50", teacher: "park", seats: 1 },
+  { id: "e-in", slot: "evening", level: "inter", days: [1, 3, 5], time: "20:10~21:00", teacher: "emma", seats: 2 },
+  { id: "e-up", slot: "evening", level: "upper", days: [2, 4], time: "20:10~21:00", teacher: "emma", seats: 3 },
+  { id: "w-st", slot: "weekend", level: "starter", days: [0], time: "10:00~11:40", teacher: "kim", seats: 5 },
+  { id: "w-ba", slot: "weekend", level: "basic", days: [6], time: "10:00~11:40", teacher: "park", seats: 3 },
+  { id: "w-in", slot: "weekend", level: "inter", days: [6], time: "13:00~14:40", teacher: "daniel", seats: 2 },
 ];
 const classOf = (id: string) => CLASSES.find((c) => c.id === id) ?? CLASSES[1];
 const slotOf = (s: Slot) => SLOTS.find((x) => x.key === s) ?? SLOTS[0];
@@ -303,11 +320,6 @@ const NAV: [string, string][] = [
   ["et-location", "오시는 길"],
 ];
 
-const TEACHERS: { key: Klass["teacher"]; title: string; note: string; img: string }[] = [
-  { key: "원어민", title: "원어민 강사", note: "Basic 이상 반, 영어로만 진행", img: "native" },
-  { key: "한국인", title: "한국인 강사", note: "Starter 반, 막히는 표현은 한국어로", img: "korean" },
-];
-
 /** 다음 달 첫 평일 */
 function nextOpening(today: Date) {
   let d = new Date(today.getFullYear(), today.getMonth() + 1, 1);
@@ -424,51 +436,93 @@ function Poster({
       </div>
 
       <div className="mx-auto max-w-[1280px] px-4 pb-12 pt-7 md:px-6 md:pt-9">
-        <div className="flex flex-wrap items-end justify-between gap-x-8 gap-y-5">
+        <div className="flex flex-wrap items-end justify-between gap-x-8 gap-y-4">
           <h1 id="et-poster-title" className="text-[32px] font-bold leading-[1.2] tracking-[-0.03em] md:text-[44px]" style={{ wordBreak: "keep-all" }}>
             출근 전 50분, 새벽 회화반
           </h1>
-          {/* 시간대 칩 */}
-          <div className="-mx-4 w-[calc(100%+32px)] overflow-x-auto px-4 md:mx-0 md:w-auto md:px-0" role="group" aria-label="시간대">
-            <div className="flex w-max gap-2">
-              {SLOTS.map((s) => {
-                const on = s.key === slot;
-                return (
-                  <button
-                    key={s.key}
-                    type="button"
-                    aria-pressed={on}
-                    onClick={() => setSlot(s.key)}
-                    className={`inline-flex min-h-[48px] items-center gap-2 rounded-full border px-4 text-[15px] font-semibold ${focusRing}`}
-                    style={{ borderColor: on ? C.ink : C.line, background: on ? C.ink : "#fff", color: on ? "#fff" : C.ink, outlineColor: C.accent }}
-                  >
-                    <s.Icon size={17} aria-hidden />
-                    {s.label}
-                    <span className="text-[13px] font-medium tabular-nums" style={{ color: on ? "rgba(255,255,255,0.8)" : C.muted }}>
-                      {s.time}
-                    </span>
-                  </button>
-                );
-              })}
-            </div>
+          {/* 레벨테스트와 무료 체험. 오른쪽 끝 작은 칸 */}
+          <div className="grid w-full grid-cols-[minmax(0,1fr)_minmax(0,1fr)] gap-2 md:flex md:w-auto">
+            <button
+              type="button"
+              onClick={() => go("et-test")}
+              data-gtm-cta="english-talk_poster_cta"
+              className={`inline-flex min-h-[48px] items-center justify-center gap-2 rounded-[6px] px-5 text-[16px] font-bold ${focusRing}`}
+              style={{ background: C.accent, color: "#fff", outlineColor: C.accent }}
+            >
+              <BookOpen size={18} aria-hidden />
+              레벨테스트 예약
+            </button>
+            <button
+              type="button"
+              onClick={() => go("et-trial")}
+              className={`inline-flex min-h-[48px] items-center justify-center gap-2 rounded-[6px] border px-5 text-[16px] font-semibold ${focusRing}`}
+              style={{ borderColor: C.ink, color: C.ink, outlineColor: C.accent }}
+            >
+              <CalendarCheck size={18} aria-hidden />
+              무료 체험
+            </button>
           </div>
         </div>
 
-        {/* 강사 카드 열. 휴대폰은 옆으로 넘긴다 */}
-        <div className="-mx-4 mt-6 flex snap-x snap-mandatory gap-4 overflow-x-auto px-4 pb-2 md:mx-0 md:grid md:grid-cols-[minmax(0,1fr)_minmax(0,1fr)_minmax(0,0.9fr)] md:overflow-visible md:px-0 md:pb-0">
-          {TEACHERS.map((t) => {
-            // 고른 시간대 반을 위로, 나머지는 흐리게 채워 네 줄까지
-            const mine = CLASSES.filter((c) => c.teacher === t.key);
-            const list = [...mine.filter((c) => c.slot === slot), ...mine.filter((c) => c.slot !== slot)].slice(0, 4);
+        {/* 시간대 칩 */}
+        <div className="-mx-4 mt-5 w-[calc(100%+32px)] overflow-x-auto px-4 md:mx-0 md:w-auto md:px-0" role="group" aria-label="시간대">
+          <div className="flex w-max gap-2">
+            {SLOTS.map((s) => {
+              const on = s.key === slot;
+              return (
+                <button
+                  key={s.key}
+                  type="button"
+                  aria-pressed={on}
+                  onClick={() => setSlot(s.key)}
+                  className={`inline-flex min-h-[48px] items-center gap-2 rounded-full border px-4 text-[15px] font-semibold ${focusRing}`}
+                  style={{ borderColor: on ? C.ink : C.line, background: on ? C.ink : "#fff", color: on ? "#fff" : C.ink, outlineColor: C.accent }}
+                >
+                  <s.Icon size={17} aria-hidden />
+                  {s.label}
+                  <span className="text-[13px] font-medium tabular-nums" style={{ color: on ? "rgba(255,255,255,0.8)" : C.muted }}>
+                    {s.time}
+                  </span>
+                </button>
+              );
+            })}
+          </div>
+        </div>
+
+        {/* 강사 카드 4장. 휴대폰은 옆으로 넘긴다 */}
+        <div className="-mx-4 mt-5 flex snap-x snap-mandatory gap-4 overflow-x-auto px-4 pb-2 md:mx-0 md:grid md:grid-cols-[repeat(2,minmax(0,1fr))] md:overflow-visible md:px-0 md:pb-0 lg:grid-cols-[repeat(4,minmax(0,1fr))]">
+          {TEACHER_LIST.map((t, i) => {
+            // 고른 시간대 반을 위로, 그 시간대 반이 없는 강사 카드는 통째로 흐리게
+            const mine = CLASSES.filter((c) => c.teacher === t.id);
+            const list = [...mine.filter((c) => c.slot === slot), ...mine.filter((c) => c.slot !== slot)];
+            const active = mine.some((c) => c.slot === slot);
             return (
-              <article key={t.key} className="w-[85%] flex-none snap-start overflow-hidden rounded-[8px] border md:w-auto" style={{ borderColor: C.line }}>
-                <div className="relative aspect-[4/3] overflow-hidden md:aspect-[16/10]" style={{ background: C.alt }}>
+              <article
+                key={t.id}
+                className="w-[85%] flex-none snap-start overflow-hidden rounded-[8px] border md:w-auto"
+                style={{ borderColor: C.line, opacity: active ? 1 : 0.45, transition: reduce ? undefined : "opacity 200ms" }}
+              >
+                <div className="relative aspect-[4/3] overflow-hidden md:aspect-[16/10] lg:aspect-[5/4]" style={{ background: C.alt }}>
                   {/* eslint-disable-next-line @next/next/no-img-element -- 정적 export 라 next/image 최적화를 쓰지 않는다 */}
-                  <img src={`${IMG}/teacher-${t.img}.jpg`} alt={`${t.title} 교실 사진`} className="absolute inset-0 h-full w-full object-cover" style={{ objectPosition: "50% 25%" }} />
+                  <img
+                    src={`${IMG}/${t.img}`}
+                    alt={t.alt}
+                    width={t.img.endsWith("-2.jpg") ? 999 : 900}
+                    height={t.img.endsWith("-2.jpg") ? 1200 : 900}
+                    loading={i === 0 ? undefined : "lazy"}
+                    fetchPriority={i === 0 ? "high" : undefined}
+                    className={`absolute inset-0 h-full w-full object-cover ${reduce ? "" : "et-photo-in"}`}
+                    style={{ objectPosition: t.img.endsWith("-2.jpg") ? "50% 22%" : "50% 30%" }}
+                  />
                 </div>
                 <div className="p-4">
-                  <h2 className="text-[19px] font-bold">{t.title}</h2>
-                  <p className="mt-0.5 text-[15px]" style={{ color: C.body }}>
+                  <h2 className="flex flex-wrap items-baseline gap-x-2 text-[19px] font-bold">
+                    {t.name}
+                    <span className="text-[14px] font-semibold" style={{ color: C.muted }}>
+                      {t.kind} 강사
+                    </span>
+                  </h2>
+                  <p className="mt-0.5 text-[15px]" style={{ color: C.body, wordBreak: "keep-all" }}>
                     {t.note}
                   </p>
                   <ul className="mt-3 divide-y border-t" style={{ borderColor: C.line }}>
@@ -476,7 +530,7 @@ function Poster({
                       const match = c.slot === slot;
                       const full = c.seats === 0;
                       return (
-                        <li key={c.id} style={{ borderColor: C.line, opacity: match ? 1 : 0.38, transition: reduce ? undefined : "opacity 200ms" }}>
+                        <li key={c.id} style={{ borderColor: C.line, opacity: match || !active ? 1 : 0.38, transition: reduce ? undefined : "opacity 200ms" }}>
                           <button
                             type="button"
                             onClick={() => onPick(c.id)}
@@ -493,7 +547,7 @@ function Poster({
                               </span>
                             </span>
                             <span
-                              className="rounded-[4px] px-2 py-1 text-[13px] font-bold tabular-nums"
+                              className="whitespace-nowrap rounded-[4px] px-2 py-1 text-[13px] font-bold tabular-nums"
                               style={full ? { background: C.alt, color: C.muted } : { background: C.tint, color: C.accentDeep }}
                             >
                               {full ? "마감" : `남은 자리 ${c.seats}`}
@@ -507,47 +561,6 @@ function Poster({
               </article>
             );
           })}
-
-          {/* 수업 장면과 레벨테스트 */}
-          <aside className="w-[85%] flex-none snap-start overflow-hidden rounded-[8px] md:w-auto" style={{ background: C.dark, color: "#fff" }}>
-            <div className="relative aspect-[4/3] overflow-hidden md:aspect-[16/10]">
-              {/* eslint-disable-next-line @next/next/no-img-element -- 정적 export 라 next/image 최적화를 쓰지 않는다 */}
-              <img
-                src={`${IMG}/hero-sm.jpg`}
-                srcSet={`${IMG}/hero-sm.jpg 960w, ${IMG}/hero.jpg 1920w`}
-                sizes="(min-width: 768px) 30vw, 85vw"
-                alt="밝은 학원 교실 원탁에서 정장 차림 직장인 두 명이 노트와 커피를 두고 영어로 대화하는 모습"
-                fetchPriority="high"
-                className={`absolute inset-0 h-full w-full object-cover ${reduce ? "" : "et-photo-in"}`}
-                style={{ objectPosition: "40% 45%" }}
-              />
-            </div>
-            <div className="p-5">
-              <h2 className="text-[19px] font-bold">레벨테스트</h2>
-              <p className="mt-1 text-[15px] leading-[1.6]" style={{ color: "#d0d0d0" }}>
-                {QUESTIONS.length}문항, 레벨테스트 후 반 배정
-              </p>
-              <button
-                type="button"
-                onClick={() => go("et-test")}
-                data-gtm-cta="english-talk_poster_cta"
-                className={`mt-4 inline-flex min-h-[48px] w-full items-center justify-center gap-2 rounded-[6px] text-[16px] font-bold ${focusRing}`}
-                style={{ background: C.accent, color: "#fff", outlineColor: "#fff" }}
-              >
-                <BookOpen size={18} aria-hidden />
-                레벨테스트 시작
-              </button>
-              <button
-                type="button"
-                onClick={() => go("et-trial")}
-                className={`mt-2 inline-flex min-h-[48px] w-full items-center justify-center gap-2 rounded-[6px] border text-[16px] font-semibold ${focusRing}`}
-                style={{ borderColor: "rgba(255,255,255,0.4)", color: "#fff", outlineColor: "#fff" }}
-              >
-                <CalendarCheck size={18} aria-hidden />
-                무료 체험 신청
-              </button>
-            </div>
-          </aside>
         </div>
       </div>
     </section>
@@ -876,8 +889,8 @@ function Schedule({
                 <span className="mt-3 flex w-full items-center justify-between text-[15px]" style={{ color: C.muted }}>
                   <span className="inline-flex items-center gap-2">
                     {/* eslint-disable-next-line @next/next/no-img-element -- 정적 export 라 next/image 최적화를 쓰지 않는다 */}
-                    <img src={`${IMG}/teacher-${c.teacher === "원어민" ? "native" : "korean"}.jpg`} alt="" className="h-9 w-9 flex-none rounded-full object-cover" />
-                    {c.teacher} 강사
+                    <img src={`${IMG}/${teacherOf(c.teacher).img}`} alt="" loading="lazy" width={36} height={36} className="h-9 w-9 flex-none rounded-full object-cover" style={{ objectPosition: "50% 25%" }} />
+                    {teacherOf(c.teacher).name}
                   </span>
                   <span className="inline-flex items-center gap-1 font-bold" style={{ color: full ? C.muted : C.ink }}>
                     <Users size={14} aria-hidden />
