@@ -42,6 +42,15 @@ export const tools = [
     for: "가게·회사 홈페이지 운영자",
   },
   {
+    href: "/tools/estimate-questions",
+    need: "홈페이지 견적을 받으려고 해요",
+    who: ["사장님"],
+    category: "비용 계산",
+    title: "홈페이지 견적 질문지",
+    description: "업체에 그대로 보낼 질문 12개와 괜찮은 답, 다시 물어볼 답을 정리한 PDF입니다. 둘째 해 비용, 도메인 명의, 수정 횟수를 계약 전에 확인합니다.",
+    for: "홈페이지를 새로 여는 사장님",
+  },
+  {
     href: "/tools/hosting-cost",
     need: "홈페이지 유지비가 얼마인지 궁금해요",
     who: ["사장님"],
