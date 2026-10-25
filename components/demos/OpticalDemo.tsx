@@ -207,48 +207,29 @@ export function OpticalDemo() {
     return () => window.removeEventListener("demo:go-home", f);
   }, []);
 
-  // 휴대폰 아래 고정 막대는 포스터를 지나야 올라온다
+  // 휴대폰 아래 고정 막대는 첫 화면을 지나야 올라온다
   const [barOn, setBarOn] = useState(false);
   const { scrollY } = useScroll();
-  useMotionValueEvent(scrollY, "change", (v) => setBarOn(v > window.innerHeight * 0.8));
+  useMotionValueEvent(scrollY, "change", () => setBarOn((document.getElementById("op-poster")?.getBoundingClientRect().bottom ?? 0) < window.innerHeight * 0.5));
 
   const go = (id: string) => document.getElementById(id)?.scrollIntoView({ behavior: reduce ? "auto" : "smooth", block: "start" });
 
-  const navBtn = `rounded-md px-3 py-2 text-[15px] font-bold hover:bg-white ${focusRing}`;
-
   return (
     <div className="min-h-screen overflow-x-clip pb-24 md:pb-0" style={{ background: C.bg, color: C.ink }}>
-      <Poster reduce={reduce} onBook={() => go("op-book")} />
-
-      <header className="mx-auto flex max-w-[1200px] items-center justify-between gap-3 px-4 py-4 md:px-6">
-        <h2>
-          <SampleLogo />
-        </h2>
-        <nav aria-label="페이지 안 이동" className="hidden items-center gap-1 lg:flex" style={{ color: C.body }}>
-          <button type="button" className={navBtn} style={{ outlineColor: C.navy }} onClick={() => go("op-frame")}>
-            안경테
-          </button>
-          <button type="button" className={navBtn} style={{ outlineColor: C.navy }} onClick={() => go("op-lens")}>
-            렌즈
-          </button>
-          <button type="button" className={navBtn} style={{ outlineColor: C.navy }} onClick={() => go("op-contact")}>
-            콘택트렌즈
-          </button>
-          <button type="button" className={navBtn} style={{ outlineColor: C.navy }} onClick={() => go("op-map")}>
-            오시는 길
-          </button>
-        </nav>
-        <button
-          type="button"
-          onClick={() => go("op-book")}
-          data-gtm-cta="optical_book_top"
-          className={`inline-flex flex-none items-center gap-1.5 rounded-md px-4 py-2.5 text-[15px] font-bold text-white transition-transform duration-100 active:translate-y-px ${focusRing}`}
-          style={{ background: C.navy, outlineColor: C.navy }}
-        >
-          <Eye size={18} aria-hidden />
-          시력검사 예약
-        </button>
-      </header>
+      <Poster
+        reduce={reduce}
+        today={today}
+        shape={shape}
+        material={material}
+        go={go}
+        onCase={(c) => {
+          setShape(c.shape);
+          setMaterial(c.material);
+          setIdx(c.idx);
+          setOpts({ blue: c.opts.includes("blue"), photo: c.opts.includes("photo"), prog: c.opts.includes("prog") });
+          go("op-wear");
+        }}
+      />
 
       {/* 왼쪽에 고른 테를 쓴 사진(고정), 오른쪽에 얼굴형, 테, 렌즈 선택. 휴대폰에서는 사진이 위에 붙어 따라온다. 렌즈 두께와 색은 렌즈 칸의 안경 그림으로 */}
       <main className="mx-auto max-w-[1200px] px-4 md:px-6">
@@ -534,67 +515,179 @@ export function OpticalDemo() {
 
 const IMG = "/images/demo-optical";
 
-function Poster({ reduce, onBook }: { reduce: boolean; onBook: () => void }) {
-  const ref = useRef<HTMLElement>(null);
-  const { scrollYProgress } = useScroll({ target: ref, offset: ["start start", "end start"] });
-  // 스크롤하면 사진만 조금 느리게 내려간다
-  const photoY = useTransform(scrollYProgress, (v) => (reduce ? "0%" : `${v * 8}%`));
+/** 첫 화면 "맞춘 안경" 사례. 테와 렌즈 조합은 아래 테, 렌즈 구간의 값 그대로 */
+interface Case {
+  shape: ShapeId;
+  material: MaterialId;
+  idx: number;
+  opts: OptId[];
+  who: string;
+}
+const CASES: Case[] = [
+  { shape: "wellington", material: "acetate", idx: 1, opts: ["blue"], who: "사무직, 모니터 오래 봄" },
+  { shape: "round", material: "titanium", idx: 2, opts: [], who: "고도수, 가벼운 테" },
+  { shape: "boston", material: "acetate", idx: 1, opts: ["photo"], who: "운전 자주 함" },
+  { shape: "square", material: "ultem", idx: 0, opts: [], who: "첫 안경" },
+  { shape: "browline", material: "acetate", idx: 2, opts: ["prog"], who: "가까운 글씨가 흐림" },
+  { shape: "rimless", material: "titanium", idx: 3, opts: ["blue"], who: "고도수, 얇은 렌즈" },
+];
+const casePrice = (c: Case) =>
+  SHAPES.find((s) => s.id === c.shape)!.base + MATERIALS.find((m) => m.id === c.material)!.add + INDEXES[c.idx].price + OPTIONS.filter((o) => c.opts.includes(o.id)).reduce((n, o) => n + o.price, 0);
+
+const GNB: [string, string][] = [
+  ["op-book", "검안"],
+  ["op-lens", "렌즈"],
+  ["op-frame", "테"],
+  ["op-cases", "맞춘 사례"],
+  ["op-map", "오시는 길"],
+];
+
+function Poster({
+  reduce,
+  today,
+  shape,
+  material,
+  go,
+  onCase,
+}: {
+  reduce: boolean;
+  today: Date;
+  shape: ShapeId;
+  material: MaterialId;
+  go: (id: string) => void;
+  onCase: (c: Case) => void;
+}) {
+  const hours = HOURS.find((h) => h.dow === today.getDay())!;
+  const todayText = hours.open ? `오늘 ${hours.open}` : "오늘 휴무";
 
   return (
-    <section ref={ref} id="op-poster" aria-labelledby="op-poster-title" className="relative flex min-h-[100svh] flex-col overflow-hidden" style={{ background: "#f7f7f5", color: C.ink }}>
-      <style>{`
-        @keyframes op-rise { from { opacity: 0; transform: translateY(12px); } to { opacity: 1; transform: none; } }
-        .op-rise { animation: op-rise 0.7s cubic-bezier(0.22, 1, 0.36, 1) 0.3s both; }
-        @media (prefers-reduced-motion: reduce) { .op-rise { animation: none; } }
-      `}</style>
-      <motion.div
-        className="absolute inset-0"
-        style={{ y: photoY }}
-        initial={reduce ? false : { scale: 1.06 }}
-        animate={{ scale: 1 }}
-        transition={{ duration: reduce ? 0 : 1.6, ease: EASE }}
-      >
-        {/* eslint-disable-next-line @next/next/no-img-element -- 정적 export 라 next/image 최적화를 쓰지 않는다 */}
-        <img
-          src={`${IMG}/hero.jpg`}
-          srcSet={`${IMG}/hero-sm.jpg 960w, ${IMG}/hero.jpg 1344w`}
-          sizes="100vw"
-          alt="밝은 나무 선반에 안경테가 줄지어 놓인 매장 벽"
-          fetchPriority="high"
-          className="absolute inset-0 h-full w-full object-cover"
-          style={{ objectPosition: "78% 50%" }}
-        />
-      </motion.div>
-      {/* 밝은 사진이라 흰 막을 깔고 먹색 글자를 쓴다. 휴대폰은 위에서, PC는 왼쪽에서 */}
-      <div aria-hidden className="absolute inset-0 md:hidden" style={{ background: "linear-gradient(to bottom, rgba(255,255,255,0.94), rgba(255,255,255,0.7) 45%, rgba(255,255,255,0) 72%)" }} />
-      <div aria-hidden className="absolute inset-0 hidden md:block" style={{ background: "linear-gradient(to right, rgba(255,255,255,0.94), rgba(255,255,255,0.7) 38%, rgba(255,255,255,0) 66%)" }} />
+    <section id="op-poster" aria-labelledby="op-poster-title" style={{ background: C.bg, color: C.ink }}>
+      {/* GNB. 휴대폰은 가로로 밀어 보는 메뉴 */}
+      <header className="border-b" style={{ borderColor: C.steelLine, background: C.panel }}>
+        <div className="mx-auto flex max-w-[1200px] flex-wrap items-center justify-between gap-x-6 px-4 pt-3 md:flex-nowrap md:px-6 md:py-3">
+          <p className="py-1.5">
+            <SampleLogo />
+          </p>
+          <nav aria-label="주요 메뉴" className="-mx-4 flex w-[calc(100%+32px)] overflow-x-auto px-2 md:mx-0 md:w-auto md:px-0">
+            {GNB.map(([id, label]) => (
+              <button key={id} type="button" onClick={() => go(id)} className={`h-11 shrink-0 whitespace-nowrap rounded-md px-3 text-[16px] font-bold hover:underline hover:underline-offset-4 ${focusRing}`} style={{ outlineColor: C.navy }}>
+                {label}
+              </button>
+            ))}
+          </nav>
+        </div>
+      </header>
 
-      {/* 상호와 핵심 행동 하나 */}
-      <div className="relative z-10 flex items-center justify-between gap-3 px-4 pt-4 md:px-12 md:pt-7">
-        <p>
-          <SampleLogo small />
-        </p>
-        <button
-          type="button"
-          onClick={onBook}
-          data-gtm-cta="optical_poster_cta"
-          className={`inline-flex h-11 items-center gap-1.5 rounded-[6px] px-4 text-[15px] font-semibold text-white ${focusRing}`}
-          style={{ background: C.navy, outlineColor: C.navy }}
-        >
-          <CalendarCheck size={18} aria-hidden />
-          시력검사 예약
-        </button>
-      </div>
+      <div className="mx-auto max-w-[1200px] px-4 pb-10 md:grid md:grid-cols-[minmax(0,1fr)_minmax(0,2fr)] md:items-start md:gap-8 md:px-6 md:pt-8">
+        {/* 매장 패널. PC는 왼쪽에 붙어 있고, 휴대폰은 한 줄로 접혀 위에 붙는다 */}
+        <aside aria-label="매장 안내" className="sticky top-0 z-20 -mx-4 border-b px-4 py-2.5 md:top-4 md:mx-0 md:rounded-[8px] md:border md:p-5 md:pt-5" style={{ borderColor: C.steelLine, background: C.panel }}>
+          {/* eslint-disable-next-line @next/next/no-img-element -- 정적 export 라 next/image 최적화를 쓰지 않는다 */}
+          <img
+            src={`${IMG}/hero-sm.jpg`}
+            alt="밝은 나무 선반에 안경테가 줄지어 놓인 매장 벽"
+            width={960}
+            height={548}
+            fetchPriority="high"
+            className="hidden aspect-[16/10] w-full rounded-[6px] object-cover md:block"
+            style={{ objectPosition: "78% 50%" }}
+          />
+          <dl className="hidden gap-y-2 text-[15px] md:mt-4 md:grid md:grid-cols-[auto_minmax(0,1fr)] md:gap-x-3">
+            <dt className="inline-flex items-center gap-1.5 font-bold">
+              <Clock size={16} aria-hidden /> 영업
+            </dt>
+            <dd className="tabular-nums" style={{ color: hours.open ? C.ink : C.muted }}>
+              {todayText}
+            </dd>
+            <dt className="inline-flex items-center gap-1.5 font-bold">
+              <Eye size={16} aria-hidden /> 검안
+            </dt>
+            <dd>20분 정도</dd>
+            <dt className="inline-flex items-center gap-1.5 font-bold">
+              <Phone size={16} aria-hidden /> 전화
+            </dt>
+            <dd className="tabular-nums">{TEL}</dd>
+          </dl>
+          {/* 휴대폰 한 줄 요약 */}
+          <p className="flex items-center gap-3 md:hidden">
+            <span className="min-w-0 flex-1 truncate text-[15px] font-semibold tabular-nums">
+              {todayText}
+              <span style={{ color: C.muted }}>, 검안 20분</span>
+            </span>
+            <a href={`tel:${TEL}`} aria-label={`전화 ${TEL}`} className={`inline-flex h-11 w-11 shrink-0 items-center justify-center rounded-md border ${focusRing}`} style={{ borderColor: C.steelLine, outlineColor: C.navy }}>
+              <Phone size={18} aria-hidden />
+            </a>
+            <button type="button" onClick={() => go("op-book")} data-gtm-cta="optical_poster_cta" className={`inline-flex h-11 shrink-0 items-center gap-1.5 rounded-md px-3.5 text-[15px] font-bold text-white ${focusRing}`} style={{ background: C.navy, outlineColor: C.navy }}>
+              <CalendarCheck size={17} aria-hidden />
+              예약
+            </button>
+          </p>
+          <button
+            type="button"
+            onClick={() => go("op-book")}
+            data-gtm-cta="optical_poster_cta"
+            className={`mt-5 hidden h-12 w-full items-center justify-center gap-1.5 rounded-md text-[16px] font-bold text-white md:inline-flex ${focusRing}`}
+            style={{ background: C.navy, outlineColor: C.navy }}
+          >
+            <CalendarCheck size={18} aria-hidden />
+            검안 예약
+          </button>
+        </aside>
 
-      {/* 문장 */}
-      <div className={`relative z-10 px-4 pt-[9svh] md:my-auto md:px-12 md:pb-[6svh] md:pt-0 ${reduce ? "" : "op-rise"}`}>
-        <h1 id="op-poster-title" className="text-[36px] font-bold leading-[1.2] tracking-[-0.03em] md:text-[clamp(40px,5vw,72px)]" style={{ wordBreak: "keep-all" }}>
-          <span className="block">검사부터 맞춤까지</span>
-          <span className="block">30분</span>
-        </h1>
-        <p className="mt-4 text-[16px] font-medium tabular-nums md:text-[18px]" style={{ color: C.body }}>
-          평일 10:30 ~ 20:00, 토요일 19:00까지
-        </p>
+        {/* 맞춘 안경 사례 */}
+        <div id="op-cases" className="scroll-mt-4 pt-5 md:pt-0">
+          <h1 id="op-poster-title" className="text-[28px] font-bold leading-[1.25] tracking-[-0.03em] md:text-[36px]" style={{ wordBreak: "keep-all" }}>
+            검사부터 맞춤까지 30분
+          </h1>
+          <h2 className="mt-4 text-[20px] font-bold md:mt-5">맞춘 안경</h2>
+          <ul className="mt-3 grid grid-cols-2 gap-x-3 gap-y-5 lg:grid-cols-3 lg:gap-x-4">
+            {CASES.map((c, i) => {
+              const S = SHAPES.find((s) => s.id === c.shape)!;
+              const M = MATERIALS.find((m) => m.id === c.material)!;
+              const on = shape === c.shape && material === c.material;
+              const lens = [INDEXES[c.idx].v, ...OPTIONS.filter((o) => c.opts.includes(o.id)).map((o) => o.name)].join(", ");
+              return (
+                <li key={c.shape} className="min-w-0">
+                  <button
+                    type="button"
+                    aria-pressed={on}
+                    onClick={() => onCase(c)}
+                    className={`group block w-full rounded-[8px] text-left ${focusRing}`}
+                    style={{ outlineColor: C.navy }}
+                  >
+                    <span className="relative block aspect-square overflow-hidden rounded-[8px] border-2" style={{ borderColor: on ? C.navy : "transparent", background: C.steelSoft }}>
+                      <motion.img
+                        src={`${IMG}/wear-${c.shape}.jpg`}
+                        alt={`${S.name} ${M.name} 테를 맞춘 손님`}
+                        width={675}
+                        height={900}
+                        loading={i < 3 ? "eager" : "lazy"}
+                        initial={reduce ? false : { scale: 1.05 }}
+                        animate={{ scale: 1 }}
+                        transition={{ duration: reduce ? 0 : 1.4, ease: EASE }}
+                        className="h-full w-full object-cover"
+                        style={{ objectPosition: "50% 30%" }}
+                      />
+                      {on && (
+                        <span className="absolute left-2 top-2 inline-flex items-center gap-1 rounded px-1.5 py-0.5 text-[12px] font-bold text-white" style={{ background: C.navy }}>
+                          <Check size={12} aria-hidden /> 선택
+                        </span>
+                      )}
+                    </span>
+                    <span className="mt-2 block text-[16px] font-bold leading-snug group-hover:underline group-hover:underline-offset-4">
+                      {S.name}, {M.name}
+                    </span>
+                    <span className="mt-0.5 block text-[14px] leading-[1.45]" style={{ color: C.body }}>
+                      {lens} 렌즈
+                    </span>
+                    <span className="mt-0.5 block text-[13px] leading-[1.45]" style={{ color: C.muted }}>
+                      {c.who}, {won(casePrice(c))}
+                    </span>
+                  </button>
+                </li>
+              );
+            })}
+          </ul>
+        </div>
       </div>
     </section>
   );
