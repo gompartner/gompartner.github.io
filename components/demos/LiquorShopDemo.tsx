@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useMemo, useRef, useState } from "react";
-import { AnimatePresence, motion, useScroll, useTransform } from "framer-motion";
+import { AnimatePresence, motion } from "framer-motion";
 import { Car, ChevronLeft, ChevronRight, Clock, MapPin, Package, RotateCcw, Truck, X } from "lucide-react";
 import { useReducedMotionSafe } from "@/hooks/useReducedMotionSafe";
 import { daysAgo, fmtKo, useDemoToday } from "@/hooks/useDemoToday";
@@ -27,9 +27,8 @@ import { DemoMakerInfo } from "@/components/demos/DemoMakerInfo";
    4. 시음회 예약: 다음 두 주 토요일 2회차, 인원, 이름, 휴대폰. 접수 완료 화면.
    5. 매장 안내와 오시는 길: 영업시간(오늘 요일 진하게), 주차, 택배 안내.
 
-   포스터 첫 화면(성인 확인 뒤 처음 보이는 화면): 원목 선반의 술병과 옹기 사진 한 장이 화면을 채운다.
-   확인을 누르면 사진이 1.6초 동안 1.06배에서 제자리로 천천히 다가오고, 문장은 0.3초 뒤 아래에서 올라온다.
-   스크롤하면 사진만 조금 느리게 따라 내려간다. 반복 움직임은 없다. */
+   첫 화면(성인 확인 뒤 처음 보이는 화면): 주종 메뉴, 짧은 매장 선반 사진 띠, 도수 순서로 병을 한 줄 진열한 도수 선반.
+   확인을 누르면 사진 띠만 1.6초 동안 천천히 다가온다. 반복 움직임은 없다. */
 
 const BRAND = "곰파트너";
 const ADDRESS = "서울 ㅇㅇ구 ㅇㅇ로 00, 1층";
@@ -224,25 +223,18 @@ export function LiquorShopDemo() {
       <AgeGate state={age} onAnswer={setAge} reduce={reduce} />
 
       <div aria-hidden={age !== "yes"}>
-        <Poster ready={age === "yes"} reduce={reduce} onCta={() => go("ls-grid")} />
-
-        <header className="mx-auto flex max-w-[1200px] flex-wrap items-center justify-between gap-x-6 gap-y-3 px-4 pt-6 md:px-6">
-          <h2 className="leading-none">
-            <SampleLogo />
-          </h2>
-          <nav aria-label="주요 메뉴" className="flex flex-wrap gap-x-5 gap-y-1 text-[15px] font-semibold">
-            {[
-              ["ls-grid", "술 고르기"],
-              ["ls-gift", "선물 세트"],
-              ["ls-tasting", "시음회"],
-              ["ls-info", "오시는 길"],
-            ].map(([id, label]) => (
-              <button key={id} type="button" onClick={() => go(id)} className={`rounded-[2px] py-1 underline-offset-[6px] hover:underline ${focusRing}`}>
-                {label}
-              </button>
-            ))}
-          </nav>
-        </header>
+        <Poster
+          ready={age === "yes"}
+          reduce={reduce}
+          kinds={filters.kinds}
+          onKind={(k) => setFilters((f) => ({ ...f, kinds: k ? [k] : [] }))}
+          onMenuKind={(k) => {
+            setFilters((f) => ({ ...f, kinds: [k] }));
+            go("ls-grid");
+          }}
+          onOpen={setSelected}
+          go={go}
+        />
 
         {/* 첫 화면: 왼쪽 위 필터, 왼쪽 아래 선물 상자(따라 내려옴), 오른쪽 병 격자. 휴대폰은 필터, 격자, 상자 순서 */}
         <div className="mx-auto mt-8 grid max-w-[1200px] gap-8 px-4 md:px-6 lg:grid-cols-[300px_minmax(0,1fr)] lg:grid-rows-[auto_1fr] lg:gap-x-10 lg:gap-y-6">
@@ -351,28 +343,95 @@ export function LiquorShopDemo() {
   );
 }
 
-/* ── 포스터 첫 화면 ───────────────────────────────────── */
+/* ── 첫 화면: 매장 사진 띠 + 도수 선반 ─────────────────── */
 
-/* 사진 위 글자는 흰색. 아래쪽 막을 짙게 깔아 흰 라벨 병 위에서도 글자 대비를 지킨다. */
-const SHADE =
-  "linear-gradient(to top, rgba(0,0,0,0.78), rgba(0,0,0,0.5) 45%, rgba(0,0,0,0.12) 80%), linear-gradient(to bottom, rgba(0,0,0,0.38), rgba(0,0,0,0) 26%)";
-/* 문장 등장: 확인을 누른 뒤 0.3초 늦게, 아래 12px 에서 0.7초. 끝 상태가 기본값이라 JS 없이도 보인다. */
-const RISE_CSS = "@keyframes ls-rise{from{opacity:0;transform:translateY(12px)}to{opacity:1;transform:none}}";
+/* 실제 전통주 사이트처럼 성인 확인 뒤 상단에 주종 메뉴를 두고, 첫 화면은 짧은 매장 선반 사진 띠와 "도수 선반".
+   병을 도수 낮은 순서로 한 줄 진열하고 5도, 15도, 25도, 40도 눈금으로 구간을 나눈다. 좌우로 넘기고(휴대폰은 손가락, PC는 버튼도),
+   주종 칩을 누르면 그 주종 병만 남는다. 칩은 아래 "오늘 진열한 술" 필터와 같은 값이라 내려가도 그대로다. 병을 누르면 상세 창이 열린다.
+   모션: 확인을 누르면 사진 띠만 1.04배에서 1.6초 동안 천천히 다가온다. 동작 줄이기면 멈춘 사진. */
+const TICKS = [5, 15, 25, 40];
+const LQ_MORE: [string, string][] = [
+  ["ls-gift", "선물 세트"],
+  ["ls-tasting", "시음회"],
+  ["ls-info", "매장"],
+];
 
-function Poster({ ready, reduce, onCta }: { ready: boolean; reduce: boolean; onCta: () => void }) {
-  const wrapRef = useRef<HTMLElement>(null);
-  const { scrollYProgress: p } = useScroll({ target: wrapRef, offset: ["start start", "end start"] });
-  const photoY = useTransform(p, (v) => `${v * 8}%`);
-  const rise = ready && !reduce ? "animate-[ls-rise_0.7s_cubic-bezier(0.22,1,0.36,1)_0.3s_both]" : "";
+function Poster({
+  ready,
+  reduce,
+  kinds,
+  onKind,
+  onMenuKind,
+  onOpen,
+  go,
+}: {
+  ready: boolean;
+  reduce: boolean;
+  kinds: Kind[];
+  onKind: (k: Kind | null) => void;
+  onMenuKind: (k: Kind) => void;
+  onOpen: (id: string) => void;
+  go: (id: string) => void;
+}) {
+  const shelfRef = useRef<HTMLUListElement>(null);
+  const kind = kinds.length === 1 ? kinds[0] : null;
+  const row = [...BOTTLES].filter((b) => !kind || b.kind === kind).sort((a, b) => a.abv - b.abv || a.price - b.price);
+  const scroll = (dir: 1 | -1) => shelfRef.current?.scrollBy({ left: dir * 480, behavior: reduce ? "auto" : "smooth" });
+  const navBtn = `min-h-11 flex-none rounded-[4px] px-3 text-[15px] font-semibold underline-offset-[6px] hover:underline ${focusRing}`;
+  const chip = (on: boolean) => ({
+    className: `min-h-11 flex-none rounded-[6px] border px-4 text-[15px] font-semibold transition-colors duration-150 ${focusRing}`,
+    style: on ? { background: C.ink, color: C.white, borderColor: C.ink } : { background: C.white, color: C.ink, borderColor: C.line },
+  });
+  // 눈금마다 그 도수 이상인 첫 병 위에 둔다. 앞 눈금과 같은 병이면 큰 눈금만 남긴다
+  const tickAt = new Map<string, number>();
+  TICKS.forEach((t) => {
+    const first = row.find((b) => b.abv >= t);
+    if (first) tickAt.set(first.id, t);
+  });
 
   return (
-    <section id="ls-poster" ref={wrapRef} aria-labelledby="ls-poster-title" className="relative flex min-h-[100svh] flex-col justify-end overflow-hidden" style={{ background: "#141414", color: "#ffffff" }}>
-      <style>{RISE_CSS}</style>
-      <motion.div aria-hidden className="absolute inset-x-0 top-[-8%] h-[108%]" style={reduce ? undefined : { y: photoY }}>
+    <section id="ls-poster" aria-labelledby="ls-poster-title" style={{ background: C.paper }}>
+      <header className="border-b" style={{ background: C.white, borderColor: C.line }}>
+        <div className="mx-auto flex h-16 max-w-[1200px] items-center justify-between gap-3 px-4 md:px-6">
+          <SampleLogo small />
+          <button type="button" onClick={() => go("ls-tasting")} data-gtm-cta="liquor-shop_poster_cta" className={`inline-flex min-h-11 flex-none items-center rounded-[6px] px-4 text-[15px] font-semibold md:hidden ${focusRing}`} style={{ background: C.accent, color: C.white }}>
+            시음회 예약
+          </button>
+          <nav aria-label="주요 메뉴" className="hidden items-center md:flex">
+            {KINDS.map((k) => (
+              <button key={k} type="button" onClick={() => onMenuKind(k)} className={navBtn}>
+                {k}
+              </button>
+            ))}
+            <span aria-hidden className="mx-2 h-4 w-px" style={{ background: C.line }} />
+            {LQ_MORE.map(([id, label]) => (
+              <button key={id} type="button" onClick={() => go(id)} className={navBtn} style={{ color: C.body }}>
+                {label}
+              </button>
+            ))}
+          </nav>
+        </div>
+        {/* 휴대폰: 가로로 넘기는 메뉴 줄 */}
+        <nav aria-label="주요 메뉴" className="flex overflow-x-auto border-t px-2 md:hidden" style={{ borderColor: C.line }}>
+          {KINDS.map((k) => (
+            <button key={k} type="button" onClick={() => onMenuKind(k)} className={navBtn}>
+              {k}
+            </button>
+          ))}
+          {LQ_MORE.map(([id, label]) => (
+            <button key={id} type="button" onClick={() => go(id)} className={navBtn} style={{ color: C.body }}>
+              {label}
+            </button>
+          ))}
+        </nav>
+      </header>
+
+      {/* 매장 선반 사진 띠 */}
+      <div className="relative h-[92px] overflow-hidden md:h-[min(30svh,240px)]" style={{ background: "#141414" }}>
         <motion.div
           className="absolute inset-0"
           initial={false}
-          animate={ready && !reduce ? { scale: [1.06, 1] } : { scale: 1 }}
+          animate={ready && !reduce ? { scale: [1.04, 1] } : { scale: 1 }}
           transition={{ duration: ready && !reduce ? 1.6 : 0, ease: EASE }}
         >
           {/* eslint-disable-next-line @next/next/no-img-element -- 정적 export 라 next/image 최적화를 쓰지 않는다 */}
@@ -382,44 +441,76 @@ function Poster({ ready, reduce, onCta }: { ready: boolean; reduce: boolean; onC
             sizes="100vw"
             alt="원목 선반에 흰 라벨 막걸리와 약주 병이 줄지어 있고 오른쪽에 짙은 옹기 항아리가 놓인 사진"
             fetchPriority="high"
-            className="absolute inset-0 h-full w-full object-cover"
-            style={{ objectPosition: "62% 50%" }}
+            className="h-full w-full object-cover"
+            style={{ objectPosition: "62% 55%" }}
           />
         </motion.div>
-      </motion.div>
-      <div aria-hidden className="absolute inset-0" style={{ background: SHADE }} />
-
-      <div className="absolute inset-x-0 top-0 z-20 flex items-center justify-between gap-4 px-4 pt-4 md:px-10 md:pt-7">
-        <p>
-          <SampleLogo light small />
-        </p>
-        <button
-          type="button"
-          onClick={onCta}
-          data-gtm-cta="liquor-shop_poster_cta"
-          className="inline-flex min-h-11 items-center rounded-[6px] bg-white px-4 text-[15px] font-semibold text-[#111111] transition-colors duration-150 hover:bg-[#f7f7f5] focus-visible:outline focus-visible:outline-[3px] focus-visible:outline-offset-2 focus-visible:outline-white"
-        >
-          술 고르기
-        </button>
       </div>
 
-      <div className={`relative z-10 mx-auto w-full max-w-[1200px] px-4 pb-12 pt-32 md:px-10 md:pb-16 ${rise}`}>
-        <h1
-          id="ls-poster-title"
-          className="m-0 text-[36px] font-bold leading-[1.2] tracking-[-0.03em] md:text-[clamp(40px,5vw,72px)]"
-          style={{ ...serifF, wordBreak: "keep-all" }}
-        >
-          <span className="block">전국 양조장 전통주,</span>
-          <span className="block">온라인 주문과 택배</span>
-        </h1>
-        <p className="mt-4 text-[15px] md:mt-5 md:text-[18px]" style={{ color: "rgba(255,255,255,0.86)" }}>
-          화요일 ~ 일요일 영업
-        </p>
+      <div className="mx-auto max-w-[1200px] px-4 pb-10 pt-5 md:px-6 md:pb-12 md:pt-7">
+        <div className="flex flex-wrap items-end justify-between gap-x-6 gap-y-2">
+          <h1 id="ls-poster-title" className="text-[24px] leading-[1.3] tracking-[-0.03em] [word-break:keep-all] md:text-[32px]" style={serifF}>
+            전국 양조장 전통주, 온라인 주문과 택배
+          </h1>
+          <p className="text-[15px]" style={{ color: C.muted }}>
+            화요일 ~ 일요일 영업
+          </p>
+        </div>
+
+        {/* 주종 칩 + 넘기기 버튼 */}
+        <div className="mt-5 flex items-center justify-between gap-3">
+          <div role="group" aria-label="주종" className="-mx-4 flex min-w-0 gap-1.5 overflow-x-auto px-4 md:mx-0 md:px-0">
+            {[null, ...KINDS].map((k) => {
+              const c = chip(k === kind && (k !== null || kinds.length === 0));
+              return (
+                <button key={k ?? "all"} type="button" aria-pressed={k === kind && (k !== null || kinds.length === 0)} onClick={() => onKind(k)} className={c.className} style={c.style}>
+                  {k ?? "전체"}
+                </button>
+              );
+            })}
+          </div>
+          <div className="hidden flex-none gap-1.5 md:flex">
+            <button type="button" aria-label="선반 왼쪽으로" onClick={() => scroll(-1)} className={`inline-flex h-11 w-11 items-center justify-center rounded-[6px] border ${focusRing}`} style={{ borderColor: C.line, background: C.white }}>
+              <ChevronLeft size={20} aria-hidden />
+            </button>
+            <button type="button" aria-label="선반 오른쪽으로" onClick={() => scroll(1)} className={`inline-flex h-11 w-11 items-center justify-center rounded-[6px] border ${focusRing}`} style={{ borderColor: C.line, background: C.white }}>
+              <ChevronRight size={20} aria-hidden />
+            </button>
+          </div>
+        </div>
+
+        {/* 도수 선반: 도수 낮은 순서로 한 줄. 눈금 줄은 병 위 얇은 선 */}
+        <ul ref={shelfRef} aria-label="도수 순서 진열" className="-mx-4 mt-4 flex snap-x overflow-x-auto px-4 pb-2 md:mx-0 md:px-0" style={{ listStyle: "none", scrollPaddingLeft: 16 }}>
+          {row.map((b) => {
+            const tick = tickAt.get(b.id) ?? null;
+            return (
+              <li key={b.id} className="w-[144px] flex-none snap-start md:w-[168px]">
+                <div className="relative h-7 border-b" style={{ borderColor: "#cfcfcf" }}>
+                  {tick !== null && (
+                    <span className="absolute bottom-0 left-0 flex items-end gap-1.5">
+                      <span aria-hidden className="h-3 w-px" style={{ background: C.ink }} />
+                      <span className="pb-1 text-[13px] font-bold tabular-nums">{tick}도</span>
+                    </span>
+                  )}
+                </div>
+                <button type="button" onClick={() => onOpen(b.id)} aria-label={`${b.name} 상세 보기`} className={`mt-2 flex w-full flex-col items-start rounded-[6px] px-2 pb-2 pt-1 text-left hover:bg-white ${focusRing}`}>
+                  <span className="flex h-[150px] w-full items-end justify-center">
+                    <BottleArt b={b} height={140} />
+                  </span>
+                  <span className="mt-2 block text-[15px] font-bold leading-[1.3]">{b.name}</span>
+                  <span className="mt-0.5 block text-[13px] tabular-nums" style={{ color: C.muted }}>
+                    <b style={{ color: C.accent }}>{b.abv}도</b> {b.ml}ml
+                  </span>
+                  <span className="mt-0.5 block text-[15px] tabular-nums">{won(b.price)}</span>
+                </button>
+              </li>
+            );
+          })}
+        </ul>
       </div>
     </section>
   );
 }
-
 /* ── 성인 확인 ─────────────────────────────────────────── */
 
 function AgeGate({ state, onAnswer, reduce }: { state: "ask" | "yes" | "no"; onAnswer: (s: "yes" | "no") => void; reduce: boolean }) {

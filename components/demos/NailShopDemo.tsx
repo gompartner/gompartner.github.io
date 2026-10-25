@@ -1,7 +1,7 @@
 "use client";
 
 import { useCallback, useEffect, useId, useMemo, useRef, useState } from "react";
-import { AnimatePresence, motion, useScroll, useTransform } from "framer-motion";
+import { AnimatePresence, motion } from "framer-motion";
 import { CalendarCheck, Car, Check, CircleAlert, Clock, Download, MapPin, Paperclip, RotateCcw } from "lucide-react";
 import { useReducedMotionSafe } from "@/hooks/useReducedMotionSafe";
 import { maskName, maskPhone } from "@/components/demos/LeadReceivedPanel";
@@ -18,8 +18,7 @@ import { DemoMakerInfo } from "@/components/demos/DemoMakerInfo";
    예약은 날짜, 시간, 담당 디자이너를 고르고 이름과 휴대폰을 남긴다. 변경과 취소는 하루 전까지가 관용 문구다.
 
    핵심 모션
-   - 첫 화면(ns-poster): 젤네일 손 사진 한 장이 화면을 채운다. 들어올 때 사진이 1.06배에서 1.6초 동안 천천히 다가오고,
-     문장과 정보 줄은 0.3초 늦게 12px 아래에서 올라온다(CSS 키프레임, 끝 상태가 기본값). 스크롤하면 사진만 8% 느리게 움직인다.
+   - 첫 화면(ns-poster): 왼쪽 가격 판과 오른쪽 손 사진, 이달의 아트 6칸. 사진만 1.04배에서 1.6초 동안 천천히 다가온다.
    - 컬러칩을 누르면 칩이 손톱 자리까지 날아가 붙고(layoutId) 손톱 색이 320ms 동안 그 색으로 바뀐다.
      선택 테두리 링도 layoutId 로 칩 사이를 옮겨 다닌다. 아트는 손톱 위 패턴 레이어가 교차 전환한다.
    동작 줄이기가 켜져 있으면 첫 화면은 멈춘 사진, 나머지는 전부 즉시 바뀐다.
@@ -320,27 +319,17 @@ export function NailShopDemo() {
 
   return (
     <div className="min-h-screen overflow-x-clip" style={{ background: C.bg, color: C.plum }}>
-      <Poster reduce={reduce} onCta={() => go("ns-reserve")} />
-      <header className="mx-auto flex max-w-[1200px] items-center justify-between gap-3 px-4 py-4 md:px-6">
-        <a href="#ns-design" onClick={(e) => { e.preventDefault(); go("ns-design"); }} className={`flex items-center gap-2 rounded-[6px] ${focusRing}`} style={{ outlineColor: C.plum }}>
-          <SampleLogo />
-        </a>
-        <nav aria-label="메뉴" className="hidden items-center gap-1 text-[15px] font-bold md:flex">
-          {[
-            ["ns-design", "디자인 둘러보기"],
-            ["ns-menu", "시술 메뉴"],
-            ["ns-reserve", "예약하기"],
-            ["ns-info", "오시는 길"],
-          ].map(([id, label]) => (
-            <button key={id} type="button" onClick={() => go(id)} className={`rounded-[6px] px-3 py-2 hover:underline hover:underline-offset-4 ${focusRing}`} style={{ outlineColor: C.plum }}>
-              {label}
-            </button>
-          ))}
-        </nav>
-        <button type="button" onClick={() => go("ns-reserve")} data-gtm-cta="nail-shop_go_reserve" className={`flex-none rounded-[6px] px-4 py-2 text-[15px] font-semibold text-white ${focusRing}`} style={{ background: C.accent, outlineColor: C.plum }}>
-          예약하기
-        </button>
-      </header>
+      <Poster
+        reduce={reduce}
+        month={today.getMonth() + 1}
+        nails={nails}
+        go={go}
+        onArt={(art) => {
+          setTarget(null);
+          push((prev) => prev.map((n) => ({ ...n, art })));
+          go("ns-design");
+        }}
+      />
 
       {/* 첫 화면: 왼쪽 손, 오른쪽 컬러칩과 아트 */}
       <section id="ns-design" aria-labelledby="ns-design-title" className="mx-auto grid max-w-[1200px] gap-8 px-4 pt-4 md:px-6 lg:grid-cols-[minmax(0,460px)_minmax(0,1fr)] lg:gap-12 lg:pt-8">
@@ -574,78 +563,132 @@ export function NailShopDemo() {
 
 /* 첫 화면 */
 
-/* 문장과 정보 줄 등장: 0.3초 뒤 0.7초 동안 12px 아래에서 올라온다. 끝 상태가 기본값이라 JS 없이도 보인다. */
-const POSTER_CSS = `
-@keyframes ns-rise { from { opacity: 0; transform: translateY(12px); } }
-.ns-rise { animation: ns-rise 0.7s cubic-bezier(0.22, 1, 0.36, 1) 0.3s both; }
-@media (prefers-reduced-motion: reduce) { .ns-rise { animation: none !important; } }
-`;
+/* 첫 화면: 상단 메뉴 + 왼쪽 좁은 가격 판(이달 숫자, 기본가, 추가 조건) + 오른쪽 손 사진과 아트 6칸.
+   실제 네일샵 사이트의 "이달의 아트"와 가격 카드를 한 화면에 모은 형태. 아트 칸을 누르면 아래 칠해 보기 손에
+   그 아트가 다섯 손톱 모두 올라간 상태로 내려간다. 휴대폰 메뉴는 가로로 넘기는 탭 줄.
+   모션: 사진만 1.04배에서 1.6초 동안 천천히 다가온다. 동작 줄이기면 멈춘 사진. */
+const NS_MENU: [string, string][] = [
+  ["ns-art", "이달의 아트"],
+  ["ns-chips", "컬러"],
+  ["ns-menu", "시술 가격"],
+  ["ns-reserve", "예약"],
+  ["ns-info", "오시는 길"],
+];
 
-function Poster({ reduce, onCta }: { reduce: boolean; onCta: () => void }) {
-  const wrap = useRef<HTMLElement>(null);
-  const { scrollYProgress } = useScroll({ target: wrap, offset: ["start start", "end start"] });
-  const photoY = useTransform(scrollYProgress, (v) => `${v * 8}%`);
-
+function Poster({ reduce, month, nails, go, onArt }: { reduce: boolean; month: number; nails: Nail[]; go: (id: string) => void; onArt: (a: ArtId) => void }) {
+  const navBtn = `min-h-11 flex-none rounded-[6px] px-3 text-[15px] font-semibold hover:underline hover:underline-offset-4 ${focusRing}`;
   return (
-    <section ref={wrap} id="ns-poster" aria-labelledby="ns-poster-title" className="relative min-h-[100svh] overflow-hidden" style={{ background: C.bg }}>
-      <style>{POSTER_CSS}</style>
-      <motion.div className="absolute inset-0" style={reduce ? undefined : { y: photoY }}>
-        <motion.div className="absolute inset-0" initial={reduce ? false : { scale: 1.06 }} animate={{ scale: 1 }} transition={{ duration: reduce ? 0 : 1.6, ease: EASE }}>
-          {/* eslint-disable-next-line @next/next/no-img-element -- 정적 export 라 next/image 최적화를 쓰지 않는다 */}
-          <img
-            src={`${IMG}/hero.jpg`}
-            srcSet={`${IMG}/hero-sm.jpg 960w, ${IMG}/hero.jpg 1344w`}
-            sizes="100vw"
-            alt="분홍 실크 위에 누드 핑크 젤네일을 한 손을 올린 사진"
-            fetchPriority="high"
-            className="absolute inset-0 h-full w-full object-cover"
-            style={{ objectPosition: "70% 50%" }}
-          />
-        </motion.div>
-      </motion.div>
-      <div
-        className="absolute inset-0"
-        style={{ background: "linear-gradient(to top, rgba(255,255,255,0.88), rgba(255,255,255,0.4) 40%, rgba(255,255,255,0) 65%)" }}
-        aria-hidden
-      />
-
-      {/* 상호와 예약 버튼 */}
-      <div className="absolute inset-x-0 top-0 z-10 mx-auto flex max-w-[1200px] items-center justify-between px-4 pt-4 md:px-6 md:pt-6">
-        <p>
+    <section id="ns-poster" aria-labelledby="ns-poster-title" style={{ background: C.bg }}>
+      <header className="border-b" style={{ background: C.paper, borderColor: C.line }}>
+        <div className="mx-auto flex h-16 max-w-[1200px] items-center justify-between gap-3 px-4 md:px-6">
           <SampleLogo small />
-        </p>
-        <button
-          type="button"
-          onClick={onCta}
-          data-gtm-cta="nail-shop_poster_cta"
-          className={`inline-flex items-center gap-1.5 rounded-[6px] px-4 py-2.5 text-[15px] font-semibold text-white ${focusRing}`}
-          style={{ background: C.accent, outlineColor: C.plum }}
-        >
-          <CalendarCheck size={17} aria-hidden />
-          예약하기
-        </button>
-      </div>
+          <nav aria-label="메뉴" className="hidden items-center gap-1 md:flex">
+            {NS_MENU.filter(([id]) => id !== "ns-reserve").map(([id, label]) => (
+              <button key={id} type="button" onClick={() => go(id)} className={navBtn} style={{ outlineColor: C.plum }}>
+                {label}
+              </button>
+            ))}
+          </nav>
+          <button type="button" onClick={() => go("ns-reserve")} data-gtm-cta="nail-shop_poster_cta" className={`inline-flex min-h-11 flex-none items-center gap-1.5 rounded-[6px] px-4 text-[15px] font-semibold text-white ${focusRing}`} style={{ background: C.accent, outlineColor: C.plum }}>
+            <CalendarCheck size={17} aria-hidden />
+            예약하기
+          </button>
+        </div>
+        {/* 휴대폰: 가로로 넘기는 탭 줄 */}
+        <nav aria-label="메뉴" className="flex gap-1 overflow-x-auto border-t px-2 md:hidden" style={{ borderColor: C.line }}>
+          {NS_MENU.map(([id, label]) => (
+            <button key={id} type="button" onClick={() => go(id)} className={navBtn} style={{ outlineColor: C.plum }}>
+              {label}
+            </button>
+          ))}
+        </nav>
+      </header>
 
-      <div className="relative z-10 mx-auto flex min-h-[100svh] max-w-[1200px] flex-col justify-end px-4 pb-14 pt-28 md:px-6 md:pb-20">
-        <div className={reduce ? undefined : "ns-rise"}>
-          <h1
-            id="ns-poster-title"
-            className="text-[36px] font-bold leading-[1.2] tracking-[-0.03em] [word-break:keep-all] md:text-[clamp(40px,5vw,72px)]"
-            style={{ color: C.plum }}
-          >
-            손과 발 젤네일,
-            <br />
-            아트 개수별 가격
-          </h1>
-          <p className="mt-4 text-[16px] font-medium md:mt-5 md:text-[18px]" style={{ color: "#4b4b4b" }}>
-            {BRAND}, 100% 예약제
+      <div className="mx-auto grid max-w-[1200px] gap-4 px-4 pb-10 pt-4 md:grid-cols-[minmax(0,300px)_minmax(0,1fr)] md:gap-6 md:px-6 md:pb-12 md:pt-6 lg:grid-cols-[minmax(0,340px)_minmax(0,1fr)]">
+        {/* 가격 판 */}
+        <div className="flex flex-col rounded-[8px] border p-4 md:p-6" style={{ background: C.paper, borderColor: C.line }}>
+          <div className="flex items-center gap-4 md:block">
+            <p className="flex flex-none items-baseline gap-1 md:gap-2">
+              <span className="text-[44px] font-bold leading-none tracking-[-0.04em] tabular-nums md:text-[88px]" style={{ color: C.accent }}>
+                {month}
+              </span>
+              <span className="text-[16px] font-bold md:text-[20px]">월 아트</span>
+            </p>
+            <h1 id="ns-poster-title" className="text-[20px] font-bold leading-[1.3] tracking-[-0.03em] [word-break:keep-all] md:mt-6 md:text-[28px]">
+              손과 발 젤네일,
+              <br />
+              아트 개수별 가격
+            </h1>
+          </div>
+          <p className="mt-3 border-t pt-3 text-[15px] md:hidden" style={{ borderColor: C.line }}>
+            젤 원컬러 <b className="tabular-nums">{won(BASES[0].price)}</b>, 아트 손톱당 <b className="tabular-nums">3,000원부터</b>
           </p>
+          <div className="hidden flex-1 flex-col md:flex">
+          <dl className="mt-5 border-t pt-3 text-[15px] leading-[1.9]" style={{ borderColor: C.line }}>
+            {[
+              ["젤 원컬러", won(BASES[0].price)],
+              ["젤 그라데이션", won(BASES[1].price)],
+              ["아트 (손톱당)", "3,000원~8,000원"],
+            ].map(([k, v]) => (
+              <div key={k} className="flex justify-between gap-3">
+                <dt>{k}</dt>
+                <dd className="font-bold tabular-nums">{v}</dd>
+              </div>
+            ))}
+          </dl>
+          <ul className="mt-3 grid gap-0.5 text-[14px]" style={{ color: C.plumSoft }}>
+            <li>젤 제거 {won(REMOVE.price)} 추가</li>
+            <li>손 케어 {won(CARE.price)} 추가</li>
+            <li>패디 젤 원컬러 50,000원</li>
+          </ul>
+          <p className="mt-auto pt-4 text-[14px] font-semibold">{BRAND}, 100% 예약제</p>
+          </div>
+        </div>
+
+        {/* 손 사진 + 이달의 아트 6칸 */}
+        <div className="min-w-0">
+          <div className="relative aspect-[4/3] overflow-hidden rounded-[8px] md:aspect-auto md:h-[min(52svh,480px)]" style={{ background: C.roseSoft }}>
+            <motion.div className="absolute inset-0" initial={reduce ? false : { scale: 1.04 }} animate={{ scale: 1 }} transition={{ duration: reduce ? 0 : 1.6, ease: EASE }}>
+              {/* eslint-disable-next-line @next/next/no-img-element -- 정적 export 라 next/image 최적화를 쓰지 않는다 */}
+              <img
+                src={`${IMG}/hero.jpg`}
+                srcSet={`${IMG}/hero-sm.jpg 960w, ${IMG}/hero.jpg 1344w`}
+                sizes="(min-width: 768px) 800px, 100vw"
+                alt="분홍 실크 위에 누드 핑크 젤네일을 한 손을 올린 사진"
+                fetchPriority="high"
+                className="h-full w-full object-cover"
+                style={{ objectPosition: "70% 50%" }}
+              />
+            </motion.div>
+          </div>
+          <div role="group" aria-label="이달의 아트" className="mt-3 grid grid-cols-3 gap-2 xl:grid-cols-6">
+            {ARTS.map((a) => {
+              const on = nails.every((n) => n.art === a.id);
+              return (
+                <button
+                  key={a.id}
+                  type="button"
+                  aria-pressed={on}
+                  onClick={() => onArt(a.id)}
+                  className={`flex min-h-[64px] flex-col items-start justify-center gap-1 rounded-[6px] border px-3 py-2 text-left ${focusRing}`}
+                  style={{ borderColor: on ? C.accent : C.line, background: on ? C.accent : C.paper, color: on ? "#ffffff" : C.plum, outlineColor: C.plum }}
+                >
+                  <span className="inline-flex items-center gap-1.5 text-[15px] font-bold">
+                    <ArtSwatch art={a.id} />
+                    {a.id === "none" ? "원컬러" : a.label}
+                  </span>
+                  <span className="text-[13px] tabular-nums" style={{ opacity: 0.85 }}>
+                    {a.price ? `손톱당 ${a.price.toLocaleString("ko-KR")}원` : "아트 없음"}
+                  </span>
+                </button>
+              );
+            })}
+          </div>
         </div>
       </div>
     </section>
   );
 }
-
 /* 손 SVG */
 
 function HandSvg({ ref, uid, nails, target, onPick, reduce }: { ref: React.RefObject<SVGSVGElement | null>; uid: string; nails: Nail[]; target: number | null; onPick: (i: number) => void; reduce: boolean }) {

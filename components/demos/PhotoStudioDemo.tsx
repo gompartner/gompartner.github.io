@@ -1,8 +1,8 @@
 "use client";
 
 import { useEffect, useRef, useState } from "react";
-import { AnimatePresence, motion, useScroll, useTransform } from "framer-motion";
-import { AlertCircle, CalendarCheck, Camera, Car, Check, Clock, MapPin, MessageCircle, Minus, Plus, Shirt } from "lucide-react";
+import { AnimatePresence, motion, useInView } from "framer-motion";
+import { AlertCircle, CalendarCheck, Camera, Car, Check, Clock, MapPin, Menu, MessageCircle, Minus, Plus, Shirt, X } from "lucide-react";
 import { useReducedMotionSafe } from "@/hooks/useReducedMotionSafe";
 import { daysAgo, fmtKo, useDemoToday } from "@/hooks/useDemoToday";
 import { maskName, maskPhone } from "@/components/demos/LeadReceivedPanel";
@@ -19,8 +19,8 @@ import { DemoMakerInfo } from "@/components/demos/DemoMakerInfo";
    - 촬영 안내에 준비물(여권 규격, 안경), 복장(단색 상의, 배경지 색과 겹치지 않게), 주차. 영업시간에 정기 휴무.
 
    핵심 모션
-   - 첫 화면(ps-poster): 스튜디오 사진 한 장이 화면을 채운다. 들어올 때 사진이 1.06배에서 1.6초 동안 천천히 다가오고,
-     문장과 정보 줄은 0.3초 늦게 12px 아래에서 올라온다(CSS 키프레임, 끝 상태가 기본값). 스크롤하면 사진만 8% 느리게 움직인다.
+   - 첫 화면(ps-poster): 상단 메뉴 아래 촬영 종류 세 장(증명, 프로필, 가족)을 세로로 나란히 둔다. 고른 패널이 넓어지며
+     시작가와 버튼이 나온다(실제 사진관 사이트의 촬영 상품별 배너를 한 화면에 모은 형태).
    - 갤러리: 세로 스크롤에 맞춰 가로로 흐른다(sticky 구간 + useScroll). 가운데 온 카드만 살짝 커지고 캡션이 뜬다.
    동작 줄이기면 첫 화면은 멈춘 사진, 갤러리는 보통 가로 스크롤(scroll-snap)로 바뀐다.
 
@@ -188,82 +188,232 @@ function Stepper({ value, min, max, onChange, label }: { value: number; min: num
 
 /* ---------- 첫 화면 ---------- */
 
-/* 문장과 정보 줄 등장: 0.3초 뒤 0.7초 동안 12px 아래에서 올라온다. 끝 상태가 기본값이라 JS 없이도 보인다. */
-const POSTER_CSS = `
-@keyframes ps-rise { from { opacity: 0; transform: translateY(12px); } }
-.ps-rise { animation: ps-rise 0.7s cubic-bezier(0.22, 1, 0.36, 1) 0.3s both; }
-@media (prefers-reduced-motion: reduce) { .ps-rise { animation: none !important; } }
-`;
+/* 첫 화면: 상단 메뉴 + 촬영 종류 세로 3분할 패널(증명, 프로필, 가족).
+   PC는 마우스를 올리거나 누른 패널이 50%로 넓어지고 나머지 둘은 25%로 줄며(flex-grow 0.45초), 넓어진 패널에만 버튼이 나온다.
+   휴대폰은 세 단을 위아래로 쌓고 누른 단만 길어진다. 사진은 들어올 때 1.04배에서 1.6초 동안 천천히 다가온다.
+   동작 줄이기면 넓어지는 전환과 다가오기 없이 바로 바뀐다. */
+const SHOOTS = [
+  { concept: "증명" as Concept, img: "id-passport", name: "증명사진", price: ID_PRICES[0][2], time: "20분", note: "보정 1장, 출력 8매, 파일" },
+  { concept: "프로필" as Concept, img: "pf-biz", name: "프로필", price: PKGS[0].price, time: `${PKGS[0].time}부터`, note: `${PKGS[0].shots}부터, 원본 제공 패키지` },
+  { concept: "가족" as Concept, img: "fm-four", name: "가족사진", price: PKGS[0].price, time: `${PKGS[0].time}부터`, note: "인원 추가, 액자 출력 옵션" },
+];
 
-function Poster({ reduce, onCta }: { reduce: boolean; onCta: () => void }) {
+const MENU: [string, string, Concept?][] = [
+  ["ps-gallery", "증명", "증명"],
+  ["ps-gallery", "프로필", "프로필"],
+  ["ps-gallery", "가족", "가족"],
+  ["ps-price", "가격"],
+  ["ps-guide", "촬영 안내"],
+  ["ps-map", "오시는 길"],
+];
+
+const GROW = "cubic-bezier(0.22, 1, 0.36, 1)";
+
+function Poster({
+  reduce,
+  go,
+  onConcept,
+  openDay,
+  openLeft,
+  onOpenDay,
+}: {
+  reduce: boolean;
+  go: (id: string) => void;
+  onConcept: (c: Concept) => void;
+  openDay: Date;
+  openLeft: number;
+  onOpenDay: () => void;
+}) {
+  const [active, setActive] = useState(0);
+  const [menu, setMenu] = useState(false);
   const ref = useRef<HTMLElement>(null);
-  const { scrollYProgress } = useScroll({ target: ref, offset: ["start start", "end start"] });
-  const photoY = useTransform(scrollYProgress, (v) => `${v * 8}%`);
+  const inView = useInView(ref, { amount: 0.25 });
+  const nav = (id: string, concept?: Concept) => {
+    setMenu(false);
+    if (concept) onConcept(concept);
+    go(id);
+  };
 
   return (
-    <section ref={ref} id="ps-poster" aria-labelledby="ps-poster-title" className="relative min-h-[100svh] overflow-hidden" style={{ background: C.bg }}>
-      <style>{POSTER_CSS}</style>
-      <motion.div className="absolute inset-0" style={reduce ? undefined : { y: photoY }}>
-        <motion.div
-          className="absolute inset-0"
-          initial={reduce ? false : { scale: 1.06 }}
-          animate={{ scale: 1 }}
-          transition={{ duration: reduce ? 0 : 1.6, ease: EASE }}
-        >
-          {/* eslint-disable-next-line @next/next/no-img-element -- 정적 export 라 next/image 최적화를 쓰지 않는다 */}
-          <img
-            src={`${IMG}/hero.jpg`}
-            srcSet={`${IMG}/hero-sm.jpg 960w, ${IMG}/hero.jpg 1920w`}
-            sizes="100vw"
-            alt="양쪽에 소프트박스 조명을 세운 사진 스튜디오와 가운데 내려진 배경지"
-            fetchPriority="high"
-            className="absolute inset-0 h-full w-full object-cover"
-            style={{ objectPosition: "50% 45%" }}
-          />
-        </motion.div>
-      </motion.div>
-      <div
-        className="absolute inset-0"
-        style={{ background: "linear-gradient(to top, rgba(0,0,0,0.72), rgba(0,0,0,0.3) 55%, rgba(0,0,0,0.25))" }}
-        aria-hidden
-      />
+    <section ref={ref} id="ps-poster" aria-labelledby="ps-poster-title" className="relative" style={{ background: C.bg }}>
+      {/* 상단 메뉴. 휴대폰과 태블릿은 햄버거 */}
+      <header className="relative z-20 border-b" style={{ borderColor: C.line }}>
+        <div className="mx-auto flex h-16 max-w-[1200px] items-center justify-between gap-3 px-4 md:px-6">
+          <SampleLogo light small />
+          <nav aria-label="메뉴" className="hidden items-center gap-1 text-[15px] lg:flex" style={{ color: C.muted }}>
+            {MENU.map(([id, label, concept]) => (
+              <button key={label} type="button" onClick={() => nav(id, concept)} className={`min-h-11 rounded-[4px] px-3 hover:text-[#f2f2f2] ${focusRing}`}>
+                {label}
+              </button>
+            ))}
+          </nav>
+          <div className="flex items-center gap-2">
+            <button
+              type="button"
+              onClick={() => go("ps-book")}
+              data-gtm-cta="photo-studio_poster_cta"
+              className={`inline-flex min-h-11 items-center gap-1.5 rounded-[4px] px-4 text-[15px] font-semibold ${focusRing}`}
+              style={{ background: C.accent, color: C.accentInk }}
+            >
+              <CalendarCheck size={17} aria-hidden />
+              예약
+            </button>
+            <button
+              type="button"
+              aria-expanded={menu}
+              aria-controls="ps-menu"
+              aria-label={menu ? "메뉴 닫기" : "메뉴 열기"}
+              onClick={() => setMenu((v) => !v)}
+              className={`inline-flex h-11 w-11 items-center justify-center rounded-[4px] border lg:hidden ${focusRing}`}
+              style={{ borderColor: C.line, color: C.text }}
+            >
+              {menu ? <X size={20} aria-hidden /> : <Menu size={20} aria-hidden />}
+            </button>
+          </div>
+        </div>
+        {menu && (
+          <nav id="ps-menu" aria-label="메뉴 펼침" className="absolute inset-x-0 top-full border-b px-4 pb-4 pt-2 lg:hidden" style={{ background: C.panel, borderColor: C.line }}>
+            <ul className="grid grid-cols-2 gap-1">
+              {MENU.map(([id, label, concept]) => (
+                <li key={label}>
+                  <button type="button" onClick={() => nav(id, concept)} className={`flex min-h-11 w-full items-center rounded-[4px] px-3 text-left text-[16px] font-semibold ${focusRing}`} style={{ color: C.text }}>
+                    {label}
+                  </button>
+                </li>
+              ))}
+            </ul>
+          </nav>
+        )}
+      </header>
 
-      {/* 상호와 예약 버튼 */}
-      <div className="absolute inset-x-0 top-0 z-10 mx-auto flex max-w-[1200px] items-center justify-between px-4 pt-4 md:px-6 md:pt-6">
-        <SampleLogo light small />
-        <button
-          type="button"
-          onClick={onCta}
-          data-gtm-cta="photo-studio_poster_cta"
-          className={`inline-flex items-center gap-1.5 rounded-[6px] px-4 py-2.5 text-[15px] font-semibold ${focusRing}`}
-          style={{ background: C.accent, color: C.accentInk }}
-        >
-          <CalendarCheck size={17} aria-hidden />
-          예약하기
+      {/* 제목 줄 */}
+      <div className="mx-auto flex max-w-[1200px] flex-wrap items-end justify-between gap-x-6 gap-y-2 px-4 pb-4 pt-5 md:px-6 md:pb-5 md:pt-7">
+        <h1 id="ps-poster-title" className="text-[30px] font-bold leading-[1.2] tracking-[-0.03em] [word-break:keep-all] md:text-[40px]" style={{ color: C.text }}>
+          증명사진 20분 완성
+        </h1>
+        <p className="inline-flex items-center gap-1.5 text-[15px]" style={{ color: C.muted }}>
+          <MapPin size={16} aria-hidden />
+          ㅇㅇ역 2번 출구 도보 5분
+        </p>
+      </div>
+
+      {/* 촬영 종류 3분할 */}
+      <ul className="mx-auto flex max-w-[1440px] flex-col gap-2 px-4 md:h-[max(480px,calc(100svh-230px))] md:flex-row md:px-6">
+        {SHOOTS.map((s, i) => {
+          const on = active === i;
+          return (
+            <li
+              key={s.name}
+              className={`relative min-w-0 overflow-hidden rounded-[6px] ${on ? "h-[46svh] min-h-[300px]" : "h-[22svh] min-h-[150px]"} md:h-auto md:min-h-0`}
+              style={{
+                flexGrow: on ? 2 : 1,
+                flexBasis: 0,
+                transition: reduce ? "none" : `flex-grow 0.45s ${GROW}, height 0.45s ${GROW}`,
+                background: C.panel,
+              }}
+              onMouseEnter={() => setActive(i)}
+            >
+              <button
+                type="button"
+                aria-expanded={on}
+                aria-controls={`ps-shoot-${i}`}
+                aria-label={`${s.name} 펼치기`}
+                onClick={() => setActive(i)}
+                onFocus={() => setActive(i)}
+                className={`absolute inset-0 block h-full w-full ${focusRing} focus-visible:outline-offset-[-3px]`}
+              >
+                <motion.span
+                  aria-hidden
+                  className="absolute inset-0 block"
+                  initial={reduce ? false : { scale: 1.04 }}
+                  animate={{ scale: 1 }}
+                  transition={{ duration: reduce ? 0 : 1.6, ease: EASE }}
+                >
+                  {/* eslint-disable-next-line @next/next/no-img-element -- 정적 export 라 next/image 최적화를 쓰지 않는다 */}
+                  <img
+                    src={`${IMG}/${s.img}.jpg`}
+                    alt=""
+                    fetchPriority={i === 0 ? "high" : undefined}
+                    className="h-full w-full object-cover"
+                    style={{ objectPosition: "50% 30%", filter: on ? "none" : "brightness(0.78)", transition: reduce ? "none" : "filter 0.3s" }}
+                  />
+                </motion.span>
+              </button>
+              {/* 아래 이름판: 그라데이션 대신 단색 판 */}
+              <div id={`ps-shoot-${i}`} className="pointer-events-none absolute inset-x-2 bottom-2 rounded-[4px] px-3 py-2.5 md:inset-x-3 md:bottom-3 md:px-4 md:py-3" style={{ background: "rgba(20,20,20,0.88)" }}>
+                <p className="flex flex-wrap items-baseline justify-between gap-x-3">
+                  <span className="text-[18px] font-bold md:text-[20px]" style={{ color: C.text }}>
+                    {s.name}
+                  </span>
+                  <span className="text-[15px] font-semibold tabular-nums" style={{ color: C.accent }}>
+                    {won(s.price)}부터
+                  </span>
+                </p>
+                <p className={`mt-0.5 items-center gap-1 text-[14px] ${on ? "inline-flex" : "hidden md:inline-flex"}`} style={{ color: C.muted }}>
+                  <Clock size={14} aria-hidden />
+                  촬영 {s.time}
+                </p>
+                {on && (
+                  <div className="pointer-events-auto mt-2.5">
+                    <p className="text-[14px]" style={{ color: "#d6d6d6" }}>
+                      {s.note}
+                    </p>
+                    <div className="mt-2.5 flex flex-wrap gap-2">
+                      <button
+                        type="button"
+                        onClick={() => nav("ps-gallery", s.concept)}
+                        className={`inline-flex min-h-11 items-center rounded-[4px] border px-3.5 text-[15px] font-semibold ${focusRing}`}
+                        style={{ borderColor: "#555555", color: C.text }}
+                      >
+                        사진 보기
+                      </button>
+                      <button
+                        type="button"
+                        onClick={() => go("ps-book")}
+                        data-gtm-cta={`photo-studio_shoot_${s.img}`}
+                        className={`inline-flex min-h-11 items-center gap-1.5 rounded-[4px] px-3.5 text-[15px] font-semibold ${focusRing}`}
+                        style={{ background: C.accent, color: C.accentInk }}
+                      >
+                        이 촬영 예약
+                      </button>
+                    </div>
+                  </div>
+                )}
+              </div>
+            </li>
+          );
+        })}
+      </ul>
+
+      {/* 예약 가능한 가장 가까운 날. PC 왼쪽 아래는 사용법 버튼 자리라 오른쪽에 둔다 */}
+      <div className="mx-auto flex max-w-[1200px] flex-wrap items-center justify-between gap-3 px-4 pb-8 pt-4 md:justify-end md:px-6 md:pb-10">
+        <p className="text-[15px]" style={{ color: C.muted }}>
+          30분 단위 예약, 당일 촬영은 전화 문의
+        </p>
+        <button type="button" onClick={onOpenDay} className={`inline-flex min-h-11 items-center gap-2 rounded-[4px] border px-4 text-[15px] ${focusRing}`} style={{ borderColor: C.line, color: C.text }}>
+          <span>{fmtKo(openDay)}</span>
+          <span className="font-bold" style={{ color: C.accent }}>
+            예약 가능 {openLeft}타임
+          </span>
         </button>
       </div>
 
-      <div className="relative z-10 mx-auto flex min-h-[100svh] max-w-[1200px] flex-col justify-end px-4 pb-14 pt-28 md:px-6 md:pb-20">
-        <div className={reduce ? undefined : "ps-rise"}>
-          <h1
-            id="ps-poster-title"
-            className="text-[36px] font-bold leading-[1.2] tracking-[-0.03em] [word-break:keep-all] md:text-[clamp(40px,5vw,72px)]"
-            style={{ color: C.text }}
-          >
-            증명사진
-            <br />
-            20분 완성
-          </h1>
-          <p className="mt-4 inline-flex items-center gap-1.5 text-[15px] md:mt-5 md:text-[17px]" style={{ color: "#d6d6d6" }}>
-            <MapPin size={16} aria-hidden />
-            ㅇㅇ역 2번 출구 도보 5분
-          </p>
+      {/* 휴대폰 하단 고정 바: 첫 화면이 보일 때만 */}
+      {inView && (
+        <div className="fixed inset-x-0 bottom-0 z-40 border-t px-4 pt-3 md:hidden" style={{ background: C.panel, borderColor: C.line, paddingBottom: "calc(12px + env(safe-area-inset-bottom))" }}>
+          <div className="flex items-center justify-between gap-3">
+            <p className="min-w-0 text-[14px]" style={{ color: C.muted }}>
+              {fmtKo(openDay)} <b style={{ color: C.text }}>예약 가능 {openLeft}타임</b>
+            </p>
+            <button type="button" onClick={() => go("ps-book")} className={`inline-flex min-h-11 flex-none items-center rounded-[4px] px-4 text-[15px] font-semibold ${focusRing}`} style={{ background: C.accent, color: C.accentInk }}>
+              예약하기
+            </button>
+          </div>
         </div>
-      </div>
+      )}
     </section>
   );
 }
-
 
 type Booking = { no: number; day: Date; slot: string; people: number; name: string; phone: string; pkg: PkgId };
 
@@ -344,27 +494,17 @@ export function PhotoStudioDemo() {
 
   return (
     <div className="min-h-screen overflow-x-clip" style={{ background: C.bg, color: C.text }}>
-      <Poster reduce={reduce} onCta={() => go("ps-book")} />
-
-      <header className="mx-auto flex max-w-[1200px] items-center justify-between gap-3 px-4 py-4 md:px-6">
-        <SampleLogo light />
-        <nav aria-label="메뉴" className="hidden items-center gap-6 text-[15px] md:flex" style={{ color: C.muted }}>
-          {[
-            ["ps-gallery", "갤러리"],
-            ["ps-price", "상품 안내"],
-            ["ps-book", "예약"],
-            ["ps-guide", "촬영 안내"],
-            ["ps-map", "오시는 길"],
-          ].map(([id, label]) => (
-            <button key={id} type="button" onClick={() => go(id)} className={`rounded-[2px] hover:text-[#f2f2f2] ${focusRing}`}>
-              {label}
-            </button>
-          ))}
-        </nav>
-        <button type="button" onClick={() => go("ps-book")} data-gtm-cta="photo-studio_go_book" className={`${accentBtn} px-4 py-2 text-[15px]`} style={{ background: C.accent, color: C.accentInk }}>
-          예약하기
-        </button>
-      </header>
+      <Poster
+        reduce={reduce}
+        go={go}
+        onConcept={pickConcept}
+        openDay={days[firstOpen]}
+        openLeft={SLOTS.filter((_, i) => !isTaken(days[firstOpen], i)).length}
+        onOpenDay={() => {
+          pickDay(firstOpen);
+          go("ps-book");
+        }}
+      />
 
       {/* 1. 갤러리: 보통 세로 스크롤 격자. 컨셉을 고르면 그 컨셉 사진만 남고 나머지는 자리를 옮긴다 */}
       <section id="ps-gallery" aria-labelledby="ps-gallery-title" className="mx-auto max-w-[1200px] scroll-mt-4 px-4 pt-12 md:px-6 md:pt-16">

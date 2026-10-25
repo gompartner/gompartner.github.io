@@ -1,8 +1,8 @@
 "use client";
 
 import { useEffect, useRef, useState } from "react";
-import { AnimatePresence, motion, useMotionValue, useScroll, useTransform } from "framer-motion";
-import { Bus, Car, ChevronLeft, ChevronRight, DoorOpen, Flower2, MessageCircle, TrainFront, Trees } from "lucide-react";
+import { AnimatePresence, motion, useInView, useMotionValue, useScroll, useTransform } from "framer-motion";
+import { Bus, Car, ChevronLeft, ChevronRight, DoorOpen, Flower2, Menu, MessageCircle, TrainFront, Trees, X } from "lucide-react";
 import { useReducedMotionSafe } from "@/hooks/useReducedMotionSafe";
 import { daysAgo, fmtDash, fmtKo, useDemoToday } from "@/hooks/useDemoToday";
 import { maskName, maskPhone } from "@/components/demos/LeadReceivedPanel";
@@ -17,15 +17,14 @@ import { DemoMakerInfo } from "@/components/demos/DemoMakerInfo";
    패키지는 대관료 + 식사(1인 단가 x 하객 수) + 꽃장식 + 추가 옵션으로 적는다(부가세 별도 표기).
    하객 주차 2시간 무료, 신부 대기실, 지하철역 셔틀 운행은 거의 모든 홀이 적는 관용 문구다.
 
-   첫 화면 포스터: 꽃으로 꾸민 예식 테이블 사진 한 장이 화면을 채운다. 사진은 1.6초 동안 scale 1.06 -> 1 로 천천히 다가오고
-   문장 "하객 30명부터 120명, 홀 하나와 야외 정원"과 정보 줄은 0.3초 늦게 아래 12px 에서 올라온다(CSS 키프레임, 스크립트 없이도 끝 상태가 보임).
-   스크롤하면 사진만 조금 느리게 움직인다(y 0 -> 8%). 동작 줄이기에서는 처음부터 정지 화면이다.
+   첫 화면(sw-poster): 맨 위에 붙은 메뉴 아래 큰 공간 사진, 썸네일 투어(예식 테이블, 시간대별 홀), 남은 날짜 상자.
+   사진은 1.6초 동안 scale 1.04 -> 1 로 천천히 다가온다. 동작 줄이기에서는 처음부터 정지 화면이다.
    글꼴은 Pretendard, h1 과 h2 는 굵게. 바탕은 흰색과 #f7f7f5 를 번갈아 쓰고 강조색은 올리브 하나.
 
    핵심 모션: 섹션 와이프(다음 섹션이 아래에서 clip-path로 덮으며 올라옴, 앞 섹션은 sticky로 뒤에 남음), D-day 숫자 롤링.
 
    상호작용(모두 브라우저 안에서만 돈다. 실제로 보내지 않는다)
-   1. 날짜와 시간 고르기: 12개월 달력(토, 일 예약, 마감 표시)과 시간대 4개. 고르면 D-day가 롤링하고 그 시간대의 홀 사진으로 바뀐다.
+   1. 날짜와 시간 고르기: 12개월 달력(토, 일 예약, 마감 표시)과 시간대 4개. 고르면 D-day가 롤링한다. 첫 화면의 남은 날짜와 홀 썸네일도 같은 값을 바꾼다.
    2. 하객 수에 따른 홀 배치: 슬라이더(30~120)에 맞춰 8인 원형 테이블이 평면도에 늘고 줄며, 야외 정원 사용을 켤 수 있다.
    3. 패키지 견적: 대관(시간대별), 식사(코스 또는 뷔페 x 하객 수), 꽃장식(기본, 풍성), 음향과 사진 추가. 합계 표시.
    4. 상담신청과 방문 예약: 두 사람 이름, 휴대폰, 희망 예식일, 방문 희망일. 완료 화면에 접수번호, 담당 창구, 회신 예정일.
@@ -73,9 +72,7 @@ const serif = { fontWeight: 700 } as const;
 
 /* 모션 값(ms). 모두 reduce면 0 */
 const EASE = [0.22, 1, 0.36, 1] as const;
-const HERO_MS = 1600; // 사진이 scale 1.06 -> 1 로 다가오는 시간
-const RISE_MS = 700; // 문장과 정보 줄이 아래 12px 에서 올라오는 시간
-const RISE_DELAY_MS = 300; // 문장 등장 지연
+const HERO_MS = 1600; // 사진이 scale 1.04 -> 1 로 다가오는 시간
 const ROLL_MS = 650; // 숫자 롤링
 const LIGHT_MS = 800; // 홀 사진의 시간대 전환
 const TABLE_MS = 320; // 테이블 하나 등장
@@ -188,56 +185,95 @@ export function SmallWeddingDemo() {
     window.scrollTo({ top: Math.max(0, top), behavior: reduce ? "auto" : "smooth" });
   };
 
+  /* 메뉴 이름은 실제 스몰웨딩 홀 사이트 표기(공간, 식사, 예식 안내, 남은 날짜, 방문 상담)를 따른다 */
   const NAV = [
-    ["sw-hero", "예약 현황"],
-    ["sw-layout", "홀 배치"],
-    ["sw-package", "패키지와 비용"],
-    ["sw-space", "공간 안내"],
-    ["sw-consult", "상담신청"],
+    ["sw-hero", "남은 날짜"],
+    ["sw-layout", "예식 안내"],
+    ["sw-package", "식사와 비용"],
+    ["sw-space", "공간"],
   ] as const;
+  const [menu, setMenu] = useState(false);
+  const nav = (id: string) => {
+    setMenu(false);
+    go(id);
+  };
 
   return (
     <div className="min-h-screen overflow-x-clip" style={{ background: C.paper, color: C.ink }}>
-      <Poster reduce={reduce} onCta={() => go("sw-date")} />
-
-      {/* 머리글과 스크롤 진행 바. 포스터 안에는 메뉴를 두지 않으려고 포스터 다음에 두고 위에 붙인다 */}
+      {/* 상단 메뉴와 스크롤 진행 바. 맨 위부터 붙어 있다. 휴대폰과 태블릿은 햄버거 */}
       <header className="sticky top-0 z-40 border-b" style={{ height: HEADER_H, background: C.paper, borderColor: C.line }}>
         <motion.div aria-hidden className="absolute inset-x-0 top-0 h-[3px] origin-left" style={{ background: C.olive, scaleX: scrollYProgress }} />
         <div className="mx-auto flex h-full max-w-[1200px] items-center justify-between gap-3 px-4 md:px-6">
-          <button type="button" onClick={() => go("sw-hero")} className={`${focusRing} leading-none`} style={{ outlineColor: C.olive }}>
+          <button type="button" onClick={() => window.scrollTo({ top: 0, behavior: reduce ? "auto" : "smooth" })} className={`${focusRing} leading-none`} style={{ outlineColor: C.olive }}>
             <SampleLogo />
           </button>
-          <nav aria-label="메뉴" className="hidden items-center gap-5 text-[15px] md:flex">
-            {NAV.slice(0, 4).map(([id, label]) => (
-              <button key={id} type="button" onClick={() => go(id)} className={`${focusRing} underline-offset-4 hover:underline`} style={{ outlineColor: C.olive }}>
+          <nav aria-label="메뉴" className="hidden items-center gap-1 text-[15px] lg:flex">
+            {NAV.map(([id, label]) => (
+              <button key={id} type="button" onClick={() => nav(id)} className={`${focusRing} min-h-11 rounded-[4px] px-3 underline-offset-4 hover:underline`} style={{ outlineColor: C.olive }}>
                 {label}
               </button>
             ))}
           </nav>
-          <button
-            type="button"
-            onClick={() => go("sw-consult")}
-            data-gtm-cta="small-wedding_consult_go"
-            className={`${btnBase} rounded-[4px] px-4 py-2 text-[14px]`}
-            style={{ background: C.olive, color: C.paper, outlineColor: C.olive, fontWeight: 600 }}
-          >
-            상담신청
-          </button>
+          <div className="flex items-center gap-2">
+            <button
+              type="button"
+              onClick={() => nav("sw-consult")}
+              data-gtm-cta="small-wedding_consult_go"
+              className={`${btnBase} min-h-11 rounded-[4px] px-4 text-[14px]`}
+              style={{ background: C.olive, color: C.paper, outlineColor: C.olive, fontWeight: 600 }}
+            >
+              방문 상담
+            </button>
+            <button
+              type="button"
+              aria-expanded={menu}
+              aria-controls="sw-menu-list"
+              aria-label={menu ? "메뉴 닫기" : "메뉴 열기"}
+              onClick={() => setMenu((m) => !m)}
+              className={`${focusRing} inline-flex h-11 w-11 items-center justify-center rounded-[4px] border lg:hidden`}
+              style={{ borderColor: C.line, outlineColor: C.olive }}
+            >
+              {menu ? <X size={20} aria-hidden /> : <Menu size={20} aria-hidden />}
+            </button>
+          </div>
         </div>
+        {menu && (
+          <nav id="sw-menu-list" aria-label="메뉴 펼침" className="absolute inset-x-0 top-full border-b px-4 pb-4 pt-2 lg:hidden" style={{ background: C.paper, borderColor: C.line }}>
+            <ul className="grid gap-1">
+              {NAV.map(([id, label]) => (
+                <li key={id}>
+                  <button type="button" onClick={() => nav(id)} className={`${focusRing} flex min-h-11 w-full items-center rounded-[4px] px-3 text-left text-[16px] font-bold`} style={{ outlineColor: C.olive }}>
+                    {label}
+                  </button>
+                </li>
+              ))}
+            </ul>
+          </nav>
+        )}
       </header>
+
+      <Poster
+        reduce={reduce}
+        today={today}
+        date={date}
+        slot={slot}
+        onSlot={(i) => setPick({ date, slot: i })}
+        onOpenDate={(d, i) => {
+          setPick({ date: d, slot: i });
+          go("sw-consult");
+        }}
+        go={go}
+      />
 
       {/* 첫 화면. 겹침 없이 보통 흐름에 둔다. 가이드와 메뉴가 바로 찾아올 수 있게 */}
       <section id="sw-hero" aria-labelledby="sw-title" className="relative mx-auto grid max-w-[1200px] gap-10 px-4 pb-16 md:px-6 lg:grid-cols-[minmax(0,1.05fr)_minmax(0,0.95fr)] lg:items-start lg:gap-12 lg:pb-24" style={{ paddingTop: 36 }}>
-        <div className="min-w-0">
-          <p className="text-[14px] font-bold" style={{ color: C.muted }}>
-            스몰웨딩 홀, {ADDRESS}
-          </p>
-          <h2 id="sw-title" className="mt-2 text-[40px] leading-[1.15] md:text-[52px]" style={{ ...serif, fontWeight: 700, color: C.ink, letterSpacing: "-0.02em" }}>
-            {BRAND}
+        <div className="min-w-0 lg:sticky lg:top-[88px]">
+          {/* 상호와 소개 문장은 첫 화면 제목과 겹쳐 뺐다 */}
+          <h2 id="sw-title" className="text-[30px] leading-[1.25] md:text-[38px]" style={{ ...serif, fontWeight: 700, color: C.ink }}>
+            남은 날짜
           </h2>
-          <p className="mt-3 text-[17px] leading-[1.6]" style={{ color: C.body }}>하객 30명부터 120명까지. 홀 하나와 야외 정원, 식사와 꽃장식까지 한 곳에서 해요.</p>
 
-          <div id="sw-dday" className="mt-8 rounded-[6px] border p-5 md:p-6" style={{ borderColor: C.line, background: C.ivory }}>
+          <div id="sw-dday" className="mt-6 rounded-[6px] border p-5 md:p-6" style={{ borderColor: C.line, background: C.ivory }}>
             <p className="text-[14px] font-bold" style={{ color: C.muted }}>
               고른 예식일까지
             </p>
@@ -252,7 +288,6 @@ export function SmallWeddingDemo() {
             </p>
           </div>
 
-          <HallScene slot={slot} reduce={reduce} />
         </div>
 
         <div id="sw-date" className="min-w-0 rounded-[6px] border p-4 md:p-6" style={{ borderColor: C.line, background: C.paper }}>
@@ -335,82 +370,156 @@ export function SmallWeddingDemo() {
   );
 }
 
-/* 첫 화면 포스터: 사진 한 장 위에 문장. 문장 등장은 CSS 키프레임이라 스크립트가 없어도 끝 상태가 보인다 */
-const HERO_CSS = `
-@keyframes sw-rise {
-  from { opacity: 0; transform: translateY(12px); }
-  to { opacity: 1; transform: none; }
-}
-.sw-rise { animation: sw-rise ${RISE_MS}ms cubic-bezier(0.22, 1, 0.36, 1) ${RISE_DELAY_MS}ms both; }
-@media (prefers-reduced-motion: reduce) {
-  .sw-rise { animation: none; }
-}
-`;
+/* 첫 화면: 큰 공간 사진 + 아래 썸네일 투어 + 오른쪽 위 남은 날짜 상자.
+   실제 스몰웨딩 홀 사이트의 공간별 썸네일 홀 투어와 잔여 타임 공지를 한 화면에 모았다.
+   썸네일을 누르면 큰 사진이 그 장면으로 바뀌고(0.8초 교차), 홀 시간대 사진이면 아래 예약 현황의 시간대도 그 시간으로 맞춘다(그 날 비어 있을 때).
+   남은 날짜를 누르면 날짜와 시간대가 고른 값으로 바뀌고 방문 상담 신청으로 내려가 희망 예식일이 채워진다.
+   휴대폰은 사진 4:3, 남은 날짜는 썸네일 아래 가로로 넘기는 칩, 첫 화면이 보이는 동안 하단에 방문 상담 버튼을 고정한다.
+   모션: 사진만 1.04배에서 1.6초 동안 천천히 다가온다. 동작 줄이기면 멈춘 사진, 교차 없이 바로 바뀐다. */
+const VIEWS = [
+  { key: "table", img: "hero", label: "예식 테이블", line: "8인 원형 테이블, 꽃장식 기본 포함", slot: null as number | null },
+  ...SLOTS.map((s, i) => ({ key: s.img, img: s.img, label: `홀 ${s.time}`, line: `하객 ${HALL_MIN}명부터 ${HALL_MAX}명, ${s.note}`, slot: i as number | null })),
+];
 
-function Poster({ reduce, onCta }: { reduce: boolean; onCta: () => void }) {
+function Poster({
+  reduce,
+  today,
+  date,
+  slot,
+  onSlot,
+  onOpenDate,
+  go,
+}: {
+  reduce: boolean;
+  today: Date;
+  date: Date;
+  slot: number;
+  onSlot: (i: number) => void;
+  onOpenDate: (d: Date, i: number) => void;
+  go: (id: string) => void;
+}) {
+  const [view, setView] = useState(0);
   const ref = useRef<HTMLElement>(null);
-  const { scrollYProgress: p } = useScroll({ target: ref, offset: ["start start", "end start"] });
-  const photoY = useTransform(p, (v) => `${(v * 8).toFixed(2)}%`);
+  const inView = useInView(ref, { amount: 0.3 });
+  const v = VIEWS[view];
+
+  /* 앞으로 3개월 안 토, 일 중 남은 시간대. 가장 가까운 4개 */
+  const open: { d: Date; i: number }[] = [];
+  for (let n = 1; n <= 92 && open.length < 4; n++) {
+    const d = daysAgo(today, -n);
+    if (!isWeekend(d)) continue;
+    const i = SLOTS.findIndex((_, k) => !slotTaken(today, d, k));
+    if (i >= 0) open.push({ d, i });
+  }
+  const picked = (d: Date, i: number) => sameDay(d, date) && i === slot;
+  const dateBtn = (o: { d: Date; i: number }) => {
+    const on = picked(o.d, o.i);
+    return (
+      <button
+        key={o.d.getTime()}
+        type="button"
+        aria-pressed={on}
+        onClick={() => onOpenDate(o.d, o.i)}
+        className={`${focusRing} flex min-h-11 flex-none items-center justify-between gap-3 rounded-[4px] border px-3 py-2 text-left text-[15px]`}
+        style={{ borderColor: on ? C.olive : C.line, background: on ? C.olive : C.paper, color: on ? C.paper : C.ink, outlineColor: C.olive }}
+      >
+        <span className="font-bold tabular-nums">
+          {o.d.getMonth() + 1}월 {o.d.getDate()}일 ({DOW[o.d.getDay()]})
+        </span>
+        <span className="tabular-nums">{SLOTS[o.i].time}</span>
+      </button>
+    );
+  };
 
   return (
-    <section ref={ref} id="sw-poster" aria-labelledby="sw-poster-title" className="relative min-h-[100svh] overflow-hidden" style={{ background: "#2b2b2b" }}>
-      <style>{HERO_CSS}</style>
-      <motion.div
-        className="absolute inset-0"
-        initial={reduce ? false : { scale: 1.06 }}
-        animate={{ scale: 1 }}
-        transition={{ duration: reduce ? 0 : HERO_MS / 1000, ease: EASE }}
-        style={reduce ? undefined : { y: photoY }}
-      >
-        {/* eslint-disable-next-line @next/next/no-img-element -- 정적 export 라 next/image 최적화를 쓰지 않는다 */}
-        <img
-          src={`${IMG}/hero.jpg`}
-          srcSet={`${IMG}/hero-sm.jpg 960w, ${IMG}/hero.jpg 1920w`}
-          sizes="100vw"
-          alt="분홍 장미와 유칼립투스로 꾸민 예식 테이블과 하객 의자"
-          fetchPriority="high"
-          className="absolute inset-0 h-full w-full object-cover"
-          style={{ objectPosition: "55% 45%" }}
-        />
-      </motion.div>
-      {/* 글자 대비용 막. 꽃이 밝아서 아래쪽을 진하게 덮는다 */}
-      <div aria-hidden className="absolute inset-0" style={{ background: "linear-gradient(to top, rgba(0,0,0,0.72), rgba(0,0,0,0.32) 55%, rgba(0,0,0,0.18))" }} />
-
-      <div className="relative mx-auto flex min-h-[100svh] max-w-[1200px] flex-col px-4 md:px-6">
-        <div className="flex items-center justify-between gap-3 py-4">
-          <p className="leading-none">
-            <SampleLogo light small />
-          </p>
-          <button
-            type="button"
-            onClick={onCta}
-            data-gtm-cta="small-wedding_poster_cta"
-            className={`${btnBase} rounded-[6px] px-4 py-2 text-[15px]`}
-            style={{ background: C.olive, color: "#ffffff", outlineColor: "#ffffff", fontWeight: 600 }}
-          >
-            예약하기
-          </button>
-        </div>
-
-        <div className={`mt-auto pb-[10svh] ${reduce ? "" : "sw-rise"}`}>
-          <h1
-            id="sw-poster-title"
-            className="text-[36px] md:text-[clamp(40px,5vw,72px)]"
-            style={{ ...serif, fontWeight: 700, color: "#ffffff", letterSpacing: "-0.03em", lineHeight: 1.2, wordBreak: "keep-all" }}
-          >
-            하객 30명부터 120명,
-            <br />
-            홀 하나와 야외 정원
+    <section ref={ref} id="sw-poster" aria-labelledby="sw-poster-title" style={{ background: C.ivory }}>
+      <div className="mx-auto max-w-[1200px] px-4 pb-10 pt-5 md:px-6 md:pb-12 md:pt-6">
+        <div className="flex flex-wrap items-end justify-between gap-x-6 gap-y-1">
+          <h1 id="sw-poster-title" className="text-[24px] leading-[1.3] [word-break:keep-all] md:text-[32px]" style={{ ...serif, color: C.ink, letterSpacing: "-0.03em" }}>
+            하객 30명부터 120명, 홀 하나와 야외 정원
           </h1>
-          <p className="mt-4 text-[15px] md:text-[17px]" style={{ color: "rgba(255,255,255,0.86)", lineHeight: 1.5 }}>
+          <p className="text-[15px]" style={{ color: C.muted }}>
             {BRAND}, ㅇㅇ역 3번 출구 걸어서 5분
           </p>
         </div>
+
+        {/* 큰 사진 + 남은 날짜 상자(PC는 사진 오른쪽 위) */}
+        <div className="relative mt-4 aspect-[4/3] overflow-hidden rounded-[6px] md:aspect-auto md:h-[max(400px,calc(100svh-380px))]" style={{ background: C.ivoryDeep }}>
+          <motion.div className="absolute inset-0" initial={reduce ? false : { scale: 1.04 }} animate={{ scale: 1 }} transition={{ duration: reduce ? 0 : HERO_MS / 1000, ease: EASE }}>
+            {VIEWS.map((x, i) => (
+              // eslint-disable-next-line @next/next/no-img-element -- 정적 export 라 next/image 최적화를 쓰지 않는다
+              <img
+                key={x.key}
+                src={`${IMG}/${x.img}.jpg`}
+                srcSet={x.img === "hero" ? `${IMG}/hero-sm.jpg 960w, ${IMG}/hero.jpg 1920w` : undefined}
+                sizes="(min-width: 1200px) 1150px, 100vw"
+                alt={i === view ? (x.slot === null ? "분홍 장미와 유칼립투스로 꾸민 예식 테이블과 하객 의자" : `${SLOTS[x.slot].time} 예식 때 아치창으로 빛이 드는 홀`) : ""}
+                aria-hidden={i !== view}
+                fetchPriority={i === 0 ? "high" : undefined}
+                loading={i === 0 ? undefined : "lazy"}
+                className="absolute inset-0 h-full w-full object-cover"
+                style={{ objectPosition: "55% 45%", opacity: i === view ? 1 : 0, transition: reduce ? "none" : `opacity ${LIGHT_MS}ms ease` }}
+              />
+            ))}
+          </motion.div>
+          <div className="absolute right-4 top-4 hidden w-[260px] rounded-[6px] border p-4 md:block" style={{ background: C.paper, borderColor: C.line }}>
+            <p className="text-[15px] font-bold">남은 날짜</p>
+            <p className="mt-0.5 text-[13px]" style={{ color: C.muted }}>
+              3개월 안 토, 일
+            </p>
+            <div className="mt-3 grid gap-1.5">{open.map(dateBtn)}</div>
+          </div>
+        </div>
+
+        {/* 썸네일 투어 */}
+        <div role="group" aria-label="공간 사진" className="mt-3 grid grid-cols-5 gap-2 md:grid-cols-[repeat(5,minmax(0,168px))] md:gap-3">
+          {VIEWS.map((x, i) => {
+            const on = i === view;
+            return (
+              <button
+                key={x.key}
+                type="button"
+                aria-pressed={on}
+                onClick={() => {
+                  setView(i);
+                  if (x.slot !== null && !slotTaken(today, date, x.slot)) onSlot(x.slot);
+                }}
+                className={`${focusRing} min-w-0 text-left`}
+                style={{ outlineColor: C.olive }}
+              >
+                <span className="relative block aspect-[4/3] overflow-hidden rounded-[4px] border-2" style={{ borderColor: on ? C.olive : "transparent" }}>
+                  {/* eslint-disable-next-line @next/next/no-img-element -- 정적 export 라 next/image 최적화를 쓰지 않는다 */}
+                  <img src={`${IMG}/${x.img === "hero" ? "hero-sm" : x.img}.jpg`} alt="" aria-hidden loading="lazy" className="h-full w-full object-cover" />
+                </span>
+                <span className="mt-1 block truncate text-[13px] md:text-[15px]" style={{ fontWeight: on ? 700 : 400, color: on ? C.ink : C.body }}>
+                  {x.label}
+                </span>
+              </button>
+            );
+          })}
+        </div>
+        <p className="mt-2 text-[15px]" style={{ color: C.body }} aria-live="polite">
+          {v.label}, {v.line}
+        </p>
+
+        {/* 휴대폰: 남은 날짜 칩 */}
+        <div className="mt-4 md:hidden">
+          <p className="text-[15px] font-bold">남은 날짜</p>
+          <div className="-mx-4 mt-2 flex gap-2 overflow-x-auto px-4 pb-1">{open.map(dateBtn)}</div>
+        </div>
       </div>
+
+      {/* 휴대폰 하단 고정 바: 첫 화면이 보일 때만 */}
+      {inView && (
+        <div className="fixed inset-x-0 bottom-0 z-40 border-t px-4 pt-3 md:hidden" style={{ background: C.paper, borderColor: C.line, paddingBottom: "calc(12px + env(safe-area-inset-bottom))" }}>
+          <button type="button" onClick={() => go("sw-consult")} data-gtm-cta="small-wedding_poster_cta" className={`${btnBase} min-h-11 w-full rounded-[4px] text-[16px]`} style={{ background: C.olive, color: C.paper, outlineColor: C.olive, fontWeight: 600 }}>
+            방문 상담
+          </button>
+        </div>
+      )}
     </section>
   );
 }
-
 /* 겹침 섹션. 앞 섹션은 화면에 붙어 남고(화면보다 길면 바닥을 맞춰 붙는다), 이 섹션은 아래에서 올라오며
    위쪽이 clip-path로 가려져 있다가 위치에 따라 걷힌다. 가려지는 높이 = 섹션 윗변의 화면 위치라서 걷히는 선이 스크롤의 두 배 속도로 올라간다. */
 function Panel({ id, z, bg, color, reduce, children }: { id: string; z: number; bg: string; color: string; reduce: boolean; children: React.ReactNode }) {
@@ -492,32 +601,6 @@ function Roll({ text, reduce }: { text: string; reduce: boolean }) {
         })}
       </span>
     </span>
-  );
-}
-
-/* 홀 사진. 같은 홀을 시간대마다 찍은 사진 네 장을 겹쳐 두고 고른 시간대만 보인다 */
-function HallScene({ slot, reduce }: { slot: number; reduce: boolean }) {
-  return (
-    <figure className="mt-6">
-      <div className="relative aspect-[16/10] overflow-hidden rounded-[6px] border" style={{ borderColor: C.line, background: C.ivoryDeep }}>
-        {SLOTS.map((s, i) => (
-          <div key={s.time}>
-            {/* eslint-disable-next-line @next/next/no-img-element -- 정적 export 라 next/image 최적화를 쓰지 않는다 */}
-            <img
-              src={`${IMG}/${s.img}.jpg`}
-              alt={i === slot ? `${s.time} 예식 때 아치창으로 빛이 드는 홀` : ""}
-              aria-hidden={i !== slot}
-              loading="lazy"
-              className="absolute inset-0 h-full w-full object-cover"
-              style={{ opacity: i === slot ? 1 : 0, transition: reduce ? "none" : `opacity ${LIGHT_MS}ms ease` }}
-            />
-          </div>
-        ))}
-      </div>
-      <figcaption className="mt-2 text-[14px]" style={{ color: C.muted }}>
-        {SLOTS[slot].time} 예식, {SLOTS[slot].note}. 창은 남서쪽이라 오후에 빛이 깊게 들어와요.
-      </figcaption>
-    </figure>
   );
 }
 

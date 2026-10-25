@@ -1,8 +1,8 @@
 "use client";
 
 import { useEffect, useMemo, useRef, useState, type FormEvent, type KeyboardEvent, type ReactNode } from "react";
-import { animate, motion, useInView, useMotionTemplate, useMotionValue, useMotionValueEvent, useScroll, useTransform } from "framer-motion";
-import { Armchair, CalendarCheck, Check, ChevronsLeftRight, ChevronsRight, Clock, Coffee, MapPin, MessageCircle, Phone, ShieldCheck, SquareParking, TrainFront, Truck } from "lucide-react";
+import { motion, useInView, useMotionTemplate, useMotionValue, useMotionValueEvent } from "framer-motion";
+import { Armchair, CalendarCheck, Check, ChevronsLeftRight, ChevronsRight, Clock, Coffee, MapPin, Menu as MenuIcon, MessageCircle, Phone, ShieldCheck, SquareParking, TrainFront, Truck, X } from "lucide-react";
 import { useReducedMotionSafe } from "@/hooks/useReducedMotionSafe";
 import { daysAgo, fmtKo, useDemoToday } from "@/hooks/useDemoToday";
 import { maskName, maskPhone } from "@/components/demos/LeadReceivedPanel";
@@ -17,11 +17,8 @@ import { DemoMakerInfo } from "@/components/demos/DemoMakerInfo";
    관용 문구: 당일 예약 가능, 픽업 서비스, 보증서 발급, 입고 전날 확인 문자, 시공 중 차량 보관.
 
    핵심 모션
-   - 첫 화면(cd-poster): 광택 낸 차 사진 한 장이 화면을 채운다. 들어올 때 사진이 1.06배에서 1.6초 동안 천천히 다가오고,
-     문장과 정보 줄은 0.3초 늦게 12px 아래에서 올라온다(CSS 키프레임, 끝 상태가 기본값). 스크롤하면 사진만 8% 느리게 움직인다.
-   - 그 아래 차 그림이 스크롤에 따라 왼쪽부터 광택 입은 차로 바뀌고(clip-path), 바뀌는 자리에 빛줄기 하나가 지나간다.
-   - 비교 구역은 손으로 밀어 보는 비포 애프터 슬라이더.
-   동작 줄이기면 첫 화면은 멈춘 사진, 차 그림은 애프터 상태로 고정.
+   - 첫 화면(cd-poster): 화면 폭 비포 애프터 슬라이더(손으로 밀기, 키보드 좌우)와 바로 아래 차종, 시공 칩 가격 띠.
+     반복 움직임 없이 손잡이를 끄는 만큼만 움직인다.
 
    상호작용(모두 브라우저 안에서만 돈다. 실제로 보내지 않는다)
    1. 차종 고르기: 경차, 준중형, 중형, SUV, 대형. 차 윤곽과 요금 기준이 바뀐다.
@@ -75,7 +72,6 @@ type Look = {
   under: boolean;
 };
 
-const SHOWROOM: Look = { after: true, gloss: true, polish: true, interior: true, tintFront: false, tintSide: false, under: false };
 
 
 /* ---------- 시공 메뉴와 가격 ---------- */
@@ -200,36 +196,7 @@ export function CarDetailingDemo() {
 
   return (
     <div className="min-h-screen overflow-x-clip" style={{ background: C.bg, color: C.text }}>
-      <Poster reduce={reduce} todayHours={todayHours} onBook={() => go("cd-book")} />
-
-      <header className="mx-auto flex max-w-[1200px] items-center justify-between gap-3 px-4 py-4 md:px-6">
-        <a href="#cd-hero" onClick={(e) => { e.preventDefault(); window.scrollTo({ top: 0, behavior: reduce ? "auto" : "smooth" }); }} className={`inline-flex items-center gap-2 rounded-[4px] ${focusRing}`} style={{ outlineColor: C.accent }}>
-          <SampleLogo light />
-        </a>
-        <nav aria-label="주요 메뉴" className="hidden items-center gap-5 text-[15px] font-bold md:flex" style={{ color: C.muted }}>
-          {[
-            ["cd-menu", "시공 메뉴"],
-            ["cd-compare", "비포 애프터"],
-            ["cd-process", "시공 과정"],
-            ["cd-way", "오시는 길"],
-          ].map(([id, label]) => (
-            <button key={id} type="button" onClick={() => go(id)} className={`rounded-[4px] px-1 py-1 hover:text-[#f2f2f2] ${focusRing}`} style={{ outlineColor: C.accent }}>
-              {label}
-            </button>
-          ))}
-        </nav>
-        <button
-          type="button"
-          onClick={() => go("cd-book")}
-          data-gtm-cta="car-detailing_go_book"
-          className={`inline-flex flex-none items-center gap-1.5 rounded-[6px] px-4 py-2 text-[15px] font-semibold ${focusRing}`}
-          style={{ background: C.accent, color: C.accentInk, outlineColor: C.text }}
-        >
-          예약하기
-        </button>
-      </header>
-
-      <Hero type={type} setType={setType} reduce={reduce} todayHours={todayHours} onBook={() => go("cd-book")} />
+      <Poster reduce={reduce} type={type} setType={setType} picked={picked} toggle={toggle} sum={sum} look={afterLook} todayHours={todayHours} go={go} />
 
       {/* 시공 메뉴 */}
       <section id="cd-menu" aria-labelledby="cd-menu-title" className="mx-auto mt-8 max-w-[1200px] scroll-mt-4 px-4 md:mt-12 md:px-6">
@@ -305,11 +272,7 @@ export function CarDetailingDemo() {
         </div>
       </section>
 
-      {/* 비포 애프터 */}
-      <section id="cd-compare" aria-labelledby="cd-compare-title" className="mx-auto mt-16 max-w-[1200px] scroll-mt-4 px-4 md:mt-24 md:px-6">
-        <SectionTitle id="cd-compare-title" title="비포 애프터" side={sum.items.length ? sum.items.map((s) => s.name).join(", ") : "세차만"} />
-        <CompareSlider type={type} look={afterLook} reduce={reduce} />
-      </section>
+      {/* 비포 애프터는 첫 화면(cd-compare)으로 올렸다 */}
 
       {/* 예약 */}
       <section id="cd-book" aria-labelledby="cd-book-title" className="mx-auto mt-16 max-w-[1200px] scroll-mt-4 px-4 md:mt-24 md:px-6">
@@ -379,192 +342,198 @@ function SectionTitle({ id, title, side }: { id: string; title: string; side?: s
   );
 }
 
-/* ---------- 0. 첫 화면: 사진 한 장 ---------- */
+/* ---------- 0. 첫 화면: 비포 애프터 + 가격 띠 ---------- */
 
-/* 문장과 정보 줄 등장: 0.3초 뒤 0.7초 동안 12px 아래에서 올라온다. 끝 상태가 기본값이라 JS 없이도 보인다. */
-const POSTER_CSS = `
-@keyframes cd-rise { from { opacity: 0; transform: translateY(12px); } }
-.cd-rise { animation: cd-rise 0.7s cubic-bezier(0.22, 1, 0.36, 1) 0.3s both; }
-@media (prefers-reduced-motion: reduce) { .cd-rise { animation: none !important; } }
-`;
+/* 실제 디테일링 샵 사이트의 전후 비교 슬라이더와 차종별 가격표를 첫 화면 한 줄로 합쳤다.
+   화면 폭 비교 사진(가운데 손잡이를 끌거나 키보드 좌우) 아래에 붙은 띠에서 차종과 시공을 고르면
+   오른쪽 합계와 소요 시간이 바로 바뀐다. 고른 값은 아래 시공 메뉴, 예약과 같은 상태라 그대로 이어진다.
+   휴대폰은 칩 두 줄을 가로로 넘기고, 첫 화면이 보이는 동안 합계와 예약 버튼을 하단에 고정한다. */
+const HERO_SVCS = ["coat1", "coat3", "pol1", "interior", "tintS", "under"];
+const CD_MENU: [string, string][] = [
+  ["cd-menu", "시공 메뉴"],
+  ["cd-process", "시공 과정"],
+  ["cd-warranty", "보증 안내"],
+  ["cd-way", "오시는 길"],
+];
 
-function Poster({ reduce, todayHours, onBook }: { reduce: boolean; todayHours: { open: string }; onBook: () => void }) {
-  const wrapRef = useRef<HTMLElement>(null);
-  const { scrollYProgress } = useScroll({ target: wrapRef, offset: ["start start", "end start"] });
-  const photoY = useTransform(scrollYProgress, (v) => `${v * 8}%`);
+function Poster({
+  reduce,
+  type,
+  setType,
+  picked,
+  toggle,
+  sum,
+  look,
+  todayHours,
+  go,
+}: {
+  reduce: boolean;
+  type: CarType;
+  setType: (t: CarType) => void;
+  picked: Set<string>;
+  toggle: (s: Svc) => void;
+  sum: ReturnType<typeof summarize>;
+  look: Look;
+  todayHours: { open: string };
+  go: (id: string) => void;
+}) {
+  const [menu, setMenu] = useState(false);
+  const ref = useRef<HTMLElement>(null);
+  const inView = useInView(ref, { amount: 0.3 });
+  const ti = CAR_TYPES.indexOf(type);
+  const nav = (id: string) => {
+    setMenu(false);
+    go(id);
+  };
+  const chip = (on: boolean) => ({
+    className: `min-h-11 flex-none rounded-[6px] border px-3.5 text-[15px] font-semibold transition-colors duration-150 ${focusRing}`,
+    style: { borderColor: on ? C.accent : C.line, background: on ? C.accent : "transparent", color: on ? C.accentInk : C.text, outlineColor: C.accent },
+  });
+  const price = sum.items.length ? won(sum.total) : "시공 선택 없음";
 
   return (
-    <section ref={wrapRef} id="cd-poster" aria-labelledby="cd-poster-title" className="relative min-h-[100svh] overflow-hidden" style={{ background: C.bg }}>
-      <style>{POSTER_CSS}</style>
-      <motion.div className="absolute inset-0" style={reduce ? undefined : { y: photoY }}>
-        <motion.div className="absolute inset-0" initial={reduce ? false : { scale: 1.06 }} animate={{ scale: 1 }} transition={{ duration: reduce ? 0 : 1.6, ease: EASE }}>
-          {/* eslint-disable-next-line @next/next/no-img-element -- 정적 export 라 next/image 최적화를 쓰지 않는다 */}
-          <img
-            src={`${IMG}/hero.jpg`}
-            srcSet={`${IMG}/hero-sm.jpg 960w, ${IMG}/hero.jpg 1920w`}
-            sizes="100vw"
-            alt="조명 아래 보닛에 천장 불빛이 비치는 검정 스포츠카 정면"
-            fetchPriority="high"
-            className="absolute inset-0 h-full w-full object-cover"
-            style={{ objectPosition: "50% 68%" }}
-          />
-        </motion.div>
-      </motion.div>
-      <div
-        className="absolute inset-0"
-        style={{ background: "linear-gradient(to bottom, rgba(0,0,0,0.55), rgba(0,0,0,0.15) 25%, rgba(0,0,0,0.2) 50%, rgba(0,0,0,0.8))" }}
-        aria-hidden
-      />
-
-      {/* 상호와 예약 버튼 */}
-      <div className="absolute inset-x-0 top-0 z-10 mx-auto flex max-w-[1200px] items-center justify-between px-4 pt-4 md:px-6 md:pt-6">
-        <p>
+    <section ref={ref} id="cd-poster" aria-labelledby="cd-poster-title" style={{ background: C.bg }}>
+      <header className="relative z-20 border-b" style={{ borderColor: C.line }}>
+        <div className="mx-auto flex h-16 max-w-[1200px] items-center justify-between gap-3 px-4 md:px-6">
           <SampleLogo light small />
-        </p>
-        <button
-          type="button"
-          onClick={onBook}
-          data-gtm-cta="car-detailing_poster_cta"
-          className={`inline-flex items-center gap-1.5 rounded-[6px] px-4 py-2.5 text-[15px] font-semibold ${focusRing}`}
-          style={{ background: C.accent, color: C.accentInk, outlineColor: C.text }}
-        >
-          <CalendarCheck size={17} aria-hidden />
-          예약하기
-        </button>
-      </div>
-
-      <div className="relative z-10 mx-auto flex min-h-[100svh] max-w-[1200px] flex-col justify-end px-4 pb-14 pt-28 md:px-6 md:pb-20">
-        <div className={reduce ? undefined : "cd-rise"}>
-          <h1
-            id="cd-poster-title"
-            className="text-[36px] font-bold leading-[1.2] tracking-[-0.03em] [word-break:keep-all] md:text-[clamp(40px,5vw,72px)]"
-            style={{ color: C.text }}
-          >
-            유리막 코팅부터
-            <br />
-            실내 세차까지
-          </h1>
-          <p className="mt-4 inline-flex items-center gap-1.5 text-[15px] font-medium md:mt-5 md:text-[17px]" style={{ color: "#d6d6d6" }}>
-            <Clock size={16} aria-hidden />
-            오늘 {todayHours.open === "휴무" ? "휴무" : `${todayHours.open} 영업`}
-          </p>
-        </div>
-      </div>
-    </section>
-  );
-}
-
-/* ---------- 1. 스크롤 광택 와이프 ---------- */
-
-function Hero({ type, setType, reduce, todayHours, onBook }: { type: CarType; setType: (t: CarType) => void; reduce: boolean; todayHours: { label: string; open: string }; onBook: () => void }) {
-  const sceneRef = useRef<HTMLDivElement>(null);
-  // 장면 높이 220vh. 꼭대기가 화면 위에 닿을 때 0, 바닥이 화면 아래에 닿을 때 1.
-  const { scrollYProgress } = useScroll({ target: sceneRef, offset: ["start start", "end end"] });
-  // PC: 진행 0.05~0.8 사이에 왼쪽부터 오른쪽으로 애프터가 덧씌워진다.
-  // 휴대폰: 고정 스크롤 장면을 두지 않고, 화면에 들어오면 2.4초 동안 저절로 덧씌운다(장면 아래가 비어 보이지 않게).
-  const [desk, setDesk] = useState(true);
-  useEffect(() => {
-    const m = window.matchMedia("(min-width: 768px)");
-    const sync = () => setDesk(m.matches);
-    sync();
-    m.addEventListener("change", sync);
-    return () => m.removeEventListener("change", sync);
-  }, []);
-  const scrollWipe = useTransform(scrollYProgress, [0.05, 0.8], [0, 100]);
-  const autoWipe = useMotionValue(0);
-  const inView = useInView(sceneRef, { once: true, amount: 0.6 });
-  useEffect(() => {
-    if (desk || reduce || !inView) return;
-    const c = animate(autoWipe, 100, { duration: 2.4, delay: 0.4, ease: "easeInOut" });
-    return () => c.stop();
-  }, [desk, reduce, inView, autoWipe]);
-  const wipe = useTransform<number, number>([scrollWipe, autoWipe], ([sv, av]) => (desk ? sv : av));
-  const rest = useTransform(wipe, (v) => 100 - v);
-  const clip = useMotionTemplate`inset(0 ${rest}% 0 0)`;
-  const beamLeft = useMotionTemplate`${wipe}%`;
-  const beamOp = useTransform(wipe, (v) => (v <= 0 || v >= 100 ? 0 : Math.min(1, v / 2, (100 - v) / 4)));
-  const clamp01 = (v: number) => Math.max(0, Math.min(1, v));
-  const hint = useTransform(wipe, (v) => clamp01(1 - v / 8));
-  const afterLabelOp = useTransform(wipe, (v) => clamp01(v / 30));
-  const beforeLabelOp = useTransform(wipe, (v) => clamp01((100 - v) / 30));
-
-  return (
-    <div ref={sceneRef} id="cd-hero" className={reduce ? "" : "md:h-[220vh]"}>
-      <div className={`${reduce ? "" : "md:sticky md:top-0 md:min-h-[100svh]"} mx-auto flex max-w-[1200px] flex-col justify-start px-4 pb-6 pt-3 md:justify-center md:px-6`}>
-        <div className="flex flex-wrap items-end justify-between gap-x-6 gap-y-2">
-          <h2 className="text-[30px] font-bold leading-[1.15] tracking-[-0.02em] md:text-[44px]">
-            {BRAND}
-          </h2>
-          <p className="inline-flex items-center gap-1.5 text-[15px] font-bold" style={{ color: C.muted }}>
-            <Clock size={16} aria-hidden style={{ color: C.accent }} />
-            오늘 {todayHours.open === "휴무" ? "휴무" : `${todayHours.open} 영업`}
-          </p>
-        </div>
-
-        <div className="relative mt-3 overflow-hidden rounded-[8px] md:mt-5" style={{ background: `radial-gradient(ellipse at 50% 100%, ${C.panel2} 0%, ${C.bg} 70%)` }}>
-          <div className="relative aspect-[1344/576] w-full">
-            <CarPhoto type={type} before className="absolute inset-0" />
-            <motion.div className="absolute inset-0" style={{ clipPath: reduce ? "inset(0 0 0 0)" : clip }}>
-              <CarPhoto type={type} look={SHOWROOM} className="absolute inset-0" />
-            </motion.div>
-            {!reduce && (
-              <>
-                <motion.div
-                  aria-hidden
-                  className="pointer-events-none absolute inset-y-0 w-[5%] -translate-x-1/2 -skew-x-[14deg]"
-                  style={{ left: beamLeft, opacity: beamOp, background: "linear-gradient(90deg, rgba(255,255,255,0) 0%, rgba(255,255,255,0.6) 50%, rgba(255,255,255,0) 100%)", mixBlendMode: "screen" }}
-                />
-              </>
-            )}
-            <motion.div className="absolute left-3 top-3 text-[12px] font-semibold tracking-wide md:left-4 md:top-4 md:text-[13px]" style={{ color: C.muted, opacity: reduce ? 0 : beforeLabelOp }}>
-              비포
-            </motion.div>
-            <motion.div className="absolute right-3 top-3 text-[12px] font-semibold tracking-wide md:right-4 md:top-4 md:text-[13px]" style={{ color: C.accent, opacity: reduce ? 1 : afterLabelOp }}>
-              애프터
-            </motion.div>
-          </div>
-        </div>
-        {!reduce && desk && (
-          <motion.p aria-hidden className="pointer-events-none mt-2 h-5 text-center text-[13px] font-bold" style={{ color: C.muted, opacity: hint }}>
-            아래로 내리면 광택이 올라와요
-          </motion.p>
-        )}
-
-        <div className="mt-3 flex flex-wrap items-center justify-between gap-3 md:mt-4">
-          <div id="cd-size" role="group" aria-label="차종" className="flex flex-wrap gap-1.5">
-            {CAR_TYPES.map((t) => {
-              const on = t === type;
-              return (
-                <button
-                  key={t}
-                  type="button"
-                  aria-pressed={on}
-                  onClick={() => setType(t)}
-                  className={`rounded-[6px] border px-3.5 py-1.5 text-[15px] font-semibold transition-colors duration-150 ${focusRing}`}
-                  style={{ borderColor: on ? C.accent : C.line, background: on ? C.accent : "transparent", color: on ? C.accentInk : C.text, outlineColor: C.accent }}
-                >
-                  {t}
-                </button>
-              );
-            })}
-          </div>
-          <div className="flex flex-wrap gap-2">
-            <a href={`tel:${TEL.replace(/-/g, "")}`} className={`inline-flex items-center gap-1.5 rounded-[6px] border px-4 py-2.5 text-[15px] font-bold ${focusRing}`} style={{ borderColor: C.line, outlineColor: C.accent }}>
-              <Phone size={16} aria-hidden /> 전화
+          <nav aria-label="주요 메뉴" className="hidden items-center gap-1 text-[15px] font-bold md:flex" style={{ color: C.muted }}>
+            {CD_MENU.map(([id, label]) => (
+              <button key={id} type="button" onClick={() => nav(id)} className={`min-h-11 rounded-[4px] px-3 hover:text-[#f2f2f2] ${focusRing}`} style={{ outlineColor: C.accent }}>
+                {label}
+              </button>
+            ))}
+          </nav>
+          <div className="flex items-center gap-2">
+            <a href={`tel:${TEL.replace(/-/g, "")}`} aria-label={`전화 ${TEL}`} className={`hidden min-h-11 items-center gap-1.5 rounded-[6px] border px-3 text-[15px] font-bold sm:inline-flex ${focusRing}`} style={{ borderColor: C.line, outlineColor: C.accent }}>
+              <Phone size={16} aria-hidden /> {TEL}
             </a>
-            <button type="button" className={`inline-flex items-center gap-1.5 rounded-[6px] border px-4 py-2.5 text-[15px] font-bold ${focusRing}`} style={{ borderColor: C.line, outlineColor: C.accent }} data-gtm-cta="car-detailing_kakao">
-              <MessageCircle size={16} aria-hidden /> 카카오톡 채널
+            <button type="button" onClick={() => go("cd-book")} data-gtm-cta="car-detailing_poster_cta" className={`inline-flex min-h-11 items-center gap-1.5 rounded-[6px] px-4 text-[15px] font-semibold ${focusRing}`} style={{ background: C.accent, color: C.accentInk, outlineColor: C.text }}>
+              <CalendarCheck size={17} aria-hidden />
+              예약
             </button>
-            <button type="button" onClick={onBook} data-gtm-cta="car-detailing_hero_book" className={`inline-flex items-center gap-1.5 rounded-[6px] px-4 py-2.5 text-[15px] font-semibold ${focusRing}`} style={{ background: C.accent, color: C.accentInk, outlineColor: C.text }}>
+            <button
+              type="button"
+              aria-expanded={menu}
+              aria-controls="cd-menu-list"
+              aria-label={menu ? "메뉴 닫기" : "메뉴 열기"}
+              onClick={() => setMenu((v) => !v)}
+              className={`inline-flex h-11 w-11 items-center justify-center rounded-[6px] border md:hidden ${focusRing}`}
+              style={{ borderColor: C.line, outlineColor: C.accent }}
+            >
+              {menu ? <X size={20} aria-hidden /> : <MenuIcon size={20} aria-hidden />}
+            </button>
+          </div>
+        </div>
+        {menu && (
+          <nav id="cd-menu-list" aria-label="메뉴 펼침" className="absolute inset-x-0 top-full border-b px-4 pb-4 pt-2 md:hidden" style={{ background: C.panel, borderColor: C.line }}>
+            <ul className="grid gap-1">
+              {CD_MENU.map(([id, label]) => (
+                <li key={id}>
+                  <button type="button" onClick={() => nav(id)} className={`flex min-h-11 w-full items-center rounded-[4px] px-3 text-left text-[16px] font-bold ${focusRing}`} style={{ outlineColor: C.accent }}>
+                    {label}
+                  </button>
+                </li>
+              ))}
+              <li>
+                <a href={`tel:${TEL.replace(/-/g, "")}`} className={`flex min-h-11 w-full items-center gap-2 rounded-[4px] px-3 text-[16px] font-bold ${focusRing}`} style={{ outlineColor: C.accent }}>
+                  <Phone size={16} aria-hidden /> 전화 {TEL}
+                </a>
+              </li>
+            </ul>
+          </nav>
+        )}
+      </header>
+
+      <div className="mx-auto max-w-[1200px] px-4 pt-4 md:px-6 md:pt-6">
+        {/* 상호와 영업시간은 작게, 비교 사진 위 왼쪽 */}
+        <div id="cd-compare" className="relative scroll-mt-4">
+          {/* 상호 판: 휴대폰은 사진 위 한 줄, PC는 사진 왼쪽 위에 작게 */}
+          <div className="pointer-events-none mb-3 flex flex-wrap items-baseline justify-between gap-x-3 md:absolute md:left-4 md:top-4 md:z-10 md:mb-0 md:block md:rounded-[4px] md:bg-[rgba(20,20,20,0.86)] md:px-3 md:py-2">
+            <h1 id="cd-poster-title" className="text-[20px] font-bold leading-[1.35] md:text-[18px]">
+              유리막 코팅부터 실내 세차까지
+            </h1>
+            <p className="mt-0.5 inline-flex items-center gap-1 text-[14px]" style={{ color: C.muted }}>
+              <Clock size={14} aria-hidden />
+              오늘 {todayHours.open === "휴무" ? "휴무" : `${todayHours.open} 영업`}
+            </p>
+          </div>
+          <CompareSlider type={type} look={look} reduce={reduce} bare />
+        </div>
+
+        {/* 사진 아래 가격 띠 */}
+        <div className="mt-2 grid gap-4 rounded-[8px] border p-4 md:p-5 lg:grid-cols-[minmax(0,1fr)_300px] lg:items-center" style={{ borderColor: C.line, background: C.panel2 }}>
+          <div className="grid min-w-0 gap-3">
+            <div className="flex min-w-0 items-center gap-3">
+              <span className="w-10 flex-none text-[14px] font-bold" style={{ color: C.muted }}>
+                차종
+              </span>
+              <div id="cd-size" role="group" aria-label="차종" className="-my-1 flex min-w-0 gap-1.5 overflow-x-auto py-1">
+                {CAR_TYPES.map((t) => {
+                  const on = t === type;
+                  const c = chip(on);
+                  return (
+                    <button key={t} type="button" aria-pressed={on} onClick={() => setType(t)} className={c.className} style={c.style}>
+                      {t}
+                    </button>
+                  );
+                })}
+              </div>
+            </div>
+            <div className="flex min-w-0 items-center gap-3">
+              <span className="w-10 flex-none text-[14px] font-bold" style={{ color: C.muted }}>
+                시공
+              </span>
+              <div role="group" aria-label="시공" className="-my-1 flex min-w-0 gap-1.5 overflow-x-auto py-1">
+                {SERVICES.filter((s) => HERO_SVCS.includes(s.id)).map((s) => {
+                  const on = picked.has(s.id);
+                  // 코팅에는 광택이 들어 있어 코팅을 고르면 광택 칩은 포함 표시만 한다
+                  const included = s.group === "polish" && (picked.has("coat1") || picked.has("coat3"));
+                  const c = chip(on);
+                  return (
+                    <button key={s.id} type="button" aria-pressed={on} aria-disabled={included || undefined} onClick={() => !included && toggle(s)} className={`${c.className} ${included ? "cursor-default" : ""}`} style={{ ...c.style, color: included ? C.muted : c.style.color }}>
+                      {included ? `${s.name} 포함` : s.name}
+                    </button>
+                  );
+                })}
+              </div>
+            </div>
+          </div>
+          <div className="hidden items-center justify-between gap-4 border-t pt-4 md:flex lg:border-l lg:border-t-0 lg:pl-5 lg:pt-0" style={{ borderColor: C.line }} aria-live="polite">
+            <p>
+              <span className="block text-[13px]" style={{ color: C.muted }}>
+                {type} 기준{sum.items.length ? `, ${sum.duration}` : ""}
+              </span>
+              <span className="block text-[22px] font-bold tabular-nums">{price}</span>
+            </p>
+            <button type="button" onClick={() => go("cd-book")} data-gtm-cta="car-detailing_strip_book" className={`inline-flex min-h-11 flex-none items-center rounded-[6px] px-4 text-[15px] font-semibold ${focusRing}`} style={{ background: C.accent, color: C.accentInk, outlineColor: C.text }}>
               예약하기
             </button>
           </div>
         </div>
+        <p className="mt-2 pb-8 text-[13px] md:pb-10 md:text-right" style={{ color: C.muted }}>
+          {sum.items.length ? sum.items.map((s) => `${s.name} ${won(s.price[ti])}`).join(", ") : "부가세 포함, 도장 상태에 따라 현장에서 조정"}
+        </p>
       </div>
-    </div>
+
+      {/* 휴대폰 하단 고정 바: 첫 화면이 보일 때만 */}
+      {inView && (
+        <div className="fixed inset-x-0 bottom-0 z-40 border-t px-4 pt-3 md:hidden" style={{ background: C.panel, borderColor: C.line, paddingBottom: "calc(12px + env(safe-area-inset-bottom))" }}>
+          <div className="flex items-center justify-between gap-3" aria-live="polite">
+            <p className="min-w-0">
+              <span className="block text-[13px]" style={{ color: C.muted }}>
+                {type} 기준{sum.items.length ? `, ${sum.duration}` : ""}
+              </span>
+              <span className="block truncate text-[17px] font-bold tabular-nums">{price}</span>
+            </p>
+            <button type="button" onClick={() => go("cd-book")} className={`inline-flex min-h-11 flex-none items-center rounded-[6px] px-4 text-[15px] font-semibold ${focusRing}`} style={{ background: C.accent, color: C.accentInk, outlineColor: C.text }}>
+              예약하기
+            </button>
+          </div>
+        </div>
+      )}
+    </section>
   );
 }
-
 /* ---------- 차 사진 ---------- */
 
 /** 차종별 옆모습 사진. 비포(-before)는 같은 사진에 바랜 도장, 물때, 흙먼지를 입혀 만들어 슬라이더로 밀어도 차 위치가 맞는다 */
@@ -595,7 +564,8 @@ function CarPhoto({ type, before, look, className = "" }: { type: CarType; befor
 
 /* ---------- 3. 비포 애프터 슬라이더 ---------- */
 
-function CompareSlider({ type, look, reduce }: { type: CarType; look: Look; reduce: boolean }) {
+/** bare 는 첫 화면용. 아래 설명 줄을 빼고, 비포 애프터 꼬리표를 아래 모서리로 내린다(왼쪽 위에 상호 판이 올라간다) */
+function CompareSlider({ type, look, bare = false }: { type: CarType; look: Look; reduce?: boolean; bare?: boolean }) {
   const boxRef = useRef<HTMLDivElement>(null);
   const handleRef = useRef<HTMLDivElement>(null);
   const pos = useMotionValue(50);
@@ -625,7 +595,7 @@ function CompareSlider({ type, look, reduce }: { type: CarType; look: Look; redu
   };
 
   return (
-    <div className="mt-5">
+    <div className={bare ? "" : "mt-5"}>
       <div
         ref={boxRef}
         className="relative select-none overflow-hidden rounded-[8px]"
@@ -650,10 +620,10 @@ function CompareSlider({ type, look, reduce }: { type: CarType; look: Look; redu
           <motion.div className="absolute inset-0" style={{ clipPath: clip }}>
             <CarPhoto type={type} look={look} className="absolute inset-0" />
           </motion.div>
-          <span className="pointer-events-none absolute left-3 top-3 rounded-[4px] px-2 py-0.5 text-[12px] font-semibold md:left-4 md:top-4 md:text-[13px]" style={{ background: "rgba(21,23,26,0.8)", color: C.text }}>
+          <span className={`pointer-events-none absolute left-3 rounded-[4px] px-2 py-0.5 text-[12px] font-semibold md:left-4 md:text-[13px] ${bare ? "bottom-3 md:bottom-4" : "top-3 md:top-4"}`} style={{ background: "rgba(21,23,26,0.8)", color: C.text }}>
             비포
           </span>
-          <span className="pointer-events-none absolute right-3 top-3 rounded-[4px] px-2 py-0.5 text-[12px] font-semibold md:right-4 md:top-4 md:text-[13px]" style={{ background: C.accent, color: C.accentInk }}>
+          <span className={`pointer-events-none absolute right-3 rounded-[4px] px-2 py-0.5 text-[12px] font-semibold md:right-4 md:text-[13px] ${bare ? "bottom-3 md:bottom-4" : "top-3 md:top-4"}`} style={{ background: C.accent, color: C.accentInk }}>
             애프터
           </span>
           {/* 핸들: 세로 선과 둥근 손잡이. 키보드 좌우로도 움직인다. */}
@@ -677,7 +647,7 @@ function CompareSlider({ type, look, reduce }: { type: CarType; look: Look; redu
           </motion.div>
         </div>
       </div>
-      <dl className="mt-3 grid gap-x-6 gap-y-1 text-[14px] sm:grid-cols-2" style={{ color: C.muted }}>
+      <dl className={`mt-3 grid gap-x-6 gap-y-1 text-[14px] sm:grid-cols-2 ${bare ? "sr-only" : ""}`} style={{ color: C.muted }}>
         <div className="flex gap-2">
           <dt className="font-bold" style={{ color: C.text }}>
             비포
