@@ -878,7 +878,7 @@ export function FurnitureWorkshopDemo() {
                 </motion.div>
               ) : (
                 <motion.div key="form" initial={reduce ? false : { opacity: 0, y: 8 }} animate={{ opacity: 1, y: 0 }} exit={reduce ? { opacity: 0 } : { opacity: 0, y: -8 }} transition={{ duration: 0.25, ease: EASE }}>
-                  <InquiryForm today={today} spec={`${kind.name} ${dims.w}x${dims.d}x${dims.h} ${wood.name}`} onDone={(r) => setReceipt(r)} />
+                  <InquiryForm today={today} spec={`${kind.name} ${dims.w} x ${dims.d} x ${dims.h} ${wood.name}`} onDone={(r) => setReceipt(r)} />
                 </motion.div>
               )}
             </AnimatePresence>
