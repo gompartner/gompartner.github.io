@@ -220,7 +220,7 @@ export const tours: Record<string, TourStep[]> = {
     { target: "#ns-reserve", title: "예약하기", desc: "날짜, 시간, 담당을 고르고 저장한 디자인을 첨부하세요." },
   ],
   "car-detailing": [
-    { target: "#cd-size", title: "차종 고르기", desc: "차종을 누르면 차 윤곽과 요금 기준이 바뀌어요." },
+    { target: "#cd-size", title: "차종 고르기", desc: "차종을 누르면 차 사진과 요금이 바뀌어요." },
     { target: "#cd-menu", title: "시공 메뉴", desc: "메뉴를 여러 개 골라 합계와 소요 시간을 보세요." },
     { target: "#cd-compare", title: "비포 애프터", desc: "가운데 손잡이를 좌우로 밀어 보세요." },
     { target: "#cd-book", title: "예약하기", desc: "입고 날짜와 시간을 고르고 예약 접수를 누르세요." },

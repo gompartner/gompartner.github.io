@@ -250,9 +250,9 @@ const NAV: [string, string][] = [
 
 /** 첫 화면 상태 목록. 고르면 맞는 병실, 진료, 간병 방식과 월 예상 비용이 바뀐다 */
 const STATES: { cond: (typeof CONDITIONS)[number]; room: RoomId; care: string; who: string; photo: string; alt: string }[] = [
-  { cond: "뇌졸중 후 재활", room: "4", care: "재활의학과 진료, 하루 두 번 재활치료", who: "박ㅈ우 진료과장, 재활의학과 전문의", photo: "staff-2.jpg", alt: "재활의학과 박ㅈ우 진료과장" },
+  { cond: "뇌졸중 후 재활", room: "4", care: "재활의학과 진료, 하루 두 번 재활치료", who: "박ㅅ영 진료과장, 재활의학과 전문의", photo: "staff-2.jpg", alt: "재활의학과 박ㅅ영 진료과장" },
   { cond: "치매 증상", room: "6", care: "내과 진료, 낙상 예방과 투약 관리", who: "김ㅎ늘 병원장, 내과 전문의", photo: "staff-1.jpg", alt: "내과 김ㅎ늘 병원장" },
-  { cond: "수술 후 회복", room: "4", care: "재활의학과 진료, 통증 조절과 보행 연습", who: "박ㅈ우 진료과장, 재활의학과 전문의", photo: "staff-2.jpg", alt: "재활의학과 박ㅈ우 진료과장" },
+  { cond: "수술 후 회복", room: "4", care: "재활의학과 진료, 통증 조절과 보행 연습", who: "박ㅅ영 진료과장, 재활의학과 전문의", photo: "staff-2.jpg", alt: "재활의학과 박ㅅ영 진료과장" },
   { cond: "욕창 관리", room: "2", care: "가정의학과 진료, 두 시간마다 자세 바꾸기", who: "이ㅅ연 진료과장, 가정의학과 전문의", photo: "staff-3.jpg", alt: "가정의학과 이ㅅ연 진료과장" },
   { cond: "거동이 불편해요", room: "6", care: "내과 진료, 식사와 이동 도움", who: "병동 간호사, 요양보호사", photo: "hero.jpg", alt: "병상 위 어르신 손을 보호사가 두 손으로 감싸 쥔 모습" },
 ];
@@ -894,7 +894,7 @@ function MealSection({ today }: { today: Date }) {
 function Doctors() {
   const list = [
     ["김ㅎ늘", "병원장", "내과 전문의", "내과, 만성질환 관리"],
-    ["박ㅈ우", "진료과장", "재활의학과 전문의", "뇌졸중, 골절 후 재활"],
+    ["박ㅅ영", "진료과장", "재활의학과 전문의", "뇌졸중, 골절 후 재활"],
     ["이ㅅ연", "진료과장", "가정의학과 전문의", "영양, 통증 관리"],
   ];
   return (
