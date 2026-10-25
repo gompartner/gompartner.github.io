@@ -1,7 +1,7 @@
 "use client";
 
-import { useEffect, useMemo, useRef, useState, type CSSProperties, type FormEvent } from "react";
-import { AnimatePresence, motion, useScroll, useTransform } from "framer-motion";
+import { useEffect, useMemo, useState, type CSSProperties, type FormEvent } from "react";
+import { AnimatePresence, motion } from "framer-motion";
 import { CalendarCheck, Car, Check, ChevronDown, Clock, MapPin, MessageCircle, Phone, RotateCcw } from "lucide-react";
 import { useReducedMotionSafe } from "@/hooks/useReducedMotionSafe";
 import { daysAgo, fmtDot, fmtKo, useDemoToday } from "@/hooks/useDemoToday";
@@ -23,9 +23,8 @@ import { DemoMakerInfo } from "@/components/demos/DemoMakerInfo";
    3. 체험 레슨 신청: 과정, 나이, 날짜, 시간, 이름, 연락처. 완료하면 접수 번호, 담당 창구, 회신 예정일.
    4. 연주회 소식: 다음 정기 연주회 날짜와 남은 날, 공지 펼쳐 보기, 과정별 연주곡.
 
-   첫 화면(pa-poster): 피아노 건반 위 손 사진 한 장을 화면 가득 깔고 왼쪽 아래에 문장 "원장 선생님과 1:1 개인 레슨"를 둔다.
-   핵심 모션: 들어올 때 사진이 1.6초 동안 천천히 다가오고(scale 1.06 에서 1), 문장은 0.3초 늦게 아래 12px 에서 올라온다(CSS).
-   스크롤하면 사진만 조금 느리게 내려간다(y 0 에서 8%). 동작 줄이기면 전부 멈춘 상태로 둔다.
+   첫 화면(pa-poster): 메뉴 줄, 막 없는 레슨실 사진 띠, 그 아래 제목과 나이 칩 다섯 개, 고른 나이의 과정 카드.
+   핵심 모션: 사진만 1.6초 동안 천천히 다가오고(scale 1.06 에서 1), 카드 내용은 0.2초 겹쳐 바뀐다. 동작 줄이기면 전부 멈춘 상태로 둔다.
    사진 출처: Pexels 사진 34767574 */
 
 const TEL = "02-000-0000";
@@ -59,8 +58,7 @@ const EASE = [0.22, 1, 0.36, 1] as const;
 /** 첫 화면 사진이 다가오는 시간(초) */
 const PHOTO_IN = 1.6;
 /** 사진 위 막. 왼쪽 아래를 어둡게 해 흰 글자 대비를 맞춘다 */
-const SCRIM = "linear-gradient(to top, rgba(0,0,0,0.72), rgba(0,0,0,0.3) 55%, rgba(0,0,0,0.15)), linear-gradient(to right, rgba(0,0,0,0.35), rgba(0,0,0,0) 65%)";
-const POSTER_CSS = `@keyframes pa-rise{from{opacity:0;transform:translateY(12px)}}.pa-rise{animation:pa-rise .7s cubic-bezier(0.22,1,0.36,1) .3s both}@media (prefers-reduced-motion:reduce){.pa-rise{animation:none}}`;
+const POSTER_CSS = `@keyframes pa-in{from{transform:scale(1.06)}}.pa-in{animation:pa-in ${PHOTO_IN}s cubic-bezier(0.22,1,0.36,1) both}@media (prefers-reduced-motion:reduce){.pa-in{animation:none}}`;
 const IMG = "/images/demo-piano-academy";
 /** 과정 바꿀 때 오선 위 선이 이어지는 시간(초) */
 const STAFF_DUR = 0.7;
@@ -224,6 +222,15 @@ export function PianoAcademyDemo() {
   const reduce = useReducedMotionSafe();
 
   const [courseId, setCourseId] = useState<CourseId>("beyer");
+  /* 첫 화면 나이 칩과 체험 레슨 신청의 나이는 같은 값이다 */
+  const [age, setAge] = useState(AGES[1]);
+  /* 아래 구간에서 성인 과정과 유초등 과정을 오가면 첫 화면 나이도 따라 바꾼다 */
+  const pickCourseId = (id: CourseId) => {
+    setCourseId(id);
+    const adult = courseOf(id).who === "adult";
+    if (adult) setAge("성인");
+    else if (age === "성인") setAge(AGES[1]);
+  };
   const course = courseOf(courseId);
 
   /* 체험 레슨 신청 상태. 시간표 칸을 누르면 날짜와 시간이 채워진다 */
@@ -245,33 +252,20 @@ export function PianoAcademyDemo() {
     go("pa-trial");
   };
 
-  const navBtn = `rounded-[4px] px-2.5 py-1.5 text-[15px] underline-offset-4 hover:underline ${focusRing}`;
 
   return (
-    <div className="min-h-screen overflow-x-clip" style={{ background: C.paper, color: C.ink }}>
-      <Poster reduce={reduce} onCta={() => go("pa-trial")} />
+    <div className="min-h-screen overflow-x-clip pb-20 md:pb-0" style={{ background: C.paper, color: C.ink }}>
+      <Poster
+        reduce={reduce}
+        go={go}
+        age={age}
+        onAge={(a) => {
+          setAge(a);
+          setCourseId(AGE_COURSE[a]?.course ?? "beyer");
+        }}
+      />
 
-      <header className="mx-auto flex max-w-[1200px] flex-wrap items-center justify-between gap-x-4 gap-y-2 px-4 py-5 md:px-6">
-        <h2>
-          <SampleLogo />
-        </h2>
-        <nav aria-label="주요 메뉴" className="-mx-2 flex flex-wrap items-center">
-          {[
-            ["pa-course", "교육과정"],
-            ["pa-timetable", "수업시간표"],
-            ["pa-fees", "교습비 안내"],
-            ["pa-trial", "체험 레슨"],
-            ["pa-concert", "연주회"],
-            ["pa-visit", "오시는 길"],
-          ].map(([id, label]) => (
-            <button key={id} type="button" onClick={() => go(id)} className={navBtn} style={{ outlineColor: C.felt }}>
-              {label}
-            </button>
-          ))}
-        </nav>
-      </header>
-
-      <CourseSection reduce={reduce} course={course} setCourseId={setCourseId} onTrial={() => go("pa-trial")} />
+      <CourseSection reduce={reduce} course={course} setCourseId={pickCourseId} onTrial={() => go("pa-trial")} />
       <section id="pa-teachers" aria-labelledby="pa-teachers-title" className="mx-auto mt-20 max-w-[1200px] scroll-mt-4 px-4 md:mt-24 md:px-6">
         <SectionTitle id="pa-teachers-title" title="선생님" />
         <ul className="grid gap-8 sm:grid-cols-3 md:gap-6">
@@ -289,7 +283,7 @@ export function PianoAcademyDemo() {
           ))}
         </ul>
       </section>
-      <TimetableSection today={today} course={course} setCourseId={setCourseId} pickDow={pickDow} pickTime={pickTime} onPick={pickSlot} />
+      <TimetableSection today={today} course={course} setCourseId={pickCourseId} pickDow={pickDow} pickTime={pickTime} onPick={pickSlot} />
       <FeeSection today={today} />
       <TrialSection
         reduce={reduce}
@@ -297,6 +291,8 @@ export function PianoAcademyDemo() {
         dates={dates}
         course={course}
         setCourseId={setCourseId}
+        age={age}
+        setAge={setAge}
         pickDow={pickDow}
         setPickDow={setPickDow}
         pickTime={pickTime}
@@ -320,68 +316,209 @@ export function PianoAcademyDemo() {
   );
 }
 
-/* ---------- 포스터 ---------- */
+/* ---------- 첫 화면 ---------- */
 
-function Poster({ reduce, onCta }: { reduce: boolean; onCta: () => void }) {
-  const ref = useRef<HTMLElement>(null);
-  const { scrollYProgress } = useScroll({ target: ref, offset: ["start start", "end start"] });
-  const photoY = useTransform(scrollYProgress, (v) => (reduce ? "0%" : `${v * 8}%`));
+/* 첫 화면 구조(국내 피아노 학원, 음악교실 사이트 조사, 2026-10): 메뉴 줄 아래 레슨실 사진 가로 띠(막 없음), 띠 아래 흰 영역 왼쪽에
+   제목과 나이 칩 다섯 개, 오른쪽에 고른 나이의 과정 카드 하나. 칩을 누르면 카드만 바뀌고, 아래 교육과정, 수업시간표, 체험 레슨 신청의
+   과정과 나이도 같이 바뀐다. 처음엔 초등 1~3학년. 휴대폰에서는 메뉴를 가로로 넘기는 한 줄로, 사진 띠는 낮게, 나이 칩은 가로 한 줄,
+   카드는 칩 아래 전체 폭, 하단 고정 줄에 체험 레슨, 전화 두 버튼.
+   모션: 사진만 1.06배에서 1배로 1.6초 동안 다가오고, 카드 내용은 0.2초 겹쳐 바뀐다. 동작 줄이기면 모두 끈다. */
+const CARD_DUR = 0.2;
+
+const NAV: [string, string][] = [
+  ["pa-course", "교육과정"],
+  ["pa-timetable", "수업시간표"],
+  ["pa-fees", "교습비 안내"],
+  ["pa-trial", "체험 레슨"],
+  ["pa-concert", "연주회"],
+  ["pa-visit", "오시는 길"],
+];
+
+/** 나이 칩마다 이어지는 과정과 교습비 게시표 줄 */
+const AGE_COURSE: Record<string, { course: CourseId; fee: string }> = {
+  "미취학(6~7세)": { course: "beyer", fee: "유초등 피아노" },
+  "초등 1~3학년": { course: "beyer", fee: "유초등 피아노" },
+  "초등 4~6학년": { course: "czerny", fee: "유초등 피아노" },
+  중고등: { course: "sonatine", fee: "중고등 피아노" },
+  성인: { course: "adult", fee: "성인 취미" },
+};
+
+function Poster({ reduce, go, age, onAge }: { reduce: boolean; go: (id: string) => void; age: string; onAge: (age: string) => void }) {
+  const pick = AGE_COURSE[age] ?? AGE_COURSE[AGES[1]];
+  const course = courseOf(pick.course);
+  const fees = FEES.filter((f) => f.course === pick.fee);
+  const navBtn = `inline-flex h-11 flex-none items-center rounded-[4px] px-3 text-[15px] font-semibold underline-offset-4 hover:underline ${focusRing}`;
 
   return (
-    <section id="pa-poster" ref={ref} aria-labelledby="pa-poster-title" className="relative flex min-h-[100svh] flex-col overflow-hidden" style={{ background: "#141414", color: "#fff" }}>
+    <section id="pa-poster" aria-labelledby="pa-poster-title" style={{ background: C.paper, color: C.ink }}>
       <style>{POSTER_CSS}</style>
-      <motion.div className="absolute inset-0" style={{ y: photoY }}>
-        <motion.div
-          className="absolute inset-0"
-          initial={reduce ? false : { scale: 1.06 }}
-          animate={{ scale: 1 }}
-          transition={{ duration: reduce ? 0 : PHOTO_IN, ease: EASE }}
-        >
-          {/* eslint-disable-next-line @next/next/no-img-element -- 정적 export 라 next/image 최적화를 쓰지 않는다 */}
-          <img
-            src={`${IMG}/hero.jpg`}
-            srcSet={`${IMG}/hero-sm.jpg 960w, ${IMG}/hero.jpg 1920w`}
-            sizes="100vw"
-            alt="갈색 업라이트 피아노 건반 위에 오른손을 올린 모습"
-            fetchPriority="high"
-            className="absolute inset-0 h-full w-full object-cover"
-            style={{ objectPosition: "58% center" }}
-          />
-        </motion.div>
-      </motion.div>
-      <div className="absolute inset-0" style={{ background: SCRIM }} aria-hidden />
 
-      {/* 로고와 핵심 행동 하나 */}
-      <div className="relative z-10 mx-auto flex w-full max-w-[1200px] items-center justify-between gap-4 px-4 pt-4 md:px-6 md:pt-6">
-        <p>
-          <SampleLogo light size={18} />
-        </p>
-        <button
-          type="button"
-          onClick={onCta}
-          data-gtm-cta={`${SLUG}_poster_cta`}
-          className={`inline-flex h-11 flex-none items-center gap-1.5 rounded-[6px] px-4 text-[15px] font-semibold ${focusRing}`}
-          style={{ background: C.felt, color: "#fff", outlineColor: "#fff" }}
-        >
-          <CalendarCheck size={17} aria-hidden />
-          체험 레슨
-        </button>
+      {/* 메뉴: PC 는 한 줄, 휴대폰은 로고 아래 가로로 넘기는 줄 */}
+      <header className="border-b" style={{ borderColor: C.line }}>
+        <div className="mx-auto flex h-16 max-w-[1200px] items-center justify-between gap-3 px-4 md:px-6">
+          <p>
+            <SampleLogo />
+          </p>
+          <nav aria-label="주요 메뉴" className="hidden items-center lg:flex">
+            {NAV.map(([id, label]) => (
+              <button key={id} type="button" onClick={() => go(id)} className={navBtn} style={{ outlineColor: C.felt }}>
+                {label}
+              </button>
+            ))}
+          </nav>
+          <a
+            href={`tel:${TEL.replace(/-/g, "")}`}
+            className={`hidden h-11 flex-none items-center gap-1.5 rounded-[6px] border px-3 text-[15px] font-semibold tabular-nums md:inline-flex ${focusRing}`}
+            style={{ borderColor: C.line, color: C.ink, outlineColor: C.felt }}
+          >
+            <Phone size={16} aria-hidden />
+            {TEL}
+          </a>
+        </div>
+        <nav aria-label="주요 메뉴" className="-mt-1 flex overflow-x-auto px-2 pb-1 lg:hidden">
+          {NAV.map(([id, label]) => (
+            <button key={id} type="button" onClick={() => go(id)} className={navBtn} style={{ outlineColor: C.felt }}>
+              {label}
+            </button>
+          ))}
+        </nav>
+      </header>
+
+      {/* 레슨실 사진 띠 */}
+      <div className="relative h-[28svh] min-h-[200px] overflow-hidden md:h-[36svh] lg:h-[36svh] lg:max-h-[360px]" style={{ background: "#3a2a24" }}>
+        {/* eslint-disable-next-line @next/next/no-img-element -- 정적 export 라 next/image 최적화를 쓰지 않는다 */}
+        <img
+          src={`${IMG}/hero.jpg`}
+          srcSet={`${IMG}/hero-sm.jpg 960w, ${IMG}/hero.jpg 1920w`}
+          sizes="100vw"
+          alt="갈색 업라이트 피아노 건반 위에 오른손을 올린 모습"
+          fetchPriority="high"
+          className={`absolute inset-0 h-full w-full object-cover ${reduce ? "" : "pa-in"}`}
+          style={{ objectPosition: "55% 60%" }}
+        />
       </div>
 
-      {/* 문장 */}
-      <div className={`${reduce ? "" : "pa-rise"} relative z-10 mx-auto mt-auto w-full max-w-[1200px] px-4 pb-[12svh] md:px-6`}>
-        <h1
-          id="pa-poster-title"
-          className="text-[36px] font-bold md:text-[clamp(40px,5vw,72px)]"
-          style={{ wordBreak: "keep-all", letterSpacing: "-0.03em", lineHeight: 1.2 }}
+      {/* 제목, 나이 칩, 과정 카드 */}
+      <div className="mx-auto grid max-w-[1200px] grid-cols-[minmax(0,1fr)] gap-6 px-4 pb-12 pt-7 md:px-6 lg:grid-cols-[minmax(0,1fr)_minmax(0,1fr)] lg:gap-12 lg:pb-16 lg:pt-8">
+        <div>
+          <h1 id="pa-poster-title" className="text-[30px] font-bold md:text-[42px]" style={{ wordBreak: "keep-all", letterSpacing: "-0.035em", lineHeight: 1.2 }}>
+            원장 선생님과 1:1 개인 레슨
+          </h1>
+          <p className="mt-2 text-[15px] font-medium tabular-nums md:text-[16px]" style={{ color: C.muted }}>
+            평일 13:00~21:30, 토요일 10:00~14:00
+          </p>
+
+          <fieldset className="mt-7 min-w-0">
+            <legend className="text-[16px] font-bold">나이</legend>
+            <div role="radiogroup" aria-label="나이" className="-mx-4 mt-3 flex gap-2 overflow-x-auto px-4 pb-1 lg:mx-0 lg:flex-wrap lg:px-0">
+              {AGES.map((a) => {
+                const on = a === age;
+                return (
+                  <button
+                    key={a}
+                    type="button"
+                    role="radio"
+                    aria-checked={on}
+                    onClick={() => onAge(a)}
+                    className={`inline-flex h-11 flex-none items-center gap-1.5 rounded-full border px-4 text-[15px] font-semibold transition-colors duration-150 ${focusRing}`}
+                    style={{ borderColor: on ? C.felt : C.line, background: on ? C.felt : C.paper, color: on ? "#fff" : C.ink, outlineColor: C.felt }}
+                  >
+                    {on && <Check size={15} aria-hidden />}
+                    {a}
+                  </button>
+                );
+              })}
+            </div>
+          </fieldset>
+        </div>
+
+        {/* 고른 나이의 과정 카드 */}
+        <div className="rounded-[10px] border p-5 md:p-6" style={{ borderColor: C.line, background: C.paperDeep }} aria-live="polite">
+          <AnimatePresence mode="wait" initial={false}>
+            <motion.div
+              key={age}
+              initial={reduce ? false : { opacity: 0, y: 6 }}
+              animate={{ opacity: 1, y: 0 }}
+              exit={reduce ? { opacity: 0, transition: { duration: 0 } } : { opacity: 0, y: -6 }}
+              transition={{ duration: reduce ? 0 : CARD_DUR, ease: EASE }}
+            >
+              <p className="text-[14px] font-bold" style={{ color: C.felt }}>
+                {age}
+              </p>
+              <p className="mt-1 text-[24px] font-bold tracking-[-0.02em]">
+                {course.name} <span className="text-[16px] font-semibold" style={{ color: C.muted }}>{course.sub}</span>
+              </p>
+              <ol className="mt-4 grid gap-1.5 text-[15px]">
+                {course.steps.map((st, i) => (
+                  <li key={st.book} className="grid grid-cols-[1.5em_minmax(0,1fr)_auto] items-baseline gap-2">
+                    <span className="text-[13px] font-bold tabular-nums" style={{ color: C.muted }}>
+                      {i + 1}
+                    </span>
+                    <span className="font-semibold">{st.book}</span>
+                    <span className="text-[14px]" style={{ color: C.muted }}>
+                      {st.span}
+                    </span>
+                  </li>
+                ))}
+              </ol>
+              <dl className="mt-5 grid grid-cols-[minmax(0,1fr)_minmax(0,1fr)] gap-3 border-t pt-4" style={{ borderColor: C.line }}>
+                {fees.map((f) => (
+                  <div key={f.times}>
+                    <dt className="text-[14px]" style={{ color: C.muted }}>
+                      {f.times}, {f.time}
+                    </dt>
+                    <dd className="text-[20px] font-bold tabular-nums">{won(f.price)}</dd>
+                  </div>
+                ))}
+              </dl>
+              <p className="mt-2 text-[14px]" style={{ color: C.muted }}>
+                1:1 개인 레슨, 월 교습비, 교재비 별도
+              </p>
+            </motion.div>
+          </AnimatePresence>
+          <div className="mt-5 grid grid-cols-[minmax(0,1fr)_auto] gap-2">
+            <button
+              type="button"
+              onClick={() => go("pa-trial")}
+              data-gtm-cta={`${SLUG}_poster_cta`}
+              className={`inline-flex h-12 items-center justify-center gap-2 rounded-[6px] px-4 text-[16px] font-semibold ${focusRing}`}
+              style={{ background: C.felt, color: "#fff", outlineColor: C.ink }}
+            >
+              <CalendarCheck size={18} aria-hidden />
+              체험 레슨 신청
+            </button>
+            <button
+              type="button"
+              onClick={() => go("pa-course")}
+              className={`inline-flex h-12 items-center justify-center rounded-[6px] border px-4 text-[15px] font-semibold ${focusRing}`}
+              style={{ borderColor: "#c8c8c8", background: C.paper, color: C.ink, outlineColor: C.felt }}
+            >
+              과정 진도
+            </button>
+          </div>
+        </div>
+      </div>
+
+      {/* 휴대폰: 하단 고정 줄 두 버튼 */}
+      <div className="fixed inset-x-0 bottom-0 z-30 grid grid-cols-[minmax(0,1fr)_minmax(0,1fr)] gap-2 border-t px-4 py-3 md:hidden" style={{ background: C.paper, borderColor: C.line, paddingBottom: "calc(12px + env(safe-area-inset-bottom))" }}>
+        <button
+          type="button"
+          onClick={() => go("pa-trial")}
+          data-gtm-cta={`${SLUG}_sticky_trial`}
+          className={`inline-flex h-12 items-center justify-center gap-1.5 rounded-[6px] text-[16px] font-semibold text-white ${focusRing}`}
+          style={{ background: C.felt, outlineColor: C.ink }}
         >
-          원장 선생님과
-          <br />
-          1:1 개인 레슨
-        </h1>
-        <p className="mt-4 text-[16px] font-medium tabular-nums md:mt-6 md:text-[18px]" style={{ color: "rgba(255,255,255,0.88)" }}>
-          평일 13:00~21:30, 토요일 10:00~14:00
-        </p>
+          <CalendarCheck size={18} aria-hidden />
+          체험 레슨
+        </button>
+        <a
+          href={`tel:${TEL.replace(/-/g, "")}`}
+          className={`inline-flex h-12 items-center justify-center gap-1.5 rounded-[6px] border text-[16px] font-semibold ${focusRing}`}
+          style={{ borderColor: C.line, color: C.ink, outlineColor: C.felt }}
+        >
+          <Phone size={18} aria-hidden />
+          전화
+        </a>
       </div>
     </section>
   );
@@ -786,6 +923,8 @@ function TrialSection({
   dates,
   course,
   setCourseId,
+  age,
+  setAge,
   pickDow,
   setPickDow,
   pickTime,
@@ -796,12 +935,13 @@ function TrialSection({
   dates: Date[];
   course: Course;
   setCourseId: (id: CourseId) => void;
+  age: string;
+  setAge: (age: string) => void;
   pickDow: number | null;
   setPickDow: (d: number | null) => void;
   pickTime: string | null;
   setPickTime: (t: string | null) => void;
 }) {
-  const [age, setAge] = useState(course.who === "adult" ? "성인" : AGES[1]);
   const [exp, setExp] = useState(EXPS[0]);
   const [name, setName] = useState("");
   const [phone, setPhone] = useState("");

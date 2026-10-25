@@ -1,8 +1,8 @@
 "use client";
 
-import { useEffect, useRef, useState, type FormEvent } from "react";
-import { AnimatePresence, motion, useScroll, useTransform } from "framer-motion";
-import { AlertCircle, Check, Minus, Plus, RotateCcw } from "lucide-react";
+import { useEffect, useState, type FormEvent } from "react";
+import { AnimatePresence, motion } from "framer-motion";
+import { AlertCircle, Check, Menu, Minus, Plus, RotateCcw, X } from "lucide-react";
 import { useReducedMotionSafe } from "@/hooks/useReducedMotionSafe";
 import { daysAgo, fmtKo, useDemoToday } from "@/hooks/useDemoToday";
 import { maskName, maskPhone } from "@/components/demos/LeadReceivedPanel";
@@ -24,9 +24,9 @@ import { DemoMakerInfo } from "@/components/demos/DemoMakerInfo";
    4. 도입 문의: 문의 유형, 상호, 담당자, 휴대폰, 매장 수. 접수하면 접수 번호, 담당 창구, 회신 예정일을 보여 준다.
    5. 자주 묻는 질문(접고 펴기).
 
-   핵심 모션: 첫 화면(ss-poster)은 사람 없는 업소용 주방 사진 한 장. 들어올 때 사진이 1.06배에서 1배로 1.6초 동안 다가오고,
-   문장과 정보 줄은 0.3초 늦게 12px 아래에서 올라온다(CSS keyframes, 끝 상태가 기본값이라 JS 없이도 보인다).
-   스크롤하면 사진만 포스터 높이의 8%까지 느리게 움직인다. 숫자가 굴러 바뀌는 효과는 매장 수 계산 합계 한 곳에만 둔다.
+   첫 화면(ss-poster): 흰 배경 위 메뉴, 제목과 버튼 두 갈래, 기능 탭 세 개와 넓은 제품 화면, 오른쪽 아래 현장 사진 한 장.
+   핵심 모션: 현장 사진이 1.06배에서 1배로 1.6초 동안 다가오고, 탭을 바꾸면 화면 안 내용만 0.2초 겹쳐 바뀐다.
+   숫자가 굴러 바뀌는 효과는 매장 수 계산 합계 한 곳에만 둔다.
    동작 줄이기면 모두 끈다. */
 
 const ADDRESS = "서울 ㅇㅇ구 ㅇㅇ로 00, 0층";
@@ -179,38 +179,15 @@ export function SaasDemo() {
     go("ss-contact");
   };
 
-  const navBtn = `rounded-[4px] px-2.5 py-1.5 text-[15px] font-semibold underline-offset-4 hover:underline ${focusRing}`;
 
   return (
     <div className="min-h-screen overflow-x-clip" style={{ background: C.bg, color: C.ink }}>
-      <Poster reduce={reduce} onCta={() => go("ss-contact")} />
-
-      <header className="mx-auto flex max-w-[1200px] flex-wrap items-center justify-between gap-x-4 gap-y-2 px-4 py-4 md:px-6">
-        <p>
-          <SampleLogo />
-        </p>
-        <nav aria-label="주요 메뉴" className="-mx-2 flex flex-wrap items-center" style={{ outlineColor: C.ink }}>
-          {[
-            ["ss-features", "기능 소개"],
-            ["ss-plans", "요금 안내"],
-            ["ss-compare", "기능 비교"],
-            ["ss-faq", "자주 묻는 질문"],
-          ].map(([id, label]) => (
-            <button key={id} type="button" onClick={() => go(id)} className={navBtn} style={{ outlineColor: C.ink }}>
-              {label}
-            </button>
-          ))}
-          <button
-            type="button"
-            onClick={() => ask({ type: "도입 문의", plan: "standard", stores: 1 })}
-            data-gtm-cta={`${SLUG}_header_contact`}
-            className={`ml-2 rounded-[6px] px-3.5 py-2 text-[15px] font-semibold ${focusRing}`}
-            style={{ background: C.accent, color: "#fff", outlineColor: C.accent }}
-          >
-            도입 문의
-          </button>
-        </nav>
-      </header>
+      <Poster
+        reduce={reduce}
+        go={go}
+        onTrial={() => ask({ type: "무료 체험", plan: "standard", stores: 1 })}
+        onContact={() => ask({ type: "도입 문의", plan: "standard", stores: 1 })}
+      />
 
       {/* 기능 구역: 앱 화면 카드 세 장 */}
       <section id="ss-features" aria-labelledby="ss-features-title" className="mx-auto max-w-[1200px] scroll-mt-4 px-4 pt-8 md:px-6 md:pt-14">
@@ -294,72 +271,322 @@ export function SaasDemo() {
   );
 }
 
-/* ---------- 포스터 ---------- */
+/* ---------- 첫 화면 ---------- */
 
-/* 포스터 모션(ms). 사진 다가오기 1600, 문장은 300 늦게 700 동안 12px 올라오며 나타난다(CSS keyframes, 끝 상태가 기본값).
-   스크롤하면 사진만 포스터 높이의 8%까지 느리게 움직인다. 동작 줄이기면 모두 끈다. */
+/* 첫 화면 구조(국내 B2B SaaS 사이트 조사, 2026-10): 흰 배경 위 메뉴, 왼쪽 제목, 오른쪽 버튼 두 갈래(무료로 시작하기, 도입 문의),
+   그 아래 기능 탭 세 개와 넓은 제품 화면. 탭을 누르면 화면 안 내용만 바뀐다. 사진은 배경이 아니라 화면 오른쪽 아래 칸의
+   현장 사진 한 장으로만 쓴다(실제 사이트는 겹쳐 두지만 내용을 가리지 않게 옆 칸으로 뺐다). 휴대폰에서는 메뉴를 햄버거로 접고, 탭은 가로 칩, 제품 화면은 사이드바를 뺀 세로 목록, 현장 사진은 화면 아래로.
+   모션: 사진만 1.06배에서 1배로 1.6초 동안 다가오고, 탭 전환은 0.2초 겹쳐 바뀐다. 동작 줄이기면 모두 끈다. */
 const HERO_IN_MS = 1600;
-const HERO_TEXT_DELAY_MS = 300;
-const HERO_TEXT_MS = 700;
-const HERO_PARALLAX = 8;
+const TAB_DUR = 0.2;
 
 const HERO_CSS = `
 @keyframes ss-hero-in { from { transform: scale(1.06); } }
-@keyframes ss-hero-rise { from { opacity: 0; transform: translateY(12px); } }
 .ss-hero-photo { animation: ss-hero-in ${HERO_IN_MS}ms ${EASE_CSS} both; }
-.ss-hero-rise { animation: ss-hero-rise ${HERO_TEXT_MS}ms ${EASE_CSS} ${HERO_TEXT_DELAY_MS}ms both; }
-@media (prefers-reduced-motion: reduce) { .ss-hero-photo, .ss-hero-rise { animation: none; } }
+@media (prefers-reduced-motion: reduce) { .ss-hero-photo { animation: none; } }
 `;
 
-function Poster({ reduce, onCta }: { reduce: boolean; onCta: () => void }) {
-  const ref = useRef<HTMLElement>(null);
-  const { scrollYProgress } = useScroll({ target: ref, offset: ["start start", "end start"] });
-  const photoY = useTransform(scrollYProgress, (v) => `${v * HERO_PARALLAX}%`);
+const NAV: [string, string][] = [
+  ["ss-features", "기능 소개"],
+  ["ss-plans", "요금 안내"],
+  ["ss-compare", "기능 비교"],
+  ["ss-faq", "자주 묻는 질문"],
+];
+
+const TABS: { kind: CardKind; label: string; time: string }[] = [
+  { kind: "count", label: "재고 세기", time: "21:40 마감 재고" },
+  { kind: "order", label: "발주 알림", time: "09:10 발주" },
+  { kind: "cost", label: "메뉴 원가", time: "10월 원가율" },
+];
+
+/** 발주 알림 화면 줄: 품목, 남은 양, 적정 재고, 거래처, 상태 */
+const ORDERS: [string, string, string, string, "발주 필요" | "발주 완료" | "충분"][] = [
+  ["대파", "2단", "8단", "ㅇㅇ청과", "발주 필요"],
+  ["식용유", "3통", "6통", "ㅇㅇ식자재", "발주 필요"],
+  ["돼지 앞다리", "8kg", "10kg", "ㅇㅇ정육", "발주 완료"],
+  ["두부", "14모", "12모", "ㅇㅇ식품", "충분"],
+];
+
+function Poster({ reduce, go, onTrial, onContact }: { reduce: boolean; go: (id: string) => void; onTrial: () => void; onContact: () => void }) {
+  const [tab, setTab] = useState<CardKind>("count");
+  const [menu, setMenu] = useState(false);
+  const cur = TABS.find((t) => t.kind === tab) ?? TABS[0];
+  const navBtn = `inline-flex h-11 items-center rounded-[4px] px-3 text-[15px] font-semibold underline-offset-4 hover:underline ${focusRing}`;
 
   return (
-    <section id="ss-poster" ref={ref} aria-labelledby="ss-poster-title" className="relative flex min-h-[100svh] flex-col overflow-hidden text-white" style={{ background: "#141414" }}>
+    <section id="ss-poster" aria-labelledby="ss-poster-title" className="relative" style={{ background: C.bg, color: C.ink }}>
       <style>{HERO_CSS}</style>
-      <motion.div aria-hidden className="absolute inset-0" style={{ y: reduce ? 0 : photoY }}>
-        <div className={`absolute inset-0 ${reduce ? "" : "ss-hero-photo"}`}>
-          {/* eslint-disable-next-line @next/next/no-img-element -- 정적 export 라 next/image 최적화를 쓰지 않는다 */}
-          <img
-            src={`${IMG}/hero.jpg`}
-            srcSet={`${IMG}/hero-sm.jpg 960w, ${IMG}/hero.jpg 1920w`}
-            sizes="100vw"
-            alt="사람 없는 식당 주방의 스테인리스 조리대와 냄비, 뒤쪽 흰 타일 벽과 선반"
-            fetchPriority="high"
-            className="absolute inset-0 h-full w-full object-cover"
-            style={{ objectPosition: "65% 50%" }}
-          />
-        </div>
-      </motion.div>
-      <div aria-hidden className="absolute inset-0" style={{ background: "linear-gradient(to top, rgba(0,0,0,0.76), rgba(0,0,0,0.4) 50%, rgba(0,0,0,0.25) 78%, rgba(0,0,0,0.5))" }} />
 
-      {/* 왼쪽 위 상호, 오른쪽 위 도입 문의 */}
-      <div className="relative z-10 mx-auto flex w-full max-w-[1200px] items-center justify-between gap-3 px-4 pt-4 md:px-6 lg:pt-7">
-        <p>
-          <SampleLogo light size={18} />
-        </p>
-        <button
-          type="button"
-          onClick={onCta}
-          data-gtm-cta={`${SLUG}_poster_cta`}
-          className={`flex-none rounded-[6px] bg-white px-4 py-2.5 text-[15px] font-semibold transition-colors duration-150 hover:bg-[#f0f0f0] ${focusRing}`}
-          style={{ color: C.ink, outlineColor: "#ffffff" }}
-        >
-          도입 문의
-        </button>
+      {/* 메뉴 */}
+      <header className="relative z-20 border-b" style={{ borderColor: C.line, background: C.bg }}>
+        <div className="mx-auto flex h-16 max-w-[1200px] items-center justify-between gap-4 px-4 md:px-6">
+          <p>
+            <SampleLogo />
+          </p>
+          <nav aria-label="주요 메뉴" className="hidden items-center lg:flex">
+            {NAV.map(([id, label]) => (
+              <button key={id} type="button" onClick={() => go(id)} className={navBtn} style={{ outlineColor: C.ink }}>
+                {label}
+              </button>
+            ))}
+          </nav>
+          <div className="hidden items-center gap-2 lg:flex">
+            <span className="px-2 text-[15px] font-semibold" style={{ color: C.body }}>
+              로그인
+            </span>
+            <button
+              type="button"
+              onClick={onContact}
+              data-gtm-cta={`${SLUG}_header_contact`}
+              className={`inline-flex h-11 items-center rounded-[6px] px-4 text-[15px] font-semibold ${focusRing}`}
+              style={{ background: C.accent, color: "#fff", outlineColor: C.accent }}
+            >
+              도입 문의
+            </button>
+          </div>
+          <button
+            type="button"
+            aria-expanded={menu}
+            aria-controls="ss-menu"
+            aria-label={menu ? "메뉴 닫기" : "메뉴 열기"}
+            onClick={() => setMenu((v) => !v)}
+            className={`inline-flex h-11 w-11 items-center justify-center rounded-[6px] border lg:hidden ${focusRing}`}
+            style={{ borderColor: C.line, outlineColor: C.ink }}
+          >
+            {menu ? <X size={20} aria-hidden /> : <Menu size={20} aria-hidden />}
+          </button>
+        </div>
+        {menu && (
+          <nav id="ss-menu" aria-label="주요 메뉴" className="absolute inset-x-0 top-full border-b px-4 pb-4 pt-2 lg:hidden" style={{ background: C.bg, borderColor: C.line }}>
+            <ul>
+              {NAV.map(([id, label]) => (
+                <li key={id} className="border-b" style={{ borderColor: C.line }}>
+                  <button
+                    type="button"
+                    onClick={() => {
+                      setMenu(false);
+                      go(id);
+                    }}
+                    className={`flex h-12 w-full items-center text-left text-[16px] font-semibold ${focusRing}`}
+                    style={{ outlineColor: C.ink }}
+                  >
+                    {label}
+                  </button>
+                </li>
+              ))}
+            </ul>
+          </nav>
+        )}
+      </header>
+
+      {/* 제목과 버튼 두 갈래 */}
+      <div className="mx-auto grid max-w-[1200px] gap-5 px-4 pt-8 md:px-6 lg:grid-cols-[minmax(0,1fr)_minmax(0,auto)] lg:items-end lg:gap-10 lg:pt-12">
+        <h1 id="ss-poster-title" className="text-[34px] font-bold md:text-[48px] lg:text-[56px]" style={{ letterSpacing: "-0.035em", lineHeight: 1.15, wordBreak: "keep-all" }}>
+          식당 재고 관리, 하루 10분
+        </h1>
+        <div className="lg:pb-2">
+          <p className="text-[17px] font-medium" style={{ color: C.body }}>
+            14일 무료 체험
+          </p>
+          <div className="mt-3 grid grid-cols-[minmax(0,1fr)_minmax(0,1fr)] gap-2 sm:flex">
+            <button
+              type="button"
+              onClick={onTrial}
+              data-gtm-cta={`${SLUG}_poster_trial`}
+              className={`inline-flex h-12 items-center justify-center rounded-[6px] px-5 text-[16px] font-semibold ${focusRing}`}
+              style={{ background: C.ink, color: "#fff", outlineColor: C.ink }}
+            >
+              무료로 시작하기
+            </button>
+            <button
+              type="button"
+              onClick={onContact}
+              data-gtm-cta={`${SLUG}_poster_cta`}
+              className={`inline-flex h-12 items-center justify-center rounded-[6px] border px-5 text-[16px] font-semibold ${focusRing}`}
+              style={{ borderColor: "#c4c4c4", color: C.ink, outlineColor: C.ink }}
+            >
+              도입 문의
+            </button>
+          </div>
+        </div>
       </div>
 
-      <div className="relative z-10 mx-auto mt-auto w-full max-w-[1200px] px-4 pb-14 md:px-6 md:pb-20">
-        <div className={reduce ? "" : "ss-hero-rise"}>
-          <h1 id="ss-poster-title" className="max-w-[14em] text-[36px] font-bold md:text-[clamp(40px,5vw,72px)]" style={{ letterSpacing: "-0.03em", lineHeight: 1.2, wordBreak: "keep-all" }}>
-            식당 재고 관리, 하루 10분
-          </h1>
-          <p className="mt-4 text-[16px] font-medium text-white/90 md:text-[18px]">14일 무료 체험</p>
+      {/* 기능 탭과 제품 화면 */}
+      <div className="mx-auto max-w-[1200px] px-4 pb-10 pt-8 md:px-6 lg:pb-14 lg:pt-10">
+        <div role="tablist" aria-label="기능" className="-mx-4 flex gap-2 overflow-x-auto px-4 pb-1 md:mx-0 md:px-0">
+          {TABS.map((t) => {
+            const on = t.kind === tab;
+            return (
+              <button
+                key={t.kind}
+                id={`ss-tab-${t.kind}`}
+                type="button"
+                role="tab"
+                aria-selected={on}
+                aria-controls="ss-screen"
+                onClick={() => setTab(t.kind)}
+                className={`inline-flex h-11 flex-none items-center gap-1.5 rounded-full border px-4 text-[15px] font-semibold transition-colors duration-150 ${focusRing}`}
+                style={{ borderColor: on ? C.accent : C.line, background: on ? C.accent : C.bg, color: on ? "#fff" : C.ink, outlineColor: C.accent }}
+              >
+                {on && <Check size={15} aria-hidden />}
+                {t.label}
+              </button>
+            );
+          })}
+        </div>
+
+        <div className="mt-4 grid gap-4 lg:grid-cols-[minmax(0,1fr)_300px] lg:items-end lg:gap-6">
+          {/* 제품 화면 프레임 */}
+          <div id="ss-screen" role="tabpanel" aria-labelledby={`ss-tab-${tab}`} className="overflow-hidden rounded-[10px] border" style={{ borderColor: C.line, background: C.soft }}>
+            <div className="flex h-9 items-center gap-1.5 border-b px-4" style={{ borderColor: C.line, background: C.bg }} aria-hidden>
+              <span className="h-2.5 w-2.5 rounded-full" style={{ background: C.line }} />
+              <span className="h-2.5 w-2.5 rounded-full" style={{ background: C.line }} />
+              <span className="h-2.5 w-2.5 rounded-full" style={{ background: C.line }} />
+              <span className="ml-3 text-[12px] font-medium" style={{ color: C.muted }}>
+                곰파트너 재고, ㅇㅇ식당 본점
+              </span>
+            </div>
+            <div className="grid md:grid-cols-[160px_minmax(0,1fr)]">
+              <ul className="hidden border-r py-4 md:block" style={{ borderColor: C.line, background: C.bg }} aria-hidden>
+                {TABS.map((t) => (
+                  <li key={t.kind} className="px-4 py-2 text-[13px] font-semibold" style={{ color: t.kind === tab ? C.accent : C.muted, background: t.kind === tab ? C.soft : undefined }}>
+                    {t.label}
+                  </li>
+                ))}
+                <li className="px-4 py-2 text-[13px] font-semibold" style={{ color: C.muted }}>
+                  거래처
+                </li>
+                <li className="px-4 py-2 text-[13px] font-semibold" style={{ color: C.muted }}>
+                  직원 계정
+                </li>
+              </ul>
+              <div className="p-4 md:min-h-[300px] md:p-6 lg:min-h-[330px]">
+                <AnimatePresence mode="wait" initial={false}>
+                  <motion.div
+                    key={tab}
+                    initial={reduce ? false : { opacity: 0, y: 6 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    exit={reduce ? { opacity: 0, transition: { duration: 0 } } : { opacity: 0, y: -6 }}
+                    transition={{ duration: reduce ? 0 : TAB_DUR, ease: EASE }}
+                  >
+                    <p className="flex items-baseline justify-between gap-3">
+                      <span className="text-[18px] font-bold tracking-[-0.02em]">{cur.label}</span>
+                      <span className="text-[13px] font-medium tabular-nums" style={{ color: C.muted }}>
+                        {cur.time}
+                      </span>
+                    </p>
+                    <Screen kind={tab} />
+                  </motion.div>
+                </AnimatePresence>
+              </div>
+            </div>
+          </div>
+
+          {/* 현장 사진 한 장: PC 는 화면 오른쪽 아래 칸, 휴대폰은 화면 아래로 */}
+          <figure className="overflow-hidden rounded-[10px] border" style={{ borderColor: C.line, background: C.bg }}>
+            <div className="relative aspect-[16/9] overflow-hidden md:aspect-[21/9] lg:aspect-[4/3]">
+              {/* eslint-disable-next-line @next/next/no-img-element -- 정적 export 라 next/image 최적화를 쓰지 않는다 */}
+              <img
+                src={`${IMG}/hero-sm.jpg`}
+                srcSet={`${IMG}/hero-sm.jpg 960w, ${IMG}/hero.jpg 1920w`}
+                sizes="(min-width: 1024px) 300px, 100vw"
+                alt="식재료 보관 선반 앞에서 태블릿으로 재고를 세는 손"
+                fetchPriority="high"
+                className={`absolute inset-0 h-full w-full object-cover ${reduce ? "" : "ss-hero-photo"}`}
+                style={{ objectPosition: "70% 50%" }}
+              />
+            </div>
+            <figcaption className="px-4 py-3 text-[14px] leading-[1.5]">
+              <span className="font-bold">마감 후 창고 재고 세기</span>
+              <span className="block" style={{ color: C.muted }}>
+                품목을 누르고 남은 양만 입력
+              </span>
+            </figcaption>
+          </figure>
         </div>
       </div>
     </section>
+  );
+}
+
+/** 제품 화면 안 내용. PC 는 표, 휴대폰은 같은 줄을 세로 목록으로 */
+function Screen({ kind }: { kind: CardKind }) {
+  if (kind === "count")
+    return (
+      <ul className="mt-4 space-y-3">
+        {STOCK.map(([name, qty, v], i) => (
+          <li key={name} className="grid grid-cols-[minmax(0,5em)_minmax(0,1fr)_minmax(0,4em)] items-center gap-3 text-[14px] font-medium">
+            <span className="truncate">{name}</span>
+            <span className="h-[8px] rounded-full" style={{ background: C.line }}>
+              <Bar v={v} color={i === 1 ? C.accent : "#9a9a9a"} />
+            </span>
+            <span className="text-right tabular-nums">{qty}</span>
+          </li>
+        ))}
+        <li className="pt-1 text-[13px]" style={{ color: C.muted }}>
+          적정 재고보다 적은 품목 1개
+        </li>
+      </ul>
+    );
+  if (kind === "order")
+    return (
+      <div className="mt-4 overflow-hidden rounded-[8px] border" style={{ borderColor: C.line, background: C.bg }}>
+        <div className="hidden grid-cols-[minmax(0,1.2fr)_repeat(3,minmax(0,1fr))_minmax(0,1fr)] gap-3 border-b px-4 py-2 text-[13px] font-semibold md:grid" style={{ borderColor: C.line, color: C.muted }}>
+          <span>품목</span>
+          <span>남은 양</span>
+          <span>적정 재고</span>
+          <span>거래처</span>
+          <span className="text-right">상태</span>
+        </div>
+        <ul>
+          {ORDERS.map(([name, left, ok, vendor, state]) => (
+            <li key={name} className="grid grid-cols-[minmax(0,1fr)_auto] gap-x-3 gap-y-0.5 border-b px-4 py-2.5 text-[14px] last:border-b-0 md:grid-cols-[minmax(0,1.2fr)_repeat(3,minmax(0,1fr))_minmax(0,1fr)] md:items-center" style={{ borderColor: C.line }}>
+              <span className="font-semibold">{name}</span>
+              <span className="tabular-nums md:order-none">
+                <span className="md:hidden" style={{ color: C.muted }}>
+                  {left} / 적정 {ok}
+                </span>
+                <span className="hidden md:inline">{left}</span>
+              </span>
+              <span className="hidden tabular-nums md:inline">{ok}</span>
+              <span className="text-[13px] md:text-[14px]" style={{ color: C.muted }}>
+                {vendor}
+              </span>
+              <span className="text-right">
+                <span
+                  className="inline-flex rounded-[4px] px-2 py-0.5 text-[13px] font-semibold"
+                  style={
+                    state === "발주 필요"
+                      ? { background: C.accent, color: "#fff" }
+                      : state === "발주 완료"
+                        ? { background: C.soft, color: C.ink, boxShadow: `inset 0 0 0 1px ${C.line}` }
+                        : { color: C.muted }
+                  }
+                >
+                  {state}
+                </span>
+              </span>
+            </li>
+          ))}
+        </ul>
+      </div>
+    );
+  return (
+    <ul className="mt-4 space-y-3">
+      {COST.map(([name, pct]) => (
+        <li key={name} className="grid grid-cols-[minmax(0,5em)_minmax(0,1fr)_minmax(0,3em)] items-center gap-3 text-[14px] font-medium">
+          <span className="truncate">{name}</span>
+          <span className="relative h-[8px] rounded-full" style={{ background: C.line }}>
+            <Bar v={pct / 45} color={pct > 35 ? C.accent : "#9a9a9a"} />
+            <span aria-hidden className="absolute -top-1 h-4 w-px" style={{ left: `${(35 / 45) * 100}%`, background: C.ink }} />
+          </span>
+          <span className="text-right tabular-nums">{pct}%</span>
+        </li>
+      ))}
+      <li className="pt-1 text-[13px]" style={{ color: C.muted }}>
+        세로선은 목표 원가율 35%, 넘은 메뉴 1개
+      </li>
+    </ul>
   );
 }
 

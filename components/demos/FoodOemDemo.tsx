@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useRef, useState, type FormEvent, type ReactNode } from "react";
-import { AnimatePresence, motion, useScroll, useTransform } from "framer-motion";
+import { AnimatePresence, motion } from "framer-motion";
 import {
   AlertCircle,
   Check,
@@ -9,12 +9,14 @@ import {
   Clock,
   Factory,
   MapPin,
+  Menu,
   MessageCircle,
   PackageOpen,
   Phone,
   RotateCcw,
   ShieldCheck,
   Truck,
+  X,
 } from "lucide-react";
 import { useReducedMotionSafe } from "@/hooks/useReducedMotionSafe";
 import { daysAgo, fmtKo, useDemoToday } from "@/hooks/useDemoToday";
@@ -35,9 +37,8 @@ import { DemoMakerInfo } from "@/components/demos/DemoMakerInfo";
    3. 생산 공정: 공정 칸을 누르면 표시가 그 칸으로 옮겨 가고 관리 기준(CCP 포함)이 나온다.
    4. 샘플 의뢰 신청: 업체명, 담당자, 휴대폰, 품목, 포장, 예상 수량. 완료하면 접수 번호, 담당 창구, 회신 예정일을 보여 준다.
 
-   첫 화면(fo-poster): 소스 숙성 창고의 나무 통 사진 한 장을 화면 가득 깔고 아래쪽에 문장 "소스 OEM, 1,000개부터 생산"를 둔다.
-   핵심 모션: 들어올 때 사진이 1.6초 동안 천천히 다가오고(scale 1.06 에서 1), 문장은 0.3초 늦게 아래 12px 에서 올라온다(CSS).
-   스크롤하면 사진만 조금 느리게 내려간다(y 0 에서 8%). 동작 줄이기면 전부 멈춘 상태로 둔다.
+   첫 화면(fo-poster): 맨 위 메뉴 줄 아래 제목 한 줄과 인증, 대행 줄, 세로 사진 다섯 칸(공장 한 칸, 소스 분류 네 칸) 아코디언.
+   핵심 모션: 고른 칸만 0.45초 동안 넓어지고, 첫 칸 사진이 1.6초 동안 천천히 다가온다(scale 1.06 에서 1). 동작 줄이기면 폭이 바로 바뀌고 사진은 멈춘다.
    사진 출처: Pexels 사진 6711641 */
 
 const ADDRESS = "충북 ㅇㅇ군 ㅇㅇ면 ㅇㅇ로 00";
@@ -62,10 +63,15 @@ const C = {
 const EASE = [0.22, 1, 0.36, 1] as const;
 /** 첫 화면 사진이 다가오는 시간 */
 const PHOTO_IN = 1.6;
-/** 사진 위 막. 아래와 왼쪽을 어둡게 해 흰 글자 대비를 맞춘다 */
-const SCRIM = "linear-gradient(to top, rgba(0,0,0,0.72), rgba(0,0,0,0.25) 55%, rgba(0,0,0,0.12)), linear-gradient(to right, rgba(0,0,0,0.35), rgba(0,0,0,0) 60%)";
-const POSTER_CSS = `@keyframes fo-rise{from{opacity:0;transform:translateY(12px)}}.fo-rise{animation:fo-rise .7s cubic-bezier(0.22,1,0.36,1) .3s both}@media (prefers-reduced-motion:reduce){.fo-rise{animation:none}}`;
+const POSTER_CSS = `@keyframes fo-in{from{transform:scale(1.06)}}.fo-in{animation:fo-in ${PHOTO_IN}s cubic-bezier(0.22,1,0.36,1) both}@media (prefers-reduced-motion:reduce){.fo-in{animation:none}}`;
 const IMG = "/images/demo-food-oem";
+const NAV: [string, string][] = [
+  ["fo-items", "제조 품목"],
+  ["fo-calc", "단가 계산"],
+  ["fo-process", "생산 공정"],
+  ["fo-sample", "샘플 의뢰"],
+  ["fo-visit", "오시는 길"],
+];
 /** 칩, 패널, 숫자 전환 */
 const DUR = 0.3;
 
@@ -203,35 +209,38 @@ export function FoodOemDemo() {
     go("fo-calc");
   };
 
-  const navBtn = `rounded-[4px] px-2.5 py-1.5 text-[15px] font-semibold underline-offset-4 hover:underline ${focusRing}`;
+  const [menu, setMenu] = useState(false);
 
   return (
     <div className="min-h-screen overflow-x-clip pb-24" style={{ background: C.paper, color: C.ink }}>
-      <Poster reduce={reduce} onCta={() => go("fo-sample")} />
-
       <header className="sticky top-0 z-30 border-b" style={{ borderColor: C.line, background: "rgba(255,255,255,0.96)" }}>
         <div className="mx-auto flex max-w-[1200px] items-center justify-between gap-4 px-4 py-3 md:px-6">
           <h2>
             <SampleLogo />
           </h2>
           <nav aria-label="주요 메뉴" className="-mx-2 hidden items-center lg:flex">
-            {[
-              ["fo-items", "제조 품목"],
-              ["fo-calc", "단가 계산"],
-              ["fo-process", "생산 공정"],
-              ["fo-sample", "샘플 의뢰"],
-              ["fo-visit", "오시는 길"],
-            ].map(([id, label]) => (
-              <button key={id} type="button" onClick={() => go(id)} className={navBtn} style={{ outlineColor: C.tomato }}>
+            {NAV.map(([id, label]) => (
+              <button key={id} type="button" onClick={() => go(id)} className={`inline-flex h-11 items-center rounded-[4px] px-3 text-[15px] font-semibold underline-offset-4 hover:underline ${focusRing}`} style={{ outlineColor: C.tomato }}>
                 {label}
               </button>
             ))}
           </nav>
           <div className="flex items-center gap-2">
+            <button
+              type="button"
+              aria-expanded={menu}
+              aria-controls="fo-menu"
+              aria-label={menu ? "메뉴 닫기" : "메뉴 열기"}
+              onClick={() => setMenu((v) => !v)}
+              className={`inline-flex h-11 w-11 items-center justify-center rounded-[6px] border lg:hidden ${focusRing}`}
+              style={{ borderColor: C.line, outlineColor: C.tomato }}
+            >
+              {menu ? <X size={20} aria-hidden /> : <Menu size={20} aria-hidden />}
+            </button>
             <a
               href={`tel:${TEL.replace(/-/g, "")}`}
               aria-label={`전화 ${TEL}`}
-              className={`inline-flex h-10 w-10 items-center justify-center rounded-full border ${focusRing}`}
+              className={`hidden h-11 w-11 items-center justify-center rounded-full border sm:inline-flex ${focusRing}`}
               style={{ borderColor: C.line, color: C.tomatoDeep, outlineColor: C.tomato }}
             >
               <Phone size={18} aria-hidden />
@@ -240,7 +249,7 @@ export function FoodOemDemo() {
               type="button"
               onClick={() => go("fo-sample")}
               data-gtm-cta="food-oem_header_sample"
-              className={`inline-flex h-10 items-center gap-1.5 rounded-[6px] px-4 text-[15px] font-semibold text-white ${focusRing}`}
+              className={`hidden h-11 items-center gap-1.5 rounded-[6px] px-4 text-[15px] font-semibold text-white sm:inline-flex ${focusRing}`}
               style={{ background: C.tomato, outlineColor: C.tomatoDeep }}
             >
               <PackageOpen size={17} aria-hidden />
@@ -248,10 +257,34 @@ export function FoodOemDemo() {
             </button>
           </div>
         </div>
+        {menu && (
+          <nav id="fo-menu" aria-label="주요 메뉴" className="border-t px-4 pb-4 pt-2 lg:hidden" style={{ borderColor: C.line, background: C.paper }}>
+            <ul>
+              {NAV.map(([id, label]) => (
+                <li key={id} className="border-b" style={{ borderColor: C.line }}>
+                  <button
+                    type="button"
+                    onClick={() => {
+                      setMenu(false);
+                      // 메뉴가 닫혀 헤더 높이가 줄어든 뒤에 옮긴다
+                      requestAnimationFrame(() => go(id));
+                    }}
+                    className={`flex h-12 w-full items-center text-left text-[16px] font-semibold ${focusRing}`}
+                    style={{ outlineColor: C.tomato }}
+                  >
+                    {label}
+                  </button>
+                </li>
+              ))}
+            </ul>
+          </nav>
+        )}
       </header>
 
+      <Poster reduce={reduce} go={go} onCalc={toCalc} />
+
       {/* 1. 제조 가능 품목 */}
-      <section id="fo-items" aria-labelledby="fo-items-title" className="mx-auto max-w-[1200px] scroll-mt-20 px-4 pt-14 md:px-6 md:pt-20">
+      <section id="fo-items" aria-labelledby="fo-items-title" className="mx-auto max-w-[1200px] scroll-mt-20 px-4 pt-6 md:px-6 md:pt-8">
         <SectionTitle id="fo-items-title" title="제조 가능 품목" />
         <Items reduce={reduce} onCalc={toCalc} />
       </section>
@@ -327,68 +360,220 @@ function SectionTitle({ id, title, badge }: { id: string; title: string; badge?:
   );
 }
 
-/* ---------- 포스터 ---------- */
+/* ---------- 첫 화면 ---------- */
 
-function Poster({ reduce, onCta }: { reduce: boolean; onCta: () => void }) {
-  const ref = useRef<HTMLElement>(null);
-  const { scrollYProgress } = useScroll({ target: ref, offset: ["start start", "end start"] });
-  const photoY = useTransform(scrollYProgress, (v) => (reduce ? "0%" : `${v * 8}%`));
+/* 첫 화면 구조(국내 식품 OEM 사이트 조사, 2026-10): 위쪽에 제목 한 줄과 인증, 대행 글자 줄, 본문은 세로로 긴 사진 다섯 칸이
+   가로로 나란히 선다. 고른 칸만 넓어지고 나머지는 좁아진다(마우스를 올리거나 누르면). 공정 사진이 없어 공장 한 칸과
+   소스 분류 네 칸으로 바꿨다. 넓어진 칸의 품목을 누르면 아래 단가 계산이 그 품목, 그 포장으로 열린다.
+   PC 넓은 화면은 왼쪽 가장자리에 세로 고정 탭 두 개(샘플 의뢰, 단가 계산). 휴대폰은 다섯 칸을 가로로 넘기는 카드(scroll-snap)로,
+   세로 고정 탭은 하단 고정 줄 두 버튼(샘플 의뢰, 전화)으로 바꾼다.
+   모션: 칸 폭이 0.45초 동안 바뀌고, 첫 칸 사진만 1.06배에서 1배로 1.6초 동안 다가온다. 동작 줄이기면 폭은 바로 바뀐다. */
+const PANEL_DUR = 0.45;
+
+type Panel = { id: string; title: string; img: string; alt: string; group?: Group };
+const PANELS: Panel[] = [
+  { id: "factory", title: "숙성, 보관", img: `${IMG}/hero-sm.jpg`, alt: "숙성 창고에 줄지어 선 큰 나무 통" },
+  { id: "meat", title: "고기 소스", img: `${IMG}/item-bbq.jpg`, alt: "유리병에 담긴 바베큐 소스와 구운 갈비", group: "고기 소스" },
+  { id: "stir", title: "볶음, 조림 소스", img: `${IMG}/item-tteokbokki.jpg`, alt: "유리병에 담긴 떡볶이 소스와 떡볶이", group: "볶음, 조림 소스" },
+  { id: "dressing", title: "드레싱", img: `${IMG}/item-oriental.jpg`, alt: "병에 담긴 오리엔탈 드레싱과 샐러드", group: "드레싱" },
+  { id: "dip", title: "디핑 소스", img: `${IMG}/item-sweet-chili.jpg`, alt: "스위트 칠리 소스와 춘권", group: "디핑 소스" },
+];
+
+function Poster({ reduce, go, onCalc }: { reduce: boolean; go: (id: string) => void; onCalc: (item: string, pack: PackId) => void }) {
+  const [open, setOpen] = useState(1);
+  const [slide, setSlide] = useState(0);
+  const railRef = useRef<HTMLDivElement>(null);
+  const onRail = () => {
+    const el = railRef.current;
+    if (!el || !el.firstElementChild) return;
+    const w = (el.firstElementChild as HTMLElement).offsetWidth + 12;
+    setSlide(Math.min(PANELS.length - 1, Math.max(0, Math.round(el.scrollLeft / w))));
+  };
 
   return (
-    <section id="fo-poster" ref={ref} aria-labelledby="fo-poster-title" className="relative flex min-h-[100svh] flex-col overflow-hidden" style={{ background: "#141414", color: "#fff" }}>
+    <section id="fo-poster" aria-labelledby="fo-poster-title" className="relative" style={{ background: C.paper, color: C.ink }}>
       <style>{POSTER_CSS}</style>
-      <motion.div className="absolute inset-0" style={{ y: photoY }}>
-        <motion.div
-          className="absolute inset-0"
-          initial={reduce ? false : { scale: 1.06 }}
-          animate={{ scale: 1 }}
-          transition={{ duration: reduce ? 0 : PHOTO_IN, ease: EASE }}
-        >
-          {/* eslint-disable-next-line @next/next/no-img-element -- 정적 export 라 next/image 최적화를 쓰지 않는다 */}
-          <img
-            src={`${IMG}/hero.jpg`}
-            srcSet={`${IMG}/hero-sm.jpg 960w, ${IMG}/hero.jpg 1920w`}
-            sizes="100vw"
-            alt="숙성 창고에 줄지어 선 큰 나무 통"
-            fetchPriority="high"
-            className="absolute inset-0 h-full w-full object-cover"
-            style={{ objectPosition: "55% center" }}
-          />
-        </motion.div>
-      </motion.div>
-      <div className="absolute inset-0" style={{ background: SCRIM }} aria-hidden />
 
-      {/* 로고와 샘플 의뢰 버튼 */}
-      <div className="relative z-10 mx-auto flex w-full max-w-[1200px] items-center justify-between gap-4 px-4 pt-4 md:px-6 md:pt-6">
-        <p>
-          <SampleLogo light size={18} />
-        </p>
-        <button
-          type="button"
-          onClick={onCta}
-          data-gtm-cta="food-oem_poster_cta"
-          className={`inline-flex h-11 items-center gap-1.5 rounded-[6px] px-4 text-[15px] font-semibold text-white ${focusRing}`}
-          style={{ background: C.tomato, outlineColor: "#fff" }}
-        >
-          <PackageOpen size={17} aria-hidden />
-          샘플 의뢰
-        </button>
+      {/* 제목 한 줄과 인증, 대행 */}
+      <div className="mx-auto flex max-w-[1200px] flex-wrap items-end justify-between gap-x-8 gap-y-3 px-4 pt-7 md:px-6 md:pt-10">
+        <h1 id="fo-poster-title" className="text-[30px] font-bold md:text-[44px]" style={{ wordBreak: "keep-all", letterSpacing: "-0.035em", lineHeight: 1.2 }}>
+          소스 OEM, 1,000개부터 생산
+        </h1>
+        <ul className="flex flex-wrap gap-x-4 gap-y-1 pb-1 text-[15px] font-semibold" style={{ color: C.body }} aria-label="인증과 대행">
+          <li className="inline-flex items-center gap-1.5">
+            <ShieldCheck size={17} aria-hidden style={{ color: C.tomatoDeep }} />
+            HACCP 인증 공장
+          </li>
+          <li>품목제조보고 대행</li>
+          <li>소비기한 설정 대행</li>
+        </ul>
       </div>
 
-      {/* 문장 */}
-      <div className={`${reduce ? "" : "fo-rise"} relative z-10 mx-auto mt-auto w-full max-w-[1200px] px-4 pb-[12svh] md:px-6`}>
-        <h1
-          id="fo-poster-title"
-          className="text-[36px] font-bold md:text-[clamp(40px,5vw,72px)]"
-          style={{ wordBreak: "keep-all", letterSpacing: "-0.03em", lineHeight: 1.2 }}
-        >
-          소스 OEM,
-          <br />
-          1,000개부터 생산
-        </h1>
-        <p className="mt-4 text-[16px] font-medium md:mt-6 md:text-[18px]" style={{ color: "rgba(255,255,255,0.88)" }}>
-          소스, 드레싱 OEM 제조. HACCP 인증 공장
+      {/* PC: 다섯 칸 아코디언 */}
+      <div className="mx-auto mt-6 hidden h-[min(62svh,560px)] min-h-[440px] max-w-[1200px] gap-3 px-6 pb-12 md:flex">
+        {PANELS.map((p, i) => {
+          const on = i === open;
+          const items = p.group ? ITEMS.filter((it) => it.group === p.group) : [];
+          return (
+            <motion.div
+              key={p.id}
+              onMouseEnter={() => setOpen(i)}
+              onFocus={() => setOpen(i)}
+              animate={{ flexGrow: on ? 4.2 : 1 }}
+              initial={false}
+              transition={{ duration: reduce ? 0 : PANEL_DUR, ease: EASE }}
+              className="relative flex min-w-0 basis-0 flex-col overflow-hidden rounded-[8px] border"
+              style={{ borderColor: on ? C.tomato : C.line, background: C.paper }}
+            >
+              <button
+                type="button"
+                aria-expanded={on}
+                aria-controls={`fo-panel-${p.id}`}
+                onClick={() => setOpen(i)}
+                className={`relative block min-h-0 flex-1 overflow-hidden text-left ${focusRing}`}
+                style={{ outlineColor: C.tomato, outlineOffset: -3 }}
+              >
+                {/* eslint-disable-next-line @next/next/no-img-element -- 정적 export 라 next/image 최적화를 쓰지 않는다 */}
+                <img
+                  src={p.img}
+                  alt={p.alt}
+                  fetchPriority={i < 2 ? "high" : undefined}
+                  className={`absolute inset-0 h-full w-full object-cover ${i === 0 && !reduce ? "fo-in" : ""}`}
+                  style={{ objectPosition: i === 0 ? "40% center" : on ? "50% center" : "78% center" }}
+                />
+                <span className="sr-only">{p.title} 펼치기</span>
+              </button>
+              <div className="flex-none border-t px-4 py-3" style={{ borderColor: C.line }}>
+                <p className="flex min-h-[44px] items-baseline gap-2">
+                  <span aria-hidden className="text-[13px] font-bold tabular-nums" style={{ color: on ? C.tomatoDeep : C.muted }}>
+                    {p2(i + 1)}
+                  </span>
+                  <span className="text-[16px] font-bold leading-snug" style={{ wordBreak: "keep-all" }}>{p.title}</span>
+                </p>
+                <div id={`fo-panel-${p.id}`} hidden={!on} className="mt-2 min-h-[44px]">
+                  {p.group ? (
+                    <ul className="flex flex-wrap gap-1.5" aria-label={`${p.title} 품목, 누르면 단가 계산`}>
+                      {items.map((it) => (
+                        <li key={it.id}>
+                          <button
+                            type="button"
+                            onClick={() => onCalc(it.name, it.packs[0])}
+                            className={`inline-flex h-11 items-center rounded-[6px] border px-3 text-[14px] font-semibold hover:bg-[#f7f7f5] ${focusRing}`}
+                            style={{ borderColor: C.line, outlineColor: C.tomato }}
+                          >
+                            {it.name}
+                          </button>
+                        </li>
+                      ))}
+                    </ul>
+                  ) : (
+                    <button
+                      type="button"
+                      onClick={() => go("fo-process")}
+                      className={`inline-flex h-11 items-center gap-1.5 rounded-[6px] border px-3 text-[14px] font-semibold hover:bg-[#f7f7f5] ${focusRing}`}
+                      style={{ borderColor: C.line, outlineColor: C.tomato }}
+                    >
+                      <Factory size={16} aria-hidden />
+                      생산 공정, CCP 2곳
+                    </button>
+                  )}
+                </div>
+              </div>
+            </motion.div>
+          );
+        })}
+      </div>
+
+      {/* 휴대폰: 가로로 넘기는 카드 */}
+      <div className="mt-5 pb-8 md:hidden">
+        <p className="px-4 text-[14px] font-semibold tabular-nums" style={{ color: C.muted }} aria-live="polite">
+          {slide + 1} / {PANELS.length} {PANELS[slide].title}
         </p>
+        <div ref={railRef} onScroll={onRail} className="mt-2 flex snap-x snap-mandatory gap-3 overflow-x-auto px-4 pb-2" style={{ scrollPaddingLeft: 16 }}>
+          {PANELS.map((p, i) => {
+            const items = p.group ? ITEMS.filter((it) => it.group === p.group) : [];
+            return (
+              <article key={p.id} className="w-[84%] flex-none snap-start overflow-hidden rounded-[8px] border" style={{ borderColor: C.line }} aria-label={`${i + 1} / ${PANELS.length} ${p.title}`}>
+                <div className="relative aspect-[4/3]">
+                  {/* eslint-disable-next-line @next/next/no-img-element -- 정적 export 라 next/image 최적화를 쓰지 않는다 */}
+                  <img src={p.img} alt={p.alt} loading={i < 2 ? undefined : "lazy"} className="absolute inset-0 h-full w-full object-cover" />
+                </div>
+                <div className="px-4 py-3">
+                  <p className="text-[17px] font-bold">{p.title}</p>
+                  {p.group ? (
+                    <ul className="mt-2 flex flex-wrap gap-1.5">
+                      {items.slice(0, 3).map((it) => (
+                        <li key={it.id}>
+                          <button
+                            type="button"
+                            onClick={() => onCalc(it.name, it.packs[0])}
+                            className={`inline-flex h-11 items-center rounded-[6px] border px-3 text-[14px] font-semibold ${focusRing}`}
+                            style={{ borderColor: C.line, outlineColor: C.tomato }}
+                          >
+                            {it.name}
+                          </button>
+                        </li>
+                      ))}
+                    </ul>
+                  ) : (
+                    <button
+                      type="button"
+                      onClick={() => go("fo-process")}
+                      className={`mt-2 inline-flex h-11 items-center gap-1.5 rounded-[6px] border px-3 text-[14px] font-semibold ${focusRing}`}
+                      style={{ borderColor: C.line, outlineColor: C.tomato }}
+                    >
+                      <Factory size={16} aria-hidden />
+                      생산 공정, CCP 2곳
+                    </button>
+                  )}
+                </div>
+              </article>
+            );
+          })}
+        </div>
+      </div>
+
+      {/* 넓은 PC: 왼쪽 가장자리 세로 고정 탭 */}
+      <div className="fixed left-0 top-1/2 z-30 hidden -translate-y-1/2 flex-col gap-px xl:flex" aria-label="빠른 문의" role="group">
+        {(
+          [
+            ["fo-sample", "샘플 의뢰", C.tomato],
+            ["fo-calc", "단가 계산", C.ink],
+          ] as const
+        ).map(([id, label, bg]) => (
+          <button
+            key={id}
+            type="button"
+            onClick={() => go(id)}
+            data-gtm-cta={`food-oem_side_${id}`}
+            className={`flex w-11 items-center justify-center rounded-r-[6px] py-4 text-[15px] font-semibold text-white ${focusRing}`}
+            style={{ background: bg, writingMode: "vertical-rl", letterSpacing: "0.05em", outlineColor: C.tomatoDeep }}
+          >
+            {label}
+          </button>
+        ))}
+      </div>
+
+      {/* 휴대폰: 하단 고정 줄 두 버튼 */}
+      <div className="fixed inset-x-0 bottom-0 z-30 grid grid-cols-[minmax(0,1fr)_minmax(0,1fr)] gap-2 border-t px-4 py-3 md:hidden" style={{ background: C.paper, borderColor: C.line, paddingBottom: "calc(12px + env(safe-area-inset-bottom))" }}>
+        <button
+          type="button"
+          onClick={() => go("fo-sample")}
+          data-gtm-cta="food-oem_sticky_sample"
+          className={`inline-flex h-12 items-center justify-center gap-1.5 rounded-[6px] text-[16px] font-semibold text-white ${focusRing}`}
+          style={{ background: C.tomato, outlineColor: C.tomatoDeep }}
+        >
+          <PackageOpen size={18} aria-hidden />
+          샘플 의뢰
+        </button>
+        <a
+          href={`tel:${TEL.replace(/-/g, "")}`}
+          className={`inline-flex h-12 items-center justify-center gap-1.5 rounded-[6px] border text-[16px] font-semibold ${focusRing}`}
+          style={{ borderColor: C.line, color: C.ink, outlineColor: C.tomato }}
+        >
+          <Phone size={18} aria-hidden />
+          전화
+        </a>
       </div>
     </section>
   );
