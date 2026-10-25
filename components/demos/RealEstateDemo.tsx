@@ -870,6 +870,8 @@ function HeartButton({ saved, full, name, onToggle, className = "" }: { saved: b
 }
 
 const PHOTO_ALT: Record<Kind, string> = { apt: "거실", officetel: "실내", villa: "거실", store: "매장 내부" };
+// 종류 기본값과 다른 곳을 찍은 사진
+const PHOTO_ALT_BY_ID: Record<string, string> = { b1: "주방", b2: "방", f1: "매장 전면" };
 
 function ListingCard({ l, selected, saved, full, onPick, onToggle }: { l: Listing; selected: boolean; saved: boolean; full: boolean; onPick: () => void; onToggle: () => void }) {
   return (
@@ -1269,7 +1271,7 @@ function Detail({ listing: l, basket, onToggle, onTour, onCalc }: { listing: Lis
             {l.kind === "store" ? (
               <StorePlan />
             ) : (
-              <Image src={`${IMG}/listing-${l.id}.jpg`} alt={`${l.name} ${PHOTO_ALT[l.kind]}`} fill sizes="(min-width: 1024px) 40vw, 100vw" className="object-cover" />
+              <Image src={`${IMG}/listing-${l.id}.jpg`} alt={`${l.name} ${PHOTO_ALT_BY_ID[l.id] ?? PHOTO_ALT[l.kind]}`} fill sizes="(min-width: 1024px) 40vw, 100vw" className="object-cover" />
             )}
           </div>
 
