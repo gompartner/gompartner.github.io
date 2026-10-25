@@ -963,13 +963,13 @@ function Poster({
             <motion.div className="absolute inset-0" initial={reduce ? false : { scale: ZOOM_FROM }} animate={{ scale: 1 }} transition={reduce ? { duration: 0 } : { duration: ZOOM, ease: EASE }}>
               {/* eslint-disable-next-line @next/next/no-img-element -- 정적 export 라 next/image 최적화를 쓰지 않는다 */}
               <img
-                src={`${IMG}/hero.jpg`}
-                srcSet={`${IMG}/hero-sm.jpg 960w, ${IMG}/hero.jpg 1920w`}
-                sizes="(min-width: 768px) 400px, 100vw"
-                alt={tx(lang, "회색 탁자 위에 겹쳐 놓은 붉은 여권 세 권과 신분증", "Three red passports and ID cards on a grey table")}
+                src={`${IMG}/office.jpg`}
+                width={900}
+                height={1200}
+                alt={tx(lang, "흰 접수대 위에 모니터 두 대와 호출 벨, 안내판이 놓인 사무소 접수 창구", "Office reception counter with two monitors, a desk bell and a notice stand")}
                 fetchPriority="high"
                 className="absolute inset-0 h-full w-full object-cover"
-                style={{ objectPosition: "40% 45%" }}
+                style={{ objectPosition: "58% 52%" }}
               />
             </motion.div>
           </div>
