@@ -1,7 +1,7 @@
 "use client";
 
-import { useEffect, useMemo, useRef, useState } from "react";
-import { AnimatePresence, animate, motion, useMotionValue, useScroll, useTransform } from "framer-motion";
+import { useEffect, useMemo, useState } from "react";
+import { AnimatePresence, animate, motion, useMotionValue, useTransform } from "framer-motion";
 import {
   CalendarCheck,
   Car,
@@ -10,11 +10,13 @@ import {
   Clock,
   DoorClosed,
   MapPin,
+  Menu,
   MessageCircle,
   Phone,
   PhoneOff,
   ShieldCheck,
   Video,
+  X,
 } from "lucide-react";
 import { useReducedMotionSafe } from "@/hooks/useReducedMotionSafe";
 import { daysAgo, fmtKo, useDemoToday } from "@/hooks/useDemoToday";
@@ -39,10 +41,10 @@ import { DemoMakerInfo } from "@/components/demos/DemoMakerInfo";
 
    사진 출처: AI 생성(Z-Image-Turbo, Apache 2.0). 직원 사진은 AI 생성(Z-Image-Turbo).
 
-   첫 화면(fl-poster): 조용한 상담실 사진 한 장이 화면을 채운다. 둥근 원목 탁자에 물 한 잔과 서류철, 뒤로 밝은 창과 법률 서가.
-   아래쪽 어두운 막 위에 문장 "다른 의뢰인과 마주치지 않는 상담"를 왼쪽 정렬로 둔다.
-   핵심 모션: 들어올 때 사진이 1.06배에서 1배로 1.6초 동안 천천히 다가오고, 문장은 0.3초 뒤 아래에서 올라온다.
-   스크롤하면 사진만 조금 느리게 움직인다. 동작 줄이기 설정이면 모두 멈춘다. */
+   첫 화면(fl-poster): 상단 메뉴(좁은 화면은 햄버거), 왼쪽 45% 대표 변호사 세로 사진, 오른쪽 55% 이름과 등록 분야, 경력 줄,
+   그 아래 진행 단계 4칸(고민 중, 협의 중, 조정 중, 소송 중). 단계를 고르면 할 일 세 줄이 바뀌고,
+   "이 단계로 상담예약"은 아래 예약의 분야를 미리 골라 둔다. 휴대폰은 사진 대신 가로 명함, 단계는 2x2.
+   핵심 모션: 인물 사진이 1.06배에서 1배로 1.6초 동안 천천히 다가오고, 할 일 목록은 짧게 바뀐다. 동작 줄이기면 멈춘다. */
 
 /* 제목은 본문과 같은 Pretendard, 굵게 */
 const serifF = { fontWeight: 700 } as const;
@@ -76,59 +78,210 @@ const won = (n: number) => `${n.toLocaleString("ko-KR")}원`;
 const p2 = (n: number) => String(n).padStart(2, "0");
 const hm = (m: number) => `${p2(Math.floor(m / 60))}:${p2(m % 60)}`;
 
-function Poster({ reduce, onCta }: { reduce: boolean; onCta: () => void }) {
-  const ref = useRef<HTMLElement>(null);
-  const { scrollYProgress } = useScroll({ target: ref, offset: ["start start", "end start"] });
-  // 스크롤하면 사진만 조금 느리게 내려간다
-  const photoY = useTransform(scrollYProgress, (v) => (reduce ? "0%" : `${v * 8}%`));
+/* ---------- 첫 화면: 메뉴 + 대표 변호사 + 진행 단계 ---------- */
+
+type Stage = "고민 중" | "협의 중" | "조정 중" | "소송 중";
+const STAGE_LIST: Stage[] = ["고민 중", "협의 중", "조정 중", "소송 중"];
+
+/** 단계마다 할 일 세 줄. 아래 업무분야 절차(AREAS)에서 옮겼다. area는 예약으로 넘길 분야 */
+const STAGES: Record<Stage, { todo: string[]; area: Area }> = {
+  "고민 중": {
+    todo: ["혼인관계증명서, 가족관계증명서 떼어 두기", "재산, 소득 자료와 대출 내역 모아 두기", "아이 돌봄 일정과 주거 환경 적어 두기"],
+    area: "협의이혼",
+  },
+  "협의 중": {
+    todo: ["부부가 함께 가정법원에 협의이혼의사확인 신청", "미성년 자녀가 있으면 숙려기간 3개월, 없으면 1개월", "친권자, 양육자, 양육비, 면접교섭을 정해 양육 협의서 제출"],
+    area: "협의이혼",
+  },
+  "조정 중": {
+    todo: ["가사조사관 면담과 조정 기일 준비", "상대 재산을 모르면 재산명시, 재산조회 신청", "소송 중 아이를 누가 돌볼지 사전처분 신청"],
+    area: "재판이혼",
+  },
+  "소송 중": {
+    todo: ["변론 기일에 증거와 주장 정리", "판결문을 받고 2주 안에 항소 여부 결정", "확정된 날부터 1개월 안에 이혼 신고"],
+    area: "재판이혼",
+  },
+};
+
+const MENU: [string, string][] = [
+  ["fl-areas", "업무분야"],
+  ["fl-lawyers", "변호사 소개"],
+  ["fl-support", "양육비 계산"],
+  ["fl-faq", "자주 묻는 질문"],
+  ["fl-visit", "오시는 길"],
+];
+
+function Poster({ reduce, go, setArea }: { reduce: boolean; go: (id: string) => void; setArea: (a: Area) => void }) {
+  const [stage, setStage] = useState<Stage>("협의 중");
+  const [menuOpen, setMenuOpen] = useState(false);
+  const lead = LAWYERS[0];
+  const s = STAGES[stage];
+
+  const to = (id: string) => {
+    setMenuOpen(false);
+    go(id);
+  };
+  const book = () => {
+    setArea(s.area);
+    go("fl-booking");
+  };
 
   return (
-    <section id="fl-poster" ref={ref} aria-labelledby="fl-poster-title" className="relative flex min-h-[100svh] flex-col overflow-hidden" style={{ background: "#141414", color: "#ffffff" }}>
-      <style>{`@keyframes fl-rise{from{opacity:0;transform:translateY(12px)}to{opacity:1;transform:none}}.fl-rise{animation:fl-rise 0.7s cubic-bezier(0.22,1,0.36,1) 0.3s both}@media (prefers-reduced-motion: reduce){.fl-rise{animation:none}}`}</style>
-      <motion.div className="absolute inset-x-0 top-[-10%] h-[110%]" style={{ y: photoY }}>
-        <motion.div className="h-full w-full" initial={reduce ? false : { scale: 1.06 }} animate={{ scale: 1 }} transition={{ duration: reduce ? 0 : PHOTO_IN, ease: EASE }}>
-          {/* eslint-disable-next-line @next/next/no-img-element -- 정적 export 라 next/image 최적화를 쓰지 않는다 */}
-          <img
-            src={`${IMG}/hero.jpg`}
-            srcSet={`${IMG}/hero-sm.jpg 960w, ${IMG}/hero.jpg 1920w`}
-            sizes="100vw"
-            alt="밝은 창과 법률 서가 앞, 물 한 잔과 서류철이 놓인 둥근 원목 탁자가 있는 상담실"
-            fetchPriority="high"
-            className="absolute inset-0 h-full w-full object-cover"
-            style={{ objectPosition: "50% 55%" }}
-          />
-        </motion.div>
-      </motion.div>
-      {/* 글자 대비를 위한 막. 위는 상호, 아래는 문장 */}
-      <div aria-hidden className="pointer-events-none absolute inset-0" style={{ background: "linear-gradient(to top, rgba(0,0,0,0.78), rgba(0,0,0,0.45) 45%, rgba(0,0,0,0.12) 72%, rgba(0,0,0,0.42))" }} />
+    <section id="fl-poster" aria-labelledby="fl-poster-title" style={{ background: C.bg, color: C.ink }}>
+      {/* 상단 메뉴. 좁은 화면은 햄버거 */}
+      <header className="relative z-20 border-b" style={{ borderColor: C.line, background: C.bg }}>
+        <div className="mx-auto flex max-w-[1200px] items-center justify-between gap-3 px-4 py-3 md:px-6">
+          <p className="inline-flex items-center gap-2 text-[19px] font-bold leading-none">
+            <SampleLogo />
+          </p>
+          <nav aria-label="주요 메뉴" className="hidden items-center lg:flex">
+            {MENU.map(([id, label]) => (
+              <button key={id} type="button" onClick={() => to(id)} className={`inline-flex min-h-11 items-center rounded-[4px] px-3 text-[15px] underline-offset-4 hover:underline ${focusRing}`} style={{ outlineColor: C.accent }}>
+                {label}
+              </button>
+            ))}
+          </nav>
+          <div className="flex items-center gap-2">
+            <button
+              type="button"
+              onClick={() => to("fl-booking")}
+              data-gtm-cta={`${SLUG}_poster_cta`}
+              className={`inline-flex min-h-11 items-center gap-1.5 rounded-[6px] px-4 text-[15px] font-semibold ${focusRing}`}
+              style={{ background: C.accent, color: "#ffffff", outlineColor: C.accent }}
+            >
+              <CalendarCheck size={17} aria-hidden />
+              상담예약
+            </button>
+            <button
+              type="button"
+              aria-expanded={menuOpen}
+              aria-controls="fl-menu"
+              aria-label={menuOpen ? "메뉴 닫기" : "메뉴 열기"}
+              onClick={() => setMenuOpen((v) => !v)}
+              className={`inline-flex h-11 w-11 items-center justify-center rounded-[6px] border lg:hidden ${focusRing}`}
+              style={{ borderColor: C.line, outlineColor: C.accent }}
+            >
+              {menuOpen ? <X size={20} aria-hidden /> : <Menu size={20} aria-hidden />}
+            </button>
+          </div>
+        </div>
+        {menuOpen && (
+          <nav id="fl-menu" aria-label="주요 메뉴" className="absolute inset-x-0 top-full border-b lg:hidden" style={{ borderColor: C.line, background: C.bg }}>
+            <ul className="mx-auto max-w-[1200px] px-4 py-2 md:px-6">
+              {MENU.map(([id, label]) => (
+                <li key={id} className="border-b last:border-b-0" style={{ borderColor: C.line }}>
+                  <button type="button" onClick={() => to(id)} className={`flex min-h-12 w-full items-center text-left text-[17px] font-semibold ${focusRing}`} style={{ outlineColor: C.accent }}>
+                    {label}
+                  </button>
+                </li>
+              ))}
+            </ul>
+          </nav>
+        )}
+      </header>
 
-      <div className="relative z-[1] flex items-center justify-between gap-3 px-4 pt-4 md:px-12 md:pt-7">
-        <p className="inline-flex items-center gap-2 text-[17px] font-bold leading-none">
-          <SampleLogo light size={18} />
-        </p>
-        <button
-          type="button"
-          onClick={onCta}
-          data-gtm-cta={`${SLUG}_poster_cta`}
-          className={`inline-flex min-h-11 items-center gap-1.5 rounded-[6px] px-4 text-[15px] font-semibold ${focusRing}`}
-          style={{ background: C.accent, color: "#ffffff", outlineColor: "#ffffff" }}
-        >
-          <CalendarCheck size={17} aria-hidden />
-          상담 예약
-        </button>
-      </div>
+      <div className="mx-auto grid max-w-[1200px] md:grid-cols-[minmax(0,45fr)_minmax(0,55fr)] md:px-6 md:py-8 lg:py-10">
+        {/* 넓은 화면: 왼쪽 세로 인물 사진. 사진 위 글자 없음 */}
+        <div className="relative hidden overflow-hidden rounded-[8px] md:block" style={{ background: C.alt }}>
+          <motion.div className="absolute inset-0" initial={reduce ? false : { scale: 1.06 }} animate={{ scale: 1 }} transition={{ duration: reduce ? 0 : PHOTO_IN, ease: EASE }}>
+            {/* eslint-disable-next-line @next/next/no-img-element -- 정적 export 라 next/image 최적화를 쓰지 않는다 */}
+            <img src={lead.photo} alt={`${lead.role} ${lead.name}`} fetchPriority="high" className="absolute inset-0 h-full w-full object-cover" style={{ objectPosition: "50% 18%" }} />
+          </motion.div>
+        </div>
 
-      <div className={`relative z-[1] mt-auto px-4 pb-14 md:px-12 md:pb-20 ${reduce ? "" : "fl-rise"}`}>
-        <h1
-          id="fl-poster-title"
-          className="max-w-[12em] text-[36px] font-bold md:text-[clamp(40px,5vw,72px)]"
-          style={{ ...serifF, letterSpacing: "-0.03em", lineHeight: 1.2, wordBreak: "keep-all" }}
-        >
-          다른 의뢰인과 마주치지 않는 상담
-        </h1>
-        <p className="mt-4 text-[16px] md:mt-6 md:text-[18px]" style={{ color: "rgba(255,255,255,0.86)" }}>
-          이혼, 가사 사건 상담 평일 밤 9시까지
-        </p>
+        <div className="min-w-0 px-4 pt-6 md:pl-10 md:pr-0 md:pt-2 lg:pl-14">
+          <h1 id="fl-poster-title" className="text-[28px] font-bold md:text-[34px] lg:text-[40px]" style={{ ...serifF, letterSpacing: "-0.03em", lineHeight: 1.25, wordBreak: "keep-all" }}>
+            다른 의뢰인과 마주치지 않는 상담
+          </h1>
+
+          {/* 대표 변호사. 좁은 화면은 가로 명함 */}
+          <div className="mt-5 flex gap-4 border-t pt-5 md:mt-7 md:block md:pt-6" style={{ borderColor: C.line }}>
+            {/* eslint-disable-next-line @next/next/no-img-element -- 정적 export 라 next/image 최적화를 쓰지 않는다 */}
+            <img src={lead.photo} alt="" aria-hidden width={96} height={96} className="h-24 w-24 flex-none rounded-[6px] object-cover md:hidden" style={{ objectPosition: "50% 15%", background: C.alt }} />
+            <div className="min-w-0">
+              <p className="text-[14px] font-bold" style={{ color: C.accent }}>
+                {lead.role}
+              </p>
+              <p className="mt-0.5 text-[24px] font-bold md:text-[30px]">{lead.name} 변호사</p>
+              <ul className="mt-2 grid gap-1 text-[15px] md:mt-3 md:text-[16px]" style={{ color: C.body }}>
+                <li>{lead.note}</li>
+                <li>주로 맡는 사건: {lead.cases}</li>
+                <li className="hidden md:list-item">
+                  상담 평일 {HOURS[0][1]}, 토요일 {HOURS[1][1]}
+                </li>
+              </ul>
+            </div>
+          </div>
+
+          {/* 진행 단계 */}
+          <div className="mt-6 md:mt-8">
+            <h2 className="text-[16px] font-bold">진행 단계</h2>
+            <div role="radiogroup" aria-label="진행 단계" className="mt-3 grid grid-cols-2 gap-2 sm:grid-cols-4">
+              {STAGE_LIST.map((k, i) => {
+                const on = k === stage;
+                return (
+                  <button
+                    key={k}
+                    type="button"
+                    role="radio"
+                    aria-checked={on}
+                    onClick={() => setStage(k)}
+                    className={`flex min-h-12 items-center gap-2 rounded-[6px] border px-3 text-left text-[16px] font-semibold ${focusRing}`}
+                    style={{ borderColor: on ? C.accent : C.line, background: on ? C.accent : C.bg, color: on ? "#ffffff" : C.ink, outlineColor: C.accent }}
+                  >
+                    <span className="text-[13px] tabular-nums" style={{ color: on ? "#eadde0" : C.muted }}>
+                      {i + 1}
+                    </span>
+                    {k}
+                  </button>
+                );
+              })}
+            </div>
+            <AnimatePresence mode="wait" initial={false}>
+              <motion.div
+                key={stage}
+                className="mt-3 rounded-[8px] p-4 md:p-5"
+                style={{ background: C.accentSoft }}
+                initial={reduce ? false : { opacity: 0, y: 6 }}
+                animate={{ opacity: 1, y: 0 }}
+                exit={reduce ? undefined : { opacity: 0, y: -6 }}
+                transition={{ duration: reduce ? 0 : 0.2, ease: EASE }}
+              >
+                <ul className="grid gap-1.5 text-[15px] md:text-[16px]">
+                  {s.todo.map((t) => (
+                    <li key={t} className="flex gap-2">
+                      <Check size={16} aria-hidden className="mt-[4px] flex-none" style={{ color: C.accent }} />
+                      {t}
+                    </li>
+                  ))}
+                </ul>
+                <div className="mt-4 flex flex-wrap gap-2">
+                  <button
+                    type="button"
+                    onClick={book}
+                    data-gtm-cta={`${SLUG}_stage_book`}
+                    className={`inline-flex min-h-11 items-center gap-1.5 rounded-[6px] px-4 text-[15px] font-semibold ${focusRing}`}
+                    style={{ background: C.accent, color: "#ffffff", outlineColor: C.accent }}
+                  >
+                    <CalendarCheck size={17} aria-hidden />
+                    이 단계로 상담예약
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => {
+                      setArea(s.area);
+                      go("fl-areas");
+                    }}
+                    className={`inline-flex min-h-11 items-center rounded-[6px] border px-4 text-[15px] font-semibold ${focusRing}`}
+                    style={{ borderColor: C.accent, color: C.accent, background: C.bg, outlineColor: C.accent }}
+                  >
+                    {s.area} 절차
+                  </button>
+                </div>
+              </motion.div>
+            </AnimatePresence>
+          </div>
+        </div>
       </div>
     </section>
   );
@@ -855,34 +1008,14 @@ export function FamilyLawDemo() {
   }, []);
 
   const go = (id: string) => document.getElementById(id)?.scrollIntoView({ behavior: reduce ? "auto" : "smooth", block: "start" });
-  const navBtn = `rounded-[4px] px-2.5 py-1.5 text-[15px] underline-offset-4 hover:underline ${focusRing}`;
 
   return (
     <div className="min-h-screen overflow-x-clip pb-24" style={{ background: C.bg, color: C.ink }}>
-      <Poster reduce={reduce} onCta={() => go("fl-booking")} />
+      <Poster reduce={reduce} go={go} setArea={setArea} />
 
-      <header className="mx-auto flex max-w-[1200px] flex-wrap items-center justify-between gap-x-4 gap-y-2 px-4 py-4 md:px-6">
-        <h2 className="inline-flex items-center gap-2 text-[21px] font-bold leading-none">
-          <SampleLogo />
-        </h2>
-        <nav aria-label="주요 메뉴" className="-mx-2 flex flex-wrap items-center">
-          {[
-            ["fl-areas", "업무분야"],
-            ["fl-support", "양육비 계산"],
-            ["fl-booking", "상담 예약"],
-            ["fl-lawyers", "변호사 소개"],
-            ["fl-faq", "자주 묻는 질문"],
-            ["fl-visit", "오시는 길"],
-          ].map(([id, label]) => (
-            <button key={id} type="button" onClick={() => go(id)} className={navBtn} style={{ outlineColor: C.accent }}>
-              {label}
-            </button>
-          ))}
-        </nav>
-      </header>
 
       {/* 약속 세 가지 */}
-      <div className="mx-auto max-w-[1200px] px-4 md:px-6">
+      <div className="mx-auto mt-8 max-w-[1200px] px-4 md:mt-0 md:px-6">
         <ul className="grid gap-px overflow-hidden rounded-[8px] border sm:grid-cols-3" style={{ borderColor: C.line, background: C.line }}>
           {[
             [ShieldCheck, "변호사가 직접 상담", "처음부터 끝까지 같은 변호사가 맡아요."],

@@ -1,7 +1,7 @@
 "use client";
 
-import { useEffect, useMemo, useRef, useState } from "react";
-import { AnimatePresence, motion, useScroll, useTransform } from "framer-motion";
+import { useEffect, useMemo, useState } from "react";
+import { AnimatePresence, motion } from "framer-motion";
 import { Check, ChevronDown, Clock, FileText, Lightbulb, MapPin, MessageCircle, Minus, Plus, Search, X } from "lucide-react";
 import { useReducedMotionSafe } from "@/hooks/useReducedMotionSafe";
 import { daysAgo, fmtDot, fmtKo, useDemoToday } from "@/hooks/useDemoToday";
@@ -22,9 +22,9 @@ import { DemoMakerInfo } from "@/components/demos/DemoMakerInfo";
    특허 심사 기간은 심사청구 뒤 1차 결과까지 1년 안팎, 우선심사는 결정 뒤 몇 달 안으로 잡은 개략이다.
 
    사진 출처: Pexels 사진 6615086, 직원 사진은 AI 생성(Z-Image-Turbo)
-   첫 화면(po-poster): 도면 위에 컴퍼스를 세운 사진 한 장이 한 화면을 채운다. 아래 왼쪽에 문장 "상표는 먼저 출원한 사람의 권리입니다".
-   핵심 모션: 들어올 때 사진이 1.06배에서 1배로 1.6초 동안 천천히 다가오고, 문장과 정보 줄은 0.3초 늦게 12px 아래에서 올라온다(CSS).
-   스크롤하면 사진만 조금 느리게 내려간다(0 ~ 8%). 동작 줄이기면 모두 멈춘 상태로 보인다.
+   첫 화면(po-poster): 상단 메뉴, 가로로 긴 도면 사진 띠, 그 아래 특허, 상표, 디자인 3열 비교표(권리 비교표형).
+   열 머리(휴대폰은 탭)를 고르면 그 열이 강조되고 표 아래 진행 순서가 바뀐다. 열마다 출원 상담 버튼은 상담신청의 분야를 미리 고른다.
+   핵심 모션: 사진 띠가 1.06배에서 1배로 1.6초 동안 천천히 다가오고, 진행 순서는 짧게 바뀐다. 동작 줄이기면 모두 멈춘다.
    본문에서 움직임은 상표 검색 결과를 훑는 선 하나와 기간 막대 전환만 남겼다.
 
    상호작용(모두 브라우저 안에서만 돈다. 실제로 보내지 않는다)
@@ -61,11 +61,6 @@ const EASE = [0.22, 1, 0.36, 1] as const;
 /** 첫 화면 사진이 다가오는 시간과 시작 배율 */
 const ZOOM = 1.6;
 const ZOOM_FROM = 1.06;
-/** 문장이 올라오는 시간과 늦춤 */
-const RISE = 0.7;
-const RISE_DELAY = 0.3;
-/** 스크롤할 때 사진이 내려가는 정도(%) */
-const PARALLAX = 8;
 /** 검색 결과를 훑는 선 */
 const SCAN_DUR = 0.9;
 const ROW_GAP = 0.11;
@@ -221,31 +216,10 @@ export function PatentOfficeDemo() {
     go("po-consult");
   };
 
-  const navBtn = `rounded-[4px] px-2.5 py-1.5 text-[15px] font-semibold underline-offset-[6px] hover:underline ${focusRing}`;
-
   return (
     <div className="min-h-screen overflow-x-clip pb-24" style={{ background: C.paper, color: C.ink }}>
-      <Poster reduce={reduce} onCta={() => go("po-consult")} />
+      <Poster reduce={reduce} go={go} onConsult={(t) => toConsult(t)} />
 
-      <header className="mx-auto flex max-w-[1200px] flex-wrap items-center justify-between gap-x-4 gap-y-2 border-b px-4 py-4 md:px-6" style={{ borderColor: C.line }}>
-        <p className="inline-flex items-center gap-2 text-[19px] font-bold leading-none">
-          <SampleLogo />
-        </p>
-        <nav aria-label="주요 메뉴" className="-mx-2 flex flex-wrap items-center" style={{ outlineColor: C.ink }}>
-          {[
-            ["po-search", "상표 검색"],
-            ["po-fee", "비용안내"],
-            ["po-steps", "출원절차"],
-            ["po-office", "사무소 소개"],
-            ["po-consult", "상담신청"],
-            ["po-visit", "오시는 길"],
-          ].map(([id, label]) => (
-            <button key={id} type="button" onClick={() => go(id)} className={navBtn} style={{ outlineColor: C.ink }}>
-              {label}
-            </button>
-          ))}
-        </nav>
-      </header>
 
       {/* 상표 검색 */}
       <section id="po-search" aria-labelledby="po-search-title" className="mx-auto mt-12 max-w-[1200px] scroll-mt-4 px-4 md:mt-16 md:px-6">
@@ -310,76 +284,244 @@ function SectionTitle({ id, title }: { id: string; title: string }) {
   );
 }
 
-/* ---------- 포스터 ---------- */
+/* ---------- 첫 화면: 메뉴 + 사진 띠 + 권리 비교표 ---------- */
 
-function Poster({ reduce, onCta }: { reduce: boolean; onCta: () => void }) {
-  const ref = useRef<HTMLElement>(null);
-  const { scrollYProgress } = useScroll({ target: ref, offset: ["start start", "end start"] });
-  const photoY = useTransform(scrollYProgress, (v) => (reduce ? "0%" : `${v * PARALLAX}%`));
+type Right = "특허" | "상표" | "디자인";
+const RIGHT_LIST: Right[] = ["특허", "상표", "디자인"];
+
+const RIGHT_ROWS: { label: string; v: Record<Right, string> }[] = [
+  { label: "보호하는 것", v: { 특허: "제품 구조, 장치, 앱 기능, 제조 방법", 상표: "가게 이름, 브랜드, 로고, 상품 이름", 디자인: "제품 겉모양, 포장 용기, 아이콘" } },
+  { label: "권리 기간", v: { 특허: "출원일부터 20년", 상표: "등록부터 10년분, 갱신", 디자인: "상담 때 안내" } },
+  { label: "출원부터 등록까지", v: { 특허: `일반심사 ${TRACK_TOTAL.일반심사}, 우선심사 ${TRACK_TOTAL.우선심사}`, 상표: "상담 때 안내", 디자인: "상담 때 안내" } },
+  { label: "관납료", v: { 특허: "상담 때 견적", 상표: `1상품류 ${won(FEE_FILE)}, 고시 상품명 ${won(FEE_FILE_NOTICED)}`, 디자인: "상담 때 견적" } },
+  { label: "수수료", v: { 특허: "상담 때 견적", 상표: `첫 류 ${won(AGENT_FILE_FIRST)}, 부가세 별도`, 디자인: "상담 때 견적" } },
+  { label: "준비할 자료", v: { 특허: "도면이나 사진, 비슷한 제품 링크", 상표: "이름, 로고 파일, 팔 상품이나 서비스", 디자인: "제품 사진 여러 각도" } },
+];
+
+const RIGHT_FLOW: Record<Right, { steps: string[]; links: [string, string][] }> = {
+  특허: { steps: STEPS.map((s) => s.name), links: [["po-steps", "출원절차"]] },
+  상표: { steps: ["선행 조사", "출원", "심사", "등록결정", "등록료 납부", "등록"], links: [["po-search", "상표 검색"], ["po-fee", "비용 계산"]] },
+  디자인: { steps: ["상담", "출원", "심사", "등록결정", "등록"], links: [] },
+};
+
+const MENU: [string, string][] = [
+  ["po-office", "사무소 소개"],
+  ["po-rights", "업무영역"],
+  ["po-fee", "비용안내"],
+  ["po-steps", "출원절차"],
+  ["po-search", "상표 검색"],
+  ["po-visit", "오시는 길"],
+];
+
+const isAsk = (v: string) => v.startsWith("상담 때");
+
+function Poster({ reduce, go, onConsult }: { reduce: boolean; go: (id: string) => void; onConsult: (t: Topic) => void }) {
+  const [right, setRight] = useState<Right>("상표");
+  const flow = RIGHT_FLOW[right];
+  const menuBtn = `inline-flex min-h-11 flex-none items-center whitespace-nowrap rounded-[4px] px-3 text-[15px] font-semibold underline-offset-[6px] hover:underline ${focusRing}`;
 
   return (
-    <section id="po-poster" ref={ref} aria-labelledby="po-poster-title" className="relative flex min-h-[100svh] flex-col overflow-hidden" style={{ background: "#141414", color: "#fff" }}>
-      <style>{`
-        @keyframes po-rise { from { opacity: 0; transform: translateY(12px); } to { opacity: 1; transform: none; } }
-        .po-rise { animation: po-rise ${RISE}s cubic-bezier(${EASE.join(",")}) ${RISE_DELAY}s both; }
-        @media (prefers-reduced-motion: reduce) { .po-rise { animation: none; } }
-      `}</style>
-      <motion.div className="absolute inset-0" style={{ y: photoY }}>
-        <motion.div
-          className="absolute inset-0"
-          initial={reduce ? false : { scale: ZOOM_FROM }}
-          animate={{ scale: 1 }}
-          transition={reduce ? { duration: 0 } : { duration: ZOOM, ease: EASE }}
-        >
-          {/* eslint-disable-next-line @next/next/no-img-element -- 정적 export 라 next/image 최적화를 쓰지 않는다 */}
-          <img
-            src={`${IMG}/hero.jpg`}
-            srcSet={`${IMG}/hero-sm.jpg 960w, ${IMG}/hero.jpg 1920w`}
-            sizes="100vw"
-            alt="짙은 남색 도면 위에 세운 제도용 컴퍼스"
-            fetchPriority="high"
-            className="absolute inset-0 h-full w-full object-cover"
-            style={{ objectPosition: "55% 40%" }}
-          />
-        </motion.div>
-      </motion.div>
-      <div
-        aria-hidden
-        className="pointer-events-none absolute inset-0"
-        style={{ background: "linear-gradient(to top, rgba(0,0,0,0.75), rgba(0,0,0,0.35) 55%, rgba(0,0,0,0.3))" }}
-      />
+    <section id="po-poster" aria-labelledby="po-poster-title" style={{ background: C.paper, color: C.ink }}>
+      {/* 상단 메뉴. 넓은 화면은 한 줄, 좁으면 아래 줄을 가로로 민다 */}
+      <header className="border-b" style={{ borderColor: C.line }}>
+        <div className="mx-auto flex max-w-[1200px] items-center justify-between gap-4 px-4 py-3 md:px-6">
+          <p className="inline-flex items-center gap-2 text-[19px] font-bold leading-none">
+            <SampleLogo />
+          </p>
+          <nav aria-label="주요 메뉴" className="hidden items-center lg:flex">
+            {MENU.map(([id, label]) => (
+              <button key={id} type="button" onClick={() => go(id)} className={menuBtn} style={{ outlineColor: C.ink }}>
+                {label}
+              </button>
+            ))}
+          </nav>
+          <button
+            type="button"
+            onClick={() => onConsult(right)}
+            data-gtm-cta="patent-office_poster_cta"
+            className={`inline-flex min-h-11 flex-none items-center gap-1.5 rounded-[6px] px-4 text-[15px] font-semibold ${focusRing}`}
+            style={{ background: C.red, color: "#fff", outlineColor: C.ink }}
+          >
+            <MessageCircle size={17} aria-hidden />
+            상담신청
+          </button>
+        </div>
+        <nav aria-label="주요 메뉴" className="flex overflow-x-auto border-t px-2 lg:hidden" style={{ borderColor: C.line, scrollbarWidth: "none" }}>
+          {MENU.map(([id, label]) => (
+            <button key={id} type="button" onClick={() => go(id)} className={menuBtn} style={{ outlineColor: C.ink }}>
+              {label}
+            </button>
+          ))}
+        </nav>
+      </header>
 
-      {/* 로고와 핵심 행동 하나 */}
-      <div className="relative z-10 flex items-center justify-between gap-3 px-4 pt-4 md:px-12 md:pt-7">
-        <p className="inline-flex items-center gap-2 text-[17px] font-bold leading-none">
-          <SampleLogo light size={18} />
-        </p>
-        <button
-          type="button"
-          onClick={onCta}
-          data-gtm-cta="patent-office_poster_cta"
-          className={`inline-flex items-center gap-2 rounded-[6px] px-4 py-2.5 text-[15px] font-semibold ${focusRing}`}
-          style={{ background: "#fff", color: C.ink, outlineColor: "#fff" }}
-        >
-          <MessageCircle size={18} aria-hidden />
-          상담신청
-        </button>
+      {/* 가로로 긴 사진 띠. 사진 위에는 글자를 얹지 않는다 */}
+      <div className="mx-auto max-w-[1200px] md:px-6 md:pt-6">
+        <div className="relative aspect-[16/9] overflow-hidden md:aspect-auto md:h-[clamp(170px,24vh,260px)] md:rounded-[6px]" style={{ background: C.soft }}>
+          <motion.div className="absolute inset-0" initial={reduce ? false : { scale: ZOOM_FROM }} animate={{ scale: 1 }} transition={reduce ? { duration: 0 } : { duration: ZOOM, ease: EASE }}>
+            {/* eslint-disable-next-line @next/next/no-img-element -- 정적 export 라 next/image 최적화를 쓰지 않는다 */}
+            <img
+              src={`${IMG}/hero.jpg`}
+              srcSet={`${IMG}/hero-sm.jpg 960w, ${IMG}/hero.jpg 1920w`}
+              sizes="(min-width: 1200px) 1152px, 100vw"
+              alt="짙은 남색 도면 위에 세운 제도용 컴퍼스"
+              fetchPriority="high"
+              className="absolute inset-0 h-full w-full object-cover"
+              style={{ objectPosition: "55% 45%" }}
+            />
+          </motion.div>
+        </div>
       </div>
 
-      {/* 문장 */}
-      <div className="relative z-[1] mt-auto max-w-[1200px] px-4 pb-14 md:px-12 md:pb-20">
-        <h1
-          id="po-poster-title"
-          className={`${reduce ? "" : "po-rise "}text-[36px] font-bold md:text-[clamp(40px,5vw,72px)]`}
-          style={{ letterSpacing: "-0.03em", lineHeight: 1.2, wordBreak: "keep-all" }}
-        >
-          상표는 먼저 출원한
-          <br />
-          사람의 권리입니다
-        </h1>
-        <p className={`${reduce ? "" : "po-rise "}mt-4 text-[16px] md:mt-6 md:text-[18px]`} style={{ color: "rgba(255,255,255,0.86)" }}>
-          특허, 상표, 디자인 출원 / 평일 09:00 ~ 18:00
-        </p>
+      <div className="mx-auto max-w-[1200px] px-4 pt-6 md:px-6 md:pt-7">
+        <div className="flex flex-wrap items-end justify-between gap-x-6 gap-y-2">
+          <h1 id="po-poster-title" className="text-[28px] font-bold md:text-[34px]" style={{ letterSpacing: "-0.03em", lineHeight: 1.25, wordBreak: "keep-all" }}>
+            상표는 먼저 출원한 사람의 권리입니다
+          </h1>
+          <p className="text-[16px]" style={{ color: C.body }}>
+            특허, 상표, 디자인 출원 / 평일 09:00 ~ 18:00
+          </p>
+        </div>
+      </div>
+
+      {/* 권리 비교 */}
+      <div id="po-rights" className="mx-auto max-w-[1200px] scroll-mt-4 px-4 pb-4 pt-6 md:px-6 md:pt-8">
+        <h2 className="sr-only">업무영역 비교</h2>
+
+        {/* 좁은 화면: 탭 세 개와 고른 권리 한 열 */}
+        <div className="md:hidden">
+          <div role="tablist" aria-label="권리 종류" className="grid grid-cols-3 overflow-hidden rounded-[6px] border" style={{ borderColor: C.field }}>
+            {RIGHT_LIST.map((r) => (
+              <button
+                key={r}
+                type="button"
+                role="tab"
+                aria-selected={right === r}
+                aria-controls="po-right-panel"
+                onClick={() => setRight(r)}
+                className={`min-h-11 text-[16px] font-semibold ${focusRing}`}
+                style={{ background: right === r ? C.red : C.paper, color: right === r ? "#fff" : C.ink, outlineColor: C.ink }}
+              >
+                {r}
+              </button>
+            ))}
+          </div>
+          <dl id="po-right-panel" role="tabpanel" aria-label={`${right} 안내`} className="mt-3 border-t" style={{ borderColor: C.ink }}>
+            {RIGHT_ROWS.map((row) => (
+              <div key={row.label} className="grid grid-cols-[104px_minmax(0,1fr)] gap-3 border-b py-3 text-[15px]" style={{ borderColor: C.line }}>
+                <dt className="font-bold">{row.label}</dt>
+                <dd style={{ color: isAsk(row.v[right]) ? C.gray : C.ink }}>{row.v[right]}</dd>
+              </div>
+            ))}
+          </dl>
+        </div>
+
+        {/* 넓은 화면: 3열 비교표. 열 머리를 누르면 그 열이 강조된다 */}
+        <table className="hidden w-full table-fixed border-collapse text-left text-[15px] md:table">
+          <caption className="sr-only">특허, 상표, 디자인 비교</caption>
+          <colgroup>
+            <col className="w-[150px] lg:w-[180px]" />
+            {RIGHT_LIST.map((r) => (
+              <col key={r} />
+            ))}
+          </colgroup>
+          <thead>
+            <tr>
+              <td />
+              {RIGHT_LIST.map((r) => {
+                const on = right === r;
+                return (
+                  <th key={r} scope="col" className="p-0 align-bottom">
+                    <button
+                      type="button"
+                      aria-pressed={on}
+                      onClick={() => setRight(r)}
+                      className={`flex min-h-12 w-full items-center gap-2 rounded-t-[6px] px-4 text-[19px] font-bold ${focusRing}`}
+                      style={{ background: on ? C.red : C.soft, color: on ? "#fff" : C.ink, outlineColor: C.ink }}
+                    >
+                      {on && <Check size={17} strokeWidth={3} aria-hidden />}
+                      {r}
+                    </button>
+                  </th>
+                );
+              })}
+            </tr>
+          </thead>
+          <tbody>
+            {RIGHT_ROWS.map((row) => (
+              <tr key={row.label} className="border-b" style={{ borderColor: C.line }}>
+                <th scope="row" className="py-3 pr-3 align-top font-bold">
+                  {row.label}
+                </th>
+                {RIGHT_LIST.map((r) => (
+                  <td key={r} className="px-4 py-3 align-top" style={{ background: right === r ? C.redSoft : undefined, color: isAsk(row.v[r]) ? C.gray : C.ink }}>
+                    {row.v[r]}
+                  </td>
+                ))}
+              </tr>
+            ))}
+            <tr>
+              <td />
+              {RIGHT_LIST.map((r) => (
+                <td key={r} className="px-4 pb-4 pt-4" style={{ background: right === r ? C.redSoft : undefined }}>
+                  <button
+                    type="button"
+                    onClick={() => onConsult(r)}
+                    data-gtm-cta={`patent-office_rights_${r}`}
+                    className={`inline-flex min-h-11 items-center rounded-[6px] border px-4 text-[15px] font-semibold ${focusRing}`}
+                    style={right === r ? { background: C.red, borderColor: C.red, color: "#fff", outlineColor: C.ink } : { background: C.paper, borderColor: C.field, color: C.ink, outlineColor: C.ink }}
+                  >
+                    {r} 출원 상담
+                  </button>
+                </td>
+              ))}
+            </tr>
+          </tbody>
+        </table>
+
+        {/* 고른 권리의 진행 순서 */}
+        <div className="mt-5 rounded-[6px] border p-4 md:p-5" style={{ borderColor: C.line }}>
+          <div className="flex flex-wrap items-center justify-between gap-x-4 gap-y-2">
+            <p className="text-[16px] font-bold">{right} 진행 순서</p>
+            <div className="flex flex-wrap gap-2">
+              {flow.links.map(([id, label]) => (
+                <button key={id} type="button" onClick={() => go(id)} className={`inline-flex min-h-11 items-center rounded-[6px] border px-3 text-[15px] font-semibold ${focusRing}`} style={{ borderColor: C.field, outlineColor: C.ink }}>
+                  {label}
+                </button>
+              ))}
+              <button
+                type="button"
+                onClick={() => onConsult(right)}
+                className={`inline-flex min-h-11 items-center rounded-[6px] px-3 text-[15px] font-semibold md:hidden ${focusRing}`}
+                style={{ background: C.red, color: "#fff", outlineColor: C.ink }}
+              >
+                {right} 출원 상담
+              </button>
+            </div>
+          </div>
+          <AnimatePresence mode="wait" initial={false}>
+            <motion.ol
+              key={right}
+              className="mt-3 flex flex-wrap items-center gap-x-1 gap-y-2"
+              initial={reduce ? false : { opacity: 0, x: 8 }}
+              animate={{ opacity: 1, x: 0 }}
+              exit={reduce ? undefined : { opacity: 0, x: -8 }}
+              transition={{ duration: reduce ? 0 : 0.2, ease: EASE }}
+            >
+              {flow.steps.map((s, i) => (
+                <li key={s} className="flex items-center gap-1">
+                  <span className="inline-flex items-center gap-2 rounded-[4px] px-2.5 py-1.5 text-[15px]" style={{ background: C.soft }}>
+                    <span className="text-[13px] font-bold tabular-nums" style={{ color: C.red }}>
+                      {i + 1}
+                    </span>
+                    {s}
+                  </span>
+                  {i < flow.steps.length - 1 && <span aria-hidden className="h-px w-3 md:w-5" style={{ background: C.field }} />}
+                </li>
+              ))}
+            </motion.ol>
+          </AnimatePresence>
+        </div>
       </div>
     </section>
   );

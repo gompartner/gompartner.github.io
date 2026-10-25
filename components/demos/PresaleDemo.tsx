@@ -1,7 +1,7 @@
 "use client";
 
-import { useEffect, useMemo, useRef, useState } from "react";
-import { AnimatePresence, motion, useScroll, useTransform } from "framer-motion";
+import { useEffect, useMemo, useState } from "react";
+import { AnimatePresence, motion } from "framer-motion";
 import { CalendarCheck, Check, CircleAlert, GraduationCap, MapPin, MessageCircle, Minus, Phone, Plus, ShoppingCart, TrainFront, Trees } from "lucide-react";
 import { useReducedMotionSafe } from "@/hooks/useReducedMotionSafe";
 import { daysAgo, fmtKo, useDemoToday } from "@/hooks/useDemoToday";
@@ -16,9 +16,11 @@ import { DemoMakerInfo } from "@/components/demos/DemoMakerInfo";
    아래에 대표번호와 방문예약 버튼이 붙어 다닌다. 관용 문구는 주택형, 전용면적, 공급면적, 계약금 10%, 중도금 60% 이자후불제,
    잔금 30%, 발코니 확장 별도, "견본주택 방문은 사전 예약제로 운영됩니다", "이해를 돕기 위한 것으로 실제와 다를 수 있습니다".
 
-   핵심 모션: 첫 화면(pv-poster)은 밝은 복층 거실 사진 한 장이 화면을 채운다. 들어올 때 사진이 1.6초 동안 천천히 다가오고
-   (scale 1.06 -> 1), 문장과 정보 줄은 0.3초 늦게 아래에서 올라온다(CSS keyframes, 끝 상태가 기본값이라 JS 없이도 보인다).
-   스크롤하면 사진만 조금 느리게 움직인다(y 0 -> 8%). 본문에서는 타입을 바꿀 때 평면도 벽선이 다시 그려지는 것 하나만 남겼다.
+   첫 화면(pv-poster): 실제 분양 사이트처럼 상단 메뉴, 왼쪽 2/3 단지 사진(16:10, 글자 얹지 않음)과 분양개요 표,
+   오른쪽 1/3 은 스크롤을 따라오는 관심고객 등록 패널(관심 타입, 방문 희망일). 패널에서 고른 타입과 날짜는
+   아래 평면도, 분양가, 방문예약 폼과 같은 값이다. 휴대폰은 사진, 단지명, 개요 표 순서로 쌓고 패널 대신 하단 고정 바.
+   핵심 모션: 들어올 때 사진이 1.6초 동안 천천히 다가온다(scale 1.06 -> 1). 본문에서는 타입을 바꿀 때 평면도 벽선이
+   다시 그려지는 것 하나만 남겼다.
    동작 줄이기면 모두 멈춘 완성 상태다. 제목(h1, h2)은 굵게, 글꼴은 모두 Pretendard.
 
    상호작용(모두 브라우저 안에서만 돈다. 실제로 보내지 않는다)
@@ -270,10 +272,22 @@ const PLACES: Record<Cat, { n: string; t: string; x: number; y: number }[]> = {
 
 /* ====================================================================== */
 
+/** 상단 메뉴. 실제 분양 홈페이지 표준 순서(사업개요, 입지환경, 평면도, 분양가, 일정, 방문예약) */
+const MENU: [string, string][] = [
+  ["pv-overview", "사업개요"],
+  ["pv-map", "입지환경"],
+  ["pv-types", "평면도"],
+  ["pv-price", "분양가"],
+  ["pv-schedule", "분양일정"],
+  ["pv-visit", "방문예약"],
+];
+
 export function PresaleDemo() {
   const today = useDemoToday();
   const reduce = useReducedMotionSafe();
   const [typeId, setTypeId] = useState<TypeId>("84");
+  /** 방문 희망일(오늘부터 0~6일 뒤). 첫 화면 패널과 방문예약 폼이 같이 쓴다 */
+  const [visitDay, setVisitDay] = useState(0);
 
   useEffect(() => {
     const f = () => window.scrollTo({ top: 0 });
@@ -282,38 +296,13 @@ export function PresaleDemo() {
   }, []);
 
   const go = (id: string) => document.getElementById(id)?.scrollIntoView({ behavior: reduce ? "auto" : "smooth", block: "start" });
-  const navBtn = `rounded-[4px] px-2.5 py-1.5 text-[15px] font-medium underline-offset-4 hover:underline ${focusRing}`;
 
   return (
-    <div className="min-h-screen overflow-x-clip" style={{ background: C.paper, color: C.ink }}>
-      <Poster reduce={reduce} onCta={() => go("pv-visit")} />
+    <div className="min-h-screen overflow-x-clip pb-[76px] md:pb-0" style={{ background: C.paper, color: C.ink }}>
+      <TopBar go={go} />
+      <Poster reduce={reduce} today={today} typeId={typeId} setTypeId={setTypeId} visitDay={visitDay} setVisitDay={setVisitDay} go={go} />
 
-      <header className="border-b" style={{ borderColor: C.line }}>
-        <div className="mx-auto flex max-w-[1200px] flex-wrap items-center justify-between gap-x-4 gap-y-2 px-4 py-4 md:px-6">
-          <h2 className="inline-flex items-center gap-2 text-[21px] font-bold leading-none">
-            <SampleLogo />
-          </h2>
-          <nav aria-label="주요 메뉴" className="-mx-2 flex flex-wrap items-center">
-            {[
-              ["pv-overview", "사업개요"],
-              ["pv-types", "세대안내"],
-              ["pv-price", "분양안내"],
-              ["pv-visit", "견본주택"],
-              ["pv-map", "입지환경"],
-            ].map(([id, label]) => (
-              <button key={id} type="button" onClick={() => go(id)} className={navBtn} style={{ outlineColor: C.accent }}>
-                {label}
-              </button>
-            ))}
-            <a href={`tel:${TEL.replace(/-/g, "")}`} className={`ml-1 inline-flex items-center gap-1.5 rounded-[4px] px-3 py-1.5 text-[15px] font-semibold text-white ${focusRing}`} style={{ background: C.accent, outlineColor: C.accent }}>
-              <Phone size={16} aria-hidden />
-              {TEL}
-            </a>
-          </nav>
-        </div>
-      </header>
-
-      <Overview today={today} />
+      <Schedule today={today} />
 
       <section id="pv-types" aria-labelledby="pv-types-title" className="mx-auto mt-16 max-w-[1200px] scroll-mt-4 px-4 md:mt-24 md:px-6">
         <SectionTitle id="pv-types-title" title="세대안내" />
@@ -328,7 +317,7 @@ export function PresaleDemo() {
       <section id="pv-visit" aria-labelledby="pv-visit-title" className="mt-16 scroll-mt-4 md:mt-24" style={{ background: C.soft, color: C.ink }}>
         <div className="mx-auto max-w-[1200px] px-4 py-12 md:px-6 md:py-16">
           <SectionTitle id="pv-visit-title" title="견본주택 방문예약" />
-          <VisitForm reduce={reduce} today={today} typeId={typeId} />
+          <VisitForm reduce={reduce} today={today} typeId={typeId} setTypeId={setTypeId} day={visitDay} setDay={setVisitDay} />
         </div>
       </section>
 
@@ -351,6 +340,20 @@ export function PresaleDemo() {
           </div>
         </div>
       </footer>
+
+      {/* 휴대폰: 관심고객 등록 패널 대신 하단 고정 바(태블릿부터는 패널이 보인다). DemoDock 은 이 바 높이를 재서 위로 비켜 선다 */}
+      <div className="fixed inset-x-0 bottom-0 z-40 border-t md:hidden" style={{ background: C.paper, borderColor: C.line, paddingBottom: "env(safe-area-inset-bottom)" }}>
+        <div className="mx-auto grid max-w-[1200px] grid-cols-[minmax(0,1fr)_minmax(0,1.6fr)] gap-2 px-4 py-2.5">
+          <a href={`tel:${TEL.replace(/-/g, "")}`} className={`inline-flex min-h-12 items-center justify-center gap-1.5 rounded-[4px] border text-[16px] font-semibold ${focusRing}`} style={{ borderColor: C.field, color: C.ink, outlineColor: C.accent }}>
+            <Phone size={17} aria-hidden />
+            전화
+          </a>
+          <button type="button" onClick={() => go("pv-visit")} data-gtm-cta="presale_bar_interest" className={`inline-flex min-h-12 items-center justify-center gap-1.5 rounded-[4px] text-[16px] font-semibold text-white ${focusRing}`} style={{ background: C.accent, outlineColor: C.accent }}>
+            <CalendarCheck size={18} aria-hidden />
+            관심고객 등록
+          </button>
+        </div>
+      </div>
     </div>
   );
 }
@@ -366,132 +369,228 @@ function SectionTitle({ id, title }: { id: string; title: string }) {
   );
 }
 
-/* ---------- 첫 화면 ---------- */
+/* ---------- 상단 메뉴 ---------- */
 
-/** 문장 등장. 끝 상태가 기본값이라 JS 가 없어도 보인다 */
-const RISE_CSS = `@keyframes pv-rise{from{opacity:0;transform:translateY(12px)}to{opacity:1;transform:none}}
-.pv-rise{animation:pv-rise 0.7s cubic-bezier(0.22,1,0.36,1) 0.3s both}
-@media (prefers-reduced-motion: reduce){.pv-rise{animation:none}}`;
-
-function Poster({ reduce, onCta }: { reduce: boolean; onCta: () => void }) {
-  const ref = useRef<HTMLElement>(null);
-  const { scrollYProgress } = useScroll({ target: ref, offset: ["start start", "end start"] });
-  const photoY = useTransform(scrollYProgress, (v) => (reduce ? "0%" : `${v * 8}%`));
-
+function TopBar({ go }: { go: (id: string) => void }) {
+  const item = `inline-flex min-h-11 flex-none items-center whitespace-nowrap rounded-[4px] px-3 text-[15px] font-semibold hover:underline underline-offset-4 ${focusRing}`;
   return (
-    <section id="pv-poster" ref={ref} aria-labelledby="pv-poster-title" className="relative flex min-h-[100svh] flex-col overflow-hidden" style={{ background: C.soft, color: C.ink }}>
-      <style>{RISE_CSS}</style>
-      <motion.div className="absolute inset-0" style={{ y: photoY }}>
-        <motion.div className="absolute inset-0" initial={reduce ? false : { scale: 1.06 }} animate={{ scale: 1 }} transition={{ duration: reduce ? 0 : HERO_IN, ease: EASE }}>
-          {/* eslint-disable-next-line @next/next/no-img-element -- 정적 export 라 next/image 최적화를 쓰지 않는다 */}
-          <img
-            src={`${IMG}/hero.jpg`}
-            srcSet={`${IMG}/hero-sm.jpg 960w, ${IMG}/hero.jpg 1920w`}
-            sizes="100vw"
-            alt="천장이 높은 복층 세대 내부. 위층 거실 난간 아래로 주방과 식탁이 보인다"
-            fetchPriority="high"
-            className="absolute inset-0 h-full w-full object-cover"
-            style={{ objectPosition: "55% 35%" }}
-          />
-        </motion.div>
-      </motion.div>
-      <div
-        aria-hidden
-        className="absolute inset-0"
-        style={{ background: "linear-gradient(to bottom, rgba(255,255,255,0.55), rgba(255,255,255,0) 22%), linear-gradient(to top, rgba(255,255,255,0.95), rgba(255,255,255,0.8) 38%, rgba(255,255,255,0.1) 72%)" }}
-      />
-
-      {/* 로고와 핵심 행동 하나 */}
-      <div className="relative z-10 flex items-center justify-between gap-3 px-4 pt-4 md:px-12 md:pt-7">
+    <header className="border-b" style={{ background: C.paper, borderColor: C.line }}>
+      <div className="mx-auto flex max-w-[1200px] items-center justify-between gap-4 px-4 pt-3 lg:py-3 md:px-6">
         <p className="inline-flex items-center gap-2 text-[17px] font-bold leading-none">
           <SampleLogo size={18} />
         </p>
-        <button
-          type="button"
-          onClick={onCta}
-          data-gtm-cta="presale_poster_cta"
-          className={`inline-flex h-11 flex-none items-center gap-1.5 rounded-[6px] px-4 text-[15px] font-semibold text-white ${focusRing}`}
-          style={{ background: C.accent, outlineColor: C.accent }}
-        >
-          <CalendarCheck size={18} aria-hidden />
-          방문예약
-        </button>
+        <nav aria-label="주요 메뉴" className="hidden items-center lg:flex">
+          {MENU.map(([id, label]) => (
+            <button key={id} type="button" onClick={() => go(id)} className={item} style={{ color: C.ink, outlineColor: C.accent }}>
+              {label}
+            </button>
+          ))}
+        </nav>
+        <a href={`tel:${TEL.replace(/-/g, "")}`} className={`inline-flex min-h-11 flex-none items-center gap-1.5 rounded-[4px] px-2 text-[16px] font-bold tabular-nums ${focusRing}`} style={{ color: C.accent, outlineColor: C.accent }}>
+          <Phone size={17} aria-hidden />
+          {TEL}
+        </a>
       </div>
+      {/* 휴대폰, 태블릿: 가로로 밀어 보는 메뉴 한 줄 */}
+      <nav aria-label="주요 메뉴" className="-mb-px flex gap-1 overflow-x-auto px-2 pb-1 lg:hidden" style={{ scrollbarWidth: "none" }}>
+        {MENU.map(([id, label]) => (
+          <button key={id} type="button" onClick={() => go(id)} className={item} style={{ color: C.ink, outlineColor: C.accent }}>
+            {label}
+          </button>
+        ))}
+      </nav>
+    </header>
+  );
+}
 
-      {/* 문장 */}
-      <div className={`relative z-[1] mt-auto max-w-[1200px] px-4 pb-[10svh] md:px-12 ${reduce ? "" : "pv-rise"}`}>
-        <h1
-          id="pv-poster-title"
-          className="text-[36px] font-bold md:text-[clamp(40px,5vw,72px)]"
-          style={{ ...serifF, letterSpacing: "-0.03em", lineHeight: 1.2, wordBreak: "keep-all" }}
-        >
-          ㅎㄷ역 도보 6분,
-          <br />
-          초등학교 도보 4분
-        </h1>
-        <p className="mt-4 text-[16px] md:mt-5 md:text-[18px]" style={{ color: C.body }}>
-          {GALLERY}, 매일 10:00 ~ 18:00
-        </p>
+/* ---------- 첫 화면: 단지 사진, 분양개요 표, 따라오는 관심고객 등록 패널 ---------- */
+
+function Poster({
+  reduce,
+  today,
+  typeId,
+  setTypeId,
+  visitDay,
+  setVisitDay,
+  go,
+}: {
+  reduce: boolean;
+  today: Date;
+  typeId: TypeId;
+  setTypeId: (t: TypeId) => void;
+  visitDay: number;
+  setVisitDay: (d: number) => void;
+  go: (id: string) => void;
+}) {
+  const days = useMemo(() => Array.from({ length: 7 }, (_, i) => daysAgo(today, -i)), [today]);
+  const moveIn = addMonths(daysAgo(today, -CONTRACT_IN), MOVE_IN_MONTHS);
+  const rows: [string, React.ReactNode][] = [
+    ["대지위치", SITE_ADDR],
+    ["건축규모", "지하 2층, 지상 25층, 8개동"],
+    ["세대수", `총 ${TOTAL_HOUSEHOLDS}세대`],
+    [
+      "타입 구성",
+      <>
+        {TYPES.map((t, i) => (
+          <span key={t.id}>
+            {i > 0 && ", "}
+            {t.id}타입 {t.households}세대
+          </span>
+        ))}
+      </>,
+    ],
+    ["입주예정", ym(moveIn)],
+    ["견본주택", GALLERY_ADDR],
+  ];
+  const chip = (on: boolean) => ({
+    background: on ? C.accent : "#fff",
+    color: on ? "#fff" : C.ink,
+    borderColor: on ? C.accent : C.field,
+    outlineColor: C.accent,
+  });
+  const weekend = (d: Date) => d.getDay() === 0 || d.getDay() === 6;
+
+  return (
+    <section
+      id="pv-poster"
+      aria-labelledby="pv-poster-title"
+      className="mx-auto grid max-w-[1200px] gap-x-8 gap-y-6 px-4 pt-4 md:px-6 md:pt-6 lg:grid-cols-[minmax(0,2fr)_minmax(0,1fr)]"
+    >
+      {/* 단지 사진. 위에 글자를 얹지 않는다 */}
+      <figure className="min-w-0 lg:col-start-1 lg:row-start-1">
+        <div className="relative aspect-[16/10] overflow-hidden rounded-[4px]" style={{ background: C.soft }}>
+          <motion.div className="absolute inset-0" initial={reduce ? false : { scale: 1.06 }} animate={{ scale: 1 }} transition={{ duration: reduce ? 0 : HERO_IN, ease: EASE }}>
+            {/* eslint-disable-next-line @next/next/no-img-element -- 정적 export 라 next/image 최적화를 쓰지 않는다 */}
+            <img
+              src={`${IMG}/hero.jpg`}
+              srcSet={`${IMG}/hero-sm.jpg 960w, ${IMG}/hero.jpg 1920w`}
+              sizes="(min-width: 1024px) 66vw, 100vw"
+              alt="천장이 높은 복층 세대 내부. 위층 거실 난간 아래로 주방과 식탁이 보인다"
+              fetchPriority="high"
+              className="absolute inset-0 h-full w-full object-cover"
+              style={{ objectPosition: "55% 40%" }}
+            />
+          </motion.div>
+        </div>
+      </figure>
+
+      {/* 단지명과 관심고객 등록. PC 에서는 오른쪽 1/3 에서 스크롤을 따라온다 */}
+      <aside className="min-w-0 lg:col-start-2 lg:row-span-2 lg:row-start-1" aria-label="관심고객 등록">
+        <div className="md:grid md:grid-cols-[minmax(0,1fr)_minmax(0,1fr)] md:gap-8 lg:sticky lg:top-6 lg:block lg:rounded-[6px] lg:border lg:p-6" style={{ borderColor: C.line }}>
+          <div>
+            <p className="text-[15px] font-semibold" style={{ color: C.accent }}>
+              {BRAND} 아파트, 총 {TOTAL_HOUSEHOLDS}세대
+            </p>
+            <h1 id="pv-poster-title" className="mt-2 text-[28px] font-bold md:text-[32px]" style={{ ...serifF, letterSpacing: "-0.03em", lineHeight: 1.25, wordBreak: "keep-all" }}>
+              ㅎㄷ역 도보 6분,
+              <br />
+              초등학교 도보 4분
+            </h1>
+            <p className="mt-3 inline-flex items-start gap-1.5 text-[15px] leading-[1.6]" style={{ color: C.body }}>
+              <MapPin size={17} aria-hidden className="mt-0.5 flex-none" style={{ color: C.accent }} />
+              {GALLERY}, 매일 10:00 ~ 18:00
+            </p>
+          </div>
+
+          <div className="hidden space-y-5 md:block lg:mt-6 lg:border-t lg:pt-5" style={{ borderColor: C.line }}>
+            <fieldset>
+              <legend className="mb-2 text-[15px] font-bold">관심 타입</legend>
+              <div className="grid grid-cols-3 gap-2">
+                {TYPES.map((t) => (
+                  <button
+                    key={t.id}
+                    type="button"
+                    aria-pressed={typeId === t.id}
+                    onClick={() => setTypeId(t.id)}
+                    className={`flex min-h-14 flex-col items-center justify-center rounded-[4px] border px-1 ${focusRing}`}
+                    style={chip(typeId === t.id)}
+                  >
+                    <span className="text-[17px] font-bold">{t.id}</span>
+                    <span className="text-[12px]">{t.pyeong}평형</span>
+                  </button>
+                ))}
+              </div>
+            </fieldset>
+            <fieldset>
+              <legend className="mb-2 text-[15px] font-bold">방문 희망일</legend>
+              <div className="grid grid-cols-7 gap-1">
+                {days.map((d, i) => (
+                  <button
+                    key={i}
+                    type="button"
+                    aria-pressed={visitDay === i}
+                    aria-label={`${fmtKo(d)}${weekend(d) ? ", 주말" : ""}`}
+                    onClick={() => setVisitDay(i)}
+                    className={`flex min-h-14 min-w-0 flex-col items-center justify-center rounded-[4px] border ${focusRing}`}
+                    style={chip(visitDay === i)}
+                  >
+                    <span className="text-[12px]">{i === 0 ? "오늘" : DOW[d.getDay()]}</span>
+                    <span className="text-[16px] font-bold tabular-nums">{d.getDate()}</span>
+                  </button>
+                ))}
+              </div>
+            </fieldset>
+            <button
+              type="button"
+              onClick={() => go("pv-visit")}
+              data-gtm-cta="presale_poster_cta"
+              className={`inline-flex min-h-12 w-full items-center justify-center gap-2 rounded-[4px] text-[17px] font-semibold text-white ${focusRing}`}
+              style={{ background: C.accent, outlineColor: C.accent }}
+            >
+              <CalendarCheck size={19} aria-hidden />
+              관심고객 등록
+            </button>
+            <p className="text-[14px] leading-[1.6]" style={{ color: C.muted }}>
+              선택 {typeId}타입, {fmtKo(days[visitDay])}
+            </p>
+          </div>
+        </div>
+      </aside>
+
+      {/* 분양개요 표 */}
+      <div id="pv-overview" className="min-w-0 scroll-mt-4 lg:col-start-1 lg:row-start-2">
+        <h2 className="mb-3 text-[20px] font-bold md:text-[22px]">분양개요</h2>
+        <dl className="grid border-t text-[15px] md:grid-cols-2 md:text-[16px]" style={{ borderColor: C.ink }}>
+          {rows.map(([k, v]) => (
+            <div key={k} className="grid grid-cols-[88px_minmax(0,1fr)] gap-3 border-b py-3 md:grid-cols-[96px_minmax(0,1fr)] md:pr-4" style={{ borderColor: C.line }}>
+              <dt className="font-semibold" style={{ color: C.ink }}>
+                {k}
+              </dt>
+              <dd style={{ color: C.body }}>{v}</dd>
+            </div>
+          ))}
+        </dl>
       </div>
     </section>
   );
 }
 
-/* ---------- 사업개요와 분양 일정 ---------- */
+/* ---------- 분양 일정 ---------- */
 
-function Overview({ today }: { today: Date }) {
-  const moveIn = addMonths(daysAgo(today, -CONTRACT_IN), MOVE_IN_MONTHS);
-  const rows: [string, React.ReactNode][] = [
-    ["대지위치", SITE_ADDR],
-    ["건축규모", "지하 2층, 지상 25층, 8개동"],
-    ["세대수", `총 ${TOTAL_HOUSEHOLDS}세대 (59타입, 84타입, 109타입)`],
-    ["입주예정", ym(moveIn)],
-    ["견본주택", GALLERY_ADDR],
-  ];
+function Schedule({ today }: { today: Date }) {
   return (
-    <section id="pv-overview" aria-labelledby="pv-overview-title" className="mx-auto mt-12 grid max-w-[1200px] scroll-mt-4 gap-10 px-4 md:mt-16 md:grid-cols-[minmax(0,1.15fr)_minmax(0,1fr)] md:px-6">
-      <div>
-        <SectionTitle id="pv-overview-title" title="사업개요" />
-        <dl className="grid grid-cols-[88px_minmax(0,1fr)] border-t text-[16px] md:grid-cols-[110px_minmax(0,1fr)]" style={{ borderColor: C.ink }}>
-          {rows.map(([k, v]) => (
-            <div key={k} className="contents">
-              <dt className="border-b py-3 font-semibold" style={{ borderColor: C.line, color: C.ink }}>
-                {k}
-              </dt>
-              <dd className="border-b py-3" style={{ borderColor: C.line }}>
-                {v}
-              </dd>
-            </div>
-          ))}
-        </dl>
-      </div>
-      <div>
-        <h3 className="mb-7 text-[22px] font-bold leading-[42px] md:text-[26px] md:leading-[51px]" style={{ color: C.ink }}>
-          분양 일정
-        </h3>
-        <ol className="border-t" style={{ borderColor: C.ink }}>
-          {SCHEDULE.map(([name, from, to]) => {
-            const d1 = daysAgo(today, -from);
-            const done = from < 0;
-            const label = to ? `${fmtKo(d1)} ~ ${fmtKo(daysAgo(today, -to))}` : fmtKo(d1);
-            return (
-              <li key={name} className="flex items-center justify-between gap-3 border-b py-3 text-[16px]" style={{ borderColor: C.line, color: done ? C.muted : C.ink }}>
-                <span className="inline-flex items-center gap-2 font-bold">
-                  {name}
-                  {done && (
-                    <span className="rounded-[3px] px-1.5 py-0.5 text-[12px] font-bold" style={{ background: C.soft, color: C.muted }}>
-                      완료
-                    </span>
-                  )}
-                </span>
-                <span className="text-right text-[15px] tabular-nums">
-                  {label}
-                </span>
-              </li>
-            );
-          })}
-        </ol>
-      </div>
+    <section id="pv-schedule" aria-labelledby="pv-schedule-title" className="mx-auto mt-16 max-w-[1200px] scroll-mt-4 px-4 md:mt-24 md:px-6">
+      <SectionTitle id="pv-schedule-title" title="분양 일정" />
+      <ol className="grid border-t md:grid-cols-2 md:gap-x-10" style={{ borderColor: C.ink }}>
+        {SCHEDULE.map(([name, from, to]) => {
+          const d1 = daysAgo(today, -from);
+          const done = from < 0;
+          const label = to ? `${fmtKo(d1)} ~ ${fmtKo(daysAgo(today, -to))}` : fmtKo(d1);
+          return (
+            <li key={name} className="flex items-center justify-between gap-3 border-b py-3 text-[16px]" style={{ borderColor: C.line, color: done ? C.muted : C.ink }}>
+              <span className="inline-flex items-center gap-2 font-bold">
+                {name}
+                {done && (
+                  <span className="rounded-[3px] px-1.5 py-0.5 text-[12px] font-bold" style={{ background: C.soft, color: C.muted }}>
+                    완료
+                  </span>
+                )}
+              </span>
+              <span className="text-right text-[15px] tabular-nums">{label}</span>
+            </li>
+          );
+        })}
+      </ol>
     </section>
   );
 }
@@ -760,12 +859,28 @@ function PriceCalc({ today, typeId, setTypeId }: { today: Date; typeId: TypeId; 
 
 type Done = { no: string; date: Date; slot: string; type: TypeId; people: number; name: string; phone: string };
 
-function VisitForm({ reduce, today, typeId }: { reduce: boolean; today: Date; typeId: TypeId }) {
+function VisitForm({
+  reduce,
+  today,
+  typeId,
+  setTypeId,
+  day,
+  setDay,
+}: {
+  reduce: boolean;
+  today: Date;
+  typeId: TypeId;
+  setTypeId: (t: TypeId) => void;
+  day: number;
+  setDay: (d: number) => void;
+}) {
   const days = useMemo(() => Array.from({ length: 7 }, (_, i) => daysAgo(today, -i)), [today]);
-  const [day, setDay] = useState(0);
-  const [slot, setSlot] = useState<number | null>(null);
-  const [typePick, setType] = useState<TypeId | null>(null);
-  const type = typePick ?? typeId;
+  /* 날짜는 첫 화면 패널에서도 바뀌므로, 고른 시간은 그 날짜에만 붙여 둔다 */
+  const [pick, setPick] = useState<{ day: number; i: number } | null>(null);
+  const slot = pick && pick.day === day ? pick.i : null;
+  const setSlot = (i: number | null) => setPick(i === null ? null : { day, i });
+  const type = typeId;
+  const setType = setTypeId;
   const [people, setPeople] = useState(2);
   const [name, setName] = useState("");
   const [phone, setPhone] = useState("");
