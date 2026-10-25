@@ -2,7 +2,7 @@
 
 import { useCallback, useEffect, useId, useMemo, useRef, useState } from "react";
 import { AnimatePresence, motion } from "framer-motion";
-import { CalendarCheck, Car, Check, CircleAlert, Clock, Download, MapPin, Paperclip, RotateCcw } from "lucide-react";
+import { CalendarCheck, Car, Check, CircleAlert, Clock, Download, MapPin, Paperclip, RotateCcw, X } from "lucide-react";
 import { useReducedMotionSafe } from "@/hooks/useReducedMotionSafe";
 import { maskName, maskPhone } from "@/components/demos/LeadReceivedPanel";
 import { daysAgo, fmtKo, useDemoToday } from "@/hooks/useDemoToday";
@@ -18,7 +18,7 @@ import { DemoMakerInfo } from "@/components/demos/DemoMakerInfo";
    예약은 날짜, 시간, 담당 디자이너를 고르고 이름과 휴대폰을 남긴다. 변경과 취소는 하루 전까지가 관용 문구다.
 
    핵심 모션
-   - 첫 화면(ns-poster): 왼쪽 가격 판과 오른쪽 손 사진, 이달의 아트 6칸. 사진만 1.04배에서 1.6초 동안 천천히 다가온다.
+   - 첫 화면(ns-poster): 왼쪽 가격 판과 오른쪽 이달의 아트 손 사진 3x3. 칸을 누르면 그 칸 자리에서 240ms 동안 크게 열린다.
    - 컬러칩을 누르면 칩이 손톱 자리까지 날아가 붙고(layoutId) 손톱 색이 320ms 동안 그 색으로 바뀐다.
      선택 테두리 링도 layoutId 로 칩 사이를 옮겨 다닌다. 아트는 손톱 위 패턴 레이어가 교차 전환한다.
    동작 줄이기가 켜져 있으면 첫 화면은 멈춘 사진, 나머지는 전부 즉시 바뀐다.
@@ -87,14 +87,33 @@ const CHIPS: { name: string; hex: string }[] = [
   { name: "블랙", hex: "#1f1d21" },
 ];
 
-type ArtId = "none" | "french" | "grad" | "glitter" | "check" | "magnet";
+type ArtId = "none" | "french" | "grad" | "glitter" | "pearl" | "flower" | "check" | "marble" | "chrome" | "magnet";
 const ARTS: { id: ArtId; label: string; price: number }[] = [
   { id: "none", label: "없음", price: 0 },
   { id: "french", label: "프렌치", price: 3000 },
   { id: "grad", label: "그라데이션", price: 4000 },
   { id: "glitter", label: "글리터", price: 4000 },
+  { id: "pearl", label: "진주 펄", price: 5000 },
+  { id: "flower", label: "꽃", price: 5000 },
   { id: "check", label: "체크", price: 6000 },
+  { id: "marble", label: "마블", price: 6000 },
+  { id: "chrome", label: "크롬", price: 7000 },
   { id: "magnet", label: "마그네틱", price: 8000 },
+];
+const artOf = (id: ArtId) => ARTS.find((a) => a.id === id)!;
+
+/** 이달의 아트 9개. 사진(art-*.jpg)마다 칠해 보기 손에 올릴 아트와 바탕색(CHIPS 순번) */
+type Monthly = { img: string; name: string; art: ArtId; chip: number; alt: string };
+const MONTHLY: Monthly[] = [
+  { img: "art-french", name: "누드 프렌치", art: "french", chip: 1, alt: "연한 분홍 바탕에 흰 끝선을 넣은 프렌치 네일" },
+  { img: "art-glitter", name: "핑크 글리터", art: "glitter", chip: 1, alt: "분홍 바탕에 잔 글리터를 올린 네일" },
+  { img: "art-magnet", name: "버건디 마그네틱", art: "magnet", chip: 15, alt: "버건디 바탕에 빛줄기가 도는 마그네틱 네일" },
+  { img: "art-nude", name: "누드 원컬러", art: "none", chip: 0, alt: "맑은 누드 톤 원컬러 네일" },
+  { img: "art-marble", name: "화이트 마블", art: "marble", chip: 0, alt: "흰 바탕에 회색 결을 그린 마블 네일" },
+  { img: "art-flower", name: "데이지 포인트", art: "flower", chip: 1, alt: "분홍 바탕 두 손톱에 흰 꽃을 그린 네일" },
+  { img: "art-check", name: "브라운 체크", art: "check", chip: 20, alt: "누드 바탕에 갈색 체크를 넣은 네일" },
+  { img: "art-chrome", name: "실버 크롬", art: "chrome", chip: 22, alt: "은색으로 빛나는 크롬 네일" },
+  { img: "art-pearl", name: "진주 펄 프렌치", art: "pearl", chip: 0, alt: "누드 바탕에 진주빛 펄을 올린 네일" },
 ];
 
 type BaseId = "one" | "grad";
@@ -192,6 +211,7 @@ export function NailShopDemo() {
   const [remove, setRemove] = useState(false);
   const [fly, setFly] = useState<Fly | null>(null);
   const [saved, setSaved] = useState<{ url: string; at: string } | null>(null);
+  const [artNote, setArtNote] = useState<string | null>(null);
   const svgRef = useRef<SVGSVGElement>(null);
   const flyKey = useRef(0);
 
@@ -322,12 +342,13 @@ export function NailShopDemo() {
       <Poster
         reduce={reduce}
         month={today.getMonth() + 1}
-        nails={nails}
         go={go}
-        onArt={(art) => {
+        onPick={(m, book) => {
           setTarget(null);
-          push((prev) => prev.map((n) => ({ ...n, art })));
-          go("ns-design");
+          setChip(m.chip);
+          push(() => START.map(() => ({ color: CHIPS[m.chip].hex, art: m.art })));
+          if (book) setArtNote(m.name);
+          go(book ? "ns-reserve" : "ns-design");
         }}
       />
 
@@ -539,7 +560,7 @@ export function NailShopDemo() {
         <h2 id="ns-reserve-title" className="font-bold tracking-[-0.02em] text-[30px] md:text-[38px]">
           예약하기
         </h2>
-        <ReserveForm today={today} reduce={reduce} saved={saved} bill={bill} />
+        <ReserveForm today={today} reduce={reduce} saved={saved} bill={bill} artNote={artNote} />
       </section>
 
       {/* 샵 안내와 오시는 길 */}
@@ -563,10 +584,11 @@ export function NailShopDemo() {
 
 /* 첫 화면 */
 
-/* 첫 화면: 상단 메뉴 + 왼쪽 좁은 가격 판(이달 숫자, 기본가, 추가 조건) + 오른쪽 손 사진과 아트 6칸.
-   실제 네일샵 사이트의 "이달의 아트"와 가격 카드를 한 화면에 모은 형태. 아트 칸을 누르면 아래 칠해 보기 손에
-   그 아트가 다섯 손톱 모두 올라간 상태로 내려간다. 휴대폰 메뉴는 가로로 넘기는 탭 줄.
-   모션: 사진만 1.04배에서 1.6초 동안 천천히 다가온다. 동작 줄이기면 멈춘 사진. */
+/* 첫 화면: 상단 메뉴 + 왼쪽 좁은 가격 판(이달 숫자, 기본가, 추가 조건) + 오른쪽 이달의 아트 손 사진 3x3.
+   실제 네일샵 사이트의 "이달의 아트"와 가격 카드를 한 화면에 모은 형태. 칸을 누르면 그 자리에서 크게 열리고
+   "손에 올려 보기"는 아래 칠해 보기 손에, "이 아트로 예약"은 같은 아트를 올린 뒤 예약 요청 사항에 아트 이름을 넣는다.
+   휴대폰 메뉴는 가로로 넘기는 탭 줄, 격자는 인스타 프로필처럼 3열 정사각.
+   모션: 열린 칸이 누른 칸 자리에서 커진다. 동작 줄이기면 바로 바뀐다. */
 const NS_MENU: [string, string][] = [
   ["ns-art", "이달의 아트"],
   ["ns-chips", "컬러"],
@@ -575,7 +597,7 @@ const NS_MENU: [string, string][] = [
   ["ns-info", "오시는 길"],
 ];
 
-function Poster({ reduce, month, nails, go, onArt }: { reduce: boolean; month: number; nails: Nail[]; go: (id: string) => void; onArt: (a: ArtId) => void }) {
+function Poster({ reduce, month, go, onPick }: { reduce: boolean; month: number; go: (id: string) => void; onPick: (m: Monthly, book: boolean) => void }) {
   const navBtn = `min-h-11 flex-none rounded-[6px] px-3 text-[15px] font-semibold hover:underline hover:underline-offset-4 ${focusRing}`;
   return (
     <section id="ns-poster" aria-labelledby="ns-poster-title" style={{ background: C.bg }}>
@@ -645,48 +667,117 @@ function Poster({ reduce, month, nails, go, onArt }: { reduce: boolean; month: n
           </div>
         </div>
 
-        {/* 손 사진 + 이달의 아트 6칸 */}
-        <div className="min-w-0">
-          <div className="relative aspect-[4/3] overflow-hidden rounded-[8px] md:aspect-auto md:h-[min(52svh,480px)]" style={{ background: C.roseSoft }}>
-            <motion.div className="absolute inset-0" initial={reduce ? false : { scale: 1.04 }} animate={{ scale: 1 }} transition={{ duration: reduce ? 0 : 1.6, ease: EASE }}>
-              {/* eslint-disable-next-line @next/next/no-img-element -- 정적 export 라 next/image 최적화를 쓰지 않는다 */}
-              <img
-                src={`${IMG}/hero.jpg`}
-                srcSet={`${IMG}/hero-sm.jpg 960w, ${IMG}/hero.jpg 1344w`}
-                sizes="(min-width: 768px) 800px, 100vw"
-                alt="분홍 실크 위에 누드 핑크 젤네일을 한 손을 올린 사진"
-                fetchPriority="high"
-                className="h-full w-full object-cover"
-                style={{ objectPosition: "70% 50%" }}
-              />
-            </motion.div>
-          </div>
-          <div role="group" aria-label="이달의 아트" className="mt-3 grid grid-cols-3 gap-2 xl:grid-cols-6">
-            {ARTS.map((a) => {
-              const on = nails.every((n) => n.art === a.id);
-              return (
-                <button
-                  key={a.id}
-                  type="button"
-                  aria-pressed={on}
-                  onClick={() => onArt(a.id)}
-                  className={`flex min-h-[64px] flex-col items-start justify-center gap-1 rounded-[6px] border px-3 py-2 text-left ${focusRing}`}
-                  style={{ borderColor: on ? C.accent : C.line, background: on ? C.accent : C.paper, color: on ? "#ffffff" : C.plum, outlineColor: C.plum }}
-                >
-                  <span className="inline-flex items-center gap-1.5 text-[15px] font-bold">
-                    <ArtSwatch art={a.id} />
-                    {a.id === "none" ? "원컬러" : a.label}
-                  </span>
-                  <span className="text-[13px] tabular-nums" style={{ opacity: 0.85 }}>
-                    {a.price ? `손톱당 ${a.price.toLocaleString("ko-KR")}원` : "아트 없음"}
-                  </span>
-                </button>
-              );
-            })}
-          </div>
-        </div>
+        {/* 이달의 아트 3x3. 칸을 누르면 그 자리에서 크게 열린다 */}
+        <ArtGrid reduce={reduce} month={month} onPick={onPick} />
       </div>
     </section>
+  );
+}
+
+function ArtGrid({ reduce, month, onPick }: { reduce: boolean; month: number; onPick: (m: Monthly, book: boolean) => void }) {
+  const [open, setOpen] = useState<number | null>(null);
+  const cells = useRef<(HTMLButtonElement | null)[]>([]);
+  const closeBtn = useRef<HTMLButtonElement>(null);
+  const m = open === null ? null : MONTHLY[open];
+  const art = m ? artOf(m.art) : null;
+  const close = () => {
+    const i = open;
+    setOpen(null);
+    if (i !== null) requestAnimationFrame(() => cells.current[i]?.focus());
+  };
+  useEffect(() => {
+    if (open !== null) closeBtn.current?.focus();
+  }, [open]);
+  const t = { duration: reduce ? 0 : 0.24, ease: EASE };
+  return (
+    <div className="min-w-0">
+      <div
+        className="relative mx-auto aspect-square w-full overflow-hidden rounded-[8px] md:mx-0 md:max-w-[min(100%,calc(100svh-140px))]"
+        onKeyDown={(e) => {
+          if (e.key === "Escape" && open !== null) close();
+        }}
+      >
+        <ul aria-label={`${month}월 아트 9가지`} className="grid h-full grid-cols-3 grid-rows-3 gap-1 md:gap-1.5">
+          {MONTHLY.map((x, i) => (
+            <li key={x.img} className="min-h-0 min-w-0">
+              <button
+                ref={(el) => {
+                  cells.current[i] = el;
+                }}
+                type="button"
+                onClick={() => setOpen(i)}
+                aria-haspopup="dialog"
+                aria-label={`${x.name}, ${x.art === "none" ? "아트 없음" : `손톱당 ${won(artOf(x.art).price)}`}`}
+                className={`group relative block h-full w-full overflow-hidden ${focusRing}`}
+                style={{ background: C.roseSoft, outlineColor: C.plum, outlineOffset: -3 }}
+                tabIndex={open === null ? 0 : -1}
+              >
+                {/* eslint-disable-next-line @next/next/no-img-element -- 정적 export 라 next/image 최적화를 쓰지 않는다 */}
+                <img
+                  src={`${IMG}/${x.img}.jpg`}
+                  alt=""
+                  loading={i < 3 ? "eager" : "lazy"}
+                  fetchPriority={i === 0 ? "high" : undefined}
+                  sizes="(min-width: 768px) 260px, 33vw"
+                  className={`h-full w-full object-cover ${reduce ? "" : "transition-transform duration-300 group-hover:scale-[1.03]"}`}
+                />
+                <span className="absolute bottom-1.5 left-1.5 max-w-[calc(100%-12px)] truncate rounded-[4px] px-1.5 py-0.5 text-[12px] font-semibold md:bottom-2 md:left-2 md:text-[13px]" style={{ background: "rgba(255,255,255,0.92)", color: C.plum }}>
+                  {x.name}
+                </span>
+              </button>
+            </li>
+          ))}
+        </ul>
+
+        <AnimatePresence>
+          {m && art && open !== null && (
+            <motion.div
+              key="open"
+              role="dialog"
+              aria-label={m.name}
+              className="absolute inset-0 flex flex-col"
+              style={{ background: C.paper, transformOrigin: `${(open % 3) * 50}% ${Math.floor(open / 3) * 50}%` }}
+              initial={reduce ? { opacity: 0 } : { opacity: 0, scale: 0.34 }}
+              animate={{ opacity: 1, scale: 1 }}
+              exit={reduce ? { opacity: 0 } : { opacity: 0, scale: 0.34 }}
+              transition={t}
+            >
+              <div className="relative min-h-0 flex-1">
+                {/* eslint-disable-next-line @next/next/no-img-element -- 정적 export 라 next/image 최적화를 쓰지 않는다 */}
+                <img src={`${IMG}/${m.img}.jpg`} alt={m.alt} sizes="(min-width: 768px) 780px, 100vw" className="h-full w-full object-cover" />
+                <button
+                  ref={closeBtn}
+                  type="button"
+                  onClick={close}
+                  aria-label="닫기"
+                  className={`absolute right-2 top-2 inline-flex h-11 w-11 items-center justify-center rounded-full ${focusRing}`}
+                  style={{ background: "rgba(255,255,255,0.94)", color: C.plum, outlineColor: C.plum }}
+                >
+                  <X size={20} aria-hidden />
+                </button>
+              </div>
+              <div className="flex flex-wrap items-center gap-x-4 gap-y-2 border-t p-3 md:p-4" style={{ borderColor: C.line }}>
+                <div className="min-w-0 flex-1">
+                  <p className="text-[17px] font-bold md:text-[20px]">{m.name}</p>
+                  <p className="text-[14px] tabular-nums" style={{ color: C.plumSoft }}>
+                    {m.art === "none" ? `${won(BASES[0].price)}, 아트 없음` : `손톱당 ${won(art.price)}, 열 손톱 ${won(BASES[0].price + art.price * 10)}`}
+                  </p>
+                </div>
+                <div className="flex w-full gap-2 sm:w-auto">
+                  <button type="button" onClick={() => { setOpen(null); onPick(m, false); }} data-gtm-cta="nail-shop_poster_try" className={`min-h-11 flex-1 rounded-[6px] border px-4 text-[15px] font-semibold sm:flex-none ${focusRing}`} style={{ borderColor: C.line, outlineColor: C.plum }}>
+                    손에 올려 보기
+                  </button>
+                  <button type="button" onClick={() => { setOpen(null); onPick(m, true); }} data-gtm-cta="nail-shop_poster_book" className={`inline-flex min-h-11 flex-1 items-center justify-center gap-1.5 rounded-[6px] px-4 text-[15px] font-semibold text-white sm:flex-none ${focusRing}`} style={{ background: C.accent, outlineColor: C.plum }}>
+                    <CalendarCheck size={17} aria-hidden />
+                    이 아트로 예약
+                  </button>
+                </div>
+              </div>
+            </motion.div>
+          )}
+        </AnimatePresence>
+      </div>
+    </div>
   );
 }
 /* 손 SVG */
@@ -715,6 +806,18 @@ function HandSvg({ ref, uid, nails, target, onPick, reduce }: { ref: React.RefOb
           <stop offset="0.56" stopColor="#fff" stopOpacity="0.85" />
           <stop offset="0.75" stopColor="#fff" stopOpacity="0" />
         </linearGradient>
+        <linearGradient id={`chrome-${uid}`} x1="0" y1="0" x2="1" y2="1">
+          <stop offset="0" stopColor="#f4f4f4" />
+          <stop offset="0.35" stopColor="#a9abb0" />
+          <stop offset="0.55" stopColor="#ffffff" />
+          <stop offset="0.8" stopColor="#8f9196" />
+          <stop offset="1" stopColor="#d8d9dc" />
+        </linearGradient>
+        <radialGradient id={`pearl-${uid}`} cx="0.4" cy="0.3" r="0.7">
+          <stop offset="0" stopColor="#ffffff" stopOpacity="0.95" />
+          <stop offset="0.45" stopColor="#fdf3f6" stopOpacity="0.55" />
+          <stop offset="1" stopColor="#e9e2f2" stopOpacity="0.2" />
+        </radialGradient>
         <linearGradient id={`gloss-${uid}`} x1="0" y1="0" x2="1" y2="0">
           <stop offset="0.18" stopColor="#fff" stopOpacity="0" />
           <stop offset="0.3" stopColor="#fff" stopOpacity="0.5" />
@@ -786,6 +889,29 @@ function ArtLayer({ art, uid, cx, top, w, h }: { art: ArtId; uid: string; cx: nu
   if (art === "glitter") return <rect x={l - 2} y={top - 2} width={w + 4} height={h + 4} fill={`url(#glit-${uid})`} />;
   if (art === "check") return <rect x={l - 2} y={top - 2} width={w + 4} height={h + 4} fill={`url(#chk-${uid})`} />;
   if (art === "magnet") return <rect x={l - 2} y={top - 2} width={w + 4} height={h + 4} fill={`url(#mag-${uid})`} />;
+  if (art === "chrome") return <rect x={l - 2} y={top - 2} width={w + 4} height={h + 4} fill={`url(#chrome-${uid})`} opacity={0.92} />;
+  if (art === "pearl") return <rect x={l - 2} y={top - 2} width={w + 4} height={h + 4} fill={`url(#pearl-${uid})`} />;
+  if (art === "marble")
+    return (
+      <g fill="none" stroke="#8d8d93" strokeLinecap="round" opacity={0.7}>
+        <path d={`M${l} ${top + h * 0.25} Q${cx} ${top + h * 0.4} ${cx + w * 0.2} ${top + h * 0.6} T${cx + w / 2} ${top + h * 0.95}`} strokeWidth={1.1} />
+        <path d={`M${cx - w * 0.1} ${top} Q${cx + w * 0.25} ${top + h * 0.2} ${cx + w / 2} ${top + h * 0.35}`} strokeWidth={0.7} />
+        <path d={`M${l} ${top + h * 0.7} Q${cx - w * 0.1} ${top + h * 0.75} ${cx} ${top + h}`} strokeWidth={0.6} />
+      </g>
+    );
+  if (art === "flower") {
+    const fy = top + h * 0.45;
+    const r = w * 0.13;
+    return (
+      <g>
+        {[0, 72, 144, 216, 288].map((a) => {
+          const t = ((a - 90) * Math.PI) / 180;
+          return <circle key={a} cx={cx + Math.cos(t) * r * 1.3} cy={fy + Math.sin(t) * r * 1.3} r={r} fill="#ffffff" />;
+        })}
+        <circle cx={cx} cy={fy} r={r * 0.75} fill="#e3b341" />
+      </g>
+    );
+  }
   return null;
 }
 
@@ -798,6 +924,10 @@ function ArtSwatch({ art }: { art: ArtId }) {
     glitter: `radial-gradient(circle at 30% 30%, #fff 1.2px, transparent 1.6px) 0 0/6px 6px, radial-gradient(circle at 70% 70%, #fff 0.9px, transparent 1.3px) 0 0/6px 6px, ${C.rose}`,
     check: `linear-gradient(90deg, rgba(255,255,255,0.5) 50%, transparent 50%) 0 0/8px 8px, linear-gradient(180deg, rgba(255,255,255,0.5) 50%, transparent 50%) 0 0/8px 8px, ${C.rose}`,
     magnet: `linear-gradient(135deg, ${C.rose} 30%, #fff 50%, ${C.rose} 70%)`,
+    pearl: `radial-gradient(circle at 40% 30%, #fff 0 30%, #f1e6ee 70%)`,
+    flower: `radial-gradient(circle at 50% 45%, #e3b341 0 2px, #fff 2.5px 5px, transparent 5.5px), ${C.rose}`,
+    marble: `linear-gradient(120deg, #fff 0 40%, #9a9aa0 42%, #fff 46%)`,
+    chrome: `linear-gradient(135deg, #f4f4f4, #a9abb0 40%, #fff 55%, #8f9196 85%)`,
   };
   return <span aria-hidden className="inline-block h-5 w-4 rounded-[50%_50%_30%_30%/55%_55%_20%_20%] border" style={{ background: bg[art], borderColor: "rgba(17,17,17,0.25)" }} />;
 }
@@ -840,13 +970,22 @@ function isDark(hex: string) {
 
 type Bill = { price: number; min: number; artNails: number; baseLabel: string };
 
-function ReserveForm({ today, reduce, saved, bill }: { today: Date; reduce: boolean; saved: { url: string; at: string } | null; bill: Bill }) {
+function ReserveForm({ today, reduce, saved, bill, artNote }: { today: Date; reduce: boolean; saved: { url: string; at: string } | null; bill: Bill; artNote: string | null }) {
   const [day, setDay] = useState(() => (HOURS[today.getDay()] ? 0 : 1));
   const [hour, setHour] = useState<number | null>(null);
   const [staff, setStaff] = useState<number | null>(null);
   const [name, setName] = useState("");
   const [phone, setPhone] = useState("");
   const [memo, setMemo] = useState("");
+  // 첫 화면 이달의 아트에서 "이 아트로 예약"을 누르면 요청 사항 첫 줄에 아트 이름을 넣는다
+  const [lastNote, setLastNote] = useState<string | null>(null);
+  if (artNote !== lastNote) {
+    setLastNote(artNote);
+    if (artNote) {
+      const rest = memo.startsWith("이달의 아트") ? memo.split("\n").slice(1).join("\n") : memo;
+      setMemo(`이달의 아트 ${artNote}${rest ? `\n${rest}` : ""}`);
+    }
+  }
   const [err, setErr] = useState<string | null>(null);
   const [done, setDone] = useState<{ no: string; date: Date; hour: number; staff: number; name: string; phone: string } | null>(null);
   const [nowH, setNowH] = useState(0);
