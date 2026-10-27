@@ -219,7 +219,6 @@ export const guides: Guide[] = [
       { h2: "그래도 안 되면" },
       { p: "다섯 가지를 다 봐도 안 풀리면 코드 쪽 문제일 가능성이 커요. 빌드 기록과 오류 화면을 캡처해 두면 원인을 빨리 찾을 수 있어요." },
       { link: { href: "/classic/contact", label: "배포 문제 상담 신청하기" } },
-      { link: { href: "https://kmong.com/gig/840014", label: "크몽에서 막힌 곳 1건 바로 맡기기" } },
     ],
     sources: [
       { label: "Vercel 문서, 환경 변수", href: "https://vercel.com/docs/environment-variables" },
