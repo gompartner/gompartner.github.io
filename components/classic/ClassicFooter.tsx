@@ -15,7 +15,6 @@ const menu = [
 ];
 const channels = [
   { href: "https://blog.naver.com/gompartner", label: "네이버 블로그" },
-  { href: "https://gompartner.tistory.com", label: "티스토리" },
   { href: "https://www.youtube.com/@gompartner", label: "유튜브" },
   { href: "https://www.instagram.com/gompartner.co.kr", label: "인스타그램" },
   { href: "https://clip.naver.com/@gompartner", label: "네이버 클립" },

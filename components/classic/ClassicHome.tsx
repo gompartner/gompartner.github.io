@@ -8,7 +8,7 @@ import { ChannelTalkButton } from "@/components/layout/ChannelTalk";
 import { industries } from "@/data/classic/industries";
 import { processSteps } from "@/data/classic/faq";
 import { projects } from "@/data/classic/projects";
-import { blogPosts } from "@/data/classic/stories";
+import { guides } from "@/data/classic/guides";
 import { tools } from "@/data/classic/tools";
 import { estimateFor, landingPlans, manwon, plans, previewDetail, previewPromise } from "@/data/classic/pricing";
 import { fieldsById } from "@/data/classic/workFilters";
@@ -309,30 +309,27 @@ function Process() {
 }
 
 function Boards() {
-  const posts = Object.entries(blogPosts)
-    .map(([slug, url]) => ({ url, project: projects.find((p) => p.demoUrl === `/demo/${slug}`) }))
-    .filter((x) => x.project)
-    .sort((a, b) => Number(b.url.split("/").pop()) - Number(a.url.split("/").pop()))
-    .slice(0, 5);
+  // 제작 일지는 10-28 티스토리에서 사이트 가이드로 합쳤다. 최근 글 5편
+  const posts = [...guides].reverse().sort((a, b) => b.published.localeCompare(a.published)).slice(0, 5);
   const row = "flex items-center justify-between gap-4 border-b border-[#e6e9ee] py-4 text-[16px] hover:text-[#256ef4]";
 
   return (
-    <section aria-label="제작 일지와 자료실" className="border-t border-[#e6e9ee]">
+    <section aria-label="가이드와 자료실" className="border-t border-[#e6e9ee]">
       <div className="mx-auto grid w-full max-w-[1248px] gap-14 px-4 py-20 md:grid-cols-2 md:gap-12 md:px-6 md:py-24">
         <div>
           <div className="flex items-end justify-between border-b-2 border-[#15171c] pb-4">
-            <h2 className="text-[24px] font-extrabold tracking-[-0.03em]">제작 일지</h2>
-            <a href="https://gompartner.tistory.com" target="_blank" rel="noopener noreferrer" className={more}>
+            <h2 className="text-[24px] font-extrabold tracking-[-0.03em]">가이드</h2>
+            <Link href="/classic/guide" className={more}>
               더보기 <Plus size={15} strokeWidth={2.5} aria-hidden />
-            </a>
+            </Link>
           </div>
           <ul role="list">
-            {posts.map((x) => (
-              <li key={x.url}>
-                <a href={x.url} target="_blank" rel="noopener noreferrer" className={row}>
-                  <span className="truncate">{x.project!.title} 만든 이야기</span>
-                  <span className="shrink-0 text-[14px] text-[#8a929e]">티스토리</span>
-                </a>
+            {posts.map((g) => (
+              <li key={g.slug}>
+                <Link href={`/classic/guide/${g.slug}`} className={row}>
+                  <span className="truncate">{g.title}</span>
+                  <span className="shrink-0 text-[14px] tabular-nums text-[#8a929e]">{g.published.slice(5).replace("-", ".")}</span>
+                </Link>
               </li>
             ))}
           </ul>

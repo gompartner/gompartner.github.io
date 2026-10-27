@@ -14,10 +14,9 @@ const menu = [
 
 const link = "underline-offset-4 hover:text-foreground hover:underline";
 
-// 곰파트너 채널. 네이버 블로그는 운영 정보 글, 티스토리는 제작 일지, 인스타그램·유튜브·네이버 클립은 샘플 숏츠다.
+// 곰파트너 채널. 네이버 블로그는 운영 정보 글, 인스타그램·유튜브·네이버 클립은 샘플 숏츠다.
 const channels = [
   { href: "https://blog.naver.com/gompartner", label: "네이버 블로그", cta: "footer_blog_naver", icon: "naverBlog" },
-  { href: "https://gompartner.tistory.com", label: "티스토리", cta: "footer_blog_tistory", icon: "tistory" },
   { href: "https://www.instagram.com/gompartner.co.kr", label: "인스타그램", cta: "footer_instagram", icon: "instagram" },
   { href: "https://www.youtube.com/@gompartner", label: "유튜브", cta: "footer_youtube", icon: "youtube" },
   { href: "https://clip.naver.com/@gompartner", label: "네이버 클립", cta: "footer_naver_clip", icon: "naverClip" },
@@ -31,14 +30,6 @@ function ChannelIcon({ name }: { name: (typeof channels)[number]["icon"] }) {
         <svg viewBox="0 0 20 20" className={box} aria-hidden>
           <rect width="20" height="20" rx="5" fill="#03c75a" />
           <path d="M6.5 5v10h3.2c2 0 3.3-1.1 3.3-2.8 0-1.2-.7-2-1.7-2.3.8-.4 1.3-1.1 1.3-2 0-1.6-1.2-2.9-3.1-2.9H6.5Zm2 1.8h.9c.8 0 1.2.4 1.2 1.1s-.4 1.2-1.2 1.2h-.9V6.8Zm0 3.9h1.1c.9 0 1.4.5 1.4 1.2s-.5 1.3-1.4 1.3H8.5v-2.5Z" fill="#fff" />
-        </svg>
-      );
-    case "tistory":
-      return (
-        <svg viewBox="0 0 20 20" className={box} aria-hidden>
-          <rect width="20" height="20" rx="5" fill="#eb531f" />
-          <circle cx="7" cy="7" r="1.6" fill="#fff" /><circle cx="10" cy="7" r="1.6" fill="#fff" /><circle cx="13" cy="7" r="1.6" fill="#fff" />
-          <circle cx="10" cy="10.5" r="1.6" fill="#fff" /><circle cx="10" cy="14" r="1.6" fill="#fff" />
         </svg>
       );
     case "instagram":

@@ -29,7 +29,8 @@ export function GET() {
 - 문의: 사이트 오른쪽 아래 채팅 상담, 전화 ${profile.phone}, ${profile.email}
 - 크몽 서비스: https://kmong.com/gig/796239
 - 평일 사장님 IT 숏츠: https://www.youtube.com/@gompartner, https://clip.naver.com/@gompartner, https://www.instagram.com/gompartner.co.kr
-- 블로그: https://blog.naver.com/gompartner (사장님 IT 정보), https://gompartner.tistory.com (제작 일지)
+- 블로그: https://blog.naver.com/gompartner (사장님 IT 정보)
+- 가이드: ${siteUrl}/guide (업체 고르기, 비용, PHP 취약점, 배포 오류)
 
 ## 홈페이지 제작 가격
 
