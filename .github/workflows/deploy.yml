@@ -4,7 +4,7 @@ on:
   push:
     branches: [main]
   workflow_dispatch:
-  # 티스토리 예약 글(09시·18시 공개)이 사례 화면 블로그 링크에 들어가도록 하루 두 번 다시 빌드한다(UTC).
+  # 하루 두 번 다시 빌드한다(UTC). 09:15 빌드에서 그날 공개일인 가이드(data/guides.ts published)가 올라간다.
   schedule:
     - cron: "15 0 * * *"
     - cron: "15 9 * * *"
@@ -49,3 +49,22 @@ jobs:
     steps:
       - id: deployment
         uses: actions/deploy-pages@v5
+
+  # 오늘 공개일인 가이드가 있으면 배포 뒤 IndexNow로 알린다.
+  notify:
+    needs: deploy
+    if: github.event.schedule == '15 0 * * *'
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v7
+      - uses: actions/setup-node@v6
+        with:
+          node-version: 22
+      - run: |
+          today=$(TZ=Asia/Seoul date +%F)
+          if grep -q "published: \"$today\"" data/guides.ts; then
+            sleep 60
+            node scripts/indexnow.mjs
+          else
+            echo "오늘 공개할 가이드 없음 ($today)"
+          fi
