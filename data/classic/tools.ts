@@ -33,6 +33,15 @@ export const tools = [
     for: "공공기관·학교 홈페이지 담당자",
   },
   {
+    href: "/classic/tools/php-check",
+    need: "PHP 취약점 뉴스를 봤어요",
+    who: ["사장님", "담당자"],
+    category: "홈페이지 점검",
+    title: "PHP 취약점 점검",
+    description: "홈페이지 주소를 넣으면 PHP 버전을 읽어 PHP2Shell(CVE-2026-109618, 109619) 패치 여부를 알려 드려요.",
+    for: "그누보드, 영카트, 워드프레스 사이트 운영자",
+  },
+  {
     href: "/classic/tools/search-preview",
     need: "검색하면 어떻게 보이는지 궁금해요",
     who: ["사장님", "담당자"],
