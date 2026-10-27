@@ -243,6 +243,34 @@ export const guides: Guide[] = [
       { label: "Supabase 문서, Row Level Security", href: "https://supabase.com/docs/guides/database/postgres/row-level-security" },
     ],
   },
+  {
+    slug: "php8-upgrade-error",
+    title: "PHP 8로 올린 뒤 홈페이지가 깨질 때, 먼저 볼 것",
+    description: "보안 패치로 PHP 버전을 올린 뒤 하얀 화면이나 오류 문구가 나올 때 원인을 찾는 순서를 적었어요.",
+    published: "2026-10-28",
+    updated: "2026-10-28",
+    blocks: [
+      { p: "보안 패치 때문에 호스팅의 PHP 버전을 올리면, 오래된 홈페이지가 하얀 화면이 되거나 오류 문구를 띄우는 일이 있어요. 그누보드, 영카트, 워드프레스처럼 PHP로 만든 사이트에서 자주 생겨요." },
+      { h2: "하얀 화면이면 오류 기록부터" },
+      { p: "운영 중인 사이트는 보통 오류를 화면에 보여 주지 않게 설정돼 있어요. 그래서 아무것도 없이 하얀 화면만 나와요. 호스팅 관리 화면의 오류 로그(error_log)를 열면 어느 파일 몇 번째 줄에서 멈췄는지 나와요." },
+      { h2: "오래된 함수가 지워졌는지" },
+      { p: "PHP 7에서는 mysql_로 시작하는 DB 함수가 통째로 빠졌어요. 아주 오래된 사이트라면 이 함수를 mysqli나 PDO로 바꿔야 해요." },
+      { p: "PHP 8에서는 each(), create_function() 같은 함수가 지워졌어요. 오류 로그에 \"Call to undefined function\"이 보이면 이 경우가 많아요." },
+      { h2: "경고가 화면을 깨뜨리는지" },
+      { p: "PHP 8부터는 없는 배열 값을 읽을 때 나오는 알림이 경고(Warning)로 올라갔어요. 이 경고가 화면에 찍히면서 레이아웃이 밀리거나, 로그인 뒤 이동이 안 되는 일이 생겨요. 경고가 난 줄을 고치는 게 맞고, 급하면 경고를 화면에 찍지 않게 설정해 두고 하나씩 고쳐요." },
+      { h2: "솔루션과 플러그인이 PHP 8을 지원하는지" },
+      { p: "그누보드, 영카트, 워드프레스 본체와 테마, 플러그인마다 PHP 8을 지원하는 버전이 따로 있어요. 본체만 올리고 오래된 플러그인을 그대로 두면 그 플러그인에서 멈춰요. 업데이트가 끊긴 플러그인은 바꾸거나 빼야 해요." },
+      { h2: "급할 때 되돌리는 법" },
+      { p: "호스팅 관리 화면에서 PHP 버전을 이전으로 돌리면 사이트는 바로 돌아와요. 다만 보안 패치를 받지 못하는 상태로 돌아가는 거라, 되돌린 동안 오류를 고치고 다시 올리는 게 좋아요." },
+      { h2: "그래도 안 되면" },
+      { p: "오류 로그에 같은 파일이 계속 나오거나 고칠 곳이 많으면, 오류 로그와 PHP 버전, 쓰는 솔루션 이름을 함께 정리해 두면 원인을 빨리 찾을 수 있어요." },
+      { link: { href: "/classic/contact", label: "PHP 업그레이드 상담 신청하기" } },
+    ],
+    sources: [
+      { label: "PHP 공식 문서, PHP 8.0으로 옮길 때 호환되지 않는 변경", href: "https://www.php.net/manual/en/migration80.incompatible.php" },
+      { label: "PHP 공식 문서, PHP 7.0에서 빠진 확장(mysql)", href: "https://www.php.net/manual/en/migration70.removed-exts-sapis.php" },
+    ],
+  },
 ];
 
 export const guideBySlug = (slug: string) => guides.find((g) => g.slug === slug);
