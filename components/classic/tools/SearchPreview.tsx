@@ -9,7 +9,8 @@ import { useReducedMotionSafe } from "@/hooks/useReducedMotionSafe";
 /* 검색 결과 미리보기.
    상호, 지역, 업종을 넣으면 제목과 설명을 추천하고, 구글과 네이버 검색 결과에 어떻게 보이는지 그린다.
    잘리는 길이는 글자 폭(한글 1, 영문·숫자 약 0.55)을 더해 어림한다. 측정 대신 계산이라 서버와 화면 결과가 같다.
-   개발자에게 넘길 meta 태그는 접어 둔다. */
+   개발자에게 넘길 meta 태그는 접어 둔다.
+   "내 홈페이지 불러오기"는 Workers(곰파트너-마케팅/php-check의 /meta)가 첫 화면 head를 읽어 지금 들어 있는 문구와 공유 이미지, 검색 차단 여부를 돌려준다. */
 
 const EASE = [0.23, 1, 0.32, 1] as const;
 
@@ -36,6 +37,10 @@ const ENGINES = {
   google: { title: 29, desc: 82 },
   naver: { title: 34, desc: 78 },
 };
+
+const META_API = "https://php-check.gompartner.workers.dev/meta";
+
+type Live = { finalUrl: string; status: number; title: string; description: string; ogTitle: string; ogDescription: string; ogImage: string; siteName: string; canonical: string; robots: string; naverVerify: boolean; googleVerify: boolean };
 
 type Fields = { name: string; region: string; industry: string; url: string; strengths: string; title: string; desc: string };
 
@@ -80,6 +85,29 @@ export function SearchPreview() {
   const [f, setF] = useState<Fields>(EXAMPLE);
   const [codeOpen, setCodeOpen] = useState(false);
   const [copied, setCopied] = useState(false);
+  const [live, setLive] = useState<Live | null>(null);
+  const [loadUrl, setLoadUrl] = useState("");
+  const [loading, setLoading] = useState(false);
+  const [loadError, setLoadError] = useState("");
+
+  const load = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setLoading(true);
+    setLoadError("");
+    try {
+      const res = await fetch(`${META_API}?url=${encodeURIComponent(loadUrl)}`);
+      const m = await res.json();
+      if (!res.ok) throw new Error(m.error);
+      setLive(m);
+      setF((s) => ({ ...s, name: m.siteName || "", region: "", industry: "", strengths: "", url: m.finalUrl, title: m.title, desc: m.description }));
+    } catch (err) {
+      setLive(null);
+      setLoadError(err instanceof Error && err.message ? err.message : "불러오지 못했어요. 주소를 확인해 주세요.");
+    } finally {
+      setLoading(false);
+    }
+  };
+
   const set = (k: keyof Fields) => (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => setF((s) => ({ ...s, [k]: e.target.value }));
 
   const title = f.title || suggestTitle(f);
@@ -95,6 +123,18 @@ export function SearchPreview() {
     { ok: !!desc && desc !== title && !desc.startsWith(title), text: "설명이 제목과 다른 내용입니다", fix: "설명에는 제목에 없는 정보(영업시간, 주차, 대표 서비스)를 넣으세요." },
   ];
   const passed = checks.filter((c) => c.ok).length;
+
+  // 불러온 홈페이지의 지금 상태. 문구 점검과 달리 고치려면 홈페이지 코드를 바꿔야 하는 것들이다.
+  const liveChecks = live
+    ? [
+        { ok: !/noindex/i.test(live.robots), text: "검색엔진이 수집할 수 있게 열려 있습니다", fix: "검색 차단(noindex)이 걸려 있어 검색 결과에 나오지 않습니다. 가장 먼저 풀어야 합니다." },
+        { ok: !!live.description, text: "설명(description)이 들어 있습니다", fix: "설명이 비어 있어 검색엔진이 본문 아무 곳이나 잘라 보여 줍니다." },
+        { ok: !!live.ogImage, text: "공유 이미지가 들어 있습니다", fix: "카카오톡이나 문자로 주소를 보낼 때 나오는 그림(og:image)이 없습니다." },
+        { ok: live.finalUrl.startsWith("https://"), text: "https로 열립니다", fix: "https가 아니라 브라우저에 \"주의 요함\"이 뜹니다. 보안 인증서(SSL)가 필요합니다." },
+        { ok: live.naverVerify, text: "네이버 서치어드바이저 등록 흔적이 있습니다", fix: "네이버 서치어드바이저 확인 태그가 보이지 않습니다. 등록하면 네이버 수집이 빨라집니다." },
+        { ok: live.googleVerify, text: "구글 서치 콘솔 등록 흔적이 있습니다", fix: "구글 서치 콘솔 확인 태그가 보이지 않습니다. 다른 방식(DNS)으로 등록했을 수도 있습니다." },
+      ]
+    : [];
 
   const code = [
     `<title>${escapeAttr(title)}</title>`,
@@ -123,7 +163,23 @@ export function SearchPreview() {
 
   return (
     <div className="mt-8 grid gap-8 lg:grid-cols-[minmax(0,5fr)_minmax(0,7fr)]">
-      <form className="min-w-0" onSubmit={(e) => e.preventDefault()}>
+      <div className="min-w-0">
+      <form onSubmit={load} className="mb-8 rounded-[10px] bg-surface p-4 md:p-5">
+        <label htmlFor="sp-load" className="block text-[17px] font-bold">
+          내 홈페이지 불러오기
+        </label>
+        <p className="mt-1 text-[15px] leading-[1.6] text-foreground-secondary">주소를 넣으면 지금 들어 있는 제목과 설명을 읽어 옵니다.</p>
+        <div className="mt-3 flex flex-col gap-2 sm:flex-row">
+          <input id="sp-load" value={loadUrl} onChange={(e) => setLoadUrl(e.target.value)} required inputMode="url" placeholder="www.우리가게.co.kr" className="h-12 min-w-0 rounded-md border border-[#8a949e] bg-background px-3 text-[17px] focus:border-accent sm:flex-1" />
+          <button type="submit" disabled={loading} className="h-12 shrink-0 rounded-md bg-accent px-5 text-[16px] font-bold text-accent-foreground hover:bg-accent-hover disabled:opacity-60">
+            {loading ? "읽는 중" : "불러오기"}
+          </button>
+        </div>
+        <p aria-live="polite" className="text-[15px] font-bold text-[#b42318]">
+          {loadError && <span className="mt-2 block">{loadError}</span>}
+        </p>
+      </form>
+      <form onSubmit={(e) => e.preventDefault()}>
         <fieldset className="grid gap-4">
           <legend className="w-full border-b-2 border-foreground pb-2 text-[19px] font-bold">가게 정보</legend>
           <label className="block text-[16px] font-bold">
@@ -170,6 +226,7 @@ export function SearchPreview() {
           </button>
         </fieldset>
       </form>
+      </div>
 
       <div className="min-w-0">
         <section aria-labelledby="pv-google" className="rounded-[10px] border border-border p-5">
@@ -204,6 +261,50 @@ export function SearchPreview() {
             <p className="mt-1 text-[15px] leading-[1.6] text-[#404040]">{n.d.text}</p>
           </div>
         </section>
+
+        {live && (
+          <section aria-labelledby="pv-share" className="mt-4 rounded-[10px] border border-border p-5">
+            <h2 id="pv-share" className="text-[15px] font-bold text-foreground-secondary">
+              카카오톡, 문자로 보낼 때
+            </h2>
+            <div className="mt-3 max-w-[320px] overflow-hidden rounded-[10px] border border-border bg-white">
+              {live.ogImage ? (
+                // 바깥 사이트 그림이라 next/image 대신 img를 쓴다
+                // eslint-disable-next-line @next/next/no-img-element
+                <img src={live.ogImage} alt="" className="aspect-[1.91/1] w-full object-cover" />
+              ) : (
+                <div className="grid aspect-[1.91/1] place-items-center bg-surface-secondary text-[14px] text-foreground-secondary">공유 이미지 없음</div>
+              )}
+              <div className="p-3">
+                <p className="truncate text-[15px] font-bold">{live.ogTitle || live.title || url.host}</p>
+                <p className="mt-0.5 line-clamp-2 text-[13px] leading-[1.5] text-[#5b6370]">{live.ogDescription || live.description}</p>
+                <p className="mt-1 text-[12px] text-[#8a929e]">{url.host}</p>
+              </div>
+            </div>
+          </section>
+        )}
+
+        {live && (
+          <section aria-labelledby="pv-live" className="mt-6">
+            <h2 id="pv-live" className="flex items-baseline justify-between text-[19px] font-bold">
+              지금 홈페이지 상태
+              <span className="text-[15px] font-normal tabular-nums text-foreground-secondary">
+                {liveChecks.length}개 중 {liveChecks.filter((c) => c.ok).length}개 좋음
+              </span>
+            </h2>
+            <ul className="mt-3 grid gap-2">
+              {liveChecks.map((c) => (
+                <li key={c.text} className={`flex gap-2.5 rounded-md px-3 py-2.5 text-[16px] leading-[1.5] ${c.ok ? "bg-[#e8f5eb]" : "bg-[#fff4e5]"}`}>
+                  {c.ok ? <Check size={18} className="mt-0.5 shrink-0 text-[#228738]" aria-hidden /> : <CircleAlert size={18} className="mt-0.5 shrink-0 text-[#b45309]" aria-hidden />}
+                  <span>
+                    <span className="sr-only">{c.ok ? "좋음: " : "고칠 점: "}</span>
+                    {c.ok ? c.text : c.fix}
+                  </span>
+                </li>
+              ))}
+            </ul>
+          </section>
+        )}
 
         <section aria-labelledby="pv-check" className="mt-6">
           <h2 id="pv-check" className="flex items-baseline justify-between text-[19px] font-bold">

@@ -47,7 +47,10 @@ const kmongCare = { label: "크몽 가격 안내, 홈페이지 수정 유지보�
 const wishket = { label: "위시켓 블로그, 외주 개발 비용", href: "https://blog.wishket.com/blog/outsourcing-development-cost" };
 const hostingTool = { label: `곰파트너 호스팅 유지비 비교(${checkedAt} 확인)`, href: "/tools/hosting-cost" };
 
-export const guides: Guide[] = [
+// 예약 공개: published가 오늘(한국 시간) 이후인 글은 빌드에서 뺀다. 배포 워크플로가 매일 09:15에 다시 빌드한다.
+const todayKst = new Date(Date.now() + 9 * 3600_000).toISOString().slice(0, 10);
+
+const allGuides: Guide[] = [
   {
     slug: "agency-ranking",
     title: "홈페이지 제작 업체 추천, 순위 글보다 먼저 볼 것",
@@ -332,6 +335,8 @@ export const guides: Guide[] = [
     ],
   },
 ];
+
+export const guides = allGuides.filter((g) => g.published <= todayKst);
 
 export const guideBySlug = (slug: string) => guides.find((g) => g.slug === slug);
 
