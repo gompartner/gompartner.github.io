@@ -195,6 +195,37 @@ export const guides: Guide[] = [
     ],
     sources: [kmongCare],
   },
+  {
+    slug: "vercel-deploy-error",
+    title: "Vercel에 올렸는데 화면이 안 뜰 때, 먼저 볼 다섯 가지",
+    description: "AI로 만든 서비스를 Vercel에 올린 뒤 하얀 화면, 404, 빈 목록이 나올 때 먼저 확인할 곳을 순서대로 적었어요.",
+    published: "2026-10-28",
+    updated: "2026-10-28",
+    blocks: [
+      { p: "Claude나 Cursor로 만든 서비스는 내 컴퓨터에서는 잘 되다가 Vercel에 올리면 멈추는 일이 흔해요. 대부분은 코드보다 설정 문제예요. 아래 순서대로 보면 원인이 금방 보여요." },
+      { h2: "빌드 기록에 빨간 줄이 있는지" },
+      { p: "Vercel 프로젝트의 Deployments에서 실패한 배포를 열면 Build Logs가 나와요. 맨 아래 빨간 줄 몇 줄이 원인이에요." },
+      { p: "\"Module not found\"가 보이면 파일 이름의 대소문자가 다르거나 패키지가 빠진 경우가 많아요. 맥과 윈도는 대소문자를 가리지 않아도 Vercel 서버는 가려요." },
+      { h2: "환경 변수를 Vercel에도 넣었는지" },
+      { p: ".env 파일은 보통 Git에 올라가지 않아요. 그래서 Vercel의 Settings > Environment Variables에 같은 값을 따로 넣어야 해요." },
+      { p: "Next.js에서 화면 쪽 코드가 읽는 값은 이름이 NEXT_PUBLIC_으로 시작해야 해요. 값을 바꾼 뒤에는 다시 배포해야 반영돼요." },
+      { h2: "새로고침하면 404가 나오는지" },
+      { p: "첫 화면은 뜨는데 다른 주소에서 새로고침하면 404가 나온다면, React와 Vite로 만든 한 페이지 앱일 가능성이 커요. vercel.json에 모든 주소를 index.html로 보내는 rewrites 설정을 넣으면 풀려요. Next.js로 만든 서비스는 이 설정이 필요 없어요." },
+      { h2: "화면은 뜨는데 목록이 비어 있는지" },
+      { p: "Supabase를 쓰는데 로그인한 뒤에도 목록이 비어 있다면 RLS(행 단위 권한) 정책이 막고 있는 경우가 많아요." },
+      { p: "그렇다고 정책을 꺼 두면 누구나 데이터를 볼 수 있어서 위험해요. 테이블마다 정책을 켜고, 로그인한 본인 데이터만 보이게 만드는 게 맞아요." },
+      { h2: "도메인을 붙였는데 접속이 안 되는지" },
+      { p: "도메인을 산 곳(가비아 등)의 DNS에 Vercel이 알려 주는 값을 넣어야 해요. 넣자마자 되지 않을 수 있고, 반영까지 몇 시간 걸리기도 해요. Vercel의 Domains 화면에 Valid Configuration이 뜨면 연결된 거예요." },
+      { h2: "그래도 안 되면" },
+      { p: "다섯 가지를 다 봐도 안 풀리면 코드 쪽 문제일 가능성이 커요. 빌드 기록과 오류 화면을 캡처해 두면 원인을 빨리 찾을 수 있어요." },
+      { link: { href: "https://kmong.com/gig/840014", label: "배포 막힌 곳 1건 해결 맡기기(크몽)" } },
+    ],
+    sources: [
+      { label: "Vercel 문서, 환경 변수", href: "https://vercel.com/docs/environment-variables" },
+      { label: "Vercel 문서, vercel.json 설정(rewrites)", href: "https://vercel.com/docs/project-configuration" },
+      { label: "Supabase 문서, Row Level Security", href: "https://supabase.com/docs/guides/database/postgres/row-level-security" },
+    ],
+  },
 ];
 
 export const guideBySlug = (slug: string) => guides.find((g) => g.slug === slug);
