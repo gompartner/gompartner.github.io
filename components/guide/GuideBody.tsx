@@ -1,3 +1,4 @@
+import Image from "next/image";
 import Link from "next/link";
 import { ArrowRight } from "lucide-react";
 import type { Guide, GuideBlock } from "@/data/guides";
@@ -69,7 +70,7 @@ function Block({ b, look }: { b: GuideBlock; look: Look }) {
         </table>
       </div>
     );
-  const href = look === "classic" && b.link.href.startsWith("/") ? `/classic${b.link.href}` : b.link.href;
+  const href = look === "classic" && b.link.href.startsWith("/") && !b.link.href.startsWith("/classic") ? `/classic${b.link.href}` : b.link.href;
   return (
     <p className="mt-6">
       <Link href={href} data-gtm-cta={`guide_link_${look}`} className={s.link}>
@@ -91,12 +92,17 @@ export function GuideBody({ guide, look }: { guide: Guide; look: Look }) {
     author: { "@type": "Organization", name: "곰파트너", url: siteUrl },
     publisher: { "@type": "Organization", name: "곰파트너", url: siteUrl },
     mainEntityOfPage: `${siteUrl}/guide/${guide.slug}`,
+    ...(guide.image ? { image: [`${siteUrl}${guide.image.src}`] } : {}),
   };
   return (
     <article className="max-w-[760px]">
       <p className="text-[15px] text-foreground-tertiary">
         <time dateTime={guide.updated}>{guide.updated.replaceAll("-", ".")}</time> 곰파트너
       </p>
+      {guide.image && (
+        // 구글 디스커버는 가로 1200px 이상 대표 이미지를 본문과 og:image에서 같이 본다.
+        <Image src={guide.image.src} alt={guide.image.alt} width={1200} height={675} priority className="mt-5 h-auto w-full" />
+      )}
       {guide.blocks.map((b, i) => (
         <Block key={i} b={b} look={look} />
       ))}

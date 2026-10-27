@@ -10,16 +10,17 @@ export const OG_IMAGE = { url: "/og-image.png?v=20261014", width: 1200, height: 
 // 하위 페이지가 openGraph를 따로 정하지 않으면 홈 제목과 설명이 그대로 공유된다.
 // 페이지 제목과 설명으로 openGraph, twitter를 같이 채운다.
 // 클래식과 짝이 있는 웹툰 주소는 검색 대표 주소를 클래식 쪽으로 둔다(10-22부터 클래식이 기본).
-export function pageMeta(opts: { title: string; description: string; path: string }) {
+export function pageMeta(opts: { title: string; description: string; path: string; image?: { src: string; alt: string }; article?: boolean }) {
   const description = fitDescription(opts.description);
   const title = `${opts.title} | 곰파트너`;
   const url = canonicalFor(opts.path);
+  const image = opts.image ? { url: opts.image.src, width: 1200, height: 675, alt: opts.image.alt } : OG_IMAGE;
   return {
     title: opts.title,
     description,
     alternates: { canonical: url },
-    openGraph: { type: "website" as const, locale: "ko_KR", siteName: "곰파트너", url, title, description, images: [OG_IMAGE] },
-    twitter: { card: "summary_large_image" as const, title, description, images: [OG_IMAGE.url] },
+    openGraph: { type: opts.article ? ("article" as const) : ("website" as const), locale: "ko_KR", siteName: "곰파트너", url, title, description, images: [image] },
+    twitter: { card: "summary_large_image" as const, title, description, images: [image.url] },
   };
 }
 
