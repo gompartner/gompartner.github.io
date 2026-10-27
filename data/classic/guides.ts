@@ -35,6 +35,7 @@ export const guides: Guide[] = [
     description: "업체 추천 순위 글을 읽을 때 걸러 볼 점과, 업체를 고르기 전에 직접 확인할 다섯 가지를 적었어요.",
     published: "2026-10-22",
     updated: "2026-10-22",
+    image: { src: "/images/guide/agency-ranking.jpg", alt: "홈페이지 제작 업체 추천, 순위 글보다 먼저 볼 것" },
     blocks: [
       { p: "\"홈페이지 제작 업체 추천\"을 검색하면 TOP5, 순위 글이 먼저 나와요. 이런 글은 대부분 제작 업체가 직접 써요. 글쓴 회사가 순위 안에 들어 있는 경우가 많아요." },
       { p: "순위 글이 틀렸다는 말은 아니에요. 다만 순위만 보고 고르면 우리 가게에 맞는지는 알 수 없어요. 아래 다섯 가지는 어느 업체든 사이트만 열어 보면 확인할 수 있어요." },
@@ -63,6 +64,7 @@ export const guides: Guide[] = [
     description: "같은 내용으로 물어봐도 견적이 몇 배씩 차이 나는 이유와, 견적서에서 비교할 다섯 항목을 적었어요.",
     published: "2026-10-22",
     updated: "2026-10-22",
+    image: { src: "/images/guide/homepage-cost.jpg", alt: "홈페이지 제작 비용, 업체마다 왜 다를까" },
     blocks: [
       { p: "같은 내용으로 세 곳에 물어봐도 30만 원, 100만 원, 300만 원이 같이 나와요. 크몽 가격 안내는 홈페이지 제작을 최저 8만 원, 평균 69만 원, 최고 180만 원으로 적어요." },
       { p: "차이는 대부분 다섯 군데에서 나요. 견적서를 나란히 놓고 이 다섯 줄만 비교하면 돼요." },
@@ -96,6 +98,7 @@ export const guides: Guide[] = [
     description: "원본 소스, 도메인 명의, 수정 횟수, 무상 수정 기간처럼 계약서에 없으면 나중에 다투게 되는 질문 7가지예요.",
     published: "2026-10-22",
     updated: "2026-10-22",
+    image: { src: "/images/guide/contract-checklist.jpg", alt: "홈페이지 업체와 계약 전에 물어볼 7가지" },
     blocks: [
       { p: "홈페이지 다툼은 대부분 끝난 뒤에 생겨요. \"수정은 두 번까지라고 했잖아요\", \"도메인은 저희 명의라서요\" 같은 말이에요. 계약 전에 아래 일곱 가지를 묻고 답을 글로 받아 두세요." },
       { h2: "1. 원본 소스를 받을 수 있나요" },
@@ -137,6 +140,7 @@ export const guides: Guide[] = [
     description: "아임웹 같은 구독형과 웹호스팅에 따로 만드는 방식의 1년 비용, 직접 고치기, 옮기기를 비교했어요.",
     published: "2026-10-22",
     updated: "2026-10-22",
+    image: { src: "/images/guide/builder-or-custom.jpg", alt: "아임웹으로 만들까, 따로 만들까" },
     blocks: [
       { p: `홈페이지를 만드는 방법은 크게 둘이에요. 아임웹, 식스샵처럼 매달 내고 쓰는 구독형이 있고, 웹호스팅을 빌려 따로 만드는 방식이 있어요. 금액은 ${checkedAt}에 각 업체 요금 페이지에서 확인했어요.` },
       { h2: "한눈에 비교" },
@@ -168,6 +172,7 @@ export const guides: Guide[] = [
     description: "월 유지보수 시세와 흔히 들어가는 일, 빠지는 일, 계약 전에 확인할 1건 기준과 최소 기간을 적었어요.",
     published: "2026-10-22",
     updated: "2026-10-22",
+    image: { src: "/images/guide/maintenance-cost.jpg", alt: "홈페이지 유지보수비, 얼마가 적당할까" },
     blocks: [
       { p: "홈페이지 업체 공개 요금을 보면 월 유지보수 첫 단계는 월 5만 원 안팎이 많아요. 크몽 가격 안내는 최저 월 5만 원, 평균 월 20만 원, 최고 월 100만 원으로 적어요." },
       { p: "같은 5만 원이라도 해 주는 일이 달라요. 금액보다 아래 네 가지를 먼저 비교하세요." },
@@ -201,6 +206,7 @@ export const guides: Guide[] = [
     description: "AI로 만든 서비스를 Vercel에 올린 뒤 하얀 화면, 404, 빈 목록이 나올 때 먼저 확인할 곳을 순서대로 적었어요.",
     published: "2026-10-28",
     updated: "2026-10-28",
+    image: { src: "/images/guide/vercel-deploy-error.jpg", alt: "Vercel에 올렸는데 화면이 안 뜰 때, 먼저 볼 다섯 가지" },
     blocks: [
       { p: "Claude나 Cursor로 만든 서비스는 내 컴퓨터에서는 잘 되다가 Vercel에 올리면 멈추는 일이 흔해요. 대부분은 코드보다 설정 문제예요. 아래 순서대로 보면 원인이 금방 보여요." },
       { h2: "빌드 기록에 빨간 줄이 있는지" },
@@ -232,6 +238,7 @@ export const guides: Guide[] = [
     description: "보안 패치로 PHP 버전을 올린 뒤 하얀 화면이나 오류 문구가 나올 때 원인을 찾는 순서를 적었어요.",
     published: "2026-10-28",
     updated: "2026-10-28",
+    image: { src: "/images/guide/php8-upgrade-error.jpg", alt: "PHP 8로 올린 뒤 홈페이지가 깨질 때, 먼저 볼 것" },
     blocks: [
       { p: "보안 패치 때문에 호스팅의 PHP 버전을 올리면, 오래된 홈페이지가 하얀 화면이 되거나 오류 문구를 띄우는 일이 있어요. 그누보드, 영카트, 워드프레스처럼 PHP로 만든 사이트에서 자주 생겨요." },
       { h2: "하얀 화면이면 오류 기록부터" },
