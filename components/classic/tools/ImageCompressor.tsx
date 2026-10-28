@@ -226,7 +226,7 @@ export function ImageCompressor() {
   const current = items.find((i) => i.id === selected);
 
   const chip = (on: boolean) =>
-    `inline-flex h-10 items-center rounded-md border px-4 text-[15px] font-bold transition-colors ${on ? "border-accent bg-accent-surface text-accent" : "border-border hover:bg-surface"}`;
+    `inline-flex h-10 items-center rounded-md border px-4 text-[15px] font-bold transition-colors ${on ? "border-accent bg-accent-surface text-[#1d5fd6]" : "border-border hover:bg-surface"}`;
 
   return (
     <div className="mt-8 grid gap-8 lg:grid-cols-[minmax(0,5fr)_minmax(0,7fr)]">

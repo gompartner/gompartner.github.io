@@ -91,6 +91,7 @@ function Hero() {
             <div
               key={s.id}
               aria-hidden={n !== i}
+              inert={n !== i}
               className={cn("absolute inset-0 transition-opacity duration-500 motion-reduce:transition-none", n === i ? "opacity-100" : "pointer-events-none opacity-0")}
             >
               <p className="text-[15px] font-bold text-[#8fb4ff] md:text-[17px]">{s.project.title}</p>
@@ -196,7 +197,7 @@ function Services() {
               <ArrowUpRight
                 size={28}
                 aria-hidden
-                className="hidden text-[#8a929e] md:col-start-4 md:row-start-1 transition-[color,transform] duration-200 group-hover:-translate-y-0.5 group-hover:translate-x-0.5 group-hover:text-[#256ef4] md:block"
+                className="hidden text-[#6b7280] md:col-start-4 md:row-start-1 transition-[color,transform] duration-200 group-hover:-translate-y-0.5 group-hover:translate-x-0.5 group-hover:text-[#256ef4] md:block"
               />
             </Link>
           </li>
@@ -276,7 +277,7 @@ function Samples() {
                       className="aspect-[16/10] w-full object-cover object-top transition-transform duration-500 group-hover:scale-[1.04] motion-reduce:transition-none"
                     />
                   </span>
-                  <span className="mt-3 block text-[13px] font-bold text-[#256ef4] md:text-[14px]">{p.category}</span>
+                  <span className="mt-3 block text-[13px] font-bold text-[#1d5fd6] md:text-[14px]">{p.category}</span>
                   <span className="mt-1 block text-[16px] font-bold leading-[1.4] tracking-[-0.02em] group-hover:underline md:text-[18px]">{p.title}</span>
                   {est && <span className="mt-1 block text-[14px] tabular-nums text-[#5b6370] md:text-[15px]">{manwon(est.total)}, {est.days}일</span>}
                 </Link>
@@ -328,7 +329,7 @@ function Boards() {
               <li key={g.slug}>
                 <Link href={`/classic/guide/${g.slug}`} className={row}>
                   <span className="truncate">{g.title}</span>
-                  <span className="shrink-0 text-[14px] tabular-nums text-[#8a929e]">{g.published.slice(5).replace("-", ".")}</span>
+                  <span className="shrink-0 text-[14px] tabular-nums text-[#6b7280]">{g.published.slice(5).replace("-", ".")}</span>
                 </Link>
               </li>
             ))}
@@ -346,7 +347,7 @@ function Boards() {
               <li key={t.href}>
                 <Link href={t.href} className={row}>
                   <span className="truncate">{t.title}</span>
-                  <span className="shrink-0 text-[14px] text-[#8a929e]">{t.category}</span>
+                  <span className="shrink-0 text-[14px] text-[#6b7280]">{t.category}</span>
                 </Link>
               </li>
             ))}
@@ -365,7 +366,7 @@ function Band() {
           <h2 id="c-band" className="text-[30px] font-extrabold leading-[1.25] tracking-[-0.04em] md:text-[40px]">
             {previewPromise}
           </h2>
-          <p className="mt-3 text-[16px] leading-[1.65] text-white/85 md:text-[17px]">{previewDetail}</p>
+          <p className="mt-3 text-[16px] leading-[1.65] text-white md:text-[17px]">{previewDetail}</p>
         </div>
         <div className="flex shrink-0 flex-wrap gap-3">
           <ChannelTalkButton cta="classic_band_chat" className="inline-flex h-14 items-center rounded-md bg-white px-7 text-[17px] font-bold" >

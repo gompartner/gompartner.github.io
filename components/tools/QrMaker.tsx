@@ -192,7 +192,7 @@ export function QrMaker() {
 
   const input = "mt-1.5 h-12 w-full rounded-md border border-[#8a949e] bg-background px-3 text-[17px] focus:border-accent";
   const chip = (on: boolean) =>
-    `inline-flex h-10 cursor-pointer items-center rounded-md border px-4 text-[15px] font-bold transition-colors ${on ? "border-accent bg-accent-surface text-accent-hover" : "border-border hover:bg-surface"}`;
+    `inline-flex h-10 cursor-pointer items-center rounded-md border px-4 text-[15px] font-bold transition-colors ${on ? "border-accent bg-accent-surface text-[#1d5fd6]-hover" : "border-border hover:bg-surface"}`;
 
   return (
     <div className="mt-8 grid gap-8 lg:grid-cols-[minmax(0,7fr)_minmax(0,5fr)]">

@@ -97,7 +97,7 @@ export default function ClassicMaintenancePage() {
               <ul className="space-y-1.5 text-[#5b6370]">
                 {shown(s.excludes).map((item) => (
                   <li key={item} className="flex gap-2">
-                    <X size={18} strokeWidth={2.5} className="mt-[3px] shrink-0 text-[#8a929e]" aria-hidden />
+                    <X size={18} strokeWidth={2.5} className="mt-[3px] shrink-0 text-[#6b7280]" aria-hidden />
                     {item}
                   </li>
                 ))}

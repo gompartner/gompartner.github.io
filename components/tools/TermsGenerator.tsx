@@ -559,7 +559,7 @@ function Marked({ text }: { text: string }) {
 const label = "block text-[15px] font-bold";
 const input = "mt-1.5 h-11 w-full rounded-md border border-[#6d7882] bg-white px-3 text-[16px]";
 const chip = (on: boolean) =>
-  `min-h-12 rounded-md border px-3 py-2 text-left text-[15px] font-bold transition-colors ${on ? "border-accent bg-accent-surface text-accent-hover" : "border-border hover:bg-surface"}`;
+  `min-h-12 rounded-md border px-3 py-2 text-left text-[15px] font-bold transition-colors ${on ? "border-accent bg-accent-surface text-[#1d5fd6]-hover" : "border-border hover:bg-surface"}`;
 
 export function TermsGenerator() {
   const reduce = useReducedMotionSafe();
@@ -747,7 +747,7 @@ export function TermsGenerator() {
               <motion.div className="h-full rounded-full bg-accent" animate={{ width: `${(done / required.length) * 100}%` }} transition={{ duration: reduce ? 0 : 0.3, ease: EASE }} />
             </div>
           </div>
-          <article className="max-h-[70vh] overflow-auto p-5 text-[15px] leading-[1.7] md:p-6" aria-live="off">
+          <article tabIndex={0} className="max-h-[70vh] overflow-auto p-5 text-[15px] leading-[1.7] md:p-6" aria-live="off">
             <h3 className="text-[19px] font-bold">{form.siteName.trim() ? `${form.siteName.trim()} 이용약관` : "이용약관"}</h3>
             {sections.map((s, si) => (
               <div key={s.id} className="relative mt-4">

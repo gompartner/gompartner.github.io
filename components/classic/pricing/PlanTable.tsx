@@ -27,7 +27,7 @@ export function PlanTable({ plans, product, ctaPrefix }: { plans: Plan[]; produc
   );
 
   return (
-    <div className="-mx-4 mt-10 overflow-x-auto px-4 md:mx-0 md:px-0">
+    <div tabIndex={0} className="-mx-4 mt-10 overflow-x-auto px-4 md:mx-0 md:px-0">
       <table className="w-full min-w-[720px] border-collapse border-t-2 border-[#15171c]">
         <caption className="sr-only">{product} 패키지 비교</caption>
         <thead>
@@ -123,7 +123,7 @@ export function PlanTable({ plans, product, ctaPrefix }: { plans: Plan[]; produc
                       ))}
                     </ul>
                   ) : (
-                    <span className="text-[#8a929e]">없음</span>
+                    <span className="text-[#6b7280]">없음</span>
                   )}
                 </td>
               ))}

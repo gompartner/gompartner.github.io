@@ -125,7 +125,7 @@ export function ClassicLeadReceivedPanel({
     st === "계약"
       ? { background: BLUE, color: "#fff", borderColor: BLUE }
       : st === "통화함"
-        ? { background: BLUE_SOFT, color: BLUE, borderColor: BLUE }
+        ? { background: BLUE_SOFT, color: "#1d5fd6", borderColor: BLUE }
         : st === "보류"
           ? { background: "#fff", color: MUTED, borderColor: "#c9cfd8" }
           : { background: "#fff", color: INK, borderColor: INK };

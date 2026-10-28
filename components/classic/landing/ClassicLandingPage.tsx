@@ -290,7 +290,7 @@ function Plans({ onPick }: { onPick: (planId: string) => void }) {
                         })}
                       </ul>
                     ) : (
-                      <span className="text-[#8a929e]">없음</span>
+                      <span className="text-[#6b7280]">없음</span>
                     )}
                   </td>
                 ))}
@@ -350,7 +350,7 @@ function Samples() {
                       className="aspect-[16/10] w-full object-cover object-top transition-transform duration-500 group-hover:scale-[1.04] motion-reduce:transition-none"
                     />
                   </span>
-                  <span className="mt-3 block text-[13px] font-bold text-[#256ef4] md:text-[14px]">{p.layout}</span>
+                  <span className="mt-3 block text-[13px] font-bold text-[#1d5fd6] md:text-[14px]">{p.layout}</span>
                   <span className="mt-1 block text-[16px] font-bold leading-[1.4] tracking-[-0.02em] group-hover:underline md:text-[18px]">{p.title}</span>
                   {est && (
                     <span className="mt-1 block text-[14px] tabular-nums text-[#5b6370] md:text-[15px]">
@@ -379,7 +379,7 @@ function Faq() {
             <details key={q} className="group border-b border-[#e6e9ee]">
               <summary className="flex cursor-pointer list-none items-center justify-between gap-4 py-5 text-[17px] font-bold leading-[1.5] hover:text-[#256ef4] md:py-6 md:text-[19px] [&::-webkit-details-marker]:hidden">
                 {q}
-                <ChevronDown size={22} aria-hidden className="shrink-0 text-[#8a929e] transition-transform group-open:rotate-180 motion-reduce:transition-none" />
+                <ChevronDown size={22} aria-hidden className="shrink-0 text-[#6b7280] transition-transform group-open:rotate-180 motion-reduce:transition-none" />
               </summary>
               <p className="pb-6 text-[16px] leading-[1.7] text-[#3d4450] md:text-[17px]">{a}</p>
             </details>

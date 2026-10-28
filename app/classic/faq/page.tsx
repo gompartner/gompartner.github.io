@@ -28,7 +28,7 @@ export default function ClassicFaqPage() {
                     Q
                   </span>
                   <span className="min-w-0 flex-1 text-[17px] font-bold leading-[1.5] tracking-[-0.02em] md:text-[19px]">{f.q}</span>
-                  <ChevronDown size={22} aria-hidden className="mt-0.5 shrink-0 text-[#8a929e] transition-transform duration-200 group-open:rotate-180 motion-reduce:transition-none" />
+                  <ChevronDown size={22} aria-hidden className="mt-0.5 shrink-0 text-[#6b7280] transition-transform duration-200 group-open:rotate-180 motion-reduce:transition-none" />
                 </summary>
                 <div className="flex gap-4 bg-[#f6f7f9] px-4 py-5 md:gap-6 md:px-6 md:py-6">
                   <span aria-hidden className="shrink-0 text-[19px] font-extrabold text-[#5b6370] md:text-[21px]">

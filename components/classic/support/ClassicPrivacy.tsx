@@ -7,7 +7,7 @@ const hrefOf = (id: string) => (id === privacyVersions[0].id ? "/classic/privacy
 
 function DataTable({ head, rows }: Table) {
   return (
-    <div className="overflow-x-auto border-t-2 border-[#15171c]">
+    <div tabIndex={0} className="overflow-x-auto border-t-2 border-[#15171c]">
       <table className="w-full min-w-[480px] border-collapse text-left text-[15px] leading-[1.6]">
         <thead className="bg-[#f6f7f9] text-[#15171c]">
           <tr>
