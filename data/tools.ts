@@ -33,6 +33,15 @@ export const tools = [
     for: "공공기관·학교 홈페이지 담당자",
   },
   {
+    href: "/tools/site-check",
+    need: "홈페이지에 문제가 있는지 모르겠어요",
+    who: ["사장님", "담당자"],
+    category: "홈페이지 점검",
+    title: "홈페이지 진단",
+    description: "홈페이지 주소를 넣으면 접속과 보안 설정, 휴대폰 화면, 속도, 검색 노출 문제를 급함, 주의, 양호로 나눠 보여 드려요.",
+    for: "가게·회사 홈페이지, 쇼핑몰 운영자",
+  },
+  {
     href: "/tools/php-check",
     need: "PHP 취약점 뉴스를 봤어요",
     who: ["사장님", "담당자"],
