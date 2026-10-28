@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useRef, useState } from "react";
+import { useSearchParams } from "next/navigation";
 import { Check, ChevronDown, MessageCircle } from "lucide-react";
 import { ChannelTalkButton } from "@/components/layout/ChannelTalk";
 import { LEAD_ENDPOINT } from "@/data/classic/leadEndpoint";
@@ -23,9 +24,11 @@ export function ContactForm() {
   const [name, setName] = useState("");
   const [phone, setPhone] = useState("");
   const [business, setBusiness] = useState("");
-  const [service, setService] = useState("");
+  // 홈페이지 진단(/tools/site-check)의 "전체 보고서 받기"로 넘어오면 ?site=주소 가 붙는다. 서비스와 문의 내용을 미리 채운다.
+  const site = useSearchParams().get("site") ?? "";
+  const [service, setService] = useState(site ? "유지보수" : "");
   const [sample, setSample] = useState("");
-  const [message, setMessage] = useState("");
+  const [message, setMessage] = useState(site ? `홈페이지 진단 전체 보고서 요청: ${site}` : "");
   const [agree, setAgree] = useState(false);
   const [website, setWebsite] = useState("");
   const [errors, setErrors] = useState<Record<string, string>>({});

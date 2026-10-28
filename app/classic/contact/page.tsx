@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import { Suspense } from "react";
 import { MessageCircle } from "lucide-react";
 import { ContactForm } from "@/components/classic/contact/ContactForm";
 import { PageHead, btnLine, wrap } from "@/components/classic/ui";
@@ -19,7 +20,10 @@ export default function ClassicContactPage() {
 
       <div className={`${wrap} grid gap-14 py-12 md:py-16 lg:grid-cols-[minmax(0,1fr)_340px] lg:gap-16`}>
         <section aria-label="상담 신청서" className="min-w-0">
-          <ContactForm />
+          {/* 폼이 주소의 ?site= 를 읽어서(useSearchParams) 정적 내보내기에는 Suspense가 있어야 한다 */}
+          <Suspense fallback={null}>
+            <ContactForm />
+          </Suspense>
         </section>
 
         <aside aria-labelledby="contact-steps" className="min-w-0 lg:pt-8">
