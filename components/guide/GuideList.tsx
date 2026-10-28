@@ -67,7 +67,7 @@ export function GuideList({ items, look }: { items: GuideItem[]; look: Look }) {
                   <span className="block text-[17px] font-bold leading-[1.5] tracking-[-0.02em] group-hover:text-[#256ef4] md:text-[19px]">{g.title}</span>
                   <span className="mt-1 block text-[15px] leading-[1.6] text-[#5b6370] md:text-[16px]">{g.description}</span>
                 </span>
-                <ChevronRight size={22} aria-hidden className="shrink-0 text-[#8a929e] group-hover:text-[#256ef4]" />
+                <ChevronRight size={22} aria-hidden className="shrink-0 text-[#6b7280] group-hover:text-[#256ef4]" />
               </Link>
             </li>
           ))}

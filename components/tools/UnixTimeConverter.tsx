@@ -247,7 +247,7 @@ export function UnixTimeConverter() {
               ).map(([v, label]) => (
                 <label
                   key={v}
-                  className={`inline-flex h-10 cursor-pointer items-center rounded-md border px-4 text-[15px] font-bold transition-colors ${zone === v ? "border-accent bg-accent-surface text-accent" : "border-border hover:bg-surface"}`}
+                  className={`inline-flex h-10 cursor-pointer items-center rounded-md border px-4 text-[15px] font-bold transition-colors ${zone === v ? "border-accent bg-accent-surface text-[#1d5fd6]" : "border-border hover:bg-surface"}`}
                 >
                   <input type="radio" name="ut-zone" checked={zone === v} onChange={() => setZone(v)} className="sr-only" />
                   {label}

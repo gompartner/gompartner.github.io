@@ -449,7 +449,7 @@ export function PrivacyPolicyGenerator() {
                 aria-pressed={form.siteType === t}
                 onClick={() => setForm((f) => ({ ...f, siteType: t, ...PRESETS[t], vendors: PRESETS[t].vendors.map((v) => ({ ...v })) }))}
                 className={`min-h-12 rounded-md border px-3 py-2 text-left text-[15px] font-bold transition-colors ${
-                  form.siteType === t ? "border-accent bg-accent-surface text-accent-hover" : "border-border hover:bg-surface"
+                  form.siteType === t ? "border-accent bg-accent-surface text-[#1d5fd6]-hover" : "border-border hover:bg-surface"
                 }`}
               >
                 {t}
@@ -593,7 +593,7 @@ export function PrivacyPolicyGenerator() {
               <motion.div className="h-full rounded-full bg-accent" animate={{ width: `${(done / required.length) * 100}%` }} transition={{ duration: reduce ? 0 : 0.3, ease: EASE }} />
             </div>
           </div>
-          <article className="max-h-[70vh] overflow-auto p-5 text-[15px] leading-[1.7] md:p-6" aria-live="off">
+          <article tabIndex={0} className="max-h-[70vh] overflow-auto p-5 text-[15px] leading-[1.7] md:p-6" aria-live="off">
             <h3 className="text-[19px] font-bold">개인정보 처리방침</h3>
             {sections.map((s, si) => {
               const n = numbers[si];

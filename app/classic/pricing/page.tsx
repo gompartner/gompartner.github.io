@@ -41,7 +41,7 @@ export default function ClassicPricingPage() {
               <a href={p.href} className="group flex h-full flex-col px-1 py-5 sm:px-5 lg:py-7">
                 <span className="flex items-center justify-between gap-2 text-[20px] font-extrabold tracking-[-0.03em] group-hover:text-[#256ef4] md:text-[22px]">
                   {p.name}
-                  <ChevronDown size={20} aria-hidden className="shrink-0 text-[#8a929e] group-hover:text-[#256ef4]" />
+                  <ChevronDown size={20} aria-hidden className="shrink-0 text-[#6b7280] group-hover:text-[#256ef4]" />
                 </span>
                 <span className="mt-1 text-[17px] font-bold tabular-nums text-[#256ef4]">{p.price}</span>
                 <span className="mt-2 text-[15px] leading-[1.55] text-[#5b6370]">{p.what}</span>
@@ -85,7 +85,7 @@ export default function ClassicPricingPage() {
           <h2 id="addons-title" className={h2}>
             추가 기능 단가
           </h2>
-          <div className="-mx-4 mt-10 overflow-x-auto px-4 md:mx-0 md:px-0">
+          <div tabIndex={0} className="-mx-4 mt-10 overflow-x-auto px-4 md:mx-0 md:px-0">
             <table className="w-full min-w-[480px] border-collapse border-t-2 border-[#15171c]">
               <caption className="sr-only">추가 기능 단가표</caption>
               <thead>
@@ -130,7 +130,7 @@ export default function ClassicPricingPage() {
               1건 기준과 맡지 않는 일 <ChevronRight size={16} aria-hidden />
             </Link>
           </div>
-          <div className="-mx-4 mt-10 overflow-x-auto px-4 md:mx-0 md:px-0">
+          <div tabIndex={0} className="-mx-4 mt-10 overflow-x-auto px-4 md:mx-0 md:px-0">
             <table className="w-full min-w-[560px] border-collapse border-t-2 border-[#15171c]">
               <caption className="sr-only">유지보수 가격</caption>
               <thead>
@@ -192,7 +192,7 @@ export default function ClassicPricingPage() {
             <h2 id="pricing-band" className="text-[30px] font-extrabold leading-[1.25] tracking-[-0.04em] md:text-[40px]">
               {previewPromise}
             </h2>
-            <p className="mt-3 text-[16px] leading-[1.65] text-white/85 md:text-[17px]">{previewDetail}</p>
+            <p className="mt-3 text-[16px] leading-[1.65] text-white md:text-[17px]">{previewDetail}</p>
           </div>
           <div className="flex shrink-0 flex-wrap gap-3">
             <ChannelTalkButton cta="classic_pricing_band_chat" className="inline-flex h-14 items-center rounded-md bg-white px-7 text-[17px] font-bold text-[#15171c] hover:bg-[#e8efff]">

@@ -131,7 +131,7 @@ export function ClassicHeader() {
                     )}
                   >
                     {m.label}
-                    {m.items.length > 0 && <ChevronDown size={15} strokeWidth={2.5} aria-hidden className="text-[#8a929e]" />}
+                    {m.items.length > 0 && <ChevronDown size={15} strokeWidth={2.5} aria-hidden className="text-[#6b7280]" />}
                   </Link>
                   {m.items.length > 0 && (
                     <div

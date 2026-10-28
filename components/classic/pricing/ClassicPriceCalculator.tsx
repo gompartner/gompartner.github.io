@@ -52,7 +52,7 @@ export function ClassicPriceCalculator() {
                     >
                       <input type="radio" name="classic-calc-plan" value={p.id} checked={on} onChange={() => setPlanId(p.id)} className="sr-only" />
                       <span className="text-[16px] font-bold">{p.title}</span>
-                      <span className={cn("text-[14px] tabular-nums", on ? "text-white/85" : "text-[#5b6370]")}>
+                      <span className={cn("text-[14px] tabular-nums", on ? "text-white" : "text-[#5b6370]")}>
                         {manwon(p.price)}, {p.days}일
                       </span>
                     </label>

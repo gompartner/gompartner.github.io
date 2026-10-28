@@ -18,12 +18,12 @@ type Status = { kind: "idle" } | { kind: "error"; message: string } | { kind: "d
 
 // 얇은 회색 테두리, 초점이 들어오면 파란 테두리. 격자 안에서 넘치지 않게 min-w-0.
 const field =
-  "h-12 w-full min-w-0 rounded-md border border-[#c9cfd8] bg-white px-4 text-[17px] outline-none transition-colors placeholder:text-[#8a929e] focus:border-[#256ef4] focus:ring-1 focus:ring-[#256ef4] aria-[invalid=true]:border-[#d63d4a] motion-reduce:transition-none";
+  "h-12 w-full min-w-0 rounded-md border border-[#c9cfd8] bg-white px-4 text-[17px] outline-none transition-colors placeholder:text-[#6b7280] focus:border-[#256ef4] focus:ring-1 focus:ring-[#256ef4] aria-[invalid=true]:border-[#d63d4a] motion-reduce:transition-none";
 const label = "block text-[15px] font-bold text-[#3d4450]";
 const err = "mt-1.5 text-[15px] text-[#d63d4a]";
 const chip = (on: boolean) =>
   `inline-flex h-12 items-center gap-1.5 rounded-md border px-4 text-[16px] font-bold transition-colors motion-reduce:transition-none ${
-    on ? "border-[#256ef4] bg-[#eaf1fe] text-[#256ef4]" : "border-[#c9cfd8] bg-white text-[#3d4450] hover:border-[#15171c]"
+    on ? "border-[#256ef4] bg-[#eaf1fe] text-[#1d5fd6]" : "border-[#c9cfd8] bg-white text-[#3d4450] hover:border-[#15171c]"
   }`;
 
 /** 이 페이지 자체의 상담 신청 폼. Apps Script 웹 앱으로 보내고, 응답의 접수 번호를 보여 준다. */

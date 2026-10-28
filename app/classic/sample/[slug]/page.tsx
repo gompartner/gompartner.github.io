@@ -121,7 +121,7 @@ export default async function ClassicSamplePage({ params }: Props) {
                 )}
               </dl>
               <p className="mt-5 flex flex-wrap items-baseline gap-x-3 gap-y-1">
-                {est.discount > 0 && <s className="text-[17px] font-bold tabular-nums text-[#8a929e]">{manwon(est.list)}</s>}
+                {est.discount > 0 && <s className="text-[17px] font-bold tabular-nums text-[#6b7280]">{manwon(est.list)}</s>}
                 <span className="text-[34px] font-extrabold tabular-nums tracking-[-0.03em] md:text-[40px]">{manwon(est.total)}</span>
                 <span className="text-[17px] font-bold text-[#5b6370]">작업 {est.days}일</span>
               </p>

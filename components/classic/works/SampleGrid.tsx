@@ -20,7 +20,7 @@ export function SampleGrid({ items, cols = 4 }: { items: Project[]; cols?: 3 | 4
                 className="aspect-[16/10] w-full object-cover object-top transition-transform duration-500 group-hover:scale-[1.04] motion-reduce:transition-none"
               />
             </span>
-            <span className="mt-3 block text-[13px] font-bold text-[#256ef4] md:text-[14px]">{p.category}</span>
+            <span className="mt-3 block text-[13px] font-bold text-[#1d5fd6] md:text-[14px]">{p.category}</span>
             <span className="mt-1 block break-keep text-[16px] font-bold leading-[1.4] tracking-[-0.02em] group-hover:underline md:text-[18px]">{p.title}</span>
             <span className="mt-1 block text-[14px] tabular-nums text-[#5b6370] md:text-[15px]">{priceLine(p)}</span>
           </Link>

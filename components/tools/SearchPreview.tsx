@@ -278,7 +278,7 @@ export function SearchPreview() {
               <div className="p-3">
                 <p className="truncate text-[15px] font-bold">{live.ogTitle || live.title || url.host}</p>
                 <p className="mt-0.5 line-clamp-2 text-[13px] leading-[1.5] text-[#5b6370]">{live.ogDescription || live.description}</p>
-                <p className="mt-1 text-[12px] text-[#8a929e]">{url.host}</p>
+                <p className="mt-1 text-[12px] text-[#6b7280]">{url.host}</p>
               </div>
             </div>
           </section>

@@ -27,7 +27,7 @@ export default function ClassicToolsPage() {
                 <h2 id={`cat-${c}`} className="text-[22px] font-extrabold tracking-[-0.03em] md:text-[26px]">
                   {c}
                 </h2>
-                <span className="text-[15px] tabular-nums text-[#8a929e]">{list.length}건</span>
+                <span className="text-[15px] tabular-nums text-[#6b7280]">{list.length}건</span>
               </div>
               <ul role="list">
                 {list.map((t) => (
@@ -38,7 +38,7 @@ export default function ClassicToolsPage() {
                         <span className="block text-[18px] font-bold tracking-[-0.02em] group-hover:text-[#256ef4] md:text-[19px]">{t.title}</span>
                         <span className="mt-1.5 block text-[15px] leading-[1.65] text-[#5b6370] md:text-[16px]">{t.description}</span>
                       </span>
-                      <ChevronRight size={20} aria-hidden className="hidden text-[#8a929e] group-hover:text-[#256ef4] md:block" />
+                      <ChevronRight size={20} aria-hidden className="hidden text-[#6b7280] group-hover:text-[#256ef4] md:block" />
                     </Link>
                   </li>
                 ))}

@@ -14,7 +14,7 @@ const PHONE_RE = /^01[016789]-?\d{3,4}-?\d{4}$/;
 type Status = { kind: "idle" } | { kind: "sending" } | { kind: "error"; message: string } | { kind: "done"; id: string };
 
 const field =
-  "mt-2 h-12 w-full min-w-0 rounded-md border border-[#c9cfd8] bg-white px-4 text-[17px] text-[#15171c] outline-none transition-colors placeholder:text-[#8a929e] focus:border-[#256ef4] focus:ring-1 focus:ring-[#256ef4] aria-[invalid=true]:border-[#d63d4a] motion-reduce:transition-none";
+  "mt-2 h-12 w-full min-w-0 rounded-md border border-[#c9cfd8] bg-white px-4 text-[17px] text-[#15171c] outline-none transition-colors placeholder:text-[#6b7280] focus:border-[#256ef4] focus:ring-1 focus:ring-[#256ef4] aria-[invalid=true]:border-[#d63d4a] motion-reduce:transition-none";
 const label = "block text-[16px] font-bold";
 const opt = "font-normal text-[#5b6370]";
 const err = "mt-1.5 text-[15px] text-[#d63d4a]";
