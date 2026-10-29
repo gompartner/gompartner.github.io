@@ -4,6 +4,7 @@
 // 바깥 시세는 출처와 확인 날짜를 sources에 남긴다. 클래식 보기는 data/classic/guides.ts를 따로 쓴다.
 import { addons, formatWon, manwon, plans } from "@/data/pricing";
 import { domainPrices, hostingPlans, checkedAt } from "@/data/hostingPrices";
+import { sharedGuides } from "@/data/guidesShared";
 
 export type GuideBlock =
   | { h2: string }
@@ -433,7 +434,7 @@ const allGuides: Guide[] = [
   },
 ];
 
-export const guides = allGuides.filter((g) => g.published <= todayKst);
+export const guides = [...allGuides, ...sharedGuides].filter((g) => g.published <= todayKst);
 
 export const guideBySlug = (slug: string) => guides.find((g) => g.slug === slug);
 
