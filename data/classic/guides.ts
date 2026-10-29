@@ -6,6 +6,7 @@ import { addons, formatWon, manwon, plans } from "@/data/classic/pricing";
 import { domainPrices, hostingPlans, checkedAt } from "@/data/classic/hostingPrices";
 
 import type { Guide } from "@/data/guides";
+import { sharedGuides } from "@/data/guidesShared";
 
 // 가격 데이터의 이름은 가운뎃점을 쓰는데 글에서는 쉼표로 바꾼다. 1만 원 아래는 원 단위로 적는다.
 const plain = (t: string) => t.replaceAll("·", ", ");
@@ -414,6 +415,6 @@ const allGuides: Guide[] = [
   },
 ];
 
-export const guides = allGuides.filter((g) => g.published <= todayKst);
+export const guides = [...allGuides, ...sharedGuides].filter((g) => g.published <= todayKst);
 
 export const guideBySlug = (slug: string) => guides.find((g) => g.slug === slug);
