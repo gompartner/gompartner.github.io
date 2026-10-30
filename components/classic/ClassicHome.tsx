@@ -2,49 +2,46 @@
 
 import Image from "next/image";
 import Link from "next/link";
-import { useEffect, useState } from "react";
-import { ArrowUpRight, ChevronDown, ChevronLeft, ChevronRight, Pause, Play, Plus } from "lucide-react";
-import { industries } from "@/data/classic/industries";
+import { ArrowUpRight, ChevronDown, ChevronRight, Plus } from "lucide-react";
 import { faq, processSteps } from "@/data/classic/faq";
 import { projects } from "@/data/classic/projects";
-import { guides } from "@/data/classic/guides";
-import { tools } from "@/data/classic/tools";
-import { fieldsById } from "@/data/classic/workFilters";
 import { PROGRAM_IDS } from "@/data/classic/programIds";
-import { useReducedMotionSafe } from "@/hooks/useReducedMotionSafe";
 import { cn } from "@/lib/utils";
 
-// 클래식 보기의 첫 화면. 웹 에이전시형 회사 홈페이지 구성:
-// 큰 배너 슬라이드(실제 샘플 화면), 상황별 진입, 서비스, 업종별 샘플, 진행 절차, 맡길 곳 고르기 표, 가이드와 자료실, 자주 묻는 질문, 문의 띠배너.
-// 내용은 클래식 전용 데이터(data/classic)를 쓴다. 웹툰 쪽과 따로 고친다.
+// 클래식 보기의 첫 화면. 딱 보면 무엇을 하는 곳이고 어떻게 진행되는지 보이게 한다(10-30):
+// 하는 일 한 줄, 서비스, 진행 절차, 카탈로그 분류, 제작 방식 비교, 자주 묻는 질문.
+// 카탈로그 카드는 첫 화면에 늘어놓지 않고 분류 네 칸으로만 보여 준다.
 
 const NAVY = "#0f1b3d";
 
 const slugOf = (demoUrl: string) => demoUrl.replace("/demo/", "");
-const byId = (id: string) => projects.find((p) => p.id === id)!;
-
-const slides = [
-  { id: "company", headline: "회사 홈페이지 제작" },
-  { id: "dental-homepage", headline: "병원 홈페이지 제작" },
-  { id: "online-store", headline: "자사 쇼핑몰 제작" },
-].map((s) => ({ ...s, project: byId(s.id) }));
+const heroShot = projects.find((p) => p.id === "company")!;
 
 const services = [
-  { href: "/classic/landing", name: "광고 랜딩페이지", what: "광고 유입 고객의 상담 신청을 접수하고 관리하는 단일 페이지" },
   { href: "/classic/homepage", name: "홈페이지 제작", what: "사업장 소개와 문의, 예약 접수를 갖춘 반응형 홈페이지" },
-  { href: "/classic/maintenance", name: "유지보수", what: "정기 점검, 보안 업데이트, 장애 대응과 콘텐츠 수정" },
+  { href: "/classic/landing", name: "광고 랜딩페이지", what: "광고 유입 고객의 상담 신청을 접수하고 관리하는 단일 페이지" },
   { href: "/classic/program", name: "업무 프로그램", what: "엑셀 기반 반복 업무를 웹 프로그램으로 전환" },
+  { href: "/classic/maintenance", name: "유지보수", what: "정기 점검, 보안 업데이트, 장애 대응과 콘텐츠 수정" },
 ];
 
-// 첫 화면 상황별 진입. 고객이 처한 상황으로 고르면 맞는 서비스 페이지로 간다.
-const situations = [
-  { href: "/classic/homepage", say: "홈페이지를 새로 구축해야 할 때", to: "홈페이지 제작" },
-  { href: "/classic/landing", say: "광고로 유입된 고객의 상담 신청을 받아야 할 때", to: "광고 랜딩페이지" },
-  { href: "/classic/maintenance", say: "운영 중인 홈페이지에 장애나 수정 요청이 생겼을 때", to: "유지보수" },
-  { href: "/classic/program", say: "엑셀 수작업을 웹 프로그램으로 옮기고 싶을 때", to: "업무 프로그램" },
-];
+// 카탈로그 분류. works/samples.ts groups 와 같은 기준으로 센다
+const live = projects.filter((p) => p.demoUrl.startsWith("/demo/"));
+const groupOf = (p: (typeof projects)[number]) =>
+  p.category === "랜딩페이지" || p.id.startsWith("landing-")
+    ? "landing"
+    : p.kind === "유지보수" || ["maintenance-dashboard", "maintenance-urgent-fix", "accessibility-review"].includes(p.id)
+      ? "maintenance"
+      : PROGRAM_IDS.includes(p.id)
+        ? "program"
+        : "homepage";
+const catalog = [
+  { key: "homepage", href: "/classic/works", name: "업종별 홈페이지", what: "병원, 매장, 전문직, 기업, 교육 업종별 구성" },
+  { key: "landing", href: "/classic/works/landing", name: "광고 랜딩페이지", what: "상담, 예약, 사전 등록 신청 페이지" },
+  { key: "program", href: "/classic/works/program", name: "업무 프로그램", what: "주문 취합, 관리자, 결과지 출력" },
+  { key: "maintenance", href: "/classic/works/maintenance", name: "유지보수", what: "오류 접수와 처리 과정" },
+].map((c) => ({ ...c, count: live.filter((p) => groupOf(p) === c.key).length }));
 
-// 맡길 곳 고르기 표. 남의 서비스는 일반적인 방식만 적고 이름은 쓰지 않는다.
+// 제작 방식 비교. 남의 서비스는 일반적인 방식만 적고 이름은 쓰지 않는다.
 const compareCols = ["셀프 제작 도구", "대형 제작사", "곰파트너"];
 const compareRows = [
   { label: "수행 인력", cells: ["운영자가 직접 제작", "영업, 기획, 디자인, 개발 분업", "상담한 개발자가 전 과정 수행"] },
@@ -59,157 +56,61 @@ const more = "inline-flex items-center gap-1 text-[15px] font-bold text-[#5b6370
 export function ClassicHome() {
   return (
     <div className="bg-white text-[#15171c]">
-      <h1 className="sr-only">곰파트너 홈페이지 제작</h1>
       <Hero />
-      <Situations />
       <Services />
-      <Samples />
       <Process />
+      <Catalog />
       <Compare />
-      <Boards />
       <Faq />
     </div>
   );
 }
 
 function Hero() {
-  const reduce = useReducedMotionSafe();
-  const [i, setI] = useState(0);
-  const [paused, setPaused] = useState(false);
-  const [hold, setHold] = useState(false);
-  const go = (n: number) => setI((n + slides.length) % slides.length);
-
-  useEffect(() => {
-    if (reduce || paused || hold) return;
-    const t = window.setTimeout(() => setI((v) => (v + 1) % slides.length), 6000);
-    return () => window.clearTimeout(t);
-  }, [i, reduce, paused, hold]);
-
+  const slug = slugOf(heroShot.demoUrl);
   return (
-    <section
-      aria-roledescription="carousel"
-      aria-label="대표 카탈로그"
-      className="relative overflow-hidden text-white"
-      style={{ backgroundColor: NAVY }}
-      onMouseEnter={() => setHold(true)}
-      onMouseLeave={() => setHold(false)}
-      onFocus={() => setHold(true)}
-      onBlur={() => setHold(false)}
-    >
-      <div className="mx-auto grid w-full max-w-[1248px] items-center gap-10 px-4 pb-24 pt-12 md:min-h-[600px] md:grid-cols-[1fr_1.15fr] md:gap-12 md:px-6 md:py-20">
-        <div className="relative min-h-[260px] md:min-h-[320px]">
-          {slides.map((s, n) => (
-            <div
-              key={s.id}
-              aria-hidden={n !== i}
-              inert={n !== i}
-              className={cn("absolute inset-0 transition-opacity duration-500 motion-reduce:transition-none", n === i ? "opacity-100" : "pointer-events-none opacity-0")}
-            >
-              <p className="text-[15px] font-bold text-[#8fb4ff] md:text-[17px]">{s.project.title}</p>
-              <p className="mt-4 text-[44px] font-extrabold leading-[1.08] tracking-[-0.05em] md:text-[76px]">{s.headline}</p>
-              <div className="mt-8 flex flex-wrap gap-3">
-                <Link
-                  href={`/classic/sample/${slugOf(s.project.demoUrl)}`}
-                  tabIndex={n === i ? 0 : -1}
-                  data-gtm-cta={`classic_hero_${s.id}`}
-                  className="inline-flex h-12 items-center rounded-md bg-white px-6 text-[16px] font-bold text-[#15171c] transition-colors hover:bg-[#e8efff]"
-                >
-                  카탈로그 보기
-                </Link>
-              </div>
-            </div>
-          ))}
+    <section aria-labelledby="c-hero" className="text-white" style={{ backgroundColor: NAVY }}>
+      <div className="mx-auto grid w-full max-w-[1248px] items-center gap-10 px-4 pb-16 pt-12 md:min-h-[560px] md:grid-cols-[1fr_1.1fr] md:gap-12 md:px-6 md:py-20">
+        <div>
+          <p className="text-[15px] font-bold text-[#8fb4ff] md:text-[17px]">웹 개발 사업자 곰파트너</p>
+          <h1 id="c-hero" className="mt-4 break-keep text-[38px] font-extrabold leading-[1.15] tracking-[-0.05em] md:text-[60px]">
+            홈페이지 구축부터
+            <br />
+            운영과 유지보수까지
+          </h1>
+          <p className="mt-5 max-w-[520px] break-keep text-[17px] leading-[1.7] text-[#c9d3e6] md:text-[19px]">상담한 개발자가 요구사항 확인, 디자인과 개발, 납품, 운영까지 직접 수행합니다.</p>
+          <div className="mt-8 flex flex-wrap gap-3">
+            <a href="#c-services" className="inline-flex h-12 items-center rounded-md bg-white px-6 text-[16px] font-bold text-[#15171c] transition-colors hover:bg-[#e8efff]">
+              서비스 보기
+            </a>
+            <a href="#c-process" className="inline-flex h-12 items-center rounded-md border border-white/40 px-6 text-[16px] font-bold text-white transition-colors hover:bg-white/10">
+              진행 절차
+            </a>
+          </div>
         </div>
 
-        {/* PC 화면 위에 휴대폰 화면을 겹친다. 슬라이드마다 실제 샘플 캡처 */}
-        <div className="relative aspect-[16/11] w-full">
-          {slides.map((s, n) => (
-            <div
-              key={s.id}
-              aria-hidden
-              className={cn(
-                "absolute inset-0 transition-[opacity,transform] duration-700 motion-reduce:transition-none",
-                n === i ? "translate-y-0 opacity-100" : "pointer-events-none translate-y-4 opacity-0"
-              )}
-            >
-              <div className="absolute left-0 top-0 w-[88%] overflow-hidden rounded-lg bg-white shadow-[0_30px_60px_rgba(0,0,0,.35)]">
-                <div className="flex h-6 items-center gap-1.5 bg-[#e9ecf1] px-3">
-                  <span className="h-2 w-2 rounded-full bg-[#c5cbd4]" />
-                  <span className="h-2 w-2 rounded-full bg-[#c5cbd4]" />
-                  <span className="h-2 w-2 rounded-full bg-[#c5cbd4]" />
-                </div>
-                <Image src={s.project.imageUrl} alt="" width={1440} height={900} priority={n === 0} sizes="(min-width: 768px) 600px, 90vw" className="aspect-[16/10] w-full object-cover object-top" />
-              </div>
-              <div className="absolute bottom-0 right-0 w-[27%] overflow-hidden rounded-[18px] border-[5px] border-[#1c2a52] bg-white shadow-[0_24px_48px_rgba(0,0,0,.4)]">
-                <Image src={`/images/demos/m/${slugOf(s.project.demoUrl)}.jpg`} alt="" width={390} height={736} sizes="180px" className="aspect-[9/17] w-full object-cover object-top" />
-              </div>
+        {/* PC 화면 위에 휴대폰 화면을 겹친다. 실제 카탈로그 캡처 한 장 */}
+        <div aria-hidden className="relative aspect-[16/11] w-full">
+          <div className="absolute left-0 top-0 w-[88%] overflow-hidden rounded-lg bg-white shadow-[0_30px_60px_rgba(0,0,0,.35)]">
+            <div className="flex h-6 items-center gap-1.5 bg-[#e9ecf1] px-3">
+              <span className="h-2 w-2 rounded-full bg-[#c5cbd4]" />
+              <span className="h-2 w-2 rounded-full bg-[#c5cbd4]" />
+              <span className="h-2 w-2 rounded-full bg-[#c5cbd4]" />
             </div>
-          ))}
+            <Image src={heroShot.imageUrl} alt="" width={1440} height={900} priority sizes="(min-width: 768px) 600px, 90vw" className="aspect-[16/10] w-full object-cover object-top" />
+          </div>
+          <div className="absolute bottom-0 right-0 w-[27%] overflow-hidden rounded-[18px] border-[5px] border-[#1c2a52] bg-white shadow-[0_24px_48px_rgba(0,0,0,.4)]">
+            <Image src={`/images/demos/m/${slug}.jpg`} alt="" width={390} height={736} sizes="180px" className="aspect-[9/17] w-full object-cover object-top" />
+          </div>
         </div>
       </div>
-
-      <div className="absolute inset-x-0 bottom-6">
-        <div className="mx-auto flex w-full max-w-[1248px] items-center gap-2 px-4 md:px-6">
-          <span className="mr-2 text-[14px] tabular-nums text-[#c9d3e6]">
-            <span className="font-bold text-white">{i + 1}</span> / {slides.length}
-          </span>
-          {[
-            { label: "이전 카탈로그", icon: <ChevronLeft size={18} aria-hidden />, on: () => go(i - 1) },
-            { label: "다음 카탈로그", icon: <ChevronRight size={18} aria-hidden />, on: () => go(i + 1) },
-          ].map((b) => (
-            <button key={b.label} type="button" onClick={b.on} aria-label={b.label} className="grid h-9 w-9 place-items-center rounded-full border border-white/30 hover:bg-white/10">
-              {b.icon}
-            </button>
-          ))}
-          {!reduce && (
-            <button
-              type="button"
-              onClick={() => setPaused((v) => !v)}
-              aria-label={paused ? "자동 넘김 켜기" : "자동 넘김 멈추기"}
-              className="grid h-9 w-9 place-items-center rounded-full border border-white/30 hover:bg-white/10"
-            >
-              {paused ? <Play size={15} aria-hidden /> : <Pause size={15} aria-hidden />}
-            </button>
-          )}
-          <span className="ml-3 hidden h-[3px] flex-1 max-w-[160px] bg-white/20 md:block">
-            <span className="block h-full bg-white transition-[width] duration-300" style={{ width: `${((i + 1) / slides.length) * 100}%` }} />
-          </span>
-        </div>
-      </div>
-    </section>
-  );
-}
-
-function Situations() {
-  return (
-    <section aria-labelledby="c-situations" className="mx-auto w-full max-w-[1248px] px-4 pt-20 md:px-6 md:pt-28">
-      <h2 id="c-situations" className={h2}>
-        상황별 서비스 안내
-      </h2>
-      <ul className="mt-10 grid gap-3 md:grid-cols-2 md:gap-4" role="list">
-        {situations.map((s) => (
-          <li key={s.href}>
-            <Link
-              href={s.href}
-              data-gtm-cta={`classic_situation_${s.href.split("/").pop()}`}
-              className="group flex h-full items-center justify-between gap-4 rounded-md border border-[#d9dee5] px-5 py-5 transition-colors hover:border-[#256ef4] md:px-6 md:py-6"
-            >
-              <span className="min-w-0">
-                <span className="block break-keep text-[18px] font-bold leading-[1.45] tracking-[-0.02em] md:text-[20px]">{s.say}</span>
-                <span className="mt-1 block text-[15px] font-bold text-[#256ef4]">{s.to}</span>
-              </span>
-              <ChevronRight size={22} aria-hidden className="shrink-0 text-[#6b7280] transition-colors group-hover:text-[#256ef4]" />
-            </Link>
-          </li>
-        ))}
-      </ul>
     </section>
   );
 }
 
 function Services() {
   return (
-    <section aria-labelledby="c-services" className="mx-auto w-full max-w-[1248px] px-4 py-20 md:px-6 md:py-28">
+    <section aria-labelledby="c-services" className="mx-auto w-full max-w-[1248px] scroll-mt-16 px-4 py-20 md:scroll-mt-[76px] md:px-6 md:py-28">
       <h2 id="c-services" className={h2}>
         서비스
       </h2>
@@ -236,81 +137,29 @@ function Services() {
   );
 }
 
-function Samples() {
-  const [tab, setTab] = useState<string>("all");
-  const field = industries.find((x) => x.slug === tab)?.field;
-  // 업무 프로그램, 랜딩, 유지보수는 업종 홈페이지와 섞지 않고 탭을 따로 둔다(works/samples.ts groups 와 같은 기준)
-  const groupOf = (p: (typeof projects)[number]) =>
-    p.category === "랜딩페이지" || p.id.startsWith("landing-")
-      ? "landing"
-      : p.kind === "유지보수" || ["maintenance-dashboard", "maintenance-urgent-fix", "accessibility-review"].includes(p.id)
-        ? "maintenance"
-        : PROGRAM_IDS.includes(p.id)
-          ? "program"
-          : null;
-  const list = projects
-    .filter((p) => p.demoUrl.startsWith("/demo/"))
-    .filter((p) => (tab === "program" || tab === "landing" || tab === "maintenance" ? groupOf(p) === tab : !groupOf(p) && (!field || fieldsById[p.id]?.includes(field))))
-    .slice(0, 8);
-  const tabs = [
-    { slug: "all", label: "전체" },
-    ...industries.map((x) => ({ slug: x.slug, label: x.label })),
-    { slug: "program", label: "업무 프로그램" },
-    { slug: "landing", label: "랜딩페이지" },
-    { slug: "maintenance", label: "유지보수" },
-  ];
-
+function Catalog() {
   return (
-    <section aria-labelledby="c-samples" className="bg-[#f4f6f9]">
+    <section aria-labelledby="c-catalog" className="bg-[#f4f6f9]">
       <div className="mx-auto w-full max-w-[1248px] px-4 py-20 md:px-6 md:py-28">
-        <div className="flex items-end justify-between gap-4">
-          <h2 id="c-samples" className={h2}>
-            카탈로그
-          </h2>
-          <Link href={tab === "all" ? "/classic/works" : `/classic/works/${tab}`} className={more}>
-            더보기 <Plus size={15} strokeWidth={2.5} aria-hidden />
-          </Link>
-        </div>
-
-        <div role="tablist" aria-label="업종" className="-mx-4 mt-8 flex gap-2 overflow-x-auto px-4 pb-1 md:mx-0 md:flex-wrap md:px-0">
-          {tabs.map((t) => (
-            <button
-              key={t.slug}
-              type="button"
-              role="tab"
-              aria-selected={tab === t.slug}
-              onClick={() => setTab(t.slug)}
-              className={cn(
-                "h-10 shrink-0 rounded-full border px-4 text-[15px] font-bold transition-colors",
-                tab === t.slug ? "border-[#15171c] bg-[#15171c] text-white" : "border-[#d9dee5] bg-white text-[#3d4450] hover:border-[#15171c]"
-              )}
-            >
-              {t.label}
-            </button>
+        <h2 id="c-catalog" className={h2}>
+          카탈로그
+        </h2>
+        <p className="mt-3 text-[16px] leading-[1.65] text-[#5b6370] md:text-[17px]">분류별로 실제 동작하는 화면을 직접 체험할 수 있습니다.</p>
+        <ul className="mt-10 grid gap-3 sm:grid-cols-2 md:gap-4 lg:grid-cols-4" role="list">
+          {catalog.map((c) => (
+            <li key={c.key}>
+              <Link href={c.href} className="group flex h-full flex-col rounded-md border border-[#d9dee5] bg-white p-6 transition-colors hover:border-[#256ef4]">
+                <span className="flex items-baseline justify-between gap-3">
+                  <span className="text-[20px] font-extrabold tracking-[-0.03em] group-hover:text-[#256ef4] md:text-[22px]">{c.name}</span>
+                  <span className="shrink-0 text-[15px] font-bold tabular-nums text-[#5b6370]">{c.count}개</span>
+                </span>
+                <span className="mt-2 flex-1 text-[15px] leading-[1.6] text-[#5b6370] md:text-[16px]">{c.what}</span>
+                <span className="mt-5 inline-flex items-center gap-1 text-[15px] font-bold text-[#256ef4]">
+                  보기 <ChevronRight size={16} aria-hidden />
+                </span>
+              </Link>
+            </li>
           ))}
-        </div>
-
-        <ul className="mt-8 grid grid-cols-2 gap-x-4 gap-y-8 md:grid-cols-4 md:gap-x-6 md:gap-y-12" role="list">
-          {list.map((p) => {
-            return (
-              <li key={p.id}>
-                <Link href={`/classic/sample/${slugOf(p.demoUrl)}`} className="group block">
-                  <span className="block overflow-hidden rounded-md border border-[#e1e5eb] bg-white">
-                    <Image
-                      src={`/images/demos/sm/${slugOf(p.demoUrl)}.jpg`}
-                      alt={p.imageAlt}
-                      width={720}
-                      height={450}
-                      sizes="(min-width: 768px) 290px, 45vw"
-                      className="aspect-[16/10] w-full object-cover object-top transition-transform duration-500 group-hover:scale-[1.04] motion-reduce:transition-none"
-                    />
-                  </span>
-                  <span className="mt-3 block text-[13px] font-bold text-[#1d5fd6] md:text-[14px]">{p.category}</span>
-                  <span className="mt-1 block text-[16px] font-bold leading-[1.4] tracking-[-0.02em] group-hover:underline md:text-[18px]">{p.title}</span>
-                </Link>
-              </li>
-            );
-          })}
         </ul>
       </div>
     </section>
@@ -319,7 +168,7 @@ function Samples() {
 
 function Process() {
   return (
-    <section aria-labelledby="c-process" className="mx-auto w-full max-w-[1248px] px-4 py-20 md:px-6 md:py-28">
+    <section aria-labelledby="c-process" className="mx-auto w-full max-w-[1248px] scroll-mt-16 px-4 py-20 md:scroll-mt-[76px] md:px-6 md:py-28">
       <h2 id="c-process" className={h2}>
         진행 절차
       </h2>
@@ -372,55 +221,6 @@ function Compare() {
               ))}
             </tbody>
           </table>
-        </div>
-      </div>
-    </section>
-  );
-}
-
-function Boards() {
-  // 제작 일지는 10-28 티스토리에서 사이트 가이드로 합쳤다. 최근 글 5편
-  const posts = [...guides].reverse().sort((a, b) => b.published.localeCompare(a.published)).slice(0, 5);
-  const row = "flex items-center justify-between gap-4 border-b border-[#e6e9ee] py-4 text-[16px] hover:text-[#256ef4]";
-
-  return (
-    <section aria-label="가이드와 자료실" className="border-t border-[#e6e9ee]">
-      <div className="mx-auto grid w-full max-w-[1248px] gap-14 px-4 py-20 md:grid-cols-2 md:gap-12 md:px-6 md:py-24">
-        <div className="min-w-0">
-          <div className="flex items-end justify-between border-b-2 border-[#15171c] pb-4">
-            <h2 className="text-[24px] font-extrabold tracking-[-0.03em]">가이드</h2>
-            <Link href="/classic/guide" className={more}>
-              더보기 <Plus size={15} strokeWidth={2.5} aria-hidden />
-            </Link>
-          </div>
-          <ul role="list">
-            {posts.map((g) => (
-              <li key={g.slug}>
-                <Link href={`/classic/guide/${g.slug}`} className={row}>
-                  <span className="truncate">{g.title}</span>
-                  <span className="shrink-0 text-[14px] tabular-nums text-[#6b7280]">{g.published.slice(5).replace("-", ".")}</span>
-                </Link>
-              </li>
-            ))}
-          </ul>
-        </div>
-        <div className="min-w-0">
-          <div className="flex items-end justify-between border-b-2 border-[#15171c] pb-4">
-            <h2 className="text-[24px] font-extrabold tracking-[-0.03em]">자료실</h2>
-            <Link href="/classic/tools" className={more}>
-              더보기 <Plus size={15} strokeWidth={2.5} aria-hidden />
-            </Link>
-          </div>
-          <ul role="list">
-            {tools.slice(0, 5).map((t) => (
-              <li key={t.href}>
-                <Link href={t.href} className={row}>
-                  <span className="truncate">{t.title}</span>
-                  <span className="shrink-0 text-[14px] text-[#6b7280]">{t.category}</span>
-                </Link>
-              </li>
-            ))}
-          </ul>
         </div>
       </div>
     </section>
