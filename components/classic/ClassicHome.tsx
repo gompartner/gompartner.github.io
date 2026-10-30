@@ -50,7 +50,9 @@ const situations = [
 const compareCols = ["셀프 제작 도구", "큰 제작사", "곰파트너"];
 const compareRows = [
   { label: "만드는 사람", cells: ["사장님이 직접", "제작사 담당 팀", "곰파트너가 대신"] },
-  { label: "다 만든 뒤", cells: ["고장 나면 직접 고치기", "유지보수 계약", "1개월 무상 오류 수정, 원본 소스 제공"] },
+  { label: "법으로 정한 표시", cells: ["사장님이 직접 챙기기", "업체에 따라 다름", "업종별로 확인해 넣기"] },
+  { label: "다 만든 뒤 받는 것", cells: ["플랫폼 관리자 계정", "계약서에 정한 결과물", "원본 소스, 점검 결과표, 인계 문서"] },
+  { label: "고장 나면", cells: ["직접 고치기", "유지보수 계약", "1개월 무상 오류 수정"] },
 ];
 
 const h2 = "text-[30px] font-extrabold leading-[1.25] tracking-[-0.04em] md:text-[44px]";
