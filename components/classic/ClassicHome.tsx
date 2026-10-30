@@ -22,7 +22,7 @@ const services = [
   { href: "/classic/homepage", name: "홈페이지 제작", what: "사업장 소개와 문의, 예약 접수를 갖춘 반응형 홈페이지" },
   { href: "/classic/landing", name: "광고 랜딩페이지", what: "광고 유입 고객의 상담 신청을 접수하고 관리하는 단일 페이지" },
   { href: "/classic/program", name: "업무 프로그램", what: "엑셀 기반 반복 업무를 웹 프로그램으로 전환" },
-  { href: "/classic/maintenance", name: "유지보수", what: "정기 점검, 보안 업데이트, 장애 대응과 콘텐츠 수정" },
+  { href: "/classic/maintenance", name: "유지보수", what: "정기 점검, 서버 보안 패치, 인증 심사 대응, 장애 대응과 콘텐츠 수정" },
 ];
 
 // 카탈로그 분류. works/samples.ts groups 와 같은 기준으로 센다
