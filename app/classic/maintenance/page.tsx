@@ -2,14 +2,13 @@ import type { Metadata } from "next";
 import { Check, Clock, X } from "lucide-react";
 import { StepList } from "@/components/classic/pricing/StepList";
 import { serviceTabs } from "@/components/classic/pricing/tabs";
-import { MaintenanceForm } from "@/components/classic/maintenance/MaintenanceForm";
-import { PageHead, SubTabs, btnPrimary, h3, wrap } from "@/components/classic/ui";
+import { PageHead, SubTabs, h3, wrap } from "@/components/classic/ui";
 import { maintenanceServices, maintenanceSteps, responseTime } from "@/data/classic/maintenance";
 import { pageMeta } from "@/lib/seo";
 
 export const metadata: Metadata = pageMeta({
   title: "홈페이지 유지보수 비용 (월 관리, 오류 수정)",
-  description: "월 유지보수, 오류 수정, 다른 업체가 만든 홈페이지 인계 점검, 검색 노출 세팅. 하는 일과 맡지 않는 일을 적었습니다.",
+  description: "월 유지보수, 오류 수정, 다른 업체가 만든 홈페이지 인계 점검, 검색 노출 세팅. 서비스별 업무 범위와 기준을 안내합니다.",
   path: "/classic/maintenance",
 });
 
@@ -87,7 +86,7 @@ export default function ClassicMaintenancePage() {
             ),
           })),
           {
-            label: "맡지 않는 일",
+            label: "별도 범위",
             body: (
               <ul className="space-y-1.5 text-[#5b6370]">
                 {shown(s.excludes).map((item) => (
@@ -130,11 +129,6 @@ export default function ClassicMaintenancePage() {
                   </div>
                 ))}
               </dl>
-              <div className="mt-8 flex flex-wrap gap-3">
-                <a href={`#apply-${s.id}`} className={btnPrimary}>
-                  {s.title} 접수
-                </a>
-              </div>
             </div>
           </section>
         );
@@ -142,7 +136,6 @@ export default function ClassicMaintenancePage() {
 
       <StepList steps={maintenanceSteps} title="유지보수 진행 절차" id="maintenance-process" />
 
-      <MaintenanceForm />
     </>
   );
 }

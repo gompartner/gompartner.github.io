@@ -2,7 +2,7 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import { Check } from "lucide-react";
 import { StepList } from "@/components/classic/pricing/StepList";
-import { PageHead, btnPrimary, h2, wrap } from "@/components/classic/ui";
+import { PageHead, h2, wrap } from "@/components/classic/ui";
 import { SampleGrid } from "@/components/classic/works/SampleGrid";
 import { demoProjects, isProgram, slugOf } from "@/components/classic/works/samples";
 import { processSteps } from "@/data/classic/faq";
@@ -39,11 +39,6 @@ export default function ClassicProgramPage() {
             <p className="mt-1 text-[28px] font-extrabold tracking-[-0.03em] text-[#256ef4] md:text-[34px]">별도 견적</p>
             <p className="mt-1 text-[16px] leading-[1.6] text-[#5b6370]">필요한 화면 수와 사용자 범위를 확인한 뒤 견적과 일정을 안내합니다.</p>
           </div>
-          <div className="flex flex-wrap gap-3">
-            <Link href="/classic/contact" className={btnPrimary}>
-              상담 신청
-            </Link>
-          </div>
         </div>
       </section>
 
@@ -61,7 +56,7 @@ export default function ClassicProgramPage() {
       <section id="features" aria-labelledby="pg-features" className={section}>
         <div className={`${wrap} py-16 md:py-24`}>
           <h2 id="pg-features" className={h2}>
-            만들 수 있는 것
+            구현 사례
           </h2>
           <ul className="mt-10 border-t-2 border-[#15171c]" role="list">
             {programs.map((p) => (
@@ -86,18 +81,6 @@ export default function ClassicProgramPage() {
 
       <StepList steps={processSteps} title="진행 절차" id="process" />
 
-      <section aria-labelledby="pg-band" className="text-white" style={{ backgroundColor: "#256ef4" }}>
-        <div className={`${wrap} flex flex-col gap-8 py-16 md:flex-row md:items-center md:justify-between md:py-20`}>
-          <h2 id="pg-band" className={h2}>
-            업무 프로그램 상담
-          </h2>
-          <div className="flex shrink-0 flex-wrap gap-3">
-            <Link href="/classic/contact" data-gtm-cta="classic_program_band_contact" className="inline-flex h-14 items-center rounded-md border border-white/60 px-7 text-[17px] font-bold hover:bg-white/10">
-              상담 신청
-            </Link>
-          </div>
-        </div>
-      </section>
     </>
   );
 }

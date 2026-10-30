@@ -1,7 +1,6 @@
 import type { Metadata } from "next";
-import Link from "next/link";
 import { ChevronDown } from "lucide-react";
-import { PageHead, btnLine, wrap } from "@/components/classic/ui";
+import { PageHead, wrap } from "@/components/classic/ui";
 import { SupportTabs } from "@/components/classic/support/SupportTabs";
 import { faq } from "@/data/classic/faq";
 import { fitDescription } from "@/lib/seo";
@@ -40,13 +39,6 @@ export default function ClassicFaqPage() {
           ))}
         </ul>
 
-        <div className="mt-12 flex flex-col gap-5 border-t border-[#e6e9ee] pt-8 md:flex-row md:items-center md:justify-end">
-          <div className="flex flex-wrap gap-3">
-            <Link href="/classic/contact" data-gtm-cta="classic_faq_contact" className={btnLine}>
-              상담 신청
-            </Link>
-          </div>
-        </div>
       </div>
     </>
   );

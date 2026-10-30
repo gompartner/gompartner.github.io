@@ -1,8 +1,7 @@
 import type { Metadata } from "next";
 import Image from "next/image";
-import Link from "next/link";
 import { channels } from "@/components/classic/ClassicFooter";
-import { PageHead, btnPrimary, h2, wrap } from "@/components/classic/ui";
+import { PageHead, h2, wrap } from "@/components/classic/ui";
 import { aboutLead, principles } from "@/data/classic/about";
 import { profile } from "@/data/classic/profile";
 import { pageMeta } from "@/lib/seo";
@@ -91,11 +90,6 @@ export default function ClassicStoryPage() {
                 </li>
               ))}
             </ul>
-            <div className="mt-8 flex flex-wrap gap-3">
-              <Link href="/classic/contact" className={btnPrimary}>
-                상담 신청
-              </Link>
-            </div>
           </div>
         </div>
       </section>

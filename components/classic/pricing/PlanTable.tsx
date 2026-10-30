@@ -7,7 +7,7 @@ const th = "sticky left-0 z-[1] w-[112px] bg-[#f6f7f9] px-4 py-4 text-left align
 const td = "px-4 py-4 align-top text-[16px] leading-[1.6] md:px-6";
 
 /** 패키지 비교표. 열은 패키지, 행은 수정 횟수, 구성, 포함 항목. 금액과 기간은 상담 뒤에 안내한다(10-30). 휴대폰에서는 표만 가로로 밀어 본다. */
-export function PlanTable({ plans, product, ctaPrefix }: { plans: Plan[]; product: string; ctaPrefix: string }) {
+export function PlanTable({ plans, product }: { plans: Plan[]; product: string }) {
   const list = (items: string[]) => (
     <ul className="space-y-1.5">
       {items.map((item) => (
@@ -106,18 +106,6 @@ export function PlanTable({ plans, product, ctaPrefix }: { plans: Plan[]; produc
               ))}
             </tr>
           )}
-          <tr className="border-b border-[#15171c]">
-            <th scope="row" className={th}>
-              <span className="sr-only">상담</span>
-            </th>
-            {plans.map((p) => (
-              <td key={p.id} className={td}>
-                <Link href="/classic/contact" data-gtm-cta={`${ctaPrefix}_${p.id}`} className="inline-flex h-11 w-full items-center justify-center rounded-md border border-[#c9cfd8] bg-white px-4 text-[15px] font-bold text-[#15171c] transition-colors hover:border-[#256ef4] hover:text-[#256ef4]">
-                  이 패키지로 상담
-                </Link>
-              </td>
-            ))}
-          </tr>
         </tbody>
       </table>
     </div>

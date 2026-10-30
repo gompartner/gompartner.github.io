@@ -28,7 +28,7 @@ export const plans: Plan[] = [
     days: 6,
     revisions: 2,
     summary: "매장, 병원 등 사업장 소개 중심",
-    includes: ["5쪽 이내", "반응형 화면(PC, 모바일)", "전화, 지도, 영업시간 안내", "네이버, 구글 검색엔진 등록"],
+    includes: ["기본 5쪽 구성", "반응형 화면(PC, 모바일)", "전화, 지도, 영업시간 안내", "네이버, 구글 검색엔진 등록"],
   },
   {
     id: "standard",
@@ -38,7 +38,7 @@ export const plans: Plan[] = [
     days: 9,
     revisions: 3,
     summary: "문의, 예약 접수와 게시물 직접 관리",
-    includes: ["10쪽 이내", "소개 홈페이지 구성 전부", "문의, 예약 신청 폼", "관리자 페이지(공지, 사진 게시)"],
+    includes: ["기본 10쪽 구성", "소개 홈페이지 구성 전부", "문의, 예약 신청 폼", "관리자 페이지(공지, 사진 게시)"],
   },
   {
     id: "premium",
@@ -48,7 +48,7 @@ export const plans: Plan[] = [
     days: 12,
     revisions: 4,
     summary: "예약, 주문 등 업종 맞춤 기능 개발",
-    includes: ["10쪽 이내", "문의, 예약 홈페이지 구성 전부", "맞춤 기능 1개", "업종 맞춤 메인 화면 디자인"],
+    includes: ["기본 10쪽 구성", "문의, 예약 홈페이지 구성 전부", "업종 맞춤 기능 개발", "업종 맞춤 메인 화면 디자인"],
   },
 ];
 
@@ -61,7 +61,7 @@ export const landingPlans: Plan[] = [
     days: 4,
     revisions: 2,
     summary: "신청 접수와 즉시 알림",
-    includes: ["섹션 5개 이내", "반응형 화면(PC, 모바일)", "신청 폼과 개인정보 수집 동의", "접수 메일 알림", "구글 시트 자동 저장"],
+    includes: ["기본 5개 섹션 구성", "반응형 화면(PC, 모바일)", "신청 폼과 개인정보 수집 동의", "접수 메일 알림", "구글 시트 자동 저장"],
   },
   {
     id: "landing-standard",
@@ -71,7 +71,7 @@ export const landingPlans: Plan[] = [
     days: 5,
     revisions: 2,
     summary: "상담 진행 상태 관리",
-    includes: ["섹션 7개 이내", "신청 접수 구성 전부", "문자, 알림톡 알림(발송 비용 별도)", "시트 상담 상태 관리", "중복 신청 자동 표시"],
+    includes: ["기본 7개 섹션 구성", "신청 접수 구성 전부", "문자, 알림톡 알림(발송 비용 별도)", "시트 상담 상태 관리", "중복 신청 자동 표시"],
   },
   {
     id: "landing-premium",
@@ -81,15 +81,11 @@ export const landingPlans: Plan[] = [
     days: 7,
     revisions: 3,
     summary: "광고 채널별 성과 집계",
-    includes: ["섹션 10개 이내", "상담 관리 구성 전부", "30분 미처리 신청 재알림", "광고 채널별 신청, 계약 주간 리포트", "네이버, 메타, 구글 광고별 유입 기록", "견적 계산 같은 맞춤 기능 1개"],
+    includes: ["기본 10개 섹션 구성", "상담 관리 구성 전부", "30분 미처리 신청 재알림", "광고 채널별 신청, 계약 주간 리포트", "네이버, 메타, 구글 광고별 유입 기록", "견적 계산 등 맞춤 기능 개발"],
   },
 ];
 
 export const planCommon = ["업종별 법정 고지 검토", "원본 소스 제공", "점검 결과표, 인계 문서", "오픈 후 1개월 무상 하자보수"];
-
-/** 페이지 아래 파란 띠의 상담 안내. 금액과 기간은 상담 뒤에 알린다(10-30). */
-export const contactTitle = "프로젝트 상담";
-export const contactDetail = "업종, 필요한 기능, 희망 오픈 시기를 남겨 주시면 작업 범위와 일정, 견적을 정리해 회신합니다.";
 
 /** 패키지 금액 밖에서 드는 돈. 숫자는 /tools/hosting-cost(data/hostingPrices.ts) 조사값에서 나온 범위다. */
 export const runningCostNote =

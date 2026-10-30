@@ -4,12 +4,12 @@ import { ChevronRight } from "lucide-react";
 import { PlanTable } from "@/components/classic/pricing/PlanTable";
 import { StepList } from "@/components/classic/pricing/StepList";
 import { serviceTabs } from "@/components/classic/pricing/tabs";
-import { PageHead, SubTabs, btnPrimary, h2, more, wrap } from "@/components/classic/ui";
+import { PageHead, SubTabs, h2, more, wrap } from "@/components/classic/ui";
 import { SampleGrid } from "@/components/classic/works/SampleGrid";
 import { demoProjects } from "@/components/classic/works/samples";
 import { processSteps } from "@/data/classic/faq";
 import { industries } from "@/data/classic/industries";
-import { plans, contactDetail, contactTitle, runningCostNote, samplesForPlan } from "@/data/classic/pricing";
+import { plans, runningCostNote, samplesForPlan } from "@/data/classic/pricing";
 import { pageMeta } from "@/lib/seo";
 
 // 홈페이지 제작 서비스 상세. 패키지 데이터(data/classic/pricing)를 쓴다.
@@ -47,11 +47,6 @@ export default function ClassicHomepagePage() {
               검색 노출과 문의 접수까지 고려한 업종별 홈페이지
             </h2>
           </div>
-          <div className="flex flex-wrap gap-3">
-            <Link href="/classic/contact" className={btnPrimary}>
-              상담 신청
-            </Link>
-          </div>
         </div>
       </section>
 
@@ -79,7 +74,7 @@ export default function ClassicHomepagePage() {
           <h2 id="hp-plans" className={h2}>
             패키지
           </h2>
-          <PlanTable plans={plans} product="홈페이지" ctaPrefix="classic_homepage_chat" />
+          <PlanTable plans={plans} product="홈페이지" />
           <p className="mt-6 text-[15px] leading-[1.65] text-[#5b6370] md:text-[16px]">{runningCostNote}</p>
         </div>
       </section>
@@ -104,21 +99,6 @@ export default function ClassicHomepagePage() {
 
       <StepList steps={processSteps} title="진행 절차" id="process" />
 
-      <section aria-labelledby="hp-band" className="text-white" style={{ backgroundColor: "#256ef4" }}>
-        <div className={`${wrap} flex flex-col gap-8 py-16 md:flex-row md:items-center md:justify-between md:py-20`}>
-          <div className="max-w-[640px]">
-            <h2 id="hp-band" className="text-[30px] font-extrabold leading-[1.25] tracking-[-0.04em] md:text-[40px]">
-              {contactTitle}
-            </h2>
-            <p className="mt-3 text-[16px] leading-[1.65] text-white md:text-[17px]">{contactDetail}</p>
-          </div>
-          <div className="flex shrink-0 flex-wrap gap-3">
-            <Link href="/classic/contact" data-gtm-cta="classic_homepage_band_contact" className="inline-flex h-14 items-center rounded-md border border-white/60 px-7 text-[17px] font-bold hover:bg-white/10">
-              상담 신청
-            </Link>
-          </div>
-        </div>
-      </section>
     </>
   );
 }
