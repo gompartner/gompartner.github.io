@@ -9,6 +9,7 @@ import { LEAD_ENDPOINT } from "@/data/classic/leadEndpoint";
 // 클래식 상담 신청 폼. 보내는 방식과 필드명은 /landing 폼과 같다(같은 Apps Script 시트에 쌓인다).
 
 export const SERVICES = ["광고 랜딩페이지", "홈페이지 제작", "유지보수", "업무 프로그램", "잘 모르겠음"] as const;
+export const BUDGETS = ["30만 원 안쪽", "30~50만 원", "50~100만 원", "100만 원 넘음", "협의"] as const;
 
 const PHONE_RE = /^01[016789]-?\d{3,4}-?\d{4}$/;
 
@@ -28,6 +29,9 @@ export function ContactForm() {
   const site = useSearchParams().get("site") ?? "";
   const [service, setService] = useState(site ? "유지보수" : "");
   const [sample, setSample] = useState("");
+  const [budget, setBudget] = useState("");
+  const [openDate, setOpenDate] = useState("");
+  const [currentSite, setCurrentSite] = useState(site);
   const [message, setMessage] = useState(site ? `홈페이지 진단 전체 보고서 요청: ${site}` : "");
   const [agree, setAgree] = useState(false);
   const [website, setWebsite] = useState("");
@@ -60,14 +64,21 @@ export function ContactForm() {
       return;
     }
     const q = new URLSearchParams(window.location.search);
-    const body = message.trim();
+    // 시트 칸은 /landing 폼과 같아서, 더한 항목은 문의 내용 앞에 줄로 붙인다
+    const extra = [
+      sample.trim() && `참고 샘플: ${sample.trim()}`,
+      budget && `예산: ${budget}`,
+      openDate.trim() && `희망 오픈일: ${openDate.trim()}`,
+      currentSite.trim() && `지금 홈페이지: ${currentSite.trim()}`,
+    ].filter(Boolean);
+    const body = [...extra, message.trim()].join("\n");
     const payload = {
       name: name.trim(),
       phone: phone.trim(),
       business: business.trim(),
       channel: "",
       pkg: service || "잘 모르겠음",
-      message: sample.trim() ? `참고 샘플: ${sample.trim()}\n${body}` : body,
+      message: body,
       agree,
       utm_source: q.get("utm_source") ?? "",
       utm_campaign: q.get("utm_campaign") ?? "",
@@ -171,6 +182,46 @@ export function ContactForm() {
         </div>
       </fieldset>
 
+      <fieldset>
+        <legend className={label}>
+          예산 <span className={opt}>(선택)</span>
+        </legend>
+        <div className="mt-2 grid grid-cols-2 gap-2 sm:flex sm:flex-wrap">
+          {BUDGETS.map((b) => {
+            const on = budget === b;
+            return (
+              <button
+                key={b}
+                type="button"
+                aria-pressed={on}
+                onClick={() => setBudget(on ? "" : b)}
+                className={`inline-flex min-h-12 min-w-0 items-center justify-center gap-1.5 break-keep rounded-md border px-2 py-2 text-[15px] font-bold tabular-nums sm:px-4 sm:text-[16px] transition-colors motion-reduce:transition-none ${
+                  on ? "border-[#256ef4] bg-[#eef4ff] text-[#256ef4]" : "border-[#c9cfd8] bg-white text-[#3d4450] hover:border-[#15171c]"
+                }`}
+              >
+                {on && <Check size={16} strokeWidth={3} aria-hidden className="shrink-0" />}
+                {b}
+              </button>
+            );
+          })}
+        </div>
+      </fieldset>
+
+      <div className="grid gap-7 md:grid-cols-2 md:gap-6">
+        <div className="min-w-0">
+          <label htmlFor="cc-open" className={label}>
+            희망 오픈일 <span className={opt}>(선택)</span>
+          </label>
+          <input id="cc-open" value={openDate} onChange={(e) => setOpenDate(e.target.value)} placeholder="예: 12월 초" className={field} />
+        </div>
+        <div className="min-w-0">
+          <label htmlFor="cc-site" className={label}>
+            지금 홈페이지 주소 <span className={opt}>(있으면)</span>
+          </label>
+          <input id="cc-site" value={currentSite} onChange={(e) => setCurrentSite(e.target.value)} inputMode="url" autoComplete="url" placeholder="예: www.hanulcoffee.co.kr" className={field} />
+        </div>
+      </div>
+
       <div>
         <label htmlFor="cc-sample" className={label}>
           참고 샘플 <span className={opt}>(선택)</span>
@@ -187,7 +238,7 @@ export function ContactForm() {
           value={message}
           onChange={(e) => setMessage(e.target.value)}
           rows={6}
-          placeholder="필요한 기능, 희망 오픈일, 예산"
+          placeholder="필요한 기능, 고칠 곳, 궁금한 점"
           className={`${field} h-auto py-3 leading-[1.6]`}
           aria-invalid={!!errors.message}
           aria-describedby={errors.message ? "cc-message-err" : undefined}
@@ -222,7 +273,7 @@ export function ContactForm() {
             <ChevronDown size={16} className="transition-transform group-open:rotate-180 motion-reduce:transition-none" aria-hidden />
           </summary>
           <ul className="mt-2 space-y-1">
-            <li>수집 항목: 이름, 휴대폰 번호, 회사 또는 상호(업종), 관심 서비스, 참고 샘플, 문의 내용, 유입 경로</li>
+            <li>수집 항목: 이름, 휴대폰 번호, 회사 또는 상호(업종), 관심 서비스, 예산, 희망 오픈일, 지금 홈페이지 주소, 참고 샘플, 문의 내용, 유입 경로</li>
             <li>이용 목적: 상담 신청 확인 및 회신</li>
             <li>보관 기간: 신청일로부터 1년</li>
             <li>동의를 거부할 수 있으며 거부 시 신청이 제한됩니다.</li>
