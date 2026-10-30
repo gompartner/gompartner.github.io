@@ -89,7 +89,7 @@ function Hero() {
   return (
     <section
       aria-roledescription="carousel"
-      aria-label="대표 샘플"
+      aria-label="대표 카탈로그"
       className="relative overflow-hidden text-white"
       style={{ backgroundColor: NAVY }}
       onMouseEnter={() => setHold(true)}
@@ -115,7 +115,7 @@ function Hero() {
                   data-gtm-cta={`classic_hero_${s.id}`}
                   className="inline-flex h-12 items-center rounded-md bg-white px-6 text-[16px] font-bold text-[#15171c] transition-colors hover:bg-[#e8efff]"
                 >
-                  샘플 보기
+                  카탈로그 보기
                 </Link>
               </div>
             </div>
@@ -155,8 +155,8 @@ function Hero() {
             <span className="font-bold text-white">{i + 1}</span> / {slides.length}
           </span>
           {[
-            { label: "이전 샘플", icon: <ChevronLeft size={18} aria-hidden />, on: () => go(i - 1) },
-            { label: "다음 샘플", icon: <ChevronRight size={18} aria-hidden />, on: () => go(i + 1) },
+            { label: "이전 카탈로그", icon: <ChevronLeft size={18} aria-hidden />, on: () => go(i - 1) },
+            { label: "다음 카탈로그", icon: <ChevronRight size={18} aria-hidden />, on: () => go(i + 1) },
           ].map((b) => (
             <button key={b.label} type="button" onClick={b.on} aria-label={b.label} className="grid h-9 w-9 place-items-center rounded-full border border-white/30 hover:bg-white/10">
               {b.icon}
@@ -266,7 +266,7 @@ function Samples() {
       <div className="mx-auto w-full max-w-[1248px] px-4 py-20 md:px-6 md:py-28">
         <div className="flex items-end justify-between gap-4">
           <h2 id="c-samples" className={h2}>
-            샘플
+            카탈로그
           </h2>
           <Link href={tab === "all" ? "/classic/works" : `/classic/works/${tab}`} className={more}>
             더보기 <Plus size={15} strokeWidth={2.5} aria-hidden />

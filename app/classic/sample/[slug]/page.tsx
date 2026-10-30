@@ -20,7 +20,7 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
   const { slug } = await params;
   const p = findBySlug(slug);
   if (!p) return {};
-  return pageMeta({ title: `${p.title} 샘플 소개`, description: p.description, path: `/classic/sample/${slug}` });
+  return pageMeta({ title: `${p.title} 카탈로그`, description: p.description, path: `/classic/sample/${slug}` });
 }
 
 const row = "flex justify-between gap-4 border-b border-[#e6e9ee] py-3";
@@ -40,16 +40,16 @@ export default async function ClassicSamplePage({ params }: Props) {
       <PageHead
         title={p.title}
         trail={[
-          { href: "/classic/works", label: "샘플" },
+          { href: "/classic/works", label: "카탈로그" },
           ...(ind ? [{ href: `/classic/works/${ind.slug}`, label: ind.label }] : []),
           { href: `/classic/sample/${slug}`, label: p.title },
         ]}
       />
 
       {/* PC 화면에 휴대폰 화면을 겹친다. 누르면 샘플이 열린다 */}
-      <section aria-label="샘플 화면" className="bg-[#f4f6f9]">
+      <section aria-label="카탈로그 화면" className="bg-[#f4f6f9]">
         <div className={`${wrap} py-10 md:py-16`}>
-          <Link href={p.demoUrl} prefetch={false} aria-label={`${p.title} 샘플 열기`} className="group relative mx-auto block max-w-[1040px] pb-[6%]">
+          <Link href={p.demoUrl} prefetch={false} aria-label={`${p.title} 카탈로그 열기`} className="group relative mx-auto block max-w-[1040px] pb-[6%]">
             <span className="block w-[88%] overflow-hidden rounded-lg border border-[#d9dee5] bg-white">
               <span aria-hidden className="flex h-6 items-center gap-1.5 border-b border-[#e6e9ee] bg-[#eef1f5] px-3 md:h-8">
                 <span className="h-2 w-2 rounded-full bg-[#c5cbd4]" />
@@ -99,7 +99,7 @@ export default async function ClassicSamplePage({ params }: Props) {
           {est ? (
             <>
               <h2 id="c-price" className="border-b-2 border-[#15171c] pb-3 text-[18px] font-extrabold tracking-[-0.02em]">
-                비슷하게 만들면
+                구성
               </h2>
               <dl className="text-[15px] md:text-[16px]">
                 <div className={row}>
@@ -108,7 +108,7 @@ export default async function ClassicSamplePage({ params }: Props) {
                 </div>
                 {est.lines.length > 0 && (
                   <div className={row}>
-                    <dt className="shrink-0">더하는 기능</dt>
+                    <dt className="shrink-0">추가 기능</dt>
                     <dd className="min-w-0 text-right font-bold">{est.lines.map((l) => l.name).join(", ")}</dd>
                   </div>
                 )}
@@ -139,7 +139,7 @@ export default async function ClassicSamplePage({ params }: Props) {
 
           <div className="mt-8 grid gap-3">
             <Link href={p.demoUrl} prefetch={false} data-gtm-cta={`classic_sample_open_${p.id}`} className={btnPrimary}>
-              샘플 열기
+              카탈로그 열기
             </Link>
             <Link href="/classic/contact" data-gtm-cta={`classic_sample_contact_${p.id}`} className={btnLine}>
               상담 신청
@@ -153,7 +153,7 @@ export default async function ClassicSamplePage({ params }: Props) {
           <div className={`${wrap} py-14 md:py-20`}>
             <div className="flex items-end justify-between gap-4">
               <h2 id="c-others" className={`${h2} break-keep`}>
-                {ind ? `${ind.label} 샘플` : "다른 샘플"}
+                {ind ? `${ind.label} 카탈로그` : "다른 카탈로그"}
               </h2>
               <Link href={ind ? `/classic/works/${ind.slug}` : "/classic/works"} className={`${more} shrink-0`}>
                 더보기 <Plus size={15} strokeWidth={2.5} aria-hidden />

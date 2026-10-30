@@ -5,15 +5,15 @@ import { demoProjects, groups, homepageProjects, samplesIn, worksTabs } from "@/
 import { pageMeta } from "@/lib/seo";
 
 export const metadata: Metadata = pageMeta({
-  title: "홈페이지 제작 샘플",
-  description: `쇼핑몰, 펜션, 회사, 병원, 학원, 카페 홈페이지와 랜딩페이지 샘플 ${demoProjects.length}개. 샘플을 직접 눌러 볼 수 있습니다.`,
+  title: "홈페이지 제작 카탈로그",
+  description: `쇼핑몰, 펜션, 회사, 병원, 학원, 카페 홈페이지와 랜딩페이지 카탈로그 ${demoProjects.length}개. 카탈로그를 직접 눌러 볼 수 있습니다.`,
   path: "/classic/works",
 });
 
 export default function ClassicWorksPage() {
   return (
     <>
-      <PageHead title="샘플" trail={[{ href: "/classic/works", label: "샘플" }]} />
+      <PageHead title="카탈로그" trail={[{ href: "/classic/works", label: "카탈로그" }]} />
       <SubTabs items={worksTabs} current="/classic/works" />
       {[
         { id: "c-all", title: "업종별 홈페이지", items: homepageProjects },

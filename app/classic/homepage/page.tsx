@@ -16,7 +16,7 @@ import { pageMeta } from "@/lib/seo";
 
 export const metadata: Metadata = pageMeta({
   title: "홈페이지 제작",
-  description: `${plans.map((p) => p.title).join(", ")}. 병원, 전문직 사무실, 학원, 가게, 회사 홈페이지를 업종별 샘플을 보고 고를 수 있습니다.`,
+  description: `${plans.map((p) => p.title).join(", ")}. 병원, 전문직 사무실, 학원, 가게, 회사 홈페이지를 업종별 카탈로그를 보고 고를 수 있습니다.`,
   path: "/classic/homepage",
 });
 
@@ -89,10 +89,10 @@ export default function ClassicHomepagePage() {
           <div className={`${wrap} py-16 md:py-24`}>
             <div className="flex flex-wrap items-end justify-between gap-4">
               <h2 id="hp-samples" className={h2}>
-                샘플
+                카탈로그
               </h2>
               <Link href="/classic/works" className={more}>
-                전체 샘플 <ChevronRight size={16} aria-hidden />
+                전체 카탈로그 <ChevronRight size={16} aria-hidden />
               </Link>
             </div>
             <div className="mt-10">
