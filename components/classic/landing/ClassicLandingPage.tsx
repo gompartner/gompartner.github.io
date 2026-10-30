@@ -5,7 +5,7 @@ import Image from "next/image";
 import Link from "next/link";
 import { BellRing, Check, ChevronDown, Plus } from "lucide-react";
 import { h2, more, wrap } from "@/components/classic/ui";
-import { estimateFor, formatWon, landingPlans, manwon, planCommon, samplesForPlan } from "@/data/classic/pricing";
+import { landingPlans, planCommon, samplesForPlan } from "@/data/classic/pricing";
 import { projects } from "@/data/classic/projects";
 import { useReducedMotionSafe } from "@/hooks/useReducedMotionSafe";
 import { ClassicLeadForm, type PackageName } from "./ClassicLeadForm";
@@ -13,8 +13,8 @@ import { ClassicOwnerPreview } from "./ClassicOwnerPreview";
 
 /*
   클래식 보기의 광고 랜딩페이지 상품 소개. /landing(웹툰)과 내용은 같고 모양만 에이전시형이다.
-  순서: 첫 화면(남색 배너 + 실제 샘플 캡처) -> 이럴 때 -> 신청 접수 화면 -> 가격표 -> 샘플 -> 자주 묻는 질문 -> 상담 신청 폼.
-  가격표에서 패키지를 고르면 폼의 관심 패키지에 그대로 들어간다.
+  순서: 첫 화면(남색 배너 + 실제 샘플 캡처) -> 이럴 때 -> 신청 접수 화면 -> 패키지 -> 샘플 -> 자주 묻는 질문 -> 상담 신청 폼.
+  패키지 표에서 고르면 폼의 관심 패키지에 그대로 들어간다.
 */
 
 const NAVY = "#0f1b3d";
@@ -35,7 +35,7 @@ const FAQ: [string, string][] = [
   ["신청 내용은 어디에 저장되나요?", "고객 구글 계정의 구글 시트에 저장됩니다. 곰파트너는 신청 내용을 보관하지 않습니다."],
   ["월 비용이 있나요?", "무료 호스팅을 사용하여 월 비용은 없습니다. 도메인은 고객 명의로 직접 구매하며 연 2만 원 내외입니다."],
   ["진행하지 않는 업종이 있나요?", "대부 중개 및 주식·코인 리딩 업종은 진행하지 않습니다."],
-  ["작업 기간은 얼마나 걸리나요?", `자료 전달일 기준 ${landingPlans.map((p) => `${p.title} ${p.days}일`).join(" / ")}입니다.`],
+  ["작업 기간은 얼마나 걸리나요?", "작업 범위를 정할 때 일정도 같이 정합니다. 자료를 받은 날부터 계산합니다."],
 ];
 
 const PLAN_TO_PKG: Record<string, PackageName> = {
@@ -72,7 +72,6 @@ export function ClassicLandingPage() {
 }
 
 function Hero({ onApply }: { onApply: () => void }) {
-  const basic = landingPlans[0];
   const shot = projects.find((p) => p.id === "landing-water-rental")!;
   const slug = slugOf(shot.demoUrl);
 
@@ -86,9 +85,6 @@ function Hero({ onApply }: { onApply: () => void }) {
             <br />
             랜딩페이지 제작
           </h1>
-          <p className="mt-5 text-[17px] tabular-nums text-[#c9d3e6] md:text-[19px]">
-            {manwon(basic.price)}부터, 작업 {basic.days}일
-          </p>
           <div className="mt-8 flex flex-wrap gap-3">
             <button
               type="button"
@@ -184,14 +180,9 @@ function Plans({ onPick }: { onPick: (planId: string) => void }) {
   return (
     <section id="plans" aria-labelledby="plans-title" className={`${section} bg-[#f6f7f9]`}>
       <div className={`${wrap} py-16 md:py-24`}>
-        <div className="flex flex-wrap items-end justify-between gap-4">
-          <h2 id="plans-title" className={h2}>
-            가격
-          </h2>
-          <Link href="/classic/pricing" className={more}>
-            전체 가격표 <Plus size={15} strokeWidth={2.5} aria-hidden />
-          </Link>
-        </div>
+        <h2 id="plans-title" className={h2}>
+          패키지
+        </h2>
         <div className="-mx-4 mt-10 overflow-x-auto px-4 md:mx-0 md:px-0">
           <table className="w-full min-w-[720px] border-collapse border-t-2 border-[#15171c] bg-white">
             <caption className="sr-only">광고 랜딩페이지 패키지 비교</caption>
@@ -209,26 +200,6 @@ function Plans({ onPick }: { onPick: (planId: string) => void }) {
               </tr>
             </thead>
             <tbody>
-              <tr className="border-b border-[#e6e9ee]">
-                <th scope="row" className={th}>
-                  금액
-                </th>
-                {landingPlans.map((p) => (
-                  <td key={p.id} className={td}>
-                    <span className="text-[24px] font-extrabold tabular-nums tracking-[-0.03em] text-[#256ef4] md:text-[28px]">{formatWon(p.price)}</span>
-                  </td>
-                ))}
-              </tr>
-              <tr className="border-b border-[#e6e9ee]">
-                <th scope="row" className={th}>
-                  작업 기간
-                </th>
-                {landingPlans.map((p) => (
-                  <td key={p.id} className={`${td} tabular-nums`}>
-                    {p.days}일
-                  </td>
-                ))}
-              </tr>
               <tr className="border-b border-[#e6e9ee]">
                 <th scope="row" className={th}>
                   수정 횟수
@@ -282,7 +253,6 @@ function Plans({ onPick }: { onPick: (planId: string) => void }) {
                                 />
                                 <span className="min-w-0 text-[15px] leading-[1.45]">
                                   <span className="line-clamp-2 group-hover:text-[#256ef4] group-hover:underline">{s.project!.title}</span>
-                                  <span className="tabular-nums text-[#5b6370]">{manwon(s.total)}</span>
                                 </span>
                               </Link>
                             </li>
@@ -336,7 +306,6 @@ function Samples() {
         <ul className="mt-10 grid grid-cols-2 gap-x-4 gap-y-8 md:grid-cols-3 md:gap-x-6 md:gap-y-12 lg:grid-cols-4" role="list">
           {list.map((p) => {
             const slug = slugOf(p.demoUrl);
-            const est = estimateFor(p.id);
             return (
               <li key={p.id} className="min-w-0">
                 <Link href={`/classic/sample/${slug}`} className="group block">
@@ -352,11 +321,6 @@ function Samples() {
                   </span>
                   <span className="mt-3 block text-[13px] font-bold text-[#1d5fd6] md:text-[14px]">{p.layout}</span>
                   <span className="mt-1 block text-[16px] font-bold leading-[1.4] tracking-[-0.02em] group-hover:underline md:text-[18px]">{p.title}</span>
-                  {est && (
-                    <span className="mt-1 block text-[14px] tabular-nums text-[#5b6370] md:text-[15px]">
-                      {manwon(est.total)}, {est.days}일
-                    </span>
-                  )}
                 </Link>
               </li>
             );

@@ -3,7 +3,6 @@ import path from "node:path";
 import type { Project } from "@/lib/types";
 import { industries } from "@/data/classic/industries";
 import { projects } from "@/data/classic/projects";
-import { estimateFor, manwon } from "@/data/classic/pricing";
 import { fieldsById } from "@/data/classic/workFilters";
 import { PROGRAM_IDS } from "@/data/classic/programIds";
 
@@ -27,13 +26,6 @@ export function mobileShotOf(p: Project) {
 }
 
 export const isMaintenance = (p: Project) => p.kind === "유지보수" || ["maintenance-dashboard", "maintenance-urgent-fix", "accessibility-review"].includes(p.id);
-
-/** 카드 아래 금액 줄. 견적이 없으면 유지보수 또는 업무 프로그램(별도 견적). */
-export function priceLine(p: Project) {
-  const est = estimateFor(p.id);
-  if (est) return `${manwon(est.total)}, ${est.days}일`;
-  return isMaintenance(p) ? "월 5만 원부터" : "별도 견적";
-}
 
 export const isLanding = (p: Project) => p.category === "랜딩페이지" || p.id.startsWith("landing-");
 export const isProgram = (p: Project) => PROGRAM_IDS.includes(p.id);

@@ -1,8 +1,8 @@
 // 가이드(/guide). "홈페이지 제작 업체 추천", "제작 비용" 같은 검색어로 오는 손님이 업체를 고르기 전에 읽는 글.
 // 2026-10-22 결과 화면 확인: 네이버 AI 브리핑과 구글 상위가 업체 사이트 안의 설명 글을 가져간다.
-// 곰파트너 금액은 data/pricing.ts에서 읽는다. 유지보수 금액은 data/maintenance.ts의 문자열이라 여기 숫자를 같이 고친다.
+// 곰파트너 자체 금액과 기간은 글에 싣지 않는다(10-30). 시세와 호스팅 비용만 적는다.
 // 바깥 시세는 출처와 확인 날짜를 sources에 남긴다. 클래식 보기는 data/classic/guides.ts를 따로 쓴다.
-import { addons, formatWon, manwon, plans } from "@/data/pricing";
+import { formatWon, manwon, plans } from "@/data/pricing";
 import { domainPrices, hostingPlans, checkedAt } from "@/data/hostingPrices";
 import { sharedGuides } from "@/data/guidesShared";
 
@@ -30,10 +30,6 @@ export interface Guide {
 // 가격 데이터의 이름은 가운뎃점을 쓰는데 글에서는 쉼표로 바꾼다. 1만 원 아래는 원 단위로 적는다.
 const plain = (t: string) => t.replaceAll("·", ", ");
 const won = (n: number) => (n < 10_000 ? formatWon(n) : manwon(n));
-const addon = (id: string) => {
-  const a = addons.find((x) => x.id === id)!;
-  return { ...a, name: plain(a.name) };
-};
 const host = (id: string) => hostingPlans.find((h) => h.id === id)!;
 const gabia = domainPrices.find((d) => d.registrar === "가비아")!;
 const imweb = host("imweb-starter");
@@ -41,7 +37,6 @@ const cafe24 = host("cafe24-saver");
 const gabiaHost = host("gabia-basic");
 const sixshop = host("sixshop-home");
 
-const planRows = plans.map((p) => [plain(p.title), manwon(p.price), `${p.days}일`, p.includes.slice(0, 2).map(plain).join(", ")]);
 
 const kmongCost = { label: "크몽 가격 안내, 홈페이지 제작(2025년 9월 글)", href: "https://kmong.com/prices/%ED%99%88%ED%8E%98%EC%9D%B4%EC%A7%80-%EC%A0%9C%EC%9E%91" };
 const kmongCare = { label: "크몽 가격 안내, 홈페이지 수정 유지보수", href: "https://kmong.com/prices/%ED%99%88%ED%8E%98%EC%9D%B4%EC%A7%80-%EC%88%98%EC%A0%95-%EC%9C%A0%EC%A7%80%EB%B3%B4%EC%88%98" };
@@ -92,15 +87,9 @@ const allGuides: Guide[] = [
       { p: "같은 내용으로 세 곳에 물어봐도 30만 원, 100만 원, 300만 원이 같이 나와요. 크몽 가격 안내는 홈페이지 제작을 최저 8만 원, 평균 69만 원, 최고 180만 원으로 적어요." },
       { p: "차이는 대부분 다섯 군데에서 나요. 견적서를 나란히 놓고 이 다섯 줄만 비교하면 돼요." },
       { h2: "화면이 몇 쪽인가요" },
-      { p: `회사 소개, 오시는 길, 메뉴판처럼 따로 열리는 화면 하나가 1쪽이에요. 쪽이 늘면 값도 늘어요. 곰파트너는 기본 5쪽이고 1쪽 더할 때 ${manwon(addon("page").price)}이에요.` },
+      { p: `회사 소개, 오시는 길, 메뉴판처럼 따로 열리는 화면 하나가 1쪽이에요. 쪽이 늘면 값도 늘어요.` },
       { h2: "어떤 기능이 들어가나요" },
       { p: "전화와 지도만 있는 홈페이지와 예약을 받는 홈페이지는 만드는 시간이 달라요. 기능은 하나씩 값이 붙어요." },
-      {
-        table: {
-          head: ["기능", "곰파트너 추가 금액"],
-          rows: ["board", "member", "live", "pay", "cart"].map((id) => [addon(id).name, manwon(addon(id).price)]),
-        },
-      },
       { h2: "디자인을 새로 그리나요" },
       { p: "있는 틀에 사진과 글만 바꾸면 빠르고 싸요. 업종에 맞춰 첫 화면을 새로 그리면 시간이 더 들어요. 견적서에 \"템플릿\"인지 \"맞춤 디자인\"인지 적혀 있는지 보세요." },
       { h2: "도메인과 호스팅이 들어 있나요" },
@@ -108,10 +97,9 @@ const allGuides: Guide[] = [
       { p: "싼 견적은 이 돈이 빠져 있고 비싼 견적은 1년치가 들어 있기도 해요. 둘째 해부터 누가 내는지도 물어보세요." },
       { h2: "만든 뒤에 고쳐 주는 일이 들어 있나요" },
       { p: "제작비에 무상 수정 기간을 묶는 업체가 많아요. 1~2주인 곳도 있고 몇 년인 곳도 있어요. 위시켓도 유지보수를 넣느냐에 따라 같은 일이 2~3배 차이 난다고 적어요." },
-      { h2: "곰파트너 제작 금액" },
-      { table: { head: ["구성", "금액", "기간", "들어가는 것"], rows: planRows } },
+      { h2: "곰파트너는" },
       { p: "원본 소스를 드리고, 완료 후 1개월 동안 오류를 무상으로 고쳐요. 도메인과 호스팅은 손님 명의로 사시고 저는 연결만 해요." },
-      { link: { href: "/classic/pricing", label: "기능 골라서 견적 보기" } },
+      { link: { href: "/classic/homepage", label: "홈페이지 제작 보기" } },
     ],
     sources: [kmongCost, wishket, hostingTool],
   },
@@ -147,8 +135,8 @@ const allGuides: Guide[] = [
             ["도메인, 호스팅 명의", "손님 명의로 사시고 권한만 주세요"],
             ["작업 중 수정", plans.map((p) => `${plain(p.title)} ${p.revisions}회`).join(", ")],
             ["무상 오류 수정", "완료 후 1개월"],
-            ["추가 비용", `추가 페이지 ${manwon(addon("page").price)}, 게시판 ${manwon(addon("board").price)}처럼 가격 페이지에 적어 뒀어요`],
-            ["끝난 뒤 문구 수정", "월 유지보수 월 5만 원(3건), 오류 수정은 건당 5만 원부터"],
+            ["추가 비용", "어떤 경우에 붙는지 견적서에 같이 적어 드려요"],
+            ["끝난 뒤 문구 수정", "월 유지보수나 건별 수정으로 맡을 수 있어요"],
             ["업종 샘플", "업종별 샘플 화면을 열어 볼 수 있어요"],
           ],
         },
@@ -211,11 +199,11 @@ const allGuides: Guide[] = [
       { h2: "곰파트너 유지보수" },
       {
         table: {
-          head: ["구분", "금액", "조건"],
+          head: ["구분", "조건"],
           rows: [
-            ["월 유지보수", "월 5만 원(3건), 월 15만 원(6건)", "3개월 단위, 1건은 30분 안에 끝나는 수정"],
-            ["오류 수정", "건당 5만 원부터", "원인을 본 뒤 금액을 먼저 알려 드려요"],
-            ["유지보수 인계", "인계 점검 10만 원", "다른 업체가 만든 홈페이지"],
+            ["월 유지보수", "3개월 단위, 1건은 30분 안에 끝나는 수정"],
+            ["오류 수정", "원인을 본 뒤 금액을 먼저 알려 드려요"],
+            ["유지보수 인계", "다른 업체가 만든 홈페이지"],
           ],
         },
       },

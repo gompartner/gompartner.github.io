@@ -9,14 +9,14 @@ import { SampleGrid } from "@/components/classic/works/SampleGrid";
 import { demoProjects } from "@/components/classic/works/samples";
 import { processSteps } from "@/data/classic/faq";
 import { industries } from "@/data/classic/industries";
-import { manwon, plans, previewDetail, previewPromise, runningCostNote, samplesForPlan } from "@/data/classic/pricing";
+import { plans, contactDetail, contactTitle, runningCostNote, samplesForPlan } from "@/data/classic/pricing";
 import { pageMeta } from "@/lib/seo";
 
-// 홈페이지 제작 서비스 상세. 가격 페이지의 홈페이지 패키지와 같은 데이터(data/classic/pricing)를 쓴다.
+// 홈페이지 제작 서비스 상세. 패키지 데이터(data/classic/pricing)를 쓴다.
 
 export const metadata: Metadata = pageMeta({
   title: "홈페이지 제작",
-  description: `${plans.map((p) => `${p.title} ${manwon(p.price)}, ${p.days}일`).join(", ")}. 병원, 전문직 사무실, 학원, 가게, 회사 홈페이지를 업종별 샘플을 보고 고를 수 있습니다.`,
+  description: `${plans.map((p) => p.title).join(", ")}. 병원, 전문직 사무실, 학원, 가게, 회사 홈페이지를 업종별 샘플을 보고 고를 수 있습니다.`,
   path: "/classic/homepage",
 });
 
@@ -46,9 +46,6 @@ export default function ClassicHomepagePage() {
             <h2 id="hp-lead" className="break-keep text-[26px] font-extrabold leading-[1.35] tracking-[-0.04em] md:text-[34px]">
               우리 가게를 검색하면 나오는 홈페이지
             </h2>
-            <p className="mt-2 text-[17px] font-bold tabular-nums text-[#256ef4] md:text-[19px]">
-              {manwon(plans[0].price)}부터, {plans[0].days}일
-            </p>
           </div>
           <div className="flex flex-wrap gap-3">
             <Link href="/classic/contact" className={btnPrimary}>
@@ -79,14 +76,9 @@ export default function ClassicHomepagePage() {
 
       <section id="plans" aria-labelledby="hp-plans" className={section}>
         <div className={`${wrap} py-16 md:py-24`}>
-          <div className="flex flex-wrap items-end justify-between gap-4">
-            <h2 id="hp-plans" className={h2}>
-              패키지
-            </h2>
-            <Link href="/classic/pricing#addons" className={more}>
-              추가 기능 단가 <ChevronRight size={16} aria-hidden />
-            </Link>
-          </div>
+          <h2 id="hp-plans" className={h2}>
+            패키지
+          </h2>
           <PlanTable plans={plans} product="홈페이지" ctaPrefix="classic_homepage_chat" />
           <p className="mt-6 text-[15px] leading-[1.65] text-[#5b6370] md:text-[16px]">{runningCostNote}</p>
         </div>
@@ -116,9 +108,9 @@ export default function ClassicHomepagePage() {
         <div className={`${wrap} flex flex-col gap-8 py-16 md:flex-row md:items-center md:justify-between md:py-20`}>
           <div className="max-w-[640px]">
             <h2 id="hp-band" className="text-[30px] font-extrabold leading-[1.25] tracking-[-0.04em] md:text-[40px]">
-              {previewPromise}
+              {contactTitle}
             </h2>
-            <p className="mt-3 text-[16px] leading-[1.65] text-white md:text-[17px]">{previewDetail}</p>
+            <p className="mt-3 text-[16px] leading-[1.65] text-white md:text-[17px]">{contactDetail}</p>
           </div>
           <div className="flex shrink-0 flex-wrap gap-3">
             <Link href="/classic/contact" data-gtm-cta="classic_homepage_band_contact" className="inline-flex h-14 items-center rounded-md border border-white/60 px-7 text-[17px] font-bold hover:bg-white/10">

@@ -5,8 +5,6 @@ export interface CustomerCase {
   industry: string;
   problem: string;
   made: string;
-  /** 예: "9일, 49만 원" */
-  term: string;
   /** 고객 한마디. 동의받은 문장 그대로 */
   quote?: string;
   url?: string;

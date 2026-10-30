@@ -9,14 +9,14 @@ import { faq, processSteps } from "@/data/classic/faq";
 import { projects } from "@/data/classic/projects";
 import { guides } from "@/data/classic/guides";
 import { tools } from "@/data/classic/tools";
-import { estimateFor, landingPlans, manwon, plans, previewDetail, previewPromise } from "@/data/classic/pricing";
+import { contactDetail, contactTitle } from "@/data/classic/pricing";
 import { fieldsById } from "@/data/classic/workFilters";
 import { PROGRAM_IDS } from "@/data/classic/programIds";
 import { useReducedMotionSafe } from "@/hooks/useReducedMotionSafe";
 import { cn } from "@/lib/utils";
 
 // 클래식 보기의 첫 화면. 웹 에이전시형 회사 홈페이지 구성:
-// 큰 배너 슬라이드(실제 샘플 화면), 상황별 진입, 서비스, 업종별 샘플, 진행 절차, 다른 방법과 비교, 가이드와 자료실, 자주 묻는 질문, 문의 띠배너.
+// 큰 배너 슬라이드(실제 샘플 화면), 상황별 진입, 서비스, 업종별 샘플, 진행 절차, 맡길 곳 고르기 표, 가이드와 자료실, 자주 묻는 질문, 문의 띠배너.
 // 내용은 클래식 전용 데이터(data/classic)를 쓴다. 웹툰 쪽과 따로 고친다.
 
 const NAVY = "#0f1b3d";
@@ -24,10 +24,6 @@ const BLUE = "#256ef4";
 
 const slugOf = (demoUrl: string) => demoUrl.replace("/demo/", "");
 const byId = (id: string) => projects.find((p) => p.id === id)!;
-const priceOf = (id: string) => {
-  const est = estimateFor(id);
-  return est ? `이 샘플 기준 ${manwon(est.total)}, ${est.days}일` : null;
-};
 
 const slides = [
   { id: "company", headline: "회사 홈페이지 제작" },
@@ -36,10 +32,10 @@ const slides = [
 ].map((s) => ({ ...s, project: byId(s.id) }));
 
 const services = [
-  { href: "/classic/landing", name: "광고 랜딩페이지", price: `${manwon(landingPlans[0].price)}부터`, what: "광고 보고 온 사람의 신청을 받는 한 페이지" },
-  { href: "/classic/homepage", name: "홈페이지 제작", price: `${manwon(plans[0].price)}부터`, what: "회사와 가게 소개, 문의와 예약을 받는 홈페이지" },
-  { href: "/classic/maintenance", name: "유지보수", price: "월 5만 원부터", what: "만든 홈페이지 수정과 오류 수정" },
-  { href: "/classic/program", name: "업무 프로그램", price: "별도 견적", what: "엑셀로 하던 일을 화면으로 옮기기" },
+  { href: "/classic/landing", name: "광고 랜딩페이지", what: "광고 보고 온 사람의 신청을 받는 한 페이지" },
+  { href: "/classic/homepage", name: "홈페이지 제작", what: "회사와 가게 소개, 문의와 예약을 받는 홈페이지" },
+  { href: "/classic/maintenance", name: "유지보수", what: "만든 홈페이지 수정과 오류 수정" },
+  { href: "/classic/program", name: "업무 프로그램", what: "엑셀로 하던 일을 화면으로 옮기기" },
 ];
 
 // 첫 화면 상황별 진입. 사장님이 겪는 일로 고르면 맞는 서비스 페이지로 간다.
@@ -50,12 +46,10 @@ const situations = [
   { href: "/classic/program", say: "엑셀로 하는 일이 너무 많아요", to: "업무 프로그램" },
 ];
 
-// 다른 방법과 비교. 남의 서비스는 일반적인 방식만 적고 이름은 쓰지 않는다.
+// 맡길 곳 고르기 표. 남의 서비스는 일반적인 방식만 적고 이름은 쓰지 않는다.
 const compareCols = ["셀프 제작 도구", "큰 제작사", "곰파트너"];
 const compareRows = [
-  { label: "가격 확인", cells: ["요금제 공개", "견적 문의 뒤에 안내", `가격표 공개, ${manwon(plans[0].price)}부터`] },
   { label: "만드는 사람", cells: ["사장님이 직접", "제작사 담당 팀", "곰파트너가 대신"] },
-  { label: "결제 전에 보는 것", cells: ["무료 체험 기간", "포트폴리오와 상담", "상호와 색을 넣은 첫 화면"] },
   { label: "다 만든 뒤", cells: ["고장 나면 직접 고치기", "유지보수 계약", "1개월 무상 오류 수정, 원본 소스 제공"] },
 ];
 
@@ -114,7 +108,6 @@ function Hero() {
             >
               <p className="text-[15px] font-bold text-[#8fb4ff] md:text-[17px]">{s.project.title}</p>
               <p className="mt-4 text-[44px] font-extrabold leading-[1.08] tracking-[-0.05em] md:text-[76px]">{s.headline}</p>
-              {priceOf(s.id) && <p className="mt-5 text-[17px] text-[#c9d3e6] md:text-[19px]">{priceOf(s.id)}</p>}
               <div className="mt-8 flex flex-wrap gap-3">
                 <Link
                   href={`/classic/sample/${slugOf(s.project.demoUrl)}`}
@@ -227,15 +220,14 @@ function Services() {
             <Link
               href={s.href}
               data-gtm-cta={`classic_service_${s.href.split("/").pop()}`}
-              className="group grid grid-cols-[1fr_auto] items-center gap-x-6 gap-y-1 py-6 md:grid-cols-[minmax(0,360px)_1fr_auto_auto] md:py-8"
+              className="group grid grid-cols-[1fr_auto] items-center gap-x-6 gap-y-1 py-6 md:grid-cols-[minmax(0,360px)_1fr_auto] md:py-8"
             >
               <span className="col-start-1 row-start-1 text-[24px] font-extrabold tracking-[-0.04em] transition-colors group-hover:text-[#256ef4] md:text-[34px]">{s.name}</span>
               <span className="col-span-2 col-start-1 row-start-2 text-[16px] text-[#5b6370] md:col-span-1 md:col-start-2 md:row-start-1 md:text-[17px]">{s.what}</span>
-              <span className="col-start-2 row-start-1 text-right text-[16px] font-bold tabular-nums md:col-start-3 md:text-[19px]">{s.price}</span>
               <ArrowUpRight
                 size={28}
                 aria-hidden
-                className="hidden text-[#6b7280] md:col-start-4 md:row-start-1 transition-[color,transform] duration-200 group-hover:-translate-y-0.5 group-hover:translate-x-0.5 group-hover:text-[#256ef4] md:block"
+                className="hidden text-[#6b7280] md:col-start-3 md:row-start-1 transition-[color,transform] duration-200 group-hover:-translate-y-0.5 group-hover:translate-x-0.5 group-hover:text-[#256ef4] md:block"
               />
             </Link>
           </li>
@@ -301,7 +293,6 @@ function Samples() {
 
         <ul className="mt-8 grid grid-cols-2 gap-x-4 gap-y-8 md:grid-cols-4 md:gap-x-6 md:gap-y-12" role="list">
           {list.map((p) => {
-            const est = estimateFor(p.id);
             return (
               <li key={p.id}>
                 <Link href={`/classic/sample/${slugOf(p.demoUrl)}`} className="group block">
@@ -317,7 +308,6 @@ function Samples() {
                   </span>
                   <span className="mt-3 block text-[13px] font-bold text-[#1d5fd6] md:text-[14px]">{p.category}</span>
                   <span className="mt-1 block text-[16px] font-bold leading-[1.4] tracking-[-0.02em] group-hover:underline md:text-[18px]">{p.title}</span>
-                  {est && <span className="mt-1 block text-[14px] tabular-nums text-[#5b6370] md:text-[15px]">{manwon(est.total)}, {est.days}일</span>}
                 </Link>
               </li>
             );
@@ -353,7 +343,7 @@ function Compare() {
     <section aria-labelledby="c-compare" className="bg-[#f4f6f9]">
       <div className="mx-auto w-full max-w-[1248px] px-4 py-20 md:px-6 md:py-28">
         <h2 id="c-compare" className={h2}>
-          다른 방법과 비교
+          어디에 맡길지 고를 때
         </h2>
         <div tabIndex={0} className="-mx-4 mt-10 overflow-x-auto px-4 md:mx-0 md:px-0">
           <table className="w-full min-w-[640px] border-collapse border-t-2 border-[#15171c] bg-white">
@@ -474,9 +464,9 @@ function Band() {
       <div className="mx-auto flex w-full max-w-[1248px] flex-col gap-8 px-4 py-16 md:flex-row md:items-center md:justify-between md:px-6 md:py-20">
         <div className="max-w-[640px]">
           <h2 id="c-band" className="text-[30px] font-extrabold leading-[1.25] tracking-[-0.04em] md:text-[40px]">
-            {previewPromise}
+            {contactTitle}
           </h2>
-          <p className="mt-3 text-[16px] leading-[1.65] text-white md:text-[17px]">{previewDetail}</p>
+          <p className="mt-3 text-[16px] leading-[1.65] text-white md:text-[17px]">{contactDetail}</p>
         </div>
         <div className="flex shrink-0 flex-wrap gap-3">
           <Link href="/classic/contact" data-gtm-cta="classic_band_contact" className="inline-flex h-14 items-center rounded-md border border-white/60 px-7 text-[17px] font-bold hover:bg-white/10">
