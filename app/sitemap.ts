@@ -32,7 +32,7 @@ export default function sitemap(): MetadataRoute.Sitemap {
       changeFrequency: "monthly" as const,
       priority: 0.9,
     },
-    ...["/classic/works", "/classic/pricing", "/classic/maintenance", "/classic/program", "/classic/faq", "/classic/contact", "/classic/privacy", "/guide", ...guides.map((g) => `/guide/${g.slug}`), ...industries.map((i) => `/classic/works/${i.slug}`)].map((path) => ({
+    ...["/classic/works", "/classic/homepage", "/classic/pricing", "/classic/story", "/classic/maintenance", "/classic/program", "/classic/faq", "/classic/contact", "/classic/privacy", "/guide", ...guides.map((g) => `/guide/${g.slug}`), ...industries.map((i) => `/classic/works/${i.slug}`)].map((path) => ({
       url: `${siteUrl}${path}`,
       lastModified,
       changeFrequency: "monthly" as const,

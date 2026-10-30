@@ -1,19 +1,19 @@
 import Image from "next/image";
 import Link from "next/link";
 import { profile } from "@/data/classic/profile";
-import { LookLink } from "@/components/layout/LookToggle";
 
 // 클래식 보기 바닥글. 사업자 정보는 상호와 번호만 둔다(통신판매업 신고 전).
 const menu = [
   { href: "/classic/works", label: "샘플" },
   { href: "/classic/pricing", label: "가격" },
+  { href: "/classic/story", label: "곰파트너 이야기" },
   { href: "/classic/maintenance", label: "유지보수" },
   { href: "/classic/faq", label: "자주 묻는 질문" },
   { href: "/classic/guide", label: "가이드" },
   { href: "/classic/tools", label: "자료실" },
   { href: "/classic/contact", label: "상담 신청" },
 ];
-const channels = [
+export const channels = [
   { href: "https://blog.naver.com/gompartner", label: "네이버 블로그" },
   { href: "https://www.youtube.com/@gompartner", label: "유튜브" },
   { href: "https://www.instagram.com/gompartner.co.kr", label: "인스타그램" },
@@ -50,11 +50,6 @@ export function ClassicFooter() {
                 </Link>
               </li>
             ))}
-            <li>
-              <LookLink to="webtoon" cta="footer_webtoon" className="hover:text-white">
-                곰파트너 이야기
-              </LookLink>
-            </li>
           </ul>
         </nav>
         <div>

@@ -6,7 +6,8 @@ import { usePathname } from "next/navigation";
 import { useEffect, useState } from "react";
 import { ChevronDown, Menu, X } from "lucide-react";
 import { ChannelTalkButton } from "@/components/layout/ChannelTalk";
-import { LookLink, LookToggle } from "@/components/layout/LookToggle";
+import { LookToggle } from "@/components/layout/LookToggle";
+import { cases } from "@/data/classic/cases";
 import { industries } from "@/data/classic/industries";
 import { cn } from "@/lib/utils";
 
@@ -18,10 +19,10 @@ export const classicMenu = [
   {
     label: "서비스",
     href: "/classic/landing",
-    match: ["/classic/landing", "/classic/maintenance", "/classic/program"],
+    match: ["/classic/landing", "/classic/homepage", "/classic/maintenance", "/classic/program"],
     items: [
       { href: "/classic/landing", label: "광고 랜딩페이지" },
-      { href: "/classic/pricing#homepage", label: "홈페이지 제작" },
+      { href: "/classic/homepage", label: "홈페이지 제작" },
       { href: "/classic/maintenance", label: "유지보수" },
       { href: "/classic/program", label: "업무 프로그램" },
     ],
@@ -39,17 +40,20 @@ export const classicMenu = [
     ],
   },
   { label: "가격", href: "/classic/pricing", match: ["/classic/pricing"], items: [] },
+  // 고객 사례는 실제 사례가 생기면 data/classic/cases.ts에 넣는 순간 메뉴에 나온다
+  ...(cases.length > 0 ? [{ label: "고객 사례", href: "/classic/cases", match: ["/classic/cases"], items: [] }] : []),
+  { label: "곰파트너 이야기", href: "/classic/story", match: ["/classic/story"], items: [] },
   {
     label: "고객지원",
     href: "/classic/faq",
-    match: ["/classic/faq", "/classic/guide", "/classic/tools", "/classic/privacy", "/classic/contact"],
+    match: ["/classic/faq", "/classic/guide", "/classic/tools", "/classic/privacy"],
     items: [
       { href: "/classic/faq", label: "자주 묻는 질문" },
       { href: "/classic/guide", label: "가이드" },
       { href: "/classic/tools", label: "자료실" },
-      { href: "/classic/contact", label: "상담 신청" },
     ],
   },
+  { label: "상담 신청", href: "/classic/contact", match: ["/classic/contact"], items: [] },
 ];
 
 const channels = [
@@ -126,7 +130,7 @@ export function ClassicHeader() {
                     }}
                     aria-expanded={m.items.length > 0 ? drop === m.label : undefined}
                     className={cn(
-                      "flex items-center gap-1 px-6 text-[17px] font-bold tracking-[-0.02em] transition-colors hover:text-[#256ef4]",
+                      "flex items-center gap-1 px-4 text-[17px] xl:px-6 font-bold tracking-[-0.02em] transition-colors hover:text-[#256ef4]",
                       active ? "text-[#256ef4]" : "text-[#15171c]"
                     )}
                   >
@@ -154,11 +158,6 @@ export function ClassicHeader() {
                 </li>
               );
             })}
-            <li className="flex">
-              <LookLink to="webtoon" cta="menu_webtoon" className="flex items-center px-6 text-[17px] font-bold tracking-[-0.02em] text-[#15171c] transition-colors hover:text-[#256ef4]">
-                곰파트너 이야기
-              </LookLink>
-            </li>
           </ul>
 
           <div className="flex items-center gap-2">
@@ -203,11 +202,6 @@ export function ClassicHeader() {
               )}
             </section>
           ))}
-          <section className="border-b border-[#e6e9ee] py-4">
-            <LookLink to="webtoon" cta="menu_webtoon" onClick={() => setOpen(false)} className="text-[18px] font-extrabold tracking-[-0.02em] text-[#15171c]">
-              곰파트너 이야기
-            </LookLink>
-          </section>
           <ul className="mt-5 flex flex-wrap gap-x-4 gap-y-2 text-[14px] text-[#5b6370]" role="list">
             {channels.map((c) => (
               <li key={c.href}>
