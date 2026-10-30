@@ -1,5 +1,5 @@
 import type { Metadata } from "next";
-import { Check } from "lucide-react";
+import { ArrowRight, Check, FileSpreadsheet, LayoutDashboard, X } from "lucide-react";
 import { StepList } from "@/components/classic/pricing/StepList";
 import { serviceTabs } from "@/components/classic/pricing/tabs";
 import { PageHead, SubTabs, h2, wrap } from "@/components/classic/ui";
@@ -40,6 +40,10 @@ const STEPS = [
   { title: "운영 지원", body: "납품 후 1개월간 하자를 무상으로 보수합니다. 이후에는 건별 수정 또는 월 유지보수로 지원합니다." },
 ];
 
+// 이 페이지의 디자인 포인트(10-30): 엑셀 수작업과 웹 프로그램 전후 비교
+const BEFORE = ["거래처마다 다른 양식의 엑셀을 손으로 합침", "수식이 깨지거나 같은 자료를 두 번 입력", "발주서, 결과지를 매번 새로 만듦", "파일을 아는 담당자가 없으면 업무가 멈춤"];
+const AFTER = ["파일을 올리면 열을 맞춰 한 화면에 정리", "입력 오류를 자동으로 검사하고 일괄 수정", "버튼 한 번으로 인쇄, PDF, 엑셀 내려받기", "권한별 화면으로 누구나 같은 순서로 처리"];
+
 const section = "scroll-mt-20 border-t border-[#e6e9ee] md:scroll-mt-24";
 
 export default function ClassicProgramPage() {
@@ -75,6 +79,51 @@ export default function ClassicProgramPage() {
               </li>
             ))}
           </ul>
+        </div>
+      </section>
+
+      <section aria-labelledby="pg-compare" className={`${section} bg-[#f4f6f9]`}>
+        <div className={`${wrap} py-16 md:py-24`}>
+          <h2 id="pg-compare" className={h2}>
+            전환 전과 후
+          </h2>
+          <div className="mt-10 grid items-stretch gap-4 md:grid-cols-[1fr_auto_1fr] md:gap-6">
+            <div className="rounded-md border border-[#d9dee5] bg-white p-6 md:p-8">
+              <p className="flex items-center gap-3 text-[20px] font-[800] tracking-[-0.03em] text-[#3d4450] md:text-[22px]">
+                <span className="grid h-11 w-11 place-items-center rounded-full bg-[#eef0f3] text-[#5b6370]">
+                  <FileSpreadsheet size={22} aria-hidden />
+                </span>
+                엑셀 수작업
+              </p>
+              <ul className="mt-5 space-y-3 text-[16px] leading-[1.6] text-[#5b6370] md:text-[17px]" role="list">
+                {BEFORE.map((t) => (
+                  <li key={t} className="flex gap-2.5">
+                    <X size={18} strokeWidth={2.5} aria-hidden className="mt-[3px] shrink-0 text-[#8a94a6]" />
+                    {t}
+                  </li>
+                ))}
+              </ul>
+            </div>
+            <div aria-hidden className="grid place-items-center text-[#256ef4]">
+              <ArrowRight size={28} className="rotate-90 md:rotate-0" />
+            </div>
+            <div className="rounded-md border-2 border-[#256ef4] bg-white p-6 md:p-8">
+              <p className="flex items-center gap-3 text-[20px] font-[800] tracking-[-0.03em] md:text-[22px]">
+                <span className="grid h-11 w-11 place-items-center rounded-full bg-[#256ef4] text-white">
+                  <LayoutDashboard size={22} aria-hidden />
+                </span>
+                웹 프로그램
+              </p>
+              <ul className="mt-5 space-y-3 text-[16px] leading-[1.6] text-[#3d4450] md:text-[17px]" role="list">
+                {AFTER.map((t) => (
+                  <li key={t} className="flex gap-2.5">
+                    <Check size={18} strokeWidth={2.5} aria-hidden className="mt-[3px] shrink-0 text-[#256ef4]" />
+                    {t}
+                  </li>
+                ))}
+              </ul>
+            </div>
+          </div>
         </div>
       </section>
 

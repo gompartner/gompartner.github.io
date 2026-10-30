@@ -121,11 +121,11 @@ function Services() {
               className="group grid grid-cols-[1fr_auto] items-center gap-x-6 gap-y-1 py-6 md:grid-cols-[minmax(0,360px)_1fr_auto] md:py-8"
             >
               <h3 className="col-start-1 row-start-1 text-[24px] font-[800] tracking-[-0.04em] transition-colors group-hover:text-[#256ef4] md:text-[34px]">{s.name}</h3>
-              <p className="col-span-2 col-start-1 row-start-2 text-[16px] text-[#5b6370] md:col-span-1 md:col-start-2 md:row-start-1 md:text-[17px]">{s.what}</p>
+              <p className="col-start-1 row-start-2 text-[16px] text-[#5b6370] md:col-start-2 md:row-start-1 md:text-[17px]">{s.what}</p>
               <ArrowUpRight
                 size={28}
                 aria-hidden
-                className="hidden text-[#6b7280] md:col-start-3 md:row-start-1 transition-[color,transform] duration-200 group-hover:-translate-y-0.5 group-hover:translate-x-0.5 group-hover:text-[#256ef4] md:block"
+                className="col-start-2 row-span-2 row-start-1 self-center text-[#6b7280] transition-[color,transform] duration-200 group-hover:-translate-y-0.5 group-hover:translate-x-0.5 group-hover:text-[#256ef4] md:col-start-3 md:row-span-1"
               />
             </Link>
           </li>
