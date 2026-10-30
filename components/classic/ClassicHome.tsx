@@ -3,10 +3,10 @@
 import Image from "next/image";
 import Link from "next/link";
 import { useEffect, useState } from "react";
-import { ArrowUpRight, ChevronLeft, ChevronRight, Pause, Play, Plus } from "lucide-react";
+import { ArrowUpRight, ChevronDown, ChevronLeft, ChevronRight, Pause, Play, Plus } from "lucide-react";
 import { ChannelTalkButton } from "@/components/layout/ChannelTalk";
 import { industries } from "@/data/classic/industries";
-import { processSteps } from "@/data/classic/faq";
+import { faq, processSteps } from "@/data/classic/faq";
 import { projects } from "@/data/classic/projects";
 import { guides } from "@/data/classic/guides";
 import { tools } from "@/data/classic/tools";
@@ -17,7 +17,7 @@ import { useReducedMotionSafe } from "@/hooks/useReducedMotionSafe";
 import { cn } from "@/lib/utils";
 
 // 클래식 보기의 첫 화면. 웹 에이전시형 회사 홈페이지 구성:
-// 큰 배너 슬라이드(실제 샘플 화면) → 서비스 → 업종별 샘플 → 진행 절차 → 제작 일지·자료실 → 문의 띠배너.
+// 큰 배너 슬라이드(실제 샘플 화면), 상황별 진입, 서비스, 업종별 샘플, 진행 절차, 다른 방법과 비교, 가이드와 자료실, 자주 묻는 질문, 문의 띠배너.
 // 내용은 클래식 전용 데이터(data/classic)를 쓴다. 웹툰 쪽과 따로 고친다.
 
 const INK = "#15171c";
@@ -39,9 +39,26 @@ const slides = [
 
 const services = [
   { href: "/classic/landing", name: "광고 랜딩페이지", price: `${manwon(landingPlans[0].price)}부터`, what: "광고 보고 온 사람의 신청을 받는 한 페이지" },
-  { href: "/classic/pricing", name: "홈페이지 제작", price: `${manwon(plans[0].price)}부터`, what: "회사와 가게 소개, 문의와 예약을 받는 홈페이지" },
+  { href: "/classic/homepage", name: "홈페이지 제작", price: `${manwon(plans[0].price)}부터`, what: "회사와 가게 소개, 문의와 예약을 받는 홈페이지" },
   { href: "/classic/maintenance", name: "유지보수", price: "월 5만 원부터", what: "만든 홈페이지 수정과 오류 수정" },
   { href: "/classic/program", name: "업무 프로그램", price: "별도 견적", what: "엑셀로 하던 일을 화면으로 옮기기" },
+];
+
+// 첫 화면 상황별 진입. 사장님이 겪는 일로 고르면 맞는 서비스 페이지로 간다.
+const situations = [
+  { href: "/classic/homepage", say: "홈페이지가 아직 없어요", to: "홈페이지 제작" },
+  { href: "/classic/landing", say: "광고 보고 온 손님의 신청을 받을 페이지가 필요해요", to: "광고 랜딩페이지" },
+  { href: "/classic/maintenance", say: "있는 홈페이지가 고장 났거나 고칠 게 있어요", to: "유지보수" },
+  { href: "/classic/program", say: "엑셀로 하는 일이 너무 많아요", to: "업무 프로그램" },
+];
+
+// 다른 방법과 비교. 남의 서비스는 일반적인 방식만 적고 이름은 쓰지 않는다.
+const compareCols = ["셀프 제작 도구", "큰 제작사", "곰파트너"];
+const compareRows = [
+  { label: "가격 확인", cells: ["요금제 공개", "견적 문의 뒤에 안내", `가격표 공개, ${manwon(plans[0].price)}부터`] },
+  { label: "만드는 사람", cells: ["사장님이 직접", "제작사 담당 팀", "곰파트너가 대신"] },
+  { label: "결제 전에 보는 것", cells: ["무료 체험 기간", "포트폴리오와 상담", "상호와 색을 넣은 첫 화면"] },
+  { label: "다 만든 뒤", cells: ["고장 나면 직접 고치기", "유지보수 계약", "1개월 무상 오류 수정, 원본 소스 제공"] },
 ];
 
 const h2 = "text-[30px] font-extrabold leading-[1.25] tracking-[-0.04em] md:text-[44px]";
@@ -52,10 +69,13 @@ export function ClassicHome() {
     <div className="bg-white text-[#15171c]">
       <h1 className="sr-only">곰파트너 홈페이지 제작</h1>
       <Hero />
+      <Situations />
       <Services />
       <Samples />
       <Process />
+      <Compare />
       <Boards />
+      <Faq />
       <Band />
     </div>
   );
@@ -173,6 +193,33 @@ function Hero() {
           </span>
         </div>
       </div>
+    </section>
+  );
+}
+
+function Situations() {
+  return (
+    <section aria-labelledby="c-situations" className="mx-auto w-full max-w-[1248px] px-4 pt-20 md:px-6 md:pt-28">
+      <h2 id="c-situations" className={h2}>
+        사장님, 어떤 일로 오셨어요?
+      </h2>
+      <ul className="mt-10 grid gap-3 md:grid-cols-2 md:gap-4" role="list">
+        {situations.map((s) => (
+          <li key={s.href}>
+            <Link
+              href={s.href}
+              data-gtm-cta={`classic_situation_${s.href.split("/").pop()}`}
+              className="group flex h-full items-center justify-between gap-4 rounded-md border border-[#d9dee5] px-5 py-5 transition-colors hover:border-[#256ef4] md:px-6 md:py-6"
+            >
+              <span className="min-w-0">
+                <span className="block break-keep text-[18px] font-bold leading-[1.45] tracking-[-0.02em] md:text-[20px]">{s.say}</span>
+                <span className="mt-1 block text-[15px] font-bold text-[#256ef4]">{s.to}</span>
+              </span>
+              <ChevronRight size={22} aria-hidden className="shrink-0 text-[#6b7280] transition-colors group-hover:text-[#256ef4]" />
+            </Link>
+          </li>
+        ))}
+      </ul>
     </section>
   );
 }
@@ -309,6 +356,48 @@ function Process() {
   );
 }
 
+function Compare() {
+  const th = "px-4 py-4 text-left text-[15px] font-bold md:px-5 md:text-[16px]";
+  return (
+    <section aria-labelledby="c-compare" className="bg-[#f4f6f9]">
+      <div className="mx-auto w-full max-w-[1248px] px-4 py-20 md:px-6 md:py-28">
+        <h2 id="c-compare" className={h2}>
+          다른 방법과 비교
+        </h2>
+        <div tabIndex={0} className="-mx-4 mt-10 overflow-x-auto px-4 md:mx-0 md:px-0">
+          <table className="w-full min-w-[640px] border-collapse border-t-2 border-[#15171c] bg-white">
+            <caption className="sr-only">셀프 제작 도구, 큰 제작사, 곰파트너 비교</caption>
+            <thead>
+              <tr className="border-b border-[#e6e9ee]">
+                <td className="w-[150px] md:w-[200px]" />
+                {compareCols.map((c, n) => (
+                  <th key={c} scope="col" className={cn(th, n === compareCols.length - 1 ? "text-[#256ef4]" : "text-[#3d4450]")}>
+                    {c}
+                  </th>
+                ))}
+              </tr>
+            </thead>
+            <tbody>
+              {compareRows.map((r) => (
+                <tr key={r.label} className="border-b border-[#e6e9ee]">
+                  <th scope="row" className={cn(th, "text-[#3d4450]")}>
+                    {r.label}
+                  </th>
+                  {r.cells.map((c, n) => (
+                    <td key={n} className={cn("px-4 py-4 text-[16px] leading-[1.55] md:px-5 md:text-[17px]", n === r.cells.length - 1 ? "font-bold" : "text-[#5b6370]")}>
+                      {c}
+                    </td>
+                  ))}
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </section>
+  );
+}
+
 function Boards() {
   // 제작 일지는 10-28 티스토리에서 사이트 가이드로 합쳤다. 최근 글 5편
   const posts = [...guides].reverse().sort((a, b) => b.published.localeCompare(a.published)).slice(0, 5);
@@ -353,6 +442,36 @@ function Boards() {
             ))}
           </ul>
         </div>
+      </div>
+    </section>
+  );
+}
+
+function Faq() {
+  return (
+    <section aria-labelledby="c-faq" className="border-t border-[#e6e9ee]">
+      <div className="mx-auto w-full max-w-[1248px] px-4 py-20 md:px-6 md:py-24">
+        <div className="flex items-end justify-between gap-4">
+          <h2 id="c-faq" className={h2}>
+            자주 묻는 질문
+          </h2>
+          <Link href="/classic/faq" className={more}>
+            더보기 <Plus size={15} strokeWidth={2.5} aria-hidden />
+          </Link>
+        </div>
+        <ul className="mt-10 border-t-2 border-[#15171c]" role="list">
+          {faq.slice(0, 5).map((f) => (
+            <li key={f.q} className="border-b border-[#e6e9ee]">
+              <details className="group">
+                <summary className="flex cursor-pointer list-none items-start gap-4 py-5 md:py-6 [&::-webkit-details-marker]:hidden">
+                  <span className="min-w-0 flex-1 text-[17px] font-bold leading-[1.5] tracking-[-0.02em] md:text-[19px]">{f.q}</span>
+                  <ChevronDown size={22} aria-hidden className="mt-0.5 shrink-0 text-[#6b7280] transition-transform duration-200 group-open:rotate-180 motion-reduce:transition-none" />
+                </summary>
+                <p className="pb-6 text-[16px] leading-[1.75] text-[#3d4450] md:pr-12 md:text-[17px]">{f.a}</p>
+              </details>
+            </li>
+          ))}
+        </ul>
       </div>
     </section>
   );
