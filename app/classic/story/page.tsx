@@ -9,7 +9,7 @@ import { pageMeta } from "@/lib/seo";
 
 export const metadata: Metadata = pageMeta({
   title: "곰파트너 이야기",
-  description: `${aboutLead} 원본 소스 제공, 한 달 무료 수정. 곰파트너가 일하는 원칙입니다.`,
+  description: `${aboutLead} 업종별 필수 표시, 점검 결과표, 인계 문서, 원본 소스, 한 달 무료 수정. 곰파트너가 일하는 원칙입니다.`,
   path: "/classic/story",
 });
 
