@@ -17,7 +17,7 @@ export const metadata: Metadata = pageMeta({
   path: "/classic/program",
 });
 
-const section = "scroll-mt-20 border-t border-[#e6e9ee] md:scroll-mt-32";
+const section = "scroll-mt-20 border-t border-[#e6e9ee] md:scroll-mt-24";
 
 export default function ClassicProgramPage() {
   return (

@@ -19,7 +19,7 @@ import { ClassicOwnerPreview } from "./ClassicOwnerPreview";
 
 const NAVY = "#0f1b3d";
 const slugOf = (demoUrl: string) => demoUrl.replace("/demo/", "");
-const section = "scroll-mt-20 border-t border-[#e6e9ee] md:scroll-mt-32";
+const section = "scroll-mt-20 border-t border-[#e6e9ee] md:scroll-mt-24";
 
 const FOR_WHOM = [
   "광고 신청을 메일과 문자로 따로 확인하는 경우",

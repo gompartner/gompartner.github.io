@@ -5,7 +5,7 @@ type Step = { title: string; body: string };
 /** 진행 절차. 첫 화면의 절차 구성과 같게 윗선 + 단계 번호로 나눈다. */
 export function StepList({ steps, title, id }: { steps: Step[]; title: string; id: string }) {
   return (
-    <section id={id} aria-labelledby={`${id}-title`} className="scroll-mt-20 border-t border-[#e6e9ee] md:scroll-mt-32">
+    <section id={id} aria-labelledby={`${id}-title`} className="scroll-mt-20 border-t border-[#e6e9ee] md:scroll-mt-24">
       <div className={`${wrap} py-16 md:py-24`}>
         <h2 id={`${id}-title`} className={h2}>
           {title}

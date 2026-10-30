@@ -17,7 +17,7 @@ export function ClassicShell({ children }: { children: React.ReactNode }) {
       <RememberClassic />
       <ChannelTalk />
       <ClassicHeader />
-      <main id="main" className="flex-1 pt-16 md:pt-[112px]">
+      <main id="main" className="flex-1 pt-16 md:pt-[76px]">
         {children}
       </main>
       <ClassicFooter />
