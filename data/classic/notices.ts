@@ -14,7 +14,8 @@ export interface Notice {
   /** 목록과 검색 설명에 쓰는 한 줄 요약 */
   summary: string;
   sections: NoticeSection[];
-  image?: { src: string; alt: string; note?: string };
+  /** 그때 첫 화면 전체를 한 장으로 찍은 캡처. w, h는 원본 픽셀 크기 */
+  image?: { src: string; alt: string; note?: string; w: number; h: number };
 }
 
 export const notices: Notice[] = [
@@ -47,7 +48,7 @@ export const notices: Notice[] = [
         ],
       },
     ],
-    image: { src: "/images/notice/design-5.jpg", alt: "현재 첫 화면" },
+    image: { src: "/images/notice/design-5.jpg", alt: "현재 첫 화면", w: 1366, h: 4152 },
   },
   {
     id: "design-4",
@@ -77,7 +78,7 @@ export const notices: Notice[] = [
         p: ["안내할 내용이 늘어난 만큼 메뉴와 상담 창구를 하나로 모으고, 첫 화면을 서비스와 진행 절차 중심으로 정리했습니다."],
       },
     ],
-    image: { src: "/images/notice/design-4.jpg", alt: "서비스별 상세 안내 페이지 오픈 당시 첫 화면", note: "당시 표시하던 금액은 가렸습니다." },
+    image: { src: "/images/notice/design-4.jpg", alt: "서비스별 상세 안내 페이지 오픈 당시 첫 화면", note: "당시 표시하던 금액과 작업 기간은 가렸습니다.", w: 1366, h: 4141 },
   },
   {
     id: "design-3",
@@ -106,7 +107,7 @@ export const notices: Notice[] = [
         p: ["브랜드 이야기는 별도 페이지로 이어 가고, 조건과 범위를 빠르게 확인하려는 담당자를 위해 서비스별 상세 안내 페이지를 더했습니다."],
       },
     ],
-    image: { src: "/images/notice/design-3.jpg", alt: "브랜드 이야기 공개 당시 첫 화면" },
+    image: { src: "/images/notice/design-3.jpg", alt: "브랜드 이야기 공개 당시 첫 화면", note: "당시 표시하던 금액은 가렸습니다.", w: 1366, h: 2500 },
   },
   {
     id: "design-2",
@@ -136,7 +137,7 @@ export const notices: Notice[] = [
         p: ["카탈로그와 함께 어떤 상황에서 어떤 서비스가 필요한지 먼저 이해할 수 있도록, 고객 상황을 그린 브랜드 이야기를 더했습니다."],
       },
     ],
-    image: { src: "/images/notice/design-2.jpg", alt: "카탈로그 서비스 시작 당시 첫 화면", note: "당시 표시하던 금액은 가렸습니다." },
+    image: { src: "/images/notice/design-2.jpg", alt: "카탈로그 서비스 시작 당시 첫 화면", note: "당시 표시하던 금액과 작업 기간은 가렸습니다.", w: 1366, h: 4256 },
   },
   {
     id: "design-1",
@@ -162,7 +163,7 @@ export const notices: Notice[] = [
         p: ["방문자가 자기 업종의 결과물을 바로 확인할 수 있도록 업종별 카탈로그를 더했습니다."],
       },
     ],
-    image: { src: "/images/notice/design-1.jpg", alt: "오픈 당시 첫 화면", note: "당시 상호는 가렸습니다." },
+    image: { src: "/images/notice/design-1.jpg", alt: "오픈 당시 첫 화면", note: "당시 상호는 가렸습니다.", w: 1366, h: 4915 },
   },
 ];
 

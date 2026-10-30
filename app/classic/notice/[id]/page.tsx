@@ -71,9 +71,23 @@ export default async function ClassicNoticeDetailPage({ params }: Props) {
           ))}
         </div>
         {n.image && (
-          <figure className="pb-10">
-            <Image src={n.image.src} alt={n.image.alt} width={1600} height={1007} sizes="(min-width: 1248px) 1200px, 100vw" className="w-full rounded-md border border-[#e6e9ee]" />
-            {n.image.note && <figcaption className="mt-3 text-[14px] text-[#6b7280] md:text-[15px]">{n.image.note}</figcaption>}
+          <figure className="mx-auto max-w-[600px] pb-10">
+            {/* 첫 화면 전체 캡처를 브라우저 창 틀에 넣어 페이지 한 장으로 보여 준다 */}
+            <div className="overflow-hidden rounded-lg border border-[#d9dee5] bg-white shadow-[0_12px_32px_rgba(21,23,28,.08)]">
+              <div className="flex h-9 items-center gap-1.5 border-b border-[#e6e9ee] bg-[#f1f3f6] px-4">
+                <span className="h-2.5 w-2.5 rounded-full bg-[#c5cbd4]" />
+                <span className="h-2.5 w-2.5 rounded-full bg-[#c5cbd4]" />
+                <span className="h-2.5 w-2.5 rounded-full bg-[#c5cbd4]" />
+                <span className="ml-3 truncate text-[13px] text-[#6b7280]">gompartner.co.kr</span>
+              </div>
+              <Image src={n.image.src} alt={n.image.alt} width={n.image.w} height={n.image.h} sizes="(min-width: 768px) 600px, 100vw" className="block w-full" />
+            </div>
+            <figcaption className="mt-3 flex flex-wrap items-center justify-between gap-x-4 gap-y-1 text-[14px] text-[#6b7280] md:text-[15px]">
+              <span>당시 첫 화면 전체입니다.{n.image.note && ` ${n.image.note}`}</span>
+              <a href={n.image.src} target="_blank" rel="noopener noreferrer" className="font-bold text-[#256ef4] hover:underline">
+                원본 크기로 보기
+              </a>
+            </figcaption>
           </figure>
         )}
         <nav aria-label="이전 글과 다음 글" className="border-t border-[#e6e9ee] text-[16px]">
