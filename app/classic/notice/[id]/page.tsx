@@ -17,7 +17,7 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
   const { id } = await params;
   const n = noticeById(id);
   if (!n) return {};
-  return pageMeta({ title: n.title, description: n.body[0], path: `/classic/notice/${id}` });
+  return pageMeta({ title: n.title, description: n.summary, path: `/classic/notice/${id}` });
 }
 
 const dot = (d: string) => d.replaceAll("-", ".");
@@ -44,14 +44,29 @@ export default async function ClassicNoticeDetailPage({ params }: Props) {
       <article className={`${wrap} pb-16 pt-10 md:pb-24 md:pt-14`}>
         <header className="border-y-2 border-[#15171c] border-b-[#e6e9ee] py-6 md:border-b">
           <h2 className="break-keep text-[24px] font-[800] leading-[1.4] tracking-[-0.03em] md:text-[30px]">{n.title}</h2>
-          <p className="mt-2 flex flex-wrap gap-x-4 gap-y-1 text-[15px] tabular-nums text-[#6b7280]">
-            <time dateTime={n.date}>{dot(n.date)}</time>
-            {n.period && <span>운영 기간 {n.period}</span>}
-          </p>
+          <time dateTime={n.date} className="mt-2 block text-[15px] tabular-nums text-[#6b7280]">
+            {dot(n.date)}
+          </time>
         </header>
-        <div className="space-y-3 py-8 text-[17px] leading-[1.8] text-[#3d4450] md:py-10 md:text-[18px]">
-          {n.body.map((p) => (
-            <p key={p}>{p}</p>
+        <p className="pt-8 text-[18px] font-bold leading-[1.7] md:pt-10 md:text-[19px]">{n.summary}</p>
+        <div className="space-y-8 py-8 md:py-10">
+          {n.sections.map((sec) => (
+            <section key={sec.h}>
+              <h3 className="text-[19px] font-[800] tracking-[-0.02em] md:text-[21px]">{sec.h}</h3>
+              <div className="mt-3 space-y-2 text-[16px] leading-[1.8] text-[#3d4450] md:text-[17px]">
+                {sec.p?.map((t) => <p key={t}>{t}</p>)}
+                {sec.list && (
+                  <ul className="space-y-1.5" role="list">
+                    {sec.list.map((t) => (
+                      <li key={t} className="flex gap-2.5">
+                        <span aria-hidden className="mt-[11px] h-1.5 w-1.5 shrink-0 rounded-full bg-[#256ef4]" />
+                        {t}
+                      </li>
+                    ))}
+                  </ul>
+                )}
+              </div>
+            </section>
           ))}
         </div>
         {n.image && (
