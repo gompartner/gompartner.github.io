@@ -4,31 +4,31 @@ import Link from "next/link";
 import { Check, ChevronRight } from "lucide-react";
 import { PageHead, SubTabs, h2, wrap } from "@/components/classic/ui";
 import { SampleGrid } from "@/components/classic/works/SampleGrid";
-import { groups, samplesIn, worksTabs } from "@/components/classic/works/samples";
+import { catalogGroups, samplesIn, worksTabs } from "@/components/classic/works/samples";
 import { industries } from "@/data/classic/industries";
 import { pageMeta } from "@/lib/seo";
 
 type Props = { params: Promise<{ slug: string }> };
 
 export function generateStaticParams() {
-  return [...industries, ...groups].map((ind) => ({ slug: ind.slug }));
+  return [...industries, ...catalogGroups].map((ind) => ({ slug: ind.slug }));
 }
 
 export async function generateMetadata({ params }: Props): Promise<Metadata> {
   const { slug } = await params;
-  const ind = industries.find((i) => i.slug === slug) ?? groups.find((g) => g.slug === slug);
+  const ind = industries.find((i) => i.slug === slug) ?? catalogGroups.find((g) => g.slug === slug);
   if (!ind) return {};
   return { ...pageMeta({ title: `${ind.title} 카탈로그`, description: ind.description, path: `/classic/works/${slug}` }), keywords: ind.keywords };
 }
 
 export default async function ClassicIndustryPage({ params }: Props) {
   const { slug } = await params;
-  const ind = industries.find((i) => i.slug === slug) ?? groups.find((g) => g.slug === slug);
+  const ind = industries.find((i) => i.slug === slug) ?? catalogGroups.find((g) => g.slug === slug);
   if (!ind) notFound();
   const list = samplesIn(slug);
   const href = `/classic/works/${slug}`;
   // 아래쪽에 붙이는 다른 분류. 분류마다 4개만 보여 주고 나머지는 그 분류 페이지로
-  const others = [...industries, ...groups].filter((c) => c.slug !== slug).map((c) => ({ slug: c.slug, label: c.label, items: samplesIn(c.slug) })).filter((c) => c.items.length > 0);
+  const others = [...industries, ...catalogGroups].filter((c) => c.slug !== slug).map((c) => ({ slug: c.slug, label: c.label, items: samplesIn(c.slug) })).filter((c) => c.items.length > 0);
 
   return (
     <>

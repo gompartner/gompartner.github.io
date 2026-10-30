@@ -37,8 +37,6 @@ const groupOf = (p: (typeof projects)[number]) =>
 const catalog = [
   { key: "homepage", href: "/classic/works", name: "업종별 홈페이지", what: "병원, 매장, 전문직, 기업, 교육 업종별 구성" },
   { key: "landing", href: "/classic/works/landing", name: "광고 랜딩페이지", what: "상담, 예약, 사전 등록 신청 페이지" },
-  { key: "program", href: "/classic/works/program", name: "업무 프로그램", what: "주문 취합, 관리자, 결과지 출력" },
-  { key: "maintenance", href: "/classic/works/maintenance", name: "유지보수", what: "오류 접수와 처리 과정" },
 ].map((c) => ({ ...c, count: live.filter((p) => groupOf(p) === c.key).length }));
 
 // 제작 방식 비교. 남의 서비스는 일반적인 방식만 적고 이름은 쓰지 않는다.
@@ -144,7 +142,7 @@ function Catalog() {
           카탈로그
         </h2>
         <p className="mt-3 text-[16px] leading-[1.65] text-[#5b6370] md:text-[17px]">분류별로 실제 동작하는 화면을 직접 체험할 수 있습니다.</p>
-        <ul className="mt-10 grid gap-3 sm:grid-cols-2 md:gap-4 lg:grid-cols-4" role="list">
+        <ul className="mt-10 grid gap-3 sm:grid-cols-2 md:gap-4" role="list">
           {catalog.map((c) => (
             <li key={c.key}>
               <Link href={c.href} className="group flex h-full flex-col rounded-md border border-[#d9dee5] bg-white p-6 transition-colors hover:border-[#256ef4]">
