@@ -2,7 +2,7 @@ import { faq } from "@/data/classic/faq";
 import { guides } from "@/data/guides";
 import { maintenanceServices } from "@/data/classic/maintenance";
 import { industries } from "@/data/industries";
-import { landingPlans, planCommon, plans } from "@/data/pricing";
+import { landingPlans, planCommon, plans } from "@/data/classic/pricing";
 import { profile } from "@/data/profile";
 import { projects } from "@/data/projects";
 import { tools } from "@/data/tools";
@@ -30,11 +30,11 @@ export function GET() {
 
 ## 홈페이지 제작 패키지
 
-${plans.map((p) => `- ${p.title}(${p.name}): 수정 ${p.revisions}회. ${p.summary}. ${p.includes.join(", ")}.`).join("\n")}
+${plans.map((p) => `- ${p.title}: 수정 ${p.revisions}회. ${p.summary}. ${p.includes.join(", ")}.`).join("\n")}
 - 모든 패키지: ${planCommon.join(", ")}. 도메인과 호스팅 비용은 별도입니다.
 
 광고 신청 접수 랜딩페이지:
-${landingPlans.map((p) => `- ${p.title}(${p.name}): 수정 ${p.revisions}회. ${p.summary}. ${p.includes.join(", ")}.`).join("\n")}
+${landingPlans.map((p) => `- ${p.title}: 수정 ${p.revisions}회. ${p.summary}. ${p.includes.join(", ")}.`).join("\n")}
 
 금액과 작업 기간은 상담 신청을 받은 뒤 견적으로 안내합니다. 자세히: [홈페이지 제작](${url("/classic/homepage")}), [광고 랜딩페이지](${url("/classic/landing")})
 

@@ -10,7 +10,7 @@ export const processSteps = [
   { title: "운영", body: "완료 후 1개월은 오류를 무상으로 수정합니다. 이후 수정은 건별 작업 또는 월 유지보수로 맡을 수 있습니다." },
 ];
 
-const revisions = plans.map((p) => `${p.name} ${p.revisions}회`).join(", ");
+const revisions = plans.map((p) => `${p.title} ${p.revisions}회`).join(", ");
 
 export const faq = [
   {
@@ -35,7 +35,7 @@ export const faq = [
   },
   {
     q: "수정은 몇 번까지 되나요?",
-    a: `패키지별로 ${revisions}입니다. 작업 실수로 생긴 오류는 횟수와 관계없이 완료 전까지 바로 고칩니다. 문구, 위치, 업무 절차를 바꾸는 요청은 수정 횟수에 포함됩니다.`,
+    a: `${revisions}입니다. 작업 실수로 생긴 오류는 횟수와 관계없이 완료 전까지 바로 고칩니다. 문구, 위치, 업무 절차를 바꾸는 요청은 수정 횟수에 포함됩니다.`,
   },
   {
     q: "결제는 언제 하나요?",

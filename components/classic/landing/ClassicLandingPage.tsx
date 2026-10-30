@@ -39,9 +39,9 @@ const FAQ: [string, string][] = [
 ];
 
 const PLAN_TO_PKG: Record<string, PackageName> = {
-  "landing-basic": "랜딩 기본",
-  "landing-standard": "랜딩 표준",
-  "landing-premium": "랜딩 고급",
+  "landing-basic": "신청 접수",
+  "landing-standard": "상담 관리",
+  "landing-premium": "광고 성과 정리",
 };
 
 const th = "sticky left-0 z-[1] w-[112px] bg-[#f6f7f9] px-4 py-4 text-left align-top text-[15px] font-bold text-[#3d4450] md:w-[180px] md:px-5";

@@ -36,8 +36,7 @@ export function PlanTable({ plans, product, ctaPrefix }: { plans: Plan[]; produc
             </th>
             {plans.map((p) => (
               <th key={p.id} scope="col" className="px-4 py-5 text-left align-top md:px-6">
-                <span className="block text-[14px] font-bold text-[#256ef4]">{p.name}</span>
-                {p.title !== p.name && <span className="mt-1 block text-[19px] font-extrabold tracking-[-0.03em] md:text-[22px]">{p.title}</span>}
+                <span className="block text-[19px] font-extrabold tracking-[-0.03em] md:text-[22px]">{p.title}</span>
               </th>
             ))}
           </tr>

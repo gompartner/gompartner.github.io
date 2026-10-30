@@ -22,70 +22,70 @@ export interface Plan {
 export const plans: Plan[] = [
   {
     id: "basic",
-    name: "기본",
+    name: "소개 홈페이지",
     title: "소개 홈페이지",
     price: 299_000,
     days: 6,
     revisions: 2,
     summary: "가게나 병원을 소개하는 홈페이지",
-    includes: ["5쪽 이내", "PC·모바일 화면", "전화·지도·영업시간 안내", "네이버·구글 검색 등록"],
+    includes: ["5쪽 이내", "PC, 모바일 화면", "전화, 지도, 영업시간 안내", "네이버, 구글 검색 등록"],
   },
   {
     id: "standard",
-    name: "표준",
-    title: "문의·예약 홈페이지",
+    name: "문의, 예약 홈페이지",
+    title: "문의, 예약 홈페이지",
     price: 490_000,
     days: 9,
     revisions: 3,
     summary: "문의와 예약 신청을 받는 홈페이지",
-    includes: ["10쪽 이내", "기본 패키지 전부", "문의·예약 신청 폼", "공지·사진 직접 올리기"],
+    includes: ["10쪽 이내", "소개 홈페이지 구성 전부", "문의, 예약 신청 폼", "공지, 사진 직접 올리기"],
   },
   {
     id: "premium",
-    name: "고급",
+    name: "맞춤 기능 홈페이지",
     title: "맞춤 기능 홈페이지",
     price: 990_000,
     days: 12,
     revisions: 4,
-    summary: "예약·주문 같은 맞춤 기능을 넣은 홈페이지",
-    includes: ["10쪽 이내", "표준 패키지 전부", "맞춤 기능 1개", "업종에 맞춘 첫 화면 디자인"],
+    summary: "예약, 주문 같은 맞춤 기능을 넣은 홈페이지",
+    includes: ["10쪽 이내", "문의, 예약 홈페이지 구성 전부", "맞춤 기능 1개", "업종에 맞춘 첫 화면 디자인"],
   },
 ];
 
 export const landingPlans: Plan[] = [
   {
     id: "landing-basic",
-    name: "기본",
-    title: "기본",
+    name: "신청 접수",
+    title: "신청 접수",
     price: 99_000,
     days: 4,
     revisions: 2,
     summary: "상담 신청 접수 페이지",
-    includes: ["섹션 5개 이내", "PC·모바일 화면", "신청 폼과 개인정보 수집 동의", "접수 메일 알림", "구글 시트 자동 저장"],
+    includes: ["섹션 5개 이내", "PC, 모바일 화면", "신청 폼과 개인정보 수집 동의", "접수 메일 알림", "구글 시트 자동 저장"],
   },
   {
     id: "landing-standard",
-    name: "표준",
-    title: "표준",
+    name: "상담 관리",
+    title: "상담 관리",
     price: 149_000,
     days: 5,
     revisions: 2,
     summary: "상담 상태 관리 포함",
-    includes: ["섹션 7개 이내", "기본 구성 전부", "문자·카톡 알림(발송 비용 별도)", "시트에 상담 상태 칸", "같은 번호 중복 표시"],
+    includes: ["섹션 7개 이내", "신청 접수 구성 전부", "문자, 카톡 알림(발송 비용 별도)", "시트에 상담 상태 칸", "같은 번호 중복 표시"],
   },
   {
     id: "landing-premium",
-    name: "고급",
-    title: "고급",
+    name: "광고 성과 정리",
+    title: "광고 성과 정리",
     price: 249_000,
     days: 7,
     revisions: 3,
-    summary: "광고별 신청·계약 정리 포함",
-    includes: ["섹션 10개 이내", "표준 구성 전부", "30분 넘게 연락 안 한 신청 다시 알림", "광고별 신청·계약 주간 요약", "네이버·메타·구글 광고별 신청 기록", "견적 계산 같은 맞춤 기능 1개"],
+    summary: "광고별 신청, 계약 정리 포함",
+    includes: ["섹션 10개 이내", "상담 관리 구성 전부", "30분 넘게 연락 안 한 신청 다시 알림", "광고별 신청, 계약 주간 요약", "네이버, 메타, 구글 광고별 신청 기록", "견적 계산 같은 맞춤 기능 1개"],
   },
 ];
 
-export const planCommon = ["원본 소스 제공", "완료 후 1개월 무상 오류 수정"];
+export const planCommon = ["업종별 필수 표시 확인", "원본 소스 제공", "점검 결과표, 인계 문서", "완료 후 1개월 무상 오류 수정"];
 
 /** 페이지 아래 파란 띠의 상담 안내. 금액과 기간은 상담 뒤에 알린다(10-30). */
 export const contactTitle = "필요한 것을 남겨 주세요";
@@ -103,7 +103,7 @@ export function samplesForPlan(planId: PlanId | LandingPlanId) {
     .sort((a, b) => a.total - b.total);
 }
 
-/** 패키지에 없는 기능을 더할 때의 단가. 고급 패키지의 맞춤 기능 1개는 따로 받지 않는다. */
+/** 패키지에 없는 기능을 더할 때의 단가. 맞춤 기능 홈페이지의 맞춤 기능 1개는 따로 받지 않는다. */
 export type AddonId = "page" | "board" | "tool" | "print" | "lang" | "live" | "map" | "pay" | "member" | "cart";
 
 export interface Addon {
@@ -118,14 +118,14 @@ export interface Addon {
 export const addons: Addon[] = [
   { id: "page", name: "추가 페이지", price: 30_000, unit: "쪽", days: 0.2 },
   { id: "board", name: "게시판 추가", price: 100_000, unit: "개", days: 1 },
-  { id: "tool", name: "조회·계산 도구", price: 100_000, unit: "개", days: 1 },
+  { id: "tool", name: "조회, 계산 도구", price: 100_000, unit: "개", days: 1 },
   { id: "print", name: "인쇄용 출력 화면", price: 100_000, unit: "개", days: 1 },
   { id: "lang", name: "영문 화면", price: 200_000, unit: "식", days: 2 },
-  { id: "member", name: "회원가입·로그인", price: 200_000, unit: "식", days: 2 },
+  { id: "member", name: "회원가입, 로그인", price: 200_000, unit: "식", days: 2 },
   { id: "live", name: "실시간 예약 현황", price: 300_000, unit: "식", days: 3 },
   { id: "map", name: "지도 검색", price: 300_000, unit: "식", days: 3 },
   { id: "pay", name: "온라인 결제 연동", price: 300_000, unit: "식", days: 2 },
-  { id: "cart", name: "상품·장바구니·주문", price: 500_000, unit: "식", days: 4 },
+  { id: "cart", name: "상품, 장바구니, 주문", price: 500_000, unit: "식", days: 4 },
 ];
 
 type Extra = [AddonId, number?];
@@ -135,10 +135,10 @@ const estimateSource: Record<string, { plan: PlanId | LandingPlanId; extras: Ext
   "landing-water-rental": { plan: "landing-basic", extras: [] },
   "landing-coding-camp": { plan: "landing-standard", extras: [] },
   "landing-move-clean": { plan: "landing-premium", extras: [] }, // 견적 계산기
-  "landing-popup-store": { plan: "landing-premium", extras: [["tool", 2]] }, // 회차 발권, 더해서 현장 웨이팅·돌림판 쿠폰
-  "landing-stamp-tour": { plan: "landing-premium", extras: [["tool", 2]] }, // 스탬프 투어, 더해서 해설사 회차 예약·코스 선택 지도
-  "landing-zine-fair": { plan: "landing-premium", extras: [["tool", 2]] }, // 입장 회차 등록, 더해서 셀러 필터·부스 지도, 미리 담기
-  "landing-leather-class": { plan: "landing-premium", extras: [["pay"], ["tool"]] }, // 회차 신청·자동 마감, 더해서 결제 연동·예약 변경 조회
+  "landing-popup-store": { plan: "landing-premium", extras: [["tool", 2]] }, // 회차 발권, 더해서 현장 웨이팅, 돌림판 쿠폰
+  "landing-stamp-tour": { plan: "landing-premium", extras: [["tool", 2]] }, // 스탬프 투어, 더해서 해설사 회차 예약, 코스 선택 지도
+  "landing-zine-fair": { plan: "landing-premium", extras: [["tool", 2]] }, // 입장 회차 등록, 더해서 셀러 필터, 부스 지도, 미리 담기
+  "landing-leather-class": { plan: "landing-premium", extras: [["pay"], ["tool"]] }, // 회차 신청, 자동 마감, 더해서 결제 연동, 예약 변경 조회
   "clinic-homepage": { plan: "standard", extras: [["page", 5]] },
   "dental-homepage": { plan: "standard", extras: [["tool"], ["page", 5]] }, // 증상 자가체크
   pharmacy: { plan: "standard", extras: [["print"]] }, // 처방전 미리 보내기는 문의 폼으로
@@ -146,17 +146,17 @@ const estimateSource: Record<string, { plan: PlanId | LandingPlanId; extras: Ext
   "tax-office": { plan: "standard", extras: [["board", 2]] }, // 신고일정
   "real-estate": { plan: "premium", extras: [["map"], ["tool"]] }, // 매물검색
   pension: { plan: "premium", extras: [["page", 3]] }, // 실시간예약
-  "private-gym": { plan: "premium", extras: [["map"], ["pay"]] }, // 지점·시간 예약
+  "private-gym": { plan: "premium", extras: [["map"], ["pay"]] }, // 지점, 시간 예약
   "korean-restaurant": { plan: "basic", extras: [] }, // 기본 패키지 범위 그대로
-  interior: { plan: "standard", extras: [] }, // 표준 패키지 범위 그대로(시공사례·공지 직접 올리기)
-  academy: { plan: "standard", extras: [["tool"], ["board"]] }, // 반 찾기·시간표
-  "pilates-studio": { plan: "standard", extras: [["tool"]] }, // 시간표·레슨 추천
-  "hanok-cafe": { plan: "standard", extras: [["tool"]] }, // 메뉴 찾기·공간 예약
-  "bakery-cafe": { plan: "standard", extras: [["tool", 2]] }, // 빵 나오는 시간·픽업 예약
+  interior: { plan: "standard", extras: [] }, // 표준 패키지 범위 그대로(시공사례, 공지 직접 올리기)
+  academy: { plan: "standard", extras: [["tool"], ["board"]] }, // 반 찾기, 시간표
+  "pilates-studio": { plan: "standard", extras: [["tool"]] }, // 시간표, 레슨 추천
+  "hanok-cafe": { plan: "standard", extras: [["tool"]] }, // 메뉴 찾기, 공간 예약
+  "bakery-cafe": { plan: "standard", extras: [["tool", 2]] }, // 빵 나오는 시간, 픽업 예약
   company: { plan: "standard", extras: [["lang"], ["page", 5], ["tool"]] }, // 가공 가능 범위
   "cert-lab": { plan: "premium", extras: [] }, // 시험진행현황 조회
   "flower-expo": { plan: "basic", extras: [["tool"]] }, // 한 페이지 안내+관람요금 계산
-  "online-store": { plan: "premium", extras: [["cart"], ["pay"], ["member"]] }, // 유약 색·각인 미리보기
+  "online-store": { plan: "premium", extras: [["cart"], ["pay"], ["member"]] }, // 유약 색, 각인 미리보기
   "roastery": { plan: "standard", extras: [["tool", 2], ["cart"]] }, // 구독 금액 계산, 분쇄도와 맛 노트 고르기, 원두 담기와 주문 접수
   "hair-salon": { plan: "standard", extras: [["tool"]] }, // 디자이너별 소요시간 합산 예약 시간표
   "optical": { plan: "standard", extras: [["tool", 2], ["map"]] }, // 테와 렌즈 가격 계산기, 시력검사 예약 접수가 tool, 오시는 길 지도가 map

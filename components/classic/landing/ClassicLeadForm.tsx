@@ -7,7 +7,7 @@ import { LEAD_ENDPOINT } from "@/data/classic/leadEndpoint";
 
 // components/landing-page/LeadForm을 클래식 모양으로 옮긴 것. 보내는 필드와 검증은 원본과 똑같이 둔다.
 export const CHANNELS = ["네이버", "메타", "구글", "아직 안 함"] as const;
-export const PACKAGES = ["랜딩 기본", "랜딩 표준", "랜딩 고급", "잘 모르겠음"] as const;
+export const PACKAGES = ["신청 접수", "상담 관리", "광고 성과 정리", "잘 모르겠음"] as const;
 export type PackageName = (typeof PACKAGES)[number];
 
 const PHONE_RE = /^01[016789]-?\d{3,4}-?\d{4}$/;
