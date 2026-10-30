@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import Image from "next/image";
+import { ClipboardCheck, FileText, KeyRound, ScrollText, ShieldCheck } from "lucide-react";
 import { channels } from "@/components/classic/ClassicFooter";
 import { PageHead, h2, wrap } from "@/components/classic/ui";
 import { aboutLead, aboutTitle, principles } from "@/data/classic/about";
@@ -38,13 +39,22 @@ export default function ClassicStoryPage() {
             일하는 원칙
           </h2>
           <ol className="mt-10 grid gap-8 md:grid-cols-2 md:gap-x-12 md:gap-y-10">
-            {principles.map((p, n) => (
+            {principles.map((p, n) => {
+              // 이 페이지의 디자인 포인트(10-30): 원칙마다 아이콘
+              const Icon = [ScrollText, KeyRound, ClipboardCheck, FileText, ShieldCheck][n] ?? ShieldCheck;
+              return (
               <li key={p.title} className="border-t-2 border-[#15171c] pt-5">
-                <span className="text-[15px] font-bold tabular-nums text-[#256ef4]">{n + 1}</span>
-                <p className="mt-2 text-[21px] font-[800] tracking-[-0.03em] md:text-[24px]">{p.title}</p>
+                <span className="flex items-center gap-3">
+                  <span className="grid h-11 w-11 place-items-center rounded-full bg-[#e8efff] text-[#256ef4]">
+                    <Icon size={22} aria-hidden />
+                  </span>
+                  <span className="text-[15px] font-bold tabular-nums text-[#256ef4]">{n + 1}</span>
+                </span>
+                <h3 className="mt-3 text-[21px] font-[800] tracking-[-0.03em] md:text-[24px]">{p.title}</h3>
                 <p className="mt-2 text-[16px] leading-[1.7] text-[#5b6370] md:text-[17px]">{p.body}</p>
               </li>
-            ))}
+              );
+            })}
           </ol>
         </div>
       </section>

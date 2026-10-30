@@ -103,7 +103,7 @@ export default async function ClassicSamplePage({ params }: Props) {
               </h2>
               <dl className="text-[15px] md:text-[16px]">
                 <div className={row}>
-                  <dt>기준 패키지</dt>
+                  <dt>기본 구성</dt>
                   <dd className="min-w-0 text-right font-bold">{est.plan.title}</dd>
                 </div>
                 {est.lines.length > 0 && (

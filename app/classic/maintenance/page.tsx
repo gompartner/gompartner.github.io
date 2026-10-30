@@ -1,9 +1,9 @@
 import type { Metadata } from "next";
-import { Check, Clock, X } from "lucide-react";
+import { CalendarClock, Check, FileBarChart, MessageSquareReply, Wrench, X } from "lucide-react";
 import { StepList } from "@/components/classic/pricing/StepList";
 import { serviceTabs } from "@/components/classic/pricing/tabs";
 import { PageHead, SubTabs, h3, wrap } from "@/components/classic/ui";
-import { maintenanceServices, maintenanceSteps, responseTime } from "@/data/classic/maintenance";
+import { maintenanceServices, maintenanceSteps } from "@/data/classic/maintenance";
 import { pageMeta } from "@/lib/seo";
 
 export const metadata: Metadata = pageMeta({
@@ -16,6 +16,14 @@ const cellTh = "px-4 py-3.5 text-left text-[15px] font-bold text-[#3d4450] md:px
 const cell = "px-4 py-3.5 text-[16px] md:px-5";
 const dt = "pt-5 text-[15px] font-bold text-[#3d4450] md:py-5";
 const dd = "pb-5 pt-2 text-[16px] leading-[1.6] md:py-5";
+
+// 이 페이지의 디자인 포인트(10-30): 무엇을 언제까지 해 주는지 큰 숫자로. 모두 아래 서비스 기준에 적힌 약속이다
+const PROMISES = [
+  { icon: MessageSquareReply, num: "24시간", label: "이내 회신", body: "문의를 남기시면 하루 안에 답장합니다." },
+  { icon: Wrench, num: "3일", label: "이내 반영", body: "단순 수정은 접수 확인 뒤 3일 안에 반영합니다." },
+  { icon: CalendarClock, num: "30일 전", label: "만료 알림", body: "도메인, SSL, 호스팅 만료를 미리 알립니다." },
+  { icon: FileBarChart, num: "월 1회", label: "작업 보고", body: "월 유지보수는 월말에 작업 내역을 정리해 드립니다." },
+];
 
 // 해킹 피해 복구는 이 페이지에서 언급하지 않는다.
 const shown = (items: string[]) => items.filter((i) => !i.includes("해킹"));
@@ -63,10 +71,26 @@ export default function ClassicMaintenancePage() {
             </tbody>
           </table>
         </div>
-        <p className="mt-6 flex gap-2.5 text-[16px] leading-[1.6] md:text-[17px]">
-          <Clock size={20} aria-hidden className="mt-[3px] shrink-0 text-[#256ef4]" />
-          {responseTime}
-        </p>
+      </section>
+
+      <section aria-labelledby="m-promise" className="bg-[#0f1b3d] text-white">
+        <div className={`${wrap} py-14 md:py-20`}>
+          <h2 id="m-promise" className="text-[26px] font-[800] tracking-[-0.04em] md:text-[34px]">
+            응답과 점검 기준
+          </h2>
+          <ul className="mt-8 grid gap-4 sm:grid-cols-2 lg:grid-cols-4" role="list">
+            {PROMISES.map((p) => (
+              <li key={p.label} className="rounded-md border border-white/15 bg-white/5 p-6">
+                <p.icon size={24} aria-hidden className="text-[#8fb4ff]" />
+                <p className="mt-4 flex items-baseline gap-2">
+                  <span className="text-[34px] font-[800] tabular-nums tracking-[-0.04em] md:text-[40px]">{p.num}</span>
+                  <span className="text-[17px] font-bold text-[#c9d3e6]">{p.label}</span>
+                </p>
+                <p className="mt-2 text-[15px] leading-[1.6] text-[#c9d3e6]">{p.body}</p>
+              </li>
+            ))}
+          </ul>
+        </div>
       </section>
 
       {maintenanceServices.map((s) => {
