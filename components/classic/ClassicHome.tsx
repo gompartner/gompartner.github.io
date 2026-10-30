@@ -406,7 +406,7 @@ function Boards() {
   return (
     <section aria-label="가이드와 자료실" className="border-t border-[#e6e9ee]">
       <div className="mx-auto grid w-full max-w-[1248px] gap-14 px-4 py-20 md:grid-cols-2 md:gap-12 md:px-6 md:py-24">
-        <div>
+        <div className="min-w-0">
           <div className="flex items-end justify-between border-b-2 border-[#15171c] pb-4">
             <h2 className="text-[24px] font-extrabold tracking-[-0.03em]">가이드</h2>
             <Link href="/classic/guide" className={more}>
@@ -424,7 +424,7 @@ function Boards() {
             ))}
           </ul>
         </div>
-        <div>
+        <div className="min-w-0">
           <div className="flex items-end justify-between border-b-2 border-[#15171c] pb-4">
             <h2 className="text-[24px] font-extrabold tracking-[-0.03em]">자료실</h2>
             <Link href="/classic/tools" className={more}>
