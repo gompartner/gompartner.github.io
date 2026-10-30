@@ -2,7 +2,6 @@
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { ChannelTalkButton } from "@/components/layout/ChannelTalk";
 
 // 클래식 보기의 휴대폰 하단 상담 줄. 샘플 소개에서는 샘플을 바로 연다.
 export function ClassicMobileBar() {
@@ -15,9 +14,9 @@ export function ClassicMobileBar() {
       <Link href={href} prefetch={onSample ? false : undefined} data-gtm-cta="classic_mobilebar_left" className="flex h-12 items-center justify-center rounded-md border border-[#c9cfd8] text-[16px] font-bold text-[#15171c]">
         {onSample ? "샘플 열기" : onPricing ? "샘플 보기" : "가격 보기"}
       </Link>
-      <ChannelTalkButton cta="classic_mobilebar_chat" className="flex h-12 items-center justify-center rounded-md bg-[#256ef4] text-[16px] font-bold text-white">
-        채팅 상담
-      </ChannelTalkButton>
+      <Link href="/classic/contact" data-gtm-cta="classic_mobilebar_contact" className="flex h-12 items-center justify-center rounded-md bg-[#256ef4] text-[16px] font-bold text-white">
+        상담 신청
+      </Link>
     </div>
   );
 }

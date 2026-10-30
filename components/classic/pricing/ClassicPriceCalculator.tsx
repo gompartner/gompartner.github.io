@@ -1,9 +1,9 @@
 "use client";
 
+import Link from "next/link";
 import { useState } from "react";
 import { Minus, Plus } from "lucide-react";
 import { h2, wrap } from "@/components/classic/ui";
-import { ChannelTalkButton } from "@/components/layout/ChannelTalk";
 import { addons, formatWon, manwon, plans, sampleReuseRate, type AddonId } from "@/data/classic/pricing";
 import { cn } from "@/lib/utils";
 
@@ -134,13 +134,9 @@ export function ClassicPriceCalculator() {
                 <span className="block text-[#5b6370]">추가 기능 금액의 {Math.round(sampleReuseRate * 100)}%를 할인합니다.</span>
               </span>
             </label>
-            <ChannelTalkButton
-              cta="classic_calc_chat"
-              message={`견적 계산: ${summary}, ${manwon(total)}로 상담받고 싶어요.`}
-              className="mt-5 flex h-12 w-full items-center justify-center rounded-md bg-[#256ef4] text-[16px] font-bold text-white transition-colors hover:bg-[#0b50d0]"
-            >
+            <Link href={`/classic/contact?msg=${encodeURIComponent(`견적 계산: ${summary}, ${manwon(total)}`)}`} data-gtm-cta="classic_calc_contact" className="mt-5 flex h-12 w-full items-center justify-center rounded-md bg-[#256ef4] text-[16px] font-bold text-white transition-colors hover:bg-[#0b50d0]">
               이 견적으로 상담
-            </ChannelTalkButton>
+            </Link>
           </div>
         </div>
       </div>

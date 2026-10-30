@@ -5,7 +5,6 @@ import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { useEffect, useState } from "react";
 import { ChevronDown, Menu, X } from "lucide-react";
-import { ChannelTalkButton } from "@/components/layout/ChannelTalk";
 import { LookToggle } from "@/components/layout/LookToggle";
 import { cases } from "@/data/classic/cases";
 import { industries } from "@/data/classic/industries";
@@ -162,12 +161,6 @@ export function ClassicHeader() {
 
           <div className="flex items-center gap-2">
             <LookToggle className={toggle} />
-            <ChannelTalkButton
-              cta="classic_header_chat"
-              className="hidden h-10 items-center rounded-md bg-[#256ef4] px-5 text-[15px] font-bold text-white transition-colors hover:bg-[#0b50d0] md:inline-flex"
-            >
-              채팅 상담
-            </ChannelTalkButton>
             <button
               type="button"
               onClick={() => setOpen((v) => !v)}

@@ -2,8 +2,7 @@
 
 import { forwardRef, useEffect, useRef, useState } from "react";
 import { Check, ChevronDown } from "lucide-react";
-import { ChannelTalkButton } from "@/components/layout/ChannelTalk";
-import { btnLine, h2, wrap } from "@/components/classic/ui";
+import { h2, wrap } from "@/components/classic/ui";
 import { LEAD_ENDPOINT } from "@/data/classic/leadEndpoint";
 
 // components/landing-page/LeadForm을 클래식 모양으로 옮긴 것. 보내는 필드와 검증은 원본과 똑같이 둔다.
@@ -113,9 +112,6 @@ export const ClassicLeadForm = forwardRef<HTMLElement, { pkg: PackageName | ""; 
           <h2 id="apply-title" className={h2}>
             상담 신청
           </h2>
-          <ChannelTalkButton cta="classic_landing_apply_chat" message="광고 랜딩페이지 상담받고 싶어요." className={`${btnLine} mt-8`}>
-            채팅 상담
-          </ChannelTalkButton>
         </div>
 
         {status.kind === "done" ? (

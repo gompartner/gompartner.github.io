@@ -1,13 +1,12 @@
 import type { Metadata } from "next";
 import Link from "next/link";
-import { ChevronRight, MessageCircle } from "lucide-react";
+import { ChevronRight } from "lucide-react";
 import { PlanTable } from "@/components/classic/pricing/PlanTable";
 import { StepList } from "@/components/classic/pricing/StepList";
 import { serviceTabs } from "@/components/classic/pricing/tabs";
-import { PageHead, SubTabs, btnLine, btnPrimary, h2, more, wrap } from "@/components/classic/ui";
+import { PageHead, SubTabs, btnPrimary, h2, more, wrap } from "@/components/classic/ui";
 import { SampleGrid } from "@/components/classic/works/SampleGrid";
 import { demoProjects } from "@/components/classic/works/samples";
-import { ChannelTalkButton } from "@/components/layout/ChannelTalk";
 import { processSteps } from "@/data/classic/faq";
 import { industries } from "@/data/classic/industries";
 import { manwon, plans, previewDetail, previewPromise, runningCostNote, samplesForPlan } from "@/data/classic/pricing";
@@ -52,11 +51,7 @@ export default function ClassicHomepagePage() {
             </p>
           </div>
           <div className="flex flex-wrap gap-3">
-            <ChannelTalkButton cta="classic_homepage_chat_top" message="홈페이지 제작 상담을 받고 싶어요." className={`${btnPrimary} gap-2`}>
-              <MessageCircle size={18} aria-hidden />
-              채팅 상담
-            </ChannelTalkButton>
-            <Link href="/classic/contact" className={btnLine}>
+            <Link href="/classic/contact" className={btnPrimary}>
               상담 신청
             </Link>
           </div>
@@ -126,14 +121,6 @@ export default function ClassicHomepagePage() {
             <p className="mt-3 text-[16px] leading-[1.65] text-white md:text-[17px]">{previewDetail}</p>
           </div>
           <div className="flex shrink-0 flex-wrap gap-3">
-            <ChannelTalkButton
-              cta="classic_homepage_band_chat"
-              message="홈페이지 제작 상담을 받고 싶어요."
-              className="inline-flex h-14 items-center gap-2 rounded-md bg-white px-7 text-[17px] font-bold text-[#15171c] hover:bg-[#e8efff]"
-            >
-              <MessageCircle size={18} aria-hidden />
-              채팅 상담
-            </ChannelTalkButton>
             <Link href="/classic/contact" data-gtm-cta="classic_homepage_band_contact" className="inline-flex h-14 items-center rounded-md border border-white/60 px-7 text-[17px] font-bold hover:bg-white/10">
               상담 신청
             </Link>

@@ -1,7 +1,6 @@
 import type { Metadata } from "next";
 import Link from "next/link";
-import { ChevronDown, MessageCircle } from "lucide-react";
-import { ChannelTalkButton } from "@/components/layout/ChannelTalk";
+import { ChevronDown } from "lucide-react";
 import { PageHead, btnLine, wrap } from "@/components/classic/ui";
 import { SupportTabs } from "@/components/classic/support/SupportTabs";
 import { faq } from "@/data/classic/faq";
@@ -43,13 +42,6 @@ export default function ClassicFaqPage() {
 
         <div className="mt-12 flex flex-col gap-5 border-t border-[#e6e9ee] pt-8 md:flex-row md:items-center md:justify-end">
           <div className="flex flex-wrap gap-3">
-            <ChannelTalkButton
-              cta="classic_faq_chat"
-              className="inline-flex h-12 items-center justify-center gap-2 rounded-md bg-[#256ef4] px-6 text-[16px] font-bold text-white transition-colors hover:bg-[#0b50d0]"
-            >
-              <MessageCircle size={18} aria-hidden />
-              채팅 상담
-            </ChannelTalkButton>
             <Link href="/classic/contact" data-gtm-cta="classic_faq_contact" className={btnLine}>
               상담 신청
             </Link>

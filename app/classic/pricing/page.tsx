@@ -5,7 +5,6 @@ import { ClassicPriceCalculator } from "@/components/classic/pricing/ClassicPric
 import { PlanTable } from "@/components/classic/pricing/PlanTable";
 import { StepList } from "@/components/classic/pricing/StepList";
 import { PageHead, btnLine, btnPrimary, h2, more, wrap } from "@/components/classic/ui";
-import { ChannelTalkButton } from "@/components/layout/ChannelTalk";
 import { paymentFaq, processSteps } from "@/data/classic/faq";
 import { maintenanceServices } from "@/data/classic/maintenance";
 import { addons, formatWon, landingPlans, manwon, plans, previewDetail, previewPromise, runningCostNote } from "@/data/classic/pricing";
@@ -174,9 +173,9 @@ export default function ClassicPricingPage() {
             <p className="mt-1 text-[16px] leading-[1.6] text-[#5b6370]">화면 수와 쓰는 사람을 듣고 금액과 기간을 알려 드립니다.</p>
           </div>
           <div className="flex shrink-0 flex-wrap gap-3">
-            <ChannelTalkButton cta="classic_pricing_chat_program" message="업무 프로그램 견적을 받고 싶어요." className={btnPrimary}>
+            <Link href="/classic/contact" data-gtm-cta="classic_pricing_contact_program" className={btnPrimary}>
               업무 프로그램 상담
-            </ChannelTalkButton>
+            </Link>
             <Link href="/classic/program" className={btnLine}>
               샘플 보기
             </Link>
@@ -211,9 +210,9 @@ export default function ClassicPricingPage() {
             <p className="mt-3 text-[16px] leading-[1.65] text-white md:text-[17px]">{previewDetail}</p>
           </div>
           <div className="flex shrink-0 flex-wrap gap-3">
-            <ChannelTalkButton cta="classic_pricing_band_chat" className="inline-flex h-14 items-center rounded-md bg-white px-7 text-[17px] font-bold text-[#15171c] hover:bg-[#e8efff]">
-              채팅 상담
-            </ChannelTalkButton>
+            <Link href="/classic/contact" data-gtm-cta="classic_pricing_band_contact" className="inline-flex h-14 items-center rounded-md bg-white px-7 text-[17px] font-bold text-[#15171c] hover:bg-[#e8efff]">
+              상담 신청
+            </Link>
             <Link href="/classic/contact" data-gtm-cta="classic_pricing_band_contact" className="inline-flex h-14 items-center rounded-md border border-white/60 px-7 text-[17px] font-bold hover:bg-white/10">
               상담 신청
             </Link>

@@ -3,7 +3,6 @@ import Image from "next/image";
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import { Check, Plus } from "lucide-react";
-import { ChannelTalkButton } from "@/components/layout/ChannelTalk";
 import { PageHead, btnLine, btnPrimary, h2, h3, more, wrap } from "@/components/classic/ui";
 import { SampleGrid } from "@/components/classic/works/SampleGrid";
 import { demoProjects, findBySlug, groupOf, industryOf, isMaintenance, mobileShotOf, samplesIn, slugOf } from "@/components/classic/works/samples";
@@ -154,9 +153,9 @@ export default async function ClassicSamplePage({ params }: Props) {
             <Link href={p.demoUrl} prefetch={false} data-gtm-cta={`classic_sample_open_${p.id}`} className={btnPrimary}>
               샘플 열기
             </Link>
-            <ChannelTalkButton cta={`classic_sample_chat_${p.id}`} message={`${p.title} 샘플을 보고 문의합니다.`} className={btnLine}>
-              채팅 상담
-            </ChannelTalkButton>
+            <Link href="/classic/contact" data-gtm-cta={`classic_sample_contact_${p.id}`} className={btnLine}>
+              상담 신청
+            </Link>
           </div>
         </section>
       </div>

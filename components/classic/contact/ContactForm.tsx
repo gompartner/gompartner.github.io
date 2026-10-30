@@ -2,9 +2,9 @@
 
 import { useEffect, useRef, useState } from "react";
 import { useSearchParams } from "next/navigation";
-import { Check, ChevronDown, MessageCircle } from "lucide-react";
-import { ChannelTalkButton } from "@/components/layout/ChannelTalk";
+import { Check, ChevronDown } from "lucide-react";
 import { LEAD_ENDPOINT } from "@/data/classic/leadEndpoint";
+import { profile } from "@/data/classic/profile";
 
 // 클래식 상담 신청 폼. 보내는 방식과 필드명은 /landing 폼과 같다(같은 Apps Script 시트에 쌓인다).
 
@@ -26,13 +26,16 @@ export function ContactForm() {
   const [phone, setPhone] = useState("");
   const [business, setBusiness] = useState("");
   // 홈페이지 진단(/tools/site-check)의 "전체 보고서 받기"로 넘어오면 ?site=주소 가 붙는다. 서비스와 문의 내용을 미리 채운다.
-  const site = useSearchParams().get("site") ?? "";
+  const params = useSearchParams();
+  const site = params.get("site") ?? "";
+  // 가격 페이지 견적 계산의 "이 견적으로 상담"은 ?msg=계산 내용 을 붙여 넘긴다
+  const msg = params.get("msg") ?? "";
   const [service, setService] = useState(site ? "유지보수" : "");
   const [sample, setSample] = useState("");
   const [budget, setBudget] = useState("");
   const [openDate, setOpenDate] = useState("");
   const [currentSite, setCurrentSite] = useState(site);
-  const [message, setMessage] = useState(site ? `홈페이지 진단 전체 보고서 요청: ${site}` : "");
+  const [message, setMessage] = useState(site ? `홈페이지 진단 전체 보고서 요청: ${site}` : msg);
   const [agree, setAgree] = useState(false);
   const [website, setWebsite] = useState("");
   const [errors, setErrors] = useState<Record<string, string>>({});
@@ -117,17 +120,9 @@ export function ContactForm() {
           </div>
           <div className="flex flex-col gap-1 border-b border-[#e6e9ee] py-4 sm:flex-row sm:gap-6">
             <dt className="w-[120px] shrink-0 font-bold text-[#3d4450]">다른 연락 창구</dt>
-            <dd>채팅 상담</dd>
+            <dd>전화 {profile.phone}, 이메일 {profile.email}</dd>
           </div>
         </dl>
-        <ChannelTalkButton
-          cta="classic_contact_done_chat"
-          message={`접수 번호 ${status.id} 관련 문의입니다.`}
-          className="mt-8 inline-flex h-12 items-center justify-center gap-2 rounded-md border border-[#c9cfd8] bg-white px-6 text-[16px] font-bold text-[#15171c] transition-colors hover:border-[#15171c]"
-        >
-          <MessageCircle size={18} aria-hidden />
-          채팅 상담
-        </ChannelTalkButton>
       </div>
     );
   }

@@ -1,11 +1,10 @@
 import type { Metadata } from "next";
 import Link from "next/link";
-import { Check, MessageCircle } from "lucide-react";
+import { Check } from "lucide-react";
 import { StepList } from "@/components/classic/pricing/StepList";
-import { PageHead, btnLine, btnPrimary, h2, wrap } from "@/components/classic/ui";
+import { PageHead, btnPrimary, h2, wrap } from "@/components/classic/ui";
 import { SampleGrid } from "@/components/classic/works/SampleGrid";
 import { demoProjects, isProgram, slugOf } from "@/components/classic/works/samples";
-import { ChannelTalkButton } from "@/components/layout/ChannelTalk";
 import { processSteps } from "@/data/classic/faq";
 import { pageMeta } from "@/lib/seo";
 
@@ -41,11 +40,7 @@ export default function ClassicProgramPage() {
             <p className="mt-1 text-[16px] leading-[1.6] text-[#5b6370]">화면 수와 쓰는 사람을 듣고 금액과 기간을 알려 드립니다.</p>
           </div>
           <div className="flex flex-wrap gap-3">
-            <ChannelTalkButton cta="classic_program_chat_top" message="업무 프로그램 견적을 받고 싶어요." className={`${btnPrimary} gap-2`}>
-              <MessageCircle size={18} aria-hidden />
-              채팅 상담
-            </ChannelTalkButton>
-            <Link href="/classic/contact" className={btnLine}>
+            <Link href="/classic/contact" className={btnPrimary}>
               상담 신청
             </Link>
           </div>
@@ -97,14 +92,6 @@ export default function ClassicProgramPage() {
             업무 프로그램 상담
           </h2>
           <div className="flex shrink-0 flex-wrap gap-3">
-            <ChannelTalkButton
-              cta="classic_program_band_chat"
-              message="업무 프로그램 견적을 받고 싶어요."
-              className="inline-flex h-14 items-center gap-2 rounded-md bg-white px-7 text-[17px] font-bold text-[#15171c] hover:bg-[#e8efff]"
-            >
-              <MessageCircle size={18} aria-hidden />
-              채팅 상담
-            </ChannelTalkButton>
             <Link href="/classic/contact" data-gtm-cta="classic_program_band_contact" className="inline-flex h-14 items-center rounded-md border border-white/60 px-7 text-[17px] font-bold hover:bg-white/10">
               상담 신청
             </Link>
