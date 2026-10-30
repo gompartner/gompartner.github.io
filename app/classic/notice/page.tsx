@@ -1,5 +1,5 @@
 import type { Metadata } from "next";
-import { ChevronDown } from "lucide-react";
+import Link from "next/link";
 import { PageHead, wrap } from "@/components/classic/ui";
 import { SupportTabs } from "@/components/classic/support/SupportTabs";
 import { notices } from "@/data/classic/notices";
@@ -7,12 +7,13 @@ import { fitDescription } from "@/lib/seo";
 
 export const metadata: Metadata = {
   title: "공지사항",
-  description: fitDescription("곰파트너 서비스 운영, 정책 변경, 휴무 일정 안내입니다."),
+  description: fitDescription("곰파트너 서비스 운영, 정책 변경, 홈페이지 개편 안내입니다."),
   alternates: { canonical: "/classic/notice" },
 };
 
 const dot = (d: string) => d.replaceAll("-", ".");
 
+// 공지사항 목록. 일반 회사 게시판처럼 번호, 제목, 날짜를 두고 제목을 누르면 글로 간다.
 export default function ClassicNoticePage() {
   return (
     <>
@@ -22,27 +23,40 @@ export default function ClassicNoticePage() {
         <p className="mb-4 text-[15px] text-[#5b6370]">
           전체 <span className="font-bold tabular-nums text-[#15171c]">{notices.length}</span>건
         </p>
-        <ul className="border-t-2 border-[#15171c]" role="list">
-          {notices.map((n, i) => (
-            <li key={n.id} className="border-b border-[#e6e9ee]">
-              <details className="group" open={i === 0}>
-                <summary className="flex cursor-pointer list-none items-center gap-4 px-4 py-5 md:gap-6 md:px-6 md:py-6 [&::-webkit-details-marker]:hidden">
-                  <span className="hidden w-12 shrink-0 text-[15px] tabular-nums text-[#6b7280] md:block">{notices.length - i}</span>
-                  <span className="min-w-0 flex-1 text-[17px] font-bold leading-[1.5] tracking-[-0.02em] md:text-[19px]">{n.title}</span>
-                  <time dateTime={n.date} className="shrink-0 text-[15px] tabular-nums text-[#6b7280]">
+        <table className="w-full border-collapse border-t-2 border-[#15171c]">
+          <caption className="sr-only">공지사항 목록</caption>
+          <thead className="hidden md:table-header-group">
+            <tr className="border-b border-[#e6e9ee] bg-[#f6f7f9] text-[15px] text-[#3d4450]">
+              <th scope="col" className="w-20 py-4 font-bold">
+                번호
+              </th>
+              <th scope="col" className="py-4 text-left font-bold">
+                제목
+              </th>
+              <th scope="col" className="w-32 py-4 font-bold">
+                날짜
+              </th>
+            </tr>
+          </thead>
+          <tbody>
+            {notices.map((n, i) => (
+              <tr key={n.id} className="border-b border-[#e6e9ee]">
+                <td className="hidden py-5 text-center text-[15px] tabular-nums text-[#6b7280] md:table-cell">{notices.length - i}</td>
+                <td className="py-5 pr-4 md:pr-6">
+                  <Link href={`/classic/notice/${n.id}`} className="text-[17px] font-bold leading-[1.5] tracking-[-0.02em] hover:text-[#256ef4] hover:underline md:text-[18px]">
+                    {n.title}
+                  </Link>
+                  <time dateTime={n.date} className="mt-1 block text-[14px] tabular-nums text-[#6b7280] md:hidden">
                     {dot(n.date)}
                   </time>
-                  <ChevronDown size={22} aria-hidden className="shrink-0 text-[#6b7280] transition-transform duration-200 group-open:rotate-180 motion-reduce:transition-none" />
-                </summary>
-                <div className="space-y-2 bg-[#f6f7f9] px-4 py-5 text-[16px] leading-[1.75] text-[#3d4450] md:px-6 md:py-6 md:pl-[96px] md:text-[17px]">
-                  {n.body.map((p) => (
-                    <p key={p}>{p}</p>
-                  ))}
-                </div>
-              </details>
-            </li>
-          ))}
-        </ul>
+                </td>
+                <td className="hidden py-5 text-center text-[15px] tabular-nums text-[#6b7280] md:table-cell">
+                  <time dateTime={n.date}>{dot(n.date)}</time>
+                </td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
       </div>
     </>
   );
