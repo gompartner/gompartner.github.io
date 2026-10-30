@@ -6,6 +6,7 @@ import { ArrowUpRight, ChevronDown, ChevronRight, Plus } from "lucide-react";
 import { faq, processSteps } from "@/data/classic/faq";
 import { projects } from "@/data/classic/projects";
 import { PROGRAM_IDS } from "@/data/classic/programIds";
+import { FlowSteps } from "@/components/classic/pricing/StepList";
 import { cn } from "@/lib/utils";
 
 // 클래식 보기의 첫 화면. 딱 보면 무엇을 하는 곳이고 어떻게 진행되는지 보이게 한다(10-30):
@@ -169,15 +170,7 @@ function Process() {
       <h2 id="c-process" className={h2}>
         진행 절차
       </h2>
-      <ol className="mt-10 grid gap-8 md:grid-cols-5 md:gap-6">
-        {processSteps.map((s, n) => (
-          <li key={s.title} className="border-t-2 border-[#15171c] pt-5">
-            <span className="text-[15px] font-bold tabular-nums text-[#256ef4]">{n + 1}단계</span>
-            <h3 className="mt-2 text-[21px] font-[800] tracking-[-0.03em]">{s.title}</h3>
-            <p className="mt-2 text-[15px] leading-[1.65] text-[#5b6370]">{s.body}</p>
-          </li>
-        ))}
-      </ol>
+      <FlowSteps steps={processSteps} />
     </section>
   );
 }

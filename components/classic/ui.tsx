@@ -29,8 +29,8 @@ export function PageHead({ title, trail = [] }: { title: string; trail?: { href:
                 <Home size={15} aria-hidden />
               </Link>
             </li>
-            {trail.map((t) => (
-              <li key={t.href} className="inline-flex items-center gap-1.5">
+            {trail.map((t, i) => (
+              <li key={`${i}-${t.href}`} className="inline-flex items-center gap-1.5">
                 <ChevronRight size={14} aria-hidden />
                 <Link href={t.href} className="hover:text-white">
                   {t.label}
