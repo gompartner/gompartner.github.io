@@ -9,8 +9,8 @@ export const NAVY = "#0f1b3d";
 export const BLUE = "#256ef4";
 
 export const wrap = "mx-auto w-full max-w-[1248px] px-4 md:px-6";
-export const h2 = "text-[30px] font-extrabold leading-[1.25] tracking-[-0.04em] md:text-[44px]";
-export const h3 = "text-[22px] font-extrabold leading-[1.35] tracking-[-0.03em] md:text-[26px]";
+export const h2 = "text-[30px] font-[800] leading-[1.25] tracking-[-0.04em] md:text-[44px]";
+export const h3 = "text-[22px] font-[800] leading-[1.35] tracking-[-0.03em] md:text-[26px]";
 export const more = "inline-flex items-center gap-1 text-[15px] font-bold text-[#5b6370] hover:text-[#15171c]";
 export const btnPrimary = "inline-flex h-12 items-center justify-center rounded-md bg-[#256ef4] px-6 text-[16px] font-bold text-white transition-colors hover:bg-[#0b50d0]";
 export const btnLine = "inline-flex h-12 items-center justify-center rounded-md border border-[#c9cfd8] bg-white px-6 text-[16px] font-bold text-[#15171c] transition-colors hover:border-[#15171c]";
@@ -39,7 +39,7 @@ export function PageHead({ title, trail = [] }: { title: string; trail?: { href:
             ))}
           </ol>
         </nav>
-        <h1 className="mt-5 text-[40px] font-extrabold leading-[1.1] tracking-[-0.05em] md:text-[64px]">{title}</h1>
+        <h1 className="mt-5 text-[40px] font-[800] leading-[1.1] tracking-[-0.05em] md:text-[64px]">{title}</h1>
       </div>
     </section>
   );

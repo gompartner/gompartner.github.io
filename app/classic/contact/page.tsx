@@ -8,7 +8,7 @@ import { pageMeta } from "@/lib/seo";
 
 export const metadata: Metadata = pageMeta({
   title: "상담 신청",
-  description: "만들고 싶은 홈페이지나 고칠 곳을 적어 주시면 확인하고 연락드립니다.",
+  description: "제작하거나 수정할 홈페이지의 업종, 필요한 기능, 희망 일정을 남겨 주시면 검토 뒤 견적서로 회신합니다.",
   path: "/classic/contact",
 });
 
@@ -28,7 +28,7 @@ export default function ClassicContactPage() {
         </section>
 
         <aside aria-labelledby="contact-ready" className="min-w-0 lg:pt-8">
-          <h2 id="contact-ready" className="text-[22px] font-extrabold tracking-[-0.03em]">
+          <h2 id="contact-ready" className="text-[22px] font-[800] tracking-[-0.03em]">
             있으면 좋은 자료
           </h2>
           <ul className="mt-4 border-t-2 border-[#15171c]" role="list">
@@ -41,7 +41,7 @@ export default function ClassicContactPage() {
           </ul>
           <p className="mt-3 text-[15px] leading-[1.6] text-[#5b6370]">자료가 없어도 신청할 수 있습니다.</p>
 
-          <h2 id="contact-steps" className="mt-12 text-[22px] font-extrabold tracking-[-0.03em]">
+          <h2 id="contact-steps" className="mt-12 text-[22px] font-[800] tracking-[-0.03em]">
             진행 절차
           </h2>
           <ol className="mt-4 border-t-2 border-[#15171c]">

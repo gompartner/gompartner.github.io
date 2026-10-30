@@ -54,7 +54,7 @@ export function ClassicPrivacy({ version }: { version: PolicyVersion }) {
           <div className="mt-10 space-y-12">
             {version.sections.map((s) => (
               <section key={s.title}>
-                <h2 className="text-[21px] font-extrabold leading-[1.45] tracking-[-0.03em] md:text-[23px]">{s.title}</h2>
+                <h2 className="text-[21px] font-[800] leading-[1.45] tracking-[-0.03em] md:text-[23px]">{s.title}</h2>
                 <div className="mt-4 space-y-3 text-[17px] leading-[1.7] text-[#3d4450]">
                   {s.body.map((b, i) =>
                     typeof b === "string" ? (
@@ -75,7 +75,7 @@ export function ClassicPrivacy({ version }: { version: PolicyVersion }) {
           </div>
 
           <section className="mt-16 border-t-2 border-[#15171c] pt-6">
-            <h2 className="text-[21px] font-extrabold tracking-[-0.03em]">변경 이력</h2>
+            <h2 className="text-[21px] font-[800] tracking-[-0.03em]">변경 이력</h2>
             <ul className="mt-2" role="list">
               {privacyVersions.map((v) => (
                 <li key={v.id} className="flex flex-col gap-1 border-b border-[#e6e9ee] py-4 text-[16px] md:flex-row md:gap-6">

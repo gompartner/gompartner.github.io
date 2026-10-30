@@ -14,7 +14,7 @@ export function StepList({ steps, title, id }: { steps: Step[]; title: string; i
           {steps.map((s, n) => (
             <li key={s.title} className="border-t-2 border-[#15171c] pt-5">
               <span className="text-[15px] font-bold tabular-nums text-[#256ef4]">{n + 1}단계</span>
-              <p className="mt-2 text-[21px] font-extrabold tracking-[-0.03em]">{s.title}</p>
+              <p className="mt-2 text-[21px] font-[800] tracking-[-0.03em]">{s.title}</p>
               <p className="mt-2 text-[15px] leading-[1.65] text-[#5b6370]">{s.body}</p>
             </li>
           ))}

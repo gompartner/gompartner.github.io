@@ -13,7 +13,7 @@ const programs = demoProjects.filter(isProgram);
 
 export const metadata: Metadata = pageMeta({
   title: "업무 프로그램 제작",
-  description: `업무 프로그램 제작은 별도 견적입니다. ${programs.map((p) => p.category).join(", ")} 카탈로그를 직접 써 볼 수 있습니다.`,
+  description: "주문 취합, 쇼핑몰 관리자, 결과지 출력처럼 엑셀로 하던 반복 업무를 웹 프로그램으로 만듭니다. 견적은 범위 확인 뒤 안내합니다.",
   path: "/classic/program",
 });
 
@@ -36,7 +36,7 @@ export default function ClassicProgramPage() {
             <h2 id="pg-price" className="text-[15px] font-bold text-[#3d4450]">
               금액
             </h2>
-            <p className="mt-1 text-[28px] font-extrabold tracking-[-0.03em] text-[#256ef4] md:text-[34px]">별도 견적</p>
+            <p className="mt-1 text-[28px] font-[800] tracking-[-0.03em] text-[#256ef4] md:text-[34px]">별도 견적</p>
             <p className="mt-1 text-[16px] leading-[1.6] text-[#5b6370]">필요한 화면 수와 사용자 범위를 확인한 뒤 견적과 일정을 안내합니다.</p>
           </div>
         </div>

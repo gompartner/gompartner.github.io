@@ -23,7 +23,7 @@ export function ClassicFooter() {
     <footer className="bg-[#15171c] pb-24 text-[15px] text-[#a3abb8] md:pb-0">
       <div className="mx-auto grid w-full max-w-[1248px] gap-10 px-4 py-14 md:grid-cols-[1.3fr_1fr_1fr] md:px-6 md:py-16">
         <div>
-          <p className="flex items-center gap-2.5 text-[21px] font-extrabold tracking-[-0.04em] text-white">
+          <p className="flex items-center gap-2.5 text-[21px] font-[800] tracking-[-0.04em] text-white">
             <Image src="/images/bear-avatar.webp" alt="" width={32} height={32} className="h-8 w-8 rounded-full object-cover" />
             {profile.name}
           </p>

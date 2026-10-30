@@ -98,7 +98,7 @@ export default async function ClassicSamplePage({ params }: Props) {
         <section aria-labelledby="c-price" className="min-w-0">
           {est ? (
             <>
-              <h2 id="c-price" className="border-b-2 border-[#15171c] pb-3 text-[18px] font-extrabold tracking-[-0.02em]">
+              <h2 id="c-price" className="border-b-2 border-[#15171c] pb-3 text-[18px] font-[800] tracking-[-0.02em]">
                 구성
               </h2>
               <dl className="text-[15px] md:text-[16px]">
@@ -116,7 +116,7 @@ export default async function ClassicSamplePage({ params }: Props) {
             </>
           ) : isMaintenance(p) ? (
             <>
-              <h2 id="c-price" className="border-b-2 border-[#15171c] pb-3 text-[18px] font-extrabold tracking-[-0.02em]">
+              <h2 id="c-price" className="border-b-2 border-[#15171c] pb-3 text-[18px] font-[800] tracking-[-0.02em]">
                 유지보수
               </h2>
               <ul role="list" className="text-[15px] md:text-[16px]">
@@ -129,7 +129,7 @@ export default async function ClassicSamplePage({ params }: Props) {
             </>
           ) : (
             <>
-              <h2 id="c-price" className="border-b-2 border-[#15171c] pb-3 text-[18px] font-extrabold tracking-[-0.02em]">
+              <h2 id="c-price" className="border-b-2 border-[#15171c] pb-3 text-[18px] font-[800] tracking-[-0.02em]">
                 업무 프로그램
               </h2>
               <p className="mt-5 text-[16px] leading-[1.7] text-[#5b6370] md:text-[17px]">필요한 화면 수와 사용자 범위를 확인한 뒤 별도로 견적을 드립니다.</p>

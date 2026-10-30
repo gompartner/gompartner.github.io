@@ -44,13 +44,13 @@ const catalog = [
 // 제작 방식 비교. 남의 서비스는 일반적인 방식만 적고 이름은 쓰지 않는다.
 const compareCols = ["셀프 제작 도구", "대형 제작사", "곰파트너"];
 const compareRows = [
-  { label: "수행 인력", cells: ["운영자가 직접 제작", "영업, 기획, 디자인, 개발 분업", "상담한 개발자가 전 과정 수행"] },
+  { label: "수행 인력", cells: ["운영자가 직접 제작", "영업, 기획, 디자인, 개발 분업", "상담부터 운영까지 한 사람이 담당"] },
   { label: "업종별 법정 고지", cells: ["운영자가 직접 확인", "업체마다 상이", "제작 전 검토 후 반영"] },
   { label: "납품물", cells: ["플랫폼 관리자 계정", "계약서에 명시된 결과물", "원본 소스, 점검 결과표, 인계 문서"] },
   { label: "사후 관리", cells: ["운영자가 직접 대응", "별도 유지보수 계약", "오픈 후 1개월 무상 하자보수"] },
 ];
 
-const h2 = "text-[30px] font-extrabold leading-[1.25] tracking-[-0.04em] md:text-[44px]";
+const h2 = "text-[30px] font-[800] leading-[1.25] tracking-[-0.04em] md:text-[44px]";
 const more = "inline-flex items-center gap-1 text-[15px] font-bold text-[#5b6370] hover:text-[#15171c]";
 
 export function ClassicHome() {
@@ -72,13 +72,12 @@ function Hero() {
     <section aria-labelledby="c-hero" className="text-white" style={{ backgroundColor: NAVY }}>
       <div className="mx-auto grid w-full max-w-[1248px] items-center gap-10 px-4 pb-16 pt-12 md:min-h-[560px] md:grid-cols-[1fr_1.1fr] md:gap-12 md:px-6 md:py-20">
         <div>
-          <p className="text-[15px] font-bold text-[#8fb4ff] md:text-[17px]">웹 개발 사업자 곰파트너</p>
-          <h1 id="c-hero" className="mt-4 break-keep text-[38px] font-extrabold leading-[1.15] tracking-[-0.05em] md:text-[60px]">
-            홈페이지 구축부터
+          <h1 id="c-hero" className="break-keep text-[38px] font-[800] leading-[1.15] tracking-[-0.05em] md:text-[60px]">
+            홈페이지 제작과
             <br />
-            운영과 유지보수까지
+            유지보수
           </h1>
-          <p className="mt-5 max-w-[520px] break-keep text-[17px] leading-[1.7] text-[#c9d3e6] md:text-[19px]">상담한 개발자가 요구사항 확인, 디자인과 개발, 납품, 운영까지 직접 수행합니다.</p>
+          <p className="mt-5 max-w-[520px] break-keep text-[17px] leading-[1.7] text-[#c9d3e6] md:text-[19px]">병원, 매장, 전문직 사무실, 기업, 학원의 홈페이지와 광고 랜딩페이지, 업무 프로그램을 제작합니다. 업종별 법정 고지 검토, 화면과 웹 접근성 점검을 마치고 원본 소스와 인계 문서까지 갖춰 납품합니다.</p>
           <div className="mt-8 flex flex-wrap gap-3">
             <a href="#c-services" className="inline-flex h-12 items-center rounded-md bg-white px-6 text-[16px] font-bold text-[#15171c] transition-colors hover:bg-[#e8efff]">
               서비스 보기
@@ -122,8 +121,8 @@ function Services() {
               data-gtm-cta={`classic_service_${s.href.split("/").pop()}`}
               className="group grid grid-cols-[1fr_auto] items-center gap-x-6 gap-y-1 py-6 md:grid-cols-[minmax(0,360px)_1fr_auto] md:py-8"
             >
-              <span className="col-start-1 row-start-1 text-[24px] font-extrabold tracking-[-0.04em] transition-colors group-hover:text-[#256ef4] md:text-[34px]">{s.name}</span>
-              <span className="col-span-2 col-start-1 row-start-2 text-[16px] text-[#5b6370] md:col-span-1 md:col-start-2 md:row-start-1 md:text-[17px]">{s.what}</span>
+              <h3 className="col-start-1 row-start-1 text-[24px] font-[800] tracking-[-0.04em] transition-colors group-hover:text-[#256ef4] md:text-[34px]">{s.name}</h3>
+              <p className="col-span-2 col-start-1 row-start-2 text-[16px] text-[#5b6370] md:col-span-1 md:col-start-2 md:row-start-1 md:text-[17px]">{s.what}</p>
               <ArrowUpRight
                 size={28}
                 aria-hidden
@@ -150,7 +149,7 @@ function Catalog() {
             <li key={c.key}>
               <Link href={c.href} className="group flex h-full flex-col rounded-md border border-[#d9dee5] bg-white p-6 transition-colors hover:border-[#256ef4]">
                 <span className="flex items-baseline justify-between gap-3">
-                  <span className="text-[20px] font-extrabold tracking-[-0.03em] group-hover:text-[#256ef4] md:text-[22px]">{c.name}</span>
+                  <h3 className="text-[20px] font-[800] tracking-[-0.03em] group-hover:text-[#256ef4] md:text-[22px]">{c.name}</h3>
                   <span className="shrink-0 text-[15px] font-bold tabular-nums text-[#5b6370]">{c.count}개</span>
                 </span>
                 <span className="mt-2 flex-1 text-[15px] leading-[1.6] text-[#5b6370] md:text-[16px]">{c.what}</span>
@@ -176,7 +175,7 @@ function Process() {
         {processSteps.map((s, n) => (
           <li key={s.title} className="border-t-2 border-[#15171c] pt-5">
             <span className="text-[15px] font-bold tabular-nums text-[#256ef4]">{n + 1}단계</span>
-            <p className="mt-2 text-[21px] font-extrabold tracking-[-0.03em]">{s.title}</p>
+            <h3 className="mt-2 text-[21px] font-[800] tracking-[-0.03em]">{s.title}</h3>
             <p className="mt-2 text-[15px] leading-[1.65] text-[#5b6370]">{s.body}</p>
           </li>
         ))}

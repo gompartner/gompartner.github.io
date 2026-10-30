@@ -5,7 +5,7 @@ import { fitDescription } from "@/lib/seo";
 // 클래식 보기의 광고 랜딩페이지 상품 소개와 실제 상담 신청 폼. metadata는 /landing과 같다(검색 제외는 레이아웃이 한다).
 export const metadata: Metadata = {
   title: { absolute: "광고 신청 접수 랜딩페이지 제작 | 곰파트너" },
-  description: fitDescription("광고를 보고 온 사람의 상담 신청을 받는 랜딩페이지를 만듭니다. 신청이 들어오면 바로 알리고, 구글 시트에 통화했는지 계약했는지까지 적고, 광고별 신청과 계약 수를 묶어 보여 드립니다."),
+  description: fitDescription("광고 유입 고객의 상담 신청을 접수하는 랜딩페이지 제작. 접수 즉시 알림, 구글 시트 기록, 광고 채널별 성과 집계를 제공합니다."),
   alternates: { canonical: "/landing" },
   openGraph: {
     title: "광고 신청 접수 랜딩페이지 제작",
