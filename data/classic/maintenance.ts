@@ -59,11 +59,11 @@ export const maintenanceServices: MaintenanceService[] = [
   {
     id: "patch",
     title: "서버 보안 패치",
-    term: "Java, Apache, Tomcat 보안 업데이트",
-    target: "Java(JSP, 스프링) 기반 홈페이지와 Apache, Tomcat, Nginx 웹 서버. 리눅스, 윈도우 서버 모두 지원합니다.",
+    term: "Java, PHP, Apache, Tomcat 보안 업데이트",
+    target: "Java(JSP, 스프링), PHP(그누보드, 워드프레스, 라라벨) 기반 홈페이지와 Apache, Tomcat, Nginx 웹 서버. 리눅스, 윈도우 서버 모두 지원합니다.",
     unit: {
       label: "적용 대상",
-      items: ["JDK(Java) 보안 업데이트, 지원 종료 버전 교체", "Apache HTTP Server, Tomcat 보안 패치와 버전 업그레이드", "OpenSSL, PHP 등 웹 서버 구성 요소 업데이트", "취약점 점검 결과에 나온 웹 서버 설정 조치"],
+      items: ["JDK(Java) 보안 업데이트, 지원 종료 버전 교체", "PHP 보안 업데이트, 지원 종료 버전(5.x, 7.x) 업그레이드와 호환성 점검", "Apache HTTP Server, Tomcat 보안 패치와 버전 업그레이드", "OpenSSL 등 웹 서버 구성 요소 업데이트", "취약점 점검 결과에 나온 웹 서버 설정 조치"],
     },
     does: {
       label: "진행 순서",
@@ -100,7 +100,7 @@ export const maintenanceServices: MaintenanceService[] = [
       label: "인계 점검 결과물",
       items: ["전체 파일, DB 백업 1부", "구성 정리(언어, 버전, 플러그인, 관리자 주소)", "위험 요소 보고서(오래된 버전, 만료일, 쓰지 않는 계정)"],
     },
-    excludes: ["보고서에 나온 문제 고치기(오류 수정이나 월 유지보수로 진행)", "PHP 버전을 올리느라 코드를 고치는 일(별도 견적)", "메일 서버 이전", "아임웹 등 다른 솔루션으로 옮기기(새로 만드는 일이라 제작 패키지로 진행)"],
+    excludes: ["보고서에 나온 문제 고치기(오류 수정이나 월 유지보수로 진행)", "PHP 버전 업그레이드(서버 보안 패치로 진행)", "메일 서버 이전", "아임웹 등 다른 솔루션으로 옮기기(새로 만드는 일이라 제작 패키지로 진행)"],
     notes: ["호스팅 이전은 같은 종류 서버로 파일, DB 옮기기, 도메인 연결 변경, SSL 설치, 주요 화면 점검까지입니다."],
   },
   {
