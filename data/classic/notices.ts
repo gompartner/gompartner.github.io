@@ -21,7 +21,7 @@ export interface Notice {
 export const notices: Notice[] = [
   {
     id: "renewal-2026-10",
-    date: "2026-10-30",
+    date: "2026-10-31",
     title: "메뉴 구성 개선과 견적서 안내 도입",
     summary: "메뉴를 네 묶음으로 정리하고, 첫 화면을 서비스와 진행 절차 중심으로 다시 구성했습니다.",
     sections: [
