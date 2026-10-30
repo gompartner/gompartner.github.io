@@ -3,7 +3,7 @@
 import Image from "next/image";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { ChevronDown, Menu, X } from "lucide-react";
 import { cases } from "@/data/classic/cases";
 import { industries } from "@/data/classic/industries";
@@ -60,8 +60,10 @@ const toggle = "inline-flex h-10 w-10 items-center justify-center rounded-md bor
 export function ClassicHeader() {
   const pathname = usePathname();
   const [open, setOpen] = useState(false);
-  // 터치 기기는 hover가 없어서, 하위 메뉴가 있는 메뉴는 첫 탭에 전체 메뉴를 열고 두 번째 탭에 이동한다
+  // 손가락이나 펜으로 누르면 hover가 없으니, 하위 메뉴가 있는 메뉴는 첫 탭에 전체 메뉴를 열고 두 번째 탭에 이동한다.
+  // 아이패드는 데스크톱 모드나 트랙패드에서 (hover: none)이 거짓으로 나와서, 미디어 쿼리 대신 실제로 누른 입력 종류를 본다
   const [all, setAll] = useState(false);
+  const pointer = useRef("mouse");
   const [prev, setPrev] = useState(pathname);
   if (prev !== pathname) {
     setPrev(pathname);
@@ -111,8 +113,11 @@ export function ClassicHeader() {
                   <li key={m.label} className="relative flex w-[128px] justify-center xl:w-[150px]">
                     <Link
                       href={m.href}
+                      onPointerDown={(e) => {
+                        pointer.current = e.pointerType;
+                      }}
                       onClick={(e) => {
-                        if (m.items.length === 0 || all || !window.matchMedia("(hover: none)").matches) return;
+                        if (m.items.length === 0 || all || pointer.current === "mouse") return;
                         e.preventDefault();
                         setAll(true);
                       }}
