@@ -44,9 +44,10 @@ export default async function ClassicNoticeDetailPage({ params }: Props) {
       <article className={`${wrap} pb-16 pt-10 md:pb-24 md:pt-14`}>
         <header className="border-y-2 border-[#15171c] border-b-[#e6e9ee] py-6 md:border-b">
           <h2 className="break-keep text-[24px] font-[800] leading-[1.4] tracking-[-0.03em] md:text-[30px]">{n.title}</h2>
-          <time dateTime={n.date} className="mt-2 block text-[15px] tabular-nums text-[#6b7280]">
-            {dot(n.date)}
-          </time>
+          <p className="mt-2 flex flex-wrap gap-x-4 gap-y-1 text-[15px] tabular-nums text-[#6b7280]">
+            <time dateTime={n.date}>{dot(n.date)}</time>
+            {n.period && <span>운영 기간 {n.period}</span>}
+          </p>
         </header>
         <div className="space-y-3 py-8 text-[17px] leading-[1.8] text-[#3d4450] md:py-10 md:text-[18px]">
           {n.body.map((p) => (

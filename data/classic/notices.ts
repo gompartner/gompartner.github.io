@@ -1,11 +1,13 @@
 // 공지사항(/classic/notice). 최신 글이 위로 오게 넣는다. 사실만 적는다.
-// date는 게시일이다. 디자인 변천 글은 단계마다 날짜를 적지 않고 차수로만 적는다(10-30 사용자 결정, 날짜를 바꿔 적지 않는다).
+// date는 그 내용이 실제로 적용된 날이다. 디자인 변천 글은 그 디자인을 만들어 운영하기 시작한 날을 쓰고 운영 기간을 같이 적는다(커밋 기록 기준).
 export interface Notice {
   id: string;
   /** 게시일 YYYY-MM-DD */
   date: string;
   title: string;
   body: string[];
+  /** 디자인을 운영한 기간. 예: "2026.07.13 ~ 2026.09.29" */
+  period?: string;
   image?: { src: string; alt: string; note?: string };
 }
 
@@ -13,6 +15,7 @@ export const notices: Notice[] = [
   {
     id: "renewal-2026-10",
     date: "2026-10-30",
+    period: "2026.10.30 ~",
     title: "홈페이지 개편 안내",
     body: [
       "메뉴를 회사소개, 서비스, 카탈로그, 고객지원으로 정리했습니다.",
@@ -24,7 +27,8 @@ export const notices: Notice[] = [
   },
   {
     id: "design-4",
-    date: "2026-10-30",
+    date: "2026-10-22",
+    period: "2026.10.22 ~ 2026.10.29",
     title: "디자인 변천 4차, 회사 홈페이지형",
     body: [
       "서비스, 카탈로그, 가격, 고객지원 메뉴와 내림 메뉴를 갖춘 일반 회사 홈페이지 구성으로 바꿨습니다.",
@@ -35,7 +39,8 @@ export const notices: Notice[] = [
   },
   {
     id: "design-3",
-    date: "2026-10-30",
+    date: "2026-10-14",
+    period: "2026.10.14 ~ 2026.10.21",
     title: "디자인 변천 3차, 웹툰형",
     body: [
       "고객이 홈페이지 때문에 겪는 상황을 네 칸 웹툰으로 보여 주고, 곰 캐릭터가 서비스를 설명하는 구성이었습니다.",
@@ -45,7 +50,8 @@ export const notices: Notice[] = [
   },
   {
     id: "design-2",
-    date: "2026-10-30",
+    date: "2026-09-30",
+    period: "2026.09.30 ~ 2026.10.13",
     title: "디자인 변천 2차, 카탈로그형",
     body: [
       "첫 화면에서 업종별 카탈로그를 바로 넘겨 보고 눌러 볼 수 있게 했습니다.",
@@ -56,7 +62,8 @@ export const notices: Notice[] = [
   },
   {
     id: "design-1",
-    date: "2026-10-30",
+    date: "2026-07-13",
+    period: "2026.07.13 ~ 2026.09.29",
     title: "디자인 변천 1차, 포트폴리오형",
     body: [
       "처음 공개한 사이트는 소개, 포트폴리오, 블로그를 메뉴로 둔 개인 포트폴리오 형식이었습니다.",
