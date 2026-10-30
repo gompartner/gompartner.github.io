@@ -49,7 +49,7 @@ export default async function ClassicIndustryPage({ params }: Props) {
           <p className="mt-6 max-w-[680px] break-keep text-[17px] leading-[1.75] text-[#3d4450]">{ind.description}</p>
         </div>
         <div>
-          <h3 className="border-b-2 border-[#15171c] pb-3 text-[18px] font-[800] tracking-[-0.02em]">많이 넣는 기능</h3>
+          <h3 className="border-b-2 border-[#15171c] pb-3 text-[18px] font-[800] tracking-[-0.02em]">자주 찾는 기능</h3>
           <ul role="list">
             {ind.needs.map((n) => (
               <li key={n} className="flex items-center gap-3 border-b border-[#e6e9ee] py-4 text-[16px] font-bold md:text-[17px]">
