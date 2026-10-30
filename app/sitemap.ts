@@ -1,5 +1,5 @@
 import type { MetadataRoute } from "next";
-import { demoProjects, slugOf } from "@/components/classic/works/samples";
+import { catalogProjects, slugOf } from "@/components/classic/works/samples";
 import { industries } from "@/data/classic/industries";
 import { siteUrl } from "@/lib/site";
 
@@ -9,7 +9,7 @@ export const dynamic = "force-static";
 // 10-22부터 클래식이 기본이라 웹툰과 짝이 있는 페이지는 /classic 주소를 넣고, 웹툰(/story)은 뺀다.
 export default function sitemap(): MetadataRoute.Sitemap {
   const lastModified = new Date();
-  const samples = demoProjects
+  const samples = catalogProjects
     .map((project) => ({
       url: `${siteUrl}/classic/sample/${slugOf(project.demoUrl)}`,
       lastModified,

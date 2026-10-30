@@ -33,7 +33,7 @@ export const classicMenu = [
       { href: "/classic/maintenance", label: "유지보수" },
     ],
   },
-  // 업종(병원, 카페 등)은 카탈로그 화면 안의 탭에서 고른다. 메뉴는 서비스와 같은 네 분류만 둔다
+  // 업종(병원, 카페 등)은 카탈로그 화면 안의 탭에서 고른다. 카탈로그는 홈페이지 제작과 랜딩만(10-30)
   {
     label: "카탈로그",
     href: "/classic/works",
@@ -41,8 +41,6 @@ export const classicMenu = [
     items: [
       { href: "/classic/works", label: "업종별 홈페이지" },
       { href: "/classic/works/landing", label: "광고 랜딩페이지" },
-      { href: "/classic/works/program", label: "업무 프로그램" },
-      { href: "/classic/works/maintenance", label: "유지보수" },
     ],
   },
   // 고객 사례는 실제 사례가 생기면 data/classic/cases.ts에 넣는 순간 메뉴에 나온다
