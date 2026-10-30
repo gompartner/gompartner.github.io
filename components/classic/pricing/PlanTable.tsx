@@ -86,7 +86,7 @@ export function PlanTable({ plans, product, ctaPrefix }: { plans: Plan[]; produc
           {samples.some((s) => s.length > 0) && (
             <tr className="border-b border-[#e6e9ee]">
               <th scope="row" className={th}>
-                샘플
+                카탈로그
               </th>
               {samples.map((list, i) => (
                 <td key={plans[i].id} className={td}>

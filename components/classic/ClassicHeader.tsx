@@ -27,11 +27,11 @@ export const classicMenu = [
     ],
   },
   {
-    label: "샘플",
+    label: "카탈로그",
     href: "/classic/works",
     match: ["/classic/works", "/classic/sample"],
     items: [
-      { href: "/classic/works", label: "전체 샘플" },
+      { href: "/classic/works", label: "전체 카탈로그" },
       ...industries.map((i) => ({ href: `/classic/works/${i.slug}`, label: i.label })),
       { href: "/classic/works/landing", label: "랜딩페이지" },
       { href: "/classic/works/maintenance", label: "유지보수" },

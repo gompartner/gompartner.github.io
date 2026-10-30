@@ -13,7 +13,7 @@ const programs = demoProjects.filter(isProgram);
 
 export const metadata: Metadata = pageMeta({
   title: "업무 프로그램 제작",
-  description: `업무 프로그램 제작은 별도 견적입니다. ${programs.map((p) => p.category).join(", ")} 샘플을 직접 써 볼 수 있습니다.`,
+  description: `업무 프로그램 제작은 별도 견적입니다. ${programs.map((p) => p.category).join(", ")} 카탈로그를 직접 써 볼 수 있습니다.`,
   path: "/classic/program",
 });
 
@@ -50,7 +50,7 @@ export default function ClassicProgramPage() {
       <section id="samples" aria-labelledby="pg-samples" className={section}>
         <div className={`${wrap} py-16 md:py-24`}>
           <h2 id="pg-samples" className={h2}>
-            샘플
+            카탈로그
           </h2>
           <div className="mt-10">
             <SampleGrid items={programs} cols={3} />

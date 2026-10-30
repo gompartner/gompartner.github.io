@@ -13,7 +13,7 @@ import { ClassicOwnerPreview } from "./ClassicOwnerPreview";
 
 /*
   클래식 보기의 광고 랜딩페이지 상품 소개. /landing(웹툰)과 내용은 같고 모양만 에이전시형이다.
-  순서: 첫 화면(남색 배너 + 실제 샘플 캡처) -> 이럴 때 -> 신청 접수 화면 -> 패키지 -> 샘플 -> 자주 묻는 질문 -> 상담 신청 폼.
+  순서: 첫 화면(남색 배너 + 실제 카탈로그 캡처) -> 이럴 때 -> 신청 접수 화면 -> 패키지 -> 카탈로그 -> 자주 묻는 질문 -> 상담 신청 폼.
   패키지 표에서 고르면 폼의 관심 패키지에 그대로 들어간다.
 */
 
@@ -95,7 +95,7 @@ function Hero({ onApply }: { onApply: () => void }) {
               상담 신청
             </button>
             <a href="#samples" className="inline-flex h-12 items-center rounded-md border border-white/40 px-6 text-[16px] font-bold text-white transition-colors hover:bg-white/10">
-              샘플
+              카탈로그
             </a>
           </div>
         </div>
@@ -232,7 +232,7 @@ function Plans({ onPick }: { onPick: (planId: string) => void }) {
               </tr>
               <tr className="border-b border-[#e6e9ee]">
                 <th scope="row" className={th}>
-                  이 패키지로 만든 샘플
+                  이 패키지로 만든 카탈로그
                 </th>
                 {samples.map((items, i) => (
                   <td key={landingPlans[i].id} className={td}>
@@ -297,7 +297,7 @@ function Samples() {
       <div className={`${wrap} py-16 md:py-24`}>
         <div className="flex flex-wrap items-end justify-between gap-4">
           <h2 id="samples-title" className={h2}>
-            샘플
+            카탈로그
           </h2>
           <Link href="/classic/works" className={more}>
             더보기 <Plus size={15} strokeWidth={2.5} aria-hidden />

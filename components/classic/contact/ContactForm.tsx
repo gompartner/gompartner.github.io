@@ -69,7 +69,7 @@ export function ContactForm() {
     const q = new URLSearchParams(window.location.search);
     // 시트 칸은 /landing 폼과 같아서, 더한 항목은 문의 내용 앞에 줄로 붙인다
     const extra = [
-      sample.trim() && `참고 샘플: ${sample.trim()}`,
+      sample.trim() && `참고 카탈로그: ${sample.trim()}`,
       budget && `예산: ${budget}`,
       openDate.trim() && `희망 오픈일: ${openDate.trim()}`,
       currentSite.trim() && `지금 홈페이지: ${currentSite.trim()}`,
@@ -219,9 +219,9 @@ export function ContactForm() {
 
       <div>
         <label htmlFor="cc-sample" className={label}>
-          참고 샘플 <span className={opt}>(선택)</span>
+          참고 카탈로그 <span className={opt}>(선택)</span>
         </label>
-        <input id="cc-sample" value={sample} onChange={(e) => setSample(e.target.value)} placeholder="샘플 이름이나 참고 사이트 주소" className={field} />
+        <input id="cc-sample" value={sample} onChange={(e) => setSample(e.target.value)} placeholder="카탈로그 이름이나 참고 사이트 주소" className={field} />
       </div>
 
       <div>
@@ -268,7 +268,7 @@ export function ContactForm() {
             <ChevronDown size={16} className="transition-transform group-open:rotate-180 motion-reduce:transition-none" aria-hidden />
           </summary>
           <ul className="mt-2 space-y-1">
-            <li>수집 항목: 이름, 휴대폰 번호, 회사 또는 상호(업종), 관심 서비스, 예산, 희망 오픈일, 지금 홈페이지 주소, 참고 샘플, 문의 내용, 유입 경로</li>
+            <li>수집 항목: 이름, 휴대폰 번호, 회사 또는 상호(업종), 관심 서비스, 예산, 희망 오픈일, 지금 홈페이지 주소, 참고 카탈로그, 문의 내용, 유입 경로</li>
             <li>이용 목적: 상담 신청 확인 및 회신</li>
             <li>보관 기간: 신청일로부터 1년</li>
             <li>동의를 거부할 수 있으며 거부 시 신청이 제한됩니다.</li>
