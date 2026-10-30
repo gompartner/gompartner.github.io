@@ -37,7 +37,7 @@ export default function ClassicProgramPage() {
               금액
             </h2>
             <p className="mt-1 text-[28px] font-extrabold tracking-[-0.03em] text-[#256ef4] md:text-[34px]">별도 견적</p>
-            <p className="mt-1 text-[16px] leading-[1.6] text-[#5b6370]">화면 수와 쓰는 사람을 듣고 금액과 기간을 알려 드립니다.</p>
+            <p className="mt-1 text-[16px] leading-[1.6] text-[#5b6370]">필요한 화면 수와 사용자 범위를 확인한 뒤 견적과 일정을 안내합니다.</p>
           </div>
           <div className="flex flex-wrap gap-3">
             <Link href="/classic/contact" className={btnPrimary}>

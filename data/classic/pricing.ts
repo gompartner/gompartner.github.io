@@ -27,8 +27,8 @@ export const plans: Plan[] = [
     price: 299_000,
     days: 6,
     revisions: 2,
-    summary: "가게나 병원을 소개하는 홈페이지",
-    includes: ["5쪽 이내", "PC, 모바일 화면", "전화, 지도, 영업시간 안내", "네이버, 구글 검색 등록"],
+    summary: "매장, 병원 등 사업장 소개 중심",
+    includes: ["5쪽 이내", "반응형 화면(PC, 모바일)", "전화, 지도, 영업시간 안내", "네이버, 구글 검색엔진 등록"],
   },
   {
     id: "standard",
@@ -37,8 +37,8 @@ export const plans: Plan[] = [
     price: 490_000,
     days: 9,
     revisions: 3,
-    summary: "문의와 예약 신청을 받는 홈페이지",
-    includes: ["10쪽 이내", "소개 홈페이지 구성 전부", "문의, 예약 신청 폼", "공지, 사진 직접 올리기"],
+    summary: "문의, 예약 접수와 게시물 직접 관리",
+    includes: ["10쪽 이내", "소개 홈페이지 구성 전부", "문의, 예약 신청 폼", "관리자 페이지(공지, 사진 게시)"],
   },
   {
     id: "premium",
@@ -47,8 +47,8 @@ export const plans: Plan[] = [
     price: 990_000,
     days: 12,
     revisions: 4,
-    summary: "예약, 주문 같은 맞춤 기능을 넣은 홈페이지",
-    includes: ["10쪽 이내", "문의, 예약 홈페이지 구성 전부", "맞춤 기능 1개", "업종에 맞춘 첫 화면 디자인"],
+    summary: "예약, 주문 등 업종 맞춤 기능 개발",
+    includes: ["10쪽 이내", "문의, 예약 홈페이지 구성 전부", "맞춤 기능 1개", "업종 맞춤 메인 화면 디자인"],
   },
 ];
 
@@ -60,8 +60,8 @@ export const landingPlans: Plan[] = [
     price: 99_000,
     days: 4,
     revisions: 2,
-    summary: "상담 신청 접수 페이지",
-    includes: ["섹션 5개 이내", "PC, 모바일 화면", "신청 폼과 개인정보 수집 동의", "접수 메일 알림", "구글 시트 자동 저장"],
+    summary: "신청 접수와 즉시 알림",
+    includes: ["섹션 5개 이내", "반응형 화면(PC, 모바일)", "신청 폼과 개인정보 수집 동의", "접수 메일 알림", "구글 시트 자동 저장"],
   },
   {
     id: "landing-standard",
@@ -70,8 +70,8 @@ export const landingPlans: Plan[] = [
     price: 149_000,
     days: 5,
     revisions: 2,
-    summary: "상담 상태 관리 포함",
-    includes: ["섹션 7개 이내", "신청 접수 구성 전부", "문자, 카톡 알림(발송 비용 별도)", "시트에 상담 상태 칸", "같은 번호 중복 표시"],
+    summary: "상담 진행 상태 관리",
+    includes: ["섹션 7개 이내", "신청 접수 구성 전부", "문자, 알림톡 알림(발송 비용 별도)", "시트 상담 상태 관리", "중복 신청 자동 표시"],
   },
   {
     id: "landing-premium",
@@ -80,20 +80,20 @@ export const landingPlans: Plan[] = [
     price: 249_000,
     days: 7,
     revisions: 3,
-    summary: "광고별 신청, 계약 정리 포함",
-    includes: ["섹션 10개 이내", "상담 관리 구성 전부", "30분 넘게 연락 안 한 신청 다시 알림", "광고별 신청, 계약 주간 요약", "네이버, 메타, 구글 광고별 신청 기록", "견적 계산 같은 맞춤 기능 1개"],
+    summary: "광고 채널별 성과 집계",
+    includes: ["섹션 10개 이내", "상담 관리 구성 전부", "30분 미처리 신청 재알림", "광고 채널별 신청, 계약 주간 리포트", "네이버, 메타, 구글 광고별 유입 기록", "견적 계산 같은 맞춤 기능 1개"],
   },
 ];
 
-export const planCommon = ["업종별 필수 표시 확인", "원본 소스 제공", "점검 결과표, 인계 문서", "완료 후 1개월 무상 오류 수정"];
+export const planCommon = ["업종별 법정 고지 검토", "원본 소스 제공", "점검 결과표, 인계 문서", "오픈 후 1개월 무상 하자보수"];
 
 /** 페이지 아래 파란 띠의 상담 안내. 금액과 기간은 상담 뒤에 알린다(10-30). */
-export const contactTitle = "필요한 것을 남겨 주세요";
-export const contactDetail = "업종과 필요한 기능, 원하는 오픈 시기를 상담 신청에 남기시면 견적과 일정을 정리해 보내 드립니다.";
+export const contactTitle = "프로젝트 상담";
+export const contactDetail = "업종, 필요한 기능, 희망 오픈 시기를 남겨 주시면 작업 범위와 일정, 견적을 정리해 회신합니다.";
 
 /** 패키지 금액 밖에서 드는 돈. 숫자는 /tools/hosting-cost(data/hostingPrices.ts) 조사값에서 나온 범위다. */
 export const runningCostNote =
-  "도메인과 호스팅은 고객 명의로 직접 구매한 뒤 계정을 공유하거나 권한을 주시면 됩니다. 비용을 전달해 주시면 대리 구매도 가능합니다. 저렴한 웹호스팅이면 1년 3~4만 원, 아임웹 같은 구독형이면 1년 18~21만 원쯤 듭니다.";
+  "도메인과 호스팅은 고객 명의로 계약하고 관리 권한만 공유받습니다. 요청하시면 대리 구매도 가능합니다. 연간 비용은 일반 웹호스팅 3~4만 원, 아임웹 등 구독형 18~21만 원 수준입니다.";
 
 /** 이 패키지를 바탕으로 만든 샘플(견적 기준). 가격표 카드에 예시로 붙인다. */
 export function samplesForPlan(planId: PlanId | LandingPlanId) {
