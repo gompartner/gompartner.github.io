@@ -36,7 +36,7 @@ export function PlanTable({ plans, product }: { plans: Plan[]; product: string }
             </th>
             {plans.map((p) => (
               <th key={p.id} scope="col" className="px-4 py-5 text-left align-top md:px-6">
-                <span className="block text-[19px] font-extrabold tracking-[-0.03em] md:text-[22px]">{p.title}</span>
+                <span className="block text-[19px] font-[800] tracking-[-0.03em] md:text-[22px]">{p.title}</span>
               </th>
             ))}
           </tr>

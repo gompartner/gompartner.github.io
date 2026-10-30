@@ -16,7 +16,7 @@ import { pageMeta } from "@/lib/seo";
 
 export const metadata: Metadata = pageMeta({
   title: "홈페이지 제작",
-  description: `${plans.map((p) => p.title).join(", ")}. 병원, 전문직 사무실, 학원, 가게, 회사 홈페이지를 업종별 카탈로그를 보고 고를 수 있습니다.`,
+  description: "업종별 홈페이지 제작. 소개, 문의와 예약, 맞춤 기능 세 가지 구성이며 반응형 화면, 검색엔진 등록, 원본 소스를 포함합니다.",
   path: "/classic/homepage",
 });
 
@@ -43,7 +43,7 @@ export default function ClassicHomepagePage() {
       <section aria-labelledby="hp-lead" className={`${wrap} py-12 md:py-16`}>
         <div className="flex flex-col gap-6 border-t-2 border-[#15171c] pt-6 md:flex-row md:items-end md:justify-between">
           <div>
-            <h2 id="hp-lead" className="break-keep text-[26px] font-extrabold leading-[1.35] tracking-[-0.04em] md:text-[34px]">
+            <h2 id="hp-lead" className="break-keep text-[26px] font-[800] leading-[1.35] tracking-[-0.04em] md:text-[34px]">
               검색 노출과 문의 접수까지 고려한 업종별 홈페이지
             </h2>
           </div>
@@ -59,7 +59,7 @@ export default function ClassicHomepagePage() {
             {industries.map((i) => (
               <li key={i.slug} className="border-b border-[#e6e9ee]">
                 <Link href={`/classic/works/${i.slug}`} className="group flex flex-col gap-1 py-5 md:flex-row md:items-center md:gap-8 md:py-6">
-                  <span className="shrink-0 text-[19px] font-extrabold tracking-[-0.03em] group-hover:text-[#256ef4] md:w-[220px] md:text-[21px]">{i.label}</span>
+                  <span className="shrink-0 text-[19px] font-[800] tracking-[-0.03em] group-hover:text-[#256ef4] md:w-[220px] md:text-[21px]">{i.label}</span>
                   <span className="min-w-0 flex-1 text-[16px] leading-[1.6] text-[#5b6370]">{i.needs.join(", ")}</span>
                   <ChevronRight size={20} aria-hidden className="hidden shrink-0 text-[#6b7280] group-hover:text-[#256ef4] md:block" />
                 </Link>

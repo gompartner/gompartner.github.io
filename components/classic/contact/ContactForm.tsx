@@ -112,7 +112,7 @@ export function ContactForm() {
     return (
       <div role="status" className="border-t-2 border-[#15171c] pt-8">
         <p className="text-[15px] font-bold tabular-nums text-[#256ef4]">접수 번호 {status.id}</p>
-        <p className="mt-2 text-[26px] font-extrabold leading-[1.35] tracking-[-0.03em] md:text-[32px]">상담 신청이 접수되었습니다.</p>
+        <p className="mt-2 text-[26px] font-[800] leading-[1.35] tracking-[-0.03em] md:text-[32px]">상담 신청이 접수되었습니다.</p>
         <dl className="mt-8 border-t border-[#e6e9ee] text-[16px]">
           <div className="flex flex-col gap-1 border-b border-[#e6e9ee] py-4 sm:flex-row sm:gap-6">
             <dt className="w-[120px] shrink-0 font-bold text-[#3d4450]">회신</dt>

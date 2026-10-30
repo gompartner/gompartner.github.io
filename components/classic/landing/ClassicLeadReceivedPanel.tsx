@@ -131,7 +131,7 @@ export function ClassicLeadReceivedPanel({
           : { background: "#fff", color: INK, borderColor: INK };
 
   const block = "min-w-0 border-t-2 border-[#15171c] pt-5";
-  const head = "flex items-center gap-2 text-[17px] font-extrabold tracking-[-0.02em]";
+  const head = "flex items-center gap-2 text-[17px] font-[800] tracking-[-0.02em]";
   const td = "border-b border-[#e6e9ee] px-3 py-2.5";
 
   return (

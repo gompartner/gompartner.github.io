@@ -105,7 +105,7 @@ export function ClassicHeader() {
     <header className="fixed inset-x-0 top-0 z-50 bg-white">
       <div className="border-b border-[#e6e9ee]">
         <nav aria-label="주 메뉴" className="mx-auto flex h-16 w-full max-w-[1248px] items-center justify-between gap-6 px-4 md:h-[76px] md:px-6">
-          <Link href="/" className="flex items-center gap-2.5 text-[21px] font-extrabold tracking-[-0.04em] text-[#15171c]">
+          <Link href="/" className="flex items-center gap-2.5 text-[21px] font-[800] tracking-[-0.04em] text-[#15171c]">
             <Image src="/images/bear-avatar.webp" alt="" width={32} height={32} className="h-8 w-8 rounded-full object-cover" />
             곰파트너
           </Link>
@@ -193,7 +193,7 @@ export function ClassicHeader() {
         <div id="classic-menu" className="fixed inset-x-0 bottom-0 top-16 overflow-y-auto bg-white px-4 pb-10 md:top-[77px] lg:hidden">
           {classicMenu.map((m) => (
             <section key={m.label} className="border-b border-[#e6e9ee] py-4">
-              <Link href={m.href} className="text-[18px] font-extrabold tracking-[-0.02em] text-[#15171c]">
+              <Link href={m.href} className="text-[18px] font-[800] tracking-[-0.02em] text-[#15171c]">
                 {m.label}
               </Link>
               {m.items.length > 0 && (

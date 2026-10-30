@@ -6,7 +6,7 @@ import { pageMeta } from "@/lib/seo";
 
 export const metadata: Metadata = pageMeta({
   title: "홈페이지 제작 카탈로그",
-  description: `쇼핑몰, 펜션, 회사, 병원, 학원, 카페 홈페이지와 랜딩페이지 카탈로그 ${demoProjects.length}개. 카탈로그를 직접 눌러 볼 수 있습니다.`,
+  description: `업종별 홈페이지, 광고 랜딩페이지, 업무 프로그램, 유지보수 카탈로그 ${demoProjects.length}개. 실제 동작하는 화면을 직접 체험할 수 있습니다.`,
   path: "/classic/works",
 });
 

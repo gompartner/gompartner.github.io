@@ -7,7 +7,7 @@ import { maintenanceServices, maintenanceSteps, responseTime } from "@/data/clas
 import { pageMeta } from "@/lib/seo";
 
 export const metadata: Metadata = pageMeta({
-  title: "홈페이지 유지보수 비용 (월 관리, 오류 수정)",
+  title: "홈페이지 유지보수 (월 관리, 오류 수정, 인계)",
   description: "월 유지보수, 오류 수정, 다른 업체가 만든 홈페이지 인계 점검, 검색 노출 세팅. 서비스별 업무 범위와 기준을 안내합니다.",
   path: "/classic/maintenance",
 });

@@ -60,7 +60,7 @@ function Hero() {
       <div className="mx-auto grid w-full max-w-[1248px] items-center gap-12 px-4 pb-16 pt-12 md:min-h-[600px] md:grid-cols-[1fr_1.15fr] md:px-6 md:py-20">
         <div>
           <p className="text-[15px] font-bold text-[#8fb4ff] md:text-[17px]">광고 랜딩페이지</p>
-          <h1 id="hero-title" className="mt-4 text-[44px] font-extrabold leading-[1.08] tracking-[-0.05em] md:text-[72px]">
+          <h1 id="hero-title" className="mt-4 text-[44px] font-[800] leading-[1.08] tracking-[-0.05em] md:text-[72px]">
             광고 신청 접수
             <br />
             랜딩페이지 제작
@@ -165,7 +165,7 @@ function Plans() {
                 </th>
                 {landingPlans.map((p) => (
                   <th key={p.id} scope="col" className="px-4 py-5 text-left align-top md:px-6">
-                    <span className="block text-[19px] font-extrabold tracking-[-0.03em] md:text-[22px]">{p.title}</span>
+                    <span className="block text-[19px] font-[800] tracking-[-0.03em] md:text-[22px]">{p.title}</span>
                     <span className="mt-1 block text-[15px] font-normal text-[#5b6370]">{p.summary}</span>
                   </th>
                 ))}

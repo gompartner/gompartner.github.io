@@ -1,5 +1,6 @@
 // 회사소개(/classic/story). 대표 이름, 사진, 경력은 싣지 않고 일하는 원칙만 적는다.
-export const aboutLead = "곰파트너는 홈페이지 구축부터 운영, 유지보수까지 상담한 개발자가 직접 수행하는 웹 개발 사업자입니다.";
+export const aboutTitle = "홈페이지 제작과 유지보수";
+export const aboutLead = "병원, 매장, 전문직 사무실, 기업, 학원의 홈페이지와 광고 랜딩페이지, 업무 프로그램을 제작합니다. 업종별 법정 고지 검토, 화면과 웹 접근성 점검을 마치고 원본 소스와 인계 문서까지 갖춰 납품합니다.";
 
 export const principles = [
   {

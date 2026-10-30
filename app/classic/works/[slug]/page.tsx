@@ -49,7 +49,7 @@ export default async function ClassicIndustryPage({ params }: Props) {
           <p className="mt-6 max-w-[680px] break-keep text-[17px] leading-[1.75] text-[#3d4450]">{ind.description}</p>
         </div>
         <div>
-          <h3 className="border-b-2 border-[#15171c] pb-3 text-[18px] font-extrabold tracking-[-0.02em]">많이 넣는 기능</h3>
+          <h3 className="border-b-2 border-[#15171c] pb-3 text-[18px] font-[800] tracking-[-0.02em]">많이 넣는 기능</h3>
           <ul role="list">
             {ind.needs.map((n) => (
               <li key={n} className="flex items-center gap-3 border-b border-[#e6e9ee] py-4 text-[16px] font-bold md:text-[17px]">
@@ -82,7 +82,7 @@ export default async function ClassicIndustryPage({ params }: Props) {
         {others.map((c) => (
           <div key={c.slug} className="mt-12 first-of-type:mt-8 md:mt-16">
             <div className="flex items-baseline justify-between gap-3 border-b-2 border-[#15171c] pb-4">
-              <h3 className="text-[20px] font-extrabold tracking-[-0.02em] md:text-[24px]">
+              <h3 className="text-[20px] font-[800] tracking-[-0.02em] md:text-[24px]">
                 {c.label} <span className="ml-1 text-[15px] font-bold tabular-nums text-[#5b6370] md:text-[17px]">{c.items.length}개</span>
               </h3>
               <Link href={`/classic/works/${c.slug}`} className="inline-flex shrink-0 items-center gap-0.5 text-[15px] font-bold text-[#256ef4] hover:underline md:text-[16px]">
