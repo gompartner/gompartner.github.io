@@ -59,11 +59,11 @@ export const maintenanceServices: MaintenanceService[] = [
   {
     id: "patch",
     title: "서버 보안 패치",
-    term: "Java, PHP, Apache, Tomcat 보안 업데이트",
-    target: "Java(JSP, 스프링), PHP(그누보드, 워드프레스, 라라벨) 기반 홈페이지와 Apache, Tomcat, Nginx 웹 서버. 리눅스, 윈도우 서버 모두 지원합니다.",
+    term: "Java, PHP, React, Apache, Tomcat 보안 업데이트",
+    target: "Java(JSP, 스프링), PHP(그누보드, 워드프레스, 라라벨), React(Next.js, Node.js) 기반 홈페이지와 Apache, Tomcat, Nginx 웹 서버. 리눅스, 윈도우 서버 모두 지원합니다.",
     unit: {
       label: "적용 대상",
-      items: ["JDK(Java) 보안 업데이트, 지원 종료 버전 교체", "PHP 보안 업데이트, 지원 종료 버전(5.x, 7.x) 업그레이드와 호환성 점검", "Apache HTTP Server, Tomcat 보안 패치와 버전 업그레이드", "OpenSSL 등 웹 서버 구성 요소 업데이트", "취약점 점검 결과에 나온 웹 서버 설정 조치"],
+      items: ["JDK(Java) 보안 업데이트, 지원 종료 버전 교체", "PHP 보안 업데이트, 지원 종료 버전(5.x, 7.x) 업그레이드와 호환성 점검", "React, Next.js 보안 패치, Node.js 지원 종료 버전 업그레이드, npm 패키지 취약점 조치", "Apache HTTP Server, Tomcat 보안 패치와 버전 업그레이드", "OpenSSL 등 웹 서버 구성 요소 업데이트", "취약점 점검 결과에 나온 웹 서버 설정 조치"],
     },
     does: {
       label: "진행 순서",
@@ -91,7 +91,7 @@ export const maintenanceServices: MaintenanceService[] = [
     id: "handover",
     title: "유지보수 인계",
     term: "인계 점검, 호스팅 이전",
-    target: "워드프레스, 그누보드, PHP, Java(JSP), HTML 기반 사이트. 아임웹, 카페24 등 플랫폼 사이트는 관리자 권한을 받아 월 유지보수와 오류 수정으로 지원합니다.",
+    target: "워드프레스, 그누보드, PHP, Java(JSP), React(Next.js), HTML 기반 사이트. 아임웹, 카페24 등 플랫폼 사이트는 관리자 권한을 받아 월 유지보수와 오류 수정으로 지원합니다.",
     unit: {
       label: "준비할 것",
       items: ["고객 명의의 호스팅 관리 계정", "고객 명의의 도메인 관리 계정", "이전 업체와 연락이 닿지 않아도 두 계정이 있으면 인계를 진행합니다."],

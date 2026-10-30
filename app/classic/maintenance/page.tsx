@@ -8,7 +8,7 @@ import { pageMeta } from "@/lib/seo";
 
 export const metadata: Metadata = pageMeta({
   title: "홈페이지 유지보수 (월 관리, 보안 패치, 인증 심사 대응)",
-  description: "월 유지보수, 오류 수정, Java, PHP, Apache, Tomcat 보안 패치, ISMS 웹 영역과 웹 접근성 인증 대응, 인계 점검, 검색 노출 세팅. 서비스별 업무 범위와 기준을 안내합니다.",
+  description: "월 유지보수, 오류 수정, Java, PHP, React, Apache, Tomcat 보안 패치, ISMS 웹 영역과 웹 접근성 인증 대응, 인계 점검, 검색 노출 세팅. 서비스별 업무 범위와 기준을 안내합니다.",
   path: "/classic/maintenance",
 });
 
