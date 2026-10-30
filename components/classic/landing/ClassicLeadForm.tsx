@@ -106,7 +106,7 @@ export const ClassicLeadForm = forwardRef<HTMLElement, { pkg: PackageName | ""; 
   };
 
   return (
-    <section ref={ref} id="apply" aria-labelledby="apply-title" className="scroll-mt-20 border-t border-[#e6e9ee] bg-[#f6f7f9] md:scroll-mt-32">
+    <section ref={ref} id="apply" aria-labelledby="apply-title" className="scroll-mt-20 border-t border-[#e6e9ee] bg-[#f6f7f9] md:scroll-mt-24">
       <div className={`${wrap} grid gap-10 py-16 md:py-24 lg:grid-cols-[minmax(0,360px)_minmax(0,1fr)] lg:gap-16`}>
         <div>
           <h2 id="apply-title" className={h2}>

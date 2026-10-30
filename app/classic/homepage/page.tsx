@@ -26,7 +26,7 @@ const related = plans
   .map((s) => demoProjects.find((p) => p.id === s.id))
   .filter((p) => !!p);
 
-const section = "scroll-mt-20 border-t border-[#e6e9ee] md:scroll-mt-32";
+const section = "scroll-mt-20 border-t border-[#e6e9ee] md:scroll-mt-24";
 
 export default function ClassicHomepagePage() {
   return (

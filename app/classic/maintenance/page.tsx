@@ -112,7 +112,7 @@ export default function ClassicMaintenancePage() {
         ].filter((r) => r !== null);
 
         return (
-          <section key={s.id} id={s.id} aria-labelledby={`${s.id}-title`} className="scroll-mt-20 border-t border-[#e6e9ee] md:scroll-mt-32">
+          <section key={s.id} id={s.id} aria-labelledby={`${s.id}-title`} className="scroll-mt-20 border-t border-[#e6e9ee] md:scroll-mt-24">
             <div className={`${wrap} py-14 md:py-20`}>
               <div className="flex flex-col gap-3 border-b-2 border-[#15171c] pb-5 md:flex-row md:items-end md:justify-between">
                 <h2 id={`${s.id}-title`} className={h3}>
