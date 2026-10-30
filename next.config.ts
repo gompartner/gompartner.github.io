@@ -12,6 +12,8 @@ const nextConfig: NextConfig = {
     optimizePackageImports: ["lucide-react", "framer-motion"],
   },
   poweredByHeader: false,
+  // 같은 와이파이의 휴대폰, 아이패드로 개발 서버를 검수할 때 JS 요청이 403으로 막히지 않게 한다(개발 모드에만 적용)
+  allowedDevOrigins: ["192.168.50.205"],
 };
 
 export default nextConfig;
