@@ -1,6 +1,6 @@
 import type { Metadata } from "next";
 import { Suspense } from "react";
-import { MessageCircle } from "lucide-react";
+import { Check, MessageCircle } from "lucide-react";
 import { ContactForm } from "@/components/classic/contact/ContactForm";
 import { PageHead, btnLine, wrap } from "@/components/classic/ui";
 import { ChannelTalkButton } from "@/components/layout/ChannelTalk";
@@ -12,6 +12,8 @@ export const metadata: Metadata = pageMeta({
   description: "만들고 싶은 홈페이지나 고칠 곳을 적어 주시면 확인하고 연락드립니다.",
   path: "/classic/contact",
 });
+
+const prepare = ["로고", "가게나 제품 사진", "영업시간과 주소", "참고하고 싶은 사이트"];
 
 export default function ClassicContactPage() {
   return (
@@ -26,8 +28,21 @@ export default function ClassicContactPage() {
           </Suspense>
         </section>
 
-        <aside aria-labelledby="contact-steps" className="min-w-0 lg:pt-8">
-          <h2 id="contact-steps" className="text-[22px] font-extrabold tracking-[-0.03em]">
+        <aside aria-labelledby="contact-ready" className="min-w-0 lg:pt-8">
+          <h2 id="contact-ready" className="text-[22px] font-extrabold tracking-[-0.03em]">
+            있으면 좋은 자료
+          </h2>
+          <ul className="mt-4 border-t-2 border-[#15171c]" role="list">
+            {prepare.map((t) => (
+              <li key={t} className="flex gap-2.5 border-b border-[#e6e9ee] py-3.5 text-[16px]">
+                <Check size={18} strokeWidth={2.5} aria-hidden className="mt-[3px] shrink-0 text-[#256ef4]" />
+                {t}
+              </li>
+            ))}
+          </ul>
+          <p className="mt-3 text-[15px] leading-[1.6] text-[#5b6370]">없으면 없는 대로 신청하셔도 됩니다.</p>
+
+          <h2 id="contact-steps" className="mt-12 text-[22px] font-extrabold tracking-[-0.03em]">
             진행 절차
           </h2>
           <ol className="mt-4 border-t-2 border-[#15171c]">
