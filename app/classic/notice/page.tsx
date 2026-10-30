@@ -17,7 +17,7 @@ const dot = (d: string) => d.replaceAll("-", ".");
 export default function ClassicNoticePage() {
   return (
     <>
-      <PageHead title="공지사항" trail={[{ href: "/classic/notice", label: "공지사항" }]} />
+      <PageHead title="공지사항" trail={[{ href: "/classic/notice", label: "고객지원" }, { href: "/classic/notice", label: "공지사항" }]} />
       <SupportTabs current="/classic/notice" />
       <div className={`${wrap} pb-16 pt-10 md:pb-24 md:pt-14`}>
         <p className="mb-4 text-[15px] text-[#5b6370]">

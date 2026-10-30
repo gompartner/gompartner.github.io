@@ -3,6 +3,7 @@ import { Suspense } from "react";
 import { Check } from "lucide-react";
 import { ContactForm } from "@/components/classic/contact/ContactForm";
 import { PageHead, wrap } from "@/components/classic/ui";
+import { SupportTabs } from "@/components/classic/support/SupportTabs";
 import { processSteps } from "@/data/classic/faq";
 import { pageMeta } from "@/lib/seo";
 
@@ -17,7 +18,14 @@ const prepare = ["로고", "사업장 또는 제품 사진", "영업시간과 �
 export default function ClassicContactPage() {
   return (
     <>
-      <PageHead title="상담 신청" trail={[{ href: "/classic/contact", label: "상담 신청" }]} />
+      <PageHead
+        title="상담 신청"
+        trail={[
+          { href: "/classic/notice", label: "고객지원" },
+          { href: "/classic/contact", label: "상담 신청" },
+        ]}
+      />
+      <SupportTabs current="/classic/contact" />
 
       <div className={`${wrap} grid gap-14 py-12 md:py-16 lg:grid-cols-[minmax(0,1fr)_340px] lg:gap-16`}>
         <section aria-label="상담 신청서" className="min-w-0">

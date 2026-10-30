@@ -34,6 +34,7 @@ export default async function ClassicGuideArticlePage({ params }: Props) {
       <PageHead
         title="운영 가이드"
         trail={[
+          { href: "/classic/notice", label: "고객지원" },
           { href: "/classic/guide", label: "운영 가이드" },
           { href: `/classic/guide/${g.slug}`, label: g.title },
         ]}

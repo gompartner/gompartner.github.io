@@ -18,7 +18,7 @@ export default function ClassicGuidePage() {
   const list = [...guides].sort((a, b) => b.published.localeCompare(a.published));
   return (
     <>
-      <PageHead title="운영 가이드" trail={[{ href: "/classic/guide", label: "운영 가이드" }]} />
+      <PageHead title="운영 가이드" trail={[{ href: "/classic/notice", label: "고객지원" }, { href: "/classic/guide", label: "운영 가이드" }]} />
       <SupportTabs current="/classic/guide" />
       <div className={`${wrap} pb-16 pt-10 md:pb-24 md:pt-14`}>
         <p className="mb-4 text-[15px] text-[#5b6370]">

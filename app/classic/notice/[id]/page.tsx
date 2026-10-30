@@ -36,6 +36,7 @@ export default async function ClassicNoticeDetailPage({ params }: Props) {
       <PageHead
         title="공지사항"
         trail={[
+          { href: "/classic/notice", label: "고객지원" },
           { href: "/classic/notice", label: "공지사항" },
           { href: `/classic/notice/${id}`, label: n.title },
         ]}

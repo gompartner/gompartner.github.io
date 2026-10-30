@@ -14,7 +14,7 @@ export const metadata: Metadata = {
 export default function ClassicFaqPage() {
   return (
     <>
-      <PageHead title="자주 묻는 질문" trail={[{ href: "/classic/faq", label: "자주 묻는 질문" }]} />
+      <PageHead title="자주 묻는 질문" trail={[{ href: "/classic/notice", label: "고객지원" }, { href: "/classic/faq", label: "자주 묻는 질문" }]} />
       <SupportTabs current="/classic/faq" />
       <div className={`${wrap} pb-16 pt-10 md:pb-24 md:pt-14`}>
         <ul className="border-t-2 border-[#15171c]" role="list">

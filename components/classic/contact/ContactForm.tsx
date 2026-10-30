@@ -8,7 +8,7 @@ import { profile } from "@/data/classic/profile";
 
 // 클래식 상담 신청 폼. 보내는 방식과 필드명은 /landing 폼과 같다(같은 Apps Script 시트에 쌓인다).
 
-export const SERVICES = ["광고 랜딩페이지", "홈페이지 제작", "유지보수", "업무 프로그램", "잘 모르겠음"] as const;
+export const SERVICES = ["홈페이지 제작", "광고 랜딩페이지", "업무 프로그램", "유지보수", "잘 모르겠음"] as const;
 export const BUDGETS = ["30만 원 안쪽", "30~50만 원", "50~100만 원", "100만 원 넘음", "협의"] as const;
 
 const PHONE_RE = /^01[016789]-?\d{3,4}-?\d{4}$/;
