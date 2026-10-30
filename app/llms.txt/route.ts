@@ -1,11 +1,9 @@
 import { faq } from "@/data/classic/faq";
-import { guides } from "@/data/guides";
 import { maintenanceServices } from "@/data/classic/maintenance";
 import { industries } from "@/data/industries";
 import { landingPlans, planCommon, plans } from "@/data/classic/pricing";
 import { profile } from "@/data/profile";
 import { projects } from "@/data/projects";
-import { tools } from "@/data/tools";
 import { siteUrl } from "@/lib/site";
 
 export const dynamic = "force-static";
@@ -26,7 +24,6 @@ export function GET() {
 - 크몽 서비스: https://kmong.com/gig/796239
 - 평일 사장님 IT 숏츠: https://www.youtube.com/@gompartner, https://clip.naver.com/@gompartner, https://www.instagram.com/gompartner.co.kr
 - 블로그: https://blog.naver.com/gompartner (사장님 IT 정보)
-- 가이드: ${siteUrl}/guide (업체 고르기, 비용, PHP 취약점, 배포 오류)
 
 ## 홈페이지 제작 패키지
 
@@ -55,14 +52,6 @@ ${projects.filter((p) => p.demoUrl.startsWith("/demo/")).map(demoLine).join("\n"
 ## 자주 묻는 질문
 
 ${faq.map((f) => `- ${f.q} ${f.a}`).join("\n")}
-
-## 가이드
-
-${guides.map((g) => `- [${g.title}](${url(`/guide/${g.slug}`)}): ${g.description}`).join("\n")}
-
-## 무료 도구
-
-${tools.map((t) => `- [${t.title}](${url(t.href)}): ${t.description}`).join("\n")}
 
 ## Optional
 

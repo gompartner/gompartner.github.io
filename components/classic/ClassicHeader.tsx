@@ -49,12 +49,11 @@ export const classicMenu = [
   ...(cases.length > 0 ? [{ label: "고객 사례", href: "/classic/cases", match: ["/classic/cases"], items: [] }] : []),
   {
     label: "고객지원",
-    href: "/classic/faq",
-    match: ["/classic/faq", "/classic/guide", "/classic/tools", "/classic/privacy"],
+    href: "/classic/notice",
+    match: ["/classic/notice", "/classic/faq", "/classic/privacy"],
     items: [
+      { href: "/classic/notice", label: "공지사항" },
       { href: "/classic/faq", label: "자주 묻는 질문" },
-      { href: "/classic/guide", label: "가이드" },
-      { href: "/classic/tools", label: "자료실" },
     ],
   },
 ];
