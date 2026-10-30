@@ -114,7 +114,7 @@ export function ClassicPriceCalculator() {
               ))}
               {discount > 0 && (
                 <div className="flex justify-between gap-3 border-b border-[#e6e9ee] py-2.5 font-bold text-[#256ef4]">
-                  <dt>오픈 할인</dt>
+                  <dt>샘플 기능 재사용 할인</dt>
                   <dd className="tabular-nums">-{formatWon(discount)}</dd>
                 </div>
               )}
@@ -131,7 +131,7 @@ export function ClassicPriceCalculator() {
               <input type="checkbox" checked={reuse} onChange={(e) => setReuse(e.target.checked)} className="mt-1 size-4 shrink-0 accent-[#256ef4]" />
               <span>
                 <b>샘플에 있는 기능을 그대로 사용</b>
-                <span className="block text-[#5b6370]">추가 기능 금액의 {Math.round(sampleReuseRate * 100)}%를 오픈 할인으로 차감합니다.</span>
+                <span className="block text-[#5b6370]">추가 기능 금액의 {Math.round(sampleReuseRate * 100)}%를 할인합니다.</span>
               </span>
             </label>
             <ChannelTalkButton

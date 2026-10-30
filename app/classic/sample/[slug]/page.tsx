@@ -115,7 +115,7 @@ export default async function ClassicSamplePage({ params }: Props) {
                 ))}
                 {est.discount > 0 && (
                   <div className={`${row} font-bold text-[#256ef4]`}>
-                    <dt>오픈 할인</dt>
+                    <dt>샘플 기능 재사용 할인</dt>
                     <dd className="shrink-0 tabular-nums">-{formatWon(est.discount)}</dd>
                   </div>
                 )}
@@ -125,6 +125,7 @@ export default async function ClassicSamplePage({ params }: Props) {
                 <span className="text-[34px] font-extrabold tabular-nums tracking-[-0.03em] md:text-[40px]">{manwon(est.total)}</span>
                 <span className="text-[17px] font-bold text-[#5b6370]">작업 {est.days}일</span>
               </p>
+              {est.discount > 0 && <p className="mt-2 text-[14px] leading-[1.6] text-[#5b6370] md:text-[15px]">이 샘플에 이미 있는 기능은 다시 쓰므로 추가 기능 금액을 절반만 받습니다.</p>}
             </>
           ) : isMaintenance(p) ? (
             <>

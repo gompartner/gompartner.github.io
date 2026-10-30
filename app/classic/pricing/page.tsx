@@ -6,7 +6,7 @@ import { PlanTable } from "@/components/classic/pricing/PlanTable";
 import { StepList } from "@/components/classic/pricing/StepList";
 import { PageHead, btnLine, btnPrimary, h2, more, wrap } from "@/components/classic/ui";
 import { ChannelTalkButton } from "@/components/layout/ChannelTalk";
-import { processSteps } from "@/data/classic/faq";
+import { paymentFaq, processSteps } from "@/data/classic/faq";
 import { maintenanceServices } from "@/data/classic/maintenance";
 import { addons, formatWon, landingPlans, manwon, plans, previewDetail, previewPromise, runningCostNote } from "@/data/classic/pricing";
 import { pageMeta } from "@/lib/seo";
@@ -181,6 +181,22 @@ export default function ClassicPricingPage() {
               샘플 보기
             </Link>
           </div>
+        </div>
+      </section>
+
+      <section id="payment" aria-labelledby="payment-title" className={section}>
+        <div className={`${wrap} py-16 md:py-24`}>
+          <h2 id="payment-title" className={h2}>
+            결제와 환불
+          </h2>
+          <dl className="mt-10 border-t-2 border-[#15171c]">
+            {paymentFaq.map((f) => (
+              <div key={f.q} className="grid gap-2 border-b border-[#e6e9ee] py-5 md:grid-cols-[280px_1fr] md:gap-8 md:py-6">
+                <dt className="text-[17px] font-bold md:text-[18px]">{f.q}</dt>
+                <dd className="text-[16px] leading-[1.7] text-[#3d4450] md:text-[17px]">{f.a}</dd>
+              </div>
+            ))}
+          </dl>
         </div>
       </section>
 
