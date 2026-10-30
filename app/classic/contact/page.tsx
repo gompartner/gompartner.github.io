@@ -1,9 +1,8 @@
 import type { Metadata } from "next";
 import { Suspense } from "react";
-import { Check, MessageCircle } from "lucide-react";
+import { Check } from "lucide-react";
 import { ContactForm } from "@/components/classic/contact/ContactForm";
-import { PageHead, btnLine, wrap } from "@/components/classic/ui";
-import { ChannelTalkButton } from "@/components/layout/ChannelTalk";
+import { PageHead, wrap } from "@/components/classic/ui";
 import { processSteps } from "@/data/classic/faq";
 import { pageMeta } from "@/lib/seo";
 
@@ -56,10 +55,6 @@ export default function ClassicContactPage() {
               </li>
             ))}
           </ol>
-          <ChannelTalkButton cta="classic_contact_aside_chat" className={`${btnLine} mt-6 w-full gap-2`}>
-            <MessageCircle size={18} aria-hidden />
-            채팅 상담
-          </ChannelTalkButton>
         </aside>
       </div>
     </>

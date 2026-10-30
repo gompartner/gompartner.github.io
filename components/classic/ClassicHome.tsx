@@ -4,7 +4,6 @@ import Image from "next/image";
 import Link from "next/link";
 import { useEffect, useState } from "react";
 import { ArrowUpRight, ChevronDown, ChevronLeft, ChevronRight, Pause, Play, Plus } from "lucide-react";
-import { ChannelTalkButton } from "@/components/layout/ChannelTalk";
 import { industries } from "@/data/classic/industries";
 import { faq, processSteps } from "@/data/classic/faq";
 import { projects } from "@/data/classic/projects";
@@ -20,7 +19,6 @@ import { cn } from "@/lib/utils";
 // 큰 배너 슬라이드(실제 샘플 화면), 상황별 진입, 서비스, 업종별 샘플, 진행 절차, 다른 방법과 비교, 가이드와 자료실, 자주 묻는 질문, 문의 띠배너.
 // 내용은 클래식 전용 데이터(data/classic)를 쓴다. 웹툰 쪽과 따로 고친다.
 
-const INK = "#15171c";
 const NAVY = "#0f1b3d";
 const BLUE = "#256ef4";
 
@@ -126,13 +124,6 @@ function Hero() {
                 >
                   샘플 보기
                 </Link>
-                <ChannelTalkButton
-                  cta={`classic_hero_chat_${s.id}`}
-                  message={`${s.project.title} 샘플을 보고 문의합니다.`}
-                  className="inline-flex h-12 items-center rounded-md border border-white/40 px-6 text-[16px] font-bold text-white transition-colors hover:bg-white/10"
-                >
-                  채팅 상담
-                </ChannelTalkButton>
               </div>
             </div>
           ))}
@@ -488,9 +479,6 @@ function Band() {
           <p className="mt-3 text-[16px] leading-[1.65] text-white md:text-[17px]">{previewDetail}</p>
         </div>
         <div className="flex shrink-0 flex-wrap gap-3">
-          <ChannelTalkButton cta="classic_band_chat" className="inline-flex h-14 items-center rounded-md bg-white px-7 text-[17px] font-bold" >
-            <span style={{ color: INK }}>채팅 상담</span>
-          </ChannelTalkButton>
           <Link href="/classic/contact" data-gtm-cta="classic_band_contact" className="inline-flex h-14 items-center rounded-md border border-white/60 px-7 text-[17px] font-bold hover:bg-white/10">
             상담 신청
           </Link>

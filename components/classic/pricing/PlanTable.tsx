@@ -1,6 +1,5 @@
 import Link from "next/link";
 import { Check } from "lucide-react";
-import { ChannelTalkButton } from "@/components/layout/ChannelTalk";
 import { formatWon, manwon, planCommon, samplesForPlan, type Plan } from "@/data/classic/pricing";
 import { projects } from "@/data/classic/projects";
 
@@ -135,13 +134,9 @@ export function PlanTable({ plans, product, ctaPrefix }: { plans: Plan[]; produc
             </th>
             {plans.map((p) => (
               <td key={p.id} className={td}>
-                <ChannelTalkButton
-                  cta={`${ctaPrefix}_${p.id}`}
-                  message={`${p.title === p.name ? `${product} ${p.name}` : p.title}(${manwon(p.price)}) 패키지로 상담받고 싶어요.`}
-                  className="inline-flex h-11 w-full items-center justify-center rounded-md border border-[#c9cfd8] bg-white px-4 text-[15px] font-bold text-[#15171c] transition-colors hover:border-[#256ef4] hover:text-[#256ef4]"
-                >
+                <Link href="/classic/contact" data-gtm-cta={`${ctaPrefix}_${p.id}`} className="inline-flex h-11 w-full items-center justify-center rounded-md border border-[#c9cfd8] bg-white px-4 text-[15px] font-bold text-[#15171c] transition-colors hover:border-[#256ef4] hover:text-[#256ef4]">
                   이 패키지로 상담
-                </ChannelTalkButton>
+                </Link>
               </td>
             ))}
           </tr>

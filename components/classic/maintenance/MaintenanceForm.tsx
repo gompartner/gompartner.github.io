@@ -1,10 +1,10 @@
 "use client";
 
 import { useEffect, useRef, useState } from "react";
-import { Check, ChevronDown, MessageCircle } from "lucide-react";
-import { ChannelTalkButton } from "@/components/layout/ChannelTalk";
-import { btnLine, h2, wrap } from "@/components/classic/ui";
+import { Check, ChevronDown, Mail } from "lucide-react";
+import { h2, wrap } from "@/components/classic/ui";
 import { LEAD_ENDPOINT } from "@/data/classic/leadEndpoint";
+import { profile } from "@/data/classic/profile";
 import { maintenanceServices } from "@/data/classic/maintenance";
 
 // 유지보수 접수 폼. 보내는 방식과 필드명은 /classic/contact 폼과 같다(같은 Apps Script 시트에 쌓인다).
@@ -116,9 +116,6 @@ export function MaintenanceForm() {
             유지보수 접수
           </h2>
           <p className="mt-4 text-[17px] leading-[1.6] text-[#5b6370]">접수하시면 24시간 이내에 연락드립니다. 오류는 원인을 본 뒤 금액부터 알려 드리고, 동의 전에는 작업하지 않습니다.</p>
-          <ChannelTalkButton cta="classic_maintenance_apply_chat" message="유지보수 상담받고 싶어요." className={`${btnLine} mt-8`}>
-            채팅 상담
-          </ChannelTalkButton>
         </div>
 
         {status.kind === "done" ? (
@@ -132,17 +129,17 @@ export function MaintenanceForm() {
               </div>
               <div className="flex flex-col gap-1 border-b border-[#e6e9ee] py-4 sm:flex-row sm:gap-6">
                 <dt className="w-[120px] shrink-0 font-bold text-[#3d4450]">화면 캡처</dt>
-                <dd>채팅 상담에 접수 번호와 함께 올려 주세요.</dd>
+                <dd>이메일 {profile.email}로 접수 번호와 함께 보내 주세요.</dd>
               </div>
             </dl>
-            <ChannelTalkButton
-              cta="classic_maintenance_done_chat"
-              message={`유지보수 접수 번호 ${status.id} 관련 캡처 보냅니다.`}
+            <a
+              href={`mailto:${profile.email}?subject=${encodeURIComponent(`유지보수 접수 번호 ${status.id} 화면 캡처`)}`}
+              data-gtm-cta="classic_maintenance_done_mail"
               className="mt-8 inline-flex h-12 items-center justify-center gap-2 rounded-md border border-[#c9cfd8] bg-white px-6 text-[16px] font-bold text-[#15171c] transition-colors hover:border-[#15171c]"
             >
-              <MessageCircle size={18} aria-hidden />
-              채팅으로 캡처 보내기
-            </ChannelTalkButton>
+              <Mail size={18} aria-hidden />
+              메일로 캡처 보내기
+            </a>
           </div>
         ) : (
           <form onSubmit={submit} noValidate className="min-w-0 space-y-7 border-t-2 border-[#15171c] bg-white px-4 py-7 min-[360px]:px-5 md:px-8 md:py-9">

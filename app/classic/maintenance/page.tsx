@@ -3,8 +3,7 @@ import { Check, Clock, X } from "lucide-react";
 import { StepList } from "@/components/classic/pricing/StepList";
 import { serviceTabs } from "@/components/classic/pricing/tabs";
 import { MaintenanceForm } from "@/components/classic/maintenance/MaintenanceForm";
-import { PageHead, SubTabs, btnLine, btnPrimary, h3, wrap } from "@/components/classic/ui";
-import { ChannelTalkButton } from "@/components/layout/ChannelTalk";
+import { PageHead, SubTabs, btnPrimary, h3, wrap } from "@/components/classic/ui";
 import { maintenanceServices, maintenanceSteps, responseTime } from "@/data/classic/maintenance";
 import { pageMeta } from "@/lib/seo";
 
@@ -140,9 +139,6 @@ export default function ClassicMaintenancePage() {
                 <a href={`#apply-${s.id}`} className={btnPrimary}>
                   {s.title} 접수
                 </a>
-                <ChannelTalkButton cta={`classic_maintenance_chat_${s.id}`} message={`${s.title} 상담받고 싶어요.`} className={btnLine}>
-                  채팅 상담
-                </ChannelTalkButton>
               </div>
             </div>
           </section>
