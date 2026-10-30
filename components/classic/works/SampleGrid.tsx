@@ -1,7 +1,7 @@
 import Image from "next/image";
 import Link from "next/link";
 import type { Project } from "@/lib/types";
-import { priceLine, slugOf, thumbOf } from "./samples";
+import { slugOf, thumbOf } from "./samples";
 
 // 샘플 카드 격자. 홈 화면 샘플 목록과 같은 모양(썸네일 선 하나, 그림자 없음).
 export function SampleGrid({ items, cols = 4 }: { items: Project[]; cols?: 3 | 4 }) {
@@ -22,7 +22,6 @@ export function SampleGrid({ items, cols = 4 }: { items: Project[]; cols?: 3 | 4
             </span>
             <span className="mt-3 block text-[13px] font-bold text-[#1d5fd6] md:text-[14px]">{p.category}</span>
             <span className="mt-1 block break-keep text-[16px] font-bold leading-[1.4] tracking-[-0.02em] group-hover:underline md:text-[18px]">{p.title}</span>
-            <span className="mt-1 block text-[14px] tabular-nums text-[#5b6370] md:text-[15px]">{priceLine(p)}</span>
           </Link>
         </li>
       ))}

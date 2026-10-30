@@ -5,7 +5,6 @@
 export interface MaintenanceService {
   id: string;
   title: string;
-  price: string;
   term: string;
   target?: string;
   unit?: { label: string; items: string[] };
@@ -29,8 +28,7 @@ export const maintenanceServices: MaintenanceService[] = [
   {
     id: "monthly",
     title: "월 유지보수",
-    price: "월 5만 원(3건), 월 15만 원(6건)",
-    term: "3개월 단위 계약",
+    term: "월 건수 단위, 3개월 단위 계약",
     target: "곰파트너가 만든 홈페이지, 또는 인계 점검을 마친 홈페이지",
     unit: {
       label: "1건 기준",
@@ -40,13 +38,12 @@ export const maintenanceServices: MaintenanceService[] = [
       label: "매달 하는 일",
       items: ["백업 확인 1회", "워드프레스, 그누보드 보안 업데이트 1회", "도메인, SSL, 호스팅 만료 30일 전 알림", "월말 작업 내역 보고"],
     },
-    excludes: ["새 페이지 추가(추가 페이지 3만 원)", "새 기능, 게시판 추가", "디자인 변경(배치, 색, 첫 화면)", "글 작성, 사진 촬영, 번역"],
+    excludes: ["새 페이지 추가", "새 기능, 게시판 추가", "디자인 변경(배치, 색, 첫 화면)", "글 작성, 사진 촬영, 번역"],
     notes: ["남은 건수는 다음 달로 넘어가지 않습니다."],
   },
   {
     id: "fix",
     title: "오류 수정",
-    price: "건당 5만 원부터",
     term: "증상 한 가지가 1건",
     unit: {
       label: "오류의 기준(원래 되던 것이 안 되는 경우)",
@@ -55,15 +52,14 @@ export const maintenanceServices: MaintenanceService[] = [
     does: { label: "하는 일", items: ["원인 확인", "수정", "고친 내용 정리"] },
     excludes: ["해킹, 악성코드 피해 복구", "백업이 없는 데이터 복구", "결제, 문자, 지도 같은 외부 서비스 자체의 장애", "새 기능 요청"],
     notes: [
-      "원인이 복잡하면 비용이 늘어날 수 있습니다. 확인한 뒤 금액을 먼저 안내하고, 동의하시면 진행합니다.",
+      "원인을 확인한 뒤 금액을 먼저 안내하고, 동의하시면 진행합니다.",
       "곰파트너가 만든 홈페이지는 완료 후 1개월 동안 무상으로 고칩니다.",
     ],
   },
   {
     id: "handover",
     title: "유지보수 인계",
-    price: "인계 점검 10만 원, 호스팅 이전 8만 원",
-    term: "인계 점검은 계정을 받은 뒤 5일",
+    term: "인계 점검, 호스팅 이전",
     target: "워드프레스, 그누보드, PHP, HTML로 만든 사이트. 아임웹, 카페24 쇼핑몰처럼 플랫폼에 묶인 사이트는 소스를 받을 수 없어 대상이 아닙니다.",
     unit: {
       label: "준비할 것",
@@ -79,8 +75,7 @@ export const maintenanceServices: MaintenanceService[] = [
   {
     id: "search",
     title: "검색 노출 세팅",
-    price: "5만 원",
-    term: "3일",
+    term: "새로 만드는 홈페이지에는 포함",
     does: {
       label: "하는 일",
       items: ["손님 계정으로 네이버 서치어드바이저, 구글 서치 콘솔 등록", "사이트맵 제출", "첫 화면과 주요 5쪽의 제목, 설명 작성", "2주 뒤 검색 반영 여부 알림"],

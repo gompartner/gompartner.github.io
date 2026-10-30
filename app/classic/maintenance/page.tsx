@@ -9,7 +9,7 @@ import { pageMeta } from "@/lib/seo";
 
 export const metadata: Metadata = pageMeta({
   title: "홈페이지 유지보수 비용 (월 관리, 오류 수정)",
-  description: "월 유지보수 5만 원, 오류 수정 건당 5만 원부터, 다른 업체가 만든 홈페이지 인계 점검 10만 원. 하는 일과 맡지 않는 일을 적었습니다.",
+  description: "월 유지보수, 오류 수정, 다른 업체가 만든 홈페이지 인계 점검, 검색 노출 세팅. 하는 일과 맡지 않는 일을 적었습니다.",
   path: "/classic/maintenance",
 });
 
@@ -27,7 +27,7 @@ export default function ClassicMaintenancePage() {
       <PageHead
         title="유지보수"
         trail={[
-          { href: "/classic/pricing", label: "서비스" },
+          { href: "/classic/landing", label: "서비스" },
           { href: "/classic/maintenance", label: "유지보수" },
         ]}
       />
@@ -38,15 +38,12 @@ export default function ClassicMaintenancePage() {
           서비스 목록
         </h2>
         <div className="-mx-4 overflow-x-auto px-4 md:mx-0 md:px-0">
-          <table className="w-full min-w-[560px] border-collapse border-t-2 border-[#15171c]">
-            <caption className="sr-only">유지보수 서비스와 금액</caption>
+          <table className="w-full min-w-[480px] border-collapse border-t-2 border-[#15171c]">
+            <caption className="sr-only">유지보수 서비스와 기준</caption>
             <thead>
               <tr className="border-b border-[#e6e9ee] bg-[#f6f7f9]">
                 <th scope="col" className={cellTh}>
                   서비스
-                </th>
-                <th scope="col" className={cellTh}>
-                  금액
                 </th>
                 <th scope="col" className={cellTh}>
                   기준
@@ -61,7 +58,6 @@ export default function ClassicMaintenancePage() {
                       {s.title}
                     </a>
                   </th>
-                  <td className={`${cell} font-bold tabular-nums`}>{s.price}</td>
                   <td className={`${cell} text-[#5b6370]`}>{s.term}</td>
                 </tr>
               ))}
@@ -123,8 +119,7 @@ export default function ClassicMaintenancePage() {
                   {s.title}
                 </h2>
                 <div className="md:text-right">
-                  <p className="text-[20px] font-extrabold tabular-nums tracking-[-0.02em] text-[#256ef4] md:text-[24px]">{s.price}</p>
-                  <p className="mt-0.5 text-[15px] text-[#5b6370]">{s.term}</p>
+                  <p className="text-[15px] text-[#5b6370] md:text-[16px]">{s.term}</p>
                 </div>
               </div>
               <dl className="md:grid md:grid-cols-[200px_1fr]">

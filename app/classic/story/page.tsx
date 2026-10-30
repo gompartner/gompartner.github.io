@@ -2,14 +2,14 @@ import type { Metadata } from "next";
 import Image from "next/image";
 import Link from "next/link";
 import { channels } from "@/components/classic/ClassicFooter";
-import { PageHead, btnLine, btnPrimary, h2, wrap } from "@/components/classic/ui";
+import { PageHead, btnPrimary, h2, wrap } from "@/components/classic/ui";
 import { aboutLead, principles } from "@/data/classic/about";
 import { profile } from "@/data/classic/profile";
 import { pageMeta } from "@/lib/seo";
 
 export const metadata: Metadata = pageMeta({
   title: "곰파트너 이야기",
-  description: `${aboutLead} 가격 먼저 공개, 결제 전 첫 화면, 원본 소스 제공, 한 달 무료 수정. 곰파트너가 일하는 원칙입니다.`,
+  description: `${aboutLead} 원본 소스 제공, 한 달 무료 수정. 곰파트너가 일하는 원칙입니다.`,
   path: "/classic/story",
 });
 
@@ -94,9 +94,6 @@ export default function ClassicStoryPage() {
             <div className="mt-8 flex flex-wrap gap-3">
               <Link href="/classic/contact" className={btnPrimary}>
                 상담 신청
-              </Link>
-              <Link href="/classic/pricing" className={btnLine}>
-                가격 보기
               </Link>
             </div>
           </div>

@@ -5,7 +5,7 @@ import { cases } from "@/data/classic/cases";
 import { pageMeta } from "@/lib/seo";
 
 export const metadata: Metadata = {
-  ...pageMeta({ title: "고객 사례", description: "곰파트너가 만든 고객 홈페이지와 맡긴 이유, 걸린 기간과 비용입니다.", path: "/classic/cases" }),
+  ...pageMeta({ title: "고객 사례", description: "곰파트너가 만든 고객 홈페이지와 맡긴 이유와 만든 것입니다.", path: "/classic/cases" }),
   // 사례가 쌓이기 전까지는 검색에 내보내지 않는다
   robots: { index: false, follow: true },
 };
@@ -29,10 +29,6 @@ export default function ClassicCasesPage() {
               <div>
                 <dt className={dt}>이렇게 만들었어요</dt>
                 <dd className="mt-0.5">{c.made}</dd>
-              </div>
-              <div>
-                <dt className={dt}>기간과 비용</dt>
-                <dd className="mt-0.5 tabular-nums">{c.term}</dd>
               </div>
             </dl>
             {c.quote && <p className="mt-4 bg-[#f4f6f9] px-4 py-3 text-[16px] font-bold leading-[1.6]">{c.quote}</p>}

@@ -6,7 +6,7 @@ import { Check, Plus } from "lucide-react";
 import { PageHead, btnLine, btnPrimary, h2, h3, more, wrap } from "@/components/classic/ui";
 import { SampleGrid } from "@/components/classic/works/SampleGrid";
 import { demoProjects, findBySlug, groupOf, industryOf, isMaintenance, mobileShotOf, samplesIn, slugOf } from "@/components/classic/works/samples";
-import { estimateFor, formatWon, manwon } from "@/data/classic/pricing";
+import { estimateFor } from "@/data/classic/pricing";
 import { maintenanceServices } from "@/data/classic/maintenance";
 import { pageMeta } from "@/lib/seo";
 
@@ -103,51 +103,39 @@ export default async function ClassicSamplePage({ params }: Props) {
               </h2>
               <dl className="text-[15px] md:text-[16px]">
                 <div className={row}>
-                  <dt>{est.plan.title}</dt>
-                  <dd className="shrink-0 tabular-nums">{formatWon(est.plan.price)}</dd>
+                  <dt>기준 패키지</dt>
+                  <dd className="min-w-0 text-right font-bold">{est.plan.title}</dd>
                 </div>
-                {est.lines.map((l) => (
-                  <div key={l.name} className={row}>
-                    <dt className="min-w-0">{l.name}</dt>
-                    <dd className="shrink-0 tabular-nums">{formatWon(l.amount)}</dd>
-                  </div>
-                ))}
-                {est.discount > 0 && (
-                  <div className={`${row} font-bold text-[#256ef4]`}>
-                    <dt>샘플 기능 재사용 할인</dt>
-                    <dd className="shrink-0 tabular-nums">-{formatWon(est.discount)}</dd>
+                {est.lines.length > 0 && (
+                  <div className={row}>
+                    <dt className="shrink-0">더하는 기능</dt>
+                    <dd className="min-w-0 text-right font-bold">{est.lines.map((l) => l.name).join(", ")}</dd>
                   </div>
                 )}
               </dl>
-              <p className="mt-5 flex flex-wrap items-baseline gap-x-3 gap-y-1">
-                {est.discount > 0 && <s className="text-[17px] font-bold tabular-nums text-[#6b7280]">{manwon(est.list)}</s>}
-                <span className="text-[34px] font-extrabold tabular-nums tracking-[-0.03em] md:text-[40px]">{manwon(est.total)}</span>
-                <span className="text-[17px] font-bold text-[#5b6370]">작업 {est.days}일</span>
-              </p>
-              {est.discount > 0 && <p className="mt-2 text-[14px] leading-[1.6] text-[#5b6370] md:text-[15px]">이 샘플에 이미 있는 기능은 다시 쓰므로 추가 기능 금액을 절반만 받습니다.</p>}
             </>
           ) : isMaintenance(p) ? (
             <>
               <h2 id="c-price" className="border-b-2 border-[#15171c] pb-3 text-[18px] font-extrabold tracking-[-0.02em]">
                 유지보수
               </h2>
-              <dl className="text-[15px] md:text-[16px]">
+              <ul role="list" className="text-[15px] md:text-[16px]">
                 {maintenanceServices.map((s) => (
-                  <div key={s.id} className={row}>
-                    <dt className="shrink-0">{s.title}</dt>
-                    <dd className="min-w-0 text-right font-bold">{s.price}</dd>
-                  </div>
+                  <li key={s.id} className={`${row} font-bold`}>
+                    {s.title}
+                  </li>
                 ))}
-              </dl>
+              </ul>
             </>
           ) : (
             <>
               <h2 id="c-price" className="border-b-2 border-[#15171c] pb-3 text-[18px] font-extrabold tracking-[-0.02em]">
                 업무 프로그램
               </h2>
-              <p className="mt-5 text-[34px] font-extrabold tracking-[-0.03em] md:text-[40px]">별도 견적</p>
+              <p className="mt-5 text-[16px] leading-[1.7] text-[#5b6370] md:text-[17px]">필요한 화면 수와 쓰는 사람을 듣고 따로 견적을 드립니다.</p>
             </>
           )}
+          <p className="mt-5 text-[15px] leading-[1.65] text-[#5b6370] md:text-[16px]">금액과 일정은 상담 신청을 받은 뒤 정리해 보내 드립니다.</p>
 
           <div className="mt-8 grid gap-3">
             <Link href={p.demoUrl} prefetch={false} data-gtm-cta={`classic_sample_open_${p.id}`} className={btnPrimary}>

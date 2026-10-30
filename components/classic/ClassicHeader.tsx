@@ -38,7 +38,6 @@ export const classicMenu = [
       { href: "/classic/works/program", label: "업무 프로그램" },
     ],
   },
-  { label: "가격", href: "/classic/pricing", match: ["/classic/pricing"], items: [] },
   // 고객 사례는 실제 사례가 생기면 data/classic/cases.ts에 넣는 순간 메뉴에 나온다
   ...(cases.length > 0 ? [{ label: "고객 사례", href: "/classic/cases", match: ["/classic/cases"], items: [] }] : []),
   { label: "곰파트너 이야기", href: "/classic/story", match: ["/classic/story"], items: [] },
