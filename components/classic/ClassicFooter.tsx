@@ -9,6 +9,7 @@ const menu = [
   { href: "/classic/works", label: "카탈로그" },
   { href: "/classic/faq", label: "자주 묻는 질문" },
   { href: "/classic/notice", label: "공지사항" },
+  { href: "/classic/guide", label: "운영 가이드" },
   { href: "/classic/contact", label: "상담 신청" },
 ];
 export const channels = [

@@ -81,7 +81,8 @@ function Block({ b, look }: { b: GuideBlock; look: Look }) {
   );
 }
 
-export function GuideBody({ guide, look }: { guide: Guide; look: Look }) {
+/** meta=false면 날짜 줄을 숨긴다(클래식 운영 가이드는 게시판 머리에 날짜가 따로 있다). */
+export function GuideBody({ guide, look, meta = true }: { guide: Guide; look: Look; meta?: boolean }) {
   const jsonLd = {
     "@context": "https://schema.org",
     "@type": "Article",
@@ -96,9 +97,11 @@ export function GuideBody({ guide, look }: { guide: Guide; look: Look }) {
   };
   return (
     <article className="max-w-[760px]">
-      <p className="text-[15px] text-foreground-tertiary">
-        <time dateTime={guide.updated}>{guide.updated.replaceAll("-", ".")}</time> 곰파트너
-      </p>
+      {meta && (
+        <p className="text-[15px] text-foreground-tertiary">
+          <time dateTime={guide.updated}>{guide.updated.replaceAll("-", ".")}</time> 곰파트너
+        </p>
+      )}
       {guide.image && (
         // 구글 디스커버는 가로 1200px 이상 대표 이미지를 본문과 og:image에서 같이 본다.
         <Image src={guide.image.src} alt={guide.image.alt} width={1200} height={675} priority className="mt-5 h-auto w-full" />

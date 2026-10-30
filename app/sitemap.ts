@@ -2,6 +2,7 @@ import type { MetadataRoute } from "next";
 import { catalogProjects, slugOf } from "@/components/classic/works/samples";
 import { industries } from "@/data/classic/industries";
 import { notices } from "@/data/classic/notices";
+import { guides } from "@/data/classic/guides";
 import { siteUrl } from "@/lib/site";
 
 export const dynamic = "force-static";
@@ -31,7 +32,7 @@ export default function sitemap(): MetadataRoute.Sitemap {
       changeFrequency: "monthly" as const,
       priority: 0.9,
     },
-    ...["/classic/works", "/classic/homepage", "/classic/story", "/classic/maintenance", "/classic/program", "/classic/notice", "/classic/faq", "/classic/contact", "/classic/privacy", ...industries.map((i) => `/classic/works/${i.slug}`), ...notices.map((n) => `/classic/notice/${n.id}`)].map((path) => ({
+    ...["/classic/works", "/classic/homepage", "/classic/story", "/classic/maintenance", "/classic/program", "/classic/notice", "/classic/faq", "/classic/contact", "/classic/privacy", ...industries.map((i) => `/classic/works/${i.slug}`), ...notices.map((n) => `/classic/notice/${n.id}`), "/classic/guide", ...guides.map((g) => `/classic/guide/${g.slug}`)].map((path) => ({
       url: `${siteUrl}${path}`,
       lastModified,
       changeFrequency: "monthly" as const,
