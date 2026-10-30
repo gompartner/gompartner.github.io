@@ -13,6 +13,8 @@ import { cn } from "@/lib/utils";
 
 // match는 그 메뉴를 켜는 주소. 한 주소가 두 메뉴를 켜지 않게 겹치지 않게 둔다.
 export const classicMenu = [
+  // 10-30 회사 홈페이지 순서로 소개를 맨 앞에 둔다
+  { label: "곰파트너 이야기", href: "/classic/story", match: ["/classic/story"], items: [] },
   {
     label: "서비스",
     href: "/classic/landing",
@@ -38,7 +40,6 @@ export const classicMenu = [
   },
   // 고객 사례는 실제 사례가 생기면 data/classic/cases.ts에 넣는 순간 메뉴에 나온다
   ...(cases.length > 0 ? [{ label: "고객 사례", href: "/classic/cases", match: ["/classic/cases"], items: [] }] : []),
-  { label: "곰파트너 이야기", href: "/classic/story", match: ["/classic/story"], items: [] },
   {
     label: "고객지원",
     href: "/classic/faq",

@@ -4,9 +4,9 @@ import { profile } from "@/data/classic/profile";
 
 // 클래식 보기 바닥글. 사업자 정보는 상호와 번호만 둔다(통신판매업 신고 전).
 const menu = [
-  { href: "/classic/works", label: "카탈로그" },
   { href: "/classic/story", label: "곰파트너 이야기" },
   { href: "/classic/maintenance", label: "유지보수" },
+  { href: "/classic/works", label: "카탈로그" },
   { href: "/classic/faq", label: "자주 묻는 질문" },
   { href: "/classic/guide", label: "가이드" },
   { href: "/classic/tools", label: "자료실" },
