@@ -48,9 +48,10 @@ export const classicMenu = [
   {
     label: "고객지원",
     href: "/classic/notice",
-    match: ["/classic/notice", "/classic/faq", "/classic/privacy"],
+    match: ["/classic/notice", "/classic/guide", "/classic/faq", "/classic/privacy"],
     items: [
       { href: "/classic/notice", label: "공지사항" },
+      { href: "/classic/guide", label: "운영 가이드" },
       { href: "/classic/faq", label: "자주 묻는 질문" },
     ],
   },

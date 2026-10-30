@@ -1,89 +1,27 @@
-// 가이드(/guide). "홈페이지 제작 업체 추천", "제작 비용" 같은 검색어로 오는 손님이 업체를 고르기 전에 읽는 글.
-// 2026-10-22 결과 화면 확인: 네이버 AI 브리핑과 구글 상위가 업체 사이트 안의 설명 글을 가져간다.
+// 운영 가이드(/classic/guide). 홈페이지를 가진 고객이 계약, 보안, 장애, 점검을 직접 확인할 때 읽는 글(10-30 개편).
+// 업체 순위, 제작 비용 시세, 유지보수비 시세처럼 영업 글로 보이는 글은 뺐다.
 // 곰파트너 자체 금액과 기간은 글에 싣지 않는다(10-30). 시세와 호스팅 비용만 적는다.
 // 바깥 시세는 출처와 확인 날짜를 sources에 남긴다. 웹툰 보기 data/guides.ts의 클래식 복사본. 양쪽을 따로 고친다.
 import { formatWon, manwon, plans } from "@/data/classic/pricing";
-import { domainPrices, hostingPlans, checkedAt } from "@/data/classic/hostingPrices";
+import { hostingPlans, checkedAt } from "@/data/classic/hostingPrices";
 
 import type { Guide } from "@/data/guides";
-import { sharedGuides } from "@/data/guidesShared";
 
 // 가격 데이터의 이름은 가운뎃점을 쓰는데 글에서는 쉼표로 바꾼다. 1만 원 아래는 원 단위로 적는다.
 const plain = (t: string) => t.replaceAll("·", ", ");
 const won = (n: number) => (n < 10_000 ? formatWon(n) : manwon(n));
 const host = (id: string) => hostingPlans.find((h) => h.id === id)!;
-const gabia = domainPrices.find((d) => d.registrar === "가비아")!;
 const imweb = host("imweb-starter");
 const cafe24 = host("cafe24-saver");
 const gabiaHost = host("gabia-basic");
 const sixshop = host("sixshop-home");
 
 
-const kmongCost = { label: "크몽 가격 안내, 홈페이지 제작(2025년 9월 글)", href: "https://kmong.com/prices/%ED%99%88%ED%8E%98%EC%9D%B4%EC%A7%80-%EC%A0%9C%EC%9E%91" };
-const kmongCare = { label: "크몽 가격 안내, 홈페이지 수정 유지보수", href: "https://kmong.com/prices/%ED%99%88%ED%8E%98%EC%9D%B4%EC%A7%80-%EC%88%98%EC%A0%95-%EC%9C%A0%EC%A7%80%EB%B3%B4%EC%88%98" };
-const wishket = { label: "위시켓 블로그, 외주 개발 비용", href: "https://blog.wishket.com/blog/outsourcing-development-cost" };
-const hostingTool = { label: `곰파트너 호스팅 유지비 비교(${checkedAt} 확인)`, href: "/tools/hosting-cost" };
 
 // 예약 공개: published가 오늘(한국 시간) 이후인 글은 빌드에서 뺀다. 배포 워크플로가 매일 09:15에 다시 빌드한다.
 const todayKst = new Date(Date.now() + 9 * 3600_000).toISOString().slice(0, 10);
 
 const allGuides: Guide[] = [
-  {
-    slug: "agency-ranking",
-    title: "홈페이지 제작 업체 추천, 순위 글보다 먼저 볼 것",
-    description: "업체 추천 순위 글을 읽을 때 걸러 볼 점과, 업체를 고르기 전에 직접 확인할 다섯 가지를 적었어요.",
-    published: "2026-10-22",
-    updated: "2026-10-22",
-    image: { src: "/images/guide/agency-ranking.jpg", alt: "홈페이지 제작 업체 추천, 순위 글보다 먼저 볼 것" },
-    blocks: [
-      { p: "\"홈페이지 제작 업체 추천\"을 검색하면 TOP5, 순위 글이 먼저 나와요. 이런 글은 대부분 제작 업체가 직접 써요. 글쓴 회사가 순위 안에 들어 있는 경우가 많아요." },
-      { p: "순위 글이 틀렸다는 말은 아니에요. 다만 순위만 보고 고르면 우리 가게에 맞는지는 알 수 없어요. 아래 다섯 가지는 어느 업체든 사이트만 열어 보면 확인할 수 있어요." },
-      { h2: "순위 글에서 걸러 볼 것" },
-      { list: ["순위를 매긴 기준이 적혀 있나요", "글을 쓴 회사가 순위에 들어 있나요", "글 날짜가 1년 안쪽인가요", "업체마다 금액이 적혀 있나요"] },
-      { p: "기준이 \"참고했다\" 한 줄뿐이면 광고 글로 보시는 편이 맞아요." },
-      { h2: "1. 우리 업종 샘플이 있나요" },
-      { p: "카페와 병원은 첫 화면에 둘 것이 달라요. 카페는 메뉴와 위치, 병원은 진료 시간과 예약이에요. 같은 업종을 만들어 본 곳은 이걸 묻지 않아도 알아요. 사진 한 장이 아니라 열어서 써 볼 수 있는 샘플인지도 보세요." },
-      { link: { href: "/classic/works", label: "업종별 샘플 보기" } },
-      { h2: "2. 금액이 공개돼 있나요" },
-      { p: "\"견적 문의\"만 있고 금액이 없으면 상담을 몇 번 해야 대략 값을 알 수 있어요. 기본 금액과 기능별 추가 금액이 적힌 곳이 비교하기 쉬워요." },
-      { h2: "3. 끝난 뒤에 받는 것이 적혀 있나요" },
-      { p: "원본 소스, 관리자 계정, 도메인 명의를 누가 갖는지 봐야 해요. 이게 업체에 있으면 업체를 바꿀 때 처음부터 다시 만들 수도 있어요." },
-      { h2: "4. 무상으로 고쳐 주는 기간이 있나요" },
-      { p: "열어 보니 휴대폰에서 글자가 깨지는 일이 생겨요. 이런 오류를 언제까지 무상으로 고쳐 주는지 계약 전에 확인하세요. 업체마다 1주에서 몇 년까지 차이가 커요." },
-      { h2: "5. 연락하는 방법이 정해져 있나요" },
-      { p: "담당자 전화만 있으면 담당자가 바뀔 때 끊겨요. 채팅이나 메일처럼 기록이 남는 창구가 있는지, 답장은 언제까지 오는지 보세요." },
-      { p: "계약할 때 물어볼 질문은 따로 정리해 뒀어요." },
-      { link: { href: "/guide/contract-checklist", label: "계약 전에 물어볼 7가지" } },
-    ],
-    sources: [],
-  },
-  {
-    slug: "homepage-cost",
-    title: "홈페이지 제작 비용, 업체마다 왜 다를까",
-    description: "같은 내용으로 물어봐도 견적이 몇 배씩 차이 나는 이유와, 견적서에서 비교할 다섯 항목을 적었어요.",
-    published: "2026-10-22",
-    updated: "2026-10-22",
-    image: { src: "/images/guide/homepage-cost.jpg", alt: "홈페이지 제작 비용, 업체마다 왜 다를까" },
-    blocks: [
-      { p: "같은 내용으로 세 곳에 물어봐도 30만 원, 100만 원, 300만 원이 같이 나와요. 크몽 가격 안내는 홈페이지 제작을 최저 8만 원, 평균 69만 원, 최고 180만 원으로 적어요." },
-      { p: "차이는 대부분 다섯 군데에서 나요. 견적서를 나란히 놓고 이 다섯 줄만 비교하면 돼요." },
-      { h2: "화면이 몇 쪽인가요" },
-      { p: `회사 소개, 오시는 길, 메뉴판처럼 따로 열리는 화면 하나가 1쪽이에요. 쪽이 늘면 값도 늘어요.` },
-      { h2: "어떤 기능이 들어가나요" },
-      { p: "전화와 지도만 있는 홈페이지와 예약을 받는 홈페이지는 만드는 시간이 달라요. 기능은 하나씩 값이 붙어요." },
-      { h2: "디자인을 새로 그리나요" },
-      { p: "있는 틀에 사진과 글만 바꾸면 빠르고 싸요. 업종에 맞춰 첫 화면을 새로 그리면 시간이 더 들어요. 견적서에 \"템플릿\"인지 \"맞춤 디자인\"인지 적혀 있는지 보세요." },
-      { h2: "도메인과 호스팅이 들어 있나요" },
-      { p: `도메인은 1년에 2만 원대예요. 가비아 기준 .co.kr ${formatWon(gabia.prices[".co.kr"])}, .com ${formatWon(gabia.prices[".com"])}이에요. 호스팅은 웹호스팅이면 1년 ${won(cafe24.yearly)}에서 ${manwon(gabiaHost.yearly)} 사이, 아임웹 같은 구독형이면 1년 ${manwon(imweb.yearly)}쯤이에요.` },
-      { p: "싼 견적은 이 돈이 빠져 있고 비싼 견적은 1년치가 들어 있기도 해요. 둘째 해부터 누가 내는지도 물어보세요." },
-      { h2: "만든 뒤에 고쳐 주는 일이 들어 있나요" },
-      { p: "제작비에 무상 수정 기간을 묶는 업체가 많아요. 1~2주인 곳도 있고 몇 년인 곳도 있어요. 위시켓도 유지보수를 넣느냐에 따라 같은 일이 2~3배 차이 난다고 적어요." },
-      { h2: "곰파트너는" },
-      { p: "원본 소스를 드리고, 완료 후 1개월 동안 오류를 무상으로 고쳐요. 도메인과 호스팅은 손님 명의로 사시고 저는 연결만 해요." },
-      { link: { href: "/classic/homepage", label: "홈페이지 제작 보기" } },
-    ],
-    sources: [kmongCost, wishket, hostingTool],
-  },
   {
     slug: "contract-checklist",
     title: "홈페이지 업체와 계약 전에 물어볼 7가지",
@@ -154,43 +92,8 @@ const allGuides: Guide[] = [
       { p: "예약 현황표, 견적 계산기처럼 업종에 맞춘 기능이 필요하면 따로 만드는 편이 나아요. 유지비가 1년 몇천 원에서 몇만 원이라 오래 둘수록 싸요. 대신 고칠 때마다 업체에 맡기거나 관리자 화면을 같이 만들어야 해요." },
       { h2: "정하기 어려우면" },
       { p: "\"1년에 몇 번 고치나요\"를 먼저 세어 보세요. 한 달에 한 번 넘게 직접 고친다면 구독형, 1년에 몇 번이면 따로 만들기가 맞을 때가 많아요." },
-      { link: { href: "/tools/hosting-cost", label: "호스팅 1년 유지비 비교 보기" } },
     ],
-    sources: [hostingTool],
-  },
-  {
-    slug: "maintenance-cost",
-    title: "홈페이지 유지보수비, 얼마가 적당할까",
-    description: "월 유지보수 시세와 흔히 들어가는 일, 빠지는 일, 계약 전에 확인할 1건 기준과 최소 기간을 적었어요.",
-    published: "2026-10-22",
-    updated: "2026-10-22",
-    image: { src: "/images/guide/maintenance-cost.jpg", alt: "홈페이지 유지보수비, 얼마가 적당할까" },
-    blocks: [
-      { p: "홈페이지 업체 공개 요금을 보면 월 유지보수 첫 단계는 월 5만 원 안팎이 많아요. 크몽 가격 안내는 최저 월 5만 원, 평균 월 20만 원, 최고 월 100만 원으로 적어요." },
-      { p: "같은 5만 원이라도 해 주는 일이 달라요. 금액보다 아래 네 가지를 먼저 비교하세요." },
-      { h2: "흔히 들어가는 일" },
-      { list: ["글자와 사진 바꾸기 월 3~10건", "팝업, 배너 교체", "월 1회 점검", "도메인, 보안 인증서 만료 확인", "백업 확인"] },
-      { h2: "흔히 빠지는 일" },
-      { list: ["새 기능 만들기", "결제, 회원 기능", "해킹 피해 복구", "서버 옮기기", "밤과 주말 대응", "호스팅, 도메인 요금"] },
-      { h2: "계약 전에 확인할 것" },
-      { p: "첫째, 1건이 어디까지인지 보세요. \"30분 안에 끝나는 수정\"처럼 적힌 곳이 다툼이 적어요." },
-      { p: "둘째, 남은 건수가 다음 달로 넘어가는지 보세요. 대부분 넘어가지 않아요." },
-      { p: "셋째, 최소 계약 기간이에요. 1년 선납을 받는 곳도 있고 한 달씩 끊는 곳도 있어요." },
-      { p: "넷째, 답장 시간과 고치는 시간을 나눠 보세요. \"24시간 이내 응답\"은 고쳐 준다는 뜻이 아닐 수 있어요." },
-      { h2: "곰파트너 유지보수" },
-      {
-        table: {
-          head: ["구분", "조건"],
-          rows: [
-            ["월 유지보수", "3개월 단위, 1건은 30분 안에 끝나는 수정"],
-            ["오류 수정", "원인을 본 뒤 금액을 먼저 알려 드려요"],
-            ["유지보수 인계", "다른 업체가 만든 홈페이지"],
-          ],
-        },
-      },
-      { link: { href: "/classic/maintenance", label: "유지보수 자세히 보기" } },
-    ],
-    sources: [kmongCare],
+    sources: [],
   },
   {
     slug: "vercel-deploy-error",
@@ -216,7 +119,6 @@ const allGuides: Guide[] = [
       { p: "도메인을 산 곳(가비아 등)의 DNS에 Vercel이 알려 주는 값을 넣어야 해요. 넣자마자 되지 않을 수 있고, 반영까지 몇 시간 걸리기도 해요. Vercel의 Domains 화면에 Valid Configuration이 뜨면 연결된 거예요." },
       { h2: "그래도 안 되면" },
       { p: "다섯 가지를 다 봐도 안 풀리면 코드 쪽 문제일 가능성이 커요. 빌드 기록과 오류 화면을 캡처해 두면 원인을 빨리 찾을 수 있어요." },
-      { link: { href: "/classic/contact", label: "배포 문제 상담 신청하기" } },
     ],
     sources: [
       { label: "Vercel 문서, 환경 변수", href: "https://vercel.com/docs/environment-variables" },
@@ -246,7 +148,6 @@ const allGuides: Guide[] = [
       { p: "호스팅 관리 화면에서 PHP 버전을 이전으로 돌리면 사이트는 바로 돌아와요. 다만 보안 패치를 받지 못하는 상태로 돌아가는 거라, 되돌린 동안 오류를 고치고 다시 올리는 게 좋아요." },
       { h2: "그래도 안 되면" },
       { p: "오류 로그에 같은 파일이 계속 나오거나 고칠 곳이 많으면, 오류 로그와 PHP 버전, 쓰는 솔루션 이름을 함께 정리해 두면 원인을 빨리 찾을 수 있어요." },
-      { link: { href: "/classic/contact", label: "PHP 업그레이드 상담 신청하기" } },
     ],
     sources: [
       { label: "PHP 공식 문서, PHP 8.0으로 옮길 때 호환되지 않는 변경", href: "https://www.php.net/manual/en/migration80.incompatible.php" },
@@ -275,8 +176,6 @@ const allGuides: Guide[] = [
         ["8.2", "8.2.35 이상", "업데이트, 12월 31일 지원 종료라 8.3 이상으로 옮기기"],
         ["8.1 이하", "패치 없음", "지원되는 버전으로 옮기기"],
       ] } },
-      { p: "주소만 넣으면 밖에서 보이는 PHP 버전을 바로 읽어 주는 점검 도구도 만들어 두었어요." },
-      { link: { href: "/tools/php-check", label: "PHP 취약점 바로 점검하기" } },
       { h2: "8.1 이하라면" },
       { p: "8.1 이하는 공식 보안 지원이 끝나 이번 패치가 나오지 않아요. 버전을 올려야 하는데, 오래된 사이트는 올리자마자 하얀 화면이 되기도 해요. 그래서 미루는 곳이 많아요." },
       { p: "올리기 전에 사이트 파일과 DB를 백업해 두고, 깨지면 오류 기록을 보고 고쳐요. 순서는 아래 글에 따로 적었어요." },
@@ -294,7 +193,6 @@ const allGuides: Guide[] = [
       { h2: "이상한 흔적을 찾았다면" },
       { p: "서버를 바로 끄거나 재시작하지 말고, 먼저 외부 연결을 막고 기록을 남겨 두세요. 재시작하면 흔적이 사라질 수 있어요. 손님 개인정보가 저장된 사이트라면 KISA 118로 신고하고 상담을 받을 수 있어요." },
       { p: "버전 확인부터 업데이트, 깨진 화면 고치기, 비밀번호 교체까지 한 번에 맡기고 싶으면 사이트 주소와 호스팅 업체 이름만 알려 주세요." },
-      { link: { href: "/classic/contact", label: "PHP 보안 점검 상담 신청하기" } },
     ],
     sources: [
       { label: "PHP 공식 공지, 2026-10-21 보안 릴리스", href: "https://www.php.net/archive/2026.php#2026-10-21-5" },
@@ -312,8 +210,7 @@ const allGuides: Guide[] = [
     updated: "2026-10-30",
     image: { src: "/images/guide/site-check-items.jpg", alt: "홈페이지 진단 결과 읽는 법, 급함과 주의는 무엇이 다를까" },
     blocks: [
-      { p: "홈페이지에 문제가 있는지 알고 싶은데 어디서부터 봐야 할지 모르겠다는 사장님이 많아요. 그래서 주소만 넣으면 손님이 보는 첫 화면을 한 번 열어 보고 문제를 급함, 주의, 양호로 나눠 주는 진단 도구를 만들었어요. 이 글은 그 결과에 나오는 항목이 각각 무슨 뜻인지 설명해요." },
-      { link: { href: "/tools/site-check", label: "홈페이지 진단 바로 해 보기" } },
+      { p: "곰파트너는 홈페이지를 점검하면 손님이 보는 첫 화면을 기준으로 문제를 급함, 주의, 양호로 나눠 드려요. 이 글은 점검 결과에 나오는 항목이 각각 무슨 뜻인지 설명해요." },
       { h2: "급함과 주의의 차이" },
       { p: "급함은 지금 손님이 겪고 있는 문제예요. 사이트가 안 열리거나, 주소창에 경고가 뜨거나, 휴대폰에서 글씨가 깨알만 하게 보이는 경우예요. 하루라도 빨리 고쳐야 해요." },
       { p: "주의는 당장 손님 눈에는 안 보이지만 방치하면 급함으로 바뀌는 문제예요. 도메인 만료가 두 달 남았거나, 보안 설정이 빠졌거나, 검색 결과에 설명이 엉뚱하게 나오는 경우예요. 다음 수정 때 같이 고치면 돼요." },
@@ -339,7 +236,6 @@ const allGuides: Guide[] = [
       { h2: "속도" },
       { p: "첫 화면 문서를 받는 데 걸린 시간을 재요. 1.5초가 넘으면 주의, 3초가 넘으면 급함이에요. 구글 조사에서는 휴대폰 페이지가 3초 넘게 걸리면 방문자 절반 가까이가 기다리지 않고 나간다고 해요." },
       { p: "첫 화면 사진 중 500KB가 넘는 사진이 있으면 따로 알려 줘요. 사진 한 장이 2MB가 넘는 경우도 흔한데, 휴대폰 데이터로 보는 손님은 그 사진이 뜨기 전에 나가요. 사진은 올리기 전에 줄이면 돼요." },
-      { link: { href: "/tools/image-compress", label: "이미지 용량 줄이기 도구" } },
       { h2: "검색 노출" },
       { table: { head: ["항목", "무슨 일이 생기나"], rows: [
         ["페이지 제목 없음", "검색 결과와 카톡 공유에 사이트 이름 대신 주소만 보임"],
@@ -349,11 +245,9 @@ const allGuides: Guide[] = [
         ["사이트 지도 없음", "새로 만든 페이지가 검색에 늦게 잡힘"],
         ["네이버 서치어드바이저 흔적 없음", "네이버에 사이트를 등록하지 않았을 가능성. 등록하면 수집이 빨라짐"],
       ] } },
-      { p: "검색 결과에 제목과 설명이 어떻게 보이는지는 미리보기 도구에서 직접 볼 수 있어요." },
-      { link: { href: "/tools/search-preview", label: "검색 결과 미리보기" } },
       { h2: "진단에서 안 보는 것" },
       { p: "공개된 첫 화면만 읽어요. 관리자 화면, 회원 정보, 결제 과정, 서버 안의 파일은 사이트 주인의 동의 없이는 보지 않아요. 검색 순위, 광고 성과, 플랫폼(카페24, 아임웹) 내부 오류도 밖에서는 알 수 없어요." },
-      { p: "보안 인증서 만료일, 도메인 만료일, 휴대폰과 PC에서 실제로 보이는 화면 캡처는 전체 보고서에만 들어가요. 전체 보고서는 진단 결과 아래 버튼으로 신청하면 하루 안에 PDF로 보내 드려요." },
+      { p: "곰파트너 점검 결과표에는 보안 인증서 만료일, 도메인 만료일, 휴대폰과 PC에서 실제로 보이는 화면 캡처까지 함께 들어가요." },
     ],
     sources: [
       { label: "Google, Find out how you stack up to new industry benchmarks for mobile page speed (2018)", href: "https://www.thinkwithgoogle.com/marketing-strategies/app-and-mobile/mobile-page-speed-new-industry-benchmarks/" },
@@ -392,7 +286,6 @@ const allGuides: Guide[] = [
       { h2: "인증마크가 필요하면" },
       { p: "공공기관 입찰이나 납품에는 웹 접근성 품질인증마크를 요구하기도 해요. 정부가 지정한 인증기관에 신청하면 전문가가 직접 심사해요. 자동 검사 통과만으로는 인증이라고 말할 수 없어요." },
       { p: "우리 사이트가 어디서 걸리는지 목록으로 받아 보고 싶으면 주소만 알려 주세요. 고칠 곳과 고치는 데 드는 시간을 같이 정리해 드려요." },
-      { link: { href: "/classic/contact", label: "웹 접근성 점검 상담 신청하기" } },
     ],
     sources: [
       { label: "국가법령정보센터, 장애인차별금지 및 권리구제 등에 관한 법률", href: "https://www.law.go.kr/법령/장애인차별금지및권리구제등에관한법률" },
@@ -403,6 +296,18 @@ const allGuides: Guide[] = [
   },
 ];
 
-export const guides = [...allGuides, ...sharedGuides].filter((g) => g.published <= todayKst);
+// 10-30 운영 가이드로 바꾸며 단편 화제 글(guidesShared)은 클래식에서 뺀다
+export const guides = allGuides.filter((g) => g.published <= todayKst);
 
 export const guideBySlug = (slug: string) => guides.find((g) => g.slug === slug);
+
+/** 운영 가이드 게시판 분류 */
+export const guideCategory: Record<string, string> = {
+  "contract-checklist": "계약과 비용",
+  "builder-or-custom": "계약과 비용",
+  "php-vulnerability-check": "보안",
+  "php8-upgrade-error": "장애 대응",
+  "vercel-deploy-error": "장애 대응",
+  "site-check-items": "점검",
+  "web-accessibility-check": "점검",
+};
