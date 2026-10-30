@@ -27,7 +27,7 @@ export default function ClassicMaintenancePage() {
       <PageHead
         title="유지보수"
         trail={[
-          { href: "/classic/landing", label: "서비스" },
+          { href: "/classic/homepage", label: "서비스" },
           { href: "/classic/maintenance", label: "유지보수" },
         ]}
       />

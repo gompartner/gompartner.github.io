@@ -25,7 +25,7 @@ export default function ClassicProgramPage() {
       <PageHead
         title="업무 프로그램"
         trail={[
-          { href: "/classic/landing", label: "서비스" },
+          { href: "/classic/homepage", label: "서비스" },
           { href: "/classic/program", label: "업무 프로그램" },
         ]}
       />
