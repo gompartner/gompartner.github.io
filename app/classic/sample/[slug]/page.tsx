@@ -3,7 +3,7 @@ import Image from "next/image";
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import { Check, Plus } from "lucide-react";
-import { PageHead, btnLine, btnPrimary, h2, h3, more, wrap } from "@/components/classic/ui";
+import { PageHead, btnPrimary, h2, h3, more, wrap } from "@/components/classic/ui";
 import { SampleGrid } from "@/components/classic/works/SampleGrid";
 import { demoProjects, findBySlug, groupOf, industryOf, isMaintenance, mobileShotOf, samplesIn, slugOf } from "@/components/classic/works/samples";
 import { estimateFor } from "@/data/classic/pricing";
@@ -49,7 +49,7 @@ export default async function ClassicSamplePage({ params }: Props) {
       {/* PC 화면에 휴대폰 화면을 겹친다. 누르면 샘플이 열린다 */}
       <section aria-label="카탈로그 화면" className="bg-[#f4f6f9]">
         <div className={`${wrap} py-10 md:py-16`}>
-          <Link href={p.demoUrl} prefetch={false} aria-label={`${p.title} 카탈로그 열기`} className="group relative mx-auto block max-w-[1040px] pb-[6%]">
+          <Link href={p.demoUrl} prefetch={false} aria-label={`${p.title} 체험하기`} className="group relative mx-auto block max-w-[1040px] pb-[6%]">
             <span className="block w-[88%] overflow-hidden rounded-lg border border-[#d9dee5] bg-white">
               <span aria-hidden className="flex h-6 items-center gap-1.5 border-b border-[#e6e9ee] bg-[#eef1f5] px-3 md:h-8">
                 <span className="h-2 w-2 rounded-full bg-[#c5cbd4]" />
@@ -139,10 +139,7 @@ export default async function ClassicSamplePage({ params }: Props) {
 
           <div className="mt-8 grid gap-3">
             <Link href={p.demoUrl} prefetch={false} data-gtm-cta={`classic_sample_open_${p.id}`} className={btnPrimary}>
-              카탈로그 열기
-            </Link>
-            <Link href="/classic/contact" data-gtm-cta={`classic_sample_contact_${p.id}`} className={btnLine}>
-              상담 신청
+              체험하기
             </Link>
           </div>
         </section>

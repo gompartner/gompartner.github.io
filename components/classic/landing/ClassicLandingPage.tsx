@@ -1,19 +1,16 @@
 "use client";
 
-import { useRef, useState } from "react";
 import Image from "next/image";
 import Link from "next/link";
 import { BellRing, Check, ChevronDown, Plus } from "lucide-react";
 import { h2, more, wrap } from "@/components/classic/ui";
 import { landingPlans, planCommon, samplesForPlan } from "@/data/classic/pricing";
 import { projects } from "@/data/classic/projects";
-import { useReducedMotionSafe } from "@/hooks/useReducedMotionSafe";
-import { ClassicLeadForm, type PackageName } from "./ClassicLeadForm";
 import { ClassicOwnerPreview } from "./ClassicOwnerPreview";
 
 /*
   클래식 보기의 광고 랜딩페이지 상품 소개. /landing(웹툰)과 내용은 같고 모양만 에이전시형이다.
-  순서: 첫 화면(남색 배너 + 실제 카탈로그 캡처) -> 이럴 때 -> 신청 접수 화면 -> 패키지 -> 카탈로그 -> 자주 묻는 질문 -> 상담 신청 폼.
+  순서: 첫 화면(남색 배너 + 실제 카탈로그 캡처) -> 이럴 때 -> 신청 접수 화면 -> 패키지 -> 카탈로그 -> 자주 묻는 질문. 상담은 머리글의 상담 신청 하나로 받는다(10-30).
   패키지 표에서 고르면 폼의 관심 패키지에 그대로 들어간다.
 */
 
@@ -38,40 +35,23 @@ const FAQ: [string, string][] = [
   ["작업 기간은 얼마나 걸리나요?", "일정은 작업 범위와 함께 견적서에 명시하며, 자료를 받은 날부터 계산합니다."],
 ];
 
-const PLAN_TO_PKG: Record<string, PackageName> = {
-  "landing-basic": "신청 접수",
-  "landing-standard": "상담 관리",
-  "landing-premium": "광고 성과 정리",
-};
-
 const th = "sticky left-0 z-[1] w-[112px] bg-[#f6f7f9] px-4 py-4 text-left align-top text-[15px] font-bold text-[#3d4450] md:w-[180px] md:px-5";
 const td = "px-4 py-4 align-top text-[16px] leading-[1.6] md:px-6";
 
 export function ClassicLandingPage() {
-  const [pkg, setPkg] = useState<PackageName | "">("");
-  const formRef = useRef<HTMLElement>(null);
-  const reduce = useReducedMotionSafe();
-
-  const toForm = () => formRef.current?.scrollIntoView({ behavior: reduce ? "auto" : "smooth", block: "start" });
-  const pickPlan = (planId: string) => {
-    setPkg(PLAN_TO_PKG[planId]);
-    toForm();
-  };
-
   return (
     <div className="overflow-x-clip bg-white text-[#15171c]">
-      <Hero onApply={toForm} />
+      <Hero />
       <ForWhom />
       <Owner />
-      <Plans onPick={pickPlan} />
+      <Plans />
       <Samples />
       <Faq />
-      <ClassicLeadForm ref={formRef} pkg={pkg} onPkg={setPkg} />
     </div>
   );
 }
 
-function Hero({ onApply }: { onApply: () => void }) {
+function Hero() {
   const shot = projects.find((p) => p.id === "landing-water-rental")!;
   const slug = slugOf(shot.demoUrl);
 
@@ -86,14 +66,6 @@ function Hero({ onApply }: { onApply: () => void }) {
             랜딩페이지 제작
           </h1>
           <div className="mt-8 flex flex-wrap gap-3">
-            <button
-              type="button"
-              onClick={onApply}
-              data-gtm-cta="classic_landing_hero_apply"
-              className="inline-flex h-12 items-center rounded-md bg-[#256ef4] px-6 text-[16px] font-bold text-white transition-colors hover:bg-[#0b50d0]"
-            >
-              상담 신청
-            </button>
             <a href="#samples" className="inline-flex h-12 items-center rounded-md border border-white/40 px-6 text-[16px] font-bold text-white transition-colors hover:bg-white/10">
               카탈로그
             </a>
@@ -159,7 +131,7 @@ function Owner() {
   );
 }
 
-function Plans({ onPick }: { onPick: (planId: string) => void }) {
+function Plans() {
   const samples = landingPlans.map((p) =>
     samplesForPlan(p.id)
       .slice(0, 2)
@@ -262,23 +234,6 @@ function Plans({ onPick }: { onPick: (planId: string) => void }) {
                     ) : (
                       <span className="text-[#6b7280]">없음</span>
                     )}
-                  </td>
-                ))}
-              </tr>
-              <tr className="border-b border-[#15171c]">
-                <th scope="row" className={th}>
-                  <span className="sr-only">상담</span>
-                </th>
-                {landingPlans.map((p) => (
-                  <td key={p.id} className={td}>
-                    <button
-                      type="button"
-                      onClick={() => onPick(p.id)}
-                      data-gtm-cta={`classic_landing_plan_${p.id}`}
-                      className="inline-flex h-12 w-full items-center justify-center rounded-md border border-[#c9cfd8] bg-white px-4 text-[16px] font-bold text-[#15171c] transition-colors hover:border-[#256ef4] hover:text-[#256ef4]"
-                    >
-                      이 패키지로 상담
-                    </button>
                   </td>
                 ))}
               </tr>

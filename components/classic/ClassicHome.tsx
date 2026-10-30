@@ -9,7 +9,6 @@ import { faq, processSteps } from "@/data/classic/faq";
 import { projects } from "@/data/classic/projects";
 import { guides } from "@/data/classic/guides";
 import { tools } from "@/data/classic/tools";
-import { contactDetail, contactTitle } from "@/data/classic/pricing";
 import { fieldsById } from "@/data/classic/workFilters";
 import { PROGRAM_IDS } from "@/data/classic/programIds";
 import { useReducedMotionSafe } from "@/hooks/useReducedMotionSafe";
@@ -20,7 +19,6 @@ import { cn } from "@/lib/utils";
 // 내용은 클래식 전용 데이터(data/classic)를 쓴다. 웹툰 쪽과 따로 고친다.
 
 const NAVY = "#0f1b3d";
-const BLUE = "#256ef4";
 
 const slugOf = (demoUrl: string) => demoUrl.replace("/demo/", "");
 const byId = (id: string) => projects.find((p) => p.id === id)!;
@@ -70,7 +68,6 @@ export function ClassicHome() {
       <Compare />
       <Boards />
       <Faq />
-      <Band />
     </div>
   );
 }
@@ -460,22 +457,3 @@ function Faq() {
   );
 }
 
-function Band() {
-  return (
-    <section aria-labelledby="c-band" className="text-white" style={{ backgroundColor: BLUE }}>
-      <div className="mx-auto flex w-full max-w-[1248px] flex-col gap-8 px-4 py-16 md:flex-row md:items-center md:justify-between md:px-6 md:py-20">
-        <div className="max-w-[640px]">
-          <h2 id="c-band" className="text-[30px] font-extrabold leading-[1.25] tracking-[-0.04em] md:text-[40px]">
-            {contactTitle}
-          </h2>
-          <p className="mt-3 text-[16px] leading-[1.65] text-white md:text-[17px]">{contactDetail}</p>
-        </div>
-        <div className="flex shrink-0 flex-wrap gap-3">
-          <Link href="/classic/contact" data-gtm-cta="classic_band_contact" className="inline-flex h-14 items-center rounded-md border border-white/60 px-7 text-[17px] font-bold hover:bg-white/10">
-            상담 신청
-          </Link>
-        </div>
-      </div>
-    </section>
-  );
-}

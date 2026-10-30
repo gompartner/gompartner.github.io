@@ -1,6 +1,5 @@
 import { ClassicFooter } from "@/components/classic/ClassicFooter";
 import { ClassicHeader } from "@/components/classic/ClassicHeader";
-import { ClassicMobileBar } from "@/components/classic/ClassicMobileBar";
 import { RememberClassic } from "@/components/classic/RememberClassic";
 import { ChannelTalk } from "@/components/layout/ChannelTalk";
 
@@ -21,7 +20,6 @@ export function ClassicShell({ children }: { children: React.ReactNode }) {
         {children}
       </main>
       <ClassicFooter />
-      <ClassicMobileBar />
     </div>
   );
 }
