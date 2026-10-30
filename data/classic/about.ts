@@ -1,4 +1,4 @@
-// 곰파트너 이야기(/classic/story). 대표 이름, 사진, 경력은 싣지 않고 일하는 원칙만 적는다.
+// 회사소개(/classic/story). 대표 이름, 사진, 경력은 싣지 않고 일하는 원칙만 적는다.
 export const aboutLead = "곰파트너는 홈페이지 구축부터 운영, 유지보수까지 상담한 개발자가 직접 수행하는 웹 개발 사업자입니다.";
 
 export const principles = [

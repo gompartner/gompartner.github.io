@@ -8,18 +8,18 @@ import { profile } from "@/data/classic/profile";
 import { pageMeta } from "@/lib/seo";
 
 export const metadata: Metadata = pageMeta({
-  title: "곰파트너 이야기",
+  title: "회사소개",
   description: `${aboutLead} 업종별 필수 표시, 점검 결과표, 인계 문서, 원본 소스, 한 달 무료 수정. 곰파트너가 일하는 원칙입니다.`,
   path: "/classic/story",
 });
 
-const section = "border-t border-[#e6e9ee]";
+const section = "scroll-mt-16 border-t border-[#e6e9ee] md:scroll-mt-[76px]";
 const dt = "text-[15px] font-bold text-[#3d4450]";
 
 export default function ClassicStoryPage() {
   return (
     <>
-      <PageHead title="곰파트너 이야기" trail={[{ href: "/classic/story", label: "곰파트너 이야기" }]} />
+      <PageHead title="회사소개" trail={[{ href: "/classic/story", label: "회사소개" }]} />
 
       <section aria-labelledby="st-lead" className={`${wrap} py-14 md:py-20`}>
         <div className="flex flex-col gap-6 md:flex-row md:items-center md:gap-10">
@@ -30,7 +30,7 @@ export default function ClassicStoryPage() {
         </div>
       </section>
 
-      <section aria-labelledby="st-principles" className={section}>
+      <section id="principles" aria-labelledby="st-principles" className={section}>
         <div className={`${wrap} py-16 md:py-24`}>
           <h2 id="st-principles" className={h2}>
             일하는 원칙
@@ -47,7 +47,7 @@ export default function ClassicStoryPage() {
         </div>
       </section>
 
-      <section aria-labelledby="st-info" className={`${section} bg-[#f4f6f9]`}>
+      <section id="info" aria-labelledby="st-info" className={`${section} bg-[#f4f6f9]`}>
         <div className={`${wrap} grid gap-12 py-16 md:grid-cols-2 md:py-24`}>
           <div>
             <h2 id="st-info" className="text-[24px] font-extrabold tracking-[-0.03em]">

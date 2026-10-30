@@ -6,36 +6,43 @@ import { usePathname } from "next/navigation";
 import { useEffect, useRef, useState } from "react";
 import { ChevronDown, Menu, X } from "lucide-react";
 import { cases } from "@/data/classic/cases";
-import { industries } from "@/data/classic/industries";
 import { cn } from "@/lib/utils";
 
 // 클래식 보기(/classic)의 머리글. 로고와 내림 메뉴만 둔다(10-30 채널 줄과 웹툰 전환 버튼 뺌).
 
 // match는 그 메뉴를 켜는 주소. 한 주소가 두 메뉴를 켜지 않게 겹치지 않게 둔다.
 export const classicMenu = [
-  // 10-30 회사 홈페이지 순서로 소개를 맨 앞에 둔다
-  { label: "곰파트너 이야기", href: "/classic/story", match: ["/classic/story"], items: [] },
   {
-    label: "서비스",
-    href: "/classic/landing",
-    match: ["/classic/landing", "/classic/homepage", "/classic/maintenance", "/classic/program"],
+    label: "회사소개",
+    href: "/classic/story",
+    match: ["/classic/story"],
     items: [
-      { href: "/classic/landing", label: "광고 랜딩페이지" },
-      { href: "/classic/homepage", label: "홈페이지 제작" },
-      { href: "/classic/maintenance", label: "유지보수" },
-      { href: "/classic/program", label: "업무 프로그램" },
+      { href: "/classic/story", label: "회사 개요" },
+      { href: "/classic/story#principles", label: "일하는 원칙" },
+      { href: "/classic/story#info", label: "사업자 정보" },
     ],
   },
+  {
+    label: "서비스",
+    href: "/classic/homepage",
+    match: ["/classic/homepage", "/classic/landing", "/classic/program", "/classic/maintenance"],
+    items: [
+      { href: "/classic/homepage", label: "홈페이지 제작" },
+      { href: "/classic/landing", label: "광고 랜딩페이지" },
+      { href: "/classic/program", label: "업무 프로그램" },
+      { href: "/classic/maintenance", label: "유지보수" },
+    ],
+  },
+  // 업종(병원, 카페 등)은 카탈로그 화면 안의 탭에서 고른다. 메뉴는 서비스와 같은 네 분류만 둔다
   {
     label: "카탈로그",
     href: "/classic/works",
     match: ["/classic/works", "/classic/sample"],
     items: [
-      { href: "/classic/works", label: "전체 카탈로그" },
-      ...industries.map((i) => ({ href: `/classic/works/${i.slug}`, label: i.label })),
-      { href: "/classic/works/landing", label: "랜딩페이지" },
-      { href: "/classic/works/maintenance", label: "유지보수" },
+      { href: "/classic/works", label: "업종별 홈페이지" },
+      { href: "/classic/works/landing", label: "광고 랜딩페이지" },
       { href: "/classic/works/program", label: "업무 프로그램" },
+      { href: "/classic/works/maintenance", label: "유지보수" },
     ],
   },
   // 고객 사례는 실제 사례가 생기면 data/classic/cases.ts에 넣는 순간 메뉴에 나온다
@@ -50,7 +57,6 @@ export const classicMenu = [
       { href: "/classic/tools", label: "자료실" },
     ],
   },
-  { label: "상담 신청", href: "/classic/contact", match: ["/classic/contact"], items: [] },
 ];
 
 
@@ -160,6 +166,16 @@ export function ClassicHeader() {
           </div>
 
           <div className="flex items-center gap-2">
+            <Link
+              href="/classic/contact"
+              data-gtm-cta="classic_header_contact"
+              className={cn(
+                "hidden h-11 items-center rounded-md px-5 text-[16px] font-bold transition-colors lg:inline-flex",
+                pathname === "/classic/contact" ? "bg-[#0b50d0] text-white" : "bg-[#256ef4] text-white hover:bg-[#0b50d0]"
+              )}
+            >
+              상담 신청
+            </Link>
             <button
               type="button"
               onClick={() => setOpen((v) => !v)}
@@ -194,6 +210,9 @@ export function ClassicHeader() {
               )}
             </section>
           ))}
+          <Link href="/classic/contact" className="mt-6 flex h-12 items-center justify-center rounded-md bg-[#256ef4] text-[16px] font-bold text-white">
+            상담 신청
+          </Link>
         </div>
       )}
     </header>

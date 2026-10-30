@@ -34,7 +34,7 @@ export default function ClassicHomepagePage() {
       <PageHead
         title="홈페이지 제작"
         trail={[
-          { href: "/classic/landing", label: "서비스" },
+          { href: "/classic/homepage", label: "서비스" },
           { href: "/classic/homepage", label: "홈페이지 제작" },
         ]}
       />
