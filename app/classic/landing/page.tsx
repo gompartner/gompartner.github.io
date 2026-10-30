@@ -1,6 +1,6 @@
 import type { Metadata } from "next";
 import Link from "next/link";
-import { Check, ChevronDown, ChevronRight } from "lucide-react";
+import { BellRing, ChartColumn, Check, ChevronDown, ChevronRight, ClipboardList, MousePointerClick, Table2 } from "lucide-react";
 import { ClassicOwnerPreview } from "@/components/classic/landing/ClassicOwnerPreview";
 import { PlanTable } from "@/components/classic/pricing/PlanTable";
 import { StepList } from "@/components/classic/pricing/StepList";
@@ -39,6 +39,15 @@ const FAQ: [string, string][] = [
   ["진행하지 않는 업종이 있나요?", "대부 중개, 주식과 코인 리딩 업종은 진행하지 않습니다."],
 ];
 
+// 신청 한 건이 지나가는 길. 이 페이지의 디자인 포인트(10-30)
+const FLOW = [
+  { icon: MousePointerClick, title: "광고 클릭", body: "네이버, 메타, 구글 광고에서 유입" },
+  { icon: ClipboardList, title: "신청서 작성", body: "이름, 연락처, 문의 내용과 개인정보 동의" },
+  { icon: BellRing, title: "즉시 알림", body: "담당자 메일과 문자, 알림톡으로 바로 전달" },
+  { icon: Table2, title: "시트 기록", body: "구글 시트에 쌓이고 상담 상태를 바로 관리" },
+  { icon: ChartColumn, title: "주간 집계", body: "광고 채널별 신청과 계약 건수 리포트" },
+];
+
 const section = "scroll-mt-20 border-t border-[#e6e9ee] md:scroll-mt-24";
 
 export default function ClassicLandingServicePage() {
@@ -59,6 +68,31 @@ export default function ClassicLandingServicePage() {
           <h2 id="ld-lead" className="break-keep text-[26px] font-[800] leading-[1.35] tracking-[-0.04em] md:text-[34px]">
             광고 유입 고객의 상담 신청을 접수하고 관리하는 단일 페이지
           </h2>
+        </div>
+      </section>
+
+      <section aria-labelledby="ld-flow" className="bg-[#f4f6f9]">
+        <div className={`${wrap} py-16 md:py-20`}>
+          <h2 id="ld-flow" className={h2}>
+            신청 처리 흐름
+          </h2>
+          <ol className="mt-10 grid gap-3 md:grid-cols-5 md:gap-8">
+            {FLOW.map((f, n) => (
+              <li key={f.title} className="relative flex items-start gap-4 rounded-md border border-[#d9dee5] bg-white p-5 md:flex-col md:gap-3">
+                <span className="grid h-12 w-12 shrink-0 place-items-center rounded-full bg-[#256ef4] text-white">
+                  <f.icon size={22} aria-hidden />
+                </span>
+                <div>
+                  <p className="text-[14px] font-bold tabular-nums text-[#256ef4]">{n + 1}</p>
+                  <h3 className="text-[19px] font-[800] tracking-[-0.03em]">{f.title}</h3>
+                  <p className="mt-1 text-[15px] leading-[1.6] text-[#5b6370]">{f.body}</p>
+                </div>
+                {n < FLOW.length - 1 && (
+                  <ChevronRight size={22} aria-hidden className="absolute -right-[27px] top-1/2 hidden -translate-y-1/2 text-[#8a94a6] md:block" />
+                )}
+              </li>
+            ))}
+          </ol>
         </div>
       </section>
 
