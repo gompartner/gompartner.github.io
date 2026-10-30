@@ -31,11 +31,11 @@ const FOR_WHOM = [
 const SAMPLE_IDS = ["landing-water-rental", "landing-coding-camp", "landing-move-clean", "landing-popup-store", "landing-zine-fair", "landing-leather-class"];
 
 const FAQ: [string, string][] = [
-  ["문자·카톡 알림 비용은 별도인가요?", "발송 비용은 건당 20원 내외이며 고객 부담입니다. 카카오 알림톡은 비즈니스 채널 인증과 템플릿 심사가 필요합니다. 메일 알림은 무료입니다."],
+  ["문자, 알림톡 발송 비용은 별도인가요?", "발송 비용은 건당 20원 내외이며 고객 부담입니다. 카카오 알림톡은 비즈니스 채널 인증과 템플릿 심사가 필요합니다. 메일 알림은 무료입니다."],
   ["신청 내용은 어디에 저장되나요?", "고객 구글 계정의 구글 시트에 저장됩니다. 곰파트너는 신청 내용을 보관하지 않습니다."],
   ["월 비용이 있나요?", "무료 호스팅을 사용하여 월 비용은 없습니다. 도메인은 고객 명의로 직접 구매하며 연 2만 원 내외입니다."],
-  ["진행하지 않는 업종이 있나요?", "대부 중개 및 주식·코인 리딩 업종은 진행하지 않습니다."],
-  ["작업 기간은 얼마나 걸리나요?", "작업 범위를 정할 때 일정도 같이 정합니다. 자료를 받은 날부터 계산합니다."],
+  ["진행하지 않는 업종이 있나요?", "대부 중개, 주식과 코인 리딩 업종은 진행하지 않습니다."],
+  ["작업 기간은 얼마나 걸리나요?", "일정은 작업 범위와 함께 견적서에 명시하며, 자료를 받은 날부터 계산합니다."],
 ];
 
 const PLAN_TO_PKG: Record<string, PackageName> = {
@@ -130,7 +130,7 @@ function ForWhom() {
   return (
     <section aria-labelledby="whom-title" className={`${wrap} py-16 md:py-24`}>
       <h2 id="whom-title" className={h2}>
-        이럴 때 쓰시면 좋아요
+        도입이 필요한 경우
       </h2>
       <ul className="mt-10 grid border-t-2 border-[#15171c] md:grid-cols-2" role="list">
         {FOR_WHOM.map((t, i) => (

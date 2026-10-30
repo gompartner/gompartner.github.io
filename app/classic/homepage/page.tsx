@@ -44,7 +44,7 @@ export default function ClassicHomepagePage() {
         <div className="flex flex-col gap-6 border-t-2 border-[#15171c] pt-6 md:flex-row md:items-end md:justify-between">
           <div>
             <h2 id="hp-lead" className="break-keep text-[26px] font-extrabold leading-[1.35] tracking-[-0.04em] md:text-[34px]">
-              우리 가게를 검색하면 나오는 홈페이지
+              검색 노출과 문의 접수까지 고려한 업종별 홈페이지
             </h2>
           </div>
           <div className="flex flex-wrap gap-3">
@@ -58,7 +58,7 @@ export default function ClassicHomepagePage() {
       <section aria-labelledby="hp-whom" className={section}>
         <div className={`${wrap} py-16 md:py-24`}>
           <h2 id="hp-whom" className={h2}>
-            이런 곳에 맞아요
+            업종별 구성
           </h2>
           <ul className="mt-10 border-t-2 border-[#15171c]" role="list">
             {industries.map((i) => (

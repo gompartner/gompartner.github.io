@@ -132,10 +132,10 @@ export default async function ClassicSamplePage({ params }: Props) {
               <h2 id="c-price" className="border-b-2 border-[#15171c] pb-3 text-[18px] font-extrabold tracking-[-0.02em]">
                 업무 프로그램
               </h2>
-              <p className="mt-5 text-[16px] leading-[1.7] text-[#5b6370] md:text-[17px]">필요한 화면 수와 쓰는 사람을 듣고 따로 견적을 드립니다.</p>
+              <p className="mt-5 text-[16px] leading-[1.7] text-[#5b6370] md:text-[17px]">필요한 화면 수와 사용자 범위를 확인한 뒤 별도로 견적을 드립니다.</p>
             </>
           )}
-          <p className="mt-5 text-[15px] leading-[1.65] text-[#5b6370] md:text-[16px]">금액과 일정은 상담 신청을 받은 뒤 정리해 보내 드립니다.</p>
+          <p className="mt-5 text-[15px] leading-[1.65] text-[#5b6370] md:text-[16px]">금액과 일정은 상담 신청 내용을 검토한 뒤 견적서로 안내합니다.</p>
 
           <div className="mt-8 grid gap-3">
             <Link href={p.demoUrl} prefetch={false} data-gtm-cta={`classic_sample_open_${p.id}`} className={btnPrimary}>

@@ -32,27 +32,27 @@ const slides = [
 ].map((s) => ({ ...s, project: byId(s.id) }));
 
 const services = [
-  { href: "/classic/landing", name: "광고 랜딩페이지", what: "광고 보고 온 사람의 신청을 받는 한 페이지" },
-  { href: "/classic/homepage", name: "홈페이지 제작", what: "회사와 가게 소개, 문의와 예약을 받는 홈페이지" },
-  { href: "/classic/maintenance", name: "유지보수", what: "만든 홈페이지 수정과 오류 수정" },
-  { href: "/classic/program", name: "업무 프로그램", what: "엑셀로 하던 일을 화면으로 옮기기" },
+  { href: "/classic/landing", name: "광고 랜딩페이지", what: "광고 유입 고객의 상담 신청을 접수하고 관리하는 단일 페이지" },
+  { href: "/classic/homepage", name: "홈페이지 제작", what: "사업장 소개와 문의, 예약 접수를 갖춘 반응형 홈페이지" },
+  { href: "/classic/maintenance", name: "유지보수", what: "정기 점검, 보안 업데이트, 장애 대응과 콘텐츠 수정" },
+  { href: "/classic/program", name: "업무 프로그램", what: "엑셀 기반 반복 업무를 웹 프로그램으로 전환" },
 ];
 
-// 첫 화면 상황별 진입. 사장님이 겪는 일로 고르면 맞는 서비스 페이지로 간다.
+// 첫 화면 상황별 진입. 고객이 처한 상황으로 고르면 맞는 서비스 페이지로 간다.
 const situations = [
-  { href: "/classic/homepage", say: "홈페이지가 아직 없어요", to: "홈페이지 제작" },
-  { href: "/classic/landing", say: "광고 보고 온 손님의 신청을 받을 페이지가 필요해요", to: "광고 랜딩페이지" },
-  { href: "/classic/maintenance", say: "있는 홈페이지가 고장 났거나 고칠 게 있어요", to: "유지보수" },
-  { href: "/classic/program", say: "엑셀로 하는 일이 너무 많아요", to: "업무 프로그램" },
+  { href: "/classic/homepage", say: "홈페이지를 새로 구축해야 할 때", to: "홈페이지 제작" },
+  { href: "/classic/landing", say: "광고로 유입된 고객의 상담 신청을 받아야 할 때", to: "광고 랜딩페이지" },
+  { href: "/classic/maintenance", say: "운영 중인 홈페이지에 장애나 수정 요청이 생겼을 때", to: "유지보수" },
+  { href: "/classic/program", say: "엑셀 수작업을 웹 프로그램으로 옮기고 싶을 때", to: "업무 프로그램" },
 ];
 
 // 맡길 곳 고르기 표. 남의 서비스는 일반적인 방식만 적고 이름은 쓰지 않는다.
-const compareCols = ["셀프 제작 도구", "큰 제작사", "곰파트너"];
+const compareCols = ["셀프 제작 도구", "대형 제작사", "곰파트너"];
 const compareRows = [
-  { label: "만드는 사람", cells: ["사장님이 직접", "영업, 기획, 디자인, 개발 담당이 나뉨", "상담한 개발자가 끝까지 직접"] },
-  { label: "법으로 정한 표시", cells: ["사장님이 직접 챙기기", "업체에 따라 다름", "업종별로 확인해 넣기"] },
-  { label: "다 만든 뒤 받는 것", cells: ["플랫폼 관리자 계정", "계약서에 정한 결과물", "원본 소스, 점검 결과표, 인계 문서"] },
-  { label: "고장 나면", cells: ["직접 고치기", "유지보수 계약", "1개월 무상 오류 수정"] },
+  { label: "수행 인력", cells: ["운영자가 직접 제작", "영업, 기획, 디자인, 개발 분업", "상담한 개발자가 전 과정 수행"] },
+  { label: "업종별 법정 고지", cells: ["운영자가 직접 확인", "업체마다 상이", "제작 전 검토 후 반영"] },
+  { label: "납품물", cells: ["플랫폼 관리자 계정", "계약서에 명시된 결과물", "원본 소스, 점검 결과표, 인계 문서"] },
+  { label: "사후 관리", cells: ["운영자가 직접 대응", "별도 유지보수 계약", "오픈 후 1개월 무상 하자보수"] },
 ];
 
 const h2 = "text-[30px] font-extrabold leading-[1.25] tracking-[-0.04em] md:text-[44px]";
@@ -187,7 +187,7 @@ function Situations() {
   return (
     <section aria-labelledby="c-situations" className="mx-auto w-full max-w-[1248px] px-4 pt-20 md:px-6 md:pt-28">
       <h2 id="c-situations" className={h2}>
-        사장님, 어떤 일로 오셨어요?
+        상황별 서비스 안내
       </h2>
       <ul className="mt-10 grid gap-3 md:grid-cols-2 md:gap-4" role="list">
         {situations.map((s) => (
@@ -345,11 +345,11 @@ function Compare() {
     <section aria-labelledby="c-compare" className="bg-[#f4f6f9]">
       <div className="mx-auto w-full max-w-[1248px] px-4 py-20 md:px-6 md:py-28">
         <h2 id="c-compare" className={h2}>
-          어디에 맡길지 고를 때
+          제작 방식 비교
         </h2>
         <div tabIndex={0} className="-mx-4 mt-10 overflow-x-auto px-4 md:mx-0 md:px-0">
           <table className="w-full min-w-[640px] border-collapse border-t-2 border-[#15171c] bg-white">
-            <caption className="sr-only">셀프 제작 도구, 큰 제작사, 곰파트너 비교</caption>
+            <caption className="sr-only">셀프 제작 도구, 대형 제작사, 곰파트너 비교</caption>
             <thead>
               <tr className="border-b border-[#e6e9ee]">
                 <td className="w-[150px] md:w-[200px]" />

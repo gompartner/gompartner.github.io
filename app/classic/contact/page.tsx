@@ -12,7 +12,7 @@ export const metadata: Metadata = pageMeta({
   path: "/classic/contact",
 });
 
-const prepare = ["로고", "가게나 제품 사진", "영업시간과 주소", "참고하고 싶은 사이트"];
+const prepare = ["로고", "사업장 또는 제품 사진", "영업시간과 주소", "참고 사이트 주소"];
 
 export default function ClassicContactPage() {
   return (
@@ -39,7 +39,7 @@ export default function ClassicContactPage() {
               </li>
             ))}
           </ul>
-          <p className="mt-3 text-[15px] leading-[1.6] text-[#5b6370]">없으면 없는 대로 신청하셔도 됩니다.</p>
+          <p className="mt-3 text-[15px] leading-[1.6] text-[#5b6370]">자료가 없어도 신청할 수 있습니다.</p>
 
           <h2 id="contact-steps" className="mt-12 text-[22px] font-extrabold tracking-[-0.03em]">
             진행 절차

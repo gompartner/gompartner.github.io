@@ -183,7 +183,7 @@ export function ClassicLeadReceivedPanel({
               <Sheet size={19} aria-hidden className="text-[#256ef4]" /> 구글 시트
             </p>
             <p className="text-[14px]" style={{ color: MUTED }}>
-              상태 칸은 눌러서 바꿀 수 있어요
+              상태 칸을 눌러 변경할 수 있습니다
             </p>
           </div>
           <div className="mt-4 overflow-x-auto border-t border-[#e6e9ee]">

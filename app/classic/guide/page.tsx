@@ -8,7 +8,7 @@ import { fitDescription } from "@/lib/seo";
 
 export const metadata: Metadata = {
   title: "홈페이지 제작 가이드",
-  description: fitDescription("홈페이지 업체 고르는 법과 비용, PHP 취약점과 배포 오류 대응까지 사장님이 직접 확인할 순서를 적었어요."),
+  description: fitDescription("홈페이지 업체 선정과 비용, PHP 취약점과 배포 오류 대응까지 운영자가 직접 확인할 항목을 정리했습니다."),
   alternates: { canonical: "/guide" },
 };
 

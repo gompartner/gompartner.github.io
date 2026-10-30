@@ -23,11 +23,11 @@ export default function ClassicCasesPage() {
             <p className="text-[15px] font-bold text-[#256ef4]">{c.industry}</p>
             <dl className="mt-3 space-y-3 text-[16px] leading-[1.65]">
               <div>
-                <dt className={dt}>이런 문제가 있었어요</dt>
+                <dt className={dt}>과제</dt>
                 <dd className="mt-0.5">{c.problem}</dd>
               </div>
               <div>
-                <dt className={dt}>이렇게 만들었어요</dt>
+                <dt className={dt}>수행 내용</dt>
                 <dd className="mt-0.5">{c.made}</dd>
               </div>
             </dl>
