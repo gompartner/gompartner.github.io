@@ -1393,7 +1393,7 @@ export function HomepageDemo() {
             onClick={() => setDemoPayOpen(false)}
             role="dialog"
             aria-modal="true"
-            aria-label="네이버페이 테스트 결제"
+            aria-label="네이버페이 결제"
           >
             <motion.div
               initial={{ y: 24 }}
@@ -1407,13 +1407,7 @@ export function HomepageDemo() {
                   N
                 </span>
                 <p className="font-bold">네이버페이 결제</p>
-                <span className="ml-auto rounded-md bg-stone-100 px-2.5 py-1 text-[11px] font-semibold text-stone-500">
-                  테스트
-                </span>
               </div>
-              <p className="mt-3 text-sm leading-relaxed text-stone-500">
-                테스트 결제입니다. 실제 결제는 이루어지지 않습니다.
-              </p>
               <dl className="mt-4 space-y-2 rounded-xl bg-stone-50 p-4 text-sm">
                 <div className="flex justify-between">
                   <dt className="text-stone-500">주문</dt>
