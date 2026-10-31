@@ -42,7 +42,7 @@ export default function ClassicStoryPage() {
       <section id="principles" aria-labelledby="st-principles" className={section}>
         <div className={`${wrap} py-16 md:py-24`}>
           <h2 id="st-principles" className={h2}>
-            일하는 원칙
+            곰파트너의 약속
           </h2>
           <ol className="mt-10 grid gap-8 md:grid-cols-2 md:gap-x-12 md:gap-y-10">
             {principles.map((p, n) => {
