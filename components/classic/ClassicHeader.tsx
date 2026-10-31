@@ -16,11 +16,7 @@ export const classicMenu = [
     label: "회사소개",
     href: "/classic/story",
     match: ["/classic/story"],
-    items: [
-      { href: "/classic/story", label: "회사 개요" },
-      { href: "/classic/story#principles", label: "일하는 원칙" },
-      { href: "/classic/story#info", label: "사업자 정보" },
-    ],
+    items: [],
   },
   {
     label: "홈페이지 제작",
@@ -44,9 +40,7 @@ export const classicMenu = [
     label: "카탈로그",
     href: "/classic/works",
     match: ["/classic/works", "/classic/sample"],
-    items: [
-      { href: "/classic/works", label: "업종별 홈페이지" },
-    ],
+    items: [],
   },
   // 고객 사례는 실제 사례가 생기면 data/classic/cases.ts에 넣는 순간 메뉴에 나온다
   ...(cases.length > 0 ? [{ label: "고객 사례", href: "/classic/cases", match: ["/classic/cases"], items: [] }] : []),
