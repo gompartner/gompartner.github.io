@@ -699,7 +699,7 @@ function Home() {
           <div className="grid items-end gap-7 lg:grid-cols-[1fr_440px] lg:gap-12">
             <div>
               <h1 id="cl-page-title" tabIndex={-1} className="text-[30px] font-bold leading-[1.25] tracking-[-0.03em] outline-none md:text-[42px]">
-                {COMPANY}
+                전자파, 전기안전 시험과 KC 인증
               </h1>
               <p className="mt-2 text-[16px] font-bold md:text-[18px]" style={{ color: C.cyan }}>
                 KC인증 지정시험기관, KOLAS 공인시험기관

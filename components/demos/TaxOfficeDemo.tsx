@@ -855,10 +855,10 @@ function Home({
         <div className="mx-auto flex max-w-[1200px] flex-col gap-4 py-6 md:flex-row md:items-end md:justify-between md:py-8">
           <div>
             <h1 id="tax-home-title" tabIndex={-1} className="text-[30px] font-bold leading-[1.3] tracking-[-0.03em] outline-none md:text-[34px]">
-              {OFFICE}
+              개인사업자, 법인 세무기장과 신고대리
             </h1>
             <p className="mt-1 text-[15px]" style={{ color: C.muted }}>
-              개인사업자, 법인 세무기장, 신고대리 / 대표세무사 김ㅅ우
+              대표세무사 김ㅅ우
             </p>
           </div>
           <div className="flex flex-wrap items-end gap-x-6 gap-y-3">

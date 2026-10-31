@@ -355,10 +355,10 @@ function Hero({ onMenu }: { onMenu: () => void }) {
       </div>
       <div>
         <p className="text-[16px] font-semibold" style={{ color: C.red }}>
-          ㅁㅍ구 ㅇㄴ동 국밥, 백반
+          ㅁㅍ구 ㅇㄴ동
         </p>
         <h1 id="hansik-title" className="mt-2 text-[40px] font-bold leading-[1.2] tracking-[-0.03em] sm:text-[52px]">
-          {STORE}
+          사골 국밥과 점심 백반
         </h1>
         <p className="mt-4 max-w-[30em] text-[18px] leading-[1.7]" style={{ color: C.muted }}>
           사골을 밤새 고아 국밥을 내고, 점심에는 반찬 네 가지를 곁들인 백반을 차립니다.

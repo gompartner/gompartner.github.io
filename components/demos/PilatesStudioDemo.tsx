@@ -748,7 +748,7 @@ function Intro({ onConsult }: { onConsult: () => void }) {
         <div className="mt-6 grid gap-6 md:grid-cols-[1fr_auto] md:items-end md:gap-10">
           <div>
             <h1 id="studio-name" className="text-[32px] font-bold leading-[1.25] tracking-[-0.02em] md:text-[44px]">
-              {STUDIO}
+              개인, 듀엣, 그룹 리포머 레슨
             </h1>
             <p className="mt-3 max-w-[40em]" style={{ color: C.muted }}>
               ㅈㅇ역 3번 출구 도보 3분, 건물 주차 2시간 무료

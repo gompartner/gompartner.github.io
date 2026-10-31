@@ -650,7 +650,7 @@ function Home() {
         <div className="absolute inset-0" style={{ background: "linear-gradient(90deg, rgba(20,24,29,0.9) 0%, rgba(20,24,29,0.72) 55%, rgba(20,24,29,0.45) 100%)" }} aria-hidden />
         <div className="relative mx-auto max-w-[1200px] px-4 pb-14 pt-14 md:px-6 md:pb-20 md:pt-24">
           <h1 id="co-page-title" tabIndex={-1} className="text-[34px] font-bold leading-[1.25] tracking-[-0.03em] outline-none md:text-[52px]">
-            {s(COMPANY)}
+            {x("반도체, 의료기기 정밀부품 가공", "Precision parts for semiconductor and medical equipment")}
           </h1>
           <p className="mt-3 text-[18px] font-bold md:text-[22px]" style={{ color: C.orange }}>
             {x("CNC 선반ㆍMCTㆍ5축 정밀부품 가공", "CNC turning, MCT and 5-axis precision parts")}

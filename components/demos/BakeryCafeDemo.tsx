@@ -502,9 +502,9 @@ function Banner({ onGo }: { onGo: (target: string) => void }) {
         <div className="absolute inset-0" style={{ background: "linear-gradient(0deg, rgba(43,30,20,0.86) 0%, rgba(43,30,20,0.35) 55%, rgba(43,30,20,0.05) 100%)" }} />
         <div className="relative mx-auto flex h-full max-w-[1200px] flex-col items-center justify-end px-4 pb-10 text-center md:px-6 md:pb-14">
           <h1 id="bakery-name" className="text-[38px] font-bold leading-[1.2] tracking-[-0.03em] text-white md:text-[56px]">
-            {BAKERY}
+            오늘 빵 나오는 시간
           </h1>
-          <p className="mt-2 text-[16px] text-[#f3e9da] md:text-[18px]">08:00 ~ 17:00 빵 나오는 시간 안내, 픽업 예약 가능</p>
+          <p className="mt-2 text-[16px] text-[#f3e9da] md:text-[18px]">08:00 ~ 17:00 오븐에서 나오는 대로 안내, 픽업 예약 가능</p>
           <div className="mt-6 flex flex-wrap justify-center gap-2.5">
             <a href="#oven" className="inline-flex h-12 items-center rounded-[6px] px-6 font-semibold" style={{ background: C.butter, color: C.ink }}>
               빵 나오는 시간

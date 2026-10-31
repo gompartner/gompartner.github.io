@@ -730,7 +730,7 @@ function Home({ go }: { go: Go }) {
               transition={{ duration: 0.6, ease: EASE }}
             >
               <h1 id="home-title" className="text-[40px] font-bold leading-[1.2] tracking-[-0.02em] md:text-[64px]" style={{ color: C.ivory }}>
-                {FIRM}
+                부동산, 이혼, 형사 사건 상담
               </h1>
               <p className="mt-3 max-w-[560px] text-[16px] md:text-[18px]" style={{ color: "#dfe3ec" }}>
                 ㄱㅇ법원 건너편에서 변호사 2명이 직접 상담하고 사건을 진행합니다.

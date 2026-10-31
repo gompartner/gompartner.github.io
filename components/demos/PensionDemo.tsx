@@ -611,10 +611,10 @@ function HeroSlider({ go }: { go: Go }) {
         <div className="absolute inset-0" style={{ background: "linear-gradient(to top, rgba(11,34,51,0.78) 0%, rgba(11,34,51,0.25) 50%, rgba(11,34,51,0.1) 100%)" }} />
         <div className="absolute inset-x-0 bottom-0 px-4 pb-20 text-center text-white md:pb-24">
           <h1 id="pension-title" tabIndex={-1} className="text-[34px] font-bold leading-[1.25] tracking-[-0.03em] outline-none md:text-[54px]">
-            {PENSION}
+            ㅅㄴ 해수욕장 앞 바다 펜션
           </h1>
           <p className="mt-2 text-[16px] md:text-[19px]" style={{ color: "#e8eef2" }}>
-            ㅅㄴ 해수욕장 도보 3분, 바다 전망 객실 3실
+            해수욕장 도보 3분, 바다 전망 객실 3실
           </p>
           <div className="mt-6 flex justify-center gap-2">
             <button type="button" onClick={() => go("reserve")} className="inline-flex h-12 items-center rounded-[6px] px-6 font-bold" style={{ background: C.coral, color: C.navyDeep }}>

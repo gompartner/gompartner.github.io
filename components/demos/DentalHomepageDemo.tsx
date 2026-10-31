@@ -1017,7 +1017,7 @@ function HomePage({ go, reserve, linkOut }: { go: Go; reserve: (id: TreatmentId)
             통합치의학과, 치과교정과 전문의 진료
           </p>
           <h1 id="main-title" className="mt-2 text-[40px] font-bold leading-[1.15] tracking-[-0.045em] md:text-[56px]">
-            {CLINIC}
+            야간진료 하는<br className="sm:hidden" /> 동네 치과
           </h1>
           <p className="mt-4 text-[18px] md:text-[20px]" style={{ color: C.onInk }}>
             화, 목 야간진료 21:00까지
