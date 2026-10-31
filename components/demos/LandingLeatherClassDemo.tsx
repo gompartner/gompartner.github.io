@@ -690,27 +690,21 @@ export function LandingLeatherClassDemo() {
                     {pay === "card" ? (
                       <div className="mt-3 rounded-[8px] border p-5" style={{ borderColor: C.line, background: C.soft }}>
                         <p className="text-[13px]" style={{ color: C.muted }}>
-                          테스트 카드
+                          등록한 카드
                         </p>
                         <p className="mt-2 whitespace-nowrap text-[16px] font-semibold tabular-nums tracking-[0.08em] min-[380px]:text-[18px]">0000 0000 0000 0000</p>
-                        <p className="mt-2 text-[13px]" style={{ color: C.muted }}>
-                          번호를 받지 않는 연습용 카드예요
-                        </p>
                       </div>
                     ) : (
                       <div className="mt-3 rounded-[8px] border p-4" style={{ borderColor: C.line, background: C.soft }}>
                         <p className="text-[13px] font-semibold" style={{ color: C.muted }}>
                           이 신청 전용 계좌
                         </p>
-                        <p className="mt-1 text-[18px] font-bold tabular-nums">가상은행 000-0000-0000</p>
+                        <p className="mt-1 text-[18px] font-bold tabular-nums">국민은행 000000-00-000000</p>
                         <p className="mt-1 text-[14px]" style={{ color: C.body }}>
                           입금자명이 달라도 이 계좌로 들어오면 자동으로 확인돼요.
                         </p>
                       </div>
                     )}
-                    <p className="mt-3 text-[13px]" style={{ color: C.muted }}>
-                      샘플이라 실제로 결제되지 않아요.
-                    </p>
                     {err && (
                       <p role="alert" className="mt-2 text-[14px] font-semibold" style={{ color: C.error }}>
                         {err}
@@ -1065,7 +1059,7 @@ function Confirm({ done, label, onPaid, onRestart, onChange, reduce }: { done: B
       {done.status === "입금 대기" && (
         <div className="mt-4 rounded-[6px] border bg-white p-3 text-[14px]" style={{ borderColor: C.line }}>
           <p className="tabular-nums">
-            가상은행 000-0000-0000, <b>{won(PRICE * done.qty)}</b>
+            국민은행 000000-00-000000, <b>{won(PRICE * done.qty)}</b>
           </p>
           <button type="button" onClick={pay} disabled={paying} className={`${btnLine} mt-2 h-11 w-full text-[15px] disabled:opacity-60`} style={{ borderColor: C.accent, color: C.accent }}>
             {paying ? "입금 확인 중" : "입금했다 치고 보기"}

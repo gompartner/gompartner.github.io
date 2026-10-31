@@ -1929,10 +1929,7 @@ function OrderView({ cart, region, onRegion, onOrdered, go }: { cart: CartLine[]
       ) : (
         <form onSubmit={submit} noValidate className="mt-8 grid gap-8 lg:grid-cols-[1fr_360px]">
           <div className="min-w-0">
-            <p className="rounded-[4px] px-3 py-2 text-[14px] font-semibold" style={{ background: C.claySoft, color: C.terraDeep }}>
-              데모 화면이라 실제로 결제되지 않습니다.
-            </p>
-            <h2 className="mt-6 border-b pb-2 text-[18px] font-bold" style={{ borderColor: C.ink }}>
+            <h2 className="border-b pb-2 text-[18px] font-bold" style={{ borderColor: C.ink }}>
               배송지
             </h2>
             <div className="mt-4 grid gap-3 sm:grid-cols-2">

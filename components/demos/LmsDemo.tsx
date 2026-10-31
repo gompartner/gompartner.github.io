@@ -2279,7 +2279,7 @@ function Player({
                     <option value={1.2}>1.2배속</option>
                     <option value={1.5}>1.5배속</option>
                     <option value={2}>2.0배속</option>
-                    <option value={30}>30배속(시연용)</option>
+                    <option value={30}>30배속</option>
                   </select>
                 </label>
               </div>
