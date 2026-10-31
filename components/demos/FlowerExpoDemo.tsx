@@ -495,14 +495,14 @@ function Header({ page, go }: { page: Page; go: Go }) {
         </Container>
       </div>
       <Container className="flex h-16 items-center justify-between gap-3">
-        <button type="button" onClick={() => pick("home")} className="flex min-w-0 items-center gap-2" aria-label="곰파트너 꽃박람회 샘플 메인으로">
+        <button type="button" onClick={() => pick("home")} className="flex min-w-0 items-center gap-2" aria-label="곰파트너 카탈로그 메인으로">
           <Flower size={30} />
           <span className="flex items-baseline gap-1.5 whitespace-nowrap">
             <span className="text-[18px] font-bold leading-none tracking-[-0.03em] md:text-[20px]" style={{ color: C.green }}>
               곰파트너
             </span>
             <span className="text-[12px] font-semibold leading-none md:text-[13px]" style={{ color: C.ink, opacity: 0.65 }}>
-              꽃박람회 샘플
+              카탈로그
             </span>
           </span>
         </button>

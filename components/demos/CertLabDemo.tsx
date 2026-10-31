@@ -387,7 +387,7 @@ function Logo() {
       <img src="/images/logo-bear.png" alt="" aria-hidden width={28} height={28} className="h-7 w-7 shrink-0" />
       <span className="flex min-w-0 items-baseline gap-1.5 whitespace-nowrap">
         <span className="text-[18px] font-bold tracking-[-0.02em] sm:text-[19px]">곰파트너</span>
-        <span className="truncate text-[11px] font-bold sm:text-[12px]" style={{ opacity: 0.75 }}>시험인증 샘플</span>
+        <span className="truncate text-[11px] font-bold sm:text-[12px]" style={{ opacity: 0.75 }}>카탈로그</span>
       </span>
     </span>
   );

@@ -397,9 +397,9 @@ export function ExcelAutomationDemo() {
           <img src="/images/logo-bear.png" alt="" aria-hidden width={28} height={28} className="h-7 w-7 shrink-0" />
           <div className="mr-auto min-w-0">
             <p className="flex items-baseline gap-1 whitespace-nowrap">
-              <span className="sr-only">곰파트너 주문취합 샘플</span>
+              <span className="sr-only">곰파트너 카탈로그</span>
               <span aria-hidden className="text-[16px] font-bold">곰파트너</span>
-              <span aria-hidden className="text-[11px] font-medium opacity-80">주문취합 샘플</span>
+              <span aria-hidden className="text-[11px] font-medium opacity-80">카탈로그</span>
             </p>
             <h1 className="truncate text-[17px] font-bold">{sheet.fileName}</h1>
           </div>

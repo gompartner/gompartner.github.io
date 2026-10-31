@@ -593,7 +593,7 @@ function Hero({
           <img src="/images/logo-bear.png" alt="" aria-hidden width={28} height={28} className="h-7 w-7 shrink-0" />
           <span className="flex items-baseline gap-1">
             <span className="text-[17px] font-bold">곰파트너</span>
-            <span className="text-[11px] font-semibold text-white/75">피부과 샘플</span>
+            <span className="text-[11px] font-semibold text-white/75">카탈로그</span>
             <span className="ml-1 text-[17px] text-white/70"> 피부 진단 결과지</span>
           </span>
         </p>

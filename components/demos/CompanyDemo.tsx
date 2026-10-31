@@ -406,7 +406,7 @@ function Logo() {
       <span className="flex min-w-0 items-baseline gap-1.5 whitespace-nowrap">
         <span className="text-[18px] font-bold tracking-[-0.02em] sm:text-[20px]">{lang === "ko" ? "곰파트너" : "Gompartner"}</span>
         <span className="truncate text-[11px] font-bold sm:text-[12px]" style={{ opacity: 0.75 }}>
-          {lang === "ko" ? "정밀가공 샘플" : "Machining sample"}
+          {lang === "ko" ? "카탈로그" : "Catalog"}
         </span>
       </span>
     </span>

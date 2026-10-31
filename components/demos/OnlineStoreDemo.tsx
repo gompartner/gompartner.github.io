@@ -546,7 +546,7 @@ function Logo() {
       <img src="/images/logo-bear.png" alt="" aria-hidden width={28} height={28} className="h-7 w-7 shrink-0" />
       <span className="inline-flex items-baseline gap-1.5 whitespace-nowrap">
         <span className="text-[18px] font-bold tracking-[-0.02em] md:text-[20px]">곰파트너</span>
-        <span className="text-[11px] font-semibold opacity-80 md:text-[12px]">도자기 공방 샘플</span>
+        <span className="text-[11px] font-semibold opacity-80 md:text-[12px]">카탈로그</span>
       </span>
     </span>
   );

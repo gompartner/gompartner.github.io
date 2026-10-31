@@ -261,7 +261,7 @@ function Header({
           <LogoMark />
           <span className="inline-flex items-baseline gap-1.5 whitespace-nowrap">
             <span className="text-[18px] font-bold tracking-[-0.02em]">곰파트너</span>
-            <span className="text-[11px] font-semibold opacity-80">한식당 샘플</span>
+            <span className="text-[11px] font-semibold opacity-80">카탈로그</span>
           </span>
         </button>
 

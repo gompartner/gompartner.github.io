@@ -617,7 +617,7 @@ export function HomepageDemo() {
             <img src="/images/logo-bear.png" alt="" aria-hidden width={28} height={28} className="h-7 w-7 shrink-0" />
             <span className="inline-flex items-baseline gap-1.5 whitespace-nowrap">
               <span className="text-lg font-black tracking-wider">곰파트너</span>
-              <span className="text-[11px] font-bold opacity-80">프라이빗 짐 샘플</span>
+              <span className="text-[11px] font-bold opacity-80">카탈로그</span>
             </span>
           </button>
           <ul className="-mx-1 flex w-full items-center gap-4 overflow-x-auto px-1 text-sm font-medium sm:mx-0 sm:w-auto sm:gap-6 sm:overflow-visible sm:px-0">
@@ -1361,7 +1361,7 @@ export function HomepageDemo() {
               <img src="/images/logo-bear.png" alt="" aria-hidden width={24} height={24} className="h-6 w-6 shrink-0" />
               <span className="inline-flex items-baseline gap-1.5">
                 <span className="font-black tracking-wider">곰파트너</span>
-                <span className="text-[10px] font-bold opacity-80">프라이빗 짐 샘플</span>
+                <span className="text-[10px] font-bold opacity-80">카탈로그</span>
               </span>
             </p>
             <DemoMakerInfo className="mt-3" />

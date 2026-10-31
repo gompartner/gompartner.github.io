@@ -310,7 +310,7 @@ export function MaintenanceDemo() {
               <Brand className="flex items-baseline gap-1.5 whitespace-nowrap leading-[1.35]">
                 <span className="text-[17px] font-bold">곰파트너</span>
                 <span className="text-[12px] font-semibold" style={{ color: C.muted }}>
-                  유지보수 현황판 샘플
+                  카탈로그
                 </span>
               </Brand>
               <span className="block text-[15px] leading-[1.35]" style={{ color: C.muted }}>

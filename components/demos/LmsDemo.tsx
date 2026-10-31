@@ -593,10 +593,10 @@ function SiteHeader({ route, loggedIn, go, onMy, onLogout, onAdmin, onReset }: {
         <button type="button" onClick={() => go({ name: "home" })} className="flex h-16 items-center gap-2" style={{ color: C.brand }}>
           {/* eslint-disable-next-line @next/next/no-img-element */}
           <img src="/images/logo-bear.png" alt="" aria-hidden width={30} height={30} className="h-[30px] w-[30px] shrink-0" />
-          <span className="sr-only">곰파트너 이러닝 샘플</span>
+          <span className="sr-only">곰파트너 카탈로그</span>
           <span aria-hidden className="flex items-baseline gap-1 whitespace-nowrap">
             <span className="text-[20px] font-bold">곰파트너</span>
-            <span className="text-[12px] font-bold opacity-80">이러닝 샘플</span>
+            <span className="text-[12px] font-bold opacity-80">카탈로그</span>
           </span>
         </button>
         <div className="order-2 ml-auto flex items-center gap-1 md:order-3">
@@ -1343,10 +1343,10 @@ export function LmsDemo() {
               <p className="mr-auto flex items-center gap-2" style={{ color: C.brand }}>
                 {/* eslint-disable-next-line @next/next/no-img-element */}
                 <img src="/images/logo-bear.png" alt="" aria-hidden width={28} height={28} className="h-7 w-7 shrink-0" />
-                <span className="sr-only">곰파트너 이러닝 샘플 관리자</span>
+                <span className="sr-only">곰파트너 카탈로그 관리자</span>
                 <span aria-hidden className="flex items-baseline gap-1 whitespace-nowrap">
                   <span className="text-[18px] font-bold">곰파트너</span>
-                  <span className="text-[11px] font-bold opacity-80">이러닝 샘플</span>
+                  <span className="text-[11px] font-bold opacity-80">카탈로그</span>
                   <span className="ml-1.5 text-[14px] font-bold" style={{ color: C.text }}>
                     관리자
                   </span>

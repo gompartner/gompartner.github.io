@@ -168,7 +168,7 @@ export function LandingZineFairDemo() {
             <span className="text-[22px]" style={dF}>
               {NAME}
             </span>
-            <span className="mt-1 text-[12px] font-bold opacity-70">북페어 샘플</span>
+            <span className="mt-1 text-[12px] font-bold opacity-70">카탈로그</span>
           </span>
         </span>
         <button type="button" onClick={() => go("zf-entry")} className={`${pill} px-4 py-2 text-[15px] text-white`} style={{ background: C.blue, boxShadow: `3px 3px 0 ${C.pink}`, outlineColor: C.black }}>

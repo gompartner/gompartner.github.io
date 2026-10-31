@@ -872,7 +872,7 @@ export function DistrictPortalDemo() {
                   곰파트너
                 </span>
                 <span className="h-5 w-px bg-[#b9c0cc]" aria-hidden />
-                <span className="text-[14px] font-semibold text-[#5a6473]">구청 샘플</span>
+                <span className="text-[14px] font-semibold text-[#5a6473]">카탈로그</span>
               </a>
             </Brand>
 
