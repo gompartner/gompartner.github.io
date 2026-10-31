@@ -8,6 +8,7 @@ const menu = [
   { href: "/classic/homepage", label: "홈페이지 제작" },
   { href: "/classic/maintenance", label: "유지보수" },
   { href: "/classic/works", label: "카탈로그" },
+  { href: "/classic/notice", label: "공지사항" },
   { href: "/classic/faq", label: "자주 묻는 질문" },
   { href: "/classic/contact", label: "상담 신청" },
 ];
