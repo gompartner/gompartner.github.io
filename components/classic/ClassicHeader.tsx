@@ -23,14 +23,20 @@ export const classicMenu = [
     ],
   },
   {
-    label: "서비스",
+    label: "홈페이지 제작",
     href: "/classic/homepage",
-    match: ["/classic/homepage", "/classic/landing", "/classic/program", "/classic/maintenance"],
+    match: ["/classic/homepage", "/classic/landing", "/classic/program"],
+    items: [],
+  },
+  {
+    label: "유지보수",
+    href: "/classic/maintenance",
+    match: ["/classic/maintenance"],
     items: [
-      { href: "/classic/homepage", label: "홈페이지 제작" },
-      { href: "/classic/landing", label: "광고 랜딩페이지" },
-      { href: "/classic/program", label: "업무 프로그램" },
-      { href: "/classic/maintenance", label: "유지보수" },
+      { href: "/classic/maintenance/fix", label: "오류 수정" },
+      { href: "/classic/maintenance/takeover", label: "업체 이관" },
+      { href: "/classic/maintenance/update", label: "보안 업데이트" },
+      { href: "/classic/maintenance/monthly", label: "월 관리" },
     ],
   },
   // 업종(병원, 카페 등)은 카탈로그 화면 안의 탭에서 고른다. 카탈로그는 홈페이지 제작과 랜딩만(10-30)
@@ -40,7 +46,6 @@ export const classicMenu = [
     match: ["/classic/works", "/classic/sample"],
     items: [
       { href: "/classic/works", label: "업종별 홈페이지" },
-      { href: "/classic/works/landing", label: "광고 랜딩페이지" },
     ],
   },
   // 고객 사례는 실제 사례가 생기면 data/classic/cases.ts에 넣는 순간 메뉴에 나온다

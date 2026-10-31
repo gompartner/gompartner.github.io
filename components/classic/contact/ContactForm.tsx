@@ -8,7 +8,7 @@ import { profile } from "@/data/classic/profile";
 
 // 클래식 상담 신청 폼. 보내는 방식과 필드명은 /landing 폼과 같다(같은 Apps Script 시트에 쌓인다).
 
-export const SERVICES = ["홈페이지 제작", "광고 랜딩페이지", "업무 프로그램", "유지보수", "잘 모르겠음"] as const;
+export const SERVICES = ["홈페이지 제작", "유지보수", "잘 모르겠음"] as const;
 export const BUDGETS = ["30만 원 안쪽", "30~50만 원", "50~100만 원", "100만 원 넘음", "협의"] as const;
 
 const PHONE_RE = /^01[016789]-?\d{3,4}-?\d{4}$/;
@@ -24,6 +24,7 @@ const err = "mt-1.5 text-[15px] text-[#d63d4a]";
 export function ContactForm() {
   const [name, setName] = useState("");
   const [phone, setPhone] = useState("");
+  const [email, setEmail] = useState("");
   const [business, setBusiness] = useState("");
   // 홈페이지 진단(/tools/site-check)의 "전체 보고서 받기"로 넘어오면 ?site=주소 가 붙는다. 서비스와 문의 내용을 미리 채운다.
   const params = useSearchParams();
@@ -50,6 +51,7 @@ export function ContactForm() {
     const e: Record<string, string> = {};
     if (!name.trim()) e.name = "이름을 입력해 주세요.";
     if (!PHONE_RE.test(phone.trim())) e.phone = "휴대폰 번호를 확인해 주세요.";
+    if (email.trim() && !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email.trim())) e.email = "이메일 주소를 확인해 주세요.";
     if (!business.trim()) e.business = "회사나 상호를 입력해 주세요.";
     if (!message.trim()) e.message = "문의 내용을 입력해 주세요.";
     if (!agree) e.agree = "개인정보 수집 및 이용에 동의해 주세요.";
@@ -69,6 +71,7 @@ export function ContactForm() {
     const q = new URLSearchParams(window.location.search);
     // 시트 칸은 /landing 폼과 같아서, 더한 항목은 문의 내용 앞에 줄로 붙인다
     const extra = [
+      email.trim() && `이메일: ${email.trim()}`,
       sample.trim() && `참고 카탈로그: ${sample.trim()}`,
       budget && `예산: ${budget}`,
       openDate.trim() && `희망 오픈일: ${openDate.trim()}`,
@@ -144,6 +147,14 @@ export function ContactForm() {
           <input id="cc-phone" value={phone} onChange={(e) => setPhone(e.target.value)} inputMode="tel" autoComplete="tel" placeholder="010-0000-0000" className={field} aria-invalid={!!errors.phone} aria-describedby={errors.phone ? "cc-phone-err" : undefined} />
           {errors.phone && <p id="cc-phone-err" className={err}>{errors.phone}</p>}
         </div>
+      </div>
+
+      <div>
+        <label htmlFor="cc-email" className={label}>
+          이메일 <span className={opt}>(선택)</span>
+        </label>
+        <input id="cc-email" type="email" value={email} onChange={(e) => setEmail(e.target.value)} autoComplete="email" placeholder="name@example.com" className={field} aria-invalid={!!errors.email} aria-describedby={errors.email ? "cc-email-err" : undefined} />
+        {errors.email && <p id="cc-email-err" className={err}>{errors.email}</p>}
       </div>
 
       <div>

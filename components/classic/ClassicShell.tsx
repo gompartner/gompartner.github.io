@@ -1,3 +1,4 @@
+import { CtaBand } from "@/components/classic/CtaBand";
 import { ClassicFooter } from "@/components/classic/ClassicFooter";
 import { ClassicHeader } from "@/components/classic/ClassicHeader";
 import { RememberClassic } from "@/components/classic/RememberClassic";
@@ -19,6 +20,7 @@ export function ClassicShell({ children }: { children: React.ReactNode }) {
       <main id="main" className="flex-1 pt-16 md:pt-[76px]">
         {children}
       </main>
+      <CtaBand />
       <ClassicFooter />
     </div>
   );

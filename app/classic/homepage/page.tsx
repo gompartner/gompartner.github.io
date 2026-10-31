@@ -2,13 +2,15 @@ import type { Metadata } from "next";
 import Image from "next/image";
 import Link from "next/link";
 import { ChevronRight, Factory, GraduationCap, Scale, Stethoscope, Store } from "lucide-react";
+import { CompareTable } from "@/components/classic/CompareTable";
+import { FaqBlock } from "@/components/classic/FaqBlock";
 import { PlanTable } from "@/components/classic/pricing/PlanTable";
 import { StepList } from "@/components/classic/pricing/StepList";
 import { serviceTabs } from "@/components/classic/pricing/tabs";
 import { PageHead, SubTabs, h2, more, wrap } from "@/components/classic/ui";
 import { SampleGrid } from "@/components/classic/works/SampleGrid";
 import { demoProjects } from "@/components/classic/works/samples";
-import { processSteps } from "@/data/classic/faq";
+import { faqFor, processSteps } from "@/data/classic/faq";
 import { industries } from "@/data/classic/industries";
 import { plans, runningCostNote, samplesForPlan } from "@/data/classic/pricing";
 import { projects } from "@/data/classic/projects";
@@ -53,7 +55,7 @@ export default function ClassicHomepagePage() {
             <h2 id="hp-lead" className="break-keep text-[26px] font-[800] leading-[1.35] tracking-[-0.04em] md:text-[34px]">
               검색 노출과 문의 접수까지 고려한 업종별 홈페이지
             </h2>
-            <p className="mt-4 break-keep text-[16px] leading-[1.7] text-[#5b6370] md:text-[17px]">PC와 휴대폰에서 같은 내용을 각 화면에 맞게 보여 주는 반응형으로 제작합니다.</p>
+            <p className="mt-4 break-keep text-[16px] leading-[1.7] text-[#5b6370] md:text-[17px]">반응형, 검색엔진 등록, 원본 소스</p>
           </div>
           {/* PC 화면 위에 휴대폰 화면을 겹친다. 실제 카탈로그 캡처 */}
           <div aria-hidden className="relative aspect-[16/11] w-full">
@@ -129,7 +131,11 @@ export default function ClassicHomepagePage() {
         </section>
       )}
 
+      <CompareTable />
+
       <StepList steps={processSteps} title="진행 절차" id="process" />
+
+      <FaqBlock items={faqFor("make")} id="hp-faq" />
 
     </>
   );

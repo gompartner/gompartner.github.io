@@ -37,7 +37,7 @@ ${landingPlans.map((p) => `- ${p.title}: 수정 ${p.revisions}회. ${p.summary}.
 
 ## 제작 후 유지보수
 
-${maintenanceServices.map((s) => `- ${s.title} (${s.term}). 맡지 않는 일: ${s.excludes.join(", ")}`).join("\n")}
+${maintenanceServices.map((s) => `- [${s.title}](${url(`/classic/maintenance/${s.id}`)}): ${s.term}`).join("\n")}
 
 자세히: [유지보수](${url("/classic/maintenance")})
 
