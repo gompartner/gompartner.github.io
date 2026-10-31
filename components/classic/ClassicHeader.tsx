@@ -47,11 +47,9 @@ export const classicMenu = [
   ...(cases.length > 0 ? [{ label: "고객 사례", href: "/classic/cases", match: ["/classic/cases"], items: [] }] : []),
   {
     label: "고객지원",
-    href: "/classic/notice",
-    match: ["/classic/notice", "/classic/guide", "/classic/faq", "/classic/contact", "/classic/privacy"],
+    href: "/classic/faq",
+    match: ["/classic/faq", "/classic/contact", "/classic/privacy"],
     items: [
-      { href: "/classic/notice", label: "공지사항" },
-      { href: "/classic/guide", label: "운영 가이드" },
       { href: "/classic/faq", label: "자주 묻는 질문" },
       { href: "/classic/contact", label: "상담 신청" },
     ],

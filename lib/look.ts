@@ -4,10 +4,13 @@
 
 export const storyPath = "/story";
 
-export const classicPaths = ["/works", "/sample", "/pricing", "/maintenance", "/faq", "/tools", "/privacy", "/landing"];
+export const classicPaths = ["/works", "/sample", "/maintenance", "/faq", "/privacy", "/landing"];
 
 // 웹툰 주소로 바로 들어오면 클래식 주소로 옮기는 페이지. 검색으로 들어오는 가이드, 자료실과 광고 랜딩은 그대로 둔다.
-export const redirectPaths = ["/works", "/sample", "/pricing", "/maintenance", "/faq", "/privacy"];
+export const redirectPaths = ["/works", "/sample", "/maintenance", "/faq", "/privacy"];
+
+// 11-01 내린 페이지(공지, 가이드, 자료실, 가격). 파일이 없어 404로 응답하고, 사람은 첫 화면으로 옮긴다
+export const removedPaths = ["/classic/notice", "/classic/guide", "/guide", "/tools", "/pricing"];
 
 // 클래식에만 있는 페이지가 웹툰으로 돌아갈 때 갈 곳
 const webtoonOnly: Record<string, string> = { "/program": "/works", "/contact": "/landing" };
@@ -27,4 +30,4 @@ export function webtoonPathFor(path: string): string {
 }
 
 /** 루트 레이아웃 head 스크립트. 웹툰을 고른 사람은 첫 화면에서 이야기로, 나머지는 웹툰 주소에서 같은 클래식 주소로 그리기 전에 옮긴다. */
-export const lookRedirectScript = `try{var p=location.pathname.replace(/\\/$/,"")||"/";var w=false;try{w=localStorage.getItem("look")==="webtoon"}catch(e){}if(w){if(p==="/")location.replace("${storyPath}"+location.search+location.hash)}else if(${JSON.stringify(redirectPaths)}.some(function(x){return p===x||p.indexOf(x+"/")===0}))location.replace("/classic"+p+location.search+location.hash)}catch(e){}`;
+export const lookRedirectScript = `try{var p=location.pathname.replace(/\\/$/,"")||"/";var w=false;try{w=localStorage.getItem("look")==="webtoon"}catch(e){}if(w){if(p==="/")location.replace("${storyPath}"+location.search+location.hash)}else if(${JSON.stringify(redirectPaths)}.some(function(x){return p===x||p.indexOf(x+"/")===0}))location.replace("/classic"+p+location.search+location.hash);if(${JSON.stringify(removedPaths)}.some(function(x){return p===x||p.indexOf(x+"/")===0}))location.replace("/")}catch(e){}`;

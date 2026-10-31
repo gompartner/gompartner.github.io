@@ -21,7 +21,7 @@ export default function ClassicContactPage() {
       <PageHead
         title="상담 신청"
         trail={[
-          { href: "/classic/notice", label: "고객지원" },
+          { href: "/classic/faq", label: "고객지원" },
           { href: "/classic/contact", label: "상담 신청" },
         ]}
       />

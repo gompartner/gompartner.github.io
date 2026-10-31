@@ -7,9 +7,7 @@ import { Footer } from "@/components/layout/Footer";
 const pages = [
   { href: "/", label: "첫 화면" },
   { href: "/works", label: "샘플" },
-  { href: "/pricing", label: "가격" },
   { href: "/faq", label: "자주 묻는 질문" },
-  { href: "/tools", label: "자료실" },
 ];
 
 export default function NotFound() {
