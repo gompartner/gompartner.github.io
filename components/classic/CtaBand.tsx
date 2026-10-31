@@ -2,9 +2,10 @@
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { profile } from "@/data/classic/profile";
+import { MessageCircle } from "lucide-react";
+import { ChannelTalkButton } from "@/components/layout/ChannelTalk";
 
-// 모든 클래식 페이지 바닥글 위 상담 띠(11-01 보편 구성). 상담 신청 페이지에서는 숨긴다.
+// 모든 클래식 페이지 바닥글 위 상담 띠(11-01 보편 구성). 상담 신청과 채널톡 채팅. 상담 신청 페이지에서는 숨긴다.
 export function CtaBand() {
   const pathname = usePathname();
   if (pathname?.startsWith("/classic/contact")) return null;
@@ -16,9 +17,10 @@ export function CtaBand() {
           <Link href="/classic/contact" data-gtm-cta="cta_band_contact" className="inline-flex h-12 items-center rounded-md bg-white px-6 text-[16px] font-bold text-[#15171c] transition-colors hover:bg-[#e8efff]">
             상담 신청
           </Link>
-          <a href={`tel:${profile.phone.replace(/-/g, "")}`} data-gtm-cta="cta_band_tel" className="inline-flex h-12 items-center rounded-md border border-white/50 px-6 text-[16px] font-bold text-white tabular-nums transition-colors hover:bg-white/10">
-            {profile.phone}
-          </a>
+          <ChannelTalkButton cta="cta_band_chat" className="inline-flex h-12 items-center gap-2 rounded-md border border-white/50 px-6 text-[16px] font-bold text-white transition-colors hover:bg-white/10">
+            <MessageCircle size={18} aria-hidden />
+            채팅 상담
+          </ChannelTalkButton>
         </div>
       </div>
     </section>
