@@ -89,7 +89,7 @@ export default function ClassicStoryPage() {
           <h2 id="st-contact" className={h2}>
             연락 방법
           </h2>
-          <dl className="mt-10 grid gap-px overflow-hidden rounded-md border border-[#d9dee5] bg-[#d9dee5] sm:grid-cols-3">
+          <dl className="mt-10 grid gap-px overflow-hidden rounded-md border border-[#d9dee5] bg-[#d9dee5] sm:grid-cols-2 lg:grid-cols-4">
             <div className="bg-white p-6">
               <dt className={dt}>상담 신청</dt>
               <dd className="mt-2 text-[18px] font-bold">
@@ -106,6 +106,12 @@ export default function ClassicStoryPage() {
                 </a>
               </dd>
             </div>
+            {profile.fax && (
+              <div className="bg-white p-6">
+                <dt className={dt}>팩스</dt>
+                <dd className="mt-2 text-[18px] font-bold tabular-nums">{profile.fax}</dd>
+              </div>
+            )}
             <div className="bg-white p-6">
               <dt className={dt}>이메일</dt>
               <dd className="mt-2 break-all text-[18px] font-bold">

@@ -33,6 +33,7 @@ export function ClassicFooter() {
               전화 {profile.phone}
             </a>
           </p>
+          {profile.fax && <p className="mt-1">팩스 {profile.fax}</p>}
           <p className="mt-1">
             <a href={`mailto:${profile.email}`} data-gtm-cta="classic_footer_email" className="hover:text-white">
               이메일 {profile.email}
