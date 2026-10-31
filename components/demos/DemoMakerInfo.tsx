@@ -6,7 +6,7 @@ export function DemoMakerInfo({ className = "" }: { className?: string }) {
   const tel = profile.phone.replace(/-/g, "");
   return (
     <div className={`text-[14px] leading-[1.7] ${className}`}>
-      <p className="font-bold">이 사이트는 {profile.name}가 만든 홈페이지 샘플이에요</p>
+      <p className="font-bold">홈페이지 제작 {profile.name}</p>
       <p className="mt-1 flex flex-wrap gap-x-4 gap-y-1 opacity-90">
         <a href={`tel:${tel}`} data-gtm-cta="demo_footer_tel" className="underline-offset-4 hover:underline">
           전화 {profile.phone}
