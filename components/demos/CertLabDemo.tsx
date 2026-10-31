@@ -65,7 +65,7 @@ const IMG = "/images/demo-certlab";
 const COMPANY = "곰파트너";
 const TEL = "02-000-0000";
 const FAX = "02-000-0001";
-const EMAIL = "gompartner@gmail.com";
+const EMAIL = "contact@gompartner.co.kr";
 const ADDRESS = "ㄱㅇ시 ㅂㄹ구 ㄷㅅ로 00 곰파트너";
 const HOURS = "평일 09:00 ~ 18:00";
 
