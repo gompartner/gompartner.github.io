@@ -1,7 +1,7 @@
 import type { Metadata } from "next";
 import Image from "next/image";
-import { ClipboardCheck, FileText, KeyRound, ScrollText, ShieldCheck } from "lucide-react";
-import { channels } from "@/components/classic/ClassicFooter";
+import { ArrowUpRight, ClipboardCheck, FileText, KeyRound, ScrollText, ShieldCheck } from "lucide-react";
+import Link from "next/link";
 import { PageHead, h2, wrap } from "@/components/classic/ui";
 import { aboutLead, aboutTitle, principles } from "@/data/classic/about";
 import { profile } from "@/data/classic/profile";
@@ -15,6 +15,12 @@ export const metadata: Metadata = pageMeta({
 
 const section = "scroll-mt-16 border-t border-[#e6e9ee] md:scroll-mt-[76px]";
 const dt = "text-[15px] font-bold text-[#3d4450]";
+
+// 11-01 다른 업체 회사소개 비교: 소개, 일하는 방식, 사업 영역, 연락 방법 순. 사업자 정보와 채널은 바닥글에 있어 본문에서 뺌
+const areas = [
+  { href: "/classic/homepage", name: "홈페이지 제작", what: "병원, 매장, 전문직, 기업, 학원 반응형 홈페이지" },
+  { href: "/classic/maintenance", name: "유지보수", what: "오류 수정, 업체 이관, 보안 업데이트, 월 관리" },
+];
 
 export default function ClassicStoryPage() {
   return (
@@ -59,51 +65,57 @@ export default function ClassicStoryPage() {
         </div>
       </section>
 
-      <section id="info" aria-labelledby="st-info" className={`${section} bg-[#f4f6f9]`}>
-        <div className={`${wrap} grid gap-12 py-16 md:grid-cols-2 md:py-24`}>
-          <div>
-            <h2 id="st-info" className="text-[24px] font-[800] tracking-[-0.03em]">
-              사업자 정보
-            </h2>
-            <dl className="mt-6 space-y-4 border-t-2 border-[#15171c] pt-5 text-[16px] md:text-[17px]">
-              <div>
-                <dt className={dt}>상호</dt>
-                <dd className="mt-1">{profile.name}</dd>
-              </div>
-              <div>
-                <dt className={dt}>사업자등록번호</dt>
-                <dd className="mt-1 tabular-nums">{profile.bizNo}</dd>
-              </div>
-              <div>
-                <dt className={dt}>전화</dt>
-                <dd className="mt-1 tabular-nums">
-                  <a href={`tel:${profile.phone.replace(/-/g, "")}`} className="hover:text-[#256ef4]">
-                    {profile.phone}
-                  </a>
-                </dd>
-              </div>
-              <div>
-                <dt className={dt}>이메일</dt>
-                <dd className="mt-1">
-                  <a href={`mailto:${profile.email}`} className="hover:text-[#256ef4]">
-                    {profile.email}
-                  </a>
-                </dd>
-              </div>
-            </dl>
-          </div>
-          <div>
-            <h2 className="text-[24px] font-[800] tracking-[-0.03em]">운영 채널</h2>
-            <ul className="mt-6 border-t-2 border-[#15171c]" role="list">
-              {channels.map((c) => (
-                <li key={c.href} className="border-b border-[#d9dee5]">
-                  <a href={c.href} target="_blank" rel="noopener noreferrer" className="block py-4 text-[16px] font-bold hover:text-[#256ef4] md:text-[17px]">
-                    {c.label}
-                  </a>
-                </li>
-              ))}
-            </ul>
-          </div>
+      <section id="areas" aria-labelledby="st-areas" className={section}>
+        <div className={`${wrap} py-16 md:py-24`}>
+          <h2 id="st-areas" className={h2}>
+            사업 영역
+          </h2>
+          <ul className="mt-10 border-t-2 border-[#15171c]" role="list">
+            {areas.map((a) => (
+              <li key={a.href} className="border-b border-[#d9dee5]">
+                <Link href={a.href} className="group grid grid-cols-[1fr_auto] items-center gap-x-6 gap-y-1 py-6 md:grid-cols-[minmax(0,320px)_1fr_auto] md:py-8">
+                  <h3 className="col-start-1 row-start-1 text-[22px] font-[800] tracking-[-0.04em] group-hover:text-[#256ef4] md:text-[30px]">{a.name}</h3>
+                  <p className="col-start-1 row-start-2 text-[16px] text-[#5b6370] md:col-start-2 md:row-start-1 md:text-[17px]">{a.what}</p>
+                  <ArrowUpRight size={26} aria-hidden className="col-start-2 row-span-2 row-start-1 self-center text-[#6b7280] group-hover:text-[#256ef4] md:col-start-3 md:row-span-1" />
+                </Link>
+              </li>
+            ))}
+          </ul>
+        </div>
+      </section>
+
+      <section id="contact" aria-labelledby="st-contact" className={`${section} bg-[#f4f6f9]`}>
+        <div className={`${wrap} py-16 md:py-24`}>
+          <h2 id="st-contact" className={h2}>
+            연락 방법
+          </h2>
+          <dl className="mt-10 grid gap-px overflow-hidden rounded-md border border-[#d9dee5] bg-[#d9dee5] sm:grid-cols-3">
+            <div className="bg-white p-6">
+              <dt className={dt}>상담 신청</dt>
+              <dd className="mt-2 text-[18px] font-bold">
+                <Link href="/classic/contact" className="hover:text-[#256ef4]">
+                  상담 신청 페이지
+                </Link>
+              </dd>
+            </div>
+            <div className="bg-white p-6">
+              <dt className={dt}>전화</dt>
+              <dd className="mt-2 text-[18px] font-bold tabular-nums">
+                <a href={`tel:${profile.phone.replace(/-/g, "")}`} className="hover:text-[#256ef4]">
+                  {profile.phone}
+                </a>
+              </dd>
+            </div>
+            <div className="bg-white p-6">
+              <dt className={dt}>이메일</dt>
+              <dd className="mt-2 break-all text-[18px] font-bold">
+                <a href={`mailto:${profile.email}`} className="hover:text-[#256ef4]">
+                  {profile.email}
+                </a>
+              </dd>
+            </div>
+          </dl>
+          <p className="mt-4 text-[16px] font-bold text-[#3d4450]">24시간 이내 회신</p>
         </div>
       </section>
     </>
