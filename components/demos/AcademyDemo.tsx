@@ -403,7 +403,7 @@ function Hero() {
               초등 4학년부터 중학교 3학년까지, ㄷㅊ중 ㅁㄷ중 ㅅㄴ중 내신
             </p>
             <h1 id="academy-name" className="mt-2 text-[34px] font-bold leading-[1.2] tracking-[-0.02em] md:text-[52px]">
-              {ACADEMY}
+              수학, 영어 내신 소수반
             </h1>
             <div className="mt-5 flex flex-wrap gap-2">
               <button

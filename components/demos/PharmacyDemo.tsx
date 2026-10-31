@@ -669,7 +669,7 @@ function Intro() {
       <div className="p-4 md:p-6">
         <div className="flex flex-wrap items-center gap-x-3 gap-y-1.5">
           <h1 id="pharmacy-name" className="text-[28px] font-bold leading-[1.25] tracking-[-0.03em] md:text-[36px]">
-            {PHARMACY}
+            새벽 1시까지 여는 동네 약국
           </h1>
           <span className="rounded-[4px] px-2 py-0.5 text-[14px] font-semibold text-white" style={{ background: C.mint }}>
             공공심야약국

@@ -336,7 +336,7 @@ function HeroReceipt({ start, end, queue, no, onPick, onReserve, onWait }: { sta
     <>
       <p className="text-center text-[13px]">*** 성수 7일 한정 ***</p>
       <h1 className="mt-2 text-center text-[44px] leading-[1.05] md:text-[48px]" style={heavyF}>
-        {BRAND}
+        붕어빵 연구소
       </h1>
       <p className="mt-2 text-center text-[13px]">
         서울 성동구 ㅇㅇ길 00, {start.getMonth() + 1}.{start.getDate()}~{end.getMonth() + 1}.{end.getDate()}
