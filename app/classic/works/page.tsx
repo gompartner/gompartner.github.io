@@ -27,7 +27,7 @@ export default function ClassicWorksPage() {
             <span className="text-[16px] font-bold tabular-nums text-[#5b6370] md:text-[18px]">{sec.items.length}개</span>
           </div>
           <div className="mt-8 md:mt-10">
-            <SampleGrid items={sec.items} />
+            <SampleGrid items={sec.items} variant="mockup" />
           </div>
         </section>
       ))}

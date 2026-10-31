@@ -70,7 +70,7 @@ export default async function ClassicIndustryPage({ params }: Props) {
             <span className="text-[16px] font-bold tabular-nums text-[#5b6370] md:text-[18px]">{list.length}개</span>
           </div>
           <div className="mt-8 md:mt-10">
-            <SampleGrid items={list} />
+            <SampleGrid items={list} variant="mockup" />
           </div>
         </div>
       </section>
