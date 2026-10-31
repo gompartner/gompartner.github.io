@@ -69,9 +69,13 @@ export function ClassicFooter() {
           <Link href="/classic/privacy" className="font-bold text-white hover:underline">
             개인정보처리방침
           </Link>
-          <p>
-            상호 {profile.name} | 사업자등록번호 {profile.bizNo} | © {new Date().getFullYear()} {profile.name}
-          </p>
+          <div className="md:text-right">
+            <p>
+              상호 {profile.name} | 사업자등록번호 {profile.bizNo}
+            </p>
+            {/* 키보드로 칠 수 있는 기호만 쓴다(저작권 기호 대신 Copyright) */}
+            <p className="mt-1">Copyright {new Date().getFullYear()} {profile.name}. All rights reserved.</p>
+          </div>
         </div>
       </div>
     </footer>
