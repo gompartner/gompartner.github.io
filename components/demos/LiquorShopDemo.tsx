@@ -42,7 +42,7 @@ function SampleLogo({ light, small }: { light?: boolean; small?: boolean }) {
       <img src="/images/logo-bear.png" alt="" aria-hidden width={28} height={28} className={small ? "h-6 w-6 shrink-0" : "h-7 w-7 shrink-0"} />
       <span className="flex items-baseline gap-1 whitespace-nowrap">
         <span className={`${small ? "text-[18px]" : "text-[20px]"} font-bold tracking-[-0.03em]`}>곰파트너</span>
-        <span className="text-[12px] font-semibold opacity-75">전통주 샘플</span>
+        <span className="text-[12px] font-semibold opacity-75">카탈로그</span>
       </span>
     </span>
   );

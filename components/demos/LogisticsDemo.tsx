@@ -492,7 +492,7 @@ function SampleLogo({ light, size = 20 }: { light?: boolean; size?: number }) {
         <span className="font-bold tracking-[-0.03em]" style={{ fontSize: size }}>
           곰파트너
         </span>
-        <span className="text-[12px] font-semibold opacity-75">물류 샘플</span>
+        <span className="text-[12px] font-semibold opacity-75">카탈로그</span>
       </span>
     </span>
   );

@@ -289,7 +289,7 @@ function Logo({ light = false }: { light?: boolean }) {
       <span className="inline-flex items-baseline gap-1.5 whitespace-nowrap">
         <span className="text-[19px] font-bold tracking-[-0.01em]">곰파트너</span>
         <span className="text-[12px] font-semibold" style={{ opacity: light ? 0.85 : 0.8 }}>
-          학원 샘플
+          카탈로그
         </span>
       </span>
     </span>

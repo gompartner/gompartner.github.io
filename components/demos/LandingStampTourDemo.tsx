@@ -181,7 +181,7 @@ export function LandingStampTourDemo() {
                 {ORG}
               </span>
               <span className="text-[11px] font-semibold" style={{ color: C.muted }}>
-                스탬프 투어 샘플
+                카탈로그
               </span>
             </span>
           </span>

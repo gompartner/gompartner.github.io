@@ -114,7 +114,7 @@ export function AccessibilityDemo() {
             </span>
             <div>
               <p className="text-[17px] font-bold leading-tight">웹접근성 점검</p>
-              <p className="text-[15px] leading-tight text-[#474c68]">문화재단 샘플 메인 페이지</p>
+              <p className="text-[15px] leading-tight text-[#474c68]">문화재단 메인 페이지</p>
             </div>
           </div>
 
@@ -319,7 +319,7 @@ function SamplePage({
         )}
         <div className="flex flex-wrap items-center gap-x-6 gap-y-2 border-b border-[#e3dfe6] px-4 py-3 md:px-6">
           {/* eslint-disable-next-line @next/next/no-img-element */}
-          <img src="/images/demo-a11y/logo.svg" alt={good ? "곰파트너 문화재단 샘플" : undefined} width={212} height={44} className="h-9 w-auto" />
+          <img src="/images/demo-a11y/logo.svg" alt={good ? "곰파트너 카탈로그" : undefined} width={212} height={44} className="h-9 w-auto" />
           <nav aria-label={good ? "주 메뉴" : undefined} className="flex flex-wrap gap-x-4 gap-y-1 text-[15px] font-bold text-[#2b1a33]">
             {["재단소개", "공연, 전시", "교육", "지원사업", "알림마당"].map((m) => (
               <a key={m} href="#sample-main" onClick={(e) => e.preventDefault()} className="rounded px-1 py-0.5 hover:text-[#6b2d8c]">
@@ -331,7 +331,7 @@ function SamplePage({
       </Region>
 
       <main id="sample-main" tabIndex={-1} className="focus:outline-none">
-        <h1 className="sr-only">곰파트너 문화재단 샘플 메인</h1>
+        <h1 className="sr-only">곰파트너 카탈로그 메인</h1>
         <Region {...region("banner")}>
           <Banner good={good} reduced={reduced} />
         </Region>

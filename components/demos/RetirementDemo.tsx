@@ -259,7 +259,7 @@ function SiteHeader({ screen, go }: { screen: Screen; go: Go }) {
               곰파트너
             </span>
             <span className="text-[11px] font-bold" style={{ color: INK_3 }}>
-              보험사 샘플
+              카탈로그
             </span>
           </span>
         </button>

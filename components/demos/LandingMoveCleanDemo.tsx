@@ -141,7 +141,7 @@ export function LandingMoveCleanDemo() {
             <img src="/images/logo-bear.png" alt="" aria-hidden width={30} height={30} className="h-[30px] w-[30px] shrink-0" />
             <span className="inline-flex items-baseline gap-1.5 whitespace-nowrap">
               <span className="text-[22px] font-extrabold tracking-[-0.03em]">곰파트너</span>
-              <span className="text-[14px] font-semibold opacity-80">입주청소 샘플</span>
+              <span className="text-[14px] font-semibold opacity-80">카탈로그</span>
             </span>
           </span>
           <a href={`tel:${TEL}`} className="inline-flex items-center gap-1.5 rounded-[6px] px-3 py-2 text-[15px] font-bold" style={{ background: C.lemon, color: C.ink }}>

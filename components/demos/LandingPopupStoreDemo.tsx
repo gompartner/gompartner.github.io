@@ -145,7 +145,7 @@ export function LandingPopupStoreDemo() {
               {BRAND}
             </span>
             <span className="mt-1 text-[12px] font-bold opacity-70" style={monoF}>
-              팝업스토어 샘플
+              카탈로그
             </span>
           </span>
         </span>

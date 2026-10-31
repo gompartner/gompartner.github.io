@@ -231,7 +231,7 @@ export function ShopAdminDemo() {
             <img src="/images/logo-bear.png" alt="" aria-hidden width={26} height={26} className="h-[26px] w-[26px] shrink-0" />
             <span className="text-[16px] font-bold whitespace-nowrap">곰파트너</span>
           </p>
-          <p className="px-2 text-[13px] whitespace-nowrap" style={{ color: "#9ca3af" }}>쇼핑몰 관리자 샘플</p>
+          <p className="px-2 text-[13px] whitespace-nowrap" style={{ color: "#9ca3af" }}>카탈로그</p>
           <nav aria-label="관리 메뉴" className="mt-8 grid gap-1">
             {[
               ["options", "옵션관리"],
@@ -256,10 +256,10 @@ export function ShopAdminDemo() {
             <p className="flex items-center gap-1.5 lg:hidden" style={{ color: C.action }}>
               {/* eslint-disable-next-line @next/next/no-img-element */}
               <img src="/images/logo-bear.png" alt="" aria-hidden width={24} height={24} className="h-6 w-6 shrink-0" />
-              <span className="sr-only">곰파트너 쇼핑몰 관리자 샘플</span>
+              <span className="sr-only">곰파트너 카탈로그</span>
               <span aria-hidden className="flex items-baseline gap-1 whitespace-nowrap">
                 <span className="text-[16px] font-bold">곰파트너</span>
-                <span className="text-[10px] font-bold">쇼핑몰 관리자 샘플</span>
+                <span className="text-[10px] font-bold">카탈로그</span>
               </span>
             </p>
             <h1 className="text-[20px] font-bold leading-tight md:text-[24px]">{tab === "options" ? "옵션관리" : "주문관리"}</h1>

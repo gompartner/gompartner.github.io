@@ -285,7 +285,7 @@ function Logo() {
       <img src="/images/logo-bear.png" alt="" aria-hidden width={28} height={28} className="h-7 w-7 shrink-0" />
       <span className="flex flex-col items-start whitespace-nowrap leading-[1.2] sm:flex-row sm:items-baseline sm:gap-1">
         <span className="text-[19px] font-bold tracking-[-0.02em]">곰파트너</span>
-        <span className="text-[12px] font-semibold opacity-75">약국 샘플</span>
+        <span className="text-[12px] font-semibold opacity-75">카탈로그</span>
       </span>
     </span>
   );

@@ -251,7 +251,7 @@ export function ApplicationDemo() {
             <div className="leading-[1.3]">
               <h1 className="whitespace-nowrap text-[19px] font-bold tracking-[-0.02em]">곰파트너</h1>
               <p className={`whitespace-nowrap text-[13px] ${admin ? "text-[#c4cfca]" : "text-[#5b6862]"}`}>
-                {admin ? "지원사업 심사 샘플" : "지원사업 신청 샘플"}
+                {"카탈로그"}
               </p>
             </div>
           </div>

@@ -429,7 +429,7 @@ function Logo() {
       <img src="/images/logo-bear.png" alt="" aria-hidden width={28} height={28} className="h-7 w-7 shrink-0" />
       <span className="flex flex-col whitespace-nowrap leading-[1.15] md:flex-row md:items-baseline md:gap-1 md:leading-normal">
         <span className="text-[17px] font-bold tracking-[-0.02em] md:text-[19px]">곰파트너</span>
-        <span className="text-[11px] font-semibold opacity-75 md:text-[12px]">부동산 샘플</span>
+        <span className="text-[11px] font-semibold opacity-75 md:text-[12px]">카탈로그</span>
       </span>
     </span>
   );

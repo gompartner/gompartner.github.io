@@ -467,7 +467,7 @@ export function CommunityMapDemo() {
             <Brand className="flex flex-col whitespace-nowrap">
               <span className={`${jua.className} text-[22px] leading-[1.1]`}>곰파트너</span>
               <span className="text-[12px] font-semibold leading-[1.2]" style={{ color: INK_SOFT }}>
-                공유공간 지도 샘플
+                카탈로그
               </span>
             </Brand>
           </a>

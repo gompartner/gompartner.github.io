@@ -10,7 +10,7 @@ import { useDemoToday } from "@/hooks/useDemoToday";
 import { DemoMakerInfo } from "@/components/demos/DemoMakerInfo";
 
 /* 급한 오류 수정 샘플. 곰파트너가 직접 운영하는 "오류 수리 접수" 화면처럼 만든다. 장애 현황판(상태 표시, 접수 번호, 타임라인) 모양.
-   꽃집, 주소, 사람은 모두 가상이다. 머리글은 곰파트너와 "유지보수 샘플"만 적는다.
+   꽃집, 주소, 사람은 모두 가상이다. 머리글은 곰파트너와 "카탈로그"만 적는다.
    광고는 켜져 있는데 예약이 0건인 꽃집 이야기는 샘플 표지(data/scenes/part4.ts)가 맡는다. 이 화면에는 웹툰 컷을 넣지 않는다.
 
    금액·응답 시간·절차 문구는 data/maintenance.ts 값을 그대로 쓴다(오류 수정 건당 5만 원부터, 24시간 이내 답장, 동의 전에는 작업하지 않음).
@@ -266,7 +266,7 @@ export function MaintenanceUrgentFixDemo() {
             <span className="inline-flex items-baseline gap-1.5 whitespace-nowrap">
               <span className="text-[20px] font-extrabold tracking-[-0.03em]">곰파트너</span>
               <span className="text-[13px] font-semibold" style={{ color: C.muted }}>
-                유지보수 샘플
+                카탈로그
               </span>
             </span>
           </a>
@@ -696,7 +696,7 @@ export function MaintenanceUrgentFixDemo() {
               <a href="#uf-intake" className={`${btnPrimary} h-12 px-5 text-[16px]`}>
                 수리 접수
               </a>
-              <a href={chat("급한 오류 수정 샘플을 보고 문의합니다.")} className={`${btnSecondary} h-12 px-5 text-[16px]`} style={{ borderColor: C.line }}>
+              <a href={chat("급한 오류 수정 카탈로그를 보고 문의합니다.")} className={`${btnSecondary} h-12 px-5 text-[16px]`} style={{ borderColor: C.line }}>
                 채팅 상담
               </a>
             </div>

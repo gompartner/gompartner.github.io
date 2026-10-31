@@ -493,11 +493,11 @@ function Logo({ light = false }: { light?: boolean }) {
     <span className="inline-flex items-center gap-2">
       {/* eslint-disable-next-line @next/next/no-img-element */}
       <img src="/images/logo-bear.png" alt="" aria-hidden width={28} height={28} className="h-7 w-7 shrink-0" />
-      <span className="sr-only">{SHOP} 인테리어 샘플</span>
+      <span className="sr-only">{SHOP} 카탈로그</span>
       <span aria-hidden className="inline-flex items-baseline gap-1.5 whitespace-nowrap">
         <span className="text-[19px] font-bold tracking-[-0.02em] md:text-[20px]">곰파트너</span>
         <span className="text-[12px] font-semibold" style={{ color: light ? "#c8d6d0" : C.wood }}>
-          인테리어 샘플
+          카탈로그
         </span>
       </span>
     </span>

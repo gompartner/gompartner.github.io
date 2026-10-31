@@ -9,7 +9,7 @@ import { maskName } from "@/components/demos/LeadReceivedPanel";
 import { DemoMakerInfo } from "@/components/demos/DemoMakerInfo";
 
 /* 가죽 공방 원데이 클래스 신청 랜딩 샘플. 공방이 실제로 운영하는 수업 신청 페이지처럼 만든다.
-   공방, 강사, 신청자, 계좌, 주소는 모두 가상이다. 머리글은 곰파트너와 "가죽 공방 샘플"만 적는다.
+   공방, 강사, 신청자, 계좌, 주소는 모두 가상이다. 머리글은 곰파트너와 "카탈로그"만 적는다.
    네이버폼, 통장, 카톡으로 받던 이야기는 샘플 표지(data/scenes/part3.ts)가 맡는다. 이 화면에는 웹툰 컷을 넣지 않는다.
    사진 출처: Pexels 사진 5963170(손으로 가죽을 꿰매는 사진)
 
@@ -410,7 +410,7 @@ export function LandingLeatherClassDemo() {
               <span className="inline-flex items-baseline gap-1.5 whitespace-nowrap">
                 <span className="text-[19px] font-bold tracking-[-0.02em]">곰파트너</span>
                 <span className="text-[13px] font-semibold" style={{ color: "rgba(255,255,255,0.78)" }}>
-                  가죽 공방 샘플
+                  카탈로그
                 </span>
               </span>
             </a>

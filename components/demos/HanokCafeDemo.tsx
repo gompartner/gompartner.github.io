@@ -416,7 +416,7 @@ function SideNav({ page, go, groupId, onGroup }: { page: Page; go: Go; groupId: 
         <LogoMark />
         <span className="flex flex-col leading-[1.25]">
           <span className="text-[18px] font-bold">곰파트너</span>
-          <span className="text-[11px] font-semibold opacity-80">한옥 찻집 샘플</span>
+          <span className="text-[11px] font-semibold opacity-80">카탈로그</span>
         </span>
       </button>
       <nav aria-label="공간" className="mt-8">
@@ -477,7 +477,7 @@ function TopNav({ page, go, groupId, onGroup }: { page: Page; go: Go; groupId: G
           <LogoMark />
           <span className="inline-flex items-baseline gap-1.5 whitespace-nowrap">
             <span className="text-[18px] font-bold">곰파트너</span>
-            <span className="text-[11px] font-semibold opacity-80">한옥 찻집 샘플</span>
+            <span className="text-[11px] font-semibold opacity-80">카탈로그</span>
           </span>
         </button>
         <a href={`tel:${TEL}`} aria-label={`전화하기 ${TEL}`} className="inline-flex h-11 w-11 items-center justify-center rounded-[4px] bg-[#1f1b16] text-[#f3ede2]">
@@ -1923,7 +1923,7 @@ function Footer() {
             <LogoMark />
             <span className="flex items-baseline gap-1.5">
             <span className="text-[18px] font-bold tracking-[-0.02em]">곰파트너</span>
-            <span className="text-[11px] font-semibold opacity-80">한옥 찻집 샘플</span>
+            <span className="text-[11px] font-semibold opacity-80">카탈로그</span>
             </span>
           </p>
           <DemoMakerInfo className="mt-2" />
