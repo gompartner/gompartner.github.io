@@ -176,8 +176,8 @@ export async function generateMetadata({ params }: DemoPageProps): Promise<Metad
     };
   }
 
-  // "치과 홈페이지 제작 샘플"처럼 사장님이 찾는 말로 제목을 짓는다. 금액과 기간은 싣지 않는다(10-30).
-  const title = `${demo.title}${/(홈페이지|쇼핑몰)$/.test(demo.title) ? " 제작" : ""} 샘플`;
+  // "치과 홈페이지 제작 카탈로그"처럼 사장님이 찾는 말로 제목을 짓는다. 금액과 기간은 싣지 않는다(10-30).
+  const title = `${demo.title}${/(홈페이지|쇼핑몰)$/.test(demo.title) ? " 제작" : ""} 카탈로그`;
   const description = fitDescription(demo.description);
   return {
     title,
