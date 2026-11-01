@@ -9,6 +9,8 @@ import {
   ChevronDown,
   ChevronLeft,
   ChevronRight,
+  Pause,
+  Play,
   Plus,
 } from "lucide-react";
 import { faq, processSteps } from "@/data/classic/faq";
@@ -359,7 +361,18 @@ function Hero() {
               </button>
             ))}
           </div>
-          <div className="hidden items-center gap-2 pl-4 md:flex">
+          {/* 자동 넘김 멈춤, 재생(웹 접근성: 5초 넘게 움직이는 내용의 멈춤 수단) */}
+          <div className="flex items-center pl-2 md:pl-4">
+            <button
+              type="button"
+              onClick={() => setAuto((v) => !v)}
+              aria-label={auto ? "자동 넘김 멈춤" : "자동 넘김 재생"}
+              className="grid h-10 w-10 place-items-center rounded-full border border-white/30 hover:bg-white/10"
+            >
+              {auto ? <Pause size={16} aria-hidden /> : <Play size={16} aria-hidden />}
+            </button>
+          </div>
+          <div className="hidden items-center gap-2 pl-2 md:flex">
             <button
               type="button"
               onClick={() => go(cur - 1)}
