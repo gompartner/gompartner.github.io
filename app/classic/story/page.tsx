@@ -19,6 +19,8 @@ const dt = "text-[15px] font-bold text-[#3d4450]";
 // 11-01 다른 업체 회사소개 비교: 소개, 일하는 방식, 사업 영역, 연락 방법 순. 사업자 정보와 채널은 바닥글에 있어 본문에서 뺌
 const areas = [
   { href: "/classic/homepage", name: "홈페이지 제작", what: "병원, 매장, 전문직, 기업, 학원 반응형 홈페이지" },
+  { href: "/classic/landing", name: "랜딩페이지 제작", what: "광고 신청 접수와 알림, 구글 시트 기록" },
+  { href: "/classic/program", name: "업무 프로그램 제작", what: "엑셀 반복 업무를 웹 프로그램으로" },
   { href: "/classic/maintenance", name: "유지보수", what: "오류 수정, 업체 이관, 보안 업데이트, 월 관리" },
 ];
 
@@ -38,7 +40,7 @@ export default function ClassicStoryPage() {
       <section id="principles" aria-labelledby="st-principles" className={section}>
         <div className={`${wrap} py-16 md:py-24`}>
           <h2 id="st-principles" className={h2}>
-            곰파트너의 약속
+            일하는 방식
           </h2>
           <ol className="mt-10 grid gap-8 md:grid-cols-2 md:gap-x-12 md:gap-y-10">
             {principles.map((p, n) => {
