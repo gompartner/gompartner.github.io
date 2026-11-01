@@ -1,7 +1,9 @@
 "use client";
 
-// 필라테스 스튜디오 회원 앱 카탈로그(11-01, 2판). 수업 예약, 대기 예약과 빈자리 자동 예약, 예약 취소, 회원권 차감과 복원,
-// 강사 피드백 노트, 나의 변화 리포트가 실제로 움직인다. PC에서는 휴대폰 틀 안에, 휴대폰에서는 화면 전체로 보인다.
+// 필라테스 스튜디오 회원 앱 카탈로그(11-01, 3판). 수업 예약, 대기 예약과 빈자리 자동 예약, 예약 취소, 회원권 차감과 복원,
+// 강사 피드백 노트, 나의 변화 리포트가 실제로 움직인다.
+// 휴대폰(<768)은 화면 전체, PC는 휴대폰 틀과 태블릿 틀(세로, 가로)을 골라 보고, 터치 태블릿은 태블릿 화면을 틀 없이 보여 준다.
+// 두 화면은 같은 상태를 나눠 써서, 바꿔 봐도 예약과 탭이 그대로 남는다.
 import { useEffect, useMemo, useRef, useState, type ReactNode } from "react";
 import Image from "next/image";
 import { AnimatePresence, motion, useReducedMotion } from "framer-motion";
@@ -16,10 +18,13 @@ import {
   Clock,
   Flame,
   House,
+  Lock,
   MapPin,
   MessageSquareText,
   Phone,
   Signal,
+  Smartphone,
+  Tablet,
   Ticket,
   TrendingUp,
   UserRound,
@@ -39,6 +44,8 @@ type ClassItem = Slot & { id: string; off: number; date: Date; booked: number; w
 type Booking = { id: string; status: "예약 완료" | "대기"; waitNo?: number; fromWait?: boolean };
 type HistoryRow = { key: string; date: Date; name: string; time: string; status: "예약 완료" | "취소" | "출석" | "결석"; delta: number };
 type PushMsg = { key: number; text: string; tab: Tab };
+type Env = "phone" | "desktop" | "touchTablet";
+type SheetMode = "bottom" | "center" | "side";
 
 const IMG = "/images/demo-pilates";
 const TOTAL = 10;
@@ -163,6 +170,9 @@ const dayWord = (off: number, date: Date) => (off === 0 ? "오늘" : off === 1 ?
 const ring = "focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#2E5A4C]";
 const card = "rounded-[12px] border border-[#ECE7DF] bg-white shadow-[0_1px_2px_rgba(40,32,20,0.04),0_4px_16px_-8px_rgba(40,32,20,0.10)]";
 
+const TABLET = { portrait: { w: 820, h: 1180 }, landscape: { w: 1180, h: 820 } };
+const BEZEL = 14;
+
 const BADGE: Record<string, string> = {
   "예약 완료": "bg-[#E4EEE9] text-[#245044]",
   대기: "bg-[#F4EBDC] text-[#7A5418]",
@@ -205,7 +215,34 @@ function CloseOnPhoto({ onClose }: { onClose: () => void }) {
   );
 }
 
-function Sheet({ open, onClose, labelId, flush, tall, children }: { open: boolean; onClose: () => void; labelId: string; flush?: boolean; tall?: boolean; children: ReactNode }) {
+function CloseButton({ onClose }: { onClose: () => void }) {
+  return (
+    <button type="button" onClick={onClose} aria-label="닫기" className={`-mr-2 grid h-11 w-11 shrink-0 place-items-center rounded-full text-[#6B665E] hover:bg-[#F1EEE9] ${ring}`}>
+      <X size={22} aria-hidden />
+    </button>
+  );
+}
+
+// 휴대폰은 아래에서 올라오는 시트, 태블릿은 가운데 창(center)이나 오른쪽 패널(side)로 연다.
+function Sheet({
+  open,
+  onClose,
+  labelId,
+  flush,
+  tall,
+  mode = "bottom",
+  maxW = 600,
+  children,
+}: {
+  open: boolean;
+  onClose: () => void;
+  labelId: string;
+  flush?: boolean;
+  tall?: boolean;
+  mode?: SheetMode;
+  maxW?: number;
+  children: ReactNode;
+}) {
   const reduce = useReducedMotion();
   const panelRef = useRef<HTMLDivElement>(null);
   useEffect(() => {
@@ -218,10 +255,19 @@ function Sheet({ open, onClose, labelId, flush, tall, children }: { open: boolea
       window.removeEventListener("keydown", onKey);
     };
   }, [open, onClose]);
+  const from = mode === "side" ? { x: "100%" } : mode === "center" ? { y: 24, opacity: 0 } : { y: "100%" };
+  const to = mode === "side" ? { x: 0 } : mode === "center" ? { y: 0, opacity: 1 } : { y: 0 };
+  const wrap = mode === "bottom" ? "fixed inset-0 z-[65] md:absolute md:z-40" : `absolute inset-0 z-40 ${mode === "center" ? "flex items-center justify-center p-10" : ""}`;
+  const panel =
+    mode === "bottom"
+      ? `absolute inset-x-0 bottom-0 rounded-t-[16px] ${tall ? "h-[92%]" : "max-h-[90%]"}`
+      : mode === "side"
+        ? "absolute right-0 top-0 h-full w-[440px] max-w-full"
+        : `relative max-h-full w-full rounded-[16px] shadow-[0_24px_60px_-20px_rgba(30,24,16,0.45)]`;
   return (
     <AnimatePresence>
       {open && (
-        <div className="fixed inset-0 z-[65] md:absolute md:z-40">
+        <div className={wrap}>
           <motion.button
             type="button"
             aria-label="닫기"
@@ -238,15 +284,16 @@ function Sheet({ open, onClose, labelId, flush, tall, children }: { open: boolea
             aria-modal="true"
             aria-labelledby={labelId}
             tabIndex={-1}
-            className={`absolute inset-x-0 bottom-0 overflow-y-auto overscroll-contain rounded-t-[16px] bg-white px-5 pb-[calc(20px+env(safe-area-inset-bottom))] outline-none ${flush ? "pt-0" : "pt-3"} ${
-              tall ? "h-[92%]" : "max-h-[90%]"
+            style={mode === "center" ? { maxWidth: maxW } : undefined}
+            className={`${panel} overflow-y-auto overscroll-contain bg-white px-5 pb-[calc(20px+env(safe-area-inset-bottom))] outline-none ${flush ? "pt-0" : mode === "bottom" ? "pt-3" : "pt-5"} ${
+              mode !== "bottom" ? "px-7" : ""
             }`}
-            initial={reduce ? { opacity: 0 } : { y: "100%" }}
-            animate={reduce ? { opacity: 1 } : { y: 0 }}
-            exit={reduce ? { opacity: 0 } : { y: "100%" }}
+            initial={reduce ? { opacity: 0 } : from}
+            animate={reduce ? { opacity: 1 } : to}
+            exit={reduce ? { opacity: 0 } : from}
             transition={reduce ? { duration: 0 } : { type: "spring", stiffness: 420, damping: 40 }}
           >
-            {!flush && <div className="mx-auto mb-3 h-1 w-10 rounded-full bg-[#DAD5CC]" aria-hidden />}
+            {!flush && mode === "bottom" && <div className="mx-auto mb-3 h-1 w-10 rounded-full bg-[#DAD5CC]" aria-hidden />}
             {children}
           </motion.div>
         </div>
@@ -257,13 +304,7 @@ function Sheet({ open, onClose, labelId, flush, tall, children }: { open: boolea
 
 function Toggle({ label, sub, on, onChange }: { label: string; sub?: string; on: boolean; onChange: (v: boolean) => void }) {
   return (
-    <button
-      type="button"
-      role="switch"
-      aria-checked={on}
-      onClick={() => onChange(!on)}
-      className={`flex min-h-[56px] w-full items-center justify-between gap-3 px-4 py-2 text-left ${ring}`}
-    >
+    <button type="button" role="switch" aria-checked={on} onClick={() => onChange(!on)} className={`flex min-h-[56px] w-full items-center justify-between gap-3 px-4 py-2 text-left ${ring}`}>
       <span>
         <span className="block text-[15px] text-[#22201C]">{label}</span>
         {sub && <span className="block text-[12px] text-[#8A847A]">{sub}</span>}
@@ -337,6 +378,39 @@ function MonthChart({ labels, values }: { labels: string[]; values: number[] }) 
   );
 }
 
+function StatusIcons() {
+  return (
+    <span className="flex items-center gap-1.5">
+      <Signal size={15} />
+      <Wifi size={15} />
+      <BatteryFull size={20} />
+    </span>
+  );
+}
+
+// PC에서 기기 틀을 고르는 버튼 묶음
+function DevicePicker<T extends string>({ label, value, onChange, items }: { label: string; value: T; onChange: (v: T) => void; items: { id: T; label: string; Icon?: typeof House }[] }) {
+  return (
+    <div role="group" aria-label={label} className="flex rounded-full bg-white p-1 shadow-[0_1px_2px_rgba(40,32,20,0.08)] ring-1 ring-[#E1DBD1]">
+      {items.map(({ id, label: l, Icon }) => {
+        const on = value === id;
+        return (
+          <button
+            key={id}
+            type="button"
+            aria-pressed={on}
+            onClick={() => onChange(id)}
+            className={`inline-flex min-h-[44px] items-center gap-1.5 rounded-full px-4 text-[14px] font-semibold transition-colors ${ring} ${on ? "bg-[#22201C] text-white" : "text-[#4E4A43] hover:bg-[#F1EEE9]"}`}
+          >
+            {Icon && <Icon size={16} aria-hidden />}
+            {l}
+          </button>
+        );
+      })}
+    </div>
+  );
+}
+
 export function AppPilatesDemo() {
   const today = useDemoToday();
   const reduce = useReducedMotion();
@@ -350,9 +424,12 @@ export function AppPilatesDemo() {
     { id: FIRST_BOOKING, status: "예약 완료" },
     { id: FIRST_WAIT, status: "대기", waitNo: 1 },
   ]);
+  const [pendingWait, setPendingWait] = useState<string[]>([FIRST_WAIT]);
   const [cancelled, setCancelled] = useState<{ id: string; at: number }[]>([]);
   const [usage, setUsage] = useState<{ key: string; id: string; status: "예약 완료" | "취소"; delta: number }[]>([{ key: "u0", id: FIRST_BOOKING, status: "예약 완료", delta: -1 }]);
   const [detailId, setDetailId] = useState<string | null>(null);
+  const [selId, setSelId] = useState<string | null>(null);
+  const [mineSel, setMineSel] = useState<string | null>(null);
   const [doneId, setDoneId] = useState<string | null>(null);
   const [cancelId, setCancelId] = useState<string | null>(null);
   const [teacherOpen, setTeacherOpen] = useState<TeacherName | null>(null);
@@ -365,9 +442,19 @@ export function AppPilatesDemo() {
   const [alarmClass, setAlarmClass] = useState(true);
   const [alarmWait, setAlarmWait] = useState(true);
   const [alarmNotice, setAlarmNotice] = useState(false);
+  const [env, setEnv] = useState<Env | null>(null);
+  const [vp, setVp] = useState({ w: 1280, h: 900 });
+  const [device, setDevice] = useState<"phone" | "tablet">("phone");
+  const [orient, setOrient] = useState<"portrait" | "landscape">("portrait");
   const scrollRef = useRef<HTMLDivElement>(null);
-  const seq = useRef(1);
+  const tabScrollRef = useRef<HTMLDivElement>(null);
   const pushTimer = useRef<number | undefined>(undefined);
+
+  const isTablet = env === "touchTablet" || (env === "desktop" && device === "tablet");
+  const framed = env === "desktop" && device === "tablet";
+  const tSize = framed ? TABLET[orient] : { w: vp.w, h: vp.h };
+  const wide = tSize.w >= 1000;
+  const sheetMode: SheetMode = isTablet ? "center" : "bottom";
 
   const days = useMemo(() => Array.from({ length: 7 }, (_, off) => ({ off, date: daysAgo(today, -off) })), [today]);
 
@@ -398,6 +485,8 @@ export function AppPilatesDemo() {
   const remaining = TOTAL - used;
   const passStart = daysAgo(today, 24);
   const passEnd = daysAgo(today, -66);
+  const reserved = bookings.filter((b) => b.status === "예약 완료").length;
+  const dLeft = Math.round((passEnd.getTime() - today.getTime()) / 86400000);
 
   const upcoming = bookings
     .map((b) => ({ b, c: findClass(b.id) }))
@@ -418,6 +507,16 @@ export function AppPilatesDemo() {
   ];
   const historyShown = history.filter((h) => (passView === "all" ? true : passView === "use" ? h.delta < 0 : h.delta > 0));
 
+  const pastRows = [
+    ...cancelled
+      .slice()
+      .sort((a, z) => z.at - a.at)
+      .map((x) => findClass(x.id))
+      .filter((c): c is ClassItem => c !== null)
+      .map((c) => ({ key: `c-${c.id}`, ago: -1, cid: c.id, kind: c.kind, date: c.date, time: c.time, name: c.name, teacher: c.teacher, status: "취소" as const })),
+    ...PAST.map((p) => ({ key: `p${p.ago}`, ago: p.ago, cid: "", kind: "reformer" as Kind, date: daysAgo(today, p.ago), time: p.time, name: p.name, teacher: p.teacher, status: p.status })),
+  ];
+
   // 나의 변화 리포트: 지난 5개월 기록 + 이번 달(출석과 예약 완료)
   const monthLabels = Array.from({ length: 6 }, (_, i) => `${new Date(today.getFullYear(), today.getMonth() - 5 + i, 1).getMonth() + 1}월`);
   const sameMonth = (d: Date) => d.getFullYear() === today.getFullYear() && d.getMonth() === today.getMonth();
@@ -430,8 +529,7 @@ export function AppPilatesDemo() {
 
   const showPush = (text: string, to: Tab) => {
     window.clearTimeout(pushTimer.current);
-    const key = seq.current++;
-    setPush({ key, text, tab: to });
+    setPush((p) => ({ key: (p?.key ?? 0) + 1, text, tab: to }));
     pushTimer.current = window.setTimeout(() => setPush(null), 6500);
   };
 
@@ -442,8 +540,8 @@ export function AppPilatesDemo() {
     if (!b || b.status !== "대기" || !c || remaining <= 0) return;
     setWaitDelta((d) => ({ ...d, [id]: (d[id] ?? 0) - 1 }));
     setBookings((all) => all.map((x) => (x.id === id ? { id, status: "예약 완료", fromWait: true } : x)));
-    const k = seq.current++;
-    setUsage((u) => [...u, { key: `u${k}`, id, status: "예약 완료", delta: -1 }]);
+    setUsage((u) => [...u, { key: `u${u.length}`, id, status: "예약 완료", delta: -1 }]);
+    setPendingWait((p) => p.filter((x) => x !== id));
     if (alarmWait) showPush(`[필라테스 스튜디오] 대기하던 ${fmtKo(c.date)} ${c.time} ${c.name} 수업에 빈자리가 나 예약 완료되었습니다`, "mine");
   };
 
@@ -460,20 +558,36 @@ export function AppPilatesDemo() {
   });
 
   useEffect(() => {
-    const frame = requestAnimationFrame(() => setNowMs(new Date().getTime()));
+    const measure = () => {
+      const w = window.innerWidth;
+      const coarse = window.matchMedia("(pointer: coarse)").matches;
+      setEnv(w < 768 ? "phone" : coarse ? "touchTablet" : "desktop");
+      setVp({ w, h: window.innerHeight });
+    };
+    const frame = requestAnimationFrame(() => {
+      setNowMs(new Date().getTime());
+      measure();
+    });
     const t1 = window.setTimeout(() => actions.current.remind(), 1400);
-    const t2 = window.setTimeout(() => actions.current.promote(FIRST_WAIT), 16000);
+    window.addEventListener("resize", measure);
     return () => {
       cancelAnimationFrame(frame);
       window.clearTimeout(t1);
-      window.clearTimeout(t2);
       window.clearTimeout(pushTimer.current);
+      window.removeEventListener("resize", measure);
     };
   }, []);
+
+  // 대기 예약은 잠시 뒤 빈자리가 나서 자동으로 예약된다(처음 대기는 16초, 새로 건 대기는 12초).
+  useEffect(() => {
+    const timers = pendingWait.map((id) => window.setTimeout(() => actions.current.promote(id), id === FIRST_WAIT ? 16000 : 12000));
+    return () => timers.forEach((t) => window.clearTimeout(t));
+  }, [pendingWait]);
 
   const go = (t: Tab) => {
     setTab(t);
     scrollRef.current?.scrollTo({ top: 0 });
+    tabScrollRef.current?.scrollTo({ top: 0 });
     if (window.innerWidth < 768) window.scrollTo({ top: 0 });
   };
 
@@ -482,18 +596,29 @@ export function AppPilatesDemo() {
     go("book");
   };
 
+  // 휴대폰은 상세 시트를 열고, 태블릿은 예약 탭 오른쪽 상세에 띄운다.
+  const pickClass = (c: ClassItem) => {
+    if (isTablet) {
+      setDayOff(c.off);
+      setSelId(c.id);
+      if (tab !== "book") {
+        if (kindFilter !== "all" && kindFilter !== c.kind) setKindFilter("all");
+        go("book");
+      }
+    } else setDetailId(c.id);
+  };
+
   const book = (c: ClassItem) => {
     if (myBooking(c.id)) return;
     if (c.booked >= c.cap) {
       setWaitDelta((d) => ({ ...d, [c.id]: (d[c.id] ?? 0) + 1 }));
       setBookings((b) => [...b, { id: c.id, status: "대기", waitNo: c.wait + 1 }]);
-      window.setTimeout(() => actions.current.promote(c.id), 12000);
+      setPendingWait((p) => [...p, c.id]);
     } else {
       if (remaining <= 0) return;
       setSeatDelta((d) => ({ ...d, [c.id]: (d[c.id] ?? 0) + 1 }));
       setBookings((b) => [...b, { id: c.id, status: "예약 완료" }]);
-      const k = seq.current++;
-      setUsage((u) => [...u, { key: `u${k}`, id: c.id, status: "예약 완료", delta: -1 }]);
+      setUsage((u) => [...u, { key: `u${u.length}`, id: c.id, status: "예약 완료", delta: -1 }]);
     }
     setCancelled((x) => x.filter((y) => y.id !== c.id));
     setDetailId(null);
@@ -505,14 +630,13 @@ export function AppPilatesDemo() {
     if (!b) return;
     if (b.status === "예약 완료") {
       setSeatDelta((d) => ({ ...d, [id]: (d[id] ?? 0) - 1 }));
-      const k = seq.current++;
-      setUsage((u) => [...u, { key: `u${k}`, id, status: "취소", delta: 1 }]);
+      setUsage((u) => [...u, { key: `u${u.length}`, id, status: "취소", delta: 1 }]);
     } else {
       setWaitDelta((d) => ({ ...d, [id]: (d[id] ?? 0) - 1 }));
+      setPendingWait((p) => p.filter((x) => x !== id));
     }
     setBookings((all) => all.filter((x) => x.id !== id));
-    const at = seq.current++;
-    setCancelled((x) => [...x.filter((y) => y.id !== id), { id, at }]);
+    setCancelled((x) => [...x.filter((y) => y.id !== id), { id, at: x.reduce((m, y) => Math.max(m, y.at), 0) + 1 }]);
     setCancelId(null);
   };
 
@@ -522,9 +646,6 @@ export function AppPilatesDemo() {
   };
 
   const detail = detailId ? findClass(detailId) : null;
-  const bookDetail = () => {
-    if (detail) book(detail);
-  };
   const done = doneId ? findClass(doneId) : null;
   const doneBooking = doneId ? myBooking(doneId) : undefined;
   const cancelTarget = cancelId ? findClass(cancelId) : null;
@@ -541,6 +662,9 @@ export function AppPilatesDemo() {
       picks.push(c);
     }
   }
+
+  const bookList = dayClasses(dayOff).filter((c) => kindFilter === "all" || c.kind === kindFilter);
+  const selClass = (selId && bookList.find((c) => c.id === selId)) || bookList.find((c) => !isEnded(c)) || bookList[0] || null;
 
   const seatText = (c: ClassItem) => {
     if (isEnded(c)) return { text: "종료", tone: "text-[#9A948A]" };
@@ -559,7 +683,9 @@ export function AppPilatesDemo() {
 
   const title: Record<Tab, string> = { home: "필라테스 스튜디오", book: "수업 예약", mine: "내 예약", pass: "회원권", my: "마이" };
 
-  const classRow = (c: ClassItem, withDate = false) => {
+  /* ---------- 공통 조각 ---------- */
+
+  const classRow = (c: ClassItem, opts: { withDate?: boolean; selected?: boolean } = {}) => {
     const mine = myBooking(c.id);
     const seat = seatText(c);
     const k = KIND[c.kind];
@@ -567,15 +693,16 @@ export function AppPilatesDemo() {
       <li key={c.id}>
         <button
           type="button"
-          onClick={() => setDetailId(c.id)}
-          className={`flex w-full items-center gap-3 rounded-[12px] border bg-white p-3 text-left shadow-[0_1px_2px_rgba(40,32,20,0.04)] transition-colors hover:border-[#C9C2B6] ${ring} ${
-            mine ? "border-[#2E5A4C]" : "border-[#ECE7DF]"
+          onClick={() => pickClass(c)}
+          aria-current={opts.selected ? "true" : undefined}
+          className={`flex w-full items-center gap-3 rounded-[12px] border p-3 text-left shadow-[0_1px_2px_rgba(40,32,20,0.04)] transition-colors hover:border-[#C9C2B6] ${ring} ${
+            opts.selected ? "border-[#22201C] bg-[#FBFAF7] ring-1 ring-[#22201C]" : mine ? "border-[#2E5A4C] bg-white" : "border-[#ECE7DF] bg-white"
           } ${isEnded(c) ? "opacity-55" : ""}`}
         >
           <Photo src={k.photo} alt="" pos={k.pos} className="h-[68px] w-[68px] shrink-0 rounded-[8px]" sizes="136px" />
           <span className="min-w-0 flex-1">
             <span className="block text-[13px] font-semibold tabular-nums text-[#2E5A4C]">
-              {withDate ? `${dayWord(c.off, c.date)} ` : ""}
+              {opts.withDate ? `${dayWord(c.off, c.date)} ` : ""}
               {c.time}~{endTime(c.time, c.dur)}
             </span>
             <span className="mt-0.5 block truncate text-[16px] font-bold text-[#22201C]">{c.name}</span>
@@ -586,7 +713,7 @@ export function AppPilatesDemo() {
               </span>
             </span>
           </span>
-          <span className="flex shrink-0 flex-col items-end gap-1 self-stretch justify-center">
+          <span className="flex shrink-0 flex-col items-end justify-center gap-1 self-stretch">
             {mine ? <Badge>{mine.status}</Badge> : <span className={`text-[13px] font-semibold ${seat.tone}`}>{seat.text}</span>}
             <span className="text-[12px] tabular-nums text-[#9A948A]">
               {Math.min(c.booked, c.cap)}/{c.cap}명
@@ -597,291 +724,1021 @@ export function AppPilatesDemo() {
     );
   };
 
-  const feedbackCard = latestFeedback && FEEDBACK[latestFeedback.ago] && (
-    <button type="button" onClick={() => openFeedback(latestFeedback.ago)} className={`${card} block w-full p-4 text-left hover:border-[#D6D0C6] ${ring}`}>
-      <span className="flex items-center gap-3">
-        <span className="relative">
-          <Avatar name={latestFeedback.teacher} size={44} />
-          {unread.length > 0 && <span className="absolute -right-0.5 -top-0.5 h-3 w-3 rounded-full border-2 border-white bg-[#B5532F]" aria-hidden />}
-        </span>
-        <span className="min-w-0 flex-1">
-          <span className="flex items-center gap-1.5 text-[13px] font-semibold text-[#2E5A4C]">
-            <MessageSquareText size={14} aria-hidden /> 강사 피드백 노트{unread.length > 0 ? ", 새 노트" : ""}
+  const dayStrip = () => (
+    <>
+      <p className="mb-2 text-[13px] font-semibold text-[#6B665E]">
+        {days[dayOff].date.getFullYear()}년 {days[dayOff].date.getMonth() + 1}월
+      </p>
+      <div role="tablist" aria-label="날짜 선택" className="grid grid-cols-7 gap-1">
+        {days.map(({ off, date }) => {
+          const active = off === dayOff;
+          const dow = ["일", "월", "화", "수", "목", "금", "토"][date.getDay()];
+          const hasMine = bookings.some((b) => b.id.startsWith(`d${off}-`));
+          return (
+            <button
+              key={off}
+              type="button"
+              role="tab"
+              aria-selected={active}
+              aria-label={`${fmtKo(date)}${off === 0 ? ", 오늘" : ""}${hasMine ? ", 예약 있음" : ""}`}
+              onClick={() => {
+                setDayOff(off);
+                setSelId(null);
+              }}
+              className={`flex min-h-[64px] flex-col items-center justify-center rounded-[10px] ${ring} ${active ? "bg-[#2E5A4C] text-white" : "text-[#22201C] hover:bg-[#ECE8E1]"}`}
+            >
+              <span className={`text-[12px] ${active ? "text-[#CFE0D8]" : date.getDay() === 0 ? "text-[#93402B]" : "text-[#6B665E]"}`}>{off === 0 ? "오늘" : dow}</span>
+              <span className="text-[17px] font-bold tabular-nums">{date.getDate()}</span>
+              <span className={`mt-0.5 h-1 w-1 rounded-full ${hasMine ? (active ? "bg-white" : "bg-[#2E5A4C]") : "bg-transparent"}`} aria-hidden />
+            </button>
+          );
+        })}
+      </div>
+      <div className="-mx-4 mt-3 flex gap-1.5 overflow-x-auto px-4 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden" role="group" aria-label="수업 종류">
+        {(
+          [
+            { id: "all", label: "전체" },
+            { id: "reformer", label: "리포머" },
+            { id: "mat", label: "매트" },
+            { id: "stretch", label: "스트레칭" },
+            { id: "chair", label: "체어 바렐" },
+          ] as { id: Kind | "all"; label: string }[]
+        ).map((ch) => {
+          const on = kindFilter === ch.id;
+          return (
+            <button
+              key={ch.id}
+              type="button"
+              aria-pressed={on}
+              onClick={() => {
+                setKindFilter(ch.id);
+                setSelId(null);
+              }}
+              className={`min-h-[44px] shrink-0 rounded-full border px-3 text-[14px] font-semibold ${ring} ${on ? "border-[#22201C] bg-[#22201C] text-white" : "border-[#DAD5CC] bg-white text-[#4E4A43]"}`}
+            >
+              {ch.label}
+            </button>
+          );
+        })}
+      </div>
+    </>
+  );
+
+  const bookListBlock = (selectable: boolean) => (
+    <>
+      <p className="mb-3 text-[14px] text-[#6B665E]">
+        {fmtKo(days[dayOff].date)}, 수업 {bookList.length}개
+      </p>
+      {bookList.length === 0 ? (
+        <div className={`${card} px-5 py-8 text-center`}>
+          <p className="text-[15px] text-[#4E4A43]">이 날은 {kindFilter !== "all" ? KIND[kindFilter].label : ""} 수업이 없습니다.</p>
+          <button type="button" onClick={() => setKindFilter("all")} className={`mt-3 min-h-[44px] rounded-[8px] border border-[#D6D1C8] px-4 text-[14px] font-semibold text-[#4E4A43] ${ring}`}>
+            전체 수업 보기
+          </button>
+        </div>
+      ) : (
+        <ul className="space-y-2">{bookList.map((c) => classRow(c, { selected: selectable && selClass?.id === c.id }))}</ul>
+      )}
+      <p className="mt-4 text-[13px] leading-[1.6] text-[#6B665E]">
+        예약은 7일 전부터 열리고, 수업 {CANCEL_HOURS}시간 전까지 취소할 수 있습니다. 마감된 수업은 대기 예약을 하면 빈자리가 날 때 자동으로 예약됩니다.
+      </p>
+    </>
+  );
+
+  // 수업 상세: 휴대폰은 시트 안, 태블릿은 예약 탭 오른쪽에 그대로 놓는다.
+  const detailBody = (c: ClassItem, inline: boolean) => {
+    const mine = myBooking(c.id);
+    const full = c.booked >= c.cap;
+    const ended = isEnded(c);
+    const t = TEACHERS[c.teacher];
+    return (
+      <div>
+        {inline ? (
+          <Photo src={KIND[c.kind].photo} alt={`${c.name} 수업 공간`} pos={KIND[c.kind].pos} className="aspect-[21/9] w-full rounded-[14px]" sizes="720px" />
+        ) : (
+          <div className="relative -mx-5">
+            <Photo src={KIND[c.kind].photo} alt={`${c.name} 수업 공간`} pos={KIND[c.kind].pos} className="aspect-[16/9] w-full" />
+            <CloseOnPhoto onClose={() => setDetailId(null)} />
+          </div>
+        )}
+        <div className="mt-5 flex items-start justify-between gap-3">
+          <div>
+            <p className="text-[14px] font-semibold text-[#2E5A4C]">
+              {fmtKo(c.date)} {c.time}~{endTime(c.time, c.dur)}
+            </p>
+            <h2 id={inline ? "inline-detail-title" : "detail-title"} className={`mt-1 font-bold text-[#22201C] ${inline ? "text-[26px]" : "text-[22px]"}`}>
+              {c.name}
+            </h2>
+          </div>
+          {mine && <Badge>{mine.status}</Badge>}
+        </div>
+        <dl className="mt-4 grid grid-cols-3 gap-2 rounded-[10px] bg-[#F6F4F0] p-4 text-[14px]">
+          <div>
+            <dt className="text-[12px] text-[#6B665E]">장소</dt>
+            <dd className="font-semibold">{c.room}</dd>
+          </div>
+          <div>
+            <dt className="text-[12px] text-[#6B665E]">난이도</dt>
+            <dd className="font-semibold">{c.level}</dd>
+          </div>
+          <div>
+            <dt className="text-[12px] text-[#6B665E]">정원</dt>
+            <dd className="inline-flex items-center gap-1 font-semibold tabular-nums">
+              <Users size={14} aria-hidden /> {Math.min(c.booked, c.cap)}/{c.cap}명
+            </dd>
+          </div>
+        </dl>
+        <button
+          type="button"
+          onClick={() => {
+            setDetailId(null);
+            setTeacherOpen(c.teacher);
+          }}
+          className={`mt-3 flex min-h-[64px] w-full items-center gap-3 rounded-[10px] border border-[#ECE7DF] bg-white px-3 py-2 text-left ${ring}`}
+        >
+          <Avatar name={c.teacher} size={44} />
+          <span className="min-w-0 flex-1">
+            <span className="block text-[15px] font-bold text-[#22201C]">
+              {c.teacher} <span className="text-[13px] font-medium text-[#6B665E]">{t.role}</span>
+            </span>
+            <span className="block truncate text-[13px] text-[#6B665E]">{t.career[0]}</span>
           </span>
-          <span className="mt-0.5 block text-[15px] font-bold text-[#22201C]">
-            {latestFeedback.teacher} 강사, {fmtMD(daysAgo(today, latestFeedback.ago))} {latestFeedback.name}
+          <ChevronRight size={18} className="text-[#9A948A]" aria-hidden />
+        </button>
+        <p className="mt-4 text-[15px] leading-[1.65] text-[#4E4A43]">{c.desc}</p>
+        <p className="mt-2 text-[13px] text-[#6B665E]">준비물: 미끄럼 방지 양말, 수업 10분 전 입실</p>
+        <p className="mt-1 text-[13px] text-[#6B665E]">수업 {CANCEL_HOURS}시간 전까지 취소할 수 있습니다.</p>
+
+        <div className="mt-5">
+          {mine ? (
+            <div className="flex gap-2">
+              {!inline && (
+                <button type="button" onClick={() => setDetailId(null)} className={`min-h-[52px] flex-1 rounded-[10px] border border-[#D6D1C8] text-[15px] font-semibold text-[#4E4A43] ${ring}`}>
+                  닫기
+                </button>
+              )}
+              <button
+                type="button"
+                onClick={() => {
+                  setDetailId(null);
+                  setCancelId(c.id);
+                }}
+                className={`min-h-[52px] flex-1 rounded-[10px] bg-[#22201C] text-[15px] font-semibold text-white ${ring}`}
+              >
+                {mine.status === "대기" ? "대기 취소" : "예약 취소"}
+              </button>
+            </div>
+          ) : ended ? (
+            <button type="button" disabled className="min-h-[52px] w-full rounded-[10px] bg-[#ECE8E1] text-[15px] font-semibold text-[#9A948A]">
+              종료된 수업입니다
+            </button>
+          ) : !full && remaining <= 0 ? (
+            <button type="button" disabled className="min-h-[52px] w-full rounded-[10px] bg-[#ECE8E1] text-[15px] font-semibold text-[#9A948A]">
+              남은 횟수가 없습니다
+            </button>
+          ) : (
+            <>
+              <button
+                type="button"
+                onClick={() => book(c)}
+                className={`min-h-[52px] w-full rounded-[10px] text-[16px] font-bold text-white ${ring} ${full ? "bg-[#7A5418] hover:bg-[#684714]" : "bg-[#2E5A4C] hover:bg-[#254a3e]"}`}
+              >
+                {full ? `대기 예약 (${c.wait + 1}번째)` : "예약하기"}
+              </button>
+              <p className="mt-2 text-center text-[13px] text-[#6B665E]">
+                {full ? "빈자리가 나면 자동으로 예약되고 그때 1회 차감됩니다." : `예약하면 회원권 1회가 차감됩니다. 남은 횟수 ${remaining}회`}
+              </p>
+            </>
+          )}
+        </div>
+      </div>
+    );
+  };
+
+  const feedbackCard = () =>
+    latestFeedback &&
+    FEEDBACK[latestFeedback.ago] && (
+      <button type="button" onClick={() => openFeedback(latestFeedback.ago)} className={`${card} block w-full p-4 text-left hover:border-[#D6D0C6] ${ring}`}>
+        <span className="flex items-center gap-3">
+          <span className="relative">
+            <Avatar name={latestFeedback.teacher} size={44} />
+            {unread.length > 0 && <span className="absolute -right-0.5 -top-0.5 h-3 w-3 rounded-full border-2 border-white bg-[#B5532F]" aria-hidden />}
+          </span>
+          <span className="min-w-0 flex-1">
+            <span className="flex items-center gap-1.5 text-[13px] font-semibold text-[#2E5A4C]">
+              <MessageSquareText size={14} aria-hidden /> 강사 피드백 노트{unread.length > 0 ? ", 새 노트" : ""}
+            </span>
+            <span className="mt-0.5 block text-[15px] font-bold text-[#22201C]">
+              {latestFeedback.teacher} 강사, {fmtMD(daysAgo(today, latestFeedback.ago))} {latestFeedback.name}
+            </span>
+          </span>
+          <ChevronRight size={18} className="shrink-0 text-[#9A948A]" aria-hidden />
+        </span>
+        <span className="mt-3 line-clamp-2 block rounded-[8px] bg-[#F6F4F0] px-3 py-2.5 text-[14px] leading-[1.6] text-[#4E4A43]">{FEEDBACK[latestFeedback.ago].point}</span>
+      </button>
+    );
+
+  const heroBanner = (aspect: string) => (
+    <div className="relative overflow-hidden rounded-[16px]">
+      <Photo src={`${IMG}/hero.jpg`} alt="햇빛이 드는 스튜디오에서 리포머 동작을 하는 회원" pos="72% 40%" className={`${aspect} w-full`} sizes="720px" />
+      <div className="absolute inset-0 bg-[linear-gradient(to_top,rgba(24,22,18,0.72),rgba(24,22,18,0.05)_62%)]" aria-hidden />
+      <div className="absolute inset-x-0 bottom-0 p-5 text-white">
+        <p className="text-[13px] font-medium text-white/80">김ㅎ늘 회원님</p>
+        <p className="mt-1 text-[22px] font-bold leading-[1.35]">다음 주 시간표가 열렸습니다</p>
+        <button
+          type="button"
+          onClick={() => openKind("all")}
+          className="mt-3 inline-flex min-h-[44px] items-center gap-1 rounded-full bg-white px-4 text-[14px] font-bold text-[#22201C] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-white"
+        >
+          시간표 보기 <ChevronRight size={16} aria-hidden />
+        </button>
+      </div>
+    </div>
+  );
+
+  const nextClassBlock = () => (
+    <>
+      {nextClass ? (
+        <div className={`${card} p-4`}>
+          <div className="flex items-center gap-3">
+            <Avatar name={nextClass.c.teacher} size={48} />
+            <div className="min-w-0 flex-1">
+              <p className="text-[14px] font-semibold text-[#2E5A4C]">
+                {dayWord(nextClass.c.off, nextClass.c.date)} {nextClass.c.time}
+              </p>
+              <p className="truncate text-[18px] font-bold text-[#22201C]">{nextClass.c.name}</p>
+            </div>
+            <Badge>예약 완료</Badge>
+          </div>
+          <p className="mt-3 flex flex-wrap items-center gap-x-4 gap-y-1 border-t border-[#EEEAE3] pt-3 text-[13px] text-[#6B665E]">
+            <span className="inline-flex items-center gap-1">
+              <UserRound size={14} aria-hidden /> {nextClass.c.teacher} 강사
+            </span>
+            <span className="inline-flex items-center gap-1">
+              <MapPin size={14} aria-hidden /> {nextClass.c.room}
+            </span>
+            <span className="inline-flex items-center gap-1">
+              <Clock size={14} aria-hidden /> {nextClass.c.time}~{endTime(nextClass.c.time, nextClass.c.dur)}
+            </span>
+          </p>
+        </div>
+      ) : (
+        <div className={`${card} flex items-center justify-between gap-3 p-4`}>
+          <p className="text-[15px] text-[#4E4A43]">예정된 수업이 없습니다.</p>
+          <button type="button" onClick={() => openKind("all")} className={`min-h-[44px] rounded-[8px] bg-[#2E5A4C] px-4 text-[14px] font-semibold text-white ${ring}`}>
+            예약하기
+          </button>
+        </div>
+      )}
+    </>
+  );
+
+  const quickActions = () => (
+    <div className="grid grid-cols-2 gap-3">
+      <button type="button" onClick={() => openKind("all")} className={`${card} flex min-h-[64px] items-center gap-3 px-4 text-left hover:border-[#D6D0C6] ${ring}`}>
+        <CalendarPlus size={22} className="text-[#2E5A4C]" aria-hidden />
+        <span className="text-[15px] font-bold text-[#22201C]">수업 예약</span>
+      </button>
+      <button type="button" onClick={() => go("pass")} className={`${card} flex min-h-[64px] items-center gap-3 px-4 text-left hover:border-[#D6D0C6] ${ring}`}>
+        <Ticket size={22} className="text-[#2E5A4C]" aria-hidden />
+        <span>
+          <span className="block text-[15px] font-bold text-[#22201C]">회원권</span>
+          <span className="block text-[12px] text-[#6B665E]">{remaining}회 남음</span>
+        </span>
+      </button>
+    </div>
+  );
+
+  const changeCard = () => (
+    <button type="button" onClick={() => setReportOpen(true)} className={`${card} block w-full p-4 text-left hover:border-[#D6D0C6] ${ring}`}>
+      <span className="flex items-start justify-between gap-3">
+        <span>
+          <span className="flex items-center gap-1.5 text-[13px] font-semibold text-[#B5532F]">
+            <Flame size={14} aria-hidden /> 4주 연속 출석
+          </span>
+          <span className="mt-1 block text-[15px] text-[#4E4A43]">
+            이번 달 <strong className="text-[20px] font-bold text-[#22201C]">{thisMonth}회</strong>, 지난달 {PREV_MONTHS[4]}회
           </span>
         </span>
-        <ChevronRight size={18} className="shrink-0 text-[#9A948A]" aria-hidden />
+        <span className="inline-flex min-h-[28px] items-center gap-0.5 text-[13px] text-[#6B665E]">
+          리포트 <ChevronRight size={15} aria-hidden />
+        </span>
       </span>
-      <span className="mt-3 line-clamp-2 block rounded-[8px] bg-[#F6F4F0] px-3 py-2.5 text-[14px] leading-[1.6] text-[#4E4A43]">{FEEDBACK[latestFeedback.ago].point}</span>
+      <span className="mt-3 flex h-[44px] items-end gap-1.5" aria-hidden>
+        {monthValues.map((v, i) => (
+          <span key={monthLabels[i]} className={`flex-1 rounded-t-[3px] ${i === 5 ? "bg-[#2E5A4C]" : "bg-[#DCD6CC]"}`} style={{ height: `${Math.max(8, (v / 8) * 100)}%` }} />
+        ))}
+      </span>
     </button>
   );
 
-  const screen = (() => {
+  const kindCards = (grid: boolean) => (
+    <ul className={grid ? "grid grid-cols-4 gap-4" : "flex snap-x scroll-px-4 gap-3 overflow-x-auto px-4 pb-1 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden"}>
+      {(["reformer", "mat", "stretch", "chair"] as Kind[]).map((k) => (
+        <li key={k} className={grid ? "" : "w-[148px] shrink-0 snap-start"}>
+          <button type="button" onClick={() => openKind(k)} className={`block w-full overflow-hidden rounded-[12px] bg-white text-left shadow-[0_1px_2px_rgba(40,32,20,0.05)] ${ring}`}>
+            <Photo src={KIND[k].photo} alt="" pos={KIND[k].pos} className="aspect-[4/5] w-full" sizes="300px" />
+            <span className="block px-3 py-2.5">
+              <span className="block text-[15px] font-bold text-[#22201C]">{KIND[k].label}</span>
+              <span className="block truncate text-[12px] text-[#6B665E]">{KIND[k].line}</span>
+            </span>
+          </button>
+        </li>
+      ))}
+    </ul>
+  );
+
+  const teacherGrid = () => (
+    <ul className="grid grid-cols-3 gap-3">
+      {(Object.keys(TEACHERS) as TeacherName[]).map((n) => (
+        <li key={n}>
+          <button type="button" onClick={() => setTeacherOpen(n)} className={`block w-full rounded-[12px] text-left ${ring}`}>
+            <Photo src={TEACHERS[n].photo} alt={`${n} 강사`} pos={TEACHERS[n].pos} className="aspect-[3/4] w-full rounded-[12px]" sizes="240px" />
+            <span className="mt-2 block text-[15px] font-bold text-[#22201C]">{n}</span>
+            <span className="block text-[12px] text-[#6B665E]">{TEACHERS[n].role}</span>
+          </button>
+        </li>
+      ))}
+    </ul>
+  );
+
+  const noticeBlock = () => (
+    <>
+      <article className={`${card} overflow-hidden`}>
+        <Photo src={`${IMG}/studio.jpg`} alt="리포머 세 대가 놓인 B룸 전경" pos="50% 65%" className="aspect-[2/1] w-full" sizes="720px" />
+        <div className="p-4">
+          <p className="text-[12px] text-[#9A948A]">{fmtMD(daysAgo(today, 4))}</p>
+          <h3 className="mt-1 text-[16px] font-bold text-[#22201C]">주말 체어 바렐 수업이 열렸습니다</h3>
+          <p className="mt-1 text-[14px] leading-[1.6] text-[#4E4A43]">토요일과 일요일 12:20, B룸에서 정원 4명으로 진행합니다.</p>
+          <button type="button" onClick={() => openKind("chair")} className={`-ml-1 mt-2 inline-flex min-h-[44px] items-center gap-0.5 px-1 text-[14px] font-semibold text-[#2E5A4C] ${ring}`}>
+            체어 바렐 시간표 <ChevronRight size={15} aria-hidden />
+          </button>
+        </div>
+      </article>
+      <ul className={`${card} mt-3 divide-y divide-[#EEEAE3]`}>
+        {NOTICES.map((n) => (
+          <li key={n.title}>
+            <details className="group">
+              <summary className={`flex min-h-[56px] cursor-pointer list-none items-center gap-3 px-4 py-3 [&::-webkit-details-marker]:hidden ${ring}`}>
+                <span className="min-w-0 flex-1">
+                  <span className="block truncate text-[15px] text-[#22201C]">{n.title}</span>
+                  <span className="block text-[12px] text-[#9A948A]">{fmtMD(daysAgo(today, n.ago))}</span>
+                </span>
+                <ChevronDown size={18} className="shrink-0 text-[#9A948A] transition-transform group-open:rotate-180" aria-hidden />
+              </summary>
+              <p className="px-4 pb-4 text-[14px] leading-[1.6] text-[#4E4A43]">{n.body}</p>
+            </details>
+          </li>
+        ))}
+      </ul>
+    </>
+  );
+
+  const passCard = () => (
+    <div className="relative aspect-[1.586/1] overflow-hidden rounded-[16px] bg-[#1F3A31] text-white shadow-[0_18px_36px_-18px_rgba(20,40,32,0.6)]">
+      <Image src={`${IMG}/studio.jpg`} alt="" fill sizes="600px" className="object-cover opacity-25 mix-blend-luminosity" style={{ objectPosition: "50% 70%" }} />
+      <div className="absolute inset-0 bg-[#1F3A31]/55" aria-hidden />
+      <div className="absolute inset-0 flex flex-col justify-between p-5">
+        <div className="flex items-start justify-between gap-3">
+          <div>
+            <p className="text-[12px] font-semibold tracking-[0.08em] text-[#CFE0D8]">필라테스 스튜디오 회원권</p>
+            <p className="mt-1 text-[19px] font-bold">그룹 리포머 10회권</p>
+          </div>
+          <span className="rounded-[4px] bg-white/15 px-2 py-1 text-[12px] font-semibold">D-{dLeft}</span>
+        </div>
+        <div>
+          <p className="text-[14px] text-white/80">
+            {TOTAL}회 중 <strong className="text-[34px] font-bold leading-none text-white">{remaining}</strong>회 남음
+          </p>
+          <div className="mt-3 h-1.5 overflow-hidden rounded-full bg-white/20" role="progressbar" aria-label="남은 횟수" aria-valuemin={0} aria-valuemax={TOTAL} aria-valuenow={remaining}>
+            <div className="h-full rounded-full bg-white transition-[width] duration-300" style={{ width: `${(remaining / TOTAL) * 100}%` }} />
+          </div>
+          <div className="mt-3 flex items-end justify-between text-[12px] text-white/75">
+            <span>김ㅎ늘, 회원번호 20417</span>
+            <span className="tabular-nums">~ {fmtMD(passEnd)}</span>
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+
+  const passSummary = () => (
+    <>
+      <dl className={`${card} mt-3 grid grid-cols-3 gap-2 p-4 text-center`}>
+        <div>
+          <dt className="text-[12px] text-[#6B665E]">사용</dt>
+          <dd className="text-[18px] font-bold text-[#22201C]">{used - reserved}회</dd>
+        </div>
+        <div className="border-x border-[#EEEAE3]">
+          <dt className="text-[12px] text-[#6B665E]">예약 중</dt>
+          <dd className="text-[18px] font-bold text-[#22201C]">{reserved}회</dd>
+        </div>
+        <div>
+          <dt className="text-[12px] text-[#6B665E]">남음</dt>
+          <dd className="text-[18px] font-bold text-[#2E5A4C]">{remaining}회</dd>
+        </div>
+      </dl>
+      <p className="mt-3 text-[13px] text-[#6B665E]">
+        유효기간 {fmtKo(passStart)} ~ {fmtKo(passEnd)}
+      </p>
+    </>
+  );
+
+  const historyBlock = () => (
+    <section aria-labelledby="usage-title">
+      <SectionHead id="usage-title" title="사용 내역" />
+      <Segmented
+        label="사용 내역 구분"
+        value={passView}
+        onChange={setPassView}
+        items={[
+          { id: "all", label: "전체" },
+          { id: "use", label: "차감" },
+          { id: "back", label: "복원" },
+        ]}
+      />
+      {historyShown.length === 0 ? (
+        <p className={`${card} mt-3 px-4 py-6 text-center text-[14px] text-[#6B665E]`}>복원된 내역이 없습니다.</p>
+      ) : (
+        <ul className={`${card} mt-3 divide-y divide-[#EEEAE3]`}>
+          {historyShown.map((h) => (
+            <li key={h.key} className="flex min-h-[64px] items-center gap-3 px-4 py-3">
+              <span className="w-[44px] shrink-0 text-[13px] tabular-nums text-[#6B665E]">{fmtMD(h.date)}</span>
+              <span className="min-w-0 flex-1">
+                <span className="block truncate text-[15px] text-[#22201C]">{h.name}</span>
+                <span className="mt-0.5 flex items-center gap-2 text-[12px] text-[#6B665E]">
+                  {h.time} 수업 <Badge>{h.status}</Badge>
+                </span>
+              </span>
+              <span className={`shrink-0 text-[15px] font-bold tabular-nums ${h.delta > 0 ? "text-[#2E5A4C]" : "text-[#22201C]"}`}>{h.delta > 0 ? "+1회" : "-1회"}</span>
+            </li>
+          ))}
+        </ul>
+      )}
+    </section>
+  );
+
+  const profileCard = () => (
+    <section className={`${card} flex items-center gap-4 p-5`}>
+      <span className="grid h-14 w-14 shrink-0 place-items-center rounded-full bg-[#ECE8E1] text-[#6B665E]" aria-hidden>
+        <UserRound size={28} />
+      </span>
+      <div className="min-w-0">
+        <p className="text-[18px] font-bold text-[#22201C]">김ㅎ늘 회원님</p>
+        <p className="text-[14px] tabular-nums text-[#6B665E]">010-****-5821</p>
+        <p className="text-[13px] text-[#9A948A]">회원번호 20417, 누적 출석 {totalAttend}회</p>
+      </div>
+    </section>
+  );
+
+  const recordMenu = () => (
+    <section aria-labelledby="my-record">
+      <SectionHead id="my-record" title="나의 기록" />
+      <div className={`${card} divide-y divide-[#EEEAE3]`}>
+        <button type="button" onClick={() => setReportOpen(true)} className={`flex min-h-[60px] w-full items-center gap-3 px-4 text-left ${ring}`}>
+          <TrendingUp size={20} className="text-[#2E5A4C]" aria-hidden />
+          <span className="flex-1">
+            <span className="block text-[15px] font-semibold text-[#22201C]">나의 변화 리포트</span>
+            <span className="block text-[12px] text-[#6B665E]">월별 운동 횟수, 체형 체크 기록</span>
+          </span>
+          <ChevronRight size={18} className="text-[#9A948A]" aria-hidden />
+        </button>
+        {latestFeedback && (
+          <button type="button" onClick={() => openFeedback(latestFeedback.ago)} className={`flex min-h-[60px] w-full items-center gap-3 px-4 text-left ${ring}`}>
+            <MessageSquareText size={20} className="text-[#2E5A4C]" aria-hidden />
+            <span className="flex-1">
+              <span className="block text-[15px] font-semibold text-[#22201C]">강사 피드백 노트</span>
+              <span className="block text-[12px] text-[#6B665E]">출석한 수업마다 강사가 남깁니다</span>
+            </span>
+            {unread.length > 0 && <span className="text-[12px] font-bold text-[#B5532F]">새 노트 {unread.length}</span>}
+            <ChevronRight size={18} className="text-[#9A948A]" aria-hidden />
+          </button>
+        )}
+      </div>
+    </section>
+  );
+
+  const alarmBlock = () => (
+    <section aria-labelledby="alarm-title">
+      <h2 id="alarm-title" className="mb-3 flex items-center gap-1.5 text-[17px] font-bold text-[#22201C]">
+        <Bell size={17} aria-hidden /> 알림 설정
+      </h2>
+      <div className={`${card} divide-y divide-[#EEEAE3] overflow-hidden`}>
+        <Toggle label="수업 전날 알림" on={alarmClass} onChange={setAlarmClass} />
+        <Toggle label="빈자리 자동 예약 알림" sub="대기 중인 수업이 예약되면 바로 알려 드립니다" on={alarmWait} onChange={setAlarmWait} />
+        <Toggle label="공지사항 알림" on={alarmNotice} onChange={setAlarmNotice} />
+      </div>
+    </section>
+  );
+
+  const studioBlock = () => (
+    <section aria-labelledby="studio-title">
+      <SectionHead id="studio-title" title="스튜디오 정보" />
+      <div className={`${card} overflow-hidden`}>
+        <Photo src={`${IMG}/mat.jpg`} alt="매트와 소도구가 놓인 B룸" pos="50% 55%" className="aspect-[21/9] w-full" sizes="720px" />
+        <dl className="divide-y divide-[#EEEAE3] text-[14px]">
+          <div className="flex gap-3 px-4 py-3">
+            <dt className="w-[64px] shrink-0 text-[#6B665E]">운영 시간</dt>
+            <dd className="text-[#22201C]">
+              평일 07:00~22:00
+              <br />
+              주말 10:00~13:10
+            </dd>
+          </div>
+          <div className="flex gap-3 px-4 py-3">
+            <dt className="w-[64px] shrink-0 text-[#6B665E]">전화</dt>
+            <dd className="inline-flex items-center gap-1 tabular-nums text-[#22201C]">
+              <Phone size={14} aria-hidden /> 02-***-4182
+            </dd>
+          </div>
+          <div className="flex gap-3 px-4 py-3">
+            <dt className="w-[64px] shrink-0 text-[#6B665E]">취소 규정</dt>
+            <dd className="leading-[1.6] text-[#22201C]">수업 {CANCEL_HOURS}시간 전까지 취소하면 횟수가 돌아옵니다. 이후 취소와 결석은 1회 차감됩니다.</dd>
+          </div>
+        </dl>
+      </div>
+    </section>
+  );
+
+  const upcomingCard = (b: Booking, c: ClassItem, selectable: boolean) => {
+    const selected = selectable && mineSel === c.id;
+    const inner = (
+      <>
+        <div className="flex gap-3 p-4">
+          <Photo src={KIND[c.kind].photo} alt="" pos={KIND[c.kind].pos} className="h-[72px] w-[72px] shrink-0 rounded-[8px]" sizes="144px" />
+          <div className="min-w-0 flex-1">
+            <div className="flex items-start justify-between gap-2">
+              <p className="text-[14px] font-semibold text-[#2E5A4C]">
+                {fmtKo(c.date)} {c.time}
+              </p>
+              <Badge>{b.status}</Badge>
+            </div>
+            <p className="mt-0.5 truncate text-[17px] font-bold text-[#22201C]">{c.name}</p>
+            <p className="mt-1 flex items-center gap-1.5 text-[13px] text-[#6B665E]">
+              <Avatar name={c.teacher} size={20} /> {c.teacher} 강사, {c.room}
+            </p>
+          </div>
+        </div>
+        {b.status === "대기" && (
+          <p className="mx-4 mb-3 rounded-[8px] bg-[#F7F2E9] px-3 py-2 text-[13px] leading-[1.55] text-[#6B4A16]">대기 {b.waitNo}번, 빈자리가 나면 자동으로 예약 완료되고 알림을 보내 드립니다.</p>
+        )}
+        {b.fromWait && <p className="mx-4 mb-3 rounded-[8px] bg-[#EEF4F1] px-3 py-2 text-[13px] text-[#245044]">대기 중 빈자리가 나 자동으로 예약되었습니다.</p>}
+      </>
+    );
+    return (
+      <li key={c.id} className={`${card} overflow-hidden ${selected ? "border-[#22201C] ring-1 ring-[#22201C]" : ""}`}>
+        {selectable ? (
+          <button type="button" onClick={() => setMineSel(c.id)} aria-current={selected ? "true" : undefined} className={`block w-full text-left ${ring}`}>
+            {inner}
+          </button>
+        ) : (
+          inner
+        )}
+        <div className="flex items-center justify-between gap-3 border-t border-[#EEEAE3] px-4 py-2">
+          <span className="text-[12px] text-[#9A948A]">{canCancel(c) ? `${CANCEL_HOURS}시간 전까지 취소 가능` : "취소 가능 시간 지남"}</span>
+          <button type="button" onClick={() => setCancelId(c.id)} className={`min-h-[44px] rounded-[8px] px-3 text-[14px] font-semibold text-[#4E4A43] hover:bg-[#F6F4F0] ${ring}`}>
+            {b.status === "대기" ? "대기 취소" : "예약 취소"}
+          </button>
+        </div>
+      </li>
+    );
+  };
+
+  const pastList = (selectable: boolean) => (
+    <ul className={`${card} divide-y divide-[#EEEAE3]`}>
+      {pastRows.map((r) => {
+        const selected = selectable && mineSel === r.key;
+        const head = (
+          <div className="flex min-h-[44px] items-center gap-3">
+            <Avatar name={r.teacher} size={36} />
+            <span className="min-w-0 flex-1">
+              <span className="block truncate text-[15px] font-semibold text-[#22201C]">{r.name}</span>
+              <span className="block text-[13px] text-[#6B665E]">
+                {fmtKo(r.date)} {r.time}, {r.teacher} 강사
+              </span>
+            </span>
+            <Badge>{r.status}</Badge>
+          </div>
+        );
+        return (
+          <li key={r.key} className={selected ? "bg-[#FBFAF7]" : ""}>
+            {selectable ? (
+              <button
+                type="button"
+                onClick={() => {
+                  setMineSel(r.key);
+                  if (r.status === "출석" && FEEDBACK[r.ago]) setReadFeedback((x) => (x.includes(r.ago) ? x : [...x, r.ago]));
+                }}
+                aria-current={selected ? "true" : undefined}
+                className={`block w-full px-4 py-3 text-left ${ring} ${selected ? "shadow-[inset_3px_0_0_#22201C]" : ""}`}
+              >
+                {head}
+                {r.status === "출석" && FEEDBACK[r.ago] && (
+                  <span className="mt-2 flex items-center gap-1.5 text-[13px] font-semibold text-[#2E5A4C]">
+                    <MessageSquareText size={14} aria-hidden /> 강사 피드백 노트{!readFeedback.includes(r.ago) ? ", 새 노트" : ""}
+                  </span>
+                )}
+              </button>
+            ) : (
+              <div className="px-4 py-3">
+                {head}
+                {r.status === "출석" && FEEDBACK[r.ago] && (
+                  <button
+                    type="button"
+                    onClick={() => openFeedback(r.ago)}
+                    className={`mt-2 flex min-h-[44px] w-full items-center gap-2 rounded-[8px] bg-[#F6F4F0] px-3 text-left text-[14px] font-semibold text-[#2E5A4C] ${ring}`}
+                  >
+                    <MessageSquareText size={16} aria-hidden />
+                    <span className="flex-1">강사 피드백 노트</span>
+                    {!readFeedback.includes(r.ago) && <span className="text-[12px] font-bold text-[#B5532F]">새 노트</span>}
+                    <ChevronRight size={16} aria-hidden />
+                  </button>
+                )}
+              </div>
+            )}
+          </li>
+        );
+      })}
+    </ul>
+  );
+
+  const feedbackBody = (ago: number, inline: boolean) => {
+    const f = FEEDBACK[ago];
+    const p = PAST.find((x) => x.ago === ago);
+    if (!f || !p) return null;
+    return (
+      <div>
+        <div className="flex items-start justify-between gap-3">
+          <div className="flex items-center gap-3">
+            <Avatar name={p.teacher} size={52} />
+            <div>
+              <p className="text-[13px] font-semibold text-[#2E5A4C]">강사 피드백 노트</p>
+              <h2 id={inline ? "inline-fb-title" : "fb-title"} className="text-[18px] font-bold text-[#22201C]">
+                {p.teacher} 강사
+              </h2>
+              <p className="text-[13px] text-[#6B665E]">
+                {fmtKo(daysAgo(today, p.ago))} {p.time} {p.name}
+              </p>
+            </div>
+          </div>
+          {!inline && <CloseButton onClose={() => setFeedbackOpen(null)} />}
+        </div>
+        <h3 className="mt-5 text-[15px] font-bold text-[#22201C]">오늘 자세 포인트</h3>
+        <p className="mt-2 rounded-[10px] bg-[#F6F4F0] p-4 text-[15px] leading-[1.7] text-[#33302B]">{f.point}</p>
+        <h3 className="mt-5 text-[15px] font-bold text-[#22201C]">동작 체크</h3>
+        <ul className="mt-2 divide-y divide-[#EEEAE3] rounded-[10px] border border-[#ECE7DF] bg-white">
+          {f.checks.map((c) => (
+            <li key={c.label} className="flex min-h-[48px] items-center justify-between gap-3 px-3 text-[14px]">
+              <span className="text-[#22201C]">{c.label}</span>
+              <span className={`inline-flex h-6 items-center rounded-[4px] px-2 text-[12px] font-semibold ${c.good ? "bg-[#E4EEE9] text-[#245044]" : "bg-[#F4EBDC] text-[#7A5418]"}`}>
+                {c.good ? "좋음" : "연습 필요"}
+              </span>
+            </li>
+          ))}
+        </ul>
+        <h3 className="mt-5 text-[15px] font-bold text-[#22201C]">다음 수업 추천</h3>
+        <div className="mt-2 flex items-center gap-3 rounded-[10px] border border-[#ECE7DF] bg-white p-3">
+          <Photo src={KIND[f.next].photo} alt="" pos={KIND[f.next].pos} className="h-[64px] w-[64px] shrink-0 rounded-[8px]" sizes="128px" />
+          <div className="min-w-0">
+            <p className="text-[15px] font-bold text-[#22201C]">{f.nextName}</p>
+            <p className="text-[13px] leading-[1.55] text-[#6B665E]">{f.nextWhy}</p>
+          </div>
+        </div>
+        <button
+          type="button"
+          onClick={() => {
+            setFeedbackOpen(null);
+            openKind(f.next);
+          }}
+          className={`mt-4 min-h-[52px] w-full rounded-[10px] bg-[#2E5A4C] text-[15px] font-bold text-white ${ring}`}
+        >
+          {f.nextName} 시간표 보기
+        </button>
+      </div>
+    );
+  };
+
+  const teacherBody = (n: TeacherName) => {
+    const t = TEACHERS[n];
+    const slots = [...WEEKDAY.map((s) => ({ ...s, when: "평일" })), ...WEEKEND.map((s) => ({ ...s, when: "주말" }))].filter((s) => s.teacher === n);
+    return (
+      <div>
+        <div className={`relative ${isTablet ? "-mx-7" : "-mx-5"}`}>
+          <Photo src={t.photo} alt={`${n} 강사`} pos={t.pos} className="aspect-[4/3] w-full" sizes="440px" />
+          <CloseOnPhoto onClose={() => setTeacherOpen(null)} />
+        </div>
+        <p className="mt-5 text-[13px] font-semibold text-[#2E5A4C]">{t.role}</p>
+        <h2 id="teacher-sheet-title" className="text-[22px] font-bold text-[#22201C]">
+          {n}
+        </h2>
+        <p className="mt-2 text-[15px] leading-[1.65] text-[#4E4A43]">{t.intro}</p>
+        <h3 className="mt-5 text-[15px] font-bold text-[#22201C]">경력</h3>
+        <ul className="mt-2 space-y-1.5 text-[14px] text-[#4E4A43]">
+          {t.career.map((c) => (
+            <li key={c} className="flex gap-2">
+              <span className="mt-[9px] h-1 w-1 shrink-0 rounded-full bg-[#9A948A]" aria-hidden />
+              {c}
+            </li>
+          ))}
+        </ul>
+        <h3 className="mt-5 text-[15px] font-bold text-[#22201C]">담당 수업</h3>
+        <ul className="mt-2 divide-y divide-[#EEEAE3] rounded-[10px] border border-[#ECE7DF]">
+          {slots.map((s) => (
+            <li key={`${s.when}-${s.time}`} className="flex min-h-[48px] items-center justify-between gap-3 px-3 text-[14px]">
+              <span className="font-semibold text-[#22201C]">{s.name}</span>
+              <span className="tabular-nums text-[#6B665E]">
+                {s.when} {s.time}
+              </span>
+            </li>
+          ))}
+        </ul>
+        <button
+          type="button"
+          onClick={() => {
+            const k = slots[0]?.kind ?? "all";
+            setTeacherOpen(null);
+            openKind(k);
+          }}
+          className={`mt-5 min-h-[52px] w-full rounded-[10px] bg-[#2E5A4C] text-[15px] font-bold text-white ${ring}`}
+        >
+          {n} 강사 수업 예약하기
+        </button>
+      </div>
+    );
+  };
+
+  const reportBody = (twoCol: boolean) => {
+    const left = (
+      <div>
+        <dl className="grid grid-cols-3 gap-2">
+          {[
+            { k: "누적 출석", v: `${totalAttend}회` },
+            { k: "연속 출석", v: "4주" },
+            { k: "이번 달", v: `${thisMonth}회` },
+          ].map((s) => (
+            <div key={s.k} className="rounded-[10px] bg-[#F6F4F0] px-3 py-3">
+              <dt className="text-[12px] text-[#6B665E]">{s.k}</dt>
+              <dd className="mt-0.5 text-[20px] font-bold text-[#22201C]">{s.v}</dd>
+            </div>
+          ))}
+        </dl>
+        <h3 className="mt-6 text-[15px] font-bold text-[#22201C]">월별 운동 횟수</h3>
+        <div className="mt-3 rounded-[10px] border border-[#ECE7DF] p-4">
+          <MonthChart labels={monthLabels} values={monthValues} />
+          <p className="mt-2 text-[12px] text-[#8A847A]">이번 달은 예약 완료된 수업까지 포함합니다.</p>
+        </div>
+        <div className="mt-6 flex items-start gap-3 rounded-[10px] bg-[#EEF4F1] p-4">
+          <Avatar name="이ㅅ연" size={40} />
+          <p className="text-[14px] leading-[1.65] text-[#245044]">
+            <strong className="block text-[13px]">이ㅅ연 대표 강사</strong>
+            석 달 사이 앞으로 굽히기가 9cm 좋아졌습니다. 다음 체크는 한 달 뒤에 함께 해요.
+          </p>
+        </div>
+      </div>
+    );
+    const right = (
+      <div>
+        <h3 className={`${twoCol ? "" : "mt-6"} text-[15px] font-bold text-[#22201C]`}>체형 체크 기록</h3>
+        <ol className="mt-3">
+          {BODY_CHECKS.map((b, i) => (
+            <li key={b.round} className="relative flex gap-3 pb-5 last:pb-0">
+              {i < BODY_CHECKS.length - 1 && <span className="absolute left-[7px] top-5 h-[calc(100%-12px)] w-px bg-[#DAD5CC]" aria-hidden />}
+              <span className={`relative mt-1 h-[15px] w-[15px] shrink-0 rounded-full border-2 ${i === 0 ? "border-[#2E5A4C] bg-[#2E5A4C]" : "border-[#BDB6AA] bg-white"}`} aria-hidden />
+              <div className="min-w-0 flex-1">
+                <p className="text-[14px] font-bold text-[#22201C]">
+                  {b.round}회차 체크 <span className="font-normal text-[#6B665E]">{fmtKo(daysAgo(today, b.ago))}</span>
+                </p>
+                <ul className="mt-1.5 flex flex-wrap gap-1.5">
+                  {b.items.map((it) => (
+                    <li key={it} className="rounded-[4px] bg-[#F1EEE9] px-2 py-1 text-[12px] text-[#4E4A43]">
+                      {it}
+                    </li>
+                  ))}
+                </ul>
+                <p className="mt-1.5 text-[13px] leading-[1.55] text-[#6B665E]">{b.note}</p>
+              </div>
+            </li>
+          ))}
+        </ol>
+      </div>
+    );
+    return (
+      <>
+        <div className="flex items-start justify-between gap-3">
+          <div>
+            <h2 id="report-title" className="text-[21px] font-bold text-[#22201C]">
+              나의 변화 리포트
+            </h2>
+            <p className="text-[13px] text-[#6B665E]">
+              김ㅎ늘 회원님, {monthLabels[0]}부터 {monthLabels[5]}까지
+            </p>
+          </div>
+          <CloseButton onClose={() => setReportOpen(false)} />
+        </div>
+        {twoCol ? (
+          <div className="mt-5 grid grid-cols-2 gap-8">
+            {left}
+            {right}
+          </div>
+        ) : (
+          <div className="mt-4">
+            {left}
+            {right}
+          </div>
+        )}
+      </>
+    );
+  };
+
+  /* ---------- 공통 시트와 알림 ---------- */
+
+  const sharedOverlays = (
+    <>
+      <Sheet open={done !== null} onClose={() => setDoneId(null)} labelId="done-title" mode={sheetMode} maxW={460}>
+        {done && (
+          <div className="text-center">
+            <CircleCheck size={44} className="mx-auto mt-2 text-[#2E5A4C]" aria-hidden />
+            <h2 id="done-title" className="mt-3 text-[20px] font-bold">
+              {doneBooking?.status === "대기" ? `대기 ${doneBooking.waitNo}번으로 등록되었습니다` : "예약이 완료되었습니다"}
+            </h2>
+            <div className="mt-4 flex items-center gap-3 rounded-[10px] bg-[#F6F4F0] p-3 text-left text-[14px]">
+              <Photo src={KIND[done.kind].photo} alt="" pos={KIND[done.kind].pos} className="h-[60px] w-[60px] shrink-0 rounded-[8px]" sizes="120px" />
+              <div className="min-w-0">
+                <p className="font-semibold text-[#2E5A4C]">
+                  {fmtKo(done.date)} {done.time}~{endTime(done.time, done.dur)}
+                </p>
+                <p className="truncate text-[16px] font-bold">{done.name}</p>
+                <p className="text-[#6B665E]">
+                  {done.teacher} 강사, {done.room}
+                </p>
+              </div>
+            </div>
+            <p className="mt-3 text-[14px] text-[#4E4A43]">{doneBooking?.status === "대기" ? "빈자리가 나면 자동으로 예약하고 알림을 보내 드립니다." : `회원권 남은 횟수 ${remaining}회`}</p>
+            <div className="mt-5 flex gap-2">
+              <button type="button" onClick={() => setDoneId(null)} className={`min-h-[52px] flex-1 rounded-[10px] border border-[#D6D1C8] text-[15px] font-semibold text-[#4E4A43] ${ring}`}>
+                닫기
+              </button>
+              <button
+                type="button"
+                onClick={() => {
+                  setMineSel(done.id);
+                  setDoneId(null);
+                  setMineView("upcoming");
+                  go("mine");
+                }}
+                className={`min-h-[52px] flex-1 rounded-[10px] bg-[#2E5A4C] text-[15px] font-semibold text-white ${ring}`}
+              >
+                내 예약 보기
+              </button>
+            </div>
+          </div>
+        )}
+      </Sheet>
+
+      <Sheet open={cancelTarget !== null} onClose={() => setCancelId(null)} labelId="cancel-title" mode={sheetMode} maxW={460}>
+        {cancelTarget && cancelBooking && (
+          <div>
+            <h2 id="cancel-title" className="text-[20px] font-bold">
+              {cancelBooking.status === "대기" ? "대기를 취소할까요?" : "예약을 취소할까요?"}
+            </h2>
+            <div className="mt-4 rounded-[10px] bg-[#F6F4F0] p-4 text-[14px]">
+              <p className="font-semibold text-[#2E5A4C]">
+                {fmtKo(cancelTarget.date)} {cancelTarget.time}
+              </p>
+              <p className="mt-1 text-[16px] font-bold">{cancelTarget.name}</p>
+              <p className="mt-1 text-[#6B665E]">
+                {cancelTarget.teacher} 강사, {cancelTarget.room}
+              </p>
+            </div>
+            <p className="mt-3 text-[14px] leading-[1.6] text-[#4E4A43]">
+              {canCancel(cancelTarget)
+                ? cancelBooking.status === "대기"
+                  ? "대기 순서가 사라집니다."
+                  : `수업 ${CANCEL_HOURS}시간 전까지 취소할 수 있고, 취소하면 회원권 1회가 돌아옵니다.`
+                : `수업 ${CANCEL_HOURS}시간 전이 지나 앱에서 취소할 수 없습니다. 스튜디오로 연락해 주세요.`}
+            </p>
+            <div className="mt-5 flex gap-2">
+              <button type="button" onClick={() => setCancelId(null)} className={`min-h-[52px] flex-1 rounded-[10px] border border-[#D6D1C8] text-[15px] font-semibold text-[#4E4A43] ${ring}`}>
+                돌아가기
+              </button>
+              <button
+                type="button"
+                disabled={!canCancel(cancelTarget)}
+                onClick={() => cancel(cancelTarget.id)}
+                className={`min-h-[52px] flex-1 rounded-[10px] bg-[#93402B] text-[15px] font-semibold text-white disabled:bg-[#ECE8E1] disabled:text-[#9A948A] ${ring}`}
+              >
+                {cancelBooking.status === "대기" ? "대기 취소" : "예약 취소"}
+              </button>
+            </div>
+          </div>
+        )}
+      </Sheet>
+
+      <Sheet open={teacherOpen !== null} onClose={() => setTeacherOpen(null)} labelId="teacher-sheet-title" flush mode={isTablet ? "side" : "bottom"}>
+        {teacherOpen && teacherBody(teacherOpen)}
+      </Sheet>
+
+      <Sheet open={fb !== null} onClose={() => setFeedbackOpen(null)} labelId="fb-title" mode={sheetMode} maxW={560}>
+        {fb && fbPast && feedbackBody(fbPast.ago, false)}
+      </Sheet>
+
+      <Sheet open={reportOpen} onClose={() => setReportOpen(false)} labelId="report-title" tall mode={sheetMode} maxW={wide ? 980 : 720}>
+        {reportBody(isTablet)}
+      </Sheet>
+
+      <AnimatePresence>
+        {push && (
+          <motion.div
+            key={push.key}
+            role="status"
+            className={isTablet ? "absolute right-6 top-6 z-50 w-[400px] max-w-[calc(100%-48px)]" : "fixed inset-x-3 top-3 z-[70] md:absolute md:top-[50px]"}
+            initial={reduce ? { opacity: 0 } : { y: -96, opacity: 0 }}
+            animate={reduce ? { opacity: 1 } : { y: 0, opacity: 1 }}
+            exit={reduce ? { opacity: 0 } : { y: -96, opacity: 0 }}
+            transition={reduce ? { duration: 0 } : { type: "spring", stiffness: 380, damping: 34 }}
+          >
+            <div className="flex items-start gap-1 rounded-[14px] bg-white/95 shadow-[0_8px_28px_-8px_rgba(30,24,16,0.35)] ring-1 ring-black/5 backdrop-blur">
+              <button
+                type="button"
+                onClick={() => {
+                  setPush(null);
+                  setMineView("upcoming");
+                  go(push.tab);
+                }}
+                className={`flex min-h-[64px] min-w-0 flex-1 items-start gap-3 rounded-[14px] py-3 pl-3 text-left ${ring}`}
+              >
+                <span className="grid h-9 w-9 shrink-0 place-items-center rounded-[8px] bg-[#2E5A4C] text-white" aria-hidden>
+                  <CalendarCheck size={18} />
+                </span>
+                <span className="min-w-0">
+                  <span className="flex items-center gap-2 text-[12px] text-[#6B665E]">
+                    필라테스 스튜디오 <span className="text-[#9A948A]">지금</span>
+                  </span>
+                  <span className="mt-0.5 block text-[14px] leading-snug text-[#22201C]">{push.text}</span>
+                </span>
+              </button>
+              <button type="button" aria-label="알림 닫기" onClick={() => setPush(null)} className={`grid h-11 w-11 shrink-0 place-items-center rounded-full text-[#9A948A] ${ring}`}>
+                <X size={18} aria-hidden />
+              </button>
+            </div>
+          </motion.div>
+        )}
+      </AnimatePresence>
+    </>
+  );
+
+  /* ---------- 휴대폰 화면 ---------- */
+
+  const phoneScreen = () => {
     if (tab === "home") {
       return (
         <div className="space-y-7 pb-8">
-          <div className="px-4">
-            <div className="relative overflow-hidden rounded-[16px]">
-              <Photo src={`${IMG}/hero.jpg`} alt="햇빛이 드는 스튜디오에서 리포머 동작을 하는 회원" pos="72% 40%" className="aspect-[4/3] w-full" />
-              <div className="absolute inset-0 bg-[linear-gradient(to_top,rgba(24,22,18,0.72),rgba(24,22,18,0.05)_62%)]" aria-hidden />
-              <div className="absolute inset-x-0 bottom-0 p-5 text-white">
-                <p className="text-[13px] font-medium text-white/80">김ㅎ늘 회원님</p>
-                <p className="mt-1 text-[22px] font-bold leading-[1.35]">다음 주 시간표가 열렸습니다</p>
-                <button
-                  type="button"
-                  onClick={() => openKind("all")}
-                  className="mt-3 inline-flex min-h-[44px] items-center gap-1 rounded-full bg-white px-4 text-[14px] font-bold text-[#22201C] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-white"
-                >
-                  시간표 보기 <ChevronRight size={16} aria-hidden />
-                </button>
-              </div>
-            </div>
-          </div>
-
+          <div className="px-4">{heroBanner("aspect-[4/3]")}</div>
           <section aria-labelledby="next-title" className="px-4">
             <SectionHead id="next-title" title="다음 수업" />
-            {nextClass ? (
-              <div className={`${card} p-4`}>
-                <div className="flex items-center gap-3">
-                  <Avatar name={nextClass.c.teacher} size={48} />
-                  <div className="min-w-0 flex-1">
-                    <p className="text-[14px] font-semibold text-[#2E5A4C]">
-                      {dayWord(nextClass.c.off, nextClass.c.date)} {nextClass.c.time}
-                    </p>
-                    <p className="truncate text-[18px] font-bold text-[#22201C]">{nextClass.c.name}</p>
-                  </div>
-                  <Badge>예약 완료</Badge>
-                </div>
-                <p className="mt-3 flex flex-wrap items-center gap-x-4 gap-y-1 border-t border-[#EEEAE3] pt-3 text-[13px] text-[#6B665E]">
-                  <span className="inline-flex items-center gap-1">
-                    <UserRound size={14} aria-hidden /> {nextClass.c.teacher} 강사
-                  </span>
-                  <span className="inline-flex items-center gap-1">
-                    <MapPin size={14} aria-hidden /> {nextClass.c.room}
-                  </span>
-                  <span className="inline-flex items-center gap-1">
-                    <Clock size={14} aria-hidden /> {nextClass.c.time}~{endTime(nextClass.c.time, nextClass.c.dur)}
-                  </span>
-                </p>
-              </div>
-            ) : (
-              <div className={`${card} flex items-center justify-between gap-3 p-4`}>
-                <p className="text-[15px] text-[#4E4A43]">예정된 수업이 없습니다.</p>
-                <button type="button" onClick={() => openKind("all")} className={`min-h-[44px] rounded-[8px] bg-[#2E5A4C] px-4 text-[14px] font-semibold text-white ${ring}`}>
-                  예약하기
-                </button>
-              </div>
-            )}
-            <div className="mt-3 grid grid-cols-2 gap-3">
-              <button type="button" onClick={() => openKind("all")} className={`${card} flex min-h-[64px] items-center gap-3 px-4 text-left hover:border-[#D6D0C6] ${ring}`}>
-                <CalendarPlus size={22} className="text-[#2E5A4C]" aria-hidden />
-                <span className="text-[15px] font-bold text-[#22201C]">수업 예약</span>
-              </button>
-              <button type="button" onClick={() => go("pass")} className={`${card} flex min-h-[64px] items-center gap-3 px-4 text-left hover:border-[#D6D0C6] ${ring}`}>
-                <Ticket size={22} className="text-[#2E5A4C]" aria-hidden />
-                <span>
-                  <span className="block text-[15px] font-bold text-[#22201C]">회원권</span>
-                  <span className="block text-[12px] text-[#6B665E]">{remaining}회 남음</span>
-                </span>
-              </button>
-            </div>
+            {nextClassBlock()}
+            <div className="mt-3">{quickActions()}</div>
           </section>
-
           <section aria-labelledby="note-title" className="px-4">
             <SectionHead id="note-title" title="지난 수업 피드백" />
-            {feedbackCard}
+            {feedbackCard()}
           </section>
-
           <section aria-labelledby="change-title" className="px-4">
             <SectionHead id="change-title" title="나의 변화" />
-            <button type="button" onClick={() => setReportOpen(true)} className={`${card} block w-full p-4 text-left hover:border-[#D6D0C6] ${ring}`}>
-              <span className="flex items-start justify-between gap-3">
-                <span>
-                  <span className="flex items-center gap-1.5 text-[13px] font-semibold text-[#B5532F]">
-                    <Flame size={14} aria-hidden /> 4주 연속 출석
-                  </span>
-                  <span className="mt-1 block text-[15px] text-[#4E4A43]">
-                    이번 달 <strong className="text-[20px] font-bold text-[#22201C]">{thisMonth}회</strong>, 지난달 {PREV_MONTHS[4]}회
-                  </span>
-                </span>
-                <span className="inline-flex min-h-[28px] items-center gap-0.5 text-[13px] text-[#6B665E]">
-                  리포트 <ChevronRight size={15} aria-hidden />
-                </span>
-              </span>
-              <span className="mt-3 flex h-[44px] items-end gap-1.5" aria-hidden>
-                {monthValues.map((v, i) => (
-                  <span key={monthLabels[i]} className={`flex-1 rounded-t-[3px] ${i === 5 ? "bg-[#2E5A4C]" : "bg-[#DCD6CC]"}`} style={{ height: `${Math.max(8, (v / 8) * 100)}%` }} />
-                ))}
-              </span>
-            </button>
+            {changeCard()}
           </section>
-
           <section aria-labelledby="kind-title">
             <div className="px-4">
               <SectionHead id="kind-title" title="수업 종류" />
             </div>
-            <ul className="flex snap-x scroll-px-4 gap-3 overflow-x-auto px-4 pb-1 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
-              {(["reformer", "mat", "stretch", "chair"] as Kind[]).map((k) => (
-                <li key={k} className="w-[148px] shrink-0 snap-start">
-                  <button type="button" onClick={() => openKind(k)} className={`block w-full overflow-hidden rounded-[12px] bg-white text-left shadow-[0_1px_2px_rgba(40,32,20,0.05)] ${ring}`}>
-                    <Photo src={KIND[k].photo} alt="" pos={KIND[k].pos} className="aspect-[4/5] w-full" sizes="300px" />
-                    <span className="block px-3 py-2.5">
-                      <span className="block text-[15px] font-bold text-[#22201C]">{KIND[k].label}</span>
-                      <span className="block truncate text-[12px] text-[#6B665E]">{KIND[k].line}</span>
-                    </span>
-                  </button>
-                </li>
-              ))}
-            </ul>
+            {kindCards(false)}
           </section>
-
           {picks.length > 0 && (
             <section aria-labelledby="pick-title" className="px-4">
               <SectionHead id="pick-title" title="이번 주 추천 수업" />
-              <ul className="space-y-2">{picks.map((c) => classRow(c, true))}</ul>
+              <ul className="space-y-2">{picks.map((c) => classRow(c, { withDate: true }))}</ul>
             </section>
           )}
-
-          <section aria-labelledby="teacher-title">
-            <div className="px-4">
-              <SectionHead id="teacher-title" title="강사 소개" />
-            </div>
-            <ul className="grid grid-cols-3 gap-3 px-4">
-              {(Object.keys(TEACHERS) as TeacherName[]).map((n) => (
-                <li key={n}>
-                  <button type="button" onClick={() => setTeacherOpen(n)} className={`block w-full rounded-[12px] text-left ${ring}`}>
-                    <Photo src={TEACHERS[n].photo} alt={`${n} 강사`} pos={TEACHERS[n].pos} className="aspect-[3/4] w-full rounded-[12px]" sizes="240px" />
-                    <span className="mt-2 block text-[15px] font-bold text-[#22201C]">{n}</span>
-                    <span className="block text-[12px] text-[#6B665E]">{TEACHERS[n].role}</span>
-                  </button>
-                </li>
-              ))}
-            </ul>
+          <section aria-labelledby="teacher-title" className="px-4">
+            <SectionHead id="teacher-title" title="강사 소개" />
+            {teacherGrid()}
           </section>
-
           <section aria-labelledby="notice-title" className="px-4">
             <SectionHead id="notice-title" title="공지사항" />
-            <article className={`${card} overflow-hidden`}>
-              <Photo src={`${IMG}/studio.jpg`} alt="리포머 세 대가 놓인 B룸 전경" pos="50% 65%" className="aspect-[2/1] w-full" />
-              <div className="p-4">
-                <p className="text-[12px] text-[#9A948A]">{fmtMD(daysAgo(today, 4))}</p>
-                <h3 className="mt-1 text-[16px] font-bold text-[#22201C]">주말 체어 바렐 수업이 열렸습니다</h3>
-                <p className="mt-1 text-[14px] leading-[1.6] text-[#4E4A43]">토요일과 일요일 12:20, B룸에서 정원 4명으로 진행합니다.</p>
-                <button type="button" onClick={() => openKind("chair")} className={`mt-2 -ml-1 inline-flex min-h-[44px] items-center gap-0.5 px-1 text-[14px] font-semibold text-[#2E5A4C] ${ring}`}>
-                  체어 바렐 시간표 <ChevronRight size={15} aria-hidden />
-                </button>
-              </div>
-            </article>
-            <ul className={`${card} mt-3 divide-y divide-[#EEEAE3]`}>
-              {NOTICES.map((n) => (
-                <li key={n.title}>
-                  <details className="group">
-                    <summary className={`flex min-h-[56px] cursor-pointer list-none items-center gap-3 px-4 py-3 [&::-webkit-details-marker]:hidden ${ring}`}>
-                      <span className="min-w-0 flex-1">
-                        <span className="block truncate text-[15px] text-[#22201C]">{n.title}</span>
-                        <span className="block text-[12px] text-[#9A948A]">{fmtMD(daysAgo(today, n.ago))}</span>
-                      </span>
-                      <ChevronDown size={18} className="shrink-0 text-[#9A948A] transition-transform group-open:rotate-180" aria-hidden />
-                    </summary>
-                    <p className="px-4 pb-4 text-[14px] leading-[1.6] text-[#4E4A43]">{n.body}</p>
-                  </details>
-                </li>
-              ))}
-            </ul>
+            {noticeBlock()}
           </section>
         </div>
       );
     }
-
     if (tab === "book") {
-      const list = dayClasses(dayOff).filter((c) => kindFilter === "all" || c.kind === kindFilter);
-      const sel = days[dayOff].date;
-      const chips: { id: Kind | "all"; label: string }[] = [
-        { id: "all", label: "전체" },
-        { id: "reformer", label: "리포머" },
-        { id: "mat", label: "매트" },
-        { id: "stretch", label: "스트레칭" },
-        { id: "chair", label: "체어 바렐" },
-      ];
       return (
         <div className="pb-6">
-          <div className="sticky top-[56px] z-10 border-b border-[#E7E2DA] bg-[#F6F4F0] px-4 pb-3 pt-1">
-            <p className="mb-2 text-[13px] font-semibold text-[#6B665E]">
-              {sel.getFullYear()}년 {sel.getMonth() + 1}월
-            </p>
-            <div role="tablist" aria-label="날짜 선택" className="grid grid-cols-7 gap-1">
-              {days.map(({ off, date }) => {
-                const active = off === dayOff;
-                const dow = ["일", "월", "화", "수", "목", "금", "토"][date.getDay()];
-                const hasMine = bookings.some((b) => b.id.startsWith(`d${off}-`));
-                return (
-                  <button
-                    key={off}
-                    type="button"
-                    role="tab"
-                    aria-selected={active}
-                    aria-label={`${fmtKo(date)}${off === 0 ? ", 오늘" : ""}${hasMine ? ", 예약 있음" : ""}`}
-                    onClick={() => setDayOff(off)}
-                    className={`flex min-h-[64px] flex-col items-center justify-center rounded-[10px] ${ring} ${active ? "bg-[#2E5A4C] text-white" : "text-[#22201C] hover:bg-[#ECE8E1]"}`}
-                  >
-                    <span className={`text-[12px] ${active ? "text-[#CFE0D8]" : date.getDay() === 0 ? "text-[#93402B]" : "text-[#6B665E]"}`}>{off === 0 ? "오늘" : dow}</span>
-                    <span className="text-[17px] font-bold tabular-nums">{date.getDate()}</span>
-                    <span className={`mt-0.5 h-1 w-1 rounded-full ${hasMine ? (active ? "bg-white" : "bg-[#2E5A4C]") : "bg-transparent"}`} aria-hidden />
-                  </button>
-                );
-              })}
-            </div>
-            <div className="-mx-4 mt-3 flex gap-1.5 overflow-x-auto px-4 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden" role="group" aria-label="수업 종류">
-              {chips.map((ch) => {
-                const on = kindFilter === ch.id;
-                return (
-                  <button
-                    key={ch.id}
-                    type="button"
-                    aria-pressed={on}
-                    onClick={() => setKindFilter(ch.id)}
-                    className={`min-h-[44px] shrink-0 rounded-full border px-3 text-[14px] font-semibold ${ring} ${
-                      on ? "border-[#22201C] bg-[#22201C] text-white" : "border-[#DAD5CC] bg-white text-[#4E4A43]"
-                    }`}
-                  >
-                    {ch.label}
-                  </button>
-                );
-              })}
-            </div>
-          </div>
-          <div className="px-4 pt-4">
-            <p className="mb-3 text-[14px] text-[#6B665E]">
-              {fmtKo(sel)}, 수업 {list.length}개
-            </p>
-            {list.length === 0 ? (
-              <div className={`${card} px-5 py-8 text-center`}>
-                <p className="text-[15px] text-[#4E4A43]">이 날은 {kindFilter !== "all" ? KIND[kindFilter].label : ""} 수업이 없습니다.</p>
-                <button type="button" onClick={() => setKindFilter("all")} className={`mt-3 min-h-[44px] rounded-[8px] border border-[#D6D1C8] px-4 text-[14px] font-semibold text-[#4E4A43] ${ring}`}>
-                  전체 수업 보기
-                </button>
-              </div>
-            ) : (
-              <ul className="space-y-2">{list.map((c) => classRow(c))}</ul>
-            )}
-            <p className="mt-4 text-[13px] leading-[1.6] text-[#6B665E]">예약은 7일 전부터 열리고, 수업 {CANCEL_HOURS}시간 전까지 취소할 수 있습니다. 마감된 수업은 대기 예약을 하면 빈자리가 날 때 자동으로 예약됩니다.</p>
-          </div>
+          <div className="sticky top-[56px] z-10 border-b border-[#E7E2DA] bg-[#F6F4F0] px-4 pb-3 pt-1">{dayStrip()}</div>
+          <div className="px-4 pt-4">{bookListBlock(false)}</div>
         </div>
       );
     }
-
     if (tab === "mine") {
-      const pastRows = [
-        ...cancelled
-          .slice()
-          .sort((a, z) => z.at - a.at)
-          .map((x) => findClass(x.id))
-          .filter((c): c is ClassItem => c !== null)
-          .map((c) => ({ key: `c-${c.id}`, ago: -1, date: c.date, time: c.time, name: c.name, teacher: c.teacher, status: "취소" as const })),
-        ...PAST.map((p) => ({ key: `p${p.ago}`, ago: p.ago, date: daysAgo(today, p.ago), time: p.time, name: p.name, teacher: p.teacher, status: p.status })),
-      ];
       return (
         <div className="space-y-4 px-4 pb-6 pt-2">
           <Segmented
@@ -902,259 +1759,325 @@ export function AppPilatesDemo() {
                 </button>
               </div>
             ) : (
-              <ul className="space-y-3">
-                {upcoming.map(({ b, c }) => (
-                  <li key={c.id} className={`${card} overflow-hidden`}>
-                    <div className="flex gap-3 p-4">
-                      <Photo src={KIND[c.kind].photo} alt="" pos={KIND[c.kind].pos} className="h-[72px] w-[72px] shrink-0 rounded-[8px]" sizes="144px" />
-                      <div className="min-w-0 flex-1">
-                        <div className="flex items-start justify-between gap-2">
-                          <p className="text-[14px] font-semibold text-[#2E5A4C]">
-                            {fmtKo(c.date)} {c.time}
-                          </p>
-                          <Badge>{b.status}</Badge>
-                        </div>
-                        <p className="mt-0.5 truncate text-[17px] font-bold text-[#22201C]">{c.name}</p>
-                        <p className="mt-1 flex items-center gap-1.5 text-[13px] text-[#6B665E]">
-                          <Avatar name={c.teacher} size={20} /> {c.teacher} 강사, {c.room}
-                        </p>
-                      </div>
-                    </div>
-                    {b.status === "대기" && (
-                      <p className="mx-4 mb-3 rounded-[8px] bg-[#F7F2E9] px-3 py-2 text-[13px] leading-[1.55] text-[#6B4A16]">
-                        대기 {b.waitNo}번, 빈자리가 나면 자동으로 예약 완료되고 알림을 보내 드립니다.
-                      </p>
-                    )}
-                    {b.fromWait && <p className="mx-4 mb-3 rounded-[8px] bg-[#EEF4F1] px-3 py-2 text-[13px] text-[#245044]">대기 중 빈자리가 나 자동으로 예약되었습니다.</p>}
-                    <div className="flex items-center justify-between gap-3 border-t border-[#EEEAE3] px-4 py-2">
-                      <span className="text-[12px] text-[#9A948A]">{canCancel(c) ? `${CANCEL_HOURS}시간 전까지 취소 가능` : "취소 가능 시간 지남"}</span>
-                      <button type="button" onClick={() => setCancelId(c.id)} className={`min-h-[44px] rounded-[8px] px-3 text-[14px] font-semibold text-[#4E4A43] hover:bg-[#F6F4F0] ${ring}`}>
-                        {b.status === "대기" ? "대기 취소" : "예약 취소"}
-                      </button>
-                    </div>
-                  </li>
-                ))}
-              </ul>
+              <ul className="space-y-3">{upcoming.map(({ b, c }) => upcomingCard(b, c, false))}</ul>
             )
           ) : (
-            <ul className={`${card} divide-y divide-[#EEEAE3]`}>
-              {pastRows.map((r) => (
-                <li key={r.key} className="px-4 py-3">
-                  <div className="flex min-h-[44px] items-center gap-3">
-                    <Avatar name={r.teacher} size={36} />
-                    <span className="min-w-0 flex-1">
-                      <span className="block truncate text-[15px] font-semibold text-[#22201C]">{r.name}</span>
-                      <span className="block text-[13px] text-[#6B665E]">
-                        {fmtKo(r.date)} {r.time}, {r.teacher} 강사
-                      </span>
-                    </span>
-                    <Badge>{r.status}</Badge>
-                  </div>
-                  {r.status === "출석" && FEEDBACK[r.ago] && (
-                    <button
-                      type="button"
-                      onClick={() => openFeedback(r.ago)}
-                      className={`mt-2 flex min-h-[44px] w-full items-center gap-2 rounded-[8px] bg-[#F6F4F0] px-3 text-left text-[14px] font-semibold text-[#2E5A4C] ${ring}`}
-                    >
-                      <MessageSquareText size={16} aria-hidden />
-                      <span className="flex-1">강사 피드백 노트</span>
-                      {!readFeedback.includes(r.ago) && <span className="text-[12px] font-bold text-[#B5532F]">새 노트</span>}
-                      <ChevronRight size={16} aria-hidden />
-                    </button>
-                  )}
-                </li>
-              ))}
-            </ul>
+            pastList(false)
           )}
         </div>
       );
     }
-
     if (tab === "pass") {
-      const dLeft = Math.round((passEnd.getTime() - today.getTime()) / 86400000);
-      const reserved = bookings.filter((b) => b.status === "예약 완료").length;
       return (
         <div className="space-y-6 px-4 pb-6 pt-2">
-          <section aria-labelledby="pass-title">
-            <div className="relative aspect-[1.586/1] overflow-hidden rounded-[16px] bg-[#1F3A31] text-white shadow-[0_18px_36px_-18px_rgba(20,40,32,0.6)]">
-              <Image src={`${IMG}/studio.jpg`} alt="" fill sizes="390px" className="object-cover opacity-25 mix-blend-luminosity" style={{ objectPosition: "50% 70%" }} />
-              <div className="absolute inset-0 bg-[#1F3A31]/55" aria-hidden />
-              <div className="absolute inset-0 flex flex-col justify-between p-5">
-                <div className="flex items-start justify-between gap-3">
-                  <div>
-                    <p className="text-[12px] font-semibold tracking-[0.08em] text-[#CFE0D8]">필라테스 스튜디오 회원권</p>
-                    <h2 id="pass-title" className="mt-1 text-[19px] font-bold">
-                      그룹 리포머 10회권
-                    </h2>
-                  </div>
-                  <span className="rounded-[4px] bg-white/15 px-2 py-1 text-[12px] font-semibold">D-{dLeft}</span>
-                </div>
-                <div>
-                  <p className="text-[14px] text-white/80">
-                    {TOTAL}회 중 <strong className="text-[34px] font-bold leading-none text-white">{remaining}</strong>회 남음
-                  </p>
-                  <div className="mt-3 h-1.5 overflow-hidden rounded-full bg-white/20" role="progressbar" aria-label="남은 횟수" aria-valuemin={0} aria-valuemax={TOTAL} aria-valuenow={remaining}>
-                    <div className="h-full rounded-full bg-white transition-[width] duration-300" style={{ width: `${(remaining / TOTAL) * 100}%` }} />
-                  </div>
-                  <div className="mt-3 flex items-end justify-between text-[12px] text-white/75">
-                    <span>김ㅎ늘, 회원번호 20417</span>
-                    <span className="tabular-nums">~ {fmtMD(passEnd)}</span>
-                  </div>
-                </div>
-              </div>
-            </div>
-            <dl className={`${card} mt-3 grid grid-cols-3 gap-2 p-4 text-center`}>
-              <div>
-                <dt className="text-[12px] text-[#6B665E]">사용</dt>
-                <dd className="text-[18px] font-bold text-[#22201C]">{used - reserved}회</dd>
-              </div>
-              <div className="border-x border-[#EEEAE3]">
-                <dt className="text-[12px] text-[#6B665E]">예약 중</dt>
-                <dd className="text-[18px] font-bold text-[#22201C]">{reserved}회</dd>
-              </div>
-              <div>
-                <dt className="text-[12px] text-[#6B665E]">남음</dt>
-                <dd className="text-[18px] font-bold text-[#2E5A4C]">{remaining}회</dd>
-              </div>
-            </dl>
-            <p className="mt-3 text-[13px] text-[#6B665E]">
-              유효기간 {fmtKo(passStart)} ~ {fmtKo(passEnd)}
-            </p>
+          <section aria-label="이용 중인 회원권">
+            {passCard()}
+            {passSummary()}
           </section>
+          {historyBlock()}
+        </div>
+      );
+    }
+    return (
+      <div className="space-y-6 px-4 pb-6 pt-2">
+        {profileCard()}
+        {recordMenu()}
+        {alarmBlock()}
+        {studioBlock()}
+      </div>
+    );
+  };
 
-          <section aria-labelledby="usage-title">
-            <SectionHead id="usage-title" title="사용 내역" />
+  /* ---------- 태블릿 화면 ---------- */
+
+  const tabletScreen = () => {
+    if (tab === "home") {
+      return (
+        <div className="space-y-8 px-8 pb-10">
+          <div className="grid grid-cols-2 gap-6">
+            <div className="space-y-6">
+              {heroBanner(wide ? "aspect-[16/10]" : "aspect-[4/3]")}
+              <section aria-labelledby="t-next-title">
+                <SectionHead id="t-next-title" title="다음 수업" />
+                {nextClassBlock()}
+                <div className="mt-3">{quickActions()}</div>
+              </section>
+              <section aria-labelledby="t-note-title">
+                <SectionHead id="t-note-title" title="지난 수업 피드백" />
+                {feedbackCard()}
+              </section>
+            </div>
+            <div className="space-y-6">
+              <section aria-label="이용 중인 회원권">
+                <button type="button" onClick={() => go("pass")} className={`block w-full rounded-[16px] text-left ${ring}`} aria-label="회원권 자세히 보기">
+                  {passCard()}
+                </button>
+              </section>
+              <section aria-labelledby="t-change-title">
+                <SectionHead id="t-change-title" title="나의 변화" />
+                {changeCard()}
+              </section>
+              {picks.length > 0 && (
+                <section aria-labelledby="t-pick-title">
+                  <SectionHead id="t-pick-title" title="이번 주 추천 수업" />
+                  <ul className="space-y-2">{picks.map((c) => classRow(c, { withDate: true }))}</ul>
+                </section>
+              )}
+            </div>
+          </div>
+          <section aria-labelledby="t-kind-title">
+            <SectionHead id="t-kind-title" title="수업 종류" />
+            {kindCards(true)}
+          </section>
+          <div className="grid grid-cols-2 gap-6">
+            <section aria-labelledby="t-teacher-title">
+              <SectionHead id="t-teacher-title" title="강사 소개" />
+              {teacherGrid()}
+            </section>
+            <section aria-labelledby="t-notice-title">
+              <SectionHead id="t-notice-title" title="공지사항" />
+              {noticeBlock()}
+            </section>
+          </div>
+        </div>
+      );
+    }
+    if (tab === "book") {
+      return (
+        <div className="flex h-full min-h-0 gap-6 px-8 pb-6">
+          <div className={`flex min-h-0 shrink-0 flex-col ${wide ? "w-[440px]" : "w-[340px]"}`}>
+            <div className="pb-3">{dayStrip()}</div>
+            <div className="min-h-0 flex-1 overflow-y-auto pb-4 pr-1 pt-2">{bookListBlock(true)}</div>
+          </div>
+          <section aria-labelledby="inline-detail-title" className={`${card} min-h-0 flex-1 overflow-y-auto p-6`}>
+            {selClass ? detailBody(selClass, true) : <p className="py-20 text-center text-[15px] text-[#6B665E]">수업을 고르면 자세한 내용이 여기에 나옵니다.</p>}
+          </section>
+        </div>
+      );
+    }
+    if (tab === "mine") {
+      const firstKey = mineView === "upcoming" ? upcoming[0]?.c.id : pastRows[0]?.key;
+      const sel = mineSel ?? firstKey ?? null;
+      const selUp = mineView === "upcoming" ? upcoming.find((x) => x.c.id === sel) ?? upcoming[0] : undefined;
+      const selPast = mineView === "past" ? pastRows.find((r) => r.key === sel) ?? pastRows[0] : undefined;
+      return (
+        <div className="flex h-full min-h-0 gap-6 px-8 pb-6">
+          <div className={`flex min-h-0 shrink-0 flex-col ${wide ? "w-[440px]" : "w-[340px]"}`}>
             <Segmented
-              label="사용 내역 구분"
-              value={passView}
-              onChange={setPassView}
+              label="예약 구분"
+              value={mineView}
+              onChange={(v) => {
+                setMineView(v);
+                setMineSel(null);
+              }}
               items={[
-                { id: "all", label: "전체" },
-                { id: "use", label: "차감" },
-                { id: "back", label: "복원" },
+                { id: "upcoming", label: `예정 ${upcoming.length}` },
+                { id: "past", label: "지난 수업" },
               ]}
             />
-            {historyShown.length === 0 ? (
-              <p className={`${card} mt-3 px-4 py-6 text-center text-[14px] text-[#6B665E]`}>복원된 내역이 없습니다.</p>
+            <div className="mt-4 min-h-0 flex-1 overflow-y-auto pb-4 pr-1">
+              {mineView === "upcoming" ? (
+                upcoming.length === 0 ? (
+                  <p className={`${card} px-5 py-8 text-center text-[15px] text-[#4E4A43]`}>예정된 수업이 없습니다.</p>
+                ) : (
+                  <ul className="space-y-3">{upcoming.map(({ b, c }) => upcomingCard(b, c, true))}</ul>
+                )
+              ) : (
+                pastList(true)
+              )}
+            </div>
+          </div>
+          <section aria-label="선택한 수업" className={`${card} min-h-0 flex-1 overflow-y-auto p-6`}>
+            {selUp ? (
+              detailBody(selUp.c, true)
+            ) : selPast ? (
+              selPast.status === "출석" && FEEDBACK[selPast.ago] ? (
+                feedbackBody(selPast.ago, true)
+              ) : (
+                <div>
+                  <div className="flex items-center gap-3">
+                    <Avatar name={selPast.teacher} size={52} />
+                    <div>
+                      <p className="text-[14px] font-semibold text-[#2E5A4C]">
+                        {fmtKo(selPast.date)} {selPast.time}
+                      </p>
+                      <h2 className="text-[22px] font-bold text-[#22201C]">{selPast.name}</h2>
+                    </div>
+                  </div>
+                  <div className="mt-5 flex items-center gap-2">
+                    <Badge>{selPast.status}</Badge>
+                    <span className="text-[14px] text-[#4E4A43]">{selPast.status === "결석" ? "결석한 수업은 회원권 1회가 차감됩니다." : "취소한 수업은 회원권 1회가 돌아왔습니다."}</span>
+                  </div>
+                  <button type="button" onClick={() => openKind("all")} className={`mt-6 min-h-[52px] w-full rounded-[10px] bg-[#2E5A4C] text-[15px] font-bold text-white ${ring}`}>
+                    다른 수업 예약하기
+                  </button>
+                </div>
+              )
             ) : (
-              <ul className={`${card} mt-3 divide-y divide-[#EEEAE3]`}>
-                {historyShown.map((h) => (
-                  <li key={h.key} className="flex min-h-[64px] items-center gap-3 px-4 py-3">
-                    <span className="w-[44px] shrink-0 text-[13px] tabular-nums text-[#6B665E]">{fmtMD(h.date)}</span>
-                    <span className="min-w-0 flex-1">
-                      <span className="block truncate text-[15px] text-[#22201C]">{h.name}</span>
-                      <span className="mt-0.5 flex items-center gap-2 text-[12px] text-[#6B665E]">
-                        {h.time} 수업 <Badge>{h.status}</Badge>
-                      </span>
-                    </span>
-                    <span className={`shrink-0 text-[15px] font-bold tabular-nums ${h.delta > 0 ? "text-[#2E5A4C]" : "text-[#22201C]"}`}>{h.delta > 0 ? "+1회" : "-1회"}</span>
-                  </li>
-                ))}
-              </ul>
+              <p className="py-20 text-center text-[15px] text-[#6B665E]">예약한 수업이 없습니다.</p>
             )}
           </section>
         </div>
       );
     }
-
+    if (tab === "pass") {
+      return (
+        <div className="grid grid-cols-2 items-start gap-6 px-8 pb-10">
+          <section aria-label="이용 중인 회원권">
+            {passCard()}
+            {passSummary()}
+            <div className="mt-6">{changeCard()}</div>
+          </section>
+          {historyBlock()}
+        </div>
+      );
+    }
     return (
-      <div className="space-y-6 px-4 pb-6 pt-2">
-        <section className={`${card} flex items-center gap-4 p-5`}>
-          <span className="grid h-14 w-14 shrink-0 place-items-center rounded-full bg-[#ECE8E1] text-[#6B665E]" aria-hidden>
-            <UserRound size={28} />
-          </span>
-          <div className="min-w-0">
-            <p className="text-[18px] font-bold text-[#22201C]">김ㅎ늘 회원님</p>
-            <p className="text-[14px] tabular-nums text-[#6B665E]">010-****-5821</p>
-            <p className="text-[13px] text-[#9A948A]">회원번호 20417, 누적 출석 {totalAttend}회</p>
-          </div>
-        </section>
-
-        <section aria-labelledby="my-record">
-          <SectionHead id="my-record" title="나의 기록" />
-          <div className={`${card} divide-y divide-[#EEEAE3]`}>
-            <button type="button" onClick={() => setReportOpen(true)} className={`flex min-h-[60px] w-full items-center gap-3 px-4 text-left ${ring}`}>
-              <TrendingUp size={20} className="text-[#2E5A4C]" aria-hidden />
-              <span className="flex-1">
-                <span className="block text-[15px] font-semibold text-[#22201C]">나의 변화 리포트</span>
-                <span className="block text-[12px] text-[#6B665E]">월별 운동 횟수, 체형 체크 기록</span>
-              </span>
-              <ChevronRight size={18} className="text-[#9A948A]" aria-hidden />
-            </button>
-            {latestFeedback && (
-              <button type="button" onClick={() => openFeedback(latestFeedback.ago)} className={`flex min-h-[60px] w-full items-center gap-3 px-4 text-left ${ring}`}>
-                <MessageSquareText size={20} className="text-[#2E5A4C]" aria-hidden />
-                <span className="flex-1">
-                  <span className="block text-[15px] font-semibold text-[#22201C]">강사 피드백 노트</span>
-                  <span className="block text-[12px] text-[#6B665E]">출석한 수업마다 강사가 남깁니다</span>
-                </span>
-                {unread.length > 0 && <span className="text-[12px] font-bold text-[#B5532F]">새 노트 {unread.length}</span>}
-                <ChevronRight size={18} className="text-[#9A948A]" aria-hidden />
-              </button>
-            )}
-          </div>
-        </section>
-
-        <section aria-labelledby="alarm-title">
-          <h2 id="alarm-title" className="mb-3 flex items-center gap-1.5 text-[17px] font-bold text-[#22201C]">
-            <Bell size={17} aria-hidden /> 알림 설정
-          </h2>
-          <div className={`${card} divide-y divide-[#EEEAE3] overflow-hidden`}>
-            <Toggle label="수업 전날 알림" on={alarmClass} onChange={setAlarmClass} />
-            <Toggle label="빈자리 자동 예약 알림" sub="대기 중인 수업이 예약되면 바로 알려 드립니다" on={alarmWait} onChange={setAlarmWait} />
-            <Toggle label="공지사항 알림" on={alarmNotice} onChange={setAlarmNotice} />
-          </div>
-        </section>
-
-        <section aria-labelledby="studio-title">
-          <SectionHead id="studio-title" title="스튜디오 정보" />
-          <div className={`${card} overflow-hidden`}>
-            <Photo src={`${IMG}/mat.jpg`} alt="매트와 소도구가 놓인 B룸" pos="50% 55%" className="aspect-[21/9] w-full" />
-            <dl className="divide-y divide-[#EEEAE3] text-[14px]">
-              <div className="flex gap-3 px-4 py-3">
-                <dt className="w-[64px] shrink-0 text-[#6B665E]">운영 시간</dt>
-                <dd className="text-[#22201C]">
-                  평일 07:00~22:00
-                  <br />
-                  주말 10:00~13:10
-                </dd>
-              </div>
-              <div className="flex gap-3 px-4 py-3">
-                <dt className="w-[64px] shrink-0 text-[#6B665E]">전화</dt>
-                <dd className="inline-flex items-center gap-1 tabular-nums text-[#22201C]">
-                  <Phone size={14} aria-hidden /> 02-***-4182
-                </dd>
-              </div>
-              <div className="flex gap-3 px-4 py-3">
-                <dt className="w-[64px] shrink-0 text-[#6B665E]">취소 규정</dt>
-                <dd className="leading-[1.6] text-[#22201C]">수업 {CANCEL_HOURS}시간 전까지 취소하면 횟수가 돌아옵니다. 이후 취소와 결석은 1회 차감됩니다.</dd>
-              </div>
-            </dl>
-          </div>
-        </section>
+      <div className="grid grid-cols-2 items-start gap-6 px-8 pb-10">
+        <div className="space-y-6">
+          {profileCard()}
+          {recordMenu()}
+          {alarmBlock()}
+        </div>
+        {studioBlock()}
       </div>
     );
-  })();
+  };
+
+  const tabletApp = (
+    <div className="relative flex h-full w-full flex-col overflow-hidden bg-[#F6F4F0] text-[#22201C]">
+      {framed && (
+        <div className="flex h-[28px] shrink-0 items-center justify-between px-6 text-[13px] font-semibold" aria-hidden>
+          <span className="tabular-nums">9:41</span>
+          <StatusIcons />
+        </div>
+      )}
+      <div className="flex min-h-0 flex-1">
+        <nav aria-label="주요 메뉴" className="flex w-[96px] shrink-0 flex-col items-center gap-1 border-r border-[#E7E2DA] bg-white pb-6 pt-5">
+          <span className="mb-4 text-center text-[11px] font-bold leading-[1.3] text-[#2E5A4C]">
+            필라테스
+            <br />
+            스튜디오
+          </span>
+          {tabs.map(({ id, label, Icon }) => {
+            const active = tab === id;
+            return (
+              <button
+                key={id}
+                type="button"
+                onClick={() => go(id)}
+                aria-current={active ? "page" : undefined}
+                className={`relative flex h-[68px] w-[76px] flex-col items-center justify-center gap-1 rounded-[12px] text-[12px] ${ring} ${
+                  active ? "bg-[#E4EEE9] font-bold text-[#2E5A4C]" : "text-[#8A847A] hover:bg-[#F6F4F0]"
+                }`}
+              >
+                <Icon size={24} strokeWidth={active ? 2.4 : 1.8} aria-hidden />
+                {label}
+                {id === "my" && unread.length > 0 && <span className="absolute right-4 top-2.5 h-2 w-2 rounded-full bg-[#B5532F]" aria-hidden />}
+              </button>
+            );
+          })}
+        </nav>
+        <div className="flex min-w-0 flex-1 flex-col">
+          <header className="flex h-[76px] shrink-0 items-center justify-between px-8">
+            <h1 className="text-[26px] font-bold text-[#22201C]">{title[tab]}</h1>
+            <span className="flex items-center gap-2 text-[14px] text-[#4E4A43]">
+              <span className="grid h-9 w-9 place-items-center rounded-full bg-[#ECE8E1] text-[#6B665E]" aria-hidden>
+                <UserRound size={18} />
+              </span>
+              김ㅎ늘 회원님
+            </span>
+          </header>
+          <div ref={tabScrollRef} className={`min-h-0 flex-1 ${tab === "book" || tab === "mine" ? "overflow-hidden" : "overflow-y-auto"}`}>
+            {tabletScreen()}
+          </div>
+        </div>
+      </div>
+      {sharedOverlays}
+    </div>
+  );
+
+  /* ---------- 기기 고르기(PC) ---------- */
+
+  const pickers = env === "desktop" && (
+    <div className="mb-5 flex flex-wrap items-center justify-center gap-3">
+      <DevicePicker
+        label="기기"
+        value={device}
+        onChange={setDevice}
+        items={[
+          { id: "phone", label: "휴대폰", Icon: Smartphone },
+          { id: "tablet", label: "태블릿", Icon: Tablet },
+        ]}
+      />
+      {device === "tablet" ? (
+        <DevicePicker
+          label="화면 방향"
+          value={orient}
+          onChange={setOrient}
+          items={[
+            { id: "portrait", label: "세로" },
+            { id: "landscape", label: "가로" },
+          ]}
+        />
+      ) : (
+        <span className="inline-flex min-h-[44px] items-center gap-1.5 rounded-full bg-white/60 px-4 text-[14px] font-semibold text-[#6B665E] ring-1 ring-[#E1DBD1]">
+          <Lock size={15} aria-hidden /> 세로 고정
+        </span>
+      )}
+    </div>
+  );
+
+  const footer = (
+    <div className={`px-4 text-center text-[#6B665E] ${isTablet ? "pb-8" : "pb-[96px] md:pb-0"}`}>
+      <DemoMakerInfo className="mt-6" />
+    </div>
+  );
+
+  if (isTablet) {
+    if (!framed) {
+      return (
+        <div className="min-h-screen bg-[#F6F4F0]">
+          <div className="h-[calc(100dvh-40px)] min-h-[600px]">{tabletApp}</div>
+          {footer}
+        </div>
+      );
+    }
+    const outerW = tSize.w + BEZEL * 2;
+    const outerH = tSize.h + BEZEL * 2;
+    const scale = Math.min(1, (vp.h - 40 - 64 - 56) / outerH, (vp.w - 48) / outerW);
+    return (
+      <div className="min-h-screen bg-[#E8E4DD] py-6 text-[#22201C]">
+        {pickers}
+        <div className="relative mx-auto" style={{ width: outerW * scale, height: outerH * scale }}>
+          <div
+            className="absolute left-0 top-0 origin-top-left rounded-[40px] bg-[#1D1C1A] shadow-[0_24px_60px_-20px_rgba(40,32,20,0.35)]"
+            style={{ width: outerW, height: outerH, padding: BEZEL, transform: `scale(${scale})` }}
+          >
+            <div className="h-full w-full overflow-hidden rounded-[26px]">{tabletApp}</div>
+          </div>
+        </div>
+        {footer}
+      </div>
+    );
+  }
 
   return (
     <div className="min-h-screen bg-[#F6F4F0] text-[#22201C] md:bg-[#E8E4DD] md:py-6">
+      {pickers}
       <div className="mx-auto md:w-fit">
-        <div className="relative flex min-h-screen flex-col bg-[#F6F4F0] md:h-[min(844px,calc(100dvh-88px))] md:min-h-[640px] md:w-[390px] md:overflow-hidden md:rounded-[48px] md:border-[10px] md:border-[#1D1C1A] md:shadow-[0_24px_60px_-20px_rgba(40,32,20,0.35)]">
+        <div className="relative flex min-h-screen flex-col bg-[#F6F4F0] md:h-[min(844px,calc(100dvh-152px))] md:min-h-[640px] md:w-[390px] md:overflow-hidden md:rounded-[48px] md:border-[10px] md:border-[#1D1C1A] md:shadow-[0_24px_60px_-20px_rgba(40,32,20,0.35)]">
           {/* 상태 표시줄(PC 휴대폰 틀에서만) */}
           <div className="hidden h-[44px] shrink-0 items-center justify-between bg-[#F6F4F0] px-7 text-[14px] font-semibold md:flex" aria-hidden>
             <span className="tabular-nums">9:41</span>
-            <span className="flex items-center gap-1.5">
-              <Signal size={15} />
-              <Wifi size={15} />
-              <BatteryFull size={20} />
-            </span>
+            <StatusIcons />
           </div>
 
           <div ref={scrollRef} className="flex-1 pb-[76px] md:overflow-y-auto md:pb-0 md:[scrollbar-width:none] md:[&::-webkit-scrollbar]:hidden">
             <header className="sticky top-0 z-20 flex h-[56px] items-center bg-[#F6F4F0] px-4">
               <h1 className="text-[20px] font-bold text-[#22201C]">{title[tab]}</h1>
             </header>
-            {screen}
+            {phoneScreen()}
           </div>
 
           <nav aria-label="주요 메뉴" className="fixed inset-x-0 bottom-0 z-30 border-t border-[#E7E2DA] bg-white pb-[env(safe-area-inset-bottom)] md:static md:pb-0">
@@ -1182,405 +2105,15 @@ export function AppPilatesDemo() {
             </div>
           </nav>
 
-          {/* 수업 상세 */}
+          {/* 수업 상세(휴대폰) */}
           <Sheet open={detail !== null} onClose={() => setDetailId(null)} labelId="detail-title" flush>
-            {detail &&
-              (() => {
-                const mine = myBooking(detail.id);
-                const full = detail.booked >= detail.cap;
-                const ended = isEnded(detail);
-                const t = TEACHERS[detail.teacher];
-                return (
-                  <div>
-                    <div className="relative -mx-5">
-                      <Photo src={KIND[detail.kind].photo} alt={`${detail.name} 수업 공간`} pos={KIND[detail.kind].pos} className="aspect-[16/9] w-full" />
-                      <CloseOnPhoto onClose={() => setDetailId(null)} />
-                    </div>
-                    <p className="mt-5 text-[14px] font-semibold text-[#2E5A4C]">
-                      {fmtKo(detail.date)} {detail.time}~{endTime(detail.time, detail.dur)}
-                    </p>
-                    <h2 id="detail-title" className="mt-1 text-[22px] font-bold text-[#22201C]">
-                      {detail.name}
-                    </h2>
-                    <dl className="mt-4 grid grid-cols-3 gap-2 rounded-[10px] bg-[#F6F4F0] p-4 text-[14px]">
-                      <div>
-                        <dt className="text-[12px] text-[#6B665E]">장소</dt>
-                        <dd className="font-semibold">{detail.room}</dd>
-                      </div>
-                      <div>
-                        <dt className="text-[12px] text-[#6B665E]">난이도</dt>
-                        <dd className="font-semibold">{detail.level}</dd>
-                      </div>
-                      <div>
-                        <dt className="text-[12px] text-[#6B665E]">정원</dt>
-                        <dd className="inline-flex items-center gap-1 font-semibold tabular-nums">
-                          <Users size={14} aria-hidden /> {Math.min(detail.booked, detail.cap)}/{detail.cap}명
-                        </dd>
-                      </div>
-                    </dl>
-                    <button
-                      type="button"
-                      onClick={() => {
-                        setDetailId(null);
-                        setTeacherOpen(detail.teacher);
-                      }}
-                      className={`mt-3 flex min-h-[64px] w-full items-center gap-3 rounded-[10px] border border-[#ECE7DF] px-3 py-2 text-left ${ring}`}
-                    >
-                      <Avatar name={detail.teacher} size={44} />
-                      <span className="min-w-0 flex-1">
-                        <span className="block text-[15px] font-bold text-[#22201C]">
-                          {detail.teacher} <span className="text-[13px] font-medium text-[#6B665E]">{t.role}</span>
-                        </span>
-                        <span className="block truncate text-[13px] text-[#6B665E]">{t.career[0]}</span>
-                      </span>
-                      <ChevronRight size={18} className="text-[#9A948A]" aria-hidden />
-                    </button>
-                    <p className="mt-4 text-[15px] leading-[1.65] text-[#4E4A43]">{detail.desc}</p>
-                    <p className="mt-2 text-[13px] text-[#6B665E]">준비물: 미끄럼 방지 양말, 수업 10분 전 입실</p>
-                    <p className="mt-1 text-[13px] text-[#6B665E]">수업 {CANCEL_HOURS}시간 전까지 취소할 수 있습니다.</p>
-
-                    <div className="mt-5">
-                      {mine ? (
-                        <div className="flex gap-2">
-                          <button type="button" onClick={() => setDetailId(null)} className={`min-h-[52px] flex-1 rounded-[10px] border border-[#D6D1C8] text-[15px] font-semibold text-[#4E4A43] ${ring}`}>
-                            닫기
-                          </button>
-                          <button
-                            type="button"
-                            onClick={() => {
-                              setDetailId(null);
-                              setCancelId(detail.id);
-                            }}
-                            className={`min-h-[52px] flex-1 rounded-[10px] bg-[#22201C] text-[15px] font-semibold text-white ${ring}`}
-                          >
-                            {mine.status === "대기" ? "대기 취소" : "예약 취소"}
-                          </button>
-                        </div>
-                      ) : ended ? (
-                        <button type="button" disabled className="min-h-[52px] w-full rounded-[10px] bg-[#ECE8E1] text-[15px] font-semibold text-[#9A948A]">
-                          종료된 수업입니다
-                        </button>
-                      ) : !full && remaining <= 0 ? (
-                        <button type="button" disabled className="min-h-[52px] w-full rounded-[10px] bg-[#ECE8E1] text-[15px] font-semibold text-[#9A948A]">
-                          남은 횟수가 없습니다
-                        </button>
-                      ) : (
-                        <>
-                          <button
-                            type="button"
-                            onClick={bookDetail}
-                            className={`min-h-[52px] w-full rounded-[10px] text-[16px] font-bold text-white ${ring} ${full ? "bg-[#7A5418] hover:bg-[#684714]" : "bg-[#2E5A4C] hover:bg-[#254a3e]"}`}
-                          >
-                            {full ? `대기 예약 (${detail.wait + 1}번째)` : "예약하기"}
-                          </button>
-                          <p className="mt-2 text-center text-[13px] text-[#6B665E]">
-                            {full ? "빈자리가 나면 자동으로 예약되고 그때 1회 차감됩니다." : `예약하면 회원권 1회가 차감됩니다. 남은 횟수 ${remaining}회`}
-                          </p>
-                        </>
-                      )}
-                    </div>
-                  </div>
-                );
-              })()}
+            {detail && detailBody(detail, false)}
           </Sheet>
 
-          {/* 예약 완료 */}
-          <Sheet open={done !== null} onClose={() => setDoneId(null)} labelId="done-title">
-            {done && (
-              <div className="text-center">
-                <CircleCheck size={44} className="mx-auto mt-2 text-[#2E5A4C]" aria-hidden />
-                <h2 id="done-title" className="mt-3 text-[20px] font-bold">
-                  {doneBooking?.status === "대기" ? `대기 ${doneBooking.waitNo}번으로 등록되었습니다` : "예약이 완료되었습니다"}
-                </h2>
-                <div className="mt-4 flex items-center gap-3 rounded-[10px] bg-[#F6F4F0] p-3 text-left text-[14px]">
-                  <Photo src={KIND[done.kind].photo} alt="" pos={KIND[done.kind].pos} className="h-[60px] w-[60px] shrink-0 rounded-[8px]" sizes="120px" />
-                  <div className="min-w-0">
-                    <p className="font-semibold text-[#2E5A4C]">
-                      {fmtKo(done.date)} {done.time}~{endTime(done.time, done.dur)}
-                    </p>
-                    <p className="truncate text-[16px] font-bold">{done.name}</p>
-                    <p className="text-[#6B665E]">
-                      {done.teacher} 강사, {done.room}
-                    </p>
-                  </div>
-                </div>
-                <p className="mt-3 text-[14px] text-[#4E4A43]">{doneBooking?.status === "대기" ? "빈자리가 나면 자동으로 예약하고 알림을 보내 드립니다." : `회원권 남은 횟수 ${remaining}회`}</p>
-                <div className="mt-5 flex gap-2">
-                  <button type="button" onClick={() => setDoneId(null)} className={`min-h-[52px] flex-1 rounded-[10px] border border-[#D6D1C8] text-[15px] font-semibold text-[#4E4A43] ${ring}`}>
-                    닫기
-                  </button>
-                  <button
-                    type="button"
-                    onClick={() => {
-                      setDoneId(null);
-                      setMineView("upcoming");
-                      go("mine");
-                    }}
-                    className={`min-h-[52px] flex-1 rounded-[10px] bg-[#2E5A4C] text-[15px] font-semibold text-white ${ring}`}
-                  >
-                    내 예약 보기
-                  </button>
-                </div>
-              </div>
-            )}
-          </Sheet>
-
-          {/* 취소 확인 */}
-          <Sheet open={cancelTarget !== null} onClose={() => setCancelId(null)} labelId="cancel-title">
-            {cancelTarget && cancelBooking && (
-              <div>
-                <h2 id="cancel-title" className="text-[20px] font-bold">
-                  {cancelBooking.status === "대기" ? "대기를 취소할까요?" : "예약을 취소할까요?"}
-                </h2>
-                <div className="mt-4 rounded-[10px] bg-[#F6F4F0] p-4 text-[14px]">
-                  <p className="font-semibold text-[#2E5A4C]">
-                    {fmtKo(cancelTarget.date)} {cancelTarget.time}
-                  </p>
-                  <p className="mt-1 text-[16px] font-bold">{cancelTarget.name}</p>
-                  <p className="mt-1 text-[#6B665E]">
-                    {cancelTarget.teacher} 강사, {cancelTarget.room}
-                  </p>
-                </div>
-                <p className="mt-3 text-[14px] leading-[1.6] text-[#4E4A43]">
-                  {canCancel(cancelTarget)
-                    ? cancelBooking.status === "대기"
-                      ? "대기 순서가 사라집니다."
-                      : `수업 ${CANCEL_HOURS}시간 전까지 취소할 수 있고, 취소하면 회원권 1회가 돌아옵니다.`
-                    : `수업 ${CANCEL_HOURS}시간 전이 지나 앱에서 취소할 수 없습니다. 스튜디오로 연락해 주세요.`}
-                </p>
-                <div className="mt-5 flex gap-2">
-                  <button type="button" onClick={() => setCancelId(null)} className={`min-h-[52px] flex-1 rounded-[10px] border border-[#D6D1C8] text-[15px] font-semibold text-[#4E4A43] ${ring}`}>
-                    돌아가기
-                  </button>
-                  <button
-                    type="button"
-                    disabled={!canCancel(cancelTarget)}
-                    onClick={() => cancel(cancelTarget.id)}
-                    className={`min-h-[52px] flex-1 rounded-[10px] bg-[#93402B] text-[15px] font-semibold text-white disabled:bg-[#ECE8E1] disabled:text-[#9A948A] ${ring}`}
-                  >
-                    {cancelBooking.status === "대기" ? "대기 취소" : "예약 취소"}
-                  </button>
-                </div>
-              </div>
-            )}
-          </Sheet>
-
-          {/* 강사 소개 */}
-          <Sheet open={teacherOpen !== null} onClose={() => setTeacherOpen(null)} labelId="teacher-sheet-title" flush>
-            {teacherOpen &&
-              (() => {
-                const t = TEACHERS[teacherOpen];
-                const slots = [...WEEKDAY.map((s) => ({ ...s, when: "평일" })), ...WEEKEND.map((s) => ({ ...s, when: "주말" }))].filter((s) => s.teacher === teacherOpen);
-                return (
-                  <div>
-                    <div className="relative -mx-5">
-                      <Photo src={t.photo} alt={`${teacherOpen} 강사`} pos={t.pos} className="aspect-[4/3] w-full" />
-                      <CloseOnPhoto onClose={() => setTeacherOpen(null)} />
-                    </div>
-                    <p className="mt-5 text-[13px] font-semibold text-[#2E5A4C]">{t.role}</p>
-                    <h2 id="teacher-sheet-title" className="text-[22px] font-bold text-[#22201C]">
-                      {teacherOpen}
-                    </h2>
-                    <p className="mt-2 text-[15px] leading-[1.65] text-[#4E4A43]">{t.intro}</p>
-                    <h3 className="mt-5 text-[15px] font-bold text-[#22201C]">경력</h3>
-                    <ul className="mt-2 space-y-1.5 text-[14px] text-[#4E4A43]">
-                      {t.career.map((c) => (
-                        <li key={c} className="flex gap-2">
-                          <span className="mt-[9px] h-1 w-1 shrink-0 rounded-full bg-[#9A948A]" aria-hidden />
-                          {c}
-                        </li>
-                      ))}
-                    </ul>
-                    <h3 className="mt-5 text-[15px] font-bold text-[#22201C]">담당 수업</h3>
-                    <ul className="mt-2 divide-y divide-[#EEEAE3] rounded-[10px] border border-[#ECE7DF]">
-                      {slots.map((s) => (
-                        <li key={`${s.when}-${s.time}`} className="flex min-h-[48px] items-center justify-between gap-3 px-3 text-[14px]">
-                          <span className="font-semibold text-[#22201C]">{s.name}</span>
-                          <span className="tabular-nums text-[#6B665E]">
-                            {s.when} {s.time}
-                          </span>
-                        </li>
-                      ))}
-                    </ul>
-                    <button
-                      type="button"
-                      onClick={() => {
-                        const k = slots[0]?.kind ?? "all";
-                        setTeacherOpen(null);
-                        openKind(k);
-                      }}
-                      className={`mt-5 min-h-[52px] w-full rounded-[10px] bg-[#2E5A4C] text-[15px] font-bold text-white ${ring}`}
-                    >
-                      {teacherOpen} 강사 수업 예약하기
-                    </button>
-                  </div>
-                );
-              })()}
-          </Sheet>
-
-          {/* 강사 피드백 노트 */}
-          <Sheet open={fb !== null} onClose={() => setFeedbackOpen(null)} labelId="fb-title">
-            {fb && fbPast && (
-              <div>
-                <div className="flex items-start justify-between gap-3">
-                  <div className="flex items-center gap-3">
-                    <Avatar name={fbPast.teacher} size={52} />
-                    <div>
-                      <p className="text-[13px] font-semibold text-[#2E5A4C]">강사 피드백 노트</p>
-                      <h2 id="fb-title" className="text-[18px] font-bold text-[#22201C]">
-                        {fbPast.teacher} 강사
-                      </h2>
-                      <p className="text-[13px] text-[#6B665E]">
-                        {fmtKo(daysAgo(today, fbPast.ago))} {fbPast.time} {fbPast.name}
-                      </p>
-                    </div>
-                  </div>
-                  <button type="button" onClick={() => setFeedbackOpen(null)} aria-label="닫기" className={`-mr-2 grid h-11 w-11 shrink-0 place-items-center rounded-full text-[#6B665E] hover:bg-[#F1EEE9] ${ring}`}>
-                    <X size={22} aria-hidden />
-                  </button>
-                </div>
-                <h3 className="mt-5 text-[15px] font-bold text-[#22201C]">오늘 자세 포인트</h3>
-                <p className="mt-2 rounded-[10px] bg-[#F6F4F0] p-4 text-[15px] leading-[1.7] text-[#33302B]">{fb.point}</p>
-                <h3 className="mt-5 text-[15px] font-bold text-[#22201C]">동작 체크</h3>
-                <ul className="mt-2 divide-y divide-[#EEEAE3] rounded-[10px] border border-[#ECE7DF]">
-                  {fb.checks.map((c) => (
-                    <li key={c.label} className="flex min-h-[48px] items-center justify-between gap-3 px-3 text-[14px]">
-                      <span className="text-[#22201C]">{c.label}</span>
-                      <span className={`inline-flex h-6 items-center rounded-[4px] px-2 text-[12px] font-semibold ${c.good ? "bg-[#E4EEE9] text-[#245044]" : "bg-[#F4EBDC] text-[#7A5418]"}`}>
-                        {c.good ? "좋음" : "연습 필요"}
-                      </span>
-                    </li>
-                  ))}
-                </ul>
-                <h3 className="mt-5 text-[15px] font-bold text-[#22201C]">다음 수업 추천</h3>
-                <div className="mt-2 flex items-center gap-3 rounded-[10px] border border-[#ECE7DF] p-3">
-                  <Photo src={KIND[fb.next].photo} alt="" pos={KIND[fb.next].pos} className="h-[64px] w-[64px] shrink-0 rounded-[8px]" sizes="128px" />
-                  <div className="min-w-0">
-                    <p className="text-[15px] font-bold text-[#22201C]">{fb.nextName}</p>
-                    <p className="text-[13px] leading-[1.55] text-[#6B665E]">{fb.nextWhy}</p>
-                  </div>
-                </div>
-                <button
-                  type="button"
-                  onClick={() => {
-                    setFeedbackOpen(null);
-                    openKind(fb.next);
-                  }}
-                  className={`mt-4 min-h-[52px] w-full rounded-[10px] bg-[#2E5A4C] text-[15px] font-bold text-white ${ring}`}
-                >
-                  {fb.nextName} 시간표 보기
-                </button>
-              </div>
-            )}
-          </Sheet>
-
-          {/* 나의 변화 리포트 */}
-          <Sheet open={reportOpen} onClose={() => setReportOpen(false)} labelId="report-title" tall>
-            <div className="flex items-start justify-between gap-3">
-              <div>
-                <h2 id="report-title" className="text-[21px] font-bold text-[#22201C]">
-                  나의 변화 리포트
-                </h2>
-                <p className="text-[13px] text-[#6B665E]">
-                  김ㅎ늘 회원님, {monthLabels[0]}부터 {monthLabels[5]}까지
-                </p>
-              </div>
-              <button type="button" onClick={() => setReportOpen(false)} aria-label="닫기" className={`-mr-2 grid h-11 w-11 shrink-0 place-items-center rounded-full text-[#6B665E] hover:bg-[#F1EEE9] ${ring}`}>
-                <X size={22} aria-hidden />
-              </button>
-            </div>
-            <dl className="mt-4 grid grid-cols-3 gap-2">
-              {[
-                { k: "누적 출석", v: `${totalAttend}회` },
-                { k: "연속 출석", v: "4주" },
-                { k: "이번 달", v: `${thisMonth}회` },
-              ].map((s) => (
-                <div key={s.k} className="rounded-[10px] bg-[#F6F4F0] px-3 py-3">
-                  <dt className="text-[12px] text-[#6B665E]">{s.k}</dt>
-                  <dd className="mt-0.5 text-[20px] font-bold text-[#22201C]">{s.v}</dd>
-                </div>
-              ))}
-            </dl>
-            <h3 className="mt-6 text-[15px] font-bold text-[#22201C]">월별 운동 횟수</h3>
-            <div className="mt-3 rounded-[10px] border border-[#ECE7DF] p-4">
-              <MonthChart labels={monthLabels} values={monthValues} />
-              <p className="mt-2 text-[12px] text-[#8A847A]">이번 달은 예약 완료된 수업까지 포함합니다.</p>
-            </div>
-            <h3 className="mt-6 text-[15px] font-bold text-[#22201C]">체형 체크 기록</h3>
-            <ol className="mt-3">
-              {BODY_CHECKS.map((b, i) => (
-                <li key={b.round} className="relative flex gap-3 pb-5 last:pb-0">
-                  {i < BODY_CHECKS.length - 1 && <span className="absolute left-[7px] top-5 h-[calc(100%-12px)] w-px bg-[#DAD5CC]" aria-hidden />}
-                  <span className={`relative mt-1 h-[15px] w-[15px] shrink-0 rounded-full border-2 ${i === 0 ? "border-[#2E5A4C] bg-[#2E5A4C]" : "border-[#BDB6AA] bg-white"}`} aria-hidden />
-                  <div className="min-w-0 flex-1">
-                    <p className="text-[14px] font-bold text-[#22201C]">
-                      {b.round}회차 체크 <span className="font-normal text-[#6B665E]">{fmtKo(daysAgo(today, b.ago))}</span>
-                    </p>
-                    <ul className="mt-1.5 flex flex-wrap gap-1.5">
-                      {b.items.map((it) => (
-                        <li key={it} className="rounded-[4px] bg-[#F1EEE9] px-2 py-1 text-[12px] text-[#4E4A43]">
-                          {it}
-                        </li>
-                      ))}
-                    </ul>
-                    <p className="mt-1.5 text-[13px] leading-[1.55] text-[#6B665E]">{b.note}</p>
-                  </div>
-                </li>
-              ))}
-            </ol>
-            <div className="mt-6 flex items-start gap-3 rounded-[10px] bg-[#EEF4F1] p-4">
-              <Avatar name="이ㅅ연" size={40} />
-              <p className="text-[14px] leading-[1.65] text-[#245044]">
-                <strong className="block text-[13px]">이ㅅ연 대표 강사</strong>
-                석 달 사이 앞으로 굽히기가 9cm 좋아졌습니다. 다음 체크는 한 달 뒤에 함께 해요.
-              </p>
-            </div>
-          </Sheet>
-
-          {/* 푸시 알림 */}
-          <AnimatePresence>
-            {push && (
-              <motion.div
-                key={push.key}
-                role="status"
-                className="fixed inset-x-3 top-3 z-[70] md:absolute md:top-[50px]"
-                initial={reduce ? { opacity: 0 } : { y: -96, opacity: 0 }}
-                animate={reduce ? { opacity: 1 } : { y: 0, opacity: 1 }}
-                exit={reduce ? { opacity: 0 } : { y: -96, opacity: 0 }}
-                transition={reduce ? { duration: 0 } : { type: "spring", stiffness: 380, damping: 34 }}
-              >
-                <div className="flex items-start gap-1 rounded-[14px] bg-white/95 shadow-[0_8px_28px_-8px_rgba(30,24,16,0.35)] ring-1 ring-black/5 backdrop-blur">
-                  <button
-                    type="button"
-                    onClick={() => {
-                      setPush(null);
-                      setMineView("upcoming");
-                      go(push.tab);
-                    }}
-                    className={`flex min-h-[64px] min-w-0 flex-1 items-start gap-3 rounded-[14px] py-3 pl-3 text-left ${ring}`}
-                  >
-                    <span className="grid h-9 w-9 shrink-0 place-items-center rounded-[8px] bg-[#2E5A4C] text-white" aria-hidden>
-                      <CalendarCheck size={18} />
-                    </span>
-                    <span className="min-w-0">
-                      <span className="flex items-center gap-2 text-[12px] text-[#6B665E]">
-                        필라테스 스튜디오 <span className="text-[#9A948A]">지금</span>
-                      </span>
-                      <span className="mt-0.5 block text-[14px] leading-snug text-[#22201C]">{push.text}</span>
-                    </span>
-                  </button>
-                  <button type="button" aria-label="알림 닫기" onClick={() => setPush(null)} className={`grid h-11 w-11 shrink-0 place-items-center rounded-full text-[#9A948A] ${ring}`}>
-                    <X size={18} aria-hidden />
-                  </button>
-                </div>
-              </motion.div>
-            )}
-          </AnimatePresence>
+          {sharedOverlays}
         </div>
       </div>
-      <div className="px-4 pb-[96px] text-center text-[#6B665E] md:pb-0">
-        <DemoMakerInfo className="mt-6" />
-      </div>
+      {footer}
     </div>
   );
 }

@@ -1,7 +1,7 @@
 "use client";
 
 // 학원 출결, 알림 앱 카탈로그(11-01). 학부모 화면: 홈, 출결, 알림장, 수납, 상담
-import { useEffect, useMemo, useRef, useState, type ReactNode } from "react";
+import { useEffect, useMemo, useRef, useState, useSyncExternalStore, type ReactNode } from "react";
 import Image from "next/image";
 import { AnimatePresence, motion } from "framer-motion";
 import {
@@ -21,13 +21,18 @@ import {
   House,
   Images,
   LoaderCircle,
+  Lock,
   LogIn,
   LogOut,
   MessageCircle,
   NotebookPen,
   Phone,
+  RectangleHorizontal,
+  RectangleVertical,
   School,
   Signal,
+  Smartphone,
+  Tablet,
   TrendingUp,
   Wifi,
   X,
@@ -375,9 +380,17 @@ export function AppAcademyDemo() {
     setAlertOn(alertRef.current);
   };
 
+  const env = useEnv();
+  const vp = useViewport();
+  const [device, setDevice] = useState<"phone" | "tablet">("phone");
+  const [landscape, setLandscape] = useState(false);
+  const framed = env === "desktop";
+  const tablet = env === "tablet" || (framed && device === "tablet");
+  const pos = framed ? "absolute" : "fixed";
+
   const toTop = () => {
     scrollRef.current?.scrollTo({ top: 0 });
-    if (window.matchMedia("(max-width: 767px)").matches) window.scrollTo({ top: 0 });
+    if (!framed) window.scrollTo({ top: 0 });
   };
 
   const go = (t: Tab) => {
@@ -393,11 +406,13 @@ export function AppAcademyDemo() {
     setTab("notes");
     setNoteId(id);
     setReadIds((r) => (r.includes(id) ? r : [...r, id]));
-    toTop();
+    if (!tablet) toTop();
   };
 
   const unread = notes.filter((n) => !readIds.includes(n.id)).length;
   const note = notes.find((n) => n.id === noteId) ?? null;
+  // 태블릿은 목록과 본문을 나란히 두므로 고른 글이 없으면 첫 글을 연다
+  const shownNote = note ?? (tablet ? notes[0] : null);
 
   // 머리글 제목과 뒤로 가기
   let title = TABS.find((t) => t.id === tab)?.label ?? "";
@@ -407,7 +422,7 @@ export function AppAcademyDemo() {
     title = homeView === "shuttle" ? "셔틀 위치" : "주간 학습 리포트";
     back = () => setHomeView("main");
   }
-  if (tab === "notes" && note) {
+  if (tab === "notes" && note && !tablet) {
     title = note.kind;
     back = () => setNoteId(null);
   }
@@ -415,7 +430,7 @@ export function AppAcademyDemo() {
     title = "수강료 납부";
     back = () => setPayStep("bill");
   }
-  if (tab === "consult" && consultStep === "form") {
+  if (tab === "consult" && consultStep === "form" && !tablet) {
     title = "상담 신청";
     back = () => setConsultStep("list");
   }
@@ -427,213 +442,366 @@ export function AppAcademyDemo() {
     toTop();
   };
 
+  // 태블릿 틀 크기와 축소 비율(실제 태블릿 px로 그린 뒤 화면 높이에 맞춰 줄인다)
+  const TW = landscape ? 1180 : 820;
+  const TH = landscape ? 820 : 1180;
+  const BZ = 12;
+  const vw = Math.floor(vp / 100000);
+  const vh = vp % 100000;
+  const scale = vp ? Math.min(1, (vh - 190) / (TH + BZ * 2), (vw - 48) / (TW + BZ * 2)) : 0.6;
+  const tabletFrame = framed && tablet;
+
+  const statusBar = framed && (
+    <div className={`absolute inset-x-0 top-0 z-30 flex items-center justify-between bg-white font-semibold ${tablet ? "h-6 px-6 text-[12px]" : "h-11 px-7 text-[15px]"}`} aria-hidden="true">
+      <span>{tablet ? "11월 1일 16:05" : "16:05"}</span>
+      <span className="flex items-center gap-1.5">
+        <Wifi size={tablet ? 13 : 16} strokeWidth={2.4} />
+        {!tablet && <Signal size={16} strokeWidth={2.4} />}
+        <BatteryFull size={tablet ? 17 : 20} strokeWidth={2} />
+      </span>
+    </div>
+  );
+
   return (
-    <div className="min-h-[100dvh] bg-[#f2f4f6] text-[#191f28] md:flex md:flex-col md:items-center md:bg-[#e4e7eb] md:py-6">
-      <div className="relative bg-[#f2f4f6] md:h-[min(844px,calc(100dvh-88px))] md:min-h-[640px] md:w-[390px] md:shrink-0 md:overflow-hidden md:rounded-[48px] md:border-[10px] md:border-[#17191c] md:shadow-[0_24px_60px_-20px_rgba(15,23,42,0.35)]">
-        {/* 상태 표시줄(PC 화면의 휴대폰 틀 안에서만) */}
-        <div className="absolute inset-x-0 top-0 z-30 hidden h-11 items-center justify-between bg-white px-7 text-[15px] font-semibold md:flex" aria-hidden="true">
-          <span>16:05</span>
-          <span className="flex items-center gap-1.5">
-            <Signal size={16} strokeWidth={2.4} />
-            <Wifi size={16} strokeWidth={2.4} />
-            <BatteryFull size={20} strokeWidth={2} />
-          </span>
-        </div>
-
-        <div ref={scrollRef} className="pb-[88px] md:absolute md:inset-x-0 md:bottom-0 md:top-11 md:overflow-y-auto md:overscroll-contain">
-          <header className="sticky top-0 z-20 flex h-14 items-center gap-1 border-b border-[#eceef1] bg-white px-2">
-            {back ? (
-              <button type="button" onClick={back} aria-label="뒤로" className={`grid h-11 w-11 place-items-center rounded-[10px] text-[#333d4b] hover:bg-[#f2f4f6] ${FOCUS}`}>
-                <ChevronLeft size={24} />
+    <div className={`min-h-[100dvh] text-[#191f28] ${framed ? "flex flex-col items-center bg-[#e4e7eb] py-5" : "bg-[#f2f4f6]"}`}>
+      {framed && (
+        <div className="mb-4 flex flex-wrap items-center justify-center gap-2">
+          <div role="group" aria-label="기기" className="flex rounded-[10px] bg-white p-1 shadow-[0_1px_2px_rgba(15,23,42,0.06)]">
+            {(
+              [
+                ["phone", "휴대폰", Smartphone],
+                ["tablet", "태블릿", Tablet],
+              ] as const
+            ).map(([id, label, Icon]) => (
+              <button
+                key={id}
+                type="button"
+                aria-pressed={device === id}
+                onClick={() => setDevice(id)}
+                className={`flex h-11 items-center gap-1.5 rounded-[8px] px-4 text-[14px] ${device === id ? "bg-[#191f28] font-semibold text-white" : "font-medium text-[#4e5968] hover:bg-[#f2f4f6]"} ${FOCUS}`}
+              >
+                <Icon size={17} aria-hidden="true" />
+                {label}
               </button>
-            ) : (
-              <span className="ml-2 grid h-8 w-8 place-items-center rounded-[8px] bg-[#2557d6] text-white" aria-hidden="true">
-                <School size={18} />
-              </span>
-            )}
-            <h1 className="ml-1 min-w-0 flex-1 truncate text-[18px] font-bold">{title}</h1>
-            <button
-              type="button"
-              onClick={() => go("notes")}
-              aria-label={`알림장, 읽지 않은 글 ${unread}개`}
-              className={`relative grid h-11 w-11 place-items-center rounded-[10px] text-[#333d4b] hover:bg-[#f2f4f6] ${FOCUS}`}
-            >
-              <Bell size={22} />
-              {unread > 0 && <span className="absolute right-2 top-2 h-2 w-2 rounded-full bg-[#e5483b]" />}
-            </button>
-          </header>
-
-          <main className="px-4 pt-4">
-            {tab === "home" && homeView === "shuttle" && <ShuttleView progress={progress} reduce={reduce} alertOn={alertOn} onToggle={toggleAlert} />}
-            {tab === "home" && homeView === "report" && <ReportView classDay={classDay} />}
-            {tab === "home" && homeView === "main" && (
-              <HomeView
-                today={today}
-                classDay={classDay}
-                isClassToday={isClassToday}
-                notes={notes}
-                readIds={readIds}
-                paid={!!paid}
-                bookings={bookings}
-                onOpenNote={openNote}
-                onGo={go}
-                onOpen={openHome}
-                onPhoto={setViewer}
-                progress={progress}
-              />
-            )}
-            {tab === "attend" && <AttendView today={today} classDay={classDay} />}
-            {tab === "notes" &&
-              (note ? (
-                <NoteDetail
-                  note={note}
-                  onPhoto={setViewer}
-                  checked={checkedIds.includes(note.id)}
-                  onCheck={() => setCheckedIds((c) => [...c, note.id])}
-                />
-              ) : (
-                <NotesList notes={notes} readIds={readIds} checkedIds={checkedIds} onOpen={openNote} />
+            ))}
+          </div>
+          {device === "tablet" ? (
+            <div role="group" aria-label="화면 방향" className="flex rounded-[10px] bg-white p-1 shadow-[0_1px_2px_rgba(15,23,42,0.06)]">
+              {(
+                [
+                  [false, "세로", RectangleVertical],
+                  [true, "가로", RectangleHorizontal],
+                ] as const
+              ).map(([value, label, Icon]) => (
+                <button
+                  key={label}
+                  type="button"
+                  aria-pressed={landscape === value}
+                  onClick={() => setLandscape(value)}
+                  className={`flex h-11 items-center gap-1.5 rounded-[8px] px-4 text-[14px] ${landscape === value ? "bg-[#191f28] font-semibold text-white" : "font-medium text-[#4e5968] hover:bg-[#f2f4f6]"} ${FOCUS}`}
+                >
+                  <Icon size={17} aria-hidden="true" />
+                  {label}
+                </button>
               ))}
-            {tab === "pay" && (
-              <PayView
-                today={today}
-                step={payStep}
-                paid={paid}
-                onStart={() => {
-                  setPayStep("method");
-                  toTop();
-                }}
-                onPaid={(method) => {
-                  setPaid({ method });
-                  setPayStep("done");
-                  toTop();
-                }}
-                onDone={() => {
-                  setPayStep("bill");
-                  toTop();
-                }}
-              />
-            )}
-            {tab === "consult" && (
-              <ConsultView
-                today={today}
-                step={consultStep}
-                bookings={bookings}
-                onStart={() => {
-                  setConsultStep("form");
-                  toTop();
-                }}
-                onSubmit={(b) => {
-                  setBookings((list) => [b, ...list]);
-                  setConsultStep("done");
-                  toTop();
-                }}
-                onDone={() => {
-                  setConsultStep("list");
-                  toTop();
-                }}
-              />
-            )}
-          </main>
+            </div>
+          ) : (
+            <p className="flex h-[52px] items-center gap-1.5 rounded-[10px] bg-white/60 px-4 text-[14px] font-medium text-[#6b7684]">
+              <Lock size={15} aria-hidden="true" />
+              세로 고정
+            </p>
+          )}
         </div>
+      )}
 
-        {/* 하단 탭 */}
-        <nav aria-label="주 메뉴" className="fixed inset-x-0 bottom-0 z-30 border-t border-[#eceef1] bg-white pb-[env(safe-area-inset-bottom)] md:absolute md:pb-3">
-          <ul className="mx-auto grid max-w-[480px] grid-cols-5">
-            {TABS.map(({ id, label, icon: Icon }) => {
-              const active = tab === id;
-              return (
-                <li key={id}>
-                  <button
-                    type="button"
-                    onClick={() => go(id)}
-                    aria-current={active ? "page" : undefined}
-                    className={`flex h-[60px] w-full flex-col items-center justify-center gap-1 text-[12px] ${active ? "font-bold text-[#2557d6]" : "font-medium text-[#8b95a1]"} ${FOCUS} focus-visible:ring-inset focus-visible:ring-offset-0`}
-                  >
-                    <span className="relative">
-                      <Icon size={22} strokeWidth={active ? 2.4 : 1.9} />
-                      {id === "notes" && unread > 0 && <span className="absolute -right-1 -top-0.5 h-2 w-2 rounded-full bg-[#e5483b]" />}
-                    </span>
-                    {label}
-                  </button>
-                </li>
-              );
-            })}
-          </ul>
-        </nav>
+      <div style={tabletFrame ? { width: (TW + BZ * 2) * scale, height: (TH + BZ * 2) * scale } : undefined} className={tabletFrame ? "relative shrink-0" : "contents"}>
+        <div
+          style={tabletFrame ? { width: TW + BZ * 2, height: TH + BZ * 2, transform: `scale(${scale})`, transformOrigin: "top left" } : undefined}
+          className={`relative bg-[#f2f4f6] ${
+            tabletFrame
+              ? "overflow-hidden rounded-[38px] border-[12px] border-[#1b1d21] shadow-[0_24px_60px_-20px_rgba(15,23,42,0.35)]"
+              : framed
+                ? "h-[min(844px,calc(100dvh-150px))] min-h-[600px] w-[390px] shrink-0 overflow-hidden rounded-[48px] border-[10px] border-[#17191c] shadow-[0_24px_60px_-20px_rgba(15,23,42,0.35)]"
+                : tablet
+                  ? "min-h-[100dvh]"
+                  : ""
+          }`}
+        >
+          {statusBar}
 
-        {/* 푸시 알림 */}
-        <AnimatePresence>
-          {push && (
-            <motion.div
-              role="status"
-              initial={reduce ? { opacity: 0 } : { opacity: 0, y: -110 }}
-              animate={reduce ? { opacity: 1 } : { opacity: 1, y: 0 }}
-              exit={reduce ? { opacity: 0 } : { opacity: 0, y: -110 }}
-              transition={reduce ? { duration: 0.15 } : { type: "spring", stiffness: 380, damping: 34 }}
-              className="fixed inset-x-2 top-2 z-[70] md:absolute md:top-12"
+          <div className={framed ? `absolute inset-x-0 bottom-0 ${tablet ? "top-6 flex" : "top-11"}` : tablet ? "flex min-h-[100dvh]" : ""}>
+            {tablet && (
+              <nav aria-label="주 메뉴" className={`z-30 flex w-[96px] shrink-0 flex-col items-center gap-1 border-r border-[#eceef1] bg-white py-4 ${framed ? "h-full" : "sticky top-0 h-[100dvh]"}`}>
+                <span className="mb-4 grid h-11 w-11 place-items-center rounded-[12px] bg-[#2557d6] text-white" aria-hidden="true">
+                  <School size={22} />
+                </span>
+                <ul className="flex w-full flex-col gap-1 px-2">
+                  {TABS.map(({ id, label, icon: Icon }) => {
+                    const active = tab === id;
+                    return (
+                      <li key={id}>
+                        <button
+                          type="button"
+                          onClick={() => go(id)}
+                          aria-current={active ? "page" : undefined}
+                          className={`flex h-[68px] w-full flex-col items-center justify-center gap-1 rounded-[12px] text-[13px] ${active ? "bg-[#eef3fd] font-bold text-[#2557d6]" : "font-medium text-[#6b7684] hover:bg-[#f5f6f8]"} ${FOCUS}`}
+                        >
+                          <span className="relative">
+                            <Icon size={24} strokeWidth={active ? 2.3 : 1.9} />
+                            {id === "notes" && unread > 0 && <span className="absolute -right-1 -top-0.5 h-2 w-2 rounded-full bg-[#e5483b]" />}
+                          </span>
+                          {label}
+                        </button>
+                      </li>
+                    );
+                  })}
+                </ul>
+              </nav>
+            )}
+
+            <div
+              ref={scrollRef}
+              className={`${framed ? "h-full overflow-y-auto overscroll-contain" : ""} ${tablet ? "min-w-0 flex-1 pb-8" : "pb-[88px]"}`}
             >
-              <div className="flex items-start gap-1 rounded-[16px] bg-white/95 py-1 pl-3 pr-1 shadow-[0_10px_30px_-8px_rgba(15,23,42,0.35)] ring-1 ring-black/5 backdrop-blur">
+              <header className={`sticky top-0 z-20 flex items-center gap-1 border-b border-[#eceef1] bg-white ${tablet ? "h-16 px-4" : "h-14 px-2"}`}>
+                {back ? (
+                  <button type="button" onClick={back} aria-label="뒤로" className={`grid h-11 w-11 place-items-center rounded-[10px] text-[#333d4b] hover:bg-[#f2f4f6] ${FOCUS}`}>
+                    <ChevronLeft size={24} />
+                  </button>
+                ) : (
+                  !tablet && (
+                    <span className="ml-2 grid h-8 w-8 place-items-center rounded-[8px] bg-[#2557d6] text-white" aria-hidden="true">
+                      <School size={18} />
+                    </span>
+                  )
+                )}
+                <h1 className={`ml-1 min-w-0 flex-1 truncate font-bold ${tablet ? "pl-2 text-[20px]" : "text-[18px]"}`}>{title}</h1>
+                {tablet && (
+                  <span className="mr-2 hidden items-center gap-2 text-[14px] text-[#6b7684] sm:flex">
+                    <span className="grid h-8 w-8 place-items-center rounded-full bg-[#e9eefb] text-[13px] font-bold text-[#2557d6]" aria-hidden="true">
+                      {CHILD.name.slice(-1)}
+                    </span>
+                    {CHILD.name} 학부모
+                  </span>
+                )}
                 <button
                   type="button"
-                  onClick={() => {
-                    setPush(null);
-                    if (push.target === "shuttle") openHome("shuttle");
-                    else if (isClassToday) go("home");
-                    else openNote("n1");
-                  }}
-                  className={`flex min-h-[56px] min-w-0 flex-1 items-start gap-3 rounded-[12px] py-2 text-left ${FOCUS}`}
+                  onClick={() => go("notes")}
+                  aria-label={`알림장, 읽지 않은 글 ${unread}개`}
+                  className={`relative grid h-11 w-11 place-items-center rounded-[10px] text-[#333d4b] hover:bg-[#f2f4f6] ${FOCUS}`}
                 >
-                  <span className="mt-0.5 grid h-9 w-9 shrink-0 place-items-center rounded-[9px] bg-[#2557d6] text-white" aria-hidden="true">
-                    <School size={19} />
-                  </span>
-                  <span className="min-w-0">
-                    <span className="flex items-center gap-2 text-[13px] text-[#6b7684]">
-                      <span className="font-semibold text-[#333d4b]">{ACADEMY}</span>지금
-                    </span>
-                    <span className="mt-0.5 block text-[15px] leading-[1.45] text-[#191f28]">{push.text}</span>
-                  </span>
+                  <Bell size={22} />
+                  {unread > 0 && <span className="absolute right-2 top-2 h-2 w-2 rounded-full bg-[#e5483b]" />}
                 </button>
-                <button type="button" onClick={() => setPush(null)} aria-label="알림 닫기" className={`grid h-11 w-11 shrink-0 place-items-center rounded-[10px] text-[#8b95a1] ${FOCUS}`}>
-                  <X size={18} />
-                </button>
-              </div>
-            </motion.div>
-          )}
-        </AnimatePresence>
+              </header>
 
-        {/* 사진 크게 보기 */}
-        <AnimatePresence>
-          {viewer && (
-            <motion.div
-              role="dialog"
-              aria-modal="true"
-              aria-label="사진 크게 보기"
-              initial={{ opacity: 0 }}
-              animate={{ opacity: 1 }}
-              exit={{ opacity: 0 }}
-              transition={{ duration: reduce ? 0 : 0.18 }}
-              className="fixed inset-0 z-[80] flex flex-col bg-[#0b0d10] md:absolute"
-              onKeyDown={(e) => e.key === "Escape" && setViewer(null)}
-            >
-              <div className="flex h-14 items-center justify-end px-2 md:mt-11">
-                <button type="button" autoFocus onClick={() => setViewer(null)} aria-label="닫기" className={`grid h-11 w-11 place-items-center rounded-[10px] text-white ${FOCUS}`}>
-                  <X size={24} />
-                </button>
-              </div>
-              <div className="relative mx-4 flex-1">
-                <Image src={viewer.src} alt={viewer.alt} fill sizes="(min-width: 768px) 370px, 100vw" className="object-contain" />
-              </div>
-              <p className="px-6 pb-10 pt-4 text-center text-[15px] leading-[1.5] text-white/80">{viewer.alt}</p>
-            </motion.div>
+              <main className={tablet ? "px-6 pt-5" : "px-4 pt-4"}>
+                {tab === "home" && homeView === "shuttle" && <ShuttleView progress={progress} reduce={reduce} alertOn={alertOn} onToggle={toggleAlert} tablet={tablet} />}
+                {tab === "home" && homeView === "report" && <ReportView classDay={classDay} tablet={tablet} />}
+                {tab === "home" && homeView === "main" && (
+                  <HomeView
+                    today={today}
+                    classDay={classDay}
+                    isClassToday={isClassToday}
+                    notes={notes}
+                    readIds={readIds}
+                    paid={!!paid}
+                    bookings={bookings}
+                    onOpenNote={openNote}
+                    onGo={go}
+                    onOpen={openHome}
+                    onPhoto={setViewer}
+                    progress={progress}
+                    tablet={tablet}
+                  />
+                )}
+                {tab === "attend" && <AttendView today={today} classDay={classDay} tablet={tablet} />}
+                {tab === "notes" && (
+                  <div className={tablet ? "grid grid-cols-[minmax(0,1fr)_minmax(0,1.25fr)] items-start gap-4" : ""}>
+                    {(tablet || !shownNote) && <NotesList notes={notes} readIds={readIds} checkedIds={checkedIds} onOpen={openNote} selectedId={tablet ? shownNote?.id : undefined} />}
+                    {shownNote && (
+                      <div className={tablet ? "sticky top-[84px] min-w-0" : ""}>
+                        <NoteDetail
+                          key={shownNote.id}
+                          note={shownNote}
+                          onPhoto={setViewer}
+                          checked={checkedIds.includes(shownNote.id)}
+                          onCheck={() => setCheckedIds((c) => [...c, shownNote.id])}
+                        />
+                      </div>
+                    )}
+                  </div>
+                )}
+                {tab === "pay" && (
+                  <PayView
+                    today={today}
+                    step={payStep}
+                    paid={paid}
+                    tablet={tablet}
+                    onStart={() => {
+                      setPayStep("method");
+                      toTop();
+                    }}
+                    onPaid={(method) => {
+                      setPaid({ method });
+                      setPayStep("done");
+                      toTop();
+                    }}
+                    onDone={() => {
+                      setPayStep("bill");
+                      toTop();
+                    }}
+                  />
+                )}
+                {tab === "consult" && (
+                  <ConsultView
+                    today={today}
+                    step={consultStep}
+                    bookings={bookings}
+                    tablet={tablet}
+                    onStart={() => {
+                      setConsultStep("form");
+                      toTop();
+                    }}
+                    onSubmit={(b) => {
+                      setBookings((list) => [b, ...list]);
+                      setConsultStep("done");
+                      toTop();
+                    }}
+                    onDone={() => {
+                      setConsultStep("list");
+                      toTop();
+                    }}
+                  />
+                )}
+              </main>
+            </div>
+          </div>
+
+          {/* 하단 탭(휴대폰) */}
+          {!tablet && (
+            <nav aria-label="주 메뉴" className={`${pos} inset-x-0 bottom-0 z-30 border-t border-[#eceef1] bg-white ${framed ? "pb-3" : "pb-[env(safe-area-inset-bottom)]"}`}>
+              <ul className="mx-auto grid max-w-[480px] grid-cols-5">
+                {TABS.map(({ id, label, icon: Icon }) => {
+                  const active = tab === id;
+                  return (
+                    <li key={id}>
+                      <button
+                        type="button"
+                        onClick={() => go(id)}
+                        aria-current={active ? "page" : undefined}
+                        className={`flex h-[60px] w-full flex-col items-center justify-center gap-1 text-[12px] ${active ? "font-bold text-[#2557d6]" : "font-medium text-[#8b95a1]"} ${FOCUS} focus-visible:ring-inset focus-visible:ring-offset-0`}
+                      >
+                        <span className="relative">
+                          <Icon size={22} strokeWidth={active ? 2.4 : 1.9} />
+                          {id === "notes" && unread > 0 && <span className="absolute -right-1 -top-0.5 h-2 w-2 rounded-full bg-[#e5483b]" />}
+                        </span>
+                        {label}
+                      </button>
+                    </li>
+                  );
+                })}
+              </ul>
+            </nav>
           )}
-        </AnimatePresence>
+
+          {/* 푸시 알림 */}
+          <AnimatePresence>
+            {push && (
+              <motion.div
+                role="status"
+                initial={reduce ? { opacity: 0 } : { opacity: 0, y: -110 }}
+                animate={reduce ? { opacity: 1 } : { opacity: 1, y: 0 }}
+                exit={reduce ? { opacity: 0 } : { opacity: 0, y: -110 }}
+                transition={reduce ? { duration: 0.15 } : { type: "spring", stiffness: 380, damping: 34 }}
+                className={`${pos} z-[70] ${tablet ? `right-4 w-[400px] ${framed ? "top-8" : "top-3"}` : `inset-x-2 ${framed ? "top-12" : "top-2"}`}`}
+              >
+                <div className="flex items-start gap-1 rounded-[16px] bg-white/95 py-1 pl-3 pr-1 shadow-[0_10px_30px_-8px_rgba(15,23,42,0.35)] ring-1 ring-black/5 backdrop-blur">
+                  <button
+                    type="button"
+                    onClick={() => {
+                      setPush(null);
+                      if (push.target === "shuttle") openHome("shuttle");
+                      else if (isClassToday) go("home");
+                      else openNote("n1");
+                    }}
+                    className={`flex min-h-[56px] min-w-0 flex-1 items-start gap-3 rounded-[12px] py-2 text-left ${FOCUS}`}
+                  >
+                    <span className="mt-0.5 grid h-9 w-9 shrink-0 place-items-center rounded-[9px] bg-[#2557d6] text-white" aria-hidden="true">
+                      <School size={19} />
+                    </span>
+                    <span className="min-w-0">
+                      <span className="flex items-center gap-2 text-[13px] text-[#6b7684]">
+                        <span className="font-semibold text-[#333d4b]">{ACADEMY}</span>지금
+                      </span>
+                      <span className="mt-0.5 block text-[15px] leading-[1.45] text-[#191f28]">{push.text}</span>
+                    </span>
+                  </button>
+                  <button type="button" onClick={() => setPush(null)} aria-label="알림 닫기" className={`grid h-11 w-11 shrink-0 place-items-center rounded-[10px] text-[#8b95a1] ${FOCUS}`}>
+                    <X size={18} />
+                  </button>
+                </div>
+              </motion.div>
+            )}
+          </AnimatePresence>
+
+          {/* 사진 크게 보기 */}
+          <AnimatePresence>
+            {viewer && (
+              <motion.div
+                role="dialog"
+                aria-modal="true"
+                aria-label="사진 크게 보기"
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 1 }}
+                exit={{ opacity: 0 }}
+                transition={{ duration: reduce ? 0 : 0.18 }}
+                className={`${pos} inset-0 z-[80] flex flex-col bg-[#0b0d10]`}
+                onKeyDown={(e) => e.key === "Escape" && setViewer(null)}
+              >
+                <div className={`flex h-14 items-center justify-end px-2 ${framed ? (tablet ? "mt-6" : "mt-11") : ""}`}>
+                  <button type="button" autoFocus onClick={() => setViewer(null)} aria-label="닫기" className={`grid h-11 w-11 place-items-center rounded-[10px] text-white ${FOCUS}`}>
+                    <X size={24} />
+                  </button>
+                </div>
+                <div className={`relative flex-1 ${tablet ? "mx-10" : "mx-4"}`}>
+                  <Image src={viewer.src} alt={viewer.alt} fill sizes={tablet ? "1180px" : "(min-width: 768px) 370px, 100vw"} className="object-contain" />
+                </div>
+                <p className="px-6 pb-10 pt-4 text-center text-[15px] leading-[1.5] text-white/80">{viewer.alt}</p>
+              </motion.div>
+            )}
+          </AnimatePresence>
+        </div>
       </div>
 
-      <footer className="px-4 pb-[96px] text-center text-[#6b7684] md:pb-0">
-        <DemoMakerInfo className="mt-6" />
+      <footer className={`px-4 text-center text-[#6b7684] ${framed ? "" : tablet ? "pb-6 pl-[112px]" : "pb-[96px]"}`}>
+        <DemoMakerInfo className={framed ? "mt-5" : "mt-6"} />
       </footer>
     </div>
+  );
+}
+
+// 화면 환경: 휴대폰(768 미만), PC(틀 안에 기기 보기), 실제 태블릿(터치, 틀 없이)
+type Env = "phone" | "desktop" | "tablet";
+const subscribeEnv = (cb: () => void) => {
+  window.addEventListener("resize", cb);
+  const mq = window.matchMedia("(pointer: coarse)");
+  mq.addEventListener("change", cb);
+  return () => {
+    window.removeEventListener("resize", cb);
+    mq.removeEventListener("change", cb);
+  };
+};
+const envSnapshot = (): Env => (window.innerWidth < 768 ? "phone" : window.matchMedia("(pointer: coarse)").matches ? "tablet" : "desktop");
+function useEnv(): Env {
+  return useSyncExternalStore(subscribeEnv, envSnapshot, () => "phone");
+}
+/** 가로폭 * 100000 + 세로높이 */
+function useViewport(): number {
+  return useSyncExternalStore(
+    subscribeEnv,
+    () => window.innerWidth * 100000 + window.innerHeight,
+    () => 0,
   );
 }
 
@@ -651,6 +819,7 @@ function HomeView({
   onOpen,
   onPhoto,
   progress,
+  tablet,
 }: {
   today: Date;
   classDay: Date;
@@ -664,6 +833,7 @@ function HomeView({
   onOpen: (v: "shuttle" | "report") => void;
   onPhoto: (p: Photo) => void;
   progress: number;
+  tablet: boolean;
 }) {
   const banner = notes.find((n) => n.id === "n4");
   const homework = notes.find((n) => n.id === "n1");
@@ -681,8 +851,8 @@ function HomeView({
     { icon: LogOut, label: "하원", time: isClassToday ? "18:00 예정" : "18:04", desc: isClassToday ? "수업이 끝나면 알려 드립니다" : "학원 출입문 확인", done: !isClassToday },
   ];
 
-  return (
-    <div className="space-y-3">
+  const bBanner = (
+    <>
       {banner?.cover && (
         <button type="button" onClick={() => onOpenNote(banner.id)} className={`relative block aspect-[16/9] w-full overflow-hidden rounded-[14px] bg-[#dfe3e8] text-left ${FOCUS}`}>
           <Image src={banner.cover.src} alt={banner.cover.alt} fill priority sizes="(min-width: 768px) 360px, 100vw" className="object-cover" />
@@ -694,7 +864,10 @@ function HomeView({
           </span>
         </button>
       )}
-
+    </>
+  );
+  const bChild = (
+    <>
       <Card>
         <div className="flex items-center gap-3">
           <span className="grid h-12 w-12 shrink-0 place-items-center rounded-full bg-[#e9eefb] text-[17px] font-bold text-[#2557d6]" aria-hidden="true">
@@ -719,7 +892,10 @@ function HomeView({
           ))}
         </ul>
       </Card>
-
+    </>
+  );
+  const bFeatures = (
+    <>
       <div className="grid grid-cols-2 gap-3">
         <button type="button" onClick={() => onOpen("shuttle")} className={`flex flex-col rounded-[14px] bg-[#17233f] p-4 text-left text-white shadow-[0_1px_3px_rgba(15,23,42,0.08)] ${FOCUS}`}>
           <span className="flex items-center gap-1.5 text-[13px] font-semibold text-white/75">
@@ -742,7 +918,10 @@ function HomeView({
           <Sparkline values={math.scores} className="mt-2 h-7 w-full" />
         </button>
       </div>
-
+    </>
+  );
+  const bTimeline = (
+    <>
       <Card>
         <SectionTitle action={<span className="text-[14px] text-[#6b7684]">{fmtKo(classDay)}</span>}>
           {isClassToday ? "오늘 등하원" : "최근 등하원"}
@@ -772,7 +951,10 @@ function HomeView({
           })}
         </ol>
       </Card>
-
+    </>
+  );
+  const bStats = (
+    <>
       <div className="grid grid-cols-2 gap-3">
         <button type="button" onClick={() => onGo("attend")} className={`rounded-[14px] bg-white p-4 text-left shadow-[0_1px_3px_rgba(15,23,42,0.05)] ${FOCUS}`}>
           <p className="text-[14px] text-[#6b7684]">{classDay.getMonth() + 1}월 출석률</p>
@@ -785,7 +967,10 @@ function HomeView({
           <p className={`mt-0.5 text-[13px] font-semibold ${paid ? "text-[#1f7a52]" : "text-[#c0392b]"}`}>{paid ? "납부 완료" : `미납, ${m}월 10일까지`}</p>
         </button>
       </div>
-
+    </>
+  );
+  const bPhotos = (
+    <>
       {homework?.photos && (
         <Card>
           <SectionTitle
@@ -801,7 +986,10 @@ function HomeView({
           <p className="mt-2 text-[13px] text-[#8b95a1]">{homework.teacher}, {fmtKo(homework.date)}</p>
         </Card>
       )}
-
+    </>
+  );
+  const bNotes = (
+    <>
       <Card>
         <SectionTitle
           action={
@@ -820,7 +1008,10 @@ function HomeView({
           ))}
         </ul>
       </Card>
-
+    </>
+  );
+  const bConsult = (
+    <>
       <Card className="flex items-center gap-3">
         <span className="grid h-10 w-10 shrink-0 place-items-center rounded-full bg-[#f2f4f6] text-[#4e5968]" aria-hidden="true">
           <MessageCircle size={20} />
@@ -842,12 +1033,41 @@ function HomeView({
           {bookings[0] ? "내역 보기" : "신청하기"}
         </button>
       </Card>
+    </>
+  );
+  if (tablet)
+    return (
+      <div className="grid grid-cols-2 items-start gap-4">
+        <div className="space-y-4">
+          {bBanner}
+          {bChild}
+          {bTimeline}
+          {bPhotos}
+        </div>
+        <div className="space-y-4">
+          {bFeatures}
+          {bStats}
+          {bNotes}
+          {bConsult}
+        </div>
+      </div>
+    );
+  return (
+    <div className="space-y-3">
+      {bBanner}
+      {bChild}
+      {bFeatures}
+      {bTimeline}
+      {bStats}
+      {bPhotos}
+      {bNotes}
+      {bConsult}
     </div>
   );
 }
 
 // ================= 출결 =================
-function AttendView({ today, classDay }: { today: Date; classDay: Date }) {
+function AttendView({ today, classDay, tablet }: { today: Date; classDay: Date; tablet: boolean }) {
   const [offset, setOffset] = useState(0);
   const base = new Date(classDay.getFullYear(), classDay.getMonth() + offset, 1);
   const year = base.getFullYear();
@@ -869,7 +1089,8 @@ function AttendView({ today, classDay }: { today: Date; classDay: Date }) {
   };
 
   return (
-    <div className="space-y-3">
+    <div className={tablet ? "grid grid-cols-[minmax(0,1.2fr)_minmax(0,1fr)] items-start gap-4" : "space-y-3"}>
+      <div className="min-w-0 space-y-3">
       <Card>
         <div className="mb-3 flex items-center justify-between">
           <button type="button" onClick={() => changeMonth(-1)} disabled={offset <= -2} aria-label="이전 달" className={`grid h-11 w-11 place-items-center rounded-[10px] text-[#333d4b] hover:bg-[#f2f4f6] disabled:text-[#d1d6db] ${FOCUS}`}>
@@ -929,6 +1150,8 @@ function AttendView({ today, classDay }: { today: Date; classDay: Date }) {
         </div>
       </Card>
 
+      </div>
+      <div className="min-w-0 space-y-3">
       {selRecord && (
         <Card>
           <div className="flex items-center justify-between gap-2">
@@ -961,14 +1184,15 @@ function AttendView({ today, classDay }: { today: Date; classDay: Date }) {
           ))}
         </ul>
       </Card>
+      </div>
     </div>
   );
 }
 
 // ================= 알림장 =================
-function NoteRow({ note, unread, onOpen }: { note: Note; unread: boolean; onOpen: () => void }) {
+function NoteRow({ note, unread, onOpen, selected = false }: { note: Note; unread: boolean; onOpen: () => void; selected?: boolean }) {
   return (
-    <button type="button" onClick={onOpen} className={`flex min-h-[68px] w-full items-center gap-3 px-4 py-3 text-left hover:bg-[#f9fafb] ${FOCUS} focus-visible:ring-inset focus-visible:ring-offset-0`}>
+    <button type="button" onClick={onOpen} aria-current={selected ? "true" : undefined} className={`flex min-h-[68px] w-full items-center gap-3 px-4 py-3 text-left ${selected ? "bg-[#eef3fd]" : "hover:bg-[#f9fafb]"} ${FOCUS} focus-visible:ring-inset focus-visible:ring-offset-0`}>
       <Avatar who={note.teacher} size={40} />
       <span className="min-w-0 flex-1">
         <span className="flex items-center gap-1.5">
@@ -993,7 +1217,7 @@ function NoteRow({ note, unread, onOpen }: { note: Note; unread: boolean; onOpen
   );
 }
 
-function NotesList({ notes, readIds, checkedIds, onOpen }: { notes: Note[]; readIds: string[]; checkedIds: string[]; onOpen: (id: string) => void }) {
+function NotesList({ notes, readIds, checkedIds, onOpen, selectedId }: { notes: Note[]; readIds: string[]; checkedIds: string[]; onOpen: (id: string) => void; selectedId?: string }) {
   const [filter, setFilter] = useState<"전체" | "숙제" | "공지">("전체");
   const list = filter === "전체" ? notes : notes.filter((n) => n.kind === filter);
   const waiting = notes.filter((n) => !checkedIds.includes(n.id)).length;
@@ -1019,7 +1243,7 @@ function NotesList({ notes, readIds, checkedIds, onOpen }: { notes: Note[]; read
         <ul className="divide-y divide-[#f2f4f6]">
           {list.map((n) => (
             <li key={n.id}>
-              <NoteRow note={n} unread={!readIds.includes(n.id)} onOpen={() => onOpen(n.id)} />
+              <NoteRow note={n} unread={!readIds.includes(n.id)} selected={selectedId === n.id} onOpen={() => onOpen(n.id)} />
             </li>
           ))}
         </ul>
@@ -1106,6 +1330,7 @@ function PayView({
   onStart,
   onPaid,
   onDone,
+  tablet,
 }: {
   today: Date;
   step: "bill" | "method" | "done";
@@ -1113,6 +1338,7 @@ function PayView({
   onStart: () => void;
   onPaid: (method: string) => void;
   onDone: () => void;
+  tablet: boolean;
 }) {
   const [method, setMethod] = useState<string>(PAY_METHODS[0]);
   const [processing, setProcessing] = useState(false);
@@ -1121,6 +1347,40 @@ function PayView({
     const d = new Date(today.getFullYear(), today.getMonth() - i, 5 + i);
     return { label: `${d.getMonth() + 1}월 수강료`, date: d };
   });
+
+  const historyCard = (
+      <Card>
+        <SectionTitle>납부 내역</SectionTitle>
+        <ul className="-mx-4 divide-y divide-[#f2f4f6]">
+          {history.map((h) => (
+            <li key={h.label} className="flex min-h-[56px] items-center gap-3 px-4 py-2">
+              <div className="min-w-0 flex-1">
+                <p className="text-[15px] font-semibold">{h.label}</p>
+                <p className="text-[13px] text-[#8b95a1]">{fmtKo(h.date)} 납부, 신용, 체크카드</p>
+              </div>
+              <div className="text-right">
+                <p className="text-[15px] font-semibold">{won(BILL_TOTAL)}</p>
+                <p className="text-[13px] font-semibold text-[#1f7a52]">납부 완료</p>
+              </div>
+            </li>
+          ))}
+        </ul>
+      </Card>
+  );
+  const side = (x: ReactNode, phoneHistory = false) =>
+    tablet ? (
+      <div className="grid grid-cols-[minmax(0,1.15fr)_minmax(0,1fr)] items-start gap-4">
+        <div className="min-w-0">{x}</div>
+        <div className="min-w-0">{historyCard}</div>
+      </div>
+    ) : phoneHistory ? (
+      <div className="space-y-3">
+        {x}
+        {historyCard}
+      </div>
+    ) : (
+      x
+    );
 
   const pay = () => {
     setProcessing(true);
@@ -1131,7 +1391,7 @@ function PayView({
   };
 
   if (step === "done" && paid) {
-    return (
+    return side(
       <div className="space-y-3">
         <Card className="pb-6 pt-8 text-center">
           <CircleCheck size={52} className="mx-auto text-[#2557d6]" strokeWidth={1.8} />
@@ -1150,7 +1410,7 @@ function PayView({
   }
 
   if (step === "method") {
-    return (
+    return side(
       <div className="space-y-3">
         <Card>
           <p className="text-[14px] text-[#6b7684]">{m}월 수강료</p>
@@ -1191,8 +1451,8 @@ function PayView({
     );
   }
 
-  return (
-    <div className="space-y-3">
+  return side(
+    <>
       <Card>
         <div className="flex items-start justify-between gap-2">
           <div>
@@ -1217,24 +1477,8 @@ function PayView({
           )}
         </div>
       </Card>
-      <Card>
-        <SectionTitle>납부 내역</SectionTitle>
-        <ul className="-mx-4 divide-y divide-[#f2f4f6]">
-          {history.map((h) => (
-            <li key={h.label} className="flex min-h-[56px] items-center gap-3 px-4 py-2">
-              <div className="min-w-0 flex-1">
-                <p className="text-[15px] font-semibold">{h.label}</p>
-                <p className="text-[13px] text-[#8b95a1]">{fmtKo(h.date)} 납부, 신용, 체크카드</p>
-              </div>
-              <div className="text-right">
-                <p className="text-[15px] font-semibold">{won(BILL_TOTAL)}</p>
-                <p className="text-[13px] font-semibold text-[#1f7a52]">납부 완료</p>
-              </div>
-            </li>
-          ))}
-        </ul>
-      </Card>
-    </div>
+    </>,
+    true,
   );
 }
 
@@ -1246,6 +1490,7 @@ function ConsultView({
   onStart,
   onSubmit,
   onDone,
+  tablet,
 }: {
   today: Date;
   step: "list" | "form" | "done";
@@ -1253,6 +1498,7 @@ function ConsultView({
   onStart: () => void;
   onSubmit: (b: Booking) => void;
   onDone: () => void;
+  tablet: boolean;
 }) {
   const days = useMemo(() => nextClassDays(today, 6), [today]);
   const [type, setType] = useState("전화 상담");
@@ -1264,9 +1510,55 @@ function ConsultView({
   const past: Booking = { id: "past", date: daysAgo(today, 34), time: "19:00", teacher: TEACHERS[0], type: "전화 상담", status: "상담 완료" };
   const all = [...bookings, past];
   const latest = bookings[0];
+  const listEl = (
+    <div className="space-y-3">
+      <Card>
+        <h2 className="text-[17px] font-bold">{today.getMonth() + 1}월 학부모 상담</h2>
+        <p className="mt-1 text-[15px] leading-[1.6] text-[#4e5968]">담당 선생님과 20분 동안 학습 상황과 진도를 이야기합니다.</p>
+        {!tablet && (
+          <div className="mt-4">
+            <PrimaryButton onClick={onStart}>상담 신청하기</PrimaryButton>
+          </div>
+        )}
+      </Card>
+      <Card>
+        <SectionTitle>신청 내역</SectionTitle>
+        <ul className="-mx-4 divide-y divide-[#f2f4f6]">
+          {all.map((b) => (
+            <li key={b.id} className="flex min-h-[64px] items-center gap-3 px-4 py-3">
+              <Avatar who={b.teacher} size={40} />
+              <div className="min-w-0 flex-1">
+                <p className="text-[15px] font-semibold">
+                  {fmtKo(b.date)} {b.time}
+                </p>
+                <p className="truncate text-[13px] text-[#8b95a1]">
+                  {b.teacher}, {b.type}
+                </p>
+              </div>
+              <span className={`shrink-0 rounded-[6px] px-2 py-0.5 text-[13px] font-semibold ${b.status === "예약 접수" ? "bg-[#e9eefb] text-[#2557d6]" : "bg-[#f2f4f6] text-[#6b7684]"}`}>
+                {b.status}
+              </span>
+            </li>
+          ))}
+        </ul>
+      </Card>
+      <p className="flex items-center justify-center gap-1.5 pb-2 text-[13px] text-[#8b95a1]">
+        <Clock size={14} aria-hidden="true" /> 상담 가능 시간 평일 16:00~21:00
+      </p>
+    </div>
+  );
+  const side = (x: ReactNode) =>
+    tablet ? (
+      <div className="grid grid-cols-[minmax(0,1.15fr)_minmax(0,1fr)] items-start gap-4">
+        <div className="min-w-0">{x}</div>
+        <div className="min-w-0">{listEl}</div>
+      </div>
+    ) : (
+      x
+    );
 
   if (step === "done" && latest) {
-    return (
+    return side(
       <div className="space-y-3">
         <Card className="pb-6 pt-8 text-center">
           <CircleCheck size={52} className="mx-auto text-[#2557d6]" strokeWidth={1.8} />
@@ -1284,7 +1576,7 @@ function ConsultView({
     );
   }
 
-  if (step === "form") {
+  if (step === "form" || tablet) {
     const closed = (i: number, s: string) => (i * 3 + SLOTS.indexOf(s)) % 4 === 1;
     const submit = () => {
       if (dayIdx === null || !time) return;
@@ -1293,7 +1585,7 @@ function ConsultView({
       setTime(null);
       setMemo("");
     };
-    return (
+    return side(
       <form
         className="space-y-3"
         onSubmit={(e) => {
@@ -1419,41 +1711,7 @@ function ConsultView({
     );
   }
 
-  return (
-    <div className="space-y-3">
-      <Card>
-        <h2 className="text-[17px] font-bold">{today.getMonth() + 1}월 학부모 상담</h2>
-        <p className="mt-1 text-[15px] leading-[1.6] text-[#4e5968]">담당 선생님과 20분 동안 학습 상황과 진도를 이야기합니다.</p>
-        <div className="mt-4">
-          <PrimaryButton onClick={onStart}>상담 신청하기</PrimaryButton>
-        </div>
-      </Card>
-      <Card>
-        <SectionTitle>신청 내역</SectionTitle>
-        <ul className="-mx-4 divide-y divide-[#f2f4f6]">
-          {all.map((b) => (
-            <li key={b.id} className="flex min-h-[64px] items-center gap-3 px-4 py-3">
-              <Avatar who={b.teacher} size={40} />
-              <div className="min-w-0 flex-1">
-                <p className="text-[15px] font-semibold">
-                  {fmtKo(b.date)} {b.time}
-                </p>
-                <p className="truncate text-[13px] text-[#8b95a1]">
-                  {b.teacher}, {b.type}
-                </p>
-              </div>
-              <span className={`shrink-0 rounded-[6px] px-2 py-0.5 text-[13px] font-semibold ${b.status === "예약 접수" ? "bg-[#e9eefb] text-[#2557d6]" : "bg-[#f2f4f6] text-[#6b7684]"}`}>
-                {b.status}
-              </span>
-            </li>
-          ))}
-        </ul>
-      </Card>
-      <p className="flex items-center justify-center gap-1.5 pb-2 text-[13px] text-[#8b95a1]">
-        <Clock size={14} aria-hidden="true" /> 상담 가능 시간 평일 16:00~21:00
-      </p>
-    </div>
-  );
+  return listEl;
 }
 
 function ChoiceRadio({ name, value, checked, onChange, icon: Icon }: { name: string; value: string; checked: boolean; onChange: () => void; icon: typeof Phone }) {
@@ -1506,7 +1764,7 @@ function Sparkline({ values, className = "" }: { values: number[]; className?: s
   );
 }
 
-function ReportView({ classDay }: { classDay: Date }) {
+function ReportView({ classDay, tablet }: { classDay: Date; tablet: boolean }) {
   const [subject, setSubject] = useState<Subject>("수학");
   const r = REPORT[subject];
   const last = r.scores[r.scores.length - 1];
@@ -1522,7 +1780,8 @@ function ReportView({ classDay }: { classDay: Date }) {
   const y = (v: number) => T + (1 - (v - 60) / 40) * (H - T - B);
 
   return (
-    <div className="space-y-3">
+    <div className={tablet ? "grid grid-cols-[minmax(0,1.2fr)_minmax(0,1fr)] items-start gap-4" : "space-y-3"}>
+      <div className="min-w-0 space-y-3">
       <div role="group" aria-label="과목" className="grid grid-cols-2 gap-1 rounded-[12px] bg-[#e9ecf0] p-1">
         {(Object.keys(REPORT) as Subject[]).map((sj) => (
           <button
@@ -1580,6 +1839,8 @@ function ReportView({ classDay }: { classDay: Date }) {
         </svg>
       </Card>
 
+      </div>
+      <div className="min-w-0 space-y-3">
       <Card>
         <SectionTitle>단원별 성취도</SectionTitle>
         <ul className="space-y-3">
@@ -1617,12 +1878,13 @@ function ReportView({ classDay }: { classDay: Date }) {
         </div>
         <p className="mt-3 rounded-[10px] bg-[#f7f8fa] p-3.5 text-[15px] leading-[1.65] text-[#333d4b]">{r.comment}</p>
       </Card>
+      </div>
     </div>
   );
 }
 
 // ================= 셔틀 위치 =================
-function ShuttleView({ progress, reduce, alertOn, onToggle }: { progress: number; reduce: boolean; alertOn: boolean; onToggle: () => void }) {
+function ShuttleView({ progress, reduce, alertOn, onToggle, tablet }: { progress: number; reduce: boolean; alertOn: boolean; onToggle: () => void; tablet: boolean }) {
   const [bx, by] = pointAt(progress);
   const eta = etaMin(progress);
   const done = progress >= 1;
@@ -1630,7 +1892,8 @@ function ShuttleView({ progress, reduce, alertOn, onToggle }: { progress: number
   const nextIdx = STOPS.findIndex((st) => st.at > progress + 0.0001);
 
   return (
-    <div className="space-y-3">
+    <div className={tablet ? "grid grid-cols-[minmax(0,1.5fr)_minmax(0,1fr)] items-start gap-4" : "space-y-3"}>
+      <div className="min-w-0 space-y-3">
       <Card className="!p-0 overflow-hidden">
         <div className="flex items-center justify-between px-4 pb-3 pt-4">
           <div>
@@ -1644,7 +1907,7 @@ function ShuttleView({ progress, reduce, alertOn, onToggle }: { progress: number
             <p className="text-[14px] text-[#6b7684]">하원 셔틀 2호차, 아파트 후문 정류장</p>
           </div>
         </div>
-        <svg viewBox="0 0 340 210" className="block h-auto w-full bg-[#f3f5f8]" role="img" aria-label={`셔틀 노선 지도, ${done ? "하차 정류장 도착" : `다음 정류장 ${STOPS[nextIdx]?.name ?? ""}`}`}>
+        <svg viewBox="0 0 340 210" className={`block w-full bg-[#f3f5f8] ${tablet ? "h-[340px]" : "h-auto"}`} role="img" aria-label={`셔틀 노선 지도, ${done ? "하차 정류장 도착" : `다음 정류장 ${STOPS[nextIdx]?.name ?? ""}`}`}>
           {/* 블록과 도로 */}
           {[
             [10, 10, 90, 70],
@@ -1707,6 +1970,8 @@ function ShuttleView({ progress, reduce, alertOn, onToggle }: { progress: number
         </div>
       </Card>
 
+      </div>
+      <div className="min-w-0 space-y-3">
       <Card>
         <SectionTitle>정류장</SectionTitle>
         <ol>
@@ -1741,6 +2006,7 @@ function ShuttleView({ progress, reduce, alertOn, onToggle }: { progress: number
           <Row label="동승 선생님" value="한ㅅ아" />
         </dl>
       </Card>
+      </div>
     </div>
   );
 }
