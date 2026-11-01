@@ -1,34 +1,14 @@
 import type { Metadata } from "next";
-import { notFound } from "next/navigation";
-import { PrivacyPolicy } from "@/components/legal/PrivacyPolicy";
+import { MovedTo, movedMeta } from "@/components/seo/MovedTo";
 import { privacyVersions } from "@/data/privacyPolicy";
 
-// 지난 버전 개인정보처리방침. 현재 버전은 /privacy 에서 보여 준다.
+// 옛 주소. 새 주소로 넘긴다(11-01)
 export function generateStaticParams() {
   return privacyVersions.slice(1).map((v) => ({ version: v.id }));
 }
 
-export async function generateMetadata({
-  params,
-}: {
-  params: Promise<{ version: string }>;
-}): Promise<Metadata> {
-  const { version } = await params;
-  const v = privacyVersions.find((x) => x.id === version);
-  return {
-    title: `개인정보처리방침 ${v?.id ?? ""}번째 버전`,
-    alternates: { canonical: `/classic/privacy/${version}` },
-    robots: { index: false },
-  };
-}
+export const metadata: Metadata = movedMeta("/classic/privacy");
 
-export default async function PrivacyVersionPage({
-  params,
-}: {
-  params: Promise<{ version: string }>;
-}) {
-  const { version } = await params;
-  const v = privacyVersions.find((x) => x.id === version);
-  if (!v || v.id === privacyVersions[0].id) notFound();
-  return <PrivacyPolicy version={v} />;
+export default function Page() {
+  return <MovedTo to="/classic/privacy" />;
 }

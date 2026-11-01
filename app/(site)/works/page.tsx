@@ -1,51 +1,9 @@
-import { ListScrollMemory } from "@/components/landing/ListScrollMemory";
 import type { Metadata } from "next";
-import Image from "next/image";
-import Link from "next/link";
-import { WorksSearch } from "@/components/landing/WorksSearch";
-import { industries } from "@/data/industries";
-import { projects } from "@/data/projects";
-import { fieldsById } from "@/data/workFilters";
-import { pageMeta } from "@/lib/seo";
+import { MovedTo, movedMeta } from "@/components/seo/MovedTo";
 
-export const metadata: Metadata = {
-  ...pageMeta({
-    title: "홈페이지 제작 샘플",
-    description: `쇼핑몰, 펜션, 회사, 병원, 학원, 카페 홈페이지와 랜딩페이지 샘플 ${projects.length}개. 샘플을 직접 눌러 볼 수 있어요.`,
-    path: "/works",
-  }),
-};
+// 옛 주소. 새 주소로 넘긴다(11-01)
+export const metadata: Metadata = movedMeta("/classic/works");
 
-export default function WorksPage() {
-  return (
-      <div className="mx-auto w-full max-w-[1248px] px-4 pb-10 pt-14 md:px-6 md:py-14">
-        <h1 className="text-[28px] font-bold leading-[1.4] tracking-[-0.01em] md:text-[36px]">샘플</h1>
-        {/* 업종 고르기: 업종마다 컷 하나. 사진 위에 업종 이름 상자, 아래에 샘플 수.
-            칸이 남지 않게 휴대폰(두 칸)은 홀수 마지막 컷을, 태블릿(세 칸)은 마지막 두 컷을 넓힌다 */}
-        <ul className="mt-6 grid grid-cols-2 gap-4 md:grid-cols-6 md:gap-6 lg:grid-cols-5" aria-label="업종별 샘플">
-          {industries.map((ind, i) => {
-            const wideMobile = industries.length % 2 === 1 && i === industries.length - 1;
-            const wideTablet = industries.length % 3 === 2 && i >= industries.length - 2;
-            return (
-            <li key={ind.slug} className={`${wideMobile ? "col-span-2" : ""} ${wideTablet ? "md:col-span-3" : "md:col-span-2"} lg:col-span-1`}>
-              <Link
-                href={`/works/${ind.slug}`}
-                className={`group relative block aspect-[4/3] ${wideMobile ? "aspect-[8/3]" : ""} ${wideTablet ? "md:aspect-[2/1]" : "md:aspect-[4/3]"} lg:aspect-[4/5] overflow-hidden border-[3px] border-[#1d1d1f] bg-white shadow-[4px_4px_0_#1d1d1f] transition-[transform,box-shadow] duration-150 ease-out hover:-translate-x-0.5 hover:-translate-y-0.5 hover:shadow-[6px_6px_0_#1d1d1f] active:translate-x-1 active:translate-y-1 active:shadow-none ${i % 2 ? "rotate-1" : "-rotate-1"}`}
-              >
-                <Image src={ind.image} alt="" fill sizes="(min-width: 1024px) 240px, (min-width: 768px) 33vw, 50vw" className="object-cover transition-transform duration-300 group-hover:scale-105" />
-                <span className="absolute left-2 top-2 border-[2.5px] border-[#1d1d1f] bg-[#fff3b0] px-2 py-0.5 text-[14px] font-bold leading-[1.4] md:text-[15px]">{ind.label}</span>
-                <span className="absolute bottom-2 right-2 rounded-full border-[2.5px] border-[#1d1d1f] bg-white px-2.5 py-0.5 text-[13px] font-bold tabular-nums md:text-[14px]">
-                  샘플 {projects.filter((p) => (fieldsById[p.id] ?? []).includes(ind.field)).length}개
-                </span>
-              </Link>
-            </li>
-          );
-        })}
-      </ul>
-      <div className="mt-12">
-        <WorksSearch projects={projects} />
-          <ListScrollMemory />
-      </div>
-    </div>
-  );
+export default function Page() {
+  return <MovedTo to={"/classic/works"} />;
 }
