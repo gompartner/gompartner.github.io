@@ -4,6 +4,7 @@ import { StepList } from "@/components/classic/pricing/StepList";
 import { serviceTabs } from "@/components/classic/pricing/tabs";
 import { PageHead, SubTabs, h2, h3, wrap } from "@/components/classic/ui";
 import { DeliverBlock } from "@/components/classic/DeliverBlock";
+import { OtherServices } from "@/components/classic/OtherServices";
 import { FaqBlock } from "@/components/classic/FaqBlock";
 import { replyTerm } from "@/data/classic/maintenance";
 import { demoProjects, isProgram } from "@/components/classic/works/samples";
@@ -200,6 +201,8 @@ export default function ClassicProgramPage() {
       />
 
       <FaqBlock items={FAQ} id="pg-faq" />
+
+      <OtherServices current="/classic/program" />
     </>
   );
 }

@@ -71,7 +71,7 @@ export const landingPlans: Plan[] = [
     days: 5,
     revisions: 2,
     summary: "상담 진행 상태 관리",
-    includes: ["기본 7개 섹션 구성", "신청 접수 구성 전부", "문자, 알림톡 알림(발송 비용 별도)", "시트 상담 상태 관리", "중복 신청 자동 표시"],
+    includes: ["기본 7개 섹션 구성", "신청 접수 구성 전부", "문자, 알림톡 알림", "시트 상담 상태 관리", "중복 신청 자동 표시"],
   },
   {
     id: "landing-premium",

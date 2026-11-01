@@ -1,12 +1,14 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 import { BellRing, ChartColumn, Check, ChevronRight, ClipboardList, MousePointerClick, Table2 } from "lucide-react";
-import { ClassicOwnerPreview } from "@/components/classic/landing/ClassicOwnerPreview";
+import { ClassicLeadScreens } from "@/components/classic/landing/ClassicLeadScreens";
 import { PlanTable } from "@/components/classic/pricing/PlanTable";
+import { AddonList } from "@/components/classic/pricing/AddonList";
 import { StepList } from "@/components/classic/pricing/StepList";
 import { serviceTabs } from "@/components/classic/pricing/tabs";
 import { PageHead, SubTabs, h2, h3, more, wrap } from "@/components/classic/ui";
 import { DeliverBlock } from "@/components/classic/DeliverBlock";
+import { OtherServices } from "@/components/classic/OtherServices";
 import { FaqBlock } from "@/components/classic/FaqBlock";
 import { replyTerm } from "@/data/classic/maintenance";
 import { SampleGrid } from "@/components/classic/works/SampleGrid";
@@ -124,7 +126,7 @@ export default function ClassicLandingServicePage() {
             신청 접수 화면
           </h2>
           <div className="mt-10">
-            <ClassicOwnerPreview />
+            <ClassicLeadScreens />
           </div>
         </div>
       </section>
@@ -134,7 +136,8 @@ export default function ClassicLandingServicePage() {
           <h2 id="ld-plans" className={h2}>
             패키지
           </h2>
-          <PlanTable plans={landingPlans} product="광고 랜딩페이지" />
+          <PlanTable plans={landingPlans} product="랜딩페이지" />
+          <AddonList id="ld-addons" only={["page", "tool", "pay", "map", "lang"]} />
         </div>
       </section>
 
@@ -166,6 +169,8 @@ export default function ClassicLandingServicePage() {
       />
 
       <FaqBlock items={FAQ} id="ld-faq" />
+
+      <OtherServices current="/classic/landing" />
     </>
   );
 }

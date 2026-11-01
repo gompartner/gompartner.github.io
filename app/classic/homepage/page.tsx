@@ -5,6 +5,10 @@ import { ChevronRight, Factory, GraduationCap, Scale, Stethoscope, Store } from 
 import { CompareTable } from "@/components/classic/CompareTable";
 import { FaqBlock } from "@/components/classic/FaqBlock";
 import { PlanTable } from "@/components/classic/pricing/PlanTable";
+import { DeliverBlock } from "@/components/classic/DeliverBlock";
+import { OtherServices } from "@/components/classic/OtherServices";
+import { replyTerm } from "@/data/classic/maintenance";
+import { AddonList } from "@/components/classic/pricing/AddonList";
 import { StepList } from "@/components/classic/pricing/StepList";
 import { serviceTabs } from "@/components/classic/pricing/tabs";
 import { PageHead, SubTabs, h2, more, wrap } from "@/components/classic/ui";
@@ -77,9 +81,10 @@ export default function ClassicHomepagePage() {
         <div className="grid items-center gap-10 border-t-2 border-[#15171c] pt-6 md:grid-cols-[1fr_1.1fr] md:gap-12">
           <div>
             <h2 id="hp-lead" className="break-keep text-[26px] font-[800] leading-[1.35] tracking-[-0.04em] md:text-[34px]">
-              업종별 홈페이지 제작
+              병원, 매장, 전문직, 기업, 학원 홈페이지를 업종에 맞게 만듭니다
             </h2>
-            <p className="mt-4 break-keep text-[16px] leading-[1.7] text-[#5b6370] md:text-[17px]">반응형, 검색엔진 등록, 원본 소스</p>
+            <p className="mt-4 break-keep text-[16px] leading-[1.7] text-[#5b6370] md:text-[17px]">반응형 화면, 검색엔진 등록, 원본 소스까지 함께 드립니다</p>
+            <p className="mt-3 text-[15px] font-bold text-[#256ef4]">{replyTerm}</p>
           </div>
           {/* PC 화면 위에 휴대폰 화면을 겹친다. 실제 카탈로그 캡처 */}
           <div aria-hidden className="relative aspect-[16/11] w-full">
@@ -133,6 +138,7 @@ export default function ClassicHomepagePage() {
             패키지
           </h2>
           <PlanTable plans={plans} product="홈페이지" />
+          <AddonList id="hp-addons" />
           <p className="mt-6 text-[15px] leading-[1.65] text-[#5b6370] md:text-[16px]">{runningCostNote}</p>
         </div>
       </section>
@@ -159,7 +165,16 @@ export default function ClassicHomepagePage() {
 
       <StepList steps={processSteps} title="진행 절차" id="process" />
 
+      <DeliverBlock
+        id="hp-deliver"
+        name="홈페이지와 인계 자료"
+        items={["홈페이지(PC, 모바일)", "원본 소스", "화면과 웹 접근성 점검 결과표", "계정 목록과 수정 방법을 정리한 인계 문서", "오픈 후 1개월 무상 하자보수"]}
+        photo="/images/site/scene-make.jpg"
+      />
+
       <FaqBlock items={faqFor("make")} id="hp-faq" />
+
+      <OtherServices current="/classic/homepage" />
 
     </>
   );
