@@ -2,7 +2,7 @@
 
 import { useEffect, useRef, useState } from "react";
 import { Minus, Plus } from "lucide-react";
-import { ChannelTalkButton } from "@/components/layout/ChannelTalk";
+import { KakaoChatButton } from "@/components/layout/KakaoChat";
 import { addons, formatWon, manwon, plans, sampleReuseRate, type AddonId } from "@/data/pricing";
 
 /**
@@ -151,13 +151,13 @@ export function PriceCalculator() {
                 <span className="block text-foreground-secondary">추가 기능 금액의 절반을 오픈 할인으로 빼 드립니다.</span>
               </span>
             </label>
-            <ChannelTalkButton
+            <KakaoChatButton
               cta="calc_chat"
               message={`견적 계산: ${summary}, ${manwon(total)}로 상담받고 싶어요.`}
               className="mt-5 flex h-14 w-full items-center justify-center rounded-[6px] border-[3px] border-[#1d1d1f] bg-accent text-[17px] font-bold text-white shadow-[4px_4px_0_#1d1d1f] transition-[transform,box-shadow,background-color] duration-150 hover:bg-accent-hover active:translate-x-1 active:translate-y-1 active:shadow-none"
             >
               이 견적으로 상담
-            </ChannelTalkButton>
+            </KakaoChatButton>
           </div>
         </div>
       </div>

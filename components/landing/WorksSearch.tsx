@@ -342,7 +342,7 @@ export function WorksSearch({ projects }: { projects: Project[] }) {
           >
             <div className="flex flex-col items-center gap-2 px-5 pb-6 pt-5 text-center">
               <p className="rounded-[22px] rounded-bl-[6px] border-[3px] border-[#1d1d1f] bg-white px-4 py-2.5 text-[17px] font-bold leading-[1.5]">찾는 샘플이 없어요.</p>
-              <p className="text-[16px] leading-[1.5] text-foreground-secondary">비슷한 작업이 가능한지 채팅으로 물어봐 주세요.</p>
+              <p className="text-[16px] leading-[1.5] text-foreground-secondary">비슷한 작업이 가능한지 카카오톡으로 물어봐 주세요.</p>
             </div>
             <img src="/images/webtoon/bear-think.jpg" alt="" className="aspect-[16/9] w-full border-t-[3px] border-[#1d1d1f] object-cover object-[50%_30%]" />
           </motion.div>

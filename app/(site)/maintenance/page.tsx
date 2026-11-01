@@ -1,7 +1,7 @@
 import type { Metadata } from "next";
 import Image from "next/image";
 import { Check, ChevronDown, X } from "lucide-react";
-import { ChannelTalkButton } from "@/components/layout/ChannelTalk";
+import { KakaoChatButton } from "@/components/layout/KakaoChat";
 import { ProcessSteps } from "@/components/landing/ProcessSteps";
 import { pageMeta } from "@/lib/seo";
 import {
@@ -124,13 +124,13 @@ export default function MaintenancePage() {
                       <p key={n}>{n}</p>
                     ))}
                   </div>
-                  <ChannelTalkButton
+                  <KakaoChatButton
                     cta={`maintenance_chat_${s.id}`}
                     message={`${s.title} 상담받고 싶어요.`}
                     className="inline-flex h-12 shrink-0 items-center justify-center rounded-[6px] border-[2.5px] border-[#1d1d1f] bg-accent px-6 text-[17px] font-bold text-white shadow-[3px_3px_0_#1d1d1f] transition-[transform,box-shadow,background-color] duration-150 hover:bg-accent-hover active:translate-x-[3px] active:translate-y-[3px] active:shadow-none"
                   >
                     {s.title} 상담
-                  </ChannelTalkButton>
+                  </KakaoChatButton>
                 </div>
               </div>
             </section>

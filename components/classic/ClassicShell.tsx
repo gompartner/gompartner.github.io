@@ -2,7 +2,7 @@ import { CtaBand } from "@/components/classic/CtaBand";
 import { ClassicFooter } from "@/components/classic/ClassicFooter";
 import { ClassicHeader } from "@/components/classic/ClassicHeader";
 import { RememberClassic } from "@/components/classic/RememberClassic";
-import { ChannelTalk } from "@/components/layout/ChannelTalk";
+import { KakaoChat } from "@/components/layout/KakaoChat";
 
 // 클래식 보기(웹 에이전시형 회사 홈페이지)의 틀. 첫 화면(/)과 /classic 아래 페이지가 같이 쓴다.
 export function ClassicShell({ children }: { children: React.ReactNode }) {
@@ -15,7 +15,7 @@ export function ClassicShell({ children }: { children: React.ReactNode }) {
         본문 바로가기
       </a>
       <RememberClassic />
-      <ChannelTalk />
+      <KakaoChat />
       <ClassicHeader />
       <main id="main" className="flex-1 pt-16 md:pt-[76px]">
         {children}

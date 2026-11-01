@@ -1,5 +1,5 @@
 import { Header } from "@/components/layout/Header";
-import { ChannelTalk } from "@/components/layout/ChannelTalk";
+import { KakaoChat } from "@/components/layout/KakaoChat";
 import { Footer } from "@/components/layout/Footer";
 import { MobileCtaBar } from "@/components/layout/MobileCtaBar";
 import {
@@ -27,7 +27,7 @@ export default function SiteLayout({
       <PersonJsonLd />
       <ProfessionalServiceJsonLd />
       <WebSiteJsonLd />
-      <ChannelTalk />
+      <KakaoChat />
       <Header />
       <main id="main" className="flex-1 pt-16">
         {children}

@@ -9,7 +9,7 @@ import { Menu, X } from "lucide-react";
 import { LookLink, LookToggle } from "@/components/layout/LookToggle";
 import { cn } from "@/lib/utils";
 import { profile } from "@/data/profile";
-import { ChannelTalkButton } from "@/components/layout/ChannelTalk";
+import { KakaoChatButton } from "@/components/layout/KakaoChat";
 import { useReducedMotionSafe } from "@/hooks/useReducedMotionSafe";
 
 // 자료실은 바닥글에만 둔다
@@ -89,12 +89,12 @@ export function Header() {
               </LookLink>
             </li>
           </ul>
-          <ChannelTalkButton
+          <KakaoChatButton
             cta="header_chat"
             className="hidden h-10 items-center rounded-[6px] border-[2.5px] border-[#1d1d1f] bg-accent px-4 md:inline-flex text-[15px] font-bold text-accent-foreground shadow-[3px_3px_0_#1d1d1f] transition-[transform,box-shadow,background-color] duration-150 hover:bg-accent-hover active:translate-x-[3px] active:translate-y-[3px] active:shadow-none"
           >
-            채팅 상담
-          </ChannelTalkButton>
+            카카오톡 상담
+          </KakaoChatButton>
           <button
             type="button"
             onClick={() => setMenuOpen((v) => !v)}

@@ -3,7 +3,7 @@
 import { useEffect, useRef, useState } from "react";
 import QRCode from "qrcode";
 import { CircleAlert, Download } from "lucide-react";
-import { ChannelTalkButton } from "@/components/layout/ChannelTalk";
+import { KakaoChatButton } from "@/components/layout/KakaoChat";
 
 /* QR코드 만들기.
    홈페이지 주소, 와이파이, 전화, 문자, 일반 글을 QR로 바꾸고 PNG와 SVG로 내려받는다.
@@ -350,9 +350,9 @@ export function QrMaker() {
 
         <div className="mt-4 flex flex-wrap items-center justify-between gap-3 rounded-[10px] bg-surface p-5">
           <p className="text-[16px] font-bold">QR로 연결할 홈페이지가 필요하신가요?</p>
-          <ChannelTalkButton cta="tool_qr_chat" className="inline-flex h-11 items-center rounded-md bg-accent px-4 text-[15px] font-bold text-accent-foreground hover:bg-accent-hover">
-            채팅 상담
-          </ChannelTalkButton>
+          <KakaoChatButton cta="tool_qr_chat" className="inline-flex h-11 items-center rounded-md bg-accent px-4 text-[15px] font-bold text-accent-foreground hover:bg-accent-hover">
+            카카오톡 상담
+          </KakaoChatButton>
         </div>
       </div>
     </div>

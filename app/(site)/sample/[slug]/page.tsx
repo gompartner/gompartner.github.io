@@ -5,7 +5,7 @@ import Image from "next/image";
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import { House, Pointer } from "lucide-react";
-import { ChannelTalkButton } from "@/components/layout/ChannelTalk";
+import { KakaoChatButton } from "@/components/layout/KakaoChat";
 import { SampleBack } from "@/components/renewal/SampleBack";
 import { Bubble, Narration } from "@/components/renewal/ui";
 import { projects } from "@/data/projects";
@@ -249,9 +249,9 @@ export default async function SamplePage({ params }: Props) {
             <Pointer size={18} strokeWidth={2.5} aria-hidden />
             샘플 열기
           </Link>
-          <ChannelTalkButton cta={`sample_chat_${p.id}`} message={`${p.title} 샘플을 보고 문의합니다.`} className={subButton}>
-            채팅 상담
-          </ChannelTalkButton>
+          <KakaoChatButton cta={`sample_chat_${p.id}`} message={`${p.title} 샘플을 보고 문의합니다.`} className={subButton}>
+            카카오톡 상담
+          </KakaoChatButton>
         </div>
       </section>
     </div>

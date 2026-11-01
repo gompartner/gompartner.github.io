@@ -2,10 +2,10 @@
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { MessageCircle, PenLine } from "lucide-react";
-import { ChannelTalkButton } from "@/components/layout/ChannelTalk";
+import { PenLine } from "lucide-react";
+import { KakaoChatButton } from "@/components/layout/KakaoChat";
 
-// 모든 클래식 페이지 바닥글 위 상담 띠(11-01 보편 구성). 상담 신청과 채널톡 채팅. 상담 신청 페이지에서는 숨긴다.
+// 모든 클래식 페이지 바닥글 위 상담 띠(11-01 보편 구성). 상담 신청과 카카오톡 상담. 상담 신청 페이지에서는 숨긴다.
 export function CtaBand() {
   const pathname = usePathname();
   if (pathname?.startsWith("/classic/contact")) return null;
@@ -18,10 +18,9 @@ export function CtaBand() {
             <PenLine size={18} aria-hidden />
             상담 신청
           </Link>
-          <ChannelTalkButton cta="cta_band_chat" className="inline-flex h-12 items-center gap-2 rounded-md border border-white/50 px-6 text-[16px] font-bold text-white transition-colors hover:bg-white/10">
-            <MessageCircle size={18} aria-hidden />
-            채팅 상담
-          </ChannelTalkButton>
+          <KakaoChatButton cta="cta_band_chat" className="inline-flex h-12 items-center gap-2 rounded-md px-6 text-[16px] font-bold text-white transition-colors hover:bg-white/10">
+            카카오톡 상담
+          </KakaoChatButton>
         </div>
       </div>
     </section>

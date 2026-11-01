@@ -3,7 +3,7 @@
 import { useEffect, useMemo, useState } from "react";
 import { AnimatePresence, motion } from "framer-motion";
 import { Check, Copy, Download, Plus, X } from "lucide-react";
-import { ChannelTalkButton } from "@/components/layout/ChannelTalk";
+import { KakaoChatButton } from "@/components/layout/KakaoChat";
 import { useLocalStorage } from "@/hooks/useLocalStorage";
 import { useReducedMotionSafe } from "@/hooks/useReducedMotionSafe";
 
@@ -665,9 +665,9 @@ export function PrivacyPolicyGenerator() {
         </p>
         <div className="mt-4 flex flex-wrap items-center justify-between gap-3 rounded-[10px] bg-surface p-5">
           <p className="text-[16px] font-bold">홈페이지에 바로 붙이거나 쇼핑몰 푸터를 고쳐야 하나요?</p>
-          <ChannelTalkButton cta="tool_privacy_chat" className="inline-flex h-11 items-center rounded-md bg-accent px-4 text-[15px] font-bold text-accent-foreground hover:bg-accent-hover">
-            채팅 상담
-          </ChannelTalkButton>
+          <KakaoChatButton cta="tool_privacy_chat" className="inline-flex h-11 items-center rounded-md bg-accent px-4 text-[15px] font-bold text-accent-foreground hover:bg-accent-hover">
+            카카오톡 상담
+          </KakaoChatButton>
         </div>
       </section>
     </div>
