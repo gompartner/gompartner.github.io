@@ -66,10 +66,10 @@ export const homepageProjects = demoProjects.filter((p) => !groups.some((g) => g
 
 export const groupOf = (p: Project) => groups.find((g) => g.match(p));
 
-/** 카탈로그로 보여 주는 묶음. 11-01부터 카탈로그는 업종 홈페이지만 보여 준다(랜딩, 업무 프로그램은 접은 서비스) */
-export const catalogGroups = groups.filter(() => false);
-/** 카탈로그 목록에 나오는 것(업종 홈페이지) */
-export const catalogProjects = homepageProjects;
+/** 카탈로그로 보여 주는 묶음. 업종 홈페이지와 랜딩(11-01 되살림). 업무 프로그램은 서비스 페이지에서 화면으로 보여 준다 */
+export const catalogGroups = groups.filter((g) => g.slug === "landing");
+/** 카탈로그 목록에 나오는 것(업종 홈페이지와 랜딩) */
+export const catalogProjects = demoProjects.filter((p) => !isProgram(p) && !isMaintenance(p));
 
 export const samplesIn = (slug: string) => {
   const g = groups.find((x) => x.slug === slug);

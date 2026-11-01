@@ -21,7 +21,12 @@ export const classicMenu = [
     label: "홈페이지 제작",
     href: "/classic/homepage",
     match: ["/classic/homepage", "/classic/landing", "/classic/program"],
-    items: [],
+    // 11-01 랜딩, 업무 프로그램은 제작 안에 둔다(10-29 사용자 결정)
+    items: [
+      { href: "/classic/homepage", label: "홈페이지 제작" },
+      { href: "/classic/landing", label: "랜딩페이지 제작" },
+      { href: "/classic/program", label: "업무 프로그램 제작" },
+    ],
   },
   {
     label: "유지보수",
@@ -34,7 +39,7 @@ export const classicMenu = [
       { href: "/classic/maintenance/monthly", label: "월 관리" },
     ],
   },
-  // 업종(병원, 카페 등)은 카탈로그 화면 안의 탭에서 고른다. 카탈로그는 홈페이지 제작과 랜딩만(10-30)
+  // 업종(병원, 카페 등)은 카탈로그 화면 안의 탭에서 고른다. 카탈로그는 업종 홈페이지와 랜딩(11-01 되살림)
   {
     label: "카탈로그",
     href: "/classic/works",

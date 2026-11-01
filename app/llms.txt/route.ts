@@ -3,14 +3,14 @@ import { aboutLead, aboutTitle, principles } from "@/data/classic/about";
 import { faq } from "@/data/classic/faq";
 import { industries } from "@/data/classic/industries";
 import { maintenanceServices, replyTerm } from "@/data/classic/maintenance";
-import { planCommon, plans } from "@/data/classic/pricing";
+import { landingPlans, planCommon, plans } from "@/data/classic/pricing";
 import { profile } from "@/data/classic/profile";
 import { siteUrl } from "@/lib/site";
 
 export const dynamic = "force-static";
 
 // AI 검색(ChatGPT, Perplexity, Claude 등)이 읽는 사이트 요약. llmstxt.org 형식.
-// 11-01 현재 서비스(유지보수, 홈페이지 제작)만 싣고 유지보수를 앞에 둔다. 금액과 작업 기간은 싣지 않는다(상담 뒤 견적).
+// 11-01 서비스: 유지보수, 제작(홈페이지, 랜딩, 업무 프로그램). 유지보수를 앞에 둔다. 금액과 작업 기간은 싣지 않는다(상담 뒤 견적).
 // 데이터 문구에 가운뎃점이 섞여 들어와도 쉼표로 바꿔 내보낸다.
 const plain = (t: string) => t.replaceAll("·", ", ").replace(/\s+/g, " ").trim();
 
@@ -39,6 +39,16 @@ ${plain(industries.map((i) => i.label).join(", "))} 업종의 반응형 홈페�
 
 ${plans.map((p) => `- ${plain(p.title)}: ${plain(p.summary)}. ${plain(p.includes.join(", "))}.`).join("\n")}
 - 모든 구성 공통: ${plain(planCommon.join(", "))}. 도메인과 호스팅은 고객 명의로 계약합니다.
+
+## 랜딩페이지 제작
+
+광고로 들어온 고객의 상담, 예약 신청을 받는 홍보용 페이지를 만듭니다. 신청이 들어오면 담당자 메일과 구글 시트에 바로 기록됩니다. 자세히: [랜딩페이지 제작](${url("/classic/landing")})
+
+${landingPlans.map((p) => `- ${plain(p.title)}: ${plain(p.summary)}. ${plain(p.includes.join(", "))}.`).join("\n")}
+
+## 업무 프로그램 제작
+
+엑셀로 하던 주문 취합, 관리자 화면, 결과지 출력 같은 반복 업무를 웹 프로그램으로 만듭니다. 자세히: [업무 프로그램 제작](${url("/classic/program")})
 
 금액과 일정은 상담 신청을 받은 뒤 견적서로 안내합니다.
 

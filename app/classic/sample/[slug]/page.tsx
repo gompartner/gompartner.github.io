@@ -1,11 +1,12 @@
 import type { Metadata } from "next";
+import type { Project } from "@/lib/types";
 import Image from "next/image";
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import { Check, Plus } from "lucide-react";
 import { PageHead, btnLine, btnPrimary, h2, h3, more, wrap } from "@/components/classic/ui";
 import { SampleGrid } from "@/components/classic/works/SampleGrid";
-import { catalogProjects, demoProjects, findBySlug, groupOf, industryOf, isMaintenance, mobileShotOf, samplesIn, slugOf } from "@/components/classic/works/samples";
+import { isProgram, catalogProjects, demoProjects, findBySlug, groupOf, industryOf, isMaintenance, mobileShotOf, samplesIn, slugOf } from "@/components/classic/works/samples";
 import { estimateFor } from "@/data/classic/pricing";
 import { designConcepts } from "@/data/classic/designConcepts";
 import { maintenanceServices } from "@/data/classic/maintenance";
@@ -26,7 +27,8 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
   return isFolded(p) ? { ...meta, robots: { index: false, follow: true }, alternates: undefined } : meta;
 }
 
-const isFolded = (p: { id: string }) => !catalogProjects.some((x) => x.id === p.id);
+// 유지보수 화면 카탈로그만 검색에서 뺀다. 업무 프로그램 카탈로그는 프로그램 제작 페이지에서 연결되므로 색인한다
+const isFolded = (p: Project) => !catalogProjects.some((x) => x.id === p.id) && !isProgram(p);
 
 const row = "flex justify-between gap-4 border-b border-[#e6e9ee] py-3";
 

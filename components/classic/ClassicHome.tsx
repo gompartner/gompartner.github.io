@@ -12,7 +12,9 @@ import {
   Pause,
   Play,
   Plus,
+  Megaphone,
   MonitorSmartphone,
+  Workflow,
   Repeat,
   ShieldCheck,
   Wrench,
@@ -33,7 +35,7 @@ import { FlowSteps } from "@/components/classic/pricing/StepList";
 
 const NAVY = "#0f1b3d";
 
-// 11-01 홈페이지 제작과 유지보수 두 가지만. 유지보수는 세부 페이지 네 개로
+// 11-01 제작(홈페이지, 랜딩, 업무 프로그램)과 유지보수. 유지보수는 세부 페이지 네 개로
 // 서비스 목록 아이콘(홈페이지 제작 쪽 업종별 구성과 같은 모양)
 const serviceIcon: Record<string, LucideIcon> = { fix: Wrench, takeover: Repeat, update: ShieldCheck, monthly: CalendarCheck };
 
@@ -43,6 +45,18 @@ const services = [
     name: "홈페이지 제작",
     what: "병원, 매장, 전문직, 기업, 학원 홈페이지를 업종에 맞게 만듭니다",
     icon: MonitorSmartphone,
+  },
+  {
+    href: "/classic/landing",
+    name: "랜딩페이지 제작",
+    what: "광고로 들어온 고객의 상담, 예약 신청을 바로 받는 홍보용 페이지를 만듭니다",
+    icon: Megaphone,
+  },
+  {
+    href: "/classic/program",
+    name: "업무 프로그램 제작",
+    what: "엑셀로 하던 주문 취합, 관리, 출력 업무를 웹 프로그램으로 만듭니다",
+    icon: Workflow,
   },
   ...maintenanceServices.map((m) => ({
     href: `/classic/maintenance/${m.id}`,
@@ -61,7 +75,7 @@ const strengths = [
 ];
 
 // 첫 화면 카탈로그: 업종마다 대표 1개씩 썸네일(11-01 점검: 글자 카드만 있어 약함)
-const live = projects.filter((p) => p.demoUrl.startsWith("/demo/") && !PROGRAM_IDS.includes(p.id) && p.category !== "랜딩페이지" && !p.id.startsWith("landing-") && p.kind !== "유지보수");
+const live = projects.filter((p) => p.demoUrl.startsWith("/demo/") && !PROGRAM_IDS.includes(p.id) && p.kind !== "유지보수");
 const PICKS = ["dental-homepage", "korean-restaurant", "law-firm", "company", "academy", "hanok-cafe"];
 const picks = PICKS.map((id) => projects.find((p) => p.id === id)).filter((p) => !!p);
 

@@ -11,13 +11,12 @@ import { pageMeta } from "@/lib/seo";
 const programs = demoProjects.filter(isProgram);
 const plain = (t: string) => t.replaceAll("·", ", ");
 
-// 11-01 접은 서비스라 검색에서 뺀다(noindex, follow). 대표 주소(canonical)는 두지 않는다.
-const meta = pageMeta({
+// 11-01 제작 안의 서비스로 되살림(10-29 사용자 결정)
+export const metadata: Metadata = pageMeta({
   title: "업무 프로그램 제작",
   description: "주문 취합, 쇼핑몰 관리자, 결과지 출력처럼 엑셀로 하던 반복 업무를 웹 프로그램으로 만듭니다. 견적은 범위 확인 뒤 안내합니다.",
   path: "/classic/program",
 });
-export const metadata: Metadata = { ...meta, alternates: {}, robots: { index: false, follow: true } };
 
 const FOR_WHOM = [
   "주문서나 신청서를 엑셀로 모아 손으로 합치는 경우",
@@ -52,10 +51,10 @@ export default function ClassicProgramPage() {
   return (
     <>
       <PageHead
-        title="업무 프로그램"
+        title="업무 프로그램 제작"
         trail={[
           { href: "/classic/homepage", label: "서비스" },
-          { href: "/classic/program", label: "업무 프로그램" },
+          { href: "/classic/program", label: "업무 프로그램 제작" },
         ]}
       />
       <SubTabs items={serviceTabs} current="/classic/program" />

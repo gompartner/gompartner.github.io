@@ -14,6 +14,8 @@ export function LdScript({ data }: { data: object }) {
 
 const offers = [
   { name: "홈페이지 제작", path: "/classic/homepage" },
+  { name: "랜딩페이지 제작", path: "/classic/landing" },
+  { name: "업무 프로그램 제작", path: "/classic/program" },
   ...maintenanceServices.map((s) => ({ name: s.h1, path: `/classic/maintenance/${s.id}` })),
 ];
 
