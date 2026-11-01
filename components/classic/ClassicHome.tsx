@@ -1,12 +1,14 @@
 "use client";
 
 import Image from "next/image";
+import { useEffect, useState } from "react";
 import Link from "next/link";
 import { ArrowUpRight, CheckCircle2, ChevronDown, ChevronRight, Plus } from "lucide-react";
 import { faq, processSteps } from "@/data/classic/faq";
 import { maintenanceServices } from "@/data/classic/maintenance";
 import { projects } from "@/data/classic/projects";
 import { PROGRAM_IDS } from "@/data/classic/programIds";
+import { cn } from "@/lib/utils";
 import { FlowSteps } from "@/components/classic/pricing/StepList";
 
 // 클래식 보기의 첫 화면. 딱 보면 무엇을 하는 곳이고 어떻게 진행되는지 보이게 한다(10-30):
@@ -61,40 +63,102 @@ export function ClassicHome() {
   );
 }
 
-function Hero() {
-  return (
-    <section aria-labelledby="c-hero" className="text-white" style={{ backgroundColor: NAVY }}>
-      <div className="mx-auto grid w-full max-w-[1248px] items-center gap-10 px-4 pb-16 pt-12 md:min-h-[560px] md:grid-cols-[1fr_1.1fr] md:gap-12 md:px-6 md:py-20">
-        <div>
-          <h1 id="c-hero" className="break-keep text-[38px] font-[800] leading-[1.15] tracking-[-0.05em] md:text-[60px]">
-            홈페이지 제작과
-            <br />
-            유지보수
-          </h1>
-          <p className="mt-5 max-w-[520px] break-keep text-[17px] leading-[1.7] text-[#c9d3e6] md:text-[19px]">병원, 매장, 전문직 사무실, 기업, 학원 홈페이지 제작과 유지보수</p>
-          <div className="mt-8 flex flex-wrap gap-3">
-            <Link href="/classic/contact" data-gtm-cta="classic_hero_contact" className="inline-flex h-12 items-center rounded-md bg-white px-6 text-[16px] font-bold text-[#15171c] transition-colors hover:bg-[#e8efff]">
-              상담 신청
-            </Link>
-            <Link href="/classic/works" className="inline-flex h-12 items-center rounded-md border border-white/40 px-6 text-[16px] font-bold text-white transition-colors hover:bg-white/10">
-              카탈로그
-            </Link>
-          </div>
-        </div>
+// 첫 화면 서비스별 슬라이드(11-01): 홈페이지 제작, 유지보수. 6초마다 넘어가고, 마우스를 올리거나 포커스가 있으면 멈춘다.
+// 움직임 줄이기 설정이면 자동으로 넘기지 않는다.
+const heroSlides = [
+  {
+    key: "make",
+    title: "홈페이지 제작",
+    sub: "병원, 매장, 전문직 사무실, 기업, 학원 반응형 홈페이지",
+    more: { href: "/classic/works", label: "카탈로그" },
+    pc: "/images/site/hero-pc.jpg",
+    m: "/images/site/hero-m.jpg",
+  },
+  {
+    key: "care",
+    title: "홈페이지 유지보수",
+    sub: "오류 수정, 업체 이관, 보안 업데이트, 월 관리",
+    more: { href: "/classic/maintenance", label: "유지보수 안내" },
+    pc: "/images/site/hero-care-pc.jpg",
+    m: "/images/site/hero-care-m.jpg",
+  },
+];
 
-        {/* PC 화면 위에 휴대폰 화면을 겹친다. 11-01 카탈로그 대신 곰파트너 사이트 화면(제작, 유지보수 페이지) */}
-        <div aria-hidden className="relative aspect-[16/11] w-full">
-          <div className="absolute left-0 top-0 w-[88%] overflow-hidden rounded-lg bg-white shadow-[0_30px_60px_rgba(0,0,0,.35)]">
-            <div className="flex h-6 items-center gap-1.5 bg-[#e9ecf1] px-3">
-              <span className="h-2 w-2 rounded-full bg-[#c5cbd4]" />
-              <span className="h-2 w-2 rounded-full bg-[#c5cbd4]" />
-              <span className="h-2 w-2 rounded-full bg-[#c5cbd4]" />
+function Hero() {
+  const [cur, setCur] = useState(0);
+  const [hold, setHold] = useState(false);
+  useEffect(() => {
+    if (hold || window.matchMedia("(prefers-reduced-motion: reduce)").matches) return;
+    const t = window.setTimeout(() => setCur((c) => (c + 1) % heroSlides.length), 6000);
+    return () => window.clearTimeout(t);
+  }, [cur, hold]);
+  return (
+    <section
+      aria-labelledby="c-hero"
+      aria-roledescription="carousel"
+      className="relative text-white"
+      style={{ backgroundColor: NAVY }}
+      onMouseEnter={() => setHold(true)}
+      onMouseLeave={() => setHold(false)}
+      onFocus={() => setHold(true)}
+      onBlur={() => setHold(false)}
+    >
+      <h1 id="c-hero" className="sr-only">
+        곰파트너 홈페이지 제작과 유지보수
+      </h1>
+      <div className="mx-auto grid w-full max-w-[1248px] px-4 pb-20 pt-12 md:min-h-[600px] md:px-6 md:pb-24 md:pt-20">
+        {heroSlides.map((sl, i) => (
+          <div
+            key={sl.key}
+            role="group"
+            aria-roledescription="slide"
+            aria-label={`${i + 1} / ${heroSlides.length}, ${sl.title}`}
+            aria-hidden={i !== cur}
+            className={cn("col-start-1 row-start-1 grid items-center gap-10 transition-opacity duration-500 motion-reduce:transition-none md:grid-cols-[1fr_1.1fr] md:gap-12", i === cur ? "opacity-100" : "pointer-events-none opacity-0")}
+          >
+            <div>
+              <p className="break-keep text-[38px] font-[800] leading-[1.15] tracking-[-0.05em] md:text-[60px]">{sl.title}</p>
+              <p className="mt-5 max-w-[520px] break-keep text-[17px] leading-[1.7] text-[#c9d3e6] md:text-[19px]">{sl.sub}</p>
+              <div className="mt-8 flex flex-wrap gap-3">
+                <Link href="/classic/contact" tabIndex={i === cur ? 0 : -1} data-gtm-cta={`classic_hero_contact_${sl.key}`} className="inline-flex h-12 items-center rounded-md bg-white px-6 text-[16px] font-bold text-[#15171c] transition-colors hover:bg-[#e8efff]">
+                  상담 신청
+                </Link>
+                <Link href={sl.more.href} tabIndex={i === cur ? 0 : -1} className="inline-flex h-12 items-center rounded-md border border-white/40 px-6 text-[16px] font-bold text-white transition-colors hover:bg-white/10">
+                  {sl.more.label}
+                </Link>
+              </div>
             </div>
-            <Image src="/images/site/hero-pc.jpg" alt="" width={1440} height={900} priority sizes="(min-width: 768px) 600px, 90vw" className="aspect-[16/10] w-full object-cover object-top" />
+            {/* PC 화면 위에 휴대폰 화면을 겹친다. 제작은 사이트 설계 화면, 유지보수는 월간 점검 보고 화면 */}
+            <div aria-hidden className="relative aspect-[16/11] w-full">
+              <div className="absolute left-0 top-0 w-[88%] overflow-hidden rounded-lg bg-white shadow-[0_30px_60px_rgba(0,0,0,.35)]">
+                <div className="flex h-6 items-center gap-1.5 bg-[#e9ecf1] px-3">
+                  <span className="h-2 w-2 rounded-full bg-[#c5cbd4]" />
+                  <span className="h-2 w-2 rounded-full bg-[#c5cbd4]" />
+                  <span className="h-2 w-2 rounded-full bg-[#c5cbd4]" />
+                </div>
+                <Image src={sl.pc} alt="" width={1440} height={900} priority={i === 0} sizes="(min-width: 768px) 600px, 90vw" className="aspect-[16/10] w-full object-cover object-top" />
+              </div>
+              <div className="absolute bottom-0 right-0 w-[27%] overflow-hidden rounded-[18px] border-[5px] border-[#1c2a52] bg-white shadow-[0_24px_48px_rgba(0,0,0,.4)]">
+                <Image src={sl.m} alt="" width={780} height={1472} sizes="180px" className="aspect-[9/17] w-full object-cover object-top" />
+              </div>
+            </div>
           </div>
-          <div className="absolute bottom-0 right-0 w-[27%] overflow-hidden rounded-[18px] border-[5px] border-[#1c2a52] bg-white shadow-[0_24px_48px_rgba(0,0,0,.4)]">
-            <Image src="/images/site/hero-m.jpg" alt="" width={780} height={1472} sizes="180px" className="aspect-[9/17] w-full object-cover object-top" />
-          </div>
+        ))}
+      </div>
+      <div className="absolute inset-x-0 bottom-6 md:bottom-8">
+        <div className="mx-auto flex w-full max-w-[1248px] items-center gap-2 px-4 md:px-6" role="tablist" aria-label="서비스 선택">
+          {heroSlides.map((sl, i) => (
+            <button
+              key={sl.key}
+              type="button"
+              role="tab"
+              aria-selected={i === cur}
+              onClick={() => setCur(i)}
+              className={cn("h-9 rounded-full px-4 text-[14px] font-bold transition-colors", i === cur ? "bg-white text-[#15171c]" : "bg-white/10 text-white hover:bg-white/20")}
+            >
+              {sl.title}
+            </button>
+          ))}
         </div>
       </div>
     </section>
