@@ -4,14 +4,12 @@ import { useMemo, useEffect, useRef, useState } from "react";
 import { AnimatePresence, motion } from "framer-motion";
 import {
   ArrowDown,
-  ArrowUp,
   Car,
   Check,
   ChevronDown,
   ChevronRight,
   Clock,
   Dumbbell,
-  HelpCircle,
   Lock,
   MapPin,
   QrCode,
@@ -25,7 +23,6 @@ import {
 import { useLocalStorage } from "@/hooks/useLocalStorage";
 import { useDemoToday } from "@/hooks/useDemoToday";
 import { DemoMakerInfo } from "@/components/demos/DemoMakerInfo";
-import { afterSettle, jumpTo } from "@/components/demos/guideScroll";
 
 const STORAGE_KEY = "gs-demo:homepage:v4";
 
@@ -188,12 +185,6 @@ const newReservationId = () => `R${Date.now()}`;
 
 const emptyBooking: BookingState = { locationId: null, date: null, times: [], guests: 1, reservations: [] };
 
-const tutorialSteps = [
-  { target: "map", title: "1. 지점 선택", desc: "지점 목록에서 가까운 지점의 예약하기를 누르세요." },
-  { target: "booking-date", title: "2. 날짜 선택", desc: "앞으로 14일 중 원하는 날짜를 누르세요. 빨간 요일은 주말 요금이 적용됩니다." },
-  { target: "booking-time", title: "3. 시간 선택", desc: "초록 테두리가 예약 가능한 시간이고, 칸 아래 금액이 그 시간 요금입니다. 여러 시간을 이어서 고를 수 있습니다." },
-  { target: "booking-summary", title: "4. 예약 확인, 결제", desc: "총 금액을 확인하고 결제 방법을 고르면 입장 QR이 발급됩니다." },
-];
 
 export function HomepageDemo() {
   const [booking, setBooking, hydrated] = useLocalStorage<BookingState>(STORAGE_KEY, emptyBooking);
@@ -236,67 +227,6 @@ export function HomepageDemo() {
     window.addEventListener("demo:go-home", f);
     return () => window.removeEventListener("demo:go-home", f);
   }, []);
-  // 첫 방문 예약 가이드 (스포트라이트 오버레이)
-  const [tutStep, setTutStep] = useState<number | null>(null);
-  const [tutRect, setTutRect] = useState<{ top: number; left: number; width: number; height: number } | null>(null);
-
-  const openTutorial = (n: number) => {
-    const el = document.getElementById(tutorialSteps[n].target);
-    if (!el) return;
-    // 전역 scroll-behavior:smooth를 우회해 즉시 옮기고, 위치가 멈춘 뒤에 가이드를 띄운다
-    setTutRect(null);
-    jumpTo(el);
-    afterSettle(() => {
-      const r = el.getBoundingClientRect();
-      setTutRect({ top: r.top, left: r.left, width: r.width, height: r.height });
-      setTutStep(n);
-    });
-  };
-
-  // 가이드가 열려 있는 동안 대상 영역 좌표를 스크롤·리사이즈에 맞춰 동기화
-  useEffect(() => {
-    if (tutStep === null) return;
-    const el = document.getElementById(tutorialSteps[tutStep].target);
-    if (!el) return;
-    const sync = () => {
-      const r = el.getBoundingClientRect();
-      setTutRect({ top: r.top, left: r.left, width: r.width, height: r.height });
-    };
-    sync();
-    window.addEventListener("scroll", sync, { passive: true });
-    window.addEventListener("resize", sync);
-    return () => {
-      window.removeEventListener("scroll", sync);
-      window.removeEventListener("resize", sync);
-    };
-  }, [tutStep]);
-
-  const closeTutorial = () => {
-    setTutStep(null);
-    setTutRect(null);
-    // 가이드가 끝나면 첫 단계인 지역 선택(지도)에서 바로 시작하게 한다
-    scrollTo("map");
-  };
-
-  // 가이드는 자동으로 열지 않는다. 한 번도 열지 않았으면 물음표 버튼을 반짝여 알린다(DemoDock과 같은 키).
-  const seenKey = "demo-guide-opened:private-gym";
-  const [tutFresh, setTutFresh] = useState(false);
-  useEffect(() => {
-    const frame = requestAnimationFrame(() => {
-      try {
-        setTutFresh(!localStorage.getItem(seenKey));
-      } catch {}
-    });
-    return () => cancelAnimationFrame(frame);
-  }, []);
-  const openGuide = () => {
-    setTutFresh(false);
-    try {
-      localStorage.setItem(seenKey, "1");
-    } catch {}
-    openTutorial(0);
-  };
-
   const selected = locations.find((l) => l.id === booking.locationId) ?? null;
   // 시간 칸마다 시간대 요금을 더하고, 2명이면 시간당 인원 추가 요금을 붙인다
   const hoursCost =
@@ -542,15 +472,6 @@ export function HomepageDemo() {
                     지점 선택
                   </button>
                 )}
-                <button
-                  type="button"
-                  onClick={openGuide}
-                  aria-label="예약 가이드 보기"
-                  className={`relative shrink-0 rounded-lg border p-2.5 transition-colors hover:border-[#111] hover:text-[#111] ${tutFresh ? "border-[#16A34A] text-[#16A34A]" : "border-stone-200 text-stone-400"}`}
-                >
-                  {tutFresh && <span aria-hidden className="absolute inset-0 rounded-lg bg-[#16A34A]/40 motion-safe:animate-ping" />}
-                  <HelpCircle size={16} aria-hidden className="relative" />
-                </button>
               </div>
             }
           />
@@ -963,98 +884,6 @@ export function HomepageDemo() {
         </div>
       </footer>
 
-      {/* 예약 가이드 오버레이: 해당 영역을 스포트라이트로 비추며 4단계 안내 */}
-      <AnimatePresence>
-        {tutStep !== null && tutRect && (
-          <motion.div
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            exit={{ opacity: 0 }}
-            transition={{ duration: 0.2 }}
-            className="fixed inset-0 z-50"
-            onClick={closeTutorial}
-            role="dialog"
-            aria-label="예약 가이드"
-          >
-            <div
-              className="pointer-events-none absolute rounded-2xl border-2 border-[#16A34A]"
-              style={(() => {
-                // 대상이 화면보다 크거나 가장자리에 붙어도 초록 테두리 4변이 항상 보이게 뷰포트 안쪽으로 클램프
-                const inset = 6;
-                const left = Math.max(tutRect.left - 8, inset);
-                const top = Math.max(tutRect.top - 8, inset);
-                const right = Math.min(tutRect.left + tutRect.width + 8, window.innerWidth - inset);
-                const bottom = Math.min(tutRect.top + tutRect.height + 8, window.innerHeight - inset);
-                return {
-                  top,
-                  left,
-                  width: Math.max(right - left, 0),
-                  height: Math.max(bottom - top, 0),
-                  boxShadow: "0 0 0 9999px rgba(0,0,0,.55)",
-                };
-              })()}
-              aria-hidden
-            />
-            <div
-              className="absolute inset-x-0 bottom-6 mx-auto w-[min(92vw,400px)] rounded-2xl bg-white p-5 shadow-2xl"
-              onClick={(e) => e.stopPropagation()}
-            >
-              <div className="flex items-center justify-between">
-                <p className="font-bold">{tutorialSteps[tutStep].title}</p>
-                <span className="font-mono text-xs text-stone-400">
-                  {tutStep + 1} / {tutorialSteps.length}
-                </span>
-              </div>
-              <p className="mt-2 text-sm leading-relaxed text-stone-500">{tutorialSteps[tutStep].desc}</p>
-              {/* 안내 영역이 충분히 보이지 않으면(살짝 걸친 경우 포함) 방향을 알려주고 눌러서 되돌아가게 한다 */}
-              {(() => {
-                const vh = window.innerHeight;
-                const topBound = 0;
-                const visible =
-                  Math.min(tutRect.top + tutRect.height, vh) - Math.max(tutRect.top, topBound);
-                const needed = Math.min(tutRect.height * 0.5, 200);
-                const dir =
-                  visible >= needed ? null : tutRect.top + tutRect.height / 2 < vh / 2 ? "up" : "down";
-                return (
-                  dir && (
-                    <button
-                      type="button"
-                      onClick={() => openTutorial(tutStep)}
-                      className="mt-3 flex w-full items-center justify-center gap-1.5 rounded-lg bg-[#16A34A]/10 py-2.5 text-sm font-semibold text-[#15803d] transition-colors hover:bg-[#16A34A]/20"
-                    >
-                      {dir === "up" ? <ArrowUp size={14} aria-hidden /> : <ArrowDown size={14} aria-hidden />}
-                      안내 영역으로 이동
-                    </button>
-                  )
-                );
-              })()}
-              <div className="mt-4 flex items-center justify-between">
-                <button type="button" onClick={closeTutorial} className="text-sm text-stone-400 hover:text-stone-600">
-                  건너뛰기
-                </button>
-                <div className="flex gap-2">
-                  {tutStep > 0 && (
-                    <button
-                      type="button"
-                      onClick={() => openTutorial(tutStep - 1)}
-                      className="rounded-lg border border-stone-200 px-4 py-2 text-sm font-semibold"
-                    >
-                      이전
-                    </button>
-                  )}
-                  <button
-                    type="button"
-                    onClick={() => (tutStep < tutorialSteps.length - 1 ? openTutorial(tutStep + 1) : closeTutorial())}
-                    className="rounded-lg bg-[#111] px-4 py-2 text-sm font-bold text-white"
-                  >
-                    {tutStep < tutorialSteps.length - 1 ? "다음" : "시작하기"}
-                  </button>
-                </div>
-              </div>
-            </div>
-          </motion.div>
-        )}
-      </AnimatePresence>
     </div>
   );
 }

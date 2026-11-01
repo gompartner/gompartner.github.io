@@ -11,7 +11,7 @@ if (!slugs.length) {
   console.log("slug를 하나 이상 적어 주세요");
   process.exit(1);
 }
-const HIDE = "[data-gtm-cta^='demo_guide'], .print\\:hidden.fixed { display: none !important }";
+const HIDE = "[data-gtm-cta^='demo_guide'], .demo-topbar, .print\\:hidden.fixed { display: none !important }";
 
 const b = await chromium.launch({ channel: "chrome" });
 for (const slug of slugs) {

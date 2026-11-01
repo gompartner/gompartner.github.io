@@ -331,7 +331,7 @@ export function PresaleDemo() {
         </div>
       </footer>
 
-      {/* 휴대폰: 관심고객 등록 패널 대신 하단 고정 바(태블릿부터는 패널이 보인다). DemoDock 은 이 바 높이를 재서 위로 비켜 선다 */}
+      {/* 휴대폰: 관심고객 등록 패널 대신 하단 고정 바(태블릿부터는 패널이 보인다). */}
       <div className="fixed inset-x-0 bottom-0 z-40 border-t md:hidden" style={{ background: C.paper, borderColor: C.line, paddingBottom: "env(safe-area-inset-bottom)" }}>
         <div className="mx-auto grid max-w-[1200px] grid-cols-[minmax(0,1fr)_minmax(0,1.6fr)] gap-2 px-4 py-2.5">
           <a href={`tel:${TEL.replace(/-/g, "")}`} className={`inline-flex min-h-12 items-center justify-center gap-1.5 rounded-[4px] border text-[16px] font-semibold ${focusRing}`} style={{ borderColor: C.field, color: C.ink, outlineColor: C.accent }}>

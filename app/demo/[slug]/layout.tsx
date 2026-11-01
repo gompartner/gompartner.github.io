@@ -1,7 +1,6 @@
-import { DemoDock } from "@/components/demos/DemoDock";
+import { DemoTopBar } from "@/components/demos/DemoTopBar";
 import { HideInFrame } from "@/components/demos/HideInFrame";
 import { allProjects as projects } from "@/data/projects";
-import { tours } from "@/data/tours";
 
 export default async function DemoLayout({
   children,
@@ -15,12 +14,12 @@ export default async function DemoLayout({
 
   return (
     <>
-      {children}
       {project && (
         <HideInFrame>
-          <DemoDock projectId={project.id} tour={tours[project.id]} />
+          <DemoTopBar projectId={project.id} />
         </HideInFrame>
       )}
+      {children}
     </>
   );
 }
