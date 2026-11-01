@@ -209,17 +209,18 @@ function quadMatrix(w: number, h: number, q: [number, number][]) {
 
 // 키오스크 화면 네 모서리를 매 장면 투영해 실제 화면 DOM을 그 자리에 겹친다
 /* eslint-disable react-hooks/immutability -- useFrame 안에서 겹친 화면의 style을 매 장면 바꾸는 것이 이 부품의 목적이다(React 상태를 거치지 않음) */
-function ScreenProjector({ target }: { target: React.RefObject<HTMLDivElement | null> }) {
+function ScreenProjector({ target, center = [KIOSK_X, SCREEN_Y + 0.04, KIOSK_Z + 0.027], w = SCREEN_W, h = SCREEN_H, px = [450, 800] }: { target: React.RefObject<HTMLDivElement | null>; center?: [number, number, number]; w?: number; h?: number; px?: [number, number] }) {
   const { camera, size } = useThree();
-  const pts = useMemo(() => {
-    const cx = KIOSK_X, cy = SCREEN_Y + 0.04, cz = KIOSK_Z + 0.027;
-    return [
-      new THREE.Vector3(cx - SCREEN_W / 2, cy + SCREEN_H / 2, cz),
-      new THREE.Vector3(cx + SCREEN_W / 2, cy + SCREEN_H / 2, cz),
-      new THREE.Vector3(cx + SCREEN_W / 2, cy - SCREEN_H / 2, cz),
-      new THREE.Vector3(cx - SCREEN_W / 2, cy - SCREEN_H / 2, cz),
-    ];
-  }, []);
+  const [cx, cy, cz] = center;
+  const pts = useMemo(
+    () => [
+      new THREE.Vector3(cx - w / 2, cy + h / 2, cz),
+      new THREE.Vector3(cx + w / 2, cy + h / 2, cz),
+      new THREE.Vector3(cx + w / 2, cy - h / 2, cz),
+      new THREE.Vector3(cx - w / 2, cy - h / 2, cz),
+    ],
+    [cx, cy, cz, w, h],
+  );
   const vr = useRef(new THREE.Vector3());
   useFrame(() => {
     const el = target.current;
@@ -235,7 +236,7 @@ function ScreenProjector({ target }: { target: React.RefObject<HTMLDivElement | 
       q.push([((v.x + 1) / 2) * size.width, ((1 - v.y) / 2) * size.height]);
     }
     el.style.visibility = "visible";
-    el.style.transform = quadMatrix(450, 800, q);
+    el.style.transform = quadMatrix(px[0], px[1], q);
   });
   return null;
 }
@@ -274,8 +275,9 @@ function CameraRig({ phase, reduced, onHome }: { phase: "look" | "zoom" | "back"
  * zoomSignal: 숫자가 바뀔 때마다 키오스크 앞으로 다가간다(바깥 버튼, 학생증 태그 등에서 쓰기).
  * paused: 장면이 가려져 있을 때 그리기를 멈춘다.
  */
-export function KioskScene({ place, children, className = "", zoomSignal = 0, paused = false }: { place: Place; children: ReactNode; className?: string; zoomSignal?: number; paused?: boolean }) {
+export function KioskScene({ place, children, tv, className = "", zoomSignal = 0, paused = false }: { place: Place; children: ReactNode; /** 병원 로비 벽 TV에 띄울 화면(640x352 px로 그림) */ tv?: ReactNode; className?: string; zoomSignal?: number; paused?: boolean }) {
   const screenRef = useRef<HTMLDivElement>(null);
+  const tvRef = useRef<HTMLDivElement>(null);
   const [phase, setPhase] = useState<"look" | "zoom" | "back">("look");
   const active = phase === "zoom";
   const setActive = (v: boolean) => setPhase(v ? "zoom" : "back");
@@ -314,6 +316,7 @@ export function KioskScene({ place, children, className = "", zoomSignal = 0, pa
         <Room place={place} />
         <KioskBody place={place} active={active} onOpen={() => setActive(true)} />
         <ScreenProjector target={screenRef} />
+        {tv && place === "clinic" ? <ScreenProjector target={tvRef} center={[-1.9, 2.0, -2.105]} w={1.42} h={0.78} px={[640, 352]} /> : null}
         <ContactShadows position={[0, 0.005, 0]} opacity={0.35} scale={10} blur={2.4} far={3} />
         <OrbitControls
           enabled={phase === "look"}
@@ -328,6 +331,11 @@ export function KioskScene({ place, children, className = "", zoomSignal = 0, pa
         />
         <CameraRig phase={phase} reduced={reduced} onHome={() => setPhase("look")} />
       </Canvas>
+      {tv && place === "clinic" ? (
+        <div ref={tvRef} aria-hidden className="pointer-events-none absolute left-0 top-0 z-[5] origin-top-left overflow-hidden" style={{ width: 640, height: 352, visibility: "hidden" }}>
+          {tv}
+        </div>
+      ) : null}
       {/* 실제 키오스크 화면. 3D 화면 자리에 원근을 맞춰 겹친다. 다가가기 전에는 누르면 다가간다 */}
       <div
         ref={screenRef}
