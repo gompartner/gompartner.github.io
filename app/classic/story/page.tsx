@@ -21,6 +21,8 @@ const areas = [
   { href: "/classic/homepage", name: "홈페이지 제작", what: "병원, 매장, 전문직, 기업, 학원 반응형 홈페이지" },
   { href: "/classic/landing", name: "랜딩페이지 제작", what: "광고 신청 접수와 알림, 구글 시트 기록" },
   { href: "/classic/program", name: "업무 프로그램 제작", what: "엑셀 반복 업무를 웹 프로그램으로" },
+  { href: "/classic/app", name: "앱 제작", what: "아이폰, 안드로이드 앱과 설치형 웹앱" },
+  { href: "/classic/kiosk", name: "키오스크 화면 제작", what: "접수, 출결, 체크인, 안내 키오스크" },
   { href: "/classic/maintenance", name: "유지보수", what: "오류 수정, 업체 이관, 보안 업데이트, 월 관리" },
 ];
 

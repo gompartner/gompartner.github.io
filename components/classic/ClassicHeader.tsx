@@ -18,14 +18,16 @@ export const classicMenu = [
     items: [],
   },
   {
-    label: "홈페이지 제작",
+    label: "제작",
     href: "/classic/homepage",
-    match: ["/classic/homepage", "/classic/landing", "/classic/program"],
+    match: ["/classic/homepage", "/classic/landing", "/classic/program", "/classic/app", "/classic/kiosk"],
     // 11-01 랜딩, 업무 프로그램은 제작 안에 둔다(10-29 사용자 결정)
     items: [
       { href: "/classic/homepage", label: "홈페이지 제작" },
       { href: "/classic/landing", label: "랜딩페이지 제작" },
       { href: "/classic/program", label: "업무 프로그램 제작" },
+      { href: "/classic/app", label: "앱 제작" },
+      { href: "/classic/kiosk", label: "키오스크 화면 제작" },
     ],
   },
   {

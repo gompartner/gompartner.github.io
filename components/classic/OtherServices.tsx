@@ -7,6 +7,8 @@ export const makeServices = [
   { href: "/classic/homepage", label: "홈페이지 제작" },
   { href: "/classic/landing", label: "랜딩페이지 제작" },
   { href: "/classic/program", label: "업무 프로그램 제작" },
+  { href: "/classic/app", label: "앱 제작" },
+  { href: "/classic/kiosk", label: "키오스크 화면 제작" },
 ];
 
 export function OtherServices({ current, items = makeServices, title = "다른 제작 서비스", id = "other-services" }: { current: string; items?: { href: string; label: string }[]; title?: string; id?: string }) {
@@ -17,7 +19,7 @@ export function OtherServices({ current, items = makeServices, title = "다른 �
         <h2 id={id} className={h3}>
           {title}
         </h2>
-        <ul className="mt-6 grid gap-3 sm:grid-cols-3" role="list">
+        <ul className="mt-6 grid gap-3 sm:grid-cols-2 lg:grid-cols-4" role="list">
           {others.map((o) => (
             <li key={o.href}>
               <Link href={o.href} className="group flex min-h-14 items-center justify-between gap-3 rounded-md border border-[#d9dee5] bg-white px-5 py-3 text-[17px] font-bold transition-colors hover:border-[#256ef4] hover:text-[#256ef4]">

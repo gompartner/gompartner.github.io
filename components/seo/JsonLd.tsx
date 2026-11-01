@@ -16,6 +16,8 @@ const offers = [
   { name: "홈페이지 제작", path: "/classic/homepage" },
   { name: "랜딩페이지 제작", path: "/classic/landing" },
   { name: "업무 프로그램 제작", path: "/classic/program" },
+  { name: "앱 제작", path: "/classic/app" },
+  { name: "키오스크 화면 제작", path: "/classic/kiosk" },
   ...maintenanceServices.map((s) => ({ name: s.h1, path: `/classic/maintenance/${s.id}` })),
 ];
 

@@ -16,6 +16,8 @@ import {
   MonitorSmartphone,
   Workflow,
   Repeat,
+  Smartphone,
+  TabletSmartphone,
   ShieldCheck,
   Wrench,
   type LucideIcon,
@@ -35,7 +37,7 @@ import { FlowSteps } from "@/components/classic/pricing/StepList";
 
 const NAVY = "#0f1b3d";
 
-// 11-01 제작(홈페이지, 랜딩, 업무 프로그램)과 유지보수. 유지보수는 세부 페이지 네 개로
+// 11-01 제작(홈페이지, 랜딩, 업무 프로그램, 앱, 키오스크)과 유지보수. 유지보수는 세부 페이지 네 개로
 // 서비스 목록 아이콘(홈페이지 제작 쪽 업종별 구성과 같은 모양)
 const serviceIcon: Record<string, LucideIcon> = { fix: Wrench, takeover: Repeat, update: ShieldCheck, monthly: CalendarCheck };
 
@@ -57,6 +59,18 @@ const services = [
     name: "업무 프로그램 제작",
     what: "엑셀로 하던 주문 취합, 관리, 출력 업무를 웹 프로그램으로 만듭니다",
     icon: Workflow,
+  },
+  {
+    href: "/classic/app",
+    name: "앱 제작",
+    what: "아이폰, 안드로이드 앱과 설치형 웹앱을 업무에 맞게 만듭니다",
+    icon: Smartphone,
+  },
+  {
+    href: "/classic/kiosk",
+    name: "키오스크 화면 제작",
+    what: "병원 접수, 출결, 체크인, 안내처럼 직접 누르는 화면을 만듭니다",
+    icon: TabletSmartphone,
   },
   ...maintenanceServices.map((m) => ({
     href: `/classic/maintenance/${m.id}`,
@@ -519,8 +533,16 @@ function Services() {
       <h2 id="c-services" className={h2}>
         서비스
       </h2>
-      <ul className="mt-10 border-t-2 border-[#15171c]" role="list">
-        {services.map((s) => (
+      {/* 11-01 제작과 유지보수 두 묶음으로 나눈다 */}
+      <div className="mt-10 space-y-12">
+        {[
+          { label: "제작", items: services.filter((x) => !x.href.startsWith("/classic/maintenance")) },
+          { label: "유지보수", items: services.filter((x) => x.href.startsWith("/classic/maintenance")) },
+        ].map((g) => (
+          <div key={g.label}>
+            <h3 className="mb-4 text-[15px] font-bold text-[#256ef4]">{g.label}</h3>
+          <ul className="border-t-2 border-[#15171c]" role="list">
+            {g.items.map((s) => (
           <li key={s.name} className="border-b border-[#d9dee5]">
             <Link
               href={s.href}
@@ -545,6 +567,9 @@ function Services() {
           </li>
         ))}
       </ul>
+          </div>
+        ))}
+      </div>
     </section>
   );
 }
