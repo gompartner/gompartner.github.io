@@ -1,7 +1,7 @@
 import Image from "next/image";
 import Link from "next/link";
 import { Check } from "lucide-react";
-import { ChannelTalkButton } from "@/components/layout/ChannelTalk";
+import { KakaoChatButton } from "@/components/layout/KakaoChat";
 import { estimateFor, formatWon, landingPlans, manwon, planCommon, plans, runningCostNote, samplesForPlan } from "@/data/pricing";
 import { projects } from "@/data/projects";
 import { SMALL_IMAGE_HEIGHT, SMALL_IMAGE_WIDTH, smallImage } from "@/lib/images";
@@ -84,13 +84,13 @@ export function PricingSection({
                     </div>
                   )}
                   <div className="mt-auto pt-6">
-                    <ChannelTalkButton
+                    <KakaoChatButton
                       cta={`pricing_chat_${plan.id}`}
                       message={`${plan.title}(${manwon(plan.price)}) 패키지로 상담받고 싶어요.`}
                       className="flex h-12 w-full items-center justify-center rounded-[6px] border-[2.5px] border-[#1d1d1f] bg-white text-[17px] font-bold shadow-[3px_3px_0_#1d1d1f] transition-[transform,box-shadow,background-color] duration-150 hover:bg-[#fff3b0] active:translate-x-[3px] active:translate-y-[3px] active:shadow-none"
                     >
                       이 패키지로 상담
-                    </ChannelTalkButton>
+                    </KakaoChatButton>
                   </div>
                 </div>
               </li>

@@ -2,9 +2,9 @@
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { ChannelTalkButton } from "@/components/layout/ChannelTalk";
+import { KakaoChatButton } from "@/components/layout/KakaoChat";
 
-// 휴대폰 화면 아래에 고정하는 상담 줄. 채널톡 말풍선만으로는 무엇을 누르는 버튼인지 알기 어려워서 글자 버튼으로 둔다.
+// 휴대폰 화면 아래에 고정하는 상담 줄. 떠 있는 말풍선만으로는 무엇을 누르는 버튼인지 알기 어려워서 글자 버튼으로 둔다.
 // 가격 페이지에서는 가격 대신 샘플 목록으로 보낸다.
 export function MobileCtaBar() {
   const pathname = usePathname();
@@ -21,9 +21,9 @@ export function MobileCtaBar() {
       >
         {onSample ? "샘플 열기" : onPricing ? "샘플 보기" : "가격 보기"}
       </Link>
-      <ChannelTalkButton cta="mobilebar_chat" className="flex h-12 items-center justify-center rounded-[6px] border-[2.5px] border-[#1d1d1f] bg-accent text-[16px] font-bold text-accent-foreground shadow-[3px_3px_0_#1d1d1f] active:translate-x-[3px] active:translate-y-[3px] active:shadow-none">
-        채팅 상담
-      </ChannelTalkButton>
+      <KakaoChatButton cta="mobilebar_chat" className="flex h-12 items-center justify-center rounded-[6px] border-[2.5px] border-[#1d1d1f] bg-accent text-[16px] font-bold text-accent-foreground shadow-[3px_3px_0_#1d1d1f] active:translate-x-[3px] active:translate-y-[3px] active:shadow-none">
+        카카오톡 상담
+      </KakaoChatButton>
     </div>
   );
 }

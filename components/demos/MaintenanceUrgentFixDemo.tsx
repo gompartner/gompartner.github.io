@@ -8,6 +8,7 @@ import { maintenanceServices, maintenanceSteps, responseTime } from "@/data/main
 import { useReducedMotionSafe } from "@/hooks/useReducedMotionSafe";
 import { useDemoToday } from "@/hooks/useDemoToday";
 import { DemoMakerInfo } from "@/components/demos/DemoMakerInfo";
+import { KAKAO_CHAT_URL } from "@/components/layout/KakaoChat";
 
 /* 급한 오류 수정 샘플. 곰파트너가 직접 운영하는 "오류 수리 접수" 화면처럼 만든다. 장애 현황판(상태 표시, 접수 번호, 타임라인) 모양.
    꽃집, 주소, 사람은 모두 가상이다. 머리글은 곰파트너와 "카탈로그"만 적는다.
@@ -27,7 +28,7 @@ const fix = maintenanceServices.find((s) => s.id === "fix")!;
 const monthly = maintenanceServices.find((s) => s.id === "monthly")!;
 const SYMPTOMS = [...fix.unit!.items, "그 밖의 증상"];
 const CASE_SYMPTOM = fix.unit!.items[1];
-const chat = (msg: string) => `/?chat=1&msg=${encodeURIComponent(msg)}`;
+const chat = (_msg: string) => KAKAO_CHAT_URL;
 const p2 = (n: number) => String(n).padStart(2, "0");
 const nowHM = () => {
   const n = new Date();
@@ -697,7 +698,7 @@ export function MaintenanceUrgentFixDemo() {
                 수리 접수
               </a>
               <a href={chat("급한 오류 수정 카탈로그를 보고 문의합니다.")} className={`${btnSecondary} h-12 px-5 text-[16px]`} style={{ borderColor: C.line }}>
-                채팅 상담
+                카카오톡 상담
               </a>
             </div>
           </div>

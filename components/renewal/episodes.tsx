@@ -8,11 +8,12 @@ import { landingPlans, manwon, plans } from "@/data/pricing";
 import { maintenanceServices, responseTime } from "@/data/maintenance";
 import { useReducedMotionSafe } from "@/hooks/useReducedMotionSafe";
 import { Bubble, EndCard, Gutter, Narration, Panel, Sfx, ink, maskName } from "./ui";
+import { KAKAO_CHAT_URL } from "@/components/layout/KakaoChat";
 
 // 방문자가 고른 상황마다 이어지는 이야기. 컷 순서: 문제 장면 → 곰 등장 → 직접 해 보는 컷 → 회차 끝 카드.
 // 가격·기간·응답 시간 문구는 data/pricing.ts, data/maintenance.ts 값을 그대로 쓴다.
 
-const chat = (msg: string) => `/?chat=1&msg=${encodeURIComponent(msg)}`;
+const chat = (_msg: string) => KAKAO_CHAT_URL;
 
 /** 형광펜이 왼쪽부터 그어지는 강조(600ms). 새로 생긴 줄·정리된 줄에 쓴다. */
 function Marker({ children, on }: { children: React.ReactNode; on: boolean }) {
@@ -315,7 +316,7 @@ export function CompanyEpisode() {
         price={`${manwon(basic.price)}부터 · 작업 ${basic.days}일`}
         items={plans.map((p) => `${p.title} ${manwon(p.price)} · ${p.days}일`)}
         sample={{ href: "/demo/company", label: "정밀가공 회사 샘플 보기" }}
-        consult={{ href: chat("회사 홈페이지 상담을 원합니다."), label: "채팅 상담" }}
+        consult={{ href: chat("회사 홈페이지 상담을 원합니다."), label: "카카오톡 상담" }}
       />
     </>
   );
@@ -466,7 +467,7 @@ export function ProgramEpisode() {
         price="별도 견적"
         items={["필요한 기능과 화면 수를 듣고 견적을 제공합니다.", "주문·엑셀 취합 자동화", "신청·심사 같은 내부 관리 화면", "온라인 강의(LMS)·결과지 출력"]}
         sample={{ href: "/demo/excel-automation", label: "주문 엑셀 자동화 샘플 보기" }}
-        consult={{ href: chat("업무 프로그램 견적 상담을 원합니다."), label: "채팅 상담" }}
+        consult={{ href: chat("업무 프로그램 견적 상담을 원합니다."), label: "카카오톡 상담" }}
       />
     </>
   );

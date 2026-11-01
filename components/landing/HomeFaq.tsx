@@ -1,5 +1,5 @@
 import { ChevronDown } from "lucide-react";
-import { ChannelTalkButton } from "@/components/layout/ChannelTalk";
+import { KakaoChatButton } from "@/components/layout/KakaoChat";
 import { faq } from "@/data/faq";
 
 const h2 = "text-[24px] font-bold leading-[1.5] tracking-[-0.01em] md:text-[32px]";
@@ -27,12 +27,12 @@ export function HomeFaq() {
           ))}
         </div>
         <div className="mt-10">
-          <ChannelTalkButton
+          <KakaoChatButton
             cta="home_faq_chat"
             className="inline-flex h-14 items-center rounded-[6px] bg-accent px-8 text-[17px] font-bold text-accent-foreground transition-colors hover:bg-accent-hover"
           >
-            채팅 상담
-          </ChannelTalkButton>
+            카카오톡 상담
+          </KakaoChatButton>
         </div>
       </div>
     </section>
