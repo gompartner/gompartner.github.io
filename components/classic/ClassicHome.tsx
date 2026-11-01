@@ -15,8 +15,6 @@ import { FlowSteps } from "@/components/classic/pricing/StepList";
 
 const NAVY = "#0f1b3d";
 
-const slugOf = (demoUrl: string) => demoUrl.replace("/demo/", "");
-const heroShot = projects.find((p) => p.id === "company")!;
 
 // 11-01 홈페이지 제작과 유지보수 두 가지만. 유지보수는 세부 페이지 네 개로
 const services = [
@@ -64,7 +62,6 @@ export function ClassicHome() {
 }
 
 function Hero() {
-  const slug = slugOf(heroShot.demoUrl);
   return (
     <section aria-labelledby="c-hero" className="text-white" style={{ backgroundColor: NAVY }}>
       <div className="mx-auto grid w-full max-w-[1248px] items-center gap-10 px-4 pb-16 pt-12 md:min-h-[560px] md:grid-cols-[1fr_1.1fr] md:gap-12 md:px-6 md:py-20">
@@ -85,7 +82,7 @@ function Hero() {
           </div>
         </div>
 
-        {/* PC 화면 위에 휴대폰 화면을 겹친다. 실제 카탈로그 캡처 한 장 */}
+        {/* PC 화면 위에 휴대폰 화면을 겹친다. 11-01 카탈로그 대신 곰파트너 사이트 화면(제작, 유지보수 페이지) */}
         <div aria-hidden className="relative aspect-[16/11] w-full">
           <div className="absolute left-0 top-0 w-[88%] overflow-hidden rounded-lg bg-white shadow-[0_30px_60px_rgba(0,0,0,.35)]">
             <div className="flex h-6 items-center gap-1.5 bg-[#e9ecf1] px-3">
@@ -93,10 +90,10 @@ function Hero() {
               <span className="h-2 w-2 rounded-full bg-[#c5cbd4]" />
               <span className="h-2 w-2 rounded-full bg-[#c5cbd4]" />
             </div>
-            <Image src={heroShot.imageUrl} alt="" width={1440} height={900} priority sizes="(min-width: 768px) 600px, 90vw" className="aspect-[16/10] w-full object-cover object-top" />
+            <Image src="/images/site/hero-pc.jpg" alt="" width={1440} height={900} priority sizes="(min-width: 768px) 600px, 90vw" className="aspect-[16/10] w-full object-cover object-top" />
           </div>
           <div className="absolute bottom-0 right-0 w-[27%] overflow-hidden rounded-[18px] border-[5px] border-[#1c2a52] bg-white shadow-[0_24px_48px_rgba(0,0,0,.4)]">
-            <Image src={`/images/demos/m/${slug}.jpg`} alt="" width={390} height={736} sizes="180px" className="aspect-[9/17] w-full object-cover object-top" />
+            <Image src="/images/site/hero-m.jpg" alt="" width={780} height={1472} sizes="180px" className="aspect-[9/17] w-full object-cover object-top" />
           </div>
         </div>
       </div>
