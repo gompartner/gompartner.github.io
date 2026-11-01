@@ -235,3 +235,6 @@ input[type="time"]::-webkit-date-and-time-value {
   min-height: 48px;
   text-overflow: ellipsis;
 }
+
+/* 첫 화면 서비스 슬라이드 진행 막대 */
+@keyframes hero-progress { from { width: 0% } to { width: 100% } }

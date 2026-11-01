@@ -3,7 +3,7 @@
 import Image from "next/image";
 import { useEffect, useState } from "react";
 import Link from "next/link";
-import { ArrowUpRight, CheckCircle2, ChevronDown, ChevronRight, Plus } from "lucide-react";
+import { ArrowUpRight, CheckCircle2, ChevronDown, ChevronLeft, ChevronRight, Plus } from "lucide-react";
 import { faq, processSteps } from "@/data/classic/faq";
 import { maintenanceServices } from "@/data/classic/maintenance";
 import { projects } from "@/data/classic/projects";
@@ -63,40 +63,36 @@ export function ClassicHome() {
   );
 }
 
-// 첫 화면 서비스별 슬라이드(11-01): 홈페이지 제작, 유지보수. 6초마다 넘어가고, 마우스를 올리거나 포커스가 있으면 멈춘다.
-// 움직임 줄이기 설정이면 자동으로 넘기지 않는다.
+// 첫 화면 서비스별 슬라이드(11-01): 서비스 5개, 화면 안은 서비스마다 납품하는 문서. 7초마다 넘어가고 아래 탭에 진행 막대.
+// 마우스를 올리거나 포커스가 있으면 멈추고, 움직임 줄이기 설정이면 자동으로 넘기지 않는다.
 const heroSlides = [
-  {
-    key: "make",
-    title: "홈페이지 제작",
-    sub: "병원, 매장, 전문직 사무실, 기업, 학원 반응형 홈페이지",
-    more: { href: "/classic/works", label: "카탈로그" },
-    pc: "/images/site/hero-pc.jpg",
-    m: "/images/site/hero-m.jpg",
-  },
-  {
-    key: "care",
-    title: "홈페이지 유지보수",
-    sub: "오류 수정, 업체 이관, 보안 업데이트, 월 관리",
-    more: { href: "/classic/maintenance", label: "유지보수 안내" },
-    pc: "/images/site/hero-care-pc.jpg",
-    m: "/images/site/hero-care-m.jpg",
-  },
+  { key: "make", w: 1440, h: 900, title: "홈페이지 제작", sub: "병원, 매장, 전문직 사무실, 기업, 학원 반응형 홈페이지", points: ["업종별 법정 고지 검토", "원본 소스와 인계 문서", "1개월 무상 하자보수"], href: "/classic/homepage" },
+  { key: "fix", w: 1060, h: 752, title: "오류 수정", sub: "접속 불가, 화면 깨짐, 문의 메일 미수신", points: ["24시간 내 회신", "원인 확인 후 견적", "장애 처리 내역서"], href: "/classic/maintenance/fix" },
+  { key: "takeover", w: 1060, h: 790, title: "업체 이관", sub: "기존 업체 연락 두절 시 인수", points: ["호스팅, 도메인 계정으로 인수", "전체 백업과 구성 정리", "인수 점검 보고서"], href: "/classic/maintenance/takeover" },
+  { key: "update", w: 1060, h: 752, title: "보안 업데이트", sub: "워드프레스, 그누보드, PHP", points: ["작업 전 전체 백업", "협의한 시간에 작업", "업데이트 결과서"], href: "/classic/maintenance/update" },
+  { key: "monthly", w: 1060, h: 714, title: "월 관리", sub: "문구, 사진, 공지 수정과 정기 점검", points: ["월 건수 단위 계약", "도메인, SSL 만료 알림", "월간 점검 보고서"], href: "/classic/maintenance/monthly" },
 ];
+const HERO_MS = 7000;
 
 function Hero() {
   const [cur, setCur] = useState(0);
   const [hold, setHold] = useState(false);
+  const [reduced, setReduced] = useState(false);
   useEffect(() => {
-    if (hold || window.matchMedia("(prefers-reduced-motion: reduce)").matches) return;
-    const t = window.setTimeout(() => setCur((c) => (c + 1) % heroSlides.length), 6000);
+    const f = requestAnimationFrame(() => setReduced(window.matchMedia("(prefers-reduced-motion: reduce)").matches));
+    return () => cancelAnimationFrame(f);
+  }, []);
+  useEffect(() => {
+    if (hold || reduced) return;
+    const t = window.setTimeout(() => setCur((c) => (c + 1) % heroSlides.length), HERO_MS);
     return () => window.clearTimeout(t);
-  }, [cur, hold]);
+  }, [cur, hold, reduced]);
+  const go = (n: number) => setCur((n + heroSlides.length) % heroSlides.length);
   return (
     <section
       aria-labelledby="c-hero"
       aria-roledescription="carousel"
-      className="relative text-white"
+      className="relative overflow-hidden text-white"
       style={{ backgroundColor: NAVY }}
       onMouseEnter={() => setHold(true)}
       onMouseLeave={() => setHold(false)}
@@ -106,7 +102,9 @@ function Hero() {
       <h1 id="c-hero" className="sr-only">
         곰파트너 홈페이지 제작과 유지보수
       </h1>
-      <div className="mx-auto grid w-full max-w-[1248px] px-4 pb-20 pt-12 md:min-h-[600px] md:px-6 md:pb-24 md:pt-20">
+      {/* 옅은 모눈 배경 */}
+      <div aria-hidden className="pointer-events-none absolute inset-0 opacity-[0.07]" style={{ backgroundImage: "linear-gradient(#fff 1px, transparent 1px), linear-gradient(90deg, #fff 1px, transparent 1px)", backgroundSize: "48px 48px" }} />
+      <div className="relative mx-auto grid w-full max-w-[1248px] px-4 pb-8 pt-12 md:min-h-[620px] md:px-6 md:pb-10 md:pt-16">
         {heroSlides.map((sl, i) => (
           <div
             key={sl.key}
@@ -114,51 +112,76 @@ function Hero() {
             aria-roledescription="slide"
             aria-label={`${i + 1} / ${heroSlides.length}, ${sl.title}`}
             aria-hidden={i !== cur}
-            className={cn("col-start-1 row-start-1 grid items-center gap-10 transition-opacity duration-500 motion-reduce:transition-none md:grid-cols-[1fr_1.1fr] md:gap-12", i === cur ? "opacity-100" : "pointer-events-none opacity-0")}
+            className={cn("col-start-1 row-start-1 grid items-center gap-10 transition-opacity duration-500 motion-reduce:transition-none md:grid-cols-[1fr_1.15fr] md:gap-14", i === cur ? "opacity-100" : "pointer-events-none opacity-0")}
           >
             <div>
-              <p className="break-keep text-[38px] font-[800] leading-[1.15] tracking-[-0.05em] md:text-[60px]">{sl.title}</p>
-              <p className="mt-5 max-w-[520px] break-keep text-[17px] leading-[1.7] text-[#c9d3e6] md:text-[19px]">{sl.sub}</p>
+              <p className="text-[15px] font-bold tabular-nums text-[#8fb4ff]">
+                {String(i + 1).padStart(2, "0")} / {String(heroSlides.length).padStart(2, "0")}
+              </p>
+              <p className="mt-3 break-keep text-[40px] font-[800] leading-[1.12] tracking-[-0.05em] md:text-[64px]">{sl.title}</p>
+              <p className="mt-4 max-w-[520px] break-keep text-[17px] leading-[1.7] text-[#c9d3e6] md:text-[19px]">{sl.sub}</p>
+              <ul className="mt-6 space-y-2.5" role="list">
+                {sl.points.map((pt) => (
+                  <li key={pt} className="flex items-center gap-2.5 text-[16px] font-bold md:text-[17px]">
+                    <CheckCircle2 size={20} aria-hidden className="shrink-0 text-[#8fb4ff]" />
+                    {pt}
+                  </li>
+                ))}
+              </ul>
               <div className="mt-8 flex flex-wrap gap-3">
-                <Link href="/classic/contact" tabIndex={i === cur ? 0 : -1} data-gtm-cta={`classic_hero_contact_${sl.key}`} className="inline-flex h-12 items-center rounded-md bg-white px-6 text-[16px] font-bold text-[#15171c] transition-colors hover:bg-[#e8efff]">
+                <Link href="/classic/contact" tabIndex={i === cur ? 0 : -1} data-gtm-cta={`classic_hero_contact_${sl.key}`} className="inline-flex h-12 items-center rounded-md bg-[#256ef4] px-6 text-[16px] font-bold text-white transition-colors hover:bg-[#0b50d0]">
                   상담 신청
                 </Link>
-                <Link href={sl.more.href} tabIndex={i === cur ? 0 : -1} className="inline-flex h-12 items-center rounded-md border border-white/40 px-6 text-[16px] font-bold text-white transition-colors hover:bg-white/10">
-                  {sl.more.label}
+                <Link href={sl.href} tabIndex={i === cur ? 0 : -1} className="inline-flex h-12 items-center gap-1 rounded-md border border-white/40 px-6 text-[16px] font-bold text-white transition-colors hover:bg-white/10">
+                  자세히 보기 <ChevronRight size={16} aria-hidden />
                 </Link>
               </div>
             </div>
-            {/* PC 화면 위에 휴대폰 화면을 겹친다. 제작은 사이트 설계 화면, 유지보수는 월간 점검 보고 화면 */}
-            <div aria-hidden className="relative aspect-[16/11] w-full">
-              <div className="absolute left-0 top-0 w-[88%] overflow-hidden rounded-lg bg-white shadow-[0_30px_60px_rgba(0,0,0,.35)]">
-                <div className="flex h-6 items-center gap-1.5 bg-[#e9ecf1] px-3">
-                  <span className="h-2 w-2 rounded-full bg-[#c5cbd4]" />
-                  <span className="h-2 w-2 rounded-full bg-[#c5cbd4]" />
-                  <span className="h-2 w-2 rounded-full bg-[#c5cbd4]" />
-                </div>
-                <Image src={sl.pc} alt="" width={1440} height={900} priority={i === 0} sizes="(min-width: 768px) 600px, 90vw" className="aspect-[16/10] w-full object-cover object-top" />
-              </div>
-              <div className="absolute bottom-0 right-0 w-[27%] overflow-hidden rounded-[18px] border-[5px] border-[#1c2a52] bg-white shadow-[0_24px_48px_rgba(0,0,0,.4)]">
-                <Image src={sl.m} alt="" width={780} height={1472} sizes="180px" className="aspect-[9/17] w-full object-cover object-top" />
-              </div>
+            {/* 브라우저 틀 없이 문서 종이를 겹쳐 놓는다. 앞장은 이 서비스에서 실제로 드리는 문서 모양 */}
+            <div aria-hidden className="relative mx-auto w-full max-w-[640px] px-3 py-6 md:px-0">
+              <div className="absolute inset-x-8 bottom-3 top-1 rotate-[5deg] rounded-md bg-white/25" />
+              <div className="absolute inset-x-5 bottom-4 top-3 rotate-[2.5deg] rounded-md bg-white/60 shadow-[0_10px_30px_rgba(0,0,0,.25)]" />
+              <Image
+                src={`/images/site/hero-${sl.key}-doc.jpg`}
+                alt=""
+                width={sl.w}
+                height={sl.h}
+                priority={i === 0}
+                sizes="(min-width: 768px) 640px, 92vw"
+                className="relative h-auto w-full -rotate-[1deg] rounded-md shadow-[0_30px_60px_rgba(0,0,0,.45)]"
+              />
             </div>
           </div>
         ))}
       </div>
-      <div className="absolute inset-x-0 bottom-6 md:bottom-8">
-        <div className="mx-auto flex w-full max-w-[1248px] items-center gap-2 px-4 md:px-6" role="tablist" aria-label="서비스 선택">
-          {heroSlides.map((sl, i) => (
-            <button
-              key={sl.key}
-              type="button"
-              role="tab"
-              aria-selected={i === cur}
-              onClick={() => setCur(i)}
-              className={cn("h-9 rounded-full px-4 text-[14px] font-bold transition-colors", i === cur ? "bg-white text-[#15171c]" : "bg-white/10 text-white hover:bg-white/20")}
-            >
-              {sl.title}
+      {/* 서비스 탭: 진행 막대가 차오르면 다음 서비스로 */}
+      <div className="relative border-t border-white/10">
+        <div className="mx-auto flex w-full max-w-[1248px] items-stretch px-4 md:px-6">
+          <div className="flex min-w-0 flex-1 overflow-x-auto" role="tablist" aria-label="서비스 선택">
+            {heroSlides.map((sl, i) => (
+              <button
+                key={sl.key}
+                type="button"
+                role="tab"
+                aria-selected={i === cur}
+                onClick={() => go(i)}
+                className={cn("relative shrink-0 whitespace-nowrap px-4 py-4 text-left text-[14px] font-bold transition-colors md:flex-1 md:px-5 md:py-5 md:text-[16px]", i === cur ? "text-white" : "text-white/55 hover:text-white")}
+              >
+                {sl.title}
+                <span aria-hidden className="absolute inset-x-0 top-0 h-[3px] bg-white/10">
+                  {i === cur && <span key={`${cur}-${hold}`} className="block h-full bg-[#8fb4ff]" style={reduced || hold ? { width: "100%" } : { animation: `hero-progress ${HERO_MS}ms linear forwards` }} />}
+                </span>
+              </button>
+            ))}
+          </div>
+          <div className="hidden items-center gap-2 pl-4 md:flex">
+            <button type="button" onClick={() => go(cur - 1)} aria-label="이전 서비스" className="grid h-10 w-10 place-items-center rounded-full border border-white/30 hover:bg-white/10">
+              <ChevronLeft size={18} aria-hidden />
             </button>
-          ))}
+            <button type="button" onClick={() => go(cur + 1)} aria-label="다음 서비스" className="grid h-10 w-10 place-items-center rounded-full border border-white/30 hover:bg-white/10">
+              <ChevronRight size={18} aria-hidden />
+            </button>
+          </div>
         </div>
       </div>
     </section>
