@@ -18,6 +18,11 @@ import {
 import { AnimatePresence, motion, useReducedMotion } from "framer-motion";
 import {
   ALargeSmall,
+  BellRing,
+  Pause,
+  Play,
+  Smartphone,
+  Tv,
   ArrowDownToLine,
   ChevronLeft,
   CircleCheck,
@@ -35,6 +40,7 @@ import {
   Volume2,
   VolumeOff,
 } from "lucide-react";
+import QRCode from "qrcode";
 import { DemoMakerInfo } from "@/components/demos/DemoMakerInfo";
 import { daysAgo, fmtDot, fmtKo, useDemoToday } from "@/hooks/useDemoToday";
 
@@ -65,6 +71,22 @@ type Step = "idle" | "type" | "verify" | "purpose" | "confirm" | "done";
 type Visit = "first" | "return";
 type Phase = "phone" | "birth" | "found";
 type PurposeId = "general" | "checkup" | "vaccine" | "rx";
+type Room = "1진료실" | "검진실" | "주사실";
+const ROOMS: Room[] = ["1진료실", "검진실", "주사실"];
+type Queue = Record<Room, { now: number; wait: number[] }>;
+// 접수 전 대기실 상황. 번호는 의원 전체가 한 줄로 이어진다.
+const INITIAL_QUEUE: Queue = {
+  "1진료실": { now: 18, wait: [19, 21, 22] },
+  검진실: { now: 17, wait: [20] },
+  주사실: { now: 16, wait: [] },
+};
+type Ticket = {
+  no: number;
+  time: string;
+  room: Room;
+  ahead: number;
+  wait: number;
+};
 
 const STEPS: { id: Step; label: string }[] = [
   { id: "type", label: "접수 구분" },
@@ -81,9 +103,8 @@ const PURPOSES: {
   icon: typeof Stethoscope;
   chipTitle: string;
   chips: string[];
-  ahead: number;
-  wait: number;
-  room: string;
+  per: number;
+  room: Room;
 }[] = [
   {
     id: "general",
@@ -104,8 +125,7 @@ const PURPOSES: {
       "혈압",
       "당뇨",
     ],
-    ahead: 4,
-    wait: 20,
+    per: 5,
     room: "1진료실",
   },
   {
@@ -121,8 +141,7 @@ const PURPOSES: {
       "채용 검진",
       "혈액 검사",
     ],
-    ahead: 3,
-    wait: 25,
+    per: 8,
     room: "검진실",
   },
   {
@@ -132,8 +151,7 @@ const PURPOSES: {
     icon: Syringe,
     chipTitle: "접종 종류를 골라 주세요",
     chips: ["독감", "코로나19", "폐렴구균", "대상포진", "파상풍"],
-    ahead: 2,
-    wait: 10,
+    per: 4,
     room: "주사실",
   },
   {
@@ -143,17 +161,9 @@ const PURPOSES: {
     icon: Pill,
     chipTitle: "처방 받으실 약을 골라 주세요",
     chips: ["혈압약", "당뇨약", "고지혈증약", "위장약", "그 밖의 약"],
-    ahead: 2,
-    wait: 5,
+    per: 3,
     room: "1진료실",
   },
-];
-
-const HOURS: { day: string; time: string; dow: number[] }[] = [
-  { day: "평일", time: "09:00 - 18:30", dow: [1, 2, 3, 4, 5] },
-  { day: "토요일", time: "09:00 - 13:00", dow: [6] },
-  { day: "점심시간", time: "13:00 - 14:00", dow: [] },
-  { day: "일요일, 공휴일", time: "휴진", dow: [0] },
 ];
 
 const VoiceCtx = createContext(false);
@@ -170,7 +180,14 @@ const validBirth = (b: string) => {
 
 export function KioskClinicDemo() {
   const today = useDemoToday();
-  const reduce = useReducedMotion();
+  // 서버 렌더에는 사용자 설정이 없으므로, 화면이 붙은 뒤에만 움직임 줄이기 설정을 반영한다(하이드레이션 불일치 방지).
+  const prefersReduced = useReducedMotion();
+  const [mounted, setMounted] = useState(false);
+  useEffect(() => {
+    const frame = requestAnimationFrame(() => setMounted(true));
+    return () => cancelAnimationFrame(frame);
+  }, []);
+  const reduce = mounted && !!prefersReduced;
 
   const [step, setStep] = useState<Step>("idle");
   const [visit, setVisit] = useState<Visit>("return");
@@ -181,9 +198,10 @@ export function KioskClinicDemo() {
   const [purpose, setPurpose] = useState<PurposeId | null>(null);
   const [chips, setChips] = useState<string[]>([]);
   const [agree, setAgree] = useState(false);
-  const [ticket, setTicket] = useState<{ no: number; time: string } | null>(
-    null,
-  );
+  const [ticket, setTicket] = useState<Ticket | null>(null);
+  const [mine, setMine] = useState<Ticket | null>(null);
+  const [queue, setQueue] = useState<Queue>(INITIAL_QUEUE);
+  const [called, setCalled] = useState<{ room: Room; no: number } | null>(null);
   const [nextNo, setNextNo] = useState(23);
   const [countdown, setCountdown] = useState(10);
 
@@ -334,8 +352,38 @@ export function KioskClinicDemo() {
     } else if (step === "confirm") setStep("purpose");
   };
 
+  // 접수 뒤 내 진료실 순서를 6초마다 한 명씩 불러, 대기실 화면과 휴대폰 화면이 함께 바뀌게 한다.
+  useEffect(() => {
+    if (!mine || queue[mine.room].now === mine.no) return;
+    const id = window.setTimeout(() => {
+      setQueue((q) => {
+        const r = q[mine.room];
+        if (!r.wait.length) return q;
+        const [next, ...rest] = r.wait;
+        setCalled({ room: mine.room, no: next });
+        return { ...q, [mine.room]: { now: next, wait: rest } };
+      });
+    }, 6000);
+    return () => window.clearTimeout(id);
+  }, [mine, queue]);
+
   const submit = () => {
-    setTicket({ no: nextNo, time: now ?? "09:00" });
+    if (!purposeInfo) return;
+    const room = purposeInfo.room;
+    const ahead = queue[room].wait.length;
+    const t: Ticket = {
+      no: nextNo,
+      time: now ?? "09:00",
+      room,
+      ahead,
+      wait: Math.max(3, ahead * purposeInfo.per),
+    };
+    setQueue((q) => ({
+      ...q,
+      [room]: { ...q[room], wait: [...q[room].wait, nextNo] },
+    }));
+    setTicket(t);
+    setMine(t);
     setNextNo((n) => n + 1);
     setCountdown(10);
     setStep("done");
@@ -504,7 +552,7 @@ export function KioskClinicDemo() {
                   low={low}
                   big={big}
                   voice={voice}
-                  today={today}
+                  reduce={!!reduce}
                   onStart={() => setStep("type")}
                   onBig={() => setBig((v) => !v)}
                   onVoice={() => setVoice((v) => !v)}
@@ -998,54 +1046,74 @@ export function KioskClinicDemo() {
 
   return (
     <div className="min-h-screen bg-[#E8E6E2] md:bg-[linear-gradient(180deg,#ECEAE6_0%,#ECEAE6_74%,#D6D1CA_74%,#D6D1CA_100%)]">
-      <div className="flex flex-col items-center md:pt-5">
-        {/* 키오스크 몸체 */}
-        <div className="w-full md:w-auto md:rounded-[30px] md:border md:border-[#CFD4D8] md:bg-[#FBFBFA] md:p-[14px] md:shadow-[0_18px_40px_-18px_rgba(30,40,50,0.35)]">
-          <div
-            className="hidden items-center justify-center pb-[10px] md:flex"
-            aria-hidden
-          >
-            <span className="h-[6px] w-[6px] rounded-full bg-[#9AA4AB]" />
-          </div>
-          <div className="relative w-full [container-type:inline-size] md:w-[calc(max(500px,100vh-250px)*9/16)]">
-            <div className="relative aspect-[9/16] w-full overflow-hidden md:rounded-[10px] md:ring-[6px] md:ring-[#1D252B]">
-              {screen}
+      <div className="mx-auto flex w-full max-w-[1200px] flex-col items-center md:flex-row md:items-start md:justify-center md:gap-12 md:px-6 md:pt-5">
+        <div className="flex w-full flex-col items-center md:w-auto">
+          {/* 키오스크 몸체 */}
+          <div className="w-full md:w-auto md:rounded-[30px] md:border md:border-[#CFD4D8] md:bg-[#FBFBFA] md:p-[14px] md:shadow-[0_18px_40px_-18px_rgba(30,40,50,0.35)]">
+            <div
+              className="hidden items-center justify-center pb-[10px] md:flex"
+              aria-hidden
+            >
+              <span className="h-[6px] w-[6px] rounded-full bg-[#9AA4AB]" />
+            </div>
+            <div className="relative w-full [container-type:inline-size] md:w-[calc(max(500px,100vh-250px)*9/16)]">
+              <div className="relative aspect-[9/16] w-full overflow-hidden md:rounded-[10px] md:ring-[6px] md:ring-[#1D252B]">
+                {screen}
+              </div>
+            </div>
+            {/* 카드 단말기, 번호표 출구 */}
+            <div
+              className="hidden items-center justify-between px-3 pb-1 pt-4 md:flex"
+              aria-hidden
+            >
+              <div className="flex items-center gap-2 text-[13px] font-semibold text-[#55636C]">
+                <CreditCard className="h-5 w-5" />
+                <span className="h-[8px] w-[56px] rounded-full bg-[#2B343A]" />
+              </div>
+              <div className="relative flex flex-col items-center">
+                <span className="relative z-10 h-[10px] w-[96px] rounded-full bg-[#2B343A]" />
+                <AnimatePresence>
+                  {step === "done" && (
+                    <motion.span
+                      key="paper"
+                      className="-mt-[5px] block w-[78px] rounded-b-[3px] border border-[#D9DDE0] bg-white"
+                      initial={reduce ? false : { height: 0 }}
+                      animate={{ height: 34 }}
+                      exit={{ opacity: 0 }}
+                      transition={
+                        reduce
+                          ? { duration: 0 }
+                          : { duration: 1.1, ease: "easeOut", delay: 0.3 }
+                      }
+                    />
+                  )}
+                </AnimatePresence>
+              </div>
             </div>
           </div>
-          {/* 카드 단말기, 번호표 출구 */}
-          <div
-            className="hidden items-center justify-between px-3 pb-1 pt-4 md:flex"
-            aria-hidden
-          >
-            <div className="flex items-center gap-2 text-[13px] font-semibold text-[#55636C]">
-              <CreditCard className="h-5 w-5" />
-              <span className="h-[8px] w-[56px] rounded-full bg-[#2B343A]" />
-            </div>
-            <div className="relative flex flex-col items-center">
-              <span className="relative z-10 h-[10px] w-[96px] rounded-full bg-[#2B343A]" />
-              <AnimatePresence>
-                {step === "done" && (
-                  <motion.span
-                    key="paper"
-                    className="-mt-[5px] block w-[78px] rounded-b-[3px] border border-[#D9DDE0] bg-white"
-                    initial={reduce ? false : { height: 0 }}
-                    animate={{ height: 34 }}
-                    exit={{ opacity: 0 }}
-                    transition={
-                      reduce
-                        ? { duration: 0 }
-                        : { duration: 1.1, ease: "easeOut", delay: 0.3 }
-                    }
-                  />
-                )}
-              </AnimatePresence>
-            </div>
+          {/* 받침대 */}
+          <div className="hidden flex-col items-center md:flex" aria-hidden>
+            <div className="h-[34px] w-[90px] bg-[linear-gradient(90deg,#C9CED2,#E6E9EB,#C9CED2)]" />
+            <div className="h-[16px] w-[260px] rounded-[50%] bg-[#BFC5CA] shadow-[0_10px_20px_-8px_rgba(0,0,0,0.35)]" />
           </div>
         </div>
-        {/* 받침대 */}
-        <div className="hidden flex-col items-center md:flex" aria-hidden>
-          <div className="h-[34px] w-[90px] bg-[linear-gradient(90deg,#C9CED2,#E6E9EB,#C9CED2)]" />
-          <div className="h-[16px] w-[260px] rounded-[50%] bg-[#BFC5CA] shadow-[0_10px_20px_-8px_rgba(0,0,0,0.35)]" />
+        {/* 키오스크와 이어지는 화면 */}
+        <div className="flex w-full flex-col gap-6 px-4 pt-6 md:w-[360px] md:shrink-0 md:px-0 md:pt-[40px]">
+          <WaitingTv
+            queue={queue}
+            called={called}
+            reduce={!!reduce}
+            now={now}
+          />
+          {mine && (
+            <PhoneWait
+              key={mine.no}
+              mine={mine}
+              queue={queue}
+              reduce={!!reduce}
+              now={now}
+            />
+          )}
         </div>
       </div>
       <div className="mx-auto max-w-[1200px] px-4 pb-8">
@@ -1098,180 +1166,6 @@ function StepBody({
         )}
       </div>
       <div className={low ? "mt-auto" : ""}>{children}</div>
-    </div>
-  );
-}
-
-function IdleView({
-  low,
-  big,
-  voice,
-  today,
-  onStart,
-  onBig,
-  onVoice,
-  onLow,
-}: {
-  low: boolean;
-  big: boolean;
-  voice: boolean;
-  today: Date;
-  onStart: () => void;
-  onBig: () => void;
-  onVoice: () => void;
-  onLow: () => void;
-}) {
-  const dow = today.getDay();
-  const start = (
-    <button
-      type="button"
-      onClick={onStart}
-      aria-label="접수 시작"
-      className={`flex w-full flex-col items-center justify-center text-center ${FOCUS}`}
-      style={{
-        minHeight: low ? g(560) : g(860),
-        borderRadius: u(28),
-        background: C.teal,
-        color: "#fff",
-        padding: `${u(56)} ${u(40)}`,
-        gap: u(40),
-      }}
-    >
-      <span
-        className="grid place-items-center"
-        style={{
-          width: u(200),
-          height: u(200),
-          borderRadius: "50%",
-          background: "rgba(255,255,255,0.14)",
-        }}
-      >
-        <Pointer aria-hidden style={{ width: u(110), height: u(110) }} />
-      </span>
-      <span
-        className="font-bold"
-        style={{ fontSize: t(82), lineHeight: 1.25, letterSpacing: "-0.02em" }}
-      >
-        접수하시려면
-        <br />
-        화면을 눌러 주세요
-      </span>
-      <span className="font-medium" style={{ fontSize: f(38), opacity: 0.95 }}>
-        초진, 재진 모두 여기서 접수합니다
-      </span>
-    </button>
-  );
-
-  const hours = (
-    <section
-      aria-label="오늘 진료시간"
-      style={{
-        border: `${u(3)} solid ${C.line}`,
-        borderRadius: u(24),
-        padding: `${u(32)} ${u(44)}`,
-      }}
-    >
-      <h2
-        className="flex items-center font-bold"
-        style={{
-          fontSize: f(42),
-          gap: u(14),
-          marginBottom: u(16),
-          color: C.teal,
-        }}
-      >
-        <Clock aria-hidden style={{ width: u(48), height: u(48) }} />
-        진료시간
-      </h2>
-      <dl className="grid">
-        {HOURS.map((h, i) => {
-          const isToday = h.dow.includes(dow) && h.time !== "휴진";
-          return (
-            <div
-              key={h.day}
-              className="flex items-center justify-between"
-              style={{
-                padding: `${u(14)} ${u(20)}`,
-                margin: `0 ${u(-20)}`,
-                borderRadius: u(12),
-                background: isToday ? C.tealSoft : "transparent",
-                borderTop:
-                  i && !isToday
-                    ? `${u(2)} solid #E3E9EC`
-                    : `${u(2)} solid transparent`,
-              }}
-            >
-              <dt
-                className="flex items-center font-semibold"
-                style={{ fontSize: f(38), gap: u(14) }}
-              >
-                {h.day}
-                {isToday && (
-                  <span
-                    className="font-bold"
-                    style={{
-                      fontSize: f(28),
-                      background: C.teal,
-                      color: "#fff",
-                      borderRadius: u(8),
-                      padding: `${u(4)} ${u(14)}`,
-                    }}
-                  >
-                    오늘
-                  </span>
-                )}
-              </dt>
-              <dd
-                className="font-semibold tabular-nums"
-                style={{
-                  fontSize: f(38),
-                  color: h.time === "휴진" ? C.danger : C.ink,
-                }}
-              >
-                {h.time}
-              </dd>
-            </div>
-          );
-        })}
-      </dl>
-    </section>
-  );
-
-  const a11y = (
-    <div className="grid grid-cols-3" style={{ gap: u(20) }}>
-      <IdleToggle label="큰 글씨" icon={ALargeSmall} on={big} onClick={onBig} />
-      <IdleToggle
-        label="음성 안내"
-        icon={voice ? Volume2 : VolumeOff}
-        on={voice}
-        onClick={onVoice}
-      />
-      <IdleToggle
-        label="낮은 화면"
-        icon={ArrowDownToLine}
-        on={low}
-        onClick={onLow}
-      />
-    </div>
-  );
-
-  return (
-    <div className="flex min-h-full flex-1 flex-col" style={{ gap: u(32) }}>
-      {low ? (
-        <>
-          {hours}
-          <div className="mt-auto flex flex-col" style={{ gap: u(28) }}>
-            {start}
-            {a11y}
-          </div>
-        </>
-      ) : (
-        <>
-          {start}
-          {hours}
-          <div className="mt-auto">{a11y}</div>
-        </>
-      )}
     </div>
   );
 }
@@ -1656,6 +1550,416 @@ function SummaryRow({ k, v, last }: { k: string; v: string; last?: boolean }) {
   );
 }
 
+/* ---------- 대기 화면 ---------- */
+
+const SLIDES: {
+  src: string;
+  alt: string;
+  title: string;
+  body: string;
+  pos?: string;
+}[] = [
+  {
+    src: "/images/demo-dental/lobby.jpg",
+    alt: "밝은 조명의 의원 접수 데스크와 대기 의자",
+    title: "평일 저녁 6시 30분까지 진료합니다",
+    body: "토요일 09:00 - 13:00, 점심시간 13:00 - 14:00",
+    pos: "center",
+  },
+  {
+    src: "/images/demo-pediatrics/hero.jpg",
+    alt: "의사가 청진기로 환자의 가슴 소리를 듣는 모습",
+    title: "국가건강검진을 받으실 수 있습니다",
+    body: "8시간 이상 금식하고 오시면 혈액 검사를 함께 받습니다",
+    pos: "center 40%",
+  },
+  {
+    src: "/images/demo-clinic-homepage/doctor-a.jpg",
+    alt: "흰 가운을 입은 의사가 진료실에서 미소 짓는 모습",
+    title: "독감 예방접종을 시작했습니다",
+    body: "만 65세 이상 어르신은 무료 접종 대상입니다",
+    pos: "center 30%",
+  },
+];
+
+const DOCTORS = [
+  {
+    src: "/images/demo-pediatrics/staff-1.jpg",
+    name: "이ㅈ원",
+    title: "대표원장",
+    field: ["내과 전문의", "소화기내과"],
+  },
+  {
+    src: "/images/demo-korean-medicine/staff-1.jpg",
+    name: "박ㅅ민",
+    title: "원장",
+    field: ["내과 전문의", "호흡기내과"],
+  },
+];
+
+function Slideshow({ reduce }: { reduce: boolean }) {
+  const [i, setI] = useState(0);
+  const [paused, setPaused] = useState(false);
+  const auto = !reduce && !paused;
+  useEffect(() => {
+    if (!auto) return;
+    const id = window.setInterval(
+      () => setI((v) => (v + 1) % SLIDES.length),
+      6000,
+    );
+    return () => window.clearInterval(id);
+  }, [auto]);
+  const s = SLIDES[i];
+  return (
+    <section
+      aria-roledescription="안내 슬라이드"
+      aria-label="의원 안내"
+      className="relative overflow-hidden"
+      style={{ background: C.tealDark }}
+    >
+      <div className="relative overflow-hidden" style={{ height: g(610) }}>
+        <AnimatePresence initial={false}>
+          <motion.div
+            key={s.src}
+            className="absolute inset-0"
+            initial={reduce ? false : { opacity: 0, scale: 1.03 }}
+            animate={{ opacity: 1, scale: 1 }}
+            exit={
+              reduce
+                ? { opacity: 0, transition: { duration: 0 } }
+                : { opacity: 0 }
+            }
+            transition={
+              reduce ? { duration: 0 } : { duration: 0.9, ease: "easeOut" }
+            }
+          >
+            {/* eslint-disable-next-line @next/next/no-img-element -- 정적 export 라 next/image 최적화를 쓰지 않는다 */}
+            <img
+              src={s.src}
+              alt={s.alt}
+              className="h-full w-full object-cover"
+              style={{ objectPosition: s.pos }}
+              fetchPriority={i === 0 ? "high" : undefined}
+            />
+          </motion.div>
+        </AnimatePresence>
+        <div
+          className="absolute flex items-center"
+          style={{
+            right: u(28),
+            bottom: u(24),
+            gap: u(4),
+            padding: `0 ${u(10)}`,
+            borderRadius: u(50),
+            background: "rgba(8,48,56,0.82)",
+            color: "#fff",
+          }}
+        >
+          {SLIDES.map((sl, k) => (
+            <button
+              key={sl.src}
+              type="button"
+              onClick={() => setI(k)}
+              aria-label={`${k + 1}번째 안내 보기`}
+              aria-current={k === i ? "true" : undefined}
+              className={`grid place-items-center ${FOCUS}`}
+              style={{ width: u(64), height: u(80) }}
+            >
+              <span
+                style={{
+                  width: k === i ? u(44) : u(18),
+                  height: u(18),
+                  borderRadius: u(9),
+                  background: k === i ? C.accent : "rgba(255,255,255,0.55)",
+                  transition: "width 0.3s",
+                }}
+              />
+            </button>
+          ))}
+          {!reduce && (
+            <button
+              type="button"
+              onClick={() => setPaused((v) => !v)}
+              aria-label={paused ? "안내 넘김 다시 시작" : "안내 넘김 멈춤"}
+              className={`grid place-items-center ${FOCUS}`}
+              style={{
+                width: u(80),
+                height: u(80),
+                borderRadius: "50%",
+                border: `${u(3)} solid rgba(255,255,255,0.6)`,
+                marginLeft: u(8),
+              }}
+            >
+              {paused ? (
+                <Play aria-hidden style={{ width: u(34), height: u(34) }} />
+              ) : (
+                <Pause aria-hidden style={{ width: u(34), height: u(34) }} />
+              )}
+            </button>
+          )}
+        </div>
+      </div>
+      <div
+        className="flex items-end justify-between text-white"
+        style={{
+          padding: `${g(34)} ${u(52)} ${g(30)}`,
+          gap: u(24),
+          minHeight: g(200),
+        }}
+      >
+        <div className="min-w-0" aria-live={auto ? "off" : "polite"}>
+          <p
+            className="font-bold"
+            style={{
+              fontSize: t(54),
+              lineHeight: 1.25,
+              letterSpacing: "-0.015em",
+              wordBreak: "keep-all",
+            }}
+          >
+            {s.title}
+          </p>
+          <p
+            className="font-medium"
+            style={{
+              fontSize: f(34),
+              lineHeight: 1.4,
+              marginTop: u(10),
+              color: "#D8EBEE",
+              wordBreak: "keep-all",
+            }}
+          >
+            {s.body}
+          </p>
+        </div>
+      </div>
+    </section>
+  );
+}
+
+function IdleView({
+  low,
+  big,
+  voice,
+  reduce,
+  onStart,
+  onBig,
+  onVoice,
+  onLow,
+}: {
+  low: boolean;
+  big: boolean;
+  voice: boolean;
+  reduce: boolean;
+  onStart: () => void;
+  onBig: () => void;
+  onVoice: () => void;
+  onLow: () => void;
+}) {
+  const start = (
+    <button
+      type="button"
+      onClick={onStart}
+      aria-label="접수 시작"
+      className={`relative flex w-full items-center text-left ${FOCUS}`}
+      style={{
+        minHeight: g(290),
+        borderRadius: u(28),
+        background: C.teal,
+        color: "#fff",
+        padding: `${g(36)} ${u(48)}`,
+        gap: u(40),
+        boxShadow: `0 ${u(10)} 0 ${C.tealDark}`,
+      }}
+    >
+      <span
+        className="relative grid shrink-0 place-items-center"
+        style={{ width: g(170), height: g(170) }}
+      >
+        {!reduce && (
+          <motion.span
+            aria-hidden
+            className="absolute inset-0 rounded-full"
+            style={{ border: `${u(4)} solid rgba(255,255,255,0.6)` }}
+            animate={{ scale: [1, 1.22], opacity: [0.7, 0] }}
+            transition={{ duration: 1.8, repeat: Infinity, ease: "easeOut" }}
+          />
+        )}
+        <span
+          className="grid h-full w-full place-items-center rounded-full"
+          style={{ background: "rgba(255,255,255,0.16)" }}
+        >
+          <Pointer aria-hidden style={{ width: g(96), height: g(96) }} />
+        </span>
+      </span>
+      <span className="flex min-w-0 flex-col" style={{ gap: u(12) }}>
+        <span
+          className="font-bold"
+          style={{
+            fontSize: t(66),
+            lineHeight: 1.22,
+            letterSpacing: "-0.02em",
+            wordBreak: "keep-all",
+          }}
+        >
+          접수하시려면
+          <br />
+          화면을 눌러 주세요
+        </span>
+        <span
+          className="font-medium"
+          style={{ fontSize: f(34), color: "#D8EBEE" }}
+        >
+          초진, 재진 모두 여기서 접수합니다
+        </span>
+      </span>
+    </button>
+  );
+
+  const doctors = (
+    <section aria-label="진료 의료진">
+      <h2
+        className="font-bold"
+        style={{ fontSize: f(38), color: C.teal, marginBottom: g(16) }}
+      >
+        진료 의료진
+      </h2>
+      <ul className="grid grid-cols-2" style={{ gap: u(20) }}>
+        {DOCTORS.map((d) => (
+          <li
+            key={d.name}
+            className="flex items-center overflow-hidden"
+            style={{
+              gap: u(22),
+              border: `${u(3)} solid ${C.line}`,
+              borderRadius: u(20),
+              padding: u(16),
+              background: "#fff",
+            }}
+          >
+            {/* eslint-disable-next-line @next/next/no-img-element -- 정적 export 라 next/image 최적화를 쓰지 않는다 */}
+            <img
+              src={d.src}
+              alt={`${d.name} ${d.title} 사진`}
+              className="shrink-0 object-cover"
+              style={{
+                width: g(150),
+                height: g(170),
+                borderRadius: u(14),
+                objectPosition: "center 20%",
+                background: C.surface,
+              }}
+            />
+            <div className="min-w-0">
+              <p
+                className="font-bold"
+                style={{ fontSize: f(40), lineHeight: 1.25 }}
+              >
+                {d.name}{" "}
+                <span style={{ fontSize: f(32), color: C.sub }}>{d.title}</span>
+              </p>
+              <p
+                className="font-medium"
+                style={{
+                  fontSize: f(29),
+                  lineHeight: 1.4,
+                  color: C.sub,
+                  marginTop: u(6),
+                  wordBreak: "keep-all",
+                }}
+              >
+                {d.field.map((x) => (
+                  <span key={x} className="block">
+                    {x}
+                  </span>
+                ))}
+              </p>
+            </div>
+          </li>
+        ))}
+      </ul>
+    </section>
+  );
+
+  const a11y = (
+    <div className="grid grid-cols-3" style={{ gap: u(20) }}>
+      <IdleToggle label="큰 글씨" icon={ALargeSmall} on={big} onClick={onBig} />
+      <IdleToggle
+        label="음성 안내"
+        icon={voice ? Volume2 : VolumeOff}
+        on={voice}
+        onClick={onVoice}
+      />
+      <IdleToggle
+        label="낮은 화면"
+        icon={ArrowDownToLine}
+        on={low}
+        onClick={onLow}
+      />
+    </div>
+  );
+
+  return (
+    <div
+      className="flex min-h-full flex-1 flex-col"
+      style={{
+        margin: `${voice ? "0" : `calc(${g(36)} * -1)`} calc(${u(52)} * -1) 0`,
+      }}
+    >
+      <Slideshow reduce={reduce} />
+      <div
+        className="flex flex-1 flex-col"
+        style={{ padding: `${g(32)} ${u(52)} 0`, gap: g(30) }}
+      >
+        {low ? (
+          <>
+            {doctors}
+            <div className="mt-auto flex flex-col" style={{ gap: g(26) }}>
+              {start}
+              {a11y}
+            </div>
+          </>
+        ) : (
+          <>
+            {start}
+            {doctors}
+            <div className="mt-auto">{a11y}</div>
+          </>
+        )}
+      </div>
+    </div>
+  );
+}
+
+/* ---------- QR ---------- */
+
+function QrCode({ text, size }: { text: string; size: string }) {
+  const cells = useMemo(() => {
+    const q = QRCode.create(text, { errorCorrectionLevel: "M" });
+    const n = q.modules.size;
+    const d: string[] = [];
+    for (let y = 0; y < n; y++)
+      for (let x = 0; x < n; x++)
+        if (q.modules.get(x, y)) d.push(`M${x + 2} ${y + 2}h1v1h-1z`);
+    return { n: n + 4, path: d.join("") };
+  }, [text]);
+  return (
+    <svg
+      viewBox={`0 0 ${cells.n} ${cells.n}`}
+      width={size}
+      height={size}
+      role="img"
+      aria-label="대기 순서 보기 QR 코드"
+      shapeRendering="crispEdges"
+      style={{ background: "#fff", flexShrink: 0 }}
+    >
+      <path d={cells.path} fill={C.ink} />
+    </svg>
+  );
+}
+
+/* ---------- 번호표 ---------- */
+
 function DoneView({
   low,
   reduce,
@@ -1667,7 +1971,7 @@ function DoneView({
 }: {
   low: boolean;
   reduce: boolean;
-  ticket: { no: number; time: string };
+  ticket: Ticket;
   purpose: (typeof PURPOSES)[number];
   dateText: string;
   countdown: number;
@@ -1676,28 +1980,30 @@ function DoneView({
   return (
     <div
       className="flex min-h-full flex-1 flex-col items-center text-center"
-      style={{ gap: u(28) }}
+      style={{ gap: g(24) }}
     >
-      <div className="flex flex-col items-center" style={{ gap: u(14) }}>
-        <CircleCheck
-          aria-hidden
-          style={{ width: g(96), height: g(96), color: C.teal }}
-        />
-        <h2 className="font-bold" style={{ fontSize: t(66), lineHeight: 1.2 }}>
+      <div className="flex flex-col items-center" style={{ gap: g(8) }}>
+        <h2
+          className="flex items-center font-bold"
+          style={{ fontSize: t(62), lineHeight: 1.2, gap: u(16) }}
+        >
+          <CircleCheck
+            aria-hidden
+            style={{ width: t(64), height: t(64), color: C.teal }}
+          />
           접수가 완료되었습니다
         </h2>
-        <p className="font-semibold" style={{ fontSize: f(42), color: C.sub }}>
-          번호표를 받아 주세요
+        <p className="font-semibold" style={{ fontSize: f(40), color: C.sub }}>
+          아래 출구에서 번호표를 받아 주세요
         </p>
       </div>
 
-      {/* 번호표 출력 */}
       <div
         className={`flex w-full flex-col items-center ${low ? "mt-auto" : ""}`}
       >
         <div
           style={{
-            width: "86%",
+            width: "88%",
             height: u(26),
             borderRadius: u(13),
             background: "#24303A",
@@ -1707,7 +2013,7 @@ function DoneView({
         />
         <div
           className="overflow-hidden"
-          style={{ width: "78%", marginTop: u(-12) }}
+          style={{ width: "80%", marginTop: u(-12), paddingBottom: u(20) }}
         >
           <motion.div
             initial={reduce ? false : { y: "-100%" }}
@@ -1721,69 +2027,108 @@ function DoneView({
               background: "#fff",
               border: `${u(3)} solid #D3DADE`,
               borderTop: "none",
-              padding: `${g(48)} ${u(40)} ${g(40)}`,
+              padding: `${g(40)} ${u(40)} ${g(30)}`,
               boxShadow: "0 12px 24px -16px rgba(16,33,43,0.45)",
             }}
           >
             <p
-              className="font-semibold"
-              style={{ fontSize: f(34), color: C.sub }}
+              className="flex items-center justify-center font-bold"
+              style={{ fontSize: f(32), color: C.teal, gap: u(10) }}
             >
-              내과의원 대기번호
+              <Stethoscope
+                aria-hidden
+                style={{ width: u(38), height: u(38) }}
+              />
+              내과의원 진료 번호표
             </p>
             <p
               className="font-extrabold tabular-nums"
               style={{
-                fontSize: t(230),
+                fontSize: t(200),
                 lineHeight: 1,
-                color: C.teal,
-                margin: `${u(14)} 0 ${u(6)}`,
+                color: C.ink,
+                margin: `${g(14)} 0 ${g(6)}`,
                 letterSpacing: "-0.03em",
               }}
               aria-label={`대기번호 ${ticket.no}번`}
             >
               {ticket.no}
-              <span style={{ fontSize: t(70), marginLeft: u(8), color: C.ink }}>
-                번
-              </span>
+              <span style={{ fontSize: t(64), marginLeft: u(8) }}>번</span>
             </p>
-            <p className="font-semibold" style={{ fontSize: f(38) }}>
-              {purpose.label}, {purpose.room}
+            <p className="font-bold" style={{ fontSize: f(38), color: C.teal }}>
+              {purpose.label}, {ticket.room}
             </p>
             <div
               className="grid grid-cols-2"
               style={{
-                marginTop: u(30),
+                marginTop: g(24),
                 borderTop: `${u(3)} dashed #C3CDD2`,
-                paddingTop: u(26),
+                paddingTop: g(20),
                 gap: u(12),
               }}
             >
               <div>
-                <p style={{ fontSize: f(32), color: C.sub }}>앞 대기 인원</p>
+                <p style={{ fontSize: f(30), color: C.sub }}>앞 대기 인원</p>
                 <p
                   className="font-bold tabular-nums"
-                  style={{ fontSize: f(56) }}
+                  style={{ fontSize: f(52) }}
                 >
-                  {purpose.ahead}명
+                  {ticket.ahead}명
                 </p>
               </div>
               <div style={{ borderLeft: `${u(2)} solid #E1E7EA` }}>
-                <p style={{ fontSize: f(32), color: C.sub }}>예상 대기</p>
+                <p style={{ fontSize: f(30), color: C.sub }}>예상 대기</p>
                 <p
                   className="font-bold tabular-nums"
-                  style={{ fontSize: f(56) }}
+                  style={{ fontSize: f(52) }}
                 >
-                  약 {purpose.wait}분
+                  약 {ticket.wait}분
                 </p>
               </div>
             </div>
-            <p
-              className="tabular-nums"
-              style={{ fontSize: f(28), color: C.sub, marginTop: u(22) }}
+            <div
+              className="flex items-center text-left"
+              style={{
+                marginTop: g(22),
+                borderTop: `${u(3)} dashed #C3CDD2`,
+                paddingTop: g(22),
+                gap: u(26),
+              }}
             >
-              접수 {dateText}
-            </p>
+              <QrCode
+                text={`내과의원 대기번호 ${ticket.no}번 ${ticket.room}`}
+                size={g(170)}
+              />
+              <div className="min-w-0">
+                <p
+                  className="flex items-center font-bold"
+                  style={{ fontSize: f(36), gap: u(10) }}
+                >
+                  <Smartphone
+                    aria-hidden
+                    style={{ width: u(40), height: u(40), color: C.teal }}
+                  />
+                  휴대폰으로 대기 순서 보기
+                </p>
+                <p
+                  style={{
+                    fontSize: f(28),
+                    color: C.sub,
+                    lineHeight: 1.4,
+                    marginTop: u(8),
+                    wordBreak: "keep-all",
+                  }}
+                >
+                  카메라로 찍으면 차례가 가까워질 때 알려 드립니다
+                </p>
+                <p
+                  className="tabular-nums"
+                  style={{ fontSize: f(26), color: C.sub, marginTop: u(10) }}
+                >
+                  접수 {dateText}
+                </p>
+              </div>
+            </div>
           </motion.div>
         </div>
       </div>
@@ -1792,16 +2137,16 @@ function DoneView({
         className="font-medium"
         style={{ fontSize: f(36), color: C.sub, lineHeight: 1.4 }}
       >
-        번호가 불리면 {purpose.room} 앞으로 와 주세요
+        번호가 불리면 {ticket.room} 앞으로 와 주세요
       </p>
 
       <div
         className={`flex w-full flex-col ${low ? "" : "mt-auto"}`}
-        style={{ gap: u(18) }}
+        style={{ gap: g(16) }}
       >
         <p
           className="font-semibold tabular-nums"
-          style={{ fontSize: f(36) }}
+          style={{ fontSize: f(34), color: C.sub }}
           aria-live="off"
         >
           {countdown}초 뒤 첫 화면으로 돌아갑니다
@@ -1825,5 +2170,253 @@ function DoneView({
         </button>
       </div>
     </div>
+  );
+}
+
+/* ---------- 키오스크 밖: 대기실 호출 화면, 휴대폰 대기 순서 ---------- */
+
+function WaitingTv({
+  queue,
+  called,
+  reduce,
+  now,
+}: {
+  queue: Queue;
+  called: { room: Room; no: number } | null;
+  reduce: boolean;
+  now: string | null;
+}) {
+  return (
+    <figure className="w-full">
+      <figcaption className="mb-2 flex items-center gap-1.5 text-[14px] font-semibold text-[#3F5360]">
+        <Tv aria-hidden className="h-4 w-4" />
+        대기실 호출 화면
+      </figcaption>
+      <div className="rounded-[14px] bg-[#1B2329] p-[7px] shadow-[0_14px_30px_-16px_rgba(20,30,40,0.5)]">
+        <div className="aspect-[16/9] overflow-hidden rounded-[6px] bg-[#0A2E36] text-white [container-type:inline-size]">
+          <div
+            className="flex h-full flex-col"
+            style={{ padding: "3.2cqw 3.6cqw" }}
+          >
+            <div
+              className="flex items-center justify-between"
+              style={{ fontSize: "4.2cqw" }}
+            >
+              <span
+                className="flex items-center font-bold"
+                style={{ gap: "1.6cqw" }}
+              >
+                <Stethoscope
+                  aria-hidden
+                  style={{ width: "4.6cqw", height: "4.6cqw" }}
+                />
+                내과의원 진료 순서
+              </span>
+              <span className="font-bold tabular-nums">{now ?? ""}</span>
+            </div>
+            <div
+              className="grid flex-1 grid-cols-3"
+              style={{ gap: "2.4cqw", marginTop: "2.8cqw" }}
+            >
+              {ROOMS.map((r) => {
+                const q = queue[r];
+                const hot = called?.room === r;
+                return (
+                  <div
+                    key={r}
+                    className="flex flex-col overflow-hidden"
+                    style={{ borderRadius: "1.6cqw", background: "#123E48" }}
+                  >
+                    <p
+                      className="text-center font-bold"
+                      style={{
+                        fontSize: "3.8cqw",
+                        padding: "1.4cqw 0",
+                        background: "#0B5563",
+                      }}
+                    >
+                      {r}
+                    </p>
+                    <motion.div
+                      key={`${r}-${q.now}`}
+                      className="flex flex-col items-center justify-center"
+                      style={{ padding: "1.6cqw 0" }}
+                      initial={
+                        reduce || !hot
+                          ? false
+                          : { backgroundColor: "#F2B33D", color: "#2B1D00" }
+                      }
+                      animate={{
+                        backgroundColor: "rgba(0,0,0,0)",
+                        color: "#ffffff",
+                      }}
+                      transition={{ duration: 1.6, ease: "easeOut" }}
+                    >
+                      <span style={{ fontSize: "2.8cqw", opacity: 0.9 }}>
+                        진료 중
+                      </span>
+                      <span
+                        className="font-extrabold tabular-nums"
+                        style={{ fontSize: "11cqw", lineHeight: 1 }}
+                      >
+                        {q.now}
+                      </span>
+                    </motion.div>
+                    <div
+                      className="mt-auto"
+                      style={{ padding: "0 1.6cqw 1.6cqw" }}
+                    >
+                      <p
+                        style={{
+                          fontSize: "2.6cqw",
+                          color: "#BFD9DE",
+                          marginBottom: "0.8cqw",
+                        }}
+                      >
+                        다음 순서
+                      </p>
+                      <p
+                        className="flex flex-wrap font-bold tabular-nums"
+                        style={{
+                          fontSize: "3.8cqw",
+                          gap: "0 2cqw",
+                          minHeight: "4.6cqw",
+                        }}
+                      >
+                        {q.wait.length ? (
+                          q.wait
+                            .slice(0, 3)
+                            .map((n) => <span key={n}>{n}</span>)
+                        ) : (
+                          <span style={{ color: "#BFD9DE", fontWeight: 500 }}>
+                            없음
+                          </span>
+                        )}
+                      </p>
+                    </div>
+                  </div>
+                );
+              })}
+            </div>
+          </div>
+        </div>
+      </div>
+      <p className="sr-only" aria-live="polite">
+        {called ? `${called.no}번 환자분, ${called.room}로 들어와 주세요` : ""}
+      </p>
+    </figure>
+  );
+}
+
+function PhoneWait({
+  mine,
+  queue,
+  reduce,
+  now,
+}: {
+  mine: Ticket;
+  queue: Queue;
+  reduce: boolean;
+  now: string | null;
+}) {
+  const q = queue[mine.room];
+  const idx = q.wait.indexOf(mine.no);
+  const myTurn = q.now === mine.no;
+  const ahead = myTurn ? 0 : idx < 0 ? 0 : idx;
+  const done = mine.ahead === 0 ? 1 : (mine.ahead - ahead) / mine.ahead;
+  return (
+    <motion.figure
+      className="w-full"
+      initial={reduce ? false : { opacity: 0, y: 16 }}
+      animate={{ opacity: 1, y: 0 }}
+      transition={{ duration: 0.4, ease: "easeOut" }}
+    >
+      <figcaption className="mb-2 flex items-center gap-1.5 text-[14px] font-semibold text-[#3F5360]">
+        <Smartphone aria-hidden className="h-4 w-4" />
+        번호표 QR로 연 휴대폰 화면
+      </figcaption>
+      <div className="mx-auto w-[236px] rounded-[34px] bg-[#1B2329] p-[8px] shadow-[0_16px_30px_-16px_rgba(20,30,40,0.55)]">
+        <div className="overflow-hidden rounded-[27px] bg-[#F2F5F7]">
+          <div className="flex items-center justify-between bg-white px-5 pb-1 pt-2.5 text-[11px] font-semibold text-[#10212B]">
+            <span className="tabular-nums">{now ?? ""}</span>
+            <span
+              className="h-[14px] w-[64px] rounded-full bg-[#1B2329]"
+              aria-hidden
+            />
+            <span className="w-[26px]" />
+          </div>
+          <div className="bg-white px-4 pb-3 pt-1.5">
+            <p className="flex items-center gap-1 text-[13px] font-bold text-[#0B5563]">
+              <Stethoscope aria-hidden className="h-3.5 w-3.5" />
+              내과의원 대기 순서
+            </p>
+          </div>
+          <div className="px-3 pb-4 pt-3">
+            <div className="rounded-[14px] bg-white p-4 text-center">
+              <p className="text-[12px] font-semibold text-[#3F5360]">
+                내 대기번호
+              </p>
+              <p className="text-[44px] font-extrabold leading-[1.05] tabular-nums text-[#10212B]">
+                {mine.no}
+                <span className="ml-0.5 text-[18px]">번</span>
+              </p>
+              <p className="text-[12px] font-semibold text-[#0B5563]">
+                {mine.room}
+              </p>
+            </div>
+            <div
+              className="mt-2.5 rounded-[14px] p-4"
+              style={{
+                background: myTurn ? C.accent : "#fff",
+                color: myTurn ? C.accentInk : C.ink,
+              }}
+              aria-live="polite"
+            >
+              {myTurn ? (
+                <>
+                  <p className="flex items-center gap-1.5 text-[15px] font-bold">
+                    <BellRing aria-hidden className="h-4 w-4" />
+                    지금 들어와 주세요
+                  </p>
+                  <p className="mt-1 text-[12px] font-medium">
+                    {mine.room} 앞에서 이름을 확인합니다
+                  </p>
+                </>
+              ) : (
+                <>
+                  <div className="flex items-baseline justify-between">
+                    <span className="text-[12px] font-semibold text-[#3F5360]">
+                      내 앞 대기
+                    </span>
+                    <span className="text-[22px] font-extrabold tabular-nums">
+                      {ahead}명
+                    </span>
+                  </div>
+                  <div className="mt-2 h-[8px] overflow-hidden rounded-full bg-[#DCE4E8]">
+                    <motion.div
+                      className="h-full rounded-full bg-[#0B5563]"
+                      initial={false}
+                      animate={{ width: `${Math.max(6, done * 100)}%` }}
+                      transition={reduce ? { duration: 0 } : { duration: 0.6 }}
+                    />
+                  </div>
+                  <p className="mt-2 text-[12px] font-medium text-[#3F5360]">
+                    지금 진료 중{" "}
+                    <b className="tabular-nums text-[#10212B]">{q.now}번</b>
+                    {", "}
+                    {ahead === 0
+                      ? "곧 차례입니다"
+                      : `예상 대기 약 ${Math.max(1, Math.round((mine.wait * ahead) / Math.max(1, mine.ahead)))}분`}
+                  </p>
+                </>
+              )}
+            </div>
+            <p className="mt-2.5 px-1 text-[11px] leading-[1.45] text-[#3F5360]">
+              차례가 두 명 남으면 문자로 한 번 더 알려 드립니다.
+            </p>
+          </div>
+        </div>
+      </div>
+    </motion.figure>
   );
 }

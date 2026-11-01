@@ -3,6 +3,7 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { AnimatePresence, MotionConfig, motion, useReducedMotion } from "framer-motion";
 import {
+  BatteryFull,
   Check,
   ChevronLeft,
   Delete,
@@ -11,28 +12,42 @@ import {
   LogOut,
   MessageSquareText,
   MonitorSmartphone,
+  Nfc,
   QrCode,
   ScanLine,
   Send,
+  Signal,
   TabletSmartphone,
+  Users,
+  Wifi,
   X,
 } from "lucide-react";
 import { DemoMakerInfo } from "@/components/demos/DemoMakerInfo";
 import { fmtKo, useDemoToday } from "@/hooks/useDemoToday";
 
-// 학원 입구 출결 키오스크 카탈로그(11-01).
+// 학원 입구 출결 키오스크 카탈로그(11-01, 2판).
 // 키오스크 화면은 450x800 설계 크기로 그리고, 화면 폭에 맞춰 transform으로 줄이거나 키운다.
 // 시계는 15:52에서 시작해 실제 1초마다 흐른다(첫 렌더는 항상 같은 값이라 하이드레이션 불일치 없음).
+// PC 넓은 화면은 왼쪽 학생증(누르면 리더기에 태그), 가운데 키오스크, 오른쪽 학부모 휴대폰 잠금 화면 알림.
 
 const DESIGN_W = 450;
 const DESIGN_H = 800;
 const START_SEC = (15 * 60 + 52) * 60;
 
-type ClassInfo = { id: string; name: string; start: number; end: number };
+/* ---------------- 데이터 ---------------- */
+
+type Teacher = { name: string; img: string; alt: string; pos: string };
+type ClassInfo = { id: string; name: string; start: number; end: number; room: string; teacher: Teacher };
+const T_KIM: Teacher = { name: "김ㅅ연", img: "/images/demo-english-talk/teacher-korean.jpg", alt: "김ㅅ연 선생님", pos: "50% 22%" };
+const T_DANIEL: Teacher = { name: "Daniel", img: "/images/demo-english-talk/teacher-native.jpg", alt: "Daniel 선생님", pos: "50% 25%" };
+const T_LEE: Teacher = { name: "이ㅈ훈", img: "/images/demo-english-talk/teacher-korean-2.jpg", alt: "이ㅈ훈 선생님", pos: "50% 22%" };
+const T_EMILY: Teacher = { name: "Emily", img: "/images/demo-english-talk/teacher-native-2.jpg", alt: "Emily 선생님", pos: "50% 22%" };
+
 const CLASSES: ClassInfo[] = [
-  { id: "A", name: "초등 5학년 A반", start: 16 * 60, end: 17 * 60 + 30 },
-  { id: "B", name: "초등 6학년 B반", start: 15 * 60 + 30, end: 17 * 60 },
-  { id: "C", name: "중등 1학년 C반", start: 14 * 60, end: 15 * 60 + 30 },
+  { id: "C", name: "중등 1학년 C반", start: 14 * 60, end: 15 * 60 + 30, room: "303호", teacher: T_LEE },
+  { id: "B", name: "초등 6학년 B반", start: 15 * 60 + 30, end: 17 * 60, room: "301호", teacher: T_DANIEL },
+  { id: "A", name: "초등 5학년 A반", start: 16 * 60, end: 17 * 60 + 30, room: "302호", teacher: T_KIM },
+  { id: "D", name: "중등 2학년 D반", start: 17 * 60, end: 18 * 60 + 30, room: "301호", teacher: T_EMILY },
 ];
 const classOf = (id: string) => CLASSES.find((c) => c.id === id)!;
 
@@ -50,25 +65,45 @@ const STUDENTS: Student[] = [
   { no: "2042", name: "오ㅅ빈", cls: "C", phone: "3519", parent: "어머니" },
   { no: "2043", name: "서ㅇ호", cls: "C", phone: "6087", parent: "어머니" },
   { no: "2044", name: "신ㅎ은", cls: "C", phone: "2748", parent: "어머니" },
+  { no: "2051", name: "문ㅅ율", cls: "D", phone: "5803", parent: "어머니" },
+  { no: "2052", name: "장ㅇ린", cls: "D", phone: "4126", parent: "아버지" },
 ];
+const studentOf = (no: string) => STUDENTS.find((s) => s.no === no)!;
 
 type Rec = { status: "none" | "in" | "out"; inAt?: number; outAt?: number; late?: boolean; sentAt?: number; sentKind?: string };
+const sentIn = (m: number) => ({ sentAt: m, sentKind: "등원 알림 발송" });
+const sentOut = (m: number) => ({ sentAt: m, sentKind: "하원 알림 발송" });
 const SEED: Record<string, Rec> = {
   "1021": { status: "none" },
-  "1022": { status: "in", inAt: 15 * 60 + 41, sentAt: 15 * 60 + 41, sentKind: "등원 알림 발송" },
-  "1023": { status: "in", inAt: 15 * 60 + 47, sentAt: 15 * 60 + 47, sentKind: "등원 알림 발송" },
+  "1022": { status: "in", inAt: 941, ...sentIn(941) },
+  "1023": { status: "in", inAt: 947, ...sentIn(947) },
   "1024": { status: "none" },
-  "1031": { status: "in", inAt: 15 * 60 + 22, sentAt: 15 * 60 + 22, sentKind: "등원 알림 발송" },
-  "1032": { status: "in", inAt: 15 * 60 + 38, late: true, sentAt: 15 * 60 + 38, sentKind: "등원 알림 발송" },
+  "1031": { status: "in", inAt: 922, ...sentIn(922) },
+  "1032": { status: "in", inAt: 938, late: true, ...sentIn(938) },
   "1033": { status: "none" },
-  "1034": { status: "in", inAt: 15 * 60 + 26, sentAt: 15 * 60 + 26, sentKind: "등원 알림 발송" },
-  "2041": { status: "out", inAt: 13 * 60 + 55, outAt: 15 * 60 + 34, sentAt: 15 * 60 + 34, sentKind: "하원 알림 발송" },
-  "2042": { status: "out", inAt: 13 * 60 + 58, outAt: 15 * 60 + 36, sentAt: 15 * 60 + 36, sentKind: "하원 알림 발송" },
-  "2043": { status: "in", inAt: 14 * 60 + 6, late: true, sentAt: 14 * 60 + 6, sentKind: "등원 알림 발송" },
+  "1034": { status: "in", inAt: 926, ...sentIn(926) },
+  "2041": { status: "out", inAt: 835, outAt: 934, ...sentOut(934) },
+  "2042": { status: "out", inAt: 838, outAt: 936, ...sentOut(936) },
+  "2043": { status: "in", inAt: 846, late: true, ...sentIn(846) },
   "2044": { status: "none" },
+  "2051": { status: "none" },
+  "2052": { status: "none" },
 };
-// QR 찍기를 누르면 이 순서로 학생증을 찍은 것으로 본다(등원 중이면 하원, 아니면 등원)
-const QR_ORDER = ["2043", "1031", "1034", "1022", "1023", "1032", "1021", "1024", "1033", "2044"];
+// QR 찍기를 누르면 이 순서로 학생증 QR을 찍은 것으로 본다(등원 중이면 하원, 아니면 등원)
+const QR_ORDER = ["2043", "1034", "1022", "1023", "1032", "1021", "1024", "1033", "2051", "2052", "2044", "1031"];
+// 옆에 놓인 학생증(누르면 리더기에 태그한 것으로 처리)
+const CARD_NOS = ["1021", "1024", "1033", "1031"];
+
+// 기다리는 동안 보는 오늘의 영어 한 문장(날짜마다 바뀜)
+const SENTENCES = [
+  { en: "Practice makes perfect.", ko: "연습이 완벽을 만듭니다." },
+  { en: "Little by little, one travels far.", ko: "조금씩 가다 보면 멀리 갑니다." },
+  { en: "Mistakes help me learn.", ko: "실수는 배우는 데 도움이 됩니다." },
+  { en: "Today is a good day to try.", ko: "오늘은 도전하기 좋은 날입니다." },
+  { en: "Every day is a fresh start.", ko: "매일이 새로운 시작입니다." },
+  { en: "Reading opens new doors.", ko: "읽기는 새로운 문을 열어 줍니다." },
+  { en: "Ask, and you will learn.", ko: "물어보면 배우게 됩니다." },
+];
 
 const p2 = (n: number) => String(n).padStart(2, "0");
 const hm = (min: number) => `${p2(Math.floor(min / 60) % 24)}:${p2(min % 60)}`;
@@ -83,7 +118,6 @@ const CHIP_CLS: Record<Chip, string> = {
   미등원: "bg-white text-[#4a5361] border-[#cfd4dc]",
 };
 
-const HINT = "오늘 미등원 학생 번호 1021, 1024, 1033";
 const FOCUS = "focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-[#f2b705] focus-visible:ring-offset-2";
 
 type Mode = "in" | "out";
@@ -91,21 +125,36 @@ type Screen =
   | { kind: "idle" }
   | { kind: "pad"; mode: Mode }
   | { kind: "confirm"; mode: Mode; no: string }
-  | { kind: "scan" }
-  | { kind: "done"; mode: Mode; no: string; at: number; late: boolean };
+  | { kind: "scan"; via: "qr" | "card"; no?: string; seq: number }
+  | { kind: "done"; mode: Mode; no: string; at: number; late: boolean; seq: number };
+
+type Note = { id: number; no: string; at: number | null; text: string };
+const SEED_NOTES: Note[] = [{ id: 0, no: "1021", at: null, text: "[영어 학원] 김ㅎ늘 학생이 17:34에 하원했습니다. 귀가 여부를 확인해 주세요." }];
 
 function alimText(s: Student, mode: Mode, at: number) {
   const c = classOf(s.cls);
-  if (mode === "in") return `[영어 학원] ${s.name} 학생이 ${hm(at)}에 등원했습니다. 오늘 수업은 ${c.name} ${hm(c.start)}~${hm(c.end)}입니다.`;
+  if (mode === "in") return `[영어 학원] ${s.name} 학생이 ${hm(at)}에 등원했습니다. 오늘 수업은 ${c.name} ${hm(c.start)}~${hm(c.end)}, ${c.room}입니다.`;
   return `[영어 학원] ${s.name} 학생이 ${hm(at)}에 하원했습니다. 귀가 여부를 확인해 주세요.`;
 }
+
+function Photo({ src, alt, className = "", pos }: { src: string; alt: string; className?: string; pos?: string }) {
+  return (
+    // eslint-disable-next-line @next/next/no-img-element -- 정적 export 라 next/image 최적화를 쓰지 않는다
+    <img src={src} alt={alt} draggable={false} className={`object-cover ${className}`} style={pos ? { objectPosition: pos } : undefined} />
+  );
+}
+
+/* ---------------- 페이지 ---------------- */
 
 export function KioskAcademyDemo() {
   const today = useDemoToday();
   const [view, setView] = useState<"kiosk" | "admin">("kiosk");
   const [sec, setSec] = useState(START_SEC);
   const [recs, setRecs] = useState<Record<string, Rec>>(SEED);
+  const [screen, setScreen] = useState<Screen>({ kind: "idle" });
+  const [notes, setNotes] = useState<Note[]>(SEED_NOTES);
   const [lastChanged, setLastChanged] = useState<string | null>(null);
+  const seq = useRef(1);
 
   useEffect(() => {
     const t = setInterval(() => setSec((s) => s + 1), 1000);
@@ -113,39 +162,64 @@ export function KioskAcademyDemo() {
   }, []);
   const nowMin = Math.floor(sec / 60);
 
-  const apply = useCallback((no: string, mode: Mode, at: number) => {
-    const s = STUDENTS.find((x) => x.no === no)!;
-    const late = at > classOf(s.cls).start;
-    setRecs((prev) => {
-      const r = prev[no];
-      const next: Rec =
-        mode === "in"
-          ? { status: "in", inAt: at, late, sentAt: at, sentKind: "등원 알림 발송" }
-          : { ...r, status: "out", outAt: at, sentAt: at, sentKind: "하원 알림 발송" };
-      return { ...prev, [no]: next };
-    });
-    setLastChanged(no);
-    return late;
+  const pushNote = useCallback((no: string, at: number, text: string) => {
+    seq.current += 1;
+    const id = seq.current;
+    setNotes((prev) => [{ id, no, at, text }, ...prev].slice(0, 12));
   }, []);
 
-  const resend = useCallback((no: string, at: number) => {
-    setRecs((prev) => {
-      const r = prev[no];
+  const apply = useCallback(
+    (no: string, mode: Mode, at: number) => {
+      const s = studentOf(no);
+      const late = mode === "in" && at > classOf(s.cls).start;
+      setRecs((prev) => {
+        const r = prev[no];
+        const next: Rec =
+          mode === "in" ? { status: "in", inAt: at, late, ...sentIn(at) } : { ...r, status: "out", outAt: at, ...sentOut(at) };
+        return { ...prev, [no]: next };
+      });
+      setLastChanged(no);
+      pushNote(no, at, alimText(s, mode, at));
+      seq.current += 1;
+      setScreen({ kind: "done", mode, no, at, late, seq: seq.current });
+    },
+    [pushNote],
+  );
+
+  const resend = useCallback(
+    (no: string, at: number, r: Rec) => {
+      const s = studentOf(no);
       const kind = r.status === "none" ? "미등원 안내 발송" : `${r.status === "out" ? "하원" : "등원"} 알림 재발송`;
-      return { ...prev, [no]: { ...r, sentAt: at, sentKind: kind } };
-    });
+      setRecs((prev) => ({ ...prev, [no]: { ...prev[no], sentAt: at, sentKind: kind } }));
+      const c = classOf(s.cls);
+      const text =
+        r.status === "none"
+          ? `[영어 학원] ${s.name} 학생이 아직 등원하지 않았습니다. 오늘 수업은 ${hm(c.start)}에 시작합니다.`
+          : alimText(s, r.status === "out" ? "out" : "in", r.status === "out" ? r.outAt! : r.inAt!);
+      pushNote(no, at, text);
+    },
+    [pushNote],
+  );
+
+  // 학생증을 누르면 키오스크가 처음 화면이 아니어도 바로 리더기 태그로 넘어간다
+  const tagCard = useCallback((no: string) => {
+    seq.current += 1;
+    setScreen({ kind: "scan", via: "card", no, seq: seq.current });
   }, []);
+
+  const busy = screen.kind === "scan";
+  const owner = notes[0]?.no ?? "1021";
+  const ownerNotes = notes.filter((n) => n.no === owner).slice(0, 3);
 
   return (
     <MotionConfig reducedMotion="user">
       <div className="min-h-screen bg-[#e9ecf0] text-[#142340]">
-        <div className="mx-auto w-full max-w-[1200px] px-4 pb-8 pt-5 md:px-6">
+        <div className="mx-auto w-full max-w-[1240px] px-4 pb-8 pt-5 md:px-6">
           <div className="flex flex-wrap items-center justify-between gap-3">
             <div className="flex items-center gap-2">
               <GraduationCap size={22} aria-hidden className="text-[#16294a]" />
               <span className="text-[17px] font-bold">영어 학원 출결</span>
             </div>
-            {view === "kiosk" && <p className="hidden text-[14px] text-[#4a5568] md:block">{HINT}</p>}
             <div role="tablist" aria-label="화면 선택" className="inline-flex rounded-[10px] border border-[#cfd5de] bg-[#dfe3e9] p-1">
               {(
                 [
@@ -174,7 +248,34 @@ export function KioskAcademyDemo() {
           </div>
 
           <div className={view === "kiosk" ? "" : "hidden"}>
-            <KioskStage today={today} sec={sec} recs={recs} apply={apply} active={view === "kiosk"} />
+            {/* 좁은 화면: 학생증 가로 줄 */}
+            <div className="mt-4 xl:hidden">
+              <CardTitle />
+              <div className="-mx-4 mt-2 flex gap-2.5 overflow-x-auto px-4 pb-1 md:mx-0 md:justify-center md:px-0">
+                {CARD_NOS.map((no) => (
+                  <IdCard key={no} no={no} rec={recs[no]} disabled={busy} onTag={() => tagCard(no)} compact />
+                ))}
+              </div>
+            </div>
+
+            <div className="mt-4 flex items-center justify-center gap-10 md:mt-3">
+              <aside className="hidden w-[250px] shrink-0 xl:block" aria-label="학생증">
+                <CardTitle />
+                <div className="mt-3 space-y-3">
+                  {CARD_NOS.map((no) => (
+                    <IdCard key={no} no={no} rec={recs[no]} disabled={busy} onTag={() => tagCard(no)} />
+                  ))}
+                </div>
+              </aside>
+
+              <KioskStage>
+                <Kiosk today={today} sec={sec} recs={recs} screen={screen} setScreen={setScreen} apply={apply} active={view === "kiosk"} />
+              </KioskStage>
+
+              <aside className="hidden w-[250px] shrink-0 xl:block" aria-label="학부모 휴대폰 알림">
+                <ParentPhone today={today} nowMin={nowMin} owner={studentOf(owner)} notes={ownerNotes} />
+              </aside>
+            </div>
           </div>
           {view === "admin" && <AdminPanel today={today} sec={sec} nowMin={nowMin} recs={recs} lastChanged={lastChanged} resend={resend} />}
 
@@ -185,15 +286,128 @@ export function KioskAcademyDemo() {
   );
 }
 
+function CardTitle() {
+  return (
+    <div className="flex items-center gap-1.5 text-[14px] font-bold text-[#2b3a55]">
+      <Nfc size={17} aria-hidden />
+      학생증 태그
+    </div>
+  );
+}
+
+function IdCard({ no, rec, disabled, onTag, compact }: { no: string; rec: Rec; disabled: boolean; onTag: () => void; compact?: boolean }) {
+  const s = studentOf(no);
+  const c = classOf(s.cls);
+  const action = rec.status === "none" ? "등원" : rec.status === "in" ? "하원" : null;
+  const off = disabled || !action;
+  return (
+    <motion.button
+      type="button"
+      onClick={onTag}
+      disabled={off}
+      whileHover={off ? undefined : { x: compact ? 0 : 6, y: compact ? -2 : 0 }}
+      whileTap={off ? undefined : { scale: 0.98 }}
+      aria-label={`${s.name} 학생증 태그, ${action ? `${action} 처리` : "하원 완료"}`}
+      className={`group relative block shrink-0 overflow-hidden rounded-[12px] border bg-white text-left shadow-[0_1px_2px_rgba(20,35,64,0.08)] transition-colors ${FOCUS} ${
+        compact ? "w-[236px]" : "w-full"
+      } ${off ? "cursor-default border-[#dde2e9] opacity-60" : "border-[#d5dae2] hover:border-[#16294a]"}`}
+    >
+      <div className="flex h-7 items-center justify-between bg-[#16294a] px-3 text-[12px] font-bold text-white">
+        <span>영어 학원 학생증</span>
+        <Nfc size={15} aria-hidden className="text-[#9fb3d4]" />
+      </div>
+      <div className="flex items-center gap-3 px-3 py-2.5">
+        <div className="grid h-10 w-10 shrink-0 place-items-center rounded-full bg-[#e7ecf4] text-[17px] font-bold text-[#16294a]" aria-hidden>
+          {s.name[0]}
+        </div>
+        <div className="min-w-0 flex-1">
+          <div className="flex items-baseline gap-1.5">
+            <span className="text-[16px] font-bold">{s.name}</span>
+            <span className="text-[13px] tabular-nums text-[#5a6577]">{s.no}</span>
+          </div>
+          <div className="truncate text-[13px] text-[#4a5568]">{c.name}</div>
+        </div>
+        <span
+          className={`shrink-0 rounded-[6px] px-2 py-1 text-[12px] font-bold ${
+            action === "등원" ? "bg-[#e3f3eb] text-[#0a5c40]" : action === "하원" ? "bg-[#e7ecf4] text-[#1b3359]" : "bg-[#f1f2f4] text-[#5a6577]"
+          }`}
+        >
+          {action ? (compact ? action : `${action} 태그`) : "하원 완료"}
+        </span>
+      </div>
+    </motion.button>
+  );
+}
+
+/* ---------------- 학부모 휴대폰 ---------------- */
+
+function ParentPhone({ today, nowMin, owner, notes }: { today: Date; nowMin: number; owner: Student; notes: Note[] }) {
+  const DOWF = ["일요일", "월요일", "화요일", "수요일", "목요일", "금요일", "토요일"];
+  return (
+    <div>
+      <div className="flex items-center gap-1.5 text-[14px] font-bold text-[#2b3a55]">
+        <MessageSquareText size={17} aria-hidden />
+        학부모 휴대폰
+        <span className="font-medium text-[#5a6577]">
+          {owner.name} 학생 {owner.parent}
+        </span>
+      </div>
+      <div className="mt-3 rounded-[42px] bg-[#15181d] p-[9px] shadow-[0_18px_40px_-20px_rgba(20,35,64,0.6)]">
+        <div className="relative h-[500px] overflow-hidden rounded-[34px]">
+          <Photo src="/images/demo-academy/study.jpg" alt="" className="absolute inset-0 h-full w-full" pos="40% 50%" />
+          <div className="absolute inset-0 bg-[#0b1220]/55" aria-hidden />
+          <div className="relative flex h-full flex-col px-3 pt-3 text-white">
+            <div className="flex items-center justify-between px-3 text-[12px] font-bold">
+              <span className="tabular-nums">{hm(nowMin)}</span>
+              <span className="absolute left-1/2 top-3 h-[22px] w-[78px] -translate-x-1/2 rounded-full bg-black" aria-hidden />
+              <span className="flex items-center gap-1" aria-hidden>
+                <Signal size={13} />
+                <Wifi size={13} />
+                <BatteryFull size={16} />
+              </span>
+            </div>
+            <div className="mt-8 text-center">
+              <div className="text-[15px] font-medium text-white/90">
+                {today.getMonth() + 1}월 {today.getDate()}일 {DOWF[today.getDay()]}
+              </div>
+              <div className="mt-0.5 text-[64px] font-bold leading-none tracking-[-0.02em] tabular-nums">{hm(nowMin)}</div>
+            </div>
+            <div className="mt-auto space-y-2 pb-6" aria-live="polite">
+              <AnimatePresence initial={false}>
+                {notes.map((n) => (
+                  <motion.div
+                    key={n.id}
+                    layout
+                    initial={{ opacity: 0, y: -14, scale: 0.97 }}
+                    animate={{ opacity: 1, y: 0, scale: 1 }}
+                    exit={{ opacity: 0 }}
+                    transition={{ duration: 0.28, ease: [0.2, 0, 0, 1] }}
+                    className="rounded-[18px] bg-white/90 p-3 text-[#142340] shadow-[0_4px_14px_rgba(0,0,0,0.18)]"
+                  >
+                    <div className="flex items-center gap-2">
+                      <span className="grid h-6 w-6 place-items-center rounded-[7px] bg-[#16294a] text-white" aria-hidden>
+                        <GraduationCap size={14} />
+                      </span>
+                      <span className="text-[13px] font-bold">영어 학원</span>
+                      <span className="ml-auto text-[12px] text-[#5a6577] tabular-nums">
+                        {n.at == null ? "어제" : n.at >= nowMin ? "지금" : hm(n.at)}
+                      </span>
+                    </div>
+                    <p className="mt-1.5 line-clamp-3 text-[13px] leading-[1.45]">{n.text}</p>
+                  </motion.div>
+                ))}
+              </AnimatePresence>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+}
+
 /* ---------------- 키오스크 ---------------- */
 
-function KioskStage(props: {
-  today: Date;
-  sec: number;
-  recs: Record<string, Rec>;
-  apply: (no: string, mode: Mode, at: number) => boolean;
-  active: boolean;
-}) {
+function KioskStage({ children }: { children: React.ReactNode }) {
   const screenRef = useRef<HTMLDivElement>(null);
   const [scale, setScale] = useState<number | null>(null);
 
@@ -206,34 +420,47 @@ function KioskStage(props: {
   }, []);
 
   return (
-    <div className="mt-4 flex flex-col items-center md:mt-3">
-      <p className="mb-3 text-center text-[14px] text-[#4a5568] md:hidden">{HINT}</p>
-      <div
-        className="flex w-full flex-col items-center md:w-auto"
-        style={{ ["--kh" as string]: "clamp(600px, calc(100vh - 220px), 1000px)" }}
-      >
-        <div className="w-full md:w-auto md:rounded-[30px] md:bg-[#1d2128] md:p-[14px] md:shadow-[0_18px_40px_-18px_rgba(20,35,64,0.55)]">
+    <div className="flex w-full flex-col items-center md:w-auto" style={{ ["--kh" as string]: "clamp(600px, calc(100vh - 230px), 1000px)" }}>
+      <div className="w-full md:w-auto md:rounded-[30px] md:bg-[#1d2128] md:px-[14px] md:pb-[10px] md:pt-[14px] md:shadow-[0_18px_40px_-18px_rgba(20,35,64,0.55)]">
+        <div
+          ref={screenRef}
+          className="relative aspect-[9/16] w-full overflow-hidden rounded-[16px] border border-[#cfd5de] bg-white md:h-[var(--kh)] md:w-[calc(var(--kh)*9/16)] md:rounded-[14px] md:border-0"
+        >
           <div
-            ref={screenRef}
-            className="relative aspect-[9/16] w-full overflow-hidden rounded-[16px] border border-[#cfd5de] bg-white md:h-[var(--kh)] md:w-[calc(var(--kh)*9/16)] md:rounded-[14px] md:border-0"
+            className="absolute left-0 top-0 origin-top-left"
+            style={{ width: DESIGN_W, height: DESIGN_H, transform: `scale(${scale ?? 1})`, visibility: scale ? "visible" : "hidden" }}
           >
-            <div
-              className="absolute left-0 top-0 origin-top-left"
-              style={{ width: DESIGN_W, height: DESIGN_H, transform: `scale(${scale ?? 1})`, visibility: scale ? "visible" : "hidden" }}
-            >
-              <Kiosk {...props} />
-            </div>
+            {children}
           </div>
         </div>
-        <div aria-hidden className="hidden h-7 w-14 bg-gradient-to-b from-[#a9b0bb] to-[#c3c9d2] md:block" />
-        <div aria-hidden className="hidden h-3 w-52 rounded-full bg-[#b4bbc5] md:block" />
+        <div className="hidden h-[22px] items-center justify-center gap-1.5 text-[11px] font-bold text-[#8c95a3] md:flex" aria-hidden>
+          <Nfc size={13} />
+          학생증 리더기
+        </div>
       </div>
+      <div aria-hidden className="hidden h-6 w-14 bg-gradient-to-b from-[#a9b0bb] to-[#c3c9d2] md:block" />
+      <div aria-hidden className="hidden h-3 w-52 rounded-full bg-[#b4bbc5] md:block" />
     </div>
   );
 }
 
-function Kiosk({ today, sec, recs, apply, active }: { today: Date; sec: number; recs: Record<string, Rec>; apply: (no: string, mode: Mode, at: number) => boolean; active: boolean }) {
-  const [screen, setScreen] = useState<Screen>({ kind: "idle" });
+function Kiosk({
+  today,
+  sec,
+  recs,
+  screen,
+  setScreen,
+  apply,
+  active,
+}: {
+  today: Date;
+  sec: number;
+  recs: Record<string, Rec>;
+  screen: Screen;
+  setScreen: (s: Screen) => void;
+  apply: (no: string, mode: Mode, at: number) => void;
+  active: boolean;
+}) {
   const nowMin = Math.floor(sec / 60);
   const reduce = useReducedMotion();
   const recsRef = useRef(recs);
@@ -243,51 +470,52 @@ function Kiosk({ today, sec, recs, apply, active }: { today: Date; sec: number; 
     minRef.current = nowMin;
   });
 
-  const finish = useCallback(
-    (no: string, mode: Mode) => {
-      const at = minRef.current;
-      const late = apply(no, mode, at);
-      setScreen({ kind: "done", mode, no, at, late: mode === "in" && late });
-    },
-    [apply],
-  );
-
-  // QR: 찍는 순서대로 학생을 정하고, 1초 동안 읽는 화면을 보여 준 뒤 처리
+  // QR, 학생증: 잠시 읽는 화면을 보여 준 뒤 처리
   useEffect(() => {
     if (screen.kind !== "scan") return;
-    const t = setTimeout(() => {
-      const r = recsRef.current;
-      const no = QR_ORDER.find((n) => r[n].status === "in") ?? QR_ORDER.find((n) => r[n].status === "none");
-      if (!no) {
-        setScreen({ kind: "idle" });
-        return;
-      }
-      finish(no, r[no].status === "in" ? "out" : "in");
-    }, 1100);
+    const t = setTimeout(
+      () => {
+        const r = recsRef.current;
+        const no =
+          screen.no ?? QR_ORDER.find((n) => r[n].status === "in") ?? QR_ORDER.find((n) => r[n].status === "none");
+        if (!no || r[no].status === "out") {
+          setScreen({ kind: "idle" });
+          return;
+        }
+        apply(no, r[no].status === "in" ? "out" : "in", minRef.current);
+      },
+      screen.via === "card" ? 800 : 1100,
+    );
     return () => clearTimeout(t);
-  }, [screen, finish]);
+  }, [screen, apply, setScreen]);
 
   const fade = reduce
     ? { initial: { opacity: 1 }, animate: { opacity: 1 }, exit: { opacity: 1 } }
     : { initial: { opacity: 0, y: 12 }, animate: { opacity: 1, y: 0 }, exit: { opacity: 0, y: -8 } };
+  const key = screen.kind === "done" || screen.kind === "scan" ? `${screen.kind}-${screen.seq}` : screen.kind;
 
   return (
     <div className="flex h-full flex-col bg-[#f6f7f9] text-[#142340]">
-      <header className="flex h-[72px] shrink-0 items-center justify-between bg-[#16294a] px-6 text-white">
+      <header className="flex h-[64px] shrink-0 items-center justify-between bg-[#16294a] px-6 text-white">
         <div className="flex items-center gap-2.5">
-          <GraduationCap size={26} aria-hidden />
-          <span className="text-[22px] font-bold">영어 학원</span>
+          <GraduationCap size={24} aria-hidden />
+          <span className="text-[21px] font-bold">영어 학원</span>
         </div>
         <div className="text-right leading-tight">
-          <div className="text-[15px] text-[#c9d3e3]">{fmtKo(today)}</div>
-          <div className="text-[20px] font-bold tabular-nums">{hm(nowMin)}</div>
+          <div className="text-[14px] text-[#c9d3e3]">{fmtKo(today)}</div>
+          <div className="text-[19px] font-bold tabular-nums">{hm(nowMin)}</div>
         </div>
       </header>
       <div className="relative min-h-0 flex-1">
         <AnimatePresence mode="wait" initial={false}>
-          <motion.div key={screen.kind} {...fade} transition={{ duration: 0.22, ease: [0.2, 0, 0, 1] }} className="absolute inset-0 flex flex-col">
+          <motion.div key={key} {...fade} transition={{ duration: 0.22, ease: [0.2, 0, 0, 1] }} className="absolute inset-0 flex flex-col">
             {screen.kind === "idle" && (
-              <Idle sec={sec} today={today} onMode={(mode) => setScreen({ kind: "pad", mode })} onQr={() => setScreen({ kind: "scan" })} />
+              <Idle
+                sec={sec}
+                today={today}
+                onMode={(mode) => setScreen({ kind: "pad", mode })}
+                onQr={() => setScreen({ kind: "scan", via: "qr", seq: sec })}
+              />
             )}
             {screen.kind === "pad" && (
               <Pad
@@ -303,10 +531,10 @@ function Kiosk({ today, sec, recs, apply, active }: { today: Date; sec: number; 
                 mode={screen.mode}
                 no={screen.no}
                 onRetry={() => setScreen({ kind: "pad", mode: screen.mode })}
-                onOk={() => finish(screen.no, screen.mode)}
+                onOk={() => apply(screen.no, screen.mode, minRef.current)}
               />
             )}
-            {screen.kind === "scan" && <Scan onCancel={() => setScreen({ kind: "idle" })} />}
+            {screen.kind === "scan" && <Scan via={screen.via} onCancel={() => setScreen({ kind: "idle" })} />}
             {screen.kind === "done" && <Done screen={screen} onHome={() => setScreen({ kind: "idle" })} />}
           </motion.div>
         </AnimatePresence>
@@ -318,53 +546,94 @@ function Kiosk({ today, sec, recs, apply, active }: { today: Date; sec: number; 
 function Idle({ sec, today, onMode, onQr }: { sec: number; today: Date; onMode: (m: Mode) => void; onQr: () => void }) {
   const h = Math.floor(sec / 3600) % 24;
   const m = Math.floor(sec / 60) % 60;
+  const nowMin = Math.floor(sec / 60);
+  const sentence = SENTENCES[today.getDate() % SENTENCES.length];
   return (
-    <div className="flex h-full flex-col px-6 pb-6 pt-10">
-      <div className="text-center">
-        <div className="text-[19px] font-medium text-[#4a5568]">{fmtKo(today)}</div>
-        <div className="mt-1 text-[84px] font-bold leading-none tracking-[-0.02em] tabular-nums" aria-label={`현재 시각 ${h}시 ${m}분`}>
-          {p2(h)}:{p2(m)}
-        </div>
-        <p className="mt-4 text-[19px] text-[#2b3a55]">등원 또는 하원을 눌러 주세요</p>
-      </div>
-      <div className="mt-8 grid grid-cols-2 gap-4">
-        <button
-          type="button"
-          onClick={() => onMode("in")}
-          className={`flex h-[176px] flex-col items-center justify-center gap-3 rounded-[16px] bg-[#0d6e4c] text-white shadow-[0_2px_0_#09523a] active:translate-y-[1px] ${FOCUS}`}
-        >
-          <LogIn size={44} aria-hidden />
-          <span className="text-[34px] font-bold">등원</span>
-        </button>
-        <button
-          type="button"
-          onClick={() => onMode("out")}
-          className={`flex h-[176px] flex-col items-center justify-center gap-3 rounded-[16px] bg-[#16294a] text-white shadow-[0_2px_0_#0d1a31] active:translate-y-[1px] ${FOCUS}`}
-        >
-          <LogOut size={44} aria-hidden />
-          <span className="text-[34px] font-bold">하원</span>
-        </button>
-      </div>
-      <div className="mt-5 flex flex-col rounded-[16px] border border-[#d5dae2] bg-white p-5">
-        <div className="flex items-center gap-4">
-          <div className="grid h-[76px] w-[76px] shrink-0 place-items-center rounded-[12px] border-2 border-dashed border-[#9aa6b8] text-[#16294a]">
-            <QrCode size={40} aria-hidden />
-          </div>
+    <div className="flex h-full flex-col">
+      <div className="relative h-[178px] shrink-0 overflow-hidden">
+        <Photo src="/images/demo-academy/classroom.jpg" alt="영어 학원 강의실" className="absolute inset-0 h-full w-full" pos="50% 45%" />
+        <div className="absolute inset-0 bg-gradient-to-t from-[#0c1a33]/90 via-[#0c1a33]/45 to-[#0c1a33]/10" aria-hidden />
+        <div className="absolute inset-x-6 bottom-4 flex items-end justify-between text-white">
           <div>
-            <div className="text-[21px] font-bold">QR 코드를 카메라에 대 주세요</div>
-            <div className="mt-1 text-[16px] text-[#4a5568]">학생증이나 학부모 앱의 QR 코드</div>
+            <div className="text-[16px] font-medium text-white/90">{fmtKo(today)}</div>
+            <div className="text-[64px] font-bold leading-none tracking-[-0.02em] tabular-nums" aria-label={`현재 시각 ${h}시 ${m}분`}>
+              {p2(h)}:{p2(m)}
+            </div>
           </div>
+          <p className="pb-1.5 text-right text-[16px] font-medium leading-snug text-white/95">
+            등원 또는 하원을
+            <br />
+            눌러 주세요
+          </p>
         </div>
-        <button
-          type="button"
-          onClick={onQr}
-          className={`mt-5 flex h-[72px] w-full items-center justify-center gap-2 rounded-[12px] border-2 border-[#16294a] text-[21px] font-bold text-[#16294a] active:bg-[#eef1f6] ${FOCUS}`}
-        >
-          <ScanLine size={26} aria-hidden />
-          QR 찍기
-        </button>
       </div>
-      <p className="mt-auto text-center text-[15px] text-[#5a6577]">번호를 모르면 데스크 선생님께 말씀해 주세요</p>
+
+      <div className="flex min-h-0 flex-1 flex-col px-5 pb-5 pt-4">
+        <div className="grid grid-cols-2 gap-3">
+          <button
+            type="button"
+            onClick={() => onMode("in")}
+            className={`flex h-[128px] flex-col items-center justify-center gap-2 rounded-[16px] bg-[#0d6e4c] text-white shadow-[0_2px_0_#09523a] active:translate-y-[1px] ${FOCUS}`}
+          >
+            <LogIn size={38} aria-hidden />
+            <span className="text-[30px] font-bold">등원</span>
+          </button>
+          <button
+            type="button"
+            onClick={() => onMode("out")}
+            className={`flex h-[128px] flex-col items-center justify-center gap-2 rounded-[16px] bg-[#16294a] text-white shadow-[0_2px_0_#0d1a31] active:translate-y-[1px] ${FOCUS}`}
+          >
+            <LogOut size={38} aria-hidden />
+            <span className="text-[30px] font-bold">하원</span>
+          </button>
+        </div>
+
+        <div className="mt-3 flex items-center gap-3 rounded-[16px] border border-[#d5dae2] bg-white p-3 pl-5">
+          <div className="min-w-0 flex-1">
+            <div className="text-[17px] font-bold leading-snug">QR 코드를 카메라에 대 주세요</div>
+            <div className="text-[14px] text-[#4a5568]">학생증은 화면 아래 리더기에</div>
+          </div>
+          <button
+            type="button"
+            onClick={onQr}
+            className={`flex h-[64px] shrink-0 items-center gap-1.5 rounded-[12px] border-2 border-[#16294a] px-3.5 text-[17px] font-bold text-[#16294a] active:bg-[#eef1f6] ${FOCUS}`}
+          >
+            <ScanLine size={22} aria-hidden />
+            QR 찍기
+          </button>
+        </div>
+
+        <div className="mt-4">
+          <div className="flex items-baseline justify-between">
+            <h2 className="text-[16px] font-bold">오늘 수업</h2>
+            <span className="text-[13px] text-[#5a6577]">담당 선생님</span>
+          </div>
+          <ul className="mt-2 grid grid-cols-2 gap-2">
+            {CLASSES.map((c) => {
+              const state = nowMin >= c.end ? "수업 끝" : nowMin >= c.start ? "수업 중" : `${hm(c.start)} 시작`;
+              const live = state === "수업 중";
+              return (
+                <li key={c.id} className={`flex items-center gap-2.5 rounded-[12px] border bg-white p-2 ${live ? "border-[#0d6e4c]" : "border-[#e1e5eb]"}`}>
+                  <Photo src={c.teacher.img} alt={c.teacher.alt} pos={c.teacher.pos} className="h-10 w-10 shrink-0 rounded-full" />
+                  <div className="min-w-0 flex-1">
+                    <div className="truncate text-[14px] font-bold leading-tight">{c.name}</div>
+                    <div className="mt-0.5 flex items-center gap-1.5 text-[12px] leading-tight">
+                      <span className="truncate text-[#4a5568]">{c.teacher.name}</span>
+                      <span className={`shrink-0 font-bold ${live ? "text-[#0a5c40]" : state === "수업 끝" ? "text-[#8c95a3]" : "text-[#1b3359]"}`}>{state}</span>
+                    </div>
+                  </div>
+                </li>
+              );
+            })}
+          </ul>
+        </div>
+
+        <div className="mt-auto rounded-[14px] bg-[#16294a] px-4 py-3 text-white">
+          <div className="text-[12px] font-bold text-[#9fb3d4]">오늘의 영어 한 문장</div>
+          <div className="mt-1 text-[18px] font-bold leading-snug">{sentence.en}</div>
+          <div className="text-[14px] text-[#c9d3e3]">{sentence.ko}</div>
+        </div>
+      </div>
     </div>
   );
 }
@@ -524,7 +793,7 @@ function Pad({ mode, recs, active, onBack, onMatch }: { mode: Mode; recs: Record
 }
 
 function Confirm({ mode, no, onRetry, onOk }: { mode: Mode; no: string; onRetry: () => void; onOk: () => void }) {
-  const s = STUDENTS.find((x) => x.no === no)!;
+  const s = studentOf(no);
   const c = classOf(s.cls);
   const word = mode === "in" ? "등원" : "하원";
   return (
@@ -533,10 +802,10 @@ function Confirm({ mode, no, onRetry, onOk }: { mode: Mode; no: string; onRetry:
         <BackButton onClick={onRetry} label="다시 입력" />
         <ModeTag mode={mode} />
       </div>
-      <h2 className="mt-4 text-center text-[26px] font-bold">{word}할 학생이 맞나요?</h2>
-      <div className="mt-6 rounded-[16px] border border-[#d5dae2] bg-white p-6">
+      <h2 className="mt-3 text-center text-[26px] font-bold">{word}할 학생이 맞나요?</h2>
+      <div className="mt-5 rounded-[16px] border border-[#d5dae2] bg-white p-6">
         <div className="flex items-center gap-5">
-          <div className="grid h-[88px] w-[88px] shrink-0 place-items-center rounded-full bg-[#e7ecf4] text-[36px] font-bold text-[#16294a]" aria-hidden>
+          <div className="grid h-[84px] w-[84px] shrink-0 place-items-center rounded-full bg-[#e7ecf4] text-[34px] font-bold text-[#16294a]" aria-hidden>
             {s.name[0]}
           </div>
           <div className="min-w-0">
@@ -544,12 +813,17 @@ function Confirm({ mode, no, onRetry, onOk }: { mode: Mode; no: string; onRetry:
             <div className="mt-1 text-[19px] text-[#2b3a55]">{c.name}</div>
           </div>
         </div>
-        <dl className="mt-5 grid grid-cols-[auto_1fr] gap-x-5 gap-y-2.5 border-t border-[#e4e8ee] pt-5 text-[18px]">
+        <dl className="mt-5 grid grid-cols-[auto_1fr] items-center gap-x-5 gap-y-2.5 border-t border-[#e4e8ee] pt-5 text-[18px]">
           <dt className="text-[#5a6577]">학생 번호</dt>
           <dd className="font-bold tabular-nums">{s.no}</dd>
           <dt className="text-[#5a6577]">오늘 수업</dt>
           <dd className="font-bold tabular-nums">
-            {hm(c.start)}~{hm(c.end)}
+            {hm(c.start)}~{hm(c.end)}, {c.room}
+          </dd>
+          <dt className="text-[#5a6577]">담당 선생님</dt>
+          <dd className="flex items-center gap-2 font-bold">
+            <Photo src={c.teacher.img} alt="" pos={c.teacher.pos} className="h-8 w-8 rounded-full" />
+            {c.teacher.name} 선생님
           </dd>
           <dt className="text-[#5a6577]">알림 받는 분</dt>
           <dd className="font-bold tabular-nums">
@@ -577,23 +851,23 @@ function Confirm({ mode, no, onRetry, onOk }: { mode: Mode; no: string; onRetry:
   );
 }
 
-function Scan({ onCancel }: { onCancel: () => void }) {
+function Scan({ via, onCancel }: { via: "qr" | "card"; onCancel: () => void }) {
   const reduce = useReducedMotion();
+  const card = via === "card";
   return (
     <div className="flex h-full flex-col items-center px-6 pb-6 pt-10">
       <div className="relative h-[260px] w-[260px] overflow-hidden rounded-[20px] bg-[#0f1b31]">
-        {[
-          "left-4 top-4 border-l-4 border-t-4 rounded-tl-[10px]",
-          "right-4 top-4 border-r-4 border-t-4 rounded-tr-[10px]",
-          "left-4 bottom-4 border-l-4 border-b-4 rounded-bl-[10px]",
-          "right-4 bottom-4 border-r-4 border-b-4 rounded-br-[10px]",
-        ].map((c) => (
-          <span key={c} aria-hidden className={`absolute h-12 w-12 border-white ${c}`} />
-        ))}
+        {!card &&
+          [
+            "left-4 top-4 border-l-4 border-t-4 rounded-tl-[10px]",
+            "right-4 top-4 border-r-4 border-t-4 rounded-tr-[10px]",
+            "left-4 bottom-4 border-l-4 border-b-4 rounded-bl-[10px]",
+            "right-4 bottom-4 border-r-4 border-b-4 rounded-br-[10px]",
+          ].map((c) => <span key={c} aria-hidden className={`absolute h-12 w-12 border-white ${c}`} />)}
         <div className="absolute inset-0 grid place-items-center text-[#c9d3e3]">
-          <QrCode size={96} aria-hidden strokeWidth={1.5} />
+          {card ? <Nfc size={96} aria-hidden strokeWidth={1.5} /> : <QrCode size={96} aria-hidden strokeWidth={1.5} />}
         </div>
-        {!reduce && (
+        {!reduce && !card && (
           <motion.span
             aria-hidden
             className="absolute left-6 right-6 h-[3px] rounded-full bg-[#3ccf8e]"
@@ -602,11 +876,20 @@ function Scan({ onCancel }: { onCancel: () => void }) {
             transition={{ duration: 1, ease: "easeInOut", repeat: Infinity, repeatType: "reverse" }}
           />
         )}
+        {!reduce && card && (
+          <motion.span
+            aria-hidden
+            className="absolute left-1/2 top-1/2 h-[150px] w-[150px] -translate-x-1/2 -translate-y-1/2 rounded-full border-[3px] border-[#3ccf8e]"
+            initial={{ scale: 0.6, opacity: 0.9 }}
+            animate={{ scale: 1.5, opacity: 0 }}
+            transition={{ duration: 0.8, ease: "easeOut", repeat: Infinity }}
+          />
+        )}
       </div>
       <p className="mt-8 text-[24px] font-bold" role="status">
-        QR 코드를 읽고 있습니다
+        {card ? "학생증을 읽고 있습니다" : "QR 코드를 읽고 있습니다"}
       </p>
-      <p className="mt-2 text-[17px] text-[#4a5568]">카메라에서 떼지 말고 잠시 기다려 주세요</p>
+      <p className="mt-2 text-[17px] text-[#4a5568]">{card ? "리더기에서 떼지 말고 잠시 기다려 주세요" : "카메라에서 떼지 말고 잠시 기다려 주세요"}</p>
       <button
         type="button"
         onClick={onCancel}
@@ -620,7 +903,8 @@ function Scan({ onCancel }: { onCancel: () => void }) {
 }
 
 function Done({ screen, onHome }: { screen: Extract<Screen, { kind: "done" }>; onHome: () => void }) {
-  const s = STUDENTS.find((x) => x.no === screen.no)!;
+  const s = studentOf(screen.no);
+  const c = classOf(s.cls);
   const [left, setLeft] = useState(5);
   const homeRef = useRef(onHome);
   useEffect(() => {
@@ -642,43 +926,55 @@ function Done({ screen, onHome }: { screen: Extract<Screen, { kind: "done" }>; o
   const word = screen.mode === "in" ? "등원" : "하원";
   const green = screen.mode === "in";
   return (
-    <div className="flex h-full flex-col px-6 pb-6 pt-8">
-      <div className="flex flex-col items-center text-center">
+    <div className="flex h-full flex-col px-5 pb-5 pt-6">
+      <div className="flex items-center gap-4 px-1">
         <motion.div
           initial={{ scale: 0.6, opacity: 0 }}
           animate={{ scale: 1, opacity: 1 }}
           transition={{ type: "spring", stiffness: 380, damping: 22 }}
-          className={`grid h-[112px] w-[112px] place-items-center rounded-full text-white ${green ? "bg-[#0d6e4c]" : "bg-[#16294a]"}`}
+          className={`grid h-[84px] w-[84px] shrink-0 place-items-center rounded-full text-white ${green ? "bg-[#0d6e4c]" : "bg-[#16294a]"}`}
         >
-          <Check size={64} strokeWidth={3} aria-hidden />
+          <Check size={48} strokeWidth={3} aria-hidden />
         </motion.div>
-        <p className="mt-6 text-[30px] font-bold leading-snug" role="status">
+        <p className="text-[26px] font-bold leading-snug" role="status">
           {s.name} 학생
           <br />
           <span className="tabular-nums">{hm(screen.at)}</span> {word} 처리되었습니다
         </p>
-        {screen.late && (
-          <p className="mt-2 text-[17px] font-medium text-[#8a4300]">수업 시작 {hm(classOf(s.cls).start)}보다 늦어 지각으로 기록했습니다</p>
-        )}
       </div>
-      <div className="mt-6 rounded-[16px] border border-[#d5dae2] bg-white p-5">
-        <div className="flex items-center gap-2 text-[18px] font-bold">
-          <MessageSquareText size={22} aria-hidden className="text-[#0d6e4c]" />
+      {screen.late && <p className="mt-3 px-1 text-[16px] font-medium text-[#8a4300]">수업 시작 {hm(c.start)}보다 늦어 지각으로 기록했습니다</p>}
+
+      <div className="mt-5 overflow-hidden rounded-[16px] border border-[#d5dae2] bg-white">
+        <div className="flex items-center gap-4 p-4">
+          <Photo src={c.teacher.img} alt={c.teacher.alt} pos={c.teacher.pos} className="h-[76px] w-[76px] shrink-0 rounded-[14px]" />
+          <div className="min-w-0">
+            <div className="text-[13px] font-bold text-[#0a5c40]">{green ? "오늘 수업 담당 선생님" : "오늘 수업한 선생님"}</div>
+            <div className="mt-0.5 text-[21px] font-bold leading-tight">{c.teacher.name} 선생님</div>
+            <div className="mt-1 text-[15px] tabular-nums text-[#4a5568]">
+              {c.name}, {hm(c.start)}~{hm(c.end)}, {c.room}
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div className="mt-3 rounded-[16px] border border-[#d5dae2] bg-white p-4">
+        <div className="flex items-center gap-2 text-[17px] font-bold">
+          <MessageSquareText size={21} aria-hidden className="text-[#0d6e4c]" />
           학부모님께 알림을 보냈습니다
         </div>
-        <div className="mt-1 text-[15px] text-[#5a6577] tabular-nums">
+        <div className="mt-0.5 text-[14px] text-[#5a6577] tabular-nums">
           {s.parent} {maskPhone(s.phone)} 알림톡
         </div>
-        <div className="mt-3 rounded-[12px] bg-[#f1f3f6] p-4 text-[17px] leading-[1.55] text-[#1f2b40]">{alimText(s, screen.mode, screen.at)}</div>
+        <div className="mt-2.5 rounded-[12px] bg-[#f1f3f6] p-3.5 text-[16px] leading-[1.55] text-[#1f2b40]">{alimText(s, screen.mode, screen.at)}</div>
       </div>
       <div className="mt-auto">
-        <p className="mb-3 text-center text-[17px] text-[#4a5568]" aria-live="polite">
+        <p className="mb-3 text-center text-[16px] text-[#4a5568]" aria-live="polite">
           <span className="font-bold tabular-nums text-[#142340]">{left}초</span> 뒤 처음 화면으로 돌아갑니다
         </p>
         <button
           type="button"
           onClick={onHome}
-          className={`h-[80px] w-full rounded-[14px] bg-[#16294a] text-[23px] font-bold text-white active:translate-y-[1px] ${FOCUS}`}
+          className={`h-[76px] w-full rounded-[14px] bg-[#16294a] text-[22px] font-bold text-white active:translate-y-[1px] ${FOCUS}`}
         >
           처음으로
         </button>
@@ -702,7 +998,7 @@ function AdminPanel({
   nowMin: number;
   recs: Record<string, Rec>;
   lastChanged: string | null;
-  resend: (no: string, at: number) => void;
+  resend: (no: string, at: number, r: Rec) => void;
 }) {
   const [filter, setFilter] = useState<string>("all");
   const [toast, setToast] = useState<{ id: number; text: string } | null>(null);
@@ -716,32 +1012,36 @@ function AdminPanel({
 
   const counts = useMemo(() => {
     const by = (list: Student[]) => {
-      let inn = 0, out = 0, none = 0, late = 0;
+      let inn = 0,
+        out = 0,
+        none = 0;
       list.forEach((s) => {
         const r = recs[s.no];
         if (r.status === "in") inn++;
         else if (r.status === "out") out++;
         else none++;
-        if (r.late) late++;
       });
-      return { inn, out, none, late, total: list.length };
+      return { inn, out, none, total: list.length };
     };
     return {
       all: by(STUDENTS),
       ...Object.fromEntries(CLASSES.map((c) => [c.id, by(STUDENTS.filter((s) => s.cls === c.id))])),
-    } as Record<string, { inn: number; out: number; none: number; late: number; total: number }>;
+    } as Record<string, { inn: number; out: number; none: number; total: number }>;
   }, [recs]);
 
   const rows = STUDENTS.filter((s) => filter === "all" || s.cls === filter);
 
   const onResend = (s: Student) => {
-    resend(s.no, nowMin);
     const r = recs[s.no];
+    resend(s.no, nowMin, r);
     toastSeq.current += 1;
-    setToast({ id: toastSeq.current, text: r.status === "none" ? `${s.name} 학생 학부모님께 미등원 안내를 보냈습니다` : `${s.name} 학생 학부모님께 알림을 다시 보냈습니다` });
+    setToast({
+      id: toastSeq.current,
+      text: r.status === "none" ? `${s.name} 학생 학부모님께 미등원 안내를 보냈습니다` : `${s.name} 학생 학부모님께 알림을 다시 보냈습니다`,
+    });
   };
 
-  const tabs = [{ id: "all", name: "전체" }, ...CLASSES.map((c) => ({ id: c.id, name: c.name }))];
+  const all = counts.all;
 
   return (
     <section className="mt-4 overflow-hidden rounded-[14px] border border-[#cfd5de] bg-white shadow-[0_12px_30px_-18px_rgba(20,35,64,0.4)]" aria-label="관리자 화면">
@@ -751,55 +1051,59 @@ function AdminPanel({
         <span aria-hidden className="h-3 w-3 rounded-full bg-[#d4d8de]" />
         <span className="ml-2 truncate text-[13px] text-[#5a6577]">영어 학원 출결 관리</span>
       </div>
-      <div className="p-4 md:p-6">
-        <div className="flex flex-wrap items-end justify-between gap-2">
+
+      <div className="relative overflow-hidden">
+        <Photo src="/images/demo-academy/hero.jpg" alt="영어 학원 강의실" className="absolute inset-0 h-full w-full" pos="50% 40%" />
+        <div className="absolute inset-0 bg-gradient-to-r from-[#0c1a33]/92 via-[#0c1a33]/75 to-[#0c1a33]/35" aria-hidden />
+        <div className="relative flex flex-col gap-5 px-5 py-6 text-white md:flex-row md:items-end md:justify-between md:px-7 md:py-8">
           <div>
-            <h2 className="text-[22px] font-bold">오늘 출결</h2>
-            <p className="mt-0.5 text-[15px] text-[#4a5568]">
-              {fmtKo(today)} <span className="tabular-nums">{hm(nowMin)}:{p2(sec % 60)}</span> 기준
+            <div className="text-[14px] font-medium text-[#c9d3e3]">영어 학원</div>
+            <h2 className="mt-1 text-[28px] font-bold leading-tight">오늘 출결</h2>
+            <p className="mt-1 text-[15px] text-white/90">
+              {fmtKo(today)}{" "}
+              <span className="tabular-nums">
+                {hm(nowMin)}:{p2(sec % 60)}
+              </span>{" "}
+              기준, 전체 {all.total}명
             </p>
           </div>
-          <p className="text-[15px] text-[#2b3a55]">
-            전체 {counts.all.total}명 중 <b className="text-[#0a5c40]">등원 {counts.all.inn}</b>, 하원 {counts.all.out}, 미등원 {counts.all.none}
-          </p>
+          <dl className="grid grid-cols-3 gap-2 md:w-[360px]">
+            {(
+              [
+                ["등원", all.inn],
+                ["하원", all.out],
+                ["미등원", all.none],
+              ] as const
+            ).map(([label, n]) => (
+              <div key={label} className="rounded-[10px] border border-white/20 bg-white/10 px-3 py-2.5">
+                <dt className="text-[13px] text-[#c9d3e3]">{label}</dt>
+                <dd className="text-[26px] font-bold leading-tight tabular-nums">{n}</dd>
+              </div>
+            ))}
+          </dl>
         </div>
+      </div>
 
-        <div className="mt-4 grid grid-cols-1 gap-3 sm:grid-cols-2 lg:grid-cols-4" role="group" aria-label="반 선택">
-          {tabs.map((t) => {
-            const c = counts[t.id];
-            const on = filter === t.id;
-            const info = CLASSES.find((x) => x.id === t.id);
-            return (
-              <button
-                key={t.id}
-                type="button"
-                aria-pressed={on}
-                onClick={() => setFilter(t.id)}
-                className={`rounded-[12px] border p-4 text-left transition-colors ${FOCUS} ${
-                  on ? "border-[#16294a] bg-[#f3f6fb] ring-1 ring-[#16294a]" : "border-[#dde2e9] bg-white hover:border-[#9aa6b8]"
-                }`}
-              >
-                <div className="flex items-baseline justify-between gap-2">
-                  <span className="text-[16px] font-bold">{t.name}</span>
-                  <span className="text-[13px] text-[#5a6577] tabular-nums">{info ? `${hm(info.start)}~${hm(info.end)}` : `${c.total}명`}</span>
-                </div>
-                <dl className="mt-3 grid grid-cols-3 gap-2 text-center">
-                  {(
-                    [
-                      ["등원", c.inn, "text-[#0a5c40]"],
-                      ["하원", c.out, "text-[#1b3359]"],
-                      ["미등원", c.none, "text-[#4a5361]"],
-                    ] as const
-                  ).map(([label, n, cls]) => (
-                    <div key={label} className="rounded-[8px] bg-[#f5f7fa] py-2">
-                      <dt className="text-[13px] text-[#5a6577]">{label}</dt>
-                      <dd className={`text-[20px] font-bold tabular-nums ${cls}`}>{n}</dd>
-                    </div>
-                  ))}
-                </dl>
-              </button>
-            );
-          })}
+      <div className="p-4 md:p-6">
+        <div className="text-[14px] font-bold text-[#2b3a55]">선생님별 보기</div>
+        <div className="mt-2 grid grid-cols-2 gap-2.5 sm:grid-cols-3 lg:grid-cols-5" role="group" aria-label="반 선택">
+          <FilterButton wide on={filter === "all"} onClick={() => setFilter("all")} title="전체" sub={`${all.total}명`} c={all}>
+            <span className="grid h-11 w-11 shrink-0 place-items-center rounded-full bg-[#e7ecf4] text-[#16294a]" aria-hidden>
+              <Users size={20} />
+            </span>
+          </FilterButton>
+          {CLASSES.map((c) => (
+            <FilterButton
+              key={c.id}
+              on={filter === c.id}
+              onClick={() => setFilter(c.id)}
+              title={`${c.teacher.name} 선생님`}
+              sub={`${c.name} ${hm(c.start)}`}
+              c={counts[c.id]}
+            >
+              <Photo src={c.teacher.img} alt="" pos={c.teacher.pos} className="h-11 w-11 shrink-0 rounded-full" />
+            </FilterButton>
+          ))}
         </div>
 
         {/* PC: 표 */}
@@ -819,7 +1123,7 @@ function AdminPanel({
             <tbody>
               {rows.map((s) => {
                 const r = recs[s.no];
-                const chip = chipOf(r);
+                const c = classOf(s.cls);
                 return (
                   <tr key={s.no} className={`border-t border-[#e8ebf0] ${lastChanged === s.no ? "bg-[#f6fbf8]" : ""}`}>
                     <td className="px-4 py-3 tabular-nums text-[#4a5568]">{s.no}</td>
@@ -827,11 +1131,16 @@ function AdminPanel({
                       {s.name}
                       {lastChanged === s.no && <span className="ml-2 text-[12px] font-medium text-[#0a5c40]">방금 처리</span>}
                     </td>
-                    <td className="px-4 py-3">{classOf(s.cls).name}</td>
+                    <td className="px-4 py-3">
+                      <span className="flex items-center gap-2">
+                        <Photo src={c.teacher.img} alt="" pos={c.teacher.pos} className="h-6 w-6 shrink-0 rounded-full" />
+                        {c.name}
+                      </span>
+                    </td>
                     <td className="px-4 py-3 tabular-nums">{r.inAt != null ? hm(r.inAt) : "-"}</td>
                     <td className="px-4 py-3 tabular-nums">{r.outAt != null ? hm(r.outAt) : "-"}</td>
                     <td className="px-4 py-3">
-                      <StatusChip chip={chip} />
+                      <StatusChip chip={chipOf(r)} />
                     </td>
                     <td className="px-4 py-3">
                       <ResendCell r={r} onClick={() => onResend(s)} name={s.name} />
@@ -847,6 +1156,7 @@ function AdminPanel({
         <ul className="mt-5 space-y-2.5 md:hidden">
           {rows.map((s) => {
             const r = recs[s.no];
+            const c = classOf(s.cls);
             return (
               <li key={s.no} className={`rounded-[12px] border border-[#dde2e9] p-4 ${lastChanged === s.no ? "bg-[#f6fbf8]" : "bg-white"}`}>
                 <div className="flex items-start justify-between gap-3">
@@ -854,7 +1164,10 @@ function AdminPanel({
                     <div className="text-[17px] font-bold">
                       {s.name} <span className="text-[14px] font-medium text-[#5a6577] tabular-nums">{s.no}</span>
                     </div>
-                    <div className="mt-0.5 text-[14px] text-[#4a5568]">{classOf(s.cls).name}</div>
+                    <div className="mt-1 flex items-center gap-1.5 text-[14px] text-[#4a5568]">
+                      <Photo src={c.teacher.img} alt="" pos={c.teacher.pos} className="h-5 w-5 shrink-0 rounded-full" />
+                      {c.name}
+                    </div>
                   </div>
                   <StatusChip chip={chipOf(r)} />
                 </div>
@@ -890,6 +1203,54 @@ function AdminPanel({
         </AnimatePresence>
       </div>
     </section>
+  );
+}
+
+function FilterButton({
+  on,
+  onClick,
+  title,
+  sub,
+  c,
+  children,
+  wide,
+}: {
+  wide?: boolean;
+  on: boolean;
+  onClick: () => void;
+  title: string;
+  sub: string;
+  c: { inn: number; out: number; none: number };
+  children: React.ReactNode;
+}) {
+  return (
+    <button
+      type="button"
+      aria-pressed={on}
+      onClick={onClick}
+      className={`min-w-0 rounded-[12px] border p-3 text-left transition-colors ${wide ? "col-span-2 sm:col-span-1" : ""} ${FOCUS} ${
+        on ? "border-[#16294a] bg-[#f3f6fb] ring-1 ring-[#16294a]" : "border-[#dde2e9] bg-white hover:border-[#9aa6b8]"
+      }`}
+    >
+      <div className={`flex gap-2.5 ${wide ? "items-center" : "flex-col items-start sm:flex-row sm:items-center"}`}>
+        {children}
+        <div className="min-w-0">
+          <div className="truncate text-[15px] font-bold">{title}</div>
+          <div className="truncate text-[13px] tabular-nums text-[#5a6577]">{sub}</div>
+        </div>
+      </div>
+      <div className="mt-2.5 flex flex-wrap gap-x-2.5 gap-y-0.5 text-[13px] tabular-nums text-[#4a5568]">
+        <span>
+          등원 <b className="text-[#0a5c40]">{c.inn}</b>
+        </span>
+        <span>
+          하원 <b className="text-[#1b3359]">{c.out}</b>
+        </span>
+        <span>
+          미등원 <b className="text-[#142340]">{c.none}</b>
+        </span>
+      </div>
+    </button>
   );
 }
 

@@ -2,18 +2,24 @@
 
 // 학원 출결, 알림 앱 카탈로그(11-01). 학부모 화면: 홈, 출결, 알림장, 수납, 상담
 import { useEffect, useMemo, useRef, useState, type ReactNode } from "react";
+import Image from "next/image";
 import { AnimatePresence, motion } from "framer-motion";
 import {
   BatteryFull,
   Bell,
+  BellRing,
   BookOpen,
   CalendarCheck,
   ChevronLeft,
   ChevronRight,
   CircleCheck,
+  Bus,
+  Camera,
+  ChartLine,
   Clock,
   CreditCard,
   House,
+  Images,
   LoaderCircle,
   LogIn,
   LogOut,
@@ -22,6 +28,7 @@ import {
   Phone,
   School,
   Signal,
+  TrendingUp,
   Wifi,
   X,
 } from "lucide-react";
@@ -32,6 +39,37 @@ import { useReducedMotionSafe } from "@/hooks/useReducedMotionSafe";
 const ACADEMY = "수학 영어 학원";
 const CHILD = { name: "김ㅎ늘", grade: "중학교 2학년", classes: ["중2 수학 심화반", "영어 리딩 B반"] };
 const FOCUS = "outline-none focus-visible:ring-2 focus-visible:ring-[#2557d6] focus-visible:ring-offset-2";
+const IMG = "/images/demo-academy";
+
+// 선생님 얼굴 사진. 원장실 글은 원장 사진, 행정실 글은 학원 아이콘
+const PEOPLE: Record<string, { photo: string; subject: string; short: string }> = {
+  "수학 박ㅅ연 선생님": { photo: `${IMG}/teacher1.jpg`, subject: "중2 수학 심화", short: "박ㅅ연" },
+  "영어 이ㅈ민 선생님": { photo: "/images/demo-english-talk/teacher-korean.jpg", subject: "영어 리딩 B반", short: "이ㅈ민" },
+  "원장 최ㅇ희": { photo: `${IMG}/teacher2.jpg`, subject: "학습 상담", short: "최ㅇ희" },
+};
+PEOPLE["원장실"] = PEOPLE["원장 최ㅇ희"];
+
+const PHOTOS = {
+  classroom: { src: `${IMG}/classroom.jpg`, alt: "강의실에서 교재를 펴 놓고 수업을 듣는 중학생들" },
+  study: { src: `${IMG}/study.jpg`, alt: "계산기 옆에서 연습장에 수학 문제를 푸는 손" },
+  hero: { src: `${IMG}/hero.jpg`, alt: "해 질 무렵 창밖으로 도시가 보이는 학원 강의실" },
+};
+type Photo = (typeof PHOTOS)[keyof typeof PHOTOS];
+
+function Avatar({ who, size = 40 }: { who: string; size?: number }) {
+  const person = PEOPLE[who];
+  if (!person)
+    return (
+      <span className="grid shrink-0 place-items-center rounded-full bg-[#eef1f5] text-[#4e5968]" style={{ width: size, height: size }} aria-hidden="true">
+        <School size={Math.round(size * 0.45)} />
+      </span>
+    );
+  return (
+    <span className="relative shrink-0 overflow-hidden rounded-full bg-[#eef1f5] ring-1 ring-black/5" style={{ width: size, height: size }}>
+      <Image src={person.photo} alt={`${who} 사진`} fill sizes={`${size * 2}px`} className="object-cover object-[50%_20%]" />
+    </span>
+  );
+}
 
 type Tab = "home" | "attend" | "notes" | "pay" | "consult";
 type Status = "출석" | "지각" | "결석";
@@ -124,6 +162,8 @@ type Note = {
   body: string[];
   tasks?: string[];
   due?: string;
+  photos?: Photo[];
+  cover?: Photo;
 };
 
 function buildNotes(today: Date, classDay: Date): Note[] {
@@ -139,6 +179,7 @@ function buildNotes(today: Date, classDay: Date): Note[] {
       body: ["오늘은 일차함수 그래프와 활용 문제를 배웠습니다.", "그래프 해석 문제에서 실수가 많아 오답 정리를 꼭 해 오도록 지도 부탁드립니다."],
       tasks: ["개념서 84~89쪽 풀기", "오답 노트 3문제 정리", "단원 확인 테스트 틀린 문제 다시 풀기"],
       due: next[0] ? fmtKo(next[0]) : undefined,
+      photos: [PHOTOS.classroom, PHOTOS.study],
     },
     {
       id: "n2",
@@ -168,6 +209,7 @@ function buildNotes(today: Date, classDay: Date): Note[] {
       title: "기말고사 대비 주말 보강 일정",
       teacher: "원장실",
       date: daysAgo(classDay, 4),
+      cover: PHOTOS.hero,
       body: [
         "기말고사를 앞두고 토요일 오전에 보강 수업을 엽니다.",
         "중2 수학은 10시부터 12시까지, 영어는 13시부터 15시까지입니다.",
@@ -205,12 +247,12 @@ const PAY_METHODS = ["신용, 체크카드", "계좌이체", "간편결제"] as 
 
 // ---------- 상담 데이터 ----------
 const SLOTS = ["16:00", "16:30", "17:00", "19:00", "19:30", "20:00"];
-const TEACHERS = ["수학 박ㅅ연 선생님", "영어 이ㅈ민 선생님", "원장 최ㅇ호"];
+const TEACHERS = ["수학 박ㅅ연 선생님", "영어 이ㅈ민 선생님", "원장 최ㅇ희"];
 type Booking = { id: string; date: Date; time: string; teacher: string; type: string; status: "예약 접수" | "상담 완료" };
 
 // ---------- 공통 조각 ----------
 function Card({ children, className = "" }: { children: ReactNode; className?: string }) {
-  return <section className={`rounded-[12px] bg-white p-4 ${className}`}>{children}</section>;
+  return <section className={`rounded-[14px] bg-white p-4 shadow-[0_1px_3px_rgba(15,23,42,0.05)] ${className}`}>{children}</section>;
 }
 
 function SectionTitle({ children, action }: { children: ReactNode; action?: ReactNode }) {
@@ -244,6 +286,42 @@ function Row({ label, value }: { label: string; value: ReactNode }) {
   );
 }
 
+// ================= 셔틀 =================
+type PushMsg = { text: string; target: "first" | "shuttle" };
+const SHUTTLE_START = 0.42;
+const ROUTE: [number, number][] = [
+  [34, 168],
+  [118, 168],
+  [118, 100],
+  [212, 100],
+  [212, 44],
+  [306, 44],
+];
+const SEG = ROUTE.slice(1).map((pt, i) => Math.hypot(pt[0] - ROUTE[i][0], pt[1] - ROUTE[i][1]));
+const ROUTE_LEN = SEG.reduce((a, b) => a + b, 0);
+const STOPS = [
+  { name: "학원 앞", at: 0, time: "18:05" },
+  { name: "도서관 앞", at: (SEG[0] + SEG[1]) / ROUTE_LEN, time: "18:11" },
+  { name: "주민센터", at: (SEG[0] + SEG[1] + SEG[2]) / ROUTE_LEN, time: "18:15" },
+  { name: "아파트 후문", at: 1, time: "18:21" },
+];
+function pointAt(t: number): [number, number] {
+  let d = t * ROUTE_LEN;
+  for (let i = 0; i < SEG.length; i++) {
+    if (d <= SEG[i] || i === SEG.length - 1) {
+      const r = SEG[i] ? Math.min(1, d / SEG[i]) : 0;
+      return [ROUTE[i][0] + (ROUTE[i + 1][0] - ROUTE[i][0]) * r, ROUTE[i][1] + (ROUTE[i + 1][1] - ROUTE[i][1]) * r];
+    }
+    d -= SEG[i];
+  }
+  return ROUTE[ROUTE.length - 1];
+}
+const etaMin = (p: number) => Math.max(0, Math.ceil((1 - p) * 16));
+const firstPushText = () => {
+  const d = new Date().getDay();
+  return d >= 1 && d <= 5 ? `${CHILD.name} 학생이 15:52 등원했습니다.` : "새 알림장이 등록되었습니다. 이번 주 숙제를 확인해 주세요.";
+};
+
 // ================= 메인 =================
 export function AppAcademyDemo() {
   const today = useDemoToday();
@@ -260,18 +338,42 @@ export function AppAcademyDemo() {
   const [payStep, setPayStep] = useState<"bill" | "method" | "done">("bill");
   const [bookings, setBookings] = useState<Booking[]>([]);
   const [consultStep, setConsultStep] = useState<"list" | "form" | "done">("list");
-  const [push, setPush] = useState(false);
+  const [push, setPush] = useState<PushMsg | null>(null);
+  const [homeView, setHomeView] = useState<"main" | "shuttle" | "report">("main");
+  const [viewer, setViewer] = useState<Photo | null>(null);
+  const [progress, setProgress] = useState(SHUTTLE_START);
+  const [alertOn, setAlertOn] = useState(true);
+  const progRef = useRef(SHUTTLE_START);
+  const alertRef = useRef(true);
   const scrollRef = useRef<HTMLDivElement>(null);
 
-  // 푸시 알림은 한 번만 내려왔다가 들어간다
+  // 첫 푸시 알림은 한 번만 내려온다
   useEffect(() => {
-    const show = setTimeout(() => setPush(true), 1400);
-    const hide = setTimeout(() => setPush(false), 7400);
-    return () => {
-      clearTimeout(show);
-      clearTimeout(hide);
-    };
+    const show = setTimeout(() => setPush({ text: firstPushText(), target: "first" }), 1400);
+    return () => clearTimeout(show);
   }, []);
+  // 알림은 6초 뒤 들어간다
+  useEffect(() => {
+    if (!push) return;
+    const hide = setTimeout(() => setPush(null), 6000);
+    return () => clearTimeout(hide);
+  }, [push]);
+  // 셔틀 위치는 1초마다 갱신
+  useEffect(() => {
+    const id = setInterval(() => {
+      const prev = progRef.current;
+      if (prev >= 1) return;
+      const next = Math.min(1, prev + 0.005);
+      progRef.current = next;
+      setProgress(next);
+      if (next >= 1 && alertRef.current) setPush({ text: `${CHILD.name} 학생이 ${STOPS[STOPS.length - 1].name} 정류장에서 하차했습니다.`, target: "shuttle" });
+    }, 1000);
+    return () => clearInterval(id);
+  }, []);
+  const toggleAlert = () => {
+    alertRef.current = !alertRef.current;
+    setAlertOn(alertRef.current);
+  };
 
   const toTop = () => {
     scrollRef.current?.scrollTo({ top: 0 });
@@ -281,6 +383,7 @@ export function AppAcademyDemo() {
   const go = (t: Tab) => {
     setTab(t);
     setNoteId(null);
+    setHomeView("main");
     if (t === "pay" && payStep === "done") setPayStep("bill");
     if (t === "consult" && consultStep === "done") setConsultStep("list");
     toTop();
@@ -300,6 +403,10 @@ export function AppAcademyDemo() {
   let title = TABS.find((t) => t.id === tab)?.label ?? "";
   let back: (() => void) | null = null;
   if (tab === "home") title = ACADEMY;
+  if (tab === "home" && homeView !== "main") {
+    title = homeView === "shuttle" ? "셔틀 위치" : "주간 학습 리포트";
+    back = () => setHomeView("main");
+  }
   if (tab === "notes" && note) {
     title = note.kind;
     back = () => setNoteId(null);
@@ -313,9 +420,12 @@ export function AppAcademyDemo() {
     back = () => setConsultStep("list");
   }
 
-  const pushText = isClassToday
-    ? `${CHILD.name} 학생이 15:52 등원했습니다.`
-    : `새 알림장이 등록되었습니다. 이번 주 숙제를 확인해 주세요.`;
+  const openHome = (v: "shuttle" | "report") => {
+    setTab("home");
+    setNoteId(null);
+    setHomeView(v);
+    toTop();
+  };
 
   return (
     <div className="min-h-[100dvh] bg-[#f2f4f6] text-[#191f28] md:flex md:flex-col md:items-center md:bg-[#e4e7eb] md:py-6">
@@ -354,7 +464,9 @@ export function AppAcademyDemo() {
           </header>
 
           <main className="px-4 pt-4">
-            {tab === "home" && (
+            {tab === "home" && homeView === "shuttle" && <ShuttleView progress={progress} reduce={reduce} alertOn={alertOn} onToggle={toggleAlert} />}
+            {tab === "home" && homeView === "report" && <ReportView classDay={classDay} />}
+            {tab === "home" && homeView === "main" && (
               <HomeView
                 today={today}
                 classDay={classDay}
@@ -365,6 +477,9 @@ export function AppAcademyDemo() {
                 bookings={bookings}
                 onOpenNote={openNote}
                 onGo={go}
+                onOpen={openHome}
+                onPhoto={setViewer}
+                progress={progress}
               />
             )}
             {tab === "attend" && <AttendView today={today} classDay={classDay} />}
@@ -372,6 +487,7 @@ export function AppAcademyDemo() {
               (note ? (
                 <NoteDetail
                   note={note}
+                  onPhoto={setViewer}
                   checked={checkedIds.includes(note.id)}
                   onCheck={() => setCheckedIds((c) => [...c, note.id])}
                 />
@@ -461,8 +577,9 @@ export function AppAcademyDemo() {
                 <button
                   type="button"
                   onClick={() => {
-                    setPush(false);
-                    if (isClassToday) go("home");
+                    setPush(null);
+                    if (push.target === "shuttle") openHome("shuttle");
+                    else if (isClassToday) go("home");
                     else openNote("n1");
                   }}
                   className={`flex min-h-[56px] min-w-0 flex-1 items-start gap-3 rounded-[12px] py-2 text-left ${FOCUS}`}
@@ -474,13 +591,40 @@ export function AppAcademyDemo() {
                     <span className="flex items-center gap-2 text-[13px] text-[#6b7684]">
                       <span className="font-semibold text-[#333d4b]">{ACADEMY}</span>지금
                     </span>
-                    <span className="mt-0.5 block text-[15px] leading-[1.45] text-[#191f28]">{pushText}</span>
+                    <span className="mt-0.5 block text-[15px] leading-[1.45] text-[#191f28]">{push.text}</span>
                   </span>
                 </button>
-                <button type="button" onClick={() => setPush(false)} aria-label="알림 닫기" className={`grid h-11 w-11 shrink-0 place-items-center rounded-[10px] text-[#8b95a1] ${FOCUS}`}>
+                <button type="button" onClick={() => setPush(null)} aria-label="알림 닫기" className={`grid h-11 w-11 shrink-0 place-items-center rounded-[10px] text-[#8b95a1] ${FOCUS}`}>
                   <X size={18} />
                 </button>
               </div>
+            </motion.div>
+          )}
+        </AnimatePresence>
+
+        {/* 사진 크게 보기 */}
+        <AnimatePresence>
+          {viewer && (
+            <motion.div
+              role="dialog"
+              aria-modal="true"
+              aria-label="사진 크게 보기"
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              exit={{ opacity: 0 }}
+              transition={{ duration: reduce ? 0 : 0.18 }}
+              className="fixed inset-0 z-[80] flex flex-col bg-[#0b0d10] md:absolute"
+              onKeyDown={(e) => e.key === "Escape" && setViewer(null)}
+            >
+              <div className="flex h-14 items-center justify-end px-2 md:mt-11">
+                <button type="button" autoFocus onClick={() => setViewer(null)} aria-label="닫기" className={`grid h-11 w-11 place-items-center rounded-[10px] text-white ${FOCUS}`}>
+                  <X size={24} />
+                </button>
+              </div>
+              <div className="relative mx-4 flex-1">
+                <Image src={viewer.src} alt={viewer.alt} fill sizes="(min-width: 768px) 370px, 100vw" className="object-contain" />
+              </div>
+              <p className="px-6 pb-10 pt-4 text-center text-[15px] leading-[1.5] text-white/80">{viewer.alt}</p>
             </motion.div>
           )}
         </AnimatePresence>
@@ -504,6 +648,9 @@ function HomeView({
   bookings,
   onOpenNote,
   onGo,
+  onOpen,
+  onPhoto,
+  progress,
 }: {
   today: Date;
   classDay: Date;
@@ -514,7 +661,14 @@ function HomeView({
   bookings: Booking[];
   onOpenNote: (id: string) => void;
   onGo: (t: Tab) => void;
+  onOpen: (v: "shuttle" | "report") => void;
+  onPhoto: (p: Photo) => void;
+  progress: number;
 }) {
+  const banner = notes.find((n) => n.id === "n4");
+  const homework = notes.find((n) => n.id === "n1");
+  const eta = etaMin(progress);
+  const math = REPORT.수학;
   const records = monthRecords(classDay.getFullYear(), classDay.getMonth(), today, 0);
   const present = records.filter((r) => r.status !== "결석").length;
   const rate = records.length ? Math.round((present / records.length) * 100) : 100;
@@ -529,6 +683,18 @@ function HomeView({
 
   return (
     <div className="space-y-3">
+      {banner?.cover && (
+        <button type="button" onClick={() => onOpenNote(banner.id)} className={`relative block aspect-[16/9] w-full overflow-hidden rounded-[14px] bg-[#dfe3e8] text-left ${FOCUS}`}>
+          <Image src={banner.cover.src} alt={banner.cover.alt} fill priority sizes="(min-width: 768px) 360px, 100vw" className="object-cover" />
+          <span className="absolute inset-0 bg-gradient-to-t from-black/70 via-black/20 to-transparent" aria-hidden="true" />
+          <span className="absolute inset-x-0 bottom-0 p-4 text-white">
+            <span className="inline-flex h-6 items-center rounded-[6px] bg-white/20 px-2 text-[12px] font-semibold backdrop-blur-sm">이번 주 공지</span>
+            <span className="mt-2 block text-[18px] font-bold leading-[1.35]">{banner.title}</span>
+            <span className="mt-0.5 block text-[13px] text-white/80">{banner.teacher}, {fmtMD(banner.date)}</span>
+          </span>
+        </button>
+      )}
+
       <Card>
         <div className="flex items-center gap-3">
           <span className="grid h-12 w-12 shrink-0 place-items-center rounded-full bg-[#e9eefb] text-[17px] font-bold text-[#2557d6]" aria-hidden="true">
@@ -541,7 +707,41 @@ function HomeView({
             <p className="mt-0.5 text-[14px] text-[#6b7684]">{CHILD.classes.join(", ")}</p>
           </div>
         </div>
+        <ul className="mt-4 grid grid-cols-2 gap-2 border-t border-[#f2f4f6] pt-4">
+          {TEACHERS.slice(0, 2).map((t) => (
+            <li key={t} className="flex min-w-0 items-center gap-2.5">
+              <Avatar who={t} size={36} />
+              <span className="min-w-0">
+                <span className="block truncate text-[14px] font-semibold">{PEOPLE[t].short} 선생님</span>
+                <span className="block truncate text-[12px] text-[#8b95a1]">{PEOPLE[t].subject}</span>
+              </span>
+            </li>
+          ))}
+        </ul>
       </Card>
+
+      <div className="grid grid-cols-2 gap-3">
+        <button type="button" onClick={() => onOpen("shuttle")} className={`flex flex-col rounded-[14px] bg-[#17233f] p-4 text-left text-white shadow-[0_1px_3px_rgba(15,23,42,0.08)] ${FOCUS}`}>
+          <span className="flex items-center gap-1.5 text-[13px] font-semibold text-white/75">
+            <Bus size={16} aria-hidden="true" /> 하원 셔틀 2호차
+          </span>
+          <span className="mt-2 text-[22px] font-bold leading-tight">{eta > 0 ? `${eta}분 뒤 도착` : "하차 완료"}</span>
+          <span className="mt-1 text-[13px] text-white/70">{STOPS[STOPS.length - 1].name} 정류장</span>
+          <span className="mt-3 block h-1.5 overflow-hidden rounded-full bg-white/15" aria-hidden="true">
+            <span className="block h-full rounded-full bg-[#7fa6ff] transition-[width] duration-700" style={{ width: `${Math.round(progress * 100)}%` }} />
+          </span>
+        </button>
+        <button type="button" onClick={() => onOpen("report")} className={`flex flex-col rounded-[14px] bg-white p-4 text-left shadow-[0_1px_3px_rgba(15,23,42,0.05)] ${FOCUS}`}>
+          <span className="flex items-center gap-1.5 text-[13px] font-semibold text-[#6b7684]">
+            <ChartLine size={16} aria-hidden="true" /> 주간 학습 리포트
+          </span>
+          <span className="mt-2 text-[22px] font-bold leading-tight">수학 {math.scores[math.scores.length - 1]}점</span>
+          <span className="mt-1 flex items-center gap-1 text-[13px] font-semibold text-[#1f7a52]">
+            <TrendingUp size={14} aria-hidden="true" /> 지난주보다 +{math.scores[math.scores.length - 1] - math.scores[math.scores.length - 2]}점
+          </span>
+          <Sparkline values={math.scores} className="mt-2 h-7 w-full" />
+        </button>
+      </div>
 
       <Card>
         <SectionTitle action={<span className="text-[14px] text-[#6b7684]">{fmtKo(classDay)}</span>}>
@@ -574,17 +774,33 @@ function HomeView({
       </Card>
 
       <div className="grid grid-cols-2 gap-3">
-        <button type="button" onClick={() => onGo("attend")} className={`rounded-[12px] bg-white p-4 text-left ${FOCUS}`}>
+        <button type="button" onClick={() => onGo("attend")} className={`rounded-[14px] bg-white p-4 text-left shadow-[0_1px_3px_rgba(15,23,42,0.05)] ${FOCUS}`}>
           <p className="text-[14px] text-[#6b7684]">{classDay.getMonth() + 1}월 출석률</p>
           <p className="mt-1 text-[22px] font-bold">{rate}%</p>
           <p className="mt-0.5 text-[13px] text-[#8b95a1]">수업 {records.length}회 중 {present}회</p>
         </button>
-        <button type="button" onClick={() => onGo("pay")} className={`rounded-[12px] bg-white p-4 text-left ${FOCUS}`}>
+        <button type="button" onClick={() => onGo("pay")} className={`rounded-[14px] bg-white p-4 text-left shadow-[0_1px_3px_rgba(15,23,42,0.05)] ${FOCUS}`}>
           <p className="text-[14px] text-[#6b7684]">{m}월 수강료</p>
           <p className="mt-1 text-[22px] font-bold">{won(BILL_TOTAL)}</p>
           <p className={`mt-0.5 text-[13px] font-semibold ${paid ? "text-[#1f7a52]" : "text-[#c0392b]"}`}>{paid ? "납부 완료" : `미납, ${m}월 10일까지`}</p>
         </button>
       </div>
+
+      {homework?.photos && (
+        <Card>
+          <SectionTitle
+            action={
+              <button type="button" onClick={() => onOpenNote(homework.id)} className={`-mr-2 flex h-11 items-center gap-0.5 rounded-[8px] px-2 text-[14px] text-[#6b7684] ${FOCUS}`}>
+                알림장 보기 <ChevronRight size={16} />
+              </button>
+            }
+          >
+            수업 사진
+          </SectionTitle>
+          <PhotoGrid photos={homework.photos} onPhoto={onPhoto} />
+          <p className="mt-2 text-[13px] text-[#8b95a1]">{homework.teacher}, {fmtKo(homework.date)}</p>
+        </Card>
+      )}
 
       <Card>
         <SectionTitle
@@ -752,14 +968,26 @@ function AttendView({ today, classDay }: { today: Date; classDay: Date }) {
 // ================= 알림장 =================
 function NoteRow({ note, unread, onOpen }: { note: Note; unread: boolean; onOpen: () => void }) {
   return (
-    <button type="button" onClick={onOpen} className={`flex min-h-[64px] w-full items-center gap-3 px-4 py-3 text-left hover:bg-[#f9fafb] ${FOCUS} focus-visible:ring-inset focus-visible:ring-offset-0`}>
-      <span className={`shrink-0 rounded-[6px] px-2 py-0.5 text-[12px] font-semibold ${note.kind === "숙제" ? "bg-[#e9eefb] text-[#2557d6]" : "bg-[#f2f4f6] text-[#4e5968]"}`}>{note.kind}</span>
+    <button type="button" onClick={onOpen} className={`flex min-h-[68px] w-full items-center gap-3 px-4 py-3 text-left hover:bg-[#f9fafb] ${FOCUS} focus-visible:ring-inset focus-visible:ring-offset-0`}>
+      <Avatar who={note.teacher} size={40} />
       <span className="min-w-0 flex-1">
-        <span className={`block truncate text-[15px] ${unread ? "font-bold" : "font-medium"}`}>{note.title}</span>
-        <span className="mt-0.5 block text-[13px] text-[#8b95a1]">
+        <span className="flex items-center gap-1.5">
+          <span className={`shrink-0 rounded-[5px] px-1.5 py-px text-[11px] font-semibold ${note.kind === "숙제" ? "bg-[#e9eefb] text-[#2557d6]" : "bg-[#f2f4f6] text-[#4e5968]"}`}>{note.kind}</span>
+          <span className={`truncate text-[15px] ${unread ? "font-bold" : "font-medium"}`}>{note.title}</span>
+        </span>
+        <span className="mt-0.5 block truncate text-[13px] text-[#8b95a1]">
           {note.teacher}, {fmtMD(note.date)}
         </span>
       </span>
+      {note.photos && (
+        <span className="relative h-11 w-11 shrink-0 overflow-hidden rounded-[8px] bg-[#eef1f5]">
+          <Image src={note.photos[0].src} alt="" fill sizes="88px" className="object-cover" />
+          <span className="absolute bottom-0.5 right-0.5 inline-flex items-center gap-0.5 rounded-[4px] bg-black/60 px-1 text-[10px] font-semibold leading-[14px] text-white">
+            <Images size={9} aria-hidden="true" />
+            {note.photos.length}
+          </span>
+        </span>
+      )}
       {unread && <span className="h-2 w-2 shrink-0 rounded-full bg-[#e5483b]" aria-label="읽지 않음" />}
     </button>
   );
@@ -800,21 +1028,50 @@ function NotesList({ notes, readIds, checkedIds, onOpen }: { notes: Note[]; read
   );
 }
 
-function NoteDetail({ note, checked, onCheck }: { note: Note; checked: boolean; onCheck: () => void }) {
+function PhotoGrid({ photos, onPhoto }: { photos: Photo[]; onPhoto: (p: Photo) => void }) {
+  return (
+    <ul className="grid grid-cols-2 gap-2">
+      {photos.map((ph) => (
+        <li key={ph.src}>
+          <button type="button" onClick={() => onPhoto(ph)} aria-label={`사진 크게 보기, ${ph.alt}`} className={`relative block aspect-[4/3] w-full overflow-hidden rounded-[10px] bg-[#eef1f5] ${FOCUS}`}>
+            <Image src={ph.src} alt={ph.alt} fill sizes="(min-width: 768px) 170px, 50vw" className="object-cover transition-transform duration-300 hover:scale-[1.03] motion-reduce:transition-none" />
+          </button>
+        </li>
+      ))}
+    </ul>
+  );
+}
+
+function NoteDetail({ note, checked, onCheck, onPhoto }: { note: Note; checked: boolean; onCheck: () => void; onPhoto: (p: Photo) => void }) {
   return (
     <div className="space-y-3">
+      {note.cover && (
+        <div className="relative aspect-[16/9] overflow-hidden rounded-[14px] bg-[#dfe3e8]">
+          <Image src={note.cover.src} alt={note.cover.alt} fill sizes="(min-width: 768px) 360px, 100vw" className="object-cover" />
+        </div>
+      )}
       <Card>
         <span className={`inline-block rounded-[6px] px-2 py-0.5 text-[12px] font-semibold ${note.kind === "숙제" ? "bg-[#e9eefb] text-[#2557d6]" : "bg-[#f2f4f6] text-[#4e5968]"}`}>{note.kind}</span>
         <h2 className="mt-2 text-[20px] font-bold leading-[1.4]">{note.title}</h2>
-        <p className="mt-1 text-[14px] text-[#8b95a1]">
-          {note.teacher}, {fmtKo(note.date)}
-        </p>
+        <div className="mt-3 flex items-center gap-2.5">
+          <Avatar who={note.teacher} size={36} />
+          <p className="text-[14px] text-[#6b7684]">
+            <span className="block font-semibold text-[#333d4b]">{note.teacher}</span>
+            {fmtKo(note.date)}
+          </p>
+        </div>
         <div className="mt-4 space-y-2 border-t border-[#f2f4f6] pt-4 text-[16px] leading-[1.6] text-[#333d4b]">
           {note.body.map((b) => (
             <p key={b}>{b}</p>
           ))}
         </div>
       </Card>
+      {note.photos && (
+        <Card>
+          <SectionTitle action={<span className="flex items-center gap-1 text-[13px] text-[#8b95a1]"><Camera size={14} aria-hidden="true" />{note.photos.length}장</span>}>수업 사진</SectionTitle>
+          <PhotoGrid photos={note.photos} onPhoto={onPhoto} />
+        </Card>
+      )}
       {note.tasks && (
         <Card>
           <SectionTitle action={note.due && <span className="text-[14px] text-[#6b7684]">{note.due}까지</span>}>숙제</SectionTitle>
@@ -1055,19 +1312,35 @@ function ConsultView({
           </fieldset>
         </Card>
         <Card>
-          <label htmlFor="consult-teacher" className="mb-3 block text-[17px] font-bold">
-            담당 선생님
-          </label>
-          <select
-            id="consult-teacher"
-            value={teacher}
-            onChange={(e) => setTeacher(e.target.value)}
-            className={`h-[52px] w-full rounded-[10px] border border-[#e5e8eb] bg-white px-3 text-[16px] ${FOCUS}`}
-          >
-            {TEACHERS.map((t) => (
-              <option key={t}>{t}</option>
-            ))}
-          </select>
+          <fieldset>
+            <legend className="mb-3 text-[17px] font-bold">담당 선생님</legend>
+            <div className="grid grid-cols-3 gap-2">
+              {TEACHERS.map((t) => {
+                const on = teacher === t;
+                const person = PEOPLE[t];
+                return (
+                  <label
+                    key={t}
+                    className={`relative flex cursor-pointer flex-col overflow-hidden rounded-[12px] border-2 bg-white has-[:focus-visible]:ring-2 has-[:focus-visible]:ring-[#2557d6] has-[:focus-visible]:ring-offset-2 ${on ? "border-[#2557d6]" : "border-transparent ring-1 ring-inset ring-[#e5e8eb]"}`}
+                  >
+                    <input type="radio" name="teacher" value={t} checked={on} onChange={() => setTeacher(t)} className="sr-only" />
+                    <span className="relative block aspect-square w-full bg-[#eef1f5]">
+                      <Image src={person.photo} alt={`${t} 사진`} fill sizes="120px" className="object-cover object-[50%_20%]" />
+                      {on && (
+                        <span className="absolute right-1.5 top-1.5 grid h-6 w-6 place-items-center rounded-full bg-[#2557d6] text-white" aria-hidden="true">
+                          <CircleCheck size={16} />
+                        </span>
+                      )}
+                    </span>
+                    <span className="px-2 py-2 text-center">
+                      <span className={`block text-[14px] ${on ? "font-bold text-[#2557d6]" : "font-semibold"}`}>{person.short}</span>
+                      <span className="block truncate text-[12px] text-[#8b95a1]">{person.subject}</span>
+                    </span>
+                  </label>
+                );
+              })}
+            </div>
+          </fieldset>
         </Card>
         <Card>
           <fieldset>
@@ -1160,9 +1433,7 @@ function ConsultView({
         <ul className="-mx-4 divide-y divide-[#f2f4f6]">
           {all.map((b) => (
             <li key={b.id} className="flex min-h-[64px] items-center gap-3 px-4 py-3">
-              <span className="grid h-10 w-10 shrink-0 place-items-center rounded-full bg-[#f2f4f6] text-[#4e5968]" aria-hidden="true">
-                {b.type === "전화 상담" ? <Phone size={18} /> : <School size={18} />}
-              </span>
+              <Avatar who={b.teacher} size={40} />
               <div className="min-w-0 flex-1">
                 <p className="text-[15px] font-semibold">
                   {fmtKo(b.date)} {b.time}
@@ -1194,5 +1465,282 @@ function ChoiceRadio({ name, value, checked, onChange, icon: Icon }: { name: str
       <Icon size={18} aria-hidden="true" />
       {value}
     </label>
+  );
+}
+
+// ================= 주간 학습 리포트 =================
+const REPORT = {
+  수학: {
+    teacher: "수학 박ㅅ연 선생님",
+    scores: [72, 76, 74, 79, 82, 88],
+    units: [
+      { name: "일차함수 개념", value: 94 },
+      { name: "그래프 해석", value: 78 },
+      { name: "활용 문제", value: 86 },
+    ],
+    homework: "5/5",
+    comment: "그래프 해석 문제에서 기울기를 먼저 확인하는 습관이 생겼습니다. 활용 문제는 식 세우는 과정을 조금 더 연습하면 다음 단원 평가에서 90점 이상 기대할 수 있습니다.",
+  },
+  영어: {
+    teacher: "영어 이ㅈ민 선생님",
+    scores: [80, 78, 83, 85, 84, 87],
+    units: [
+      { name: "단어 시험", value: 92 },
+      { name: "독해", value: 85 },
+      { name: "문법", value: 81 },
+    ],
+    homework: "4/5",
+    comment: "Unit 5 단어 시험을 거의 다 맞혔습니다. 긴 지문에서 주제문을 찾는 속도가 빨라졌고, 관계대명사 문제만 한 번 더 복습하면 좋겠습니다.",
+  },
+};
+type Subject = keyof typeof REPORT;
+
+function Sparkline({ values, className = "" }: { values: number[]; className?: string }) {
+  const min = Math.min(...values) - 2;
+  const max = Math.max(...values) + 2;
+  const pts = values.map((v, i) => `${(i / (values.length - 1)) * 100},${28 - ((v - min) / (max - min)) * 24}`).join(" ");
+  return (
+    <svg viewBox="0 0 100 30" preserveAspectRatio="none" className={className} aria-hidden="true">
+      <polyline points={pts} fill="none" stroke="#2557d6" strokeWidth="2" strokeLinejoin="round" strokeLinecap="round" vectorEffect="non-scaling-stroke" />
+    </svg>
+  );
+}
+
+function ReportView({ classDay }: { classDay: Date }) {
+  const [subject, setSubject] = useState<Subject>("수학");
+  const r = REPORT[subject];
+  const last = r.scores[r.scores.length - 1];
+  const diff = last - r.scores[r.scores.length - 2];
+  const weekStart = daysAgo(classDay, classDay.getDay() - 1);
+  const labels = r.scores.map((_, i) => fmtMD(daysAgo(weekStart, 7 * (r.scores.length - 1 - i))));
+  const W = 320;
+  const H = 150;
+  const L = 30;
+  const T = 14;
+  const B = 26;
+  const x = (i: number) => L + (i / (r.scores.length - 1)) * (W - L - 16);
+  const y = (v: number) => T + (1 - (v - 60) / 40) * (H - T - B);
+
+  return (
+    <div className="space-y-3">
+      <div role="group" aria-label="과목" className="grid grid-cols-2 gap-1 rounded-[12px] bg-[#e9ecf0] p-1">
+        {(Object.keys(REPORT) as Subject[]).map((sj) => (
+          <button
+            key={sj}
+            type="button"
+            aria-pressed={subject === sj}
+            onClick={() => setSubject(sj)}
+            className={`h-11 rounded-[9px] text-[15px] ${subject === sj ? "bg-white font-bold text-[#191f28] shadow-[0_1px_2px_rgba(15,23,42,0.1)]" : "font-medium text-[#6b7684]"} ${FOCUS}`}
+          >
+            {sj}
+          </button>
+        ))}
+      </div>
+
+      <Card>
+        <p className="text-[14px] text-[#6b7684]">
+          {fmtMD(weekStart)}~{fmtMD(daysAgo(weekStart, -4))} 주간 평가
+        </p>
+        <div className="mt-1 flex items-end gap-2">
+          <p className="text-[32px] font-bold leading-none">
+            {last}
+            <span className="ml-0.5 text-[18px]">점</span>
+          </p>
+          <p className={`mb-0.5 flex items-center gap-0.5 text-[14px] font-semibold ${diff >= 0 ? "text-[#1f7a52]" : "text-[#c0392b]"}`}>
+            <TrendingUp size={15} aria-hidden="true" className={diff < 0 ? "-scale-y-100" : ""} />
+            지난주보다 {diff >= 0 ? `${diff}점 올랐어요` : `${-diff}점 내렸어요`}
+          </p>
+        </div>
+        <svg viewBox={`0 0 ${W} ${H}`} className="mt-4 h-auto w-full" role="img" aria-label={`최근 6주 점수 ${r.scores.join(", ")}점`}>
+          {[60, 80, 100].map((g) => (
+            <g key={g}>
+              <line x1={L} x2={W - 8} y1={y(g)} y2={y(g)} stroke="#eef0f3" strokeWidth="1" />
+              <text x={L - 8} y={y(g) + 4} textAnchor="end" fontSize="11" fill="#8b95a1">
+                {g}
+              </text>
+            </g>
+          ))}
+          <polyline points={r.scores.map((v, i) => `${x(i)},${y(v)}`).join(" ")} fill="none" stroke="#2557d6" strokeWidth="2.5" strokeLinejoin="round" strokeLinecap="round" />
+          {r.scores.map((v, i) => {
+            const isLast = i === r.scores.length - 1;
+            return (
+              <g key={i}>
+                <circle cx={x(i)} cy={y(v)} r={isLast ? 5 : 3.5} fill={isLast ? "#2557d6" : "#fff"} stroke="#2557d6" strokeWidth="2" />
+                {isLast && (
+                  <text x={x(i)} y={y(v) - 11} textAnchor="middle" fontSize="12" fontWeight="700" fill="#2557d6">
+                    {v}
+                  </text>
+                )}
+                <text x={x(i)} y={H - 6} textAnchor="middle" fontSize="11" fill={isLast ? "#333d4b" : "#8b95a1"} fontWeight={isLast ? 600 : 400}>
+                  {labels[i]}
+                </text>
+              </g>
+            );
+          })}
+        </svg>
+      </Card>
+
+      <Card>
+        <SectionTitle>단원별 성취도</SectionTitle>
+        <ul className="space-y-3">
+          {r.units.map((u) => (
+            <li key={u.name}>
+              <div className="flex items-center justify-between text-[15px]">
+                <span>{u.name}</span>
+                <span className="font-semibold">{u.value}%</span>
+              </div>
+              <div className="mt-1.5 h-2 overflow-hidden rounded-full bg-[#eef0f3]">
+                <div className="h-full rounded-full bg-[#2557d6]" style={{ width: `${u.value}%` }} />
+              </div>
+            </li>
+          ))}
+        </ul>
+        <dl className="mt-4 grid grid-cols-2 gap-2 border-t border-[#f2f4f6] pt-4 text-center">
+          <div className="rounded-[10px] bg-[#f7f8fa] py-2.5">
+            <dt className="text-[13px] text-[#6b7684]">출석</dt>
+            <dd className="mt-0.5 text-[17px] font-bold">5/5</dd>
+          </div>
+          <div className="rounded-[10px] bg-[#f7f8fa] py-2.5">
+            <dt className="text-[13px] text-[#6b7684]">과제 제출</dt>
+            <dd className="mt-0.5 text-[17px] font-bold">{r.homework}</dd>
+          </div>
+        </dl>
+      </Card>
+
+      <Card>
+        <div className="flex items-center gap-3">
+          <Avatar who={r.teacher} size={44} />
+          <div>
+            <p className="text-[15px] font-bold">{r.teacher}</p>
+            <p className="text-[13px] text-[#8b95a1]">이번 주 코멘트</p>
+          </div>
+        </div>
+        <p className="mt-3 rounded-[10px] bg-[#f7f8fa] p-3.5 text-[15px] leading-[1.65] text-[#333d4b]">{r.comment}</p>
+      </Card>
+    </div>
+  );
+}
+
+// ================= 셔틀 위치 =================
+function ShuttleView({ progress, reduce, alertOn, onToggle }: { progress: number; reduce: boolean; alertOn: boolean; onToggle: () => void }) {
+  const [bx, by] = pointAt(progress);
+  const eta = etaMin(progress);
+  const done = progress >= 1;
+  const passedPts = [...ROUTE.filter((_, i) => i === 0 || SEG.slice(0, i).reduce((a, b) => a + b, 0) / ROUTE_LEN <= progress), [bx, by]];
+  const nextIdx = STOPS.findIndex((st) => st.at > progress + 0.0001);
+
+  return (
+    <div className="space-y-3">
+      <Card className="!p-0 overflow-hidden">
+        <div className="flex items-center justify-between px-4 pb-3 pt-4">
+          <div>
+            <p className="flex items-center gap-1.5 text-[13px] font-semibold text-[#2557d6]">
+              <span className={`h-2 w-2 rounded-full ${done ? "bg-[#8b95a1]" : "bg-[#2f9e6b]"}`} aria-hidden="true" />
+              {done ? "운행 종료" : "운행 중"}
+            </p>
+            <p className="mt-1 text-[22px] font-bold" aria-live="polite">
+              {done ? "아파트 후문 하차 완료" : `${eta}분 뒤 도착 예정`}
+            </p>
+            <p className="text-[14px] text-[#6b7684]">하원 셔틀 2호차, 아파트 후문 정류장</p>
+          </div>
+        </div>
+        <svg viewBox="0 0 340 210" className="block h-auto w-full bg-[#f3f5f8]" role="img" aria-label={`셔틀 노선 지도, ${done ? "하차 정류장 도착" : `다음 정류장 ${STOPS[nextIdx]?.name ?? ""}`}`}>
+          {/* 블록과 도로 */}
+          {[
+            [10, 10, 90, 70],
+            [140, 10, 54, 72],
+            [236, 64, 94, 62],
+            [10, 118, 90, 34],
+            [140, 122, 190, 78],
+            [10, 186, 90, 20],
+          ].map(([x, y, w, h], i) => (
+            <rect key={i} x={x} y={y} width={w} height={h} rx="6" fill={i === 4 ? "#e3efe6" : "#e8ebef"} />
+          ))}
+          <text x={235} y={166} fontSize="11" fill="#7c9b84">
+            중앙공원
+          </text>
+          <polyline points={ROUTE.map((p) => p.join(",")).join(" ")} fill="none" stroke="#c7d3ee" strokeWidth="7" strokeLinejoin="round" strokeLinecap="round" />
+          <polyline points={passedPts.map((p) => p.join(",")).join(" ")} fill="none" stroke="#2557d6" strokeWidth="7" strokeLinejoin="round" strokeLinecap="round" />
+          {STOPS.map((st, i) => {
+            const [sx, sy] = pointAt(st.at);
+            const passed = st.at <= progress;
+            const last = i === STOPS.length - 1;
+            const lx = i === 0 ? sx : last ? sx - 4 : i === 1 ? sx - 12 : sx + 10;
+            const ly = i === 0 ? sy + 22 : last ? sy - 14 : i === 1 ? sy + 4 : sy + 18;
+            return (
+              <g key={st.name}>
+                <circle cx={sx} cy={sy} r={last ? 8 : 6} fill="#fff" stroke={passed ? "#2557d6" : "#9fb2dc"} strokeWidth="3" />
+                {last && <circle cx={sx} cy={sy} r="3" fill="#2557d6" />}
+                <text x={lx} y={ly} fontSize="12" fontWeight={last ? 700 : 500} fill="#333d4b" textAnchor={i === 0 ? "middle" : last || i === 1 ? "end" : "start"}>
+                  {st.name}
+                </text>
+              </g>
+            );
+          })}
+          <g style={{ transform: `translate(${bx}px, ${by}px)`, transition: reduce ? "none" : "transform 1s linear" }}>
+            {!done && <circle r="19" fill="#2557d6" opacity="0.14" />}
+            <circle r="13" fill="#2557d6" stroke="#fff" strokeWidth="3" />
+            <Bus x={-7.5} y={-7.5} width={15} height={15} color="#fff" strokeWidth={2.2} aria-hidden="true" />
+          </g>
+        </svg>
+        <div className="flex items-center gap-3 px-4 py-3">
+          <span className="grid h-10 w-10 shrink-0 place-items-center rounded-full bg-[#e9eefb] text-[#2557d6]" aria-hidden="true">
+            <BellRing size={19} />
+          </span>
+          <div className="min-w-0 flex-1">
+            <p id="drop-alert" className="text-[15px] font-semibold">
+              하차 알림 받기
+            </p>
+            <p className="text-[13px] text-[#8b95a1]">아이가 내리면 바로 알려 드립니다</p>
+          </div>
+          <button
+            type="button"
+            role="switch"
+            aria-checked={alertOn}
+            aria-labelledby="drop-alert"
+            onClick={onToggle}
+            className={`relative h-11 w-[60px] shrink-0 rounded-full ${FOCUS}`}
+          >
+            <span className={`absolute inset-x-1 top-1/2 h-8 -translate-y-1/2 rounded-full transition-colors ${alertOn ? "bg-[#2557d6]" : "bg-[#d1d6db]"}`} />
+            <span className={`absolute top-1/2 h-6 w-6 -translate-y-1/2 rounded-full bg-white shadow transition-[left] motion-reduce:transition-none ${alertOn ? "left-[30px]" : "left-2"}`} />
+          </button>
+        </div>
+      </Card>
+
+      <Card>
+        <SectionTitle>정류장</SectionTitle>
+        <ol>
+          {STOPS.map((st, i) => {
+            const passed = st.at <= progress;
+            const isNext = i === nextIdx;
+            const last = i === STOPS.length - 1;
+            return (
+              <li key={st.name} className="relative flex gap-3 pb-4 last:pb-0">
+                {!last && <span className={`absolute left-[9px] top-5 h-[calc(100%-12px)] w-[2px] ${STOPS[i + 1].at <= progress ? "bg-[#2557d6]" : "bg-[#e5e8eb]"}`} aria-hidden="true" />}
+                <span className={`relative mt-0.5 h-5 w-5 shrink-0 rounded-full border-[3px] ${passed ? "border-[#2557d6] bg-[#2557d6]" : isNext ? "border-[#2557d6] bg-white" : "border-[#d1d6db] bg-white"}`} aria-hidden="true" />
+                <div className="flex min-w-0 flex-1 items-start justify-between gap-2">
+                  <div>
+                    <p className={`text-[15px] ${last ? "font-bold" : "font-semibold"}`}>
+                      {st.name}
+                      {last && <span className="ml-1.5 text-[13px] font-semibold text-[#2557d6]">하차</span>}
+                    </p>
+                    <p className="text-[13px] text-[#8b95a1]">{passed ? "통과" : isNext ? "다음 정류장" : "도착 예정"}</p>
+                  </div>
+                  <span className={`text-[14px] ${passed ? "text-[#8b95a1]" : "font-semibold text-[#191f28]"}`}>{st.time}</span>
+                </div>
+              </li>
+            );
+          })}
+        </ol>
+      </Card>
+
+      <Card>
+        <dl className="divide-y divide-[#f2f4f6]">
+          <Row label="차량" value="2호차, 45인승" />
+          <Row label="기사님" value="정ㅁ수, 010-5678-****" />
+          <Row label="동승 선생님" value="한ㅅ아" />
+        </dl>
+      </Card>
+    </div>
   );
 }
