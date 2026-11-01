@@ -41,34 +41,30 @@ import { DemoMakerInfo } from "@/components/demos/DemoMakerInfo";
    광고 규칙에 맞춰 치료 효과 보장, 최고, 유일 같은 표현과 치료 전후 사진, 보호자 후기는 넣지 않는다.
 
    상호작용(모두 브라우저 안에서만 돈다. 실제로 보내지 않는다)
-   1. 24시 응급 진료 안내: 지금 시각을 24시간 시계판에 바늘로 찍고, 주간 진료인지 야간 응급 진료인지와 진료 중 상태를 보여 준다.
+   1. 24시 응급 진료 안내: 주간, 야간 응급 진료 시간과 바로 와야 하는 증상 목록, 응급 전화(정적).
    2. 진료 과목: 과목을 누르면 이럴 때 오세요, 검사와 처치, 담당 수의사가 바뀐다.
-   3. 건강검진 패키지 비교: 나이를 고르면 맞는 패키지 열에 추천 표시가 옮겨 가고, 그 검진으로 바로 예약할 수 있다.
+   3. 건강검진 패키지 비교: 기본, 정밀, 시니어 패키지 표와 권장 나이(정적), 건강검진으로 바로 예약.
    4. 예약: 보호자, 휴대폰, 반려동물 종, 나이, 진료 과목, 날짜, 시간. 접수하면 접수 번호, 담당 창구, 회신 예정일을 보여 준다.
-   5. 입원 면회 시간: 지금 시각 기준 면회 가능 여부와 다음 면회 시각을 시간 막대에 표시한다.
+   5. 입원 면회 시간: 하루 두 번 면회 시간을 시간 막대와 목록으로 표시한다.
 
    사진 출처: AI 생성(Z-Image-Turbo, Apache 2.0)
 
    첫 화면(ah-poster): 위에 메뉴(응급 진료, 진료과목, 건강검진, 입원 면회, 예약하기, 오시는 길, 휴대폰은 가로로 미는 메뉴).
-   위 칸은 지금 시간대 띠. 밤(21~09시)에는 진한 남색 판에 야간 응급 시간과 응급 증상 버튼, 낮에는 옅은 청록 판에 예약 버튼.
-   오른쪽은 "오기 전에 전화로 알려 주세요" 문장형 선택(동물, 증상, 도착 예정)과 전화 버튼. 아래 칸은 사진 3장(진료실, 수의사 둘),
-   글씨는 사진 밖 캡션. 휴대폰은 지금 시간대 줄과 전화 버튼이 화면 맨 위에 계속 남고, 사진은 가로로 민다.
-   사진이 천천히 다가오는 것 말고는 움직임이 없다. 동작 줄이기면 멈춘다. */
+   위 칸은 옅은 청록 판에 24시간 진료 제목, 진료 시간, 예약 버튼. 오른쪽은 주간, 야간, 일요일 진료 시간 표와 전화 버튼.
+   아래 칸은 사진 3장(진료실, 수의사 둘), 글씨는 사진 밖 캡션. 휴대폰은 24시간 진료 줄과 전화 버튼이 화면 맨 위에 계속 남고,
+   사진은 가로로 민다. 첫 화면은 고정이다. */
 
 const IMG = "/images/demo-animal-hospital";
 const TEL = "02-000-0000";
 const ADDRESS = "서울 ㅇㅇ구 ㅇㅇ로 00, 1~2층";
-const KAKAO = "카카오톡 채널 곰파트너";
+const KAKAO = "카카오톡 채널 24시 동물병원";
 
 /* 로고: 메인 사이트와 같은 곰 로고 + 곰파트너(크게) + 업종(작게) */
 function SampleLogo({ light, small }: { light?: boolean; small?: boolean }) {
   return (
     <span className="inline-flex items-center gap-2" style={{ color: light ? "#ffffff" : "#111111" }}>
-      {/* eslint-disable-next-line @next/next/no-img-element -- 메인 사이트와 같은 곰 로고 */}
-      <img src="/images/logo-bear.png" alt="" aria-hidden width={28} height={28} className={small ? "h-6 w-6 shrink-0" : "h-7 w-7 shrink-0"} />
       <span className="flex items-baseline gap-1 whitespace-nowrap">
-        <span className={`${small ? "text-[18px]" : "text-[20px]"} font-bold tracking-[-0.03em]`}>곰파트너</span>
-        <span className="text-[12px] font-semibold opacity-75">카탈로그</span>
+        <span className={`${small ? "text-[18px]" : "text-[20px]"} font-bold tracking-[-0.03em]`}>24시 동물병원</span>
       </span>
     </span>
   );
@@ -91,35 +87,16 @@ const C = {
 const EASE = [0.22, 1, 0.36, 1] as const;
 /** 탭, 표 강조, 접수 화면 전환 */
 const DUR = 0.35;
-/** 첫 화면 사진이 다가오는 시간 */
-const PHOTO_IN = 1.6;
 
 const focusRing = "focus-visible:outline focus-visible:outline-[3px] focus-visible:outline-offset-2";
 const won = (n: number) => `${n.toLocaleString("ko-KR")}원`;
 const p2 = (n: number) => String(n).padStart(2, "0");
 
-/* ---------- 시각 ---------- */
-
-/** 브라우저 시계. 서버 렌더와 첫 화면은 null 로 두고 바로 지금 시각으로 바꾼다 */
-function useNow() {
-  const [now, setNow] = useState<Date | null>(null);
-  useEffect(() => {
-    const tick = () => setNow(new Date());
-    const frame = requestAnimationFrame(tick);
-    const id = window.setInterval(tick, 30000);
-    return () => {
-      cancelAnimationFrame(frame);
-      window.clearInterval(id);
-    };
-  }, []);
-  return now;
-}
+/* ---------- 진료 시간 ---------- */
 
 /** 주간 진료 09:00~21:00, 그 밖은 야간 응급 진료. 일요일과 공휴일은 종일 야간 진찰료 */
 const DAY_FROM = 9;
 const DAY_TO = 21;
-const isNight = (d: Date) => d.getHours() >= DAY_TO || d.getHours() < DAY_FROM;
-const hhmm = (d: Date) => `${p2(d.getHours())}:${p2(d.getMinutes())}`;
 const korTime = (h: number, m = 0) => `${h < 12 ? "오전" : "오후"} ${h % 12 === 0 ? 12 : h % 12}시${m ? ` ${m}분` : ""}`;
 
 /* ---------- 진료 과목 ---------- */
@@ -195,16 +172,10 @@ const FEES: [string, number, string?][] = [
 
 /* ---------- 건강검진 ---------- */
 
-type Pack = 0 | 1 | 2;
-const PACKS: { name: string; price: number; time: string }[] = [
-  { name: "기본", price: 150000, time: "1시간" },
-  { name: "정밀", price: 330000, time: "반나절" },
-  { name: "시니어", price: 480000, time: "반나절" },
-];
-const AGES: { label: string; pack: Pack; tip: string }[] = [
-  { label: "1~6세", pack: 0, tip: "1년에 한 번 기본 검진이면 돼요." },
-  { label: "7~10세", pack: 1, tip: "1년에 한 번 정밀 검진을 권해요. 초음파로 속을 봐요." },
-  { label: "11세 이상", pack: 2, tip: "6개월마다 시니어 검진을 권해요. 심장과 신장을 같이 봐요." },
+const PACKS: { name: string; price: number; time: string; age: string }[] = [
+  { name: "기본", price: 150000, time: "1시간", age: "1~6세, 1년에 한 번" },
+  { name: "정밀", price: 330000, time: "반나절", age: "7~10세, 1년에 한 번" },
+  { name: "시니어", price: 480000, time: "반나절", age: "11세 이상, 6개월마다" },
 ];
 /** true 는 포함, 문자열은 포함하되 내용이 다름 */
 const ITEMS: [string, (boolean | string)[]][] = [
@@ -251,10 +222,8 @@ type Done = { no: string; name: string; phone: string; species: Species; age: st
 export function AnimalHospitalDemo() {
   const today = useDemoToday();
   const reduce = useReducedMotionSafe();
-  const now = useNow();
 
   const [dept, setDept] = useState<DeptId>("내과");
-  const [age, setAge] = useState(0);
   const [form, setForm] = useState<Form>({ name: "", phone: "", species: "강아지", age: "3살", reason: "일반 진료", day: 0, slot: null, memo: "" });
 
   useEffect(() => {
@@ -268,16 +237,16 @@ export function AnimalHospitalDemo() {
 
   return (
     <div className="min-h-screen overflow-x-clip pb-24" style={{ background: C.paper, color: C.ink }}>
-      <NowBar now={now} />
-      <Poster reduce={reduce} now={now} go={go} />
+      <NowBar />
+      <Poster go={go} />
 
       <section id="ah-er" aria-labelledby="ah-er-title" className="mx-auto mt-6 max-w-[1200px] scroll-mt-[72px] md:scroll-mt-4 px-4 md:px-6">
-        <ErBoard now={now} />
+        <ErBoard />
       </section>
 
       <section id="ah-dept" aria-labelledby="ah-dept-title" className="mx-auto mt-16 max-w-[1200px] scroll-mt-[72px] md:scroll-mt-4 px-4 md:mt-24 md:px-6">
         <SectionTitle id="ah-dept-title" icon={<Stethoscope size={22} aria-hidden />} title="진료과목" />
-        <DeptPicker reduce={reduce} dept={dept} setDept={setDept} />
+        <DeptPicker dept={dept} setDept={setDept} />
       </section>
 
       <section aria-labelledby="ah-fee-title" className="mx-auto mt-16 max-w-[1200px] px-4 md:mt-24 md:px-6">
@@ -288,9 +257,6 @@ export function AnimalHospitalDemo() {
       <section id="ah-checkup" aria-labelledby="ah-checkup-title" className="mx-auto mt-16 max-w-[1200px] scroll-mt-[72px] md:scroll-mt-4 px-4 md:mt-24 md:px-6">
         <SectionTitle id="ah-checkup-title" icon={<HeartPulse size={22} aria-hidden />} title="건강검진 패키지" />
         <Checkup
-          reduce={reduce}
-          age={age}
-          setAge={setAge}
           onReserve={() => {
             setForm((f) => ({ ...f, reason: "건강검진" }));
             go("ah-reserve");
@@ -300,12 +266,12 @@ export function AnimalHospitalDemo() {
 
       <section id="ah-visit" aria-labelledby="ah-visit-title" className="mx-auto mt-16 max-w-[1200px] scroll-mt-[72px] md:scroll-mt-4 px-4 md:mt-24 md:px-6">
         <SectionTitle id="ah-visit-title" icon={<BedDouble size={22} aria-hidden />} title="입원 면회 시간" />
-        <VisitHours now={now} />
+        <VisitHours />
       </section>
 
       <section id="ah-reserve" aria-labelledby="ah-reserve-title" className="mx-auto mt-16 max-w-[1200px] scroll-mt-[72px] md:scroll-mt-4 px-4 md:mt-24 md:px-6">
         <SectionTitle id="ah-reserve-title" icon={<CalendarCheck size={22} aria-hidden />} title="진료 예약" />
-        <Reserve reduce={reduce} today={today} now={now} form={form} setForm={setForm} />
+        <Reserve reduce={reduce} today={today} form={form} setForm={setForm} />
       </section>
 
       <section id="ah-map" aria-labelledby="ah-map-title" className="mx-auto mt-16 max-w-[1200px] scroll-mt-[72px] md:scroll-mt-4 px-4 md:mt-24 md:px-6">
@@ -348,64 +314,39 @@ const NAV: [string, string][] = [
   ["ah-map", "오시는 길"],
 ];
 
-/** 오기 전에 알려 줄 세 가지. 고르면 그대로 통화할 문장이 된다 */
-const PETS = ["소형견", "중형견", "대형견", "고양이", "그 밖의 동물"] as const;
-const SIGNS = ["구토", "경련", "호흡 곤란", "이물 삼킴", "다침", "배뇨 곤란"] as const;
-const ARRIVE = ["10분 안", "30분 안", "1시간 안"] as const;
-
 const PHOTOS = [
   { src: "hero.jpg", alt: "수의사가 진료대 위 큰 개를 살펴보는 진료실", cap: "진료실" },
   { src: "vet-1.jpg", alt: "청록 진료복을 입은 수의사가 흰 강아지를 안은 모습", cap: "내과 김ㅎ늘 수의사" },
   { src: "vet-3.jpg", alt: "회색 진료복을 입은 수의사가 고양이를 안은 모습", cap: "영상의학과, 안과 이ㅅ아 수의사" },
 ] as const;
 
-/** 휴대폰에서만 맨 위에 남는 지금 시간대 줄과 전화 */
-function NowBar({ now }: { now: Date | null }) {
-  const night = now ? isNight(now) : false;
-  const bg = night ? "#1f2a33" : C.tealSoft;
-  const fg = night ? "#ffffff" : C.ink;
+/** 휴대폰에서만 맨 위에 남는 진료 안내 줄과 전화 */
+function NowBar() {
   return (
-  <div className="sticky top-0 z-20 md:hidden" style={{ background: bg, color: fg }}>
-    <div className="flex items-center justify-between gap-2 px-4 py-2">
-      <p className="min-w-0 text-[15px] font-bold" aria-live="polite">
-        {night ? "야간 응급 진료 중" : "주간 진료 중"}
-      </p>
-      <a
-        href={`tel:${TEL.replace(/-/g, "")}`}
-        className={`inline-flex min-h-11 shrink-0 items-center gap-1.5 rounded-[6px] px-3 text-[15px] font-bold ${focusRing}`}
-        style={night ? { background: "#ffffff", color: "#1f2a33", outlineColor: "#ffffff" } : { background: C.teal, color: "#ffffff", outlineColor: C.teal }}
-      >
-        <Phone size={16} aria-hidden />
-        전화
-      </a>
+    <div className="sticky top-0 z-20 md:hidden" style={{ background: C.tealSoft, color: C.ink }}>
+      <div className="flex items-center justify-between gap-2 px-4 py-2">
+        <p className="min-w-0 text-[15px] font-bold">365일 24시간 진료</p>
+        <a
+          href={`tel:${TEL.replace(/-/g, "")}`}
+          className={`inline-flex min-h-11 shrink-0 items-center gap-1.5 rounded-[6px] px-3 text-[15px] font-bold ${focusRing}`}
+          style={{ background: C.teal, color: "#ffffff", outlineColor: C.teal }}
+        >
+          <Phone size={16} aria-hidden />
+          전화
+        </a>
+      </div>
     </div>
-  </div>
   );
 }
 
-function Poster({ reduce, now, go }: { reduce: boolean; now: Date | null; go: (id: string) => void }) {
-  const [pet, setPet] = useState<(typeof PETS)[number]>("소형견");
-  const [sign, setSign] = useState<(typeof SIGNS)[number]>("구토");
-  const [arrive, setArrive] = useState<(typeof ARRIVE)[number]>("30분 안");
-  const night = now ? isNight(now) : false;
-  const bg = night ? "#1f2a33" : C.tealSoft;
-  const fg = night ? "#ffffff" : C.ink;
-  const sub = night ? "rgba(255,255,255,0.8)" : C.body;
-  const sel = `min-h-11 max-w-full rounded-[6px] border-2 px-2 text-[17px] font-bold ${focusRing}`;
-  const selStyle = { borderColor: night ? "#ffffff" : C.teal, background: night ? "#2b3945" : "#ffffff", color: fg, outlineColor: night ? "#ffffff" : C.teal };
+/** 주간, 야간 진료 시간 */
+const HOURS: [string, string, string][] = [
+  ["주간 진료", "매일 09:00 ~ 21:00", "예약 우선"],
+  ["야간 응급 진료", "매일 21:00 ~ 다음 날 09:00", "야간 진찰료 추가"],
+  ["일요일, 공휴일", "24시간", "종일 야간 진찰료"],
+];
 
-  const call = (
-    <a
-      href={`tel:${TEL.replace(/-/g, "")}`}
-      data-gtm-cta="animal-hospital_poster_cta"
-      className={`inline-flex min-h-12 items-center justify-center gap-2 rounded-[6px] px-5 text-[18px] font-bold ${focusRing}`}
-      style={night ? { background: "#ffffff", color: "#1f2a33", outlineColor: "#ffffff" } : { background: C.teal, color: "#ffffff", outlineColor: C.teal }}
-    >
-      <Phone size={19} aria-hidden />
-      전화 {TEL}
-    </a>
-  );
-
+function Poster({ go }: { go: (id: string) => void }) {
   return (
     <section id="ah-poster" aria-labelledby="ah-poster-title" style={{ background: C.paper, color: C.ink }}>
       <header className="border-b" style={{ borderColor: C.line }}>
@@ -430,73 +371,62 @@ function Poster({ reduce, now, go }: { reduce: boolean; now: Date | null; go: (i
         </nav>
       </header>
 
-      <div className="transition-colors duration-300" style={{ background: bg, color: fg }}>
+      <div style={{ background: C.tealSoft, color: C.ink }}>
         <div className="mx-auto grid max-w-[1200px] gap-6 px-4 py-7 md:grid-cols-[minmax(0,1fr)_minmax(0,1fr)] md:gap-10 md:px-6 md:py-10">
           <div className="min-w-0">
-            <p className="inline-flex items-center gap-1.5 rounded-[4px] px-2.5 py-1 text-[15px] font-bold" style={night ? { background: "#ffffff", color: "#1f2a33" } : { background: C.teal, color: "#ffffff" }}>
-              {night ? <Moon size={16} aria-hidden /> : <Sun size={16} aria-hidden />}
-              <span className="tabular-nums">{`${night ? "야간 응급 진료" : "주간 진료"}${now ? `, 지금 ${hhmm(now)}` : ""}`}</span>
+            <p className="inline-flex items-center gap-1.5 rounded-[4px] px-2.5 py-1 text-[15px] font-bold" style={{ background: C.teal, color: "#ffffff" }}>
+              <Moon size={16} aria-hidden />
+              야간 응급 진료
             </p>
             <h1 id="ah-poster-title" className="mt-4 text-[32px] font-bold md:text-[clamp(36px,3.8vw,52px)]" style={{ letterSpacing: "-0.03em", lineHeight: 1.18 }}>
               365일 24시간 진료
             </h1>
-            <p className="mt-3 text-[17px] font-semibold tabular-nums" style={{ color: sub }}>
-              {night ? `야간 응급 ${p2(DAY_TO)}:00 ~ 다음 날 ${p2(DAY_FROM)}:00` : `주간 진료 ${p2(DAY_FROM)}:00 ~ ${p2(DAY_TO)}:00, 예약 우선`}
+            <p className="mt-3 text-[17px] font-semibold tabular-nums" style={{ color: C.body }}>
+              주간 {p2(DAY_FROM)}:00 ~ {p2(DAY_TO)}:00, 야간 응급 {p2(DAY_TO)}:00 ~ 다음 날 {p2(DAY_FROM)}:00
             </p>
-            <p className="mt-4 text-[15px] leading-[1.6]" style={{ color: sub }}>
+            <p className="mt-4 text-[15px] leading-[1.6]" style={{ color: C.body }}>
               응급 시간에는 급한 아이부터 진료, 야간 진찰료 추가
             </p>
             <div className="mt-5 flex flex-wrap gap-2">
-              {night ? (
-                <button type="button" onClick={() => go("ah-er")} className={`min-h-11 rounded-[6px] border px-4 text-[16px] font-semibold ${focusRing}`} style={{ borderColor: "rgba(255,255,255,0.6)", color: "#ffffff", outlineColor: "#ffffff" }}>
-                  응급 증상 보기
-                </button>
-              ) : (
-                <>
-                  <button type="button" onClick={() => go("ah-reserve")} className={`min-h-11 rounded-[6px] px-4 text-[16px] font-semibold ${focusRing}`} style={{ background: C.teal, color: "#ffffff", outlineColor: C.teal }}>
-                    진료 예약
-                  </button>
-                  <button type="button" onClick={() => go("ah-dept")} className={`min-h-11 rounded-[6px] border px-4 text-[16px] font-semibold ${focusRing}`} style={{ borderColor: C.teal, color: C.teal, background: "#ffffff", outlineColor: C.teal }}>
-                    오늘 진료과목
-                  </button>
-                </>
-              )}
+              <button type="button" onClick={() => go("ah-reserve")} className={`min-h-11 rounded-[6px] px-4 text-[16px] font-semibold ${focusRing}`} style={{ background: C.teal, color: "#ffffff", outlineColor: C.teal }}>
+                진료 예약
+              </button>
+              <button type="button" onClick={() => go("ah-dept")} className={`min-h-11 rounded-[6px] border px-4 text-[16px] font-semibold ${focusRing}`} style={{ borderColor: C.teal, color: C.teal, background: "#ffffff", outlineColor: C.teal }}>
+                진료과목
+              </button>
             </div>
           </div>
 
-          {/* 오기 전에 알려 줄 것: 고른 값이 곧 통화할 문장 */}
-          <div className="min-w-0 rounded-[8px] p-4 md:p-6" style={{ background: night ? "#26333e" : "#ffffff", border: `1px solid ${night ? "rgba(255,255,255,0.18)" : C.line}` }}>
-            <h2 className="text-[17px] font-bold">오기 전에 전화로 알려 주세요</h2>
-            <p className="mt-3 text-[18px] leading-[2.4] md:text-[20px]" style={{ wordBreak: "keep-all" }}>
-              <label className="sr-only" htmlFor="ah-q-pet">
-                동물
-              </label>
-              <select id="ah-q-pet" value={pet} onChange={(e) => setPet(e.target.value as typeof pet)} className={sel} style={selStyle}>
-                {PETS.map((x) => (
-                  <option key={x}>{x}</option>
-                ))}
-              </select>{" "}
-              이고{" "}
-              <label className="sr-only" htmlFor="ah-q-sign">
-                증상
-              </label>
-              <select id="ah-q-sign" value={sign} onChange={(e) => setSign(e.target.value as typeof sign)} className={sel} style={selStyle}>
-                {SIGNS.map((x) => (
-                  <option key={x}>{x}</option>
-                ))}
-              </select>{" "}
-              증상이에요.{" "}
-              <label className="sr-only" htmlFor="ah-q-arrive">
-                도착 예정
-              </label>
-              <select id="ah-q-arrive" value={arrive} onChange={(e) => setArrive(e.target.value as typeof arrive)} className={sel} style={selStyle}>
-                {ARRIVE.map((x) => (
-                  <option key={x}>{x}</option>
-                ))}
-              </select>{" "}
-              에 도착해요.
+          {/* 진료 시간과 응급 전화 */}
+          <div className="min-w-0 rounded-[8px] p-4 md:p-6" style={{ background: "#ffffff", border: `1px solid ${C.line}` }}>
+            <h2 className="text-[17px] font-bold">진료 시간</h2>
+            <dl className="mt-3 grid gap-3 text-[16px]">
+              {HOURS.map(([k, v, note]) => (
+                <div key={k} className="grid gap-x-4 border-b pb-3 sm:grid-cols-[120px_minmax(0,1fr)]" style={{ borderColor: C.line }}>
+                  <dt className="font-bold" style={{ color: C.body }}>
+                    {k}
+                  </dt>
+                  <dd>
+                    <span className="font-semibold tabular-nums">{v}</span>
+                    <span className="ml-2 text-[14px]" style={{ color: C.muted }}>
+                      {note}
+                    </span>
+                  </dd>
+                </div>
+              ))}
+            </dl>
+            <p className="mt-3 text-[15px] leading-[1.6]" style={{ color: C.body }}>
+              오시기 전에 동물 종류와 증상을 전화로 알려 주시면 처치실을 준비해 둘게요.
             </p>
-            <div className="mt-4 flex flex-col gap-2 sm:flex-row sm:items-center">{call}</div>
+            <a
+              href={`tel:${TEL.replace(/-/g, "")}`}
+              data-gtm-cta="animal-hospital_poster_cta"
+              className={`mt-4 inline-flex min-h-12 items-center justify-center gap-2 rounded-[6px] px-5 text-[18px] font-bold ${focusRing}`}
+              style={{ background: C.teal, color: "#ffffff", outlineColor: C.teal }}
+            >
+              <Phone size={19} aria-hidden />
+              전화 {TEL}
+            </a>
           </div>
         </div>
       </div>
@@ -507,18 +437,16 @@ function Poster({ reduce, now, go }: { reduce: boolean; now: Date | null; go: (i
           {PHOTOS.map((ph, i) => (
             <li key={ph.src} className="w-[72%] shrink-0 snap-start md:w-auto">
               <div className="relative h-[180px] overflow-hidden rounded-[8px] md:h-[min(30svh,300px)]">
-                <motion.div className="absolute inset-0" initial={reduce ? false : { scale: 1.06 }} animate={{ scale: 1 }} transition={{ duration: reduce ? 0 : PHOTO_IN, ease: EASE, delay: reduce ? 0 : i * 0.08 }}>
-                  {/* eslint-disable-next-line @next/next/no-img-element -- 정적 export 라 next/image 최적화를 쓰지 않는다 */}
-                  <img
-                    src={`${IMG}/${ph.src}`}
-                    srcSet={ph.src === "hero.jpg" ? `${IMG}/hero-sm.jpg 960w, ${IMG}/hero.jpg 1920w` : undefined}
-                    sizes="(min-width: 768px) 33vw, 72vw"
-                    alt={ph.alt}
-                    fetchPriority={i === 0 ? "high" : undefined}
-                    className="absolute inset-0 h-full w-full object-cover"
-                    style={{ objectPosition: ph.src === "hero.jpg" ? "55% 40%" : "50% 30%" }}
-                  />
-                </motion.div>
+                {/* eslint-disable-next-line @next/next/no-img-element -- 정적 export 라 next/image 최적화를 쓰지 않는다 */}
+                <img
+                  src={`${IMG}/${ph.src}`}
+                  srcSet={ph.src === "hero.jpg" ? `${IMG}/hero-sm.jpg 960w, ${IMG}/hero.jpg 1920w` : undefined}
+                  sizes="(min-width: 768px) 33vw, 72vw"
+                  alt={ph.alt}
+                  fetchPriority={i === 0 ? "high" : undefined}
+                  className="absolute inset-0 h-full w-full object-cover"
+                  style={{ objectPosition: ph.src === "hero.jpg" ? "55% 40%" : "50% 30%" }}
+                />
               </div>
               <p className="mt-2 text-[15px] font-semibold" style={{ color: C.body }}>
                 {ph.cap}
@@ -533,43 +461,14 @@ function Poster({ reduce, now, go }: { reduce: boolean; now: Date | null; go: (i
 
 /* ---------- 1. 24시 응급 진료 안내 ---------- */
 
-function ErBoard({ now }: { now: Date | null }) {
-  const sunday = now ? now.getDay() === 0 : false;
-  const night = now ? isNight(now) : false;
-  const mins = now ? now.getHours() * 60 + now.getMinutes() : null;
+function ErBoard() {
   return (
-    <div className="grid gap-6 rounded-[8px] p-5 md:grid-cols-[300px_minmax(0,1fr)] md:gap-10 md:p-8" style={{ background: C.soft, color: C.ink }}>
-      <div>
-        <DayDial mins={mins} />
-        <p className="mt-3 flex flex-wrap justify-center gap-x-4 gap-y-1 text-[14px]" style={{ color: C.body }}>
-          <span className="inline-flex items-center gap-1.5">
-            <span aria-hidden className="h-3 w-5 rounded-[2px]" style={{ background: "#d4d4d0" }} />
-            주간 09~21시
-          </span>
-          <span className="inline-flex items-center gap-1.5">
-            <span aria-hidden className="h-3 w-5 rounded-[2px]" style={{ background: C.teal }} />
-            야간 21~09시
-          </span>
-        </p>
-      </div>
-      <div className="min-w-0">
-        <h2 id="ah-er-title" className="text-[28px] font-bold leading-tight tracking-[-0.02em] md:text-[36px]">
-          24시 응급 진료
-        </h2>
-        <p className="mt-3 inline-flex flex-wrap items-center gap-2 text-[17px] font-bold" aria-live="polite">
-          <span className="inline-flex items-center gap-1.5 rounded-[4px] px-2.5 py-1 text-[15px]" style={{ background: C.teal, color: "#ffffff" }}>
-            <Siren size={16} aria-hidden />
-            진료 중
-          </span>
-          {now ? (
-            <span>
-              지금 {hhmm(now)}, {night ? "야간 응급 진료 시간이에요" : sunday ? "일요일 진료 시간이에요" : "주간 진료 시간이에요"}
-            </span>
-          ) : (
-            <span>365일 24시간 진료</span>
-          )}
-        </p>
-        <dl className="mt-5 grid gap-x-6 gap-y-2 text-[16px] sm:grid-cols-[auto_minmax(0,1fr)]">
+    <div className="rounded-[8px] p-5 md:p-8" style={{ background: C.soft, color: C.ink }}>
+      <h2 id="ah-er-title" className="text-[28px] font-bold leading-tight tracking-[-0.02em] md:text-[36px]">
+        24시 응급 진료
+      </h2>
+      <div className="mt-5 grid gap-6 md:grid-cols-[minmax(0,1fr)_minmax(0,1fr)] md:gap-10">
+        <dl className="grid content-start gap-x-6 gap-y-2 text-[16px] sm:grid-cols-[auto_minmax(0,1fr)]">
           <dt className="inline-flex items-center gap-1.5 font-bold" style={{ color: C.body }}>
             <Sun size={16} aria-hidden />
             주간 진료
@@ -586,9 +485,12 @@ function ErBoard({ now }: { now: Date | null }) {
           </dt>
           <dd>수의사 4명, 동물보건사 2명</dd>
         </dl>
-        <div className="mt-6 rounded-[6px] p-4" style={{ background: C.paper, border: `1px solid ${C.line}` }}>
-          <p className="font-bold">이럴 땐 바로 오세요</p>
-          <ul className="mt-2 grid gap-x-6 gap-y-1 text-[15px] sm:grid-cols-2">
+        <div className="rounded-[6px] p-4" style={{ background: C.paper, border: `1px solid ${C.line}` }}>
+          <p className="inline-flex items-center gap-1.5 font-bold">
+            <Siren size={16} aria-hidden style={{ color: C.teal }} />
+            이럴 땐 바로 오세요
+          </p>
+          <ul className="mt-2 grid gap-y-1 text-[15px]">
             {["숨을 헐떡이고 잇몸이 파래요", "이물질이나 초콜릿을 먹었어요", "경련을 해요", "차에 부딪혔거나 높은 데서 떨어졌어요", "구토를 계속 해요", "고양이가 소변을 못 봐요"].map((t) => (
               <li key={t} className="flex items-start gap-2">
                 <Minus size={14} aria-hidden className="mt-[5px] flex-none" style={{ color: C.teal }} />
@@ -597,69 +499,28 @@ function ErBoard({ now }: { now: Date | null }) {
             ))}
           </ul>
         </div>
-        <div className="mt-6 flex flex-wrap items-center gap-3">
-          <a
-            href={`tel:${TEL.replace(/-/g, "")}`}
-            data-gtm-cta="animal-hospital_er_call"
-            className={`inline-flex items-center gap-2 rounded-[6px] px-5 py-3 text-[17px] font-bold ${focusRing}`}
-            style={{ background: C.teal, color: "#ffffff", outlineColor: C.teal }}
-          >
-            <Phone size={18} aria-hidden />
-            응급 전화 {TEL}
-          </a>
-          <p className="text-[15px]" style={{ color: C.body }}>
-            오시기 전에 전화 주시면 처치실을 준비해 둘게요.
-          </p>
-        </div>
+      </div>
+      <div className="mt-6 flex flex-wrap items-center gap-3">
+        <a
+          href={`tel:${TEL.replace(/-/g, "")}`}
+          data-gtm-cta="animal-hospital_er_call"
+          className={`inline-flex items-center gap-2 rounded-[6px] px-5 py-3 text-[17px] font-bold ${focusRing}`}
+          style={{ background: C.teal, color: "#ffffff", outlineColor: C.teal }}
+        >
+          <Phone size={18} aria-hidden />
+          응급 전화 {TEL}
+        </a>
+        <p className="text-[15px]" style={{ color: C.body }}>
+          오시기 전에 전화 주시면 처치실을 준비해 둘게요.
+        </p>
       </div>
     </div>
   );
 }
 
-/** 24시간 시계판. 위가 0시, 시계 방향. 야간 구간은 진하게, 지금 시각에 바늘 */
-function DayDial({ mins }: { mins: number | null }) {
-  const R = 118;
-  const ang = (h: number) => ((h / 24) * 360 - 90) * (Math.PI / 180);
-  const pt = (h: number, r: number): [number, number] => [150 + Math.cos(ang(h)) * r, 150 + Math.sin(ang(h)) * r];
-  const arc = (from: number, to: number, r: number) => {
-    const [ax, ay] = pt(from, r);
-    const [bx, by] = pt(to, r);
-    const span = (to - from + 24) % 24;
-    return `M${ax} ${ay} A${r} ${r} 0 ${span > 12 ? 1 : 0} 1 ${bx} ${by}`;
-  };
-  const hand = mins === null ? null : mins / 60;
-  return (
-    <svg viewBox="0 0 300 300" className="mx-auto w-full max-w-[280px]" role="img" aria-label={hand === null ? "24시간 진료 시계" : `24시간 시계, 지금 ${p2(Math.floor(hand))}시 ${p2(mins! % 60)}분`}>
-      <circle cx="150" cy="150" r="140" fill="#ffffff" />
-      <path d={arc(DAY_FROM, DAY_TO, R)} fill="none" stroke="#d4d4d0" strokeWidth="22" />
-      <path d={arc(DAY_TO, DAY_FROM, R)} fill="none" stroke={C.teal} strokeWidth="22" />
-      {Array.from({ length: 24 }, (_, h) => {
-        const [x1, y1] = pt(h, 98);
-        const [x2, y2] = pt(h, h % 6 === 0 ? 86 : 92);
-        return <line key={h} x1={x1} y1={y1} x2={x2} y2={y2} stroke="#9a9a9a" strokeWidth={h % 6 === 0 ? 3 : 1.5} />;
-      })}
-      {[0, 6, 12, 18].map((h) => {
-        const [x, y] = pt(h, 70);
-        return (
-          <text key={h} x={x} y={y + 6} textAnchor="middle" fontSize="17" fontWeight="700" fill={C.ink}>
-            {h}
-          </text>
-        );
-      })}
-      {hand !== null && (
-        <g>
-          <line x1="150" y1="150" x2={pt(hand, 112)[0]} y2={pt(hand, 112)[1]} stroke={C.ink} strokeWidth="4" strokeLinecap="round" />
-          <circle cx={pt(hand, 118)[0]} cy={pt(hand, 118)[1]} r="9" fill={C.ink} stroke="#ffffff" strokeWidth="3" />
-        </g>
-      )}
-      <circle cx="150" cy="150" r="7" fill={C.ink} />
-    </svg>
-  );
-}
-
 /* ---------- 2. 진료 과목 ---------- */
 
-function DeptPicker({ reduce, dept, setDept }: { reduce: boolean; dept: DeptId; setDept: (d: DeptId) => void }) {
+function DeptPicker({ dept, setDept }: { dept: DeptId; setDept: (d: DeptId) => void }) {
   const d = DEPTS.find((x) => x.id === dept) ?? DEPTS[0];
   return (
     <div className="grid gap-5 md:grid-cols-[260px_minmax(0,1fr)] md:gap-8">
@@ -672,30 +533,16 @@ function DeptPicker({ reduce, dept, setDept }: { reduce: boolean; dept: DeptId; 
               type="button"
               aria-pressed={on}
               onClick={() => setDept(id)}
-              className={`relative inline-flex items-center gap-2 rounded-[6px] border px-3.5 py-2.5 text-left text-[16px] font-bold ${focusRing}`}
-              style={{ borderColor: on ? C.teal : C.line, color: on ? C.paper : C.ink, outlineColor: C.teal }}
+              className={`inline-flex items-center gap-2 rounded-[6px] border px-3.5 py-2.5 text-left text-[16px] font-bold ${focusRing}`}
+              style={{ borderColor: on ? C.teal : C.line, background: on ? C.teal : "#ffffff", color: on ? C.paper : C.ink, outlineColor: C.teal }}
             >
-              {on && (
-                <motion.span
-                  layoutId="ah-dept-on"
-                  className="absolute inset-0 -z-0 rounded-[5px]"
-                  style={{ background: C.teal }}
-                  transition={{ duration: reduce ? 0 : DUR, ease: EASE }}
-                />
-              )}
-              <Icon size={18} aria-hidden className="relative" />
-              <span className="relative">{id}</span>
+              <Icon size={18} aria-hidden />
+              <span>{id}</span>
             </button>
           );
         })}
       </div>
-      <AnimatePresence mode="wait" initial={false}>
-        <motion.div
-          key={d.id}
-          initial={reduce ? false : { clipPath: "inset(0 0 100% 0)" }}
-          animate={{ clipPath: "inset(0 0 0% 0)" }}
-          exit={reduce ? undefined : { clipPath: "inset(100% 0 0 0)" }}
-          transition={{ duration: reduce ? 0 : DUR, ease: EASE }}
+      <div
           className="grid gap-5 rounded-[8px] border p-5 sm:grid-cols-2 md:p-7"
           style={{ borderColor: C.line, background: "#fff" }}
           aria-live="polite"
@@ -733,8 +580,7 @@ function DeptPicker({ reduce, dept, setDept }: { reduce: boolean; dept: DeptId; 
               담당 <strong style={{ color: C.ink }}>{maskName(d.vet)}</strong> 수의사
             </span>
           </p>
-        </motion.div>
-      </AnimatePresence>
+      </div>
     </div>
   );
 }
@@ -781,32 +627,9 @@ function FeeTable() {
 
 /* ---------- 3. 건강검진 패키지 비교 ---------- */
 
-function Checkup({ reduce, age, setAge, onReserve }: { reduce: boolean; age: number; setAge: (n: number) => void; onReserve: () => void }) {
-  const rec = AGES[age].pack;
+function Checkup({ onReserve }: { onReserve: () => void }) {
   return (
     <div>
-      <div className="flex flex-wrap items-center gap-2" role="group" aria-label="반려동물 나이">
-        <span className="mr-1 text-[16px] font-bold">나이</span>
-        {AGES.map((a, i) => {
-          const on = i === age;
-          return (
-            <button
-              key={a.label}
-              type="button"
-              aria-pressed={on}
-              onClick={() => setAge(i)}
-              className={`rounded-[6px] border px-4 py-2 text-[16px] font-bold ${focusRing}`}
-              style={{ borderColor: on ? C.teal : C.line, background: on ? C.tealSoft : "#fff", color: on ? C.teal : C.ink, outlineColor: C.teal }}
-            >
-              {a.label}
-            </button>
-          );
-        })}
-      </div>
-      <p className="mt-3 text-[16px]" aria-live="polite">
-        {AGES[age].tip}
-      </p>
-
       <div className="mt-5 overflow-hidden rounded-[8px] border" style={{ borderColor: C.line, background: "#fff" }}>
         <table className="w-full table-fixed border-collapse text-[14px] sm:text-[16px]">
           <caption className="sr-only">건강검진 패키지 비교</caption>
@@ -821,22 +644,8 @@ function Checkup({ reduce, age, setAge, onReserve }: { reduce: boolean; age: num
               <th scope="col" className="p-2 text-left sm:p-3">
                 검사
               </th>
-              {PACKS.map((pk, i) => (
-                <th key={pk.name} scope="col" className="relative px-1 py-2 text-center align-bottom sm:p-3">
-                  {i === rec && (
-                    <motion.span
-                      layoutId="ah-pack-on"
-                      aria-hidden
-                      className="absolute inset-x-0 top-0 h-[5px]"
-                      style={{ background: C.teal }}
-                      transition={{ duration: reduce ? 0 : DUR, ease: EASE }}
-                    />
-                  )}
-                  {i === rec && (
-                    <span className="mb-1 block text-[13px] font-bold" style={{ color: C.teal }}>
-                      추천
-                    </span>
-                  )}
+              {PACKS.map((pk) => (
+                <th key={pk.name} scope="col" className="px-1 py-2 text-center align-bottom sm:p-3">
                   <span className="block text-[17px] sm:text-[20px]" style={{ color: C.ink }}>
                     {pk.name}
                   </span>
@@ -852,7 +661,7 @@ function Checkup({ reduce, age, setAge, onReserve }: { reduce: boolean; age: num
                   {name}
                 </th>
                 {cells.map((v, i) => (
-                  <td key={i} className="p-2 text-center sm:p-3" style={{ background: i === rec ? C.tealSoft : undefined, transition: reduce ? undefined : "background-color 0.35s" }}>
+                  <td key={i} className="p-2 text-center sm:p-3">
                     {v === true ? <Check size={18} aria-label="포함" className="mx-auto" style={{ color: C.teal }} /> : v === false ? <Minus size={16} aria-label="없음" className="mx-auto" style={{ color: "#bdbdbd" }} /> : <span className="font-bold">{v}</span>}
                   </td>
                 ))}
@@ -862,9 +671,19 @@ function Checkup({ reduce, age, setAge, onReserve }: { reduce: boolean; age: num
               <th scope="row" className="p-2 text-left font-semibold sm:p-3">
                 소요 시간
               </th>
-              {PACKS.map((pk, i) => (
-                <td key={pk.name} className="p-2 text-center sm:p-3" style={{ background: i === rec ? C.tealSoft : undefined }}>
+              {PACKS.map((pk) => (
+                <td key={pk.name} className="p-2 text-center sm:p-3">
                   {pk.time}
+                </td>
+              ))}
+            </tr>
+            <tr className="border-t" style={{ borderColor: C.line }}>
+              <th scope="row" className="p-2 text-left font-semibold sm:p-3">
+                권장 나이
+              </th>
+              {PACKS.map((pk) => (
+                <td key={pk.name} className="p-2 text-center text-[13px] sm:p-3 sm:text-[15px]" style={{ wordBreak: "keep-all" }}>
+                  {pk.age}
                 </td>
               ))}
             </tr>
@@ -883,7 +702,7 @@ function Checkup({ reduce, age, setAge, onReserve }: { reduce: boolean; age: num
           style={{ background: C.teal, color: "#ffffff", outlineColor: C.teal }}
         >
           <CalendarCheck size={18} aria-hidden />
-          {PACKS[rec].name} 검진 예약
+          건강검진 예약
         </button>
       </div>
     </div>
@@ -892,33 +711,19 @@ function Checkup({ reduce, age, setAge, onReserve }: { reduce: boolean; age: num
 
 /* ---------- 5. 입원 면회 시간 ---------- */
 
-function VisitHours({ now }: { now: Date | null }) {
-  const h = now ? now.getHours() + now.getMinutes() / 60 : null;
-  let status = "면회는 매일 두 번이에요";
-  if (h !== null) {
-    const cur = VISITS.find(([a, b]) => h >= a && h < b);
-    const next = VISITS.find(([a]) => a > h);
-    status = cur ? `지금 면회 시간이에요. ${hm(cur[1])}까지` : next ? `다음 면회 오늘 ${hm(next[0])}` : `다음 면회 내일 ${hm(VISITS[0][0])}`;
-  }
+function VisitHours() {
   const pct = (v: number) => `${(v / 24) * 100}%`;
   return (
     <div className="rounded-[8px] border p-5 md:p-7" style={{ borderColor: C.line, background: "#fff" }}>
-      <p className="inline-flex items-center gap-2 text-[20px] font-bold" aria-live="polite" style={{ color: C.ink }}>
+      <p className="inline-flex items-center gap-2 text-[20px] font-bold" style={{ color: C.ink }}>
         <Clock size={20} aria-hidden />
-        {status}
+        면회는 매일 두 번이에요
       </p>
-      <div className="relative mt-8 h-10" role="img" aria-label={`면회 시간 ${VISITS.map(([a, b]) => `${hm(a)}~${hm(b)}`).join(", ")}`}>
+      <div className="relative mt-6 h-10" role="img" aria-label={`면회 시간 ${VISITS.map(([a, b]) => `${hm(a)}~${hm(b)}`).join(", ")}`}>
         <div className="absolute inset-x-0 top-3 h-4 rounded-full" style={{ background: C.tealSoft }} />
         {VISITS.map(([a, b]) => (
           <div key={a} className="absolute top-3 h-4 rounded-[3px]" style={{ left: pct(a), width: pct(b - a), background: C.teal }} />
         ))}
-        {h !== null && (
-          <div className="absolute -top-1 h-12 w-[3px] -translate-x-1/2 rounded-full" style={{ left: pct(h), background: C.teal }}>
-            <span className="absolute -top-6 left-1/2 -translate-x-1/2 whitespace-nowrap text-[13px] font-bold" style={{ color: C.teal }}>
-              지금
-            </span>
-          </div>
-        )}
         <div className="absolute inset-x-0 top-8 flex justify-between text-[13px] tabular-nums" style={{ color: C.muted }}>
           {[0, 6, 12, 18, 24].map((v) => (
             <span key={v}>{v}시</span>
@@ -949,20 +754,22 @@ function VisitHours({ now }: { now: Date | null }) {
 function Reserve({
   reduce,
   today,
-  now,
   form,
   setForm,
 }: {
   reduce: boolean;
   today: Date;
-  now: Date | null;
   form: Form;
   setForm: Dispatch<SetStateAction<Form>>;
 }) {
   const [errors, setErrors] = useState<Record<string, string>>({});
   const [done, setDone] = useState<Done | null>(null);
   const days = Array.from({ length: 7 }, (_, i) => daysAgo(today, -i));
-  const nowH = now ? now.getHours() : 0;
+  const [nowH, setNowH] = useState(0);
+  useEffect(() => {
+    const frame = requestAnimationFrame(() => setNowH(new Date().getHours()));
+    return () => cancelAnimationFrame(frame);
+  }, []);
   const disabled = (day: number, slot: number) => slotTaken(day, slot) || (day === 0 && Number(SLOTS[slot].slice(0, 2)) <= nowH);
 
   const set = <K extends keyof Form>(k: K, v: Form[K]) => setForm((f) => ({ ...f, [k]: v }));
@@ -1003,9 +810,9 @@ function Reserve({
         {done ? (
           <motion.div
             key="done"
-            initial={reduce ? false : { clipPath: "inset(0 0 100% 0)" }}
-            animate={{ clipPath: "inset(0 0 0% 0)" }}
-            transition={{ duration: reduce ? 0 : 0.5, ease: EASE }}
+            initial={reduce ? false : { opacity: 0 }}
+            animate={{ opacity: 1 }}
+            transition={{ duration: reduce ? 0 : DUR, ease: EASE }}
             className="rounded-[8px] border p-5 md:p-7"
             style={{ borderColor: C.teal, background: "#fff" }}
             role="status"

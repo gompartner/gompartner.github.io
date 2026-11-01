@@ -2,7 +2,7 @@
 
 import { useEffect, useMemo, useState } from "react";
 import { AnimatePresence, motion } from "framer-motion";
-import { AlertCircle, CalendarCheck, Car, Check, Clock, MapPin, Menu, MessageCircle, Moon, Phone, X } from "lucide-react";
+import { AlertCircle, CalendarCheck, Car, Clock, MapPin, Menu, MessageCircle, Moon, Phone, X } from "lucide-react";
 import { useReducedMotionSafe } from "@/hooks/useReducedMotionSafe";
 import { daysAgo, fmtKo, useDemoToday } from "@/hooks/useDemoToday";
 import { maskName, maskPhone } from "@/components/demos/LeadReceivedPanel";
@@ -17,19 +17,15 @@ import { DemoMakerInfo } from "@/components/demos/DemoMakerInfo";
    진료 과목 설명은 침, 뜸, 부항, 약침, 추나, 한약 순서로 짧게 적고, 추나는 "건강보험 적용" 표시를 붙인다.
    의료법 광고 규칙에 따라 치료 효과 보장, 환자 후기, 치료 전후 사진, 할인 문구는 넣지 않는다.
 
-   상호작용(모두 브라우저 안에서만 돈다. 실제로 보내지 않는다)
-   1. 아픈 부위 고르기: 사람 몸 실루엣(얼굴 없음)에서 머리, 목, 어깨, 허리, 손목, 무릎을 고르면
-      흔한 증상과 주로 받는 진료(침, 추나, 약침, 한약)가 바뀌고, 고른 자리에 동그라미가 표시된다.
-   2. 교통사고 진료: 자동차보험 접수번호를 넣으면 진료비 계산서의 본인 부담이 0원으로 바뀌고 자동차보험 도장이 찍힌다.
-   3. 진료 시간표: 요일별 진료 시간 막대. 야간 진료(화, 목 밤 9시까지)는 강조색으로, 오늘 줄과 지금 진료 중 여부를 표시한다.
+   구성
+   1. 진료 과목: 증상별 클리닉 카드와 진료 방법(침, 추나, 약침, 한약)과 보험 적용 구분, 비급여 진료비 표.
+   2. 교통사고 진료: 접수 절차 번호 목록과 안내.
+   3. 진료 시간: 요일별 진료 시간 목록. 야간 진료(화, 목 밤 9시까지) 표시.
    4. 예약: 진료 구분, 날짜, 시간, 이름, 휴대폰. 완료하면 예약 번호, 담당 창구, 확정 문자 보낼 날을 보여 준다.
+   5. 의료진, 오시는 길.
 
-   첫 화면(km-poster): 위에 메뉴 줄(진료 과목, 교통사고, 진료 시간, 온라인 예약, 오시는 길, 휴대폰은 햄버거).
-   아래는 5:7 좌우 분할. 왼쪽은 원장 반신 사진(막 없음)과 원장 고르기 탭 2개, 오른쪽은 큰 문장, 원장 이름과 과목, 약력 3줄,
-   "어디가 불편하세요" 바로가기 4개(허리, 목 어깨, 무릎은 부위 구간을 그 부위로 열고, 교통사고는 교통사고 구간으로),
-   오늘 진료 시간과 지금 상태, 예약하기. 휴대폰은 사진이 위(56svh), 글이 아래로 쌓인다.
-   핵심 모션: 사진이 천천히 다가오고(1.04배에서 1배), 원장을 바꾸면 사진이 짧게 교차한다.
-   본문에서 남긴 움직임은 접수번호를 넣으면 찍히는 자동차보험 도장 하나다.
+   첫 화면(km-poster): 위에 메뉴 줄, 아래는 5:7 좌우 분할. 왼쪽은 대표원장 반신 사진, 오른쪽은 큰 문장, 원장 이름과 과목,
+   약력, 증상 바로가기, 진료 시간 요약, 예약하기. 휴대폰은 사진이 위(56svh), 글이 아래로 쌓인다. 첫 화면은 고정 화면이다.
    동작 줄이기면 전부 멈춘다. */
 
 /* 제목은 본문과 같은 Pretendard, 굵게 */
@@ -38,17 +34,14 @@ const serifF = { fontWeight: 700 } as const;
 const IMG = "/images/demo-korean-medicine";
 const ADDRESS = "서울 ㅇㅇ구 ㅇㅇ로 00, 3층";
 const TEL = "02-000-0000";
-const KAKAO = "카카오톡 채널 곰파트너";
+const KAKAO = "카카오톡 채널 한의원";
 
 /* 로고: 메인 사이트와 같은 곰 로고 + 곰파트너(크게) + 업종(작게) */
 function SampleLogo({ light, small }: { light?: boolean; small?: boolean }) {
   return (
     <span className="inline-flex items-center gap-2" style={{ color: light ? "#ffffff" : "#111111" }}>
-      {/* eslint-disable-next-line @next/next/no-img-element -- 메인 사이트와 같은 곰 로고 */}
-      <img src="/images/logo-bear.png" alt="" aria-hidden width={28} height={28} className={small ? "h-6 w-6 shrink-0" : "h-7 w-7 shrink-0"} />
       <span className="flex items-baseline gap-1 whitespace-nowrap">
-        <span className={`${small ? "text-[18px]" : "text-[20px]"} font-bold tracking-[-0.03em]`}>곰파트너</span>
-        <span className="text-[12px] font-semibold opacity-75">카탈로그</span>
+        <span className={`${small ? "text-[18px]" : "text-[20px]"} font-bold tracking-[-0.03em]`}>한의원</span>
       </span>
     </span>
   );
@@ -69,13 +62,10 @@ const C = {
 
 /* 모션 상수. 시간은 초, 이징은 cubic-bezier */
 const EASE = [0.22, 1, 0.36, 1] as const;
-/** 첫 화면 사진이 다가오는 시간 */
-const PHOTO_IN = 1.6;
 /** 패널 전환 */
 const DUR = 0.3;
 
 const focusRing = "focus-visible:outline focus-visible:outline-[3px] focus-visible:outline-offset-2";
-const won = (n: number) => `${n.toLocaleString("ko-KR")}원`;
 const p2 = (n: number) => String(n).padStart(2, "0");
 const DOW = ["일", "월", "화", "수", "목", "금", "토"];
 
@@ -89,14 +79,11 @@ const CARES: { name: Care; desc: string; pay: string }[] = [
   { name: "한약", desc: "진찰 뒤 증상과 체질에 맞춰 달여요.", pay: "비급여" },
 ];
 
-type PartId = "head" | "neck" | "shoulder" | "waist" | "wrist" | "knee";
-const PARTS: { id: PartId; label: string; x: number; y: number; signs: string[]; care: Care[] }[] = [
-  { id: "head", label: "머리", x: 124, y: 36, signs: ["두통이 자주 와요", "어지럽고 잠을 설쳐요"], care: ["침", "한약"] },
-  { id: "neck", label: "목", x: 124, y: 80, signs: ["고개를 돌리기 힘들어요", "자고 나면 목에 담이 와요"], care: ["침", "추나", "약침"] },
-  { id: "shoulder", label: "어깨", x: 168, y: 112, signs: ["팔이 위로 안 올라가요", "밤에 어깨가 쑤셔요"], care: ["침", "약침", "추나"] },
-  { id: "waist", label: "허리", x: 124, y: 232, signs: ["오래 앉으면 허리가 뻐근해요", "다리가 저려요"], care: ["추나", "침", "약침"] },
-  { id: "wrist", label: "손목", x: 172, y: 276, signs: ["손목이 시큰거려요", "손가락이 저려요"], care: ["침", "약침"] },
-  { id: "knee", label: "무릎", x: 148, y: 352, signs: ["계단 내려갈 때 아파요", "무릎이 붓고 뻣뻣해요"], care: ["침", "약침", "한약"] },
+const CLINICS: { title: string; signs: string; care: Care[] }[] = [
+  { title: "척추 통증", signs: "허리 통증, 목 통증, 다리 저림, 디스크", care: ["추나", "침", "약침"] },
+  { title: "관절 통증", signs: "어깨 통증, 손목 통증, 무릎 통증, 오십견", care: ["침", "약침", "추나"] },
+  { title: "두통, 어지럼", signs: "잦은 두통, 어지럼, 수면 장애", care: ["침", "한약"] },
+  { title: "한약 상담", signs: "체질 상담, 보약, 기력 저하", care: ["한약"] },
 ];
 
 /* ---------- 비급여 진료비 ---------- */
@@ -110,15 +97,7 @@ const FEES: { item: string; unit: string; price: string }[] = [
 
 /* ---------- 교통사고 진료 ---------- */
 
-const CAR_ROWS: { item: string; fee: number }[] = [
-  { item: "진찰료", fee: 14300 },
-  { item: "침, 부항", fee: 12600 },
-  { item: "약침", fee: 20000 },
-  { item: "추나", fee: 31400 },
-  { item: "한방 물리요법", fee: 5600 },
-];
 const CAR_STEPS = ["보험사에 사고 접수", "문자로 접수번호 받기", "한의원에 접수번호 알려 주기", "진료"];
-const validAccident = (s: string) => s.replace(/\D/g, "").length >= 8;
 
 /* ---------- 진료 시간 ---------- */
 
@@ -134,21 +113,8 @@ const HOURS: Record<number, [number, number] | null> = {
 };
 const LUNCH: [number, number] = [780, 840];
 const NIGHT_FROM = 1140;
-/** 시간표 막대 눈금: 9시 ~ 21시 */
-const AXIS_FROM = 540;
-const AXIS_TO = 1260;
 const hm = (m: number) => `${p2(Math.floor(m / 60))}:${p2(m % 60)}`;
 const hasLunch = (dow: number) => dow >= 1 && dow <= 5;
-
-type Status = "진료 중" | "점심시간" | "진료 전" | "진료 마감" | "휴진";
-function statusAt(dow: number, min: number): Status {
-  const h = HOURS[dow];
-  if (!h) return "휴진";
-  if (min < h[0]) return "진료 전";
-  if (min >= h[1]) return "진료 마감";
-  if (hasLunch(dow) && min >= LUNCH[0] && min < LUNCH[1]) return "점심시간";
-  return "진료 중";
-}
 
 /* ---------- 예약 ---------- */
 
@@ -181,7 +147,7 @@ const nextOpenDay = (d: Date) => {
   return n;
 };
 
-/** 브라우저에서만 지금 시각(분)을 읽는다. 서버 렌더와 첫 화면은 null */
+/** 예약 시간 칸에서 지난 시간을 막으려고 브라우저에서만 지금 시각(분)을 읽는다 */
 function useNowMin(): number | null {
   const [now, setNow] = useState<number | null>(null);
   useEffect(() => {
@@ -205,8 +171,6 @@ export function KoreanMedicineDemo() {
   const nowMin = useNowMin();
 
   const [kind, setKind] = useState<Kind>("일반 진료");
-  const [accident, setAccident] = useState("");
-  const [part, setPart] = useState<PartId>("waist");
 
   useEffect(() => {
     const f = () => window.scrollTo({ top: 0 });
@@ -218,7 +182,7 @@ export function KoreanMedicineDemo() {
 
   return (
     <div className="min-h-screen overflow-x-clip" style={{ background: C.paper, color: C.ink }}>
-      <Poster reduce={reduce} today={today} nowMin={nowMin} go={go} onPart={(p) => { setPart(p); go("km-body"); }} />
+      <Poster go={go} />
 
       {/* 교통사고 띠 */}
       <div className="border-y" style={{ borderColor: C.line, background: C.soft }}>
@@ -232,10 +196,11 @@ export function KoreanMedicineDemo() {
         </p>
       </div>
 
-      <BodySection reduce={reduce} part={part} setPart={setPart} onCar={() => go("km-car")} />
-      <CarSection reduce={reduce} value={accident} setValue={setAccident} onReserve={() => { setKind("교통사고"); go("km-reserve"); }} />
-      <HoursSection today={today} nowMin={nowMin} />
-      <ReserveSection reduce={reduce} today={today} nowMin={nowMin} kind={kind} setKind={setKind} accident={accident} />
+      <ClinicSection onCar={() => go("km-car")} />
+      <CarSection onReserve={() => { setKind("교통사고"); go("km-reserve"); }} />
+      <HoursSection />
+      <DoctorSection />
+      <ReserveSection reduce={reduce} today={today} nowMin={nowMin} kind={kind} setKind={setKind} />
       <VisitSection />
 
       <footer className="mt-20 px-4 py-10 md:px-6" style={{ background: "#141414", color: "#ffffff" }}>
@@ -255,19 +220,9 @@ export function KoreanMedicineDemo() {
   );
 }
 
-/* ---------- 상호 낙관 ---------- */
-
-function Seal({ size }: { size: number }) {
-  return (
-    <span aria-hidden className="inline-flex shrink-0 items-center justify-center rounded-[4px] font-bold leading-none" style={{ width: size, height: size, background: C.red, color: "#ffffff", fontSize: size * 0.56 }}>
-      곰
-    </span>
-  );
-}
-
 /* ---------- 첫 화면 ---------- */
 
-/* 첫 화면: 원장 반신 사진(왼쪽 5) + 이름, 과목, 약력, 아픈 곳 바로가기(오른쪽 7). 위에는 메뉴 */
+/* 첫 화면: 대표원장 반신 사진(왼쪽 5) + 이름, 과목, 약력, 증상 바로가기(오른쪽 7). 위에는 메뉴 */
 const DOCTORS = [
   { id: "kim", name: "김ㅎ늘", role: "대표원장", major: "한방재활의학과 전문의", photo: "staff-1.jpg", career: ["침, 추나, 약침 진료", "교통사고 진료 담당", "화, 목 야간 진료"] },
   { id: "lee", name: "이ㅅ윤", role: "원장", major: "한의사", photo: "staff-2.jpg", career: ["한약 상담 담당", "두통, 어지럼 진료", "토요일 진료"] },
@@ -277,37 +232,22 @@ const NAV: [string, string][] = [
   ["km-body", "진료 과목"],
   ["km-car", "교통사고"],
   ["km-hours", "진료 시간"],
+  ["km-doctors", "의료진"],
   ["km-reserve", "온라인 예약"],
   ["km-visit", "오시는 길"],
 ];
 
-/** 아픈 곳 바로가기. part 가 있으면 부위 구간을 그 부위로 열고, 없으면 교통사고 구간 */
-const QUICK: { label: string; part?: PartId }[] = [
-  { label: "허리", part: "waist" },
-  { label: "목, 어깨", part: "neck" },
-  { label: "무릎", part: "knee" },
-  { label: "교통사고" },
+/** 증상 바로가기. 진료 과목 또는 교통사고 구간으로 이동 */
+const QUICK: { label: string; to: string }[] = [
+  { label: "허리, 목 통증", to: "km-body" },
+  { label: "어깨, 무릎 통증", to: "km-body" },
+  { label: "두통, 어지럼", to: "km-body" },
+  { label: "교통사고", to: "km-car" },
 ];
 
-function Poster({
-  reduce,
-  today,
-  nowMin,
-  go,
-  onPart,
-}: {
-  reduce: boolean;
-  today: Date;
-  nowMin: number | null;
-  go: (id: string) => void;
-  onPart: (p: PartId) => void;
-}) {
-  const [doc, setDoc] = useState(0);
+function Poster({ go }: { go: (id: string) => void }) {
   const [menu, setMenu] = useState(false);
-  const d = DOCTORS[doc];
-  const dow = today.getDay();
-  const h = HOURS[dow];
-  const status = nowMin === null ? null : statusAt(dow, nowMin);
+  const d = DOCTORS[0];
   const move = (id: string) => {
     setMenu(false);
     go(id);
@@ -364,47 +304,15 @@ function Poster({
       <div className="grid lg:min-h-[calc(100svh-65px)] md:grid-cols-[minmax(0,5fr)_minmax(0,7fr)]">
         {/* 원장 사진. 막 없이 화면 끝까지 */}
         <div className="relative flex flex-col" style={{ background: "#e9e9e6" }}>
-          {/* 원장 고르기 */}
-          <div role="tablist" aria-label="의료진" className="grid grid-cols-2 border-b" style={{ borderColor: C.line, background: C.paper }}>
-            {DOCTORS.map((x, i) => {
-              const on = i === doc;
-              return (
-                <button
-                  key={x.id}
-                  type="button"
-                  role="tab"
-                  aria-selected={on}
-                  onClick={() => setDoc(i)}
-                  className={`min-h-14 px-3 text-[16px] font-semibold ${focusRing}`}
-                  style={{ background: on ? C.ink : C.paper, color: on ? "#ffffff" : C.inkSoft, outlineColor: C.red, outlineOffset: -4 }}
-                >
-                  {x.role} {x.name}
-                </button>
-              );
-            })}
-          </div>
           <div className="relative h-[56svh] overflow-hidden md:h-auto md:flex-1">
-            <AnimatePresence initial={false} mode="popLayout">
-              <motion.div
-                key={d.id}
-                className="absolute inset-0"
-                initial={reduce ? false : { opacity: 0 }}
-                animate={{ opacity: 1 }}
-                exit={reduce ? undefined : { opacity: 0 }}
-                transition={{ duration: reduce ? 0 : DUR, ease: EASE }}
-              >
-                <motion.div className="h-full w-full" initial={reduce ? false : { scale: 1.04 }} animate={{ scale: 1 }} transition={{ duration: reduce ? 0 : PHOTO_IN, ease: EASE }}>
-                  {/* eslint-disable-next-line @next/next/no-img-element -- 정적 export 라 next/image 최적화를 쓰지 않는다 */}
-                  <img
-                    src={`${IMG}/${d.photo}`}
-                    alt={`${d.role} ${d.name}, 흰 가운을 입은 반신 사진`}
-                    fetchPriority={doc === 0 ? "high" : undefined}
-                    className="absolute inset-0 h-full w-full object-cover"
-                    style={{ objectPosition: "50% 18%" }}
-                  />
-                </motion.div>
-              </motion.div>
-            </AnimatePresence>
+            {/* eslint-disable-next-line @next/next/no-img-element -- 정적 export 라 next/image 최적화를 쓰지 않는다 */}
+            <img
+              src={`${IMG}/${d.photo}`}
+              alt={`${d.role} ${d.name}, 흰 가운을 입은 반신 사진`}
+              fetchPriority="high"
+              className="absolute inset-0 h-full w-full object-cover"
+              style={{ objectPosition: "50% 18%" }}
+            />
           </div>
         </div>
 
@@ -416,7 +324,7 @@ function Poster({
             본인 부담금 없음
           </h1>
 
-          <div className="mt-7 border-t pt-6" style={{ borderColor: C.line }} aria-live="polite">
+          <div className="mt-7 border-t pt-6" style={{ borderColor: C.line }}>
             <p className="flex flex-wrap items-baseline gap-x-3 gap-y-1">
               <strong className="text-[26px] font-bold tracking-[-0.02em] md:text-[30px]">{d.name}</strong>
               <span className="text-[16px] font-semibold" style={{ color: C.red }}>
@@ -432,20 +340,20 @@ function Poster({
 
           <div className="mt-7">
             <h2 className="text-[15px] font-semibold" style={{ color: C.muted }}>
-              어디가 불편하세요
+              진료 과목 바로가기
             </h2>
             <ul className="mt-2 grid grid-cols-2 gap-2 md:grid-cols-1 md:gap-0 md:border-t" style={{ borderColor: C.line }}>
               {QUICK.map((q) => (
                 <li key={q.label}>
                   <button
                     type="button"
-                    onClick={() => (q.part ? onPart(q.part) : go("km-car"))}
+                    onClick={() => go(q.to)}
                     className={`flex min-h-12 w-full items-center justify-between gap-2 rounded-[6px] border px-4 text-left text-[17px] font-semibold md:rounded-none md:border-x-0 md:border-t-0 md:px-1 md:hover:bg-[#f7f7f5] ${focusRing}`}
                     style={{ borderColor: C.line, outlineColor: C.red }}
                   >
                     {q.label}
                     <span className="text-[14px] font-normal" style={{ color: C.muted }}>
-                      {q.part ? "진료 보기" : "접수 방법"}
+                      {q.to === "km-car" ? "접수 방법" : "진료 보기"}
                     </span>
                   </button>
                 </li>
@@ -456,13 +364,8 @@ function Poster({
           <div className="mt-7 flex flex-wrap items-center justify-between gap-3 rounded-[6px] px-4 py-3" style={{ background: C.soft }}>
             <p className="flex flex-wrap items-center gap-x-2 text-[16px]">
               <Clock size={18} aria-hidden style={{ color: C.red }} />
-              <span>오늘({DOW[dow]})</span>
-              <strong>{h ? `${hm(h[0])} ~ ${hm(h[1])}` : "휴진"}</strong>
-              {h && status && (
-                <span className="rounded-[4px] px-2 py-0.5 text-[14px] font-semibold" style={status === "진료 중" ? { background: C.red, color: "#ffffff" } : { background: C.bar, color: C.inkSoft }}>
-                  {status}
-                </span>
-              )}
+              <span>평일 09:30 ~ 19:00</span>
+              <strong>화, 목 21:00까지</strong>
             </p>
             <button
               type="button"
@@ -494,130 +397,50 @@ function SectionTitle({ id, title, aside }: { id: string; title: string; aside?:
   );
 }
 
-/* ---------- 1. 아픈 부위 고르기 ---------- */
+/* ---------- 1. 진료 과목 ---------- */
 
-function BodySection({ reduce, part, setPart, onCar }: { reduce: boolean; part: PartId; setPart: (p: PartId) => void; onCar: () => void }) {
-  const cur = PARTS.find((x) => x.id === part) ?? PARTS[0];
-
+function ClinicSection({ onCar }: { onCar: () => void }) {
   return (
     <section id="km-body" aria-labelledby="km-body-title" className="mx-auto mt-14 max-w-[1200px] scroll-mt-4 px-4 md:mt-20 md:px-6">
-      <SectionTitle id="km-body-title" title="어디가 아프세요" />
+      <SectionTitle id="km-body-title" title="진료 과목" />
 
-      <div className="mt-6 grid gap-6 md:grid-cols-[minmax(0,0.8fr)_minmax(0,1.2fr)] md:gap-10">
-        {/* 몸 사진, 위에 부위 점 */}
-        <div className="relative mx-auto w-full max-w-[230px] md:max-w-[300px]">
-          {/* eslint-disable-next-line @next/next/no-img-element -- 정적 export 라 next/image 최적화를 쓰지 않는다 */}
-          <img src={`${IMG}/body.jpg`} alt={`뒤에서 본 사람 몸, ${cur.label} 표시`} className="block aspect-[1/2] h-auto w-full rounded-[8px] object-cover" />
-          <svg viewBox="0 0 240 480" className="absolute inset-0 h-full w-full" aria-hidden>
-            {PARTS.map((x) => (
-              <circle key={x.id} cx={x.x} cy={x.y} r="5" fill={x.id === part ? C.red : "#ffffff"} stroke={x.id === part ? "#ffffff" : C.muted} strokeWidth="1.5" opacity={x.id === part ? 1 : 0.9} />
-            ))}
-            <g transform={`translate(${cur.x} ${cur.y})`}>
-              <motion.circle
-                key={part}
-                r="20"
-                fill="rgba(255,255,255,0.18)"
-                stroke={C.red}
-                strokeWidth="2.5"
-                initial={reduce ? false : { opacity: 0 }}
-                animate={{ opacity: 1 }}
-                transition={{ duration: reduce ? 0 : DUR, ease: EASE }}
-              />
-            </g>
-          </svg>
-          {/* 그림 위에서 바로 누르는 자리. 키보드는 아래 부위 버튼을 쓴다 */}
-          {PARTS.map((x) => (
-            <button
-              key={x.id}
-              type="button"
-              tabIndex={-1}
-              aria-hidden
-              onClick={() => setPart(x.id)}
-              className="absolute h-11 w-11 -translate-x-1/2 -translate-y-1/2 rounded-full"
-              style={{ left: `${(x.x / 240) * 100}%`, top: `${(x.y / 480) * 100}%` }}
-            />
-          ))}
-        </div>
+      <ul className="mt-6 grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
+        {CLINICS.map((c) => (
+          <li key={c.title} className="rounded-[6px] border p-5" style={{ borderColor: C.line }}>
+            <h3 className="text-[20px] font-bold">{c.title}</h3>
+            <p className="mt-2 text-[16px] leading-relaxed" style={{ color: C.inkSoft }}>
+              {c.signs}
+            </p>
+            <p className="mt-3 text-[15px] font-semibold" style={{ color: C.red }}>
+              {c.care.join(", ")}
+            </p>
+          </li>
+        ))}
+      </ul>
 
-        <div>
-          <div role="radiogroup" aria-label="아픈 부위" className="flex flex-wrap gap-2">
-            {PARTS.map((x) => {
-              const on = x.id === part;
-              return (
-                <button
-                  key={x.id}
-                  type="button"
-                  role="radio"
-                  aria-checked={on}
-                  onClick={() => setPart(x.id)}
-                  className={`min-h-11 rounded-full border px-5 text-[17px] font-semibold transition-colors ${focusRing}`}
-                  style={{ borderColor: on ? C.red : C.field, background: on ? C.red : C.paper, color: on ? "#ffffff" : C.ink, outlineColor: C.ink }}
-                >
-                  {x.label}
-                </button>
-              );
-            })}
-          </div>
-
-          <AnimatePresence mode="wait" initial={false}>
-            <motion.div
-              key={part}
-              initial={reduce ? false : { opacity: 0 }}
-              animate={{ opacity: 1 }}
-              exit={reduce ? undefined : { opacity: 0 }}
-              transition={{ duration: reduce ? 0 : DUR, ease: EASE }}
-              className="mt-6"
-              aria-live="polite"
-            >
-              <p className="text-[15px] font-bold" style={{ color: C.muted }}>
-                {cur.label}, 이럴 때 오세요
-              </p>
-              <ul className="mt-2 space-y-1 text-[19px] font-medium leading-snug">
-                {cur.signs.map((s) => (
-                  <li key={s}>{s}</li>
-                ))}
-              </ul>
-
-              <p className="mt-6 text-[15px] font-bold" style={{ color: C.muted }}>
-                주로 받는 진료
-              </p>
-              <ul className="mt-2 grid gap-2 sm:grid-cols-2">
-                {CARES.map((c) => {
-                  const on = cur.care.includes(c.name);
-                  return (
-                    <li
-                      key={c.name}
-                      className="rounded-[6px] border p-4"
-                      style={{ borderColor: on ? C.red : C.line, background: on ? C.paper : C.soft, opacity: on ? 1 : 0.75 }}
-                    >
-                      <p className="flex items-center justify-between gap-2">
-                        <span className="inline-flex items-center gap-1.5 text-[18px] font-bold">
-                          {on && <Check size={18} aria-hidden style={{ color: C.red }} />}
-                          {c.name}
-                          <span className="sr-only">{on ? "(이 부위에 주로 받는 진료)" : ""}</span>
-                        </span>
-                        <span className="text-[13px] font-bold" style={{ color: c.pay === "비급여" ? C.muted : C.red }}>
-                          {c.pay}
-                        </span>
-                      </p>
-                      <p className="mt-1 text-[15px]" style={{ color: C.inkSoft }}>
-                        {c.desc}
-                      </p>
-                    </li>
-                  );
-                })}
-              </ul>
-              <p className="mt-4 text-[15px]" style={{ color: C.inkSoft }}>
-                사고 뒤에 아프기 시작했다면{" "}
-                <button type="button" onClick={onCar} className={`font-bold underline underline-offset-4 ${focusRing}`} style={{ color: C.red, outlineColor: C.red }}>
-                  교통사고 진료
-                </button>
-                로 받으세요.
-              </p>
-            </motion.div>
-          </AnimatePresence>
-        </div>
-      </div>
+      <h3 className="mt-12 text-[20px] font-bold">진료 방법</h3>
+      <ul className="mt-3 grid gap-2 sm:grid-cols-2">
+        {CARES.map((c) => (
+          <li key={c.name} className="rounded-[6px] border p-4" style={{ borderColor: C.line, background: C.soft }}>
+            <p className="flex items-center justify-between gap-2">
+              <span className="text-[18px] font-bold">{c.name}</span>
+              <span className="text-[13px] font-bold" style={{ color: c.pay === "비급여" ? C.muted : C.red }}>
+                {c.pay}
+              </span>
+            </p>
+            <p className="mt-1 text-[15px]" style={{ color: C.inkSoft }}>
+              {c.desc}
+            </p>
+          </li>
+        ))}
+      </ul>
+      <p className="mt-4 text-[15px]" style={{ color: C.inkSoft }}>
+        사고 뒤에 아프기 시작했다면{" "}
+        <button type="button" onClick={onCar} className={`font-bold underline underline-offset-4 ${focusRing}`} style={{ color: C.red, outlineColor: C.red }}>
+          교통사고 진료
+        </button>
+        로 받으세요.
+      </p>
 
       {/* 비급여 진료비 안내 */}
       <div className="mt-12">
@@ -662,9 +485,7 @@ function BodySection({ reduce, part, setPart, onCar }: { reduce: boolean; part: 
 
 /* ---------- 2. 교통사고 진료 ---------- */
 
-function CarSection({ reduce, value, setValue, onReserve }: { reduce: boolean; value: string; setValue: (v: string) => void; onReserve: () => void }) {
-  const ok = validAccident(value);
-  const total = CAR_ROWS.reduce((a, r) => a + r.fee, 0);
+function CarSection({ onReserve }: { onReserve: () => void }) {
 
   return (
     <section id="km-car" aria-labelledby="km-car-title" className="mx-auto mt-16 max-w-[1200px] scroll-mt-4 px-4 md:mt-24 md:px-6">
@@ -691,77 +512,23 @@ function CarSection({ reduce, value, setValue, onReserve }: { reduce: boolean; v
           </ul>
         </div>
 
-        {/* 진료비 계산서 */}
-        <div className="relative rounded-[8px] border p-5 md:p-6" style={{ borderColor: C.line, background: C.soft }}>
-          <label htmlFor="km-accident" className="block text-[16px] font-bold">
-            자동차보험 접수번호
-          </label>
-          <input
-            id="km-accident"
-            inputMode="numeric"
-            autoComplete="off"
-            value={value}
-            onChange={(e) => setValue(e.target.value.replace(/[^\d-]/g, "").slice(0, 16))}
-            placeholder="예: 2610-1234567"
-            className={`mt-2 h-12 w-full rounded-[4px] border bg-white px-3 text-[18px] tabular-nums ${focusRing}`}
-            style={{ borderColor: C.field, outlineColor: C.red }}
-          />
-
-          <table className="mt-5 w-full border-collapse text-[16px]">
-            <caption className="sr-only">교통사고 진료비 예시</caption>
-            <thead>
-              <tr className="border-b" style={{ borderColor: C.field }}>
-                <th scope="col" className="py-2 text-left font-bold">
-                  항목
-                </th>
-                <th scope="col" className="py-2 text-right font-bold">
-                  진료비
-                </th>
-                <th scope="col" className="py-2 text-right font-bold">
-                  본인 부담
-                </th>
-              </tr>
-            </thead>
-            <tbody>
-              {CAR_ROWS.map((r) => (
-                <tr key={r.item} className="border-b" style={{ borderColor: C.line }}>
-                  <td className="py-2">{r.item}</td>
-                  <td className="py-2 text-right tabular-nums" style={{ color: C.muted }}>
-                    {won(r.fee)}
-                  </td>
-                  <td className="py-2 text-right font-bold tabular-nums">{ok ? "0원" : "-"}</td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
-          <p className="mt-4 flex items-baseline justify-between gap-3">
-            <span className="text-[16px] font-bold">본인 부담 합계</span>
-            <span className="text-[30px] font-bold tabular-nums" style={{ color: ok ? C.red : C.muted }} aria-live="polite">
-              {ok ? "0원" : won(total)}
-            </span>
-          </p>
-          <p className="mt-1 text-right text-[14px]" style={{ color: C.muted }}>
-            {ok ? "진료비는 보험사에서 한의원으로 바로 내요" : "접수번호 확인 전"}
-          </p>
-
-          <AnimatePresence>
-            {ok && (
-              <motion.div
-                aria-hidden
-                className="pointer-events-none absolute -right-2 -top-7 md:-right-4"
-                initial={reduce ? false : { scale: 1.4, opacity: 0, rotate: -14 }}
-                animate={{ scale: 1, opacity: 1, rotate: -8 }}
-                exit={reduce ? undefined : { opacity: 0 }}
-                transition={{ duration: reduce ? 0 : 0.28, ease: [0.5, 0, 0.75, 0] }}
-              >
-                <span className="inline-flex h-[76px] w-[76px] flex-col items-center justify-center rounded-[6px] border text-[15px] font-bold leading-tight" style={{ borderColor: C.red, color: C.red, background: "rgba(255,255,255,0.92)" }}>
-                  자동차
-                  <br />
-                  보험
-                </span>
-              </motion.div>
-            )}
-          </AnimatePresence>
+        {/* 준비물과 예약 */}
+        <div className="rounded-[8px] border p-5 md:p-6" style={{ borderColor: C.line, background: C.soft }}>
+          <h3 className="text-[18px] font-bold">내원하실 때</h3>
+          <dl className="mt-3 grid gap-3 text-[16px]">
+            {[
+              ["준비물", "신분증, 자동차보험 접수번호"],
+              ["진료비", "보험사에서 한의원으로 바로 지급"],
+              ["진료 시간", "평일 19:00까지, 화, 목 21:00까지, 토 14:00까지"],
+            ].map(([k, v]) => (
+              <div key={k} className="border-b pb-2" style={{ borderColor: C.line }}>
+                <dt className="text-[14px]" style={{ color: C.muted }}>
+                  {k}
+                </dt>
+                <dd className="mt-0.5 font-semibold">{v}</dd>
+              </div>
+            ))}
+          </dl>
 
           <button
             type="button"
@@ -781,95 +548,34 @@ function CarSection({ reduce, value, setValue, onReserve }: { reduce: boolean; v
 
 /* ---------- 3. 진료 시간표 ---------- */
 
-function HoursSection({ today, nowMin }: { today: Date; nowMin: number | null }) {
-  const dowToday = today.getDay();
+function HoursSection() {
   const order = [1, 2, 3, 4, 5, 6, 0];
-  const span = AXIS_TO - AXIS_FROM;
-  const pct = (m: number) => `${((m - AXIS_FROM) / span) * 100}%`;
-  const status = nowMin == null ? null : statusAt(dowToday, nowMin);
 
   return (
     <section id="km-hours" aria-labelledby="km-hours-title" className="mx-auto mt-16 max-w-[1200px] scroll-mt-4 px-4 md:mt-24 md:px-6">
-      <SectionTitle
-        id="km-hours-title"
-        title="진료 시간"
-        aside={
-          status && (
-            <p className="inline-flex items-center gap-2 text-[16px] font-bold" style={{ color: status === "진료 중" ? C.red : C.inkSoft }}>
-              <Clock size={18} aria-hidden />
-              지금 {status}
-            </p>
-          )
-        }
-      />
+      <SectionTitle id="km-hours-title" title="진료 시간" />
 
-      <div className="mt-6">
-        {/* 눈금 */}
-        <div className="grid grid-cols-[52px_minmax(0,1fr)] gap-3 md:grid-cols-[72px_minmax(0,1fr)_200px]">
-          <span />
-          <div className="relative h-5 text-[12px] tabular-nums" style={{ color: C.muted }} aria-hidden>
-            {[540, 720, 900, 1080, 1260].map((m) => (
-              <span key={m} className="absolute -translate-x-1/2" style={{ left: pct(m) }}>
-                {m / 60}시
-              </span>
-            ))}
-          </div>
-          <span className="hidden md:block" />
-        </div>
-
+      <div className="mt-6 max-w-[640px]">
         <ul>
           {order.map((d) => {
             const h = HOURS[d];
-            const isToday = d === dowToday;
             const night = h && h[1] > NIGHT_FROM;
             return (
-              <li
-                key={d}
-                className="grid grid-cols-[52px_minmax(0,1fr)] items-center gap-3 border-b py-3 md:grid-cols-[72px_minmax(0,1fr)_200px]"
-                style={{ borderColor: C.line, background: isToday ? C.soft : undefined }}
-              >
-                <span className="pl-1 text-[17px] font-semibold">
-                  {DOW[d]}
-                  {isToday && (
-                    <span className="ml-1 align-middle text-[12px]" style={{ color: C.red }}>
-                      오늘
-                    </span>
-                  )}
+              <li key={d} className="flex items-center justify-between gap-3 border-b py-3 text-[17px]" style={{ borderColor: C.line }}>
+                <span className="inline-flex items-center gap-2 font-semibold">
+                  <Clock size={16} aria-hidden style={{ color: C.muted }} />
+                  {DOW[d]}요일
                 </span>
-                <div className="relative h-7 rounded-[2px]" style={{ background: C.soft }} aria-hidden>
-                  {h && (
-                    <>
-                      <span className="absolute inset-y-0 rounded-[2px]" style={{ left: pct(h[0]), width: `calc(${pct(Math.min(h[1], NIGHT_FROM))} - ${pct(h[0])})`, background: "#3a3a3a" }} />
-                      {night && (
-                        <span className="absolute inset-y-0 inline-flex items-center justify-center rounded-[2px]" style={{ left: pct(NIGHT_FROM), width: `calc(${pct(h[1])} - ${pct(NIGHT_FROM)})`, background: C.red, color: "#ffffff" }}>
-                          <Moon size={14} />
-                        </span>
-                      )}
-                      {hasLunch(d) && (
-                        <span
-                          className="absolute inset-y-0"
-                          style={{
-                            left: pct(LUNCH[0]),
-                            width: `calc(${pct(LUNCH[1])} - ${pct(LUNCH[0])})`,
-                            background: `repeating-linear-gradient(135deg, ${C.bar} 0 4px, #c4c4c0 4px 6px)`,
-                          }}
-                        />
-                      )}
-                    </>
-                  )}
-                  {isToday && nowMin != null && nowMin >= AXIS_FROM && nowMin <= AXIS_TO && (
-                    <span className="absolute -inset-y-1 w-[3px] rounded-full" style={{ left: pct(nowMin), background: C.red }} />
-                  )}
-                </div>
-                <span className="col-span-2 pl-1 text-[15px] tabular-nums md:col-span-1 md:pl-0 md:text-[16px]">
+                <span className="tabular-nums">
                   {h ? (
                     <>
-                      {hm(h[0])} ~ {hm(h[1])}
                       {night && (
-                        <strong className="ml-2" style={{ color: C.red }}>
+                        <strong className="mr-2 inline-flex items-center gap-1 text-[15px]" style={{ color: C.red }}>
+                          <Moon size={14} aria-hidden />
                           야간 진료
                         </strong>
                       )}
+                      {hm(h[0])} ~ {hm(h[1])}
                     </>
                   ) : (
                     <span style={{ color: C.muted }}>휴진</span>
@@ -889,6 +595,38 @@ function HoursSection({ today, nowMin }: { today: Date; nowMin: number | null })
   );
 }
 
+/* ---------- 의료진 ---------- */
+
+function DoctorSection() {
+  return (
+    <section id="km-doctors" aria-labelledby="km-doctors-title" className="mx-auto mt-16 max-w-[1200px] scroll-mt-4 px-4 md:mt-24 md:px-6">
+      <SectionTitle id="km-doctors-title" title="의료진" />
+      <ul className="mt-6 grid gap-6 sm:grid-cols-2">
+        {DOCTORS.map((x) => (
+          <li key={x.id} className="grid grid-cols-[112px_minmax(0,1fr)] gap-4 md:grid-cols-[160px_minmax(0,1fr)]">
+            {/* eslint-disable-next-line @next/next/no-img-element -- 정적 export 라 next/image 최적화를 쓰지 않는다 */}
+            <img src={`${IMG}/${x.photo}`} alt={`${x.role} ${x.name}`} loading="lazy" className="aspect-[3/4] w-full rounded-[6px] object-cover" style={{ objectPosition: "50% 18%" }} />
+            <div>
+              <p className="text-[15px] font-semibold" style={{ color: C.red }}>
+                {x.role}
+              </p>
+              <p className="mt-0.5 text-[22px] font-bold">{x.name}</p>
+              <p className="mt-1 text-[16px]" style={{ color: C.inkSoft }}>
+                {x.major}
+              </p>
+              <ul className="mt-3 space-y-1 text-[15px]" style={{ color: C.inkSoft }}>
+                {x.career.map((c) => (
+                  <li key={c}>{c}</li>
+                ))}
+              </ul>
+            </div>
+          </li>
+        ))}
+      </ul>
+    </section>
+  );
+}
+
 /* ---------- 4. 예약 ---------- */
 
 type Done = { no: string; when: string; kind: Kind; name: string; phone: string; reply: string };
@@ -899,14 +637,12 @@ function ReserveSection({
   nowMin,
   kind,
   setKind,
-  accident,
 }: {
   reduce: boolean;
   today: Date;
   nowMin: number | null;
   kind: Kind;
   setKind: (k: Kind) => void;
-  accident: string;
 }) {
   const days = useMemo(() => Array.from({ length: RESERVE_DAYS }, (_, i) => daysAgo(today, -i)), [today]);
   const firstOpen = days.findIndex((d) => !!HOURS[d.getDay()]);
@@ -914,7 +650,7 @@ function ReserveSection({
   const [slot, setSlot] = useState<number | null>(null);
   const [name, setName] = useState("");
   const [phone, setPhone] = useState("");
-  const [accNo, setAccNo] = useState<string | null>(null);
+  const [accNo, setAccNo] = useState("");
   const [err, setErr] = useState<string | null>(null);
   const [done, setDone] = useState<Done | null>(null);
 
@@ -922,7 +658,6 @@ function ReserveSection({
   const slots = slotsFor(day.getDay());
   // 오늘은 지금부터 30분 뒤 시간만
   const past = (m: number) => dayIdx === 0 && nowMin != null && m < nowMin + 30;
-  const accVal = accNo ?? accident;
 
   const submit = (e: React.FormEvent) => {
     e.preventDefault();
@@ -976,16 +711,13 @@ function ReserveSection({
             style={{ borderColor: C.line, background: C.soft }}
             role="status"
           >
-            <div className="flex items-start justify-between gap-4">
-              <div>
-                <p className="text-[15px] font-bold" style={{ color: C.red }}>
-                  예약 접수 완료
-                </p>
-                <p className="mt-1 text-[30px] font-bold tabular-nums md:text-[36px]">
-                  {done.no}
-                </p>
-              </div>
-              <Seal size={44} />
+            <div>
+              <p className="text-[15px] font-bold" style={{ color: C.red }}>
+                예약 접수 완료
+              </p>
+              <p className="mt-1 text-[30px] font-bold tabular-nums md:text-[36px]">
+                {done.no}
+              </p>
             </div>
             <dl className="mt-6 grid gap-x-8 gap-y-3 text-[16px] sm:grid-cols-2">
               {[
@@ -1123,7 +855,7 @@ function ReserveSection({
                   </label>
                   <input
                     id="km-acc2"
-                    value={accVal}
+                    value={accNo}
                     onChange={(e) => setAccNo(e.target.value.replace(/[^\d-]/g, "").slice(0, 16))}
                     inputMode="numeric"
                     className={`mt-2 h-12 w-full rounded-[4px] border bg-white px-3 text-[17px] tabular-nums ${focusRing}`}

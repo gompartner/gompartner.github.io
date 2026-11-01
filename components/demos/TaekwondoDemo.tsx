@@ -17,20 +17,18 @@ import { DemoMakerInfo } from "@/components/demos/DemoMakerInfo";
    탑승 시간이라 첫 화면 가까이에 둔다. 요일별 수련 내용(품새, 발차기, 겨루기, 줄넘기, 태권체조)과 월 수련비,
    어린이 통학버스 신고와 보호자 동승, 체험 수업 1회 무료 같은 문구를 그대로 쓴다.
 
-   핵심 모션: 첫 화면(tk-poster)은 흰 도복에 검은 띠를 맨 수련생 사진 한 장이 화면을 채운다.
-   들어올 때 사진이 1.06배에서 1배로 천천히 다가오고, 문장 "학교 앞까지 차량 운행"와 정보 줄이 조금 늦게
-   아래에서 올라온다(CSS keyframes). 스크롤하면 사진만 조금 느리게 움직인다.
-   본문에서는 정류장을 고르면 차 표시가 그 자리로 미끄러져 간다. 동작 줄이기면 모두 바로 바뀐다.
+   첫 화면(tk-poster)은 흰 도복에 검은 띠를 맨 수련생 사진과 평일 수련 시간, 차량 정류장 목록.
+   들어올 때 사진만 1.06배에서 1배로 천천히 다가온다(CSS keyframes). 동작 줄이기면 멈춘 상태로 둔다.
 
-   상호작용(모두 브라우저 안에서만 돈다. 실제로 보내지 않는다)
-   1. 차량 운행: 호차와 부를 고르면 정류장별 등원 탑승 시간과 하원 도착 시간이 나오고, 정류장을 고르면 차가 그 자리로 간다.
-   2. 부별 시간표: 부를 고르면 그 부의 줄이 칠해지고 요일별 수련 내용과 월 수련비가 보인다.
-   3. 승급 심사: 지금 띠를 고르면 다음 띠, 심사 품새와 항목, 다음 심사일과 신청 마감일이 나온다.
+   구성
+   1. 차량 운행: 호차별 정류장 표, 부마다 등원 탑승 시간.
+   2. 부별 시간표: 요일별 수련 내용 표와 부별 월 수련비 표.
+   3. 승급 심사: 띠별 다음 띠, 심사 품새, 항목, 수련 기간 표와 심사 일정.
    4. 상담 신청: 구분, 상담 방법, 차량 이용, 희망일, 보호자 이름과 연락처. 완료 화면에 접수 번호, 담당 창구, 회신 예정일. */
 
-const BRAND = "곰파트너";
+const BRAND = "태권도장";
 const TEL = "02-000-0000";
-const KAKAO = "카카오톡 채널 곰파트너";
+const KAKAO = "카카오톡 채널 태권도장";
 const ADDRESS = "서울 ㅇㅇ구 ㅇㅇ로 00, 2층";
 const IMG = "/images/demo-taekwondo";
 
@@ -56,7 +54,7 @@ const C = {
 
 /* 모션 상수. 시간은 초, 이징은 cubic-bezier */
 const EASE = [0.22, 1, 0.36, 1] as const;
-/** 칠하기, 차 이동, 완료 화면 전환 */
+/** 완료 화면 전환 */
 const DUR = 0.35;
 
 const focusRing = "focus-visible:outline focus-visible:outline-[3px] focus-visible:outline-offset-2";
@@ -105,11 +103,9 @@ const BUS_CLASSES = [
   { id: "e3", label: "초등 3부", start: 16 * 60 + 30 },
   { id: "e4", label: "초등 4부", start: 17 * 60 + 30 },
 ];
-const CLASS_MIN = 50;
 /** 수업 시작 몇 분 전에 도장에 내리는지, 수업 끝나고 몇 분 뒤 출발하는지 */
 const ARRIVE_BEFORE = 8;
 const LEAVE_AFTER = 5;
-const STOP_ROW = 64;
 
 /* ---------- 시간표 ---------- */
 
@@ -148,24 +144,6 @@ const BELT_STEPS: BeltStep[] = [
 ];
 const TEST_FEE = 30000;
 
-/** 그 달 마지막 토요일 */
-function lastSaturday(y: number, m: number) {
-  const d = new Date(y, m + 1, 0);
-  d.setDate(d.getDate() - ((d.getDay() + 1) % 7));
-  return d;
-}
-
-/** 신청 마감(심사 7일 전)이 지나지 않은 심사일 n개 */
-function upcomingTests(today: Date, n: number) {
-  const out: { test: Date; deadline: Date }[] = [];
-  for (let i = 0; out.length < n && i < 6; i++) {
-    const test = lastSaturday(today.getFullYear(), today.getMonth() + i);
-    const deadline = daysAgo(test, 7);
-    if (deadline.getTime() >= today.getTime()) out.push({ test, deadline });
-  }
-  return out;
-}
-
 /** 일요일과 토요일을 뺀 다음 영업일 */
 function nextWeekday(from: Date) {
   let d = daysAgo(from, -1);
@@ -184,8 +162,6 @@ export function TaekwondoDemo() {
   const reduce = useReducedMotionSafe();
   const [busPick, setBusPick] = useState<BusPick>(null);
   const [part, setPart] = useState<Part>("초등부");
-  const [routeId, setRouteId] = useState(ROUTES[0].id);
-  const [stopIdx, setStopIdx] = useState(0);
 
   useEffect(() => {
     const f = () => window.scrollTo({ top: 0 });
@@ -197,20 +173,7 @@ export function TaekwondoDemo() {
 
   return (
     <div className="min-h-screen overflow-x-clip" style={{ background: C.bg, color: C.ink }}>
-      <Poster
-        reduce={reduce}
-        today={today}
-        go={go}
-        onPart={(p) => {
-          setPart(p);
-          go("tk-time");
-        }}
-        onStop={(r, i) => {
-          setRouteId(r);
-          setStopIdx(i);
-          go("tk-bus");
-        }}
-      />
+      <Poster reduce={reduce} go={go} />
 
       {/* 관장, 사범 */}
       <section id="tk-staff" aria-labelledby="tk-staff-title" className="scroll-mt-0 py-14 md:py-20" style={{ background: C.paper }}>
@@ -237,18 +200,7 @@ export function TaekwondoDemo() {
       <section id="tk-bus" aria-labelledby="tk-bus-title" className="scroll-mt-0 py-14 md:py-20" style={{ background: C.bg }}>
         <div className="mx-auto max-w-[1200px] px-4 md:px-6">
           <SectionTitle id="tk-bus-title" icon={<Bus size={24} aria-hidden />} title="차량 운행" />
-          <BusRoute
-            reduce={reduce}
-            routeId={routeId}
-            setRouteId={setRouteId}
-            stopIdx={stopIdx}
-            setStopIdx={setStopIdx}
-            onConsult={(pick) => {
-              setBusPick(pick);
-              setPart("초등부");
-              go("tk-consult");
-            }}
-          />
+          <BusRoute />
         </div>
       </section>
 
@@ -256,7 +208,7 @@ export function TaekwondoDemo() {
       <section id="tk-time" aria-labelledby="tk-time-title" className="scroll-mt-0 py-14 md:py-20" style={{ background: C.paper }}>
         <div className="mx-auto max-w-[1200px] px-4 md:px-6">
           <SectionTitle id="tk-time-title" icon={<Clock size={24} aria-hidden />} title="수련 시간표" />
-          <Timetable part={part} setPart={setPart} reduce={reduce} />
+          <Timetable />
         </div>
       </section>
 
@@ -264,7 +216,7 @@ export function TaekwondoDemo() {
       <section id="tk-belt" aria-labelledby="tk-belt-title" className="scroll-mt-0 py-14 md:py-20" style={{ background: C.bg }}>
         <div className="mx-auto max-w-[1200px] px-4 md:px-6">
           <SectionTitle id="tk-belt-title" icon={<Award size={24} aria-hidden />} title="승급 심사" />
-          <BeltTest today={today} />
+          <BeltTest />
         </div>
       </section>
 
@@ -345,13 +297,10 @@ function SampleLogo({ light, size = 20 }: { light?: boolean; size?: number }) {
   const mark = size + 8;
   return (
     <span className="inline-flex items-center gap-2 leading-none" style={{ color: light ? "#fff" : "#111" }}>
-      {/* eslint-disable-next-line @next/next/no-img-element -- 메인 사이트와 같은 곰 로고 */}
-      <img src="/images/logo-bear.png" alt="" aria-hidden width={mark} height={mark} className="shrink-0" style={{ width: mark, height: mark }} />
       <span className="flex items-baseline gap-1 whitespace-nowrap">
         <span className="font-bold tracking-[-0.03em]" style={{ fontSize: size }}>
-          곰파트너
+          태권도장
         </span>
-        <span className="text-[12px] font-semibold opacity-75">카탈로그</span>
       </span>
     </span>
   );
@@ -362,7 +311,7 @@ function chipStyle(on: boolean) {
 }
 const chip = `inline-flex min-h-[44px] items-center gap-1.5 rounded-[6px] border px-3.5 text-[15px] font-semibold ${focusRing}`;
 
-/* ---------- 첫 화면: 오늘 시간표와 차량 정류장 학부모 보드 ---------- */
+/* ---------- 첫 화면: 평일 수련 시간과 차량 정류장 ---------- */
 
 const NAV: [string, string][] = [
   ["tk-staff", "도장 소개"],
@@ -373,53 +322,8 @@ const NAV: [string, string][] = [
   ["tk-consult", "상담 문의"],
 ];
 
-/** "13:30 ~ 14:20" 을 시작, 끝 분으로 */
-const span = (t: string) => {
-  const [a, b] = t.split("~").map((x) => x.trim().split(":").map(Number));
-  return [a[0] * 60 + a[1], b[0] * 60 + b[1]] as const;
-};
-
-/** 지금 시각(분). 서버 렌더와 첫 화면은 null, 브라우저에서 채우고 1분마다 갱신 */
-function useNowMinutes() {
-  const [now, setNow] = useState<number | null>(null);
-  useEffect(() => {
-    const read = () => {
-      const d = new Date();
-      setNow(d.getHours() * 60 + d.getMinutes());
-    };
-    const frame = requestAnimationFrame(read);
-    const id = window.setInterval(read, 60_000);
-    return () => {
-      cancelAnimationFrame(frame);
-      window.clearInterval(id);
-    };
-  }, []);
-  return now;
-}
-
-function Poster({
-  reduce,
-  today,
-  go,
-  onPart,
-  onStop,
-}: {
-  reduce: boolean;
-  today: Date;
-  go: (id: string) => void;
-  onPart: (p: Part) => void;
-  onStop: (routeId: string, stopIdx: number) => void;
-}) {
+function Poster({ reduce, go }: { reduce: boolean; go: (id: string) => void }) {
   const [menu, setMenu] = useState(false);
-  const now = useNowMinutes();
-  const dow = today.getDay();
-  // 주말에는 다음 월요일 시간표를 보여 준다
-  const isToday = dow >= 1 && dow <= 5;
-  const boardDay = isToday ? today : daysAgo(today, -(dow === 6 ? 2 : 1));
-  const col = boardDay.getDay() - 1;
-  const rows = ROWS.filter((r) => r.week[col]);
-  const live = isToday && now !== null ? rows.findIndex((r) => now >= span(r.time)[0] && now < span(r.time)[1]) : -1;
-  const next = isToday && now !== null ? rows.findIndex((r) => now < span(r.time)[0]) : -1;
 
   const navTo = (id: string) => {
     setMenu(false);
@@ -519,44 +423,18 @@ function Poster({
           </p>
 
           <div className="mt-6 rounded-[8px] border" style={{ borderColor: C.line }}>
-            <div className="flex items-center justify-between gap-3 border-b px-4 py-3" style={{ borderColor: C.line, background: C.paper }}>
-              <h2 className="text-[17px] font-bold">{fmtKo(boardDay)} 수련</h2>
-              <span className="text-[14px]" style={{ color: C.muted }}>
-                {isToday ? "오늘" : "다음 수련일"}
-              </span>
-            </div>
+            <h2 className="border-b px-4 py-3 text-[17px] font-bold" style={{ borderColor: C.line, background: C.paper }}>
+              평일 수련 시간
+            </h2>
             <ul className="divide-y" style={{ borderColor: C.line }}>
-              {rows.map((r, i) => {
-                const st = i === live ? "수련 중" : i === next && live === -1 ? "다음" : null;
-                return (
-                  <li key={r.label} style={{ borderColor: C.line }}>
-                    <button
-                      type="button"
-                      onClick={() => onPart(r.part)}
-                      className={`grid min-h-[48px] w-full grid-cols-[minmax(0,1fr)_auto] items-center gap-3 px-4 py-2 text-left md:grid-cols-[200px_minmax(0,1fr)_auto] ${focusRing}`}
-                      style={{ background: st === "수련 중" ? C.accentSoft : "transparent", outlineColor: C.ink }}
-                    >
-                      <span className="min-w-0">
-                        <span className="flex items-center gap-2 text-[16px] font-bold">
-                          {r.label}
-                          {st && (
-                            <span className="rounded-[4px] px-1.5 py-0.5 text-[13px] font-bold" style={st === "수련 중" ? { background: C.accent, color: "#fff" } : { background: C.paper, color: C.accent }}>
-                              {st}
-                            </span>
-                          )}
-                        </span>
-                        <span className="block text-[14px] tabular-nums md:hidden" style={{ color: C.body }}>
-                          {r.time}
-                        </span>
-                      </span>
-                      <span className="hidden text-[15px] tabular-nums md:block" style={{ color: C.body }}>
-                        {r.time}
-                      </span>
-                      <span className="text-[15px] font-semibold">{r.week[col]}</span>
-                    </button>
-                  </li>
-                );
-              })}
+              {ROWS.map((r) => (
+                <li key={r.label} className="flex min-h-[44px] items-center justify-between gap-3 px-4 py-2" style={{ borderColor: C.line }}>
+                  <span className="text-[16px] font-bold">{r.label}</span>
+                  <span className="text-[15px] tabular-nums" style={{ color: C.body }}>
+                    {r.time}
+                  </span>
+                </li>
+              ))}
             </ul>
           </div>
 
@@ -565,19 +443,25 @@ function Poster({
               <Bus size={19} aria-hidden />
               차량 정류장
             </h2>
-            {ROUTES.map((r) => (
-              <div key={r.id} className="mt-3 flex flex-wrap items-center gap-2">
-                <span className="w-[52px] flex-none text-[14px] font-bold" style={{ color: C.muted }}>
-                  {r.label}
-                </span>
-                {r.stops.slice(0, -1).map((s, i) => (
-                  <button key={s.name} type="button" onClick={() => onStop(r.id, i)} className={chip} style={chipStyle(false)}>
-                    <MapPin size={15} aria-hidden />
-                    {s.name}
-                  </button>
-                ))}
-              </div>
-            ))}
+            <dl className="mt-3 grid grid-cols-[52px_minmax(0,1fr)] gap-x-2 gap-y-2 text-[15px] leading-[1.6]">
+              {ROUTES.map((r) => (
+                <div key={r.id} className="contents">
+                  <dt className="font-bold" style={{ color: C.muted }}>
+                    {r.label}
+                  </dt>
+                  <dd style={{ color: C.body }}>
+                    {r.stops
+                      .slice(0, -1)
+                      .map((st) => st.name)
+                      .join(", ")}
+                  </dd>
+                </div>
+              ))}
+            </dl>
+            <button type="button" onClick={() => go("tk-bus")} className={`mt-3 ${chip}`} style={chipStyle(false)}>
+              <MapPin size={15} aria-hidden />
+              정류장별 시간 보기
+            </button>
           </div>
 
           <button
@@ -623,144 +507,74 @@ function Poster({
 
 /* ---------- 1. 차량 운행 ---------- */
 
-function BusRoute({
-  reduce,
-  routeId,
-  setRouteId,
-  stopIdx,
-  setStopIdx,
-  onConsult,
-}: {
-  reduce: boolean;
-  routeId: string;
-  setRouteId: (id: string) => void;
-  stopIdx: number;
-  setStopIdx: (i: number) => void;
-  onConsult: (pick: { route: string; stop: string }) => void;
-}) {
-  const [classId, setClassId] = useState(BUS_CLASSES[1].id);
-  const route = ROUTES.find((r) => r.id === routeId) ?? ROUTES[0];
-  const cls = BUS_CLASSES.find((c) => c.id === classId) ?? BUS_CLASSES[0];
-  const total = route.stops[route.stops.length - 1].off;
-  const pickupAt = (s: Stop) => cls.start - ARRIVE_BEFORE - (total - s.off);
-  const dropAt = (s: Stop) => cls.start + CLASS_MIN + LEAVE_AFTER + (total - s.off);
-  const stops = route.stops.slice(0, -1);
-  const stop = stops[Math.min(stopIdx, stops.length - 1)];
-  const legendId = useId();
-
+function BusRoute() {
   return (
-    <div className="grid gap-6 lg:grid-cols-[minmax(0,1fr)_380px] lg:gap-10">
-      <div>
-        <div className="flex flex-wrap gap-2" role="group" aria-label="호차">
-          {ROUTES.map((r) => (
-            <button
-              key={r.id}
-              type="button"
-              aria-pressed={routeId === r.id}
-              onClick={() => {
-                setRouteId(r.id);
-                setStopIdx(0);
-              }}
-              className={chip}
-              style={chipStyle(routeId === r.id)}
-            >
-              <Bus size={18} aria-hidden />
-              {r.label} {r.area}
-            </button>
-          ))}
-        </div>
-        <div className="mt-3 flex flex-wrap gap-2" role="group" aria-label="타는 부">
-          {BUS_CLASSES.map((c) => (
-            <button key={c.id} type="button" aria-pressed={classId === c.id} onClick={() => setClassId(c.id)} className={chip} style={chipStyle(classId === c.id)}>
-              {c.label} <span className="tabular-nums">{hm(c.start)}</span>
-            </button>
-          ))}
-        </div>
-
-        {/* 노선 */}
-        <div className="mt-6 rounded-[6px] border p-4 md:p-6" style={{ borderColor: C.line, background: C.paper }}>
-          <div id={legendId} className="mb-3 grid grid-cols-[minmax(0,1fr)_64px_64px] gap-2 pl-12 text-[13px] font-bold md:grid-cols-[minmax(0,1fr)_84px_84px] md:text-[14px]" style={{ color: C.muted }}>
-            <span>정류장</span>
-            <span className="text-right">등원 탑승</span>
-            <span className="text-right">하원 도착</span>
-          </div>
-          <div className="relative">
-            {/* 길 */}
-            <div aria-hidden className="absolute bottom-[32px] left-[19px] top-[32px] w-[6px] rounded-full" style={{ background: "#d4d4d4" }} />
-            {/* 차. 고른 정류장으로 간다 */}
-            <motion.div
-              aria-hidden
-              className="absolute left-0 top-[10px] z-[1] flex h-11 w-11 items-center justify-center rounded-full"
-              style={{ background: C.accent, color: "#fff" }}
-              initial={false}
-              animate={{ y: Math.min(stopIdx, stops.length - 1) * STOP_ROW }}
-              transition={{ duration: reduce ? 0 : DUR, ease: EASE }}
-            >
-              <Bus size={20} />
-            </motion.div>
-            <ul role="radiogroup" aria-label="정류장" aria-describedby={legendId}>
-              {route.stops.map((s, i) => {
-                const last = i === route.stops.length - 1;
-                const on = !last && i === Math.min(stopIdx, stops.length - 1);
-                return (
-                  <li key={s.name} className="relative" style={{ height: STOP_ROW }}>
-                    <span aria-hidden className="absolute left-[12px] top-[25px] h-[20px] w-[20px] rounded-full border-2" style={{ background: last ? C.ink : "#fff", borderColor: last ? C.ink : "#9a9a9a" }} />
-                    {last ? (
-                      <div className="grid h-full grid-cols-[minmax(0,1fr)_64px_64px] items-center gap-2 pl-12 md:grid-cols-[minmax(0,1fr)_84px_84px]">
-                        <span className="text-[16px] font-bold">{BRAND}</span>
-                        <span className="text-right text-[15px] font-bold tabular-nums">{hm(cls.start - ARRIVE_BEFORE)}</span>
-                        <span className="text-right text-[15px] font-bold tabular-nums">{hm(cls.start + CLASS_MIN + LEAVE_AFTER)}</span>
-                      </div>
-                    ) : (
-                      <button
-                        type="button"
-                        role="radio"
-                        aria-checked={on}
-                        onClick={() => setStopIdx(i)}
-                        className={`grid h-full w-full grid-cols-[minmax(0,1fr)_64px_64px] items-center gap-2 rounded-[4px] pl-12 pr-2 text-left md:grid-cols-[minmax(0,1fr)_84px_84px] ${focusRing}`}
-                        style={{ background: on ? C.accentSoft : "transparent", outlineColor: C.ink }}
-                      >
-                        <span className="min-w-0">
-                          <span className={`block truncate text-[16px] ${on ? "font-bold" : "font-semibold"}`}>{s.name}</span>
-                          {s.note && (
-                            <span className="block truncate text-[13px]" style={{ color: C.muted }}>
-                              {s.note}
-                            </span>
-                          )}
-                        </span>
-                        <span className="text-right text-[16px] font-bold tabular-nums">{hm(pickupAt(s))}</span>
-                        <span className="text-right text-[16px] tabular-nums">{hm(dropAt(s))}</span>
-                      </button>
-                    )}
-                  </li>
-                );
-              })}
-            </ul>
-          </div>
-        </div>
+    <div className="grid gap-6 lg:grid-cols-[minmax(0,1fr)_320px] lg:gap-10">
+      <div className="min-w-0 space-y-6">
+        {ROUTES.map((route) => {
+          const total = route.stops[route.stops.length - 1].off;
+          return (
+            <div key={route.id} className="rounded-[8px] border" style={{ borderColor: C.line, background: "#fff" }}>
+              <h3 className="flex flex-wrap items-center gap-2 px-4 pt-4 text-[18px] font-bold md:px-5">
+                <Bus size={19} aria-hidden style={{ color: C.accent }} />
+                {route.label}
+                <span className="text-[15px] font-semibold" style={{ color: C.muted }}>
+                  {route.area}
+                </span>
+              </h3>
+              <div className="mt-2 overflow-x-auto" tabIndex={0} role="region" aria-label={`${route.label} 정류장별 등원 탑승 시간`}>
+                <table className="w-full min-w-[620px] border-collapse text-[15px]">
+                  <thead>
+                    <tr style={{ background: C.paper }}>
+                      <th scope="col" className="px-4 py-2.5 text-left font-bold md:px-5">
+                        정류장
+                      </th>
+                      {BUS_CLASSES.map((c) => (
+                        <th key={c.id} scope="col" className="whitespace-nowrap px-2 py-2.5 text-center font-bold">
+                          <span className="block">{c.label}</span>
+                          <span className="block text-[13px] font-semibold tabular-nums" style={{ color: C.muted }}>
+                            {hm(c.start)} 수업
+                          </span>
+                        </th>
+                      ))}
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {route.stops.map((s, i) => {
+                      const last = i === route.stops.length - 1;
+                      return (
+                        <tr key={s.name} className="border-t" style={{ borderColor: C.line }}>
+                          <th scope="row" className="px-4 py-2.5 text-left md:px-5">
+                            <span className="block font-bold">{last ? BRAND : s.name}</span>
+                            {s.note && (
+                              <span className="block text-[13px] font-normal" style={{ color: C.muted }}>
+                                {s.note}
+                              </span>
+                            )}
+                          </th>
+                          {BUS_CLASSES.map((c) => (
+                            <td key={c.id} className="px-2 py-2.5 text-center tabular-nums" style={{ fontWeight: last ? 700 : 400 }}>
+                              {hm(c.start - ARRIVE_BEFORE - (total - s.off))}
+                            </td>
+                          ))}
+                        </tr>
+                      );
+                    })}
+                  </tbody>
+                </table>
+              </div>
+            </div>
+          );
+        })}
       </div>
 
-      {/* 고른 정류장 결과 */}
-      <aside className="self-start rounded-[8px] border p-5 md:p-6 lg:sticky lg:top-6" style={{ borderColor: C.line, background: "#fff" }} aria-live="polite">
-        <p className="text-[15px] font-bold" style={{ color: C.muted }}>
-          {route.label}, {cls.label}
-        </p>
-        <p className="mt-1 text-[22px] font-bold leading-snug">{stop.name}</p>
-        <dl className="mt-4 grid grid-cols-2 gap-3">
-          <div className="rounded-[6px] p-3" style={{ background: C.accentSoft }}>
-            <dt className="text-[14px] font-bold">등원 탑승</dt>
-            <dd className="mt-1 text-[30px] font-bold leading-none tracking-[-0.02em] tabular-nums">
-              {hm(pickupAt(stop))}
-            </dd>
-          </div>
-          <div className="rounded-[6px] p-3" style={{ background: C.paper }}>
-            <dt className="text-[14px] font-bold">하원 도착</dt>
-            <dd className="mt-1 text-[30px] font-bold leading-none tracking-[-0.02em] tabular-nums">
-              {hm(dropAt(stop))}
-            </dd>
-          </div>
-        </dl>
-        <ul className="mt-4 space-y-2 text-[15px] leading-[1.6]">
+      <aside className="self-start rounded-[8px] border p-5 md:p-6" style={{ borderColor: C.line, background: "#fff" }}>
+        <h3 className="text-[18px] font-bold">이용 안내</h3>
+        <ul className="mt-3 space-y-2.5 text-[15px] leading-[1.6]" style={{ color: C.body }}>
+          <li className="flex gap-2">
+            <Clock size={18} className="mt-0.5 flex-none" aria-hidden />
+            표의 시간은 등원 탑승 시간이에요. 하원 차는 수업이 끝나고 {LEAVE_AFTER}분 뒤 출발해 같은 정류장에 내려 드려요.
+          </li>
           <li className="flex gap-2">
             <ShieldCheck size={18} className="mt-0.5 flex-none" aria-hidden />
             어린이 통학버스 신고 차량, 사범님이 함께 타요
@@ -770,15 +584,9 @@ function BusRoute({
             출발하면 보호자에게 문자가 가요
           </li>
         </ul>
-        <button
-          type="button"
-          onClick={() => onConsult({ route: route.label, stop: stop.name })}
-          data-gtm-cta="taekwondo_bus_consult"
-          className={`mt-5 inline-flex w-full items-center justify-center gap-2 rounded-[4px] px-5 py-3 text-[16px] font-semibold ${focusRing}`}
-          style={{ background: C.accent, color: "#fff", outlineColor: C.ink }}
-        >
-          <CalendarCheck size={20} aria-hidden />이 정류장으로 상담 신청
-        </button>
+        <p className="mt-4 text-[15px]" style={{ color: C.muted }}>
+          정류장 추가는 상담 때 말씀해 주세요.
+        </p>
       </aside>
     </div>
   );
@@ -786,81 +594,67 @@ function BusRoute({
 
 /* ---------- 2. 부별 시간표 ---------- */
 
-function Timetable({ part, setPart, reduce }: { part: Part; setPart: (p: Part) => void; reduce: boolean }) {
-  const fee = FEES[part];
+function Timetable() {
   return (
-    <div>
-      <div className="flex flex-wrap gap-2" role="group" aria-label="부 고르기">
-        {PARTS.map((p) => (
-          <button key={p} type="button" aria-pressed={part === p} onClick={() => setPart(p)} className={chip} style={chipStyle(part === p)}>
-            {p}
-          </button>
-        ))}
-      </div>
-
-      <div className="mt-5 grid gap-6 lg:grid-cols-[minmax(0,1fr)_300px]">
-        <div className="overflow-x-auto rounded-[8px] border" style={{ borderColor: C.line, background: "#fff" }} tabIndex={0} aria-label="수련 시간표, 좌우로 밀어서 보기" role="region">
-          <table className="w-full min-w-[640px] border-collapse text-[15px]">
-            <caption className="sr-only">부별 요일 수련 내용</caption>
-            <thead>
-              <tr style={{ background: C.paper, color: C.ink }}>
-                <th scope="col" className="px-3 py-3 text-left font-bold">
-                  부
+    <div className="grid gap-6 lg:grid-cols-[minmax(0,1fr)_320px]">
+      <div className="overflow-x-auto rounded-[8px] border" style={{ borderColor: C.line, background: "#fff" }} tabIndex={0} aria-label="수련 시간표, 좌우로 밀어서 보기" role="region">
+        <table className="w-full min-w-[640px] border-collapse text-[15px]">
+          <caption className="sr-only">부별 요일 수련 내용</caption>
+          <thead>
+            <tr style={{ background: C.paper, color: C.ink }}>
+              <th scope="col" className="px-3 py-3 text-left font-bold">
+                부
+              </th>
+              <th scope="col" className="px-3 py-3 text-left font-bold">
+                시간
+              </th>
+              {["월", "화", "수", "목", "금"].map((d) => (
+                <th key={d} scope="col" className="px-2 py-3 text-center font-bold">
+                  {d}
                 </th>
-                <th scope="col" className="px-3 py-3 text-left font-bold">
-                  시간
+              ))}
+            </tr>
+          </thead>
+          <tbody>
+            {ROWS.map((r) => (
+              <tr key={r.label} className="border-t" style={{ borderColor: C.line }}>
+                <th scope="row" className="whitespace-nowrap px-3 py-3 text-left font-bold">
+                  {r.label}
                 </th>
-                {["월", "화", "수", "목", "금"].map((d) => (
-                  <th key={d} scope="col" className="px-2 py-3 text-center font-bold">
-                    {d}
-                  </th>
+                <td className="whitespace-nowrap px-3 py-3 tabular-nums">{r.time}</td>
+                {r.week.map((w, i) => (
+                  <td key={i} className="px-2 py-3 text-center" style={{ color: w ? C.body : C.muted }}>
+                    {w || "쉬어요"}
+                  </td>
                 ))}
               </tr>
-            </thead>
-            <tbody>
-              {ROWS.map((r) => {
-                const on = r.part === part;
-                return (
-                  <tr key={r.label} className="border-t" style={{ borderColor: C.line }}>
-                    <th scope="row" className="relative whitespace-nowrap px-3 py-3 text-left font-bold">
-                      <motion.span
-                        aria-hidden
-                        className="absolute inset-y-0 left-0 w-[6px] origin-top"
-                        style={{ background: C.accent }}
-                        initial={false}
-                        animate={{ scaleY: on ? 1 : 0 }}
-                        transition={{ duration: reduce ? 0 : DUR, ease: EASE }}
-                      />
-                      {r.label}
-                      {on && <span className="sr-only"> (고른 부)</span>}
-                    </th>
-                    <td className="whitespace-nowrap px-3 py-3 tabular-nums" style={{ background: on ? C.accentSoft : undefined }}>
-                      {r.time}
-                    </td>
-                    {r.week.map((w, i) => (
-                      <td key={i} className="px-2 py-3 text-center" style={{ background: on ? C.accentSoft : undefined, color: w ? (on ? C.ink : C.body) : C.muted, fontWeight: on && w ? 600 : 400 }}>
-                        {w || "쉬어요"}
-                      </td>
-                    ))}
-                  </tr>
-                );
-              })}
-            </tbody>
-          </table>
-        </div>
+            ))}
+          </tbody>
+        </table>
+      </div>
 
-        <div className="rounded-[8px] border p-5" style={{ background: "#fff", borderColor: C.line }} aria-live="polite">
-          <p className="text-[15px] font-bold" style={{ color: C.muted }}>
-            {part} 월 수련비
-          </p>
-          <p className="mt-1 text-[34px] font-bold leading-none tracking-[-0.02em] tabular-nums">{won(fee.fee)}</p>
-          <ul className="mt-4 space-y-1.5 text-[15px] leading-[1.6]" style={{ color: C.body }}>
-            <li>{fee.per} 수련</li>
-            <li>{fee.bus ? "차량 운행 포함" : "차량 운행 없음"}</li>
-            <li>도복과 흰띠 처음 한 번 45,000원</li>
-            <li>형제 함께 다니면 둘째부터 10,000원 빼 드려요</li>
-          </ul>
-        </div>
+      <div className="rounded-[8px] border p-5" style={{ background: "#fff", borderColor: C.line }}>
+        <h3 className="text-[18px] font-bold">월 수련비</h3>
+        <table className="mt-3 w-full text-[15px]">
+          <tbody>
+            {PARTS.map((p) => (
+              <tr key={p} className="border-t first:border-t-0" style={{ borderColor: C.line }}>
+                <th scope="row" className="py-2.5 text-left font-bold">
+                  {p}
+                  <span className="block text-[13px] font-normal" style={{ color: C.muted }}>
+                    {FEES[p].per}
+                    {FEES[p].bus ? ", 차량 포함" : ""}
+                  </span>
+                </th>
+                <td className="py-2.5 text-right font-bold tabular-nums">{won(FEES[p].fee)}</td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
+        <ul className="mt-4 space-y-1.5 border-t pt-3 text-[15px] leading-[1.6]" style={{ color: C.body, borderColor: C.line }}>
+          <li>도복과 흰띠 처음 한 번 45,000원</li>
+          <li>형제 함께 다니면 둘째부터 10,000원 빼 드려요</li>
+        </ul>
       </div>
     </div>
   );
@@ -868,92 +662,54 @@ function Timetable({ part, setPart, reduce }: { part: Part; setPart: (p: Part) =
 
 /* ---------- 3. 승급 심사 ---------- */
 
-function BeltTest({ today }: { today: Date }) {
-  const [idx, setIdx] = useState(1);
-  const step = BELT_STEPS[idx];
-  const nextColor = BELT_STEPS[idx + 1] ?? { color: C.ink, edge: "#000" };
-  const tests = upcomingTests(today, 3);
-
+function BeltTest() {
   return (
-    <div className="grid gap-6 lg:grid-cols-[minmax(0,1fr)_minmax(0,1fr)] lg:gap-10">
-      <div>
-        <p className="text-[16px] font-bold">지금 매고 있는 띠</p>
-        <div className="mt-3 grid grid-cols-3 gap-2 sm:grid-cols-6" role="radiogroup" aria-label="지금 띠">
-          {BELT_STEPS.map((b, i) => (
-            <button
-              key={b.name}
-              type="button"
-              role="radio"
-              aria-checked={idx === i}
-              onClick={() => setIdx(i)}
-              className={`flex flex-col items-center gap-2 rounded-[6px] border px-1 pb-2.5 pt-3 text-[15px] font-semibold ${focusRing}`}
-              style={{ borderColor: idx === i ? C.accent : C.line, background: idx === i ? C.accentSoft : "#fff", outlineColor: C.ink }}
-            >
-              <BeltSwatch color={b.color} edge={b.edge} split={b.name === "품띠"} />
-              {b.name}
-              {idx === i && <Check size={16} aria-hidden />}
-            </button>
-          ))}
-        </div>
-
-        <div className="mt-6 rounded-[8px] border p-5 md:p-6" style={{ borderColor: C.line }} aria-live="polite">
-          <div className="flex items-center gap-3">
-            <BeltSwatch color={step.color} edge={step.edge} split={step.name === "품띠"} />
-            <span className="text-[15px] font-bold" style={{ color: C.muted }}>
-              다음 띠
-            </span>
-            <BeltSwatch color={nextColor.color} edge={nextColor.edge} split={step.next === "품띠"} />
-          </div>
-          <p className="mt-3 text-[26px] font-bold leading-tight tracking-[-0.02em]">
-            {step.next}
-          </p>
-          <dl className="mt-4 grid grid-cols-[92px_minmax(0,1fr)] gap-y-2.5 text-[16px] leading-[1.55]">
-            <dt className="font-bold">심사 품새</dt>
-            <dd style={{ color: C.body }}>{step.poomsae}</dd>
-            <dt className="font-bold">심사 항목</dt>
-            <dd style={{ color: C.body }}>{step.items}</dd>
-            <dt className="font-bold">수련 기간</dt>
-            <dd style={{ color: C.body }}>{step.period}</dd>
-            <dt className="font-bold">심사비</dt>
-            <dd style={{ color: C.body }}>{idx === BELT_STEPS.length - 1 ? "국기원 심사비 따로 안내" : `${won(TEST_FEE)}(새 띠, 수료증 포함)`}</dd>
-          </dl>
-        </div>
-      </div>
-
-      <div>
-        <p className="text-[16px] font-bold">도장 승급 심사 일정</p>
-        <p className="mt-1 text-[15px]" style={{ color: C.muted }}>
-          매달 마지막 토요일 오전 10시, 신청은 일주일 전까지
-        </p>
-        <ol className="mt-4 space-y-3">
-          {tests.map(({ test, deadline }, i) => {
-            const left = Math.round((deadline.getTime() - today.getTime()) / 86_400_000);
-            return (
-              <li key={test.getTime()} className="flex items-center gap-4 rounded-[6px] border p-4" style={{ borderColor: i === 0 ? C.accent : C.line }}>
-                <div className="flex h-[64px] w-[64px] flex-none flex-col items-center justify-center rounded-[4px]" style={{ background: i === 0 ? C.accent : C.paper, color: i === 0 ? "#fff" : C.ink }}>
-                  <span className="text-[13px] font-bold">{test.getMonth() + 1}월</span>
-                  <span className="text-[24px] font-bold leading-none tabular-nums">
-                    {test.getDate()}
+    <div>
+      <div className="overflow-x-auto rounded-[8px] border" style={{ borderColor: C.line, background: "#fff" }} tabIndex={0} role="region" aria-label="띠별 승급 심사 안내">
+        <table className="w-full min-w-[680px] border-collapse text-[15px]">
+          <thead>
+            <tr style={{ background: C.paper }}>
+              {["지금 띠", "다음 띠", "심사 품새", "심사 항목", "수련 기간"].map((h) => (
+                <th key={h} scope="col" className="whitespace-nowrap px-4 py-3 text-left font-bold">
+                  {h}
+                </th>
+              ))}
+            </tr>
+          </thead>
+          <tbody>
+            {BELT_STEPS.map((b) => (
+              <tr key={b.name} className="border-t" style={{ borderColor: C.line }}>
+                <th scope="row" className="whitespace-nowrap px-4 py-3 text-left font-bold">
+                  <span className="inline-flex items-center gap-2">
+                    <BeltSwatch color={b.color} edge={b.edge} split={b.name === "품띠"} />
+                    {b.name}
                   </span>
-                </div>
-                <div className="min-w-0">
-                  <p className="text-[17px] font-bold">{fmtKo(test)} 승급 심사</p>
-                  <p className="text-[15px]" style={{ color: C.muted }}>
-                    신청 마감 {fmtKo(deadline)}
-                    {i === 0 && (left === 0 ? ", 오늘까지" : `, ${left}일 남음`)}
-                  </p>
-                </div>
-              </li>
-            );
-          })}
-        </ol>
-        <p className="mt-4 text-[15px] leading-[1.6]" style={{ color: C.muted }}>
-          품띠부터는 국기원 품 심사예요. 날짜가 잡히면 공지사항에 올려요.
-        </p>
+                </th>
+                <td className="whitespace-nowrap px-4 py-3">{b.next}</td>
+                <td className="px-4 py-3">{b.poomsae}</td>
+                <td className="px-4 py-3" style={{ color: C.body }}>
+                  {b.items}
+                </td>
+                <td className="px-4 py-3" style={{ color: C.body }}>
+                  {b.period}
+                </td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
       </div>
+      <dl className="mt-5 grid grid-cols-[100px_minmax(0,1fr)] gap-y-2.5 text-[16px] leading-[1.55]">
+        <dt className="font-bold">심사 일정</dt>
+        <dd style={{ color: C.body }}>매달 마지막 토요일 오전 10시, 신청은 일주일 전까지</dd>
+        <dt className="font-bold">심사비</dt>
+        <dd style={{ color: C.body }}>{won(TEST_FEE)}(새 띠, 수료증 포함)</dd>
+        <dt className="font-bold">품 심사</dt>
+        <dd style={{ color: C.body }}>품띠부터는 국기원 품 심사예요. 날짜가 잡히면 공지사항에 올려요.</dd>
+      </dl>
     </div>
   );
 }
+
 
 function BeltSwatch({ color, edge, split = false }: { color: string; edge: string; split?: boolean }) {
   return (

@@ -17,24 +17,22 @@ import { DemoMakerInfo } from "@/components/demos/DemoMakerInfo";
    관용 문구: 입원상담, 면회 예약, 공동간병, 상급병실료 차액, 비급여 진료비 안내, 주간 식단표, 주차 가능.
 
    상호작용(모두 브라우저 안에서만 돈다. 실제로 보내지 않는다)
-   1. 병실 안내: 6인실, 4인실, 2인실, 1인실을 고르면 병실 배치도와 월 예상 비용(입원비 본인부담, 식대, 병실 차액, 간병비)이 바뀐다.
+   1. 병실 안내: 6인실, 4인실, 2인실, 1인실 설명 카드와 병실별 1일 비용표(상급병실료 차액, 간병 형태, 간병비), 비급여 진료비 표.
    2. 면회 예약: 오늘부터 7일 중 날짜, 오후 30분 단위 시간 칸(남은 자리), 환자와 보호자 정보. 완료하면 예약 번호와 확인 문자 날짜.
-   3. 이번 주 식단표: 요일을 고르면 아침, 점심, 저녁, 간식. 일반식과 죽식을 바꿔 볼 수 있다.
+   3. 이번 주 식단표: 요일을 고르면 아침, 점심, 저녁, 간식.
    4. 입원 상담 신청: 환자 나이, 현재 상태, 희망 시기, 병실, 보호자 연락처. 완료하면 접수 번호, 담당 창구, 회신 예정일.
 
    사진 출처: AI 생성(Z-Image-Turbo, Apache 2.0), 직원 사진은 AI 생성(Z-Image-Turbo)
 
    첫 화면(nh-poster): 맨 위 초록 정보 줄(주소, 입원상담 시간, 입원상담 전화, 휴대폰은 전화만), 그 아래 메뉴(병실안내, 면회예약,
-   주간 식단표, 입원상담, 오시는길). 왼쪽은 큰 문장과 "어르신은 지금 어떤 상태인가요?" 상태 5개 세로 목록, 오른쪽은 고른 상태에 맞는
-   사진 한 장(담당 의료진 또는 간병 장면)과 맞는 병실, 받는 진료, 담당, 월 예상 비용. "이 상태로 입원 상담"은 아래 상담 신청에
-   그 상태와 병실을 채운 채로, "병실 보기"는 병실 안내를 그 병실로 열고 내려간다. 처음엔 첫 상태가 골라져 있다.
-   휴대폰은 고른 상태 바로 아래에 사진과 설명이 펼쳐진다(한 번에 하나). 사진은 짧게 교차하고 천천히 다가온다. 동작 줄이기면 멈춘다. */
+   주간 식단표, 입원상담, 오시는길). 왼쪽은 큰 문장, 진료 요약 세 줄, 입원상담과 병실 안내 버튼, 오른쪽은 보호자와 어르신 사진 한 장.
+   휴대폰은 사진이 위, 글이 아래. 첫 화면은 고정이다. */
 
 const IMG = "/images/demo-nursing-hospital";
-const BRAND = "곰파트너";
-const ADDRESS = "서울 ㅇㅇ구 ㅇㅇ로 00, 곰파트너 빌딩";
+const BRAND = "요양병원";
+const ADDRESS = "서울 ㅇㅇ구 ㅇㅇ로 00, ㅇㅇ빌딩";
 const TEL = "02-000-0000";
-const KAKAO = "카카오톡 채널 곰파트너";
+const KAKAO = "카카오톡 채널 요양병원";
 const SLUG = "nursing-hospital";
 
 const C = {
@@ -50,16 +48,12 @@ const C = {
   muted: "#4b4b4b",
   sub: "#767676",
   line: "#e5e5e5",
-  sun: "#fbf6e6",
   error: "#9a3412",
 };
 
-/* 모션 상수. 시간은 초, 이징은 cubic-bezier */
-const EASE = [0.22, 1, 0.36, 1] as const;
-/** 칩, 패널 전환 */
+/* 모션 상수. 시간은 초 */
+/** 접수 화면 전환 */
 const DUR = 0.35;
-/** 첫 화면 사진이 다가오는 시간 */
-const PHOTO_IN = 1.6;
 
 const focusRing = "focus-visible:outline focus-visible:outline-[3px] focus-visible:outline-offset-2";
 const won = (n: number) => `${n.toLocaleString("ko-KR")}원`;
@@ -69,15 +63,13 @@ const DOW = ["일", "월", "화", "수", "목", "금", "토"];
 /* ---------- 데이터 ---------- */
 
 type RoomId = "6" | "4" | "2" | "1";
-type Room = { id: RoomId; label: string; beds: number; diff: number; care: "공동간병" | "개인간병"; careDay: number | null; desc: string };
+type Room = { id: RoomId; label: string; diff: number; care: "공동간병" | "개인간병"; careDay: number | null; desc: string };
 
-/** 하루 기준 본인부담 개략. 실제 금액은 환자 분류 등급과 본인부담률에 따라 다르다 */
-const BASE_DAY = { stay: 13000, meal: 7500 };
 const ROOMS: Room[] = [
-  { id: "6", label: "6인실", beds: 6, diff: 0, care: "공동간병", careDay: 25000, desc: "기준병실, 병상마다 커튼과 개인 사물함" },
-  { id: "4", label: "4인실", beds: 4, diff: 15000, care: "공동간병", careDay: 30000, desc: "창가 병상 2개, 병실 안 화장실" },
-  { id: "2", label: "2인실", beds: 2, diff: 40000, care: "공동간병", careDay: 40000, desc: "보호자 의자, 병실 안 화장실과 샤워실" },
-  { id: "1", label: "1인실", beds: 1, diff: 90000, care: "개인간병", careDay: null, desc: "보호자 소파, 냉장고, 병실 안 화장실과 샤워실" },
+  { id: "6", label: "6인실", diff: 0, care: "공동간병", careDay: 25000, desc: "기준병실, 병상마다 커튼과 개인 사물함" },
+  { id: "4", label: "4인실", diff: 15000, care: "공동간병", careDay: 30000, desc: "창가 병상 2개, 병실 안 화장실" },
+  { id: "2", label: "2인실", diff: 40000, care: "공동간병", careDay: 40000, desc: "보호자 의자, 병실 안 화장실과 샤워실" },
+  { id: "1", label: "1인실", diff: 90000, care: "개인간병", careDay: null, desc: "보호자 소파, 냉장고, 병실 안 화장실과 샤워실" },
 ];
 
 const NONPAY = [
@@ -113,19 +105,6 @@ const MEALS: Meal[] = [
   { breakfast: ["쌀밥", "황태국", "계란말이", "감자채볶음", "백김치"], lunch: ["쌀밥", "소고기미역국", "불고기", "시금치나물", "배추김치"], dinner: ["쌀밥", "버섯국", "가자미조림", "무나물", "열무김치"], snack: "사과, 요구르트" },
   { breakfast: ["쌀밥", "북엇국", "연두부", "콩자반", "백김치"], lunch: ["잡곡밥", "닭곰탕", "동그랑땡", "오이무침", "배추김치"], dinner: ["쌀밥", "아욱국", "동태조림", "애호박나물", "깍두기"], snack: "카스텔라, 두유" },
 ];
-const PORRIDGE = ["흰죽", "야채죽", "소고기죽", "호박죽", "계란죽", "흰죽", "야채죽"];
-type Diet = "일반식" | "죽식";
-
-/** 죽식은 밥을 죽으로, 김치와 깍두기를 물김치로 바꾼다 */
-function forDiet(items: string[], diet: Diet, dayIdx: number, meal: number) {
-  if (diet === "일반식") return items;
-  return items.map((it, i) => {
-    if (i === 0) return PORRIDGE[(dayIdx + meal) % PORRIDGE.length];
-    if (it.includes("김치") || it === "깍두기") return "물김치";
-    return it;
-  });
-}
-
 const AGES = ["60대", "70대", "80대", "90대 이상"];
 const CONDITIONS = ["거동이 불편해요", "치매 증상", "뇌졸중 후 재활", "수술 후 회복", "암 요양", "욕창 관리"];
 const WHEN = ["이번 주", "2주 안", "한 달 안", "정하지 않음"];
@@ -142,9 +121,6 @@ function nextWeekday(d: Date) {
 export function NursingHospitalDemo() {
   const today = useDemoToday();
   const reduce = useReducedMotionSafe();
-  const [room, setRoom] = useState<RoomId>("6");
-  const [conds, setConds] = useState<string[]>([]);
-  const [consultKey, setConsultKey] = useState(0);
 
   useEffect(() => {
     const f = () => window.scrollTo({ top: 0 });
@@ -156,20 +132,7 @@ export function NursingHospitalDemo() {
 
   return (
     <div className="min-h-screen overflow-x-clip" style={{ background: C.paper, color: C.ink }}>
-      <Poster
-        reduce={reduce}
-        go={go}
-        onRoom={(r) => {
-          setRoom(r);
-          go("nh-room");
-        }}
-        onConsult={(cond, r) => {
-          setRoom(r);
-          setConds([cond]);
-          setConsultKey((k) => k + 1);
-          go("nh-consult");
-        }}
-      />
+      <Poster go={go} />
 
       {/* 병원 첫 소개: 진료과목, 면회 시간, 상담 시간 */}
       <section aria-labelledby="nh-intro-title" className="mx-auto max-w-[1200px] px-4 pt-10 md:px-6 md:pt-14">
@@ -216,11 +179,11 @@ export function NursingHospitalDemo() {
         </div>
       </section>
 
-      <RoomSection room={room} setRoom={setRoom} reduce={reduce} />
+      <RoomSection />
       <VisitSection today={today} reduce={reduce} />
       <MealSection today={today} />
       <Doctors />
-      <ConsultSection key={consultKey} today={today} room={room} reduce={reduce} initConds={conds} />
+      <ConsultSection today={today} room="6" reduce={reduce} initConds={[]} />
       <MapSection />
 
       <footer className="mt-20 border-t" style={{ borderColor: C.line, background: C.beige }}>
@@ -248,81 +211,7 @@ const NAV: [string, string][] = [
   ["nh-map", "오시는길"],
 ];
 
-/** 첫 화면 상태 목록. 고르면 맞는 병실, 진료, 간병 방식과 월 예상 비용이 바뀐다 */
-const STATES: { cond: (typeof CONDITIONS)[number]; room: RoomId; care: string; who: string; photo: string; alt: string }[] = [
-  { cond: "뇌졸중 후 재활", room: "4", care: "재활의학과 진료, 하루 두 번 재활치료", who: "박ㅅ영 진료과장, 재활의학과 전문의", photo: "staff-2.jpg", alt: "재활의학과 박ㅅ영 진료과장" },
-  { cond: "치매 증상", room: "6", care: "내과 진료, 낙상 예방과 투약 관리", who: "김ㅎ늘 병원장, 내과 전문의", photo: "staff-1.jpg", alt: "내과 김ㅎ늘 병원장" },
-  { cond: "수술 후 회복", room: "4", care: "재활의학과 진료, 통증 조절과 보행 연습", who: "박ㅅ영 진료과장, 재활의학과 전문의", photo: "staff-2.jpg", alt: "재활의학과 박ㅅ영 진료과장" },
-  { cond: "욕창 관리", room: "2", care: "가정의학과 진료, 두 시간마다 자세 바꾸기", who: "이ㅅ연 진료과장, 가정의학과 전문의", photo: "staff-3.jpg", alt: "가정의학과 이ㅅ연 진료과장" },
-  { cond: "거동이 불편해요", room: "6", care: "내과 진료, 식사와 이동 도움", who: "병동 간호사, 요양보호사", photo: "hero.jpg", alt: "병상 위 어르신 손을 보호사가 두 손으로 감싸 쥔 모습" },
-];
-const monthOf = (r: Room) => 30 * (BASE_DAY.stay + BASE_DAY.meal + r.diff + (r.careDay ?? 0));
-
-function StatePanel({ s, reduce, onRoom, onConsult, compact }: { s: (typeof STATES)[number]; reduce: boolean; onRoom: () => void; onConsult: () => void; compact?: boolean }) {
-  const r = ROOMS.find((x) => x.id === s.room) ?? ROOMS[0];
-  return (
-    <div className={compact ? "pb-4 pt-1" : "flex h-full flex-col"}>
-      <div className={`relative overflow-hidden rounded-[8px] ${compact ? "h-[180px]" : "min-h-[260px] flex-1"}`} style={{ background: C.line }}>
-        <AnimatePresence initial={false}>
-          <motion.div key={s.photo} className="absolute inset-0" initial={reduce ? false : { opacity: 0 }} animate={{ opacity: 1 }} exit={reduce ? undefined : { opacity: 0 }} transition={{ duration: reduce ? 0 : DUR, ease: EASE }}>
-            <motion.div className="h-full w-full" initial={reduce ? false : { scale: 1.05 }} animate={{ scale: 1 }} transition={{ duration: reduce ? 0 : PHOTO_IN, ease: EASE }}>
-              {/* eslint-disable-next-line @next/next/no-img-element -- 정적 export 라 next/image 최적화를 쓰지 않는다 */}
-              <img
-                src={`${IMG}/${s.photo}`}
-                srcSet={s.photo === "hero.jpg" ? `${IMG}/hero-sm.jpg 960w, ${IMG}/hero.jpg 1920w` : undefined}
-                sizes="(min-width: 768px) 45vw, 100vw"
-                alt={s.alt}
-                className="absolute inset-0 h-full w-full object-cover"
-                style={{ objectPosition: s.photo === "hero.jpg" ? "57% 50%" : "50% 22%" }}
-              />
-            </motion.div>
-          </motion.div>
-        </AnimatePresence>
-      </div>
-      <dl className="mt-4 grid grid-cols-[5.5em_minmax(0,1fr)] gap-x-3 gap-y-2 text-[16px]">
-        <dt className="font-semibold" style={{ color: C.sub }}>
-          맞는 병실
-        </dt>
-        <dd className="font-bold">
-          {r.label}, {r.care}
-        </dd>
-        <dt className="font-semibold" style={{ color: C.sub }}>
-          받는 진료
-        </dt>
-        <dd>{s.care}</dd>
-        <dt className="font-semibold" style={{ color: C.sub }}>
-          담당
-        </dt>
-        <dd>{s.who}</dd>
-        <dt className="font-semibold" style={{ color: C.sub }}>
-          월 예상
-        </dt>
-        <dd>
-          <b className="tabular-nums" style={{ color: C.green }}>
-            약 {won(monthOf(r))}
-          </b>{" "}
-          <span className="text-[14px]" style={{ color: C.sub }}>
-            {r.careDay ? "간병비 포함" : "개인간병 별도"}
-          </span>
-        </dd>
-      </dl>
-      <div className="mt-4 flex flex-wrap gap-2">
-        <button type="button" onClick={onConsult} data-gtm-cta={`${SLUG}_poster_cta`} className={`min-h-11 rounded-[6px] px-4 text-[16px] font-semibold text-white ${focusRing}`} style={{ background: C.green, outlineColor: C.green }}>
-          이 상태로 입원 상담
-        </button>
-        <button type="button" onClick={onRoom} className={`min-h-11 rounded-[6px] border px-4 text-[16px] font-semibold ${focusRing}`} style={{ borderColor: C.green, color: C.green, background: C.card, outlineColor: C.green }}>
-          {r.label} 보기
-        </button>
-      </div>
-    </div>
-  );
-}
-
-function Poster({ reduce, go, onRoom, onConsult }: { reduce: boolean; go: (id: string) => void; onRoom: (r: RoomId) => void; onConsult: (cond: string, r: RoomId) => void }) {
-  const [pick, setPick] = useState(0);
-  const s = STATES[pick];
-  const panel = (compact?: boolean) => <StatePanel s={s} reduce={reduce} compact={compact} onRoom={() => onRoom(s.room)} onConsult={() => onConsult(s.cond, s.room)} />;
-
+function Poster({ go }: { go: (id: string) => void }) {
   return (
     <section id="nh-poster" aria-labelledby="nh-poster-title" style={{ background: C.paper, color: C.ink }}>
       {/* 맨 위 정보 줄 */}
@@ -351,39 +240,52 @@ function Poster({ reduce, go, onRoom, onConsult }: { reduce: boolean; go: (id: s
         </div>
       </header>
 
-      <div className="mx-auto grid max-w-[1200px] gap-8 px-4 pb-10 pt-6 md:grid-cols-[minmax(0,1fr)_minmax(0,1fr)] md:gap-10 md:px-6 md:pt-10">
-        <div className="min-w-0">
+      <div className="mx-auto grid max-w-[1200px] gap-8 px-4 pb-10 pt-6 md:grid-cols-[minmax(0,1fr)_minmax(0,1fr)] md:items-center md:gap-10 md:px-6 md:pt-10">
+        <div className="order-2 min-w-0 md:order-1">
           <h1 id="nh-poster-title" className="text-[28px] font-bold md:text-[clamp(30px,3vw,42px)]" style={{ letterSpacing: "-0.03em", lineHeight: 1.22, wordBreak: "keep-all" }}>
-            병실별 월 비용을
+            병실별 비용을
             <br />
             간병비까지 공개합니다
           </h1>
-          <h2 className="mt-7 text-[19px] font-bold md:mt-9 md:text-[21px]">어르신은 지금 어떤 상태인가요?</h2>
-          <ul className="mt-3 border-t" style={{ borderColor: C.line }}>
-            {STATES.map((x, i) => {
-              const on = i === pick;
+          <p className="mt-4 text-[17px] leading-[1.6]" style={{ color: C.muted, wordBreak: "keep-all" }}>
+            입원상담은 평일 09:00~18:00, 토요일 09:00~13:00 전화로 받습니다.
+          </p>
+          <ul className="mt-6 grid gap-2 text-[16px]">
+            {[
+              [Stethoscope, "치매, 뇌졸중 후 재활, 수술 후 회복, 암 요양"],
+              [Users, "6인실부터 1인실까지 공동간병, 1인실 개인간병"],
+              [Clock, "면회 매일 14:00~18:00, 예약제"],
+            ].map(([Icon, t]) => {
+              const I = Icon as typeof Clock;
               return (
-                <li key={x.cond} className="border-b" style={{ borderColor: C.line }}>
-                  <button
-                    type="button"
-                    onClick={() => setPick(i)}
-                    aria-expanded={on}
-                    className={`flex min-h-14 w-full items-center gap-3 px-3 text-left text-[17px] md:text-[18px] ${focusRing}`}
-                    style={{ background: on ? C.green : "transparent", color: on ? "#ffffff" : C.ink, fontWeight: on ? 700 : 500, outlineColor: C.green, outlineOffset: -3 }}
-                  >
-                    <span aria-hidden className="inline-flex h-5 w-5 flex-none items-center justify-center rounded-full border-2" style={{ borderColor: on ? "#ffffff" : C.sub }}>
-                      {on && <span className="h-2 w-2 rounded-full" style={{ background: "#ffffff" }} />}
-                    </span>
-                    {x.cond}
-                  </button>
-                  {/* 휴대폰: 고른 상태 바로 아래 펼침 */}
-                  {on && <div className="md:hidden">{panel(true)}</div>}
+                <li key={t as string} className="flex items-start gap-2">
+                  <I size={18} aria-hidden className="mt-[3px] flex-none" style={{ color: C.green }} />
+                  {t as string}
                 </li>
               );
             })}
           </ul>
+          <div className="mt-6 flex flex-wrap gap-2">
+            <button type="button" onClick={() => go("nh-consult")} data-gtm-cta={`${SLUG}_poster_cta`} className={`min-h-11 rounded-[6px] px-5 text-[16px] font-semibold text-white ${focusRing}`} style={{ background: C.green, outlineColor: C.green }}>
+              입원상담 신청
+            </button>
+            <button type="button" onClick={() => go("nh-room")} className={`min-h-11 rounded-[6px] border px-5 text-[16px] font-semibold ${focusRing}`} style={{ borderColor: C.green, color: C.green, background: C.card, outlineColor: C.green }}>
+              병실 안내
+            </button>
+          </div>
         </div>
-        <div className="hidden min-w-0 md:block">{panel()}</div>
+        <div className="relative order-1 aspect-[4/3] min-w-0 overflow-hidden rounded-[8px] md:order-2" style={{ background: C.line }}>
+          {/* eslint-disable-next-line @next/next/no-img-element -- 정적 export 라 next/image 최적화를 쓰지 않는다 */}
+          <img
+            src={`${IMG}/hero.jpg`}
+            srcSet={`${IMG}/hero-sm.jpg 960w, ${IMG}/hero.jpg 1920w`}
+            sizes="(min-width: 768px) 50vw, 100vw"
+            alt="병상 위 어르신 손을 보호사가 두 손으로 감싸 쥔 모습"
+            fetchPriority="high"
+            className="absolute inset-0 h-full w-full object-cover"
+            style={{ objectPosition: "57% 50%" }}
+          />
+        </div>
       </div>
     </section>
   );
@@ -393,13 +295,10 @@ function Poster({ reduce, go, onRoom, onConsult }: { reduce: boolean; go: (id: s
 function SampleLogo({ light, size = 20 }: { light?: boolean; size?: number }) {
   return (
     <span className="inline-flex items-center gap-2" style={{ color: light ? "#fff" : "#111" }}>
-      {/* eslint-disable-next-line @next/next/no-img-element -- 메인 사이트와 같은 곰 로고 */}
-      <img src="/images/logo-bear.png" alt="" aria-hidden width={28} height={28} className="h-7 w-7 shrink-0" />
       <span className="flex items-baseline gap-1 whitespace-nowrap">
         <span className="font-bold tracking-[-0.03em]" style={{ fontSize: size }}>
-          곰파트너
+          요양병원
         </span>
-        <span className="text-[12px] font-semibold opacity-75">카탈로그</span>
       </span>
     </span>
   );
@@ -472,79 +371,62 @@ function Receipt({ title, rows, reply, onReset }: { title: string; rows: [string
 
 /* ---------- 1. 병실 안내 ---------- */
 
-function RoomSection({ room, setRoom, reduce }: { room: RoomId; setRoom: (r: RoomId) => void; reduce: boolean }) {
-  const r = ROOMS.find((x) => x.id === room) ?? ROOMS[0];
-  const [care, setCare] = useState(true);
-  const days = 30;
-  const stay = BASE_DAY.stay * days;
-  const meal = BASE_DAY.meal * days;
-  const diff = r.diff * days;
-  const careFee = care && r.careDay ? r.careDay * days : 0;
-  const total = stay + meal + diff + careFee;
-
+function RoomSection() {
   return (
     <section id="nh-room" aria-labelledby="nh-room-title" className="mx-auto mt-16 max-w-[1200px] scroll-mt-4 px-4 md:mt-24 md:px-6">
       <SectionHead id="nh-room-title" title="병실 안내" />
-      <div role="tablist" aria-label="병실 종류" className="flex flex-wrap gap-2">
-        {ROOMS.map((x) => {
-          const on = x.id === room;
-          return (
-            <button
-              key={x.id}
-              type="button"
-              role="tab"
-              aria-selected={on}
-              onClick={() => setRoom(x.id)}
-              className={`inline-flex items-center gap-1.5 rounded-[6px] border px-4 py-2 text-[16px] font-semibold transition-colors ${focusRing}`}
-              style={{ borderColor: C.green, background: on ? C.green : "transparent", color: on ? C.paper : C.green, outlineColor: C.green }}
-            >
-              <BedDouble size={17} aria-hidden />
-              {x.label}
-            </button>
-          );
-        })}
-      </div>
+      <ul className="grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
+        {ROOMS.map((r) => (
+          <li key={r.id} className="rounded-[8px] border p-5" style={{ borderColor: C.line, background: C.card }}>
+            <p className="inline-flex items-center gap-1.5 text-[19px] font-bold" style={{ color: C.green }}>
+              <BedDouble size={19} aria-hidden />
+              {r.label}
+            </p>
+            <p className="mt-2 text-[15px] leading-[1.6]" style={{ color: C.muted }}>
+              {r.desc}
+            </p>
+            <p className="mt-3 text-[15px] font-semibold">{r.care}</p>
+          </li>
+        ))}
+      </ul>
 
-      <div className="mt-6 grid grid-cols-1 gap-6 lg:grid-cols-[minmax(0,1fr)_minmax(0,1fr)]">
-        <div className="rounded-[8px] border p-4 md:p-6" style={{ borderColor: C.line, background: C.card }}>
-          <RoomPlan room={r} reduce={reduce} />
-          <p className="mt-3 text-[15px]" style={{ color: C.muted }}>
-            {r.desc}
-          </p>
-        </div>
-
-        <div className="rounded-[8px] p-5 md:p-6" style={{ background: C.beige }}>
-          <p className="text-[15px] font-semibold" style={{ color: C.muted }}>
-            {r.label} 월 예상 비용(30일, 개략)
-          </p>
-          <p className="mt-1 text-[38px] font-bold tabular-nums md:text-[46px]" style={{ color: C.ink }} aria-live="polite">
-            약 {Math.round(total / 10000).toLocaleString("ko-KR")}만원
-          </p>
-          <dl className="mt-4 divide-y text-[15px]" style={{ borderColor: C.line }}>
-            {(
-              [
-                ["입원비 본인부담", stay],
-                ["식대 본인부담", meal],
-                ["상급병실료 차액", diff],
-                [r.careDay ? `간병비(${r.care})` : "간병비", careFee],
-              ] as [string, number][]
-            ).map(([k, v]) => (
-              <div key={k} className="flex justify-between gap-3 py-2" style={{ borderColor: C.line }}>
-                <dt>{k}</dt>
-                <dd className="font-bold tabular-nums">{k === "간병비" ? "개인간병 별도" : v === 0 && k.startsWith("상급") ? "없음" : won(v)}</dd>
-              </div>
+      <div className="mt-8 overflow-x-auto">
+        <table className="w-full min-w-[520px] border-collapse text-[15px]">
+          <caption className="mb-2 text-left text-[18px] font-bold" style={{ color: C.ink }}>
+            병실별 1일 비용
+          </caption>
+          <thead>
+            <tr style={{ background: C.beige }}>
+              <th scope="col" className="px-3 py-2 text-left font-semibold">
+                병실
+              </th>
+              <th scope="col" className="px-3 py-2 text-right font-semibold">
+                상급병실료 차액
+              </th>
+              <th scope="col" className="px-3 py-2 text-left font-semibold">
+                간병 형태
+              </th>
+              <th scope="col" className="px-3 py-2 text-right font-semibold">
+                간병비
+              </th>
+            </tr>
+          </thead>
+          <tbody>
+            {ROOMS.map((r) => (
+              <tr key={r.id} className="border-b" style={{ borderColor: C.line }}>
+                <th scope="row" className="px-3 py-2 text-left font-semibold">
+                  {r.label}
+                </th>
+                <td className="px-3 py-2 text-right tabular-nums">{r.diff ? won(r.diff) : "기준병실"}</td>
+                <td className="px-3 py-2">{r.care}</td>
+                <td className="px-3 py-2 text-right tabular-nums">{r.careDay ? won(r.careDay) : "보호자와 협의"}</td>
+              </tr>
             ))}
-          </dl>
-          {r.careDay && (
-            <label className="mt-4 flex cursor-pointer items-center gap-2 text-[15px] font-semibold">
-              <input type="checkbox" checked={care} onChange={(e) => setCare(e.target.checked)} className={`h-5 w-5 accent-[#2c4632] ${focusRing}`} />
-              공동간병 포함해서 보기
-            </label>
-          )}
-          <p className="mt-3 text-[14px]" style={{ color: C.muted }}>
-            환자 분류 등급과 본인부담률에 따라 달라집니다.
-          </p>
-        </div>
+          </tbody>
+        </table>
+        <p className="mt-2 text-[14px]" style={{ color: C.muted }}>
+          입원비와 식대 본인부담은 환자 분류 등급과 본인부담률에 따라 정해지며 입원 상담 때 안내합니다.
+        </p>
       </div>
 
       <div className="mt-8 overflow-x-auto">
@@ -577,63 +459,6 @@ function RoomSection({ room, setRoom, reduce }: { room: RoomId; setRoom: (r: Roo
         </table>
       </div>
     </section>
-  );
-}
-
-/** 위에서 내려다본 병실 배치도. 위쪽 벽이 창이고 창으로 든 빛이 바닥에 깔린다 */
-function RoomPlan({ room, reduce }: { room: Room; reduce: boolean }) {
-  const beds = useMemo(() => {
-    const W = 64;
-    const H = 104;
-    const top = 40;
-    const bottom = 300 - 40 - H;
-    const rows = room.beds === 1 ? [[180]] : room.beds === 2 ? [[110], [250]] : room.beds === 4 ? [[90, 250], [90, 250]] : [[56, 180, 304], [56, 180, 304]];
-    const out: { x: number; y: number; flip: boolean }[] = [];
-    rows.forEach((xs, ri) => xs.forEach((cx) => out.push({ x: cx - W / 2, y: room.beds === 2 ? top + 40 : ri === 0 ? top : bottom, flip: room.beds !== 2 && ri === 1 })));
-    return { list: out, W, H };
-  }, [room]);
-
-  return (
-    <svg viewBox="0 0 360 300" className="h-auto w-full" role="img" aria-label={`${room.label} 배치도, 병상 ${room.beds}개`}>
-      <defs>
-        <linearGradient id="nh-plan-light" x1="0" y1="0" x2="0" y2="1">
-          <stop offset="0" stopColor={C.sun} stopOpacity="0.95" />
-          <stop offset="1" stopColor={C.sun} stopOpacity="0" />
-        </linearGradient>
-        <linearGradient id="nh-plan-blanket" x1="0" y1="0" x2="1" y2="1">
-          <stop offset="0" stopColor="#dfe5dc" />
-          <stop offset="1" stopColor="#c4cfc0" />
-        </linearGradient>
-      </defs>
-      <rect x="8" y="12" width="344" height="280" rx="4" fill="#f7f7f5" stroke={C.green} strokeWidth="4" />
-      {/* 창 */}
-      <rect x="70" y="8" width="220" height="8" fill="#d4e3ea" stroke={C.green} strokeWidth="2" />
-      <polygon points="70,16 290,16 320,150 40,150" fill="url(#nh-plan-light)" opacity="0.8" />
-      {/* 문 */}
-      <path d="M352 236 A44 44 0 0 1 308 280" fill="none" stroke={C.green} strokeWidth="1.5" strokeDasharray="4 4" />
-      <rect x="346" y="236" width="10" height="48" fill="#f7f7f5" />
-      {room.beds >= 4 || room.beds === 1 ? <rect x="12" y="236" width="56" height="52" fill="#ececea" stroke="#c8c8c4" /> : null}
-      <AnimatePresence initial={false} mode="popLayout">
-        {beds.list.map((b, i) => (
-          <motion.g
-            key={`${room.id}-${i}`}
-            initial={reduce ? false : { opacity: 0, y: -10 }}
-            animate={{ opacity: 1, y: 0 }}
-            exit={{ opacity: 0 }}
-            transition={{ duration: reduce ? 0 : DUR, delay: reduce ? 0 : i * 0.05, ease: EASE }}
-          >
-            {/* 병상 커튼 */}
-            <rect x={b.x - 10} y={b.y - 6} width={beds.W + 20} height={beds.H + 12} rx="3" fill="none" stroke="#b5b5b0" strokeDasharray="3 4" />
-            <rect x={b.x} y={b.y} width={beds.W} height={beds.H} rx="6" fill="#fff" stroke="#8f8f8a" strokeWidth="1.5" />
-            <rect x={b.x + 10} y={b.flip ? b.y + beds.H - 22 : b.y + 8} width={beds.W - 20} height="14" rx="5" fill="#f2f2f0" stroke="#c8c8c4" />
-            <rect x={b.x + 4} y={b.flip ? b.y + 6 : b.y + 30} width={beds.W - 8} height={beds.H - 38} rx="4" fill="url(#nh-plan-blanket)" />
-            <rect x={beds.W + b.x + 4} y={b.flip ? b.y + beds.H - 26 : b.y} width="18" height="26" rx="2" fill="#ececea" stroke="#c8c8c4" />
-          </motion.g>
-        ))}
-      </AnimatePresence>
-      {room.beds === 1 && <rect x="240" y="160" width="90" height="34" rx="8" fill="#dcdcd8" stroke="#b5b5b0" />}
-      {room.beds === 2 && <rect x="160" y="236" width="40" height="40" rx="6" fill="#dcdcd8" stroke="#b5b5b0" />}
-    </svg>
   );
 }
 
@@ -806,7 +631,6 @@ function MealSection({ today }: { today: Date }) {
   const week = Array.from({ length: 7 }, (_, i) => daysAgo(monday, -i));
   const todayIdx = (today.getDay() + 6) % 7;
   const [pick, setPick] = useState<number | null>(null);
-  const [diet, setDiet] = useState<Diet>("일반식");
   const idx = pick ?? todayIdx;
   const m = MEALS[idx];
 
@@ -838,20 +662,6 @@ function MealSection({ today }: { today: Date }) {
             );
           })}
         </div>
-        <div className="inline-flex rounded-[6px] border p-0.5" style={{ borderColor: C.green }} role="group" aria-label="식사 종류">
-          {(["일반식", "죽식"] as Diet[]).map((x) => (
-            <button
-              key={x}
-              type="button"
-              aria-pressed={diet === x}
-              onClick={() => setDiet(x)}
-              className={`rounded-[6px] px-4 py-1.5 text-[15px] font-semibold ${focusRing}`}
-              style={{ background: diet === x ? C.green : "transparent", color: diet === x ? C.paper : C.green, outlineColor: C.green }}
-            >
-              {x}
-            </button>
-          ))}
-        </div>
       </div>
 
       <div className="mt-5 grid gap-3 md:grid-cols-3">
@@ -861,7 +671,7 @@ function MealSection({ today }: { today: Date }) {
             ["점심", "11:30", m.lunch],
             ["저녁", "17:30", m.dinner],
           ] as [string, string, string[]][]
-        ).map(([label, time, items], mi) => (
+        ).map(([label, time, items]) => (
           <div key={label} className="rounded-[8px] border p-5" style={{ borderColor: C.line, background: C.card }}>
             <p className="flex items-baseline justify-between">
               <span className="inline-flex items-center gap-1.5 text-[18px] font-bold" style={{ color: C.ink }}>
@@ -873,7 +683,7 @@ function MealSection({ today }: { today: Date }) {
               </span>
             </p>
             <ul className="mt-3 space-y-1.5 text-[16px]">
-              {forDiet(items, diet, idx, mi).map((it, i) => (
+              {items.map((it, i) => (
                 <li key={i} className={i === 0 ? "font-bold" : ""}>
                   {it}
                 </li>
@@ -1092,7 +902,7 @@ function MapSection() {
           </text>
           <rect x="250" y="56" width="110" height="64" rx="6" fill={C.green} />
           <text x="305" y="94" fontSize="15" fontWeight="700" fill={C.paper} textAnchor="middle">
-            곰파트너
+            요양병원
           </text>
         </svg>
         <dl className="space-y-4 text-[16px]">

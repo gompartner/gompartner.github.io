@@ -36,7 +36,7 @@ import { DemoMakerInfo } from "@/components/demos/DemoMakerInfo";
    메뉴: 펜션소개 / 객실안내(객실 6개) / 예약안내(입실·퇴실, 유의사항, 환불규정, 입금 안내, 실시간예약) / 주변관광지 / 오시는 길.
    하위 페이지는 주소를 바꾸지 않고 컴포넌트 상태로 화면을 바꾼다.
 
-   메인 화면: 사진 슬라이드 > 객실안내(위에서 본 객실 배치도 + 객실 카드) > 실시간 예약(객실 x 날짜 예약현황표)
+   메인 화면: 사진 슬라이드 > 객실안내(객실 사진 카드 6개) > 실시간 예약(객실 x 날짜 예약현황표)
    > 예약안내 바로가기 > 주변관광지.
    예약현황표는 행이 객실, 열이 14일이다. 칸에는 1박 요금(만 원)이나 "완료"가 나온다.
    칸을 누르면 그 객실의 입실일이 되고, 같은 줄의 뒤 칸을 누르면 그날 밤까지 박수가 늘어난다. 박수는 목록으로도 고른다.
@@ -47,7 +47,7 @@ import { DemoMakerInfo } from "@/components/demos/DemoMakerInfo";
    AI 생성(Z-Image-Turbo, Apache 2.0) hero, room */
 
 const IMG = "/images/demo-pension";
-const PENSION = "곰파트너";
+const PENSION = "바다 펜션";
 const TEL = "033-000-0000";
 const ADDRESS = "강원특별자치도 ㅁㄹ군 ㄷㅅ면 해안길 00";
 const BANK = "ㅎㄴ은행 000-000000-00-000";
@@ -74,7 +74,6 @@ const C = {
   sat: "#1f5fa8",
 };
 
-const EASE = [0.22, 1, 0.36, 1] as const;
 
 /* ---------- 시간 ---------- */
 
@@ -216,7 +215,6 @@ function isBooked(dn: number, roomIdx: number) {
   return hash(dn * 8 + roomIdx) < BOOK_RATE[type];
 }
 
-const remainingOn = (dn: number) => ROOMS.reduce((n, _, i) => n + (isBooked(dn, i) ? 0 : 1), 0);
 
 function roomFree(roomIdx: number, from: number, to: number) {
   for (let dn = from; dn < to; dn++) if (isBooked(dn, roomIdx)) return false;
@@ -360,10 +358,10 @@ export function PensionDemo() {
         {page === "home" && (
           <div key="home" className="soft-in">
             <HeroSlider go={go} />
-            <RoomsSection roomId={roomId} onRoom={setRoomId} sel={sel} go={go} />
+            <RoomsSection go={go} />
             <section aria-labelledby="booking-title" id="booking" className="scroll-mt-20 px-4 py-14 md:px-6 md:py-20" style={{ background: C.sandSoft }}>
               <div className="mx-auto max-w-[1200px]">
-                <SectionTitle id="booking-title" aside={<TodayCount today={today} />}>
+                <SectionTitle id="booking-title">
                   실시간 예약
                 </SectionTitle>
                 <StatusBoard today={today} roomId={roomId} checkIn={checkIn} nights={nights} onPick={pickCell} />
@@ -422,11 +420,8 @@ type Selection = {
 function Logo() {
   return (
     <span className="inline-flex items-center gap-2">
-      {/* eslint-disable-next-line @next/next/no-img-element */}
-      <img src="/images/logo-bear.png" alt="" aria-hidden width={28} height={28} className="h-7 w-7 shrink-0" />
       <span className="inline-flex items-baseline gap-1.5 whitespace-nowrap">
-        <span className="text-[18px] font-bold tracking-[-0.02em] md:text-[19px]">곰파트너</span>
-        <span className="text-[11px] font-semibold opacity-80 md:text-[12px]">카탈로그</span>
+        <span className="text-[18px] font-bold tracking-[-0.02em] md:text-[19px]">바다 펜션</span>
       </span>
     </span>
   );
@@ -652,252 +647,59 @@ function SectionTitle({ id, children, aside }: { id: string; children: React.Rea
   );
 }
 
-function TodayCount({ today }: { today: number }) {
-  if (today < 0) return <span>&nbsp;</span>;
-  const sat = today + ((6 - parts(today).w + 7) % 7);
-  const a = remainingOn(today);
-  const b = remainingOn(sat);
+/* ---------- 메인: 객실안내 ---------- */
+
+function RoomCard({ room, go }: { room: Room; go: Go }) {
   return (
-    <span aria-live="polite">
-      오늘 예약 가능 객실 <b style={{ color: C.coralDeep }}>{a}실</b>
-      {sat !== today && (
-        <>
-          {" "}
-, 이번 주 토요일 <b style={{ color: C.coralDeep }}>{b}실</b>
-        </>
-      )}
-    </span>
-  );
-}
-
-/* ---------- 메인: 객실안내(배치도) ---------- */
-
-const PLAN: Record<string, { x: number; y: number; w: number; h: number }> = {
-  solsup: { x: 230, y: 56, w: 140, h: 100 },
-  deulkkot: { x: 385, y: 56, w: 150, h: 100 },
-  madang: { x: 550, y: 56, w: 150, h: 100 },
-  yunseul: { x: 170, y: 306, w: 160, h: 90 },
-  mulgyeol: { x: 345, y: 306, w: 160, h: 90 },
-  noeul: { x: 520, y: 306, w: 180, h: 90 },
-};
-
-const WAVES = (y: number) => {
-  let d = `M0 ${y}`;
-  for (let x = 0; x < 720; x += 40) d += ` Q${x + 10} ${y - 5} ${x + 20} ${y} T${x + 40} ${y}`;
-  return d;
-};
-
-function SitePlan({ roomId, onRoom, closed }: { roomId: string; onRoom: (id: string) => void; closed: Set<string> | null }) {
-  return (
-    <svg viewBox="0 0 720 500" className="h-auto w-full select-none" role="group" aria-label="펜션을 위에서 본 객실 배치도. 위쪽은 정원 쪽 객실, 아래쪽은 바다 쪽 객실입니다.">
-      <rect width="720" height="500" fill={C.sandSoft} />
-      <rect width="720" height="40" fill="#d8d2c6" />
-      <path d="M0 20 H720" stroke="#fff" strokeWidth="2" strokeDasharray="14 12" />
-      <text x="700" y="26" fontSize="14" fill={C.muted} textAnchor="end">
-        ㅅㄴ 해안길
-      </text>
-      <rect x="20" y="56" width="190" height="100" rx="10" fill="#e8e3d9" stroke={C.line} />
-      {[50, 80, 110, 140, 170].map((x) => (
-        <path key={x} d={`M${x} 56 V96`} stroke="#fff" strokeWidth="2" />
-      ))}
-      <rect x="32" y="112" width="24" height="24" rx="5" fill={C.navy} />
-      <text x="44" y="129" fontSize="15" fill="#fff" textAnchor="middle" fontWeight={700}>
-        P
-      </text>
-      <text x="66" y="130" fontSize="15" fill={C.ink} fontWeight={700}>
-        주차장 6대
-      </text>
-      <rect x="20" y="172" width="680" height="118" rx="14" fill={C.lawn} />
-      {[
-        [250, 196, 16],
-        [292, 268, 12],
-        [470, 194, 14],
-        [640, 200, 18],
-        [600, 266, 12],
-        [380, 270, 10],
-      ].map(([x, y, r]) => (
-        <circle key={`${x}-${y}`} cx={x} cy={y} r={r} fill={C.tree} />
-      ))}
-      {[300, 340, 380, 420, 460, 500, 540].map((x, i) => (
-        <ellipse key={x} cx={x} cy={i % 2 ? 236 : 230} rx="11" ry="7" fill="#f1ece2" />
-      ))}
-      <text x="430" y="262" fontSize="15" fill="#4f6a43" textAnchor="middle" fontWeight={700}>
-        정원
-      </text>
-      <rect x="36" y="186" width="176" height="90" rx="10" fill={C.sand} stroke={C.sandDeep} />
-      {[78, 124, 170].map((x) => (
-        <g key={x}>
-          <circle cx={x} cy="216" r="13" fill={C.navy} />
-          <path d={`M${x - 8} 212 H${x + 8} M${x - 8} 217 H${x + 8} M${x - 8} 222 H${x + 8}`} stroke={C.coral} strokeWidth="1.5" />
-        </g>
-      ))}
-      <text x="124" y="260" fontSize="15" fill={C.ink} textAnchor="middle" fontWeight={700}>
-        공용 바비큐장
-      </text>
-      <rect x="30" y="306" width="120" height="90" rx="10" fill="#e8e3d9" stroke={C.line} />
-      {[316, 328, 340, 352, 364].map((y) => (
-        <path key={y} d={`M56 ${y} H124`} stroke={C.sandDeep} strokeWidth="5" strokeLinecap="round" />
-      ))}
-      <text x="90" y="388" fontSize="14" fill={C.ink} textAnchor="middle" fontWeight={700}>
-        해변 계단
-      </text>
-      <path d="M90 396 V412" stroke={C.sandDeep} strokeWidth="4" strokeDasharray="4 4" />
-      <rect y="412" width="720" height="34" fill={C.sand} />
-      <text x="430" y="434" fontSize="14" fill={C.muted} textAnchor="middle">
-        ㅅㄴ 해수욕장 모래사장
-      </text>
-      <rect y="446" width="720" height="54" fill={C.sea} />
-      <path d={WAVES(462)} fill="none" stroke="#fff" strokeOpacity="0.6" strokeWidth="2" />
-      <path d={WAVES(482)} fill="none" stroke="#fff" strokeOpacity="0.35" strokeWidth="2" />
-      <text x="700" y="476" fontSize="15" fill={C.navy} textAnchor="end" fontWeight={700}>
-        바다
-      </text>
-
-      {ROOMS.map((r) => {
-        const b = PLAN[r.id];
-        const on = roomId === r.id;
-        const shut = closed?.has(r.id) ?? false;
-        const fill = on ? C.coral : shut ? "#e6e1d8" : C.white;
-        return (
-          <g
-            key={r.id}
-            role="button"
-            tabIndex={0}
-            aria-pressed={on}
-            aria-label={`${r.name}, ${r.side === "sea" ? "바다 쪽" : "정원 쪽"}, 기준 ${r.base}명 최대 ${r.max}명${shut ? ", 선택한 날짜 예약 완료" : ""}`}
-            onClick={() => onRoom(r.id)}
-            onKeyDown={(e) => {
-              if (e.key === "Enter" || e.key === " ") {
-                e.preventDefault();
-                onRoom(r.id);
-              }
-            }}
-            className="group cursor-pointer outline-none"
-          >
-            <rect
-              x={b.x}
-              y={b.y}
-              width={b.w}
-              height={b.h}
-              rx="10"
-              fill={fill}
-              stroke={on ? C.coralDeep : C.navy}
-              strokeWidth={on ? 3 : 1.5}
-              className="transition-[fill] duration-200 group-hover:stroke-[#e07a5f] group-focus-visible:stroke-[#e07a5f] group-focus-visible:[stroke-width:5]"
-            />
-            {r.side === "sea" && <rect x={b.x + 14} y={b.y + b.h - 7} width={b.w - 28} height="4" rx="2" fill={on ? C.navy : C.sea} />}
-            <text x={b.x + b.w / 2} y={b.y + b.h / 2 - 1} fontSize="24" fontWeight={700} textAnchor="middle" fill={on ? C.navyDeep : shut ? "#8c8578" : C.navy}>
-              {r.name}
-            </text>
-            <text x={b.x + b.w / 2} y={b.y + b.h / 2 + 22} fontSize="15" textAnchor="middle" fill={on ? C.navyDeep : C.muted}>
-              {shut ? "예약 완료" : `${r.base}~${r.max}명, ${r.size}평`}
-            </text>
-          </g>
-        );
-      })}
-    </svg>
-  );
-}
-
-function RoomCard({ room, closed, go }: { room: Room; closed: boolean; go: Go }) {
-  const reduce = useReducedMotionSafe();
-  return (
-    <AnimatePresence mode="wait" initial={false}>
-      <motion.article
-        key={room.id}
-        initial={reduce ? false : { opacity: 0 }}
-        animate={{ opacity: 1 }}
-        exit={{ opacity: 0 }}
-        transition={{ duration: 0.2, ease: EASE }}
-        className="overflow-hidden rounded-[10px] border bg-white"
-        style={{ borderColor: C.line }}
-        aria-live="polite"
-      >
-        <div className="relative aspect-[16/10]">
-          <Image src={`${IMG}/rooms/${room.id}.jpg`} alt={`${room.name} 객실`} fill sizes="(min-width: 1024px) 420px, 100vw" className="object-cover" />
+    <article className="flex w-full flex-col overflow-hidden rounded-[10px] border bg-white" style={{ borderColor: C.line }}>
+      <div className="relative aspect-[16/10]">
+        <Image src={`${IMG}/rooms/${room.id}.jpg`} alt={`${room.name} 객실`} fill sizes="(min-width: 1024px) 380px, (min-width: 640px) 50vw, 100vw" className="object-cover" />
+      </div>
+      <div className="flex flex-1 flex-col p-5">
+        <div className="flex items-baseline justify-between gap-3">
+          <h3 className="text-[22px] font-bold tracking-[-0.02em]" style={{ color: C.navy }}>
+            {room.name}
+          </h3>
+          <p className="text-[15px]" style={{ color: C.muted }}>
+            주중 <b style={{ color: C.ink }}>{man(room.prices[0])} 원</b>
+          </p>
         </div>
-        <div className="p-5">
-          <div className="flex items-baseline justify-between gap-3">
-            <h3 className="text-[24px] font-bold tracking-[-0.02em]" style={{ color: C.navy }}>
-              {room.name}
-            </h3>
-            <p className="text-[15px]" style={{ color: C.muted }}>
-              주중 <b style={{ color: C.ink }}>{man(room.prices[0])} 원</b>
-            </p>
-          </div>
-          <ul className="mt-2 space-y-0.5 text-[15px]">
-            <li>
-              {room.structure}, {room.size}평({sqm(room.size)}㎡)
-            </li>
-            <li>
-              기준 {room.base}명 ~ 최대 {room.max}명
-            </li>
-            <li style={{ color: C.coralDeep }}>{featureLine(room)}</li>
-          </ul>
-          {closed && (
-            <p className="mt-3 rounded-[6px] px-3 py-2 text-[14px] font-semibold" style={{ background: C.coralSoft, color: C.coralDeep }}>
-              선택한 날짜에 예약 완료된 객실입니다.
-            </p>
-          )}
-          <div className="mt-4 grid grid-cols-2 gap-2">
-            <button type="button" onClick={() => go("room", { room: room.id })} className="h-11 rounded-[6px] border text-[15px] font-semibold" style={{ borderColor: C.navy, color: C.navy }}>
-              자세히 보기
-            </button>
-            <a href="#booking" className="inline-flex h-11 items-center justify-center rounded-[6px] text-[15px] font-bold" style={{ background: C.navy, color: "#fff" }}>
-              예약하기
-            </a>
-          </div>
+        <ul className="mt-2 space-y-0.5 text-[15px]">
+          <li>
+            {room.structure}, {room.size}평({sqm(room.size)}m2)
+          </li>
+          <li>
+            기준 {room.base}명 ~ 최대 {room.max}명
+          </li>
+          <li style={{ color: C.coralDeep }}>{featureLine(room)}</li>
+        </ul>
+        <div className="mt-auto grid grid-cols-2 gap-2 pt-4">
+          <button type="button" onClick={() => go("room", { room: room.id })} className="h-11 rounded-[6px] border text-[15px] font-semibold" style={{ borderColor: C.navy, color: C.navy }}>
+            자세히 보기
+          </button>
+          <a href="#booking" className="inline-flex h-11 items-center justify-center rounded-[6px] text-[15px] font-bold" style={{ background: C.navy, color: "#fff" }}>
+            예약하기
+          </a>
         </div>
-      </motion.article>
-    </AnimatePresence>
+      </div>
+    </article>
   );
 }
 
-function closedSet(sel: Selection) {
-  const { checkIn, nights } = sel;
-  if (checkIn === null) return null;
-  return new Set(ROOMS.filter((_, i) => !roomFree(i, checkIn, checkIn + nights)).map((r) => r.id));
-}
-
-function RoomsSection({ roomId, onRoom, sel, go }: { roomId: string; onRoom: (id: string) => void; sel: Selection; go: Go }) {
-  const room = ROOMS[ROOM_INDEX[roomId]];
-  const closed = closedSet(sel);
-
+function RoomsSection({ go }: { go: Go }) {
   return (
     <section aria-labelledby="rooms-title" id="rooms" className="scroll-mt-20 px-4 py-14 md:px-6 md:py-20">
       <div className="mx-auto max-w-[1200px]">
         <SectionTitle id="rooms-title" aside="바다 전망 3실, 정원 전망 3실">
           객실안내
         </SectionTitle>
-        <div className="mt-8 grid items-start gap-6 lg:grid-cols-[1.5fr_1fr]">
-          <div className="min-w-0">
-            <div className="overflow-hidden rounded-[10px] border bg-white" style={{ borderColor: C.line }}>
-              <SitePlan roomId={roomId} onRoom={onRoom} closed={closed} />
-            </div>
-            <p className="mt-4 text-[15px] font-semibold" id="room-list-label">
-              객실 목록
-            </p>
-            <ul className="mt-2 grid grid-cols-3 gap-2 sm:grid-cols-6" aria-labelledby="room-list-label">
-              {ROOMS.map((r) => {
-                const on = r.id === roomId;
-                return (
-                  <li key={r.id}>
-                    <button
-                      type="button"
-                      aria-pressed={on}
-                      onClick={() => onRoom(r.id)}
-                      className="h-11 w-full rounded-[6px] border text-[15px] font-semibold transition-colors"
-                      style={on ? { background: C.navy, borderColor: C.navy, color: "#fff" } : { background: C.white, borderColor: C.line, color: C.ink }}
-                    >
-                      {r.name}
-                    </button>
-                  </li>
-                );
-              })}
-            </ul>
-          </div>
-          <RoomCard room={room} closed={closed?.has(room.id) ?? false} go={go} />
-        </div>
+        <ul className="mt-8 grid gap-5 sm:grid-cols-2 lg:grid-cols-3">
+          {ROOMS.map((r) => (
+            <li key={r.id} className="flex">
+              <RoomCard room={r} go={go} />
+            </li>
+          ))}
+        </ul>
       </div>
     </section>
   );
@@ -1270,7 +1072,7 @@ function AboutPage({ go, anchor }: { go: Go; anchor?: string }) {
             <h2 className="text-[24px] font-bold" style={{ color: C.navy }}>
               인사말
             </h2>
-            <p>{PENSION}를 찾아 주셔서 감사합니다. ㅅㄴ 해수욕장 바로 앞, 객실 6개의 작은 펜션입니다.</p>
+            <p>{PENSION}을 찾아 주셔서 감사합니다. ㅅㄴ 해수욕장 바로 앞, 객실 6개의 작은 펜션입니다.</p>
             <p>정원 앞 계단으로 내려가시면 바로 백사장입니다. 편히 쉬었다 가실 수 있도록 최선을 다하겠습니다.</p>
             <p className="pt-2 text-[15px]" style={{ color: C.muted }}>
               {PENSION} 대표 {OWNER}
@@ -1314,7 +1116,7 @@ function RoomPage({ roomId, go }: { roomId: string; go: Go }) {
   const info: [string, string][] = [
     ["객실명", room.name],
     ["구조", room.structure],
-    ["크기", `${room.size}평(${sqm(room.size)}㎡)`],
+    ["크기", `${room.size}평(${sqm(room.size)}m2)`],
     ["인원", `기준 ${room.base}명 ~ 최대 ${room.max}명`],
     ["전망", room.view ? "바다 전망" : "정원 전망"],
     ["스파", room.spa ? "스파 욕조" : "없음"],
@@ -1489,11 +1291,14 @@ function ReservePage({ sel, onPick, go }: { sel: Selection; onPick: (id: string,
   const input = "mt-1 h-12 w-full rounded-[6px] border bg-white px-3 outline-none focus:border-[#12324a]";
 
   return (
-    <>
-      <div className="soft-in">
-        <SubHeader title="실시간예약" crumbs={["예약안내", "실시간예약"]} go={go} tabs={guideTabs(go, "reserve")} />
-        <SubBody>
-          <SectionTitle id="board-title" aside={<TodayCount today={today} />}>
+    <div className="soft-in">
+      <SubHeader title="실시간예약" crumbs={["예약안내", "실시간예약"]} go={go} tabs={guideTabs(go, "reserve")} />
+      <SubBody>
+        {ticket ? (
+          <BookedNotice data={ticket} onDone={closeTicket} />
+        ) : (
+        <>
+          <SectionTitle id="board-title">
             예약현황
           </SectionTitle>
           <StatusBoard today={today} roomId={roomId} checkIn={checkIn} nights={nights} onPick={onPick} />
@@ -1678,149 +1483,68 @@ function ReservePage({ sel, onPick, go }: { sel: Selection; onPick: (id: string,
               </p>
             </form>
           </div>
-        </SubBody>
-      </div>
-      <TicketDialog data={ticket} onClose={closeTicket} />
-    </>
+        </>
+        )}
+      </SubBody>
+    </div>
   );
 }
 
 /* ---------- 예약 완료 ---------- */
 
-function TicketDialog({ data, onClose }: { data: Ticket | null; onClose: () => void }) {
-  const reduce = useReducedMotionSafe();
-  const closeRef = useRef<HTMLButtonElement>(null);
+function BookedNotice({ data, onDone }: { data: Ticket; onDone: () => void }) {
+  const titleRef = useRef<HTMLHeadingElement>(null);
 
   useEffect(() => {
-    if (!data) return;
-    closeRef.current?.focus();
-    const onKey = (e: KeyboardEvent) => e.key === "Escape" && onClose();
-    window.addEventListener("keydown", onKey);
-    return () => window.removeEventListener("keydown", onKey);
-  }, [data, onClose]);
+    window.scrollTo(0, 0);
+    titleRef.current?.focus({ preventScroll: true });
+  }, []);
+
+  const rows: [string, string][] = [
+    ["예약번호", data.no],
+    ["객실", data.room],
+    ["입실", `${dateLabel(data.checkIn)} 15:00`],
+    ["퇴실", `${dateLabel(data.checkOut)} 11:00`],
+    ["인원", `${data.people}명`],
+    ["예약자", data.name],
+    ["연락처", data.phone],
+    ["도착 예정", data.arrival],
+    ["결제 금액", won(data.total)],
+  ];
 
   return (
-    <AnimatePresence>
-      {data && (
-        <motion.div
-          className="fixed inset-0 z-50 flex items-center justify-center overflow-y-auto p-4"
-          style={{ background: "rgba(11,34,51,0.6)" }}
-          initial={reduce ? false : { opacity: 0 }}
-          animate={{ opacity: 1 }}
-          exit={{ opacity: 0 }}
-          onClick={onClose}
-        >
-          <motion.div
-            role="dialog"
-            aria-modal="true"
-            aria-labelledby="ticket-title"
-            onClick={(e) => e.stopPropagation()}
-            className="relative my-auto w-full max-w-[400px] overflow-hidden rounded-[12px] bg-white"
-            initial={reduce ? false : { y: 24, opacity: 0 }}
-            animate={{ y: 0, opacity: 1 }}
-            exit={reduce ? { opacity: 0 } : { y: 12, opacity: 0 }}
-            transition={{ duration: 0.3, ease: EASE }}
-          >
-            <div className="px-6 pb-6 pt-5 text-white" style={{ background: C.navy }}>
-              <div className="flex items-center justify-between">
-                <Logo />
-                <button ref={closeRef} type="button" onClick={onClose} aria-label="닫기" className="-mr-2 inline-flex h-11 w-11 items-center justify-center rounded-[6px]" style={{ color: C.sand }}>
-                  <X size={20} aria-hidden />
-                </button>
-              </div>
-              <h2 id="ticket-title" className="mt-3 text-[16px] font-bold" style={{ color: C.sand }}>
-                예약 신청 완료
-              </h2>
-              <div className="mt-3 grid grid-cols-[1fr_auto_1fr] items-end gap-2">
-                <TicketDate label="입실" dn={data.checkIn} time="15:00" />
-                <div className="flex flex-col items-center pb-2" style={{ color: C.coral }}>
-                  <Waves size={22} aria-hidden />
-                  <span className="mt-1 text-[13px] font-semibold" style={{ color: C.sand }}>
-                    {data.checkOut - data.checkIn}박
-                  </span>
-                </div>
-                <TicketDate label="퇴실" dn={data.checkOut} time="11:00" right />
-              </div>
-            </div>
-            <dl className="grid grid-cols-2 gap-x-4 gap-y-3 px-6 py-5 text-[15px]">
-              {[
-                ["객실", data.room],
-                ["인원", `${data.people}명`],
-                ["예약자", data.name],
-                ["연락처", data.phone],
-                ["도착 예정", data.arrival],
-                ["결제 금액", won(data.total)],
-              ].map(([k, v]) => (
-                <div key={k}>
-                  <dt className="text-[13px]" style={{ color: C.muted }}>
-                    {k}
-                  </dt>
-                  <dd className="font-bold tabular-nums">{v}</dd>
-                </div>
-              ))}
-            </dl>
-            <div className="relative h-0 border-t-2 border-dashed" style={{ borderColor: C.line }}>
-              <span className="absolute -left-3 -top-3 h-6 w-6 rounded-full" style={{ background: "#5a6a76" }} />
-              <span className="absolute -right-3 -top-3 h-6 w-6 rounded-full" style={{ background: "#5a6a76" }} />
-            </div>
-            <div className="px-6 pb-6 pt-5" style={{ background: C.sandSoft }}>
-              <p className="text-[13px]" style={{ color: C.muted }}>
-                입금 계좌
-              </p>
-              <p className="font-bold tabular-nums">{BANK}</p>
-              <p className="text-[14px]">예금주 {OWNER}</p>
-              <p className="mt-2 text-[14px]" style={{ color: C.muted }}>
-                예약 후 6시간 안에 예약자명으로 입금해 주시기 바랍니다. 기한이 지나면 자동 취소되며, 입금이 확인되면 예약 확정 문자를 보내 드립니다.
-              </p>
-              <div className="mt-4 flex items-end justify-between gap-4">
-                <div>
-                  <p className="text-[13px]" style={{ color: C.muted }}>
-                    예약번호
-                  </p>
-                  <p className="font-bold tabular-nums tracking-[0.04em]">{data.no}</p>
-                </div>
-                <Barcode seed={data.no} />
-              </div>
-            </div>
-          </motion.div>
-        </motion.div>
-      )}
-    </AnimatePresence>
-  );
-}
-
-function TicketDate({ label, dn, time, right = false }: { label: string; dn: number; time: string; right?: boolean }) {
-  const p = parts(dn);
-  return (
-    <div className={right ? "text-right" : ""}>
-      <p className="text-[13px]" style={{ color: C.sand }}>
-        {label}
-      </p>
-      <p className="text-[34px] font-bold leading-none tabular-nums">
-        {p.m + 1}.{String(p.d).padStart(2, "0")}
-      </p>
-      <p className="mt-1 text-[14px]" style={{ color: "#c9d6df" }}>
-        {DAY_NAMES[p.w]}요일 {time}
-      </p>
-    </div>
-  );
-}
-
-function Barcode({ seed }: { seed: string }) {
-  const n = Number(seed.replace(/\D/g, "")) % 100_000;
-  let x = 0;
-  const bars: { x: number; w: number }[] = [];
-  for (let i = 0; i < 28; i++) {
-    const w = (hash(n + i * 13) % 3) + 1;
-    bars.push({ x, w });
-    x += w + 2;
-  }
-  return (
-    <svg width={x} height="36" viewBox={`0 0 ${x} 36`} aria-hidden>
-      {bars.map((b) => (
-        <rect key={b.x} x={b.x} y="0" width={b.w} height="36" fill={C.navy} />
-      ))}
-    </svg>
+    <section aria-labelledby="booked-title" className="mx-auto max-w-[720px]">
+      <h2 ref={titleRef} id="booked-title" tabIndex={-1} className="border-b-2 pb-3 text-[26px] font-bold tracking-[-0.03em] outline-none md:text-[30px]" style={{ color: C.navy, borderColor: C.navy }}>
+        예약 신청이 접수되었습니다
+      </h2>
+      <p className="mt-4 text-[16px]">입금이 확인되면 예약 확정 문자를 보내 드립니다.</p>
+      <table className="mt-6 w-full border-t text-[15px] tabular-nums" style={{ borderColor: C.navy }}>
+        <caption className="sr-only">예약 신청 내역</caption>
+        <tbody>
+          {rows.map(([k, v]) => (
+            <tr key={k} className="border-b" style={{ borderColor: C.line }}>
+              <th scope="row" className="w-[110px] px-3 py-3 text-left font-semibold md:w-[140px]" style={{ background: C.sandSoft }}>
+                {k}
+              </th>
+              <td className="px-3 py-3">{v}</td>
+            </tr>
+          ))}
+        </tbody>
+      </table>
+      <div className="mt-6 rounded-[10px] p-5" style={{ background: C.sandSoft }}>
+        <h3 className="text-[17px] font-bold" style={{ color: C.navy }}>
+          입금 안내
+        </h3>
+        <p className="mt-2 font-bold tabular-nums">{BANK}</p>
+        <p className="text-[15px]">예금주 {OWNER}</p>
+        <p className="mt-2 text-[15px]" style={{ color: C.muted }}>
+          예약 후 6시간 안에 예약자명으로 입금해 주시기 바랍니다. 기한이 지나면 자동 취소됩니다.
+        </p>
+      </div>
+      <button type="button" onClick={onDone} className="mt-6 h-[52px] w-full rounded-[6px] text-[17px] font-bold md:w-[240px]" style={{ background: C.navy, color: "#fff" }}>
+        확인
+      </button>
+    </section>
   );
 }
 

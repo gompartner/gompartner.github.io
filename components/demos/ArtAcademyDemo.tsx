@@ -5,7 +5,6 @@ import { AnimatePresence, motion } from "framer-motion";
 import { AlertCircle, Bus, CalendarCheck, Car, Check, ChevronLeft, ChevronRight, Clock, MapPin, Phone, RotateCcw, TrainFront, X } from "lucide-react";
 import { useReducedMotionSafe } from "@/hooks/useReducedMotionSafe";
 import { daysAgo, fmtKo, useDemoToday } from "@/hooks/useDemoToday";
-import { maskName, maskPhone } from "@/components/demos/LeadReceivedPanel";
 import { DemoMakerInfo } from "@/components/demos/DemoMakerInfo";
 
 /* 입시 미술학원 홈페이지 샘플: 가상의 미술학원 곰파트너. 입시반(고1 ~ 재수), 성인 취미반, 초등반을 같이 운영한다.
@@ -17,20 +16,20 @@ import { DemoMakerInfo } from "@/components/demos/DemoMakerInfo";
    관용 문구: 방문 상담, 상담 예약, 실기 시간표, 평일반, 주말반, 재료비 별도, 수업 작품.
 
    첫 화면(aa-poster): 상단 메뉴 아래 왼쪽 2/3는 수업 작품 벽(큰 그림 하나와 작은 그림 여섯), 오른쪽 1/3은 문장
-   "기초 소묘부터 입시 실기까지"와 모집 중인 반 세로 판. 작품을 누르면 크게 보기가 열리고, 반을 누르면 아래 반 안내가 그 반으로 열린다.
+   "기초 소묘부터 입시 실기까지"와 모집 중인 반 세로 판. 작품을 누르면 크게 보기가 열리고, 반을 누르면 아래 반 안내로 내려간다.
    실제 입시 미술학원이 첫 화면에 재현작과 명단을 거는 방식을 따르되 합격 실적은 넣지 않는다.
    모션은 문장이 0.3초 늦게 아래 12px 에서 올라오는 것과 작품에 마우스를 올리면 살짝 커지는 것뿐. 동작 줄이기면 없음.
    사진 출처: Pexels 사진 7171387
 
    상호작용(모두 브라우저 안에서만 돈다. 실제로 보내지 않는다)
-   1. 반 안내: 입시반, 취미반, 초등반 탭과 주 횟수 칩. 고르면 과목, 수업 시간, 정원, 월 교습비가 바뀐다.
+   1. 반 안내: 입시반, 취미반, 초등반 카드 세 장에 대상, 과목, 정원, 수업 시간. 교습비는 게시표 하나로 둔다.
    2. 수업 작품: 정물 소묘, 정물 수채화로 거르고, 누르면 크게 보기(좌우 화살표 키, Esc).
    3. 실기 시간표: 반을 고르면 그 반 줄만 진하게, 오늘 요일 열을 표시한다.
-   4. 상담 신청: 학년, 관심 반, 방문 날짜와 시간, 이름과 연락처. 접수 번호, 담당 창구, 회신 예정일이 찍힌 접수증을 보여 준다. */
+   4. 상담 신청: 학년, 관심 반, 방문 날짜와 시간, 이름과 연락처. 보내면 신청한 일시와 연락 방법을 한 줄로 알려 준다. */
 
 const ADDRESS = "서울 ㅇㅇ구 ㅇㅇ로 00, 3층";
 const TEL = "02-000-0000";
-const KAKAO = "카카오톡 채널 곰파트너";
+const KAKAO = "카카오톡 채널 입시 미술학원";
 
 const C = {
   paper: "#ffffff",
@@ -52,12 +51,9 @@ const C = {
 const EASE = [0.22, 1, 0.36, 1] as const;
 const POSTER_CSS = `@keyframes aa-rise{from{opacity:0;transform:translateY(12px)}}.aa-rise{animation:aa-rise .7s cubic-bezier(0.22,1,0.36,1) .3s both}@media (prefers-reduced-motion:reduce){.aa-rise{animation:none}}`;
 const IMG = "/images/demo-art-academy";
-/** 탭 패널이 왼쪽부터 쓸리며 바뀌는 시간 */
-const WIPE = 0.45;
 
 const focusRing = "focus-visible:outline focus-visible:outline-[3px] focus-visible:outline-offset-2";
 const won = (n: number) => `${n.toLocaleString("ko-KR")}원`;
-const p2 = (n: number) => String(n).padStart(2, "0");
 
 /* ---------- 반과 교습비 ---------- */
 
@@ -390,7 +386,7 @@ export function ArtAcademyDemo() {
       {/* 1. 반 안내 */}
       <section id="aa-classes" aria-labelledby="aa-classes-title" className="mx-auto mt-14 max-w-[1200px] scroll-mt-4 px-4 md:mt-20 md:px-6">
         <SectionTitle id="aa-classes-title" title="반 안내" />
-        <ClassPicker reduce={reduce} cls={cls} setCls={setCls} onConsult={() => go("aa-consult")} />
+        <ClassList onConsult={() => go("aa-consult")} />
       </section>
 
       {/* 2. 수업 작품 */}
@@ -666,124 +662,59 @@ function Poster({ reduce, go, onClass }: { reduce: boolean; go: (id: string) => 
 
 /* ---------- 1. 반 안내 ---------- */
 
-function ClassPicker({ reduce, cls, setCls, onConsult }: { reduce: boolean; cls: ClassKey; setCls: (c: ClassKey) => void; onConsult: () => void }) {
-  const info = CLASSES.find((c) => c.key === cls) ?? CLASSES[0];
-  const [planIdx, setPlanIdx] = useState(0);
-  const plan = info.plans[Math.min(planIdx, info.plans.length - 1)];
-
+function ClassList({ onConsult }: { onConsult: () => void }) {
   return (
     <div>
-      <div role="tablist" aria-label="반 고르기" className="flex border-b" style={{ borderColor: C.line }}>
-        {CLASS_KEYS.map((k) => {
-          const on = k === cls;
-          return (
-            <button
-              key={k}
-              type="button"
-              role="tab"
-              id={`aa-tab-${k}`}
-              aria-selected={on}
-              aria-controls="aa-class-panel"
-              onClick={() => {
-                setCls(k);
-                setPlanIdx(0);
-              }}
-              className={`relative -mb-px px-4 pb-3 pt-2 text-[18px] font-bold md:px-6 md:text-[20px] ${focusRing}`}
-              style={{
-                color: on ? C.ink : C.muted,
-                outlineColor: C.orangeInk,
-              }}
-            >
-              {k}
-              {on && (
-                <motion.span
-                  layoutId={reduce ? undefined : "aa-tab-line"}
-                  className="absolute inset-x-2 bottom-0 h-[2px]"
-                  style={{ background: C.orange }}
-                  transition={{ duration: 0.3, ease: EASE }}
-                />
-              )}
-            </button>
-          );
-        })}
-      </div>
-
-      <motion.div
-        key={cls}
-        id="aa-class-panel"
-        role="tabpanel"
-        aria-labelledby={`aa-tab-${cls}`}
-        initial={reduce ? false : { clipPath: "inset(0 100% 0 0)" }}
-        animate={{ clipPath: "inset(0 0% 0 0)" }}
-        transition={{ duration: reduce ? 0 : WIPE, ease: EASE }}
-        className="grid gap-6 border-x border-b p-5 md:grid-cols-[minmax(0,1.2fr)_minmax(0,1fr)] md:gap-10 md:p-8"
-        style={{ borderColor: C.line, background: C.sheet }}
-      >
-        <div>
-          <dl className="grid grid-cols-[88px_minmax(0,1fr)] gap-y-3 text-[16px] leading-[1.6]">
-            <dt style={{ color: C.muted }}>대상</dt>
-            <dd className="font-semibold">{info.who}</dd>
-            <dt style={{ color: C.muted }}>실기 과목</dt>
-            <dd className="flex flex-wrap gap-1.5">
-              {info.subjects.map((s) => (
-                <span key={s} className="rounded-[3px] border px-2 py-0.5 text-[14px]" style={{ borderColor: C.line }}>
-                  {s}
-                </span>
-              ))}
-            </dd>
-            <dt style={{ color: C.muted }}>정원</dt>
-            <dd>반당 {info.cap}명</dd>
-          </dl>
-
-          <p className="mt-6 text-[15px] font-bold">수업 횟수</p>
-          <div className="mt-2 flex flex-wrap gap-2">
-            {info.plans.map((pl, i) => (
-              <Chip key={pl.label} on={pl === plan} onClick={() => setPlanIdx(i)}>
-                {pl.label}
-              </Chip>
-            ))}
-          </div>
-          <p className="mt-3 text-[15px]" style={{ color: C.muted }}>
-            {plan.when}
-          </p>
-
-          <div className="mt-6 flex flex-wrap items-end justify-between gap-4 border-t pt-5" style={{ borderColor: C.line }}>
-            <div>
-              <p className="text-[14px]" style={{ color: C.muted }}>
-                월 교습비
-              </p>
-              <p className="text-[32px] font-bold leading-tight tracking-[-0.02em] tabular-nums md:text-[36px]">
-                {won(plan.fee)}
-              </p>
-              <p className="text-[14px]" style={{ color: C.muted }}>
-                {info.extra}
+      <ul className="grid gap-5 md:grid-cols-3">
+        {CLASSES.map((info) => (
+          <li key={info.key} className="flex flex-col rounded-[8px] border" style={{ borderColor: C.line, background: C.sheet }}>
+            <div className="border-b p-3" style={{ borderColor: C.line }}>
+              <StillLife work={info.key === "입시반" ? WORKS[0] : info.key === "취미반" ? WORKS[7] : WORKS[3]} />
+            </div>
+            <div className="flex flex-1 flex-col p-5">
+              <h3 className="text-[22px] font-bold tracking-[-0.02em]">{info.key}</h3>
+              <dl className="mt-3 grid grid-cols-[72px_minmax(0,1fr)] gap-y-2 text-[15px] leading-[1.6]">
+                <dt style={{ color: C.muted }}>대상</dt>
+                <dd className="font-semibold">{info.who}</dd>
+                <dt style={{ color: C.muted }}>실기 과목</dt>
+                <dd>{info.subjects.join(", ")}</dd>
+                <dt style={{ color: C.muted }}>정원</dt>
+                <dd>반당 {info.cap}명</dd>
+                <dt style={{ color: C.muted }}>수업</dt>
+                <dd>
+                  {info.plans.map((pl) => (
+                    <span key={pl.label} className="block">
+                      {pl.label}, {pl.when}
+                    </span>
+                  ))}
+                </dd>
+              </dl>
+              <p className="mt-4 text-[15px] leading-[1.6]" style={{ color: C.char }}>
+                {info.note}
               </p>
             </div>
-            <button
-              type="button"
-              onClick={onConsult}
-              data-gtm-cta="art-academy_class_consult"
-              className={`inline-flex min-h-[48px] items-center gap-2 rounded-[6px] px-5 text-[16px] font-semibold text-white ${focusRing}`}
-              style={{ background: C.orangeInk, outlineColor: C.ink }}
-            >
-              <CalendarCheck size={18} aria-hidden />
-              {cls} 상담 예약
-            </button>
-          </div>
-        </div>
-
-        <figure className="flex w-full flex-col md:max-w-[360px] md:justify-self-end">
-          <div className="relative border p-3" style={{ borderColor: C.line, background: "#fff" }}>
-            <StillLife work={cls === "입시반" ? WORKS[0] : cls === "취미반" ? WORKS[7] : WORKS[3]} />
-          </div>
-          <figcaption className="mt-3 text-[15px] leading-[1.6]" style={{ color: C.char }}>
-            {info.note}
-          </figcaption>
-        </figure>
-      </motion.div>
+          </li>
+        ))}
+      </ul>
+      <div className="mt-6 flex flex-wrap items-center justify-between gap-4">
+        <p className="text-[15px]" style={{ color: C.muted }}>
+          월 교습비와 재료비는 아래 교습비 게시표에 있어요.
+        </p>
+        <button
+          type="button"
+          onClick={onConsult}
+          data-gtm-cta="art-academy_class_consult"
+          className={`inline-flex min-h-[48px] items-center gap-2 rounded-[6px] px-5 text-[16px] font-semibold text-white ${focusRing}`}
+          style={{ background: C.orangeInk, outlineColor: C.ink }}
+        >
+          <CalendarCheck size={18} aria-hidden />
+          상담 예약
+        </button>
+      </div>
     </div>
   );
 }
+
 
 /* ---------- 정물 그림(수업 작품) ---------- */
 
@@ -1082,15 +1013,9 @@ function FeeTable() {
 
 /* ---------- 4. 상담 신청 ---------- */
 
-interface Receipt {
-  no: string;
-  name: string;
-  phone: string;
-  grade: Grade;
-  cls: ClassKey;
+interface Sent {
   date: Date;
   time: string;
-  reply: Date;
 }
 
 function ConsultForm({ today, reduce, preset }: { today: Date; reduce: boolean; preset: ClassKey }) {
@@ -1103,7 +1028,7 @@ function ConsultForm({ today, reduce, preset }: { today: Date; reduce: boolean; 
   const [phone, setPhone] = useState("");
   const [agree, setAgree] = useState(false);
   const [tried, setTried] = useState(false);
-  const [done, setDone] = useState<Receipt | null>(null);
+  const [done, setDone] = useState<Sent | null>(null);
 
   const chosenCls = cls ?? (grade ? suggestClass(grade) : preset);
   const day = days[Math.min(dayIdx, days.length - 1)];
@@ -1121,17 +1046,7 @@ function ConsultForm({ today, reduce, preset }: { today: Date; reduce: boolean; 
     e.preventDefault();
     setTried(true);
     if (firstError || !grade || !time) return;
-    const reply = today;
-    setDone({
-      no: `AA-${p2(today.getMonth() + 1)}${p2(today.getDate())}-${String(100 + ((name.length * 37 + phone.length * 11 + dayIdx * 7) % 900))}`,
-      name: maskName(name),
-      phone: maskPhone(phone),
-      grade,
-      cls: chosenCls,
-      date: day,
-      time,
-      reply,
-    });
+    setDone({ date: day, time });
   };
 
   const reset = () => {
@@ -1190,31 +1105,16 @@ function ConsultForm({ today, reduce, preset }: { today: Date; reduce: boolean; 
               transition={{ duration: reduce ? 0 : 0.5, ease: EASE }}
               role="status"
             >
-              <p className="text-[24px] font-bold">
-                상담 신청이 접수됐어요
+              <p className="inline-flex items-center gap-2 text-[24px] font-bold">
+                <Check size={24} aria-hidden style={{ color: C.orangeInk }} />
+                상담 신청을 받았어요
               </p>
-              <dl className="mt-5 grid grid-cols-[96px_minmax(0,1fr)] gap-y-2.5 text-[16px]">
-                <dt style={{ color: C.muted }}>접수 번호</dt>
-                <dd className="font-bold tabular-nums">{done.no}</dd>
-                <dt style={{ color: C.muted }}>상담 일시</dt>
-                <dd className="font-semibold">
-                  {fmtKo(done.date)} {done.time}
-                </dd>
-                <dt style={{ color: C.muted }}>학생</dt>
-                <dd>
-                  {done.grade}, {done.cls}
-                </dd>
-                <dt style={{ color: C.muted }}>신청자</dt>
-                <dd>
-                  {done.name}, {done.phone}
-                </dd>
-                <dt style={{ color: C.muted }}>담당 창구</dt>
-                <dd>
-                  {KAKAO} 또는 전화 {TEL}
-                </dd>
-                <dt style={{ color: C.muted }}>회신 예정</dt>
-                <dd className="font-semibold">{fmtKo(done.reply)} 밤 9시까지 문자로 확정 연락</dd>
-              </dl>
+              <p className="mt-3 text-[16px] leading-[1.7]">
+                {fmtKo(done.date)} {done.time} 방문 상담으로 신청하셨어요. 오늘 안에 문자로 시간을 확정해 드려요.
+              </p>
+              <p className="mt-1 text-[15px]" style={{ color: C.muted }}>
+                일정을 바꾸려면 전화 {TEL} 또는 {KAKAO}로 연락 주세요.
+              </p>
               <button
                 type="button"
                 onClick={reset}
@@ -1463,13 +1363,10 @@ function SampleLogo({ light, size = 20 }: { light?: boolean; size?: number }) {
   const mark = size + 8;
   return (
     <span className="inline-flex items-center gap-2 leading-none" style={{ color: light ? "#fff" : "#111" }}>
-      {/* eslint-disable-next-line @next/next/no-img-element -- 메인 사이트와 같은 곰 로고 */}
-      <img src="/images/logo-bear.png" alt="" aria-hidden width={mark} height={mark} className="shrink-0" style={{ width: mark, height: mark }} />
       <span className="flex items-baseline gap-1 whitespace-nowrap">
         <span className="font-bold tracking-[-0.03em]" style={{ fontSize: size }}>
-          곰파트너
+          입시 미술학원
         </span>
-        <span className="text-[12px] font-semibold opacity-75">카탈로그</span>
       </span>
     </span>
   );

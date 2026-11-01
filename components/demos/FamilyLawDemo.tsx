@@ -1,7 +1,7 @@
 "use client";
 
-import { useEffect, useMemo, useState } from "react";
-import { AnimatePresence, animate, motion, useMotionValue, useTransform } from "framer-motion";
+import { useEffect, useState } from "react";
+import { AnimatePresence, motion } from "framer-motion";
 import {
   CalendarCheck,
   Car,
@@ -11,9 +11,7 @@ import {
   DoorClosed,
   MapPin,
   Menu,
-  MessageCircle,
   Phone,
-  PhoneOff,
   ShieldCheck,
   Video,
   X,
@@ -24,34 +22,31 @@ import { maskName, maskPhone } from "@/components/demos/LeadReceivedPanel";
 import { DemoMakerInfo } from "@/components/demos/DemoMakerInfo";
 
 /* 이혼, 가사 사건 법률사무소 홈페이지 샘플: 곰파트너 법률사무소.
-   사무소 이름, 변호사 이름, 주소, 전화번호, 예약 현황은 모두 가상이다.
+   사무소 이름, 변호사 이름, 주소, 전화번호는 모두 가상이다.
    변호사 광고 규정에 맞춰 승소율, 성공 사례 숫자, 결과 보장, 최고 같은 표현은 쓰지 않는다.
    "전문"은 대한변협 등록 전문분야 표기에만 쓴다.
 
    국내 이혼 전문 사무소 사이트의 흔한 구성: 메뉴는 업무분야(협의이혼, 이혼소송, 양육권, 재산분할, 위자료),
    변호사 소개, 상담신청(방문, 전화, 화상), 자주 묻는 질문, 오시는 길. 첫 화면에 비밀 보장, 변호사 직접 상담,
-   야간 상담 가능 같은 약속과 상담 예약 버튼을 둔다. 양육비 계산기는 서울가정법원 양육비 산정기준표를 쓴다.
+   야간 상담 가능 같은 약속과 상담신청 버튼을 둔다.
 
    상호작용(브라우저 안에서만 돈다. 실제로 보내지 않는다)
    1. 상담 분야 고르기: 협의이혼, 재판이혼, 양육권, 재산분할을 누르면 절차 단계, 걸리는 기간, 준비 서류가 바뀐다.
-   2. 양육비 개략: 두 부모 월 소득과 자녀 나이로 산정기준표 구간을 찾고, 소득 비율로 나눈 월 금액을 보여 준다.
-   3. 비공개 상담 예약: 방문 상담은 앞뒤 상담과 30분씩 비워 다른 손님과 마주치지 않는 시간만 열린다.
-      전화, 화상은 겹치지만 않으면 된다. 연락을 전화로만 받기(문자 안 받기)를 고를 수 있다.
+   2. 양육비 안내: 산정기준표, 분담 방식, 받지 못할 때의 절차를 글로 정리한다.
+   3. 상담신청: 방식, 분야, 희망 시간대, 연락처를 받는 일반 폼. 접수 화면에 접수 번호와 회신 예정을 보여 준다.
    4. 자주 묻는 질문.
 
    사진 출처: AI 생성(Z-Image-Turbo, Apache 2.0). 직원 사진은 AI 생성(Z-Image-Turbo).
 
    첫 화면(fl-poster): 상단 메뉴(좁은 화면은 햄버거), 왼쪽 45% 대표 변호사 세로 사진, 오른쪽 55% 이름과 등록 분야, 경력 줄,
-   그 아래 진행 단계 4칸(고민 중, 협의 중, 조정 중, 소송 중). 단계를 고르면 할 일 세 줄이 바뀌고,
-   "이 단계로 상담예약"은 아래 예약의 분야를 미리 골라 둔다. 휴대폰은 사진 대신 가로 명함, 단계는 2x2.
-   핵심 모션: 인물 사진이 1.06배에서 1배로 1.6초 동안 천천히 다가오고, 할 일 목록은 짧게 바뀐다. 동작 줄이기면 멈춘다. */
+   그 아래 업무분야 바로가기 4칸과 상담신청, 전화 버튼. 휴대폰은 사진 대신 가로 명함. */
 
 /* 제목은 본문과 같은 Pretendard, 굵게 */
 const serifF = { fontWeight: 700 } as const;
 
 const SLUG = "family-law";
 const TEL = "02-000-0000";
-const KAKAO = "카카오톡 채널 곰파트너";
+const KAKAO = "카카오톡 채널 가사 법률사무소";
 const ADDRESS = "서울 ㅇㅇ구 ㅇㅇ로 00, 7층";
 const IMG = "/images/demo-family-law";
 
@@ -60,7 +55,6 @@ const C = {
   alt: "#f7f7f5",
   accent: "#5e2a35",
   accentSoft: "#f4eeef",
-  booked: "#ececea",
   ink: "#111111",
   body: "#4b4b4b",
   muted: "#767676",
@@ -70,60 +64,28 @@ const C = {
 
 /* 모션 값 */
 const EASE = [0.22, 1, 0.36, 1] as const;
-const PHOTO_IN = 1.6; // 사진이 다가오는 시간, 초
-const NUM_DUR = 0.6; // 양육비 숫자 굴림, 초
 
 const focusRing = "focus-visible:outline focus-visible:outline-[3px] focus-visible:outline-offset-2";
 const won = (n: number) => `${n.toLocaleString("ko-KR")}원`;
 const p2 = (n: number) => String(n).padStart(2, "0");
-const hm = (m: number) => `${p2(Math.floor(m / 60))}:${p2(m % 60)}`;
 
-/* ---------- 첫 화면: 메뉴 + 대표 변호사 + 진행 단계 ---------- */
-
-type Stage = "고민 중" | "협의 중" | "조정 중" | "소송 중";
-const STAGE_LIST: Stage[] = ["고민 중", "협의 중", "조정 중", "소송 중"];
-
-/** 단계마다 할 일 세 줄. 아래 업무분야 절차(AREAS)에서 옮겼다. area는 예약으로 넘길 분야 */
-const STAGES: Record<Stage, { todo: string[]; area: Area }> = {
-  "고민 중": {
-    todo: ["혼인관계증명서, 가족관계증명서 떼어 두기", "재산, 소득 자료와 대출 내역 모아 두기", "아이 돌봄 일정과 주거 환경 적어 두기"],
-    area: "협의이혼",
-  },
-  "협의 중": {
-    todo: ["부부가 함께 가정법원에 협의이혼의사확인 신청", "미성년 자녀가 있으면 숙려기간 3개월, 없으면 1개월", "친권자, 양육자, 양육비, 면접교섭을 정해 양육 협의서 제출"],
-    area: "협의이혼",
-  },
-  "조정 중": {
-    todo: ["가사조사관 면담과 조정 기일 준비", "상대 재산을 모르면 재산명시, 재산조회 신청", "소송 중 아이를 누가 돌볼지 사전처분 신청"],
-    area: "재판이혼",
-  },
-  "소송 중": {
-    todo: ["변론 기일에 증거와 주장 정리", "판결문을 받고 2주 안에 항소 여부 결정", "확정된 날부터 1개월 안에 이혼 신고"],
-    area: "재판이혼",
-  },
-};
+/* ---------- 첫 화면: 메뉴 + 대표 변호사 + 업무분야 바로가기 ---------- */
 
 const MENU: [string, string][] = [
   ["fl-areas", "업무분야"],
   ["fl-lawyers", "변호사 소개"],
-  ["fl-support", "양육비 계산"],
+  ["fl-support", "양육비 안내"],
   ["fl-faq", "자주 묻는 질문"],
   ["fl-visit", "오시는 길"],
 ];
 
-function Poster({ reduce, go, setArea }: { reduce: boolean; go: (id: string) => void; setArea: (a: Area) => void }) {
-  const [stage, setStage] = useState<Stage>("협의 중");
+function Poster({ go, setArea }: { go: (id: string) => void; setArea: (a: Area) => void }) {
   const [menuOpen, setMenuOpen] = useState(false);
   const lead = LAWYERS[0];
-  const s = STAGES[stage];
 
   const to = (id: string) => {
     setMenuOpen(false);
     go(id);
-  };
-  const book = () => {
-    setArea(s.area);
-    go("fl-booking");
   };
 
   return (
@@ -150,7 +112,7 @@ function Poster({ reduce, go, setArea }: { reduce: boolean; go: (id: string) => 
               style={{ background: C.accent, color: "#ffffff", outlineColor: C.accent }}
             >
               <CalendarCheck size={17} aria-hidden />
-              상담예약
+              상담신청
             </button>
             <button
               type="button"
@@ -183,15 +145,13 @@ function Poster({ reduce, go, setArea }: { reduce: boolean; go: (id: string) => 
       <div className="mx-auto grid max-w-[1200px] md:grid-cols-[minmax(0,45fr)_minmax(0,55fr)] md:px-6 md:py-8 lg:py-10">
         {/* 넓은 화면: 왼쪽 세로 인물 사진. 사진 위 글자 없음 */}
         <div className="relative hidden overflow-hidden rounded-[8px] md:block" style={{ background: C.alt }}>
-          <motion.div className="absolute inset-0" initial={reduce ? false : { scale: 1.06 }} animate={{ scale: 1 }} transition={{ duration: reduce ? 0 : PHOTO_IN, ease: EASE }}>
-            {/* eslint-disable-next-line @next/next/no-img-element -- 정적 export 라 next/image 최적화를 쓰지 않는다 */}
-            <img src={lead.photo} alt={`${lead.role} ${lead.name}`} fetchPriority="high" className="absolute inset-0 h-full w-full object-cover" style={{ objectPosition: "50% 18%" }} />
-          </motion.div>
+          {/* eslint-disable-next-line @next/next/no-img-element -- 정적 export 라 next/image 최적화를 쓰지 않는다 */}
+          <img src={lead.photo} alt={`${lead.role} ${lead.name}`} fetchPriority="high" className="absolute inset-0 h-full w-full object-cover" style={{ objectPosition: "50% 18%" }} />
         </div>
 
         <div className="min-w-0 px-4 pt-6 md:pl-10 md:pr-0 md:pt-2 lg:pl-14">
           <h1 id="fl-poster-title" className="text-[28px] font-bold md:text-[34px] lg:text-[40px]" style={{ ...serifF, letterSpacing: "-0.03em", lineHeight: 1.25, wordBreak: "keep-all" }}>
-            다른 의뢰인과 마주치지 않는 상담
+            이혼과 양육 문제, 변호사가 직접 상담합니다
           </h1>
 
           {/* 대표 변호사. 좁은 화면은 가로 명함 */}
@@ -213,73 +173,46 @@ function Poster({ reduce, go, setArea }: { reduce: boolean; go: (id: string) => 
             </div>
           </div>
 
-          {/* 진행 단계 */}
+          {/* 업무분야 바로가기 */}
           <div className="mt-6 md:mt-8">
-            <h2 className="text-[16px] font-bold">진행 단계</h2>
-            <div role="radiogroup" aria-label="진행 단계" className="mt-3 grid grid-cols-2 gap-2 sm:grid-cols-4">
-              {STAGE_LIST.map((k, i) => {
-                const on = k === stage;
-                return (
-                  <button
-                    key={k}
-                    type="button"
-                    role="radio"
-                    aria-checked={on}
-                    onClick={() => setStage(k)}
-                    className={`flex min-h-12 items-center gap-2 rounded-[6px] border px-3 text-left text-[16px] font-semibold ${focusRing}`}
-                    style={{ borderColor: on ? C.accent : C.line, background: on ? C.accent : C.bg, color: on ? "#ffffff" : C.ink, outlineColor: C.accent }}
-                  >
-                    <span className="text-[13px] tabular-nums" style={{ color: on ? "#eadde0" : C.muted }}>
-                      {i + 1}
-                    </span>
-                    {k}
-                  </button>
-                );
-              })}
-            </div>
-            <AnimatePresence mode="wait" initial={false}>
-              <motion.div
-                key={stage}
-                className="mt-3 rounded-[8px] p-4 md:p-5"
-                style={{ background: C.accentSoft }}
-                initial={reduce ? false : { opacity: 0, y: 6 }}
-                animate={{ opacity: 1, y: 0 }}
-                exit={reduce ? undefined : { opacity: 0, y: -6 }}
-                transition={{ duration: reduce ? 0 : 0.2, ease: EASE }}
-              >
-                <ul className="grid gap-1.5 text-[15px] md:text-[16px]">
-                  {s.todo.map((t) => (
-                    <li key={t} className="flex gap-2">
-                      <Check size={16} aria-hidden className="mt-[4px] flex-none" style={{ color: C.accent }} />
-                      {t}
-                    </li>
-                  ))}
-                </ul>
-                <div className="mt-4 flex flex-wrap gap-2">
-                  <button
-                    type="button"
-                    onClick={book}
-                    data-gtm-cta={`${SLUG}_stage_book`}
-                    className={`inline-flex min-h-11 items-center gap-1.5 rounded-[6px] px-4 text-[15px] font-semibold ${focusRing}`}
-                    style={{ background: C.accent, color: "#ffffff", outlineColor: C.accent }}
-                  >
-                    <CalendarCheck size={17} aria-hidden />
-                    이 단계로 상담예약
-                  </button>
+            <h2 className="text-[16px] font-bold">업무분야</h2>
+            <ul className="mt-3 grid grid-cols-2 gap-2 sm:grid-cols-4">
+              {AREA_LIST.map((k) => (
+                <li key={k}>
                   <button
                     type="button"
                     onClick={() => {
-                      setArea(s.area);
+                      setArea(k);
                       go("fl-areas");
                     }}
-                    className={`inline-flex min-h-11 items-center rounded-[6px] border px-4 text-[15px] font-semibold ${focusRing}`}
-                    style={{ borderColor: C.accent, color: C.accent, background: C.bg, outlineColor: C.accent }}
+                    className={`flex min-h-12 w-full items-center rounded-[6px] border px-3 text-left text-[16px] font-semibold ${focusRing}`}
+                    style={{ borderColor: C.line, background: C.bg, color: C.ink, outlineColor: C.accent }}
                   >
-                    {s.area} 절차
+                    {k}
                   </button>
-                </div>
-              </motion.div>
-            </AnimatePresence>
+                </li>
+              ))}
+            </ul>
+            <div className="mt-4 flex flex-wrap gap-2">
+              <button
+                type="button"
+                onClick={() => go("fl-booking")}
+                data-gtm-cta={`${SLUG}_poster_book`}
+                className={`inline-flex min-h-11 items-center gap-1.5 rounded-[6px] px-4 text-[15px] font-semibold ${focusRing}`}
+                style={{ background: C.accent, color: "#ffffff", outlineColor: C.accent }}
+              >
+                <CalendarCheck size={17} aria-hidden />
+                상담신청
+              </button>
+              <a
+                href={`tel:${TEL}`}
+                className={`inline-flex min-h-11 items-center gap-1.5 rounded-[6px] border px-4 text-[15px] font-semibold tabular-nums ${focusRing}`}
+                style={{ borderColor: C.accent, color: C.accent, background: C.bg, outlineColor: C.accent }}
+              >
+                <Phone size={17} aria-hidden />
+                {TEL}
+              </a>
+            </div>
           </div>
         </div>
       </div>
@@ -424,141 +357,49 @@ function AreaPicker({ area, setArea, onBook }: { area: Area; setArea: (a: Area) 
           style={{ background: C.accent, color: "#ffffff", outlineColor: C.accent }}
         >
           <CalendarCheck size={18} aria-hidden />
-          {area} 상담 예약
+          {area} 상담신청
         </button>
       </div>
     </div>
   );
 }
 
-/* ---------- 2. 양육비 개략 ----------
-   서울가정법원 양육비 산정기준표(2021)의 부모 합산 소득 구간, 자녀 나이별 표준양육비(평균값)를 천 원 단위로 옮겼다.
-   양육하지 않는 부모는 표준양육비에 자기 소득 비율을 곱한 금액을 보낸다. 자녀 한 명 기준. */
+/* ---------- 2. 양육비 안내 ---------- */
 
-const AGE_BANDS = ["0~2세", "3~5세", "6~8세", "9~11세", "12~14세", "15~18세"];
-const SUPPORT: { upto: number; label: string; v: number[] }[] = [
-  { upto: 200, label: "0~199만 원", v: [621, 631, 648, 667, 679, 703] },
-  { upto: 300, label: "200~299만 원", v: [752, 759, 767, 782, 790, 957] },
-  { upto: 400, label: "300~399만 원", v: [945, 949, 959, 988, 998, 1227] },
-  { upto: 500, label: "400~499만 원", v: [1098, 1113, 1140, 1163, 1280, 1402] },
-  { upto: 600, label: "500~599만 원", v: [1245, 1266, 1292, 1318, 1423, 1604] },
-  { upto: 700, label: "600~699만 원", v: [1401, 1422, 1479, 1494, 1598, 1794] },
-  { upto: 800, label: "700~799만 원", v: [1582, 1598, 1614, 1630, 1711, 1964] },
-  { upto: 900, label: "800~899만 원", v: [1789, 1807, 1850, 1887, 1984, 2163] },
-  { upto: 1000, label: "900~999만 원", v: [1997, 2017, 2065, 2137, 2159, 2246] },
-  { upto: 1200, label: "1,000~1,199만 원", v: [2095, 2116, 2137, 2180, 2223, 2540] },
-  { upto: Infinity, label: "1,200만 원 이상", v: [2207, 2245, 2312, 2405, 2476, 2883] },
+const SUPPORT_INFO: [string, string][] = [
+  ["정하는 기준", "서울가정법원 양육비 산정기준표를 바탕으로 두 부모의 소득, 자녀 나이와 수를 함께 봅니다."],
+  ["나누는 방식", "표준양육비를 두 부모 소득 비율로 나눠, 아이를 키우지 않는 부모가 자기 몫을 매달 보냅니다."],
+  ["더하거나 빼는 사정", "재산, 부채, 아이 건강, 사는 지역, 학비 같은 사정에 따라 법원이 금액을 조정합니다."],
+  ["받지 못할 때", "이행명령, 양육비 직접지급명령, 담보제공명령을 신청할 수 있고 양육비이행관리원 도움도 받을 수 있습니다."],
 ];
 
-function RollingWon({ value, reduce }: { value: number; reduce: boolean }) {
-  const mv = useMotionValue(value);
-  const text = useTransform(mv, (v) => won(Math.round(v / 1000) * 1000));
-  useEffect(() => {
-    if (reduce) {
-      mv.set(value);
-      return;
-    }
-    const c = animate(mv, value, { duration: NUM_DUR, ease: EASE });
-    return () => c.stop();
-  }, [value, reduce, mv]);
-  return <motion.span>{text}</motion.span>;
-}
-
-function IncomeSlider({ id, label, value, setValue }: { id: string; label: string; value: number; setValue: (n: number) => void }) {
+function SupportInfo({ onBook }: { onBook: () => void }) {
   return (
-    <div>
-      <div className="flex items-baseline justify-between gap-3">
-        <label htmlFor={id} className="text-[15px] font-bold">
-          {label}
-        </label>
-        <span className="text-[17px] font-bold tabular-nums" style={{ color: C.accent }}>
-          월 {value.toLocaleString("ko-KR")}만 원
-        </span>
-      </div>
-      <input
-        id={id}
-        type="range"
-        min={0}
-        max={1500}
-        step={10}
-        value={value}
-        onChange={(e) => setValue(Number(e.target.value))}
-        className={`mt-2 w-full ${focusRing}`}
-        style={{ accentColor: C.accent, outlineColor: C.accent }}
-      />
-    </div>
-  );
-}
-
-function ChildSupport({ reduce }: { reduce: boolean }) {
-  const [mine, setMine] = useState(250);
-  const [other, setOther] = useState(400);
-  const [age, setAge] = useState(2);
-  const sum = mine + other;
-  const band = SUPPORT.find((b) => sum < b.upto) ?? SUPPORT[SUPPORT.length - 1];
-  const standard = band.v[age] * 1000;
-  const ratio = sum === 0 ? 0 : other / sum;
-  const pay = Math.round((standard * ratio) / 10000) * 10000;
-
-  return (
-    <div className="mt-6 grid gap-6 rounded-[8px] border p-5 md:grid-cols-[minmax(0,1fr)_minmax(0,0.9fr)] md:gap-10 md:p-7" style={{ borderColor: C.line, background: C.alt }}>
-      <div className="grid content-start gap-6">
-        <IncomeSlider id="fl-inc-mine" label="아이를 키우는 부모 소득(세전)" value={mine} setValue={setMine} />
-        <IncomeSlider id="fl-inc-other" label="아이를 키우지 않는 부모 소득(세전)" value={other} setValue={setOther} />
-        <fieldset>
-          <legend className="text-[15px] font-bold">자녀 나이</legend>
-          <div className="mt-2 grid grid-cols-3 gap-2 sm:grid-cols-6">
-            {AGE_BANDS.map((b, i) => {
-              const on = i === age;
-              return (
-                <button
-                  key={b}
-                  type="button"
-                  aria-pressed={on}
-                  onClick={() => setAge(i)}
-                  className={`rounded-[6px] border px-2 py-2 text-[14px] font-semibold tabular-nums ${focusRing}`}
-                  style={{ borderColor: on ? C.accent : C.line, background: on ? C.accent : "transparent", color: on ? "#ffffff" : C.ink, outlineColor: C.accent }}
-                >
-                  {b}
-                </button>
-              );
-            })}
+    <div className="mt-6 rounded-[8px] border p-5 md:p-7" style={{ borderColor: C.line, background: C.alt }}>
+      <dl>
+        {SUPPORT_INFO.map(([t, d]) => (
+          <div key={t} className="grid gap-1 border-b py-3 first:pt-0 md:grid-cols-[180px_minmax(0,1fr)] md:gap-8" style={{ borderColor: C.line }}>
+            <dt className="text-[16px] font-bold">{t}</dt>
+            <dd className="text-[15px] leading-[1.65]" style={{ color: C.body }}>
+              {d}
+            </dd>
           </div>
-        </fieldset>
-      </div>
-
-      <div className="flex min-w-0 flex-col rounded-[8px] border p-5" style={{ borderColor: C.line, background: C.bg, color: C.ink }} aria-live="polite">
-        <p className="text-[15px]" style={{ color: C.body }}>매달 보내는 양육비 개략</p>
-        <p className="mt-1 text-[clamp(34px,9vw,48px)] font-bold leading-[1.15] tracking-[-0.02em] tabular-nums">
-          <RollingWon value={pay} reduce={reduce} />
-        </p>
-        <dl className="mt-5 grid grid-cols-[auto_minmax(0,1fr)] gap-x-4 gap-y-2 border-t pt-4 text-[15px]" style={{ borderColor: C.line }}>
-          <dt style={{ color: C.muted }}>합산 소득</dt>
-          <dd className="text-right font-bold tabular-nums">{band.label}</dd>
-          <dt style={{ color: C.muted }}>표준양육비</dt>
-          <dd className="text-right font-bold tabular-nums">{won(standard)}</dd>
-          <dt style={{ color: C.muted }}>분담 비율</dt>
-          <dd className="text-right font-bold tabular-nums">{Math.round(ratio * 100)}%</dd>
-        </dl>
-        {/* 분담 비율 막대: 글자와 함께 보여 색에만 기대지 않는다 */}
-        <div className="mt-4 h-2.5 overflow-hidden rounded-full" style={{ background: C.line }} aria-hidden>
-          <motion.div
-            className="h-full origin-left rounded-full"
-            style={{ background: C.accent }}
-            initial={false}
-            animate={{ scaleX: ratio }}
-            transition={{ duration: reduce ? 0 : NUM_DUR, ease: EASE }}
-          />
-        </div>
-        <p className="mt-auto pt-5 text-[13px] leading-[1.6]" style={{ color: C.muted }}>
-          서울가정법원 양육비 산정기준표(2021) 기준, 자녀 한 명. 재산과 양육 환경에 따라 법원이 더하거나 뺄 수 있어요.
-        </p>
-      </div>
+        ))}
+      </dl>
+      <button
+        type="button"
+        onClick={onBook}
+        className={`mt-4 inline-flex items-center gap-2 rounded-[6px] border px-5 py-3 text-[16px] font-semibold ${focusRing}`}
+        style={{ borderColor: C.accent, color: C.accent, background: C.bg, outlineColor: C.accent }}
+      >
+        <CalendarCheck size={18} aria-hidden />
+        양육비 상담신청
+      </button>
     </div>
   );
 }
 
-/* ---------- 3. 비공개 상담 예약 ---------- */
+/* ---------- 3. 상담신청 ---------- */
 
 type Method = "visit" | "phone" | "video";
 const METHODS: { id: Method; label: string; mins: number; fee: number; Icon: typeof Phone }[] = [
@@ -566,82 +407,27 @@ const METHODS: { id: Method; label: string; mins: number; fee: number; Icon: typ
   { id: "phone", label: "전화 상담", mins: 30, fee: 30000, Icon: Phone },
   { id: "video", label: "화상 상담", mins: 50, fee: 50000, Icon: Video },
 ];
-/** 이미 잡힌 상담은 모두 방문 50분으로 본다 */
-const BOOKED_MINS = 50;
-/** 방문 상담은 앞뒤 상담과 이만큼 비운다(분) */
-const GAP = 30;
 
-/** 평일 09:00~20:00, 토요일 10:00~14:00 시작, 30분 간격 */
-function slotsFor(d: Date) {
-  const [from, to] = d.getDay() === 6 ? [600, 840] : [540, 1200];
-  const out: number[] = [];
-  for (let m = from; m <= to; m += 30) out.push(m);
-  return out;
-}
+const TIMES = ["평일 낮", "평일 저녁", "토요일", "시간 무관"];
 
-/** 날짜마다 이미 잡힌 상담. 실제로는 예약 시트에서 읽는다 */
-function bookedFor(d: Date) {
-  const slots = slotsFor(d);
-  let h = (d.getDate() * 73 + d.getMonth() * 151 + 17) >>> 0;
-  const want = d.getDay() === 6 ? 1 : 3;
-  const out: number[] = [];
-  for (let tries = 0; out.length < want && tries < 60; tries++) {
-    h = (Math.imul(h, 1103515245) + 12345) >>> 0;
-    const s = slots[(h >>> 8) % slots.length];
-    if (out.every((b) => Math.abs(b - s) >= 120)) out.push(s);
-  }
-  return out.sort((a, b) => a - b);
-}
-
-type SlotState = "open" | "booked" | "gap";
-function slotState(s: number, booked: number[], method: Method): SlotState {
-  const mins = METHODS.find((m) => m.id === method)!.mins;
-  const gap = method === "visit" ? GAP : 0;
-  let st: SlotState = "open";
-  for (const b of booked) {
-    if (s < b + BOOKED_MINS && b < s + mins) return "booked";
-    if (s < b + BOOKED_MINS + gap && b - gap < s + mins) st = "gap";
-  }
-  return st;
-}
-
-/** 예약할 수 있는 날: 내일부터 일요일을 뺀 6일 */
-function openDays(today: Date) {
-  const out: Date[] = [];
-  for (let i = 1; out.length < 6; i++) {
-    const d = daysAgo(today, -i);
-    if (d.getDay() !== 0) out.push(d);
-  }
-  return out;
-}
-
-const DOW = ["일", "월", "화", "수", "목", "금", "토"];
-
-type Done = { no: string; name: string; phone: string; when: string; method: string; callOnly: boolean; area: Area; reply: string };
+type Done = { no: string; name: string; phone: string; when: string; method: string; area: Area; reply: string };
 
 function Booking({ today, reduce, area, setArea }: { today: Date; reduce: boolean; area: Area; setArea: (a: Area) => void }) {
-  const days = useMemo(() => openDays(today), [today]);
-  const [dayIdx, setDayIdx] = useState(0);
   const [method, setMethod] = useState<Method>("visit");
-  const [slot, setSlot] = useState<number | null>(null);
+  const [when, setWhen] = useState("");
   const [name, setName] = useState("");
   const [phone, setPhone] = useState("");
-  const [callOnly, setCallOnly] = useState(true);
+  const [memo, setMemo] = useState("");
   const [agree, setAgree] = useState(false);
   const [err, setErr] = useState("");
   const [done, setDone] = useState<Done | null>(null);
 
-  const day = days[dayIdx];
-  const booked = useMemo(() => bookedFor(day), [day]);
-  const slots = slotsFor(day);
   const m = METHODS.find((x) => x.id === method)!;
-  // 방식이나 날짜를 바꿔 고른 시간이 막히면 선택을 푼다
-  const picked = slot !== null && slots.includes(slot) && slotState(slot, booked, method) === "open" ? slot : null;
 
   const submit = (e: React.FormEvent) => {
     e.preventDefault();
     const digits = phone.replace(/\D/g, "");
-    if (picked === null) return setErr("상담 시간을 골라 주세요.");
+    if (!when) return setErr("희망 시간대를 골라 주세요.");
     if (name.trim().length < 2) return setErr("이름을 적어 주세요.");
     if (digits.length < 10 || digits.length > 11) return setErr("연락처를 확인해 주세요.");
     if (!agree) return setErr("개인정보 수집, 이용에 동의해 주세요.");
@@ -650,12 +436,11 @@ function Booking({ today, reduce, area, setArea }: { today: Date; reduce: boolea
     if (reply.getDay() === 0) reply = daysAgo(reply, -1);
     const ymd = `${today.getFullYear()}${p2(today.getMonth() + 1)}${p2(today.getDate())}`;
     setDone({
-      no: `FL-${ymd}-${String(((picked + Number(digits.slice(-4))) % 900) + 100)}`,
+      no: `FL-${ymd}-${String((Number(digits.slice(-4)) % 900) + 100)}`,
       name: maskName(name),
       phone: maskPhone(phone),
-      when: `${fmtKo(day)} ${hm(picked)}~${hm(picked + m.mins)}`,
+      when,
       method: m.label,
-      callOnly,
       area,
       reply: `${fmtKo(reply)} 오후 6시 전`,
     });
@@ -663,11 +448,14 @@ function Booking({ today, reduce, area, setArea }: { today: Date; reduce: boolea
 
   const reset = () => {
     setDone(null);
-    setSlot(null);
+    setWhen("");
     setName("");
     setPhone("");
+    setMemo("");
     setAgree(false);
   };
+
+  const field = `mt-1.5 w-full rounded-[6px] border bg-transparent px-3 py-2.5 text-[16px] ${focusRing}`;
 
   return (
     <div className="mt-6 rounded-[8px] border" style={{ borderColor: C.line, background: C.alt }}>
@@ -684,16 +472,12 @@ function Booking({ today, reduce, area, setArea }: { today: Date; reduce: boolea
           >
             <p className="inline-flex items-center gap-2 text-[15px] font-bold" style={{ color: C.accent }}>
               <ShieldCheck size={18} aria-hidden />
-              상담 예약 접수
+              상담신청 접수
             </p>
             <h3 className="mt-2 text-[24px] font-bold">
               접수 번호 <span className="tabular-nums">{done.no}</span>
             </h3>
             <dl className="mt-5 grid gap-x-6 gap-y-2.5 text-[16px] sm:grid-cols-[120px_minmax(0,1fr)]">
-              <dt className="font-bold" style={{ color: C.muted }}>
-                상담 일시
-              </dt>
-              <dd className="tabular-nums">{done.when}</dd>
               <dt className="font-bold" style={{ color: C.muted }}>
                 방식, 분야
               </dt>
@@ -701,7 +485,11 @@ function Booking({ today, reduce, area, setArea }: { today: Date; reduce: boolea
                 {done.method}, {done.area}
               </dd>
               <dt className="font-bold" style={{ color: C.muted }}>
-                예약자
+                희망 시간대
+              </dt>
+              <dd>{done.when}</dd>
+              <dt className="font-bold" style={{ color: C.muted }}>
+                신청자
               </dt>
               <dd className="tabular-nums">
                 {done.name} {done.phone}
@@ -709,9 +497,7 @@ function Booking({ today, reduce, area, setArea }: { today: Date; reduce: boolea
               <dt className="font-bold" style={{ color: C.muted }}>
                 회신 예정
               </dt>
-              <dd>
-                {done.reply}, {done.callOnly ? "전화로만 연락드려요(문자 없음)" : "전화나 문자로 연락드려요"}
-              </dd>
+              <dd>{done.reply}, 전화로 상담 일정을 정해 드려요</dd>
               <dt className="font-bold" style={{ color: C.muted }}>
                 담당 창구
               </dt>
@@ -719,18 +505,12 @@ function Booking({ today, reduce, area, setArea }: { today: Date; reduce: boolea
                 상담실 전화 {TEL}, {KAKAO}
               </dd>
             </dl>
-            {done.method === "방문 상담" && (
-              <p className="mt-5 flex gap-2 rounded-[6px] p-3 text-[15px] leading-[1.6]" style={{ background: C.accentSoft }}>
-                <Car size={18} aria-hidden className="mt-[3px] flex-none" style={{ color: C.accent }} />
-                건물 뒤편 주차장 쪽 엘리베이터로 7층에 오시면 대기실을 거치지 않고 바로 상담실로 들어가요.
-              </p>
-            )}
             <button type="button" onClick={reset} className={`mt-6 rounded-[6px] border px-4 py-2.5 text-[15px] font-semibold ${focusRing}`} style={{ borderColor: C.accent, color: C.accent, outlineColor: C.accent }}>
-              다른 시간 예약
+              새로 신청하기
             </button>
           </motion.div>
         ) : (
-          <motion.form key="form" onSubmit={submit} noValidate className="grid gap-7 p-5 md:p-8 lg:grid-cols-[minmax(0,1.25fr)_minmax(0,1fr)] lg:gap-10" exit={{ opacity: 0 }} transition={{ duration: reduce ? 0 : 0.15 }}>
+          <motion.form key="form" onSubmit={submit} noValidate className="grid gap-7 p-5 md:p-8 lg:grid-cols-[minmax(0,1fr)_minmax(0,1fr)] lg:gap-10" exit={{ opacity: 0 }} transition={{ duration: reduce ? 0 : 0.15 }}>
             <div className="min-w-0">
               <fieldset>
                 <legend className="text-[15px] font-bold">상담 방식</legend>
@@ -757,108 +537,48 @@ function Booking({ today, reduce, area, setArea }: { today: Date; reduce: boolea
                 </div>
               </fieldset>
 
+              <div className="mt-6">
+                <label htmlFor="fl-area" className="text-[15px] font-bold">
+                  상담 분야
+                </label>
+                <select id="fl-area" value={area} onChange={(e) => setArea(e.target.value as Area)} className={field} style={{ borderColor: C.line, outlineColor: C.accent }}>
+                  {AREA_LIST.map((a) => (
+                    <option key={a}>{a}</option>
+                  ))}
+                </select>
+              </div>
+
               <fieldset className="mt-6">
-                <legend className="text-[15px] font-bold">날짜</legend>
-                <div className="-mx-1 mt-2 flex gap-2 overflow-x-auto px-1 pb-1">
-                  {days.map((d, i) => {
-                    const on = i === dayIdx;
+                <legend className="text-[15px] font-bold">희망 시간대</legend>
+                <div className="mt-2 grid grid-cols-2 gap-2 sm:grid-cols-4">
+                  {TIMES.map((t) => {
+                    const on = t === when;
                     return (
                       <button
-                        key={d.toDateString()}
+                        key={t}
                         type="button"
                         aria-pressed={on}
-                        onClick={() => setDayIdx(i)}
-                        className={`flex w-[58px] flex-none flex-col items-center rounded-[6px] border py-2 ${focusRing}`}
+                        onClick={() => setWhen(t)}
+                        className={`rounded-[6px] border px-3 py-2.5 text-[15px] font-semibold ${focusRing}`}
                         style={{ borderColor: on ? C.accent : C.line, background: on ? C.accent : "transparent", color: on ? "#ffffff" : C.ink, outlineColor: C.accent }}
                       >
-                        <span className="text-[13px]">{DOW[d.getDay()]}</span>
-                        <span className="text-[19px] font-bold tabular-nums">{d.getDate()}</span>
+                        {t}
                       </button>
                     );
                   })}
                 </div>
-              </fieldset>
-
-              <fieldset className="mt-6" id="fl-slots">
-                <legend className="text-[15px] font-bold">시간</legend>
-                <ul className="mt-2 flex flex-wrap gap-x-4 gap-y-1 text-[13px]" style={{ color: C.muted }}>
-                  <li className="inline-flex items-center gap-1.5">
-                    <span className="inline-block h-3 w-3 rounded-[2px] border" style={{ borderColor: C.ink }} aria-hidden />
-                    예약 가능
-                  </li>
-                  <li className="inline-flex items-center gap-1.5">
-                    <span className="inline-block h-3 w-3 rounded-[2px]" style={{ background: C.booked }} aria-hidden />
-                    예약 있음
-                  </li>
-                  <li className="inline-flex items-center gap-1.5">
-                    <span className="inline-block h-3 w-3 rounded-[2px]" style={{ backgroundImage: `repeating-linear-gradient(135deg, ${C.line} 0 2px, transparent 2px 5px)` }} aria-hidden />
-                    비워 둠(앞뒤 방문 상담과 겹침)
-                  </li>
-                </ul>
-                <div className="mt-3 grid grid-cols-3 gap-2 sm:grid-cols-4 md:grid-cols-5">
-                  {slots.map((s) => {
-                    const st = slotState(s, booked, method);
-                    const on = picked === s;
-                    const blocked = st !== "open";
-                    return (
-                      <button
-                        key={s}
-                        type="button"
-                        disabled={blocked}
-                        aria-pressed={on}
-                        aria-label={`${hm(s)} ${st === "open" ? "예약 가능" : st === "booked" ? "예약 있음" : "비워 둠"}`}
-                        onClick={() => setSlot(s)}
-                        className={`relative flex flex-col items-center rounded-[6px] border py-2 tabular-nums transition-colors duration-150 disabled:cursor-not-allowed ${focusRing}`}
-                        style={{
-                          borderColor: on ? C.accent : blocked ? "transparent" : C.line,
-                          backgroundColor: on ? C.accent : st === "booked" ? C.booked : "transparent",
-                          backgroundImage: st === "gap" ? `repeating-linear-gradient(135deg, ${C.line} 0 2px, transparent 2px 6px)` : undefined,
-                          color: on ? "#ffffff" : blocked ? C.muted : C.ink,
-                          outlineColor: C.accent,
-                        }}
-                      >
-                        <span className={`text-[16px] font-bold ${blocked ? "line-through" : ""}`}>{hm(s)}</span>
-                        {blocked && <span className="text-[11px]">{st === "booked" ? "예약 있음" : "비워 둠"}</span>}
-                      </button>
-                    );
-                  })}
-                </div>
-                <p className="mt-3 text-[14px] leading-[1.6]" style={{ color: C.muted }}>
-                  {method === "visit" ? "방문 상담은 앞뒤 상담과 30분씩 띄워 잡아요. 오가는 길에 다른 분을 만나지 않아요." : `${m.label}는 상담 시간만 겹치지 않으면 돼요.`}
+                <p className="mt-2 text-[14px] leading-[1.6]" style={{ color: C.muted }}>
+                  평일 {HOURS[0][1]}, 토요일 {HOURS[1][1]}
                 </p>
               </fieldset>
             </div>
 
             <div className="grid min-w-0 content-start gap-4">
               <div>
-                <label htmlFor="fl-area" className="text-[15px] font-bold">
-                  상담 분야
-                </label>
-                <select
-                  id="fl-area"
-                  value={area}
-                  onChange={(e) => setArea(e.target.value as Area)}
-                  className={`mt-1.5 w-full rounded-[6px] border bg-transparent px-3 py-2.5 text-[16px] ${focusRing}`}
-                  style={{ borderColor: C.line, outlineColor: C.accent }}
-                >
-                  {AREA_LIST.map((a) => (
-                    <option key={a}>{a}</option>
-                  ))}
-                </select>
-              </div>
-              <div>
                 <label htmlFor="fl-name" className="text-[15px] font-bold">
                   이름
                 </label>
-                <input
-                  id="fl-name"
-                  value={name}
-                  onChange={(e) => setName(e.target.value)}
-                  autoComplete="name"
-                  placeholder="가명도 괜찮아요"
-                  className={`mt-1.5 w-full rounded-[6px] border bg-transparent px-3 py-2.5 text-[16px] ${focusRing}`}
-                  style={{ borderColor: C.line, outlineColor: C.accent }}
-                />
+                <input id="fl-name" value={name} onChange={(e) => setName(e.target.value)} autoComplete="name" placeholder="김하늘" className={field} style={{ borderColor: C.line, outlineColor: C.accent }} />
               </div>
               <div>
                 <label htmlFor="fl-phone" className="text-[15px] font-bold">
@@ -871,55 +591,28 @@ function Booking({ today, reduce, area, setArea }: { today: Date; reduce: boolea
                   inputMode="tel"
                   autoComplete="tel"
                   placeholder="010-0000-0000"
-                  className={`mt-1.5 w-full rounded-[6px] border bg-transparent px-3 py-2.5 text-[16px] tabular-nums ${focusRing}`}
+                  className={`${field} tabular-nums`}
                   style={{ borderColor: C.line, outlineColor: C.accent }}
                 />
               </div>
-              <fieldset>
-                <legend className="text-[15px] font-bold">연락 방법</legend>
-                <div className="mt-1.5 grid grid-cols-2 gap-2">
-                  {[
-                    [true, "전화로만", PhoneOff, "문자 받지 않기"],
-                    [false, "전화, 문자", MessageCircle, "문자도 괜찮아요"],
-                  ].map(([v, label, Icon, sub]) => {
-                    const on = callOnly === v;
-                    const I = Icon as typeof Phone;
-                    return (
-                      <button
-                        key={String(v)}
-                        type="button"
-                        aria-pressed={on}
-                        onClick={() => setCallOnly(v as boolean)}
-                        className={`flex items-start gap-2 rounded-[6px] border px-3 py-2.5 text-left ${focusRing}`}
-                        style={{ borderColor: on ? C.accent : C.line, background: on ? C.accentSoft : "transparent", outlineColor: C.accent }}
-                      >
-                        <I size={17} aria-hidden className="mt-[2px] flex-none" style={{ color: C.accent }} />
-                        <span>
-                          <span className="block text-[15px] font-bold">{label as string}</span>
-                          <span className="block text-[13px]" style={{ color: C.muted }}>
-                            {sub as string}
-                          </span>
-                        </span>
-                      </button>
-                    );
-                  })}
-                </div>
-              </fieldset>
+              <div>
+                <label htmlFor="fl-memo" className="text-[15px] font-bold">
+                  상담 내용 <span className="font-normal" style={{ color: C.muted }}>(선택)</span>
+                </label>
+                <textarea
+                  id="fl-memo"
+                  value={memo}
+                  onChange={(e) => setMemo(e.target.value.slice(0, 300))}
+                  rows={4}
+                  placeholder="예) 협의이혼을 생각 중인데 아이 양육권을 어떻게 정해야 할지 궁금합니다."
+                  className={`${field} resize-none`}
+                  style={{ borderColor: C.line, outlineColor: C.accent }}
+                />
+              </div>
               <label className="flex items-start gap-2 text-[14px] leading-[1.5]">
                 <input type="checkbox" checked={agree} onChange={(e) => setAgree(e.target.checked)} className={`mt-[3px] h-4 w-4 flex-none ${focusRing}`} style={{ accentColor: C.accent, outlineColor: C.accent }} />
                 <span>개인정보 수집, 이용 동의(이름, 연락처는 상담 일정 안내에만 쓰고 상담이 끝나면 지워요)</span>
               </label>
-
-              <div className="rounded-[6px] border p-3 text-[15px]" style={{ borderColor: C.line }}>
-                <p className="flex items-center justify-between gap-3">
-                  <span style={{ color: C.muted }}>선택한 시간</span>
-                  <span className="font-bold tabular-nums">{picked === null ? "아직 안 고름" : `${fmtKo(day)} ${hm(picked)}`}</span>
-                </p>
-                <p className="mt-1 flex items-center justify-between gap-3">
-                  <span style={{ color: C.muted }}>상담료</span>
-                  <span className="font-bold tabular-nums">{won(m.fee)}</span>
-                </p>
-              </div>
 
               <p aria-live="assertive" className="min-h-[1.5em] text-[15px] font-bold" style={{ color: C.error }}>
                 {err}
@@ -931,7 +624,7 @@ function Booking({ today, reduce, area, setArea }: { today: Date; reduce: boolea
                 style={{ background: C.accent, color: "#ffffff", outlineColor: C.accent }}
               >
                 <CalendarCheck size={19} aria-hidden />
-                상담 예약하기
+                상담신청
               </button>
             </div>
           </motion.form>
@@ -944,7 +637,7 @@ function Booking({ today, reduce, area, setArea }: { today: Date; reduce: boolea
 /* ---------- 4. 자주 묻는 질문 ---------- */
 
 const FAQ: [string, string][] = [
-  ["상담하면 상대방이 알게 되나요?", "변호사는 상담 내용을 지킬 의무가 있어요. 전화로만 연락받기를 고르시면 문자도 보내지 않아요."],
+  ["상담하면 상대방이 알게 되나요?", "변호사는 상담 내용을 지킬 의무가 있어요. 상담 사실도 본인 동의 없이 알리지 않아요."],
   ["상담만 받고 사건은 안 맡겨도 되나요?", "네. 상담료만 내시면 돼요. 사건을 맡기시면 상담료는 착수금에서 빼 드려요."],
   ["상대방이 이혼을 원하지 않으면요?", "협의이혼은 할 수 없고 재판이혼으로 가야 해요. 민법이 정한 이혼 사유가 있어야 해요."],
   ["소송 중에도 아이와 같이 살 수 있나요?", "사전처분을 신청해 소송이 끝날 때까지 임시 양육자를 정할 수 있어요."],
@@ -1011,7 +704,7 @@ export function FamilyLawDemo() {
 
   return (
     <div className="min-h-screen overflow-x-clip pb-24" style={{ background: C.bg, color: C.ink }}>
-      <Poster reduce={reduce} go={go} setArea={setArea} />
+      <Poster go={go} setArea={setArea} />
 
 
       {/* 약속 세 가지 */}
@@ -1019,8 +712,8 @@ export function FamilyLawDemo() {
         <ul className="grid gap-px overflow-hidden rounded-[8px] border sm:grid-cols-3" style={{ borderColor: C.line, background: C.line }}>
           {[
             [ShieldCheck, "변호사가 직접 상담", "처음부터 끝까지 같은 변호사가 맡아요."],
-            [DoorClosed, "따로 쓰는 출입구", "주차장 쪽 엘리베이터로 상담실에 바로 와요."],
-            [PhoneOff, "문자 없이 전화로만", "가족이 볼 수 있는 문자는 보내지 않아요."],
+            [DoorClosed, "상담 내용 비밀 보장", "상담 내용은 담당 변호사만 봐요."],
+            [Clock, "저녁, 토요일 상담", "평일 21시까지, 토요일은 15시까지 상담해요."],
           ].map(([Icon, t, d]) => {
             const I = Icon as typeof Phone;
             return (
@@ -1044,12 +737,12 @@ export function FamilyLawDemo() {
       </section>
 
       <section id="fl-support" aria-labelledby="fl-support-title" className="mx-auto mt-14 max-w-[1200px] scroll-mt-4 px-4 md:mt-20 md:px-6">
-        <SectionTitle id="fl-support-title" title="양육비 계산" />
-        <ChildSupport reduce={reduce} />
+        <SectionTitle id="fl-support-title" title="양육비 안내" />
+        <SupportInfo onBook={() => go("fl-booking")} />
       </section>
 
       <section id="fl-booking" aria-labelledby="fl-booking-title" className="mx-auto mt-14 max-w-[1200px] scroll-mt-4 px-4 md:mt-20 md:px-6">
-        <SectionTitle id="fl-booking-title" title="비공개 상담 예약" />
+        <SectionTitle id="fl-booking-title" title="상담신청" />
         <Booking today={today} reduce={reduce} area={area} setArea={setArea} />
       </section>
 
@@ -1174,13 +867,10 @@ function SectionTitle({ id, title }: { id: string; title: string }) {
 function SampleLogo({ light, size = 20 }: { light?: boolean; size?: number }) {
   return (
     <span className="inline-flex items-center gap-2" style={{ color: light ? "#fff" : "#111" }}>
-      {/* eslint-disable-next-line @next/next/no-img-element -- 메인 사이트와 같은 곰 로고 */}
-      <img src="/images/logo-bear.png" alt="" aria-hidden width={28} height={28} className="h-7 w-7 shrink-0" />
       <span className="flex items-baseline gap-1 whitespace-nowrap">
         <span className="font-bold tracking-[-0.03em]" style={{ fontSize: size }}>
-          곰파트너
+          가사 법률사무소
         </span>
-        <span className="text-[12px] font-semibold opacity-75">카탈로그</span>
       </span>
     </span>
   );

@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useMemo, useRef, useState, type FormEvent, type ReactNode } from "react";
+import { useEffect, useMemo, useState, type FormEvent, type ReactNode } from "react";
 import { AnimatePresence, motion } from "framer-motion";
 import {
   BookOpen,
@@ -11,7 +11,6 @@ import {
   MapPin,
   Menu,
   MessageCircle,
-  MessagesSquare,
   Moon,
   Phone,
   RotateCcw,
@@ -36,19 +35,18 @@ import { DemoMakerInfo } from "@/components/demos/DemoMakerInfo";
    교습비는 교육지원청에 신고한 월 교습비로 게시하고 환불은 학원법 시행령 기준을 따른다고 적는 게 보통이다.
 
    상호작용(모두 브라우저 안에서만 돈다. 실제로 보내지 않는다)
-   1. 레벨테스트 5문항: 대화창처럼 문제 카드가 나오고 고른 답이 오른쪽 카드로 붙는다. 끝나면 레벨과 맞는 반.
-   2. 시간표: 새벽반, 저녁반, 주말반 탭과 레벨 칩. 반을 고르면 수강료와 체험 신청에 그대로 이어진다.
-   3. 월 수강료: 주 횟수별 월 교습비 표. 고른 반의 줄이 표시되고 개월 수를 바꾸면 합계가 나온다.
+   1. 레벨테스트 예약: 이름, 휴대폰, 희망 날짜와 시간, 지금 실력. 접수 번호와 회신 예정일. 옆에는 레벨 단계 기준표.
+   2. 시간표: 새벽반, 저녁반, 주말반 탭과 레벨 칩. 반을 고르면 체험 신청에 그대로 이어진다.
+   3. 월 수강료: 주 횟수별 월 교습비 게시표.
    4. 무료 체험 신청: 이름, 휴대폰, 체험 반, 그 반이 열리는 가까운 날짜 3개 중 하나. 접수 번호와 회신 예정일.
 
-   첫 화면(et-poster): 상단 메뉴, 역 출구와 다음 개강일 한 줄, 문장 "출근 전 50분, 새벽 회화반"과 시간대 칩(새벽반, 저녁반, 주말반).
-   그 아래 강사 4명(원어민 2, 한국인 2) 얼굴 카드에 맡은 반이 줄로 붙고, 고른 시간대가 아닌 반은 흐려지며 그 시간대 반이 없는 강사 카드는 통째로 흐려진다.
-   반을 누르면 아래 시간표가 그 반으로 열린다. 제목 오른쪽에 레벨테스트 예약, 무료 체험 버튼. 휴대폰에서는 카드가 옆으로 넘어간다(한 장 85% 폭).
-   모션은 강사 사진이 1.6초 동안 1.06배에서 제자리로 다가오는 것과 흐려짐 전환뿐. 동작 줄이기면 없음. */
+   첫 화면(et-poster): 상단 메뉴, 역 출구와 다음 개강일 한 줄, 문장 "출근 전 50분, 새벽 회화반", 레벨테스트 예약과 무료 체험 버튼,
+   시간대 세 줄 안내, 강사 4명(원어민 2, 한국인 2) 소개 카드와 맡은 반. 휴대폰에서는 카드가 옆으로 넘어간다(한 장 85% 폭).
+   모션은 강사 사진이 1.6초 동안 1.06배에서 제자리로 다가오는 것뿐. 동작 줄이기면 없음. */
 
 const TEL = "02-000-0000";
 const ADDRESS = "서울 ㅇㅇ구 ㅇㅇ로 00, 5층";
-const KAKAO = "카카오톡 채널 곰파트너";
+const KAKAO = "카카오톡 채널 영어회화 학원";
 const IMG = "/images/demo-english-talk";
 
 const C = {
@@ -66,9 +64,8 @@ const C = {
 };
 
 /* 모션 상수. 시간은 ms, 이징은 cubic-bezier */
-/** 화면 안 전환(탭, 결과, 숫자) */
+/** 화면 안 전환(탭, 접수 완료) */
 const EASE = [0.22, 1, 0.36, 1] as const;
-const DUR = 0.32;
 
 const focusRing = "focus-visible:outline focus-visible:outline-[3px] focus-visible:outline-offset-2";
 const won = (n: number) => `${n.toLocaleString("ko-KR")}원`;
@@ -84,32 +81,6 @@ const LEVELS: { key: Level; name: string; ko: string; can: string }[] = [
   { key: "upper", name: "Upper", ko: "중상급", can: "토론, 발표, 숫자 설명과 협상 표현" },
 ];
 const levelOf = (k: Level) => LEVELS.find((l) => l.key === k) ?? LEVELS[0];
-const levelByScore = (s: number): Level => (s <= 1 ? "starter" : s <= 3 ? "basic" : s === 4 ? "inter" : "upper");
-
-interface Question {
-  ask: string;
-  hint: string;
-  choices: string[];
-  answer: number;
-}
-const QUESTIONS: Question[] = [
-  { ask: "A: How's it going?\nB: ____", hint: "B의 대답으로 알맞은 것", choices: ["It goes by bus.", "Pretty good, thanks.", "Yes, I'm going."], answer: 1 },
-  { ask: "I ____ to work by subway every day.", hint: "빈칸에 맞는 말", choices: ["go", "goes", "going"], answer: 0 },
-  {
-    ask: "회의가 3시로 미뤄졌어요.",
-    hint: "영어로 자연스러운 것",
-    choices: ["The meeting is back at 3 behind.", "The meeting pushed 3 o'clock.", "The meeting got pushed back to 3."],
-    answer: 2,
-  },
-  { ask: "If I ____ more time, I'd join the evening class.", hint: "빈칸에 맞는 말", choices: ["have", "had", "will have"], answer: 1 },
-  {
-    ask: "Could you walk me through the numbers?",
-    hint: "이 말의 뜻",
-    choices: ["숫자를 지워 주시겠어요?", "숫자를 하나씩 설명해 주시겠어요?", "숫자를 걸어서 가져다주시겠어요?"],
-    answer: 1,
-  },
-];
-
 /* ---------- 시간표 ---------- */
 
 type Slot = "dawn" | "evening" | "weekend";
@@ -170,19 +141,15 @@ const classLabel = (c: Klass) => `${slotOf(c.slot).label} ${levelOf(c.level).nam
 interface Fee {
   key: string;
   label: string;
-  /** 반의 수업 요일 수. 주말반은 0으로 따로 구분 */
-  per: number;
-  weekend?: boolean;
   fee: number;
   hours: string;
 }
 const FEES: Fee[] = [
-  { key: "f5", label: "주 5회 50분", per: 5, fee: 290000, hours: "월 약 20회" },
-  { key: "f3", label: "주 3회 50분", per: 3, fee: 210000, hours: "월 약 12회" },
-  { key: "f2", label: "주 2회 50분", per: 2, fee: 160000, hours: "월 약 8회" },
-  { key: "fw", label: "주말 주 1회 100분", per: 1, weekend: true, fee: 150000, hours: "월 약 4회" },
+  { key: "f5", label: "주 5회 50분", fee: 290000, hours: "월 약 20회" },
+  { key: "f3", label: "주 3회 50분", fee: 210000, hours: "월 약 12회" },
+  { key: "f2", label: "주 2회 50분", fee: 160000, hours: "월 약 8회" },
+  { key: "fw", label: "주말 주 1회 100분", fee: 150000, hours: "월 약 4회" },
 ];
-const feeOf = (c: Klass) => FEES.find((f) => (c.slot === "weekend" ? f.weekend : !f.weekend && f.per === c.days.length)) ?? FEES[1];
 const BOOK = "교재비 별도(권당 18,000~22,000원)";
 
 /* ---------- 체험 신청 ---------- */
@@ -217,7 +184,6 @@ export function EnglishTalkDemo() {
   const [selected, setSelected] = useState("d-ba");
   const [slot, setSlot] = useState<Slot>("dawn");
   const [levelFilter, setLevelFilter] = useState<Level | "all">("all");
-  const [result, setResult] = useState<Level | null>(null);
 
   useEffect(() => {
     const f = () => window.scrollTo({ top: 0 });
@@ -232,43 +198,24 @@ export function EnglishTalkDemo() {
     setSlot(classOf(id).slot);
   };
 
-  const showLevel = (lv: Level) => {
-    setResult(lv);
-    setLevelFilter(lv);
-    const first = CLASSES.find((c) => c.level === lv && c.slot === slot && c.seats > 0) ?? CLASSES.find((c) => c.level === lv && c.seats > 0);
-    if (first) pick(first.id);
-    go("et-schedule");
-  };
-
   return (
     <div className="min-h-screen overflow-x-clip" style={{ background: C.bg, color: C.ink }}>
-      <Poster
-        reduce={reduce}
-        today={today}
-        slot={slot}
-        setSlot={setSlot}
-        go={go}
-        onPick={(id) => {
-          pick(id);
-          go("et-schedule");
-        }}
-      />
+      <Poster reduce={reduce} today={today} go={go} />
 
       <main className="mx-auto max-w-[1200px] px-4 md:px-6">
-        <LevelTest reduce={reduce} result={result} onDone={setResult} onShow={showLevel} />
+        <LevelTest reduce={reduce} today={today} />
         <Schedule
           reduce={reduce}
           slot={slot}
           setSlot={setSlot}
           levelFilter={levelFilter}
           setLevelFilter={setLevelFilter}
-          result={result}
           selected={selected}
           onPick={pick}
           onTrial={() => go("et-trial")}
         />
-        <Fees reduce={reduce} selected={classOf(selected)} />
-        <Trial reduce={reduce} today={today} selected={classOf(selected)} onPick={pick} result={result} />
+        <Fees />
+        <Trial reduce={reduce} today={today} selected={classOf(selected)} onPick={pick} />
         <Location />
       </main>
 
@@ -298,19 +245,16 @@ function SampleLogo({ light, size = 20 }: { light?: boolean; size?: number }) {
   const mark = size + 8;
   return (
     <span className="inline-flex items-center gap-2 leading-none" style={{ color: light ? "#fff" : "#111" }}>
-      {/* eslint-disable-next-line @next/next/no-img-element -- 메인 사이트와 같은 곰 로고 */}
-      <img src="/images/logo-bear.png" alt="" aria-hidden width={mark} height={mark} className="shrink-0" style={{ width: mark, height: mark }} />
       <span className="flex items-baseline gap-1 whitespace-nowrap">
         <span className="font-bold tracking-[-0.03em]" style={{ fontSize: size }}>
-          곰파트너
+          영어회화 학원
         </span>
-        <span className="text-[12px] font-semibold opacity-75">카탈로그</span>
       </span>
     </span>
   );
 }
 
-/* ---------- 첫 화면: 강사 얼굴 카드와 시간대 칩 ---------- */
+/* ---------- 첫 화면: 강사 소개 카드 ---------- */
 
 const NAV: [string, string][] = [
   ["et-schedule", "회화 과정"],
@@ -327,21 +271,7 @@ function nextOpening(today: Date) {
   return d;
 }
 
-function Poster({
-  reduce,
-  today,
-  slot,
-  setSlot,
-  go,
-  onPick,
-}: {
-  reduce: boolean;
-  today: Date;
-  slot: Slot;
-  setSlot: (s: Slot) => void;
-  go: (id: string) => void;
-  onPick: (id: string) => void;
-}) {
+function Poster({ reduce, today, go }: { reduce: boolean; today: Date; go: (id: string) => void }) {
   const [menu, setMenu] = useState(false);
   const navTo = (id: string) => {
     setMenu(false);
@@ -464,44 +394,25 @@ function Poster({
           </div>
         </div>
 
-        {/* 시간대 칩 */}
-        <div className="-mx-4 mt-5 w-[calc(100%+32px)] overflow-x-auto px-4 md:mx-0 md:w-auto md:px-0" role="group" aria-label="시간대">
-          <div className="flex w-max gap-2">
-            {SLOTS.map((s) => {
-              const on = s.key === slot;
-              return (
-                <button
-                  key={s.key}
-                  type="button"
-                  aria-pressed={on}
-                  onClick={() => setSlot(s.key)}
-                  className={`inline-flex min-h-[48px] items-center gap-2 rounded-full border px-4 text-[15px] font-semibold ${focusRing}`}
-                  style={{ borderColor: on ? C.ink : C.line, background: on ? C.ink : "#fff", color: on ? "#fff" : C.ink, outlineColor: C.accent }}
-                >
-                  <s.Icon size={17} aria-hidden />
-                  {s.label}
-                  <span className="text-[13px] font-medium tabular-nums" style={{ color: on ? "rgba(255,255,255,0.8)" : C.muted }}>
-                    {s.time}
-                  </span>
-                </button>
-              );
-            })}
-          </div>
-        </div>
+        {/* 시간대 안내 */}
+        <ul className="mt-5 flex flex-wrap gap-x-6 gap-y-2 text-[15px]" aria-label="운영 시간대">
+          {SLOTS.map((s) => (
+            <li key={s.key} className="inline-flex items-center gap-2">
+              <s.Icon size={17} aria-hidden style={{ color: C.accent }} />
+              <span className="font-semibold">{s.label}</span>
+              <span className="tabular-nums" style={{ color: C.muted }}>
+                {s.time}
+              </span>
+            </li>
+          ))}
+        </ul>
 
         {/* 강사 카드 4장. 휴대폰은 옆으로 넘긴다 */}
         <div className="-mx-4 mt-5 flex snap-x snap-mandatory gap-4 overflow-x-auto px-4 pb-2 md:mx-0 md:grid md:grid-cols-[repeat(2,minmax(0,1fr))] md:overflow-visible md:px-0 md:pb-0 lg:grid-cols-[repeat(4,minmax(0,1fr))]">
           {TEACHER_LIST.map((t, i) => {
-            // 고른 시간대 반을 위로, 그 시간대 반이 없는 강사 카드는 통째로 흐리게
             const mine = CLASSES.filter((c) => c.teacher === t.id);
-            const list = [...mine.filter((c) => c.slot === slot), ...mine.filter((c) => c.slot !== slot)];
-            const active = mine.some((c) => c.slot === slot);
             return (
-              <article
-                key={t.id}
-                className="w-[85%] flex-none snap-start overflow-hidden rounded-[8px] border md:w-auto"
-                style={{ borderColor: C.line, opacity: active ? 1 : 0.45, transition: reduce ? undefined : "opacity 200ms" }}
-              >
+              <article key={t.id} className="w-[85%] flex-none snap-start overflow-hidden rounded-[8px] border md:w-auto" style={{ borderColor: C.line }}>
                 <div className="relative aspect-[4/3] overflow-hidden md:aspect-[16/10] lg:aspect-[5/4]" style={{ background: C.alt }}>
                   {/* eslint-disable-next-line @next/next/no-img-element -- 정적 export 라 next/image 최적화를 쓰지 않는다 */}
                   <img
@@ -526,36 +437,14 @@ function Poster({
                     {t.note}
                   </p>
                   <ul className="mt-3 divide-y border-t" style={{ borderColor: C.line }}>
-                    {list.map((c) => {
-                      const match = c.slot === slot;
-                      const full = c.seats === 0;
-                      return (
-                        <li key={c.id} style={{ borderColor: C.line, opacity: match || !active ? 1 : 0.38, transition: reduce ? undefined : "opacity 200ms" }}>
-                          <button
-                            type="button"
-                            onClick={() => onPick(c.id)}
-                            disabled={full}
-                            className={`grid min-h-[48px] w-full grid-cols-[minmax(0,1fr)_auto] items-center gap-3 py-2 text-left disabled:cursor-not-allowed ${focusRing}`}
-                            style={{ outlineColor: C.accent }}
-                          >
-                            <span className="min-w-0">
-                              <span className="block text-[15px] font-semibold">
-                                {slotOf(c.slot).label} {levelOf(c.level).name}
-                              </span>
-                              <span className="block text-[14px] tabular-nums" style={{ color: C.muted }}>
-                                {daysText(c.days)} {c.time}
-                              </span>
-                            </span>
-                            <span
-                              className="whitespace-nowrap rounded-[4px] px-2 py-1 text-[13px] font-bold tabular-nums"
-                              style={full ? { background: C.alt, color: C.muted } : { background: C.tint, color: C.accentDeep }}
-                            >
-                              {full ? "마감" : `남은 자리 ${c.seats}`}
-                            </span>
-                          </button>
-                        </li>
-                      );
-                    })}
+                    {mine.map((c) => (
+                      <li key={c.id} className="py-2" style={{ borderColor: C.line }}>
+                        <span className="block text-[15px] font-semibold">{classLabel(c)}</span>
+                        <span className="block text-[14px] tabular-nums" style={{ color: C.muted }}>
+                          {daysText(c.days)} {c.time}
+                        </span>
+                      </li>
+                    ))}
                   </ul>
                 </div>
               </article>
@@ -581,178 +470,210 @@ function SectionHead({ id, title, children }: { id: string; title: string; child
   );
 }
 
-/* ---------- 1. 레벨테스트 ---------- */
+/* ---------- 1. 레벨테스트 신청 ---------- */
 
-function LevelTest({
-  reduce,
-  result,
-  onDone,
-  onShow,
-}: {
-  reduce: boolean;
-  result: Level | null;
-  onDone: (l: Level) => void;
-  onShow: (l: Level) => void;
-}) {
-  const [answers, setAnswers] = useState<number[]>([]);
-  const idx = answers.length;
-  const done = idx >= QUESTIONS.length;
-  const score = answers.filter((a, i) => a === QUESTIONS[i].answer).length;
-  const lv = levelOf(levelByScore(score));
-  const logRef = useRef<HTMLDivElement>(null);
+const TEST_TIMES = ["07:00", "12:30", "18:30", "20:00"];
 
-  const choose = (c: number) => {
-    const next = [...answers, c];
-    setAnswers(next);
-    if (next.length === QUESTIONS.length) onDone(levelByScore(next.filter((a, i) => a === QUESTIONS[i].answer).length));
+interface TestReceipt {
+  no: string;
+  name: string;
+  phone: string;
+  date: Date;
+  time: string;
+  level: string;
+  reply: Date;
+}
+
+function LevelTest({ reduce, today }: { reduce: boolean; today: Date }) {
+  const [name, setName] = useState("");
+  const [phone, setPhone] = useState("");
+  const [dateIdx, setDateIdx] = useState(0);
+  const [time, setTime] = useState(TEST_TIMES[2]);
+  const [level, setLevel] = useState("모름");
+  const [agree, setAgree] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+  const [receipt, setReceipt] = useState<TestReceipt | null>(null);
+
+  const dates = useMemo(() => nextClassDates(today, [1, 2, 3, 4, 5, 6], 6), [today]);
+
+  const submit = (e: FormEvent) => {
+    e.preventDefault();
+    const digits = phone.replace(/\D/g, "");
+    if (name.trim().length < 2) return setError("이름을 2글자 이상 적어 주세요.");
+    if (!/^01\d{8,9}$/.test(digits)) return setError("휴대폰 번호를 확인해 주세요.");
+    if (!agree) return setError("개인정보 수집에 동의해 주세요.");
+    setError(null);
+    const n = String(Math.floor(Math.random() * 900) + 100);
+    setReceipt({
+      no: `LT-${fmtMD(today).replace(".", "")}-${n}`,
+      name: name.trim(),
+      phone: digits,
+      date: dates[dateIdx],
+      time,
+      level,
+      reply: nextWeekday(today),
+    });
   };
 
-  useEffect(() => {
-    const el = logRef.current;
-    if (el) el.scrollTo({ top: el.scrollHeight, behavior: reduce ? "auto" : "smooth" });
-  }, [answers.length, reduce]);
+  const reset = () => {
+    setReceipt(null);
+    setName("");
+    setPhone("");
+    setAgree(false);
+    setDateIdx(0);
+    setLevel("모름");
+  };
 
-  const appear = () =>
-    reduce
-      ? { initial: false as const }
-      : {
-          initial: { opacity: 0, y: 6 },
-          animate: { opacity: 1, y: 0 },
-          transition: { duration: 0.24, ease: EASE },
-        };
+  const field = `mt-1.5 w-full rounded-[8px] border px-3.5 py-3 text-[16px] ${focusRing}`;
+  const fieldStyle = { borderColor: C.line, background: "#fff", outlineColor: C.accent };
 
   return (
     <section id="et-test" aria-labelledby="et-test-title" className="scroll-mt-4 pt-14">
-      <SectionHead id="et-test" title="레벨테스트">
+      <SectionHead id="et-test" title="레벨테스트 예약">
         <p className="text-[15px]" style={{ color: C.muted }}>
-          5문항, 1분
+          방문 20분, 무료
         </p>
       </SectionHead>
 
       <div className="mt-5 grid gap-5 md:grid-cols-[1.25fr_1fr]">
         <div className="rounded-[8px] border" style={{ borderColor: C.line, background: "#fff" }}>
-          <div className="flex items-center justify-between border-b px-4 py-3 text-[15px]" style={{ borderColor: C.line }}>
-            <span className="inline-flex items-center gap-2 font-semibold">
-              <MessagesSquare size={18} aria-hidden style={{ color: C.accent }} />
-              테스트 담당 강사
-            </span>
-            <span aria-live="polite" className="tabular-nums" style={{ color: C.muted }}>
-              {done ? "끝" : `${idx + 1} / ${QUESTIONS.length}`}
-            </span>
-          </div>
-          <div className="h-1 w-full" style={{ background: C.line }} aria-hidden>
-            <motion.div
-              className="h-full origin-left"
-              style={{ background: C.accent }}
-              initial={false}
-              animate={{ scaleX: idx / QUESTIONS.length }}
-              transition={{ duration: reduce ? 0 : DUR, ease: EASE }}
-            />
-          </div>
-
-          <div ref={logRef} className="flex max-h-[440px] min-h-[300px] flex-col gap-3 overflow-y-auto px-4 py-5" style={{ background: C.alt }} role="log" aria-label="레벨테스트 대화">
-            {QUESTIONS.slice(0, Math.min(idx + 1, QUESTIONS.length)).map((q, i) => (
-              <div key={i} className="flex flex-col gap-3">
-                <motion.div {...appear()} className="max-w-[88%] self-start rounded-[8px] border px-4 py-3" style={{ background: "#fff", borderColor: C.line }}>
-                  <p className="text-[13px] font-semibold" style={{ color: C.muted }}>
-                    문제 {i + 1}, {q.hint}
-                  </p>
-                  <p className="mt-1 whitespace-pre-line text-[17px] leading-[1.5]">{q.ask}</p>
-                </motion.div>
-                {answers[i] !== undefined && (
-                  <motion.p
-                    {...appear()}
-                    className="max-w-[80%] self-end rounded-[8px] px-4 py-3 text-[16px]"
-                    style={{ background: C.ink, color: "#fff" }}
-                  >
-                    {q.choices[answers[i]]}
-                  </motion.p>
-                )}
-              </div>
-            ))}
-            {done && (
-              <motion.div {...appear()} className="max-w-[92%] self-start rounded-[8px] border px-4 py-4" style={{ background: "#fff", borderColor: C.accent }}>
-                <p className="text-[15px]" style={{ color: C.body }}>
-                  5문항 중 {score}개 맞혔어요
+          <AnimatePresence mode="wait" initial={false}>
+            {receipt ? (
+              <motion.div
+                key="done"
+                className="px-5 py-6 md:px-7"
+                initial={reduce ? false : { opacity: 0, y: 8 }}
+                animate={{ opacity: 1, y: 0 }}
+                exit={reduce ? { opacity: 0, transition: { duration: 0 } } : { opacity: 0 }}
+                transition={{ duration: reduce ? 0 : 0.3, ease: EASE }}
+                role="status"
+              >
+                <p className="inline-flex items-center gap-2 text-[15px] font-semibold" style={{ color: C.accent }}>
+                  <Check size={18} aria-hidden />
+                  레벨테스트 예약이 접수됐어요
                 </p>
-                <p className="mt-1 text-[24px] font-bold leading-tight tracking-[-0.02em]" style={{ color: C.accent }}>
-                  {lv.name} {lv.ko}
+                <p className="mt-2 text-[26px] font-bold leading-tight tracking-[-0.02em]">
+                  {fmtKo(receipt.date)} {receipt.time}
                 </p>
-                <p className="mt-1 text-[15px]" style={{ color: C.body }}>
-                  {lv.can}부터 시작해요.
-                </p>
-              </motion.div>
-            )}
-          </div>
-
-          <div className="border-t px-4 py-4" style={{ borderColor: C.line }}>
-            {!done ? (
-              <div className="grid gap-2" role="group" aria-label={`문제 ${idx + 1} 보기`}>
-                {QUESTIONS[idx].choices.map((c, k) => (
-                  <button
-                    key={`${idx}-${k}`}
-                    type="button"
-                    onClick={() => choose(k)}
-                    className={`rounded-[6px] border px-4 py-3 text-left text-[16px] hover:border-[#9a9a9a] ${focusRing}`}
-                    style={{ borderColor: C.line, background: "#fff", outlineColor: C.accent }}
-                  >
-                    {c}
-                  </button>
-                ))}
-              </div>
-            ) : (
-              <div className="flex flex-wrap gap-2">
+                <dl className="mt-5 grid gap-x-6 gap-y-2.5 text-[16px] sm:grid-cols-[120px_1fr]">
+                  <dt style={{ color: C.muted }}>접수 번호</dt>
+                  <dd className="font-semibold tabular-nums">{receipt.no}</dd>
+                  <dt style={{ color: C.muted }}>신청자</dt>
+                  <dd>
+                    {maskName(receipt.name)}, {maskPhone(receipt.phone)}
+                  </dd>
+                  <dt style={{ color: C.muted }}>지금 실력</dt>
+                  <dd>{receipt.level}</dd>
+                  <dt style={{ color: C.muted }}>회신 예정</dt>
+                  <dd>{fmtKo(receipt.reply)} 오후 6시까지 문자로 확정 연락</dd>
+                  <dt style={{ color: C.muted }}>담당 창구</dt>
+                  <dd>
+                    {KAKAO}, 전화 {TEL}
+                  </dd>
+                </dl>
                 <button
                   type="button"
-                  onClick={() => onShow(lv.key)}
-                  data-gtm-cta="english-talk_test_result"
-                  className={`inline-flex items-center gap-2 rounded-[6px] px-5 py-3 text-[16px] font-semibold ${focusRing}`}
-                  style={{ background: C.accent, color: "#fff", outlineColor: C.ink }}
-                >
-                  <CalendarCheck size={18} aria-hidden />
-                  {lv.name} 반 시간표 보기
-                </button>
-                <button
-                  type="button"
-                  onClick={() => setAnswers([])}
-                  className={`inline-flex items-center gap-2 rounded-[6px] border px-5 py-3 text-[16px] font-semibold ${focusRing}`}
+                  onClick={reset}
+                  className={`mt-6 inline-flex items-center gap-2 rounded-[6px] border px-5 py-2.5 text-[15px] font-semibold ${focusRing}`}
                   style={{ borderColor: "#cfcfcf", outlineColor: C.accent }}
                 >
-                  <RotateCcw size={17} aria-hidden />
-                  다시 풀기
+                  <RotateCcw size={16} aria-hidden />
+                  새로 신청
                 </button>
-              </div>
+              </motion.div>
+            ) : (
+              <motion.form
+                key="form"
+                onSubmit={submit}
+                noValidate
+                className="grid gap-5 px-5 py-6 sm:grid-cols-2 md:px-7"
+                initial={false}
+                exit={reduce ? { opacity: 0, transition: { duration: 0 } } : { opacity: 0, transition: { duration: 0.16 } }}
+              >
+                <label className="block text-[15px] font-semibold">
+                  이름
+                  <input value={name} onChange={(e) => setName(e.target.value)} autoComplete="name" className={field} style={fieldStyle} />
+                </label>
+                <label className="block text-[15px] font-semibold">
+                  휴대폰
+                  <input value={phone} onChange={(e) => setPhone(e.target.value)} inputMode="tel" autoComplete="tel" placeholder="010-0000-0000" className={field} style={fieldStyle} />
+                </label>
+                <label className="block text-[15px] font-semibold">
+                  희망 날짜
+                  <select value={dateIdx} onChange={(e) => setDateIdx(Number(e.target.value))} className={field} style={fieldStyle}>
+                    {dates.map((d, k) => (
+                      <option key={d.getTime()} value={k}>
+                        {fmtKo(d)}
+                      </option>
+                    ))}
+                  </select>
+                </label>
+                <label className="block text-[15px] font-semibold">
+                  희망 시간
+                  <select value={time} onChange={(e) => setTime(e.target.value)} className={field} style={fieldStyle}>
+                    {TEST_TIMES.map((t) => (
+                      <option key={t} value={t}>
+                        {t}
+                      </option>
+                    ))}
+                  </select>
+                </label>
+                <label className="block text-[15px] font-semibold sm:col-span-2">
+                  지금 실력
+                  <select value={level} onChange={(e) => setLevel(e.target.value)} className={field} style={fieldStyle}>
+                    <option value="모름">잘 모르겠어요</option>
+                    {LEVELS.map((l) => (
+                      <option key={l.key} value={`${l.name} ${l.ko}`}>
+                        {l.name} {l.ko}, {l.can}
+                      </option>
+                    ))}
+                  </select>
+                </label>
+                <div className="sm:col-span-2">
+                  <label className="inline-flex cursor-pointer items-start gap-2.5 text-[15px]">
+                    <input type="checkbox" checked={agree} onChange={(e) => setAgree(e.target.checked)} className="mt-1 h-[18px] w-[18px] accent-[#9b2c2c]" />
+                    <span>
+                      개인정보 수집, 이용 동의(필수)
+                      <span className="block text-[14px]" style={{ color: C.muted }}>
+                        이름, 휴대폰 번호. 예약 연락에만 쓰고 3개월 뒤 지워요.
+                      </span>
+                    </span>
+                  </label>
+                </div>
+                <div className="flex flex-wrap items-center gap-4 sm:col-span-2">
+                  <button
+                    type="submit"
+                    data-gtm-cta="english-talk_test_submit"
+                    className={`inline-flex items-center gap-2 rounded-[6px] px-6 py-3.5 text-[17px] font-semibold ${focusRing}`}
+                    style={{ background: C.accent, color: "#fff", outlineColor: C.ink }}
+                  >
+                    <BookOpen size={19} aria-hidden />
+                    레벨테스트 예약하기
+                  </button>
+                  <p aria-live="polite" className="text-[15px] font-bold" style={{ color: C.error }}>
+                    {error}
+                  </p>
+                </div>
+              </motion.form>
             )}
-          </div>
+          </AnimatePresence>
         </div>
 
         {/* 레벨 단계 */}
         <ol className="grid content-start gap-2" aria-label="레벨 단계">
-          {LEVELS.map((l) => {
-            const on = result === l.key;
-            return (
-              <li
-                key={l.key}
-                className="flex items-start gap-3 rounded-[8px] border px-4 py-3"
-                style={{ borderColor: on ? C.accent : C.line, background: on ? C.tint : "#fff" }}
-              >
-                <span className="mt-0.5 w-[116px] shrink-0 whitespace-nowrap text-[15px] font-bold md:w-[128px] md:text-[17px]">{l.name}</span>
-                <span className="text-[15px] leading-[1.55]" style={{ color: C.body }}>
-                  <span className="font-semibold" style={{ color: C.ink }}>
-                    {l.ko}
-                  </span>{" "}
-                  {l.can}
-                  {on && (
-                    <span className="ml-2 inline-flex items-center gap-1 text-[14px] font-semibold" style={{ color: C.accent }}>
-                      <Check size={14} aria-hidden />내 레벨
-                    </span>
-                  )}
-                </span>
-              </li>
-            );
-          })}
+          {LEVELS.map((l) => (
+            <li key={l.key} className="flex items-start gap-3 rounded-[8px] border px-4 py-3" style={{ borderColor: C.line, background: "#fff" }}>
+              <span className="mt-0.5 w-[116px] shrink-0 whitespace-nowrap text-[15px] font-bold md:w-[128px] md:text-[17px]">{l.name}</span>
+              <span className="text-[15px] leading-[1.55]" style={{ color: C.body }}>
+                <span className="font-semibold" style={{ color: C.ink }}>
+                  {l.ko}
+                </span>{" "}
+                {l.can}
+              </span>
+            </li>
+          ))}
           <li className="px-1 pt-2 text-[15px] leading-[1.6]" style={{ color: C.muted }}>
-            처음 오시는 날 강사와 5분 말하기로 한 번 더 맞춰요.
+            강사와 1:1 말하기 10분, 짧은 듣기 문항으로 레벨을 정하고 맞는 반을 안내해 드려요.
           </li>
         </ol>
       </div>
@@ -769,7 +690,6 @@ function Schedule({
   setSlot,
   levelFilter,
   setLevelFilter,
-  result,
   selected,
   onPick,
   onTrial,
@@ -779,7 +699,6 @@ function Schedule({
   setSlot: (s: Slot) => void;
   levelFilter: Level | "all";
   setLevelFilter: (l: Level | "all") => void;
-  result: Level | null;
   selected: string;
   onPick: (id: string) => void;
   onTrial: () => void;
@@ -857,16 +776,7 @@ function Schedule({
                   outlineColor: C.accent,
                 }}
               >
-                <span className="flex w-full items-center justify-between gap-2">
-                  <span className="text-[19px] font-bold">
-                    {levelOf(c.level).name}
-                  </span>
-                  {result === c.level && (
-                    <span className="rounded-[4px] px-1.5 py-0.5 text-[13px] font-semibold" style={{ background: C.accent, color: "#fff" }}>
-                      추천
-                    </span>
-                  )}
-                </span>
+                <span className="text-[19px] font-bold">{levelOf(c.level).name}</span>
                 <span className="mt-2 inline-flex items-center gap-1.5 text-[16px]">
                   <Clock size={15} aria-hidden style={{ color: C.accent }} />
                   <span className="tabular-nums">{c.time}</span>
@@ -933,115 +843,47 @@ function Schedule({
 
 /* ---------- 3. 월 수강료 ---------- */
 
-function Fees({ reduce, selected }: { reduce: boolean; selected: Klass }) {
-  const [months, setMonths] = useState(1);
-  const fee = feeOf(selected);
-  const total = fee.fee * months;
-
+function Fees() {
   return (
     <section id="et-fee" aria-labelledby="et-fee-title" className="scroll-mt-4 pt-16">
       <SectionHead id="et-fee" title="월 수강료" />
 
-      <div className="mt-5 grid gap-5 md:grid-cols-[1.3fr_1fr]">
-        <div className="overflow-x-auto rounded-[8px] border" style={{ borderColor: C.line, background: "#fff" }}>
-          <table className="w-full min-w-[340px] text-left text-[16px]">
-            <caption className="px-4 pt-3 text-left text-[14px]" style={{ color: C.muted }}>
-              ㅇㅇ교육지원청 신고 월 교습비, 반 정원 {CAP}명
-            </caption>
-            <thead>
-              <tr className="border-b text-[14px]" style={{ borderColor: C.line, color: C.muted }}>
-                <th scope="col" className="px-4 py-3 font-normal">
-                  과정
+      <div className="mt-5 overflow-x-auto rounded-[8px] border" style={{ borderColor: C.line, background: "#fff" }}>
+        <table className="w-full min-w-[340px] text-left text-[16px]">
+          <caption className="px-4 pt-3 text-left text-[14px]" style={{ color: C.muted }}>
+            ㅇㅇ교육지원청 신고 월 교습비, 반 정원 {CAP}명
+          </caption>
+          <thead>
+            <tr className="border-b text-[14px]" style={{ borderColor: C.line, color: C.muted }}>
+              <th scope="col" className="px-4 py-3 font-normal">
+                과정
+              </th>
+              <th scope="col" className="px-2 py-3 font-normal">
+                수업 횟수
+              </th>
+              <th scope="col" className="px-4 py-3 text-right font-normal">
+                월 교습비
+              </th>
+            </tr>
+          </thead>
+          <tbody>
+            {FEES.map((f) => (
+              <tr key={f.key} className="border-b last:border-b-0" style={{ borderColor: C.line }}>
+                <th scope="row" className="px-4 py-3.5 font-bold">
+                  {f.label}
                 </th>
-                <th scope="col" className="px-2 py-3 font-normal">
-                  수업 횟수
-                </th>
-                <th scope="col" className="px-4 py-3 text-right font-normal">
-                  월 교습비
-                </th>
+                <td className="whitespace-nowrap px-2 py-3.5" style={{ color: C.muted }}>
+                  {f.hours}
+                </td>
+                <td className="px-4 py-3.5 text-right font-bold tabular-nums">{won(f.fee)}</td>
               </tr>
-            </thead>
-            <tbody>
-              {FEES.map((f) => {
-                const on = f.key === fee.key;
-                return (
-                  <tr key={f.key} className="border-b last:border-b-0" style={{ borderColor: C.line, background: on ? C.tint : undefined }}>
-                    <th scope="row" className="px-4 py-3.5 font-bold">
-                      {f.label}
-                      {on && (
-                        <span className="ml-2 inline-flex items-center gap-1 text-[13px]" style={{ color: C.accent }}>
-                          <Check size={13} aria-hidden />
-                          고른 반
-                        </span>
-                      )}
-                    </th>
-                    <td className="whitespace-nowrap px-2 py-3.5" style={{ color: C.muted }}>
-                      {f.hours}
-                    </td>
-                    <td className="px-4 py-3.5 text-right font-bold tabular-nums">{won(f.fee)}</td>
-                  </tr>
-                );
-              })}
-            </tbody>
-          </table>
-          <p className="flex items-center gap-1.5 px-4 pb-3 text-[14px]" style={{ color: C.muted }}>
-            <BookOpen size={14} aria-hidden />
-            {BOOK}
-          </p>
-        </div>
-
-        <div className="rounded-[8px] border px-5 py-5" style={{ background: C.alt, borderColor: C.line }}>
-          <p className="text-[15px]" style={{ color: C.muted }}>
-            고른 반
-          </p>
-          <p className="mt-1 text-[22px] font-bold leading-snug tracking-[-0.02em]">
-            {classLabel(selected)}
-          </p>
-          <p className="mt-1 text-[15px] tabular-nums" style={{ color: C.body }}>
-            {daysText(selected.days)} {selected.time}, {fee.label}
-          </p>
-
-          <div className="mt-5 flex items-center justify-between gap-3">
-            <span className="text-[15px]" style={{ color: C.body }}>
-              등록 개월
-            </span>
-            <div className="flex overflow-hidden rounded-[6px] border" style={{ borderColor: C.line, background: "#fff" }} role="group" aria-label="등록 개월 수">
-              {[1, 2, 3].map((m) => (
-                <button
-                  key={m}
-                  type="button"
-                  aria-pressed={months === m}
-                  onClick={() => setMonths(m)}
-                  className={`px-4 py-2 text-[15px] ${focusRing}`}
-                  style={{ background: months === m ? C.accent : "transparent", color: months === m ? "#fff" : C.body, fontWeight: months === m ? 600 : 400, outlineColor: C.accent }}
-                >
-                  {m}개월
-                </button>
-              ))}
-            </div>
-          </div>
-
-          <div className="mt-5 border-t pt-4" style={{ borderColor: C.line }}>
-            <p className="text-[15px]" style={{ color: C.muted }}>
-              교습비 합계
-            </p>
-            <AnimatePresence mode="popLayout" initial={false}>
-              <motion.p
-                key={total}
-                className="text-[36px] font-bold leading-tight tracking-[-0.02em] tabular-nums"
-                initial={reduce ? false : { y: "-40%", opacity: 0 }}
-                animate={{ y: 0, opacity: 1 }}
-                exit={reduce ? { opacity: 0, transition: { duration: 0 } } : { y: "40%", opacity: 0 }}
-                transition={{ duration: reduce ? 0 : DUR, ease: EASE }}
-              >
-                {won(total)}
-              </motion.p>
-            </AnimatePresence>
-            <p className="mt-1 text-[14px]" style={{ color: C.muted }}>
-              {BOOK}
-            </p>
-          </div>
-        </div>
+            ))}
+          </tbody>
+        </table>
+        <p className="flex items-center gap-1.5 px-4 pb-3 text-[14px]" style={{ color: C.muted }}>
+          <BookOpen size={14} aria-hidden />
+          {BOOK}
+        </p>
       </div>
       <p className="mt-3 text-[14px] leading-[1.6]" style={{ color: C.muted }}>
         환불은 학원의 설립, 운영 및 과외교습에 관한 법률 시행령 기준을 따릅니다.
@@ -1050,6 +892,7 @@ function Fees({ reduce, selected }: { reduce: boolean; selected: Klass }) {
   );
 }
 
+
 /* ---------- 4. 무료 체험 신청 ---------- */
 
 function Trial({
@@ -1057,13 +900,11 @@ function Trial({
   today,
   selected,
   onPick,
-  result,
 }: {
   reduce: boolean;
   today: Date;
   selected: Klass;
   onPick: (id: string) => void;
-  result: Level | null;
 }) {
   const [name, setName] = useState("");
   const [phone, setPhone] = useState("");
@@ -1203,11 +1044,6 @@ function Trial({
                     </option>
                   ))}
                 </select>
-                {result && (
-                  <span className="mt-1.5 block text-[14px] font-normal" style={{ color: C.muted }}>
-                    레벨테스트 결과 {levelOf(result).name}도 같이 보내요
-                  </span>
-                )}
               </label>
               <fieldset>
                 <legend className="text-[15px] font-semibold">체험 날짜</legend>

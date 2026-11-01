@@ -3,7 +3,7 @@
 import { useEffect, useRef, useState, useSyncExternalStore } from "react";
 import Image from "next/image";
 import { AnimatePresence, motion } from "framer-motion";
-import { ArrowLeft, ChevronRight, List, Menu, MessageSquareText, Phone, RotateCcw, Search, X } from "lucide-react";
+import { ChevronRight, List, Menu, MessageSquareText, Phone, X } from "lucide-react";
 import { useReducedMotionSafe } from "@/hooks/useReducedMotionSafe";
 import { daysAgo, fmtDot, fmtKo, useDemoToday } from "@/hooks/useDemoToday";
 import { DemoMakerInfo } from "@/components/demos/DemoMakerInfo";
@@ -17,11 +17,9 @@ import { DemoMakerInfo } from "@/components/demos/DemoMakerInfo";
    고정 탭으로, 좁은 화면에서는 상단 머리글에 둔다(화면 아래 양쪽 모서리는 사이트 공용 버튼 자리).
 
    상호작용
-   1. 그룹 시간표: 칸마다 수업명, 강사, 남은 자리를 적고 강사와 난이도로 거른다.
-      수업을 누르면 체험레슨 신청 창이 열린다. 신청은 실제로 보내지 않는다.
-   2. 나에게 맞는 레슨 찾기: 프로그램 안내 표 위 버튼으로 열고, 질문 카드 세 장(불편한 부위,
-      운동 경력, 희망 레슨)에 답하면 맞는 레슨과 이유가 나온다. 그룹이면 시간표에서 해당 수업만 비춘다.
-   3. 강사 소개에서 강사별 시간표 보기를 누르면 시간표가 그 강사 수업으로 걸러진다.
+   1. 그룹 시간표: 요일 x 시간 정적 표에 수업명, 난이도, 강사를 적는다. 표 위 버튼으로 그룹 체험레슨 신청 창을 연다.
+   2. 프로그램 안내: 개인, 듀엣, 그룹 비교 표(정원, 수업 시간, 회당 금액, 추천 대상, 예약 방법).
+   3. 체험레슨, 상담 신청 창. 신청은 실제로 보내지 않는다.
 
    하위 화면: 스튜디오 소개(스튜디오 소개, 강사진, 오시는 길), 프로그램(개인, 듀엣, 그룹레슨),
    시간표·수강료(그룹 시간표, 수강료 안내), 커뮤니티(공지사항, 이벤트). 새 주소 없이 nav 상태로 바꿔 그리고,
@@ -31,7 +29,7 @@ import { DemoMakerInfo } from "@/components/demos/DemoMakerInfo";
    AI 생성(Z-Image-Turbo, Apache 2.0) hero, teacher, mat, studio */
 
 const IMG = "/images/demo-pilates";
-const STUDIO = "곰파트너";
+const STUDIO = "필라테스 스튜디오";
 const TEL = "02-000-0000";
 const ADDRESS = "ㅁㄹ시 ㅅㄴ로 88 ㅎㄷ빌딩 2층";
 
@@ -51,7 +49,6 @@ const C = {
 };
 
 const EASE = [0.22, 1, 0.36, 1] as const;
-const EASE_INK = [0.65, 0, 0.35, 1] as const;
 
 /* ---------- 시간 ---------- */
 
@@ -140,80 +137,6 @@ const PROGRAMS = [
 
 const PROGRAM_ROWS = ["정원", "수업 시간", "회당 금액", "추천 대상", "예약"] as const;
 
-type Part = "back" | "shoulder" | "knee" | "none";
-type Exp = "new" | "sometimes" | "steady";
-type Pref = "solo" | "group";
-
-const PART_OPTIONS: { id: Part; label: string }[] = [
-  { id: "back", label: "허리" },
-  { id: "shoulder", label: "목, 어깨" },
-  { id: "knee", label: "무릎" },
-  { id: "none", label: "없음" },
-];
-
-const EXP_OPTIONS: { id: Exp; label: string }[] = [
-  { id: "new", label: "없음" },
-  { id: "sometimes", label: "6개월 미만" },
-  { id: "steady", label: "6개월 이상" },
-];
-
-const PREF_OPTIONS: { id: Pref; label: string }[] = [
-  { id: "solo", label: "1:1 개인레슨" },
-  { id: "group", label: "그룹레슨" },
-];
-
-const PART_REASON: Record<Part, string> = {
-  back: "허리 통증이 있다면 코어와 골반 안정화 동작부터 시작합니다.",
-  shoulder: "굽은 어깨와 거북목 교정을 위한 상체 정렬 위주로 진행합니다.",
-  knee: "누워서 하는 동작 위주로 무릎 부담을 줄여 진행합니다.",
-  none: "",
-};
-
-type Rec = { type: ClassType; level?: Level; reasons: string[] };
-
-function recommend(part: Part, exp: Exp, pref: Pref): Rec {
-  const base = recommendBase(part, exp);
-  const partReason = PART_REASON[part];
-  if (pref === "solo" && base.type !== "private")
-    return {
-      type: "private",
-      reasons: [partReason || "그날 컨디션에 맞춰 난이도를 조절해 드립니다."],
-    };
-  if (pref === "group" && (base.type === "private" || base.type === "duet"))
-    return {
-      type: "reformer",
-      level: exp === "steady" ? "중급" : "입문",
-      reasons: [partReason, "4:1 소수정예라 자세를 꼼꼼하게 잡아 드립니다."],
-    };
-  return base;
-}
-
-function recommendBase(part: Part, exp: Exp): Rec {
-  const partReason = PART_REASON[part];
-  if (part !== "none") {
-    if (exp === "new")
-      return {
-        type: "private",
-        reasons: [partReason, "통증이 있거나 운동이 처음이시라면 1:1 개인레슨을 권장합니다."],
-      };
-    if (exp === "sometimes")
-      return {
-        type: "duet",
-        reasons: [partReason, "가성비 높은 비용으로 함께 운동할 수 있습니다."],
-      };
-    return {
-      type: "reformer",
-      level: "중급",
-      reasons: [partReason, "운동 경험이 있다면 그룹레슨도 충분히 따라오실 수 있습니다."],
-    };
-  }
-  if (exp === "new")
-    return { type: "mat", level: "입문", reasons: ["매트에서 호흡과 기본 동작을 배우는 입문반"] };
-  if (exp === "sometimes")
-    return { type: "reformer", level: "입문", reasons: ["리포머에 익숙해지는 초급반"] };
-  return { type: "reformer", level: "중급", reasons: ["동작을 쉬지 않고 이어 가는 중급반"] };
-}
-
 /* ---------- 시간표 ---------- */
 
 type Teacher = "박ㅅ연" | "최ㅇ진" | "정ㅎ윤";
@@ -225,53 +148,37 @@ interface Session {
   type: "reformer" | "mat";
   teacher: Teacher;
   level: Level;
-  booked: number;
 }
 
 const TIMES = ["07:00", "10:00", "12:30", "19:00", "20:30"];
 const WEEK = [1, 2, 3, 4, 5, 6];
 
 const SESSIONS: Session[] = [
-  { id: "s1", day: 1, time: "07:00", type: "mat", teacher: "최ㅇ진", level: "입문", booked: 4 },
-  { id: "s2", day: 1, time: "10:00", type: "reformer", teacher: "박ㅅ연", level: "입문", booked: 2 },
-  { id: "s3", day: 1, time: "12:30", type: "mat", teacher: "정ㅎ윤", level: "입문", booked: 5 },
-  { id: "s4", day: 1, time: "19:00", type: "reformer", teacher: "박ㅅ연", level: "중급", booked: 4 },
-  { id: "s5", day: 1, time: "20:30", type: "mat", teacher: "최ㅇ진", level: "중급", booked: 3 },
-  { id: "s6", day: 2, time: "07:00", type: "reformer", teacher: "정ㅎ윤", level: "입문", booked: 1 },
-  { id: "s7", day: 2, time: "10:00", type: "mat", teacher: "최ㅇ진", level: "입문", booked: 6 },
-  { id: "s8", day: 2, time: "19:00", type: "reformer", teacher: "정ㅎ윤", level: "입문", booked: 3 },
-  { id: "s9", day: 2, time: "20:30", type: "reformer", teacher: "박ㅅ연", level: "중급", booked: 1 },
-  { id: "s10", day: 3, time: "07:00", type: "mat", teacher: "최ㅇ진", level: "입문", booked: 2 },
-  { id: "s11", day: 3, time: "10:00", type: "reformer", teacher: "박ㅅ연", level: "중급", booked: 3 },
-  { id: "s12", day: 3, time: "12:30", type: "reformer", teacher: "정ㅎ윤", level: "입문", booked: 1 },
-  { id: "s13", day: 3, time: "19:00", type: "mat", teacher: "최ㅇ진", level: "입문", booked: 5 },
-  { id: "s14", day: 3, time: "20:30", type: "reformer", teacher: "박ㅅ연", level: "중급", booked: 2 },
-  { id: "s15", day: 4, time: "07:00", type: "reformer", teacher: "정ㅎ윤", level: "입문", booked: 2 },
-  { id: "s16", day: 4, time: "10:00", type: "mat", teacher: "최ㅇ진", level: "중급", booked: 4 },
-  { id: "s17", day: 4, time: "19:00", type: "reformer", teacher: "정ㅎ윤", level: "중급", booked: 4 },
-  { id: "s18", day: 4, time: "20:30", type: "mat", teacher: "최ㅇ진", level: "입문", booked: 1 },
-  { id: "s19", day: 5, time: "07:00", type: "mat", teacher: "최ㅇ진", level: "입문", booked: 3 },
-  { id: "s20", day: 5, time: "10:00", type: "reformer", teacher: "박ㅅ연", level: "입문", booked: 0 },
-  { id: "s21", day: 5, time: "12:30", type: "mat", teacher: "정ㅎ윤", level: "입문", booked: 2 },
-  { id: "s22", day: 5, time: "19:00", type: "reformer", teacher: "박ㅅ연", level: "입문", booked: 3 },
-  { id: "s23", day: 6, time: "10:00", type: "reformer", teacher: "박ㅅ연", level: "입문", booked: 3 },
-  { id: "s24", day: 6, time: "12:30", type: "mat", teacher: "정ㅎ윤", level: "입문", booked: 2 },
+  { id: "s1", day: 1, time: "07:00", type: "mat", teacher: "최ㅇ진", level: "입문" },
+  { id: "s2", day: 1, time: "10:00", type: "reformer", teacher: "박ㅅ연", level: "입문" },
+  { id: "s3", day: 1, time: "12:30", type: "mat", teacher: "정ㅎ윤", level: "입문" },
+  { id: "s4", day: 1, time: "19:00", type: "reformer", teacher: "박ㅅ연", level: "중급" },
+  { id: "s5", day: 1, time: "20:30", type: "mat", teacher: "최ㅇ진", level: "중급" },
+  { id: "s6", day: 2, time: "07:00", type: "reformer", teacher: "정ㅎ윤", level: "입문" },
+  { id: "s7", day: 2, time: "10:00", type: "mat", teacher: "최ㅇ진", level: "입문" },
+  { id: "s8", day: 2, time: "19:00", type: "reformer", teacher: "정ㅎ윤", level: "입문" },
+  { id: "s9", day: 2, time: "20:30", type: "reformer", teacher: "박ㅅ연", level: "중급" },
+  { id: "s10", day: 3, time: "07:00", type: "mat", teacher: "최ㅇ진", level: "입문" },
+  { id: "s11", day: 3, time: "10:00", type: "reformer", teacher: "박ㅅ연", level: "중급" },
+  { id: "s12", day: 3, time: "12:30", type: "reformer", teacher: "정ㅎ윤", level: "입문" },
+  { id: "s13", day: 3, time: "19:00", type: "mat", teacher: "최ㅇ진", level: "입문" },
+  { id: "s14", day: 3, time: "20:30", type: "reformer", teacher: "박ㅅ연", level: "중급" },
+  { id: "s15", day: 4, time: "07:00", type: "reformer", teacher: "정ㅎ윤", level: "입문" },
+  { id: "s16", day: 4, time: "10:00", type: "mat", teacher: "최ㅇ진", level: "중급" },
+  { id: "s17", day: 4, time: "19:00", type: "reformer", teacher: "정ㅎ윤", level: "중급" },
+  { id: "s18", day: 4, time: "20:30", type: "mat", teacher: "최ㅇ진", level: "입문" },
+  { id: "s19", day: 5, time: "07:00", type: "mat", teacher: "최ㅇ진", level: "입문" },
+  { id: "s20", day: 5, time: "10:00", type: "reformer", teacher: "박ㅅ연", level: "입문" },
+  { id: "s21", day: 5, time: "12:30", type: "mat", teacher: "정ㅎ윤", level: "입문" },
+  { id: "s22", day: 5, time: "19:00", type: "reformer", teacher: "박ㅅ연", level: "입문" },
+  { id: "s23", day: 6, time: "10:00", type: "reformer", teacher: "박ㅅ연", level: "입문" },
+  { id: "s24", day: 6, time: "12:30", type: "mat", teacher: "정ㅎ윤", level: "입문" },
 ];
-
-const TEACHERS: Teacher[] = ["박ㅅ연", "최ㅇ진", "정ㅎ윤"];
-
-const noopSubscribe = () => () => {};
-
-/** 오늘 다음부터 해당 요일이 처음 오는 날짜 */
-function nextDate(todayKey: string, day: number) {
-  const d = new Date(todayKey);
-  for (let i = 1; i <= 7; i++) {
-    const c = new Date(d);
-    c.setDate(d.getDate() + i);
-    if (c.getDay() === day) return c;
-  }
-  return d;
-}
 
 const CHO = "ㄱㄲㄴㄷㄸㄹㅁㅂㅃㅅㅆㅇㅈㅉㅊㅋㅌㅍㅎ";
 
@@ -312,8 +219,7 @@ const won = (n: number) => `${n.toLocaleString("ko-KR")}원`;
 
 /* ============================================================ */
 
-type BookingTarget = Session | "private" | "duet" | "consult";
-type Highlight = { type: ClassType; level?: Level } | null;
+type BookingTarget = "private" | "duet" | "group" | "consult";
 
 /* ---------- 하위 화면 메뉴 ---------- */
 
@@ -378,8 +284,6 @@ export function PilatesStudioDemo() {
   const status = todayStatus(minute);
   const [nav, setNav] = useState<Target>({ page: "home" });
   const [booking, setBooking] = useState<BookingTarget | null>(null);
-  const [highlight, setHighlight] = useState<Highlight>(null);
-  const [teacher, setTeacher] = useState<"전체" | Teacher>("전체");
 
   const go: Go = (t) => {
     setNav(t.page === "program" ? { page: "program", program: t.program ?? "private" } : { page: t.page });
@@ -402,35 +306,10 @@ export function PilatesStudioDemo() {
     else go({ page: "schedule" });
   };
 
-  const goSchedule = (type: ClassType, level?: Level) => {
-    setHighlight({ type, level });
-    setTeacher("전체");
-    toSchedule();
-  };
-
-  const showTeacher = (t: Teacher) => {
-    setTeacher(t);
-    setHighlight(null);
-    toSchedule();
-  };
-
-  const timetable = () => {
-    setTeacher("전체");
-    setHighlight(null);
-    toSchedule();
-  };
-
   const consult = () => setBooking("consult");
 
   const schedule = (
-    <Schedule
-      highlight={highlight}
-      onClearHighlight={() => setHighlight(null)}
-      teacher={teacher}
-      onTeacher={setTeacher}
-      onPick={setBooking}
-      bare={nav.page !== "home"}
-    />
+    <Schedule onTrial={() => setBooking("group")} bare={nav.page !== "home"} />
   );
 
   let body: React.ReactNode = null;
@@ -439,13 +318,13 @@ export function PilatesStudioDemo() {
       body = <AboutPage onConsult={consult} />;
       break;
     case "teachers":
-      body = <TeachersPage onShow={showTeacher} />;
+      body = <TeachersPage />;
       break;
     case "location":
       body = <Location status={status} bare />;
       break;
     case "program":
-      body = <ProgramPage key={nav.program} program={nav.program ?? "private"} onSchedule={goSchedule} onBook={setBooking} onConsult={consult} onTimetable={timetable} />;
+      body = <ProgramPage key={nav.program} program={nav.program ?? "private"} onBook={setBooking} onConsult={consult} onTimetable={toSchedule} />;
       break;
     case "schedule":
       body = schedule;
@@ -469,9 +348,9 @@ export function PilatesStudioDemo() {
           <>
             <Intro onConsult={consult} />
             {schedule}
-            <Program onSchedule={goSchedule} onBook={setBooking} />
+            <Program />
             <Pricing />
-            <Teachers onShow={showTeacher} />
+            <Teachers />
             <About />
             <Location status={status} />
           </>
@@ -493,11 +372,8 @@ export function PilatesStudioDemo() {
 function Logo() {
   return (
     <span className="inline-flex items-center gap-2.5">
-      {/* eslint-disable-next-line @next/next/no-img-element */}
-      <img src="/images/logo-bear.png" alt="" aria-hidden width={28} height={28} className="h-7 w-7 shrink-0" />
       <span className="inline-flex items-baseline gap-1.5 whitespace-nowrap">
-        <span className="text-[19px] font-bold tracking-[-0.01em]">곰파트너</span>
-        <span className="text-[12px] font-semibold opacity-80">카탈로그</span>
+        <span className="text-[19px] font-bold tracking-[-0.01em]">필라테스 스튜디오</span>
       </span>
     </span>
   );
@@ -789,95 +665,22 @@ function SectionTitle({ id, children, hidden = false }: { id: string; children: 
 
 /* ---------- 그룹 시간표 ---------- */
 
-function seatsLeft(s: Session) {
-  return CLASS_INFO[s.type].cap - s.booked;
-}
-
-function seatText(s: Session) {
-  const left = seatsLeft(s);
-  return left <= 0 ? "마감" : `${left}자리 남음`;
-}
-
-function Filter<T extends string>({ label, value, options, onChange }: { label: string; value: T; options: T[]; onChange: (v: T) => void }) {
-  return (
-    <label className="inline-flex items-center gap-2 text-[14px]">
-      <span style={{ color: C.muted }}>{label}</span>
-      <select
-        value={value}
-        onChange={(e) => onChange(e.target.value as T)}
-        className="h-10 min-w-[104px] rounded-[4px] border px-2.5 text-[15px]"
-        style={{ borderColor: C.line, background: C.card, color: C.ink }}
-      >
-        {options.map((o) => (
-          <option key={o} value={o}>
-            {o === "전체" ? `${label} 전체` : o}
-          </option>
-        ))}
-      </select>
-    </label>
-  );
-}
-
-function Schedule({
-  highlight,
-  onClearHighlight,
-  teacher,
-  onTeacher,
-  onPick,
-  bare = false,
-}: {
-  highlight: Highlight;
-  onClearHighlight: () => void;
-  teacher: "전체" | Teacher;
-  onTeacher: (t: "전체" | Teacher) => void;
-  onPick: (s: Session) => void;
-  bare?: boolean;
-}) {
-  const [level, setLevel] = useState<"전체" | Level>("전체");
+function Schedule({ onTrial, bare = false }: { onTrial: () => void; bare?: boolean }) {
   const [mobileDay, setMobileDay] = useState(1);
 
-  const matches = (s: Session) =>
-    (teacher === "전체" || s.teacher === teacher) &&
-    (level === "전체" || s.level === level) &&
-    (!highlight || (s.type === highlight.type && (!highlight.level || s.level === highlight.level)));
-
-  const cell = (s: Session, compact: boolean) => {
-    const on = matches(s);
-    const full = seatsLeft(s) <= 0;
-    return (
-      <button
-        type="button"
-        disabled={full}
-        onClick={() => onPick(s)}
-        aria-label={`${DAY_NAMES[s.day]}요일 ${s.time} ${CLASS_INFO[s.type].name} ${s.level}, ${s.teacher} 강사, ${seatText(s)}, 체험레슨 신청`}
-        className={`w-full rounded-[4px] border text-left transition-[opacity,background-color] duration-200 ${compact ? "px-2.5 py-2" : "px-4 py-3"} ${full ? "cursor-not-allowed" : "hover:bg-[#dfe3ec]"}`}
-        style={{
-          borderColor: on && highlight ? C.indigo : C.line,
-          background: on && highlight ? C.indigoSoft : C.card,
-          opacity: on ? 1 : 0.3,
-        }}
-      >
-        <span className={`block font-semibold leading-[1.35] ${compact ? "text-[14px]" : "text-[16px]"}`}>
-          {CLASS_INFO[s.type].name}
-          <span className="ml-1 text-[12px] font-semibold" style={{ color: C.clayDeep }}>
-            {s.level}
-          </span>
+  const cell = (s: Session, compact: boolean) => (
+    <div className={`rounded-[4px] border ${compact ? "px-2.5 py-2" : "px-4 py-3"}`} style={{ borderColor: C.line, background: C.card }}>
+      <span className={`block font-semibold leading-[1.35] ${compact ? "text-[14px]" : "text-[16px]"}`}>
+        {CLASS_INFO[s.type].name}
+        <span className="ml-1 text-[12px] font-semibold" style={{ color: C.clayDeep }}>
+          {s.level}
         </span>
-        <span className="block text-[13px]" style={{ color: C.muted }}>
-          {s.teacher}
-        </span>
-        <span className="mt-1 block text-[13px] font-semibold tabular-nums" style={{ color: full ? C.clayDeep : C.indigo }}>
-          {seatText(s)}
-          {!full && (
-            <span className="font-normal" style={{ color: C.muted }}>
-              {" "}
-              / 정원 {CLASS_INFO[s.type].cap}명
-            </span>
-          )}
-        </span>
-      </button>
-    );
-  };
+      </span>
+      <span className="block text-[13px]" style={{ color: C.muted }}>
+        {s.teacher}
+      </span>
+    </div>
+  );
 
   return (
     <section
@@ -891,29 +694,20 @@ function Schedule({
           <SectionTitle id="schedule-title" hidden={bare}>
             그룹 시간표
           </SectionTitle>
-          <div className="flex flex-wrap items-center gap-x-4 gap-y-3">
-            <Filter label="강사" value={teacher} options={["전체", ...TEACHERS]} onChange={onTeacher} />
-            <Filter label="난이도" value={level} options={["전체", "입문", "중급"] as ("전체" | Level)[]} onChange={setLevel} />
-            {highlight && (
-              <button
-                type="button"
-                onClick={onClearHighlight}
-                className="inline-flex h-10 w-fit items-center gap-1.5 rounded-[4px] px-3.5 text-[14px] font-semibold"
-                style={{ background: C.indigo, color: C.onIndigo }}
-                aria-label={`추천 레슨 표시 해제: ${CLASS_INFO[highlight.type].name}`}
-              >
-                추천 {CLASS_INFO[highlight.type].name}
-                {highlight.level ? ` ${highlight.level}` : ""}
-                <X size={15} aria-hidden />
-              </button>
-            )}
-          </div>
+          <button
+            type="button"
+            onClick={onTrial}
+            className="inline-flex h-11 w-fit items-center rounded-[4px] px-5 text-[15px] font-semibold transition-colors hover:bg-[#1a2846]"
+            style={{ background: C.indigo, color: C.onIndigo }}
+          >
+            그룹 체험레슨 신청
+          </button>
         </div>
 
         {/* 넓은 화면: 요일 x 시간 표 */}
         <div className="mt-6 hidden md:block">
           <table className="w-full table-fixed border-collapse">
-            <caption className="sr-only">요일별, 시간별 그룹레슨 시간표. 칸을 누르면 체험레슨 신청 창이 열립니다.</caption>
+            <caption className="sr-only">요일별, 시간별 그룹레슨 시간표</caption>
             <thead>
               <tr>
                 <th scope="col" className="w-[72px] border-b-2 pb-2 text-left text-[14px] font-semibold" style={{ borderColor: C.indigo, color: C.muted }}>
@@ -975,7 +769,7 @@ function Schedule({
         </div>
 
         <p className="mt-4 text-[14px]" style={{ color: C.muted }}>
-          레슨 시간은 각 50분입니다. 개인, 듀엣레슨은 시간표와 별도로 예약합니다.
+          레슨 시간은 각 50분입니다. 정원은 리포머 4명, 매트 6명입니다. 개인, 듀엣레슨은 시간표와 별도로 예약합니다.
         </p>
       </div>
     </section>
@@ -985,17 +779,11 @@ function Schedule({
 /* ---------- 프로그램 안내 ---------- */
 
 function Program({
-  onSchedule,
-  onBook,
   bare = false,
 }: {
-  onSchedule: (t: ClassType, level?: Level) => void;
-  onBook: (t: "private" | "duet") => void;
   /** 프로그램 하위 화면 아래에 레슨 비교로 넣을 때 */
   bare?: boolean;
 }) {
-  const [finder, setFinder] = useState(false);
-
   return (
     <section aria-labelledby="program-title" id="program" className={bare ? "scroll-mt-16" : "scroll-mt-16 px-4 py-14 md:px-6 md:py-20"}>
       <div className="mx-auto max-w-[1200px]">
@@ -1007,25 +795,7 @@ function Program({
           ) : (
             <SectionTitle id="program-title">프로그램 안내</SectionTitle>
           )}
-          <button
-            id="lesson-finder"
-            type="button"
-            aria-expanded={finder}
-            aria-controls="lesson-finder-panel"
-            onClick={() => setFinder((v) => !v)}
-            className="inline-flex h-10 items-center gap-1.5 rounded-[4px] border px-4 text-[15px] font-semibold transition-colors hover:bg-[#ece6db]"
-            style={{ borderColor: C.indigo, color: C.indigo }}
-          >
-            {finder ? <X size={16} aria-hidden /> : <Search size={16} aria-hidden />}
-            나에게 맞는 레슨 찾기
-          </button>
         </div>
-
-        {finder && (
-          <div id="lesson-finder-panel" className="mt-6">
-            <Finder onSchedule={onSchedule} onBook={onBook} />
-          </div>
-        )}
 
         {/* 넓은 화면: 세 칸 비교 표 */}
         <table className="mt-8 hidden w-full table-fixed border-collapse text-left md:table">
@@ -1082,140 +852,6 @@ function Program({
         </p>
       </div>
     </section>
-  );
-}
-
-/* ---------- 나에게 맞는 레슨 찾기 (질문 카드 세 장) ---------- */
-
-function Finder({ onSchedule, onBook }: { onSchedule: (t: ClassType, level?: Level) => void; onBook: (t: "private" | "duet") => void }) {
-  const [step, setStep] = useState(0);
-  const [part, setPart] = useState<Part | null>(null);
-  const [exp, setExp] = useState<Exp | null>(null);
-  const [pref, setPref] = useState<Pref | null>(null);
-  const reduce = useReducedMotionSafe();
-  const headingRef = useRef<HTMLHeadingElement>(null);
-  const rec = part && exp && pref ? recommend(part, exp, pref) : null;
-  const info = rec ? CLASS_INFO[rec.type] : null;
-
-  // 패널이 열리거나 카드를 넘기면 질문 제목으로 초점을 옮겨 키보드와 화면 읽기 사용자가 이어서 고를 수 있게 한다.
-  useEffect(() => {
-    headingRef.current?.focus();
-  }, [step]);
-
-  const restart = () => {
-    setPart(null);
-    setExp(null);
-    setPref(null);
-    setStep(0);
-  };
-
-  const questions = [
-    { title: "불편한 부위", options: PART_OPTIONS, value: part, pick: (v: string) => setPart(v as Part) },
-    { title: "운동 경력", options: EXP_OPTIONS, value: exp, pick: (v: string) => setExp(v as Exp) },
-    { title: "희망 레슨", options: PREF_OPTIONS, value: pref, pick: (v: string) => setPref(v as Pref) },
-  ];
-  const q = step < questions.length ? questions[step] : null;
-
-  return (
-    <div className="max-w-[720px] rounded-[12px] border p-5 md:p-7" style={{ background: C.card, borderColor: C.line }}>
-      {q ? (
-        <div key={step} className="soft-in">
-          <p className="text-[14px]" style={{ color: C.muted }}>
-            {step + 1} / {questions.length}
-          </p>
-          <h3 ref={headingRef} tabIndex={-1} className="mt-0.5 text-[22px] font-bold tracking-[-0.02em] outline-none md:text-[26px]">
-            {q.title}
-          </h3>
-          <div className="mt-5 grid gap-2.5 sm:grid-cols-2" role="group" aria-label={q.title}>
-            {q.options.map((o) => (
-              <button
-                key={o.id}
-                type="button"
-                aria-pressed={q.value === o.id}
-                onClick={() => {
-                  q.pick(o.id);
-                  setStep(step + 1);
-                }}
-                className="flex h-14 items-center rounded-[10px] border px-5 text-left text-[17px] font-semibold transition-colors hover:bg-[#ece6db]"
-                style={q.value === o.id ? { borderColor: C.indigo, color: C.indigo, boxShadow: `inset 0 0 0 1px ${C.indigo}` } : { borderColor: C.line }}
-              >
-                {o.label}
-              </button>
-            ))}
-          </div>
-        </div>
-      ) : (
-        rec &&
-        info && (
-          <div aria-live="polite">
-            <h3 ref={headingRef} tabIndex={-1} className="sr-only">
-              추천 레슨
-            </h3>
-            <motion.div
-              key={`${rec.type}-${part}-${exp}-${pref}`}
-              className="rounded-[10px] p-5 md:p-7"
-              style={{ background: C.indigo, color: C.onIndigo }}
-              initial={reduce ? false : { clipPath: "circle(0% at 0% 0%)" }}
-              animate={{ clipPath: "circle(150% at 0% 0%)" }}
-              transition={{ duration: 0.7, ease: EASE_INK }}
-            >
-              <p className="text-[26px] font-bold tracking-[-0.02em]">
-                {info.name}
-                {rec.level && <span className="ml-2 align-middle text-[16px] font-medium">{rec.level}반</span>}
-              </p>
-              <ul className="mt-3 space-y-2">
-                {rec.reasons.filter(Boolean).map((r) => (
-                  <li key={r} className="flex gap-2.5">
-                    <span className="mt-[0.7em] inline-block h-1.5 w-1.5 shrink-0 rounded-full" style={{ background: C.clay }} aria-hidden />
-                    <span>{r}</span>
-                  </li>
-                ))}
-              </ul>
-              <p className="mt-3 text-[15px]" style={{ color: C.onIndigoMuted }}>
-                {info.from}
-              </p>
-              {rec.type === "private" || rec.type === "duet" ? (
-                <button
-                  type="button"
-                  onClick={() => onBook(rec.type as "private" | "duet")}
-                  className="mt-5 inline-flex h-12 items-center rounded-[4px] px-6 font-semibold"
-                  style={{ background: C.paper, color: C.indigo }}
-                >
-                  체험레슨 신청
-                </button>
-              ) : (
-                <button
-                  type="button"
-                  onClick={() => onSchedule(rec.type, rec.level)}
-                  className="mt-5 inline-flex h-12 items-center rounded-[4px] px-6 font-semibold"
-                  style={{ background: C.paper, color: C.indigo }}
-                >
-                  시간표 보기
-                </button>
-              )}
-            </motion.div>
-          </div>
-        )
-      )}
-
-      {step > 0 && (
-        <div className="mt-5 flex flex-wrap gap-2 border-t pt-4" style={{ borderColor: C.line }}>
-          <button
-            type="button"
-            onClick={() => setStep(step - 1)}
-            className="inline-flex h-11 items-center gap-1.5 rounded-[4px] border px-4 text-[15px] font-semibold"
-            style={{ borderColor: C.line, color: C.ink }}
-          >
-            <ArrowLeft size={16} aria-hidden />
-            이전
-          </button>
-          <button type="button" onClick={restart} className="inline-flex h-11 items-center gap-1.5 rounded-[4px] px-4 text-[15px] font-semibold" style={{ color: C.muted }}>
-            <RotateCcw size={16} aria-hidden />
-            다시 하기
-          </button>
-        </div>
-      )}
-    </div>
   );
 }
 
@@ -1320,7 +956,7 @@ const TEACHER_INFO: { name: Teacher; role: string; lessons: string; career: stri
   },
 ];
 
-function Teachers({ onShow }: { onShow: (t: Teacher) => void }) {
+function Teachers() {
   return (
     <section aria-labelledby="teachers-title" id="teachers" className="scroll-mt-16 px-4 py-14 md:px-6 md:py-20">
       <div className="mx-auto max-w-[1200px]">
@@ -1352,15 +988,6 @@ function Teachers({ onShow }: { onShow: (t: Teacher) => void }) {
                   </li>
                 ))}
               </ul>
-              <button
-                type="button"
-                onClick={() => onShow(t.name)}
-                className="mt-4 inline-flex h-10 items-center rounded-[4px] border px-4 text-[14px] font-semibold transition-colors hover:bg-[#ece6db]"
-                style={{ borderColor: C.line, color: C.indigo }}
-                aria-label={`${t.name} 강사 그룹 시간표 보기`}
-              >
-                강사별 시간표
-              </button>
             </li>
           ))}
         </ul>
@@ -1377,7 +1004,7 @@ const FACILITIES = [
   ["샤워실", "2곳"],
   ["사물함", "개인별"],
   ["수건, 운동복", "무료 대여"],
-  ["면적", "132㎡ (40평)"],
+  ["면적", "132m2 (40평)"],
 ];
 
 function About({ bare = false }: { bare?: boolean }) {
@@ -1543,7 +1170,7 @@ function AboutPage({ onConsult }: { onConsult: () => void }) {
 
 /* ---------- 하위 화면: 강사진 ---------- */
 
-function TeachersPage({ onShow }: { onShow: (t: Teacher) => void }) {
+function TeachersPage() {
   return (
     <div>
       <p style={{ color: C.muted }}>총 {TEACHER_INFO.length}명의 강사진이 함께합니다.</p>
@@ -1594,15 +1221,6 @@ function TeachersPage({ onShow }: { onShow: (t: Teacher) => void }) {
                   ))}
                 </ul>
 
-                <button
-                  type="button"
-                  onClick={() => onShow(t.name)}
-                  className="mt-5 inline-flex h-10 items-center rounded-[4px] border px-4 text-[14px] font-semibold transition-colors hover:bg-[#ece6db]"
-                  style={{ borderColor: C.line, color: C.indigo }}
-                  aria-label={`${t.name} 강사 그룹 시간표 보기`}
-                >
-                  강사별 시간표
-                </button>
               </div>
             </li>
           );
@@ -1641,13 +1259,11 @@ const GROUP_CLASSES: { type: "reformer" | "mat"; level: Level; desc: string }[] 
 
 function ProgramPage({
   program,
-  onSchedule,
   onBook,
   onConsult,
   onTimetable,
 }: {
   program: ProgramId;
-  onSchedule: (t: ClassType, level?: Level) => void;
   onBook: (t: "private" | "duet") => void;
   onConsult: () => void;
   onTimetable: () => void;
@@ -1728,15 +1344,6 @@ function ProgramPage({
                       </p>
                     )}
                   </div>
-                  <button
-                    type="button"
-                    onClick={() => onSchedule(g.type, g.level)}
-                    className="inline-flex h-10 items-center rounded-[4px] border px-4 text-[14px] font-semibold transition-colors hover:bg-[#ece6db]"
-                    style={{ borderColor: C.line, color: C.indigo }}
-                    aria-label={`${CLASS_INFO[g.type].name} ${g.level} 시간표 보기`}
-                  >
-                    시간표 보기
-                  </button>
                 </li>
               );
             })}
@@ -1781,7 +1388,7 @@ function ProgramPage({
         </section>
       )}
 
-      <Program onSchedule={onSchedule} onBook={onBook} bare />
+      <Program bare />
     </div>
   );
 }
@@ -1871,7 +1478,7 @@ const NOTICES: Post[] = [
   },
   {
     no: 1,
-    title: "곰파트너 오픈 안내",
+    title: "필라테스 스튜디오 오픈 안내",
     ago: 219,
     body: ["ㅈㅇ역 3번 출구 ㅎㄷ빌딩 2층에 문을 열었습니다.", "평일 07:00 ~ 22:00, 토요일 09:00 ~ 15:00 운영합니다."],
   },
@@ -2028,7 +1635,6 @@ function Board({ items, label }: { items: Post[]; label: string }) {
 
 function BookingDrawer({ target, onClose }: { target: BookingTarget | null; onClose: () => void }) {
   const reduce = useReducedMotionSafe();
-  const todayKey = useSyncExternalStore(noopSubscribe, () => new Date().toDateString(), () => "");
   const [name, setName] = useState("");
   const [phone, setPhone] = useState("");
   const [part, setPart] = useState("");
@@ -2069,16 +1675,9 @@ function BookingDrawer({ target, onClose }: { target: BookingTarget | null; onCl
   const hidden = reduce ? { opacity: 0 } : desktop ? { x: "100%" } : { y: "100%" };
 
   const isConsult = target === "consult";
-  const session = target && typeof target !== "string" ? target : null;
-  const lessonType: ClassType | null = session ? session.type : target === "private" || target === "duet" ? target : null;
-  const date = session && todayKey ? nextDate(todayKey, session.day) : null;
-  const when = session
-    ? date
-      ? `${date.getMonth() + 1}월 ${date.getDate()}일(${DAY_NAMES[session.day]}) ${session.time}`
-      : `${DAY_NAMES[session.day]}요일 ${session.time}`
-    : "상담 후 시간 확정";
-  const lessonName = session ? `${CLASS_INFO[session.type].name} ${session.level}` : lessonType ? CLASS_INFO[lessonType].name : "";
-  const fee = lessonType === "private" || lessonType === "duet" ? "30,000원" : "20,000원";
+  const lessonName = target === "private" || target === "duet" ? CLASS_INFO[target].name : "그룹레슨";
+  const fee = target === "private" || target === "duet" ? "30,000원" : "20,000원";
+  const when = "상담 후 시간 확정";
 
   const submit = (e: React.FormEvent) => {
     e.preventDefault();
@@ -2091,9 +1690,7 @@ function BookingDrawer({ target, onClose }: { target: BookingTarget | null; onCl
     setDone(
       isConsult
         ? `${who}, ${lesson} 상담 신청이 접수되었습니다. 1일 이내 ${maskPhone(phone)}로 연락드립니다.`
-        : session
-          ? `${who}, ${when} ${lessonName} 체험레슨 신청이 접수되었습니다. 1일 이내 ${maskPhone(phone)}로 연락드려 확정해 드립니다.`
-          : `${who}, ${lessonName} 체험레슨 신청이 접수되었습니다. 1일 이내 ${maskPhone(phone)}로 연락드려 수업 시간을 안내해 드립니다.`,
+        : `${who}, ${lessonName} 체험레슨 신청이 접수되었습니다. 1일 이내 ${maskPhone(phone)}로 연락드려 수업 시간을 안내해 드립니다.`,
     );
     setName("");
     setPhone("");
@@ -2142,16 +1739,6 @@ function BookingDrawer({ target, onClose }: { target: BookingTarget | null; onCl
                 <dd className="font-semibold">{lessonName}</dd>
                 <dt style={{ color: C.muted }}>일시</dt>
                 <dd>{when}</dd>
-                {session && (
-                  <>
-                    <dt style={{ color: C.muted }}>강사</dt>
-                    <dd>{session.teacher}</dd>
-                    <dt style={{ color: C.muted }}>자리</dt>
-                    <dd className="tabular-nums">
-                      {seatText(session)} (정원 {CLASS_INFO[session.type].cap}명)
-                    </dd>
-                  </>
-                )}
                 <dt style={{ color: C.muted }}>체험비</dt>
                 <dd>{fee} (등록 시 수강료에서 차감)</dd>
               </dl>

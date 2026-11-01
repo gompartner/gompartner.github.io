@@ -3,9 +3,9 @@
 import { useEffect, useMemo, useRef, useState } from "react";
 import Image from "next/image";
 import { AnimatePresence, motion } from "framer-motion";
-import { Check, ChevronDown, RotateCcw } from "lucide-react";
+import { Check, ChevronDown } from "lucide-react";
 import { useReducedMotionSafe } from "@/hooks/useReducedMotionSafe";
-import { LeadReceivedPanel, maskName, type LeadRow } from "@/components/demos/LeadReceivedPanel";
+import { maskName } from "@/components/demos/LeadReceivedPanel";
 import { daysAgo, fmtDot, fmtKo, useDemoToday } from "@/hooks/useDemoToday";
 import { DemoMakerInfo } from "@/components/demos/DemoMakerInfo";
 
@@ -18,10 +18,10 @@ import { DemoMakerInfo } from "@/components/demos/DemoMakerInfo";
 
    상호작용
    1. 아래 고정 신청 버튼: 누르면 폼으로 내려가고, 폼이 화면에 보이면 숨는다.
-   2. 4주 커리큘럼: 주차를 고르면 그 주에 쓰는 코드 블록이 쌓인다.
+   2. 4주 커리큘럼: 주차를 고르면 그 주 차시별 수업 내용이 나온다.
    3. 자주 묻는 질문 펼쳐 보기.
    4. 신청 폼: 학년을 고르면 들을 수 있는 반만 남고, 반마다 남은 자리가 보인다.
-   5. 신청 완료 화면: 접수 번호와 회신 예정일, 남은 자리가 하나 줄어든다.
+   5. 신청 완료 안내: 접수 번호와 회신 예정일, 남은 자리가 하나 줄어든다.
 
    사진(public/images/demo-landing-coding-camp): hero, teacher, work-maze, work-runner, work-robot */
 
@@ -94,25 +94,15 @@ function Block({ color, children, dark = false, indent = 0 }: { color: string; c
 function Logo() {
   return (
     <span className="inline-flex items-center gap-2.5">
-      {/* eslint-disable-next-line @next/next/no-img-element */}
-      <img src="/images/logo-bear.png" alt="" aria-hidden width={28} height={28} className="h-7 w-7 shrink-0" />
       <span className="inline-flex items-baseline gap-1.5 whitespace-nowrap">
-        <span className="text-[19px] font-bold tracking-[-0.01em]">곰파트너</span>
-        <span className="text-[12px] font-semibold opacity-80">카탈로그</span>
+        <span className="text-[19px] font-bold tracking-[-0.01em]">코딩 교실</span>
       </span>
     </span>
   );
 }
 
-function SectionTitle({ no, children }: { no: string; children: React.ReactNode }) {
-  return (
-    <div className="flex items-center gap-3">
-      <span className="inline-flex h-9 min-w-9 items-center justify-center rounded-[6px] border-2 px-2 text-[15px] font-black" style={{ borderColor: C.ink, background: C.white }}>
-        {no}
-      </span>
-      <h2 className="text-[28px] font-black leading-tight tracking-[-0.02em] md:text-[36px]">{children}</h2>
-    </div>
-  );
+function SectionTitle({ children }: { children: React.ReactNode }) {
+  return <h2 className="text-[28px] font-black leading-tight tracking-[-0.02em] md:text-[36px]">{children}</h2>;
 }
 
 /* ---------- 본문 ---------- */
@@ -159,7 +149,7 @@ export function LandingCodingCampDemo() {
       />
 
       <footer className="mx-auto mt-16 max-w-[1080px] border-t-2 px-5 pt-6 text-[14px] leading-[1.8] md:px-8" style={{ borderColor: C.ink, color: C.muted }}>
-        <p className="font-bold" style={{ color: C.ink }}>곰파트너</p>
+        <p className="font-bold" style={{ color: C.ink }}>코딩 교실</p>
         <DemoMakerInfo className="mt-1" />
       </footer>
 
@@ -252,7 +242,7 @@ const FOR_WHO: { text: string; color: string; dark?: boolean }[] = [
 function ForWho() {
   return (
     <section className="mx-auto max-w-[1080px] px-5 py-14 md:px-8">
-      <SectionTitle no="01">이런 아이에게 맞아요</SectionTitle>
+      <SectionTitle>이런 아이에게 맞아요</SectionTitle>
       <div className="mt-8 max-w-[560px] space-y-[3px]">
         {FOR_WHO.map((f, i) => (
           <Block key={f.text} color={f.color} dark={f.dark} indent={i % 2}>
@@ -266,60 +256,36 @@ function ForWho() {
 
 /* ---------- 3. 4주 커리큘럼 ---------- */
 
-const WEEKS: { title: string; goal: string; blocks: { t: string; c: string; dark?: boolean; i?: number }[] }[] = [
+const WEEKS: { title: string; goal: string; lessons: [string, string] }[] = [
   {
     title: "움직이기",
     goal: "캐릭터를 방향키로 움직이고 벽에 닿으면 튕기게 합니다.",
-    blocks: [
-      { t: "깃발을 눌렀을 때", c: C.orange },
-      { t: "오른쪽 키를 누르면 10만큼 움직이기", c: C.blue, dark: true, i: 1 },
-      { t: "벽에 닿으면 튕기기", c: C.blue, dark: true, i: 1 },
-    ],
+    lessons: ["블록 끌어 붙이기, 깃발을 눌러 캐릭터 움직이기", "방향키로 조종하기, 벽에 닿으면 튕기기"],
   },
   {
     title: "조건 걸기",
     goal: "장애물에 닿으면 처음 자리로 돌아가게 만듭니다.",
-    blocks: [
-      { t: "계속 반복하기", c: C.yellow },
-      { t: "만약 장애물에 닿았다면", c: C.yellow, i: 1 },
-      { t: "처음 자리로 가기", c: C.blue, dark: true, i: 2 },
-      { t: "아니면 앞으로 달리기", c: C.blue, dark: true, i: 2 },
-    ],
+    lessons: ["반복하기 블록으로 계속 달리는 캐릭터 만들기", "만약 블록으로 장애물에 닿으면 처음 자리로 보내기"],
   },
   {
     title: "점수와 판",
     goal: "별을 모으면 점수가 오르고 10점이면 다음 판으로 넘어갑니다.",
-    blocks: [
-      { t: "별에 닿았을 때", c: C.orange },
-      { t: "점수를 1만큼 바꾸기", c: C.pink, dark: true, i: 1 },
-      { t: "만약 점수가 10이라면", c: C.yellow, i: 1 },
-      { t: "다음 판 배경으로 바꾸기", c: C.green, dark: true, i: 2 },
-    ],
+    lessons: ["변수로 점수 세기, 별에 닿으면 1점 올리기", "10점이 되면 배경을 바꿔 다음 판으로 넘기기"],
   },
   {
     title: "발표회",
     goal: "시작 화면을 붙여 게임을 완성하고 가족 앞에서 직접 소개합니다.",
-    blocks: [
-      { t: "시작 버튼을 눌렀을 때", c: C.orange },
-      { t: "게임 이름 말하기", c: C.green, dark: true, i: 1 },
-      { t: "친구와 바꿔서 해 보기", c: C.pink, dark: true, i: 1 },
-    ],
+    lessons: ["시작 화면과 게임 이름 붙여 완성하기", "가족 앞 발표, 친구와 게임 바꿔 해 보기"],
   },
 ];
 
 function Curriculum() {
   const [week, setWeek] = useState(0);
-  const reduce = useReducedMotionSafe();
   const w = WEEKS[week];
   return (
     <section id="curriculum" className="border-y-2 py-14" style={{ borderColor: C.ink, background: C.ink, color: C.white }}>
       <div className="mx-auto max-w-[1080px] px-5 md:px-8">
-        <div className="flex items-center gap-3">
-          <span className="inline-flex h-9 min-w-9 items-center justify-center rounded-[6px] border-2 px-2 text-[15px] font-black" style={{ borderColor: C.white }}>
-            02
-          </span>
-          <h2 className="text-[28px] font-black leading-tight tracking-[-0.02em] md:text-[36px]">4주 동안 배우는 것</h2>
-        </div>
+        <h2 className="text-[28px] font-black leading-tight tracking-[-0.02em] md:text-[36px]">4주 동안 배우는 것</h2>
 
         <div className="mt-8 grid grid-cols-4 gap-2" role="tablist" aria-label="주차">
           {WEEKS.map((x, i) => (
@@ -340,25 +306,16 @@ function Curriculum() {
 
         <div className="mt-8 grid gap-8 md:grid-cols-[1fr_1.2fr] md:items-start">
           <p className="text-[18px] leading-[1.7]">{w.goal}</p>
-          <div className="rounded-[12px] border-2 p-5" style={{ ...GRID_BG, borderColor: C.white, color: C.ink }} aria-live="polite">
-            <AnimatePresence mode="wait" initial={false}>
-              <motion.div key={week} className="space-y-[3px]">
-                {w.blocks.map((b, i) => (
-                  <motion.div
-                    key={b.t}
-                    initial={reduce ? false : { opacity: 0, y: -14 }}
-                    animate={{ opacity: 1, y: 0 }}
-                    exit={reduce ? undefined : { opacity: 0 }}
-                    transition={{ duration: 0.22, delay: reduce ? 0 : i * 0.07, ease: [0.22, 1, 0.36, 1] }}
-                  >
-                    <Block color={b.c} dark={b.dark} indent={b.i ?? 0}>
-                      {b.t}
-                    </Block>
-                  </motion.div>
-                ))}
-              </motion.div>
-            </AnimatePresence>
-          </div>
+          <ol className="divide-y-2 overflow-hidden rounded-[12px] border-2" style={{ borderColor: C.white, background: C.white, color: C.ink }} aria-live="polite">
+            {w.lessons.map((t, i) => (
+              <li key={t} className="flex gap-4 px-5 py-4" style={{ borderColor: C.grid }}>
+                <span className="shrink-0 text-[14px] font-black" style={{ color: C.blue }}>
+                  {week * 2 + i + 1}회차
+                </span>
+                <span className="text-[16px] font-bold leading-[1.6]">{t}</span>
+              </li>
+            ))}
+          </ol>
         </div>
       </div>
     </section>
@@ -376,7 +333,7 @@ const WORKS = [
 function Showcase() {
   return (
     <section className="mx-auto max-w-[1080px] px-5 py-14 md:px-8">
-      <SectionTitle no="03">지난 방학에 만든 게임</SectionTitle>
+      <SectionTitle>지난 방학에 만든 게임</SectionTitle>
       <div className="mt-8 grid gap-5 md:grid-cols-3">
         {WORKS.map((w, i) => (
           <article
@@ -409,7 +366,7 @@ function Showcase() {
 function Teacher() {
   return (
     <section className="mx-auto max-w-[1080px] px-5 py-14 md:px-8">
-      <SectionTitle no="04">가르치는 사람</SectionTitle>
+      <SectionTitle>가르치는 사람</SectionTitle>
       <div className="mt-8 grid gap-6 overflow-hidden rounded-[14px] border-2 md:grid-cols-[300px_1fr]" style={{ borderColor: C.ink, background: C.white }}>
         <div className="relative aspect-[4/3] border-b-2 md:aspect-auto md:border-b-0 md:border-r-2" style={{ borderColor: C.ink }}>
           <Image src={`${IMG}/teacher.jpg`} alt="남색 스웨터를 입은 김ㅈ우 선생님" fill sizes="(min-width: 768px) 300px, 100vw" className="object-cover object-[50%_25%]" />
@@ -438,7 +395,7 @@ function Teacher() {
 function Schedule({ seats, start }: { seats: Record<ClassId, number>; start: Date }) {
   return (
     <section className="mx-auto max-w-[1080px] px-5 py-14 md:px-8">
-      <SectionTitle no="05">반과 수업료</SectionTitle>
+      <SectionTitle>반과 수업료</SectionTitle>
       <p className="mt-4 text-[16px]" style={{ color: C.muted }}>
         {fmtKo(start)} 개강, 4주 동안 8회. 형제가 함께 들으면 둘째 수업료를 10% 빼 드립니다.
       </p>
@@ -499,7 +456,7 @@ function Faq() {
   const [open, setOpen] = useState<number | null>(0);
   return (
     <section className="mx-auto max-w-[1080px] px-5 py-14 md:px-8">
-      <SectionTitle no="06">자주 묻는 질문</SectionTitle>
+      <SectionTitle>자주 묻는 질문</SectionTitle>
       <div className="mt-8 divide-y-2 overflow-hidden rounded-[12px] border-2" style={{ borderColor: C.ink, background: C.white }}>
         {FAQ.map((f, i) => {
           const isOpen = open === i;
@@ -532,21 +489,12 @@ function Faq() {
 interface Applied {
   no: string;
   parent: string;
-  phone: string;
   grade: Grade;
   cls: CampClass;
   reply: Date;
 }
 
 const mask = maskName;
-
-/* 신청 완료 뒤 사장님 시트에 미리 쌓여 있는 가상 접수. */
-const PAST_LEADS: LeadRow[] = [
-  { at: "오늘 11:42", name: "박ㅅ연", digits: "01077315820", summary: "초4, 게임 만들기반", source: "메타 광고", status: "통화함" },
-  { at: "오늘 09:16", name: "이ㅈ민", digits: "01022904417", summary: "초3, 블록 코딩반", source: "네이버 검색광고", status: "통화 전" },
-  { at: "어제 21:08", name: "이ㅈ민", digits: "01022904417", summary: "초3, 블록 코딩반", source: "네이버 검색광고", status: "계약" },
-  { at: "어제 15:31", name: "최ㅇ준", digits: "01050163302", summary: "초5, 로봇 코딩반", source: "블로그", status: "보류" },
-];
 
 /* 접수 다음 날이 회신일. 토·일이면 월요일로 넘긴다. */
 const replyDay = (today: Date) => {
@@ -594,18 +542,8 @@ function ApplyForm({
     if (!ok || !grade || !cls) return;
     const c = CLASSES.find((x) => x.id === cls)!;
     const no = `CC${fmtDot(today).replace(/\./g, "").slice(2)}-${String(Math.floor(Math.random() * 900) + 100)}`;
-    setDone({ no, parent, phone, grade, cls: c, reply: replyDay(today) });
+    setDone({ no, parent, grade, cls: c, reply: replyDay(today) });
     onApplied(c.id);
-  };
-
-  const reset = () => {
-    setParent("");
-    setPhone("");
-    setGrade("");
-    setCls("");
-    setAgree(false);
-    setTried(false);
-    setDone(null);
   };
 
   const field = "mt-2 h-12 w-full rounded-[8px] border-2 bg-white px-3.5 text-[17px] outline-none focus-visible:ring-4 focus-visible:ring-[#2f62ff]/30";
@@ -613,7 +551,7 @@ function ApplyForm({
 
   return (
     <section ref={ref} id="apply" className="mx-auto max-w-[1080px] scroll-mt-6 px-5 py-14 md:px-8">
-      <SectionTitle no="07">특강 신청</SectionTitle>
+      <SectionTitle>특강 신청</SectionTitle>
       <p className="mt-4 text-[16px]" style={{ color: C.muted }}>
         {fmtKo(deadline)}까지 받습니다. 신청하시면 다음 날 문자로 반 배정과 수업료 안내를 보내 드립니다.
       </p>
@@ -644,22 +582,6 @@ function ApplyForm({
               <p className="mt-5 text-[15px] leading-[1.7]" style={{ color: C.muted }}>
                 연락이 없으면 교실로 전화 주세요. 02-000-0000, 평일 오후 1시부터 8시까지 받습니다.
               </p>
-              <button type="button" onClick={reset} className="mt-5 inline-flex items-center gap-2 text-[15px] font-bold underline underline-offset-4">
-                <RotateCcw className="h-4 w-4" aria-hidden />
-                다른 아이도 신청하기
-              </button>
-              <LeadReceivedPanel
-                business="곰파트너"
-                name={done.parent}
-                phone={done.phone}
-                summary={`${done.grade}, ${done.cls.name}`}
-                lines={[
-                  ["학년", done.grade],
-                  ["반", `${done.cls.name} (${done.cls.when})`],
-                ]}
-                pastRows={PAST_LEADS}
-                theme={{ accent: C.blue, accentSoft: "#fff4d1", ink: C.ink, muted: C.muted, line: C.grid, paper: C.paper }}
-              />
             </motion.div>
           ) : (
             <motion.form key="form" onSubmit={submit} noValidate initial={reduce ? false : { opacity: 0 }} animate={{ opacity: 1 }} exit={reduce ? undefined : { opacity: 0 }} className="grid gap-5 md:grid-cols-2">

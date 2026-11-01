@@ -17,11 +17,8 @@ import { DemoMakerInfo } from "@/components/demos/DemoMakerInfo";
    이용 안내에는 입실 14시, 퇴실 11시, 매너타임, 화기 규정(화로대 사용, 바닥 직화 금지), 반려동물, 환불 규정표가 있다.
    오시는 길은 역이 아니라 고속도로 나들목 기준으로 적는다.
 
-   첫 화면(cp-poster): 상단 메뉴 + 좌우 분할. 왼쪽은 캠핑장 전경 항공 사진 위에 사진 속 데크 자리마다 사이트 번호 라벨
-   (고른 날짜에 찬 자리는 회색 빗금), 오른쪽은 입실일 한 칸과 구역 목록. 목록에 마우스를 올리면 사진 위 그 구역 번호가 강조되고,
-   사진 밖인 C구역과 글램핑은 구역 사진으로 바뀐다. 번호를 누르면 그 구역 행이 그 번호로 예약하도록 바뀐다.
-   들어올 때 사진이 1.06배에서 1배로 1.6초 동안 다가온다(CSS keyframes). 동작 줄이기면 멈춘 상태.
-   그 아래 이용 규칙 한 줄 띠가 이어진다.
+   첫 화면(cp-poster): 상단 메뉴 + 좌우 분할. 왼쪽은 캠핑장 전경 항공 사진 한 장(정지), 오른쪽은 입실일 한 칸과 구역 목록.
+   구역을 누르면 그 구역의 빈 사이트와 고른 날짜로 아래 실시간 예약이 채워진다. 그 아래 이용 규칙 한 줄 띠가 이어진다.
 
    사진 출처: 항공 사진과 구역 사진은 AI 생성(Z-Image-Turbo)
 
@@ -34,8 +31,8 @@ import { DemoMakerInfo } from "@/components/demos/DemoMakerInfo";
 
 const TEL = "033-000-0000";
 const ADDRESS = "강원 ㅍㅊ군 ㅇㅇ면 ㅇㅇ로 00";
-const BANK = "ㄱㅁ은행 000-000000-00-000 (예금주 곰파트너)";
-const KAKAO = "카카오톡 채널 곰파트너";
+const BANK = "ㄱㅁ은행 000-000000-00-000 (예금주 오토캠핑장)";
+const KAKAO = "카카오톡 채널 오토캠핑장";
 
 
 /* 색: 바탕은 흰색과 옅은 회색, 머리글과 바닥글, 첫 화면 띠는 먹색. 강조색은 장작불 빛을 낮춘 갈색 하나만 버튼, 선택, 작은 강조에 쓴다. */
@@ -58,7 +55,7 @@ const C = {
 };
 
 /* 모션 상수 */
-const EASE = [0.22, 1, 0.36, 1] as const; // 패널 등장, 첫 화면 사진
+const EASE = [0.22, 1, 0.36, 1] as const; // 패널 등장
 const PANEL_MS = 260; // 사이트 카드, 접수 완료 화면 전환
 
 const focusRing = "focus-visible:outline focus-visible:outline-[3px] focus-visible:outline-offset-2";
@@ -353,38 +350,8 @@ export function CampsiteDemo() {
 
 const IMG = "/images/demo-campsite";
 
-/* 첫 화면 모션(ms). 사진이 1.06배에서 1600 동안 제자리로 온다(CSS keyframes, 끝 상태가 기본값). 동작 줄이기면 끈다. */
-const HERO_IN_MS = 1600;
-const HERO_TEXT_DELAY_MS = 300;
-const HERO_TEXT_MS = 700;
-const EASE_CSS = `cubic-bezier(${EASE.join(",")})`;
-
-const HERO_CSS = `
-@keyframes cp-hero-in { from { transform: scale(1.06); } }
-@keyframes cp-hero-rise { from { opacity: 0; transform: translateY(12px); } }
-.cp-hero-photo { animation: cp-hero-in ${HERO_IN_MS}ms ${EASE_CSS} both; }
-.cp-hero-rise { animation: cp-hero-rise ${HERO_TEXT_MS}ms ${EASE_CSS} ${HERO_TEXT_DELAY_MS}ms both; }
-@media (prefers-reduced-motion: reduce) { .cp-hero-photo, .cp-hero-rise { animation: none; } }
-`;
-
-/** 첫 화면 구역 목록. 사진은 구역마다 한 장 */
-const ZONE_ROWS: { zone: Zone; photo: string; alt: string }[] = [
-  { zone: "A", photo: "zone-A.jpg", alt: "강가에 놓인 나무 데크와 텐트" },
-  { zone: "B", photo: "zone-B.jpg", alt: "잣나무 숲 안 나무 데크 위 텐트" },
-  { zone: "C", photo: "zone-C.jpg", alt: "잔디 사이트 옆에 차를 댄 오토캠핑 텐트" },
-  { zone: "G", photo: "zone-G.jpg", alt: "데크 위에 세운 글램핑 벨텐트" },
-];
-/** 항공 사진(aerial.jpg) 속 데크 자리(%). 길 왼쪽 볕 드는 잔디가 A구역, 숲 가장자리가 B구역. 나머지 번호는 사진 밖 */
-const DECK_PINS: { id: string; x: number; y: number }[] = [
-  { id: "A1", x: 28.8, y: 47.6 },
-  { id: "A2", x: 36.1, y: 59.8 },
-  { id: "A3", x: 44.0, y: 70.7 },
-  { id: "A4", x: 54.6, y: 82.0 },
-  { id: "B1", x: 50.0, y: 27.8 },
-  { id: "B2", x: 58.8, y: 36.3 },
-  { id: "B3", x: 67.7, y: 46.3 },
-  { id: "B4", x: 77.9, y: 58.2 },
-];
+/** 첫 화면 구역 목록 순서 */
+const ZONE_ORDER: Zone[] = ["A", "B", "C", "G"];
 const GNB: [string, string][] = [
   ["cp-price", "사이트 안내"],
   ["cp-map", "배치도"],
@@ -414,12 +381,8 @@ function Poster({
   const inView = useInView(ref, { amount: 0.3 });
   const [menu, setMenu] = useState(false);
   const [day, setDay] = useState<number | null>(null);
-  const [hover, setHover] = useState<Zone | null>(null);
-  const [picked, setPicked] = useState<string | null>(null);
   const dayIdx = day ?? defaultDay;
   const date = daysAgo(today, -dayIdx);
-  // A, B는 항공 사진 위에서 강조하고, 사진 밖인 C, G만 구역 사진으로 바꾼다
-  const photoRow = hover === "C" || hover === "G" ? ZONE_ROWS.find((r) => r.zone === hover)! : null;
 
   useEffect(() => {
     if (!menu) return;
@@ -484,70 +447,17 @@ function Poster({
       </header>
 
       <section id="cp-poster" ref={ref} aria-labelledby="cp-poster-title" style={{ background: C.paper }}>
-        <style>{HERO_CSS}</style>
         <div className="mx-auto grid max-w-[1200px] gap-5 px-4 pb-8 pt-5 md:grid-cols-[minmax(0,3fr)_minmax(0,2fr)] md:gap-8 md:px-6 md:pt-8">
-          {/* 왼쪽: 캠핑장 전경 항공 사진 위 데크 번호. A, B는 사진 속 데크 자리에 번호, C와 G는 사진 밖이라 구역 사진으로 바꿔 보여 준다 */}
+          {/* 왼쪽: 캠핑장 전경 항공 사진 */}
           <div className="relative aspect-[3/2] overflow-hidden rounded-[8px]" style={{ background: C.night }}>
-            <div className={`absolute inset-0 ${reduce ? "" : "cp-hero-photo"}`}>
-              <AnimatePresence initial={false}>
-                <motion.img
-                  key={photoRow ? photoRow.zone : "aerial"}
-                  src={photoRow ? `${IMG}/${photoRow.photo}` : `${IMG}/aerial.jpg`}
-                  sizes="(min-width: 768px) 60vw, 100vw"
-                  alt={photoRow ? photoRow.alt : "숲 사이 자갈길 양옆으로 나무 데크 사이트가 놓인 캠핑장을 위에서 찍은 사진"}
-                  fetchPriority={photoRow ? undefined : "high"}
-                  initial={reduce ? false : { opacity: 0 }}
-                  animate={{ opacity: 1 }}
-                  exit={reduce ? { opacity: 0, transition: { duration: 0 } } : { opacity: 0 }}
-                  transition={{ duration: reduce ? 0 : 0.35 }}
-                  className="absolute inset-0 h-full w-full object-cover"
-                  style={{ objectPosition: photoRow ? "50% 55%" : "50% 50%" }}
-                />
-              </AnimatePresence>
-            </div>
-            {/* 데크 번호. 위치는 aerial.jpg(1200x799) 속 데크 가운데 */}
-            {!photoRow && (
-              <ul aria-label="사진 속 사이트 번호">
-                <li className="pointer-events-none absolute -translate-x-1/2 -translate-y-1/2" style={{ left: "32.8%", top: "8.5%" }}>
-                  <span className="block rounded-[4px] px-1.5 py-0.5 text-[12px] font-semibold" style={{ background: "rgba(20,20,20,0.78)", color: "#fff" }}>
-                    관리동
-                  </span>
-                </li>
-                {DECK_PINS.map((pin) => {
-                  const s = siteOf(pin.id);
-                  const full = isFull(SITES.indexOf(s), dayIdx, date);
-                  const on = picked === pin.id;
-                  const zoneOn = hover === s.zone;
-                  return (
-                    <li key={pin.id} className="absolute -translate-x-1/2 -translate-y-1/2" style={{ left: `${pin.x}%`, top: `${pin.y}%` }}>
-                      <button
-                        type="button"
-                        onClick={() => {
-                          setPicked(pin.id);
-                          setHover(s.zone);
-                          document.getElementById(`cp-zone-${s.zone}`)?.scrollIntoView({ behavior: reduce ? "auto" : "smooth", block: "nearest" });
-                        }}
-                        aria-pressed={on}
-                        aria-label={`${pin.id} ${full ? "예약 마감" : "예약 가능"}`}
-                        className={`flex h-11 w-11 items-center justify-center rounded-[4px] ${focusRing}`}
-                        style={{ outlineColor: "#fff" }}
-                      >
-                        <span
-                          className={`block rounded-[4px] border px-1.5 py-0.5 text-[12px] font-bold tabular-nums md:text-[13px] ${full ? "cp-hatch line-through" : ""}`}
-                          style={{
-                            background: on ? C.fire : full ? "rgba(225,225,225,0.95)" : zoneOn ? C.fireSoft : "rgba(255,255,255,0.95)",
-                            borderColor: on ? C.fire : zoneOn ? C.fire : "transparent",
-                            color: on ? "#fff" : full ? C.muted : C.ink,
-                          }}
-                        >
-                          {pin.id}
-                        </span>
-                      </button>
-                    </li>
-                  );
-                })}
-              </ul>
-            )}
+            {/* eslint-disable-next-line @next/next/no-img-element -- 정적 export 라 next/image 최적화를 쓰지 않는다 */}
+            <img
+              src={`${IMG}/aerial.jpg`}
+              sizes="(min-width: 768px) 60vw, 100vw"
+              alt="숲 사이 자갈길 양옆으로 나무 데크 사이트가 놓인 캠핑장을 위에서 찍은 사진"
+              fetchPriority="high"
+              className="absolute inset-0 h-full w-full object-cover"
+            />
           </div>
 
           {/* 오른쪽: 날짜 한 칸과 구역 목록 */}
@@ -577,27 +487,25 @@ function Poster({
                 })}
               </select>
             </label>
-            <ul aria-label="구역별 남은 자리" className="mt-3 border-t" style={{ borderColor: C.line }} onMouseLeave={() => setHover(null)}>
-              {ZONE_ROWS.map((r) => {
-                const sites = SITES.filter((s) => s.zone === r.zone);
+            <ul aria-label="구역별 남은 자리" className="mt-3 border-t" style={{ borderColor: C.line }}>
+              {ZONE_ORDER.map((zone) => {
+                const sites = SITES.filter((s) => s.zone === zone);
                 const freeIds = sites.filter((s) => !isFull(SITES.indexOf(s), dayIdx, date)).map((s) => s.id);
                 const rate = RATE[sites[0].type];
                 const power = sites.filter((s) => s.power).length;
                 const left = freeIds.length;
                 return (
-                  <li key={r.zone} id={`cp-zone-${r.zone}`} className="border-b" style={{ borderColor: C.line }}>
+                  <li key={zone} id={`cp-zone-${zone}`} className="border-b" style={{ borderColor: C.line }}>
                     <button
                       type="button"
                       disabled={left === 0}
-                      onMouseEnter={() => setHover(r.zone)}
-                      onFocus={() => setHover(r.zone)}
-                      onClick={() => onZone(picked && freeIds.includes(picked) ? picked : freeIds[0], dayIdx)}
+                      onClick={() => onZone(freeIds[0], dayIdx)}
                       className={`grid w-full grid-cols-[minmax(0,1fr)_auto] items-center gap-x-3 px-2 py-3 text-left disabled:cursor-not-allowed ${focusRing}`}
-                      style={{ background: hover === r.zone ? C.fireSoft : "transparent", outlineColor: C.fire }}
+                      style={{ outlineColor: C.fire }}
                     >
                       <span className="min-w-0">
                         <span className="block text-[17px] font-bold" style={{ color: left ? C.night : C.muted }}>
-                          {ZONES[r.zone].name}
+                          {ZONES[zone].name}
                         </span>
                         <span className="mt-0.5 block text-[14px] tabular-nums" style={{ color: C.body }}>
                           {sizeText(sites)}, 기준 {rate.base}명 최대 {MAX_PEOPLE}명, 전기 {power === sites.length ? "전 사이트" : `${power}면`}
@@ -605,13 +513,13 @@ function Poster({
                       </span>
                       <span className="text-right">
                         <span className="block text-[13px] font-bold" style={{ color: left ? C.fireText : C.muted }}>
-                          {left ? (picked && siteOf(picked).zone === r.zone && freeIds.includes(picked) ? `${picked} 선택` : "예약 가능") : "예약 마감"}
+                          {left ? "예약 가능" : "예약 마감"}
                         </span>
                         <span className="block text-[17px] font-bold tabular-nums" style={{ color: left ? C.ink : C.muted }}>
                           {left}
                           <span className="text-[13px] font-normal" style={{ color: C.muted }}>
                             /{sites.length}
-                            {r.zone === "G" ? "동" : "면"}
+                            {zone === "G" ? "동" : "면"}
                           </span>
                         </span>
                       </span>
@@ -1408,7 +1316,7 @@ function Directions() {
         <g transform="translate(540 40)">
           <path d="M0 24 L14 2 L28 24 Z" fill={C.fire} stroke={C.ink} strokeWidth={1.5} />
           <text x={14} y={44} textAnchor="middle" fontSize="14" fontWeight={700} fill={C.ink}>
-            곰파트너
+            오토캠핑장
           </text>
         </g>
       </svg>
@@ -1440,11 +1348,8 @@ function Directions() {
 function SampleLogo({ light, small }: { light?: boolean; small?: boolean }) {
   return (
     <span className="inline-flex items-center gap-2" style={{ color: light ? "#ffffff" : "#111111" }}>
-      {/* eslint-disable-next-line @next/next/no-img-element -- 메인 사이트와 같은 곰 로고 */}
-      <img src="/images/logo-bear.png" alt="" aria-hidden width={28} height={28} className={small ? "h-6 w-6 shrink-0" : "h-7 w-7 shrink-0"} />
       <span className="flex items-baseline gap-1 whitespace-nowrap">
-        <span className={`${small ? "text-[18px]" : "text-[20px]"} font-bold leading-none tracking-[-0.03em]`}>곰파트너</span>
-        <span className="text-[12px] font-semibold leading-none opacity-75">카탈로그</span>
+        <span className={`${small ? "text-[18px]" : "text-[20px]"} font-bold leading-none tracking-[-0.03em]`}>오토캠핑장</span>
       </span>
     </span>
   );

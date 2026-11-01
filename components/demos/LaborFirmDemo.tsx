@@ -3,20 +3,16 @@
 import { useEffect, useId, useState } from "react";
 import { AnimatePresence, motion } from "framer-motion";
 import {
-  AlertTriangle,
   Briefcase,
   CalendarCheck,
   CalendarClock,
   Check,
   ChevronRight,
-  Clock,
   FileText,
   HardHat,
   MapPin,
   MessageCircle,
-  Minus,
   Phone,
-  Plus,
   Scale,
   ShieldAlert,
   Users,
@@ -40,25 +36,21 @@ import { DemoMakerInfo } from "@/components/demos/DemoMakerInfo";
    해고 다음 날부터 세어 3개월 뒤 같은 날 끝나고, 그 날이 토요일이나 공휴일이면 다음 날 끝난다.
    퇴직하면 14일 안에 임금과 퇴직금을 받아야 하고, 지나면 연 20% 지연이자가 붙는다(근로기준법 제36조, 제37조, 시행령 제17조).
    2025년 10월 23일부터는 재직 중 밀린 임금도 정기 지급일 다음 날부터 같은 지연이자가 붙는다.
-   퇴직금은 1년 이상 일했을 때 평균임금 30일분 x 근속 연수다. 계산기는 월급으로 바꿔 개략만 보여 준다.
+   퇴직금은 1년 이상 일했을 때 평균임금 30일분 x 근속 연수다.
 
    사진 출처: Pexels 사진 6814526, 직원 사진과 근로자 칸 현장 사진은 AI 생성(Z-Image-Turbo)
 
-   첫 화면(lf-poster): 상단 메뉴(휴대폰은 가로로 미는 메뉴) 아래 사업주, 근로자 두 갈래 입구. 칸마다 위에 사진, 아래 업무 5줄과
-   갈래별 상담신청 버튼. PC는 마우스를 올리거나 누른 칸이 넓어지고, 휴대폰은 위에 붙는 전환 버튼으로 한 갈래만 보인다.
-   업무 줄은 아래 구간으로 이어진다(부당해고는 기한 계산, 임금체불과 퇴직금은 체불 계산, 사업주 업무는 자문 요금, 산재와 괴롭힘은
-   상담신청 분야 미리 선택). 실제 노무법인 사이트(사업주, 근로자 상담 분리, 개인/기업 첫 칸)의 방식을 따랐다.
-   모션: 사진이 1.06배에서 1배로 1.6초 동안 다가오고, 칸 넓이는 0.4초 전환. 동작 줄이기면 전부 멈춘다.
+   첫 화면(lf-poster): 상단 메뉴(휴대폰은 가로로 미는 메뉴) 아래 사업주, 근로자 두 갈래 입구를 고정 2단으로 둔다.
+   칸마다 위에 사진, 아래 업무 5줄과 갈래별 상담신청 버튼. 휴대폰은 두 칸을 위아래로 쌓는다.
+   업무 줄은 아래 안내 구간으로 이어진다(부당해고는 구제신청 안내, 임금체불과 퇴직금은 체불 안내, 사업주 업무는 자문 요금,
+   산재와 괴롭힘은 상담신청 분야 미리 선택). 실제 노무법인 사이트(사업주, 근로자 상담 분리)의 방식을 따랐다.
 
-   상호작용(모두 브라우저 안에서만 돈다. 실제로 보내지 않는다)
-   1. 부당해고 구제신청 기한 계산: 해고일을 넣으면 신청 마감일과 남은 날, 3개월 막대 위 오늘 위치가 나온다.
-   2. 임금체불 개략 계산: 월급, 밀린 달, 퇴직 여부와 근속 연수를 넣으면 밀린 임금과 퇴직금 개략 합계가 나온다.
-   3. 노무 자문 요금: 직원 수를 움직이면 해당 구간 월 자문료와 연간 금액이 나온다.
-   4. 상담신청: 분야, 방법, 희망일, 시간대, 이름, 연락처. 완료 화면에 접수 번호, 담당 창구, 회신 예정일. */
+   구간: 업무분야, 부당해고 구제신청 안내, 임금체불과 퇴직금 안내, 직원 수 구간별 자문료 표, 노무사 소개,
+   상담신청(분야, 방법, 희망일, 시간대, 이름, 연락처. 완료 화면에 접수 번호, 담당 창구, 회신 예정일), 오시는 길, 공지사항. */
 
 const IMG = "/images/demo-labor-firm";
 const TEL = "02-000-0000";
-const KAKAO = "카카오톡 채널 곰파트너";
+const KAKAO = "카카오톡 채널 노무법인";
 const ADDRESS = "서울 ㅇㅇ구 ㅇㅇ로 00, 5층";
 
 /* 본문 색 */
@@ -80,44 +72,13 @@ const C = {
 
 /* 모션 상수. 시간은 초, 이징은 cubic-bezier */
 const EASE = [0.22, 1, 0.36, 1] as const;
-/** 첫 화면 사진이 다가오는 시간 */
-const PHOTO_IN = 1.6;
-/** 결과 숫자, 막대 전환 */
-const DUR = 0.4;
 
 const focusRing = "focus-visible:outline focus-visible:outline-[3px] focus-visible:outline-offset-2";
 const won = (n: number) => `${Math.round(n).toLocaleString("ko-KR")}원`;
-const md = (d: Date) => `${d.getMonth() + 1}.${d.getDate()}`;
-const clamp01 = (v: number) => Math.min(1, Math.max(0, v));
 
 /* ---------- 날짜 ---------- */
 
 const DOW = ["일", "월", "화", "수", "목", "금", "토"];
-const DAY_MS = 86_400_000;
-const daysBetween = (a: Date, b: Date) => Math.round((b.getTime() - a.getTime()) / DAY_MS);
-
-/** "2026-10-07" 를 그 날 0시 Date 로 */
-function parseDash(s: string) {
-  const m = /^(\d{4})-(\d{2})-(\d{2})$/.exec(s);
-  if (!m) return null;
-  const d = new Date(Number(m[1]), Number(m[2]) - 1, Number(m[3]));
-  return Number.isNaN(d.getTime()) ? null : d;
-}
-
-/** 날짜가 고정된 공휴일(월-일). 설, 추석, 부처님오신날, 대체공휴일은 넣지 않았다 */
-const FIXED_HOLIDAYS = ["1-1", "3-1", "5-5", "6-6", "8-15", "10-3", "10-9", "12-25"];
-const isOffDay = (d: Date) => d.getDay() === 0 || d.getDay() === 6 || FIXED_HOLIDAYS.includes(`${d.getMonth() + 1}-${d.getDate()}`);
-
-/** 해고일부터 3개월 되는 날. 해당 날이 없으면 그 달 말일, 토요일이나 공휴일이면 그다음 평일(민법 제161조) */
-function reliefDeadline(fired: Date) {
-  const y = fired.getFullYear();
-  const m = fired.getMonth() + 3;
-  const last = new Date(y, m + 1, 0).getDate();
-  const raw = new Date(y, m, Math.min(fired.getDate(), last));
-  let end = raw;
-  while (isOffDay(end)) end = daysAgo(end, -1);
-  return { raw, end, moved: end.getTime() !== raw.getTime() };
-}
 
 /** 다음 영업일(토, 일 제외) n개 */
 function nextBizDays(from: Date, n: number) {
@@ -150,8 +111,7 @@ const TIERS: { from: number; to: number | null; label: string; fee: number | nul
   { from: 50, to: 99, label: "50인 ~ 99인", fee: 500_000 },
   { from: 100, to: null, label: "100인 이상", fee: null },
 ];
-const tierOf = (n: number) => TIERS.findIndex((t) => n >= t.from && (t.to === null || n <= t.to));
-const ADVISORY_INCLUDES = ["전화, 카카오톡 노무 상담 횟수 제한 없음", "근로계약서, 취업규칙 검토", "징계, 해고 절차 자문", "노동청 점검 대응"];
+const ADVISORY_INCLUDES = ["전화, 카카오톡 노무 상담 횟수 제한 없음", "근로계약서, 취업규칙 검토", "징계, 해고 절차 자문", "연차, 연장근로 수당 계산 검토", "노동청 점검 대응"];
 
 /* ---------- 상담 ---------- */
 
@@ -190,7 +150,7 @@ export function LaborFirmDemo() {
 
   return (
     <div className="min-h-screen overflow-x-clip" style={{ background: C.bg, color: C.ink }}>
-      <Poster reduce={reduce} go={go} consult={consult} />
+      <Poster go={go} consult={consult} />
 
 
       {/* 업무분야 */}
@@ -214,18 +174,18 @@ export function LaborFirmDemo() {
       </section>
 
       <section id="lf-deadline" aria-labelledby="lf-deadline-title" className="mx-auto mt-14 max-w-[1200px] scroll-mt-4 px-4 md:mt-20 md:px-6">
-        <SectionTitle id="lf-deadline-title" icon={<CalendarClock size={24} aria-hidden />} title="부당해고 구제신청 기한" />
-        <DeadlineCalc today={today} reduce={reduce} onConsult={() => consult("부당해고")} />
+        <SectionTitle id="lf-deadline-title" icon={<CalendarClock size={24} aria-hidden />} title="부당해고 구제신청" />
+        <ReliefGuide onConsult={() => consult("부당해고")} />
       </section>
 
       <section id="lf-wage" aria-labelledby="lf-wage-title" className="mx-auto mt-14 max-w-[1200px] scroll-mt-4 px-4 md:mt-20 md:px-6">
-        <SectionTitle id="lf-wage-title" icon={<Wallet size={24} aria-hidden />} title="임금체불 개략 계산" />
-        <WageCalc reduce={reduce} onConsult={() => consult("임금체불")} />
+        <SectionTitle id="lf-wage-title" icon={<Wallet size={24} aria-hidden />} title="임금체불, 퇴직금" />
+        <WageGuide onConsult={() => consult("임금체불")} />
       </section>
 
       <section id="lf-advisory" aria-labelledby="lf-advisory-title" className="mx-auto mt-14 max-w-[1200px] scroll-mt-4 px-4 md:mt-20 md:px-6">
         <SectionTitle id="lf-advisory-title" icon={<Briefcase size={24} aria-hidden />} title="사업장 노무 자문" />
-        <Advisory reduce={reduce} onConsult={() => consult("노무 자문")} />
+        <Advisory onConsult={() => consult("노무 자문")} />
       </section>
 
       <section id="lf-people" aria-labelledby="lf-people-title" className="mx-auto mt-14 max-w-[1200px] scroll-mt-4 px-4 md:mt-20 md:px-6">
@@ -330,29 +290,6 @@ function SectionTitle({ id, icon, title }: { id: string; icon: React.ReactNode; 
   );
 }
 
-function Stepper({ label, value, set, min, max, unit }: { label: string; value: number; set: (n: number) => void; min: number; max: number; unit: string }) {
-  const btn = `grid h-11 w-11 place-items-center rounded-[4px] border disabled:opacity-40 ${focusRing}`;
-  return (
-    <div>
-      <p className="text-[15px] font-bold">{label}</p>
-      <div className="mt-2 flex items-center gap-2">
-        <button type="button" className={btn} style={{ borderColor: C.line, background: C.card, outlineColor: C.ink }} onClick={() => set(Math.max(min, value - 1))} disabled={value <= min} aria-label={`${label} 줄이기`}>
-          <Minus size={18} aria-hidden />
-        </button>
-        <output className="min-w-[4.5em] text-center text-[20px] font-bold tabular-nums" aria-live="polite">
-          {value}
-          <span className="ml-0.5 text-[15px]" style={{ fontFamily: "inherit" }}>
-            {unit}
-          </span>
-        </output>
-        <button type="button" className={btn} style={{ borderColor: C.line, background: C.card, outlineColor: C.ink }} onClick={() => set(Math.min(max, value + 1))} disabled={value >= max} aria-label={`${label} 늘리기`}>
-          <Plus size={18} aria-hidden />
-        </button>
-      </div>
-    </div>
-  );
-}
-
 function ConsultLink({ onClick, cta, children }: { onClick: () => void; cta: string; children: React.ReactNode }) {
   return (
     <button
@@ -418,15 +355,8 @@ const MENU: [string, string][] = [
   ["lf-visit", "오시는 길"],
 ];
 
-function Poster({ reduce, go, consult }: { reduce: boolean; go: (id: string) => void; consult: (t: Topic) => void }) {
-  // 누른 갈래는 남고, 마우스를 올린 갈래는 잠시 넓어진다. 휴대폰은 고른 갈래 하나만 보인다
-  const [picked, setPicked] = useState<Branch | null>(null);
-  const [hover, setHover] = useState<Branch | null>(null);
-  const wide = hover ?? picked;
-  const mobile = picked ?? "worker";
-
+function Poster({ go, consult }: { go: (id: string) => void; consult: (t: Topic) => void }) {
   const open = (r: Row) => (r.topic ? consult(r.topic) : go(r.to));
-  const grow = (b: Branch) => (wide === null ? 1 : wide === b ? 1.5 : 1);
 
   return (
     <section id="lf-poster" aria-labelledby="lf-poster-title" style={{ background: C.bg, color: C.ink }}>
@@ -474,68 +404,30 @@ function Poster({ reduce, go, consult }: { reduce: boolean; go: (id: string) => 
           </p>
         </div>
 
-        {/* 휴대폰: 갈래 전환 버튼이 스크롤해도 위에 붙는다 */}
-        <div role="tablist" aria-label="상담 갈래" className="sticky top-0 z-10 -mx-4 mt-4 grid grid-cols-2 gap-2 px-4 py-2 md:hidden" style={{ background: C.bg }}>
-          {(["biz", "worker"] as Branch[]).map((b) => {
-            const on = mobile === b;
-            return (
-              <button
-                key={b}
-                type="button"
-                role="tab"
-                aria-selected={on}
-                onClick={() => setPicked(b)}
-                className={`min-h-12 rounded-[4px] border text-[17px] font-bold ${focusRing}`}
-                style={{ borderColor: on ? C.gray : C.line, background: on ? C.gray : C.card, color: on ? "#fff" : C.ink, outlineColor: C.ink }}
-              >
-                {BRANCHES[b].label}
-              </button>
-            );
-          })}
-        </div>
-
-        <div className="mt-2 flex gap-4 md:mt-8 lg:gap-6">
+        <div className="mt-6 grid gap-4 md:mt-8 md:grid-cols-2 lg:gap-6">
           {(["biz", "worker"] as Branch[]).map((b) => {
             const d = BRANCHES[b];
-            const on = picked === b;
             return (
-              <motion.div
-                key={b}
-                onMouseEnter={() => setHover(b)}
-                onMouseLeave={() => setHover(null)}
-                initial={false}
-                animate={{ flexGrow: grow(b) }}
-                transition={{ duration: reduce ? 0 : DUR, ease: EASE }}
-                className={`${mobile === b ? "flex" : "hidden"} min-w-0 basis-0 flex-col overflow-hidden rounded-[6px] md:flex`}
-                style={{ border: `${on ? 2 : 1}px solid ${on ? C.gray : C.line}` }}
-              >
+              <div key={b} className="flex min-w-0 flex-col overflow-hidden rounded-[6px] border" style={{ borderColor: C.line }}>
                 <div className="relative aspect-[4/3] overflow-hidden md:aspect-auto md:h-[clamp(170px,24vh,250px)]" style={{ background: C.soft }}>
-                  <motion.div className="h-full w-full" initial={reduce ? false : { scale: 1.06 }} animate={{ scale: 1 }} transition={{ duration: reduce ? 0 : PHOTO_IN, ease: EASE }}>
-                    {/* eslint-disable-next-line @next/next/no-img-element -- 정적 export 라 next/image 최적화를 쓰지 않는다 */}
-                    <img
-                      src={d.photo}
-                      srcSet={d.srcSet}
-                      sizes="(min-width: 768px) 50vw, 100vw"
-                      alt={d.alt}
-                      fetchPriority={b === "biz" ? "high" : undefined}
-                      className="h-full w-full object-cover"
-                      style={{ objectPosition: d.pos }}
-                    />
-                  </motion.div>
+                  {/* eslint-disable-next-line @next/next/no-img-element -- 정적 export 라 next/image 최적화를 쓰지 않는다 */}
+                  <img
+                    src={d.photo}
+                    srcSet={d.srcSet}
+                    sizes="(min-width: 768px) 50vw, 100vw"
+                    alt={d.alt}
+                    fetchPriority={b === "biz" ? "high" : undefined}
+                    className="h-full w-full object-cover"
+                    style={{ objectPosition: d.pos }}
+                  />
                 </div>
                 <div className="flex flex-1 flex-col p-4 md:p-6">
-                  <button
-                    type="button"
-                    onClick={() => setPicked(b)}
-                    aria-pressed={on}
-                    className={`hidden min-h-11 items-center justify-between gap-3 rounded-[4px] text-left md:flex ${focusRing}`}
-                    style={{ outlineColor: C.ink }}
-                  >
+                  <h2 className="flex min-h-11 items-center justify-between gap-3">
                     <span className="text-[24px] font-bold tracking-[-0.02em]">{d.label}</span>
-                    <span className="text-[15px] font-semibold" style={{ color: on ? C.accent : C.muted }}>
-                      {on ? "선택" : d.sub}
+                    <span className="text-[15px] font-semibold" style={{ color: C.muted }}>
+                      {d.sub}
                     </span>
-                  </button>
+                  </h2>
                   <p className="text-[14px]" style={{ color: C.muted }}>
                     {d.caption}
                   </p>
@@ -568,7 +460,7 @@ function Poster({ reduce, go, consult }: { reduce: boolean; go: (id: string) => 
                     {d.label} 상담신청
                   </button>
                 </div>
-              </motion.div>
+              </div>
             );
           })}
         </div>
@@ -577,305 +469,137 @@ function Poster({ reduce, go, consult }: { reduce: boolean; go: (id: string) => 
   );
 }
 
-/* ---------- 1. 부당해고 구제신청 기한 ---------- */
+/* ---------- 1. 부당해고 구제신청 안내 ---------- */
 
-function DeadlineCalc({ today, reduce, onConsult }: { today: Date; reduce: boolean; onConsult: () => void }) {
-  const [input, setInput] = useState<string | null>(null);
-  const value = input ?? fmtDash(daysAgo(today, 23));
-  const fired = parseDash(value);
-  const inputId = useId();
+const RELIEF_FACTS: [string, string][] = [
+  ["신청 기한", "해고가 있었던 날부터 3개월 안. 마지막 날이 토요일이나 공휴일이면 그다음 날까지"],
+  ["신청하는 곳", "사업장 소재지 지방노동위원회"],
+  ["대상", "상시 근로자 5인 이상 사업장"],
+  ["처리 기간", "접수부터 판정까지 보통 60일 안팎"],
+];
 
-  const res = fired ? reliefDeadline(fired) : null;
-  const left = res ? daysBetween(today, res.end) : 0;
-  const total = res && fired ? Math.max(1, daysBetween(fired, res.end)) : 1;
-  const passed = res && fired ? clamp01(daysBetween(fired, today) / total) : 0;
-  const future = fired ? fired.getTime() > today.getTime() : false;
-  const tone = left < 0 ? "over" : left <= 14 ? "soon" : "ok";
+const RELIEF_STEPS: [string, string][] = [
+  ["구제신청서 제출", "해고 경위와 증거를 정리해 지방노동위원회에 냅니다."],
+  ["이유서, 답변서 교환", "회사 답변서를 받아 반박 서면을 준비합니다."],
+  ["조사관 조사", "양쪽 주장을 확인하고 화해를 권하기도 합니다."],
+  ["심문회의, 판정", "공익위원 앞에서 진술하고 당일 판정을 받습니다."],
+];
 
-  // 3개월 막대에 달 경계 표시
-  const marks =
-    fired && res
-      ? [1, 2].map((k) => {
-          const d = new Date(fired.getFullYear(), fired.getMonth() + k, Math.min(fired.getDate(), new Date(fired.getFullYear(), fired.getMonth() + k + 1, 0).getDate()));
-          return { k, f: clamp01(daysBetween(fired, d) / total) };
-        })
-      : [];
-
+function InfoTable({ caption, rows }: { caption: string; rows: [string, string][] }) {
   return (
-    <div className="mt-6 grid gap-6 rounded-[6px] border p-5 md:grid-cols-[minmax(0,0.9fr)_minmax(0,1.4fr)] md:gap-10 md:p-8" style={{ borderColor: C.line, background: C.card }}>
-      <div>
-        <label htmlFor={inputId} className="text-[16px] font-bold">
-          해고일
-        </label>
-        <input
-          id={inputId}
-          type="date"
-          value={value}
-          onChange={(e) => setInput(e.target.value)}
-          className={`mt-2 block h-12 w-full rounded-[4px] border px-3 text-[18px] ${focusRing}`}
-          style={{ borderColor: C.ink, outlineColor: C.ink }}
-        />
-        <p className="mt-2 text-[15px]" style={{ color: C.muted }}>
-          해고 통지서에 적힌 해고 날짜
+    <table className="w-full text-[16px]">
+      <caption className="sr-only">{caption}</caption>
+      <tbody>
+        {rows.map(([k, v]) => (
+          <tr key={k} className="border-b" style={{ borderColor: C.line }}>
+            <th scope="row" className="w-[34%] py-3 pr-3 text-left align-top font-bold">
+              {k}
+            </th>
+            <td className="py-3 align-top" style={{ color: C.body }}>
+              {v}
+            </td>
+          </tr>
+        ))}
+      </tbody>
+    </table>
+  );
+}
+
+function StepList({ steps }: { steps: [string, string][] }) {
+  return (
+    <ol className="grid gap-3">
+      {steps.map(([t, d], i) => (
+        <li key={t} className="grid grid-cols-[32px_minmax(0,1fr)] gap-3">
+          <span className="grid h-8 w-8 place-items-center rounded-full border text-[15px] font-bold tabular-nums" style={{ borderColor: C.ink }}>
+            {i + 1}
+          </span>
+          <span>
+            <span className="block text-[17px] font-bold">{t}</span>
+            <span className="mt-0.5 block text-[15px]" style={{ color: C.muted }}>
+              {d}
+            </span>
+          </span>
+        </li>
+      ))}
+    </ol>
+  );
+}
+
+function ReliefGuide({ onConsult }: { onConsult: () => void }) {
+  return (
+    <div className="mt-6 grid gap-6 md:grid-cols-2 md:gap-8">
+      <div className="rounded-[6px] border p-5 md:p-6" style={{ borderColor: C.line, background: C.card }}>
+        <div className="border-t" style={{ borderColor: C.ink }}>
+          <InfoTable caption="부당해고 구제신청 기본 사항" rows={RELIEF_FACTS} />
+        </div>
+        <p className="mt-4 text-[14px]" style={{ color: C.muted }}>
+          근로기준법 제28조, 민법 제161조
         </p>
-        <ul className="mt-5 space-y-2 text-[15px] leading-[1.6]">
-          {["상시 5인 이상 사업장", "회사 소재지 관할 지방노동위원회에 신청", "마감일이 공휴일이면 다음 날까지"].map((t) => (
-            <li key={t} className="flex gap-2">
-              <Check size={18} className="mt-0.5 flex-none" aria-hidden />
-              {t}
-            </li>
-          ))}
-        </ul>
       </div>
-
-      <div aria-live="polite">
-        {!fired || !res ? (
-          <p className="text-[17px] font-bold" style={{ color: C.error }}>
-            날짜를 다시 넣어 주세요.
-          </p>
-        ) : (
-          <>
-            <div className="flex flex-wrap items-end justify-between gap-4">
-              <div>
-                <p className="text-[15px] font-bold" style={{ color: C.muted }}>
-                  신청 마감일
-                </p>
-                <p className="mt-1 text-[30px] leading-tight md:text-[36px] font-bold">
-                  {fmtKo(res.end)}
-                </p>
-                {res.moved && (
-                  <p className="mt-1 text-[14px]" style={{ color: C.muted }}>
-                    3개월 되는 날 {fmtKo(res.raw)}이 쉬는 날이라 그다음 평일까지
-                  </p>
-                )}
-              </div>
-              <div
-                className="rounded-[4px] px-4 py-2 text-right"
-                style={{ background: tone === "over" ? C.error : tone === "soon" ? C.accent : C.gray, color: "#fff" }}
-              >
-                <p className="text-[13px] font-bold">{tone === "over" ? "기한 지남" : "남은 날"}</p>
-                <motion.p key={left} initial={reduce ? false : { y: -10, opacity: 0 }} animate={{ y: 0, opacity: 1 }} transition={{ duration: reduce ? 0 : DUR, ease: EASE }} className="text-[34px] leading-none font-bold">
-                  {left < 0 ? `${-left}일 지남` : left === 0 ? "오늘까지" : `${left}일`}
-                </motion.p>
-              </div>
-            </div>
-
-            {/* 3개월 막대 */}
-            <div className="mt-7">
-              <div className="relative h-5 text-[13px] font-bold" style={{ color: C.muted }}>
-                {marks.map((m) => (
-                  <span key={m.k} className="absolute bottom-0 -translate-x-1/2 whitespace-nowrap" style={{ left: `${m.f * 100}%` }}>
-                    {m.k}개월
-                  </span>
-                ))}
-              </div>
-              <div className="relative mt-1 h-4 rounded-[2px]" style={{ background: "#ececea" }}>
-                <motion.div
-                  className="absolute inset-y-0 left-0 w-full origin-left rounded-[2px]"
-                  style={{ background: tone === "over" ? C.error : C.gray }}
-                  initial={false}
-                  animate={{ scaleX: future ? 0 : passed }}
-                  transition={{ duration: reduce ? 0 : DUR, ease: EASE }}
-                />
-                {marks.map((m) => (
-                  <span key={m.k} aria-hidden className="absolute inset-y-[-4px] w-[2px]" style={{ left: `${m.f * 100}%`, background: C.accent }} />
-                ))}
-              </div>
-              <div className="mt-2 flex justify-between gap-3 text-[14px]" style={{ color: C.muted }}>
-                <span className="whitespace-nowrap">해고 {md(fired)}</span>
-                {!future && tone !== "over" && <span className="whitespace-nowrap font-bold" style={{ color: C.ink }}>{Math.round(passed * 100)}% 지남</span>}
-                <span className="whitespace-nowrap">마감 {md(res.end)}</span>
-              </div>
-            </div>
-
-            <p className="mt-5 flex items-start gap-2 text-[16px] font-semibold leading-[1.6]">
-              {tone === "over" ? <AlertTriangle size={20} className="mt-0.5 flex-none" aria-hidden /> : <Clock size={20} className="mt-0.5 flex-none" aria-hidden />}
-              {future
-                ? "해고 예정일 기준이에요. 해고 예고를 받았다면 미리 서류부터 모아 두세요."
-                : tone === "over"
-                  ? "노동위원회 신청 기한은 지났어요. 법원 소송은 따로 낼 수 있으니 상담해 보세요."
-                  : tone === "soon"
-                    ? "2주 안에 마감이에요. 신청서는 사유만 간단히 먼저 내고 이유서를 나중에 낼 수 있어요."
-                    : "해고 통지서, 근로계약서, 급여명세서를 먼저 챙겨 두세요."}
-            </p>
-            <div className="mt-5">
-              <ConsultLink onClick={onConsult} cta="labor-firm_deadline_consult">
-                부당해고 상담신청
-              </ConsultLink>
-            </div>
-          </>
-        )}
+      <div className="flex flex-col rounded-[6px] border p-5 md:p-6" style={{ borderColor: C.line, background: C.card }}>
+        <h3 className="text-[18px] font-bold">진행 절차</h3>
+        <div className="mt-4">
+          <StepList steps={RELIEF_STEPS} />
+        </div>
+        <div className="mt-auto pt-6">
+          <ConsultLink onClick={onConsult} cta="labor-firm_deadline_consult">
+            부당해고 상담신청
+          </ConsultLink>
+        </div>
       </div>
     </div>
   );
 }
 
-/* ---------- 2. 임금체불 개략 계산 ---------- */
+/* ---------- 2. 임금체불, 퇴직금 안내 ---------- */
 
-function WageCalc({ reduce, onConsult }: { reduce: boolean; onConsult: () => void }) {
-  const [payText, setPayText] = useState("2,600,000");
-  const [months, setMonths] = useState(2);
-  const [quit, setQuit] = useState(true);
-  const [years, setYears] = useState(3);
-  const payId = useId();
+const WAGE_FACTS: [string, string][] = [
+  ["퇴직 후 지급 기한", "퇴직한 날부터 14일 안에 임금, 퇴직금 지급"],
+  ["지연이자", "14일이 지나면 연 20%. 2025년 10월 23일부터는 재직 중 밀린 임금도 같은 이자"],
+  ["퇴직금", "1년 이상 근무, 주 15시간 이상. 평균임금 30일분 x 근속 연수"],
+  ["임금채권 시효", "받을 날부터 3년"],
+];
 
-  const pay = Number(payText.replace(/[^\d]/g, "")) || 0;
-  const unpaid = pay * months;
-  const severance = quit && years >= 1 ? pay * years : 0;
-  const sum = unpaid + severance;
-  const max = Math.max(sum, 1);
+const WAGE_STEPS: [string, string][] = [
+  ["노동청 진정", "체불 기간과 금액, 근로계약서와 급여 내역을 정리해 냅니다."],
+  ["근로감독관 조사", "출석 조사에서 근무 사실과 체불액을 확인합니다."],
+  ["체불 확인서 발급", "확인된 체불액으로 대지급금이나 민사 절차를 밟습니다."],
+  ["대지급금, 소송", "회사가 지급하지 못하면 대지급금 신청이나 소송으로 받습니다."],
+];
 
-  const seg = (k: string, label: string, v: number, bg: string, fg: string) =>
-    v > 0 && (
-      <motion.div
-        key={k}
-        layout={!reduce}
-        className="flex h-full min-w-0 items-center overflow-hidden px-2 text-[13px] font-bold"
-        style={{ flexGrow: v / max, flexBasis: 0, background: bg, color: fg }}
-        transition={{ duration: reduce ? 0 : DUR, ease: EASE }}
-      >
-        <span className="truncate">{label}</span>
-      </motion.div>
-    );
-
+function WageGuide({ onConsult }: { onConsult: () => void }) {
   return (
-    <div className="mt-6 grid gap-6 md:grid-cols-[minmax(0,1fr)_minmax(0,1fr)] md:gap-8">
-      <div className="space-y-5 rounded-[6px] border p-5 md:p-6" style={{ borderColor: C.line, background: C.card }}>
-        <div>
-          <label htmlFor={payId} className="text-[15px] font-bold">
-            월급(세전)
-          </label>
-          <div className="mt-2 flex items-center gap-2">
-            <input
-              id={payId}
-              inputMode="numeric"
-              value={payText}
-              onChange={(e) => {
-                const d = e.target.value.replace(/[^\d]/g, "").slice(0, 9);
-                setPayText(d ? Number(d).toLocaleString("ko-KR") : "");
-              }}
-              className={`h-12 w-full rounded-[4px] border px-3 text-right text-[19px] font-bold ${focusRing}`}
-              style={{ borderColor: C.ink, outlineColor: C.ink }}
-            />
-            <span className="text-[16px] font-bold">원</span>
-          </div>
+    <div className="mt-6 grid gap-6 md:grid-cols-2 md:gap-8">
+      <div className="rounded-[6px] border p-5 md:p-6" style={{ borderColor: C.line, background: C.card }}>
+        <div className="border-t" style={{ borderColor: C.ink }}>
+          <InfoTable caption="임금체불, 퇴직금 기본 사항" rows={WAGE_FACTS} />
         </div>
-        <Stepper label="밀린 달" value={months} set={setMonths} min={1} max={12} unit="개월" />
-        <fieldset>
-          <legend className="text-[15px] font-bold">지금 상태</legend>
-          <div className="mt-2 inline-flex rounded-[4px] border p-1" style={{ borderColor: C.line }}>
-            {[
-              [true, "퇴직함"],
-              [false, "재직 중"],
-            ].map(([v, label]) => (
-              <button
-                key={label as string}
-                type="button"
-                aria-pressed={quit === v}
-                onClick={() => setQuit(v as boolean)}
-                className={`rounded-[3px] px-4 py-2 text-[15px] font-bold ${focusRing}`}
-                style={{ background: quit === v ? C.gray : "transparent", color: quit === v ? "#fff" : C.ink, outlineColor: C.ink }}
-              >
-                {label as string}
-              </button>
-            ))}
-          </div>
-        </fieldset>
-        {quit && <Stepper label="일한 기간" value={years} set={setYears} min={0} max={30} unit="년" />}
-      </div>
-
-      <div className="rounded-[6px] p-5 md:p-6" style={{ background: C.soft, color: C.ink }} aria-live="polite">
-        <dl className="space-y-3 text-[16px]">
-          <div className="flex justify-between gap-4">
-            <dt>밀린 임금</dt>
-            <dd className="font-bold tabular-nums">
-              {won(unpaid)}
-            </dd>
-          </div>
-          <div className="flex justify-between gap-4">
-            <dt>퇴직금(개략)</dt>
-            <dd className="font-bold tabular-nums">
-              {quit ? (years >= 1 ? won(severance) : "1년 미만이라 없음") : "퇴직 때 계산"}
-            </dd>
-          </div>
-          <div className="flex items-end justify-between gap-4 border-t pt-4" style={{ borderColor: C.line }}>
-            <dt className="font-bold">받을 돈 합계(개략)</dt>
-            <dd className="text-[28px] leading-none md:text-[34px]" style={{ color: C.accent }}>
-              {won(sum)}
-            </dd>
-          </div>
-        </dl>
-        <div className="mt-4 flex h-8 overflow-hidden rounded-[3px]" style={{ background: C.line }} aria-hidden>
-          {seg("u", "임금", unpaid, C.accent, "#ffffff")}
-          {seg("s", "퇴직금", severance, "#d6d3ca", C.ink)}
-        </div>
-        <p className="mt-4 text-[14px] leading-[1.7]" style={{ color: C.body }}>
-          퇴직금은 평균임금 30일분에 근속 연수를 곱해요. 여기서는 월급으로 바꿔 계산했어요.
-          {quit ? " 퇴직하고 14일이 지나도 못 받았다면 그다음 날부터 연 20% 지연이자가 붙어요." : " 일하는 중이라도 월급날을 넘기면 그다음 날부터 연 20% 지연이자가 붙어요."}
+        <p className="mt-4 text-[14px]" style={{ color: C.muted }}>
+          근로기준법 제36조, 제37조, 제49조, 근로자퇴직급여 보장법 제8조
         </p>
-
-        <ol className="mt-5 grid gap-2 text-[15px] sm:grid-cols-2">
-          {["노동청 진정", "근로감독관 조사", "체불 확인서 발급", "대지급금 신청"].map((s, i) => (
-            <li key={s} className="flex items-center gap-2 rounded-[3px] px-3 py-2" style={{ background: C.card, border: `1px solid ${C.line}` }}>
-              <span className="grid h-6 w-6 flex-none place-items-center rounded-full text-[13px] font-bold" style={{ background: C.accent, color: "#ffffff" }}>
-                {i + 1}
-              </span>
-              {s}
-            </li>
-          ))}
-        </ol>
-        <div className="mt-5">
-          <button
-            type="button"
-            onClick={onConsult}
-            data-gtm-cta="labor-firm_wage_consult"
-            className={`inline-flex items-center gap-1.5 rounded-[4px] px-4 py-2.5 text-[16px] font-bold ${focusRing}`}
-            style={{ background: C.accent, color: "#ffffff", outlineColor: C.accent }}
-          >
+      </div>
+      <div className="flex flex-col rounded-[6px] border p-5 md:p-6" style={{ borderColor: C.line, background: C.card }}>
+        <h3 className="text-[18px] font-bold">진행 절차</h3>
+        <div className="mt-4">
+          <StepList steps={WAGE_STEPS} />
+        </div>
+        <div className="mt-auto pt-6">
+          <ConsultLink onClick={onConsult} cta="labor-firm_wage_consult">
             임금체불 상담신청
-            <ChevronRight size={18} aria-hidden />
-          </button>
+          </ConsultLink>
         </div>
       </div>
     </div>
   );
 }
 
-/* ---------- 3. 노무 자문 요금 ---------- */
+/* ---------- 3. 노무 자문 ---------- */
 
-function Advisory({ reduce, onConsult }: { reduce: boolean; onConsult: () => void }) {
-  const [staff, setStaff] = useState(12);
-  const rangeId = useId();
-  const idx = tierOf(staff);
-  const tier = TIERS[idx];
-
+function Advisory({ onConsult }: { onConsult: () => void }) {
   return (
     <div className="mt-6 grid gap-6 md:grid-cols-[minmax(0,1.1fr)_minmax(0,1fr)] md:gap-8">
       <div className="rounded-[6px] border p-5 md:p-6" style={{ borderColor: C.line, background: C.card }}>
-        <div className="flex items-baseline justify-between gap-3">
-          <label htmlFor={rangeId} className="text-[16px] font-bold">
-            직원 수
-          </label>
-          <output htmlFor={rangeId} className="text-[30px] leading-none font-bold">
-            {staff >= 300 ? "300명 이상" : `${staff}명`}
-          </output>
-        </div>
-        <input
-          id={rangeId}
-          type="range"
-          min={1}
-          max={300}
-          value={staff}
-          onChange={(e) => setStaff(Number(e.target.value))}
-          className={`mt-4 w-full ${focusRing}`}
-          style={{ accentColor: C.gray, outlineColor: C.ink }}
-        />
-        <div className="mt-1 flex justify-between text-[13px]" style={{ color: C.muted }}>
-          <span>1</span>
-          <span>300</span>
-        </div>
-
-        <table className="mt-5 w-full text-[16px]">
+        <table className="w-full text-[16px]">
           <caption className="sr-only">직원 수 구간별 월 자문료</caption>
           <thead>
             <tr className="border-b text-left text-[14px]" style={{ borderColor: C.ink, color: C.muted }}>
@@ -888,62 +612,29 @@ function Advisory({ reduce, onConsult }: { reduce: boolean; onConsult: () => voi
             </tr>
           </thead>
           <tbody>
-            {TIERS.map((t, i) => (
-              <tr
-                key={t.label}
-                className="border-b transition-colors"
-                style={{ borderColor: C.line, background: i === idx ? C.accentSoft : undefined, transitionDuration: reduce ? "0ms" : "200ms" }}
-                aria-current={i === idx ? "true" : undefined}
-              >
-                <td className="py-2.5 pl-2">
-                  <span className="inline-flex items-center gap-2 font-semibold">
-                    <ChevronRight size={16} aria-hidden style={{ opacity: i === idx ? 1 : 0 }} />
-                    {t.label}
-                  </span>
-                </td>
-                <td className="py-2.5 pr-2 text-right font-bold tabular-nums">
-                  {t.fee ? won(t.fee) : "별도 협의"}
-                </td>
+            {TIERS.map((t) => (
+              <tr key={t.label} className="border-b" style={{ borderColor: C.line }}>
+                <td className="py-2.5 font-semibold">{t.label}</td>
+                <td className="py-2.5 text-right font-bold tabular-nums">{t.fee ? won(t.fee) : "별도 협의"}</td>
               </tr>
             ))}
           </tbody>
         </table>
         <p className="mt-2 text-[14px]" style={{ color: C.muted }}>
-          부가세 별도, 1년 계약 기준
+          부가세 별도, 1년 계약 기준. 급여 아웃소싱은 직원 1명당 월 10,000원을 더합니다.
         </p>
       </div>
 
-      <div className="flex flex-col rounded-[6px] border p-5 md:p-6" style={{ borderColor: C.line, background: C.card }} aria-live="polite">
-        <p className="text-[15px] font-bold" style={{ color: C.muted }}>
-          {tier.label} 사업장
-        </p>
-        <AnimatePresence mode="wait" initial={false}>
-          <motion.div key={idx} initial={reduce ? false : { opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} transition={{ duration: reduce ? 0 : 0.25, ease: EASE }}>
-            <p className="mt-1 text-[38px] leading-tight md:text-[44px] font-bold">
-              {tier.fee ? `월 ${won(tier.fee)}` : "별도 협의"}
-            </p>
-            <p className="text-[15px]" style={{ color: C.muted }}>
-              {tier.fee ? `연 ${won(tier.fee * 12)}` : "현장 방문 후 견적"}
-            </p>
-          </motion.div>
-        </AnimatePresence>
-        <ul className="mt-5 space-y-2 text-[16px]">
+      <div className="flex flex-col rounded-[6px] border p-5 md:p-6" style={{ borderColor: C.line, background: C.card }}>
+        <h3 className="text-[18px] font-bold">자문 계약에 들어가는 일</h3>
+        <ul className="mt-4 space-y-2 text-[16px]">
           {ADVISORY_INCLUDES.map((t) => (
             <li key={t} className="flex gap-2">
               <Check size={18} className="mt-1 flex-none" aria-hidden />
               {t}
             </li>
           ))}
-          {staff >= 5 && (
-            <li className="flex gap-2">
-              <Check size={18} className="mt-1 flex-none" aria-hidden />
-              연차, 연장근로 수당 계산 검토
-            </li>
-          )}
         </ul>
-        <p className="mt-4 text-[14px]" style={{ color: C.muted }}>
-          급여 아웃소싱은 직원 1명당 월 10,000원을 더해요.
-        </p>
         <div className="mt-auto pt-5">
           <ConsultLink onClick={onConsult} cta="labor-firm_advisory_consult">
             자문 견적 상담
@@ -1154,13 +845,10 @@ function ConsultForm({ today, reduce, topic, setTopic }: { today: Date; reduce: 
 function SampleLogo({ light, size = 20 }: { light?: boolean; size?: number }) {
   return (
     <span className="inline-flex items-center gap-2" style={{ color: light ? "#fff" : "#111" }}>
-      {/* eslint-disable-next-line @next/next/no-img-element -- 메인 사이트와 같은 곰 로고 */}
-      <img src="/images/logo-bear.png" alt="" aria-hidden width={28} height={28} className="h-7 w-7 shrink-0" />
       <span className="flex items-baseline gap-1 whitespace-nowrap">
         <span className="font-bold tracking-[-0.03em]" style={{ fontSize: size }}>
-          곰파트너
+          노무법인
         </span>
-        <span className="text-[12px] font-semibold opacity-75">카탈로그</span>
       </span>
     </span>
   );

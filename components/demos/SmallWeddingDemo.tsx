@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useRef, useState } from "react";
-import { AnimatePresence, motion, useInView, useMotionValue, useScroll, useTransform } from "framer-motion";
+import { AnimatePresence, motion, useInView } from "framer-motion";
 import { Bus, Car, ChevronLeft, ChevronRight, DoorOpen, Flower2, Menu, MessageCircle, TrainFront, Trees, X } from "lucide-react";
 import { useReducedMotionSafe } from "@/hooks/useReducedMotionSafe";
 import { daysAgo, fmtDash, fmtKo, useDemoToday } from "@/hooks/useDemoToday";
@@ -17,32 +17,27 @@ import { DemoMakerInfo } from "@/components/demos/DemoMakerInfo";
    패키지는 대관료 + 식사(1인 단가 x 하객 수) + 꽃장식 + 추가 옵션으로 적는다(부가세 별도 표기).
    하객 주차 2시간 무료, 신부 대기실, 지하철역 셔틀 운행은 거의 모든 홀이 적는 관용 문구다.
 
-   첫 화면(sw-poster): 맨 위에 붙은 메뉴 아래 큰 공간 사진, 썸네일 투어(예식 테이블, 시간대별 홀), 남은 날짜 상자.
-   사진은 1.6초 동안 scale 1.04 -> 1 로 천천히 다가온다. 동작 줄이기에서는 처음부터 정지 화면이다.
+   첫 화면(sw-poster): 맨 위에 붙은 메뉴 아래 큰 공간 사진, 썸네일 투어(테이블, 가든, 신부대기실, 연회장, 포토존), 남은 날짜 상자.
+   사진은 고정 화면이고 썸네일을 누를 때만 바뀐다. 아래 섹션은 보통 세로 스크롤로 이어진다.
    글꼴은 Pretendard, h1 과 h2 는 굵게. 바탕은 흰색과 #f7f7f5 를 번갈아 쓰고 강조색은 올리브 하나.
 
-   핵심 모션: 섹션 와이프(다음 섹션이 아래에서 clip-path로 덮으며 올라옴, 앞 섹션은 sticky로 뒤에 남음), D-day 숫자 롤링.
-
    상호작용(모두 브라우저 안에서만 돈다. 실제로 보내지 않는다)
-   1. 날짜와 시간 고르기: 12개월 달력(토, 일 예약, 마감 표시)과 시간대 4개. 고르면 D-day가 롤링한다. 첫 화면의 남은 날짜와 홀 썸네일도 같은 값을 바꾼다.
-   2. 하객 수에 따른 홀 배치: 슬라이더(30~120)에 맞춰 8인 원형 테이블이 평면도에 늘고 줄며, 야외 정원 사용을 켤 수 있다.
-   3. 패키지 견적: 대관(시간대별), 식사(코스 또는 뷔페 x 하객 수), 꽃장식(기본, 풍성), 음향과 사진 추가. 합계 표시.
+   1. 날짜와 시간 고르기: 12개월 달력(토, 일 예약, 마감 표시)과 시간대 4개. 첫 화면의 남은 날짜도 같은 값을 바꾼다.
+   2. 홀과 수용 인원: 홀, 정원 사진과 공간별 수용 인원 표.
+   3. 패키지와 비용: 대관(시간대별), 식사 1인 단가, 꽃장식, 추가 옵션 요금표(부가세 별도).
    4. 상담신청과 방문 예약: 두 사람 이름, 휴대폰, 희망 예식일, 방문 희망일. 완료 화면에 접수번호, 담당 창구, 회신 예정일.
    5. 공간 안내와 오시는 길: 홀, 정원, 신부 대기실, 주차, 지하철과 셔틀, 상담 운영시간(오늘 요일 진하게). */
 
-const BRAND = "곰파트너";
+const BRAND = "스몰웨딩 홀";
 const ADDRESS = "서울 ㅇㅇ구 ㅇㅇ로 00";
-const KAKAO = "카카오톡 채널 곰파트너";
+const KAKAO = "카카오톡 채널 스몰웨딩 홀";
 
 /* 로고: 메인 사이트와 같은 곰 로고 + 곰파트너(크게) + 업종(작게) */
 function SampleLogo({ light, small }: { light?: boolean; small?: boolean }) {
   return (
     <span className="inline-flex items-center gap-2" style={{ color: light ? "#ffffff" : "#111111" }}>
-      {/* eslint-disable-next-line @next/next/no-img-element -- 메인 사이트와 같은 곰 로고 */}
-      <img src="/images/logo-bear.png" alt="" aria-hidden width={28} height={28} className={small ? "h-6 w-6 shrink-0" : "h-7 w-7 shrink-0"} />
       <span className="flex items-baseline gap-1 whitespace-nowrap">
-        <span className={`${small ? "text-[18px]" : "text-[20px]"} font-bold tracking-[-0.03em]`}>곰파트너</span>
-        <span className="text-[12px] font-semibold opacity-75">카탈로그</span>
+        <span className={`${small ? "text-[18px]" : "text-[20px]"} font-bold tracking-[-0.03em]`}>스몰웨딩 홀</span>
       </span>
     </span>
   );
@@ -51,6 +46,7 @@ const IMG = "/images/demo-small-wedding";
 const HALL_MIN = 30;
 const HALL_MAX = 120;
 const SEAT = 8;
+const GARDEN_SEATS = 40;
 const MONTHS = 12;
 const HEADER_H = 56;
 
@@ -70,20 +66,13 @@ const C = {
 /* 제목은 본문과 같은 Pretendard, 굵게 */
 const serif = { fontWeight: 700 } as const;
 
-/* 모션 값(ms). 모두 reduce면 0 */
-const EASE = [0.22, 1, 0.36, 1] as const;
-const HERO_MS = 1600; // 사진이 scale 1.04 -> 1 로 다가오는 시간
-const ROLL_MS = 650; // 숫자 롤링
-const LIGHT_MS = 800; // 홀 사진의 시간대 전환
-const TABLE_MS = 320; // 테이블 하나 등장
-const TABLE_STAGGER_MS = 60; // 테이블 등장 간격
-const WIPE_RADIUS = 8; // 와이프 윗모서리 둥글기(px)
+const FADE_MS = 800; // 첫 화면 공간 사진 교차
 
 const SLOTS = [
-  { time: "11:00", rent: 2200000, note: "오전 햇빛", img: "hall-1100" },
-  { time: "13:00", rent: 3000000, note: "가장 먼저 마감", img: "hall-1300" },
-  { time: "15:00", rent: 2600000, note: "오후 햇빛", img: "hall-1500" },
-  { time: "17:00", rent: 1500000, note: "노을과 조명", img: "hall-1700" },
+  { time: "11:00", rent: 2200000 },
+  { time: "13:00", rent: 3000000 },
+  { time: "15:00", rent: 2600000 },
+  { time: "17:00", rent: 1500000 },
 ];
 const MEALS = [
   { id: "course", name: "코스", price: 85000, desc: "전채, 수프, 메인, 디저트 4코스" },
@@ -146,13 +135,6 @@ function nextBizDay(today: Date) {
 const focusRing = "focus-visible:outline focus-visible:outline-[3px] focus-visible:outline-offset-2";
 const btnBase = `inline-flex items-center justify-center gap-1.5 font-bold transition-[background-color,color] duration-150 ${focusRing}`;
 
-/* 테이블 자리. 버진로드(가운데) 가까운 앞줄부터 채운다. */
-const COLS_L = [92, 152, 212];
-const COLS_R = [308, 368, 428];
-const ROWS = [132, 196, 260];
-const SPOTS: [number, number][] = [];
-for (const y of ROWS) for (let k = 0; k < 3; k++) SPOTS.push([COLS_L[2 - k], y], [COLS_R[k], y]);
-
 type Pick = { date: Date | null; slot: number | null };
 type Lead = { no: string; groom: string; bride: string; phone: string; wedding: string; visit: string };
 
@@ -163,13 +145,6 @@ export function SmallWeddingDemo() {
   const [pick, setPick] = useState<Pick>({ date: null, slot: null });
   const date = pick.date ?? defaultDate(today);
   const slot = pick.slot ?? firstOpenSlot(today, date);
-  const dday = diffDays(date, today);
-
-  const [guests, setGuests] = useState({ n: 80, from: 10 });
-  const tables = Math.ceil(guests.n / SEAT);
-  const [garden, setGarden] = useState(false);
-
-  const { scrollYProgress } = useScroll();
 
   useEffect(() => {
     const f = () => window.scrollTo({ top: 0 });
@@ -177,9 +152,8 @@ export function SmallWeddingDemo() {
     return () => window.removeEventListener("demo:go-home", f);
   }, []);
 
-  /** 겹쳐 있는 섹션은 getBoundingClientRect가 붙은 자리라서, 앞에 둔 기준 요소(id-top)의 위치로 옮긴다 */
   const go = (id: string) => {
-    const mark = document.getElementById(`${id}-top`) ?? document.getElementById(id);
+    const mark = document.getElementById(id);
     if (!mark) return;
     const top = mark.getBoundingClientRect().top + window.scrollY - HEADER_H;
     window.scrollTo({ top: Math.max(0, top), behavior: reduce ? "auto" : "smooth" });
@@ -200,9 +174,8 @@ export function SmallWeddingDemo() {
 
   return (
     <div className="min-h-screen overflow-x-clip" style={{ background: C.paper, color: C.ink }}>
-      {/* 상단 메뉴와 스크롤 진행 바. 맨 위부터 붙어 있다. 휴대폰과 태블릿은 햄버거 */}
+      {/* 상단 메뉴. 맨 위부터 붙어 있다. 휴대폰과 태블릿은 햄버거 */}
       <header className="sticky top-0 z-40 border-b" style={{ height: HEADER_H, background: C.paper, borderColor: C.line }}>
-        <motion.div aria-hidden className="absolute inset-x-0 top-0 h-[3px] origin-left" style={{ background: C.olive, scaleX: scrollYProgress }} />
         <div className="mx-auto flex h-full max-w-[1200px] items-center justify-between gap-3 px-4 md:px-6">
           <button type="button" onClick={() => window.scrollTo({ top: 0, behavior: reduce ? "auto" : "smooth" })} className={`${focusRing} leading-none`} style={{ outlineColor: C.olive }}>
             <SampleLogo />
@@ -272,41 +245,48 @@ export function SmallWeddingDemo() {
             남은 날짜
           </h2>
 
-          <div id="sw-dday" className="mt-6 rounded-[6px] border p-5 md:p-6" style={{ borderColor: C.line, background: C.ivory }}>
-            <p className="text-[14px] font-bold" style={{ color: C.muted }}>
-              고른 예식일까지
-            </p>
-            <p className="mt-1 text-[56px] leading-none md:text-[72px]" style={{ fontWeight: 700, color: C.ink, letterSpacing: "-0.03em" }}>
-              <Roll text={`D-${dday}`} reduce={reduce} />
-            </p>
-            <p className="mt-3 text-[17px] leading-[1.6]">
-              {date.getFullYear()}년 {date.getMonth() + 1}월 {date.getDate()}일 <b>{DOW_FULL[date.getDay()]}</b> {SLOTS[slot].time}
-              <span className="ml-2 text-[15px]" style={{ color: C.muted }}>
-                {Math.floor(dday / 7)}주 {dday % 7}일 남음
-              </span>
-            </p>
+          <p className="mt-6 text-[17px] leading-[1.6]">
+            고른 날짜 <b className="tabular-nums">{date.getFullYear()}년 {date.getMonth() + 1}월 {date.getDate()}일 {DOW_FULL[date.getDay()]} {SLOTS[slot].time}</b>
+          </p>
+
+          <div className="relative mt-4 aspect-[16/9] overflow-hidden rounded-[4px]" style={{ background: C.ivoryDeep }}>
+            {/* eslint-disable-next-line @next/next/no-img-element -- 정적 export 라 next/image 최적화를 쓰지 않는다 */}
+            <img
+              src={`${IMG}/hall-1300.jpg`}
+              alt="아치창으로 빛이 드는 예식 홀"
+              loading="lazy"
+              decoding="async"
+              sizes="(min-width: 1024px) 580px, 100vw"
+              className="absolute inset-0 h-full w-full object-cover"
+              style={{ objectPosition: "55% 45%" }}
+            />
           </div>
 
-          {/* 홀 사진은 고른 시간대의 빛으로 바뀐다 */}
-          <div className="relative mt-4 aspect-[16/9] overflow-hidden rounded-[4px]" style={{ background: C.ivoryDeep }}>
-            {SLOTS.map((s, i) => (
-              // eslint-disable-next-line @next/next/no-img-element -- 정적 export 라 next/image 최적화를 쓰지 않는다
-              <img
-                key={s.img}
-                src={`${IMG}/${s.img}.jpg`}
-                alt={i === slot ? `${s.time} 예식 때 아치창으로 빛이 드는 홀` : ""}
-                aria-hidden={i !== slot}
-                loading="lazy"
-                decoding="async"
-                sizes="(min-width: 1024px) 580px, 100vw"
-                className="absolute inset-0 h-full w-full object-cover"
-                style={{ objectPosition: "55% 45%", opacity: i === slot ? 1 : 0, transition: reduce ? "none" : `opacity ${LIGHT_MS}ms ease` }}
-              />
-            ))}
-          </div>
-          <p className="mt-2 text-[14px]" style={{ color: C.body }} aria-live="polite">
-            홀 {SLOTS[slot].time}, {SLOTS[slot].note}
-          </p>
+          <table className="mt-4 w-full border-collapse text-[15px]">
+            <caption className="py-2 text-left text-[15px] font-bold">예식 시간과 대관료</caption>
+            <thead>
+              <tr style={{ color: C.muted }}>
+                <th scope="col" className="border-t px-3 py-2 text-left font-bold" style={{ borderColor: C.line }}>
+                  예식 시작
+                </th>
+                <th scope="col" className="border-t px-3 py-2 text-right font-bold" style={{ borderColor: C.line }}>
+                  대관료 (토, 일)
+                </th>
+              </tr>
+            </thead>
+            <tbody>
+              {SLOTS.map((s) => (
+                <tr key={s.time}>
+                  <td className="border-t px-3 py-2 tabular-nums" style={{ borderColor: C.line }}>
+                    {s.time}
+                  </td>
+                  <td className="border-t px-3 py-2 text-right tabular-nums" style={{ borderColor: C.line }}>
+                    {won(s.rent)}
+                  </td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
         </div>
 
         <div id="sw-date" className="min-w-0 rounded-[6px] border p-4 md:p-6" style={{ borderColor: C.line, background: C.paper }}>
@@ -355,24 +335,21 @@ export function SmallWeddingDemo() {
         </div>
       </section>
 
-      {/* 아래 섹션들은 sticky로 겹치고, 다음 섹션이 clip-path 와이프로 덮으며 올라온다. 첫 와이프가 걷히기 전 바탕은 짙은 올리브 */}
-      <div className="relative" style={{ background: C.paper }}>
-        <Panel id="sw-layout" z={2} bg={C.ivory} color={C.ink} reduce={reduce}>
-          <LayoutSection guests={guests} setGuests={setGuests} tables={tables} garden={garden} setGarden={setGarden} reduce={reduce} />
-        </Panel>
+      <Section id="sw-layout" bg={C.ivory}>
+        <LayoutSection />
+      </Section>
 
-        <Panel id="sw-package" z={3} bg={C.paper} color={C.ink} reduce={reduce}>
-          <PackageSection slot={slot} guests={guests.n} garden={garden} />
-        </Panel>
+      <Section id="sw-package" bg={C.paper}>
+        <PackageSection />
+      </Section>
 
-        <Panel id="sw-space" z={4} bg={C.ivory} color={C.ink} reduce={reduce}>
-          <SpaceSection today={today} />
-        </Panel>
+      <Section id="sw-space" bg={C.ivory}>
+        <SpaceSection today={today} />
+      </Section>
 
-        <Panel id="sw-consult" z={5} bg={C.paper} color={C.ink} reduce={reduce}>
-          <ConsultSection today={today} date={date} />
-        </Panel>
-      </div>
+      <Section id="sw-consult" bg={C.paper}>
+        <ConsultSection today={today} date={date} />
+      </Section>
 
       <footer className="relative z-10 border-t px-4 pb-24 pt-8 text-[14px] leading-[1.8] md:px-6" style={{ background: C.ivory, borderColor: C.line, color: C.muted }}>
         <div className="mx-auto max-w-[1200px]">
@@ -392,10 +369,9 @@ export function SmallWeddingDemo() {
 /* 첫 화면: 큰 공간 사진 + 아래 공간 썸네일(테이블, 가든, 신부대기실, 연회장, 포토존) + 오른쪽 위 남은 날짜 상자.
    실제 스몰웨딩 홀 사이트의 공간별 썸네일 홀 투어와 잔여 타임 공지를 한 화면에 모았다.
    썸네일을 누르면 큰 사진이 그 공간으로 바뀌고(0.8초 교차) 썸네일 아래에 수용 인원 한 줄이 바뀐다.
-   홀의 시간대별 사진은 아래 예약 현황에서 시간대를 고를 때 바뀐다.
    남은 날짜를 누르면 날짜와 시간대가 고른 값으로 바뀌고 방문 상담 신청으로 내려가 희망 예식일이 채워진다.
    휴대폰은 사진 4:3, 남은 날짜는 썸네일 아래 가로로 넘기는 칩, 첫 화면이 보이는 동안 하단에 방문 상담 버튼을 고정한다.
-   모션: 사진만 1.04배에서 1.6초 동안 천천히 다가온다. 동작 줄이기면 멈춘 사진, 교차 없이 바로 바뀐다. */
+   동작 줄이기면 교차 없이 바로 바뀐다. */
 const VIEWS = [
   { key: "table", img: "hero", sm: "hero-sm", label: "테이블", line: "기본 꽃장식, 테이블 센터피스 포함", alt: "분홍 장미와 유칼립투스로 꾸민 예식 테이블과 하객 의자", pos: "55% 45%" },
   { key: "garden", img: "garden", sm: "garden", label: "가든", line: "야외 의자 40석, 식전 음료와 사진 촬영", alt: "잔디 위 흰 꽃 아치와 접이식 흰 의자 줄", pos: "45% 55%" },
@@ -466,7 +442,7 @@ function Poster({
 
         {/* 큰 사진 + 남은 날짜 상자(PC는 사진 오른쪽 위) */}
         <div className="relative mt-4 aspect-[4/3] overflow-hidden rounded-[6px] md:aspect-auto md:h-[max(400px,calc(100svh-380px))]" style={{ background: C.ivoryDeep }}>
-          <motion.div className="absolute inset-0" initial={reduce ? false : { scale: 1.04 }} animate={{ scale: 1 }} transition={{ duration: reduce ? 0 : HERO_MS / 1000, ease: EASE }}>
+          <div className="absolute inset-0">
             {VIEWS.map((x, i) => (
               // eslint-disable-next-line @next/next/no-img-element -- 정적 export 라 next/image 최적화를 쓰지 않는다
               <img
@@ -479,10 +455,10 @@ function Poster({
                 fetchPriority={i === 0 ? "high" : undefined}
                 loading={i === 0 ? undefined : "lazy"}
                 className="absolute inset-0 h-full w-full object-cover"
-                style={{ objectPosition: x.pos, opacity: i === view ? 1 : 0, transition: reduce ? "none" : `opacity ${LIGHT_MS}ms ease` }}
+                style={{ objectPosition: x.pos, opacity: i === view ? 1 : 0, transition: reduce ? "none" : `opacity ${FADE_MS}ms ease` }}
               />
             ))}
-          </motion.div>
+          </div>
           <div className="absolute right-4 top-4 hidden w-[260px] rounded-[6px] border p-4 md:block" style={{ background: C.paper, borderColor: C.line }}>
             <p className="text-[15px] font-bold">남은 날짜</p>
             <p className="mt-0.5 text-[13px]" style={{ color: C.muted }}>
@@ -538,87 +514,12 @@ function Poster({
     </section>
   );
 }
-/* 겹침 섹션. 앞 섹션은 화면에 붙어 남고(화면보다 길면 바닥을 맞춰 붙는다), 이 섹션은 아래에서 올라오며
-   위쪽이 clip-path로 가려져 있다가 위치에 따라 걷힌다. 가려지는 높이 = 섹션 윗변의 화면 위치라서 걷히는 선이 스크롤의 두 배 속도로 올라간다. */
-function Panel({ id, z, bg, color, reduce, children }: { id: string; z: number; bg: string; color: string; reduce: boolean; children: React.ReactNode }) {
-  const [el, setEl] = useState<HTMLElement | null>(null);
-  const [top, setTop] = useState(0);
-  const start = useMotionValue(0);
-  const { scrollY } = useScroll();
-
-  useEffect(() => {
-    if (!el) return;
-    const mark = el.previousElementSibling as HTMLElement | null;
-    const measure = () => {
-      setTop(Math.min(0, window.innerHeight - el.offsetHeight));
-      if (mark) start.set(mark.getBoundingClientRect().top + window.scrollY);
-    };
-    const ro = new ResizeObserver(measure);
-    ro.observe(el);
-    ro.observe(document.body);
-    window.addEventListener("resize", measure);
-    return () => {
-      ro.disconnect();
-      window.removeEventListener("resize", measure);
-    };
-  }, [el, start]);
-
-  const clip = useTransform([scrollY, start], ([s, st]) => {
-    const y = Math.max(0, (st as number) - (s as number));
-    const r = Math.min(WIPE_RADIUS, y);
-    return `inset(${y}px 0 0 0 round ${r}px ${r}px 0 0)`;
-  });
-
+/* 아래 섹션. 보통 세로 흐름으로 이어진다 */
+function Section({ id, bg, children }: { id: string; bg: string; children: React.ReactNode }) {
   return (
-    <>
-      <div id={`${id}-top`} aria-hidden className="h-0" />
-      <motion.section
-        id={id}
-        ref={setEl}
-        aria-labelledby={`${id}-title`}
-        style={{
-          background: bg,
-          color,
-          zIndex: z,
-          position: reduce ? "relative" : "sticky",
-          top: reduce ? undefined : top,
-          clipPath: reduce ? "none" : clip,
-        }}
-      >
-        {/* 짧은 섹션은 한 화면 높이를 채우고 내용을 세로 가운데에 둔다 */}
-        <div className="mx-auto flex min-h-screen w-full max-w-[1200px] flex-col justify-center px-4 pb-20 md:px-6" style={{ paddingTop: HEADER_H + 40 }}>
-          {children}
-        </div>
-      </motion.section>
-    </>
-  );
-}
-
-/* 숫자 롤링. 숫자 자리마다 0~9 띠가 세로로 움직인다. 글자 수가 바뀌면 오른쪽 자리부터 그대로 둔다 */
-const DIGITS = [0, 1, 2, 3, 4, 5, 6, 7, 8, 9];
-function Roll({ text, reduce }: { text: string; reduce: boolean }) {
-  const chars = text.split("");
-  return (
-    <span className="inline-flex tabular-nums">
-      <span className="sr-only">{text}</span>
-      <span aria-hidden className="inline-flex" style={{ lineHeight: 1 }}>
-        {chars.map((ch, i) => {
-          const key = chars.length - i;
-          if (!/\d/.test(ch)) return <span key={`c${key}`}>{ch}</span>;
-          return (
-            <span key={`d${key}`} className="relative inline-block overflow-hidden" style={{ height: "1em", width: "1ch" }}>
-              <motion.span className="absolute left-0 top-0 block" initial={false} animate={{ y: `${-Number(ch)}em` }} transition={reduce ? { duration: 0 } : { duration: ROLL_MS / 1000, ease: EASE }}>
-                {DIGITS.map((n) => (
-                  <span key={n} className="block" style={{ height: "1em", lineHeight: 1 }}>
-                    {n}
-                  </span>
-                ))}
-              </motion.span>
-            </span>
-          );
-        })}
-      </span>
-    </span>
+    <section id={id} aria-labelledby={`${id}-title`} style={{ background: bg, color: C.ink, scrollMarginTop: HEADER_H }}>
+      <div className="mx-auto w-full max-w-[1200px] px-4 py-16 md:px-6 md:py-24">{children}</div>
+    </section>
   );
 }
 
@@ -690,261 +591,122 @@ function Calendar({ today, date, onPick }: { today: Date; date: Date; onPick: (d
   );
 }
 
-/* 2. 하객 수에 따른 홀 배치 */
-function LayoutSection({
-  guests,
-  setGuests,
-  tables,
-  garden,
-  setGarden,
-  reduce,
-}: {
-  guests: { n: number; from: number };
-  setGuests: (g: { n: number; from: number }) => void;
-  tables: number;
-  garden: boolean;
-  setGarden: (v: boolean) => void;
-  reduce: boolean;
-}) {
-  const spare = tables * SEAT - guests.n;
-  const tr = (i: number) => (reduce ? { duration: 0 } : { duration: TABLE_MS / 1000, ease: EASE, delay: (Math.max(0, i - guests.from) * TABLE_STAGGER_MS) / 1000 });
+/* 2. 홀과 수용 인원: 사진과 표 */
+const CAPACITY = [
+  { name: "홀", seat: `${HALL_MIN}~${HALL_MAX}명`, table: `${SEAT}인 원형 테이블 최대 ${HALL_MAX / SEAT}개`, note: "최소 보증인원 30명" },
+  { name: "야외 정원", seat: `${GARDEN_SEATS}석`, table: "야외 의자", note: `식전 음료와 사진 촬영, ${manwon(GARDEN_FEE)} 추가` },
+  { name: "신부 대기실", seat: "2실", table: "가족 대기 소파", note: "예식 2시간 전부터 사용" },
+];
+const HALL_PHOTOS = [
+  { img: "banquet", label: "홀", alt: "흰 테이블보를 씌운 원형 테이블과 작은 꽃 센터피스" },
+  { img: "garden", label: "야외 정원", alt: "잔디 위 흰 꽃 아치와 접이식 흰 의자 줄" },
+];
+function LayoutSection() {
+  const cell = "border-t px-3 py-3 align-top";
   return (
     <>
       <h2 id="sw-layout-title" className="text-[30px] leading-[1.25] md:text-[38px]" style={{ ...serif, fontWeight: 700 }}>
-        하객 수에 맞춘 홀 배치
+        홀과 수용 인원
       </h2>
-      <div className="mt-8 grid gap-8 lg:grid-cols-[320px_minmax(0,1fr)] lg:gap-12">
-        <div>
-          <label htmlFor="sw-guests" className="block text-[16px] font-bold">
-            하객 수 <span className="tabular-nums text-[28px]">{guests.n}</span>명
-          </label>
-          <input
-            id="sw-guests"
-            type="range"
-            min={HALL_MIN}
-            max={HALL_MAX}
-            step={2}
-            value={guests.n}
-            onChange={(e) => setGuests({ n: Number(e.target.value), from: tables })}
-            className={`${focusRing} mt-3 w-full`}
-            style={{ accentColor: C.olive, outlineColor: C.olive }}
-          />
-          <div className="mt-1 flex justify-between text-[13px] tabular-nums" style={{ color: C.muted }}>
-            <span>{HALL_MIN}명</span>
-            <span>{HALL_MAX}명</span>
-          </div>
-          <dl className="mt-6 grid grid-cols-[auto_1fr] gap-x-4 gap-y-2 text-[16px]">
-            <dt style={{ color: C.muted }}>테이블</dt>
-            <dd className="tabular-nums">
-              <b>{tables}개</b> (8인 원형)
-            </dd>
-            <dt style={{ color: C.muted }}>남는 자리</dt>
-            <dd className="tabular-nums">{spare}석</dd>
-            <dt style={{ color: C.muted }}>동선</dt>
-            <dd>{tables <= 8 ? "앞쪽 두 줄만 써서 단상이 가까워요" : tables <= 12 ? "세 줄, 버진로드 양쪽으로 나눠요" : "세 줄 가득, 뒷줄은 통로를 넓혀요"}</dd>
-          </dl>
-          <button
-            type="button"
-            role="switch"
-            aria-checked={garden}
-            onClick={() => setGarden(!garden)}
-            className={`${focusRing} mt-6 flex w-full items-center justify-between rounded-[6px] border px-4 py-3 text-left text-[16px]`}
-            style={{ borderColor: garden ? C.olive : C.line, background: garden ? C.olive : C.paper, color: garden ? C.paper : C.ink, outlineColor: C.olive }}
-          >
-            <span className="inline-flex items-center gap-2 font-bold">
-              <Trees size={18} aria-hidden /> 야외 정원 사용
-            </span>
-            <span className="text-[14px]">{garden ? `켬, ${won(GARDEN_FEE)}` : "끔"}</span>
-          </button>
-          <p className="mt-2 text-[14px] leading-[1.6]" style={{ color: C.muted }}>
-            정원은 식전 음료와 사진 촬영에 써요. 비가 오면 홀 로비로 바꿔요.
-          </p>
-        </div>
-
-        <figure className="min-w-0">
-          <svg viewBox="0 0 760 320" role="img" aria-label={`하객 ${guests.n}명, 테이블 ${tables}개 배치도${garden ? ", 야외 정원 사용" : ""}`} className="block w-full rounded-[6px] border" style={{ background: C.paper, borderColor: C.line }}>
-            {/* 홀 */}
-            <rect x="20" y="20" width="480" height="280" rx="4" fill={C.paper} stroke="#bdbdbd" strokeWidth="1.5" />
-            <rect x="190" y="34" width="140" height="42" rx="3" fill={C.ivoryDeep} stroke={C.sage} />
-            <text x="260" y="60" textAnchor="middle" fontSize="13" fontWeight="700" fill={C.olive}>
-              단상
-            </text>
-            <rect x="248" y="76" width="24" height="224" fill={C.ivoryDeep} />
-            <text x="260" y="312" textAnchor="middle" fontSize="11" fill={C.muted}>
-              입구
-            </text>
-            <text x="30" y="40" fontSize="12" fill={C.muted}>
-              홀 (최대 120명)
-            </text>
-            <AnimatePresence>
-              {SPOTS.slice(0, tables).map(([x, y], i) => (
-                <motion.g
-                  key={`${x}-${y}`}
-                  initial={reduce ? false : { scale: 0, opacity: 0 }}
-                  animate={{ scale: 1, opacity: 1 }}
-                  exit={reduce ? { opacity: 0 } : { scale: 0, opacity: 0 }}
-                  transition={tr(i)}
-                  style={{ transformBox: "fill-box", transformOrigin: "center" }}
-                >
-                  {DIGITS.slice(0, SEAT).map((k) => {
-                    const a = (Math.PI * 2 * k) / SEAT;
-                    return <circle key={k} cx={x + Math.cos(a) * 22} cy={y + Math.sin(a) * 22} r="3.4" fill={C.sage} />;
-                  })}
-                  <circle cx={x} cy={y} r="15" fill={C.paper} stroke={C.olive} strokeWidth="2" />
-                  <circle cx={x} cy={y} r="4" fill={C.sage} />
-                </motion.g>
-              ))}
-            </AnimatePresence>
-            {/* 정원 */}
-            <motion.rect x="530" y="20" width="210" height="280" rx="4" strokeWidth="2" strokeDasharray={garden ? "0" : "8 6"} initial={false} animate={{ fill: garden ? "#eef1ea" : "rgba(238,241,234,0)", stroke: garden ? C.olive : "#bdbdbd" }} transition={reduce ? { duration: 0 } : { duration: 0.4 }} />
-            <text x="540" y="40" fontSize="12" fill={C.muted}>
-              {garden ? "야외 정원 (식전 음료, 사진)" : "야외 정원 (사용 안 함)"}
-            </text>
-            <AnimatePresence>
-              {garden &&
-                [
-                  [580, 110],
-                  [690, 110],
-                  [635, 170],
-                  [580, 230],
-                  [690, 230],
-                ].map(([x, y], i) => (
-                  <motion.g key={`g${x}-${y}`} initial={reduce ? false : { scale: 0, opacity: 0 }} animate={{ scale: 1, opacity: 1 }} exit={{ opacity: 0 }} transition={reduce ? { duration: 0 } : { duration: 0.3, delay: i * 0.05 }} style={{ transformBox: "fill-box", transformOrigin: "center" }}>
-                    <circle cx={x} cy={y} r="9" fill={C.paper} stroke={C.olive} strokeWidth="2" />
-                  </motion.g>
-                ))}
-            </AnimatePresence>
-            {garden && (
-              <>
-                <path d="M560,290 q20,-14 40,0 t40,0 t40,0 t40,0" fill="none" stroke={C.olive} strokeWidth="2" />
-                <text x="635" y="70" textAnchor="middle" fontSize="11" fill={C.olive}>
-                  포토존
-                </text>
-              </>
-            )}
-            <path d="M500,150 h30" stroke={C.olive} strokeWidth="2" strokeDasharray="4 3" />
-          </svg>
-          <figcaption className="mt-2 text-[14px]" style={{ color: C.muted }}>
-            8인 원형 테이블. 가운데 통로가 버진로드, 아래가 입구예요.
-          </figcaption>
-        </figure>
+      <ul className="mt-8 grid gap-4 sm:grid-cols-2">
+        {HALL_PHOTOS.map((p) => (
+          <li key={p.img}>
+            <figure>
+              <div className="relative aspect-[4/3] overflow-hidden rounded-[6px]" style={{ background: C.ivoryDeep }}>
+                {/* eslint-disable-next-line @next/next/no-img-element -- 정적 export 라 next/image 최적화를 쓰지 않는다 */}
+                <img src={`${IMG}/${p.img}.jpg`} alt={p.alt} loading="lazy" decoding="async" sizes="(min-width: 1200px) 580px, (min-width: 640px) 50vw, 100vw" className="absolute inset-0 h-full w-full object-cover" />
+              </div>
+              <figcaption className="mt-2 text-[15px] font-bold">{p.label}</figcaption>
+            </figure>
+          </li>
+        ))}
+      </ul>
+      <div className="mt-8 overflow-x-auto">
+        <table className="w-full min-w-[520px] border-collapse text-[15px] leading-[1.5]" style={{ background: C.paper }}>
+          <caption className="py-2 text-left text-[16px] font-bold">공간별 수용 인원</caption>
+          <thead>
+            <tr style={{ color: C.muted }}>
+              <th scope="col" className={`${cell} text-left`} style={{ borderColor: C.line }}>
+                공간
+              </th>
+              <th scope="col" className={`${cell} text-left`} style={{ borderColor: C.line }}>
+                수용 인원
+              </th>
+              <th scope="col" className={`${cell} text-left`} style={{ borderColor: C.line }}>
+                좌석
+              </th>
+              <th scope="col" className={`${cell} text-left`} style={{ borderColor: C.line }}>
+                비고
+              </th>
+            </tr>
+          </thead>
+          <tbody>
+            {CAPACITY.map((r) => (
+              <tr key={r.name}>
+                <th scope="row" className={`${cell} text-left font-bold`} style={{ borderColor: C.line }}>
+                  {r.name}
+                </th>
+                <td className={`${cell} tabular-nums`} style={{ borderColor: C.line }}>
+                  {r.seat}
+                </td>
+                <td className={cell} style={{ borderColor: C.line }}>
+                  {r.table}
+                </td>
+                <td className={cell} style={{ borderColor: C.line }}>
+                  {r.note}
+                </td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
       </div>
     </>
   );
 }
 
-/* 3. 패키지 견적 */
-function PackageSection({ slot, guests, garden }: { slot: number; guests: number; garden: boolean }) {
-  const [meal, setMeal] = useState("course");
-  const [flower, setFlower] = useState("basic");
-  const [extras, setExtras] = useState<string[]>([]);
-  const m = MEALS.find((x) => x.id === meal) ?? MEALS[0];
-  const f = FLOWERS.find((x) => x.id === flower) ?? FLOWERS[0];
-  const rent = SLOTS[slot].rent + (garden ? GARDEN_FEE : 0);
-  const mealTotal = m.price * guests;
-  const extraTotal = EXTRAS.filter((e) => extras.includes(e.id)).reduce((s, e) => s + e.price, 0);
-  const total = rent + mealTotal + f.price + extraTotal;
-
-  const opt = (on: boolean) => ({
-    borderColor: on ? C.olive : C.line,
-    background: on ? C.olive : C.paper,
-    color: on ? C.paper : C.ink,
-    outlineColor: C.olive,
-  });
-  const optCls = `${focusRing} rounded-[6px] border px-4 py-3 text-left leading-[1.5]`;
-
+/* 3. 패키지와 비용: 정적 요금표 */
+function PackageSection() {
+  const groups: { title: string; rows: { name: string; desc?: string; price: string }[] }[] = [
+    { title: "대관 (토, 일)", rows: [...SLOTS.map((s) => ({ name: `${s.time} 예식`, price: won(s.rent) })), { name: "야외 정원 추가", desc: "식전 음료와 사진 촬영", price: won(GARDEN_FEE) }] },
+    { title: "식사 (1인)", rows: MEALS.map((m) => ({ name: m.name, desc: m.desc, price: won(m.price) })) },
+    { title: "꽃장식", rows: FLOWERS.map((f) => ({ name: f.name, desc: f.desc, price: won(f.price) })) },
+    { title: "추가", rows: EXTRAS.map((e) => ({ name: e.name, price: won(e.price) })) },
+  ];
   return (
     <>
       <h2 id="sw-package-title" className="text-[30px] leading-[1.25] md:text-[38px]" style={{ ...serif, fontWeight: 700 }}>
         패키지와 비용
       </h2>
-      <div className="mt-8 grid gap-8 lg:grid-cols-[minmax(0,1fr)_380px] lg:gap-12">
-        <div className="grid gap-7">
-          <div>
-            <p className="text-[16px] font-bold">식사 (1인)</p>
-            <div className="mt-2 grid gap-2 sm:grid-cols-2" role="group" aria-label="식사">
-              {MEALS.map((x) => (
-                <button key={x.id} type="button" aria-pressed={meal === x.id} onClick={() => setMeal(x.id)} className={optCls} style={opt(meal === x.id)}>
-                  <span className="flex items-baseline justify-between gap-2">
-                    <b className="text-[17px]">{x.name}</b>
-                    <span className="tabular-nums">{won(x.price)}</span>
-                  </span>
-                  <span className="block text-[14px]">{x.desc}</span>
-                </button>
+      <div className="mt-8 grid gap-6 lg:grid-cols-2 lg:gap-x-12">
+        {groups.map((g) => (
+          <table key={g.title} className="w-full border-collapse text-[15px] leading-[1.5]">
+            <caption className="inline-flex items-center gap-1.5 py-2 text-left text-[17px] font-bold">
+              {g.title === "꽃장식" && <Flower2 size={16} aria-hidden style={{ color: C.olive }} />}
+              {g.title}
+            </caption>
+            <tbody>
+              {g.rows.map((r) => (
+                <tr key={r.name}>
+                  <th scope="row" className="border-t py-3 pr-3 text-left align-top" style={{ borderColor: C.line }}>
+                    <span className="block font-bold">{r.name}</span>
+                    {r.desc && (
+                      <span className="block text-[14px] font-normal" style={{ color: C.muted }}>
+                        {r.desc}
+                      </span>
+                    )}
+                  </th>
+                  <td className="border-t py-3 text-right align-top tabular-nums" style={{ borderColor: C.line }}>
+                    {r.price}
+                  </td>
+                </tr>
               ))}
-            </div>
-          </div>
-          <div>
-            <p className="text-[16px] font-bold">꽃장식</p>
-            <div className="mt-2 grid gap-2 sm:grid-cols-2" role="group" aria-label="꽃장식">
-              {FLOWERS.map((x) => (
-                <button key={x.id} type="button" aria-pressed={flower === x.id} onClick={() => setFlower(x.id)} className={optCls} style={opt(flower === x.id)}>
-                  <span className="flex items-baseline justify-between gap-2">
-                    <b className="inline-flex items-center gap-1.5 text-[17px]">
-                      <Flower2 size={16} aria-hidden /> {x.name}
-                    </b>
-                    <span className="tabular-nums">{won(x.price)}</span>
-                  </span>
-                  <span className="block text-[14px]">{x.desc}</span>
-                </button>
-              ))}
-            </div>
-          </div>
-          <div>
-            <p className="text-[16px] font-bold">추가</p>
-            <div className="mt-2 grid gap-2 sm:grid-cols-2" role="group" aria-label="추가 옵션">
-              {EXTRAS.map((x) => {
-                const on = extras.includes(x.id);
-                return (
-                  <button key={x.id} type="button" aria-pressed={on} onClick={() => setExtras((s) => (on ? s.filter((v) => v !== x.id) : [...s, x.id]))} className={optCls} style={opt(on)}>
-                    <span className="flex items-baseline justify-between gap-2">
-                      <b className="text-[17px]">{x.name}</b>
-                      <span className="tabular-nums">{won(x.price)}</span>
-                    </span>
-                    <span className="block text-[14px]">{on ? "담았어요" : "누르면 담겨요"}</span>
-                  </button>
-                );
-              })}
-            </div>
-          </div>
-        </div>
-
-        <div className="rounded-[6px] border p-5 md:p-6" style={{ borderColor: C.line, background: C.ivory }}>
-          <p className="text-[20px]" style={{ fontWeight: 700 }}>
-            견적
-          </p>
-          <dl className="mt-4 grid grid-cols-[1fr_auto] gap-y-3 text-[15px] leading-[1.5]">
-            <dt>
-              대관 {SLOTS[slot].time}
-              {garden && <span style={{ color: C.muted }}> (정원 포함)</span>}
-            </dt>
-            <dd className="tabular-nums">{won(rent)}</dd>
-            <dt>
-              식사 {m.name} <span style={{ color: C.muted }}>{won(m.price)} x {guests}명</span>
-            </dt>
-            <dd className="tabular-nums">{won(mealTotal)}</dd>
-            <dt>꽃장식 {f.name}</dt>
-            <dd className="tabular-nums">{won(f.price)}</dd>
-            {EXTRAS.filter((e) => extras.includes(e.id)).map((e) => (
-              <div key={e.id} className="contents">
-                <dt>{e.name}</dt>
-                <dd className="tabular-nums">{won(e.price)}</dd>
-              </div>
-            ))}
-          </dl>
-          <div className="mt-5 border-t pt-4" style={{ borderColor: C.line }}>
-            <p className="text-[14px] font-bold" style={{ color: C.muted }}>
-              합계 (부가세 별도)
-            </p>
-            <p className="mt-1 text-[32px] tabular-nums md:text-[36px]" style={{ fontWeight: 700, color: C.ink, letterSpacing: "-0.02em" }} aria-live="polite">
-              {won(total)}
-            </p>
-            <p className="mt-2 text-[14px] leading-[1.6]" style={{ color: C.muted }}>
-              하객 1인당 {won(Math.round(total / guests / 1000) * 1000)} 꼴. 하객 수와 날짜는 위에서 바꾼 값이 그대로 들어가요.
-            </p>
-          </div>
-        </div>
+            </tbody>
+          </table>
+        ))}
       </div>
+      <p className="mt-6 text-[14px] leading-[1.6]" style={{ color: C.muted }}>
+        부가세 별도. 식사는 최소 보증인원 30명 기준이며, 최종 견적은 방문 상담에서 하객 수와 날짜에 맞춰 드립니다.
+      </p>
     </>
   );
 }

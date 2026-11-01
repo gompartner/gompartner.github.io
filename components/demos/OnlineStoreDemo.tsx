@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useRef, useState, useSyncExternalStore } from "react";
+import { useEffect, useRef, useState } from "react";
 import Image from "next/image";
 import { AnimatePresence, motion } from "framer-motion";
 import { Car, Check, ChevronRight, Heart, Minus, Plus, Search, ShoppingBag, Star, TrainFront, Trash2, X } from "lucide-react";
@@ -15,16 +15,15 @@ import { DemoMakerInfo } from "@/components/demos/DemoMakerInfo";
    띠배너, 가운데 로고, 분류 메뉴, 많이 찾는 상품·새로 들어온 상품 목록으로 된 메인과
    상품 상세, 장바구니, 주문서, 주문 완료를 따로 된 화면으로 둔다(라우트 없이 상태로 바꾼다).
 
-   상품 카드와 상세 화면에서 유약(백자, 청자, 흑유, 분청)을 고르면 그 유약으로 찍은 사진으로 바뀐다.
-   각인 문구를 적으면 사진 위 그릇 자리에 글자를 얹어 보이고, 조합마다 남은 수량이 다르다.
-   도착 예정일은 지금 시각을 기준으로 평일 14시 전 주문은 그날 출고하고 주말은 건너뛰어 지역별로 계산한다.
+   상품 상세에서 유약, 크기를 옵션으로 고르고 각인 문구는 글자 옵션으로 받는다. 상품 사진은 상품마다 한 장이다.
+   배송 안내는 출고 기준과 배송비를 고정 문장으로 둔다.
    주문 완료 화면에는 이름과 전화번호를 가려서 보여 준다.
 
    사진 출처(public/images/demo-store):
-   AI 생성(Z-Image-Turbo, Apache 2.0) hero, detail, products/<상품>-<유약>.jpg */
+   AI 생성(Z-Image-Turbo, Apache 2.0) hero, detail, products/<상품>-white.jpg */
 
 const IMG = "/images/demo-store";
-const SHOP = "곰파트너";
+const SHOP = "도자기 공방";
 const TEL = "02-000-0000";
 const ADDRESS = "ㅂㄹ시 ㄷㅅ구 ㅅㄴ로 12길 8 1층";
 
@@ -46,68 +45,24 @@ const FREE_SHIP = 50_000;
 const SHIP_FEE = 3_500;
 const ENGRAVE_FEE = 3_000;
 const ENGRAVE_MAX = 8;
+const MAX_QTY = 9;
 
 const won = (n: number) => `${n.toLocaleString("ko-KR")}원`;
-
-/* ---------- 시간 ---------- */
-
-const DAY_NAMES = ["일", "월", "화", "수", "목", "금", "토"];
-
-const subscribeMinute = (cb: () => void) => {
-  const id = window.setInterval(cb, 20_000);
-  return () => window.clearInterval(id);
-};
-
-/** 분 단위 현재 시각. 서버 렌더에서는 -1을 돌려 시간에 따른 화면 차이를 막는다. */
-function useNowMinute() {
-  return useSyncExternalStore(subscribeMinute, () => Math.floor(Date.now() / 60_000), () => -1);
-}
-
-const dateText = (d: Date) => `${d.getMonth() + 1}월 ${d.getDate()}일 (${DAY_NAMES[d.getDay()]})`;
 
 /* ---------- 배송 ---------- */
 
 type Region = "metro" | "local" | "island";
 
-const REGIONS: { id: Region; label: string; days: number; extra: number }[] = [
-  { id: "metro", label: "수도권", days: 1, extra: 0 },
-  { id: "local", label: "지방", days: 2, extra: 0 },
-  { id: "island", label: "제주, 도서산간", days: 3, extra: 3_000 },
+const REGIONS: { id: Region; label: string; extra: number }[] = [
+  { id: "metro", label: "수도권", extra: 0 },
+  { id: "local", label: "지방", extra: 0 },
+  { id: "island", label: "제주, 도서산간", extra: 3_000 },
 ];
 
 const REGION_BY_ID = Object.fromEntries(REGIONS.map((r) => [r.id, r])) as Record<Region, (typeof REGIONS)[number]>;
 
-const CUTOFF = 14 * 60;
-
-const isWorkday = (d: Date) => d.getDay() !== 0 && d.getDay() !== 6;
-
-function addDays(d: Date, n: number) {
-  const x = new Date(d);
-  x.setDate(x.getDate() + n);
-  return x;
-}
-
-/** 평일 14시 전 주문은 그날 출고하고, 주말은 출고와 배송 모두 건너뛴다. */
-function estimate(minute: number, region: Region) {
-  if (minute < 0) return null;
-  const now = new Date(minute * 60_000);
-  const m = now.getHours() * 60 + now.getMinutes();
-  const today = new Date(now.getFullYear(), now.getMonth(), now.getDate());
-  const todayShip = isWorkday(today) && m < CUTOFF;
-  let ship = today;
-  if (!todayShip) {
-    do ship = addDays(ship, 1);
-    while (!isWorkday(ship));
-  }
-  let arrive = ship;
-  let left = REGION_BY_ID[region].days;
-  while (left > 0) {
-    arrive = addDays(arrive, 1);
-    if (isWorkday(arrive)) left--;
-  }
-  const dayIndex = (d: Date) => Math.round((d.getTime() - today.getTime()) / 86_400_000);
-  return { today, todayShip, ship, arrive, shipAt: dayIndex(ship), arriveAt: dayIndex(arrive) };
-}
+/** 상세, 장바구니에 같이 쓰는 출고 기준 문장 */
+const SHIP_RULE = "평일 오후 2시 이전 주문은 당일 출고합니다. 각인 상품은 다음 영업일에 출고합니다.";
 
 /* ---------- 유약, 상품 ---------- */
 
@@ -116,19 +71,13 @@ type GlazeId = "white" | "celadon" | "black" | "buncheong";
 interface Glaze {
   id: GlazeId;
   label: string;
-  body: string;
-  rim: string;
-  shade: string;
-  foot: string;
-  mark: string;
-  note: string;
 }
 
 const GLAZES: Glaze[] = [
-  { id: "white", label: "백자", body: "#efe9de", rim: "#fbf8f2", shade: "#d6ccbd", foot: "#c8a27c", mark: "#8a7f72", note: "희고 매끈해서 음식 색이 잘 살아요." },
-  { id: "celadon", label: "청자", body: "#9fbaa6", rim: "#c6d8ca", shade: "#7b9884", foot: "#c8a27c", mark: "#46624f", note: "유약이 고인 자리에 푸른빛이 짙게 남아요." },
-  { id: "black", label: "흑유", body: "#302a26", rim: "#6b5543", shade: "#1b1815", foot: "#8a6a4f", mark: "#cdb99f", note: "입술 부분에 갈색 띠가 자연스럽게 흘러요." },
-  { id: "buncheong", label: "분청", body: "#cbbca4", rim: "#e9e0d1", shade: "#a99880", foot: "#c8a27c", mark: "#6a5a47", note: "흰 흙을 붓으로 바른 자국이 그대로 보여요." },
+  { id: "white", label: "백자" },
+  { id: "celadon", label: "청자" },
+  { id: "black", label: "흑유" },
+  { id: "buncheong", label: "분청" },
 ];
 
 const GLAZE_BY_ID = Object.fromEntries(GLAZES.map((g) => [g.id, g])) as Record<GlazeId, Glaze>;
@@ -140,6 +89,7 @@ interface Size {
   label: string;
   spec: string;
   add: number;
+  soldOut?: boolean;
 }
 
 interface Product {
@@ -201,7 +151,7 @@ const PRODUCTS: Product[] = [
     glazes: ALL_GLAZES,
     sizes: [
       { id: "m", label: "지름 17cm", spec: "지름 17cm, 높이 7cm, 용량 800ml", add: 0 },
-      { id: "l", label: "지름 19cm", spec: "지름 19cm, 높이 7.5cm, 용량 1,000ml", add: 5_000 },
+      { id: "l", label: "지름 19cm", spec: "지름 19cm, 높이 7.5cm, 용량 1,000ml", add: 5_000, soldOut: true },
     ],
     added: "2026-08-25",
     desc: "국수, 덮밥, 샐러드 담기에 좋은 크기의 볼입니다.",
@@ -282,13 +232,6 @@ const SORTS: { id: Sort; label: string }[] = [
   { id: "high", label: "높은가격" },
 ];
 
-/** 조합마다 남은 수량. 서버와 브라우저가 같은 값을 내도록 글자로만 계산한다. */
-function stockOf(productId: string, glaze: GlazeId, size: string) {
-  let h = 8;
-  for (const ch of `${productId}:${glaze}:${size}`) h = (h * 31 + ch.charCodeAt(0)) % 9973;
-  return h % 9;
-}
-
 /* ---------- 추가구성상품 ---------- */
 
 type AddonId = "box" | "bag";
@@ -327,10 +270,6 @@ function lineOptions(l: CartLine) {
   if (l.kind === "addon") return "";
   const p = PRODUCT_BY_ID[l.productId];
   return `[옵션: ${GLAZE_BY_ID[l.glaze].label}/${sizeOf(p, l.size).label}${l.engrave ? `/각인 ${l.engrave}` : ""}]`;
-}
-
-function lineMax(l: CartLine) {
-  return l.kind === "addon" ? 9 : stockOf(l.productId, l.glaze, l.size);
 }
 
 function totals(cart: CartLine[], region: Region) {
@@ -421,7 +360,7 @@ function onTabKeys<T extends string>(e: React.KeyboardEvent<HTMLElement>, ids: r
 type View =
   | { name: "home" }
   | { name: "list"; cat: CatId; query: string }
-  | { name: "detail"; id: string; glaze: GlazeId }
+  | { name: "detail"; id: string }
   | { name: "cart" }
   | { name: "order" }
   | { name: "brand" }
@@ -435,7 +374,6 @@ type Go = (v: View) => void;
 /* ---------- 페이지 ---------- */
 
 export function OnlineStoreDemo() {
-  const minute = useNowMinute();
   const [view, setView] = useState<View>({ name: "home" });
   const [cart, setCart] = useState<CartLine[]>([]);
   const [region, setRegion] = useState<Region>("metro");
@@ -468,13 +406,13 @@ export function OnlineStoreDemo() {
         const key = line.kind === "addon" ? `addon|${line.addon}` : `${line.productId}|${line.glaze}|${line.size}|${line.engrave}`;
         const full = { ...line, key } as CartLine;
         const found = next.find((l) => l.key === key);
-        next = found ? next.map((l) => (l.key === key ? { ...l, qty: Math.min(lineMax(l), l.qty + line.qty) } : l)) : [...next, full];
+        next = found ? next.map((l) => (l.key === key ? { ...l, qty: Math.min(MAX_QTY, l.qty + line.qty) } : l)) : [...next, full];
       }
       return next;
     });
 
   const changeQty = (key: string, delta: number) =>
-    setCart((prev) => prev.map((l) => (l.key === key ? { ...l, qty: Math.max(1, Math.min(lineMax(l), l.qty + delta)) } : l)));
+    setCart((prev) => prev.map((l) => (l.key === key ? { ...l, qty: Math.max(1, Math.min(MAX_QTY, l.qty + delta)) } : l)));
 
   const removeLine = (key: string) => setCart((prev) => prev.filter((l) => l.key !== key));
 
@@ -490,10 +428,6 @@ export function OnlineStoreDemo() {
           <Detail
             key={view.id}
             productId={view.id}
-            initialGlaze={view.glaze}
-            minute={minute}
-            region={region}
-            onRegion={setRegion}
             go={go}
             onAdd={(lines, buyNow) => {
               addLines(lines);
@@ -503,12 +437,12 @@ export function OnlineStoreDemo() {
           />
         )}
         {view.name === "cart" && (
-          <CartView cart={cart} minute={minute} region={region} onRegion={setRegion} onQty={changeQty} onRemove={removeLine} onClear={() => setCart([])} go={go} />
+          <CartView cart={cart} region={region} onQty={changeQty} onRemove={removeLine} onClear={() => setCart([])} go={go} />
         )}
         {view.name === "order" && <OrderView cart={cart} region={region} onRegion={setRegion} onOrdered={() => setCart([])} go={go} />}
         {view.name === "brand" && <BrandView />}
         {view.name === "community" && <CommunityView key={view.tab} initialTab={view.tab} go={go} />}
-        {view.name === "visit" && <VisitView minute={minute} />}
+        {view.name === "visit" && <VisitView />}
         </div>
       </main>
       <Footer />
@@ -542,11 +476,8 @@ function TopBanner() {
 function Logo() {
   return (
     <span className="inline-flex items-center gap-2">
-      {/* eslint-disable-next-line @next/next/no-img-element */}
-      <img src="/images/logo-bear.png" alt="" aria-hidden width={28} height={28} className="h-7 w-7 shrink-0" />
       <span className="inline-flex items-baseline gap-1.5 whitespace-nowrap">
-        <span className="text-[18px] font-bold tracking-[-0.02em] md:text-[20px]">곰파트너</span>
-        <span className="text-[11px] font-semibold opacity-80 md:text-[12px]">카탈로그</span>
+        <span className="text-[18px] font-bold tracking-[-0.02em] md:text-[20px]">도자기 공방</span>
       </span>
     </span>
   );
@@ -695,64 +626,15 @@ function Header({ view, count, go }: { view: View; count: number; go: Go }) {
 
 /* ---------- 그릇 사진 ---------- */
 
-/** 상품마다 유약별 사진이 한 장씩 있다. 유약을 고르면 그 사진으로 바뀐다. */
-const wareSrc = (productId: string, glaze: GlazeId) => `${IMG}/products/${productId}-${glaze}.jpg`;
+/** 상품마다 대표 사진 한 장(백자로 찍은 사진) */
+const wareSrc = (productId: string) => `${IMG}/products/${productId}-white.jpg`;
 
-/** 각인 글자를 얹을 자리(사진 가로·세로 %)와 글자 크기(사진 폭 대비 %) */
-const MARK: Record<string, { x: number; y: number; size: number }> = {
-  mug: { x: 46, y: 60, size: 5 },
-  teacup: { x: 27, y: 60, size: 3.6 },
-  ricebowl: { x: 50, y: 62, size: 5 },
-  noodle: { x: 50, y: 62, size: 5 },
-  plate: { x: 50, y: 80, size: 4.4 },
-  sidedish: { x: 40, y: 84, size: 3.6 },
-  vase: { x: 48, y: 70, size: 4.4 },
-  teapot: { x: 47, y: 64, size: 4.4 },
-};
-
-function WarePhoto({ productId, glaze, engrave = "", alt = "" }: { productId: string; glaze: GlazeId; engrave?: string; alt?: string }) {
-  const g = GLAZE_BY_ID[glaze];
-  const mark = MARK[productId];
+function WarePhoto({ productId, alt = "" }: { productId: string; alt?: string }) {
   return (
-    <span className="relative block h-full w-full" style={{ containerType: "inline-size" }}>
+    <span className="relative block h-full w-full">
       {/* eslint-disable-next-line @next/next/no-img-element */}
-      <img src={wareSrc(productId, glaze)} alt={alt} loading="lazy" className="h-full w-full object-cover" />
-      {engrave && mark && (
-        <span
-          className="pointer-events-none absolute -translate-x-1/2 -translate-y-1/2 whitespace-nowrap font-semibold"
-          style={{
-            left: `${mark.x}%`,
-            top: `${mark.y}%`,
-            fontSize: `${mark.size}cqw`,
-            letterSpacing: "0.08em",
-            color: g.mark,
-            opacity: 0.85,
-            mixBlendMode: glaze === "black" ? "screen" : "multiply",
-          }}
-          aria-hidden
-        >
-          {engrave}
-        </span>
-      )}
+      <img src={wareSrc(productId)} alt={alt} loading="lazy" className="h-full w-full object-cover" />
     </span>
-  );
-}
-
-function Swatch({ glaze, size = 22 }: { glaze: Glaze; size?: number }) {
-  return (
-    <span
-      className="inline-block shrink-0 rounded-full"
-      style={{
-        width: size,
-        height: size,
-        background:
-          glaze.id === "buncheong"
-            ? `radial-gradient(circle at 30% 30%, ${glaze.rim} 0 30%, ${glaze.body} 31%)`
-            : `linear-gradient(135deg, ${glaze.rim}, ${glaze.body} 60%)`,
-        boxShadow: "inset 0 0 0 1px rgba(35,32,29,0.15)",
-      }}
-      aria-hidden
-    />
   );
 }
 
@@ -807,16 +689,14 @@ function Stars({ n }: { n: number }) {
 /* ---------- 상품 카드 ---------- */
 
 function ProductCard({ p, go, newBadge = true }: { p: Product; go: Go; newBadge?: boolean }) {
-  const [glaze, setGlaze] = useState<GlazeId>(p.glazes[0]);
-  const g = GLAZE_BY_ID[glaze];
-  const soldOut = p.sizes.every((s) => stockOf(p.id, glaze, s.id) === 0);
-  const open = () => go({ name: "detail", id: p.id, glaze });
+  const soldOut = p.sizes.every((s) => s.soldOut);
+  const open = () => go({ name: "detail", id: p.id });
 
   return (
     <li className="min-w-0">
-      <button type="button" onClick={open} aria-label={`${p.name} ${g.label} 상세보기`} className="relative block w-full overflow-hidden rounded-[4px]" style={{ background: C.claySoft }}>
+      <button type="button" onClick={open} aria-label={`${p.name} 상세보기`} className="relative block w-full overflow-hidden rounded-[4px]" style={{ background: C.claySoft }}>
         <span className="block aspect-square">
-          <WarePhoto productId={p.id} glaze={glaze} />
+          <WarePhoto productId={p.id} />
         </span>
         {soldOut && (
           <span className="absolute inset-x-0 bottom-0 py-1.5 text-center text-[13px] font-bold " style={{ background: "rgba(35,32,29,0.78)", color: "#fff" }}>
@@ -824,23 +704,7 @@ function ProductCard({ p, go, newBadge = true }: { p: Product; go: Go; newBadge?
           </span>
         )}
       </button>
-      <div className="-ml-1.5 mt-2 flex flex-wrap" role="group" aria-label={`${p.name} 유약 색상`}>
-        {p.glazes.map((id) => (
-          <button
-            key={id}
-            type="button"
-            aria-label={GLAZE_BY_ID[id].label}
-            aria-pressed={glaze === id}
-            onClick={() => setGlaze(id)}
-            className="inline-flex h-9 w-9 items-center justify-center rounded-full"
-          >
-            <span className="inline-flex rounded-full p-[3px]" style={{ boxShadow: glaze === id ? `0 0 0 1.5px ${C.ink}` : "none" }}>
-              <Swatch glaze={GLAZE_BY_ID[id]} size={18} />
-            </span>
-          </button>
-        ))}
-      </div>
-      <button type="button" onClick={open} className="mt-1 block text-left" tabIndex={-1} aria-hidden>
+      <button type="button" onClick={open} className="mt-2.5 block text-left" tabIndex={-1} aria-hidden>
         <span className="font-bold leading-[1.4]">
           {p.gift && <span style={{ color: C.terra }}>[선물포장] </span>}
           {p.name}
@@ -973,9 +837,9 @@ function Home({ go }: { go: Go }) {
           <ul className="grid gap-3 md:grid-cols-3 md:gap-5">
             {REVIEWS.slice(0, 3).map((r) => (
               <li key={r.name + r.ago} className="rounded-[4px] border p-4" style={{ borderColor: C.line, background: C.paper }}>
-                <button type="button" onClick={() => go({ name: "detail", id: r.productId, glaze: r.glaze })} className="flex w-full items-center gap-3 text-left">
+                <button type="button" onClick={() => go({ name: "detail", id: r.productId })} className="flex w-full items-center gap-3 text-left">
                   <span className="block h-14 w-14 shrink-0 overflow-hidden rounded-[4px]" style={{ background: C.claySoft }}>
-                    <WarePhoto productId={r.productId} glaze={r.glaze} />
+                    <WarePhoto productId={r.productId} />
                   </span>
                   <span className="min-w-0">
                     <span className="block font-semibold leading-[1.4]">{PRODUCT_BY_ID[r.productId].name}</span>
@@ -1062,24 +926,16 @@ type DetailTab = "info" | "ship" | "return" | "review";
 
 function Detail({
   productId,
-  initialGlaze,
-  minute,
-  region,
-  onRegion,
   go,
   onAdd,
 }: {
   productId: string;
-  initialGlaze: GlazeId;
-  minute: number;
-  region: Region;
-  onRegion: (r: Region) => void;
   go: Go;
   onAdd: (lines: NewLine[], buyNow: boolean) => void;
 }) {
   const p = PRODUCT_BY_ID[productId];
   const single = p.sizes.length === 1;
-  const [glaze, setGlaze] = useState<GlazeId>(initialGlaze);
+  const [glaze, setGlaze] = useState<GlazeId | "">("");
   const [sizeId, setSizeId] = useState(single ? p.sizes[0].id : "");
   const [qty, setQty] = useState(1);
   const [engrave, setEngrave] = useState("");
@@ -1088,20 +944,18 @@ function Detail({
   const [error, setError] = useState("");
   const [tab, setTab] = useState<DetailTab>("info");
 
-  const g = GLAZE_BY_ID[glaze];
   const size = sizeId ? sizeOf(p, sizeId) : null;
-  const stock = size ? stockOf(p.id, glaze, size.id) : 0;
-  const count = Math.min(qty, Math.max(stock, 1));
+  const picked = Boolean(glaze && size);
+  const count = qty;
   const text = engrave.trim();
   const unit = p.price + (size?.add ?? 0) + (text ? ENGRAVE_FEE : 0);
   const addonSum = addons.reduce((s, id) => s + ADDON_BY_ID[id].price, 0);
-  const total = size && stock ? unit * count + addonSum : addonSum;
-  const est = estimate(minute, region);
+  const total = picked ? unit * count + addonSum : addonSum;
   const reviews = REVIEWS.filter((r) => r.productId === p.id);
 
   const submit = (buyNow: boolean) => {
-    if (!size) return setError("필수 옵션을 선택해 주세요.");
-    if (!stock) return setError("선택하신 옵션은 품절입니다.");
+    if (!glaze || !size) return setError("필수 옵션을 선택해 주세요.");
+    if (size.soldOut) return setError("선택하신 옵션은 품절입니다.");
     setError("");
     onAdd(
       [
@@ -1126,11 +980,8 @@ function Detail({
       <div className="mt-5 grid gap-8 md:grid-cols-[1.1fr_1fr] md:gap-12">
         <div className="md:sticky md:top-[140px] md:self-start">
           <div className="aspect-square overflow-hidden rounded-[4px]" style={{ background: C.claySoft }}>
-            <WarePhoto productId={p.id} glaze={glaze} engrave={text} alt={`${g.label} ${p.name}${size ? ` ${size.label}` : ""}${text ? `, 각인 ${text}` : ""}`} />
+            <WarePhoto productId={p.id} alt={p.name} />
           </div>
-          <p className="mt-2 text-center text-[14px]" style={{ color: C.muted }}>
-            {g.label}. {g.note}
-          </p>
         </div>
 
         <div className="min-w-0">
@@ -1154,59 +1005,32 @@ function Detail({
               </div>
             ))}
             <div className="grid grid-cols-[84px_1fr] gap-3 py-2.5">
-              <dt style={{ color: C.muted }}>
-                <label htmlFor="detail-region">배송 예정</label>
-              </dt>
-              <dd className="flex min-w-0 flex-wrap items-center gap-x-2 gap-y-1">
-                <select
-                  id="detail-region"
-                  value={region}
-                  onChange={(e) => onRegion(e.target.value as Region)}
-                  className="h-9 rounded-[4px] border px-2 text-[14px]"
-                  style={{ borderColor: C.clay, background: C.paper }}
-                >
-                  {REGIONS.map((r) => (
-                    <option key={r.id} value={r.id}>
-                      {r.label}
-                    </option>
-                  ))}
-                </select>
-                <span aria-live="polite" className="font-semibold">
-                  {est ? `${dateText(est.arrive)} 도착 예정` : ""}
-                </span>
-              </dd>
+              <dt style={{ color: C.muted }}>출고</dt>
+              <dd className="min-w-0">{SHIP_RULE}</dd>
             </div>
           </dl>
 
-          <fieldset className="mt-5">
-            <legend className="text-[15px] font-semibold">
+          <label className="mt-5 block">
+            <span className="text-[15px] font-semibold">
               유약 <span style={{ color: C.terra }}>[필수]</span>
-            </legend>
-            <div className="mt-2 grid grid-cols-2 gap-2 sm:grid-cols-4">
+            </span>
+            <select
+              value={glaze}
+              onChange={(e) => {
+                setGlaze(e.target.value as GlazeId | "");
+                setError("");
+              }}
+              className="mt-2 h-11 w-full rounded-[4px] border px-3 text-[15px]"
+              style={{ borderColor: C.clay, background: C.paper }}
+            >
+              <option value="">- [필수] 옵션을 선택해 주세요 -</option>
               {p.glazes.map((id) => (
-                <label
-                  key={id}
-                  className="flex h-11 cursor-pointer items-center gap-2 rounded-[4px] border px-3 text-[15px] font-semibold has-[:focus-visible]:outline has-[:focus-visible]:outline-2"
-                  style={glaze === id ? { borderColor: C.ink, boxShadow: `inset 0 0 0 1px ${C.ink}` } : { borderColor: C.line, background: C.paper }}
-                >
-                  <input
-                    type="radio"
-                    name="glaze"
-                    value={id}
-                    checked={glaze === id}
-                    onChange={() => {
-                      setGlaze(id);
-                      setQty(1);
-                      setError("");
-                    }}
-                    className="sr-only"
-                  />
-                  <Swatch glaze={GLAZE_BY_ID[id]} size={18} />
+                <option key={id} value={id}>
                   {GLAZE_BY_ID[id].label}
-                </label>
+                </option>
               ))}
-            </div>
-          </fieldset>
+            </select>
+          </label>
 
           <label className="mt-4 block">
             <span className="text-[15px] font-semibold">
@@ -1223,16 +1047,13 @@ function Detail({
               style={{ borderColor: C.clay, background: C.paper }}
             >
               {!single && <option value="">- [필수] 옵션을 선택해 주세요 -</option>}
-              {p.sizes.map((s) => {
-                const left = stockOf(p.id, glaze, s.id);
-                return (
-                  <option key={s.id} value={s.id} disabled={!left}>
-                    {s.label}
-                    {s.add ? ` (+${won(s.add)})` : ""}
-                    {left ? "" : " [품절]"}
-                  </option>
-                );
-              })}
+              {p.sizes.map((s) => (
+                <option key={s.id} value={s.id} disabled={s.soldOut}>
+                  {s.label}
+                  {s.add ? ` (+${won(s.add)})` : ""}
+                  {s.soldOut ? " [품절]" : ""}
+                </option>
+              ))}
             </select>
           </label>
 
@@ -1272,12 +1093,12 @@ function Detail({
             ))}
           </fieldset>
 
-          {size && (
+          {glaze && size && (
             <div className="mt-4 rounded-[4px] p-3" style={{ background: C.claySoft }}>
               <p className="text-[15px] font-semibold leading-[1.45]">
                 {p.name}
                 <span className="block text-[14px] font-normal" style={{ color: C.muted }}>
-                  {g.label}/{size.label}
+                  {GLAZE_BY_ID[glaze].label}/{size.label}
                   {text ? `/각인 ${text}` : ""}
                 </span>
               </p>
@@ -1298,8 +1119,8 @@ function Detail({
                   </span>
                   <button
                     type="button"
-                    onClick={() => setQty((n) => Math.min(stock, n + 1))}
-                    disabled={count >= stock}
+                    onClick={() => setQty((n) => Math.min(MAX_QTY, n + 1))}
+                    disabled={count >= MAX_QTY}
                     aria-label="수량 증가"
                     className="inline-flex h-10 w-10 items-center justify-center rounded-r-[4px] border disabled:opacity-30"
                     style={{ borderColor: C.clay, background: "#fff" }}
@@ -1307,9 +1128,6 @@ function Detail({
                     <Plus size={15} aria-hidden />
                   </button>
                 </div>
-                <span className="text-[13px] font-semibold" style={{ color: stock === 0 ? C.terra : stock <= 2 ? C.terraDeep : C.muted }} aria-live="polite">
-                  {stock === 0 ? "품절" : `재고 ${stock}개`}
-                </span>
                 <span className="font-bold tabular-nums">{won(unit * count)}</span>
               </div>
             </div>
@@ -1321,7 +1139,7 @@ function Detail({
               <strong className="text-[24px]">{won(total)}</strong>
               <span className="text-[14px]" style={{ color: C.muted }}>
                 {" "}
-                ({(size && stock ? count : 0) + addons.length}개)
+                ({(picked ? count : 0) + addons.length}개)
               </span>
             </span>
           </div>
@@ -1355,8 +1173,8 @@ function Detail({
           </div>
 
           <ul className="mt-5 space-y-1 text-[14px] leading-[1.6]" style={{ color: C.muted }}>
-            <li>※ 수작업 제품 특성상 색상, 유약 흐름, 크기가 조금씩 다를 수 있으며 불량이 아닙니다.</li>
-            <li>※ 배송 중 파손은 수령 후 24시간 이내 사진과 함께 접수해 주세요.</li>
+            <li>수작업 제품 특성상 색상, 유약 흐름, 크기가 조금씩 다를 수 있으며 불량이 아닙니다.</li>
+            <li>배송 중 파손은 수령 후 24시간 이내 사진과 함께 접수해 주세요.</li>
           </ul>
         </div>
       </div>
@@ -1396,7 +1214,7 @@ function Detail({
         </div>
         <div key={tab} id="dtab-panel" role="tabpanel" aria-labelledby={`dtab-${tab}`} className="soft-in pt-8">
           {tab === "info" && <InfoTab p={p} size={size} />}
-          {tab === "ship" && <ShipTab minute={minute} region={region} onRegion={onRegion} />}
+          {tab === "ship" && <ShipTab />}
           {tab === "return" && <ReturnTab />}
           {tab === "review" && <ReviewList list={reviews} total={REVIEW_TOTAL[p.id]} />}
         </div>
@@ -1446,98 +1264,28 @@ function InfoTab({ p, size }: { p: Product; size: Size | null }) {
         />
       </div>
       <p className="mt-4 text-[14px]" style={{ color: C.muted }}>
-        ※ 수작업 제품 특성상 미세한 색상 차이, 유약 흐름, 크기 차이는 불량이 아닙니다.
+        수작업 제품 특성상 미세한 색상 차이, 유약 흐름, 크기 차이는 불량이 아닙니다.
       </p>
     </div>
   );
 }
 
-function ArrivalPlanner({ minute, region, onRegion }: { minute: number; region: Region; onRegion: (r: Region) => void }) {
-  const reduce = useReducedMotionSafe();
-  const est = estimate(minute, region);
-  const days = est ? Array.from({ length: 8 }, (_, i) => addDays(est.today, i)) : [];
-
+function ShipTab() {
   return (
-    <div className="rounded-[4px] border p-4 md:p-6" style={{ borderColor: C.line, background: C.paper }}>
-      <fieldset>
-        <legend className="text-[15px] font-semibold">받는 지역</legend>
-        <div className="mt-2 flex flex-wrap gap-1.5">
-          {REGIONS.map((r) => (
-            <label
-              key={r.id}
-              className="inline-flex h-10 cursor-pointer items-center rounded-[4px] border px-3 text-[14px] font-semibold has-[:focus-visible]:outline has-[:focus-visible]:outline-2"
-              style={region === r.id ? { background: C.ink, color: "#fff", borderColor: C.ink } : { borderColor: C.line, background: C.bg }}
-            >
-              <input type="radio" name="arrival-region" value={r.id} checked={region === r.id} onChange={() => onRegion(r.id)} className="sr-only" />
-              {r.label}
-            </label>
-          ))}
-        </div>
-      </fieldset>
-      <div aria-live="polite">
-        {est ? (
-          <>
-            <p className="mt-5 text-[24px] font-bold leading-[1.3] tracking-[-0.02em] md:text-[28px]">{dateText(est.arrive)} 도착 예정</p>
-            <p className="mt-1 text-[15px] font-semibold" style={{ color: C.terraDeep }}>
-              {est.todayShip ? "오늘 출고" : `${dateText(est.ship)} 출고`}
-            </p>
-            <ol className="mt-5 grid grid-cols-8 gap-1">
-              {days.map((d, i) => {
-                const weekend = !isWorkday(d);
-                const isShip = i === est.shipAt;
-                const isArrive = i === est.arriveAt;
-                return (
-                  <li
-                    key={i}
-                    className="flex min-w-0 flex-col items-center rounded-[4px] py-2"
-                    style={{
-                      background: isArrive ? C.terra : isShip ? C.ink : weekend ? "transparent" : C.bg,
-                      color: isArrive || isShip ? "#fff" : weekend ? "#a2978b" : C.ink,
-                      outline: weekend && !isShip && !isArrive ? `1px dashed ${C.clay}` : "none",
-                      outlineOffset: -1,
-                    }}
-                    aria-label={`${dateText(d)}${i === 0 ? ", 오늘" : ""}${weekend ? ", 주말" : ""}${isShip ? ", 출고일" : ""}${isArrive ? ", 도착 예정" : ""}`}
-                  >
-                    <span className="text-[12px]">{i === 0 ? "오늘" : DAY_NAMES[d.getDay()]}</span>
-                    <span className="text-[16px] font-bold tabular-nums">{d.getDate()}</span>
-                    <span className="h-[18px] text-[11px] font-semibold leading-[18px]">{isShip ? "출고" : isArrive ? "도착" : ""}</span>
-                  </li>
-                );
-              })}
-            </ol>
-            <div className="relative mt-2 h-1.5 rounded-full" style={{ background: C.claySoft }} aria-hidden>
-              <motion.div
-                className="absolute top-0 h-full rounded-full"
-                style={{ background: C.terra }}
-                initial={false}
-                animate={{ left: `${(est.shipAt / 8) * 100 + 6.25}%`, width: `${((est.arriveAt - est.shipAt) / 8) * 100}%` }}
-                transition={{ duration: reduce ? 0 : 0.5, ease: EASE }}
-              />
-            </div>
-          </>
-        ) : (
-          <div className="h-[180px]" />
-        )}
-      </div>
-    </div>
-  );
-}
-
-function ShipTab({ minute, region, onRegion }: { minute: number; region: Region; onRegion: (r: Region) => void }) {
-  return (
-    <div className="mx-auto grid max-w-[1000px] gap-8 md:grid-cols-[1fr_1.1fr]">
+    <div className="mx-auto max-w-[860px]">
       <SpecTable
         caption="배송 안내"
         rows={[
           ["배송 방법", "택배 (ㅎㄴ택배)"],
           ["배송 비용", `${won(FREE_SHIP)} 이상 무료배송, 미만 ${won(SHIP_FEE)}`],
           ["추가 배송비", `제주, 도서산간 ${won(3_000)}`],
-          ["당일 출고", "평일 오후 2시 이전 주문 건 당일 출고 (각인 상품 제외)"],
+          ["당일 출고", "평일 오후 2시 이전 주문 건 당일 출고 (주말, 공휴일 주문은 다음 영업일 출고)"],
+          ["제작 상품", "각인 상품은 주문 다음 영업일 출고"],
           ["배송 기간", "출고 후 수도권 1일, 지방 1~2일, 제주, 도서산간 2~3일"],
+          ["배송 조회", "출고 시 송장번호를 문자로 보내 드립니다."],
           ["포장", "에어캡, 완충재, 전용 박스 이중 포장"],
         ]}
       />
-      <ArrivalPlanner minute={minute} region={region} onRegion={onRegion} />
     </div>
   );
 }
@@ -1556,7 +1304,7 @@ function ReturnTab() {
         ]}
       />
       <p className="mt-4 text-[14px]" style={{ color: C.muted }}>
-        ※ 파손 상품은 버리지 마시고 받으신 상자 그대로 보관해 주세요.
+        파손 상품은 버리지 마시고 받으신 상자 그대로 보관해 주세요.
       </p>
     </div>
   );
@@ -1659,7 +1407,7 @@ function LineThumb({ l }: { l: CartLine }) {
   return (
     <span className="flex h-[72px] w-[72px] shrink-0 items-center justify-center overflow-hidden rounded-[4px]" style={{ background: C.claySoft }}>
       {l.kind === "item" ? (
-        <WarePhoto productId={l.productId} glaze={l.glaze} engrave={l.engrave} />
+        <WarePhoto productId={l.productId} />
       ) : (
         <ShoppingBag size={26} style={{ color: C.terra }} aria-hidden />
       )}
@@ -1669,18 +1417,14 @@ function LineThumb({ l }: { l: CartLine }) {
 
 function CartView({
   cart,
-  minute,
   region,
-  onRegion,
   onQty,
   onRemove,
   onClear,
   go,
 }: {
   cart: CartLine[];
-  minute: number;
   region: Region;
-  onRegion: (r: Region) => void;
   onQty: (key: string, delta: number) => void;
   onRemove: (key: string) => void;
   onClear: () => void;
@@ -1754,7 +1498,7 @@ function CartView({
                         <button
                           type="button"
                           onClick={() => onQty(l.key, 1)}
-                          disabled={l.qty >= lineMax(l)}
+                          disabled={l.qty >= MAX_QTY}
                           aria-label="수량 증가"
                           className="inline-flex h-9 w-9 items-center justify-center rounded-r-[4px] border disabled:opacity-30"
                           style={{ borderColor: C.clay, background: "#fff" }}
@@ -1771,9 +1515,9 @@ function CartView({
             <p className="border-t pt-3 text-[15px]" style={{ borderColor: C.line, color: C.terraDeep }} aria-live="polite">
               {left > 0 ? `${won(left)} 더 구매하시면 무료배송입니다.` : "무료배송 상품입니다."}
             </p>
-            <div className="mt-8">
-              <ArrivalPlanner minute={minute} region={region} onRegion={onRegion} />
-            </div>
+            <p className="mt-1 text-[14px]" style={{ color: C.muted }}>
+              {SHIP_RULE}
+            </p>
           </div>
 
           <aside aria-label="결제 예정 금액" className="lg:sticky lg:top-[140px] lg:self-start">
@@ -1824,7 +1568,6 @@ interface Done {
   phone: string;
   pay: string;
   total: number;
-  arrive: string;
   items: { key: string; name: string; options: string; qty: number }[];
 }
 
@@ -1849,7 +1592,6 @@ function OrderView({ cart, region, onRegion, onOrdered, go }: { cart: CartLine[]
     if (!agree) return setError("구매조건 확인 및 결제진행에 동의해 주세요.");
     setError("");
     const now = new Date();
-    const est = estimate(Math.floor(now.getTime() / 60_000), region);
     const ymd = `${now.getFullYear()}${String(now.getMonth() + 1).padStart(2, "0")}${String(now.getDate()).padStart(2, "0")}`;
     setDone({
       no: `${ymd}-${String((now.getMinutes() * 60 + now.getSeconds()) % 10000).padStart(7, "0")}`,
@@ -1857,7 +1599,6 @@ function OrderView({ cart, region, onRegion, onOrdered, go }: { cart: CartLine[]
       phone: maskPhone(phone),
       pay: PAYS.find((p) => p.id === pay)!.label,
       total: t.total,
-      arrive: est ? dateText(est.arrive) : "",
       items: cart.map((l) => ({ key: l.key, name: lineName(l), options: lineOptions(l), qty: l.qty })),
     });
     onOrdered();
@@ -1885,8 +1626,7 @@ function OrderView({ cart, region, onRegion, onOrdered, go }: { cart: CartLine[]
               ["주문번호", done.no],
               ["받는사람", done.name],
               ["휴대전화", done.phone],
-              ["결제수단", `${done.pay} (테스트)`],
-              ["도착 예정", done.arrive],
+              ["결제수단", done.pay],
               ["최종결제금액", won(done.total)],
             ].map(([k, v]) => (
               <div key={k} className="flex justify-between gap-4 py-2.5" style={{ borderColor: C.line }}>
@@ -2053,7 +1793,7 @@ function BrandView() {
         </div>
         <div>
           <p>
-            {SHOP}는 대표 김ㅈ우와 이ㅅ연 두 사람이 2019년부터 ㅈㄹ동 작업실에서 운영합니다. 한 번 가마를 땔 때 200점 남짓 나오며, 흠이 없는 것만 골라 판매합니다.
+            {SHOP}은 대표 김ㅈ우와 이ㅅ연 두 사람이 2019년부터 ㅈㄹ동 작업실에서 운영합니다. 한 번 가마를 땔 때 200점 남짓 나오며, 흠이 없는 것만 골라 판매합니다.
           </p>
           <div className="mt-6">
             <SpecTable
@@ -2197,17 +1937,6 @@ const HOURS = [
   { label: "물레 체험 (토요일)", time: "14:00, 16:00 (전화 예약)" },
 ];
 
-function visitStatus(minute: number) {
-  if (minute < 0) return null;
-  const now = new Date(minute * 60_000);
-  const day = now.getDay();
-  const m = now.getHours() * 60 + now.getMinutes();
-  if (day === 0 || day === 1) return { open: false, text: "오늘은 휴무입니다. 화요일 11시에 엽니다." };
-  if (m < 660) return { open: false, text: "오늘 11시에 엽니다." };
-  if (m >= 1140) return { open: false, text: day === 6 ? "오늘 영업이 종료되었습니다. 화요일 11시에 엽니다." : "오늘 영업이 종료되었습니다. 내일 11시에 엽니다." };
-  return { open: true, text: "영업 중 (19:00까지)" };
-}
-
 function MiniMap() {
   return (
     <svg viewBox="0 0 640 380" className="h-auto w-full" role="img" aria-label="ㅅㅈ역 3번 출구에서 공방까지 가는 약도">
@@ -2242,8 +1971,7 @@ function MiniMap() {
   );
 }
 
-function VisitView({ minute }: { minute: number }) {
-  const status = visitStatus(minute);
+function VisitView() {
   return (
     <Container className="pb-16 pt-8 md:pb-24 md:pt-12">
       <h1 className="text-center text-[24px] font-bold tracking-[-0.03em] md:text-[30px]">오시는 길</h1>
@@ -2285,8 +2013,8 @@ function VisitView({ minute }: { minute: number }) {
               ))}
             </tbody>
           </table>
-          <p className="mt-3 min-h-[26px] text-[15px] font-semibold" style={{ color: status?.open ? "#4d6b3a" : C.terraDeep }}>
-            {status?.text}
+          <p className="mt-3 text-[15px]" style={{ color: C.muted }}>
+            공휴일은 문을 닫으며, 임시 휴무는 공지사항에 올립니다.
           </p>
           <a href={`tel:${TEL}`} className="mt-4 inline-flex h-12 items-center rounded-[4px] px-6 font-semibold" style={{ background: C.ink, color: "#fff" }}>
             전화 {TEL}

@@ -1,6 +1,6 @@
 "use client";
 
-import { createContext, useContext, useEffect, useRef, useState, type FormEvent, type KeyboardEvent as ReactKeyboardEvent } from "react";
+import { createContext, useContext, useEffect, useRef, useState, type FormEvent } from "react";
 import Image from "next/image";
 import { AnimatePresence, motion } from "framer-motion";
 import { Check, ChevronDown, ChevronRight, CircleAlert, FileUp, House, Menu, RotateCcw, Trash2, X } from "lucide-react";
@@ -20,11 +20,9 @@ import { DemoMakerInfo } from "@/components/demos/DemoMakerInfo";
    모서리는 4~6px로 각지게, 치수와 사양 숫자는 고정폭 숫자로 맞춘다.
 
    맨 위 띠의 KOR/ENG는 같은 화면의 문구를 바꾸고, 바깥 div의 lang도 함께 바꾼다.
-   가공 가능 범위(설비현황 아래)는 소재, 크기, 공차, 수량을 넣으면 설비 가공 범위와 비교해 가공 가능 또는 상담 필요를 이유와 함께 보여 주고,
-   쓸 설비와 대략적인 납기, 축척대로 그린 부품 그림을 낸다. 결과에서 견적문의로 넘어가면 조건이 문의 내용에 들어간다.
-   기계설비 표의 가공품 버튼은 그 설비로 만드는 생산제품만 걸러 보여 준다.
+   설비현황은 기계설비, 측정설비 표와 가공 방식별 최대 크기, 공차, 소재를 적은 가공 사양 표로 둔다.
    견적문의는 도면 파일을 골라도 이름과 크기만 보여 주고 어디에도 올리지 않으며, 접수번호와 가린 담당자 정보로 끝난다.
-   오시는 길은 승용차 방문과 화물 납품을 탭으로 나누고, 화물 납품에 하역장 운영 시간을 둔다.
+   오시는 길은 주소, 연락처 표와 방문 안내 한 단락이다.
 
    사진 출처(public/images/demo-company):
    AI 생성(Z-Image-Turbo, Apache 2.0) hero, parts */
@@ -63,8 +61,6 @@ type MenuId = "about" | "business" | "equipment" | "products" | "support";
 type Route = { m: MenuId | "home"; s: string };
 
 type MachineKey = "vmc" | "large" | "fiveAx" | "lathe" | "turnMill";
-type Material = "al" | "sus" | "steel" | "plastic";
-type Tol = "0.1" | "0.05" | "0.01";
 type PrCat = "semi" | "medical" | "battery" | "robot";
 
 interface Ctx {
@@ -73,15 +69,7 @@ interface Ctx {
   s: (v: L) => string;
   route: Route;
   go: (m: MenuId | "home", s?: string) => void;
-  memo: string;
-  setMemo: (v: string) => void;
-  prMachine: MachineKey | null;
-  setPrMachine: (v: MachineKey | null) => void;
-  visitTab: VisitTab;
-  setVisitTab: (v: VisitTab) => void;
 }
-
-type VisitTab = "car" | "truck";
 
 const CoCtx = createContext<Ctx | null>(null);
 function useCo() {
@@ -117,7 +105,7 @@ const MENUS: { id: MenuId; label: L; subs: { id: string; label: L }[] }[] = [
     subs: [
       { id: "machines", label: l("기계설비", "Machining Equipment") },
       { id: "measuring", label: l("측정설비", "Measuring Equipment") },
-      { id: "range", label: l("가공 가능 범위", "Machinable Range") },
+      { id: "spec", label: l("가공 사양", "Machining Specs") },
     ],
   },
   {
@@ -141,7 +129,7 @@ const MENUS: { id: MenuId; label: L; subs: { id: string; label: L }[] }[] = [
   },
 ];
 
-const COMPANY = l("곰파트너", "Gompartner");
+const COMPANY = l("정밀가공 제조", "Precision Machining");
 const ADDRESS = l("ㅎㄷ시 ㅁㄹ구 ㅅㄴ산단로 00", "00 SN-sandan-ro, MR-gu, HD-si");
 const HOURS = l("평일 08:30 ~ 17:30, 토, 일, 공휴일 휴무", "Weekdays 08:30 to 17:30, closed on weekends and holidays");
 
@@ -165,9 +153,6 @@ function maskPhone(phone: string) {
   const digits = phone.replace(/\D/g, "");
   return `${digits.slice(0, 3)}-****-${digits.slice(-4)}`;
 }
-
-const r2 = (n: number) => Math.round(n * 100) / 100;
-const fmt = (n: number) => n.toLocaleString("en-US");
 
 function fileSize(bytes: number) {
   if (bytes < 1024 * 1024) return `${Math.max(1, Math.round(bytes / 1024))} KB`;
@@ -198,32 +183,32 @@ interface Machine {
 }
 
 const MACHINES: Machine[] = [
-  { type: "mc", mk: "vmc", name: "VMC-850", maker: l("ㄷㅅ공작기계 (국내)", "DS Machine Tools (Korea)"), spec: l("X850 × Y500 × Z500 mm", "X850 × Y500 × Z500 mm"), spindle: "12,000 rpm", count: 4, year: 2016 },
-  { type: "mc", mk: "large", name: "VMC-1300", maker: l("ㄷㅅ공작기계 (국내)", "DS Machine Tools (Korea)"), spec: l("X1,300 × Y650 × Z600 mm", "X1,300 × Y650 × Z600 mm"), spindle: "8,000 rpm", count: 2, year: 2019 },
-  { type: "mc", mk: "vmc", name: "HSC-500", maker: l("ㅂㄹ (일본)", "BR (Japan)"), spec: l("X500 × Y400 × Z300 mm", "X500 × Y400 × Z300 mm"), spindle: "24,000 rpm", count: 1, year: 2021 },
-  { type: "fiveAx", mk: "fiveAx", name: "5AX-600", maker: l("ㅎㅅ (독일)", "HS (Germany)"), spec: l("X600 × Y500 × Z400 mm, A ±120°, C 360°", "X600 × Y500 × Z400 mm, A ±120°, C 360°"), spindle: "20,000 rpm", count: 3, year: 2018 },
-  { type: "lathe", mk: "lathe", name: "TL-300", maker: l("ㅁㅇ기공 (국내)", "MY Machinery (Korea)"), spec: l("최대 Ø300 × 길이 500 mm", "Max. Ø300 × L500 mm"), spindle: "4,500 rpm", count: 5, year: 2016 },
-  { type: "lathe", mk: "turnMill", name: "TM-200", maker: l("ㅂㄹ (일본)", "BR (Japan)"), spec: l("최대 Ø200 × 길이 400 mm, Y축, 부 주축", "Max. Ø200 × L400 mm, Y-axis, sub spindle"), spindle: "6,000 rpm", count: 2, year: 2022 },
+  { type: "mc", mk: "vmc", name: "VMC-850", maker: l("ㄷㅅ공작기계 (국내)", "DS Machine Tools (Korea)"), spec: l("X850 x Y500 x Z500 mm", "X850 x Y500 x Z500 mm"), spindle: "12,000 rpm", count: 4, year: 2016 },
+  { type: "mc", mk: "large", name: "VMC-1300", maker: l("ㄷㅅ공작기계 (국내)", "DS Machine Tools (Korea)"), spec: l("X1,300 x Y650 x Z600 mm", "X1,300 x Y650 x Z600 mm"), spindle: "8,000 rpm", count: 2, year: 2019 },
+  { type: "mc", mk: "vmc", name: "HSC-500", maker: l("ㅂㄹ (일본)", "BR (Japan)"), spec: l("X500 x Y400 x Z300 mm", "X500 x Y400 x Z300 mm"), spindle: "24,000 rpm", count: 1, year: 2021 },
+  { type: "fiveAx", mk: "fiveAx", name: "5AX-600", maker: l("ㅎㅅ (독일)", "HS (Germany)"), spec: l("X600 x Y500 x Z400 mm, A +-120도, C 360도", "X600 x Y500 x Z400 mm, A +-120 deg, C 360 deg"), spindle: "20,000 rpm", count: 3, year: 2018 },
+  { type: "lathe", mk: "lathe", name: "TL-300", maker: l("ㅁㅇ기공 (국내)", "MY Machinery (Korea)"), spec: l("최대 D300 x 길이 500 mm", "Max. D300 x L500 mm"), spindle: "4,500 rpm", count: 5, year: 2016 },
+  { type: "lathe", mk: "turnMill", name: "TM-200", maker: l("ㅂㄹ (일본)", "BR (Japan)"), spec: l("최대 D200 x 길이 400 mm, Y축, 부 주축", "Max. D200 x L400 mm, Y-axis, sub spindle"), spindle: "6,000 rpm", count: 2, year: 2022 },
 ];
 
 const MEASURES: { name: L; maker: L; range: L; acc: L; count: number; year: number }[] = [
-  { name: l("3차원 측정기 CMM-7106", "CMM 7106"), maker: l("ㄴㄹ (독일)", "NR (Germany)"), range: l("X700 × Y1,000 × Z600 mm", "X700 × Y1,000 × Z600 mm"), acc: l("1.9 + L/300 µm", "1.9 + L/300 µm"), count: 1, year: 2022 },
-  { name: l("윤곽, 표면 거칠기 측정기", "Contour and roughness tester"), maker: l("ㅈㅇ (일본)", "JY (Japan)"), range: l("측정 길이 100 mm", "Stroke 100 mm"), acc: l("Ra 0.01 µm까지", "Down to Ra 0.01 µm"), count: 1, year: 2022 },
-  { name: l("비접촉 영상 측정기", "Vision measuring system"), maker: l("ㄷㄹ (국내)", "DR (Korea)"), range: l("X300 × Y200 mm", "X300 × Y200 mm"), acc: l("±2.5 µm", "±2.5 µm"), count: 1, year: 2023 },
-  { name: l("하이트 게이지", "Height gauge"), maker: l("ㅈㅇ (일본)", "JY (Japan)"), range: l("높이 600 mm", "Height 600 mm"), acc: l("±1.1 µm", "±1.1 µm"), count: 2, year: 2017 },
+  { name: l("3차원 측정기 CMM-7106", "CMM 7106"), maker: l("ㄴㄹ (독일)", "NR (Germany)"), range: l("X700 x Y1,000 x Z600 mm", "X700 x Y1,000 x Z600 mm"), acc: l("1.9 + L/300 um", "1.9 + L/300 um"), count: 1, year: 2022 },
+  { name: l("윤곽, 표면 거칠기 측정기", "Contour and roughness tester"), maker: l("ㅈㅇ (일본)", "JY (Japan)"), range: l("측정 길이 100 mm", "Stroke 100 mm"), acc: l("Ra 0.01 um까지", "Down to Ra 0.01 um"), count: 1, year: 2022 },
+  { name: l("비접촉 영상 측정기", "Vision measuring system"), maker: l("ㄷㄹ (국내)", "DR (Korea)"), range: l("X300 x Y200 mm", "X300 x Y200 mm"), acc: l("+-2.5 um", "+-2.5 um"), count: 1, year: 2023 },
+  { name: l("하이트 게이지", "Height gauge"), maker: l("ㅈㅇ (일본)", "JY (Japan)"), range: l("높이 600 mm", "Height 600 mm"), acc: l("+-1.1 um", "+-1.1 um"), count: 2, year: 2017 },
 ];
 
 const MACHINE_TOTAL = MACHINES.reduce((n, m) => n + m.count, 0);
 
 const PRODUCTS: { cat: PrCat; name: L; material: L; tol: string; mk: MachineKey; qty: L }[] = [
-  { cat: "semi", name: l("웨이퍼 이송 로봇 암 블록", "Wafer transfer robot arm block"), material: l("알루미늄 6061, 경질 아노다이징", "Al 6061, hard anodized"), tol: "±0.02", mk: "fiveAx", qty: l("월 120개", "120 / month") },
-  { cat: "medical", name: l("수술 기구 연결 커넥터", "Surgical instrument connector"), material: l("스테인리스 630", "SUS 630"), tol: "±0.01", mk: "turnMill", qty: l("로트당 500개", "500 / lot") },
-  { cat: "battery", name: l("전극 노칭 금형 베이스", "Electrode notching die base"), material: l("공구강 SKD11, 열처리 후 가공", "Tool steel SKD11, machined after hardening"), tol: "±0.01", mk: "fiveAx", qty: l("주문 생산", "Made to order") },
-  { cat: "robot", name: l("협동 로봇 감속기 하우징", "Cobot reducer housing"), material: l("알루미늄 7075", "Al 7075"), tol: "±0.02", mk: "fiveAx", qty: l("월 250개", "250 / month") },
-  { cat: "semi", name: l("진공 챔버 포트 플랜지", "Vacuum chamber port flange"), material: l("스테인리스 316L, Ra 0.8", "SUS 316L, Ra 0.8"), tol: "±0.03", mk: "lathe", qty: l("월 300개", "300 / month") },
-  { cat: "medical", name: l("진단 장비 시료 트레이", "Diagnostic analyzer sample tray"), material: l("PEEK", "PEEK"), tol: "±0.05", mk: "vmc", qty: l("월 200개", "200 / month") },
-  { cat: "battery", name: l("롤 프레스 베어링 하우징", "Roll press bearing housing"), material: l("탄소강 S45C", "Carbon steel S45C"), tol: "±0.02", mk: "large", qty: l("월 40개", "40 / month") },
-  { cat: "robot", name: l("비전 검사기 카메라 브래킷", "Vision inspection camera bracket"), material: l("알루미늄 6061, 흑색 아노다이징", "Al 6061, black anodized"), tol: "±0.05", mk: "vmc", qty: l("월 600개", "600 / month") },
+  { cat: "semi", name: l("웨이퍼 이송 로봇 암 블록", "Wafer transfer robot arm block"), material: l("알루미늄 6061, 경질 아노다이징", "Al 6061, hard anodized"), tol: "+-0.02", mk: "fiveAx", qty: l("월 120개", "120 / month") },
+  { cat: "medical", name: l("수술 기구 연결 커넥터", "Surgical instrument connector"), material: l("스테인리스 630", "SUS 630"), tol: "+-0.01", mk: "turnMill", qty: l("로트당 500개", "500 / lot") },
+  { cat: "battery", name: l("전극 노칭 금형 베이스", "Electrode notching die base"), material: l("공구강 SKD11, 열처리 후 가공", "Tool steel SKD11, machined after hardening"), tol: "+-0.01", mk: "fiveAx", qty: l("주문 생산", "Made to order") },
+  { cat: "robot", name: l("협동 로봇 감속기 하우징", "Cobot reducer housing"), material: l("알루미늄 7075", "Al 7075"), tol: "+-0.02", mk: "fiveAx", qty: l("월 250개", "250 / month") },
+  { cat: "semi", name: l("진공 챔버 포트 플랜지", "Vacuum chamber port flange"), material: l("스테인리스 316L, Ra 0.8", "SUS 316L, Ra 0.8"), tol: "+-0.03", mk: "lathe", qty: l("월 300개", "300 / month") },
+  { cat: "medical", name: l("진단 장비 시료 트레이", "Diagnostic analyzer sample tray"), material: l("PEEK", "PEEK"), tol: "+-0.05", mk: "vmc", qty: l("월 200개", "200 / month") },
+  { cat: "battery", name: l("롤 프레스 베어링 하우징", "Roll press bearing housing"), material: l("탄소강 S45C", "Carbon steel S45C"), tol: "+-0.02", mk: "large", qty: l("월 40개", "40 / month") },
+  { cat: "robot", name: l("비전 검사기 카메라 브래킷", "Vision inspection camera bracket"), material: l("알루미늄 6061, 흑색 아노다이징", "Al 6061, black anodized"), tol: "+-0.05", mk: "vmc", qty: l("월 600개", "600 / month") },
 ];
 
 const PR_CATS: Record<PrCat, L> = {
@@ -242,7 +227,7 @@ const HISTORY: { year: number; items: L[] }[] = [
   { year: 2018, items: [l("5축 가공기 도입, 반도체 장비 부품 납품 시작", "Added 5-axis machines, began supplying semiconductor equipment parts")] },
   { year: 2016, items: [l("ㅅㄴ산업단지 지금 공장으로 이전", "Moved to the current plant in SN Industrial Complex")] },
   { year: 2014, items: [l("ISO 9001 인증", "ISO 9001 certified")] },
-  { year: 2012, items: [l("법인 전환, 곰파트너로 상호 변경", "Incorporated as Gompartner")] },
+  { year: 2012, items: [l("법인 전환", "Incorporated")] },
   { year: 2009, items: [l("ㅎㄷ시에서 머시닝센터 2대로 창업", "Founded in HD with two machining centers")] },
 ];
 
@@ -303,8 +288,8 @@ const BUSINESS: Record<string, { desc: L; rows: [L, L][]; machines: MachineKey[]
       "Cylindrical parts such as shafts, flanges and connectors.",
     ),
     rows: [
-      [l("최대 가공 크기", "Max. size"), l("Ø300 × 길이 500 mm", "Ø300 × L500 mm")],
-      [l("공차", "Tolerance"), l("±0.01 mm (Ø200 이하)", "±0.01 mm (up to Ø200)")],
+      [l("최대 가공 크기", "Max. size"), l("D300 x 길이 500 mm", "D300 x L500 mm")],
+      [l("공차", "Tolerance"), l("+-0.01 mm (D200 이하)", "+-0.01 mm (up to D200)")],
       [l("주요 소재", "Materials"), l("스테인리스, 탄소강, 알루미늄, 황동, PEEK", "Stainless, carbon steel, aluminum, brass, PEEK")],
     ],
     machines: ["lathe", "turnMill"],
@@ -315,20 +300,20 @@ const BUSINESS: Record<string, { desc: L; rows: [L, L][]; machines: MachineKey[]
       "Prismatic parts such as blocks, housings and base plates.",
     ),
     rows: [
-      [l("최대 가공 크기", "Max. size"), l("1,300 × 650 × 600 mm", "1,300 × 650 × 600 mm")],
-      [l("공차", "Tolerance"), l("±0.02 mm", "±0.02 mm")],
+      [l("최대 가공 크기", "Max. size"), l("1,300 x 650 x 600 mm", "1,300 x 650 x 600 mm")],
+      [l("공차", "Tolerance"), l("+-0.02 mm", "+-0.02 mm")],
       [l("주요 소재", "Materials"), l("알루미늄, 탄소강, 공구강, 엔지니어링 플라스틱", "Aluminum, carbon steel, tool steel, engineering plastics")],
     ],
     machines: ["vmc", "large"],
   },
   fiveAx: {
     desc: l(
-      "여러 면에 경사 구멍이나 곡면이 있는 부품을 가공합니다. ±0.01mm 공차 부품은 항온 가공실에서 가공합니다.",
-      "Parts with angled holes or curved faces on several sides. ±0.01 mm parts are machined in the temperature-controlled room.",
+      "여러 면에 경사 구멍이나 곡면이 있는 부품을 가공합니다. +-0.01mm 공차 부품은 항온 가공실에서 가공합니다.",
+      "Parts with angled holes or curved faces on several sides. +-0.01 mm parts are machined in the temperature-controlled room.",
     ),
     rows: [
-      [l("최대 가공 크기", "Max. size"), l("600 × 500 × 400 mm", "600 × 500 × 400 mm")],
-      [l("공차", "Tolerance"), l("±0.01 mm", "±0.01 mm")],
+      [l("최대 가공 크기", "Max. size"), l("600 x 500 x 400 mm", "600 x 500 x 400 mm")],
+      [l("공차", "Tolerance"), l("+-0.01 mm", "+-0.01 mm")],
       [l("주요 소재", "Materials"), l("알루미늄 7075, 스테인리스, 열처리 공구강", "Al 7075, stainless, hardened tool steel")],
     ],
     machines: ["fiveAx"],
@@ -340,14 +325,10 @@ const BUSINESS: Record<string, { desc: L; rows: [L, L][]; machines: MachineKey[]
 export function CompanyDemo() {
   const [lang, setLang] = useState<Lang>("ko");
   const [route, setRoute] = useState<Route>({ m: "home", s: "" });
-  const [memo, setMemo] = useState("");
-  const [prMachine, setPrMachine] = useState<MachineKey | null>(null);
-  const [visitTab, setVisitTab] = useState<VisitTab>("car");
   const moved = useRef(false);
 
   const go = (m: MenuId | "home", s?: string) => {
     const sub = m === "home" ? "" : (s ?? MENUS.find((n) => n.id === m)!.subs[0].id);
-    if (m !== "products") setPrMachine(null);
     moved.current = true;
     setRoute({ m, s: sub });
     window.scrollTo({ top: 0 });
@@ -355,10 +336,7 @@ export function CompanyDemo() {
 
   // 사용법 가이드가 하위 화면에서 열리면 첫 화면으로 돌아온다
   useEffect(() => {
-    const f = () => {
-      setPrMachine(null);
-      setRoute({ m: "home", s: "" });
-    };
+    const f = () => setRoute({ m: "home", s: "" });
     window.addEventListener("demo:go-home", f);
     return () => window.removeEventListener("demo:go-home", f);
   }, []);
@@ -375,12 +353,6 @@ export function CompanyDemo() {
     s: (v) => v[lang],
     route,
     go,
-    memo,
-    setMemo,
-    prMachine,
-    setPrMachine,
-    visitTab,
-    setVisitTab,
   };
 
   return (
@@ -401,13 +373,8 @@ function Logo() {
   const { lang } = useCo();
   return (
     <span className="inline-flex min-w-0 max-w-full items-center gap-2.5">
-      {/* eslint-disable-next-line @next/next/no-img-element */}
-      <img src="/images/logo-bear.png" alt="" aria-hidden width={28} height={28} className="h-7 w-7 shrink-0" />
       <span className="flex min-w-0 items-baseline gap-1.5 whitespace-nowrap">
-        <span className="text-[18px] font-bold tracking-[-0.02em] sm:text-[20px]">{lang === "ko" ? "곰파트너" : "Gompartner"}</span>
-        <span className="truncate text-[11px] font-bold sm:text-[12px]" style={{ opacity: 0.75 }}>
-          {lang === "ko" ? "카탈로그" : "Catalog"}
-        </span>
+        <span className="text-[18px] font-bold tracking-[-0.02em] sm:text-[20px]">{lang === "ko" ? "정밀가공 제조" : "Precision Machining"}</span>
       </span>
     </span>
   );
@@ -628,15 +595,15 @@ function Home() {
   const notices = makeNotices(useDemoToday());
 
   const specs = [
-    { k: x("최소 공차", "Tightest tolerance"), v: "±0.01", u: "mm" },
-    { k: x("최대 가공 크기", "Max. part size"), v: "1,300×650×600", u: "mm" },
-    { k: x("선반 최대 지름", "Max. turning dia."), v: "Ø300", u: "mm" },
+    { k: x("최소 공차", "Tightest tolerance"), v: "+-0.01", u: "mm" },
+    { k: x("최대 가공 크기", "Max. part size"), v: "1,300x650x600", u: "mm" },
+    { k: x("선반 최대 지름", "Max. turning dia."), v: "300", u: "mm" },
   ];
 
   const links = [
     { t: x("기계설비", "Machining Equipment"), to: () => go("equipment", "machines") },
     { t: x("측정설비", "Measuring Equipment"), to: () => go("equipment", "measuring") },
-    { t: x("가공 가능 범위", "Machinable Range"), to: () => go("equipment", "range") },
+    { t: x("가공 사양", "Machining Specs"), to: () => go("equipment", "spec") },
     { t: x("인증현황", "Certifications"), to: () => go("about", "certs") },
     { t: x("오시는 길", "Location"), to: () => go("about", "location") },
   ];
@@ -653,7 +620,7 @@ function Home() {
             {x("반도체, 의료기기 정밀부품 가공", "Precision parts for semiconductor and medical equipment")}
           </h1>
           <p className="mt-3 text-[18px] font-bold md:text-[22px]" style={{ color: C.orange }}>
-            {x("CNC 선반ㆍMCTㆍ5축 정밀부품 가공", "CNC turning, MCT and 5-axis precision parts")}
+            {x("CNC 선반, MCT, 5축 정밀부품 가공", "CNC turning, MCT and 5-axis precision parts")}
           </p>
           <p className="mt-4 max-w-[560px] text-[16px] md:text-[18px]" style={{ color: "#d4d8de" }}>
             {x("반도체 장비, 의료기기, 2차전지 설비 부품 정밀가공. 시제품 1개부터 양산까지 가능합니다.", "Parts for semiconductor equipment, medical devices and battery lines. Single prototypes welcome.")}
@@ -692,14 +659,14 @@ function Home() {
               <span className="absolute inset-x-0 bottom-0 p-4 md:p-5" style={{ color: C.white, background: "linear-gradient(0deg, rgba(20,24,29,0.85), rgba(20,24,29,0))" }}>
                 <span className="block text-[13px]" style={{ color: "#d4d8de" }}>{x("사업분야", "Business")}</span>
                 <span className="block text-[20px] font-bold md:text-[23px]">{x("CNC 선반 가공", "CNC Turning")}</span>
-                <span className="block text-[14px]" style={{ color: "#d4d8de" }}>{x("최대 Ø300, 복합 선반 Y축 가공", "Up to Ø300, turn-mill with Y-axis")}</span>
+                <span className="block text-[14px]" style={{ color: "#d4d8de" }}>{x("최대 D300, 복합 선반 Y축 가공", "Up to D300, turn-mill with Y-axis")}</span>
               </span>
             </button>
             <button type="button" onClick={() => go("business", "fiveAx")} className="group relative block h-[150px] overflow-hidden rounded-[4px] text-left md:h-[190px]" style={{ background: C.steel }}>
               <Image src={`${IMG}/worker.jpg`} alt="" fill sizes="(min-width: 768px) 36vw, 100vw" className="object-cover object-[70%_50%] opacity-70 transition-opacity group-hover:opacity-55" />
               <span className="absolute inset-x-0 bottom-0 p-4 md:p-5" style={{ color: C.white, background: "linear-gradient(0deg, rgba(20,24,29,0.85), rgba(20,24,29,0))" }}>
                 <span className="block text-[13px]" style={{ color: "#d4d8de" }}>{x("사업분야", "Business")}</span>
-                <span className="block text-[20px] font-bold md:text-[23px]">{x("MCTㆍ5축 가공", "MCT and 5-Axis")}</span>
+                <span className="block text-[20px] font-bold md:text-[23px]">{x("MCT, 5축 가공", "MCT and 5-Axis")}</span>
                 <span className="block text-[14px]" style={{ color: "#d4d8de" }}>{x("X1,300 대형 가공, 동시 5축", "Large parts to X1,300, simultaneous 5-axis")}</span>
               </span>
             </button>
@@ -823,40 +790,26 @@ function Home() {
             <p className="mt-3 font-bold">{s(ADDRESS)}</p>
             <dl className="mt-2 grid gap-1 text-[15px]">
               <div className="grid grid-cols-[96px_1fr] gap-2">
-                <dt style={{ color: C.muted }}>{x("하역장", "Loading dock")}</dt>
-                <dd className="tabular-nums">{x("평일 08:30 ~ 17:00", "Weekdays 08:30 to 17:00")}</dd>
+                <dt style={{ color: C.muted }}>{x("내비게이션", "Navigation")}</dt>
+                <dd>{x("정밀가공 제조 ㅎㄷ공장", "Precision Machining HD Plant")}</dd>
               </div>
               <div className="grid grid-cols-[96px_1fr] gap-2">
-                <dt style={{ color: C.muted }}>{x("화물차", "Trucks")}</dt>
-                <dd>{x("2번 게이트, 5톤까지", "Gate 2, up to 5 tons")}</dd>
+                <dt style={{ color: C.muted }}>{x("주차", "Parking")}</dt>
+                <dd>{x("정문 오른쪽 방문 주차장", "Visitor lot right of the main gate")}</dd>
               </div>
             </dl>
-            <div className="mt-4 grid grid-cols-2 gap-2">
-              <LocationLink tab="car" label={x("승용차 방문", "By car")} />
-              <LocationLink tab="truck" label={x("화물 납품", "Deliveries")} primary />
-            </div>
+            <button
+              type="button"
+              onClick={() => go("about", "location")}
+              className="mt-4 inline-flex h-11 items-center justify-center rounded-[4px] border px-4 text-[15px] font-bold"
+              style={{ background: C.steel, color: C.white, borderColor: C.steel }}
+            >
+              {x("오시는 길 자세히 보기", "Directions")}
+            </button>
           </div>
         </div>
       </section>
     </>
-  );
-}
-
-/** 메인에서 오시는 길의 탭을 골라 들어간다. */
-function LocationLink({ tab, label, primary = false }: { tab: VisitTab; label: string; primary?: boolean }) {
-  const { go, setVisitTab } = useCo();
-  return (
-    <button
-      type="button"
-      onClick={() => {
-        setVisitTab(tab);
-        go("about", "location");
-      }}
-      className="inline-flex h-11 items-center justify-center rounded-[4px] border px-3 text-[15px] font-bold"
-      style={primary ? { background: C.steel, color: C.white, borderColor: C.steel } : { borderColor: C.line }}
-    >
-      {label}
-    </button>
   );
 }
 
@@ -981,8 +934,8 @@ function PageBody({ m, s: sub }: { m: MenuId; s: string }) {
       return <Machines />;
     case "equipment/measuring":
       return <Measuring />;
-    case "equipment/range":
-      return <Checker />;
+    case "equipment/spec":
+      return <MachiningSpec />;
     case "support/notice":
       return <Notice />;
     case "support/quote":
@@ -1041,7 +994,7 @@ function Greeting() {
         <Image src={`${IMG}/parts.jpg`} alt={x("가공을 마친 알루미늄과 스테인리스 정밀 부품", "Finished aluminum and stainless steel precision parts")} fill sizes="(min-width: 900px) 860px, 100vw" className="object-cover" />
       </div>
       <div className="mt-8 space-y-4">
-        <p className="text-[19px] font-bold leading-[1.6] md:text-[21px]">{x("곰파트너 홈페이지를 찾아 주셔서 감사합니다.", "Thank you for visiting Gompartner.")}</p>
+        <p className="text-[19px] font-bold leading-[1.6] md:text-[21px]">{x("정밀가공 제조 홈페이지를 찾아 주셔서 감사합니다.", "Thank you for visiting our website.")}</p>
         <p>
           {x(
             "2009년 머시닝센터 2대로 창업한 이래 반도체 장비, 의료기기, 2차전지 설비 부품을 가공하고 있습니다.",
@@ -1070,7 +1023,7 @@ function Overview() {
     [x("주요 사업", "Business"), x("CNC 선반, MCT, 5축 정밀부품 가공", "CNC turning, MCT and 5-axis precision machining")],
     [x("주요 고객 산업", "Industries"), x("반도체 장비, 의료기기, 2차전지 장비, 로봇, 자동화", "Semiconductor equipment, medical devices, battery equipment, robotics")],
     [x("보유 설비", "Equipment"), x(`가공 설비 ${MACHINE_TOTAL}대, 측정 설비 ${MEASURES.reduce((n, v) => n + v.count, 0)}대`, `${MACHINE_TOTAL} machines, ${MEASURES.reduce((n, v) => n + v.count, 0)} measuring instruments`)],
-    [x("사업장", "Plant"), x("대지 3,300㎡, 건물 2,150㎡ (항온 가공실, 3차원 측정실)", "Site 3,300 m², building 2,150 m² (temperature-controlled room, CMM room)")],
+    [x("사업장", "Plant"), x("대지 3,300m2, 건물 2,150m2 (항온 가공실, 3차원 측정실)", "Site 3,300 m2, building 2,150 m2 (temperature-controlled room, CMM room)")],
     [x("인증", "Certifications"), "ISO 9001, ISO 14001, ISO 13485"],
     [x("주소", "Address"), s(ADDRESS)],
   ];
@@ -1121,27 +1074,7 @@ function Certs() {
 }
 
 function Location() {
-  const { x, s, visitTab: tab, setVisitTab: setTab } = useCo();
-  const refs = useRef<Record<VisitTab, HTMLButtonElement | null>>({ car: null, truck: null });
-
-  const tabs = [
-    { id: "car" as const, label: x("승용차 방문", "By car") },
-    { id: "truck" as const, label: x("화물 납품", "Truck deliveries") },
-  ];
-
-  const onKey = (e: ReactKeyboardEvent<HTMLButtonElement>) => {
-    if (e.key !== "ArrowRight" && e.key !== "ArrowLeft") return;
-    e.preventDefault();
-    const next = tab === "car" ? "truck" : "car";
-    setTab(next);
-    refs.current[next]?.focus();
-  };
-
-  const dock: [string, string, string][] = [
-    [x("평일", "Weekdays"), "08:30 ~ 17:00", x("점심 12:00 ~ 13:00 하역 쉼", "No unloading 12:00 to 13:00")],
-    [x("토요일", "Saturday"), "09:00 ~ 12:00", x("전날까지 예약한 차량만", "Booked by the day before only")],
-    [x("일요일, 공휴일", "Sun, holidays"), x("하역 없음", "Closed"), ""],
-  ];
+  const { x, s } = useCo();
 
   return (
     <div>
@@ -1149,7 +1082,7 @@ function Location() {
         {(
           [
             [x("주소", "Address"), s(ADDRESS)],
-            [x("내비게이션", "Navigation"), x("곰파트너 ㅎㄷ공장", "Gompartner HD Plant")],
+            [x("내비게이션", "Navigation"), x("정밀가공 제조 ㅎㄷ공장", "Precision Machining HD Plant")],
             [x("전화", "Tel"), TEL],
             [x("팩스", "Fax"), FAX],
             [x("업무시간", "Office hours"), s(HOURS)],
@@ -1164,51 +1097,10 @@ function Location() {
         ))}
       </dl>
 
-      <div role="tablist" aria-label={x("방문 방법", "How to visit")} className="mt-10 grid grid-cols-2 border-b md:inline-grid md:min-w-[400px]" style={{ borderColor: C.steel }}>
-        {tabs.map((t) => {
-          const on = tab === t.id;
-          return (
-            <button
-              key={t.id}
-              ref={(el) => {
-                refs.current[t.id] = el;
-              }}
-              type="button"
-              role="tab"
-              id={`co-visit-tab-${t.id}`}
-              aria-selected={on}
-              aria-controls="co-visit-panel"
-              tabIndex={on ? 0 : -1}
-              onClick={() => setTab(t.id)}
-              onKeyDown={onKey}
-              className="h-12 border border-b-0 px-5 text-[16px] font-bold"
-              style={on ? { background: C.steel, color: C.white, borderColor: C.steel } : { background: C.white, color: C.muted, borderColor: C.line }}
-            >
-              {t.label}
-            </button>
-          );
-        })}
-      </div>
-      <div key={tab} id="co-visit-panel" role="tabpanel" aria-labelledby={`co-visit-tab-${tab}`} className="soft-in pt-6">
-        {tab === "car" ? (
-          <div className="max-w-[760px] space-y-2">
-            <p>{x("정문으로 들어와 오른쪽 방문 주차장에 주차해 주십시오. 경비실에서 방문증을 받으시면 됩니다.", "Come in through the main gate and use the visitor lot on the right. Pick up a visitor pass at the guard house.")}</p>
-            <p style={{ color: C.muted }}>{x("방문 상담은 하루 전까지 전화로 예약해 주시기 바랍니다.", "Please book visits by phone at least one day ahead.")}</p>
-          </div>
-        ) : (
-          <div>
-            <p className="max-w-[760px]">
-              {x(
-                "산단로 쪽 2번 게이트로 진입해 공장 뒤 하역장을 이용해 주십시오. 5톤 화물차까지 지게차 하역이 가능합니다.",
-                "Enter through gate 2 on Sandan-ro and park at the loading dock behind the plant. We unload trucks up to 5 tons by forklift.",
-              )}
-            </p>
-            <h3 className="mt-6 text-[18px] font-bold">{x("하역장 운영 시간", "Loading dock hours")}</h3>
-            <div className="mt-3 max-w-[760px]">
-              <DataTable caption={x("하역장 운영 시간", "Loading dock hours")} head={[x("요일", "Day"), x("시간", "Hours"), x("참고", "Note")]} rows={dock} min={420} />
-            </div>
-          </div>
-        )}
+      <h3 className="mt-10 text-[18px] font-bold">{x("방문 안내", "Visiting")}</h3>
+      <div className="mt-3 max-w-[760px] space-y-2">
+        <p>{x("정문으로 들어와 오른쪽 방문 주차장에 주차해 주십시오. 경비실에서 방문증을 받으시면 됩니다.", "Come in through the main gate and use the visitor lot on the right. Pick up a visitor pass at the guard house.")}</p>
+        <p style={{ color: C.muted }}>{x("방문 상담은 하루 전까지 전화로 예약해 주시기 바랍니다.", "Please book visits by phone at least one day ahead.")}</p>
       </div>
     </div>
   );
@@ -1282,7 +1174,7 @@ function Business({ id }: { id: string }) {
 /* ---------- 설비현황 ---------- */
 
 function Machines() {
-  const { x, s, go, setPrMachine } = useCo();
+  const { x, s } = useCo();
   const [type, setType] = useState<EqType | "all">("all");
   const list = MACHINES.filter((m) => type === "all" || m.type === type);
   const sum = list.reduce((n, m) => n + m.count, 0);
@@ -1292,11 +1184,6 @@ function Machines() {
     ["fiveAx", x("5축 가공기", "5-axis")],
     ["lathe", x("CNC 선반", "CNC lathes")],
   ];
-
-  const showParts = (mk: MachineKey) => {
-    go("products", "all");
-    setPrMachine(mk);
-  };
 
   return (
     <div>
@@ -1322,12 +1209,10 @@ function Machines() {
       <div key={type} className="soft-in mt-4">
         <DataTable
           caption={x("기계설비 현황", "Machining equipment")}
-          head={[x("설비명", "Machine"), x("제조사", "Maker"), x("규격", "Spec"), x("대수", "Units"), x("도입", "Since"), x("가공품", "Parts")]}
-          min={820}
+          head={[x("설비명", "Machine"), x("제조사", "Maker"), x("규격", "Spec"), x("대수", "Units"), x("도입", "Since")]}
+          min={720}
           numCols={[3, 4]}
-          rows={list.map((m) => {
-            const n = PRODUCTS.filter((p) => p.mk === m.mk).length;
-            return [
+          rows={list.map((m) => [
               <span key="n" className="block">
                 {s(MACHINE_NAME[m.mk])}
                 <span className="block text-[14px] font-normal tabular-nums" style={{ color: C.muted }}>
@@ -1345,25 +1230,7 @@ function Machines() {
               </span>,
               m.count,
               m.year,
-              n > 0 ? (
-                <button
-                  key="p"
-                  type="button"
-                  onClick={() => showParts(m.mk)}
-                  aria-label={x(`${s(MACHINE_NAME[m.mk])} ${m.name} 가공품 ${n}건 보기`, `View ${n} parts made on ${m.name}`)}
-                  className="inline-flex h-9 items-center gap-0.5 whitespace-nowrap rounded-[4px] border px-2.5 text-[14px] font-bold"
-                  style={{ borderColor: C.line }}
-                >
-                  {x(`${n}건`, `${n}`)}
-                  <ChevronRight size={15} aria-hidden />
-                </button>
-              ) : (
-                <span key="p" style={{ color: C.muted }}>
-                  -
-                </span>
-              ),
-            ];
-          })}
+            ])}
         />
       </div>
     </div>
@@ -1393,422 +1260,61 @@ function Measuring() {
   );
 }
 
-/* ---------- 가공 가능 범위 ---------- */
+/* ---------- 가공 사양 ---------- */
 
-/** 각형은 X, Y, Z 이송 범위, 원통형은 지름과 길이 */
-const ENV: Record<MachineKey, number[]> = {
-  vmc: [850, 500, 500],
-  large: [1300, 650, 600],
-  fiveAx: [600, 500, 400],
-  lathe: [300, 500],
-  turnMill: [200, 400],
-};
+const SPEC_ROWS: [L, L, string, L][] = [
+  [l("CNC 선반", "CNC turning"), l("최대 D300, 길이 500 mm", "Max. D300, L500 mm"), "+-0.01", l("축, 플랜지, 부싱", "Shafts, flanges, bushings")],
+  [l("복합 선반", "Turn-mill"), l("최대 D200, 길이 400 mm", "Max. D200, L400 mm"), "+-0.01", l("측면 구멍, 키홈이 있는 원통 부품", "Round parts with cross holes and keyways")],
+  [l("머시닝센터", "Machining center"), l("850 x 500 x 500 mm", "850 x 500 x 500 mm"), "+-0.02", l("블록, 브래킷, 하우징", "Blocks, brackets, housings")],
+  [l("대형 머시닝센터", "Large machining center"), l("1,300 x 650 x 600 mm", "1,300 x 650 x 600 mm"), "+-0.05", l("베이스 플레이트, 프레임", "Base plates, frames")],
+  [l("5축 가공", "5-axis"), l("600 x 500 x 400 mm", "600 x 500 x 400 mm"), "+-0.01", l("다면 가공, 곡면 부품", "Multi-face and curved parts")],
+];
 
-const BASE_DAYS: Record<MachineKey, number> = { vmc: 5, large: 7, fiveAx: 7, lathe: 4, turnMill: 5 };
-const MAT_DAYS: Record<Material, number> = { al: 0, sus: 2, steel: 1, plastic: 0 };
-const TOL_DAYS: Record<Tol, number> = { "0.1": 0, "0.05": 1, "0.01": 3 };
+const MATERIAL_ROWS: [L, L][] = [
+  [l("알루미늄", "Aluminum"), l("A6061, A7075, A5052", "A6061, A7075, A5052")],
+  [l("스테인리스", "Stainless steel"), l("SUS303, SUS304, SUS316L", "SUS303, SUS304, SUS316L")],
+  [l("탄소강, 공구강", "Carbon and tool steel"), l("S45C, SCM440, SKD11", "S45C, SCM440, SKD11")],
+  [l("엔지니어링 플라스틱", "Engineering plastics"), l("PEEK, POM, MC나일론", "PEEK, POM, MC nylon")],
+];
 
-const envText = (k: MachineKey) => (ENV[k].length === 3 ? `${ENV[k].map(fmt).join(" × ")} mm` : `Ø${fmt(ENV[k][0])} × ${fmt(ENV[k][1])} mm`);
-
-type Shape = "block" | "round";
-
-interface CheckInput {
-  shape: Shape;
-  material: Material;
-  x: number;
-  y: number;
-  z: number;
-  tol: Tol;
-  qty: number;
-}
-
-interface Verdict {
-  ok: boolean;
-  machine: MachineKey | null;
-  /** 그림에 쓸 설비 범위 */
-  env: MachineKey;
-  /** 그림에 쓸 부품 치수. 각형은 긴 쪽부터 놓는다. */
-  part: number[];
-  fits: boolean;
-  reasons: L[];
-  days: [number, number] | null;
-}
-
-const R = {
-  tol5ax: l("±0.01 공차는 항온 가공실의 5축 가공기에서 가공하고 3차원 측정기로 전수 검사합니다.", "±0.01 parts are machined on the 5-axis machine in the temperature-controlled room and 100% inspected on the CMM."),
-  tolBig: l("±0.01 공차는 600×500×400mm 이내 부품까지 맞출 수 있습니다. 크기나 공차를 함께 검토해야 합니다.", "±0.01 tolerance is available for parts up to 600×500×400 mm. Size or tolerance needs to be reviewed."),
-  tooBig: l("보유 설비의 최대 가공 범위(1,300×650×600mm)를 넘습니다. 분할 가공 후 조립 방식으로 검토합니다.", "Exceeds our largest envelope (1,300×650×600 mm). Machining in sections and assembling may be an option."),
-  latheBig: l("선반 최대 가공 범위(Ø300 × 길이 500mm)를 넘습니다.", "Exceeds our lathe capacity (Ø300 × L500 mm)."),
-  round01: l("지름 200mm가 넘는 원통 부품의 ±0.01 공차는 연삭 공정을 따로 검토해야 합니다.", "±0.01 on cylindrical parts over Ø200 needs a separate grinding review."),
-  plastic: l("엔지니어링 플라스틱은 온도에 따른 치수 변화로 ±0.01 공차 유지가 어렵습니다.", "Engineering plastics change size with temperature, so holding ±0.01 is difficult."),
-  sus: l("스테인리스는 공구 마모가 커서 납기가 2일 추가됩니다.", "Stainless steel wears tools faster, so two extra days are added."),
-  thin: l("최소 두께가 3mm 미만이라 가공 중 변형 여부를 먼저 검토해야 합니다.", "The thinnest side is under 3 mm, so distortion during machining must be checked first."),
-  qty: l("500개가 넘는 수량은 양산 일정과 단가를 따로 협의합니다.", "Quantities over 500 need a separate schedule and price agreement."),
-};
-
-const fitReason = (k: MachineKey): L => l(`${MACHINE_NAME[k].ko} 가공 범위(${envText(k)}) 안에 들어갑니다.`, `Fits within the ${MACHINE_NAME[k].en} envelope (${envText(k)}).`);
-
-function judge(i: CheckInput): Verdict | null {
-  const dims = i.shape === "block" ? [i.x, i.y, i.z] : [i.x, i.z];
-  if (dims.some((n) => !(n > 0)) || !(i.qty >= 1) || !Number.isInteger(i.qty)) return null;
-
-  const reasons: L[] = [];
-  let consult = false;
-  let machine: MachineKey | null = null;
-  let env: MachineKey;
-  let part: number[];
-  let fits: boolean;
-
-  if (i.shape === "block") {
-    part = [...dims].sort((p, q) => q - p);
-    const [a, b, c] = part;
-    const inside = (k: MachineKey) => a <= ENV[k][0] && b <= ENV[k][1] && c <= ENV[k][2];
-    if (i.tol === "0.01") {
-      if (inside("fiveAx")) {
-        machine = "fiveAx";
-        reasons.push(fitReason("fiveAx"), R.tol5ax);
-      } else if (inside("large")) {
-        consult = true;
-        machine = inside("vmc") ? "vmc" : "large";
-        reasons.push(R.tolBig);
-      } else {
-        consult = true;
-        reasons.push(R.tooBig);
-      }
-    } else {
-      machine = inside("vmc") ? "vmc" : inside("large") ? "large" : null;
-      if (machine) reasons.push(fitReason(machine));
-      else {
-        consult = true;
-        reasons.push(R.tooBig);
-      }
-    }
-    env = machine ?? "large";
-    fits = inside(env);
-    if (c < 3) {
-      consult = true;
-      reasons.push(R.thin);
-    }
-  } else {
-    part = dims;
-    const [d, len] = dims;
-    machine = d <= 200 && len <= 400 ? "turnMill" : d <= 300 && len <= 500 ? "lathe" : null;
-    if (machine) reasons.push(fitReason(machine));
-    else {
-      consult = true;
-      reasons.push(R.latheBig);
-    }
-    if (i.tol === "0.01" && machine === "lathe") {
-      consult = true;
-      reasons.push(R.round01);
-    }
-    env = machine ?? "lathe";
-    fits = d <= ENV[env][0] && len <= ENV[env][1];
-    if (d < 3) {
-      consult = true;
-      reasons.push(R.thin);
-    }
-  }
-
-  if (i.material === "plastic" && i.tol === "0.01") {
-    consult = true;
-    reasons.push(R.plastic);
-  }
-  if (i.material === "sus") reasons.push(R.sus);
-  if (i.qty > 500) {
-    consult = true;
-    reasons.push(R.qty);
-  }
-
-  let days: [number, number] | null = null;
-  if (machine && !consult) {
-    const d = BASE_DAYS[machine] + MAT_DAYS[i.material] + TOL_DAYS[i.tol] + Math.ceil(i.qty / 100) - 1;
-    days = [d, d + 3];
-  }
-
-  return { ok: !consult, machine, env, part, fits, reasons, days };
-}
-
-const COS30 = 0.866;
-const SIN30 = 0.5;
-
-/** 설비 가공 범위와 부품을 같은 축척으로 그린다. 각형은 등각 투상, 원통형은 옆에서 본 모습. */
-function EnvelopeView({ v, label }: { v: Verdict; label: string }) {
-  const VW = 420;
-  const VH = 300;
-  const P = 30;
-  const e = ENV[v.env];
-  const partFill = v.fits ? { top: "#f8a26b", right: C.orange, left: "#cf5610", stroke: "#8f3a08" } : { top: "#c8ccd2", right: "#a3a9b1", left: "#868d96", stroke: C.error };
-
-  if (e.length === 3) {
-    const [W, D, H] = [Math.max(e[0], v.part[0]), Math.max(e[1], v.part[1]), Math.max(e[2], v.part[2])];
-    const sc = Math.min((VW - 2 * P) / ((W + D) * COS30), (VH - 2 * P) / ((W + D) * SIN30 + H));
-    const ox = P + (VW - 2 * P - (W + D) * COS30 * sc) / 2 + D * COS30 * sc;
-    const oy = P + (VH - 2 * P - ((W + D) * SIN30 + H) * sc) / 2 + H * sc;
-    const pt = (x: number, y: number, z: number) => `${r2(ox + (x - y) * COS30 * sc)},${r2(oy + (x + y) * SIN30 * sc - z * sc)}`;
-    const box = (w: number, d: number, h: number) => ({
-      top: [pt(0, 0, h), pt(w, 0, h), pt(w, d, h), pt(0, d, h)].join(" "),
-      right: [pt(w, 0, 0), pt(w, d, 0), pt(w, d, h), pt(w, 0, h)].join(" "),
-      left: [pt(0, d, 0), pt(w, d, 0), pt(w, d, h), pt(0, d, h)].join(" "),
-    });
-    const [ex, ey, ez] = e;
-    const visible = [
-      [pt(ex, 0, 0), pt(ex, ey, 0)],
-      [pt(0, ey, 0), pt(ex, ey, 0)],
-      [pt(ex, ey, 0), pt(ex, ey, ez)],
-      [pt(ex, 0, 0), pt(ex, 0, ez)],
-      [pt(0, ey, 0), pt(0, ey, ez)],
-      [pt(0, 0, ez), pt(ex, 0, ez)],
-      [pt(ex, 0, ez), pt(ex, ey, ez)],
-      [pt(ex, ey, ez), pt(0, ey, ez)],
-      [pt(0, ey, ez), pt(0, 0, ez)],
-    ];
-    const hidden = [
-      [pt(0, 0, 0), pt(ex, 0, 0)],
-      [pt(0, 0, 0), pt(0, ey, 0)],
-      [pt(0, 0, 0), pt(0, 0, ez)],
-    ];
-    const p = box(v.part[0], v.part[1], v.part[2]);
-    const floor = [pt(0, 0, 0), pt(ex, 0, 0), pt(ex, ey, 0), pt(0, ey, 0)].join(" ");
-    return (
-      <svg viewBox={`0 0 ${VW} ${VH}`} className="h-auto w-full" role="img" aria-label={label}>
-        <polygon points={floor} fill="#e9ebee" />
-        {hidden.map(([a, b]) => (
-          <path key={a + b} d={`M${a} L${b}`} stroke="#b9bec5" strokeWidth="1" strokeDasharray="3 4" />
-        ))}
-        <polygon points={p.left} fill={partFill.left} stroke={partFill.stroke} strokeWidth="1" />
-        <polygon points={p.right} fill={partFill.right} stroke={partFill.stroke} strokeWidth="1" />
-        <polygon points={p.top} fill={partFill.top} stroke={partFill.stroke} strokeWidth="1" />
-        {visible.map(([a, b]) => (
-          <path key={a + b} d={`M${a} L${b}`} stroke={C.steel} strokeWidth="1.2" strokeDasharray="6 4" fill="none" />
-        ))}
-      </svg>
-    );
-  }
-
-  // 원통형: 척에 물린 부품을 옆에서 본 모습
-  const [ed, el] = e;
-  const [pd, pl] = v.part;
-  const Dm = Math.max(ed, pd);
-  const Lm = Math.max(el, pl);
-  const chuck = 34;
-  const sc = Math.min((VW - 2 * P - chuck) / Lm, (VH - 2 * P) / Dm);
-  const x0 = r2(P + chuck);
-  const cy = VH / 2;
+function MachiningSpec() {
+  const { x, s, go } = useCo();
   return (
-    <svg viewBox={`0 0 ${VW} ${VH}`} className="h-auto w-full" role="img" aria-label={label}>
-      <rect x={x0} y={r2(cy - (ed * sc) / 2)} width={r2(el * sc)} height={r2(ed * sc)} fill="#e9ebee" stroke={C.steel} strokeWidth="1.2" strokeDasharray="6 4" />
-      <rect x={x0} y={r2(cy - (pd * sc) / 2)} width={r2(pl * sc)} height={r2(pd * sc)} fill={partFill.right} stroke={partFill.stroke} strokeWidth="1" />
-      <rect x={x0} y={r2(cy - (pd * sc) / 2)} width={r2(pl * sc)} height={r2(Math.max(1, (pd * sc) / 5))} fill={partFill.top} />
-      <rect x={P} y={r2(cy - Math.min(VH / 2 - P, (pd * sc) / 2 + 22))} width={chuck - 4} height={r2(Math.min(VH - 2 * P, pd * sc + 44))} rx="2" fill={C.steel} />
-      <path d={`M${P - 10} ${cy} H${VW - P + 10}`} stroke={C.muted} strokeWidth="1" strokeDasharray="14 4 3 4" />
-    </svg>
-  );
-}
-
-const TOLS: Tol[] = ["0.1", "0.05", "0.01"];
-const MATERIALS: Material[] = ["al", "sus", "steel", "plastic"];
-const MATERIAL_NAME: Record<Material, L> = {
-  al: l("알루미늄", "Aluminum"),
-  sus: l("스테인리스", "Stainless steel"),
-  steel: l("탄소강", "Carbon steel"),
-  plastic: l("엔지니어링 플라스틱", "Engineering plastic"),
-};
-
-function Checker() {
-  const { x, s, lang, go, setMemo } = useCo();
-  const reduce = useReducedMotionSafe();
-  const [shape, setShape] = useState<Shape>("block");
-  const [material, setMaterial] = useState<Material>("al");
-  const [sx, setSx] = useState("180");
-  const [sy, setSy] = useState("120");
-  const [sz, setSz] = useState("45");
-  const [tol, setTol] = useState<Tol>("0.05");
-  const [qty, setQty] = useState("30");
-
-  const v = judge({ shape, material, x: Number(sx), y: Number(sy), z: Number(sz), tol, qty: Number(qty) });
-
-  const unit = x("개", "pcs");
-  const qtyText = `${qty}${lang === "ko" ? unit : ` ${unit}`}`;
-  const sizeText = shape === "block" ? `${sx} × ${sy} × ${sz} mm` : `Ø${sx} × ${sz} mm`;
-  const summary = [
-    `${x("형태", "Shape")}: ${shape === "block" ? x("각형 부품", "Prismatic") : x("원통형 부품", "Cylindrical")}`,
-    `${x("소재", "Material")}: ${s(MATERIAL_NAME[material])}`,
-    `${x("크기", "Size")}: ${sizeText}`,
-    `${x("공차", "Tolerance")}: ±${tol} mm`,
-    `${x("수량", "Quantity")}: ${qtyText}`,
-  ].join("\n");
-
-  const toQuote = () => {
-    setMemo(x(`가공 가능 범위에서 넣은 조건입니다.\n${summary}\n`, `Conditions from the machinable range check:\n${summary}\n`));
-    go("support", "quote");
-  };
-
-  const seg = (on: boolean) => (on ? { background: C.steel, color: C.white, borderColor: C.steel } : { background: C.white, color: C.ink, borderColor: C.line });
-
-  const numField = (id: string, label: string, value: string, set: (v: string) => void) => (
-    <label className="block min-w-0" htmlFor={id}>
-      <span className="text-[14px]" style={{ color: C.muted }}>
-        {label}
-      </span>
-      <input
-        id={id}
-        type="number"
-        inputMode="decimal"
-        min={0}
-        step="any"
-        value={value}
-        onChange={(e) => set(e.target.value)}
-        className="mt-1 h-12 w-full rounded-[4px] border bg-white px-3 tabular-nums outline-none focus:border-[#1e2329]"
-        style={{ borderColor: C.line }}
-      />
-    </label>
-  );
-
-  return (
-    <div className="grid items-start gap-6 lg:grid-cols-[1fr_1.1fr]">
-      <div className="space-y-6 rounded-[6px] border p-5 md:p-7" style={{ borderColor: C.line, background: C.gray }}>
-        <fieldset>
-          <legend className="text-[15px] font-bold">{x("형태", "Shape")}</legend>
-          <div className="mt-2 grid grid-cols-2 gap-2">
-            {(["block", "round"] as const).map((k) => (
-              <button key={k} type="button" aria-pressed={shape === k} onClick={() => setShape(k)} className="h-11 rounded-[4px] border text-[15px] font-bold" style={seg(shape === k)}>
-                {k === "block" ? x("각형 부품", "Prismatic") : x("원통형 부품", "Cylindrical")}
-              </button>
-            ))}
-          </div>
-        </fieldset>
-
-        <fieldset>
-          <legend className="text-[15px] font-bold">{x("소재", "Material")}</legend>
-          <div className="mt-2 grid grid-cols-2 gap-2">
-            {MATERIALS.map((m) => (
-              <button key={m} type="button" aria-pressed={material === m} onClick={() => setMaterial(m)} className="min-h-11 rounded-[4px] border px-2 py-2 text-[15px] font-bold leading-[1.3]" style={seg(material === m)}>
-                {s(MATERIAL_NAME[m])}
-              </button>
-            ))}
-          </div>
-        </fieldset>
-
-        <fieldset>
-          <legend className="text-[15px] font-bold">{x("크기 (mm)", "Size (mm)")}</legend>
-          <div className={`mt-2 grid gap-2 ${shape === "block" ? "grid-cols-3" : "grid-cols-2"}`}>
-            {numField("chk-x", shape === "block" ? x("가로 X", "Width X") : x("지름 Ø", "Dia. Ø"), sx, setSx)}
-            {shape === "block" && numField("chk-y", x("세로 Y", "Depth Y"), sy, setSy)}
-            {numField("chk-z", shape === "block" ? x("높이 Z", "Height Z") : x("길이", "Length"), sz, setSz)}
-          </div>
-        </fieldset>
-
-        <div className="grid gap-6 sm:grid-cols-[1.4fr_1fr]">
-          <fieldset>
-            <legend className="text-[15px] font-bold">{x("공차", "Tolerance")}</legend>
-            <div className="mt-2 grid grid-cols-3 gap-2">
-              {TOLS.map((o) => (
-                <button key={o} type="button" aria-pressed={tol === o} onClick={() => setTol(o)} className="h-12 rounded-[4px] border text-[15px] font-bold tabular-nums" style={seg(tol === o)}>
-                  ±{o}
-                </button>
-              ))}
-            </div>
-          </fieldset>
-          <div>
-            <label htmlFor="chk-qty" className="text-[15px] font-bold">
-              {x("수량", "Quantity")}
-            </label>
-            <span className="relative mt-2 block">
-              <input
-                id="chk-qty"
-                type="number"
-                inputMode="numeric"
-                min={1}
-                step={1}
-                value={qty}
-                onChange={(e) => setQty(e.target.value)}
-                className="h-12 w-full rounded-[4px] border bg-white pl-3 pr-12 tabular-nums outline-none focus:border-[#1e2329]"
-                style={{ borderColor: C.line }}
-              />
-              <span className="pointer-events-none absolute right-3 top-1/2 -translate-y-1/2 text-[14px]" style={{ color: C.muted }} aria-hidden>
-                {unit}
-              </span>
-            </span>
-          </div>
+    <div className="space-y-10">
+      <section aria-labelledby="co-spec-size">
+        <h3 id="co-spec-size" className="text-[19px] font-bold">
+          {x("가공 방식별 사양", "Specifications by process")}
+        </h3>
+        <div className="mt-3">
+          <DataTable
+            caption={x("가공 방식별 최대 크기와 공차", "Maximum size and tolerance by process")}
+            head={[x("가공 방식", "Process"), x("최대 가공 크기", "Max. size"), x("공차(mm)", "Tolerance (mm)"), x("주요 가공품", "Typical parts")]}
+            min={720}
+            rows={SPEC_ROWS.map(([a, b, c, d]) => [s(a), <span key="b" className="tabular-nums">{s(b)}</span>, <span key="c" className="tabular-nums">{c}</span>, s(d)])}
+          />
         </div>
-      </div>
-
-      <div className="min-w-0 rounded-[6px] border bg-white" style={{ borderColor: C.line }} aria-live="polite">
-        {v ? (
-          <>
-            <div className="flex flex-wrap items-center justify-between gap-3 border-b px-5 py-4 md:px-7" style={{ borderColor: C.line }}>
-              <AnimatePresence mode="wait" initial={false}>
-                <motion.p
-                  key={v.ok ? "ok" : "consult"}
-                  className="inline-flex items-center gap-2 text-[22px] font-bold tracking-[-0.02em] md:text-[26px]"
-                  style={{ color: v.ok ? C.ok : C.orangeText }}
-                  initial={reduce ? false : { opacity: 0, y: 6 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  exit={reduce ? { opacity: 0, transition: { duration: 0 } } : { opacity: 0, y: -6 }}
-                  transition={{ duration: 0.2, ease: EASE }}
-                >
-                  {v.ok ? <Check size={24} aria-hidden /> : <CircleAlert size={24} aria-hidden />}
-                  {v.ok ? x("가공 가능", "Machinable") : x("상담 필요", "Consultation needed")}
-                </motion.p>
-              </AnimatePresence>
-              <span className="text-[14px] tabular-nums" style={{ color: C.muted }}>
-                {s(MATERIAL_NAME[material])}, ±{tol} mm, {qtyText}
-              </span>
-            </div>
-            <div className="px-3 pt-3 md:px-5">
-              <EnvelopeView
-                v={v}
-                label={x(`설비 가공 범위 ${envText(v.env)} 안에 부품 ${sizeText}을 같은 비율로 그린 그림`, `Part ${sizeText} drawn to scale inside the machine envelope ${envText(v.env)}`)}
-              />
-              <ul className="flex flex-wrap gap-x-5 gap-y-1 px-2 text-[13px] tabular-nums" style={{ color: C.muted }}>
-                <li className="inline-flex items-center gap-1.5">
-                  <span className="h-0 w-5 border-t-2 border-dashed" style={{ borderColor: C.steel }} aria-hidden />
-                  {x("설비 가공 범위", "Machine envelope")} {envText(v.env)}
-                </li>
-                <li className="inline-flex items-center gap-1.5">
-                  <span className="h-2.5 w-2.5" style={{ background: v.fits ? C.orange : "#a3a9b1" }} aria-hidden />
-                  {x("입력한 부품", "Your part")} {sizeText}
-                </li>
-              </ul>
-            </div>
-            <dl className="mx-5 mt-4 grid grid-cols-2 border-l border-t md:mx-7" style={{ borderColor: C.line }}>
-              <div className="border-b border-r px-3 py-2.5" style={{ borderColor: C.line }}>
-                <dt className="text-[13px]" style={{ color: C.muted }}>
-                  {x("가공 설비", "Machine")}
-                </dt>
-                <dd className="font-bold leading-[1.4] first-letter:uppercase">{v.machine ? s(MACHINE_NAME[v.machine]) : x("보유 설비 밖", "Beyond our machines")}</dd>
-              </div>
-              <div className="border-b border-r px-3 py-2.5" style={{ borderColor: C.line }}>
-                <dt className="text-[13px]" style={{ color: C.muted }}>
-                  {x("예상 납기", "Est. lead time")}
-                </dt>
-                <dd className="font-bold tabular-nums leading-[1.4]">{v.days ? x(`${v.days[0]}~${v.days[1]}영업일`, `${v.days[0]} to ${v.days[1]} business days`) : x("도면 검토 후 안내", "After drawing review")}</dd>
-              </div>
-            </dl>
-            <ul className="space-y-1.5 px-5 pt-4 text-[15px] md:px-7">
-              {v.reasons.map((r) => (
-                <li key={r.ko} className="flex gap-2">
-                  <span className="mt-[9px] h-1.5 w-1.5 shrink-0" style={{ background: C.steel }} aria-hidden />
-                  {s(r)}
-                </li>
-              ))}
-            </ul>
-            <div className="flex flex-wrap items-center gap-x-4 gap-y-2 px-5 pb-6 pt-5 md:px-7">
-              <button type="button" onClick={toQuote} className="inline-flex h-12 items-center rounded-[4px] px-5 font-bold" style={{ background: C.orange, color: C.steel }}>
-                {x("이 조건으로 견적문의", "Request a quote with these conditions")}
-              </button>
-              <p className="text-[14px]" style={{ color: C.muted }}>
-                {x("최종 가공 여부는 도면 검토 후 안내합니다.", "Final feasibility is confirmed after drawing review.")}
-              </p>
-            </div>
-          </>
-        ) : (
-          <p className="px-5 py-16 text-center md:px-7" style={{ color: C.muted }}>
-            {x("크기와 수량을 입력해 주십시오.", "Enter size and quantity as numbers of 1 or more.")}
-          </p>
-        )}
-      </div>
+      </section>
+      <section aria-labelledby="co-spec-mat">
+        <h3 id="co-spec-mat" className="text-[19px] font-bold">
+          {x("가공 소재", "Materials")}
+        </h3>
+        <div className="mt-3 max-w-[760px]">
+          <DataTable caption={x("가공 소재", "Materials")} head={[x("구분", "Group"), x("주요 재질", "Grades")]} min={420} rows={MATERIAL_ROWS.map(([a, b]) => [s(a), s(b)])} />
+        </div>
+      </section>
+      <section aria-labelledby="co-spec-qty" className="max-w-[760px]">
+        <h3 id="co-spec-qty" className="text-[19px] font-bold">
+          {x("수량과 검사", "Quantity and inspection")}
+        </h3>
+        <ul className="mt-3 list-disc space-y-1.5 pl-5">
+          <li>{x("시제품 1개부터 월 수천 개 양산까지 대응합니다.", "From a single prototype to several thousand parts a month.")}</li>
+          <li>{x("+-0.01 mm 부품은 항온 가공실에서 가공하고 3차원 측정기로 전수 검사합니다.", "+-0.01 mm parts are machined in the temperature-controlled room and fully inspected on the CMM.")}</li>
+          <li>{x("요청 시 성적서(치수 측정 결과)를 함께 납품합니다.", "Inspection reports are supplied on request.")}</li>
+        </ul>
+        <button type="button" onClick={() => go("support", "quote")} className="mt-6 inline-flex h-12 items-center rounded-[4px] px-6 font-bold" style={{ background: C.orange, color: C.steel }}>
+          {x("도면 첨부 견적문의", "Request a quote with drawings")}
+        </button>
+      </section>
     </div>
   );
 }
@@ -1816,29 +1322,21 @@ function Checker() {
 /* ---------- 생산제품 ---------- */
 
 function Products({ cat }: { cat: PrCat | "all" }) {
-  const { x, s, prMachine, setPrMachine } = useCo();
-  const list = PRODUCTS.filter((p) => (cat === "all" || p.cat === cat) && (!prMachine || p.mk === prMachine));
+  const { x } = useCo();
+  const list = PRODUCTS.filter((p) => cat === "all" || p.cat === cat);
   return (
     <div>
       <div className="flex flex-wrap items-center justify-between gap-3">
         <p className="text-[15px]" style={{ color: C.muted }}>
           {x("고객사 보안을 위해 형상은 공개하지 않습니다.", "Part shapes are not shown to protect customer confidentiality.")}
         </p>
-        {prMachine && (
-          <p className="inline-flex items-center gap-1 rounded-[4px] border py-1 pl-3 pr-1 text-[14px] font-bold" style={{ borderColor: C.steel }}>
-            {x("설비", "Machine")}: <span className="first-letter:uppercase">{s(MACHINE_NAME[prMachine])}</span>
-            <button type="button" onClick={() => setPrMachine(null)} aria-label={x("설비 조건 지우기", "Clear machine filter")} className="inline-flex h-8 w-8 items-center justify-center rounded-[4px] hover:bg-[#f2f3f5]">
-              <X size={16} aria-hidden />
-            </button>
-          </p>
-        )}
       </div>
       <p className="mt-4 border-b-2 pb-2 text-[15px] tabular-nums" style={{ borderColor: C.steel }} aria-live="polite">
         {x("총", "Total")} <strong>{list.length}</strong>
         {x("건", "")}
       </p>
       {list.length > 0 ? (
-        <ul key={prMachine ?? "all"} className="soft-in mt-5 grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
+        <ul className="mt-5 grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
           {list.map((p) => (
             <li key={p.name.ko}>
               <ProductCard p={p} />
@@ -1928,14 +1426,15 @@ interface Receipt {
 }
 
 function Quote() {
-  const { x, s, memo, setMemo } = useCo();
+  const { x, s } = useCo();
   const reduce = useReducedMotionSafe();
+  const [memo, setMemo] = useState("");
   const [company, setCompany] = useState("");
   const [person, setPerson] = useState("");
   const [phone, setPhone] = useState("");
   const [email, setEmail] = useState("");
   const [qType, setQType] = useState(0);
-  const [subject, setSubject] = useState(() => (memo ? x("가공 가능 범위 확인 조건 견적", "Quote for checked conditions") : ""));
+  const [subject, setSubject] = useState("");
   const [file, setFile] = useState<{ name: string; size: number } | null>(null);
   const [due, setDue] = useState("");
   const [agree, setAgree] = useState(false);

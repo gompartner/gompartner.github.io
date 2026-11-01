@@ -2,31 +2,30 @@
 
 import { useEffect, useMemo, useRef, useState } from "react";
 import { Gasoek_One } from "@/lib/local-fonts";
-import { AnimatePresence, motion } from "framer-motion";
+import { motion } from "framer-motion";
 import { ChevronDown, Heart, Minus, Plus, RotateCcw, Search, X } from "lucide-react";
 import { useReducedMotionSafe } from "@/hooks/useReducedMotionSafe";
-import { maskName, maskPhone } from "@/components/demos/LeadReceivedPanel";
-import { RealQr } from "@/components/demos/eventPrint";
+import { maskName } from "@/components/demos/LeadReceivedPanel";
 import { daysAgo, useDemoToday } from "@/hooks/useDemoToday";
 import { DemoMakerInfo } from "@/components/demos/DemoMakerInfo";
 
-/* 독립출판 북페어 사전 입장 등록 랜딩 샘플: 가상의 "얇은책 장터". 이틀 동안 창고 한 층에서 셀러 24팀이 진과 굿즈를 판다.
+/* 독립출판 북페어 사전 등록 랜딩 샘플: 가상의 "얇은책 장터". 이틀 동안 창고 한 층에서 셀러 24팀이 진과 굿즈를 판다.
    행사명, 장소, 셀러, 책 제목, 담당자 이름은 모두 가상이다.
 
-   크몽 랜딩페이지 고급 패키지("랜딩 고급") 범위. 맞춤 기능은 사전 입장 회차 등록.
+   크몽 랜딩페이지 고급 패키지("랜딩 고급") 범위. 맞춤 기능은 부스 지도와 관심 부스 동선.
    리소그래프 포스터처럼 만든다. 형광 분홍과 파랑 두 색을 살짝 어긋나게 겹쳐 찍고, 망점 결, 둥근 스티커, 아주 큰 글자.
    진(얇은 소책자)은 리소로 많이 찍기 때문에 북페어와 결이 맞는다.
 
    상호작용(모두 브라우저 안에서만 돈다)
-   1. 사전 입장 등록: 날짜, 회차(남은 자리), 인원, 이름·휴대폰. 완료하면 입장권과 QR.
-   2. 참가 셀러: 장르 태그를 여러 개 고르고 이름·책 제목으로 찾는다. 걸린 셀러는 부스 지도에도 분홍으로 칠해진다.
+   1. 사전 등록: 날짜, 인원, 이름, 휴대폰. 완료하면 등록 안내가 나온다.
+   2. 참가 셀러: 이름이나 책 제목으로 찾는다.
    3. 부스 지도: 부스를 누르면 그 셀러가 열린다.
-   4. 미리 담기: 사고 싶은 진을 담으면 부스 도는 순서대로 정리하고 합계를 낸다.
+   4. 사고 싶은 진: 하트로 담으면 부스 도는 순서대로 정리한다.
    5. 오시는 길, 자주 묻는 질문. */
 
 const display = Gasoek_One;
 
-const NAME = "곰파트너";
+const NAME = "독립출판 북페어";
 const PLACE = "서울 마포구 ㅇㅇ로 00, ㅇㅇ창고 2층";
 const INSTA = "인스타그램 공식 계정";
 
@@ -47,7 +46,6 @@ const pill = `inline-flex items-center justify-center gap-2 rounded-full font-ex
 
 const DOW = ["일", "월", "화", "수", "목", "금", "토"];
 const won = (n: number) => `${n.toLocaleString("ko-KR")}원`;
-const p2 = (n: number) => String(n).padStart(2, "0");
 
 /** 분홍과 파랑 판이 조금 어긋나게 찍힌 글자 */
 function Riso({ children, className = "", as: Tag = "span", id }: { children: React.ReactNode; className?: string; as?: "span" | "h1" | "h2" | "p"; id?: string }) {
@@ -77,8 +75,7 @@ function Sticker({ children, className = "", color = C.yellow, rotate = -12, siz
 
 /* ── 데이터 ───────────────────────────────────────────── */
 
-const GENRES = ["만화", "에세이", "시", "사진", "일러스트", "여행", "요리", "리소 인쇄", "굿즈"] as const;
-type Genre = (typeof GENRES)[number];
+type Genre = "만화" | "에세이" | "시" | "사진" | "일러스트" | "여행" | "요리" | "리소 인쇄" | "굿즈";
 type Item = { id: string; title: string; price: number };
 type Seller = { booth: string; name: string; tags: Genre[]; items: Item[] };
 
@@ -114,15 +111,6 @@ const ITEM_BY_ID = Object.fromEntries(SELLERS.flatMap((s) => s.items.map((it) =>
 /** 입구에서 들어와 C줄, B줄, A줄 순서로 지그재그로 돈다 */
 const ROUTE = ["C", "B", "A"].flatMap((row, r) => Array.from({ length: 8 }, (_, i) => `${row}${r % 2 === 0 ? i + 1 : 8 - i}`));
 
-const ENTRY_CAP = 120;
-const ENTRY_SLOTS = ["11:00", "13:00", "15:00", "17:00"];
-function entryTaken(d: number, s: number) {
-  let h = (d + 2) * 2654435761 + (s + 11) * 40503;
-  h = Math.abs((h ^ (h >>> 13)) * 1274126177) % 101;
-  const base = s === 1 ? 92 : s === 2 ? 80 : s === 0 ? 64 : 40;
-  return Math.min(ENTRY_CAP, base + (h % 25) + d * 8);
-}
-
 /* ── 페이지 ───────────────────────────────────────────── */
 
 export function LandingZineFairDemo() {
@@ -145,16 +133,6 @@ export function LandingZineFairDemo() {
   }, []);
   const go = (id: string) => document.getElementById(id)?.scrollIntoView({ behavior: reduce ? "auto" : "smooth", block: "start" });
 
-  const wishTotal = wish.reduce((n, id) => n + (ITEM_BY_ID[id]?.price ?? 0), 0);
-  const [wishInView, setWishInView] = useState(false);
-  useEffect(() => {
-    const el = document.getElementById("zf-wish");
-    if (!el) return;
-    const o = new IntersectionObserver(([e]) => setWishInView(e.isIntersecting), { threshold: 0 });
-    o.observe(el);
-    return () => o.disconnect();
-  }, []);
-
   return (
     <div className="relative min-h-screen overflow-x-hidden pb-28" style={{ background: C.paper, color: C.ink }}>
       {/* 망점 결. 글자 위에도 얹혀 종이에 찍힌 느낌을 낸다 */}
@@ -162,13 +140,10 @@ export function LandingZineFairDemo() {
 
       <header className="relative z-10 mx-auto flex max-w-[1200px] items-center justify-between gap-3 px-4 py-4 md:px-6">
         <span className="inline-flex min-w-0 items-center gap-2" style={{ color: C.black }}>
-          {/* eslint-disable-next-line @next/next/no-img-element -- 메인 사이트와 같은 곰 로고 */}
-          <img src="/images/logo-bear.png" alt="" aria-hidden width={28} height={28} className="h-7 w-7 shrink-0" />
           <span className="flex flex-col whitespace-nowrap leading-none">
             <span className="text-[22px]" style={dF}>
               {NAME}
             </span>
-            <span className="mt-1 text-[12px] font-bold opacity-70">카탈로그</span>
           </span>
         </span>
         <button type="button" onClick={() => go("zf-entry")} className={`${pill} px-4 py-2 text-[15px] text-white`} style={{ background: C.blue, boxShadow: `3px 3px 0 ${C.pink}`, outlineColor: C.black }}>
@@ -187,7 +162,7 @@ export function LandingZineFairDemo() {
           <dl className="mt-8 grid gap-2 text-[16px] font-bold md:text-[18px]">
             {[
               ["날짜", `${days[0].getMonth() + 1}.${days[0].getDate()}(토) ~ ${days[1].getMonth() + 1}.${days[1].getDate()}(일)`],
-              ["시간", "11:00 ~ 19:00, 회차마다 120명"],
+              ["시간", "11:00 ~ 19:00"],
               ["장소", "망원역 1번 출구 ㅇㅇ창고 2층"],
               ["입장", "사전 등록 무료, 현장 2,000원"],
             ].map(([k, v]) => (
@@ -225,27 +200,27 @@ export function LandingZineFairDemo() {
         </div>
       </section>
 
-      {/* 1. 사전 입장 등록 */}
+      {/* 1. 사전 등록 */}
       <section id="zf-entry" aria-labelledby="zf-entry-title" className="relative scroll-mt-2 border-y-[3px] py-14 md:py-20" style={{ borderColor: C.black, background: "#ffe7f2" }}>
         <div className="mx-auto grid max-w-[1200px] gap-10 px-4 md:px-6 lg:grid-cols-[minmax(0,4fr)_minmax(0,7fr)] lg:gap-14">
           <div>
             <Riso as="h2" id="zf-entry-title" className="text-[56px] leading-[0.95] md:text-[84px]">
               사전
               <br />
-              입장 등록
+              등록
             </Riso>
             <p className="mt-5 max-w-[420px] text-[17px] font-medium leading-[1.7]">
-              창고 한 층이라 한 번에 120명까지 들어와요. 회차를 고르면 그 시간에 줄 없이 들어오고, 등록하면 입장료가 없어요.
+              미리 등록하면 입장료가 없어요. 입구 사전 등록 줄에서 이름을 말하면 팔찌로 바꿔 드려요.
             </p>
             <p className="mt-3 max-w-[420px] text-[15px] leading-[1.7]" style={{ color: C.muted }}>
-              회차는 들어오는 시간이에요. 들어온 뒤에는 문 닫을 때까지 있어도 돼요.
+              등록은 행사 전날 저녁 6시까지 받아요. 들어온 뒤에는 문 닫을 때까지 있어도 돼요.
             </p>
           </div>
           <EntryForm days={days} reduce={reduce} />
         </div>
       </section>
 
-      {/* 2·3·4. 셀러, 부스 지도, 미리 담기 */}
+      {/* 2, 3, 4. 셀러, 부스 지도, 사고 싶은 진 */}
       <SellerSection reduce={reduce} wish={wish} toggleWish={toggleWish} setWish={setWish} />
 
       {/* 5. 오시는 길과 자주 묻는 질문 */}
@@ -286,31 +261,11 @@ export function LandingZineFairDemo() {
         </div>
       </footer>
 
-      {/* 담은 게 있고 미리 담기 칸이 안 보일 때만 아래에 띄운다. 사용법 버튼과 겹치지 않게 위로 올린다. */}
-      <AnimatePresence>
-        {wish.length > 0 && !wishInView && (
-          <motion.div
-            initial={reduce ? false : { y: 24, opacity: 0 }}
-            animate={{ y: 0, opacity: 1 }}
-            exit={reduce ? { opacity: 0 } : { y: 24, opacity: 0 }}
-            transition={{ duration: 0.2 }}
-            className="fixed inset-x-0 z-40 px-4 print:hidden"
-            style={{ bottom: "calc(76px + env(safe-area-inset-bottom, 0px))" }}
-          >
-            <button type="button" onClick={() => go("zf-wish")} className={`${pill} mx-auto flex w-full max-w-[420px] justify-between px-5 py-3.5 text-[16px] text-white`} style={{ background: C.blue, boxShadow: `4px 4px 0 ${C.pink}`, outlineColor: C.black }}>
-              <span className="inline-flex items-center gap-2">
-                <Heart size={18} fill="currentColor" aria-hidden /> 담은 진 {wish.length}권
-              </span>
-              <span className="tabular-nums">{won(wishTotal)}</span>
-            </button>
-          </motion.div>
-        )}
-      </AnimatePresence>
     </div>
   );
 }
 
-/** 스테이플러로 찍은 진 세 권을 분홍·파랑 망점으로 그린 그림 */
+/** 첫 화면 사진 */
 function ZineArt() {
   return (
     // eslint-disable-next-line @next/next/no-img-element -- 정적 export 라 next/image 최적화를 쓰지 않는다
@@ -318,27 +273,20 @@ function ZineArt() {
   );
 }
 
-/* ── 1. 사전 입장 등록 ────────────────────────────────── */
+/* ── 1. 사전 등록 ────────────────────────────────── */
 
 function EntryForm({ days, reduce }: { days: Date[]; reduce: boolean }) {
   const [day, setDay] = useState(0);
-  const [slot, setSlot] = useState<number | null>(null);
   const [people, setPeople] = useState(1);
   const [name, setName] = useState("");
   const [phone, setPhone] = useState("");
   const [agree, setAgree] = useState(false);
   const [tried, setTried] = useState(false);
-  const [extra, setExtra] = useState<Record<string, number>>({});
-  const [done, setDone] = useState<{ no: string; day: number; slot: number; people: number; name: string; phone: string } | null>(null);
+  const [done, setDone] = useState<{ day: number; people: number; name: string } | null>(null);
   const doneRef = useRef<HTMLDivElement>(null);
 
-  const left = (d: number, s: number) => ENTRY_CAP - entryTaken(d, s) - (extra[`${d}-${s}`] ?? 0);
-  const l = slot === null ? 0 : left(day, slot);
-  const maxP = slot === null ? 4 : Math.max(1, Math.min(4, l));
-  const p = Math.min(people, maxP);
   const phoneOk = /^01[016789]-?\d{3,4}-?\d{4}$/.test(phone.trim());
   const errs = {
-    slot: slot === null ? "회차를 골라 주세요" : "",
     name: name.trim() ? "" : "이름을 적어 주세요",
     phone: phoneOk ? "" : "휴대폰 번호를 확인해 주세요",
     agree: agree ? "" : "개인정보 수집에 동의해 주세요",
@@ -354,19 +302,9 @@ function EntryForm({ days, reduce }: { days: Date[]; reduce: boolean }) {
   const submit = (e: React.FormEvent) => {
     e.preventDefault();
     setTried(true);
-    if (!ok || slot === null) return;
-    const no = `${["토", "일"][day]}${ENTRY_SLOTS[slot].slice(0, 2)}-${p2(ENTRY_CAP - l + 1).padStart(3, "0")}`;
-    setExtra((v) => ({ ...v, [`${day}-${slot}`]: (v[`${day}-${slot}`] ?? 0) + p }));
-    setDone({ no, day, slot, people: p, name, phone });
+    if (!ok) return;
+    setDone({ day, people, name });
     requestAnimationFrame(() => doneRef.current?.scrollIntoView({ behavior: reduce ? "auto" : "smooth", block: "nearest" }));
-  };
-  const reset = () => {
-    setDone(null);
-    setTried(false);
-    setSlot(null);
-    setName("");
-    setPhone("");
-    setAgree(false);
   };
 
   const box = "rounded-[18px] border-[3px] p-5 md:p-8";
@@ -375,47 +313,24 @@ function EntryForm({ days, reduce }: { days: Date[]; reduce: boolean }) {
   if (done) {
     const d = days[done.day];
     return (
-      <motion.div ref={doneRef} initial={reduce ? false : { rotate: -4, scale: 0.92, opacity: 0 }} animate={{ rotate: -1.5, scale: 1, opacity: 1 }} transition={{ type: "spring", stiffness: 260, damping: 18 }} className="relative" role="status">
-        <div className={`${box} relative overflow-hidden`} style={{ borderColor: C.black, background: C.paper, boxShadow: `8px 8px 0 ${C.blue}` }}>
-          <div className="grid gap-6 sm:grid-cols-[1fr_170px] sm:items-start">
-            <div>
-              <p className="text-[15px] font-extrabold" style={{ color: C.pink }}>
-                등록됐어요
-              </p>
-              <Riso className="mt-1 text-[46px] leading-none md:text-[56px]">{done.no}</Riso>
-              <dl className="mt-5 grid grid-cols-[76px_1fr] gap-x-3 gap-y-2 text-[15px] leading-[1.6]">
-                <dt className="font-extrabold">입장</dt>
-                <dd>
-                  {d.getMonth() + 1}.{d.getDate()}({DOW[d.getDay()]}) {ENTRY_SLOTS[done.slot]}, {done.people}명
-                </dd>
-                <dt className="font-extrabold">등록자</dt>
-                <dd>
-                  {maskName(done.name)}, {maskPhone(done.phone)}
-                </dd>
-                <dt className="font-extrabold">입구</dt>
-                <dd>사전 등록 줄에서 QR을 보여 주면 팔찌로 바꿔 드려요. 회차 시작 20분 뒤까지 들어오면 돼요.</dd>
-                <dt className="font-extrabold">문자</dt>
-                <dd>같은 QR을 문자로도 보냈어요. 전날 저녁 7시에 한 번 더 보내요.</dd>
-                <dt className="font-extrabold">취소</dt>
-                <dd>문자 속 링크에서 해요. 빈자리는 현장 손님에게 돌아가요.</dd>
-                <dt className="font-extrabold">담당 창구</dt>
-                <dd>운영팀 한ㅂ름, {INSTA} 메시지. 저녁 8시 전에 답해요.</dd>
-              </dl>
-            </div>
-            <div className="mx-auto w-[150px] rounded-[12px] border-[3px] bg-white p-2 sm:w-full" style={{ borderColor: C.black }}>
-              <RealQr value={`GOMPARTNER ${done.no} ${done.people}P`} color={C.blue} label={`입장 QR, 등록 번호 ${done.no}`} />
-              <p className="mt-1 text-center text-[13px] font-extrabold">{done.people}명 입장</p>
-            </div>
-          </div>
+      <motion.div ref={doneRef} initial={reduce ? false : { opacity: 0, y: 12 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.25 }} role="status">
+        <div className={box} style={{ borderColor: C.black, background: C.paper, boxShadow: `8px 8px 0 ${C.blue}` }}>
+          <Riso className="text-[46px] leading-none md:text-[56px]">등록 완료</Riso>
+          <dl className="mt-5 grid grid-cols-[76px_1fr] gap-x-3 gap-y-2 text-[15px] leading-[1.6]">
+            <dt className="font-extrabold">날짜</dt>
+            <dd>
+              {d.getMonth() + 1}.{d.getDate()}({DOW[d.getDay()]}) 11:00 ~ 19:00
+            </dd>
+            <dt className="font-extrabold">등록자</dt>
+            <dd>
+              {maskName(done.name)}, {done.people}명
+            </dd>
+            <dt className="font-extrabold">입구</dt>
+            <dd>사전 등록 줄에서 이름을 말하면 팔찌로 바꿔 드려요.</dd>
+            <dt className="font-extrabold">문자</dt>
+            <dd>행사 전날 저녁 7시에 안내 문자를 보내요.</dd>
+          </dl>
         </div>
-        <Sticker className="absolute -right-2 -top-6 text-[15px] md:-right-6" size={88} rotate={14}>
-          줄 없이
-          <br />
-          입장
-        </Sticker>
-        <button type="button" onClick={reset} className={`mt-6 inline-flex items-center gap-1.5 text-[15px] font-extrabold underline underline-offset-4 ${focusRing}`} style={{ outlineColor: C.blue }}>
-          <RotateCcw size={16} aria-hidden /> 다른 회차로 한 번 더 등록하기
-        </button>
       </motion.div>
     );
   }
@@ -432,10 +347,7 @@ function EntryForm({ days, reduce }: { days: Date[]; reduce: boolean }) {
                 key={i}
                 type="button"
                 aria-pressed={on}
-                onClick={() => {
-                  setDay(i);
-                  setSlot(null);
-                }}
+                onClick={() => setDay(i)}
                 className={`rounded-[12px] border-[3px] py-3 text-center ${focusRing}`}
                 style={{ borderColor: C.black, background: on ? C.blue : "white", color: on ? "white" : C.black, outlineColor: C.pink }}
               >
@@ -449,52 +361,19 @@ function EntryForm({ days, reduce }: { days: Date[]; reduce: boolean }) {
         </div>
       </fieldset>
 
-      <fieldset className="mt-6">
-        <legend className="text-[17px] font-extrabold">들어오는 시간</legend>
-        <div className="mt-2 grid grid-cols-2 gap-2 md:grid-cols-4">
-          {ENTRY_SLOTS.map((t, s) => {
-            const a = left(day, s);
-            const full = a <= 0;
-            const on = slot === s;
-            const pct = Math.max(0, a) / ENTRY_CAP;
-            return (
-              <button
-                key={t}
-                type="button"
-                aria-pressed={on}
-                disabled={full}
-                aria-label={`${t} 회차, ${full ? "마감" : `남은 자리 ${a}석`}`}
-                onClick={() => setSlot(s)}
-                className={`rounded-[12px] border-[3px] px-3 pb-3 pt-2 text-left disabled:cursor-not-allowed disabled:opacity-50 ${focusRing}`}
-                style={{ borderColor: C.black, background: on ? C.yellow : "white", color: C.black, outlineColor: C.pink }}
-              >
-                <span className="block text-[24px] leading-tight" style={dF}>
-                  {t}
-                </span>
-                <span className="block text-[14px] font-bold tabular-nums">{full ? "마감" : `${a}석 남음`}</span>
-                <span aria-hidden className="mt-2 block h-2 overflow-hidden rounded-full border-2" style={{ borderColor: C.black }}>
-                  <span className="block h-full" style={{ width: `${(1 - pct) * 100}%`, background: pct < 0.15 ? C.pink : C.blue }} />
-                </span>
-              </button>
-            );
-          })}
-        </div>
-        {err("slot")}
-      </fieldset>
-
       <div className="mt-6 grid gap-5 md:grid-cols-[170px_1fr_1fr]">
         <div>
           <p className="text-[17px] font-extrabold" id="zf-people">
             인원
           </p>
           <div className="mt-2 flex items-center gap-2" role="group" aria-labelledby="zf-people">
-            <button type="button" onClick={() => setPeople(Math.max(1, p - 1))} disabled={p <= 1} aria-label="한 명 빼기" className={`grid h-12 w-12 place-items-center rounded-full border-[3px] bg-white disabled:opacity-40 ${focusRing}`} style={{ borderColor: C.black, outlineColor: C.pink }}>
+            <button type="button" onClick={() => setPeople(Math.max(1, people - 1))} disabled={people <= 1} aria-label="한 명 빼기" className={`grid h-12 w-12 place-items-center rounded-full border-[3px] bg-white disabled:opacity-40 ${focusRing}`} style={{ borderColor: C.black, outlineColor: C.pink }}>
               <Minus size={18} aria-hidden />
             </button>
             <output className="w-12 text-center text-[24px]" style={dF} aria-live="polite">
-              {p}명
+              {people}명
             </output>
-            <button type="button" onClick={() => setPeople(Math.min(maxP, p + 1))} disabled={p >= maxP} aria-label="한 명 더하기" className={`grid h-12 w-12 place-items-center rounded-full border-[3px] bg-white disabled:opacity-40 ${focusRing}`} style={{ borderColor: C.black, outlineColor: C.pink }}>
+            <button type="button" onClick={() => setPeople(Math.min(4, people + 1))} disabled={people >= 4} aria-label="한 명 더하기" className={`grid h-12 w-12 place-items-center rounded-full border-[3px] bg-white disabled:opacity-40 ${focusRing}`} style={{ borderColor: C.black, outlineColor: C.pink }}>
               <Plus size={18} aria-hidden />
             </button>
           </div>
@@ -512,32 +391,29 @@ function EntryForm({ days, reduce }: { days: Date[]; reduce: boolean }) {
       </div>
       <label className="mt-6 flex cursor-pointer items-start gap-2 text-[15px] leading-[1.6]">
         <input type="checkbox" checked={agree} onChange={(e) => setAgree(e.target.checked)} className="mt-0.5 h-5 w-5 flex-none accent-[#2f6bff]" />
-        <span>입장 문자를 보내려고 이름과 휴대폰 번호를 받아요. 행사가 끝나고 7일 뒤 지워요. 동의합니다.</span>
+        <span>안내 문자를 보내려고 이름과 휴대폰 번호를 받아요. 행사가 끝나고 7일 뒤 지워요. 동의합니다.</span>
       </label>
       {err("agree")}
       <button type="submit" className={`${pill} mt-6 w-full py-4 text-[19px] text-white`} style={{ background: C.blue, boxShadow: `5px 5px 0 ${C.pink}`, outlineColor: C.black }}>
-        {slot === null ? "등록하기" : `${days[day].getMonth() + 1}.${days[day].getDate()} ${ENTRY_SLOTS[slot]} ${p}명 등록하기`}
+        {`${days[day].getMonth() + 1}.${days[day].getDate()} ${people}명 등록하기`}
       </button>
     </form>
   );
 }
 
-/* ── 2·3·4. 셀러 목록, 부스 지도, 미리 담기 ─────────── */
+/* ── 2, 3, 4. 셀러 목록, 부스 지도, 사고 싶은 진 ─────── */
 
 function SellerSection({ reduce, wish, toggleWish, setWish }: { reduce: boolean; wish: string[]; toggleWish: (id: string) => void; setWish: (v: string[]) => void }) {
-  const [tags, setTags] = useState<Genre[]>([]);
   const [q, setQ] = useState("");
   const [open, setOpen] = useState<string | null>("A4");
   const [all, setAll] = useState(false);
 
   const match = (s: Seller) => {
-    const okTag = tags.length === 0 || s.tags.some((t) => tags.includes(t));
     const k = q.trim();
-    const okQ = !k || s.name.includes(k) || s.items.some((it) => it.title.includes(k));
-    return okTag && okQ;
+    return !k || s.name.includes(k) || s.items.some((it) => it.title.includes(k));
   };
   const list = SELLERS.filter(match);
-  const filtering = tags.length > 0 || q.trim() !== "";
+  const filtering = q.trim() !== "";
 
   const pickBooth = (b: string) => {
     setOpen(b);
@@ -551,38 +427,16 @@ function SellerSection({ reduce, wish, toggleWish, setWish }: { reduce: boolean;
         <Riso as="h2" id="zf-sellers-title" className="text-[56px] leading-[0.95] md:text-[84px]">
           참가 셀러
         </Riso>
-        <p className="mt-4 max-w-[560px] text-[17px] font-medium leading-[1.7]">장르를 고르면 그 셀러 부스가 지도에 분홍으로 칠해져요. 사고 싶은 진은 하트로 담아 두세요.</p>
+        <p className="mt-4 max-w-[560px] text-[17px] font-medium leading-[1.7]">부스를 누르면 셀러가 열려요. 사고 싶은 진은 하트로 담아 두세요.</p>
 
-        {/* 장르 태그와 검색 */}
-        <div className="mt-8 flex flex-wrap gap-2" role="group" aria-label="장르 고르기">
-          {GENRES.map((g) => {
-            const on = tags.includes(g);
-            return (
-              <button
-                key={g}
-                type="button"
-                aria-pressed={on}
-                onClick={() => setTags((v) => (v.includes(g) ? v.filter((x) => x !== g) : [...v, g]))}
-                className={`rounded-full border-[2.5px] px-3.5 py-1.5 text-[15px] font-extrabold transition-transform ${on ? "-rotate-2" : ""} ${focusRing}`}
-                style={{ borderColor: C.black, background: on ? C.pink : "white", color: on ? "white" : C.black, outlineColor: C.blue }}
-              >
-                {g}
-              </button>
-            );
-          })}
-          {filtering && (
-            <button type="button" onClick={() => { setTags([]); setQ(""); }} className={`inline-flex items-center gap-1 px-2 text-[14px] font-bold underline underline-offset-4 ${focusRing}`} style={{ outlineColor: C.blue }}>
-              <X size={14} aria-hidden /> 모두 풀기
-            </button>
-          )}
-        </div>
-        <label className="mt-4 flex max-w-[420px] items-center gap-2 rounded-full border-[3px] bg-white px-4 focus-within:outline focus-within:outline-[3px] focus-within:outline-offset-2" style={{ borderColor: C.black, outlineColor: C.blue }}>
+        {/* 검색 */}
+        <label className="mt-8 flex max-w-[420px] items-center gap-2 rounded-full border-[3px] bg-white px-4 focus-within:outline focus-within:outline-[3px] focus-within:outline-offset-2" style={{ borderColor: C.black, outlineColor: C.blue }}>
           <Search size={18} aria-hidden />
           <span className="sr-only">셀러 이름이나 책 제목으로 찾기</span>
           <input value={q} onChange={(e) => setQ(e.target.value)} placeholder="셀러 이름이나 책 제목" className="w-full bg-transparent py-3 text-[16px] outline-none" />
         </label>
         <p className="mt-3 text-[15px] font-bold" aria-live="polite">
-          {filtering ? `${list.length}팀이 걸렸어요` : `셀러 ${SELLERS.length}팀 전부`}
+          {filtering ? `${list.length}팀을 찾았어요` : `셀러 ${SELLERS.length}팀 전부`}
         </p>
 
         <div className="mt-6 grid gap-10 lg:grid-cols-[minmax(0,7fr)_minmax(0,5fr)] lg:gap-10">
@@ -592,7 +446,7 @@ function SellerSection({ reduce, wish, toggleWish, setWish }: { reduce: boolean;
               <h3 id="zf-map-title" className="text-[26px]" style={{ ...dF, color: C.black }}>
                 부스 지도
               </h3>
-              <BoothMap hit={new Set(list.map((s) => s.booth))} filtering={filtering} open={open} wishBooths={new Set(wish.map((id) => id.split("-")[0]))} onPick={pickBooth} />
+              <BoothMap open={open} wishBooths={new Set(wish.map((id) => id.split("-")[0]))} onPick={pickBooth} />
               <WishList wish={wish} toggleWish={toggleWish} setWish={setWish} onOpen={pickBooth} />
             </div>
           </div>
@@ -602,7 +456,7 @@ function SellerSection({ reduce, wish, toggleWish, setWish }: { reduce: boolean;
           <ul className="grid content-start gap-3 md:grid-cols-2 md:items-start">
             {list.length === 0 && (
               <li className="rounded-[18px] border-[3px] border-dashed p-6 text-center text-[16px] font-bold" style={{ borderColor: C.black }}>
-                걸린 셀러가 없어요. 태그를 하나 풀어 보세요.
+                찾는 셀러가 없어요. 다른 이름으로 찾아 보세요.
               </li>
             )}
             {(filtering || all ? list : list.slice(0, 10)).map((s) => {
@@ -619,7 +473,7 @@ function SellerSection({ reduce, wish, toggleWish, setWish }: { reduce: boolean;
                       </span>
                       <span className="mt-0.5 flex flex-wrap gap-1">
                         {s.tags.map((t) => (
-                          <span key={t} className="rounded-full px-2 py-0.5 text-[12px] font-bold" style={{ background: tags.includes(t) ? C.pink : "#efe7ff", color: tags.includes(t) ? "white" : C.ink }}>
+                          <span key={t} className="rounded-full px-2 py-0.5 text-[12px] font-bold" style={{ background: "#efe7ff", color: C.ink }}>
                             {t}
                           </span>
                         ))}
@@ -670,7 +524,7 @@ function SellerSection({ reduce, wish, toggleWish, setWish }: { reduce: boolean;
 }
 
 /** 창고 2층 평면도. 세 줄에 부스 8개씩, 아래가 입구 */
-function BoothMap({ hit, filtering, open, wishBooths, onPick }: { hit: Set<string>; filtering: boolean; open: string | null; wishBooths: Set<string>; onPick: (b: string) => void }) {
+function BoothMap({ open, wishBooths, onPick }: { open: string | null; wishBooths: Set<string>; onPick: (b: string) => void }) {
   const BW = 58;
   const BH = 42;
   const x0 = 34;
@@ -687,9 +541,7 @@ function BoothMap({ hit, filtering, open, wishBooths, onPick }: { hit: Set<strin
           Array.from({ length: 8 }, (_, i) => {
             const b = `${r}${i + 1}`;
             const x = x0 + i * (BW + 4);
-            const isHit = hit.has(b);
             const isOpen = open === b;
-            const dim = filtering && !isHit;
             return (
               <g
                 key={b}
@@ -705,8 +557,8 @@ function BoothMap({ hit, filtering, open, wishBooths, onPick }: { hit: Set<strin
                 }}
                 className="cursor-pointer outline-none [&:focus-visible>rect:first-child]:stroke-[#ff4fa3] [&:focus-visible>rect:first-child]:[stroke-width:5]"
               >
-                <rect x={x} y={y} width={BW} height={BH} rx="6" fill={isOpen ? C.yellow : filtering && isHit ? C.pink : "white"} stroke={C.black} strokeWidth="2.5" opacity={dim ? 0.35 : 1} />
-                <text x={x + BW / 2} y={y + BH / 2 + 5} textAnchor="middle" fontSize="14" fontWeight="800" fill={filtering && isHit && !isOpen ? "white" : C.black} opacity={dim ? 0.45 : 1}>
+                <rect x={x} y={y} width={BW} height={BH} rx="6" fill={isOpen ? C.yellow : "white"} stroke={C.black} strokeWidth="2.5" />
+                <text x={x + BW / 2} y={y + BH / 2 + 5} textAnchor="middle" fontSize="14" fontWeight="800" fill={C.black}>
                   {b}
                 </text>
                 {wishBooths.has(b) && <circle cx={x + BW - 6} cy={y + 6} r="7" fill={C.blue} stroke={C.black} strokeWidth="2" />}
@@ -742,15 +594,14 @@ function WishList({ wish, toggleWish, setWish, onOpen }: { wish: string[]; toggl
   const items = wish.map((id) => ITEM_BY_ID[id]).filter(Boolean);
   // 입구에서 도는 순서대로
   const ordered = [...items].sort((a, b) => ROUTE.indexOf(a.seller.booth) - ROUTE.indexOf(b.seller.booth));
-  const total = items.reduce((n, it) => n + it.price, 0);
   return (
     <div id="zf-wish" className="mt-6 scroll-mt-6 rounded-[18px] border-[3px] p-5" style={{ borderColor: C.black, background: "#e8efff" }}>
       <div className="flex items-baseline justify-between gap-3">
         <h3 className="text-[24px]" style={{ ...dF, color: C.black }}>
-          미리 담기
+          사고 싶은 진
         </h3>
         <p className="text-[15px] font-extrabold tabular-nums" aria-live="polite">
-          {items.length}권, {won(total)}
+          {items.length}권
         </p>
       </div>
       {items.length === 0 ? (
@@ -771,7 +622,7 @@ function WishList({ wish, toggleWish, setWish, onOpen }: { wish: string[]; toggl
                 <button type="button" onClick={() => onOpen(it.seller.booth)} className={`min-w-0 flex-1 text-left ${focusRing}`} style={{ outlineColor: C.blue }}>
                   <span className="block truncate text-[15px] font-bold">{it.title}</span>
                   <span className="block text-[13px]" style={{ color: C.muted }}>
-                    {it.seller.booth} {it.seller.name}, {won(it.price)}
+                    {it.seller.booth} {it.seller.name}
                   </span>
                 </button>
                 <button type="button" onClick={() => toggleWish(it.id)} aria-label={`${it.title} 빼기`} className={`grid h-9 w-9 flex-none place-items-center rounded-full ${focusRing}`} style={{ outlineColor: C.blue }}>
@@ -780,9 +631,6 @@ function WishList({ wish, toggleWish, setWish, onOpen }: { wish: string[]; toggl
               </li>
             ))}
           </ol>
-          <p className="mt-3 text-[13px] leading-[1.6]" style={{ color: C.muted }}>
-            담기만 해 두는 목록이에요. 결제는 부스에서 해요. 계좌이체만 받는 셀러도 있어요.
-          </p>
           <button type="button" onClick={() => setWish([])} className={`mt-2 inline-flex items-center gap-1.5 text-[14px] font-bold underline underline-offset-4 ${focusRing}`} style={{ outlineColor: C.blue }}>
             <RotateCcw size={14} aria-hidden /> 다 비우기
           </button>
@@ -795,11 +643,11 @@ function WishList({ wish, toggleWish, setWish, onOpen }: { wish: string[]; toggl
 /* ── 5. 묻고 답하기 ───────────────────────────────────── */
 
 const FAQ = [
-  { q: "등록 안 하고 가도 되나요?", a: "돼요. 현장 입장료 2,000원을 내고 현장 줄에 서요. 오후 1시와 3시는 사전 등록으로 거의 차서 기다릴 수 있어요." },
+  { q: "등록 안 하고 가도 되나요?", a: "돼요. 현장 입장료 2,000원을 내고 현장 줄에 서요. 사전 등록한 분은 따로 줄이 있어 먼저 들어와요." },
   { q: "카드 결제가 되나요?", a: "부스마다 달라요. 계좌이체만 받는 셀러가 많아서 현금이나 이체를 준비해 오면 편해요." },
   { q: "셀러로 참가하고 싶어요", a: "이번 셀러 모집은 끝났어요. 다음 장터 모집은 인스타그램에 먼저 올려요." },
   { q: "리소 체험은 따로 신청하나요?", a: "입구 옆 체험 테이블에서 바로 해요. 엽서 한 장을 두 색으로 찍어 가요. 재료비 3,000원이에요." },
-  { q: "아이와 같이 가도 되나요?", a: "같이 오셔도 돼요. 초등학생 이하는 등록 인원에서 빼고 와도 돼요." },
+  { q: "아이와 같이 가도 되나요?", a: "같이 오셔도 돼요. 초등학생 이하는 등록 인원에 넣지 않아도 돼요." },
 ];
 
 function Faq() {

@@ -186,7 +186,7 @@ export function LandingStampTourDemo() {
             </span>
           </span>
           <span className="tabular-nums">
-            {year}년 8월호 · 광복 {anniv}주년
+            {year}년 8월호, 광복 {anniv}주년
           </span>
         </div>
         <nav aria-label="이 페이지 차례" className="flex gap-4 overflow-x-auto border-b py-2 text-[13px] [scrollbar-width:none] md:gap-6 md:text-[14px]" style={{ borderColor: C.hair }}>
@@ -209,7 +209,7 @@ export function LandingStampTourDemo() {
       <section aria-labelledby="ib-title" className="mx-auto grid max-w-[1200px] gap-8 px-4 pb-14 pt-8 md:px-6 md:pt-14 lg:grid-cols-[minmax(0,7fr)_minmax(0,5fr)] lg:gap-14">
         <div>
           <p className="text-[14px] font-bold tracking-[0.04em]" style={{ color: C.red }}>
-            스탬프 투어 · 8월 13일~17일
+            스탬프 투어, 8월 13일~17일
           </p>
           <h1 id="ib-title" className="mt-4 text-[60px] font-black leading-[1.02] tracking-[-0.04em] md:text-[104px]" style={serifF}>
             독립의 길
@@ -324,7 +324,7 @@ export function LandingStampTourDemo() {
             <DemoMakerInfo className="mt-1" />
           </div>
           <p className="md:self-end">
-            {year}년 8월호 · 광복 {anniv}주년 독립의 길 스탬프 투어
+            {year}년 8월호, 광복 {anniv}주년 독립의 길 스탬프 투어
           </p>
         </div>
       </footer>
@@ -449,7 +449,7 @@ function CourseAndStamps({
                   {cc.name}
                 </span>
                 <span className="block text-[13px] opacity-80">
-                  {cc.stops.length}곳 · {(cc.legs.reduce((n, l) => n + l[0], 0) / 1000).toFixed(1)}km
+                  {cc.stops.length}곳, {(cc.legs.reduce((n, l) => n + l[0], 0) / 1000).toFixed(1)}km
                 </span>
               </button>
             );
@@ -803,7 +803,7 @@ function GuideBooking({ days, reduce }: { days: Date[]; reduce: boolean }) {
           </dd>
           <dt style={{ color: C.muted }}>예약자</dt>
           <dd>
-            {maskName(booked.name)} · {maskPhone(booked.phone)}
+            {maskName(booked.name)}, {maskPhone(booked.phone)}
           </dd>
           <dt style={{ color: C.muted }}>모이는 곳</dt>
           <dd>옛 장터 터 해설판 앞. 10분 전에 와 주세요. 빨간 모자를 쓴 해설사가 기다려요.</dd>
@@ -1027,7 +1027,7 @@ function GiftForm({ complete, got, need, year, reduce, onCourse }: { complete: b
         <dl className="mt-5 grid grid-cols-[88px_1fr] gap-x-4 gap-y-3 border-t pt-4 text-[16px] leading-[1.6]" style={{ borderColor: C.hair }}>
           <dt style={{ color: C.muted }}>신청자</dt>
           <dd>
-            {maskName(done.name)} · {maskPhone(done.phone)}
+            {maskName(done.name)}, {maskPhone(done.phone)}
           </dd>
           <dt style={{ color: C.muted }}>받는 방법</dt>
           <dd>

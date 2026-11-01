@@ -10,7 +10,7 @@ import { DemoMakerInfo } from "@/components/demos/DemoMakerInfo";
 
 /* 사진관 홈페이지 샘플: 가상의 곰파트너 사진관. 증명사진, 프로필, 가족사진, 우정사진, 반려동물 촬영.
    상호, 주소, 손님 이름은 모두 가상이다.
-   첫 화면 사진 출처: Pexels 사진 30332804. 갤러리와 배경지 사진은 AI 생성(Z-Image-Turbo)
+   갤러리 사진은 AI 생성(Z-Image-Turbo)
 
    국내 사진관 사이트 구성(벤치마킹 메모)
    - 메뉴는 갤러리, 상품 안내(가격표), 예약, 촬영 안내, 오시는 길. 첫 화면은 큰 사진 갤러리.
@@ -18,23 +18,17 @@ import { DemoMakerInfo } from "@/components/demos/DemoMakerInfo";
    - 예약은 네이버 예약이나 카카오톡 채널. 30분 단위 시간표에 마감 표시. 당일 예약은 전화 문의.
    - 촬영 안내에 준비물(여권 규격, 안경), 복장(단색 상의, 배경지 색과 겹치지 않게), 주차. 영업시간에 정기 휴무.
 
-   핵심 모션
-   - 첫 화면(ps-poster): 상단 메뉴 아래 촬영 종류 세 장(증명, 프로필, 가족)을 세로로 나란히 둔다. 고른 패널이 넓어지며
-     시작가와 버튼이 나온다(실제 사진관 사이트의 촬영 상품별 배너를 한 화면에 모은 형태).
-   - 갤러리: 세로 스크롤에 맞춰 가로로 흐른다(sticky 구간 + useScroll). 가운데 온 카드만 살짝 커지고 캡션이 뜬다.
-   동작 줄이기면 첫 화면은 멈춘 사진, 갤러리는 보통 가로 스크롤(scroll-snap)로 바뀐다.
-
-   상호작용(모두 브라우저 안에서만 돈다. 실제로 보내지 않는다)
-   1. 컨셉 필터: 증명, 프로필, 가족, 우정, 반려동물. 고르면 갤러리에 그 컨셉만 남는다.
-   2. 패키지 비교: 기본, 스탠다드, 프리미엄 표와 추가 옵션 합산.
-   3. 배경지 색: 6색. 고르면 그 색으로 찍은 같은 사람 사진과 어울리는 옷 색 한 줄.
-   4. 촬영 예약: 날짜(오늘부터 14일), 시간대(30분 단위, 마감 표시), 인원, 이름, 휴대폰. 완료 화면에 예약번호, 수령 예정일, 담당 창구.
-   5. 촬영 안내와 오시는 길: 준비물, 복장, 주차 탭. 영업시간에 오늘 요일 진하게. */
+   화면 구성(모두 브라우저 안에서만 돈다. 실제로 보내지 않는다)
+   0. 첫 화면(ps-poster): 상단 메뉴 아래 촬영 종류 카드 세 장(증명, 프로필, 가족). 카드마다 사진, 시작가, 촬영 시간, 사진 보기와 예약 버튼.
+   1. 갤러리: 세로 격자. 컨셉(증명, 프로필, 가족, 우정, 반려동물)을 고르면 그 컨셉 사진만 남는다.
+   2. 상품 안내: 증명사진 가격, 기본, 스탠다드, 프리미엄 패키지 표와 추가 옵션 합산.
+   3. 촬영 예약: 날짜(오늘부터 14일), 시간대(30분 단위, 마감 표시), 인원, 이름, 휴대폰. 완료 화면에 예약번호, 수령 예정일, 담당 창구.
+   4. 촬영 안내와 오시는 길: 준비물, 복장, 주차 탭. 영업시간에 오늘 요일 진하게. */
 
 const IMG = "/images/demo-photo-studio";
 
 const ADDRESS = "서울 ㅇㅇ구 ㅇㅇ로 00, 2층";
-const KAKAO = "카카오톡 채널 곰파트너";
+const KAKAO = "카카오톡 채널 사진관";
 
 const C = {
   bg: "#141414",
@@ -50,25 +44,12 @@ const C = {
 
 /* 모션 상수 */
 const EASE = [0.22, 1, 0.36, 1] as const;
-const DUR_CARD = 0.45; // 카드 재배열 450ms
-const DUR_UI = 0.22; // 칩, 탭 220ms
+const DUR_UI = 0.22; // 탭 내용 220ms
 
 const focusRing = "focus-visible:outline focus-visible:outline-[3px] focus-visible:outline-offset-2 focus-visible:outline-[#b8956a]";
 const won = (n: number) => `${n.toLocaleString("ko-KR")}원`;
 const p2 = (n: number) => String(n).padStart(2, "0");
 const DOW = ["일", "월", "화", "수", "목", "금", "토"];
-
-/* 배경지 6색. tip은 사진관이 손님에게 하는 옷 색 안내 */
-const BACKDROPS = [
-  { id: "white", name: "화이트", hex: "#efede8", tip: "흰 배경에는 검정, 네이비처럼 진한 상의가 또렷하게 나와요. 흰 옷은 배경에 묻혀요." },
-  { id: "cobalt", name: "코발트", hex: "#3d5683", tip: "파란 배경에는 흰색, 베이지 상의가 잘 받아요. 파란 계열 옷은 피해 주세요." },
-  { id: "lemon", name: "레몬", hex: "#d4b45a", tip: "노란 배경에는 흰색, 데님 상의가 산뜻해요. 노란 옷은 피해 주세요." },
-  { id: "coral", name: "코랄", hex: "#c47c66", tip: "코랄 배경에는 흰색, 아이보리 상의가 화사해요. 빨간 계열은 피해 주세요." },
-  { id: "mint", name: "민트", hex: "#7aa396", tip: "민트 배경에는 흰색, 연한 베이지 상의가 어울려요. 초록 옷은 묻혀요." },
-  { id: "lilac", name: "라일락", hex: "#8a7fa6", tip: "라일락 배경에는 흰색, 차콜 상의가 차분해요. 보라 계열 옷은 피해 주세요." },
-] as const;
-type BackdropId = (typeof BACKDROPS)[number]["id"];
-const backdropHex = (id: BackdropId) => BACKDROPS.find((b) => b.id === id)!.hex;
 
 const CONCEPTS = ["증명", "프로필", "가족", "우정", "반려동물"] as const;
 type Concept = (typeof CONCEPTS)[number];
@@ -127,39 +108,6 @@ function isTaken(d: Date, slot: number) {
   return h < limit;
 }
 
-/* 색 보조 */
-function rgb(hex: string): [number, number, number] {
-  const n = parseInt(hex.slice(1), 16);
-  return [(n >> 16) & 255, (n >> 8) & 255, n & 255];
-}
-const isDark = (hex: string) => {
-  const [r, g, b] = rgb(hex);
-  return (0.2126 * r + 0.7152 * g + 0.0722 * b) / 255 < 0.42;
-};
-/* 배경지 색 버튼 */
-function Roll({ b, on, onPick }: { b: (typeof BACKDROPS)[number]; on: boolean; onPick: () => void }) {
-  return (
-    <button
-      type="button"
-      onClick={onPick}
-      aria-pressed={on}
-      className={`flex flex-col items-center gap-1 rounded-[6px] px-1.5 pb-1 pt-1.5 ${focusRing}`}
-      style={{ background: on ? C.panel2 : "transparent" }}
-    >
-      <span className="relative block h-7 w-8 rounded-[4px] border" style={{ background: b.hex, borderColor: on ? C.accent : C.line }} aria-hidden>
-        {on && (
-          <span className="absolute inset-0 flex items-center justify-center" style={{ color: isDark(b.hex) ? "#fff" : "#1c1c1c" }}>
-            <Check size={14} strokeWidth={2.5} />
-          </span>
-        )}
-      </span>
-      <span className="text-[12px] font-medium" style={{ color: on ? C.text : C.muted }}>
-        {b.name}
-      </span>
-    </button>
-  );
-}
-
 /* 하위 섹션 제목 */
 function Title({ id, children }: { id: string; children: React.ReactNode }) {
   return (
@@ -188,10 +136,7 @@ function Stepper({ value, min, max, onChange, label }: { value: number; min: num
 
 /* ---------- 첫 화면 ---------- */
 
-/* 첫 화면: 상단 메뉴 + 촬영 종류 세로 3분할 패널(증명, 프로필, 가족).
-   PC는 마우스를 올리거나 누른 패널이 50%로 넓어지고 나머지 둘은 25%로 줄며(flex-grow 0.45초), 넓어진 패널에만 버튼이 나온다.
-   휴대폰은 세 단을 위아래로 쌓고 누른 단만 길어진다. 사진은 들어올 때 1.04배에서 1.6초 동안 천천히 다가온다.
-   동작 줄이기면 넓어지는 전환과 다가오기 없이 바로 바뀐다. */
+/* 첫 화면: 상단 메뉴 + 촬영 종류 카드 세 장(증명, 프로필, 가족). 휴대폰은 위아래로 쌓는다. */
 const SHOOTS = [
   { concept: "증명" as Concept, img: "id-passport", name: "증명사진", price: ID_PRICES[0][2], time: "20분", note: "보정 1장, 출력 8매, 파일" },
   { concept: "프로필" as Concept, img: "pf-biz", name: "프로필", price: PKGS[0].price, time: `${PKGS[0].time}부터`, note: `${PKGS[0].shots}부터, 원본 제공 패키지` },
@@ -207,24 +152,19 @@ const MENU: [string, string, Concept?][] = [
   ["ps-map", "오시는 길"],
 ];
 
-const GROW = "cubic-bezier(0.22, 1, 0.36, 1)";
-
 function Poster({
-  reduce,
   go,
   onConcept,
   openDay,
   openLeft,
   onOpenDay,
 }: {
-  reduce: boolean;
   go: (id: string) => void;
   onConcept: (c: Concept) => void;
   openDay: Date;
   openLeft: number;
   onOpenDay: () => void;
 }) {
-  const [active, setActive] = useState(0);
   const [menu, setMenu] = useState(false);
   const ref = useRef<HTMLElement>(null);
   const inView = useInView(ref, { amount: 0.25 });
@@ -297,92 +237,41 @@ function Poster({
         </p>
       </div>
 
-      {/* 촬영 종류 3분할 */}
-      <ul className="mx-auto flex max-w-[1440px] flex-col gap-2 px-4 md:h-[max(480px,calc(100svh-230px))] md:flex-row md:px-6">
-        {SHOOTS.map((s, i) => {
-          const on = active === i;
-          return (
-            <li
-              key={s.name}
-              className={`relative min-w-0 overflow-hidden rounded-[6px] ${on ? "h-[46svh] min-h-[300px]" : "h-[22svh] min-h-[150px]"} md:h-auto md:min-h-0`}
-              style={{
-                flexGrow: on ? 2 : 1,
-                flexBasis: 0,
-                transition: reduce ? "none" : `flex-grow 0.45s ${GROW}, height 0.45s ${GROW}`,
-                background: C.panel,
-              }}
-              onMouseEnter={() => setActive(i)}
-            >
-              <button
-                type="button"
-                aria-expanded={on}
-                aria-controls={`ps-shoot-${i}`}
-                aria-label={`${s.name} 펼치기`}
-                onClick={() => setActive(i)}
-                onFocus={() => setActive(i)}
-                className={`absolute inset-0 block h-full w-full ${focusRing} focus-visible:outline-offset-[-3px]`}
-              >
-                <motion.span
-                  aria-hidden
-                  className="absolute inset-0 block"
-                  initial={reduce ? false : { scale: 1.04 }}
-                  animate={{ scale: 1 }}
-                  transition={{ duration: reduce ? 0 : 1.6, ease: EASE }}
-                >
-                  {/* eslint-disable-next-line @next/next/no-img-element -- 정적 export 라 next/image 최적화를 쓰지 않는다 */}
-                  <img
-                    src={`${IMG}/${s.img}.jpg`}
-                    alt=""
-                    fetchPriority={i === 0 ? "high" : undefined}
-                    className="h-full w-full object-cover"
-                    style={{ objectPosition: "50% 30%", filter: on ? "none" : "brightness(0.78)", transition: reduce ? "none" : "filter 0.3s" }}
-                  />
-                </motion.span>
-              </button>
-              {/* 아래 이름판: 그라데이션 대신 단색 판 */}
-              <div id={`ps-shoot-${i}`} className="pointer-events-none absolute inset-x-2 bottom-2 rounded-[4px] px-3 py-2.5 md:inset-x-3 md:bottom-3 md:px-4 md:py-3" style={{ background: "rgba(20,20,20,0.88)" }}>
-                <p className="flex flex-wrap items-baseline justify-between gap-x-3">
-                  <span className="text-[18px] font-bold md:text-[20px]" style={{ color: C.text }}>
-                    {s.name}
-                  </span>
-                  <span className="text-[15px] font-semibold tabular-nums" style={{ color: C.accent }}>
-                    {won(s.price)}부터
-                  </span>
-                </p>
-                <p className={`mt-0.5 items-center gap-1 text-[14px] ${on ? "inline-flex" : "hidden md:inline-flex"}`} style={{ color: C.muted }}>
-                  <Clock size={14} aria-hidden />
-                  촬영 {s.time}
-                </p>
-                {on && (
-                  <div className="pointer-events-auto mt-2.5">
-                    <p className="text-[14px]" style={{ color: "#d6d6d6" }}>
-                      {s.note}
-                    </p>
-                    <div className="mt-2.5 flex flex-wrap gap-2">
-                      <button
-                        type="button"
-                        onClick={() => nav("ps-gallery", s.concept)}
-                        className={`inline-flex min-h-11 items-center rounded-[4px] border px-3.5 text-[15px] font-semibold ${focusRing}`}
-                        style={{ borderColor: "#555555", color: C.text }}
-                      >
-                        사진 보기
-                      </button>
-                      <button
-                        type="button"
-                        onClick={() => go("ps-book")}
-                        data-gtm-cta={`photo-studio_shoot_${s.img}`}
-                        className={`inline-flex min-h-11 items-center gap-1.5 rounded-[4px] px-3.5 text-[15px] font-semibold ${focusRing}`}
-                        style={{ background: C.accent, color: C.accentInk }}
-                      >
-                        이 촬영 예약
-                      </button>
-                    </div>
-                  </div>
-                )}
+      {/* 촬영 종류 카드 세 장 */}
+      <ul className="mx-auto grid max-w-[1200px] gap-4 px-4 md:grid-cols-3 md:px-6">
+        {SHOOTS.map((s, i) => (
+          <li key={s.name} className="min-w-0 overflow-hidden rounded-[6px] border" style={{ borderColor: C.line, background: C.panel }}>
+            <div className="aspect-[4/5] overflow-hidden md:aspect-[4/5]">
+              {/* eslint-disable-next-line @next/next/no-img-element -- 정적 export 라 next/image 최적화를 쓰지 않는다 */}
+              <img src={`${IMG}/${s.img}.jpg`} alt={`${s.name} 촬영 예시`} width={640} height={800} fetchPriority={i === 0 ? "high" : undefined} className="h-full w-full object-cover" style={{ objectPosition: "50% 30%" }} />
+            </div>
+            <div className="p-4">
+              <p className="flex flex-wrap items-baseline justify-between gap-x-3">
+                <span className="text-[20px] font-bold" style={{ color: C.text }}>
+                  {s.name}
+                </span>
+                <span className="text-[16px] font-semibold tabular-nums" style={{ color: C.accent }}>
+                  {won(s.price)}부터
+                </span>
+              </p>
+              <p className="mt-1 inline-flex items-center gap-1 text-[14px]" style={{ color: C.muted }}>
+                <Clock size={14} aria-hidden />
+                촬영 {s.time}
+              </p>
+              <p className="mt-1 text-[14px]" style={{ color: "#d6d6d6" }}>
+                {s.note}
+              </p>
+              <div className="mt-3 flex flex-wrap gap-2">
+                <button type="button" onClick={() => nav("ps-gallery", s.concept)} className={`inline-flex min-h-11 items-center rounded-[4px] border px-3.5 text-[15px] font-semibold ${focusRing}`} style={{ borderColor: "#555555", color: C.text }}>
+                  사진 보기
+                </button>
+                <button type="button" onClick={() => go("ps-book")} data-gtm-cta={`photo-studio_shoot_${s.img}`} className={`inline-flex min-h-11 items-center gap-1.5 rounded-[4px] px-3.5 text-[15px] font-semibold ${focusRing}`} style={{ background: C.accent, color: C.accentInk }}>
+                  이 촬영 예약
+                </button>
               </div>
-            </li>
-          );
-        })}
+            </div>
+          </li>
+        ))}
       </ul>
 
       {/* 예약 가능한 가장 가까운 날. PC 왼쪽 아래는 사용법 버튼 자리라 오른쪽에 둔다 */}
@@ -421,11 +310,9 @@ export function PhotoStudioDemo() {
   const today = useDemoToday();
   const reduce = useReducedMotionSafe();
 
-  /* 1. 컨셉 필터, 3. 배경지 */
+  /* 1. 컨셉 필터 */
   const [concept, setConcept] = useState<Concept | "전체">("전체");
-  const [backdrop, setBackdrop] = useState<BackdropId>("white");
   const visible = concept === "전체" ? CARDS : CARDS.filter((c) => c.concept === concept);
-
 
   useEffect(() => {
     const f = () => window.scrollTo({ top: 0 });
@@ -436,7 +323,6 @@ export function PhotoStudioDemo() {
   const go = (id: string) => document.getElementById(id)?.scrollIntoView({ behavior: reduce ? "auto" : "smooth", block: "start" });
 
   const pickConcept = (c: Concept | "전체") => setConcept(c);
-  const pickBackdrop = (id: BackdropId) => setBackdrop(id);
 
   /* 2. 패키지 */
   const [pkg, setPkg] = useState<PkgId>("standard");
@@ -495,7 +381,6 @@ export function PhotoStudioDemo() {
   return (
     <div className="min-h-screen overflow-x-clip" style={{ background: C.bg, color: C.text }}>
       <Poster
-        reduce={reduce}
         go={go}
         onConcept={pickConcept}
         openDay={days[firstOpen]}
@@ -506,7 +391,7 @@ export function PhotoStudioDemo() {
         }}
       />
 
-      {/* 1. 갤러리: 보통 세로 스크롤 격자. 컨셉을 고르면 그 컨셉 사진만 남고 나머지는 자리를 옮긴다 */}
+      {/* 1. 갤러리: 세로 격자. 컨셉을 고르면 그 컨셉 사진만 남는다 */}
       <section id="ps-gallery" aria-labelledby="ps-gallery-title" className="mx-auto max-w-[1200px] scroll-mt-4 px-4 pt-12 md:px-6 md:pt-16">
         <Title id="ps-gallery-title">갤러리</Title>
         <div id="ps-filter" role="group" aria-label="촬영 컨셉" className="mt-4 flex flex-wrap gap-2">
@@ -516,68 +401,27 @@ export function PhotoStudioDemo() {
             </button>
           ))}
         </div>
-        <motion.ul layout={!reduce} className="mt-6 grid grid-cols-2 gap-3 md:grid-cols-3 md:gap-5 lg:grid-cols-4">
-          <AnimatePresence initial={false} mode="popLayout">
-            {visible.map((card) => (
-              <motion.li
-                key={card.id}
-                layout={reduce ? false : "position"}
-                initial={reduce ? false : { opacity: 0, scale: 0.97 }}
-                animate={{ opacity: 1, scale: 1 }}
-                exit={reduce ? { opacity: 0, transition: { duration: 0 } } : { opacity: 0, scale: 0.97, transition: { duration: DUR_UI } }}
-                transition={{ duration: reduce ? 0 : DUR_CARD, ease: EASE }}
-              >
-                <figure>
-                  <div className="aspect-[4/5] overflow-hidden rounded-[4px]" style={{ background: card.bg }}>
-                    {/* eslint-disable-next-line @next/next/no-img-element -- 정적 export 라 next/image 최적화를 쓰지 않는다 */}
-                    <img src={`${IMG}/${card.id}.jpg`} alt={`${card.name} 촬영 예시`} loading="lazy" width={640} height={800} className="h-full w-full object-cover transition-transform duration-500 hover:scale-[1.03]" />
-                  </div>
-                  <figcaption className="mt-2">
-                    <span className="text-[13px] font-semibold" style={{ color: C.accent }}>
-                      {card.concept}
-                    </span>
-                    <span className="block text-[16px] font-bold leading-snug md:text-[17px]">{card.name}</span>
-                    <span className="block text-[13px]" style={{ color: C.muted }}>
-                      조명 {card.light}
-                    </span>
-                  </figcaption>
-                </figure>
-              </motion.li>
-            ))}
-          </AnimatePresence>
-        </motion.ul>
-
-        {/* 배경지: 고른 색으로 찍은 같은 사람 사진과 어울리는 옷 색 안내 */}
-        <div id="ps-backdrop" className="mt-12 grid gap-6 rounded-[6px] border p-4 md:grid-cols-[260px_minmax(0,1fr)] md:items-center md:gap-8 md:p-6" style={{ borderColor: C.line, background: C.panel2 }}>
-          <div className="relative mx-auto aspect-[4/5] w-full max-w-[260px] overflow-hidden rounded-[4px]" style={{ background: backdropHex(backdrop) }}>
-            <AnimatePresence initial={false}>
-              <motion.img
-                key={backdrop}
-                src={`${IMG}/bd-${backdrop}.jpg`}
-                alt={`${BACKDROPS.find((b) => b.id === backdrop)!.name} 배경지로 찍은 프로필 예시`}
-                width={640}
-                height={800}
-                className="absolute inset-0 h-full w-full object-cover"
-                initial={reduce ? false : { opacity: 0 }}
-                animate={{ opacity: 1 }}
-                exit={{ opacity: 0 }}
-                transition={{ duration: reduce ? 0 : 0.3 }}
-              />
-            </AnimatePresence>
-          </div>
-          <div>
-            <h3 className="text-[20px] font-bold md:text-[22px]">배경지 색</h3>
-            <div role="group" aria-label="배경지 색" className="mt-3 flex flex-wrap gap-1">
-              {BACKDROPS.map((b) => (
-                <Roll key={b.id} b={b} on={backdrop === b.id} onPick={() => pickBackdrop(b.id)} />
-              ))}
-            </div>
-            <p className="mt-3 max-w-[560px] text-[15px] leading-[1.7]" style={{ color: C.text }} aria-live="polite">
-              <Shirt size={16} aria-hidden className="mr-1.5 inline-block align-[-3px]" style={{ color: C.accent }} />
-              {BACKDROPS.find((b) => b.id === backdrop)!.tip}
-            </p>
-          </div>
-        </div>
+        <ul className="mt-6 grid grid-cols-2 gap-3 md:grid-cols-3 md:gap-5 lg:grid-cols-4">
+          {visible.map((card) => (
+            <li key={card.id}>
+              <figure>
+                <div className="aspect-[4/5] overflow-hidden rounded-[4px]" style={{ background: card.bg }}>
+                  {/* eslint-disable-next-line @next/next/no-img-element -- 정적 export 라 next/image 최적화를 쓰지 않는다 */}
+                  <img src={`${IMG}/${card.id}.jpg`} alt={`${card.name} 촬영 예시`} loading="lazy" width={640} height={800} className="h-full w-full object-cover" />
+                </div>
+                <figcaption className="mt-2">
+                  <span className="text-[13px] font-semibold" style={{ color: C.accent }}>
+                    {card.concept}
+                  </span>
+                  <span className="block text-[16px] font-bold leading-snug md:text-[17px]">{card.name}</span>
+                  <span className="block text-[13px]" style={{ color: C.muted }}>
+                    조명 {card.light}
+                  </span>
+                </figcaption>
+              </figure>
+            </li>
+          ))}
+        </ul>
       </section>
 
       {/* 2. 상품 안내와 가격 */}
@@ -909,7 +753,7 @@ export function PhotoStudioDemo() {
                   >
                     <Icon size={16} aria-hidden />
                     {label}
-                    {on && <motion.span layoutId={reduce ? undefined : "ps-tab-line"} className="absolute inset-x-3 bottom-0 h-[3px] rounded-full" style={{ background: C.accent }} transition={{ duration: DUR_UI, ease: EASE }} />}
+                    {on && <span aria-hidden className="absolute inset-x-3 bottom-0 h-[3px] rounded-full" style={{ background: C.accent }} />}
                   </button>
                 );
               })}
@@ -1012,7 +856,7 @@ const GUIDE = {
   ],
   dress: [
     "무늬 없는 단색 상의가 얼굴에 시선을 모아요. 잔 줄무늬와 체크는 화면에 물결이 생겨요.",
-    "배경지와 같은 계열 옷은 묻혀요. 위 배경지 안내를 보고 반대 톤으로 골라 주세요.",
+    "배경지와 같은 계열 옷은 묻혀요. 흰 배경에는 진한 상의, 색 배경에는 흰색이나 베이지 상의가 잘 받아요.",
     "가족, 우정사진은 톤을 맞춰요. 전부 같은 옷보다 흰색과 베이지, 네이비처럼 두세 색 안에서.",
     "안경은 반사 방지 코팅이면 그대로. 광택 있는 소재는 조명에 번져요.",
   ],
@@ -1090,11 +934,8 @@ function StudioMap() {
 function SampleLogo({ light, small }: { light?: boolean; small?: boolean }) {
   return (
     <span className="inline-flex items-center gap-2" style={{ color: light ? "#ffffff" : "#111111" }}>
-      {/* eslint-disable-next-line @next/next/no-img-element -- 메인 사이트와 같은 곰 로고 */}
-      <img src="/images/logo-bear.png" alt="" aria-hidden width={28} height={28} className={small ? "h-6 w-6 shrink-0" : "h-7 w-7 shrink-0"} />
       <span className="flex items-baseline gap-1 whitespace-nowrap">
-        <span className={`${small ? "text-[18px]" : "text-[20px]"} font-bold leading-none tracking-[-0.03em]`}>곰파트너</span>
-        <span className="text-[12px] font-semibold leading-none opacity-75">카탈로그</span>
+        <span className={`${small ? "text-[18px]" : "text-[20px]"} font-bold leading-none tracking-[-0.03em]`}>사진관</span>
       </span>
     </span>
   );

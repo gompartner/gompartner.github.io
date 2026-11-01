@@ -12,7 +12,7 @@ import { DemoMakerInfo } from "@/components/demos/DemoMakerInfo";
    구성: 실제 동네 피부과에서 흔한 두 갈래형.
    첫 화면을 "피부질환 진료"(건강보험)와 "피부미용 시술"(비급여) 두 판으로 나누고,
    메뉴와 문의 전화도 일반진료 / 시술상담 둘로 나눈다. 갈래마다 색을 따로 쓴다.
-   메인은 첫 화면 사진, 두 갈래 진료 안내, 요일별 진료시간 띠(오늘 강조), 장비소개 탭, 의료진, 공지사항 · 오시는 길 순서.
+   메인은 첫 화면 사진, 두 갈래 진료 안내, 요일별 진료시간 띠, 장비소개 탭, 의료진, 공지사항 · 오시는 길 순서.
    하위 페이지는 라우트를 늘리지 않고 상태로 화면을 바꾼다(기본 패키지 5쪽 구성).
 
    사진 출처(Unsplash 무료 라이선스, public/images/demo-clinic-homepage):
@@ -21,7 +21,7 @@ import { DemoMakerInfo } from "@/components/demos/DemoMakerInfo";
    lobby Ishan Sharma(0EWVvxSyDE0), doctor-a·doctor-b AI 생성(Z-Image-Turbo, Apache 2.0) */
 
 const IMG = "/images/demo-clinic-homepage";
-const CLINIC = "곰파트너";
+const CLINIC = "피부과의원";
 const TEL_MED = "02-000-0000";
 const TEL_COS = "02-000-0001";
 const ADDRESS = "ㅎㄷ시 ㅁㄹ로 123 ㅈㅇ빌딩 4층";
@@ -159,32 +159,15 @@ const DOCTORS = [
 
 /* ---------- 진료시간 ---------- */
 
-// 0=일요일 ~ 6=토요일, 월요일부터 적는다
 const HOURS = [
-  { short: "월", label: "월요일", day: 1, start: "09:30", end: "19:00", open: [570, 1140] },
-  { short: "화", label: "화요일", day: 2, start: "09:30", end: "19:00", open: [570, 1140] },
-  { short: "수", label: "수요일", day: 3, start: "09:30", end: "19:00", open: [570, 1140] },
-  { short: "목", label: "목요일", day: 4, start: "09:30", end: "19:00", open: [570, 1140] },
-  { short: "금", label: "금요일", day: 5, start: "09:30", end: "19:00", open: [570, 1140] },
-  { short: "토", label: "토요일", day: 6, start: "09:30", end: "14:00", open: [570, 840] },
-  { short: "일", label: "일요일, 공휴일", day: 0, start: "", end: "", open: null },
+  { short: "월", label: "월요일", start: "09:30", end: "19:00", open: true },
+  { short: "화", label: "화요일", start: "09:30", end: "19:00", open: true },
+  { short: "수", label: "수요일", start: "09:30", end: "19:00", open: true },
+  { short: "목", label: "목요일", start: "09:30", end: "19:00", open: true },
+  { short: "금", label: "금요일", start: "09:30", end: "19:00", open: true },
+  { short: "토", label: "토요일", start: "09:30", end: "14:00", open: true },
+  { short: "일", label: "일요일, 공휴일", start: "", end: "", open: false },
 ] as const;
-
-type Now = { day: number; minutes: number };
-
-function useToday() {
-  const [now, setNow] = useState<Now | null>(null);
-  useEffect(() => {
-    const update = () => {
-      const d = new Date();
-      setNow({ day: d.getDay(), minutes: d.getHours() * 60 + d.getMinutes() });
-    };
-    update();
-    const timer = window.setInterval(update, 60_000);
-    return () => window.clearInterval(timer);
-  }, []);
-  return now;
-}
 
 /* ---------- 법정 비급여 진료비 ---------- */
 
@@ -229,7 +212,6 @@ export function ClinicHomepageDemo() {
   const [page, setPage] = useState<Page>("home");
   const [feeTab, setFeeTab] = useState<"price" | "legal">("price");
   const [menuOpen, setMenuOpen] = useState(false);
-  const now = useToday();
   useEffect(() => {
     const f = () => {
       setPage("home");
@@ -331,11 +313,11 @@ export function ClinicHomepageDemo() {
       </header>
 
       <main key={page} className="soft-in">
-        {page === "home" && <Home now={now} go={go} />}
-        {page === "medical" && <MedicalPage now={now} />}
+        {page === "home" && <Home go={go} />}
+        {page === "medical" && <MedicalPage />}
         {page === "beauty" && <BeautyPage go={go} />}
         {page === "fees" && <FeesPage tab={feeTab} setTab={setFeeTab} />}
-        {page === "about" && <AboutPage now={now} />}
+        {page === "about" && <AboutPage />}
         {page === "notice" && <NoticePage />}
       </main>
 
@@ -470,7 +452,7 @@ function PageBand({ title, sub, track, children }: { title: string; sub: string;
 
 /* ---------- 메인 ---------- */
 
-function Home({ now, go }: { now: Now | null; go: (p: Page) => void }) {
+function Home({ go }: { go: (p: Page) => void }) {
   const today = useDemoToday();
   return (
     <>
@@ -517,7 +499,7 @@ function Home({ now, go }: { now: Now | null; go: (p: Page) => void }) {
         />
       </section>
 
-      <WeekHours id="today-hours" now={now} />
+      <WeekHours id="today-hours" />
 
       <EquipmentSection />
 
@@ -622,8 +604,8 @@ function WayPanel({
   );
 }
 
-/** 요일별 진료시간 띠. 오늘 칸만 진하게 채우고 다른 실시간 표시는 두지 않는다 */
-function WeekHours({ id, now }: { id: string; now: Now | null }) {
+/** 요일별 진료시간 띠. 고정 표 */
+function WeekHours({ id }: { id: string }) {
   return (
     <section id={id} className="border-b bg-white" style={{ borderColor: C.line }} aria-labelledby={`${id}-title`}>
       <div className={`${container} grid gap-6 py-8 md:py-10 lg:grid-cols-[220px_1fr] lg:items-center`}>
@@ -635,15 +617,13 @@ function WeekHours({ id, now }: { id: string; now: Now | null }) {
         <div>
           <ol className="grid grid-cols-7 gap-1 sm:gap-2" aria-label="요일별 진료시간">
             {HOURS.map((h) => {
-              const isToday = now?.day === h.day;
               return (
                 <li
                   key={h.short}
                   className="flex flex-col items-center rounded-[6px] px-0.5 py-3 text-center"
-                  style={{ backgroundColor: isToday ? C.ink : C.paper, color: isToday ? "#fff" : C.ink, border: `1px solid ${isToday ? C.ink : C.line}` }}
-                  aria-current={isToday ? "date" : undefined}
+                  style={{ backgroundColor: C.paper, color: C.ink, border: `1px solid ${C.line}` }}
                 >
-                  <span className="text-[15px] font-semibold" style={{ color: isToday ? "#fff" : h.open ? C.ink : "#b3261e" }}>
+                  <span className="text-[15px] font-semibold" style={{ color: h.open ? C.ink : "#b3261e" }}>
                     <span className="sr-only">{h.label}</span>
                     <span aria-hidden>{h.short}</span>
                   </span>
@@ -657,7 +637,7 @@ function WeekHours({ id, now }: { id: string; now: Now | null }) {
                       {h.end}
                     </span>
                   ) : (
-                    <span className="mt-1 text-[13px] font-semibold sm:text-[15px]" style={{ color: isToday ? "#fff" : "#b3261e" }}>
+                    <span className="mt-1 text-[13px] font-semibold sm:text-[15px]" style={{ color: "#b3261e" }}>
                       휴진
                     </span>
                   )}
@@ -754,7 +734,7 @@ function Location() {
 
 /* ---------- 피부질환 진료 ---------- */
 
-function MedicalPage({ now }: { now: Now | null }) {
+function MedicalPage() {
   const t = TRACK.medical;
   return (
     <>
@@ -813,7 +793,7 @@ function MedicalPage({ now }: { now: Now | null }) {
         </div>
       </section>
 
-      <WeekHours id="medical-hours" now={now} />
+      <WeekHours id="medical-hours" />
     </>
   );
 }
@@ -999,7 +979,7 @@ function FeesPage({ tab, setTab }: { tab: "price" | "legal"; setTab: (t: "price"
 
 /* ---------- 병원소개 ---------- */
 
-function AboutPage({ now }: { now: Now | null }) {
+function AboutPage() {
   return (
     <>
       <PageBand title="병원소개" sub="피부과 전문의 2인 진료" />
@@ -1035,7 +1015,7 @@ function AboutPage({ now }: { now: Now | null }) {
           </div>
         </div>
       </section>
-      <WeekHours id="about-hours" now={now} />
+      <WeekHours id="about-hours" />
       <section className={`${container} py-12 md:py-16`} aria-labelledby="about-location">
         <h2 id="about-location" className={h2}>
           오시는 길
@@ -1116,11 +1096,8 @@ function NoticePage() {
 function BrandLogo() {
   return (
     <span className="inline-flex items-center gap-2">
-      {/* eslint-disable-next-line @next/next/no-img-element -- 메인 사이트와 같은 곰 로고 */}
-      <img src="/images/logo-bear.png" alt="" aria-hidden width={28} height={28} className="h-7 w-7 shrink-0" />
       <span className="flex items-baseline gap-1 whitespace-nowrap">
-        <span className="text-[20px] font-semibold tracking-[-0.03em]">곰파트너</span>
-        <span className="text-[12px] font-medium opacity-75">카탈로그</span>
+        <span className="text-[20px] font-semibold tracking-[-0.03em]">피부과의원</span>
       </span>
     </span>
   );

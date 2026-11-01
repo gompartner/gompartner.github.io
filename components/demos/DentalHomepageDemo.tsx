@@ -15,7 +15,7 @@ import { DemoMakerInfo } from "@/components/demos/DemoMakerInfo";
    대메뉴 6개에 마우스를 올리거나 초점을 주면 하위 메뉴 전체가 한 번에 펼쳐지는 펼침 메뉴,
    넓은 화면 오른쪽에 고정 퀵메뉴(네이버 예약, 카카오톡 상담, 전화 상담, 비급여 안내, 오시는 길, TOP),
    좁은 화면에는 아래쪽 빠른 메뉴 막대(예약, 카카오톡, 길찾기, 전화)를 둔다.
-   메인은 배너, 진료과목 이름 띠, 공지사항과 진료시간, 상담 전화 줄, 증상 자가체크(치아 차트), 의료진 순서.
+   메인은 배너, 진료과목 이름 띠, 공지사항과 진료시간, 상담 전화 줄, 증상별 안내, 의료진 순서.
    하위 페이지는 라우트를 늘리지 않고 상태로 화면을 바꾼다.
 
    디자인: 흰 바탕에 짙은 청록 잉크(#10302f)와 청록 강조색(#0b6664), 옅은 민트(#e3f1ef).
@@ -26,7 +26,7 @@ import { DemoMakerInfo } from "@/components/demos/DemoMakerInfo";
    caries Katarzyna Zygnerska(rubu_NvklJE), scaling Quilia(y8fWicGsv4g), ct Quang Tri NGUYEN(VckdJzo7ig0) */
 
 const IMG = "/images/demo-dental";
-const CLINIC = "곰파트너";
+const CLINIC = "동네 치과";
 const TEL = "02-000-0000";
 const ADDRESS = "ㄷㅅ시 ㅎㄷ로 45 ㅅㅈ타워 3층";
 
@@ -166,7 +166,6 @@ const MENUS: { id: MenuId; label: string; subs: SubMenu[] }[] = [
     id: "symptom",
     label: "증상별 안내",
     subs: [
-      { id: "selfcheck", label: "증상 자가체크" },
       { id: "list", label: "증상별 안내" },
     ],
   },
@@ -192,30 +191,18 @@ const MENUS: { id: MenuId; label: string; subs: SubMenu[] }[] = [
 type View = { page: "home" } | { page: "sub"; menu: MenuId; sub: string };
 type Go = (menu: MenuId | "home", sub?: string) => void;
 
-/* ---------- 치아 지도 데이터 ---------- */
-
-type Kind = "front" | "premolar" | "molar" | "wisdom";
-type Selection = number | "gum";
+/* ---------- 증상별 안내 ---------- */
 
 interface Symptom {
   text: string;
-  treatment: TreatmentId;
+  treatment: Exclude<TreatmentId, "check">;
   body: string;
-  visits: string;
-  insurance: string;
-  cost: string;
-  /** 빠진 이: 그림에서 고른 치아를 점선으로 비운다 */
-  missing?: boolean;
 }
 
 const MISSING: Symptom = {
   text: "치아가 빠졌을 때",
   treatment: "implant",
   body: "치아가 빠진 채로 오래 두면 주변 치아가 기울어지고 잇몸뼈가 줄어듭니다. CT 검사 후 임플란트, 브리지, 틀니 중 알맞은 치료를 권해 드립니다.",
-  visits: "3~6개월, 5~7회",
-  insurance: "만 65세 이상 평생 2개 적용",
-  cost: "1개 110만 원, 보험 적용 시 본인부담 40만 원 안팎",
-  missing: true,
 };
 
 const MOLAR_SYMPTOMS: Symptom[] = [
@@ -223,166 +210,65 @@ const MOLAR_SYMPTOMS: Symptom[] = [
     text: "씹으면 아플 때",
     treatment: "endo",
     body: "충치가 신경 가까이 진행되었거나 치아에 금이 간 경우가 많습니다. 엑스레이로 확인한 뒤 신경치료 여부를 결정합니다.",
-    visits: "3~4회",
-    insurance: "신경치료는 적용, 크라운은 비급여",
-    cost: "신경치료 3만~5만 원, 지르코니아 크라운 50만 원",
   },
   {
     text: "이가 시릴 때",
     treatment: "caries",
     body: "초기 충치이거나 잇몸이 내려가 치아 뿌리가 드러난 경우입니다. 충치는 치료하고, 시린 부위는 약제를 바르거나 레진으로 덮어 줍니다.",
-    visits: "1~2회",
-    insurance: "대부분 적용",
-    cost: "1만~3만 원",
   },
   {
     text: "치아가 까맣게 변했을 때",
     treatment: "caries",
     body: "겉보다 안쪽으로 넓게 퍼진 충치일 수 있습니다. 충치 크기에 따라 레진이나 인레이로 치료합니다.",
-    visits: "1~2회",
-    insurance: "레진, 인레이는 비급여 (만 12세 이하 영구치 레진은 적용)",
-    cost: "레진 10만 원, 금 인레이 40만 원",
   },
   MISSING,
 ];
 
-const SYMPTOMS: Record<Kind | "gum", Symptom[]> = {
-  front: [
+const SYMPTOM_GROUPS: { label: string; list: Symptom[] }[] = [
+  { label: "앞니", list: [
     {
       text: "치아 색이 누렇게 변했을 때",
       treatment: "whitening",
       body: "커피, 차, 흡연 등으로 생긴 착색은 미백으로 개선할 수 있습니다. 충치나 잇몸 염증이 있으면 먼저 치료한 뒤 진행합니다.",
-      visits: "1~3회",
-      insurance: "비급여",
-      cost: "전문가 미백 1회 20만 원",
     },
     {
       text: "치열이 고르지 않을 때",
       treatment: "ortho",
       body: "덧니, 벌어진 앞니, 돌출입은 교정 치료로 개선할 수 있습니다. 정밀 검사 후 투명교정과 장치 교정 중 알맞은 방법을 권해 드립니다.",
-      visits: "1년 6개월 안팎, 4~6주마다",
-      insurance: "비급여",
-      cost: "투명교정 480만 원, 장치 교정 350만 원",
     },
     {
       text: "치아가 깨졌을 때",
       treatment: "caries",
       body: "조금 깨졌으면 치아와 비슷한 레진을 추천하여 치료합니다. 많이 깨진 경우에는 신경 상태를 확인한 뒤 크라운으로 치료합니다.",
-      visits: "1회",
-      insurance: "비급여",
-      cost: "레진 10만 원",
     },
     MISSING,
-  ],
-  premolar: MOLAR_SYMPTOMS,
-  molar: MOLAR_SYMPTOMS,
-  wisdom: [
+  ] },
+  { label: "어금니", list: MOLAR_SYMPTOMS },
+  { label: "사랑니", list: [
     {
       text: "사랑니 주변이 붓고 아플 때",
       treatment: "wisdom",
       body: "사랑니 주변 잇몸에 염증이 생긴 경우입니다. 염증을 가라앉힌 뒤 파노라마 사진으로 발치 여부를 결정합니다.",
-      visits: "1~2회, 실밥 제거 1회",
-      insurance: "적용",
-      cost: "2만~5만 원",
     },
     {
       text: "사랑니가 누워 났을 때",
       treatment: "wisdom",
       body: "누워 있는 사랑니는 앞 어금니에 충치를 만들기 쉽습니다. CT로 신경과의 거리를 확인한 뒤 발치합니다.",
-      visits: "1회, 실밥 제거 1회",
-      insurance: "발치는 적용, CT는 비급여",
-      cost: "3만~6만 원, CT 8만 원",
     },
-  ],
-  gum: [
+  ] },
+  { label: "잇몸", list: [
     {
       text: "잇몸에서 피가 날 때",
       treatment: "scaling",
       body: "대부분 치석으로 인한 잇몸 염증입니다. 스케일링으로 좋아지는 경우가 많습니다.",
-      visits: "1회",
-      insurance: "만 19세 이상 1년에 한 번 적용",
-      cost: "1만 5천 원 안팎",
     },
     {
       text: "잇몸이 붓고 내려앉았을 때",
       treatment: "gum",
       body: "잇몸 속 깊이 치석이 쌓인 치주염일 수 있습니다. 잇몸 치료를 부위별로 나누어 진행합니다.",
-      visits: "2~4회",
-      insurance: "적용",
-      cost: "회당 1만~3만 원",
     },
-  ],
-};
-
-const kindOf = (fdi: number): Kind => {
-  const d = fdi % 10;
-  if (d <= 3) return "front";
-  if (d <= 5) return "premolar";
-  if (d <= 7) return "molar";
-  return "wisdom";
-};
-
-const QUADRANT_NAME: Record<number, string> = { 1: "위 오른쪽", 2: "위 왼쪽", 3: "아래 왼쪽", 4: "아래 오른쪽" };
-const TOOTH_NAME: Record<number, string> = {
-  1: "가운데 앞니",
-  2: "옆 앞니",
-  3: "송곳니",
-  4: "첫째 작은어금니",
-  5: "둘째 작은어금니",
-  6: "첫째 큰어금니",
-  7: "둘째 큰어금니",
-  8: "사랑니",
-};
-const toothLabel = (fdi: number) => `${QUADRANT_NAME[Math.floor(fdi / 10)]} ${TOOTH_NAME[fdi % 10]}`;
-
-const QUICK: { label: string; select: Selection }[] = [
-  { label: "앞니", select: 11 },
-  { label: "어금니", select: 36 },
-  { label: "사랑니", select: 38 },
-  { label: "잇몸", select: "gum" },
+  ] },
 ];
-
-interface Preset {
-  select: Selection;
-  index: number;
-}
-
-/* ---------- 치아 차트(FDI) ---------- */
-
-type ToothShape = "incisor" | "canine" | "premolar" | "molar";
-
-/** 정면에서 본 치아 선화. 위턱 기준(뿌리가 위, 머리가 아래), 세로 64. 아래턱은 뒤집어 그린다 */
-const TOOTH_SHAPE: Record<ToothShape, { w: number; crown: string; roots: string[] }> = {
-  incisor: {
-    w: 18,
-    crown: "M4.5 30 L3 54 Q3 59 9 59 Q15 59 15 54 L13.5 30 Z",
-    roots: ["M5 31 L7.6 5 Q9 2.5 10.4 5 L13 31"],
-  },
-  canine: {
-    w: 19,
-    crown: "M4.5 30 L3 48 Q5 54 9.5 60 Q14 54 16 48 L14.5 30 Z",
-    roots: ["M5 31 L8 2.5 Q9.5 0.5 11 2.5 L14 31"],
-  },
-  premolar: {
-    w: 20,
-    crown: "M4.5 30 L3 51 Q3 58 10 58 Q17 58 17 51 L15.5 30 Z",
-    roots: ["M5.5 31 L8.6 7 Q10 5 11.4 7 L14.5 31"],
-  },
-  molar: {
-    w: 28,
-    crown: "M4 30 L2.5 52 Q2.5 58 7.5 58 Q11 58 14 55.5 Q17 58 20.5 58 Q25.5 58 25.5 52 L24 30 Z",
-    roots: ["M4.5 31 L6.5 9 Q8 6.5 9.5 9 L12.5 31", "M15.5 31 L18.5 9 Q20 6.5 21.5 9 L23.5 31"],
-  },
-};
-
-const shapeOf = (fdi: number): ToothShape => {
-  const d = fdi % 10;
-  return d <= 2 ? "incisor" : d === 3 ? "canine" : d <= 5 ? "premolar" : "molar";
-};
-
-/** 환자를 마주 본 차트: 그림의 왼쪽이 환자의 오른쪽 */
-const CHART_UPPER = [18, 17, 16, 15, 14, 13, 12, 11, 21, 22, 23, 24, 25, 26, 27, 28];
-const CHART_LOWER = [48, 47, 46, 45, 44, 43, 42, 41, 31, 32, 33, 34, 35, 36, 37, 38];
 
 /* ---------- 의료진 ---------- */
 
@@ -407,49 +293,23 @@ const DOCTORS = [
 
 /* ---------- 진료시간 ---------- */
 
-// 0=일요일 ~ 6=토요일, 분 단위 [시작, 끝]
 const HOURS = [
-  { label: "월요일", day: 1, time: "09:30 ~ 18:30", open: [570, 1110] },
-  { label: "화요일", day: 2, time: "09:30 ~ 21:00", open: [570, 1260], night: true },
-  { label: "수요일", day: 3, time: "09:30 ~ 18:30", open: [570, 1110] },
-  { label: "목요일", day: 4, time: "09:30 ~ 21:00", open: [570, 1260], night: true },
-  { label: "금요일", day: 5, time: "09:30 ~ 18:30", open: [570, 1110] },
-  { label: "토요일", day: 6, time: "09:30 ~ 14:00", open: [570, 840] },
-  { label: "일요일, 공휴일", day: 0, time: "휴진", open: null },
+  { label: "월요일", time: "09:30 ~ 18:30", open: true },
+  { label: "화요일", time: "09:30 ~ 21:00", open: true, night: true },
+  { label: "수요일", time: "09:30 ~ 18:30", open: true },
+  { label: "목요일", time: "09:30 ~ 21:00", open: true, night: true },
+  { label: "금요일", time: "09:30 ~ 18:30", open: true },
+  { label: "토요일", time: "09:30 ~ 14:00", open: true },
+  { label: "일요일, 공휴일", time: "휴진", open: false },
 ] as const;
-const LUNCH = [780, 840]; // 평일 13:00 ~ 14:00
 
 /** 메인 진료시간 상자: 실제 의원처럼 요일을 묶어 적는다 */
 const HOURS_GROUPED = [
-  { label: "월, 수, 금", days: [1, 3, 5], time: "09:30 ~ 18:30" },
-  { label: "화, 목", days: [2, 4], time: "09:30 ~ 21:00", night: true },
-  { label: "토요일", days: [6], time: "09:30 ~ 14:00" },
-  { label: "일요일, 공휴일", days: [0], time: "휴진" },
+  { label: "월, 수, 금", time: "09:30 ~ 18:30" },
+  { label: "화, 목", time: "09:30 ~ 21:00", night: true },
+  { label: "토요일", time: "09:30 ~ 14:00" },
+  { label: "일요일, 공휴일", time: "휴진" },
 ];
-
-function useNow() {
-  const [now, setNow] = useState<Date | null>(null);
-  useEffect(() => {
-    const update = () => setNow(new Date());
-    update();
-    const timer = window.setInterval(update, 60_000);
-    return () => window.clearInterval(timer);
-  }, []);
-  return now;
-}
-
-function openStatus(now: Date | null) {
-  if (!now) return null;
-  const day = now.getDay();
-  const minutes = now.getHours() * 60 + now.getMinutes();
-  const row = HOURS.find((h) => h.day === day);
-  if (!row || !row.open) return { text: "오늘 휴진", open: false };
-  const [start, end] = row.open;
-  if (minutes < start) return { text: "진료 시작 전", open: false };
-  if (minutes >= end) return { text: "오늘 진료 종료", open: false };
-  if (day >= 1 && day <= 5 && minutes >= LUNCH[0] && minutes < LUNCH[1]) return { text: "점심시간", open: false };
-  return { text: "진료 중", open: true };
-}
 
 /* ---------- 비급여 ---------- */
 
@@ -595,7 +455,6 @@ const btnLine =
 export function DentalHomepageDemo() {
   const [view, setView] = useState<View>({ page: "home" });
   const [reserveTreatment, setReserveTreatment] = useState<TreatmentId>("check");
-  const [preset, setPreset] = useState<Preset>({ select: 36, index: 0 });
   const [toast, setToast] = useState<string | null>(null);
 
   useEffect(() => {
@@ -625,11 +484,6 @@ export function DentalHomepageDemo() {
     go("reserve", "reserve");
   };
 
-  const openSelfcheck = (p: Preset) => {
-    setPreset(p);
-    go("symptom", "selfcheck");
-  };
-
   const linkOut = (what: "naver" | "kakao" | "map") =>
     setToast(
       what === "naver"
@@ -645,7 +499,7 @@ export function DentalHomepageDemo() {
 
       <main id="top" key={view.page === "home" ? "home" : `${view.menu}-${view.sub}`} className="soft-in">
         {view.page === "home" ? (
-          <HomePage go={go} reserve={reserve} linkOut={linkOut} />
+          <HomePage go={go} linkOut={linkOut} />
         ) : (
           <SubPage
             key={`${view.menu}-${view.sub}`}
@@ -653,8 +507,6 @@ export function DentalHomepageDemo() {
             sub={view.sub}
             go={go}
             reserve={reserve}
-            preset={preset}
-            openSelfcheck={openSelfcheck}
             reserveTreatment={reserveTreatment}
             setReserveTreatment={setReserveTreatment}
             linkOut={linkOut}
@@ -1001,10 +853,8 @@ function QuickMenu({ go, linkOut }: { go: Go; linkOut: (w: "naver" | "kakao" | "
 /** 배너 아래 진료과목 띠: 이름만 나열한다 */
 const SHORTCUTS = TREATMENT_ORDER as Exclude<TreatmentId, "check">[];
 
-function HomePage({ go, reserve, linkOut }: { go: Go; reserve: (id: TreatmentId) => void; linkOut: (w: "naver" | "kakao" | "map") => void }) {
+function HomePage({ go, linkOut }: { go: Go; linkOut: (w: "naver" | "kakao" | "map") => void }) {
   const NOTICES = useNotices();
-  const now = useNow();
-  const status = openStatus(now);
 
   return (
     <>
@@ -1076,11 +926,6 @@ function HomePage({ go, reserve, linkOut }: { go: Go; reserve: (id: TreatmentId)
         <div id="hours-box" className="rounded-[6px] p-5 md:p-6 lg:col-span-5" style={{ backgroundColor: C.ink, color: C.onInk }}>
           <div className="flex items-center justify-between border-b pb-3" style={{ borderColor: "rgba(238,246,245,0.2)" }}>
             <h2 className="text-[20px] font-bold tracking-[-0.03em]">진료시간</h2>
-            {status && (
-              <span className="text-[15px] font-bold" style={{ color: status.open ? "#bfe0db" : C.onInkMuted }}>
-                {status.text}
-              </span>
-            )}
           </div>
           <table className="mt-2 w-full">
             <caption className="sr-only">요일별 진료시간</caption>
@@ -1145,19 +990,21 @@ function HomePage({ go, reserve, linkOut }: { go: Go; reserve: (id: TreatmentId)
         </div>
       </section>
 
-      {/* 증상 자가체크 */}
-      <section id="selfcheck" aria-labelledby="selfcheck-title" style={{ backgroundColor: C.mist }}>
+      {/* 증상별 안내 */}
+      <section id="symptoms" aria-labelledby="symptoms-title" style={{ backgroundColor: C.mist }}>
         <div className={`${container} py-12 md:py-16`}>
           <div className="flex flex-wrap items-end justify-between gap-3">
-            <h2 id="selfcheck-title" className={h2}>
-              증상 자가체크
+            <h2 id="symptoms-title" className={h2}>
+              증상별 안내
             </h2>
             <button type="button" onClick={() => go("symptom", "list")} className="inline-flex items-center text-[15px] font-bold" style={{ color: C.muted }}>
-              증상별 안내
+              전체 보기
               <ChevronRight size={16} aria-hidden />
             </button>
           </div>
-          <ToothMap preset={{ select: 36, index: 0 }} onReserve={reserve} />
+          <div className="mt-8">
+            <SymptomList go={go} compact />
+          </div>
         </div>
       </section>
 
@@ -1213,8 +1060,6 @@ function SubPage({
   sub,
   go,
   reserve,
-  preset,
-  openSelfcheck,
   reserveTreatment,
   setReserveTreatment,
   linkOut,
@@ -1223,8 +1068,6 @@ function SubPage({
   sub: string;
   go: Go;
   reserve: (id: TreatmentId) => void;
-  preset: Preset;
-  openSelfcheck: (p: Preset) => void;
   reserveTreatment: TreatmentId;
   setReserveTreatment: (id: TreatmentId) => void;
   linkOut: (w: "naver" | "kakao" | "map") => void;
@@ -1299,8 +1142,7 @@ function SubPage({
         {menu === "about" && s.id === "tour" && <Tour />}
         {menu === "about" && s.id === "location" && <Location linkOut={linkOut} />}
         {menu === "treat" && <TreatmentDetail id={s.id as Exclude<TreatmentId, "check">} reserve={reserve} />}
-        {menu === "symptom" && s.id === "selfcheck" && <ToothMap preset={preset} onReserve={reserve} />}
-        {menu === "symptom" && s.id === "list" && <SymptomList openSelfcheck={openSelfcheck} />}
+        {menu === "symptom" && <SymptomList go={go} />}
         {menu === "fees" && s.id === "fees" && <Fees />}
         {menu === "fees" && s.id === "insurance" && <Insurance />}
         {menu === "community" && s.id === "notice" && <Notice no={noticeNo} go={go} />}
@@ -1471,29 +1313,31 @@ function InfoGrid({ visits, insurance, cost }: { visits: string; insurance: stri
   );
 }
 
-function SymptomList({ openSelfcheck }: { openSelfcheck: (p: Preset) => void }) {
-  const groups: { label: string; select: Selection; list: Symptom[] }[] = [
-    { label: "앞니", select: 11, list: SYMPTOMS.front },
-    { label: "어금니", select: 36, list: SYMPTOMS.molar },
-    { label: "사랑니", select: 38, list: SYMPTOMS.wisdom },
-    { label: "잇몸", select: "gum", list: SYMPTOMS.gum },
-  ];
+/** 증상별 안내: 증상 글 목록. 누르면 해당 진료과목 페이지로 이동한다. compact 는 메인용(설명 생략) */
+function SymptomList({ go, compact }: { go: Go; compact?: boolean }) {
   return (
     <div className="grid gap-8 md:grid-cols-2">
-      {groups.map((g) => (
-        <section key={g.label} aria-labelledby={`sym-${g.label}`}>
-          <h2 id={`sym-${g.label}`} className="border-b-2 pb-2 text-[20px] font-bold" style={{ borderColor: C.ink }}>
+      {SYMPTOM_GROUPS.map((g) => (
+        <section key={g.label} aria-labelledby={`sym-${compact ? "home-" : ""}${g.label}`}>
+          <h2 id={`sym-${compact ? "home-" : ""}${g.label}`} className="border-b-2 pb-2 text-[20px] font-bold" style={{ borderColor: C.ink }}>
             {g.label}
           </h2>
           <ul>
-            {g.list.map((s, i) => (
+            {g.list.map((s) => (
               <li key={s.text} className="border-b" style={{ borderColor: C.line }}>
-                <button type="button" onClick={() => openSelfcheck({ select: g.select, index: i })} className="flex w-full items-center justify-between gap-3 py-3.5 text-left hover:text-[#0b6664]">
-                  <span className="font-bold">{s.text}</span>
-                  <span className="inline-flex shrink-0 items-center text-[14px]" style={{ color: C.muted }}>
-                    {TREATMENT_NAME[s.treatment]}
-                    <ChevronRight size={15} aria-hidden />
+                <button type="button" onClick={() => go("treat", s.treatment)} className="w-full py-3.5 text-left hover:text-[#0b6664]">
+                  <span className="flex items-center justify-between gap-3">
+                    <span className="font-bold">{s.text}</span>
+                    <span className="inline-flex shrink-0 items-center text-[14px]" style={{ color: C.muted }}>
+                      {TREATMENT_NAME[s.treatment]}
+                      <ChevronRight size={15} aria-hidden />
+                    </span>
                   </span>
+                  {!compact && (
+                    <span className="mt-1 block text-[15px] leading-[1.6]" style={{ color: C.muted }}>
+                      {s.body}
+                    </span>
+                  )}
                 </button>
               </li>
             ))}
@@ -1682,220 +1526,6 @@ function Notice({ no, go }: { no: number | null; go: Go }) {
       </span>
     </p>
     </>
-  );
-}
-
-/* ---------- 증상 자가체크 ---------- */
-
-function ToothMap({ preset, onReserve }: { preset: Preset; onReserve: (id: TreatmentId) => void }) {
-  const reduce = useReducedMotionSafe();
-  const [selected, setSelected] = useState<Selection>(preset.select);
-  const [symptomIndex, setSymptomIndex] = useState(preset.index);
-
-  const list = selected === "gum" ? SYMPTOMS.gum : SYMPTOMS[kindOf(selected)];
-  const symptom = list[symptomIndex] ?? list[0];
-  const title = selected === "gum" ? "잇몸" : toothLabel(selected);
-
-  const select = (next: Selection) => {
-    setSelected(next);
-    setSymptomIndex(0);
-  };
-
-  return (
-    <div className="mt-6 grid gap-8 lg:grid-cols-12 lg:gap-12">
-      <div className="lg:col-span-6">
-        <p className="text-center text-[15px] font-bold" style={{ color: C.muted }}>
-          부위 선택
-        </p>
-        <ToothChart selected={selected} missing={!!symptom.missing} onSelect={select} reduce={reduce} />
-
-        <div className="mt-2 flex flex-wrap items-center justify-center gap-2" role="group" aria-label="부위 바로 선택">
-          {QUICK.map((q) => {
-            const on = q.select === "gum" ? selected === "gum" : selected !== "gum" && kindOf(selected) === kindOf(q.select as number);
-            return (
-              <button
-                key={q.label}
-                type="button"
-                onClick={() => select(q.select)}
-                aria-pressed={on}
-                className="inline-flex h-10 items-center rounded-[6px] border px-4 text-[16px] font-bold transition-colors"
-                style={{ borderColor: on ? C.ink : C.toothLine, backgroundColor: on ? C.ink : "#fff", color: on ? "#fff" : C.ink }}
-              >
-                {q.label}
-              </button>
-            );
-          })}
-        </div>
-      </div>
-
-      <div className="lg:col-span-6">
-        <div className="border-t-2 pt-5 lg:pt-6" style={{ borderColor: C.ink }} aria-live="polite">
-          <AnimatePresence mode="wait" initial={false}>
-            <motion.div
-              key={String(selected)}
-              initial={reduce ? false : { opacity: 0, x: 12 }}
-              animate={{ opacity: 1, x: 0 }}
-              exit={reduce ? { opacity: 0 } : { opacity: 0, x: -8 }}
-              transition={{ duration: reduce ? 0 : 0.2, ease: EASE }}
-            >
-              <p className="text-[15px]" style={{ color: C.muted }}>
-                {selected === "gum" ? "잇몸 전체" : `치아 번호 ${selected}`}
-              </p>
-              <h3 className="mt-0.5 text-[26px] font-bold tracking-[-0.035em] md:text-[30px]">{title}</h3>
-
-              <fieldset className="mt-5">
-                <legend className="text-[17px] font-bold">증상 선택</legend>
-                <div className="mt-3 flex flex-wrap gap-2">
-                  {list.map((s, i) => {
-                    const on = i === symptomIndex;
-                    return (
-                      <button
-                        key={s.text}
-                        type="button"
-                        onClick={() => setSymptomIndex(i)}
-                        aria-pressed={on}
-                        className="relative inline-flex min-h-11 items-center rounded-[6px] border px-4 py-2 text-left text-[16px] transition-colors"
-                        style={{ borderColor: on ? C.accent : C.line, color: on ? "#fff" : C.ink }}
-                      >
-                        {on && (
-                          <motion.span
-                            layoutId="symptom-chip"
-                            className="absolute inset-[-1px] rounded-[6px]"
-                            style={{ backgroundColor: C.accent }}
-                            transition={{ duration: reduce ? 0 : 0.22, ease: EASE }}
-                            aria-hidden
-                          />
-                        )}
-                        <span className="relative">{s.text}</span>
-                      </button>
-                    );
-                  })}
-                </div>
-              </fieldset>
-            </motion.div>
-          </AnimatePresence>
-
-          <AnimatePresence mode="wait" initial={false}>
-            <motion.div
-              key={`${String(selected)}-${symptomIndex}`}
-              initial={reduce ? false : { opacity: 0, y: 6 }}
-              animate={{ opacity: 1, y: 0 }}
-              exit={{ opacity: 0 }}
-              transition={{ duration: reduce ? 0 : 0.2, ease: EASE, delay: reduce ? 0 : 0.04 }}
-              className="mt-6 border-t pt-6"
-              style={{ borderColor: C.line }}
-            >
-              <p className="text-[24px] font-bold tracking-[-0.03em]">{TREATMENT_NAME[symptom.treatment]}</p>
-              <p className="mt-2" style={{ color: C.muted }}>
-                {symptom.body}
-              </p>
-              <InfoGrid visits={symptom.visits} insurance={symptom.insurance} cost={symptom.cost} />
-              <div className="mt-6 flex flex-wrap items-center gap-x-4 gap-y-2">
-                <button type="button" onClick={() => onReserve(symptom.treatment)} className={btnPrimary} style={{ backgroundColor: C.accent }}>
-                  {TREATMENT_NAME[symptom.treatment]} 상담 예약
-                </button>
-                <span className="text-[15px]" style={{ color: C.muted }}>
-                  정확한 진단과 비용은 검진 후 안내합니다.
-                </span>
-              </div>
-            </motion.div>
-          </AnimatePresence>
-        </div>
-      </div>
-    </div>
-  );
-}
-
-/** 위턱 한 줄, 아래턱 한 줄의 치과 차트. 고른 치아만 주색으로 채운다 */
-function ToothChart({ selected, missing, onSelect, reduce }: { selected: Selection; missing: boolean; onSelect: (s: Selection) => void; reduce: boolean }) {
-  const gum = selected === "gum";
-  const label = "#767676";
-
-  const row = (teeth: number[], upper: boolean) => (
-    <div className="flex">
-      {[teeth.slice(0, 8), teeth.slice(8)].map((half, h) => (
-        <div key={h} className={`flex min-w-0 flex-1 ${h === 0 ? "border-r" : ""}`} style={{ borderColor: "#c9c9c9" }}>
-          {half.map((fdi) => {
-            const shape = TOOTH_SHAPE[shapeOf(fdi)];
-            const isSel = selected === fdi;
-            const empty = isSel && missing;
-            const stroke = isSel ? C.accent : "#c9c9c9";
-            const hover = isSel ? "" : "group-hover:fill-[#ececec]";
-            const tr = reduce ? "none" : "fill 150ms ease-out, stroke 150ms ease-out";
-            const num = (
-              <span
-                className={`block text-[11px] leading-none tabular-nums ${upper ? "mt-1" : "mb-1"}`}
-                style={{ color: isSel ? C.ink : label, fontWeight: isSel ? 700 : 400 }}
-              >
-                {fdi}
-              </span>
-            );
-            return (
-              <button
-                key={fdi}
-                type="button"
-                onClick={() => onSelect(fdi)}
-                aria-pressed={isSel}
-                aria-label={`${toothLabel(fdi)}, ${fdi}번`}
-                className="group flex min-w-0 cursor-pointer flex-col items-center rounded-[2px] py-1 focus-visible:outline-2 focus-visible:outline-offset-0 focus-visible:outline-[#10302f]"
-                style={{ flex: `${shape.w} 1 0` }}
-              >
-                {!upper && num}
-                <svg viewBox={`0 0 ${shape.w} 64`} className="block h-auto w-full" aria-hidden>
-                  <g transform={upper ? undefined : "matrix(1 0 0 -1 0 64)"}>
-                    {shape.roots.map((d) => (
-                      <path
-                        key={d}
-                        d={d}
-                        fill={empty ? "none" : isSel ? C.accent : "#fff"}
-                        fillOpacity={isSel ? 0.35 : 1}
-                        stroke={isSel ? C.accent : "#dedede"}
-                        strokeWidth={1}
-                        strokeDasharray={empty ? "3 2" : undefined}
-                        vectorEffect="non-scaling-stroke"
-                        className={hover}
-                        style={{ transition: tr }}
-                      />
-                    ))}
-                    <path
-                      d={shape.crown}
-                      fill={empty ? "none" : isSel ? C.accent : "#fff"}
-                      stroke={stroke}
-                      strokeWidth={1}
-                      strokeDasharray={empty ? "3 2" : undefined}
-                      vectorEffect="non-scaling-stroke"
-                      className={hover}
-                      style={{ transition: tr }}
-                    />
-                    {gum && <line x1="0" x2={shape.w} y1="30" y2="30" stroke={C.accent} strokeWidth={2} vectorEffect="non-scaling-stroke" />}
-                  </g>
-                </svg>
-                {upper && num}
-              </button>
-            );
-          })}
-        </div>
-      ))}
-    </div>
-  );
-
-  return (
-    <figure id="tooth-map" className="mx-auto mt-3 w-full max-w-[540px]">
-      <div className="flex items-end justify-between text-[12px]" style={{ color: label }} aria-hidden>
-        <span>오른쪽</span>
-        <span>위턱</span>
-        <span>왼쪽</span>
-      </div>
-      <div className="mt-1 touch-manipulation" role="group" aria-label="치아 차트">
-        {row(CHART_UPPER, true)}
-        <div className="border-t" style={{ borderColor: "#c9c9c9" }} />
-        {row(CHART_LOWER, false)}
-      </div>
-      <p className="mt-1 text-center text-[12px]" style={{ color: label }} aria-hidden>
-        아래턱
-      </p>
-      <figcaption className="sr-only">환자 기준 좌우입니다. 그림의 왼쪽이 환자의 오른쪽입니다.</figcaption>
-    </figure>
   );
 }
 
@@ -2146,11 +1776,8 @@ function SiteFooter({ go }: { go: Go }) {
 function BrandLogo() {
   return (
     <span className="inline-flex items-center gap-2">
-      {/* eslint-disable-next-line @next/next/no-img-element -- 메인 사이트와 같은 곰 로고 */}
-      <img src="/images/logo-bear.png" alt="" aria-hidden width={28} height={28} className="h-7 w-7 shrink-0" />
       <span className="flex items-baseline gap-1 whitespace-nowrap">
-        <span className="text-[20px] font-bold tracking-[-0.03em]">곰파트너</span>
-        <span className="text-[12px] font-semibold opacity-75">카탈로그</span>
+        <span className="text-[20px] font-bold tracking-[-0.03em]">동네 치과</span>
       </span>
     </span>
   );

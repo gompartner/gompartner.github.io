@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useRef, useState, type FormEvent, type ReactNode } from "react";
+import { useEffect, useState, type FormEvent, type ReactNode } from "react";
 import { AnimatePresence, motion } from "framer-motion";
 import {
   AlertCircle,
@@ -29,22 +29,16 @@ import { DemoMakerInfo } from "@/components/demos/DemoMakerInfo";
    국내 소스 OEM 업체 사이트 공통 구성(참고): 메뉴는 회사소개, OEM/ODM, 제조 품목, 생산 공정, 인증현황, 고객문의.
    첫 화면에는 "소량 생산 가능", 최소 주문 수량(MOQ), HACCP 인증서를 올리고, 샘플 의뢰와 견적문의 버튼을 크게 둔다.
    포장 형태(스탠딩 파우치, PET 병, 업소용 대용량, 디핑컵)별로 가능한 품목을 나누고, 품목제조보고와 소비기한 설정을 대행한다고 적는다.
-   단가는 공개하지 않는 곳이 많아 "수량별 단가 개략"으로만 보여 주고 부가세 별도, 인쇄 동판비 별도를 붙인다.
+   단가는 공개하지 않고 상담 후 견적으로 안내한다.
 
-   상호작용(모두 브라우저 안에서만 돈다. 실제로 보내지 않는다)
-   1. 제조 가능 품목: 포장 형태를 고르면 그 포장으로 만드는 품목과 최소 주문 수량만 남는다. 품목에서 단가 계산으로 넘어간다.
-   2. 개당 단가 개략 계산: 포장, 수량, 원료 지정을 고르면 개당 단가 범위와 총액, 수량 구간별 막대가 바뀐다.
-   3. 생산 공정: 공정 칸을 누르면 표시가 그 칸으로 옮겨 가고 관리 기준(CCP 포함)이 나온다.
-   4. 샘플 의뢰 신청: 업체명, 담당자, 휴대폰, 품목, 포장, 예상 수량. 완료하면 접수 번호, 담당 창구, 회신 예정일을 보여 준다.
-
-   첫 화면(fo-poster): 맨 위 메뉴 줄 아래 제목 한 줄과 인증, 대행 줄, 세로 공정 사진 다섯 칸(원료 입고, 배합, 충진, 포장, 검사) 아코디언,
-   그 아래 소스 분류별 품목 줄.
-   핵심 모션: 고른 칸만 0.45초 동안 넓어지고, 처음 열린 칸 사진이 1.6초 동안 천천히 다가온다(scale 1.06 에서 1). 동작 줄이기면 폭이 바로 바뀌고 사진은 멈춘다.
+   구성: 첫 화면(사진 배너, 강점 4칸), 제조 가능 품목(포장 형태로 거르기), 포장별 최소 주문 수량 표, 생산 공정 단계,
+   샘플 의뢰(브라우저 안에서만 돈다. 완료하면 접수 번호, 담당 창구, 회신 예정일), 진행 순서, 자주 묻는 질문, 오시는 길.
+   첫 화면 모션: 사진만 1.6초 동안 천천히 다가온다(scale 1.06 에서 1). 동작 줄이기면 멈춘다.
    사진 출처: 공정 사진과 품목 사진은 AI 생성(Z-Image-Turbo) */
 
 const ADDRESS = "충북 ㅇㅇ군 ㅇㅇ면 ㅇㅇ로 00";
 const TEL = "043-000-0000";
-const KAKAO = "카카오톡 채널 곰파트너";
+const KAKAO = "카카오톡 채널 식품 OEM 제조";
 
 const C = {
   /** 구역 구분 옅은 회색 */
@@ -68,7 +62,7 @@ const POSTER_CSS = `@keyframes fo-in{from{transform:scale(1.06)}}.fo-in{animatio
 const IMG = "/images/demo-food-oem";
 const NAV: [string, string][] = [
   ["fo-items", "제조 품목"],
-  ["fo-calc", "단가 계산"],
+  ["fo-moq", "포장 안내"],
   ["fo-process", "생산 공정"],
   ["fo-sample", "샘플 의뢰"],
   ["fo-visit", "오시는 길"],
@@ -77,7 +71,6 @@ const NAV: [string, string][] = [
 const DUR = 0.3;
 
 const focusRing = "focus-visible:outline focus-visible:outline-[3px] focus-visible:outline-offset-2";
-const won = (n: number) => `${n.toLocaleString("ko-KR")}원`;
 const num = (n: number) => n.toLocaleString("ko-KR");
 const p2 = (n: number) => String(n).padStart(2, "0");
 
@@ -89,16 +82,14 @@ interface Pack {
   kind: "스탠딩 파우치" | "PET 병" | "업소용 대용량" | "디핑컵";
   label: string;
   moq: number;
-  /** 10,000개 기준 개당 단가(원). 원료, 포장재, 제조, 살균 포함 */
-  base: number;
   why: string;
 }
 const PACKS: Pack[] = [
-  { id: "pouch200", kind: "스탠딩 파우치", label: "스탠딩 파우치 200g", moq: 1000, base: 980, why: "한 번 끓이는 최소량이 200kg이라 200g은 1,000개부터예요." },
-  { id: "pouch500", kind: "스탠딩 파우치", label: "스탠딩 파우치 500g", moq: 400, base: 1850, why: "500g은 400개면 한 번 끓이는 양이 차요." },
-  { id: "pet300", kind: "PET 병", label: "PET 병 300g", moq: 2000, base: 1350, why: "병 충전 라인은 라벨 작업까지 묶여 2,000개부터예요." },
-  { id: "bulk2kg", kind: "업소용 대용량", label: "업소용 파우치 2kg", moq: 100, base: 6200, why: "식당, 프랜차이즈 납품용이라 100개부터 받아요." },
-  { id: "cup30", kind: "디핑컵", label: "디핑컵 30g", moq: 5000, base: 210, why: "컵 성형 실링기가 한 번 돌 때 5,000개가 기본이에요." },
+  { id: "pouch200", kind: "스탠딩 파우치", label: "스탠딩 파우치 200g", moq: 1000, why: "한 번 끓이는 최소량이 200kg이라 200g은 1,000개부터예요." },
+  { id: "pouch500", kind: "스탠딩 파우치", label: "스탠딩 파우치 500g", moq: 400, why: "500g은 400개면 한 번 끓이는 양이 차요." },
+  { id: "pet300", kind: "PET 병", label: "PET 병 300g", moq: 2000, why: "병 충전 라인은 라벨 작업까지 묶여 2,000개부터예요." },
+  { id: "bulk2kg", kind: "업소용 대용량", label: "업소용 파우치 2kg", moq: 100, why: "식당, 프랜차이즈 납품용이라 100개부터 받아요." },
+  { id: "cup30", kind: "디핑컵", label: "디핑컵 30g", moq: 5000, why: "컵 성형 실링기가 한 번 돌 때 5,000개가 기본이에요." },
 ];
 const packById = (id: PackId) => PACKS.find((p) => p.id === id) ?? PACKS[0];
 const PACK_KINDS = ["전체", "스탠딩 파우치", "PET 병", "업소용 대용량", "디핑컵"] as const;
@@ -128,43 +119,21 @@ const ITEMS: Item[] = [
 ];
 const GROUPS: Group[] = ["고기 소스", "볶음, 조림 소스", "드레싱", "디핑 소스"];
 
-/* ---------- 2. 단가 계산 ---------- */
-
-/** 수량 구간과 10,000개 기준 대비 배수. 수량이 적으면 포장재 인쇄와 세척 시간이 개당 단가에 크게 붙는다 */
-const TIERS = [
-  { from: 30000, k: 0.9 },
-  { from: 10000, k: 1 },
-  { from: 5000, k: 1.12 },
-  { from: 3000, k: 1.25 },
-  { from: 1000, k: 1.45 },
-  { from: 0, k: 1.7 },
-];
-const tierK = (q: number) => (TIERS.find((t) => q >= t.from) ?? TIERS[TIERS.length - 1]).k;
-/** 국산 원료로 지정하면 원료값이 오른다 */
-const LOCAL_K = 1.18;
-const round10 = (n: number) => Math.round(n / 10) * 10;
-function unitRange(pack: Pack, q: number, local: boolean) {
-  const mid = pack.base * tierK(q) * (local ? LOCAL_K : 1);
-  return { lo: round10(mid * 0.93), hi: round10(mid * 1.07) };
-}
-const QTY_STEPS = [100, 400, 1000, 2000, 3000, 5000, 10000, 20000, 30000, 50000];
-
 /* ---------- 3. 생산 공정 ---------- */
 
 interface Step {
   name: string;
   ccp?: string;
   what: string;
-  rule: string[];
 }
 const STEPS: Step[] = [
-  { name: "원료 입고", what: "원료가 들어오면 성상, 이물, 온도, 소비기한을 보고 시험성적서를 받아 둬요.", rule: ["냉장 원료 입고 온도 10도 이하", "부적합 원료는 따로 표시해 반품"] },
-  { name: "계량, 배합", what: "확정한 레시피대로 원료를 계량하고 배합비를 일지에 남겨요. 두 사람이 같이 확인해요.", rule: ["계량 저울 매일 영점 확인", "알레르기 원료는 전용 도구 사용"] },
-  { name: "가열 살균", ccp: "CCP-1", what: "배합한 소스를 솥에서 끓여 살균해요. 품온과 시간은 자동으로 기록돼요.", rule: ["품온 90도 이상에서 10분 이상", "기준을 벗어나면 그 솥은 다시 가열"] },
-  { name: "충전, 밀봉", what: "뜨거운 소스를 바로 파우치나 병에 채우고 입구를 열로 봉합해요.", rule: ["충전 온도 85도 이상", "30분마다 실링 강도와 새는 곳 확인"] },
-  { name: "냉각", what: "봉합한 제품을 냉각 수조에 통과시켜 빠르게 식혀요.", rule: ["제품 품온 35도 이하로", "냉각수 염소 농도 매일 확인"] },
-  { name: "금속 검출", ccp: "CCP-2", what: "모든 제품이 금속 검출기를 지나가요. 걸린 제품은 자동으로 밀려나요.", rule: ["철 2.0mm, 스테인리스 2.5mm 테스트피스", "작업 시작 때와 2시간마다 감도 확인"] },
-  { name: "포장, 출고", what: "제조번호와 소비기한 인쇄를 확인하고 박스에 담아요. 제조번호마다 보관 샘플을 남겨요.", rule: ["출고 전 검사 성적 첨부", "보관 샘플은 소비기한까지 보관"] },
+  { name: "원료 입고", what: "원료가 들어오면 성상, 이물, 온도, 소비기한을 보고 시험성적서를 받아 둬요." },
+  { name: "계량, 배합", what: "확정한 레시피대로 원료를 계량하고 배합비를 일지에 남겨요. 두 사람이 같이 확인해요." },
+  { name: "가열 살균", ccp: "CCP-1", what: "배합한 소스를 솥에서 끓여 살균해요. 품온과 시간은 자동으로 기록돼요." },
+  { name: "충전, 밀봉", what: "뜨거운 소스를 바로 파우치나 병에 채우고 입구를 열로 봉합해요." },
+  { name: "냉각", what: "봉합한 제품을 냉각 수조에 통과시켜 빠르게 식혀요." },
+  { name: "금속 검출", ccp: "CCP-2", what: "모든 제품이 금속 검출기를 지나가요. 걸린 제품은 자동으로 밀려나요." },
+  { name: "포장, 출고", what: "제조번호와 소비기한 인쇄를 확인하고 박스에 담아요. 제조번호마다 보관 샘플을 남겨요." },
 ];
 
 /* ---------- 4. 샘플 의뢰 ---------- */
@@ -182,20 +151,10 @@ function addBizDays(d: Date, n: number) {
   return out;
 }
 
-interface Prefill {
-  item: string;
-  pack: PackId;
-  qty: number;
-}
-
 export function FoodOemDemo() {
   const today = useDemoToday();
   const reduce = useReducedMotionSafe();
 
-  const [calcPack, setCalcPack] = useState<PackId>("pouch200");
-  const [calcItem, setCalcItem] = useState("바베큐 소스");
-  const [prefill, setPrefill] = useState<Prefill | null>(null);
-  const [procIdx, setProcIdx] = useState(2);
 
   useEffect(() => {
     const f = () => window.scrollTo({ top: 0 });
@@ -204,12 +163,6 @@ export function FoodOemDemo() {
   }, []);
 
   const go = (id: string) => document.getElementById(id)?.scrollIntoView({ behavior: reduce ? "auto" : "smooth", block: "start" });
-
-  const toCalc = (item: string, pack: PackId) => {
-    setCalcItem(item);
-    setCalcPack(pack);
-    go("fo-calc");
-  };
 
   const [menu, setMenu] = useState(false);
 
@@ -283,48 +236,31 @@ export function FoodOemDemo() {
         )}
       </header>
 
-      <Poster
-        reduce={reduce}
-        go={go}
-        onCalc={toCalc}
-        onStep={(i) => {
-          setProcIdx(i);
-          go("fo-process");
-        }}
-      />
+      <Poster reduce={reduce} go={go} />
 
       {/* 1. 제조 가능 품목 */}
       <section id="fo-items" aria-labelledby="fo-items-title" className="mx-auto max-w-[1200px] scroll-mt-20 px-4 pt-6 md:px-6 md:pt-8">
         <SectionTitle id="fo-items-title" title="제조 가능 품목" />
-        <Items reduce={reduce} onCalc={toCalc} />
+        <Items reduce={reduce} />
       </section>
 
-      {/* 2. 단가 계산 */}
-      <section id="fo-calc" aria-labelledby="fo-calc-title" className="mx-auto mt-16 max-w-[1200px] scroll-mt-20 px-4 md:mt-24 md:px-6">
-        <SectionTitle id="fo-calc-title" title="수량별 개당 단가" />
-        <PriceCalc
-          reduce={reduce}
-          item={calcItem}
-          pack={calcPack}
-          setPack={setCalcPack}
-          onSample={(qty) => {
-            setPrefill({ item: calcItem, pack: calcPack, qty });
-            go("fo-sample");
-          }}
-        />
+      {/* 2. 포장별 최소 주문 수량 */}
+      <section id="fo-moq" aria-labelledby="fo-moq-title" className="mx-auto mt-16 max-w-[1200px] scroll-mt-20 px-4 md:mt-24 md:px-6">
+        <SectionTitle id="fo-moq-title" title="포장별 최소 주문 수량" />
+        <PackTable />
       </section>
 
       {/* 3. 생산 공정 */}
       <section id="fo-process" aria-labelledby="fo-process-title" className="mx-auto mt-16 max-w-[1200px] scroll-mt-20 px-4 md:mt-24 md:px-6">
         <SectionTitle id="fo-process-title" title="생산 공정" badge="HACCP 인증 공장" />
-        <Process reduce={reduce} idx={procIdx} setIdx={setProcIdx} />
+        <Process />
       </section>
 
       {/* 4. 샘플 의뢰 */}
       <section id="fo-sample" aria-labelledby="fo-sample-title" className="mx-auto mt-16 max-w-[1200px] scroll-mt-20 px-4 md:mt-24 md:px-6">
         <SectionTitle id="fo-sample-title" title="샘플 의뢰" />
         <div className="mt-8 grid gap-10 lg:grid-cols-[minmax(0,1.3fr)_minmax(0,1fr)] lg:gap-14">
-          <SampleForm key={prefill ? `${prefill.item}-${prefill.pack}-${prefill.qty}` : "blank"} reduce={reduce} today={today} prefill={prefill} />
+          <SampleForm reduce={reduce} today={today} />
           <Flow />
         </div>
       </section>
@@ -372,190 +308,79 @@ function SectionTitle({ id, title, badge }: { id: string; title: string; badge?:
 
 /* ---------- 첫 화면 ---------- */
 
-/* 첫 화면 구조(국내 식품 OEM 사이트 조사, 2026-10): 위쪽에 제목 한 줄과 인증, 대행 글자 줄, 본문은 세로로 긴 공정 사진 다섯 칸
-   (원료 입고, 배합, 충진, 포장, 검사)이 가로로 나란히 선다. 칸마다 아래에 공정 이름과 설비 이름. 고른 칸만 넓어지고 나머지는
-   좁아진다(마우스를 올리거나 누르면). 넓어진 칸의 관리 기준 버튼은 아래 생산 공정 구간을 그 공정이 고른 상태로 연다.
-   아코디언 아래 품목 줄은 소스 분류별 품목이고, 누르면 아래 단가 계산이 그 품목, 그 포장으로 열린다.
-   PC 넓은 화면은 왼쪽 가장자리에 세로 고정 탭 두 개(샘플 의뢰, 단가 계산). 휴대폰은 다섯 칸을 가로로 넘기는 카드(scroll-snap)로,
-   세로 고정 탭은 하단 고정 줄 두 버튼(샘플 의뢰, 전화)으로 바꾼다.
-   모션: 칸 폭이 0.45초 동안 바뀌고, 처음 열린 칸 사진만 1.06배에서 1배로 1.6초 동안 다가온다. 동작 줄이기면 폭은 바로 바뀐다. */
-const PANEL_DUR = 0.45;
+/* 첫 화면 구조(국내 식품 OEM 사이트 조사, 2026-10): 충진 라인 사진 배너 위에 제목, 인증과 대행 줄, 샘플 의뢰와 전화 버튼.
+   배너 아래 강점 4칸. 휴대폰은 하단 고정 줄 두 버튼(샘플 의뢰, 전화).
+   모션: 사진만 1.06배에서 1배로 1.6초 동안 다가온다. 동작 줄이기면 끈다. */
 
-/** 공정 사진 다섯 칸. step 은 아래 생산 공정(STEPS) 순번 */
-type Panel = { id: string; title: string; gear: string; img: string; alt: string; step: number };
-const PANELS: Panel[] = [
-  { id: "receive", title: "원료 입고", gear: "원료 검수, 원료 창고", img: `${IMG}/step-receive.jpg`, alt: "위생복을 입은 작업자가 팔레트에 쌓인 원료 포대를 확인하는 모습", step: 0 },
-  { id: "mix", title: "배합", gear: "계량 저울, 배합 솥", img: `${IMG}/step-mix.jpg`, alt: "큰 스테인리스 솥에서 붉은 소스를 배합하는 작업자", step: 1 },
-  { id: "fill", title: "충진", gear: "PET 병 자동 충진기", img: `${IMG}/step-fill.jpg`, alt: "컨베이어 위로 소스가 채워진 PET 병이 줄지어 지나가는 충진 라인", step: 3 },
-  { id: "pack", title: "포장", gear: "박스 포장 라인", img: `${IMG}/step-pack.jpg`, alt: "위생복 차림의 작업자들이 소스 병을 박스에 담는 포장 라인", step: 6 },
-  { id: "inspect", title: "검사", gear: "품질 검사실, 금속 검출기", img: `${IMG}/step-inspect.jpg`, alt: "품질 검사실에서 소스 시료 컵을 살펴보는 연구원", step: 5 },
+const STRENGTHS: [string, string][] = [
+  ["HACCP 인증 공장", "가열 살균과 금속 검출을 중요관리점으로 기록합니다."],
+  ["1,000개부터 생산", "업소용 2kg 파우치는 100개부터 받습니다."],
+  ["품목제조보고 대행", "소비기한 설정과 표시사항 검토까지 함께 진행합니다."],
+  ["샘플 2종 제작", "맛을 확정하기 전 샘플을 한 번 더 고칠 수 있습니다."],
 ];
 
-function Poster({ reduce, go, onCalc, onStep }: { reduce: boolean; go: (id: string) => void; onCalc: (item: string, pack: PackId) => void; onStep: (step: number) => void }) {
-  const [open, setOpen] = useState(2);
-  const [slide, setSlide] = useState(0);
-  const railRef = useRef<HTMLDivElement>(null);
-  const onRail = () => {
-    const el = railRef.current;
-    if (!el || !el.firstElementChild) return;
-    const w = (el.firstElementChild as HTMLElement).offsetWidth + 12;
-    setSlide(Math.min(PANELS.length - 1, Math.max(0, Math.round(el.scrollLeft / w))));
-  };
-  const stepBtn = (p: Panel) => {
-    const st = STEPS[p.step];
-    return (
-      <button
-        type="button"
-        onClick={() => onStep(p.step)}
-        className={`inline-flex min-h-11 items-center gap-1.5 rounded-[6px] border px-3 py-1.5 text-left text-[14px] font-semibold hover:bg-[#f7f7f5] ${focusRing}`}
-        style={{ borderColor: C.line, outlineColor: C.tomato }}
-      >
-        <ShieldCheck size={16} aria-hidden className="flex-none" style={{ color: C.tomatoDeep }} />
-        {st.rule[0]}
-        {st.ccp ? `, ${st.ccp}` : ""}
-      </button>
-    );
-  };
-
+function Poster({ reduce, go }: { reduce: boolean; go: (id: string) => void }) {
   return (
     <section id="fo-poster" aria-labelledby="fo-poster-title" className="relative" style={{ background: C.paper, color: C.ink }}>
       <style>{POSTER_CSS}</style>
 
-      {/* 제목 한 줄과 인증, 대행 */}
-      <div className="mx-auto flex max-w-[1200px] flex-wrap items-end justify-between gap-x-8 gap-y-3 px-4 pt-7 md:px-6 md:pt-10">
-        <h1 id="fo-poster-title" className="text-[30px] font-bold md:text-[44px]" style={{ wordBreak: "keep-all", letterSpacing: "-0.035em", lineHeight: 1.2 }}>
-          소스 OEM, 1,000개부터 생산
-        </h1>
-        <ul className="flex flex-wrap gap-x-4 gap-y-1 pb-1 text-[15px] font-semibold" style={{ color: C.body }} aria-label="인증과 대행">
-          <li className="inline-flex items-center gap-1.5">
-            <ShieldCheck size={17} aria-hidden style={{ color: C.tomatoDeep }} />
-            HACCP 인증 공장
-          </li>
-          <li>품목제조보고 대행</li>
-          <li>소비기한 설정 대행</li>
-        </ul>
-      </div>
-
-      {/* PC: 공정 다섯 칸 아코디언 */}
-      <div className="mx-auto mt-6 hidden h-[min(56svh,520px)] min-h-[420px] max-w-[1200px] gap-3 px-6 md:flex">
-        {PANELS.map((p, i) => {
-          const on = i === open;
-          return (
-            <motion.div
-              key={p.id}
-              onMouseEnter={() => setOpen(i)}
-              onFocus={() => setOpen(i)}
-              animate={{ flexGrow: on ? 3.6 : 1 }}
-              initial={false}
-              transition={{ duration: reduce ? 0 : PANEL_DUR, ease: EASE }}
-              className="relative flex min-w-0 basis-0 flex-col overflow-hidden rounded-[8px] border"
-              style={{ borderColor: on ? C.tomato : C.line, background: C.paper }}
+      {/* 사진 배너 */}
+      <div className="relative h-[52svh] min-h-[340px] overflow-hidden md:h-[min(60svh,560px)]" style={{ background: "#d9d9d6" }}>
+        {/* eslint-disable-next-line @next/next/no-img-element -- 정적 export 라 next/image 최적화를 쓰지 않는다 */}
+        <img
+          src={`${IMG}/step-fill.jpg`}
+          alt="컨베이어 위로 소스가 채워진 PET 병이 줄지어 지나가는 충진 라인"
+          fetchPriority="high"
+          className={`absolute inset-0 h-full w-full object-cover ${reduce ? "" : "fo-in"}`}
+          style={{ objectPosition: "50% 40%" }}
+        />
+        <div className="absolute inset-0" style={{ background: "linear-gradient(90deg, rgba(0,0,0,0.62) 0%, rgba(0,0,0,0.35) 55%, rgba(0,0,0,0.1) 100%)" }} aria-hidden />
+        <div className="relative mx-auto flex h-full max-w-[1200px] flex-col justify-end px-4 pb-8 md:px-6 md:pb-12">
+          <h1 id="fo-poster-title" className="text-[30px] font-bold text-white md:text-[48px]" style={{ wordBreak: "keep-all", letterSpacing: "-0.035em", lineHeight: 1.2 }}>
+            소스 OEM, 1,000개부터 생산
+          </h1>
+          <ul className="mt-3 flex flex-wrap gap-x-4 gap-y-1 text-[15px] font-semibold md:text-[17px]" style={{ color: "rgba(255,255,255,0.9)" }} aria-label="인증과 대행">
+            <li className="inline-flex items-center gap-1.5">
+              <ShieldCheck size={17} aria-hidden />
+              HACCP 인증 공장
+            </li>
+            <li>품목제조보고 대행</li>
+            <li>소비기한 설정 대행</li>
+          </ul>
+          <div className="mt-6 hidden gap-2 sm:flex">
+            <button
+              type="button"
+              onClick={() => go("fo-sample")}
+              data-gtm-cta="food-oem_poster_sample"
+              className={`inline-flex h-12 items-center gap-2 rounded-[6px] px-6 text-[16px] font-semibold text-white ${focusRing}`}
+              style={{ background: C.tomato, outlineColor: "#fff" }}
             >
-              <button
-                type="button"
-                aria-expanded={on}
-                aria-controls={`fo-panel-${p.id}`}
-                onClick={() => setOpen(i)}
-                className={`relative block min-h-0 flex-1 overflow-hidden text-left ${focusRing}`}
-                style={{ outlineColor: C.tomato, outlineOffset: -3 }}
-              >
-                {/* eslint-disable-next-line @next/next/no-img-element -- 정적 export 라 next/image 최적화를 쓰지 않는다 */}
-                <img
-                  src={p.img}
-                  alt={p.alt}
-                  sizes="(min-width: 768px) 560px, 84vw"
-                  fetchPriority={i === 2 ? "high" : undefined}
-                  className={`absolute inset-0 h-full w-full object-cover ${i === 2 && !reduce ? "fo-in" : ""}`}
-                  style={{ objectPosition: "50% 35%" }}
-                />
-                <span className="sr-only">{p.title} 펼치기</span>
-              </button>
-              <div className="flex-none border-t px-4 py-3" style={{ borderColor: C.line }}>
-                <p className="text-[16px] font-bold leading-snug" style={{ wordBreak: "keep-all" }}>
-                  {p.title}
-                </p>
-                <p className="mt-0.5 truncate text-[13px]" style={{ color: C.muted }}>
-                  {p.gear}
-                </p>
-                <div id={`fo-panel-${p.id}`} hidden={!on} className="mt-2">
-                  {stepBtn(p)}
-                </div>
-              </div>
-            </motion.div>
-          );
-        })}
-      </div>
-
-      {/* 휴대폰: 가로로 넘기는 공정 카드 */}
-      <div className="mt-5 md:hidden">
-        <p className="px-4 text-[14px] font-semibold tabular-nums" style={{ color: C.muted }} aria-live="polite">
-          {slide + 1} / {PANELS.length} {PANELS[slide].title}
-        </p>
-        <div ref={railRef} onScroll={onRail} className="mt-2 flex snap-x snap-mandatory gap-3 overflow-x-auto px-4 pb-2" style={{ scrollPaddingLeft: 16 }}>
-          {PANELS.map((p, i) => (
-            <article key={p.id} className="w-[84%] flex-none snap-start overflow-hidden rounded-[8px] border" style={{ borderColor: C.line }} aria-label={`${i + 1} / ${PANELS.length} ${p.title}`}>
-              <div className="relative aspect-[4/5]">
-                {/* eslint-disable-next-line @next/next/no-img-element -- 정적 export 라 next/image 최적화를 쓰지 않는다 */}
-                <img src={p.img} alt={p.alt} sizes="84vw" loading={i < 2 ? undefined : "lazy"} className="absolute inset-0 h-full w-full object-cover" style={{ objectPosition: "50% 35%" }} />
-              </div>
-              <div className="px-4 py-3">
-                <p className="text-[17px] font-bold">{p.title}</p>
-                <p className="text-[14px]" style={{ color: C.muted }}>
-                  {p.gear}
-                </p>
-                <div className="mt-2">{stepBtn(p)}</div>
-              </div>
-            </article>
-          ))}
+              <PackageOpen size={18} aria-hidden />
+              샘플 의뢰
+            </button>
+            <a
+              href={`tel:${TEL.replace(/-/g, "")}`}
+              className={`inline-flex h-12 items-center gap-2 rounded-[6px] border px-5 text-[16px] font-semibold text-white ${focusRing}`}
+              style={{ borderColor: "rgba(255,255,255,0.7)", outlineColor: "#fff" }}
+            >
+              <Phone size={18} aria-hidden />
+              {TEL}
+            </a>
+          </div>
         </div>
       </div>
 
-      {/* 품목 줄: 누르면 아래 단가 계산이 그 품목으로 열린다 */}
-      <div className="mx-auto max-w-[1200px] px-4 pb-8 pt-5 md:px-6 md:pb-12">
-        <ul aria-label="제조 품목, 누르면 단가 계산" className="-mx-4 flex gap-x-6 overflow-x-auto px-4 pb-1 md:mx-0 md:grid md:grid-cols-4 md:gap-x-4 md:overflow-visible md:px-0">
-          {GROUPS.map((g) => (
-            <li key={g} className="flex flex-none items-center gap-1.5 md:flex-col md:items-start md:gap-1">
-              <span className="flex-none text-[14px] font-bold md:text-[13px]" style={{ color: C.muted }}>
-                {g}
-              </span>
-              <span className="flex gap-1.5 md:flex-wrap">
-                {ITEMS.filter((it) => it.group === g).map((it) => (
-                  <button
-                    key={it.id}
-                    type="button"
-                    onClick={() => onCalc(it.name, it.packs[0])}
-                    className={`inline-flex h-11 flex-none items-center rounded-[6px] border px-3 text-[14px] font-semibold hover:bg-[#f7f7f5] ${focusRing}`}
-                    style={{ borderColor: C.line, outlineColor: C.tomato }}
-                  >
-                    {it.name}
-                  </button>
-                ))}
-              </span>
-            </li>
-          ))}
-        </ul>
-      </div>
-
-      {/* 넓은 PC: 왼쪽 가장자리 세로 고정 탭 */}
-      <div className="fixed left-0 top-1/2 z-30 hidden -translate-y-1/2 flex-col gap-px xl:flex" aria-label="빠른 문의" role="group">
-        {(
-          [
-            ["fo-sample", "샘플 의뢰", C.tomato],
-            ["fo-calc", "단가 계산", C.ink],
-          ] as const
-        ).map(([id, label, bg]) => (
-          <button
-            key={id}
-            type="button"
-            onClick={() => go(id)}
-            data-gtm-cta={`food-oem_side_${id}`}
-            className={`flex w-11 items-center justify-center rounded-r-[6px] py-4 text-[15px] font-semibold text-white ${focusRing}`}
-            style={{ background: bg, writingMode: "vertical-rl", letterSpacing: "0.05em", outlineColor: C.tomatoDeep }}
-          >
-            {label}
-          </button>
+      {/* 강점 4칸 */}
+      <ul className="mx-auto grid max-w-[1200px] grid-cols-1 gap-px px-4 pb-8 pt-6 sm:grid-cols-2 md:px-6 md:pb-12 lg:grid-cols-4">
+        {STRENGTHS.map(([t, d]) => (
+          <li key={t} className="border-b py-4 sm:pr-4 lg:border-b-0 lg:border-r lg:px-5 lg:first:pl-0 lg:last:border-r-0" style={{ borderColor: C.line }}>
+            <p className="text-[18px] font-bold">{t}</p>
+            <p className="mt-1 text-[15px] leading-[1.6]" style={{ color: C.body, wordBreak: "keep-all" }}>
+              {d}
+            </p>
+          </li>
         ))}
-      </div>
+      </ul>
 
       {/* 휴대폰: 하단 고정 줄 두 버튼 */}
       <div className="fixed inset-x-0 bottom-0 z-30 grid grid-cols-[minmax(0,1fr)_minmax(0,1fr)] gap-2 border-t px-4 py-3 md:hidden" style={{ background: C.paper, borderColor: C.line, paddingBottom: "calc(12px + env(safe-area-inset-bottom))" }}>
@@ -584,7 +409,7 @@ function Poster({ reduce, go, onCalc, onStep }: { reduce: boolean; go: (id: stri
 
 /* ---------- 1. 제조 가능 품목 ---------- */
 
-function Items({ reduce, onCalc }: { reduce: boolean; onCalc: (item: string, pack: PackId) => void }) {
+function Items({ reduce }: { reduce: boolean }) {
   const [kind, setKind] = useState<PackKind>("전체");
   const shown = (packs: PackId[]) => (kind === "전체" ? packs : packs.filter((id) => packById(id).kind === kind));
   const kindPacks = kind === "전체" ? [] : PACKS.filter((p) => p.kind === kind);
@@ -669,17 +494,14 @@ function Items({ reduce, onCalc }: { reduce: boolean; onCalc: (item: string, pac
                           {packs.map((id) => {
                             const pk = packById(id);
                             return (
-                              <button
+                              <span
                                 key={id}
-                                type="button"
-                                onClick={() => onCalc(it.name, id)}
-                                aria-label={`${it.name} ${pk.label} 단가 계산`}
-                                className={`inline-flex items-center gap-1 rounded-[6px] border px-2.5 py-1 text-[13px] font-semibold hover:bg-white ${focusRing}`}
-                                style={{ borderColor: C.line, outlineColor: C.tomato }}
+                                className="inline-flex items-center gap-1 rounded-[6px] border px-2.5 py-1 text-[13px] font-semibold"
+                                style={{ borderColor: C.line }}
                               >
                                 {pk.label.replace("스탠딩 ", "").replace("업소용 파우치", "업소용")}
                                 <span className="tabular-nums" style={{ color: C.tomatoDeep }}>{num(pk.moq)}~</span>
-                              </button>
+                              </span>
                             );
                           })}
                         </div>
@@ -693,278 +515,94 @@ function Items({ reduce, onCalc }: { reduce: boolean; onCalc: (item: string, pac
         })}
       </div>
       <p className="mt-5 text-[14px]" style={{ color: C.muted }}>
-        포장 칸의 숫자는 최소 주문 수량이에요. 누르면 그 조건으로 단가를 계산해요.
+        포장 칸의 숫자는 최소 주문 수량입니다.
       </p>
     </div>
   );
 }
 
-/* ---------- 2. 단가 계산 ---------- */
+/* ---------- 2. 포장별 최소 주문 수량 ---------- */
 
-function PriceCalc({
-  reduce,
-  item,
-  pack,
-  setPack,
-  onSample,
-}: {
-  reduce: boolean;
-  item: string;
-  pack: PackId;
-  setPack: (p: PackId) => void;
-  onSample: (qty: number) => void;
-}) {
-  const pk = packById(pack);
-  const [qtyRaw, setQtyRaw] = useState(String(pk.moq));
-  const [local, setLocal] = useState(false);
-  const qty = Math.max(0, Math.floor(Number(qtyRaw.replace(/\D/g, "")) || 0));
-  const under = qty < pk.moq;
-  const r = unitRange(pk, Math.max(qty, pk.moq), local);
-  const tiers = QTY_STEPS.filter((q) => q >= pk.moq).slice(0, 6);
-  const maxUnit = unitRange(pk, tiers[0], local).hi;
-  // 다음 구간까지 얼마나 더 주문하면 개당 얼마 내려가는지
-  const nextTier = [...TIERS].reverse().find((t) => t.from > qty);
-  const nextGain = nextTier ? r.lo + r.hi - (unitRange(pk, nextTier.from, local).lo + unitRange(pk, nextTier.from, local).hi) : 0;
-
-  const pickPack = (id: PackId) => {
-    setPack(id);
-    setQtyRaw(String(packById(id).moq));
-  };
-  // 품목 목록에서 포장을 골라 넘어오면 수량을 그 포장의 최소 수량으로 맞춘다
-  const [lastPack, setLastPack] = useState(pack);
-  if (lastPack !== pack) {
-    setLastPack(pack);
-    setQtyRaw(String(pk.moq));
-  }
-
+function PackTable() {
   return (
-    <div className="mt-8 grid gap-8 lg:grid-cols-[minmax(0,1fr)_minmax(0,1.1fr)] lg:gap-12">
-      <div>
-        <p className="text-[15px] font-semibold" style={{ color: C.muted }}>
-          품목 <b style={{ color: C.ink }}>{item}</b>
-        </p>
-        <fieldset className="mt-4">
-          <legend className="text-[16px] font-bold">포장</legend>
-          <div className="mt-2 grid grid-cols-2 gap-2 sm:grid-cols-3">
-            {PACKS.map((p) => {
-              const on = p.id === pack;
-              return (
-                <button
-                  key={p.id}
-                  type="button"
-                  aria-pressed={on}
-                  onClick={() => pickPack(p.id)}
-                  className={`rounded-[8px] border px-3 py-2.5 text-left text-[14px] font-bold leading-[1.35] ${focusRing}`}
-                  style={{ borderColor: on ? C.tomato : C.line, background: on ? C.cream : "transparent", outlineColor: C.tomato }}
-                >
+    <div className="mt-8">
+      <div className="overflow-x-auto">
+        <table className="w-full min-w-[560px] border-collapse text-left text-[15px]">
+          <caption className="sr-only">포장 형태별 최소 주문 수량</caption>
+          <thead>
+            <tr className="border-b" style={{ background: C.cream, borderColor: C.line }}>
+              <th scope="col" className="px-4 py-2.5 font-semibold">
+                포장
+              </th>
+              <th scope="col" className="px-4 py-2.5 text-right font-semibold">
+                최소 주문 수량
+              </th>
+              <th scope="col" className="px-4 py-2.5 font-semibold">
+                기준
+              </th>
+            </tr>
+          </thead>
+          <tbody>
+            {PACKS.map((p) => (
+              <tr key={p.id} className="border-b" style={{ borderColor: C.line }}>
+                <th scope="row" className="whitespace-nowrap px-4 py-3 font-semibold">
                   {p.label}
-                  <span className="mt-0.5 block text-[12px] font-semibold" style={{ color: C.muted }}>
-                    최소 {num(p.moq)}개
-                  </span>
-                </button>
-              );
-            })}
-          </div>
-        </fieldset>
-
-        <label className="mt-6 block text-[16px] font-bold" htmlFor="fo-qty">
-          수량
-        </label>
-        <div className="mt-2 flex items-center gap-2">
-          <input
-            id="fo-qty"
-            inputMode="numeric"
-            value={qtyRaw === "" ? "" : num(qty)}
-            onChange={(e) => setQtyRaw(e.target.value.replace(/\D/g, "").slice(0, 6))}
-            aria-describedby="fo-qty-help"
-            aria-invalid={under}
-            className={`h-12 w-40 rounded-[8px] border px-3 text-right text-[18px] font-bold tabular-nums ${focusRing}`}
-            style={{ borderColor: under ? C.error : C.line, background: "#fff", outlineColor: C.tomato }}
-          />
-          <span className="text-[16px] font-bold">개</span>
-        </div>
-        <div className="mt-3 flex flex-wrap gap-1.5">
-          {tiers.map((q) => (
-            <button
-              key={q}
-              type="button"
-              onClick={() => setQtyRaw(String(q))}
-              className={`rounded-[6px] border px-3 py-1 text-[13px] font-semibold tabular-nums ${focusRing}`}
-              style={{ borderColor: qty === q ? C.tomato : C.line, background: qty === q ? C.tomato : "transparent", color: qty === q ? "#fff" : C.ink, outlineColor: C.tomato }}
-            >
-              {num(q)}
-            </button>
-          ))}
-        </div>
-        <p id="fo-qty-help" className="mt-2 flex items-center gap-1.5 text-[14px]" style={{ color: under ? C.error : C.muted }}>
-          {under && <AlertCircle size={15} aria-hidden />}
-          {under ? `${pk.label}는 ${num(pk.moq)}개부터 만들어요. 최소 수량으로 계산했어요.` : pk.why}
-        </p>
-
-        <label className="mt-6 flex cursor-pointer items-center gap-3 text-[16px] font-bold">
-          <input type="checkbox" checked={local} onChange={(e) => setLocal(e.target.checked)} className={`h-5 w-5 accent-[#9a3324] ${focusRing}`} />
-          국산 원료로 지정
-        </label>
+                </th>
+                <td className="whitespace-nowrap px-4 py-3 text-right font-bold tabular-nums" style={{ color: C.tomatoDeep }}>
+                  {num(p.moq)}개
+                </td>
+                <td className="px-4 py-3" style={{ color: C.body, wordBreak: "keep-all" }}>
+                  {p.why}
+                </td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
       </div>
-
-      {/* 결과 */}
-      <div className="rounded-[8px] p-5 md:p-7" style={{ background: C.ink, color: C.paper }} aria-live="polite">
-        <p className="text-[15px] font-semibold opacity-80">개당 단가 개략</p>
-        <p className="mt-1 text-[34px] font-bold leading-tight tracking-[-0.03em] md:text-[42px] tabular-nums">
-          {num(r.lo)} ~ {num(r.hi)}
-          <span className="ml-1 text-[20px]">원</span>
-        </p>
-        <p className="mt-2 text-[15px] opacity-85">
-          {num(Math.max(qty, pk.moq))}개 총액 {won(r.lo * Math.max(qty, pk.moq))} ~ {won(r.hi * Math.max(qty, pk.moq))}
-        </p>
-        {nextTier && nextGain > 0 && (
-          <p className="mt-1 text-[14px] font-semibold" style={{ color: "#e9b8ab" }}>
-            {num(nextTier.from)}개부터는 개당 약 {num(round10(nextGain / 2))}원 내려가요
-          </p>
-        )}
-
-        {/* 수량 구간별 막대. 막대 높이는 scaleY 로 바꾼다 */}
-        <div className="mt-6 flex h-[150px] items-end gap-2 border-b pb-0" style={{ borderColor: "rgba(255,255,255,0.25)" }} aria-hidden>
-          {tiers.map((q) => {
-            const u = unitRange(pk, q, local).hi;
-            const on = tierK(Math.max(qty, pk.moq)) === tierK(q);
-            return (
-              <div key={q} className="flex h-full min-w-0 flex-1 flex-col items-center justify-end">
-                <span className="mb-1 text-[11px] font-semibold tabular-nums sm:text-[12px]" style={{ color: on ? "#e9b8ab" : "rgba(255,255,255,0.7)" }}>
-                  {num(u)}
-                </span>
-                <motion.div
-                  className="w-full rounded-t-[4px]"
-                  style={{ height: "100%", originY: 1, background: on ? "#c4705f" : "rgba(255,255,255,0.22)" }}
-                  initial={false}
-                  animate={{ scaleY: Math.max(0.08, (u / maxUnit) * 0.86) }}
-                  transition={{ duration: reduce ? 0 : 0.45, ease: EASE }}
-                />
-              </div>
-            );
-          })}
+      <dl className="mt-6 grid gap-4 rounded-[8px] p-5 text-[15px] leading-[1.6] sm:grid-cols-2" style={{ background: C.cream }}>
+        <div>
+          <dt className="font-bold">견적에 포함</dt>
+          <dd style={{ color: C.body }}>원료, 포장재, 제조, 살균, 금속 검출</dd>
         </div>
-        <div className="mt-1.5 flex gap-2" aria-hidden>
-          {tiers.map((q) => (
-            <span key={q} className="min-w-0 flex-1 text-center text-[11px] opacity-75 tabular-nums sm:text-[12px]">
-              {q >= 10000 ? `${q / 10000}만` : num(q)}
-            </span>
-          ))}
+        <div>
+          <dt className="font-bold">따로 드는 비용</dt>
+          <dd style={{ color: C.body }}>파우치 인쇄 동판비, 영양성분 분석, 운송비</dd>
         </div>
-
-        <dl className="mt-6 grid gap-3 text-[14px] leading-[1.6] sm:grid-cols-2">
-          <div>
-            <dt className="font-bold">단가에 포함</dt>
-            <dd className="opacity-85">원료, 포장재, 제조, 살균, 금속 검출</dd>
-          </div>
-          <div>
-            <dt className="font-bold">따로 드는 비용</dt>
-            <dd className="opacity-85">파우치 인쇄 동판비, 영양성분 분석, 운송비</dd>
-          </div>
-        </dl>
-        <p className="mt-3 text-[13px] opacity-75">부가세 별도. 레시피와 원료 시세에 따라 달라져요.</p>
-
-        <button
-          type="button"
-          onClick={() => onSample(Math.max(qty, pk.moq))}
-          data-gtm-cta="food-oem_calc_sample"
-          className={`mt-6 inline-flex h-12 w-full items-center justify-center gap-2 rounded-[6px] text-[16px] font-semibold text-white ${focusRing}`}
-          style={{ background: "#ffffff", color: C.ink, outlineColor: "#ffffff" }}
-        >
-          <PackageOpen size={18} aria-hidden />이 조건으로 샘플 의뢰
-        </button>
-      </div>
+      </dl>
+      <p className="mt-3 text-[14px]" style={{ color: C.muted }}>
+        단가는 레시피, 원료, 수량을 확인한 뒤 상담으로 안내합니다.
+      </p>
     </div>
   );
 }
 
 /* ---------- 3. 생산 공정 ---------- */
 
-function Process({ reduce, idx, setIdx }: { reduce: boolean; idx: number; setIdx: (i: number) => void }) {
-  const s = STEPS[idx];
-  const t = { duration: reduce ? 0 : 0.5, ease: EASE };
-
+function Process() {
   return (
     <div className="mt-8">
-      {/* 공정 라인. 고른 칸 위로 파우치 표시가 옮겨 간다 */}
-      <div className="relative">
-        <div className="absolute inset-x-2 top-[57px] hidden h-px md:block" style={{ background: C.line }} aria-hidden />
-        <ol className="relative grid grid-cols-2 gap-2 sm:grid-cols-4 md:grid-cols-7 md:gap-1.5">
-          {STEPS.map((st, i) => {
-            const on = i === idx;
-            return (
-              <li key={st.name}>
-                <button
-                  type="button"
-                  aria-pressed={on}
-                  onClick={() => setIdx(i)}
-                  className={`relative flex w-full flex-col items-center rounded-[8px] px-1 pb-3 pt-2 text-center ${focusRing}`}
-                  style={{ outlineColor: C.tomato, background: on ? C.cream : "transparent" }}
-                >
-                  <span className="relative flex h-[46px] w-full items-end justify-center">
-                    {on && (
-                      <motion.span layoutId="fo-proc-pouch" transition={t} className="block" aria-hidden>
-                        <PackageOpen size={22} style={{ color: C.tomato }} />
-                      </motion.span>
-                    )}
-                  </span>
-                  <span
-                    className="relative z-[1] mt-1.5 inline-flex h-[14px] w-[14px] items-center justify-center rounded-full border"
-                    style={{ borderColor: on ? C.tomato : "#b5b5b5", background: on ? C.tomato : C.paper }}
-                    aria-hidden
-                  />
-                  <span className="mt-2 text-[15px] font-bold leading-tight">{st.name}</span>
-                  {st.ccp && (
-                    <span className="mt-1 rounded-[4px] border px-1.5 text-[12px] font-semibold" style={{ borderColor: C.line, color: C.tomatoDeep }}>
-                      {st.ccp}
-                    </span>
-                  )}
-                </button>
-              </li>
-            );
-          })}
-        </ol>
-      </div>
-
-      <AnimatePresence mode="wait" initial={false}>
-        <motion.div
-          key={idx}
-          initial={reduce ? false : { clipPath: "inset(0 0 100% 0)" }}
-          animate={{ clipPath: "inset(0 0 0% 0)" }}
-          exit={reduce ? { opacity: 0 } : { clipPath: "inset(100% 0 0 0)" }}
-          transition={{ duration: reduce ? 0 : DUR, ease: EASE }}
-          className="mt-6 grid gap-5 rounded-[8px] border p-5 md:grid-cols-[minmax(0,1.2fr)_minmax(0,1fr)] md:p-7"
-          style={{ borderColor: C.line }}
-          aria-live="polite"
-        >
-          <div>
-            <h3 className="flex flex-wrap items-center gap-2 text-[22px] font-bold">
-              {s.name}
-              {s.ccp && (
-                <span className="rounded-[4px] border px-2 py-0.5 text-[13px] font-semibold" style={{ borderColor: C.line, color: C.tomatoDeep }}>
-                  {s.ccp} 중요관리점
+      <ol className="border-t" style={{ borderColor: C.line }}>
+        {STEPS.map((st, i) => (
+          <li key={st.name} className="grid gap-1 border-b py-4 md:grid-cols-[240px_minmax(0,1fr)] md:gap-6" style={{ borderColor: C.line }}>
+            <p className="flex flex-wrap items-center gap-2">
+              <span className="text-[14px] font-bold tabular-nums" style={{ color: C.tomatoDeep }}>
+                {p2(i + 1)}
+              </span>
+              <span className="text-[18px] font-bold">{st.name}</span>
+              {st.ccp && (
+                <span className="rounded-[4px] border px-1.5 text-[12px] font-semibold" style={{ borderColor: C.line, color: C.tomatoDeep }}>
+                  {st.ccp}
                 </span>
               )}
-            </h3>
-            <p className="mt-3 text-[16px] leading-[1.7]">{s.what}</p>
-          </div>
-          <div className="rounded-[8px] p-4" style={{ background: C.cream }}>
-            <p className="text-[14px] font-bold" style={{ color: C.tomatoDeep }}>
-              관리 기준
             </p>
-            <ul className="mt-2 space-y-1.5">
-              {s.rule.map((r) => (
-                <li key={r} className="flex gap-2 text-[15px] leading-[1.55]">
-                  <Check size={17} className="mt-[3px] flex-none" style={{ color: C.tomatoDeep }} aria-hidden />
-                  {r}
-                </li>
-              ))}
-            </ul>
-          </div>
-        </motion.div>
-      </AnimatePresence>
+            <p className="text-[15px] leading-[1.65] md:text-[16px]" style={{ color: C.body, wordBreak: "keep-all" }}>
+              {st.what}
+            </p>
+          </li>
+        ))}
+      </ol>
       <p className="mt-4 text-[14px]" style={{ color: C.muted }}>
-        공정마다 작업 일지와 온도 기록을 남겨요. 거래처에는 제조번호별 기록을 보여 드려요.
+        공정마다 작업 일지와 온도 기록을 남기고, 거래처에는 제조번호별 기록을 보여 드립니다.
       </p>
     </div>
   );
@@ -982,14 +620,13 @@ interface Done {
   reply: Date;
 }
 
-function SampleForm({ reduce, today, prefill }: { reduce: boolean; today: Date; prefill: Prefill | null }) {
-  const initQty = prefill ? (prefill.qty < 1000 ? QTY_PLANS[0] : prefill.qty < 3000 ? QTY_PLANS[1] : prefill.qty < 10000 ? QTY_PLANS[2] : QTY_PLANS[3]) : "";
+function SampleForm({ reduce, today }: { reduce: boolean; today: Date }) {
   const [company, setCompany] = useState("");
   const [name, setName] = useState("");
   const [phone, setPhone] = useState("");
-  const [item, setItem] = useState(prefill?.item ?? "");
-  const [pack, setPack] = useState<string>(prefill ? packById(prefill.pack).label : "");
-  const [plan, setPlan] = useState<string>(initQty);
+  const [item, setItem] = useState("");
+  const [pack, setPack] = useState<string>("");
+  const [plan, setPlan] = useState<string>("");
   const [memo, setMemo] = useState("");
   const [sendRef, setSendRef] = useState(false);
   const [agree, setAgree] = useState(false);
@@ -1309,7 +946,7 @@ function Visit() {
     [<Clock key="c" size={19} aria-hidden />, "상담 시간", "평일 09:00 ~ 18:00, 점심시간 12:00 ~ 13:00, 주말 공휴일 휴무"],
     [<Truck key="t" size={19} aria-hidden />, "화물 입출고", "평일 08:00 ~ 16:00, 5톤 윙바디 진입 가능"],
     [<Phone key="p" size={19} aria-hidden />, "대표전화", TEL],
-    [<MessageCircle key="k" size={19} aria-hidden />, "카카오톡", "카카오톡 채널 곰파트너"],
+    [<MessageCircle key="k" size={19} aria-hidden />, "카카오톡", "카카오톡 채널 식품 OEM 제조"],
   ];
   return (
     <div className="mt-6 grid gap-8 md:grid-cols-[minmax(0,1fr)_minmax(0,1fr)]">
@@ -1345,13 +982,10 @@ function SampleLogo({ light, size = 20 }: { light?: boolean; size?: number }) {
   const mark = size + 8;
   return (
     <span className="inline-flex items-center gap-2 leading-none" style={{ color: light ? "#fff" : "#111" }}>
-      {/* eslint-disable-next-line @next/next/no-img-element -- 메인 사이트와 같은 곰 로고 */}
-      <img src="/images/logo-bear.png" alt="" aria-hidden width={mark} height={mark} className="shrink-0" style={{ width: mark, height: mark }} />
       <span className="flex items-baseline gap-1 whitespace-nowrap">
         <span className="font-bold tracking-[-0.03em]" style={{ fontSize: size }}>
-          곰파트너
+          식품 OEM 제조
         </span>
-        <span className="text-[12px] font-semibold opacity-75">카탈로그</span>
       </span>
     </span>
   );

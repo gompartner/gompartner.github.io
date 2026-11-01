@@ -13,23 +13,20 @@ import { DemoMakerInfo } from "@/components/demos/DemoMakerInfo";
    구역 다섯 개(가게 소개, 대표메뉴, 전체 메뉴, 영업시간, 오시는 길)를 한 페이지에 두고 위쪽 메뉴로 이동한다.
    예약·주문 폼, 게시판, 회원, 결제, 실시간 현황은 넣지 않는다.
 
-   뼈대: 메뉴판형. 국밥집 벽에 거는 나무 메뉴패를 그대로 옮겨 식사 메뉴를 세로쓰기 패로 걸고,
-   안주·추가 메뉴와 원산지 표시는 그 아래 점선 목록으로 둔다.
-   영업시간은 요일마다 10시부터 22시까지 막대를 그려 브레이크타임 빈칸이 한눈에 보이게 한다.
-   오늘 요일 강조는 하이드레이션 뒤에만 한다.
+   뼈대: 메뉴판형. 식사, 안주, 추가 메뉴를 점선 가격 목록으로 두고 원산지 표시는 그 아래에 둔다.
+   영업시간은 글자 안내와 요일별 표로 두고, 오늘 요일 강조는 하이드레이션 뒤에만 한다.
    지도는 넣지 않고 네이버 지도, 카카오맵으로 여는 버튼과 주소, 주차, 대중교통 안내만 둔다.
 
    항목 명칭은 네이버 플레이스와 맛집 소개 매체의 국밥·백반집 표기를 따른다
    (대표메뉴, 영업시간, 브레이크타임, 라스트오더, 정기휴무, 포장 가능, 단체 이용 가능, 주차, 원산지).
 
    디자인: 백자색 바탕(#f8f5ee)에 먹색 글씨(#1e1b17), 국물 빛 붉은색(#a32a1d) 하나만 강조색으로 쓴다.
-   메뉴패는 밝은 나무색(#d9bf8f).
 
    사진 출처(public/images/demo-hansik):
    AI 생성(Z-Image-Turbo, Apache 2.0) hero, gukbap, baekban, suyuk, interior */
 
 const IMG = "/images/demo-hansik";
-const STORE = "곰파트너";
+const STORE = "동네 한식당";
 const TEL = "02-000-0000";
 const ADDRESS = "서울 ㅁㅍ구 ㅇㄴ동 ㅇㄴ로 3길 14 1층";
 
@@ -40,10 +37,6 @@ const C = {
   muted: "#5c554b",
   line: "#e3ddd0",
   red: "#a32a1d",
-  wood: "#d9bf8f",
-  woodEdge: "#b8955a",
-  woodInk: "#2b1d0e",
-  woodMuted: "#5a4426",
 };
 
 const SECTIONS = [
@@ -60,14 +53,14 @@ const won = (n: number) => n.toLocaleString("ko-KR");
 
 /* ---------- 메뉴 ---------- */
 
-interface Plaque {
+interface Meal {
   name: string;
   price: number;
   /** 특 가격 */
   big?: number;
 }
 
-const MEALS: Plaque[] = [
+const MEALS: Meal[] = [
   { name: "소고기국밥", price: 10000, big: 13000 },
   { name: "순대국밥", price: 9500, big: 12000 },
   { name: "돼지국밥", price: 9500, big: 12000 },
@@ -117,8 +110,6 @@ const ORIGIN = [
 
 /* ---------- 영업시간 ---------- */
 
-const RULER_FROM = 600; // 10:00
-const RULER_TO = 1320; // 22:00
 const BREAK: [number, number] = [900, 990]; // 15:00~16:30
 
 interface Day {
@@ -138,7 +129,6 @@ const WEEK: Day[] = [
 ];
 
 const hhmm = (m: number) => `${String(Math.floor(m / 60)).padStart(2, "0")}:${String(m % 60).padStart(2, "0")}`;
-const pct = (m: number) => `${((m - RULER_FROM) / (RULER_TO - RULER_FROM)) * 100}%`;
 
 const noopSubscribe = () => () => {};
 
@@ -148,15 +138,6 @@ function useWeekday() {
 }
 
 /* ---------- 공용 ---------- */
-
-function LogoMark() {
-  return (
-    <>
-      {/* eslint-disable-next-line @next/next/no-img-element */}
-      <img src="/images/logo-bear.png" alt="" aria-hidden width={32} height={32} className="h-8 w-8 shrink-0" />
-    </>
-  );
-}
 
 function SectionHead({ id, title, sub }: { id: string; title: string; sub?: string }) {
   return (
@@ -258,10 +239,8 @@ function Header({
           aria-label={`${STORE} 처음으로`}
           className="flex items-center gap-2"
         >
-          <LogoMark />
           <span className="inline-flex items-baseline gap-1.5 whitespace-nowrap">
-            <span className="text-[18px] font-bold tracking-[-0.02em]">곰파트너</span>
-            <span className="text-[11px] font-semibold opacity-80">카탈로그</span>
+            <span className="text-[18px] font-bold tracking-[-0.02em]">동네 한식당</span>
           </span>
         </button>
 
@@ -515,34 +494,25 @@ function MenuBoard() {
       <div className="mx-auto max-w-[1200px] px-4 sm:px-6">
         <SectionHead id="menu-title" title="전체 메뉴" sub="국밥은 보통과 특 두 가지이고, 특은 고기가 두 배입니다. 모든 메뉴 포장 가능합니다." />
 
-        <h3 className="sr-only">식사</h3>
-        <div className="relative px-1 pt-3 sm:px-3">
-          {/* 메뉴패를 거는 가로대 */}
-          <span aria-hidden className="absolute inset-x-0 top-0 h-2 rounded-[2px]" style={{ background: C.woodEdge }} />
-          <ul className="grid grid-cols-4 gap-x-2 gap-y-6 sm:gap-x-4 lg:grid-cols-8">
+        <div>
+          <h3 className="flex items-baseline justify-between border-b pb-2 text-[20px] font-bold" style={{ borderColor: C.ink }}>
+            식사
+            <span className="flex gap-3 text-[14px] font-semibold sm:gap-10" style={{ color: C.muted }}>
+              <span className="w-[64px] text-right">보통</span>
+              <span className="w-[64px] text-right">특</span>
+            </span>
+          </h3>
+          <ul className="grid md:grid-cols-2 md:gap-x-14">
             {MEALS.map((m) => (
-              <li key={m.name} className="flex flex-col items-center">
-                <span aria-hidden className="h-4 w-px" style={{ background: C.woodEdge }} />
-                <div
-                  className="flex h-[236px] w-full max-w-[104px] flex-col items-center justify-between rounded-[4px] border px-1 pb-3 pt-4 shadow-[0_2px_0_rgba(43,29,14,0.18)]"
-                  style={{
-                    background: `repeating-linear-gradient(90deg, ${C.wood} 0 7px, #d4b884 7px 8px)`,
-                    borderColor: C.woodEdge,
-                    color: C.woodInk,
-                  }}
-                >
-                  <span className="text-[19px] font-bold leading-none tracking-[0.06em] sm:text-[21px]" style={{ writingMode: "vertical-rl" }}>
-                    {m.name}
+              <li key={m.name} className="flex items-baseline gap-3 border-b py-3 text-[17px]" style={{ borderColor: C.line }}>
+                <span className="shrink-0 font-semibold">{m.name}</span>
+                <span aria-hidden className="min-w-4 flex-1 translate-y-[-4px] border-b border-dotted" style={{ borderColor: "#b9b1a3" }} />
+                <span className="flex shrink-0 gap-3 tabular-nums sm:gap-10">
+                  <span className="w-[64px] whitespace-nowrap text-right font-semibold">{won(m.price)}</span>
+                  <span className="w-[64px] whitespace-nowrap text-right" style={{ color: m.big ? C.ink : C.muted }}>
+                    {m.big ? won(m.big) : "-"}
                   </span>
-                  <span className="flex flex-col items-center text-center leading-[1.3]">
-                    <span className="text-[15px] font-bold tabular-nums sm:text-[16px]">{won(m.price)}</span>
-                    {m.big && (
-                      <span className="text-[13px] font-semibold tabular-nums sm:text-[14px]" style={{ color: C.woodMuted }}>
-                        특 {won(m.big)}
-                      </span>
-                    )}
-                  </span>
-                </div>
+                </span>
               </li>
             ))}
           </ul>
@@ -587,7 +557,6 @@ function MenuBoard() {
 
 function Hours() {
   const today = useWeekday();
-  const ticks = [600, 720, 840, 960, 1080, 1200, 1320];
 
   return (
     <section id="hours" aria-labelledby="hours-title" className="scroll-mt-16 py-16 sm:py-20">
@@ -609,72 +578,45 @@ function Hours() {
           </dl>
         </div>
 
-        <div className="rounded-[6px] border p-4 sm:p-6" style={{ borderColor: C.line, background: C.card }}>
-          <h3 className="sr-only">요일별 영업시간</h3>
-          {/* 시각 눈금 */}
-          <div aria-hidden className="relative ml-[44px] h-6 text-[12px] tabular-nums sm:ml-[52px] sm:text-[13px]" style={{ color: C.muted }}>
-            {ticks.map((t, i) => (
-              <span
-                key={t}
-                className="absolute top-0"
-                style={{ left: pct(t), transform: i === 0 ? "none" : i === ticks.length - 1 ? "translateX(-100%)" : "translateX(-50%)" }}
-              >
-                {t / 60}시
-              </span>
-            ))}
-          </div>
-          <ul className="space-y-1.5">
-            {WEEK.map((d) => {
-              const isToday = d.day === today;
-              const text = d.open
-                ? `${d.label}요일 ${hhmm(d.open[0])}~${hhmm(d.open[1])}, 브레이크타임 ${hhmm(BREAK[0])}~${hhmm(BREAK[1])}, 라스트오더 ${hhmm(d.open[1] - 30)}`
-                : `${d.label}요일 정기휴무`;
-              return (
-                <li
-                  key={d.day}
-                  className="flex items-center gap-2 rounded-[4px] py-1.5 sm:gap-3"
-                  style={isToday ? { background: "#f3e6e3" } : undefined}
-                >
-                  <span className="sr-only">{text}</span>
-                  <span aria-hidden className="w-[36px] shrink-0 text-center text-[16px] font-bold sm:w-[40px]" style={isToday ? { color: C.red } : undefined}>
-                    {d.label}
-                    {isToday && <span className="block text-[11px] font-semibold leading-none">오늘</span>}
-                  </span>
-                  <div aria-hidden className="relative h-8 flex-1 rounded-[2px]" style={{ background: "#efeae0" }}>
+        <div className="overflow-hidden rounded-[6px] border" style={{ borderColor: C.line, background: C.card }}>
+          <table className="w-full text-left text-[16px]">
+            <caption className="sr-only">요일별 영업시간</caption>
+            <thead>
+              <tr className="border-b text-[14px]" style={{ borderColor: C.line, color: C.muted }}>
+                <th scope="col" className="px-4 py-3 font-semibold sm:px-6">요일</th>
+                <th scope="col" className="px-2 py-3 font-semibold">영업</th>
+                <th scope="col" className="px-4 py-3 font-semibold sm:px-6">라스트오더</th>
+              </tr>
+            </thead>
+            <tbody>
+              {WEEK.map((d) => {
+                const isToday = d.day === today;
+                return (
+                  <tr key={d.day} className="border-b last:border-b-0" style={{ borderColor: C.line, background: isToday ? "#f3e6e3" : undefined }}>
+                    <th scope="row" className="px-4 py-3 font-bold sm:px-6" style={isToday ? { color: C.red } : undefined}>
+                      {d.label}
+                      {isToday && <span className="ml-1.5 text-[13px] font-semibold">오늘</span>}
+                    </th>
                     {d.open ? (
                       <>
-                        <span className="absolute inset-y-0 rounded-[2px]" style={{ left: pct(d.open[0]), width: `calc(${pct(BREAK[0])} - ${pct(d.open[0])})`, background: C.ink }} />
-                        <span className="absolute inset-y-0 rounded-[2px]" style={{ left: pct(BREAK[1]), width: `calc(${pct(d.open[1])} - ${pct(BREAK[1])})`, background: C.ink }} />
-                        <span
-                          className="absolute inset-y-0 border-x border-dashed"
-                          style={{ left: pct(BREAK[0]), width: `calc(${pct(BREAK[1])} - ${pct(BREAK[0])})`, borderColor: "#b9b1a3" }}
-                        />
-                        <span className="absolute inset-y-0 w-[2px]" style={{ left: `calc(${pct(d.open[1] - 30)} - 1px)`, background: C.red }} />
+                        <td className="px-2 py-3 tabular-nums">
+                          {hhmm(d.open[0])}~{hhmm(d.open[1])}
+                        </td>
+                        <td className="px-4 py-3 tabular-nums sm:px-6">{hhmm(d.open[1] - 30)}</td>
                       </>
                     ) : (
-                      <span className="absolute inset-0 flex items-center pl-3 text-[15px] font-semibold" style={{ color: C.red }}>
+                      <td colSpan={2} className="px-2 py-3 font-semibold" style={{ color: C.red }}>
                         정기휴무
-                      </span>
+                      </td>
                     )}
-                  </div>
-                </li>
-              );
-            })}
-          </ul>
-          <div aria-hidden className="mt-4 flex flex-wrap gap-x-5 gap-y-1 text-[14px]" style={{ color: C.muted }}>
-            <span className="inline-flex items-center gap-1.5">
-              <span className="h-3 w-5 rounded-[2px]" style={{ background: C.ink }} />
-              영업
-            </span>
-            <span className="inline-flex items-center gap-1.5">
-              <span className="h-3 w-5 border border-dashed" style={{ borderColor: "#8f8676" }} />
-              브레이크타임
-            </span>
-            <span className="inline-flex items-center gap-1.5">
-              <span className="h-3 w-[2px]" style={{ background: C.red }} />
-              라스트오더
-            </span>
-          </div>
+                  </tr>
+                );
+              })}
+            </tbody>
+          </table>
+          <p className="border-t px-4 py-3 text-[15px] sm:px-6" style={{ borderColor: C.line, color: C.muted }}>
+            브레이크타임 매일 {hhmm(BREAK[0])}~{hhmm(BREAK[1])}
+          </p>
         </div>
       </div>
     </section>
@@ -757,7 +699,6 @@ function Footer() {
     <footer className="px-4 pb-28 pt-12 text-[15px] sm:px-6" style={{ background: C.ink, color: "#c9c2b6" }}>
       <div className="mx-auto max-w-[1200px]">
         <p className="flex items-center gap-2 text-[18px] font-bold text-[#f8f5ee]">
-          <LogoMark />
           {STORE}
         </p>
         <DemoMakerInfo className="mt-4" />

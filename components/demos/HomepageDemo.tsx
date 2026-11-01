@@ -5,7 +5,6 @@ import { AnimatePresence, motion } from "framer-motion";
 import {
   ArrowDown,
   ArrowUp,
-  Calendar,
   Car,
   Check,
   ChevronDown,
@@ -16,7 +15,6 @@ import {
   Lock,
   MapPin,
   QrCode,
-  RotateCcw,
   ShieldCheck,
   ShowerHead,
   Speaker,
@@ -31,55 +29,19 @@ import { afterSettle, jumpTo } from "@/components/demos/guideScroll";
 
 const STORAGE_KEY = "gs-demo:homepage:v4";
 
-/* 네이버페이 JS SDK 연동 (개발모드 샌드박스).
-   기본값은 네이버페이 개발자센터 샌드박스 키 — 운영 전환 시 NEXT_PUBLIC_NAVERPAY_*로 교체한다.
-   SDK 로드에 실패하면 데모 결제 시트로 흐름만 시뮬레이션한다. */
-const NAVERPAY_CLIENT_ID = process.env.NEXT_PUBLIC_NAVERPAY_CLIENT_ID ?? "HN3GGCMDdTgGUfl0kFCo";
-const NAVERPAY_CHAIN_ID = process.env.NEXT_PUBLIC_NAVERPAY_CHAIN_ID ?? "T2F3eUptcXJ5eU5";
-const NAVERPAY_SDK_URL = "https://nsp.pay.naver.com/sdk/js/naverpay.min.js";
-
-interface NaverPayInstance {
-  open: (params: Record<string, unknown>) => void;
-}
-
-declare global {
-  interface Window {
-    Naver?: { Pay: { create: (options: Record<string, unknown>) => NaverPayInstance } };
-  }
-}
-
-let naverPaySdkPromise: Promise<void> | null = null;
-function loadNaverPaySdk() {
-  if (!naverPaySdkPromise) {
-    naverPaySdkPromise = new Promise<void>((resolve, reject) => {
-      const script = document.createElement("script");
-      script.src = NAVERPAY_SDK_URL;
-      script.onload = () => resolve();
-      script.onerror = () => {
-        naverPaySdkPromise = null;
-        reject(new Error("네이버페이 SDK 로드 실패"));
-      };
-      document.head.appendChild(script);
-    });
-  }
-  return naverPaySdkPromise;
-}
-
-/* 지점 데이터: 항목만 추가하면 지도 마커, 카드, 요금표, 지점별 시설 표가 함께 생성된다.
-   x, y는 서울 행정구역 지도(public/images/demo-gym/seoul-districts.svg) 기준 백분율 좌표.
-   좌표는 구별 path의 getBBox 중심을 보정 후 viewBox(30 108 1332 1099) 기준 %로 환산한 값.
+/* 지점 데이터: 항목만 추가하면 지점 카드, 요금표, 지점별 시설 표가 함께 생성된다.
    price는 평일 저녁(기본) 시간당 요금이다. 주간·주말 요금은 slotPrice에서 계산한다. */
 const locations = [
-  { id: "gangnam", name: "강남점", x: 69.5, y: 73, price: 18000, rating: 4.9, reviews: 128, available: true, img: "/images/demo-gym/zone-weight.jpg", facilities: ["주차", "샤워", "락커", "PT"] },
-  { id: "jamsil", name: "잠실점", x: 82, y: 70, price: 16000, rating: 4.8, reviews: 96, available: true, img: "/images/demo-gym/zone-cardio.jpg", facilities: ["주차", "샤워", "락커"] },
-  { id: "seongsu", name: "성수점", x: 67, y: 55, price: 17000, rating: 4.9, reviews: 143, available: true, img: "/images/demo-gym/zone-recovery.jpg", facilities: ["샤워", "락커", "PT"] },
-  { id: "hongdae", name: "홍대점", x: 37, y: 52, price: 15000, rating: 4.7, reviews: 87, available: true, img: "/images/demo-gym/zone-studio.jpg", facilities: ["락커"] },
-  { id: "yeouido", name: "여의도점", x: 37, y: 63, price: 19000, rating: 4.8, reviews: 74, available: false, img: "/images/demo-gym/zone-weight.jpg", facilities: ["주차", "샤워", "락커", "PT"] },
-  { id: "jongno", name: "종로점", x: 53, y: 40, price: 16000, rating: 4.6, reviews: 59, available: true, img: "/images/demo-gym/zone-cardio.jpg", facilities: ["락커"] },
-  { id: "yongsan", name: "용산점", x: 51, y: 61, price: 18000, rating: 4.8, reviews: 102, available: true, img: "/images/demo-gym/zone-recovery.jpg", facilities: ["주차", "샤워", "락커", "PT"] },
-  { id: "kondae", name: "건대점", x: 75, y: 58, price: 15000, rating: 4.7, reviews: 68, available: true, img: "/images/demo-gym/zone-studio.jpg", facilities: ["샤워", "락커"] },
-  { id: "sinchon", name: "신촌점", x: 41, y: 46, price: 15000, rating: 4.6, reviews: 51, available: false, img: "/images/demo-gym/zone-weight.jpg", facilities: ["샤워", "락커", "PT"] },
-  { id: "samsung", name: "삼성점", x: 73.5, y: 71, price: 20000, rating: 4.9, reviews: 156, available: true, img: "/images/demo-gym/zone-cardio.jpg", facilities: ["주차", "샤워", "락커", "PT"] },
+  { id: "gangnam", name: "강남점", price: 18000, rating: 4.9, reviews: 128, available: true, img: "/images/demo-gym/zone-weight.jpg", facilities: ["주차", "샤워", "락커", "PT"] },
+  { id: "jamsil", name: "잠실점", price: 16000, rating: 4.8, reviews: 96, available: true, img: "/images/demo-gym/zone-cardio.jpg", facilities: ["주차", "샤워", "락커"] },
+  { id: "seongsu", name: "성수점", price: 17000, rating: 4.9, reviews: 143, available: true, img: "/images/demo-gym/zone-recovery.jpg", facilities: ["샤워", "락커", "PT"] },
+  { id: "hongdae", name: "홍대점", price: 15000, rating: 4.7, reviews: 87, available: true, img: "/images/demo-gym/zone-studio.jpg", facilities: ["락커"] },
+  { id: "yeouido", name: "여의도점", price: 19000, rating: 4.8, reviews: 74, available: false, img: "/images/demo-gym/zone-weight.jpg", facilities: ["주차", "샤워", "락커", "PT"] },
+  { id: "jongno", name: "종로점", price: 16000, rating: 4.6, reviews: 59, available: true, img: "/images/demo-gym/zone-cardio.jpg", facilities: ["락커"] },
+  { id: "yongsan", name: "용산점", price: 18000, rating: 4.8, reviews: 102, available: true, img: "/images/demo-gym/zone-recovery.jpg", facilities: ["주차", "샤워", "락커", "PT"] },
+  { id: "kondae", name: "건대점", price: 15000, rating: 4.7, reviews: 68, available: true, img: "/images/demo-gym/zone-studio.jpg", facilities: ["샤워", "락커"] },
+  { id: "sinchon", name: "신촌점", price: 15000, rating: 4.6, reviews: 51, available: false, img: "/images/demo-gym/zone-weight.jpg", facilities: ["샤워", "락커", "PT"] },
+  { id: "samsung", name: "삼성점", price: 20000, rating: 4.9, reviews: 156, available: true, img: "/images/demo-gym/zone-cardio.jpg", facilities: ["주차", "샤워", "락커", "PT"] },
 ];
 
 // 후기 영역의 평점은 지점별 후기 수로 가중 평균한다
@@ -183,69 +145,14 @@ const branchInfo: Record<string, { addr: string; subway: string }> = {
   samsung: { addr: "서울 강남구 영동대로 000, 2층", subway: "2호선 삼성역 5번 출구 도보 3분" },
 };
 
-/** 요소가 뷰포트에 들어왔는지 한 번만 감지 */
-function useInView<T extends HTMLElement>(threshold = 0.25) {
-  const ref = useRef<T>(null);
-  const [inView, setInView] = useState(false);
-  useEffect(() => {
-    const el = ref.current;
-    if (!el) return;
-    const io = new IntersectionObserver(
-      ([entry]) => {
-        if (entry.isIntersecting) {
-          setInView(true);
-          io.disconnect();
-        }
-      },
-      { threshold },
-    );
-    io.observe(el);
-    return () => io.disconnect();
-  }, [threshold]);
-  return [ref, inView] as const;
-}
-
-/** 스크롤로 시야에 들어오면 부드럽게 나타나는 래퍼 */
-function Reveal({ children, className = "" }: { children: React.ReactNode; className?: string }) {
-  const ref = useRef<HTMLDivElement>(null);
-  const [shown, setShown] = useState(false);
-
-  useEffect(() => {
-    const el = ref.current;
-    if (!el) return;
-    const io = new IntersectionObserver(
-      ([entry]) => {
-        if (entry.isIntersecting) {
-          setShown(true);
-          io.disconnect();
-        }
-      },
-      { threshold: 0.15 },
-    );
-    io.observe(el);
-    return () => io.disconnect();
-  }, []);
-
-  return (
-    <div
-      ref={ref}
-      className={`${className} transition-all duration-700 ease-out motion-reduce:transition-none ${
-        shown ? "translate-y-0 opacity-100" : "translate-y-6 opacity-0"
-      } motion-reduce:translate-y-0 motion-reduce:opacity-100`}
-    >
-      {children}
-    </div>
-  );
-}
-
 function SectionHead({ id, title, aside }: { id?: string; title: string; aside?: React.ReactNode }) {
   return (
-    <Reveal className="flex flex-wrap items-end justify-between gap-4">
+    <div className="flex flex-wrap items-end justify-between gap-4">
       <h2 id={id} className="text-2xl font-black tracking-tight sm:text-4xl">
         {title}
       </h2>
       {aside}
-    </Reveal>
+    </div>
   );
 }
 
@@ -265,7 +172,7 @@ interface Reservation {
   date: string;
   times: string[];
   total: number;
-  method?: "naverpay" | "onsite";
+  method?: "card" | "transfer";
 }
 
 interface BookingState {
@@ -276,16 +183,16 @@ interface BookingState {
   reservations?: Reservation[];
 }
 
-/** 결제 확정 시점에 부르는 예약 번호 생성기 */
+/** 예약 확정 시점에 부르는 예약 번호 생성기 */
 const newReservationId = () => `R${Date.now()}`;
 
 const emptyBooking: BookingState = { locationId: null, date: null, times: [], guests: 1, reservations: [] };
 
 const tutorialSteps = [
-  { target: "map", title: "1. 지점 선택", desc: "지도의 핀이나 지점 카드에서 가까운 지점을 고르세요. 핀에 마우스를 올리면 해당 카드가 강조됩니다." },
+  { target: "map", title: "1. 지점 선택", desc: "지점 목록에서 가까운 지점의 예약하기를 누르세요." },
   { target: "booking-date", title: "2. 날짜 선택", desc: "앞으로 14일 중 원하는 날짜를 누르세요. 빨간 요일은 주말 요금이 적용됩니다." },
   { target: "booking-time", title: "3. 시간 선택", desc: "초록 테두리가 예약 가능한 시간이고, 칸 아래 금액이 그 시간 요금입니다. 여러 시간을 이어서 고를 수 있습니다." },
-  { target: "booking-summary", title: "4. 예약 확인, 결제", desc: "총 금액을 확인하고 예약하기와 결제를 차례로 누르면 입장 QR이 바로 발급됩니다." },
+  { target: "booking-summary", title: "4. 예약 확인, 결제", desc: "총 금액을 확인하고 결제 방법을 고르면 입장 QR이 발급됩니다." },
 ];
 
 export function HomepageDemo() {
@@ -293,7 +200,6 @@ export function HomepageDemo() {
   // 첫 예약 무료 행사는 이번 달 말일까지로 보여 준다
   const today = useDemoToday();
   const promoEnd = new Date(today.getFullYear(), today.getMonth() + 1, 0);
-  const videoRef = useRef<HTMLVideoElement>(null);
   // 하위 화면 전환 (지점 안내, 시설 안내, 이용요금, 이용안내)
   const [page, setPage] = useState<GymPage>("home");
   const [branchId, setBranchId] = useState(locations[0].id);
@@ -317,15 +223,7 @@ export function HomepageDemo() {
     });
     return () => cancelAnimationFrame(frame);
   }, [page, pendingAnchor]);
-  // 하위 화면에 있는 동안 첫 화면 영상은 멈춘다
-  useEffect(() => {
-    if (page !== "home") videoRef.current?.pause();
-  }, [page]);
-  const [introKey, setIntroKey] = useState(0);
-  const [hoverId, setHoverId] = useState<string | null>(null);
   const [stage, setStage] = useState<"select" | "confirm" | "paid">("select");
-  // 네이버페이 데모 결제 시트 (clientId 미설정 시 실제 결제창 대신 표시)
-  const [demoPayOpen, setDemoPayOpen] = useState(false);
   // 내 예약 목록에서 클릭한 예약의 QR 보기
   const [viewingId, setViewingId] = useState<string | null>(null);
   // 사용법 가이드: 하위 화면에서 누르면 하위 화면·창을 닫고 첫 화면으로 돌아간다
@@ -333,27 +231,11 @@ export function HomepageDemo() {
     const f = () => {
       setPage("home");
       setPendingAnchor(null);
-      setDemoPayOpen(false);
       setViewingId(null);
     };
     window.addEventListener("demo:go-home", f);
     return () => window.removeEventListener("demo:go-home", f);
   }, []);
-  // 핀 드롭 애니메이션은 지도가 스크롤로 보이는 순간 시작한다
-  const [mapRef, mapInView] = useInView<HTMLDivElement>();
-  // PC에서 카드 리스트 높이를 지도 높이에 맞추고, 핀 호버 시 해당 카드로 스크롤한다
-  const listRef = useRef<HTMLDivElement>(null);
-  const cardRefs = useRef<Record<string, HTMLDivElement | null>>({});
-  const [mapHeight, setMapHeight] = useState(0);
-
-  useEffect(() => {
-    const el = mapRef.current;
-    if (!el) return;
-    const ro = new ResizeObserver(([entry]) => setMapHeight(entry.contentRect.height));
-    ro.observe(el);
-    return () => ro.disconnect();
-  }, [mapRef]);
-
   // 첫 방문 예약 가이드 (스포트라이트 오버레이)
   const [tutStep, setTutStep] = useState<number | null>(null);
   const [tutRect, setTutRect] = useState<{ top: number; left: number; width: number; height: number } | null>(null);
@@ -415,25 +297,6 @@ export function HomepageDemo() {
     openTutorial(0);
   };
 
-  const scrollToCard = (id: string) => {
-    const list = listRef.current;
-    const card = cardRefs.current[id];
-    if (!list || !card) return;
-    // 가로 슬라이더(모바일)를 먼저 판정 — 세로는 패딩 등으로 1~2px 오차가 생겨 오판할 수 있다
-    if (list.scrollWidth > list.clientWidth + 1) {
-      list.scrollTo({
-        left: card.getBoundingClientRect().left - list.getBoundingClientRect().left + list.scrollLeft - 16,
-        behavior: "smooth",
-      });
-    } else if (list.scrollHeight > list.clientHeight + 1) {
-      // 데스크톱: 세로 내부 스크롤 리스트
-      list.scrollTo({
-        top: card.getBoundingClientRect().top - list.getBoundingClientRect().top + list.scrollTop - 8,
-        behavior: "smooth",
-      });
-    }
-  };
-
   const selected = locations.find((l) => l.id === booking.locationId) ?? null;
   // 시간 칸마다 시간대 요금을 더하고, 2명이면 시간당 인원 추가 요금을 붙인다
   const hoursCost =
@@ -456,17 +319,6 @@ export function HomepageDemo() {
     });
   }, [hydrated]);
 
-  useEffect(() => {
-    if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) {
-      const v = videoRef.current;
-      if (v) {
-        v.autoplay = false;
-        v.pause();
-        v.currentTime = v.duration || 4;
-      }
-    }
-  }, []);
-
   // 저장된 날짜가 과거면 초기화
   useEffect(() => {
     if (hydrated && booking.date && days.length && booking.date < days[0].iso) {
@@ -474,16 +326,6 @@ export function HomepageDemo() {
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [hydrated, days.length]);
-
-  const replay = () => {
-    window.scrollTo({ top: 0, behavior: "auto" });
-    const v = videoRef.current;
-    if (v) {
-      v.currentTime = 0;
-      v.play().catch(() => {});
-    }
-    setIntroKey((k) => k + 1);
-  };
 
   const selectLocation = (id: string) => {
     setBooking((prev) => (prev.locationId === id ? prev : { ...prev, locationId: id, times: [] }));
@@ -503,8 +345,8 @@ export function HomepageDemo() {
     setStage("select");
   };
 
-  // 결제 확정: 예약 목록에 저장하고 확정 화면으로 전환 (이벤트 리스너에서 최신 상태로 부르기 위해 ref 경유)
-  const confirmPayment = (method: Reservation["method"] = "naverpay") => {
+  // 결제 확정: 예약 목록에 저장하고 확정 화면으로 전환
+  const confirmPayment = (method: Reservation["method"]) => {
     setStage("paid");
     if (!selected || !booking.date || booking.times.length === 0) return;
     const reservation: Reservation = {
@@ -517,107 +359,25 @@ export function HomepageDemo() {
     };
     setBooking((prev) => ({ ...prev, reservations: [...(prev.reservations ?? []), reservation] }));
   };
-  const confirmPaymentRef = useRef(confirmPayment);
-  useEffect(() => {
-    confirmPaymentRef.current = confirmPayment;
-  });
 
-  // 네이버페이 returnUrl 복귀 처리: 팝업이면 결과를 부모창에 알리고 닫고, 본창이면 바로 반영
-  useEffect(() => {
-    if (!hydrated) return;
-    const qs = new URLSearchParams(window.location.search);
-    const resultCode = qs.get("resultCode");
-    if (!resultCode) return;
-    if (window.opener) {
-      window.opener.postMessage({ type: "naverpay-result", resultCode }, window.location.origin);
-      window.close();
-    } else {
-      if (resultCode === "Success") confirmPaymentRef.current();
-      window.history.replaceState(null, "", window.location.pathname);
-    }
-  }, [hydrated]);
-
-  useEffect(() => {
-    const onMessage = (e: MessageEvent) => {
-      if (e.origin !== window.location.origin) return;
-      if (e.data?.type === "naverpay-result" && e.data.resultCode === "Success") {
-        confirmPaymentRef.current();
-      }
-    };
-    window.addEventListener("message", onMessage);
-    return () => window.removeEventListener("message", onMessage);
-  }, []);
-
-  const startNaverPay = async () => {
-    if (!selected) return;
-    if (!NAVERPAY_CLIENT_ID) {
-      // 가맹 키가 없는 데모 환경 — 결제 흐름만 시뮬레이션
-      setDemoPayOpen(true);
-      return;
-    }
-    try {
-      await loadNaverPaySdk();
-      // 공식 샘플과 동일한 파라미터 형식 (문자열 값)
-      const pay = window.Naver!.Pay.create({
-        mode: "development",
-        clientId: NAVERPAY_CLIENT_ID,
-        chainId: NAVERPAY_CHAIN_ID,
-      });
-      pay.open({
-        merchantPayKey: `grizzly-${selected.id}-${Date.now()}`,
-        productName: `${selected.name} 공간 대여 ${booking.times.length}시간`,
-        productCount: String(booking.times.length),
-        totalPayAmount: String(total),
-        taxScopeAmount: String(total),
-        taxExScopeAmount: "0",
-        // 결제 팝업이 승인 후 이 주소로 돌아오면 아래 useEffect가 결과를 부모창에 넘기고 팝업을 닫는다
-        returnUrl: window.location.origin + window.location.pathname,
-      });
-    } catch {
-      setDemoPayOpen(true);
-    }
-  };
-
-  const step = !booking.locationId ? 1 : !booking.date ? 2 : booking.times.length === 0 ? 3 : stage === "select" ? 4 : 5;
+  const ready = Boolean(selected && booking.date && booking.times.length > 0);
   const scrollTo = (id: string) => document.getElementById(id)?.scrollIntoView({ behavior: "smooth" });
 
   return (
     <div className="min-h-screen bg-white font-sans text-[#111]">
       <style>{`
-        @keyframes gym-hero-in {
-          from { opacity: 0; transform: translateY(24px); }
-          to { opacity: 1; transform: translateY(0); }
-        }
-        .gym-hero-in { animation: gym-hero-in 1.2s ease 2s both; }
         .gym-hero-title { text-wrap: balance; }
-        @keyframes pin-drop {
-          0% { transform: translate(-50%, -150%); opacity: 0; }
-          60% { transform: translate(-50%, -40%); opacity: 1; }
-          100% { transform: translate(-50%, -50%); opacity: 1; }
-        }
-        .pin-drop { animation: pin-drop .5s ease both; }
-        @keyframes pin-pulse {
-          from { transform: scale(1); opacity: .45; }
-          to { transform: scale(2.6); opacity: 0; }
-        }
-        .pin-pulse { animation: pin-pulse 1.2s ease-out infinite; }
-        @media (prefers-reduced-motion: reduce) {
-          .gym-hero-in, .pin-drop, .pin-pulse { animation: none; }
-        }
       `}</style>
 
-      {/* 상단 메뉴: 첫 화면에서는 영상 위에 겹치고, 하위 화면에서는 검은 띠로 둔다 */}
+      {/* 상단 메뉴: 첫 화면에서는 사진 위에 겹치고, 하위 화면에서는 검은 띠로 둔다 */}
       <nav
         aria-label="주 메뉴"
         className={page === "home" ? "absolute inset-x-0 top-0 z-40 bg-gradient-to-b from-black/55 to-transparent" : "relative z-40 bg-[#111]"}
       >
         <div className="flex flex-wrap items-center justify-between gap-x-3 gap-y-3 px-4 py-5 text-white sm:flex-nowrap sm:px-8">
-          <button type="button" onClick={() => goHome("top")} className="flex shrink-0 items-center gap-2" aria-label="곰파트너 홈">
-            {/* eslint-disable-next-line @next/next/no-img-element */}
-            <img src="/images/logo-bear.png" alt="" aria-hidden width={28} height={28} className="h-7 w-7 shrink-0" />
+          <button type="button" onClick={() => goHome("top")} className="flex shrink-0 items-center gap-2" aria-label="프라이빗 짐 홈">
             <span className="inline-flex items-baseline gap-1.5 whitespace-nowrap">
-              <span className="text-lg font-black tracking-wider">곰파트너</span>
-              <span className="text-[11px] font-bold opacity-80">카탈로그</span>
+              <span className="text-lg font-black tracking-wider">프라이빗 짐</span>
             </span>
           </button>
           <ul className="-mx-1 flex w-full items-center gap-4 overflow-x-auto px-1 text-sm font-medium sm:mx-0 sm:w-auto sm:gap-6 sm:overflow-visible sm:px-0">
@@ -649,30 +409,24 @@ export function HomepageDemo() {
         </div>
       </nav>
 
-      {/* 첫 화면은 하위 화면에 있는 동안 숨겨만 둔다(지도 크기 측정, 예약 상태 유지) */}
+      {/* 첫 화면은 하위 화면에 있는 동안 숨겨만 둔다(예약 상태 유지) */}
       <div hidden={page !== "home"} className="soft-in">
-      {/* 첫 화면: 매장 안으로 걸어 들어가는 영상 */}
+      {/* 첫 화면: 매장 사진 */}
       <header id="top" className="relative h-svh min-h-[600px] overflow-hidden bg-[#111]">
-        <video
-          ref={videoRef}
-          autoPlay
-          muted
-          playsInline
-          preload="auto"
-          poster="/videos/gym-entrance-poster.jpg"
+        {/* eslint-disable-next-line @next/next/no-img-element */}
+        <img
+          src="/videos/gym-entrance-poster.jpg"
+          alt="아침 햇살이 드는 프라이빗 짐 내부"
           className="absolute inset-0 h-full w-full object-cover"
-          aria-label="아침 햇살이 드는 프라이빗 짐 안으로 걸어 들어가는 영상"
-        >
-          <source src="/videos/gym-entrance.mp4" type="video/mp4" />
-        </video>
+        />
         <div
           className="absolute inset-0"
           style={{ background: "linear-gradient(to top, rgba(18,14,9,.88) 0%, rgba(18,14,9,.35) 45%, rgba(18,14,9,.15) 100%)" }}
           aria-hidden
         />
         {/* pb-24: 화면 아래 양쪽 모서리의 사이트 공용 버튼과 겹치지 않게 띄운다 */}
-        <div key={introKey} className="gym-hero-in absolute inset-x-0 bottom-0 px-4 pb-24 text-stone-100 sm:px-8">
-          <p className="text-sm font-semibold text-stone-300">곰파트너</p>
+        <div className="absolute inset-x-0 bottom-0 px-4 pb-24 text-stone-100 sm:px-8">
+          <p className="text-sm font-semibold text-stone-300">프라이빗 짐</p>
           <h1 className="gym-hero-title mt-2 max-w-4xl text-[11vw] font-black leading-[1.08] tracking-tight sm:text-7xl">
             1시간 단위 단독 이용
           </h1>
@@ -702,263 +456,106 @@ export function HomepageDemo() {
         </div>
       </header>
 
-      {/* 빠른 예약 바 + 진행 스테퍼 (Sticky) */}
-      <div className="sticky top-0 z-30 border-b border-stone-200 bg-white">
-        <div className="mx-auto max-w-6xl px-4 py-3">
-          {/* 현재 선택 요약 — 실제 선택은 지도와 캘린더에서 한다 */}
-          <div className="flex items-center gap-3">
-            <div className="flex min-w-0 flex-1 flex-wrap items-center gap-x-5 gap-y-1 text-sm font-medium">
-              <button
-                type="button"
-                onClick={() => scrollTo("map")}
-                className={`flex items-center gap-1.5 transition-colors hover:text-[#15803d] ${selected ? "" : "text-stone-400"}`}
-              >
-                <MapPin size={15} className="shrink-0 text-stone-400" aria-hidden />
-                {selected ? selected.name : "지점 선택"}
-              </button>
-              <button
-                type="button"
-                onClick={() => scrollTo("booking")}
-                className={`flex items-center gap-1.5 transition-colors hover:text-[#15803d] ${booking.date ? "" : "text-stone-400"}`}
-              >
-                <Calendar size={15} className="shrink-0 text-stone-400" aria-hidden />
-                {booking.date ? `${booking.date.slice(5).replace("-", ".")}` : "날짜"}
-              </button>
-              <button
-                type="button"
-                onClick={() => scrollTo("booking")}
-                className={`flex items-center gap-1.5 transition-colors hover:text-[#15803d] ${booking.times.length ? "" : "text-stone-400"}`}
-              >
-                <Clock size={15} className="shrink-0 text-stone-400" aria-hidden />
-                {booking.times.length
-                  ? `${booking.times[0]}${booking.times.length > 1 ? ` 외 ${booking.times.length - 1}` : ""}`
-                  : "시간"}
-              </button>
-            </div>
-            <button
-              type="button"
-              onClick={() => scrollTo(booking.locationId ? "booking" : "map")}
-              className="inline-flex shrink-0 items-center gap-1.5 rounded-lg bg-[#111] px-5 py-2.5 text-sm font-bold text-white transition-colors hover:bg-stone-800 active:scale-95"
-            >
-              예약하기
-            </button>
-            <button
-              type="button"
-              onClick={openGuide}
-              aria-label="예약 가이드 보기"
-              className={`relative shrink-0 rounded-lg border p-2.5 transition-colors hover:border-[#111] hover:text-[#111] ${tutFresh ? "border-[#16A34A] text-[#16A34A]" : "border-stone-200 text-stone-400"}`}
-            >
-              {tutFresh && <span aria-hidden className="absolute inset-0 rounded-lg bg-[#16A34A]/40 motion-safe:animate-ping" />}
-              <HelpCircle size={16} aria-hidden className="relative" />
-            </button>
-          </div>
-          {/* 예약 진행 스테퍼 */}
-          <ol aria-label="예약 진행 단계" className="mt-2.5 flex items-center gap-1 overflow-x-auto text-[11px] font-medium text-stone-400 sm:gap-2 sm:text-xs">
-            {["지점 선택", "날짜", "시간", "예약 확인", "결제"].map((label, i) => {
-              const n = i + 1;
-              const done = stage === "paid" || n < step;
-              const current = stage !== "paid" && n === step;
+      {/* 지점 안내: 지점 카드 목록 */}
+      <section id="map" aria-labelledby="map-title" className="scroll-mt-8 bg-[#F4F4F4] py-16 sm:py-24">
+        <div className="mx-auto max-w-6xl px-4">
+          <SectionHead
+            id="map-title"
+            title="지점 안내"
+            aside={<p className="text-sm text-stone-500">서울 {locations.length}개 지점, 매일 06:00 ~ 22:00</p>}
+          />
+          <ul className="mt-8 grid gap-4 sm:grid-cols-2 lg:grid-cols-3 lg:gap-5">
+            {locations.map((loc) => {
+              const active = booking.locationId === loc.id;
               return (
-                <li key={label} className="flex shrink-0 items-center gap-1 sm:gap-2">
-                  <span
-                    className={`flex h-5 w-5 items-center justify-center rounded-full text-[10px] font-bold ${
-                      done ? "bg-[#16A34A] text-white" : current ? "bg-[#111] text-white" : "bg-stone-200 text-stone-500"
-                    }`}
-                  >
-                    {done ? <Check size={11} aria-hidden /> : n}
-                  </span>
-                  <span className={current ? "text-[#111]" : done ? "text-[#16A34A]" : ""}>{label}</span>
-                  {n < 5 && <ChevronRight size={12} className="text-stone-300" aria-hidden />}
+                <li
+                  key={loc.id}
+                  className={`flex overflow-hidden rounded-lg border bg-white transition-colors sm:block duration-200 hover:border-stone-500 ${
+                    active ? "border-[#111]" : "border-stone-200"
+                  }`}
+                >
+                  <div className="relative w-28 shrink-0 overflow-hidden sm:w-auto">
+                    {/* eslint-disable-next-line @next/next/no-img-element */}
+                    <img src={loc.img} alt={`${loc.name} 내부`} className="h-full w-full object-cover sm:aspect-[16/10] sm:h-auto" />
+                    {active && (
+                      <span className="absolute left-0 top-0 bg-[#16A34A] px-3 py-1.5 text-xs font-bold text-white">선택됨</span>
+                    )}
+                    {!loc.available && !active && (
+                      <span className="absolute left-0 top-0 bg-[#111]/80 px-3 py-1.5 text-xs font-bold text-white">오늘 마감</span>
+                    )}
+                  </div>
+                  <div className="min-w-0 flex-1 p-4 sm:p-5">
+                    <div className="flex items-center justify-between gap-2">
+                      <p className="text-lg font-bold">{loc.name}</p>
+                      <p className="flex shrink-0 items-center gap-1 text-sm text-stone-500">
+                        <Star size={14} className="fill-[#111] text-[#111]" aria-hidden />
+                        {loc.rating} <span className="text-stone-400">({loc.reviews})</span>
+                      </p>
+                    </div>
+                    <p className="mt-1 text-xs text-stone-500 sm:text-sm">{branchInfo[loc.id]?.subway}</p>
+                    <p className="mt-2 tabular-nums text-lg font-bold">
+                      {(loc.price + RATE_BANDS[0].diff).toLocaleString()}원
+                      <span className="text-sm font-normal text-stone-400"> 부터 / 1시간</span>
+                    </p>
+                    <div className="mt-3 flex items-center gap-2.5 text-stone-500 sm:mt-4 sm:gap-3">
+                      {loc.facilities.map((f) => {
+                        const Icon = facilityIcons[f];
+                        return <Icon key={f} size={17} strokeWidth={1.6} role="img" aria-label={f} />;
+                      })}
+                      <button
+                        type="button"
+                        onClick={() => {
+                          selectLocation(loc.id);
+                          scrollTo("booking");
+                        }}
+                        aria-label={`${loc.name} ${loc.available ? "예약하기" : "오늘 마감"}`}
+                        className={`ml-auto shrink-0 rounded-lg px-4 py-2.5 text-sm font-bold transition-colors sm:px-5 ${
+                          loc.available ? "bg-[#111] text-white hover:bg-[#16A34A]" : "bg-stone-100 text-stone-400"
+                        }`}
+                      >
+                        {loc.available ? "예약하기" : "마감"}
+                      </button>
+                    </div>
+                  </div>
                 </li>
               );
             })}
-          </ol>
-        </div>
-      </div>
-
-      {/* 지점 안내: 지도와 지점 카드 */}
-      <section id="map" aria-labelledby="map-title" className="scroll-mt-28 bg-[#F4F4F4] py-16 sm:py-24">
-        <div className="mx-auto max-w-6xl px-4">
-          <SectionHead id="map-title" title="지점 안내" />
-          {/* 모바일은 지도-카드 사이 간격을 더 넉넉하게 */}
-          <div
-            className="mt-8 grid gap-10 lg:gap-6 lg:grid-cols-[2fr_3fr]"
-            style={{ "--map-h": mapHeight ? `${mapHeight}px` : "600px" } as React.CSSProperties}
-          >
-            {/* 좌측: 서울 행정구역 지도 + 핀 오버레이 */}
-            <Reveal className="relative lg:sticky lg:top-36 lg:self-start">
-              <div ref={mapRef} className="relative">
-                <div className="overflow-hidden rounded-lg border border-stone-200 bg-[#FBFAF8]">
-                <div
-                  className="relative transition-transform duration-700 ease-out motion-reduce:transition-none"
-                  style={
-                    selected
-                      ? { transform: "scale(1.12)", transformOrigin: `${selected.x}% ${selected.y}%` }
-                      : undefined
-                  }
-                >
-                  <img
-                    src="/images/demo-gym/seoul-districts.svg"
-                    alt="서울 행정구역 지도"
-                    className="block w-full select-none"
-                    draggable={false}
-                  />
-                  {locations.map((loc, i) => {
-                    const active = booking.locationId === loc.id;
-                    const hovered = hoverId === loc.id;
-                    return (
-                      <button
-                        key={loc.id}
-                        type="button"
-                        className={`absolute -translate-x-1/2 -translate-y-1/2 ${mapInView ? "pin-drop" : "opacity-0"}`}
-                        style={{ left: `${loc.x}%`, top: `${loc.y}%`, animationDelay: `${i * 70}ms` }}
-                        onClick={() => {
-                          selectLocation(loc.id);
-                          scrollToCard(loc.id);
-                        }}
-                        onMouseEnter={() => {
-                          setHoverId(loc.id);
-                          scrollToCard(loc.id);
-                        }}
-                        onMouseLeave={() => setHoverId(null)}
-                        aria-label={`${loc.name} 선택`}
-                      >
-                        <span className="relative flex h-7 w-7 items-center justify-center">
-                          {(hovered || active) && (
-                            <span
-                              className={`pin-pulse absolute inset-0 rounded-full ${active ? "bg-[#16A34A]" : "bg-[#111]"}`}
-                              aria-hidden
-                            />
-                          )}
-                          <span
-                            className={`relative block rounded-full border-2 border-white shadow transition-all ${
-                              active ? "h-5 w-5 bg-[#16A34A]" : hovered ? "h-5 w-5 bg-[#111]" : "h-4 w-4 bg-stone-700"
-                            }`}
-                            aria-hidden
-                          />
-                        </span>
-                        {/* 작은 화면에서는 라벨끼리 겹쳐서 핀만 보여준다 */}
-                        <span
-                          className={`absolute left-1/2 top-full hidden -translate-x-1/2 whitespace-nowrap text-xs font-bold tracking-tight sm:block ${
-                            active ? "text-[#15803d]" : "text-stone-600"
-                          }`}
-                          aria-hidden
-                        >
-                          {loc.name.replace("점", "")}
-                        </span>
-                      </button>
-                    );
-                  })}
-                </div>
-
-                <p className="pointer-events-none absolute bottom-3 left-4 text-xs font-semibold text-stone-400">
-                  서울 {locations.length}개 지점
-                </p>
-                </div>
-              </div>
-            </Reveal>
-
-            {/* 우측: 지점 카드 리스트 — 모바일은 가로 슬라이더, 데스크톱은 지도 높이에 맞춘 내부 스크롤 */}
-            <div
-              ref={listRef}
-              className="flex snap-x snap-mandatory gap-4 overflow-x-auto pb-3 lg:grid lg:max-h-[var(--map-h)] lg:grid-cols-2 lg:content-start lg:gap-5 lg:overflow-y-auto lg:overflow-x-hidden lg:pb-0 lg:pr-3 lg:[scrollbar-width:thin]"
-            >
-              {locations.map((loc) => {
-                const active = booking.locationId === loc.id;
-                const highlight = hoverId === loc.id || active;
-                return (
-                  <Reveal key={loc.id} className="w-72 shrink-0 snap-start lg:w-auto lg:shrink">
-                    <div
-                      ref={(el) => {
-                        cardRefs.current[loc.id] = el;
-                      }}
-                      onMouseEnter={() => setHoverId(loc.id)}
-                      onMouseLeave={() => setHoverId(null)}
-                      className={`overflow-hidden rounded-lg border bg-white transition-colors duration-200 hover:border-stone-500 ${
-                        highlight ? "border-[#111]" : "border-stone-200"
-                      }`}
-                    >
-                      <div className="relative overflow-hidden">
-                        <img
-                          src={loc.img}
-                          alt={`${loc.name} 내부`}
-                          className="aspect-[16/10] w-full object-cover"
-                        />
-                        {active && (
-                          <span className="absolute left-0 top-0 bg-[#16A34A] px-3 py-1.5 text-xs font-bold text-white">
-                            선택됨
-                          </span>
-                        )}
-                        {!loc.available && (
-                          <span className="absolute left-0 top-0 bg-[#111]/80 px-3 py-1.5 text-xs font-bold text-white">
-                            오늘 마감
-                          </span>
-                        )}
-                      </div>
-                      <div className="p-5">
-                        <div className="flex items-center justify-between gap-2">
-                          <p className="text-lg font-bold">{loc.name}</p>
-                          <p className="flex shrink-0 items-center gap-1 text-sm text-stone-500">
-                            <Star size={14} className="fill-[#111] text-[#111]" aria-hidden />
-                            {loc.rating} <span className="text-stone-400">({loc.reviews})</span>
-                          </p>
-                        </div>
-                        <p className="mt-1 tabular-nums text-lg font-bold">
-                          {(loc.price + RATE_BANDS[0].diff).toLocaleString()}원
-                          <span className="text-sm font-normal text-stone-400"> 부터 / 1시간</span>
-                        </p>
-                        <div className="mt-4 flex items-center gap-3 text-stone-500">
-                          {loc.facilities.map((f) => {
-                            const Icon = facilityIcons[f];
-                            return <Icon key={f} size={17} strokeWidth={1.6} role="img" aria-label={f} />;
-                          })}
-                          <button
-                            type="button"
-                            onClick={() => {
-                              selectLocation(loc.id);
-                              scrollTo("booking");
-                            }}
-                            aria-label={`${loc.name} ${loc.available ? "예약하기" : "오늘 마감"}`}
-                            className={`ml-auto rounded-lg px-5 py-2.5 text-sm font-bold transition-colors ${
-                              loc.available
-                                ? "bg-[#111] text-white hover:bg-[#16A34A]"
-                                : "bg-stone-100 text-stone-400"
-                            }`}
-                          >
-                            {loc.available ? "예약하기" : "마감"}
-                          </button>
-                        </div>
-                      </div>
-                    </div>
-                  </Reveal>
-                );
-              })}
-            </div>
-          </div>
+          </ul>
         </div>
       </section>
 
       {/* 예약: 날짜, 시간, 결제 */}
-      <section id="booking" aria-labelledby="booking-title" className="scroll-mt-28 py-16 sm:py-24">
+      <section id="booking" aria-labelledby="booking-title" className="scroll-mt-8 py-16 sm:py-24">
         <div className="mx-auto max-w-6xl px-4">
           <SectionHead
             id="booking-title"
             title={selected ? `${selected.name} 예약` : "예약"}
             aside={
-              !selected && (
+              <div className="flex items-center gap-2">
+                {!selected && (
+                  <button
+                    type="button"
+                    onClick={() => scrollTo("map")}
+                    className="inline-flex items-center gap-1.5 rounded-lg bg-[#111] px-5 py-2.5 text-sm font-bold text-white hover:bg-stone-800"
+                  >
+                    <MapPin size={15} aria-hidden />
+                    지점 선택
+                  </button>
+                )}
                 <button
                   type="button"
-                  onClick={() => scrollTo("map")}
-                  className="inline-flex items-center gap-1.5 rounded-lg bg-[#111] px-5 py-2.5 text-sm font-bold text-white hover:bg-stone-800"
+                  onClick={openGuide}
+                  aria-label="예약 가이드 보기"
+                  className={`relative shrink-0 rounded-lg border p-2.5 transition-colors hover:border-[#111] hover:text-[#111] ${tutFresh ? "border-[#16A34A] text-[#16A34A]" : "border-stone-200 text-stone-400"}`}
                 >
-                  <MapPin size={15} aria-hidden />
-                  지점 선택
+                  {tutFresh && <span aria-hidden className="absolute inset-0 rounded-lg bg-[#16A34A]/40 motion-safe:animate-ping" />}
+                  <HelpCircle size={16} aria-hidden className="relative" />
                 </button>
-              )
+              </div>
             }
           />
           <div className="mt-8 grid gap-8 lg:grid-cols-[3fr_2fr]">
-            <Reveal>
+            <div>
               {/* 선택한 지점 미리보기 — 무엇을 예약 중인지 항상 보이게 */}
               {selected && (
                 <div className="mb-6 flex items-center gap-4 rounded-lg border border-stone-200 bg-stone-50 p-3">
@@ -1072,11 +669,11 @@ export function HomepageDemo() {
                 </motion.div>
               </AnimatePresence>
               </div>
-            </Reveal>
+            </div>
 
             {/* 예약 요약 */}
             {/* 좌측 컬럼 높이를 꽉 채워 아래 여백이 생기지 않게 한다 */}
-            <Reveal className="lg:h-full">
+            <div className="lg:h-full">
               <div id="booking-summary" className="flex h-full flex-col rounded-lg border border-stone-200 bg-white p-6">
                 {(() => {
                   // 내 예약에서 클릭한 예약의 QR 보기가 우선
@@ -1161,24 +758,21 @@ export function HomepageDemo() {
                     {stage === "confirm" ? (
                       <div className="mt-5">
                         <p className="rounded-lg border border-[#16A34A]/30 bg-[#16A34A]/5 px-4 py-3 text-xs leading-relaxed text-[#15803d]">
-                          결제 후 입장 QR이 바로 발급됩니다.
+                          결제가 끝나면 입장 QR이 발급됩니다.
                         </p>
                         <button
                           type="button"
-                          onClick={startNaverPay}
-                          className="mt-3 flex w-full items-center justify-center gap-2 rounded-lg bg-[#03C75A] py-3.5 font-bold text-white transition-colors hover:bg-[#02b152] active:scale-[0.98]"
+                          onClick={() => confirmPayment("card")}
+                          className="mt-3 w-full rounded-lg bg-[#111] py-3.5 font-bold text-white transition-colors hover:bg-stone-800 active:scale-[0.98]"
                         >
-                          <span className="flex h-5 w-5 items-center justify-center rounded bg-white font-black leading-none text-[#03C75A]">
-                            N
-                          </span>
-                          네이버페이로 {total.toLocaleString()}원 결제
+                          카드 결제 {total.toLocaleString()}원
                         </button>
                         <button
                           type="button"
-                          onClick={() => confirmPayment("onsite")}
+                          onClick={() => confirmPayment("transfer")}
                           className="mt-2 w-full rounded-lg border border-stone-300 py-3.5 font-bold text-stone-700 transition-colors hover:border-[#111] hover:text-[#111] active:scale-[0.98]"
                         >
-                          방문 시 결제
+                          계좌이체
                         </button>
                         <button type="button" onClick={() => setStage("select")} className="mt-2 w-full py-2 text-xs text-stone-400 hover:text-stone-600">
                           돌아가기
@@ -1187,7 +781,7 @@ export function HomepageDemo() {
                     ) : (
                       <button
                         type="button"
-                        disabled={step < 4}
+                        disabled={!ready}
                         onClick={() => setStage("confirm")}
                         className="mt-5 w-full rounded-lg bg-[#111] py-3.5 font-bold text-white transition-colors hover:bg-stone-800 active:scale-[0.98] disabled:bg-stone-200 disabled:text-stone-400"
                       >
@@ -1197,13 +791,12 @@ export function HomepageDemo() {
                   </>
                 ))}
               </div>
-
-            </Reveal>
+            </div>
           </div>
 
           {/* 내 예약 — 예약이 몇 건이든 한 줄 가로 스트립으로 넉넉하게 */}
           {(booking.reservations ?? []).length > 0 && (
-            <div id="my-bookings" className="mt-14 scroll-mt-40">
+            <div id="my-bookings" className="mt-14 scroll-mt-8">
               <h3 className="text-lg font-bold">
                 내 예약 <span className="tabular-nums text-stone-500">{(booking.reservations ?? []).length}</span>
               </h3>
@@ -1235,7 +828,7 @@ export function HomepageDemo() {
                       <div className="mt-3 flex items-center justify-between border-t border-stone-100 pt-3">
                         <p className="tabular-nums text-sm font-semibold">
                           {r.total.toLocaleString()}원
-                          {r.method === "onsite" && <span className="ml-1.5 text-xs font-medium text-amber-600">방문 시 결제</span>}
+                          {r.method === "transfer" && <span className="ml-1.5 text-xs font-medium text-stone-500">계좌이체</span>}
                         </p>
                         <button
                           type="button"
@@ -1262,7 +855,7 @@ export function HomepageDemo() {
       </section>
 
       {/* 이용 후기 */}
-      <section id="reviews" aria-labelledby="reviews-title" className="scroll-mt-28 py-16 sm:py-24">
+      <section id="reviews" aria-labelledby="reviews-title" className="scroll-mt-8 py-16 sm:py-24">
         <div className="mx-auto max-w-6xl px-4">
           <SectionHead
             id="reviews-title"
@@ -1310,7 +903,7 @@ export function HomepageDemo() {
       <section id="visit" aria-labelledby="visit-title" className="relative overflow-hidden py-24 sm:py-32">
         <img src="/videos/gym-entrance-poster.jpg" alt="" className="absolute inset-0 h-full w-full object-cover" aria-hidden />
         <div className="absolute inset-0 bg-black/65" aria-hidden />
-        <Reveal className="relative mx-auto max-w-6xl px-4 text-center text-white">
+        <div className="relative mx-auto max-w-6xl px-4 text-center text-white">
           <h2 id="visit-title" className="text-3xl font-black tracking-tight sm:text-5xl">
             예약하기
           </h2>
@@ -1330,7 +923,7 @@ export function HomepageDemo() {
               문의하기
             </a>
           </div>
-        </Reveal>
+        </div>
       </section>
 
       </div>
@@ -1357,11 +950,8 @@ export function HomepageDemo() {
         <div className="mx-auto flex max-w-6xl flex-wrap items-start justify-between gap-6 px-4">
           <div>
             <p className="flex items-center gap-2 text-white">
-              {/* eslint-disable-next-line @next/next/no-img-element */}
-              <img src="/images/logo-bear.png" alt="" aria-hidden width={24} height={24} className="h-6 w-6 shrink-0" />
               <span className="inline-flex items-baseline gap-1.5">
-                <span className="font-black tracking-wider">곰파트너</span>
-                <span className="text-[10px] font-bold opacity-80">카탈로그</span>
+                <span className="font-black tracking-wider">프라이빗 짐</span>
               </span>
             </p>
             <DemoMakerInfo className="mt-3" />
@@ -1369,78 +959,9 @@ export function HomepageDemo() {
           <div className="flex flex-wrap items-center gap-5 text-xs">
             <a href="#top" className="hover:text-white">이용약관</a>
             <a href="#top" className="font-semibold text-stone-300 hover:text-white">개인정보처리방침</a>
-            <button
-              type="button"
-              onClick={replay}
-              className="inline-flex items-center gap-1.5 rounded-md border border-stone-700 px-3.5 py-2 font-medium text-stone-300 transition-colors hover:border-[#4ade80] hover:text-[#4ade80]"
-            >
-              <RotateCcw size={13} aria-hidden />
-              입장 영상 다시 보기
-            </button>
           </div>
         </div>
       </footer>
-
-      {/* 네이버페이 데모 결제 시트 — 가맹 키가 없어 실제 결제창 대신 승인 흐름을 시뮬레이션 */}
-      <AnimatePresence>
-        {demoPayOpen && (
-          <motion.div
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            exit={{ opacity: 0 }}
-            transition={{ duration: 0.2 }}
-            className="fixed inset-0 z-50 flex items-end justify-center bg-black/55 p-4 sm:items-center"
-            onClick={() => setDemoPayOpen(false)}
-            role="dialog"
-            aria-modal="true"
-            aria-label="네이버페이 결제"
-          >
-            <motion.div
-              initial={{ y: 24 }}
-              animate={{ y: 0 }}
-              exit={{ y: 24 }}
-              className="w-full max-w-sm rounded-lg bg-white p-6"
-              onClick={(e) => e.stopPropagation()}
-            >
-              <div className="flex items-center gap-2">
-                <span className="flex h-6 w-6 items-center justify-center rounded bg-[#03C75A] font-black leading-none text-white">
-                  N
-                </span>
-                <p className="font-bold">네이버페이 결제</p>
-              </div>
-              <dl className="mt-4 space-y-2 rounded-xl bg-stone-50 p-4 text-sm">
-                <div className="flex justify-between">
-                  <dt className="text-stone-500">주문</dt>
-                  <dd className="font-semibold">{selected?.name} 공간 대여 {booking.times.length}시간</dd>
-                </div>
-                <div className="flex justify-between">
-                  <dt className="text-stone-500">결제 금액</dt>
-                  <dd className="tabular-nums font-bold">{total.toLocaleString()}원</dd>
-                </div>
-              </dl>
-              <div className="mt-5 flex gap-2">
-                <button
-                  type="button"
-                  onClick={() => setDemoPayOpen(false)}
-                  className="flex-1 rounded-lg border border-stone-200 py-3 text-sm font-semibold text-stone-500"
-                >
-                  취소
-                </button>
-                <button
-                  type="button"
-                  onClick={() => {
-                    setDemoPayOpen(false);
-                    confirmPayment();
-                  }}
-                  className="flex-1 rounded-lg bg-[#03C75A] py-3 text-sm font-bold text-white transition-colors hover:bg-[#02b152]"
-                >
-                  결제 승인
-                </button>
-              </div>
-            </motion.div>
-          </motion.div>
-        )}
-      </AnimatePresence>
 
       {/* 예약 가이드 오버레이: 해당 영역을 스포트라이트로 비추며 4단계 안내 */}
       <AnimatePresence>
@@ -1488,7 +1009,7 @@ export function HomepageDemo() {
               {/* 안내 영역이 충분히 보이지 않으면(살짝 걸친 경우 포함) 방향을 알려주고 눌러서 되돌아가게 한다 */}
               {(() => {
                 const vh = window.innerHeight;
-                const topBound = 100; // 상단 고정 바에 가려지는 영역
+                const topBound = 0;
                 const visible =
                   Math.min(tutRect.top + tutRect.height, vh) - Math.max(tutRect.top, topBound);
                 const needed = Math.min(tutRect.height * 0.5, 200);

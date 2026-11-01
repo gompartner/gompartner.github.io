@@ -52,7 +52,7 @@ import { DemoMakerInfo } from "@/components/demos/DemoMakerInfo";
    사진(public/images/demo-interior): hero, case1(거실), case2(주방), case3(욕실), before·after(같은 집 거실 전후). AI 생성 예정. */
 
 const IMG = "/images/demo-interior";
-const SHOP = "곰파트너";
+const SHOP = "인테리어 시공";
 const TEL = "02-000-0000";
 const MOBILE = "010-0000-0000";
 const OWNER = "박ㅈ훈";
@@ -491,14 +491,9 @@ type Ctx = {
 function Logo({ light = false }: { light?: boolean }) {
   return (
     <span className="inline-flex items-center gap-2">
-      {/* eslint-disable-next-line @next/next/no-img-element */}
-      <img src="/images/logo-bear.png" alt="" aria-hidden width={28} height={28} className="h-7 w-7 shrink-0" />
-      <span className="sr-only">{SHOP} 카탈로그</span>
+      <span className="sr-only">{SHOP}</span>
       <span aria-hidden className="inline-flex items-baseline gap-1.5 whitespace-nowrap">
-        <span className="text-[19px] font-bold tracking-[-0.02em] md:text-[20px]">곰파트너</span>
-        <span className="text-[12px] font-semibold" style={{ color: light ? "#c8d6d0" : C.wood }}>
-          카탈로그
-        </span>
+        <span className="text-[19px] font-bold tracking-[-0.02em] md:text-[20px]">인테리어 시공</span>
       </span>
     </span>
   );
@@ -1270,20 +1265,6 @@ const STEPS: { name: string; when: string; what: string }[] = [
   { name: "준공, A/S", when: "공사 마지막 날", what: "같이 둘러보며 손볼 곳을 적고, A/S 보증서를 드립니다." },
 ];
 
-const WEEKS = ["1주", "2주", "3주", "4주", "5주"];
-const GANTT: { work: string; from: number; to: number }[] = [
-  { work: "철거, 폐기물", from: 0, to: 0.4 },
-  { work: "설비, 방수", from: 0.3, to: 1.2 },
-  { work: "샷시", from: 0.6, to: 1.0 },
-  { work: "목공, 전기", from: 1.0, to: 2.2 },
-  { work: "욕실 타일", from: 1.6, to: 2.6 },
-  { work: "도장, 필름", from: 2.2, to: 3.0 },
-  { work: "도배", from: 3.0, to: 3.5 },
-  { work: "바닥", from: 3.4, to: 3.9 },
-  { work: "가구, 조명", from: 3.8, to: 4.4 },
-  { work: "입주청소", from: 4.4, to: 4.6 },
-];
-
 function ProcessPage({ go }: { go: Go }) {
   return (
     <>
@@ -1304,44 +1285,6 @@ function ProcessPage({ go }: { go: Go }) {
               </li>
             ))}
           </ol>
-        </section>
-
-        <section aria-labelledby="it-gantt" className="mt-16">
-          <H2 id="it-gantt">32평 전체 리모델링 공정표</H2>
-          <p className="mb-5 text-[15px] md:text-[16px]" style={{ color: C.muted }}>
-            빈집 기준입니다. 확장이나 욕실 개수에 따라 3~5일 달라집니다.
-          </p>
-          <div className="rounded-[4px] border" style={{ borderColor: C.line }}>
-            <div className="grid grid-cols-[96px_1fr] border-b text-[13px] font-semibold md:grid-cols-[140px_1fr] md:text-[14px]" style={{ borderColor: C.line, background: C.paper }}>
-              <span className="px-3 py-2">공정</span>
-              <span className="grid grid-cols-5">
-                {WEEKS.map((w) => (
-                  <span key={w} className="border-l px-1.5 py-2" style={{ borderColor: C.line }}>
-                    {w}
-                  </span>
-                ))}
-              </span>
-            </div>
-            <ul>
-              {GANTT.map((g) => (
-                <li key={g.work} className="grid grid-cols-[96px_1fr] border-b last:border-b-0 md:grid-cols-[140px_1fr]" style={{ borderColor: C.line }}>
-                  <span className="px-3 py-2.5 text-[14px] font-semibold md:text-[15px]">{g.work}</span>
-                  <span className="relative" aria-label={`${(g.from * 7 + 1).toFixed(0)}일째부터 ${Math.round(g.to * 7)}일째까지`} role="img">
-                    <span className="absolute inset-0 grid grid-cols-5" aria-hidden>
-                      {WEEKS.map((w) => (
-                        <span key={w} className="border-l" style={{ borderColor: C.line }} />
-                      ))}
-                    </span>
-                    <span
-                      aria-hidden
-                      className="absolute top-1/2 h-3 -translate-y-1/2 rounded-[2px]"
-                      style={{ left: `${(g.from / 5) * 100}%`, width: `${((g.to - g.from) / 5) * 100}%`, background: C.forest }}
-                    />
-                  </span>
-                </li>
-              ))}
-            </ul>
-          </div>
         </section>
 
         <section aria-labelledby="it-as" id="it-as" className="mt-16 scroll-mt-20">
@@ -1617,7 +1560,7 @@ function QuotePage({ today, onSubmit, count }: { today: Date; onSubmit: (q: Inqu
                         문자
                       </p>
                       <p className="mt-2 whitespace-pre-line rounded-[10px] rounded-tl-[2px] bg-white px-3.5 py-3 text-[15px] leading-[1.6]">
-                        {`[곰파트너] 새 견적문의
+                        {`[인테리어 시공] 새 견적문의
 ${done.name} ${done.phone}
 ${done.town} ${done.pyeong} ${done.living}
 ${done.works.join(", ")}
@@ -2050,72 +1993,6 @@ function NoticePage({ ctx, anchor }: { ctx: Ctx; anchor?: string }) {
 
 /* ---------- 오시는 길 ---------- */
 
-function TownMap() {
-  // 단지 배치를 단순화한 동네 지도. 회색 약도 대신 단지·공원 면 색으로 구분한다.
-  return (
-    <svg viewBox="0 0 640 380" role="img" aria-label="ㄱㄷ로와 ㅅㅍ대로가 만나는 사거리, ㅎㅇ아파트 상가동 1층에 곰파트너가 있습니다. ㄱㄷ동 주민센터 버스 정류장은 길 건너편에 있습니다." className="block h-auto w-full">
-      <rect width="640" height="380" fill="#efe7da" />
-      {/* 단지와 공원 */}
-      <rect x="20" y="20" width="300" height="190" rx="6" fill="#dbe6df" />
-      <rect x="380" y="20" width="240" height="190" rx="6" fill="#e6dccb" />
-      <rect x="20" y="268" width="300" height="96" rx="6" fill="#d3e3cf" />
-      <rect x="380" y="268" width="240" height="96" rx="6" fill="#e6dccb" />
-      {/* 아파트 동 */}
-      {[50, 120, 190].map((x) => (
-        <rect key={x} x={x} y="44" width="52" height="96" rx="3" fill="#bfd2c6" />
-      ))}
-      <rect x="196" y="160" width="104" height="38" rx="3" fill={C.forest} />
-      {/* 도로 */}
-      <rect x="0" y="222" width="640" height="34" fill="#ffffff" />
-      <rect x="334" y="0" width="34" height="380" fill="#ffffff" />
-      <line x1="0" y1="239" x2="640" y2="239" stroke="#e2c99e" strokeWidth="2" />
-      <line x1="351" y1="0" x2="351" y2="380" stroke="#e2c99e" strokeWidth="2" />
-      {/* 글자 */}
-      <g fontFamily="inherit" fontWeight="700">
-        <text x="40" y="34" dy="12" fontSize="17" fill="#2f4a40">
-          ㅎㅇ아파트
-        </text>
-        <text x="400" y="122" fontSize="17" fill="#6b5536">
-          ㄱㄷ초등학교
-        </text>
-        <text x="96" y="322" fontSize="17" fill="#3d5a3a">
-          ㄱㄷ근린공원
-        </text>
-        <text x="400" y="322" fontSize="17" fill="#6b5536">
-          ㄱㄷ동 주민센터
-        </text>
-        <text x="520" y="250" fontSize="15" fill="#7a6a52">
-          ㄱㄷ로
-        </text>
-        <text x="362" y="372" fontSize="15" fill="#7a6a52" transform="rotate(-90 362 372)">
-          ㅅㅍ대로
-        </text>
-        <text x="248" y="184" textAnchor="middle" fontSize="15" fill="#ffffff">
-          상가동
-        </text>
-      </g>
-      {/* 버스 정류장 */}
-      <g transform="translate(560 274)">
-        <rect width="30" height="22" rx="3" fill="#1f5fa8" />
-        <text x="15" y="16" textAnchor="middle" fontSize="13" fontWeight="700" fill="#ffffff">
-          B
-        </text>
-      </g>
-      {/* 가게 표시 */}
-      <g transform="translate(248 150)">
-        <path d="M0 0c-13 0-22 9-22 21 0 15 22 35 22 35s22-20 22-35C22 9 13 0 0 0z" transform="translate(0 -58)" fill={C.wood} />
-        <circle cx="0" cy="-37" r="8" fill="#ffffff" />
-      </g>
-      <g transform="translate(248 72)">
-        <rect x="-56" y="-20" width="112" height="34" rx="4" fill="#ffffff" stroke={C.wood} strokeWidth="2" />
-        <text x="0" y="3" textAnchor="middle" fontSize="16" fontWeight="700" fill={C.ink}>
-          곰파트너
-        </text>
-      </g>
-    </svg>
-  );
-}
-
 function LocationPage({ go }: { go: Go }) {
   const [copied, setCopied] = useState(false);
   const copy = async () => {
@@ -2133,8 +2010,21 @@ function LocationPage({ go }: { go: Go }) {
       <PageHead crumb="오시는 길" title="오시는 길" />
       <div className="mx-auto max-w-[1200px] px-4 py-10 md:px-6 md:py-14">
         <div className="grid gap-8 lg:grid-cols-[minmax(0,7fr)_minmax(0,5fr)]">
-          <div className="min-w-0 overflow-hidden rounded-[6px] border" style={{ borderColor: C.line }}>
-            <TownMap />
+          <div className="flex min-h-[240px] min-w-0 flex-col items-center justify-center gap-4 rounded-[6px] border px-5 py-10 text-center md:min-h-[360px]" style={{ borderColor: C.line, background: C.paper }}>
+            <MapPin size={32} aria-hidden style={{ color: C.wood }} />
+            <p className="break-keep text-[17px] font-bold">ㅎㅇ아파트 상가동 1층 102호</p>
+            <div className="flex flex-wrap justify-center gap-2">
+              {(
+                [
+                  ["네이버 지도", "https://map.naver.com/"],
+                  ["카카오맵", "https://map.kakao.com/"],
+                ] as const
+              ).map(([label, href]) => (
+                <a key={label} href={href} target="_blank" rel="noopener noreferrer" className="inline-flex h-11 items-center rounded-[4px] border bg-white px-4 text-[15px] font-semibold" style={{ borderColor: C.lineDark }}>
+                  {label}에서 보기
+                </a>
+              ))}
+            </div>
           </div>
           <div className="min-w-0">
             <p className="text-[15px] font-semibold" style={{ color: C.wood }}>

@@ -21,32 +21,26 @@ import { DemoMakerInfo } from "@/components/demos/DemoMakerInfo";
    첫 화면(ec-poster): 위에 메뉴(시력교정, 정밀검사, 백내장, 비급여 진료비, 진료안내, 상담예약, 휴대폰은 메뉴 버튼으로 펼침).
    제목 아래 수술 탭 4개(라식, 라섹, 스마일라식, 백내장). 탭 판은 왼쪽 글(수술 이름, 설명, 숫자 3칸), 오른쪽 사진(시력교정은 시험테,
    백내장은 대표원장). 판 아래 붙은 빠른 상담 줄(이름, 연락처, 상담 분야)은 탭에 맞춰 분야가 미리 채워지고, 신청하면 아래 상담 예약에
-   같은 값이 들어간 채로 내려간다. 비교표 링크는 그 수술이 골라진 비교 구간으로 내려간다.
-   탭을 바꾸면 글과 사진만 짧게 교차한다. 사진은 들어올 때 천천히 다가온다. 동작 줄이기면 즉시 바뀐다.
-
-   본문 핵심 모션: 수술을 고르면 각막 단면 그림에서 라식은 절편이 열리고, 라섹은 상피가 벗겨지고, 스마일은 작은 절개로 조직이 빠진다.
-   정밀검사 단계를 고르면 눈 그림 둘레에 누적 시간이 차고, 산동 검사에서 동공이 커진다.
+   같은 값이 들어간 채로 내려간다. 비교표 링크는 비교 구간으로 내려간다.
+   탭을 바꾸면 글과 사진만 짧게 교차한다. 동작 줄이기면 즉시 바뀐다.
 
    상호작용(모두 브라우저 안에서만 돈다. 실제로 보내지 않는다)
-   1. 시력교정 수술 비교: 라식, 라섹, 스마일라식을 고르면 각막 단면 그림, 회복 기간 막대, 비교표 열이 바뀐다.
-   2. 수술 전 검사 단계: 8단계를 고르면 단계 설명과 시작 후 누적 시간이 바뀐다.
-   3. 백내장 진료 안내: 백내장 있을 때, 단초점 렌즈, 다초점 렌즈를 고르면 거리별로 보이는 예시 그림이 바뀐다.
+   1. 시력교정 수술 비교: 수술별 설명 카드와 비교표(정적).
+   2. 수술 전 검사 단계: 8단계 순서와 소요 시간 목록(정적).
+   3. 백내장 진료 안내: 인공수정체 종류 카드와 증상 목록(정적).
    4. 상담 예약: 진료 분야, 날짜, 시간, 이름, 휴대폰. 완료하면 예약번호, 담당 창구, 회신 예정일을 보여 준다. */
 
 const IMG = "/images/demo-eye-clinic";
 const TEL = "02-000-0000";
 const ADDRESS = "서울 ㅇㅇ구 ㅇㅇ로 00, 5층";
-const KAKAO = "카카오톡 채널 곰파트너";
+const KAKAO = "카카오톡 채널 안과";
 
 /* 로고: 메인 사이트와 같은 곰 로고 + 곰파트너(크게) + 업종(작게) */
 function SampleLogo({ light, small }: { light?: boolean; small?: boolean }) {
   return (
     <span className="inline-flex items-center gap-2" style={{ color: light ? "#ffffff" : "#111111" }}>
-      {/* eslint-disable-next-line @next/next/no-img-element -- 메인 사이트와 같은 곰 로고 */}
-      <img src="/images/logo-bear.png" alt="" aria-hidden width={28} height={28} className={small ? "h-6 w-6 shrink-0" : "h-7 w-7 shrink-0"} />
       <span className="flex items-baseline gap-1 whitespace-nowrap">
-        <span className={`${small ? "text-[18px]" : "text-[20px]"} font-bold tracking-[-0.03em]`}>곰파트너</span>
-        <span className="text-[12px] font-semibold opacity-75">카탈로그</span>
+        <span className={`${small ? "text-[18px]" : "text-[20px]"} font-bold tracking-[-0.03em]`}>안과</span>
       </span>
     </span>
   );
@@ -62,17 +56,11 @@ const C = {
   /** 강조색 하나. 차분한 청록 */
   teal: "#2c5f5b",
   tealSoft: "#edf2f1",
-  /** 그림 안에서만 쓰는 옅은 청록 */
-  tealMid: "#a9c2be",
   error: "#b42318",
 };
 
 /* 모션 상수. 시간은 초, 이징은 cubic-bezier */
 const EASE = [0.22, 1, 0.36, 1] as const;
-/** 첫 화면 사진이 다가오는 시간 */
-const PHOTO_IN = 1.6;
-/** 칩, 막대, 그림 전환 */
-const DUR = 0.45;
 /** 패널 전환 */
 const DUR_FAST = 0.2;
 
@@ -101,36 +89,6 @@ const COMPARE_ROWS: { label: string; v: [string, string, string] }[] = [
   { label: "수술비(양안)", v: [won(1700000), won(1500000), won(2900000)] },
 ];
 
-/** 회복 막대. 일상 복귀일과 시력 안정까지 걸리는 날 */
-const RECOVERY: Record<Surgery, { back: number; stable: number }> = {
-  lasik: { back: 1, stable: 14 },
-  lasek: { back: 4, stable: 60 },
-  smile: { back: 1, stable: 14 },
-};
-const AXIS: [number, string][] = [
-  [0, "당일"],
-  [1, "다음 날"],
-  [7, "1주"],
-  [30, "1개월"],
-  [90, "3개월"],
-];
-/** 날짜를 막대 위치(0~1)로. 앞쪽 며칠이 잘 보이게 구간마다 다르게 늘린다 */
-function axisPos(d: number) {
-  const stops: [number, number][] = [
-    [0, 0],
-    [1, 0.16],
-    [7, 0.42],
-    [30, 0.72],
-    [90, 1],
-  ];
-  for (let i = 1; i < stops.length; i++) {
-    const [d0, p0] = stops[i - 1];
-    const [d1, pp1] = stops[i];
-    if (d <= d1) return p0 + ((d - d0) / (d1 - d0)) * (pp1 - p0);
-  }
-  return 1;
-}
-
 /* ---------- 2. 수술 전 정밀검사 ---------- */
 
 const EXAM_STEPS: { name: string; min: number; body: string }[] = [
@@ -144,7 +102,6 @@ const EXAM_STEPS: { name: string; min: number; body: string }[] = [
   { name: "원장 상담", min: 30, body: "검사 결과를 같이 보고 수술 가능 여부와 맞는 수술 방법을 정해요." },
 ];
 const EXAM_TOTAL = EXAM_STEPS.reduce((a, s) => a + s.min, 0);
-const DILATE_STEP = 6;
 const hm = (m: number) => (m < 60 ? `${m}분` : m % 60 === 0 ? `${m / 60}시간` : `${Math.floor(m / 60)}시간 ${m % 60}분`);
 
 const PREP = [
@@ -155,19 +112,11 @@ const PREP = [
 
 /* ---------- 3. 백내장 ---------- */
 
-type Lens = "cataract" | "mono" | "multi";
-const LENSES: { id: Lens; name: string; note: string }[] = [
-  { id: "cataract", name: "백내장 있을 때", note: "수정체가 뿌옇게 흐려져 거리와 상관없이 안개 낀 것처럼 보여요." },
-  { id: "mono", name: "단초점 렌즈", note: "먼 곳에 초점을 맞춰요. 가까운 글씨는 돋보기를 써야 해요. 건강보험이 적용돼요." },
-  { id: "multi", name: "다초점 렌즈", note: "먼 곳과 가까운 곳에 초점이 나뉘어 있어요. 밤에 불빛 번짐이 생길 수 있어요. 비급여예요." },
+const LENSES: { name: string; pay: string; note: string }[] = [
+  { name: "단초점 렌즈", pay: "건강보험 적용", note: "먼 곳에 초점을 맞춰요. 가까운 글씨는 돋보기를 써야 해요." },
+  { name: "다초점 렌즈", pay: "비급여", note: "먼 곳과 가까운 곳에 초점이 나뉘어 있어요. 밤에 불빛 번짐이 생길 수 있어요." },
+  { name: "난시교정 렌즈", pay: "비급여", note: "각막 난시가 큰 경우 난시까지 함께 교정해요. 검사에서 난시 정도를 보고 정해요." },
 ];
-/** 거리별 흐림 정도(px)와 뿌연 막. 가까이, 중간, 멀리 순서 */
-const VISION: Record<Lens, { blur: [number, number, number]; haze: number }> = {
-  cataract: { blur: [2.4, 2.4, 2.8], haze: 0.5 },
-  mono: { blur: [2.6, 1.3, 0], haze: 0 },
-  multi: { blur: [0.4, 0.9, 0.3], haze: 0 },
-};
-const DISTANCES = ["가까이 40cm", "중간 70cm", "멀리 5m"] as const;
 
 const CATARACT_SIGNS = ["안개 낀 것처럼 뿌옇게 보여요", "밤에 불빛이 번져 보여요", "안경 도수가 자주 바뀌어요", "색이 누렇게 바래 보여요"];
 
@@ -237,7 +186,6 @@ export function EyeClinicDemo() {
   }, []);
 
   const go = (id: string) => document.getElementById(id)?.scrollIntoView({ behavior: reduce ? "auto" : "smooth", block: "start" });
-  const [pick, setPick] = useState<Surgery>("lasik");
   const [prefill, setPrefill] = useState<Prefill | null>(null);
   const [prefillKey, setPrefillKey] = useState(0);
 
@@ -247,10 +195,6 @@ export function EyeClinicDemo() {
         reduce={reduce}
         today={today}
         go={go}
-        onCompare={(s) => {
-          setPick(s);
-          go("ec-compare");
-        }}
         onConsult={(p) => {
           setPrefill(p);
           setPrefillKey((k) => k + 1);
@@ -260,17 +204,17 @@ export function EyeClinicDemo() {
 
       <section id="ec-compare" aria-labelledby="ec-compare-title" className="mx-auto mt-14 max-w-[1200px] scroll-mt-4 px-4 md:mt-20 md:px-6">
         <SectionTitle id="ec-compare-title" title="시력교정 수술 비교" />
-        <Compare reduce={reduce} pick={pick} setPick={setPick} />
+        <Compare />
       </section>
 
       <section id="ec-exam" aria-labelledby="ec-exam-title" className="mx-auto mt-16 max-w-[1200px] scroll-mt-4 px-4 md:mt-24 md:px-6">
         <SectionTitle id="ec-exam-title" title="수술 전 정밀검사" />
-        <ExamSteps reduce={reduce} onBook={() => go("ec-book")} />
+        <ExamSteps onBook={() => go("ec-book")} />
       </section>
 
       <section id="ec-cataract" aria-labelledby="ec-cataract-title" className="mx-auto mt-16 max-w-[1200px] scroll-mt-4 px-4 md:mt-24 md:px-6">
         <SectionTitle id="ec-cataract-title" title="백내장" />
-        <Cataract reduce={reduce} />
+        <Cataract />
       </section>
 
       <section id="ec-fees" aria-labelledby="ec-fees-title" className="mx-auto mt-16 max-w-[1200px] scroll-mt-4 px-4 md:mt-24 md:px-6">
@@ -359,13 +303,11 @@ function Poster({
   reduce,
   today,
   go,
-  onCompare,
   onConsult,
 }: {
   reduce: boolean;
   today: Date;
   go: (id: string) => void;
-  onCompare: (s: Surgery) => void;
   onConsult: (p: Prefill) => void;
 }) {
   const [tab, setTab] = useState<Tab>("smile");
@@ -486,10 +428,10 @@ function Poster({
             <div className="mt-5 flex flex-wrap gap-x-5 gap-y-1">
               {tab === "cataract" ? (
                 <button type="button" onClick={() => go("ec-cataract")} className={`min-h-11 text-[16px] font-semibold underline underline-offset-4 ${focusRing}`} style={{ color: C.teal, outlineColor: C.teal }}>
-                  렌즈별로 보이는 모습
+                  인공수정체 종류
                 </button>
               ) : (
-                <button type="button" onClick={() => onCompare(tab)} className={`min-h-11 text-[16px] font-semibold underline underline-offset-4 ${focusRing}`} style={{ color: C.teal, outlineColor: C.teal }}>
+                <button type="button" onClick={() => go("ec-compare")} className={`min-h-11 text-[16px] font-semibold underline underline-offset-4 ${focusRing}`} style={{ color: C.teal, outlineColor: C.teal }}>
                   라식, 라섹, 스마일라식 비교표
                 </button>
               )}
@@ -509,18 +451,16 @@ function Poster({
                 exit={reduce ? undefined : { opacity: 0 }}
                 transition={t}
               >
-                <motion.div className="h-full w-full" initial={reduce ? false : { scale: 1.06 }} animate={{ scale: 1 }} transition={{ duration: reduce ? 0 : PHOTO_IN, ease: EASE }}>
-                  {/* eslint-disable-next-line @next/next/no-img-element -- 정적 export 라 next/image 최적화를 쓰지 않는다 */}
-                  <img
-                    src={tab === "cataract" ? DOCTORS[0].photo : `${IMG}/hero.jpg`}
-                    srcSet={tab === "cataract" ? undefined : `${IMG}/hero-sm.jpg 960w, ${IMG}/hero.jpg 1920w`}
-                    sizes="(min-width: 768px) 50vw, 100vw"
-                    alt={tab === "cataract" ? `${DOCTORS[0].role} ${DOCTORS[0].name}` : "검안 상자 위에 놓인 시력 검사용 시험테와 렌즈"}
-                    fetchPriority="high"
-                    className="absolute inset-0 h-full w-full object-cover"
-                    style={{ objectPosition: tab === "cataract" ? "50% 22%" : "40% 50%" }}
-                  />
-                </motion.div>
+                {/* eslint-disable-next-line @next/next/no-img-element -- 정적 export 라 next/image 최적화를 쓰지 않는다 */}
+                <img
+                  src={tab === "cataract" ? DOCTORS[0].photo : `${IMG}/hero.jpg`}
+                  srcSet={tab === "cataract" ? undefined : `${IMG}/hero-sm.jpg 960w, ${IMG}/hero.jpg 1920w`}
+                  sizes="(min-width: 768px) 50vw, 100vw"
+                  alt={tab === "cataract" ? `${DOCTORS[0].role} ${DOCTORS[0].name}` : "검안 상자 위에 놓인 시력 검사용 시험테와 렌즈"}
+                  fetchPriority="high"
+                  className="absolute inset-0 h-full w-full object-cover"
+                  style={{ objectPosition: tab === "cataract" ? "50% 22%" : "40% 50%" }}
+                />
               </motion.div>
             </AnimatePresence>
             {tab === "cataract" && (
@@ -569,76 +509,29 @@ function Poster({
 
 /* ---------- 1. 시력교정 수술 비교 ---------- */
 
-function Compare({ reduce, pick, setPick }: { reduce: boolean; pick: Surgery; setPick: (s: Surgery) => void }) {
-  const idx = SURGERIES.findIndex((s) => s.id === pick);
-  const s = SURGERIES[idx];
-  const rec = RECOVERY[pick];
-  const t = { duration: reduce ? 0 : DUR, ease: EASE };
-
+function Compare() {
   return (
-    <div className="grid gap-8 lg:grid-cols-[minmax(0,1fr)_minmax(0,1.05fr)] lg:gap-12">
-      <div>
-        <div role="group" aria-label="수술 고르기" className="flex flex-wrap gap-2">
-          {SURGERIES.map((x) => {
-            const on = x.id === pick;
-            return (
-              <button
-                key={x.id}
-                type="button"
-                aria-pressed={on}
-                onClick={() => setPick(x.id)}
-                className={`min-h-11 rounded-[6px] border px-5 text-[16px] font-bold transition-colors ${focusRing}`}
-                style={{ background: on ? C.teal : C.card, color: on ? "#fff" : C.text, borderColor: on ? C.teal : C.line, outlineColor: C.teal }}
-              >
-                {x.name}
-              </button>
-            );
-          })}
-        </div>
-
-        <div className="mt-5 rounded-[8px] border p-4 md:p-6" style={{ background: C.card, borderColor: C.line }}>
-          <CorneaDiagram key={pick} kind={pick} reduce={reduce} />
-          <p className="mt-3 text-[16px] leading-[1.7]">
-            <b>{s.name}</b> {s.how}
-          </p>
-        </div>
-
-        <div className="mt-6" aria-label={`${s.name} 회복 기간`}>
-          <p className="text-[15px] font-bold">회복 기간</p>
-          <div className="relative mt-3 h-[44px]">
-            <div className="absolute inset-x-0 top-[10px] h-[10px] rounded-full" style={{ background: C.tealSoft }} />
-            <motion.div
-              className="absolute left-0 top-[10px] h-[10px] w-full rounded-full"
-              style={{ background: C.tealMid, originX: 0 }}
-              initial={false}
-              animate={{ scaleX: axisPos(rec.stable) }}
-              transition={t}
-            />
-            <motion.div className="absolute left-0 top-[10px] h-[10px] w-full rounded-full" style={{ background: C.teal, originX: 0 }} initial={false} animate={{ scaleX: Math.max(0.03, axisPos(rec.back)) }} transition={t} />
-            {AXIS.map(([d, label], i) => (
-              <span
-                key={d}
-                className={`absolute top-[26px] whitespace-nowrap text-[12px] ${i === 0 ? "" : i === AXIS.length - 1 ? "-translate-x-full" : "-translate-x-1/2"}`}
-                style={{ left: `${axisPos(d) * 100}%`, color: C.muted }}
-              >
-                {label}
-              </span>
-            ))}
-          </div>
-          <dl className="mt-3 flex flex-wrap gap-x-6 gap-y-1 text-[15px]">
-            <div className="inline-flex items-center gap-2">
-              <span aria-hidden className="inline-block h-3 w-6 rounded-full" style={{ background: C.teal }} />
-              <dt>일상생활</dt>
-              <dd className="font-bold">{COMPARE_ROWS[2].v[idx]}</dd>
-            </div>
-            <div className="inline-flex items-center gap-2">
-              <span aria-hidden className="inline-block h-3 w-6 rounded-full" style={{ background: C.tealMid }} />
-              <dt>시력 안정</dt>
-              <dd className="font-bold">{COMPARE_ROWS[3].v[idx]}</dd>
-            </div>
-          </dl>
-        </div>
-      </div>
+    <div className="grid gap-8">
+      <ul className="grid gap-3 md:grid-cols-3">
+        {SURGERIES.map((x, i) => (
+          <li key={x.id} className="rounded-[8px] border p-5" style={{ background: C.card, borderColor: C.line }}>
+            <h3 className="text-[20px] font-bold">{x.name}</h3>
+            <p className="mt-2 text-[16px] leading-[1.7]" style={{ color: C.body, wordBreak: "keep-all" }}>
+              {x.how}
+            </p>
+            <dl className="mt-4 grid grid-cols-2 gap-2">
+              {[COMPARE_ROWS[2], COMPARE_ROWS[3]].map((row) => (
+                <div key={row.label} className="rounded-[6px] px-3 py-2.5" style={{ background: C.tealSoft }}>
+                  <dt className="text-[13px]" style={{ color: C.body }}>
+                    {row.label}
+                  </dt>
+                  <dd className="mt-0.5 text-[16px] font-bold">{row.v[i]}</dd>
+                </div>
+              ))}
+            </dl>
+          </li>
+        ))}
+      </ul>
 
       <div>
         <div className="overflow-hidden rounded-[8px] border" style={{ background: C.card, borderColor: C.line }}>
@@ -655,17 +548,9 @@ function Compare({ reduce, pick, setPick }: { reduce: boolean; pick: Surgery; se
                 <th scope="col" className="px-2 py-3 text-left font-normal md:px-4" style={{ color: C.muted }}>
                   구분
                 </th>
-                {SURGERIES.map((x, i) => (
-                  <th key={x.id} scope="col" className="p-1 md:p-2" style={{ background: i === idx ? C.tealSoft : undefined }}>
-                    <button
-                      type="button"
-                      onClick={() => setPick(x.id)}
-                      aria-pressed={i === idx}
-                      className={`w-full rounded-[6px] px-1 py-2 font-bold ${focusRing}`}
-                      style={{ color: i === idx ? C.teal : C.text, outlineColor: C.teal, textDecoration: i === idx ? "underline" : undefined, textUnderlineOffset: 5 }}
-                    >
-                      {x.name}
-                    </button>
+                {SURGERIES.map((x) => (
+                  <th key={x.id} scope="col" className="px-1 py-3 font-bold md:px-2">
+                    {x.name}
                   </th>
                 ))}
               </tr>
@@ -677,7 +562,7 @@ function Compare({ reduce, pick, setPick }: { reduce: boolean; pick: Surgery; se
                     {row.label}
                   </th>
                   {row.v.map((v, i) => (
-                    <td key={i} className="px-1 py-3 text-center leading-snug tracking-[-0.02em] transition-colors md:px-2 md:tracking-normal" style={{ background: i === idx ? C.tealSoft : undefined, fontWeight: i === idx ? 700 : 400 }}>
+                    <td key={i} className="px-1 py-3 text-center leading-snug tracking-[-0.02em] md:px-2 md:tracking-normal">
                       {v}
                     </td>
                   ))}
@@ -694,179 +579,39 @@ function Compare({ reduce, pick, setPick }: { reduce: boolean; pick: Surgery; se
   );
 }
 
-/** 각막 단면. 수술마다 무엇이 열리고 빠지는지 */
-function CorneaDiagram({ kind, reduce }: { kind: Surgery; reduce: boolean }) {
-  const t = (d: number, delay = 0) => (reduce ? { duration: 0 } : { duration: d, delay, ease: EASE });
-  const label = kind === "lasik" ? "각막 절편이 열리고 레이저가 비치는 단면 그림" : kind === "lasek" ? "각막 상피가 벗겨지고 레이저가 비치는 단면 그림" : "각막 속 조직이 작은 절개로 빠져나오는 단면 그림";
-  // 바깥 곡선 Q(20,140)(160,10)(300,140)의 가운데 구간(t 0.18~0.82)과 양 끝 구간
-  const CENTER = "M70.4 101.6 Q160 48.4 249.6 101.6";
-  return (
-    <svg viewBox="0 0 320 170" className="mx-auto block h-auto w-full max-w-[460px]" role="img" aria-label={label}>
-      <defs>
-        <linearGradient id="ec-stroma" x1="0" y1="0" x2="0" y2="1">
-          <stop offset="0" stopColor="#e3ebea" />
-          <stop offset="1" stopColor="#bccfcc" />
-        </linearGradient>
-        <linearGradient id="ec-beam" x1="0" y1="0" x2="0" y2="1">
-          <stop offset="0" stopColor={C.teal} stopOpacity="0" />
-          <stop offset="1" stopColor={C.teal} stopOpacity="0.45" />
-        </linearGradient>
-      </defs>
-      <ellipse cx="160" cy="164" rx="130" ry="5" fill="#000" fillOpacity="0.08" />
-      {/* 실질 */}
-      <path d="M20 140 Q160 10 300 140 L296 158 Q160 50 24 158 Z" fill="url(#ec-stroma)" />
-      <path d="M40 128 Q160 30 280 128" fill="none" stroke="#fff" strokeOpacity="0.6" strokeWidth="1.5" />
-      {/* 양 끝 상피 */}
-      <path d="M20 140 Q45.2 116.6 70.4 101.6 M249.6 101.6 Q274.8 116.6 300 140" fill="none" stroke="#b9b4a8" strokeWidth="4" />
-      <text x="292" y="120" fontSize="10" textAnchor="end" fill={C.muted}>
-        상피
-      </text>
-      <text x="160" y="96" fontSize="10" textAnchor="middle" fill={C.teal}>
-        실질
-      </text>
-
-      {kind === "lasik" && (
-        <>
-          <motion.path d="M100 78 L160 84 L220 78" fill="none" stroke={C.teal} strokeWidth="1.5" strokeDasharray="3 3" initial={reduce ? false : { opacity: 0 }} animate={{ opacity: 1 }} transition={t(0.3, 0.9)} />
-          <motion.polygon points="160,0 128,80 192,80" fill="url(#ec-beam)" initial={reduce ? false : { opacity: 0 }} animate={{ opacity: 0.7 }} transition={t(0.8, 0.9)} />
-          <motion.g style={{ originX: 0, originY: 1 }} initial={reduce ? false : { rotate: 0 }} animate={{ rotate: -26 }} transition={t(0.8, 0.15)}>
-            <path d="M70.4 106 Q160 53 249.6 106" fill="none" stroke="#cbdad8" strokeWidth="8" strokeLinecap="round" />
-            <path d={CENTER} fill="none" stroke="#b9b4a8" strokeWidth="4" />
-          </motion.g>
-          <text x="66" y="122" fontSize="10" textAnchor="middle" fill={C.text}>
-            절편
-          </text>
-        </>
-      )}
-
-      {kind === "lasek" && (
-        <>
-          <motion.polygon points="160,0 128,80 192,80" fill="url(#ec-beam)" initial={reduce ? false : { opacity: 0 }} animate={{ opacity: 0.7 }} transition={t(0.8, 0.8)} />
-          <motion.path d={CENTER} fill="none" stroke="#b9b4a8" strokeWidth="4" initial={reduce ? false : { y: 0, opacity: 1 }} animate={{ y: -28, opacity: 0 }} transition={t(0.8, 0.15)} />
-        </>
-      )}
-
-      {kind === "smile" && (
-        <>
-          <path d={CENTER} fill="none" stroke="#b9b4a8" strokeWidth="4" />
-          <path d="M236 95 L246 106" stroke={C.text} strokeWidth="2" strokeLinecap="round" />
-          {/* 조직이 빠진 자리 */}
-          <path d="M118 92 Q160 77 202 92 Q160 103 118 92 Z" fill="none" stroke={C.teal} strokeWidth="1.2" strokeDasharray="3 3" />
-          <text x="252" y="92" fontSize="10" fill={C.text}>
-            절개 2~4mm
-          </text>
-          <motion.path
-            d="M118 92 Q160 77 202 92 Q160 103 118 92 Z"
-            fill={C.teal}
-            fillOpacity="0.55"
-            stroke={C.teal}
-            strokeWidth="1"
-            initial={reduce ? false : { x: 0, y: 0, opacity: 1 }}
-            animate={reduce ? { x: 0, y: 0, opacity: 0.35 } : { x: [0, 0, 80], y: [0, 0, 16], opacity: [1, 1, 0] }}
-            transition={reduce ? { duration: 0 } : { duration: 1.4, delay: 0.2, ease: EASE, times: [0, 0.35, 1] }}
-          />
-        </>
-      )}
-    </svg>
-  );
-}
-
 /* ---------- 2. 수술 전 정밀검사 ---------- */
 
-function ExamSteps({ reduce, onBook }: { reduce: boolean; onBook: () => void }) {
-  const [step, setStep] = useState(0);
-  const done = EXAM_STEPS.slice(0, step + 1).reduce((a, s) => a + s.min, 0);
-  const startAt = done - EXAM_STEPS[step].min;
-  const t = { duration: reduce ? 0 : DUR, ease: EASE };
-  const dilated = step >= DILATE_STEP;
-  const R = 66;
-  const CIRC = 2 * Math.PI * R;
-
+function ExamSteps({ onBook }: { onBook: () => void }) {
   return (
-    <div className="grid gap-8 lg:grid-cols-[minmax(0,1fr)_minmax(0,1fr)] lg:gap-12">
-      <ol className="grid gap-1.5" aria-label="정밀검사 순서">
-        {EXAM_STEPS.map((s, i) => {
-          const on = i === step;
-          return (
-            <li key={s.name}>
-              <button
-                type="button"
-                aria-current={on ? "step" : undefined}
-                onClick={() => setStep(i)}
-                className={`flex w-full items-center gap-3 rounded-[8px] border px-3 py-2.5 text-left transition-colors md:px-4 ${focusRing}`}
-                style={{ background: on ? C.teal : C.card, color: on ? "#fff" : C.text, borderColor: on ? C.teal : C.line, outlineColor: C.teal }}
-              >
-                <span
-                  className="inline-flex h-7 w-7 flex-none items-center justify-center rounded-full text-[13px] font-bold"
-                  style={{ background: on ? "#fff" : i < step ? C.tealSoft : C.paper, color: C.teal }}
-                >
-                  {i < step ? <Check size={15} aria-label="지난 단계" /> : i + 1}
-                </span>
-                <span className="min-w-0 flex-1 text-[16px] font-bold">{s.name}</span>
-                <span className="flex-none text-[14px]" style={{ opacity: 0.85 }}>
-                  {s.min}분
-                </span>
-              </button>
-            </li>
-          );
-        })}
-      </ol>
-
-      <div className="rounded-[8px] border p-5 md:p-7" style={{ background: C.card, borderColor: C.line }}>
-        <div className="flex flex-wrap items-center gap-6">
-          <svg viewBox="0 0 160 160" className="h-[150px] w-[150px] flex-none" role="img" aria-label={`검사 시작 후 ${hm(done)} 지점, ${dilated ? "동공을 키운 상태" : "평소 동공"}`}>
-            <defs>
-              <radialGradient id="ec-mini-iris" cx="0.45" cy="0.42" r="0.6">
-                <stop offset="0" stopColor="#8f8a7e" />
-                <stop offset="0.45" stopColor="#56706d" />
-                <stop offset="1" stopColor="#2d3d3b" />
-              </radialGradient>
-            </defs>
-            <circle cx="80" cy="80" r={R} fill="none" stroke={C.tealSoft} strokeWidth="9" />
-            <motion.circle
-              cx="80"
-              cy="80"
-              r={R}
-              fill="none"
-              stroke={C.teal}
-              strokeWidth="9"
-              strokeLinecap="round"
-              strokeDasharray={CIRC}
-              transform="rotate(-90 80 80)"
-              initial={false}
-              animate={{ strokeDashoffset: CIRC * (1 - done / EXAM_TOTAL) }}
-              transition={t}
-            />
-            <circle cx="80" cy="80" r="44" fill="url(#ec-mini-iris)" />
-            <motion.circle cx="80" cy="80" fill="#111111" initial={false} animate={{ r: dilated ? 30 : 14 }} transition={{ duration: reduce ? 0 : 1.1, ease: EASE }} />
-            <ellipse cx="66" cy="64" rx="8" ry="5" fill="#fff" fillOpacity="0.8" transform="rotate(-30 66 64)" />
-          </svg>
-          <div className="min-w-0">
-            <p className="text-[14px]" style={{ color: C.muted }}>
-              시작 후
-            </p>
-            <p className="text-[30px] font-bold leading-tight" style={{ color: C.teal }}>
-              {hm(done)}
-            </p>
-            <p className="text-[14px]" style={{ color: C.muted }}>
-              전체 약 {hm(EXAM_TOTAL)}
-            </p>
-          </div>
-        </div>
-
-        <AnimatePresence mode="wait" initial={false}>
-          <motion.div key={step} initial={reduce ? false : { opacity: 0 }} animate={{ opacity: 1 }} exit={reduce ? { opacity: 1 } : { opacity: 0 }} transition={{ duration: reduce ? 0 : DUR_FAST }} className="mt-5">
-            <h3 className="text-[20px] font-bold">
-              {step + 1}. {EXAM_STEPS[step].name}
-              <span className="ml-2 text-[14px] font-normal" style={{ color: C.muted }}>
-                {startAt === 0 ? "도착하면 바로" : `${hm(startAt)} 지나서`}
+    <div className="grid gap-8 lg:grid-cols-[minmax(0,1.3fr)_minmax(0,1fr)] lg:gap-12">
+      <div>
+        <p className="text-[16px] leading-[1.7]" style={{ color: C.body }}>
+          검사는 아래 순서로 진행하고 전체 약 {hm(EXAM_TOTAL)} 걸려요.
+        </p>
+        <ol className="mt-4 grid overflow-hidden rounded-[8px] border" aria-label="정밀검사 순서" style={{ background: C.card, borderColor: C.line }}>
+          {EXAM_STEPS.map((s, i) => (
+            <li key={s.name} className={`flex gap-3 px-4 py-3.5 md:px-5 ${i ? "border-t" : ""}`} style={{ borderColor: C.line }}>
+              <span className="inline-flex h-7 w-7 flex-none items-center justify-center rounded-full text-[13px] font-bold" style={{ background: C.tealSoft, color: C.teal }}>
+                {i + 1}
               </span>
-            </h3>
-            <p className="mt-2 text-[16px] leading-[1.7]">{EXAM_STEPS[step].body}</p>
-          </motion.div>
-        </AnimatePresence>
+              <div className="min-w-0 flex-1">
+                <p className="flex flex-wrap items-baseline justify-between gap-x-3">
+                  <b className="text-[16px]">{s.name}</b>
+                  <span className="text-[14px]" style={{ color: C.muted }}>
+                    {s.min}분
+                  </span>
+                </p>
+                <p className="mt-1 text-[15px] leading-[1.6]" style={{ color: C.body }}>
+                  {s.body}
+                </p>
+              </div>
+            </li>
+          ))}
+        </ol>
+      </div>
 
-        <div className="mt-6 rounded-[8px] p-4" style={{ background: C.paper }}>
+      <div className="content-start">
+        <div className="rounded-[8px] p-5" style={{ background: C.paper }}>
           <p className="inline-flex items-center gap-1.5 text-[15px] font-bold">
             <AlertCircle size={17} aria-hidden style={{ color: C.teal }} />
             검사 전 렌즈 빼는 시기
@@ -902,59 +647,34 @@ function ExamSteps({ reduce, onBook }: { reduce: boolean; onBook: () => void }) 
 
 /* ---------- 3. 백내장 ---------- */
 
-function Cataract({ reduce }: { reduce: boolean }) {
-  const [lens, setLens] = useState<Lens>("cataract");
-  const v = VISION[lens];
-  const info = LENSES.find((l) => l.id === lens) ?? LENSES[0];
-  const t = { duration: reduce ? 0 : 0.7, ease: EASE };
-
+function Cataract() {
   return (
     <div className="grid gap-8 lg:grid-cols-[minmax(0,1.3fr)_minmax(0,1fr)] lg:gap-12">
       <div>
-        <div role="group" aria-label="보이는 모습 고르기" className="flex flex-wrap gap-2">
-          {LENSES.map((l) => {
-            const on = l.id === lens;
-            return (
-              <button
-                key={l.id}
-                type="button"
-                aria-pressed={on}
-                onClick={() => setLens(l.id)}
-                className={`min-h-11 rounded-[6px] border px-4 text-[15px] font-bold transition-colors md:px-5 md:text-[16px] ${focusRing}`}
-                style={{ background: on ? C.teal : C.card, color: on ? "#fff" : C.text, borderColor: on ? C.teal : C.line, outlineColor: C.teal }}
-              >
-                {l.name}
-              </button>
-            );
-          })}
-        </div>
-
-        <div className="mt-5 grid grid-cols-3 gap-2 md:gap-3" aria-live="polite">
-          {DISTANCES.map((d, i) => (
-            <figure key={d} className="relative overflow-hidden rounded-[8px] border" style={{ background: "#eef3f2", borderColor: C.line }}>
-              <motion.div initial={false} animate={{ filter: `blur(${v.blur[i]}px)` }} transition={t} className="aspect-[3/4]">
-                <VisionThing i={i} />
-              </motion.div>
-              <motion.div aria-hidden className="pointer-events-none absolute inset-0" style={{ background: "#e9dcb4" }} initial={false} animate={{ opacity: v.haze }} transition={t} />
-              <figcaption className="relative border-t px-2 py-2 text-center text-[13px] md:text-[14px]" style={{ background: C.card, borderColor: C.line }}>
-                {d}
-              </figcaption>
-            </figure>
+        <h3 className="text-[18px] font-bold">인공수정체 종류</h3>
+        <ul className="mt-3 grid gap-3">
+          {LENSES.map((l) => (
+            <li key={l.name} className="rounded-[8px] border p-5" style={{ background: C.card, borderColor: C.line }}>
+              <p className="flex flex-wrap items-baseline justify-between gap-x-3">
+                <b className="text-[18px]">{l.name}</b>
+                <span className="text-[14px] font-semibold" style={{ color: C.teal }}>
+                  {l.pay}
+                </span>
+              </p>
+              <p className="mt-2 text-[15px] leading-[1.7]" style={{ color: C.body }}>
+                {l.note}
+              </p>
+            </li>
           ))}
-        </div>
-        <p className="mt-3 text-[15px] leading-[1.7]">
-          <b>{info.name}</b> {info.note}
-        </p>
-        <p className="mt-1 text-[13px]" style={{ color: C.muted }}>
-          예시 그림이에요. 렌즈는 검사 뒤 생활 습관에 맞춰 정해요.
+        </ul>
+        <p className="mt-3 text-[14px]" style={{ color: C.muted }}>
+          렌즈는 검사 결과와 생활 습관에 맞춰 원장 상담 뒤 정해요.
         </p>
       </div>
 
       <div className="grid content-start gap-5">
         <div className="rounded-[8px] border p-5" style={{ background: C.card, borderColor: C.line }}>
-          <h3 className="text-[18px] font-bold">
-            이럴 때 검사 받아 보세요
-          </h3>
+          <h3 className="text-[18px] font-bold">이럴 때 검사 받아 보세요</h3>
           <ul className="mt-3 grid gap-2 text-[15px]">
             {CATARACT_SIGNS.map((s) => (
               <li key={s} className="flex items-start gap-2">
@@ -979,53 +699,6 @@ function Cataract({ reduce }: { reduce: boolean }) {
         </dl>
       </div>
     </div>
-  );
-}
-
-/** 거리별 예시 사물. 0 휴대폰 문자, 1 모니터 달력, 2 버스 정류장 표지판 */
-function VisionThing({ i }: { i: number }) {
-  if (i === 0)
-    return (
-      <svg viewBox="0 0 120 160" className="h-full w-full" aria-hidden>
-        <rect x="26" y="14" width="68" height="132" rx="10" fill="#2a2a2a" />
-        <rect x="31" y="22" width="58" height="116" rx="4" fill="#f9fbfb" />
-        <rect x="36" y="32" width="38" height="12" rx="6" fill={C.tealSoft} />
-        <rect x="46" y="50" width="38" height="12" rx="6" fill={C.teal} />
-        <rect x="36" y="68" width="30" height="12" rx="6" fill={C.tealSoft} />
-        <text x="60" y="104" fontSize="9" textAnchor="middle" fill={C.text}>
-          내일 오전 10시
-        </text>
-        <text x="60" y="118" fontSize="9" textAnchor="middle" fill={C.text}>
-          약 드세요
-        </text>
-      </svg>
-    );
-  if (i === 1)
-    return (
-      <svg viewBox="0 0 120 160" className="h-full w-full" aria-hidden>
-        <rect x="12" y="40" width="96" height="66" rx="5" fill="#2a2a2a" />
-        <rect x="17" y="45" width="86" height="56" rx="2" fill="#f9fbfb" />
-        {Array.from({ length: 15 }, (_, k) => (
-          <text key={k} x={26 + (k % 5) * 17} y={60 + Math.floor(k / 5) * 15} fontSize="9" textAnchor="middle" fill={k === 7 ? C.teal : C.text} fontWeight={k === 7 ? 700 : 400}>
-            {k + 8}
-          </text>
-        ))}
-        <rect x="54" y="106" width="12" height="18" fill="#3a4747" />
-        <rect x="38" y="124" width="44" height="5" rx="2" fill="#3a4747" />
-      </svg>
-    );
-  return (
-    <svg viewBox="0 0 120 160" className="h-full w-full" aria-hidden>
-      <rect x="0" y="118" width="120" height="42" fill="#d7dfdd" />
-      <rect x="57" y="56" width="6" height="74" fill="#5b6767" />
-      <rect x="26" y="20" width="68" height="40" rx="5" fill={C.teal} />
-      <text x="60" y="38" fontSize="11" textAnchor="middle" fill="#fff" fontWeight="700">
-        ㅇㅇ역
-      </text>
-      <text x="60" y="52" fontSize="9" textAnchor="middle" fill="#fff">
-        버스 7번
-      </text>
-    </svg>
   );
 }
 

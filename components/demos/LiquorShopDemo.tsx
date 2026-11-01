@@ -2,7 +2,7 @@
 
 import { useEffect, useMemo, useRef, useState } from "react";
 import { AnimatePresence, motion } from "framer-motion";
-import { Car, ChevronLeft, ChevronRight, Clock, MapPin, Package, RotateCcw, Truck, X } from "lucide-react";
+import { Car, ChevronLeft, ChevronRight, Clock, MapPin, Truck, X } from "lucide-react";
 import { useReducedMotionSafe } from "@/hooks/useReducedMotionSafe";
 import { daysAgo, fmtKo, useDemoToday } from "@/hooks/useDemoToday";
 import { maskName, maskPhone } from "@/components/demos/LeadReceivedPanel";
@@ -12,46 +12,38 @@ import { DemoMakerInfo } from "@/components/demos/DemoMakerInfo";
    첫 화면과 병 사진 출처: AI 생성(Z-Image-Turbo, Apache 2.0)
 
    국내 전통주 보틀숍과 전통주 쇼핑몰은 첫 진입에 성인 인증 창(만 19세 이상이십니까)을 먼저 띄운다.
-   메뉴는 막걸리, 약주, 청주, 증류주, 과실주로 종류별 분류, 첫 화면에 추천과 선물 세트, 시음회 안내,
-   오시는 길(주차, 영업시간)을 둔다. 상품 상세는 도수, 용량, 단맛과 산미 정도, 어울리는 음식, 보관법을 적는다.
+   메뉴는 막걸리, 약주, 청주, 증류주, 과실주로 종류별 분류, 첫 화면에 추천과 선물세트, 시음회 안내,
+   오시는 길(주차, 영업시간)을 둔다. 상품 상세는 도수, 용량, 맛 설명, 어울리는 음식, 보관법을 적는다.
    하단에는 지나친 음주 경고 문구를 둔다. 전통주는 온라인 주문과 택배가 가능해 택배 안내도 흔하다.
 
-   핵심 모션: 필터에 따라 병 카드가 자리를 바꾸는 재배열. 남는 카드는 미끄러지고 빠지는 카드는
-   아래로 가라앉으며 사라진다. 카드를 누르면 같은 자리에서 커져 상세가 열리고, 맛 레이더가 그 술 값으로 변한다.
-   선물 세트에 담으면 병 그림이 카드에서 상자 안 자리로 옮겨 간다.
-
    상호작용(모두 브라우저 안에서만 돈다. 실제로 보내지 않는다)
-   1. 필터: 도수 범위, 단맛, 탄산, 종류, 가격대. 재배열과 결과 수.
-   2. 병 상세: 맛 레이더 5축, 도수, 용량, 가격, 어울리는 음식, 보관법. 이전, 다음 병으로 넘기기.
-   3. 선물 세트: 병 2~3개를 담으면 상자 안에 들어간다. 포장 종류와 합계.
+   1. 주종 탭: 막걸리, 약주, 청주, 증류주, 과실주로 목록을 나눈다.
+   2. 병 상세: 도수, 용량, 가격, 맛 설명, 어울리는 음식, 보관법. 이전, 다음 병으로 넘기기.
+   3. 선물세트: 가격대별로 미리 꾸린 세트 세 가지.
    4. 시음회 예약: 다음 두 주 토요일 2회차, 인원, 이름, 휴대폰. 접수 완료 화면.
    5. 매장 안내와 오시는 길: 영업시간(오늘 요일 진하게), 주차, 택배 안내.
 
-   첫 화면(성인 확인 뒤 처음 보이는 화면): 주종 메뉴, 짧은 매장 선반 사진 띠, 도수 순서로 병을 한 줄 진열한 도수 선반.
-   확인을 누르면 사진 띠만 1.6초 동안 천천히 다가온다. 반복 움직임은 없다. */
+   첫 화면(성인 확인 뒤 처음 보이는 화면): 주종 메뉴, 매장 선반 사진, 이번 주 추천 술.
+   확인을 누르면 사진만 1.6초 동안 천천히 다가온다. 반복 움직임은 없다. */
 
-const BRAND = "곰파트너";
+const BRAND = "전통주 보틀숍";
 const ADDRESS = "서울 ㅇㅇ구 ㅇㅇ로 00, 1층";
-const KAKAO = "카카오톡 채널 곰파트너";
+const KAKAO = "카카오톡 채널 전통주 보틀숍";
 
 /* 로고: 메인 사이트와 같은 곰 로고 + 곰파트너(크게) + 업종(작게) */
 function SampleLogo({ light, small }: { light?: boolean; small?: boolean }) {
   return (
     <span className="inline-flex items-center gap-2" style={{ color: light ? "#ffffff" : "#111111" }}>
-      {/* eslint-disable-next-line @next/next/no-img-element -- 메인 사이트와 같은 곰 로고 */}
-      <img src="/images/logo-bear.png" alt="" aria-hidden width={28} height={28} className={small ? "h-6 w-6 shrink-0" : "h-7 w-7 shrink-0"} />
       <span className="flex items-baseline gap-1 whitespace-nowrap">
-        <span className={`${small ? "text-[18px]" : "text-[20px]"} font-bold tracking-[-0.03em]`}>곰파트너</span>
-        <span className="text-[12px] font-semibold opacity-75">카탈로그</span>
+        <span className={`${small ? "text-[18px]" : "text-[20px]"} font-bold tracking-[-0.03em]`}>전통주 보틀숍</span>
       </span>
     </span>
   );
 }
 
-/* 모션 상수. 재배열과 카드 등장, 퇴장은 240ms, 카드마다 20ms씩 늦춘다. */
+
+/* 모션 곡선 */
 const EASE = [0.22, 1, 0.36, 1] as const;
-const DUR = 0.24;
-const STAGGER = 0.02;
 
 const IMG = "/images/demo-liquor-shop";
 
@@ -68,63 +60,50 @@ const C = {
 };
 
 type Kind = "막걸리" | "약주" | "청주" | "증류주" | "과실주";
-type Sweet = "드라이" | "보통" | "달콤";
 
 const KINDS: Kind[] = ["막걸리", "약주", "청주", "증류주", "과실주"];
-const SWEETS: Sweet[] = ["드라이", "보통", "달콤"];
-
-
-const PRICE_BANDS = ["1만원 이하", "1~3만원", "3~5만원", "5만원 이상"] as const;
-type PriceBand = (typeof PRICE_BANDS)[number];
-const inBand = (p: number, b: PriceBand) =>
-  b === "1만원 이하" ? p <= 10000 : b === "1~3만원" ? p > 10000 && p <= 30000 : b === "3~5만원" ? p > 30000 && p <= 50000 : p > 50000;
-
-const ABV_MIN = 6;
-const ABV_MAX = 45;
 
 type Bottle = {
   id: string;
   name: string;
   kind: Kind;
   abv: number;
-  sweet: Sweet;
-  fizz: boolean;
   price: number;
   ml: number;
-  /** 단맛, 산미, 바디, 향, 여운. 1~5 */
-  taste: [number, number, number, number, number];
+  /** 맛 설명 한두 문장 */
+  note: string;
   food: string;
   keep: string;
   pick?: string;
 };
 
 const BOTTLES: Bottle[] = [
-  { id: "m1", name: "첫눈 생막걸리", kind: "막걸리", abv: 6, sweet: "달콤", fizz: true, price: 7000, ml: 750, taste: [4, 3, 2, 3, 2], food: "파전, 두부김치", keep: "냉장 보관. 개봉 뒤 3일 안에 드세요.", pick: "입문" },
-  { id: "m2", name: "느티 탁주", kind: "막걸리", abv: 8, sweet: "보통", fizz: true, price: 9000, ml: 750, taste: [3, 3, 3, 3, 3], food: "제육볶음, 김치전", keep: "냉장 보관. 흔들어서 드세요." },
-  { id: "m3", name: "밤밭 밤막걸리", kind: "막걸리", abv: 6, sweet: "달콤", fizz: true, price: 12000, ml: 500, taste: [5, 2, 3, 4, 3], food: "약과, 구운 밤", keep: "냉장 보관. 개봉 뒤 2일 안에 드세요.", pick: "선물" },
-  { id: "m4", name: "누룩향 탁주", kind: "막걸리", abv: 12, sweet: "드라이", fizz: false, price: 15000, ml: 500, taste: [2, 4, 5, 4, 4], food: "홍어 삼합, 묵은지", keep: "냉장 보관. 가라앉은 침전물은 섞어 드세요." },
-  { id: "m5", name: "솔잎 막걸리", kind: "막걸리", abv: 7, sweet: "보통", fizz: true, price: 8500, ml: 750, taste: [3, 3, 2, 4, 2], food: "도토리묵, 나물", keep: "냉장 보관. 개봉 뒤 3일 안에 드세요." },
-  { id: "y1", name: "가을들 약주", kind: "약주", abv: 13, sweet: "보통", fizz: false, price: 28000, ml: 500, taste: [3, 3, 3, 4, 4], food: "전복찜, 갈비찜", keep: "서늘한 곳에 두고 개봉 뒤 냉장 보관." },
-  { id: "y2", name: "매화 약주", kind: "약주", abv: 15, sweet: "드라이", fizz: false, price: 32000, ml: 500, taste: [2, 4, 3, 5, 4], food: "회, 생선구이", keep: "서늘한 곳에 두고 개봉 뒤 냉장 보관.", pick: "선물" },
-  { id: "y3", name: "대추 약주", kind: "약주", abv: 14, sweet: "달콤", fizz: false, price: 25000, ml: 375, taste: [4, 2, 4, 4, 5], food: "약식, 떡갈비", keep: "서늘한 곳에 두고 개봉 뒤 냉장 보관." },
-  { id: "c1", name: "맑은새 청주", kind: "청주", abv: 14, sweet: "드라이", fizz: false, price: 36000, ml: 500, taste: [2, 3, 2, 3, 3], food: "회, 초밥", keep: "냉장 보관. 차갑게 드세요." },
-  { id: "c2", name: "서리 청주", kind: "청주", abv: 16, sweet: "보통", fizz: false, price: 42000, ml: 500, taste: [3, 2, 4, 3, 4], food: "장어구이, 수육", keep: "냉장 보관. 개봉 뒤 2주 안에 드세요.", pick: "추천" },
-  { id: "c3", name: "벼꽃 청주", kind: "청주", abv: 13, sweet: "달콤", fizz: false, price: 30000, ml: 375, taste: [4, 3, 2, 4, 3], food: "잡채, 모둠전", keep: "냉장 보관. 차갑게 드세요." },
-  { id: "s1", name: "소나무 소주 25", kind: "증류주", abv: 25, sweet: "드라이", fizz: false, price: 45000, ml: 375, taste: [1, 1, 3, 4, 4], food: "삼겹살, 족발", keep: "실온 보관. 직사광선을 피하세요." },
-  { id: "s2", name: "참나무 소주 41", kind: "증류주", abv: 41, sweet: "드라이", fizz: false, price: 98000, ml: 500, taste: [1, 1, 5, 5, 5], food: "육회, 한우 구이", keep: "실온 보관. 개봉 뒤에도 오래 두고 드실 수 있어요.", pick: "선물" },
-  { id: "s3", name: "쌀소주 32", kind: "증류주", abv: 32, sweet: "보통", fizz: false, price: 38000, ml: 375, taste: [2, 1, 4, 3, 4], food: "보쌈, 전골", keep: "실온 보관. 직사광선을 피하세요." },
-  { id: "s4", name: "보리소주 45", kind: "증류주", abv: 45, sweet: "드라이", fizz: false, price: 72000, ml: 500, taste: [1, 1, 5, 4, 5], food: "곱창, 양대창", keep: "실온 보관. 서늘한 곳에 세워 두세요." },
-  { id: "f1", name: "복숭아 와인", kind: "과실주", abv: 12, sweet: "달콤", fizz: false, price: 24000, ml: 500, taste: [5, 3, 2, 5, 3], food: "치즈, 과일", keep: "냉장 보관. 개봉 뒤 5일 안에 드세요.", pick: "입문" },
-  { id: "f2", name: "오미자 술", kind: "과실주", abv: 14, sweet: "보통", fizz: false, price: 22000, ml: 375, taste: [3, 5, 3, 4, 4], food: "오리구이, 떡볶이", keep: "서늘한 곳에 두고 개봉 뒤 냉장 보관." },
-  { id: "f3", name: "사과 스파클링", kind: "과실주", abv: 7, sweet: "달콤", fizz: true, price: 19000, ml: 750, taste: [4, 4, 1, 4, 2], food: "샐러드, 피자", keep: "냉장 보관. 차갑게 바로 드세요." },
+  { id: "m1", name: "첫눈 생막걸리", kind: "막걸리", abv: 6, price: 7000, ml: 750, note: "쌀 단맛이 먼저 오고 탄산이 가볍게 올라오는 생막걸리. 처음 드시는 분께 권해요.", food: "파전, 두부김치", keep: "냉장 보관. 개봉 뒤 3일 안에 드세요.", pick: "입문" },
+  { id: "m2", name: "느티 탁주", kind: "막걸리", abv: 8, price: 9000, ml: 750, note: "단맛과 산미가 고르게 섞인 탁주. 탄산이 있어 기름진 음식과 잘 맞아요.", food: "제육볶음, 김치전", keep: "냉장 보관. 흔들어서 드세요." },
+  { id: "m3", name: "밤밭 밤막걸리", kind: "막걸리", abv: 6, price: 12000, ml: 500, note: "구운 밤 향이 진하고 달콤해요. 걸쭉한 편이라 차갑게 드시면 좋아요.", food: "약과, 구운 밤", keep: "냉장 보관. 개봉 뒤 2일 안에 드세요.", pick: "선물" },
+  { id: "m4", name: "누룩향 탁주", kind: "막걸리", abv: 12, price: 15000, ml: 500, note: "단맛을 줄이고 누룩 향을 살린 진한 탁주. 산미와 여운이 길어요.", food: "홍어 삼합, 묵은지", keep: "냉장 보관. 가라앉은 침전물은 섞어 드세요." },
+  { id: "m5", name: "솔잎 막걸리", kind: "막걸리", abv: 7, price: 8500, ml: 750, note: "솔잎 향이 은은하게 남는 막걸리. 단맛은 보통, 끝맛이 깔끔해요.", food: "도토리묵, 나물", keep: "냉장 보관. 개봉 뒤 3일 안에 드세요." },
+  { id: "y1", name: "가을들 약주", kind: "약주", abv: 13, price: 28000, ml: 500, note: "햇쌀로 빚어 부드럽고 향이 고와요. 단맛은 보통, 여운이 긴 편이에요.", food: "전복찜, 갈비찜", keep: "서늘한 곳에 두고 개봉 뒤 냉장 보관." },
+  { id: "y2", name: "매화 약주", kind: "약주", abv: 15, price: 32000, ml: 500, note: "매화 향이 맑게 피는 드라이한 약주. 산미가 있어 생선과 잘 어울려요.", food: "회, 생선구이", keep: "서늘한 곳에 두고 개봉 뒤 냉장 보관.", pick: "선물" },
+  { id: "y3", name: "대추 약주", kind: "약주", abv: 14, price: 25000, ml: 375, note: "대추를 넣어 달고 묵직해요. 단맛과 여운이 진한 편이에요.", food: "약식, 떡갈비", keep: "서늘한 곳에 두고 개봉 뒤 냉장 보관." },
+  { id: "c1", name: "맑은새 청주", kind: "청주", abv: 14, price: 36000, ml: 500, note: "맑고 가벼운 드라이 청주. 차갑게 드시면 산뜻해요.", food: "회, 초밥", keep: "냉장 보관. 차갑게 드세요." },
+  { id: "c2", name: "서리 청주", kind: "청주", abv: 16, price: 42000, ml: 500, note: "바디감이 있고 쌀 향이 오래 남는 청주. 따뜻한 음식과도 잘 맞아요.", food: "장어구이, 수육", keep: "냉장 보관. 개봉 뒤 2주 안에 드세요.", pick: "추천" },
+  { id: "c3", name: "벼꽃 청주", kind: "청주", abv: 13, price: 30000, ml: 375, note: "과일 향이 은은하고 달콤한 청주. 도수가 낮아 편하게 마시기 좋아요.", food: "잡채, 모둠전", keep: "냉장 보관. 차갑게 드세요." },
+  { id: "s1", name: "소나무 소주 25", kind: "증류주", abv: 25, price: 45000, ml: 375, note: "솔 향이 살짝 나는 맑은 증류식 소주. 단맛 없이 깔끔해요.", food: "삼겹살, 족발", keep: "실온 보관. 직사광선을 피하세요." },
+  { id: "s2", name: "참나무 소주 41", kind: "증류주", abv: 41, price: 98000, ml: 500, note: "참나무통에서 숙성해 향이 깊고 바디가 묵직해요. 여운이 아주 길어요.", food: "육회, 한우 구이", keep: "실온 보관. 개봉 뒤에도 오래 두고 드실 수 있어요.", pick: "선물" },
+  { id: "s3", name: "쌀소주 32", kind: "증류주", abv: 32, price: 38000, ml: 375, note: "쌀로 빚은 부드러운 증류주. 단맛이 조금 있어 처음 드시기 편해요.", food: "보쌈, 전골", keep: "실온 보관. 직사광선을 피하세요." },
+  { id: "s4", name: "보리소주 45", kind: "증류주", abv: 45, price: 72000, ml: 500, note: "보리 고소함이 진한 고도수 증류주. 얼음을 넣어 드셔도 좋아요.", food: "곱창, 양대창", keep: "실온 보관. 서늘한 곳에 세워 두세요." },
+  { id: "f1", name: "복숭아 와인", kind: "과실주", abv: 12, price: 24000, ml: 500, note: "복숭아 향이 진하고 달콤한 과실주. 차갑게 드시면 좋아요.", food: "치즈, 과일", keep: "냉장 보관. 개봉 뒤 5일 안에 드세요.", pick: "입문" },
+  { id: "f2", name: "오미자 술", kind: "과실주", abv: 14, price: 22000, ml: 375, note: "오미자 특유의 새콤함이 살아 있는 과실주. 단맛은 보통이에요.", food: "오리구이, 떡볶이", keep: "서늘한 곳에 두고 개봉 뒤 냉장 보관." },
+  { id: "f3", name: "사과 스파클링", kind: "과실주", abv: 7, price: 19000, ml: 750, note: "사과 향과 탄산이 가벼운 스파클링. 산뜻하게 시작하기 좋아요.", food: "샐러드, 피자", keep: "냉장 보관. 차갑게 바로 드세요." },
 ];
 
-const PACKS = [
-  { id: "box", name: "한지 상자", price: 5000 },
-  { id: "cloth", name: "보자기", price: 4000 },
-] as const;
-type PackId = (typeof PACKS)[number]["id"];
-const GIFT_MAX = 3;
+/** 선물세트. 가격대별로 미리 꾸린 세트 */
+const GIFTS: { name: string; band: string; items: string[]; pack: "box" | "cloth"; price: number }[] = [
+  { name: "막걸리 맛보기 세트", band: "3만원대", items: ["첫눈 생막걸리", "밤밭 밤막걸리", "솔잎 막걸리"], pack: "cloth", price: 31500 },
+  { name: "약주와 청주 세트", band: "7만원대", items: ["매화 약주", "서리 청주"], pack: "box", price: 79000 },
+  { name: "증류주 명절 세트", band: "10만원 이상", items: ["참나무 소주 41", "소나무 소주 25"], pack: "box", price: 148000 },
+];
 
 const TASTING_FEE = 15000;
 const TASTING_CAP = 8;
@@ -163,33 +142,15 @@ function nextOpenDay(today: Date) {
   return d.getDay() === 1 ? daysAgo(d, -1) : d;
 }
 
-type Filters = { kinds: Kind[]; abv: [number, number]; sweets: Sweet[]; fizz: boolean; band: PriceBand | null };
-const EMPTY: Filters = { kinds: [], abv: [ABV_MIN, ABV_MAX], sweets: [], fizz: false, band: null };
-
-function matches(b: Bottle, f: Filters) {
-  if (f.kinds.length && !f.kinds.includes(b.kind)) return false;
-  if (b.abv < f.abv[0] || b.abv > f.abv[1]) return false;
-  if (f.sweets.length && !f.sweets.includes(b.sweet)) return false;
-  if (f.fizz && !b.fizz) return false;
-  if (f.band && !inBand(b.price, f.band)) return false;
-  return true;
-}
-
 export function LiquorShopDemo() {
   const today = useDemoToday();
   const reduce = useReducedMotionSafe();
 
   const [age, setAge] = useState<"ask" | "yes" | "no">("ask");
-  const [filters, setFilters] = useState<Filters>(EMPTY);
+  const [kind, setKind] = useState<Kind | null>(null);
   const [selected, setSelected] = useState<string | null>(null);
-  const [gift, setGift] = useState<string[]>([]);
-  const [pack, setPack] = useState<PackId>("box");
 
-  const shown = useMemo(() => BOTTLES.filter((b) => matches(b, filters)), [filters]);
-  const isDefault = filters === EMPTY || (filters.kinds.length === 0 && filters.sweets.length === 0 && !filters.fizz && !filters.band && filters.abv[0] === ABV_MIN && filters.abv[1] === ABV_MAX);
-
-  const toggleGift = (id: string) =>
-    setGift((g) => (g.includes(id) ? g.filter((x) => x !== id) : g.length >= GIFT_MAX ? g : [...g, id]));
+  const shown = useMemo(() => BOTTLES.filter((b) => !kind || b.kind === kind), [kind]);
 
   useEffect(() => {
     const f = () => {
@@ -211,9 +172,10 @@ export function LiquorShopDemo() {
   }, [age]);
 
   const go = (id: string) => document.getElementById(id)?.scrollIntoView({ behavior: reduce ? "auto" : "smooth", block: "start" });
-
-  const giftBottles = gift.map((id) => BOTTLES.find((b) => b.id === id)!).filter(Boolean);
-  const giftSum = giftBottles.reduce((s, b) => s + b.price, 0);
+  const tab = (on: boolean) => ({
+    className: `min-h-11 flex-none rounded-[6px] border px-4 text-[15px] font-semibold ${focusRing}`,
+    style: on ? { background: C.ink, color: C.white, borderColor: C.ink } : { background: C.white, color: C.ink, borderColor: C.line },
+  });
 
   return (
     <div
@@ -226,58 +188,44 @@ export function LiquorShopDemo() {
         <Poster
           ready={age === "yes"}
           reduce={reduce}
-          kinds={filters.kinds}
-          onKind={(k) => setFilters((f) => ({ ...f, kinds: k ? [k] : [] }))}
           onMenuKind={(k) => {
-            setFilters((f) => ({ ...f, kinds: [k] }));
+            setKind(k);
             go("ls-grid");
           }}
           onOpen={setSelected}
           go={go}
         />
 
-        {/* 첫 화면: 왼쪽 위 필터, 왼쪽 아래 선물 상자(따라 내려옴), 오른쪽 병 격자. 휴대폰은 필터, 격자, 상자 순서 */}
-        <div className="mx-auto mt-8 grid max-w-[1200px] gap-8 px-4 md:px-6 lg:grid-cols-[300px_minmax(0,1fr)] lg:grid-rows-[auto_1fr] lg:gap-x-10 lg:gap-y-6">
-          <FilterPanel filters={filters} setFilters={setFilters} count={shown.length} total={BOTTLES.length} isDefault={isDefault} />
-
-          <section id="ls-grid" aria-labelledby="ls-grid-title" className="scroll-mt-4 lg:col-start-2 lg:row-span-2 lg:row-start-1">
-            <div className="flex items-end justify-between gap-4">
-              <h2 id="ls-grid-title" className="text-[24px] leading-none md:text-[28px]" style={serifF}>
-                오늘 진열한 술
-              </h2>
-              <p className="text-[15px] tabular-nums" style={{ color: C.muted }} aria-live="polite">
-                {isDefault ? `${BOTTLES.length}병` : `${BOTTLES.length}병 중 ${shown.length}병`}
-              </p>
+        {/* 주종 탭과 병 목록 */}
+        <section id="ls-grid" aria-labelledby="ls-grid-title" className="mx-auto mt-8 max-w-[1200px] scroll-mt-4 px-4 md:px-6">
+          <SectionTitle id="ls-grid-title">전체 상품</SectionTitle>
+          <div className="flex items-center justify-between gap-3">
+            <div role="group" aria-label="주종" className="-mx-4 flex min-w-0 gap-1.5 overflow-x-auto px-4 md:mx-0 md:px-0">
+              {[null, ...KINDS].map((k) => {
+                const t = tab(k === kind);
+                return (
+                  <button key={k ?? "all"} type="button" aria-pressed={k === kind} onClick={() => setKind(k)} className={t.className} style={t.style}>
+                    {k ?? "전체"}
+                  </button>
+                );
+              })}
             </div>
-
-            <ul className="relative mt-5 grid grid-cols-2 gap-3 sm:grid-cols-3 md:gap-4 xl:grid-cols-4" style={{ listStyle: "none", margin: 0, padding: 0 }}>
-              <AnimatePresence mode="popLayout" initial={false}>
-                {shown.map((b, i) => (
-                  <BottleCard
-                    key={b.id}
-                    b={b}
-                    index={i}
-                    reduce={reduce}
-                    hidden={selected === b.id}
-                    inGift={gift.includes(b.id)}
-                    giftFull={gift.length >= GIFT_MAX}
-                    onOpen={() => setSelected(b.id)}
-                    onGift={() => toggleGift(b.id)}
-                  />
-                ))}
-              </AnimatePresence>
-            </ul>
-            {shown.length === 0 && (
-              <p className="mt-6 rounded-[6px] border px-4 py-5 text-center text-[16px]" style={{ borderColor: C.line, background: C.white, color: C.body }}>
-                조건에 맞는 술이 없어요. 도수나 가격대를 넓혀 보세요.
-              </p>
-            )}
-          </section>
-
-          <div className="lg:col-start-1 lg:row-start-2 lg:self-start lg:sticky lg:top-4">
-            <GiftBox bottles={giftBottles} pack={pack} setPack={setPack} sum={giftSum} onRemove={toggleGift} reduce={reduce} />
+            <p className="hidden flex-none text-[15px] tabular-nums sm:block" style={{ color: C.muted }} aria-live="polite">
+              {shown.length}개 상품
+            </p>
           </div>
-        </div>
+
+          <ul className="mt-5 grid grid-cols-2 gap-3 sm:grid-cols-3 md:gap-4 lg:grid-cols-4 xl:grid-cols-5" style={{ listStyle: "none", padding: 0 }}>
+            {shown.map((b) => (
+              <BottleCard key={b.id} b={b} onOpen={() => setSelected(b.id)} />
+            ))}
+          </ul>
+        </section>
+
+        <section id="ls-gift" aria-labelledby="ls-gift-title" className="mx-auto mt-16 max-w-[1200px] scroll-mt-4 px-4 md:mt-24 md:px-6">
+          <SectionTitle id="ls-gift-title">선물세트</SectionTitle>
+          <GiftSets />
+        </section>
 
         <section id="ls-tasting" aria-labelledby="ls-tasting-title" className="mx-auto mt-16 max-w-[1200px] scroll-mt-4 px-4 md:mt-24 md:px-6">
           <SectionTitle id="ls-tasting-title">주말 시음회</SectionTitle>
@@ -299,29 +247,6 @@ export function LiquorShopDemo() {
           <p className="mt-3">경고: 지나친 음주는 뇌졸중, 기억력 손상이나 치매를 유발합니다. 임신 중 음주는 기형아 출생 위험을 높입니다.</p>
           <DemoMakerInfo className="mt-6" />
         </footer>
-
-        {/* 휴대폰 하단: 담은 병 수와 합계 */}
-        <AnimatePresence>
-          {gift.length > 0 && (
-            <motion.div
-              initial={reduce ? false : { y: 24, opacity: 0 }}
-              animate={{ y: 0, opacity: 1 }}
-              exit={reduce ? { opacity: 0 } : { y: 24, opacity: 0 }}
-              transition={{ duration: reduce ? 0 : 0.2, ease: EASE }}
-              className="fixed inset-x-0 z-40 px-4 lg:hidden"
-              style={{ bottom: "calc(76px + env(safe-area-inset-bottom, 0px))" }}
-            >
-              <div className="mx-auto flex max-w-[520px] items-center justify-between gap-3 rounded-[8px] px-4 py-3" style={{ background: C.ink, color: C.white }}>
-                <p className="min-w-0 truncate text-[15px] tabular-nums">
-                  선물 세트 {gift.length}병, {won(giftSum + PACKS.find((p) => p.id === pack)!.price)}
-                </p>
-                <button type="button" onClick={() => go("ls-gift")} className={`flex-none rounded-[4px] px-3 py-1.5 text-[15px] font-semibold ${focusRing}`} style={{ background: C.white, color: C.ink, outlineColor: C.white }}>
-                  상자 보기
-                </button>
-              </div>
-            </motion.div>
-          )}
-        </AnimatePresence>
       </div>
 
       <AnimatePresence>
@@ -333,9 +258,6 @@ export function LiquorShopDemo() {
             reduce={reduce}
             onClose={() => setSelected(null)}
             onMove={setSelected}
-            inGift={gift.includes(selected)}
-            giftFull={gift.length >= GIFT_MAX}
-            onGift={() => toggleGift(selected)}
           />
         )}
       </AnimatePresence>
@@ -343,15 +265,13 @@ export function LiquorShopDemo() {
   );
 }
 
-/* ── 첫 화면: 매장 사진 띠 + 도수 선반 ─────────────────── */
+/* ── 첫 화면: 매장 사진 + 이번 주 추천 ─────────────────── */
 
-/* 실제 전통주 사이트처럼 성인 확인 뒤 상단에 주종 메뉴를 두고, 첫 화면은 짧은 매장 선반 사진 띠와 "도수 선반".
-   병을 도수 낮은 순서로 한 줄 진열하고 5도, 15도, 25도, 40도 눈금으로 구간을 나눈다. 좌우로 넘기고(휴대폰은 손가락, PC는 버튼도),
-   주종 칩을 누르면 그 주종 병만 남는다. 칩은 아래 "오늘 진열한 술" 필터와 같은 값이라 내려가도 그대로다. 병을 누르면 상세 창이 열린다.
-   모션: 확인을 누르면 사진 띠만 1.04배에서 1.6초 동안 천천히 다가온다. 동작 줄이기면 멈춘 사진. */
-const TICKS = [5, 15, 25, 40];
+/* 실제 전통주 사이트처럼 성인 확인 뒤 상단에 주종 메뉴를 두고, 첫 화면은 매장 선반 사진과 이번 주 추천 술.
+   추천 병을 누르면 상세 창이 열린다.
+   모션: 확인을 누르면 사진만 1.04배에서 1.6초 동안 천천히 다가온다. 동작 줄이기면 멈춘 사진. */
 const LQ_MORE: [string, string][] = [
-  ["ls-gift", "선물 세트"],
+  ["ls-gift", "선물세트"],
   ["ls-tasting", "시음회"],
   ["ls-info", "매장"],
 ];
@@ -359,35 +279,18 @@ const LQ_MORE: [string, string][] = [
 function Poster({
   ready,
   reduce,
-  kinds,
-  onKind,
   onMenuKind,
   onOpen,
   go,
 }: {
   ready: boolean;
   reduce: boolean;
-  kinds: Kind[];
-  onKind: (k: Kind | null) => void;
   onMenuKind: (k: Kind) => void;
   onOpen: (id: string) => void;
   go: (id: string) => void;
 }) {
-  const shelfRef = useRef<HTMLUListElement>(null);
-  const kind = kinds.length === 1 ? kinds[0] : null;
-  const row = [...BOTTLES].filter((b) => !kind || b.kind === kind).sort((a, b) => a.abv - b.abv || a.price - b.price);
-  const scroll = (dir: 1 | -1) => shelfRef.current?.scrollBy({ left: dir * 480, behavior: reduce ? "auto" : "smooth" });
   const navBtn = `min-h-11 flex-none rounded-[4px] px-3 text-[15px] font-semibold underline-offset-[6px] hover:underline ${focusRing}`;
-  const chip = (on: boolean) => ({
-    className: `min-h-11 flex-none rounded-[6px] border px-4 text-[15px] font-semibold transition-colors duration-150 ${focusRing}`,
-    style: on ? { background: C.ink, color: C.white, borderColor: C.ink } : { background: C.white, color: C.ink, borderColor: C.line },
-  });
-  // 눈금마다 그 도수 이상인 첫 병 위에 둔다. 앞 눈금과 같은 병이면 큰 눈금만 남긴다
-  const tickAt = new Map<string, number>();
-  TICKS.forEach((t) => {
-    const first = row.find((b) => b.abv >= t);
-    if (first) tickAt.set(first.id, t);
-  });
+  const picks = BOTTLES.filter((b) => b.pick);
 
   return (
     <section id="ls-poster" aria-labelledby="ls-poster-title" style={{ background: C.paper }}>
@@ -426,8 +329,8 @@ function Poster({
         </nav>
       </header>
 
-      {/* 매장 선반 사진 띠 */}
-      <div className="relative h-[92px] overflow-hidden md:h-[min(30svh,240px)]" style={{ background: "#141414" }}>
+      {/* 매장 선반 사진 */}
+      <div className="relative h-[220px] overflow-hidden md:h-[min(52svh,460px)]" style={{ background: "#141414" }}>
         <motion.div
           className="absolute inset-0"
           initial={false}
@@ -457,55 +360,25 @@ function Poster({
           </p>
         </div>
 
-        {/* 주종 칩 + 넘기기 버튼 */}
-        <div className="mt-5 flex items-center justify-between gap-3">
-          <div role="group" aria-label="주종" className="-mx-4 flex min-w-0 gap-1.5 overflow-x-auto px-4 md:mx-0 md:px-0">
-            {[null, ...KINDS].map((k) => {
-              const c = chip(k === kind && (k !== null || kinds.length === 0));
-              return (
-                <button key={k ?? "all"} type="button" aria-pressed={k === kind && (k !== null || kinds.length === 0)} onClick={() => onKind(k)} className={c.className} style={c.style}>
-                  {k ?? "전체"}
-                </button>
-              );
-            })}
-          </div>
-          <div className="hidden flex-none gap-1.5 md:flex">
-            <button type="button" aria-label="선반 왼쪽으로" onClick={() => scroll(-1)} className={`inline-flex h-11 w-11 items-center justify-center rounded-[6px] border ${focusRing}`} style={{ borderColor: C.line, background: C.white }}>
-              <ChevronLeft size={20} aria-hidden />
-            </button>
-            <button type="button" aria-label="선반 오른쪽으로" onClick={() => scroll(1)} className={`inline-flex h-11 w-11 items-center justify-center rounded-[6px] border ${focusRing}`} style={{ borderColor: C.line, background: C.white }}>
-              <ChevronRight size={20} aria-hidden />
-            </button>
-          </div>
-        </div>
-
-        {/* 도수 선반: 도수 낮은 순서로 한 줄. 눈금 줄은 병 위 얇은 선 */}
-        <ul ref={shelfRef} aria-label="도수 순서 진열" className="-mx-4 mt-4 flex snap-x overflow-x-auto px-4 pb-2 md:mx-0 md:px-0" style={{ listStyle: "none", scrollPaddingLeft: 16 }}>
-          {row.map((b) => {
-            const tick = tickAt.get(b.id) ?? null;
-            return (
-              <li key={b.id} className="w-[144px] flex-none snap-start md:w-[168px]">
-                <div className="relative h-7 border-b" style={{ borderColor: "#cfcfcf" }}>
-                  {tick !== null && (
-                    <span className="absolute bottom-0 left-0 flex items-end gap-1.5">
-                      <span aria-hidden className="h-3 w-px" style={{ background: C.ink }} />
-                      <span className="pb-1 text-[13px] font-bold tabular-nums">{tick}도</span>
-                    </span>
-                  )}
-                </div>
-                <button type="button" onClick={() => onOpen(b.id)} aria-label={`${b.name} 상세 보기`} className={`mt-2 flex w-full flex-col items-start rounded-[6px] px-2 pb-2 pt-1 text-left hover:bg-white ${focusRing}`}>
-                  <span className="flex h-[150px] w-full items-end justify-center">
-                    <BottleArt b={b} height={140} />
-                  </span>
-                  <span className="mt-2 block text-[15px] font-bold leading-[1.3]">{b.name}</span>
-                  <span className="mt-0.5 block text-[13px] tabular-nums" style={{ color: C.muted }}>
-                    <b style={{ color: C.accent }}>{b.abv}도</b> {b.ml}ml
-                  </span>
-                  <span className="mt-0.5 block text-[15px] tabular-nums">{won(b.price)}</span>
-                </button>
-              </li>
-            );
-          })}
+        <h2 className="mt-8 text-[18px] font-bold">이번 주 추천</h2>
+        <ul className="mt-3 grid grid-cols-2 gap-3 sm:grid-cols-3 md:gap-4 lg:grid-cols-6" style={{ listStyle: "none", padding: 0 }}>
+          {picks.map((b) => (
+            <li key={b.id}>
+              <button type="button" onClick={() => onOpen(b.id)} aria-label={`${b.name} 상세 보기`} className={`flex h-full w-full flex-col items-start rounded-[6px] border p-3 text-left ${focusRing}`} style={{ background: C.white, borderColor: C.line }}>
+                <span className="flex h-[130px] w-full items-end justify-center">
+                  <BottleArt b={b} height={120} />
+                </span>
+                <span className="mt-2 rounded-[4px] px-1.5 py-0.5 text-[12px] font-semibold" style={{ background: C.paper, color: C.accent }}>
+                  {b.pick}
+                </span>
+                <span className="mt-1 block text-[15px] font-bold leading-[1.3]">{b.name}</span>
+                <span className="mt-0.5 block text-[13px] tabular-nums" style={{ color: C.muted }}>
+                  {b.kind} {b.abv}도 {b.ml}ml
+                </span>
+                <span className="mt-0.5 block text-[15px] tabular-nums">{won(b.price)}</span>
+              </button>
+            </li>
+          ))}
         </ul>
       </div>
     </section>
@@ -537,7 +410,7 @@ function AgeGate({ state, onAnswer, reduce }: { state: "ask" | "yes" | "no"; onA
             {state === "ask" ? (
               <>
                 <p className="mt-3 text-[16px] leading-[1.7]" style={{ color: C.body }}>
-                  {BRAND}는 주류를 판매합니다.
+                  {BRAND}은 주류를 판매합니다.
                   <br />
                   만 19세 미만 청소년은 이용할 수 없습니다.
                 </p>
@@ -585,142 +458,6 @@ function SectionTitle({ id, children }: { id: string; children: React.ReactNode 
   );
 }
 
-function Chip({ on, onClick, children }: { on: boolean; onClick: () => void; children: React.ReactNode }) {
-  return (
-    <button
-      type="button"
-      onClick={onClick}
-      aria-pressed={on}
-      className={`inline-flex min-h-10 items-center gap-1.5 rounded-full border px-3.5 text-[15px] transition-colors duration-100 ${focusRing}`}
-      style={on ? { background: C.accent, borderColor: C.accent, color: C.white, fontWeight: 600 } : { background: C.white, borderColor: C.line, color: C.body }}
-    >
-      {children}
-    </button>
-  );
-}
-
-/* ── 1. 필터 ──────────────────────────────────────────── */
-
-function FilterPanel({ filters, setFilters, count, total, isDefault }: { filters: Filters; setFilters: (f: Filters | ((f: Filters) => Filters)) => void; count: number; total: number; isDefault: boolean }) {
-  const toggle = <T,>(arr: T[], v: T) => (arr.includes(v) ? arr.filter((x) => x !== v) : [...arr, v]);
-  const legend = "text-[14px] font-semibold";
-  return (
-    <div id="ls-filter" className="rounded-[8px] border p-4 md:p-5" style={{ borderColor: C.line, background: C.white }}>
-      <div className="flex items-center justify-between gap-3">
-        <p className="text-[18px] font-bold">
-          술 고르기
-        </p>
-        <button
-          type="button"
-          onClick={() => setFilters(EMPTY)}
-          disabled={isDefault}
-          className={`inline-flex items-center gap-1 text-[14px] underline-offset-4 hover:underline disabled:opacity-40 disabled:hover:no-underline ${focusRing}`}
-          style={{ color: C.muted }}
-        >
-          <RotateCcw size={14} aria-hidden /> 초기화
-        </button>
-      </div>
-
-      <fieldset className="mt-4">
-        <legend className={legend}>종류</legend>
-        <div className="mt-2 flex flex-wrap gap-2">
-          {KINDS.map((k) => (
-            <Chip key={k} on={filters.kinds.includes(k)} onClick={() => setFilters((f) => ({ ...f, kinds: toggle(f.kinds, k) }))}>
-              {k}
-            </Chip>
-          ))}
-        </div>
-      </fieldset>
-
-      <fieldset className="mt-5">
-        <legend className={legend}>
-          도수{" "}
-          <span className="font-normal tabular-nums" style={{ color: C.muted }}>
-            {filters.abv[0]}도 ~ {filters.abv[1]}도
-          </span>
-        </legend>
-        <DualRange value={filters.abv} onChange={(abv) => setFilters((f) => ({ ...f, abv }))} />
-      </fieldset>
-
-      <fieldset className="mt-5">
-        <legend className={legend}>단맛</legend>
-        <div className="mt-2 flex flex-wrap gap-2">
-          {SWEETS.map((s) => (
-            <Chip key={s} on={filters.sweets.includes(s)} onClick={() => setFilters((f) => ({ ...f, sweets: toggle(f.sweets, s) }))}>
-              {s}
-            </Chip>
-          ))}
-          <Chip on={filters.fizz} onClick={() => setFilters((f) => ({ ...f, fizz: !f.fizz }))}>
-            탄산 있는 것만
-          </Chip>
-        </div>
-      </fieldset>
-
-      <fieldset className="mt-5">
-        <legend className={legend}>가격대</legend>
-        <div className="mt-2 flex flex-wrap gap-2">
-          {PRICE_BANDS.map((b) => (
-            <Chip key={b} on={filters.band === b} onClick={() => setFilters((f) => ({ ...f, band: f.band === b ? null : b }))}>
-              {b}
-            </Chip>
-          ))}
-        </div>
-      </fieldset>
-
-      <p className="mt-5 border-t pt-3 text-[15px] tabular-nums" style={{ borderColor: C.line }}>
-        {isDefault ? (
-          <>전체 {total}병</>
-        ) : (
-          <>
-            <b>{count}병</b>이 조건에 맞아요
-          </>
-        )}
-      </p>
-    </div>
-  );
-}
-
-/** 도수 범위 슬라이더. 겹쳐 둔 range 두 개를 손잡이만 눌리게 한다. */
-function DualRange({ value, onChange }: { value: [number, number]; onChange: (v: [number, number]) => void }) {
-  const [lo, hi] = value;
-  const pct = (v: number) => ((v - ABV_MIN) / (ABV_MAX - ABV_MIN)) * 100;
-  const thumb =
-    "pointer-events-none absolute inset-x-0 top-0 m-0 h-7 w-full appearance-none bg-transparent " +
-    "[&::-webkit-slider-runnable-track]:bg-transparent [&::-webkit-slider-thumb]:pointer-events-auto [&::-webkit-slider-thumb]:h-6 [&::-webkit-slider-thumb]:w-6 [&::-webkit-slider-thumb]:appearance-none [&::-webkit-slider-thumb]:rounded-full [&::-webkit-slider-thumb]:border-2 [&::-webkit-slider-thumb]:border-[#8a3a2e] [&::-webkit-slider-thumb]:bg-white " +
-    "[&::-moz-range-track]:bg-transparent [&::-moz-range-thumb]:pointer-events-auto [&::-moz-range-thumb]:h-5 [&::-moz-range-thumb]:w-5 [&::-moz-range-thumb]:rounded-full [&::-moz-range-thumb]:border-2 [&::-moz-range-thumb]:border-[#8a3a2e] [&::-moz-range-thumb]:bg-white " +
-    "focus-visible:outline-none [&:focus-visible::-webkit-slider-thumb]:outline [&:focus-visible::-webkit-slider-thumb]:outline-[3px] [&:focus-visible::-webkit-slider-thumb]:outline-offset-2 [&:focus-visible::-webkit-slider-thumb]:outline-[#111111] [&:focus-visible::-moz-range-thumb]:outline [&:focus-visible::-moz-range-thumb]:outline-[3px]";
-  return (
-    <div className="relative mt-3 h-7 px-3">
-      <div className="absolute inset-x-3 top-1/2 h-1 -translate-y-1/2 rounded-full" style={{ background: C.line }} aria-hidden>
-        <div className="absolute inset-y-0 rounded-full" style={{ left: `${pct(lo)}%`, right: `${100 - pct(hi)}%`, background: C.accent }} />
-      </div>
-      <input
-        type="range"
-        min={ABV_MIN}
-        max={ABV_MAX}
-        step={1}
-        value={lo}
-        aria-label="최저 도수"
-        aria-valuetext={`${lo}도`}
-        onChange={(e) => onChange([Math.min(Number(e.target.value), hi), hi])}
-        className={thumb}
-        style={{ zIndex: lo > ABV_MAX - 5 ? 2 : 1 }}
-      />
-      <input
-        type="range"
-        min={ABV_MIN}
-        max={ABV_MAX}
-        step={1}
-        value={hi}
-        aria-label="최고 도수"
-        aria-valuetext={`${hi}도`}
-        onChange={(e) => onChange([lo, Math.max(Number(e.target.value), lo)])}
-        className={thumb}
-      />
-    </div>
-  );
-}
-
 /* ── 병 그림 ──────────────────────────────────────────── */
 
 /** 병 사진. 흰 바탕 사진이라 곱하기 섞기로 카드와 선물 상자 위에 바탕 없이 얹힌다 */
@@ -743,110 +480,36 @@ function BottleArt({ b, height = 120, className = "" }: { b: Bottle; height?: nu
 
 /* ── 병 카드 ──────────────────────────────────────────── */
 
-/** popLayout 이 빠지는 카드를 제자리에 고정하려면 ref 가 필요하다. */
-function BottleCard({ ref, b, index, reduce, hidden, inGift, giftFull, onOpen, onGift }: { ref?: React.Ref<HTMLLIElement>; b: Bottle; index: number; reduce: boolean; hidden: boolean; inGift: boolean; giftFull: boolean; onOpen: () => void; onGift: () => void }) {
-  const t = reduce ? { duration: 0 } : { duration: DUR, ease: EASE };
+function BottleCard({ b, onOpen }: { b: Bottle; onOpen: () => void }) {
   return (
-    <motion.li
-      ref={ref}
-      layout={!reduce}
-      layoutId={`card-${b.id}`}
-      initial={reduce ? false : { opacity: 0, y: 10 }}
-      animate={{ opacity: 1, y: 0, transition: { ...t, delay: reduce ? 0 : index * STAGGER } }}
-      exit={reduce ? { opacity: 0, transition: { duration: 0 } } : { opacity: 0, y: 14, transition: { duration: DUR, ease: EASE, delay: Math.min(index, 8) * STAGGER } }}
-      transition={{ layout: t }}
-      className="relative"
-    >
-      <div className="flex h-full flex-col rounded-[6px] border p-3 transition-colors duration-100" style={{ visibility: hidden ? "hidden" : "visible", background: C.white, borderColor: inGift ? C.accent : C.line }}>
-        <button type="button" onClick={onOpen} aria-label={`${b.name} 상세 보기`} className={`flex flex-1 flex-col items-center text-left ${focusRing}`}>
-          <div className="relative flex h-[128px] w-full items-end justify-center">
-            {b.pick && (
-              <span className="absolute left-0 top-0 rounded-[4px] px-1.5 py-0.5 text-[12px] font-semibold" style={{ background: C.paper, color: C.accent }}>
-                {b.pick}
-              </span>
-            )}
-            {inGift ? (
-              <div className="flex h-[120px] w-[45px] items-center justify-center rounded-[4px] border border-dashed text-center text-[12px] leading-[1.4]" style={{ borderColor: C.line, color: C.muted }} aria-hidden>
-                상자에
-                <br />
-                담김
-              </div>
-            ) : (
-              <motion.div layoutId={`art-${b.id}`} transition={t}>
-                <BottleArt b={b} height={120} />
-              </motion.div>
-            )}
-          </div>
-          <p className="mt-3 w-full text-[16px] font-bold leading-[1.3]">{b.name}</p>
-          <p className="mt-0.5 w-full text-[13px]" style={{ color: C.muted }}>
-            {b.kind} {b.abv}도 {b.ml}ml{b.fizz ? ", 탄산" : ""}
-          </p>
-          <p className="mt-1 w-full text-[16px] tabular-nums">{won(b.price)}</p>
-        </button>
-        <button
-          type="button"
-          onClick={onGift}
-          disabled={!inGift && giftFull}
-          data-gtm-cta="liquor-shop_gift_add"
-          aria-pressed={inGift}
-          className={`mt-3 min-h-10 w-full rounded-[4px] border text-[14px] font-semibold transition-colors duration-100 disabled:opacity-40 ${focusRing}`}
-          style={inGift ? { background: C.accent, color: C.white, borderColor: C.accent } : { borderColor: "#cfcfcf", background: C.white }}
-        >
-          {inGift ? "상자에서 빼기" : "선물 세트에 담기"}
-        </button>
-      </div>
-    </motion.li>
+    <li>
+      <button type="button" onClick={onOpen} aria-label={`${b.name} 상세 보기`} className={`flex h-full w-full flex-col items-center rounded-[6px] border p-3 text-left ${focusRing}`} style={{ background: C.white, borderColor: C.line }}>
+        <span className="relative flex h-[128px] w-full items-end justify-center">
+          {b.pick && (
+            <span className="absolute left-0 top-0 rounded-[4px] px-1.5 py-0.5 text-[12px] font-semibold" style={{ background: C.paper, color: C.accent }}>
+              {b.pick}
+            </span>
+          )}
+          <BottleArt b={b} height={120} />
+        </span>
+        <span className="mt-3 block w-full text-[16px] font-bold leading-[1.3]">{b.name}</span>
+        <span className="mt-0.5 block w-full text-[13px]" style={{ color: C.muted }}>
+          {b.kind} {b.abv}도 {b.ml}ml
+        </span>
+        <span className="mt-1 block w-full text-[16px] tabular-nums">{won(b.price)}</span>
+      </button>
+    </li>
   );
 }
 
 /* ── 2. 병 상세 ───────────────────────────────────────── */
 
-const AXES = ["단맛", "산미", "바디", "향", "여운"];
-const R = 62;
-const CX = 90;
-const CY = 86;
-function radarPoint(i: number, v: number) {
-  const a = -Math.PI / 2 + (i * 2 * Math.PI) / 5;
-  return [CX + Math.cos(a) * R * (v / 5), CY + Math.sin(a) * R * (v / 5)] as const;
-}
-function radarPath(vals: readonly number[]) {
-  return vals.map((v, i) => radarPoint(i, v)).map(([x, y], i) => `${i ? "L" : "M"}${x.toFixed(1)} ${y.toFixed(1)}`).join(" ") + " Z";
-}
-const RADAR_BASE = radarPath([2.5, 2.5, 2.5, 2.5, 2.5]);
-
-function Radar({ b, reduce }: { b: Bottle; reduce: boolean }) {
-  const color = C.accent;
-  return (
-    <figure className="m-0">
-      <svg viewBox="0 0 180 176" className="mx-auto w-full max-w-[280px]" role="img" aria-label={`맛 그래프: ${AXES.map((a, i) => `${a} ${b.taste[i]}`).join(", ")} (5점 만점)`}>
-        {[1, 2, 3, 4, 5].map((lv) => (
-          <path key={lv} d={radarPath([lv, lv, lv, lv, lv])} fill="none" stroke={lv === 5 ? "#d4d4d4" : C.line} strokeWidth={lv === 5 ? 1.2 : 0.8} />
-        ))}
-        {AXES.map((a, i) => {
-          const [x, y] = radarPoint(i, 5);
-          const [lx, ly] = radarPoint(i, 6.25);
-          return (
-            <g key={a}>
-              <line x1={CX} y1={CY} x2={x} y2={y} stroke={C.line} strokeWidth="0.8" />
-              <text x={lx} y={ly + 4} textAnchor="middle" fontSize="11" fontWeight="600" fill={C.body}>
-                {a} {b.taste[i]}
-              </text>
-            </g>
-          );
-        })}
-        <motion.path initial={{ d: reduce ? radarPath(b.taste) : RADAR_BASE }} animate={{ d: radarPath(b.taste) }} transition={{ duration: reduce ? 0 : 0.36, ease: EASE }} fill={color} fillOpacity="0.16" stroke={color} strokeWidth="1.8" strokeLinejoin="round" />
-      </svg>
-    </figure>
-  );
-}
-
-function DetailModal({ list, id, reduce, onClose, onMove, inGift, giftFull, onGift }: { list: Bottle[]; id: string; reduce: boolean; onClose: () => void; onMove: (id: string) => void; inGift: boolean; giftFull: boolean; onGift: () => void }) {
+function DetailModal({ list, id, reduce, onClose, onMove }: { list: Bottle[]; id: string; reduce: boolean; onClose: () => void; onMove: (id: string) => void }) {
   const b = BOTTLES.find((x) => x.id === id)!;
   const idx = list.findIndex((x) => x.id === id);
   const prev = idx > 0 ? list[idx - 1] : null;
   const next = idx >= 0 && idx < list.length - 1 ? list[idx + 1] : null;
   const closeRef = useRef<HTMLButtonElement>(null);
-  const t = reduce ? { duration: 0 } : { duration: DUR, ease: EASE };
 
   useEffect(() => {
     closeRef.current?.focus();
@@ -871,15 +534,17 @@ function DetailModal({ list, id, reduce, onClose, onMove, inGift, giftFull, onGi
         style={{ background: "rgba(17,17,17,0.55)" }}
       />
       <motion.div
-        layoutId={`card-${b.id}`}
-        transition={{ layout: t }}
+        initial={{ opacity: 0 }}
+        animate={{ opacity: 1 }}
+        exit={{ opacity: 0 }}
+        transition={{ duration: reduce ? 0 : 0.2 }}
         role="dialog"
         aria-modal="true"
         aria-labelledby="ls-detail-title"
         className="relative max-h-[calc(100dvh-24px)] w-full max-w-[860px] overflow-y-auto rounded-[8px]"
         style={{ background: C.white }}
       >
-        <motion.div initial={{ opacity: reduce ? 1 : 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0, transition: { duration: reduce ? 0 : 0.1 } }} transition={{ duration: reduce ? 0 : 0.2, delay: reduce ? 0 : 0.12 }} className="p-5 md:p-8">
+        <div className="p-5 md:p-8">
           <div className="flex items-start justify-between gap-4">
             <div>
               <p className="inline-block rounded-[4px] border px-2 py-0.5 text-[13px] font-semibold" style={{ borderColor: C.line, color: C.body }}>
@@ -900,17 +565,12 @@ function DetailModal({ list, id, reduce, onClose, onMove, inGift, giftFull, onGi
             </div>
 
             <div>
-              <Radar b={b} reduce={reduce} />
-              <dl className="mt-3 grid grid-cols-[auto_1fr] gap-x-4 gap-y-1 text-[15px] leading-[1.6]">
+              <p className="text-[16px] leading-[1.7]">{b.note}</p>
+              <dl className="mt-4 grid grid-cols-[auto_1fr] gap-x-4 gap-y-1 text-[15px] leading-[1.6]">
                 <dt style={{ color: C.muted }}>도수</dt>
                 <dd className="tabular-nums">{b.abv}도</dd>
                 <dt style={{ color: C.muted }}>용량</dt>
                 <dd className="tabular-nums">{b.ml}ml</dd>
-                <dt style={{ color: C.muted }}>단맛</dt>
-                <dd>
-                  {b.sweet}
-                  {b.fizz ? ", 탄산 있음" : ""}
-                </dd>
                 <dt style={{ color: C.muted }}>가격</dt>
                 <dd className="text-[18px] font-bold tabular-nums">{won(b.price)}</dd>
               </dl>
@@ -921,18 +581,6 @@ function DetailModal({ list, id, reduce, onClose, onMove, inGift, giftFull, onGi
               <p>{b.food}</p>
               <p className="mt-4 font-semibold" style={{ color: C.ink }}>보관법</p>
               <p>{b.keep}</p>
-              <button
-                type="button"
-                onClick={onGift}
-                disabled={!inGift && giftFull}
-                data-gtm-cta="liquor-shop_gift_add"
-                aria-pressed={inGift}
-                className={`mt-6 inline-flex min-h-12 w-full items-center justify-center gap-2 rounded-[6px] border px-4 text-[16px] font-semibold disabled:opacity-40 ${focusRing}`}
-                style={inGift ? { background: C.accent, color: C.white, borderColor: C.accent } : { borderColor: "#cfcfcf", background: C.white }}
-              >
-                <Package size={18} aria-hidden />
-                {inGift ? "상자에서 빼기" : giftFull ? "상자가 찼어요 (3병)" : "선물 세트에 담기"}
-              </button>
             </div>
           </div>
 
@@ -947,103 +595,45 @@ function DetailModal({ list, id, reduce, onClose, onMove, inGift, giftFull, onGi
               {next ? next.name : "마지막"} <ChevronRight size={18} aria-hidden />
             </button>
           </div>
-        </motion.div>
+        </div>
       </motion.div>
     </div>
   );
 }
 
-/* ── 3. 선물 세트 ─────────────────────────────────────── */
+/* ── 3. 선물세트 ──────────────────────────────────────── */
 
-function GiftBox({ bottles, pack, setPack, sum, onRemove, reduce }: { bottles: Bottle[]; pack: PackId; setPack: (p: PackId) => void; sum: number; onRemove: (id: string) => void; reduce: boolean }) {
-  const packInfo = PACKS.find((p) => p.id === pack)!;
-  const total = sum + packInfo.price;
-  const ready = bottles.length >= 2;
-  const t = reduce ? { duration: 0 } : { duration: DUR, ease: EASE };
-  const slots = [33, 50, 67]; // 상자 안 병 자리(%)
-  const box = pack === "box";
+function GiftSets() {
   return (
-    <div id="ls-gift" className="scroll-mt-4 rounded-[8px] border p-4 md:p-5" style={{ borderColor: C.line, background: C.white }}>
-      <p className="text-[18px] font-bold">
-        선물 세트 만들기
-      </p>
-      <p className="mt-1 text-[14px]" style={{ color: C.muted }}>
-        병 2~3개를 담아 주세요.
-      </p>
-
-      {/* 포장 사진. 병은 카드에서 이 자리로 옮겨 온다. 상자는 같은 사진의 앞면만 병 위에 한 번 더 깔아 병 아래가 상자 안에 들어간 것처럼 보이게 한다 */}
-      <div className="relative mx-auto mt-4 aspect-[16/9] w-full max-w-[380px] overflow-hidden rounded-[6px]">
-        {/* eslint-disable-next-line @next/next/no-img-element -- 정적 export 라 next/image 최적화를 쓰지 않는다 */}
-        <img src={`${IMG}/pack-${pack}.jpg`} alt={box ? "뚜껑을 연 한지 선물 상자" : "바닥에 펼친 보자기"} className="absolute inset-0 h-full w-full object-cover" />
-        <ul className="absolute inset-0 m-0 list-none p-0">
-          {bottles.map((b, i) => (
-            <li key={b.id} className="absolute" style={{ left: `${slots[i]}%`, bottom: box ? "19%" : "15%" }}>
-              {/* 병 사진의 흰 바탕이 포장 사진에 섞이도록 곱하기 합성은 변형이 없는 바깥 칸에 둔다 */}
-              <div className="absolute bottom-0 left-0 w-max -translate-x-1/2" style={{ mixBlendMode: "multiply" }}>
-                <motion.div layoutId={`art-${b.id}`} transition={t}>
-                  <BottleArt b={b} height={104} />
-                </motion.div>
-              </div>
-              <button
-                type="button"
-                onClick={() => onRemove(b.id)}
-                aria-label={`${b.name} 상자에서 빼기`}
-                className={`absolute bottom-[90px] left-[6px] inline-flex h-7 w-7 items-center justify-center rounded-full border ${focusRing}`}
-                style={{ background: C.white, borderColor: C.line }}
-              >
-                <X size={14} aria-hidden />
-              </button>
-            </li>
-          ))}
-          {bottles.length === 0 && (
-            <li className="absolute inset-x-0 top-[42%] text-center text-[14px]" style={{ color: C.muted }}>
-              {box ? "상자가 비어 있어요" : "보자기가 비어 있어요"}
-            </li>
-          )}
-        </ul>
-        {box && (
-          <>
+    <div>
+      <ul className="grid gap-4 md:grid-cols-3" style={{ listStyle: "none", padding: 0 }}>
+        {GIFTS.map((g) => (
+          <li key={g.name} className="overflow-hidden rounded-[8px] border" style={{ borderColor: C.line, background: C.white }}>
             {/* eslint-disable-next-line @next/next/no-img-element -- 정적 export 라 next/image 최적화를 쓰지 않는다 */}
-            <img src={`${IMG}/pack-box.jpg`} alt="" aria-hidden className="pointer-events-none absolute inset-0 h-full w-full object-cover" style={{ clipPath: "inset(69.5% 0 0 0)" }} />
-          </>
-        )}
-      </div>
-
-      <fieldset className="mt-4">
-        <legend className="text-[14px] font-semibold">포장</legend>
-        <div className="mt-2 grid grid-cols-2 gap-2">
-          {PACKS.map((p) => (
-            <label key={p.id} className={`flex min-h-11 cursor-pointer items-center justify-between gap-2 rounded-[4px] border px-3 text-[15px] has-[:focus-visible]:outline has-[:focus-visible]:outline-[3px] has-[:focus-visible]:outline-offset-2`} style={{ borderColor: pack === p.id ? C.accent : C.line, background: C.white, fontWeight: pack === p.id ? 600 : 400 }}>
-              <span className="flex items-center gap-2">
-                <input type="radio" name="ls-pack" value={p.id} checked={pack === p.id} onChange={() => setPack(p.id)} className="sr-only" />
-                {p.name}
-              </span>
-              <span className="tabular-nums" style={{ color: C.muted }}>
-                +{won(p.price)}
-              </span>
-            </label>
-          ))}
-        </div>
-      </fieldset>
-
-      <dl className="mt-4 grid grid-cols-[1fr_auto] gap-y-1 border-t pt-3 text-[15px] tabular-nums" style={{ borderColor: C.line }}>
-        {bottles.map((b) => (
-          <div key={b.id} className="contents">
-            <dt className="truncate">{b.name}</dt>
-            <dd>{won(b.price)}</dd>
-          </div>
+            <img src={`${IMG}/pack-${g.pack}.jpg`} alt={g.pack === "box" ? "뚜껑을 연 한지 선물 상자" : "바닥에 펼친 보자기"} loading="lazy" className="aspect-[16/9] w-full object-cover" />
+            <div className="p-4 md:p-5">
+              <p className="text-[13px] font-semibold" style={{ color: C.accent }}>
+                {g.band}
+              </p>
+              <p className="mt-1 text-[18px] font-bold">{g.name}</p>
+              <p className="mt-1 text-[15px] leading-[1.6]" style={{ color: C.body }}>
+                {g.items.join(", ")}
+              </p>
+              <p className="mt-1 text-[14px]" style={{ color: C.muted }}>
+                {g.pack === "box" ? "한지 상자" : "보자기"} 포장
+              </p>
+              <p className="mt-3 text-[18px] font-bold tabular-nums">{won(g.price)}</p>
+            </div>
+          </li>
         ))}
-        <dt style={{ color: C.muted }}>{packInfo.name} 포장</dt>
-        <dd style={{ color: C.muted }}>{won(packInfo.price)}</dd>
-        <dt className="mt-1 text-[17px] font-bold">합계</dt>
-        <dd className="mt-1 text-[17px] font-bold">{bottles.length ? won(total) : "0원"}</dd>
-      </dl>
-      <p className="mt-3 text-[14px] leading-[1.6]" style={{ color: C.muted }} aria-live="polite">
-        {bottles.length === 0 ? "병을 담으면 합계가 보여요." : ready ? "매장에서 바로 포장해 드려요. 택배도 가능해요." : "한 병 더 담으면 세트가 돼요."}
+      </ul>
+      <p className="mt-3 text-[14px] leading-[1.6]" style={{ color: C.muted }}>
+        원하는 술로 세트를 꾸리려면 매장이나 {KAKAO}로 문의해 주세요. 택배도 보내 드려요.
       </p>
     </div>
   );
 }
+
 
 /* ── 4. 시음회 예약 ───────────────────────────────────── */
 

@@ -1,12 +1,11 @@
 "use client";
 
-import { useEffect, useRef, useState, useSyncExternalStore } from "react";
+import { useEffect, useRef, useState } from "react";
 import Image from "next/image";
 import { AnimatePresence, motion } from "framer-motion";
 import {
   Building2,
   CalendarCheck,
-  Check,
   ChevronDown,
   ChevronRight,
   MapPin,
@@ -29,8 +28,8 @@ import { DemoMakerInfo } from "@/components/demos/DemoMakerInfo";
    구조: 종합 로펌형. 첫 화면은 풀폭 사진 위 사무소명, 그 아래 업무분야 4칸 글 목록(분야명 + 다루는 사건), 변호사 소개와
    성공사례·상담 안내·오시는 길을 나란히 둔 게시판형 묶음이다.
    하위 화면은 라우트 없이 상태로 바꾼다. 서브 비주얼, 위치 표시줄, 좌측 하위 메뉴(LNB)와 문서형 본문.
-   업무분야 하위 화면에서 사건을 고르면 예상 기간, 진행 절차, 준비 서류 체크 목록이 나온다.
-   상담신청은 방식을 고르면 그 방식이 되는 시간만 남는다. 확인 창에는 가린 이름과 번호, 상담 번호가 나온다.
+   업무분야 하위 화면에서 사건을 고르면 예상 기간, 진행 절차, 준비 서류 목록이 나온다.
+   상담신청은 방식, 분야, 희망 시간대, 연락처를 받는 일반 폼이다. 확인 창에는 가린 이름과 번호, 상담 번호가 나온다.
    성공사례는 분야와 결과로 거르는 게시판 목록이다.
 
    디자인: 아이보리 바탕(#f6f3ec)에 짙은 남색(#14213d), 바랜 금색(#b08d57)은 가는 선과 작은 표시에만 쓴다.
@@ -40,7 +39,7 @@ import { DemoMakerInfo } from "@/components/demos/DemoMakerInfo";
    AI 생성(Z-Image-Turbo, Apache 2.0) hero, desk, lawyer-1(김ㅈ우), lawyer-2(이ㅅ연) */
 
 const IMG = "/images/demo-law";
-const FIRM = "곰파트너";
+const FIRM = "법률사무소";
 const TEL = "02-000-0000";
 const ADDRESS = "ㄱㅇ시 ㅅㄴ로 88 ㅁㄹ빌딩 3층";
 
@@ -61,36 +60,6 @@ const C = {
 };
 
 const EASE = [0.22, 1, 0.36, 1] as const;
-
-/* ---------- 시간 ---------- */
-
-const DAY_NAMES = ["일", "월", "화", "수", "목", "금", "토"];
-
-const subscribeMinute = (cb: () => void) => {
-  const id = window.setInterval(cb, 30_000);
-  return () => window.clearInterval(id);
-};
-
-/** 분 단위 현재 시각. 서버 렌더에서는 -1을 돌려 날짜에 따른 화면 차이를 막는다. */
-function useNowMinute() {
-  return useSyncExternalStore(
-    subscribeMinute,
-    () => Math.floor(Date.now() / 60_000),
-    () => -1,
-  );
-}
-
-// 날짜가 고정된 공휴일만 둔다(음력 공휴일은 해마다 바뀌어 데모에서는 뺀다)
-const HOLIDAYS: Record<string, string> = {
-  "1-1": "신정",
-  "3-1": "삼일절",
-  "5-5": "어린이날",
-  "6-6": "현충일",
-  "8-15": "광복절",
-  "10-3": "개천절",
-  "10-9": "한글날",
-  "12-25": "성탄절",
-};
 
 const CHO = "ㄱㄲㄴㄷㄸㄹㅁㅂㅃㅅㅆㅇㅈㅉㅊㅋㅌㅍㅎ";
 
@@ -482,9 +451,7 @@ const itemLabel = (t: Target) => groupOf(t.page)?.items.find((it) => sameTarget(
 /* ---------- 페이지 ---------- */
 
 export function LawFirmDemo() {
-  const minute = useNowMinute();
   const [nav, setNav] = useState<Target>({ page: "home" });
-  const [checked, setChecked] = useState<Record<string, boolean>>({});
   const [bookField, setBookField] = useState<Field | null>(null);
 
   const go: Go = (t) => {
@@ -518,7 +485,7 @@ export function LawFirmDemo() {
       body = <Location />;
       break;
     case "practice":
-      body = <Practice key={nav.field} field={nav.field ?? "lease"} checked={checked} setChecked={setChecked} onBook={bookCase} />;
+      body = <Practice key={nav.field} field={nav.field ?? "lease"} onBook={bookCase} />;
       break;
     case "cases":
       body = <Cases />;
@@ -530,7 +497,7 @@ export function LawFirmDemo() {
       body = <Faq />;
       break;
     case "booking":
-      body = <Booking minute={minute} initialField={bookField} />;
+      body = <Booking initialField={bookField} />;
       break;
   }
 
@@ -551,11 +518,8 @@ function Logo({ light = false }: { light?: boolean }) {
   const fg = light ? C.ivory : C.navy;
   return (
     <span className="inline-flex items-center gap-2.5">
-      {/* eslint-disable-next-line @next/next/no-img-element -- 메인 사이트와 같은 곰 로고 */}
-      <img src="/images/logo-bear.png" alt="" aria-hidden width={32} height={32} className="h-8 w-8 shrink-0" />
       <span className="flex flex-col whitespace-nowrap text-left leading-[1.15]" style={{ color: fg }}>
-        <span className="text-[18px] font-bold tracking-[-0.02em] md:text-[19px]">곰파트너</span>
-        <span className="text-[11px] font-bold opacity-75">카탈로그</span>
+        <span className="text-[18px] font-bold tracking-[-0.02em] md:text-[19px]">법률사무소</span>
       </span>
     </span>
   );
@@ -686,7 +650,7 @@ function QuickRail({ go }: { go: Go }) {
         <li>
           <button type="button" onClick={() => go({ page: "booking" })} className="flex w-[64px] flex-col items-center gap-1 py-4 text-[13px] font-semibold" style={{ color: C.ivory }}>
             <CalendarCheck size={20} aria-hidden style={{ color: C.gold }} />
-            상담예약
+            상담신청
           </button>
         </li>
         <li className="border-t" style={{ borderColor: C.navySoft }}>
@@ -1161,25 +1125,11 @@ function Location() {
 
 /* ---------- 업무분야: 사건별 절차 ---------- */
 
-function Practice({
-  field,
-  checked,
-  setChecked,
-  onBook,
-}: {
-  field: Field;
-  checked: Record<string, boolean>;
-  setChecked: React.Dispatch<React.SetStateAction<Record<string, boolean>>>;
-  onBook: (f: Field) => void;
-}) {
+function Practice({ field, onBook }: { field: Field; onBook: (f: Field) => void }) {
   const list = SITUATIONS.filter((s) => s.field === field);
   const [sitId, setSitId] = useState(list[0].id);
   const sit = list.find((s) => s.id === sitId) ?? list[0];
   const info = FIELD_INFO[field];
-
-  const docKey = (step: number, doc: number) => `${sit.id}:${step}:${doc}`;
-  const allDocs = sit.steps.flatMap((st, i) => st.docs.map((_, j) => docKey(i, j)));
-  const doneCount = allDocs.filter((k) => checked[k]).length;
 
   return (
     <div>
@@ -1233,18 +1183,14 @@ function Practice({
             진행 절차
           </h4>
           <ol className="mt-2 border-t" style={{ borderColor: C.navy }}>
-            {sit.steps.map((st, i) => {
-              const keys = st.docs.map((_, j) => docKey(i, j));
-              const done = keys.filter((k) => checked[k]).length;
-              const ready = done === keys.length;
-              return (
+            {sit.steps.map((st, i) => (
                 <li key={st.title} className="grid grid-cols-[40px_1fr] gap-x-3 border-b py-4 md:grid-cols-[48px_1fr_150px] md:gap-x-5" style={{ borderColor: C.line }}>
                   <span
                     className="inline-flex h-9 w-9 items-center justify-center rounded-full border text-[15px] font-bold tabular-nums"
-                    style={ready ? { background: C.navy, borderColor: C.navy, color: C.ivory } : { background: C.white, borderColor: C.navy, color: C.navy }}
+                    style={{ background: C.white, borderColor: C.navy, color: C.navy }}
                     aria-hidden
                   >
-                    {ready ? <Check size={17} /> : i + 1}
+                    {i + 1}
                   </span>
                   <div className="min-w-0">
                     <p className="font-bold leading-[1.45]" style={{ color: C.navy }}>
@@ -1257,51 +1203,26 @@ function Practice({
                     <p className="tabular-nums" style={{ color: C.muted }}>
                       {st.time}
                     </p>
-                    <p className="font-semibold tabular-nums" style={{ color: ready ? C.goldText : C.muted }}>
-                      {ready ? "준비" : `준비 서류 ${keys.length}건 중 ${done}건`}
-                    </p>
                   </div>
                 </li>
-              );
-            })}
+            ))}
           </ol>
 
-          <div className="mt-8 flex flex-wrap items-baseline justify-between gap-2">
-            <h4 className="text-[15px] font-bold" style={{ color: C.goldText }} id="doc-list-title">
-              준비 서류
-            </h4>
-            <p className="text-[14px] tabular-nums" style={{ color: C.muted }} aria-live="polite">
-              {allDocs.length}건 중 <strong style={{ color: C.navy }}>{doneCount}건</strong> 준비
-            </p>
-          </div>
+          <h4 className="mt-8 text-[15px] font-bold" style={{ color: C.goldText }} id="doc-list-title">
+            준비 서류
+          </h4>
           <div id="doc-list" className="mt-2 grid gap-x-8 border-t sm:grid-cols-2" style={{ borderColor: C.navy }}>
             {sit.steps.map((st, i) => (
-              <fieldset key={st.title} className="min-w-0 border-b py-3" style={{ borderColor: C.line }}>
-                <legend className="sr-only">{st.title} 준비 서류</legend>
-                <p className="text-[14px] font-semibold" style={{ color: C.muted }} aria-hidden>
+              <div key={st.title} className="min-w-0 border-b py-3" style={{ borderColor: C.line }}>
+                <p className="text-[14px] font-semibold" style={{ color: C.muted }}>
                   {i + 1}. {st.title}
                 </p>
-                <ul className="mt-1">
-                  {st.docs.map((d, j) => {
-                    const k = docKey(i, j);
-                    return (
-                      <li key={d}>
-                        <label className="flex min-h-11 cursor-pointer items-center gap-3">
-                          <input
-                            type="checkbox"
-                            checked={!!checked[k]}
-                            onChange={(e) => setChecked((p) => ({ ...p, [k]: e.target.checked }))}
-                            className="h-5 w-5 shrink-0 accent-[#14213d]"
-                          />
-                          <span className={checked[k] ? "line-through" : ""} style={{ color: checked[k] ? C.muted : C.ink }}>
-                            {d}
-                          </span>
-                        </label>
-                      </li>
-                    );
-                  })}
+                <ul className="mt-1 list-disc pl-5 text-[15px] leading-[1.8]">
+                  {st.docs.map((d) => (
+                    <li key={d}>{d}</li>
+                  ))}
                 </ul>
-              </fieldset>
+              </div>
             ))}
           </div>
 
@@ -1316,7 +1237,7 @@ function Practice({
               className="inline-flex h-12 shrink-0 items-center justify-center gap-2 rounded-[4px] px-5 text-[15px] font-semibold"
               style={{ background: C.navy, color: C.ivory }}
             >
-              <CalendarCheck size={17} aria-hidden />이 사건 상담 예약
+              <CalendarCheck size={17} aria-hidden />이 사건 상담 신청
             </button>
           </div>
         </div>
@@ -1623,54 +1544,18 @@ type Method = "visit" | "phone" | "video";
 
 const METHODS: { id: Method; label: string; icon: typeof Phone; desc: string }[] = [
   { id: "visit", label: "방문", icon: Building2, desc: "사무소에서 서류를 보며 상담합니다." },
-  { id: "phone", label: "전화", icon: Phone, desc: "예약 시간에 변호사가 전화드립니다." },
+  { id: "phone", label: "전화", icon: Phone, desc: "정한 시간에 변호사가 전화드립니다." },
   { id: "video", label: "화상", icon: Video, desc: "접속 주소를 문자로 보내 드립니다." },
 ];
 
-const WEEKDAY_HOURS = [10, 11, 14, 15, 16, 17];
-const SAT_HOURS = [10, 11];
-const PAGE = 6;
-
-type Slot = { key: string; date: Date; hour: number; methods: Method[] };
-
-const hourLabel = (h: number) => (h < 12 ? `오전 ${h}시` : h === 12 ? "낮 12시" : `오후 ${h - 12}시`);
-const slotLabel = (sl: Slot) => `${sl.date.getMonth() + 1}월 ${sl.date.getDate()}일 (${DAY_NAMES[sl.date.getDay()]}) ${hourLabel(sl.hour)}`;
-
-/** 앞으로 4주 동안 비어 있는 시간. 날짜와 시간 순서로 정해지므로 다시 그려도 같다. */
-function openSlots(minute: number) {
-  if (minute < 0) return [];
-  const now = new Date(minute * 60_000);
-  const out: Slot[] = [];
-  for (let i = 1; i <= 28; i++) {
-    const d = new Date(now.getFullYear(), now.getMonth(), now.getDate() + i);
-    if (d.getDay() === 0 || HOLIDAYS[`${d.getMonth() + 1}-${d.getDate()}`]) continue;
-    const sat = d.getDay() === 6;
-    (sat ? SAT_HOURS : WEEKDAY_HOURS).forEach((h, j) => {
-      const n = d.getDate() * 3 + d.getMonth() + j * 5;
-      const methods: Method[] = [];
-      if (n % 4 !== 0) methods.push("visit");
-      if (n % 3 !== 1) methods.push("phone");
-      if (!sat && n % 5 < 2) methods.push("video");
-      if (n % 7 === 2) methods.length = 0;
-      if (methods.length)
-        out.push({
-          key: `${d.getFullYear()}-${d.getMonth() + 1}-${d.getDate()}-${h}`,
-          date: d,
-          hour: h,
-          methods,
-        });
-    });
-  }
-  return out;
-}
+const TIMES = ["평일 오전", "평일 오후", "토요일 오전", "시간 무관"];
 
 type Confirm = { no: string; method: Method; field: Field; when: string; name: string; phone: string };
 
-function Booking({ minute, initialField }: { minute: number; initialField: Field | null }) {
+function Booking({ initialField }: { initialField: Field | null }) {
   const [method, setMethod] = useState<Method | null>(null);
   const [field, setField] = useState<Field | null>(initialField);
-  const [page, setPage] = useState(0);
-  const [slotKey, setSlotKey] = useState<string | null>(null);
+  const [when, setWhen] = useState("");
   const [name, setName] = useState("");
   const [phone, setPhone] = useState("");
   const [memo, setMemo] = useState("");
@@ -1678,39 +1563,25 @@ function Booking({ minute, initialField }: { minute: number; initialField: Field
   const [error, setError] = useState("");
   const [confirm, setConfirm] = useState<Confirm | null>(null);
 
-  const all = openSlots(minute);
-  const slots = method ? all.filter((sl) => sl.methods.includes(method)) : all;
-  const pages = Math.max(1, Math.ceil(slots.length / PAGE));
-  const shown = slots.slice(page * PAGE, page * PAGE + PAGE);
-  const picked = all.find((sl) => sl.key === slotKey) ?? null;
-
-  const pickMethod = (m: Method) => {
-    const next = method === m ? null : m;
-    setMethod(next);
-    setPage(0);
-    if (next && picked && !picked.methods.includes(next)) setSlotKey(null);
-  };
-
   const submit = (e: React.FormEvent) => {
     e.preventDefault();
     if (!method) return setError("상담 방식을 선택해 주세요.");
     if (!field) return setError("사건 분야를 선택해 주세요.");
-    if (!picked) return setError("상담 시간을 선택해 주세요.");
+    if (!when) return setError("희망 시간대를 선택해 주세요.");
     if (name.trim().length < 2) return setError("이름을 입력해 주세요.");
     if (phone.replace(/\D/g, "").length < 10) return setError("휴대전화 번호를 입력해 주세요.");
     if (!agree) return setError("개인정보 수집과 이용에 동의해 주세요.");
     setError("");
-    const mm = String(picked.date.getMonth() + 1).padStart(2, "0");
-    const dd = String(picked.date.getDate()).padStart(2, "0");
     const t = new Date();
+    const mm = String(t.getMonth() + 1).padStart(2, "0");
+    const dd = String(t.getDate()).padStart(2, "0");
     const seq = String(100 + ((t.getMinutes() * 60 + t.getSeconds()) % 900));
-    setConfirm({ no: `${mm}${dd}-${seq}`, method, field, when: slotLabel(picked), name: maskName(name), phone: maskPhone(phone) });
+    setConfirm({ no: `${mm}${dd}-${seq}`, method, field, when, name: maskName(name), phone: maskPhone(phone) });
   };
 
   const reset = () => {
     setConfirm(null);
-    setPage(0);
-    setSlotKey(null);
+    setWhen("");
     setName("");
     setPhone("");
     setMemo("");
@@ -1735,7 +1606,7 @@ function Booking({ minute, initialField }: { minute: number; initialField: Field
                   key={m.id}
                   type="button"
                   aria-pressed={method === m.id}
-                  onClick={() => pickMethod(m.id)}
+                  onClick={() => setMethod(m.id)}
                   className="flex h-[72px] flex-col items-center justify-center gap-1 rounded-[4px] border text-[15px] font-semibold"
                   style={pill(method === m.id)}
                 >
@@ -1766,60 +1637,18 @@ function Booking({ minute, initialField }: { minute: number; initialField: Field
 
           <fieldset>
             <legend className="font-bold" style={{ color: C.navy }}>
-              상담 가능 시간
+              희망 시간대
             </legend>
-            {all.length ? (
-              <>
-                <ul key={`${method ?? "all"}-${page}`} className="soft-in mt-3 border-t" style={{ borderColor: C.navy }}>
-                  {shown.map((sl) => {
-                    const on = slotKey === sl.key;
-                    const id = `law-slot-${sl.key}`;
-                    return (
-                      <li key={sl.key} className="border-b" style={{ borderColor: C.line }}>
-                        <label htmlFor={id} className="flex min-h-[60px] cursor-pointer items-center gap-3 px-2 py-2.5" style={on ? { background: C.goldSoft } : undefined}>
-                          <input id={id} type="radio" name="law-slot" value={sl.key} checked={on} onChange={() => setSlotKey(sl.key)} className="h-5 w-5 shrink-0 accent-[#14213d]" />
-                          <span className="flex min-w-0 flex-1 flex-col gap-0.5 sm:flex-row sm:items-center sm:justify-between sm:gap-3">
-                            <span className="font-semibold tabular-nums" style={{ color: on ? C.navy : C.ink }}>
-                              {slotLabel(sl)}
-                            </span>
-                            <span className="flex shrink-0 gap-2.5 text-[14px]" style={{ color: C.muted }}>
-                              {METHODS.filter((m) => sl.methods.includes(m.id)).map((m) => (
-                                <span key={m.id} className="inline-flex items-center gap-1">
-                                  <m.icon size={15} aria-hidden style={{ color: C.gold }} />
-                                  {m.label}
-                                </span>
-                              ))}
-                            </span>
-                          </span>
-                        </label>
-                      </li>
-                    );
-                  })}
-                </ul>
-                <div className="mt-3 flex flex-wrap items-center justify-between gap-2 text-[15px]">
-                  <button
-                    type="button"
-                    onClick={() => setPage((p) => Math.max(0, p - 1))}
-                    disabled={page === 0}
-                    className="inline-flex h-11 items-center px-1 font-semibold disabled:invisible"
-                    style={{ color: C.navy }}
-                  >
-                    이전 시간
-                  </button>
-                  <button
-                    type="button"
-                    onClick={() => setPage((p) => Math.min(pages - 1, p + 1))}
-                    disabled={page >= pages - 1}
-                    className="inline-flex h-11 items-center rounded-[4px] border px-4 font-semibold disabled:cursor-not-allowed disabled:opacity-40"
-                    style={{ borderColor: C.navy, color: C.navy }}
-                  >
-                    다음 시간
-                  </button>
-                </div>
-              </>
-            ) : (
-              <div className="mt-3 h-[372px] rounded-[4px]" style={{ background: C.goldSoft }} />
-            )}
+            <div className="mt-3 grid grid-cols-2 gap-2">
+              {TIMES.map((t) => (
+                <button key={t} type="button" aria-pressed={when === t} onClick={() => setWhen(t)} className="h-12 rounded-[4px] border text-[15px] font-semibold" style={pill(when === t)}>
+                  {t}
+                </button>
+              ))}
+            </div>
+            <p className="mt-2 text-[14px]" style={{ color: C.muted }}>
+              접수 후 담당 직원이 전화로 상담 일정을 정해 드립니다.
+            </p>
           </fieldset>
         </div>
 
@@ -1907,10 +1736,10 @@ function ConfirmDialog({ data, onClose }: { data: Confirm | null; onClose: () =>
 
   const guide = data
     ? data.method === "visit"
-      ? `${ADDRESS}로 오시면 됩니다. 관련 서류가 있으면 지참해 주세요.`
+      ? `일정이 정해지면 ${ADDRESS}로 방문해 주세요. 관련 서류가 있으면 지참해 주세요.`
       : data.method === "phone"
-        ? `예약 시간에 ${TEL}에서 ${data.phone}로 전화드립니다.`
-        : `상담 30분 전에 ${data.phone}로 화상 접속 주소를 보내 드립니다.`
+        ? `영업일 기준 하루 안에 ${TEL}에서 ${data.phone}로 전화드립니다.`
+        : `일정이 정해지면 ${data.phone}로 화상 접속 주소를 보내 드립니다.`
     : "";
 
   return (
@@ -1955,7 +1784,7 @@ function ConfirmDialog({ data, onClose }: { data: Confirm | null; onClose: () =>
             <dl className="mt-5 border-y text-[15px]" style={{ borderColor: C.line }}>
               {[
                 ["상담 번호", data.no],
-                ["일시", data.when],
+                ["희망 시간대", data.when],
                 ["방식", METHODS.find((m) => m.id === data.method)!.label],
                 ["분야", FIELD_LABEL[data.field]],
                 ["이름", data.name],
@@ -1971,7 +1800,7 @@ function ConfirmDialog({ data, onClose }: { data: Confirm | null; onClose: () =>
             </dl>
             <p className="mt-4 text-[15px]">{guide}</p>
             <p className="mt-2 text-[14px]" style={{ color: C.muted }}>
-              일정을 바꾸시려면 상담 번호를 알려 주시고 {TEL}로 전화해 주세요.
+              문의는 상담 번호와 함께 {TEL}로 전화해 주세요.
             </p>
             <button type="button" onClick={onClose} className="mt-6 inline-flex h-11 items-center gap-1.5 text-[15px] font-semibold" style={{ color: C.navy }}>
               <RotateCcw size={16} aria-hidden />

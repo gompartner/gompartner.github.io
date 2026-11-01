@@ -17,11 +17,10 @@ import { DemoMakerInfo } from "@/components/demos/DemoMakerInfo";
    교습비는 교육청에 신고한 월 교습비를 과정과 주 횟수별 표로 게시한다.
 
    상호작용(모두 브라우저 안에서만 돈다. 실제로 보내지 않는다)
-   1. 과정 고르기: 건반 모양 버튼 네 개(바이엘, 체르니, 소나티네, 성인 취미)를 누르면 진도가 오선 위 음표로
-      이어지고, 한 번 수업 50분의 구성과 월 교습비가 바뀐다.
-   2. 요일별 시간표: 유초등, 성인 시간대를 요일별로 보여 주고 남은 자리를 표시한다. 칸을 누르면 체험 레슨 날짜와 시간이 채워진다.
+   1. 교육과정: 바이엘, 체르니, 소나티네, 성인 취미 네 과정의 진도와 수업 구성을 목록으로 보여 준다.
+   2. 수업시간표: 과정별 평일, 토요일 수업 시간 표.
    3. 체험 레슨 신청: 과정, 나이, 날짜, 시간, 이름, 연락처. 완료하면 접수 번호, 담당 창구, 회신 예정일.
-   4. 연주회 소식: 다음 정기 연주회 날짜와 남은 날, 공지 펼쳐 보기, 과정별 연주곡.
+   4. 연주회 소식: 다음 정기 연주회 날짜, 공지 펼쳐 보기, 과정별 연주곡.
 
    첫 화면(pa-poster): 메뉴 줄, 막 없는 레슨실 사진 띠, 그 아래 제목과 나이 칩 다섯 개, 고른 나이의 과정 카드.
    핵심 모션: 사진만 1.6초 동안 천천히 다가오고(scale 1.06 에서 1), 카드 내용은 0.2초 겹쳐 바뀐다. 동작 줄이기면 전부 멈춘 상태로 둔다.
@@ -29,7 +28,7 @@ import { DemoMakerInfo } from "@/components/demos/DemoMakerInfo";
 
 const TEL = "02-000-0000";
 const ADDRESS = "서울 ㅇㅇ구 ㅇㅇ로 00, 2층";
-const KAKAO = "카카오톡 채널 곰파트너";
+const KAKAO = "카카오톡 채널 피아노 학원";
 const SLUG = "piano-academy";
 
 const TEACHERS = [
@@ -60,8 +59,6 @@ const PHOTO_IN = 1.6;
 /** 사진 위 막. 왼쪽 아래를 어둡게 해 흰 글자 대비를 맞춘다 */
 const POSTER_CSS = `@keyframes pa-in{from{transform:scale(1.06)}}.pa-in{animation:pa-in ${PHOTO_IN}s cubic-bezier(0.22,1,0.36,1) both}@media (prefers-reduced-motion:reduce){.pa-in{animation:none}}`;
 const IMG = "/images/demo-piano-academy";
-/** 과정 바꿀 때 오선 위 선이 이어지는 시간(초) */
-const STAFF_DUR = 0.7;
 
 const focusRing = "focus-visible:outline focus-visible:outline-[3px] focus-visible:outline-offset-2";
 const won = (n: number) => `${n.toLocaleString("ko-KR")}원`;
@@ -170,26 +167,11 @@ const FEES: { course: string; who: Who; times: string; time: string; price: numb
 
 /* ---------- 시간표 ---------- */
 
-const OPEN_DAYS = [1, 2, 3, 4, 5, 6];
-/** 연습실이 다섯 개라 한 시간에 다섯 명까지 */
-const CAP = 5;
 const SLOTS: Record<Who, { weekday: string[]; sat: string[] }> = {
   kid: { weekday: ["13:00", "14:00", "15:00", "16:00", "17:00", "18:00"], sat: ["10:00", "11:00"] },
   adult: { weekday: ["19:30", "20:30"], sat: ["12:00", "13:00"] },
 };
 const slotsFor = (dow: number, who: Who) => (dow === 0 ? [] : dow === 6 ? SLOTS[who].sat : SLOTS[who].weekday);
-const timesOf = (who: Who) => [...new Set([...SLOTS[who].sat, ...SLOTS[who].weekday])].sort();
-
-/** 요일, 시간별 이미 찬 자리. 실제로는 학원 관리 프로그램에서 읽는다 */
-function taken(dow: number, time: string) {
-  const t = Number(time.replace(":", ""));
-  let h = (dow + 5) * 2654435761 + (t + 13) * 40503;
-  h = Math.abs((h ^ (h >>> 13)) * 1274126177) % 89;
-  // 하교 시간(15~17시)과 성인 저녁반이 먼저 찬다
-  const busy = t >= 1500 && t <= 1700 ? 2 : t >= 1930 ? 1 : 0;
-  return Math.min(CAP, (h % 4) + busy);
-}
-const left = (dow: number, time: string) => CAP - taken(dow, time);
 
 /** 내일부터 문 여는 날 6일(일요일 빼고). 월~토가 한 번씩 들어간다 */
 function trialDates(today: Date) {
@@ -224,16 +206,9 @@ export function PianoAcademyDemo() {
   const [courseId, setCourseId] = useState<CourseId>("beyer");
   /* 첫 화면 나이 칩과 체험 레슨 신청의 나이는 같은 값이다 */
   const [age, setAge] = useState(AGES[1]);
-  /* 아래 구간에서 성인 과정과 유초등 과정을 오가면 첫 화면 나이도 따라 바꾼다 */
-  const pickCourseId = (id: CourseId) => {
-    setCourseId(id);
-    const adult = courseOf(id).who === "adult";
-    if (adult) setAge("성인");
-    else if (age === "성인") setAge(AGES[1]);
-  };
   const course = courseOf(courseId);
 
-  /* 체험 레슨 신청 상태. 시간표 칸을 누르면 날짜와 시간이 채워진다 */
+  /* 체험 레슨 신청 상태 */
   const dates = useMemo(() => trialDates(today), [today]);
   const [pickDow, setPickDow] = useState<number | null>(null);
   const [pickTime, setPickTime] = useState<string | null>(null);
@@ -245,12 +220,6 @@ export function PianoAcademyDemo() {
   }, []);
 
   const go = (id: string) => document.getElementById(id)?.scrollIntoView({ behavior: reduce ? "auto" : "smooth", block: "start" });
-
-  const pickSlot = (dow: number, time: string) => {
-    setPickDow(dow);
-    setPickTime(time);
-    go("pa-trial");
-  };
 
 
   return (
@@ -265,7 +234,7 @@ export function PianoAcademyDemo() {
         }}
       />
 
-      <CourseSection reduce={reduce} course={course} setCourseId={pickCourseId} onTrial={() => go("pa-trial")} />
+      <CourseSection onTrial={() => go("pa-trial")} />
       <section id="pa-teachers" aria-labelledby="pa-teachers-title" className="mx-auto mt-20 max-w-[1200px] scroll-mt-4 px-4 md:mt-24 md:px-6">
         <SectionTitle id="pa-teachers-title" title="선생님" />
         <ul className="grid gap-8 sm:grid-cols-3 md:gap-6">
@@ -283,7 +252,7 @@ export function PianoAcademyDemo() {
           ))}
         </ul>
       </section>
-      <TimetableSection today={today} course={course} setCourseId={pickCourseId} pickDow={pickDow} pickTime={pickTime} onPick={pickSlot} />
+      <TimetableSection />
       <FeeSection today={today} />
       <TrialSection
         reduce={reduce}
@@ -319,7 +288,7 @@ export function PianoAcademyDemo() {
 /* ---------- 첫 화면 ---------- */
 
 /* 첫 화면 구조(국내 피아노 학원, 음악교실 사이트 조사, 2026-10): 메뉴 줄 아래 레슨실 사진 가로 띠(막 없음), 띠 아래 흰 영역 왼쪽에
-   제목과 나이 칩 다섯 개, 오른쪽에 고른 나이의 과정 카드 하나. 칩을 누르면 카드만 바뀌고, 아래 교육과정, 수업시간표, 체험 레슨 신청의
+   제목과 나이 칩 다섯 개, 오른쪽에 고른 나이의 과정 카드 하나. 칩을 누르면 카드만 바뀌고, 아래 체험 레슨 신청의
    과정과 나이도 같이 바뀐다. 처음엔 초등 1~3학년. 휴대폰에서는 메뉴를 가로로 넘기는 한 줄로, 사진 띠는 낮게, 나이 칩은 가로 한 줄,
    카드는 칩 아래 전체 폭, 하단 고정 줄에 체험 레슨, 전화 두 버튼.
    모션: 사진만 1.06배에서 1배로 1.6초 동안 다가오고, 카드 내용은 0.2초 겹쳐 바뀐다. 동작 줄이기면 모두 끈다. */
@@ -493,7 +462,7 @@ function Poster({ reduce, go, age, onAge }: { reduce: boolean; go: (id: string) 
               className={`inline-flex h-12 items-center justify-center rounded-[6px] border px-4 text-[15px] font-semibold ${focusRing}`}
               style={{ borderColor: "#c8c8c8", background: C.paper, color: C.ink, outlineColor: C.felt }}
             >
-              과정 진도
+              교육과정
             </button>
           </div>
         </div>
@@ -536,330 +505,109 @@ function SectionTitle({ id, title }: { id: string; title: string }) {
   );
 }
 
-/* ---------- 1. 과정 고르기 ---------- */
+/* ---------- 1. 교육과정 ---------- */
 
-function CourseSection({ reduce, course, setCourseId, onTrial }: { reduce: boolean; course: Course; setCourseId: (id: CourseId) => void; onTrial: () => void }) {
-  const total = course.parts.reduce((s, x) => s + x.min, 0);
-  const fees = FEES.filter((f) => f.who === course.who && f.course !== "중고등 피아노");
+function CourseSection({ onTrial }: { onTrial: () => void }) {
   return (
     <section id="pa-course" aria-labelledby="pa-course-title" className="mx-auto mt-8 max-w-[1200px] scroll-mt-4 px-4 md:mt-12 md:px-6">
       <SectionTitle id="pa-course-title" title="교육과정" />
+      <p className="mt-4 text-[16px]" style={{ color: C.muted }}>
+        모든 과정은 1:1 개인 레슨과 개인 연습실 연습으로 진행해요. 한 번 수업은 50분이에요.
+      </p>
 
-      <div className="mt-7 grid gap-8 lg:grid-cols-[minmax(0,5fr)_minmax(0,7fr)] lg:gap-10">
-        {/* 건반 버튼 */}
-        <div>
-          <div role="group" aria-label="과정 고르기" className="relative flex gap-px overflow-hidden rounded-[6px] border" style={{ background: C.line, borderColor: C.line }}>
-            {COURSES.map((c) => {
-              const on = c.id === course.id;
-              return (
-                <button
-                  key={c.id}
-                  type="button"
-                  aria-pressed={on}
-                  onClick={() => setCourseId(c.id)}
-                  className={`relative flex h-[184px] flex-1 flex-col items-center justify-end px-1 pb-4 text-center transition-colors duration-150 md:h-[220px] ${focusRing}`}
-                  style={{
-                    background: on ? C.paperDeep : "#ffffff",
-                    boxShadow: on ? `inset 0 -3px 0 ${C.felt}` : undefined,
-                    outlineColor: C.felt,
-                    outlineOffset: -3,
-                    color: C.ink,
-                  }}
-                >
-                  <span className="text-[16px] font-bold leading-tight md:text-[18px]">
-                    {c.name}
+      <ul className="mt-6 grid gap-5 md:grid-cols-2">
+        {COURSES.map((c) => (
+          <li key={c.id} className="rounded-[8px] border p-5 md:p-6" style={{ borderColor: C.line, background: C.card }}>
+            <h3 className="text-[22px] font-bold tracking-[-0.02em]">
+              {c.name} <span className="text-[15px] font-semibold" style={{ color: C.muted }}>{c.sub}</span>
+            </h3>
+            <p className="mt-1 text-[15px] font-bold" style={{ color: C.felt }}>
+              {c.target}
+            </p>
+            <ol className="mt-4 grid gap-1.5 text-[15px]">
+              {c.steps.map((st, i) => (
+                <li key={st.book} className="grid grid-cols-[1.5em_minmax(0,1fr)_auto] items-baseline gap-2">
+                  <span className="text-[13px] font-bold tabular-nums" style={{ color: C.muted }}>
+                    {i + 1}
                   </span>
-                  <span className="mt-1 text-[12px] leading-tight md:text-[13px]" style={{ color: C.muted }}>
-                    {c.sub}
+                  <span className="font-semibold">{st.book}</span>
+                  <span className="text-[14px]" style={{ color: C.muted }}>
+                    {st.span}
                   </span>
-                  {on && (
-                    <span className="mt-2 inline-flex items-center gap-1 text-[12px] font-bold" style={{ color: C.felt }}>
-                      <Check size={13} aria-hidden />
-                      선택
-                    </span>
-                  )}
-                </button>
-              );
-            })}
-            {/* 건반 사이 검은 건반 */}
-            {[25, 50, 75].map((x) => (
-              <span
-                key={x}
-                aria-hidden
-                className="pointer-events-none absolute top-0 h-[40%] w-[9%] -translate-x-1/2 rounded-b-[3px]"
-                style={{ left: `${x}%`, background: "#222222" }}
-              />
-            ))}
-          </div>
-          <p className="mt-4 text-[15px]" style={{ color: C.muted }}>
-            모든 과정은 1:1 개인 레슨과 개인 연습실 연습으로 진행해요.
-          </p>
-        </div>
-
-        {/* 고른 과정 */}
-        <div>
-          <p className="text-[15px] font-bold" style={{ color: C.felt }}>
-            {course.target}
-          </p>
-          <h3 className="mt-1 text-[24px] font-bold md:text-[28px]">
-            {course.name} 과정 진도
-          </h3>
-          <Staff key={course.id} course={course} reduce={reduce} />
-
-          <h4 className="mt-7 text-[17px] font-bold">한 번 수업 {total}분</h4>
-          <div className="mt-3 flex h-12 overflow-hidden rounded-[4px] border" style={{ borderColor: C.line }} aria-hidden>
-            {course.parts.map((x, i) => (
-              <span
-                key={x.label}
-                className="flex items-center justify-center text-[14px] font-bold tabular-nums"
-                style={{
-                  flexGrow: x.min,
-                  flexBasis: 0,
-                  background: i === 0 ? C.felt : i === 1 ? C.card : C.feltSoft,
-                  color: i === 0 ? "#fff" : C.ink,
-                  borderLeft: i > 0 ? `1px solid ${C.line}` : undefined,
-                }}
-              >
-                {x.min}분
-              </span>
-            ))}
-          </div>
-          <ul className="mt-3 flex flex-wrap gap-x-5 gap-y-1 text-[15px]">
-            {course.parts.map((x, i) => (
-              <li key={x.label} className="inline-flex items-center gap-2">
-                <span aria-hidden className="h-3 w-3 rounded-[2px] border" style={{ borderColor: i === 0 ? C.felt : "#b5b5b5", background: i === 0 ? C.felt : i === 1 ? C.card : C.feltSoft }} />
-                {x.label} {x.min}분
-              </li>
-            ))}
-          </ul>
-          <p className="mt-4 text-[15px]" style={{ color: C.muted }}>
-            {course.side}
-          </p>
-
-          <div className="mt-6 flex flex-wrap items-end justify-between gap-4 border-t pt-5" style={{ borderColor: C.line }}>
-            <dl className="flex flex-wrap gap-x-8 gap-y-2">
-              {fees.map((f) => (
-                <div key={f.times}>
-                  <dt className="text-[14px]" style={{ color: C.muted }}>
-                    월 교습비 {f.times}
-                  </dt>
-                  <dd className="text-[22px] font-bold tabular-nums">
-                    {won(f.price)}
-                  </dd>
-                </div>
+                </li>
               ))}
-            </dl>
-            <button
-              type="button"
-              onClick={onTrial}
-              data-gtm-cta={`${SLUG}_course_trial`}
-              className={`inline-flex h-12 items-center gap-2 rounded-[6px] px-5 text-[16px] font-semibold ${focusRing}`}
-              style={{ background: C.felt, color: "#fff", outlineColor: C.ink }}
-            >
-              <CalendarCheck size={18} aria-hidden />
-              {course.name} 체험 레슨 신청
-            </button>
-          </div>
-        </div>
-      </div>
+            </ol>
+            <p className="mt-4 border-t pt-3 text-[15px]" style={{ borderColor: C.line }}>
+              <span className="font-bold">수업 구성</span> {c.parts.map((x) => `${x.label} ${x.min}분`).join(", ")}
+            </p>
+            <p className="mt-1 text-[15px]" style={{ color: C.muted }}>
+              {c.side}
+            </p>
+          </li>
+        ))}
+      </ul>
+
+      <button
+        type="button"
+        onClick={onTrial}
+        data-gtm-cta={`${SLUG}_course_trial`}
+        className={`mt-6 inline-flex h-12 items-center gap-2 rounded-[6px] px-5 text-[16px] font-semibold ${focusRing}`}
+        style={{ background: C.felt, color: "#fff", outlineColor: C.ink }}
+      >
+        <CalendarCheck size={18} aria-hidden />
+        체험 레슨 신청
+      </button>
     </section>
   );
 }
 
-/** 진도를 오선 위 음표로. 단계가 올라갈수록 음이 높아진다 */
-function Staff({ course, reduce }: { course: Course; reduce: boolean }) {
-  const n = course.steps.length;
-  const xs = course.steps.map((_, i) => 60 + (i * 480) / (n - 1));
-  const ys = course.steps.map((_, i) => 92 - (i * 54) / (n - 1));
-  const d = xs.map((x, i) => `${i === 0 ? "M" : "L"}${x} ${ys[i]}`).join(" ");
-  return (
-    <div className="mt-3">
-      <svg viewBox="0 0 600 120" className="block h-auto w-full" role="img" aria-label={`${course.name} 과정 진도: ${course.steps.map((s) => s.book).join(", ")}`}>
-        {[38, 50, 62, 74, 86].map((y) => (
-          <line key={y} x1="10" x2="590" y1={y} y2={y} stroke="#d4d4d4" strokeWidth="1.2" />
-        ))}
-        <line x1="10" x2="10" y1="38" y2="86" stroke={C.ink} strokeWidth="2" />
-        <line x1="584" x2="584" y1="38" y2="86" stroke={C.ink} strokeWidth="2" />
-        <line x1="590" x2="590" y1="38" y2="86" stroke={C.ink} strokeWidth="4" />
-        <motion.path
-          d={d}
-          fill="none"
-          stroke={C.felt}
-          strokeWidth="2.5"
-          initial={reduce ? false : { pathLength: 0 }}
-          animate={{ pathLength: 1 }}
-          transition={{ duration: reduce ? 0 : STAFF_DUR, ease: EASE }}
-        />
-        {xs.map((x, i) => (
-          <motion.g
-            key={i}
-            initial={reduce ? false : { y: 14, opacity: 0 }}
-            animate={{ y: 0, opacity: 1 }}
-            transition={{ duration: reduce ? 0 : 0.35, delay: reduce ? 0 : (i * STAFF_DUR) / n, ease: EASE }}
-          >
-            <ellipse cx={x} cy={ys[i]} rx="11" ry="8" transform={`rotate(-22 ${x} ${ys[i]})`} fill={i === n - 1 ? C.felt : C.ink} />
-            <rect x={x + 7.5} y={ys[i] - 44} width="3" height="44" fill={i === n - 1 ? C.felt : C.ink} />
-          </motion.g>
-        ))}
-      </svg>
-      <ol className="grid gap-2 text-center" style={{ gridTemplateColumns: `repeat(${n}, minmax(0, 1fr))` }}>
-        {course.steps.map((s) => (
-          <li key={s.book} className="text-[14px] leading-snug md:text-[15px]">
-            <span className="block font-bold">{s.book}</span>
-            <span className="block" style={{ color: C.muted }}>
-              {s.span}
-            </span>
-          </li>
-        ))}
-      </ol>
-    </div>
-  );
-}
+/* ---------- 2. 수업시간표 ---------- */
 
-/* ---------- 2. 요일별 시간표 ---------- */
+const HOURS: { who: string; weekday: string; sat: string }[] = [
+  { who: "유초등, 중고등", weekday: "13:00~19:00", sat: "10:00~12:00" },
+  { who: "성인 취미", weekday: "19:30~21:30", sat: "12:00~14:00" },
+];
 
-function TimetableSection({
-  today,
-  course,
-  setCourseId,
-  pickDow,
-  pickTime,
-  onPick,
-}: {
-  today: Date;
-  course: Course;
-  setCourseId: (id: CourseId) => void;
-  pickDow: number | null;
-  pickTime: string | null;
-  onPick: (dow: number, time: string) => void;
-}) {
-  const who = course.who;
-  const times = timesOf(who);
-  const todayDow = today.getDay();
-  const [mDow, setMDow] = useState<number | null>(null);
-  const mobileDow = mDow ?? (todayDow === 0 ? 1 : todayDow);
-  const setWho = (w: Who) => {
-    if (w !== who) setCourseId(w === "adult" ? "adult" : "beyer");
-  };
-  const tab = `h-11 rounded-[6px] px-4 text-[15px] font-semibold border ${focusRing}`;
-
-  const cell = (dow: number, time: string, wide: boolean) => {
-    const n = left(dow, time);
-    const full = n <= 0;
-    const picked = pickDow === dow && pickTime === time;
-    return (
-      <button
-        type="button"
-        disabled={full}
-        onClick={() => onPick(dow, time)}
-        aria-label={`${DOW[dow]}요일 ${time}, ${full ? "마감" : `남은 자리 ${n}`}${picked ? ", 선택" : ""}`}
-        data-gtm-cta={`${SLUG}_timetable_pick`}
-        className={`${wide ? "w-full" : "min-w-[112px]"} h-11 rounded-[4px] border px-2 text-[14px] font-bold tabular-nums transition-colors ${focusRing} disabled:cursor-not-allowed`}
-        style={{
-          borderColor: picked ? C.felt : full ? C.line : "#c8c8c8",
-          background: picked ? C.felt : full ? "transparent" : C.card,
-          color: picked ? "#fff" : full ? C.muted : C.ink,
-          outlineColor: C.felt,
-          textDecoration: full ? "line-through" : undefined,
-        }}
-      >
-        {full ? "마감" : picked ? "선택" : `자리 ${n}`}
-      </button>
-    );
-  };
-
+function TimetableSection() {
   return (
     <section id="pa-timetable" aria-labelledby="pa-timetable-title" className="mx-auto mt-20 max-w-[1200px] scroll-mt-4 px-4 md:mt-24 md:px-6">
       <SectionTitle id="pa-timetable-title" title="수업시간표" />
-      <div className="mt-6 flex flex-wrap items-center gap-2" role="group" aria-label="시간대">
-        {(["kid", "adult"] as Who[]).map((w) => (
-          <button
-            key={w}
-            type="button"
-            aria-pressed={who === w}
-            onClick={() => setWho(w)}
-            className={tab}
-            style={{ borderColor: who === w ? C.felt : "#c8c8c8", background: who === w ? C.felt : "transparent", color: who === w ? "#fff" : C.ink, outlineColor: C.felt }}
-          >
-            {w === "kid" ? "유초등 과정" : "성인 취미"}
-          </button>
-        ))}
-        <p className="ml-1 text-[15px]" style={{ color: C.muted }}>
-          한 시간에 {CAP}명까지, 칸을 누르면 체험 레슨 시간으로 담겨요
-        </p>
-      </div>
-
-      {/* PC: 요일 x 시간 표 */}
-      <div className="mt-6 hidden overflow-hidden rounded-[6px] border md:block" style={{ borderColor: C.line, background: C.card }}>
-        <table className="w-full border-collapse text-[15px]">
-          <caption className="sr-only">{who === "kid" ? "유초등 과정" : "성인 취미"} 요일별 수업 시간과 남은 자리</caption>
+      <div className="mt-6 overflow-x-auto rounded-[6px] border" style={{ borderColor: C.line, background: C.card }}>
+        <table className="w-full min-w-[340px] border-collapse text-left text-[15px]">
+          <caption className="sr-only">과정별 수업 시간</caption>
           <thead>
             <tr style={{ background: C.paperDeep }}>
-              <th scope="col" className="w-[110px] px-4 py-3 text-left font-bold">
-                시간
+              <th scope="col" className="px-4 py-3 font-bold">
+                과정
               </th>
-              {OPEN_DAYS.map((d) => (
-                <th key={d} scope="col" className="px-2 py-3 text-center font-bold">
-                  {DOW[d]}
-                  {d === todayDow && (
-                    <span className="ml-1.5 rounded-[3px] px-1.5 py-0.5 text-[12px]" style={{ background: C.felt, color: "#fff" }}>
-                      오늘
-                    </span>
-                  )}
-                </th>
-              ))}
+              <th scope="col" className="px-4 py-3 font-bold">
+                평일(월~금)
+              </th>
+              <th scope="col" className="px-4 py-3 font-bold">
+                토요일
+              </th>
             </tr>
           </thead>
           <tbody>
-            {times.map((t) => (
-              <tr key={t} className="border-t" style={{ borderColor: C.line }}>
-                <th scope="row" className="px-4 py-2 text-left font-bold tabular-nums">
-                  {t}
+            {HOURS.map((h) => (
+              <tr key={h.who} className="border-t" style={{ borderColor: C.line }}>
+                <th scope="row" className="px-4 py-3 font-bold">
+                  {h.who}
                 </th>
-                {OPEN_DAYS.map((d) => (
-                  <td key={d} className="px-2 py-2 text-center" style={{ background: d === todayDow ? C.paperDeep : undefined }}>
-                    {slotsFor(d, who).includes(t) ? cell(d, t, true) : <span className="sr-only">수업 없음</span>}
-                  </td>
-                ))}
+                <td className="whitespace-nowrap px-4 py-3 tabular-nums">{h.weekday}</td>
+                <td className="whitespace-nowrap px-4 py-3 tabular-nums">{h.sat}</td>
               </tr>
             ))}
           </tbody>
         </table>
       </div>
-
-      {/* 휴대폰: 요일 고르고 목록 */}
-      <div className="mt-5 md:hidden">
-        <div className="grid grid-cols-6 gap-1" role="group" aria-label="요일">
-          {OPEN_DAYS.map((d) => (
-            <button
-              key={d}
-              type="button"
-              aria-pressed={mobileDow === d}
-              onClick={() => setMDow(d)}
-              className={`h-11 rounded-[4px] border text-[15px] font-bold ${focusRing}`}
-              style={{ borderColor: mobileDow === d ? C.felt : "#c8c8c8", background: mobileDow === d ? C.felt : C.card, color: mobileDow === d ? "#fff" : C.ink, outlineColor: C.felt }}
-            >
-              {DOW[d]}
-            </button>
-          ))}
-        </div>
-        <ul className="mt-3 divide-y rounded-[6px] border" style={{ borderColor: C.line, background: C.card }}>
-          {slotsFor(mobileDow, who).map((t) => (
-            <li key={t} className="flex items-center justify-between gap-3 px-4 py-2.5" style={{ borderColor: C.line }}>
-              <span className="text-[16px] font-bold tabular-nums">
-                {DOW[mobileDow]} {t}
-              </span>
-              {cell(mobileDow, t, false)}
-            </li>
-          ))}
-        </ul>
-      </div>
       <p className="mt-3 text-[14px]" style={{ color: C.muted }}>
-        일요일, 공휴일 휴원. 수업 시간은 50분이에요.
+        매시 정각에 시작하는 50분 수업이에요. 요일과 시간은 등록 상담 때 정해요. 일요일, 공휴일 휴원.
       </p>
     </section>
   );
 }
+
 
 /* ---------- 교습비 ---------- */
 
@@ -951,7 +699,7 @@ function TrialSection({
 
   const date = dates.find((d) => d.getDay() === pickDow) ?? null;
   const slots = date ? slotsFor(date.getDay(), course.who) : [];
-  const timeOk = !!pickTime && slots.includes(pickTime) && date !== null && left(date.getDay(), pickTime) > 0;
+  const timeOk = !!pickTime && slots.includes(pickTime) && date !== null;
   const digits = phone.replace(/\D/g, "");
   const errs = {
     when: !date || !timeOk ? "체험 날짜와 시간을 골라 주세요." : "",
@@ -999,10 +747,10 @@ function TrialSection({
   };
 
   const chip = `min-h-11 rounded-[6px] border px-3 text-[15px] font-semibold ${focusRing}`;
-  const chipStyle = (on: boolean, disabled = false): CSSProperties => ({
-    borderColor: on ? C.felt : disabled ? C.line : "#c8c8c8",
-    background: on ? C.felt : disabled ? "transparent" : C.card,
-    color: on ? "#fff" : disabled ? C.muted : C.ink,
+  const chipStyle = (on: boolean): CSSProperties => ({
+    borderColor: on ? C.felt : "#c8c8c8",
+    background: on ? C.felt : C.card,
+    color: on ? "#fff" : C.ink,
     outlineColor: C.felt,
   });
   const label = "block text-[15px] font-bold";
@@ -1126,19 +874,10 @@ function TrialSection({
                     {date ? (
                       <div className="mt-2 flex flex-wrap gap-2">
                         {slots.map((t) => {
-                          const n = left(date.getDay(), t);
                           const on = pickTime === t;
                           return (
-                            <button
-                              key={t}
-                              type="button"
-                              disabled={n <= 0}
-                              aria-pressed={on}
-                              onClick={() => setPickTime(t)}
-                              className={`${chip} tabular-nums disabled:cursor-not-allowed`}
-                              style={{ ...chipStyle(on, n <= 0), textDecoration: n <= 0 ? "line-through" : undefined }}
-                            >
-                              {t} {n <= 0 ? "마감" : `(자리 ${n})`}
+                            <button key={t} type="button" aria-pressed={on} onClick={() => setPickTime(t)} className={`${chip} tabular-nums`} style={chipStyle(on)}>
+                              {t}
                             </button>
                           );
                         })}
@@ -1246,7 +985,6 @@ function TrialSection({
 
 function ConcertSection({ today }: { today: Date }) {
   const day = concertDate(today);
-  const dd = Math.round((day.getTime() - today.getTime()) / 86400000);
   const rehearsal = daysAgo(day, 7);
   const notices = [
     {
@@ -1292,9 +1030,8 @@ function ConcertSection({ today }: { today: Date }) {
             <p className="mt-1 text-[20px]">
               오후 3시, ㅇㅇ구민회관 소공연장
             </p>
-            <p className="mt-5 inline-flex items-center gap-2 rounded-[4px] px-3 py-1.5 text-[16px] font-bold tabular-nums" style={{ background: C.felt, color: "#fff" }}>
-              <Clock size={17} aria-hidden />
-              {dd}일 남았어요
+            <p className="mt-3 text-[16px]" style={{ color: C.muted }}>
+              재원생 누구나 참가, 관람은 가족, 친구 누구나 무료
             </p>
 
             <h3 className="mt-10 text-[17px] font-bold">과정별 연주곡</h3>
@@ -1384,13 +1121,10 @@ function SampleLogo({ light, size = 20 }: { light?: boolean; size?: number }) {
   const mark = size + 8;
   return (
     <span className="inline-flex items-center gap-2 leading-none" style={{ color: light ? "#fff" : "#111" }}>
-      {/* eslint-disable-next-line @next/next/no-img-element -- 메인 사이트와 같은 곰 로고 */}
-      <img src="/images/logo-bear.png" alt="" aria-hidden width={mark} height={mark} className="shrink-0" style={{ width: mark, height: mark }} />
       <span className="flex items-baseline gap-1 whitespace-nowrap">
         <span className="font-bold tracking-[-0.03em]" style={{ fontSize: size }}>
-          곰파트너
+          피아노 학원
         </span>
-        <span className="text-[12px] font-semibold opacity-75">카탈로그</span>
       </span>
     </span>
   );

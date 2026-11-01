@@ -12,9 +12,7 @@ import {
   House,
   List,
   Menu,
-  Minus,
   Phone,
-  Plus,
   RotateCcw,
   Search,
   X,
@@ -32,20 +30,18 @@ import { DemoMakerInfo } from "@/components/demos/DemoMakerInfo";
    컴포넌트 상태로 하위 화면을 바꾼다.
 
    디자인: 장부 느낌의 따뜻한 흰 바탕(#fbfaf6), 짙은 초록(#1f5c45), 먹색 글자(#1d2422).
-   D-day는 화면마다 가장 가까운 기한 하나에만 형광펜 노랑(#f4d35e)으로 달고, 나머지는 날짜로만 적는다.
 
-   세무일정은 사업자 유형, 직원 유무와 원천세 납부 방법, 성실신고확인대상 여부로
-   올해 1월부터 다음 해 3월까지의 신고 기한을 계산해 월 탭과 목록으로 보여 준다.
-   기한이 주말이나 공휴일이면 다음 영업일로 옮겨 적고, 기한을 고르면 준비 서류 체크 목록이 나온다.
-   메인 박스에서 고른 사업자 유형은 세무일정 화면으로 그대로 이어진다.
-   요금안내는 연 매출 구간 x 개인·법인 요금표의 칸을 고르는 방식이고, 직원 수를 더해 월 합계를 낸다.
-   고른 조건은 상담신청서 문의 내용에 채워 넘긴다. 접수 화면에는 이름과 번호를 가려 보여 준다.
+   세무일정은 일반과세자, 간이과세자, 법인, 원천세를 합친 사무소 공통 달력이다.
+   올해 1월부터 다음 해 3월까지 월 탭과 목록으로 보여 주고, 기한이 주말이나 공휴일이면 다음 영업일로 옮겨 적는다.
+   기한을 고르면 신고 설명과 준비 서류 목록이 나온다.
+   요금안내는 연 매출 구간별 개인, 법인 기장료와 조정료 정적 표다.
+   상담신청서 접수 화면에는 이름과 번호를 가려 보여 준다.
 
    사진 출처(public/images/demo-tax):
    AI 생성(Z-Image-Turbo, Apache 2.0) office, 직원 사진은 AI 생성(Z-Image-Turbo) staff-1 ~ staff-3 */
 
 const IMG = "/images/demo-tax";
-const OFFICE = "곰파트너";
+const OFFICE = "세무회계 사무소";
 const TEL = "02-000-0000";
 const ADDRESS = "ㅎㄷ시 ㅅㄴ로 88 ㅁㄹ빌딩 5층";
 
@@ -59,8 +55,6 @@ const C = {
   muted: "#56615d",
   line: "#e2dfd3",
   rule: "rgba(31,92,69,0.07)",
-  yellow: "#f4d35e",
-  yellowSoft: "#fbf0c4",
   margin: "#e2aaa3",
   red: "#b3261e",
 };
@@ -137,20 +131,11 @@ function nextBusinessDay(d: Date) {
 }
 
 const md = (d: Date) => `${d.getMonth() + 1}월 ${d.getDate()}일 (${DAY_NAMES[d.getDay()]})`;
-const dayDiff = (a: Date, b: Date) => Math.round((a.getTime() - b.getTime()) / 86_400_000);
-const dday = (n: number) => (n === 0 ? "D-day" : n > 0 ? `D-${n}` : `D+${-n}`);
 const comma = (n: number) => String(Math.round(n)).replace(/\B(?=(\d{3})+(?!\d))/g, ",");
 
 /* ---------- 신고 일정 ---------- */
 
 type BizType = "general" | "simple" | "corp" | "free";
-
-const BIZ: { id: BizType; label: string; short: string }[] = [
-  { id: "general", label: "개인 일반과세자", short: "일반과세자" },
-  { id: "simple", label: "개인 간이과세자", short: "간이과세자" },
-  { id: "corp", label: "법인 (12월 결산)", short: "법인" },
-  { id: "free", label: "프리랜서 (3.3%)", short: "프리랜서" },
-];
 
 type Profile = { type: BizType; staff: boolean; half: boolean; freelancePay: boolean; sincere: boolean };
 
@@ -325,11 +310,25 @@ function buildYear(y: number, p: Profile): Deadline[] {
   return out;
 }
 
+/** 사무소 공통 달력에 싣는 사업자 유형. 같은 이름, 같은 날 기한은 한 번만 적는다. */
+const OFFICE_PROFILES: Profile[] = [
+  { type: "general", staff: true, half: false, freelancePay: true, sincere: false },
+  { type: "general", staff: false, half: false, freelancePay: false, sincere: true },
+  { type: "simple", staff: false, half: false, freelancePay: false, sincere: false },
+  { type: "corp", staff: false, half: false, freelancePay: false, sincere: false },
+];
+
 /** 올해 1월부터 다음 해 3월까지 */
-function scheduleFor(y: number, p: Profile) {
+function scheduleFor(y: number) {
   const end = new Date(y + 1, 2, 31);
-  return [...buildYear(y, p), ...buildYear(y + 1, p)]
-    .filter((d) => d.due <= end)
+  const seen = new Set<string>();
+  return OFFICE_PROFILES.flatMap((p) => [...buildYear(y, p), ...buildYear(y + 1, p)])
+    .filter((d) => {
+      const k = `${d.title}|${d.due.getTime()}`;
+      if (d.due > end || seen.has(k)) return false;
+      seen.add(k);
+      return true;
+    })
     .sort((a, b) => a.due.getTime() - b.due.getTime() || a.title.localeCompare(b.title));
 }
 
@@ -369,9 +368,6 @@ const BANDS = [
 const CORP_ADD = 50_000;
 const monthlyFee = (band: number, corp: boolean) => BANDS[band].fee + (corp ? CORP_ADD : 0);
 const adjustFee = (band: number, corp: boolean) => (corp ? Math.round((BANDS[band].adjust * 1.3) / 50_000) * 50_000 : BANDS[band].adjust);
-const staffFee = (n: number) => Math.min(n, 5) * 10_000 + Math.max(0, n - 5) * 5_000;
-
-type FeePick = { band: number; corp: boolean; staff: number };
 
 /* ---------- 세무자료실 ---------- */
 
@@ -431,7 +427,6 @@ const SHORTCUTS = [
 /* ---------- 페이지 ---------- */
 
 const BIZ_CHOICES = ["개인 일반과세자", "개인 간이과세자", "법인", "프리랜서", "사업 준비 중"];
-const BIZ_TO_CHOICE: Record<BizType, string> = { general: "개인 일반과세자", simple: "개인 간이과세자", corp: "법인", free: "프리랜서" };
 
 type Prefill = { key: number; topics: string[]; biz: string; memo: string };
 type AskFn = (p: Omit<Prefill, "key">) => void;
@@ -462,10 +457,8 @@ type Go = (v: View) => void;
 export function TaxOfficeDemo() {
   const minute = useNowMinute();
   const [view, setView] = useState<View>("home");
-  const [profile, setProfile] = useState<Profile>({ type: "general", staff: false, half: false, freelancePay: false, sincere: false });
   const [selectedId, setSelectedId] = useState<string | null>(null);
   const [month, setMonth] = useState<number | null>(null);
-  const [fee, setFee] = useState<FeePick>({ band: 2, corp: false, staff: 0 });
   const [board, setBoard] = useState<BoardId>("news");
   const [postId, setPostId] = useState<number | null>(null);
   const [prefill, setPrefill] = useState<Prefill>({ key: 0, topics: [], biz: "", memo: "" });
@@ -518,13 +511,6 @@ export function TaxOfficeDemo() {
         {view === "home" ? (
           <Home
             minute={minute}
-            profile={profile}
-            setProfile={(p) => {
-              setProfile(p);
-              setSelectedId(null);
-            }}
-            fee={fee}
-            setFee={setFee}
             go={go}
             ask={ask}
             openDeadline={openDeadline}
@@ -535,11 +521,6 @@ export function TaxOfficeDemo() {
             {view === "schedule" && (
               <Schedule
                 minute={minute}
-                profile={profile}
-                setProfile={(p) => {
-                  setProfile(p);
-                  setSelectedId(null);
-                }}
                 selectedId={selectedId}
                 setSelectedId={setSelectedId}
                 month={month}
@@ -547,7 +528,7 @@ export function TaxOfficeDemo() {
                 onAsk={ask}
               />
             )}
-            {view === "fee" && <FeeTable fee={fee} setFee={setFee} onAsk={ask} />}
+            {view === "fee" && <FeeTable onAsk={ask} />}
             {view === "board" && (
               <Board
                 board={board}
@@ -577,11 +558,8 @@ export function TaxOfficeDemo() {
 function Logo() {
   return (
     <span className="inline-flex items-center gap-2">
-      {/* eslint-disable-next-line @next/next/no-img-element -- 메인 사이트와 같은 곰 로고 */}
-      <img src="/images/logo-bear.png" alt="" aria-hidden width={28} height={28} className="h-7 w-7 shrink-0" />
       <span className="flex items-baseline gap-1 whitespace-nowrap">
-        <span className="text-[19px] font-bold tracking-[-0.02em]">곰파트너</span>
-        <span className="text-[12px] font-semibold opacity-75">카탈로그</span>
+        <span className="text-[19px] font-bold tracking-[-0.02em]">세무회계 사무소</span>
       </span>
     </span>
   );
@@ -702,26 +680,6 @@ function Header({ view, go }: { view: View; go: Go }) {
 
 /* ---------- 공용 조각 ---------- */
 
-function DdayBadge({ n, big = false }: { n: number; big?: boolean }) {
-  return (
-    <span
-      className={`inline-flex shrink-0 items-center justify-center rounded-[4px] font-bold tabular-nums ${big ? "px-2.5 py-1 text-[20px]" : "min-w-[58px] px-2 py-0.5 text-[14px]"}`}
-      style={{ background: n <= 7 ? C.yellow : C.yellowSoft, color: C.ink }}
-    >
-      {dday(n)}
-    </span>
-  );
-}
-
-function Radio({ name, checked, onChange, children }: { name: string; checked: boolean; onChange: () => void; children: React.ReactNode }) {
-  return (
-    <label className="flex min-h-10 cursor-pointer items-center gap-2.5 text-[15px] leading-[1.4]">
-      <input type="radio" name={name} checked={checked} onChange={onChange} className="h-[18px] w-[18px] shrink-0 accent-[#1f5c45]" />
-      {children}
-    </label>
-  );
-}
-
 function Pill({ on, onClick, children, disabled }: { on: boolean; onClick: () => void; children: React.ReactNode; disabled?: boolean }) {
   return (
     <button
@@ -779,9 +737,9 @@ const inputCls = "mt-1.5 h-12 w-full rounded-[6px] border bg-white px-3 outline-
 /* ---------- 메인 ---------- */
 
 /** 이번 달 기한(지난 것 포함)과, 남은 게 적으면 다음 달 기한을 붙인다 */
-function monthDigest(today: Date, p: Profile) {
+function monthDigest(today: Date) {
   const y = today.getFullYear();
-  const all = scheduleFor(y, p);
+  const all = scheduleFor(y);
   const thisMonth = all.filter((d) => d.due.getFullYear() === y && d.due.getMonth() === today.getMonth());
   const upcoming = thisMonth.filter((d) => d.real >= today).length;
   const nm = new Date(y, today.getMonth() + 1, 1);
@@ -791,33 +749,23 @@ function monthDigest(today: Date, p: Profile) {
 
 function Home({
   minute,
-  profile,
-  setProfile,
-  fee,
-  setFee,
   go,
   ask,
   openDeadline,
   openPost,
 }: {
   minute: number;
-  profile: Profile;
-  setProfile: (p: Profile) => void;
-  fee: FeePick;
-  setFee: (f: FeePick) => void;
   go: Go;
   ask: AskFn;
   openDeadline: (id: string, monthIdx: number) => void;
   openPost: (p: Post) => void;
 }) {
   const today = todayOf(minute);
-  const digest = today ? monthDigest(today, profile) : null;
+  const digest = today ? monthDigest(today) : null;
   const postDate = usePostDate();
   const latest = POSTS.slice(0, 5);
   const boardLabel = (b: BoardId) => BOARDS.find((x) => x.id === b)?.label ?? "";
   const monthIdxOf = (d: Date) => (today ? (d.getFullYear() - today.getFullYear()) * 12 + d.getMonth() : 0);
-  // D-day는 가장 가까운 기한 하나에만 단다
-  const nearest = digest && today ? [...digest.thisMonth, ...digest.nextMonth].find((d) => d.real >= today) ?? null : null;
 
   const row = (d: Deadline) => {
     const past = today ? d.real < today : false;
@@ -830,17 +778,7 @@ function Home({
           </button>
         </td>
         <td className="whitespace-nowrap py-2.5 text-right align-top text-[14px] tabular-nums">
-          {past ? (
-            "지남"
-          ) : nearest?.id === d.id && today ? (
-            <span className="px-1 font-bold" style={{ background: C.yellow, color: C.ink }}>
-              {dday(dayDiff(d.real, today))}
-            </span>
-          ) : d.shifted ? (
-            `${d.shifted}로 연기`
-          ) : (
-            ""
-          )}
+          {past ? "지남" : d.shifted ? `${d.shifted}로 연기` : ""}
         </td>
       </tr>
     );
@@ -882,28 +820,7 @@ function Home({
         <div className="mx-auto grid max-w-[1200px] items-start gap-5 lg:grid-cols-12">
           {/* 이달의 신고일정 */}
           <Box id="tax-schedule" title={today ? `${today.getMonth() + 1}월 신고일정` : "이달의 신고일정"} more="전체 일정" onMore={() => go("schedule")} className="lg:col-span-7">
-            <div className="flex flex-wrap items-center gap-x-4 gap-y-2">
-              <label className="flex items-center gap-2 text-[15px] font-semibold">
-                사업자 유형
-                <select
-                  value={profile.type}
-                  onChange={(e) => setProfile({ ...profile, type: e.target.value as BizType })}
-                  className="h-10 rounded-[6px] border bg-white px-2 font-normal"
-                  style={{ borderColor: C.line }}
-                >
-                  {BIZ.map((b) => (
-                    <option key={b.id} value={b.id}>
-                      {b.label}
-                    </option>
-                  ))}
-                </select>
-              </label>
-              <label className="inline-flex h-10 cursor-pointer items-center gap-2 text-[15px]">
-                <input type="checkbox" checked={profile.staff} onChange={(e) => setProfile({ ...profile, staff: e.target.checked })} className="h-5 w-5 accent-[#1f5c45]" />
-                직원 있음
-              </label>
-            </div>
-            <div className="mt-3 min-h-[220px]" aria-live="polite">
+            <div className="min-h-[220px]">
               {digest && today && (
                 <table className="w-full border-t-2 text-[15px]" style={{ borderColor: C.ink }}>
                   <caption className="sr-only">신고, 납부 기한</caption>
@@ -939,24 +856,20 @@ function Home({
 
           {/* 기장료 안내 */}
           <Box id="tax-fee" title="기장료 안내" more="요금표" onMore={() => go("fee")} className="lg:col-span-5">
-            <FeeGrid fee={fee} setFee={setFee} compact />
-            <div className="mt-4 flex flex-wrap items-end justify-between gap-3 border-t pt-3" style={{ borderColor: C.ink }} aria-live="polite">
-              <p className="text-[15px] leading-[1.5]">
-                {fee.corp ? "법인" : "개인"}, {BANDS[fee.band].label}
-                <span className="block text-[20px] font-bold tabular-nums">월 {comma(monthlyFee(fee.band, fee.corp) + staffFee(fee.staff))}원부터</span>
+            <FeeGrid compact />
+            <div className="mt-4 flex flex-wrap items-center justify-between gap-3 border-t pt-3" style={{ borderColor: C.ink }}>
+              <p className="text-[13px]" style={{ color: C.muted }}>
+                월 기장료, 부가세 별도
               </p>
               <button
                 type="button"
-                onClick={() => ask({ topics: ["신규 기장"], biz: fee.corp ? "법인" : "", memo: `${fee.corp ? "법인" : "개인사업자"}, 작년 매출 ${BANDS[fee.band].label}, 기장료 상담 원합니다.` })}
+                onClick={() => ask({ topics: ["신규 기장"], biz: "", memo: "" })}
                 className="h-11 rounded-[6px] border px-4 text-[15px] font-semibold"
                 style={{ borderColor: C.green, color: C.green }}
               >
                 기장 상담 신청
               </button>
             </div>
-            <p className="mt-2 text-[13px]" style={{ color: C.muted }}>
-              부가세 별도, 직원 {fee.staff}명 기준
-            </p>
           </Box>
         </div>
 
@@ -1059,8 +972,6 @@ function SubPage({ view, go, children }: { view: Exclude<View, "home">; go: Go; 
 
 function Schedule({
   minute,
-  profile,
-  setProfile,
   selectedId,
   setSelectedId,
   month,
@@ -1068,8 +979,6 @@ function Schedule({
   onAsk,
 }: {
   minute: number;
-  profile: Profile;
-  setProfile: (p: Profile) => void;
   selectedId: string | null;
   setSelectedId: (id: string | null) => void;
   month: number | null;
@@ -1077,24 +986,17 @@ function Schedule({
   onAsk: AskFn;
 }) {
   const reduce = useReducedMotionSafe();
-  const [checked, setChecked] = useState<Set<string>>(new Set());
   const tabsRef = useRef<HTMLDivElement>(null);
 
   const today = todayOf(minute);
   const year = today ? today.getFullYear() : 0;
-  const { type, staff, half, freelancePay } = profile;
-  const sincereOk = type !== "simple";
-  const eff: Profile = { ...profile, sincere: profile.sincere && sincereOk };
-  const items = today ? scheduleFor(year, eff) : [];
-  const next = today ? items.find((d) => d.real >= today) ?? null : null;
-  const remainThisYear = today ? items.filter((d) => d.real >= today && d.due.getFullYear() === year).length : 0;
+  const items = today ? scheduleFor(year) : [];
 
   const cur = month ?? (today ? today.getMonth() : 0);
   const ym = { y: year + Math.floor(cur / 12), m: (cur % 12) + 1 };
   const inMonth = items.filter((d) => d.due.getFullYear() === ym.y && d.due.getMonth() + 1 === ym.m);
   const selected = items.find((d) => d.id === selectedId) ?? inMonth.find((d) => today && d.real >= today) ?? inMonth[0] ?? null;
 
-  const set = (p: Partial<Profile>) => setProfile({ ...profile, ...p });
   const moveMonth = (m: number) => {
     setMonth(m);
     setSelectedId(null);
@@ -1107,90 +1009,9 @@ function Schedule({
     if (box && tab) box.scrollLeft = Math.max(0, tab.offsetLeft - box.clientWidth / 2 + tab.offsetWidth / 2);
   }, [cur, year]);
 
-  const toggleCheck = (key: string) =>
-    setChecked((prev) => {
-      const s = new Set(prev);
-      if (s.has(key)) s.delete(key);
-      else s.add(key);
-      return s;
-    });
-
   return (
-    <div className="grid items-start gap-6 lg:grid-cols-[290px_1fr]">
-      <div className="space-y-5 border-t-2 pt-4" style={{ borderColor: C.ink }}>
-        <fieldset>
-          <legend className="text-[15px] font-bold">사업자 유형</legend>
-          <div className="mt-1 grid grid-cols-2 gap-x-3 lg:grid-cols-1">
-            {BIZ.map((b) => (
-              <Radio key={b.id} name="sch-biz" checked={type === b.id} onChange={() => set({ type: b.id })}>
-                {b.label}
-              </Radio>
-            ))}
-          </div>
-        </fieldset>
-        <fieldset className="border-t pt-4" style={{ borderColor: C.line }}>
-          <legend className="float-left w-full text-[15px] font-bold">직원</legend>
-          <div className="clear-both flex flex-wrap gap-x-5">
-            <Radio name="sch-staff" checked={!staff} onChange={() => set({ staff: false })}>
-              없음
-            </Radio>
-            <Radio name="sch-staff" checked={staff} onChange={() => set({ staff: true })}>
-              있음
-            </Radio>
-          </div>
-          <label className="mt-3 flex min-h-11 cursor-pointer items-start gap-2.5 text-[15px] leading-[1.45]">
-            <input type="checkbox" checked={freelancePay} onChange={(e) => set({ freelancePay: e.target.checked })} className="mt-0.5 h-5 w-5 shrink-0 accent-[#1f5c45]" />
-            사업소득 지급(3.3%) 있음
-          </label>
-          {(staff || freelancePay) && (
-            <div className="mt-3">
-              <p className="text-[14px] font-semibold" style={{ color: C.muted }}>
-                원천세 납부
-              </p>
-              <div className="flex flex-wrap gap-x-5">
-                <Radio name="sch-half" checked={!half} onChange={() => set({ half: false })}>
-                  매월
-                </Radio>
-                <Radio name="sch-half" checked={half} onChange={() => set({ half: true })}>
-                  반기 (승인받음)
-                </Radio>
-              </div>
-            </div>
-          )}
-        </fieldset>
-        <label className={`flex min-h-11 items-start gap-2.5 border-t pt-4 text-[15px] leading-[1.45] ${sincereOk ? "cursor-pointer" : "opacity-50"}`} style={{ borderColor: C.line }}>
-          <input type="checkbox" disabled={!sincereOk} checked={eff.sincere} onChange={(e) => set({ sincere: e.target.checked })} className="mt-0.5 h-5 w-5 shrink-0 accent-[#1f5c45]" />
-          <span>
-            <span className="font-bold">성실신고확인대상</span>
-            <span className="block text-[14px]" style={{ color: C.muted }}>
-              {!sincereOk ? "간이과세자는 해당하지 않습니다" : type === "corp" ? "성실신고 사업자가 전환한 지 3년 안 된 법인 등" : "업종별 매출 기준을 넘은 사업자"}
-            </span>
-          </span>
-        </label>
-      </div>
-
+    <div className="grid items-start gap-6">
       <div className="min-w-0 space-y-4">
-        <div className="flex min-h-[72px] flex-wrap items-center justify-between gap-3 border-b-2 pb-3" style={{ borderColor: C.ink }} aria-live="polite">
-          {today && next && (
-            <>
-              <div className="flex min-w-0 items-center gap-3">
-                <DdayBadge n={dayDiff(next.real, today)} big />
-                <div className="min-w-0">
-                  <p className="text-[14px]" style={{ color: C.muted }}>
-                    다음 기한
-                  </p>
-                  <p className="font-bold leading-[1.4]">
-                    {next.title}, <span className="tabular-nums">{md(next.real)}</span>
-                  </p>
-                </div>
-              </div>
-              <p className="text-[15px] tabular-nums" style={{ color: C.muted }}>
-                올해 남은 기한 <span className="font-bold" style={{ color: C.ink }}>{remainThisYear}건</span>
-              </p>
-            </>
-          )}
-        </div>
-
         <div className="rounded-[10px] border bg-white" style={{ borderColor: C.line }}>
           <div className="flex items-center gap-1 border-b px-2 py-2" style={{ borderColor: C.line }}>
             <button
@@ -1325,26 +1146,17 @@ function Schedule({
                 <h3 className="mt-4 font-bold">
                   준비 서류
                 </h3>
-                <ul className="mt-1">
-                  {KIND_INFO[selected.kind].prep.map((p, i) => {
-                    const key = `${selected.id}:${i}`;
-                    const on = checked.has(key);
-                    return (
-                      <li key={key}>
-                        <label className="flex min-h-[32px] cursor-pointer items-start gap-2.5 py-0.5 text-[15px] leading-[2]">
-                          <input type="checkbox" checked={on} onChange={() => toggleCheck(key)} className="mt-[9px] h-4 w-4 shrink-0 accent-[#1f5c45]" />
-                          <span style={on ? { textDecoration: "line-through", color: C.muted } : undefined}>{p}</span>
-                        </label>
-                      </li>
-                    );
-                  })}
+                <ul className="mt-1 list-disc pl-5 text-[15px] leading-[2]">
+                  {KIND_INFO[selected.kind].prep.map((p) => (
+                    <li key={p}>{p}</li>
+                  ))}
                 </ul>
                 <button
                   type="button"
                   onClick={() =>
                     onAsk({
                       topics: [KIND_INFO[selected.kind].topic],
-                      biz: BIZ_TO_CHOICE[type],
+                      biz: "",
                       memo: `${selected.title} (${md(selected.real)}까지) 신고 대리를 맡기고 싶습니다.`,
                     })
                   }
@@ -1367,23 +1179,13 @@ function Schedule({
 
 /* ---------- 요금안내 ---------- */
 
-/** 매출 구간 x 개인·법인 요금표. 칸을 누르면 그 조건이 선택된다. */
-function FeeGrid({ fee, setFee, compact = false }: { fee: FeePick; setFee: (f: FeePick) => void; compact?: boolean }) {
+/** 매출 구간 x 개인, 법인 요금표 */
+function FeeGrid({ compact = false }: { compact?: boolean }) {
   const cell = (band: number, corp: boolean) => {
-    const on = fee.band === band && fee.corp === corp;
     const v = monthlyFee(band, corp);
     return (
-      <td className="p-0">
-        <button
-          type="button"
-          aria-pressed={on}
-          onClick={() => setFee({ ...fee, band, corp })}
-          aria-label={`${corp ? "법인" : "개인"} ${BANDS[band].label}, 월 ${comma(v)}원`}
-          className={`w-full px-2 text-right tabular-nums underline-offset-4 hover:underline ${compact ? "h-10 text-[15px]" : "h-11 text-[16px]"} ${on ? "font-bold underline" : ""}`}
-          style={{ color: on ? C.green : C.ink }}
-        >
-          {compact ? `${v / 10_000}만` : `${comma(v)}원`}
-        </button>
+      <td className={`px-2 text-right tabular-nums ${compact ? "h-10 text-[15px]" : "h-11 text-[16px]"}`}>
+        {compact ? `${v / 10_000}만` : `${comma(v)}원`}
       </td>
     );
   };
@@ -1415,8 +1217,8 @@ function FeeGrid({ fee, setFee, compact = false }: { fee: FeePick; setFee: (f: F
       </thead>
       <tbody>
         {BANDS.map((b, i) => (
-          <tr key={b.label} className="border-t" style={{ borderColor: C.line, background: fee.band === i ? C.greenSoft : undefined }}>
-            <th scope="row" className="py-0.5 pl-1 pr-2 text-left font-normal tabular-nums" style={{ color: fee.band === i ? C.ink : C.muted, fontWeight: fee.band === i ? 700 : 400 }}>
+          <tr key={b.label} className="border-t" style={{ borderColor: C.line }}>
+            <th scope="row" className="py-0.5 pl-1 pr-2 text-left font-normal tabular-nums" style={{ color: C.muted }}>
               {compact ? b.short : b.label}
             </th>
             {cell(i, false)}
@@ -1438,89 +1240,39 @@ function FeeGrid({ fee, setFee, compact = false }: { fee: FeePick; setFee: (f: F
   );
 }
 
-function FeeTable({ fee, setFee, onAsk }: { fee: FeePick; setFee: (f: FeePick) => void; onAsk: AskFn }) {
-  const base = monthlyFee(fee.band, fee.corp);
-  const sFee = staffFee(fee.staff);
-  const total = base + sFee;
-  const adjust = adjustFee(fee.band, fee.corp);
-  const rows = [
-    { k: `기장료 (${fee.corp ? "법인" : "개인"}, ${BANDS[fee.band].label})`, v: base },
-    { k: `인건비 신고 (직원 ${fee.staff}명)`, v: sFee },
-  ];
-
+function FeeTable({ onAsk }: { onAsk: AskFn }) {
   return (
-    <div className="grid items-start gap-6 lg:grid-cols-[1fr_380px]">
+    <div className="grid items-start gap-6 lg:grid-cols-[1fr_340px]">
       <div className="min-w-0 rounded-[10px] border bg-white p-4 md:p-6" style={{ borderColor: C.line }}>
         <h2 className="text-[20px] font-bold tracking-[-0.02em]">세무기장대행, 결산세무조정료</h2>
         <div className="mt-4">
-          <FeeGrid fee={fee} setFee={setFee} />
+          <FeeGrid />
         </div>
         <ul className="mt-4 space-y-1 text-[14px]" style={{ color: C.muted }}>
           <li>부가세, 원천세 신고는 기장료에 포함됩니다.</li>
           <li>종합소득세, 법인세 신고 시 연 1회 세무조정료가 별도로 청구됩니다.</li>
+          <li>직원 인건비 신고는 1인당 월 1만 원(6명부터 5천 원)이 더해집니다.</li>
           <li>신규사업자는 첫 3개월 기장료가 무료입니다. 모든 금액은 부가세 별도입니다.</li>
         </ul>
       </div>
 
-      <div className="rounded-[10px] border bg-white p-5 md:p-6 lg:sticky lg:top-20" style={{ borderColor: C.line }}>
-        <div className="flex flex-wrap items-center justify-between gap-3">
-          <p className="text-[15px] font-bold" id="fee-people-label">
-            직원 수 (대표자 제외)
-          </p>
-          <div className="flex items-center gap-1" role="group" aria-labelledby="fee-people-label">
-            <button type="button" aria-label="직원 한 명 빼기" onClick={() => setFee({ ...fee, staff: Math.max(0, fee.staff - 1) })} className="inline-flex h-11 w-11 items-center justify-center rounded-[6px] border" style={{ borderColor: C.line }}>
-              <Minus size={18} aria-hidden />
-            </button>
-            <span className="w-14 text-center text-[20px] font-bold tabular-nums" aria-live="polite">
-              {fee.staff}명
-            </span>
-            <button type="button" aria-label="직원 한 명 더하기" onClick={() => setFee({ ...fee, staff: Math.min(50, fee.staff + 1) })} className="inline-flex h-11 w-11 items-center justify-center rounded-[6px] border" style={{ borderColor: C.line }}>
-              <Plus size={18} aria-hidden />
-            </button>
-          </div>
-        </div>
-        <div aria-live="polite">
-          <p className="mt-5 text-[15px] font-bold" style={{ color: C.muted }}>
-            월 합계
-          </p>
-          <p className="mt-1 text-[34px] font-bold leading-[1.2] tracking-[-0.02em] tabular-nums">{comma(total)}원~</p>
-          <table className="mt-4 w-full text-[15px] tabular-nums">
-            <caption className="sr-only">월 기장료 내역</caption>
-            <tbody>
-              {rows.map((r) => (
-                <tr key={r.k} className="border-t" style={{ borderColor: C.line }}>
-                  <th scope="row" className="py-2.5 pr-3 text-left font-normal" style={{ color: C.muted }}>
-                    {r.k}
-                  </th>
-                  <td className="py-2.5 text-right">{comma(r.v)}원</td>
-                </tr>
-              ))}
-              <tr className="border-t-2" style={{ borderColor: C.ink }}>
-                <th scope="row" className="py-2.5 text-left font-bold">
-                  조정료 (연 1회)
-                </th>
-                <td className="py-2.5 text-right font-bold">{comma(adjust)}원~</td>
-              </tr>
-            </tbody>
-          </table>
-        </div>
+      <div className="rounded-[10px] border bg-white p-5 md:p-6" style={{ borderColor: C.line }}>
+        <h2 className="text-[18px] font-bold">기장 상담</h2>
+        <p className="mt-2 text-[15px] leading-[1.6]" style={{ color: C.muted }}>
+          거래 건수와 장부 상태를 보고 정확한 금액을 안내해 드립니다. 대표세무사가 직접 상담합니다.
+        </p>
+        <a href={`tel:${TEL}`} className="mt-4 inline-flex items-center gap-2 text-[22px] font-bold tabular-nums" style={{ color: C.green }}>
+          <Phone size={20} aria-hidden />
+          {TEL}
+        </a>
         <button
           type="button"
-          onClick={() =>
-            onAsk({
-              topics: ["신규 기장"],
-              biz: fee.corp ? "법인" : "",
-              memo: `${fee.corp ? "법인" : "개인사업자"}, 작년 매출 ${BANDS[fee.band].label}, 직원 ${fee.staff}명. 요금표 기준 월 ${comma(total)}원부터`,
-            })
-          }
-          className="mt-5 h-12 w-full rounded-[6px] text-[16px] font-bold"
+          onClick={() => onAsk({ topics: ["신규 기장"], biz: "", memo: "" })}
+          className="mt-4 h-12 w-full rounded-[6px] text-[16px] font-bold"
           style={{ background: C.green, color: "#fff" }}
         >
           기장 상담 신청
         </button>
-        <p className="mt-3 text-[14px]" style={{ color: C.muted }}>
-          거래 건수와 장부 상태에 따라 달라질 수 있습니다.
-        </p>
       </div>
     </div>
   );

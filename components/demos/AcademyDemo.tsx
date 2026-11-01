@@ -8,26 +8,23 @@ import { useReducedMotionSafe } from "@/hooks/useReducedMotionSafe";
 import { daysAgo, fmtDash, fmtDot, fmtKo, useDemoToday } from "@/hooks/useDemoToday";
 import { DemoMakerInfo } from "@/components/demos/DemoMakerInfo";
 
-/* 학원 홈페이지 데모: 가상의 곰파트너 수학·영어학원(초4~중3 보습학원).
-   학원명, 강사, 주소, 전화번호, 등록번호, 교습비, 학교명, 정류장은 모두 가상이다.
+/* 학원 홈페이지 데모: 곰파트너 수학, 영어학원(초4~중3 보습학원).
+   학원명, 강사, 주소, 전화번호, 등록번호, 교습비, 학교명, 정류장은 모두 지어낸 값이다.
 
-   뼈대: 반 찾기형. 실제 학원 사이트(수학의아침, 탑플수학, 청담어학원, 시대인재, 대형 입시학원)의
-   메뉴 이름을 따랐다. 학원 소개, 강사 소개, 반 편성·시간표, 교습비 안내, 레벨테스트 예약,
-   차량 운행, 공지사항. 하위 화면 없이 한 페이지에 구역을 쌓고 머리글 메뉴는 구역으로 내려간다.
-   첫 화면은 사진 한 장 위에 학원명, 바로 아래에 사진에 걸친 반 찾기 문장이 놓인다.
+   뼈대: 실제 학원 사이트(수학의아침, 수이학원, 세정학원)의 메뉴 이름을 따랐다.
+   반 편성과 시간표, 레벨테스트 예약, 교습비 안내, 차량 운행, 성적 변화, 강사 소개, 학원 소개, 공지사항.
+   하위 화면 없이 한 페이지에 구역을 쌓고 머리글 메뉴는 구역으로 내려간다.
+   첫 화면은 사진 한 장 위에 학원명, 바로 아래에 사진에 걸친 반 편성 안내가 놓인다.
 
    상호작용
-   1. 반 찾기: "중2 학생이고 수학은 학교 시험 70점대, 주 3회" 문장 안의 칸을 고르면
-      맞는 반이 학년별 시간표에서 형광펜으로 칠해지고 남은 자리가 보인다.
-   2. 레벨테스트 예약: 날짜, 시간, 학생 정보를 거쳐 확인 화면과 보호자에게 가는 문자 미리보기.
-   3. 교습비: 교습비 등 게시 표와 계산(주 횟수, 과목 추가, 차량 이용). 교재비는 별도.
-   4. 차량 운행: 정류장을 고르면 찾은 반 기준으로 등원 탑승 시간과 하원 도착 시간이 나온다.
-   5. 공지사항 펼쳐 보기.
+   1. 학년별 시간표: 학년 버튼으로 그 학년의 주간 시간표를 본다.
+   2. 레벨테스트 예약: 날짜, 시간, 학생 정보를 거쳐 확인 화면.
+   3. 교습비 반환 기준과 공지사항 펼쳐 보기.
 
    사진(public/images/demo-academy): hero, classroom, study, teacher1, teacher2 */
 
 const IMG = "/images/demo-academy";
-const ACADEMY = "곰파트너";
+const ACADEMY = "수학 영어 학원";
 const TEL = "02-000-0000";
 const ADDRESS = "ㅁㄹ시 ㅎㄷ로 120 ㅁㄹ빌딩 3층";
 
@@ -53,22 +50,21 @@ const EASE = [0.22, 1, 0.36, 1] as const;
 type Grade = "초4" | "초5" | "초6" | "중1" | "중2" | "중3";
 type Subject = "수학" | "영어";
 type Level = "심화반" | "정규반" | "기초반";
-type Score = "90점 이상" | "80점대" | "70점대" | "60점대 이하" | "아직 몰라요";
 type Times = 2 | 3;
 type Band = "초등" | "중등";
 
 const GRADES: Grade[] = ["초4", "초5", "초6", "중1", "중2", "중3"];
 const SUBJECTS: Subject[] = ["수학", "영어"];
 const LEVELS: Level[] = ["심화반", "정규반", "기초반"];
-const SCORES: Score[] = ["90점 이상", "80점대", "70점대", "60점대 이하", "아직 몰라요"];
 const DAY = ["일", "월", "화", "수", "목", "금", "토"];
 const WEEK = [1, 2, 3, 4, 5, 6];
 
 const bandOf = (g: Grade): Band => (g.startsWith("초") ? "초등" : "중등");
 const gradeLabel = (g: Grade) => (g.startsWith("초") ? `초등학교 ${g.slice(1)}학년` : `중학교 ${g.slice(1)}학년`);
 
-/* 수학은 월·수·금, 영어는 화·목·토. 주 2회는 앞의 두 요일만 나온다. */
+/* 수학은 월, 수, 금, 영어는 화, 목, 토. 주 2회는 앞의 두 요일만 나온다. */
 const SUBJECT_DAYS: Record<Subject, number[]> = { 수학: [1, 3, 5], 영어: [2, 4, 6] };
+
 
 const SLOTS: Record<Band, { week: [string, string][]; sat: [string, string][] }> = {
   초등: {
@@ -97,6 +93,7 @@ const SLOTS: Record<Band, { week: [string, string][]; sat: [string, string][] }>
   },
 };
 
+
 const CAP: Record<Band, number> = { 초등: 8, 중등: 10 };
 const MINUTES: Record<Band, number> = { 초등: 90, 중등: 120 };
 
@@ -106,37 +103,17 @@ type ClassItem = {
   subject: Subject;
   level: Level;
   slot: number;
-  cap: number;
-  left: number;
 };
-
-const FULL = new Set(["중2-수학-심화반", "초6-영어-심화반"]);
 
 const CLASSES: ClassItem[] = GRADES.flatMap((grade, gi) =>
   SUBJECTS.flatMap((subject, si) =>
-    LEVELS.map((level, li) => {
-      const id = `${grade}-${subject}-${level}`;
-      const cap = CAP[bandOf(grade)];
-      const h = [...id].reduce((a, ch) => a + ch.charCodeAt(0), 0);
-      const booked = FULL.has(id) ? cap : 2 + (h % (cap - 2));
-      return { id, grade, subject, level, slot: (gi + li + si) % 3, cap, left: cap - booked };
-    }),
+    LEVELS.map((level, li) => ({ id: `${grade}-${subject}-${level}`, grade, subject, level, slot: (gi + li + si) % 3 })),
   ),
 );
-
-const classById = (id: string) => CLASSES.find((c) => c.id === id)!;
-const className = (c: ClassItem) => `${c.grade} ${c.subject} ${c.level}`;
 
 function timeOf(c: ClassItem, day: number) {
   const s = SLOTS[bandOf(c.grade)];
   return day === 6 ? s.sat[c.slot] : s.week[c.slot];
-}
-
-function daysText(c: ClassItem, times: Times) {
-  return SUBJECT_DAYS[c.subject]
-    .slice(0, times)
-    .map((d) => DAY[d])
-    .join(", ");
 }
 
 const toMin = (t: string) => {
@@ -145,24 +122,6 @@ const toMin = (t: string) => {
 };
 const p2 = (n: number) => String(n).padStart(2, "0");
 const fmtMin = (m: number) => `${p2(Math.floor(m / 60))}:${p2(m % 60)}`;
-
-/** 점수 구간에 맞는 반과, 레벨테스트 결과에 따라 갈 수 있는 다른 반 */
-function levelFor(score: Score): { main: Level | null; alt: Level | null } {
-  switch (score) {
-    case "90점 이상":
-      return { main: "심화반", alt: null };
-    case "80점대":
-      return { main: "정규반", alt: "심화반" };
-    case "70점대":
-      return { main: "정규반", alt: "기초반" };
-    case "60점대 이하":
-      return { main: "기초반", alt: null };
-    default:
-      return { main: null, alt: null };
-  }
-}
-
-type Pick = { grade: Grade; subject: Subject; score: Score; times: Times };
 
 /* ---------- 교습비 ---------- */
 
@@ -186,10 +145,6 @@ function maskName(name: string) {
   return s[0] + second + s.slice(2).join("");
 }
 
-const maskPhone = (p: string) => {
-  const d = p.replace(/\D/g, "");
-  return d.length >= 10 ? `${d.slice(0, 3)}-****-${d.slice(-4)}` : p;
-};
 
 /* ---------- 차량 ---------- */
 
@@ -241,14 +196,8 @@ const goTo = (id: string) => document.getElementById(id)?.scrollIntoView({ behav
 /* ================================================================== */
 
 export function AcademyDemo() {
-  const [pick, setPick] = useState<Pick>({ grade: "중2", subject: "수학", score: "70점대", times: 3 });
   const [viewGrade, setViewGrade] = useState<Grade>("중2");
   const [bookingReset, setBookingReset] = useState(0);
-
-  const change = (p: Partial<Pick>) => {
-    setPick((prev) => ({ ...prev, ...p }));
-    if (p.grade) setViewGrade(p.grade);
-  };
 
   // 사용법 가이드가 첫 화면으로 돌려 달라고 하면 예약 단계를 처음으로 돌린다
   useEffect(() => {
@@ -257,18 +206,15 @@ export function AcademyDemo() {
     return () => window.removeEventListener("demo:go-home", f);
   }, []);
 
-  const { main, alt } = levelFor(pick.score);
-  const matched = main ? classById(`${pick.grade}-${pick.subject}-${main}`) : null;
-
   return (
     <div className="min-h-screen overflow-x-hidden text-[17px] leading-[1.7]" style={{ background: C.paper, color: C.ink }}>
       <Header />
       <main>
         <Hero />
-        <ClassSection pick={pick} onChange={change} viewGrade={viewGrade} onView={setViewGrade} matched={matched} alt={alt} />
-        <LevelTest key={bookingReset} pick={pick} />
-        <Fee pick={pick} onChange={change} />
-        <Shuttle pick={pick} matched={matched} />
+        <ClassSection viewGrade={viewGrade} onView={setViewGrade} />
+        <LevelTest key={bookingReset} />
+        <Fee />
+        <Shuttle />
         <Results />
         <Teachers />
         <About />
@@ -284,13 +230,8 @@ export function AcademyDemo() {
 function Logo({ light = false }: { light?: boolean }) {
   return (
     <span className="inline-flex items-center gap-2.5">
-      {/* eslint-disable-next-line @next/next/no-img-element */}
-      <img src="/images/logo-bear.png" alt="" aria-hidden width={28} height={28} className="h-7 w-7 shrink-0" />
       <span className="inline-flex items-baseline gap-1.5 whitespace-nowrap">
-        <span className="text-[19px] font-bold tracking-[-0.01em]">곰파트너</span>
-        <span className="text-[12px] font-semibold" style={{ opacity: light ? 0.85 : 0.8 }}>
-          카탈로그
-        </span>
+        <span className="text-[19px] font-bold tracking-[-0.01em]">수학 영어 학원</span>
       </span>
     </span>
   );
@@ -439,184 +380,69 @@ function SectionTitle({ id, children }: { id: string; children: React.ReactNode 
   );
 }
 
-/* ---------- 반 찾기 + 학년별 시간표 ---------- */
+/* ---------- 반 편성 + 학년별 시간표 ---------- */
 
-/** 문장 안에 들어가는 선택 칸. 네이티브 select라 키보드와 휴대폰에서 그대로 쓴다. */
-function Blank<T extends string | number>({
-  label,
-  value,
-  options,
-  onChange,
-  render = (v) => String(v),
-}: {
-  label: string;
-  value: T;
-  options: readonly T[];
-  onChange: (v: T) => void;
-  render?: (v: T) => string;
-}) {
-  return (
-    <span className="relative inline-flex align-baseline">
-      <select
-        aria-label={label}
-        value={String(value)}
-        onChange={(e) => onChange(options.find((o) => String(o) === e.target.value)!)}
-        className="cursor-pointer appearance-none rounded-none border-b-[3px] bg-transparent py-0.5 pl-1 pr-7 font-bold focus-visible:outline-2 focus-visible:outline-offset-2"
-        style={{ borderColor: C.board, color: C.board, outlineColor: C.board }}
-      >
-        {options.map((o) => (
-          <option key={String(o)} value={String(o)}>
-            {render(o)}
-          </option>
-        ))}
-      </select>
-      <ChevronDown size={18} aria-hidden className="pointer-events-none absolute right-1 top-1/2 -translate-y-1/2" style={{ color: C.board }} />
-    </span>
-  );
-}
+const LEVEL_INFO: { level: Level; who: string; what: string }[] = [
+  { level: "심화반", who: "학교 시험 90점 이상", what: "교과 심화와 서술형, 선행 한 학기" },
+  { level: "정규반", who: "학교 시험 70~80점대", what: "교과 진도와 내신 대비, 단원 테스트" },
+  { level: "기초반", who: "학교 시험 60점대 이하", what: "이전 학년 개념 복습과 교과 진도" },
+];
 
-function ClassSection({
-  pick,
-  onChange,
-  viewGrade,
-  onView,
-  matched,
-  alt,
-}: {
-  pick: Pick;
-  onChange: (p: Partial<Pick>) => void;
-  viewGrade: Grade;
-  onView: (g: Grade) => void;
-  matched: ClassItem | null;
-  alt: Level | null;
-}) {
-  const altClass = matched && alt ? classById(`${pick.grade}-${pick.subject}-${alt}`) : null;
-  const unknown = pick.score === "아직 몰라요";
-  const ending = unknown ? "." : pick.score === "90점 이상" ? "이에요." : pick.score === "60점대 이하" ? "예요." : "쯤이에요.";
-  const examName = bandOf(pick.grade) === "초등" ? "단원평가" : "학교 시험";
-
+function ClassSection({ viewGrade, onView }: { viewGrade: Grade; onView: (g: Grade) => void }) {
   return (
     <section id="classes" aria-labelledby="classes-title" className="scroll-mt-16 px-4 pb-16 md:px-6 md:pb-24">
       <div className="mx-auto max-w-[1200px]">
         <div className="relative -mt-14 rounded-[10px] border p-5 shadow-[0_6px_24px_rgba(20,42,34,0.12)] md:-mt-16 md:p-8" style={{ background: C.card, borderColor: C.line }}>
           <SectionTitle id="classes-title">반 편성, 시간표</SectionTitle>
-          <p className="mt-4 text-[19px] leading-[2.2] md:text-[22px]">
-            <Blank label="학년" value={pick.grade} options={GRADES} onChange={(grade) => onChange({ grade })} /> 학생이고,{" "}
-            <Blank label="과목" value={pick.subject} options={SUBJECTS} onChange={(subject) => onChange({ subject })} /> {examName} 점수는{" "}
-            <Blank label="점수" value={pick.score} options={SCORES} onChange={(score) => onChange({ score })} />
-            {ending} 주{" "}
-            <Blank label="주 횟수" value={pick.times} options={[2, 3] as const} onChange={(times) => onChange({ times })} render={(v) => `${v}회`} /> 다닐
-            생각이에요.
+          <p className="mt-2" style={{ color: C.muted }}>
+            학년마다 수학, 영어 각각 세 반을 운영합니다. 반은 레벨테스트와 원장 상담 뒤에 정합니다.
           </p>
-
-          <div className="mt-5 border-t pt-5" style={{ borderColor: C.line }} aria-live="polite">
-            {matched ? (
-              <div className="grid gap-4 md:grid-cols-[1fr_auto] md:items-center">
-                <div>
-                  <p className="text-[15px] font-semibold" style={{ color: C.muted }}>
-                    맞는 반
-                  </p>
-                  <p className="text-[22px] font-bold md:text-[24px]">
-                    <Marked>{className(matched)}</Marked>
-                  </p>
-                  <p className="mt-1 tabular-nums">
-                    {daysText(matched, pick.times)} {timeOf(matched, SUBJECT_DAYS[matched.subject][0]).join("~")}
-                    {pick.times === 3 && matched.subject === "영어" && <span style={{ color: C.muted }}> (토 {timeOf(matched, 6).join("~")})</span>}
-                    <span style={{ color: C.muted }}>, 정원 {matched.cap}명</span>
-                  </p>
-                  {altClass && (
-                    <p className="mt-1 text-[15px]" style={{ color: C.muted }}>
-                      레벨테스트 결과에 따라 {altClass.level}({altClass.left > 0 ? `${altClass.left}자리 남음` : "마감"})으로 배정할 수 있습니다.
-                    </p>
-                  )}
-                </div>
-                <div className="flex flex-wrap items-center gap-3">
-                  <SeatBadge left={matched.left} large />
-                  <button
-                    type="button"
-                    onClick={() => goTo("leveltest")}
-                    className="inline-flex h-12 items-center rounded-[4px] px-5 text-[17px] font-bold transition-colors hover:bg-[#142a22]"
-                    style={{ background: C.board, color: C.onBoard }}
-                  >
-                    {matched.left > 0 ? "레벨테스트 예약" : "대기 신청하고 레벨테스트 예약"}
-                  </button>
-                </div>
-              </div>
-            ) : (
-              <p>
-                {unknown && (
-                  <>
-                    <span className="font-bold">{pick.grade} {pick.subject}</span>{pick.subject === "수학" ? "은" : "는"} 심화반, 정규반, 기초반이 있습니다. 레벨테스트 뒤 원장 상담에서 반을 정합니다.{" "}
-                  </>
-                )}
-                <button type="button" onClick={() => goTo("leveltest")} className="font-bold underline underline-offset-4" style={{ color: C.board }}>
-                  레벨테스트 예약
-                </button>
-              </p>
-            )}
+          <div tabIndex={0} role="region" aria-label="반 편성 안내" className="mt-5 overflow-x-auto rounded-[6px] border" style={{ borderColor: C.line }}>
+            <table className="w-full min-w-[560px] border-collapse text-[16px]">
+              <thead>
+                <tr className="text-[14px]" style={{ background: C.boardSoft, color: C.muted }}>
+                  {["반", "대상", "수업 내용", "정원"].map((h) => (
+                    <th key={h} scope="col" className="whitespace-nowrap px-4 py-2.5 text-left font-semibold">
+                      {h}
+                    </th>
+                  ))}
+                </tr>
+              </thead>
+              <tbody>
+                {LEVEL_INFO.map((l) => (
+                  <tr key={l.level} className="border-t" style={{ borderColor: C.line }}>
+                    <th scope="row" className="whitespace-nowrap px-4 py-3 text-left font-bold">
+                      {l.level}
+                    </th>
+                    <td className="px-4 py-3">{l.who}</td>
+                    <td className="px-4 py-3">{l.what}</td>
+                    <td className="whitespace-nowrap px-4 py-3 tabular-nums">
+                      초등 {CAP.초등}명, 중등 {CAP.중등}명
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
           </div>
+          <button
+            type="button"
+            onClick={() => goTo("leveltest")}
+            className="mt-5 inline-flex h-12 items-center rounded-[4px] px-5 text-[17px] font-bold transition-colors hover:bg-[#142a22]"
+            style={{ background: C.board, color: C.onBoard }}
+          >
+            레벨테스트 예약
+          </button>
         </div>
 
-        <Timetable grade={viewGrade} onView={onView} pick={pick} matched={matched} unknown={unknown} />
+        <Timetable grade={viewGrade} onView={onView} />
       </div>
     </section>
   );
 }
 
-/** 형광펜으로 칠한 글자. 칠하는 움직임은 동작 줄이기 설정이면 생략한다. */
-function Marked({ children, delay = 0 }: { children: React.ReactNode; delay?: number }) {
-  const reduce = useReducedMotionSafe();
-  return (
-    <span className="relative inline-block">
-      <motion.span
-        aria-hidden
-        className="absolute -inset-x-1 bottom-[0.08em] top-[0.35em] -skew-x-6 rounded-[2px]"
-        style={{ background: C.marker, originX: 0 }}
-        initial={reduce ? false : { scaleX: 0 }}
-        animate={{ scaleX: 1 }}
-        transition={{ duration: 0.45, ease: EASE, delay }}
-      />
-      <span className="relative">{children}</span>
-    </span>
-  );
-}
-
-function SeatBadge({ left, large = false }: { left: number; large?: boolean }) {
-  const full = left <= 0;
-  return (
-    <span
-      className={`inline-flex items-center whitespace-nowrap rounded-[4px] border font-semibold tabular-nums ${large ? "h-12 px-4 text-[17px]" : "px-1.5 text-[14px]"}`}
-      style={full ? { borderColor: C.red, color: C.red } : { borderColor: C.line, color: C.ink }}
-    >
-      {full ? "마감" : `${left}자리 남음`}
-    </span>
-  );
-}
-
-function Timetable({
-  grade,
-  onView,
-  pick,
-  matched,
-  unknown,
-}: {
-  grade: Grade;
-  onView: (g: Grade) => void;
-  pick: Pick;
-  matched: ClassItem | null;
-  unknown: boolean;
-}) {
+function Timetable({ grade, onView }: { grade: Grade; onView: (g: Grade) => void }) {
   const band = bandOf(grade);
   const list = CLASSES.filter((c) => c.grade === grade);
-
-  /** 이 요일 칸이 찾은 반인지: 주 2회면 세 번째 요일은 칠하지 않는다 */
-  const state = (c: ClassItem, day: number): "on" | "extra" | "maybe" | null => {
-    if (grade !== pick.grade || c.subject !== pick.subject) return null;
-    const idx = SUBJECT_DAYS[c.subject].indexOf(day);
-    if (unknown) return idx < pick.times ? "maybe" : null;
-    if (!matched || c.id !== matched.id) return null;
-    return idx < pick.times ? "on" : "extra";
-  };
 
   const cellAt = (day: number, slot: number) => list.find((c) => SUBJECT_DAYS[c.subject].includes(day) && c.slot === slot) ?? null;
 
@@ -665,37 +491,17 @@ function Timetable({
                 <th scope="row" className="py-3 text-[14px] font-semibold tabular-nums" style={{ color: C.muted }}>
                   {SLOTS[band].week[slot][0]}
                 </th>
-                {WEEK.map((d, di) => {
+                {WEEK.map((d) => {
                   const c = cellAt(d, slot);
                   if (!c) return <td key={d} className="border-l" style={{ borderColor: C.line }} />;
-                  const st = state(c, d);
                   const [s, e] = timeOf(c, d);
                   return (
-                    <td
-                      key={d}
-                      className="border-l p-2 align-top"
-                      style={{ borderColor: C.line, background: st === "on" ? "#fffbe3" : undefined, boxShadow: st === "on" ? `inset 0 0 0 2px ${C.ink}` : undefined }}
-                    >
+                    <td key={d} className="border-l p-2 align-top" style={{ borderColor: C.line }}>
                       <p className="font-bold leading-[1.4]">
-                        {st === "on" || st === "maybe" ? (
-                          <Marked key={`${c.id}-${pick.times}-${pick.score}`} delay={di * 0.06}>
-                            {c.subject} {c.level}
-                          </Marked>
-                        ) : (
-                          `${c.subject} ${c.level}`
-                        )}
+                        {c.subject} {c.level}
                       </p>
                       <p className="mt-0.5 tabular-nums" style={{ color: C.muted }}>
                         {s}~{e}
-                      </p>
-                      <p className="mt-1 flex flex-wrap items-center gap-1">
-                        <SeatBadge left={c.left} />
-                        {st === "on" && <span className="text-[14px] font-semibold">맞는 반</span>}
-                        {st === "extra" && (
-                          <span className="text-[14px]" style={{ color: C.muted }}>
-                            주 3회만
-                          </span>
-                        )}
                       </p>
                     </td>
                   );
@@ -708,7 +514,7 @@ function Timetable({
 
       {/* 좁은 화면: 요일별 목록 */}
       <ul className="mt-4 space-y-3 md:hidden">
-        {WEEK.map((d, di) => {
+        {WEEK.map((d) => {
           const items = list.filter((c) => SUBJECT_DAYS[c.subject].includes(d)).sort((a, b) => a.slot - b.slot);
           return (
             <li key={d} className="rounded-[6px] border" style={{ borderColor: C.line, background: C.card }}>
@@ -717,35 +523,15 @@ function Timetable({
               </p>
               <ul>
                 {items.map((c) => {
-                  const st = state(c, d);
                   const [s, e] = timeOf(c, d);
                   return (
-                    <li
-                      key={c.id}
-                      className="flex items-center justify-between gap-2 border-t px-4 py-2.5 first:border-t-0"
-                      style={{ borderColor: C.line, background: st === "on" ? "#fffbe3" : undefined }}
-                    >
-                      <span className="min-w-0">
-                        <span className="block font-bold">
-                          {st === "on" || st === "maybe" ? (
-                            <Marked key={`${c.id}-${pick.times}-${pick.score}`} delay={di * 0.04}>
-                              {c.subject} {c.level}
-                            </Marked>
-                          ) : (
-                            `${c.subject} ${c.level}`
-                          )}
-                          {st === "on" && <span className="ml-1.5 text-[14px] font-semibold">맞는 반</span>}
-                          {st === "extra" && (
-                            <span className="ml-1.5 text-[14px] font-normal" style={{ color: C.muted }}>
-                              주 3회만
-                            </span>
-                          )}
-                        </span>
-                        <span className="text-[15px] tabular-nums" style={{ color: C.muted }}>
-                          {s}~{e}
-                        </span>
+                    <li key={c.id} className="flex items-center justify-between gap-2 border-t px-4 py-2.5 first:border-t-0" style={{ borderColor: C.line }}>
+                      <span className="font-bold">
+                        {c.subject} {c.level}
                       </span>
-                      <SeatBadge left={c.left} />
+                      <span className="text-[15px] tabular-nums" style={{ color: C.muted }}>
+                        {s}~{e}
+                      </span>
                     </li>
                   );
                 })}
@@ -758,12 +544,13 @@ function Timetable({
   );
 }
 
+
 /* ---------- 레벨테스트 예약 ---------- */
 
 const TEST_SLOTS = { week: ["16:00", "17:30", "19:00"], sat: ["10:00", "11:30", "13:00"] };
 const TEST_MIN: Record<string, number> = { 수학: 50, 영어: 40, "수학, 영어": 90 };
 
-function LevelTest({ pick }: { pick: Pick }) {
+function LevelTest() {
   const today = useDemoToday();
   const reduce = useReducedMotionSafe();
   const [step, setStep] = useState<"pick" | "info" | "done">("pick");
@@ -772,19 +559,10 @@ function LevelTest({ pick }: { pick: Pick }) {
   const [name, setName] = useState("");
   const [school, setSchool] = useState("");
   const [phone, setPhone] = useState("");
-  const [subject, setSubject] = useState<string>(pick.subject);
-  const [grade, setGrade] = useState<Grade>(pick.grade);
+  const [subject, setSubject] = useState<string>("수학");
+  const [grade, setGrade] = useState<Grade>("중2");
   const [tried, setTried] = useState(false);
   const headRef = useRef<HTMLHeadingElement>(null);
-
-  // 반 찾기에서 고른 학년과 과목을 예약서에 미리 채운다
-  useEffect(() => {
-    const frame = requestAnimationFrame(() => {
-      setGrade(pick.grade);
-      setSubject(pick.subject);
-    });
-    return () => cancelAnimationFrame(frame);
-  }, [pick.grade, pick.subject]);
 
   const days = useMemo(
     () =>
@@ -1015,19 +793,9 @@ function LevelTest({ pick }: { pick: Pick }) {
                     ))}
                   </dl>
 
-                  <p className="mt-6 text-[15px] font-semibold" style={{ color: C.muted }}>
-                    {maskPhone(phone)}로 가는 문자
+                  <p className="mt-4 text-[15px]" style={{ color: C.muted }}>
+                    예약 내용은 보호자 휴대폰으로 문자 드립니다. 일정 변경은 {TEL}로 연락 주세요.
                   </p>
-                  <div className="mt-2 max-w-[360px] rounded-[18px] p-3" style={{ background: "#e9ece8" }}>
-                    <p className="whitespace-pre-line rounded-[14px] rounded-tl-[4px] bg-white px-4 py-3 text-[15px] leading-[1.65]">
-                      {`[${ACADEMY}]
-${maskName(name)} 학생 레벨테스트 예약
-${fmtKo(chosen)} ${time}
-${subject} ${testMin}분, 원장 상담 20분
-필기구와 최근 학교 시험지를 가져와 주세요.
-일정 변경: ${TEL}`}
-                    </p>
-                  </div>
                   <button type="button" onClick={reset} className="mt-6 inline-flex h-11 items-center gap-2 rounded-[4px] border px-4 text-[16px] font-semibold" style={{ borderColor: C.line, background: C.card }}>
                     <RotateCcw size={16} aria-hidden />
                     다른 시간 예약
@@ -1075,59 +843,15 @@ function Field({ label, error = null, children }: { label: string; error?: strin
 
 /* ---------- 교습비 ---------- */
 
-function Fee({ pick, onChange }: { pick: Pick; onChange: (p: Partial<Pick>) => void }) {
-  const [both, setBoth] = useState(false);
-  const [shuttle, setShuttle] = useState(false);
-  const band = bandOf(pick.grade);
-  const other: Subject = pick.subject === "수학" ? "영어" : "수학";
-
-  const lines: [string, number][] = [[`${pick.subject} 주 ${pick.times}회`, FEES[band][pick.subject][pick.times]]];
-  if (both) lines.push([`${other} 주 ${pick.times}회`, FEES[band][other][pick.times]]);
-  if (shuttle) lines.push(["차량비", SHUTTLE_FEE]);
-  const total = lines.reduce((a, [, n]) => a + n, 0);
-
+function Fee() {
   const rows = (["초등", "중등"] as Band[]).flatMap((b) => SUBJECTS.flatMap((s) => ([2, 3] as Times[]).map((t) => ({ b, s, t }))));
-  const isOn = (r: { b: Band; s: Subject; t: Times }) => r.b === band && r.t === pick.times && (r.s === pick.subject || (both && r.s === other));
 
   return (
     <section id="fee" aria-labelledby="fee-title" className="scroll-mt-16 px-4 py-16 md:px-6 md:py-24">
       <div className="mx-auto max-w-[1200px]">
         <SectionTitle id="fee-title">교습비 안내</SectionTitle>
 
-        <div className="mt-6 grid gap-8 lg:grid-cols-[minmax(0,4fr)_minmax(0,8fr)]">
-          <div className="rounded-[10px] border p-5 md:p-6" style={{ borderColor: C.line, background: C.card }}>
-            <h3 className="text-[19px] font-bold">한 달 교습비 계산</h3>
-            <div className="mt-4 space-y-4">
-              <Seg label="학년" value={pick.grade} options={GRADES} onChange={(grade) => onChange({ grade })} cols="grid-cols-6" />
-              <Seg label="과목" value={pick.subject} options={SUBJECTS} onChange={(subject) => onChange({ subject })} cols="grid-cols-2" />
-              <Seg label="주 횟수" value={pick.times} options={[2, 3] as Times[]} onChange={(times) => onChange({ times })} cols="grid-cols-2" render={(v) => `주 ${v}회`} />
-              <div className="space-y-1">
-                <Check2 checked={both} onChange={setBoth}>
-                  {other}도 함께 다녀요
-                </Check2>
-                <Check2 checked={shuttle} onChange={setShuttle}>
-                  학원 차량을 타요
-                </Check2>
-              </div>
-            </div>
-            <dl className="mt-5 space-y-1.5 border-t pt-4 text-[16px] tabular-nums" style={{ borderColor: C.line }} aria-live="polite">
-              {lines.map(([k, v]) => (
-                <div key={k} className="flex justify-between gap-3">
-                  <dt style={{ color: C.muted }}>{k}</dt>
-                  <dd>{won(v)}</dd>
-                </div>
-              ))}
-              <div className="flex items-baseline justify-between gap-3 border-t pt-2.5" style={{ borderColor: C.line }}>
-                <dt className="font-bold">한 달 합계</dt>
-                <dd className="text-[24px] font-bold">{won(total)}</dd>
-              </div>
-            </dl>
-            <p className="mt-2 text-[15px]" style={{ color: C.muted }}>
-              교재비 별도. 교재는 시중 교재로 학기 초에 직접 구입합니다(1권 13,000~18,000원).
-            </p>
-          </div>
-
-          <div className="min-w-0">
+        <div className="mt-6 min-w-0">
             <div tabIndex={0} role="region" aria-labelledby="fee-caption" className="overflow-x-auto rounded-[6px] border" style={{ borderColor: C.line, background: C.card }}>
               <table className="w-full min-w-[640px] border-collapse text-[15px]">
                 <caption id="fee-caption" className="px-4 pb-1 pt-4 text-left">
@@ -1147,20 +871,18 @@ function Fee({ pick, onChange }: { pick: Pick; onChange: (p: Partial<Pick>) => v
                 </thead>
                 <tbody className="tabular-nums">
                   {rows.map((r) => {
-                    const on = isOn(r);
                     return (
-                      <tr key={`${r.b}${r.s}${r.t}`} className="border-t" style={{ borderColor: C.line, background: on ? "#fffbe3" : undefined }}>
+                      <tr key={`${r.b}${r.s}${r.t}`} className="border-t" style={{ borderColor: C.line }}>
                         <td className="whitespace-nowrap px-3 py-2.5">{r.b}</td>
                         <th scope="row" className="whitespace-nowrap px-3 py-2.5 text-left font-semibold">
                           {r.s} 주 {r.t}회
-                          {on && <span className="sr-only"> (계산에 넣은 과목)</span>}
                         </th>
                         <td className="px-3 py-2.5">{CAP[r.b]}명</td>
                         <td className="whitespace-nowrap px-3 py-2.5">
-                          주 {r.t}회 × {MINUTES[r.b]}분
+                          주 {r.t}회, 회당 {MINUTES[r.b]}분
                         </td>
                         <td className="px-3 py-2.5">{(r.t * 4 * MINUTES[r.b]).toLocaleString("ko-KR")}분</td>
-                        <td className="px-3 py-2.5 font-semibold">{on ? <Marked key={`${pick.times}${pick.grade}${both}`}>{won(FEES[r.b][r.s][r.t])}</Marked> : won(FEES[r.b][r.s][r.t])}</td>
+                        <td className="px-3 py-2.5 font-semibold">{won(FEES[r.b][r.s][r.t])}</td>
                         <td className="whitespace-nowrap px-3 py-2.5" style={{ color: C.muted }}>
                           차량비 {won(SHUTTLE_FEE)}
                         </td>
@@ -1173,6 +895,7 @@ function Fee({ pick, onChange }: { pick: Pick; onChange: (p: Partial<Pick>) => v
             <ul className="mt-3 space-y-1 text-[15px]" style={{ color: C.muted }}>
               <li>교습비등은 ㅁㄹ교육지원청에 등록한 금액입니다. 학원 등록번호 제2026-00호.</li>
               <li>차량비는 학원 차량을 이용하는 학생만 냅니다.</li>
+              <li>교재비 별도. 교재는 시중 교재로 학기 초에 직접 구입합니다(1권 13,000~18,000원).</li>
             </ul>
             <details className="group mt-4 rounded-[6px] border" style={{ borderColor: C.line, background: C.card }}>
               <summary className="flex h-12 cursor-pointer list-none items-center justify-between px-4 font-semibold [&::-webkit-details-marker]:hidden">
@@ -1198,225 +921,105 @@ function Fee({ pick, onChange }: { pick: Pick; onChange: (p: Partial<Pick>) => v
                 </tbody>
               </table>
             </details>
-          </div>
         </div>
       </div>
     </section>
   );
 }
 
-function Seg<T extends string | number>({
-  label,
-  value,
-  options,
-  onChange,
-  cols,
-  render = (v) => String(v),
-}: {
-  label: string;
-  value: T;
-  options: readonly T[];
-  onChange: (v: T) => void;
-  cols: string;
-  render?: (v: T) => string;
-}) {
-  return (
-    <div role="group" aria-label={label}>
-      <p className="text-[15px] font-semibold" style={{ color: C.muted }} aria-hidden>
-        {label}
-      </p>
-      <div className={`mt-1.5 grid gap-1 ${cols}`}>
-        {options.map((o) => {
-          const on = o === value;
-          return (
-            <button
-              key={String(o)}
-              type="button"
-              aria-pressed={on}
-              onClick={() => onChange(o)}
-              className="h-11 min-w-0 rounded-[4px] border px-1 text-[16px] font-semibold transition-colors"
-              style={on ? { background: C.board, borderColor: C.board, color: C.onBoard } : { background: C.card, borderColor: C.line }}
-            >
-              {render(o)}
-            </button>
-          );
-        })}
-      </div>
-    </div>
-  );
-}
-
-function Check2({ checked, onChange, children }: { checked: boolean; onChange: (v: boolean) => void; children: React.ReactNode }) {
-  return (
-    <label className="flex min-h-11 cursor-pointer items-center gap-2.5">
-      <input type="checkbox" checked={checked} onChange={(e) => onChange(e.target.checked)} className="h-5 w-5 shrink-0" style={{ accentColor: C.board }} />
-      <span>{children}</span>
-    </label>
-  );
-}
 
 /* ---------- 차량 운행 ---------- */
 
-function Shuttle({ pick, matched }: { pick: Pick; matched: ClassItem | null }) {
-  const [routeId, setRouteId] = useState(ROUTES[0].id);
-  const [stopName, setStopName] = useState<string | null>(ROUTES[0].stops[2].name);
-  const route = ROUTES.find((r) => r.id === routeId)!;
-  const stop = route.stops.find((s) => s.name === stopName) ?? null;
+/* 등원 차는 수업 10분 전에 학원에 닿고, 하원 차는 수업이 끝나고 5분 뒤 출발한다. */
+const RUNS = [
+  { label: "초등 등원", sub: "14:30 수업", at: (m: number) => fmtMin(toMin("14:30") - 10 - m) },
+  { label: "중등 등원", sub: "15:30 수업", at: (m: number) => fmtMin(toMin("15:30") - 10 - m) },
+  { label: "초등 하원", sub: "19:20 끝", at: (m: number) => fmtMin(toMin("19:20") + 5 + m) },
+  { label: "중등 하원", sub: "21:50 끝", at: (m: number) => fmtMin(toMin("21:50") + 5 + m) },
+];
 
-  // 반을 못 정했으면 같은 학년·과목의 정규반 시간으로 보여 준다
-  const base = matched ?? classById(`${pick.grade}-${pick.subject}-정규반`);
-  const usedDays = SUBJECT_DAYS[base.subject].slice(0, pick.times);
-  const groups = [
-    { label: usedDays.filter((d) => d !== 6).map((d) => DAY[d]).join(", "), time: timeOf(base, usedDays[0]) },
-    ...(usedDays.includes(6) ? [{ label: "토", time: timeOf(base, 6) }] : []),
-  ];
-
+function Shuttle() {
   return (
     <section id="shuttle" aria-labelledby="shuttle-title" className="scroll-mt-16 border-y px-4 py-16 md:px-6 md:py-24" style={{ background: C.boardSoft, borderColor: C.line }}>
       <div className="mx-auto max-w-[1200px]">
         <SectionTitle id="shuttle-title">차량 운행 노선</SectionTitle>
         <p className="mt-2" style={{ color: C.muted }}>
-          15인승 2대, 어린이통학버스 신고 차량이며 모든 운행에 동승 보호자가 탑니다.
+          15인승 2대, 어린이통학버스 신고 차량이며 모든 운행에 동승 보호자가 탑니다. 평일 기준이며 토요일 시간은 상담 때 안내합니다.
         </p>
 
-        <div className="mt-6 grid gap-6 lg:grid-cols-[minmax(0,5fr)_minmax(0,7fr)]">
-          <div className="rounded-[10px] border p-5 md:p-6" style={{ borderColor: C.line, background: C.card }}>
-            <div role="group" aria-label="노선" className="grid grid-cols-2 gap-1.5">
-              {ROUTES.map((r) => (
-                <button
-                  key={r.id}
-                  type="button"
-                  aria-pressed={r.id === routeId}
-                  onClick={() => {
-                    setRouteId(r.id);
-                    setStopName(null);
-                  }}
-                  className="flex min-h-[56px] flex-col items-start justify-center rounded-[4px] border px-3 text-left"
-                  style={r.id === routeId ? { background: C.board, borderColor: C.board, color: C.onBoard } : { background: C.card, borderColor: C.line }}
-                >
-                  <span className="font-bold">{r.name}</span>
-                  <span className="text-[14px]" style={{ opacity: 0.85 }}>
+        <div className="mt-6 grid gap-6 lg:grid-cols-[minmax(0,8fr)_minmax(0,4fr)]">
+          <div className="min-w-0 space-y-6">
+            {ROUTES.map((r) => (
+              <div key={r.id} className="rounded-[10px] border" style={{ borderColor: C.line, background: C.card }}>
+                <h3 className="flex flex-wrap items-baseline gap-x-2 px-5 pt-4 text-[19px] font-bold">
+                  <Bus size={18} aria-hidden className="self-center" style={{ color: C.board }} />
+                  {r.name}
+                  <span className="text-[15px] font-normal" style={{ color: C.muted }}>
                     {r.area}
                   </span>
-                </button>
-              ))}
-            </div>
-
-            <ol className="relative mt-5" aria-label={`${route.name} 정류장`}>
-              <span aria-hidden className="absolute bottom-6 left-[15px] top-6 w-[3px] rounded-full" style={{ background: C.board, opacity: 0.25 }} />
-              {route.stops.map((s) => {
-                const on = s.name === stopName;
-                return (
-                  <li key={s.name} className="relative">
-                    <button
-                      type="button"
-                      aria-pressed={on}
-                      onClick={() => setStopName(s.name)}
-                      className="flex min-h-12 w-full items-center gap-3 rounded-[4px] py-1.5 pr-2 text-left transition-colors hover:bg-black/[0.03]"
-                    >
-                      <span
-                        aria-hidden
-                        className="relative z-10 grid h-[33px] w-[33px] shrink-0 place-items-center rounded-full border-[3px]"
-                        style={on ? { background: C.marker, borderColor: C.ink } : { background: C.card, borderColor: C.board }}
-                      >
-                        {on && <Bus size={15} />}
-                      </span>
-                      <span className={`flex-1 ${on ? "font-bold" : ""}`}>{s.name}</span>
-                      <span className="text-[15px] tabular-nums" style={{ color: C.muted }}>
-                        학원까지 {s.min}분
-                      </span>
-                    </button>
-                  </li>
-                );
-              })}
-              <li className="relative flex min-h-12 items-center gap-3 py-1.5">
-                <span aria-hidden className="relative z-10 grid h-[33px] w-[33px] shrink-0 place-items-center rounded-[6px]" style={{ background: C.board, color: C.onBoard }}>
-                  <span className="text-[13px] font-bold">학원</span>
-                </span>
-                <span className="font-semibold">{ACADEMY}</span>
-              </li>
-            </ol>
-          </div>
-
-          <div className="flex flex-col gap-6">
-            <div className="rounded-[10px] border p-5 md:p-6" style={{ borderColor: C.line, background: C.card }} aria-live="polite">
-              {stop ? (
-                <>
-                  <p className="text-[15px] font-semibold" style={{ color: C.muted }}>
-                    {className(base)} 기준
-                  </p>
-                  <h3 className="mt-0.5 text-[21px] font-bold">{stop.name}</h3>
-                  <table className="mt-4 w-full text-[16px] tabular-nums">
-                    <caption className="sr-only">{stop.name} 탑승, 하원 시간</caption>
+                </h3>
+                <div tabIndex={0} role="region" aria-label={`${r.name} 정류장별 시간`} className="mt-2 overflow-x-auto">
+                  <table className="w-full min-w-[560px] border-collapse text-[15px] tabular-nums">
                     <thead>
-                      <tr className="text-[14px]" style={{ color: C.muted }}>
-                        <th scope="col" className="pb-2 text-left font-semibold">
-                          요일
+                      <tr className="border-b text-[14px]" style={{ borderColor: C.line, color: C.muted }}>
+                        <th scope="col" className="px-5 py-2.5 text-left font-semibold">
+                          정류장
                         </th>
-                        <th scope="col" className="pb-2 text-left font-semibold">
-                          수업
-                        </th>
-                        <th scope="col" className="pb-2 text-left font-semibold">
-                          등원 탑승
-                        </th>
-                        <th scope="col" className="pb-2 text-left font-semibold">
-                          하원 도착
-                        </th>
+                        {RUNS.map((run) => (
+                          <th key={run.label} scope="col" className="whitespace-nowrap px-3 py-2.5 text-left font-semibold">
+                            <span className="block">{run.label}</span>
+                            <span className="block font-normal">{run.sub}</span>
+                          </th>
+                        ))}
                       </tr>
                     </thead>
                     <tbody>
-                      {groups.map((g) => {
-                        const [s, e] = g.time;
-                        return (
-                          <tr key={g.label} className="border-t" style={{ borderColor: C.line }}>
-                            <th scope="row" className="py-3 pr-2 text-left font-semibold">
-                              {g.label}
-                            </th>
-                            <td className="py-3 pr-2" style={{ color: C.muted }}>
-                              {s}~{e}
+                      {r.stops.map((s) => (
+                        <tr key={s.name} className="border-t" style={{ borderColor: C.line }}>
+                          <th scope="row" className="px-5 py-2.5 text-left font-semibold">
+                            {s.name}
+                          </th>
+                          {RUNS.map((run) => (
+                            <td key={run.label} className="px-3 py-2.5">
+                              {run.at(s.min)}
                             </td>
-                            <td className="py-3 pr-2 text-[20px] font-bold">{fmtMin(toMin(s) - 10 - stop.min)}</td>
-                            <td className="py-3 text-[20px] font-bold">{fmtMin(toMin(e) + 5 + stop.min)}</td>
-                          </tr>
-                        );
-                      })}
+                          ))}
+                        </tr>
+                      ))}
                     </tbody>
                   </table>
-                  <p className="mt-3 text-[15px]" style={{ color: C.muted }}>
-                    차는 정류장에서 1분 기다립니다. 늦으면 차량 기사님 번호로 문자 주세요.
-                  </p>
-                </>
-              ) : (
-                <p className="py-6 text-center" style={{ color: C.muted }}>
-                  정류장을 고르면 등원, 하원 시간이 나옵니다.
-                </p>
-              )}
-            </div>
+                </div>
+              </div>
+            ))}
+            <p className="text-[15px]" style={{ color: C.muted }}>
+              차는 정류장에서 1분 기다립니다. 늦으면 차량 기사님 번호로 문자 주세요.
+            </p>
+          </div>
 
-            <div className="rounded-[10px] border p-5 md:p-6" style={{ borderColor: C.line, background: C.card }}>
-              <h3 className="text-[19px] font-bold">학원 위치</h3>
-              <dl className="mt-3 space-y-1.5 text-[16px]">
-                {[
-                  ["주소", ADDRESS],
-                  ["걸어서", "ㅁㄹ역 2번 출구에서 5분, ㄷㅊ중 정문 건너편 건물"],
-                  ["주차", "건물 지하 1층, 상담 방문 1시간 무료"],
-                  ["전화", TEL],
-                ].map(([k, v]) => (
-                  <div key={k} className="grid grid-cols-[72px_1fr] gap-3">
-                    <dt className="font-semibold" style={{ color: C.muted }}>
-                      {k}
-                    </dt>
-                    <dd>{k === "전화" ? <a href={`tel:${TEL}`} className="font-semibold underline underline-offset-4">{v}</a> : v}</dd>
-                  </div>
-                ))}
-              </dl>
-            </div>
+          <div className="h-fit rounded-[10px] border p-5 md:p-6" style={{ borderColor: C.line, background: C.card }}>
+            <h3 className="text-[19px] font-bold">학원 위치</h3>
+            <dl className="mt-3 space-y-1.5 text-[16px]">
+              {[
+                ["주소", ADDRESS],
+                ["걸어서", "ㅁㄹ역 2번 출구에서 5분, ㄷㅊ중 정문 건너편 건물"],
+                ["주차", "건물 지하 1층, 상담 방문 1시간 무료"],
+                ["전화", TEL],
+              ].map(([k, v]) => (
+                <div key={k} className="grid grid-cols-[72px_1fr] gap-3">
+                  <dt className="font-semibold" style={{ color: C.muted }}>
+                    {k}
+                  </dt>
+                  <dd>{k === "전화" ? <a href={`tel:${TEL}`} className="font-semibold underline underline-offset-4">{v}</a> : v}</dd>
+                </div>
+              ))}
+            </dl>
           </div>
         </div>
       </div>
     </section>
   );
 }
+
 
 /* ---------- 반별 성적 변화 ---------- */
 

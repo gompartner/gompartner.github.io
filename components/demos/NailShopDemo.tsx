@@ -1,8 +1,8 @@
 "use client";
 
-import { useCallback, useEffect, useId, useMemo, useRef, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { AnimatePresence, motion } from "framer-motion";
-import { CalendarCheck, Car, Check, CircleAlert, Clock, Download, MapPin, Paperclip, RotateCcw, X } from "lucide-react";
+import { CalendarCheck, Car, Check, CircleAlert, Clock, MapPin, X } from "lucide-react";
 import { useReducedMotionSafe } from "@/hooks/useReducedMotionSafe";
 import { maskName, maskPhone } from "@/components/demos/LeadReceivedPanel";
 import { daysAgo, fmtKo, useDemoToday } from "@/hooks/useDemoToday";
@@ -10,31 +10,26 @@ import { DemoMakerInfo } from "@/components/demos/DemoMakerInfo";
 
 /* 네일샵 홈페이지 샘플: 가상의 곰파트너 네일샵. 젤네일, 패디, 케어, 아트.
    상호, 주소, 직원 이름은 모두 가상이다.
-   첫 화면 사진과 칠해 보기 손 사진은 AI 생성(Z-Image-Turbo)
+   첫 화면 사진과 이달의 아트 사진은 AI 생성(Z-Image-Turbo)
 
    국내 네일샵 홈페이지와 네이버 예약의 공통 구성을 따랐다.
-   메뉴는 디자인 둘러보기, 시술 메뉴와 가격, 예약하기, 오시는 길 네 개.
-   첫 화면에는 디자인 사진과 가격표, 예약 버튼이 같이 있고, 시술 메뉴는 젤 제거, 케어, 원컬러, 아트(손톱당), 패디로 나뉜다.
-   예약은 날짜, 시간, 담당 디자이너를 고르고 이름과 휴대폰을 남긴다. 변경과 취소는 하루 전까지가 관용 문구다.
+   메뉴는 이달의 아트, 시술 가격, 예약하기, 오시는 길 네 개.
+   첫 화면에는 이달의 아트 사진과 가격표, 예약 버튼이 같이 있고, 시술 메뉴는 젤 제거, 케어, 원컬러, 아트(손톱당), 패디로 나뉜다.
+   예약은 날짜, 시간, 담당 디자이너, 시술을 고르고 이름과 휴대폰을 남긴다. 변경과 취소는 하루 전까지가 관용 문구다.
 
-   핵심 모션
-   - 첫 화면(ns-poster): 왼쪽 가격 판과 오른쪽 이달의 아트 손 사진 3x3. 칸을 누르면 그 칸 자리에서 240ms 동안 크게 열린다.
-   - 컬러칩을 누르면 칩이 손톱 자리까지 날아가 붙고(layoutId) 손톱 색이 320ms 동안 그 색으로 바뀐다.
-     선택 테두리 링도 layoutId 로 칩 사이를 옮겨 다닌다. 아트는 손톱 위 패턴 레이어가 교차 전환한다.
-   동작 줄이기가 켜져 있으면 첫 화면은 멈춘 사진, 나머지는 전부 즉시 바뀐다.
+   모션
+   - 이달의 아트 칸을 누르면 사진을 크게 보는 창이 짧게 나타난다. 동작 줄이기가 켜져 있으면 바로 바뀐다.
 
    상호작용(모두 브라우저 안에서만 돈다. 실제로 보내지 않는다)
-   1. 컬러칩과 손톱 색 입히기: 전체 또는 손톱 하나씩. 되돌리기.
-   2. 아트와 시술 메뉴: 베이스(젤 원컬러, 젤 그라데이션)와 아트 개수로 시술 시간과 금액 합산. 케어, 젤 제거 포함 여부.
-   3. 디자인 저장: 손 그림을 PNG 로 내려받고 예약에 첨부된 것으로 표시.
-   4. 예약: 날짜(오늘부터 7일), 시간, 담당, 이름, 휴대폰. 접수 완료 화면.
-   5. 샵 안내와 오시는 길: 영업시간(오늘 요일 진하게), 주차, 예약제. */
+   1. 이달의 아트 크게 보기, 이 아트로 예약(요청 사항에 아트 이름이 들어간다).
+   2. 예약: 날짜(오늘부터 7일), 시간, 담당, 시술, 이름, 휴대폰. 접수 완료 화면.
+   3. 샵 안내와 오시는 길: 영업시간(오늘 요일 진하게), 주차, 예약제. */
 
 const IMG = "/images/demo-nail-shop";
 
-const BRAND = "곰파트너";
+const BRAND = "네일샵";
 const ADDRESS = "서울 ㅇㅇ구 ㅇㅇ로 00, 3층";
-const KAKAO = "카카오톡 채널 곰파트너";
+const KAKAO = "카카오톡 채널 네일샵";
 
 /** 320ms, 부드럽게 멈추는 곡선 */
 const DUR = 0.32;
@@ -47,51 +42,21 @@ const C = {
   plum: "#111111",
   plumSoft: "#767676",
   accent: "#9a5b6a",
-  rose: "#c98d9b",
   roseSoft: "#f4eef0",
   line: "#e5e5e5",
-  skin: "#f1ddd0",
-  skinLine: "#d6bcab",
   error: "#b42318",
 };
 const focusRing = "focus-visible:outline focus-visible:outline-[3px] focus-visible:outline-offset-2";
 const won = (n: number) => `${n.toLocaleString("ko-KR")}원`;
 const p2 = (n: number) => String(n).padStart(2, "0");
 
-/* 색과 메뉴 */
 
-const CHIPS: { name: string; hex: string }[] = [
-  { name: "밀크", hex: "#f6eee8" },
-  { name: "베이비핑크", hex: "#f7c9d4" },
-  { name: "피치", hex: "#f7c59f" },
-  { name: "살몬", hex: "#f4a58a" },
-  { name: "코랄", hex: "#f08a7e" },
-  { name: "버터", hex: "#f3e2a2" },
-  { name: "머스타드", hex: "#d9a441" },
-  { name: "세이지", hex: "#a8b8a0" },
-  { name: "올리브", hex: "#8a9a5b" },
-  { name: "민트", hex: "#9fd8cb" },
-  { name: "스카이", hex: "#9cc7e6" },
-  { name: "네이비", hex: "#2f3f6b" },
-  { name: "라벤더", hex: "#c3b1e1" },
-  { name: "라일락", hex: "#b78ccf" },
-  { name: "플럼", hex: "#6b2d5c" },
-  { name: "버건디", hex: "#7a1f2e" },
-  { name: "체리", hex: "#c0243a" },
-  { name: "레드", hex: "#d7392f" },
-  { name: "브릭", hex: "#a8503a" },
-  { name: "카멜", hex: "#b98b5e" },
-  { name: "모카", hex: "#7b5a44" },
-  { name: "토프", hex: "#a89a8c" },
-  { name: "그레이", hex: "#8d8d93" },
-  { name: "블랙", hex: "#1f1d21" },
-];
+/* 메뉴 */
 
-type ArtId = "none" | "french" | "grad" | "glitter" | "pearl" | "flower" | "check" | "marble" | "chrome" | "magnet";
+type ArtId = "none" | "french" | "glitter" | "pearl" | "flower" | "check" | "marble" | "chrome" | "magnet";
 const ARTS: { id: ArtId; label: string; price: number }[] = [
   { id: "none", label: "없음", price: 0 },
   { id: "french", label: "프렌치", price: 3000 },
-  { id: "grad", label: "그라데이션", price: 4000 },
   { id: "glitter", label: "글리터", price: 4000 },
   { id: "pearl", label: "진주 펄", price: 5000 },
   { id: "flower", label: "꽃", price: 5000 },
@@ -102,32 +67,41 @@ const ARTS: { id: ArtId; label: string; price: number }[] = [
 ];
 const artOf = (id: ArtId) => ARTS.find((a) => a.id === id)!;
 
-/** 이달의 아트 9개. 사진(art-*.jpg)마다 칠해 보기 손에 올릴 아트와 바탕색(CHIPS 순번) */
-type Monthly = { img: string; name: string; art: ArtId; chip: number; alt: string };
+/** 이달의 아트 9개. 사진(art-*.jpg)마다 아트 종류 */
+type Monthly = { img: string; name: string; art: ArtId; alt: string };
 const MONTHLY: Monthly[] = [
-  { img: "art-french", name: "누드 프렌치", art: "french", chip: 1, alt: "연한 분홍 바탕에 흰 끝선을 넣은 프렌치 네일" },
-  { img: "art-glitter", name: "핑크 글리터", art: "glitter", chip: 1, alt: "분홍 바탕에 잔 글리터를 올린 네일" },
-  { img: "art-magnet", name: "버건디 마그네틱", art: "magnet", chip: 15, alt: "버건디 바탕에 빛줄기가 도는 마그네틱 네일" },
-  { img: "art-nude", name: "누드 원컬러", art: "none", chip: 0, alt: "맑은 누드 톤 원컬러 네일" },
-  { img: "art-marble", name: "화이트 마블", art: "marble", chip: 0, alt: "흰 바탕에 회색 결을 그린 마블 네일" },
-  { img: "art-flower", name: "데이지 포인트", art: "flower", chip: 1, alt: "분홍 바탕 두 손톱에 흰 꽃을 그린 네일" },
-  { img: "art-check", name: "브라운 체크", art: "check", chip: 20, alt: "누드 바탕에 갈색 체크를 넣은 네일" },
-  { img: "art-chrome", name: "실버 크롬", art: "chrome", chip: 22, alt: "은색으로 빛나는 크롬 네일" },
-  { img: "art-pearl", name: "진주 펄 프렌치", art: "pearl", chip: 0, alt: "누드 바탕에 진주빛 펄을 올린 네일" },
+  { img: "art-french", name: "누드 프렌치", art: "french", alt: "연한 분홍 바탕에 흰 끝선을 넣은 프렌치 네일" },
+  { img: "art-glitter", name: "핑크 글리터", art: "glitter", alt: "분홍 바탕에 잔 글리터를 올린 네일" },
+  { img: "art-magnet", name: "버건디 마그네틱", art: "magnet", alt: "버건디 바탕에 빛줄기가 도는 마그네틱 네일" },
+  { img: "art-nude", name: "누드 원컬러", art: "none", alt: "맑은 누드 톤 원컬러 네일" },
+  { img: "art-marble", name: "화이트 마블", art: "marble", alt: "흰 바탕에 회색 결을 그린 마블 네일" },
+  { img: "art-flower", name: "데이지 포인트", art: "flower", alt: "분홍 바탕 두 손톱에 흰 꽃을 그린 네일" },
+  { img: "art-check", name: "브라운 체크", art: "check", alt: "누드 바탕에 갈색 체크를 넣은 네일" },
+  { img: "art-chrome", name: "실버 크롬", art: "chrome", alt: "은색으로 빛나는 크롬 네일" },
+  { img: "art-pearl", name: "진주 펄 프렌치", art: "pearl", alt: "누드 바탕에 진주빛 펄을 올린 네일" },
 ];
 
-type BaseId = "one" | "grad";
-const BASES: { id: BaseId; label: string; price: number; min: number }[] = [
-  { id: "one", label: "젤 원컬러", price: 40000, min: 60 },
-  { id: "grad", label: "젤 그라데이션", price: 50000, min: 75 },
+const BASES = [
+  { label: "젤 원컬러", price: 40000 },
+  { label: "젤 그라데이션", price: 50000 },
 ];
-const CARE = { price: 15000, min: 20 };
-const REMOVE = { price: 10000, min: 15 };
+const CARE = { price: 15000 };
+const REMOVE = { price: 10000 };
 
 const MENU: { group: string; rows: [string, string][] }[] = [
   { group: "손", rows: [["젤 제거", "10,000원"], ["손 케어", "15,000원"], ["젤 원컬러", "40,000원"], ["젤 그라데이션", "50,000원"], ["아트 (손톱당)", "3,000원~8,000원"]] },
   { group: "패디", rows: [["패디 케어", "25,000원"], ["패디 젤 원컬러", "50,000원"], ["패디 아트 (발톱당)", "3,000원~8,000원"]] },
 ];
+
+/** 회원권. 충전 금액에 따라 추가 적립 */
+const PASSES: [string, string][] = [
+  ["20만원 충전", "2만원 추가 적립"],
+  ["30만원 충전", "4만원 추가 적립"],
+  ["50만원 충전", "8만원 추가 적립"],
+];
+
+/** 예약할 때 고르는 시술 */
+const SERVICES = ["젤 원컬러", "젤 그라데이션", "이달의 아트", "손 케어만", "패디 젤 원컬러", "패디 케어만"];
 
 const STAFF = [
   { role: "원장", name: "박ㅅ연" },
@@ -147,184 +121,10 @@ function booked(dayIdx: number, hour: number, staff: number) {
   return h < 28 + busy;
 }
 
-/* 손 모양 */
-
-const VB = { w: 340, h: 420 };
-/** 손 사진(hand.jpg, 520x642를 viewBox 340x420에 맞춤) 위 손톱 자리. cx와 top은 손톱 가운데 위쪽 끝, rot은 손톱 가운데를 기준으로 돌린 각도 */
-type Finger = { name: string; cx: number; top: number; w: number; h: number; rot: number; pivot: [number, number] };
-const FINGERS: Finger[] = [
-  { name: "엄지", cx: 44.5, top: 201.4, w: 19.6, h: 28.8, rot: -28, pivot: [44.5, 215.8] },
-  { name: "검지", cx: 132.4, top: 49.7, w: 22.9, h: 32, rot: 0, pivot: [0, 0] },
-  { name: "중지", cx: 190.3, top: 31.4, w: 27.5, h: 34, rot: 0, pivot: [0, 0] },
-  { name: "약지", cx: 234.1, top: 62.1, w: 24.2, h: 32.7, rot: 0, pivot: [0, 0] },
-  { name: "소지", cx: 289.6, top: 127.5, w: 18.3, h: 26.2, rot: 3, pivot: [289.6, 140.6] },
-];
-
-function nailGeo(f: Finger) {
-  return { cx: f.cx, w: f.w, h: f.h, top: f.top };
-}
-
-/** 위는 반원(손톱 끝), 아래는 완만한 호(큐티클 선) */
-function nailPath(cx: number, top: number, w: number, h: number) {
-  const l = cx - w / 2;
-  const r = cx + w / 2;
-  const b = top + h;
-  const rt = w / 2;
-  const rb = w * 0.32;
-  return `M${l} ${top + rt} A${rt} ${rt} 0 0 1 ${r} ${top + rt} L${r} ${b - rb} A${rt} ${rb} 0 0 1 ${l} ${b - rb} Z`;
-}
-
-/** 점 (px, py)를 (cx, cy) 기준으로 deg 만큼 돌린다 */
-function rot(px: number, py: number, cx: number, cy: number, deg: number) {
-  const a = (deg * Math.PI) / 180;
-  const dx = px - cx;
-  const dy = py - cy;
-  return { x: cx + dx * Math.cos(a) - dy * Math.sin(a), y: cy + dx * Math.sin(a) + dy * Math.cos(a) };
-}
-
-/** 손톱 가운데 점을 화면 비율(%)로. 날아가는 칩이 내려앉는 자리 */
-function nailAnchor(i: number) {
-  const f = FINGERS[i];
-  const g = nailGeo(f);
-  const c = rot(g.cx, g.top + g.h / 2, f.pivot[0], f.pivot[1], f.rot);
-  // 회전은 빼고 가운데 점 기준 상자만 넘긴다. layoutId 전환은 부모 회전을 모르기 때문이다.
-  return { left: ((c.x - g.w / 2) / VB.w) * 100, top: ((c.y - g.h / 2) / VB.h) * 100, w: (g.w / VB.w) * 100, h: (g.h / VB.h) * 100 };
-}
-
-type Nail = { color: string; art: ArtId };
-/** 처음에는 다섯 손톱 모두 베이비핑크 원컬러 */
-const START: Nail[] = Array.from({ length: 5 }, () => ({ color: CHIPS[1].hex, art: "none" }));
-
-type Fly = { key: number; color: string; chip: number; nail: number; phase: "chip" | "nail" };
-
 export function NailShopDemo() {
   const today = useDemoToday();
   const reduce = useReducedMotionSafe();
-  const uid = useId().replace(/:/g, "");
-
-  const [nails, setNails] = useState<Nail[]>(START);
-  const [hist, setHist] = useState<Nail[][]>([]);
-  const [target, setTarget] = useState<number | null>(null); // null = 전체
-  const [chip, setChip] = useState(1);
-  const [base, setBase] = useState<BaseId>("one");
-  const [care, setCare] = useState(false);
-  const [remove, setRemove] = useState(false);
-  const [fly, setFly] = useState<Fly | null>(null);
-  const [saved, setSaved] = useState<{ url: string; at: string } | null>(null);
   const [artNote, setArtNote] = useState<string | null>(null);
-  const svgRef = useRef<SVGSVGElement>(null);
-  const flyKey = useRef(0);
-
-  const push = useCallback((next: (prev: Nail[]) => Nail[]) => {
-    setNails((prev) => {
-      setHist((h) => [...h.slice(-29), prev]);
-      return next(prev);
-    });
-  }, []);
-
-  const undo = () => {
-    setHist((h) => {
-      if (!h.length) return h;
-      setNails(h[h.length - 1]);
-      return h.slice(0, -1);
-    });
-  };
-
-  const paint = (ci: number) => {
-    const hex = CHIPS[ci].hex;
-    setChip(ci);
-    push((prev) => prev.map((n, i) => (target === null || target === i ? { ...n, color: hex } : n)));
-    if (reduce) return;
-    flyKey.current += 1;
-    setFly({ key: flyKey.current, color: hex, chip: ci, nail: target ?? 2, phase: "chip" });
-  };
-
-  // 칩 자리에 먼저 그린 뒤 다음 프레임에 손톱 자리로 옮긴다. 같은 layoutId 라 날아가는 것처럼 보인다.
-  useEffect(() => {
-    if (!fly || fly.phase !== "chip") return;
-    const a = requestAnimationFrame(() => requestAnimationFrame(() => setFly((f) => (f && f.key === fly.key ? { ...f, phase: "nail" } : f))));
-    return () => cancelAnimationFrame(a);
-  }, [fly]);
-
-  const setArt = (art: ArtId) => {
-    push((prev) => prev.map((n, i) => (target === null || target === i ? { ...n, art } : n)));
-  };
-
-  const pickBase = (b: BaseId) => {
-    setBase(b);
-    if (b === "grad") push((prev) => prev.map((n) => ({ ...n, art: "grad" })));
-  };
-
-  const bill = useMemo(() => {
-    const b = BASES.find((x) => x.id === base)!;
-    let art = 0;
-    let artNails = 0;
-    nails.forEach((n) => {
-      if (n.art === "none") return;
-      if (base === "grad" && n.art === "grad") return;
-      artNails += 1;
-      art += ARTS.find((a) => a.id === n.art)!.price;
-    });
-    const price = b.price + art * 2 + (care ? CARE.price : 0) + (remove ? REMOVE.price : 0);
-    const min = b.min + artNails * 5 * 2 + (care ? CARE.min : 0) + (remove ? REMOVE.min : 0);
-    return { price, min, art: art * 2, artNails: artNails * 2, baseLabel: b.label, basePrice: b.price };
-  }, [nails, base, care, remove]);
-
-  // 손 그림을 PNG 로. 화면의 SVG 를 복사해 손톱 색을 상태 값으로 고정하고 캔버스에 그린다.
-  const savePng = async () => {
-    const src = svgRef.current;
-    if (!src) return;
-    const clone = src.cloneNode(true) as SVGSVGElement;
-    clone.querySelectorAll("[data-skip-export]").forEach((el) => el.remove());
-    clone.querySelectorAll<SVGElement>("[data-nail-base]").forEach((el) => {
-      const i = Number(el.getAttribute("data-nail-base"));
-      el.setAttribute("fill", nails[i].color);
-      el.removeAttribute("style");
-    });
-    clone.querySelectorAll<SVGElement>("[data-art-layer]").forEach((el) => {
-      el.removeAttribute("style");
-      el.setAttribute("opacity", "1");
-    });
-    clone.setAttribute("width", String(VB.w * 2));
-    clone.setAttribute("height", String(VB.h * 2));
-    clone.setAttribute("xmlns", "http://www.w3.org/2000/svg");
-    const xml = new XMLSerializer().serializeToString(clone);
-    const blob = new Blob([xml], { type: "image/svg+xml;charset=utf-8" });
-    const url = URL.createObjectURL(blob);
-    try {
-      const img = await new Promise<HTMLImageElement>((ok, no) => {
-        const im = new Image();
-        im.onload = () => ok(im);
-        im.onerror = () => no(new Error("svg"));
-        im.src = url;
-      });
-      const cv = document.createElement("canvas");
-      cv.width = VB.w * 2;
-      cv.height = VB.h * 2;
-      const ctx = cv.getContext("2d");
-      if (!ctx) return;
-      const hand = await new Promise<HTMLImageElement>((ok, no) => {
-        const im = new Image();
-        im.onload = () => ok(im);
-        im.onerror = () => no(new Error("hand"));
-        im.src = `${IMG}/hand.jpg`;
-      });
-      ctx.drawImage(hand, 0, 0, cv.width, cv.height);
-      ctx.drawImage(img, 0, 0, cv.width, cv.height);
-      ctx.fillStyle = C.plum;
-      ctx.font = "bold 22px Pretendard, sans-serif";
-      ctx.fillText(`${BRAND}  ${bill.baseLabel}  아트 ${bill.artNails}개`, 24, cv.height - 28);
-      const png = cv.toDataURL("image/png");
-      const a = document.createElement("a");
-      a.href = png;
-      a.download = "곰파트너-내-디자인.png";
-      a.click();
-      const d = new Date();
-      setSaved({ url: png, at: `${p2(d.getHours())}:${p2(d.getMinutes())}` });
-    } finally {
-      URL.revokeObjectURL(url);
-    }
-  };
 
   useEffect(() => {
     const f = () => window.scrollTo({ top: 0 });
@@ -333,9 +133,6 @@ export function NailShopDemo() {
   }, []);
 
   const go = (id: string) => document.getElementById(id)?.scrollIntoView({ behavior: reduce ? "auto" : "smooth", block: "start" });
-  const spring = reduce ? { duration: 0 } : { duration: DUR, ease: EASE };
-  const targetName = target === null ? "손톱 전체" : `${FINGERS[target].name} 손톱`;
-  const anchor = fly ? nailAnchor(fly.nail) : null;
 
   return (
     <div className="min-h-screen overflow-x-clip" style={{ background: C.bg, color: C.plum }}>
@@ -343,200 +140,18 @@ export function NailShopDemo() {
         reduce={reduce}
         month={today.getMonth() + 1}
         go={go}
-        onPick={(m, book) => {
-          setTarget(null);
-          setChip(m.chip);
-          push(() => START.map(() => ({ color: CHIPS[m.chip].hex, art: m.art })));
-          if (book) setArtNote(m.name);
-          go(book ? "ns-reserve" : "ns-design");
+        onBook={(m) => {
+          setArtNote(m.name);
+          go("ns-reserve");
         }}
       />
 
-      {/* 첫 화면: 왼쪽 손, 오른쪽 컬러칩과 아트 */}
-      <section id="ns-design" aria-labelledby="ns-design-title" className="mx-auto grid max-w-[1200px] gap-8 px-4 pt-4 md:px-6 lg:grid-cols-[minmax(0,460px)_minmax(0,1fr)] lg:gap-12 lg:pt-8">
-        <div>
-          <h2 id="ns-design-title" className="font-bold tracking-[-0.02em] text-[30px] leading-[1.2] md:text-[40px]">
-            내 손에 먼저 올려 보는 젤네일
-          </h2>
-          <div className="mt-5 flex items-center justify-between gap-3">
-            <p className="text-[15px] font-bold" aria-live="polite">
-              {targetName}에 칠해요
-            </p>
-            <button type="button" onClick={undo} disabled={!hist.length} aria-label="되돌리기" className={`inline-flex h-10 w-10 items-center justify-center rounded-[6px] border disabled:opacity-35 ${focusRing}`} style={{ borderColor: C.line, outlineColor: C.plum }}>
-              <RotateCcw size={18} aria-hidden />
-            </button>
-          </div>
-
-          <div className="relative mx-auto mt-3 w-full max-w-[440px] overflow-hidden rounded-[8px]" style={{ aspectRatio: `${VB.w} / ${VB.h}` }}>
-            <HandSvg ref={svgRef} uid={uid} nails={nails} target={target} onPick={(i) => setTarget((t) => (t === i ? null : i))} reduce={reduce} />
-            {/* 날아온 칩이 손톱 위에 내려앉는 자리 */}
-            <AnimatePresence>
-              {fly && fly.phase === "nail" && anchor && (
-                <motion.span
-                  key={`fly-${fly.key}`}
-                  layoutId={`ns-flyer-${uid}`}
-                  aria-hidden
-                  className="pointer-events-none absolute block"
-                  style={{
-                    left: `${anchor.left}%`,
-                    top: `${anchor.top}%`,
-                    width: `${anchor.w}%`,
-                    height: `${anchor.h}%`,
-                    background: fly.color,
-                    borderRadius: "50% 50% 22% 22% / 55% 55% 16% 16%",
-                  }}
-                  initial={false}
-                  animate={{ opacity: 1 }}
-                  exit={{ opacity: 0, transition: { duration: 0.18 } }}
-                  transition={spring}
-                  onLayoutAnimationComplete={() => setFly((f) => (f && f.key === fly.key ? null : f))}
-                />
-              )}
-            </AnimatePresence>
-          </div>
-
-          {/* 손톱 고르기(키보드용 포함) */}
-          <div role="group" aria-label="칠할 손톱" className="mt-3 flex flex-wrap justify-center gap-2">
-            <NailTab active={target === null} onClick={() => setTarget(null)}>
-              전체
-            </NailTab>
-            {FINGERS.map((f, i) => (
-              <NailTab key={f.name} active={target === i} onClick={() => setTarget((t) => (t === i ? null : i))}>
-                {f.name}
-              </NailTab>
-            ))}
-          </div>
-
-          <div className="mt-5 flex flex-wrap items-center gap-3">
-            <button type="button" onClick={savePng} data-gtm-cta="nail-shop_save_png" className={`inline-flex items-center gap-2 rounded-[6px] px-5 py-3 text-[15px] font-semibold text-white ${focusRing}`} style={{ background: C.accent, outlineColor: C.plum }}>
-              <Download size={18} aria-hidden />
-              내 디자인 저장
-            </button>
-            {saved && (
-              <span className="inline-flex items-center gap-2 text-[14px] font-bold">
-                <Paperclip size={16} aria-hidden />
-                {saved.at} 저장, 예약에 첨부돼요
-              </span>
-            )}
-          </div>
-        </div>
-
-        <div>
-          <div id="ns-chips" className="rounded-[8px] border p-4 md:p-5" style={{ background: C.paper, borderColor: C.line }}>
-            <div className="flex items-baseline justify-between gap-3">
-              <h2 className="font-bold tracking-[-0.02em] text-[24px]">
-                컬러칩 24색
-              </h2>
-              <p className="text-[14px] font-bold" style={{ color: C.plumSoft }}>
-                {CHIPS[chip].name}
-              </p>
-            </div>
-            <div role="radiogroup" aria-label="컬러칩" className="mt-4 grid grid-cols-6 gap-2 sm:grid-cols-8 sm:gap-3">
-              {CHIPS.map((c, i) => {
-                const on = i === chip;
-                return (
-                  <button
-                    key={c.hex}
-                    type="button"
-                    role="radio"
-                    aria-checked={on}
-                    aria-label={c.name}
-                    title={c.name}
-                    onClick={() => paint(i)}
-                    className={`relative aspect-square w-full rounded-full ${focusRing}`}
-                    style={{ background: c.hex, outlineColor: C.plum, boxShadow: `inset 0 0 0 1px rgba(17,17,17,0.14)` }}
-                  >
-                    {on && (
-                      <motion.span layoutId={`ns-ring-${uid}`} transition={spring} aria-hidden className="pointer-events-none absolute -inset-[5px] rounded-full border-2" style={{ borderColor: C.plum }} />
-                    )}
-                    {fly && fly.phase === "chip" && fly.chip === i && (
-                      <motion.span layoutId={`ns-flyer-${uid}`} transition={spring} aria-hidden className="pointer-events-none absolute inset-0 block rounded-full" style={{ background: fly.color, borderRadius: "50%" }} />
-                    )}
-                    {on && <Check size={16} aria-hidden className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2" style={{ color: isDark(c.hex) ? "#fff" : C.plum }} />}
-                  </button>
-                );
-              })}
-            </div>
-          </div>
-
-          <div id="ns-art" className="mt-4 rounded-[8px] border p-4 md:p-5" style={{ background: C.paper, borderColor: C.line }}>
-            <h2 className="font-bold tracking-[-0.02em] text-[24px]">
-              아트
-            </h2>
-            <div role="radiogroup" aria-label="아트" className="mt-3 flex flex-wrap gap-2">
-              {ARTS.map((a) => {
-                const on = target === null ? nails.every((n) => n.art === a.id) : nails[target].art === a.id;
-                const free = base === "grad" && a.id === "grad";
-                return (
-                  <button
-                    key={a.id}
-                    type="button"
-                    role="radio"
-                    aria-checked={on}
-                    onClick={() => setArt(a.id)}
-                    className={`inline-flex items-center gap-2 rounded-[6px] border px-3 py-2 text-[14px] font-bold ${focusRing}`}
-                    style={{ borderColor: on ? C.accent : C.line, background: on ? C.accent : "transparent", color: on ? "#fff" : C.plum, outlineColor: C.plum }}
-                  >
-                    <ArtSwatch art={a.id} />
-                    {a.label}
-                    {a.price > 0 && <span className="text-[12px] opacity-80">{free ? "포함" : `+${a.price.toLocaleString("ko-KR")}`}</span>}
-                  </button>
-                );
-              })}
-            </div>
-            <p className="mt-2 text-[13px]" style={{ color: C.plumSoft }}>
-              아트 금액은 손톱당. {targetName}에 적용돼요.
-            </p>
-          </div>
-
-          <div id="ns-menu" className="mt-4 rounded-[8px] border p-4 md:p-5" style={{ background: C.paper, borderColor: C.line }}>
-            <h2 className="font-bold tracking-[-0.02em] text-[24px]">
-              이 디자인 시술 금액
-            </h2>
-            <div role="radiogroup" aria-label="베이스" className="mt-3 grid grid-cols-2 gap-2">
-              {BASES.map((b) => {
-                const on = base === b.id;
-                return (
-                  <button key={b.id} type="button" role="radio" aria-checked={on} onClick={() => pickBase(b.id)} className={`rounded-[8px] border px-3 py-2.5 text-left ${focusRing}`} style={{ borderColor: on ? C.accent : C.line, background: on ? C.roseSoft : "transparent", outlineColor: C.plum }}>
-                    <span className="block text-[15px] font-bold">{b.label}</span>
-                    <span className="block text-[13px]" style={{ color: C.plumSoft }}>
-                      {won(b.price)}, {b.min}분
-                    </span>
-                  </button>
-                );
-              })}
-            </div>
-            <div className="mt-3 flex flex-wrap gap-x-5 gap-y-2 text-[15px]">
-              <Toggle checked={care} onChange={setCare} label={`손 케어 포함 (+${won(CARE.price)}, ${CARE.min}분)`} />
-              <Toggle checked={remove} onChange={setRemove} label={`기존 젤 제거 (+${won(REMOVE.price)}, ${REMOVE.min}분)`} />
-            </div>
-            <dl className="mt-4 border-t pt-3 text-[15px] leading-[1.9]" style={{ borderColor: C.line }}>
-              <Row k={bill.baseLabel} v={won(bill.basePrice)} />
-              <Row k={`아트 ${bill.artNails}개 (양손 같은 디자인 기준)`} v={won(bill.art)} />
-              {care && <Row k="손 케어" v={won(CARE.price)} />}
-              {remove && <Row k="젤 제거" v={won(REMOVE.price)} />}
-              <div className="mt-1 flex items-baseline justify-between gap-4 border-t pt-2 text-[22px]" style={{ borderColor: C.line }}>
-                <dt className="inline-flex items-center gap-2 text-[16px] font-bold">
-                  <Clock size={18} aria-hidden />약 {bill.min}분
-                </dt>
-                <dd className="font-bold tabular-nums" aria-live="polite">
-                  {won(bill.price)}
-                </dd>
-              </div>
-            </dl>
-            <button type="button" onClick={() => go("ns-reserve")} data-gtm-cta="nail-shop_design_to_reserve" className={`mt-4 w-full rounded-[6px] px-5 py-3 text-[16px] font-semibold text-white ${focusRing}`} style={{ background: C.accent, outlineColor: C.plum }}>
-              이 디자인으로 예약하기
-            </button>
-          </div>
-        </div>
-      </section>
-
       {/* 시술 메뉴 전체 */}
-      <section aria-labelledby="ns-price-title" className="mx-auto mt-16 max-w-[1200px] px-4 md:mt-24 md:px-6">
+      <section id="ns-price" aria-labelledby="ns-price-title" className="mx-auto mt-6 max-w-[1200px] scroll-mt-4 px-4 md:mt-10 md:px-6">
         <h2 id="ns-price-title" className="font-bold tracking-[-0.02em] text-[30px] md:text-[38px]">
           시술 메뉴와 가격
         </h2>
-        <div className="mt-5 grid gap-4 md:grid-cols-2">
+        <div className="mt-5 grid gap-4 md:grid-cols-3">
           {MENU.map((m) => (
             <div key={m.group} className="rounded-[8px] border p-5" style={{ background: C.paper, borderColor: C.line }}>
               <h3 className="font-bold tracking-[-0.02em] text-[20px]">
@@ -549,10 +164,34 @@ export function NailShopDemo() {
               </dl>
             </div>
           ))}
+          <div className="rounded-[8px] border p-5" style={{ background: C.paper, borderColor: C.line }}>
+            <h3 className="font-bold tracking-[-0.02em] text-[20px]">
+              아트 (손톱당)
+            </h3>
+            <dl className="mt-2 text-[16px] leading-[2]">
+              {ARTS.filter((a) => a.price > 0).map((a) => (
+                <Row key={a.id} k={a.label} v={won(a.price)} />
+              ))}
+            </dl>
+          </div>
         </div>
         <p className="mt-3 text-[14px]" style={{ color: C.plumSoft }}>
           부가세 포함. 연장과 보수는 상담 후 안내해요.
         </p>
+
+        <div className="mt-6 rounded-[8px] border p-5" style={{ background: C.paper, borderColor: C.line }}>
+          <h3 className="font-bold tracking-[-0.02em] text-[20px]">
+            회원권
+          </h3>
+          <dl className="mt-2 grid gap-x-8 text-[16px] leading-[2] md:grid-cols-3">
+            {PASSES.map(([k, v]) => (
+              <Row key={k} k={k} v={v} />
+            ))}
+          </dl>
+          <p className="mt-2 text-[14px]" style={{ color: C.plumSoft }}>
+            회원권은 손과 패디 시술 모두에 쓸 수 있어요. 유효기간 1년.
+          </p>
+        </div>
       </section>
 
       {/* 예약 */}
@@ -560,8 +199,9 @@ export function NailShopDemo() {
         <h2 id="ns-reserve-title" className="font-bold tracking-[-0.02em] text-[30px] md:text-[38px]">
           예약하기
         </h2>
-        <ReserveForm today={today} reduce={reduce} saved={saved} bill={bill} artNote={artNote} />
+        <ReserveForm today={today} reduce={reduce} artNote={artNote} />
       </section>
+
 
       {/* 샵 안내와 오시는 길 */}
       <section id="ns-info" aria-labelledby="ns-info-title" className="mx-auto mt-16 max-w-[1200px] scroll-mt-4 px-4 md:mt-24 md:px-6">
@@ -585,19 +225,17 @@ export function NailShopDemo() {
 /* 첫 화면 */
 
 /* 첫 화면: 상단 메뉴 + 왼쪽 좁은 가격 판(이달 숫자, 기본가, 추가 조건) + 오른쪽 이달의 아트 손 사진 3x3.
-   실제 네일샵 사이트의 "이달의 아트"와 가격 카드를 한 화면에 모은 형태. 칸을 누르면 그 자리에서 크게 열리고
-   "손에 올려 보기"는 아래 칠해 보기 손에, "이 아트로 예약"은 같은 아트를 올린 뒤 예약 요청 사항에 아트 이름을 넣는다.
-   휴대폰 메뉴는 가로로 넘기는 탭 줄, 격자는 인스타 프로필처럼 3열 정사각.
-   모션: 열린 칸이 누른 칸 자리에서 커진다. 동작 줄이기면 바로 바뀐다. */
+   실제 네일샵 사이트의 "이달의 아트"와 가격 카드를 한 화면에 모은 형태. 칸을 누르면 사진을 크게 보고
+   "이 아트로 예약"은 예약 요청 사항에 아트 이름을 넣는다.
+   휴대폰 메뉴는 가로로 넘기는 탭 줄, 격자는 인스타 프로필처럼 3열 정사각. */
 const NS_MENU: [string, string][] = [
   ["ns-art", "이달의 아트"],
-  ["ns-chips", "컬러"],
-  ["ns-menu", "시술 가격"],
+  ["ns-price", "시술 가격"],
   ["ns-reserve", "예약"],
   ["ns-info", "오시는 길"],
 ];
 
-function Poster({ reduce, month, go, onPick }: { reduce: boolean; month: number; go: (id: string) => void; onPick: (m: Monthly, book: boolean) => void }) {
+function Poster({ reduce, month, go, onBook }: { reduce: boolean; month: number; go: (id: string) => void; onBook: (m: Monthly) => void }) {
   const navBtn = `min-h-11 flex-none rounded-[6px] px-3 text-[15px] font-semibold hover:underline hover:underline-offset-4 ${focusRing}`;
   return (
     <section id="ns-poster" aria-labelledby="ns-poster-title" style={{ background: C.bg }}>
@@ -667,14 +305,14 @@ function Poster({ reduce, month, go, onPick }: { reduce: boolean; month: number;
           </div>
         </div>
 
-        {/* 이달의 아트 3x3. 칸을 누르면 그 자리에서 크게 열린다 */}
-        <ArtGrid reduce={reduce} month={month} onPick={onPick} />
+        {/* 이달의 아트 3x3. 칸을 누르면 크게 본다 */}
+        <ArtGrid reduce={reduce} month={month} onBook={onBook} />
       </div>
     </section>
   );
 }
 
-function ArtGrid({ reduce, month, onPick }: { reduce: boolean; month: number; onPick: (m: Monthly, book: boolean) => void }) {
+function ArtGrid({ reduce, month, onBook }: { reduce: boolean; month: number; onBook: (m: Monthly) => void }) {
   const [open, setOpen] = useState<number | null>(null);
   const cells = useRef<(HTMLButtonElement | null)[]>([]);
   const closeBtn = useRef<HTMLButtonElement>(null);
@@ -688,9 +326,9 @@ function ArtGrid({ reduce, month, onPick }: { reduce: boolean; month: number; on
   useEffect(() => {
     if (open !== null) closeBtn.current?.focus();
   }, [open]);
-  const t = { duration: reduce ? 0 : 0.24, ease: EASE };
+  const t = { duration: reduce ? 0 : 0.18, ease: EASE };
   return (
-    <div className="min-w-0">
+    <div id="ns-art" className="min-w-0 scroll-mt-4">
       <div
         className="relative mx-auto aspect-square w-full overflow-hidden rounded-[8px] md:mx-0 md:max-w-[min(100%,calc(100svh-140px))]"
         onKeyDown={(e) => {
@@ -736,10 +374,10 @@ function ArtGrid({ reduce, month, onPick }: { reduce: boolean; month: number; on
               role="dialog"
               aria-label={m.name}
               className="absolute inset-0 flex flex-col"
-              style={{ background: C.paper, transformOrigin: `${(open % 3) * 50}% ${Math.floor(open / 3) * 50}%` }}
-              initial={reduce ? { opacity: 0 } : { opacity: 0, scale: 0.34 }}
-              animate={{ opacity: 1, scale: 1 }}
-              exit={reduce ? { opacity: 0 } : { opacity: 0, scale: 0.34 }}
+              style={{ background: C.paper }}
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              exit={{ opacity: 0 }}
               transition={t}
             >
               <div className="relative min-h-0 flex-1">
@@ -764,10 +402,7 @@ function ArtGrid({ reduce, month, onPick }: { reduce: boolean; month: number; on
                   </p>
                 </div>
                 <div className="flex w-full gap-2 sm:w-auto">
-                  <button type="button" onClick={() => { setOpen(null); onPick(m, false); }} data-gtm-cta="nail-shop_poster_try" className={`min-h-11 flex-1 rounded-[6px] border px-4 text-[15px] font-semibold sm:flex-none ${focusRing}`} style={{ borderColor: C.line, outlineColor: C.plum }}>
-                    손에 올려 보기
-                  </button>
-                  <button type="button" onClick={() => { setOpen(null); onPick(m, true); }} data-gtm-cta="nail-shop_poster_book" className={`inline-flex min-h-11 flex-1 items-center justify-center gap-1.5 rounded-[6px] px-4 text-[15px] font-semibold text-white sm:flex-none ${focusRing}`} style={{ background: C.accent, outlineColor: C.plum }}>
+                  <button type="button" onClick={() => { setOpen(null); onBook(m); }} data-gtm-cta="nail-shop_poster_book" className={`inline-flex min-h-11 flex-1 items-center justify-center gap-1.5 rounded-[6px] px-4 text-[15px] font-semibold text-white sm:flex-none ${focusRing}`} style={{ background: C.accent, outlineColor: C.plum }}>
                     <CalendarCheck size={17} aria-hidden />
                     이 아트로 예약
                   </button>
@@ -780,174 +415,6 @@ function ArtGrid({ reduce, month, onPick }: { reduce: boolean; month: number; on
     </div>
   );
 }
-/* 손 SVG */
-
-function HandSvg({ ref, uid, nails, target, onPick, reduce }: { ref: React.RefObject<SVGSVGElement | null>; uid: string; nails: Nail[]; target: number | null; onPick: (i: number) => void; reduce: boolean }) {
-  const dur = reduce ? 0 : DUR;
-  return (
-    <svg ref={ref} viewBox={`0 0 ${VB.w} ${VB.h}`} className="absolute inset-0 h-full w-full" role="img" aria-label="손 사진. 손톱을 누르면 그 손톱만 고를 수 있어요">
-      <defs>
-        <pattern id={`glit-${uid}`} patternUnits="userSpaceOnUse" width="9" height="9">
-          <circle cx="2" cy="2" r="1.1" fill="#fff" opacity="0.95" />
-          <circle cx="6.5" cy="5" r="0.8" fill="#fff" opacity="0.8" />
-          <circle cx="3.5" cy="7.5" r="0.6" fill="#fffbe6" opacity="0.9" />
-        </pattern>
-        <pattern id={`chk-${uid}`} patternUnits="userSpaceOnUse" width="14" height="14">
-          <rect x="0" y="0" width="7" height="14" fill="#fff" opacity="0.45" />
-          <rect x="0" y="0" width="14" height="7" fill="#fff" opacity="0.45" />
-        </pattern>
-        <linearGradient id={`grad-${uid}`} x1="0" y1="0" x2="0" y2="1">
-          <stop offset="0.35" stopColor="#fff" stopOpacity="0" />
-          <stop offset="1" stopColor="#fff" stopOpacity="0.92" />
-        </linearGradient>
-        <linearGradient id={`mag-${uid}`} x1="0" y1="0" x2="1" y2="1">
-          <stop offset="0.3" stopColor="#fff" stopOpacity="0" />
-          <stop offset="0.48" stopColor="#fff" stopOpacity="0.85" />
-          <stop offset="0.56" stopColor="#fff" stopOpacity="0.85" />
-          <stop offset="0.75" stopColor="#fff" stopOpacity="0" />
-        </linearGradient>
-        <linearGradient id={`chrome-${uid}`} x1="0" y1="0" x2="1" y2="1">
-          <stop offset="0" stopColor="#f4f4f4" />
-          <stop offset="0.35" stopColor="#a9abb0" />
-          <stop offset="0.55" stopColor="#ffffff" />
-          <stop offset="0.8" stopColor="#8f9196" />
-          <stop offset="1" stopColor="#d8d9dc" />
-        </linearGradient>
-        <radialGradient id={`pearl-${uid}`} cx="0.4" cy="0.3" r="0.7">
-          <stop offset="0" stopColor="#ffffff" stopOpacity="0.95" />
-          <stop offset="0.45" stopColor="#fdf3f6" stopOpacity="0.55" />
-          <stop offset="1" stopColor="#e9e2f2" stopOpacity="0.2" />
-        </radialGradient>
-        <linearGradient id={`gloss-${uid}`} x1="0" y1="0" x2="1" y2="0">
-          <stop offset="0.18" stopColor="#fff" stopOpacity="0" />
-          <stop offset="0.3" stopColor="#fff" stopOpacity="0.5" />
-          <stop offset="0.42" stopColor="#fff" stopOpacity="0" />
-        </linearGradient>
-        {/* 손톱이 둥글게 보이도록 가장자리를 조금 어둡게 */}
-        <radialGradient id={`shade-${uid}`} cx="0.5" cy="0.45" r="0.62">
-          <stop offset="0.55" stopColor="#000" stopOpacity="0" />
-          <stop offset="1" stopColor="#000" stopOpacity="0.28" />
-        </radialGradient>
-        {FINGERS.map((f, i) => {
-          const g = nailGeo(f);
-          return (
-            <clipPath key={f.name} id={`clip-${uid}-${i}`}>
-              <path d={nailPath(g.cx, g.top, g.w, g.h)} />
-            </clipPath>
-          );
-        })}
-      </defs>
-
-      {/* 실제 손 사진. 저장할 때는 캔버스에 먼저 그리고 SVG에서는 뺀다(SVG를 그림으로 바꾸면 바깥 사진을 못 불러온다) */}
-      <image href={`${IMG}/hand.jpg`} x="0" y="0" width={VB.w} height={VB.h} preserveAspectRatio="xMidYMid slice" data-skip-export="" />
-      {/* 손톱 */}
-      {FINGERS.map((f, i) => {
-        const g = nailGeo(f);
-        const d = nailPath(g.cx, g.top, g.w, g.h);
-        const n = nails[i];
-        const on = target === i;
-        return (
-          <g key={f.name} transform={f.rot ? `rotate(${f.rot} ${f.pivot[0]} ${f.pivot[1]})` : undefined}>
-            <g clipPath={`url(#clip-${uid}-${i})`}>
-              <path d={d} data-nail-base={i} fill={n.color} style={{ transition: `fill ${dur}s cubic-bezier(${EASE.join(",")})` }} />
-              <AnimatePresence initial={false}>
-                {n.art !== "none" && (
-                  <motion.g key={n.art} data-art-layer initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} transition={{ duration: dur, ease: EASE }}>
-                    <ArtLayer art={n.art} uid={uid} cx={g.cx} top={g.top} w={g.w} h={g.h} />
-                  </motion.g>
-                )}
-              </AnimatePresence>
-              <path d={d} fill={`url(#shade-${uid})`} pointerEvents="none" />
-              <path d={d} fill={`url(#gloss-${uid})`} pointerEvents="none" />
-            </g>
-            <path d={d} fill="none" stroke={on ? C.plum : "rgba(120,80,60,0.35)"} strokeWidth={on ? 2.5 : 0.8} strokeDasharray={on ? "5 3" : undefined} data-skip-export={on ? "" : undefined} />
-            <path
-              d={d}
-              fill="transparent"
-              role="button"
-              tabIndex={-1}
-              aria-label={`${f.name} 손톱`}
-              aria-pressed={on}
-              data-skip-export=""
-              className="cursor-pointer"
-              onClick={() => onPick(i)}
-            />
-          </g>
-        );
-      })}
-    </svg>
-  );
-}
-
-function ArtLayer({ art, uid, cx, top, w, h }: { art: ArtId; uid: string; cx: number; top: number; w: number; h: number }) {
-  const l = cx - w / 2;
-  if (art === "french") {
-    const tip = h * 0.3;
-    return <path d={`M${l - 2} ${top - 2} H${cx + w / 2 + 2} V${top + tip} Q${cx} ${top + tip + 10} ${l - 2} ${top + tip} Z`} fill="#fbf7f3" />;
-  }
-  if (art === "grad") return <rect x={l - 2} y={top - 2} width={w + 4} height={h + 4} fill={`url(#grad-${uid})`} />;
-  if (art === "glitter") return <rect x={l - 2} y={top - 2} width={w + 4} height={h + 4} fill={`url(#glit-${uid})`} />;
-  if (art === "check") return <rect x={l - 2} y={top - 2} width={w + 4} height={h + 4} fill={`url(#chk-${uid})`} />;
-  if (art === "magnet") return <rect x={l - 2} y={top - 2} width={w + 4} height={h + 4} fill={`url(#mag-${uid})`} />;
-  if (art === "chrome") return <rect x={l - 2} y={top - 2} width={w + 4} height={h + 4} fill={`url(#chrome-${uid})`} opacity={0.92} />;
-  if (art === "pearl") return <rect x={l - 2} y={top - 2} width={w + 4} height={h + 4} fill={`url(#pearl-${uid})`} />;
-  if (art === "marble")
-    return (
-      <g fill="none" stroke="#8d8d93" strokeLinecap="round" opacity={0.7}>
-        <path d={`M${l} ${top + h * 0.25} Q${cx} ${top + h * 0.4} ${cx + w * 0.2} ${top + h * 0.6} T${cx + w / 2} ${top + h * 0.95}`} strokeWidth={1.1} />
-        <path d={`M${cx - w * 0.1} ${top} Q${cx + w * 0.25} ${top + h * 0.2} ${cx + w / 2} ${top + h * 0.35}`} strokeWidth={0.7} />
-        <path d={`M${l} ${top + h * 0.7} Q${cx - w * 0.1} ${top + h * 0.75} ${cx} ${top + h}`} strokeWidth={0.6} />
-      </g>
-    );
-  if (art === "flower") {
-    const fy = top + h * 0.45;
-    const r = w * 0.13;
-    return (
-      <g>
-        {[0, 72, 144, 216, 288].map((a) => {
-          const t = ((a - 90) * Math.PI) / 180;
-          return <circle key={a} cx={cx + Math.cos(t) * r * 1.3} cy={fy + Math.sin(t) * r * 1.3} r={r} fill="#ffffff" />;
-        })}
-        <circle cx={cx} cy={fy} r={r * 0.75} fill="#e3b341" />
-      </g>
-    );
-  }
-  return null;
-}
-
-/** 아트 버튼 앞의 작은 견본 */
-function ArtSwatch({ art }: { art: ArtId }) {
-  const bg: Record<ArtId, string> = {
-    none: C.roseSoft,
-    french: `linear-gradient(180deg, #fff 0 34%, ${C.rose} 34%)`,
-    grad: `linear-gradient(180deg, ${C.rose}, #fff)`,
-    glitter: `radial-gradient(circle at 30% 30%, #fff 1.2px, transparent 1.6px) 0 0/6px 6px, radial-gradient(circle at 70% 70%, #fff 0.9px, transparent 1.3px) 0 0/6px 6px, ${C.rose}`,
-    check: `linear-gradient(90deg, rgba(255,255,255,0.5) 50%, transparent 50%) 0 0/8px 8px, linear-gradient(180deg, rgba(255,255,255,0.5) 50%, transparent 50%) 0 0/8px 8px, ${C.rose}`,
-    magnet: `linear-gradient(135deg, ${C.rose} 30%, #fff 50%, ${C.rose} 70%)`,
-    pearl: `radial-gradient(circle at 40% 30%, #fff 0 30%, #f1e6ee 70%)`,
-    flower: `radial-gradient(circle at 50% 45%, #e3b341 0 2px, #fff 2.5px 5px, transparent 5.5px), ${C.rose}`,
-    marble: `linear-gradient(120deg, #fff 0 40%, #9a9aa0 42%, #fff 46%)`,
-    chrome: `linear-gradient(135deg, #f4f4f4, #a9abb0 40%, #fff 55%, #8f9196 85%)`,
-  };
-  return <span aria-hidden className="inline-block h-5 w-4 rounded-[50%_50%_30%_30%/55%_55%_20%_20%] border" style={{ background: bg[art], borderColor: "rgba(17,17,17,0.25)" }} />;
-}
-
-function NailTab({ active, onClick, children }: { active: boolean; onClick: () => void; children: React.ReactNode }) {
-  return (
-    <button type="button" aria-pressed={active} onClick={onClick} className={`rounded-[6px] border px-3 py-1.5 text-[14px] font-semibold ${focusRing}`} style={{ borderColor: active ? C.accent : C.line, background: active ? C.accent : "transparent", color: active ? "#fff" : C.plum, outlineColor: C.plum }}>
-      {children}
-    </button>
-  );
-}
-
-function Toggle({ checked, onChange, label }: { checked: boolean; onChange: (v: boolean) => void; label: string }) {
-  return (
-    <label className="inline-flex cursor-pointer items-center gap-2">
-      <input type="checkbox" checked={checked} onChange={(e) => onChange(e.target.checked)} className="h-5 w-5 accent-[#9a5b6a]" />
-      <span>{label}</span>
-    </label>
-  );
-}
 
 function Row({ k, v }: { k: string; v: string }) {
   return (
@@ -958,36 +425,28 @@ function Row({ k, v }: { k: string; v: string }) {
   );
 }
 
-function isDark(hex: string) {
-  const n = parseInt(hex.slice(1), 16);
-  const r = (n >> 16) & 255;
-  const g = (n >> 8) & 255;
-  const b = n & 255;
-  return 0.299 * r + 0.587 * g + 0.114 * b < 140;
-}
-
 /* 예약 */
 
-type Bill = { price: number; min: number; artNails: number; baseLabel: string };
-
-function ReserveForm({ today, reduce, saved, bill, artNote }: { today: Date; reduce: boolean; saved: { url: string; at: string } | null; bill: Bill; artNote: string | null }) {
+function ReserveForm({ today, reduce, artNote }: { today: Date; reduce: boolean; artNote: string | null }) {
   const [day, setDay] = useState(() => (HOURS[today.getDay()] ? 0 : 1));
   const [hour, setHour] = useState<number | null>(null);
   const [staff, setStaff] = useState<number | null>(null);
   const [name, setName] = useState("");
   const [phone, setPhone] = useState("");
   const [memo, setMemo] = useState("");
+  const [service, setService] = useState(SERVICES[0]);
   // 첫 화면 이달의 아트에서 "이 아트로 예약"을 누르면 요청 사항 첫 줄에 아트 이름을 넣는다
   const [lastNote, setLastNote] = useState<string | null>(null);
   if (artNote !== lastNote) {
     setLastNote(artNote);
     if (artNote) {
+      setService("이달의 아트");
       const rest = memo.startsWith("이달의 아트") ? memo.split("\n").slice(1).join("\n") : memo;
       setMemo(`이달의 아트 ${artNote}${rest ? `\n${rest}` : ""}`);
     }
   }
   const [err, setErr] = useState<string | null>(null);
-  const [done, setDone] = useState<{ no: string; date: Date; hour: number; staff: number; name: string; phone: string } | null>(null);
+  const [done, setDone] = useState<{ no: string; date: Date; hour: number; staff: number; service: string; name: string; phone: string } | null>(null);
   const [nowH, setNowH] = useState(0);
   useEffect(() => {
     const f = requestAnimationFrame(() => setNowH(new Date().getHours()));
@@ -1007,7 +466,7 @@ function ReserveForm({ today, reduce, saved, bill, artNote }: { today: Date; red
     if (phone.replace(/\D/g, "").length < 10) return setErr("휴대폰 번호를 다시 확인해 주세요.");
     setErr(null);
     const no = `N${String(date.getFullYear()).slice(2)}${p2(date.getMonth() + 1)}${p2(date.getDate())}-${hour}${staff}${p2(name.trim().length + phone.length)}`;
-    setDone({ no, date, hour, staff, name, phone });
+    setDone({ no, date, hour, staff, service, name, phone });
   };
 
   const fade = reduce ? { duration: 0 } : { duration: DUR, ease: EASE };
@@ -1034,21 +493,12 @@ function ReserveForm({ today, reduce, saved, bill, artNote }: { today: Date; red
               </dd>
               <dt className="font-bold">시술</dt>
               <dd>
-                {bill.baseLabel}, 아트 {bill.artNails}개, 약 {bill.min}분, {won(bill.price)}
+                {done.service}
               </dd>
               <dt className="font-bold">예약자</dt>
               <dd>
                 {maskName(done.name)} {maskPhone(done.phone)}
               </dd>
-              {saved && (
-                <>
-                  <dt className="font-bold">첨부 디자인</dt>
-                  <dd>
-                    {/* eslint-disable-next-line @next/next/no-img-element */}
-                    <img src={saved.url} alt="저장한 네일 디자인" className="h-28 w-auto rounded-[8px] border" style={{ borderColor: C.line }} />
-                  </dd>
-                </>
-              )}
             </dl>
             <div className="mt-5 rounded-[8px] p-4 text-[15px] leading-[1.8]" style={{ background: C.roseSoft }}>
               <p>예약 확정 문자는 오늘 영업시간 안에 보내 드려요.</p>
@@ -1149,7 +599,17 @@ function ReserveForm({ today, reduce, saved, bill, artNote }: { today: Date; red
             </div>
 
             <div>
-              <label className="block text-[16px] font-bold" htmlFor={`ns-name`}>
+              <label className="block text-[16px] font-bold" htmlFor="ns-service">
+                시술
+              </label>
+              <select id="ns-service" value={service} onChange={(e) => setService(e.target.value)} className={`mt-1 w-full rounded-[8px] border px-3 py-2.5 text-[16px] ${focusRing}`} style={{ borderColor: C.line, outlineColor: C.plum, background: C.bg }}>
+                {SERVICES.map((x) => (
+                  <option key={x} value={x}>
+                    {x}
+                  </option>
+                ))}
+              </select>
+              <label className="mt-4 block text-[16px] font-bold" htmlFor="ns-name">
                 이름
               </label>
               <input id="ns-name" value={name} onChange={(e) => setName(e.target.value)} autoComplete="name" className={`mt-1 w-full rounded-[8px] border px-3 py-2.5 text-[16px] ${focusRing}`} style={{ borderColor: C.line, outlineColor: C.plum, background: C.bg }} />
@@ -1162,18 +622,6 @@ function ReserveForm({ today, reduce, saved, bill, artNote }: { today: Date; red
               </label>
               <textarea id="ns-memo" value={memo} onChange={(e) => setMemo(e.target.value)} rows={3} placeholder="손톱 길이, 보수할 손톱 등" className={`mt-1 w-full rounded-[8px] border px-3 py-2.5 text-[16px] ${focusRing}`} style={{ borderColor: C.line, outlineColor: C.plum, background: C.bg }} />
 
-              <div className="mt-4 rounded-[8px] border p-3 text-[14px] leading-[1.7]" style={{ borderColor: C.line }}>
-                <p className="font-bold">
-                  {bill.baseLabel}, 아트 {bill.artNails}개
-                </p>
-                <p>
-                  약 {bill.min}분, {won(bill.price)}
-                </p>
-                <p className="mt-1 inline-flex items-center gap-1.5">
-                  <Paperclip size={14} aria-hidden />
-                  {saved ? `내 디자인.png (${saved.at} 저장)` : "저장한 디자인 없음"}
-                </p>
-              </div>
 
               {err && (
                 <p role="alert" className="mt-3 inline-flex items-center gap-1.5 text-[14px] font-bold" style={{ color: C.error }}>
@@ -1273,7 +721,7 @@ function MiniMap() {
       <path d="M84 110 H236 V60 H300" fill="none" stroke={C.accent} strokeWidth="3" strokeLinecap="round" strokeDasharray="2 8" />
       <rect x="300" y="24" width="72" height="56" rx="4" fill={C.roseSoft} stroke={C.accent} strokeWidth="1.5" />
       <text x="336" y="48" textAnchor="middle" fontSize="13" fontWeight="700" fill={C.plum} fontFamily="Pretendard, sans-serif">
-        곰파트너
+        네일샵
       </text>
       <text x="336" y="66" textAnchor="middle" fontSize="12" fill={C.plumSoft} fontFamily="Pretendard, sans-serif">
         3층 (1층 약국)
@@ -1289,11 +737,8 @@ function MiniMap() {
 function SampleLogo({ light, small }: { light?: boolean; small?: boolean }) {
   return (
     <span className="inline-flex items-center gap-2" style={{ color: light ? "#ffffff" : "#111111" }}>
-      {/* eslint-disable-next-line @next/next/no-img-element -- 메인 사이트와 같은 곰 로고 */}
-      <img src="/images/logo-bear.png" alt="" aria-hidden width={28} height={28} className={small ? "h-6 w-6 shrink-0" : "h-7 w-7 shrink-0"} />
       <span className="flex items-baseline gap-1 whitespace-nowrap">
-        <span className={`${small ? "text-[18px]" : "text-[20px]"} font-bold leading-none tracking-[-0.03em]`}>곰파트너</span>
-        <span className="text-[12px] font-semibold leading-none opacity-75">카탈로그</span>
+        <span className={`${small ? "text-[18px]" : "text-[20px]"} font-bold leading-none tracking-[-0.03em]`}>네일샵</span>
       </span>
     </span>
   );

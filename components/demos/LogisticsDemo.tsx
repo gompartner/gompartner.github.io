@@ -3,7 +3,6 @@
 import { useEffect, useRef, useState, type FormEvent } from "react";
 import { AnimatePresence, motion } from "framer-motion";
 import {
-  Calculator,
   Check,
   ChevronRight,
   Clock,
@@ -11,7 +10,6 @@ import {
   MapPin,
   Menu,
   MessageCircle,
-  Package,
   PackageCheck,
   PackageOpen,
   Phone,
@@ -37,21 +35,17 @@ import { DemoMakerInfo } from "@/components/demos/DemoMakerInfo";
    고객사 로고, 출고량 같은 실적 숫자는 넣지 않는다.
    첫 화면 사진 출처: AI 생성(Z-Image-Turbo, Apache 2.0)
 
-   첫 화면(lg-poster): 메뉴 줄, 막 없는 물류센터 사진과 왼쪽 위 짙은 제목 판, 사진 경계에 걸친 빠른 견적 바, 운영 정보 띠 4칸.
-   핵심 모션: 사진만 1.6초 동안 천천히 다가온다(scale 1.06 -> 1). 본문에서는 견적 막대가 금액 비율만큼 늘어나는 것과
-   센터 지도가 옮겨 가는 것만 남겼다. 동작 줄이기면 모두 멈춘 완성 상태다.
+   첫 화면(lg-poster): 메뉴 줄, 막 없는 물류센터 사진과 왼쪽 위 짙은 제목 판, 사진 경계에 걸친 상담 바(대표전화, 견적 문의), 운영 정보 띠 4칸.
+   핵심 모션: 사진만 1.6초 동안 천천히 다가온다(scale 1.06 -> 1). 동작 줄이기면 끈다.
 
-   상호작용(모두 브라우저 안에서만 돈다. 실제로 보내지 않는다)
-   1. 견적 계산: 월 출고 건수, 보관 팔레트 수, 택배 크기를 고르면 보관비, 출고 작업비, 택배비와 월 합계, 건당 평균이 나온다.
-   2. 출고 마감 시계: 지금 시각 기준 오늘 오후 2시 마감까지 남은 시간. 지났거나 주말이면 다음 출고일과 남은 시간을 보여 준다.
-   3. 물류센터 안내: 그린 지도에서 1센터(상온), 2센터(냉장, 냉동)를 고르면 지도가 그 센터로 옮겨 가고 입고 시간, 화물차 진입을 바꿔 보여 준다.
-   4. 도입 상담 신청: 견적 조건을 이어 받아 쇼핑몰, 담당자, 판매 채널, 상품 종류를 받는다. 완료 화면에 접수 번호, 담당 창구, 회신 예정일. */
+   구성: 서비스 흐름, 평일 출고 일정(고정 안내), 이용 요금표, 물류센터 2곳 안내, 도입 상담 신청.
+   도입 상담 신청은 브라우저 안에서만 돈다. 쇼핑몰, 담당자, 판매 채널, 상품 종류를 받고 완료 화면에 접수 번호, 담당 창구, 회신 예정일. */
 
 const IMG = "/images/demo-logistics";
 
 const ADDRESS = "경기 ㅇㅊ시 ㅇㅇ면 ㅇㅇ로 00";
 const TEL = "031-000-0000";
-const KAKAO = "카카오톡 채널 곰파트너";
+const KAKAO = "카카오톡 채널 물류 대행";
 
 const C = {
   paper: "#ffffff",
@@ -67,16 +61,14 @@ const C = {
   error: "#b42318",
 };
 
-/* 모션 상수. 시간은 초, 이징은 cubic-bezier */
-const EASE = [0.22, 1, 0.36, 1] as const;
-/** 첫 화면 사진이 다가오는 시간 */
+/** 첫 화면 사진이 다가오는 시간(초) */
 const HERO_IN = 1.6;
-/** 막대, 지도, 패널 전환 */
-const DUR = 0.45;
+const EASE = [0.22, 1, 0.36, 1] as const;
 
 /* ---------- 요금 ---------- */
 
 const PALLET_FEE = 30000;
+const COLD_PALLET_FEE = 45000;
 type ParcelSize = "극소" | "소형" | "중형";
 const PARCEL: Record<ParcelSize, { fee: number; spec: string }> = {
   극소: { fee: 2300, spec: "세 변 합 80cm, 2kg 이하" },
@@ -88,48 +80,25 @@ const WORK_TIERS = [
   { from: 1000, label: "월 1,000 ~ 4,999건", fee: 900 },
   { from: 5000, label: "월 5,000건 이상", fee: 800 },
 ];
-const workFee = (orders: number) => [...WORK_TIERS].reverse().find((t) => orders >= t.from)!.fee;
 
 const won = (n: number) => `${Math.round(n).toLocaleString("ko-KR")}원`;
-const num = (n: number) => n.toLocaleString("ko-KR");
-const p2 = (n: number) => String(n).padStart(2, "0");
 const focusRing = "focus-visible:outline focus-visible:outline-[3px] focus-visible:outline-offset-2";
 
-/* ---------- 출고 마감 ---------- */
-
-const CUTOFF_H = 14;
 const isWeekday = (d: Date) => d.getDay() >= 1 && d.getDay() <= 5;
-/** 지금 주문하면 나가는 날과 그날 마감 시각 */
-function nextCutoff(now: Date) {
-  const d = new Date(now.getFullYear(), now.getMonth(), now.getDate(), CUTOFF_H);
-  if (isWeekday(now) && now < d) return { at: d, today: true };
-  let n = new Date(d.getFullYear(), d.getMonth(), d.getDate() + 1, CUTOFF_H);
-  while (!isWeekday(n)) n = new Date(n.getFullYear(), n.getMonth(), n.getDate() + 1, CUTOFF_H);
-  return { at: n, today: false };
-}
 const nextBizDay = (d: Date) => {
   let n = daysAgo(d, -1);
   while (!isWeekday(n)) n = daysAgo(n, -1);
   return n;
 };
-/** 하루 흐름 막대 눈금(시). 오른쪽 끝은 다음 날 도착 글자 자리 */
-const DAY_FROM = 8;
-const DAY_TO = 21;
-const DAY_MARKS = [
-  { h: 9, label: "주문 수집" },
-  { h: 14, label: "출고 마감" },
-  { h: 17, label: "택배사 집하" },
-];
 
 /* ---------- 물류센터 ---------- */
 
 type CenterId = "c1" | "c2";
-const CENTERS: Record<CenterId, { name: string; kind: string; icon: typeof Warehouse; at: [number, number]; rows: [string, string][] }> = {
+const CENTERS: Record<CenterId, { name: string; kind: string; icon: typeof Warehouse; rows: [string, string][] }> = {
   c1: {
     name: "ㅇㅊ 1센터",
     kind: "상온",
     icon: Warehouse,
-    at: [372, 168],
     rows: [
       ["주소", "경기 ㅇㅊ시 ㅇㅇ면 ㅇㅇ로 00"],
       ["보관", "상온 랙, 팔레트와 소량 선반"],
@@ -142,7 +111,6 @@ const CENTERS: Record<CenterId, { name: string; kind: string; icon: typeof Wareh
     name: "ㅇㅊ 2센터",
     kind: "냉장, 냉동",
     icon: Snowflake,
-    at: [478, 300],
     rows: [
       ["주소", "경기 ㅇㅊ시 ㅇㅇ읍 ㅇㅇ길 00"],
       ["보관", "냉장 0 ~ 10도, 냉동 영하 18도 이하"],
@@ -153,15 +121,9 @@ const CENTERS: Record<CenterId, { name: string; kind: string; icon: typeof Wareh
   },
 };
 
-type Prefill = { orders: number; pallets: number; size: ParcelSize } | null;
-
 export function LogisticsDemo() {
   const today = useDemoToday();
   const reduce = useReducedMotionSafe();
-  const [prefill, setPrefill] = useState<Prefill>(null);
-  /* 첫 화면 견적 바에서 고른 출고량과 보관 온도를 아래 견적 계산, 센터 안내가 이어 받는다 */
-  const [orders, setOrders] = useState(1500);
-  const [center, setCenter] = useState<CenterId>("c1");
 
   useEffect(() => {
     const f = () => window.scrollTo({ top: 0 });
@@ -173,17 +135,9 @@ export function LogisticsDemo() {
 
   return (
     <div className="min-h-screen overflow-x-clip pb-24" style={{ background: C.paper, color: C.ink }}>
-      <Poster
-        reduce={reduce}
-        go={go}
-        onQuote={(v, c) => {
-          setOrders(v);
-          setCenter(c);
-          go("lg-quote");
-        }}
-      />
+      <Poster reduce={reduce} go={go} />
 
-      {/* 하는 일과 오늘 출고 마감 */}
+      {/* 하는 일과 출고 일정 */}
       <section aria-labelledby="lg-hero-title" className="mx-auto grid max-w-[1200px] gap-8 px-4 pt-4 md:px-6 lg:grid-cols-[minmax(0,1fr)_minmax(0,1.05fr)] lg:items-center lg:gap-12 lg:pt-10">
         <div>
           <h2 id="lg-hero-title" className="text-[32px] font-bold leading-[1.25] tracking-[-0.02em] md:text-[44px]" style={{ wordBreak: "keep-all" }}>
@@ -202,39 +156,31 @@ export function LogisticsDemo() {
             </li>
           </ul>
         </div>
-        <CutoffBoard />
+        <ShipSchedule />
       </section>
 
       {/* 서비스 */}
       <section id="lg-service" aria-labelledby="lg-service-title" className="mx-auto mt-16 max-w-[1200px] scroll-mt-4 px-4 md:mt-24 md:px-6">
-        <SectionTitle id="lg-service-title" title="맡기시면 이렇게 돌아가요" />
+        <SectionTitle id="lg-service-title" title="서비스 흐름" />
         <ServiceLine />
       </section>
 
-      {/* 견적 계산 */}
+      {/* 이용 요금 */}
       <section id="lg-quote" aria-labelledby="lg-quote-title" className="mx-auto mt-16 max-w-[1200px] scroll-mt-4 px-4 md:mt-24 md:px-6">
         <SectionTitle id="lg-quote-title" title="이용 요금" />
-        <Quote
-          reduce={reduce}
-          orders={orders}
-          setOrders={setOrders}
-          onApply={(v) => {
-            setPrefill(v);
-            go("lg-contact");
-          }}
-        />
+        <FeeTable />
       </section>
 
       {/* 물류센터 */}
       <section id="lg-center" aria-labelledby="lg-center-title" className="mx-auto mt-16 max-w-[1200px] scroll-mt-4 px-4 md:mt-24 md:px-6">
         <SectionTitle id="lg-center-title" title="물류센터" />
-        <CenterMap reduce={reduce} sel={center} setSel={setCenter} />
+        <Centers />
       </section>
 
       {/* 도입 상담 */}
       <section id="lg-contact" aria-labelledby="lg-contact-title" className="mx-auto mt-16 max-w-[1200px] scroll-mt-4 px-4 md:mt-24 md:px-6">
         <SectionTitle id="lg-contact-title" title="도입 상담 신청" />
-        <Contact key={prefill ? `${prefill.orders}-${prefill.pallets}-${prefill.size}` : "blank"} prefill={prefill} today={today} reduce={reduce} />
+        <Contact today={today} reduce={reduce} />
       </section>
 
       <footer className="mt-20 px-4 pb-10 pt-10 text-[14px] leading-[1.8] md:px-6" style={{ background: C.soft, color: C.muted }}>
@@ -255,11 +201,10 @@ export function LogisticsDemo() {
 
 /* ---------- 첫 화면 ---------- */
 
-/* 첫 화면 구조(국내 풀필먼트 사이트 조사, 2026-10): 흰 메뉴 줄 오른쪽에 견적 받기, 그 아래 막 없는 물류센터 사진,
-   사진 아래 경계에 반쯤 걸친 흰 견적 바(보관 온도 3택, 월 출고량 구간 3택, 견적 받기), 그 아래 운영 정보 띠 4칸.
-   제목은 사진 왼쪽 위 짙은 판 위에 한 줄. 견적 받기를 누르면 아래 견적 계산의 월 출고 건수와 센터 안내의 센터가 그 조건으로 바뀐다.
-   휴대폰에서는 메뉴를 햄버거로 접고, 사진은 낮게, 견적 바는 사진 아래로 내려 세로로 쌓고, 정보 띠는 2x2,
-   견적 바를 지나 내려가면 하단에 견적 받기 고정 줄.
+/* 첫 화면 구조(국내 풀필먼트 사이트 조사, 2026-10): 흰 메뉴 줄 오른쪽에 견적 문의, 그 아래 막 없는 물류센터 사진,
+   사진 아래 경계에 반쯤 걸친 흰 상담 바(대표전화, 견적 문의), 그 아래 운영 정보 띠 4칸. 제목은 사진 왼쪽 위 짙은 판 위에 한 줄.
+   휴대폰에서는 메뉴를 햄버거로 접고, 사진은 낮게, 상담 바는 사진 아래로 내리고, 정보 띠는 2x2,
+   상담 바를 지나 내려가면 하단에 견적 문의 고정 줄.
    모션: 사진만 1.06배에서 1배로 1.6초 동안 다가온다. 동작 줄이기면 끈다. */
 
 const NAV: [string, string][] = [
@@ -267,15 +212,6 @@ const NAV: [string, string][] = [
   ["lg-quote", "요금 안내"],
   ["lg-center", "센터 소개"],
   ["lg-contact", "도입 상담"],
-];
-
-type Temp = "상온" | "냉장" | "냉동";
-const TEMPS: Temp[] = ["상온", "냉장", "냉동"];
-/** 월 출고량 구간과 견적 계산에 넘길 대표 건수 */
-const VOLUMES: { label: string; orders: number }[] = [
-  { label: "1천 건 이하", orders: 800 },
-  { label: "1천~5천 건", orders: 3000 },
-  { label: "5천 건 이상", orders: 8000 },
 ];
 
 /** 운영 정보 띠. 실적 숫자가 아니라 이 샘플 안 센터, 요금 데이터에 있는 값만 쓴다 */
@@ -286,12 +222,10 @@ const FACTS: [string, string, string][] = [
   ["11톤", "도크 접안 화물차", "1센터 윙바디 기준"],
 ];
 
-function Poster({ reduce, go, onQuote }: { reduce: boolean; go: (id: string) => void; onQuote: (orders: number, center: CenterId) => void }) {
+function Poster({ reduce, go }: { reduce: boolean; go: (id: string) => void }) {
   const [menu, setMenu] = useState(false);
-  const [temp, setTemp] = useState<Temp>("상온");
-  const [vol, setVol] = useState(1);
-  /* 하단 고정 줄은 첫 화면 견적 바가 화면에서 벗어난 뒤에만 올라온다 */
-  const formRef = useRef<HTMLFormElement>(null);
+  /* 하단 고정 줄은 첫 화면 상담 바가 화면에서 벗어난 뒤에만 올라온다 */
+  const formRef = useRef<HTMLDivElement>(null);
   const [barOn, setBarOn] = useState(false);
   useEffect(() => {
     const el = formRef.current;
@@ -300,9 +234,7 @@ function Poster({ reduce, go, onQuote }: { reduce: boolean; go: (id: string) => 
     io.observe(el);
     return () => io.disconnect();
   }, []);
-  const submit = () => onQuote(VOLUMES[vol].orders, temp === "상온" ? "c1" : "c2");
   const navBtn = `inline-flex h-11 items-center rounded-[4px] px-3 text-[15px] font-semibold underline-offset-4 hover:underline ${focusRing}`;
-  const chip = (on: boolean) => ({ borderColor: on ? C.accent : C.field, background: on ? C.accent : C.paper, color: on ? "#fff" : C.ink, outlineColor: C.accent });
 
   return (
     <section id="lg-poster" aria-labelledby="lg-poster-title" style={{ background: C.paper, color: C.ink }}>
@@ -324,13 +256,13 @@ function Poster({ reduce, go, onQuote }: { reduce: boolean; go: (id: string) => 
           <div className="flex items-center gap-2">
             <button
               type="button"
-              onClick={() => go("lg-quote")}
+              onClick={() => go("lg-contact")}
               data-gtm-cta="logistics_header_cta"
               className={`hidden h-11 items-center gap-1.5 rounded-[6px] px-4 text-[15px] font-semibold text-white sm:inline-flex ${focusRing}`}
               style={{ background: C.accent, outlineColor: C.accent }}
             >
-              <Calculator size={17} aria-hidden />
-              견적 받기
+              <MessageCircle size={17} aria-hidden />
+              견적 문의
             </button>
             <button
               type="button"
@@ -392,56 +324,46 @@ function Poster({ reduce, go, onQuote }: { reduce: boolean; go: (id: string) => 
         </div>
       </div>
 
-      {/* 사진 경계에 걸친 견적 바 */}
+      {/* 사진 경계에 걸친 상담 바 */}
       <div className="relative z-10 mx-auto max-w-[1200px] px-4 md:px-6">
-        <form
+        <div
           ref={formRef}
-          aria-label="빠른 견적"
-          onSubmit={(e) => {
-            e.preventDefault();
-            submit();
-          }}
-          className="mt-4 grid gap-4 rounded-[8px] border p-4 md:p-5 lg:-mt-[60px] lg:grid-cols-[minmax(0,1fr)_minmax(0,1.3fr)_auto] lg:items-end lg:gap-6 lg:p-6"
+          className="mt-4 flex flex-col gap-4 rounded-[8px] border p-4 md:p-5 lg:-mt-[60px] lg:flex-row lg:items-center lg:justify-between lg:gap-6 lg:p-6"
           style={{ borderColor: C.line, background: C.paper }}
         >
-          <fieldset>
-            <legend className="text-[15px] font-bold">보관 온도</legend>
-            <div className="mt-2 grid grid-cols-3 gap-2">
-              {TEMPS.map((t) => {
-                const on = temp === t;
-                return (
-                  <button key={t} type="button" aria-pressed={on} onClick={() => setTemp(t)} className={`inline-flex h-11 items-center justify-center gap-1 rounded-[6px] border text-[15px] font-semibold ${focusRing}`} style={chip(on)}>
-                    {on && <Check size={15} aria-hidden />}
-                    {t}
-                  </button>
-                );
-              })}
-            </div>
-          </fieldset>
-          <fieldset>
-            <legend className="text-[15px] font-bold">월 출고량</legend>
-            <div className="mt-2 grid grid-cols-3 gap-2">
-              {VOLUMES.map((v, i) => {
-                const on = vol === i;
-                return (
-                  <button key={v.label} type="button" aria-pressed={on} onClick={() => setVol(i)} className={`inline-flex h-11 items-center justify-center gap-1 rounded-[6px] border px-1 text-[14px] font-semibold md:text-[15px] ${focusRing}`} style={chip(on)}>
-                    {on && <Check size={15} aria-hidden className="hidden sm:block" />}
-                    {v.label}
-                  </button>
-                );
-              })}
-            </div>
-          </fieldset>
-          <button
-            type="submit"
-            data-gtm-cta="logistics_poster_cta"
-            className={`inline-flex h-12 items-center justify-center gap-2 rounded-[6px] px-6 text-[16px] font-semibold text-white ${focusRing}`}
-            style={{ background: C.ink, outlineColor: C.ink }}
-          >
-            <Calculator size={18} aria-hidden />
-            견적 받기
-          </button>
-        </form>
+          <div>
+            <p className="text-[15px] font-bold" style={{ color: C.body }}>
+              도입 상담
+            </p>
+            <p className="mt-1 flex items-center gap-2 text-[24px] font-bold tabular-nums md:text-[28px]">
+              <Phone size={22} aria-hidden style={{ color: C.accent }} />
+              {TEL}
+            </p>
+            <p className="mt-1 text-[14px]" style={{ color: C.muted }}>
+              평일 09:00 ~ 18:00, {KAKAO}
+            </p>
+          </div>
+          <div className="grid grid-cols-2 gap-2 sm:flex">
+            <button
+              type="button"
+              onClick={() => go("lg-quote")}
+              className={`inline-flex h-12 items-center justify-center gap-2 rounded-[6px] border px-5 text-[16px] font-semibold ${focusRing}`}
+              style={{ borderColor: C.field, outlineColor: C.accent }}
+            >
+              요금 안내
+            </button>
+            <button
+              type="button"
+              onClick={() => go("lg-contact")}
+              data-gtm-cta="logistics_poster_cta"
+              className={`inline-flex h-12 items-center justify-center gap-2 rounded-[6px] px-6 text-[16px] font-semibold text-white ${focusRing}`}
+              style={{ background: C.ink, outlineColor: C.ink }}
+            >
+              <MessageCircle size={18} aria-hidden />
+              견적 문의
+            </button>
+          </div>
+        </div>
 
         {/* 운영 정보 띠 */}
         <dl className="mt-6 grid grid-cols-[minmax(0,1fr)_minmax(0,1fr)] border-t lg:grid-cols-4" style={{ borderColor: C.ink }}>
@@ -459,7 +381,7 @@ function Poster({ reduce, go, onQuote }: { reduce: boolean; go: (id: string) => 
         </dl>
       </div>
 
-      {/* 휴대폰 하단 고정 견적 받기 */}
+      {/* 휴대폰 하단 고정 견적 문의 */}
       <div
         aria-hidden={!barOn}
         inert={!barOn}
@@ -467,13 +389,13 @@ function Poster({ reduce, go, onQuote }: { reduce: boolean; go: (id: string) => 
         style={{ background: C.paper, borderColor: C.line, paddingBottom: "calc(12px + env(safe-area-inset-bottom))" }}>
         <button
           type="button"
-          onClick={() => go("lg-quote")}
+          onClick={() => go("lg-contact")}
           data-gtm-cta="logistics_sticky_cta"
           className={`flex h-12 w-full items-center justify-center gap-2 rounded-[6px] text-[16px] font-semibold text-white ${focusRing}`}
           style={{ background: C.accent, outlineColor: C.accent }}
         >
-          <Calculator size={18} aria-hidden />
-          견적 받기
+          <MessageCircle size={18} aria-hidden />
+          견적 문의
         </button>
       </div>
     </section>
@@ -486,13 +408,10 @@ function SampleLogo({ light, size = 20 }: { light?: boolean; size?: number }) {
   const mark = size + 8;
   return (
     <span className="inline-flex items-center gap-2 leading-none" style={{ color: light ? "#fff" : "#111" }}>
-      {/* eslint-disable-next-line @next/next/no-img-element -- 메인 사이트와 같은 곰 로고 */}
-      <img src="/images/logo-bear.png" alt="" aria-hidden width={mark} height={mark} className="shrink-0" style={{ width: mark, height: mark }} />
       <span className="flex items-baseline gap-1 whitespace-nowrap">
         <span className="font-bold tracking-[-0.03em]" style={{ fontSize: size }}>
-          곰파트너
+          물류 대행
         </span>
-        <span className="text-[12px] font-semibold opacity-75">카탈로그</span>
       </span>
     </span>
   );
@@ -506,82 +425,39 @@ function SectionTitle({ id, title }: { id: string; title: string }) {
   );
 }
 
-/* ---------- 2. 출고 마감 시계 ---------- */
+/* ---------- 출고 일정 ---------- */
 
-function CutoffBoard() {
-  const [now, setNow] = useState<Date | null>(null);
-  useEffect(() => {
-    const tick = () => setNow(new Date());
-    const f = requestAnimationFrame(tick);
-    const id = window.setInterval(tick, 1000);
-    return () => {
-      cancelAnimationFrame(f);
-      window.clearInterval(id);
-    };
-  }, []);
+const DAY_STEPS: [string, string, string][] = [
+  ["09:00", "주문 수집", "연동된 쇼핑몰 주문을 모아 출고 목록을 만듭니다."],
+  ["14:00", "출고 마감", "평일 오후 2시까지 들어온 주문은 그날 포장해 보냅니다."],
+  ["17:00", "택배사 집하", "포장을 마친 상자를 택배사에 넘깁니다."],
+  ["다음 날", "도착", "수도권 기준 다음 날 받아 보실 수 있습니다."],
+];
 
-  const cut = now ? nextCutoff(now) : null;
-  const left = cut && now ? Math.max(0, Math.floor((cut.at.getTime() - now.getTime()) / 1000)) : 0;
-  const days = Math.floor(left / 86400);
-  const hh = Math.floor((left % 86400) / 3600);
-  const mm = Math.floor((left % 3600) / 60);
-  const ss = left % 60;
-  const timer = now ? `${p2(hh)}:${p2(mm)}:${p2(ss)}` : "--:--:--";
-
-  let status = "지금 시각을 불러오는 중";
-  if (now && cut) {
-    if (cut.today) status = `지금 주문하면 오늘 ${fmtKo(now)} 출고`;
-    else if (isWeekday(now)) status = `오늘 출고는 마감됐어요. 지금 주문은 ${fmtKo(cut.at)} 출고`;
-    else status = `주말은 출고를 쉬어요. 지금 주문은 ${fmtKo(cut.at)} 출고`;
-  }
-
-  // 하루 흐름 막대 위 지금 위치(평일 08~19시 사이일 때만)
-  const hourNow = now ? now.getHours() + now.getMinutes() / 60 : -1;
-  const showNow = !!now && isWeekday(now) && hourNow >= DAY_FROM && hourNow <= 18;
-  const pos = (h: number) => ((h - DAY_FROM) / (DAY_TO - DAY_FROM)) * 100;
-
+function ShipSchedule() {
   return (
-    <div id="lg-cutoff" className="scroll-mt-4 rounded-[8px] border p-5 md:p-7" style={{ background: C.soft, borderColor: C.line, color: C.ink }} aria-labelledby="lg-cutoff-title">
-      <p id="lg-cutoff-title" className="inline-flex items-center gap-2 text-[16px] font-bold" style={{ color: C.body }}>
+    <div id="lg-schedule" className="rounded-[8px] border p-5 md:p-7" style={{ background: C.soft, borderColor: C.line, color: C.ink }}>
+      <p className="inline-flex items-center gap-2 text-[16px] font-bold" style={{ color: C.body }}>
         <Clock size={18} aria-hidden />
-        {cut && !cut.today ? "다음 출고 마감까지" : "오늘 출고 마감까지"}
+        평일 출고 일정
       </p>
-      <p className="mt-2 flex items-baseline gap-3 text-[48px] font-semibold leading-none tracking-[-0.02em] tabular-nums md:text-[72px]" style={{ color: C.accent }} aria-live="off">
-        {days > 0 && <span className="text-[26px] md:text-[34px]">{days}일</span>}
-        <span>{timer}</span>
+      <p className="mt-2 text-[28px] font-bold leading-tight tracking-[-0.02em] md:text-[36px]" style={{ color: C.accent }}>
+        오후 2시 이전 주문 당일 출고
       </p>
-      <p className="mt-3 text-[16px] leading-snug" role="status">
-        {status}
-      </p>
-
-      {/* 하루 흐름 */}
-      <div className="relative mt-8 pb-12" aria-label="하루 출고 흐름">
-        <div className="relative h-[6px] rounded-full" style={{ background: "#dcdcda" }}>
-          <div className="absolute inset-y-0 left-0 rounded-full" style={{ width: `${pos(CUTOFF_H)}%`, background: C.accent }} />
-        </div>
-        {DAY_MARKS.map((m) => (
-          <div key={m.h} className="absolute top-[-5px] -translate-x-1/2 text-center" style={{ left: `${pos(m.h)}%` }}>
-            <span className="mx-auto block h-4 w-4 rounded-full border-[3px]" style={{ borderColor: m.h === CUTOFF_H ? C.accent : "#9a9a9a", background: C.soft }} />
-            <span className="mt-2 block whitespace-nowrap text-[13px] leading-tight" style={{ color: m.h === CUTOFF_H ? C.accent : C.muted }}>
-              <span className="block tabular-nums">
-                {p2(m.h)}:00
-              </span>
-              {m.label}
+      <ol className="mt-6 grid gap-0 border-t" style={{ borderColor: C.line }}>
+        {DAY_STEPS.map(([time, name, desc]) => (
+          <li key={name} className="grid grid-cols-[72px_minmax(0,1fr)] gap-3 border-b py-3 text-[15px]" style={{ borderColor: C.line }}>
+            <span className="font-bold tabular-nums">{time}</span>
+            <span>
+              <b className="block text-[16px]">{name}</b>
+              <span style={{ color: C.body, wordBreak: "keep-all" }}>{desc}</span>
             </span>
-          </div>
+          </li>
         ))}
-        <span className="absolute right-0 top-[18px] text-[13px]" style={{ color: C.muted }}>
-          다음 날 도착
-        </span>
-        {showNow && (
-          <span className="absolute top-[-30px] -translate-x-1/2" style={{ left: `${pos(hourNow)}%` }}>
-            <span className="flex items-center gap-1 whitespace-nowrap rounded-[4px] px-1.5 py-0.5 text-[12px] font-bold text-white" style={{ background: C.ink }}>
-              <Package size={13} aria-hidden />
-              지금
-            </span>
-          </span>
-        )}
-      </div>
+      </ol>
+      <p className="mt-4 text-[14px]" style={{ color: C.muted }}>
+        토요일, 일요일, 공휴일 주문은 다음 평일에 출고합니다.
+      </p>
     </div>
   );
 }
@@ -627,141 +503,25 @@ function ServiceLine() {
   );
 }
 
-/* ---------- 1. 견적 계산 ---------- */
+/* ---------- 이용 요금 ---------- */
 
-function Quote({
-  reduce,
-  orders,
-  setOrders,
-  onApply,
-}: {
-  reduce: boolean;
-  orders: number;
-  setOrders: (n: number) => void;
-  onApply: (v: { orders: number; pallets: number; size: ParcelSize }) => void;
-}) {
-  const [pallets, setPallets] = useState(6);
-  const [size, setSize] = useState<ParcelSize>("극소");
+const FEE_ROWS: [string, string, string][] = [
+  ["입고비", "박스 1개 검수와 적치", won(300)],
+  ["보관비", "상온 팔레트 1개(1,100 x 1,100mm, 높이 1.5m), 월", won(PALLET_FEE)],
+  ["보관비", "냉장, 냉동 팔레트 1개, 월", won(COLD_PALLET_FEE)],
+  ...WORK_TIERS.map((w): [string, string, string] => ["출고 작업비", `${w.label}, 피킹과 포장 1건`, won(w.fee)]),
+  ["합포장", "상품 1개 추가될 때마다", won(200)],
+  ...(Object.keys(PARCEL) as ParcelSize[]).map((k): [string, string, string] => [`택배비 ${k}`, PARCEL[k].spec, won(PARCEL[k].fee)]),
+  ["반품 처리", "회수 상품 검수와 재입고 1건", won(1000)],
+  ["포장재", "박스, 완충재, 테이프", "실비"],
+];
 
-  const storage = pallets * PALLET_FEE;
-  const work = orders * workFee(orders);
-  const parcel = orders * PARCEL[size].fee;
-  const total = storage + work + parcel;
-  const per = orders ? total / orders : 0;
-  const parts = [
-    { key: "보관비", v: storage, bg: "#3a3a3a", pattern: "" },
-    { key: "출고 작업비", v: work, bg: "#a8a8a6", pattern: "repeating-linear-gradient(90deg, rgba(0,0,0,0.18) 0 2px, transparent 2px 8px)" },
-    { key: "택배비", v: parcel, bg: C.accent, pattern: "repeating-linear-gradient(45deg, rgba(255,255,255,0.22) 0 2px, transparent 2px 9px)" },
-  ];
-  const t = { duration: reduce ? 0 : DUR, ease: EASE };
-
+function FeeTable() {
   return (
-    <div className="mt-6 grid gap-6 lg:grid-cols-[minmax(0,1fr)_minmax(0,1fr)] lg:gap-10">
-      <div className="rounded-[8px] border p-5 md:p-7" style={{ borderColor: C.line, background: C.paper }}>
-        <RangeField
-          id="lg-q-orders"
-          label="월 출고 건수"
-          value={orders}
-          min={100}
-          max={20000}
-          step={100}
-          unit="건"
-          onChange={setOrders}
-        />
-        <RangeField id="lg-q-pallets" label="보관 팔레트 수" value={pallets} min={1} max={60} step={1} unit="개" onChange={setPallets} />
-        <fieldset className="mt-7">
-          <legend className="text-[16px] font-bold">택배 크기</legend>
-          <div className="mt-3 grid grid-cols-3 gap-2">
-            {(Object.keys(PARCEL) as ParcelSize[]).map((k) => {
-              const on = size === k;
-              return (
-                <button
-                  key={k}
-                  type="button"
-                  aria-pressed={on}
-                  onClick={() => setSize(k)}
-                  className={`rounded-[6px] border px-2 py-2.5 text-left ${focusRing}`}
-                  style={{ borderColor: on ? C.accent : C.field, background: on ? C.accent : C.paper, color: on ? "#fff" : C.ink, outlineColor: C.accent }}
-                >
-                  <span className="flex items-center gap-1 text-[16px] font-semibold">
-                    {on && <Check size={16} aria-hidden />}
-                    {k}
-                  </span>
-                  <span className="mt-0.5 block text-[12px] leading-tight opacity-80">{PARCEL[k].spec}</span>
-                </button>
-              );
-            })}
-          </div>
-        </fieldset>
-      </div>
-
-      {/* 결과: 송장처럼 */}
-      <div className="flex flex-col rounded-[8px] border p-5 md:p-7" style={{ borderColor: C.line, background: C.paper }} aria-live="polite">
-        <p className="flex items-center justify-between gap-3 text-[15px] font-bold">
-          <span>월 예상 비용</span>
-          <span className="rounded-[3px] px-2 py-0.5 text-[12px]" style={{ background: C.soft, color: C.body }}>
-            개략, 부가세 별도
-          </span>
-        </p>
-        <p className="mt-2 text-[44px] font-semibold leading-none tracking-[-0.03em] tabular-nums md:text-[56px]">
-          {won(total)}
-        </p>
-        <p className="mt-2 text-[15px]" style={{ color: C.muted }}>
-          주문 1건당 평균 <b className="tabular-nums" style={{ color: C.ink }}>{won(per)}</b>
-        </p>
-
-        {/* 쌓인 막대: 겹친 띠를 누적 비율만큼 가로로 늘린다 */}
-        <div className="relative mt-6 h-9 overflow-hidden rounded-[4px]" style={{ background: C.soft }} aria-hidden>
-          {[...parts].reverse().map((part, k) => {
-            const upto = parts.slice(0, parts.length - k).reduce((a, b) => a + b.v, 0);
-            return (
-              <motion.div
-                key={part.key}
-                className="absolute inset-0 origin-left"
-                style={{ background: part.pattern ? `${part.pattern}, ${part.bg}` : part.bg }}
-                initial={false}
-                animate={{ scaleX: total ? upto / total : 0 }}
-                transition={t}
-              />
-            );
-          })}
-        </div>
-
-        <dl className="mt-5 grid gap-2.5 text-[16px]">
-          {parts.map((part) => (
-            <div key={part.key} className="flex items-center justify-between gap-3 border-b border-dashed pb-2.5" style={{ borderColor: C.line }}>
-              <dt className="inline-flex items-center gap-2">
-                <span className="inline-block h-3.5 w-3.5 flex-none rounded-[2px]" style={{ background: part.pattern ? `${part.pattern}, ${part.bg}` : part.bg }} aria-hidden />
-                {part.key}
-                <span className="text-[13px]" style={{ color: C.muted }}>
-                  {part.key === "보관비" && `${pallets}개 x ${won(PALLET_FEE)}`}
-                  {part.key === "출고 작업비" && `${num(orders)}건 x ${won(workFee(orders))}`}
-                  {part.key === "택배비" && `${num(orders)}건 x ${won(PARCEL[size].fee)}`}
-                </span>
-              </dt>
-              <dd className="tabular-nums">
-                {won(part.v)}
-              </dd>
-            </div>
-          ))}
-        </dl>
-
-        <button
-          type="button"
-          data-gtm-cta="logistics_quote_to_contact"
-          onClick={() => onApply({ orders, pallets, size })}
-          className={`mt-6 inline-flex items-center justify-center gap-2 rounded-[6px] px-5 py-3.5 text-[16px] font-semibold text-white ${focusRing}`}
-          style={{ background: C.accent, outlineColor: C.accent }}
-        >
-          이 조건으로 상담 신청
-          <ChevronRight size={18} aria-hidden />
-        </button>
-      </div>
-
-      {/* 요금 기준 */}
-      <div className="overflow-x-auto lg:col-span-2">
+    <div className="mt-6">
+      <div className="overflow-x-auto">
         <table className="w-full min-w-[560px] border-collapse text-left text-[15px]">
-          <caption className="pb-3 text-left text-[17px] font-bold">요금 기준</caption>
+          <caption className="sr-only">항목별 이용 요금</caption>
           <thead>
             <tr className="border-b" style={{ background: C.soft, borderColor: C.field }}>
               <th scope="col" className="px-4 py-2.5 font-semibold">
@@ -776,178 +536,41 @@ function Quote({
             </tr>
           </thead>
           <tbody>
-            {[
-              ["보관비", "상온 팔레트 1개(1,100 x 1,100mm, 높이 1.5m), 월", won(PALLET_FEE)],
-              ["입고비", "박스 1개 검수와 적치", won(300)],
-              ...WORK_TIERS.map((w) => ["출고 작업비", `${w.label}, 피킹과 포장 1건`, won(w.fee)]),
-              ["합포장", "상품 1개 추가될 때마다", won(200)],
-              ...(Object.keys(PARCEL) as ParcelSize[]).map((k) => [`택배비 ${k}`, PARCEL[k].spec, won(PARCEL[k].fee)]),
-              ["포장재", "박스, 완충재, 테이프", "실비"],
-            ].map(([a, b, c], k) => (
+            {FEE_ROWS.map(([a, b, c], k) => (
               <tr key={k} className="border-b" style={{ borderColor: C.line, background: C.paper }}>
                 <th scope="row" className="whitespace-nowrap px-4 py-2.5 font-semibold">
                   {a}
                 </th>
                 <td className="px-4 py-2.5">{b}</td>
-                <td className="whitespace-nowrap px-4 py-2.5 text-right tabular-nums">
-                  {c}
-                </td>
+                <td className="whitespace-nowrap px-4 py-2.5 text-right tabular-nums">{c}</td>
               </tr>
             ))}
           </tbody>
         </table>
       </div>
+      <p className="mt-3 text-[14px] leading-[1.6]" style={{ color: C.muted }}>
+        부가세 별도. 월 출고량과 상품 특성에 따라 상담 후 최종 견적을 드립니다.
+      </p>
     </div>
   );
 }
 
-function RangeField({
-  id,
-  label,
-  value,
-  min,
-  max,
-  step,
-  unit,
-  onChange,
-}: {
-  id: string;
-  label: string;
-  value: number;
-  min: number;
-  max: number;
-  step: number;
-  unit: string;
-  onChange: (v: number) => void;
-}) {
+/* ---------- 물류센터 ---------- */
+
+function Centers() {
   return (
-    <div className="mt-6 first:mt-0">
-      <div className="flex items-baseline justify-between gap-3">
-        <label htmlFor={id} className="text-[16px] font-bold">
-          {label}
-        </label>
-        <span className="text-[26px] font-semibold tabular-nums">
-          {num(value)}
-          <span className="ml-1 text-[15px]">{unit}</span>
-        </span>
-      </div>
-      <input
-        id={id}
-        type="range"
-        min={min}
-        max={max}
-        step={step}
-        value={value}
-        aria-valuetext={`${num(value)}${unit}`}
-        onChange={(e) => onChange(Number(e.target.value))}
-        className={`mt-2 h-8 w-full cursor-pointer ${focusRing}`}
-        style={{ accentColor: C.accent, outlineColor: C.accent }}
-      />
-      <div className="flex justify-between text-[13px]" style={{ color: C.muted }}>
-        <span>
-          {num(min)}
-          {unit}
-        </span>
-        <span>
-          {num(max)}
-          {unit}
-        </span>
-      </div>
-    </div>
-  );
-}
-
-/* ---------- 3. 물류센터 지도 ---------- */
-
-function CenterMap({ reduce, sel, setSel }: { reduce: boolean; sel: CenterId; setSel: (id: CenterId) => void }) {
-  const c = CENTERS[sel];
-  // 고른 센터가 지도 가운데쯤 오도록 지도 전체를 옮긴다
-  const [cx, cy] = c.at;
-  const cam = { x: 320 - cx * 1.25, y: 190 - cy * 1.25, scale: 1.25 };
-
-  return (
-    <div className="mt-6 grid gap-6 lg:grid-cols-[minmax(0,1.3fr)_minmax(0,1fr)] lg:gap-10">
-      <div className="relative overflow-hidden rounded-[8px] border" style={{ borderColor: C.line, background: "#f2f2f0" }}>
-        <svg viewBox="0 0 640 420" className="block h-auto w-full" role="img" aria-label={`${c.name} 위치를 보여 주는 그린 지도`}>
-          <defs>
-            <pattern id="lg-map-grid" width="32" height="32" patternUnits="userSpaceOnUse">
-              <path d="M32 0 H0 V32" fill="none" stroke="#e6e6e4" strokeWidth="1" />
-            </pattern>
-          </defs>
-          <motion.g initial={false} animate={cam} transition={{ duration: reduce ? 0 : 0.8, ease: EASE }} style={{ transformOrigin: "0 0" }}>
-            <rect x="-400" y="-300" width="1440" height="1020" fill="url(#lg-map-grid)" />
-            {/* 논밭과 산 */}
-            <path d="M-200 40 C40 10 110 90 60 160 C20 220 -80 230 -200 210 Z" fill="#dfe3d8" />
-            <path d="M560 -60 C700 -40 760 80 700 140 C640 190 560 120 540 60 Z" fill="#dfe3d8" />
-            <path d="M120 300 h120 v70 h-120 Z M260 320 h90 v60 h-90 Z" fill="#e7e9e1" />
-            {/* 하천 */}
-            <path d="M-200 340 C40 300 160 400 320 370 C480 340 560 420 840 380" fill="none" stroke="#cfdbe0" strokeWidth="22" strokeLinecap="round" />
-            {/* 지방도 */}
-            <g fill="none" strokeLinecap="round">
-              <path d="M372 168 L372 -100 M372 168 L478 300 L478 520 M478 300 L760 300" stroke="#c4c4c4" strokeWidth="13" />
-              <path d="M372 168 L372 -100 M372 168 L478 300 L478 520 M478 300 L760 300" stroke="#fff" strokeWidth="8" />
-            </g>
-            {/* 고속도로 */}
-            <g fill="none" strokeLinecap="round">
-              <path d="M-200 110 C120 120 260 90 420 110 C560 128 680 160 860 150" stroke="#9a9a9a" strokeWidth="20" />
-              <path d="M-200 110 C120 120 260 90 420 110 C560 128 680 160 860 150" stroke="#f2f2f0" strokeWidth="12" />
-            </g>
-            <g>
-              <rect x="336" y="74" width="72" height="26" rx="4" fill={C.ink} />
-              <text x="372" y="92" textAnchor="middle" fontSize="14" fontWeight="700" fill="#fff">
-                ㅇㅊ IC
-              </text>
-            </g>
-            {/* 센터 표시 */}
-            {(Object.keys(CENTERS) as CenterId[]).map((id) => {
-              const [x, y] = CENTERS[id].at;
-              const on = id === sel;
-              return (
-                <g key={id} transform={`translate(${x} ${y})`}>
-                  <path d="M0 0 C-14 -16 -20 -26 -20 -36 A20 20 0 1 1 20 -36 C20 -26 14 -16 0 0 Z" fill={on ? C.accent : "#fff"} stroke={on ? C.accent : C.ink} strokeWidth="1.5" />
-                  <text x="0" y="-30" textAnchor="middle" fontSize="17" fontWeight="700" fill={on ? "#fff" : C.ink}>
-                    {id === "c1" ? "1" : "2"}
-                  </text>
-                </g>
-              );
-            })}
-          </motion.g>
-        </svg>
-        <div className="absolute bottom-3 left-3 flex flex-wrap gap-2" role="group" aria-label="센터 고르기">
-          {(Object.keys(CENTERS) as CenterId[]).map((id) => {
-            const on = id === sel;
-            return (
-              <button
-                key={id}
-                type="button"
-                aria-pressed={on}
-                onClick={() => setSel(id)}
-                className={`rounded-[6px] border px-3 py-1.5 text-[14px] font-semibold md:text-[15px] ${focusRing}`}
-                style={{ borderColor: on ? C.accent : C.field, background: on ? C.accent : C.paper, color: on ? "#fff" : C.ink, outlineColor: C.accent }}
-              >
-                {id === "c1" ? "1센터" : "2센터"} {CENTERS[id].kind}
-              </button>
-            );
-          })}
-        </div>
-      </div>
-
-      <div>
-        <AnimatePresence mode="wait" initial={false}>
-          <motion.div
-            key={sel}
-            initial={reduce ? false : { opacity: 0 }}
-            animate={{ opacity: 1 }}
-            exit={{ opacity: 0 }}
-            transition={{ duration: reduce ? 0 : 0.35, ease: EASE }}
-          >
-            <p className="flex flex-wrap items-center gap-2 text-[24px] font-bold">
-              <c.icon size={24} aria-hidden style={{ color: C.accent }} />
+    <div className="mt-6 grid gap-5 md:grid-cols-2">
+      {(Object.keys(CENTERS) as CenterId[]).map((id) => {
+        const c = CENTERS[id];
+        return (
+          <article key={id} className="rounded-[8px] border p-5 md:p-7" style={{ borderColor: C.line, background: C.paper }}>
+            <h3 className="flex flex-wrap items-center gap-2 text-[22px] font-bold">
+              <c.icon size={22} aria-hidden style={{ color: C.accent }} />
               {c.name}
               <span className="rounded-[4px] border px-2 py-0.5 text-[14px] font-medium" style={{ borderColor: C.line, color: C.body }}>
                 {c.kind}
               </span>
-            </p>
+            </h3>
             <dl className="mt-5 grid gap-x-5 gap-y-3 text-[16px] sm:grid-cols-[auto_1fr]">
               {c.rows.map(([k, v]) => (
                 <div key={k} className="contents">
@@ -958,13 +581,13 @@ function CenterMap({ reduce, sel, setSel }: { reduce: boolean; sel: CenterId; se
                 </div>
               ))}
             </dl>
-          </motion.div>
-        </AnimatePresence>
-        <p className="mt-6 flex items-start gap-2 rounded-[8px] p-4 text-[15px] leading-[1.6]" style={{ background: C.soft }}>
-          <Truck size={18} className="mt-0.5 flex-none" aria-hidden />
-          택배사 집하는 평일 오후 5시예요. 센터 견학은 상담 때 날짜를 잡아 드려요.
-        </p>
-      </div>
+          </article>
+        );
+      })}
+      <p className="flex items-start gap-2 rounded-[8px] p-4 text-[15px] leading-[1.6] md:col-span-2" style={{ background: C.soft }}>
+        <Truck size={18} className="mt-0.5 flex-none" aria-hidden />
+        택배사 집하는 평일 오후 5시입니다. 센터 견학은 상담 때 날짜를 잡아 드립니다.
+      </p>
     </div>
   );
 }
@@ -977,15 +600,15 @@ const STARTS = ["바로", "1개월 안", "2~3개월 안", "아직 미정"];
 
 type Done = { no: string; shop: string; name: string; phone: string; reply: Date };
 
-function Contact({ prefill, today, reduce }: { prefill: Prefill; today: Date; reduce: boolean }) {
+function Contact({ today, reduce }: { today: Date; reduce: boolean }) {
   const [shop, setShop] = useState("");
   const [name, setName] = useState("");
   const [phone, setPhone] = useState("");
   const [channels, setChannels] = useState<string[]>([]);
   const [goods, setGoods] = useState(GOODS[0]);
-  const [orders, setOrders] = useState(prefill ? String(prefill.orders) : "");
+  const [orders, setOrders] = useState("");
   const [start, setStart] = useState(STARTS[1]);
-  const [memo, setMemo] = useState(prefill ? `보관 팔레트 ${prefill.pallets}개, 택배 ${prefill.size} 크기 기준 견적 계산을 봤어요.` : "");
+  const [memo, setMemo] = useState("");
   const [agree, setAgree] = useState(false);
   const [err, setErr] = useState<Record<string, string>>({});
   const [done, setDone] = useState<Done | null>(null);

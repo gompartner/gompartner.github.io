@@ -1,13 +1,12 @@
 "use client";
 
-import { Fragment, useEffect, useId, useMemo, useState } from "react";
-import { AnimatePresence, motion } from "framer-motion";
+import { Fragment, useEffect, useId, useState } from "react";
+import { motion } from "framer-motion";
 import {
   AlertCircle,
   Building2,
   Calculator,
   Check,
-  ChevronDown,
   ChevronRight,
   Clock,
   FileText,
@@ -19,7 +18,6 @@ import {
   Phone,
   RotateCcw,
   Scale,
-  Search,
   Train,
   Users,
   X,
@@ -38,17 +36,13 @@ import { DemoMakerInfo } from "@/components/demos/DemoMakerInfo";
    법무사 광고 규정에 맞춰 성공 사례 수, 최저가, 100% 같은 표현은 쓰지 않는다.
 
    사진 출처: Pexels 사진 31424880
-   첫 화면(js-poster): 상단 메뉴(휴대폰은 햄버거) 아래 흰 바탕의 "상황으로 찾기". 왼쪽 2/3는 검색칸과 상황 문장 8줄
-   (상황, 업무, 처리 기간), 오른쪽 1/3은 세로 사진과 사무소 정보(휴대폰은 가로 명함). 검색어로 줄을 거르고, 줄을 누르면
-   진행 순서 3단계, 준비 서류, 처리 기간이 펼쳐진다. 펼친 줄의 버튼은 아래 구간으로 이어진다(비용 계산, 매도인 서류 탭,
-   개인회생 단계, 상담신청 분야 미리 선택). 실제 법무사 사이트(이안, 등기로, 리젠)의 검색창과 상황 문장 방식을 따랐다.
-   모션: 사진이 1.06배에서 1배로 1.6초 동안 다가오고, 줄이 펼쳐질 때 0.28초 높이 전환. 동작 줄이기면 모두 멈춘다.
+   첫 화면(js-poster): 상단 메뉴(휴대폰은 햄버거) 아래 왼쪽 2/3는 제목, 상담 버튼, 업무별 처리 기간 표,
+   오른쪽 1/3은 세로 사진과 사무소 정보(휴대폰은 가로 명함).
 
-   상호작용(모두 브라우저 안에서만 돈다. 실제로 보내지 않는다)
-   1. 소유권 이전 등기 비용 개략 계산: 매매가, 이번 집 포함 주택 수, 조정대상지역, 전용 85제곱미터 초과를 넣으면
-      취득세, 지방교육세, 농어촌특별세, 등기신청수수료, 법무사 보수 범위와 합계 범위가 견적서 양식으로 나온다.
-   2. 필요 서류 체크리스트: 매수인, 매도인 탭. 챙긴 서류를 누르면 몇 개 남았는지 보인다.
-   3. 개인회생 상담 안내: 신청 자격과 5단계 진행 순서. 단계를 누르면 기간과 할 일이 바뀐다.
+   구간
+   1. 등기 비용 안내: 주택 취득세율 표, 부대 세금과 수수료, 매매가 구간별 법무사 보수 표.
+   2. 잔금일 준비 서류: 매수인, 매도인 서류 목록.
+   3. 개인회생 상담 안내: 신청 자격과 5단계 진행 순서.
    4. 상담신청: 분야, 상담 방법, 이름, 휴대폰. 부동산 등기를 고르면 잔금일을 받는다. 완료 화면에 접수 번호, 담당 창구, 회신 예정일. */
 
 /* 제목은 본문과 같은 Pretendard, 굵게 */
@@ -56,7 +50,7 @@ const serifF = { fontWeight: 700 } as const;
 
 const ADDRESS = "서울 ㅇㅇ구 ㅇㅇ로 00, 5층";
 const TEL = "02-000-0000";
-const KAKAO = "카카오톡 채널 곰파트너";
+const KAKAO = "카카오톡 채널 법무사사무소";
 
 const IMG = "/images/demo-scrivener";
 
@@ -73,60 +67,36 @@ const C = {
 
 /* 모션 상수. 시간은 초, 이징은 cubic-bezier */
 const EASE = [0.22, 1, 0.36, 1] as const;
-/** 첫 화면 사진이 다가오는 시간과 시작 배율 */
-const ZOOM = 1.6;
-const ZOOM_FROM = 1.06;
-/** 칩, 패널 전환 */
-const DUR = 0.28;
 
 const focusRing = "focus-visible:outline focus-visible:outline-[3px] focus-visible:outline-offset-2";
-const won = (n: number) => `${Math.round(n).toLocaleString("ko-KR")}원`;
 const p2 = (n: number) => String(n).padStart(2, "0");
 
 /* ---------- 1. 등기 비용 ---------- */
 
-type Homes = 1 | 2 | 3 | 4;
-const HOMES: { v: Homes; label: string }[] = [
-  { v: 1, label: "1주택" },
-  { v: 2, label: "2주택" },
-  { v: 3, label: "3주택" },
-  { v: 4, label: "4주택 이상" },
+/** 주택 유상 취득세율 */
+const ACQ_ROWS: [string, string][] = [
+  ["1주택, 6억 원 이하", "1%"],
+  ["1주택, 6억 초과 9억 원 이하", "1% ~ 3% (가격에 따라)"],
+  ["1주택, 9억 원 초과", "3%"],
+  ["2주택, 조정대상지역", "8%"],
+  ["3주택, 조정대상지역", "12%"],
+  ["3주택 비조정, 4주택 이상", "8% ~ 12%"],
 ];
 
-/** 주택 유상 취득세율(%). 1주택은 6억 이하 1%, 6억 초과 9억 이하 (매매가 x 2/3억 - 3)%, 9억 초과 3% */
-function acqRate(price: number, homes: Homes, adjusted: boolean) {
-  const eok = price / 1e8;
-  const base = eok <= 6 ? 1 : eok <= 9 ? Math.round((eok * (2 / 3) - 3) * 100) / 100 : 3;
-  if (homes === 1) return base;
-  if (homes === 2) return adjusted ? 8 : base;
-  if (homes === 3) return adjusted ? 12 : 8;
-  return 12;
-}
-/** 지방교육세: 1~3% 구간은 취득세율의 10분의 1, 중과는 0.4% */
-const eduRate = (r: number) => (r <= 3 ? Math.round(r * 10) / 100 : 0.4);
-/** 농어촌특별세: 전용 85제곱미터 이하는 비과세. 초과면 0.2%, 8%는 0.6%, 12%는 1% */
-const ruralRate = (r: number, over85: boolean) => (!over85 ? 0 : r <= 3 ? 0.2 : r === 8 ? 0.6 : 1);
-/** 법무사 보수 범위(만 원, 부가세 별도). 매매가 구간별 */
-function feeRange(price: number): [number, number] {
-  const eok = price / 1e8;
-  if (eok <= 1) return [25, 35];
-  if (eok <= 3) return [30, 45];
-  if (eok <= 6) return [40, 55];
-  if (eok <= 9) return [45, 65];
-  return [55, 80];
-}
-/** 등기신청수수료(방문 신청 기준) */
-const REG_FEE = 15000;
-const floor10 = (n: number) => Math.floor(n / 10) * 10;
+/** 법무사 보수 범위(부가세 별도). 매매가 구간별 */
+const FEE_ROWS: [string, string][] = [
+  ["1억 원 이하", "25만 ~ 35만 원"],
+  ["1억 초과 3억 원 이하", "30만 ~ 45만 원"],
+  ["3억 초과 6억 원 이하", "40만 ~ 55만 원"],
+  ["6억 초과 9억 원 이하", "45만 ~ 65만 원"],
+  ["9억 원 초과", "55만 ~ 80만 원"],
+];
 
-/** 만 원 단위 금액을 읽는 말로. 52000 -> 5억 2,000만 원 */
-function readManwon(m: number) {
-  if (!m) return "0원";
-  const eok = Math.floor(m / 10000);
-  const rest = m % 10000;
-  return `${eok ? `${eok}억 ` : ""}${rest ? `${rest.toLocaleString("ko-KR")}만 ` : ""}원`;
-}
-const fmtRate = (r: number) => `${Number.isInteger(r) ? r : r.toFixed(2).replace(/0$/, "")}%`;
+const EXTRA_ROWS: [string, string][] = [
+  ["지방교육세", "취득세율의 10분의 1 (중과는 0.4%)"],
+  ["농어촌특별세", "전용 85제곱미터 이하 비과세, 초과 0.2%"],
+  ["등기신청수수료", "15,000원 (방문 신청)"],
+];
 
 /* ---------- 2. 필요 서류 ---------- */
 
@@ -184,7 +154,6 @@ export function ScrivenerDemo() {
   const today = useDemoToday();
   const reduce = useReducedMotionSafe();
   const [field, setField] = useState<Field>("부동산 등기");
-  const [docSide, setDocSide] = useState<Side>("buyer");
 
   useEffect(() => {
     const f = () => window.scrollTo({ top: 0 });
@@ -196,7 +165,7 @@ export function ScrivenerDemo() {
 
   return (
     <div className="min-h-screen overflow-x-clip pb-24" style={{ background: C.paper, color: C.ink }}>
-      <Poster reduce={reduce} go={go} onPick={setField} onSide={setDocSide} />
+      <Poster go={go} onPick={setField} />
 
       {/* 하는 일 한 줄과 바로 연락 */}
       <section id="js-work" aria-labelledby="js-work-title" className="mx-auto max-w-[1200px] scroll-mt-4 px-4 pt-10 md:px-6 md:pt-14">
@@ -233,25 +202,21 @@ export function ScrivenerDemo() {
             </li>
           ))}
         </ul>
-        <p className="mt-4 text-[15px]" style={{ color: C.muted }}>
-          잔금일에는 은행이나 중개사무소로 직접 가서 서류를 받고, 그날 바로 등기를 접수해요.
-        </p>
       </section>
 
       <section id="js-cost" aria-labelledby="js-cost-title" className="mx-auto mt-16 max-w-[1200px] scroll-mt-4 px-4 md:mt-24 md:px-6">
         <SectionTitle id="js-cost-title" icon={<Calculator size={22} aria-hidden />} title="소유권 이전 등기 비용" />
-        <CostCalc reduce={reduce} onApply={() => go("js-apply")} />
+        <CostGuide onApply={() => go("js-apply")} />
       </section>
 
       <section id="js-docs" aria-labelledby="js-docs-title" className="mx-auto mt-16 max-w-[1200px] scroll-mt-4 px-4 md:mt-24 md:px-6">
         <SectionTitle id="js-docs-title" icon={<FileText size={22} aria-hidden />} title="잔금일 준비 서류" />
-        <DocChecklist reduce={reduce} side={docSide} setSide={setDocSide} />
+        <DocList />
       </section>
 
       <section id="js-rehab" aria-labelledby="js-rehab-title" className="mx-auto mt-16 max-w-[1200px] scroll-mt-4 px-4 md:mt-24 md:px-6">
         <SectionTitle id="js-rehab-title" icon={<Scale size={22} aria-hidden />} title="개인회생 상담 안내" />
         <Rehab
-          reduce={reduce}
           onApply={() => {
             setField("개인회생");
             go("js-apply");
@@ -293,135 +258,35 @@ function SectionTitle({ id, icon, title }: { id: string; icon: React.ReactNode; 
   );
 }
 
-/* ---------- 첫 화면: 상황으로 찾기 ---------- */
+/* ---------- 첫 화면 ---------- */
 
-type Situation = {
-  id: string;
-  text: string;
-  work: string;
-  period: string;
-  words: string;
-  steps: [string, string, string];
-  docs: string[];
-  field: Field;
-  /** 펼친 줄 아래 버튼이 여는 구간 */
-  to: { id: string; label: string; side?: Side };
-};
-
-const SITUATIONS: Situation[] = [
-  {
-    id: "buy",
-    text: "집을 사서 잔금일이 다가와요",
-    work: "소유권 이전 등기",
-    period: "잔금일 당일 접수",
-    words: "매매 매수 아파트 잔금 취득세",
-    steps: ["계약서로 등기 비용 견적", "잔금일 은행, 중개사무소로 출장", "그날 바로 등기 접수"],
-    docs: ["신분증", "도장", "주민등록등본", "매매계약서 원본"],
-    field: "부동산 등기",
-    to: { id: "js-cost", label: "등기 비용 계산" },
-  },
-  {
-    id: "sell",
-    text: "집을 팔고 매수인에게 넘겨요",
-    work: "매도인 서류 준비",
-    period: "잔금일 당일",
-    words: "매도 매각 인감 등기권리증",
-    steps: ["매도용 인감증명서 발급", "등기권리증 확인", "잔금일 서류 전달"],
-    docs: ["등기권리증", "부동산 매도용 인감증명서", "인감도장", "주민등록초본"],
-    field: "부동산 등기",
-    to: { id: "js-docs", label: "매도인 서류 확인", side: "seller" },
-  },
-  {
-    id: "mortgage",
-    text: "대출을 다 갚았는데 근저당이 남아 있어요",
-    work: "근저당 말소 등기",
-    period: "상환 후 1주 안팎",
-    words: "대출 상환 근저당 말소 은행",
-    steps: ["은행 상환 영수증 확인", "말소 서류 받기", "등기소 접수"],
-    docs: ["대출 상환 영수증", "신분증", "등기권리증"],
-    field: "부동산 등기",
-    to: { id: "js-apply", label: "상담신청" },
-  },
-  {
-    id: "inherit",
-    text: "부모님이 돌아가시고 집이 남았어요",
-    work: "상속 등기",
-    period: "서류 준비 후 1~2주",
-    words: "상속 사망 부모 협의분할 유증",
-    steps: ["상속인 확인", "상속재산 협의분할서 작성", "상속 등기 접수"],
-    docs: ["가족관계증명서", "기본증명서", "제적등본", "상속인 인감증명서"],
-    field: "상속 등기",
-    to: { id: "js-apply", label: "상속 등기 상담신청" },
-  },
-  {
-    id: "officer",
-    text: "회사 대표나 임원이 바뀌었어요",
-    work: "임원 변경 등기",
-    period: "접수 후 3일 안팎",
-    words: "법인 회사 대표 이사 임원 변경",
-    steps: ["주주총회, 이사회 의사록 작성", "취임 승낙서 받기", "법인 등기 접수"],
-    docs: ["법인 인감", "의사록", "취임 승낙서", "새 임원 인감증명서"],
-    field: "법인 등기",
-    to: { id: "js-apply", label: "법인 등기 상담신청" },
-  },
-  {
-    id: "found",
-    text: "회사를 새로 세우려고 해요",
-    work: "법인 설립 등기",
-    period: "서류 준비 후 1주 안팎",
-    words: "법인 설립 창업 주식회사 정관",
-    steps: ["상호, 목적, 자본금 정하기", "정관 작성과 잔고 증명", "설립 등기 접수"],
-    docs: ["발기인 신분증", "인감증명서", "주금 납입 잔고증명서"],
-    field: "법인 등기",
-    to: { id: "js-apply", label: "법인 등기 상담신청" },
-  },
-  {
-    id: "debt",
-    text: "빚을 갚기 어렵고 독촉 전화가 와요",
-    work: "개인회생 신청",
-    period: "개시결정까지 1개월 안팎",
-    words: "빚 채무 독촉 회생 파산 대출",
-    steps: ["빚과 소득으로 자격 확인", "소득, 재산, 채권자 목록 준비", "회생법원 신청과 금지명령"],
-    docs: ["소득 증빙", "재산 목록", "채권자 목록"],
-    field: "개인회생",
-    to: { id: "js-rehab", label: "개인회생 단계 보기" },
-  },
-  {
-    id: "lend",
-    text: "빌려준 돈이나 보증금을 못 받고 있어요",
-    work: "내용증명, 지급명령",
-    period: "법원 결정 후 확정",
-    words: "대여금 보증금 전세 돈 지급명령 내용증명",
-    steps: ["내용증명으로 반환 요청", "지급명령 신청서 작성", "법원 결정 뒤 강제집행 검토"],
-    docs: ["차용증 또는 계약서", "송금 내역", "상대방 주소"],
-    field: "기타",
-    to: { id: "js-apply", label: "상담신청" },
-  },
+/** 업무별 처리 기간. 줄을 누르면 해당 구간으로 간다 */
+const WORK_PERIODS: { work: string; period: string; to: string; field: Field }[] = [
+  { work: "소유권 이전 등기", period: "잔금일 당일 접수", to: "js-cost", field: "부동산 등기" },
+  { work: "근저당 말소 등기", period: "상환 후 1주 안팎", to: "js-apply", field: "부동산 등기" },
+  { work: "상속 등기", period: "서류 준비 후 1~2주", to: "js-apply", field: "상속 등기" },
+  { work: "임원 변경 등기", period: "접수 후 3일 안팎", to: "js-apply", field: "법인 등기" },
+  { work: "법인 설립 등기", period: "서류 준비 후 1주 안팎", to: "js-apply", field: "법인 등기" },
+  { work: "개인회생 신청", period: "개시결정까지 1개월 안팎", to: "js-rehab", field: "개인회생" },
+  { work: "내용증명, 지급명령", period: "법원 결정 후 확정", to: "js-apply", field: "기타" },
 ];
 
 const MENU: [string, string][] = [
   ["js-work", "업무 분야"],
-  ["js-cost", "비용안내"],
+  ["js-cost", "등기비용 안내"],
   ["js-docs", "준비 서류"],
   ["js-rehab", "개인회생"],
   ["js-apply", "상담신청"],
   ["js-visit", "오시는 길"],
 ];
 
-function Poster({ reduce, go, onPick, onSide }: { reduce: boolean; go: (id: string) => void; onPick: (f: Field) => void; onSide: (s: Side) => void }) {
-  const [q, setQ] = useState("");
-  const [open, setOpen] = useState<string | null>("buy");
+function Poster({ go, onPick }: { go: (id: string) => void; onPick: (f: Field) => void }) {
   const [menu, setMenu] = useState(false);
-  const searchId = useId();
   const menuId = useId();
 
-  const words = q.trim().split(/\s+/).filter(Boolean);
-  const list = SITUATIONS.filter((s) => words.every((w) => `${s.text} ${s.work} ${s.words}`.includes(w)));
-
-  const move = (s: Situation) => {
-    onPick(s.field);
-    if (s.to.side) onSide(s.to.side);
-    go(s.to.id);
+  const move = (w: (typeof WORK_PERIODS)[number]) => {
+    onPick(w.field);
+    go(w.to);
   };
   const menuGo = (id: string) => {
     // 메뉴 칸이 접혀 높이가 바뀐 뒤에 이동해야 목적지가 어긋나지 않는다
@@ -494,146 +359,68 @@ function Poster({ reduce, go, onPick, onSide }: { reduce: boolean; go: (id: stri
             </p>
           </div>
 
-          {/* 휴대폰에서는 검색칸이 위에 붙는다 */}
-          <div className="sticky top-0 z-10 -mx-4 mt-6 px-4 py-2 lg:static lg:mx-0 lg:px-0" style={{ background: C.paper }}>
-            <h2 className="text-[18px] font-bold" style={{ color: C.navy }}>
-              <label htmlFor={searchId}>상황으로 찾기</label>
-            </h2>
-            <div className="relative mt-2">
-              <Search size={20} aria-hidden className="pointer-events-none absolute left-3 top-1/2 -translate-y-1/2" style={{ color: C.muted }} />
-              <input
-                id={searchId}
-                type="search"
-                value={q}
-                onChange={(e) => setQ(e.target.value)}
-                placeholder="상속, 근저당, 법인, 보증금"
-                className={`block h-12 w-full rounded-[4px] border pl-10 pr-3 text-[17px] ${focusRing}`}
-                style={{ borderColor: C.ink, background: C.paper, outlineColor: C.navy }}
-              />
-            </div>
+          <p className="mt-3 text-[17px] leading-[1.7]" style={{ color: C.body }}>
+            잔금일에 은행이나 중개사무소로 직접 가서 서류를 받고, 그날 바로 등기를 접수합니다.
+          </p>
+          <div className="mt-5 flex flex-wrap gap-2">
+            <button
+              type="button"
+              onClick={() => go("js-apply")}
+              data-gtm-cta="scrivener_poster_apply"
+              className={`inline-flex min-h-12 items-center gap-1.5 rounded-[4px] px-5 text-[16px] font-bold text-white ${focusRing}`}
+              style={{ background: C.navy, outlineColor: C.navy }}
+            >
+              <MessageCircle size={18} aria-hidden />
+              상담신청
+            </button>
+            <button
+              type="button"
+              onClick={() => go("js-cost")}
+              className={`inline-flex min-h-12 items-center gap-1.5 rounded-[4px] border px-5 text-[16px] font-bold ${focusRing}`}
+              style={{ borderColor: C.navy, color: C.navy, outlineColor: C.navy }}
+            >
+              등기비용 안내
+            </button>
           </div>
 
-          <div className="mt-3 hidden grid-cols-[minmax(0,1.5fr)_minmax(0,1fr)_minmax(0,0.9fr)] gap-4 border-b px-1 pb-2 text-[14px] font-semibold md:grid" style={{ borderColor: C.ink, color: C.muted }}>
-            <span>상황</span>
-            <span>업무</span>
-            <span className="text-right">처리 기간</span>
-          </div>
-          <ul className="border-t md:border-t-0" style={{ borderColor: C.ink }} aria-live="polite">
-            {list.map((s) => {
-              const on = open === s.id;
-              const panelId = `js-sit-${s.id}`;
-              return (
-                <li key={s.id} className="border-b" style={{ borderColor: C.line }}>
-                  <button
-                    type="button"
-                    onClick={() => setOpen(on ? null : s.id)}
-                    aria-expanded={on}
-                    aria-controls={panelId}
-                    className={`grid min-h-14 w-full grid-cols-[minmax(0,1fr)_auto] items-center gap-x-3 px-1 py-3 text-left md:grid-cols-[minmax(0,1.5fr)_minmax(0,1fr)_minmax(0,0.9fr)] md:gap-x-4 ${focusRing}`}
-                    style={{ background: on ? C.paperDeep : "transparent", outlineColor: C.navy }}
-                  >
-                    <span className="min-w-0">
-                      <span className="block text-[17px] font-semibold" style={{ color: on ? C.navy : C.ink, wordBreak: "keep-all" }}>
-                        {s.text}
-                      </span>
-                      <span className="mt-0.5 block text-[14px] md:hidden" style={{ color: C.muted }}>
-                        {s.work}
-                      </span>
-                    </span>
-                    <span className="hidden text-[16px] md:block" style={{ color: C.body }}>
-                      {s.work}
-                    </span>
-                    <span className="inline-flex items-center justify-end gap-1 text-right text-[14px] md:text-[15px]" style={{ color: C.muted }}>
-                      <span className="hidden sm:inline">{s.period}</span>
-                      <ChevronDown size={18} aria-hidden className="flex-none" style={{ transform: on ? "rotate(180deg)" : "none", transition: reduce ? "none" : `transform ${DUR}s` }} />
-                    </span>
-                  </button>
-                  <AnimatePresence initial={false}>
-                    {on && (
-                      <motion.div
-                        id={panelId}
-                        key="panel"
-                        initial={reduce ? false : { height: 0, opacity: 0 }}
-                        animate={{ height: "auto", opacity: 1 }}
-                        exit={reduce ? { opacity: 0, transition: { duration: 0 } } : { height: 0, opacity: 0 }}
-                        transition={{ duration: reduce ? 0 : DUR, ease: EASE }}
-                        className="overflow-hidden"
-                        style={{ background: C.paperDeep }}
-                      >
-                        <div className="grid gap-5 px-3 pb-5 pt-1 md:grid-cols-[minmax(0,1.2fr)_minmax(0,1fr)] md:px-4">
-                          <div>
-                            <h3 className="text-[14px] font-bold" style={{ color: C.muted }}>
-                              진행 순서
-                            </h3>
-                            <ol className="mt-2 space-y-2">
-                              {s.steps.map((t, i) => (
-                                <li key={t} className="flex gap-2.5 text-[16px]">
-                                  <span className="grid h-6 w-6 flex-none place-items-center rounded-full text-[13px] font-bold text-white" style={{ background: C.navy }}>
-                                    {i + 1}
-                                  </span>
-                                  <span className="min-w-0">{t}</span>
-                                </li>
-                              ))}
-                            </ol>
-                            <p className="mt-3 text-[15px]">
-                              <span className="font-bold">처리 기간</span> <span style={{ color: C.body }}>{s.period}</span>
-                            </p>
-                          </div>
-                          <div>
-                            <h3 className="text-[14px] font-bold" style={{ color: C.muted }}>
-                              준비 서류
-                            </h3>
-                            <ul className="mt-2 space-y-1.5">
-                              {s.docs.map((d) => (
-                                <li key={d} className="flex gap-2 text-[16px]">
-                                  <Check size={17} aria-hidden className="mt-1 flex-none" style={{ color: C.navy }} />
-                                  {d}
-                                </li>
-                              ))}
-                            </ul>
-                            <button
-                              type="button"
-                              onClick={() => move(s)}
-                              data-gtm-cta={`scrivener_poster_${s.id}`}
-                              className={`mt-4 inline-flex min-h-11 items-center gap-1.5 rounded-[4px] px-4 text-[16px] font-bold text-white ${focusRing}`}
-                              style={{ background: C.navy, outlineColor: C.navy }}
-                            >
-                              {s.to.label}
-                              <ChevronRight size={18} aria-hidden />
-                            </button>
-                          </div>
-                        </div>
-                      </motion.div>
-                    )}
-                  </AnimatePresence>
-                </li>
-              );
-            })}
+          <h2 className="mt-8 text-[18px] font-bold" style={{ color: C.navy }}>
+            업무별 처리 기간
+          </h2>
+          <ul className="mt-2 border-t" style={{ borderColor: C.ink }}>
+            {WORK_PERIODS.map((w) => (
+              <li key={w.work} className="border-b" style={{ borderColor: C.line }}>
+                <button
+                  type="button"
+                  onClick={() => move(w)}
+                  className={`grid min-h-12 w-full grid-cols-[minmax(0,1fr)_auto] items-center gap-x-3 px-1 py-2.5 text-left hover:bg-[#f7f7f5] ${focusRing}`}
+                  style={{ outlineColor: C.navy }}
+                >
+                  <span className="text-[17px] font-semibold">{w.work}</span>
+                  <span className="inline-flex items-center gap-1 text-[15px]" style={{ color: C.muted }}>
+                    {w.period}
+                    <ChevronRight size={17} aria-hidden className="flex-none" />
+                  </span>
+                </button>
+              </li>
+            ))}
           </ul>
-          {list.length === 0 && (
-            <p className="border-b px-1 py-5 text-[16px]" style={{ borderColor: C.line, color: C.body }}>
-              맞는 상황이 없으면 전화 상담 <a href={`tel:${TEL.replace(/-/g, "")}`} className={`font-bold underline underline-offset-4 ${focusRing}`} style={{ color: C.navy, outlineColor: C.navy }}>{TEL}</a>
-            </p>
-          )}
         </div>
 
         {/* 사무소 정보. PC는 세로 사진, 휴대폰은 가로 명함 */}
         <aside aria-label="사무소 정보" className="flex min-w-0 gap-4 rounded-[6px] border p-3 lg:block lg:self-start lg:border-0 lg:p-0" style={{ borderColor: C.line }}>
           <div className="h-24 w-24 flex-none overflow-hidden rounded-[4px] lg:aspect-[3/4] lg:h-auto lg:w-full" style={{ background: C.paperDeep }}>
-            <motion.div className="h-full w-full" initial={reduce ? false : { scale: ZOOM_FROM }} animate={{ scale: 1 }} transition={{ duration: reduce ? 0 : ZOOM, ease: EASE }}>
-              {/* eslint-disable-next-line @next/next/no-img-element -- 정적 export 라 next/image 최적화를 쓰지 않는다 */}
-              <img
-                src={`${IMG}/office.jpg`}
-                width={900}
-                height={1200}
-                alt="서류 묶음이 놓인 나무 상담 책상과 창가 의자 두 개가 있는 상담실"
-                className="h-full w-full object-cover"
-                style={{ objectPosition: "50% 62%" }}
-              />
-            </motion.div>
+            {/* eslint-disable-next-line @next/next/no-img-element -- 정적 export 라 next/image 최적화를 쓰지 않는다 */}
+            <img
+              src={`${IMG}/office.jpg`}
+              width={900}
+              height={1200}
+              alt="서류 묶음이 놓인 나무 상담 책상과 창가 의자 두 개가 있는 상담실"
+              className="h-full w-full object-cover"
+              style={{ objectPosition: "50% 62%" }}
+            />
           </div>
           <div className="min-w-0 lg:mt-4">
-            <p className="text-[17px] font-bold">곰파트너 법무사사무소</p>
+            <p className="text-[17px] font-bold">법무사사무소</p>
             <p className="mt-1 text-[15px]" style={{ color: C.body }}>
               ㅇㅇ등기소 건너편, ㅇㅇ역 2번 출구
             </p>
@@ -658,150 +445,61 @@ function Poster({ reduce, go, onPick, onSide }: { reduce: boolean; go: (id: stri
 
 /* ---------- 1. 등기 비용 계산 ---------- */
 
-function CostCalc({ reduce, onApply }: { reduce: boolean; onApply: () => void }) {
-  const uid = useId();
-  const [manwon, setManwon] = useState(50000);
-  const [homes, setHomes] = useState<Homes>(1);
-  const [adjusted, setAdjusted] = useState(false);
-  const [over85, setOver85] = useState(false);
-
-  const price = manwon * 10000;
-  const r = useMemo(() => {
-    const rate = acqRate(price, homes, adjusted);
-    const acq = floor10((price * rate) / 100);
-    const edu = floor10((price * eduRate(rate)) / 100);
-    const rural = floor10((price * ruralRate(rate, over85)) / 100);
-    const [fl, fh] = feeRange(price);
-    const taxes = acq + edu + rural + REG_FEE;
-    return { rate, acq, edu, rural, fl, fh, low: taxes + fl * 11000, high: taxes + fh * 11000 };
-  }, [price, homes, adjusted, over85]);
-
-  const chip = (on: boolean) =>
-    `rounded-[4px] border px-3.5 py-2 text-[15px] font-semibold transition-colors ${focusRing} ${on ? "text-white" : ""}`;
-
-  const rows: [string, string, number | string][] = [
-    ["취득세", fmtRate(r.rate), r.acq],
-    ["지방교육세", fmtRate(eduRate(r.rate)), r.edu],
-    ["농어촌특별세", over85 ? fmtRate(ruralRate(r.rate, over85)) : "비과세", r.rural],
-    ["등기신청수수료", "방문 신청", REG_FEE],
-    ["법무사 보수", "부가세 별도", `${r.fl}만 ~ ${r.fh}만 원`],
-  ];
-
+function RowsTable({ caption, head, rows }: { caption: string; head: [string, string]; rows: [string, string][] }) {
   return (
-    <div className="grid gap-6 lg:grid-cols-[minmax(0,0.9fr)_minmax(0,1.1fr)] lg:gap-10">
-      <div className="space-y-6">
-        <div>
-          <label htmlFor={`${uid}-price`} className="block text-[16px] font-bold">
-            매매가 (만 원)
-          </label>
-          <input
-            id={`${uid}-price`}
-            inputMode="numeric"
-            value={manwon ? manwon.toLocaleString("ko-KR") : ""}
-            onChange={(e) => {
-              const n = Number(e.target.value.replace(/[^0-9]/g, ""));
-              setManwon(Math.min(n, 999999));
-            }}
-            className={`mt-2 w-full rounded-[4px] border bg-white px-3.5 py-3 text-right text-[22px] font-semibold tabular-nums ${focusRing}`}
-            style={{ borderColor: C.line, outlineColor: C.navy }}
-          />
-          <p className="mt-1.5 text-right text-[15px] font-bold" style={{ color: C.navy }} aria-live="polite">
-            {readManwon(manwon)}
-          </p>
-          <div className="mt-2 flex flex-wrap gap-1.5">
-            {[30000, 50000, 70000, 90000, 120000].map((m) => (
-              <button
-                key={m}
-                type="button"
-                onClick={() => setManwon(m)}
-                aria-pressed={manwon === m}
-                className={`rounded-[4px] border px-2.5 py-1 text-[14px] ${focusRing}`}
-                style={{ borderColor: manwon === m ? C.navy : C.line, background: manwon === m ? C.paperDeep : "#fff", outlineColor: C.navy }}
-              >
-                {readManwon(m)}
-              </button>
-            ))}
-          </div>
-        </div>
+    <table className="w-full text-[15px]">
+      <caption className="sr-only">{caption}</caption>
+      <thead>
+        <tr className="border-b text-left text-[13px]" style={{ borderColor: C.ink, color: C.muted }}>
+          <th scope="col" className="py-2 font-normal">
+            {head[0]}
+          </th>
+          <th scope="col" className="py-2 text-right font-normal">
+            {head[1]}
+          </th>
+        </tr>
+      </thead>
+      <tbody>
+        {rows.map(([k, v]) => (
+          <tr key={k} className="border-b" style={{ borderColor: C.line }}>
+            <th scope="row" className="py-2.5 pr-3 text-left font-semibold">
+              {k}
+            </th>
+            <td className="py-2.5 text-right font-bold tabular-nums">{v}</td>
+          </tr>
+        ))}
+      </tbody>
+    </table>
+  );
+}
 
-        <fieldset>
-          <legend className="text-[16px] font-bold">이번 집을 포함한 주택 수</legend>
-          <div className="mt-2 flex flex-wrap gap-2">
-            {HOMES.map((h) => (
-              <button
-                key={h.v}
-                type="button"
-                aria-pressed={homes === h.v}
-                onClick={() => setHomes(h.v)}
-                className={chip(homes === h.v)}
-                style={{ borderColor: C.navy, background: homes === h.v ? C.navy : "#fff", color: homes === h.v ? "#fff" : C.navy, outlineColor: C.navy }}
-              >
-                {h.label}
-              </button>
-            ))}
-          </div>
-        </fieldset>
-
-        <div className="space-y-2.5">
-          <CheckRow checked={adjusted} onChange={setAdjusted} label="조정대상지역에 있는 집" />
-          <CheckRow checked={over85} onChange={setOver85} label="전용면적 85제곱미터 초과" />
+function CostGuide({ onApply }: { onApply: () => void }) {
+  return (
+    <div className="grid gap-6 lg:grid-cols-2 lg:gap-10">
+      <div>
+        <h3 className="text-[18px] font-bold" style={{ color: C.navy }}>
+          주택 취득세율
+        </h3>
+        <div className="mt-3">
+          <RowsTable caption="주택 수와 매매가에 따른 취득세율" head={["구분", "세율"]} rows={ACQ_ROWS} />
         </div>
-        <p className="text-[14px] leading-[1.7]" style={{ color: C.muted }}>
-          일시적 2주택은 1주택 세율이 적용될 수 있어요. 국민주택채권 할인 비용과 인지세는 따로 알려 드려요.
-        </p>
+        <h3 className="mt-8 text-[18px] font-bold" style={{ color: C.navy }}>
+          함께 내는 세금과 수수료
+        </h3>
+        <div className="mt-3">
+          <RowsTable caption="취득세와 함께 내는 항목" head={["항목", "기준"]} rows={EXTRA_ROWS} />
+        </div>
       </div>
-
-      {/* 견적서 양식 */}
-      <div className="relative rounded-[6px] border bg-white p-5 md:p-7" style={{ borderColor: C.line }}>
-        <div className="flex items-baseline justify-between gap-3 border-b pb-3" style={{ borderColor: C.ink }}>
-          <p className="text-[20px] font-bold tracking-[0.2em] md:text-[22px]" style={{ color: C.ink }}>
-            등기비용 견적서
-          </p>
-          <p className="text-[14px]" style={{ color: C.muted }}>
-            주택 매매, 개략
-          </p>
+      <div className="flex flex-col rounded-[6px] border bg-white p-5 md:p-6" style={{ borderColor: C.line }}>
+        <h3 className="text-[18px] font-bold" style={{ color: C.navy }}>
+          법무사 보수
+        </h3>
+        <div className="mt-3">
+          <RowsTable caption="매매가 구간별 법무사 보수" head={["매매가", "보수 (부가세 별도)"]} rows={FEE_ROWS} />
         </div>
-        <table className="mt-2 w-full text-[15px]">
-          <caption className="sr-only">항목별 등기 비용</caption>
-          <thead>
-            <tr className="text-left text-[13px]" style={{ color: C.muted }}>
-              <th scope="col" className="py-2 font-normal">
-                항목
-              </th>
-              <th scope="col" className="py-2 font-normal">
-                세율, 기준
-              </th>
-              <th scope="col" className="py-2 text-right font-normal">
-                금액
-              </th>
-            </tr>
-          </thead>
-          <tbody>
-            {rows.map(([name, basis, amt]) => (
-              <tr key={name} className="border-t" style={{ borderColor: C.line }}>
-                <th scope="row" className="py-2.5 text-left font-bold">
-                  {name}
-                </th>
-                <td className="py-2.5" style={{ color: C.muted }}>
-                  {basis}
-                </td>
-                <td className="py-2.5 text-right font-bold tabular-nums">
-                  <motion.span key={String(amt)} className="inline-block" initial={reduce ? false : { y: -6 }} animate={{ y: 0 }} transition={{ duration: reduce ? 0 : DUR, ease: EASE }}>
-                    {typeof amt === "number" ? won(amt) : amt}
-                  </motion.span>
-                </td>
-              </tr>
-            ))}
-          </tbody>
-        </table>
-        <div className="mt-3 border-t pt-4" style={{ borderColor: C.ink }}>
-          <p className="text-[14px]" style={{ color: C.muted }}>
-            합계 (법무사 보수 부가세 포함)
-          </p>
-          <p className="mt-1 text-[24px] font-bold tabular-nums md:text-[28px]" style={{ color: C.navy }} aria-live="polite">
-            약 {won(Math.round(r.low / 10000) * 10000)} ~ {won(Math.round(r.high / 10000) * 10000)}
-          </p>
-        </div>
+        <p className="mt-3 text-[14px] leading-[1.6]" style={{ color: C.muted }}>
+          계약서를 보내 주시면 취득세와 보수를 합한 견적서를 보내 드립니다.
+        </p>
         <button
           type="button"
           onClick={onApply}
@@ -810,125 +508,42 @@ function CostCalc({ reduce, onApply }: { reduce: boolean; onApply: () => void })
           style={{ background: C.navy, outlineColor: C.navy }}
         >
           <MessageCircle size={18} aria-hidden />
-          정확한 견적 받기
+          등기 비용 견적 받기
         </button>
       </div>
     </div>
   );
 }
 
-function CheckRow({ checked, onChange, label }: { checked: boolean; onChange: (v: boolean) => void; label: string }) {
-  return (
-    <label className="flex cursor-pointer items-center gap-3 text-[16px]">
-      <input type="checkbox" checked={checked} onChange={(e) => onChange(e.target.checked)} className="peer sr-only" />
-      <span
-        aria-hidden
-        className="flex h-6 w-6 flex-none items-center justify-center rounded-[3px] border-[1.5px] peer-focus-visible:outline peer-focus-visible:outline-[3px] peer-focus-visible:outline-offset-2"
-        style={{ borderColor: C.navy, background: checked ? C.navy : "#fff", outlineColor: C.navy }}
-      >
-        {checked && <Check size={16} color="#fff" strokeWidth={3} />}
-      </span>
-      {label}
-    </label>
-  );
-}
-
 /* ---------- 2. 필요 서류 ---------- */
 
-function DocChecklist({ reduce, side, setSide }: { reduce: boolean; side: Side; setSide: (s: Side) => void }) {
-  const [got, setGot] = useState<Record<string, boolean>>({});
-  const list = DOCS[side];
-  const done = list.filter((d) => got[d.id]).length;
-  const all = done === list.length;
-
+function DocList() {
   return (
-    <div>
-      <div role="tablist" aria-label="서류를 챙기는 사람" className="flex border-b" style={{ borderColor: C.line }}>
-        {(["buyer", "seller"] as Side[]).map((s) => {
-          const on = side === s;
-          return (
-            <button
-              key={s}
-              type="button"
-              role="tab"
-              aria-selected={on}
-              onClick={() => setSide(s)}
-              className={`-mb-px border-b-[3px] px-5 py-3 text-[17px] font-semibold ${focusRing}`}
-              style={{ borderColor: on ? C.navy : "transparent", color: on ? C.navy : C.muted, outlineColor: C.navy }}
-            >
-              {s === "buyer" ? "매수인 (사는 분)" : "매도인 (파는 분)"}
-            </button>
-          );
-        })}
-      </div>
-
-      <div className="mt-5 flex flex-wrap items-center justify-between gap-3">
-        <p className="text-[16px] font-bold" aria-live="polite">
-          {list.length}개 중 {done}개 챙김
-          {all && <span style={{ color: C.navy }}> | 잔금일에 그대로 들고 오세요</span>}
-        </p>
-        <button
-          type="button"
-          onClick={() => setGot({})}
-          className={`inline-flex items-center gap-1.5 rounded-[4px] px-2 py-1 text-[14px] underline-offset-4 hover:underline ${focusRing}`}
-          style={{ color: C.muted, outlineColor: C.navy }}
-        >
-          <RotateCcw size={15} aria-hidden />
-          처음부터
-        </button>
-      </div>
-      <div className="mt-2 h-1.5 overflow-hidden" style={{ background: C.paperDeep }}>
-        <motion.div
-          className="h-full origin-left"
-          style={{ background: C.navy }}
-          initial={false}
-          animate={{ scaleX: done / list.length }}
-          transition={{ duration: reduce ? 0 : DUR, ease: EASE }}
-        />
-      </div>
-
-      <ul className="mt-4 grid gap-x-8 md:grid-cols-2">
-        {list.map((d) => {
-          const on = !!got[d.id];
-          return (
-            <li key={d.id} className="border-b" style={{ borderColor: C.line }}>
-              <button
-                type="button"
-                role="checkbox"
-                aria-checked={on}
-                onClick={() => setGot((g) => ({ ...g, [d.id]: !g[d.id] }))}
-                className={`flex w-full items-start gap-3 py-4 text-left ${focusRing}`}
-                style={{ outlineColor: C.navy }}
-              >
-                <span
-                  className="mt-0.5 flex h-7 w-7 flex-none items-center justify-center rounded-full border-[1.5px] transition-colors"
-                  style={{ borderColor: on ? C.navy : "#c4c4c4", background: on ? C.navy : "#fff" }}
-                >
-                  {on && <Check size={16} color="#fff" strokeWidth={3} aria-hidden />}
+    <div className="grid gap-8 md:grid-cols-2">
+      {(["buyer", "seller"] as Side[]).map((side) => (
+        <div key={side}>
+          <h3 className="border-b-2 pb-2 text-[18px] font-bold" style={{ color: C.navy, borderColor: C.navy }}>
+            {side === "buyer" ? "매수인 (사는 분)" : "매도인 (파는 분)"}
+          </h3>
+          <ul>
+            {DOCS[side].map((d) => (
+              <li key={d.id} className="border-b py-3" style={{ borderColor: C.line }}>
+                <span className="block text-[17px] font-bold">{d.name}</span>
+                <span className="mt-0.5 block text-[15px]" style={{ color: C.muted }}>
+                  {d.note}
                 </span>
-                <span>
-                  <span className="block text-[17px] font-bold" style={{ color: on ? C.muted : C.ink, textDecoration: on ? "line-through" : undefined }}>
-                    {d.name}
-                  </span>
-                  <span className="mt-0.5 block text-[15px]" style={{ color: C.muted }}>
-                    {d.note}
-                  </span>
-                </span>
-              </button>
-            </li>
-          );
-        })}
-      </ul>
+              </li>
+            ))}
+          </ul>
+        </div>
+      ))}
     </div>
   );
 }
 
 /* ---------- 3. 개인회생 ---------- */
 
-function Rehab({ reduce, onApply }: { reduce: boolean; onApply: () => void }) {
-  const [step, setStep] = useState(0);
-  const s = REHAB[step];
-
+function Rehab({ onApply }: { onApply: () => void }) {
   return (
     <div className="grid gap-8 lg:grid-cols-[minmax(0,0.8fr)_minmax(0,1.2fr)] lg:gap-12">
       <div>
@@ -962,80 +577,48 @@ function Rehab({ reduce, onApply }: { reduce: boolean; onApply: () => void }) {
         </button>
       </div>
 
-      <div>
-        <ol className="grid grid-cols-5 gap-1.5" aria-label="개인회생 진행 순서">
-          {REHAB.map((r, i) => {
-            const on = i === step;
-            const past = i < step;
-            return (
-              <li key={r.name}>
-                <button
-                  type="button"
-                  aria-current={on ? "step" : undefined}
-                  onClick={() => setStep(i)}
-                  className={`flex h-full w-full flex-col items-start gap-1 border-t-2 px-1 pb-2 pt-2.5 text-left md:px-2 ${focusRing}`}
-                  style={{ borderColor: on || past ? C.navy : C.line, outlineColor: C.navy }}
-                >
-                  <span className="text-[13px] tabular-nums" style={{ color: C.muted }}>
-                    {i + 1}단계
-                  </span>
-                  <span className="text-[14px] font-bold leading-[1.35] md:text-[16px]" style={{ color: on ? C.navy : C.ink, wordBreak: "keep-all" }}>
-                    {r.name}
-                  </span>
-                </button>
-              </li>
-            );
-          })}
-        </ol>
-        <div className="relative mt-4 min-h-[140px] overflow-hidden border bg-white" style={{ borderColor: C.line }}>
-          <AnimatePresence mode="wait" initial={false}>
-            <motion.div
-              key={step}
-              className="p-5 md:p-6"
-              initial={reduce ? false : { x: 24, clipPath: "inset(0 0 0 100%)" }}
-              animate={{ x: 0, clipPath: "inset(0 0 0 0%)" }}
-              exit={reduce ? { opacity: 0 } : { x: -16, clipPath: "inset(0 100% 0 0)" }}
-              transition={{ duration: reduce ? 0 : DUR, ease: EASE }}
-            >
-              <p className="flex flex-wrap items-baseline gap-x-3 gap-y-1">
-                <span className="text-[20px] font-bold" style={{ color: C.ink }}>
-                  {s.name}
+      <ol className="border-t" style={{ borderColor: C.ink }} aria-label="개인회생 진행 순서">
+        {REHAB.map((r, i) => (
+          <li key={r.name} className="grid grid-cols-[56px_minmax(0,1fr)] gap-3 border-b py-4" style={{ borderColor: C.line }}>
+            <span className="text-[14px] font-semibold tabular-nums" style={{ color: C.muted }}>
+              {i + 1}단계
+            </span>
+            <span>
+              <span className="flex flex-wrap items-baseline gap-x-3 gap-y-1">
+                <span className="text-[18px] font-bold">{r.name}</span>
+                <span className="inline-flex items-center gap-1 text-[14px] font-bold" style={{ color: C.navy }}>
+                  <Clock size={14} aria-hidden />
+                  {r.time}
                 </span>
-                <span className="inline-flex items-center gap-1 text-[15px] font-bold" style={{ color: C.navy }}>
-                  <Clock size={15} aria-hidden />
-                  {s.time}
-                </span>
-              </p>
-              <p className="mt-3 text-[16px] leading-[1.75]">{s.todo}</p>
-            </motion.div>
-          </AnimatePresence>
-        </div>
-        <div className="mt-3 flex justify-between gap-2">
-          <button
-            type="button"
-            disabled={step === 0}
-            onClick={() => setStep((v) => Math.max(0, v - 1))}
-            className={`rounded-[4px] px-3 py-1.5 text-[15px] font-semibold disabled:opacity-40 ${focusRing}`}
-            style={{ color: C.navy, outlineColor: C.navy }}
-          >
-            이전 단계
-          </button>
-          <button
-            type="button"
-            disabled={step === REHAB.length - 1}
-            onClick={() => setStep((v) => Math.min(REHAB.length - 1, v + 1))}
-            className={`rounded-[4px] px-3 py-1.5 text-[15px] font-semibold disabled:opacity-40 ${focusRing}`}
-            style={{ color: C.navy, outlineColor: C.navy }}
-          >
-            다음 단계
-          </button>
-        </div>
-      </div>
+              </span>
+              <span className="mt-1 block text-[16px] leading-[1.7]" style={{ color: C.body }}>
+                {r.todo}
+              </span>
+            </span>
+          </li>
+        ))}
+      </ol>
     </div>
   );
 }
 
 /* ---------- 4. 상담신청 ---------- */
+
+function CheckRow({ checked, onChange, label }: { checked: boolean; onChange: (v: boolean) => void; label: string }) {
+  return (
+    <label className="flex cursor-pointer items-center gap-3 text-[16px]">
+      <input type="checkbox" checked={checked} onChange={(e) => onChange(e.target.checked)} className="peer sr-only" />
+      <span
+        aria-hidden
+        className="flex h-6 w-6 flex-none items-center justify-center rounded-[3px] border-[1.5px] peer-focus-visible:outline peer-focus-visible:outline-[3px] peer-focus-visible:outline-offset-2"
+        style={{ borderColor: C.navy, background: checked ? C.navy : "#fff", outlineColor: C.navy }}
+      >
+        {checked && <Check size={16} color="#fff" strokeWidth={3} />}
+      </span>
+      {label}
+    </label>
+  );
+}
 
 function ApplyForm({ today, reduce, field, setField }: { today: Date; reduce: boolean; field: Field; setField: (f: Field) => void }) {
   const uid = useId();
@@ -1251,7 +834,7 @@ function Visit({ today }: { today: Date }) {
           {/* 사무소 */}
           <rect x="230" y="40" width="110" height="80" fill={C.navy} />
           <text x="285" y="76" textAnchor="middle" fontSize="14" fontWeight="700" fill="#fff">
-            곰파트너
+            법무사사무소
           </text>
           <text x="285" y="98" textAnchor="middle" fontSize="13" fill="#fff">
             5층
@@ -1307,13 +890,10 @@ function Visit({ today }: { today: Date }) {
 function SampleLogo({ light, size = 20 }: { light?: boolean; size?: number }) {
   return (
     <span className="inline-flex items-center gap-2" style={{ color: light ? "#fff" : "#111" }}>
-      {/* eslint-disable-next-line @next/next/no-img-element -- 메인 사이트와 같은 곰 로고 */}
-      <img src="/images/logo-bear.png" alt="" aria-hidden width={28} height={28} className="h-7 w-7 shrink-0" />
       <span className="flex items-baseline gap-1 whitespace-nowrap">
         <span className="font-bold tracking-[-0.03em]" style={{ fontSize: size }}>
-          곰파트너
+          법무사사무소
         </span>
-        <span className="text-[12px] font-semibold opacity-75">카탈로그</span>
       </span>
     </span>
   );

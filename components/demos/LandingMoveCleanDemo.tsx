@@ -3,9 +3,8 @@
 import { useEffect, useMemo, useRef, useState } from "react";
 import Image from "next/image";
 import { AnimatePresence, motion } from "framer-motion";
-import { Check, ChevronDown, Clock, MoveHorizontal, Phone, RotateCcw, Users } from "lucide-react";
+import { Check, ChevronDown, Clock, Phone, Users } from "lucide-react";
 import { useReducedMotionSafe } from "@/hooks/useReducedMotionSafe";
-import { LeadReceivedPanel, type LeadRow } from "@/components/demos/LeadReceivedPanel";
 import { daysAgo, fmtKo, useDemoToday } from "@/hooks/useDemoToday";
 import { DemoMakerInfo } from "@/components/demos/DemoMakerInfo";
 
@@ -14,7 +13,8 @@ import { DemoMakerInfo } from "@/components/demos/DemoMakerInfo";
 
    크몽 랜딩페이지 고급 패키지("맞춤 기능 랜딩") 범위로 만든다.
    한 쪽짜리 페이지이고 상단 메뉴가 없다. 목적은 하나, 견적을 보고 예약 신청하는 것.
-   맞춤 기능 1개: 평수·집 종류·옵션을 고르면 금액·인원·시간이 바로 나오는 견적 계산기.
+   맞춤 기능 1개: 평수, 집 종류, 옵션을 고르면 금액, 인원, 시간이 바로 나오는 견적 계산기.
+   계산기 아래에 평형별 가격표와 옵션 가격을 함께 둔다.
    예약 신청은 실제로 보내지 않고 완료 화면만 보여 준다.
 
    금액은 수도권 입주청소 업체들이 공개한 평당 단가(1.2만~1.8만 원)와 옵션가를 참고한 가상값이다.
@@ -22,7 +22,7 @@ import { DemoMakerInfo } from "@/components/demos/DemoMakerInfo";
    사진(public/images/demo-landing-move-clean): before·after(같은 거실 청소 전후), kitchen. AI 생성. */
 
 const IMG = "/images/demo-landing-move-clean";
-const SHOP = "곰파트너";
+const SHOP = "입주청소";
 const TEL = "1600-0000";
 
 const C = {
@@ -51,12 +51,12 @@ const TYPES: { id: HomeType; label: string; perPy: number }[] = [
   { id: "officetel", label: "오피스텔", perPy: 16_000 },
 ];
 
-const OPTIONS: { id: OptId; label: string; price: (py: number) => number; note: string; zone: string }[] = [
-  { id: "veranda", label: "베란다, 발코니", price: () => 30_000, note: "3만 원", zone: "veranda" },
-  { id: "air", label: "새집증후군 케어", price: (py) => py * 3_000, note: "평당 3천 원", zone: "all" },
-  { id: "mold", label: "욕실 곰팡이 제거", price: () => 50_000, note: "5만 원", zone: "bath" },
-  { id: "grout", label: "줄눈 오염 제거", price: () => 40_000, note: "4만 원", zone: "bath" },
-  { id: "builtin", label: "붙박이장, 냉장고장 안쪽", price: () => 30_000, note: "3만 원", zone: "room" },
+const OPTIONS: { id: OptId; label: string; price: (py: number) => number; note: string }[] = [
+  { id: "veranda", label: "베란다, 발코니", price: () => 30_000, note: "3만 원" },
+  { id: "air", label: "새집증후군 케어", price: (py) => py * 3_000, note: "평당 3천 원" },
+  { id: "mold", label: "욕실 곰팡이 제거", price: () => 50_000, note: "5만 원" },
+  { id: "grout", label: "줄눈 오염 제거", price: () => 40_000, note: "4만 원" },
+  { id: "builtin", label: "붙박이장, 냉장고장 안쪽", price: () => 30_000, note: "3만 원" },
 ];
 
 const MIN_PRICE = 200_000;
@@ -137,11 +137,8 @@ export function LandingMoveCleanDemo() {
       <header className="absolute inset-x-0 top-0 z-20">
         <div className="mx-auto flex max-w-[1200px] items-center justify-between px-4 py-4 md:px-6">
           <span className="inline-flex items-center gap-2 text-white">
-            {/* eslint-disable-next-line @next/next/no-img-element */}
-            <img src="/images/logo-bear.png" alt="" aria-hidden width={30} height={30} className="h-[30px] w-[30px] shrink-0" />
             <span className="inline-flex items-baseline gap-1.5 whitespace-nowrap">
-              <span className="text-[22px] font-extrabold tracking-[-0.03em]">곰파트너</span>
-              <span className="text-[14px] font-semibold opacity-80">카탈로그</span>
+              <span className="text-[22px] font-extrabold tracking-[-0.03em]">입주청소</span>
             </span>
           </span>
           <a href={`tel:${TEL}`} className="inline-flex items-center gap-1.5 rounded-[6px] px-3 py-2 text-[15px] font-bold" style={{ background: C.lemon, color: C.ink }}>
@@ -153,7 +150,6 @@ export function LandingMoveCleanDemo() {
 
       {/* 1. 첫 화면: 바로 계산기 */}
       <section ref={heroRef} className="relative overflow-hidden pb-14 pt-24 md:pb-20 md:pt-28" style={{ background: C.cobalt, color: C.white }}>
-        <PlanGrid />
         <div className="relative mx-auto grid max-w-[1200px] gap-10 px-4 md:grid-cols-[1fr_520px] md:px-6">
           <div className="md:pt-6">
             <p className="inline-block rounded-[4px] px-2 py-1 text-[15px] font-bold" style={{ background: C.lemon, color: C.ink }}>
@@ -190,7 +186,6 @@ export function LandingMoveCleanDemo() {
             setLived={setLived}
             est={est}
             onApply={goApply}
-            reduce={reduce}
           />
         </div>
       </section>
@@ -198,8 +193,16 @@ export function LandingMoveCleanDemo() {
       {/* 2. 청소 전후 */}
       <section className="px-4 py-16 md:px-6 md:py-24">
         <div className="mx-auto max-w-[1200px]">
-          <SectionHead title="같은 거실, 청소 전과 후" desc="공사 먼지와 보호 필름이 남은 신축 거실입니다. 가운데 손잡이를 옆으로 밀어 보세요." />
+          <SectionHead title="같은 거실, 청소 전과 후" desc="공사 먼지와 보호 필름이 남은 신축 거실입니다." />
           <BeforeAfter />
+        </div>
+      </section>
+
+      {/* 평형별 가격표 */}
+      <section className="px-4 pb-16 md:px-6 md:pb-24">
+        <div className="mx-auto max-w-[1200px]">
+          <SectionHead title="평형별 가격" desc="빈집 기준 금액입니다. 짐이 있으면 20%가 더해집니다." />
+          <PriceTable />
         </div>
       </section>
 
@@ -334,20 +337,6 @@ export function LandingMoveCleanDemo() {
   );
 }
 
-/* 첫 화면 배경의 평면도 모눈. 그라데이션 대신 SVG 패턴으로 그린다. */
-function PlanGrid() {
-  return (
-    <svg className="pointer-events-none absolute inset-0 h-full w-full opacity-[0.18]" aria-hidden>
-      <defs>
-        <pattern id="mc-grid" width="32" height="32" patternUnits="userSpaceOnUse">
-          <path d="M32 0H0V32" fill="none" stroke="#fff" strokeWidth="1" />
-        </pattern>
-      </defs>
-      <rect width="100%" height="100%" fill="url(#mc-grid)" />
-    </svg>
-  );
-}
-
 function SectionHead({ title, desc, dark }: { title: string; desc?: string; dark?: boolean }) {
   return (
     <div className="mb-8 md:mb-10">
@@ -358,35 +347,6 @@ function SectionHead({ title, desc, dark }: { title: string; desc?: string; dark
         </p>
       )}
     </div>
-  );
-}
-
-/* 평면도. 고른 옵션이 닿는 구역에 노란 칠을 한다. */
-const PLAN_ROOMS = [
-  { x: 1, y: 1, w: 120, h: 88, z: "room", label: "안방" },
-  { x: 121, y: 1, w: 118, h: 88, z: "living", label: "거실" },
-  { x: 239, y: 1, w: 80, h: 56, z: "room", label: "작은방" },
-  { x: 239, y: 57, w: 80, h: 56, z: "room", label: "작은방" },
-  { x: 1, y: 89, w: 70, h: 60, z: "bath", label: "욕실" },
-  { x: 71, y: 89, w: 110, h: 60, z: "kitchen", label: "주방" },
-  { x: 181, y: 89, w: 58, h: 60, z: "bath", label: "욕실" },
-  { x: 239, y: 113, w: 80, h: 36, z: "veranda", label: "베란다" },
-];
-
-function FloorPlan({ opts }: { opts: OptId[] }) {
-  const zones = new Set(opts.map((id) => OPTIONS.find((o) => o.id === id)!.zone));
-  const on = (z: string) => zones.has("all") || zones.has(z);
-  return (
-    <svg viewBox="0 0 320 150" className="h-auto w-full" role="img" aria-label="평면도에 고른 옵션이 닿는 구역 표시">
-      {PLAN_ROOMS.map((r, i) => (
-        <g key={i}>
-          <rect x={r.x} y={r.y} width={r.w} height={r.h} fill={on(r.z) ? C.lemonSoft : C.white} stroke={C.ink} strokeWidth={2} style={{ transition: "fill .25s" }} />
-          <text x={r.x + 8} y={r.y + 18} fontSize={12} fontWeight={700} fill={C.ink}>
-            {r.label}
-          </text>
-        </g>
-      ))}
-    </svg>
   );
 }
 
@@ -403,7 +363,6 @@ function Calculator(p: {
   setLived: (b: boolean) => void;
   est: Est;
   onApply: () => void;
-  reduce: boolean;
 }) {
   return (
     <div className="rounded-[12px] p-5 shadow-[0_20px_50px_rgba(10,20,60,0.35)] md:p-7" style={{ background: C.white, color: C.ink }}>
@@ -482,17 +441,13 @@ function Calculator(p: {
         짐이 있는 상태 (이사 청소, 20% 추가)
       </label>
 
-      <div className="mt-5 rounded-[8px] border-2 p-3" style={{ borderColor: C.ink }}>
-        <FloorPlan opts={p.opts} />
-      </div>
-
       <div className="mt-5 flex flex-wrap items-end justify-between gap-3 border-t-2 pt-4" style={{ borderColor: C.ink }}>
         <div>
           <p className="text-[14px] font-bold" style={{ color: C.muted }}>
             예상 금액
           </p>
           <p className="text-[36px] font-extrabold leading-tight tracking-[-0.03em] tabular-nums" aria-live="polite">
-            <RollingWon value={p.est.total} reduce={p.reduce} />
+            {won(p.est.total)}
           </p>
         </div>
         <div className="flex gap-4 text-[15px] font-bold">
@@ -511,63 +466,69 @@ function Calculator(p: {
   );
 }
 
-/* 금액이 바뀔 때 숫자가 이어서 굴러간다. 동작 줄이기면 바로 바뀐다. */
-function RollingWon({ value, reduce }: { value: number; reduce: boolean }) {
-  const [shown, setShown] = useState(value);
-  const from = useRef(value);
-  useEffect(() => {
-    if (reduce) {
-      from.current = value;
-      const id = requestAnimationFrame(() => setShown(value));
-      return () => cancelAnimationFrame(id);
-    }
-    const start = performance.now();
-    const a = from.current;
-    let id = 0;
-    const tick = (now: number) => {
-      const k = Math.min(1, (now - start) / 300);
-      const v = Math.round(a + (value - a) * (1 - Math.pow(1 - k, 3)));
-      setShown(v);
-      if (k < 1) id = requestAnimationFrame(tick);
-      else from.current = value;
-    };
-    id = requestAnimationFrame(tick);
-    return () => {
-      cancelAnimationFrame(id);
-      from.current = value;
-    };
-  }, [value, reduce]);
-  return <>{won(Math.round(shown / 1000) * 1000)}</>;
+function BeforeAfter() {
+  const shots = [
+    { src: "before", label: "청소 전", alt: "청소 전 거실: 공사 먼지와 보호 필름", tag: { background: C.ink, color: C.white } },
+    { src: "after", label: "청소 후", alt: "청소 후 거실: 먼지 없는 바닥과 맑은 창", tag: { background: C.lemon, color: C.ink } },
+  ];
+  return (
+    <div className="grid gap-4 md:grid-cols-2">
+      {shots.map((x) => (
+        <figure key={x.src} className="relative aspect-[4/3] overflow-hidden rounded-[12px] border-2" style={{ borderColor: C.ink, background: C.line }}>
+          <Image src={`${IMG}/${x.src}.jpg`} alt={x.alt} fill sizes="(min-width: 768px) 600px, 100vw" className="object-cover" />
+          <figcaption className="absolute left-3 top-3 rounded-[4px] px-2 py-1 text-[14px] font-bold" style={x.tag}>
+            {x.label}
+          </figcaption>
+        </figure>
+      ))}
+    </div>
+  );
 }
 
-function BeforeAfter() {
-  const [pos, setPos] = useState(50);
+const PRICE_ROWS = [10, 18, 24, 32, 40, 50];
+
+function PriceTable() {
   return (
-    <div className="relative aspect-[16/9] select-none overflow-hidden rounded-[12px] border-2" style={{ borderColor: C.ink, background: C.line }}>
-      <Image src={`${IMG}/after.jpg`} alt="청소 후 거실: 먼지 없는 바닥과 맑은 창" fill sizes="(min-width: 1200px) 1200px, 100vw" className="object-cover" />
-      <div className="absolute inset-0" style={{ clipPath: `inset(0 ${100 - pos}% 0 0)` }}>
-        <Image src={`${IMG}/before.jpg`} alt="청소 전 거실: 공사 먼지와 보호 필름" fill sizes="(min-width: 1200px) 1200px, 100vw" className="object-cover" />
+    <div className="grid gap-6 md:grid-cols-[1.4fr_1fr] md:items-start">
+      <div className="overflow-x-auto rounded-[12px] border-2" style={{ borderColor: C.ink, background: C.white }}>
+        <table className="w-full min-w-[340px] text-left text-[16px]">
+          <thead style={{ background: C.ink, color: C.white }}>
+            <tr>
+              <th scope="col" className="px-4 py-3 font-bold">평형</th>
+              <th scope="col" className="px-4 py-3 font-bold">인원</th>
+              <th scope="col" className="px-4 py-3 font-bold">시간</th>
+              <th scope="col" className="px-4 py-3 text-right font-bold">아파트</th>
+            </tr>
+          </thead>
+          <tbody>
+            {PRICE_ROWS.map((py) => {
+              const e = estimate("apt", py, [], false);
+              return (
+                <tr key={py} className="border-t" style={{ borderColor: C.line }}>
+                  <th scope="row" className="px-4 py-3 font-bold">{py}평</th>
+                  <td className="px-4 py-3">{e.staff}명</td>
+                  <td className="px-4 py-3">약 {e.hours}시간</td>
+                  <td className="px-4 py-3 text-right font-extrabold tabular-nums">{won(e.total)}</td>
+                </tr>
+              );
+            })}
+          </tbody>
+        </table>
+        <p className="border-t px-4 py-3 text-[14px]" style={{ borderColor: C.line, color: C.muted }}>
+          빌라는 평당 14,000원, 오피스텔은 평당 16,000원, 최소 {won(MIN_PRICE)}
+        </p>
       </div>
-      <span className="absolute left-3 top-3 rounded-[4px] px-2 py-1 text-[14px] font-bold" style={{ background: C.ink, color: C.white }}>
-        청소 전
-      </span>
-      <span className="absolute right-3 top-3 rounded-[4px] px-2 py-1 text-[14px] font-bold" style={{ background: C.lemon, color: C.ink }}>
-        청소 후
-      </span>
-      <div className="pointer-events-none absolute inset-y-0 w-[3px]" style={{ left: `calc(${pos}% - 1.5px)`, background: C.lemon }}>
-        <span className="absolute left-1/2 top-1/2 grid h-11 w-11 -translate-x-1/2 -translate-y-1/2 place-items-center rounded-full border-2" style={{ background: C.lemon, borderColor: C.ink }}>
-          <MoveHorizontal size={22} aria-hidden />
-        </span>
+      <div className="rounded-[12px] border-2 p-5" style={{ borderColor: C.ink, background: C.white }}>
+        <p className="text-[17px] font-extrabold">추가 작업</p>
+        <ul className="mt-3">
+          {OPTIONS.map((o) => (
+            <li key={o.id} className="flex justify-between gap-4 border-b py-3 text-[16px] last:border-b-0" style={{ borderColor: C.line }}>
+              <span>{o.label}</span>
+              <span className="shrink-0 font-bold">{o.note}</span>
+            </li>
+          ))}
+        </ul>
       </div>
-      <input
-        type="range"
-        min={0}
-        max={100}
-        value={pos}
-        onChange={(e) => setPos(Number(e.target.value))}
-        aria-label="청소 전후 비교 위치"
-        className="absolute inset-0 h-full w-full cursor-ew-resize opacity-0"
-      />
     </div>
   );
 }
@@ -622,14 +583,6 @@ function Checklist({ reduce }: { reduce: boolean }) {
   );
 }
 
-/* 신청 완료 뒤 사장님 시트에 미리 쌓여 있는 가상 접수. */
-const PAST_LEADS: LeadRow[] = [
-  { at: "오늘 10:15", name: "박ㅅ연", digits: "01044172290", summary: "빌라 18평, 짐 있음", source: "메타 광고", status: "통화함" },
-  { at: "오늘 08:52", name: "김ㅎ늘", digits: "01083025517", summary: "아파트 32평, 베란다", source: "메타 광고", status: "통화 전" },
-  { at: "어제 22:47", name: "김ㅎ늘", digits: "01083025517", summary: "아파트 32평, 베란다", source: "네이버 검색광고", status: "계약" },
-  { at: "어제 13:20", name: "이ㅈ민", digits: "01061253048", summary: "오피스텔 11평", source: "블로그", status: "보류" },
-];
-
 function ApplyForm(p: { today: Date; type: HomeType; py: number; opts: OptId[]; lived: boolean; est: Est; reduce: boolean }) {
   const [date, setDate] = useState<number | null>(null);
   const [slot, setSlot] = useState<Slot>("am");
@@ -661,16 +614,6 @@ function ApplyForm(p: { today: Date; type: HomeType; py: number; opts: OptId[]; 
     const d = days[date];
     const ymd = `${String(p.today.getFullYear()).slice(2)}${String(p.today.getMonth() + 1).padStart(2, "0")}${String(p.today.getDate()).padStart(2, "0")}`;
     setDone({ no: `MC-${ymd}-0${(p.py * 7 + p.opts.length * 13) % 90 + 10}`, date: d });
-  };
-
-  const reset = () => {
-    setDone(null);
-    setTried(false);
-    setDate(null);
-    setName("");
-    setPhone("");
-    setAddr("");
-    setAgree(false);
   };
 
   const typeLabel = TYPES.find((t) => t.id === p.type)!.label;
@@ -712,22 +655,6 @@ function ApplyForm(p: { today: Date; type: HomeType; py: number; opts: OptId[]; 
           </dt>
           <dd>예약 담당 정ㅁ석 실장</dd>
         </dl>
-        <button type="button" onClick={reset} className="mt-5 inline-flex items-center gap-1.5 text-[15px] font-bold underline underline-offset-4">
-          <RotateCcw size={16} aria-hidden /> 다시 신청해 보기
-        </button>
-        <LeadReceivedPanel
-          business={SHOP}
-          name={name}
-          phone={phone}
-          summary={`${typeLabel} ${p.py}평${optLabels.length ? `, ${optLabels.join(", ")}` : ""}${p.lived ? ", 짐 있음" : ""}`}
-          lines={[
-            ["견적", `${typeLabel} ${p.py}평, ${won(p.est.total)}`],
-            ["희망일", `${fmtKo(done.date)} ${slot === "am" ? "오전 8시 30분" : "오후 1시"}`],
-            ["주소", addr],
-          ]}
-          pastRows={PAST_LEADS}
-          theme={{ accent: C.cobalt, accentSoft: C.lemonSoft, ink: C.ink, muted: C.muted, line: C.line, paper: C.paper }}
-        />
       </motion.div>
     );
   }

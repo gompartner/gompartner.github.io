@@ -3,9 +3,8 @@
 import { useEffect, useRef, useState } from "react";
 import Image from "next/image";
 import { AnimatePresence, motion } from "framer-motion";
-import { Check, ChevronDown } from "lucide-react";
+import { Check, ChevronDown, Star } from "lucide-react";
 import { useReducedMotionSafe } from "@/hooks/useReducedMotionSafe";
-import { LeadReceivedPanel, type LeadRow } from "@/components/demos/LeadReceivedPanel";
 import { fmtKo, useDemoToday } from "@/hooks/useDemoToday";
 import { DemoMakerInfo } from "@/components/demos/DemoMakerInfo";
 
@@ -19,7 +18,7 @@ import { DemoMakerInfo } from "@/components/demos/DemoMakerInfo";
    상호작용
    1. 첫 화면 제품 고르기: 고른 제품이 신청 폼에 그대로 들어가고 폼으로 내려간다.
    2. 제품 비교: 의무 사용 기간(3년, 5년)을 바꾸면 월 렌탈료가 바뀐다.
-   3. 필터 단면: 고리를 누르면 그 층이 걸러 내는 것을 보여 준다.
+   3. 자주 묻는 질문 펼치기.
    4. 상담 신청 폼과 완료 화면(접수 번호, 전화 예정 시간).
    5. 아래 고정 상담 신청 바: 첫 화면을 지나면 뜨고, 폼이 보이면 숨는다.
 
@@ -83,11 +82,19 @@ const PRODUCTS: {
 const won = (n: number) => n.toLocaleString("ko-KR");
 const MIN_PRICE = Math.min(...PRODUCTS.map((p) => p.price[5]));
 
-const LAYERS = [
-  { id: 1, name: "세디먼트 필터", catch: "녹, 모래처럼 눈에 보이는 큰 알갱이", ring: "#9fd3d6" },
-  { id: 2, name: "카본 필터", catch: "수돗물 소독 냄새(잔류 염소)와 맛을 흐리는 성분", ring: "#4fa8ae" },
-  { id: 3, name: "UF 필터", catch: "머리카락 굵기의 수백분의 일 크기 미세 입자", ring: "#00838f" },
-] as const;
+const REVIEWS = [
+  { name: "정ㅁ석", product: "냉온정수기 M", when: "3개월 사용", text: "설치 기사님이 싱크대 아래 배관을 깔끔하게 정리해 주셨어요. 온수 잠금이 있어서 아이 있는 집에 안심입니다." },
+  { name: "박ㅅ연", product: "직수 정수기 S", when: "1년 사용", text: "물통 갈 일이 없어서 편해요. 방문 전에 문자로 날짜를 물어봐 주셔서 시간 맞추기 좋았습니다." },
+  { name: "김ㅎ늘", product: "공기청정기 A", when: "6개월 사용", text: "필터를 직접 사러 다니지 않아도 되는 게 제일 좋아요. 미세먼지 숫자가 바로 보여서 창문 여는 시점을 정합니다." },
+];
+
+const FAQS = [
+  { q: "의무 사용 기간 안에 해지하면 위약금이 얼마인가요?", a: "남은 기간 렌탈료의 10%와 설치비 면제분을 받습니다. 1년 이상 쓰셨다면 상담 때 정확한 금액을 계산해 드려요." },
+  { q: "이사하면 옮겨 설치해 주나요?", a: "같은 지역 안 이전 설치는 1회 무료입니다. 이사 날짜 일주일 전에 전화 주시면 일정을 잡아 드립니다." },
+  { q: "제휴 카드 할인은 어떻게 받나요?", a: "제휴 카드로 렌탈료를 자동이체하고 전월 실적을 채우면 매달 청구 금액에서 할인됩니다. 카드별 조건은 상담 때 안내해 드려요." },
+  { q: "설치까지 얼마나 걸리나요?", a: "상담 뒤 보통 3일 안에 설치합니다. 원하는 날짜가 있으면 상담 때 말씀해 주세요." },
+  { q: "의무 사용 기간이 끝나면 어떻게 되나요?", a: "제품은 고객님 소유가 됩니다. 이후에도 원하시면 방문 관리만 따로 신청할 수 있어요." },
+];
 
 const CALL_TIMES = ["오전 9~12시", "오후 12~6시", "저녁 6~8시"] as const;
 
@@ -141,6 +148,8 @@ export function LandingWaterRentalDemo() {
       <Compare term={term} setTerm={setTerm} onPick={(id) => { setPicked([id]); goForm(); }} />
       <Benefits today={today} />
       <Care />
+      <Reviews />
+      <Faq />
       <ApplyForm formRef={formRef} today={today} picked={picked} setPicked={setPicked} term={term} />
       <Footer />
       <StickyBar show={!heroVisible && !formVisible} onApply={goForm} reduce={reduce} />
@@ -153,11 +162,8 @@ export function LandingWaterRentalDemo() {
 function Logo({ light = false }: { light?: boolean }) {
   return (
     <span className="inline-flex items-center gap-2" style={{ color: light ? C.white : C.ink }}>
-      {/* eslint-disable-next-line @next/next/no-img-element */}
-      <img src="/images/logo-bear.png" alt="" aria-hidden width={30} height={30} className="h-[30px] w-[30px] shrink-0" />
       <span className="inline-flex items-baseline gap-1.5 whitespace-nowrap">
-        <span className="text-[22px] font-extrabold tracking-[-0.03em]">곰파트너</span>
-        <span className="text-[14px] font-semibold opacity-80">카탈로그</span>
+        <span className="text-[22px] font-extrabold tracking-[-0.03em]">정수기 렌탈</span>
       </span>
     </span>
   );
@@ -246,24 +252,14 @@ function Drop({ src, alt }: { src: string; alt: string }) {
   );
 }
 
-/* 필터 단면을 닮은 겹 고리 */
-function Rings({ className, active }: { className?: string; active?: number }) {
-  const rs = [96, 72, 48];
+/* 첫 화면 배경의 겹 고리 */
+function Rings({ className }: { className?: string }) {
   return (
     <svg viewBox="0 0 200 200" className={className} aria-hidden>
-      {rs.map((r, i) => (
-        <circle
-          key={r}
-          cx="100"
-          cy="100"
-          r={r}
-          fill={active === undefined ? "none" : LAYERS[i].ring}
-          stroke={active === undefined ? "#ffffff" : C.white}
-          strokeWidth={active === undefined ? 10 : 3}
-          opacity={active === undefined || active === i + 1 ? 1 : 0.28}
-        />
+      {[96, 72, 48].map((r) => (
+        <circle key={r} cx="100" cy="100" r={r} fill="none" stroke="#ffffff" strokeWidth={10} />
       ))}
-      <circle cx="100" cy="100" r="22" fill={active === undefined ? "none" : C.white} stroke={active === undefined ? "#ffffff" : C.sea} strokeWidth="4" />
+      <circle cx="100" cy="100" r="22" fill="none" stroke="#ffffff" strokeWidth="4" />
     </svg>
   );
 }
@@ -398,90 +394,104 @@ function DropMark({ className }: { className?: string }) {
 /* ---------- 관리 방식 ---------- */
 
 function Care() {
-  const [layer, setLayer] = useState<number>(1);
-  const cur = LAYERS[layer - 1];
   return (
     <section aria-labelledby="wr-care-title" className="px-5 py-16 md:px-8 md:py-24">
       <div className="mx-auto max-w-[1120px]">
         <h2 id="wr-care-title" className="text-[32px] font-black leading-[1.2] tracking-[-0.03em] md:text-[44px]">
-          필터는 3겹,
-          <br />
-          교체는 방문해서
+          필터 교체는 방문해서
         </h2>
-
-        <div className="mt-10 grid items-center gap-8 md:grid-cols-[320px_1fr] md:gap-14">
-          <div className="mx-auto w-full max-w-[300px]">
-            <Rings className="w-full" active={layer} />
-          </div>
-          <div>
-            <div className="flex flex-wrap gap-2" role="tablist" aria-label="필터 층">
-              {LAYERS.map((l) => (
-                <button
-                  key={l.id}
-                  type="button"
-                  role="tab"
-                  aria-selected={layer === l.id}
-                  onClick={() => setLayer(l.id)}
-                  className="h-11 rounded-full border-2 px-4 text-[15px] font-bold"
-                  style={layer === l.id ? { background: C.sea, borderColor: C.sea, color: C.white } : { borderColor: C.line }}
-                >
-                  {l.id}겹 {l.name}
-                </button>
-              ))}
-            </div>
-            <div className="mt-5 rounded-[14px] border-2 bg-white p-6" style={{ borderColor: C.line }} role="tabpanel">
-              <p className="text-[14px] font-bold" style={{ color: C.sea }}>
-                {cur.id}겹째에서 거르는 것
+        <ul className="mt-8 grid gap-4 md:grid-cols-2">
+          {[
+            { label: "정수기", every: "4개월마다 방문", desc: "필터 교체, 물 나오는 곳 살균, 수질 점검" },
+            { label: "공기청정기", every: "6개월마다 방문", desc: "필터 교체, 센서와 내부 청소" },
+          ].map((v) => (
+            <li key={v.label} className="rounded-[16px] border-2 bg-white p-6" style={{ borderColor: C.line }}>
+              <p className="text-[15px] font-bold" style={{ color: C.sea }}>
+                {v.label}
               </p>
-              <p className="mt-2 text-[22px] font-extrabold leading-[1.45] tracking-[-0.02em]">{cur.catch}</p>
-            </div>
-
-            <h3 className="mt-10 text-[20px] font-extrabold">1년 동안 방문하는 날</h3>
-            <div className="mt-4 space-y-4">
-              <VisitRow label="정수기" every={4} />
-              <VisitRow label="공기청정기" every={6} />
-            </div>
-            <p className="mt-4 text-[15px] leading-[1.7]" style={{ color: C.muted }}>
-              방문 3일 전에 문자로 날짜를 여쭤봅니다. 필터 교체와 물 나오는 곳 살균까지 30분 안쪽으로 끝나요.
-            </p>
-          </div>
-        </div>
+              <p className="mt-1 text-[24px] font-extrabold tracking-[-0.02em]">{v.every}</p>
+              <p className="mt-2 text-[15px] leading-[1.6]" style={{ color: C.muted }}>
+                {v.desc}
+              </p>
+            </li>
+          ))}
+        </ul>
+        <p className="mt-4 text-[15px] leading-[1.7]" style={{ color: C.muted }}>
+          방문 3일 전에 문자로 날짜를 여쭤봅니다. 관리는 30분 안쪽으로 끝나요.
+        </p>
       </div>
     </section>
   );
 }
 
-function VisitRow({ label, every }: { label: string; every: number }) {
+/* ---------- 후기 ---------- */
+
+function Reviews() {
   return (
-    <div className="flex items-center gap-3">
-      <span className="w-[84px] shrink-0 text-[15px] font-bold">{label}</span>
-      <ol className="grid flex-1 grid-cols-12 gap-[3px]" aria-label={`${label} ${every}개월마다 방문`}>
-        {Array.from({ length: 12 }, (_, i) => {
-          const visit = (i + 1) % every === 0;
-          return (
-            <li
-              key={i}
-              className="flex h-8 items-center justify-center rounded-[4px] text-[11px] font-bold"
-              style={visit ? { background: C.sea, color: C.white } : { background: C.mist, color: C.muted }}
-            >
-              {visit ? `${i + 1}월` : ""}
+    <section aria-labelledby="wr-review-title" className="px-5 py-16 md:px-8 md:py-24" style={{ background: C.mist }}>
+      <div className="mx-auto max-w-[1120px]">
+        <h2 id="wr-review-title" className="text-[32px] font-black leading-[1.2] tracking-[-0.03em] md:text-[44px]">
+          먼저 써 본 분들의 후기
+        </h2>
+        <ul className="mt-8 grid gap-4 md:grid-cols-3">
+          {REVIEWS.map((r) => (
+            <li key={r.name} className="rounded-[16px] bg-white p-6">
+              <p className="flex gap-0.5" style={{ color: "#e0a800" }} aria-label="별점 5점">
+                {Array.from({ length: 5 }, (_, i) => (
+                  <Star key={i} size={18} fill="currentColor" strokeWidth={0} aria-hidden />
+                ))}
+              </p>
+              <p className="mt-3 text-[16px] leading-[1.7]">{r.text}</p>
+              <p className="mt-4 text-[14px] font-bold" style={{ color: C.muted }}>
+                {r.name} 님, {r.product}, {r.when}
+              </p>
             </li>
-          );
-        })}
-      </ol>
-    </div>
+          ))}
+        </ul>
+      </div>
+    </section>
+  );
+}
+
+/* ---------- 자주 묻는 질문 ---------- */
+
+function Faq() {
+  const [open, setOpen] = useState<number | null>(0);
+  return (
+    <section aria-labelledby="wr-faq-title" className="px-5 py-16 md:px-8 md:py-24">
+      <div className="mx-auto max-w-[800px]">
+        <h2 id="wr-faq-title" className="text-[32px] font-black leading-[1.2] tracking-[-0.03em] md:text-[44px]">
+          자주 묻는 질문
+        </h2>
+        <ul className="mt-8 divide-y border-y-2" style={{ borderColor: C.line }}>
+          {FAQS.map((f, i) => {
+            const on = open === i;
+            return (
+              <li key={f.q} style={{ borderColor: C.line }}>
+                <button
+                  type="button"
+                  aria-expanded={on}
+                  onClick={() => setOpen(on ? null : i)}
+                  className="flex w-full items-center justify-between gap-4 py-5 text-left text-[17px] font-bold"
+                >
+                  {f.q}
+                  <ChevronDown size={20} className={`shrink-0 transition-transform ${on ? "rotate-180" : ""}`} style={{ color: C.sea }} aria-hidden />
+                </button>
+                {on && (
+                  <p className="pb-5 text-[16px] leading-[1.7]" style={{ color: C.muted }}>
+                    {f.a}
+                  </p>
+                )}
+              </li>
+            );
+          })}
+        </ul>
+      </div>
+    </section>
   );
 }
 
 /* ---------- 상담 신청 ---------- */
-
-/* 신청 완료 뒤 사장님 시트에 미리 쌓여 있는 가상 접수. */
-const PAST_LEADS: LeadRow[] = [
-  { at: "오늘 13:05", name: "정ㅁ석", digits: "01039184406", summary: "냉온정수기 M, 5년", source: "네이버 검색광고", status: "통화함" },
-  { at: "오늘 10:41", name: "박ㅅ연", digits: "01072615503", summary: "직수 정수기 S, 3년", source: "메타 광고", status: "통화 전" },
-  { at: "어제 19:22", name: "박ㅅ연", digits: "01072615503", summary: "직수 정수기 S, 5년", source: "메타 광고", status: "보류" },
-  { at: "어제 11:58", name: "김ㅎ늘", digits: "01088420917", summary: "공기청정기 A, 5년", source: "블로그", status: "계약" },
-];
 
 function ApplyForm({
   formRef,
@@ -502,7 +512,7 @@ function ApplyForm({
   const [agree, setAgree] = useState(false);
   const [showTerms, setShowTerms] = useState(false);
   const [tried, setTried] = useState(false);
-  const [done, setDone] = useState<{ no: string; name: string; rawName: string; phone: string } | null>(null);
+  const [done, setDone] = useState<{ no: string; name: string } | null>(null);
 
   const phoneOk = /^01[016789]\d{7,8}$/.test(phone);
   const errors = {
@@ -519,7 +529,7 @@ function ApplyForm({
     if (!ok) return;
     const ymd = `${String(today.getFullYear()).slice(2)}${String(today.getMonth() + 1).padStart(2, "0")}${String(today.getDate()).padStart(2, "0")}`;
     const seq = String((Number(phone.slice(-4)) % 900) + 100);
-    setDone({ no: `R${ymd}-${seq}`, name: maskName(name), rawName: name, phone });
+    setDone({ no: `R${ymd}-${seq}`, name: maskName(name) });
   };
 
   return (
@@ -549,32 +559,6 @@ function ApplyForm({
                 <Row k="의무 사용" v={`${term}년 기준 안내`} />
                 <Row k="통화 시간" v={time} />
               </dl>
-              <button
-                type="button"
-                onClick={() => {
-                  setDone(null);
-                  setName("");
-                  setPhone("");
-                  setAgree(false);
-                  setTried(false);
-                }}
-                className="mt-5 h-12 w-full rounded-[10px] border-2 text-[16px] font-bold"
-                style={{ borderColor: C.line }}
-              >
-                다시 신청해 보기
-              </button>
-              <LeadReceivedPanel
-                business="곰파트너"
-                name={done.rawName}
-                phone={done.phone}
-                summary={`${PRODUCTS.filter((p) => picked.includes(p.id)).map((p) => p.name).join(", ")}, ${term}년`}
-                lines={[
-                  ["관심 제품", PRODUCTS.filter((p) => picked.includes(p.id)).map((p) => p.name).join(", ")],
-                  ["통화 시간", time],
-                ]}
-                pastRows={PAST_LEADS}
-                theme={{ accent: C.sea, accentSoft: C.mist, ink: C.ink, muted: C.muted, line: C.line, paper: C.foam }}
-              />
             </div>
           ) : (
             <form onSubmit={submit} noValidate className="space-y-6">

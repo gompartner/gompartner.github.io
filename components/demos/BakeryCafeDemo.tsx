@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useMemo, useRef, useState, useSyncExternalStore } from "react";
+import { useEffect, useRef, useState, useSyncExternalStore } from "react";
 import Image from "next/image";
 import { AnimatePresence, motion } from "framer-motion";
 import { Car, Check, ChevronRight, Clock3, Menu, Minus, Phone, Plus, ShoppingBag, TrainFront, Trash2, X } from "lucide-react";
@@ -17,17 +17,15 @@ import { DemoMakerInfo } from "@/components/demos/DemoMakerInfo";
    담기 바는 사이트 공용 버튼(왼쪽 아래, 오른쪽 아래)보다 위에 띄운다.
 
    디자인: 크림색 바탕(#fbf6ec)에 빵 껍질 갈색(#9a4f1c), 버터 노랑(#f2c14e), 크라프트지(#efe3cb).
-   예약 확인은 영수증 모양으로 보여 준다.
 
-   빵 나오는 시간은 8시부터 20시까지를 한 바퀴로 그린 오븐 시계에 점으로 찍는다.
-   상품 카드에는 같은 계산으로 판매 중·남은 개수·나오는 시간을 글자로 적고, 품절만 배지로 띄운다.
+   빵 나오는 시간은 시간, 빵, 수량을 적은 시간표로 둔다. 상품 카드에는 첫 출고 시간을 글자로 적는다.
    픽업 시간은 담은 빵이 처음 나오는 시간 뒤로만 고를 수 있다.
 
    사진 출처(public/images/demo-bakery):
    AI 생성(Z-Image-Turbo, Apache 2.0) hero, display, menu/*.jpg(빵마다 1장) */
 
 const IMG = "/images/demo-bakery";
-const BAKERY = "곰파트너";
+const BAKERY = "베이커리 카페";
 const TEL = "02-000-0000";
 const ADDRESS = "ㅁㄹ시 ㅎㄷ로 5길 21 1층";
 
@@ -75,7 +73,6 @@ const NAV: { id: View; label: string }[] = GROUPS.map((g) => ({ id: g.items[0].i
 
 /* ---------- 시간 ---------- */
 
-const OPEN = 480; // 08:00
 const CLOSE = 1200; // 20:00
 const DAY_NAMES = ["일", "월", "화", "수", "목", "금", "토"];
 
@@ -118,24 +115,22 @@ interface Bread {
   price: number;
   cat: Cat;
   allergens: Allergen[];
-  /** 몇 분마다 하나씩 팔리는지. 남은 개수 계산에만 쓴다. */
-  sellEvery: number;
   desc: string;
 }
 
 const BREADS: Bread[] = [
-  { id: "salt", name: "소금빵", price: 3200, cat: "pastry", allergens: ["milk", "wheat"], sellEvery: 5, desc: "프랑스산 버터를 넣고 돌소금을 올린 쫄깃 고소한 소금빵" },
-  { id: "croissant", name: "크루아상", price: 4200, cat: "pastry", allergens: ["milk", "egg", "wheat"], sellEvery: 8, desc: "3일 동안 접어 만든 결이 살아 있는 버터 크루아상" },
-  { id: "campagne", name: "깜파뉴", price: 7500, cat: "meal", allergens: ["wheat"], sellEvery: 25, desc: "통밀, 호밀, 천연발효종. 48시간 저온 숙성" },
-  { id: "fig", name: "무화과 호두 깜파뉴", price: 8500, cat: "meal", allergens: ["wheat", "nut"], sellEvery: 25, desc: "반건조 무화과와 구운 호두 듬뿍." },
-  { id: "bagel", name: "플레인 베이글", price: 3500, cat: "meal", allergens: ["wheat"], sellEvery: 12, desc: "겉은 단단하고 속은 쫄깃한 기본 베이글" },
-  { id: "pretzel", name: "버터 프레첼", price: 4000, cat: "pastry", allergens: ["milk", "wheat"], sellEvery: 12, desc: "짭조름한 프레첼에 차가운 버터 한 조각" },
-  { id: "redbean", name: "단팥빵", price: 3000, cat: "sweet", allergens: ["milk", "egg", "wheat"], sellEvery: 10, desc: "국산 팥으로 직접 만든 앙금, 덜 달게" },
-  { id: "cream", name: "우유 크림빵", price: 3500, cat: "sweet", allergens: ["milk", "egg", "wheat"], sellEvery: 9, desc: "주문 즉시 우유 크림을 가득 채워 드려요" },
-  { id: "milkbread", name: "우유식빵", price: 5500, cat: "meal", allergens: ["milk", "wheat"], sellEvery: 15, desc: "물 없이 우유로만 반죽한 결대로 찢어지는 식빵" },
-  { id: "castella", name: "쌀 카스텔라", price: 6000, cat: "baked", allergens: ["milk", "egg"], sellEvery: 18, desc: "밀가루 없이 100% 쌀가루로 구운 카스텔라" },
-  { id: "financier", name: "휘낭시에", price: 2500, cat: "baked", allergens: ["milk", "egg", "nut", "wheat"], sellEvery: 6, desc: "태운 버터와 아몬드 가루로 구운 휘낭시에" },
-  { id: "tart", name: "에그타르트", price: 3000, cat: "sweet", allergens: ["milk", "egg", "wheat"], sellEvery: 7, desc: "바삭한 파이 반죽에 커스터드를 채운 에그타르트" },
+  { id: "salt", name: "소금빵", price: 3200, cat: "pastry", allergens: ["milk", "wheat"], desc: "프랑스산 버터를 넣고 돌소금을 올린 쫄깃 고소한 소금빵" },
+  { id: "croissant", name: "크루아상", price: 4200, cat: "pastry", allergens: ["milk", "egg", "wheat"], desc: "3일 동안 접어 만든 결이 살아 있는 버터 크루아상" },
+  { id: "campagne", name: "깜파뉴", price: 7500, cat: "meal", allergens: ["wheat"], desc: "통밀, 호밀, 천연발효종. 48시간 저온 숙성" },
+  { id: "fig", name: "무화과 호두 깜파뉴", price: 8500, cat: "meal", allergens: ["wheat", "nut"], desc: "반건조 무화과와 구운 호두 듬뿍." },
+  { id: "bagel", name: "플레인 베이글", price: 3500, cat: "meal", allergens: ["wheat"], desc: "겉은 단단하고 속은 쫄깃한 기본 베이글" },
+  { id: "pretzel", name: "버터 프레첼", price: 4000, cat: "pastry", allergens: ["milk", "wheat"], desc: "짭조름한 프레첼에 차가운 버터 한 조각" },
+  { id: "redbean", name: "단팥빵", price: 3000, cat: "sweet", allergens: ["milk", "egg", "wheat"], desc: "국산 팥으로 직접 만든 앙금, 덜 달게" },
+  { id: "cream", name: "우유 크림빵", price: 3500, cat: "sweet", allergens: ["milk", "egg", "wheat"], desc: "주문 즉시 우유 크림을 가득 채워 드려요" },
+  { id: "milkbread", name: "우유식빵", price: 5500, cat: "meal", allergens: ["milk", "wheat"], desc: "물 없이 우유로만 반죽한 결대로 찢어지는 식빵" },
+  { id: "castella", name: "쌀 카스텔라", price: 6000, cat: "baked", allergens: ["milk", "egg"], desc: "밀가루 없이 100% 쌀가루로 구운 카스텔라" },
+  { id: "financier", name: "휘낭시에", price: 2500, cat: "baked", allergens: ["milk", "egg", "nut", "wheat"], desc: "태운 버터와 아몬드 가루로 구운 휘낭시에" },
+  { id: "tart", name: "에그타르트", price: 3000, cat: "sweet", allergens: ["milk", "egg", "wheat"], desc: "바삭한 파이 반죽에 커스터드를 채운 에그타르트" },
 ];
 
 const breadImg = (id: string) => `${IMG}/menu/${id}.jpg`;
@@ -181,57 +176,6 @@ const BATCHES: Batch[] = [
 const FIRST_AT = Object.fromEntries(
   BREADS.map((b) => [b.id, Math.min(...BATCHES.filter((x) => x.bread === b.id).map((x) => x.at))]),
 ) as Record<string, number>;
-
-type BatchState = { kind: "unknown" } | { kind: "closed" } | { kind: "soon"; diff: number } | { kind: "out"; left: number };
-
-function batchState(batch: Batch, clock: Clock): BatchState {
-  if (!clock) return { kind: "unknown" };
-  if (clock.day === 1) return { kind: "closed" };
-  if (clock.m < batch.at) return { kind: "soon", diff: batch.at - clock.m };
-  const sold = Math.floor((clock.m - batch.at) / BREAD_BY_ID[batch.bread].sellEvery);
-  return { kind: "out", left: Math.max(0, batch.qty - sold) };
-}
-
-/** 영업시간 밖에 다음 날을 미리 보여 줄 때는 "몇 분 뒤"가 맞지 않아 준비 중으로만 적는다 */
-const stateTextFor = (s: BatchState, closedView: boolean) => (closedView && s.kind === "soon" ? "준비 중" : stateText(s));
-
-function stateText(s: BatchState) {
-  switch (s.kind) {
-    case "unknown":
-      return "";
-    case "closed":
-      return "오늘 휴무";
-    case "soon":
-      return s.diff < 60 ? `${s.diff}분 뒤 나와요` : `${Math.floor(s.diff / 60)}시간${s.diff % 60 ? ` ${s.diff % 60}분` : ""} 뒤 나와요`;
-    case "out":
-      return s.left > 0 ? `판매 중, ${s.left}개 남음` : "품절";
-  }
-}
-
-type BreadNow =
-  | { kind: "unknown" }
-  | { kind: "closed"; text: string }
-  | { kind: "sale"; left: number; next: number | null }
-  | { kind: "soon"; at: number }
-  | { kind: "soldout" };
-
-/** 상품 카드용: 그 빵의 모든 굽는 차례를 합쳐 지금 상태를 낸다. */
-function breadNow(id: string, clock: Clock): BreadNow {
-  if (!clock) return { kind: "unknown" };
-  if (clock.day === 1) return { kind: "closed", text: "오늘 휴무" };
-  if (clock.m >= CLOSE) return { kind: "closed", text: "영업 종료" };
-  let left = 0;
-  let next: number | null = null;
-  for (const b of BATCHES) {
-    if (b.bread !== id) continue;
-    const s = batchState(b, clock);
-    if (s.kind === "out") left += s.left;
-    else if (s.kind === "soon" && next === null) next = b.at;
-  }
-  if (left > 0) return { kind: "sale", left, next };
-  if (next !== null) return { kind: "soon", at: next };
-  return { kind: "soldout" };
-}
 
 const won = (n: number) => `${n.toLocaleString("ko-KR")}원`;
 
@@ -319,10 +263,10 @@ export function BakeryCafeDemo() {
       body = <StoreInfo />;
       break;
     case "menu-all":
-      body = <MenuAllPage clock={clock} cart={cart} onAdd={add} />;
+      body = <MenuAllPage cart={cart} onAdd={add} />;
       break;
     case "oven-time":
-      body = <OvenTimePage clock={clock} />;
+      body = <OvenTimePage />;
       break;
     case "pickup":
       body = <PickupOrder clock={clock} cart={cart} onAdd={add} onClear={() => setCart({})} onBack={() => go("menu-all")} />;
@@ -341,8 +285,8 @@ export function BakeryCafeDemo() {
       {view === "home" ? (
         <main key="home" className="soft-in">
           <Banner onGo={go} />
-          <Oven clock={clock} onAdd={(id) => add(id, 1)} />
-          <MenuGrid clock={clock} cart={cart} onAdd={add} onGo={go} />
+          <Oven />
+          <MenuGrid cart={cart} onAdd={add} onGo={go} />
           <Store />
         </main>
       ) : (
@@ -363,11 +307,8 @@ export function BakeryCafeDemo() {
 function Logo() {
   return (
     <span className="inline-flex items-center gap-2">
-      {/* eslint-disable-next-line @next/next/no-img-element */}
-      <img src="/images/logo-bear.png" alt="" aria-hidden width={28} height={28} className="h-7 w-7 shrink-0" />
       <span className="inline-flex items-baseline gap-1.5 whitespace-nowrap">
-        <span className="text-[19px] font-bold tracking-[-0.02em]">곰파트너</span>
-        <span className="text-[12px] font-semibold opacity-80">카탈로그</span>
+        <span className="text-[19px] font-bold tracking-[-0.02em]">베이커리 카페</span>
       </span>
     </span>
   );
@@ -489,11 +430,6 @@ function Header({ view, count, onGo }: { view: View; count: number; onGo: (targe
 
 /* ---------- 첫 화면 ---------- */
 
-function nextBatch(clock: Clock) {
-  if (!clock || clock.day === 1) return null;
-  return BATCHES.find((b) => b.at > clock.m) ?? null;
-}
-
 function Banner({ onGo }: { onGo: (target: string) => void }) {
   return (
     <section id="top" aria-labelledby="bakery-name" className="relative">
@@ -542,285 +478,39 @@ function SectionTitle({ id, title, aside }: { id: string; title: string; aside?:
   );
 }
 
-/* ---------- 오븐 시계 ---------- */
+/* ---------- 빵 나오는 시간 ---------- */
 
-const CX = 170;
-const CY = 170;
-
-/** 벽시계와 같은 12시간 문자판. 12가 맨 위, 08:00은 8시 자리. 영업이 12시간이라 한 바퀴가 영업 시간 전체다 */
-function polar(m: number, r: number) {
-  const a = ((m % 720) / 720) * Math.PI * 2 - Math.PI / 2;
-  // 서버와 브라우저의 소수점 끝자리 차이로 하이드레이션이 어긋나지 않게 반올림한다
-  return { x: Math.round((CX + Math.cos(a) * r) * 100) / 100, y: Math.round((CY + Math.sin(a) * r) * 100) / 100 };
-}
-
-function describeArc(from: number, to: number, r: number) {
-  const a = polar(from, r);
-  const b = polar(to, r);
-  const large = (to - from) / (CLOSE - OPEN) > 0.5 ? 1 : 0;
-  return `M${a.x} ${a.y} A${r} ${r} 0 ${large} 1 ${b.x} ${b.y}`;
-}
-
-function OvenClock({ clock, selected, onSelect, rest, closedView }: { clock: Clock; selected: number; onSelect: (i: number) => void; rest: Rest | null; closedView: boolean }) {
-  const reduce = useReducedMotionSafe();
-  const next = nextBatch(clock);
-  const showHand = clock && clock.day !== 1 && clock.m >= OPEN && clock.m < CLOSE;
-  const hand = showHand ? { a: polar(clock.m, 104), b: polar(clock.m, 150) } : null;
-  const sel = BATCHES[selected];
-  const selState = batchState(sel, clock);
-
-  return (
-    <svg id="oven-clock" viewBox="0 0 340 340" className="mx-auto h-auto w-full max-w-[420px]" role="group" aria-label="오늘 빵 나오는 시간 시계">
-      <circle cx={CX} cy={CY} r="160" fill={C.paper} stroke={C.line} />
-      {/* 가운데에 고른 빵 사진. 글자가 읽히게 어두운 막을 덮는다 */}
-      <defs>
-        <clipPath id="oven-face">
-          <circle cx={CX} cy={CY} r="119" />
-        </clipPath>
-      </defs>
-      <g clipPath="url(#oven-face)" aria-hidden>
-        <AnimatePresence initial={false}>
-          <motion.image
-            key={rest ? rest.img : sel.bread}
-            href={rest ? rest.img : breadImg(sel.bread)}
-            x={CX - 119}
-            y={CY - 119}
-            width="238"
-            height="238"
-            preserveAspectRatio="xMidYMid slice"
-            initial={reduce ? false : { opacity: 0 }}
-            animate={{ opacity: 1 }}
-            exit={{ opacity: 0 }}
-            transition={{ duration: reduce ? 0 : 0.35 }}
-          />
-        </AnimatePresence>
-        <circle cx={CX} cy={CY} r="119" fill="rgba(36,24,14,0.5)" />
-      </g>
-      <circle cx={CX} cy={CY} r="128" fill="none" stroke={C.kraft} strokeWidth="18" />
-      {showHand && clock && <path d={describeArc(OPEN, clock.m, 128)} fill="none" stroke={C.butterSoft} strokeWidth="18" strokeLinecap="butt" />}
-      {Array.from({ length: 12 }, (_, i) => (i + 1) * 60).map((m) => {
-        const p = polar(m, 150);
-        return (
-          <text key={m} x={p.x} y={Math.round((p.y + 4) * 100) / 100} fontSize="12" textAnchor="middle" fill={C.muted} fontWeight={600} aria-hidden>
-            {m / 60}
-          </text>
-        );
-      })}
-
-      {BATCHES.map((b, i) => {
-        const s = batchState(b, clock);
-        const p = polar(b.at, 128);
-        const isNext = next === b;
-        const done = s.kind === "out";
-        const soldOut = s.kind === "out" && s.left === 0;
-        const label = `${hhmm(b.at)} ${BREAD_BY_ID[b.bread].name}${stateTextFor(s, closedView) ? `, ${stateTextFor(s, closedView)}` : ""}`;
-        return (
-          <g
-            key={b.at}
-            role="button"
-            tabIndex={0}
-            aria-label={label}
-            aria-pressed={selected === i}
-            onClick={() => onSelect(i)}
-            onKeyDown={(e) => {
-              if (e.key === "Enter" || e.key === " ") {
-                e.preventDefault();
-                onSelect(i);
-              }
-            }}
-            className="cursor-pointer outline-none [&:focus-visible>circle:first-child]:stroke-[#2b1e14]"
-          >
-            <circle cx={p.x} cy={p.y} r="16" fill="transparent" stroke="transparent" strokeWidth="2" />
-            {isNext && !reduce && (
-              <motion.circle
-                cx={p.x}
-                cy={p.y}
-                r="9"
-                fill="none"
-                stroke={C.butter}
-                strokeWidth="3"
-                style={{ transformBox: "fill-box", transformOrigin: "center" }}
-                animate={{ scale: [1, 1.9], opacity: [0.9, 0] }}
-                transition={{ duration: 1.8, repeat: Infinity, ease: "easeOut" }}
-              />
-            )}
-            <circle
-              cx={p.x}
-              cy={p.y}
-              r={selected === i ? 10 : 7.5}
-              fill={soldOut ? C.kraftDeep : done ? C.crust : isNext ? C.butter : C.paper}
-              stroke={selected === i ? C.ink : done ? C.crust : C.crustDeep}
-              strokeWidth={selected === i ? 2.5 : 1.8}
-            />
-          </g>
-        );
-      })}
-
-      {hand && (
-        <g aria-hidden pointerEvents="none">
-          <line x1={hand.a.x} y1={hand.a.y} x2={hand.b.x} y2={hand.b.y} stroke={C.ink} strokeWidth="3" strokeLinecap="round" />
-          <circle cx={hand.a.x} cy={hand.a.y} r="3.5" fill={C.ink} />
-        </g>
-      )}
-
-      <foreignObject x={CX - 78} y={CY - 52} width="156" height="104">
-        <div className="flex h-full flex-col items-center justify-center text-center" aria-live="polite">
-          <span className="text-[13px] font-semibold tabular-nums" style={{ color: "#ffe2a8" }}>
-            {rest ? rest.title : hhmm(sel.at)}
-          </span>
-          <span className="text-[19px] font-bold leading-[1.3] tracking-[-0.02em]" style={{ color: "#fff" }}>
-            {rest ? rest.sub : BREAD_BY_ID[sel.bread].name}
-          </span>
-          <span className="mt-0.5 text-[13px] font-semibold leading-[1.4]" style={{ color: "rgba(255,255,255,0.88)" }}>
-            {rest ? `${BREAD_BY_ID[sel.bread].name}부터 나와요` : stateTextFor(selState, closedView) || `${sel.qty}개`}
-          </span>
-        </div>
-      </foreignObject>
-    </svg>
-  );
-}
-
-/** 영업시간 밖에 시계 가운데에 띄우는 장면. 개점 전은 반죽하는 손, 마감 뒤와 휴무일은 불 하나 켜 둔 빈 매장 */
-type Rest = { img: string; title: string; sub: string };
-
-function Oven({ clock: realClock, onAdd }: { clock: Clock; onAdd: (id: string) => void }) {
-  const [preview, setPreview] = useState<number | null>(null);
-  // 영업시간 밖에는 다음 영업일 첫 출고 전 상태로 보여 주고, 가운데에 준비하거나 쉬는 장면을 띄운다
-  const closedNow = !!realClock && (realClock.day === 1 || realClock.m < OPEN || realClock.m >= CLOSE - 10);
-  const beforeOpen = !!realClock && realClock.day !== 1 && realClock.m < OPEN;
-  const first = hhmm(BATCHES[0].at);
-  const viewM = preview ?? (closedNow ? OPEN - 10 : null);
-  const clock: Clock = viewM === null ? realClock : { day: realClock && realClock.day !== 1 ? realClock.day : 2, m: viewM };
-  const next = nextBatch(clock);
-  const [picked, setPicked] = useState<number | null>(null);
-  const closedView = preview === null && closedNow;
-  const rest: Rest | null =
-    closedView && picked === null && realClock
-      ? beforeOpen
-        ? { img: `${IMG}/clock-prep.jpg`, title: "영업 전", sub: `${first} 첫 출고` }
-        : { img: `${IMG}/clock-rest.jpg`, title: realClock.day === 1 ? "오늘 휴무" : "오늘 영업 끝", sub: `내일 ${first} 첫 출고` }
-      : null;
-  const selected = picked ?? (next ? BATCHES.indexOf(next) : 0);
-  const [added, setAdded] = useState<string | null>(null);
-
-  useEffect(() => {
-    if (!added) return;
-    const id = window.setTimeout(() => setAdded(null), 1600);
-    return () => window.clearTimeout(id);
-  }, [added]);
-
-  const sel = BATCHES[selected];
-  const bread = BREAD_BY_ID[sel.bread];
-
+function Oven() {
   return (
     <section aria-labelledby="oven-title" id="oven" className="scroll-mt-16 px-4 py-14 md:px-6 md:py-20">
       <div className="mx-auto max-w-[1200px]">
-        <SectionTitle id="oven-title" title="오늘 빵 나오는 시간" />
-        <div className="mt-8 grid items-start gap-8 md:grid-cols-[1fr_1fr] md:gap-12">
-          <div>
-            <OvenClock clock={clock} selected={selected} onSelect={setPicked} rest={rest} closedView={closedView} />
-            <div className="mx-auto mt-4 max-w-[420px]">
-              <div className="flex items-center justify-between text-[15px]">
-                <label htmlFor="oven-time" className="font-semibold">
-                  시간 이동
-                </label>
-                <span className="flex items-center gap-2">
-                  <span className="font-bold tabular-nums" style={{ color: C.crust }}>
-                    {closedView && realClock ? hhmm(realClock.m) : clock ? hhmm(clock.m) : ""}
-                  </span>
-                  {preview !== null && !closedNow && (
-                    <button type="button" onClick={() => setPreview(null)} className="h-9 rounded-[6px] border px-3 text-[14px] font-semibold" style={{ borderColor: C.line, background: C.paper }}>
-                      현재 시각
-                    </button>
-                  )}
-                </span>
-              </div>
-              <input
-                id="oven-time"
-                type="range"
-                min={OPEN}
-                max={CLOSE - 10}
-                step={10}
-                value={clock ? Math.min(CLOSE - 10, Math.max(OPEN, clock.m)) : OPEN}
-                onChange={(e) => {
-                  setPreview(Number(e.target.value));
-                  setPicked(null);
-                }}
-                aria-valuetext={clock ? hhmm(clock.m) : undefined}
-                className="mt-2 w-full accent-[#9a4f1c]"
-              />
-            </div>
-            <ul className="mt-3 flex flex-wrap justify-center gap-x-5 gap-y-1 text-[14px]" style={{ color: C.muted }} aria-label="범례">
-              {[
-                ["판매 중", { background: C.crust }],
-                ["다음 출고", { background: C.butter }],
-                ["준비 중", { background: C.paper, border: `2px solid ${C.crustDeep}` }],
-                ["품절", { background: C.kraftDeep }],
-              ].map(([label, style]) => (
-                <li key={label as string} className="inline-flex items-center gap-1.5">
-                  <span className="h-3 w-3 rounded-full" style={style as React.CSSProperties} aria-hidden />
-                  {label as string}
-                </li>
-              ))}
-            </ul>
-          </div>
-
-          <div>
-            <div className="flex items-start gap-4 rounded-[10px] border p-5" style={{ background: C.paper, borderColor: C.line }}>
+        <SectionTitle
+          id="oven-title"
+          title="빵 나오는 시간"
+          aside={
+            <p className="text-[15px]" style={{ color: C.muted }}>
+              화요일 ~ 일요일, 하루 17번 굽습니다
+            </p>
+          }
+        />
+        <ul className="mt-6 grid gap-x-10 sm:grid-cols-2 lg:grid-cols-3">
+          {BATCHES.map((b) => (
+            <li key={b.at} className="flex items-center gap-3 border-b py-3" style={{ borderColor: C.line }}>
+              <span className="w-[52px] shrink-0 font-semibold tabular-nums" style={{ color: C.crust }}>
+                {hhmm(b.at)}
+              </span>
               {/* eslint-disable-next-line @next/next/no-img-element */}
-              <img src={breadImg(bread.id)} alt={bread.name} loading="lazy" className="h-[88px] w-[88px] shrink-0 rounded-[6px] object-cover" />
-              <div className="min-w-0 flex-1">
-                <p className="text-[14px] font-semibold tabular-nums" style={{ color: C.crust }}>
-                  {hhmm(sel.at)}, {sel.qty}개
-                </p>
-                <p className="text-[21px] font-bold tracking-[-0.02em]">{bread.name}</p>
-                <p className="mt-1 text-[15px]" style={{ color: C.muted }}>
-                  {bread.desc}
-                </p>
-                <div className="mt-3 flex items-center justify-between gap-3">
-                  <span className="font-bold tabular-nums">{won(bread.price)}</span>
-                  <button
-                    type="button"
-                    onClick={() => {
-                      onAdd(bread.id);
-                      setAdded(bread.id);
-                    }}
-                    className="inline-flex h-11 items-center gap-1.5 rounded-[6px] px-5 text-[15px] font-semibold"
-                    style={{ background: C.crust, color: "#fff" }}
-                  >
-                    {added === bread.id ? <Check size={17} aria-hidden /> : <Plus size={17} aria-hidden />}
-                    담기
-                  </button>
-                </div>
-              </div>
-            </div>
-
-            <ul className="mt-4 max-h-[360px] overflow-y-auto rounded-[10px] border" style={{ borderColor: C.line, background: C.paper }} aria-label="굽는 순서">
-              {BATCHES.map((b, i) => {
-                const s = batchState(b, clock);
-                return (
-                  <li key={b.at} className="border-b last:border-b-0" style={{ borderColor: C.line }}>
-                    <button
-                      type="button"
-                      onClick={() => setPicked(i)}
-                      aria-pressed={selected === i}
-                      className="flex w-full items-center gap-3 px-4 py-2.5 text-left transition-colors hover:bg-[#fbf3e2]"
-                      style={selected === i ? { background: C.butterSoft } : undefined}
-                    >
-                      <span className="w-[48px] shrink-0 text-[15px] font-semibold tabular-nums" style={{ color: C.crust }}>
-                        {hhmm(b.at)}
-                      </span>
-                      <span className="min-w-0 flex-1 truncate font-semibold">{BREAD_BY_ID[b.bread].name}</span>
-                      <span className="shrink-0 text-[14px]" style={{ color: s.kind === "out" && s.left > 0 ? C.green : C.muted }}>
-                        {stateTextFor(s, closedView)}
-                      </span>
-                    </button>
-                  </li>
-                );
-              })}
-            </ul>
-          </div>
-        </div>
+              <img src={breadImg(b.bread)} alt="" aria-hidden loading="lazy" className="h-10 w-10 shrink-0 rounded-[6px] object-cover" style={{ background: C.kraft }} />
+              <span className="min-w-0 flex-1 truncate font-semibold">{BREAD_BY_ID[b.bread].name}</span>
+              <span className="shrink-0 text-[15px] tabular-nums" style={{ color: C.muted }}>
+                {b.qty}개
+              </span>
+            </li>
+          ))}
+        </ul>
+        <p className="mt-5 text-[14px]" style={{ color: C.muted }}>
+          굽는 상황에 따라 10분 정도 늦어질 수 있습니다. 원하는 빵은 픽업 예약으로 미리 맡아 두실 수 있습니다.
+        </p>
       </div>
     </section>
   );
@@ -828,71 +518,22 @@ function Oven({ clock: realClock, onAdd }: { clock: Clock; onAdd: (id: string) =
 
 /* ---------- 메뉴 (분류 탭 + 상품 격자) ---------- */
 
-/** 품절만 배지로 띄우고 나머지 상태는 글자로 적는다. */
-function nowBadge(s: BreadNow): { text: string; color: string; bg: string } | null {
-  return s.kind === "soldout" ? { text: "품절", color: "#fff", bg: "#8a7a68" } : null;
-}
-
-function nowLine(s: BreadNow) {
-  switch (s.kind) {
-    case "sale":
-      return `판매 중, ${s.left}개 남음`;
-    case "soon":
-      return `${hhmm(s.at)}에 나와요`;
-    case "closed":
-      return s.text;
-    default:
-      return "";
-  }
-}
-
 function MenuGrid({
-  clock,
   cart,
   onAdd,
   onGo,
 }: {
-  clock: Clock;
   cart: Cart;
   onAdd: (id: string, delta: number) => void;
   onGo: (target: string, tab?: "pickup" | "group") => void;
 }) {
   const [cat, setCat] = useState<Cat | "all">("all");
-  const [state, setState] = useState<"all" | "sale" | "soon">("all");
-
-  const list = BREADS.map((b) => ({ b, s: breadNow(b.id, clock) })).filter(
-    ({ b, s }) => (cat === "all" || b.cat === cat) && (state === "all" || s.kind === state),
-  );
+  const list = BREADS.filter((b) => cat === "all" || b.cat === cat);
 
   return (
     <section aria-labelledby="menu-title" id="menu" className="scroll-mt-16 px-4 py-14 md:px-6 md:py-20" style={{ background: C.paper }}>
       <div className="mx-auto max-w-[1200px]">
-        <SectionTitle
-          id="menu-title"
-          title="메뉴"
-          aside={
-            <div className="flex gap-1" role="group" aria-label="판매 상태">
-              {(
-                [
-                  ["all", "전체"],
-                  ["sale", "판매 중"],
-                  ["soon", "준비 중"],
-                ] as const
-              ).map(([v, label]) => (
-                <button
-                  key={v}
-                  type="button"
-                  aria-pressed={state === v}
-                  onClick={() => setState(v)}
-                  className="h-9 rounded-[6px] border px-3 text-[14px] font-semibold"
-                  style={state === v ? { background: C.ink, color: "#fff", borderColor: C.ink } : { borderColor: C.line, color: C.muted }}
-                >
-                  {label}
-                </button>
-              ))}
-            </div>
-          }
-        />
+        <SectionTitle id="menu-title" title="메뉴" />
         <div className="-mx-4 mt-2 overflow-x-auto px-4 md:mx-0 md:px-0">
           <div className="flex min-w-max gap-1 border-b" role="group" aria-label="분류" style={{ borderColor: C.line }}>
             {CATS.map((c) => (
@@ -910,28 +551,22 @@ function MenuGrid({
           </div>
         </div>
 
-        <ul key={`${cat}|${state}`} className="soft-in mt-6 grid grid-cols-2 gap-x-3 gap-y-6 sm:grid-cols-3 lg:grid-cols-4 lg:gap-x-5">
-          {list.map(({ b, s }) => {
+        <ul key={cat} className="soft-in mt-6 grid grid-cols-2 gap-x-3 gap-y-6 sm:grid-cols-3 lg:grid-cols-4 lg:gap-x-5">
+          {list.map((b) => {
             const n = cart[b.id] ?? 0;
-            const badge = nowBadge(s);
             return (
               <li key={b.id} className="flex flex-col">
                 <div className="relative aspect-square overflow-hidden rounded-[8px]" style={{ background: C.kraft, outline: n ? `2px solid ${C.crust}` : undefined, outlineOffset: n ? 2 : undefined }}>
                   {/* eslint-disable-next-line @next/next/no-img-element */}
                   <img src={breadImg(b.id)} alt={b.name} loading="lazy" className="h-full w-full object-cover" />
-                  {badge && (
-                    <span className="absolute left-2 top-2 rounded-[4px] px-1.5 py-0.5 text-[12px] font-bold" style={{ color: badge.color, background: badge.bg }}>
-                      {badge.text}
-                    </span>
-                  )}
                 </div>
                 <p className="mt-2.5 font-bold leading-[1.35]">{b.name}</p>
                 <p className="text-[15px] font-semibold tabular-nums">{won(b.price)}</p>
                 <p className="text-[13px] leading-[1.5]" style={{ color: C.muted }}>
                   {allergyTags(b).join(", ")}
                 </p>
-                <p className="min-h-[20px] text-[13px] font-semibold tabular-nums" style={{ color: s.kind === "sale" ? C.green : C.muted }}>
-                  {nowLine(s)}
+                <p className="text-[13px] font-semibold tabular-nums" style={{ color: C.crust }}>
+                  {hhmm(FIRST_AT[b.id])}부터
                 </p>
                 <div className="mt-auto pt-2">
                   {n === 0 ? (
@@ -964,11 +599,6 @@ function MenuGrid({
             );
           })}
         </ul>
-        {list.length === 0 && (
-          <p className="mt-6 rounded-[8px] p-6 text-center" style={{ background: C.cream, color: C.muted }}>
-            해당하는 빵이 없습니다.
-          </p>
-        )}
         <p className="mt-6 text-[14px]" style={{ color: C.muted }}>
           모든 빵을 같은 작업대에서 만들어 다른 재료가 섞일 수 있습니다.
         </p>
@@ -1104,7 +734,7 @@ function SubPage({ view, onGo, children }: { view: View; onGo: (target: string) 
 
 /* ---------- 빵 나오는 시간 (전체 시간표) ---------- */
 
-function OvenTimePage({ clock }: { clock: Clock }) {
+function OvenTimePage() {
   return (
     <div className="grid gap-10 lg:grid-cols-[1fr_320px] lg:gap-14">
       <div className="min-w-0">
@@ -1115,25 +745,18 @@ function OvenTimePage({ clock }: { clock: Clock }) {
               <th scope="col" className="w-[72px] py-3 text-left font-semibold">시간</th>
               <th scope="col" className="py-3 text-left font-semibold">빵</th>
               <th scope="col" className="w-[56px] py-3 text-right font-semibold">수량</th>
-              <th scope="col" className="hidden w-[120px] py-3 text-right font-semibold sm:table-cell">지금</th>
             </tr>
           </thead>
           <tbody>
-            {BATCHES.map((b) => {
-              const s = batchState(b, clock);
-              return (
-                <tr key={b.at} className="border-b" style={{ borderColor: C.line }}>
-                  <td className="py-3 font-semibold tabular-nums" style={{ color: C.crust }}>
-                    {hhmm(b.at)}
-                  </td>
-                  <td className="py-3 font-semibold">{BREAD_BY_ID[b.bread].name}</td>
-                  <td className="py-3 text-right tabular-nums">{b.qty}개</td>
-                  <td className="hidden py-3 text-right text-[14px] sm:table-cell" style={{ color: s.kind === "out" && s.left > 0 ? C.green : C.muted }}>
-                    {stateText(s)}
-                  </td>
-                </tr>
-              );
-            })}
+            {BATCHES.map((b) => (
+              <tr key={b.at} className="border-b" style={{ borderColor: C.line }}>
+                <td className="py-3 font-semibold tabular-nums" style={{ color: C.crust }}>
+                  {hhmm(b.at)}
+                </td>
+                <td className="py-3 font-semibold">{BREAD_BY_ID[b.bread].name}</td>
+                <td className="py-3 text-right tabular-nums">{b.qty}개</td>
+              </tr>
+            ))}
           </tbody>
         </table>
       </div>
@@ -1157,7 +780,7 @@ function OvenTimePage({ clock }: { clock: Clock }) {
 
 /* ---------- 메뉴 (전체, 설명 포함) ---------- */
 
-function MenuAllPage({ clock, cart, onAdd }: { clock: Clock; cart: Cart; onAdd: (id: string, delta: number) => void }) {
+function MenuAllPage({ cart, onAdd }: { cart: Cart; onAdd: (id: string, delta: number) => void }) {
   return (
     <div className="space-y-12">
       {CATS.filter((c) => c.id !== "all").map((c) => (
@@ -1168,7 +791,6 @@ function MenuAllPage({ clock, cart, onAdd }: { clock: Clock; cart: Cart; onAdd: 
           <ul>
             {BREADS.filter((b) => b.cat === c.id).map((b) => {
               const n = cart[b.id] ?? 0;
-              const s = breadNow(b.id, clock);
               return (
                 <li key={b.id} className="flex gap-4 border-b py-4" style={{ borderColor: C.line }}>
                   {/* eslint-disable-next-line @next/next/no-img-element */}
@@ -1181,12 +803,9 @@ function MenuAllPage({ clock, cart, onAdd }: { clock: Clock; cart: Cart; onAdd: 
                     <p className="mt-0.5 text-[15px]" style={{ color: C.muted }}>
                       {b.desc}
                     </p>
-                    <p className="mt-1 text-[13px]" style={{ color: C.muted }}>
-                      {allergyTags(b).join(", ")}, 첫 출고 {hhmm(FIRST_AT[b.id])}
-                    </p>
                     <div className="mt-2 flex items-center justify-between gap-3">
-                      <span className="text-[13px] font-semibold tabular-nums" style={{ color: s.kind === "sale" ? C.green : C.muted }}>
-                        {nowLine(s)}
+                      <span className="text-[13px]" style={{ color: C.muted }}>
+                        {allergyTags(b).join(", ")}, 첫 출고 {hhmm(FIRST_AT[b.id])}
                       </span>
                       {n === 0 ? (
                         <button
@@ -1241,7 +860,7 @@ const NOTICES: { no: number; title: string; ago: number; body: string[] | ((post
     body: (d) => [`${fmtKo(daysAgo(d, -14))} ~ ${fmtKo(daysAgo(d, -16))} 휴무`, `${fmtKo(daysAgo(d, -17))}부터 정상 영업`],
   },
   { no: 3, title: "단체주문 예약 안내", ago: 40, body: ["20개 이상 단체주문과 홀 케이크는 이틀 전까지 예약합니다.", "개별 포장 가능"] },
-  { no: 2, title: "곰파트너는 천연 발효종을 사용합니다.", ago: 67, body: ["깜파뉴, 무화과 호두 깜파뉴는 천연 발효종으로 48시간 저온 숙성합니다."] },
+  { no: 2, title: "베이커리 카페는 천연 발효종을 사용합니다.", ago: 67, body: ["깜파뉴, 무화과 호두 깜파뉴는 천연 발효종으로 48시간 저온 숙성합니다."] },
   { no: 1, title: "홈페이지 오픈", ago: 84, body: ["빵 나오는 시간과 픽업 예약을 홈페이지에서 확인할 수 있습니다."] },
 ];
 
@@ -1356,6 +975,54 @@ function PickupOrder({
   };
 
   const fieldLabel = "block text-[15px] font-bold";
+
+  if (receipt) {
+    const sum = receipt.items.reduce((acc, [id, n]) => acc + BREAD_BY_ID[id].price * n, 0);
+    return (
+      <div className="mt-6 max-w-[560px] rounded-[10px] border p-6" style={{ borderColor: C.line, background: C.paper }} role="status">
+        <p className="flex items-center gap-2 text-[20px] font-bold">
+          <Check size={22} style={{ color: C.green }} aria-hidden />
+          예약 완료
+        </p>
+        <dl className="mt-4 space-y-1 text-[15px] tabular-nums">
+          {[
+            ["주문번호", receipt.no],
+            ["픽업 날짜", receipt.day],
+            ["픽업 시간", hhmm(receipt.slot)],
+            ["성함", receipt.name],
+            ["연락처", receipt.phone],
+          ].map(([k, v]) => (
+            <div key={k} className="flex gap-3">
+              <dt className="w-[80px] shrink-0" style={{ color: C.muted }}>
+                {k}
+              </dt>
+              <dd className="font-semibold">{v}</dd>
+            </div>
+          ))}
+        </dl>
+        <ul className="mt-4 space-y-1 border-t pt-3 text-[15px] tabular-nums" style={{ borderColor: C.line }}>
+          {receipt.items.map(([id, n]) => (
+            <li key={id} className="flex justify-between gap-3">
+              <span>
+                {BREAD_BY_ID[id].name} {n}개
+              </span>
+              <span>{won(BREAD_BY_ID[id].price * n)}</span>
+            </li>
+          ))}
+        </ul>
+        <p className="mt-3 flex justify-between border-t pt-3 text-[17px] font-bold tabular-nums" style={{ borderColor: C.line }}>
+          <span>합계</span>
+          <span>{won(sum)}</span>
+        </p>
+        <p className="mt-4 text-[15px]" style={{ color: C.muted }}>
+          결제는 매장에서 해 주세요. 픽업 시간 30분 경과 시 예약이 취소될 수 있습니다.
+        </p>
+        <button type="button" onClick={closeReceipt} className="mt-4 h-10 text-[15px] font-semibold underline underline-offset-4" style={{ color: C.crust }}>
+          메뉴로 돌아가기
+        </button>
+      </div>
+    );
+  }
 
   return (
     <form onSubmit={submit} noValidate className="mt-6 grid items-start gap-6 lg:grid-cols-[1fr_380px] lg:gap-10">
@@ -1489,7 +1156,6 @@ function PickupOrder({
           <li>픽업 시간 30분 경과 시 예약이 취소될 수 있습니다.</li>
         </ul>
       </div>
-      <Receipt data={receipt} onClose={closeReceipt} />
     </form>
   );
 }
@@ -1616,98 +1282,6 @@ function GroupOrder({ minute }: { minute: number }) {
         </p>
       </div>
     </form>
-  );
-}
-
-function Receipt({ data, onClose }: { data: ReceiptData | null; onClose: () => void }) {
-  const reduce = useReducedMotionSafe();
-  const closeRef = useRef<HTMLButtonElement>(null);
-  const onCloseRef = useRef(onClose);
-  useEffect(() => {
-    onCloseRef.current = onClose;
-  });
-
-  useEffect(() => {
-    if (!data) return;
-    closeRef.current?.focus();
-    const onKey = (e: KeyboardEvent) => e.key === "Escape" && onCloseRef.current();
-    window.addEventListener("keydown", onKey);
-    return () => window.removeEventListener("keydown", onKey);
-  }, [data]);
-
-  const total = useMemo(() => (data ? data.items.reduce((s, [id, n]) => s + BREAD_BY_ID[id].price * n, 0) : 0), [data]);
-
-  return (
-    <AnimatePresence>
-      {data && (
-        <motion.div
-          className="fixed inset-0 z-[60] flex items-center justify-center p-4"
-          style={{ background: "rgba(43,30,20,0.55)" }}
-          initial={reduce ? false : { opacity: 0 }}
-          animate={{ opacity: 1 }}
-          exit={{ opacity: 0 }}
-          onClick={onClose}
-        >
-          <motion.div
-            role="dialog"
-            aria-modal="true"
-            aria-labelledby="receipt-title"
-            onClick={(e) => e.stopPropagation()}
-            className="relative w-full max-w-[360px] px-6 pb-8 pt-7"
-            style={{
-              background: "#fffefa",
-              clipPath:
-                "polygon(0 0,100% 0,100% calc(100% - 10px),95% 100%,90% calc(100% - 10px),85% 100%,80% calc(100% - 10px),75% 100%,70% calc(100% - 10px),65% 100%,60% calc(100% - 10px),55% 100%,50% calc(100% - 10px),45% 100%,40% calc(100% - 10px),35% 100%,30% calc(100% - 10px),25% 100%,20% calc(100% - 10px),15% 100%,10% calc(100% - 10px),5% 100%,0 calc(100% - 10px))",
-            }}
-            initial={reduce ? false : { y: -40, opacity: 0 }}
-            animate={{ y: 0, opacity: 1 }}
-            transition={{ duration: 0.45, ease: EASE }}
-          >
-            <button ref={closeRef} type="button" onClick={onClose} aria-label="닫기" className="absolute right-3 top-3 inline-flex h-10 w-10 items-center justify-center rounded-full" style={{ color: C.muted }}>
-              <X size={20} aria-hidden />
-            </button>
-            <p className="text-center">
-              <Logo />
-            </p>
-            <h3 id="receipt-title" className="mt-3 flex items-center justify-center gap-1.5 text-[18px] font-bold">
-              <Check size={20} style={{ color: C.green }} aria-hidden />
-              예약 완료
-            </h3>
-            <dl className="mt-4 space-y-1 border-y border-dashed py-3 text-[15px] tabular-nums" style={{ borderColor: C.kraftDeep }}>
-              {[
-                ["주문번호", data.no],
-                ["픽업 날짜", data.day],
-                ["픽업 시간", hhmm(data.slot)],
-                ["성함", data.name],
-                ["연락처", data.phone],
-              ].map(([k, v]) => (
-                <div key={k} className="flex justify-between gap-3">
-                  <dt style={{ color: C.muted }}>{k}</dt>
-                  <dd className="font-semibold">{v}</dd>
-                </div>
-              ))}
-            </dl>
-            <ul className="mt-3 space-y-1 text-[15px] tabular-nums">
-              {data.items.map(([id, n]) => (
-                <li key={id} className="flex justify-between gap-3">
-                  <span>
-                    {BREAD_BY_ID[id].name} {n}개
-                  </span>
-                  <span>{won(BREAD_BY_ID[id].price * n)}</span>
-                </li>
-              ))}
-            </ul>
-            <p className="mt-3 flex justify-between border-t border-dashed pt-3 text-[17px] font-bold tabular-nums" style={{ borderColor: C.kraftDeep }}>
-              <span>합계</span>
-              <span>{won(total)}</span>
-            </p>
-            <p className="mt-4 text-center text-[14px]" style={{ color: C.muted }}>
-              결제는 매장에서 해 주세요. 픽업 시간 30분 경과 시 예약이 취소될 수 있습니다.
-            </p>
-          </motion.div>
-        </motion.div>
-      )}
-    </AnimatePresence>
   );
 }
 

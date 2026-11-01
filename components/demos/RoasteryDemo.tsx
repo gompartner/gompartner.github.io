@@ -1,8 +1,8 @@
 "use client";
 
 import { useEffect, useRef, useState } from "react";
-import { AnimatePresence, animate, motion, type MotionValue, useMotionValue, useMotionValueEvent, useScroll, useTransform } from "framer-motion";
-import { AlertCircle, Bell, Check, ChevronDown, Clock, Coffee, Flame, MapPin, MessageCircle, Minus, Plus, ShoppingBag, Store, Truck, X } from "lucide-react";
+import { AnimatePresence, motion } from "framer-motion";
+import { AlertCircle, Bell, Check, Clock, Coffee, Flame, MapPin, MessageCircle, Minus, Plus, ShoppingBag, Store, Truck, X } from "lucide-react";
 import { useReducedMotionSafe } from "@/hooks/useReducedMotionSafe";
 import { daysAgo, fmtKo, useDemoToday } from "@/hooks/useDemoToday";
 import { maskName, maskPhone } from "@/components/demos/LeadReceivedPanel";
@@ -18,27 +18,24 @@ import { DemoMakerInfo } from "@/components/demos/DemoMakerInfo";
 
    사진 출처: Pexels 사진 894695, 7125599, 9899790, 4177917, 36343666, 8987828, 10226668, 4820838
 
-   핵심 모션: 첫 화면은 로스터 냉각판 사진 한 장이다. 들어올 때 사진이 1.06배에서 천천히 제자리로 오고, 문장은 0.3초 늦게
-   아래에서 올라온다(CSS keyframes). 스크롤하면 사진만 조금 느리게 움직인다. 그 아래 고정 장면에서는 스크롤에 맞춰 원두 사진이
-   생두, 라이트, 미디엄, 다크 순서로 겹쳐 바뀌고 옆의 로스팅 온도 곡선이 그려진다. 동작 줄이기면 사진은 멈추고, 로스팅 장면은
-   단계별 사진과 설명을 세로로 나열하고 곡선은 다크까지 완성된 상태로 둔다.
+   모션: 첫 화면 사진이 1.06배에서 천천히 제자리로 오고, 표 행에 마우스를 올리면 사진이 그 배전 사진으로 바뀐다.
+   동작 줄이기면 바로 바뀐다.
 
-   상호작용(모두 브라우저 안에서만 돈다. 실제로 보내지 않는다)
-   1. 로스팅 단계 고르기: 라이트, 미디엄, 미디엄다크, 다크 칩을 누르면 맛 노트 막대(산미, 바디, 단맛)와 추천 원두가 바뀐다.
-   2. 분쇄도 고르기: 홀빈, 핸드드립, 에스프레소, 모카포트, 콜드브루. 핸드드립과 홀빈은 사진, 나머지는 굵기 설명으로 바뀐다.
-   3. 구독 계산: 주기, 용량, 봉수를 고르면 회당 금액과 월 환산 금액이 바뀐다.
-   4. 원두 담기: 카드에서 담으면 하단 바에 봉수와 합계가 뜨고, 주문하기에서 이름과 휴대폰을 받아 접수 완료 화면을 보여 준다.
-   5. 오시는 길과 영업시간: 오늘 요일을 진하게 표시한다.
+   구성(모두 브라우저 안에서만 돈다. 실제로 보내지 않는다)
+   1. 로스팅 포인트 안내: 라이트, 미디엄, 미디엄다크, 다크 사진과 맛 설명, 해당 원두.
+   2. 원두 담기: 카드에서 담으면 하단 바에 봉수와 합계가 뜨고, 주문하기에서 분쇄, 이름, 휴대폰을 받아 접수 완료 화면을 보여 준다.
+   3. 정기 구독: 구성별 정가와 구독가 표.
+   4. 오시는 길과 영업시간: 오늘 요일을 진하게 표시한다.
 
-   포스터 첫 화면(rs-poster): 한 화면 높이의 사진 위에 왼쪽 위 상호, 오른쪽 위 원두 고르기 버튼, 아래쪽 문장 "볶은 다음 날 발송하는 원두"와
-   로스팅 요일 한 줄. 글꼴은 Pretendard 한 벌, 바탕은 흰색, 정보 판은 옅은 회색. */
+   포스터 첫 화면(rs-poster): 사진 띠 아래 문장 "볶은 다음 날 발송하는 원두"와 이번 주 로스팅 표.
+   글꼴은 Pretendard 한 벌, 바탕은 흰색, 정보 판은 옅은 회색. */
 
-const BRAND = "곰파트너";
+const BRAND = "커피 로스터리";
 const ADDRESS = "서울 ㅇㅇ구 ㅇㅇ로 00, 1층";
-const KAKAO = "카카오톡 채널 곰파트너";
+const KAKAO = "카카오톡 채널 커피 로스터리";
 const IMG = "/images/demo-roastery";
 
-/** 흰 바탕과 옅은 회색 판, 먹색 글자, 강조색은 차분한 커피 갈색 하나. brown, light, dark, green 은 로스팅 단계 색(정보용) */
+/** 흰 바탕과 옅은 회색 판, 먹색 글자, 강조색은 차분한 커피 갈색 하나. brown, light, dark 는 로스팅 단계 색(정보용) */
 const C = {
   paper: "#ffffff",
   paperDeep: "#f7f7f5",
@@ -55,116 +52,15 @@ const C = {
 
 /* 모션 상수. 시간은 초, 이징은 cubic-bezier */
 const EASE = [0.22, 1, 0.36, 1] as const;
-/** 칩, 막대, 숫자 전환 */
+/** 사진 전환 */
 const DUR = 0.4;
 /** 바, 시트 등장 */
 const DUR_FAST = 0.22;
-/** 고정 장면이 차지하는 스크롤 길이. 사진 단계 4개에 단계당 70vh */
-const SCENE_VH = 280;
-/** 사진이 겹쳐 바뀌는 구간(진행도 비율) */
-const PHOTO_FADE = 0.05;
 
 const focusRing = "focus-visible:outline focus-visible:outline-[3px] focus-visible:outline-offset-2";
 const won = (n: number) => `${n.toLocaleString("ko-KR")}원`;
 const p2 = (n: number) => String(n).padStart(2, "0");
 const DOW = ["일", "월", "화", "수", "목", "금", "토"];
-
-/* ---------- 로스팅 장면 데이터 ---------- */
-
-/** 사진 단계. from 은 그 사진이 보이기 시작하는 진행도 */
-const PHOTO_STAGES = [
-  {
-    from: 0,
-    src: "stage-green.jpg",
-    name: "생두",
-    temp: 25,
-    note: "볶기 전 연둣빛 생두예요",
-    alt: "볶기 전 연둣빛 생두",
-  },
-  {
-    from: 0.3,
-    src: "stage-light.jpg",
-    name: "라이트",
-    temp: 200,
-    note: "1차 크랙을 막 지나 밝은 갈색이에요",
-    alt: "밝은 갈색으로 볶은 라이트 로스트 원두",
-  },
-  {
-    from: 0.5,
-    src: "stage-medium.jpg",
-    name: "미디엄",
-    temp: 210,
-    note: "단맛과 산미가 균형을 잡아요",
-    alt: "고른 갈색의 미디엄 로스트 원두",
-  },
-  {
-    from: 0.7,
-    src: "stage-dark.jpg",
-    name: "다크",
-    temp: 236,
-    note: "2차 크랙 뒤 표면에 기름이 돌아요",
-    alt: "표면에 기름이 도는 다크 로스트 원두",
-  },
-];
-
-/** 진행도별 원두 온도(도). 생두 25도에서 시작해 1차 크랙 196도, 2차 크랙 224도를 지난다 */
-const TEMP_STOPS = [0, 0.3, 0.5, 0.7, 0.88, 1];
-const TEMPS = [25, 196, 210, 224, 230, 236];
-
-/** 단계 이름과 시작 진행도 */
-const STAGES = [
-  { from: 0, name: "생두", note: "수분이 빠지며 색이 노랗게 변해요" },
-  { from: 0.3, name: "1차 크랙", note: "탁 소리와 함께 알이 부풀어요" },
-  { from: 0.5, name: "미디엄", note: "단맛과 산미가 균형을 잡아요" },
-  { from: 0.7, name: "2차 크랙", note: "표면에 기름이 돌기 시작해요" },
-  { from: 0.88, name: "다크", note: "쓴맛과 바디가 올라와요" },
-];
-const stageOf = (v: number) => {
-  let i = 0;
-  for (let k = 0; k < STAGES.length; k++) if (v >= STAGES[k].from) i = k;
-  return i;
-};
-
-/** 온도 곡선 꼭지점. x는 시간(0~12분), y는 온도를 viewBox 320x200 좌표로 바꾼 값 */
-const CURVE_PTS: [number, number][] = [
-  [10, 176],
-  [47.5, 122],
-  [110, 85.5],
-  [210, 52],
-  [247.5, 41.8],
-  [285, 31.6],
-  [310, 22.9],
-];
-const CURVE_D = CURVE_PTS.map(([x, y], i) => `${i === 0 ? "M" : "L"}${x} ${y}`).join(" ");
-/** 각 꼭지점까지의 누적 길이 비율 */
-const CURVE_FRACS = (() => {
-  const seg: number[] = [0];
-  for (let i = 1; i < CURVE_PTS.length; i++) {
-    const [ax, ay] = CURVE_PTS[i - 1];
-    const [bx, by] = CURVE_PTS[i];
-    seg.push(seg[i - 1] + Math.hypot(bx - ax, by - ay));
-  }
-  const total = seg[seg.length - 1];
-  return seg.map((s) => s / total);
-})();
-/** 진행도별로 그려야 할 곡선 길이. 1차 크랙(0.3)은 네 번째 점, 미디엄은 다섯 번째, 2차 크랙은 여섯 번째 점에 맞춘다 */
-const LEN_STOPS = [0, 0.3, 0.5, 0.7, 1];
-const LEN_OUT = [0, CURVE_FRACS[3], CURVE_FRACS[4], CURVE_FRACS[5], 1];
-
-/** 곡선 위 길이 비율 f 지점의 좌표 */
-function pointAt(f: number): [number, number] {
-  const t = Math.min(1, Math.max(0, f));
-  for (let i = 1; i < CURVE_PTS.length; i++) {
-    if (t <= CURVE_FRACS[i]) {
-      const a = CURVE_FRACS[i - 1];
-      const r = (t - a) / (CURVE_FRACS[i] - a || 1);
-      const [ax, ay] = CURVE_PTS[i - 1];
-      const [bx, by] = CURVE_PTS[i];
-      return [ax + (bx - ax) * r, ay + (by - ay) * r];
-    }
-  }
-  return CURVE_PTS[CURVE_PTS.length - 1];
-}
 
 /* ---------- 원두와 로스팅 포인트 ---------- */
 
@@ -183,12 +79,11 @@ const ROAST_PHOTO: Record<Roast, string> = {
   미디엄다크: "stage-medium.jpg",
   다크: "stage-dark.jpg",
 };
-/** 산미, 바디, 단맛 (5점 만점) */
-const ROAST_NOTES: Record<Roast, [number, number, number]> = {
-  라이트: [5, 2, 3],
-  미디엄: [3, 3, 4],
-  미디엄다크: [2, 4, 4],
-  다크: [1, 5, 3],
+const ROAST_ALT: Record<Roast, string> = {
+  라이트: "밝은 갈색으로 볶은 라이트 로스트 원두",
+  미디엄: "고른 갈색의 미디엄 로스트 원두",
+  미디엄다크: "진한 갈색으로 볶은 미디엄다크 원두",
+  다크: "표면에 기름이 도는 다크 로스트 원두",
 };
 const ROAST_DESC: Record<Roast, string> = {
   라이트: "꽃향과 과일 산미가 또렷해요. 핸드드립에 맞아요.",
@@ -196,7 +91,6 @@ const ROAST_DESC: Record<Roast, string> = {
   미디엄다크: "초콜릿과 견과 맛이 진해요. 라떼에도 잘 어울려요.",
   다크: "묵직한 바디와 긴 여운. 에스프레소와 모카포트용이에요.",
 };
-const NOTE_LABELS = ["산미", "바디", "단맛"];
 
 interface Bean {
   id: string;
@@ -284,53 +178,28 @@ const BEANS: Bean[] = [
 ];
 const beanById = (id: string) => BEANS.find((b) => b.id === id) ?? BEANS[0];
 
-/* ---------- 분쇄도 ---------- */
+/* ---------- 분쇄 ---------- */
 
 type Grind = "홀빈" | "핸드드립" | "에스프레소" | "모카포트" | "콜드브루";
-/** photo 가 없는 분쇄는 사진 자리에 굵기 글자만 둔다(맞는 사진이 없다) */
-const GRINDS: {
-  name: Grind;
-  size: string;
-  tip: string;
-  photo?: { src: string; alt: string; pos: string };
-}[] = [
-  {
-    name: "홀빈",
-    size: "통원두",
-    tip: "집에 그라인더가 있으면 통원두가 가장 오래 향이 남아요",
-    photo: { src: "stage-medium.jpg", alt: "갈지 않은 통원두", pos: "50% 40%" },
-  },
-  {
-    name: "핸드드립",
-    size: "중간",
-    tip: "드리퍼, 커피메이커용. 설탕 알 정도 굵기",
-    photo: {
-      src: "brew-drip.jpg",
-      alt: "종이 필터 드리퍼에 물을 붓는 핸드드립",
-      pos: "50% 60%",
-    },
-  },
-  {
-    name: "에스프레소",
-    size: "아주 가늘게",
-    tip: "가정용 에스프레소 머신용. 밀가루보다 조금 굵게",
-  },
-  { name: "모카포트", size: "가늘게", tip: "모카포트, 에어로프레스용" },
-  {
-    name: "콜드브루",
-    size: "굵게",
-    tip: "콜드브루, 프렌치프레스용. 굵은 소금 정도",
-  },
+const GRINDS: { name: Grind; use: string }[] = [
+  { name: "홀빈", use: "통원두" },
+  { name: "핸드드립", use: "드리퍼, 커피메이커" },
+  { name: "에스프레소", use: "가정용 에스프레소 머신" },
+  { name: "모카포트", use: "모카포트, 에어로프레스" },
+  { name: "콜드브루", use: "콜드브루, 프렌치프레스" },
 ];
 
 /* ---------- 구독 ---------- */
 
-type Size = 200 | 500 | 1000;
-const SIZES: Size[] = [200, 500, 1000];
-const sizeLabel = (s: Size) => (s === 1000 ? "1kg" : `${s}g`);
-/** 200g 가격 기준 500g은 2.2배, 1kg은 4배(천 원 단위) */
-const priceFor = (bean: Bean, size: Size) => (size === 200 ? bean.price : Math.round((bean.price * (size === 500 ? 2.2 : 4)) / 1000) * 1000);
-const SUB_DISCOUNT = 0.1;
+/** 아침 블렌드 기준 구독 구성. 정가는 200g 가격 기준 500g 2.2배, 1kg 4배(천 원 단위), 구독은 10% 할인(백 원 단위) */
+const SUB_BEAN = "아침 블렌드";
+const SUB_PLANS: { name: string; note: string; price: number }[] = [
+  { name: "200g 1봉", note: "혼자 하루 한 잔", price: 14000 },
+  { name: "200g 2봉", note: "두 사람이 하루 한 잔씩", price: 28000 },
+  { name: "500g 1봉", note: "가족, 작은 사무실", price: 31000 },
+  { name: "1kg 1봉", note: "사무실, 매일 여러 잔", price: 56000 },
+];
+const subPrice = (n: number) => Math.round((n * 0.9) / 100) * 100;
 
 /* ---------- 영업시간 ---------- */
 const HOURS: { dow: number; label: string; open: string }[] = [
@@ -356,8 +225,6 @@ export function RoasteryDemo() {
   const today = useDemoToday();
   const reduce = useReducedMotionSafe();
 
-  const [roast, setRoast] = useState<Roast>("미디엄");
-  const [grind, setGrind] = useState<Grind>("홀빈");
   const [cart, setCart] = useState<Cart>({});
   const [sheet, setSheet] = useState<"closed" | "form" | "done">("closed");
 
@@ -389,34 +256,29 @@ export function RoasteryDemo() {
     <div className="min-h-screen overflow-x-clip pb-24" style={{ background: C.paper, color: C.ink }}>
       <Poster reduce={reduce} today={today} cart={cart} bags={bags} onAdd={add} go={go} />
 
-      <RoastScene reduce={reduce} />
-
       {/* 로스팅 포인트 */}
       <section id="rs-notes" aria-labelledby="rs-notes-title" className="mx-auto mt-14 max-w-[1200px] scroll-mt-4 px-4 md:mt-20 md:px-6">
         <SectionTitle id="rs-notes-title" icon={<Flame size={22} aria-hidden />} title="로스팅 포인트" />
-        <RoastPicker reduce={reduce} roast={roast} setRoast={setRoast} onJump={(id) => go(`bean-${id}`)} />
+        <RoastGuide onJump={(id) => go(`bean-${id}`)} />
       </section>
 
       {/* 원두 */}
       <section id="rs-beans" aria-labelledby="rs-beans-title" className="mx-auto mt-14 max-w-[1200px] scroll-mt-4 px-4 md:mt-20 md:px-6">
         <SectionTitle id="rs-beans-title" icon={<Coffee size={22} aria-hidden />} title="이번 주 로스팅 원두" />
-        <div id="rs-grind" className="scroll-mt-4">
-          <GrindPicker reduce={reduce} grind={grind} setGrind={setGrind} />
-        </div>
-        <ul className="mt-8 grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
+        <ul className="mt-5 grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
           {BEANS.map((b) => (
             <BeanCard key={b.id} bean={b} count={cart[b.id] ?? 0} onAdd={(d) => add(b.id, d)} />
           ))}
         </ul>
         <p className="mt-4 text-[14px]" style={{ color: C.muted }}>
-          200g 기준, 화요일과 금요일에 로스팅해서 다음 날 발송해요. 3만 원 이상 무료 배송.
+          200g 기준, 화요일과 금요일에 로스팅해서 다음 날 발송해요. 분쇄는 주문할 때 고를 수 있어요. 3만 원 이상 무료 배송.
         </p>
       </section>
 
       {/* 정기 구독 */}
       <section id="rs-subscribe" aria-labelledby="rs-sub-title" className="mx-auto mt-14 max-w-[1200px] scroll-mt-4 px-4 md:mt-20 md:px-6">
         <SectionTitle id="rs-sub-title" icon={<Truck size={22} aria-hidden />} title="정기 구독" />
-        <Subscription reduce={reduce} />
+        <Subscription />
       </section>
 
       {/* 도매 문의 */}
@@ -515,7 +377,6 @@ export function RoasteryDemo() {
             reduce={reduce}
             today={today}
             cart={cart}
-            grind={grind}
             total={total}
             bags={bags}
             done={sheet === "done"}
@@ -546,11 +407,8 @@ function SectionTitle({ id, icon, title }: { id: string; icon: React.ReactNode; 
 function BrandLogo() {
   return (
     <span className="inline-flex items-center gap-2">
-      {/* eslint-disable-next-line @next/next/no-img-element -- 메인 사이트와 같은 곰 로고 */}
-      <img src="/images/logo-bear.png" alt="" aria-hidden width={28} height={28} className="h-7 w-7 shrink-0" />
       <span className="flex items-baseline gap-1 whitespace-nowrap">
         <span className="text-[20px] font-bold tracking-[-0.03em]">{BRAND}</span>
-        <span className="text-[12px] font-semibold opacity-75">카탈로그</span>
       </span>
     </span>
   );
@@ -756,339 +614,40 @@ function PosterAdd({ name, price, count, onAdd }: { name: string; price: number;
   );
 }
 
-/* ---------- 1. 스크롤 고정 로스팅 장면 ---------- */
+/* ---------- 1. 로스팅 포인트 안내 ---------- */
 
-function RoastScene({ reduce }: { reduce: boolean }) {
-  const ref = useRef<HTMLDivElement>(null);
-  const { scrollYProgress } = useScroll({
-    target: ref,
-    offset: ["start start", "end end"],
-  });
-  // 동작 줄이기면 다크까지 볶은 상태로 고정
-  const progress = useTransform(scrollYProgress, (v) => (reduce ? 1 : v));
-
-  const temp = useTransform(progress, TEMP_STOPS, TEMPS);
-  const tempText = useTransform(temp, (v) => `${Math.round(v)}도`);
-  const pathLen = useTransform(progress, LEN_STOPS, LEN_OUT);
-  const dotX = useTransform(pathLen, (f) => pointAt(f)[0]);
-  const dotY = useTransform(pathLen, (f) => pointAt(f)[1]);
-  const crack1 = useTransform(progress, (v) => Math.min(1, Math.max(0, (v - 0.29) / 0.03)));
-  const crack2 = useTransform(progress, (v) => Math.min(1, Math.max(0, (v - 0.69) / 0.03)));
-  const photoLabel = useTransform(progress, (v) => PHOTO_STAGES[photoIndexOf(v)].name);
-  // 사진이 바뀌기 전에도 스크롤에 따라 천천히 다가와 움직임이 보이게
-  const photoScale = useTransform(progress, [0, 1], [1, 1.12]);
-  // 처음에만 아래 화살표를 보여 스크롤해야 한다는 걸 알린다
-  const hintOpacity = useTransform(progress, [0, 0.06], [1, 0]);
-
-  const [scrolled, setScrolled] = useState(0);
-  useMotionValueEvent(progress, "change", (v) => {
-    const s = stageOf(v);
-    setScrolled((p) => (p === s ? p : s));
-  });
-  const stage = reduce ? STAGES.length - 1 : scrolled;
-
-  const info = (
-    <div className="min-h-0">
-      <p className="text-[15px] font-bold" style={{ color: C.muted }}>
-        이번 주 로스팅
-      </p>
-      <div className="mt-1 flex flex-wrap items-baseline justify-between gap-x-6 gap-y-1">
-        <p className="font-bold text-[30px] leading-none md:text-[52px]">{STAGES[stage].name}</p>
-        <p className="text-[28px] leading-none tabular-nums md:text-[44px]">
-          <motion.span>{tempText}</motion.span>
-        </p>
-      </div>
-      <p className="mt-2 min-h-[1.6em] text-[15px] md:text-[16px]" style={{ color: C.muted }}>
-        {STAGES[stage].note}
-      </p>
-
-      <svg viewBox="0 0 340 200" className="mt-2 max-h-[22dvh] w-full max-w-[520px] md:mt-3 md:max-h-none" role="img" aria-label="12분 동안 25도에서 236도까지 오르는 로스팅 온도 곡선">
-        {/* 눈금 */}
-        {[196, 224].map((t) => {
-          const y = 180 - ((t - 20) / 220) * 160;
-          return (
-            <g key={t}>
-              <line x1="10" x2="310" y1={y} y2={y} stroke={C.line} strokeDasharray="3 4" />
-              <text x="312" y={y + 3} fontSize="9" fill={C.muted}>
-                {t}
-              </text>
-            </g>
-          );
-        })}
-        <line x1="10" x2="310" y1="180" y2="180" stroke={C.line} />
-        {[0, 4, 8, 12].map((m) => (
-          <text key={m} x={10 + (m / 12) * 300} y="194" fontSize="9" textAnchor={m === 12 ? "end" : m === 0 ? "start" : "middle"} fill={C.muted}>
-            {m}분
-          </text>
-        ))}
-        {/* 전체 곡선은 흐리게, 진행한 부분만 진하게 */}
-        <path d={CURVE_D} fill="none" stroke={C.line} strokeWidth="2" />
-        <motion.path d={CURVE_D} fill="none" stroke={C.ink} strokeWidth="3" strokeLinecap="round" style={{ pathLength: pathLen }} />
-        <motion.g style={{ opacity: crack1 }}>
-          <circle cx={CURVE_PTS[3][0]} cy={CURVE_PTS[3][1]} r="5" fill={C.paper} stroke={C.ink} strokeWidth="2" />
-          <text x={CURVE_PTS[3][0]} y={CURVE_PTS[3][1] + 20} fontSize="10" textAnchor="middle" fill={C.ink}>
-            1차 크랙
-          </text>
-        </motion.g>
-        <motion.g style={{ opacity: crack2 }}>
-          <circle cx={CURVE_PTS[5][0]} cy={CURVE_PTS[5][1]} r="5" fill={C.paper} stroke={C.ink} strokeWidth="2" />
-          <text x={CURVE_PTS[5][0] - 4} y={CURVE_PTS[5][1] + 20} fontSize="10" textAnchor="middle" fill={C.ink}>
-            2차 크랙
-          </text>
-        </motion.g>
-        <motion.g style={{ x: dotX, y: dotY }}>
-          <circle r="6" fill={C.accent} />
-        </motion.g>
-      </svg>
-
-      {/* 단계 눈금 */}
-      <ol className="mt-3 grid grid-cols-5 gap-1 text-[12px] md:text-[13px]" aria-label="로스팅 단계">
-        {STAGES.map((s, i) => (
-          <li key={s.name} className="min-w-0">
-            <span className="block h-[4px] rounded-[2px]" style={{ background: i <= stage ? C.ink : C.line }} aria-hidden />
-            <span className={`mt-1 block truncate ${i === stage ? "font-bold" : ""}`} style={{ color: i === stage ? C.ink : C.muted }}>
-              {s.name}
-            </span>
-          </li>
-        ))}
-      </ol>
-    </div>
-  );
-
-  // 동작 줄이기: 단계별 사진과 설명을 세로로 나열하고 곡선은 완성 상태
-  if (reduce) {
-    return (
-      <div id="rs-roast" ref={ref} className="relative mx-auto mt-10 max-w-[1200px] scroll-mt-4 px-4 md:px-6">
-        <ol className="grid gap-5 sm:grid-cols-2 lg:grid-cols-4" aria-label="로스팅 단계별 원두">
-          {PHOTO_STAGES.map((p) => (
-            <li key={p.name}>
-              {/* eslint-disable-next-line @next/next/no-img-element -- 정적 export 라 next/image 최적화를 쓰지 않는다 */}
-              <img src={`${IMG}/${p.src}`} alt={p.alt} loading="lazy" width={600} height={450} className="aspect-[4/3] w-full rounded-[6px] object-cover" />
-              <p className="mt-3 flex items-baseline justify-between gap-3">
-                <span className="text-[19px] font-bold">{p.name}</span>
-                <span className="text-[15px] tabular-nums" style={{ color: C.muted }}>
-                  {p.temp}도
-                </span>
-              </p>
-              <p className="mt-1 text-[15px] leading-[1.6]" style={{ color: C.body }}>
-                {p.note}
-              </p>
-            </li>
-          ))}
-        </ol>
-        <div className="mt-8 max-w-[560px]">{info}</div>
-      </div>
-    );
-  }
-
+function RoastGuide({ onJump }: { onJump: (id: string) => void }) {
   return (
-    <div id="rs-roast" ref={ref} className="relative scroll-mt-4" style={{ height: `${SCENE_VH}vh` }}>
-      <style>{`
-        @keyframes rs-bob { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(6px); } }
-        .rs-bob { animation: rs-bob 1.4s ease-in-out infinite; }
-        @media (prefers-reduced-motion: reduce) { .rs-bob { animation: none; } }
-      `}</style>
-      <div className="sticky top-0 h-[100dvh]">
-        <div className="mx-auto grid h-full max-w-[1200px] grid-rows-[minmax(0,1fr)_auto] gap-4 px-4 pb-5 pt-4 md:grid-cols-[minmax(0,1.1fr)_minmax(0,1fr)] md:grid-rows-1 md:items-center md:gap-12 md:px-6 md:py-10">
-          {/* 단계별 원두 사진. 뒤 단계 사진이 앞 사진 위로 겹쳐 나타난다 */}
-          <div className="relative h-full min-h-0 w-full overflow-hidden rounded-[6px] md:h-[min(78dvh,680px)]" style={{ background: C.paperDeep }}>
-            <motion.div className="absolute inset-0" style={{ scale: photoScale }}>
-              {PHOTO_STAGES.map((p, i) => (
-                <StagePhoto key={p.src} index={i} progress={progress} />
-              ))}
-            </motion.div>
-            <p className="absolute bottom-3 left-3 rounded-[4px] px-2.5 py-1 text-[14px] font-semibold text-white" style={{ background: "rgba(17,17,17,0.72)" }}>
-              <motion.span>{photoLabel}</motion.span>
+    <ul className="mt-5 grid gap-5 sm:grid-cols-2 lg:grid-cols-4">
+      {ROASTS.map((r) => (
+        <li key={r} className="flex flex-col overflow-hidden rounded-[8px] border" style={{ borderColor: C.line }}>
+          {/* eslint-disable-next-line @next/next/no-img-element -- 정적 export 라 next/image 최적화를 쓰지 않는다 */}
+          <img src={`${IMG}/${ROAST_PHOTO[r]}`} alt={ROAST_ALT[r]} loading="lazy" width={600} height={450} className="aspect-[4/3] w-full object-cover" />
+          <div className="flex flex-1 flex-col p-4">
+            <h3 className="inline-flex items-center gap-2 text-[19px] font-bold">
+              <span className="inline-block h-3.5 w-3.5 rounded-full" style={{ background: ROAST_TONE[r] }} aria-hidden />
+              {r}
+            </h3>
+            <p className="mt-2 text-[15px] leading-[1.6]" style={{ color: C.body }}>
+              {ROAST_DESC[r]}
             </p>
+            <ul className="mt-auto grid gap-0.5 pt-3 text-[15px]">
+              {BEANS.filter((b) => b.roast === r).map((b) => (
+                <li key={b.id}>
+                  <button type="button" onClick={() => onJump(b.id)} className={`min-h-9 rounded-[4px] text-left font-semibold underline underline-offset-4 ${focusRing}`} style={{ outlineColor: C.ink }}>
+                    {b.name}
+                  </button>
+                </li>
+              ))}
+            </ul>
           </div>
-
-          {info}
-        </div>
-        <motion.div aria-hidden className="pointer-events-none absolute inset-x-0 bottom-3 flex justify-center md:bottom-6" style={{ opacity: hintOpacity }}>
-          <span className="rs-bob flex h-11 w-11 items-center justify-center rounded-full" style={{ background: C.ink, color: "#fff" }}>
-            <ChevronDown size={24} />
-          </span>
-        </motion.div>
-      </div>
-    </div>
+        </li>
+      ))}
+    </ul>
   );
 }
 
-const photoIndexOf = (v: number) => {
-  let i = 0;
-  for (let k = 0; k < PHOTO_STAGES.length; k++) if (v >= PHOTO_STAGES[k].from) i = k;
-  return i;
-};
-
-/** 고정 장면의 사진 한 장. 첫 사진은 늘 보이고, 나머지는 시작 진행도 앞뒤 PHOTO_FADE 구간에서 나타난다 */
-function StagePhoto({ index, progress }: { index: number; progress: MotionValue<number> }) {
-  const p = PHOTO_STAGES[index];
-  const opacity = useTransform(progress, (v) => (index === 0 ? 1 : Math.min(1, Math.max(0, (v - p.from + PHOTO_FADE / 2) / PHOTO_FADE))));
-  return (
-    <motion.div className="absolute inset-0" style={{ opacity }}>
-      {/* eslint-disable-next-line @next/next/no-img-element -- 정적 export 라 next/image 최적화를 쓰지 않는다 */}
-      <img src={`${IMG}/${p.src}`} alt={p.alt} loading="lazy" width={900} height={1200} className="h-full w-full object-cover" />
-    </motion.div>
-  );
-}
-
-/* ---------- 2. 로스팅 단계 고르기 ---------- */
-
-function RoastPicker({ reduce, roast, setRoast, onJump }: { reduce: boolean; roast: Roast; setRoast: (r: Roast) => void; onJump: (id: string) => void }) {
-  const notes = ROAST_NOTES[roast];
-  const picks = BEANS.filter((b) => b.roast === roast);
-  const tone = ROAST_TONE[roast];
-
-  return (
-    <div className="mt-5 grid gap-6 md:grid-cols-[auto_1fr] md:gap-10">
-      <div>
-        <div role="group" aria-label="로스팅 단계" className="flex flex-wrap gap-2">
-          {ROASTS.map((r) => {
-            const on = r === roast;
-            return (
-              <button
-                key={r}
-                type="button"
-                aria-pressed={on}
-                onClick={() => setRoast(r)}
-                className={`inline-flex items-center gap-2 rounded-full border px-4 py-2 text-[15px] font-bold transition-colors duration-150 ${focusRing}`}
-                style={{
-                  borderColor: on ? C.accent : C.line,
-                  background: on ? C.accent : "transparent",
-                  color: on ? C.paper : C.ink,
-                  outlineColor: C.ink,
-                }}
-              >
-                <span
-                  className="inline-block h-3.5 w-3.5 rounded-full border"
-                  style={{
-                    background: ROAST_TONE[r],
-                    borderColor: on ? C.paper : C.ink,
-                  }}
-                  aria-hidden
-                />
-                {r}
-              </button>
-            );
-          })}
-        </div>
-        <p className="mt-4 max-w-[420px] text-[17px] leading-[1.6]">{ROAST_DESC[roast]}</p>
-
-        <dl className="mt-5 grid max-w-[420px] gap-3">
-          {NOTE_LABELS.map((label, i) => (
-            <div key={label} className="grid grid-cols-[48px_1fr_40px] items-center gap-3 text-[15px]">
-              <dt className="font-bold">{label}</dt>
-              <dd className="h-3 overflow-hidden rounded-[2px]" style={{ background: C.paperDeep }}>
-                <motion.span
-                  className="block h-full w-full origin-left rounded-[2px]"
-                  initial={false}
-                  animate={{ scaleX: notes[i] / 5, backgroundColor: tone }}
-                  transition={{ duration: reduce ? 0 : DUR, ease: EASE }}
-                />
-              </dd>
-              <dd className="text-right tabular-nums">{notes[i]}/5</dd>
-            </div>
-          ))}
-        </dl>
-      </div>
-
-      <div className="rounded-[8px] border p-4 md:p-5" style={{ borderColor: C.line }}>
-        <p className="text-[15px] font-bold" style={{ color: C.muted }}>
-          {roast} 추천 원두
-        </p>
-        <ul className="mt-2 divide-y" style={{ borderColor: C.line }}>
-          {picks.map((b) => (
-            <li key={b.id} className="flex items-center justify-between gap-3 py-3" style={{ borderColor: C.line }}>
-              <button type="button" onClick={() => onJump(b.id)} className={`min-w-0 text-left ${focusRing} rounded-[4px]`} style={{ outlineColor: C.ink }}>
-                <span className="block text-[17px] font-bold">{b.name}</span>
-                <span className="block text-[14px]" style={{ color: C.muted }}>
-                  {b.cup}
-                </span>
-              </button>
-              <span className="flex-none text-[15px] tabular-nums">{won(b.price)}</span>
-            </li>
-          ))}
-        </ul>
-      </div>
-    </div>
-  );
-}
-
-/* ---------- 3. 분쇄도 고르기 ---------- */
-
-function GrindPicker({ reduce, grind, setGrind }: { reduce: boolean; grind: Grind; setGrind: (g: Grind) => void }) {
-  const cur = GRINDS.find((g) => g.name === grind) ?? GRINDS[0];
-
-  return (
-    <div className="mt-5 grid items-center gap-5 rounded-[8px] border p-4 md:grid-cols-[240px_1fr] md:gap-8 md:p-5" style={{ borderColor: C.line, background: C.paperDeep }}>
-      {/* 맞는 사진이 있는 분쇄만 사진, 나머지는 굵기 글자 */}
-      <div className="relative mx-auto aspect-[4/3] w-full max-w-[320px] overflow-hidden rounded-[6px] md:max-w-[240px]" style={{ background: C.paper, border: `1px solid ${C.line}` }}>
-        <AnimatePresence initial={false}>
-          <motion.div
-            key={grind}
-            className="absolute inset-0"
-            initial={reduce ? false : { opacity: 0 }}
-            animate={{ opacity: 1 }}
-            exit={reduce ? { opacity: 0, transition: { duration: 0 } } : { opacity: 0 }}
-            transition={{ duration: reduce ? 0 : DUR_FAST }}
-          >
-            {cur.photo ? (
-              <>
-                {/* eslint-disable-next-line @next/next/no-img-element -- 정적 export 라 next/image 최적화를 쓰지 않는다 */}
-                <img src={`${IMG}/${cur.photo.src}`} alt={cur.photo.alt} loading="lazy" width={480} height={360} className="h-full w-full object-cover" style={{ objectPosition: cur.photo.pos }} />
-              </>
-            ) : (
-              <div className="flex h-full flex-col items-center justify-center gap-2" style={{ color: C.ink }}>
-                <Coffee size={28} aria-hidden style={{ color: C.accent }} />
-                <p className="text-[20px] font-bold">{cur.size}</p>
-                <p className="text-[14px]" style={{ color: C.muted }}>
-                  {cur.name}용 분쇄
-                </p>
-              </div>
-            )}
-          </motion.div>
-        </AnimatePresence>
-      </div>
-
-      <div>
-        <p className="text-[15px] font-bold" style={{ color: C.muted }}>
-          분쇄 선택
-        </p>
-        <div role="group" aria-label="분쇄도" className="mt-2 flex flex-wrap gap-2">
-          {GRINDS.map((g) => {
-            const on = g.name === grind;
-            return (
-              <button
-                key={g.name}
-                type="button"
-                aria-pressed={on}
-                onClick={() => setGrind(g.name)}
-                className={`rounded-[6px] border px-3.5 py-2 text-[15px] font-bold transition-colors duration-150 ${focusRing}`}
-                style={{
-                  borderColor: on ? C.accent : C.line,
-                  background: on ? C.accent : C.paper,
-                  color: on ? C.paper : C.ink,
-                  outlineColor: C.ink,
-                }}
-              >
-                {g.name}
-              </button>
-            );
-          })}
-        </div>
-        <p className="mt-3 text-[16px] leading-[1.6]">
-          <span className="font-bold">{cur.size}</span>
-          <span style={{ color: C.muted }}> {cur.tip}</span>
-        </p>
-        <p className="mt-1 text-[14px]" style={{ color: C.muted }}>
-          주문한 원두 전체에 같은 분쇄가 적용돼요. 분쇄 원두는 2주 안에 드시는 걸 권해요.
-        </p>
-      </div>
-    </div>
-  );
-}
-
-/* ---------- 4. 원두 카드와 담기 ---------- */
+/* ---------- 2. 원두 카드와 담기 ---------- */
 
 function BeanCard({ bean, count, onAdd }: { bean: Bean; count: number; onAdd: (d: number) => void }) {
   const tone = ROAST_TONE[bean.roast];
@@ -1162,155 +721,51 @@ function BeanCard({ bean, count, onAdd }: { bean: Bean; count: number; onAdd: (d
   );
 }
 
-/** 금액이 바뀌면 숫자가 굴러가며 바뀐다. 동작 줄이기면 바로 바뀐다 */
-function RollingWon({ value, reduce, className, style }: { value: number; reduce: boolean; className?: string; style?: React.CSSProperties }) {
-  const mv = useMotionValue(value);
-  const text = useTransform(mv, (v) => won(Math.round(v / 10) * 10));
-  useEffect(() => {
-    if (reduce) {
-      mv.set(value);
-      return;
-    }
-    const c = animate(mv, value, { duration: DUR, ease: EASE });
-    return () => c.stop();
-  }, [value, reduce, mv]);
+/* ---------- 3. 정기 구독 ---------- */
+
+function Subscription() {
   return (
-    <motion.span className={className} style={style}>
-      {text}
-    </motion.span>
-  );
-}
-
-/* ---------- 5. 구독 계산 ---------- */
-
-function Subscription({ reduce }: { reduce: boolean }) {
-  const [period, setPeriod] = useState<2 | 4>(4);
-  const [size, setSize] = useState<Size>(200);
-  const [bags, setBags] = useState(1);
-  const [beanId, setBeanId] = useState("morning");
-  const bean = beanById(beanId);
-
-  const unit = priceFor(bean, size);
-  const perShip = Math.round((unit * bags * (1 - SUB_DISCOUNT)) / 100) * 100;
-  const perMonth = perShip * (period === 2 ? 2 : 1);
-  const saved = unit * bags - perShip;
-
-  const chip = (on: boolean) =>
-    ({
-      borderColor: on ? C.accent : C.line,
-      background: on ? C.accent : "#fff",
-      color: on ? C.paper : C.ink,
-      outlineColor: C.ink,
-    }) as const;
-  const chipCls = `rounded-[6px] border px-3.5 py-2 text-[15px] font-bold transition-colors duration-150 ${focusRing}`;
-  const label = "block text-[14px] font-bold";
-
-  return (
-    <div className="mt-5 grid gap-6 rounded-[8px] border p-5 md:grid-cols-[1fr_minmax(260px,320px)] md:gap-10 md:p-6" style={{ borderColor: C.line, background: "#fff" }}>
-      <div className="grid gap-5">
-        <div>
-          <label htmlFor="rs-sub-bean" className={label} style={{ color: C.muted }}>
-            원두
-          </label>
-          <select
-            id="rs-sub-bean"
-            value={beanId}
-            onChange={(e) => setBeanId(e.target.value)}
-            className={`mt-1.5 w-full max-w-[420px] rounded-[6px] border px-3 py-2 text-[16px] ${focusRing}`}
-            style={{
-              borderColor: C.line,
-              background: C.paper,
-              color: C.ink,
-              outlineColor: C.ink,
-            }}
-          >
-            {BEANS.map((b) => (
-              <option key={b.id} value={b.id}>
-                {b.name} ({b.roast})
-              </option>
+    <div className="mt-5 grid gap-6 md:grid-cols-[1fr_minmax(260px,320px)] md:gap-10">
+      <div>
+        <table className="w-full border-collapse text-[15px] md:text-[16px]">
+          <caption className="pb-2 text-left text-[14px]" style={{ color: C.muted }}>
+            {SUB_BEAN} 기준, 2주마다 또는 4주마다
+          </caption>
+          <thead>
+            <tr className="border-y-2 text-left" style={{ borderColor: C.ink }}>
+              <th scope="col" className="py-2.5 pr-3 font-bold">구성</th>
+              <th scope="col" className="py-2.5 pr-3 text-right font-bold">정가</th>
+              <th scope="col" className="py-2.5 text-right font-bold">회당 구독가</th>
+            </tr>
+          </thead>
+          <tbody>
+            {SUB_PLANS.map((p) => (
+              <tr key={p.name} className="border-b" style={{ borderColor: C.line }}>
+                <th scope="row" className="py-3 pr-3 text-left font-normal">
+                  <span className="block font-bold">{p.name}</span>
+                  <span className="block text-[14px]" style={{ color: C.muted }}>
+                    {p.note}
+                  </span>
+                </th>
+                <td className="py-3 pr-3 text-right tabular-nums" style={{ color: C.muted }}>
+                  {won(p.price)}
+                </td>
+                <td className="py-3 text-right font-bold tabular-nums">{won(subPrice(p.price))}</td>
+              </tr>
             ))}
-          </select>
-        </div>
-        <div>
-          <span id="rs-sub-period" className={label} style={{ color: C.muted }}>
-            배송 주기
-          </span>
-          <div role="group" aria-labelledby="rs-sub-period" className="mt-1.5 flex flex-wrap gap-2">
-            {([2, 4] as const).map((p) => (
-              <button key={p} type="button" aria-pressed={period === p} onClick={() => setPeriod(p)} className={chipCls} style={chip(period === p)}>
-                {p}주마다
-              </button>
-            ))}
-          </div>
-        </div>
-        <div>
-          <span id="rs-sub-size" className={label} style={{ color: C.muted }}>
-            용량
-          </span>
-          <div role="group" aria-labelledby="rs-sub-size" className="mt-1.5 flex flex-wrap gap-2">
-            {SIZES.map((s) => (
-              <button key={s} type="button" aria-pressed={size === s} onClick={() => setSize(s)} className={chipCls} style={chip(size === s)}>
-                {sizeLabel(s)}
-              </button>
-            ))}
-          </div>
-        </div>
-        <div>
-          <span id="rs-sub-bags" className={label} style={{ color: C.muted }}>
-            봉수
-          </span>
-          <div role="group" aria-labelledby="rs-sub-bags" className="mt-1.5 inline-flex items-center gap-2">
-            <button
-              type="button"
-              onClick={() => setBags((b) => Math.max(1, b - 1))}
-              aria-label="한 봉 빼기"
-              className={`inline-flex h-10 w-10 items-center justify-center rounded-[6px] border ${focusRing}`}
-              style={{ borderColor: C.ink, outlineColor: C.ink }}
-            >
-              <Minus size={18} aria-hidden />
-            </button>
-            <span className="min-w-[3ch] text-center text-[20px] font-bold tabular-nums" aria-live="polite">
-              {bags}봉
-            </span>
-            <button
-              type="button"
-              onClick={() => setBags((b) => Math.min(6, b + 1))}
-              aria-label="한 봉 더"
-              className={`inline-flex h-10 w-10 items-center justify-center rounded-[6px] border ${focusRing}`}
-              style={{
-                borderColor: C.ink,
-                background: C.accent,
-                color: C.paper,
-                outlineColor: C.ink,
-              }}
-            >
-              <Plus size={18} aria-hidden />
-            </button>
-          </div>
-        </div>
+          </tbody>
+        </table>
+        <p className="mt-3 text-[14px]" style={{ color: C.muted }}>
+          싱글오리진은 200g 기준 1,000~4,000원이 더해져요.
+        </p>
       </div>
 
       <div className="rounded-[8px] p-5" style={{ background: C.paperDeep }}>
-        <p className="text-[14px] font-bold" style={{ color: C.muted }}>
-          회당 결제
-        </p>
-        <RollingWon value={perShip} reduce={reduce} className="mt-1 block text-[34px] leading-none tabular-nums" />
-        <p className="mt-2 text-[14px]" style={{ color: C.muted }}>
-          정가 <span className="tabular-nums">{won(unit * bags)}</span> 에서 <span className="tabular-nums">{won(saved)}</span> 할인
-        </p>
-        <div className="mt-5 border-t pt-4" style={{ borderColor: C.line }}>
-          <p className="text-[14px] font-bold" style={{ color: C.muted }}>
-            월 환산
-          </p>
-          <RollingWon value={perMonth} reduce={reduce} className="mt-1 block text-[24px] leading-none tabular-nums" />
-          <p className="mt-1 text-[14px]" style={{ color: C.muted }}>
-            {period}주마다 {bean.name} {sizeLabel(size)} {bags}봉
-          </p>
-        </div>
-        <ul className="mt-5 grid gap-1.5 text-[14px]">
+        <p className="text-[17px] font-bold">구독 혜택</p>
+        <ul className="mt-3 grid gap-1.5 text-[15px]">
           {["구독 10% 할인, 배송비 무료", "로스팅 다음 날 발송", "원두와 분쇄는 회차마다 바꿀 수 있어요", "다음 결제 전까지 언제든 해지"].map((t) => (
             <li key={t} className="flex items-start gap-1.5">
-              <Check size={16} className="mt-0.5 flex-none" aria-hidden />
+              <Check size={16} className="mt-1 flex-none" aria-hidden />
               {t}
             </li>
           ))}
@@ -1323,13 +778,13 @@ function Subscription({ reduce }: { reduce: boolean }) {
   );
 }
 
-/* ---------- 6. 주문 시트 ---------- */
+
+/* ---------- 4. 주문 시트 ---------- */
 
 function OrderSheet({
   reduce,
   today,
   cart,
-  grind,
   total,
   bags,
   done,
@@ -1339,7 +794,6 @@ function OrderSheet({
   reduce: boolean;
   today: Date;
   cart: Cart;
-  grind: Grind;
   total: number;
   bags: number;
   done: boolean;
@@ -1348,6 +802,7 @@ function OrderSheet({
 }) {
   const [name, setName] = useState("");
   const [phone, setPhone] = useState("");
+  const [grind, setGrind] = useState<Grind>("홀빈");
   const [err, setErr] = useState<string | null>(null);
   const first = useRef<HTMLInputElement>(null);
 
@@ -1449,6 +904,31 @@ function OrderSheet({
         {!done ? (
           <form onSubmit={submit} noValidate className="mt-5 grid gap-4">
             <div>
+              <label htmlFor="rs-grind" className="block text-[14px] font-bold">
+                분쇄
+              </label>
+              <select
+                id="rs-grind"
+                value={grind}
+                onChange={(e) => setGrind(e.target.value as Grind)}
+                className={field}
+                style={{
+                  borderColor: C.line,
+                  background: "#fff",
+                  outlineColor: C.ink,
+                }}
+              >
+                {GRINDS.map((g) => (
+                  <option key={g.name} value={g.name}>
+                    {g.name} ({g.use})
+                  </option>
+                ))}
+              </select>
+              <p className="mt-1 text-[13px]" style={{ color: C.muted }}>
+                주문한 원두 전체에 같은 분쇄가 적용돼요. 분쇄 원두는 2주 안에 드시는 걸 권해요.
+              </p>
+            </div>
+            <div>
               <label htmlFor="rs-name" className="block text-[14px] font-bold">
                 이름
               </label>
@@ -1538,7 +1018,7 @@ function OrderSheet({
   );
 }
 
-/* ---------- 7. 오시는 길, 영업시간 ---------- */
+/* ---------- 5. 오시는 길, 영업시간 ---------- */
 
 function Visit({ today }: { today: Date }) {
   const dow = today.getDay();
@@ -1626,7 +1106,7 @@ function Visit({ today }: { today: Date }) {
   );
 }
 
-/* ---------- 8. 공지 ---------- */
+/* ---------- 6. 공지 ---------- */
 
 function Notice({ today }: { today: Date }) {
   const items = [

@@ -19,19 +19,17 @@ import { DemoMakerInfo } from "@/components/demos/DemoMakerInfo";
 
    상호작용(모두 브라우저 안에서만 돈다. 실제로 보내지 않는다)
    1. 요금제 월 결제, 연 결제 전환: 연 결제면 20% 할인된 월 금액과 연 결제 금액이 같이 바뀐다.
-   2. 기능 비교표: "다른 점만 보기"를 누르면 요금제마다 다른 줄만 남는다.
-   3. 매장 수 계산: 매장 수와 요금제를 고르면 매장당 금액, 월 합계가 나온다. 5곳 이상 다매장 할인, 20곳 이상은 견적 안내.
+   2. 기능 비교표와 매장 수별 요금표(고정 표). 5곳 이상 다매장 할인, 20곳 이상은 별도 견적.
    4. 도입 문의: 문의 유형, 상호, 담당자, 휴대폰, 매장 수. 접수하면 접수 번호, 담당 창구, 회신 예정일을 보여 준다.
    5. 자주 묻는 질문(접고 펴기).
 
    첫 화면(ss-poster): 흰 배경 위 메뉴, 제목과 버튼 두 갈래, 기능 탭 세 개와 넓은 제품 화면, 오른쪽 아래 현장 사진 한 장.
    핵심 모션: 현장 사진이 1.06배에서 1배로 1.6초 동안 다가오고, 탭을 바꾸면 화면 안 내용만 0.2초 겹쳐 바뀐다.
-   숫자가 굴러 바뀌는 효과는 매장 수 계산 합계 한 곳에만 둔다.
    동작 줄이기면 모두 끈다. */
 
 const ADDRESS = "서울 ㅇㅇ구 ㅇㅇ로 00, 0층";
 const TEL = "02-000-0000";
-const KAKAO = "카카오톡 채널 곰파트너";
+const KAKAO = "카카오톡 채널 재고 관리 서비스";
 const SLUG = "saas-startup";
 const IMG = "/images/demo-saas-startup";
 
@@ -49,8 +47,6 @@ const C = {
 /* 모션 상수. 시간은 초, 이징은 cubic-bezier */
 const EASE = [0.22, 1, 0.36, 1] as const;
 const EASE_CSS = "cubic-bezier(0.22, 1, 0.36, 1)";
-/** 합계 숫자 전환 */
-const DUR = 0.32;
 
 const focusRing = "focus-visible:outline focus-visible:outline-[3px] focus-visible:outline-offset-2";
 const won = (n: number) => `${n.toLocaleString("ko-KR")}원`;
@@ -66,16 +62,12 @@ const PLANS: { id: PlanId; name: string; price: number; who: string; points: str
   { id: "standard", name: "스탠다드", price: 39000, who: "발주까지 앱으로 할 때", points: ["스타터 기능 전부", "품목 무제한", "적정 재고 알림, 거래처 발주서", "메뉴별 원가율", "직원 계정 10명"] },
   { id: "pro", name: "프로", price: 59000, who: "매장이 두 곳 이상일 때", points: ["스탠다드 기능 전부", "여러 매장 한 화면", "매장 간 재고 이동", "POS 매출 연동", "전담 매니저"] },
 ];
-const planById = (id: PlanId) => PLANS.find((p) => p.id === id) ?? PLANS[1];
 
 /** 연 결제 할인율 */
 const YEAR_OFF = 0.2;
 /** 다매장 할인: 5곳 이상 매장당 10% */
 const MULTI_FROM = 5;
 const MULTI_OFF = 0.1;
-/** 이 매장 수부터는 계산 대신 견적 안내 */
-const QUOTE_FROM = 20;
-const STORE_MAX = 30;
 
 /** 100원 단위로 내린다 */
 const floor100 = (n: number) => Math.floor(n / 100) * 100;
@@ -220,7 +212,7 @@ export function SaasDemo() {
 
       <Plans billing={billing} setBilling={setBilling} onTrial={(plan) => ask({ type: "무료 체험", plan, stores: 1 })} />
       <Compare />
-      <Calculator billing={billing} setBilling={setBilling} reduce={reduce} onAsk={(plan, stores) => ask({ type: stores >= MULTI_FROM ? "다매장 견적" : "도입 문의", plan, stores })} />
+      <StoreTable onAsk={() => ask({ type: "다매장 견적", plan: "pro", stores: MULTI_FROM })} />
 
       <section id="ss-contact" aria-labelledby="ss-contact-title" className="mx-auto mt-20 max-w-[1200px] scroll-mt-4 px-4 md:mt-28 md:px-6">
         <div className="grid gap-8 md:grid-cols-[minmax(0,0.8fr)_minmax(0,1.2fr)] md:gap-12">
@@ -443,7 +435,7 @@ function Poster({ reduce, go, onTrial, onContact }: { reduce: boolean; go: (id: 
               <span className="h-2.5 w-2.5 rounded-full" style={{ background: C.line }} />
               <span className="h-2.5 w-2.5 rounded-full" style={{ background: C.line }} />
               <span className="ml-3 text-[12px] font-medium" style={{ color: C.muted }}>
-                곰파트너 재고, ㅇㅇ식당 본점
+                재고 관리 서비스, ㅇㅇ식당 본점
               </span>
             </div>
             <div className="grid md:grid-cols-[160px_minmax(0,1fr)]">
@@ -676,13 +668,10 @@ function SampleLogo({ light, size = 20 }: { light?: boolean; size?: number }) {
   const mark = size + 8;
   return (
     <span className="inline-flex items-center gap-2 leading-none" style={{ color: light ? "#fff" : "#111" }}>
-      {/* eslint-disable-next-line @next/next/no-img-element -- 메인 사이트와 같은 곰 로고 */}
-      <img src="/images/logo-bear.png" alt="" aria-hidden width={mark} height={mark} className="shrink-0" style={{ width: mark, height: mark }} />
       <span className="flex items-baseline gap-1 whitespace-nowrap">
         <span className="font-bold tracking-[-0.03em]" style={{ fontSize: size }}>
-          곰파트너
+          재고 관리 서비스
         </span>
-        <span className="text-[12px] font-semibold opacity-75">카탈로그</span>
       </span>
     </span>
   );
@@ -714,26 +703,6 @@ function BillingToggle({ billing, setBilling, label }: { billing: Billing; setBi
         );
       })}
     </div>
-  );
-}
-
-/** 숫자가 바뀌면 아래에서 위로 굴러 바뀐다. 매장 수 계산 합계에만 쓴다 */
-function Rolling({ text, reduce, className = "" }: { text: string; reduce: boolean; className?: string }) {
-  return (
-    <span className={`relative inline-flex overflow-hidden align-bottom ${className}`}>
-      <AnimatePresence mode="popLayout" initial={false}>
-        <motion.span
-          key={text}
-          initial={reduce ? false : { y: "70%", opacity: 0 }}
-          animate={{ y: 0, opacity: 1 }}
-          exit={reduce ? { opacity: 0, transition: { duration: 0 } } : { y: "-70%", opacity: 0 }}
-          transition={{ duration: reduce ? 0 : DUR, ease: EASE }}
-          className="inline-block"
-        >
-          {text}
-        </motion.span>
-      </AnimatePresence>
-    </span>
   );
 }
 
@@ -820,28 +789,12 @@ function CellView({ v }: { v: Cell }) {
 }
 
 function Compare() {
-  const [diffOnly, setDiffOnly] = useState(false);
-  const groups = COMPARE.map((g) => ({ ...g, rows: diffOnly ? g.rows.filter(([, a, b, c]) => !(a === b && b === c)) : g.rows })).filter((g) => g.rows.length > 0);
 
   return (
     <section id="ss-compare" aria-labelledby="ss-compare-title" className="mx-auto mt-16 max-w-[1200px] scroll-mt-4 px-4 md:mt-20 md:px-6">
-      <div className="flex flex-wrap items-center justify-between gap-3">
-        <h2 id="ss-compare-title" className="text-[24px] font-bold tracking-[-0.03em] md:text-[28px]">
-          요금제별 기능 비교
-        </h2>
-        <button
-          type="button"
-          aria-pressed={diffOnly}
-          onClick={() => setDiffOnly((d) => !d)}
-          className={`inline-flex items-center gap-2 rounded-[6px] px-3.5 py-2 text-[15px] font-semibold ${focusRing}`}
-          style={{ background: C.bg, color: C.ink, boxShadow: `inset 0 0 0 1px ${diffOnly ? C.accent : C.line}`, outlineColor: C.accent }}
-        >
-          <span className="inline-flex h-[18px] w-[18px] items-center justify-center rounded-[4px]" style={{ background: diffOnly ? C.accent : "#fff", boxShadow: diffOnly ? undefined : `inset 0 0 0 1.5px ${C.muted}` }}>
-            {diffOnly && <Check size={13} aria-hidden strokeWidth={3} color="#ffffff" />}
-          </span>
-          다른 점만 보기
-        </button>
-      </div>
+      <h2 id="ss-compare-title" className="text-[24px] font-bold tracking-[-0.03em] md:text-[28px]">
+        요금제별 기능 비교
+      </h2>
 
       <table className="mt-6 w-full table-fixed border-collapse text-left">
         <caption className="sr-only">스타터, 스탠다드, 프로 요금제 기능 비교</caption>
@@ -863,7 +816,7 @@ function Compare() {
             ))}
           </tr>
         </thead>
-        {groups.map((g) => (
+        {COMPARE.map((g) => (
           <tbody key={g.group}>
             <tr>
               <th colSpan={4} scope="colgroup" className="pb-2 pt-6 text-[13px] font-bold md:text-[14px]" style={{ color: C.muted, borderBottom: `1px solid ${C.ink}` }}>
@@ -893,159 +846,68 @@ function Compare() {
   );
 }
 
-/* ---------- 3. 매장 수 계산 ---------- */
+/* ---------- 3. 매장 수별 요금 ---------- */
 
-function Calculator({
-  billing,
-  setBilling,
-  reduce,
-  onAsk,
-}: {
-  billing: Billing;
-  setBilling: (b: Billing) => void;
-  reduce: boolean;
-  onAsk: (plan: PlanId, stores: number) => void;
-}) {
-  const [stores, setStores] = useState(3);
-  const [plan, setPlan] = useState<PlanId>("standard");
-  const n = Math.max(1, Math.min(STORE_MAX, stores));
-  const quote = n >= QUOTE_FROM;
-  // 스타터는 매장 1곳 전용. 2곳 이상이면 고를 수 없다
-  const choices = PLANS.filter((p) => p.id !== "starter" || n === 1);
-  const active = choices.some((p) => p.id === plan) ? plan : "standard";
-  const base = monthly(planById(active).price, billing);
-  const multi = n >= MULTI_FROM;
-  const per = multi ? floor100(base * (1 - MULTI_OFF)) : base;
-  const total = per * n;
+const STORE_ROWS: [string, string, string, string][] = [
+  ["1곳", won(PLANS[0].price), won(PLANS[1].price), won(PLANS[2].price)],
+  ["2~4곳", "-", won(PLANS[1].price), won(PLANS[2].price)],
+  [`${MULTI_FROM}~19곳`, "-", won(floor100(PLANS[1].price * (1 - MULTI_OFF))), won(floor100(PLANS[2].price * (1 - MULTI_OFF)))],
+  ["20곳 이상", "-", "별도 견적", "별도 견적"],
+];
 
-  const set = (v: number) => setStores(Math.max(1, Math.min(STORE_MAX, Math.round(v) || 1)));
-  const stepBtn = `inline-flex h-11 w-11 items-center justify-center rounded-[6px] disabled:opacity-40 ${focusRing}`;
-
+function StoreTable({ onAsk }: { onAsk: () => void }) {
   return (
-    <section id="ss-calc" aria-labelledby="ss-calc-title" className="mx-auto mt-20 max-w-[1200px] scroll-mt-4 px-4 md:mt-28 md:px-6">
-      <div className="grid overflow-hidden rounded-[8px] md:grid-cols-[minmax(0,1.1fr)_minmax(0,0.9fr)]" style={{ boxShadow: `inset 0 0 0 1px ${C.line}` }}>
-        <div className="p-5 md:p-8">
-          <h2 id="ss-calc-title" className="text-[24px] font-bold tracking-[-0.03em] md:text-[28px]">
-            매장 수로 요금 계산
-          </h2>
-
-          <div className="mt-6">
-            <label htmlFor="ss-calc-stores" className="text-[15px] font-bold">
+    <section id="ss-stores" aria-labelledby="ss-stores-title" className="mx-auto mt-20 max-w-[1200px] scroll-mt-4 px-4 md:mt-28 md:px-6">
+      <h2 id="ss-stores-title" className="text-[24px] font-bold tracking-[-0.03em] md:text-[28px]">
+        매장 수별 요금
+      </h2>
+      <p className="mt-2 text-[16px] leading-[1.6]" style={{ color: C.body, wordBreak: "keep-all" }}>
+        매장당 월 요금, 월 결제 기준입니다. {MULTI_FROM}곳부터 매장당 10% 할인, 연 결제 시 20% 추가 할인. 부가세 별도.
+      </p>
+      <table className="mt-6 w-full table-fixed border-collapse text-left">
+        <caption className="sr-only">매장 수와 요금제별 매장당 월 요금</caption>
+        <colgroup>
+          <col className="w-[25%]" />
+          <col />
+          <col />
+          <col />
+        </colgroup>
+        <thead>
+          <tr className="text-[14px] md:text-[16px]" style={{ borderBottom: `1px solid ${C.ink}` }}>
+            <th scope="col" className="py-3 pr-2 font-semibold" style={{ color: C.muted }}>
               매장 수
-            </label>
-            <div className="mt-2 flex items-center gap-2">
-              <button type="button" aria-label="매장 하나 빼기" disabled={n <= 1} onClick={() => set(n - 1)} className={stepBtn} style={{ background: C.bg, boxShadow: `inset 0 0 0 1px ${C.line}`, outlineColor: C.accent }}>
-                <Minus size={18} aria-hidden />
-              </button>
-              <input
-                id="ss-calc-stores"
-                type="number"
-                inputMode="numeric"
-                min={1}
-                max={STORE_MAX}
-                value={n}
-                onChange={(ev) => set(Number(ev.target.value))}
-                className={`h-11 w-20 rounded-[8px] text-center text-[20px] font-bold tabular-nums ${focusRing}`}
-                style={{ boxShadow: `inset 0 0 0 1px ${C.line}`, outlineColor: C.accent }}
-              />
-              <button type="button" aria-label="매장 하나 더하기" disabled={n >= STORE_MAX} onClick={() => set(n + 1)} className={stepBtn} style={{ background: C.bg, boxShadow: `inset 0 0 0 1px ${C.line}`, outlineColor: C.accent }}>
-                <Plus size={18} aria-hidden />
-              </button>
-              <span className="text-[16px] font-semibold">곳</span>
-            </div>
-            <input
-              type="range"
-              aria-label="매장 수 조절"
-              min={1}
-              max={STORE_MAX}
-              value={n}
-              onChange={(ev) => set(Number(ev.target.value))}
-              className={`mt-4 w-full ${focusRing}`}
-              style={{ accentColor: C.accent, outlineColor: C.accent }}
-            />
-          </div>
-
-          <fieldset className="mt-6">
-            <legend className="text-[15px] font-bold">요금제</legend>
-            <div className="mt-2 flex flex-wrap gap-2">
-              {PLANS.map((p) => {
-                const ok = choices.some((c) => c.id === p.id);
-                const on = active === p.id;
-                return (
-                  <label
-                    key={p.id}
-                    className={`inline-flex items-center gap-2 rounded-[6px] px-3.5 py-2 text-[15px] font-semibold has-[:focus-visible]:outline has-[:focus-visible]:outline-[3px] has-[:focus-visible]:outline-offset-2 ${ok ? "cursor-pointer" : "cursor-not-allowed opacity-45"}`}
-                    style={{ background: on ? C.accent : C.bg, color: on ? "#fff" : C.ink, boxShadow: on ? undefined : `inset 0 0 0 1px ${C.line}`, outlineColor: C.accent }}
-                  >
-                    <input type="radio" name="ss-calc-plan" className="sr-only" checked={on} disabled={!ok} onChange={() => setPlan(p.id)} />
-                    {p.name}
-                  </label>
-                );
-              })}
-            </div>
-            {n > 1 && <p className="mt-2 text-[14px]" style={{ color: C.muted }}>스타터는 매장 1곳만 쓸 수 있어요.</p>}
-          </fieldset>
-
-          <div className="mt-6">
-            <BillingToggle billing={billing} setBilling={setBilling} label="계산할 결제 주기" />
-          </div>
-        </div>
-
-        <div className="flex flex-col p-5 md:p-8" style={{ background: C.soft, color: C.ink }} aria-live="polite">
-          {quote ? (
-            <>
-              <p className="text-[15px] font-semibold" style={{ color: C.body }}>
-                매장 {n}곳
-              </p>
-              <p className="mt-2 text-[28px] font-bold leading-[1.3] tracking-[-0.03em]" style={{ wordBreak: "keep-all" }}>
-                20곳 이상은 따로 견적을 드려요
-              </p>
-              <p className="mt-3 text-[15px] leading-[1.6]" style={{ color: C.body }}>
-                본사 계정, 매장별 권한, POS 연동 범위를 듣고 금액을 맞춰요.
-              </p>
-            </>
-          ) : (
-            <>
-              <p className="text-[15px] font-semibold" style={{ color: C.body }}>
-                {planById(active).name}, 매장 {n}곳, {billing === "year" ? "연 결제" : "월 결제"}
-              </p>
-              <p className="mt-2 flex items-baseline gap-1.5">
-                <span className="text-[16px] font-semibold">월</span>
-                <Rolling text={total.toLocaleString("ko-KR")} reduce={reduce} className="text-[44px] font-bold tracking-[-0.03em] tabular-nums md:text-[52px]" />
-                <span className="text-[18px] font-bold">원</span>
-              </p>
-              <dl className="mt-4 space-y-1.5 text-[15px]">
-                <div className="flex justify-between gap-3">
-                  <dt style={{ color: C.body }}>매장당 월</dt>
-                  <dd className="font-bold tabular-nums">{won(per)}</dd>
-                </div>
-                <div className="flex justify-between gap-3">
-                  <dt style={{ color: C.body }}>다매장 할인</dt>
-                  <dd className="font-bold">{multi ? "10% 적용" : `${MULTI_FROM}곳부터 10%`}</dd>
-                </div>
-                {billing === "year" && (
-                  <div className="flex justify-between gap-3">
-                    <dt style={{ color: C.body }}>연 결제 금액</dt>
-                    <dd className="font-bold tabular-nums">{won(total * 12)}</dd>
-                  </div>
-                )}
-              </dl>
-              <p className="mt-3 text-[13px]" style={{ color: C.muted }}>
-                부가세 별도
-              </p>
-            </>
-          )}
-          <button
-            type="button"
-            onClick={() => onAsk(active, n)}
-            data-gtm-cta={`${SLUG}_calc_contact`}
-            className={`mt-6 rounded-[6px] py-3 text-[16px] font-semibold transition-transform duration-100 active:translate-y-[1px] md:mt-auto ${focusRing}`}
-            style={{ background: C.accent, color: "#fff", outlineColor: C.accent }}
-          >
-            이 조건으로 문의하기
-          </button>
-        </div>
-      </div>
+            </th>
+            {PLANS.map((p) => (
+              <th key={p.id} scope="col" className="py-3 text-center font-bold" style={p.id === "standard" ? { background: C.soft } : undefined}>
+                {p.name}
+              </th>
+            ))}
+          </tr>
+        </thead>
+        <tbody>
+          {STORE_ROWS.map(([label, a, b, c]) => (
+            <tr key={label} style={{ borderBottom: `1px solid ${C.line}` }}>
+              <th scope="row" className="py-3 pr-2 text-[14px] font-medium md:text-[16px]">
+                {label}
+              </th>
+              <td className="py-3 text-center text-[13px] font-semibold tabular-nums md:text-[15px]">{a}</td>
+              <td className="py-3 text-center text-[13px] font-semibold tabular-nums md:text-[15px]" style={{ background: C.soft }}>
+                {b}
+              </td>
+              <td className="py-3 text-center text-[13px] font-semibold tabular-nums md:text-[15px]">{c}</td>
+            </tr>
+          ))}
+        </tbody>
+      </table>
+      <button
+        type="button"
+        onClick={onAsk}
+        data-gtm-cta={`${SLUG}_stores_contact`}
+        className={`mt-6 rounded-[6px] px-5 py-3 text-[16px] font-semibold transition-transform duration-100 active:translate-y-[1px] ${focusRing}`}
+        style={{ background: C.accent, color: "#fff", outlineColor: C.accent }}
+      >
+        다매장 견적 문의
+      </button>
     </section>
   );
 }

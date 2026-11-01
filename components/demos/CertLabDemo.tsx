@@ -1,38 +1,27 @@
 "use client";
 
-import { createContext, useContext, useEffect, useId, useRef, useState, useSyncExternalStore, type FormEvent, type KeyboardEvent as ReactKeyboardEvent, type ReactNode } from "react";
+import { createContext, useContext, useEffect, useId, useRef, useState, type FormEvent, type KeyboardEvent as ReactKeyboardEvent, type ReactNode } from "react";
 import Image from "next/image";
 import { AnimatePresence, motion } from "framer-motion";
 import {
-  Activity,
-  BatteryFull,
-  Bluetooth,
   Check,
   ChevronDown,
   ChevronRight,
   CircleAlert,
   ClipboardList,
   Copy,
-  Factory,
   FileText,
   FileUp,
   House,
-  Lightbulb,
   Menu,
   MessageCircle,
-  Monitor,
   Phone,
-  Plug,
   Plus,
   RotateCcw,
   Search,
   ShieldCheck,
-  Signal,
   Trash2,
-  Wifi,
-  WifiOff,
   X,
-  Zap,
 } from "lucide-react";
 import { useReducedMotionSafe } from "@/hooks/useReducedMotionSafe";
 import { daysAgo, fmtDot, useDemoToday } from "@/hooks/useDemoToday";
@@ -42,19 +31,16 @@ import { DemoMakerInfo } from "@/components/demos/DemoMakerInfo";
    회사명, 대표자, 주소, 전화번호, 사업자 정보, 지정 번호, 담당자, 의뢰사는 모두 가상이고 실제 기관 로고나 등록번호는 쓰지 않는다.
 
    구성: 실제 시험인증기관의 포털·게시판형 홈페이지를 따랐다. 메뉴는 회사소개, 인증업무, 국내인증, 해외인증, 고객지원.
-   메인은 큰 사진 대신 맨 위에 조회 도구 줄(인증 대상 조회, 시험진행현황 조회, 성적서 진위확인, 신청서 양식, 견적문의)과
-   접수번호 바로 조회를 두고, 그 아래 새소식·자료실 게시판 2단, 바로가기 배너, 인증 서비스 목록을 둔다.
+   메인은 큰 사진 배너를 먼저 두고, 그 아래 바로가기 줄(성적서 진위확인, 신청서 양식, 견적문의, 고객 문의 안내),
+   새소식, 자료실 게시판 2단, 바로가기 배너, 인증 서비스 목록을 둔다.
    하위 화면은 라우트를 따로 두지 않고 상태로 바꾸며, 왼쪽 하위 메뉴(LNB)와 그 아래 상담 안내 상자, 위치 표시를 쓴다.
    좁은 화면에서는 LNB가 선택 상자로 바뀐다. 오른쪽 아래 공용 버튼 위에 견적문의·전화연결·카톡상담 버튼을 띄운다.
    회사소개에는 KOLAS 인정 시험소에 있는 공평성 선언과 고객불만 처리 절차 화면을 둔다.
 
    디자인: 흰색과 서늘한 종이색(#f4f7fb) 바탕에 짙은 남색(#23307a), 신호 청록(#0aa2c0) 하나를 포인트로 쓴다.
 
-   인증 대상 조회는 전원 방식, 무선 기능, 제품 분류, 판매 국가를 고르면 필요할 가능성이 높은 인증을 국가별로 묶어
-   이유, 주요 시험 항목, 예상 기간과 함께 보여 주고, 견적문의에 추가하면 견적문의 양식의 인증 칸으로 들어간다.
-   해외인증은 점으로 찍은 세계 지도와 LNB로 대륙을 고르고, 국가 탭으로 인증 이름과 설명을 본다.
-   시험진행현황 조회는 접수번호 끝 네 자리로 진행 단계를 정해 단계표와 날짜를 보여 주고,
-   전자파 시험이면 30MHz~1GHz 방사 방출 그래프에 기준선, 측정값, 최소 여유를 그린다. 동작 줄이기를 켜면 선 그리기를 하지 않는다.
+   해외인증은 LNB로 대륙을 고르고, 시험 분야 목록과 국가 탭으로 인증 이름과 설명을 본다.
+   고객 문의 안내는 업무별 문의 창구 표와 필요한 인증 상담, 시험 진행 상황 문의 방법을 글로 안내한다.
    견적문의는 고객사를 가린 공개 접수 목록과 작성 양식으로 나뉘고, 사양서 파일은 이름과 크기만 보여 주며 어디에도 올리지 않는다.
    시료 접수 안내(오시는 길 화면 안)는 받는 주소 복사와 상자에 넣을 것 목록을 둔다.
 
@@ -62,11 +48,10 @@ import { DemoMakerInfo } from "@/components/demos/DemoMakerInfo";
    AI 생성(Z-Image-Turbo, Apache 2.0) hero, lab, facility-(chamber, shield, conducted, safety) */
 
 const IMG = "/images/demo-certlab";
-const COMPANY = "곰파트너";
+const COMPANY = "시험인증기관";
 const TEL = "02-000-0000";
 const FAX = "02-000-0001";
-const EMAIL = "contact@gompartner.co.kr";
-const ADDRESS = "ㄱㅇ시 ㅂㄹ구 ㄷㅅ로 00 곰파트너";
+const ADDRESS = "ㄱㅇ시 ㅂㄹ구 ㄷㅅ로 00";
 const HOURS = "평일 09:00 ~ 18:00";
 
 const C = {
@@ -146,8 +131,7 @@ const MENUS: { id: MenuId; label: string; subs: { id: string; label: string }[] 
     id: "support",
     label: "고객지원",
     subs: [
-      { id: "finder", label: "인증 대상 조회" },
-      { id: "track", label: "시험진행현황 조회" },
+      { id: "inquiry", label: "고객 문의 안내" },
       { id: "verify", label: "성적서 진위확인" },
       { id: "quote", label: "견적문의" },
       { id: "news", label: "새소식" },
@@ -173,13 +157,8 @@ interface Ctx {
   openQuote: () => void;
   quoteForm: boolean;
   setQuoteForm: (v: boolean) => void;
-  certs: string[];
-  setCerts: (fn: (prev: string[]) => string[]) => void;
-  trackQuery: string;
-  setTrackQuery: (v: string) => void;
   rows: QuoteRow[];
   addRow: (r: QuoteRow) => void;
-  minute: number;
   today: Date;
 }
 
@@ -190,23 +169,10 @@ function useCl() {
   return c;
 }
 
-/* ---------- 시간 ---------- */
+/* ---------- 날짜 ---------- */
 
-const subscribeMinute = (cb: () => void) => {
-  const id = window.setInterval(cb, 30_000);
-  return () => window.clearInterval(id);
-};
-
-/** 분 단위 현재 시각. 서버 렌더에서는 -1을 돌려 날짜에 따른 화면 차이를 막는다. */
-function useNowMinute() {
-  return useSyncExternalStore(subscribeMinute, () => Math.floor(Date.now() / 60_000), () => -1);
-}
-
-const DAY_NAMES = ["일", "월", "화", "수", "목", "금", "토"];
 const pad2 = (n: number) => String(n).padStart(2, "0");
 const md = (d: Date) => `${pad2(d.getMonth() + 1)}.${pad2(d.getDate())}`;
-const mdw = (d: Date) => `${md(d)} (${DAY_NAMES[d.getDay()]})`;
-const dayStart = (d: Date) => new Date(d.getFullYear(), d.getMonth(), d.getDate()).getTime();
 /** 10월 5일 */
 const mdKo = (d: Date) => `${d.getMonth() + 1}월 ${d.getDate()}일`;
 /** 오늘 기준 n일 전 날짜를 10월 5일 형식으로 */
@@ -234,53 +200,12 @@ function maskPhone(phone: string) {
   return `${digits.slice(0, 3)}-****-${digits.slice(-4)}`;
 }
 
-const r2 = (n: number) => Math.round(n * 100) / 100;
 
 function fileSize(bytes: number) {
   if (bytes < 1024 * 1024) return `${Math.max(1, Math.round(bytes / 1024))} KB`;
   return `${(bytes / 1024 / 1024).toFixed(1)} MB`;
 }
 
-/* ---------- 방사 방출 그래프 데이터 (30MHz ~ 1GHz) ---------- */
-
-const F0 = 30;
-const F1 = 1000;
-const LOG_RANGE = Math.log10(F1 / F0);
-const SX0 = 46;
-const SX1 = 466;
-const SY0 = 14;
-const SY1 = 228;
-const DB0 = 10;
-const DB1 = 60;
-
-const fx = (f: number) => r2(SX0 + (Math.log10(f / F0) / LOG_RANGE) * (SX1 - SX0));
-const dy = (db: number) => r2(SY1 - ((db - DB0) / (DB1 - DB0)) * (SY1 - SY0));
-/** 3m 거리 B급 기기 방사 방출 기준(준첨두값) */
-const limitAt = (f: number) => (f < 230 ? 40 : 47);
-
-const PEAKS = [
-  { f: 48, v: 30.6 },
-  { f: 96, v: 33.1 },
-  { f: 144, v: 35.8 },
-  { f: 300, v: 38.4 },
-  { f: 480, v: 41.5 },
-  { f: 720, v: 36.9 },
-];
-
-const TRACE_POINTS = Array.from({ length: 160 }, (_, i) => {
-  const t = i / 159;
-  const f = F0 * 10 ** (t * LOG_RANGE);
-  const noise = 15.5 + 4 * t + 2.6 * Math.sin(i * 1.7) + 1.8 * Math.sin(i * 0.53 + 1) + 1.2 * Math.sin(i * 3.1);
-  const peak = Math.max(...PEAKS.map((p) => p.v - 25000 * Math.log10(f / p.f) ** 2));
-  return { f, db: Math.max(noise, peak) };
-});
-
-const TRACE_PATH = TRACE_POINTS.map((p, i) => `${i === 0 ? "M" : "L"}${fx(p.f)} ${dy(p.db)}`).join(" ");
-const LIMIT_PATH = `M${fx(30)} ${dy(40)} H${fx(230)} V${dy(47)} H${fx(1000)}`;
-const WORST = PEAKS.reduce((w, p) => (limitAt(p.f) - p.v < limitAt(w.f) - w.v ? p : w), PEAKS[0]);
-const WORST_MARGIN = (limitAt(WORST.f) - WORST.v).toFixed(1);
-
-/** 고객사 가리기: (주)한빛전자는 (주)ㅎㅂ전자, 업종 말이 없으면 앞 두 글자만 초성 */
 const COMPANY_SUFFIX = /(전자|테크|시스템|산업|기계|기공|정밀|라이팅|모빌리티|메디칼|전기|통신|소프트|솔루션|엔지니어링|상사|물산|화학|에너지|바이오|로보틱스|네트웍스|컴퍼니|코리아)$/;
 function maskCompany(name: string) {
   const v = name.trim();
@@ -315,12 +240,9 @@ const QUOTE_ROWS: QuoteRow[] = [
 ];
 
 export function CertLabDemo() {
-  const minute = useNowMinute();
   const today = useDemoToday();
   const [route, setRoute] = useState<Route>({ m: "home", s: "" });
   const [quoteForm, setQuoteForm] = useState(false);
-  const [certs, setCerts] = useState<string[]>([]);
-  const [trackQuery, setTrackQuery] = useState("");
   const [rows, setRows] = useState<QuoteRow[]>(QUOTE_ROWS);
   const moved = useRef(false);
   useEffect(() => {
@@ -355,13 +277,8 @@ export function CertLabDemo() {
     },
     quoteForm,
     setQuoteForm,
-    certs,
-    setCerts,
-    trackQuery,
-    setTrackQuery,
     rows,
     addRow: (r) => setRows((prev) => [r, ...prev]),
-    minute,
     today,
   };
 
@@ -383,11 +300,8 @@ export function CertLabDemo() {
 function Logo() {
   return (
     <span className="inline-flex min-w-0 max-w-full items-center gap-2.5">
-      {/* eslint-disable-next-line @next/next/no-img-element */}
-      <img src="/images/logo-bear.png" alt="" aria-hidden width={28} height={28} className="h-7 w-7 shrink-0" />
       <span className="flex min-w-0 items-baseline gap-1.5 whitespace-nowrap">
-        <span className="text-[18px] font-bold tracking-[-0.02em] sm:text-[19px]">곰파트너</span>
-        <span className="truncate text-[11px] font-bold sm:text-[12px]" style={{ opacity: 0.75 }}>카탈로그</span>
+        <span className="text-[18px] font-bold tracking-[-0.02em] sm:text-[19px]">시험인증기관</span>
       </span>
     </span>
   );
@@ -619,7 +533,7 @@ function FloatingContact() {
         <div id="cl-kakao" className="absolute bottom-0 right-full mr-2 w-[220px] rounded-[10px] border bg-white p-4 text-[14px] leading-[1.55] shadow-[0_6px_18px_rgba(20,26,51,0.16)]" style={{ borderColor: C.line }}>
           <p className="font-bold">카카오톡 상담</p>
           <p className="mt-1" style={{ color: C.muted }}>
-            카카오톡에서 &lsquo;곰파트너&rsquo; 채널을 추가해 주십시오. {HOURS}
+            카카오톡에서 &lsquo;시험인증기관&rsquo; 채널을 추가해 주십시오. {HOURS}
           </p>
           <button type="button" onClick={() => setKakao(false)} className="mt-2 inline-flex h-9 items-center rounded-[6px] border px-3 text-[13px] font-bold" style={{ borderColor: C.line }}>
             닫기
@@ -668,22 +582,14 @@ const MARKS: { name: string; to: [MenuId, string] }[] = [
 ];
 
 function Home() {
-  const { go, openQuote, setTrackQuery, today } = useCl();
-  const [no, setNo] = useState("");
+  const { go, openQuote, today } = useCl();
 
   const tools = [
-    { icon: Search, label: "인증 대상 조회", to: () => go("support", "finder") },
-    { icon: Activity, label: "시험진행현황 조회", to: () => go("support", "track") },
     { icon: ShieldCheck, label: "성적서 진위확인", to: () => go("support", "verify") },
     { icon: FileText, label: "신청서 양식", to: () => go("support", "files") },
     { icon: ClipboardList, label: "견적문의", to: openQuote },
+    { icon: Phone, label: "고객 문의 안내", to: () => go("support", "inquiry") },
   ];
-
-  const quick = (e: FormEvent) => {
-    e.preventDefault();
-    setTrackQuery(no);
-    go("support", "track");
-  };
 
   const banners = [
     { title: "시험시설", sub: "3m 전파무향실 30MHz ~ 18GHz", img: `${IMG}/hero.jpg`, pos: "50% 50%", to: () => go("about", "facility") },
@@ -694,51 +600,41 @@ function Home() {
 
   return (
     <>
-      <section id="cl-tools" aria-labelledby="cl-page-title" className="relative overflow-hidden px-4 md:px-6" style={{ background: C.indigoDeep, color: C.white }}>
-        <div className="relative mx-auto max-w-[1200px] pb-6 pt-8 md:pb-8 md:pt-12">
-          <div className="grid items-end gap-7 lg:grid-cols-[1fr_440px] lg:gap-12">
-            <div>
-              <h1 id="cl-page-title" tabIndex={-1} className="text-[30px] font-bold leading-[1.25] tracking-[-0.03em] outline-none md:text-[42px]">
-                전자파, 전기안전 시험과 KC 인증
-              </h1>
-              <p className="mt-2 text-[16px] font-bold md:text-[18px]" style={{ color: C.cyan }}>
-                KC인증 지정시험기관, KOLAS 공인시험기관
-              </p>
-            </div>
-            <form id="cl-track-quick" onSubmit={quick} className="rounded-[10px] bg-white p-4 md:p-5" style={{ color: C.ink }}>
-              <label htmlFor="cl-quick-no" className="flex items-center gap-2 text-[16px] font-bold">
-                <Activity size={18} style={{ color: C.cyanText }} aria-hidden />
-                시험진행현황 조회
-              </label>
-              <div className="mt-2.5 flex gap-2">
-                <input
-                  id="cl-quick-no"
-                  value={no}
-                  onChange={(e) => setNo(e.target.value)}
-                  placeholder={`접수번호 (예: ${sampleNo(today)})`}
-                  autoComplete="off"
-                  className="h-12 min-w-0 flex-1 rounded-[8px] border px-3 text-[16px] font-semibold tabular-nums outline-none focus:border-[#23307a]"
-                  style={{ borderColor: C.line }}
-                />
-                <button type="submit" className="inline-flex h-12 shrink-0 items-center gap-1.5 rounded-[8px] px-4 font-bold" style={{ background: C.indigo, color: C.white }}>
-                  <Search size={17} aria-hidden />
-                  조회
-                </button>
-              </div>
-            </form>
+      <section aria-labelledby="cl-page-title" className="relative overflow-hidden" style={{ background: C.indigoDeep, color: C.white }}>
+        <Image src={`${IMG}/hero.jpg`} alt="" fill priority sizes="100vw" className="object-cover" />
+        <div className="absolute inset-0" style={{ background: "linear-gradient(90deg, rgba(24,33,90,0.9) 0%, rgba(24,33,90,0.7) 55%, rgba(24,33,90,0.4) 100%)" }} aria-hidden />
+        <div className="relative mx-auto max-w-[1200px] px-4 pb-14 pt-14 md:px-6 md:pb-20 md:pt-24">
+          <h1 id="cl-page-title" tabIndex={-1} className="text-[30px] font-bold leading-[1.25] tracking-[-0.03em] outline-none md:text-[46px]">
+            전자파, 전기안전 시험과 KC 인증
+          </h1>
+          <p className="mt-2 text-[16px] font-bold md:text-[19px]" style={{ color: C.cyan }}>
+            KC인증 지정시험기관, KOLAS 공인시험기관
+          </p>
+          <p className="mt-4 max-w-[560px] text-[16px] md:text-[18px]" style={{ color: "#dfe3f5" }}>
+            전자파, 무선, 전기안전 시험부터 국내 KC 인증과 해외 인증 대행까지 한 곳에서 진행합니다.
+          </p>
+          <div className="mt-7 flex flex-wrap gap-2">
+            <button type="button" onClick={openQuote} className="inline-flex h-12 items-center rounded-[8px] px-6 font-bold" style={{ background: C.cyan, color: C.indigoDeep }}>
+              견적문의
+            </button>
+            <button type="button" onClick={() => go("about", "facility")} className="inline-flex h-12 items-center rounded-[8px] border px-6 font-bold" style={{ borderColor: "rgba(255,255,255,0.6)", color: C.white }}>
+              시험시설 보기
+            </button>
           </div>
-
-          <ul aria-label="온라인 서비스" className="mt-7 grid grid-cols-5 gap-px overflow-hidden rounded-[10px] md:mt-10" style={{ background: "rgba(255,255,255,0.14)" }}>
-            {tools.map((t) => (
-              <li key={t.label} style={{ background: C.indigo }}>
-                <button type="button" onClick={t.to} className="flex h-full w-full flex-col items-center justify-start gap-2 px-1 py-3.5 text-center hover:bg-[#2c3a8f] md:flex-row md:justify-center md:gap-2.5 md:py-5">
-                  <t.icon size={22} style={{ color: C.cyan }} aria-hidden />
-                  <span className="text-[12px] font-bold leading-[1.3] sm:text-[13px] md:text-[16px]">{t.label}</span>
-                </button>
-              </li>
-            ))}
-          </ul>
         </div>
+      </section>
+
+      <section id="cl-tools" aria-label="온라인 서비스" className="px-4 pt-6 md:px-6 md:pt-8">
+        <ul className="mx-auto grid max-w-[1200px] grid-cols-2 gap-px overflow-hidden rounded-[10px] border md:grid-cols-4" style={{ background: C.line, borderColor: C.line }}>
+          {tools.map((t) => (
+            <li key={t.label} className="bg-white">
+              <button type="button" onClick={t.to} className="flex h-full w-full items-center justify-center gap-2.5 px-2 py-4 text-center hover:bg-[#f4f7fb] md:py-5">
+                <t.icon size={22} style={{ color: C.cyanText }} aria-hidden />
+                <span className="text-[15px] font-bold md:text-[16px]">{t.label}</span>
+              </button>
+            </li>
+          ))}
+        </ul>
       </section>
 
       <section id="cl-boards" aria-label="새소식, 자료실" className="px-4 py-10 md:px-6 md:py-14">
@@ -942,8 +838,6 @@ function ContactBox({ className = "" }: { className?: string }) {
       </a>
       <p className="text-[14px] tabular-nums" style={{ color: C.muted }}>
         {HOURS}
-        <br />
-        {EMAIL}
       </p>
       <button type="button" onClick={openQuote} className="mt-3 inline-flex h-11 w-full items-center justify-center rounded-[8px] text-[15px] font-bold" style={{ background: C.indigo, color: C.white }}>
         견적문의
@@ -968,10 +862,8 @@ function PageBody({ m, s: sub }: { m: MenuId; s: string }) {
       return <Recruit />;
     case "about/location":
       return <Location />;
-    case "support/finder":
-      return <Finder />;
-    case "support/track":
-      return <Tracking />;
+    case "support/inquiry":
+      return <Inquiry />;
     case "support/verify":
       return <Verify />;
     case "support/quote":
@@ -1060,7 +952,7 @@ function Greeting() {
       </div>
       <div className="mt-8 space-y-4">
         <p className="text-[19px] font-bold leading-[1.6]">{COMPANY} 홈페이지를 찾아 주셔서 감사합니다.</p>
-        <p>{COMPANY}는 전자파 시험실로 문을 열었고, 지금은 무선과 전기안전 시험, 해외인증 업무도 함께 하고 있습니다.</p>
+        <p>{COMPANY}은 전자파 시험실로 문을 열었고, 지금은 무선과 전기안전 시험, 해외인증 업무도 함께 하고 있습니다.</p>
         <p>부적합 항목이 발생하면 원인 분석과 대책을 함께 안내해 드립니다. 인증이 처음이신 기업도 부담 없이 문의해 주시기 바랍니다.</p>
         <p className="pt-4 text-right font-bold">대표이사 김ㅈ우</p>
       </div>
@@ -1092,7 +984,7 @@ const FACILITIES = [
     name: "3m 전파무향실",
     body: "방사 방출과 방사 내성을 측정합니다. 지름 2m 턴테이블과 1~4m 안테나 마스트를 보유하고 있습니다.",
     specs: [
-      ["크기", "9 × 6 × 6 m"],
+      ["크기", "9 x 6 x 6 m"],
       ["주파수", "30MHz ~ 18GHz"],
       ["턴테이블 하중", "1.2톤"],
     ],
@@ -1104,7 +996,7 @@ const FACILITIES = [
     body: "외부 전파가 차단된 차폐실에서 정전기, 전도 내성, 서지 등 내성 시험을 수행합니다.",
     specs: [
       ["차폐 성능", "100dB 이상"],
-      ["정전기 방전", "±30kV까지"],
+      ["정전기 방전", "+-30kV까지"],
       ["서지", "6kV까지"],
     ],
     kind: "shield",
@@ -1127,7 +1019,7 @@ const FACILITIES = [
     specs: [
       ["내전압", "AC 5kV"],
       ["온도 기록", "60채널"],
-      ["항온항습", "-40 ~ 150°C"],
+      ["항온항습", "-40 ~ 150도"],
     ],
     kind: "safety",
     alt: "내전압 시험기와 항온항습 챔버가 있는 안전 시험실",
@@ -1174,7 +1066,7 @@ function Impartiality() {
   return (
     <div className="max-w-[820px] rounded-[10px] border p-6 md:p-9" style={{ borderColor: C.line }}>
       <p className="text-center text-[22px] font-bold tracking-[-0.02em] md:text-[26px]">공평성 선언문</p>
-      <p className="mt-5">{COMPANY}는 시험, 인증 기관으로서 공평성의 중요성을 인식하고, 다음과 같이 선언합니다.</p>
+      <p className="mt-5">{COMPANY}은 공평성의 중요성을 인식하고, 다음과 같이 선언합니다.</p>
       <ol className="mt-5 list-decimal space-y-2.5 pl-6 marker:font-bold marker:text-[#23307a]">
         {IMPARTIAL.map((t) => (
           <li key={t} className="pl-1">
@@ -1214,7 +1106,6 @@ function Complaint() {
           <InfoList
             rows={[
               ["전화", <span key="t" className="tabular-nums">{TEL} (품질책임자)</span>],
-              ["이메일", EMAIL],
               ["서면, 방문", ADDRESS],
             ]}
           />
@@ -1236,7 +1127,7 @@ function Recruit() {
       <DataTable caption="모집 분야" head={["모집 분야", "자격 요건", "고용 형태"]} rows={JOBS} />
       <InfoList
         rows={[
-          ["접수 방법", `이메일 접수 (${EMAIL})`],
+          ["접수 방법", "이메일 접수"],
           ["제출 서류", "이력서, 자기소개서"],
           ["전형 절차", "서류 전형, 면접, 최종 합격 (서류 검토 후 2주 이내 연락)"],
         ]}
@@ -1427,9 +1318,9 @@ function ServicePage({ id }: { id: string }) {
         <button type="button" onClick={openQuote} className="inline-flex h-12 items-center rounded-[8px] px-6 font-bold" style={{ background: C.indigo, color: C.white }}>
           견적문의
         </button>
-        <button type="button" onClick={() => go("support", "finder")} className="inline-flex h-12 items-center gap-1.5 rounded-[8px] border px-5 font-bold" style={{ borderColor: C.line, color: C.indigo }}>
-          <Search size={17} aria-hidden />
-          인증 대상 조회
+        <button type="button" onClick={() => go("support", "inquiry")} className="inline-flex h-12 items-center gap-1.5 rounded-[8px] border px-5 font-bold" style={{ borderColor: C.line, color: C.indigo }}>
+          <Phone size={17} aria-hidden />
+          고객 문의 안내
         </button>
       </div>
     </div>
@@ -1588,62 +1479,14 @@ function DomesticPage({ id }: { id: string }) {
 
 type RegionId = "na" | "sa" | "eu" | "as" | "af" | "oc";
 
-type Poly = number[][];
-
-const REGION_SHAPES: Record<RegionId, Poly[]> = {
-  na: [
-    [[33, 65], [83, 48], [194, 41], [278, 41], [328, 86], [347, 121], [306, 145], [278, 183], [275, 207], [255, 197], [250, 218], [268, 262], [262, 268], [236, 236], [206, 207], [175, 152], [140, 128], [100, 100], [60, 95]],
-    [[347, 14], [444, 14], [444, 52], [375, 86], [347, 52]],
-  ],
-  sa: [[[278, 265], [333, 259], [361, 293], [403, 317], [389, 369], [347, 414], [311, 483], [292, 448], [300, 355], [275, 310]]],
-  eu: [[[472, 169], [475, 145], [486, 128], [483, 121], [483, 93], [514, 79], [528, 48], [583, 48], [611, 66], [625, 103], [611, 138], [578, 152], [555, 162], [533, 162], [508, 148]]],
-  af: [[[425, 221], [486, 172], [528, 166], [589, 186], [619, 252], [642, 252], [611, 345], [592, 390], [555, 414], [533, 352], [525, 279], [478, 279], [453, 245]]],
-  as: [
-    [[611, 66], [694, 38], [806, 28], [889, 41], [990, 59], [944, 86], [889, 114], [861, 148], [839, 190], [806, 224], [792, 259], [778, 286], [769, 234], [750, 217], [717, 265], [700, 224], [658, 207], [644, 241], [619, 252], [589, 186], [600, 165], [578, 152], [611, 138], [625, 103]],
-    [[858, 180], [880, 160], [900, 140], [912, 148], [893, 172], [868, 194]],
-    [[764, 276], [792, 314], [833, 324], [892, 321], [892, 300], [847, 282], [828, 269]],
-  ],
-  oc: [
-    [[817, 369], [817, 410], [861, 403], [889, 424], [917, 424], [925, 386], [903, 345], [878, 334], [861, 341], [839, 352]],
-    [[972, 410], [992, 420], [982, 442], [962, 460], [956, 448]],
-  ],
-};
-
-function inPoly(x: number, y: number, poly: Poly) {
-  let inside = false;
-  for (let i = 0, j = poly.length - 1; i < poly.length; j = i++) {
-    const [xi, yi] = poly[i];
-    const [xj, yj] = poly[j];
-    if (yi > y !== yj > y && x < ((xj - xi) * (y - yi)) / (yj - yi) + xi) inside = !inside;
-  }
-  return inside;
-}
-
-const DOT_STEP = 13;
-const REGION_IDS: RegionId[] = ["na", "sa", "eu", "af", "as", "oc"];
-
-/** 모듈을 불러올 때 한 번만 계산하는 점 지도. 서버와 브라우저에서 같은 값이 나온다. */
-const REGION_DOTS: Record<RegionId, [number, number][]> = (() => {
-  const dots: Record<RegionId, [number, number][]> = { na: [], sa: [], eu: [], af: [], as: [], oc: [] };
-  for (let y = 8; y < 500; y += DOT_STEP) {
-    for (let x = 8; x < 1000; x += DOT_STEP) {
-      const id = REGION_IDS.find((r) => REGION_SHAPES[r].some((p) => inPoly(x, y, p)));
-      if (id) dots[id].push([x, y]);
-    }
-  }
-  return dots;
-})();
-
 interface RegionInfo {
   name: string;
-  label: [number, number];
   countries: { name: string; certs: { name: string; desc: string }[] }[];
 }
 
 const REGIONS: Record<RegionId, RegionInfo> = {
   na: {
     name: "북아메리카",
-    label: [196, 120],
     countries: [
       {
         name: "미국",
@@ -1671,7 +1514,6 @@ const REGIONS: Record<RegionId, RegionInfo> = {
   },
   sa: {
     name: "남아메리카",
-    label: [338, 372],
     countries: [
       {
         name: "브라질",
@@ -1687,7 +1529,6 @@ const REGIONS: Record<RegionId, RegionInfo> = {
   },
   eu: {
     name: "유럽",
-    label: [548, 112],
     countries: [
       { name: "유럽연합", certs: [{ name: "CE", desc: "RED, EMC, LVD 지침 적합 선언과 기술 문서" }, { name: "RoHS, WEEE", desc: "유해물질 제한과 폐전자제품 회수 의무" }] },
       { name: "영국", certs: [{ name: "UKCA", desc: "영국 적합성 표시. CE 성적서를 바탕으로 준비" }] },
@@ -1696,7 +1537,6 @@ const REGIONS: Record<RegionId, RegionInfo> = {
   },
   af: {
     name: "아프리카",
-    label: [548, 300],
     countries: [
       { name: "남아프리카공화국", certs: [{ name: "ICASA", desc: "통신, 무선기기 형식승인" }, { name: "NRCS", desc: "전기안전 의무 규격 승인" }] },
       { name: "나이지리아", certs: [{ name: "NCC", desc: "통신기기 형식승인" }, { name: "SONCAP", desc: "수입 제품 적합성 평가" }] },
@@ -1706,7 +1546,6 @@ const REGIONS: Record<RegionId, RegionInfo> = {
   },
   as: {
     name: "아시아",
-    label: [760, 132],
     countries: [
       { name: "일본", certs: [{ name: "TELEC", desc: "무선기기 기술기준적합증명" }, { name: "PSE", desc: "전기용품안전법 적합 표시" }, { name: "VCCI", desc: "정보기기 전자파 자율 규제" }] },
       { name: "중국", certs: [{ name: "CCC", desc: "강제인증 목록 품목의 안전, 전자파 인증" }, { name: "SRRC", desc: "무선기기 형식승인" }] },
@@ -1718,7 +1557,6 @@ const REGIONS: Record<RegionId, RegionInfo> = {
   },
   oc: {
     name: "오세아니아",
-    label: [868, 384],
     countries: [
       { name: "호주", certs: [{ name: "RCM", desc: "전자파, 무선, 전기안전을 하나로 표시. 공급자 등록 필요" }] },
       { name: "뉴질랜드", certs: [{ name: "RCM", desc: "호주와 같은 표시 체계, 무선은 별도 규정 확인" }] },
@@ -1727,59 +1565,7 @@ const REGIONS: Record<RegionId, RegionInfo> = {
 };
 
 const GLOBAL_STEPS = ["견적, 계약", "시료 접수", "시험", "현지 기관 신청", "인증서 발급"];
-
-function RegionMap({ region }: { region: RegionId }) {
-  const { go } = useCl();
-  const reduce = useReducedMotionSafe();
-  const [focus, setFocus] = useState<RegionId | null>(null);
-
-  const onKey = (id: RegionId) => (e: ReactKeyboardEvent<SVGGElement>) => {
-    if (e.key === "Enter" || e.key === " ") {
-      e.preventDefault();
-      go("global", id);
-    }
-  };
-
-  return (
-    <div className="rounded-[10px] p-2 md:p-4" style={{ background: C.indigoDeep }}>
-      <svg viewBox="0 0 1000 500" className="h-auto w-full" role="group" aria-label="대륙 선택 지도">
-        {REGION_IDS.map((id) => {
-          const on = region === id;
-          const hot = focus === id;
-          return (
-            <g
-              key={id}
-              role="button"
-              tabIndex={0}
-              aria-pressed={on}
-              aria-label={REGIONS[id].name}
-              onClick={() => go("global", id)}
-              onKeyDown={onKey(id)}
-              onFocus={() => setFocus(id)}
-              onBlur={() => setFocus(null)}
-              onMouseEnter={() => setFocus(id)}
-              onMouseLeave={() => setFocus(null)}
-              className="cursor-pointer outline-none"
-            >
-              {REGION_SHAPES[id].map((p, i) => (
-                <polygon key={i} points={p.map(([x, y]) => `${x},${y}`).join(" ")} fill="transparent" stroke={hot ? C.cyan : "transparent"} strokeWidth="2" strokeDasharray="6 5" strokeLinejoin="round" />
-              ))}
-              {REGION_DOTS[id].map(([x, y]) => (
-                <circle key={`${x}-${y}`} cx={x} cy={y} r={4.4} fill={on ? C.cyan : hot ? "#7c88c9" : "#4a5598"} style={{ transition: reduce ? undefined : "fill 0.25s" }} />
-              ))}
-              <g pointerEvents="none">
-                <rect x={REGIONS[id].label[0] - 66} y={REGIONS[id].label[1] - 21} width="132" height="38" rx="8" fill={on ? C.white : C.indigoDeep} stroke={on ? C.white : "rgba(255,255,255,0.35)"} />
-                <text x={REGIONS[id].label[0]} y={REGIONS[id].label[1] + 6} textAnchor="middle" fontSize="20" fontWeight={700} fill={on ? C.indigo : C.white}>
-                  {REGIONS[id].name}
-                </text>
-              </g>
-            </g>
-          );
-        })}
-      </svg>
-    </div>
-  );
-}
+const GLOBAL_FIELDS = SERVICES.filter((v) => v.code !== "GMA");
 
 function GlobalPage({ id }: { id: RegionId }) {
   const { openQuote } = useCl();
@@ -1800,9 +1586,21 @@ function GlobalPage({ id }: { id: RegionId }) {
 
   return (
     <div className="grid gap-8">
-      <div className="max-w-[720px]">
-        <RegionMap region={region} />
-      </div>
+      <section aria-labelledby="cl-gl-fields">
+        <SubHead id="cl-gl-fields">{info.name} 인증 시험 분야</SubHead>
+        <ul className="mt-3 grid gap-3 md:grid-cols-3">
+          {GLOBAL_FIELDS.map((f) => (
+            <li key={f.code} className="rounded-[10px] border p-4" style={{ borderColor: C.line }}>
+              <p className="font-bold">
+                {f.name} <span className="text-[14px] font-semibold" style={{ color: C.cyanText }}>{f.code}</span>
+              </p>
+              <p className="mt-1 text-[15px]" style={{ color: C.muted }}>
+                {f.tests.join(", ")}
+              </p>
+            </li>
+          ))}
+        </ul>
+      </section>
       <div>
         <div role="tablist" aria-label={`${info.name} 국가`} className="flex flex-wrap gap-1.5">
           {info.countries.map((c, i) => {
@@ -1866,531 +1664,54 @@ function GlobalPage({ id }: { id: RegionId }) {
   );
 }
 
-/* ---------- 인증 대상 조회 ---------- */
+/* ---------- 고객 문의 안내 ---------- */
 
-type Power = "battery" | "adapter" | "ac";
-type Radio = "none" | "bt" | "wifi" | "cell";
-type Kind = "home" | "ict" | "light" | "industrial";
-type Country = "kr" | "us" | "ca" | "eu" | "uk" | "jp" | "cn" | "au";
-
-interface Cert {
-  id: string;
-  name: string;
-  short: string;
-  reason: string;
-  tests: string;
-  period: string;
-}
-
-const POWER_OPTS: { v: Power; label: string; icon: typeof Plug }[] = [
-  { v: "battery", label: "배터리만", icon: BatteryFull },
-  { v: "adapter", label: "외부 어댑터", icon: Plug },
-  { v: "ac", label: "AC 220V 직결", icon: Zap },
+const INQUIRY_ROWS: [string, string, ReactNode][] = [
+  ["견적, 인증 상담", "기술영업팀", <a key="t" href={`tel:${TEL}`} className="tabular-nums underline underline-offset-4">{TEL}</a>],
+  ["시험 진행 문의", "담당 시험원", "접수 확인 메일에 적힌 직통 번호"],
+  ["성적서, 인증서 발급", "품질보증팀", <a key="m" href={`tel:${TEL}`} className="tabular-nums underline underline-offset-4">{TEL}</a>],
+  ["시료 접수, 반출", SHIP_RECEIVER, <a key="s" href={`tel:${SHIP_TEL}`} className="tabular-nums underline underline-offset-4">{SHIP_TEL}</a>],
 ];
 
-const RADIO_OPTS: { v: Radio; label: string; icon: typeof Plug }[] = [
-  { v: "none", label: "없음", icon: WifiOff },
-  { v: "bt", label: "블루투스", icon: Bluetooth },
-  { v: "wifi", label: "Wi-Fi", icon: Wifi },
-  { v: "cell", label: "LTE, 5G", icon: Signal },
-];
-
-const KIND_OPTS: { v: Kind; label: string; icon: typeof Plug }[] = [
-  { v: "home", label: "가정용 전자기기", icon: House },
-  { v: "ict", label: "정보통신기기", icon: Monitor },
-  { v: "light", label: "조명기기", icon: Lightbulb },
-  { v: "industrial", label: "산업용 장비", icon: Factory },
-];
-
-const COUNTRIES: { v: Country; label: string; code: string }[] = [
-  { v: "kr", label: "한국", code: "KR" },
-  { v: "us", label: "미국", code: "US" },
-  { v: "ca", label: "캐나다", code: "CA" },
-  { v: "eu", label: "유럽연합", code: "EU" },
-  { v: "uk", label: "영국", code: "UK" },
-  { v: "jp", label: "일본", code: "JP" },
-  { v: "cn", label: "중국", code: "CN" },
-  { v: "au", label: "호주", code: "AU" },
-];
-
-const RADIO_NAME: Record<Radio, string> = { none: "", bt: "블루투스", wifi: "Wi-Fi", cell: "LTE, 5G" };
-
-const KR_EMC_STD: Record<Kind, string> = {
-  home: "KS C 9814-1, 2",
-  ict: "KS C 9832, 9835",
-  light: "KS C 9815, 9547",
-  industrial: "KS C 9610-6-2, 6-4",
-};
-
-const EU_EMC_STD: Record<Kind, string> = {
-  home: "EN 55014-1, 2",
-  ict: "EN 55032, 55035",
-  light: "EN 55015, 61547",
-  industrial: "EN 61000-6-2, 6-4",
-};
-
-interface FinderInput {
-  power: Power;
-  radio: Radio;
-  kind: Kind;
-}
-
-function certsFor(country: Country, { power, radio, kind }: FinderInput): Cert[] {
-  const wireless = radio !== "none";
-  const ac = power === "ac";
-  const out: Cert[] = [];
-
-  if (country === "kr") {
-    if (wireless) {
-      out.push({
-        id: "kr-ri",
-        name: "방송통신기자재 적합인증 (무선)",
-        short: "적합인증 (무선)",
-        reason: `${RADIO_NAME[radio]} 기능이 있어 전파법에 따른 적합인증 대상입니다. 전자파 시험도 함께 합니다.`,
-        tests: radio === "cell" ? "송신 출력, 불요발사, 전자파 흡수율(SAR), 전자파 방출, 내성" : "송신 출력, 주파수 허용편차, 점유주파수폭, 불요발사, 전자파 방출, 내성",
-        period: radio === "cell" ? "6~8주" : "3~5주",
-      });
-    } else {
-      out.push({
-        id: "kr-emc",
-        name: "방송통신기자재 적합등록 (전자파)",
-        short: "적합등록 (전자파)",
-        reason: kind === "industrial" ? "산업 환경용(A급) 기기 기준으로 전자파 방출과 내성을 봅니다." : "전원이 들어가는 전자기기라 전자파 적합등록 대상입니다.",
-        tests: `전도, 방사 방출, 정전기, 방사 내성 (${KR_EMC_STD[kind]})`,
-        period: "2~3주",
-      });
-    }
-    if (kind === "industrial") {
-      out.push({
-        id: "kr-kcs",
-        name: "자율안전확인신고 (KCs)",
-        short: "자율안전확인신고 (KCs)",
-        reason: "산업용 기계, 기구 중 신고 대상 품목이면 산업안전보건법에 따라 신고합니다.",
-        tests: "전기적 안전, 위험 부위 방호, 비상정지 장치",
-        period: "3~4주",
-      });
-    } else if (ac) {
-      const strict = kind === "home" || kind === "light";
-      out.push({
-        id: strict ? "kr-safe-cert" : "kr-safe-check",
-        name: strict ? "전기용품 안전인증" : "전기용품 안전확인",
-        short: strict ? "전기용품 안전인증" : "전기용품 안전확인",
-        reason: strict ? "교류 전원에 바로 연결하는 가전, 조명은 대부분 안전인증 대상이고 공장 심사가 함께 진행됩니다." : "교류 전원을 쓰는 정보통신기기는 보통 안전확인 대상입니다.",
-        tests: "절연저항, 내전압, 온도 상승, 누설전류, 비정상 동작",
-        period: strict ? "4~6주" : "2~4주",
-      });
-    } else if (power === "adapter") {
-      out.push({
-        id: "kr-sdoc",
-        name: "전기용품 공급자적합성확인",
-        short: "공급자적합성확인",
-        reason: "안전인증을 받은 어댑터를 쓰면 본체는 직류 전원 기기로 공급자적합성확인 대상인지 봅니다.",
-        tests: "어댑터 인증서 확인, 본체 온도 상승, 절연",
-        period: "1~2주",
-      });
-    } else {
-      out.push({
-        id: "kr-battery",
-        name: "2차전지 안전확인 (배터리)",
-        short: "2차전지 안전확인",
-        reason: "리튬 배터리는 배터리 자체가 안전확인 대상입니다. 인증받은 배터리를 쓰면 시험을 줄일 수 있습니다.",
-        tests: "과충전, 외부 단락, 낙하, 열 노출",
-        period: "2~3주",
-      });
-    }
-    if (ac && (kind === "home" || kind === "light")) {
-      out.push({
-        id: "kr-energy",
-        name: "에너지소비효율, 대기전력 확인",
-        short: "에너지효율 표시",
-        reason: "효율관리기자재나 대기전력 저감 대상 품목이면 효율 시험과 표시가 필요합니다.",
-        tests: kind === "light" ? "소비전력, 광효율, 역률" : "소비전력, 대기전력",
-        period: "2~3주",
-      });
-    }
-  }
-
-  if (country === "us") {
-    out.push(
-      wireless
-        ? {
-            id: "us-fcc-id",
-            name: radio === "cell" ? "FCC ID (Part 15, 22, 24, 27)" : "FCC ID (Part 15 Subpart C)",
-            short: "FCC ID",
-            reason: "무선기기는 TCB 심사를 거쳐 FCC ID를 받아야 판매할 수 있습니다.",
-            tests: "송신 출력, 대역 외 발사, RF 노출, 비의도성 방사(Part 15B)",
-            period: radio === "cell" ? "6~10주" : "4~6주",
-          }
-        : {
-            id: "us-fcc-sdoc",
-            name: "FCC Part 15 Subpart B (SDoC)",
-            short: "FCC SDoC",
-            reason: "무선 기능이 없는 디지털 기기는 공급자 적합성 선언으로 판매합니다.",
-            tests: kind === "industrial" ? "전도, 방사 방출 (A급)" : "전도, 방사 방출 (B급)",
-            period: "2~3주",
-          },
-    );
-    if (ac) {
-      out.push({
-        id: "us-nrtl",
-        name: "NRTL 안전 인증 (UL 규격)",
-        short: "NRTL 안전 인증",
-        reason: "연방 의무는 아니지만 대형 유통사와 설치 현장에서 대부분 요구합니다.",
-        tests: kind === "light" ? "UL 8750, UL 1598 등 조명 규격" : "UL 62368-1, UL 60335-1 등 품목 규격",
-        period: "6~10주",
-      });
-    }
-  }
-
-  if (country === "ca") {
-    out.push(
-      wireless
-        ? {
-            id: "ca-ised",
-            name: "ISED 인증 (RSS)",
-            short: "ISED",
-            reason: "무선기기는 캐나다 혁신과학경제개발부 인증 번호(IC)가 필요합니다.",
-            tests: radio === "cell" ? "RSS-130, 133 등, RF 노출" : "RSS-247, RSS-Gen, RF 노출",
-            period: "FCC와 함께 진행하면 2~3주 추가",
-          }
-        : {
-            id: "ca-ices",
-            name: "ISED ICES-003",
-            short: "ICES-003",
-            reason: "디지털 기기는 ICES-003 기준에 맞다는 표시를 붙여 판매합니다.",
-            tests: "전도, 방사 방출",
-            period: "FCC 시험과 함께 1주 추가",
-          },
-    );
-    if (ac) {
-      out.push({
-        id: "ca-safety",
-        name: "캐나다 전기안전 인증 (CSA 규격)",
-        short: "캐나다 전기안전",
-        reason: "주마다 전기 제품을 판매하기 전에 인정 기관의 안전 인증을 요구합니다.",
-        tests: "CSA C22.2 품목 규격",
-        period: "NRTL과 함께 진행",
-      });
-    }
-  }
-
-  if (country === "eu") {
-    if (wireless) {
-      out.push({
-        id: "eu-red",
-        name: "CE (RED)",
-        short: "CE (RED)",
-        reason: "무선기기는 무선기기 지침(RED) 하나로 전파, 전자파, 전기안전을 함께 봅니다.",
-        tests: `${radio === "cell" ? "EN 301 908" : radio === "wifi" ? "EN 300 328, 301 893" : "EN 300 328"}, EN 301 489, EN 62368-1, EN 62311`,
-        period: "5~7주",
-      });
-    } else {
-      out.push({
-        id: ac ? "eu-emc-lvd" : "eu-emc",
-        name: ac ? "CE (EMC, LVD)" : "CE (EMC)",
-        short: ac ? "CE (EMC, LVD)" : "CE (EMC)",
-        reason: ac
-          ? "교류 50~1,000V 전원을 쓰는 기기라 EMC 지침과 저전압 지침을 함께 적용합니다."
-          : power === "adapter"
-            ? "어댑터가 저전압 지침(LVD)을 만족하면 본체는 EMC 지침을 따릅니다."
-            : "배터리로만 동작하면 저전압 지침 대상이 아니고 EMC 지침을 따릅니다.",
-        tests: `${EU_EMC_STD[kind]}${ac ? ", EN 62368-1 또는 EN 60335-1" : ""}`,
-        period: "3~5주",
-      });
-    }
-    out.push({
-      id: "eu-rohs",
-      name: "RoHS 유해물질 확인",
-      short: "RoHS",
-      reason: "전기, 전자 제품은 납, 카드뮴 등 10가지 유해물질 함량 기준을 지켜야 합니다.",
-      tests: "부품별 성분 분석 또는 공급사 자료 검토",
-      period: "1~2주",
-    });
-  }
-
-  if (country === "uk") {
-    out.push({
-      id: "uk-ukca",
-      name: wireless ? "UKCA (무선기기 규정)" : "UKCA (EMC, 전기안전 규정)",
-      short: "UKCA",
-      reason: "영국은 EU와 따로 UKCA 표시 규정을 둡니다. CE 시험 성적서를 바탕으로 준비할 수 있습니다.",
-      tests: "CE와 같은 시험 항목, 영국 지정 규격 확인",
-      period: "CE와 함께 진행하면 1~2주 추가",
-    });
-  }
-
-  if (country === "jp") {
-    if (wireless) {
-      out.push({
-        id: "jp-telec",
-        name: radio === "cell" ? "TELEC, JATE" : "TELEC 기술기준적합증명",
-        short: radio === "cell" ? "TELEC, JATE" : "TELEC",
-        reason: radio === "cell" ? "무선 기능은 일본 전파법 인증을, 통신망에 접속하는 단말은 단말기기 기술기준 인증을 함께 받습니다." : "무선 기능은 일본 전파법 인증을 받아야 판매할 수 있습니다.",
-        tests: "송신 출력, 주파수 편차, 스퓨리어스 발사",
-        period: radio === "cell" ? "8~10주" : "4~6주",
-      });
-    }
-    if (ac) {
-      out.push({
-        id: "jp-pse",
-        name: "PSE (전기용품안전법)",
-        short: "PSE",
-        reason: "콘센트에 바로 꽂는 제품은 전기용품안전법 대상입니다. 품목에 따라 특정전기용품과 그 밖의 전기용품으로 나뉩니다.",
-        tests: "절연, 내전압, 온도 상승, 잡음 전계 강도",
-        period: "4~8주",
-      });
-    }
-    if (kind === "ict" && !wireless) {
-      out.push({
-        id: "jp-vcci",
-        name: "VCCI (자율 규제)",
-        short: "VCCI",
-        reason: "정보기기는 VCCI 자율 규제 기준으로 전자파를 맞추는 것이 일반적입니다.",
-        tests: "전도, 방사 방출",
-        period: "2~3주",
-      });
-    }
-  }
-
-  if (country === "cn") {
-    if (ac && kind !== "industrial") {
-      out.push({
-        id: "cn-ccc",
-        name: "CCC 강제인증",
-        short: "CCC",
-        reason: "강제인증 목록에 든 품목은 CCC 없이 수입, 판매할 수 없습니다. 공장 심사가 함께 진행됩니다.",
-        tests: "중국 지정시험소 시험 (GB 4943.1, GB 4706.1 등)",
-        period: "10~14주",
-      });
-    }
-    if (wireless) {
-      out.push({
-        id: "cn-srrc",
-        name: radio === "cell" ? "SRRC, CTA (망 접속 허가)" : "SRRC 형식승인",
-        short: radio === "cell" ? "SRRC, CTA" : "SRRC",
-        reason: radio === "cell" ? "무선 형식승인과 함께 통신망 접속 허가를 받아야 합니다." : "무선 기능이 있는 제품은 무선 형식승인이 필요합니다.",
-        tests: "주파수 범위, 송신 출력, 스퓨리어스 발사",
-        period: radio === "cell" ? "10~14주" : "6~8주",
-      });
-    }
-  }
-
-  if (country === "au") {
-    const parts = ["EMC", wireless ? "무선" : "", ac ? "전기안전" : ""].filter(Boolean).join(", ");
-    out.push({
-      id: "au-rcm",
-      name: `RCM (${parts})`,
-      short: "RCM",
-      reason: "호주는 전자파, 무선, 전기안전 규정을 RCM 표시 하나로 관리합니다. 공급자 등록을 먼저 합니다.",
-      tests: ["AS/NZS CISPR 32", wireless ? "AS/NZS 4268" : "", ac ? "AS/NZS 62368.1" : ""].filter(Boolean).join(", "),
-      period: "3~5주",
-    });
-  }
-
-  if (out.length === 0) {
-    out.push({
-      id: `${country}-check`,
-      name: "강제 인증 대상 여부 확인",
-      short: `${COUNTRIES.find((c) => c.v === country)?.label} 인증 검토`,
-      reason: "선택하신 조건은 강제 인증 대상이 아닌 경우가 많습니다. 품목 분류(HS 코드)로 다시 확인이 필요합니다.",
-      tests: "품목 분류 검토, 수입 통관 서류 확인",
-      period: "1주 안팎",
-    });
-  }
-  return out;
-}
-
-function maxWeeks(period: string) {
-  const m = period.match(/(\d+)~(\d+)주/);
-  return m ? Number(m[2]) : 0;
-}
-
-function ChipGroup<T extends string>({
-  legend,
-  value,
-  options,
-  onPick,
-}: {
-  legend: string;
-  value: T;
-  options: { v: T; label: string; icon: typeof Plug }[];
-  onPick: (v: T) => void;
-}) {
+function Inquiry() {
+  const { go, openQuote } = useCl();
   return (
-    <fieldset>
-      <legend className="text-[15px] font-bold">{legend}</legend>
-      <div className="mt-2 flex flex-wrap gap-2">
-        {options.map((o) => {
-          const on = value === o.v;
-          return (
-            <button
-              key={o.v}
-              type="button"
-              aria-pressed={on}
-              onClick={() => onPick(o.v)}
-              className="inline-flex min-h-11 items-center gap-1.5 rounded-[8px] border px-3 text-[15px] font-semibold transition-colors"
-              style={on ? { background: C.indigo, color: C.white, borderColor: C.indigo } : { background: C.white, color: C.ink, borderColor: C.line }}
-            >
-              <o.icon size={17} aria-hidden style={{ color: on ? C.cyan : C.muted }} />
-              {o.label}
-            </button>
-          );
-        })}
-      </div>
-    </fieldset>
-  );
-}
-
-function Finder() {
-  const { certs, setCerts, openQuote } = useCl();
-  const reduce = useReducedMotionSafe();
-  const [power, setPower] = useState<Power>("adapter");
-  const [radio, setRadio] = useState<Radio>("bt");
-  const [kind, setKind] = useState<Kind>("home");
-  const [countries, setCountries] = useState<Country[]>(["kr", "us", "eu"]);
-
-  const input = { power, radio, kind };
-  const groups = COUNTRIES.filter((c) => countries.includes(c.v)).map((c) => ({ ...c, items: certsFor(c.v, input) }));
-  const all = groups.flatMap((g) => g.items);
-  const longest = Math.max(0, ...all.map((c) => maxWeeks(c.period)));
-  const added = all.length > 0 && all.every((c) => certs.includes(c.short));
-
-  const toggleCountry = (v: Country) => setCountries((prev) => (prev.includes(v) ? prev.filter((x) => x !== v) : [...prev, v]));
-  const addAll = () => setCerts((prev) => [...prev, ...all.map((c) => c.short).filter((n) => !prev.includes(n))]);
-
-  return (
-    <div>
-      <p>제품 조건을 선택하세요.</p>
-      <div className="mt-5 grid items-start gap-6 xl:grid-cols-[340px_1fr]">
-        <div className="space-y-6 rounded-[10px] border p-5" style={{ borderColor: C.line, background: C.paper }}>
-          <ChipGroup legend="전원 방식" value={power} options={POWER_OPTS} onPick={setPower} />
-          <ChipGroup legend="무선 기능" value={radio} options={RADIO_OPTS} onPick={setRadio} />
-          <ChipGroup legend="제품 분류" value={kind} options={KIND_OPTS} onPick={setKind} />
-          <fieldset>
-            <legend className="text-[15px] font-bold">
-              판매 국가 <span className="font-normal" style={{ color: C.muted }}>(복수 선택)</span>
-            </legend>
-            <div className="mt-2 grid grid-cols-2 gap-2 sm:grid-cols-4 xl:grid-cols-2">
-              {COUNTRIES.map((c) => {
-                const on = countries.includes(c.v);
-                return (
-                  <button
-                    key={c.v}
-                    type="button"
-                    aria-pressed={on}
-                    onClick={() => toggleCountry(c.v)}
-                    className="inline-flex h-11 items-center gap-2 rounded-[8px] border px-3 text-[15px] font-semibold"
-                    style={on ? { background: C.cyanSoft, color: C.indigoDeep, borderColor: C.cyan } : { background: C.white, color: C.ink, borderColor: C.line }}
-                  >
-                    <span className="inline-flex h-5 w-5 shrink-0 items-center justify-center rounded-[4px] border" style={on ? { background: C.cyan, borderColor: C.cyan, color: C.white } : { borderColor: "#b4bdd0" }} aria-hidden>
-                      {on && <Check size={14} strokeWidth={3} />}
-                    </span>
-                    {c.label}
-                  </button>
-                );
-              })}
-            </div>
-          </fieldset>
+    <div className="grid gap-10">
+      <section aria-labelledby="cl-iq-desk" className="min-w-0">
+        <SubHead id="cl-iq-desk">문의 창구</SubHead>
+        <div className="mt-3">
+          <DataTable caption="업무별 문의 창구" head={["업무", "담당", "연락처"]} rows={INQUIRY_ROWS} min={340} />
         </div>
-
-        <div className="min-w-0">
-          <div className="flex flex-wrap items-center justify-between gap-3 rounded-[10px] px-5 py-4" style={{ background: C.indigo, color: C.white }} aria-live="polite">
-            {groups.length > 0 ? (
-              <p className="text-[16px]">
-                국가 <strong className="tabular-nums">{groups.length}</strong>곳, 인증 <strong className="tabular-nums">{all.length}</strong>건
-                {longest > 0 && (
-                  <span style={{ color: "#c8cdea" }}>
-                    , 함께 진행 시 약 <span className="tabular-nums">{longest}</span>주
-                  </span>
-                )}
-              </p>
-            ) : (
-              <p>판매 국가를 하나 이상 선택해 주십시오.</p>
-            )}
-            <div className="flex flex-wrap gap-2">
-              <button
-                type="button"
-                onClick={addAll}
-                disabled={all.length === 0}
-                className="inline-flex h-11 items-center gap-1.5 rounded-[8px] px-4 text-[15px] font-bold disabled:opacity-40"
-                style={{ background: C.cyan, color: C.indigoDeep }}
-              >
-                {added ? <Check size={18} aria-hidden /> : <Plus size={18} aria-hidden />}
-                {added ? "추가됨" : "견적문의에 추가"}
-              </button>
-              {certs.length > 0 && (
-                <button type="button" onClick={openQuote} className="inline-flex h-11 items-center gap-1 rounded-[8px] border px-4 text-[15px] font-bold" style={{ borderColor: "rgba(255,255,255,0.5)" }}>
-                  견적문의 작성
-                  <span className="tabular-nums">({certs.length})</span>
-                </button>
-              )}
-            </div>
-          </div>
-
-          <div className="mt-4 space-y-4">
-            <AnimatePresence initial={false}>
-              {groups.map((g) => (
-                <motion.section
-                  key={g.v}
-                  aria-label={`${g.label} 인증`}
-                  className="rounded-[10px] border bg-white"
-                  style={{ borderColor: C.line }}
-                  initial={reduce ? false : { opacity: 0, y: 10 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  exit={reduce ? { opacity: 0, transition: { duration: 0 } } : { opacity: 0, y: -6 }}
-                  transition={{ duration: 0.3, ease: EASE }}
-                >
-                  <h3 className="flex items-center gap-2.5 border-b px-5 py-3 text-[17px] font-bold" style={{ borderColor: C.line }}>
-                    <span className="inline-flex h-7 min-w-9 items-center justify-center rounded-[6px] px-1.5 text-[13px] font-bold tracking-[0.04em]" style={{ background: C.indigoSoft, color: C.indigo }}>
-                      {g.code}
-                    </span>
-                    {g.label}
-                    <span className="ml-auto text-[14px] font-semibold tabular-nums" style={{ color: C.muted }}>
-                      {g.items.length}건
-                    </span>
-                  </h3>
-                  <ul>
-                    {g.items.map((c) => (
-                      <li key={c.id} className="border-b px-5 py-4 last:border-b-0" style={{ borderColor: C.paper }}>
-                        <p className="font-bold" style={{ color: C.indigo }}>
-                          {c.name}
-                        </p>
-                        <p className="mt-1 text-[15px]" style={{ color: C.muted }}>
-                          {c.reason}
-                        </p>
-                        <dl className="mt-2.5 grid gap-x-6 gap-y-1 text-[14px] sm:grid-cols-[1fr_auto]">
-                          <div className="flex min-w-0 gap-2">
-                            <dt className="shrink-0 font-semibold" style={{ color: C.cyanText }}>
-                              시험 항목
-                            </dt>
-                            <dd className="min-w-0">{c.tests}</dd>
-                          </div>
-                          <div className="flex gap-2">
-                            <dt className="shrink-0 font-semibold" style={{ color: C.cyanText }}>
-                              예상 기간
-                            </dt>
-                            <dd className="font-bold tabular-nums">{c.period}</dd>
-                          </div>
-                        </dl>
-                      </li>
-                    ))}
-                  </ul>
-                </motion.section>
-              ))}
-            </AnimatePresence>
-          </div>
-          <p className="mt-4 text-[14px]" style={{ color: C.muted }}>
-            품목과 사양에 따라 달라질 수 있으며, 최종 대상은 사양서 검토 후 안내합니다.
-          </p>
-        </div>
-      </div>
+        <p className="mt-3 text-[15px]" style={{ color: C.muted }}>
+          상담 시간 {HOURS}, 팩스 {FAX}
+        </p>
+      </section>
+      <section aria-labelledby="cl-iq-need" className="max-w-[820px]">
+        <SubHead id="cl-iq-need">필요한 인증 상담</SubHead>
+        <p className="mt-3">
+          판매할 국가와 제품 사양서(전원 방식, 무선 기능)를 견적문의에 첨부해 주시면 필요한 인증과 시험 항목, 예상 기간을 담당자가 정리해 회신해 드립니다.
+        </p>
+        <button type="button" onClick={openQuote} className="mt-4 inline-flex h-12 items-center rounded-[8px] px-6 font-bold" style={{ background: C.indigo, color: C.white }}>
+          견적문의
+        </button>
+      </section>
+      <section aria-labelledby="cl-iq-progress" className="max-w-[820px]">
+        <SubHead id="cl-iq-progress">시험 진행 상황 문의</SubHead>
+        <ul className="mt-3 list-disc space-y-1.5 pl-5">
+          <li>시료가 입고되면 접수번호와 담당 시험원 연락처를 메일로 보내 드립니다.</li>
+          <li>진행 상황은 접수번호를 알려 주시면 담당 시험원이 안내해 드립니다.</li>
+          <li>성적서가 발행되면 신청서에 적은 메일로 알려 드리고, 진위는 성적서 진위확인에서 볼 수 있습니다.</li>
+        </ul>
+        <button type="button" onClick={() => go("support", "verify")} className="mt-4 inline-flex h-12 items-center rounded-[8px] border px-5 font-bold" style={{ borderColor: C.line, color: C.indigo }}>
+          성적서 진위확인
+        </button>
+      </section>
     </div>
   );
 }
 
-/* ---------- 시험진행현황 조회 ---------- */
+/* ---------- 성적서 조회 데이터 ---------- */
 
-const STEPS = ["접수", "시료 입고", "시험 중", "성적서 발행", "인증 신청", "인증 완료"];
 const STEP_OFFSET = [0, 3, 7, 16, 19, 28];
 
 type TestKind = "EMC" | "RF" | "SAFETY";
@@ -2402,21 +1723,12 @@ const PRODUCTS: Record<TestKind, string[]> = {
   RF: ["블루투스 스피커", "무선 이어폰", "Wi-Fi 공유기", "LTE 위치 추적기"],
   SAFETY: ["전기 그릴", "가습기", "LED 스탠드", "전기 히터"],
 };
-const ITEMS: Record<Exclude<TestKind, "EMC">, string[]> = {
-  RF: ["송신 출력", "주파수 허용편차", "점유주파수폭", "불요발사"],
-  SAFETY: ["절연저항", "내전압", "온도 상승", "누설전류"],
-};
 
 /** 예시 접수번호: 오늘 기준 보름 전이 속한 달에 접수한 건 (2026-10-07이면 TE-2609-0412) */
 const sampleYm = (t: Date) => {
   const d = daysAgo(t, 15);
   return { yy: d.getFullYear() % 100, mm: d.getMonth() + 1 };
 };
-const sampleNo = (t: Date) => {
-  const { yy, mm } = sampleYm(t);
-  return `TE-${pad2(yy)}${pad2(mm)}-0412`;
-};
-
 interface TrackResult {
   no: string;
   step: number;
@@ -2443,281 +1755,6 @@ function lookup(raw: string, today: Date): TrackResult | null {
     product: PRODUCTS[kind][seed % 4],
     dates: STEP_OFFSET.map((o) => new Date(start.getFullYear(), start.getMonth(), start.getDate() + o)),
   };
-}
-
-function Spectrum({ pending, replayKey }: { pending: boolean; replayKey: string }) {
-  const reduce = useReducedMotionSafe();
-  const freqTicks = [30, 50, 100, 200, 300, 500, 1000];
-  const dbTicks = [10, 20, 30, 40, 50, 60];
-  return (
-    <svg
-      viewBox="0 0 480 268"
-      className="h-auto w-full"
-      role="img"
-      aria-label={`30MHz부터 1GHz까지 방사 방출 측정 그래프. 기준선 아래에 측정값이 있고 가장 가까운 지점은 ${WORST.f}MHz에서 기준보다 ${WORST_MARGIN}dB 낮습니다.`}
-    >
-      <rect x={SX0} y={SY0} width={SX1 - SX0} height={SY1 - SY0} fill={C.paper} />
-      {dbTicks.map((d) => (
-        <g key={d}>
-          <path d={`M${SX0} ${dy(d)} H${SX1}`} stroke={C.grid} strokeWidth="1" />
-          <text x={SX0 - 6} y={dy(d) + 4} textAnchor="end" fontSize="12" fill={C.muted} className="tabular-nums">
-            {d}
-          </text>
-        </g>
-      ))}
-      {freqTicks.map((f) => (
-        <g key={f}>
-          <path d={`M${fx(f)} ${SY0} V${SY1}`} stroke={C.grid} strokeWidth="1" />
-          <text x={fx(f)} y={SY1 + 17} textAnchor="middle" fontSize="12" fill={C.muted} className="tabular-nums">
-            {f >= 1000 ? "1G" : `${f}M`}
-          </text>
-        </g>
-      ))}
-      <text x={SX0} y={SY1 + 36} fontSize="12" fill={C.muted}>
-        주파수 (Hz)
-      </text>
-      <text x={SX1} y={SY1 + 36} fontSize="12" fill={C.muted} textAnchor="end">
-        세로축 dBμV/m
-      </text>
-
-      <path d={LIMIT_PATH} fill="none" stroke={C.error} strokeWidth="1.8" strokeDasharray="6 4" />
-      <text x={fx(232)} y={dy(47) - 6} fontSize="12" fill={C.error} fontWeight={700}>
-        기준 B급
-      </text>
-
-      <motion.path
-        key={replayKey}
-        d={TRACE_PATH}
-        fill="none"
-        stroke={C.indigo}
-        strokeWidth="1.6"
-        strokeLinejoin="round"
-        initial={reduce ? false : { pathLength: 0 }}
-        whileInView={{ pathLength: 1 }}
-        viewport={{ once: true, amount: 0.5 }}
-        transition={{ duration: 1.6, ease: "easeInOut" }}
-      />
-
-      {!pending &&
-        PEAKS.map((p, i) => {
-          const worst = p === WORST;
-          return (
-            <motion.g
-              key={`${replayKey}-${p.f}`}
-              initial={reduce ? false : { opacity: 0 }}
-              whileInView={{ opacity: 1 }}
-              viewport={{ once: true, amount: 0.5 }}
-              transition={{ duration: 0.3, delay: reduce ? 0 : 1.4 + i * 0.08 }}
-            >
-              <path d={`M${fx(p.f)} ${dy(p.v) - 6} l5 6 l-5 6 l-5 -6 Z`} fill={worst ? C.cyan : C.white} stroke={worst ? C.indigoDeep : C.indigo} strokeWidth="1.2" />
-              {worst && (
-                <>
-                  <path d={`M${fx(p.f)} ${dy(limitAt(p.f))} V${dy(p.v) - 7}`} stroke={C.indigoDeep} strokeWidth="1.2" />
-                  <rect x={fx(p.f) + 8} y={dy(p.v) - 46} width="106" height="24" rx="5" fill={C.indigoDeep} />
-                  <text x={fx(p.f) + 61} y={dy(p.v) - 29} textAnchor="middle" fontSize="12.5" fontWeight={700} fill={C.white}>
-                    최소 여유 {WORST_MARGIN}dB
-                  </text>
-                </>
-              )}
-            </motion.g>
-          );
-        })}
-    </svg>
-  );
-}
-
-function Tracking() {
-  const { trackQuery, minute, today: demoToday } = useCl();
-  const SAMPLE_NO = sampleNo(demoToday);
-  const reduce = useReducedMotionSafe();
-  const first = trackQuery.trim();
-  const [query, setQuery] = useState(first);
-  const [result, setResult] = useState<TrackResult | null>(() => (first ? lookup(first, demoToday) : null));
-  const [error, setError] = useState(() => (!first || lookup(first, demoToday) ? "" : `접수번호 끝 네 자리 숫자를 확인해 주십시오. 예: ${SAMPLE_NO}`));
-
-  const submit = (e: FormEvent) => {
-    e.preventDefault();
-    const r = lookup(query, demoToday);
-    if (!r) {
-      setError(query.trim() ? `접수번호 끝 네 자리 숫자를 확인해 주십시오. 예: ${SAMPLE_NO}` : "접수번호를 입력해 주십시오.");
-      setResult(null);
-      return;
-    }
-    setError("");
-    setQuery(r.no);
-    setResult(r);
-  };
-
-  const today = minute < 0 ? null : new Date(minute * 60_000);
-  const elapsed = result && today ? Math.round((dayStart(today) - dayStart(result.dates[0])) / 86_400_000) : null;
-
-  return (
-    <div>
-      <form onSubmit={submit} noValidate className="rounded-[10px] border p-4 md:p-5" style={{ borderColor: C.line, background: C.paper }}>
-        <label htmlFor="track-no" className="text-[15px] font-bold">
-          접수번호
-        </label>
-        <div className="mt-2 flex max-w-[560px] flex-col gap-2 sm:flex-row">
-          <input
-            id="track-no"
-            value={query}
-            onChange={(e) => setQuery(e.target.value)}
-            placeholder={`예: ${SAMPLE_NO}`}
-            autoComplete="off"
-            aria-invalid={!!error}
-            aria-describedby={error ? "track-err" : "track-hint"}
-            className="h-12 min-w-0 flex-1 rounded-[8px] border bg-white px-4 text-[17px] font-semibold tracking-[0.02em] tabular-nums outline-none focus:border-[#23307a]"
-            style={{ borderColor: error ? C.error : C.line }}
-          />
-          <button type="submit" className="inline-flex h-12 items-center justify-center gap-2 rounded-[8px] px-6 font-bold" style={{ background: C.indigo, color: C.white }}>
-            <Search size={18} aria-hidden />
-            조회
-          </button>
-        </div>
-        {error ? (
-          <p id="track-err" role="alert" className="mt-2 text-[15px] font-semibold" style={{ color: C.error }}>
-            {error}
-          </p>
-        ) : (
-          <p id="track-hint" className="mt-2 text-[14px]" style={{ color: C.muted }}>
-            접수증과 접수 안내 메일에 적힌 번호를 입력하세요.
-          </p>
-        )}
-      </form>
-
-      {result && (
-        <div key={result.no} className="soft-in mt-6 rounded-[10px] border bg-white" style={{ borderColor: C.line }} aria-live="polite">
-          <div className="flex flex-wrap items-center justify-between gap-x-6 gap-y-2 border-b px-5 py-4 md:px-6" style={{ borderColor: C.line }}>
-            <div className="min-w-0">
-              <p className="text-[14px] tabular-nums" style={{ color: C.muted }}>
-                {result.no}, 의뢰사 (주)ㅎㄷ전자
-              </p>
-              <p className="text-[19px] font-bold tracking-[-0.02em]">
-                {result.product} <span style={{ color: C.cyanText }}>{TEST_LABEL[result.kind]}</span>
-              </p>
-            </div>
-            <p className="text-[15px]">
-              <span style={{ color: C.muted }}>현재 단계 </span>
-              <strong style={{ color: C.indigo }}>{STEPS[result.step]}</strong>
-              {elapsed !== null && elapsed >= 0 && result.step < 5 && (
-                <span className="tabular-nums" style={{ color: C.muted }}>
-                  {" "}
-                  (접수 후 {elapsed + 1}일째)
-                </span>
-              )}
-            </p>
-          </div>
-
-          <ol className="grid grid-cols-1 gap-0 px-5 py-5 sm:grid-cols-3 md:px-6 xl:grid-cols-6">
-            {STEPS.map((st, i) => {
-              const done = i < result.step || result.step === 5;
-              const now = i === result.step && result.step !== 5;
-              return (
-                <li key={st} className="relative flex gap-3 pb-4 sm:block sm:pb-5 sm:pr-3" aria-current={now ? "step" : undefined}>
-                  <div className="flex flex-col items-center sm:flex-row">
-                    <motion.span
-                      className="relative z-10 inline-flex h-8 w-8 shrink-0 items-center justify-center rounded-full border-2 text-[14px] font-bold tabular-nums"
-                      style={done ? { background: C.indigo, borderColor: C.indigo, color: C.white } : now ? { background: C.white, borderColor: C.cyan, color: C.indigo } : { background: C.white, borderColor: C.line, color: C.muted }}
-                      initial={reduce ? false : { scale: 0.6, opacity: 0 }}
-                      animate={{ scale: 1, opacity: 1 }}
-                      transition={{ duration: 0.3, delay: reduce ? 0 : i * 0.07, ease: EASE }}
-                      key={`${result.no}-${i}`}
-                    >
-                      {done ? <Check size={16} strokeWidth={3} aria-hidden /> : i + 1}
-                    </motion.span>
-                    {i < STEPS.length - 1 && <span className="mt-1 w-0.5 flex-1 sm:ml-1 sm:mt-0 sm:h-0.5 sm:w-auto" style={{ background: done ? C.indigo : C.line }} aria-hidden />}
-                  </div>
-                  <div className="sm:mt-2.5">
-                    <p className="font-bold" style={{ color: done || now ? C.ink : C.muted }}>
-                      {st}
-                      {now && <span className="sr-only"> (현재 단계)</span>}
-                    </p>
-                    <p className="text-[14px] tabular-nums" style={{ color: C.muted }}>
-                      {done || now ? mdw(result.dates[i]) : `${md(result.dates[i])} 예정`}
-                    </p>
-                  </div>
-                </li>
-              );
-            })}
-          </ol>
-
-          <div className="border-t px-5 py-5 md:px-6" style={{ borderColor: C.line }}>
-            {result.step < 2 ? (
-              <p className="rounded-[8px] px-4 py-3 text-[15px]" style={{ background: C.paper, color: C.muted }}>
-                {result.step === 0 ? "시료가 들어오면 시험 일정을 확정해 메일로 알려 드립니다." : `${md(result.dates[2])}에 시험을 시작합니다. 시험 모드 설정이 필요한 시료는 담당 시험원이 먼저 연락드립니다.`}
-              </p>
-            ) : result.kind === "EMC" ? (
-              <div className="grid items-start gap-6 xl:grid-cols-[1.6fr_1fr]">
-                <div className="min-w-0">
-                  <p className="font-bold">
-                    방사 방출 {result.step === 2 ? "예비 측정" : "측정 결과"}{" "}
-                    <span className="text-[14px] font-normal" style={{ color: C.muted }}>
-                      3m, 수평, 수직 편파 중 큰 값
-                    </span>
-                  </p>
-                  <div className="mt-3">
-                    <Spectrum pending={false} replayKey={result.no} />
-                  </div>
-                </div>
-                <dl className="divide-y rounded-[8px] border text-[15px]" style={{ borderColor: C.line }}>
-                  {[
-                    ["판정", result.step === 2 ? "측정 중" : "적합"],
-                    ["최소 여유", `${WORST_MARGIN}dB (${WORST.f}MHz)`],
-                    ["기준", "방사 방출 B급, 준첨두값"],
-                    ["측정 장소", "3m 전파무향실"],
-                    ["담당 시험원", "김ㅈ우"],
-                  ].map(([k, v], i) => (
-                    <div key={k} className="flex items-center justify-between gap-3 px-4 py-2.5" style={{ borderColor: C.line }}>
-                      <dt style={{ color: C.muted }}>{k}</dt>
-                      <dd
-                        className={`text-right tabular-nums ${i === 0 ? "rounded-[6px] px-2.5 py-0.5 font-bold" : "font-semibold"}`}
-                        style={i === 0 ? (result.step === 2 ? { background: C.cyanSoft, color: C.cyanText } : { background: C.okSoft, color: C.ok }) : undefined}
-                      >
-                        {v}
-                      </dd>
-                    </div>
-                  ))}
-                </dl>
-              </div>
-            ) : (
-              <div className="overflow-x-auto">
-                <table className="w-full min-w-[320px] text-left text-[15px]">
-                  <caption className="pb-2 text-left font-bold">{TEST_LABEL[result.kind]} 항목별 결과</caption>
-                  <thead>
-                    <tr style={{ color: C.muted }}>
-                      <th scope="col" className="py-2 pr-3 font-semibold">
-                        항목
-                      </th>
-                      <th scope="col" className="py-2 font-semibold">
-                        결과
-                      </th>
-                    </tr>
-                  </thead>
-                  <tbody>
-                    {ITEMS[result.kind].map((it, i) => {
-                      const pass = result.step >= 3 || i < 2;
-                      return (
-                        <tr key={it} className="border-t" style={{ borderColor: C.line }}>
-                          <th scope="row" className="py-2.5 pr-3 font-semibold">
-                            {it}
-                          </th>
-                          <td className="py-2.5">
-                            <span className="rounded-[6px] px-2.5 py-0.5 text-[14px] font-bold" style={pass ? { background: C.okSoft, color: C.ok } : { background: C.cyanSoft, color: C.cyanText }}>
-                              {pass ? "적합" : "시험 중"}
-                            </span>
-                          </td>
-                        </tr>
-                      );
-                    })}
-                  </tbody>
-                </table>
-              </div>
-            )}
-          </div>
-        </div>
-      )}
-    </div>
-  );
 }
 
 /* ---------- 성적서 진위확인 ---------- */
@@ -2904,8 +1941,9 @@ function QuoteList({ rows, onWrite }: { rows: QuoteRow[]; onWrite: () => void })
 }
 
 function QuoteForm({ onList }: { onList: () => void }) {
-  const { certs, setCerts, go, rows, addRow } = useCl();
+  const { go, rows, addRow } = useCl();
   const reduce = useReducedMotionSafe();
+  const [certs, setCerts] = useState<string[]>([]);
   const [values, setValues] = useState<Values>({ company: "", person: "", phone: "", email: "", product: "", agree: false });
   const [model, setModel] = useState("");
   const [memo, setMemo] = useState("");
@@ -2975,7 +2013,7 @@ function QuoteForm({ onList }: { onList: () => void }) {
     setFile(null);
     setFileErr("");
     setTried(false);
-    setCerts(() => []);
+    setCerts([]);
     onList();
   };
 
@@ -3117,10 +2155,7 @@ function QuoteForm({ onList }: { onList: () => void }) {
                     </ul>
                   ) : (
                     <p className="text-[14px]" style={{ color: C.muted }}>
-                      선택한 인증이 없습니다.{" "}
-                      <button type="button" onClick={() => go("support", "finder")} className="font-semibold underline underline-offset-4" style={{ color: C.indigo }}>
-                        인증 대상 조회
-                      </button>
+                      아래에서 진행할 인증을 골라 주십시오. 정해지지 않았으면 상담 후 정합니다.
                     </p>
                   )}
                   {extra.length > 0 && (
