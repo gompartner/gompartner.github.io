@@ -2,11 +2,14 @@ import type { Metadata } from "next";
 import { ArrowRight, Check, FileSpreadsheet, LayoutDashboard, X } from "lucide-react";
 import { StepList } from "@/components/classic/pricing/StepList";
 import { serviceTabs } from "@/components/classic/pricing/tabs";
-import { PageHead, SubTabs, h2, wrap } from "@/components/classic/ui";
+import { PageHead, SubTabs, h2, h3, wrap } from "@/components/classic/ui";
+import { DeliverBlock } from "@/components/classic/DeliverBlock";
+import { FaqBlock } from "@/components/classic/FaqBlock";
+import { replyTerm } from "@/data/classic/maintenance";
 import { demoProjects, isProgram } from "@/components/classic/works/samples";
 import { pageMeta } from "@/lib/seo";
 
-// 업무 프로그램 서비스 상세. 홈페이지 제작, 광고 랜딩페이지, 유지보수 페이지와 같은 틀을 쓴다(10-30).
+// 업무 프로그램 서비스 상세. 홈페이지 제작, 랜딩페이지 제작, 유지보수 페이지와 같은 틀을 쓴다(10-30, 11-01 톤 맞춤).
 // 카탈로그 화면은 보여 주지 않고, 구현 범위와 사례, 업무 프로그램에 맞춘 진행 방식을 글로 설명한다.
 const programs = demoProjects.filter(isProgram);
 const plain = (t: string) => t.replaceAll("·", ", ");
@@ -45,6 +48,15 @@ const STEPS = [
 const BEFORE = ["거래처마다 다른 양식의 엑셀을 손으로 합침", "수식이 깨지거나 같은 자료를 두 번 입력", "발주서, 결과지를 매번 새로 만듦", "파일을 아는 담당자가 없으면 업무가 멈춤"];
 const AFTER = ["파일을 올리면 열을 맞춰 한 화면에 정리", "입력 오류를 자동으로 검사하고 일괄 수정", "버튼 한 번으로 인쇄, PDF, 엑셀 내려받기", "권한별 화면으로 누구나 같은 순서로 처리"];
 
+// 11-01 톤 맞춤: 다른 서비스 페이지처럼 질문 5개. 사실은 구현 범위와 진행 절차에 적힌 것만
+const FAQ = [
+  { q: "지금 쓰는 엑셀 파일을 그대로 쓸 수 있나요?", a: "네. 엑셀, CSV 파일을 그대로 올리면 열 이름이 달라도 맞춰 정리하도록 만듭니다. 업무 분석 단계에서 지금 쓰는 파일을 받아 확인합니다." },
+  { q: "기존 데이터도 옮겨 주나요?", a: "기존 엑셀 데이터를 새 프로그램으로 옮기는 작업까지 납품에 포함합니다." },
+  { q: "여러 사람이 같이 쓸 수 있나요?", a: "신청자와 관리자 화면을 나누고, 권한별로 볼 수 있는 화면을 정합니다." },
+  { q: "금액은 언제 정해지나요?", a: "필요한 화면과 권한을 목록으로 확정한 뒤, 그 범위로 견적과 일정을 드립니다." },
+  { q: "납품 후 고칠 부분이 생기면 어떻게 하나요?", a: "납품 후 1개월간 하자를 무상으로 보수합니다. 이후에는 건별 수정이나 월 유지보수로 이어갑니다." },
+];
+
 const section = "scroll-mt-20 border-t border-[#e6e9ee] md:scroll-mt-24";
 
 export default function ClassicProgramPage() {
@@ -60,10 +72,11 @@ export default function ClassicProgramPage() {
       <SubTabs items={serviceTabs} current="/classic/program" />
 
       <section aria-labelledby="pg-lead" className={`${wrap} py-12 md:py-16`}>
-        <div className="border-t-2 border-[#15171c] pt-6">
-          <h2 id="pg-lead" className="break-keep text-[26px] font-[800] leading-[1.35] tracking-[-0.04em] md:text-[34px]">
-            엑셀 기반 반복 업무를 웹 프로그램으로 전환
+        <div className="flex flex-col gap-2 border-b-2 border-[#15171c] pb-5 md:flex-row md:items-end md:justify-between">
+          <h2 id="pg-lead" className={h3}>
+            엑셀로 하던 주문 취합, 관리, 출력 업무를 웹 프로그램으로 만듭니다
           </h2>
+          <p className="shrink-0 text-[15px] font-bold text-[#256ef4]">{replyTerm}</p>
         </div>
       </section>
 
@@ -177,7 +190,16 @@ export default function ClassicProgramPage() {
         </div>
       </section>
 
-      <StepList steps={STEPS} title="진행 방식" id="process" />
+      <StepList steps={STEPS} title="진행 절차" id="process" />
+
+      <DeliverBlock
+        id="pg-deliver"
+        name="업무 프로그램과 인계 자료"
+        items={["업무 프로그램(관리자, 사용자 화면)", "기존 엑셀 데이터 이관", "원본 소스", "사용 방법과 계정 목록을 정리한 인계 문서", "납품 후 1개월 무상 하자보수"]}
+        photo="/images/site/scene-program.jpg"
+      />
+
+      <FaqBlock items={FAQ} id="pg-faq" />
     </>
   );
 }

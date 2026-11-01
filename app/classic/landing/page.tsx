@@ -1,11 +1,14 @@
 import type { Metadata } from "next";
 import Link from "next/link";
-import { BellRing, ChartColumn, Check, ChevronDown, ChevronRight, ClipboardList, MousePointerClick, Table2 } from "lucide-react";
+import { BellRing, ChartColumn, Check, ChevronRight, ClipboardList, MousePointerClick, Table2 } from "lucide-react";
 import { ClassicOwnerPreview } from "@/components/classic/landing/ClassicOwnerPreview";
 import { PlanTable } from "@/components/classic/pricing/PlanTable";
 import { StepList } from "@/components/classic/pricing/StepList";
 import { serviceTabs } from "@/components/classic/pricing/tabs";
-import { PageHead, SubTabs, h2, more, wrap } from "@/components/classic/ui";
+import { PageHead, SubTabs, h2, h3, more, wrap } from "@/components/classic/ui";
+import { DeliverBlock } from "@/components/classic/DeliverBlock";
+import { FaqBlock } from "@/components/classic/FaqBlock";
+import { replyTerm } from "@/data/classic/maintenance";
 import { SampleGrid } from "@/components/classic/works/SampleGrid";
 import { samplesIn } from "@/components/classic/works/samples";
 import { processSteps } from "@/data/classic/faq";
@@ -32,20 +35,22 @@ const FOR_WHOM = [
   "홈페이지보다 신청 페이지가 먼저 필요한 경우",
 ];
 
-const FAQ: [string, string][] = [
-  ["문자, 알림톡 발송 비용은 별도인가요?", "발송 비용은 건당 20원 내외이며 고객 부담입니다. 카카오 알림톡은 비즈니스 채널 인증과 템플릿 심사가 필요합니다. 메일 알림은 무료입니다."],
-  ["신청 내용은 어디에 저장되나요?", "고객 구글 계정의 구글 시트에 저장됩니다. 곰파트너는 신청 내용을 보관하지 않습니다."],
-  ["월 비용이 있나요?", "무료 호스팅을 사용하여 월 비용은 없습니다. 도메인은 고객 명의로 직접 구매하며 연 2만 원 내외입니다."],
-  ["진행하지 않는 업종이 있나요?", "대부 중개, 주식과 코인 리딩 업종은 진행하지 않습니다."],
+// 11-01 톤 맞춤: 질문은 실제 질문 형태, 금액과 안 맡는 일은 쓰지 않는다
+const FAQ = [
+  { q: "신청이 들어오면 어떻게 알 수 있나요?", a: "신청 즉시 담당자 메일로 알림이 갑니다. 상담 관리 이상 패키지는 문자와 카카오 알림톡으로도 받을 수 있습니다." },
+  { q: "신청 내용은 어디에 저장되나요?", a: "고객 구글 계정의 구글 시트에 저장됩니다. 곰파트너는 신청 내용을 보관하지 않습니다." },
+  { q: "문자, 알림톡을 쓰려면 무엇이 필요한가요?", a: "카카오 알림톡은 비즈니스 채널 인증과 템플릿 심사가 필요합니다. 신청 절차를 함께 안내하고, 발송 비용은 견적서에 함께 적어 드립니다." },
+  { q: "운영 비용은 어떻게 되나요?", a: "도메인과 호스팅은 고객 명의로 계약합니다. 연간 비용은 호스팅 종류에 따라 견적서에 함께 안내합니다." },
+  { q: "광고별로 신청 수를 볼 수 있나요?", a: "광고 성과 정리 패키지는 네이버, 메타, 구글 등 광고 채널별 신청과 계약 건수를 시트에서 집계해 보여 드립니다." },
 ];
 
 // 신청 한 건이 지나가는 길. 이 페이지의 디자인 포인트(10-30)
 const FLOW = [
-  { icon: MousePointerClick, title: "광고 클릭", body: "네이버, 메타, 구글 광고에서 유입" },
-  { icon: ClipboardList, title: "신청서 작성", body: "이름, 연락처, 문의 내용과 개인정보 동의" },
-  { icon: BellRing, title: "즉시 알림", body: "담당자 메일과 문자, 알림톡으로 바로 전달" },
-  { icon: Table2, title: "시트 기록", body: "구글 시트에 쌓이고 상담 상태를 바로 관리" },
-  { icon: ChartColumn, title: "주간 집계", body: "광고 채널별 신청과 계약 건수 리포트" },
+  { icon: MousePointerClick, title: "광고 클릭", body: "네이버, 메타, 구글 광고에서 들어옵니다" },
+  { icon: ClipboardList, title: "신청서 작성", body: "이름, 연락처, 문의 내용을 받고 개인정보 동의를 거칩니다" },
+  { icon: BellRing, title: "즉시 알림", body: "담당자 메일과 문자, 알림톡으로 바로 알립니다" },
+  { icon: Table2, title: "시트 기록", body: "구글 시트에 쌓이고 상담 상태를 바로 관리합니다" },
+  { icon: ChartColumn, title: "주간 집계", body: "광고 채널별 신청과 계약 건수를 정리합니다" },
 ];
 
 const section = "scroll-mt-20 border-t border-[#e6e9ee] md:scroll-mt-24";
@@ -64,10 +69,11 @@ export default function ClassicLandingServicePage() {
       <SubTabs items={serviceTabs} current="/classic/landing" />
 
       <section aria-labelledby="ld-lead" className={`${wrap} py-12 md:py-16`}>
-        <div className="border-t-2 border-[#15171c] pt-6">
-          <h2 id="ld-lead" className="break-keep text-[26px] font-[800] leading-[1.35] tracking-[-0.04em] md:text-[34px]">
-            광고 유입 고객의 상담 신청을 접수하고 관리하는 단일 페이지
+        <div className="flex flex-col gap-2 border-b-2 border-[#15171c] pb-5 md:flex-row md:items-end md:justify-between">
+          <h2 id="ld-lead" className={h3}>
+            광고로 들어온 고객의 상담, 예약 신청을 바로 받는 홍보용 페이지를 만듭니다
           </h2>
+          <p className="shrink-0 text-[15px] font-bold text-[#256ef4]">{replyTerm}</p>
         </div>
       </section>
 
@@ -152,24 +158,14 @@ export default function ClassicLandingServicePage() {
 
       <StepList steps={processSteps} title="진행 절차" id="process" />
 
-      <section aria-labelledby="ld-faq" className={section}>
-        <div className={`${wrap} py-16 md:py-24`}>
-          <h2 id="ld-faq" className={h2}>
-            자주 묻는 질문
-          </h2>
-          <div className="mt-10 border-t-2 border-[#15171c]">
-            {FAQ.map(([q, a]) => (
-              <details key={q} className="group border-b border-[#e6e9ee]">
-                <summary className="flex cursor-pointer list-none items-center justify-between gap-4 py-5 text-[17px] font-bold leading-[1.5] hover:text-[#256ef4] md:py-6 md:text-[19px] [&::-webkit-details-marker]:hidden">
-                  {q}
-                  <ChevronDown size={22} aria-hidden className="shrink-0 text-[#6b7280] transition-transform group-open:rotate-180 motion-reduce:transition-none" />
-                </summary>
-                <p className="pb-6 text-[16px] leading-[1.7] text-[#3d4450] md:text-[17px]">{a}</p>
-              </details>
-            ))}
-          </div>
-        </div>
-      </section>
+      <DeliverBlock
+        id="ld-deliver"
+        name="랜딩페이지와 신청 접수 설정"
+        items={["랜딩페이지(PC, 모바일)", "신청 알림 설정(메일, 문자, 알림톡)", "신청 기록용 구글 시트", "원본 소스", "계정 목록과 수정 방법을 정리한 인계 문서"]}
+        photo="/images/site/scene-landing.jpg"
+      />
+
+      <FaqBlock items={FAQ} id="ld-faq" />
     </>
   );
 }
