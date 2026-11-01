@@ -102,6 +102,7 @@ export function ClassicHome() {
 const heroSlides = [
   {
     key: "make",
+    tab: "제작",
     w: 1440,
     h: 900,
     title: "홈페이지 제작",
@@ -115,6 +116,7 @@ const heroSlides = [
   },
   {
     key: "fix",
+    tab: "오류 수정",
     w: 1060,
     h: 752,
     title: "오류 수정",
@@ -124,6 +126,7 @@ const heroSlides = [
   },
   {
     key: "takeover",
+    tab: "이관",
     w: 1060,
     h: 790,
     title: "업체 이관",
@@ -137,6 +140,7 @@ const heroSlides = [
   },
   {
     key: "update",
+    tab: "보안",
     w: 1060,
     h: 752,
     title: "보안 업데이트",
@@ -146,6 +150,7 @@ const heroSlides = [
   },
   {
     key: "monthly",
+    tab: "월 관리",
     w: 1060,
     h: 714,
     title: "월 관리",
@@ -157,7 +162,13 @@ const heroSlides = [
 const HERO_MS = 7000;
 
 function Hero() {
-  const [cur, setCur] = useState(0);
+  const N = heroSlides.length;
+  // pos는 트랙 위치. N은 맨 끝에 붙인 첫 슬라이드 복제본이라, 마지막에서 다음으로 가면 이어서 들어온 뒤 처음으로 조용히 옮긴다
+  const [pos, setPos] = useState(0);
+  const [anim, setAnim] = useState(true);
+  // 자동 넘김은 한 바퀴만. 직접 고르면 그때부터 멈춘다
+  const [auto, setAuto] = useState(true);
+  const cur = pos % N;
   const [hold, setHold] = useState(false);
   const [reduced, setReduced] = useState(false);
   useEffect(() => {
@@ -167,14 +178,27 @@ function Hero() {
     return () => cancelAnimationFrame(f);
   }, []);
   useEffect(() => {
-    if (hold || reduced) return;
-    const t = window.setTimeout(
-      () => setCur((c) => (c + 1) % heroSlides.length),
-      HERO_MS,
-    );
+    if (!auto || hold || reduced) return;
+    const t = window.setTimeout(() => {
+      if (pos >= N - 1) {
+        setPos(N);
+        setAuto(false);
+      } else setPos(pos + 1);
+    }, HERO_MS);
     return () => window.clearTimeout(t);
-  }, [cur, hold, reduced]);
-  const go = (n: number) => setCur((n + heroSlides.length) % heroSlides.length);
+  }, [pos, auto, hold, reduced, N]);
+  const go = (n: number) => {
+    setAuto(false);
+    setAnim(true);
+    if (n === N) setPos(N);
+    else setPos((n + N) % N);
+  };
+  const settle = () => {
+    if (pos !== N) return;
+    setAnim(false);
+    setPos(0);
+    requestAnimationFrame(() => requestAnimationFrame(() => setAnim(true)));
+  };
   const touchX = useRef(0);
   return (
     <section
@@ -212,25 +236,26 @@ function Hero() {
         }}
       >
         <div
-          className="flex transition-transform duration-700 ease-[cubic-bezier(.22,.61,.36,1)] motion-reduce:transition-none"
-          style={{ transform: `translateX(-${cur * 100}%)` }}
+          className={cn(
+            "flex",
+            anim &&
+              "transition-transform duration-700 ease-[cubic-bezier(.22,.61,.36,1)] motion-reduce:transition-none",
+          )}
+          style={{ transform: `translateX(-${pos * 100}%)` }}
+          onTransitionEnd={settle}
         >
-          {heroSlides.map((sl, i) => (
+          {[...heroSlides, heroSlides[0]].map((sl, i) => (
             <div
-              key={sl.key}
-              role="group"
-              aria-roledescription="slide"
-              aria-label={`${i + 1} / ${heroSlides.length}, ${sl.title}`}
-              aria-hidden={i !== cur}
+              key={i === N ? "clone" : sl.key}
+              role={i === N ? undefined : "group"}
+              aria-roledescription={i === N ? undefined : "slide"}
+              aria-label={i === N ? undefined : `${i + 1} / ${N}, ${sl.title}`}
+              aria-hidden={i !== pos}
               className="w-full shrink-0"
             >
               <div className="mx-auto grid w-full max-w-[1248px] items-center gap-10 px-4 pb-8 pt-12 md:min-h-[620px] md:grid-cols-[1fr_1.15fr] md:gap-14 md:px-6 md:pb-10 md:pt-16">
                 <div>
-                  <p className="text-[15px] font-bold tabular-nums text-[#8fb4ff]">
-                    {String(i + 1).padStart(2, "0")} /{" "}
-                    {String(heroSlides.length).padStart(2, "0")}
-                  </p>
-                  <p className="mt-3 break-keep text-[40px] font-[800] leading-[1.12] tracking-[-0.05em] md:text-[64px]">
+                  <p className="break-keep text-[40px] font-[800] leading-[1.12] tracking-[-0.05em] md:text-[64px]">
                     {sl.title}
                   </p>
                   <p className="mt-4 max-w-[520px] break-keep text-[17px] leading-[1.7] text-[#c9d3e6] md:text-[19px]">
@@ -254,7 +279,7 @@ function Hero() {
                   <div className="mt-8 flex flex-wrap gap-3">
                     <Link
                       href="/classic/contact"
-                      tabIndex={i === cur ? 0 : -1}
+                      tabIndex={i === pos ? 0 : -1}
                       data-gtm-cta={`classic_hero_contact_${sl.key}`}
                       className="inline-flex h-12 items-center rounded-md bg-[#256ef4] px-6 text-[16px] font-bold text-white transition-colors hover:bg-[#0b50d0]"
                     >
@@ -262,7 +287,7 @@ function Hero() {
                     </Link>
                     <Link
                       href={sl.href}
-                      tabIndex={i === cur ? 0 : -1}
+                      tabIndex={i === pos ? 0 : -1}
                       className="inline-flex h-12 items-center gap-1 rounded-md border border-white/40 px-6 text-[16px] font-bold text-white transition-colors hover:bg-white/10"
                     >
                       자세히 보기 <ChevronRight size={16} aria-hidden />
@@ -295,7 +320,7 @@ function Hero() {
       <div className="relative border-t border-white/10">
         <div className="mx-auto flex w-full max-w-[1248px] items-stretch px-4 md:px-6">
           <div
-            className="flex min-w-0 flex-1 overflow-x-auto"
+            className="grid min-w-0 flex-1 grid-cols-5 md:flex"
             role="tablist"
             aria-label="서비스 선택"
           >
@@ -307,21 +332,22 @@ function Hero() {
                 aria-selected={i === cur}
                 onClick={() => go(i)}
                 className={cn(
-                  "relative shrink-0 whitespace-nowrap px-4 py-4 text-left text-[14px] font-bold transition-colors md:flex-1 md:px-5 md:py-5 md:text-[16px]",
+                  "relative whitespace-nowrap px-1 py-4 text-center text-[13px] font-bold transition-colors md:flex-1 md:px-5 md:py-5 md:text-left md:text-[16px]",
                   i === cur ? "text-white" : "text-white/55 hover:text-white",
                 )}
               >
-                {sl.title}
+                <span className="md:hidden">{sl.tab}</span>
+                <span className="hidden md:inline">{sl.title}</span>
                 <span
                   aria-hidden
                   className="absolute inset-x-0 top-0 h-[3px] bg-white/10"
                 >
                   {i === cur && (
                     <span
-                      key={`${cur}-${hold}`}
+                      key={`${cur}-${hold}-${auto}`}
                       className="block h-full bg-[#8fb4ff]"
                       style={
-                        reduced || hold
+                        reduced || hold || !auto
                           ? { width: "100%" }
                           : {
                               animation: `hero-progress ${HERO_MS}ms linear forwards`,
