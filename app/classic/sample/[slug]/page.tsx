@@ -3,7 +3,7 @@ import type { Project } from "@/lib/types";
 import Image from "next/image";
 import Link from "next/link";
 import { notFound } from "next/navigation";
-import { Check, Plus } from "lucide-react";
+import { Check, Plus, Pointer } from "lucide-react";
 import { PageHead, btnLine, btnPrimary, h2, h3, more, wrap } from "@/components/classic/ui";
 import { SampleGrid } from "@/components/classic/works/SampleGrid";
 import { Kiosk3dLink } from "@/components/classic/works/Kiosk3dLink";
@@ -59,12 +59,13 @@ export default async function ClassicSamplePage({ params }: Props) {
       <section aria-label="카탈로그 화면" className="bg-[#f4f6f9]">
         <div className={`${wrap} py-10 md:py-16`}>
           {isDeviceCatalog(p) ? (
-            <Link href={p.demoUrl} prefetch={false} aria-label={`${p.title} 체험하기`} className="group mx-auto block max-w-[1040px] overflow-hidden rounded-lg bg-[#eef0f3]">
+            <Link href={p.demoUrl} prefetch={false} aria-label={`${p.title} 체험하기`} className="group relative mx-auto block max-w-[1040px] overflow-hidden rounded-lg bg-[#eef0f3]">
               <Image src={p.imageUrl} alt={p.imageAlt} width={1440} height={900} priority sizes="(min-width: 1088px) 1040px, 92vw" className="aspect-[16/10] w-full object-cover object-center" />
+              <TapHint />
             </Link>
           ) : (
           <Link href={p.demoUrl} prefetch={false} aria-label={`${p.title} 체험하기`} className="group relative mx-auto block max-w-[1040px] pb-[6%]">
-            <span className="block w-[88%] overflow-hidden rounded-lg border border-[#d9dee5] bg-white">
+            <span className="relative block w-[88%] overflow-hidden rounded-lg border border-[#d9dee5] bg-white">
               <span aria-hidden className="flex h-6 items-center gap-1.5 border-b border-[#e6e9ee] bg-[#eef1f5] px-3 md:h-8">
                 <span className="h-2 w-2 rounded-full bg-[#c5cbd4]" />
                 <span className="h-2 w-2 rounded-full bg-[#c5cbd4]" />
@@ -79,6 +80,7 @@ export default async function ClassicSamplePage({ params }: Props) {
                 sizes="(min-width: 1088px) 915px, 80vw"
                 className="aspect-[16/10] w-full object-cover object-top"
               />
+              <TapHint />
             </span>
             {mobileShot && (
               <span className="absolute bottom-0 right-0 block w-[25%] max-w-[230px] overflow-hidden rounded-[14px] border-[4px] border-[#15171c] bg-white shadow-[0_16px_32px_rgba(21,23,28,.18)] md:rounded-[24px] md:border-[6px]">
@@ -226,5 +228,15 @@ export default async function ClassicSamplePage({ params }: Props) {
         </section>
       )}
     </>
+  );
+}
+
+/** 캡처를 누르면 체험 화면이 열린다는 걸 알리는 가운데 알약. 휴대폰은 늘 보이고 PC는 올렸을 때 */
+function TapHint() {
+  return (
+    <span aria-hidden className="pointer-events-none absolute left-1/2 top-1/2 inline-flex h-12 -translate-x-1/2 -translate-y-1/2 items-center gap-2 whitespace-nowrap rounded-full bg-[#256ef4] px-5 text-[16px] font-bold text-white shadow-[0_8px_24px_rgba(15,27,61,.35)] transition-opacity duration-200 md:h-14 md:px-6 md:text-[17px] md:opacity-0 md:group-hover:opacity-100 md:group-focus-visible:opacity-100">
+      <Pointer size={20} strokeWidth={2.5} />
+      눌러서 체험하기
+    </span>
   );
 }
