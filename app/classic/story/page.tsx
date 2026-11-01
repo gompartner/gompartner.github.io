@@ -1,5 +1,4 @@
 import type { Metadata } from "next";
-import Image from "next/image";
 import { ArrowUpRight, ClipboardCheck, FileText, KeyRound, ScrollText, ShieldCheck } from "lucide-react";
 import Link from "next/link";
 import { PageHead, h2, wrap } from "@/components/classic/ui";
@@ -28,15 +27,10 @@ export default function ClassicStoryPage() {
       <PageHead title="회사소개" trail={[{ href: "/classic/story", label: "회사소개" }]} />
 
       <section aria-labelledby="st-lead" className={`${wrap} py-14 md:py-20`}>
-        <div className="flex flex-col gap-6 md:flex-row md:items-center md:gap-10">
-          <Image src="/images/bear-avatar.webp" alt="" width={120} height={120} className="h-20 w-20 shrink-0 rounded-full object-cover md:h-28 md:w-28" />
-          <div>
-            <h2 id="st-lead" className="break-keep text-[28px] font-[800] leading-[1.35] tracking-[-0.04em] md:text-[40px]">
-              {aboutTitle}
-            </h2>
-            <p className="mt-3 max-w-[760px] break-keep text-[17px] leading-[1.75] text-[#3d4450] md:text-[19px]">{aboutLead}</p>
-          </div>
-        </div>
+        <h2 id="st-lead" className="break-keep text-[28px] font-[800] leading-[1.35] tracking-[-0.04em] md:text-[40px]">
+          {aboutTitle}
+        </h2>
+        <p className="mt-3 max-w-[760px] break-keep text-[17px] leading-[1.75] text-[#3d4450] md:text-[19px]">{aboutLead}</p>
       </section>
 
       <section id="principles" aria-labelledby="st-principles" className={section}>

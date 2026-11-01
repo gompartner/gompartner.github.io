@@ -1,47 +1,42 @@
-import Image from "next/image";
+import type { Metadata } from "next";
 import Link from "next/link";
-import { Header } from "@/components/layout/Header";
-import { Footer } from "@/components/layout/Footer";
+import { ArrowUpRight } from "lucide-react";
+import { ClassicShell } from "@/components/classic/ClassicShell";
+import { PageHead, wrap } from "@/components/classic/ui";
 
-// 없는 주소로 들어왔을 때. (site) 그룹 밖이라 머리글·바닥글을 직접 둔다.
+// 없는 주소로 들어왔을 때(11-01 클래식 틀로 새로). 일반 회사 홈페이지처럼 짧은 안내와 주요 메뉴만 둔다.
+export const metadata: Metadata = {
+  title: "페이지를 찾을 수 없습니다",
+  robots: { index: false, follow: true },
+};
+
 const pages = [
   { href: "/", label: "첫 화면" },
-  { href: "/works", label: "샘플" },
-  { href: "/faq", label: "자주 묻는 질문" },
+  { href: "/classic/homepage", label: "홈페이지 제작" },
+  { href: "/classic/maintenance", label: "유지보수" },
+  { href: "/classic/works", label: "카탈로그" },
+  { href: "/classic/faq", label: "자주 묻는 질문" },
+  { href: "/classic/contact", label: "상담 신청" },
 ];
 
 export default function NotFound() {
   return (
-    <div className="wt flex min-h-screen flex-col">
-      <Header />
-      <main id="main" className="flex-1 pt-16">
-        <div className="mx-auto flex w-full max-w-[640px] flex-col items-start px-4 py-20 md:py-28">
-          <Image src="/images/webtoon/bear-hello.jpg" alt="" width={160} height={160} className="h-40 w-40 border-[3px] border-[#1d1d1f] shadow-[5px_5px_0_#1d1d1f]" />
-          <p className="mt-6 text-[15px] font-bold text-accent">404</p>
-          <h1 className="mt-1 text-[28px] font-bold leading-[1.4] md:text-[32px]">페이지를 찾을 수 없습니다</h1>
-          <p className="mt-2 text-[17px] leading-[1.6] text-foreground-secondary">
-            주소가 바뀌었거나 없는 페이지입니다. 주소를 다시 확인해 주세요.
-          </p>
-
-          <h2 className="mt-10 text-[17px] font-bold">자주 찾는 페이지</h2>
-          <ul className="mt-3 grid w-full gap-2 sm:grid-cols-2">
-            {pages.map((p) => (
-              <li key={p.href}>
-                <Link
-                  href={p.href}
-                  className="flex h-12 items-center justify-between rounded-[6px] border-[2.5px] border-[#1d1d1f] bg-white px-4 text-[17px] font-bold shadow-[3px_3px_0_#1d1d1f] hover:bg-[#fff3b0]"
-                >
-                  {p.label}
-                  <span aria-hidden className="text-foreground-tertiary">
-                    &gt;
-                  </span>
-                </Link>
-              </li>
-            ))}
-          </ul>
-        </div>
-      </main>
-      <Footer />
-    </div>
+    <ClassicShell>
+      <PageHead title="페이지를 찾을 수 없습니다" />
+      <section className={`${wrap} py-14 md:py-20`}>
+        <p className="text-[15px] font-bold tabular-nums text-[#256ef4]">404</p>
+        <p className="mt-2 text-[17px] text-[#3d4450] md:text-[18px]">주소가 바뀌었거나 삭제된 페이지입니다.</p>
+        <ul className="mt-10 grid gap-3 border-t-2 border-[#15171c] pt-6 sm:grid-cols-2 lg:grid-cols-3" role="list">
+          {pages.map((p) => (
+            <li key={p.href}>
+              <Link href={p.href} className="group flex h-14 items-center justify-between rounded-md border border-[#d9dee5] bg-white px-5 text-[17px] font-bold transition-colors hover:border-[#256ef4] hover:text-[#256ef4]">
+                {p.label}
+                <ArrowUpRight size={20} aria-hidden className="text-[#6b7280] group-hover:text-[#256ef4]" />
+              </Link>
+            </li>
+          ))}
+        </ul>
+      </section>
+    </ClassicShell>
   );
 }
