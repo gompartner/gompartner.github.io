@@ -1,28 +1,27 @@
 <!doctype html><html lang="ko"><head><meta charset="utf-8"><link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/static/pretendard.min.css">
 <style>
-*{box-sizing:border-box;margin:0}body{width:1440px;height:900px;font-family:Pretendard;background:#f4f6f9;color:#15171c;padding:48px 60px}
-.top{display:flex;justify-content:space-between;align-items:center}.h{font-size:30px;font-weight:800;letter-spacing:-.04em}.sub{color:#5b6370;font-size:17px;margin-top:6px}
-.badge{background:#e8f6ee;color:#147a45;font-weight:800;padding:10px 18px;border-radius:8px;font-size:18px}
-.stats{display:grid;grid-template-columns:repeat(4,1fr);gap:16px;margin-top:28px}
-.s{background:#fff;border:1px solid #e1e5eb;border-radius:10px;padding:20px}.s b{display:block;font-size:34px;letter-spacing:-.04em}.s span{color:#5b6370;font-size:16px}
-.cols{display:grid;grid-template-columns:1.4fr 1fr;gap:16px;margin-top:16px}
-.card{background:#fff;border:1px solid #e1e5eb;border-radius:10px;padding:22px}.card h3{font-size:19px;margin-bottom:10px}
-.row{display:flex;justify-content:space-between;align-items:center;border-top:1px solid #eef1f5;padding:13px 0;font-size:17px}
-.ok{color:#147a45;font-weight:800}.warn{color:#b45309;font-weight:800}
-.bar{height:10px;background:#eef1f5;border-radius:5px;margin-top:8px}.bar i{display:block;height:100%;background:#256ef4;border-radius:5px}
-</style></head><body>
-<div class="top"><div><div class="h">월간 점검 보고</div><div class="sub">2026년 10월, 홈페이지 유지보수</div></div><div class="badge">정상 운영</div></div>
-<div class="stats"><div class="s"><b>24시간</b><span>내 회신</span></div><div class="s"><b>12건</b><span>이번 달 수정</span></div><div class="s"><b>4회</b><span>백업 확인</span></div><div class="s"><b>D-28</b><span>SSL 만료</span></div></div>
-<div class="cols">
-<div class="card"><h3>정기 점검</h3>
-<div class="row"><span>도메인 만료일</span><span class="ok">정상</span></div>
-<div class="row"><span>SSL 인증서</span><span class="warn">갱신 예정</span></div>
-<div class="row"><span>전체 백업</span><span class="ok">완료</span></div>
-<div class="row"><span>워드프레스 보안 업데이트</span><span class="ok">적용</span></div>
-<div class="row"><span>문의 폼 메일 수신</span><span class="ok">정상</span></div></div>
-<div class="card"><h3>수정 요청</h3>
-<div class="row"><span>영업시간 변경</span><span class="ok">반영</span></div>
-<div class="row"><span>메인 사진 교체</span><span class="ok">반영</span></div>
-<div class="row"><span>공지 등록 2건</span><span class="ok">반영</span></div>
-<div style="margin-top:14px;font-size:15px;color:#5b6370">월 건수 사용 7 / 10</div><div class="bar"><i style="width:70%"></i></div></div>
+*{box-sizing:border-box;margin:0}body{width:1440px;height:900px;font-family:Pretendard;background:#e9ecf1;display:flex;justify-content:center;padding-top:40px;overflow:hidden}
+.sheet{width:1040px;background:#fff;box-shadow:0 10px 30px rgba(0,0,0,.12);padding:56px 72px;color:#15171c}
+.head{display:flex;justify-content:space-between;align-items:flex-end;border-bottom:3px solid #15171c;padding-bottom:16px}
+.head h1{font-size:34px;letter-spacing:-.04em}.no{font-size:15px;color:#5b6370}
+table{width:100%;border-collapse:collapse;font-size:16px}
+.meta{margin-top:18px}.meta th{width:120px;background:#f4f6f9;text-align:left;font-weight:700;color:#3d4450}.meta td,.meta th{border:1px solid #d9dee5;padding:9px 12px}
+h2{font-size:19px;margin:26px 0 10px;letter-spacing:-.02em}
+.t th{background:#f4f6f9;font-weight:700;color:#3d4450;text-align:left}.t th,.t td{border:1px solid #d9dee5;padding:9px 12px}
+.ok{color:#147a45;font-weight:700}.warn{color:#b45309;font-weight:700}
+.sign{display:flex;justify-content:flex-end;gap:28px;margin-top:26px;font-size:16px}.sign div{border:1px solid #d9dee5;padding:10px 18px;min-width:170px}.sign b{display:block;font-size:13px;color:#5b6370;margin-bottom:4px}
+</style></head><body><div class="sheet">
+<div class="head"><h1>홈페이지 월간 점검 보고서</h1><div class="no">2026년 10월호</div></div>
+<table class="meta"><tr><th>점검 기간</th><td>2026. 10. 1 ~ 2026. 10. 31</td><th>작성일</th><td>2026. 10. 31</td></tr><tr><th>계약</th><td>월 유지보수, 월 10건</td><th>사용</th><td>7건</td></tr></table>
+<h2>1. 정기 점검</h2>
+<table class="t"><tr><th>항목</th><th>결과</th><th>비고</th></tr>
+<tr><td>도메인 만료일</td><td class="ok">정상</td><td>2027. 8. 14 만료</td></tr>
+<tr><td>SSL 인증서</td><td class="warn">갱신 예정</td><td>2026. 11. 28 만료, 11월 중 갱신</td></tr>
+<tr><td>전체 백업</td><td class="ok">완료</td><td>주 1회, 4회 확인</td></tr>
+<tr><td>보안 업데이트</td><td class="ok">적용</td><td>워드프레스 코어, 플러그인 3종</td></tr></table>
+<h2>2. 수정 요청 처리</h2>
+<table class="t"><tr><th>접수일</th><th>내용</th><th>처리</th></tr>
+<tr><td>10. 7</td><td>영업시간 변경</td><td class="ok">당일 반영</td></tr>
+<tr><td>10. 15</td><td>메인 사진 교체 3장</td><td class="ok">다음 날 반영</td></tr></table>
+<div class="sign"><div><b>작성</b>곰파트너</div><div><b>확인</b>&nbsp;</div></div>
 </div></body></html>
