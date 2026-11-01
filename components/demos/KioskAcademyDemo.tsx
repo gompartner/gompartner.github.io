@@ -151,7 +151,8 @@ function Photo({ src, alt, className = "", pos }: { src: string; alt: string; cl
 
 /* ---------------- 페이지 ---------------- */
 
-export function KioskAcademyDemo() {
+/** threeD: true면 md 이상(모션 줄이기 아님)에서 학원 입구 3D 공간 안의 키오스크(/3d 경로용). 기본은 평면 키오스크 */
+export function KioskAcademyDemo({ threeD = false }: { threeD?: boolean } = {}) {
   const today = useDemoToday();
   const [view, setView] = useState<"kiosk" | "admin">("kiosk");
   const [sec, setSec] = useState(START_SEC);
@@ -233,9 +234,10 @@ export function KioskAcademyDemo() {
     [tagCard],
   );
 
-  // md 이상이고 모션 줄이기가 아니면 3D 공간, 아니면 평면 키오스크(첫 렌더는 정하지 않고 비워 둔다)
-  const [layout, setLayout] = useState<"3d" | "flat" | null>(null);
+  // threeD이고 md 이상, 모션 줄이기가 아니면 3D 공간. 그 밖은 평면 키오스크(threeD일 때만 첫 렌더를 비워 둔다)
+  const [layout, setLayout] = useState<"3d" | "flat" | null>(threeD ? null : "flat");
   useEffect(() => {
+    if (!threeD) return;
     const wide = window.matchMedia("(min-width: 768px)");
     const calm = window.matchMedia("(prefers-reduced-motion: reduce)");
     const pick = () => setLayout(wide.matches && !calm.matches ? "3d" : "flat");
@@ -247,7 +249,7 @@ export function KioskAcademyDemo() {
       wide.removeEventListener("change", pick);
       calm.removeEventListener("change", pick);
     };
-  }, []);
+  }, [threeD]);
 
   const busy = screen.kind === "scan";
   const owner = notes[0]?.no ?? "1021";
@@ -290,61 +292,50 @@ export function KioskAcademyDemo() {
           </div>
 
           <div className={view === "kiosk" ? "" : "hidden"}>
-            {layout === "3d" ? (
-              <div className="mt-4 grid gap-6 xl:grid-cols-[250px_minmax(0,1fr)_250px] xl:items-center">
-                <aside className="order-2 xl:order-1" aria-label="학생증">
-                  <CardTitle />
-                  <div className="mt-3 grid grid-cols-2 gap-3 xl:grid-cols-1">
-                    {CARD_NOS.map((no) => (
-                      <IdCard key={no} no={no} rec={recs[no]} disabled={busy || approaching} onTag={() => tagCard3d(no)} />
-                    ))}
-                  </div>
-                </aside>
-                <div className="order-1 min-w-0 xl:order-2">
-                  <KioskScene place="academy" zoomSignal={zoomSignal} paused={view !== "kiosk"} className="h-[min(78vh,820px)] min-h-[600px] w-full">
-                    <div style={{ width: DESIGN_W, height: DESIGN_H }}>
-                      <Kiosk today={today} sec={sec} recs={recs} screen={screen} setScreen={setScreen} apply={apply} active={view === "kiosk"} />
-                    </div>
-                  </KioskScene>
-                </div>
-                <aside className="order-3 mx-auto w-[250px] xl:mx-0" aria-label="학부모 휴대폰 알림">
-                  <ParentPhone today={today} nowMin={nowMin} owner={studentOf(owner)} notes={ownerNotes} />
-                </aside>
-              </div>
-            ) : layout === "flat" ? (
-              <>
-                {/* 좁은 화면: 학생증 가로 줄 */}
-                <div className="mt-4 xl:hidden">
-                  <CardTitle />
-                  <div className="-mx-4 mt-2 flex gap-2.5 overflow-x-auto px-4 pb-1 md:mx-0 md:justify-center md:px-0">
-                    {CARD_NOS.map((no) => (
-                      <IdCard key={no} no={no} rec={recs[no]} disabled={busy} onTag={() => tagCard(no)} compact />
-                    ))}
-                  </div>
-                </div>
-
-                <div className="mt-4 flex items-center justify-center gap-10 md:mt-3">
-                  <aside className="hidden w-[250px] shrink-0 xl:block" aria-label="학생증">
-                    <CardTitle />
-                    <div className="mt-3 space-y-3">
-                      {CARD_NOS.map((no) => (
-                        <IdCard key={no} no={no} rec={recs[no]} disabled={busy} onTag={() => tagCard(no)} />
-                      ))}
-                    </div>
-                  </aside>
-
-                  <KioskStage><Kiosk today={today} sec={sec} recs={recs} screen={screen} setScreen={setScreen} apply={apply} active={view === "kiosk"} /></KioskStage>
-
-                  <aside className="hidden w-[250px] shrink-0 xl:block" aria-label="학부모 휴대폰 알림">
-                    <ParentPhone today={today} nowMin={nowMin} owner={studentOf(owner)} notes={ownerNotes} />
-                  </aside>
-                </div>
-              </>
-            ) : (
+            {layout === null ? (
               <div className="mt-4 aspect-[9/16] w-full md:aspect-auto md:h-[min(78vh,820px)] md:min-h-[600px]" aria-hidden />
+            ) : (
+              <div
+                className={`mt-4 grid grid-cols-1 gap-4 ${
+                  layout === "3d" ? "xl:grid-cols-[264px_minmax(0,1fr)_264px]" : "xl:grid-cols-[264px_auto_264px] xl:justify-center"
+                }`}
+              >
+                <Zone step={1} role="학생" title="학생증 태그" sub="누르면 리더기에 댄 것으로 처리" className="min-w-0">
+                  <div className="-mx-4 flex gap-2.5 self-stretch overflow-x-auto px-4 pb-1 md:mx-0 md:grid md:grid-cols-2 md:overflow-visible md:px-0 xl:grid-cols-1">
+                    {CARD_NOS.map((no) => (
+                      <IdCard
+                        key={no}
+                        no={no}
+                        rec={recs[no]}
+                        disabled={busy || approaching}
+                        onTag={() => (layout === "3d" ? tagCard3d(no) : tagCard(no))}
+                        compact
+                      />
+                    ))}
+                  </div>
+                </Zone>
+                <Zone step={2} role="학생" title="입구 키오스크" sub="번호, QR, 학생증으로 등원과 하원" className="min-w-0">
+                  {layout === "3d" ? (
+                    <KioskScene place="academy" zoomSignal={zoomSignal} paused={view !== "kiosk"} className="h-[min(74vh,780px)] min-h-[560px] w-full">
+                      <div style={{ width: DESIGN_W, height: DESIGN_H }}>
+                        <Kiosk today={today} sec={sec} recs={recs} screen={screen} setScreen={setScreen} apply={apply} active={view === "kiosk"} />
+                      </div>
+                    </KioskScene>
+                  ) : (
+                    <KioskStage><Kiosk today={today} sec={sec} recs={recs} screen={screen} setScreen={setScreen} apply={apply} active={view === "kiosk"} /></KioskStage>
+                  )}
+                </Zone>
+                <Zone step={3} role="학부모" title="알림 받는 휴대폰" sub={`${studentOf(owner).name} 학생 ${studentOf(owner).parent}`}>
+                  <ParentPhone today={today} nowMin={nowMin} notes={ownerNotes} />
+                </Zone>
+              </div>
             )}
           </div>
-          {view === "admin" && <AdminPanel today={today} sec={sec} nowMin={nowMin} recs={recs} lastChanged={lastChanged} resend={resend} />}
+          {view === "admin" && (
+            <Zone fill role="원장" title="출결 관리 화면" sub="키오스크 기록이 바로 반영됩니다" className="mt-4">
+              <AdminPanel today={today} sec={sec} nowMin={nowMin} recs={recs} lastChanged={lastChanged} resend={resend} />
+            </Zone>
+          )}
 
           <DemoMakerInfo className="mt-6 text-center text-[#4a5568]" />
         </div>
@@ -353,12 +344,44 @@ export function KioskAcademyDemo() {
   );
 }
 
-function CardTitle() {
+const ROLE_CLS: Record<string, string> = {
+  학생: "bg-[#e3f3eb] text-[#0a5c40]",
+  학부모: "bg-[#fdf1e2] text-[#8a4300]",
+  원장: "bg-[#16294a] text-white",
+};
+
+// 화면 영역 묶음: 누가 쓰는 화면인지(역할)와 이름을 맨 위 한 줄에 둔다
+function Zone({
+  step,
+  role,
+  title,
+  sub,
+  className = "",
+  children,
+  fill,
+}: {
+  fill?: boolean;
+  step?: number;
+  role: "학생" | "학부모" | "원장";
+  title: string;
+  sub?: string;
+  className?: string;
+  children: React.ReactNode;
+}) {
   return (
-    <div className="flex items-center gap-1.5 text-[14px] font-bold text-[#2b3a55]">
-      <Nfc size={17} aria-hidden />
-      학생증 태그
-    </div>
+    <section aria-label={`${role} ${title}`} className={`flex flex-col rounded-[18px] border border-[#d9dee6] bg-[#f4f6f9] p-4 ${className}`}>
+      <header className="flex flex-wrap items-center gap-x-2 gap-y-1">
+        {step != null && (
+          <span className="grid h-6 w-6 shrink-0 place-items-center rounded-full border border-[#c3cad6] bg-white text-[12px] font-bold tabular-nums text-[#4a5568]" aria-hidden>
+            {step}
+          </span>
+        )}
+        <span className={`rounded-[6px] px-2 py-0.5 text-[13px] font-bold ${ROLE_CLS[role]}`}>{role}</span>
+        <h2 className="text-[16px] font-bold text-[#142340]">{title}</h2>
+      </header>
+      {sub && <p className="mt-1 text-[13px] text-[#5a6577]">{sub}</p>}
+      <div className={`mt-4 flex flex-1 flex-col ${fill ? "" : "items-center justify-center"}`}>{children}</div>
+    </section>
   );
 }
 
@@ -376,7 +399,7 @@ function IdCard({ no, rec, disabled, onTag, compact }: { no: string; rec: Rec; d
       whileTap={off ? undefined : { scale: 0.98 }}
       aria-label={`${s.name} 학생증 태그, ${action ? `${action} 처리` : "하원 완료"}`}
       className={`group relative block shrink-0 overflow-hidden rounded-[12px] border bg-white text-left shadow-[0_1px_2px_rgba(20,35,64,0.08)] transition-colors ${FOCUS} ${
-        compact ? "w-[236px]" : "w-full"
+        compact ? "w-[236px] md:w-full" : "w-full"
       } ${off ? "cursor-default border-[#dde2e9] opacity-60" : "border-[#d5dae2] hover:border-[#16294a]"}`}
     >
       <div className="flex h-7 items-center justify-between bg-[#16294a] px-3 text-[12px] font-bold text-white">
@@ -399,7 +422,14 @@ function IdCard({ no, rec, disabled, onTag, compact }: { no: string; rec: Rec; d
             action === "등원" ? "bg-[#e3f3eb] text-[#0a5c40]" : action === "하원" ? "bg-[#e7ecf4] text-[#1b3359]" : "bg-[#f1f2f4] text-[#5a6577]"
           }`}
         >
-          {action ? (compact ? action : `${action} 태그`) : "하원 완료"}
+          {action ? (
+            <>
+              {action}
+              <span className={compact ? "hidden md:inline" : ""}> 태그</span>
+            </>
+          ) : (
+            "하원 완료"
+          )}
         </span>
       </div>
     </motion.button>
@@ -408,18 +438,11 @@ function IdCard({ no, rec, disabled, onTag, compact }: { no: string; rec: Rec; d
 
 /* ---------------- 학부모 휴대폰 ---------------- */
 
-function ParentPhone({ today, nowMin, owner, notes }: { today: Date; nowMin: number; owner: Student; notes: Note[] }) {
+function ParentPhone({ today, nowMin, notes }: { today: Date; nowMin: number; notes: Note[] }) {
   const DOWF = ["일요일", "월요일", "화요일", "수요일", "목요일", "금요일", "토요일"];
   return (
-    <div>
-      <div className="flex items-center gap-1.5 text-[14px] font-bold text-[#2b3a55]">
-        <MessageSquareText size={17} aria-hidden />
-        학부모 휴대폰
-        <span className="font-medium text-[#5a6577]">
-          {owner.name} 학생 {owner.parent}
-        </span>
-      </div>
-      <div className="mt-3 rounded-[42px] bg-[#15181d] p-[9px] shadow-[0_18px_40px_-20px_rgba(20,35,64,0.6)]">
+    <div className="w-[232px]">
+      <div className="rounded-[42px] bg-[#15181d] p-[9px] shadow-[0_18px_40px_-20px_rgba(20,35,64,0.6)]">
         <div className="relative h-[500px] overflow-hidden rounded-[34px]">
           <Photo src="/images/demo-academy/study.jpg" alt="" className="absolute inset-0 h-full w-full" pos="40% 50%" />
           <div className="absolute inset-0 bg-[#0b1220]/55" aria-hidden />
@@ -487,7 +510,7 @@ function KioskStage({ children }: { children: React.ReactNode }) {
   }, []);
 
   return (
-    <div className="flex w-full flex-col items-center md:w-auto" style={{ ["--kh" as string]: "clamp(600px, calc(100vh - 230px), 1000px)" }}>
+    <div className="flex w-full flex-col items-center md:w-auto" style={{ ["--kh" as string]: "clamp(560px, calc(100vh - 320px), 960px)" }}>
       <div className="w-full md:w-auto md:rounded-[30px] md:bg-[#1d2128] md:px-[14px] md:pb-[10px] md:pt-[14px] md:shadow-[0_18px_40px_-18px_rgba(20,35,64,0.55)]">
         <div
           ref={screenRef}
@@ -1111,7 +1134,7 @@ function AdminPanel({
   const all = counts.all;
 
   return (
-    <section className="mt-4 overflow-hidden rounded-[14px] border border-[#cfd5de] bg-white shadow-[0_12px_30px_-18px_rgba(20,35,64,0.4)]" aria-label="관리자 화면">
+    <section className="overflow-hidden rounded-[14px] border border-[#cfd5de] bg-white shadow-[0_12px_30px_-18px_rgba(20,35,64,0.4)]" aria-label="관리자 화면">
       <div className="flex h-10 items-center gap-2 border-b border-[#e1e5eb] bg-[#f3f5f8] px-4">
         <span aria-hidden className="h-3 w-3 rounded-full bg-[#d4d8de]" />
         <span aria-hidden className="h-3 w-3 rounded-full bg-[#d4d8de]" />
