@@ -40,6 +40,7 @@ export function PageHead({ title, trail = [] }: { title: string; trail?: { href:
           </ol>
         </nav>
         <h1 className="mt-5 text-[40px] font-[800] leading-[1.1] tracking-[-0.05em] md:text-[64px]">{title}</h1>
+        <span aria-hidden className="mt-6 block h-1.5 w-14 rounded-[2px] md:mt-8 md:w-20" style={{ backgroundColor: BLUE }} />
       </div>
     </section>
   );
