@@ -15,8 +15,8 @@ export type PolicyVersion = {
 export const privacyVersions: PolicyVersion[] = [
   {
     id: "4",
-    date: "2026년 11월 1일",
-    note: "처리 목적과 상담 신청 항목을 현재 서비스와 신청 양식에 맞추고, 채팅 상담을 카카오톡 상담으로 바꾸고, 보유 기간과 권리 행사 표현을 정리",
+    date: "2026년 11월 2일",
+    note: "채팅 상담(채널톡)을 카카오톡 상담(카카오톡 채널)으로 바꾸고, 처리 목적과 상담 신청 항목을 현재 서비스와 신청 양식에 맞추고, 보유 기간과 권리 행사 표현을 정리",
     sections: [
       {
         title: "1. 처리 목적",
