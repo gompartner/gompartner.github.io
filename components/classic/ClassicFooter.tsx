@@ -28,24 +28,24 @@ export function ClassicFooter() {
             <Image src="/images/bear-avatar.webp" alt="" width={32} height={32} className="h-8 w-8 rounded-full object-cover" />
             {profile.name}
           </p>
-          <p className="mt-2.5">
-            <a href={`tel:${profile.phone.replace(/-/g, "")}`} data-gtm-cta="classic_footer_tel" className="inline-flex min-h-11 items-center hover:text-white">
+          <p className="mt-4">
+            <a href={`tel:${profile.phone.replace(/-/g, "")}`} data-gtm-cta="classic_footer_tel" className="-my-1.5 inline-block py-1.5 hover:text-white">
               전화 {profile.phone}
             </a>
           </p>
-          {profile.fax && <p className="py-2.5">팩스 {profile.fax}</p>}
-          <p>
-            <a href={`mailto:${profile.email}`} data-gtm-cta="classic_footer_email" className="inline-flex min-h-11 items-center hover:text-white">
+          {profile.fax && <p className="mt-1">팩스 {profile.fax}</p>}
+          <p className="mt-1">
+            <a href={`mailto:${profile.email}`} data-gtm-cta="classic_footer_email" className="-my-1.5 inline-block py-1.5 hover:text-white">
               이메일 {profile.email}
             </a>
           </p>
         </div>
         <nav aria-label="바닥글 메뉴">
           <h2 className="text-[14px] font-bold text-white">메뉴</h2>
-          <ul className="mt-2.5 grid grid-cols-2" role="list">
+          <ul className="mt-4 grid grid-cols-2 gap-y-2.5" role="list">
             {menu.map((m) => (
               <li key={m.href}>
-                <Link href={m.href} className="inline-flex min-h-11 items-center hover:text-white">
+                <Link href={m.href} className="-my-1.5 inline-block py-1.5 hover:text-white">
                   {m.label}
                 </Link>
               </li>
@@ -54,10 +54,10 @@ export function ClassicFooter() {
         </nav>
         <div>
           <h2 className="text-[14px] font-bold text-white">채널</h2>
-          <ul className="mt-2.5 grid grid-cols-2" role="list">
+          <ul className="mt-4 grid grid-cols-2 gap-y-2.5" role="list">
             {channels.map((c) => (
               <li key={c.href}>
-                <a href={c.href} target="_blank" rel="noopener noreferrer" className="inline-flex min-h-11 items-center hover:text-white">
+                <a href={c.href} target="_blank" rel="noopener noreferrer" className="-my-1.5 inline-block py-1.5 hover:text-white">
                   {c.label}
                   <span className="sr-only"> (새 창)</span>
                 </a>

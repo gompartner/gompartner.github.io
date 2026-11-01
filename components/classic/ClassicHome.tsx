@@ -443,9 +443,9 @@ function Services() {
             <Link
               href={s.href}
               data-gtm-cta={`classic_service_${s.href.split("/").pop()}`}
-              className="group grid grid-cols-[1fr_auto] items-center gap-x-6 gap-y-1 py-6 md:grid-cols-[minmax(0,460px)_1fr_auto] md:py-8"
+              className="group grid grid-cols-[1fr_auto] items-center gap-x-6 gap-y-1 py-6 md:grid-cols-[minmax(0,400px)_1fr_auto] md:py-8"
             >
-              <h3 className="col-start-1 row-start-1 text-[24px] font-[800] tracking-[-0.04em] transition-colors group-hover:text-[#256ef4] md:text-[34px]">
+              <h3 className="col-start-1 row-start-1 text-[20px] font-[800] tracking-[-0.04em] transition-colors group-hover:text-[#256ef4] md:text-[26px]">
                 {s.name}
               </h3>
               <p className="col-start-1 row-start-2 text-[16px] text-[#5b6370] md:col-start-2 md:row-start-1 md:text-[17px]">

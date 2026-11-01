@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import Image from "next/image";
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import { ArrowUpRight, Check, FileText } from "lucide-react";
@@ -24,6 +25,9 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
   if (!s) return {};
   return pageMeta({ title: s.metaTitle, description: s.metaDescription, path: `/classic/maintenance/${s.id}` });
 }
+
+// 문서 이미지 크기(public/images/site/hero-<id>-doc.jpg)
+const docSize: Record<string, [number, number]> = { fix: [1060, 752], takeover: [1060, 790], update: [1060, 752], monthly: [1060, 714] };
 
 const tabs = maintenanceServices.map((s) => ({ href: `/classic/maintenance/${s.id}`, label: s.title }));
 
@@ -118,7 +122,7 @@ export default async function MaintenanceDetailPage({ params }: Props) {
       <StepList steps={s.steps} title="진행 절차" id="md-process" />
 
       <section aria-labelledby="md-report" className="border-t border-[#e6e9ee]">
-        <div className={`${wrap} grid gap-8 py-16 md:grid-cols-[minmax(0,1fr)_minmax(0,1.2fr)] md:py-24`}>
+        <div className={`${wrap} grid items-center gap-10 py-16 md:grid-cols-[minmax(0,1fr)_minmax(0,1.15fr)] md:gap-14 md:py-24`}>
           <div>
             <h2 id="md-report" className={h2}>
               납품 문서
@@ -127,15 +131,28 @@ export default async function MaintenanceDetailPage({ params }: Props) {
               <FileText size={22} aria-hidden />
               {s.report.name}
             </p>
+            <ul className="mt-6 border-t-2 border-[#15171c]" role="list">
+              {s.report.items.map((item) => (
+                <li key={item} className="flex gap-2 border-b border-[#e6e9ee] py-3.5 text-[17px]">
+                  <Check size={20} strokeWidth={2.5} className="mt-[3px] shrink-0 text-[#256ef4]" aria-hidden />
+                  {item}
+                </li>
+              ))}
+            </ul>
           </div>
-          <ul className="border-t-2 border-[#15171c]" role="list">
-            {s.report.items.map((item) => (
-              <li key={item} className="flex gap-2 border-b border-[#e6e9ee] py-4 text-[17px]">
-                <Check size={20} strokeWidth={2.5} className="mt-[3px] shrink-0 text-[#256ef4]" aria-hidden />
-                {item}
-              </li>
-            ))}
-          </ul>
+          {/* 첫 화면 슬라이드와 같은 문서 이미지. 종이를 겹쳐 놓은 모양 */}
+          <div className="relative rounded-lg px-6 py-10 md:px-10 md:py-14" style={{ backgroundColor: "#0f1b3d" }}>
+            <div aria-hidden className="absolute inset-x-12 bottom-8 top-6 rotate-[4deg] rounded-md bg-white/25 md:inset-x-16" />
+            <div aria-hidden className="absolute inset-x-9 bottom-9 top-8 rotate-[2deg] rounded-md bg-white/60 md:inset-x-12" />
+            <Image
+              src={`/images/site/hero-${s.id}-doc.jpg`}
+              alt={`${s.report.name} 예시`}
+              width={docSize[s.id]?.[0] ?? 1060}
+              height={docSize[s.id]?.[1] ?? 752}
+              sizes="(min-width: 768px) 560px, 90vw"
+              className="relative h-auto w-full -rotate-[1deg] rounded-md shadow-[0_24px_50px_rgba(0,0,0,.45)]"
+            />
+          </div>
         </div>
       </section>
 

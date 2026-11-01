@@ -189,9 +189,6 @@ export default async function ClassicSamplePage({ params }: Props) {
             <Link href={p.demoUrl} prefetch={false} data-gtm-cta={`classic_sample_open_${p.id}`} className={btnLine}>
               체험하기
             </Link>
-            <Link href="/classic/homepage" className={`${more} mt-1 min-h-11 justify-center`}>
-              홈페이지 제작 안내
-            </Link>
           </div>
         </section>
       </div>
