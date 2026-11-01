@@ -1,9 +1,16 @@
 "use client";
 
 import Image from "next/image";
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import Link from "next/link";
-import { ArrowUpRight, CheckCircle2, ChevronDown, ChevronLeft, ChevronRight, Plus } from "lucide-react";
+import {
+  ArrowUpRight,
+  CheckCircle2,
+  ChevronDown,
+  ChevronLeft,
+  ChevronRight,
+  Plus,
+} from "lucide-react";
 import { faq, processSteps } from "@/data/classic/faq";
 import { maintenanceServices } from "@/data/classic/maintenance";
 import { projects } from "@/data/classic/projects";
@@ -17,11 +24,18 @@ import { FlowSteps } from "@/components/classic/pricing/StepList";
 
 const NAVY = "#0f1b3d";
 
-
 // 11-01 홈페이지 제작과 유지보수 두 가지만. 유지보수는 세부 페이지 네 개로
 const services = [
-  { href: "/classic/homepage", name: "홈페이지 제작", what: "병원, 매장, 전문직, 기업, 학원 반응형 홈페이지" },
-  ...maintenanceServices.map((m) => ({ href: `/classic/maintenance/${m.id}`, name: m.title, what: m.term })),
+  {
+    href: "/classic/homepage",
+    name: "홈페이지 제작",
+    what: "병원, 매장, 전문직, 기업, 학원 반응형 홈페이지",
+  },
+  ...maintenanceServices.map((m) => ({
+    href: `/classic/maintenance/${m.id}`,
+    name: m.title,
+    what: m.term,
+  })),
 ];
 
 // 강점. 모두 진행 절차와 자주 묻는 질문에 적힌 약속이다
@@ -37,18 +51,38 @@ const live = projects.filter((p) => p.demoUrl.startsWith("/demo/"));
 const groupOf = (p: (typeof projects)[number]) =>
   p.category === "랜딩페이지" || p.id.startsWith("landing-")
     ? "landing"
-    : p.kind === "유지보수" || ["maintenance-dashboard", "maintenance-urgent-fix", "accessibility-review"].includes(p.id)
+    : p.kind === "유지보수" ||
+        [
+          "maintenance-dashboard",
+          "maintenance-urgent-fix",
+          "accessibility-review",
+        ].includes(p.id)
       ? "maintenance"
       : PROGRAM_IDS.includes(p.id)
         ? "program"
         : "homepage";
 const catalog = [
-  { key: "homepage", href: "/classic/works", name: "업종별 홈페이지", what: "병원, 매장, 전문직, 기업, 교육 업종별 구성" },
-  { key: "landing", href: "/classic/works/landing", name: "광고 랜딩페이지", what: "상담, 예약, 사전 등록 신청 페이지" },
-].map((c) => ({ ...c, count: live.filter((p) => groupOf(p) === c.key).length }));
+  {
+    key: "homepage",
+    href: "/classic/works",
+    name: "업종별 홈페이지",
+    what: "병원, 매장, 전문직, 기업, 교육 업종별 구성",
+  },
+  {
+    key: "landing",
+    href: "/classic/works/landing",
+    name: "광고 랜딩페이지",
+    what: "상담, 예약, 사전 등록 신청 페이지",
+  },
+].map((c) => ({
+  ...c,
+  count: live.filter((p) => groupOf(p) === c.key).length,
+}));
 
-const h2 = "text-[30px] font-[800] leading-[1.25] tracking-[-0.04em] md:text-[44px]";
-const more = "inline-flex items-center gap-1 text-[15px] font-bold text-[#5b6370] hover:text-[#15171c]";
+const h2 =
+  "text-[30px] font-[800] leading-[1.25] tracking-[-0.04em] md:text-[44px]";
+const more =
+  "inline-flex items-center gap-1 text-[15px] font-bold text-[#5b6370] hover:text-[#15171c]";
 
 export function ClassicHome() {
   return (
@@ -66,11 +100,59 @@ export function ClassicHome() {
 // 첫 화면 서비스별 슬라이드(11-01): 서비스 5개, 화면 안은 서비스마다 납품하는 문서. 7초마다 넘어가고 아래 탭에 진행 막대.
 // 마우스를 올리거나 포커스가 있으면 멈추고, 움직임 줄이기 설정이면 자동으로 넘기지 않는다.
 const heroSlides = [
-  { key: "make", w: 1440, h: 900, title: "홈페이지 제작", sub: "병원, 매장, 전문직 사무실, 기업, 학원 반응형 홈페이지", points: ["업종별 법정 고지 검토", "원본 소스와 인계 문서", "1개월 무상 하자보수"], href: "/classic/homepage" },
-  { key: "fix", w: 1060, h: 752, title: "오류 수정", sub: "접속 불가, 화면 깨짐, 문의 메일 미수신", points: ["24시간 내 회신", "원인 확인 후 견적", "장애 처리 내역서"], href: "/classic/maintenance/fix" },
-  { key: "takeover", w: 1060, h: 790, title: "업체 이관", sub: "기존 업체 연락 두절 시 인수", points: ["호스팅, 도메인 계정으로 인수", "전체 백업과 구성 정리", "인수 점검 보고서"], href: "/classic/maintenance/takeover" },
-  { key: "update", w: 1060, h: 752, title: "보안 업데이트", sub: "워드프레스, 그누보드, PHP", points: ["작업 전 전체 백업", "협의한 시간에 작업", "업데이트 결과서"], href: "/classic/maintenance/update" },
-  { key: "monthly", w: 1060, h: 714, title: "월 관리", sub: "문구, 사진, 공지 수정과 정기 점검", points: ["월 건수 단위 계약", "도메인, SSL 만료 알림", "월간 점검 보고서"], href: "/classic/maintenance/monthly" },
+  {
+    key: "make",
+    w: 1440,
+    h: 900,
+    title: "홈페이지 제작",
+    sub: "병원, 매장, 전문직 사무실, 기업, 학원 반응형 홈페이지",
+    points: [
+      "업종별 법정 고지 검토",
+      "원본 소스와 인계 문서",
+      "1개월 무상 하자보수",
+    ],
+    href: "/classic/homepage",
+  },
+  {
+    key: "fix",
+    w: 1060,
+    h: 752,
+    title: "오류 수정",
+    sub: "접속 불가, 화면 깨짐, 문의 메일 미수신",
+    points: ["24시간 내 회신", "원인 확인 후 견적", "장애 처리 내역서"],
+    href: "/classic/maintenance/fix",
+  },
+  {
+    key: "takeover",
+    w: 1060,
+    h: 790,
+    title: "업체 이관",
+    sub: "기존 업체 연락 두절 시 인수",
+    points: [
+      "호스팅, 도메인 계정으로 인수",
+      "전체 백업과 구성 정리",
+      "인수 점검 보고서",
+    ],
+    href: "/classic/maintenance/takeover",
+  },
+  {
+    key: "update",
+    w: 1060,
+    h: 752,
+    title: "보안 업데이트",
+    sub: "워드프레스, 그누보드, PHP",
+    points: ["작업 전 전체 백업", "협의한 시간에 작업", "업데이트 결과서"],
+    href: "/classic/maintenance/update",
+  },
+  {
+    key: "monthly",
+    w: 1060,
+    h: 714,
+    title: "월 관리",
+    sub: "문구, 사진, 공지 수정과 정기 점검",
+    points: ["월 건수 단위 계약", "도메인, SSL 만료 알림", "월간 점검 보고서"],
+    href: "/classic/maintenance/monthly",
+  },
 ];
 const HERO_MS = 7000;
 
@@ -79,15 +161,21 @@ function Hero() {
   const [hold, setHold] = useState(false);
   const [reduced, setReduced] = useState(false);
   useEffect(() => {
-    const f = requestAnimationFrame(() => setReduced(window.matchMedia("(prefers-reduced-motion: reduce)").matches));
+    const f = requestAnimationFrame(() =>
+      setReduced(window.matchMedia("(prefers-reduced-motion: reduce)").matches),
+    );
     return () => cancelAnimationFrame(f);
   }, []);
   useEffect(() => {
     if (hold || reduced) return;
-    const t = window.setTimeout(() => setCur((c) => (c + 1) % heroSlides.length), HERO_MS);
+    const t = window.setTimeout(
+      () => setCur((c) => (c + 1) % heroSlides.length),
+      HERO_MS,
+    );
     return () => window.clearTimeout(t);
   }, [cur, hold, reduced]);
   const go = (n: number) => setCur((n + heroSlides.length) % heroSlides.length);
+  const touchX = useRef(0);
   return (
     <section
       aria-labelledby="c-hero"
@@ -103,61 +191,114 @@ function Hero() {
         곰파트너 홈페이지 제작과 유지보수
       </h1>
       {/* 옅은 모눈 배경 */}
-      <div aria-hidden className="pointer-events-none absolute inset-0 opacity-[0.07]" style={{ backgroundImage: "linear-gradient(#fff 1px, transparent 1px), linear-gradient(90deg, #fff 1px, transparent 1px)", backgroundSize: "48px 48px" }} />
-      <div className="relative mx-auto grid w-full max-w-[1248px] px-4 pb-8 pt-12 md:min-h-[620px] md:px-6 md:pb-10 md:pt-16">
-        {heroSlides.map((sl, i) => (
-          <div
-            key={sl.key}
-            role="group"
-            aria-roledescription="slide"
-            aria-label={`${i + 1} / ${heroSlides.length}, ${sl.title}`}
-            aria-hidden={i !== cur}
-            className={cn("col-start-1 row-start-1 grid items-center gap-10 transition-opacity duration-500 motion-reduce:transition-none md:grid-cols-[1fr_1.15fr] md:gap-14", i === cur ? "opacity-100" : "pointer-events-none opacity-0")}
-          >
-            <div>
-              <p className="text-[15px] font-bold tabular-nums text-[#8fb4ff]">
-                {String(i + 1).padStart(2, "0")} / {String(heroSlides.length).padStart(2, "0")}
-              </p>
-              <p className="mt-3 break-keep text-[40px] font-[800] leading-[1.12] tracking-[-0.05em] md:text-[64px]">{sl.title}</p>
-              <p className="mt-4 max-w-[520px] break-keep text-[17px] leading-[1.7] text-[#c9d3e6] md:text-[19px]">{sl.sub}</p>
-              <ul className="mt-6 space-y-2.5" role="list">
-                {sl.points.map((pt) => (
-                  <li key={pt} className="flex items-center gap-2.5 text-[16px] font-bold md:text-[17px]">
-                    <CheckCircle2 size={20} aria-hidden className="shrink-0 text-[#8fb4ff]" />
-                    {pt}
-                  </li>
-                ))}
-              </ul>
-              <div className="mt-8 flex flex-wrap gap-3">
-                <Link href="/classic/contact" tabIndex={i === cur ? 0 : -1} data-gtm-cta={`classic_hero_contact_${sl.key}`} className="inline-flex h-12 items-center rounded-md bg-[#256ef4] px-6 text-[16px] font-bold text-white transition-colors hover:bg-[#0b50d0]">
-                  상담 신청
-                </Link>
-                <Link href={sl.href} tabIndex={i === cur ? 0 : -1} className="inline-flex h-12 items-center gap-1 rounded-md border border-white/40 px-6 text-[16px] font-bold text-white transition-colors hover:bg-white/10">
-                  자세히 보기 <ChevronRight size={16} aria-hidden />
-                </Link>
+      <div
+        aria-hidden
+        className="pointer-events-none absolute inset-0 opacity-[0.07]"
+        style={{
+          backgroundImage:
+            "linear-gradient(#fff 1px, transparent 1px), linear-gradient(90deg, #fff 1px, transparent 1px)",
+          backgroundSize: "48px 48px",
+        }}
+      />
+      {/* 좌우로 미는 슬라이드. 휴대폰은 손가락으로 밀어 넘긴다 */}
+      <div
+        className="relative overflow-hidden"
+        onTouchStart={(e) => {
+          touchX.current = e.touches[0].clientX;
+        }}
+        onTouchEnd={(e) => {
+          const dx = e.changedTouches[0].clientX - touchX.current;
+          if (Math.abs(dx) > 50) go(cur + (dx < 0 ? 1 : -1));
+        }}
+      >
+        <div
+          className="flex transition-transform duration-700 ease-[cubic-bezier(.22,.61,.36,1)] motion-reduce:transition-none"
+          style={{ transform: `translateX(-${cur * 100}%)` }}
+        >
+          {heroSlides.map((sl, i) => (
+            <div
+              key={sl.key}
+              role="group"
+              aria-roledescription="slide"
+              aria-label={`${i + 1} / ${heroSlides.length}, ${sl.title}`}
+              aria-hidden={i !== cur}
+              className="w-full shrink-0"
+            >
+              <div className="mx-auto grid w-full max-w-[1248px] items-center gap-10 px-4 pb-8 pt-12 md:min-h-[620px] md:grid-cols-[1fr_1.15fr] md:gap-14 md:px-6 md:pb-10 md:pt-16">
+                <div>
+                  <p className="text-[15px] font-bold tabular-nums text-[#8fb4ff]">
+                    {String(i + 1).padStart(2, "0")} /{" "}
+                    {String(heroSlides.length).padStart(2, "0")}
+                  </p>
+                  <p className="mt-3 break-keep text-[40px] font-[800] leading-[1.12] tracking-[-0.05em] md:text-[64px]">
+                    {sl.title}
+                  </p>
+                  <p className="mt-4 max-w-[520px] break-keep text-[17px] leading-[1.7] text-[#c9d3e6] md:text-[19px]">
+                    {sl.sub}
+                  </p>
+                  <ul className="mt-6 space-y-2.5" role="list">
+                    {sl.points.map((pt) => (
+                      <li
+                        key={pt}
+                        className="flex items-center gap-2.5 text-[16px] font-bold md:text-[17px]"
+                      >
+                        <CheckCircle2
+                          size={20}
+                          aria-hidden
+                          className="shrink-0 text-[#8fb4ff]"
+                        />
+                        {pt}
+                      </li>
+                    ))}
+                  </ul>
+                  <div className="mt-8 flex flex-wrap gap-3">
+                    <Link
+                      href="/classic/contact"
+                      tabIndex={i === cur ? 0 : -1}
+                      data-gtm-cta={`classic_hero_contact_${sl.key}`}
+                      className="inline-flex h-12 items-center rounded-md bg-[#256ef4] px-6 text-[16px] font-bold text-white transition-colors hover:bg-[#0b50d0]"
+                    >
+                      상담 신청
+                    </Link>
+                    <Link
+                      href={sl.href}
+                      tabIndex={i === cur ? 0 : -1}
+                      className="inline-flex h-12 items-center gap-1 rounded-md border border-white/40 px-6 text-[16px] font-bold text-white transition-colors hover:bg-white/10"
+                    >
+                      자세히 보기 <ChevronRight size={16} aria-hidden />
+                    </Link>
+                  </div>
+                </div>
+                {/* 브라우저 틀 없이 문서 종이를 겹쳐 놓는다. 앞장은 이 서비스에서 실제로 드리는 문서 모양 */}
+                <div
+                  aria-hidden
+                  className="relative mx-auto w-full max-w-[640px] px-3 py-6 md:px-0"
+                >
+                  <div className="absolute inset-x-8 bottom-3 top-1 rotate-[5deg] rounded-md bg-white/25" />
+                  <div className="absolute inset-x-5 bottom-4 top-3 rotate-[2.5deg] rounded-md bg-white/60 shadow-[0_10px_30px_rgba(0,0,0,.25)]" />
+                  <Image
+                    src={`/images/site/hero-${sl.key}-doc.jpg`}
+                    alt=""
+                    width={sl.w}
+                    height={sl.h}
+                    priority={i === 0}
+                    sizes="(min-width: 768px) 640px, 92vw"
+                    className="relative h-auto w-full -rotate-[1deg] rounded-md shadow-[0_30px_60px_rgba(0,0,0,.45)]"
+                  />
+                </div>
               </div>
             </div>
-            {/* 브라우저 틀 없이 문서 종이를 겹쳐 놓는다. 앞장은 이 서비스에서 실제로 드리는 문서 모양 */}
-            <div aria-hidden className="relative mx-auto w-full max-w-[640px] px-3 py-6 md:px-0">
-              <div className="absolute inset-x-8 bottom-3 top-1 rotate-[5deg] rounded-md bg-white/25" />
-              <div className="absolute inset-x-5 bottom-4 top-3 rotate-[2.5deg] rounded-md bg-white/60 shadow-[0_10px_30px_rgba(0,0,0,.25)]" />
-              <Image
-                src={`/images/site/hero-${sl.key}-doc.jpg`}
-                alt=""
-                width={sl.w}
-                height={sl.h}
-                priority={i === 0}
-                sizes="(min-width: 768px) 640px, 92vw"
-                className="relative h-auto w-full -rotate-[1deg] rounded-md shadow-[0_30px_60px_rgba(0,0,0,.45)]"
-              />
-            </div>
-          </div>
-        ))}
+          ))}
+        </div>
       </div>
       {/* 서비스 탭: 진행 막대가 차오르면 다음 서비스로 */}
       <div className="relative border-t border-white/10">
         <div className="mx-auto flex w-full max-w-[1248px] items-stretch px-4 md:px-6">
-          <div className="flex min-w-0 flex-1 overflow-x-auto" role="tablist" aria-label="서비스 선택">
+          <div
+            className="flex min-w-0 flex-1 overflow-x-auto"
+            role="tablist"
+            aria-label="서비스 선택"
+          >
             {heroSlides.map((sl, i) => (
               <button
                 key={sl.key}
@@ -165,20 +306,48 @@ function Hero() {
                 role="tab"
                 aria-selected={i === cur}
                 onClick={() => go(i)}
-                className={cn("relative shrink-0 whitespace-nowrap px-4 py-4 text-left text-[14px] font-bold transition-colors md:flex-1 md:px-5 md:py-5 md:text-[16px]", i === cur ? "text-white" : "text-white/55 hover:text-white")}
+                className={cn(
+                  "relative shrink-0 whitespace-nowrap px-4 py-4 text-left text-[14px] font-bold transition-colors md:flex-1 md:px-5 md:py-5 md:text-[16px]",
+                  i === cur ? "text-white" : "text-white/55 hover:text-white",
+                )}
               >
                 {sl.title}
-                <span aria-hidden className="absolute inset-x-0 top-0 h-[3px] bg-white/10">
-                  {i === cur && <span key={`${cur}-${hold}`} className="block h-full bg-[#8fb4ff]" style={reduced || hold ? { width: "100%" } : { animation: `hero-progress ${HERO_MS}ms linear forwards` }} />}
+                <span
+                  aria-hidden
+                  className="absolute inset-x-0 top-0 h-[3px] bg-white/10"
+                >
+                  {i === cur && (
+                    <span
+                      key={`${cur}-${hold}`}
+                      className="block h-full bg-[#8fb4ff]"
+                      style={
+                        reduced || hold
+                          ? { width: "100%" }
+                          : {
+                              animation: `hero-progress ${HERO_MS}ms linear forwards`,
+                            }
+                      }
+                    />
+                  )}
                 </span>
               </button>
             ))}
           </div>
           <div className="hidden items-center gap-2 pl-4 md:flex">
-            <button type="button" onClick={() => go(cur - 1)} aria-label="이전 서비스" className="grid h-10 w-10 place-items-center rounded-full border border-white/30 hover:bg-white/10">
+            <button
+              type="button"
+              onClick={() => go(cur - 1)}
+              aria-label="이전 서비스"
+              className="grid h-10 w-10 place-items-center rounded-full border border-white/30 hover:bg-white/10"
+            >
               <ChevronLeft size={18} aria-hidden />
             </button>
-            <button type="button" onClick={() => go(cur + 1)} aria-label="다음 서비스" className="grid h-10 w-10 place-items-center rounded-full border border-white/30 hover:bg-white/10">
+            <button
+              type="button"
+              onClick={() => go(cur + 1)}
+              aria-label="다음 서비스"
+              className="grid h-10 w-10 place-items-center rounded-full border border-white/30 hover:bg-white/10"
+            >
               <ChevronRight size={18} aria-hidden />
             </button>
           </div>
@@ -190,17 +359,34 @@ function Hero() {
 
 function Strengths() {
   return (
-    <section aria-labelledby="c-strengths" className="border-b border-[#e6e9ee]">
+    <section
+      aria-labelledby="c-strengths"
+      className="border-b border-[#e6e9ee]"
+    >
       <h2 id="c-strengths" className="sr-only">
         곰파트너 납품 기준
       </h2>
-      <ul className="mx-auto grid w-full max-w-[1248px] gap-px px-4 py-10 sm:grid-cols-2 md:px-6 md:py-12 lg:grid-cols-4" role="list">
+      <ul
+        className="mx-auto grid w-full max-w-[1248px] gap-px px-4 py-10 sm:grid-cols-2 md:px-6 md:py-12 lg:grid-cols-4"
+        role="list"
+      >
         {strengths.map((s) => (
-          <li key={s.name} className="flex items-start gap-3 py-3 lg:px-4 lg:first:pl-0">
-            <CheckCircle2 size={24} aria-hidden className="mt-0.5 shrink-0 text-[#256ef4]" />
+          <li
+            key={s.name}
+            className="flex items-start gap-3 py-3 lg:px-4 lg:first:pl-0"
+          >
+            <CheckCircle2
+              size={24}
+              aria-hidden
+              className="mt-0.5 shrink-0 text-[#256ef4]"
+            />
             <span>
-              <span className="block text-[18px] font-[800] tracking-[-0.03em] md:text-[19px]">{s.name}</span>
-              <span className="mt-0.5 block text-[15px] text-[#5b6370]">{s.what}</span>
+              <span className="block text-[18px] font-[800] tracking-[-0.03em] md:text-[19px]">
+                {s.name}
+              </span>
+              <span className="mt-0.5 block text-[15px] text-[#5b6370]">
+                {s.what}
+              </span>
             </span>
           </li>
         ))}
@@ -211,7 +397,10 @@ function Strengths() {
 
 function Services() {
   return (
-    <section aria-labelledby="c-services" className="mx-auto w-full max-w-[1248px] scroll-mt-16 px-4 py-20 md:scroll-mt-[76px] md:px-6 md:py-28">
+    <section
+      aria-labelledby="c-services"
+      className="mx-auto w-full max-w-[1248px] scroll-mt-16 px-4 py-20 md:scroll-mt-[76px] md:px-6 md:py-28"
+    >
       <h2 id="c-services" className={h2}>
         서비스
       </h2>
@@ -223,8 +412,12 @@ function Services() {
               data-gtm-cta={`classic_service_${s.href.split("/").pop()}`}
               className="group grid grid-cols-[1fr_auto] items-center gap-x-6 gap-y-1 py-6 md:grid-cols-[minmax(0,360px)_1fr_auto] md:py-8"
             >
-              <h3 className="col-start-1 row-start-1 text-[24px] font-[800] tracking-[-0.04em] transition-colors group-hover:text-[#256ef4] md:text-[34px]">{s.name}</h3>
-              <p className="col-start-1 row-start-2 text-[16px] text-[#5b6370] md:col-start-2 md:row-start-1 md:text-[17px]">{s.what}</p>
+              <h3 className="col-start-1 row-start-1 text-[24px] font-[800] tracking-[-0.04em] transition-colors group-hover:text-[#256ef4] md:text-[34px]">
+                {s.name}
+              </h3>
+              <p className="col-start-1 row-start-2 text-[16px] text-[#5b6370] md:col-start-2 md:row-start-1 md:text-[17px]">
+                {s.what}
+              </p>
               <ArrowUpRight
                 size={28}
                 aria-hidden
@@ -248,12 +441,21 @@ function Catalog() {
         <ul className="mt-10 grid gap-3 sm:grid-cols-2 md:gap-4" role="list">
           {catalog.map((c) => (
             <li key={c.key}>
-              <Link href={c.href} className="group flex h-full flex-col rounded-md border border-[#d9dee5] bg-white p-6 transition-colors hover:border-[#256ef4]">
+              <Link
+                href={c.href}
+                className="group flex h-full flex-col rounded-md border border-[#d9dee5] bg-white p-6 transition-colors hover:border-[#256ef4]"
+              >
                 <span className="flex items-baseline justify-between gap-3">
-                  <h3 className="text-[20px] font-[800] tracking-[-0.03em] group-hover:text-[#256ef4] md:text-[22px]">{c.name}</h3>
-                  <span className="shrink-0 text-[15px] font-bold tabular-nums text-[#5b6370]">{c.count}개</span>
+                  <h3 className="text-[20px] font-[800] tracking-[-0.03em] group-hover:text-[#256ef4] md:text-[22px]">
+                    {c.name}
+                  </h3>
+                  <span className="shrink-0 text-[15px] font-bold tabular-nums text-[#5b6370]">
+                    {c.count}개
+                  </span>
                 </span>
-                <span className="mt-2 flex-1 text-[15px] leading-[1.6] text-[#5b6370] md:text-[16px]">{c.what}</span>
+                <span className="mt-2 flex-1 text-[15px] leading-[1.6] text-[#5b6370] md:text-[16px]">
+                  {c.what}
+                </span>
                 <span className="mt-5 inline-flex items-center gap-1 text-[15px] font-bold text-[#256ef4]">
                   보기 <ChevronRight size={16} aria-hidden />
                 </span>
@@ -268,7 +470,10 @@ function Catalog() {
 
 function Process() {
   return (
-    <section aria-labelledby="c-process" className="mx-auto w-full max-w-[1248px] scroll-mt-16 px-4 py-20 md:scroll-mt-[76px] md:px-6 md:py-28">
+    <section
+      aria-labelledby="c-process"
+      className="mx-auto w-full max-w-[1248px] scroll-mt-16 px-4 py-20 md:scroll-mt-[76px] md:px-6 md:py-28"
+    >
       <h2 id="c-process" className={h2}>
         진행 절차
       </h2>
@@ -294,10 +499,18 @@ function Faq() {
             <li key={f.q} className="border-b border-[#e6e9ee]">
               <details className="group">
                 <summary className="flex cursor-pointer list-none items-start gap-4 py-5 md:py-6 [&::-webkit-details-marker]:hidden">
-                  <span className="min-w-0 flex-1 text-[17px] font-bold leading-[1.5] tracking-[-0.02em] md:text-[19px]">{f.q}</span>
-                  <ChevronDown size={22} aria-hidden className="mt-0.5 shrink-0 text-[#6b7280] transition-transform duration-200 group-open:rotate-180 motion-reduce:transition-none" />
+                  <span className="min-w-0 flex-1 text-[17px] font-bold leading-[1.5] tracking-[-0.02em] md:text-[19px]">
+                    {f.q}
+                  </span>
+                  <ChevronDown
+                    size={22}
+                    aria-hidden
+                    className="mt-0.5 shrink-0 text-[#6b7280] transition-transform duration-200 group-open:rotate-180 motion-reduce:transition-none"
+                  />
                 </summary>
-                <p className="pb-6 text-[16px] leading-[1.75] text-[#3d4450] md:pr-12 md:text-[17px]">{f.a}</p>
+                <p className="pb-6 text-[16px] leading-[1.75] text-[#3d4450] md:pr-12 md:text-[17px]">
+                  {f.a}
+                </p>
               </details>
             </li>
           ))}
@@ -306,4 +519,3 @@ function Faq() {
     </section>
   );
 }
-
