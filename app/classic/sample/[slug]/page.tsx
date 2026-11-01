@@ -177,9 +177,11 @@ export default async function ClassicSamplePage({ params }: Props) {
           ) : (
             <>
               <h2 id="c-price" className="border-b-2 border-[#15171c] pb-3 text-[18px] font-[800] tracking-[-0.02em]">
-                업무 프로그램
+                {p.category === "앱" ? "앱 제작" : p.category === "키오스크" ? "키오스크 화면 제작" : "업무 프로그램"}
               </h2>
-              <p className="mt-5 text-[16px] leading-[1.7] text-[#5b6370] md:text-[17px]">필요한 화면 수와 사용자 범위를 확인한 뒤 별도로 견적을 드립니다.</p>
+              <p className="mt-5 text-[16px] leading-[1.7] text-[#5b6370] md:text-[17px]">
+                {p.category === "키오스크" ? "현장 흐름과 장비 사양을 확인한 뒤 화면 범위로 견적을 드립니다." : "필요한 화면과 기능 목록을 확정한 뒤 그 범위로 견적을 드립니다."}
+              </p>
             </>
           )}
           <p className="mt-5 text-[15px] leading-[1.65] text-[#5b6370] md:text-[16px]">금액과 일정은 상담 신청 내용을 검토한 뒤 견적서로 안내합니다.</p>

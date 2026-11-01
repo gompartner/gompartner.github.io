@@ -41,6 +41,10 @@ const LandingStampTourDemo = dynamic(() => import("@/components/demos/LandingSta
 const LandingZineFairDemo = dynamic(() => import("@/components/demos/LandingZineFairDemo").then((m) => m.LandingZineFairDemo));
 const LandingLeatherClassDemo = dynamic(() => import("@/components/demos/LandingLeatherClassDemo").then((m) => m.LandingLeatherClassDemo));
 const MaintenanceUrgentFixDemo = dynamic(() => import("@/components/demos/MaintenanceUrgentFixDemo").then((m) => m.MaintenanceUrgentFixDemo));
+const AppAcademyDemo = dynamic(() => import("@/components/demos/AppAcademyDemo").then((m) => m.AppAcademyDemo));
+const AppPilatesDemo = dynamic(() => import("@/components/demos/AppPilatesDemo").then((m) => m.AppPilatesDemo));
+const KioskClinicDemo = dynamic(() => import("@/components/demos/KioskClinicDemo").then((m) => m.KioskClinicDemo));
+const KioskAcademyDemo = dynamic(() => import("@/components/demos/KioskAcademyDemo").then((m) => m.KioskAcademyDemo));
 const LandingWaterRentalDemo = dynamic(() => import("@/components/demos/LandingWaterRentalDemo").then((m) => m.LandingWaterRentalDemo));
 const ShopAdminDemo = dynamic(() => import("@/components/demos/ShopAdminDemo").then((m) => m.ShopAdminDemo));
 const RoasteryDemo = dynamic(() => import("@/components/demos/RoasteryDemo").then((m) => m.RoasteryDemo));
@@ -93,6 +97,10 @@ const demoComponents: Record<string, ComponentType> = {
   "pilates-studio": PilatesStudioDemo,
   "flower-expo": FlowerExpoDemo,
   "bakery-cafe": BakeryCafeDemo,
+  "app-academy": AppAcademyDemo,
+  "app-pilates": AppPilatesDemo,
+  "kiosk-clinic": KioskClinicDemo,
+  "kiosk-academy": KioskAcademyDemo,
   "landing-water-rental": LandingWaterRentalDemo,
   "landing-coding-camp": LandingCodingCampDemo,
   "landing-move-clean": LandingMoveCleanDemo,

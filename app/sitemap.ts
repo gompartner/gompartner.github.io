@@ -54,6 +54,8 @@ export default function sitemap(): MetadataRoute.Sitemap {
     { path: "/classic/works", priority: 0.7, files: ["app/classic/works/page.tsx", "components/classic/works/samples.ts"] },
     ...industries.map((i) => ({ path: `/classic/works/${i.slug}`, priority: 0.7, files: ["app/classic/works/[slug]/page.tsx", "data/classic/industries.ts"] })),
     { path: "/classic/works/landing", priority: 0.6, files: ["app/classic/works/[slug]/page.tsx", "components/classic/works/samples.ts"] },
+    { path: "/classic/works/app", priority: 0.6, files: ["app/classic/works/[slug]/page.tsx", "components/classic/works/samples.ts"] },
+    { path: "/classic/works/kiosk", priority: 0.6, files: ["app/classic/works/[slug]/page.tsx", "components/classic/works/samples.ts"] },
 
     ...[...catalogProjects, ...demoProjects.filter(isProgram)].map((p) => ({ path: `/classic/sample/${slugOf(p.demoUrl)}`, priority: 0.5, files: ["app/classic/sample/[slug]/page.tsx", "components/classic/works/samples.ts"] })),
 

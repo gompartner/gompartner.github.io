@@ -51,6 +51,24 @@ export const groups: { slug: string; label: string; title: string; description: 
     match: isLanding,
   },
   {
+    slug: "app",
+    label: "앱",
+    title: "앱 제작",
+    description: "예약, 출결, 회원권처럼 고객이 휴대폰으로 쓰는 앱 카탈로그입니다. 화면을 직접 눌러 볼 수 있습니다.",
+    keywords: ["앱 제작", "앱 개발", "예약 앱", "학원 앱"],
+    needs: ["푸시 알림", "예약, 출결", "회원권, 적립", "관리자 웹"],
+    match: (p) => p.category === "앱",
+  },
+  {
+    slug: "kiosk",
+    label: "키오스크",
+    title: "키오스크 화면 제작",
+    description: "병원 접수, 학원 출결처럼 현장에서 직접 누르는 키오스크 화면 카탈로그입니다.",
+    keywords: ["키오스크 제작", "접수 키오스크", "출결 키오스크", "키오스크 프로그램"],
+    needs: ["큰 글씨, 음성 안내", "대기번호 출력", "QR, 번호 입력", "관리자 화면"],
+    match: (p) => p.category === "키오스크",
+  },
+  {
     slug: "maintenance",
     label: "유지보수",
     title: "홈페이지 유지보수",
@@ -66,8 +84,8 @@ export const homepageProjects = demoProjects.filter((p) => !groups.some((g) => g
 
 export const groupOf = (p: Project) => groups.find((g) => g.match(p));
 
-/** 카탈로그로 보여 주는 묶음. 업종 홈페이지와 랜딩(11-01 되살림). 업무 프로그램은 서비스 페이지에서 화면으로 보여 준다 */
-export const catalogGroups = groups.filter((g) => g.slug === "landing");
+/** 카탈로그로 보여 주는 묶음. 업종 홈페이지, 랜딩, 앱, 키오스크(11-01). 업무 프로그램은 서비스 페이지에서 화면으로 보여 준다 */
+export const catalogGroups = groups.filter((g) => ["landing", "app", "kiosk"].includes(g.slug));
 /** 카탈로그 목록에 나오는 것(업종 홈페이지와 랜딩) */
 export const catalogProjects = demoProjects.filter((p) => !isProgram(p) && !isMaintenance(p));
 

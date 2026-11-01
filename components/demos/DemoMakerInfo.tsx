@@ -5,6 +5,10 @@ import { usePathname } from "next/navigation";
 // 데모 바닥글 저작권 줄. 11-01 사용자 결정: 실제 업체 사이트처럼 그 데모의 업종 상호로 저작권 한 줄만 둔다.
 // 상호는 각 데모 머리글 로고와 같은 업종 이름이다. 표에 없는 데모(업무 프로그램 등)는 곰파트너로 둔다.
 const NAMES: Record<string, string> = {
+  "app-academy": "수학 영어 학원",
+  "app-pilates": "필라테스 스튜디오",
+  "kiosk-clinic": "내과의원",
+  "kiosk-academy": "영어 학원",
   "online-store": "도자기 공방",
   pension: "바다 펜션",
   company: "정밀가공 제조",
