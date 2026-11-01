@@ -23,13 +23,13 @@ export function KakaoChat() {
 }
 
 // 카카오 디자인 가이드(developers.kakao.com/docs/ko/kakaologin/design-guide): 바탕 #FEE500, 심볼 #000000,
-// 레이블 #000000 85%, 모서리 12px, 규정 밖 색 금지(마우스 올림 색 변화도 넣지 않음).
-// 자리마다 넘어온 클래스에서 색과 모서리만 빼고 가이드 값으로 바꾼다(크기, 테두리, 그림자는 그대로)
-const GUIDE_CLASS = /^(hover:)?bg-|^text-(white|accent-foreground|foreground)|^border-white|^rounded/;
+// 레이블 #000000 85%, 규정 밖 색 금지(마우스 올림 색 변화도 넣지 않음). 모서리는 가이드의 12px 대신 사이트 버튼 규격을 따른다(11-02 사용자).
+// 자리마다 넘어온 클래스에서 색만 빼고 가이드 값으로 바꾼다(크기, 모서리, 테두리, 그림자는 그대로)
+const GUIDE_CLASS = /^(hover:)?bg-|^text-(white|accent-foreground|foreground)|^border-white/;
 function kakaoColors(className: string) {
   const kept = className.split(/\s+/).filter((c) => c && !GUIDE_CLASS.test(c));
   const gap = kept.some((c) => c.startsWith("gap-")) ? [] : ["gap-2"];
-  return [...kept, ...gap, "rounded-[12px]", "bg-[#FEE500]", "text-black/85"].join(" ");
+  return [...kept, ...gap, "bg-[#FEE500]", "text-black/85"].join(" ");
 }
 
 // 카카오 심볼(검은 말풍선). simple-icons의 KakaoTalk 아이콘에서 말풍선 모양만 옮김
