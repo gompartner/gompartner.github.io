@@ -275,7 +275,7 @@ function CameraRig({ phase, reduced, onHome }: { phase: "look" | "zoom" | "back"
  * zoomSignal: 숫자가 바뀔 때마다 키오스크 앞으로 다가간다(바깥 버튼, 학생증 태그 등에서 쓰기).
  * paused: 장면이 가려져 있을 때 그리기를 멈춘다.
  */
-export function KioskScene({ place, children, tv, className = "", zoomSignal = 0, paused = false }: { place: Place; children: ReactNode; /** 병원 로비 벽 TV에 띄울 화면(640x352 px로 그림) */ tv?: ReactNode; className?: string; zoomSignal?: number; paused?: boolean }) {
+export function KioskScene({ place, children, tv, phone, className = "", zoomSignal = 0, paused = false }: { place: Place; children: ReactNode; /** 병원 로비 벽 TV에 띄울 화면(640x352 px로 그림) */ tv?: ReactNode; /** 접수 뒤 휴대폰 대기 화면(장면 오른쪽 아래) */ phone?: ReactNode; className?: string; zoomSignal?: number; paused?: boolean }) {
   const screenRef = useRef<HTMLDivElement>(null);
   const tvRef = useRef<HTMLDivElement>(null);
   const [phase, setPhase] = useState<"look" | "zoom" | "back">("look");
@@ -364,6 +364,7 @@ export function KioskScene({ place, children, tv, className = "", zoomSignal = 0
           키오스크 사용해 보기
         </button>
       )}
+      {phone ? <div className="pointer-events-auto absolute bottom-20 right-4 z-[40] w-[236px]">{phone}</div> : null}
       {active ? (
         <button type="button" onClick={leave} className="absolute left-4 top-4 z-[40] rounded-full bg-white/95 px-4 py-2 text-[14px] font-bold text-[#15171c] shadow-[0_6px_16px_rgba(0,0,0,.15)]">
           공간 보기
