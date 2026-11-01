@@ -9,7 +9,7 @@ import { maskName, maskPhone } from "@/components/demos/LeadReceivedPanel";
 import { DemoMakerInfo } from "@/components/demos/DemoMakerInfo";
 
 /* 아파트 분양 홍보관 샘플: 가상의 곰파트너 아파트(ㅎㄷ시). 사업지, 견본주택 주소, 분양가, 손님 이름은 모두 가상이다.
-   첫 화면 사진 출처: Pexels 사진 28456460
+   첫 화면 사진 출처: Pexels 사진 28456460. 세대안내 평면도 그림(plan-59, 84, 109): AI 생성 (Z-Image-Turbo)
 
    국내 분양 홈페이지 공통 구성(참고): 메뉴는 사업개요, 입지환경, 단지안내, 세대안내(타입별 평면도), 분양안내(분양 일정,
    입주자모집공고, 분양가), 견본주택(방문예약, 오시는 길), 관심고객등록. 첫 화면은 큰 조감도와 "견본주택 오픈" 문구,
@@ -80,11 +80,6 @@ function M2() {
 /* ---------- 타입 ---------- */
 
 type TypeId = "59" | "84" | "109";
-interface Room {
-  n: string;
-  r: [number, number, number, number];
-  kind: "live" | "bed" | "wet" | "etc" | "bal";
-}
 interface UnitType {
   id: TypeId;
   excl: number;
@@ -98,9 +93,6 @@ interface UnitType {
   /** 기준층 분양가 */
   price: number;
   balcony: number;
-  w: number;
-  d: number;
-  plan: Room[];
 }
 
 const TYPES: UnitType[] = [
@@ -116,21 +108,6 @@ const TYPES: UnitType[] = [
     tags: ["3Bay 판상형", "안방 드레스룸", "주방 창 있음"],
     price: 548000000,
     balcony: 12800000,
-    w: 11,
-    d: 9.7,
-    plan: [
-      { n: "침실3", r: [0, 0, 3, 3.6], kind: "bed" },
-      { n: "욕실1", r: [3, 0, 5, 2.4], kind: "wet" },
-      { n: "현관", r: [5, 0, 7, 2.4], kind: "etc" },
-      { n: "", r: [3, 2.4, 7, 3.6], kind: "etc" },
-      { n: "주방", r: [7, 0, 9.2, 3.6], kind: "live" },
-      { n: "욕실2", r: [9.2, 0, 11, 2.2], kind: "wet" },
-      { n: "드레스룸", r: [9.2, 2.2, 11, 3.6], kind: "etc" },
-      { n: "침실2", r: [0, 3.6, 3, 8.4], kind: "bed" },
-      { n: "거실", r: [3, 3.6, 7.4, 8.4], kind: "live" },
-      { n: "안방", r: [7.4, 3.6, 11, 8.4], kind: "bed" },
-      { n: "발코니", r: [0, 8.4, 11, 9.7], kind: "bal" },
-    ],
   },
   {
     id: "84",
@@ -144,22 +121,6 @@ const TYPES: UnitType[] = [
     tags: ["4Bay 판상형", "주방 팬트리", "안방 드레스룸"],
     price: 719000000,
     balcony: 16500000,
-    w: 14,
-    d: 10.4,
-    plan: [
-      { n: "현관", r: [0, 0, 2.2, 2.6], kind: "etc" },
-      { n: "욕실1", r: [2.2, 0, 4.4, 2.6], kind: "wet" },
-      { n: "팬트리", r: [4.4, 0, 6, 2.6], kind: "etc" },
-      { n: "", r: [0, 2.6, 6, 4.6], kind: "etc" },
-      { n: "주방", r: [6, 0, 10.2, 4], kind: "live" },
-      { n: "거실", r: [6, 4, 10.2, 9], kind: "live" },
-      { n: "침실2", r: [0, 4.6, 3, 9], kind: "bed" },
-      { n: "침실3", r: [3, 4.6, 6, 9], kind: "bed" },
-      { n: "드레스룸", r: [10.2, 0, 12.2, 3.4], kind: "etc" },
-      { n: "욕실2", r: [12.2, 0, 14, 3.4], kind: "wet" },
-      { n: "안방", r: [10.2, 3.4, 14, 9], kind: "bed" },
-      { n: "발코니", r: [0, 9, 14, 10.4], kind: "bal" },
-    ],
   },
   {
     id: "109",
@@ -173,22 +134,6 @@ const TYPES: UnitType[] = [
     tags: ["4Bay 판상형", "침실 4개", "안방 드레스룸"],
     price: 926000000,
     balcony: 19800000,
-    w: 16,
-    d: 11,
-    plan: [
-      { n: "침실4", r: [0, 0, 3, 3.8], kind: "bed" },
-      { n: "욕실1", r: [3, 0, 5, 2.6], kind: "wet" },
-      { n: "현관", r: [5, 0, 7.4, 2.6], kind: "etc" },
-      { n: "", r: [3, 2.6, 7.4, 3.8], kind: "etc" },
-      { n: "주방", r: [7.4, 0, 11.4, 3.8], kind: "live" },
-      { n: "드레스룸", r: [11.4, 0, 13.8, 3.8], kind: "etc" },
-      { n: "욕실2", r: [13.8, 0, 16, 3.8], kind: "wet" },
-      { n: "침실2", r: [0, 3.8, 3.2, 9.6], kind: "bed" },
-      { n: "침실3", r: [3.2, 3.8, 6.4, 9.6], kind: "bed" },
-      { n: "거실", r: [6.4, 3.8, 11.4, 9.6], kind: "live" },
-      { n: "안방", r: [11.4, 3.8, 16, 9.6], kind: "bed" },
-      { n: "발코니", r: [0, 9.6, 16, 11], kind: "bal" },
-    ],
   },
 ];
 const typeById = (id: TypeId) => TYPES.find((t) => t.id === id) ?? TYPES[1];
@@ -561,7 +506,13 @@ function Schedule({ today }: { today: Date }) {
         {SCHEDULE.map(([name, from, to]) => {
           const d1 = daysAgo(today, -from);
           const done = from < 0;
-          const label = to ? `${fmtKo(d1)} ~ ${fmtKo(daysAgo(today, -to))}` : fmtKo(d1);
+          const label = to ? (
+            <>
+              <span className="whitespace-nowrap">{fmtKo(d1)} ~</span> <span className="whitespace-nowrap">{fmtKo(daysAgo(today, -to))}</span>
+            </>
+          ) : (
+            <span className="whitespace-nowrap">{fmtKo(d1)}</span>
+          );
           return (
             <li key={name} className="flex items-center justify-between gap-3 border-b py-3 text-[16px]" style={{ borderColor: C.line, color: done ? C.muted : C.ink }}>
               <span className="inline-flex items-center gap-2 font-bold">
@@ -582,15 +533,6 @@ function Schedule({ today }: { today: Date }) {
 }
 
 /* ---------- 1. 타입 고르기와 평면도 ---------- */
-
-const ROOM_FILL: Record<Room["kind"], string> = {
-  live: "#f3f2ee",
-  bed: "#eef0ee",
-  wet: "#e9eced",
-  etc: "#f7f7f5",
-  bal: "#efefed",
-};
-const PLAN_U = 40;
 
 function TypePicker({ typeId, setTypeId }: { typeId: TypeId; setTypeId: (t: TypeId) => void }) {
   const t = typeById(typeId);
@@ -621,7 +563,7 @@ function TypePicker({ typeId, setTypeId }: { typeId: TypeId; setTypeId: (t: Type
       </div>
 
       <div className="mt-6 grid gap-8 md:grid-cols-[minmax(0,1.5fr)_minmax(0,1fr)] md:items-start">
-        <div className="rounded-[6px] border bg-white p-3 md:p-6" style={{ borderColor: C.line }}>
+        <div className="overflow-hidden rounded-[6px] border bg-white" style={{ borderColor: C.line }}>
           <FloorPlan t={t} />
         </div>
         <div>
@@ -668,37 +610,13 @@ function TypePicker({ typeId, setTypeId }: { typeId: TypeId; setTypeId: (t: Type
   );
 }
 
+/** 타입별 평면도 그림(AI 생성, Z-Image-Turbo). 방 이름은 그림에 얹지 않고 오른쪽 표로 둔다 */
 function FloorPlan({ t }: { t: UnitType }) {
-  const W = t.w * PLAN_U;
-  const D = t.d * PLAN_U;
   return (
-    <svg viewBox={`-10 -10 ${W + 20} ${D + 20}`} className="block h-auto w-full" role="img" aria-label={`${t.id}타입 평면도. ${t.plan.filter((r) => r.n).map((r) => r.n).join(", ")}`}>
-      {t.plan.map((room, i) => {
-        const [x0, y0, x1, y1] = room.r.map((v) => v * PLAN_U);
-        const w = x1 - x0;
-        const hgt = y1 - y0;
-        const d = `M${x0} ${y0} H${x1} V${y1} H${x0} Z`;
-        const fs = room.n ? Math.min(24, (w * 0.86) / room.n.length) : 0;
-        return (
-          <g key={i}>
-            <path d={d} fill={ROOM_FILL[room.kind]} />
-            <path
-              d={d}
-              fill="none"
-              stroke={room.kind === "bal" ? C.muted : "#333333"}
-              strokeWidth={room.kind === "bal" ? 1.5 : 4}
-              strokeDasharray={room.kind === "bal" ? "6 5" : undefined}
-              strokeLinejoin="miter"
-            />
-            {room.n && (
-              <text x={x0 + w / 2} y={y0 + hgt / 2} textAnchor="middle" dominantBaseline="central" fontSize={fs} fontWeight={700} fill={room.kind === "bal" ? C.muted : C.ink}>
-                {room.n}
-              </text>
-            )}
-          </g>
-        );
-      })}
-    </svg>
+    <div className="aspect-[4/3]" style={{ background: "#fff" }}>
+      {/* eslint-disable-next-line @next/next/no-img-element -- 정적 export 라 next/image 최적화를 쓰지 않는다 */}
+      <img key={t.id} src={`${IMG}/plan-${t.id}.jpg`} alt={`${t.id}타입 평면도`} width={1200} height={900} loading="lazy" decoding="async" className="block h-full w-full object-contain" />
+    </div>
   );
 }
 
@@ -716,7 +634,32 @@ function PriceTable() {
     <div className="grid gap-10">
       <div>
         <h3 className="mb-3 text-[18px] font-bold">주택형별 분양가</h3>
-        <div className="overflow-hidden rounded-[6px] border" style={{ borderColor: C.line }}>
+        {/* 휴대폰: 주택형마다 카드 한 장 */}
+        <ul className="grid gap-3 md:hidden" aria-label="주택형과 층에 따른 분양가 (발코니 확장 별도)">
+          {TYPES.map((t) => (
+            <li key={t.id} className="rounded-[6px] border px-4 py-3.5" style={{ borderColor: C.line }}>
+              <div className="flex flex-wrap items-baseline justify-between gap-x-3 gap-y-1">
+                <span className="text-[17px] font-bold">{t.id}타입</span>
+                <span className="whitespace-nowrap text-[14px] tabular-nums" style={{ color: C.muted }}>
+                  확장 {eok(t.balcony)}
+                </span>
+              </div>
+              <dl className="mt-3 grid grid-cols-3 gap-2 border-t pt-3" style={{ borderColor: C.line }}>
+                {[...FLOORS].reverse().map((f) => (
+                  <div key={f.id} className="min-w-0">
+                    <dt className="whitespace-nowrap text-[13px]" style={{ color: C.muted }}>
+                      {f.label}
+                    </dt>
+                    <dd className="mt-0.5 whitespace-nowrap text-[14px] font-semibold tabular-nums tracking-[-0.01em]">
+                      {eok(Math.round((t.price * f.rate) / 1e6) * 1e6)}
+                    </dd>
+                  </div>
+                ))}
+              </dl>
+            </li>
+          ))}
+        </ul>
+        <div className="hidden overflow-hidden rounded-[6px] border md:block" style={{ borderColor: C.line }}>
           <table className="w-full text-left text-[14px] md:text-[16px]">
             <caption className="sr-only">주택형과 층에 따른 분양가 (발코니 확장 별도)</caption>
             <thead>
@@ -868,7 +811,7 @@ function VisitForm({
               </dd>
               <dt style={{ color: C.muted }}>방문 일시</dt>
               <dd className="font-bold">
-                {fmtKo(done.date)} {done.slot}
+                <span className="whitespace-nowrap">{fmtKo(done.date)}</span> <span className="tabular-nums">{done.slot}</span>
               </dd>
               <dt style={{ color: C.muted }}>관심 타입</dt>
               <dd>
@@ -883,7 +826,7 @@ function VisitForm({
                 {KAKAO}, 분양 문의 {TEL}
               </dd>
               <dt style={{ color: C.muted }}>확인 연락</dt>
-              <dd>{fmtKo(today)} 중 확인 문자, 방문 전날 안내 문자</dd>
+              <dd><span className="whitespace-nowrap">{fmtKo(today)} 중</span> 확인 문자, 방문 전날 안내 문자</dd>
             </dl>
             <button type="button" onClick={() => setDone(null)} className={`mt-5 rounded-[4px] border px-4 py-2 text-[15px] font-semibold ${focusRing}`} style={{ borderColor: C.field, color: C.ink, outlineColor: C.accent }}>
               다른 날로 다시 예약
