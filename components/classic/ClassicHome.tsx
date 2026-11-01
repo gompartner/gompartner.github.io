@@ -169,8 +169,23 @@ const heroSlides = [
 ];
 const HERO_MS = 7000;
 
+// 11-01 제작 슬라이드 화면은 업종(병원, 가게, 전문직, 기업, 학원)을 먼저 무작위로 고르고, 그 업종 대표 카탈로그 중 하나를 보여 준다
+const MAKE_POOL: string[][] = [
+  ["dental-homepage", "eye-clinic", "pediatrics"],
+  ["hanok-cafe", "bakery-cafe", "korean-restaurant"],
+  ["law-firm", "tax-office", "patent-office"],
+  ["company", "cert-lab", "logistics"],
+  ["academy", "piano-academy", "english-talk"],
+];
+const pick = <T,>(a: T[]) => a[Math.floor(Math.random() * a.length)];
+
 function Hero() {
   const N = heroSlides.length;
+  const [makeShot, setMakeShot] = useState(MAKE_POOL[0][0]);
+  useEffect(() => {
+    const f = requestAnimationFrame(() => setMakeShot(pick(pick(MAKE_POOL))));
+    return () => cancelAnimationFrame(f);
+  }, []);
   // pos는 트랙 위치. N은 맨 끝에 붙인 첫 슬라이드 복제본이라, 마지막에서 다음으로 가면 이어서 들어온 뒤 처음으로 조용히 옮긴다
   const [pos, setPos] = useState(0);
   const [anim, setAnim] = useState(true);
@@ -357,10 +372,10 @@ function Hero() {
                           <span className="h-2 w-2 rounded-full bg-[#c5cbd4]" />
                           <span className="h-2 w-2 rounded-full bg-[#c5cbd4]" />
                         </div>
-                        <Image src="/images/demos/dental-homepage.jpg" alt="" width={1440} height={900} priority={i === 0} sizes="(min-width: 768px) 640px, 92vw" className="aspect-[16/10] h-auto w-full object-cover object-top" />
+                        <Image src={`/images/demos/${makeShot}.jpg`} alt="" width={1440} height={900} priority={i === 0} sizes="(min-width: 768px) 640px, 92vw" className="aspect-[16/10] h-auto w-full object-cover object-top" />
                       </div>
                       <div className="absolute -bottom-4 -right-2 w-[24%] overflow-hidden rounded-[14px] border-[4px] border-[#15171c] bg-white shadow-[0_20px_40px_rgba(0,0,0,.45)] md:-right-6">
-                        <Image src="/images/demos/m/dental-homepage.jpg" alt="" width={390} height={736} sizes="160px" className="aspect-[9/17] w-full object-cover object-top" />
+                        <Image src={`/images/demos/m/${makeShot}.jpg`} alt="" width={390} height={736} sizes="160px" className="aspect-[9/17] w-full object-cover object-top" />
                       </div>
                     </div>
                   ) : (
