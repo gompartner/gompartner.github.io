@@ -3,6 +3,8 @@ import { PageHead, SubTabs, h2, wrap } from "@/components/classic/ui";
 import { SampleGrid } from "@/components/classic/works/SampleGrid";
 import { catalogGroups, catalogProjects, homepageProjects, samplesIn, worksTabs } from "@/components/classic/works/samples";
 import { pageMeta } from "@/lib/seo";
+import { buildCatalogIndex } from "@/components/classic/search/index";
+import { CatalogSearch } from "@/components/classic/search/CatalogSearch";
 
 export const metadata: Metadata = pageMeta({
   title: "홈페이지 제작 카탈로그",
@@ -15,6 +17,7 @@ export default function ClassicWorksPage() {
     <>
       <PageHead title="카탈로그" trail={[{ href: "/classic/works", label: "카탈로그" }]} />
       <SubTabs items={worksTabs} current="/classic/works" />
+      <CatalogSearch index={buildCatalogIndex()}>
       {[
         { id: "c-all", title: "업종별 홈페이지", items: homepageProjects },
         ...catalogGroups.map((g) => ({ id: `c-${g.slug}`, title: g.label, items: samplesIn(g.slug) })),
@@ -31,6 +34,7 @@ export default function ClassicWorksPage() {
           </div>
         </section>
       ))}
+      </CatalogSearch>
     </>
   );
 }

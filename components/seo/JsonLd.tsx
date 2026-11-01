@@ -60,6 +60,11 @@ export function SiteJsonLd() {
         description: homeDescription,
         inLanguage: "ko-KR",
         publisher: { "@id": ORG_ID },
+        potentialAction: {
+          "@type": "SearchAction",
+          target: { "@type": "EntryPoint", urlTemplate: `${siteUrl}/classic/search?q={search_term_string}` },
+          "query-input": "required name=search_term_string",
+        },
       },
     ],
   };

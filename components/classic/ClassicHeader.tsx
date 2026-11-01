@@ -3,7 +3,7 @@
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { useEffect, useRef, useState } from "react";
-import { ChevronDown, Menu, X } from "lucide-react";
+import { ChevronDown, Menu, Search, X } from "lucide-react";
 import { cases } from "@/data/classic/cases";
 import { cn } from "@/lib/utils";
 
@@ -216,6 +216,15 @@ export function ClassicHeader() {
           </div>
 
           <div className="flex shrink-0 items-center gap-2">
+            {/* 11-01 통합검색 */}
+            <Link
+              href="/classic/search"
+              aria-label="통합검색"
+              aria-current={pathname === "/classic/search" ? "page" : undefined}
+              className="grid h-11 w-11 place-items-center rounded-md text-[#15171c] transition-colors hover:bg-[#f1f3f6]"
+            >
+              <Search size={21} aria-hidden />
+            </Link>
             {/* 휴대폰과 태블릿은 작게, PC는 크게. 같은 버튼 하나를 폭에 따라 줄인다 */}
             <Link
               href="/classic/contact"
