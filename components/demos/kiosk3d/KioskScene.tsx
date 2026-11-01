@@ -269,13 +269,22 @@ function CameraRig({ phase, reduced, onHome }: { phase: "look" | "zoom" | "back"
   return null;
 }
 
-/** 장소 안의 키오스크. children은 450x800 크기로 그린 실제 키오스크 화면 */
-export function KioskScene({ place, children, className = "" }: { place: Place; children: ReactNode; className?: string }) {
+/**
+ * 장소 안의 키오스크. children은 450x800 크기로 그린 실제 키오스크 화면.
+ * zoomSignal: 숫자가 바뀔 때마다 키오스크 앞으로 다가간다(바깥 버튼, 학생증 태그 등에서 쓰기).
+ * paused: 장면이 가려져 있을 때 그리기를 멈춘다.
+ */
+export function KioskScene({ place, children, className = "", zoomSignal = 0, paused = false }: { place: Place; children: ReactNode; className?: string; zoomSignal?: number; paused?: boolean }) {
   const screenRef = useRef<HTMLDivElement>(null);
   const [phase, setPhase] = useState<"look" | "zoom" | "back">("look");
   const active = phase === "zoom";
   const setActive = (v: boolean) => setPhase(v ? "zoom" : "back");
   const [reduced, setReduced] = useState(false);
+  useEffect(() => {
+    if (!zoomSignal) return;
+    const f = requestAnimationFrame(() => setPhase("zoom"));
+    return () => cancelAnimationFrame(f);
+  }, [zoomSignal]);
   useEffect(() => {
     const f = requestAnimationFrame(() => setReduced(window.matchMedia("(prefers-reduced-motion: reduce)").matches));
     return () => cancelAnimationFrame(f);
@@ -291,7 +300,7 @@ export function KioskScene({ place, children, className = "" }: { place: Place; 
   const leave = () => setActive(false);
   return (
     <div className={`relative overflow-hidden rounded-xl bg-[#e9e6e0] ${className}`}>
-      <Canvas shadows dpr={[1, 2]} camera={{ position: [3.2, 2.1, 5.0], fov: 38 }} gl={{ antialias: true }}>
+      <Canvas frameloop={paused ? "never" : "always"} shadows dpr={[1, 2]} camera={{ position: [3.2, 2.1, 5.0], fov: 38 }} gl={{ antialias: true }}>
         <color attach="background" args={[place === "clinic" ? "#ece8e1" : "#e6e9ee"]} />
         <hemisphereLight args={["#ffffff", "#d9d2c6", 1.1]} />
         <ambientLight intensity={0.6} />
