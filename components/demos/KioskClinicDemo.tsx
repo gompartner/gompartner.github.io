@@ -22,7 +22,6 @@ import {
   Pause,
   Play,
   Smartphone,
-  Tv,
   ArrowDownToLine,
   ChevronLeft,
   CircleCheck,
@@ -41,6 +40,7 @@ import {
   VolumeOff,
 } from "lucide-react";
 import dynamic from "next/dynamic";
+import { QrCode as QrIcon } from "lucide-react";
 import QRCode from "qrcode";
 import { DemoMakerInfo } from "@/components/demos/DemoMakerInfo";
 import { daysAgo, fmtDot, fmtKo, useDemoToday } from "@/hooks/useDemoToday";
@@ -185,7 +185,8 @@ const validBirth = (b: string) => {
   return m >= 1 && m <= 12 && d >= 1 && d <= 31;
 };
 
-export function KioskClinicDemo() {
+/** threeD가 true면 태블릿 폭 이상에서 3D 로비로 보여 준다(따로 연 3D 체험 주소용). 기본은 평면 키오스크 */
+export function KioskClinicDemo({ threeD = false }: { threeD?: boolean } = {}) {
   const today = useDemoToday();
   // 서버 렌더에는 사용자 설정이 없으므로, 화면이 붙은 뒤에만 움직임 줄이기 설정을 반영한다(하이드레이션 불일치 방지).
   const prefersReduced = useReducedMotion();
@@ -207,7 +208,7 @@ export function KioskClinicDemo() {
       mq.removeEventListener("change", on);
     };
   }, []);
-  const layout3d = mounted && wide && !prefersReduced;
+  const layout3d = threeD && mounted && wide && !prefersReduced;
 
   const [step, setStep] = useState<Step>("idle");
   const [visit, setVisit] = useState<Visit>("return");
@@ -1065,57 +1066,83 @@ export function KioskClinicDemo() {
   );
 
   // 대기실 TV와 휴대폰 화면: xl은 장면 옆 세로 한 줄, md와 lg는 장면 아래 두 칸(한 번만 그린다)
-  const panels = (
-    <div className="grid w-full grid-cols-2 items-start gap-8 xl:grid-cols-1 xl:gap-6">
-      <WaitingTv queue={queue} called={called} reduce={!!reduce} now={now} />
-      {mine && (
-        <PhoneWait
-          key={mine.no}
-          mine={mine}
-          queue={queue}
-          reduce={!!reduce}
-          now={now}
-        />
-      )}
-    </div>
-  );
-
   if (layout3d) {
     // 3D 로비: 키오스크를 눌러 다가가면 같은 화면(state 하나)을 원근에 맞춰 겹쳐 쓴다.
     return (
       <div className="min-h-screen bg-[#E8E6E2]">
-        <div className="mx-auto grid w-full max-w-[1280px] gap-8 px-6 pt-5 xl:grid-cols-[minmax(0,1fr)_360px] xl:items-start">
-          <KioskScene
-            place="clinic"
-            className="h-[min(78vh,820px)] min-h-[600px] w-full"
-            tv={
-              <div
-                className="overflow-hidden bg-[#0A2E36] text-white"
-                style={{
-                  width: 640,
-                  height: 352,
-                  padding: "8px 16px",
-                  boxSizing: "border-box",
-                  containerType: "inline-size",
-                }}
-              >
-                <TvBoard
-                  queue={queue}
-                  called={called}
-                  reduce={!!reduce}
-                  now={now}
-                />
-              </div>
-            }
+        <div className="mx-auto grid w-full max-w-[1280px] grid-cols-2 items-start gap-5 px-6 pt-5 xl:grid-cols-[minmax(0,1fr)_340px]">
+          <Zone
+            step={1}
+            role="환자"
+            title="로비 접수 키오스크"
+            className="col-span-2 xl:col-span-1 xl:row-span-2"
           >
-            <div
-              className="relative overflow-hidden bg-white"
-              style={{ width: 450, height: 800, containerType: "size" }}
+            <KioskScene
+              place="clinic"
+              className="h-[min(78vh,820px)] min-h-[600px] w-full"
+              // 이용 흐름 3단계(휴대폰 알림)에서 장면 옆에 띄우는 실제 휴대폰 대기 화면
+              // 접수 중에는 이용 흐름 자동 넘김을 멈춘다
+              paused={step !== "idle" && step !== "done"}
+              phone={
+                mine ? (
+                  <PhoneWait
+                    key={mine.no}
+                    mine={mine}
+                    queue={queue}
+                    reduce={!!reduce}
+                    now={now}
+                  />
+                ) : undefined
+              }
+              tv={
+                <div
+                  className="overflow-hidden bg-[#0A2E36] text-white"
+                  style={{
+                    width: 640,
+                    height: 352,
+                    padding: "8px 16px",
+                    boxSizing: "border-box",
+                    containerType: "inline-size",
+                  }}
+                >
+                  <TvBoard
+                    queue={queue}
+                    called={called}
+                    reduce={!!reduce}
+                    now={now}
+                  />
+                </div>
+              }
             >
-              {screen}
-            </div>
-          </KioskScene>
-          {panels}
+              <div
+                className="relative overflow-hidden bg-white"
+                style={{ width: 450, height: 800, containerType: "size" }}
+              >
+                {screen}
+              </div>
+            </KioskScene>
+          </Zone>
+          <Zone step={2} role="대기실" title="호출 화면">
+            <WaitingTv
+              queue={queue}
+              called={called}
+              reduce={!!reduce}
+              now={now}
+            />
+          </Zone>
+          <Zone step={3} role="환자" title="휴대폰 대기 순서">
+            {mine ? (
+              <PhoneWait
+                key={mine.no}
+                mine={mine}
+                queue={queue}
+                reduce={!!reduce}
+                now={now}
+              />
+            ) : (
+              <PhoneEmpty now={now} />
+            )}
+          </Zone>
         </div>
         <div className="mx-auto max-w-[1280px] px-6 pb-8">
           <DemoMakerInfo className="mt-6" />
@@ -1126,68 +1153,77 @@ export function KioskClinicDemo() {
 
   return (
     <div
-      className={`min-h-screen bg-[#E8E6E2] ${mounted ? "" : "md:opacity-0"} md:bg-[linear-gradient(180deg,#ECEAE6_0%,#ECEAE6_74%,#D6D1CA_74%,#D6D1CA_100%)]`}
+      className={`min-h-screen bg-[#E8E6E2] ${mounted || !threeD ? "" : "md:opacity-0"}`}
     >
-      <div className="mx-auto flex w-full max-w-[1200px] flex-col items-center md:flex-row md:items-start md:justify-center md:gap-12 md:px-6 md:pt-5">
-        <div className="flex w-full flex-col items-center md:w-auto">
-          {/* 키오스크 몸체 */}
-          <div className="w-full md:w-auto md:rounded-[30px] md:border md:border-[#CFD4D8] md:bg-[#FBFBFA] md:p-[14px] md:shadow-[0_18px_40px_-18px_rgba(30,40,50,0.35)]">
-            <div
-              className="hidden items-center justify-center pb-[10px] md:flex"
-              aria-hidden
-            >
-              <span className="h-[6px] w-[6px] rounded-full bg-[#9AA4AB]" />
-            </div>
-            <div className="relative w-full [container-type:inline-size] md:w-[calc(max(500px,100vh-250px)*9/16)]">
-              <div className="relative aspect-[9/16] w-full overflow-hidden md:rounded-[10px] md:ring-[6px] md:ring-[#1D252B]">
-                {screen}
+      {/* 1 접수 키오스크, 2 대기실 호출 화면, 3 휴대폰 대기 순서: 흐름 순서대로 구역을 나눈다 */}
+      <div className="mx-auto flex w-full max-w-[1240px] flex-col gap-4 px-4 pt-4 md:grid md:grid-cols-[auto_minmax(0,1fr)] md:items-start md:gap-5 md:px-6 md:pt-5 xl:grid-cols-[auto_minmax(0,1fr)_290px]">
+        <Zone
+          step={1}
+          role="환자"
+          title="로비 접수 키오스크"
+          className="md:row-span-2"
+        >
+          <div className="flex flex-col items-center">
+            {/* 키오스크 몸체 */}
+            <div className="w-full md:w-auto md:rounded-[30px] md:border md:border-[#CFD4D8] md:bg-[#FBFBFA] md:p-[14px] md:shadow-[0_18px_40px_-18px_rgba(30,40,50,0.35)]">
+              <div
+                className="hidden items-center justify-center pb-[10px] md:flex"
+                aria-hidden
+              >
+                <span className="h-[6px] w-[6px] rounded-full bg-[#9AA4AB]" />
+              </div>
+              <div className="relative w-full [container-type:inline-size] md:w-[calc(max(480px,100vh-300px)*9/16)]">
+                <div className="relative aspect-[9/16] w-full overflow-hidden rounded-[10px] md:ring-[6px] md:ring-[#1D252B]">
+                  {screen}
+                </div>
+              </div>
+              {/* 카드 단말기, 번호표 출구 */}
+              <div
+                className="hidden items-center justify-between px-3 pb-1 pt-4 md:flex"
+                aria-hidden
+              >
+                <div className="flex items-center gap-2 text-[13px] font-semibold text-[#55636C]">
+                  <CreditCard className="h-5 w-5" />
+                  <span className="h-[8px] w-[56px] rounded-full bg-[#2B343A]" />
+                </div>
+                <div className="relative flex flex-col items-center">
+                  <span className="relative z-10 h-[10px] w-[96px] rounded-full bg-[#2B343A]" />
+                  <AnimatePresence>
+                    {step === "done" && (
+                      <motion.span
+                        key="paper"
+                        className="-mt-[5px] block w-[78px] rounded-b-[3px] border border-[#D9DDE0] bg-white"
+                        initial={reduce ? false : { height: 0 }}
+                        animate={{ height: 34 }}
+                        exit={{ opacity: 0 }}
+                        transition={
+                          reduce
+                            ? { duration: 0 }
+                            : { duration: 1.1, ease: "easeOut", delay: 0.3 }
+                        }
+                      />
+                    )}
+                  </AnimatePresence>
+                </div>
               </div>
             </div>
-            {/* 카드 단말기, 번호표 출구 */}
-            <div
-              className="hidden items-center justify-between px-3 pb-1 pt-4 md:flex"
-              aria-hidden
-            >
-              <div className="flex items-center gap-2 text-[13px] font-semibold text-[#55636C]">
-                <CreditCard className="h-5 w-5" />
-                <span className="h-[8px] w-[56px] rounded-full bg-[#2B343A]" />
-              </div>
-              <div className="relative flex flex-col items-center">
-                <span className="relative z-10 h-[10px] w-[96px] rounded-full bg-[#2B343A]" />
-                <AnimatePresence>
-                  {step === "done" && (
-                    <motion.span
-                      key="paper"
-                      className="-mt-[5px] block w-[78px] rounded-b-[3px] border border-[#D9DDE0] bg-white"
-                      initial={reduce ? false : { height: 0 }}
-                      animate={{ height: 34 }}
-                      exit={{ opacity: 0 }}
-                      transition={
-                        reduce
-                          ? { duration: 0 }
-                          : { duration: 1.1, ease: "easeOut", delay: 0.3 }
-                      }
-                    />
-                  )}
-                </AnimatePresence>
-              </div>
+            {/* 받침대 */}
+            <div className="hidden flex-col items-center md:flex" aria-hidden>
+              <div className="h-[34px] w-[90px] bg-[linear-gradient(90deg,#C9CED2,#E6E9EB,#C9CED2)]" />
+              <div className="h-[16px] w-[260px] rounded-[50%] bg-[#BFC5CA] shadow-[0_10px_20px_-8px_rgba(0,0,0,0.35)]" />
             </div>
           </div>
-          {/* 받침대 */}
-          <div className="hidden flex-col items-center md:flex" aria-hidden>
-            <div className="h-[34px] w-[90px] bg-[linear-gradient(90deg,#C9CED2,#E6E9EB,#C9CED2)]" />
-            <div className="h-[16px] w-[260px] rounded-[50%] bg-[#BFC5CA] shadow-[0_10px_20px_-8px_rgba(0,0,0,0.35)]" />
-          </div>
-        </div>
-        {/* 키오스크와 이어지는 화면 */}
-        <div className="flex w-full flex-col gap-6 px-4 pt-6 md:w-[360px] md:shrink-0 md:px-0 md:pt-[40px]">
+        </Zone>
+        <Zone step={2} role="대기실" title="호출 화면">
           <WaitingTv
             queue={queue}
             called={called}
             reduce={!!reduce}
             now={now}
           />
-          {mine && (
+        </Zone>
+        <Zone step={3} role="환자" title="휴대폰 대기 순서">
+          {mine ? (
             <PhoneWait
               key={mine.no}
               mine={mine}
@@ -1195,10 +1231,12 @@ export function KioskClinicDemo() {
               reduce={!!reduce}
               now={now}
             />
+          ) : (
+            <PhoneEmpty now={now} />
           )}
-        </div>
+        </Zone>
       </div>
-      <div className="mx-auto max-w-[1200px] px-4 pb-8">
+      <div className="mx-auto max-w-[1240px] px-4 pb-8 md:px-6">
         <DemoMakerInfo className="mt-6" />
       </div>
     </div>
@@ -2270,10 +2308,6 @@ function WaitingTv({
 }) {
   return (
     <figure className="w-full">
-      <figcaption className="mb-2 flex items-center gap-1.5 text-[14px] font-semibold text-[#3F5360]">
-        <Tv aria-hidden className="h-4 w-4" />
-        대기실 호출 화면
-      </figcaption>
       <div className="rounded-[14px] bg-[#1B2329] p-[7px] shadow-[0_14px_30px_-16px_rgba(20,30,40,0.5)]">
         <div className="aspect-[16/9] overflow-hidden rounded-[6px] bg-[#0A2E36] text-white [container-type:inline-size]">
           <TvBoard queue={queue} called={called} reduce={reduce} now={now} />
@@ -2396,6 +2430,80 @@ function TvBoard({
   );
 }
 
+/* ---------- 체험 구역 ---------- */
+
+const ROLE_STYLE: Record<string, { bg: string; fg: string }> = {
+  환자: { bg: "#0B5563", fg: "#FFFFFF" },
+  대기실: { bg: "#F2E3BF", fg: "#4A3500" },
+};
+
+// 누가 보는 화면인지 첫눈에 알 수 있게 구역마다 순서, 역할, 이름을 단다.
+function Zone({
+  step,
+  role,
+  title,
+  className = "",
+  children,
+}: {
+  step: number;
+  role: string;
+  title: string;
+  className?: string;
+  children: ReactNode;
+}) {
+  const r = ROLE_STYLE[role] ?? ROLE_STYLE["환자"];
+  return (
+    <section
+      aria-label={`${step}. ${role} ${title}`}
+      className={`min-w-0 rounded-[16px] border border-[#D5D1CA] bg-[#F7F6F3] p-3 md:p-4 ${className}`}
+    >
+      <div className="mb-3 flex items-center gap-2">
+        <span
+          aria-hidden
+          className="grid h-6 w-6 shrink-0 place-items-center rounded-full border border-[#9AA6AD] text-[12px] font-bold tabular-nums text-[#3F5360]"
+        >
+          {step}
+        </span>
+        <span
+          className="rounded-[6px] px-2 py-0.5 text-[12px] font-bold"
+          style={{ background: r.bg, color: r.fg }}
+        >
+          {role}
+        </span>
+        <h2 className="text-[15px] font-bold text-[#10212B]">{title}</h2>
+      </div>
+      {children}
+    </section>
+  );
+}
+
+function PhoneEmpty({ now }: { now: string | null }) {
+  return (
+    <div className="mx-auto w-[236px] rounded-[34px] bg-[#1B2329] p-[8px] shadow-[0_16px_30px_-16px_rgba(20,30,40,0.55)]">
+      <div className="flex min-h-[380px] flex-col overflow-hidden rounded-[27px] bg-[#F2F5F7]">
+        <div className="flex items-center justify-between bg-white px-5 pb-1 pt-2.5 text-[11px] font-semibold text-[#10212B]">
+          <span className="tabular-nums">{now ?? ""}</span>
+          <span
+            className="h-[14px] w-[64px] rounded-full bg-[#1B2329]"
+            aria-hidden
+          />
+          <span className="w-[26px]" />
+        </div>
+        <div className="flex flex-1 flex-col items-center justify-center gap-3 px-6 text-center">
+          <span className="grid h-16 w-16 place-items-center rounded-[16px] bg-white">
+            <QrIcon aria-hidden className="h-8 w-8 text-[#0B5563]" />
+          </span>
+          <p className="text-[14px] font-bold leading-[1.45] text-[#10212B]">
+            접수하면 번호표 QR로
+            <br />
+            열립니다
+          </p>
+        </div>
+      </div>
+    </div>
+  );
+}
+
 function PhoneWait({
   mine,
   queue,
@@ -2419,10 +2527,6 @@ function PhoneWait({
       animate={{ opacity: 1, y: 0 }}
       transition={{ duration: 0.4, ease: "easeOut" }}
     >
-      <figcaption className="mb-2 flex items-center gap-1.5 text-[14px] font-semibold text-[#3F5360]">
-        <Smartphone aria-hidden className="h-4 w-4" />
-        번호표 QR로 연 휴대폰 화면
-      </figcaption>
       <div className="mx-auto w-[236px] rounded-[34px] bg-[#1B2329] p-[8px] shadow-[0_16px_30px_-16px_rgba(20,30,40,0.55)]">
         <div className="overflow-hidden rounded-[27px] bg-[#F2F5F7]">
           <div className="flex items-center justify-between bg-white px-5 pb-1 pt-2.5 text-[11px] font-semibold text-[#10212B]">
