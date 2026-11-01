@@ -1,6 +1,5 @@
 import type { Metadata, Viewport } from "next";
 import localFont from "next/font/local";
-import { Black_Han_Sans } from "@/lib/local-fonts";
 import Script from "next/script";
 import { lookRedirectScript } from "@/lib/look";
 import "./globals.css";
@@ -22,8 +21,7 @@ const pretendard = localFont({
   fallback: ["-apple-system", "BlinkMacSystemFont", "Apple SD Gothic Neo", "Segoe UI", "sans-serif"],
 });
 
-// 웹툰 톤의 제목·효과음 글꼴. 본문은 Pretendard.
-const sfx = Black_Han_Sans;
+// 웹툰 제목 글꼴(Black Han Sans)은 옛 화면(/story, /landing)의 레이아웃에서만 불러온다(11-01 점검: 새 화면은 안 씀).
 
 // 메인 첫 화면 문구와 맞춘 사이트 제목·설명
 const siteTitle = homeTitle;
@@ -41,7 +39,7 @@ export const metadata: Metadata = {
     template: `%s | ${profile.name}`,
   },
   description: siteDescription,
-  keywords: ["홈페이지 제작", "홈페이지 유지보수", "도메인 만료", "SSL 인증서", "랜딩페이지 제작", "업무 프로그램 개발", profile.name, "gompartner"],
+  keywords: ["홈페이지 제작", "홈페이지 유지보수", "홈페이지 오류 수정", "유지보수 업체 변경", "워드프레스 유지보수", profile.name, "gompartner"],
   authors: [{ name: profile.name }],
   creator: profile.name,
   openGraph: {
@@ -51,7 +49,7 @@ export const metadata: Metadata = {
     siteName: profile.name,
     title: siteTitle,
     description: siteDescription,
-    images: [{ ...OG_IMAGE, alt: `${profile.name}, 사장님 홈페이지와 IT 문제` }],
+    images: [{ ...OG_IMAGE, alt: `${profile.name}, 홈페이지 제작과 유지보수` }],
   },
   twitter: {
     card: "summary_large_image",
@@ -78,7 +76,7 @@ export default function RootLayout({
     <html
       lang="ko"
       data-scroll-behavior="smooth"
-      className={`${pretendard.variable} ${sfx.variable}`}
+      className={pretendard.variable}
       suppressHydrationWarning
     >
       <body className="min-h-screen bg-background text-foreground antialiased">

@@ -3,9 +3,9 @@ import Image from "next/image";
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import { Check, Plus } from "lucide-react";
-import { PageHead, btnPrimary, h2, h3, more, wrap } from "@/components/classic/ui";
+import { PageHead, btnLine, btnPrimary, h2, h3, more, wrap } from "@/components/classic/ui";
 import { SampleGrid } from "@/components/classic/works/SampleGrid";
-import { demoProjects, findBySlug, groupOf, industryOf, isMaintenance, mobileShotOf, samplesIn, slugOf } from "@/components/classic/works/samples";
+import { catalogProjects, demoProjects, findBySlug, groupOf, industryOf, isMaintenance, mobileShotOf, samplesIn, slugOf } from "@/components/classic/works/samples";
 import { estimateFor } from "@/data/classic/pricing";
 import { designConcepts } from "@/data/classic/designConcepts";
 import { maintenanceServices } from "@/data/classic/maintenance";
@@ -21,8 +21,12 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
   const { slug } = await params;
   const p = findBySlug(slug);
   if (!p) return {};
-  return pageMeta({ title: `${p.title} 카탈로그`, description: p.description, path: `/classic/sample/${slug}` });
+  const meta = pageMeta({ title: `${p.title} 카탈로그`, description: p.description, path: `/classic/sample/${slug}` });
+  // 접은 서비스(랜딩, 업무 프로그램, 유지보수 화면) 카탈로그는 주소만 남기고 검색에서 뺀다
+  return isFolded(p) ? { ...meta, robots: { index: false, follow: true }, alternates: undefined } : meta;
 }
+
+const isFolded = (p: { id: string }) => !catalogProjects.some((x) => x.id === p.id);
 
 const row = "flex justify-between gap-4 border-b border-[#e6e9ee] py-3";
 
@@ -179,8 +183,14 @@ export default async function ClassicSamplePage({ params }: Props) {
           <p className="mt-5 text-[15px] leading-[1.65] text-[#5b6370] md:text-[16px]">금액과 일정은 상담 신청 내용을 검토한 뒤 견적서로 안내합니다.</p>
 
           <div className="mt-8 grid gap-3">
-            <Link href={p.demoUrl} prefetch={false} data-gtm-cta={`classic_sample_open_${p.id}`} className={btnPrimary}>
+            <Link href={`/classic/contact?sample=${slug}`} data-gtm-cta={`classic_sample_contact_${p.id}`} className={btnPrimary}>
+              이 구성으로 상담
+            </Link>
+            <Link href={p.demoUrl} prefetch={false} data-gtm-cta={`classic_sample_open_${p.id}`} className={btnLine}>
               체험하기
+            </Link>
+            <Link href="/classic/homepage" className={`${more} mt-1 min-h-11 justify-center`}>
+              홈페이지 제작 안내
             </Link>
           </div>
         </section>
@@ -193,7 +203,7 @@ export default async function ClassicSamplePage({ params }: Props) {
               <h2 id="c-others" className={`${h2} break-keep`}>
                 {ind ? `${ind.label} 카탈로그` : "다른 카탈로그"}
               </h2>
-              <Link href={ind ? `/classic/works/${ind.slug}` : "/classic/works"} className={`${more} shrink-0`}>
+              <Link href={ind ? `/classic/works/${ind.slug}` : "/classic/works"} aria-label={`${ind ? ind.label : "다른"} 카탈로그 더보기`} className={`${more} min-h-11 shrink-0`}>
                 더보기 <Plus size={15} strokeWidth={2.5} aria-hidden />
               </Link>
             </div>

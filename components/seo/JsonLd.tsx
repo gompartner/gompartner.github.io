@@ -1,119 +1,65 @@
-import { profile } from "@/data/profile";
+import { maintenanceServices } from "@/data/classic/maintenance";
+import { profile } from "@/data/classic/profile";
+import { homeDescription } from "@/data/seo";
+import { ORG_ID, WEBSITE_ID } from "@/lib/seo";
 import { siteUrl } from "@/lib/site";
 
-// 같은 이름의 다른 회사와 구분되도록 외부 프로필을 묶는다.
-const sameAs = ["https://kmong.com/gig/796239", "https://blog.naver.com/gompartner", "https://www.instagram.com/gompartner.co.kr", "https://www.youtube.com/@gompartner", "https://clip.naver.com/@gompartner"];
+// 같은 이름의 다른 회사와 구분되도록 회사가 운영하는 채널을 묶는다.
+const sameAs = ["https://blog.naver.com/gompartner", "https://www.instagram.com/gompartner.co.kr", "https://www.youtube.com/@gompartner", "https://clip.naver.com/@gompartner"];
 
-export function PersonJsonLd() {
-  const schema = {
+/** JSON-LD 한 덩어리(객체 또는 배열)를 script 태그로 넣는다. */
+export function LdScript({ data }: { data: object }) {
+  return <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(data) }} />;
+}
+
+const offers = [
+  { name: "홈페이지 제작", path: "/classic/homepage" },
+  ...maintenanceServices.map((s) => ({ name: s.h1, path: `/classic/maintenance/${s.id}` })),
+];
+
+// 전역 구조화 데이터. 회사 개체 하나(@id .../#org)와 사이트 개체. 첫 화면(/)과 /classic 레이아웃이 넣는다.
+// 구글 AI 개요가 "곰파트너"를 곰앤컴퍼니의 곰랩 파트너스로 설명한 적이 있어 구분 문구를 둔다.
+export function SiteJsonLd() {
+  const data = {
     "@context": "https://schema.org",
-    "@type": "Person",
-    name: profile.name,
-    alternateName: profile.nameEn,
-    jobTitle: profile.title,
-    description: profile.bio,
-    url: siteUrl,
-    sameAs,
-    address: {
-      "@type": "PostalAddress",
-      addressLocality: "서울",
-      addressCountry: "KR",
-    },
-    email: profile.email,
-    telephone: profile.phone,
-    knowsAbout: [
-      "홈페이지 구축",
-      "홈페이지 유지보수",
-      "웹접근성 개선",
-      "레거시 시스템 고도화",
-      "Java Spring",
-      "PHP 마이그레이션",
-      "AWS 이전",
-      "워드프레스 이관",
-      "업무 프로그램 개발",
+    "@graph": [
+      {
+        "@type": "ProfessionalService",
+        "@id": ORG_ID,
+        name: profile.name,
+        legalName: profile.name,
+        alternateName: [profile.nameEn, "gompartner"],
+        url: `${siteUrl}/`,
+        logo: `${siteUrl}/apple-icon.png`,
+        image: `${siteUrl}/apple-icon.png`,
+        description: homeDescription,
+        disambiguatingDescription: "홈페이지 제작과 유지보수 업체. 곰앤컴퍼니의 곰랩 파트너스와 관계없음.",
+        email: profile.email,
+        telephone: profile.phone,
+        faxNumber: profile.fax,
+        taxID: profile.bizNo,
+        areaServed: "KR",
+        address: { "@type": "PostalAddress", addressLocality: "서울", addressCountry: "KR" },
+        sameAs,
+        hasOfferCatalog: {
+          "@type": "OfferCatalog",
+          name: "홈페이지 제작과 유지보수",
+          itemListElement: offers.map((o) => ({
+            "@type": "Offer",
+            itemOffered: { "@type": "Service", name: o.name, url: `${siteUrl}${o.path}` },
+          })),
+        },
+      },
+      {
+        "@type": "WebSite",
+        "@id": WEBSITE_ID,
+        url: `${siteUrl}/`,
+        name: profile.name,
+        description: homeDescription,
+        inLanguage: "ko-KR",
+        publisher: { "@id": ORG_ID },
+      },
     ],
   };
-
-  return (
-    <script
-      type="application/ld+json"
-      dangerouslySetInnerHTML={{ __html: JSON.stringify(schema) }}
-    />
-  );
-}
-
-export function ProfessionalServiceJsonLd() {
-  const schema = {
-    "@context": "https://schema.org",
-    "@type": "ProfessionalService",
-    name: profile.name,
-    description: profile.bio,
-    url: siteUrl,
-    email: profile.email,
-    telephone: profile.phone,
-    areaServed: "KR",
-    sameAs,
-    address: {
-      "@type": "PostalAddress",
-      addressLocality: "서울",
-      addressCountry: "KR",
-    },
-    founder: {
-      "@type": "Person",
-      name: profile.name,
-    },
-  };
-
-  return (
-    <script
-      type="application/ld+json"
-      dangerouslySetInnerHTML={{ __html: JSON.stringify(schema) }}
-    />
-  );
-}
-
-export function WebSiteJsonLd() {
-  const schema = {
-    "@context": "https://schema.org",
-    "@type": "WebSite",
-    url: siteUrl,
-    name: profile.name,
-    description: profile.bio,
-    author: {
-      "@type": "Person",
-      name: profile.name,
-    },
-  };
-
-  return (
-    <script
-      type="application/ld+json"
-      dangerouslySetInnerHTML={{ __html: JSON.stringify(schema) }}
-    />
-  );
-}
-
-// 구글 AI 개요가 "곰파트너"를 곰앤컴퍼니의 곰랩 파트너스로 설명해서, 브랜드 자체를 따로 밝힌다.
-export function OrganizationJsonLd() {
-  const schema = {
-    "@context": "https://schema.org",
-    "@type": "Organization",
-    name: profile.name,
-    alternateName: [profile.nameEn, "gompartner"],
-    url: siteUrl,
-    logo: `${siteUrl}/apple-icon.png`,
-    description: profile.bio,
-    disambiguatingDescription: "소상공인 홈페이지 제작과 유지보수를 하는 1인 웹 개발 브랜드. 곰앤컴퍼니의 곰랩 파트너스와 관계없음.",
-    email: profile.email,
-    telephone: profile.phone,
-    areaServed: "KR",
-    sameAs,
-  };
-
-  return (
-    <script
-      type="application/ld+json"
-      dangerouslySetInnerHTML={{ __html: JSON.stringify(schema) }}
-    />
-  );
+  return <LdScript data={data} />;
 }

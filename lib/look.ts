@@ -10,7 +10,7 @@ export const classicPaths = ["/works", "/sample", "/maintenance", "/faq", "/priv
 export const redirectPaths = ["/works", "/sample", "/maintenance", "/faq", "/privacy"];
 
 // 11-01 내린 페이지(공지, 가이드, 자료실, 가격). 파일이 없어 404로 응답하고, 사람은 첫 화면으로 옮긴다
-export const removedPaths = ["/classic/notice/design-3", "/classic/guide", "/guide", "/tools", "/pricing"];
+export const removedPaths = ["/classic/notice/design-3", "/classic/works/landing", "/classic/guide", "/guide", "/tools", "/pricing"];
 
 // 클래식에만 있는 페이지가 웹툰으로 돌아갈 때 갈 곳
 const webtoonOnly: Record<string, string> = { "/program": "/works", "/contact": "/landing" };

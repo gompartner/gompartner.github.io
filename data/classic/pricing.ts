@@ -89,7 +89,7 @@ export const planCommon = ["업종별 법정 고지 검토", "원본 소스 제�
 
 /** 패키지 금액 밖에서 드는 돈. 숫자는 /tools/hosting-cost(data/hostingPrices.ts) 조사값에서 나온 범위다. */
 export const runningCostNote =
-  "도메인과 호스팅은 고객 명의로 계약하고 관리 권한만 공유받습니다. 요청하시면 대리 구매도 가능합니다. 연간 비용은 일반 웹호스팅 3~4만 원, 아임웹 등 구독형 18~21만 원 수준입니다.";
+  "도메인과 호스팅은 고객 명의로 계약하고 관리 권한만 공유받습니다. 연간 비용은 호스팅 종류에 따라 견적서에 함께 안내합니다.";
 
 /** 이 패키지를 바탕으로 만든 샘플(견적 기준). 가격표 카드에 예시로 붙인다. */
 export function samplesForPlan(planId: PlanId | LandingPlanId) {

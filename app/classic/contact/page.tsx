@@ -5,7 +5,8 @@ import { ContactForm } from "@/components/classic/contact/ContactForm";
 import { PageHead, wrap } from "@/components/classic/ui";
 import { SupportTabs } from "@/components/classic/support/SupportTabs";
 import { processSteps } from "@/data/classic/faq";
-import { pageMeta } from "@/lib/seo";
+import { LdScript } from "@/components/seo/JsonLd";
+import { breadcrumbLd, pageMeta } from "@/lib/seo";
 
 export const metadata: Metadata = pageMeta({
   title: "상담 신청",
@@ -18,6 +19,7 @@ const prepare = ["로고", "사업장 또는 제품 사진", "영업시간과 �
 export default function ClassicContactPage() {
   return (
     <>
+      <LdScript data={breadcrumbLd([{ name: "상담 신청", path: "/classic/contact" }])} />
       <PageHead
         title="상담 신청"
         trail={[

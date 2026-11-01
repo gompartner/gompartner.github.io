@@ -1,61 +1,68 @@
+import { catalogProjects, slugOf } from "@/components/classic/works/samples";
+import { aboutLead, aboutTitle, principles } from "@/data/classic/about";
 import { faq } from "@/data/classic/faq";
-import { maintenanceServices } from "@/data/classic/maintenance";
-import { industries } from "@/data/industries";
-import { landingPlans, planCommon, plans } from "@/data/classic/pricing";
-import { profile } from "@/data/profile";
-import { projects } from "@/data/projects";
+import { industries } from "@/data/classic/industries";
+import { maintenanceServices, replyTerm } from "@/data/classic/maintenance";
+import { planCommon, plans } from "@/data/classic/pricing";
+import { profile } from "@/data/classic/profile";
 import { siteUrl } from "@/lib/site";
 
 export const dynamic = "force-static";
 
 // AI 검색(ChatGPT, Perplexity, Claude 등)이 읽는 사이트 요약. llmstxt.org 형식.
-// 패키지, 샘플, 도구 데이터에서 만든다. 금액과 작업 기간은 10-30부터 싣지 않는다(상담 뒤 안내).
+// 11-01 현재 서비스(유지보수, 홈페이지 제작)만 싣고 유지보수를 앞에 둔다. 금액과 작업 기간은 싣지 않는다(상담 뒤 견적).
+// 데이터 문구에 가운뎃점이 섞여 들어와도 쉼표로 바꿔 내보낸다.
+const plain = (t: string) => t.replaceAll("·", ", ").replace(/\s+/g, " ").trim();
+
 export function GET() {
   const url = (path: string) => `${siteUrl}${path}`;
 
-  const demoLine = (p: (typeof projects)[number]) => `- [${p.title}](${url(p.demoUrl)}): ${p.description}`;
-
   const text = `# ${profile.name} (${profile.nameEn})
 
-> ${profile.name}는 사장님이 업체에 묻기 애매한 홈페이지와 IT 문제를 짧게 알려 드리는 채널이자, 소상공인 홈페이지 제작과 유지보수를 맡는 1인 웹 개발 브랜드입니다. 서울에서 재택과 온라인 미팅으로 일합니다. 곰앤컴퍼니의 곰랩 파트너스와 관계없습니다.
+> ${profile.name}는 ${aboutTitle} 업체입니다. ${aboutLead} 곰앤컴퍼니의 곰랩 파트너스와 관계없습니다.
 
 - 사이트: ${siteUrl}
-- 문의: 사이트 상담 신청(${siteUrl}/classic/contact), 전화 ${profile.phone}, ${profile.email}
-- 크몽 서비스: https://kmong.com/gig/796239
-- 평일 사장님 IT 숏츠: https://www.youtube.com/@gompartner, https://clip.naver.com/@gompartner, https://www.instagram.com/gompartner.co.kr
-- 블로그: https://blog.naver.com/gompartner (사장님 IT 정보)
+- 회사소개: ${url("/classic/story")}
+- 상담 신청: ${url("/classic/contact")} (${replyTerm})
+- 전화 ${profile.phone}, 이메일 ${profile.email}
+- 사업자: ${profile.name}, 사업자등록번호 ${profile.bizNo}
 
-## 홈페이지 제작 패키지
+## 유지보수
 
-${plans.map((p) => `- ${p.title}: 수정 ${p.revisions}회. ${p.summary}. ${p.includes.join(", ")}.`).join("\n")}
-- 모든 패키지: ${planCommon.join(", ")}. 도메인과 호스팅 비용은 별도입니다.
+다른 업체가 만든 홈페이지도 맡습니다. 작업 전 전체 백업을 하고, 작업 뒤 작업 내역 문서를 드립니다. 자세히: [홈페이지 유지보수](${url("/classic/maintenance")})
 
-광고 신청 접수 랜딩페이지:
-${landingPlans.map((p) => `- ${p.title}: 수정 ${p.revisions}회. ${p.summary}. ${p.includes.join(", ")}.`).join("\n")}
+${maintenanceServices.map((s) => `- [${plain(s.h1)}](${url(`/classic/maintenance/${s.id}`)}): ${plain(s.metaDescription)}`).join("\n")}
 
-금액과 작업 기간은 상담 신청을 받은 뒤 견적으로 안내합니다. 자세히: [홈페이지 제작](${url("/classic/homepage")}), [광고 랜딩페이지](${url("/classic/landing")})
+## 홈페이지 제작
 
-## 제작 후 유지보수
+${plain(industries.map((i) => i.label).join(", "))} 업종의 반응형 홈페이지를 만듭니다. 자세히: [홈페이지 제작](${url("/classic/homepage")})
 
-${maintenanceServices.map((s) => `- [${s.title}](${url(`/classic/maintenance/${s.id}`)}): ${s.term}`).join("\n")}
+${plans.map((p) => `- ${plain(p.title)}: ${plain(p.summary)}. ${plain(p.includes.join(", "))}.`).join("\n")}
+- 모든 구성 공통: ${plain(planCommon.join(", "))}. 도메인과 호스팅은 고객 명의로 계약합니다.
 
-자세히: [유지보수](${url("/classic/maintenance")})
+금액과 일정은 상담 신청을 받은 뒤 견적서로 안내합니다.
 
-## 업종별 샘플
+## 일하는 원칙
 
-${industries.map((i) => `- [${i.title}](${url(`/classic/works/${i.slug}`)}): ${i.description}`).join("\n")}
+${principles.map((p) => `- ${plain(p.title)}: ${plain(p.body)}`).join("\n")}
 
-## 샘플 사이트
+## 업종별 카탈로그
 
-${projects.filter((p) => p.demoUrl.startsWith("/demo/")).map(demoLine).join("\n")}
+${industries.map((i) => `- [${plain(i.title)}](${url(`/classic/works/${i.slug}`)}): ${plain(i.description)}`).join("\n")}
+
+## 카탈로그 상세
+
+${catalogProjects.map((p) => `- [${plain(p.title)}](${url(`/classic/sample/${slugOf(p.demoUrl)}`)}): ${plain(p.description)}`).join("\n")}
 
 ## 자주 묻는 질문
 
-${faq.map((f) => `- ${f.q} ${f.a}`).join("\n")}
+${faq.map((f) => `- ${plain(f.q)} ${plain(f.a)}`).join("\n")}
 
 ## Optional
 
 - [자주 묻는 질문](${url("/classic/faq")})
+- [공지사항](${url("/classic/notice")})
+- [개인정보처리방침](${url("/classic/privacy")})
 `;
 
   return new Response(text, { headers: { "Content-Type": "text/plain; charset=utf-8" } });

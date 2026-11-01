@@ -1,14 +1,15 @@
 import type { MetadataRoute } from "next";
 import { profile } from "@/data/profile";
+import { homeDescription } from "@/data/seo";
 
 export const dynamic = "force-static";
 
 // 폰 홈 화면에 바로가기를 만들 때 쓰는 이름·아이콘·색
 export default function manifest(): MetadataRoute.Manifest {
   return {
-    name: `${profile.name} 홈페이지·업무 프로그램 제작`,
+    name: `${profile.name} 홈페이지 제작과 유지보수`,
     short_name: profile.name,
-    description: "홈페이지와 업무 프로그램을 직접 만듭니다.",
+    description: homeDescription,
     start_url: "/",
     display: "standalone",
     background_color: "#ffffff",

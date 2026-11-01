@@ -58,7 +58,7 @@ export const classicMenu = [
 
 const maxItems = Math.max(...classicMenu.map((m) => m.items.length));
 
-const toggle = "inline-flex h-10 w-10 items-center justify-center rounded-md border border-[#d9dee5] bg-white text-[#15171c] transition-colors hover:bg-[#eef1f5]";
+const toggle = "inline-flex h-11 w-11 items-center justify-center rounded-md border border-[#d9dee5] bg-white text-[#15171c] transition-colors hover:bg-[#eef1f5]";
 
 export function ClassicHeader() {
   const pathname = usePathname();
@@ -67,11 +67,17 @@ export function ClassicHeader() {
   // 아이패드는 데스크톱 모드나 트랙패드에서 (hover: none)이 거짓으로 나와서, 미디어 쿼리 대신 실제로 누른 입력 종류를 본다
   const [all, setAll] = useState(false);
   const pointer = useRef("mouse");
+  // 키보드로 메뉴 안에 들어오면 하위 항목을 연다(초점이 메뉴 밖으로 나가거나 Esc를 누르면 닫는다)
+  const [kb, setKb] = useState(false);
+  const menuBtn = useRef<HTMLButtonElement>(null);
+  const panel = useRef<HTMLDivElement>(null);
+  const escaped = useRef(false);
   const [prev, setPrev] = useState(pathname);
   if (prev !== pathname) {
     setPrev(pathname);
     setOpen(false);
     setAll(false);
+    setKb(false);
   }
   // 메뉴를 눌러 이동한 뒤 초점이 메뉴에 남아 내림 메뉴가 열려 있지 않게 푼다
   useEffect(() => {
@@ -91,6 +97,28 @@ export function ClassicHeader() {
       document.removeEventListener("keydown", esc);
     };
   }, [all]);
+  // 휴대폰 메뉴: 열면 첫 항목으로 초점, Tab은 메뉴 버튼과 메뉴 안에서만 돌고, Esc는 닫고 메뉴 버튼으로 돌아간다
+  useEffect(() => {
+    if (!open) return;
+    const links = () => [menuBtn.current, ...Array.from(panel.current?.querySelectorAll<HTMLElement>("a[href]") ?? [])].filter((el): el is HTMLElement => !!el);
+    links()[1]?.focus();
+    const onKey = (e: KeyboardEvent) => {
+      if (e.key === "Escape") {
+        e.preventDefault();
+        setOpen(false);
+        menuBtn.current?.focus();
+        return;
+      }
+      if (e.key !== "Tab") return;
+      const list = links();
+      const i = list.indexOf(document.activeElement as HTMLElement);
+      const next = e.shiftKey ? (i <= 0 ? list.length - 1 : i - 1) : i < 0 || i === list.length - 1 ? 0 : i + 1;
+      e.preventDefault();
+      list[next]?.focus();
+    };
+    document.addEventListener("keydown", onKey);
+    return () => document.removeEventListener("keydown", onKey);
+  }, [open]);
   useEffect(() => {
     document.body.style.overflow = open ? "hidden" : "";
     return () => {
@@ -107,12 +135,33 @@ export function ClassicHeader() {
           </Link>
 
           {/* 메뉴 하나에 올리거나(터치는 한 번 누르면) 모든 메뉴의 하위 항목을 한 판에 펼친다. 항목은 한 줄 고정이라 판 높이를 줄 수로 계산한다 */}
-          <div data-drop className="group/nav hidden h-full lg:block">
+          <div
+            data-drop
+            className="group/nav hidden h-full lg:block"
+            onFocus={(e) => {
+              if (escaped.current) escaped.current = false;
+              else if (e.target.matches(":focus-visible")) setKb(true);
+            }}
+            onBlur={(e) => {
+              if (!(e.relatedTarget instanceof Node && e.currentTarget.contains(e.relatedTarget))) setKb(false);
+            }}
+            onKeyDown={(e) => {
+              if (e.key !== "Escape" || !(kb || all)) return;
+              setKb(false);
+              setAll(false);
+              // 하위 항목에서 닫으면 그 메뉴 이름으로 초점을 옮긴다
+              const top = (e.target as HTMLElement).closest("li[data-top]")?.querySelector<HTMLElement>("a");
+              if (top && top !== e.target) {
+                escaped.current = true;
+                top.focus();
+              }
+            }}
+          >
             <ul className="flex h-full items-stretch" role="list">
               {classicMenu.map((m) => {
                 const active = m.match.some((p) => pathname === p || pathname.startsWith(p + "/"));
                 return (
-                  <li key={m.label} className="relative flex w-[128px] justify-center xl:w-[150px]">
+                  <li key={m.label} data-top className="relative flex w-[128px] justify-center xl:w-[150px]">
                     <Link
                       href={m.href}
                       onPointerDown={(e) => {
@@ -123,7 +172,8 @@ export function ClassicHeader() {
                         e.preventDefault();
                         setAll(true);
                       }}
-                      aria-expanded={m.items.length > 0 ? all : undefined}
+                      aria-expanded={m.items.length > 0 ? all || kb : undefined}
+                      aria-current={pathname === m.href ? "page" : active ? "true" : undefined}
                       className={cn("flex items-center gap-1 text-[17px] font-bold tracking-[-0.02em] transition-colors hover:text-[#256ef4]", active ? "text-[#256ef4]" : "text-[#15171c]")}
                     >
                       {m.label}
@@ -133,13 +183,13 @@ export function ClassicHeader() {
                       <ul
                         role="list"
                         className={cn(
-                          "absolute left-0 top-full z-10 w-full py-5 text-center transition-opacity duration-150 group-hover/nav:visible group-hover/nav:opacity-100 group-has-[:focus-visible]/nav:visible group-has-[:focus-visible]/nav:opacity-100",
-                          all ? "visible opacity-100" : "invisible opacity-0"
+                          "absolute left-0 top-full z-10 w-full py-5 text-center transition-opacity duration-150 group-hover/nav:visible group-hover/nav:opacity-100",
+                          all || kb ? "visible opacity-100" : "invisible opacity-0"
                         )}
                       >
                         {m.items.map((i) => (
                           <li key={i.label}>
-                            <Link href={i.href} className="flex h-11 items-center justify-center whitespace-nowrap text-[15px] text-[#3d4450] hover:text-[#256ef4] hover:underline underline-offset-4">
+                            <Link href={i.href} aria-current={pathname === i.href ? "page" : undefined} className="flex h-11 items-center justify-center whitespace-nowrap text-[15px] text-[#3d4450] hover:text-[#256ef4] hover:underline underline-offset-4">
                               {i.label}
                             </Link>
                           </li>
@@ -154,24 +204,27 @@ export function ClassicHeader() {
               aria-hidden
               style={{ height: maxItems * 44 + 40 }}
               className={cn(
-                "fixed inset-x-0 top-[77px] border-y border-[#e6e9ee] bg-white shadow-[0_12px_24px_rgba(21,23,28,.08)] transition-opacity duration-150 group-hover/nav:visible group-hover/nav:opacity-100 group-has-[:focus-visible]/nav:visible group-has-[:focus-visible]/nav:opacity-100",
-                all ? "visible opacity-100" : "invisible opacity-0"
+                "fixed inset-x-0 top-[77px] border-y border-[#e6e9ee] bg-white shadow-[0_12px_24px_rgba(21,23,28,.08)] transition-opacity duration-150 group-hover/nav:visible group-hover/nav:opacity-100",
+                all || kb ? "visible opacity-100" : "invisible opacity-0"
               )}
             />
           </div>
 
-          <div className="flex items-center gap-2">
+          <div className="flex shrink-0 items-center gap-2">
+            {/* 휴대폰과 태블릿은 작게, PC는 크게. 같은 버튼 하나를 폭에 따라 줄인다 */}
             <Link
               href="/classic/contact"
               data-gtm-cta="classic_header_contact"
+              aria-current={pathname === "/classic/contact" ? "page" : undefined}
               className={cn(
-                "hidden h-11 items-center rounded-md px-5 text-[16px] font-bold transition-colors lg:inline-flex",
+                "inline-flex h-11 items-center whitespace-nowrap rounded-md px-3.5 text-[15px] font-bold transition-colors lg:px-5 lg:text-[16px]",
                 pathname === "/classic/contact" ? "bg-[#0b50d0] text-white" : "bg-[#256ef4] text-white hover:bg-[#0b50d0]"
               )}
             >
               상담 신청
             </Link>
             <button
+              ref={menuBtn}
               type="button"
               onClick={() => setOpen((v) => !v)}
               aria-expanded={open}
@@ -186,17 +239,17 @@ export function ClassicHeader() {
       </div>
 
       {open && (
-        <div id="classic-menu" className="fixed inset-x-0 bottom-0 top-16 overflow-y-auto bg-white px-4 pb-10 md:top-[77px] lg:hidden">
+        <div id="classic-menu" ref={panel} className="fixed inset-x-0 bottom-0 top-16 overflow-y-auto bg-white px-4 pb-10 md:top-[77px] lg:hidden">
           {classicMenu.map((m) => (
             <section key={m.label} className="border-b border-[#e6e9ee] py-4">
-              <Link href={m.href} className="text-[18px] font-[800] tracking-[-0.02em] text-[#15171c]">
+              <Link href={m.href} aria-current={pathname === m.href ? "page" : undefined} className="text-[18px] font-[800] tracking-[-0.02em] text-[#15171c]">
                 {m.label}
               </Link>
               {m.items.length > 0 && (
                 <ul className="mt-2 grid grid-cols-2 gap-x-4" role="list">
                   {m.items.map((i) => (
                     <li key={i.label}>
-                      <Link href={i.href} className="block py-2 text-[15px] text-[#3d4450]">
+                      <Link href={i.href} aria-current={pathname === i.href ? "page" : undefined} className="block py-2 text-[15px] text-[#3d4450]">
                         {i.label}
                       </Link>
                     </li>

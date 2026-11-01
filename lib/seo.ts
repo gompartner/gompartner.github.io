@@ -1,4 +1,5 @@
 import { redirectPaths } from "@/lib/look";
+import { siteUrl } from "@/lib/site";
 
 // 검색 결과 설명은 80자 안쪽으로 맞춘다(네이버·구글 모두 그 뒤는 잘린다).
 // 문장 단위로 앞에서부터 담고, 첫 문장부터 넘치면 쉼표나 띄어쓰기에서 끊는다.
@@ -43,4 +44,38 @@ export function fitDescription(text: string, max = DESCRIPTION_MAX): string {
 
 export function canonicalFor(path: string): string {
   return redirectPaths.some((p) => path === p || path.startsWith(p + "/")) ? `/classic${path}` : path;
+}
+
+// 구조화 데이터(JSON-LD) 공용 헬퍼. 전역 회사 개체는 components/seo/JsonLd.tsx 의 SiteJsonLd 가 낸다.
+// 페이지별 Service, BreadcrumbList는 아래 함수로 만들고 <LdScript data={...} /> 로 넣는다.
+export const ORG_ID = `${siteUrl}/#org`;
+export const WEBSITE_ID = `${siteUrl}/#website`;
+
+/** 회사 개체 참조. Service의 provider 등에 쓴다. */
+export const orgRef = { "@id": ORG_ID } as const;
+
+const abs = (path: string) => (/^https?:\/\//.test(path) ? path : `${siteUrl}${path.startsWith("/") ? path : `/${path}`}`);
+
+/** 이동 경로. 첫 항목이 "/"가 아니면 "홈"을 앞에 붙인다. */
+export function breadcrumbLd(items: { name: string; path: string }[]) {
+  const list = items[0]?.path === "/" ? items : [{ name: "홈", path: "/" }, ...items];
+  return {
+    "@context": "https://schema.org",
+    "@type": "BreadcrumbList",
+    itemListElement: list.map((it, i) => ({ "@type": "ListItem", position: i + 1, name: it.name, item: abs(it.path) })),
+  };
+}
+
+/** 서비스 페이지 한 쪽. provider는 회사 개체(@id) 참조. serviceType을 따로 주지 않으면 name을 쓴다. */
+export function serviceLd(name: string, description: string, path: string, serviceType?: string) {
+  return {
+    "@context": "https://schema.org",
+    "@type": "Service",
+    name,
+    description,
+    serviceType: serviceType ?? name,
+    areaServed: "KR",
+    url: abs(path),
+    provider: orgRef,
+  };
 }

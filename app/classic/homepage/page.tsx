@@ -15,12 +15,13 @@ import { industries } from "@/data/classic/industries";
 import { plans, runningCostNote, samplesForPlan } from "@/data/classic/pricing";
 import { projects } from "@/data/classic/projects";
 import { pageMeta } from "@/lib/seo";
+import { siteUrl } from "@/lib/site";
 
 // 홈페이지 제작 서비스 상세. 패키지 데이터(data/classic/pricing)를 쓴다.
 
 export const metadata: Metadata = pageMeta({
   title: "홈페이지 제작",
-  description: "업종별 홈페이지 제작. 소개, 문의와 예약, 맞춤 기능 세 가지 구성이며 반응형 화면, 검색엔진 등록, 원본 소스를 포함합니다.",
+  description: "병원, 매장, 전문직, 기업, 학원 업종별 홈페이지 제작. 반응형 화면, 검색엔진 등록, 원본 소스, 점검 결과표, 인계 문서 납품.",
   path: "/classic/homepage",
 });
 
@@ -28,7 +29,8 @@ export const metadata: Metadata = pageMeta({
 const related = plans
   .flatMap((p) => samplesForPlan(p.id).slice(0, 2))
   .map((s) => demoProjects.find((p) => p.id === s.id))
-  .filter((p) => !!p);
+  .filter((p) => !!p)
+  .slice(0, 6);
 
 const section = "scroll-mt-20 border-t border-[#e6e9ee] md:scroll-mt-24";
 
@@ -37,9 +39,31 @@ const shot = projects.find((p) => p.id === "company")!;
 const shotSlug = shot.demoUrl.replace("/demo/", "");
 const industryIcon = { hospital: Stethoscope, store: Store, professional: Scale, company: Factory, academy: GraduationCap } as const;
 
+const ld = [
+  {
+    "@context": "https://schema.org",
+    "@type": "Service",
+    name: "홈페이지 제작",
+    serviceType: "홈페이지 제작",
+    description: "병원, 매장, 전문직 사무실, 기업, 학원 반응형 홈페이지 제작. 검색엔진 등록, 원본 소스, 점검 결과표, 인계 문서 납품.",
+    areaServed: "KR",
+    url: `${siteUrl}/classic/homepage`,
+    provider: { "@id": `${siteUrl}/#org` },
+  },
+  {
+    "@context": "https://schema.org",
+    "@type": "BreadcrumbList",
+    itemListElement: [
+      { "@type": "ListItem", position: 1, name: "홈", item: `${siteUrl}/` },
+      { "@type": "ListItem", position: 2, name: "홈페이지 제작", item: `${siteUrl}/classic/homepage` },
+    ],
+  },
+];
+
 export default function ClassicHomepagePage() {
   return (
     <>
+      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(ld) }} />
       <PageHead
         title="홈페이지 제작"
         trail={[
@@ -53,7 +77,7 @@ export default function ClassicHomepagePage() {
         <div className="grid items-center gap-10 border-t-2 border-[#15171c] pt-6 md:grid-cols-[1fr_1.1fr] md:gap-12">
           <div>
             <h2 id="hp-lead" className="break-keep text-[26px] font-[800] leading-[1.35] tracking-[-0.04em] md:text-[34px]">
-              검색 노출과 문의 접수까지 고려한 업종별 홈페이지
+              업종별 홈페이지 제작
             </h2>
             <p className="mt-4 break-keep text-[16px] leading-[1.7] text-[#5b6370] md:text-[17px]">반응형, 검색엔진 등록, 원본 소스</p>
           </div>

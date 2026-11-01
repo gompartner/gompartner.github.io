@@ -1,15 +1,19 @@
 "use client";
 
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useRef, useState, type KeyboardEvent } from "react";
 import { useSearchParams } from "next/navigation";
 import { Check, ChevronDown } from "lucide-react";
 import { LEAD_ENDPOINT } from "@/data/classic/leadEndpoint";
 import { profile } from "@/data/classic/profile";
+import { projects } from "@/data/classic/projects";
 
 // 클래식 상담 신청 폼. 보내는 방식과 필드명은 /landing 폼과 같다(같은 Apps Script 시트에 쌓인다).
 
-export const SERVICES = ["홈페이지 제작", "유지보수", "잘 모르겠음"] as const;
-export const BUDGETS = ["30만 원 안쪽", "30~50만 원", "50~100만 원", "100만 원 넘음", "협의"] as const;
+export const SERVICES = ["홈페이지 제작", "유지보수", "상담 후 결정"] as const;
+export const BUDGETS = ["30만 원 미만", "30만~50만 원", "50만~100만 원", "100만 원 이상", "협의"] as const;
+
+// 오류가 나면 이 순서대로 첫 칸에 초점을 옮긴다
+const FIELD_IDS: Record<string, string> = { name: "cc-name", phone: "cc-phone", email: "cc-email", business: "cc-business", message: "cc-message", agree: "cc-agree" };
 
 const PHONE_RE = /^01[016789]-?\d{3,4}-?\d{4}$/;
 
@@ -20,6 +24,48 @@ const field =
 const label = "block text-[16px] font-bold";
 const opt = "font-normal text-[#5b6370]";
 const err = "mt-1.5 text-[15px] text-[#d63d4a]";
+const choice = "inline-flex min-h-12 min-w-0 items-center justify-center gap-1.5 break-keep rounded-md border px-2 py-2 text-[15px] font-bold sm:px-4 sm:text-[16px] transition-colors motion-reduce:transition-none";
+
+/** 하나만 고르는 버튼 묶음. 화살표 키로 옮기며 고른다(라디오 버튼과 같은 방식). */
+function ChoiceGroup({ labelId, options, value, onChange, nums }: { labelId: string; options: readonly string[]; value: string; onChange: (v: string) => void; nums?: boolean }) {
+  const refs = useRef<(HTMLButtonElement | null)[]>([]);
+  const current = options.indexOf(value);
+  const onKey = (e: KeyboardEvent<HTMLButtonElement>, i: number) => {
+    const step = e.key === "ArrowRight" || e.key === "ArrowDown" ? 1 : e.key === "ArrowLeft" || e.key === "ArrowUp" ? -1 : 0;
+    let next = step ? (i + step + options.length) % options.length : -1;
+    if (e.key === "Home") next = 0;
+    if (e.key === "End") next = options.length - 1;
+    if (next < 0) return;
+    e.preventDefault();
+    onChange(options[next]);
+    refs.current[next]?.focus();
+  };
+  return (
+    <div role="radiogroup" aria-labelledby={labelId} className="mt-2 grid grid-cols-2 gap-2 sm:flex sm:flex-wrap">
+      {options.map((o, i) => {
+        const on = value === o;
+        return (
+          <button
+            key={o}
+            ref={(el) => {
+              refs.current[i] = el;
+            }}
+            type="button"
+            role="radio"
+            aria-checked={on}
+            tabIndex={on || (current < 0 && i === 0) ? 0 : -1}
+            onClick={() => onChange(o)}
+            onKeyDown={(e) => onKey(e, i)}
+            className={`${choice} ${nums ? "tabular-nums" : ""} ${on ? "border-[#256ef4] bg-[#eef4ff] text-[#256ef4]" : "border-[#c9cfd8] bg-white text-[#3d4450] hover:border-[#15171c]"}`}
+          >
+            {on && <Check size={16} strokeWidth={3} aria-hidden className="shrink-0" />}
+            <span className="whitespace-nowrap">{o}</span>
+          </button>
+        );
+      })}
+    </div>
+  );
+}
 
 export function ContactForm() {
   const [name, setName] = useState("");
@@ -31,8 +77,10 @@ export function ContactForm() {
   const site = params.get("site") ?? "";
   // 가격 페이지 견적 계산의 "이 견적으로 상담"은 ?msg=계산 내용 을 붙여 넘긴다
   const msg = params.get("msg") ?? "";
-  const [service, setService] = useState(site ? "유지보수" : "");
-  const [sample, setSample] = useState("");
+  // 카탈로그 화면의 "이 카탈로그로 상담"은 ?sample=slug 를 붙인다. 이름을 찾아 참고 카탈로그 칸에 넣는다
+  const sampleTitle = projects.find((p) => p.id === params.get("sample"))?.title ?? "";
+  const [service, setService] = useState(site ? "유지보수" : sampleTitle ? "홈페이지 제작" : "");
+  const [sample, setSample] = useState(sampleTitle);
   const [budget, setBudget] = useState("");
   const [openDate, setOpenDate] = useState("");
   const [currentSite, setCurrentSite] = useState(site);
@@ -49,14 +97,17 @@ export function ContactForm() {
 
   const validate = () => {
     const e: Record<string, string> = {};
-    if (!name.trim()) e.name = "이름을 입력해 주세요.";
-    if (!PHONE_RE.test(phone.trim())) e.phone = "휴대폰 번호를 확인해 주세요.";
-    if (email.trim() && !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email.trim())) e.email = "이메일 주소를 확인해 주세요.";
-    if (!business.trim()) e.business = "회사나 상호를 입력해 주세요.";
-    if (!message.trim()) e.message = "문의 내용을 입력해 주세요.";
-    if (!agree) e.agree = "개인정보 수집 및 이용에 동의해 주세요.";
+    if (!name.trim()) e.name = "이름을 입력해 주십시오.";
+    if (!PHONE_RE.test(phone.trim())) e.phone = "휴대폰 번호를 확인해 주십시오.";
+    if (email.trim() && !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email.trim())) e.email = "이메일 주소를 확인해 주십시오.";
+    if (!business.trim()) e.business = "회사나 상호를 입력해 주십시오.";
+    if (!message.trim()) e.message = "문의 내용을 입력해 주십시오.";
+    if (!agree) e.agree = "개인정보 수집 및 이용에 동의해 주십시오.";
     setErrors(e);
-    return Object.keys(e).length === 0;
+    const keys = Object.keys(e);
+    const first = Object.keys(FIELD_IDS).find((k) => e[k]);
+    if (first) document.getElementById(FIELD_IDS[first])?.focus();
+    return keys.length === 0;
   };
 
   const submit = async (ev: React.FormEvent) => {
@@ -65,7 +116,7 @@ export function ContactForm() {
     if (!validate()) return;
     if (!LEAD_ENDPOINT) {
       console.warn("LEAD_ENDPOINT가 비어 있어 신청을 보내지 않았습니다. data/classic/leadEndpoint.ts를 확인하세요.");
-      setStatus({ kind: "error", message: "지금은 신청을 받을 수 없습니다. 잠시 뒤 다시 시도해 주세요." });
+      setStatus({ kind: "error", message: "지금은 신청을 받을 수 없습니다. 잠시 뒤 다시 시도해 주십시오." });
       return;
     }
     const q = new URLSearchParams(window.location.search);
@@ -75,7 +126,7 @@ export function ContactForm() {
       sample.trim() && `참고 카탈로그: ${sample.trim()}`,
       budget && `예산: ${budget}`,
       openDate.trim() && `희망 오픈일: ${openDate.trim()}`,
-      currentSite.trim() && `지금 홈페이지: ${currentSite.trim()}`,
+      currentSite.trim() && `기존 홈페이지: ${currentSite.trim()}`,
     ].filter(Boolean);
     const body = [...extra, message.trim()].join("\n");
     const payload = {
@@ -83,7 +134,7 @@ export function ContactForm() {
       phone: phone.trim(),
       business: business.trim(),
       channel: "",
-      pkg: service || "잘 모르겠음",
+      pkg: service || "상담 후 결정",
       message: body,
       agree,
       utm_source: q.get("utm_source") ?? "",
@@ -104,10 +155,10 @@ export function ContactForm() {
         window.dataLayer.push({ event: "generate_lead", lead_package: payload.pkg });
         window.scrollTo({ top: 0 });
       } else {
-        setStatus({ kind: "error", message: data.error || "신청을 저장하지 못했습니다. 다시 시도해 주세요." });
+        setStatus({ kind: "error", message: data.error || "신청을 저장하지 못했습니다. 다시 시도해 주십시오." });
       }
     } catch {
-      setStatus({ kind: "error", message: "신청을 보내지 못했습니다. 다시 시도해 주세요." });
+      setStatus({ kind: "error", message: "신청을 보내지 못했습니다. 다시 시도해 주십시오." });
     }
   };
 
@@ -119,7 +170,7 @@ export function ContactForm() {
         <dl className="mt-8 border-t border-[#e6e9ee] text-[16px]">
           <div className="flex flex-col gap-1 border-b border-[#e6e9ee] py-4 sm:flex-row sm:gap-6">
             <dt className="w-[120px] shrink-0 font-bold text-[#3d4450]">회신</dt>
-            <dd>24시간 이내에 답장합니다.</dd>
+            <dd>영업일 기준 24시간 이내에 회신합니다.</dd>
           </div>
           <div className="flex flex-col gap-1 border-b border-[#e6e9ee] py-4 sm:flex-row sm:gap-6">
             <dt className="w-[120px] shrink-0 font-bold text-[#3d4450]">다른 연락 창구</dt>
@@ -132,19 +183,24 @@ export function ContactForm() {
 
   return (
     <form onSubmit={submit} noValidate className="space-y-7 border-t-2 border-[#15171c] pt-8">
+      <div role="alert">
+        {Object.keys(errors).length > 0 && (
+          <p className="rounded-md border border-[#d63d4a] bg-white px-4 py-3 text-[16px] font-bold text-[#d63d4a]">입력 내용 {Object.keys(errors).length}곳을 확인해 주십시오.</p>
+        )}
+      </div>
       <div className="grid gap-7 md:grid-cols-2 md:gap-6">
         <div className="min-w-0">
           <label htmlFor="cc-name" className={label}>
             이름
           </label>
-          <input id="cc-name" value={name} onChange={(e) => setName(e.target.value)} autoComplete="name" placeholder="김ㅎ늘" className={field} aria-invalid={!!errors.name} aria-describedby={errors.name ? "cc-name-err" : undefined} />
+          <input id="cc-name" aria-required="true" value={name} onChange={(e) => setName(e.target.value)} autoComplete="name" placeholder="김ㅎ늘" className={field} aria-invalid={!!errors.name} aria-describedby={errors.name ? "cc-name-err" : undefined} />
           {errors.name && <p id="cc-name-err" className={err}>{errors.name}</p>}
         </div>
         <div className="min-w-0">
           <label htmlFor="cc-phone" className={label}>
             휴대폰
           </label>
-          <input id="cc-phone" value={phone} onChange={(e) => setPhone(e.target.value)} inputMode="tel" autoComplete="tel" placeholder="010-0000-0000" className={field} aria-invalid={!!errors.phone} aria-describedby={errors.phone ? "cc-phone-err" : undefined} />
+          <input id="cc-phone" aria-required="true" value={phone} onChange={(e) => setPhone(e.target.value)} inputMode="tel" autoComplete="tel" placeholder="010-0000-0000" className={field} aria-invalid={!!errors.phone} aria-describedby={errors.phone ? "cc-phone-err" : undefined} />
           {errors.phone && <p id="cc-phone-err" className={err}>{errors.phone}</p>}
         </div>
       </div>
@@ -161,57 +217,23 @@ export function ContactForm() {
         <label htmlFor="cc-business" className={label}>
           회사 또는 상호 <span className={opt}>(업종)</span>
         </label>
-        <input id="cc-business" value={business} onChange={(e) => setBusiness(e.target.value)} autoComplete="organization" placeholder="예: 하늘정밀 (정밀가공 제조)" className={field} aria-invalid={!!errors.business} aria-describedby={errors.business ? "cc-business-err" : undefined} />
+        <input id="cc-business" aria-required="true" value={business} onChange={(e) => setBusiness(e.target.value)} autoComplete="organization" placeholder="예: 하늘정밀 (정밀가공 제조)" className={field} aria-invalid={!!errors.business} aria-describedby={errors.business ? "cc-business-err" : undefined} />
         {errors.business && <p id="cc-business-err" className={err}>{errors.business}</p>}
       </div>
 
-      <fieldset>
-        <legend className={label}>관심 서비스</legend>
-        <div className="mt-2 grid grid-cols-2 gap-2 sm:flex sm:flex-wrap">
-          {SERVICES.map((s) => {
-            const on = service === s;
-            return (
-              <button
-                key={s}
-                type="button"
-                aria-pressed={on}
-                onClick={() => setService(on ? "" : s)}
-                className={`inline-flex min-h-12 min-w-0 items-center justify-center gap-1.5 break-keep rounded-md border px-2 py-2 text-[15px] font-bold sm:px-4 sm:text-[16px] transition-colors motion-reduce:transition-none ${
-                  on ? "border-[#256ef4] bg-[#eef4ff] text-[#256ef4]" : "border-[#c9cfd8] bg-white text-[#3d4450] hover:border-[#15171c]"
-                }`}
-              >
-                {on && <Check size={16} strokeWidth={3} aria-hidden className="shrink-0" />}
-                {s}
-              </button>
-            );
-          })}
-        </div>
-      </fieldset>
+      <div>
+        <p id="cc-service-label" className={label}>
+          관심 서비스
+        </p>
+        <ChoiceGroup labelId="cc-service-label" options={SERVICES} value={service} onChange={setService} />
+      </div>
 
-      <fieldset>
-        <legend className={label}>
+      <div>
+        <p id="cc-budget-label" className={label}>
           예산 <span className={opt}>(선택)</span>
-        </legend>
-        <div className="mt-2 grid grid-cols-2 gap-2 sm:flex sm:flex-wrap">
-          {BUDGETS.map((b) => {
-            const on = budget === b;
-            return (
-              <button
-                key={b}
-                type="button"
-                aria-pressed={on}
-                onClick={() => setBudget(on ? "" : b)}
-                className={`inline-flex min-h-12 min-w-0 items-center justify-center gap-1.5 break-keep rounded-md border px-2 py-2 text-[15px] font-bold tabular-nums sm:px-4 sm:text-[16px] transition-colors motion-reduce:transition-none ${
-                  on ? "border-[#256ef4] bg-[#eef4ff] text-[#256ef4]" : "border-[#c9cfd8] bg-white text-[#3d4450] hover:border-[#15171c]"
-                }`}
-              >
-                {on && <Check size={16} strokeWidth={3} aria-hidden className="shrink-0" />}
-                {b}
-              </button>
-            );
-          })}
-        </div>
-      </fieldset>
+        </p>
+        <ChoiceGroup labelId="cc-budget-label" options={BUDGETS} value={budget} onChange={setBudget} nums />
+      </div>
 
       <div className="grid gap-7 md:grid-cols-2 md:gap-6">
         <div className="min-w-0">
@@ -222,7 +244,7 @@ export function ContactForm() {
         </div>
         <div className="min-w-0">
           <label htmlFor="cc-site" className={label}>
-            지금 홈페이지 주소 <span className={opt}>(있으면)</span>
+            기존 홈페이지 주소 <span className={opt}>(선택)</span>
           </label>
           <input id="cc-site" value={currentSite} onChange={(e) => setCurrentSite(e.target.value)} inputMode="url" autoComplete="url" placeholder="예: www.hanulcoffee.co.kr" className={field} />
         </div>
@@ -241,6 +263,7 @@ export function ContactForm() {
         </label>
         <textarea
           id="cc-message"
+          aria-required="true"
           value={message}
           onChange={(e) => setMessage(e.target.value)}
           rows={6}
@@ -262,6 +285,7 @@ export function ContactForm() {
         <div className="flex items-start gap-3">
           <input
             id="cc-agree"
+            aria-required="true"
             type="checkbox"
             checked={agree}
             onChange={(e) => setAgree(e.target.checked)}
@@ -279,9 +303,9 @@ export function ContactForm() {
             <ChevronDown size={16} className="transition-transform group-open:rotate-180 motion-reduce:transition-none" aria-hidden />
           </summary>
           <ul className="mt-2 space-y-1">
-            <li>수집 항목: 이름, 휴대폰 번호, 회사 또는 상호(업종), 관심 서비스, 예산, 희망 오픈일, 지금 홈페이지 주소, 참고 카탈로그, 문의 내용, 유입 경로</li>
+            <li>수집 항목: 이름, 휴대폰 번호, 이메일(선택), 회사 또는 상호(업종), 관심 서비스, 예산(선택), 희망 오픈일(선택), 기존 홈페이지 주소(선택), 참고 카탈로그(선택), 문의 내용, 유입 경로(접속 페이지 주소, 이전 페이지 주소)</li>
             <li>이용 목적: 상담 신청 확인 및 회신</li>
-            <li>보관 기간: 신청일로부터 1년</li>
+            <li>보관 기간: 상담 종료일부터 1년</li>
             <li>동의를 거부할 수 있으며 거부 시 신청이 제한됩니다.</li>
           </ul>
         </details>

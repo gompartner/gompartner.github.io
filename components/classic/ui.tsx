@@ -25,14 +25,14 @@ export function PageHead({ title, trail = [] }: { title: string; trail?: { href:
         <nav aria-label="현재 위치">
           <ol className="flex flex-wrap items-center gap-1.5 text-[14px] text-[#aebbd6]">
             <li>
-              <Link href="/" aria-label="처음" className="inline-flex hover:text-white">
+              <Link href="/" aria-label="처음" className="-m-[14.5px] inline-flex p-[14.5px] hover:text-white">
                 <Home size={15} aria-hidden />
               </Link>
             </li>
             {trail.map((t, i) => (
               <li key={`${i}-${t.href}`} className="inline-flex items-center gap-1.5">
                 <ChevronRight size={14} aria-hidden />
-                <Link href={t.href} className="hover:text-white">
+                <Link href={t.href} aria-current={i === trail.length - 1 ? "page" : undefined} className="hover:text-white">
                   {t.label}
                 </Link>
               </li>

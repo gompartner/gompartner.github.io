@@ -4,7 +4,8 @@ import Link from "next/link";
 import { PageHead, h2, wrap } from "@/components/classic/ui";
 import { aboutLead, aboutTitle, principles } from "@/data/classic/about";
 import { profile } from "@/data/classic/profile";
-import { pageMeta } from "@/lib/seo";
+import { LdScript } from "@/components/seo/JsonLd";
+import { breadcrumbLd, pageMeta } from "@/lib/seo";
 
 export const metadata: Metadata = pageMeta({
   title: "회사소개",
@@ -24,6 +25,7 @@ const areas = [
 export default function ClassicStoryPage() {
   return (
     <>
+      <LdScript data={breadcrumbLd([{ name: "회사소개", path: "/classic/story" }])} />
       <PageHead title="회사소개" trail={[{ href: "/classic/story", label: "회사소개" }]} />
 
       <section aria-labelledby="st-lead" className={`${wrap} py-14 md:py-20`}>
@@ -115,7 +117,7 @@ export default function ClassicStoryPage() {
               </dd>
             </div>
           </dl>
-          <p className="mt-4 text-[16px] font-bold text-[#3d4450]">24시간 이내 회신</p>
+          <p className="mt-4 text-[16px] font-bold text-[#3d4450]">영업일 기준 24시간 이내 회신</p>
         </div>
       </section>
     </>

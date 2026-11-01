@@ -5,7 +5,8 @@ import { notFound } from "next/navigation";
 import { PageHead, btnLine, wrap } from "@/components/classic/ui";
 import { SupportTabs } from "@/components/classic/support/SupportTabs";
 import { noticeById, notices } from "@/data/classic/notices";
-import { pageMeta } from "@/lib/seo";
+import { LdScript } from "@/components/seo/JsonLd";
+import { breadcrumbLd, pageMeta } from "@/lib/seo";
 
 type Props = { params: Promise<{ id: string }> };
 
@@ -17,12 +18,12 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
   const { id } = await params;
   const n = noticeById(id);
   if (!n) return {};
-  return pageMeta({ title: n.title, description: n.summary, path: `/classic/notice/${id}` });
+  return pageMeta({ title: n.title, description: n.summary, path: `/classic/notice/${id}`, article: true });
 }
 
 const dot = (d: string) => d.replaceAll("-", ".");
 
-// 공지사항 글. 제목, 날짜, 본문, 그림, 이전 글과 다음 글, 목록 버튼.
+// 공지사항 글. 글 제목이 페이지 큰 제목(h1)이고, 목록 이름 "공지사항"은 이동 경로에 둔다. 제목, 날짜, 본문, 그림, 이전 글과 다음 글, 목록 버튼.
 export default async function ClassicNoticeDetailPage({ params }: Props) {
   const { id } = await params;
   const n = noticeById(id);
@@ -33,8 +34,14 @@ export default async function ClassicNoticeDetailPage({ params }: Props) {
 
   return (
     <>
+      <LdScript
+        data={breadcrumbLd([
+          { name: "공지사항", path: "/classic/notice" },
+          { name: n.title, path: `/classic/notice/${id}` },
+        ])}
+      />
       <PageHead
-        title="공지사항"
+        title={n.title}
         trail={[
           { href: "/classic/notice", label: "고객지원" },
           { href: "/classic/notice", label: "공지사항" },
@@ -43,16 +50,15 @@ export default async function ClassicNoticeDetailPage({ params }: Props) {
       />
       <SupportTabs current="/classic/notice" />
       <article className={`${wrap} pb-16 pt-10 md:pb-24 md:pt-14`}>
-        <header className="border-y-2 border-[#15171c] border-b-[#e6e9ee] py-6 md:border-b">
-          <h2 className="break-keep text-[24px] font-[800] leading-[1.4] tracking-[-0.03em] md:text-[30px]">{n.title}</h2>
-          <time dateTime={n.date} className="mt-2 block text-[15px] tabular-nums text-[#6b7280]">
+        <header className="border-y-2 border-[#15171c] border-b-[#e6e9ee] py-4 md:border-b">
+          <time dateTime={n.date} className="block text-[15px] tabular-nums text-[#6b7280]">
             {dot(n.date)}
           </time>
         </header>
         <div className="space-y-8 py-8 md:py-10">
           {n.sections.map((sec) => (
             <section key={sec.h}>
-              {sec.h && <h3 className="text-[19px] font-[800] tracking-[-0.02em] md:text-[21px]">{sec.h}</h3>}
+              {sec.h && <h2 className="text-[19px] font-[800] tracking-[-0.02em] md:text-[21px]">{sec.h}</h2>}
               <div className="mt-3 space-y-2 text-[16px] leading-[1.8] text-[#3d4450] md:text-[17px]">
                 {sec.p?.map((t) => <p key={t}>{t}</p>)}
                 {sec.list && (

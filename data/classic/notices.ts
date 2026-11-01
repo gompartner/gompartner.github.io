@@ -60,7 +60,7 @@ export const notices: Notice[] = [
   {
     id: "design-2",
     date: "2026-09-30",
-    title: "업종별 카탈로그 서비스 시작",
+    title: "업종별 카탈로그 공개",
     summary: "병원, 매장, 전문직, 기업, 학원 업종별 홈페이지 카탈로그를 열었습니다.",
     sections: [
       {

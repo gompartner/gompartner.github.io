@@ -66,16 +66,17 @@ export const homepageProjects = demoProjects.filter((p) => !groups.some((g) => g
 
 export const groupOf = (p: Project) => groups.find((g) => g.match(p));
 
-/** 카탈로그로 보여 주는 묶음. 10-30부터 카탈로그는 홈페이지 제작과 랜딩만 보여 준다(업무 프로그램, 유지보수는 서비스 페이지에서 글로 설명) */
-export const catalogGroups = groups.filter((g) => g.slug === "landing");
-/** 카탈로그 목록에 나오는 것(업종 홈페이지와 랜딩) */
-export const catalogProjects = demoProjects.filter((p) => !isProgram(p) && !isMaintenance(p));
+/** 카탈로그로 보여 주는 묶음. 11-01부터 카탈로그는 업종 홈페이지만 보여 준다(랜딩, 업무 프로그램은 접은 서비스) */
+export const catalogGroups = groups.filter(() => false);
+/** 카탈로그 목록에 나오는 것(업종 홈페이지) */
+export const catalogProjects = homepageProjects;
 
 export const samplesIn = (slug: string) => {
   const g = groups.find((x) => x.slug === slug);
   if (g) return demoProjects.filter(g.match);
   const ind = industries.find((i) => i.slug === slug);
-  return ind ? homepageProjects.filter((p) => (fieldsById[p.id] ?? []).includes(ind.field)) : [];
+  // 11-01 카탈로그마다 대표 분야 하나만(분야별 개수 합이 전체와 맞게)
+  return ind ? homepageProjects.filter((p) => industryOf(p)?.slug === ind.slug) : [];
 };
 
 /** 샘플이 속한 첫 업종 */

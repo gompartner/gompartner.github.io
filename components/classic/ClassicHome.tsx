@@ -14,7 +14,7 @@ import {
   Plus,
 } from "lucide-react";
 import { faq, processSteps } from "@/data/classic/faq";
-import { maintenanceServices } from "@/data/classic/maintenance";
+import { maintenanceServices, maintenanceSteps } from "@/data/classic/maintenance";
 import { projects } from "@/data/classic/projects";
 import { PROGRAM_IDS } from "@/data/classic/programIds";
 import { cn } from "@/lib/utils";
@@ -35,7 +35,7 @@ const services = [
   },
   ...maintenanceServices.map((m) => ({
     href: `/classic/maintenance/${m.id}`,
-    name: m.title,
+    name: m.h1,
     what: m.term,
   })),
 ];
@@ -43,43 +43,22 @@ const services = [
 // 강점. 모두 진행 절차와 자주 묻는 질문에 적힌 약속이다
 const strengths = [
   { name: "원본 소스 제공", what: "도메인, 호스팅 고객 명의" },
-  { name: "점검 결과표", what: "PC, 태블릿, 휴대폰 화면과 웹 접근성" },
+  { name: "점검 결과표", what: "PC, 태블릿, 모바일 화면과 웹 접근성" },
   { name: "인계 문서", what: "계정 목록과 수정 방법" },
   { name: "1개월 무상 하자보수", what: "오픈 후 1개월" },
 ];
 
-// 카탈로그 분류. works/samples.ts groups 와 같은 기준으로 센다
-const live = projects.filter((p) => p.demoUrl.startsWith("/demo/"));
-const groupOf = (p: (typeof projects)[number]) =>
-  p.category === "랜딩페이지" || p.id.startsWith("landing-")
-    ? "landing"
-    : p.kind === "유지보수" ||
-        [
-          "maintenance-dashboard",
-          "maintenance-urgent-fix",
-          "accessibility-review",
-        ].includes(p.id)
-      ? "maintenance"
-      : PROGRAM_IDS.includes(p.id)
-        ? "program"
-        : "homepage";
-const catalog = [
-  {
-    key: "homepage",
-    href: "/classic/works",
-    name: "업종별 홈페이지",
-    what: "병원, 매장, 전문직, 기업, 교육 업종별 구성",
-  },
-  {
-    key: "landing",
-    href: "/classic/works/landing",
-    name: "광고 랜딩페이지",
-    what: "상담, 예약, 사전 등록 신청 페이지",
-  },
-].map((c) => ({
-  ...c,
-  count: live.filter((p) => groupOf(p) === c.key).length,
-}));
+// 첫 화면 카탈로그: 업종마다 대표 1개씩 썸네일(11-01 점검: 글자 카드만 있어 약함)
+const live = projects.filter((p) => p.demoUrl.startsWith("/demo/") && !PROGRAM_IDS.includes(p.id) && p.category !== "랜딩페이지" && !p.id.startsWith("landing-") && p.kind !== "유지보수");
+const PICKS = ["dental-homepage", "korean-restaurant", "law-firm", "company", "academy", "hanok-cafe"];
+const picks = PICKS.map((id) => projects.find((p) => p.id === id)).filter((p) => !!p);
+
+// 첫 화면 질문: 제작 2, 유지보수 2, 결제 1
+const homeFaq = [
+  ...faq.filter((f) => f.tag === "make").slice(0, 2),
+  ...faq.filter((f) => f.tag === "care").slice(0, 2),
+  ...faq.filter((f) => f.tag === "common").slice(0, 1),
+];
 
 const h2 =
   "text-[30px] font-[800] leading-[1.25] tracking-[-0.04em] md:text-[44px]";
@@ -111,8 +90,8 @@ const heroSlides = [
     sub: "병원, 매장, 전문직 사무실, 기업, 학원 반응형 홈페이지",
     points: [
       "업종별 법정 고지 검토",
-      "원본 소스와 인계 문서",
-      "1개월 무상 하자보수",
+      "반응형, 검색엔진 등록",
+      "카탈로그 기준 견적",
     ],
     href: "/classic/homepage",
   },
@@ -123,7 +102,7 @@ const heroSlides = [
     h: 752,
     title: "오류 수정",
     sub: "접속 불가, 화면 깨짐, 문의 메일 미수신",
-    points: ["24시간 내 회신", "원인 확인 후 견적", "장애 처리 내역서"],
+    points: ["영업일 24시간 이내 회신", "원인 확인 후 견적", "장애 처리 내역서"],
     href: "/classic/maintenance/fix",
   },
   {
@@ -132,7 +111,7 @@ const heroSlides = [
     w: 1060,
     h: 790,
     title: "업체 이관",
-    sub: "기존 업체 연락 두절 시 인수",
+    sub: "기존 업체 연락 두절, 관리 업체 교체",
     points: [
       "호스팅, 도메인 계정으로 인수",
       "전체 백업과 구성 정리",
@@ -303,6 +282,21 @@ function Hero() {
                 >
                   <div className="absolute inset-x-8 bottom-3 top-1 rotate-[5deg] rounded-md bg-white/25" />
                   <div className="absolute inset-x-5 bottom-4 top-3 rotate-[2.5deg] rounded-md bg-white/60 shadow-[0_10px_30px_rgba(0,0,0,.25)]" />
+                  {sl.key === "make" ? (
+                    <div className="relative -rotate-[1deg]">
+                      <div className="overflow-hidden rounded-md bg-white shadow-[0_30px_60px_rgba(0,0,0,.45)]">
+                        <div className="flex h-6 items-center gap-1.5 bg-[#eef0f3] px-3">
+                          <span className="h-2 w-2 rounded-full bg-[#c5cbd4]" />
+                          <span className="h-2 w-2 rounded-full bg-[#c5cbd4]" />
+                          <span className="h-2 w-2 rounded-full bg-[#c5cbd4]" />
+                        </div>
+                        <Image src="/images/demos/dental-homepage.jpg" alt="" width={1440} height={900} priority={i === 0} sizes="(min-width: 768px) 640px, 92vw" className="aspect-[16/10] h-auto w-full object-cover object-top" />
+                      </div>
+                      <div className="absolute -bottom-4 -right-2 w-[24%] overflow-hidden rounded-[14px] border-[4px] border-[#15171c] bg-white shadow-[0_20px_40px_rgba(0,0,0,.45)] md:-right-6">
+                        <Image src="/images/demos/m/dental-homepage.jpg" alt="" width={390} height={736} sizes="160px" className="aspect-[9/17] w-full object-cover object-top" />
+                      </div>
+                    </div>
+                  ) : (
                   <Image
                     src={`/images/site/hero-${sl.key}-doc.jpg`}
                     alt=""
@@ -312,6 +306,7 @@ function Hero() {
                     sizes="(min-width: 768px) 640px, 92vw"
                     className="relative h-auto w-full -rotate-[1deg] rounded-md shadow-[0_30px_60px_rgba(0,0,0,.45)]"
                   />
+                  )}
                 </div>
               </div>
             </div>
@@ -323,15 +318,14 @@ function Hero() {
         <div className="mx-auto flex w-full max-w-[1248px] items-stretch px-4 md:px-6">
           <div
             className="grid min-w-0 flex-1 grid-cols-5 md:flex"
-            role="tablist"
+            role="group"
             aria-label="서비스 선택"
           >
             {heroSlides.map((sl, i) => (
               <button
                 key={sl.key}
                 type="button"
-                role="tab"
-                aria-selected={i === cur}
+                aria-current={i === cur ? "true" : undefined}
                 onClick={() => go(i)}
                 className={cn(
                   "relative whitespace-nowrap px-1 py-4 text-center text-[13px] font-bold transition-colors md:flex-1 md:px-5 md:py-5 md:text-left md:text-[16px]",
@@ -367,7 +361,7 @@ function Hero() {
               type="button"
               onClick={() => setAuto((v) => !v)}
               aria-label={auto ? "자동 넘김 멈춤" : "자동 넘김 재생"}
-              className="grid h-10 w-10 place-items-center rounded-full border border-white/30 hover:bg-white/10"
+              className="grid h-11 w-11 place-items-center rounded-full border border-white/30 hover:bg-white/10"
             >
               {auto ? <Pause size={16} aria-hidden /> : <Play size={16} aria-hidden />}
             </button>
@@ -377,7 +371,7 @@ function Hero() {
               type="button"
               onClick={() => go(cur - 1)}
               aria-label="이전 서비스"
-              className="grid h-10 w-10 place-items-center rounded-full border border-white/30 hover:bg-white/10"
+              className="grid h-11 w-11 place-items-center rounded-full border border-white/30 hover:bg-white/10"
             >
               <ChevronLeft size={18} aria-hidden />
             </button>
@@ -385,7 +379,7 @@ function Hero() {
               type="button"
               onClick={() => go(cur + 1)}
               aria-label="다음 서비스"
-              className="grid h-10 w-10 place-items-center rounded-full border border-white/30 hover:bg-white/10"
+              className="grid h-11 w-11 place-items-center rounded-full border border-white/30 hover:bg-white/10"
             >
               <ChevronRight size={18} aria-hidden />
             </button>
@@ -449,7 +443,7 @@ function Services() {
             <Link
               href={s.href}
               data-gtm-cta={`classic_service_${s.href.split("/").pop()}`}
-              className="group grid grid-cols-[1fr_auto] items-center gap-x-6 gap-y-1 py-6 md:grid-cols-[minmax(0,360px)_1fr_auto] md:py-8"
+              className="group grid grid-cols-[1fr_auto] items-center gap-x-6 gap-y-1 py-6 md:grid-cols-[minmax(0,460px)_1fr_auto] md:py-8"
             >
               <h3 className="col-start-1 row-start-1 text-[24px] font-[800] tracking-[-0.04em] transition-colors group-hover:text-[#256ef4] md:text-[34px]">
                 {s.name}
@@ -474,29 +468,22 @@ function Catalog() {
   return (
     <section aria-labelledby="c-catalog" className="bg-[#f4f6f9]">
       <div className="mx-auto w-full max-w-[1248px] px-4 py-20 md:px-6 md:py-28">
-        <h2 id="c-catalog" className={h2}>
-          카탈로그
-        </h2>
-        <ul className="mt-10 grid gap-3 sm:grid-cols-2 md:gap-4" role="list">
-          {catalog.map((c) => (
-            <li key={c.key}>
-              <Link
-                href={c.href}
-                className="group flex h-full flex-col rounded-md border border-[#d9dee5] bg-white p-6 transition-colors hover:border-[#256ef4]"
-              >
-                <span className="flex items-baseline justify-between gap-3">
-                  <h3 className="text-[20px] font-[800] tracking-[-0.03em] group-hover:text-[#256ef4] md:text-[22px]">
-                    {c.name}
-                  </h3>
-                  <span className="shrink-0 text-[15px] font-bold tabular-nums text-[#5b6370]">
-                    {c.count}개
-                  </span>
-                </span>
-                <span className="mt-2 flex-1 text-[15px] leading-[1.6] text-[#5b6370] md:text-[16px]">
-                  {c.what}
-                </span>
-                <span className="mt-5 inline-flex items-center gap-1 text-[15px] font-bold text-[#256ef4]">
-                  보기 <ChevronRight size={16} aria-hidden />
+        <div className="flex items-end justify-between gap-4">
+          <h2 id="c-catalog" className={h2}>
+            업종별 카탈로그
+          </h2>
+          <Link href="/classic/works" aria-label={`업종별 카탈로그 ${live.length}개 전체 보기`} className={cn(more, "min-h-11")}>
+            전체 {live.length}개 <ChevronRight size={16} aria-hidden />
+          </Link>
+        </div>
+        <ul className="mt-10 grid grid-cols-2 gap-3 md:grid-cols-3 md:gap-5" role="list">
+          {picks.map((p) => (
+            <li key={p.id}>
+              <Link href={`/classic/sample/${p.demoUrl.replace("/demo/", "")}`} className="group block overflow-hidden rounded-md border border-[#d9dee5] bg-white transition-colors hover:border-[#256ef4]">
+                <Image src={`/images/demos/sm/${p.demoUrl.replace("/demo/", "")}.jpg`} alt="" width={720} height={450} sizes="(min-width: 768px) 400px, 50vw" className="aspect-[16/10] w-full object-cover object-top" />
+                <span className="block px-4 py-3 md:px-5 md:py-4">
+                  <span className="block text-[13px] font-bold text-[#5b6370] md:text-[14px]">{p.category}</span>
+                  <span className="mt-0.5 block text-[16px] font-[800] tracking-[-0.03em] group-hover:text-[#256ef4] md:text-[18px]">{p.title}</span>
                 </span>
               </Link>
             </li>
@@ -508,15 +495,31 @@ function Catalog() {
 }
 
 function Process() {
+  const [kind, setKind] = useState<"make" | "care">("make");
   return (
     <section
       aria-labelledby="c-process"
       className="mx-auto w-full max-w-[1248px] scroll-mt-16 px-4 py-20 md:scroll-mt-[76px] md:px-6 md:py-28"
     >
-      <h2 id="c-process" className={h2}>
-        진행 절차
-      </h2>
-      <FlowSteps steps={processSteps} />
+      <div className="flex flex-wrap items-end justify-between gap-4">
+        <h2 id="c-process" className={h2}>
+          진행 절차
+        </h2>
+        <div className="inline-flex rounded-md border border-[#d9dee5] p-1" role="group" aria-label="절차 선택">
+          {([["make", "홈페이지 제작"], ["care", "유지보수"]] as const).map(([k, label]) => (
+            <button
+              key={k}
+              type="button"
+              aria-pressed={kind === k}
+              onClick={() => setKind(k)}
+              className={cn("min-h-11 rounded px-4 text-[15px] font-bold transition-colors md:px-5 md:text-[16px]", kind === k ? "bg-[#15171c] text-white" : "text-[#5b6370] hover:text-[#15171c]")}
+            >
+              {label}
+            </button>
+          ))}
+        </div>
+      </div>
+      <FlowSteps steps={kind === "make" ? processSteps : maintenanceSteps} />
     </section>
   );
 }
@@ -529,12 +532,12 @@ function Faq() {
           <h2 id="c-faq" className={h2}>
             자주 묻는 질문
           </h2>
-          <Link href="/classic/faq" className={more}>
+          <Link href="/classic/faq" aria-label="자주 묻는 질문 더보기" className={cn(more, "min-h-11")}>
             더보기 <Plus size={15} strokeWidth={2.5} aria-hidden />
           </Link>
         </div>
         <ul className="mt-10 border-t-2 border-[#15171c]" role="list">
-          {faq.slice(0, 5).map((f) => (
+          {homeFaq.map((f) => (
             <li key={f.q} className="border-b border-[#e6e9ee]">
               <details className="group">
                 <summary className="flex cursor-pointer list-none items-start gap-4 py-5 md:py-6 [&::-webkit-details-marker]:hidden">

@@ -3,13 +3,13 @@ import Link from "next/link";
 import { PageHead, wrap } from "@/components/classic/ui";
 import { SupportTabs } from "@/components/classic/support/SupportTabs";
 import { notices } from "@/data/classic/notices";
-import { fitDescription } from "@/lib/seo";
+import { pageMeta } from "@/lib/seo";
 
-export const metadata: Metadata = {
+export const metadata: Metadata = pageMeta({
   title: "공지사항",
-  description: fitDescription("곰파트너 서비스 운영, 정책 변경, 홈페이지 개편 안내입니다."),
-  alternates: { canonical: "/classic/notice" },
-};
+  description: "곰파트너 서비스 운영, 정책 변경, 홈페이지 개편 안내입니다.",
+  path: "/classic/notice",
+});
 
 const dot = (d: string) => d.replaceAll("-", ".");
 

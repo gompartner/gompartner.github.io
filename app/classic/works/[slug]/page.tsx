@@ -58,6 +58,10 @@ export default async function ClassicIndustryPage({ params }: Props) {
               </li>
             ))}
           </ul>
+          <Link href="/classic/homepage" className="mt-5 inline-flex min-h-11 items-center gap-0.5 text-[16px] font-bold text-[#256ef4] hover:underline">
+            {ind.label} 홈페이지 제작 안내
+            <ChevronRight size={16} strokeWidth={2.5} aria-hidden />
+          </Link>
         </div>
       </section>
 

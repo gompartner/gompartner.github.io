@@ -5,10 +5,13 @@ import { privacyVersions, type PolicyVersion, type Table } from "@/data/classic/
 // 개인정보처리방침 본문(클래식 보기). 내용은 웹툰 쪽과 같은 data/privacyPolicy 를 쓴다.
 const hrefOf = (id: string) => (id === privacyVersions[0].id ? "/classic/privacy" : `/classic/privacy/${id}`);
 
-function DataTable({ head, rows }: Table) {
+function DataTable({ head, rows, caption }: Table) {
+  // 좁은 화면에서 가로로 스크롤하는 상자. 키보드로도 스크롤할 수 있게 초점을 받고, 이름을 붙인다.
+  const name = caption ?? head.join(", ");
   return (
-    <div tabIndex={0} className="overflow-x-auto border-t-2 border-[#15171c]">
+    <div role="region" aria-label={name} tabIndex={0} className="overflow-x-auto border-t-2 border-[#15171c]">
       <table className="w-full min-w-[480px] border-collapse text-left text-[15px] leading-[1.6]">
+        <caption className="sr-only">{name}</caption>
         <thead className="bg-[#f6f7f9] text-[#15171c]">
           <tr>
             {head.map((h) => (
