@@ -152,7 +152,7 @@ function Photo({ src, alt, className = "", pos }: { src: string; alt: string; cl
 /* ---------------- 페이지 ---------------- */
 
 /** threeD: true면 md 이상(모션 줄이기 아님)에서 학원 입구 3D 공간 안의 키오스크(/3d 경로용). 기본은 평면 키오스크 */
-export function KioskAcademyDemo({ threeD = false }: { threeD?: boolean } = {}) {
+export function KioskAcademyDemo({ threeD = false }: { threeD?: boolean }) {
   const today = useDemoToday();
   const [view, setView] = useState<"kiosk" | "admin">("kiosk");
   const [sec, setSec] = useState(START_SEC);

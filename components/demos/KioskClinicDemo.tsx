@@ -186,7 +186,7 @@ const validBirth = (b: string) => {
 };
 
 /** threeD가 true면 태블릿 폭 이상에서 3D 로비로 보여 준다(따로 연 3D 체험 주소용). 기본은 평면 키오스크 */
-export function KioskClinicDemo({ threeD = false }: { threeD?: boolean } = {}) {
+export function KioskClinicDemo({ threeD = false }: { threeD?: boolean }) {
   const today = useDemoToday();
   // 서버 렌더에는 사용자 설정이 없으므로, 화면이 붙은 뒤에만 움직임 줄이기 설정을 반영한다(하이드레이션 불일치 방지).
   const prefersReduced = useReducedMotion();
