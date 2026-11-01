@@ -40,9 +40,16 @@ import {
   Volume2,
   VolumeOff,
 } from "lucide-react";
+import dynamic from "next/dynamic";
 import QRCode from "qrcode";
 import { DemoMakerInfo } from "@/components/demos/DemoMakerInfo";
 import { daysAgo, fmtDot, fmtKo, useDemoToday } from "@/hooks/useDemoToday";
+
+const KioskScene = dynamic(
+  () =>
+    import("@/components/demos/kiosk3d/KioskScene").then((m) => m.KioskScene),
+  { ssr: false },
+);
 
 const u = (n: number) => `calc(var(--u) * ${n})`;
 const f = (n: number) => `calc(var(--u) * ${n} * var(--fs))`;
@@ -188,6 +195,19 @@ export function KioskClinicDemo() {
     return () => cancelAnimationFrame(frame);
   }, []);
   const reduce = mounted && !!prefersReduced;
+  // 태블릿 폭 이상이고 움직임 줄이기가 아니면 3D 로비로 보여 준다. 휴대폰 폭은 평면 키오스크 그대로.
+  const [wide, setWide] = useState(false);
+  useEffect(() => {
+    const mq = window.matchMedia("(min-width: 768px)");
+    const frame = requestAnimationFrame(() => setWide(mq.matches));
+    const on = (e: MediaQueryListEvent) => setWide(e.matches);
+    mq.addEventListener("change", on);
+    return () => {
+      cancelAnimationFrame(frame);
+      mq.removeEventListener("change", on);
+    };
+  }, []);
+  const layout3d = mounted && wide && !prefersReduced;
 
   const [step, setStep] = useState<Step>("idle");
   const [visit, setVisit] = useState<Visit>("return");
@@ -1044,8 +1064,70 @@ export function KioskClinicDemo() {
     </VoiceCtx.Provider>
   );
 
+  // 대기실 TV와 휴대폰 화면: xl은 장면 옆 세로 한 줄, md와 lg는 장면 아래 두 칸(한 번만 그린다)
+  const panels = (
+    <div className="grid w-full grid-cols-2 items-start gap-8 xl:grid-cols-1 xl:gap-6">
+      <WaitingTv queue={queue} called={called} reduce={!!reduce} now={now} />
+      {mine && (
+        <PhoneWait
+          key={mine.no}
+          mine={mine}
+          queue={queue}
+          reduce={!!reduce}
+          now={now}
+        />
+      )}
+    </div>
+  );
+
+  if (layout3d) {
+    // 3D 로비: 키오스크를 눌러 다가가면 같은 화면(state 하나)을 원근에 맞춰 겹쳐 쓴다.
+    return (
+      <div className="min-h-screen bg-[#E8E6E2]">
+        <div className="mx-auto grid w-full max-w-[1280px] gap-8 px-6 pt-5 xl:grid-cols-[minmax(0,1fr)_360px] xl:items-start">
+          <KioskScene
+            place="clinic"
+            className="h-[min(78vh,820px)] min-h-[600px] w-full"
+            tv={
+              <div
+                className="overflow-hidden bg-[#0A2E36] text-white"
+                style={{
+                  width: 640,
+                  height: 352,
+                  padding: "8px 16px",
+                  boxSizing: "border-box",
+                  containerType: "inline-size",
+                }}
+              >
+                <TvBoard
+                  queue={queue}
+                  called={called}
+                  reduce={!!reduce}
+                  now={now}
+                />
+              </div>
+            }
+          >
+            <div
+              className="relative overflow-hidden bg-white"
+              style={{ width: 450, height: 800, containerType: "size" }}
+            >
+              {screen}
+            </div>
+          </KioskScene>
+          {panels}
+        </div>
+        <div className="mx-auto max-w-[1280px] px-6 pb-8">
+          <DemoMakerInfo className="mt-6" />
+        </div>
+      </div>
+    );
+  }
+
   return (
-    <div className="min-h-screen bg-[#E8E6E2] md:bg-[linear-gradient(180deg,#ECEAE6_0%,#ECEAE6_74%,#D6D1CA_74%,#D6D1CA_100%)]">
+    <div
+      className={`min-h-screen bg-[#E8E6E2] ${mounted ? "" : "md:opacity-0"} md:bg-[linear-gradient(180deg,#ECEAE6_0%,#ECEAE6_74%,#D6D1CA_74%,#D6D1CA_100%)]`}
+    >
       <div className="mx-auto flex w-full max-w-[1200px] flex-col items-center md:flex-row md:items-start md:justify-center md:gap-12 md:px-6 md:pt-5">
         <div className="flex w-full flex-col items-center md:w-auto">
           {/* 키오스크 몸체 */}
@@ -2194,117 +2276,123 @@ function WaitingTv({
       </figcaption>
       <div className="rounded-[14px] bg-[#1B2329] p-[7px] shadow-[0_14px_30px_-16px_rgba(20,30,40,0.5)]">
         <div className="aspect-[16/9] overflow-hidden rounded-[6px] bg-[#0A2E36] text-white [container-type:inline-size]">
-          <div
-            className="flex h-full flex-col"
-            style={{ padding: "3.2cqw 3.6cqw" }}
-          >
-            <div
-              className="flex items-center justify-between"
-              style={{ fontSize: "4.2cqw" }}
-            >
-              <span
-                className="flex items-center font-bold"
-                style={{ gap: "1.6cqw" }}
-              >
-                <Stethoscope
-                  aria-hidden
-                  style={{ width: "4.6cqw", height: "4.6cqw" }}
-                />
-                내과의원 진료 순서
-              </span>
-              <span className="font-bold tabular-nums">{now ?? ""}</span>
-            </div>
-            <div
-              className="grid flex-1 grid-cols-3"
-              style={{ gap: "2.4cqw", marginTop: "2.8cqw" }}
-            >
-              {ROOMS.map((r) => {
-                const q = queue[r];
-                const hot = called?.room === r;
-                return (
-                  <div
-                    key={r}
-                    className="flex flex-col overflow-hidden"
-                    style={{ borderRadius: "1.6cqw", background: "#123E48" }}
-                  >
-                    <p
-                      className="text-center font-bold"
-                      style={{
-                        fontSize: "3.8cqw",
-                        padding: "1.4cqw 0",
-                        background: "#0B5563",
-                      }}
-                    >
-                      {r}
-                    </p>
-                    <motion.div
-                      key={`${r}-${q.now}`}
-                      className="flex flex-col items-center justify-center"
-                      style={{ padding: "1.6cqw 0" }}
-                      initial={
-                        reduce || !hot
-                          ? false
-                          : { backgroundColor: "#F2B33D", color: "#2B1D00" }
-                      }
-                      animate={{
-                        backgroundColor: "rgba(0,0,0,0)",
-                        color: "#ffffff",
-                      }}
-                      transition={{ duration: 1.6, ease: "easeOut" }}
-                    >
-                      <span style={{ fontSize: "2.8cqw", opacity: 0.9 }}>
-                        진료 중
-                      </span>
-                      <span
-                        className="font-extrabold tabular-nums"
-                        style={{ fontSize: "11cqw", lineHeight: 1 }}
-                      >
-                        {q.now}
-                      </span>
-                    </motion.div>
-                    <div
-                      className="mt-auto"
-                      style={{ padding: "0 1.6cqw 1.6cqw" }}
-                    >
-                      <p
-                        style={{
-                          fontSize: "2.6cqw",
-                          color: "#BFD9DE",
-                          marginBottom: "0.8cqw",
-                        }}
-                      >
-                        다음 순서
-                      </p>
-                      <p
-                        className="flex flex-wrap font-bold tabular-nums"
-                        style={{
-                          fontSize: "3.8cqw",
-                          gap: "0 2cqw",
-                          minHeight: "4.6cqw",
-                        }}
-                      >
-                        {q.wait.length ? (
-                          q.wait
-                            .slice(0, 3)
-                            .map((n) => <span key={n}>{n}</span>)
-                        ) : (
-                          <span style={{ color: "#BFD9DE", fontWeight: 500 }}>
-                            없음
-                          </span>
-                        )}
-                      </p>
-                    </div>
-                  </div>
-                );
-              })}
-            </div>
-          </div>
+          <TvBoard queue={queue} called={called} reduce={reduce} now={now} />
         </div>
       </div>
       <p className="sr-only" aria-live="polite">
         {called ? `${called.no}번 환자분, ${called.room}로 들어와 주세요` : ""}
       </p>
     </figure>
+  );
+}
+
+// 대기실 TV 화면 내용. 부모 너비(container inline-size) 기준 cqw로 그려 옆 패널과 3D 벽 TV 어디에 넣어도 같은 비율이 된다.
+function TvBoard({
+  queue,
+  called,
+  reduce,
+  now,
+}: {
+  queue: Queue;
+  called: { room: Room; no: number } | null;
+  reduce: boolean;
+  now: string | null;
+}) {
+  return (
+    <div className="flex h-full flex-col" style={{ padding: "3.2cqw 3.6cqw" }}>
+      <div
+        className="flex items-center justify-between"
+        style={{ fontSize: "4.2cqw" }}
+      >
+        <span className="flex items-center font-bold" style={{ gap: "1.6cqw" }}>
+          <Stethoscope
+            aria-hidden
+            style={{ width: "4.6cqw", height: "4.6cqw" }}
+          />
+          내과의원 진료 순서
+        </span>
+        <span className="font-bold tabular-nums">{now ?? ""}</span>
+      </div>
+      <div
+        className="grid flex-1 grid-cols-3"
+        style={{ gap: "2.4cqw", marginTop: "2.8cqw" }}
+      >
+        {ROOMS.map((r) => {
+          const q = queue[r];
+          const hot = called?.room === r;
+          return (
+            <div
+              key={r}
+              className="flex flex-col overflow-hidden"
+              style={{ borderRadius: "1.6cqw", background: "#123E48" }}
+            >
+              <p
+                className="text-center font-bold"
+                style={{
+                  fontSize: "3.8cqw",
+                  padding: "1.4cqw 0",
+                  background: "#0B5563",
+                }}
+              >
+                {r}
+              </p>
+              <motion.div
+                key={`${r}-${q.now}`}
+                className="flex flex-col items-center justify-center"
+                style={{ padding: "1.6cqw 0" }}
+                initial={
+                  reduce || !hot
+                    ? false
+                    : { backgroundColor: "#F2B33D", color: "#2B1D00" }
+                }
+                animate={{
+                  backgroundColor: "rgba(0,0,0,0)",
+                  color: "#ffffff",
+                }}
+                transition={{ duration: 1.6, ease: "easeOut" }}
+              >
+                <span style={{ fontSize: "2.8cqw", opacity: 0.9 }}>
+                  진료 중
+                </span>
+                <span
+                  className="font-extrabold tabular-nums"
+                  style={{ fontSize: "11cqw", lineHeight: 1 }}
+                >
+                  {q.now}
+                </span>
+              </motion.div>
+              <div className="mt-auto" style={{ padding: "0 1.6cqw 1.6cqw" }}>
+                <p
+                  style={{
+                    fontSize: "2.6cqw",
+                    color: "#BFD9DE",
+                    marginBottom: "0.8cqw",
+                  }}
+                >
+                  다음 순서
+                </p>
+                <p
+                  className="flex flex-wrap font-bold tabular-nums"
+                  style={{
+                    fontSize: "3.8cqw",
+                    gap: "0 2cqw",
+                    minHeight: "4.6cqw",
+                  }}
+                >
+                  {q.wait.length ? (
+                    q.wait.slice(0, 3).map((n) => <span key={n}>{n}</span>)
+                  ) : (
+                    <span style={{ color: "#BFD9DE", fontWeight: 500 }}>
+                      없음
+                    </span>
+                  )}
+                </p>
+              </div>
+            </div>
+          );
+        })}
+      </div>
+    </div>
   );
 }
 
