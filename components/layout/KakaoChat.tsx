@@ -26,7 +26,20 @@ export function KakaoChat() {
 const COLOR_CLASS = /^(hover:)?bg-|^text-(white|accent-foreground|foreground)|^border-white/;
 function kakaoColors(className: string) {
   const kept = className.split(/\s+/).filter((c) => c && !COLOR_CLASS.test(c));
-  return [...kept, "bg-[#FEE500]", "text-[#191919]", "hover:bg-[#F5D800]"].join(" ");
+  const gap = kept.some((c) => c.startsWith("gap-")) ? [] : ["gap-2"];
+  return [...kept, ...gap, "bg-[#FEE500]", "text-[#191919]", "hover:bg-[#F5D800]"].join(" ");
+}
+
+// 카카오 심볼(검은 말풍선). simple-icons의 KakaoTalk 아이콘에서 말풍선 모양만 옮김
+function KakaoSymbol() {
+  return (
+    <svg viewBox="2.25 3.375 19.5 17.85" width="18" height="17" aria-hidden="true" className="shrink-0">
+      <path
+        fill="currentColor"
+        d="M12 3.375c-5.3848 0-9.75 3.4418-9.75 7.6875 0 2.7449 1.8249 5.1535 4.5701 6.5135-.1494.515-.9598 3.3135-.992 3.5333 0 0-.0194.1652.0876.2282s.2328.0141.2328.0141c.3068-.0428 3.5572-2.326 4.1198-2.7225.562.0796 1.1407.1209 1.7317.1209 5.3848 0 9.75-3.4418 9.75-7.6875S17.3848 3.375 12 3.375z"
+      />
+    </svg>
+  );
 }
 
 export function KakaoChatButton({
@@ -41,6 +54,7 @@ export function KakaoChatButton({
 }) {
   return (
     <a href={KAKAO_CHAT_URL} target="_blank" rel="noopener noreferrer" data-gtm-cta={cta} className={kakaoColors(className)}>
+      <KakaoSymbol />
       {children}
     </a>
   );
