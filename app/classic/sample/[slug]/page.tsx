@@ -3,9 +3,10 @@ import type { Project } from "@/lib/types";
 import Image from "next/image";
 import Link from "next/link";
 import { notFound } from "next/navigation";
-import { Box, Check, Plus } from "lucide-react";
+import { Check, Plus } from "lucide-react";
 import { PageHead, btnLine, btnPrimary, h2, h3, more, wrap } from "@/components/classic/ui";
 import { SampleGrid } from "@/components/classic/works/SampleGrid";
+import { Kiosk3dLink } from "@/components/classic/works/Kiosk3dLink";
 import { isDeviceCatalog, isProgram, catalogProjects, demoProjects, findBySlug, groupOf, industryOf, isMaintenance, mobileShotOf, samplesIn, slugOf } from "@/components/classic/works/samples";
 import { estimateFor } from "@/data/classic/pricing";
 import { designConcepts } from "@/data/classic/designConcepts";
@@ -199,12 +200,9 @@ export default async function ClassicSamplePage({ params }: Props) {
             <Link href={p.demoUrl} prefetch={false} data-gtm-cta={`classic_sample_open_${p.id}`} className={btnLine}>
               체험하기
             </Link>
-            {/* 11-02 키오스크는 장소 무대 3D 체험을 별도 버튼으로 */}
+            {/* 11-02 키오스크는 장소 무대 3D 체험을 별도 버튼으로. 공개 주소에서는 숨김(Kiosk3dLink) */}
             {p.category === "키오스크" ? (
-              <Link href={`${p.demoUrl}/3d`} prefetch={false} data-gtm-cta={`classic_sample_open3d_${p.id}`} className={`${btnLine} gap-2`}>
-                <Box size={18} aria-hidden />
-                3D 체험
-              </Link>
+              <Kiosk3dLink href={`${p.demoUrl}/3d`} id={p.id} className={btnLine} />
             ) : null}
           </div>
         </section>
