@@ -1,8 +1,11 @@
 사람 모형 (components/demos/kiosk3d/People.tsx)
-Quaternius의 Ultimate Animated Character Pack 계열 모형. 라이선스는 CC0 1.0(퍼블릭 도메인)이다.
-Poly Pizza에서 glb로 받아 @gltf-transform/cli 4 resample, dedup, prune만 했다(뼈대와 동작은 그대로).
+모두 Quaternius의 Ultimate Animated Character Pack 계열 모형이며 라이선스는 CC0 1.0(퍼블릭 도메인)이다.
+같은 뼈대(HumanArmature)와 같은 동작(*_Walk, *_Idle, *_Sitting)을 쓴다. Poly Pizza에서 glb로 받아
+@gltf-transform/cli 4 resample, dedup, prune만 했다(뼈대와 동작은 그대로). 옷, 머리, 피부 색과 키는 코드(CAST)에서 바꾼다.
 
-- person_a.glb  Woman Casual (Quaternius)  https://poly.pizza/m/jpKRgGDxhk  CC0
-- person_b.glb  Woman (Quaternius)         https://poly.pizza/m/AQsd9ngvKU  CC0
-  쓰는 동작: Female_Walk, Female_Idle, Female_Sitting. 옷과 머리 색은 코드에서 바꾼다.
+- man_casual.glb    Man (Quaternius)           https://poly.pizza/m/HMnuH5geEG  CC0
+- man_suit.glb      Man in Suit (Quaternius)   https://poly.pizza/m/mQnGoME1ez  CC0
+- woman_casual.glb  Woman Casual (Quaternius)  https://poly.pizza/m/jpKRgGDxhk  CC0
+- woman_jacket.glb  Woman (Quaternius)         https://poly.pizza/m/AQsd9ngvKU  CC0
+- woman_dress.glb   Woman in Dress (Quaternius) https://poly.pizza/m/zMyPlQXBzq  CC0
 제작자 페이지: https://quaternius.com

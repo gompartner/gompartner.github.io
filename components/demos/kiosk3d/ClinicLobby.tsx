@@ -1,10 +1,11 @@
 "use client";
 
 import { useMemo } from "react";
+import { useThree } from "@react-three/fiber";
 import { Clone, RoundedBox, useGLTF, useTexture } from "@react-three/drei";
 import * as THREE from "three";
 import type { RoomProps } from "./places";
-import { SeatedPerson } from "./People";
+import { CAST, SeatedPerson, StandingPerson } from "./People";
 
 /*
   병원 로비 모형(잘라 낸 집 모형처럼 위에서 내려다본다).
@@ -32,6 +33,8 @@ const WHITE = "#f7f7f5";
 const SEAT = "#6f8f94";
 
 function useSet(name: string, repeat: [number, number], tint?: string) {
+  // 비스듬히 내려다보는 바닥, 나무결이 멀리서 자글거리지 않게 그래픽 카드가 허락하는 최대 이방성 필터를 쓴다
+  const maxAniso = useThree((s) => s.gl.capabilities.getMaxAnisotropy());
   const t = useTexture({ map: `${TX}${name}_diff_1k.jpg`, normalMap: `${TX}${name}_nor_gl_1k.jpg`, aoMap: `${TX}${name}_arm_1k.jpg` });
   return useMemo(() => {
     const out: Record<string, THREE.Texture> = {};
@@ -40,14 +43,14 @@ function useSet(name: string, repeat: [number, number], tint?: string) {
       c.wrapS = c.wrapT = THREE.RepeatWrapping;
       c.repeat.set(repeat[0], repeat[1]);
       c.colorSpace = k === "map" ? THREE.SRGBColorSpace : THREE.NoColorSpace;
-      c.anisotropy = 8;
+      c.anisotropy = maxAniso;
       c.needsUpdate = true;
       out[k] = c;
     }
     const m = new THREE.MeshStandardMaterial({ map: out.map, normalMap: out.normalMap, roughnessMap: out.aoMap, roughness: 1, color: tint ?? "#ffffff" });
     m.normalScale.set(0.6, 0.6);
     return m;
-  }, [t, repeat, tint]);
+  }, [t, repeat, tint, maxAniso]);
 }
 
 const FLOOR_REPEAT: [number, number] = [4, 3];
@@ -301,10 +304,12 @@ export function ClinicLobby({ config }: RoomProps) {
       {/* 대기석 두 줄(TV를 본다), 줄 끝 협탁 */}
       {/* 의자는 TV(뒤벽) 쪽을 본다. 앉는 면 중심은 의자 자리에서 등받이 쪽(+z)으로 0.2m */}
       {rows.map((z) => seatsX.map((x) => <Chair key={`${x}${z}`} p={[x, 0, z]} rot={Math.PI} />))}
-      {/* 기다리는 환자 셋 */}
-      <SeatedPerson seat={[-2.0, 0.44, rows[0] + 0.2]} rotationY={Math.PI} look={{ model: "b", jacket: "#6d7f8c", pants: "#2f3338", hair: "#231c18" }} />
-      <SeatedPerson seat={[-2.85, 0.44, rows[1] + 0.2]} rotationY={Math.PI} phone look={{ model: "a", shirt: "#c9a27a", pants: "#3a4250", hair: "#3a2a20" }} />
-      <SeatedPerson seat={[-1.15, 0.44, rows[1] + 0.2]} rotationY={Math.PI} look={{ model: "b", jacket: "#9a6b5b", pants: "#2b2f36", hair: "#15120f" }} />
+      {/* 기다리는 환자 셋(노년 여성, 20대 여성, 직장인 남성) */}
+      <SeatedPerson seat={[-2.0, 0.44, rows[0] + 0.2]} rotationY={Math.PI} look={CAST.elder} />
+      <SeatedPerson seat={[-2.85, 0.44, rows[1] + 0.2]} rotationY={Math.PI} phone look={CAST.young} />
+      <SeatedPerson seat={[-1.15, 0.44, rows[1] + 0.2]} rotationY={Math.PI} look={CAST.worker} />
+      {/* 접수대 뒤 직원 */}
+      <StandingPerson at={[2.75, 0, -2.98]} look={CAST.receptionist} />
       {rows.map((z) => (
         <Model key={z} url={`${M}side_table_01.glb`} p={[-3.75, 0, z]} rot={Math.PI / 2} scale={0.9} />
       ))}

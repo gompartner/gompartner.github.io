@@ -1,10 +1,11 @@
 "use client";
 
 import { useLayoutEffect, useMemo } from "react";
+import { useThree } from "@react-three/fiber";
 import { RoundedBox, useGLTF, useTexture } from "@react-three/drei";
 import * as THREE from "three";
 import { ACADEMY, type RoomProps } from "./places";
-import { SeatedPerson } from "./People";
+import { CAST, SeatedPerson, StandingPerson } from "./People";
 
 /*
   학원 입구 디오라마(11-01 방향 바뀜: "물건 디테일보다 우리 기능이 부각되게").
@@ -137,15 +138,18 @@ function Wall({ along, fixed, from, to, h = WALL_H, t = WALL_T, openings = [] }:
 function Floor({ x0, x1, z0, z1, tex, tint = "#ffffff", y = 0 }: { x0: number; x1: number; z0: number; z1: number; tex?: THREE.Texture; tint?: string; y?: number }) {
   const w = x1 - x0;
   const d = z1 - z0;
+  const maxAniso = useThree((s) => s.gl.capabilities.getMaxAnisotropy());
   const map = useMemo(() => {
     if (!tex) return undefined;
     const t = tex.clone();
     t.colorSpace = THREE.SRGBColorSpace;
     t.wrapS = t.wrapT = THREE.RepeatWrapping;
-    t.repeat.set(w / 1.6, d / 1.6);
+    // 마루 한 장 크기를 키워(2.2m마다 되풀이) 멀리서 결이 자글거리지 않게, 이방성 필터는 최대로
+    t.repeat.set(w / 2.2, d / 2.2);
+    t.anisotropy = maxAniso;
     t.needsUpdate = true;
     return t;
-  }, [tex, w, d]);
+  }, [tex, w, d, maxAniso]);
   return (
     <mesh rotation={[-Math.PI / 2, 0, 0]} position={[(x0 + x1) / 2, y, (z0 + z1) / 2]} receiveShadow>
       <planeGeometry args={[w, d]} />
@@ -502,9 +506,9 @@ export function AcademyEntrance(_props: RoomProps) {
         <boxGeometry args={[DIR_X - X0, 1.4, 0.012]} />
         <meshStandardMaterial color={C.glass} roughness={0.05} transparent opacity={0.22} depthWrite={false} />
       </mesh>
-      <Box p={[(X0 + DIR_X) / 2, WALL_H - 0.015, DIR_Z]} s={[DIR_X - X0, 0.03, 0.04]} c="#c3c8cf" rough={0.4} metal={0.6} />
+      <Box p={[(X0 + DIR_X) / 2, WALL_H - 0.025, DIR_Z]} s={[DIR_X - X0, 0.05, 0.06]} c="#c3c8cf" rough={0.5} metal={0.3} />
       <Box p={[DIR_X, 1.0, DIR_Z]} s={[0.06, 0.02, 0.06]} c={C.frame} rough={0.4} metal={0.6} />
-      <Box p={[DIR_X, 1.7, DIR_Z]} s={[0.04, 1.4, 0.04]} c="#c3c8cf" rough={0.4} metal={0.6} />
+      <Box p={[DIR_X, 1.7, DIR_Z]} s={[0.06, 1.4, 0.06]} c="#c3c8cf" rough={0.5} metal={0.3} />
 
       {/* 입구: 유리문, 신발장, 우산꽂이, 매트 */}
       <GlassDoor x={-3.4} z={Z0} />
@@ -522,7 +526,7 @@ export function AcademyEntrance(_props: RoomProps) {
       {/* 대기 의자와 게시판(왼쪽 벽) */}
       <Bench x={X0 + 0.3} z={-0.2} len={1.6} rotationY={Math.PI / 2} />
       {/* 기다리는 학부모(휴대폰으로 입실 알림을 받는다) */}
-      <SeatedPerson seat={[-4.74, 0.455, -0.2]} rotationY={Math.PI / 2} phone look={{ model: "b", jacket: "#8d6e63", pants: "#3b3f47", hair: "#1f1a17" }} />
+      <SeatedPerson seat={[-4.74, 0.455, -0.2]} rotationY={Math.PI / 2} phone look={CAST.parent} />
       <NoticeBoard x={X0 + WALL_T / 2 + 0.02} y={1.55} z={-0.2} rotationY={Math.PI / 2} />
       <Model url={MODELS.plant} position={[X0 + 0.45, 0, 0.95]} />
       <Model url={MODELS.extinguisher} position={[0.75, 0, -3.3]} />
@@ -530,7 +534,7 @@ export function AcademyEntrance(_props: RoomProps) {
 
       {/* 원장실: 책상, 모니터, 상담 탁자, 책장 */}
       <DirectorDesk x={-2.75} z={2.2} />
-      <SeatedPerson seat={[-2.75, 0.51, 2.9]} rotationY={Math.PI} look={{ model: "b", jacket: "#2b3348", shirt: "#f2f2f2", pants: "#2b2f36", hair: "#15120f" }} />
+      <SeatedPerson seat={[-2.75, 0.51, 2.9]} rotationY={Math.PI} look={CAST.director} />
       <ConsultTable x={-4.3} z={2.45} />
       <Model url={MODELS.shelf} position={[-0.86, 0, 2.95]} />
 
@@ -544,6 +548,8 @@ export function AcademyEntrance(_props: RoomProps) {
           </group>
         )),
       )}
+      {/* 화이트보드 앞 선생님(학생 쪽을 본다) */}
+      <StandingPerson at={[4.5, 0, -1.5]} rotationY={-Math.PI / 2} look={CAST.teacher} />
       {/* 교실 B(닫힌 문) */}
       <Whiteboard x={X1 - WALL_T / 2 - 0.02} y={1.35} z={2.35} rotationY={-Math.PI / 2} w={1.6} />
       {[1.95, 2.95].flatMap((dz) =>

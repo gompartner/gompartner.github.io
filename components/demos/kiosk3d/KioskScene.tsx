@@ -2,12 +2,13 @@
 
 import { Suspense, useEffect, useMemo, useRef, useState, type ComponentType, type ReactNode } from "react";
 import { Canvas, useFrame, useThree } from "@react-three/fiber";
-import { ContactShadows, Environment, Lightformer, OrbitControls, RoundedBox, useProgress } from "@react-three/drei";
+import { ContactShadows, Environment, Lightformer, OrbitControls, PerformanceMonitor, Preload, RoundedBox, useProgress } from "@react-three/drei";
 import type { OrbitControls as OrbitControlsImpl } from "three-stdlib";
 import * as THREE from "three";
+import { Hand, Maximize2, Mouse, RotateCcw } from "lucide-react";
 import { AcademyEntrance } from "./AcademyEntrance";
 import { ClinicLobby } from "./ClinicLobby";
-import { Person, SIT_BACK, SIT_THIGH, WALK_SPEED } from "./People";
+import { CAST, Person, SIT_BACK, SIT_THIGH, heightScale, type PersonLook } from "./People";
 import { PLACES, type CameraShot, type Place, type PlaceConfig, type RoomProps, type Vec3 } from "./places";
 
 /*
@@ -30,6 +31,9 @@ const SCREEN_CY = 1.26;
 const SCREEN_CZ = 0.049;
 
 const ROOMS: Record<Place, ComponentType<RoomProps>> = { clinic: ClinicLobby, academy: AcademyEntrance };
+
+/** 원근 변환한 화면 DOM: 투명한 1px 테두리로 가장자리를 부드럽게, 뒷면은 숨긴다. will-change는 쓰지 않는다(크롬이 처음 배율로 굳혀 다가가면 글자가 흐려짐) */
+const LAYER: React.CSSProperties = { outline: "1px solid transparent", backfaceVisibility: "hidden" };
 
 /** 화면 자리 재질: 투명한 점을 써서(섞지 않음) 캔버스 아래 실제 화면 DOM이 보이게 한다. 앞에 있는 물건은 깊이 검사로 그대로 남는다 */
 const HOLE = new THREE.MeshBasicMaterial({ color: "#000000", transparent: true, opacity: 0, blending: THREE.NoBlending, depthWrite: true, toneMapped: false });
@@ -185,6 +189,9 @@ function ScreenProjector({ target, corners, px }: { target: React.RefObject<HTML
     const el = target.current;
     if (!el) return;
     const { v, n, d } = tmp.current;
+    // 둘러보기 조작과 카메라 이동(우선순위 -1, -2)이 이 장면에서 옮긴 카메라 자리를 행렬에 반영한 뒤 투영한다.
+    // 이것을 빼면 행렬이 그리기 직전에야 바뀌어, 화면 DOM이 한 장면 늦게 따라오며 테두리와 어긋난다
+    camera.updateMatrixWorld();
     n.subVectors(corners[1], corners[0]).cross(d.subVectors(corners[3], corners[0]));
     d.subVectors(camera.position, corners[0]);
     if (n.dot(d) > 0) {
@@ -211,13 +218,16 @@ function ScreenProjector({ target, corners, px }: { target: React.RefObject<HTML
 
 /* eslint-disable react-hooks/immutability -- useFrame 안에서 카메라와 둘러보기 조작(three 객체)을 매 장면 직접 옮기는 것이 이 부품의 목적이다 */
 // shot이 바뀌면 둘러보기 조작을 잠시 끄고 카메라를 그 자리로 옮긴 뒤, 도착하면 그 자리를 중심으로 다시 끌어서 돌려 볼 수 있게 넘긴다
-function CameraRig({ shot, locked, reduced, controls }: { shot: CameraShot; locked: boolean; reduced: boolean; controls: React.RefObject<OrbitControlsImpl | null> }) {
+function CameraRig({ shot, locked, reduced, controls, resetKey = 0 }: { shot: CameraShot; locked: boolean; reduced: boolean; controls: React.RefObject<OrbitControlsImpl | null>; resetKey?: number }) {
   const camera = useThree((s) => s.camera);
   const state = useRef({ moving: true, look: new THREE.Vector3(...shot.target), pos: new THREE.Vector3(), tgt: new THREE.Vector3(), key: "" });
-  useFrame((_, dt) => {
+  // 우선순위 -2: 화면 투영(ScreenProjector, 이름표)보다 먼저 카메라를 옮겨 같은 장면 안에서 맞춘다(한 장면 늦게 따라오며 튀는 것 방지)
+  useFrame((_, rawDt) => {
+    // 한 장면이 늦게 그려져도(셰이더 준비 등) 카메라가 크게 건너뛰지 않게 한 장면 시간을 1/30초로 묶는다
+    const dt = Math.min(rawDt, 1 / 30);
     const s = state.current;
     const c = controls.current;
-    const key = `${shot.position.join(",")}|${shot.target.join(",")}|${locked}`;
+    const key = `${shot.position.join(",")}|${shot.target.join(",")}|${locked}|${resetKey}`;
     if (key !== s.key) {
       s.key = key;
       s.moving = true;
@@ -242,7 +252,7 @@ function CameraRig({ shot, locked, reduced, controls }: { shot: CameraShot; lock
         if (!locked) c.update();
       }
     }
-  });
+  }, -2);
   return null;
 }
 /* eslint-enable react-hooks/immutability */
@@ -302,12 +312,13 @@ function PathDashes({ path, color }: { path: Vec3[]; color: string }) {
 }
 
 const FIGURE_SPEED = 1.2;
-/** 학생, 환자 옷 색 */
-const WALKER_LOOK = { model: "a", shirt: "#e9eef6", pants: "#2c3442", hair: "#2a211c" } as const;
+/** 장소마다 걷는 사람(병원은 환자, 학원은 가방 멘 학생) */
+const WALKERS: Record<Place, PersonLook> = { clinic: CAST.patient, academy: CAST.student };
 
 /* eslint-disable react-hooks/immutability -- useFrame 안에서 사람 모형(three 객체)의 자리와 방향을 매 장면 직접 옮긴다 */
 // 걷는 사람. 길을 따라 걸을 때는 걷기 동작(속도에 맞춘 빠르기), 멈추면 서서 쉬기, sit이면 그 점(앉는 면 중심)에 앉는다
-function Figure({ path, at, facing, sit, seat, seatBack, phone, hidden, reduced, accent, g }: { path: Vec3[]; at: number; facing: number; sit: boolean; seat: number; seatBack: number; phone: boolean; hidden: boolean; reduced: boolean; accent: string; g: React.RefObject<THREE.Group | null> }) {
+function Figure({ look, path, at, facing, sit, seat, seatBack, phone, hidden, reduced, accent, g }: { look: PersonLook; path: Vec3[]; at: number; facing: number; sit: boolean; seat: number; seatBack: number; phone: boolean; hidden: boolean; reduced: boolean; accent: string; g: React.RefObject<THREE.Group | null> }) {
+  const hk = heightScale(look);
   const acc = useMemo(() => pathLengths(path), [path]);
   const body = useRef<THREE.Group>(null);
   const ring = useRef<THREE.Mesh>(null);
@@ -336,10 +347,10 @@ function Figure({ path, at, facing, sit, seat, seatBack, phone, hidden, reduced,
     s.k += reduced ? wantK - s.k : (wantK - s.k) * Math.min(1, dt * 5);
     grp.position.set(x, 0, z);
     grp.rotation.y = s.yaw;
-    b.position.set(0, Math.max(0, seat - SIT_THIGH) * s.k, (SIT_BACK - seatBack) * s.k);
+    b.position.set(0, Math.max(0, seat - SIT_THIGH * hk) * s.k, (SIT_BACK * hk - seatBack) * s.k);
     if (ring.current) ring.current.visible = !seated;
     grp.visible = !hidden;
-  });
+  }, -1);
   return (
     <group ref={g}>
       {/* 발밑 원 */}
@@ -348,13 +359,28 @@ function Figure({ path, at, facing, sit, seat, seatBack, phone, hidden, reduced,
         <meshBasicMaterial color={accent} transparent opacity={0.5} />
       </mesh>
       <group ref={body}>
-        <Person look={WALKER_LOOK} action={mode} timeScale={FIGURE_SPEED / WALK_SPEED} phone={phone} />
+        <Person look={look} action={mode} speed={FIGURE_SPEED} phone={phone} />
       </group>
     </group>
   );
 }
 
 /* eslint-enable react-hooks/immutability */
+
+const CTRL = "flex items-center gap-1.5 rounded-full bg-white/95 px-3.5 py-2 text-[13px] font-bold text-[#15171c] shadow-[0_6px_16px_rgba(0,0,0,.15)] hover:bg-white";
+
+/** 끌어서 옮길 때 보는 점이 방 밖으로 나가지 않게 묶는다(카메라도 같은 만큼 옮겨 회전 각도는 그대로) */
+const ROOM_BOUNDS = { x: [-4.6, 4.6], y: [0, 2.2], z: [-3.2, 3.2] } as const;
+const clampTmp = new THREE.Vector3();
+function clampToRoom(c: OrbitControlsImpl | null) {
+  if (!c || !c.enabled) return;
+  const t = c.target;
+  clampTmp.set(THREE.MathUtils.clamp(t.x, ROOM_BOUNDS.x[0], ROOM_BOUNDS.x[1]), THREE.MathUtils.clamp(t.y, ROOM_BOUNDS.y[0], ROOM_BOUNDS.y[1]), THREE.MathUtils.clamp(t.z, ROOM_BOUNDS.z[0], ROOM_BOUNDS.z[1]));
+  if (clampTmp.equals(t)) return;
+  clampTmp.sub(t);
+  t.add(clampTmp);
+  c.object.position.add(clampTmp);
+}
 
 const PILL = "whitespace-nowrap rounded-full bg-white/95 px-2.5 py-1 text-[12px] font-bold leading-none text-[#1f2b33] shadow-[0_2px_8px_rgba(20,30,40,.18)]";
 const PILL_ON = "whitespace-nowrap rounded-full bg-(--acc) px-2.5 py-1 text-[12px] font-bold leading-none text-white shadow-[0_2px_8px_rgba(20,30,40,.25)]";
@@ -388,6 +414,7 @@ function Anchors({ labels, els }: { labels: Label[]; els: React.RefObject<(HTMLE
   const { camera, size } = useThree();
   const v = useRef(new THREE.Vector3());
   useFrame(() => {
+    camera.updateMatrixWorld();
     labels.forEach((l, i) => {
       const el = els.current[i];
       if (!el) return;
@@ -422,12 +449,29 @@ function LabelView({ l }: { l: Label }) {
 
 /* ---------------- 불러오는 동안 ---------------- */
 
-function Loading() {
-  const { active } = useProgress();
-  if (!active) return null;
+// 곰파트너 곰이 위아래로 살짝 움직이고, 아래에 불러온 비율을 보여 준다. 다 불러오면 0.5초 동안 흐려지며 사라진다
+function Loading({ ready, progress }: { ready: boolean; progress: number }) {
+  const [gone, setGone] = useState(false);
+  useEffect(() => {
+    if (!ready) return;
+    const t = window.setTimeout(() => setGone(true), 600);
+    return () => window.clearTimeout(t);
+  }, [ready]);
+  if (gone) return null;
+  const pct = Math.round(ready ? 100 : Math.min(99, progress));
   return (
-    <div className="pointer-events-none absolute inset-0 z-[45] flex items-center justify-center bg-(--bg)" aria-hidden>
-      <span className="h-8 w-8 animate-spin rounded-full border-[3px] border-(--acc)/20 border-t-(--acc) motion-reduce:animate-none" />
+    <div className={`pointer-events-none absolute inset-0 z-[45] flex flex-col items-center justify-center gap-4 bg-(--bg) transition-opacity duration-500 motion-reduce:transition-none ${ready ? "opacity-0" : "opacity-100"}`} aria-live="polite">
+      <style>{"@keyframes kiosk-bear-bob{0%,100%{transform:translateY(0)}50%{transform:translateY(-8px)}}@media (prefers-reduced-motion: reduce){.kiosk-bear{animation:none!important}}"}</style>
+      {/* eslint-disable-next-line @next/next/no-img-element -- 정적 내보내기 사이트라 next/image 최적화를 쓰지 않는다 */}
+      <img src="/images/bear-avatar.webp" alt="" width={96} height={96} className="kiosk-bear h-24 w-24 select-none rounded-full shadow-[0_6px_16px_rgba(20,30,40,.12)]" style={{ animation: "kiosk-bear-bob 1.6s ease-in-out infinite" }} draggable={false} />
+      <div className="flex w-[200px] flex-col items-center gap-2">
+        <div className="h-1.5 w-full overflow-hidden rounded-full bg-black/10">
+          <div className="h-full rounded-full bg-(--acc) transition-[width] duration-300 motion-reduce:transition-none" style={{ width: `${pct}%` }} />
+        </div>
+        <p className="text-[13px] font-bold text-[#3d4450]">
+          3D 공간 준비 중 <span className="tabular-nums">{pct}%</span>
+        </p>
+      </div>
     </div>
   );
 }
@@ -459,7 +503,17 @@ export function KioskScene({ place, children, tv, phone, monitor, className = ""
   const [zoom, setZoom] = useState(false);
   const [figAt, setFigAt] = useState(0);
   const [auto, setAuto] = useState(false);
+  // 재생 버튼으로 멈췄는지(전체 보기로 돌아와도 다시 재생하지 않는다)
+  const [held, setHeld] = useState(false);
+  // 자동 넘김을 다시 시작할 때 이어 갈 단계
+  const resume = useRef(0);
+  const [hint, setHint] = useState(true);
+  const [touch, setTouch] = useState(false);
+  const [resetKey, setResetKey] = useState(0);
+  const { active: loadingNow, progress } = useProgress();
+  const [ready, setReady] = useState(false);
   const [reduced, setReduced] = useState(false);
+  const [dprState, setDpr] = useState(() => (typeof window === "undefined" ? 1.5 : Math.min(2, Math.max(1.5, window.devicePixelRatio || 1))));
   const active = zoom;
 
   const ks = useMemo(() => kioskScreen(config), [config]);
@@ -478,14 +532,27 @@ export function KioskScene({ place, children, tv, phone, monitor, className = ""
       setZoom(false);
       return;
     }
+    resume.current = (i + 1) % Math.max(1, steps.length);
     setZoom(steps[i].camera === "kiosk");
     setFigAt(steps[i].at);
   };
+  // 사용자가 직접 고르거나 키오스크로 다가가면 자동 넘김을 멈춘다
+  const pick = (i: number) => {
+    setAuto(false);
+    go(i);
+  };
   const open = () => {
+    setAuto(false);
     if (kioskIdx >= 0) go(kioskIdx);
     else setZoom(true);
   };
-  const leave = () => go(null);
+  // 전체 보기(Esc와 같음): 전체 장면으로 돌아와, 재생 버튼으로 멈춘 게 아니면 지금 단계 다음부터 다시 자동 넘김
+  const leave = () => {
+    go(null);
+    if (!held && !reduced && steps.length) setAuto(true);
+  };
+  // 정면 보기: 지금 장면(전체 또는 단계)의 처음 카메라 자리로 되돌린다
+  const resetView = () => setResetKey((k) => k + 1);
 
   useEffect(() => {
     if (!zoomSignal) return;
@@ -501,60 +568,78 @@ export function KioskScene({ place, children, tv, phone, monitor, className = ""
   }, [zoomSignal, kioskIdx, steps]);
   useEffect(() => {
     const f = requestAnimationFrame(() => {
-      const r = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
-      setReduced(r);
-      if (!r && steps.length) setAuto(true);
+      setReduced(window.matchMedia("(prefers-reduced-motion: reduce)").matches);
+      setTouch(window.matchMedia("(pointer: coarse)").matches);
     });
     return () => cancelAnimationFrame(f);
-  }, [steps.length]);
+  }, []);
+  // 모델, 텍스처, HDRI를 다 불러오면 준비 완료. 그때부터 자동 넘김을 시작한다(모션 줄이기면 시작하지 않음)
+  useEffect(() => {
+    if (ready || loadingNow || progress < 100) return;
+    const f = requestAnimationFrame(() => {
+      setReady(true);
+      if (!window.matchMedia("(prefers-reduced-motion: reduce)").matches && steps.length) setAuto(true);
+    });
+    return () => cancelAnimationFrame(f);
+  }, [ready, loadingNow, progress, steps.length]);
   useEffect(() => {
     if (step === null && !zoom) return;
     const onKey = (e: KeyboardEvent) => {
-      if (e.key === "Escape") {
-        setAuto(false);
-        go(null);
-      }
+      if (e.key === "Escape") leave();
     };
     window.addEventListener("keydown", onKey);
     return () => window.removeEventListener("keydown", onKey);
   });
-  // 자동 넘김: 전체 장면에서 잠시 머문 뒤 1단계부터 차례로, 마지막 단계 뒤에는 전체 장면으로 돌아간다
+  // 자동 넘김: 전체 장면에서 잠시 머문 뒤 이어 갈 단계부터 차례로, 마지막 단계 뒤에는 전체 장면으로 돌아간다.
+  // 의존 값을 적어 둔다: 바깥 데모가 시계 때문에 1초마다 다시 그려도 타이머가 처음부터 다시 시작하지 않게(예전에는 이것 때문에 첫 단계로 넘어가지 못했다)
+  const stepId = step === null ? null : steps[step]?.id;
   useEffect(() => {
-    if (!auto || paused || !steps.length) return;
-    const wait = step === null ? 2600 : (DWELL[steps[step].id] ?? 4800);
+    if (!auto || !ready || !steps.length) return;
+    // 병원 데모는 접수 중(paused)에 장면을 멈춘다. 다가간 키오스크 화면을 쓰는 중일 때만 기다리고, 처음 자동 재생은 막지 않는다
+    if (paused && zoom) return;
+    const wait = step === null ? 2600 : (DWELL[stepId ?? ""] ?? 4800);
     const t = window.setTimeout(() => {
-      if (step === null) go(0);
+      if (step === null) go(resume.current);
       else if (step + 1 < steps.length) go(step + 1);
-      else go(null);
+      else {
+        resume.current = 0;
+        go(null);
+      }
     }, wait);
     return () => window.clearTimeout(t);
-  });
+    // eslint-disable-next-line react-hooks/exhaustive-deps -- go는 매번 새로 만들어지지만 안에서 쓰는 값은 위 의존 값뿐이다
+  }, [auto, ready, paused, zoom, step, stepId, steps.length]);
 
   const cur = step !== null ? steps[step] : null;
   const labels: Label[] = [
-    ...steps.map((s, i): Label => ({ key: `pin-${i + 1}`, at: [config.path[s.at][0], 0.05, config.path[s.at][2]], kind: "pin", text: `${i + 1}단계 ${s.label}`, show: !zoom && step === null, onClick: () => go(i) })),
+    ...steps.map((s, i): Label => ({ key: `pin-${i + 1}`, at: [config.path[s.at][0], 0.05, config.path[s.at][2]], kind: "pin", text: `${i + 1}단계 ${s.label}`, show: !zoom && step === null, onClick: () => pick(i) })),
     ...config.callouts.map((c): Label => ({ key: `c-${c.text}`, at: c.at, kind: "callout", text: c.text, on: !!c.step, show: !zoom && (cur ? c.step === cur.id : !c.step) })),
     ...(config.dimensions ?? []).map((d): Label => ({ key: `d-${d.text}`, at: [(d.from[0] + d.to[0]) / 2, 0.05, (d.from[2] + d.to[2]) / 2], kind: "dim", text: d.text, show: !zoom && (cur ? d.step === cur.id : !d.step) })),
   ];
   const shot: CameraShot = zoom ? kioskShot : cur && cur.camera !== "kiosk" ? cur.camera : config.view;
-  // 사용자가 장면을 만지면 자동 넘김을 멈춘다(자동 넘김 버튼 자체는 빼고)
-  const stopAuto = (e: React.SyntheticEvent) => {
-    if (!(e.target as HTMLElement).closest?.("[data-autoplay]")) setAuto(false);
+  // 끌기, 휠, 두 손가락으로 장면을 만지면 자동 넘김을 멈추고 조작 안내를 접는다
+  const touched = () => {
+    setAuto(false);
+    setHint(false);
   };
   const lit = !!config.hdri;
 
   return (
-    <div className={`relative overflow-hidden rounded-xl ${className}`} style={{ background: config.background, ["--acc" as string]: config.accent, ["--bg" as string]: config.background } as React.CSSProperties} onPointerDownCapture={stopAuto} onWheelCapture={stopAuto}>
+    <div className={`relative overflow-hidden rounded-xl ${className}`} style={{ background: config.background, ["--acc" as string]: config.accent, ["--bg" as string]: config.background } as React.CSSProperties}>
       <Canvas
-        frameloop={paused ? "never" : "always"}
+        onWheel={() => setHint(false)}
+        // 바깥 데모가 멈춰 달라고 해도(병원 접수 중) 키오스크 앞에 있을 때만 그리기를 멈춘다. 전체 장면으로 나오면 바로 다시 그린다
+        frameloop={paused && zoom ? "never" : "always"}
         shadows="percentage"
-        dpr={[1, 2]}
+        // 화면 배율 1인 모니터에서도 1.5배로 그려 계단 현상을 줄이고, 느려지면 PerformanceMonitor가 1로 내린다
+        dpr={dprState}
         camera={{ position: config.view.position, fov: 38, near: 0.05, far: 60 }}
         gl={{ antialias: true, alpha: true }}
         // 키오스크 앞에서는 캔버스가 누르기를 받지 않아 아래 실제 화면을 누를 수 있다
         style={{ position: "absolute", inset: 0, zIndex: 2, pointerEvents: zoom ? "none" : "auto" }}
       >
         <color attach="background" args={[config.background]} />
+        <PerformanceMonitor onDecline={() => setDpr(1)} />
         {lit ? (
           <>
             <hemisphereLight args={["#ffffff", "#e6dfd3", 0.35]} />
@@ -563,16 +648,17 @@ export function KioskScene({ place, children, tv, phone, monitor, className = ""
               intensity={1.6}
               color="#fff6ea"
               castShadow
+              // 그림자 범위를 방(10 x 7m)에 딱 맞춰 같은 2048 지도로도 그림자 가장자리가 덜 각지게 한다
               shadow-mapSize={[2048, 2048]}
-              shadow-bias={-0.0003}
-              shadow-normalBias={0.02}
-              shadow-radius={6}
-              shadow-camera-left={-8}
-              shadow-camera-right={8}
-              shadow-camera-top={8}
-              shadow-camera-bottom={-8}
-              shadow-camera-near={1}
-              shadow-camera-far={30}
+              shadow-bias={-0.0002}
+              shadow-normalBias={0.025}
+              shadow-radius={3}
+              shadow-camera-left={-6.6}
+              shadow-camera-right={6.6}
+              shadow-camera-top={6.6}
+              shadow-camera-bottom={-6.6}
+              shadow-camera-near={4}
+              shadow-camera-far={22}
             />
           </>
         ) : (
@@ -592,6 +678,8 @@ export function KioskScene({ place, children, tv, phone, monitor, className = ""
             </Environment>
           )}
           <Room config={config} />
+          {/* 처음 불러올 때 숨은 물건(휴대폰, 치수선 등)까지 셰이더를 미리 준비해, 단계를 바꿀 때 멈칫하지 않게 한다 */}
+          <Preload all />
         </Suspense>
         <KioskBody config={config} active={active} onOpen={open} />
         <ScreenProjector target={screenRef} corners={ks.corners} px={[450, 800]} />
@@ -611,17 +699,22 @@ export function KioskScene({ place, children, tv, phone, monitor, className = ""
         {steps.length ? (
           <>
             <PathDashes path={config.path} color={config.accent} />
-            <Figure path={config.path} at={figAt} facing={cur?.facing ?? Math.PI} sit={cur?.pose === "sit"} seat={cur?.seat ?? 0.45} seatBack={cur?.seatBack ?? 0} phone={cur?.card === "phone"} hidden={zoom} reduced={reduced} accent={config.accent} g={figRef} />
+            <Figure look={WALKERS[place]} path={config.path} at={figAt} facing={cur?.facing ?? Math.PI} sit={cur?.pose === "sit"} seat={cur?.seat ?? 0.45} seatBack={cur?.seatBack ?? 0} phone={cur?.card === "phone"} hidden={zoom} reduced={reduced} accent={config.accent} g={figRef} />
             {(config.dimensions ?? []).map((d) => (
               <DimensionLine key={d.text} from={d.from} to={d.to} color={config.accent} show={!zoom && (cur ? d.step === cur.id : !d.step)} />
             ))}
             <Anchors labels={labels} els={labelEls} />
           </>
         ) : null}
+        {/* 보통 3D 보기 조작: 왼쪽 끌기 회전, 휠과 두 손가락 확대, 오른쪽 끌기와 두 손가락 끌기 이동(방 안으로 묶음) */}
         <OrbitControls
           ref={controls}
           enabled={false}
-          enablePan={false}
+          enableDamping
+          enablePan
+          screenSpacePanning
+          onStart={touched}
+          onChange={() => clampToRoom(controls.current)}
           dampingFactor={0.08}
           rotateSpeed={0.55}
           zoomSpeed={0.6}
@@ -632,15 +725,15 @@ export function KioskScene({ place, children, tv, phone, monitor, className = ""
           minAzimuthAngle={config.view.azimuth[0]}
           maxAzimuthAngle={config.view.azimuth[1]}
         />
-        <CameraRig shot={shot} locked={zoom} reduced={reduced} controls={controls} />
+        <CameraRig shot={shot} locked={zoom} reduced={reduced} controls={controls} resetKey={resetKey} />
       </Canvas>
       {tv && tvCorners ? (
-        <div ref={tvRef} aria-hidden className="pointer-events-none absolute left-0 top-0 z-[1] origin-top-left overflow-hidden" style={{ width: 640, height: 352, visibility: "hidden" }}>
+        <div ref={tvRef} aria-hidden className="pointer-events-none absolute left-0 top-0 z-[1] origin-top-left overflow-hidden" style={{ width: 640, height: 352, visibility: "hidden", ...LAYER }}>
           {tv}
         </div>
       ) : null}
       {monitor && monCorners ? (
-        <div ref={monRef} aria-hidden className="pointer-events-none absolute left-0 top-0 z-[1] origin-top-left overflow-hidden bg-white" style={{ width: 1280, height: 720, visibility: "hidden" }}>
+        <div ref={monRef} aria-hidden className="pointer-events-none absolute left-0 top-0 z-[1] origin-top-left overflow-hidden bg-white" style={{ width: 1280, height: 720, visibility: "hidden", ...LAYER }}>
           {monitor}
         </div>
       ) : null}
@@ -648,7 +741,9 @@ export function KioskScene({ place, children, tv, phone, monitor, className = ""
       <div
         ref={screenRef}
         className="absolute left-0 top-0 z-[1] origin-top-left overflow-hidden rounded-[3px] bg-white"
-        style={{ width: 450, height: 800, visibility: "hidden" }}
+        style={{ width: 450, height: 800, visibility: "hidden", ...LAYER }}
+        // 다가간 키오스크 화면을 누르기 시작하면 자동 넘김을 멈춘다(쓰는 중에 다음 단계로 넘어가지 않게)
+        onPointerDownCapture={() => setAuto(false)}
         onClickCapture={(e) => {
           if (!active) {
             e.stopPropagation();
@@ -694,7 +789,7 @@ export function KioskScene({ place, children, tv, phone, monitor, className = ""
                 <li key={s.id} className="min-w-0 flex-1">
                   <button
                     type="button"
-                    onClick={() => go(i)}
+                    onClick={() => pick(i)}
                     aria-current={on ? "step" : undefined}
                     className={`flex h-full w-full items-center gap-2 rounded-xl px-2.5 py-2 text-left text-[13px] font-bold leading-tight transition-colors ${on ? "bg-(--acc) text-white" : "text-[#33414a] hover:bg-[#eef3f3]"}`}
                   >
@@ -709,8 +804,14 @@ export function KioskScene({ place, children, tv, phone, monitor, className = ""
             type="button"
             data-autoplay
             onClick={() => {
-              if (!auto && step === steps.length - 1) go(null);
-              setAuto((v) => !v);
+              if (auto) {
+                setAuto(false);
+                setHeld(true);
+              } else {
+                setHeld(false);
+                if (step === steps.length - 1) go(null);
+                setAuto(true);
+              }
             }}
             aria-label={auto ? "자동 넘김 멈춤" : "자동 넘김 시작"}
             className="flex w-10 shrink-0 items-center justify-center rounded-xl text-[#33414a] hover:bg-[#eef3f3]"
@@ -738,18 +839,41 @@ export function KioskScene({ place, children, tv, phone, monitor, className = ""
       )}
       {/* 키오스크 앞에서는 단계 막대를 접어 화면 위쪽을 가리지 않는다. 다음 단계로 바로 넘어갈 수 있다 */}
       {zoom && step !== null && step + 1 < steps.length ? (
-        <button type="button" onClick={() => go(step + 1)} className="absolute bottom-4 right-4 z-[40] rounded-full bg-(--acc) px-5 py-2.5 text-[14px] font-bold text-white shadow-[0_8px_20px_rgba(0,0,0,.25)]">
+        <button type="button" onClick={() => pick(step + 1)} className="absolute bottom-4 right-4 z-[40] rounded-full bg-(--acc) px-5 py-2.5 text-[14px] font-bold text-white shadow-[0_8px_20px_rgba(0,0,0,.25)]">
           다음 단계
         </button>
       ) : null}
-      {active || step !== null ? (
-        <button type="button" onClick={leave} className={`absolute left-4 z-[40] rounded-full bg-white/95 px-4 py-2 text-[14px] font-bold text-[#15171c] shadow-[0_6px_16px_rgba(0,0,0,.15)] ${steps.length && !zoom ? "bottom-4" : "top-4"}`}>
-          공간 보기
-        </button>
-      ) : (
-        <p className="pointer-events-none absolute bottom-4 left-4 z-[40] rounded-full bg-white/90 px-4 py-2 text-[13px] font-bold text-[#3d4450]">끌어서 둘러보기</p>
-      )}
-      <Loading />
+      {/* 아래 왼쪽 보기 조작 막대: 정면 보기, 전체 보기(단계 화면이나 키오스크 앞에서만), 조작 안내(처음 만지면 접힘) */}
+      <div className="absolute bottom-4 left-4 z-[40] flex items-center gap-2">
+        {!zoom ? (
+          <button type="button" onClick={resetView} className={CTRL} aria-label="정면 보기">
+            <RotateCcw size={15} aria-hidden />
+            정면 보기
+          </button>
+        ) : null}
+        {zoom || step !== null ? (
+          <button type="button" onClick={leave} className={CTRL} aria-label="전체 보기" aria-keyshortcuts="Escape">
+            <Maximize2 size={15} aria-hidden />
+            전체 보기
+          </button>
+        ) : null}
+        {hint && !zoom ? (
+          <p className="pointer-events-none flex items-center gap-1.5 rounded-full bg-white/80 px-3 py-2 text-[12px] font-bold text-[#3d4450]">
+            {touch ? (
+              <>
+                <Hand size={15} aria-hidden />
+                한 손가락 회전, 두 손가락 확대
+              </>
+            ) : (
+              <>
+                <Mouse size={15} aria-hidden />
+                끌어서 회전, 휠로 확대
+              </>
+            )}
+          </p>
+        ) : null}
+      </div>
+      <Loading ready={ready} progress={progress} />
     </div>
   );
 }
