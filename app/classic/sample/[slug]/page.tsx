@@ -6,7 +6,7 @@ import { notFound } from "next/navigation";
 import { Check, Plus } from "lucide-react";
 import { PageHead, btnLine, btnPrimary, h2, h3, more, wrap } from "@/components/classic/ui";
 import { SampleGrid } from "@/components/classic/works/SampleGrid";
-import { isProgram, catalogProjects, demoProjects, findBySlug, groupOf, industryOf, isMaintenance, mobileShotOf, samplesIn, slugOf } from "@/components/classic/works/samples";
+import { isDeviceCatalog, isProgram, catalogProjects, demoProjects, findBySlug, groupOf, industryOf, isMaintenance, mobileShotOf, samplesIn, slugOf } from "@/components/classic/works/samples";
 import { estimateFor } from "@/data/classic/pricing";
 import { designConcepts } from "@/data/classic/designConcepts";
 import { maintenanceServices } from "@/data/classic/maintenance";
@@ -54,9 +54,14 @@ export default async function ClassicSamplePage({ params }: Props) {
         ]}
       />
 
-      {/* PC 화면에 휴대폰 화면을 겹친다. 누르면 샘플이 열린다 */}
+      {/* PC 화면에 휴대폰 화면을 겹친다. 앱, 키오스크는 기기 캡처만. 누르면 샘플이 열린다 */}
       <section aria-label="카탈로그 화면" className="bg-[#f4f6f9]">
         <div className={`${wrap} py-10 md:py-16`}>
+          {isDeviceCatalog(p) ? (
+            <Link href={p.demoUrl} prefetch={false} aria-label={`${p.title} 체험하기`} className="group mx-auto block max-w-[1040px] overflow-hidden rounded-lg bg-[#eef0f3]">
+              <Image src={p.imageUrl} alt={p.imageAlt} width={1440} height={900} priority sizes="(min-width: 1088px) 1040px, 92vw" className="aspect-[16/10] w-full object-cover object-center" />
+            </Link>
+          ) : (
           <Link href={p.demoUrl} prefetch={false} aria-label={`${p.title} 체험하기`} className="group relative mx-auto block max-w-[1040px] pb-[6%]">
             <span className="block w-[88%] overflow-hidden rounded-lg border border-[#d9dee5] bg-white">
               <span aria-hidden className="flex h-6 items-center gap-1.5 border-b border-[#e6e9ee] bg-[#eef1f5] px-3 md:h-8">
@@ -80,6 +85,7 @@ export default async function ClassicSamplePage({ params }: Props) {
               </span>
             )}
           </Link>
+          )}
         </div>
       </section>
 

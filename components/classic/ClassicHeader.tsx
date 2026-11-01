@@ -5,6 +5,7 @@ import { usePathname } from "next/navigation";
 import { useEffect, useRef, useState } from "react";
 import { ChevronDown, Menu, Search, X } from "lucide-react";
 import { cases } from "@/data/classic/cases";
+import { industries } from "@/data/classic/industries";
 import { cn } from "@/lib/utils";
 
 // 클래식 보기(/classic)의 머리글. 로고와 내림 메뉴만 둔다(10-30 채널 줄과 웹툰 전환 버튼 뺌).
@@ -46,7 +47,14 @@ export const classicMenu = [
     label: "카탈로그",
     href: "/classic/works",
     match: ["/classic/works", "/classic/sample"],
-    items: [],
+    // 11-01 카탈로그 탭과 같은 하위 메뉴(업종 5개, 랜딩, 앱, 키오스크)
+    items: [
+      { href: "/classic/works", label: "전체" },
+      ...industries.map((i) => ({ href: `/classic/works/${i.slug}`, label: i.label })),
+      { href: "/classic/works/landing", label: "랜딩페이지" },
+      { href: "/classic/works/app", label: "앱" },
+      { href: "/classic/works/kiosk", label: "키오스크" },
+    ],
   },
   // 고객 사례는 실제 사례가 생기면 data/classic/cases.ts에 넣는 순간 메뉴에 나온다
   ...(cases.length > 0 ? [{ label: "고객 사례", href: "/classic/cases", match: ["/classic/cases"], items: [] }] : []),

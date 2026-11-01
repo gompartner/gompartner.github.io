@@ -1,7 +1,7 @@
 import Image from "next/image";
 import Link from "next/link";
 import type { Project } from "@/lib/types";
-import { mobileShotOf, slugOf, thumbOf } from "./samples";
+import { isDeviceCatalog, mobileShotOf, slugOf, thumbOf } from "./samples";
 
 // 샘플 카드 격자. 홈 화면 샘플 목록과 같은 모양(썸네일 선 하나, 그림자 없음).
 // variant="mockup"은 카탈로그 목록용: PC 화면을 크게 두고 휴대폰 화면을 오른쪽 아래에 걸친다(10-31 C안).
@@ -38,10 +38,17 @@ function MockupGrid({ items }: { items: Project[] }) {
   return (
     <ul className="grid gap-y-14 md:grid-cols-2 md:gap-x-10 md:gap-y-[72px]" role="list">
       {items.map((p) => {
-        const phone = mobileShotOf(p);
+        // 11-01 앱, 키오스크는 브라우저 틀 없이 기기 캡처(휴대폰, 키오스크 본체가 담긴 첫 화면)만 보여 준다
+        const device = isDeviceCatalog(p);
+        const phone = device ? null : mobileShotOf(p);
         return (
           <li key={p.id} className="min-w-0">
             <Link href={`/classic/sample/${slugOf(p.demoUrl)}`} className="group block">
+              {device ? (
+                <span className="block overflow-hidden rounded-lg bg-[#eef0f3]">
+                  <Image src={p.imageUrl} alt={p.imageAlt} width={1440} height={900} sizes="(min-width: 1200px) 560px, (min-width: 768px) 46vw, 92vw" className="aspect-[16/10] w-full object-cover object-center transition-transform duration-500 group-hover:scale-[1.03] motion-reduce:transition-none" />
+                </span>
+              ) : (
               <span className="relative block pb-6 md:pb-7">
                 <span className={`block overflow-hidden rounded-lg bg-white shadow-[0_1px_0_#e1e5eb,0_10px_30px_rgba(17,24,39,0.10)] ${phone ? "w-[84%]" : "w-full"}`}>
                   <span aria-hidden className="flex h-[18px] items-center gap-[5px] bg-[#f1f3f6] px-2.5 md:h-[22px]">
@@ -71,6 +78,7 @@ function MockupGrid({ items }: { items: Project[] }) {
                   </span>
                 )}
               </span>
+              )}
               <span className="mt-3 flex flex-col gap-1.5 lg:flex-row lg:items-end lg:justify-between lg:gap-6">
                 <span className="block min-w-0">
                   <span className="block text-[14px] font-semibold text-[#5b6370]">

@@ -27,6 +27,9 @@ export function mobileShotOf(p: Project) {
 
 export const isMaintenance = (p: Project) => p.kind === "유지보수" || ["maintenance-dashboard", "maintenance-urgent-fix", "accessibility-review"].includes(p.id);
 
+/** 앱, 키오스크 카탈로그: 브라우저 틀 없이 기기만 보여 준다 */
+export const isDeviceCatalog = (p: Project) => p.category === "앱" || p.category === "키오스크";
+
 export const isLanding = (p: Project) => p.category === "랜딩페이지" || p.id.startsWith("landing-");
 export const isProgram = (p: Project) => PROGRAM_IDS.includes(p.id);
 
