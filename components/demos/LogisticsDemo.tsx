@@ -519,7 +519,20 @@ const FEE_ROWS: [string, string, string][] = [
 function FeeTable() {
   return (
     <div className="mt-6">
-      <div className="overflow-x-auto">
+      <ul className="border-t md:hidden" style={{ borderColor: C.field, background: C.paper }}>
+        {FEE_ROWS.map(([a, b, c], k) => (
+          <li key={`m${k}`} className="border-b px-4 py-2.5" style={{ borderColor: C.line }}>
+            <div className="flex items-baseline justify-between gap-3">
+              <span className="min-w-0 font-semibold">{a}</span>
+              <span className="whitespace-nowrap tabular-nums">{c}</span>
+            </div>
+            <p className="mt-0.5 text-[14px]" style={{ color: C.muted }}>
+              {b}
+            </p>
+          </li>
+        ))}
+      </ul>
+      <div className="hidden overflow-x-auto md:block">
         <table className="w-full min-w-[560px] border-collapse text-left text-[15px]">
           <caption className="sr-only">항목별 이용 요금</caption>
           <thead>

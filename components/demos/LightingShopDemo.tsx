@@ -214,7 +214,23 @@ export function LightingShopDemo() {
           ))}
         </ul>
         <h3 className="mt-8 text-[20px] font-bold">공간별 추천</h3>
-        <div className="mt-3 overflow-x-auto rounded-[8px] border" style={{ borderColor: C.line, background: C.panel }}>
+        {/* 휴대폰: 공간마다 한 줄 */}
+        <ul className="mt-3 divide-y rounded-[8px] border md:hidden" style={{ borderColor: C.line, background: C.panel }}>
+          {ROOMS.map((r) => (
+            <li key={`m${r.room}`} className="px-4 py-2.5" style={{ borderColor: C.line }}>
+              <p className="flex items-baseline justify-between gap-3 text-[15px]">
+                <span className="font-bold">{r.room}</span>
+                <span className="whitespace-nowrap tabular-nums" style={{ color: C.amber }}>
+                  {r.kelvin}
+                </span>
+              </p>
+              <p className="mt-0.5 text-[14px]" style={{ color: C.creamDim }}>
+                {r.pick}
+              </p>
+            </li>
+          ))}
+        </ul>
+        <div className="mt-3 hidden overflow-x-auto rounded-[8px] border md:block" style={{ borderColor: C.line, background: C.panel }}>
           <table className="w-full min-w-[480px] text-left text-[15px]">
             <thead style={{ color: C.creamDim }}>
               <tr className="border-b" style={{ borderColor: C.line }}>

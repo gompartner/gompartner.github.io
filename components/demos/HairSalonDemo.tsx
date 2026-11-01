@@ -221,7 +221,28 @@ export function HairSalonDemo() {
       {/* 2. 시술 가격표 */}
       <section id="hs-menu" aria-labelledby="hs-menu-title" className="mx-auto mt-14 max-w-[1200px] scroll-mt-4 px-4 md:mt-20 md:px-6">
         <SectionTitle id="hs-menu-title">시술 메뉴</SectionTitle>
-        <div className="mt-6">
+        {/* 휴대폰: 시술마다 등급별 가격을 3칸 격자로 */}
+        <ul className="mt-6 border-t-2 md:hidden" style={{ borderColor: C.ink }}>
+          {SERVICES.map((s) => (
+            <li key={`m${s.id}`} className="border-b py-3" style={{ borderColor: C.line }}>
+              <p className="text-[18px] font-bold">{s.name}</p>
+              <p className="text-[14px]" style={{ color: C.muted }}>
+                {s.detail}, {fmtMin(s.min)}
+              </p>
+              <dl className="mt-2 grid grid-cols-3 gap-1.5 tabular-nums">
+                {PRICE_COLS.map((d) => (
+                  <div key={d.id} className="rounded-[4px] px-2 py-1.5" style={{ background: C.soft }}>
+                    <dt className="text-[13px]" style={{ color: C.muted }}>
+                      {d.role}
+                    </dt>
+                    <dd className="whitespace-nowrap text-[15px] font-bold">{d.can.includes(s.id) ? won(priceOf(s, d)) : <span style={{ color: C.muted, fontWeight: 400 }}>-</span>}</dd>
+                  </div>
+                ))}
+              </dl>
+            </li>
+          ))}
+        </ul>
+        <div className="mt-6 hidden md:block">
           <table className="w-full border-collapse text-[14px] sm:text-[15px] md:text-[16px]">
             <thead>
               <tr className="border-y-2 text-left" style={{ borderColor: C.ink }}>
@@ -243,7 +264,7 @@ export function HairSalonDemo() {
                     </span>
                   </th>
                   {PRICE_COLS.map((d) => (
-                    <td key={d.id} className="py-3 pl-2 text-right font-bold tabular-nums sm:pl-3">
+                    <td key={d.id} className="py-3 pl-2 whitespace-nowrap text-right font-bold tabular-nums sm:pl-3">
                       {d.can.includes(s.id) ? won(priceOf(s, d)) : <span style={{ color: C.muted, fontWeight: 400 }}>-</span>}
                     </td>
                   ))}

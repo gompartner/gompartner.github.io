@@ -185,7 +185,20 @@ export function PediatricsDemo() {
       {/* 비급여 진료비 */}
       <section id="pd-fees" aria-labelledby="pd-fees-title" className="mx-auto mt-16 max-w-[1200px] scroll-mt-4 px-4 md:mt-20 md:px-6">
         <SectionTitle id="pd-fees-title" icon={<ClipboardCheck size={22} aria-hidden />} title="비급여 진료비 안내" />
-        <div className="mt-6 overflow-x-auto rounded-[6px] border" style={{ borderColor: C.line, background: "#fff" }}>
+        <ul className="mt-6 overflow-hidden rounded-[6px] border md:hidden" style={{ borderColor: C.line, background: "#fff" }}>
+          {FEES.map((f, i) => (
+            <li key={`m${f.name}`} className={`px-4 py-3 ${i ? "border-t" : ""}`} style={{ borderColor: C.line }}>
+              <div className="flex items-baseline justify-between gap-3">
+                <span className="min-w-0">{f.name}</span>
+                <span className="whitespace-nowrap font-bold tabular-nums">{won(f.price)}</span>
+              </div>
+              <p className="mt-0.5 text-[14px]" style={{ color: C.muted }}>
+                {f.kind}
+              </p>
+            </li>
+          ))}
+        </ul>
+        <div className="mt-6 hidden overflow-x-auto rounded-[6px] border md:block" style={{ borderColor: C.line, background: "#fff" }}>
           <table className="w-full min-w-[340px] border-collapse text-left text-[15px]">
             <caption className="sr-only">비급여 진료비</caption>
             <thead>

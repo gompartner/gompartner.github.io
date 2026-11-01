@@ -627,7 +627,9 @@ function MenuReceipt() {
                 </span>
               </td>
               <td className="py-1.5 text-right tabular-nums">{m.unit}</td>
-              <td className="py-1.5 text-right font-bold tabular-nums">{won(m.price)}</td>
+              <td className="whitespace-nowrap py-1.5 text-right font-bold tabular-nums">
+                <span>{won(m.price)}</span>
+              </td>
             </tr>
           ))}
         </tbody>

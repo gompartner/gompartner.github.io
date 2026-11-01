@@ -522,7 +522,35 @@ function BusRoute() {
                   {route.area}
                 </span>
               </h3>
-              <div className="mt-2 overflow-x-auto" tabIndex={0} role="region" aria-label={`${route.label} 정류장별 등원 탑승 시간`}>
+              <p className="mt-2 px-4 text-[13px] tabular-nums md:hidden" style={{ color: C.muted }}>
+                {BUS_CLASSES.map((c) => `${c.label} ${hm(c.start)} 수업`).join(", ")}
+              </p>
+              <ul className="mt-3 divide-y border-t md:hidden" style={{ borderColor: C.line }} aria-label={`${route.label} 정류장별 등원 탑승 시간`}>
+                {route.stops.map((s, i) => {
+                  const last = i === route.stops.length - 1;
+                  return (
+                    <li key={`m${s.name}`} className="px-4 py-3 tabular-nums" style={{ borderColor: C.line }}>
+                      <p className="font-bold">{last ? BRAND : s.name}</p>
+                      {s.note && (
+                        <p className="text-[13px]" style={{ color: C.muted }}>
+                          {s.note}
+                        </p>
+                      )}
+                      <dl className="mt-1.5 grid grid-cols-2 gap-x-4 gap-y-1 text-[14px]">
+                        {BUS_CLASSES.map((c) => (
+                          <div key={c.id} className="flex justify-between gap-2">
+                            <dt style={{ color: C.muted }}>{c.label}</dt>
+                            <dd className="whitespace-nowrap" style={{ fontWeight: last ? 700 : 600 }}>
+                              {hm(c.start - ARRIVE_BEFORE - (total - s.off))}
+                            </dd>
+                          </div>
+                        ))}
+                      </dl>
+                    </li>
+                  );
+                })}
+              </ul>
+              <div className="mt-2 hidden overflow-x-auto md:block" tabIndex={0} role="region" aria-label={`${route.label} 정류장별 등원 탑승 시간`}>
                 <table className="w-full min-w-[620px] border-collapse text-[15px]">
                   <thead>
                     <tr style={{ background: C.paper }}>
@@ -597,7 +625,29 @@ function BusRoute() {
 function Timetable() {
   return (
     <div className="grid gap-6 lg:grid-cols-[minmax(0,1fr)_320px]">
-      <div className="overflow-x-auto rounded-[8px] border" style={{ borderColor: C.line, background: "#fff" }} tabIndex={0} aria-label="수련 시간표, 좌우로 밀어서 보기" role="region">
+      <ul className="space-y-3 md:hidden" aria-label="부별 요일 수련 내용">
+        {["월", "화", "수", "목", "금"].map((d, i) => (
+          <li key={d} className="rounded-[8px] border" style={{ borderColor: C.line, background: "#fff" }}>
+            <p className="px-4 pt-3 text-[17px] font-bold">{d}</p>
+            <ul className="mt-2 divide-y border-t" style={{ borderColor: C.line }}>
+              {ROWS.map((r) => (
+                <li key={r.label} className="flex items-baseline justify-between gap-3 px-4 py-2.5 text-[15px]" style={{ borderColor: C.line }}>
+                  <span>
+                    <span className="font-bold">{r.label}</span>
+                    <span className="ml-2 whitespace-nowrap text-[13px] tabular-nums" style={{ color: C.muted }}>
+                      {r.time}
+                    </span>
+                  </span>
+                  <span className="whitespace-nowrap" style={{ color: r.week[i] ? C.body : C.muted }}>
+                    {r.week[i] || "쉬어요"}
+                  </span>
+                </li>
+              ))}
+            </ul>
+          </li>
+        ))}
+      </ul>
+      <div className="hidden overflow-x-auto rounded-[8px] border md:block" style={{ borderColor: C.line, background: "#fff" }} tabIndex={0} aria-label="수련 시간표, 좌우로 밀어서 보기" role="region">
         <table className="w-full min-w-[640px] border-collapse text-[15px]">
           <caption className="sr-only">부별 요일 수련 내용</caption>
           <thead>
@@ -646,7 +696,9 @@ function Timetable() {
                     {FEES[p].bus ? ", 차량 포함" : ""}
                   </span>
                 </th>
-                <td className="py-2.5 text-right font-bold tabular-nums">{won(FEES[p].fee)}</td>
+                <td className="py-2.5 text-right font-bold tabular-nums">
+                  <span className="whitespace-nowrap">{won(FEES[p].fee)}</span>
+                </td>
               </tr>
             ))}
           </tbody>
@@ -665,7 +717,26 @@ function Timetable() {
 function BeltTest() {
   return (
     <div>
-      <div className="overflow-x-auto rounded-[8px] border" style={{ borderColor: C.line, background: "#fff" }} tabIndex={0} role="region" aria-label="띠별 승급 심사 안내">
+      <ul className="divide-y rounded-[8px] border md:hidden" style={{ borderColor: C.line, background: "#fff" }} aria-label="띠별 승급 심사 안내">
+        {BELT_STEPS.map((b) => (
+          <li key={`m${b.name}`} className="px-4 py-3 text-[15px]" style={{ borderColor: C.line }}>
+            <div className="flex items-center justify-between gap-3">
+              <span className="inline-flex items-center gap-2 font-bold">
+                <BeltSwatch color={b.color} edge={b.edge} split={b.name === "품띠"} />
+                {b.name}
+              </span>
+              <span className="whitespace-nowrap text-[14px]" style={{ color: C.muted }}>
+                다음 띠 {b.next}
+              </span>
+            </div>
+            <p className="mt-1">{b.poomsae}</p>
+            <p className="mt-0.5 text-[14px]" style={{ color: C.muted }}>
+              {b.items}, {b.period}
+            </p>
+          </li>
+        ))}
+      </ul>
+      <div className="hidden overflow-x-auto rounded-[8px] border md:block" style={{ borderColor: C.line, background: "#fff" }} tabIndex={0} role="region" aria-label="띠별 승급 심사 안내">
         <table className="w-full min-w-[680px] border-collapse text-[15px]">
           <thead>
             <tr style={{ background: C.paper }}>

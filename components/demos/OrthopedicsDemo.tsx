@@ -563,7 +563,32 @@ function FeeTable({ today }: { today: Date }) {
 
   return (
     <div className="mt-8">
-      <div className="overflow-hidden rounded-[8px] border" style={{ borderColor: C.line }}>
+      <div className="overflow-hidden rounded-[8px] border md:hidden" style={{ borderColor: C.line }}>
+        {FEE_CATS.map((c) => (
+          <div key={`m${c}`}>
+            <p className="border-t px-4 py-2 text-[14px] font-bold first:border-t-0" style={{ background: C.paper, borderColor: C.line, color: C.muted }}>
+              {c}
+            </p>
+            <ul>
+              {FEES.filter((f) => f.cat === c).map((f) => (
+                <li key={`m${f.name}-${f.unit}`} className="border-t px-4 py-3" style={{ borderColor: C.line }}>
+                  <div className="flex items-baseline justify-between gap-3">
+                    <span className="min-w-0 font-bold">{f.name}</span>
+                    <span className="whitespace-nowrap font-semibold tabular-nums" style={{ color: C.ink }}>
+                      {won(f.price)}
+                    </span>
+                  </div>
+                  <p className="mt-0.5 text-[14px]" style={{ color: C.muted }}>
+                    {f.unit}
+                    {f.note ? `, ${f.note}` : ""}
+                  </p>
+                </li>
+              ))}
+            </ul>
+          </div>
+        ))}
+      </div>
+      <div className="hidden overflow-hidden rounded-[8px] border md:block" style={{ borderColor: C.line }}>
         <table className="w-full border-collapse text-left text-[15px] md:text-[16px]">
           <caption className="sr-only">비급여 진료비 안내</caption>
           <thead style={{ background: C.paper }}>

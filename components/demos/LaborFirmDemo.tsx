@@ -599,7 +599,21 @@ function Advisory({ onConsult }: { onConsult: () => void }) {
   return (
     <div className="mt-6 grid gap-6 md:grid-cols-[minmax(0,1.1fr)_minmax(0,1fr)] md:gap-8">
       <div className="rounded-[6px] border p-5 md:p-6" style={{ borderColor: C.line, background: C.card }}>
-        <table className="w-full text-[16px]">
+        <div className="md:hidden">
+          <p className="flex justify-between gap-3 border-b py-2 text-[14px] font-bold" style={{ borderColor: C.ink, color: C.muted }}>
+            <span>직원 수</span>
+            <span>월 자문료</span>
+          </p>
+          <ul>
+            {TIERS.map((t) => (
+              <li key={`m${t.label}`} className="flex items-baseline justify-between gap-3 border-b py-2.5" style={{ borderColor: C.line }}>
+                <span className="min-w-0 font-semibold">{t.label}</span>
+                <span className="whitespace-nowrap font-bold tabular-nums">{t.fee ? won(t.fee) : "별도 협의"}</span>
+              </li>
+            ))}
+          </ul>
+        </div>
+        <table className="hidden w-full text-[16px] md:table">
           <caption className="sr-only">직원 수 구간별 월 자문료</caption>
           <thead>
             <tr className="border-b text-left text-[14px]" style={{ borderColor: C.ink, color: C.muted }}>
@@ -615,7 +629,7 @@ function Advisory({ onConsult }: { onConsult: () => void }) {
             {TIERS.map((t) => (
               <tr key={t.label} className="border-b" style={{ borderColor: C.line }}>
                 <td className="py-2.5 font-semibold">{t.label}</td>
-                <td className="py-2.5 text-right font-bold tabular-nums">{t.fee ? won(t.fee) : "별도 협의"}</td>
+                <td className="whitespace-nowrap py-2.5 text-right font-bold tabular-nums">{t.fee ? won(t.fee) : "별도 협의"}</td>
               </tr>
             ))}
           </tbody>

@@ -534,7 +534,26 @@ function Compare() {
       </ul>
 
       <div>
-        <div className="overflow-hidden rounded-[8px] border" style={{ background: C.card, borderColor: C.line }}>
+        <ul className="overflow-hidden rounded-[8px] border md:hidden" style={{ background: C.card, borderColor: C.line }}>
+          {COMPARE_ROWS.map((row, r) => (
+            <li key={`m${row.label}`} className={`px-3 py-3 ${r ? "border-t" : ""}`} style={{ borderColor: C.line }}>
+              <p className="text-[14px]" style={{ color: C.muted }}>
+                {row.label}
+              </p>
+              <dl className="mt-1.5 grid grid-cols-3 gap-2">
+                {row.v.map((v, i) => (
+                  <div key={i} className="min-w-0">
+                    <dt className="text-[13px] font-bold">{SURGERIES[i].name}</dt>
+                    <dd className={`mt-0.5 text-[14px] leading-snug ${row.label === "수술비(양안)" ? "whitespace-nowrap font-bold tabular-nums tracking-[-0.02em]" : ""}`} style={{ color: C.body }}>
+                      {v}
+                    </dd>
+                  </div>
+                ))}
+              </dl>
+            </li>
+          ))}
+        </ul>
+        <div className="hidden overflow-hidden rounded-[8px] border md:block" style={{ background: C.card, borderColor: C.line }}>
           <table className="w-full table-fixed border-collapse text-[13px] md:text-[15px]">
             <caption className="sr-only">라식, 라섹, 스마일라식 비교표</caption>
             <colgroup>
@@ -707,7 +726,20 @@ function Cataract() {
 function Fees() {
   return (
     <div className="overflow-hidden rounded-[8px] border" style={{ background: C.card, borderColor: C.line }}>
-      <table className="w-full border-collapse text-[15px]">
+      <ul className="md:hidden">
+        {FEES.map((f, i) => (
+          <li key={`m${f.item}`} className={`px-3 py-3 ${i ? "border-t" : ""}`} style={{ borderColor: C.line }}>
+            <div className="flex items-baseline justify-between gap-3">
+              <span className="min-w-0">{f.item}</span>
+              <span className="whitespace-nowrap font-bold tabular-nums">{f.price}</span>
+            </div>
+            <p className="mt-0.5 text-[14px]" style={{ color: C.muted }}>
+              {f.unit}
+            </p>
+          </li>
+        ))}
+      </ul>
+      <table className="hidden w-full border-collapse text-[15px] md:table">
         <caption className="sr-only">비급여 진료비 목록</caption>
         <thead style={{ background: C.tealSoft }}>
           <tr>
@@ -731,7 +763,7 @@ function Fees() {
               <td className="whitespace-nowrap px-2 py-3" style={{ color: C.muted }}>
                 {f.unit}
               </td>
-              <td className="px-3 py-3 text-right font-bold tabular-nums md:px-5">
+              <td className="whitespace-nowrap px-3 py-3 text-right font-bold tabular-nums md:px-5">
                 {f.price}
               </td>
             </tr>

@@ -191,21 +191,6 @@ function BrushRule({ className = "", color = "#1f1b16" }: { className?: string; 
   );
 }
 
-function Seal({ lines, size = 64, className = "" }: { lines: string[]; size?: number; className?: string }) {
-  return (
-    <span
-      className={`inline-flex items-center justify-center rounded-[6px] border-2 border-[#f3ede2]/50 bg-[#a8432a] tracking-[-0.02em] text-[#f8efe4] shadow-[inset_0_0_0_3px_#a8432a,inset_0_0_0_4px_rgba(248,239,228,0.6)] ${className}`}
-      style={{ width: size, height: size, writingMode: "vertical-rl", fontSize: Math.round(size / 4.2), lineHeight: 1.05 }}
-      aria-hidden
-    >
-      {lines.map((l) => (
-        <span key={l} className="font-bold">
-          {l}
-        </span>
-      ))}
-    </span>
-  );
-}
 
 /* ---------- 데모 ---------- */
 
@@ -1019,7 +1004,6 @@ function Footer() {
           </p>
           <DemoMakerInfo className="mt-2" />
         </div>
-        <Seal lines={["곰파", "트너"]} size={52} className="rotate-3 self-start" />
       </div>
     </footer>
   );

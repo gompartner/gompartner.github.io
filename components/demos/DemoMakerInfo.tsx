@@ -1,24 +1,71 @@
-import Link from "next/link";
-import { profile } from "@/data/profile";
+"use client";
 
-// 데모 하단의 가짜 상호·사업자 정보 대신 넣는 곰파트너 정보. 색은 각 데모 바닥글 글자색을 따른다.
+import { usePathname } from "next/navigation";
+
+// 데모 바닥글 저작권 줄. 11-01 사용자 결정: 실제 업체 사이트처럼 그 데모의 업종 상호로 저작권 한 줄만 둔다.
+// 상호는 각 데모 머리글 로고와 같은 업종 이름이다. 표에 없는 데모(업무 프로그램 등)는 곰파트너로 둔다.
+const NAMES: Record<string, string> = {
+  "online-store": "도자기 공방",
+  pension: "바다 펜션",
+  company: "정밀가공 제조",
+  "cert-lab": "시험인증기관",
+  "dental-homepage": "동네 치과",
+  "clinic-homepage": "피부과의원",
+  pharmacy: "동네 약국",
+  "law-firm": "법률사무소",
+  "tax-office": "세무회계 사무소",
+  "real-estate": "공인중개사사무소",
+  "small-business-homepage": "프라이빗 짐",
+  "korean-restaurant": "동네 한식당",
+  interior: "인테리어 시공",
+  academy: "수학 영어 학원",
+  "pilates-studio": "필라테스 스튜디오",
+  "hanok-cafe": "한옥 찻집",
+  "bakery-cafe": "베이커리 카페",
+  roastery: "커피 로스터리",
+  "hair-salon": "미용실",
+  optical: "안경원",
+  "furniture-workshop": "원목 가구 공방",
+  coworking: "공유오피스",
+  campsite: "오토캠핑장",
+  "photo-studio": "사진관",
+  "nail-shop": "네일샵",
+  "car-detailing": "디테일링 샵",
+  "lighting-shop": "조명 가게",
+  "liquor-shop": "전통주 보틀숍",
+  "small-wedding": "스몰웨딩 홀",
+  "korean-medicine": "한의원",
+  orthopedics: "정형외과",
+  pediatrics: "소아청소년과",
+  "eye-clinic": "안과",
+  "animal-hospital": "24시 동물병원",
+  "nursing-hospital": "요양병원",
+  "labor-firm": "노무법인",
+  scrivener: "법무사사무소",
+  "patent-office": "특허사무소",
+  "family-law": "가사 법률사무소",
+  "visa-agent": "비자 행정사사무소",
+  "architect-office": "건축사사무소",
+  presale: "아파트 분양",
+  "saas-startup": "재고 관리 서비스",
+  logistics: "물류 대행",
+  "food-oem": "식품 OEM 제조",
+  "piano-academy": "피아노 학원",
+  taekwondo: "태권도장",
+  "art-academy": "입시 미술학원",
+  "english-talk": "영어회화 학원",
+  "driving-school": "운전전문학원",
+  "reading-academy": "독서 논술 학원",
+  "landing-water-rental": "정수기 렌탈",
+  "landing-coding-camp": "코딩 교실",
+  "landing-move-clean": "입주청소",
+  "landing-popup-store": "팝업스토어",
+  "landing-zine-fair": "독립출판 북페어",
+  "landing-leather-class": "가죽 공방",
+};
+
 export function DemoMakerInfo({ className = "" }: { className?: string }) {
-  const tel = profile.phone.replace(/-/g, "");
-  return (
-    <div className={`text-[14px] leading-[1.7] ${className}`}>
-      <p className="font-bold">홈페이지 제작 {profile.name}</p>
-      <p className="mt-1 flex flex-wrap gap-x-4 gap-y-1 opacity-90">
-        <a href={`tel:${tel}`} data-gtm-cta="demo_footer_tel" className="underline-offset-4 hover:underline">
-          전화 {profile.phone}
-        </a>
-        <a href={`mailto:${profile.email}`} data-gtm-cta="demo_footer_email" className="underline-offset-4 hover:underline">
-          이메일 {profile.email}
-        </a>
-        <Link href="/" data-gtm-cta="demo_footer_home" className="underline-offset-4 hover:underline">
-          gompartner.co.kr
-        </Link>
-        <span>사업자등록번호 {profile.bizNo}</span>
-      </p>
-    </div>
-  );
+  const slug = (usePathname() ?? "").split("/").filter(Boolean)[1] ?? "";
+  const name = NAMES[slug] ?? "곰파트너";
+  return <p className={`text-[14px] leading-[1.7] opacity-90 ${className}`}>Copyright {new Date().getFullYear()} {name}. All rights reserved.</p>;
 }

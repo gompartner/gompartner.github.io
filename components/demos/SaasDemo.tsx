@@ -864,7 +864,24 @@ function StoreTable({ onAsk }: { onAsk: () => void }) {
       <p className="mt-2 text-[16px] leading-[1.6]" style={{ color: C.body, wordBreak: "keep-all" }}>
         매장당 월 요금, 월 결제 기준입니다. {MULTI_FROM}곳부터 매장당 10% 할인, 연 결제 시 20% 추가 할인. 부가세 별도.
       </p>
-      <table className="mt-6 w-full table-fixed border-collapse text-left">
+      <ul className="mt-6 md:hidden" style={{ borderTop: `1px solid ${C.ink}` }}>
+        {STORE_ROWS.map(([label, ...vals]) => (
+          <li key={`m${label}`} className="py-3" style={{ borderBottom: `1px solid ${C.line}` }}>
+            <p className="text-[15px] font-semibold">{label}</p>
+            <dl className="mt-1.5 grid grid-cols-3 gap-2">
+              {PLANS.map((p, i) => (
+                <div key={p.id} className="min-w-0 rounded-[4px] px-2 py-1.5" style={p.id === "standard" ? { background: C.soft } : undefined}>
+                  <dt className="text-[13px]" style={{ color: C.muted }}>
+                    {p.name}
+                  </dt>
+                  <dd className="whitespace-nowrap text-[14px] font-semibold tabular-nums">{vals[i]}</dd>
+                </div>
+              ))}
+            </dl>
+          </li>
+        ))}
+      </ul>
+      <table className="mt-6 hidden w-full table-fixed border-collapse text-left md:table">
         <caption className="sr-only">매장 수와 요금제별 매장당 월 요금</caption>
         <colgroup>
           <col className="w-[25%]" />
@@ -890,11 +907,11 @@ function StoreTable({ onAsk }: { onAsk: () => void }) {
               <th scope="row" className="py-3 pr-2 text-[14px] font-medium md:text-[16px]">
                 {label}
               </th>
-              <td className="py-3 text-center text-[13px] font-semibold tabular-nums md:text-[15px]">{a}</td>
-              <td className="py-3 text-center text-[13px] font-semibold tabular-nums md:text-[15px]" style={{ background: C.soft }}>
+              <td className="whitespace-nowrap py-3 text-center text-[13px] font-semibold tabular-nums md:text-[15px]">{a}</td>
+              <td className="whitespace-nowrap py-3 text-center text-[13px] font-semibold tabular-nums md:text-[15px]" style={{ background: C.soft }}>
                 {b}
               </td>
-              <td className="py-3 text-center text-[13px] font-semibold tabular-nums md:text-[15px]">{c}</td>
+              <td className="whitespace-nowrap py-3 text-center text-[13px] font-semibold tabular-nums md:text-[15px]">{c}</td>
             </tr>
           ))}
         </tbody>

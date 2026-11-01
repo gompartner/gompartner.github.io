@@ -397,7 +397,23 @@ function ClassSection({ viewGrade, onView }: { viewGrade: Grade; onView: (g: Gra
           <p className="mt-2" style={{ color: C.muted }}>
             학년마다 수학, 영어 각각 세 반을 운영합니다. 반은 레벨테스트와 원장 상담 뒤에 정합니다.
           </p>
-          <div tabIndex={0} role="region" aria-label="반 편성 안내" className="mt-5 overflow-x-auto rounded-[6px] border" style={{ borderColor: C.line }}>
+          <ul className="mt-5 divide-y rounded-[6px] border md:hidden" style={{ borderColor: C.line }} aria-label="반 편성 안내">
+            {LEVEL_INFO.map((l) => (
+              <li key={`m${l.level}`} className="px-4 py-3" style={{ borderColor: C.line }}>
+                <div className="flex items-baseline justify-between gap-3">
+                  <span className="font-bold">{l.level}</span>
+                  <span className="whitespace-nowrap text-[14px] tabular-nums" style={{ color: C.muted }}>
+                    초등 {CAP.초등}명, 중등 {CAP.중등}명
+                  </span>
+                </div>
+                <p className="mt-1">{l.who}</p>
+                <p className="mt-0.5 text-[14px]" style={{ color: C.muted }}>
+                  {l.what}
+                </p>
+              </li>
+            ))}
+          </ul>
+          <div tabIndex={0} role="region" aria-label="반 편성 안내" className="mt-5 hidden overflow-x-auto rounded-[6px] border md:block" style={{ borderColor: C.line }}>
             <table className="w-full min-w-[560px] border-collapse text-[16px]">
               <thead>
                 <tr className="text-[14px]" style={{ background: C.boardSoft, color: C.muted }}>
@@ -611,13 +627,13 @@ function LevelTest() {
             테스트는 학원에서 봅니다. 수학 50분, 영어 40분이고 끝나면 원장 상담 20분이 이어집니다.
           </p>
           <h3 className="mt-8 text-[18px] font-bold">입학 절차</h3>
-          <ol className="mt-3 flex flex-wrap items-center gap-x-2 gap-y-2 text-[16px]">
+          <ol className="mt-3 grid grid-cols-2 gap-px overflow-hidden rounded-[4px] border text-[16px] sm:grid-cols-4" style={{ borderColor: C.line, background: C.line }}>
             {["테스트 예약", "레벨테스트", "원장 상담", "반 배정, 등록"].map((s, i) => (
-              <li key={s} className="flex items-center gap-2">
-                {i > 0 && <ChevronRight size={16} aria-hidden style={{ color: C.muted }} />}
-                <span className="rounded-[4px] border px-3 py-1.5" style={{ borderColor: C.line, background: i === 0 ? C.boardSoft : undefined }}>
-                  {s}
+              <li key={s} className="px-3 py-3" style={{ background: C.paper }}>
+                <span className="block text-[13px] font-bold tabular-nums" style={{ color: C.muted }}>
+                  {i + 1}단계
                 </span>
+                <span className="mt-0.5 block font-semibold">{s}</span>
               </li>
             ))}
           </ol>
@@ -852,14 +868,28 @@ function Fee() {
         <SectionTitle id="fee-title">교습비 안내</SectionTitle>
 
         <div className="mt-6 min-w-0">
-            <div tabIndex={0} role="region" aria-labelledby="fee-caption" className="overflow-x-auto rounded-[6px] border" style={{ borderColor: C.line, background: C.card }}>
-              <table className="w-full min-w-[640px] border-collapse text-[15px]">
-                <caption id="fee-caption" className="px-4 pb-1 pt-4 text-left">
-                  <span className="block text-[18px] font-bold">교습비 등 게시</span>
-                  <span className="block text-[14px] font-normal" style={{ color: C.muted }}>
-                    교습계열 입시, 검정 및 보습, 교습과정 보통교과, 교습기간 1개월(4주)
-                  </span>
-                </caption>
+            <p id="fee-caption" className="text-[18px] font-bold">교습비 등 게시</p>
+            <p className="mt-1 text-[14px]" style={{ color: C.muted }}>
+              교습계열 입시, 검정 및 보습, 교습과정 보통교과, 교습기간 1개월(4주)
+            </p>
+            {/* 휴대폰: 과목마다 카드 한 장 */}
+            <ul className="mt-4 divide-y rounded-[6px] border md:hidden" style={{ borderColor: C.line, background: C.card }}>
+              {rows.map((r) => (
+                <li key={`m${r.b}${r.s}${r.t}`} className="px-4 py-3 tabular-nums" style={{ borderColor: C.line }}>
+                  <div className="flex items-baseline justify-between gap-3">
+                    <span className="font-semibold">
+                      {r.b} {r.s} 주 {r.t}회
+                    </span>
+                    <span className="whitespace-nowrap font-bold">{won(FEES[r.b][r.s][r.t])}</span>
+                  </div>
+                  <p className="mt-1 text-[14px]" style={{ color: C.muted }}>
+                    정원 {CAP[r.b]}명, 회당 {MINUTES[r.b]}분, 총 {(r.t * 4 * MINUTES[r.b]).toLocaleString("ko-KR")}분, 차량비 {won(SHUTTLE_FEE)}
+                  </p>
+                </li>
+              ))}
+            </ul>
+            <div className="mt-4 hidden overflow-hidden rounded-[6px] border md:block" style={{ borderColor: C.line, background: C.card }}>
+              <table className="w-full border-collapse text-[15px]" aria-labelledby="fee-caption">
                 <thead>
                   <tr className="border-b text-[14px]" style={{ borderColor: C.line, color: C.muted }}>
                     {["과정", "과목", "정원", "교습시간", "총 교습시간", "교습비", "기타경비"].map((h) => (
@@ -870,25 +900,23 @@ function Fee() {
                   </tr>
                 </thead>
                 <tbody className="tabular-nums">
-                  {rows.map((r) => {
-                    return (
-                      <tr key={`${r.b}${r.s}${r.t}`} className="border-t" style={{ borderColor: C.line }}>
-                        <td className="whitespace-nowrap px-3 py-2.5">{r.b}</td>
-                        <th scope="row" className="whitespace-nowrap px-3 py-2.5 text-left font-semibold">
-                          {r.s} 주 {r.t}회
-                        </th>
-                        <td className="px-3 py-2.5">{CAP[r.b]}명</td>
-                        <td className="whitespace-nowrap px-3 py-2.5">
-                          주 {r.t}회, 회당 {MINUTES[r.b]}분
-                        </td>
-                        <td className="px-3 py-2.5">{(r.t * 4 * MINUTES[r.b]).toLocaleString("ko-KR")}분</td>
-                        <td className="px-3 py-2.5 font-semibold">{won(FEES[r.b][r.s][r.t])}</td>
-                        <td className="whitespace-nowrap px-3 py-2.5" style={{ color: C.muted }}>
-                          차량비 {won(SHUTTLE_FEE)}
-                        </td>
-                      </tr>
-                    );
-                  })}
+                  {rows.map((r) => (
+                    <tr key={`${r.b}${r.s}${r.t}`} className="border-t" style={{ borderColor: C.line }}>
+                      <td className="whitespace-nowrap px-3 py-2.5">{r.b}</td>
+                      <th scope="row" className="whitespace-nowrap px-3 py-2.5 text-left font-semibold">
+                        {r.s} 주 {r.t}회
+                      </th>
+                      <td className="whitespace-nowrap px-3 py-2.5">{CAP[r.b]}명</td>
+                      <td className="whitespace-nowrap px-3 py-2.5">
+                        주 {r.t}회, 회당 {MINUTES[r.b]}분
+                      </td>
+                      <td className="whitespace-nowrap px-3 py-2.5">{(r.t * 4 * MINUTES[r.b]).toLocaleString("ko-KR")}분</td>
+                      <td className="whitespace-nowrap px-3 py-2.5 font-semibold">{won(FEES[r.b][r.s][r.t])}</td>
+                      <td className="whitespace-nowrap px-3 py-2.5" style={{ color: C.muted }}>
+                        차량비 {won(SHUTTLE_FEE)}
+                      </td>
+                    </tr>
+                  ))}
                 </tbody>
               </table>
             </div>
@@ -902,24 +930,19 @@ function Fee() {
                 교습비 반환 기준
                 <ChevronDown size={18} aria-hidden className="transition-transform group-open:rotate-180" />
               </summary>
-              <table className="w-full border-t text-[15px]" style={{ borderColor: C.line }}>
-                <caption className="sr-only">교습기간 1개월 이내 반환 기준</caption>
-                <tbody>
-                  {[
-                    ["교습 시작 전", "낸 교습비 전액"],
-                    ["총 교습시간의 1/3이 지나기 전", "낸 교습비의 2/3"],
-                    ["총 교습시간의 1/2이 지나기 전", "낸 교습비의 1/2"],
-                    ["총 교습시간의 1/2이 지난 뒤", "반환하지 않음"],
-                  ].map(([k, v]) => (
-                    <tr key={k} className="border-t first:border-t-0" style={{ borderColor: C.line }}>
-                      <th scope="row" className="px-4 py-2.5 text-left font-normal">
-                        {k}
-                      </th>
-                      <td className="px-4 py-2.5 text-right font-semibold">{v}</td>
-                    </tr>
-                  ))}
-                </tbody>
-              </table>
+              <dl className="divide-y border-t text-[15px]" style={{ borderColor: C.line }}>
+                {[
+                  ["교습 시작 전", "낸 교습비 전액"],
+                  ["총 교습시간의 1/3이 지나기 전", "낸 교습비의 2/3"],
+                  ["총 교습시간의 1/2이 지나기 전", "낸 교습비의 1/2"],
+                  ["총 교습시간의 1/2이 지난 뒤", "반환하지 않음"],
+                ].map(([k, v]) => (
+                  <div key={k} className="flex items-center justify-between gap-4 px-4 py-2.5" style={{ borderColor: C.line }}>
+                    <dt>{k}</dt>
+                    <dd className="whitespace-nowrap font-semibold">{v}</dd>
+                  </div>
+                ))}
+              </dl>
             </details>
         </div>
       </div>
@@ -958,8 +981,23 @@ function Shuttle() {
                     {r.area}
                   </span>
                 </h3>
-                <div tabIndex={0} role="region" aria-label={`${r.name} 정류장별 시간`} className="mt-2 overflow-x-auto">
-                  <table className="w-full min-w-[560px] border-collapse text-[15px] tabular-nums">
+                <ul className="mt-3 divide-y border-t md:hidden" style={{ borderColor: C.line }}>
+                  {r.stops.map((st) => (
+                    <li key={`m${st.name}`} className="px-5 py-3 tabular-nums" style={{ borderColor: C.line }}>
+                      <p className="font-semibold">{st.name}</p>
+                      <dl className="mt-1.5 grid grid-cols-2 gap-x-4 gap-y-1 text-[14px]">
+                        {RUNS.map((run) => (
+                          <div key={run.label} className="flex justify-between gap-2">
+                            <dt style={{ color: C.muted }}>{run.label}</dt>
+                            <dd className="font-semibold">{run.at(st.min)}</dd>
+                          </div>
+                        ))}
+                      </dl>
+                    </li>
+                  ))}
+                </ul>
+                <div className="mt-2 hidden md:block">
+                  <table className="w-full border-collapse text-[15px] tabular-nums" aria-label={`${r.name} 정류장별 시간`}>
                     <thead>
                       <tr className="border-b text-[14px]" style={{ borderColor: C.line, color: C.muted }}>
                         <th scope="col" className="px-5 py-2.5 text-left font-semibold">
@@ -974,14 +1012,14 @@ function Shuttle() {
                       </tr>
                     </thead>
                     <tbody>
-                      {r.stops.map((s) => (
-                        <tr key={s.name} className="border-t" style={{ borderColor: C.line }}>
+                      {r.stops.map((st) => (
+                        <tr key={st.name} className="border-t" style={{ borderColor: C.line }}>
                           <th scope="row" className="px-5 py-2.5 text-left font-semibold">
-                            {s.name}
+                            {st.name}
                           </th>
                           {RUNS.map((run) => (
-                            <td key={run.label} className="px-3 py-2.5">
-                              {run.at(s.min)}
+                            <td key={run.label} className="whitespace-nowrap px-3 py-2.5">
+                              {run.at(st.min)}
                             </td>
                           ))}
                         </tr>

@@ -712,6 +712,40 @@ function StatusBoard({ today, roomId, checkIn, nights, onPick }: { today: number
   const from = today >= 0 ? today + pageNo * BOARD_DAYS : -1;
   const dates = from >= 0 ? Array.from({ length: BOARD_DAYS }, (_, i) => from + i) : [];
 
+  const cell = (r: Room, ri: number, dn: number, withDate = false) => {
+    const booked = isBooked(dn, ri);
+    const on = r.id === roomId && checkIn !== null && dn >= checkIn && dn < checkIn + nights;
+    const first = on && dn === checkIn;
+    const p = parts(dn);
+    const hol = holidayOf(dn);
+    const price = r.prices[PRICE_COL[nightType(dn)]];
+    const dayColor = on ? "#fff" : p.w === 0 || hol ? C.red : p.w === 6 ? C.sat : C.muted;
+    return (
+      <button
+        type="button"
+        disabled={booked}
+        aria-pressed={on}
+        aria-label={`${r.name} ${p.m + 1}월 ${p.d}일 ${DAY_NAMES[p.w]}요일, ${booked ? "예약 완료" : `예약 가능, 1박 ${won(price)}`}${first ? ", 입실일" : ""}`}
+        onClick={() => onPick(r.id, dn)}
+        className={`${withDate ? "flex h-[52px] flex-col items-center justify-center gap-0.5 leading-[1.2]" : "h-11"} w-full whitespace-nowrap rounded-[4px] border text-[13px] font-semibold transition-colors hover:border-[#12324a] disabled:cursor-not-allowed disabled:hover:border-transparent`}
+        style={
+          on
+            ? { background: C.navy, borderColor: C.navy, color: "#fff" }
+            : booked
+              ? { background: "#e6e1d8", borderColor: "transparent", color: "#857d70" }
+              : { background: "#fff", borderColor: C.line, color: C.ink }
+        }
+      >
+        {withDate && (
+          <span className="text-[11px] font-normal" style={{ color: booked ? undefined : dayColor }}>
+            {shortDate(dn)} {DAY_NAMES[p.w]}
+          </span>
+        )}
+        <span>{booked ? "완료" : first ? "입실" : man(price)}</span>
+      </button>
+    );
+  };
+
   return (
     <div className="mt-6">
       <div className="flex flex-wrap items-center justify-between gap-2">
@@ -756,7 +790,27 @@ function StatusBoard({ today, roomId, checkIn, nights, onPick }: { today: number
         </ul>
       </div>
 
-      <div className="mt-3 overflow-x-auto rounded-[10px] border bg-white" style={{ borderColor: C.line }} role="region" aria-label="객실별 예약현황표" tabIndex={0}>
+      {/* 휴대폰: 객실마다 2주를 7칸 격자로 */}
+      <ul className="mt-3 divide-y rounded-[10px] border bg-white md:hidden" style={{ borderColor: C.line }} aria-label="객실별 예약현황">
+        {ROOMS.map((r, ri) => (
+          <li key={r.id} className="px-3 py-3" style={{ borderColor: C.line }}>
+            <p className="flex items-baseline justify-between gap-3">
+              <span className="font-bold" style={{ color: C.navy }}>
+                {r.name}
+              </span>
+              <span className="whitespace-nowrap text-[13px]" style={{ color: C.muted }}>
+                {r.base}~{r.max}명
+              </span>
+            </p>
+            <div className="mt-2 grid grid-cols-7 gap-1 tabular-nums">
+              {dates.length
+                ? dates.map((dn) => <div key={dn}>{cell(r, ri, dn, true)}</div>)
+                : Array.from({ length: BOARD_DAYS }, (_, i) => <div key={i} className="h-[52px]" />)}
+            </div>
+          </li>
+        ))}
+      </ul>
+      <div className="mt-3 hidden overflow-x-auto rounded-[10px] border bg-white md:block" style={{ borderColor: C.line }} role="region" aria-label="객실별 예약현황표" tabIndex={0}>
         <table className="w-full min-w-[880px] border-collapse text-center text-[14px] tabular-nums">
           <caption className="sr-only">객실별 날짜별 예약현황. 칸의 숫자는 1박 요금(만 원)입니다.</caption>
           <thead>
@@ -793,34 +847,11 @@ function StatusBoard({ today, roomId, checkIn, nights, onPick }: { today: number
                   </span>
                 </th>
                 {dates.length
-                  ? dates.map((dn) => {
-                      const booked = isBooked(dn, ri);
-                      const on = r.id === roomId && checkIn !== null && dn >= checkIn && dn < checkIn + nights;
-                      const first = on && dn === checkIn;
-                      const p = parts(dn);
-                      const price = r.prices[PRICE_COL[nightType(dn)]];
-                      return (
-                        <td key={dn} className="p-[3px]">
-                          <button
-                            type="button"
-                            disabled={booked}
-                            aria-pressed={on}
-                            aria-label={`${r.name} ${p.m + 1}월 ${p.d}일 ${DAY_NAMES[p.w]}요일, ${booked ? "예약 완료" : `예약 가능, 1박 ${won(price)}`}${first ? ", 입실일" : ""}`}
-                            onClick={() => onPick(r.id, dn)}
-                            className="h-11 w-full rounded-[4px] border text-[13px] font-semibold transition-colors hover:border-[#12324a] disabled:cursor-not-allowed disabled:hover:border-transparent"
-                            style={
-                              on
-                                ? { background: C.navy, borderColor: C.navy, color: "#fff" }
-                                : booked
-                                  ? { background: "#e6e1d8", borderColor: "transparent", color: "#857d70" }
-                                  : { background: "#fff", borderColor: C.line, color: C.ink }
-                            }
-                          >
-                            {booked ? "완료" : first ? "입실" : man(price)}
-                          </button>
-                        </td>
-                      );
-                    })
+                  ? dates.map((dn) => (
+                      <td key={dn} className="p-[3px]">
+                        {cell(r, ri, dn)}
+                      </td>
+                    ))
                   : Array.from({ length: BOARD_DAYS }, (_, i) => <td key={i} className="h-[50px]" />)}
               </tr>
             ))}

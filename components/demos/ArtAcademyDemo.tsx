@@ -882,7 +882,45 @@ function Timetable({ dow, initial }: { dow: number; initial: ClassKey }) {
         ))}
       </div>
 
-      <div className="mt-5 overflow-x-auto border" style={{ borderColor: C.line, background: C.sheet }}>
+      <ul className="mt-5 space-y-3 md:hidden" aria-label="반별 요일 실기 시간">
+        {WEEK.map((d) => {
+          const isToday = d.dow === dow;
+          const rows = TIMETABLE.filter((r) => r.times[d.dow]);
+          return (
+            <li key={d.dow} className="border" style={{ borderColor: isToday ? C.orangeInk : C.line, background: C.sheet }}>
+              <p className="flex items-center px-4 py-2.5 font-bold" style={{ background: isToday ? C.orangeTint : C.soft }}>
+                {d.label}
+                {isToday && (
+                  <span className="ml-1.5 rounded-[3px] px-1.5 py-0.5 text-[12px] text-white" style={{ background: C.orangeInk }}>
+                    오늘
+                  </span>
+                )}
+              </p>
+              <ul className="divide-y" style={{ borderColor: C.line }}>
+                {rows.map((r) => {
+                  const on = pick === "전체" || pick === r.cls;
+                  return (
+                    <li
+                      key={r.cls + r.name}
+                      className="flex items-baseline justify-between gap-3 border-t px-4 py-2.5 text-[15px] transition-opacity duration-200"
+                      style={{ borderColor: C.line, opacity: on ? 1 : 0.32 }}
+                    >
+                      <span>
+                        <span className="font-semibold">{r.cls}</span>
+                        <span className="ml-2 text-[13px]" style={{ color: C.muted }}>
+                          {r.name}
+                        </span>
+                      </span>
+                      <span className="whitespace-nowrap text-[14px] font-semibold tabular-nums">{r.times[d.dow]}</span>
+                    </li>
+                  );
+                })}
+              </ul>
+            </li>
+          );
+        })}
+      </ul>
+      <div className="mt-5 hidden overflow-x-auto border md:block" style={{ borderColor: C.line, background: C.sheet }}>
         <table className="w-full min-w-[720px] border-collapse text-[15px]">
           <caption className="sr-only">반별 요일 실기 시간. 일요일은 쉬어요.</caption>
           <thead>
@@ -968,7 +1006,25 @@ function Timetable({ dow, initial }: { dow: number; initial: ClassKey }) {
 
 function FeeTable() {
   return (
-    <div className="overflow-x-auto border" style={{ borderColor: C.line, background: C.sheet }}>
+    <>
+    <ul className="divide-y border md:hidden" style={{ borderColor: C.line, background: C.sheet }} aria-label="교습과정별 월 교습비와 기타경비">
+      {CLASSES.flatMap((c) =>
+        c.plans.map((pl) => (
+          <li key={`m${c.key}${pl.label}`} className="px-4 py-3" style={{ borderColor: C.line }}>
+            <div className="flex items-baseline justify-between gap-3">
+              <span className="font-semibold">
+                {c.key} {pl.label}
+              </span>
+              <span className="whitespace-nowrap font-bold tabular-nums">{won(pl.fee)}</span>
+            </div>
+            <p className="mt-1 text-[14px]" style={{ color: C.muted }}>
+              {c.who}, 정원 {c.cap}명, {c.extra}
+            </p>
+          </li>
+        )),
+      )}
+    </ul>
+    <div className="hidden overflow-x-auto border md:block" style={{ borderColor: C.line, background: C.sheet }}>
       <table className="w-full min-w-[640px] border-collapse text-[15px]">
         <caption className="sr-only">교습과정별 월 교습비와 기타경비</caption>
         <thead>
@@ -996,7 +1052,7 @@ function FeeTable() {
                 <td className="border-b px-3 py-3" style={{ borderColor: C.line }}>
                   {c.cap}명
                 </td>
-                <td className="border-b px-3 py-3 font-bold tabular-nums" style={{ borderColor: C.line }}>
+                <td className="border-b whitespace-nowrap px-3 py-3 font-bold tabular-nums" style={{ borderColor: C.line }}>
                   {won(pl.fee)}
                 </td>
                 <td className="border-b px-3 py-3" style={{ borderColor: C.line, color: C.muted }}>
@@ -1008,6 +1064,7 @@ function FeeTable() {
         </tbody>
       </table>
     </div>
+    </>
   );
 }
 

@@ -390,7 +390,40 @@ function RoomSection() {
         ))}
       </ul>
 
-      <div className="mt-8 overflow-x-auto">
+      <div className="mt-8 md:hidden">
+        <p className="mb-2 text-[18px] font-bold" style={{ color: C.ink }}>
+          병실별 1일 비용
+        </p>
+        <ul className="border-t" style={{ borderColor: C.line }}>
+          {ROOMS.map((r) => (
+            <li key={`m${r.id}`} className="border-b py-3" style={{ borderColor: C.line }}>
+              <p className="font-semibold">{r.label}</p>
+              <dl className="mt-1.5 grid grid-cols-2 gap-3 text-[15px]">
+                <div className="min-w-0">
+                  <dt className="text-[13px]" style={{ color: C.muted }}>
+                    상급병실료 차액
+                  </dt>
+                  <dd className="whitespace-nowrap tabular-nums">{r.diff ? won(r.diff) : "기준병실"}</dd>
+                </div>
+                <div className="min-w-0">
+                  <dt className="text-[13px]" style={{ color: C.muted }}>
+                    간병비
+                  </dt>
+                  <dd className="whitespace-nowrap tabular-nums">{r.careDay ? won(r.careDay) : "보호자와 협의"}</dd>
+                </div>
+              </dl>
+              <p className="mt-1 text-[14px]" style={{ color: C.muted }}>
+                {r.care}
+              </p>
+            </li>
+          ))}
+        </ul>
+        <p className="mt-2 text-[14px]" style={{ color: C.muted }}>
+          입원비와 식대 본인부담은 환자 분류 등급과 본인부담률에 따라 정해지며 입원 상담 때 안내합니다.
+        </p>
+      </div>
+
+      <div className="mt-8 hidden overflow-x-auto md:block">
         <table className="w-full min-w-[520px] border-collapse text-[15px]">
           <caption className="mb-2 text-left text-[18px] font-bold" style={{ color: C.ink }}>
             병실별 1일 비용
@@ -417,9 +450,9 @@ function RoomSection() {
                 <th scope="row" className="px-3 py-2 text-left font-semibold">
                   {r.label}
                 </th>
-                <td className="px-3 py-2 text-right tabular-nums">{r.diff ? won(r.diff) : "기준병실"}</td>
+                <td className="whitespace-nowrap px-3 py-2 text-right tabular-nums">{r.diff ? won(r.diff) : "기준병실"}</td>
                 <td className="px-3 py-2">{r.care}</td>
-                <td className="px-3 py-2 text-right tabular-nums">{r.careDay ? won(r.careDay) : "보호자와 협의"}</td>
+                <td className="whitespace-nowrap px-3 py-2 text-right tabular-nums">{r.careDay ? won(r.careDay) : "보호자와 협의"}</td>
               </tr>
             ))}
           </tbody>
@@ -429,7 +462,26 @@ function RoomSection() {
         </p>
       </div>
 
-      <div className="mt-8 overflow-x-auto">
+      <div className="mt-8 md:hidden">
+        <p className="mb-2 text-[18px] font-bold" style={{ color: C.ink }}>
+          비급여 진료비 안내
+        </p>
+        <ul className="border-t" style={{ borderColor: C.line }}>
+          {NONPAY.map(([k, unit, v]) => (
+            <li key={`m${k}`} className="border-b py-2.5" style={{ borderColor: C.line }}>
+              <div className="flex items-baseline justify-between gap-3">
+                <span className="min-w-0">{k}</span>
+                <span className="whitespace-nowrap font-bold tabular-nums">{won(v)}</span>
+              </div>
+              <p className="mt-0.5 text-[14px]" style={{ color: C.muted }}>
+                {unit}
+              </p>
+            </li>
+          ))}
+        </ul>
+      </div>
+
+      <div className="mt-8 hidden overflow-x-auto md:block">
         <table className="w-full border-collapse text-[15px]">
           <caption className="mb-2 text-left text-[18px] font-bold" style={{ color: C.ink }}>
             비급여 진료비 안내
@@ -452,7 +504,7 @@ function RoomSection() {
               <tr key={k} className="border-b" style={{ borderColor: C.line }}>
                 <td className="px-3 py-2">{k}</td>
                 <td className="px-3 py-2">{unit}</td>
-                <td className="px-3 py-2 text-right font-bold tabular-nums">{won(v)}</td>
+                <td className="whitespace-nowrap px-3 py-2 text-right font-bold tabular-nums">{won(v)}</td>
               </tr>
             ))}
           </tbody>

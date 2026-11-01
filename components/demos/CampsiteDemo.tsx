@@ -726,7 +726,7 @@ function SiteCard({ site, reduce }: { site: Site; reduce: boolean }) {
           </div>
         </dl>
         <p className="mt-3 text-[15px] tabular-nums">
-          평일 <b>{won(rate.weekday)}</b> <span style={{ color: C.muted }}>/</span> 주말 <b>{won(rate.weekend)}</b>
+          평일 <b className="whitespace-nowrap">{won(rate.weekday)}</b> <span style={{ color: C.muted }}>/</span> 주말 <b className="whitespace-nowrap">{won(rate.weekend)}</b>
           <span className="ml-2 text-[13px]" style={{ color: C.muted }}>
             기본 {rate.base}인, 차량 1대
           </span>
@@ -1146,10 +1146,42 @@ function Receipt({ booking, today, reduce, onReset }: { booking: Booking; today:
 
 function PriceTable() {
   const th = "border-b px-3 py-2.5 text-left text-[14px] font-bold";
-  const td = "border-b px-3 py-2.5 text-[15px] tabular-nums";
+  const td = "border-b whitespace-nowrap px-3 py-2.5 text-[15px] tabular-nums";
   return (
     <div className="mt-5 grid gap-6 lg:grid-cols-[minmax(0,1fr)_360px]">
-      <div className="overflow-x-auto rounded-[8px] border bg-white" style={{ borderColor: C.line }}>
+      {/* 휴대폰: 사이트 종류마다 카드 한 장 */}
+      <ul className="divide-y rounded-[8px] border bg-white md:hidden" style={{ borderColor: C.line }} aria-label="사이트별 1박 요금">
+        {(Object.keys(RATE) as SiteType[]).map((t) => (
+          <li key={`m${t}`} className="px-3 py-3 tabular-nums" style={{ borderColor: C.line }}>
+            <p className="flex items-baseline justify-between gap-3">
+              <span className="text-[15px] font-bold">
+                {RATE[t].name}
+                <span className="ml-1 text-[13px] font-normal" style={{ color: C.muted }}>
+                  {t === "deck" ? "A, B구역" : t === "auto" ? "C구역" : "G1, G2"}
+                </span>
+              </span>
+              <span className="whitespace-nowrap text-[13px]" style={{ color: C.muted }}>
+                {RATE[t].base}인, 차량 1대
+              </span>
+            </p>
+            <dl className="mt-2 grid grid-cols-2 gap-1.5">
+              <div className="rounded-[4px] px-2.5 py-1.5" style={{ background: C.paperDim }}>
+                <dt className="text-[13px]" style={{ color: C.muted }}>
+                  평일
+                </dt>
+                <dd className="whitespace-nowrap text-[15px] font-bold">{won(RATE[t].weekday)}</dd>
+              </div>
+              <div className="rounded-[4px] px-2.5 py-1.5" style={{ background: C.paperDim }}>
+                <dt className="text-[13px]" style={{ color: C.muted }}>
+                  주말, 공휴일 전날
+                </dt>
+                <dd className="whitespace-nowrap text-[15px] font-bold">{won(RATE[t].weekend)}</dd>
+              </div>
+            </dl>
+          </li>
+        ))}
+      </ul>
+      <div className="hidden overflow-x-auto rounded-[8px] border bg-white md:block" style={{ borderColor: C.line }}>
         <table className="w-full min-w-[520px] border-collapse">
           <caption className="sr-only">사이트별 1박 요금</caption>
           <thead>

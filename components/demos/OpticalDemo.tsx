@@ -210,8 +210,8 @@ export function OpticalDemo() {
                         {x.desc}
                       </span>
                     </th>
-                    <td className="py-3 pr-3 tabular-nums">{x.mm}mm</td>
-                    <td className="py-3 text-right font-bold tabular-nums">{won(x.price)}</td>
+                    <td className="whitespace-nowrap py-3 pr-3 tabular-nums">{x.mm}mm</td>
+                    <td className="whitespace-nowrap py-3 text-right font-bold tabular-nums"><span className="whitespace-nowrap">{won(x.price)}</span></td>
                   </tr>
                 ))}
               </tbody>
@@ -235,7 +235,7 @@ export function OpticalDemo() {
                         {o.desc}
                       </span>
                     </th>
-                    <td className="py-3 text-right font-bold tabular-nums">+{won(o.price)}</td>
+                    <td className="whitespace-nowrap py-3 text-right font-bold tabular-nums"><span className="whitespace-nowrap">+{won(o.price)}</span></td>
                   </tr>
                 ))}
               </tbody>
@@ -787,7 +787,7 @@ function Directions({ today }: { today: Date }) {
           <MapPin size={20} aria-hidden className="mt-0.5 flex-none" style={{ color: C.navy }} />
           <div className="text-[15px] leading-[1.6]">
             <p className="font-bold">{ADDRESS}</p>
-            <p style={{ color: C.muted }}>1층 길가 매장, 간판에 곰 그림</p>
+            <p style={{ color: C.muted }}>1층 길가 매장</p>
           </div>
         </div>
         <div className="flex items-start gap-3">

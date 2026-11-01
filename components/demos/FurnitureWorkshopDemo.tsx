@@ -378,7 +378,25 @@ export function FurnitureWorkshopDemo() {
             <h3 id="fw-size-title" className="text-[20px] font-bold">
               제작 가능 치수
             </h3>
-            <div className="mt-3 overflow-x-auto rounded-[4px] border" style={{ borderColor: C.line, background: C.sheet }}>
+            {/* 휴대폰: 가구마다 한 줄 */}
+            <ul className="mt-3 divide-y rounded-[4px] border md:hidden" style={{ borderColor: C.line, background: C.sheet }}>
+              {KINDS.map((k) => (
+                <li key={`m${k.id}`} className="px-3 py-2.5 tabular-nums" style={{ borderColor: C.line }}>
+                  <p className="flex items-baseline justify-between gap-3">
+                    <span className="font-bold" style={{ color: C.ink }}>
+                      {k.name}
+                    </span>
+                    <span className="whitespace-nowrap font-bold" style={{ color: C.ink }}>
+                      {won(quote(k, { w: k.w.min, d: k.d.min, h: k.h.min }, WOODS.find((w) => w.id === "redpine")!, "oil").total)}~
+                    </span>
+                  </p>
+                  <p className="mt-0.5 text-[14px]" style={{ color: C.soft }}>
+                    폭 {k.w.min}~{k.w.max}, 깊이 {k.d.min}~{k.d.max}, 높이 {k.h.min}~{k.h.max}
+                  </p>
+                </li>
+              ))}
+            </ul>
+            <div className="mt-3 hidden overflow-x-auto rounded-[4px] border md:block" style={{ borderColor: C.line, background: C.sheet }}>
               <table className="w-full min-w-[520px] text-left text-[15px]">
                 <thead style={{ background: C.paper }}>
                   <tr>
@@ -404,7 +422,7 @@ export function FurnitureWorkshopDemo() {
                       <td className="px-3 py-2.5">
                         {k.h.min}~{k.h.max}
                       </td>
-                      <td className="px-3 py-2.5 font-bold" style={{ color: C.ink }}>
+                      <td className="whitespace-nowrap px-3 py-2.5 font-bold" style={{ color: C.ink }}>
                         {won(quote(k, { w: k.w.min, d: k.d.min, h: k.h.min }, WOODS.find((w) => w.id === "redpine")!, "oil").total)}~
                       </td>
                     </tr>

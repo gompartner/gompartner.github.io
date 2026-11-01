@@ -734,8 +734,8 @@ function Subscription() {
           <thead>
             <tr className="border-y-2 text-left" style={{ borderColor: C.ink }}>
               <th scope="col" className="py-2.5 pr-3 font-bold">구성</th>
-              <th scope="col" className="py-2.5 pr-3 text-right font-bold">정가</th>
-              <th scope="col" className="py-2.5 text-right font-bold">회당 구독가</th>
+              <th scope="col" className="whitespace-nowrap py-2.5 pr-3 text-right font-bold">정가</th>
+              <th scope="col" className="whitespace-nowrap py-2.5 text-right font-bold">회당 구독가</th>
             </tr>
           </thead>
           <tbody>
@@ -747,10 +747,10 @@ function Subscription() {
                     {p.note}
                   </span>
                 </th>
-                <td className="py-3 pr-3 text-right tabular-nums" style={{ color: C.muted }}>
-                  {won(p.price)}
+                <td className="py-3 pr-3 text-right whitespace-nowrap tabular-nums" style={{ color: C.muted }}>
+                  <span className="whitespace-nowrap">{won(p.price)}</span>
                 </td>
-                <td className="py-3 text-right font-bold tabular-nums">{won(subPrice(p.price))}</td>
+                <td className="py-3 whitespace-nowrap text-right font-bold tabular-nums"><span className="whitespace-nowrap">{won(subPrice(p.price))}</span></td>
               </tr>
             ))}
           </tbody>

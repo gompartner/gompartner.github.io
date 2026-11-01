@@ -4,7 +4,6 @@ import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import Image from "next/image";
 import { AnimatePresence, motion } from "framer-motion";
 import {
-  Bath,
   Bus,
   Car,
   Check,
@@ -13,14 +12,12 @@ import {
   CircleAlert,
   Clock,
   Eye,
-  Hammer,
   ImagePlus,
   Inbox,
   Mail,
   MapPin,
   Menu,
   MessageSquareText,
-  PaintRoller,
   Pencil,
   Phone,
   Pin,
@@ -720,28 +717,25 @@ function Home({ ctx }: { ctx: Ctx }) {
           <ul className="divide-y border-y" style={{ borderColor: C.line }}>
             {(
               [
-                { w: "full", icon: Hammer, name: "전체 리모델링", what: "철거, 샷시, 목공, 전기, 욕실, 주방, 도배, 바닥", term: "30평대 4~5주" },
-                { w: "part", icon: Bath, name: "욕실, 주방", what: "욕실 방수, 타일, 도기, 싱크대, 상판, 주방 타일", term: "욕실 1곳 4~5일, 주방 3~4일" },
-                { w: "paper", icon: PaintRoller, name: "도배, 바닥", what: "실크, 합지 도배, 강마루, 장판, 포세린 타일", term: "30평대 2~4일" },
+                { w: "full", name: "전체 리모델링", what: "철거, 샷시, 목공, 전기, 욕실, 주방, 도배, 바닥", term: "30평대 4~5주" },
+                { w: "part", name: "욕실, 주방", what: "욕실 방수, 타일, 도기, 싱크대, 상판, 주방 타일", term: "욕실 1곳 4~5일, 주방 3~4일" },
+                { w: "paper", name: "도배, 바닥", what: "실크, 합지 도배, 강마루, 장판, 포세린 타일", term: "30평대 2~4일" },
               ] as const
-            ).map(({ w, icon: Icon, name, what, term }) => (
+            ).map(({ w, name, what, term }) => (
               <li key={w} style={{ borderColor: C.line }}>
                 <button
                   type="button"
                   onClick={() => go("cases", { work: w, size: "all" })}
-                  className="grid w-full grid-cols-[44px_1fr_auto] items-center gap-x-4 gap-y-1 py-5 text-left md:grid-cols-[52px_200px_1fr_200px_auto] md:py-6"
+                  className="grid w-full grid-cols-[1fr_auto] items-center gap-x-4 gap-y-1 py-5 text-left md:grid-cols-[200px_1fr_200px_auto] md:py-6"
                 >
-                  <span className="inline-flex h-11 w-11 items-center justify-center rounded-[4px] md:h-12 md:w-12" style={{ background: C.forestSoft, color: C.forest }}>
-                    <Icon size={22} aria-hidden />
-                  </span>
                   <span className="text-[19px] font-bold">{name}</span>
-                  <span className="col-start-2 row-start-2 text-[15px] md:col-start-3 md:row-start-1 md:text-[16px]" style={{ color: C.muted }}>
+                  <span className="col-start-1 row-start-2 text-[15px] md:col-start-2 md:row-start-1 md:text-[16px]" style={{ color: C.muted }}>
                     {what}
                   </span>
-                  <span className="col-start-2 row-start-3 text-[15px] font-semibold md:col-start-4 md:row-start-1" style={{ color: C.wood }}>
+                  <span className="col-start-1 row-start-3 text-[15px] font-semibold md:col-start-3 md:row-start-1" style={{ color: C.wood }}>
                     {term}
                   </span>
-                  <span className="col-start-3 row-span-3 row-start-1 inline-flex items-center gap-1 text-[15px] font-semibold md:col-start-5 md:row-span-1" style={{ color: C.forest }}>
+                  <span className="col-start-2 row-span-3 row-start-1 inline-flex items-center gap-1 text-[15px] font-semibold md:col-start-4 md:row-span-1" style={{ color: C.forest }}>
                     사례 {countOf(w)}건
                     <ChevronRight size={16} aria-hidden />
                   </span>

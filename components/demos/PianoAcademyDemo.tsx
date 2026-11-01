@@ -615,7 +615,20 @@ function FeeSection({ today }: { today: Date }) {
   return (
     <section id="pa-fees" aria-labelledby="pa-fees-title" className="mx-auto mt-20 max-w-[1200px] scroll-mt-4 px-4 md:mt-24 md:px-6">
       <SectionTitle id="pa-fees-title" title="교습비 안내" />
-      <div className="mt-6 overflow-x-auto rounded-[6px] border" style={{ borderColor: C.line, background: C.card }}>
+      <ul className="mt-6 divide-y rounded-[6px] border md:hidden" style={{ borderColor: C.line, background: C.card }} aria-label="교습과정별 월 교습비">
+        {FEES.map((f) => (
+          <li key={`m${f.course}${f.times}`} className="px-4 py-3" style={{ borderColor: C.line }}>
+            <div className="flex items-baseline justify-between gap-3">
+              <span className="font-bold">{f.course}</span>
+              <span className="whitespace-nowrap font-bold tabular-nums">{won(f.price)}</span>
+            </div>
+            <p className="mt-1 text-[14px]" style={{ color: C.muted }}>
+              {f.times}, {f.time}
+            </p>
+          </li>
+        ))}
+      </ul>
+      <div className="mt-6 hidden overflow-x-auto rounded-[6px] border md:block" style={{ borderColor: C.line, background: C.card }}>
         <table className="w-full min-w-[340px] border-collapse text-left text-[15px]">
           <caption className="sr-only">교습과정별 월 교습비</caption>
           <thead>

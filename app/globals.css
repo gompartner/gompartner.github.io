@@ -220,3 +220,18 @@ input[type="time"]::-webkit-date-and-time-value {
     align-items: center;
   }
 }
+
+/* 카탈로그 데모 선택상자(11-01): 휴대폰 기본 모양 대신 입력칸과 같은 높이, 오른쪽 화살표 하나.
+   데모마다 inline background를 쓰는 곳이 있어 화살표 관련 값만 !important로 덮는다. */
+.demo-root { display: contents; }
+.demo-root select:not([multiple]):not([size]) {
+  -webkit-appearance: none;
+  appearance: none;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' viewBox='0 0 24 24' fill='none' stroke='%236b7280' stroke-width='2.5' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='m6 9 6 6 6-6'/%3E%3C/svg%3E") !important;
+  background-repeat: no-repeat !important;
+  background-position: right 14px center !important;
+  background-size: 16px 16px !important;
+  padding-right: 42px !important;
+  min-height: 48px;
+  text-overflow: ellipsis;
+}

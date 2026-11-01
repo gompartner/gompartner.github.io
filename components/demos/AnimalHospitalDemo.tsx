@@ -590,7 +590,22 @@ function DeptPicker({ dept, setDept }: { dept: DeptId; setDept: (d: DeptId) => v
 function FeeTable() {
   return (
     <div>
-      <table className="w-full max-w-[760px] border-collapse text-[16px]">
+      <ul className="border-t md:hidden" style={{ borderColor: C.ink }}>
+        {FEES.map(([name, price, note]) => (
+          <li key={`m${name}`} className="border-b py-2.5" style={{ borderColor: C.line }}>
+            <div className="flex items-baseline justify-between gap-3">
+              <span className="min-w-0 font-semibold">{name}</span>
+              <span className="whitespace-nowrap tabular-nums">{won(price)}</span>
+            </div>
+            {note && (
+              <p className="mt-0.5 text-[14px]" style={{ color: C.muted }}>
+                {note}
+              </p>
+            )}
+          </li>
+        ))}
+      </ul>
+      <table className="hidden w-full max-w-[760px] border-collapse text-[16px] md:table">
         <caption className="sr-only">주요 진료비</caption>
         <thead>
           <tr className="border-b" style={{ borderColor: C.ink }}>
@@ -613,7 +628,7 @@ function FeeTable() {
                   </span>
                 )}
               </th>
-              <td className="py-2.5 text-right tabular-nums">{won(price)}</td>
+              <td className="whitespace-nowrap py-2.5 text-right tabular-nums">{won(price)}</td>
             </tr>
           ))}
         </tbody>

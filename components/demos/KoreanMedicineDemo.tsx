@@ -447,7 +447,20 @@ function ClinicSection({ onCar }: { onCar: () => void }) {
         <h3 className="text-[20px] font-bold">
           비급여 진료비 안내
         </h3>
-        <div className="mt-3 overflow-x-auto">
+        <ul className="mt-3 border-t md:hidden" style={{ borderColor: C.field }}>
+          {FEES.map((f) => (
+            <li key={`m${f.item}`} className="border-b py-2.5" style={{ borderColor: C.line }}>
+              <div className="flex items-baseline justify-between gap-3">
+                <span className="min-w-0">{f.item}</span>
+                <span className="whitespace-nowrap tabular-nums">{f.price}</span>
+              </div>
+              <p className="mt-0.5 text-[14px]" style={{ color: C.muted }}>
+                {f.unit}
+              </p>
+            </li>
+          ))}
+        </ul>
+        <div className="mt-3 hidden overflow-x-auto md:block">
           <table className="w-full min-w-[340px] border-collapse text-left text-[16px]">
             <thead>
               <tr className="border-b" style={{ borderColor: C.field }}>
@@ -469,7 +482,7 @@ function ClinicSection({ onCar }: { onCar: () => void }) {
                   <td className="py-2.5 pr-3" style={{ color: C.muted }}>
                     {f.unit}
                   </td>
-                  <td className="py-2.5 text-right tabular-nums">{f.price}</td>
+                  <td className="whitespace-nowrap py-2.5 text-right tabular-nums">{f.price}</td>
                 </tr>
               ))}
             </tbody>
@@ -922,7 +935,7 @@ function VisitSection() {
           <rect x="350" y="96" width="92" height="64" rx="3" fill="#ffffff" stroke="#9a9a9a" strokeWidth="1" />
           <rect x="378" y="66" width="36" height="36" rx="3" fill={C.red} />
           <text x="396" y="91" textAnchor="middle" fontSize="20" fontWeight="700" fill="#ffffff">
-            곰
+            한
           </text>
           <text x="396" y="136" textAnchor="middle" fontSize="13" fontWeight="700" fill={C.ink}>
             3층

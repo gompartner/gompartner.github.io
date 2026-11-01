@@ -526,7 +526,22 @@ function Items({ reduce }: { reduce: boolean }) {
 function PackTable() {
   return (
     <div className="mt-8">
-      <div className="overflow-x-auto">
+      <ul className="divide-y border-y md:hidden" style={{ borderColor: C.line }} aria-label="포장 형태별 최소 주문 수량">
+        {PACKS.map((p) => (
+          <li key={`m${p.id}`} className="px-1 py-3" style={{ borderColor: C.line }}>
+            <div className="flex items-baseline justify-between gap-3">
+              <span className="font-semibold">{p.label}</span>
+              <span className="whitespace-nowrap font-bold tabular-nums" style={{ color: C.tomatoDeep }}>
+                {num(p.moq)}개
+              </span>
+            </div>
+            <p className="mt-1 text-[14px]" style={{ color: C.body, wordBreak: "keep-all" }}>
+              {p.why}
+            </p>
+          </li>
+        ))}
+      </ul>
+      <div className="hidden overflow-x-auto md:block">
         <table className="w-full min-w-[560px] border-collapse text-left text-[15px]">
           <caption className="sr-only">포장 형태별 최소 주문 수량</caption>
           <thead>

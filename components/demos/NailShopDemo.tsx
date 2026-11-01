@@ -533,7 +533,7 @@ function ReserveForm({ today, reduce, artNote }: { today: Date; reduce: boolean;
                       >
                         <span className="block text-[12px]">{i === 0 ? "오늘" : DOW[d.getDay()]}</span>
                         <span className="block text-[18px] font-bold tabular-nums">{d.getDate()}</span>
-                        <span className="block text-[11px]">{closed ? "휴무" : `${HOURS[d.getDay()]![0]}~${HOURS[d.getDay()]![1]}시`}</span>
+                        <span className="block whitespace-nowrap text-[10px] tabular-nums tracking-[-0.03em] sm:text-[11px]">{closed ? "휴무" : `${HOURS[d.getDay()]![0]}~${HOURS[d.getDay()]![1]}시`}</span>
                       </button>
                     );
                   })}

@@ -143,7 +143,29 @@ export function CarDetailingDemo() {
       {/* 시공 메뉴: 차종별 가격표 */}
       <section id="cd-menu" aria-labelledby="cd-menu-title" className="mx-auto mt-8 max-w-[1200px] scroll-mt-4 px-4 md:mt-12 md:px-6">
         <SectionTitle id="cd-menu-title" title="시공 메뉴" side="차종별 요금, 부가세 포함" />
-        <div className="mt-5 overflow-x-auto rounded-[8px] border" style={{ borderColor: C.line, background: C.panel }}>
+        {/* 휴대폰: 시공마다 차종별 요금을 2칸 격자로 */}
+        <ul className="mt-5 divide-y rounded-[8px] border md:hidden" style={{ borderColor: C.line, background: C.panel }}>
+          {SERVICES.map((s) => (
+            <li key={`m${s.id}`} className="px-4 py-3" style={{ borderColor: C.line }}>
+              <p className="font-bold">{s.name}</p>
+              <p className="text-[13px]" style={{ color: C.muted }}>
+                {s.desc}
+                {s.overnight ? ", 1박 2일" : ""}
+              </p>
+              <dl className="mt-2 grid grid-cols-2 gap-1.5 tabular-nums">
+                {s.price.map((p, i) => (
+                  <div key={i} className="rounded-[4px] px-2 py-1.5" style={{ background: C.panel2 }}>
+                    <dt className="text-[13px]" style={{ color: C.muted }}>
+                      {CAR_TYPES[i]}
+                    </dt>
+                    <dd className="whitespace-nowrap text-[15px] font-bold">{won(p)}</dd>
+                  </div>
+                ))}
+              </dl>
+            </li>
+          ))}
+        </ul>
+        <div className="mt-5 hidden overflow-x-auto rounded-[8px] border md:block" style={{ borderColor: C.line, background: C.panel }}>
           <table className="w-full min-w-[720px] text-[15px]">
             <thead style={{ background: C.panel2 }}>
               <tr>
@@ -168,7 +190,7 @@ export function CarDetailingDemo() {
                     </span>
                   </th>
                   {s.price.map((p, i) => (
-                    <td key={i} className="px-3 py-3 text-right tabular-nums">
+                    <td key={i} className="whitespace-nowrap px-3 py-3 text-right tabular-nums">
                       {won(p)}
                     </td>
                   ))}

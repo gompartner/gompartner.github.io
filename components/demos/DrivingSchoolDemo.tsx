@@ -607,7 +607,23 @@ const EXAM_INFO = [
 function ExamInfo() {
   return (
     <div className="mt-6 overflow-x-auto rounded-[6px] border" style={{ borderColor: C.line, background: C.card }}>
-      <table className="w-full min-w-[560px] text-left text-[16px]">
+      <ul className="divide-y md:hidden" style={{ borderColor: C.line }} aria-label="시험 일정">
+        {EXAM_INFO.map((e) => (
+          <li key={`m${e.kind}`} className="px-5 py-3.5" style={{ borderColor: C.line }}>
+            <div className="flex items-baseline justify-between gap-3">
+              <span className="font-bold">{e.kind}</span>
+              <span className="whitespace-nowrap">{e.days}</span>
+            </div>
+            <p className="mt-1 text-[14px] tabular-nums" style={{ color: C.muted }}>
+              {e.times}
+            </p>
+            <p className="text-[14px]" style={{ color: C.muted }}>
+              {e.place}
+            </p>
+          </li>
+        ))}
+      </ul>
+      <table className="hidden w-full min-w-[560px] text-left text-[16px] md:table">
         <thead>
           <tr className="border-b text-[14px]" style={{ borderColor: C.line, color: C.muted }}>
             <th scope="col" className="px-5 py-3 font-normal">

@@ -849,7 +849,25 @@ function Fees() {
       <SectionHead id="et-fee" title="월 수강료" />
 
       <div className="mt-5 overflow-x-auto rounded-[8px] border" style={{ borderColor: C.line, background: "#fff" }}>
-        <table className="w-full min-w-[340px] text-left text-[16px]">
+        <div className="md:hidden">
+          <p className="px-4 pt-3 text-[14px]" style={{ color: C.muted }}>
+            ㅇㅇ교육지원청 신고 월 교습비, 반 정원 {CAP}명
+          </p>
+          <ul className="mt-2 divide-y border-y" style={{ borderColor: C.line }}>
+            {FEES.map((f) => (
+              <li key={`m${f.key}`} className="px-4 py-3" style={{ borderColor: C.line }}>
+                <div className="flex items-baseline justify-between gap-3">
+                  <span className="font-bold">{f.label}</span>
+                  <span className="whitespace-nowrap font-bold tabular-nums">{won(f.fee)}</span>
+                </div>
+                <p className="mt-1 text-[14px]" style={{ color: C.muted }}>
+                  {f.hours}
+                </p>
+              </li>
+            ))}
+          </ul>
+        </div>
+        <table className="hidden w-full min-w-[340px] text-left text-[16px] md:table">
           <caption className="px-4 pt-3 text-left text-[14px]" style={{ color: C.muted }}>
             ㅇㅇ교육지원청 신고 월 교습비, 반 정원 {CAP}명
           </caption>
@@ -875,7 +893,7 @@ function Fees() {
                 <td className="whitespace-nowrap px-2 py-3.5" style={{ color: C.muted }}>
                   {f.hours}
                 </td>
-                <td className="px-4 py-3.5 text-right font-bold tabular-nums">{won(f.fee)}</td>
+                <td className="whitespace-nowrap px-4 py-3.5 text-right font-bold tabular-nums">{won(f.fee)}</td>
               </tr>
             ))}
           </tbody>

@@ -491,7 +491,28 @@ function PriceTable() {
   return (
     <div className="grid gap-6 md:grid-cols-[1.4fr_1fr] md:items-start">
       <div className="overflow-x-auto rounded-[12px] border-2" style={{ borderColor: C.ink, background: C.white }}>
-        <table className="w-full min-w-[340px] text-left text-[16px]">
+        <ul className="md:hidden" aria-label="평형별 아파트 금액">
+          {PRICE_ROWS.map((py) => {
+            const e = estimate("apt", py, [], false);
+            return (
+              <li key={`m${py}`} className="border-t px-4 py-3 first:border-t-0" style={{ borderColor: C.line }}>
+                <div className="flex items-baseline justify-between gap-3">
+                  <span className="font-bold">{py}평</span>
+                  <span className="whitespace-nowrap">
+                    <span className="mr-1.5 text-[14px]" style={{ color: C.muted }}>
+                      아파트
+                    </span>
+                    <span className="font-extrabold tabular-nums">{won(e.total)}</span>
+                  </span>
+                </div>
+                <p className="mt-0.5 text-[14px]" style={{ color: C.muted }}>
+                  {e.staff}명, 약 {e.hours}시간
+                </p>
+              </li>
+            );
+          })}
+        </ul>
+        <table className="hidden w-full min-w-[340px] text-left text-[16px] md:table">
           <thead style={{ background: C.ink, color: C.white }}>
             <tr>
               <th scope="col" className="px-4 py-3 font-bold">평형</th>
@@ -508,7 +529,7 @@ function PriceTable() {
                   <th scope="row" className="px-4 py-3 font-bold">{py}평</th>
                   <td className="px-4 py-3">{e.staff}명</td>
                   <td className="px-4 py-3">약 {e.hours}시간</td>
-                  <td className="px-4 py-3 text-right font-extrabold tabular-nums">{won(e.total)}</td>
+                  <td className="whitespace-nowrap px-4 py-3 text-right font-extrabold tabular-nums">{won(e.total)}</td>
                 </tr>
               );
             })}

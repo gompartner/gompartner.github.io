@@ -280,8 +280,8 @@ export function SmallWeddingDemo() {
                   <td className="border-t px-3 py-2 tabular-nums" style={{ borderColor: C.line }}>
                     {s.time}
                   </td>
-                  <td className="border-t px-3 py-2 text-right tabular-nums" style={{ borderColor: C.line }}>
-                    {won(s.rent)}
+                  <td className="whitespace-nowrap border-t px-3 py-2 text-right tabular-nums" style={{ borderColor: C.line }}>
+                    <span className="whitespace-nowrap">{won(s.rent)}</span>
                   </td>
                 </tr>
               ))}
@@ -621,7 +621,24 @@ function LayoutSection() {
           </li>
         ))}
       </ul>
-      <div className="mt-8 overflow-x-auto">
+      {/* 휴대폰: 공간마다 한 줄 */}
+      <div className="mt-8 md:hidden">
+        <p className="py-2 text-[16px] font-bold">공간별 수용 인원</p>
+        <ul className="border-b" style={{ borderColor: C.line, background: C.paper }}>
+          {CAPACITY.map((r) => (
+            <li key={`m${r.name}`} className="border-t px-3 py-3 text-[15px] leading-[1.5]" style={{ borderColor: C.line }}>
+              <p className="flex items-baseline justify-between gap-3">
+                <span className="font-bold">{r.name}</span>
+                <span className="whitespace-nowrap tabular-nums">{r.seat}</span>
+              </p>
+              <p className="mt-0.5 text-[14px]" style={{ color: C.muted }}>
+                {r.table}, {r.note}
+              </p>
+            </li>
+          ))}
+        </ul>
+      </div>
+      <div className="mt-8 hidden overflow-x-auto md:block">
         <table className="w-full min-w-[520px] border-collapse text-[15px] leading-[1.5]" style={{ background: C.paper }}>
           <caption className="py-2 text-left text-[16px] font-bold">공간별 수용 인원</caption>
           <thead>
@@ -695,8 +712,8 @@ function PackageSection() {
                       </span>
                     )}
                   </th>
-                  <td className="border-t py-3 text-right align-top tabular-nums" style={{ borderColor: C.line }}>
-                    {r.price}
+                  <td className="whitespace-nowrap border-t py-3 text-right align-top tabular-nums" style={{ borderColor: C.line }}>
+                    <span className="whitespace-nowrap">{r.price}</span>
                   </td>
                 </tr>
               ))}

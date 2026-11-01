@@ -445,7 +445,37 @@ export function PhotoStudioDemo() {
         <h3 className="mt-10 text-[20px] font-bold">
           프로필, 가족, 우정 패키지
         </h3>
-        <div className="mt-3 overflow-x-auto rounded-[6px] border" style={{ borderColor: C.line }}>
+        {/* 휴대폰: 패키지마다 고르는 카드 */}
+        <ul className="mt-3 grid gap-2 md:hidden">
+          {PKGS.map((p) => {
+            const on = p.id === pkg;
+            return (
+              <li key={`m${p.id}`}>
+                <button
+                  type="button"
+                  onClick={() => setPkg(p.id)}
+                  aria-pressed={on}
+                  className={`w-full rounded-[6px] border px-4 py-3 text-left transition-colors duration-200 ${focusRing}`}
+                  style={{ borderColor: on ? C.accent : C.line, background: on ? C.panel2 : "transparent", color: C.text }}
+                >
+                  <span className="flex items-baseline justify-between gap-3">
+                    <span className="inline-flex items-center gap-1.5 text-[16px] font-semibold">
+                      {on && <Check size={15} strokeWidth={3} aria-hidden style={{ color: C.accent }} />}
+                      {p.name}
+                    </span>
+                    <span className="whitespace-nowrap text-[16px] font-bold tabular-nums" style={{ color: on ? C.accent : C.text }}>
+                      {won(p.price)}
+                    </span>
+                  </span>
+                  <span className="mt-1 block text-[14px] leading-[1.6] tabular-nums" style={{ color: C.muted }}>
+                    {ROWS.map(([label, key]) => `${label} ${p[key]}`).join(", ")}
+                  </span>
+                </button>
+              </li>
+            );
+          })}
+        </ul>
+        <div className="mt-3 hidden overflow-x-auto rounded-[6px] border md:block" style={{ borderColor: C.line }}>
           <table className="w-full min-w-[560px] border-collapse text-left text-[15px]">
             <thead>
               <tr>
@@ -467,7 +497,7 @@ export function PhotoStudioDemo() {
                           {on && <Check size={15} strokeWidth={3} aria-hidden style={{ color: C.accent }} />}
                           {p.name}
                         </span>
-                        <span className="text-[15px] tabular-nums" style={{ color: on ? C.accent : C.muted }}>
+                        <span className="whitespace-nowrap text-[15px] tabular-nums" style={{ color: on ? C.accent : C.muted }}>
                           {won(p.price)}
                         </span>
                       </button>
