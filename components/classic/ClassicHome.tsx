@@ -40,7 +40,7 @@ const services = [
   {
     href: "/classic/homepage",
     name: "홈페이지 제작",
-    what: "병원, 매장, 전문직, 기업, 학원 반응형 홈페이지",
+    what: "병원, 매장, 전문직, 기업, 학원 홈페이지를 업종에 맞게 만듭니다",
     icon: MonitorSmartphone,
   },
   ...maintenanceServices.map((m) => ({
@@ -98,7 +98,7 @@ const heroSlides = [
     w: 1440,
     h: 900,
     title: "홈페이지 제작",
-    sub: "병원, 매장, 전문직 사무실, 기업, 학원 반응형 홈페이지",
+    sub: "병원, 매장, 전문직 사무실, 기업, 학원 홈페이지를 업종에 맞게 만듭니다",
     points: [
       "업종별 법정 고지 검토",
       "반응형, 검색엔진 등록",
@@ -112,7 +112,7 @@ const heroSlides = [
     w: 1060,
     h: 752,
     title: "오류 수정",
-    sub: "접속 불가, 화면 깨짐, 문의 메일 미수신",
+    sub: "홈페이지가 열리지 않거나 화면이 깨질 때 원인을 찾아 고칩니다",
     points: ["영업일 24시간 이내 회신", "원인 확인 후 견적", "장애 처리 내역서"],
     href: "/classic/maintenance/fix",
   },
@@ -122,7 +122,7 @@ const heroSlides = [
     w: 1060,
     h: 790,
     title: "업체 이관",
-    sub: "기존 업체 연락 두절, 관리 업체 교체",
+    sub: "기존 업체와 연락이 끊겼거나 관리 업체를 바꿀 때 인수합니다",
     points: [
       "호스팅, 도메인 계정으로 인수",
       "전체 백업과 구성 정리",
@@ -136,7 +136,7 @@ const heroSlides = [
     w: 1060,
     h: 752,
     title: "보안 업데이트",
-    sub: "워드프레스, 그누보드, PHP",
+    sub: "워드프레스, 그누보드, PHP를 최신 버전으로 안전하게 올립니다",
     points: ["작업 전 전체 백업", "협의한 시간에 작업", "업데이트 결과서"],
     href: "/classic/maintenance/update",
   },
@@ -146,7 +146,7 @@ const heroSlides = [
     w: 1060,
     h: 714,
     title: "월 관리",
-    sub: "문구, 사진, 공지 수정과 정기 점검",
+    sub: "문구, 사진, 공지 수정과 정기 점검을 매달 맡습니다",
     points: ["월 건수 단위 계약", "도메인, SSL 만료 알림", "월간 점검 보고서"],
     href: "/classic/maintenance/monthly",
   },
@@ -268,6 +268,7 @@ function Hero() {
                       </li>
                     ))}
                   </ul>
+                  {sl.key === "make" ? (
                   <div className="mt-8 flex flex-wrap gap-3">
                     <Link
                       href="/classic/contact"
@@ -285,14 +286,53 @@ function Hero() {
                       자세히 보기 <ChevronRight size={16} aria-hidden />
                     </Link>
                   </div>
+                  ) : (
+                    // 11-01 유지보수 슬라이드: 주소를 넣고 바로 점검 요청(상담 신청서가 ?site= 를 읽어 미리 채운다)
+                    <div className="mt-8">
+                      <form action="/classic/contact" method="get" className="flex max-w-[520px] overflow-hidden rounded-md bg-white">
+                        <label htmlFor={`hero-site-${sl.key}`} className="sr-only">
+                          홈페이지 주소
+                        </label>
+                        <input
+                          id={`hero-site-${sl.key}`}
+                          name="site"
+                          type="text"
+                          inputMode="url"
+                          autoComplete="url"
+                          placeholder="홈페이지 주소"
+                          tabIndex={i === pos ? 0 : -1}
+                          className="min-w-0 flex-1 px-4 text-[16px] text-[#15171c] outline-none placeholder:text-[#8a94a6]"
+                        />
+                        <button
+                          type="submit"
+                          tabIndex={i === pos ? 0 : -1}
+                          data-gtm-cta={`classic_hero_check_${sl.key}`}
+                          className="h-12 shrink-0 bg-[#256ef4] px-6 text-[16px] font-bold text-white transition-colors hover:bg-[#0b50d0]"
+                        >
+                          점검 요청
+                        </button>
+                      </form>
+                      <Link
+                        href={sl.href}
+                        tabIndex={i === pos ? 0 : -1}
+                        className="mt-4 inline-flex min-h-11 items-center gap-1 text-[15px] font-bold text-[#c9d3e6] hover:text-white"
+                      >
+                        자세히 보기 <ChevronRight size={16} aria-hidden />
+                      </Link>
+                    </div>
+                  )}
                 </div>
                 {/* 브라우저 틀 없이 문서 종이를 겹쳐 놓는다. 앞장은 이 서비스에서 실제로 드리는 문서 모양 */}
                 <div
                   aria-hidden
                   className="relative mx-auto w-full max-w-[640px] px-3 py-6 md:px-0"
                 >
-                  <div className="absolute inset-x-8 bottom-3 top-1 rotate-[5deg] rounded-md bg-white/25" />
-                  <div className="absolute inset-x-5 bottom-4 top-3 rotate-[2.5deg] rounded-md bg-white/60 shadow-[0_10px_30px_rgba(0,0,0,.25)]" />
+                  {sl.key === "make" ? (
+                    <div className="absolute inset-x-8 bottom-3 top-1 rotate-[5deg] rounded-md bg-white/25" />
+                  ) : null}
+                  {sl.key === "make" ? (
+                    <div className="absolute inset-x-5 bottom-4 top-3 rotate-[2.5deg] rounded-md bg-white/60 shadow-[0_10px_30px_rgba(0,0,0,.25)]" />
+                  ) : null}
                   {sl.key === "make" ? (
                     <div className="relative -rotate-[1deg]">
                       <div className="overflow-hidden rounded-md bg-white shadow-[0_30px_60px_rgba(0,0,0,.45)]">
@@ -308,14 +348,15 @@ function Hero() {
                       </div>
                     </div>
                   ) : (
+                  // 11-01 유지보수 슬라이드: 문서 그림 대신 작업 장면 사진
                   <Image
-                    src={`/images/site/hero-${sl.key}-doc.jpg`}
+                    src={`/images/site/scene-${sl.key}.jpg`}
                     alt=""
-                    width={sl.w}
-                    height={sl.h}
+                    width={1344}
+                    height={768}
                     priority={i === 0}
                     sizes="(min-width: 768px) 640px, 92vw"
-                    className="relative h-auto w-full -rotate-[1deg] rounded-md shadow-[0_30px_60px_rgba(0,0,0,.45)]"
+                    className="relative aspect-[16/10] h-auto w-full rounded-md object-cover shadow-[0_30px_60px_rgba(0,0,0,.45)]"
                   />
                   )}
                 </div>

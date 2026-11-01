@@ -72,7 +72,7 @@ export function ContactForm() {
   const [phone, setPhone] = useState("");
   const [email, setEmail] = useState("");
   const [business, setBusiness] = useState("");
-  // 홈페이지 진단(/tools/site-check)의 "전체 보고서 받기"로 넘어오면 ?site=주소 가 붙는다. 서비스와 문의 내용을 미리 채운다.
+  // 첫 화면 주소 칸의 "점검 요청"으로 넘어오면 ?site=주소 가 붙는다. 서비스와 문의 내용을 미리 채운다.
   const params = useSearchParams();
   const site = params.get("site") ?? "";
   // 가격 페이지 견적 계산의 "이 견적으로 상담"은 ?msg=계산 내용 을 붙여 넘긴다
@@ -84,7 +84,7 @@ export function ContactForm() {
   const [budget, setBudget] = useState("");
   const [openDate, setOpenDate] = useState("");
   const [currentSite, setCurrentSite] = useState(site);
-  const [message, setMessage] = useState(site ? `홈페이지 진단 전체 보고서 요청: ${site}` : msg);
+  const [message, setMessage] = useState(site ? `홈페이지 점검 요청: ${site}` : msg);
   const [agree, setAgree] = useState(false);
   const [website, setWebsite] = useState("");
   const [errors, setErrors] = useState<Record<string, string>>({});

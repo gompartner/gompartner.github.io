@@ -26,8 +26,6 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
   return pageMeta({ title: s.metaTitle, description: s.metaDescription, path: `/classic/maintenance/${s.id}` });
 }
 
-// 문서 이미지 크기(public/images/site/hero-<id>-doc.jpg)
-const docSize: Record<string, [number, number]> = { fix: [1060, 752], takeover: [1060, 790], update: [1060, 752], monthly: [1060, 714] };
 
 const tabs = maintenanceServices.map((s) => ({ href: `/classic/maintenance/${s.id}`, label: s.title }));
 
@@ -141,18 +139,9 @@ export default async function MaintenanceDetailPage({ params }: Props) {
               ))}
             </ul>
           </div>
-          {/* 첫 화면 슬라이드와 같은 문서 이미지. 종이를 겹쳐 놓은 모양 */}
-          <div className="relative rounded-lg px-6 py-10 md:px-10 md:py-14" style={{ backgroundColor: "#0f1b3d" }}>
-            <div aria-hidden className="absolute inset-x-12 bottom-8 top-6 rotate-[4deg] rounded-md bg-white/25 md:inset-x-16" />
-            <div aria-hidden className="absolute inset-x-9 bottom-9 top-8 rotate-[2deg] rounded-md bg-white/60 md:inset-x-12" />
-            <Image
-              src={`/images/site/hero-${s.id}-doc.jpg`}
-              alt={`${s.report.name} 예시`}
-              width={docSize[s.id]?.[0] ?? 1060}
-              height={docSize[s.id]?.[1] ?? 752}
-              sizes="(min-width: 768px) 560px, 90vw"
-              className="relative h-auto w-full -rotate-[1deg] rounded-md shadow-[0_24px_50px_rgba(0,0,0,.45)]"
-            />
+          {/* 11-01 문서 그림은 밖에 보이지 않는다(지어낸 기록처럼 읽힘). 작업 장면 사진으로 */}
+          <div className="relative aspect-[16/10] overflow-hidden rounded-lg">
+            <Image src={`/images/site/scene-${s.id}.jpg`} alt="" fill sizes="(min-width: 768px) 560px, 92vw" className="object-cover" />
           </div>
         </div>
       </section>

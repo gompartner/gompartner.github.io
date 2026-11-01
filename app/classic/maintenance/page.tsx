@@ -63,20 +63,18 @@ export default function ClassicMaintenancePage() {
         <h2 id="m-list" className="sr-only">
           유지보수 서비스
         </h2>
-        {/* 11-01 글자 목록만 있어 밋밋함: 서비스마다 납품 문서 미리보기 카드 */}
+        {/* 11-01 서비스마다 작업 장면 사진 카드 */}
         <ul className="grid gap-5 md:grid-cols-2" role="list">
           {maintenanceServices.map((s) => (
             <li key={s.id}>
               <Link href={`/classic/maintenance/${s.id}`} data-gtm-cta={`maintenance_${s.id}`} className="group flex h-full flex-col overflow-hidden rounded-lg border border-[#d9dee5] bg-white transition-colors hover:border-[#256ef4]">
-                <div className="relative h-[180px] overflow-hidden bg-[#0f1b3d] px-8 pt-8 md:h-[220px] md:px-12 md:pt-10">
-                  <div aria-hidden className="absolute inset-x-12 bottom-0 top-6 rotate-[3deg] rounded-t-md bg-white/20 md:inset-x-16" />
+                <div className="relative aspect-[16/9] overflow-hidden bg-[#0f1b3d]">
                   <Image
-                    src={`/images/site/hero-${s.id}-doc.jpg`}
+                    src={`/images/site/scene-${s.id}.jpg`}
                     alt=""
-                    width={1060}
-                    height={760}
-                    sizes="(min-width: 768px) 520px, 90vw"
-                    className="relative h-auto w-full rounded-t-md shadow-[0_18px_40px_rgba(0,0,0,.4)] transition-transform duration-300 group-hover:-translate-y-1 motion-reduce:transition-none"
+                    fill
+                    sizes="(min-width: 768px) 600px, 92vw"
+                    className="object-cover transition-transform duration-500 group-hover:scale-[1.03] motion-reduce:transition-none"
                   />
                 </div>
                 <div className="flex flex-1 items-start justify-between gap-4 border-t border-[#d9dee5] p-6 md:p-7">
