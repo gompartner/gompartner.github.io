@@ -226,12 +226,19 @@ export function ClassicHeader() {
           </div>
 
           <div className="flex shrink-0 items-center gap-2">
-            {/* 11-01 통합검색 */}
+            {/* 11-02 통합검색: 넓은 화면은 바로 입력하는 칸, 좁은 화면은 돋보기 */}
+            <form action="/classic/search" method="get" role="search" className="hidden h-11 w-[220px] items-center rounded-md border border-[#d9dee5] bg-white focus-within:border-[#15171c] xl:flex">
+              <Search size={18} aria-hidden className="ml-3 shrink-0 text-[#6b7280]" />
+              <label htmlFor="header-q" className="sr-only">
+                통합검색
+              </label>
+              <input id="header-q" name="q" type="search" placeholder="서비스, 카탈로그 검색" autoComplete="off" className="h-full min-w-0 flex-1 bg-transparent px-2.5 text-[15px] outline-none placeholder:text-[#8a94a6] [&::-webkit-search-cancel-button]:hidden" />
+            </form>
             <Link
               href="/classic/search"
               aria-label="통합검색"
               aria-current={pathname === "/classic/search" ? "page" : undefined}
-              className="grid h-11 w-11 place-items-center rounded-md text-[#15171c] transition-colors hover:bg-[#f1f3f6]"
+              className="grid h-11 w-11 place-items-center rounded-md text-[#15171c] transition-colors hover:bg-[#f1f3f6] xl:hidden"
             >
               <Search size={21} aria-hidden />
             </Link>

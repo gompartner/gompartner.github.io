@@ -4,6 +4,8 @@ import Link from "next/link";
 import { Check, ChevronRight } from "lucide-react";
 import { PageHead, SubTabs, h2, wrap } from "@/components/classic/ui";
 import { SampleGrid } from "@/components/classic/works/SampleGrid";
+import { CatalogSearch } from "@/components/classic/search/CatalogSearch";
+import { buildCatalogIndex, topKeywords } from "@/components/classic/search/index";
 import { catalogGroups, samplesIn, worksTabs } from "@/components/classic/works/samples";
 import { industries } from "@/data/classic/industries";
 import { pageMeta } from "@/lib/seo";
@@ -73,8 +75,11 @@ export default async function ClassicIndustryPage({ params }: Props) {
             </h2>
             <span className="text-[16px] font-bold tabular-nums text-[#5b6370] md:text-[18px]">{list.length}개</span>
           </div>
-          <div className="mt-8 md:mt-10">
-            <SampleGrid items={list} variant="mockup" />
+          {/* 11-02 업종 탭마다 그 분야 안에서 찾는 검색창 */}
+          <div className="mt-6">
+            <CatalogSearch index={buildCatalogIndex(list)} bare suggestions={topKeywords(list)}>
+              <SampleGrid items={list} variant="mockup" />
+            </CatalogSearch>
           </div>
         </div>
       </section>

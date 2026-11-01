@@ -53,7 +53,18 @@ export function buildSearchIndex(): SearchItem[] {
 }
 
 /** 카탈로그 검색용(카탈로그 목록 페이지) */
-export function buildCatalogIndex(): SearchItem[] {
-  const ids = new Set(catalogProjects.map((p) => `/classic/sample/${slugOf(p.demoUrl)}`));
+export function buildCatalogIndex(only?: { demoUrl: string }[]): SearchItem[] {
+  const ids = new Set((only ?? catalogProjects).map((p) => `/classic/sample/${slugOf(p.demoUrl)}`));
   return buildSearchIndex().filter((i) => i.kind === "카탈로그" && ids.has(i.href));
+}
+
+/** 업종 탭 추천 검색어: 그 탭 카탈로그 기능 이름에 두 번 이상 나오는 낱말(눌렀을 때 결과가 있는 말만) */
+const STOP = new Set(["안내", "관리", "화면", "목록", "정보", "보기", "신청", "소개", "확인", "자주", "묻는", "질문", "오시는", "남은", "자리", "이번", "달"]);
+export function topKeywords(items: { features: string[] }[], n = 5) {
+  const count = new Map<string, number>();
+  for (const p of items) {
+    const words = new Set(plain(p.features.join(" ")).split(/[\s,()]+/).filter((w) => w.length >= 2 && w.length <= 6 && !STOP.has(w)));
+    for (const w of words) count.set(w, (count.get(w) ?? 0) + 1);
+  }
+  return [...count.entries()].filter(([, c]) => c >= 2).sort((a, b) => b[1] - a[1]).slice(0, n).map(([w]) => w);
 }
