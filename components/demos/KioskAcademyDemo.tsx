@@ -22,13 +22,18 @@ import {
   Wifi,
   X,
 } from "lucide-react";
+import dynamic from "next/dynamic";
 import { DemoMakerInfo } from "@/components/demos/DemoMakerInfo";
 import { fmtKo, useDemoToday } from "@/hooks/useDemoToday";
 
 // 학원 입구 출결 키오스크 카탈로그(11-01, 2판).
 // 키오스크 화면은 450x800 설계 크기로 그리고, 화면 폭에 맞춰 transform으로 줄이거나 키운다.
 // 시계는 15:52에서 시작해 실제 1초마다 흐른다(첫 렌더는 항상 같은 값이라 하이드레이션 불일치 없음).
-// PC 넓은 화면은 왼쪽 학생증(누르면 리더기에 태그), 가운데 키오스크, 오른쪽 학부모 휴대폰 잠금 화면 알림.
+// md 이상(모션 줄이기 아님)은 학원 입구 3D 공간 안의 키오스크, 옆이나 아래에 학생증(누르면 리더기 태그)과 학부모 휴대폰 알림.
+// 휴대폰 폭과 모션 줄이기는 평면 키오스크. 키오스크 화면 상태는 이 페이지 하나에만 둔다.
+
+// 학원 입구 3D 공간(공용 장면). 브라우저에서만 그린다
+const KioskScene = dynamic(() => import("@/components/demos/kiosk3d/KioskScene").then((m) => m.KioskScene), { ssr: false });
 
 const DESIGN_W = 450;
 const DESIGN_H = 800;
@@ -207,6 +212,43 @@ export function KioskAcademyDemo() {
     setScreen({ kind: "scan", via: "card", no, seq: seq.current });
   }, []);
 
+  // 3D 공간: 학생증을 누르면 먼저 카메라가 키오스크로 다가가고(zoomSignal), 약 0.9초 뒤 태그를 처리한다
+  const [zoomSignal, setZoomSignal] = useState(0);
+  const [approaching, setApproaching] = useState(false);
+  const approachTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
+  useEffect(() => () => {
+    if (approachTimer.current) clearTimeout(approachTimer.current);
+  }, []);
+  const tagCard3d = useCallback(
+    (no: string) => {
+      if (approachTimer.current) return;
+      setZoomSignal((z) => z + 1);
+      setApproaching(true);
+      approachTimer.current = setTimeout(() => {
+        approachTimer.current = null;
+        setApproaching(false);
+        tagCard(no);
+      }, 900);
+    },
+    [tagCard],
+  );
+
+  // md 이상이고 모션 줄이기가 아니면 3D 공간, 아니면 평면 키오스크(첫 렌더는 정하지 않고 비워 둔다)
+  const [layout, setLayout] = useState<"3d" | "flat" | null>(null);
+  useEffect(() => {
+    const wide = window.matchMedia("(min-width: 768px)");
+    const calm = window.matchMedia("(prefers-reduced-motion: reduce)");
+    const pick = () => setLayout(wide.matches && !calm.matches ? "3d" : "flat");
+    const f = requestAnimationFrame(pick);
+    wide.addEventListener("change", pick);
+    calm.addEventListener("change", pick);
+    return () => {
+      cancelAnimationFrame(f);
+      wide.removeEventListener("change", pick);
+      calm.removeEventListener("change", pick);
+    };
+  }, []);
+
   const busy = screen.kind === "scan";
   const owner = notes[0]?.no ?? "1021";
   const ownerNotes = notes.filter((n) => n.no === owner).slice(0, 3);
@@ -248,34 +290,59 @@ export function KioskAcademyDemo() {
           </div>
 
           <div className={view === "kiosk" ? "" : "hidden"}>
-            {/* 좁은 화면: 학생증 가로 줄 */}
-            <div className="mt-4 xl:hidden">
-              <CardTitle />
-              <div className="-mx-4 mt-2 flex gap-2.5 overflow-x-auto px-4 pb-1 md:mx-0 md:justify-center md:px-0">
-                {CARD_NOS.map((no) => (
-                  <IdCard key={no} no={no} rec={recs[no]} disabled={busy} onTag={() => tagCard(no)} compact />
-                ))}
-              </div>
-            </div>
-
-            <div className="mt-4 flex items-center justify-center gap-10 md:mt-3">
-              <aside className="hidden w-[250px] shrink-0 xl:block" aria-label="학생증">
-                <CardTitle />
-                <div className="mt-3 space-y-3">
-                  {CARD_NOS.map((no) => (
-                    <IdCard key={no} no={no} rec={recs[no]} disabled={busy} onTag={() => tagCard(no)} />
-                  ))}
+            {layout === "3d" ? (
+              <div className="mt-4 grid gap-6 xl:grid-cols-[250px_minmax(0,1fr)_250px] xl:items-center">
+                <aside className="order-2 xl:order-1" aria-label="학생증">
+                  <CardTitle />
+                  <div className="mt-3 grid grid-cols-2 gap-3 xl:grid-cols-1">
+                    {CARD_NOS.map((no) => (
+                      <IdCard key={no} no={no} rec={recs[no]} disabled={busy || approaching} onTag={() => tagCard3d(no)} />
+                    ))}
+                  </div>
+                </aside>
+                <div className="order-1 min-w-0 xl:order-2">
+                  <KioskScene place="academy" zoomSignal={zoomSignal} paused={view !== "kiosk"} className="h-[min(78vh,820px)] min-h-[600px] w-full">
+                    <div style={{ width: DESIGN_W, height: DESIGN_H }}>
+                      <Kiosk today={today} sec={sec} recs={recs} screen={screen} setScreen={setScreen} apply={apply} active={view === "kiosk"} />
+                    </div>
+                  </KioskScene>
                 </div>
-              </aside>
+                <aside className="order-3 mx-auto w-[250px] xl:mx-0" aria-label="학부모 휴대폰 알림">
+                  <ParentPhone today={today} nowMin={nowMin} owner={studentOf(owner)} notes={ownerNotes} />
+                </aside>
+              </div>
+            ) : layout === "flat" ? (
+              <>
+                {/* 좁은 화면: 학생증 가로 줄 */}
+                <div className="mt-4 xl:hidden">
+                  <CardTitle />
+                  <div className="-mx-4 mt-2 flex gap-2.5 overflow-x-auto px-4 pb-1 md:mx-0 md:justify-center md:px-0">
+                    {CARD_NOS.map((no) => (
+                      <IdCard key={no} no={no} rec={recs[no]} disabled={busy} onTag={() => tagCard(no)} compact />
+                    ))}
+                  </div>
+                </div>
 
-              <KioskStage>
-                <Kiosk today={today} sec={sec} recs={recs} screen={screen} setScreen={setScreen} apply={apply} active={view === "kiosk"} />
-              </KioskStage>
+                <div className="mt-4 flex items-center justify-center gap-10 md:mt-3">
+                  <aside className="hidden w-[250px] shrink-0 xl:block" aria-label="학생증">
+                    <CardTitle />
+                    <div className="mt-3 space-y-3">
+                      {CARD_NOS.map((no) => (
+                        <IdCard key={no} no={no} rec={recs[no]} disabled={busy} onTag={() => tagCard(no)} />
+                      ))}
+                    </div>
+                  </aside>
 
-              <aside className="hidden w-[250px] shrink-0 xl:block" aria-label="학부모 휴대폰 알림">
-                <ParentPhone today={today} nowMin={nowMin} owner={studentOf(owner)} notes={ownerNotes} />
-              </aside>
-            </div>
+                  <KioskStage><Kiosk today={today} sec={sec} recs={recs} screen={screen} setScreen={setScreen} apply={apply} active={view === "kiosk"} /></KioskStage>
+
+                  <aside className="hidden w-[250px] shrink-0 xl:block" aria-label="학부모 휴대폰 알림">
+                    <ParentPhone today={today} nowMin={nowMin} owner={studentOf(owner)} notes={ownerNotes} />
+                  </aside>
+                </div>
+              </>
+            ) : (
+              <div className="mt-4 aspect-[9/16] w-full md:aspect-auto md:h-[min(78vh,820px)] md:min-h-[600px]" aria-hidden />
+            )}
           </div>
           {view === "admin" && <AdminPanel today={today} sec={sec} nowMin={nowMin} recs={recs} lastChanged={lastChanged} resend={resend} />}
 
