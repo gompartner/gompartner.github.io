@@ -4,6 +4,7 @@ import Link from "next/link";
 import { notFound } from "next/navigation";
 import { ArrowUpRight, Check, FileText } from "lucide-react";
 import { FaqBlock } from "@/components/classic/FaqBlock";
+import { PhpPromo } from "@/components/classic/PhpPromo";
 import { StepList } from "@/components/classic/pricing/StepList";
 import { PageHead, SubTabs, h2, h3, wrap } from "@/components/classic/ui";
 import { maintenanceFaq, maintenanceServices, replyTerm } from "@/data/classic/maintenance";
@@ -94,6 +95,8 @@ export default async function MaintenanceDetailPage({ params }: Props) {
           ))}
         </dl>
       </section>
+
+      {s.id === "update" ? <PhpPromo id="md-php-promo" /> : null}
 
       <section aria-labelledby="md-cases" className="border-t border-[#e6e9ee] bg-[#f6f8fb]">
         <div className={`${wrap} py-16 md:py-24`}>

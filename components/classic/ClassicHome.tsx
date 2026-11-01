@@ -19,6 +19,7 @@ import {
   type LucideIcon,
 } from "lucide-react";
 import { FaqBlock } from "@/components/classic/FaqBlock";
+import { PhpPromo } from "@/components/classic/PhpPromo";
 import { faq, processSteps } from "@/data/classic/faq";
 import { maintenanceServices, maintenanceSteps } from "@/data/classic/maintenance";
 import { projects } from "@/data/classic/projects";
@@ -80,6 +81,7 @@ export function ClassicHome() {
   return (
     <div className="bg-white text-[#15171c]">
       <Hero />
+      <PhpPromo />
       <Strengths />
       <Services />
       <Catalog />

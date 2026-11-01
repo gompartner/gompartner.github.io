@@ -75,16 +75,18 @@ export function ContactForm() {
   // 첫 화면 주소 칸의 "점검 요청"으로 넘어오면 ?site=주소 가 붙는다. 서비스와 문의 내용을 미리 채운다.
   const params = useSearchParams();
   const site = params.get("site") ?? "";
+  // PHP 프로모션 띠에서 오면 promo=php 가 붙는다
+  const promo = params.get("promo") ?? "";
   // 가격 페이지 견적 계산의 "이 견적으로 상담"은 ?msg=계산 내용 을 붙여 넘긴다
   const msg = params.get("msg") ?? "";
   // 카탈로그 화면의 "이 카탈로그로 상담"은 ?sample=slug 를 붙인다. 이름을 찾아 참고 카탈로그 칸에 넣는다
   const sampleTitle = projects.find((p) => p.id === params.get("sample"))?.title ?? "";
-  const [service, setService] = useState(site ? "유지보수" : sampleTitle ? "홈페이지 제작" : "");
+  const [service, setService] = useState(site || promo ? "유지보수" : sampleTitle ? "홈페이지 제작" : "");
   const [sample, setSample] = useState(sampleTitle);
   const [budget, setBudget] = useState("");
   const [openDate, setOpenDate] = useState("");
   const [currentSite, setCurrentSite] = useState(site);
-  const [message, setMessage] = useState(site ? `홈페이지 점검 요청: ${site}` : msg);
+  const [message, setMessage] = useState(site || promo === "php" ? `${promo === "php" ? "PHP 무료 점검 요청" : "홈페이지 점검 요청"}: ${site}` : msg);
   const [agree, setAgree] = useState(false);
   const [website, setWebsite] = useState("");
   const [errors, setErrors] = useState<Record<string, string>>({});
