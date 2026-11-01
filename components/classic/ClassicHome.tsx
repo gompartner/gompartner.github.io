@@ -5,14 +5,20 @@ import { useEffect, useRef, useState } from "react";
 import Link from "next/link";
 import {
   ArrowUpRight,
+  CalendarCheck,
   CheckCircle2,
-  ChevronDown,
   ChevronLeft,
   ChevronRight,
   Pause,
   Play,
   Plus,
+  MonitorSmartphone,
+  Repeat,
+  ShieldCheck,
+  Wrench,
+  type LucideIcon,
 } from "lucide-react";
+import { FaqBlock } from "@/components/classic/FaqBlock";
 import { faq, processSteps } from "@/data/classic/faq";
 import { maintenanceServices, maintenanceSteps } from "@/data/classic/maintenance";
 import { projects } from "@/data/classic/projects";
@@ -27,16 +33,21 @@ import { FlowSteps } from "@/components/classic/pricing/StepList";
 const NAVY = "#0f1b3d";
 
 // 11-01 홈페이지 제작과 유지보수 두 가지만. 유지보수는 세부 페이지 네 개로
+// 서비스 목록 아이콘(홈페이지 제작 쪽 업종별 구성과 같은 모양)
+const serviceIcon: Record<string, LucideIcon> = { fix: Wrench, takeover: Repeat, update: ShieldCheck, monthly: CalendarCheck };
+
 const services = [
   {
     href: "/classic/homepage",
     name: "홈페이지 제작",
     what: "병원, 매장, 전문직, 기업, 학원 반응형 홈페이지",
+    icon: MonitorSmartphone,
   },
   ...maintenanceServices.map((m) => ({
     href: `/classic/maintenance/${m.id}`,
     name: m.h1,
     what: m.term,
+    icon: serviceIcon[m.id] ?? Wrench,
   })),
 ];
 
@@ -400,24 +411,23 @@ function Strengths() {
         곰파트너 납품 기준
       </h2>
       <ul
-        className="mx-auto grid w-full max-w-[1248px] gap-px px-4 py-10 sm:grid-cols-2 md:px-6 md:py-12 lg:grid-cols-4"
+        className="mx-auto grid w-full max-w-[1248px] grid-cols-2 gap-x-4 gap-y-2 px-4 py-8 md:px-6 md:py-12 lg:grid-cols-4"
         role="list"
       >
         {strengths.map((s) => (
           <li
             key={s.name}
-            className="flex items-start gap-3 py-3 lg:px-4 lg:first:pl-0"
+            className="flex items-start gap-2 py-2 md:gap-3 md:py-3 lg:px-4 lg:first:pl-0"
           >
             <CheckCircle2
-              size={24}
               aria-hidden
-              className="mt-0.5 shrink-0 text-[#256ef4]"
+              className="mt-0.5 size-5 shrink-0 text-[#256ef4] md:size-6"
             />
             <span>
-              <span className="block text-[18px] font-[800] tracking-[-0.03em] md:text-[19px]">
+              <span className="block text-[16px] font-[800] leading-[1.4] tracking-[-0.03em] md:text-[19px]">
                 {s.name}
               </span>
-              <span className="mt-0.5 block text-[15px] text-[#5b6370]">
+              <span className="mt-0.5 block text-[14px] leading-[1.5] text-[#5b6370] md:text-[15px]">
                 {s.what}
               </span>
             </span>
@@ -443,12 +453,15 @@ function Services() {
             <Link
               href={s.href}
               data-gtm-cta={`classic_service_${s.href.split("/").pop()}`}
-              className="group grid grid-cols-[1fr_auto] items-center gap-x-6 gap-y-1 py-6 md:grid-cols-[minmax(0,400px)_1fr_auto] md:py-8"
+              className="group grid grid-cols-[1fr_auto] items-center gap-x-6 gap-y-1 py-6 md:grid-cols-[minmax(0,460px)_1fr_auto] md:py-7"
             >
-              <h3 className="col-start-1 row-start-1 text-[20px] font-[800] tracking-[-0.04em] transition-colors group-hover:text-[#256ef4] md:text-[26px]">
+              <h3 className="col-start-1 row-start-1 flex items-center gap-3 text-[20px] font-[800] tracking-[-0.04em] transition-colors group-hover:text-[#256ef4] md:gap-4 md:text-[26px]">
+                <span className="grid h-10 w-10 shrink-0 place-items-center rounded-full bg-[#e8efff] text-[#256ef4] md:h-12 md:w-12">
+                  <s.icon aria-hidden className="size-5 md:size-6" />
+                </span>
                 {s.name}
               </h3>
-              <p className="col-start-1 row-start-2 text-[16px] text-[#5b6370] md:col-start-2 md:row-start-1 md:text-[17px]">
+              <p className="col-start-1 row-start-2 pl-[52px] text-[16px] text-[#5b6370] md:col-start-2 md:row-start-1 md:pl-0 md:text-[17px]">
                 {s.what}
               </p>
               <ArrowUpRight
@@ -536,27 +549,9 @@ function Faq() {
             더보기 <Plus size={15} strokeWidth={2.5} aria-hidden />
           </Link>
         </div>
-        <ul className="mt-10 border-t-2 border-[#15171c]" role="list">
-          {homeFaq.map((f) => (
-            <li key={f.q} className="border-b border-[#e6e9ee]">
-              <details className="group">
-                <summary className="flex cursor-pointer list-none items-start gap-4 py-5 md:py-6 [&::-webkit-details-marker]:hidden">
-                  <span className="min-w-0 flex-1 text-[17px] font-bold leading-[1.5] tracking-[-0.02em] md:text-[19px]">
-                    {f.q}
-                  </span>
-                  <ChevronDown
-                    size={22}
-                    aria-hidden
-                    className="mt-0.5 shrink-0 text-[#6b7280] transition-transform duration-200 group-open:rotate-180 motion-reduce:transition-none"
-                  />
-                </summary>
-                <p className="pb-6 text-[16px] leading-[1.75] text-[#3d4450] md:pr-12 md:text-[17px]">
-                  {f.a}
-                </p>
-              </details>
-            </li>
-          ))}
-        </ul>
+        <div className="mt-10">
+          <FaqBlock items={homeFaq} bare />
+        </div>
       </div>
     </section>
   );

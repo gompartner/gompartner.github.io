@@ -64,6 +64,7 @@ export default async function MaintenanceDetailPage({ params }: Props) {
       <PageHead
         title={s.h1}
         trail={[
+          { href: "/classic/homepage", label: "서비스" },
           { href: "/classic/maintenance", label: "유지보수" },
           { href: path, label: s.title },
         ]}

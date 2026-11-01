@@ -30,14 +30,17 @@ export default function ClassicContactPage() {
       <SupportTabs current="/classic/contact" />
 
       <div className={`${wrap} grid gap-14 py-12 md:py-16 lg:grid-cols-[minmax(0,1fr)_340px] lg:gap-16`}>
-        <section aria-label="상담 신청서" className="min-w-0">
+        <section aria-labelledby="contact-form" className="min-w-0">
+          <h2 id="contact-form" className="mb-4 text-[22px] font-[800] tracking-[-0.03em]">
+            신청서
+          </h2>
           {/* 폼이 주소의 ?site= 를 읽어서(useSearchParams) 정적 내보내기에는 Suspense가 있어야 한다 */}
           <Suspense fallback={null}>
             <ContactForm />
           </Suspense>
         </section>
 
-        <aside aria-labelledby="contact-ready" className="min-w-0 lg:pt-8">
+        <aside aria-labelledby="contact-ready" className="min-w-0">
           <h2 id="contact-ready" className="text-[22px] font-[800] tracking-[-0.03em]">
             있으면 좋은 자료
           </h2>

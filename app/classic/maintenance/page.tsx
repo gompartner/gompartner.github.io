@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import Image from "next/image";
 import Link from "next/link";
 import { ArrowUpRight, CalendarClock, FileBarChart, MessageSquareReply, Wrench } from "lucide-react";
 import { FaqBlock } from "@/components/classic/FaqBlock";
@@ -62,13 +63,30 @@ export default function ClassicMaintenancePage() {
         <h2 id="m-list" className="sr-only">
           유지보수 서비스
         </h2>
-        <ul className="border-t-2 border-[#15171c]" role="list">
+        {/* 11-01 글자 목록만 있어 밋밋함: 서비스마다 납품 문서 미리보기 카드 */}
+        <ul className="grid gap-5 md:grid-cols-2" role="list">
           {maintenanceServices.map((s) => (
-            <li key={s.id} className="border-b border-[#d9dee5]">
-              <Link href={`/classic/maintenance/${s.id}`} data-gtm-cta={`maintenance_${s.id}`} className="group grid grid-cols-[1fr_auto] items-center gap-x-6 gap-y-1 py-6 md:grid-cols-[minmax(0,440px)_1fr_auto] md:py-8">
-                <h3 className="col-start-1 row-start-1 text-[22px] font-[800] tracking-[-0.04em] transition-colors group-hover:text-[#256ef4] md:text-[30px]">{s.h1}</h3>
-                <p className="col-start-1 row-start-2 text-[16px] text-[#5b6370] md:col-start-2 md:row-start-1 md:text-[17px]">{s.term}</p>
-                <ArrowUpRight size={26} aria-hidden className="col-start-2 row-span-2 row-start-1 self-center text-[#6b7280] group-hover:text-[#256ef4] md:col-start-3 md:row-span-1" />
+            <li key={s.id}>
+              <Link href={`/classic/maintenance/${s.id}`} data-gtm-cta={`maintenance_${s.id}`} className="group flex h-full flex-col overflow-hidden rounded-lg border border-[#d9dee5] bg-white transition-colors hover:border-[#256ef4]">
+                <div className="relative h-[180px] overflow-hidden bg-[#0f1b3d] px-8 pt-8 md:h-[220px] md:px-12 md:pt-10">
+                  <div aria-hidden className="absolute inset-x-12 bottom-0 top-6 rotate-[3deg] rounded-t-md bg-white/20 md:inset-x-16" />
+                  <Image
+                    src={`/images/site/hero-${s.id}-doc.jpg`}
+                    alt=""
+                    width={1060}
+                    height={760}
+                    sizes="(min-width: 768px) 520px, 90vw"
+                    className="relative h-auto w-full rounded-t-md shadow-[0_18px_40px_rgba(0,0,0,.4)] transition-transform duration-300 group-hover:-translate-y-1 motion-reduce:transition-none"
+                  />
+                </div>
+                <div className="flex flex-1 items-start justify-between gap-4 border-t border-[#d9dee5] p-6 md:p-7">
+                  <div>
+                    <h3 className="text-[20px] font-[800] tracking-[-0.04em] transition-colors group-hover:text-[#256ef4] md:text-[24px]">{s.h1}</h3>
+                    <p className="mt-1.5 text-[16px] text-[#5b6370]">{s.term}</p>
+                    <p className="mt-3 text-[14px] font-bold text-[#256ef4]">{s.report.name}</p>
+                  </div>
+                  <ArrowUpRight size={24} aria-hidden className="mt-1 shrink-0 text-[#6b7280] group-hover:text-[#256ef4]" />
+                </div>
               </Link>
             </li>
           ))}
