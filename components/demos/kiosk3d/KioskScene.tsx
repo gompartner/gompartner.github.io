@@ -1,140 +1,55 @@
 "use client";
 
-import { Suspense, useEffect, useMemo, useRef, useState, type ReactNode } from "react";
+import { Suspense, useEffect, useMemo, useRef, useState, type ComponentType, type ReactNode } from "react";
 import { Canvas, useFrame, useThree } from "@react-three/fiber";
-import { ContactShadows, Environment, Lightformer, OrbitControls, RoundedBox } from "@react-three/drei";
+import { ContactShadows, Environment, Lightformer, OrbitControls, RoundedBox, useProgress } from "@react-three/drei";
+import type { OrbitControls as OrbitControlsImpl } from "three-stdlib";
 import * as THREE from "three";
+import { AcademyEntrance } from "./AcademyEntrance";
+import { ClinicLobby } from "./ClinicLobby";
+import { Person, SIT_BACK, SIT_THIGH, WALK_SPEED } from "./People";
+import { PLACES, type CameraShot, type Place, type PlaceConfig, type RoomProps, type Vec3 } from "./places";
 
 /*
-  키오스크 3D 장소(11-01 사용자 요청: "장소에 키오스크가 있고, 누르면 볼 수 있게").
-  - 병원 로비(clinic), 학원 입구(academy) 두 장소. 가구는 상자, 원기둥으로 간단히 만든다(외부 모델, HDR 파일을 받지 않음).
-  - 처음엔 공간 전체가 보이고 끌어서 둘러볼 수 있다. 키오스크를 누르면 카메라가 화면 앞으로 다가가고, 그때부터 화면을 누를 수 있다.
-  - 키오스크 화면은 그림이 아니라 실제 화면(children)이다. 매 장면 화면 네 모서리를 투영해 원근 변환(matrix3d)으로 캔버스 위에 겹친다(글자가 선명하고 그대로 동작).
-  - 모션 줄이기면 카메라가 미끄러지지 않고 바로 옮긴다.
-  screen: 화면 설계 크기(px). 9:16이어야 키오스크 화면 칸에 맞는다.
+  키오스크 3D 장소.
+  - 장소마다 방 부품(ROOMS)과 설정(places.ts)을 짝지어 그린다. 병원 로비(ClinicLobby)와 학원 입구(AcademyEntrance) 모두 위에서 내려다보는 잘라 낸 모형.
+  - 이용 흐름 단계(steps)가 있으면 위에 단계 막대가 생기고, 사람 모형이 바닥 점선을 따라 걸어가며 단계마다 카메라가 그 자리로 옮긴다.
+  - 키오스크 화면, 벽 TV, 원장 모니터는 그림이 아니라 실제 화면(children, tv, monitor)이다. 매 장면 화면 네 모서리를 투영해 원근 변환(matrix3d)으로 옮긴다.
+  - 실제 화면 DOM은 캔버스 아래에 깔고, 3D에서는 화면 자리를 투명하게 뚫는다(HOLE 재질). 그래서 사람이나 물건이 화면 앞에 오면 그대로 화면을 가린다.
+    키오스크 앞으로 다가간 동안에는 캔버스가 누르기를 받지 않아 아래 화면을 그대로 누를 수 있다.
+  - 키오스크 단계(또는 키오스크를 누르면) 화면이 높이의 86%를 채우도록 다가가고, 그때부터 화면을 누를 수 있다.
+  - 모션 줄이기면 카메라와 사람이 미끄러지지 않고 바로 옮기고, 자동 넘김을 켜지 않는다.
 */
 
-type Place = "clinic" | "academy";
+export type { Place, PlaceConfig, RoomProps } from "./places";
 
 const SCREEN_W = 0.54;
 const SCREEN_H = 0.96;
-const SCREEN_Y = 1.22;
-const KIOSK_X = 0;
-const KIOSK_Z = 0.4;
+/** 키오스크 받침 기준 화면 중심 높이와 앞면 거리 */
+const SCREEN_CY = 1.26;
+const SCREEN_CZ = 0.049;
 
-const PALETTE: Record<Place, { floor: string; wall: string; accent: string; wood: string; seat: string }> = {
-  clinic: { floor: "#d8cfc2", wall: "#f4f3ef", accent: "#0f5560", wood: "#c9a27a", seat: "#7fa7ad" },
-  academy: { floor: "#cfd3d8", wall: "#f1f2f4", accent: "#16285a", wood: "#b68b62", seat: "#2f4f8f" },
-};
+const ROOMS: Record<Place, ComponentType<RoomProps>> = { clinic: ClinicLobby, academy: AcademyEntrance };
 
-function Box({ p, s, c, r = 0.02 }: { p: [number, number, number]; s: [number, number, number]; c: string; r?: number }) {
+/** 화면 자리 재질: 투명한 점을 써서(섞지 않음) 캔버스 아래 실제 화면 DOM이 보이게 한다. 앞에 있는 물건은 깊이 검사로 그대로 남는다 */
+const HOLE = new THREE.MeshBasicMaterial({ color: "#000000", transparent: true, opacity: 0, blending: THREE.NoBlending, depthWrite: true, toneMapped: false });
+
+/** 판 하나(중심, 회전, 너비, 높이)에 화면 자리 구멍을 낸다. 판보다 2mm 앞에 둔다 */
+function ScreenHole({ center, rotationY, w, h }: { center: Vec3; rotationY: number; w: number; h: number }) {
+  const n = 0.002;
   return (
-    <RoundedBox args={s} radius={r} smoothness={3} position={p} castShadow receiveShadow>
-      <meshStandardMaterial color={c} roughness={0.7} />
-    </RoundedBox>
+    <mesh position={[center[0] + Math.sin(rotationY) * n, center[1], center[2] + Math.cos(rotationY) * n]} rotation={[0, rotationY, 0]} material={HOLE}>
+      <planeGeometry args={[w, h]} />
+    </mesh>
   );
 }
 
-function Chair({ x, z, color }: { x: number; z: number; color: string }) {
-  return (
-    <group position={[x, 0, z]}>
-      <Box p={[0, 0.44, 0]} s={[0.46, 0.08, 0.46]} c={color} r={0.03} />
-      <Box p={[0, 0.72, -0.2]} s={[0.46, 0.5, 0.07]} c={color} r={0.03} />
-      <Box p={[0, 0.2, 0]} s={[0.06, 0.4, 0.06]} c="#9aa0a6" r={0.01} />
-    </group>
-  );
-}
+/* ---------------- 키오스크 ---------------- */
 
-function Plant({ x, z }: { x: number; z: number }) {
-  return (
-    <group position={[x, 0, z]}>
-      <mesh position={[0, 0.22, 0]} castShadow>
-        <cylinderGeometry args={[0.18, 0.14, 0.44, 24]} />
-        <meshStandardMaterial color="#e9e4dc" roughness={0.6} />
-      </mesh>
-      {[0, 1, 2, 3, 4].map((i) => (
-        <mesh key={i} position={[Math.sin(i * 1.3) * 0.12, 0.75 + (i % 3) * 0.14, Math.cos(i * 1.3) * 0.12]} castShadow>
-          <sphereGeometry args={[0.2 - (i % 2) * 0.04, 20, 16]} />
-          <meshStandardMaterial color={i % 2 ? "#4f7d4a" : "#5f9157"} roughness={0.8} />
-        </mesh>
-      ))}
-    </group>
-  );
-}
+const METAL = { color: "#c4c8cc", metalness: 0.85, roughness: 0.32 } as const;
 
-function Room({ place }: { place: Place }) {
-  const c = PALETTE[place];
-  return (
-    <group>
-      {/* 바닥과 벽 */}
-      <mesh rotation={[-Math.PI / 2, 0, 0]} receiveShadow>
-        <planeGeometry args={[12, 9]} />
-        <meshStandardMaterial color={c.floor} roughness={0.85} />
-      </mesh>
-      <mesh position={[0, 1.6, -2.2]} receiveShadow>
-        <planeGeometry args={[12, 3.2]} />
-        <meshStandardMaterial color={c.wall} roughness={0.9} />
-      </mesh>
-      <mesh position={[-4.2, 1.6, 0.8]} rotation={[0, Math.PI / 2, 0]} receiveShadow>
-        <planeGeometry args={[7, 3.2]} />
-        <meshStandardMaterial color={c.wall} roughness={0.9} />
-      </mesh>
-      {/* 벽 띠 */}
-      <mesh position={[0, 0.5, -2.19]}>
-        <planeGeometry args={[12, 1]} />
-        <meshStandardMaterial color={place === "clinic" ? "#e3ecea" : c.accent} roughness={0.9} />
-      </mesh>
-      {/* 창(빛이 들어오는 면) */}
-      <mesh position={[-4.19, 1.7, 0.6]} rotation={[0, Math.PI / 2, 0]}>
-        <planeGeometry args={[2.6, 1.5]} />
-        <meshStandardMaterial color="#ffffff" emissive="#fdfaf2" emissiveIntensity={0.9} />
-      </mesh>
-
-      {place === "clinic" ? (
-        <>
-          {/* 접수 데스크 */}
-          <Box p={[2.1, 0.55, -1.4]} s={[2.4, 1.1, 0.7]} c="#ffffff" r={0.04} />
-          <Box p={[2.1, 1.12, -1.4]} s={[2.5, 0.05, 0.78]} c={c.wood} r={0.02} />
-          <Box p={[2.1, 0.55, -1.04]} s={[2.4, 0.18, 0.02]} c={c.accent} r={0.005} />
-          {/* 대기 의자 두 줄 */}
-          {[-2.6, -2.0, -1.4].map((x) => (
-            <Chair key={`a${x}`} x={x} z={-0.9} color={c.seat} />
-          ))}
-          {[-2.6, -2.0, -1.4].map((x) => (
-            <Chair key={`b${x}`} x={x} z={0.4} color={c.seat} />
-          ))}
-          {/* 벽 TV */}
-          <Box p={[-1.9, 2.0, -2.15]} s={[1.5, 0.86, 0.06]} c="#1b1f24" r={0.02} />
-          <mesh position={[-1.9, 2.0, -2.11]}>
-            <planeGeometry args={[1.42, 0.78]} />
-            <meshStandardMaterial color={c.accent} emissive={c.accent} emissiveIntensity={0.6} />
-          </mesh>
-          <Plant x={3.6} z={-1.7} />
-          <Plant x={-3.6} z={-1.6} />
-        </>
-      ) : (
-        <>
-          {/* 입구 문 */}
-          <Box p={[2.4, 1.1, -2.15]} s={[1.2, 2.2, 0.06]} c="#e6e8eb" r={0.02} />
-          <mesh position={[2.4, 1.15, -2.11]}>
-            <planeGeometry args={[0.9, 1.6]} />
-            <meshStandardMaterial color="#cfe0ee" emissive="#e8f1f8" emissiveIntensity={0.5} />
-          </mesh>
-          {/* 신발장, 게시판, 벤치 */}
-          <Box p={[-2.4, 0.5, -1.9]} s={[1.6, 1.0, 0.4]} c={c.wood} r={0.03} />
-          <Box p={[-0.9, 1.75, -2.16]} s={[1.6, 0.9, 0.04]} c="#ffffff" r={0.02} />
-          <Box p={[-0.9, 1.75, -2.13]} s={[1.5, 0.8, 0.01]} c="#e8ecf4" r={0.01} />
-          <Box p={[-2.6, 0.42, 0.6]} s={[1.6, 0.1, 0.45]} c={c.wood} r={0.03} />
-          <Box p={[-2.6, 0.2, 0.6]} s={[1.5, 0.36, 0.06]} c="#9aa0a6" r={0.01} />
-          <Plant x={3.5} z={-1.6} />
-        </>
-      )}
-    </group>
-  );
-}
-
-function KioskBody({ place, active, onOpen }: { place: Place; active: boolean; onOpen: () => void }) {
-  const c = PALETTE[place];
+function KioskBody({ config, active, onOpen }: { config: PlaceConfig; active: boolean; onOpen: () => void }) {
+  const { position, rotationY } = config.kiosk;
   const [hover, setHover] = useState(false);
   useEffect(() => {
     document.body.style.cursor = hover && !active ? "pointer" : "";
@@ -142,9 +57,13 @@ function KioskBody({ place, active, onOpen }: { place: Place; active: boolean; o
       document.body.style.cursor = "";
     };
   }, [hover, active]);
+  const headH = 1.3;
+  const headY = 0.56 + headH / 2;
+  const below = SCREEN_CY - SCREEN_H / 2 - 0.1;
   return (
     <group
-      position={[KIOSK_X, 0, KIOSK_Z]}
+      position={position}
+      rotation={[0, rotationY, 0]}
       onClick={(e) => {
         e.stopPropagation();
         if (!active) onOpen();
@@ -152,32 +71,80 @@ function KioskBody({ place, active, onOpen }: { place: Place; active: boolean; o
       onPointerOver={() => setHover(true)}
       onPointerOut={() => setHover(false)}
     >
-      {/* 받침과 기둥 */}
-      <Box p={[0, 0.03, 0]} s={[0.62, 0.06, 0.46]} c="#e9ebee" r={0.02} />
-      <Box p={[0, 0.4, 0]} s={[0.16, 0.72, 0.12]} c="#f3f4f6" r={0.03} />
-      {/* 본체 */}
-      <Box p={[0, SCREEN_Y, -0.04]} s={[SCREEN_W + 0.12, SCREEN_H + 0.3, 0.12]} c="#f7f8fa" r={0.05} />
-      {/* 화면 테두리 */}
-      <Box p={[0, SCREEN_Y + 0.04, 0.02]} s={[SCREEN_W + 0.04, SCREEN_H + 0.04, 0.01]} c="#15171c" r={0.012} />
-      {/* 카드 투입구, 번호표 출구 */}
-      <Box p={[-0.12, SCREEN_Y - SCREEN_H / 2 - 0.08, 0.03]} s={[0.16, 0.025, 0.01]} c="#2a2e35" r={0.004} />
-      <Box p={[0.14, SCREEN_Y - SCREEN_H / 2 - 0.08, 0.03]} s={[0.12, 0.012, 0.01]} c="#2a2e35" r={0.004} />
-      {/* 색 띠 */}
-      <Box p={[0, SCREEN_Y + SCREEN_H / 2 + 0.11, 0.025]} s={[SCREEN_W, 0.03, 0.005]} c={c.accent} r={0.004} />
-      {/* 화면 자리. 실제 화면은 캔버스 위에 원근을 맞춰 겹친다(ScreenProjector) */}
-      <mesh position={[0, SCREEN_Y + 0.04, 0.026]}>
+      {/* 바닥 받침판과 기둥(금속) */}
+      <RoundedBox args={[0.56, 0.025, 0.44]} radius={0.01} smoothness={2} position={[0, 0.0125, -0.02]} castShadow receiveShadow>
+        <meshStandardMaterial {...METAL} />
+      </RoundedBox>
+      <RoundedBox args={[0.16, 0.56, 0.1]} radius={0.04} smoothness={4} position={[0, 0.3, -0.02]} castShadow>
+        <meshStandardMaterial {...METAL} />
+      </RoundedBox>
+      {/* 본체(둥근 흰 몸통, 뒤판은 회색) */}
+      <RoundedBox args={[SCREEN_W + 0.1, headH, 0.09]} radius={0.035} smoothness={5} position={[0, headY, 0]} castShadow receiveShadow>
+        <meshStandardMaterial color="#f5f6f7" roughness={0.38} />
+      </RoundedBox>
+      <RoundedBox args={[SCREEN_W + 0.06, headH - 0.04, 0.02]} radius={0.008} smoothness={2} position={[0, headY, -0.05]}>
+        <meshStandardMaterial color="#b8bdc2" roughness={0.5} metalness={0.3} />
+      </RoundedBox>
+      {/* 검은 유리 테두리 */}
+      <RoundedBox args={[SCREEN_W + 0.035, SCREEN_H + 0.035, 0.004]} radius={0.0015} smoothness={2} position={[0, SCREEN_CY, 0.0455]}>
+        <meshStandardMaterial color="#0e1013" roughness={0.12} metalness={0.2} />
+      </RoundedBox>
+      {/* 화면 자리. 투명하게 뚫어 캔버스 아래 실제 화면이 보이게 한다(ScreenProjector가 자리를 맞춘다) */}
+      <mesh position={[0, SCREEN_CY, SCREEN_CZ - 0.0005]} material={HOLE}>
         <planeGeometry args={[SCREEN_W, SCREEN_H]} />
-        <meshBasicMaterial color="#ffffff" />
+      </mesh>
+      {/* 화면 아래: 카드 투입구, 번호표 출구, QR 읽는 창 */}
+      <group position={[0, below, 0.046]}>
+        <RoundedBox args={[0.17, 0.05, 0.02]} radius={0.006} smoothness={2} position={[-0.15, 0, 0.004]}>
+          <meshStandardMaterial color="#2b3036" roughness={0.4} />
+        </RoundedBox>
+        <mesh position={[-0.15, 0, 0.0145]}>
+          <boxGeometry args={[0.12, 0.006, 0.002]} />
+          <meshStandardMaterial color="#050607" />
+        </mesh>
+        <RoundedBox args={[0.18, 0.035, 0.016]} radius={0.006} smoothness={2} position={[0.12, 0.005, 0.002]}>
+          <meshStandardMaterial color="#d9dde1" roughness={0.4} />
+        </RoundedBox>
+        <mesh position={[0.12, 0.005, 0.0105]}>
+          <boxGeometry args={[0.13, 0.004, 0.002]} />
+          <meshStandardMaterial color="#1a1d21" />
+        </mesh>
+        <mesh position={[0.12, -0.07, 0.001]}>
+          <boxGeometry args={[0.09, 0.05, 0.002]} />
+          <meshStandardMaterial color="#141a1f" roughness={0.1} />
+        </mesh>
+      </group>
+      {/* 위쪽 병원 색 띠 */}
+      <mesh position={[0, SCREEN_CY + SCREEN_H / 2 + 0.07, 0.0455]}>
+        <boxGeometry args={[SCREEN_W - 0.1, 0.012, 0.002]} />
+        <meshStandardMaterial color={config.accent} roughness={0.4} />
       </mesh>
     </group>
   );
 }
 
-const HOME = new THREE.Vector3(3.2, 2.1, 5.0);
+/** 장소 설정에서 키오스크 화면 네 모서리(왼위, 오른위, 오른아래, 왼아래)와 화면 중심, 앞 방향을 구한다 */
+function kioskScreen(config: PlaceConfig) {
+  const m = new THREE.Matrix4().compose(new THREE.Vector3(...config.kiosk.position), new THREE.Quaternion().setFromAxisAngle(new THREE.Vector3(0, 1, 0), config.kiosk.rotationY), new THREE.Vector3(1, 1, 1));
+  const local = (x: number, y: number) => new THREE.Vector3(x, y, SCREEN_CZ + 0.001).applyMatrix4(m);
+  const corners = [local(-SCREEN_W / 2, SCREEN_CY + SCREEN_H / 2), local(SCREEN_W / 2, SCREEN_CY + SCREEN_H / 2), local(SCREEN_W / 2, SCREEN_CY - SCREEN_H / 2), local(-SCREEN_W / 2, SCREEN_CY - SCREEN_H / 2)];
+  const center = local(0, SCREEN_CY);
+  const normal = new THREE.Vector3(Math.sin(config.kiosk.rotationY), 0, Math.cos(config.kiosk.rotationY));
+  return { corners, center, normal };
+}
+
+function planeCorners(center: Vec3, rotationY: number, w: number, h: number) {
+  const c = new THREE.Vector3(...center);
+  const right = new THREE.Vector3(Math.cos(rotationY), 0, -Math.sin(rotationY));
+  const up = new THREE.Vector3(0, 1, 0);
+  const at = (sx: number, sy: number) => c.clone().addScaledVector(right, (sx * w) / 2).addScaledVector(up, (sy * h) / 2);
+  return [at(-1, 1), at(1, 1), at(1, -1), at(-1, -1)];
+}
 
 // 네 점을 잇는 원근 변환(호모그래피)을 CSS matrix3d로 만든다. 사각형 w x h를 화면의 네 점 q0..q3(왼위, 오른위, 오른아래, 왼아래)에 맞춘다
-function quadMatrix(w: number, h: number, q: [number, number][]) {
-  const src: [number, number][] = [[0, 0], [w, 0], [w, h], [0, h]];
+type P2 = [number, number];
+
+function solveH(src: P2[], q: P2[]) {
   const A: number[][] = [];
   const B: number[] = [];
   for (let i = 0; i < 4; i++) {
@@ -188,7 +155,6 @@ function quadMatrix(w: number, h: number, q: [number, number][]) {
     A.push([0, 0, 0, x, y, 1, -v * x, -v * y]);
     B.push(v);
   }
-  // 가우스 소거
   const n = 8;
   for (let c = 0; c < n; c++) {
     let p = c;
@@ -202,32 +168,31 @@ function quadMatrix(w: number, h: number, q: [number, number][]) {
       B[r] -= f * B[c];
     }
   }
-  const h8 = B.map((b, i) => b / A[i][i]);
-  const [a, b, c, d, e, f, g, hh] = h8;
+  return B.map((v, i) => v / A[i][i]);
+}
+
+function quadMatrix(w: number, h: number, q: P2[]) {
+  const [a, b, c, d, e, f, g, hh] = solveH([[0, 0], [w, 0], [w, h], [0, h]], q);
   return `matrix3d(${a},${d},0,${g},${b},${e},0,${hh},0,0,1,0,${c},${f},0,1)`;
 }
 
-// 키오스크 화면 네 모서리를 매 장면 투영해 실제 화면 DOM을 그 자리에 겹친다
-/* eslint-disable react-hooks/immutability -- useFrame 안에서 겹친 화면의 style을 매 장면 바꾸는 것이 이 부품의 목적이다(React 상태를 거치지 않음) */
-function ScreenProjector({ target, center = [KIOSK_X, SCREEN_Y + 0.04, KIOSK_Z + 0.027], w = SCREEN_W, h = SCREEN_H, px = [450, 800] }: { target: React.RefObject<HTMLDivElement | null>; center?: [number, number, number]; w?: number; h?: number; px?: [number, number] }) {
+// 화면 네 모서리를 매 장면 투영해 실제 화면 DOM을 그 자리에 옮긴다. 뒤를 보거나 카메라 뒤로 가면 숨긴다
+/* eslint-disable react-hooks/immutability -- useFrame 안에서 화면 DOM의 style을 매 장면 바꾸는 것이 이 부품의 목적이다(React 상태를 거치지 않음) */
+function ScreenProjector({ target, corners, px }: { target: React.RefObject<HTMLDivElement | null>; corners: THREE.Vector3[]; px: [number, number] }) {
   const { camera, size } = useThree();
-  const [cx, cy, cz] = center;
-  const pts = useMemo(
-    () => [
-      new THREE.Vector3(cx - w / 2, cy + h / 2, cz),
-      new THREE.Vector3(cx + w / 2, cy + h / 2, cz),
-      new THREE.Vector3(cx + w / 2, cy - h / 2, cz),
-      new THREE.Vector3(cx - w / 2, cy - h / 2, cz),
-    ],
-    [cx, cy, cz, w, h],
-  );
-  const vr = useRef(new THREE.Vector3());
+  const tmp = useRef({ v: new THREE.Vector3(), n: new THREE.Vector3(), d: new THREE.Vector3() });
   useFrame(() => {
     const el = target.current;
     if (!el) return;
-    const v = vr.current;
+    const { v, n, d } = tmp.current;
+    n.subVectors(corners[1], corners[0]).cross(d.subVectors(corners[3], corners[0]));
+    d.subVectors(camera.position, corners[0]);
+    if (n.dot(d) > 0) {
+      el.style.visibility = "hidden";
+      return;
+    }
     const q: [number, number][] = [];
-    for (const p of pts) {
+    for (const p of corners) {
       v.copy(p).project(camera);
       if (v.z > 1) {
         el.style.visibility = "hidden";
@@ -242,136 +207,549 @@ function ScreenProjector({ target, center = [KIOSK_X, SCREEN_Y + 0.04, KIOSK_Z +
 }
 /* eslint-enable react-hooks/immutability */
 
-// 카메라 이동: zoom이면 키오스크 화면 앞으로, back이면 처음 자리로 돌아간 뒤 둘러보기 조작에 넘긴다
-function CameraRig({ phase, reduced, onHome }: { phase: "look" | "zoom" | "back"; reduced: boolean; onHome: () => void }) {
-  const { camera } = useThree();
-  const tr = useRef(new THREE.Vector3());
-  const lr = useRef(new THREE.Vector3());
-  const lookNow = useRef(new THREE.Vector3(0, 1.1, 0));
+/* ---------------- 카메라 ---------------- */
+
+/* eslint-disable react-hooks/immutability -- useFrame 안에서 카메라와 둘러보기 조작(three 객체)을 매 장면 직접 옮기는 것이 이 부품의 목적이다 */
+// shot이 바뀌면 둘러보기 조작을 잠시 끄고 카메라를 그 자리로 옮긴 뒤, 도착하면 그 자리를 중심으로 다시 끌어서 돌려 볼 수 있게 넘긴다
+function CameraRig({ shot, locked, reduced, controls }: { shot: CameraShot; locked: boolean; reduced: boolean; controls: React.RefObject<OrbitControlsImpl | null> }) {
+  const camera = useThree((s) => s.camera);
+  const state = useRef({ moving: true, look: new THREE.Vector3(...shot.target), pos: new THREE.Vector3(), tgt: new THREE.Vector3(), key: "" });
   useFrame((_, dt) => {
-    if (phase === "look") return;
-    const target = tr.current;
-    const look = lr.current;
-    const fov = (camera as THREE.PerspectiveCamera).fov ?? 38;
-    if (phase === "zoom") {
-      const dist = SCREEN_H / 2 / Math.tan(((fov / 2) * Math.PI) / 180) / 0.86;
-      target.set(KIOSK_X, SCREEN_Y + 0.04, KIOSK_Z + 0.03 + dist);
-      look.set(KIOSK_X, SCREEN_Y + 0.04, KIOSK_Z);
-    } else {
-      target.copy(HOME);
-      look.set(0, 1.1, 0);
+    const s = state.current;
+    const c = controls.current;
+    const key = `${shot.position.join(",")}|${shot.target.join(",")}|${locked}`;
+    if (key !== s.key) {
+      s.key = key;
+      s.moving = true;
+      s.pos.set(...shot.position);
+      s.tgt.set(...shot.target);
+      if (c) s.look.copy(c.target);
     }
-    const k = reduced ? 1 : 1 - Math.exp(-dt * 4);
-    camera.position.lerp(target, k);
-    lookNow.current.lerp(look, k);
-    camera.lookAt(lookNow.current);
-    if (phase === "back" && camera.position.distanceTo(target) < 0.01) onHome();
+    if (!s.moving) return;
+    if (c) c.enabled = false;
+    const k = reduced ? 1 : 1 - Math.exp(-dt * 3.2);
+    camera.position.lerp(s.pos, k);
+    s.look.lerp(s.tgt, k);
+    camera.lookAt(s.look);
+    if (camera.position.distanceTo(s.pos) < 0.004 && s.look.distanceTo(s.tgt) < 0.004) {
+      camera.position.copy(s.pos);
+      camera.lookAt(s.tgt);
+      s.moving = false;
+      if (c) {
+        c.target.copy(s.tgt);
+        c.enabled = !locked;
+        // update()는 거리 제한을 적용하므로 화면 앞에 붙는 잠긴 자리에서는 부르지 않는다
+        if (!locked) c.update();
+      }
+    }
+  });
+  return null;
+}
+/* eslint-enable react-hooks/immutability */
+
+/* ---------------- 이용 흐름: 바닥 점선, 사람, 이름표 ---------------- */
+
+function pathLengths(path: Vec3[]) {
+  const acc = [0];
+  for (let i = 1; i < path.length; i++) {
+    const [ax, , az] = path[i - 1];
+    const [bx, , bz] = path[i];
+    acc.push(acc[i - 1] + Math.hypot(bx - ax, bz - az));
+  }
+  return acc;
+}
+
+function pointAt(path: Vec3[], acc: number[], s: number): [number, number, number] {
+  for (let i = 1; i < path.length; i++) {
+    if (s <= acc[i] || i === path.length - 1) {
+      const seg = acc[i] - acc[i - 1] || 1;
+      const t = Math.min(1, Math.max(0, (s - acc[i - 1]) / seg));
+      const [ax, , az] = path[i - 1];
+      const [bx, , bz] = path[i];
+      return [ax + (bx - ax) * t, az + (bz - az) * t, Math.atan2(bx - ax, bz - az)];
+    }
+  }
+  return [path[0][0], path[0][2], 0];
+}
+
+function PathDashes({ path, color }: { path: Vec3[]; color: string }) {
+  const dashes = useMemo(() => {
+    const out: { x: number; z: number; r: number }[] = [];
+    for (let i = 1; i < path.length; i++) {
+      const a = path[i - 1];
+      const b = path[i];
+      // 되돌아가는 구간(의자에서 일어나 나오는 길)은 한 번만 그린다
+      const prev = path[i - 2];
+      if (prev && prev[0] === b[0] && prev[2] === b[2]) continue;
+      const len = Math.hypot(b[0] - a[0], b[2] - a[2]);
+      const r = Math.atan2(b[0] - a[0], b[2] - a[2]);
+      for (let t = 0.12; t < len - 0.06; t += 0.3) {
+        out.push({ x: a[0] + ((b[0] - a[0]) * t) / len, z: a[2] + ((b[2] - a[2]) * t) / len, r });
+      }
+    }
+    return out;
+  }, [path]);
+  return (
+    <group>
+      {dashes.map((d, i) => (
+        <mesh key={i} position={[d.x, 0.006, d.z]} rotation={[-Math.PI / 2, 0, d.r]}>
+          <planeGeometry args={[0.06, 0.16]} />
+          <meshBasicMaterial color={color} transparent opacity={0.7} />
+        </mesh>
+      ))}
+    </group>
+  );
+}
+
+const FIGURE_SPEED = 1.2;
+/** 학생, 환자 옷 색 */
+const WALKER_LOOK = { model: "a", shirt: "#e9eef6", pants: "#2c3442", hair: "#2a211c" } as const;
+
+/* eslint-disable react-hooks/immutability -- useFrame 안에서 사람 모형(three 객체)의 자리와 방향을 매 장면 직접 옮긴다 */
+// 걷는 사람. 길을 따라 걸을 때는 걷기 동작(속도에 맞춘 빠르기), 멈추면 서서 쉬기, sit이면 그 점(앉는 면 중심)에 앉는다
+function Figure({ path, at, facing, sit, seat, seatBack, phone, hidden, reduced, accent, g }: { path: Vec3[]; at: number; facing: number; sit: boolean; seat: number; seatBack: number; phone: boolean; hidden: boolean; reduced: boolean; accent: string; g: React.RefObject<THREE.Group | null> }) {
+  const acc = useMemo(() => pathLengths(path), [path]);
+  const body = useRef<THREE.Group>(null);
+  const ring = useRef<THREE.Mesh>(null);
+  const st = useRef({ s: 0, yaw: Math.PI, k: 0 });
+  const [mode, setMode] = useState<"walk" | "idle" | "sit">("idle");
+  useFrame((_, dt) => {
+    const grp = g.current;
+    const b = body.current;
+    if (!grp || !b) return;
+    const s = st.current;
+    const goal = acc[Math.min(at, acc.length - 1)] ?? 0;
+    // 앞 단계로 돌아가면 걸어서 되돌아가지 않고 바로 옮긴다
+    if (reduced || goal < s.s - 0.01) s.s = goal;
+    else s.s = Math.min(goal, s.s + dt * FIGURE_SPEED);
+    const walking = goal - s.s > 0.01;
+    const seated = sit && !walking;
+    const want = walking ? "walk" : seated ? "sit" : "idle";
+    if (want !== mode) setMode(want);
+    const [x, z, dir] = pointAt(path, acc, s.s);
+    const wantYaw = walking ? dir : facing;
+    let dy = wantYaw - s.yaw;
+    dy = Math.atan2(Math.sin(dy), Math.cos(dy));
+    s.yaw += reduced ? dy : dy * Math.min(1, dt * 7);
+    // 앉을 때는 의자 앞에 선 자리에서 몸을 앉는 면 높이와 앉는 면 중심(seatBack만큼 뒤)으로 옮긴다(SeatedPerson과 같은 계산)
+    const wantK = seated ? 1 : 0;
+    s.k += reduced ? wantK - s.k : (wantK - s.k) * Math.min(1, dt * 5);
+    grp.position.set(x, 0, z);
+    grp.rotation.y = s.yaw;
+    b.position.set(0, Math.max(0, seat - SIT_THIGH) * s.k, (SIT_BACK - seatBack) * s.k);
+    if (ring.current) ring.current.visible = !seated;
+    grp.visible = !hidden;
+  });
+  return (
+    <group ref={g}>
+      {/* 발밑 원 */}
+      <mesh ref={ring} position={[0, 0.008, 0]} rotation={[-Math.PI / 2, 0, 0]}>
+        <ringGeometry args={[0.24, 0.29, 40]} />
+        <meshBasicMaterial color={accent} transparent opacity={0.5} />
+      </mesh>
+      <group ref={body}>
+        <Person look={WALKER_LOOK} action={mode} timeScale={FIGURE_SPEED / WALK_SPEED} phone={phone} />
+      </group>
+    </group>
+  );
+}
+
+/* eslint-enable react-hooks/immutability */
+
+const PILL = "whitespace-nowrap rounded-full bg-white/95 px-2.5 py-1 text-[12px] font-bold leading-none text-[#1f2b33] shadow-[0_2px_8px_rgba(20,30,40,.18)]";
+const PILL_ON = "whitespace-nowrap rounded-full bg-(--acc) px-2.5 py-1 text-[12px] font-bold leading-none text-white shadow-[0_2px_8px_rgba(20,30,40,.25)]";
+
+function DimensionLine({ from, to, color, show }: { from: Vec3; to: Vec3; color: string; show: boolean }) {
+  const a = new THREE.Vector3(...from);
+  const b = new THREE.Vector3(...to);
+  const len = a.distanceTo(b);
+  const mid = a.clone().add(b).multiplyScalar(0.5);
+  const r = Math.atan2(b.x - a.x, b.z - a.z);
+  return (
+    <group position={[mid.x, 0.01, mid.z]} rotation={[0, r, 0]} visible={show}>
+      <mesh rotation={[-Math.PI / 2, 0, 0]}>
+        <planeGeometry args={[0.02, len]} />
+        <meshBasicMaterial color={color} />
+      </mesh>
+      {[-len / 2, len / 2].map((zz) => (
+        <mesh key={zz} position={[0, 0, zz]} rotation={[-Math.PI / 2, 0, 0]}>
+          <planeGeometry args={[0.22, 0.02]} />
+          <meshBasicMaterial color={color} />
+        </mesh>
+      ))}
+    </group>
+  );
+}
+
+type Label = { key: string; at: Vec3; kind: "pin" | "callout" | "dim"; text: string; show: boolean; on?: boolean; onClick?: () => void };
+
+// 이름표 DOM을 매 장면 세계 좌표에 맞춰 옮긴다(drei Html은 떼었다 붙일 때 React 루트 오류가 나서 직접 투영한다)
+function Anchors({ labels, els }: { labels: Label[]; els: React.RefObject<(HTMLElement | null)[]> }) {
+  const { camera, size } = useThree();
+  const v = useRef(new THREE.Vector3());
+  useFrame(() => {
+    labels.forEach((l, i) => {
+      const el = els.current[i];
+      if (!el) return;
+      const p = v.current.set(...l.at).project(camera);
+      if (p.z > 1 || Math.abs(p.x) > 1.2 || Math.abs(p.y) > 1.2) {
+        el.style.visibility = "hidden";
+        return;
+      }
+      el.style.visibility = "";
+      el.style.transform = `translate3d(${(((p.x + 1) / 2) * size.width).toFixed(1)}px, ${(((1 - p.y) / 2) * size.height).toFixed(1)}px, 0)`;
+    });
   });
   return null;
 }
 
+function LabelView({ l }: { l: Label }) {
+  const fade = `transition-opacity duration-300 motion-reduce:transition-none ${l.show ? "opacity-100" : "pointer-events-none opacity-0"}`;
+  if (l.kind === "pin")
+    return (
+      <button type="button" onClick={l.onClick} tabIndex={l.show ? 0 : -1} aria-hidden={!l.show} aria-label={`${l.text} 보기`} className={`${fade} ${l.show ? "pointer-events-auto" : ""} flex h-7 w-7 -translate-x-1/2 -translate-y-1/2 items-center justify-center rounded-full border-2 border-white bg-(--acc) text-[13px] font-bold text-white shadow-[0_2px_8px_rgba(20,30,40,.3)]`}>
+        {l.key.slice(4)}
+      </button>
+    );
+  if (l.kind === "dim") return <span aria-hidden={!l.show} className={`${fade} block -translate-x-1/2 -translate-y-1/2 ${PILL_ON}`}>{l.text}</span>;
+  return (
+    <div aria-hidden={!l.show} className={`${fade} flex -translate-x-1/2 -translate-y-full flex-col items-center`}>
+      <span className={l.on ? PILL_ON : PILL}>{l.text}</span>
+      <span className="h-3 w-px bg-[#1f2b33]/40" />
+    </div>
+  );
+}
+
+/* ---------------- 불러오는 동안 ---------------- */
+
+function Loading() {
+  const { active } = useProgress();
+  if (!active) return null;
+  return (
+    <div className="pointer-events-none absolute inset-0 z-[45] flex items-center justify-center bg-(--bg)" aria-hidden>
+      <span className="h-8 w-8 animate-spin rounded-full border-[3px] border-(--acc)/20 border-t-(--acc) motion-reduce:animate-none" />
+    </div>
+  );
+}
+
+/* ---------------- 장면 ---------------- */
+
+const DWELL: Record<string, number> = { kiosk: 6500 };
+
 /**
  * 장소 안의 키오스크. children은 450x800 크기로 그린 실제 키오스크 화면.
+ * tv: 병원 로비 벽 TV에 띄울 화면(640x352 px로 그림).
+ * monitor: 학원 원장실 책상 모니터에 띄울 관리자 화면(1280x720 px로 그림).
+ * phone: 휴대폰 알림 단계에서 옆에 띄울 실제 휴대폰 화면(없으면 3D 이름표만 보인다).
  * zoomSignal: 숫자가 바뀔 때마다 키오스크 앞으로 다가간다(바깥 버튼, 학생증 태그 등에서 쓰기).
- * paused: 장면이 가려져 있을 때 그리기를 멈춘다.
+ * paused: 장면이 가려져 있을 때 그리기와 자동 넘김을 멈춘다.
  */
-export function KioskScene({ place, children, tv, phone, className = "", zoomSignal = 0, paused = false }: { place: Place; children: ReactNode; /** 병원 로비 벽 TV에 띄울 화면(640x352 px로 그림) */ tv?: ReactNode; /** 접수 뒤 휴대폰 대기 화면(장면 오른쪽 아래) */ phone?: ReactNode; className?: string; zoomSignal?: number; paused?: boolean }) {
+export function KioskScene({ place, children, tv, phone, monitor, className = "", zoomSignal = 0, paused = false }: { place: Place; children: ReactNode; tv?: ReactNode; phone?: ReactNode; monitor?: ReactNode; className?: string; zoomSignal?: number; paused?: boolean }) {
+  const config = PLACES[place];
+  const Room = ROOMS[place];
+  const steps = config.steps;
+  const kioskIdx = steps.findIndex((s) => s.camera === "kiosk");
   const screenRef = useRef<HTMLDivElement>(null);
   const tvRef = useRef<HTMLDivElement>(null);
-  const [phase, setPhase] = useState<"look" | "zoom" | "back">("look");
-  const active = phase === "zoom";
-  const setActive = (v: boolean) => setPhase(v ? "zoom" : "back");
+  const monRef = useRef<HTMLDivElement>(null);
+  const controls = useRef<OrbitControlsImpl>(null);
+  const figRef = useRef<THREE.Group>(null);
+  const labelEls = useRef<(HTMLElement | null)[]>([]);
+  const [step, setStep] = useState<number | null>(null);
+  const [zoom, setZoom] = useState(false);
+  const [figAt, setFigAt] = useState(0);
+  const [auto, setAuto] = useState(false);
   const [reduced, setReduced] = useState(false);
+  const active = zoom;
+
+  const ks = useMemo(() => kioskScreen(config), [config]);
+  const tvCorners = useMemo(() => (config.tv ? planeCorners(config.tv.center, config.tv.rotationY, config.tv.w, config.tv.h) : null), [config]);
+  const monCorners = useMemo(() => (config.monitor ? planeCorners(config.monitor.center, config.monitor.rotationY, config.monitor.w, config.monitor.h) : null), [config]);
+  const kioskShot = useMemo<CameraShot>(() => {
+    const fov = 38;
+    const dist = SCREEN_H / 2 / Math.tan(((fov / 2) * Math.PI) / 180) / 0.86;
+    const p = ks.center.clone().addScaledVector(ks.normal, dist);
+    return { position: [p.x, p.y, p.z], target: [ks.center.x, ks.center.y, ks.center.z] };
+  }, [ks]);
+
+  const go = (i: number | null) => {
+    setStep(i);
+    if (i === null) {
+      setZoom(false);
+      return;
+    }
+    setZoom(steps[i].camera === "kiosk");
+    setFigAt(steps[i].at);
+  };
+  const open = () => {
+    if (kioskIdx >= 0) go(kioskIdx);
+    else setZoom(true);
+  };
+  const leave = () => go(null);
+
   useEffect(() => {
     if (!zoomSignal) return;
-    const f = requestAnimationFrame(() => setPhase("zoom"));
+    const f = requestAnimationFrame(() => {
+      setAuto(false);
+      if (kioskIdx >= 0) {
+        setStep(kioskIdx);
+        setFigAt(steps[kioskIdx].at);
+      }
+      setZoom(true);
+    });
     return () => cancelAnimationFrame(f);
-  }, [zoomSignal]);
+  }, [zoomSignal, kioskIdx, steps]);
   useEffect(() => {
-    const f = requestAnimationFrame(() => setReduced(window.matchMedia("(prefers-reduced-motion: reduce)").matches));
+    const f = requestAnimationFrame(() => {
+      const r = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+      setReduced(r);
+      if (!r && steps.length) setAuto(true);
+    });
     return () => cancelAnimationFrame(f);
-  }, []);
+  }, [steps.length]);
   useEffect(() => {
-    if (!active) return;
+    if (step === null && !zoom) return;
     const onKey = (e: KeyboardEvent) => {
-      if (e.key === "Escape") setPhase("back");
+      if (e.key === "Escape") {
+        setAuto(false);
+        go(null);
+      }
     };
     window.addEventListener("keydown", onKey);
     return () => window.removeEventListener("keydown", onKey);
-  }, [active]);
-  const leave = () => setActive(false);
+  });
+  // 자동 넘김: 전체 장면에서 잠시 머문 뒤 1단계부터 차례로, 마지막 단계 뒤에는 전체 장면으로 돌아간다
+  useEffect(() => {
+    if (!auto || paused || !steps.length) return;
+    const wait = step === null ? 2600 : (DWELL[steps[step].id] ?? 4800);
+    const t = window.setTimeout(() => {
+      if (step === null) go(0);
+      else if (step + 1 < steps.length) go(step + 1);
+      else go(null);
+    }, wait);
+    return () => window.clearTimeout(t);
+  });
+
+  const cur = step !== null ? steps[step] : null;
+  const labels: Label[] = [
+    ...steps.map((s, i): Label => ({ key: `pin-${i + 1}`, at: [config.path[s.at][0], 0.05, config.path[s.at][2]], kind: "pin", text: `${i + 1}단계 ${s.label}`, show: !zoom && step === null, onClick: () => go(i) })),
+    ...config.callouts.map((c): Label => ({ key: `c-${c.text}`, at: c.at, kind: "callout", text: c.text, on: !!c.step, show: !zoom && (cur ? c.step === cur.id : !c.step) })),
+    ...(config.dimensions ?? []).map((d): Label => ({ key: `d-${d.text}`, at: [(d.from[0] + d.to[0]) / 2, 0.05, (d.from[2] + d.to[2]) / 2], kind: "dim", text: d.text, show: !zoom && (cur ? d.step === cur.id : !d.step) })),
+  ];
+  const shot: CameraShot = zoom ? kioskShot : cur && cur.camera !== "kiosk" ? cur.camera : config.view;
+  // 사용자가 장면을 만지면 자동 넘김을 멈춘다(자동 넘김 버튼 자체는 빼고)
+  const stopAuto = (e: React.SyntheticEvent) => {
+    if (!(e.target as HTMLElement).closest?.("[data-autoplay]")) setAuto(false);
+  };
+  const lit = !!config.hdri;
+
   return (
-    <div className={`relative overflow-hidden rounded-xl bg-[#e9e6e0] ${className}`}>
-      <Canvas frameloop={paused ? "never" : "always"} shadows dpr={[1, 2]} camera={{ position: [3.2, 2.1, 5.0], fov: 38 }} gl={{ antialias: true }}>
-        <color attach="background" args={[place === "clinic" ? "#ece8e1" : "#e6e9ee"]} />
-        <hemisphereLight args={["#ffffff", "#d9d2c6", 1.1]} />
-        <ambientLight intensity={0.6} />
-        <directionalLight position={[-3, 5, 3]} intensity={1.8} castShadow shadow-mapSize={[2048, 2048]} shadow-bias={-0.0004} />
+    <div className={`relative overflow-hidden rounded-xl ${className}`} style={{ background: config.background, ["--acc" as string]: config.accent, ["--bg" as string]: config.background } as React.CSSProperties} onPointerDownCapture={stopAuto} onWheelCapture={stopAuto}>
+      <Canvas
+        frameloop={paused ? "never" : "always"}
+        shadows="percentage"
+        dpr={[1, 2]}
+        camera={{ position: config.view.position, fov: 38, near: 0.05, far: 60 }}
+        gl={{ antialias: true, alpha: true }}
+        // 키오스크 앞에서는 캔버스가 누르기를 받지 않아 아래 실제 화면을 누를 수 있다
+        style={{ position: "absolute", inset: 0, zIndex: 2, pointerEvents: zoom ? "none" : "auto" }}
+      >
+        <color attach="background" args={[config.background]} />
+        {lit ? (
+          <>
+            <hemisphereLight args={["#ffffff", "#e6dfd3", 0.35]} />
+            <directionalLight
+              position={[-5, 9, 6]}
+              intensity={1.6}
+              color="#fff6ea"
+              castShadow
+              shadow-mapSize={[2048, 2048]}
+              shadow-bias={-0.0003}
+              shadow-normalBias={0.02}
+              shadow-radius={6}
+              shadow-camera-left={-8}
+              shadow-camera-right={8}
+              shadow-camera-top={8}
+              shadow-camera-bottom={-8}
+              shadow-camera-near={1}
+              shadow-camera-far={30}
+            />
+          </>
+        ) : (
+          <>
+            <hemisphereLight args={["#ffffff", "#d9d2c6", 1.1]} />
+            <ambientLight intensity={0.6} />
+            <directionalLight position={[-3, 5, 3]} intensity={1.8} castShadow shadow-mapSize={[2048, 2048]} shadow-bias={-0.0004} />
+          </>
+        )}
         <Suspense fallback={null}>
-          <Environment resolution={128}>
-            <Lightformer form="rect" intensity={2} position={[-4, 2, 1]} scale={[3, 2, 1]} />
-            <Lightformer form="rect" intensity={1} position={[3, 3, 4]} scale={[4, 2, 1]} />
-          </Environment>
+          {lit ? (
+            <Environment files={config.hdri} environmentIntensity={0.85} />
+          ) : (
+            <Environment resolution={128}>
+              <Lightformer form="rect" intensity={2} position={[-4, 2, 1]} scale={[3, 2, 1]} />
+              <Lightformer form="rect" intensity={1} position={[3, 3, 4]} scale={[4, 2, 1]} />
+            </Environment>
+          )}
+          <Room config={config} />
         </Suspense>
-        <Room place={place} />
-        <KioskBody place={place} active={active} onOpen={() => setActive(true)} />
-        <ScreenProjector target={screenRef} />
-        {tv && place === "clinic" ? <ScreenProjector target={tvRef} center={[-1.9, 2.0, -2.105]} w={1.42} h={0.78} px={[640, 352]} /> : null}
-        <ContactShadows position={[0, 0.005, 0]} opacity={0.35} scale={10} blur={2.4} far={3} />
+        <KioskBody config={config} active={active} onOpen={open} />
+        <ScreenProjector target={screenRef} corners={ks.corners} px={[450, 800]} />
+        {tv && config.tv && tvCorners ? (
+          <>
+            <ScreenHole {...config.tv} />
+            <ScreenProjector target={tvRef} corners={tvCorners} px={[640, 352]} />
+          </>
+        ) : null}
+        {monitor && config.monitor && monCorners ? (
+          <>
+            <ScreenHole {...config.monitor} />
+            <ScreenProjector target={monRef} corners={monCorners} px={[1280, 720]} />
+          </>
+        ) : null}
+        {lit ? null : <ContactShadows position={[0, 0.005, 0]} opacity={0.35} scale={10} blur={2.4} far={3} />}
+        {steps.length ? (
+          <>
+            <PathDashes path={config.path} color={config.accent} />
+            <Figure path={config.path} at={figAt} facing={cur?.facing ?? Math.PI} sit={cur?.pose === "sit"} seat={cur?.seat ?? 0.45} seatBack={cur?.seatBack ?? 0} phone={cur?.card === "phone"} hidden={zoom} reduced={reduced} accent={config.accent} g={figRef} />
+            {(config.dimensions ?? []).map((d) => (
+              <DimensionLine key={d.text} from={d.from} to={d.to} color={config.accent} show={!zoom && (cur ? d.step === cur.id : !d.step)} />
+            ))}
+            <Anchors labels={labels} els={labelEls} />
+          </>
+        ) : null}
         <OrbitControls
-          enabled={phase === "look"}
-          target={[0, 1.1, 0]}
+          ref={controls}
+          enabled={false}
           enablePan={false}
-          minDistance={3.2}
-          maxDistance={8}
-          minPolarAngle={Math.PI / 4}
-          maxPolarAngle={Math.PI / 2.1}
-          minAzimuthAngle={-Math.PI / 3}
-          maxAzimuthAngle={Math.PI / 2.5}
+          dampingFactor={0.08}
+          rotateSpeed={0.55}
+          zoomSpeed={0.6}
+          minDistance={config.view.distance[0]}
+          maxDistance={config.view.distance[1]}
+          minPolarAngle={config.view.polar[0]}
+          maxPolarAngle={config.view.polar[1]}
+          minAzimuthAngle={config.view.azimuth[0]}
+          maxAzimuthAngle={config.view.azimuth[1]}
         />
-        <CameraRig phase={phase} reduced={reduced} onHome={() => setPhase("look")} />
+        <CameraRig shot={shot} locked={zoom} reduced={reduced} controls={controls} />
       </Canvas>
-      {tv && place === "clinic" ? (
-        <div ref={tvRef} aria-hidden className="pointer-events-none absolute left-0 top-0 z-[5] origin-top-left overflow-hidden" style={{ width: 640, height: 352, visibility: "hidden" }}>
+      {tv && tvCorners ? (
+        <div ref={tvRef} aria-hidden className="pointer-events-none absolute left-0 top-0 z-[1] origin-top-left overflow-hidden" style={{ width: 640, height: 352, visibility: "hidden" }}>
           {tv}
         </div>
       ) : null}
-      {/* 실제 키오스크 화면. 3D 화면 자리에 원근을 맞춰 겹친다. 다가가기 전에는 누르면 다가간다 */}
+      {monitor && monCorners ? (
+        <div ref={monRef} aria-hidden className="pointer-events-none absolute left-0 top-0 z-[1] origin-top-left overflow-hidden bg-white" style={{ width: 1280, height: 720, visibility: "hidden" }}>
+          {monitor}
+        </div>
+      ) : null}
+      {/* 실제 키오스크 화면. 캔버스 아래에 깔고 3D 화면 자리(투명한 구멍)에 원근을 맞춘다. 다가가기 전에는 캔버스가 누르기를 받아 키오스크로 다가간다 */}
       <div
         ref={screenRef}
-        className="absolute left-0 top-0 z-[10] origin-top-left overflow-hidden rounded-[4px] bg-white"
+        className="absolute left-0 top-0 z-[1] origin-top-left overflow-hidden rounded-[3px] bg-white"
         style={{ width: 450, height: 800, visibility: "hidden" }}
         onClickCapture={(e) => {
           if (!active) {
             e.stopPropagation();
             e.preventDefault();
-            setActive(true);
+            open();
           }
         }}
         role={active ? undefined : "button"}
         aria-label={active ? undefined : "키오스크 사용해 보기"}
         tabIndex={active ? -1 : 0}
         onKeyDown={(e) => {
-          if (!active && (e.key === "Enter" || e.key === " ")) setActive(true);
+          if (!active && (e.key === "Enter" || e.key === " ")) open();
         }}
       >
         <div style={{ pointerEvents: active ? "auto" : "none" }} className="h-full w-full">
           {children}
         </div>
       </div>
-      {!active && phase === "look" && (
-        <button type="button" onClick={() => setActive(true)} className="absolute bottom-4 right-4 z-[40] rounded-full bg-[#15171c] px-5 py-2.5 text-[14px] font-bold text-white shadow-[0_8px_20px_rgba(0,0,0,.25)]">
+
+      {labels.length ? (
+        <div className="pointer-events-none absolute inset-0 z-[20] overflow-hidden">
+          {labels.map((l, i) => (
+            <div
+              key={l.key}
+              ref={(el) => {
+                labelEls.current[i] = el;
+              }}
+              className="absolute left-0 top-0"
+              style={{ visibility: "hidden" }}
+            >
+              <LabelView l={l} />
+            </div>
+          ))}
+        </div>
+      ) : null}
+
+      {steps.length && !zoom ? (
+        <nav aria-label="이용 흐름" className="absolute left-1/2 top-3 z-[40] flex w-[calc(100%-24px)] max-w-[860px] -translate-x-1/2 items-stretch gap-1 rounded-2xl bg-white/95 p-1 shadow-[0_6px_18px_rgba(20,30,40,.14)]">
+          <ol className="flex min-w-0 flex-1 items-stretch gap-1">
+            {steps.map((s, i) => {
+              const on = step === i;
+              return (
+                <li key={s.id} className="min-w-0 flex-1">
+                  <button
+                    type="button"
+                    onClick={() => go(i)}
+                    aria-current={on ? "step" : undefined}
+                    className={`flex h-full w-full items-center gap-2 rounded-xl px-2.5 py-2 text-left text-[13px] font-bold leading-tight transition-colors ${on ? "bg-(--acc) text-white" : "text-[#33414a] hover:bg-[#eef3f3]"}`}
+                  >
+                    <span className={`flex h-5 w-5 shrink-0 items-center justify-center rounded-full text-[11px] ${on ? "bg-white text-(--acc)" : "bg-(--acc)/10 text-(--acc)"}`}>{i + 1}</span>
+                    <span className="min-w-0 break-keep">{s.label}</span>
+                  </button>
+                </li>
+              );
+            })}
+          </ol>
+          <button
+            type="button"
+            data-autoplay
+            onClick={() => {
+              if (!auto && step === steps.length - 1) go(null);
+              setAuto((v) => !v);
+            }}
+            aria-label={auto ? "자동 넘김 멈춤" : "자동 넘김 시작"}
+            className="flex w-10 shrink-0 items-center justify-center rounded-xl text-[#33414a] hover:bg-[#eef3f3]"
+          >
+            {auto ? (
+              <svg viewBox="0 0 16 16" className="h-4 w-4" aria-hidden>
+                <rect x="3" y="2.5" width="3.4" height="11" rx="1" fill="currentColor" />
+                <rect x="9.6" y="2.5" width="3.4" height="11" rx="1" fill="currentColor" />
+              </svg>
+            ) : (
+              <svg viewBox="0 0 16 16" className="h-4 w-4" aria-hidden>
+                <path d="M4 2.6v10.8c0 .6.6.9 1.1.6l8.4-5.4a.7.7 0 0 0 0-1.2L5.1 2c-.5-.3-1.1 0-1.1.6Z" fill="currentColor" />
+              </svg>
+            )}
+          </button>
+        </nav>
+      ) : null}
+
+      {cur?.card === "phone" && phone && !zoom ? <div className="absolute bottom-16 right-4 z-[35] w-[236px]">{phone}</div> : null}
+
+      {!active && (
+        <button type="button" onClick={open} className="absolute bottom-4 right-4 z-[40] rounded-full bg-[#15171c] px-5 py-2.5 text-[14px] font-bold text-white shadow-[0_8px_20px_rgba(0,0,0,.25)]">
           키오스크 사용해 보기
         </button>
       )}
-      {phone ? <div className="pointer-events-auto absolute bottom-20 right-4 z-[40] w-[236px]">{phone}</div> : null}
-      {active ? (
-        <button type="button" onClick={leave} className="absolute left-4 top-4 z-[40] rounded-full bg-white/95 px-4 py-2 text-[14px] font-bold text-[#15171c] shadow-[0_6px_16px_rgba(0,0,0,.15)]">
+      {/* 키오스크 앞에서는 단계 막대를 접어 화면 위쪽을 가리지 않는다. 다음 단계로 바로 넘어갈 수 있다 */}
+      {zoom && step !== null && step + 1 < steps.length ? (
+        <button type="button" onClick={() => go(step + 1)} className="absolute bottom-4 right-4 z-[40] rounded-full bg-(--acc) px-5 py-2.5 text-[14px] font-bold text-white shadow-[0_8px_20px_rgba(0,0,0,.25)]">
+          다음 단계
+        </button>
+      ) : null}
+      {active || step !== null ? (
+        <button type="button" onClick={leave} className={`absolute left-4 z-[40] rounded-full bg-white/95 px-4 py-2 text-[14px] font-bold text-[#15171c] shadow-[0_6px_16px_rgba(0,0,0,.15)] ${steps.length && !zoom ? "bottom-4" : "top-4"}`}>
           공간 보기
         </button>
       ) : (
         <p className="pointer-events-none absolute bottom-4 left-4 z-[40] rounded-full bg-white/90 px-4 py-2 text-[13px] font-bold text-[#3d4450]">끌어서 둘러보기</p>
       )}
+      <Loading />
     </div>
   );
 }

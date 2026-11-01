@@ -1,0 +1,16 @@
+병원 로비 3D 장면에 쓰는 외부 자료. 모두 Poly Haven(https://polyhaven.com) 자료이며 라이선스는 CC0(퍼블릭 도메인, 출처 표기 의무 없음)이다.
+모델은 1k glTF를 받아 @gltf-transform/cli로 하나의 .glb로 묶고 텍스처를 WebP로 줄였다(meshopt 압축).
+
+모델 (public/models/clinic)
+- modern_arm_chair_01.glb   https://polyhaven.com/a/modern_arm_chair_01   CC0  (대기석, 쿠션 색은 코드에서 바꿈)
+- side_table_01.glb         https://polyhaven.com/a/side_table_01         CC0  (대기석 줄 끝 협탁)
+- potted_plant_02.glb       https://polyhaven.com/a/potted_plant_02       CC0  (화분)
+- wall_clock.glb            https://polyhaven.com/a/wall_clock            CC0  (벽시계)
+- ceramic_vase_01.glb       https://polyhaven.com/a/ceramic_vase_01       CC0  (접수 데스크 꽃병)
+
+텍스처 (public/textures/clinic, 1k jpg를 다시 압축)
+- laminate_floor_02   https://polyhaven.com/a/laminate_floor_02   CC0  (바닥 마루: diff, nor_gl, arm)
+- white_oak_veneer    https://polyhaven.com/a/white_oak_veneer    CC0  (데스크 상판, 진료실 문: diff, nor_gl, arm)
+
+HDRI (public/hdri)
+- hospital_room_1k.hdr   https://polyhaven.com/a/hospital_room   CC0  (실내 조명 반사용)

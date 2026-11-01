@@ -1,0 +1,17 @@
+학원 입구 3D 장면 자료(components/demos/kiosk3d/AcademyEntrance.tsx)
+모두 Poly Haven(https://polyhaven.com) 자료이며 라이선스는 CC0 1.0(퍼블릭 도메인)이다.
+모델은 gltf 1k를 받아 @gltf-transform/cli 4 optimize(webp, 1024)로 glb 한 파일씩 묶었다.
+
+모델 (public/models/academy/)
+- schoolchair_01.glb            SchoolChair_01            https://polyhaven.com/a/SchoolChair_01            CC0
+- schooldesk_01.glb             SchoolDesk_01             https://polyhaven.com/a/SchoolDesk_01             CC0
+- potted_plant_02.glb           potted_plant_02           https://polyhaven.com/a/potted_plant_02           CC0
+- wall_clock.glb                wall_clock                https://polyhaven.com/a/wall_clock                CC0
+- wooden_display_shelves_01.glb wooden_display_shelves_01 https://polyhaven.com/a/wooden_display_shelves_01 CC0
+- korean_fire_extinguisher_01.glb korean_fire_extinguisher_01 https://polyhaven.com/a/korean_fire_extinguisher_01 CC0
+
+텍스처 (public/textures/academy/)
+- laminate_floor_02_diff_1k.jpg  laminate_floor_02  https://polyhaven.com/a/laminate_floor_02  CC0
+
+HDRI (public/hdri/)
+- academy-white_studio_03_1k.hdr  white_studio_03  https://polyhaven.com/a/white_studio_03  CC0

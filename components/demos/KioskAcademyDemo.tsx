@@ -316,7 +316,12 @@ export function KioskAcademyDemo({ threeD = false }: { threeD?: boolean }) {
                 </Zone>
                 <Zone step={2} role="학생" title="입구 키오스크" sub="번호, QR, 학생증으로 등원과 하원" className="min-w-0">
                   {layout === "3d" ? (
-                    <KioskScene place="academy" zoomSignal={zoomSignal} paused={view !== "kiosk"} className="h-[min(74vh,780px)] min-h-[560px] w-full">
+                    <KioskScene
+                      place="academy"
+                      zoomSignal={zoomSignal}
+                      paused={view !== "kiosk"}
+                      monitor={<AdminMonitor today={today} sec={sec} recs={recs} lastChanged={lastChanged} />}
+                      phone={<ParentPhone today={today} nowMin={nowMin} notes={ownerNotes.slice(0, 2)} short />} className="h-[min(74vh,780px)] min-h-[560px] w-full">
                       <div style={{ width: DESIGN_W, height: DESIGN_H }}>
                         <Kiosk today={today} sec={sec} recs={recs} screen={screen} setScreen={setScreen} apply={apply} active={view === "kiosk"} />
                       </div>
@@ -438,12 +443,12 @@ function IdCard({ no, rec, disabled, onTag, compact }: { no: string; rec: Rec; d
 
 /* ---------------- 학부모 휴대폰 ---------------- */
 
-function ParentPhone({ today, nowMin, notes }: { today: Date; nowMin: number; notes: Note[] }) {
+function ParentPhone({ today, nowMin, notes, short }: { today: Date; nowMin: number; notes: Note[]; short?: boolean }) {
   const DOWF = ["일요일", "월요일", "화요일", "수요일", "목요일", "금요일", "토요일"];
   return (
     <div className="w-[232px]">
       <div className="rounded-[42px] bg-[#15181d] p-[9px] shadow-[0_18px_40px_-20px_rgba(20,35,64,0.6)]">
-        <div className="relative h-[500px] overflow-hidden rounded-[34px]">
+        <div className={`relative overflow-hidden rounded-[34px] ${short ? "h-[400px]" : "h-[500px]"}`}>
           <Photo src="/images/demo-academy/study.jpg" alt="" className="absolute inset-0 h-full w-full" pos="40% 50%" />
           <div className="absolute inset-0 bg-[#0b1220]/55" aria-hidden />
           <div className="relative flex h-full flex-col px-3 pt-3 text-white">
@@ -1293,6 +1298,99 @@ function AdminPanel({
         </AnimatePresence>
       </div>
     </section>
+  );
+}
+
+// 3D 원장실 책상 모니터용 관리자 화면(1280x720 고정, 보기 전용). 같은 출결 상태를 그대로 보여 준다
+function AdminMonitor({ today, sec, recs, lastChanged }: { today: Date; sec: number; recs: Record<string, Rec>; lastChanged: string | null }) {
+  const nowMin = Math.floor(sec / 60);
+  const count = (list: Student[]) => {
+    let inn = 0,
+      out = 0,
+      none = 0;
+    list.forEach((s) => {
+      const st = recs[s.no].status;
+      if (st === "in") inn++;
+      else if (st === "out") out++;
+      else none++;
+    });
+    return { inn, out, none };
+  };
+  const all = count(STUDENTS);
+  const half = Math.ceil(STUDENTS.length / 2);
+  const cols = [STUDENTS.slice(0, half), STUDENTS.slice(half)];
+  return (
+    <div className="flex flex-col bg-white text-[#142340]" style={{ width: 1280, height: 720 }}>
+      <div className="flex h-[96px] shrink-0 items-center justify-between bg-[#16294a] px-10 text-white">
+        <div>
+          <div className="text-[16px] text-[#c9d3e3]">영어 학원 출결 관리</div>
+          <div className="text-[34px] font-bold leading-tight">
+            오늘 출결 <span className="ml-3 text-[20px] font-medium tabular-nums text-[#c9d3e3]">{fmtKo(today)} {hm(nowMin)}:{p2(sec % 60)} 기준</span>
+          </div>
+        </div>
+        <div className="flex gap-3">
+          {(
+            [
+              ["등원", all.inn, "text-[#8ee0b8]"],
+              ["하원", all.out, "text-white"],
+              ["미등원", all.none, "text-[#f8c98f]"],
+            ] as const
+          ).map(([label, n, cls]) => (
+            <div key={label} className="w-[120px] rounded-[10px] border border-white/20 bg-white/10 px-4 py-2">
+              <div className="text-[15px] text-[#c9d3e3]">{label}</div>
+              <div className={`text-[32px] font-bold leading-tight tabular-nums ${cls}`}>{n}</div>
+            </div>
+          ))}
+        </div>
+      </div>
+      <div className="grid shrink-0 grid-cols-4 gap-3 px-10 pt-5">
+        {CLASSES.map((c) => {
+          const n = count(STUDENTS.filter((s) => s.cls === c.id));
+          return (
+            <div key={c.id} className="flex items-center gap-3 rounded-[12px] border border-[#dde2e9] px-4 py-3">
+              <Photo src={c.teacher.img} alt="" pos={c.teacher.pos} className="h-12 w-12 shrink-0 rounded-full" />
+              <div className="min-w-0">
+                <div className="text-[18px] font-bold leading-tight">{c.name}</div>
+                <div className="mt-1 text-[15px] tabular-nums text-[#4a5568]">
+                  등원 <b className="text-[#0a5c40]">{n.inn}</b> 하원 <b>{n.out}</b> 미등원 <b>{n.none}</b>
+                </div>
+              </div>
+            </div>
+          );
+        })}
+      </div>
+      <div className="grid min-h-0 flex-1 grid-cols-2 gap-6 px-10 pb-6 pt-5">
+        {cols.map((list, i) => (
+          <table key={i} className="w-full self-start text-left text-[19px]">
+            <thead className="text-[15px] text-[#5a6577]">
+              <tr className="border-b border-[#dde2e9]">
+                <th className="py-2 font-medium">이름</th>
+                <th className="py-2 font-medium">반</th>
+                <th className="py-2 font-medium">등원</th>
+                <th className="py-2 font-medium">하원</th>
+                <th className="py-2 font-medium">상태</th>
+              </tr>
+            </thead>
+            <tbody>
+              {list.map((s) => {
+                const r = recs[s.no];
+                return (
+                  <tr key={s.no} className={`border-b border-[#eef0f4] ${lastChanged === s.no ? "bg-[#eef8f2]" : ""}`}>
+                    <td className="py-[14px] font-bold">{s.name}</td>
+                    <td className="py-[14px] text-[#2b3a55]">{classOf(s.cls).name}</td>
+                    <td className="py-[14px] tabular-nums">{r.inAt != null ? hm(r.inAt) : "-"}</td>
+                    <td className="py-[14px] tabular-nums">{r.outAt != null ? hm(r.outAt) : "-"}</td>
+                    <td className="py-[14px]">
+                      <StatusChip chip={chipOf(r)} />
+                    </td>
+                  </tr>
+                );
+              })}
+            </tbody>
+          </table>
+        ))}
+      </div>
+    </div>
   );
 }
 
