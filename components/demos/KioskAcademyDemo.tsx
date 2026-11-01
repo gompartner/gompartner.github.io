@@ -240,7 +240,8 @@ export function KioskAcademyDemo({ threeD = false }: { threeD?: boolean }) {
     if (!threeD) return;
     const wide = window.matchMedia("(min-width: 768px)");
     const calm = window.matchMedia("(prefers-reduced-motion: reduce)");
-    const pick = () => setLayout(wide.matches && !calm.matches ? "3d" : "flat");
+    // 11-02 휴대폰에서도 3D(폭 제한 없음)
+    const pick = () => setLayout(!calm.matches ? "3d" : "flat");
     const f = requestAnimationFrame(pick);
     wide.addEventListener("change", pick);
     calm.addEventListener("change", pick);
@@ -321,7 +322,7 @@ export function KioskAcademyDemo({ threeD = false }: { threeD?: boolean }) {
                       zoomSignal={zoomSignal}
                       paused={view !== "kiosk"}
                       monitor={<AdminMonitor today={today} sec={sec} recs={recs} lastChanged={lastChanged} />}
-                      phone={<ParentPhone today={today} nowMin={nowMin} notes={ownerNotes.slice(0, 2)} short />} className="h-[min(74vh,780px)] min-h-[560px] w-full">
+                      phone={<ParentPhone today={today} nowMin={nowMin} notes={ownerNotes.slice(0, 2)} short />} className="h-[72svh] min-h-[460px] w-full md:h-[min(74vh,780px)] md:min-h-[560px]">
                       <div style={{ width: DESIGN_W, height: DESIGN_H }}>
                         <Kiosk today={today} sec={sec} recs={recs} screen={screen} setScreen={setScreen} apply={apply} active={view === "kiosk"} />
                       </div>

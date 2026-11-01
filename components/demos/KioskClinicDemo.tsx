@@ -208,7 +208,8 @@ export function KioskClinicDemo({ threeD = false }: { threeD?: boolean }) {
       mq.removeEventListener("change", on);
     };
   }, []);
-  const layout3d = threeD && mounted && wide && !prefersReduced;
+  // 11-02 휴대폰에서도 3D 체험(폭 제한 없음). wide는 휴대폰 장면 높이에만 쓴다
+  const layout3d = threeD && mounted && !prefersReduced;
 
   const [step, setStep] = useState<Step>("idle");
   const [visit, setVisit] = useState<Visit>("return");
@@ -1070,16 +1071,16 @@ export function KioskClinicDemo({ threeD = false }: { threeD?: boolean }) {
     // 3D 로비: 키오스크를 눌러 다가가면 같은 화면(state 하나)을 원근에 맞춰 겹쳐 쓴다.
     return (
       <div className="min-h-screen bg-[#E8E6E2]">
-        <div className="mx-auto grid w-full max-w-[1280px] grid-cols-2 items-start gap-5 px-6 pt-5 xl:grid-cols-[minmax(0,1fr)_340px]">
+        <div className="mx-auto grid w-full max-w-[1280px] grid-cols-1 items-start gap-4 px-4 pt-4 md:grid-cols-2 md:gap-5 md:px-6 md:pt-5 xl:grid-cols-[minmax(0,1fr)_340px]">
           <Zone
             step={1}
             role="환자"
             title="로비 접수 키오스크"
-            className="col-span-2 xl:col-span-1 xl:row-span-2"
+            className="md:col-span-2 xl:col-span-1 xl:row-span-2"
           >
             <KioskScene
               place="clinic"
-              className="h-[min(78vh,820px)] min-h-[600px] w-full"
+              className={wide ? "h-[min(78vh,820px)] min-h-[600px] w-full" : "h-[72svh] min-h-[460px] w-full"}
               // 이용 흐름 3단계(휴대폰 알림)에서 장면 옆에 띄우는 실제 휴대폰 대기 화면
               // 접수 중에는 이용 흐름 자동 넘김을 멈춘다
               paused={step !== "idle" && step !== "done"}
@@ -1144,7 +1145,7 @@ export function KioskClinicDemo({ threeD = false }: { threeD?: boolean }) {
             )}
           </Zone>
         </div>
-        <div className="mx-auto max-w-[1280px] px-6 pb-8">
+        <div className="mx-auto max-w-[1280px] px-4 pb-8 md:px-6">
           <DemoMakerInfo className="mt-6" />
         </div>
       </div>
