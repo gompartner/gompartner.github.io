@@ -22,6 +22,13 @@ export function KakaoChat() {
   return null;
 }
 
+// 카카오톡 버튼만 카카오 노랑. 자리마다 넘어온 클래스에서 바탕과 글자 색만 빼고 노랑 바탕, 검은 글자로 바꾼다(크기, 테두리, 그림자는 그대로)
+const COLOR_CLASS = /^(hover:)?bg-|^text-(white|accent-foreground|foreground)|^border-white/;
+function kakaoColors(className: string) {
+  const kept = className.split(/\s+/).filter((c) => c && !COLOR_CLASS.test(c));
+  return [...kept, "bg-[#FEE500]", "text-[#191919]", "hover:bg-[#F5D800]"].join(" ");
+}
+
 export function KakaoChatButton({
   className,
   children,
@@ -33,7 +40,7 @@ export function KakaoChatButton({
   message?: string;
 }) {
   return (
-    <a href={KAKAO_CHAT_URL} target="_blank" rel="noopener noreferrer" data-gtm-cta={cta} className={className}>
+    <a href={KAKAO_CHAT_URL} target="_blank" rel="noopener noreferrer" data-gtm-cta={cta} className={kakaoColors(className)}>
       {children}
     </a>
   );

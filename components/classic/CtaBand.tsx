@@ -18,7 +18,7 @@ export function CtaBand() {
             <PenLine size={18} aria-hidden />
             상담 신청
           </Link>
-          <KakaoChatButton cta="cta_band_chat" className="inline-flex h-12 items-center gap-2 rounded-md border border-white/50 px-6 text-[16px] font-bold text-white transition-colors hover:bg-white/10">
+          <KakaoChatButton cta="cta_band_chat" className="inline-flex h-12 items-center gap-2 rounded-md px-6 text-[16px] font-bold text-white transition-colors hover:bg-white/10">
             <MessageCircle size={18} aria-hidden />
             카카오톡 상담
           </KakaoChatButton>
