@@ -7,6 +7,7 @@ import { PageHead, btnPrimary, h2, h3, more, wrap } from "@/components/classic/u
 import { SampleGrid } from "@/components/classic/works/SampleGrid";
 import { demoProjects, findBySlug, groupOf, industryOf, isMaintenance, mobileShotOf, samplesIn, slugOf } from "@/components/classic/works/samples";
 import { estimateFor } from "@/data/classic/pricing";
+import { designConcepts } from "@/data/classic/designConcepts";
 import { maintenanceServices } from "@/data/classic/maintenance";
 import { pageMeta } from "@/lib/seo";
 
@@ -30,6 +31,7 @@ export default async function ClassicSamplePage({ params }: Props) {
   const p = findBySlug(slug);
   if (!p) notFound();
   const est = estimateFor(p.id);
+  const concept = designConcepts[slug];
   const mobileShot = mobileShotOf(p);
   const ind = industryOf(p);
   const grp = groupOf(p);
@@ -83,6 +85,45 @@ export default async function ClassicSamplePage({ params }: Props) {
             <span className="text-[#5b6370]">{p.layout}</span>
           </p>
           <p className="mt-4 break-keep text-[18px] leading-[1.75] md:text-[19px]">{p.description}</p>
+
+          {concept && (
+            <section aria-labelledby="c-concept" className="mt-12">
+              <h2 id="c-concept" className={`${h3} border-b-2 border-[#15171c] pb-3`}>
+                디자인 컨셉
+              </h2>
+              <dl className="text-[16px] md:text-[17px]">
+                <div className="grid grid-cols-[88px_1fr] items-start gap-4 border-b border-[#e6e9ee] py-4">
+                  <dt className="pt-1 text-[15px] font-bold text-[#5b6370]">키워드</dt>
+                  <dd className="flex flex-wrap gap-2">
+                    {concept.keywords.map((k) => (
+                      <span key={k} className="rounded-md border border-[#d9dee5] bg-white px-3 py-1 text-[15px] font-bold">
+                        {k}
+                      </span>
+                    ))}
+                  </dd>
+                </div>
+                <div className="grid grid-cols-[88px_1fr] items-start gap-4 border-b border-[#e6e9ee] py-4">
+                  <dt className="pt-1 text-[15px] font-bold text-[#5b6370]">컬러</dt>
+                  <dd className="grid gap-3 sm:grid-cols-3">
+                    {concept.colors.map((c) => (
+                      <span key={c.hex} className="flex items-center gap-3 sm:flex-col sm:items-start sm:gap-2">
+                        <span aria-hidden className="h-12 w-12 shrink-0 rounded-md border border-black/10 sm:h-16 sm:w-full" style={{ background: c.hex }} />
+                        <span className="min-w-0">
+                          <span className="block text-[13px] font-bold text-[#5b6370]">{c.role}</span>
+                          <span className="block text-[15px] font-bold">{c.name}</span>
+                          <span className="block text-[14px] tabular-nums text-[#5b6370]">{c.hex}</span>
+                        </span>
+                      </span>
+                    ))}
+                  </dd>
+                </div>
+                <div className="grid grid-cols-[88px_1fr] items-center gap-4 border-b border-[#e6e9ee] py-4">
+                  <dt className="text-[15px] font-bold text-[#5b6370]">글꼴</dt>
+                  <dd className="font-bold">{concept.font}</dd>
+                </div>
+              </dl>
+            </section>
+          )}
 
           <h2 className={`${h3} mt-12 border-b-2 border-[#15171c] pb-3`}>기능</h2>
           <ul role="list" className="sm:grid sm:grid-cols-2 sm:gap-x-8">
