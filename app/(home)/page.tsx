@@ -8,7 +8,7 @@ export const metadata: Metadata = {
   // 루트 템플릿(`%s | 곰파트너`)이 브랜드를 또 붙이지 않도록 absolute 사용
   title: { absolute: homeTitle },
   description: fitDescription(homeDescription),
-  alternates: { canonical: "/" },
+  alternates: { canonical: "/", languages: { ko: "/", en: "/en" } },
 };
 
 export default function HomePage() {

@@ -1,6 +1,6 @@
 import Image from "next/image";
 import Link from "next/link";
-import { Mail, Phone, Printer } from "lucide-react";
+import { Globe, Mail, Phone, Printer } from "lucide-react";
 import { ChannelIcon, type ChannelIconName } from "@/components/layout/Footer";
 import { profile } from "@/data/classic/profile";
 
@@ -114,9 +114,15 @@ export function ClassicFooter() {
       </div>
       <div className="border-t border-white/10">
         <div className="mx-auto flex w-full max-w-[1248px] flex-col gap-2 px-4 py-6 text-[14px] md:flex-row md:justify-between md:px-6">
-          <Link href="/classic/privacy" className="inline-flex min-h-11 items-center self-start font-bold text-white hover:underline">
-            개인정보처리방침
-          </Link>
+          <div className="flex flex-wrap items-center gap-x-5">
+            <Link href="/classic/privacy" className="inline-flex min-h-11 items-center self-start font-bold text-white hover:underline">
+              개인정보처리방침
+            </Link>
+            <Link href="/en" lang="en" hrefLang="en" className="inline-flex min-h-11 items-center gap-1.5 self-start hover:text-white hover:underline">
+              <Globe size={15} strokeWidth={2} aria-hidden />
+              English
+            </Link>
+          </div>
           <div className="md:text-right">
             <p>
               상호 {profile.name} | 사업자등록번호 {profile.bizNo}

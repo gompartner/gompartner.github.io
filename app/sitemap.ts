@@ -41,6 +41,7 @@ export default function sitemap(): MetadataRoute.Sitemap {
     { path: "/", priority: 1.0, files: ["app/(home)/page.tsx", "components/classic/ClassicHome.tsx", "data/seo.ts"] },
 
     { path: "/classic/homepage", priority: 0.9, files: ["app/classic/homepage/page.tsx"] },
+    { path: "/en", priority: 0.6, files: ["app/en/page.tsx"] },
     { path: "/classic/landing", priority: 0.8, files: ["app/classic/landing/page.tsx", "data/classic/pricing.ts"] },
     { path: "/classic/program", priority: 0.8, files: ["app/classic/program/page.tsx"] },
     { path: "/classic/app", priority: 0.8, files: ["app/classic/app/page.tsx", "data/classic/makeExtra.ts"] },
