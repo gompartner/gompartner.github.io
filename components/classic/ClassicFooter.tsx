@@ -1,5 +1,7 @@
 import Image from "next/image";
 import Link from "next/link";
+import { Mail, Phone, Printer } from "lucide-react";
+import { ChannelIcon, type ChannelIconName } from "@/components/layout/Footer";
 import { profile } from "@/data/classic/profile";
 
 // 클래식 보기 바닥글. 사업자 정보는 상호와 번호만 둔다(통신판매업 신고 전).
@@ -35,12 +37,16 @@ const groups = [
     ],
   },
 ];
-export const channels = [
-  { href: "https://blog.naver.com/gompartner", label: "네이버 블로그" },
-  { href: "https://www.youtube.com/@gompartner", label: "유튜브" },
-  { href: "https://www.instagram.com/gompartner.co.kr", label: "인스타그램" },
-  { href: "https://clip.naver.com/@gompartner", label: "네이버 클립" },
+// 11-03 채널은 아이콘, 이름, 계정명. 계정명이 보여야 앱에서 바로 찾는다
+export const channels: { href: string; label: string; handle: string; icon: ChannelIconName }[] = [
+  { href: "https://www.instagram.com/gompartner.co.kr", label: "인스타그램", handle: "@gompartner.co.kr", icon: "instagram" },
+  { href: "https://www.youtube.com/@gompartner", label: "유튜브", handle: "@gompartner", icon: "youtube" },
+  { href: "https://clip.naver.com/@gompartner", label: "네이버 클립", handle: "@gompartner", icon: "naverClip" },
+  { href: "https://blog.naver.com/gompartner", label: "네이버 블로그", handle: "gompartner", icon: "naverBlog" },
 ];
+
+const contactRow = "-my-1.5 inline-flex items-center gap-2 py-1.5";
+const contactIcon = "shrink-0 text-[#7d8594]";
 
 export function ClassicFooter() {
   return (
@@ -52,13 +58,22 @@ export function ClassicFooter() {
             {profile.name}
           </p>
           <p className="mt-4">
-            <a href={`tel:${profile.phone.replace(/-/g, "")}`} data-gtm-cta="classic_footer_tel" className="-my-1.5 inline-block py-1.5 hover:text-white">
+            <a href={`tel:${profile.phone.replace(/-/g, "")}`} data-gtm-cta="classic_footer_tel" className={`${contactRow} hover:text-white`}>
+              <Phone size={16} aria-hidden className={contactIcon} />
               전화 {profile.phone}
             </a>
           </p>
-          {profile.fax && <p className="mt-1">팩스 {profile.fax}</p>}
+          {profile.fax && (
+            <p className="mt-1">
+              <span className={contactRow}>
+                <Printer size={16} aria-hidden className={contactIcon} />
+                팩스 {profile.fax}
+              </span>
+            </p>
+          )}
           <p className="mt-1">
-            <a href={`mailto:${profile.email}`} data-gtm-cta="classic_footer_email" className="-my-1.5 inline-block py-1.5 hover:text-white">
+            <a href={`mailto:${profile.email}`} data-gtm-cta="classic_footer_email" className={`${contactRow} hover:text-white`}>
+              <Mail size={16} aria-hidden className={contactIcon} />
               이메일 {profile.email}
             </a>
           </p>
@@ -82,9 +97,15 @@ export function ClassicFooter() {
           <ul className="mt-4 grid gap-y-2.5" role="list">
             {channels.map((c) => (
               <li key={c.href}>
-                <a href={c.href} target="_blank" rel="noopener noreferrer" className="-my-1.5 inline-block py-1.5 hover:text-white">
-                  {c.label}
-                  <span className="sr-only"> (새 창)</span>
+                <a href={c.href} target="_blank" rel="noopener noreferrer" data-gtm-cta={`classic_footer_${c.icon}`} className="group -my-1.5 flex items-start gap-2 py-1.5 hover:text-white">
+                  <span className="mt-[2px]">
+                    <ChannelIcon name={c.icon} />
+                  </span>
+                  <span className="min-w-0">
+                    <span className="block">{c.label}</span>
+                    <span className="block whitespace-nowrap text-[14px] text-[#7d8594] group-hover:text-[#c9ced8]">{c.handle}</span>
+                    <span className="sr-only"> (새 창)</span>
+                  </span>
                 </a>
               </li>
             ))}

@@ -22,7 +22,10 @@ const channels = [
   { href: "https://clip.naver.com/@gompartner", label: "네이버 클립", cta: "footer_naver_clip", icon: "naverClip" },
 ] as const;
 
-function ChannelIcon({ name }: { name: (typeof channels)[number]["icon"] }) {
+// 클래식 바닥글(ClassicFooter)도 같은 아이콘을 쓴다
+export type ChannelIconName = "naverBlog" | "instagram" | "youtube" | "naverClip";
+
+export function ChannelIcon({ name }: { name: ChannelIconName }) {
   const box = "h-5 w-5 shrink-0";
   switch (name) {
     case "naverBlog":
