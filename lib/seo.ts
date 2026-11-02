@@ -6,7 +6,7 @@ import { siteUrl } from "@/lib/site";
 export const DESCRIPTION_MAX = 80;
 
 // 공유 미리보기 이미지. 루트 레이아웃과 페이지별 메타가 같이 쓴다.
-export const OG_IMAGE = { url: "/og-image.png?v=20261014", width: 1200, height: 630, alt: "곰파트너" };
+export const OG_IMAGE = { url: "/og-image.png?v=20261102", width: 1200, height: 630, alt: "곰파트너" };
 
 // 하위 페이지가 openGraph를 따로 정하지 않으면 홈 제목과 설명이 그대로 공유된다.
 // 페이지 제목과 설명으로 openGraph, twitter를 같이 채운다.
