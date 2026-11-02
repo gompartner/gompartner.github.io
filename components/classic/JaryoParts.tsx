@@ -1,5 +1,6 @@
 import Image from "next/image";
-import { ArrowUpRight, Download } from "lucide-react";
+import Link from "next/link";
+import { Download, FileText } from "lucide-react";
 import { pdfFor, type Jaryo } from "@/data/classic/jaryo";
 
 // 1쪽 앞, 2쪽 뒤로 겹친 실물 미리보기. 두 장 모두 틀 안에 다 들어오게 고정 크기로 놓는다
@@ -35,19 +36,20 @@ export function JaryoList({ it }: { it: Jaryo }) {
   );
 }
 
-export function JaryoButtons({ it }: { it: Jaryo }) {
+// view=false: 자료 한 장 페이지 안이라 '자료 보기' 없이 PDF 받기만
+export function JaryoButtons({ it, view = true }: { it: Jaryo; view?: boolean }) {
   return (
-    <div className="grid grid-cols-2 gap-2">
-      <a
-        href={it.notion}
-        target="_blank"
-        rel="noopener"
-        data-gtm-cta={`jaryo_view_${it.id}`}
-        className="inline-flex h-12 items-center justify-center gap-1 rounded-md bg-[#256ef4] px-3 text-[16px] font-bold text-white transition-colors hover:bg-[#0b50d0]"
-      >
-        자료 보기
-        <ArrowUpRight size={18} aria-hidden />
-      </a>
+    <div className={view ? "grid grid-cols-2 gap-2" : "grid gap-2 sm:max-w-[280px]"}>
+      {view && (
+        <Link
+          href={`/classic/jaryo/${it.id}`}
+          data-gtm-cta={`jaryo_view_${it.id}`}
+          className="inline-flex h-12 items-center justify-center gap-1.5 rounded-md bg-[#256ef4] px-3 text-[16px] font-bold text-white transition-colors hover:bg-[#0b50d0]"
+        >
+          <FileText size={18} aria-hidden />
+          자료 보기
+        </Link>
+      )}
       <a
         href={pdfFor(it.id)}
         download

@@ -6,7 +6,7 @@ import { jaryo } from "@/data/classic/jaryo";
 import { pageMeta } from "@/lib/seo";
 
 // 11-03 인스타 '자료' 댓글 DM으로 들어오는 페이지(짧은 주소 /go/jaryo/ 가 여기로 넘긴다).
-// 메뉴, sitemap, 검색에서 뺀다. 자료 한 장짜리는 /classic/jaryo/<id>
+// 메뉴, sitemap, 검색에서 뺀다. 자료 한 장짜리는 /classic/jaryo/<id>(1쪽, 2쪽 그림과 PDF)
 export const metadata: Metadata = {
   ...pageMeta({
     title: "무료 자료",

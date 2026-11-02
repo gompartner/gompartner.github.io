@@ -11,7 +11,7 @@ const CONTACT = "/classic/contact";
 const CARE = "/classic/maintenance";
 const FIX = "/classic/maintenance/fix";
 const UPDATE = "/classic/maintenance/update";
-const ESTIMATE = "https://gompartner.notion.site/40cb66b1a946814b851ae4702f64bfe3"; // 노션 견적 질문지
+const ESTIMATE = "/classic/jaryo/estimate";
 
 const tools = {
   "": CARE,
@@ -61,7 +61,7 @@ const page = (to) => `<!doctype html>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>곰파트너</title>
-<link rel="canonical" href="${to.startsWith("http") ? to : SITE + to}">
+<link rel="canonical" href="${SITE}${to}">
 <meta http-equiv="refresh" content="0; url=${to}">
 <script>location.replace(${JSON.stringify(to)}+location.hash);</script>
 <style>body{margin:0;min-height:100vh;display:flex;align-items:center;justify-content:center;background:#0F1B3D;color:#fff;font:16px/1.6 -apple-system,BlinkMacSystemFont,"Apple SD Gothic Neo","Noto Sans KR",sans-serif;text-align:center;padding:0 16px}a{color:#fff}</style>

@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 import { notFound } from "next/navigation";
+import Image from "next/image";
 import { ArrowRight } from "lucide-react";
 import { JaryoButtons, JaryoList, JaryoPreview } from "@/components/classic/JaryoParts";
 import { PageHead, wrap } from "@/components/classic/ui";
@@ -8,6 +9,7 @@ import { jaryo } from "@/data/classic/jaryo";
 import { pageMeta } from "@/lib/seo";
 
 // 자료 한 장. 인스타 댓글 단어(견적, 점검, AI)로 DM을 받은 사람이 /go/jaryo/<id>/ 를 거쳐 들어온다. 검색에서 뺀다
+// 자료 본문은 1쪽, 2쪽 그림으로 이 페이지에서 바로 보여 준다(11-03 노션 쓰지 않기로)
 export function generateStaticParams() {
   return jaryo.map((j) => ({ id: j.id }));
 }
@@ -58,10 +60,26 @@ export default async function ClassicJaryoItemPage({ params }: { params: Promise
                 <JaryoList it={it} />
               </div>
               <div className="mt-8">
-                <JaryoButtons it={it} />
+                <JaryoButtons it={it} view={false} />
               </div>
             </div>
           </div>
+
+          <h2 className="mt-14 text-[22px] font-[800] tracking-[-0.04em] md:text-[26px]">자료 보기</h2>
+          <ol className="mt-5 grid gap-6 lg:grid-cols-2" role="list">
+            {[1, 2].map((n) => (
+              <li key={n}>
+                <p className="mb-2 text-[15px] font-bold text-[#5b6370]">{n}쪽</p>
+                <Image
+                  src={`/images/jaryo/${it.id}-${n}-full.jpg`}
+                  alt={`${it.title} ${n}쪽`}
+                  width={1240}
+                  height={1754}
+                  className="block h-auto w-full rounded-md border border-[#d9dee5] bg-white shadow-[0_6px_20px_rgba(15,27,61,0.08)]"
+                />
+              </li>
+            ))}
+          </ol>
 
           <h2 className="mt-14 text-[22px] font-[800] tracking-[-0.04em] md:text-[26px]">다른 자료</h2>
           <ul className="mt-5 grid gap-4 md:grid-cols-2" role="list">
