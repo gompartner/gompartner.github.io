@@ -40,6 +40,7 @@ import {
   VolumeOff,
 } from "lucide-react";
 import dynamic from "next/dynamic";
+import { SceneLoading } from "@/components/demos/kiosk3d/SceneLoading";
 import { QrCode as QrIcon } from "lucide-react";
 import QRCode from "qrcode";
 import { DemoMakerInfo } from "@/components/demos/DemoMakerInfo";
@@ -47,8 +48,7 @@ import { daysAgo, fmtDot, fmtKo, useDemoToday } from "@/hooks/useDemoToday";
 
 const KioskScene = dynamic(
   () =>
-    import("@/components/demos/kiosk3d/KioskScene").then((m) => m.KioskScene),
-  { ssr: false },
+    import("@/components/demos/kiosk3d/KioskScene").then((m) => m.KioskScene), { ssr: false, loading: () => <SceneLoading bg="#e9e6e0" className="h-[72svh] min-h-[460px] w-full md:h-[min(78vh,820px)] md:min-h-[600px]" /> },
 );
 
 const u = (n: number) => `calc(var(--u) * ${n})`;
@@ -1154,7 +1154,7 @@ export function KioskClinicDemo({ threeD = false }: { threeD?: boolean }) {
 
   return (
     <div
-      className={`min-h-screen bg-[#E8E6E2] ${mounted || !threeD ? "" : "md:opacity-0"}`}
+      className={`min-h-screen bg-[#E8E6E2] ${mounted || !threeD ? "" : "opacity-0"}`}
     >
       {/* 1 접수 키오스크, 2 대기실 호출 화면, 3 휴대폰 대기 순서: 흐름 순서대로 구역을 나눈다 */}
       <div className="mx-auto flex w-full max-w-[1240px] flex-col gap-4 px-4 pt-4 md:grid md:grid-cols-[auto_minmax(0,1fr)] md:items-start md:gap-5 md:px-6 md:pt-5 xl:grid-cols-[auto_minmax(0,1fr)_290px]">

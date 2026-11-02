@@ -23,6 +23,7 @@ import {
   X,
 } from "lucide-react";
 import dynamic from "next/dynamic";
+import { SceneLoading } from "@/components/demos/kiosk3d/SceneLoading";
 import { DemoMakerInfo } from "@/components/demos/DemoMakerInfo";
 import { fmtKo, useDemoToday } from "@/hooks/useDemoToday";
 
@@ -33,7 +34,7 @@ import { fmtKo, useDemoToday } from "@/hooks/useDemoToday";
 // 휴대폰 폭과 모션 줄이기는 평면 키오스크. 키오스크 화면 상태는 이 페이지 하나에만 둔다.
 
 // 학원 입구 3D 공간(공용 장면). 브라우저에서만 그린다
-const KioskScene = dynamic(() => import("@/components/demos/kiosk3d/KioskScene").then((m) => m.KioskScene), { ssr: false });
+const KioskScene = dynamic(() => import("@/components/demos/kiosk3d/KioskScene").then((m) => m.KioskScene), { ssr: false, loading: () => <SceneLoading bg="#e8ecf1" className="h-[72svh] min-h-[460px] w-full md:h-[min(74vh,780px)] md:min-h-[560px]" /> });
 
 const DESIGN_W = 450;
 const DESIGN_H = 800;

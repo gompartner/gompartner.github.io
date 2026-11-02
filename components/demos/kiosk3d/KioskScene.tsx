@@ -367,6 +367,7 @@ function Figure({ look, path, at, facing, sit, seat, seatBack, phone, hidden, re
 
 /* eslint-enable react-hooks/immutability */
 
+const CTRL_ICON = "flex h-11 w-11 items-center justify-center rounded-full bg-white/95 text-[#15171c] shadow-[0_6px_16px_rgba(0,0,0,.15)] hover:bg-white";
 const CTRL = "flex items-center gap-1.5 rounded-full bg-white/95 px-3.5 py-2 text-[13px] font-bold text-[#15171c] shadow-[0_6px_16px_rgba(0,0,0,.15)] hover:bg-white";
 
 /** 끌어서 옮길 때 보는 점이 방 밖으로 나가지 않게 묶는다(카메라도 같은 만큼 옮겨 회전 각도는 그대로) */
@@ -509,6 +510,8 @@ export function KioskScene({ place, children, tv, phone, monitor, className = ""
   const resume = useRef(0);
   const [hint, setHint] = useState(true);
   const [touch, setTouch] = useState(false);
+  // 11-02 휴대폰 폭: 단계 막대는 번호만, 장면 설명표와 조작 안내는 숨기고 버튼은 아이콘만
+  const [narrow, setNarrow] = useState(false);
   const [resetKey, setResetKey] = useState(0);
   const { active: loadingNow, progress } = useProgress();
   const [ready, setReady] = useState(false);
@@ -571,16 +574,25 @@ export function KioskScene({ place, children, tv, phone, monitor, className = ""
       setReduced(window.matchMedia("(prefers-reduced-motion: reduce)").matches);
       setTouch(window.matchMedia("(pointer: coarse)").matches);
     });
-    return () => cancelAnimationFrame(f);
+    const mq = window.matchMedia("(max-width: 639px)");
+    const f2 = requestAnimationFrame(() => setNarrow(mq.matches));
+    const on = (e: MediaQueryListEvent) => setNarrow(e.matches);
+    mq.addEventListener("change", on);
+    return () => {
+      cancelAnimationFrame(f);
+      cancelAnimationFrame(f2);
+      mq.removeEventListener("change", on);
+    };
   }, []);
   // 모델, 텍스처, HDRI를 다 불러오면 준비 완료. 그때부터 자동 넘김을 시작한다(모션 줄이기면 시작하지 않음)
   useEffect(() => {
     if (ready || loadingNow || progress < 100) return;
-    const f = requestAnimationFrame(() => {
+    // 다 불러온 뒤에도 첫 그리기(셰이더, 텍스처 올리기)와 화면 맞추기가 끝나도록 0.7초 더 덮어 둔다
+    const t = window.setTimeout(() => {
       setReady(true);
       if (!window.matchMedia("(prefers-reduced-motion: reduce)").matches && steps.length) setAuto(true);
-    });
-    return () => cancelAnimationFrame(f);
+    }, 700);
+    return () => window.clearTimeout(t);
   }, [ready, loadingNow, progress, steps.length]);
   useEffect(() => {
     if (step === null && !zoom) return;
@@ -613,8 +625,8 @@ export function KioskScene({ place, children, tv, phone, monitor, className = ""
   const cur = step !== null ? steps[step] : null;
   const labels: Label[] = [
     ...steps.map((s, i): Label => ({ key: `pin-${i + 1}`, at: [config.path[s.at][0], 0.05, config.path[s.at][2]], kind: "pin", text: `${i + 1}단계 ${s.label}`, show: !zoom && step === null, onClick: () => pick(i) })),
-    ...config.callouts.map((c): Label => ({ key: `c-${c.text}`, at: c.at, kind: "callout", text: c.text, on: !!c.step, show: !zoom && (cur ? c.step === cur.id : !c.step) })),
-    ...(config.dimensions ?? []).map((d): Label => ({ key: `d-${d.text}`, at: [(d.from[0] + d.to[0]) / 2, 0.05, (d.from[2] + d.to[2]) / 2], kind: "dim", text: d.text, show: !zoom && (cur ? d.step === cur.id : !d.step) })),
+    ...config.callouts.map((c): Label => ({ key: `c-${c.text}`, at: c.at, kind: "callout", text: c.text, on: !!c.step, show: !narrow && !zoom && (cur ? c.step === cur.id : !c.step) })),
+    ...(config.dimensions ?? []).map((d): Label => ({ key: `d-${d.text}`, at: [(d.from[0] + d.to[0]) / 2, 0.05, (d.from[2] + d.to[2]) / 2], kind: "dim", text: d.text, show: !narrow && !zoom && (cur ? d.step === cur.id : !d.step) })),
   ];
   const shot: CameraShot = zoom ? kioskShot : cur && cur.camera !== "kiosk" ? cur.camera : config.view;
   // 끌기, 휠, 두 손가락으로 장면을 만지면 자동 넘김을 멈추고 조작 안내를 접는다
@@ -780,26 +792,32 @@ export function KioskScene({ place, children, tv, phone, monitor, className = ""
         </div>
       ) : null}
 
-      {steps.length && !zoom ? (
+      {ready && steps.length && !zoom ? (
         <nav aria-label="이용 흐름" className="absolute left-1/2 top-3 z-[40] flex w-[calc(100%-24px)] max-w-[860px] -translate-x-1/2 items-stretch gap-1 rounded-2xl bg-white/95 p-1 shadow-[0_6px_18px_rgba(20,30,40,.14)]">
-          <ol className="flex min-w-0 flex-1 items-stretch gap-1">
+          <ol className={`flex items-stretch gap-1 ${narrow ? "shrink-0" : "min-w-0 flex-1"}`}>
             {steps.map((s, i) => {
               const on = step === i;
               return (
-                <li key={s.id} className="min-w-0 flex-1">
+                <li key={s.id} className={narrow ? "shrink-0" : "min-w-0 flex-1"}>
                   <button
                     type="button"
                     onClick={() => pick(i)}
                     aria-current={on ? "step" : undefined}
-                    className={`flex h-full w-full items-center gap-2 rounded-xl px-2.5 py-2 text-left text-[13px] font-bold leading-tight transition-colors ${on ? "bg-(--acc) text-white" : "text-[#33414a] hover:bg-[#eef3f3]"}`}
+                    aria-label={narrow ? `${i + 1}단계 ${s.label}` : undefined}
+                    className={`flex h-full w-full items-center gap-2 rounded-xl text-left text-[13px] font-bold leading-tight transition-colors ${narrow ? "px-1.5 py-1.5" : "px-2.5 py-2"} ${on ? "bg-(--acc) text-white" : "text-[#33414a] hover:bg-[#eef3f3]"}`}
                   >
                     <span className={`flex h-5 w-5 shrink-0 items-center justify-center rounded-full text-[11px] ${on ? "bg-white text-(--acc)" : "bg-(--acc)/10 text-(--acc)"}`}>{i + 1}</span>
-                    <span className="min-w-0 break-keep">{s.label}</span>
+                    {narrow ? null : <span className="min-w-0 break-keep">{s.label}</span>}
                   </button>
                 </li>
               );
             })}
           </ol>
+          {narrow ? (
+            <p aria-hidden className="flex min-w-0 flex-1 items-center truncate px-1.5 text-[13px] font-bold text-[#33414a]">
+              <span className="truncate">{cur ? cur.label : "이용 흐름"}</span>
+            </p>
+          ) : null}
           <button
             type="button"
             data-autoplay
@@ -830,9 +848,9 @@ export function KioskScene({ place, children, tv, phone, monitor, className = ""
         </nav>
       ) : null}
 
-      {cur?.card === "phone" && phone && !zoom ? <div className="absolute bottom-16 right-4 z-[35] w-[236px]">{phone}</div> : null}
+      {cur?.card === "phone" && phone && !zoom && !narrow ? <div className="absolute bottom-16 right-4 z-[35] w-[236px]">{phone}</div> : null}
 
-      {!active && (
+      {ready && !active && (
         <button type="button" onClick={open} className="absolute bottom-4 right-4 z-[40] rounded-full bg-[#15171c] px-5 py-2.5 text-[14px] font-bold text-white shadow-[0_8px_20px_rgba(0,0,0,.25)]">
           키오스크 사용해 보기
         </button>
@@ -844,20 +862,20 @@ export function KioskScene({ place, children, tv, phone, monitor, className = ""
         </button>
       ) : null}
       {/* 아래 왼쪽 보기 조작 막대: 정면 보기, 전체 보기(단계 화면이나 키오스크 앞에서만), 조작 안내(처음 만지면 접힘) */}
-      <div className="absolute bottom-4 left-4 z-[40] flex items-center gap-2">
+      <div className={`absolute bottom-4 left-4 z-[40] flex items-center gap-2 ${ready ? "" : "hidden"}`}>
         {!zoom ? (
-          <button type="button" onClick={resetView} className={CTRL} aria-label="정면 보기">
-            <RotateCcw size={15} aria-hidden />
-            정면 보기
+          <button type="button" onClick={resetView} className={narrow ? CTRL_ICON : CTRL} aria-label="정면 보기">
+            <RotateCcw size={narrow ? 18 : 15} aria-hidden />
+            {narrow ? null : "정면 보기"}
           </button>
         ) : null}
         {zoom || step !== null ? (
-          <button type="button" onClick={leave} className={CTRL} aria-label="전체 보기" aria-keyshortcuts="Escape">
-            <Maximize2 size={15} aria-hidden />
-            전체 보기
+          <button type="button" onClick={leave} className={narrow ? CTRL_ICON : CTRL} aria-label="전체 보기" aria-keyshortcuts="Escape">
+            <Maximize2 size={narrow ? 18 : 15} aria-hidden />
+            {narrow ? null : "전체 보기"}
           </button>
         ) : null}
-        {hint && !zoom ? (
+        {hint && !zoom && !narrow ? (
           <p className="pointer-events-none flex items-center gap-1.5 rounded-full bg-white/80 px-3 py-2 text-[12px] font-bold text-[#3d4450]">
             {touch ? (
               <>
