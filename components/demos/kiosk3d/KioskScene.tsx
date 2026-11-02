@@ -824,6 +824,9 @@ export function KioskScene({ place, children, tv, phone, monitor, className = ""
           <ol className={`flex items-stretch ${narrow ? "shrink-0 gap-0" : "min-w-0 flex-1 gap-1"}`}>
             {steps.map((s, i) => {
               const on = step === i;
+              const done = step !== null && i < step;
+              // 11-02 고른 칸 강조 대신 진행 막대처럼 색을 채운다: 지난 단계는 가득, 지금 단계는 다음 장면까지 왼쪽부터 차오른다
+              const fill = narrow ? "none" : done ? "full" : on ? (auto && timer ? "grow" : "full") : "none";
               return (
                 <li key={s.id} className={narrow ? "shrink-0" : "min-w-0 flex-1"}>
                   <button
@@ -831,25 +834,31 @@ export function KioskScene({ place, children, tv, phone, monitor, className = ""
                     onClick={() => pick(i)}
                     aria-current={on ? "step" : undefined}
                     aria-label={narrow ? `${i + 1}단계 ${s.label}` : undefined}
-                    className={`flex h-full w-full items-center gap-2 rounded-xl text-left text-[13px] font-bold leading-tight transition-colors ${narrow ? "px-1 py-1.5" : "px-2.5 py-2"} ${on ? "bg-(--acc) text-white" : "text-[#33414a] hover:bg-[#eef3f3]"}`}
+                    className={`relative flex h-full w-full items-center gap-2 overflow-hidden rounded-xl text-left leading-tight transition-colors ${narrow ? "px-1 py-1.5" : "px-2.5 py-2"} ${fill === "none" && !on && !done ? "hover:bg-[#eef3f3]" : ""}`}
                   >
-                    <span className={`flex h-5 w-5 shrink-0 items-center justify-center rounded-full text-[11px] ${on ? "bg-white text-(--acc)" : "bg-(--acc)/10 text-(--acc)"}`}>{i + 1}</span>
-                    {narrow ? null : <span className="min-w-0 break-keep">{s.label}</span>}
+                    {fill !== "none" ? (
+                      <span
+                        key={fill === "grow" ? `g-${timer?.at}` : "f"}
+                        aria-hidden
+                        className={`pointer-events-none absolute inset-0 origin-left ${done ? "bg-(--acc)/12" : "bg-(--acc)/22"}`}
+                        style={fill === "grow" && timer ? { animation: `kiosk-next ${timer.ms}ms linear forwards` } : undefined}
+                      />
+                    ) : null}
+                    <span className={`relative flex h-5 w-5 shrink-0 items-center justify-center rounded-full text-[11px] font-bold ${on || done ? "bg-(--acc) text-white" : "border border-[#c9d1d6] text-[#7a858d]"}`}>{i + 1}</span>
+                    {narrow ? null : (
+                      <span className={`relative min-w-0 break-keep ${on ? "text-[14px] font-extrabold tracking-[-0.02em] text-[#0f1d24]" : done ? "text-[13px] font-semibold text-[#33414a]" : "text-[13px] font-medium text-[#7a858d]"}`}>{s.label}</span>
+                    )}
                   </button>
                 </li>
               );
             })}
           </ol>
           {narrow ? (
-            <p aria-hidden className="flex min-w-0 flex-1 items-center px-1.5 text-[12px] font-bold leading-tight text-[#33414a]">
+            <p aria-hidden className="flex min-w-0 flex-1 items-center px-1.5 text-[13px] font-extrabold leading-tight tracking-[-0.02em] text-[#0f1d24]">
               <span className="line-clamp-2 break-keep">{cur ? cur.label : "이용 흐름"}</span>
             </p>
           ) : null}
           {auto && timer ? <Countdown key={timer.at} timer={timer} className="self-center px-1 text-[12px] font-bold text-[#5b6670]" /> : null}
-          {/* 막대 아래쪽 가는 줄이 다음 장면까지 차오른다 */}
-          {auto && timer ? (
-            <span key={`bar-${timer.at}`} aria-hidden className="pointer-events-none absolute inset-x-3 bottom-0 h-[3px] origin-left rounded-full bg-(--acc)/70 motion-reduce:hidden" style={{ animation: `kiosk-next ${timer.ms}ms linear forwards` }} />
-          ) : null}
           <button
             type="button"
             data-autoplay
