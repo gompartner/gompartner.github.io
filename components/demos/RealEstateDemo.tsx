@@ -541,7 +541,7 @@ function SearchPage({
   return (
     <>
       <section aria-labelledby="realty-page-title" className="relative isolate border-b px-4 pb-5 pt-10 md:px-6 md:pb-10 md:pt-20" style={{ background: C.ink, borderColor: C.line }}>
-        <Image src={`${IMG}/hero.jpg`} alt="" fill priority sizes="100vw" className="-z-10 object-cover" />
+        <Image src={`${IMG}/hero.jpg`} alt="가을 아파트 단지 전경" fill priority sizes="100vw" className="-z-10 object-cover" />
         <div className="absolute inset-0 -z-10" style={{ background: "rgba(20,22,25,0.55)" }} aria-hidden />
         <div className="mx-auto max-w-[1200px]">
           <div className="flex flex-wrap items-baseline justify-between gap-x-4 gap-y-1 text-white">
@@ -752,7 +752,7 @@ function ListingCard({ l, selected, onPick }: { l: Listing; selected: boolean; o
       >
         <span className="block aspect-[4/3] overflow-hidden" style={{ background: C.gray }}>
           {/* eslint-disable-next-line @next/next/no-img-element -- 정적 export 라 next/image 최적화를 쓰지 않는다 */}
-          <img src={`${IMG}/listing-${l.id}.jpg`} alt="" loading="lazy" className="h-full w-full object-cover" />
+          <img src={`${IMG}/listing-${l.id}.jpg`} alt={`${l.name} ${l.floor}층 매물 사진`} loading="lazy" className="h-full w-full object-cover" />
         </span>
         <span className="block p-4">
           <span className="flex flex-wrap items-center gap-1.5">

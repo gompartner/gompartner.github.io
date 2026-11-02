@@ -386,17 +386,17 @@ function Hero() {
                           <span className="h-2 w-2 rounded-full bg-[#c5cbd4]" />
                           <span className="h-2 w-2 rounded-full bg-[#c5cbd4]" />
                         </div>
-                        <Image src={`/images/demos/${makeShot}.jpg`} alt="" width={1440} height={900} priority={i === 0} sizes="(min-width: 768px) 640px, 92vw" className="aspect-[16/10] h-auto w-full object-cover object-top" />
+                        <Image src={`/images/demos/${makeShot}.jpg`} alt={`${sl.title} PC 화면`} width={1440} height={900} priority={i === 0} sizes="(min-width: 768px) 640px, 92vw" className="aspect-[16/10] h-auto w-full object-cover object-top" />
                       </div>
                       <div className="absolute -bottom-4 -right-2 w-[24%] overflow-hidden rounded-[14px] border-[4px] border-[#15171c] bg-white shadow-[0_20px_40px_rgba(0,0,0,.45)] md:-right-6">
-                        <Image src={`/images/demos/m/${makeShot}.jpg`} alt="" width={390} height={736} sizes="160px" className="aspect-[9/17] w-full object-cover object-top" />
+                        <Image src={`/images/demos/m/${makeShot}.jpg`} alt={`${sl.title} 휴대폰 화면`} width={390} height={736} sizes="160px" className="aspect-[9/17] w-full object-cover object-top" />
                       </div>
                     </div>
                   ) : (
                   // 11-01 유지보수 슬라이드: 문서 그림 대신 작업 장면 사진
                   <Image
                     src={`/images/site/scene-${sl.key}.jpg`}
-                    alt=""
+                    alt={`${sl.title} 작업 장면`}
                     width={1344}
                     height={768}
                     priority={i === 0}
@@ -590,7 +590,7 @@ function Catalog() {
           {picks.map((p) => (
             <li key={p.id}>
               <Link href={`/classic/sample/${p.demoUrl.replace("/demo/", "")}`} className="group block overflow-hidden rounded-md border border-[#d9dee5] bg-white transition-colors hover:border-[#256ef4]">
-                <Image src={`/images/demos/sm/${p.demoUrl.replace("/demo/", "")}.jpg`} alt="" width={720} height={450} sizes="(min-width: 768px) 400px, 50vw" className="aspect-[16/10] w-full object-cover object-top" />
+                <Image src={`/images/demos/sm/${p.demoUrl.replace("/demo/", "")}.jpg`} alt={`${p.title} 카탈로그 화면`} width={720} height={450} sizes="(min-width: 768px) 400px, 50vw" className="aspect-[16/10] w-full object-cover object-top" />
                 <span className="block px-4 py-3 md:px-5 md:py-4">
                   <span className="block text-[13px] font-bold text-[#5b6370] md:text-[14px]">{p.category}</span>
                   <span className="mt-0.5 block text-[16px] font-[800] tracking-[-0.03em] group-hover:text-[#256ef4] md:text-[18px]">{p.title}</span>

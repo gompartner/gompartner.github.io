@@ -195,14 +195,14 @@ export function ContactForm() {
           <label htmlFor="cc-name" className={label}>
             이름
           </label>
-          <input id="cc-name" aria-required="true" value={name} onChange={(e) => setName(e.target.value)} autoComplete="name" placeholder="김ㅎ늘" className={field} aria-invalid={!!errors.name} aria-describedby={errors.name ? "cc-name-err" : undefined} />
+          <input id="cc-name" aria-required="true" value={name} onChange={(e) => setName(e.target.value)} autoComplete="name" placeholder={profile.name} className={field} aria-invalid={!!errors.name} aria-describedby={errors.name ? "cc-name-err" : undefined} />
           {errors.name && <p id="cc-name-err" className={err}>{errors.name}</p>}
         </div>
         <div className="min-w-0">
           <label htmlFor="cc-phone" className={label}>
             휴대폰
           </label>
-          <input id="cc-phone" aria-required="true" value={phone} onChange={(e) => setPhone(e.target.value)} inputMode="tel" autoComplete="tel" placeholder="010-0000-0000" className={field} aria-invalid={!!errors.phone} aria-describedby={errors.phone ? "cc-phone-err" : undefined} />
+          <input id="cc-phone" aria-required="true" value={phone} onChange={(e) => setPhone(e.target.value)} inputMode="tel" autoComplete="tel" placeholder={profile.phone} className={field} aria-invalid={!!errors.phone} aria-describedby={errors.phone ? "cc-phone-err" : undefined} />
           {errors.phone && <p id="cc-phone-err" className={err}>{errors.phone}</p>}
         </div>
       </div>
@@ -211,7 +211,7 @@ export function ContactForm() {
         <label htmlFor="cc-email" className={label}>
           이메일 <span className={opt}>(선택)</span>
         </label>
-        <input id="cc-email" type="email" value={email} onChange={(e) => setEmail(e.target.value)} autoComplete="email" placeholder="name@example.com" className={field} aria-invalid={!!errors.email} aria-describedby={errors.email ? "cc-email-err" : undefined} />
+        <input id="cc-email" type="email" value={email} onChange={(e) => setEmail(e.target.value)} autoComplete="email" placeholder={profile.email} className={field} aria-invalid={!!errors.email} aria-describedby={errors.email ? "cc-email-err" : undefined} />
         {errors.email && <p id="cc-email-err" className={err}>{errors.email}</p>}
       </div>
 
@@ -219,7 +219,7 @@ export function ContactForm() {
         <label htmlFor="cc-business" className={label}>
           회사 또는 상호 <span className={opt}>(업종)</span>
         </label>
-        <input id="cc-business" aria-required="true" value={business} onChange={(e) => setBusiness(e.target.value)} autoComplete="organization" placeholder="예: 하늘정밀 (정밀가공 제조)" className={field} aria-invalid={!!errors.business} aria-describedby={errors.business ? "cc-business-err" : undefined} />
+        <input id="cc-business" aria-required="true" value={business} onChange={(e) => setBusiness(e.target.value)} autoComplete="organization" placeholder="홈페이지 제작" className={field} aria-invalid={!!errors.business} aria-describedby={errors.business ? "cc-business-err" : undefined} />
         {errors.business && <p id="cc-business-err" className={err}>{errors.business}</p>}
       </div>
 
@@ -248,7 +248,7 @@ export function ContactForm() {
           <label htmlFor="cc-site" className={label}>
             기존 홈페이지 주소 <span className={opt}>(선택)</span>
           </label>
-          <input id="cc-site" value={currentSite} onChange={(e) => setCurrentSite(e.target.value)} inputMode="url" autoComplete="url" placeholder="예: www.hanulcoffee.co.kr" className={field} />
+          <input id="cc-site" value={currentSite} onChange={(e) => setCurrentSite(e.target.value)} inputMode="url" autoComplete="url" placeholder="www.gompartner.co.kr" className={field} />
         </div>
       </div>
 

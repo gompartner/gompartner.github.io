@@ -601,7 +601,7 @@ function Home() {
   return (
     <>
       <section aria-labelledby="cl-page-title" className="relative overflow-hidden" style={{ background: C.indigoDeep, color: C.white }}>
-        <Image src={`${IMG}/hero.jpg`} alt="" fill priority sizes="100vw" className="object-cover" />
+        <Image src={`${IMG}/hero.jpg`} alt="전자파 시험실 내부" fill priority sizes="100vw" className="object-cover" />
         <div className="absolute inset-0" style={{ background: "linear-gradient(90deg, rgba(24,33,90,0.9) 0%, rgba(24,33,90,0.7) 55%, rgba(24,33,90,0.4) 100%)" }} aria-hidden />
         <div className="relative mx-auto max-w-[1200px] px-4 pb-14 pt-14 md:px-6 md:pb-20 md:pt-24">
           <h1 id="cl-page-title" tabIndex={-1} className="text-[30px] font-bold leading-[1.25] tracking-[-0.03em] outline-none md:text-[46px]">
@@ -683,7 +683,7 @@ function Home() {
                 className="relative flex h-[120px] w-full flex-col justify-end overflow-hidden rounded-[10px] border p-4 text-left md:h-[150px] md:p-5"
                 style={{ borderColor: C.indigoDeep, color: C.white, background: C.indigoDeep }}
               >
-                <Image src={b.img} alt="" fill sizes="(min-width: 1024px) 25vw, 50vw" className="object-cover" style={{ objectPosition: b.pos }} />
+                <Image src={b.img} alt={`${b.title} 안내 사진`} fill sizes="(min-width: 1024px) 25vw, 50vw" className="object-cover" style={{ objectPosition: b.pos }} />
                 <span className="absolute inset-0" style={{ background: "linear-gradient(180deg, rgba(24,33,90,0.25) 0%, rgba(24,33,90,0.88) 100%)" }} aria-hidden />
                 <span className="relative flex items-center gap-1 text-[17px] font-bold md:text-[19px]">
                   {b.title}

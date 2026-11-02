@@ -192,7 +192,7 @@ export function LaborFirmDemo() {
         <SectionTitle id="lf-people-title" icon={<Scale size={24} aria-hidden />} title="노무사 소개" />
         <ul className="mt-6 grid gap-4 md:grid-cols-2">
           {[
-            { name: "김ㅎ늘", role: "대표 공인노무사", areas: "부당해고, 직장 내 괴롭힘, 징계 자문", photo: `${IMG}/staff-1.jpg` },
+            { name: "송ㅅ연", role: "대표 공인노무사", areas: "부당해고, 직장 내 괴롭힘, 징계 자문", photo: `${IMG}/staff-1.jpg` },
             { name: "박ㅈ민", role: "공인노무사", areas: "임금체불, 산재, 급여 아웃소싱", photo: `${IMG}/staff-2.jpg` },
           ].map((p) => (
             <li key={p.name} className="flex items-center gap-4 rounded-[6px] border p-5" style={{ borderColor: C.line, background: C.card }}>
@@ -319,7 +319,7 @@ const BRANCHES: Record<Branch, { label: string; sub: string; photo: string; srcS
     srcSet: `${IMG}/hero-sm.jpg 960w, ${IMG}/hero.jpg 1920w`,
     alt: "회의 탁자에서 펜을 든 손으로 서류를 검토하는 모습",
     pos: "62% 50%",
-    caption: "담당 김ㅎ늘 대표 공인노무사",
+    caption: "담당 송ㅅ연 대표 공인노무사",
     cta: "노무 자문",
     rows: [
       { name: "인사노무 자문", meta: "월 150,000원부터", to: "lf-advisory" },

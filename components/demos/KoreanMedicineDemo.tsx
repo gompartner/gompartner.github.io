@@ -224,7 +224,7 @@ export function KoreanMedicineDemo() {
 
 /* 첫 화면: 대표원장 반신 사진(왼쪽 5) + 이름, 과목, 약력, 증상 바로가기(오른쪽 7). 위에는 메뉴 */
 const DOCTORS = [
-  { id: "kim", name: "김ㅎ늘", role: "대표원장", major: "한방재활의학과 전문의", photo: "staff-1.jpg", career: ["침, 추나, 약침 진료", "교통사고 진료 담당", "화, 목 야간 진료"] },
+  { id: "kim", name: "차ㅅ율", role: "대표원장", major: "한방재활의학과 전문의", photo: "staff-1.jpg", career: ["침, 추나, 약침 진료", "교통사고 진료 담당", "화, 목 야간 진료"] },
   { id: "lee", name: "이ㅅ윤", role: "원장", major: "한의사", photo: "staff-2.jpg", career: ["한약 상담 담당", "두통, 어지럼 진료", "토요일 진료"] },
 ] as const;
 
@@ -972,9 +972,9 @@ function VisitSection() {
             <ul className="mt-3 grid gap-4 sm:grid-cols-2">
               <li className="flex items-center gap-4">
                 {/* eslint-disable-next-line @next/next/no-img-element -- 정적 export 라 next/image 최적화를 쓰지 않는다 */}
-                <img src={`${IMG}/staff-1.jpg`} alt="대표원장 김ㅎ늘" className="h-24 w-20 flex-none rounded-[8px] object-cover" />
+                <img src={`${IMG}/staff-1.jpg`} alt="대표원장 차ㅅ율" className="h-24 w-20 flex-none rounded-[8px] object-cover" />
                 <span>
-                  <strong className="block text-[17px]">대표원장 김ㅎ늘</strong> <span style={{ color: C.inkSoft }}>한방재활의학과 전문의</span>
+                  <strong className="block text-[17px]">대표원장 차ㅅ율</strong> <span style={{ color: C.inkSoft }}>한방재활의학과 전문의</span>
                 </span>
               </li>
               <li className="flex items-center gap-4">

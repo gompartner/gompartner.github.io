@@ -399,7 +399,7 @@ export function ImageCompressor() {
                     >
                       <button type="button" onClick={() => setSelected(it.id)} aria-pressed={on} className="flex min-w-0 flex-1 items-center gap-3 text-left">
                         {/* eslint-disable-next-line @next/next/no-img-element -- blob 주소 미리보기 */}
-                        <img src={it.origUrl} alt="" className="h-12 w-12 shrink-0 rounded-md bg-surface object-cover" />
+                        <img src={it.origUrl} alt={`${it.file.name} 미리보기`} className="h-12 w-12 shrink-0 rounded-md bg-surface object-cover" />
                         <span className="min-w-0">
                           <span className="block truncate text-[16px] font-bold">{it.file.name}</span>
                           {it.status === "working" && <span className="block text-[14px] text-foreground-secondary">줄이는 중</span>}

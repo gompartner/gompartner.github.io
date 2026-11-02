@@ -62,7 +62,7 @@ export function GuideList({ items, look }: { items: GuideItem[]; look: Look }) {
           {list.map((g) => (
             <li key={g.slug} className="border-b border-[#e6e9ee]">
               <Link href={`${base}/${g.slug}`} className="group flex items-center gap-4 px-2 py-5 md:gap-6 md:px-4 md:py-6">
-                {g.image && <Image src={g.image.src} alt="" width={160} height={90} className="hidden w-[160px] shrink-0 rounded sm:block" />}
+                {g.image && <Image src={g.image.src} alt={g.title} width={160} height={90} className="hidden w-[160px] shrink-0 rounded sm:block" />}
                 <span className="min-w-0 flex-1">
                   <span className="block text-[17px] font-bold leading-[1.5] tracking-[-0.02em] group-hover:text-[#256ef4] md:text-[19px]">{g.title}</span>
                   <span className="mt-1 block text-[15px] leading-[1.6] text-[#5b6370] md:text-[16px]">{g.description}</span>
@@ -80,7 +80,7 @@ export function GuideList({ items, look }: { items: GuideItem[]; look: Look }) {
                 href={`${base}/${g.slug}`}
                 className="group flex h-full flex-col border-[3px] border-[#1d1d1f] bg-white shadow-[5px_5px_0_#1d1d1f] transition-[transform,box-shadow,background-color] duration-150 hover:-translate-x-0.5 hover:-translate-y-0.5 hover:bg-[#fff3b0] hover:shadow-[7px_7px_0_#1d1d1f] active:translate-x-1 active:translate-y-1 active:shadow-none motion-reduce:transition-none"
               >
-                {g.image && <Image src={g.image.src} alt="" width={600} height={338} className="h-auto w-full border-b-[3px] border-[#1d1d1f]" />}
+                {g.image && <Image src={g.image.src} alt={g.title} width={600} height={338} className="h-auto w-full border-b-[3px] border-[#1d1d1f]" />}
                 <span className="flex flex-1 flex-col p-5 md:p-7">
                   <span className="text-[20px] font-bold leading-[1.45] md:text-[22px]">{g.title}</span>
                   <span className="mt-2 flex-1 text-[16px] leading-[1.65] text-foreground-secondary">{g.description}</span>

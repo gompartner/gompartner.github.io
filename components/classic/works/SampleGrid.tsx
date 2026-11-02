@@ -69,7 +69,7 @@ function MockupGrid({ items }: { items: Project[] }) {
                   <span className="absolute bottom-0 right-0 block w-[24%] rounded-[18px] bg-[#111] p-[4px] shadow-[0_12px_30px_rgba(17,24,39,0.22)] transition-transform duration-300 ease-out group-hover:-translate-y-1.5 motion-reduce:transition-none md:rounded-[24px] md:p-[6px]">
                     <Image
                       src={phone}
-                      alt=""
+                      alt={`${p.title} 휴대폰 화면`}
                       width={390}
                       height={736}
                       sizes="(min-width: 1200px) 140px, (min-width: 768px) 12vw, 24vw"

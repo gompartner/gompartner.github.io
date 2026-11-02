@@ -479,7 +479,7 @@ function ReserveForm({ today, reduce, pick, setPick }: { today: Date; reduce: bo
           </div>
           <label className="block text-[16px] font-bold">
             예약자 이름
-            <input value={name} onChange={(e) => setName(e.target.value)} placeholder="김ㅎ늘" autoComplete="name" className={inputCls} style={{ borderColor: C.ink, outlineColor: C.red }} />
+            <input value={name} onChange={(e) => setName(e.target.value)} placeholder="이름" autoComplete="name" className={inputCls} style={{ borderColor: C.ink, outlineColor: C.red }} />
             {err("name")}
           </label>
           <label className="block text-[16px] font-bold">
@@ -615,7 +615,7 @@ function MenuReceipt() {
               <td className="py-1.5 pr-2">
                 <span className="flex items-center gap-3">
                   {/* eslint-disable-next-line @next/next/no-img-element -- 정적 export 라 next/image 최적화를 쓰지 않는다 */}
-                  <img src={`${IMG}/menu-${m.id}.jpg`} alt="" className="h-12 w-12 flex-none rounded-[3px] object-cover" />
+                  <img src={`${IMG}/menu-${m.id}.jpg`} alt={m.name} className="h-12 w-12 flex-none rounded-[3px] object-cover" />
                   <span>
                     <span className="font-bold">{m.name}</span>
                     {m.note && (

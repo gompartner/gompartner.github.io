@@ -34,10 +34,10 @@ const episodes: Record<Key, () => React.ReactNode> = {
 };
 
 const coverShots = [
-  ["/images/webtoon/night-phone.jpg", -4],
-  ["/images/webtoon/factory.jpg", 3],
-  ["/images/webtoon/cafe-broken-6.jpg", 2.5],
-  ["/images/webtoon/excel.jpg", -3],
+  ["/images/webtoon/night-phone.jpg", -4, "가게 계산대에서 휴대폰을 보며 걱정하는 사장님"],
+  ["/images/webtoon/factory.jpg", 3, "공장 사무실 컴퓨터 앞에서 고민하는 직원"],
+  ["/images/webtoon/cafe-broken-6.jpg", 2.5, "빵집에서 태블릿에 오류 화면을 받은 손님"],
+  ["/images/webtoon/excel.jpg", -3, "엑셀 서류 더미 앞에서 머리를 짚은 직원"],
 ] as const;
 
 /** 표지: 네 장면이 한 장씩 찍히듯 떨어지고(120ms 간격) 그 위에 제목이 얹힌다. */
@@ -46,7 +46,7 @@ function Cover() {
   return (
     <header className="relative px-4 pb-14 pt-4 md:px-8 md:pb-20 md:pt-6">
       <div className="grid grid-cols-2 gap-3 md:gap-4">
-        {coverShots.map(([src, r], i) => (
+        {coverShots.map(([src, r, alt], i) => (
           <motion.div
             key={src}
             initial={reduce ? false : { opacity: 0, scale: 1.25, rotate: r * 3 }}
@@ -55,7 +55,7 @@ function Cover() {
             className="overflow-hidden border-[3px] bg-white"
             style={{ borderColor: ink, boxShadow: `5px 5px 0 ${ink}` }}
           >
-            <Image src={src} alt="" width={900} height={900} sizes="(min-width: 768px) 300px, 50vw" priority={i < 2} className="block h-auto w-full" />
+            <Image src={src} alt={alt} width={900} height={900} sizes="(min-width: 768px) 300px, 50vw" priority={i < 2} className="block h-auto w-full" />
           </motion.div>
         ))}
       </div>

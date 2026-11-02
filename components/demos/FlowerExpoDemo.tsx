@@ -604,7 +604,7 @@ function PosterBanner() {
   return (
     <section aria-labelledby="poster-title" className="relative">
       <div className="relative h-[460px] sm:h-[520px] md:h-[600px]">
-        <Image src={`${IMG}/hero.jpg`} alt="" fill priority sizes="100vw" className="object-cover" style={{ objectPosition: "60% 50%" }} />
+        <Image src={`${IMG}/hero.jpg`} alt="꽃밭이 펼쳐진 박람회장" fill priority sizes="100vw" className="object-cover" style={{ objectPosition: "60% 50%" }} />
         <div className="absolute inset-0" style={{ background: "linear-gradient(180deg, rgba(31,77,58,0.1) 0%, rgba(31,77,58,0.2) 45%, rgba(20,40,30,0.72) 100%)" }} />
         <div className="absolute inset-x-0 bottom-0 flex flex-col items-center px-6 pb-10 text-center text-white md:pb-14">
           <h1 id="poster-title" className="font-bold leading-[1.05] tracking-[-0.04em]" style={{ textShadow: "0 2px 18px rgba(0,0,0,0.25)" }}>
@@ -837,7 +837,7 @@ function QuickTiles({ go }: { go: Go }) {
     <nav id="quick" aria-label="바로가기" className="grid grid-cols-2 gap-3 md:grid-cols-4 md:gap-4">
       {tiles.map((t) => (
         <button key={t.page} type="button" onClick={() => go(t.page)} className="group relative aspect-[4/3] overflow-hidden rounded-[10px] text-left md:aspect-[5/4]">
-          <Image src={t.src} alt="" fill sizes="(min-width: 768px) 280px, 50vw" className="object-cover" />
+          <Image src={t.src} alt={`${t.label} 사진`} fill sizes="(min-width: 768px) 280px, 50vw" className="object-cover" />
           <span className="absolute inset-0" style={{ background: "linear-gradient(180deg, rgba(0,0,0,0) 40%, rgba(0,0,0,0.6) 100%)" }} />
           <span className="absolute inset-x-3 bottom-3 flex items-center justify-between text-[17px] font-bold text-white underline-offset-4 group-hover:underline md:text-[19px]">
             {t.label}
@@ -944,7 +944,7 @@ function Home({ go, openNotice }: { go: Go; openNotice: (i: number) => void }) {
               {PHOTOS.map((p) => (
                 <li key={p.src}>
                   <button type="button" onClick={() => go("gallery")} className="relative block aspect-[4/3] w-full overflow-hidden rounded-[6px]" aria-label={`${p.caption} 사진 보기`}>
-                    <Image src={p.src} alt="" fill sizes="(min-width: 1024px) 290px, 50vw" className="object-cover" />
+                    <Image src={p.src} alt={p.caption} fill sizes="(min-width: 1024px) 290px, 50vw" className="object-cover" />
                   </button>
                 </li>
               ))}
@@ -968,7 +968,7 @@ function SubFrame({ page, go, children }: { page: Page; go: Go; children: React.
   return (
     <>
       <div className="relative h-[120px] overflow-hidden md:h-[160px]">
-        <Image src={`${IMG}/tulip.jpg`} alt="" fill sizes="100vw" className="object-cover" />
+        <Image src={`${IMG}/tulip.jpg`} alt="튤립 꽃밭" fill sizes="100vw" className="object-cover" />
         <div className="absolute inset-0" style={{ background: "rgba(31,77,58,0.72)" }} />
         <p className="absolute inset-0 flex items-center justify-center text-[24px] font-bold tracking-[-0.02em] text-white md:text-[32px]">{group.label}</p>
       </div>

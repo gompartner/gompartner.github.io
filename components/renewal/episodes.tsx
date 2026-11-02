@@ -37,7 +37,7 @@ function Marker({ children, on }: { children: React.ReactNode; on: boolean }) {
 export function AdEpisode() {
   const reduce = useReducedMotionSafe();
   const id = useId();
-  const [name, setName] = useState("김하늘");
+  const [name, setName] = useState("박수현");
   const [phone, setPhone] = useState("010-1234-5678");
   const [item, setItem] = useState("정수기");
   const [sent, setSent] = useState<null | { name: string; phone: string; item: string; at: string }>(null);
@@ -47,7 +47,7 @@ export function AdEpisode() {
     e.preventDefault();
     const now = new Date();
     setSent({
-      name: maskName(name) || "김ㅎ늘",
+      name: maskName(name) || "박ㅅ현",
       phone: phone.replace(/(\d{3})-?(\d{3,4})-?\d{4}$/, "$1-$2-****"),
       item,
       at: `${now.getHours()}:${String(now.getMinutes()).padStart(2, "0")}`,

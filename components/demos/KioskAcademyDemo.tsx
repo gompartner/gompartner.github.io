@@ -59,7 +59,7 @@ const classOf = (id: string) => CLASSES.find((c) => c.id === id)!;
 
 type Student = { no: string; name: string; cls: string; phone: string; parent: string };
 const STUDENTS: Student[] = [
-  { no: "1021", name: "김ㅎ늘", cls: "A", phone: "3842", parent: "어머니" },
+  { no: "1021", name: "남ㅇ호", cls: "A", phone: "3842", parent: "어머니" },
   { no: "1022", name: "이ㅈ민", cls: "A", phone: "5170", parent: "어머니" },
   { no: "1023", name: "박ㅅ우", cls: "A", phone: "2096", parent: "아버지" },
   { no: "1024", name: "최ㅇ서", cls: "A", phone: "7731", parent: "어머니" },
@@ -135,7 +135,7 @@ type Screen =
   | { kind: "done"; mode: Mode; no: string; at: number; late: boolean; seq: number };
 
 type Note = { id: number; no: string; at: number | null; text: string };
-const SEED_NOTES: Note[] = [{ id: 0, no: "1021", at: null, text: "[영어 학원] 김ㅎ늘 학생이 17:34에 하원했습니다. 귀가 여부를 확인해 주세요." }];
+const SEED_NOTES: Note[] = [{ id: 0, no: "1021", at: null, text: "[영어 학원] 남ㅇ호 학생이 17:34에 하원했습니다. 귀가 여부를 확인해 주세요." }];
 
 function alimText(s: Student, mode: Mode, at: number) {
   const c = classOf(s.cls);

@@ -143,7 +143,7 @@ const HOURS: { dow: number; label: string; open: string }[] = [
 ];
 
 const DOCTORS = [
-  { name: "김ㅎ늘", role: "대표원장", field: "시력교정, 백내장", photo: `${IMG}/staff-1.jpg` },
+  { name: "서ㅇ재", role: "대표원장", field: "시력교정, 백내장", photo: `${IMG}/staff-1.jpg` },
   { name: "이ㅅ우", role: "원장", field: "망막, 녹내장", photo: `${IMG}/staff-2.jpg` },
 ];
 

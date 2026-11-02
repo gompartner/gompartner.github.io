@@ -483,7 +483,7 @@ function Poster({
               >
                 <span className="relative block aspect-[4/3] overflow-hidden rounded-[4px] border-2" style={{ borderColor: on ? C.olive : "transparent" }}>
                   {/* eslint-disable-next-line @next/next/no-img-element -- 정적 export 라 next/image 최적화를 쓰지 않는다 */}
-                  <img src={`${IMG}/${x.sm}.jpg`} alt="" aria-hidden loading="lazy" decoding="async" sizes="(min-width: 768px) 168px, 20vw" className="h-full w-full object-cover" style={{ objectPosition: x.pos }} />
+                  <img src={`${IMG}/${x.sm}.jpg`} alt={`${x.label} 사진`} loading="lazy" decoding="async" sizes="(min-width: 768px) 168px, 20vw" className="h-full w-full object-cover" style={{ objectPosition: x.pos }} />
                 </span>
                 <span className="mt-1 block truncate text-[13px] md:text-[15px]" style={{ fontWeight: on ? 700 : 400, color: on ? C.ink : C.body }}>
                   {x.label}

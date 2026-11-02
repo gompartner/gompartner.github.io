@@ -71,7 +71,7 @@ export function PricingSection({
                           return (
                             <li key={s.id}>
                               <Link href={sampleHref(p.demoUrl)} prefetch={false} className="group block overflow-hidden border-[2.5px] border-[#1d1d1f] bg-white">
-                                <Image src={smallImage(p.imageUrl)} alt="" width={SMALL_IMAGE_WIDTH} height={SMALL_IMAGE_HEIGHT} className="aspect-[16/10] h-auto w-full object-cover object-top transition-transform duration-300 group-hover:scale-105" />
+                                <Image src={smallImage(p.imageUrl)} alt={`${p.title} 화면`} width={SMALL_IMAGE_WIDTH} height={SMALL_IMAGE_HEIGHT} className="aspect-[16/10] h-auto w-full object-cover object-top transition-transform duration-300 group-hover:scale-105" />
                                 <span className="block border-t-[2.5px] border-[#1d1d1f] px-2 py-1.5 text-[13px] font-bold leading-[1.35]">
                                   <span className="line-clamp-1">{p.title}</span>
                                   <span className="tabular-nums text-accent">{manwon(est.total)}</span>

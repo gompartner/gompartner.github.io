@@ -500,7 +500,7 @@ function Oven() {
                 {hhmm(b.at)}
               </span>
               {/* eslint-disable-next-line @next/next/no-img-element */}
-              <img src={breadImg(b.bread)} alt="" aria-hidden loading="lazy" className="h-10 w-10 shrink-0 rounded-[6px] object-cover" style={{ background: C.kraft }} />
+              <img src={breadImg(b.bread)} alt={BREAD_BY_ID[b.bread]?.name ?? "빵 사진"} loading="lazy" className="h-10 w-10 shrink-0 rounded-[6px] object-cover" style={{ background: C.kraft }} />
               <span className="min-w-0 flex-1 truncate font-semibold">{BREAD_BY_ID[b.bread].name}</span>
               <span className="shrink-0 text-[15px] tabular-nums" style={{ color: C.muted }}>
                 {b.qty}개
@@ -1136,7 +1136,7 @@ function PickupOrder({
         <div className="mt-4 grid gap-3">
           <label className="block">
             <span className={fieldLabel}>성함</span>
-            <input value={name} onChange={(e) => setName(e.target.value)} autoComplete="name" placeholder="김하늘" className="mt-1.5 h-11 w-full rounded-[6px] border px-3 outline-none focus:border-[#9a4f1c]" style={{ borderColor: C.line }} />
+            <input value={name} onChange={(e) => setName(e.target.value)} autoComplete="name" placeholder="이름" className="mt-1.5 h-11 w-full rounded-[6px] border px-3 outline-none focus:border-[#9a4f1c]" style={{ borderColor: C.line }} />
           </label>
           <label className="block">
             <span className={fieldLabel}>휴대전화</span>
@@ -1262,7 +1262,7 @@ function GroupOrder({ minute }: { minute: number }) {
       </label>
       <label className="block">
         <span className="block text-[15px] font-bold">성함</span>
-        <input value={name} onChange={(e) => setName(e.target.value)} autoComplete="name" placeholder="김하늘" className={input} style={{ borderColor: C.line }} />
+        <input value={name} onChange={(e) => setName(e.target.value)} autoComplete="name" placeholder="이름" className={input} style={{ borderColor: C.line }} />
       </label>
       <label className="block">
         <span className="block text-[15px] font-bold">휴대전화</span>

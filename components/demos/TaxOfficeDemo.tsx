@@ -900,7 +900,7 @@ function Home({
               <ListHead id="tax-about-title" title="세무사 인사말" />
               <div className="mt-3 flex items-start gap-4">
                 <span className="relative h-[84px] w-[112px] shrink-0 overflow-hidden rounded-[4px]">
-                  <Image src={`${IMG}/office.jpg`} alt="" fill sizes="112px" className="object-cover" />
+                  <Image src={`${IMG}/office.jpg`} alt="세무사 사무실 상담 테이블" fill sizes="112px" className="object-cover" />
                 </span>
                 <p className="text-[15px] leading-[1.6]" style={{ color: C.muted }}>
                   음식점과 소매점 장부를 가장 많이 맡고 있습니다.{" "}

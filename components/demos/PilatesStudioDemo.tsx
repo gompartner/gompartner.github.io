@@ -513,7 +513,7 @@ function SubPage({ nav, go, children }: { nav: Target; go: Go; children: React.R
   return (
     <>
       <div className="relative h-[120px] md:h-[180px]">
-        <Image src={`${IMG}/studio.jpg`} alt="" fill sizes="100vw" className="object-cover" style={{ objectPosition: "center 55%" }} />
+        <Image src={`${IMG}/studio.jpg`} alt="필라테스 스튜디오 내부" fill sizes="100vw" className="object-cover" style={{ objectPosition: "center 55%" }} />
         <div className="absolute inset-0" style={{ background: "rgba(36,54,90,0.8)" }} aria-hidden />
         <div className="absolute inset-0 flex items-center px-4 md:px-6">
           <p className="mx-auto w-full max-w-[1200px] text-[26px] font-bold tracking-[-0.02em] md:text-[36px]" style={{ color: C.onIndigo }}>

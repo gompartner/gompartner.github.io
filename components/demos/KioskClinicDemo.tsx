@@ -761,7 +761,7 @@ export function KioskClinicDemo({ threeD = false }: { threeD?: boolean }) {
                           className="font-bold"
                           style={{ fontSize: t(88), lineHeight: 1.1 }}
                         >
-                          김ㅎ늘 님
+                          표ㅈ성 님
                         </span>
                       </div>
                       <dl className="grid" style={{ gap: u(18) }}>
@@ -940,7 +940,7 @@ export function KioskClinicDemo({ threeD = false }: { threeD?: boolean }) {
                       />
                       <SummaryRow
                         k="성함"
-                        v={visit === "first" ? "처음 오신 분" : "김ㅎ늘 님"}
+                        v={visit === "first" ? "처음 오신 분" : "표ㅈ성 님"}
                       />
                       <SummaryRow k="휴대폰" v={maskPhone(phone)} />
                       {visit === "first" && (

@@ -42,7 +42,7 @@ import { daysAgo, fmtKo, fmtMD, useDemoToday } from "@/hooks/useDemoToday";
 import { useReducedMotionSafe } from "@/hooks/useReducedMotionSafe";
 
 const ACADEMY = "수학 영어 학원";
-const CHILD = { name: "김ㅎ늘", grade: "중학교 2학년", classes: ["중2 수학 심화반", "영어 리딩 B반"] };
+const CHILD = { name: "고ㅌ희", grade: "중학교 2학년", classes: ["중2 수학 심화반", "영어 리딩 B반"] };
 const FOCUS = "outline-none focus-visible:ring-2 focus-visible:ring-[#2557d6] focus-visible:ring-offset-2";
 const IMG = "/images/demo-academy";
 
@@ -1205,7 +1205,7 @@ function NoteRow({ note, unread, onOpen, selected = false }: { note: Note; unrea
       </span>
       {note.photos && (
         <span className="relative h-11 w-11 shrink-0 overflow-hidden rounded-[8px] bg-[#eef1f5]">
-          <Image src={note.photos[0].src} alt="" fill sizes="88px" className="object-cover" />
+          <Image src={note.photos[0].src} alt={note.photos[0].alt} fill sizes="88px" className="object-cover" />
           <span className="absolute bottom-0.5 right-0.5 inline-flex items-center gap-0.5 rounded-[4px] bg-black/60 px-1 text-[10px] font-semibold leading-[14px] text-white">
             <Images size={9} aria-hidden="true" />
             {note.photos.length}

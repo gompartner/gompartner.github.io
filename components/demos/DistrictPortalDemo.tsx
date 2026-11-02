@@ -252,7 +252,7 @@ const BOARDS: Record<string, { kind: BoardKind; posts: Post[] }> = {
         date: "2026.09.28",
         dept: "주차관리과",
         views: 97,
-        writer: "박ㅎ늘",
+        writer: "양ㅈ호",
         status: "답변완료",
         body: ["ㅎㄷ동 공영주차장을 야간에도 이용할 수 있는지 궁금합니다."],
         answer: [

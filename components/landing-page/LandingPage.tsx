@@ -96,7 +96,7 @@ export function LandingPage() {
         <div className="mx-auto max-w-[720px] bg-[#fffdf8] pb-20 shadow-[0_0_0_3px_#1d1d1f] md:pb-24">
           <header className={`${strip} flex h-16 items-center border-b-[3px]`} style={{ borderColor: ink }}>
             <Link href="/story" className="flex items-center gap-2 font-[family-name:var(--font-sfx)] text-[22px]">
-              <Image src="/images/bear-avatar.webp" alt="" width={34} height={34} className="h-[34px] w-[34px] rounded-full border-2 border-[#1d1d1f] bg-[#fffdf8] object-cover" />
+              <Image src="/images/bear-avatar.webp" alt="곰파트너 곰 캐릭터" width={34} height={34} className="h-[34px] w-[34px] rounded-full border-2 border-[#1d1d1f] bg-[#fffdf8] object-cover" />
               {profile.name}
             </Link>
           </header>
@@ -190,7 +190,7 @@ export function LandingPage() {
                     <BellRing size={15} aria-hidden /> 문자 · 지금
                   </p>
                   <p className="mt-0.5 text-[16px] font-bold">[곰파트너 렌탈] 새 신청 1건</p>
-                  <p className="text-[15px] text-foreground-secondary">김ㅎ늘 · 010-1234-**** · 정수기 · 네이버 검색광고</p>
+                  <p className="text-[15px] text-foreground-secondary">정ㅅ진 · 010-1234-**** · 정수기 · 네이버 검색광고</p>
                 </div>
                 <Sfx className="bottom-6 left-5 text-[64px] md:text-[80px]" color="#ffd43b" rotate={-10} delay={0.3}>
                   띠링!
@@ -269,7 +269,7 @@ export function LandingPage() {
                                 return (
                                   <li key={s.id} className="min-w-0">
                                     <Link href={sampleHref(p.demoUrl)} prefetch={false} className="group block overflow-hidden border-[2.5px] bg-white" style={{ borderColor: ink }}>
-                                      <Image src={smallImage(p.imageUrl)} alt="" width={SMALL_IMAGE_WIDTH} height={SMALL_IMAGE_HEIGHT} className="aspect-[16/10] h-auto w-full object-cover object-top transition-transform duration-300 group-hover:scale-105 motion-reduce:transition-none" />
+                                      <Image src={smallImage(p.imageUrl)} alt={`${p.title} 화면`} width={SMALL_IMAGE_WIDTH} height={SMALL_IMAGE_HEIGHT} className="aspect-[16/10] h-auto w-full object-cover object-top transition-transform duration-300 group-hover:scale-105 motion-reduce:transition-none" />
                                       <span className="block border-t-[2.5px] px-2 py-1.5 text-[13px] font-bold leading-[1.35]" style={{ borderColor: ink }}>
                                         <span className="line-clamp-1">{p.title}</span>
                                         <span className="tabular-nums text-accent">{manwon(est.total)}</span>

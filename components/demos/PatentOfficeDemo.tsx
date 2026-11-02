@@ -569,7 +569,7 @@ function Office() {
           {/* eslint-disable-next-line @next/next/no-img-element -- 정적 export 라 next/image 최적화를 쓰지 않는다 */}
           <img
             src={`${IMG}/staff-1.jpg`}
-            alt="대표 변리사 김ㅎ늘"
+            alt="대표 변리사 오ㅈ후"
             width={108}
             height={132}
             loading="lazy"
@@ -582,7 +582,7 @@ function Office() {
             대표 변리사
           </p>
           <p className="mt-1 text-[24px] font-bold">
-            김ㅎ늘
+            오ㅈ후
           </p>
           <p className="mt-3 text-[16px] leading-relaxed">상담부터 출원서 작성, 의견서까지 변리사가 직접 봅니다. 상표 출원 전 조사는 따로 비용을 받지 않아요.</p>
         </div>

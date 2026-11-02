@@ -43,7 +43,7 @@ const PASS_PROGRESS = 80;
 const PASS_TOTAL = 60;
 const MID_WEIGHT = 0.3;
 const FINAL_WEIGHT = 0.7;
-const ME = { id: "me", name: "김하늘", dept: "인사팀" };
+const ME = { id: "me", name: "임하율", dept: "인사팀" };
 
 // 학습기간·기수·공지일은 모두 오늘 기준으로 계산한다 (아래 makeDates)
 const COURSE = {
@@ -1087,7 +1087,7 @@ function ApplyPage({ go }: { go: (r: Route) => void }) {
             return (
               <li key={c.id} className="flex items-center gap-4 border-b py-4" style={{ borderColor: C.line }}>
                 <span className="relative hidden aspect-video w-28 shrink-0 overflow-hidden rounded-md sm:block" style={{ background: C.soft }}>
-                  <Image src={c.img} alt="" fill sizes="112px" className="object-cover" />
+                  <Image src={c.img} alt={`${c.title} 강의 표지`} fill sizes="112px" className="object-cover" />
                 </span>
                 <span className="min-w-0 flex-1">
                   <span className="block text-[16px] font-bold">{c.title}</span>
@@ -1510,7 +1510,7 @@ function LearnerView({ state, setState, ratios, done, progress, notify }: { stat
                 return (
                   <li key={w.id} className={rowCls} style={{ borderColor: C.line }}>
                     <span className="relative aspect-video w-24 shrink-0 overflow-hidden rounded-md" style={{ background: C.soft }}>
-                      <Image src={c.img} alt="" fill sizes="96px" className="object-cover" />
+                      <Image src={c.img} alt={`${c.title} 강의 표지`} fill sizes="96px" className="object-cover" />
                     </span>
                     <span className="min-w-0 flex-1">
                       <span className="block text-[16px] font-bold">{c.title}</span>

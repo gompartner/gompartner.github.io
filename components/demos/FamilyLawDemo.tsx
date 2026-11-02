@@ -157,7 +157,7 @@ function Poster({ go, setArea }: { go: (id: string) => void; setArea: (a: Area) 
           {/* 대표 변호사. 좁은 화면은 가로 명함 */}
           <div className="mt-5 flex gap-4 border-t pt-5 md:mt-7 md:block md:pt-6" style={{ borderColor: C.line }}>
             {/* eslint-disable-next-line @next/next/no-img-element -- 정적 export 라 next/image 최적화를 쓰지 않는다 */}
-            <img src={lead.photo} alt="" aria-hidden width={96} height={96} className="h-24 w-24 flex-none rounded-[6px] object-cover md:hidden" style={{ objectPosition: "50% 15%", background: C.alt }} />
+            <img src={lead.photo} alt={`${lead.role} ${lead.name}`} width={96} height={96} className="h-24 w-24 flex-none rounded-[6px] object-cover md:hidden" style={{ objectPosition: "50% 15%", background: C.alt }} />
             <div className="min-w-0">
               <p className="text-[14px] font-bold" style={{ color: C.accent }}>
                 {lead.role}
@@ -578,7 +578,7 @@ function Booking({ today, reduce, area, setArea }: { today: Date; reduce: boolea
                 <label htmlFor="fl-name" className="text-[15px] font-bold">
                   이름
                 </label>
-                <input id="fl-name" value={name} onChange={(e) => setName(e.target.value)} autoComplete="name" placeholder="김하늘" className={field} style={{ borderColor: C.line, outlineColor: C.accent }} />
+                <input id="fl-name" value={name} onChange={(e) => setName(e.target.value)} autoComplete="name" placeholder="이름" className={field} style={{ borderColor: C.line, outlineColor: C.accent }} />
               </div>
               <div>
                 <label htmlFor="fl-phone" className="text-[15px] font-bold">
@@ -685,7 +685,7 @@ const HOURS = [
 ];
 
 const LAWYERS = [
-  { name: "김ㅎ늘", role: "대표 변호사", note: "대한변협 등록 전문분야 가사법", cases: "이혼소송, 양육권, 재산분할", photo: `${IMG}/staff-1.jpg` },
+  { name: "강ㅈ안", role: "대표 변호사", note: "대한변협 등록 전문분야 가사법", cases: "이혼소송, 양육권, 재산분할", photo: `${IMG}/staff-1.jpg` },
   { name: "박ㅅ연", role: "변호사", note: "가사, 상속 사건 담당", cases: "협의이혼, 양육비, 면접교섭", photo: `${IMG}/staff-2.jpg` },
 ];
 

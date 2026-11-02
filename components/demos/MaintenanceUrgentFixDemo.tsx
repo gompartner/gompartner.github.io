@@ -104,7 +104,7 @@ function ShopPhone({ fixed, interactive = false, small = false }: { fixed: boole
       <div className={small ? "px-2.5 pb-3 pt-2" : "px-3 pb-4 pt-2.5"}>
         <p className={`font-bold ${small ? "text-[11px]" : "text-[13px]"}`}>어버이날 꽃바구니</p>
         {/* eslint-disable-next-line @next/next/no-img-element -- 정적 export 라 next/image 최적화를 쓰지 않는다 */}
-        <img src="/images/demo-urgent-fix/basket.jpg" alt="" className="mt-1.5 block aspect-[5/3] w-full rounded-[10px] object-cover" />
+        <img src="/images/demo-urgent-fix/basket.jpg" alt="어버이날 꽃바구니 사진" className="mt-1.5 block aspect-[5/3] w-full rounded-[10px] object-cover" />
         <p className={`mt-2 font-bold tabular-nums ${small ? "text-[12px]" : "text-[15px]"}`}>카네이션 꽃바구니 39,000원</p>
         <p className={`text-[#5a626d] ${small ? "text-[10px]" : "text-[12px]"}`}>내일 오전 배송 마감 임박</p>
         <div className="relative mt-3">

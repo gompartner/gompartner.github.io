@@ -585,7 +585,7 @@ function Poster({ reduce, go, onClass }: { reduce: boolean; go: (id: string) => 
                 {/* eslint-disable-next-line @next/next/no-img-element -- 정적 export 라 next/image 최적화를 쓰지 않는다 */}
                 <img
                   src={`${IMG}/work-${w.id}.jpg`}
-                  alt=""
+                  alt={`${w.cls} 학생의 ${w.medium} 작품`}
                   fetchPriority={i === 0 ? "high" : undefined}
                   className={`absolute inset-0 h-full w-full object-cover ${reduce ? "" : "transition-transform duration-500 group-hover:scale-[1.03]"}`}
                 />

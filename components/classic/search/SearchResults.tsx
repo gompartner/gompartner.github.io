@@ -25,7 +25,7 @@ export function SearchResults({ items, grouped = true }: { items: SearchItem[]; 
                 <li key={i.href} className="min-w-0">
                   <Link href={i.href} className="group block">
                     <span className="block overflow-hidden rounded-md border border-[#e1e5eb] bg-white">
-                      {i.thumb ? <Image src={i.thumb} alt="" width={720} height={450} sizes="(min-width: 1024px) 290px, 45vw" className="aspect-[16/10] w-full object-cover object-top transition-transform duration-500 group-hover:scale-[1.04] motion-reduce:transition-none" /> : null}
+                      {i.thumb ? <Image src={i.thumb} alt={`${i.title} 화면`} width={720} height={450} sizes="(min-width: 1024px) 290px, 45vw" className="aspect-[16/10] w-full object-cover object-top transition-transform duration-500 group-hover:scale-[1.04] motion-reduce:transition-none" /> : null}
                     </span>
                     <span className="mt-3 block break-keep text-[16px] font-bold leading-[1.4] group-hover:underline md:text-[17px]">{i.title}</span>
                     <span className="mt-1 line-clamp-2 block text-[14px] leading-[1.5] text-[#5b6370]">{i.desc}</span>

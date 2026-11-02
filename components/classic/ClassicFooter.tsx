@@ -54,7 +54,7 @@ export function ClassicFooter() {
       <div className="mx-auto grid w-full max-w-[1248px] grid-cols-2 gap-x-6 gap-y-10 px-4 py-14 md:grid-cols-4 md:px-6 md:py-16 lg:grid-cols-[1.4fr_repeat(4,minmax(0,1fr))]">
         <div className="col-span-2 md:col-span-4 lg:col-span-1">
           <p className="flex items-center gap-2.5 text-[21px] font-[800] tracking-[-0.04em] text-white">
-            <Image src="/images/bear-avatar.webp" alt="" width={32} height={32} className="h-8 w-8 rounded-full object-cover" />
+            <Image src="/images/bear-avatar.webp" alt="곰파트너 곰 캐릭터" width={32} height={32} className="h-8 w-8 rounded-full object-cover" />
             {profile.name}
           </p>
           <p className="mt-4">

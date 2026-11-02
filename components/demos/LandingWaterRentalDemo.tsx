@@ -85,7 +85,7 @@ const MIN_PRICE = Math.min(...PRODUCTS.map((p) => p.price[5]));
 const REVIEWS = [
   { name: "정ㅁ석", product: "냉온정수기 M", when: "3개월 사용", text: "설치 기사님이 싱크대 아래 배관을 깔끔하게 정리해 주셨어요. 온수 잠금이 있어서 아이 있는 집에 안심입니다." },
   { name: "박ㅅ연", product: "직수 정수기 S", when: "1년 사용", text: "물통 갈 일이 없어서 편해요. 방문 전에 문자로 날짜를 물어봐 주셔서 시간 맞추기 좋았습니다." },
-  { name: "김ㅎ늘", product: "공기청정기 A", when: "6개월 사용", text: "필터를 직접 사러 다니지 않아도 되는 게 제일 좋아요. 미세먼지 숫자가 바로 보여서 창문 여는 시점을 정합니다." },
+  { name: "손ㅇ린", product: "공기청정기 A", when: "6개월 사용", text: "필터를 직접 사러 다니지 않아도 되는 게 제일 좋아요. 미세먼지 숫자가 바로 보여서 창문 여는 시점을 정합니다." },
 ];
 
 const FAQS = [
@@ -299,7 +299,7 @@ function Compare({ term, setTerm, onPick }: { term: Term; setTerm: (t: Term) => 
             <li key={p.id} className="flex flex-col rounded-[16px] border-2 bg-white p-6" style={{ borderColor: C.line }}>
               <div className="-mx-2 -mt-2 mb-5 aspect-[4/3] overflow-hidden rounded-[12px]" style={{ background: C.foam }}>
                 {/* eslint-disable-next-line @next/next/no-img-element -- 정적 export 라 next/image 최적화를 쓰지 않는다 */}
-                <img src={`${IMG}/product-${p.id}.jpg`} alt="" loading="lazy" className="h-full w-full object-cover" />
+                <img src={`${IMG}/product-${p.id}.jpg`} alt={`${p.name} 제품 사진`} loading="lazy" className="h-full w-full object-cover" />
               </div>
               <p className="text-[14px] font-bold" style={{ color: C.sea }}>
                 {p.kind}

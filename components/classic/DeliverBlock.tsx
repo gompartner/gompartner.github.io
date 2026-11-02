@@ -25,7 +25,7 @@ export function DeliverBlock({ id, title = "납품물", name, items, photo }: { 
           </ul>
         </div>
         <div className="relative aspect-[16/10] overflow-hidden rounded-lg">
-          <Image src={photo} alt="" fill sizes="(min-width: 768px) 560px, 92vw" className="object-cover" />
+          <Image src={photo} alt={`${name} 작업 장면`} fill sizes="(min-width: 768px) 560px, 92vw" className="object-cover" />
         </div>
       </div>
     </section>

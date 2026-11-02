@@ -466,8 +466,7 @@ function BottleArt({ b, height = 120, className = "" }: { b: Bottle; height?: nu
     // eslint-disable-next-line @next/next/no-img-element -- 정적 export 라 next/image 최적화를 쓰지 않는다
     <img
       src={`${IMG}/bottles/${b.id}.jpg`}
-      alt=""
-      aria-hidden
+      alt={`${b.name} 병 사진`}
       loading="lazy"
       draggable={false}
       width={Math.round(height * 0.389)}

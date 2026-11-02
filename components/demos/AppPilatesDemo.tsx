@@ -943,7 +943,7 @@ export function AppPilatesDemo() {
       <Photo src={`${IMG}/hero.jpg`} alt="햇빛이 드는 스튜디오에서 리포머 동작을 하는 회원" pos="72% 40%" className={`${aspect} w-full`} sizes="720px" />
       <div className="absolute inset-0 bg-[linear-gradient(to_top,rgba(24,22,18,0.72),rgba(24,22,18,0.05)_62%)]" aria-hidden />
       <div className="absolute inset-x-0 bottom-0 p-5 text-white">
-        <p className="text-[13px] font-medium text-white/80">김ㅎ늘 회원님</p>
+        <p className="text-[13px] font-medium text-white/80">석ㅇ진 회원님</p>
         <p className="mt-1 text-[22px] font-bold leading-[1.35]">다음 주 시간표가 열렸습니다</p>
         <button
           type="button"
@@ -1096,7 +1096,7 @@ export function AppPilatesDemo() {
 
   const passCard = () => (
     <div className="relative aspect-[1.586/1] overflow-hidden rounded-[16px] bg-[#1F3A31] text-white shadow-[0_18px_36px_-18px_rgba(20,40,32,0.6)]">
-      <Image src={`${IMG}/studio.jpg`} alt="" fill sizes="600px" className="object-cover opacity-25 mix-blend-luminosity" style={{ objectPosition: "50% 70%" }} />
+      <Image src={`${IMG}/studio.jpg`} alt="필라테스 스튜디오 내부" fill sizes="600px" className="object-cover opacity-25 mix-blend-luminosity" style={{ objectPosition: "50% 70%" }} />
       <div className="absolute inset-0 bg-[#1F3A31]/55" aria-hidden />
       <div className="absolute inset-0 flex flex-col justify-between p-5">
         <div className="flex items-start justify-between gap-3">
@@ -1114,7 +1114,7 @@ export function AppPilatesDemo() {
             <div className="h-full rounded-full bg-white transition-[width] duration-300" style={{ width: `${(remaining / TOTAL) * 100}%` }} />
           </div>
           <div className="mt-3 flex items-end justify-between text-[12px] text-white/75">
-            <span>김ㅎ늘, 회원번호 20417</span>
+            <span>석ㅇ진, 회원번호 20417</span>
             <span className="tabular-nums">~ {fmtMD(passEnd)}</span>
           </div>
         </div>
@@ -1184,7 +1184,7 @@ export function AppPilatesDemo() {
         <UserRound size={28} />
       </span>
       <div className="min-w-0">
-        <p className="text-[18px] font-bold text-[#22201C]">김ㅎ늘 회원님</p>
+        <p className="text-[18px] font-bold text-[#22201C]">석ㅇ진 회원님</p>
         <p className="text-[14px] tabular-nums text-[#6B665E]">010-****-5821</p>
         <p className="text-[13px] text-[#9A948A]">회원번호 20417, 누적 출석 {totalAttend}회</p>
       </div>
@@ -1530,7 +1530,7 @@ export function AppPilatesDemo() {
               나의 변화 리포트
             </h2>
             <p className="text-[13px] text-[#6B665E]">
-              김ㅎ늘 회원님, {monthLabels[0]}부터 {monthLabels[5]}까지
+              석ㅇ진 회원님, {monthLabels[0]}부터 {monthLabels[5]}까지
             </p>
           </div>
           <CloseButton onClose={() => setReportOpen(false)} />
@@ -1985,7 +1985,7 @@ export function AppPilatesDemo() {
               <span className="grid h-9 w-9 place-items-center rounded-full bg-[#ECE8E1] text-[#6B665E]" aria-hidden>
                 <UserRound size={18} />
               </span>
-              김ㅎ늘 회원님
+              석ㅇ진 회원님
             </span>
           </header>
           <div ref={tabScrollRef} className={`min-h-0 flex-1 ${tab === "book" || tab === "mine" ? "overflow-hidden" : "overflow-y-auto"}`}>

@@ -83,7 +83,7 @@ const INITIAL_STATE: State = {
   customers: [
     {
       id: "c1",
-      name: "김하늘",
+      name: "한다온",
       gender: "여",
       age: 37,
       chartNo: "2026-0412",
@@ -580,7 +580,7 @@ function Hero({
 
   return (
     <header className="relative isolate overflow-hidden text-white print:hidden">
-      <Image src="/images/demo-clinic-report/hero-face.jpg" alt="" fill priority sizes="100vw" className="-z-20 object-cover object-[50%_25%]" />
+      <Image src="/images/demo-clinic-report/hero-face.jpg" alt="피부 진단을 받는 여성의 얼굴" fill priority sizes="100vw" className="-z-20 object-cover object-[50%_25%]" />
       <div
         className="absolute inset-0 -z-10"
         style={{ background: "linear-gradient(90deg, rgba(42,31,43,0.92) 0%, rgba(42,31,43,0.72) 45%, rgba(42,31,43,0.25) 100%)" }}
@@ -725,7 +725,7 @@ function ReportScreen({ customer, session, previous }: { customer: Customer; ses
           <ul className="mt-4 grid gap-4 sm:grid-cols-2">
             {focus.map((a, i) => (
               <li key={a.id} className="overflow-hidden rounded-[20px] bg-white">
-                <Image src={CARE_PHOTOS[i]} alt="" width={900} height={900} className="aspect-[4/3] w-full object-cover" />
+                <Image src={CARE_PHOTOS[i]} alt={`${a.label} 관리 제품 사진`} width={900} height={900} className="aspect-[4/3] w-full object-cover" />
                 <div className="p-5">
                   <p className="flex items-center gap-2 text-[19px] font-bold">
                     <span className="h-3 w-3 rounded-full" style={{ background: a.color }} aria-hidden />

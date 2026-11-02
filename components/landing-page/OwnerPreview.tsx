@@ -28,7 +28,7 @@ export function OwnerPreview() {
       <LeadReceivedPanel
         hideTitle
         business="곰파트너"
-        name="김하늘"
+        name="최유진"
         phone="010-1234-5678"
         summary="렌탈 · 랜딩 표준"
         lines={[

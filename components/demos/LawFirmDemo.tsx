@@ -904,7 +904,7 @@ function SubPage({ nav, go, children }: { nav: Target; go: Go; children: React.R
   return (
     <>
       <div className="relative h-[140px] md:h-[200px]">
-        <Image src={`${IMG}/hero.jpg`} alt="" fill sizes="100vw" className="object-cover" style={{ objectPosition: "center 40%" }} />
+        <Image src={`${IMG}/hero.jpg`} alt="법률사무소 상담실" fill sizes="100vw" className="object-cover" style={{ objectPosition: "center 40%" }} />
         <div className="absolute inset-0" style={{ background: "rgba(20,33,61,0.78)" }} aria-hidden />
         <div className="absolute inset-0 flex items-center px-4 md:px-6">
           <p className="mx-auto w-full max-w-[1200px] text-[28px] font-bold tracking-[-0.02em] md:text-[40px]" style={{ color: C.ivory }}>
@@ -1660,7 +1660,7 @@ function Booking({ initialField }: { initialField: Field | null }) {
                 value={name}
                 onChange={(e) => setName(e.target.value)}
                 autoComplete="name"
-                placeholder="김하늘"
+                placeholder="이름"
                 className="mt-1.5 h-12 w-full rounded-[4px] border px-3 outline-none focus:border-[#14213d]"
                 style={{ borderColor: C.line }}
               />

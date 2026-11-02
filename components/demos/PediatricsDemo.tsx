@@ -238,7 +238,7 @@ export function PediatricsDemo() {
         <div className="mt-6 grid gap-6 md:grid-cols-[minmax(0,1fr)_minmax(0,1.3fr)]">
           <ul className="grid content-start gap-3">
             {[
-              ["대표원장", "김ㅎ늘", `${IMG}/staff-1.jpg`],
+              ["대표원장", "조ㅈ원", `${IMG}/staff-1.jpg`],
               ["원장", "박ㅅ윤", `${IMG}/staff-2.jpg`],
             ].map(([role, name, photo]) => (
               <li key={name} className="flex items-center gap-4 rounded-[6px] border px-4 py-4" style={{ borderColor: C.line, background: "#fff" }}>
@@ -337,7 +337,7 @@ const NAV: [string, string][] = [
 /** 첫 화면 진료시간 요약 */
 const POSTER_HOURS: [string, string, string][] = [
   ["평일", "09:00 ~ 19:00", "점심시간 13:00 ~ 14:00"],
-  ["화, 목 야간", "19:00 ~ 20:30", "화 김ㅎ늘, 목 박ㅅ윤 원장"],
+  ["화, 목 야간", "19:00 ~ 20:30", "화 조ㅈ원, 목 박ㅅ윤 원장"],
   ["토요일", "09:00 ~ 13:00", "점심시간 없이 진료"],
   ["일요일, 공휴일", "휴진", ""],
 ];

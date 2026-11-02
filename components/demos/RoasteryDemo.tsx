@@ -662,7 +662,7 @@ function BeanCard({ bean, count, onAdd }: { bean: Bean; count: number; onAdd: (d
           <h3 className="font-bold mt-1 text-[19px] leading-[1.3]">{bean.name}</h3>
         </div>
         {/* eslint-disable-next-line @next/next/no-img-element -- 정적 export 라 next/image 최적화를 쓰지 않는다 */}
-        <img src={`${IMG}/${ROAST_PHOTO[bean.roast]}`} alt="" aria-hidden loading="lazy" width={56} height={56} className="h-14 w-14 flex-none rounded-[6px] object-cover" />
+        <img src={`${IMG}/${ROAST_PHOTO[bean.roast]}`} alt={`${bean.name} 원두 사진`} loading="lazy" width={56} height={56} className="h-14 w-14 flex-none rounded-[6px] object-cover" />
       </div>
       <p className="mt-3 text-[15px]" style={{ color: C.muted }}>
         {bean.cup}

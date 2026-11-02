@@ -71,7 +71,7 @@ export default function ClassicMaintenancePage() {
                 <div className="relative aspect-[16/9] overflow-hidden bg-[#0f1b3d]">
                   <Image
                     src={`/images/site/scene-${s.id}.jpg`}
-                    alt=""
+                    alt={`${s.title} 작업 장면`}
                     fill
                     sizes="(min-width: 768px) 600px, 92vw"
                     className="object-cover transition-transform duration-500 group-hover:scale-[1.03] motion-reduce:transition-none"

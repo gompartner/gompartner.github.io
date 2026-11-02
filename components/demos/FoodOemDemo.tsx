@@ -482,7 +482,7 @@ function Items({ reduce }: { reduce: boolean }) {
                       <li key={it.name} className="flex flex-wrap items-center justify-between gap-x-4 gap-y-2 border-b py-3" style={{ borderColor: C.line }}>
                         <div className="flex min-w-0 items-center gap-3">
                           {/* eslint-disable-next-line @next/next/no-img-element -- 정적 export 라 next/image 최적화를 쓰지 않는다 */}
-                          <img src={`${IMG}/item-${it.id}.jpg`} alt="" className="h-14 w-14 flex-none rounded-[6px] object-cover" />
+                          <img src={`${IMG}/item-${it.id}.jpg`} alt={`${it.name} 제품 사진`} className="h-14 w-14 flex-none rounded-[6px] object-cover" />
                           <div className="min-w-0">
                             <p className="text-[17px] font-bold">{it.name}</p>
                             <p className="text-[14px]" style={{ color: C.muted }}>

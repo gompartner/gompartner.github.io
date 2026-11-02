@@ -330,7 +330,7 @@ const TILES: { id: PartId; tx: [Tx, Tx]; photo: string; pos: string; alt: string
 ];
 
 const DOCS = [
-  { name: "김ㅎ늘", room: "1진료실", photo: "staff-1.jpg" },
+  { name: "배ㅈ하", room: "1진료실", photo: "staff-1.jpg" },
   { name: "박ㅈ원", room: "2진료실", photo: "staff-2.jpg" },
 ] as const;
 
@@ -355,7 +355,7 @@ function Poster({ reduce, today, onPart }: { reduce: boolean; today: Date; onPar
             {DOCS.map((d) => (
               <p key={d.name} className="flex items-center gap-2.5">
                 {/* eslint-disable-next-line @next/next/no-img-element -- 정적 export 라 next/image 최적화를 쓰지 않는다 */}
-                <img src={`${IMG}/${d.photo}`} alt="" className="h-11 w-11 flex-none rounded-full object-cover" style={{ objectPosition: "50% 20%" }} />
+                <img src={`${IMG}/${d.photo}`} alt={`${d.name} 사진`} className="h-11 w-11 flex-none rounded-full object-cover" style={{ objectPosition: "50% 20%" }} />
                 <span className="text-[15px] leading-tight">
                   <strong className="block text-[16px]">{d.name} 원장</strong>
                   <span style={{ color: C.muted }}>
@@ -512,7 +512,7 @@ function PartList({ onReserve }: { onReserve: (p: PartId) => void }) {
 /* ---------- 2. 의료진 ---------- */
 
 const DOC_INFO: Record<(typeof DOCS)[number]["name"], { major: string; career: string[]; days: string }> = {
-  김ㅎ늘: { major: "척추, 통증 클리닉", career: ["정형외과 전문의", "대한정형외과학회 정회원", "대한척추외과학회 정회원"], days: "월, 화, 목, 토" },
+  배ㅈ하: { major: "척추, 통증 클리닉", career: ["정형외과 전문의", "대한정형외과학회 정회원", "대한척추외과학회 정회원"], days: "월, 화, 목, 토" },
   박ㅈ원: { major: "관절, 스포츠 클리닉", career: ["정형외과 전문의", "대한정형외과학회 정회원", "대한슬관절학회 정회원"], days: "월, 수, 금, 토" },
 };
 
@@ -946,9 +946,9 @@ function Hours({ today }: { today: Date }) {
         <ul className="grid gap-4 sm:grid-cols-2">
           <li className="flex items-center gap-4">
             {/* eslint-disable-next-line @next/next/no-img-element -- 정적 export 라 next/image 최적화를 쓰지 않는다 */}
-            <img src={`${IMG}/staff-1.jpg`} alt="대표원장 김ㅎ늘" className="h-24 w-20 flex-none rounded-[8px] object-cover" />
+            <img src={`${IMG}/staff-1.jpg`} alt="대표원장 배ㅈ하" className="h-24 w-20 flex-none rounded-[8px] object-cover" />
             <span>
-              <strong className="block text-[17px]">대표원장 김ㅎ늘</strong> <span style={{ color: C.muted }}>정형외과 전문의</span>
+              <strong className="block text-[17px]">대표원장 배ㅈ하</strong> <span style={{ color: C.muted }}>정형외과 전문의</span>
             </span>
           </li>
           <li className="flex items-center gap-4">

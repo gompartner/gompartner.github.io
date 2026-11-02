@@ -102,7 +102,7 @@ interface Teacher {
 const TEACHER_LIST: Teacher[] = [
   { id: "daniel", name: "Daniel R.", kind: "원어민", note: "Basic, Intermediate 반, 영어로만 진행", img: "teacher-native.jpg", alt: "교실 칠판 앞에서 웃고 있는 남색 니트 차림의 원어민 남성 강사" },
   { id: "emma", name: "Emma K.", kind: "원어민", note: "Intermediate, Upper 반, 회의와 발표 표현", img: "teacher-native-2.jpg", alt: "밝은 회색 벽 앞에서 웃고 있는 하늘색 니트 차림의 원어민 여성 강사" },
-  { id: "kim", name: "김ㅎ늘", kind: "한국인", note: "Starter 반, 막히는 표현은 한국어로", img: "teacher-korean.jpg", alt: "교실에서 웃고 있는 흰 블라우스 차림의 한국인 여성 강사" },
+  { id: "kim", name: "황ㅅ민", kind: "한국인", note: "Starter 반, 막히는 표현은 한국어로", img: "teacher-korean.jpg", alt: "교실에서 웃고 있는 흰 블라우스 차림의 한국인 여성 강사" },
   { id: "park", name: "박ㅈ우", kind: "한국인", note: "Starter, Basic 반, 문법 설명은 한국어로", img: "teacher-korean-2.jpg", alt: "회색 벽 앞에서 웃고 있는 남색 카디건 차림의 한국인 남성 강사" },
 ];
 const teacherOf = (id: TeacherId) => TEACHER_LIST.find((t) => t.id === id) ?? TEACHER_LIST[0];
@@ -799,7 +799,7 @@ function Schedule({
                 <span className="mt-3 flex w-full items-center justify-between text-[15px]" style={{ color: C.muted }}>
                   <span className="inline-flex items-center gap-2">
                     {/* eslint-disable-next-line @next/next/no-img-element -- 정적 export 라 next/image 최적화를 쓰지 않는다 */}
-                    <img src={`${IMG}/${teacherOf(c.teacher).img}`} alt="" loading="lazy" width={36} height={36} className="h-9 w-9 flex-none rounded-full object-cover" style={{ objectPosition: "50% 25%" }} />
+                    <img src={`${IMG}/${teacherOf(c.teacher).img}`} alt={teacherOf(c.teacher).alt} loading="lazy" width={36} height={36} className="h-9 w-9 flex-none rounded-full object-cover" style={{ objectPosition: "50% 25%" }} />
                     {teacherOf(c.teacher).name}
                   </span>
                   <span className="inline-flex items-center gap-1 font-bold" style={{ color: full ? C.muted : C.ink }}>

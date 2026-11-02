@@ -271,7 +271,7 @@ export function SearchPreview() {
               {live.ogImage ? (
                 // 바깥 사이트 그림이라 next/image 대신 img를 쓴다
                 // eslint-disable-next-line @next/next/no-img-element
-                <img src={live.ogImage} alt="" className="aspect-[1.91/1] w-full object-cover" />
+                <img src={live.ogImage} alt="공유 미리보기 대표 이미지" className="aspect-[1.91/1] w-full object-cover" />
               ) : (
                 <div className="grid aspect-[1.91/1] place-items-center bg-surface-secondary text-[14px] text-foreground-secondary">공유 이미지 없음</div>
               )}

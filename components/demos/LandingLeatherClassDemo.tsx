@@ -114,7 +114,7 @@ const WORKS = [
 ];
 
 const REVIEWS = [
-  { name: "김ㅎ늘", when: "토요일 오전반", text: "바느질이 처음이었는데 옆에서 한 땀씩 봐 주셔서 끝까지 했어요. 이니셜이 들어가니 선물하기 좋았습니다." },
+  { name: "안ㅈ희", when: "토요일 오전반", text: "바느질이 처음이었는데 옆에서 한 땀씩 봐 주셔서 끝까지 했어요. 이니셜이 들어가니 선물하기 좋았습니다." },
   { name: "박ㅅ연", when: "금요일 저녁반", text: "퇴근하고 두 시간 집중하니 머리가 맑아졌어요. 도구가 다 있어서 빈손으로 가면 됩니다." },
   { name: "이ㅈ민", when: "일요일 오후반, 2명", text: "친구랑 둘이 들었어요. 색을 다르게 골라서 서로 바꿔 쓰고 있어요. 공방이 조용하고 밝아요." },
 ];
@@ -175,7 +175,7 @@ export function LandingLeatherClassDemo() {
   /* 신청 흐름 */
   const [step, setStep] = useState<1 | 2 | 3>(1);
   const [sid, setSid] = useState("s1");
-  const [name, setName] = useState("김하늘");
+  const [name, setName] = useState("안재희");
   const [phone, setPhone] = useState("010-1234-5678");
   const [qty, setQty] = useState(1);
   const [initials, setInitials] = useState("HN");

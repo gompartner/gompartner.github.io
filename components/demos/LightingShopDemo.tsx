@@ -411,7 +411,7 @@ function Poster({
             <li key={c} className="w-[132px] flex-none md:w-auto">
               <button type="button" onClick={() => onCat(c)} className={`flex w-full items-center gap-3 rounded-[6px] border p-2 text-left ${focusRing}`} style={{ borderColor: C.line, background: C.panel, outlineColor: C.amber }}>
                 {/* eslint-disable-next-line @next/next/no-img-element -- 정적 export 라 next/image 최적화를 쓰지 않는다 */}
-                <img src={`${IMG}/products/${CAT_COVER[c]}.jpg`} alt="" aria-hidden loading="lazy" width={48} height={48} className="h-12 w-12 flex-none rounded-[4px] object-cover" />
+                <img src={`${IMG}/products/${CAT_COVER[c]}.jpg`} alt={`${c} 대표 조명 사진`} loading="lazy" width={48} height={48} className="h-12 w-12 flex-none rounded-[4px] object-cover" />
                 <span className="min-w-0">
                   <span className="block text-[15px] font-bold leading-[1.3]">{c}</span>
                   <span className="block text-[13px] tabular-nums" style={{ color: C.creamDim }}>
@@ -614,7 +614,7 @@ function QuotePanel({ today, reduce, rows, total, setQty }: { today: Date; reduc
             <div className="mt-4 grid gap-4 sm:grid-cols-2">
               <label className="block text-[15px] font-bold">
                 이름
-                <input value={name} onChange={(e) => setName(e.target.value)} placeholder="김ㅎ늘" autoComplete="name" className={inputCls} style={inputStyle} />
+                <input value={name} onChange={(e) => setName(e.target.value)} placeholder="이름" autoComplete="name" className={inputCls} style={inputStyle} />
                 {err("name")}
               </label>
               <label className="block text-[15px] font-bold">

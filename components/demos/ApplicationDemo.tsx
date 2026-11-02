@@ -140,7 +140,7 @@ const STATUS_STYLE: Record<Status, { color: string; fill: string; icon: typeof I
 };
 
 const SEED_NAMES = [
-  "김하늘", "이서연", "박지훈", "최민지", "정우진", "강수아", "조현우", "윤지아", "장도현", "임하은",
+  "유태윤", "이서연", "박지훈", "최민지", "정우진", "강수아", "조현우", "윤지아", "장도현", "임하은",
   "한예린", "오승민", "서지유", "신동현", "권나윤", "황민재", "안소희", "송재원", "전유나", "홍석진",
 ];
 const SEED_ORGS = ["개인", "주식회사 ㄷㄹ랩", "ㅁㄹ디자인", "개인", "ㅅㅇ소프트", "개인", "ㅍㄹ바이오", "ㄷㄹ에너지"];
@@ -421,7 +421,7 @@ function ApplicantView({ state, setState }: { state: ViewState; setState: (u: (s
       <main key="done" className="soft-in mx-auto max-w-[1248px] px-4 py-10 pb-28 md:px-6">
         <section className="mx-auto max-w-[640px] overflow-hidden rounded-2xl bg-white ring-1 ring-[#d3dbd7]">
           <div className="relative isolate overflow-hidden bg-[#00745c] px-6 py-10 text-center text-white">
-            <Image src={PROGRAMS.find((p) => p.id === programId)!.image} alt="" fill sizes="640px" className="-z-20 object-cover" />
+            <Image src={PROGRAMS.find((p) => p.id === programId)!.image} alt={`${PROGRAMS.find((p) => p.id === programId)!.name} 대표 사진`} fill sizes="640px" className="-z-20 object-cover" />
             <span aria-hidden className="absolute inset-0 -z-10 bg-[rgba(0,81,63,0.86)]" />
             <CheckCircle2 size={44} className="mx-auto" aria-hidden />
             <h2 className="mt-3 text-[26px] font-bold tracking-[-0.02em]">신청서 제출 완료</h2>
@@ -446,7 +446,7 @@ function ApplicantView({ state, setState }: { state: ViewState; setState: (u: (s
       <main key={`form-${programId}`} className="soft-in mx-auto max-w-[1248px] px-4 py-8 pb-28 md:px-6">
         <div className="mx-auto grid max-w-[960px] overflow-hidden rounded-2xl bg-white ring-1 ring-[#d3dbd7] md:grid-cols-[260px_1fr]">
           <aside className="relative isolate overflow-hidden bg-[#00513f] p-6 text-white md:p-8">
-            <Image src={program.image} alt="" fill sizes="260px" className="-z-20 object-cover" />
+            <Image src={program.image} alt={`${program.name} 대표 사진`} fill sizes="260px" className="-z-20 object-cover" />
             <span aria-hidden className="absolute inset-0 -z-10 bg-[linear-gradient(180deg,rgba(0,81,63,0.78),rgba(0,58,45,0.96)_55%)]" />
             <p className="text-[15px] text-[#d7efe7]">신청서 작성</p>
             <h2 className="mt-1 text-[21px] font-bold leading-[1.4] tracking-[-0.02em]">{program.name}</h2>
@@ -635,7 +635,7 @@ function ApplicantView({ state, setState }: { state: ViewState; setState: (u: (s
       <section aria-labelledby="notice-title" className="relative isolate overflow-hidden bg-[#0c1f19] text-white">
         <Image
           src="/images/demo-application/hero.jpg"
-          alt=""
+          alt="지원사업 공고 대표 사진"
           fill
           priority
           sizes="100vw"
@@ -749,7 +749,7 @@ function ProgramCard({ program: p, onApply }: { program: Program; onApply: () =>
       <div className="relative aspect-[4/3] overflow-hidden bg-[#0c1f19]">
         <Image
           src={p.image}
-          alt=""
+          alt={`${p.name} 대표 사진`}
           fill
           sizes="(min-width: 1024px) 300px, (min-width: 768px) 50vw, 100vw"
           className={`object-cover ${closed ? "opacity-60 grayscale" : ""}`}
@@ -890,7 +890,7 @@ function AdminView({
               {perProgram.map(({ program, count }) => (
                 <li key={program.id} className="flex items-center gap-3">
                   <span className="relative hidden h-10 w-10 shrink-0 overflow-hidden rounded-lg sm:block">
-                    <Image src={program.image} alt="" fill sizes="40px" className="object-cover" />
+                    <Image src={program.image} alt={`${program.name} 대표 사진`} fill sizes="40px" className="object-cover" />
                   </span>
                   <div className="min-w-0 flex-1">
                     <div className="flex items-baseline justify-between gap-3 text-[15px]">

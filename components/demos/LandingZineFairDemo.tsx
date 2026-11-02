@@ -380,7 +380,7 @@ function EntryForm({ days, reduce }: { days: Date[]; reduce: boolean }) {
         </div>
         <label className="block text-[17px] font-extrabold">
           이름
-          <input value={name} onChange={(e) => setName(e.target.value)} placeholder="김ㅎ늘" autoComplete="name" className={input} style={{ borderColor: C.black, outlineColor: C.pink }} />
+          <input value={name} onChange={(e) => setName(e.target.value)} placeholder="이름" autoComplete="name" className={input} style={{ borderColor: C.black, outlineColor: C.pink }} />
           {err("name")}
         </label>
         <label className="block text-[17px] font-extrabold">

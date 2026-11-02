@@ -282,7 +282,7 @@ function totals(cart: CartLine[], region: Region) {
 /* ---------- 후기 ---------- */
 
 const REVIEWS: { productId: string; name: string; glaze: GlazeId; rating: number; ago: number; text: string }[] = [
-  { productId: "mug", name: "김ㅎ늘", glaze: "black", rating: 5, ago: 7, text: "흑유 머그 두 개 샀어요. 손잡이가 도톰해서 잡기 편하고 입술 쪽 갈색 띠가 사진보다 진해요." },
+  { productId: "mug", name: "신ㅎ서", glaze: "black", rating: 5, ago: 7, text: "흑유 머그 두 개 샀어요. 손잡이가 도톰해서 잡기 편하고 입술 쪽 갈색 띠가 사진보다 진해요." },
   { productId: "mug", name: "박*", glaze: "celadon", rating: 4, ago: 16, text: "400ml로 받았는데 생각보다 무게감 있어요. 아침 커피용으로 잘 쓰고 있어요." },
   { productId: "ricebowl", name: "이ㅅ진", glaze: "white", rating: 5, ago: 25, text: "굽이 높아서 뜨거운 밥 담아도 덜 뜨거워요. 포장도 꼼꼼했어요." },
   { productId: "plate", name: "최ㅇ호", glaze: "buncheong", rating: 5, ago: 40, text: "분청 접시 붓 자국이 하나하나 달라서 두 장이 다른 그릇 같아요ㅎㅎ" },
@@ -802,7 +802,7 @@ function Home({ go }: { go: Go }) {
         <Container className="grid gap-3 md:grid-cols-2 md:gap-5">
           <button type="button" onClick={() => go({ name: "brand" })} className="group grid grid-cols-[120px_1fr] overflow-hidden rounded-[4px] text-left md:grid-cols-[180px_1fr]" style={{ background: C.claySoft }}>
             <span className="relative block min-h-[120px]">
-              <Image src={`${IMG}/detail.jpg`} alt="" fill sizes="180px" className="object-cover" />
+              <Image src={`${IMG}/detail.jpg`} alt="쌓아 둔 청자색 도자기 그릇" fill sizes="180px" className="object-cover" />
             </span>
             <span className="flex flex-col justify-center p-4 md:p-6">
               <span className="text-[18px] font-bold">시험성적서와 안전 포장</span>

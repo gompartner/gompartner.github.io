@@ -102,7 +102,7 @@ const korTime = (h: number, m = 0) => `${h < 12 ? "오전" : "오후"} ${h % 12 
 /* ---------- 진료 과목 ---------- */
 
 type DeptId = "내과" | "외과" | "영상의학과" | "치과" | "안과" | "피부과" | "고양이 진료";
-const VET_PHOTO: Record<string, number> = { 김하늘: 1, 박준우: 2, 이서아: 3, 최도현: 4 };
+const VET_PHOTO: Record<string, number> = { 허윤호: 1, 박준우: 2, 이서아: 3, 최도현: 4 };
 
 const DEPTS: { id: DeptId; Icon: typeof Stethoscope; when: string[]; care: string[]; vet: string }[] = [
   {
@@ -110,7 +110,7 @@ const DEPTS: { id: DeptId; Icon: typeof Stethoscope; when: string[]; care: strin
     Icon: Stethoscope,
     when: ["구토나 설사가 하루 넘게 이어져요", "물을 평소보다 많이 마셔요", "기침을 하고 숨소리가 거칠어요"],
     care: ["혈액검사, 혈청화학검사", "호르몬 검사(갑상선, 부신)", "수액 처치, 입원 관리"],
-    vet: "김하늘",
+    vet: "허윤호",
   },
   {
     id: "외과",
@@ -145,7 +145,7 @@ const DEPTS: { id: DeptId; Icon: typeof Stethoscope; when: string[]; care: strin
     Icon: Droplets,
     when: ["몸을 계속 긁어요", "털이 동그랗게 빠졌어요", "귀에서 냄새가 나요"],
     care: ["피부 스크래핑, 곰팡이 배양", "귀 세정, 귀 내시경", "알레르기 관리"],
-    vet: "김하늘",
+    vet: "허윤호",
   },
   {
     id: "고양이 진료",
@@ -316,7 +316,7 @@ const NAV: [string, string][] = [
 
 const PHOTOS = [
   { src: "hero.jpg", alt: "수의사가 진료대 위 큰 개를 살펴보는 진료실", cap: "진료실" },
-  { src: "vet-1.jpg", alt: "청록 진료복을 입은 수의사가 흰 강아지를 안은 모습", cap: "내과 김ㅎ늘 수의사" },
+  { src: "vet-1.jpg", alt: "청록 진료복을 입은 수의사가 흰 강아지를 안은 모습", cap: "내과 허ㅇ호 수의사" },
   { src: "vet-3.jpg", alt: "회색 진료복을 입은 수의사가 고양이를 안은 모습", cap: "영상의학과, 안과 이ㅅ아 수의사" },
 ] as const;
 
@@ -575,7 +575,7 @@ function DeptPicker({ dept, setDept }: { dept: DeptId; setDept: (d: DeptId) => v
           </div>
           <p className="flex items-center gap-3 border-t pt-4 text-[15px] sm:col-span-2" style={{ borderColor: C.line, color: C.muted }}>
             {/* eslint-disable-next-line @next/next/no-img-element -- 정적 export 라 next/image 최적화를 쓰지 않는다 */}
-            <img src={`${IMG}/vet-${VET_PHOTO[d.vet]}.jpg`} alt="" className="h-16 w-16 flex-none rounded-full object-cover" />
+            <img src={`${IMG}/vet-${VET_PHOTO[d.vet]}.jpg`} alt={`${maskName(d.vet)} 수의사 사진`} className="h-16 w-16 flex-none rounded-full object-cover" />
             <span>
               담당 <strong style={{ color: C.ink }}>{maskName(d.vet)}</strong> 수의사
             </span>

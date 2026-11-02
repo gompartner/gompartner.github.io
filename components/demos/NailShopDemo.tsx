@@ -353,7 +353,7 @@ function ArtGrid({ reduce, month, onBook }: { reduce: boolean; month: number; on
                 {/* eslint-disable-next-line @next/next/no-img-element -- 정적 export 라 next/image 최적화를 쓰지 않는다 */}
                 <img
                   src={`${IMG}/${x.img}.jpg`}
-                  alt=""
+                  alt={`${x.name} 네일 사진`}
                   loading={i < 3 ? "eager" : "lazy"}
                   fetchPriority={i === 0 ? "high" : undefined}
                   sizes="(min-width: 768px) 260px, 33vw"

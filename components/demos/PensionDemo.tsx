@@ -1024,7 +1024,7 @@ function SubHeader({ title, crumbs, tabs, go }: { title: string; crumbs: string[
   return (
     <>
       <div className="relative h-[180px] overflow-hidden md:h-[220px]" style={{ background: C.navyDeep }}>
-        <Image src={`${IMG}/hero.jpg`} alt="" fill sizes="100vw" className="object-cover opacity-45" style={{ objectPosition: "center 60%" }} />
+        <Image src={`${IMG}/hero.jpg`} alt="바다 앞 펜션 건물 전경" fill sizes="100vw" className="object-cover opacity-45" style={{ objectPosition: "center 60%" }} />
         <div className="absolute inset-0 flex flex-col items-center justify-center px-4 text-center text-white">
           <h1 id="pension-title" tabIndex={-1} className="text-[30px] font-bold tracking-[-0.03em] outline-none md:text-[38px]">
             {title}

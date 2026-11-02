@@ -144,7 +144,7 @@ export default async function MaintenanceDetailPage({ params }: Props) {
           </div>
           {/* 11-01 문서 그림은 밖에 보이지 않는다(지어낸 기록처럼 읽힘). 작업 장면 사진으로 */}
           <div className="relative aspect-[16/10] overflow-hidden rounded-lg">
-            <Image src={`/images/site/scene-${s.id}.jpg`} alt="" fill sizes="(min-width: 768px) 560px, 92vw" className="object-cover" />
+            <Image src={`/images/site/scene-${s.id}.jpg`} alt={`${s.title} 작업 장면`} fill sizes="(min-width: 768px) 560px, 92vw" className="object-cover" />
           </div>
         </div>
       </section>

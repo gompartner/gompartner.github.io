@@ -223,7 +223,7 @@ function Poster({ reduce, go, onOpen }: { reduce: boolean; go: (id: string) => v
 
         <div className="mt-8 flex flex-col gap-4 border-t pt-6 md:flex-row md:items-center md:justify-between" style={{ borderColor: C.line }}>
           <p className="text-[15px] leading-[1.7]" style={{ color: C.body }}>
-            건축사 김ㅎ늘, 설계 담당 2명, {ADDRESS}
+            건축사 왕ㅎ진, 설계 담당 2명, {ADDRESS}
           </p>
           <button
             type="button"

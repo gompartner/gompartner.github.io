@@ -1146,7 +1146,7 @@ function Results() {
 
 const TEACHERS = [
   {
-    name: "김ㅎ늘",
+    name: "구ㅁ채",
     role: "원장, 수학",
     photo: `${IMG}/teacher1.jpg`,
     alt: "화이트보드 앞에 선 남색 스웨터 차림의 수학 강사",

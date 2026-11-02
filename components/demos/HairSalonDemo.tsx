@@ -83,7 +83,7 @@ interface Designer {
   styles: string[];
 }
 const DESIGNERS: Designer[] = [
-  { id: "kim", name: "김ㅎ늘", role: "원장", extra: 0.4, good: "매직, 손상모 펌", can: ["cut", "perm", "color", "clinic", "magic", "dry"], styles: ["volmagic", "ccurl"] },
+  { id: "kim", name: "전ㅁ재", role: "원장", extra: 0.4, good: "매직, 손상모 펌", can: ["cut", "perm", "color", "clinic", "magic", "dry"], styles: ["volmagic", "ccurl"] },
   { id: "lee", name: "이ㅅ아", role: "수석 디자이너", extra: 0.15, good: "레이어드컷, 열펌", can: ["cut", "perm", "color", "clinic", "magic", "dry"], styles: ["layered", "build"] },
   { id: "park", name: "박ㅈ우", role: "디자이너", extra: 0, good: "염색, 발레아쥬", can: ["cut", "perm", "color", "clinic", "dry"], styles: ["balayage", "ashbrown"] },
   { id: "choi", name: "최ㅁ영", role: "디자이너", extra: 0, good: "남성 컷, 다운펌", can: ["cut", "perm", "color", "dry"], styles: ["down", "parting"] },
@@ -199,7 +199,7 @@ export function HairSalonDemo() {
                   return (
                     <span key={k} className="relative block aspect-square overflow-hidden rounded-[4px]">
                       {/* eslint-disable-next-line @next/next/no-img-element -- 정적 export 라 next/image 최적화를 쓰지 않는다 */}
-                      <img src={`${IMG}/style-${k}.jpg`} alt="" loading="lazy" width={300} height={300} className="h-full w-full object-cover" style={{ objectPosition: "50% 25%" }} />
+                      <img src={`${IMG}/style-${k}.jpg`} alt={`${st.name} 스타일 사진`} loading="lazy" width={300} height={300} className="h-full w-full object-cover" style={{ objectPosition: "50% 25%" }} />
                       <span className="absolute inset-x-0 bottom-0 px-2 py-1 text-[12px] font-bold text-white" style={{ background: "linear-gradient(to top, rgba(0,0,0,0.65), rgba(0,0,0,0))" }}>
                         {st.name}
                       </span>
@@ -479,7 +479,7 @@ function Poster({ reduce, today, go, onReserve }: { reduce: boolean; today: Date
             {DESIGNERS.map((d, i) => (
               <li key={d.id} className="flex items-center gap-3 border-b py-3" style={{ borderColor: C.line }}>
                 {/* eslint-disable-next-line @next/next/no-img-element -- 정적 export 라 next/image 최적화를 쓰지 않는다 */}
-                <img src={`${IMG}/designer-${d.id}.jpg`} alt="" width={56} height={56} className="h-14 w-14 shrink-0 rounded-full object-cover" style={{ objectPosition: "50% 20%" }} />
+                <img src={`${IMG}/designer-${d.id}.jpg`} alt={`${d.role} ${d.name} 디자이너 사진`} width={56} height={56} className="h-14 w-14 shrink-0 rounded-full object-cover" style={{ objectPosition: "50% 20%" }} />
                 <div className="min-w-0 flex-1">
                   <p className="text-[17px] font-bold leading-tight">
                     <span className="mr-1.5 text-[14px] font-semibold" style={{ color: C.muted }}>

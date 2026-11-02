@@ -94,10 +94,10 @@ export default function ClassicHomepagePage() {
                 <span className="h-2 w-2 rounded-full bg-[#c5cbd4]" />
                 <span className="h-2 w-2 rounded-full bg-[#c5cbd4]" />
               </div>
-              <Image src={shot.imageUrl} alt="" width={1440} height={900} sizes="(min-width: 768px) 560px, 90vw" className="aspect-[16/10] w-full object-cover object-top" />
+              <Image src={shot.imageUrl} alt={`${shot.title} PC 화면`} width={1440} height={900} sizes="(min-width: 768px) 560px, 90vw" className="aspect-[16/10] w-full object-cover object-top" />
             </div>
             <div className="absolute bottom-0 right-0 w-[27%] overflow-hidden rounded-[16px] border-[4px] border-[#15171c] bg-white shadow-[0_20px_40px_rgba(21,23,28,.2)]">
-              <Image src={`/images/demos/m/${shotSlug}.jpg`} alt="" width={390} height={736} sizes="160px" className="aspect-[9/17] w-full object-cover object-top" />
+              <Image src={`/images/demos/m/${shotSlug}.jpg`} alt={`${shot.title} 휴대폰 화면`} width={390} height={736} sizes="160px" className="aspect-[9/17] w-full object-cover object-top" />
             </div>
           </div>
         </div>

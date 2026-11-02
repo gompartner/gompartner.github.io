@@ -500,7 +500,7 @@ function Loading({ ready, progress }: { ready: boolean; progress: number }) {
     <div className={`pointer-events-none absolute inset-0 z-[45] flex flex-col items-center justify-center gap-4 bg-(--bg) transition-opacity duration-500 motion-reduce:transition-none ${ready ? "opacity-0" : "opacity-100"}`} aria-live="polite">
       <style>{"@keyframes kiosk-bear-bob{0%,100%{transform:translateY(0)}50%{transform:translateY(-8px)}}@media (prefers-reduced-motion: reduce){.kiosk-bear{animation:none!important}}"}</style>
       {/* eslint-disable-next-line @next/next/no-img-element -- 정적 내보내기 사이트라 next/image 최적화를 쓰지 않는다 */}
-      <img src="/images/bear-avatar.webp" alt="" width={96} height={96} className="kiosk-bear h-24 w-24 select-none rounded-full shadow-[0_6px_16px_rgba(20,30,40,.12)]" style={{ animation: "kiosk-bear-bob 1.6s ease-in-out infinite" }} draggable={false} />
+      <img src="/images/bear-avatar.webp" alt="곰파트너 곰 캐릭터" width={96} height={96} className="kiosk-bear h-24 w-24 select-none rounded-full shadow-[0_6px_16px_rgba(20,30,40,.12)]" style={{ animation: "kiosk-bear-bob 1.6s ease-in-out infinite" }} draggable={false} />
       <div className="flex w-[200px] flex-col items-center gap-2">
         <div className="h-1.5 w-full overflow-hidden rounded-full bg-black/10">
           <div className="h-full rounded-full bg-(--acc) transition-[width] duration-300 motion-reduce:transition-none" style={{ width: `${pct}%` }} />

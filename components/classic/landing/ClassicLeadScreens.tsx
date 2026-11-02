@@ -5,10 +5,10 @@ import { ChevronDown, Sheet } from "lucide-react";
 // 틀은 사이트의 카탈로그 캡처와 같은 브라우저 틀(점 세 개), 휴대폰 틀(검은 테두리)을 쓴다. 로고는 넣지 않는다.
 // 시각이 바뀌지 않는 고정 화면이라 서버에서 그린다.
 
-const LEAD = { biz: "정수기 렌탈", name: "김ㅎ늘", phone: "010-1234-****", product: "정수기, 비데", time: "평일 저녁", source: "네이버 검색광고", at: "11.01 21:56" };
+const LEAD = { biz: "정수기 렌탈", name: "이ㅈ원", phone: "010-1234-****", product: "정수기, 비데", time: "평일 저녁", source: "네이버 검색광고", at: "11.01 21:56" };
 
 const ROWS = [
-  { at: "11.01 21:56", name: "김ㅎ늘", phone: "010-1234-****", what: "정수기, 비데", source: "네이버 검색광고", status: "통화 전", dup: false, fresh: true },
+  { at: "11.01 21:56", name: "이ㅈ원", phone: "010-1234-****", what: "정수기, 비데", source: "네이버 검색광고", status: "통화 전", dup: false, fresh: true },
   { at: "11.01 11:20", name: "박ㅅ연", phone: "010-7731-****", what: "정수기", source: "메타 광고", status: "통화함", dup: false, fresh: false },
   { at: "11.01 09:05", name: "이ㅈ민", phone: "010-2290-****", what: "공기청정기", source: "네이버 검색광고", status: "계약", dup: true, fresh: false },
   { at: "10.31 21:40", name: "이ㅈ민", phone: "010-2290-****", what: "공기청정기", source: "네이버 검색광고", status: "보류", dup: true, fresh: false },

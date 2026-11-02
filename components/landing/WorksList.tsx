@@ -18,7 +18,7 @@ export function WorksList({ projects }: { projects: Project[] }) {
             <Link href={w.demoUrl.replace("/demo/", "/sample/")} prefetch={false} data-gtm-cta={`demo_open_${w.id}`} className="group flex items-center gap-4 py-3 md:gap-6">
               <Image
                 src={smallImage(w.imageUrl)}
-                alt=""
+                alt={`${w.title} 화면`}
                 width={SMALL_IMAGE_WIDTH}
                 height={SMALL_IMAGE_HEIGHT}
                 className="aspect-[16/10] h-auto w-24 shrink-0 rounded-[4px] border border-border object-cover object-top md:w-36"

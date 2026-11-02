@@ -860,7 +860,7 @@ function HomePage({ go, linkOut }: { go: Go; linkOut: (w: "naver" | "kakao" | "m
     <>
       {/* 메인 배너 */}
       <section className="relative isolate overflow-hidden" style={{ backgroundColor: C.ink }} aria-labelledby="main-title">
-        <Image src={`${IMG}/hero.jpg`} alt="" fill priority sizes="100vw" className="-z-10 object-cover object-[72%_50%]" />
+        <Image src={`${IMG}/hero.jpg`} alt="치과 진료실 내부" fill priority sizes="100vw" className="-z-10 object-cover object-[72%_50%]" />
         <div className="absolute inset-0 -z-10" style={{ background: "linear-gradient(90deg, rgba(16,48,47,0.86) 0%, rgba(16,48,47,0.6) 50%, rgba(16,48,47,0.15) 100%)" }} aria-hidden />
         <div className={`${container} pb-14 pt-14 text-white md:pb-20 md:pt-20`}>
           <p className="text-[17px] font-bold" style={{ color: C.onInkMuted }}>
@@ -1030,8 +1030,8 @@ function DoctorList() {
     <ul className="mt-8 grid gap-8 md:grid-cols-2">
       {DOCTORS.map((d) => (
         <li key={d.name} className="grid grid-cols-[112px_1fr] gap-5 sm:grid-cols-[160px_1fr] sm:gap-7">
-          <span className="relative block aspect-[4/5] overflow-hidden rounded-[10px]" style={{ backgroundColor: C.mint }} aria-hidden>
-            <Image src={`${IMG}/${d.img}.jpg`} alt="" fill sizes="160px" className="object-cover" style={{ objectPosition: d.pos }} />
+          <span className="relative block aspect-[4/5] overflow-hidden rounded-[10px]" style={{ backgroundColor: C.mint }}>
+            <Image src={`${IMG}/${d.img}.jpg`} alt={`${d.name} 원장 사진`} fill sizes="160px" className="object-cover" style={{ objectPosition: d.pos }} />
           </span>
           <div className="min-w-0 self-center">
             <p className="text-[15px] font-bold" style={{ color: C.accent }}>
@@ -1266,7 +1266,7 @@ function TreatmentDetail({ id, reserve }: { id: Exclude<TreatmentId, "check">; r
   return (
     <div className="grid gap-8 lg:grid-cols-12 lg:gap-12">
       <div className="relative aspect-[3/2] overflow-hidden rounded-[10px] lg:col-span-5" style={{ backgroundColor: C.mint }}>
-        <Image src={`${IMG}/${t.img}.jpg`} alt="" fill sizes="(min-width:1024px) 480px, 100vw" className="object-cover" style={{ objectPosition: t.pos ?? "50% 50%" }} />
+        <Image src={`${IMG}/${t.img}.jpg`} alt={`${TREATMENT_NAME[id]} 진료 사진`} fill sizes="(min-width:1024px) 480px, 100vw" className="object-cover" style={{ objectPosition: t.pos ?? "50% 50%" }} />
       </div>
       <div className="min-w-0 lg:col-span-7">
         <p className="text-[19px]">{t.summary}</p>

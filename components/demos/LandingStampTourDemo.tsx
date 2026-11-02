@@ -917,7 +917,7 @@ function GuideBooking({ days, reduce }: { days: Date[]; reduce: boolean }) {
         </div>
         <label className="block text-[13px] font-bold tracking-[0.1em]" style={{ color: C.red }}>
           이름
-          <input value={name} onChange={(e) => setName(e.target.value)} placeholder="김ㅎ늘" autoComplete="name" className={input} style={{ borderColor: C.ink, color: C.ink, outlineColor: C.red, letterSpacing: 0, fontWeight: 400 }} />
+          <input value={name} onChange={(e) => setName(e.target.value)} placeholder="이름" autoComplete="name" className={input} style={{ borderColor: C.ink, color: C.ink, outlineColor: C.red, letterSpacing: 0, fontWeight: 400 }} />
           {err("name")}
         </label>
         <label className="block text-[13px] font-bold tracking-[0.1em]" style={{ color: C.red }}>
@@ -1070,7 +1070,7 @@ function GiftForm({ complete, got, need, year, reduce, onCourse }: { complete: b
         <div className="grid gap-6 md:grid-cols-2">
           <label className="block text-[13px] font-bold tracking-[0.1em]" style={{ color: C.red }}>
             이름
-            <input value={name} onChange={(e) => setName(e.target.value)} placeholder="김ㅎ늘" autoComplete="name" className={input} style={fieldStyle} />
+            <input value={name} onChange={(e) => setName(e.target.value)} placeholder="이름" autoComplete="name" className={input} style={fieldStyle} />
             {err("name")}
           </label>
           <label className="block text-[13px] font-bold tracking-[0.1em]" style={{ color: C.red }}>

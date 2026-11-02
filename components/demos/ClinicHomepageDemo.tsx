@@ -458,7 +458,7 @@ function Home({ go }: { go: (p: Page) => void }) {
     <>
       {/* 첫 화면 */}
       <section className="relative isolate overflow-hidden" style={{ backgroundColor: TRACK.beauty.tint }} aria-labelledby="hero-title">
-        <Image src={`${IMG}/hero.jpg`} alt="" fill priority sizes="100vw" className="-z-10 object-cover object-[70%_30%]" />
+        <Image src={`${IMG}/hero.jpg`} alt="피부과 상담을 받는 여성" fill priority sizes="100vw" className="-z-10 object-cover object-[70%_30%]" />
         <div className="absolute inset-0 -z-10" style={{ background: "linear-gradient(90deg, rgba(251,249,248,0.94) 0%, rgba(251,249,248,0.75) 45%, rgba(251,249,248,0) 75%)" }} aria-hidden />
         <div className={`${container} py-16 md:py-24`}>
           <p className="text-[16px] font-semibold" style={{ color: TRACK.beauty.accent }}>
@@ -788,7 +788,7 @@ function MedicalPage() {
             </p>
           </div>
           <div className="relative aspect-[4/3] overflow-hidden rounded-[16px]" style={{ backgroundColor: t.soft }}>
-            <Image src={`${IMG}/lobby.jpg`} alt="" fill sizes="(min-width:1024px) 600px, 100vw" className="object-cover object-[50%_75%]" />
+            <Image src={`${IMG}/lobby.jpg`} alt="피부과 대기실" fill sizes="(min-width:1024px) 600px, 100vw" className="object-cover object-[50%_75%]" />
           </div>
         </div>
       </section>
@@ -865,7 +865,7 @@ function BeautyPage({ go }: { go: (p: Page, tab?: "price" | "legal") => void }) 
         <div key={cat} id="cat-panel" role="tabpanel" aria-labelledby={`cat-tab-${cat}`} className="soft-in grid gap-8 pt-8 lg:grid-cols-12">
           <div className="lg:col-span-4">
             <div className="relative aspect-[4/3] overflow-hidden rounded-[16px]" style={{ backgroundColor: t.soft }}>
-              <Image src={`${IMG}/${current.img}.jpg`} alt="" fill sizes="(min-width:1024px) 400px, 100vw" className="object-cover" />
+              <Image src={`${IMG}/${current.img}.jpg`} alt={`${current.label} 시술 사진`} fill sizes="(min-width:1024px) 400px, 100vw" className="object-cover" />
             </div>
             <h2 className="mt-5 text-[24px] font-semibold tracking-[-0.03em]">{current.label}</h2>
             <p className="mt-2" style={{ color: C.muted }}>
