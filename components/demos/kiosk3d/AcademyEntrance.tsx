@@ -538,13 +538,13 @@ export function AcademyEntrance(_props: RoomProps) {
       <ConsultTable x={-4.3} z={2.45} />
       <Model url={MODELS.shelf} position={[-0.86, 0, 2.95]} />
 
-      {/* 교실 A(열린 문): 책상 6개가 화이트보드(오른쪽 벽)를 본다 */}
+      {/* 교실 A(열린 문): 책상 6개가 화이트보드(오른쪽 벽)를 본다. 의자 모델은 앞이 -z라 +90도로 돌려야 화이트보드를 본다(11-02 반대 방향 지적) */}
       <Whiteboard x={X1 - WALL_T / 2 - 0.02} y={1.35} z={-1.15} rotationY={-Math.PI / 2} w={1.8} />
       {[-2.75, -1.75, -0.8].flatMap((dz) =>
         [2.4, 3.6].map((dx) => (
           <group key={`a${dx}${dz}`}>
             <Model url={MODELS.desk} position={[dx + 0.1, 0, dz]} rotationY={-Math.PI / 2} />
-            <Model url={MODELS.chair} position={[dx - 0.42, 0, dz]} rotationY={-Math.PI / 2} />
+            <Model url={MODELS.chair} position={[dx - 0.42, 0, dz]} rotationY={Math.PI / 2} />
           </group>
         )),
       )}
@@ -556,7 +556,7 @@ export function AcademyEntrance(_props: RoomProps) {
         [2.4, 3.6].map((dx) => (
           <group key={`b${dx}${dz}`}>
             <Model url={MODELS.desk} position={[dx + 0.1, 0, dz]} rotationY={-Math.PI / 2} />
-            <Model url={MODELS.chair} position={[dx - 0.42, 0, dz]} rotationY={-Math.PI / 2} />
+            <Model url={MODELS.chair} position={[dx - 0.42, 0, dz]} rotationY={Math.PI / 2} />
           </group>
         )),
       )}

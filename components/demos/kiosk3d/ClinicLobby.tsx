@@ -159,8 +159,8 @@ function Reception() {
         <boxGeometry args={[2.7, 0.12, 0.006]} />
         <meshStandardMaterial color="#0f5560" roughness={0.45} />
       </mesh>
-      {/* 발 쪽 그림자 홈 */}
-      <mesh position={[0, 0.04, 0.3]}>
+      {/* 발 쪽 걸레받이. 앞판 앞면(z 0.31)과 같은 면에 두면 떨려 보여서 1cm 앞으로 뺀다(11-02) */}
+      <mesh position={[0, 0.04, 0.322]}>
         <boxGeometry args={[2.66, 0.08, 0.02]} />
         <meshStandardMaterial color="#9aa1a3" roughness={0.8} />
       </mesh>
