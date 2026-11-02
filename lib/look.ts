@@ -29,5 +29,5 @@ export function webtoonPathFor(path: string): string {
   return rest === "" || rest === "/" ? storyPath : (webtoonOnly[rest] ?? rest);
 }
 
-/** 루트 레이아웃 head 스크립트. 웹툰을 고른 사람은 첫 화면에서 이야기로, 나머지는 웹툰 주소에서 같은 클래식 주소로 그리기 전에 옮긴다. */
-export const lookRedirectScript = `try{var p=location.pathname.replace(/\\/$/,"")||"/";var w=false;try{w=localStorage.getItem("look")==="webtoon"}catch(e){}if(w){if(p==="/")location.replace("${storyPath}"+location.search+location.hash)}else if(${JSON.stringify(redirectPaths)}.some(function(x){return p===x||p.indexOf(x+"/")===0}))location.replace("/classic"+p+location.search+location.hash);if(${JSON.stringify(removedPaths)}.some(function(x){return p===x||p.indexOf(x+"/")===0}))location.replace("/")}catch(e){}`;
+/** 루트 레이아웃 head 스크립트. 11-03 웹툰(/story)을 내렸다. 예전 웹툰 기억은 지우고, /story는 클래식 회사소개로, 웹툰 주소는 같은 클래식 주소로 그리기 전에 옮긴다. */
+export const lookRedirectScript = `try{var p=location.pathname.replace(/\\/$/,"")||"/";try{localStorage.removeItem("look")}catch(e){}if(p==="${storyPath}"||p.indexOf("${storyPath}/")===0)location.replace("/classic/story"+location.search+location.hash);else if(${JSON.stringify(redirectPaths)}.some(function(x){return p===x||p.indexOf(x+"/")===0}))location.replace("/classic"+p+location.search+location.hash);if(${JSON.stringify(removedPaths)}.some(function(x){return p===x||p.indexOf(x+"/")===0}))location.replace("/")}catch(e){}`;
