@@ -24,6 +24,7 @@ import {
 } from "lucide-react";
 import { FaqBlock } from "@/components/classic/FaqBlock";
 import { PhpPromo } from "@/components/classic/PhpPromo";
+import { PriceBand } from "@/components/classic/PriceBand";
 import { faq, processSteps } from "@/data/classic/faq";
 import { maintenanceServices, maintenanceSteps } from "@/data/classic/maintenance";
 import { projects } from "@/data/classic/projects";
@@ -112,6 +113,7 @@ export function ClassicHome() {
       <PhpPromo />
       <Strengths />
       <Services />
+      <PriceBand />
       <Catalog />
       <Process />
       <Faq />
