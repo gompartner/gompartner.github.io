@@ -837,40 +837,32 @@ export function KioskScene({ place, children, tv, phone, monitor, className = ""
       ) : null}
 
       {ready && steps.length && !zoom ? (
-        <nav aria-label="이용 흐름" className="absolute left-1/2 top-3 z-[40] flex w-[calc(100%-24px)] max-w-[860px] -translate-x-1/2 items-stretch gap-1 overflow-hidden rounded-2xl bg-white/95 p-1 shadow-[0_6px_18px_rgba(20,30,40,.14)]">
+        <nav aria-label="이용 흐름" className="absolute left-1/2 top-3 z-[40] flex w-[calc(100%-24px)] max-w-[480px] -translate-x-1/2 items-stretch gap-1 overflow-hidden rounded-2xl bg-white/95 p-1 shadow-[0_6px_18px_rgba(20,30,40,.14)]">
           <style>{"@keyframes kiosk-next{from{transform:scaleX(0)}to{transform:scaleX(1)}}"}</style>
-          <ol className={`relative z-[1] flex items-stretch ${narrow ? "shrink-0 gap-0" : "min-w-0 flex-1 gap-1"}`}>
+          <ol className={`relative z-[1] flex shrink-0 items-stretch ${narrow ? "gap-0" : "gap-1"}`}>
             {steps.map((s, i) => {
               const on = step === i;
               const done = step !== null && i < step;
               return (
-                <li key={s.id} className={narrow ? "relative shrink-0" : "min-w-0 flex-1"}>
+                <li key={s.id} className="relative shrink-0">
                   <button
                     type="button"
                     onClick={() => pick(i)}
                     aria-current={on ? "step" : undefined}
-                    aria-label={narrow ? `${i + 1}단계 ${s.label}` : undefined}
-                    className={
-                      narrow
-                        ? "flex h-full w-full items-center rounded-xl px-1 py-1.5"
-                        : "flex h-full w-full items-center gap-2 rounded-xl px-2.5 py-2 text-left leading-tight"
-                    }
+                    aria-label={`${i + 1}단계 ${s.label}`}
+                    className={`flex h-full w-full items-center rounded-xl py-1.5 ${narrow ? "px-1" : "px-1.5"}`}
                   >
-                    {/* 지난 단계와 지금 단계는 색을 채운 번호, 남은 단계는 테두리만. PC는 이름도 굵기로 구분 */}
+                    {/* 지난 단계와 지금 단계는 색을 채운 번호, 남은 단계는 테두리만. 지금 단계 이름은 번호 옆 한 곳에만 */}
                     <span className={`flex h-5 w-5 shrink-0 items-center justify-center rounded-full text-[11px] font-bold ${on || done ? "bg-(--acc) text-white" : "border border-[#c9d1d6] bg-white/70 text-[#7a858d]"}`}>{i + 1}</span>
-                    {narrow ? null : (
-                      <span className={`min-w-0 break-keep ${on ? "text-[14px] font-extrabold tracking-[-0.02em] text-[#0f1d24]" : done ? "text-[13px] font-semibold text-[#33414a]" : "text-[13px] font-medium text-[#7a858d]"}`}>{s.label}</span>
-                    )}
+                    
                   </button>
                 </li>
               );
             })}
           </ol>
-          {narrow ? (
-            <p aria-hidden className="relative z-[1] flex min-w-0 flex-1 items-center px-1.5 text-[13px] font-extrabold leading-tight tracking-[-0.02em] text-[#0f1d24]">
-              <span className="line-clamp-2 break-keep">{cur ? cur.label : "이용 흐름"}</span>
-            </p>
-          ) : null}
+          <p aria-hidden className={`relative z-[1] flex min-w-0 flex-1 items-center font-extrabold leading-tight tracking-[-0.02em] text-[#0f1d24] ${narrow ? "px-1.5 text-[13px]" : "px-3 text-[15px]"}`}>
+            <span className="line-clamp-2 break-keep">{cur ? cur.label : "이용 흐름"}</span>
+          </p>
           {auto && timer ? <Countdown key={timer.at} timer={timer} className="relative z-[1] self-center px-1 text-[12px] font-bold text-[#5b6670]" /> : null}
           {/* 막대 전체가 진행만큼 색으로 차오른다(지난 단계까지 + 지금 단계는 다음 장면까지 이어서) */}
           <ProgressFill key={`p-${step}-${timer?.at ?? "x"}`} from={step === null ? 0 : step / steps.length} to={step === null ? 0 : (step + (auto && timer ? 1 : 0.5)) / steps.length} ms={auto && timer ? timer.ms : 0} />
