@@ -3,14 +3,37 @@ import Link from "next/link";
 import { profile } from "@/data/classic/profile";
 
 // 클래식 보기 바닥글. 사업자 정보는 상호와 번호만 둔다(통신판매업 신고 전).
-const menu = [
-  { href: "/classic/story", label: "회사소개" },
-  { href: "/classic/homepage", label: "홈페이지 제작" },
-  { href: "/classic/maintenance", label: "유지보수" },
-  { href: "/classic/works", label: "카탈로그" },
-  { href: "/classic/notice", label: "공지사항" },
-  { href: "/classic/faq", label: "자주 묻는 질문" },
-  { href: "/classic/contact", label: "상담 신청" },
+// 11-02 머리글 메뉴(제작, 유지보수, 고객지원)와 같은 묶음으로 맞춘다
+const groups = [
+  {
+    title: "제작",
+    items: [
+      { href: "/classic/homepage", label: "홈페이지 제작" },
+      { href: "/classic/landing", label: "랜딩페이지 제작" },
+      { href: "/classic/program", label: "업무 프로그램 제작" },
+      { href: "/classic/app", label: "앱 제작" },
+      { href: "/classic/kiosk", label: "키오스크 화면 제작" },
+    ],
+  },
+  {
+    title: "유지보수",
+    items: [
+      { href: "/classic/maintenance/fix", label: "오류 수정" },
+      { href: "/classic/maintenance/takeover", label: "업체 이관" },
+      { href: "/classic/maintenance/update", label: "보안 업데이트" },
+      { href: "/classic/maintenance/monthly", label: "월 관리" },
+    ],
+  },
+  {
+    title: "곰파트너",
+    items: [
+      { href: "/classic/story", label: "회사소개" },
+      { href: "/classic/works", label: "카탈로그" },
+      { href: "/classic/notice", label: "공지사항" },
+      { href: "/classic/faq", label: "자주 묻는 질문" },
+      { href: "/classic/contact", label: "상담 신청" },
+    ],
+  },
 ];
 export const channels = [
   { href: "https://blog.naver.com/gompartner", label: "네이버 블로그" },
@@ -22,8 +45,8 @@ export const channels = [
 export function ClassicFooter() {
   return (
     <footer className="bg-[#15171c] pb-24 text-[15px] text-[#a3abb8] md:pb-0">
-      <div className="mx-auto grid w-full max-w-[1248px] gap-10 px-4 py-14 md:grid-cols-[1.3fr_1fr_1fr] md:px-6 md:py-16">
-        <div>
+      <div className="mx-auto grid w-full max-w-[1248px] grid-cols-2 gap-x-6 gap-y-10 px-4 py-14 md:grid-cols-4 md:px-6 md:py-16 lg:grid-cols-[1.4fr_repeat(4,minmax(0,1fr))]">
+        <div className="col-span-2 md:col-span-4 lg:col-span-1">
           <p className="flex items-center gap-2.5 text-[21px] font-[800] tracking-[-0.04em] text-white">
             <Image src="/images/bear-avatar.webp" alt="" width={32} height={32} className="h-8 w-8 rounded-full object-cover" />
             {profile.name}
@@ -40,21 +63,23 @@ export function ClassicFooter() {
             </a>
           </p>
         </div>
-        <nav aria-label="바닥글 메뉴">
-          <h2 className="text-[14px] font-bold text-white">메뉴</h2>
-          <ul className="mt-4 grid grid-cols-2 gap-y-2.5" role="list">
-            {menu.map((m) => (
-              <li key={m.href}>
-                <Link href={m.href} className="-my-1.5 inline-block py-1.5 hover:text-white">
-                  {m.label}
-                </Link>
-              </li>
-            ))}
-          </ul>
-        </nav>
+        {groups.map((g) => (
+          <nav key={g.title} aria-label={`바닥글 ${g.title} 메뉴`}>
+            <h2 className="text-[14px] font-bold text-white">{g.title}</h2>
+            <ul className="mt-4 grid gap-y-2.5" role="list">
+              {g.items.map((m) => (
+                <li key={m.href}>
+                  <Link href={m.href} className="-my-1.5 inline-block py-1.5 hover:text-white">
+                    {m.label}
+                  </Link>
+                </li>
+              ))}
+            </ul>
+          </nav>
+        ))}
         <div>
           <h2 className="text-[14px] font-bold text-white">채널</h2>
-          <ul className="mt-4 grid grid-cols-2 gap-y-2.5" role="list">
+          <ul className="mt-4 grid gap-y-2.5" role="list">
             {channels.map((c) => (
               <li key={c.href}>
                 <a href={c.href} target="_blank" rel="noopener noreferrer" className="-my-1.5 inline-block py-1.5 hover:text-white">
