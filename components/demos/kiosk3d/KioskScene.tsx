@@ -448,6 +448,24 @@ function LabelView({ l }: { l: Label }) {
   );
 }
 
+/* ---------------- 다음 장면까지 남은 시간 ---------------- */
+
+// 자동 넘김이 켜져 있을 때 "3초"처럼 남은 초를 보여 준다. key로 장면마다 새로 센다
+function Countdown({ timer, className = "" }: { timer: { at: number; ms: number }; className?: string }) {
+  const left = () => Math.max(0, Math.ceil((timer.at + timer.ms - performance.now()) / 1000));
+  const [sec, setSec] = useState(left);
+  useEffect(() => {
+    const id = window.setInterval(() => setSec(left()), 200);
+    return () => window.clearInterval(id);
+    // eslint-disable-next-line react-hooks/exhaustive-deps -- timer는 key로 바뀌므로 처음 값만 쓴다
+  }, []);
+  return (
+    <span className={`shrink-0 whitespace-nowrap tabular-nums ${className}`} aria-hidden>
+      {sec}초
+    </span>
+  );
+}
+
 /* ---------------- 불러오는 동안 ---------------- */
 
 // 곰파트너 곰이 위아래로 살짝 움직이고, 아래에 불러온 비율을 보여 준다. 다 불러오면 0.5초 동안 흐려지며 사라진다
@@ -512,6 +530,7 @@ export function KioskScene({ place, children, tv, phone, monitor, className = ""
   const [touch, setTouch] = useState(false);
   // 11-02 휴대폰 폭: 단계 막대는 번호만, 장면 설명표와 조작 안내는 숨기고 버튼은 아이콘만
   const [narrow, setNarrow] = useState(false);
+  const [timer, setTimer] = useState<{ at: number; ms: number } | null>(null);
   const [resetKey, setResetKey] = useState(0);
   const { active: loadingNow, progress } = useProgress();
   const [ready, setReady] = useState(false);
@@ -610,6 +629,9 @@ export function KioskScene({ place, children, tv, phone, monitor, className = ""
     // 병원 데모는 접수 중(paused)에 장면을 멈춘다. 다가간 키오스크 화면을 쓰는 중일 때만 기다리고, 처음 자동 재생은 막지 않는다
     if (paused && zoom) return;
     const wait = step === null ? 2600 : (DWELL[stepId ?? ""] ?? 4800);
+    // 11-02 다음 장면까지 남은 시간 표시용
+    const at = performance.now();
+    const f = requestAnimationFrame(() => setTimer({ at, ms: wait }));
     const t = window.setTimeout(() => {
       if (step === null) go(resume.current);
       else if (step + 1 < steps.length) go(step + 1);
@@ -618,7 +640,11 @@ export function KioskScene({ place, children, tv, phone, monitor, className = ""
         go(null);
       }
     }, wait);
-    return () => window.clearTimeout(t);
+    return () => {
+      window.clearTimeout(t);
+      cancelAnimationFrame(f);
+      setTimer(null);
+    };
     // eslint-disable-next-line react-hooks/exhaustive-deps -- go는 매번 새로 만들어지지만 안에서 쓰는 값은 위 의존 값뿐이다
   }, [auto, ready, paused, zoom, step, stepId, steps.length]);
 
@@ -794,7 +820,8 @@ export function KioskScene({ place, children, tv, phone, monitor, className = ""
 
       {ready && steps.length && !zoom ? (
         <nav aria-label="이용 흐름" className="absolute left-1/2 top-3 z-[40] flex w-[calc(100%-24px)] max-w-[860px] -translate-x-1/2 items-stretch gap-1 rounded-2xl bg-white/95 p-1 shadow-[0_6px_18px_rgba(20,30,40,.14)]">
-          <ol className={`flex items-stretch gap-1 ${narrow ? "shrink-0" : "min-w-0 flex-1"}`}>
+          <style>{"@keyframes kiosk-next{from{transform:scaleX(0)}to{transform:scaleX(1)}}"}</style>
+          <ol className={`flex items-stretch ${narrow ? "shrink-0 gap-0" : "min-w-0 flex-1 gap-1"}`}>
             {steps.map((s, i) => {
               const on = step === i;
               return (
@@ -804,7 +831,7 @@ export function KioskScene({ place, children, tv, phone, monitor, className = ""
                     onClick={() => pick(i)}
                     aria-current={on ? "step" : undefined}
                     aria-label={narrow ? `${i + 1}단계 ${s.label}` : undefined}
-                    className={`flex h-full w-full items-center gap-2 rounded-xl text-left text-[13px] font-bold leading-tight transition-colors ${narrow ? "px-1.5 py-1.5" : "px-2.5 py-2"} ${on ? "bg-(--acc) text-white" : "text-[#33414a] hover:bg-[#eef3f3]"}`}
+                    className={`flex h-full w-full items-center gap-2 rounded-xl text-left text-[13px] font-bold leading-tight transition-colors ${narrow ? "px-1 py-1.5" : "px-2.5 py-2"} ${on ? "bg-(--acc) text-white" : "text-[#33414a] hover:bg-[#eef3f3]"}`}
                   >
                     <span className={`flex h-5 w-5 shrink-0 items-center justify-center rounded-full text-[11px] ${on ? "bg-white text-(--acc)" : "bg-(--acc)/10 text-(--acc)"}`}>{i + 1}</span>
                     {narrow ? null : <span className="min-w-0 break-keep">{s.label}</span>}
@@ -814,9 +841,14 @@ export function KioskScene({ place, children, tv, phone, monitor, className = ""
             })}
           </ol>
           {narrow ? (
-            <p aria-hidden className="flex min-w-0 flex-1 items-center truncate px-1.5 text-[13px] font-bold text-[#33414a]">
-              <span className="truncate">{cur ? cur.label : "이용 흐름"}</span>
+            <p aria-hidden className="flex min-w-0 flex-1 items-center px-1.5 text-[12px] font-bold leading-tight text-[#33414a]">
+              <span className="line-clamp-2 break-keep">{cur ? cur.label : "이용 흐름"}</span>
             </p>
+          ) : null}
+          {auto && timer ? <Countdown key={timer.at} timer={timer} className="self-center px-1 text-[12px] font-bold text-[#5b6670]" /> : null}
+          {/* 막대 아래쪽 가는 줄이 다음 장면까지 차오른다 */}
+          {auto && timer ? (
+            <span key={`bar-${timer.at}`} aria-hidden className="pointer-events-none absolute inset-x-3 bottom-0 h-[3px] origin-left rounded-full bg-(--acc)/70 motion-reduce:hidden" style={{ animation: `kiosk-next ${timer.ms}ms linear forwards` }} />
           ) : null}
           <button
             type="button"
@@ -832,7 +864,7 @@ export function KioskScene({ place, children, tv, phone, monitor, className = ""
               }
             }}
             aria-label={auto ? "자동 넘김 멈춤" : "자동 넘김 시작"}
-            className="flex w-10 shrink-0 items-center justify-center rounded-xl text-[#33414a] hover:bg-[#eef3f3]"
+            className={`flex shrink-0 items-center justify-center rounded-xl text-[#33414a] hover:bg-[#eef3f3] ${narrow ? "w-8" : "w-10"}`}
           >
             {auto ? (
               <svg viewBox="0 0 16 16" className="h-4 w-4" aria-hidden>
@@ -859,6 +891,7 @@ export function KioskScene({ place, children, tv, phone, monitor, className = ""
       {zoom && step !== null && step + 1 < steps.length ? (
         <button type="button" onClick={() => pick(step + 1)} className="absolute bottom-4 right-4 z-[40] rounded-full bg-(--acc) px-5 py-2.5 text-[14px] font-bold text-white shadow-[0_8px_20px_rgba(0,0,0,.25)]">
           다음 단계
+          {auto && timer ? <Countdown key={timer.at} timer={timer} className="ml-1.5 font-semibold text-white/80" /> : null}
         </button>
       ) : null}
       {/* 아래 왼쪽 보기 조작 막대: 정면 보기, 전체 보기(단계 화면이나 키오스크 앞에서만), 조작 안내(처음 만지면 접힘) */}
