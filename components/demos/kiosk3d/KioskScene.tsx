@@ -853,17 +853,13 @@ export function KioskScene({ place, children, tv, phone, monitor, className = ""
                     className={
                       narrow
                         ? "flex h-full w-full items-center rounded-xl px-1 py-1.5"
-                        : `flex h-full w-full items-center gap-2 rounded-xl px-2.5 py-2 text-left text-[13px] font-bold leading-tight transition-colors ${on ? "bg-(--acc) text-white" : "text-[#33414a] hover:bg-[#eef3f3]"}`
+                        : "flex h-full w-full items-center gap-2 rounded-xl px-2.5 py-2 text-left leading-tight"
                     }
                   >
-                    {narrow ? (
-                      // 휴대폰: 지난 단계와 지금 단계는 색을 채운 번호, 남은 단계는 테두리만
-                      <span className={`flex h-5 w-5 shrink-0 items-center justify-center rounded-full text-[11px] font-bold ${on || done ? "bg-(--acc) text-white" : "border border-[#c9d1d6] bg-white/70 text-[#7a858d]"}`}>{i + 1}</span>
-                    ) : (
-                      <>
-                        <span className={`flex h-5 w-5 shrink-0 items-center justify-center rounded-full text-[11px] ${on ? "bg-white text-(--acc)" : "bg-(--acc)/10 text-(--acc)"}`}>{i + 1}</span>
-                        <span className="min-w-0 break-keep">{s.label}</span>
-                      </>
+                    {/* 지난 단계와 지금 단계는 색을 채운 번호, 남은 단계는 테두리만. PC는 이름도 굵기로 구분 */}
+                    <span className={`flex h-5 w-5 shrink-0 items-center justify-center rounded-full text-[11px] font-bold ${on || done ? "bg-(--acc) text-white" : "border border-[#c9d1d6] bg-white/70 text-[#7a858d]"}`}>{i + 1}</span>
+                    {narrow ? null : (
+                      <span className={`min-w-0 break-keep ${on ? "text-[14px] font-extrabold tracking-[-0.02em] text-[#0f1d24]" : done ? "text-[13px] font-semibold text-[#33414a]" : "text-[13px] font-medium text-[#7a858d]"}`}>{s.label}</span>
                     )}
                   </button>
                 </li>
@@ -876,13 +872,8 @@ export function KioskScene({ place, children, tv, phone, monitor, className = ""
             </p>
           ) : null}
           {auto && timer ? <Countdown key={timer.at} timer={timer} className="relative z-[1] self-center px-1 text-[12px] font-bold text-[#5b6670]" /> : null}
-          {narrow ? (
-            // 휴대폰: 막대 전체가 진행만큼 색으로 차오른다(지난 단계까지 + 지금 단계는 다음 장면까지 이어서)
-            <ProgressFill key={`p-${step}-${timer?.at ?? "x"}`} from={step === null ? 0 : step / steps.length} to={step === null ? 0 : (step + (auto && timer ? 1 : 0.5)) / steps.length} ms={auto && timer ? timer.ms : 0} />
-          ) : auto && timer ? (
-            // PC: 막대 아래쪽 가는 줄이 다음 장면까지 차오른다
-            <span key={`bar-${timer.at}`} aria-hidden className="pointer-events-none absolute inset-x-3 bottom-0 h-[3px] origin-left rounded-full bg-(--acc)/70 motion-reduce:hidden" style={{ animation: `kiosk-next ${timer.ms}ms linear forwards` }} />
-          ) : null}
+          {/* 막대 전체가 진행만큼 색으로 차오른다(지난 단계까지 + 지금 단계는 다음 장면까지 이어서) */}
+          <ProgressFill key={`p-${step}-${timer?.at ?? "x"}`} from={step === null ? 0 : step / steps.length} to={step === null ? 0 : (step + (auto && timer ? 1 : 0.5)) / steps.length} ms={auto && timer ? timer.ms : 0} />
           <button
             type="button"
             data-autoplay
