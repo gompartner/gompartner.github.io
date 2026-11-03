@@ -1,5 +1,6 @@
 "use client";
 
+import Image from "next/image";
 import Link from "next/link";
 import { NavLink } from "@/components/classic/NavLink";
 import { usePathname } from "next/navigation";
@@ -151,7 +152,9 @@ export function ClassicHeader() {
     <header className="fixed inset-x-0 top-0 z-50 bg-white">
       <div className="border-b border-[#e6e9ee]">
         <nav aria-label="주 메뉴" className="mx-auto flex h-16 w-full max-w-[1248px] items-center justify-between gap-6 px-4 md:h-[76px] md:px-6">
-          <Link href="/" className="flex items-center gap-2.5 text-[21px] font-[800] tracking-[-0.04em] text-[#15171c]">
+          <Link href="/" className="flex shrink-0 items-center gap-2.5 text-[21px] font-[800] tracking-[-0.04em] text-[#15171c]">
+            {/* 11-04 곰 얼굴 다시(11-01에 메뉴가 늘어 뺐던 것). 채널 프로필과 같은 곰 */}
+            <Image src="/images/bear-avatar.webp" alt="" width={32} height={32} className="h-8 w-8 rounded-full object-cover" />
             곰파트너
           </Link>
 
@@ -182,7 +185,7 @@ export function ClassicHeader() {
               {classicMenu.map((m) => {
                 const active = m.match.some((p) => pathname === p || pathname.startsWith(p + "/"));
                 return (
-                  <li key={m.label} data-top className="relative flex w-[128px] justify-center xl:w-[150px]">
+                  <li key={m.label} data-top className="relative flex w-[128px] justify-center xl:w-[142px]">
                     <Link
                       href={m.href}
                       onPointerDown={(e) => {
