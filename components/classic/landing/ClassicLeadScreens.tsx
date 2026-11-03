@@ -133,7 +133,7 @@ function SheetView() {
         <span className="w-8 font-bold">fx</span>
         <span className="truncate">{LEAD.at}</span>
       </div>
-      <div className="overflow-x-auto">
+      <div tabIndex={0} role="region" aria-label={`${LEAD.biz} 신청 목록 표, 옆으로 밀어 보기`} className="overflow-x-auto focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#256ef4]">
         <table className="w-full min-w-[620px] border-collapse text-[12.5px]">
           <thead>
             <tr className="bg-[#f8f9fa] text-[11px] text-[#5b6370]">

@@ -107,7 +107,7 @@ export function EnContactForm() {
           <input type="checkbox" checked={agree} onChange={(e) => setAgree(e.target.checked)} className="mt-1 h-5 w-5 shrink-0 accent-[#256ef4]" aria-invalid={!!errors.agree} />
           <span>
             I agree that my details are used only to reply to this inquiry.{" "}
-            <Link href="/classic/privacy" lang="ko" className="text-[#5b6370] underline underline-offset-4">Privacy policy (Korean)</Link>
+            <Link href="/privacy" lang="ko" className="text-[#5b6370] underline underline-offset-4">Privacy policy (Korean)</Link>
           </span>
         </label>
         {errors.agree && <p className="mt-1.5 text-[14px] text-[#d63d4a]">{errors.agree}</p>}

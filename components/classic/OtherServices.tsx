@@ -1,14 +1,15 @@
-import Link from "next/link";
+import { NavLink } from "@/components/classic/NavLink";
 import { ArrowUpRight } from "lucide-react";
 import { h3, wrap } from "@/components/classic/ui";
 
 // 같은 묶음의 다른 서비스 링크. 유지보수 세부 페이지의 "다른 유지보수 서비스"와 같은 모양(11-01 제작 쪽도 맞춤)
 export const makeServices = [
-  { href: "/classic/homepage", label: "홈페이지 제작" },
-  { href: "/classic/landing", label: "랜딩페이지 제작" },
-  { href: "/classic/program", label: "업무 프로그램 제작" },
-  { href: "/classic/app", label: "앱 제작" },
-  { href: "/classic/kiosk", label: "키오스크 화면 제작" },
+  { href: "/homepage", label: "홈페이지 제작" },
+  { href: "/landing-page", label: "랜딩페이지 제작" },
+  { href: "/program", label: "업무 프로그램 제작" },
+  { href: "/app", label: "앱 제작" },
+  { href: "/kiosk", label: "키오스크 화면 제작" },
+  { href: "/3d", label: "3D 웹 제작" },
 ];
 
 export function OtherServices({ current, items = makeServices, title = "다른 제작 서비스", id = "other-services" }: { current: string; items?: { href: string; label: string }[]; title?: string; id?: string }) {
@@ -22,10 +23,10 @@ export function OtherServices({ current, items = makeServices, title = "다른 �
         <ul className="mt-6 grid gap-3 sm:grid-cols-2 lg:grid-cols-4" role="list">
           {others.map((o) => (
             <li key={o.href}>
-              <Link href={o.href} className="group flex min-h-14 items-center justify-between gap-3 rounded-md border border-[#d9dee5] bg-white px-5 py-3 text-[17px] font-bold transition-colors hover:border-[#256ef4] hover:text-[#256ef4]">
+              <NavLink href={o.href} className="group flex min-h-14 items-center justify-between gap-3 rounded-md border border-[#d9dee5] bg-white px-5 py-3 text-[17px] font-bold transition-colors hover:border-[#256ef4] hover:text-[#256ef4]">
                 {o.label}
                 <ArrowUpRight size={20} aria-hidden className="shrink-0 text-[#6b7280] group-hover:text-[#256ef4]" />
-              </Link>
+              </NavLink>
             </li>
           ))}
         </ul>

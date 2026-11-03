@@ -1,8 +1,8 @@
 import type { Metadata } from "next";
 import Image from "next/image";
 import Link from "next/link";
-import { ArrowUpRight, CreditCard, FileCheck2, Globe, Search, Check } from "lucide-react";
-import { EnContactForm } from "@/components/en/EnContactForm";
+import { ArrowUpRight, CreditCard, FileCheck2, Search, Check } from "lucide-react";
+import { EnContact } from "@/components/en/EnContact";
 import { profile } from "@/data/classic/profile";
 import { siteUrl } from "@/lib/site";
 
@@ -17,8 +17,7 @@ export const metadata: Metadata = {
   openGraph: { type: "website", locale: "en_US", siteName: profile.nameEn, url: `${siteUrl}/en`, title, description },
 };
 
-const wrap = "mx-auto w-full max-w-[1248px] px-4 md:px-6";
-const h2 = "text-[28px] font-[800] leading-[1.3] tracking-[-0.02em] md:text-[36px]";
+import { h2, wrap } from "@/components/en/EnShell";
 
 const why = [
   { icon: Search, title: "Search starts on Naver", text: "Many Korean customers look a business up on Naver first. A site that is not registered there is hard to find." },
@@ -26,11 +25,13 @@ const why = [
   { icon: FileCheck2, title: "Privacy law and business info", text: "Sites that collect personal data need a privacy policy under PIPA. Online stores must show business details in the footer." },
 ];
 
-const services = [
-  { title: "Naver setup", items: ["Naver Search Advisor registration", "Sitemap and RSS submission", "Naver Smart Place (Naver Map) listing"] },
-  { title: "Korean payments", items: ["Toss Payments integration", "KakaoPay and Naver Pay", "Web stores and booking sites"] },
+// 11-04 상세 페이지가 생긴 서비스는 href로 잇는다
+const services: { title: string; href?: string; items: string[] }[] = [
+  { title: "Naver setup", href: "/en/naver-setup", items: ["Naver Search Advisor registration", "Sitemap and RSS submission", "Naver Smart Place (Naver Map) listing"] },
+  { title: "Korean payments", href: "/en/korean-payments", items: ["Toss Payments integration", "KakaoPay and Naver Pay", "Web stores and booking sites"] },
   { title: "Login and messaging", items: ["Kakao and Naver social login", "KakaoTalk notification messages"] },
-  { title: "Localization", items: ["Natural Korean copy, not machine translation", "Korean fonts and line breaks", "Layout fixes for Korean text"] },
+  { title: "Localization", href: "/en/localization", items: ["Natural Korean copy, not machine translation", "Korean fonts and line breaks", "Layout fixes for Korean text"] },
+  { title: "3D configurators", href: "/en/3d", items: ["Customers build the product in 3D", "Live price from your price list", "Quote requests with the exact setup"] },
   { title: "Maintenance", items: ["Updates and fixes after launch", "Security patches", "Monthly checks"] },
 ];
 
@@ -48,25 +49,7 @@ const samples = [
 
 export default function EnPage() {
   return (
-    <div lang="en" className="min-h-screen bg-white text-[#15171c]">
-      <header className="border-b border-[#e6e9ee]">
-        <div className={`${wrap} flex h-16 items-center justify-between`}>
-          <Link href="/en" className="flex items-center gap-2.5 text-[19px] font-[800] tracking-[-0.02em]">
-            <Image src="/images/bear-avatar.webp" alt="" width={30} height={30} className="h-[30px] w-[30px] rounded-full object-cover" />
-            {profile.nameEn}
-          </Link>
-          <nav className="flex items-center gap-1 text-[15px] font-bold">
-            <a href="#services" className="hidden min-h-11 items-center px-3 hover:text-[#256ef4] sm:inline-flex">Services</a>
-            <a href="#samples" className="hidden min-h-11 items-center px-3 hover:text-[#256ef4] sm:inline-flex">Samples</a>
-            <Link href="/" lang="ko" hrefLang="ko" className="inline-flex min-h-11 items-center gap-1.5 px-3 text-[#5b6370] hover:text-[#15171c]">
-              <Globe size={16} strokeWidth={2} aria-hidden />
-              한국어
-            </Link>
-          </nav>
-        </div>
-      </header>
-
-      <main>
+    <>
         <section className="bg-[#0f1b3d] text-white">
           <div className={`${wrap} py-20 md:py-28`}>
             <h1 className="max-w-[860px] text-[38px] font-[800] leading-[1.2] tracking-[-0.03em] md:text-[60px]">{title}</h1>
@@ -99,7 +82,7 @@ export default function EnPage() {
             <h2 id="services-h" className={h2}>Services</h2>
             <ul className="mt-10 grid gap-5 sm:grid-cols-2 lg:grid-cols-3" role="list">
               {services.map((s) => (
-                <li key={s.title} className="rounded-lg bg-white p-6 md:p-8">
+                <li key={s.title} className="flex flex-col rounded-lg bg-white p-6 md:p-8">
                   <h3 className="text-[20px] font-[800] tracking-[-0.01em]">{s.title}</h3>
                   <ul className="mt-4 space-y-2.5" role="list">
                     {s.items.map((t) => (
@@ -109,6 +92,12 @@ export default function EnPage() {
                       </li>
                     ))}
                   </ul>
+                  {s.href && (
+                    <Link href={s.href} className="mt-6 inline-flex min-h-11 items-center gap-1 self-start text-[16px] font-bold text-[#256ef4] hover:underline">
+                      Learn more <span className="sr-only">about {s.title}</span>
+                      <ArrowUpRight size={18} strokeWidth={2.5} aria-hidden />
+                    </Link>
+                  )}
                 </li>
               ))}
             </ul>
@@ -131,7 +120,12 @@ export default function EnPage() {
         <section id="samples" aria-labelledby="samples-h" className="scroll-mt-4 border-t border-[#e6e9ee]">
           <div className={`${wrap} py-16 md:py-24`}>
             <h2 id="samples-h" className={h2}>Samples</h2>
-            <p className="mt-3 text-[17px] leading-[1.6] text-[#3d4450]">Live Korean sites you can click through.</p>
+            <p className="mt-3 text-[17px] leading-[1.6] text-[#3d4450]">
+              Live Korean sites you can click through.{" "}
+              <Link href="/en/works" className="font-bold text-[#256ef4] underline-offset-4 hover:underline">
+                See all samples
+              </Link>
+            </p>
             <ul className="mt-10 grid gap-8 md:grid-cols-3" role="list">
               {samples.map((s) => (
                 <li key={s.slug}>
@@ -151,30 +145,7 @@ export default function EnPage() {
           </div>
         </section>
 
-        <section id="contact" aria-labelledby="contact-h" className="scroll-mt-4 bg-[#f4f6f9]">
-          <div className={`${wrap} grid gap-10 py-16 md:py-24 lg:grid-cols-[minmax(0,1fr)_minmax(0,1.4fr)] lg:gap-16`}>
-            <div>
-              <h2 id="contact-h" className={h2}>Contact</h2>
-              <p className="mt-4 text-[17px] leading-[1.6] text-[#3d4450]">
-                Or email{" "}
-                <a href={`mailto:${profile.email}`} className="font-bold text-[#256ef4] underline-offset-4 hover:underline">
-                  {profile.email}
-                </a>
-              </p>
-            </div>
-            <EnContactForm />
-          </div>
-        </section>
-      </main>
-
-      <footer className="bg-[#15171c] text-[14px] text-[#a3abb8]">
-        <div className={`${wrap} flex flex-col gap-1 py-8 md:flex-row md:justify-between`}>
-          <p>
-            {profile.nameEn} ({profile.name}) | Business registration no. {profile.bizNo} | Seoul, Korea
-          </p>
-          <p>Copyright {new Date().getFullYear()} {profile.nameEn}. All rights reserved.</p>
-        </div>
-      </footer>
-    </div>
+        <EnContact />
+    </>
   );
 }

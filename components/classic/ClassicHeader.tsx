@@ -1,6 +1,7 @@
 "use client";
 
 import Link from "next/link";
+import { NavLink } from "@/components/classic/NavLink";
 import { usePathname } from "next/navigation";
 import { useEffect, useRef, useState } from "react";
 import { ChevronDown, Menu, Search, X } from "lucide-react";
@@ -14,58 +15,63 @@ import { cn } from "@/lib/utils";
 export const classicMenu = [
   {
     label: "회사소개",
-    href: "/classic/story",
-    match: ["/classic/story"],
+    href: "/story",
+    match: ["/story"],
     items: [],
   },
   {
     label: "제작",
-    href: "/classic/homepage",
-    match: ["/classic/homepage", "/classic/landing", "/classic/program", "/classic/app", "/classic/kiosk"],
+    href: "/homepage",
+    match: ["/homepage", "/landing-page", "/program", "/app", "/kiosk", "/3d"],
     // 11-01 랜딩, 업무 프로그램은 제작 안에 둔다(10-29 사용자 결정)
     items: [
-      { href: "/classic/homepage", label: "홈페이지 제작" },
-      { href: "/classic/landing", label: "랜딩페이지 제작" },
-      { href: "/classic/program", label: "업무 프로그램 제작" },
-      { href: "/classic/app", label: "앱 제작" },
-      { href: "/classic/kiosk", label: "키오스크 화면 제작" },
+      { href: "/homepage", label: "홈페이지 제작" },
+      { href: "/landing-page", label: "랜딩페이지 제작" },
+      { href: "/program", label: "업무 프로그램 제작" },
+      { href: "/app", label: "앱 제작" },
+      { href: "/kiosk", label: "키오스크 화면 제작" },
+      { href: "/3d", label: "3D 웹 제작" },
     ],
   },
   {
     label: "유지보수",
-    href: "/classic/maintenance",
-    match: ["/classic/maintenance"],
+    href: "/maintenance",
+    match: ["/maintenance"],
     items: [
-      { href: "/classic/maintenance/fix", label: "오류 수정" },
-      { href: "/classic/maintenance/takeover", label: "업체 이관" },
-      { href: "/classic/maintenance/update", label: "보안 업데이트" },
-      { href: "/classic/maintenance/monthly", label: "월 관리" },
+      { href: "/maintenance/fix", label: "오류 수정" },
+      { href: "/maintenance/takeover", label: "업체 이관" },
+      { href: "/maintenance/update", label: "보안 업데이트" },
+      { href: "/maintenance/monthly", label: "월 관리" },
     ],
   },
   // 업종(병원, 카페 등)은 카탈로그 화면 안의 탭에서 고른다. 카탈로그는 업종 홈페이지와 랜딩(11-01 되살림)
   {
     label: "카탈로그",
-    href: "/classic/works",
-    match: ["/classic/works", "/classic/sample"],
-    // 11-01 카탈로그 탭과 같은 하위 메뉴(업종 5개, 랜딩, 앱, 키오스크)
+    href: "/works",
+    match: ["/works", "/sample"],
+    // 11-01 카탈로그 탭과 같은 하위 메뉴(업종 5개, 랜딩, 앱, 키오스크, 11-04 3D)
     items: [
-      { href: "/classic/works", label: "전체" },
-      ...industries.map((i) => ({ href: `/classic/works/${i.slug}`, label: i.label })),
-      { href: "/classic/works/landing", label: "랜딩페이지" },
-      { href: "/classic/works/app", label: "앱" },
-      { href: "/classic/works/kiosk", label: "키오스크" },
+      { href: "/works", label: "전체" },
+      ...industries.map((i) => ({ href: `/works/${i.slug}`, label: i.label })),
+      { href: "/works/landing", label: "랜딩페이지" },
+      { href: "/works/app", label: "앱" },
+      { href: "/works/kiosk", label: "키오스크" },
+      { href: "/works/3d", label: "3D" },
     ],
   },
   // 고객 사례는 실제 사례가 생기면 data/classic/cases.ts에 넣는 순간 메뉴에 나온다
-  ...(cases.length > 0 ? [{ label: "고객 사례", href: "/classic/cases", match: ["/classic/cases"], items: [] }] : []),
+  ...(cases.length > 0 ? [{ label: "고객 사례", href: "/cases", match: ["/cases"], items: [] }] : []),
   {
     label: "고객지원",
-    href: "/classic/faq",
-    match: ["/classic/notice", "/classic/faq", "/classic/contact", "/classic/privacy"],
+    href: "/faq",
+    match: ["/notice", "/insight", "/tools", "/faq", "/contact", "/privacy"],
+    // 11-04 인사이트는 글이 쌓일 때까지 고객지원 안(공지사항 옆)에 둔다
     items: [
-      { href: "/classic/notice", label: "공지사항" },
-      { href: "/classic/faq", label: "자주 묻는 질문" },
-      { href: "/classic/contact", label: "상담 신청" },
+      { href: "/notice", label: "공지사항" },
+      { href: "/insight", label: "인사이트" },
+      { href: "/tools", label: "자료실" },
+      { href: "/faq", label: "자주 묻는 질문" },
+      { href: "/contact", label: "상담 신청" },
     ],
   },
 ];
@@ -204,9 +210,9 @@ export function ClassicHeader() {
                       >
                         {m.items.map((i) => (
                           <li key={i.label}>
-                            <Link href={i.href} aria-current={pathname === i.href ? "page" : undefined} className="flex h-11 items-center justify-center whitespace-nowrap text-[15px] text-[#3d4450] hover:text-[#256ef4] hover:underline underline-offset-4">
+                            <NavLink href={i.href} aria-current={pathname === i.href ? "page" : undefined} className="flex h-11 items-center justify-center whitespace-nowrap text-[15px] text-[#3d4450] hover:text-[#256ef4] hover:underline underline-offset-4">
                               {i.label}
-                            </Link>
+                            </NavLink>
                           </li>
                         ))}
                       </ul>
@@ -227,7 +233,7 @@ export function ClassicHeader() {
 
           <div className="flex shrink-0 items-center gap-2">
             {/* 11-02 통합검색: 넓은 화면은 바로 입력하는 칸, 좁은 화면은 돋보기 */}
-            <form action="/classic/search" method="get" role="search" className="hidden h-11 w-[220px] items-center rounded-md border border-[#d9dee5] bg-white focus-within:border-[#15171c] xl:flex">
+            <form action="/search" method="get" role="search" className="hidden h-11 w-[220px] items-center rounded-md border border-[#d9dee5] bg-white focus-within:border-[#15171c] xl:flex">
               <Search size={18} aria-hidden className="ml-3 shrink-0 text-[#6b7280]" />
               <label htmlFor="header-q" className="sr-only">
                 통합검색
@@ -235,21 +241,21 @@ export function ClassicHeader() {
               <input id="header-q" name="q" type="search" placeholder="서비스, 카탈로그 검색" autoComplete="off" className="h-full min-w-0 flex-1 bg-transparent px-2.5 text-[15px] outline-none placeholder:text-[#8a94a6] [&::-webkit-search-cancel-button]:hidden" />
             </form>
             <Link
-              href="/classic/search"
+              href="/search"
               aria-label="통합검색"
-              aria-current={pathname === "/classic/search" ? "page" : undefined}
+              aria-current={pathname === "/search" ? "page" : undefined}
               className="grid h-11 w-11 place-items-center rounded-md text-[#15171c] transition-colors hover:bg-[#f1f3f6] xl:hidden"
             >
               <Search size={21} aria-hidden />
             </Link>
             {/* 휴대폰과 태블릿은 작게, PC는 크게. 같은 버튼 하나를 폭에 따라 줄인다 */}
             <Link
-              href="/classic/contact"
+              href="/contact"
               data-gtm-cta="classic_header_contact"
-              aria-current={pathname === "/classic/contact" ? "page" : undefined}
+              aria-current={pathname === "/contact" ? "page" : undefined}
               className={cn(
                 "inline-flex h-11 items-center whitespace-nowrap rounded-md px-3.5 text-[15px] font-bold transition-colors lg:px-5 lg:text-[16px]",
-                pathname === "/classic/contact" ? "bg-[#0b50d0] text-white" : "bg-[#256ef4] text-white hover:bg-[#0b50d0]"
+                pathname === "/contact" ? "bg-[#0b50d0] text-white" : "bg-[#256ef4] text-white hover:bg-[#0b50d0]"
               )}
             >
               상담 신청
@@ -280,16 +286,16 @@ export function ClassicHeader() {
                 <ul className="mt-2 grid grid-cols-2 gap-x-4" role="list">
                   {m.items.map((i) => (
                     <li key={i.label}>
-                      <Link href={i.href} aria-current={pathname === i.href ? "page" : undefined} className="block py-2 text-[15px] text-[#3d4450]">
+                      <NavLink href={i.href} aria-current={pathname === i.href ? "page" : undefined} className="block py-2 text-[15px] text-[#3d4450]">
                         {i.label}
-                      </Link>
+                      </NavLink>
                     </li>
                   ))}
                 </ul>
               )}
             </section>
           ))}
-          <Link href="/classic/contact" className="mt-6 flex h-12 items-center justify-center rounded-md bg-[#256ef4] text-[16px] font-bold text-white">
+          <Link href="/contact" className="mt-6 flex h-12 items-center justify-center rounded-md bg-[#256ef4] text-[16px] font-bold text-white">
             상담 신청
           </Link>
         </div>

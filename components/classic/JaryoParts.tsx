@@ -42,7 +42,7 @@ export function JaryoButtons({ it, view = true }: { it: Jaryo; view?: boolean })
     <div className={view ? "grid grid-cols-2 gap-2" : "grid gap-2 sm:max-w-[280px]"}>
       {view && (
         <Link
-          href={`/classic/jaryo/${it.id}`}
+          href={`/jaryo/${it.id}`}
           data-gtm-cta={`jaryo_view_${it.id}`}
           className="inline-flex h-12 items-center justify-center gap-1.5 rounded-md bg-[#256ef4] px-3 text-[16px] font-bold text-white transition-colors hover:bg-[#0b50d0]"
         >

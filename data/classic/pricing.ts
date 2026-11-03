@@ -6,7 +6,7 @@ export type PlanId = "basic" | "standard" | "premium";
 /** 한 쪽짜리 랜딩페이지. 크몽 랜딩페이지 서비스와 같게 맞춘다. */
 export type LandingPlanId = "landing-basic" | "landing-standard" | "landing-premium";
 /** 11-03 앱, 키오스크 화면 패키지. 크몽 시세(웹앱 55만~, 하이브리드 앱 평균 150만, 키오스크 100만~, 주문형 300~450만)를 보고 정했다. */
-export type ExtraPlanId = "app-basic" | "app-standard" | "app-premium" | "kiosk-basic" | "kiosk-standard" | "kiosk-premium";
+export type ExtraPlanId = "app-basic" | "app-standard" | "app-premium" | "kiosk-basic" | "kiosk-standard" | "kiosk-premium" | "3d-viewer" | "3d-brand" | "3d-config";
 
 export interface Plan {
   id: PlanId | LandingPlanId | ExtraPlanId;
@@ -15,8 +15,10 @@ export interface Plan {
   title: string;
   price: number;
   days: number;
-  /** 작업 중 수정 횟수. 크몽 패키지와 같게 맞춘다. */
+  /** 작업 중 수정 횟수. 크몽 패키지와 같게 맞춘다. 0이면 표에서 행을 뺀다(3D). */
   revisions: number;
+  /** 작업 기간 표기를 일 대신 따로 쓸 때(예: "3주") */
+  period?: string;
   summary: string;
   includes: string[];
 }

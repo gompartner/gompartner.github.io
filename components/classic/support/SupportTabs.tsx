@@ -2,9 +2,11 @@ import { SubTabs } from "@/components/classic/ui";
 
 // 고객지원 묶음의 하위 탭.
 const items = [
-  { href: "/classic/notice", label: "공지사항" },
-  { href: "/classic/faq", label: "자주 묻는 질문" },
-  { href: "/classic/contact", label: "상담 신청" },
+  { href: "/notice", label: "공지사항" },
+  { href: "/insight", label: "인사이트" },
+  { href: "/tools", label: "자료실" },
+  { href: "/faq", label: "자주 묻는 질문" },
+  { href: "/contact", label: "상담 신청" },
 ];
 
 export function SupportTabs({ current }: { current: string }) {

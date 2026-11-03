@@ -12,11 +12,11 @@ export const metadata: Metadata = {
 
 const pages = [
   { href: "/", label: "첫 화면" },
-  { href: "/classic/homepage", label: "홈페이지 제작" },
-  { href: "/classic/maintenance", label: "유지보수" },
-  { href: "/classic/works", label: "카탈로그" },
-  { href: "/classic/faq", label: "자주 묻는 질문" },
-  { href: "/classic/contact", label: "상담 신청" },
+  { href: "/homepage", label: "홈페이지 제작" },
+  { href: "/maintenance", label: "유지보수" },
+  { href: "/works", label: "카탈로그" },
+  { href: "/faq", label: "자주 묻는 질문" },
+  { href: "/contact", label: "상담 신청" },
 ];
 
 export default function NotFound() {

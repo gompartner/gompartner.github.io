@@ -1,4 +1,4 @@
-// 고객 사례(/classic/cases). 게재 동의를 받은 실제 사례만 넣는다.
+// 고객 사례(/cases). 게재 동의를 받은 실제 사례만 넣는다.
 // 비어 있으면 메뉴에 나오지 않고 페이지도 열리지 않는다.
 export interface CustomerCase {
   id: string;

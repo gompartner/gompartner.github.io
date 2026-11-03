@@ -1,4 +1,4 @@
-// 무료 자료 3종. /classic/jaryo(목록)와 /classic/jaryo/<id>(자료 한 장)가 같이 쓴다.
+// 무료 자료 3종. /jaryo(목록)와 /jaryo/<id>(자료 한 장)가 같이 쓴다.
 // 인스타 insta-dm Workers가 댓글 단어(견적, 점검, AI, 자료)에 따라 /go/jaryo/<id>/ 를 보낸다. id를 바꾸면 그쪽 MATERIALS도 고친다.
 // 미리보기 public/images/jaryo/<id>-1.jpg, -2.jpg(목록), <id>-1-full.jpg, -2-full.jpg(한 장 페이지), PDF public/files/jaryo/gompartner-<id>.pdf
 // 원본은 01_Active/곰파트너-마케팅/무료자료 의 HTML, PDF, PNG. 자료를 고치면 그림과 PDF를 다시 뽑는다

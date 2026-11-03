@@ -13,15 +13,16 @@ export function LdScript({ data }: { data: object }) {
 }
 
 const offers = [
-  { name: "홈페이지 제작", path: "/classic/homepage" },
-  { name: "랜딩페이지 제작", path: "/classic/landing" },
-  { name: "업무 프로그램 제작", path: "/classic/program" },
-  { name: "앱 제작", path: "/classic/app" },
-  { name: "키오스크 화면 제작", path: "/classic/kiosk" },
-  ...maintenanceServices.map((s) => ({ name: s.h1, path: `/classic/maintenance/${s.id}` })),
+  { name: "홈페이지 제작", path: "/homepage" },
+  { name: "랜딩페이지 제작", path: "/landing-page" },
+  { name: "업무 프로그램 제작", path: "/program" },
+  { name: "앱 제작", path: "/app" },
+  { name: "키오스크 화면 제작", path: "/kiosk" },
+  { name: "3D 웹 제작", path: "/3d" },
+  ...maintenanceServices.map((s) => ({ name: s.h1, path: `/maintenance/${s.id}` })),
 ];
 
-// 전역 구조화 데이터. 회사 개체 하나(@id .../#org)와 사이트 개체. 첫 화면(/)과 /classic 레이아웃이 넣는다.
+// 전역 구조화 데이터. 회사 개체 하나(@id .../#org)와 사이트 개체. 첫 화면(/)과 app/(classic) 레이아웃이 넣는다.
 // 구글 AI 개요가 "곰파트너"를 곰앤컴퍼니의 곰랩 파트너스로 설명한 적이 있어 구분 문구를 둔다.
 export function SiteJsonLd() {
   const data = {
@@ -64,7 +65,7 @@ export function SiteJsonLd() {
         publisher: { "@id": ORG_ID },
         potentialAction: {
           "@type": "SearchAction",
-          target: { "@type": "EntryPoint", urlTemplate: `${siteUrl}/classic/search?q={search_term_string}` },
+          target: { "@type": "EntryPoint", urlTemplate: `${siteUrl}/search?q={search_term_string}` },
           "query-input": "required name=search_term_string",
         },
       },

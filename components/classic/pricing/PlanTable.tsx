@@ -58,10 +58,11 @@ export function PlanTable({ plans, product, common = planCommon }: { plans: Plan
             </th>
             {plans.map((p) => (
               <td key={p.id} className={`${td} tabular-nums`}>
-                {p.days}일
+                {p.period ?? `${p.days}일`}
               </td>
             ))}
           </tr>
+          {plans.some((p) => p.revisions > 0) && (
           <tr className="border-b border-[#e6e9ee]">
             <th scope="row" className={th}>
               수정 횟수
@@ -72,6 +73,7 @@ export function PlanTable({ plans, product, common = planCommon }: { plans: Plan
               </td>
             ))}
           </tr>
+          )}
           <tr className="border-b border-[#e6e9ee]">
             <th scope="row" className={th}>
               구성
@@ -113,7 +115,7 @@ export function PlanTable({ plans, product, common = planCommon }: { plans: Plan
                     <ul className="space-y-1.5">
                       {list.map((s) => (
                         <li key={s.id}>
-                          <Link href={`/classic/sample/${s.project!.demoUrl.replace("/demo/", "")}`} className="underline-offset-4 hover:text-[#256ef4] hover:underline">
+                          <Link href={`/sample/${s.project!.demoUrl.replace("/demo/", "")}`} className="underline-offset-4 hover:text-[#256ef4] hover:underline">
                             {s.project!.title}
                           </Link>
                         </li>

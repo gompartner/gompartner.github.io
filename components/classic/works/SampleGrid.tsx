@@ -1,7 +1,7 @@
 import Image from "next/image";
-import Link from "next/link";
+import { NavLink as Link } from "@/components/classic/NavLink";
 import type { Project } from "@/lib/types";
-import { isDeviceCatalog, mobileShotOf, slugOf, thumbOf } from "./samples";
+import { hrefOf, isDeviceCatalog, mobileShotOf, thumbOf } from "./samples";
 
 // 샘플 카드 격자. 홈 화면 샘플 목록과 같은 모양(썸네일 선 하나, 그림자 없음).
 // variant="mockup"은 카탈로그 목록용: PC 화면을 크게 두고 휴대폰 화면을 오른쪽 아래에 걸친다(10-31 C안).
@@ -11,7 +11,7 @@ export function SampleGrid({ items, cols = 4, variant = "plain" }: { items: Proj
     <ul className={`grid grid-cols-2 gap-x-4 gap-y-8 md:gap-x-6 md:gap-y-12 ${cols === 4 ? "md:grid-cols-3 lg:grid-cols-4" : "md:grid-cols-3"}`} role="list">
       {items.map((p) => (
         <li key={p.id} className="min-w-0">
-          <Link href={`/classic/sample/${slugOf(p.demoUrl)}`} className="group block">
+          <Link href={hrefOf(p)} className="group block">
             <span className="block overflow-hidden rounded-md border border-[#e1e5eb] bg-white">
               <Image
                 src={thumbOf(p)}
@@ -43,7 +43,7 @@ function MockupGrid({ items }: { items: Project[] }) {
         const phone = device ? null : mobileShotOf(p);
         return (
           <li key={p.id} className="min-w-0">
-            <Link href={`/classic/sample/${slugOf(p.demoUrl)}`} className="group block">
+            <Link href={hrefOf(p)} className="group block">
               {device ? (
                 <span className="block overflow-hidden rounded-lg bg-[#eef0f3]">
                   <Image src={p.imageUrl} alt={p.imageAlt} width={1440} height={900} sizes="(min-width: 1200px) 560px, (min-width: 768px) 46vw, 92vw" className="aspect-[16/10] w-full object-cover object-center transition-transform duration-500 group-hover:scale-[1.03] motion-reduce:transition-none" />

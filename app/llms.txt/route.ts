@@ -22,33 +22,33 @@ export function GET() {
 > ${profile.name}는 ${aboutTitle} 업체입니다. ${aboutLead} 곰앤컴퍼니의 곰랩 파트너스와 관계없습니다.
 
 - 사이트: ${siteUrl}
-- 회사소개: ${url("/classic/story")}
-- 상담 신청: ${url("/classic/contact")} (${replyTerm})
+- 회사소개: ${url("/story")}
+- 상담 신청: ${url("/contact")} (${replyTerm})
 - 전화 ${profile.phone}, 이메일 ${profile.email}
 - 사업자: ${profile.name}, 사업자등록번호 ${profile.bizNo}
 
 ## 유지보수
 
-다른 업체가 만든 홈페이지도 맡습니다. 작업 전 전체 백업을 하고, 작업 뒤 작업 내역 문서를 드립니다. 자세히: [홈페이지 유지보수](${url("/classic/maintenance")})
+다른 업체가 만든 홈페이지도 맡습니다. 작업 전 전체 백업을 하고, 작업 뒤 작업 내역 문서를 드립니다. 자세히: [홈페이지 유지보수](${url("/maintenance")})
 
-${maintenanceServices.map((s) => `- [${plain(s.h1)}](${url(`/classic/maintenance/${s.id}`)}): ${plain(s.metaDescription)}`).join("\n")}
+${maintenanceServices.map((s) => `- [${plain(s.h1)}](${url(`/maintenance/${s.id}`)}): ${plain(s.metaDescription)}`).join("\n")}
 
 ## 홈페이지 제작
 
-${plain(industries.map((i) => i.label).join(", "))} 업종의 반응형 홈페이지를 만듭니다. 자세히: [홈페이지 제작](${url("/classic/homepage")})
+${plain(industries.map((i) => i.label).join(", "))} 업종의 반응형 홈페이지를 만듭니다. 자세히: [홈페이지 제작](${url("/homepage")})
 
 ${plans.map((p) => `- ${plain(p.title)}: ${plain(p.summary)}. ${plain(p.includes.join(", "))}.`).join("\n")}
 - 모든 구성 공통: ${plain(planCommon.join(", "))}. 도메인과 호스팅은 고객 명의로 계약합니다.
 
 ## 랜딩페이지 제작
 
-광고로 들어온 고객의 상담, 예약 신청을 받는 홍보용 페이지를 만듭니다. 신청이 들어오면 담당자 메일과 구글 시트에 바로 기록됩니다. 자세히: [랜딩페이지 제작](${url("/classic/landing")})
+광고로 들어온 고객의 상담, 예약 신청을 받는 홍보용 페이지를 만듭니다. 신청이 들어오면 담당자 메일과 구글 시트에 바로 기록됩니다. 자세히: [랜딩페이지 제작](${url("/landing-page")})
 
 ${landingPlans.map((p) => `- ${plain(p.title)}: ${plain(p.summary)}. ${plain(p.includes.join(", "))}.`).join("\n")}
 
 ## 업무 프로그램 제작
 
-엑셀로 하던 주문 취합, 관리자 화면, 결과지 출력 같은 반복 업무를 웹 프로그램으로 만듭니다. 자세히: [업무 프로그램 제작](${url("/classic/program")})
+엑셀로 하던 주문 취합, 관리자 화면, 결과지 출력 같은 반복 업무를 웹 프로그램으로 만듭니다. 자세히: [업무 프로그램 제작](${url("/program")})
 
 금액과 일정은 상담 신청을 받은 뒤 견적서로 안내합니다.
 
@@ -58,11 +58,11 @@ ${principles.map((p) => `- ${plain(p.title)}: ${plain(p.body)}`).join("\n")}
 
 ## 업종별 카탈로그
 
-${industries.map((i) => `- [${plain(i.title)}](${url(`/classic/works/${i.slug}`)}): ${plain(i.description)}`).join("\n")}
+${industries.map((i) => `- [${plain(i.title)}](${url(`/works/${i.slug}`)}): ${plain(i.description)}`).join("\n")}
 
 ## 카탈로그 상세
 
-${catalogProjects.map((p) => `- [${plain(p.title)}](${url(`/classic/sample/${slugOf(p.demoUrl)}`)}): ${plain(p.description)}`).join("\n")}
+${catalogProjects.map((p) => `- [${plain(p.title)}](${url(`/sample/${slugOf(p.demoUrl)}`)}): ${plain(p.description)}`).join("\n")}
 
 ## 자주 묻는 질문
 
@@ -70,9 +70,9 @@ ${faq.map((f) => `- ${plain(f.q)} ${plain(f.a)}`).join("\n")}
 
 ## Optional
 
-- [자주 묻는 질문](${url("/classic/faq")})
-- [공지사항](${url("/classic/notice")})
-- [개인정보처리방침](${url("/classic/privacy")})
+- [자주 묻는 질문](${url("/faq")})
+- [공지사항](${url("/notice")})
+- [개인정보처리방침](${url("/privacy")})
 `;
 
   return new Response(text, { headers: { "Content-Type": "text/plain; charset=utf-8" } });

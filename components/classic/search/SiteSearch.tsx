@@ -15,7 +15,7 @@ export function SiteSearch({ index }: { index: SearchItem[] }) {
   const router = useRouter();
   const [q, setQ] = useState(params.get("q") ?? "");
   useEffect(() => {
-    const t = setTimeout(() => router.replace(q ? `/classic/search?q=${encodeURIComponent(q)}` : "/classic/search", { scroll: false }), 300);
+    const t = setTimeout(() => router.replace(q ? `/search?q=${encodeURIComponent(q)}` : "/search", { scroll: false }), 300);
     return () => clearTimeout(t);
   }, [q, router]);
   const found = useMemo(() => index.filter((i) => matches(`${i.title} ${i.desc} ${i.hay} ${i.kind}`, q)), [index, q]);

@@ -1,4 +1,5 @@
 import Link from "next/link";
+import { NavLink } from "@/components/classic/NavLink";
 import { ChevronRight, Home } from "lucide-react";
 
 // 클래식 보기 공용 조각. 색은 흰 바탕 + 남색 배너 + 곰파트너 파랑 하나.
@@ -53,13 +54,13 @@ export function SubTabs({ items, current }: { items: { href: string; label: stri
       <ul className={`${wrap} flex gap-6 overflow-x-auto`} role="list">
         {items.map((i) => (
           <li key={i.href} className="shrink-0">
-            <Link
+            <NavLink
               href={i.href}
               aria-current={i.href === current ? "page" : undefined}
               className={`block border-b-2 py-4 text-[16px] font-bold ${i.href === current ? "border-[#256ef4] text-[#256ef4]" : "border-transparent text-[#3d4450] hover:text-[#15171c]"}`}
             >
               {i.label}
-            </Link>
+            </NavLink>
           </li>
         ))}
       </ul>

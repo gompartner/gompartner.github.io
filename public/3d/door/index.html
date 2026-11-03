@@ -1,0 +1,1670 @@
+<!doctype html>
+<!--
+  벤치마킹 메모 (2026-10-31 조사)
+  - glasswallet.com/calculate/middle-door-cost/ : 폭 1200mm 기준 3연동 약 935,000원, 원슬라이딩 약 825,000원, 스윙도어 약 1,050,000원, 자동중문 약 2,700,000원 (부가세 포함 추정 시세)
+  - glasswallet.com/calculate/middle-door-cost/three-slide-price : 폭 900mm 832,130원 ~ 폭 2000mm 1,215,500원, 브론즈/아쿠아/패턴 유리 +180,000원, 초슬림 알루미늄 1.2배, 기존 중문 철거 +120,000원, 무턱 시공 +150,000원
+  - soomgo.com/prices/중문-시공 : 중문 시공 평균 750,000원 (최저 550,000원, 최고 1,300,000원)
+  - brunch.co.kr/@life-efficiency/41 : 여닫이(양개, 편개), 원슬라이딩, 상부구동형, 3연동, 댐핑, 셀프클로징, 도어클로저, 모헤어, 분체도장 용어
+  - 숨고 시공 사례 (soomgo.com/portfolio) : 무레일 원슬라이딩, 브론즈 샤틴유리, 초슬림 3연동 화이트 프레임, 영림 간살 중문
+  - 영림, 예림, 한샘 중문 상품 구성 (초슬림 3연동, 원슬라이딩, 스윙도어, 강화유리 기본, 프레임 화이트, 블랙, 브론즈, 샴페인골드)
+  가격은 위 시세를 기준으로 폭 1000mm, 높이 2300mm 기본에 폭과 높이 100mm마다 가산하도록 정했습니다.
+-->
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>인테리어 | 현관 중문 견적</title>
+<meta name="description" content="문 방식을 고르면 문짝이 레일에 끼워지고, 줄자로 폭과 높이를 맞춘 뒤 프레임 색과 유리를 골라 바로 견적을 받습니다.">
+<link rel="canonical" href="https://gompartner.co.kr/3d/door/">
+<meta property="og:type" content="website">
+<meta property="og:site_name" content="곰파트너 3D 카탈로그">
+<meta property="og:url" content="https://gompartner.co.kr/3d/door/">
+<meta property="og:title" content="인테리어 | 현관 중문 견적">
+<meta property="og:description" content="문 방식을 고르면 문짝이 레일에 끼워지고, 줄자로 폭과 높이를 맞춘 뒤 프레임 색과 유리를 골라 바로 견적을 받습니다.">
+<meta property="og:image" content="https://gompartner.co.kr/3d/assets/door.jpg">
+<meta name="twitter:card" content="summary_large_image">
+<link rel="icon" href="data:,">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/static/pretendard.min.css">
+<style>
+  @property --a { syntax: '<angle>'; inherits: false; initial-value: 90deg; }
+  :root {
+    --bg: #ece8e1;
+    --surface: #ffffff;
+    --ink: #1e1f1f;
+    --ink-2: #474a4a;
+    --ink-3: #5f6262;
+    --line: #dddbd6;
+    --line-2: #c7c4bd;
+    --accent: #2f5d50;
+    --accent-ink: #ffffff;
+    --accent-soft: #e6efeb;
+    --tile: #f3f1ec;
+    --over: #c25a0c;
+    --over-soft: #fff1e3;
+    --focus: #1f5fbf;
+    --warn: #a3341f;
+    --shadow: 0 1px 2px rgba(40,34,24,.10), 0 6px 18px rgba(40,34,24,.10);
+    --top: env(safe-area-inset-top, 0px);
+    --bot: env(safe-area-inset-bottom, 0px);
+  }
+  * { box-sizing: border-box; }
+  [hidden] { display: none !important; }
+  html, body { margin: 0; height: 100%; overflow: hidden; overscroll-behavior: none; }
+  body {
+    background: var(--bg); color: var(--ink);
+    font-family: Pretendard, -apple-system, "Apple SD Gothic Neo", sans-serif;
+    font-size: 16px; line-height: 1.5; word-break: keep-all;
+    -webkit-text-size-adjust: 100%;
+    font-variant-ligatures: no-contextual; font-feature-settings: "calt" 0;
+  }
+  button, input, select { font: inherit; color: inherit; font-feature-settings: "calt" 0; }
+  button { -webkit-tap-highlight-color: transparent; cursor: pointer; }
+  :focus-visible { outline: 2px solid var(--focus); outline-offset: 2px; }
+  .sr { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; }
+  svg { display: block; }
+
+  #scene { position: fixed; inset: 0; width: 100%; height: 100%; display: block; touch-action: none; outline: none; cursor: grab; }
+  .nogl { position: fixed; inset: 0; display: none; place-items: center; padding: 24px; text-align: center; color: var(--ink-2); }
+
+  /* 위: 상호, 메뉴, 견적 요청 */
+  .top {
+    position: fixed; left: 0; right: 0; top: 0; z-index: 5;
+    padding: calc(var(--top) + 10px) 16px 0; display: flex; align-items: center; gap: 8px; pointer-events: none;
+  }
+  .top > * { pointer-events: auto; }
+  .brand { display: flex; align-items: center; gap: 8px; min-height: 44px; color: var(--ink); text-decoration: none; margin-right: auto; min-width: 0; }
+  .brand b { font-size: 20px; font-weight: 800; letter-spacing: -0.02em; white-space: nowrap; }
+  .brand small { font-size: 12px; color: var(--ink-2); background: var(--surface); border-radius: 4px; padding: 2px 6px; white-space: nowrap; }
+  .ibtn {
+    width: 44px; height: 44px; flex: none; display: inline-grid; place-items: center; padding: 0;
+    background: var(--surface); border: 0; border-radius: 10px; color: var(--ink); box-shadow: var(--shadow);
+  }
+  .ibtn svg { width: 22px; height: 22px; }
+  .cta {
+    height: 44px; padding: 0 16px; border: 0; border-radius: 10px; font-weight: 700; font-size: 16px;
+    background: var(--accent); color: var(--accent-ink); box-shadow: var(--shadow); white-space: nowrap;
+  }
+  .cta:active { transform: translateY(1px); }
+
+  .menu {
+    position: fixed; z-index: 8; top: calc(var(--top) + 60px); right: 16px; width: 220px;
+    background: var(--surface); border-radius: 12px; box-shadow: var(--shadow); padding: 8px;
+  }
+  .menu a, .menu button { display: flex; align-items: center; gap: 10px; width: 100%; min-height: 48px; padding: 0 12px; border: 0; background: none; border-radius: 6px; color: var(--ink); text-decoration: none; font-size: 16px; text-align: left; }
+  .menu a[aria-current="page"] { font-weight: 700; background: var(--accent-soft); }
+  .menu a:hover, .menu button:hover { background: #f3f2ef; }
+  .menu button svg { width: 20px; height: 20px; color: var(--ink-2); }
+  .menu hr { border: 0; border-top: 1px solid var(--line); margin: 6px 4px; }
+  .menu p { margin: 8px 12px 6px; font-size: 13px; color: var(--ink-3); }
+
+  /* 치수와 금액 */
+  .info {
+    position: fixed; z-index: 4; left: 50%; top: calc(var(--top) + 64px); transform: translateX(-50%);
+    display: flex; align-items: stretch; background: var(--surface); border-radius: 12px; box-shadow: var(--shadow);
+    font-variant-numeric: tabular-nums; max-width: calc(100vw - 32px);
+  }
+  .info button { border: 0; background: none; padding: 6px 12px; min-height: 52px; text-align: left; display: flex; align-items: center; gap: 8px; }
+  .dbtn { border-radius: 12px 0 0 12px; }
+  .dbtn svg { width: 22px; height: 22px; flex: none; color: var(--ink-2); }
+  .dbtn span { display: grid; line-height: 1.25; }
+  .dbtn b { font-size: 15px; white-space: nowrap; }
+  .dbtn small { font-size: 13px; color: var(--ink-3); white-space: nowrap; }
+  .dbtn.over { background: repeating-linear-gradient(-45deg, var(--over-soft) 0 8px, #ffe2c4 8px 16px); }
+  .dbtn.over small, .dbtn.over svg { color: var(--over); font-weight: 700; }
+  .pbtn { border-left: 1px solid var(--line) !important; border-radius: 0 12px 12px 0; position: relative; }
+  .pbtn b { font-size: 18px; white-space: nowrap; }
+  .delta {
+    position: absolute; right: 12px; top: 100%; margin-top: 6px; font-style: normal; font-size: 13px; font-weight: 700;
+    background: var(--ink); color: #fff; padding: 2px 8px; border-radius: 4px; white-space: nowrap;
+    visibility: hidden; transform: translateY(-4px); transition: transform .25s, visibility 0s .25s;
+  }
+  .delta.on { visibility: visible; transform: none; transition: transform .25s; }
+
+  .dimpop {
+    position: fixed; z-index: 6; left: 50%; top: calc(var(--top) + 124px); transform: translateX(-50%);
+    background: var(--surface); border-radius: 12px; box-shadow: var(--shadow); padding: 10px 10px 8px;
+    display: grid; gap: 8px; width: max-content; max-width: calc(100vw - 32px);
+  }
+  .drow { display: flex; align-items: center; gap: 6px; }
+  .drow label { font-size: 15px; color: var(--ink-2); width: 40px; padding-left: 4px; white-space: nowrap; }
+  .drow input {
+    width: 96px; height: 44px; border: 1px solid var(--line-2); border-radius: 6px; text-align: center; font-size: 17px; font-weight: 700;
+    font-variant-numeric: tabular-nums; -moz-appearance: textfield; appearance: textfield; background: #fff;
+  }
+  .drow input::-webkit-inner-spin-button, .drow input::-webkit-outer-spin-button { -webkit-appearance: none; margin: 0; }
+  .drow input.over { border: 2px solid var(--over); background: var(--over-soft); }
+  .drow .ibtn { box-shadow: none; background: #f0eee9; }
+  .drow em { font-style: normal; font-size: 14px; color: var(--ink-3); }
+  .dimpop p { margin: 0 4px; font-size: 13px; color: var(--ink-3); font-variant-numeric: tabular-nums; white-space: nowrap; }
+  .dimpop .fix { height: 44px; border: 0; border-radius: 8px; background: var(--over); color: #fff; font-weight: 700; font-size: 15px; }
+
+  /* 줄자 손잡이 */
+  .knob {
+    position: fixed; z-index: 3; left: 0; top: 0; width: 44px; height: 44px; margin: -22px 0 0 -22px; padding: 0; border-radius: 50%;
+    border: 3px solid var(--accent); background: #fff; color: var(--accent); display: grid; place-items: center;
+    box-shadow: 0 2px 8px rgba(0,0,0,.18); touch-action: none; visibility: hidden; cursor: grab;
+  }
+  .knob svg { width: 22px; height: 22px; }
+  .knob.over { border-color: var(--over); color: var(--over); }
+  .knob.on { cursor: grabbing; background: var(--accent); color: #fff; }
+  .knob.over.on { background: var(--over); }
+  .kval {
+    position: fixed; z-index: 4; left: 0; top: 0; padding: 3px 10px; border-radius: 6px; background: var(--ink); color: #fff;
+    font-size: 15px; font-weight: 700; font-variant-numeric: tabular-nums; white-space: nowrap; pointer-events: none; visibility: hidden;
+  }
+  .kval.over { background: var(--over); }
+
+  /* 3D 위 문 도구 */
+  .act {
+    position: fixed; z-index: 3; left: 0; top: 0; display: flex; gap: 6px; padding: 6px;
+    background: var(--surface); border-radius: 12px; box-shadow: var(--shadow); visibility: hidden;
+  }
+  .act button { width: 44px; height: 44px; border: 0; border-radius: 8px; background: #f0eee9; display: grid; place-items: center; padding: 0; color: var(--ink); }
+  .act button svg { width: 24px; height: 24px; }
+  .act button[aria-pressed="true"] { background: var(--accent); color: #fff; }
+  .act .sep { width: 1px; background: var(--line); margin: 4px 2px; }
+
+  /* 아래: 문 방식 트레이 */
+  .tray {
+    position: fixed; z-index: 4; left: 16px; right: 16px; bottom: calc(var(--bot) + 12px);
+    display: flex; align-items: center; gap: 6px; padding: 8px;
+    background: var(--surface); border-radius: 12px; box-shadow: var(--shadow);
+  }
+  .tile {
+    flex: 1 1 0; min-width: 0; height: 68px; border: 0; border-radius: 10px; background: var(--tile);
+    display: grid; grid-template-rows: 1fr auto; justify-items: center; align-items: center; padding: 6px 0;
+    user-select: none; -webkit-user-select: none; -webkit-touch-callout: none;
+  }
+  .tile svg { width: 34px; height: 34px; color: var(--ink); }
+  .tile span { font-size: 13px; font-weight: 600; line-height: 1.1; white-space: nowrap; }
+  .tile:active { background: #e6e2da; }
+  .tile[aria-pressed="true"] { background: var(--accent-soft); box-shadow: inset 0 0 0 2px var(--accent); }
+  .tile[aria-pressed="true"] span { color: var(--accent); }
+  .tdiv { width: 1px; align-self: stretch; margin: 6px 2px; background: var(--line); flex: none; }
+  .swbtn {
+    width: 56px; height: 56px; flex: none; border-radius: 50%; border: 3px solid #fff; padding: 0;
+    box-shadow: 0 0 0 1px var(--line-2), 0 2px 6px rgba(0,0,0,.18);
+  }
+  .swbtn[aria-expanded="true"] { box-shadow: 0 0 0 2px var(--ink), 0 2px 6px rgba(0,0,0,.18); }
+
+  /* 견본 부채: 안쪽 줄 유리, 바깥 줄 프레임 색 */
+  .fan { position: fixed; z-index: 6; left: 0; top: 0; width: 0; height: 0; visibility: hidden; }
+  .fan.on { visibility: visible; }
+  .blade {
+    position: absolute; left: 0; top: -23px; width: 272px; height: 46px; transform-origin: 0 50%;
+    transform: rotate(calc(var(--a) * -1)); pointer-events: none;
+    transition: --a .46s cubic-bezier(.3, 1.45, .55, 1);
+  }
+  .blade::before {
+    content: ""; position: absolute; left: 22px; width: 160px; top: 19px; height: 8px; border-radius: 4px;
+    background: #cfcac0; box-shadow: 0 0 0 2px #fff, 0 1px 4px rgba(0,0,0,.2);
+  }
+  .chip {
+    position: absolute; top: 0; bottom: 0; border-radius: 23px; border: 3px solid #fff; padding: 0;
+    pointer-events: auto; box-shadow: 0 2px 8px rgba(0,0,0,.22); transition: transform .2s;
+  }
+  .chip.g { left: 106px; width: 44px; top: 1px; bottom: 1px; }
+  .chip.f { left: 180px; width: 92px; }
+  .chip[aria-pressed="true"] { transform: translateX(10px); box-shadow: 0 0 0 2px var(--ink), 0 2px 8px rgba(0,0,0,.22); }
+  .fanlab {
+    position: absolute; transform: translate(-50%, -50%); padding: 1px 8px; border-radius: 4px; background: var(--surface);
+    font-size: 12px; font-weight: 700; color: var(--ink-2); white-space: nowrap; box-shadow: 0 1px 3px rgba(0,0,0,.14);
+    opacity: 0; transition: opacity .2s .25s;
+  }
+  .fan.spread .fanlab { opacity: 1; }
+  .fanhead { position: fixed; z-index: 6; right: 16px; bottom: 0; display: grid; justify-items: end; gap: 4px; visibility: hidden; }
+  .fanhead.on { visibility: visible; }
+  .fanhead p {
+    margin: 0; background: var(--ink); color: #fff; font-size: 14px; padding: 4px 10px; border-radius: 6px; white-space: nowrap;
+    font-variant-numeric: tabular-nums;
+  }
+
+  .toast {
+    position: fixed; z-index: 7; left: 50%; bottom: calc(var(--bot) + 104px); transform: translate(-50%, 8px);
+    background: var(--ink); color: #fff; border-radius: 10px; padding: 0 6px 0 16px; min-height: 48px;
+    display: flex; align-items: center; gap: 6px; font-size: 15px; max-width: calc(100vw - 32px); width: max-content;
+    visibility: hidden; transition: transform .2s, visibility 0s .2s;
+  }
+  .toast.on { visibility: visible; transform: translate(-50%, 0); transition: transform .2s; }
+  .toast span { padding: 12px 10px 12px 0; }
+  .toast button { min-height: 44px; border: 0; background: none; color: #ffc896; font-weight: 700; padding: 0 10px; white-space: nowrap; }
+
+  /* 견적 시트 */
+  dialog.sheet {
+    border: 0; padding: 0; margin: auto 0 0; width: 100%; max-width: 100%; max-height: 90dvh;
+    border-radius: 16px 16px 0 0; background: var(--surface); color: var(--ink); overflow: hidden;
+  }
+  dialog.sheet[open] { animation: sheet-up .32s cubic-bezier(.2,.9,.3,1); }
+  @keyframes sheet-up { from { transform: translateY(100%); } }
+  dialog.sheet::backdrop { background: rgba(28,24,18,.32); }
+  .sheet-in { max-height: 90dvh; overflow-y: auto; padding: 8px 16px calc(var(--bot) + 16px); }
+  .sheet-h { display: flex; align-items: center; justify-content: space-between; position: sticky; top: -8px; background: var(--surface); padding: 6px 0; z-index: 1; }
+  .sheet-h h2 { font-size: 19px; margin: 0; }
+  .sheet-h .ibtn { box-shadow: none; }
+  .sum { display: grid; gap: 2px; padding: 12px 14px; background: #f3f1ec; border-radius: 10px; }
+  .sum b { font-size: 24px; font-variant-numeric: tabular-nums; }
+  .sum p { margin: 0; font-size: 14px; color: var(--ink-2); }
+  .issue {
+    margin-top: 10px; padding: 10px 12px; border-radius: 10px; display: grid; gap: 8px; font-size: 14px; color: #7a3300;
+    background: repeating-linear-gradient(-45deg, var(--over-soft) 0 8px, #ffe7cf 8px 16px); border: 1px solid #f1b47a;
+  }
+  .issue p { margin: 0; }
+  .issue button { justify-self: start; min-height: 44px; padding: 0 14px; border: 0; border-radius: 8px; background: var(--over); color: #fff; font-weight: 700; font-size: 15px; }
+  details.fold { margin-top: 8px; border-bottom: 1px solid var(--line); }
+  details.fold summary { min-height: 48px; display: flex; align-items: center; gap: 8px; cursor: pointer; font-size: 15px; color: var(--ink-2); list-style: none; }
+  details.fold summary::-webkit-details-marker { display: none; }
+  details.fold summary span { margin-left: auto; color: var(--ink-3); font-size: 14px; text-align: right; }
+  details.fold summary::after { content: ""; flex: none; width: 8px; height: 8px; border: solid currentColor; border-width: 0 2px 2px 0; transform: rotate(45deg); margin: -4px 4px 0 6px; }
+  details.fold[open] summary::after { transform: rotate(-135deg); margin-top: 4px; }
+  table { width: 100%; border-collapse: collapse; font-size: 14px; font-variant-numeric: tabular-nums; margin-bottom: 8px; }
+  td { padding: 7px 0; border-top: 1px solid var(--line); vertical-align: top; }
+  td.n { text-align: right; white-space: nowrap; padding-left: 12px; }
+  td small { display: block; color: var(--ink-3); font-size: 13px; }
+  .xo { display: flex; align-items: center; gap: 12px; min-height: 52px; padding: 4px 0; border-top: 1px solid var(--line); cursor: pointer; font-size: 15px; }
+  .xo input { width: 22px; height: 22px; flex: none; accent-color: var(--accent); margin: 0; }
+  .xo span { display: grid; line-height: 1.3; }
+  .xo small { font-size: 13px; color: var(--ink-3); }
+  .xo em { margin-left: auto; font-style: normal; font-size: 14px; color: var(--ink-2); white-space: nowrap; font-variant-numeric: tabular-nums; }
+  .xo.off { opacity: .45; cursor: not-allowed; }
+  .xo:last-child { margin-bottom: 8px; }
+  form .in { display: grid; gap: 4px; font-size: 14px; color: var(--ink-2); margin-top: 12px; min-width: 0; }
+  form input {
+    height: 48px; border: 1px solid #bdb9b1; border-radius: 6px; padding: 0 12px; font-size: 17px; color: var(--ink); background: #fff; width: 100%; min-width: 0;
+  }
+  form input[type="date"] { -webkit-appearance: none; appearance: none; display: block; line-height: 46px; text-align: left; }
+  form input[type="date"]::-webkit-date-and-time-value { text-align: left; }
+  form [aria-invalid="true"] { border-color: #b3261e; border-width: 2px; }
+  .row2 { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); gap: 10px; }
+  .err { color: #b3261e; font-size: 13px; }
+  .err:empty { display: none; }
+  .send { width: 100%; height: 52px; margin-top: 18px; font-size: 17px; }
+  .done { padding: 4px 0; outline: none; }
+  .done h3 { font-size: 19px; margin: 6px 0 12px; }
+  .done dl { margin: 0; display: grid; grid-template-columns: 76px minmax(0, 1fr); gap: 8px 12px; font-size: 15px; }
+  .done dt { color: var(--ink-3); }
+  .done dd { margin: 0; min-width: 0; overflow-wrap: anywhere; }
+  .line-btn { width: 100%; height: 48px; margin-top: 18px; border: 1px solid #bdb9b1; background: #fff; border-radius: 10px; font-size: 16px; }
+  .foot { margin: 20px 0 0; padding-top: 12px; border-top: 1px solid var(--line); font-size: 13px; color: var(--ink-3); text-align: center; }
+
+  @media (min-width: 900px) {
+    .top { padding: 18px 24px 0; }
+    .brand b { font-size: 24px; }
+    .info { top: 20px; }
+    .info button { min-height: 56px; padding: 6px 18px; }
+    .dbtn b { font-size: 17px; } .pbtn b { font-size: 20px; }
+    .dimpop { top: 86px; }
+    .menu { top: 72px; right: 24px; }
+    .tray { left: 50%; right: auto; transform: translateX(-50%); width: 560px; bottom: 24px; padding: 10px; gap: 8px; }
+    .tile { height: 80px; }
+    .tile svg { width: 40px; height: 40px; }
+    .tile span { font-size: 14px; }
+    .tile:hover { background: #ebe8e1; }
+    .tile[aria-pressed="true"]:hover { background: var(--accent-soft); }
+    .swbtn { width: 64px; height: 64px; }
+    .toast { bottom: 132px; }
+    dialog.sheet { margin: 16px 16px 16px auto; width: 440px; max-height: calc(100dvh - 32px); border-radius: 16px; }
+    dialog.sheet[open] { animation-name: sheet-in; }
+    @keyframes sheet-in { from { transform: translateX(110%); } }
+    .sheet-in { max-height: calc(100dvh - 32px); padding: 12px 24px 24px; }
+  }
+  @media (max-width: 420px) {
+    .dbtn svg { display: none; }
+    .info button { padding: 6px 11px; }
+    .pbtn b { font-size: 17px; }
+  }
+  @media (max-width: 370px) {
+    .brand small { display: none; }
+    .tile span { font-size: 12px; }
+  }
+  @media (prefers-reduced-motion: reduce) {
+    .blade, .chip, .delta, .toast, .fanlab { transition: none !important; }
+    dialog.sheet[open] { animation: none; }
+  }
+  /* 11-04 다른 카탈로그 데모와 같은 맨 위 곰파트너 바로가기 줄(40px, 검정) */
+  .gp-bar { height: 40px; background: #15171c; color: #fff; z-index: 40; font-family: Pretendard, -apple-system, "Apple SD Gothic Neo", sans-serif; }
+  .gp-bar > div { max-width: 1248px; height: 100%; margin: 0 auto; padding: 0 16px; display: flex; align-items: center; }
+  .gp-bar a { display: inline-flex; align-items: center; min-height: 40px; color: #fff; font-size: 14px; font-weight: 700; text-decoration: none; }
+  .gp-bar a:hover { color: #8fb4ff; }
+  .gp-bar a:focus-visible { outline: 2px solid #8fb4ff; outline-offset: 2px; }
+  /* PC는 위치가 px로 따로 정해져 있어 바로가기 줄(40px)만큼 내린다 */
+  @media (min-width: 900px) { .top { padding-top: 58px; } .info { top: 60px; } .dimpop { top: 126px; } .menu { top: 112px; } }
+  @media (min-width: 768px) { .gp-bar > div { padding: 0 24px; } }
+  .gp-bar { position: fixed; top: 0; left: 0; right: 0; }
+  :root { --top: calc(env(safe-area-inset-top, 0px) + 40px) !important; }
+</style>
+<script type="importmap">
+{ "imports": {
+  "three": "https://cdn.jsdelivr.net/npm/three@0.160.0/build/three.module.js",
+  "three/addons/": "https://cdn.jsdelivr.net/npm/three@0.160.0/examples/jsm/"
+} }
+</script>
+</head>
+<body>
+<div class="gp-bar" role="navigation" aria-label="곰파트너"><div><a href="/">‹ 곰파트너 바로가기</a></div></div>
+<h1 class="sr">현관 중문 견적</h1>
+<canvas id="scene" aria-label="현관 중문 3D 화면. 문을 누르면 열고 닫거나 간살과 손잡이를 바꿀 수 있습니다." tabindex="-1"></canvas>
+<div class="nogl" id="nogl">이 브라우저에서는 3D 화면을 열 수 없습니다. 아래 문 방식 버튼과 치수 칸으로 구성하고 견적을 요청할 수 있습니다.</div>
+
+<div class="top">
+  <a class="brand" href="../space/"><b>인테리어</b><small>곰파트너 카탈로그</small></a>
+  <button class="ibtn" type="button" id="menu-btn" aria-label="메뉴" aria-expanded="false" aria-controls="menu">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><path d="M4 7h16M4 12h16M4 17h16"/></svg>
+  </button>
+  <button class="cta" type="button" id="to-quote">견적 요청</button>
+</div>
+<nav class="menu" id="menu" aria-label="주요 메뉴" hidden>
+  <a href="../space/">시공 사례</a>
+  <a href="./" aria-current="page">중문 견적</a>
+  <a href="../">카탈로그 목록</a>
+  <hr>
+  <button type="button" id="copy"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M10 13a5 5 0 0 0 7.5.5l3-3a5 5 0 0 0-7-7l-1.7 1.7"/><path d="M14 11a5 5 0 0 0-7.5-.5l-3 3a5 5 0 0 0 7 7l1.7-1.7"/></svg>구성 링크 복사</button>
+  <p>인테리어 | 곰파트너 카탈로그</p>
+</nav>
+
+<div class="info">
+  <button class="dbtn" type="button" id="dbtn" aria-expanded="false" aria-controls="dimpop">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="2" y="8" width="20" height="8" rx="1.5"/><path d="M6 8v3M10 8v4M14 8v3M18 8v4"/></svg>
+    <span><b id="dtxt">폭 1,200mm, 높이 2,300mm</b><small id="dsub"></small></span>
+    <span class="sr">, 폭과 높이 바꾸기</span>
+  </button>
+  <button class="pbtn" type="button" id="pbtn"><b id="total">0원</b><span class="sr">, 견적 내역 보기</span><em class="delta" id="delta" aria-hidden="true"></em></button>
+</div>
+<div class="dimpop" id="dimpop" hidden>
+  <div class="drow">
+    <label for="in-w">폭</label>
+    <button class="ibtn" type="button" data-dim="w" data-d="-100" aria-label="폭 100mm 줄이기"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" aria-hidden="true"><path d="M5 12h14"/></svg></button>
+    <input id="in-w" type="number" inputmode="numeric" step="10" autocomplete="off">
+    <button class="ibtn" type="button" data-dim="w" data-d="100" aria-label="폭 100mm 늘리기"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" aria-hidden="true"><path d="M12 5v14M5 12h14"/></svg></button>
+    <em>mm</em>
+  </div>
+  <div class="drow">
+    <label for="in-h">높이</label>
+    <button class="ibtn" type="button" data-dim="h" data-d="-100" aria-label="높이 100mm 줄이기"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" aria-hidden="true"><path d="M5 12h14"/></svg></button>
+    <input id="in-h" type="number" inputmode="numeric" step="10" autocomplete="off">
+    <button class="ibtn" type="button" data-dim="h" data-d="100" aria-label="높이 100mm 늘리기"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" aria-hidden="true"><path d="M12 5v14M5 12h14"/></svg></button>
+    <em>mm</em>
+  </div>
+  <p id="range"></p>
+  <button class="fix" type="button" id="dim-fix" hidden></button>
+</div>
+
+<button class="knob" type="button" id="knob-w" aria-label="폭 줄자 손잡이. 끌어서 폭을 바꿉니다."><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 12h18M7 8l-4 4 4 4M17 8l4 4-4 4"/></svg></button>
+<button class="knob" type="button" id="knob-h" aria-label="높이 줄자 손잡이. 끌어서 높이를 바꿉니다."><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 3v18M8 7l4-4 4 4M8 17l4 4 4-4"/></svg></button>
+<div class="kval" id="kval" aria-hidden="true"></div>
+
+<div class="act" id="act" role="group" aria-label="중문"></div>
+
+<div class="tray" id="tray" role="group" aria-label="문 방식">
+  <button class="tile" type="button" data-t="3" aria-pressed="false"><svg viewBox="0 0 40 40" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round" aria-hidden="true"><rect x="4" y="4" width="32" height="32" rx="1.5"/><rect x="7" y="7" width="11" height="27" fill="#fff"/><rect x="15" y="7" width="11" height="27" fill="#dfe8e4"/><rect x="23" y="7" width="10" height="27" fill="#fff"/><path d="M8 37h24" stroke-linecap="round"/></svg><span>3연동</span></button>
+  <button class="tile" type="button" data-t="1" aria-pressed="false"><svg viewBox="0 0 40 40" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round" aria-hidden="true"><rect x="4" y="4" width="32" height="32" rx="1.5"/><rect x="20" y="7" width="13" height="27" fill="#dfe8e4"/><rect x="7" y="7" width="15" height="27" fill="#fff"/><path d="M10 20h3" stroke-linecap="round"/><path d="M8 37h24" stroke-linecap="round"/></svg><span>원슬라이딩</span></button>
+  <button class="tile" type="button" data-t="s" aria-pressed="false"><svg viewBox="0 0 40 40" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round" aria-hidden="true"><rect x="4" y="4" width="32" height="32" rx="1.5"/><rect x="7" y="7" width="26" height="27" fill="#fff"/><path d="M33 7L7 20.5 33 34" stroke-width="1.4" stroke-dasharray="2.5 2"/><path d="M8 37h24" stroke-linecap="round"/></svg><span>스윙</span></button>
+  <button class="tile" type="button" data-t="d" aria-pressed="false"><svg viewBox="0 0 40 40" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round" aria-hidden="true"><rect x="4" y="4" width="32" height="32" rx="1.5"/><rect x="7" y="7" width="13" height="27" fill="#fff"/><rect x="20" y="7" width="13" height="27" fill="#fff"/><path d="M20 7L7 20.5 20 34M20 7l13 13.5L20 34" stroke-width="1.4" stroke-dasharray="2.5 2"/><path d="M8 37h24" stroke-linecap="round"/></svg><span>양개</span></button>
+  <span class="tdiv" aria-hidden="true"></span>
+  <button class="swbtn" type="button" id="swbtn" aria-expanded="false" aria-controls="fan" aria-label="프레임 색과 유리 고르기"></button>
+</div>
+
+<div class="fanhead" id="fanhead"><p id="cap-f"></p><p id="cap-g"></p></div>
+<div class="fan" id="fan" role="group" aria-label="프레임 색과 유리"></div>
+
+<div class="toast" id="toast" role="status" aria-live="polite"><span id="toast-t"></span><button type="button" id="toast-act" hidden></button></div>
+
+<dialog class="sheet" id="sheet" aria-labelledby="sheet-h">
+  <div class="sheet-in">
+    <div class="sheet-h">
+      <h2 id="sheet-h">견적 요청</h2>
+      <button class="ibtn" type="button" id="sheet-close" aria-label="닫기"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><path d="M6 6l12 12M18 6L6 18"/></svg></button>
+    </div>
+    <div id="ask">
+      <div class="sum"><b id="qt-total">0원</b><p id="qt-what"></p><p>부가세 포함, 수도권 시공 기준</p></div>
+      <div class="issue" id="issue" hidden><p id="issue-t"></p><button type="button" id="issue-fix"></button></div>
+      <details class="fold"><summary>금액 내역</summary><table><tbody id="lines"></tbody></table></details>
+      <details class="fold" id="more"><summary>추가 옵션<span id="extra-names"></span></summary><div id="extras"></div></details>
+      <form id="quote-form" novalidate>
+        <div class="row2">
+          <label class="in">이름<input name="name" autocomplete="name" required aria-describedby="e-name"><span class="err" id="e-name"></span></label>
+          <label class="in">연락처<input name="tel" type="tel" inputmode="tel" autocomplete="tel" placeholder="010-0000-0000" maxlength="13" required aria-describedby="e-tel"><span class="err" id="e-tel"></span></label>
+        </div>
+        <div class="row2">
+          <label class="in">지역<input name="addr" autocomplete="address-level2" placeholder="서울 관악구" required aria-describedby="e-addr"><span class="err" id="e-addr"></span></label>
+          <label class="in">실측 희망일<input name="date" type="date" required aria-describedby="e-date"><span class="err" id="e-date"></span></label>
+        </div>
+        <button class="cta send" type="submit">이 구성으로 견적 요청</button>
+      </form>
+    </div>
+    <div class="done" id="done" hidden tabindex="-1">
+      <h3>견적 요청을 받았습니다</h3>
+      <dl id="done-list"></dl>
+      <button class="line-btn" type="button" id="again">구성 다시 고치기</button>
+    </div>
+    <p class="foot">인테리어 | 곰파트너 카탈로그</p>
+  </div>
+</dialog>
+
+<script type="module">
+import * as THREE from 'three';
+import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
+import { RoomEnvironment } from 'three/addons/environments/RoomEnvironment.js';
+import { RoundedBoxGeometry } from 'three/addons/geometries/RoundedBoxGeometry.js';
+
+const reduce = matchMedia('(prefers-reduced-motion: reduce)').matches;
+const $ = id => document.getElementById(id);
+const wide = () => innerWidth >= 900;
+
+// ---------- 상품 정보와 단가 (부가세 포함) ----------
+// 기본가는 폭 1000mm, 높이 2300mm까지. 그 위로 100mm마다 가산합니다.
+const TYPES = [
+  { id: '3', name: '3연동 슬라이딩', short: '3연동', sub: '문짝 3장이 한쪽으로 겹쳐 열림', base: 720000, perW: 33000, wMin: 1000, wMax: 2000, slide: true, leaves: 1 },
+  { id: '1', name: '원슬라이딩', short: '원슬라이딩', sub: '문짝 1장과 고정창 1장', base: 620000, perW: 30000, wMin: 900, wMax: 1800, slide: true, leaves: 1 },
+  { id: 's', name: '스윙 도어', short: '스윙', sub: '한쪽 경첩, 안쪽으로 열림', base: 850000, perW: 28000, wMin: 900, wMax: 1600, slide: false, leaves: 1 },
+  { id: 'd', name: '양개 여닫이', short: '양개', sub: '문짝 2장이 양쪽으로 열림', base: 690000, perW: 30000, wMin: 1100, wMax: 2000, slide: false, leaves: 2 }
+];
+const H_MIN = 2000, H_MAX = 2500, BASE_W = 1000, BASE_H = 2300, PER_H = 25000;
+// 현관 개구부로 잴 수 있는 범위 (문 방식 범위를 넘으면 주황 줄무늬로 알립니다)
+const W_ALL = [700, 2400], H_ALL = [1800, 2650];
+const FRAMES = [
+  { id: 'w', name: '화이트', hex: '#efeeea', color: 0xeeede9, metal: 0.15, rough: 0.42, add: 0 },
+  { id: 'k', name: '블랙', hex: '#262626', color: 0x222222, metal: 0.5, rough: 0.4, add: 0 },
+  { id: 'b', name: '브론즈', hex: '#5d4838', color: 0x5a4434, metal: 0.7, rough: 0.36, add: 40000 },
+  { id: 'c', name: '샴페인골드', hex: '#c4ad80', color: 0xbca57a, metal: 0.82, rough: 0.3, add: 60000 }
+];
+const GLASSES = [
+  { id: 'c', name: '투명', sub: '맑은 강화유리', hex: '#dbe6e4', rate: 0, color: 0xe4eeec, opacity: 0.14, rough: 0.04 },
+  { id: 'b', name: '브론즈', sub: '은은한 갈색 톤', hex: '#7d6a58', rate: 65000, color: 0x5e5044, opacity: 0.42, rough: 0.05 },
+  { id: 's', name: '샤틴', sub: '불투명 산 부식', hex: '#e6e9e6', rate: 55000, color: 0xe3e8e6, opacity: 0.74, rough: 0.75 },
+  { id: 'a', name: '아쿠아', sub: '물결 무늬, 반투명', hex: '#cfdcdb', rate: 65000, color: 0xd5e2e0, opacity: 0.6, rough: 0.28 }
+];
+const DESIGNS = [
+  { id: 'f', name: '통유리', sub: '간살 없음', add: 0 },
+  { id: 'v', name: '세로 간살', sub: '세로 분할', add: 60000 },
+  { id: 'h', name: '가로 간살', sub: '가로 4분할', add: 50000 },
+  { id: 'g', name: '격자 간살', sub: '바둑판 분할', add: 110000 }
+];
+const HANDLES = [
+  { id: 'b', name: '일자 바 손잡이', short: '일자 바', sub: '길이 300mm', add: 0 },
+  { id: 'l', name: '롱바 손잡이', short: '롱바', sub: '길이 1200mm', add: 35000 },
+  { id: 'r', name: '매립 손잡이', short: '매립', sub: '프레임 홈 가공', add: 20000 }
+];
+const EXTRAS = [
+  { id: 'hanger', name: '상부 행거형', sub: '하부 레일 없이 바닥이 매끈합니다', price: 150000 },
+  { id: 'close', name: '자동 닫힘', sub: '', price: 70000 },
+  { id: 'remove', name: '기존 중문 철거', sub: '폐기물 처리 포함', price: 120000 }
+];
+const INSTALL = 145000;
+
+const state = { type: '3', w: 1200, h: 2300, frame: 'k', glass: 'b', design: 'v', handle: 'l', o: { hanger: false, close: true, remove: false } };
+const ui = { sel: false, sub: '', fan: false, drag: null };
+const typeOf = () => TYPES.find(t => t.id === state.type);
+const byId = (arr, id) => arr.find(x => x.id === id);
+const won = n => n.toLocaleString('ko-KR') + '원';
+const mm = n => n.toLocaleString('ko-KR') + 'mm';
+const clamp = (v, a, b) => Math.min(b, Math.max(a, v));
+// 문이 실제로 만들어지는 크기(문 방식 범위 안)와 개구부 실측의 차이
+function door() {
+  const t = typeOf();
+  const dw = clamp(state.w, t.wMin, t.wMax), dh = clamp(state.h, H_MIN, H_MAX);
+  return { t, dw, dh, ow: state.w - dw, oh: state.h - dh };
+}
+function issueText(d, short) {
+  const part = [];
+  if (d.ow) part.push(`폭 ${mm(Math.abs(d.ow))} ${d.ow > 0 ? '넘침' : '모자람'}`);
+  if (d.oh) part.push(`높이 ${mm(Math.abs(d.oh))} ${d.oh > 0 ? '넘침' : '모자람'}`);
+  if (short) return part.join(', ');
+  const n = d.t.name, j = (n.charCodeAt(n.length - 1) - 0xac00) % 28 ? '은' : '는';
+  return `${n}${j} 폭 ${mm(d.t.wMin)}~${mm(d.t.wMax)}, 높이 ${mm(H_MIN)}~${mm(H_MAX)}까지 만듭니다. 지금 ${part.join(', ')}.`;
+}
+
+// ---------- 해시 저장과 복원 ----------
+function toHash() {
+  const o = ['hanger', 'close', 'remove'].map(k => state.o[k] ? 1 : 0).join('');
+  return 'cfg=' + [state.type, state.frame, state.glass, state.design, state.handle, state.w, state.h, o].join('-');
+}
+function fromHash() {
+  const m = location.hash.match(/cfg=([31sd])-([wkbc])-([cbsa])-([fvhg])-([blr])-(\d{3,4})-(\d{4})-([01]{3})/);
+  if (!m) return false;
+  const t = byId(TYPES, m[1]);
+  Object.assign(state, {
+    type: m[1], frame: m[2], glass: m[3], design: m[4], handle: m[5],
+    w: clamp(Math.round(+m[6] / 10) * 10, W_ALL[0], W_ALL[1]), h: clamp(Math.round(+m[7] / 10) * 10, H_ALL[0], H_ALL[1]),
+    o: { hanger: m[8][0] === '1' && t.slide, close: m[8][1] === '1', remove: m[8][2] === '1' }
+  });
+  return true;
+}
+fromHash();
+
+// ---------- 견적 계산 (문 크기 기준) ----------
+function computeLines() {
+  const { t, dw, dh } = door();
+  const f = byId(FRAMES, state.frame), g = byId(GLASSES, state.glass), d = byId(DESIGNS, state.design), hd = byId(HANDLES, state.handle);
+  const stepsW = Math.max(0, Math.ceil((dw - BASE_W) / 100));
+  const stepsH = Math.max(0, Math.ceil((dh - BASE_H) / 100));
+  const area = dw * dh / 1e6;
+  const lines = [];
+  lines.push({ name: `기본 제품가, ${t.name}`, sub: `폭 ${BASE_W}mm, 높이 ${BASE_H}mm까지, 투명 강화유리`, price: t.base });
+  const sizeParts = [];
+  if (stepsW) sizeParts.push(`폭 100mm당 ${won(t.perW)}`);
+  if (stepsH) sizeParts.push(`높이 100mm당 ${won(PER_H)}`);
+  lines.push({ name: '치수 추가', sub: sizeParts.length ? sizeParts.join(', ') : '기본 치수 안', price: stepsW * t.perW + stepsH * PER_H });
+  if (f.add) lines.push({ name: `프레임 ${f.name}`, sub: '아노다이징 색상 가산', price: f.add });
+  lines.push({ name: `유리 ${g.name}`, sub: g.rate ? `유리 면적 기준, 투명 대비 가산` : '기본 사양', price: Math.round(g.rate * area / 1000) * 1000 });
+  if (d.add) lines.push({ name: d.name, sub: d.sub, price: d.add });
+  if (hd.add) lines.push({ name: hd.name, sub: hd.sub, price: hd.add });
+  for (const x of EXTRAS) if (state.o[x.id] && !(x.id === 'hanger' && !t.slide)) {
+    const n = x.id === 'close' ? t.leaves : 1;
+    lines.push({ name: x.name + (n > 1 ? ` ${n}개` : ''), sub: x.id === 'close' ? (t.slide ? '소프트 클로징 댐퍼' : '도어클로저') : x.sub, price: x.price * n });
+  }
+  lines.push({ name: '시공비', sub: '실측, 설치, 실리콘 마감, 수도권 기준', price: INSTALL });
+  const total = lines.reduce((s, l) => s + l.price, 0);
+  return { lines, total };
+}
+const glassAdd = () => { const { dw, dh } = door(), g = byId(GLASSES, state.glass); return Math.round(g.rate * dw * dh / 1e6 / 1000) * 1000; };
+
+// 합계: 숫자가 짧게 굴러가며 바뀌고, 변동액이 잠깐 보입니다
+let totTarget = null, totShown = 0, totRaf = 0;
+function setTotal(v) {
+  const el = $('total');
+  if (totTarget === null) { totTarget = totShown = v; el.textContent = won(v); return; }
+  if (v === totTarget) return;
+  const d = v - totTarget;
+  totTarget = v;
+  const de = $('delta');
+  de.textContent = (d > 0 ? '+' : '-') + won(Math.abs(d));
+  de.classList.add('on');
+  clearTimeout(de._t); de._t = setTimeout(() => de.classList.remove('on'), 1500);
+  cancelAnimationFrame(totRaf);
+  if (reduce) { totShown = v; el.textContent = won(v); return; }
+  const from = totShown, t0 = performance.now(), dur = 450;
+  const tick = now => {
+    const k = Math.min(1, (now - t0) / dur), e = 1 - (1 - k) ** 3;
+    totShown = k < 1 ? Math.round((from + (v - from) * e) / 1000) * 1000 : v;
+    el.textContent = won(totShown);
+    if (k < 1) totRaf = requestAnimationFrame(tick);
+  };
+  totRaf = requestAnimationFrame(tick);
+}
+
+const frameBg = f => `linear-gradient(135deg, rgba(255,255,255,.34), rgba(255,255,255,0) 42%, rgba(0,0,0,.16)), ${f.hex}`;
+const GLASS_BG = {
+  c: 'linear-gradient(135deg, #f1f6f5 0 42%, #cddcd9 42% 52%, #f1f6f5 52%)',
+  b: 'linear-gradient(135deg, #8a7764 0 42%, #6e5c4b 42% 52%, #8a7764 52%)',
+  s: 'radial-gradient(circle at 35% 30%, #f4f5f3, #d9dedb)',
+  a: 'repeating-radial-gradient(circle at 30% 40%, #dbe7e5 0 3px, #bccfcc 3px 5px)'
+};
+
+// ---------- 화면 반영 ----------
+const inW = $('in-w'), inH = $('in-h');
+inW.min = W_ALL[0]; inW.max = W_ALL[1]; inH.min = H_ALL[0]; inH.max = H_ALL[1];
+function renderInfo() {
+  const d = door(), { lines, total } = computeLines();
+  const issue = d.ow || d.oh;
+  $('dtxt').textContent = `폭 ${mm(state.w)}, 높이 ${mm(state.h)}`;
+  $('dbtn').classList.toggle('over', !!issue);
+  $('dsub').textContent = issue ? issueText(d, true) : d.t.name;
+  setTotal(total);
+  $('qt-total').textContent = won(total);
+  const f = byId(FRAMES, state.frame), g = byId(GLASSES, state.glass);
+  const nw = s => `<span style="white-space:nowrap">${s}</span>`;
+  $('qt-what').innerHTML = `${nw(d.t.name)}, ${nw('폭 ' + mm(d.dw) + ',')} ${nw('높이 ' + mm(d.dh))}<br>${nw(f.name + ' 프레임')}, ${nw(g.name + ' 유리')}, ${nw(byId(DESIGNS, state.design).name)}, ${nw(byId(HANDLES, state.handle).short)}`;
+  $('lines').innerHTML = lines.map(l =>
+    `<tr><td>${l.name}<small>${l.sub}</small></td><td class="n">${won(l.price)}</td></tr>`).join('') +
+    `<tr><td><b>합계</b><small>부가세 포함</small></td><td class="n"><b>${won(total)}</b></td></tr>`;
+  // 범위를 벗어났을 때
+  $('issue').hidden = !issue;
+  if (issue) { $('issue-t').textContent = issueText(d); $('issue-fix').textContent = `폭 ${mm(d.dw)}, 높이 ${mm(d.dh)}로 맞추기`; }
+  // 치수 칸
+  if (document.activeElement !== inW) inW.value = state.w;
+  if (document.activeElement !== inH) inH.value = state.h;
+  inW.classList.toggle('over', !!d.ow); inH.classList.toggle('over', !!d.oh);
+  $('range').textContent = `${d.t.short} 폭 ${mm(d.t.wMin)}~${mm(d.t.wMax)}, 높이 ${mm(H_MIN)}~${mm(H_MAX)}`;
+  $('dim-fix').hidden = !issue;
+  if (issue) $('dim-fix').textContent = `폭 ${mm(d.dw)}, 높이 ${mm(d.dh)}로 맞추기`;
+  for (const b of document.querySelectorAll('[data-dim]')) {
+    const k = b.dataset.dim, dd = +b.dataset.d, R = k === 'w' ? W_ALL : H_ALL;
+    b.disabled = dd < 0 ? state[k] <= R[0] : state[k] >= R[1];
+  }
+  // 추가 옵션
+  $('extras').innerHTML = EXTRAS.map(x => {
+    const off = x.id === 'hanger' && !d.t.slide;
+    const price = x.price * (x.id === 'close' ? d.t.leaves : 1);
+    const sub = off ? '슬라이딩 방식만 됩니다' : x.id === 'close' ? (d.t.slide ? '소프트 클로징 댐퍼' : '도어클로저') + (d.t.leaves > 1 ? ' 2개' : '') : x.sub;
+    return `<label class="xo${off ? ' off' : ''}"><input type="checkbox" name="extra" value="${x.id}"${state.o[x.id] && !off ? ' checked' : ''}${off ? ' disabled' : ''}><span>${x.name}<small>${sub}</small></span><em>+${won(price)}</em></label>`;
+  }).join('');
+  const ex = EXTRAS.filter(x => state.o[x.id] && !(x.id === 'hanger' && !d.t.slide));
+  $('extra-names').textContent = ex.length ? ex.map(x => x.name).join(', ') : '없음';
+  // 견본 버튼과 부채 머리
+  $('swbtn').style.background = `linear-gradient(135deg, ${f.hex} 0 50%, transparent 50%), ${GLASS_BG[g.id]}`;
+  $('cap-f').textContent = `프레임 ${f.name}${f.add ? ', +' + won(f.add) : ''}`;
+  const ga = glassAdd();
+  $('cap-g').textContent = `유리 ${g.name}${ga ? ', +' + won(ga) : ''}`;
+}
+function renderTray() {
+  document.querySelectorAll('.tile').forEach(b => {
+    const t = byId(TYPES, b.dataset.t);
+    b.setAttribute('aria-pressed', String(t.id === state.type));
+    b.setAttribute('aria-label', `${t.name}, 폭 ${mm(t.wMin)}~${mm(t.wMax)}`);
+  });
+}
+
+const I = (d, extra = '') => `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">${extra}<path d="${d}"/></svg>`;
+const ICON = {
+  open: I('M4 21h16M6 21V3h12v18M14 12h.01'),
+  close: I('M6 6l12 12M18 6L6 18'),
+  back: I('M15 6l-6 6 6 6'),
+  f: I('M6 3h12v18H6z'),
+  v: I('M6 3h12v18H6zM10 3v18M14 3v18'),
+  h: I('M6 3h12v18H6zM6 7.5h12M6 12h12M6 16.5h12'),
+  g: I('M6 3h12v18H6zM10 3v18M14 3v18M6 9h12M6 15h12'),
+  hb: I('M6 3h12v18H6zM9.5 10v4', ''),
+  hl: I('M6 3h12v18H6zM9.5 5v14'),
+  hr: I('M6 3h12v18H6z', '<rect x="8.5" y="9.5" width="2" height="5" rx="1" fill="currentColor" stroke="none"/>')
+};
+const HICON = { b: 'hb', l: 'hl', r: 'hr' };
+let doorOpen = 0;
+function renderAct() {
+  const act = $('act');
+  if (!ui.sel) { act.innerHTML = ''; return; }
+  if (ui.sub === 'design') {
+    act.setAttribute('aria-label', '간살 디자인');
+    act.innerHTML = `<button type="button" data-act="back" aria-label="뒤로">${ICON.back}</button><span class="sep" aria-hidden="true"></span>` +
+      DESIGNS.map(d => `<button type="button" data-design="${d.id}" aria-label="${d.name}${d.add ? ', +' + won(d.add) : ''}" title="${d.name}" aria-pressed="${d.id === state.design}">${ICON[d.id]}</button>`).join('');
+  } else if (ui.sub === 'handle') {
+    act.setAttribute('aria-label', '손잡이');
+    act.innerHTML = `<button type="button" data-act="back" aria-label="뒤로">${ICON.back}</button><span class="sep" aria-hidden="true"></span>` +
+      HANDLES.map(h => `<button type="button" data-handle="${h.id}" aria-label="${h.name}${h.add ? ', +' + won(h.add) : ''}" title="${h.name}" aria-pressed="${h.id === state.handle}">${ICON[HICON[h.id]]}</button>`).join('');
+  } else {
+    act.setAttribute('aria-label', '중문');
+    const d = byId(DESIGNS, state.design), h = byId(HANDLES, state.handle);
+    act.innerHTML = `<button type="button" data-act="open" aria-pressed="${!!doorOpen}" aria-label="${doorOpen ? '문 닫기' : '문 열기'}" title="${doorOpen ? '문 닫기' : '문 열기'}">${ICON.open}</button>` +
+      `<button type="button" data-act="design" aria-label="간살 디자인 바꾸기, 지금 ${d.name}" title="간살 디자인">${ICON[d.id]}</button>` +
+      `<button type="button" data-act="handle" aria-label="손잡이 바꾸기, 지금 ${h.name}" title="손잡이">${ICON[HICON[h.id]]}</button>` +
+      `<span class="sep" aria-hidden="true"></span><button type="button" data-act="x" aria-label="닫기">${ICON.close}</button>`;
+  }
+}
+
+function update(opts = {}) {
+  const t = typeOf();
+  if (!t.slide) state.o.hanger = false;
+  renderInfo(); renderTray(); renderAct();
+  history.replaceState(null, '', '#' + toHash());
+  if (scene3d) scene3d.build(opts);
+}
+
+// ---------- 알림 ----------
+const toastEl = $('toast'), toastT = $('toast-t'), toastA = $('toast-act');
+let toastFn = null;
+function toast(text, label, fn) {
+  toastT.textContent = text;
+  toastFn = fn || null;
+  toastA.hidden = !fn; if (fn) toastA.textContent = label;
+  toastEl.classList.add('on');
+  clearTimeout(toast._t); toast._t = setTimeout(() => { toastEl.classList.remove('on'); toastFn = null; }, fn ? 5000 : 2400);
+}
+toastA.addEventListener('click', () => { const f = toastFn; toastFn = null; toastEl.classList.remove('on'); if (f) f(); });
+function fitRange() {
+  const d = door();
+  state.w = d.dw; state.h = d.dh;
+  update();
+}
+
+// ---------- 문 방식 트레이 ----------
+$('tray').addEventListener('click', e => {
+  const b = e.target.closest('.tile');
+  if (!b) return;
+  closeFan(); closePops();
+  const id = b.dataset.t;
+  if (id === state.type) { if (scene3d) scene3d.showMove(); return; }
+  const hadHanger = state.o.hanger;
+  state.type = id;
+  const nt = typeOf();
+  const msgs = [];
+  if (hadHanger && !nt.slide) msgs.push('상부 행거형을 뺐습니다');
+  update({ drop: true });
+  const d = door();
+  if (d.ow || d.oh) toast(`${nt.short} ${issueText(d, true)}`, '범위로 맞추기', fitRange);
+  else if (msgs.length) toast(msgs.join(', '));
+});
+
+// ---------- 문 도구 ----------
+function setSel(on) {
+  ui.sel = on; ui.sub = '';
+  renderAct();
+}
+$('act').addEventListener('click', e => {
+  const b = e.target.closest('button');
+  if (!b) return;
+  if (b.dataset.design) { if (b.dataset.design !== state.design) { state.design = b.dataset.design; update(); } else renderAct(); return; }
+  if (b.dataset.handle) { if (b.dataset.handle !== state.handle) { state.handle = b.dataset.handle; update(); } else renderAct(); return; }
+  const a = b.dataset.act;
+  if (a === 'open') { if (scene3d) scene3d.toggleDoor(); return; }
+  if (a === 'x') { setSel(false); return; }
+  ui.sub = a === 'back' ? '' : a;
+  renderAct();
+  const f = $('act').querySelector('button[aria-pressed="true"]') || $('act').querySelector('button');
+  if (f) f.focus({ preventScroll: true });
+});
+function onDoorState(v) {
+  doorOpen = v;
+  const b = $('act').querySelector('[data-act="open"]');
+  if (b) { b.setAttribute('aria-pressed', String(!!v)); b.setAttribute('aria-label', v ? '문 닫기' : '문 열기'); b.title = v ? '문 닫기' : '문 열기'; }
+}
+
+// ---------- 견본 부채 ----------
+const fan = $('fan'), fanhead = $('fanhead'), swbtn = $('swbtn');
+const ANG = [96, 117, 137, 158];
+let fanO = { x: 0, y: 0 };
+function placeFan() {
+  const r = swbtn.getBoundingClientRect(), tr = $('tray').getBoundingClientRect();
+  fanO = { x: r.left + r.width / 2, y: tr.top - 10 };
+  fan.style.transform = `translate(${fanO.x}px, ${fanO.y}px)`;
+  fanhead.style.right = Math.max(16, innerWidth - fanO.x - 30) + 'px';
+  fanhead.style.bottom = (innerHeight - fanO.y + 284) + 'px';
+}
+function renderFan() {
+  const lab = (txt, r) => { const a = 177 * Math.PI / 180; return `<span class="fanlab" style="left:${Math.cos(a) * r}px;top:${-Math.sin(a) * r - 6}px" aria-hidden="true">${txt}</span>`; };
+  fan.innerHTML = [0, 1, 2, 3].map(i => {
+    const g = GLASSES[i], f = FRAMES[i];
+    return `<div class="blade" style="--a:90deg;z-index:${4 - i}" data-a="${ANG[i]}">` +
+      `<button class="chip g" type="button" data-glass="${g.id}" aria-label="유리 ${g.name}" title="유리 ${g.name}" aria-pressed="${g.id === state.glass}" style="background:${GLASS_BG[g.id]}"></button>` +
+      `<button class="chip f" type="button" data-frame="${f.id}" aria-label="프레임 ${f.name}${f.add ? ', +' + won(f.add) : ''}" title="프레임 ${f.name}" aria-pressed="${f.id === state.frame}" style="background:${frameBg(f)}"></button></div>`;
+  }).join('') + lab('유리', 128) + lab('프레임', 226);
+}
+function spreadFan() {
+  const bl = [...fan.querySelectorAll('.blade')];
+  if (reduce) { bl.forEach(b => { b.style.transition = 'none'; b.style.setProperty('--a', b.dataset.a + 'deg'); }); fan.classList.add('spread'); return; }
+  requestAnimationFrame(() => requestAnimationFrame(() => {
+    bl.forEach((b, i) => { b.style.transitionDelay = (i * 0.04) + 's'; b.style.setProperty('--a', b.dataset.a + 'deg'); });
+    fan.classList.add('spread');
+  }));
+}
+function openFan() {
+  closePops(); if (ui.sel) setSel(false);
+  toastEl.classList.remove('on');
+  ui.fan = true; placeFan(); renderFan();
+  fan.classList.add('on'); fanhead.classList.add('on');
+  swbtn.setAttribute('aria-expanded', 'true');
+  spreadFan();
+}
+function closeFan() {
+  if (!ui.fan) return;
+  ui.fan = false;
+  swbtn.setAttribute('aria-expanded', 'false');
+  fanhead.classList.remove('on'); fan.classList.remove('spread');
+  fan.querySelectorAll('.blade').forEach(b => { b.style.transitionDelay = '0s'; b.style.setProperty('--a', '90deg'); });
+  clearTimeout(closeFan._t);
+  closeFan._t = setTimeout(() => { if (!ui.fan) fan.classList.remove('on'); }, reduce ? 0 : 260);
+}
+swbtn.addEventListener('click', () => ui.fan ? closeFan() : openFan());
+fan.addEventListener('click', e => {
+  const b = e.target.closest('.chip');
+  if (!b) return;
+  const k = b.dataset.frame ? 'frame' : 'glass', v = b.dataset[k];
+  fan.querySelectorAll(`[data-${k}]`).forEach(x => x.setAttribute('aria-pressed', String(x === b)));
+  if (state[k] === v) return;
+  state[k] = v; update({ paint: true });
+});
+
+// ---------- 치수 칸, 메뉴 ----------
+const dimpop = $('dimpop'), menu = $('menu');
+function closePops() {
+  if (!dimpop.hidden) { dimpop.hidden = true; $('dbtn').setAttribute('aria-expanded', 'false'); }
+  if (!menu.hidden) { menu.hidden = true; $('menu-btn').setAttribute('aria-expanded', 'false'); }
+}
+function openDims(focusKey) {
+  closePops(); closeFan();
+  dimpop.hidden = false; $('dbtn').setAttribute('aria-expanded', 'true');
+  renderInfo();
+  (focusKey === 'h' ? inH : inW).focus({ preventScroll: true });
+}
+$('dbtn').addEventListener('click', () => { if (dimpop.hidden) openDims('w'); else closePops(); });
+function setDim(k, v) {
+  const R = k === 'w' ? W_ALL : H_ALL;
+  const nv = clamp(Math.round(v / 10) * 10, R[0], R[1]);
+  if (nv === state[k]) return false;
+  state[k] = nv; update({ dims: true });
+  return true;
+}
+for (const b of document.querySelectorAll('[data-dim]')) b.addEventListener('click', () => {
+  const k = b.dataset.dim;
+  setDim(k, state[k] + +b.dataset.d);
+  (k === 'w' ? inW : inH).value = state[k];
+});
+for (const [el, k] of [[inW, 'w'], [inH, 'h']]) {
+  el.addEventListener('input', () => { const v = +el.value, R = k === 'w' ? W_ALL : H_ALL; if (v >= R[0] && v <= R[1]) setDim(k, v); });
+  el.addEventListener('change', () => { if (el.value !== '') setDim(k, +el.value); el.value = state[k]; });
+  el.addEventListener('keydown', e => { if (e.key === 'Enter') el.blur(); });
+}
+$('dim-fix').addEventListener('click', fitRange);
+$('issue-fix').addEventListener('click', fitRange);
+$('menu-btn').addEventListener('click', () => {
+  const open = menu.hidden;
+  closePops(); closeFan();
+  if (open) { menu.hidden = false; $('menu-btn').setAttribute('aria-expanded', 'true'); }
+});
+$('copy').addEventListener('click', async () => {
+  const url = location.href.split('#')[0] + '#' + toHash();
+  let ok = false;
+  try { await navigator.clipboard.writeText(url); ok = true; } catch (e) {
+    const ta = document.createElement('textarea');
+    ta.value = url; ta.setAttribute('readonly', ''); ta.style.position = 'fixed'; ta.style.opacity = '0';
+    document.body.appendChild(ta); ta.select();
+    try { ok = document.execCommand('copy'); } catch (e2) { ok = false; }
+    ta.remove();
+  }
+  closePops();
+  toast(ok ? '링크를 복사했습니다' : '주소창의 링크를 길게 눌러 복사해 주십시오');
+});
+addEventListener('keydown', e => {
+  if (e.key !== 'Escape') return;
+  if (ui.fan) { closeFan(); swbtn.focus(); }
+  else if (!dimpop.hidden || !menu.hidden) closePops();
+  else if (ui.sel) setSel(false);
+});
+document.addEventListener('pointerdown', e => {
+  if (!e.target.closest('#menu, #menu-btn') && !menu.hidden) { menu.hidden = true; $('menu-btn').setAttribute('aria-expanded', 'false'); }
+  if (!e.target.closest('#dimpop, #dbtn, .knob') && !dimpop.hidden) { dimpop.hidden = true; $('dbtn').setAttribute('aria-expanded', 'false'); }
+  if (ui.fan && !e.target.closest('#fan, #fanhead, #swbtn')) closeFan();
+});
+addEventListener('resize', () => { if (ui.fan) placeFan(); });
+window.addEventListener('hashchange', () => { if (fromHash()) update({ drop: true }); });
+
+// ---------- 줄자 손잡이: 끌면 10mm 단위, 누르면 치수 칸 ----------
+const knobs = { w: $('knob-w'), h: $('knob-h') }, kval = $('kval');
+for (const k of ['w', 'h']) {
+  const el = knobs[k];
+  el.addEventListener('pointerdown', e => {
+    if (!scene3d || e.button > 0) return;
+    e.preventDefault();
+    closeFan(); if (ui.sel) setSel(false);
+    el.setPointerCapture(e.pointerId);
+    ui.drag = { k, id: e.pointerId, x: e.clientX, y: e.clientY, v0: state[k], on: false, axis: scene3d.axisPx(k) };
+  });
+  el.addEventListener('pointermove', e => {
+    const d = ui.drag;
+    if (!d || d.id !== e.pointerId) return;
+    const dx = e.clientX - d.x, dy = e.clientY - d.y;
+    if (!d.on) { if (Math.hypot(dx, dy) < 6) return; d.on = true; el.classList.add('on'); closePops(); }
+    const u = d.axis, m = (dx * u.x + dy * u.y) / (u.x * u.x + u.y * u.y);
+    setDim(k, d.v0 + m * 1000);
+  });
+  const end = e => {
+    const d = ui.drag;
+    if (!d || d.id !== e.pointerId) return;
+    ui.drag = null; el.classList.remove('on');
+    if (!d.on && e.type === 'pointerup') openDims(k);
+    if (scene3d) scene3d.build({ dims: true });
+  };
+  el.addEventListener('pointerup', end);
+  el.addEventListener('pointercancel', end);
+  el.addEventListener('keydown', e => {
+    const dd = { ArrowRight: 100, ArrowUp: 100, ArrowLeft: -100, ArrowDown: -100 }[e.key];
+    if (dd) { e.preventDefault(); setDim(k, state[k] + dd); }
+  });
+}
+
+// ---------- 견적 시트 ----------
+const sheet = $('sheet'), form = $('quote-form'), done = $('done');
+const ymd = d => `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`;
+const kday = d => `${d.getMonth() + 1}월 ${d.getDate()}일(${'일월화수목금토'[d.getDay()]})`;
+(() => {
+  const a = new Date(); a.setDate(a.getDate() + 1);
+  const b = new Date(); b.setDate(b.getDate() + 60);
+  form.date.min = ymd(a); form.date.max = ymd(b);
+})();
+function nextBizDay() {
+  const d = new Date();
+  do { d.setDate(d.getDate() + 1); } while (d.getDay() === 0 || d.getDay() === 6);
+  return kday(d);
+}
+function openSheet() {
+  closeFan(); closePops(); if (ui.sel) setSel(false);
+  renderInfo();
+  if (typeof sheet.showModal === 'function') sheet.showModal(); else sheet.setAttribute('open', '');
+  if (done.hidden && !(door().ow || door().oh)) setTimeout(() => form.elements.name.focus({ preventScroll: true }), reduce ? 0 : 330);
+}
+$('to-quote').addEventListener('click', openSheet);
+$('pbtn').addEventListener('click', openSheet);
+$('sheet-close').addEventListener('click', () => sheet.close());
+sheet.addEventListener('click', e => { if (e.target === sheet) sheet.close(); });
+$('extras').addEventListener('change', e => {
+  if (e.target.name !== 'extra') return;
+  state.o[e.target.value] = e.target.checked;
+  update({});
+});
+$('extras').addEventListener('click', e => {
+  if (e.target.closest('.xo.off')) toast('상부 행거형은 슬라이딩 방식에서만 고를 수 있습니다');
+});
+function fmtTel(v) {
+  const d = v.replace(/\D/g, '').slice(0, 11);
+  if (d.startsWith('02')) {
+    if (d.length <= 2) return d;
+    if (d.length <= 5) return d.slice(0, 2) + '-' + d.slice(2);
+    if (d.length <= 9) return d.slice(0, 2) + '-' + d.slice(2, d.length - 4) + '-' + d.slice(-4);
+    return d.slice(0, 2) + '-' + d.slice(2, 6) + '-' + d.slice(6, 10);
+  }
+  if (d.length <= 3) return d;
+  if (d.length <= 7) return d.slice(0, 3) + '-' + d.slice(3);
+  if (d.length <= 10) return d.slice(0, 3) + '-' + d.slice(3, 6) + '-' + d.slice(6);
+  return d.slice(0, 3) + '-' + d.slice(3, 7) + '-' + d.slice(7);
+}
+form.tel.addEventListener('input', () => { const v = fmtTel(form.tel.value); if (v !== form.tel.value) form.tel.value = v; });
+const checks = {
+  name: v => v.trim() ? '' : '이름을 적어 주십시오.',
+  tel: v => /^0\d{1,2}-\d{3,4}-\d{4}$/.test(fmtTel(v)) ? '' : '연락처를 010-1234-5678 형식으로 적어 주십시오.',
+  addr: v => v.trim().length >= 2 ? '' : '설치 주소를 시군구까지 적어 주십시오.',
+  date: v => v && v >= form.date.min && v <= form.date.max ? '' : '내일부터 60일 안에서 골라 주십시오.'
+};
+function setErr(n, t) {
+  $('e-' + n).textContent = t;
+  if (t) form[n].setAttribute('aria-invalid', 'true'); else form[n].removeAttribute('aria-invalid');
+}
+form.addEventListener('input', e => { if (e.target.name && checks[e.target.name] && !checks[e.target.name](e.target.value)) setErr(e.target.name, ''); });
+form.addEventListener('change', e => { if (e.target.name && checks[e.target.name] && !checks[e.target.name](e.target.value)) setErr(e.target.name, ''); });
+const esc = s => s.replace(/[&<>"]/g, ch => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[ch]));
+form.addEventListener('submit', e => {
+  e.preventDefault();
+  const d = door();
+  if (d.ow || d.oh) { $('issue').scrollIntoView({ block: 'nearest' }); $('issue-fix').focus(); return; }
+  let firstBad = null;
+  for (const n of Object.keys(checks)) {
+    const m = checks[n](form[n].value);
+    setErr(n, m);
+    if (m && !firstBad) firstBad = form[n];
+  }
+  if (firstBad) { firstBad.focus(); return; }
+  const name = form.elements.name.value.trim(), tel = fmtTel(form.tel.value), addr = form.addr.value.trim(), date = form.date.value;
+  const t = d.t;
+  const { total } = computeLines();
+  const extras = EXTRAS.filter(x => state.o[x.id] && !(x.id === 'hanger' && !t.slide)).map(x => x.name).join(', ') || '추가 옵션 없음';
+  const no = 'HG' + new Date().toISOString().slice(2, 10).replace(/-/g, '') + '-' + String(Math.floor(1000 + Math.random() * 9000));
+  const [yy, mo, dd] = date.split('-').map(Number);
+  $('done-list').innerHTML = `
+    <dt>접수 번호</dt><dd>${no}</dd>
+    <dt>받은 구성</dt><dd>${t.name}, 폭 ${mm(state.w)}, 높이 ${mm(state.h)}<br>${byId(FRAMES, state.frame).name} 프레임, ${byId(GLASSES, state.glass).name} 유리, ${byId(DESIGNS, state.design).name}<br>${byId(HANDLES, state.handle).name}, ${extras}</dd>
+    <dt>견적 합계</dt><dd>${won(total)} (부가세 포함, 실측 뒤 확정)</dd>
+    <dt>요청한 분</dt><dd>${esc(name)}, ${esc(tel)}<br>${esc(addr)}</dd>
+    <dt>실측 희망</dt><dd>${kday(new Date(yy, mo - 1, dd))}</dd>
+    <dt>담당 창구</dt><dd>인테리어 중문 실측 담당<br>전화 1588-0000, 평일 09:00~18:00</dd>
+    <dt>회신 예정</dt><dd>영업일 1일 안, ${nextBizDay()}까지 실측 시간을 정해 연락드립니다.</dd>`;
+  $('ask').hidden = true; done.hidden = false;
+  $('sheet-h').textContent = '접수 완료';
+  done.focus({ preventScroll: true });
+  sheet.querySelector('.sheet-in').scrollTop = 0;
+});
+$('again').addEventListener('click', () => {
+  done.hidden = true; $('ask').hidden = false; form.reset();
+  $('sheet-h').textContent = '견적 요청';
+  sheet.close();
+});
+
+// ---------- 3D ----------
+let scene3d = null;
+try { scene3d = makeScene(); } catch (e) {
+  $('scene').style.display = 'none';
+  $('nogl').style.display = 'grid';
+  console.warn(e);
+}
+update({ first: true });
+if (document.fonts) document.fonts.ready.then(() => { if (scene3d) scene3d.build({ relabel: true }); });
+
+function makeScene() {
+  const canvas = $('scene');
+  const renderer = new THREE.WebGLRenderer({ canvas, antialias: true, preserveDrawingBuffer: true });
+  renderer.setPixelRatio(Math.min(devicePixelRatio, 2));
+  renderer.shadowMap.enabled = true;
+  renderer.shadowMap.type = THREE.PCFShadowMap;
+  renderer.outputColorSpace = THREE.SRGBColorSpace;
+  renderer.toneMapping = THREE.ACESFilmicToneMapping;
+  renderer.toneMappingExposure = 1.0;
+
+  const scene = new THREE.Scene();
+  scene.background = new THREE.Color(0xece8e1);
+  const pmrem = new THREE.PMREMGenerator(renderer);
+  scene.environment = pmrem.fromScene(new RoomEnvironment(), 0.04).texture;
+  scene.environmentIntensity = 0.42;
+  pmrem.dispose();
+
+  // 정사영 카메라: 현관 바닥과 개구부를 비스듬히 내려다봅니다
+  const camera = new THREE.OrthographicCamera(-1, 1, 1, -1, 0.1, 80);
+  const mob = innerWidth < 600;
+  const DEF_AZ = mob ? 0.34 : 0.5, DEF_POLAR = mob ? 0.98 : 1.02, DIST = 24;
+  const dirOf = (az, polar) => new THREE.Vector3(Math.sin(polar) * Math.sin(az), Math.cos(polar), Math.sin(polar) * Math.cos(az));
+  const controls = new OrbitControls(camera, canvas);
+  controls.enableDamping = true; controls.dampingFactor = 0.1;
+  controls.enablePan = false;
+  controls.minZoom = 0.8; controls.maxZoom = 2.4;
+  controls.minPolarAngle = 0.9; controls.maxPolarAngle = 1.3;
+  controls.minAzimuthAngle = -0.5; controls.maxAzimuthAngle = 0.95;
+  controls.rotateSpeed = 0.7;
+
+  // 빛: 또렷한 그림자를 만드는 해, 밝은 하늘빛
+  scene.add(new THREE.HemisphereLight(0xffffff, 0xc4b9a8, 0.6));
+  const sun = new THREE.DirectionalLight(0xfff4e2, 2.8);
+  sun.castShadow = true;
+  sun.shadow.mapSize.set(2048, 2048);
+  sun.shadow.bias = -0.0003; sun.shadow.normalBias = 0.02;
+  Object.assign(sun.shadow.camera, { left: -3.4, right: 3.4, top: 3.4, bottom: -3.4, near: 0.5, far: 30 });
+  scene.add(sun); scene.add(sun.target);
+  const SUN_OFF = new THREE.Vector3(2.4, 6.4, 3.8);
+
+  function canvasTex(w, h, draw, srgb = true) {
+    const c = document.createElement('canvas'); c.width = w; c.height = h;
+    draw(c.getContext('2d'), w, h);
+    const t = new THREE.CanvasTexture(c);
+    if (srgb) t.colorSpace = THREE.SRGBColorSpace;
+    t.anisotropy = Math.min(8, renderer.capabilities.getMaxAnisotropy());
+    t.wrapS = t.wrapT = THREE.RepeatWrapping;
+    return t;
+  }
+  let seed = 7;
+  const rnd = () => (seed = (seed * 9301 + 49297) % 233280) / 233280;
+  // 현관 포세린 타일 600mm, 텍스처 한 장에 가로세로 2장씩
+  const tileTex = canvasTex(512, 512, (g, w, h) => {
+    for (let i = 0; i < 2; i++) for (let j = 0; j < 2; j++) {
+      const v = 196 + Math.floor(rnd() * 10);
+      g.fillStyle = `rgb(${v},${v - 3},${v - 8})`; g.fillRect(i * 256, j * 256, 256, 256);
+      for (let k = 0; k < 900; k++) {
+        const a = rnd() * 0.06;
+        g.fillStyle = rnd() > 0.5 ? `rgba(255,255,255,${a})` : `rgba(40,40,40,${a})`;
+        g.fillRect(i * 256 + rnd() * 256, j * 256 + rnd() * 256, 1 + rnd() * 3, 1 + rnd() * 3);
+      }
+    }
+    g.fillStyle = '#9a958d';
+    g.fillRect(0, 0, w, 2); g.fillRect(0, 255, w, 2); g.fillRect(0, 0, 2, h); g.fillRect(255, 0, 2, h);
+  });
+  const woodTex = canvasTex(1024, 512, (g, w, h) => {
+    const rows = 8;
+    g.fillStyle = 'rgb(198,164,122)'; g.fillRect(0, 0, w, h);
+    for (let r = 0; r < rows; r++) {
+      const off = rnd() * w * 0.6;
+      for (let s = -1; s < 2; s++) {
+        const tone = 188 + Math.floor(rnd() * 22);
+        g.fillStyle = `rgb(${tone},${tone - 32},${tone - 70})`;
+        g.fillRect(off + s * w * 0.62, r * h / rows, w * 0.62, h / rows);
+      }
+      for (let k = 0; k < 14; k++) {
+        g.strokeStyle = `rgba(90,58,30,${0.05 + rnd() * 0.12})`; g.lineWidth = 0.6 + rnd() * 1.6;
+        const y = r * h / rows + rnd() * h / rows;
+        g.beginPath(); g.moveTo(0, y);
+        for (let x = 0; x <= w; x += 32) g.lineTo(x, y + Math.sin(x * 0.01 + k) * 1.5);
+        g.stroke();
+      }
+      g.fillStyle = 'rgba(60,40,20,0.3)'; g.fillRect(0, r * h / rows, w, 1.5);
+      g.fillRect(off % w, r * h / rows, 1.5, h / rows);
+    }
+  });
+  const aquaTex = canvasTex(256, 256, (g, w, h) => {
+    g.fillStyle = '#808080'; g.fillRect(0, 0, w, h);
+    for (let i = 0; i < 160; i++) {
+      const x = rnd() * w, y = rnd() * h, r = 6 + rnd() * 18;
+      const gr = g.createRadialGradient(x, y, 0, x, y, r);
+      gr.addColorStop(0, `rgba(255,255,255,${0.25 + rnd() * 0.3})`); gr.addColorStop(1, 'rgba(255,255,255,0)');
+      g.fillStyle = gr; g.beginPath(); g.arc(x, y, r, 0, Math.PI * 2); g.fill();
+    }
+  }, false);
+  aquaTex.repeat.set(3, 6);
+  // 범위를 넘은 자리: 주황 줄무늬
+  const stripeTex = canvasTex(64, 64, (g, w, h) => {
+    g.fillStyle = 'rgba(255,241,227,0.78)'; g.fillRect(0, 0, w, h);
+    g.fillStyle = 'rgba(232,119,28,0.92)';
+    for (let k = -2; k < 3; k++) { g.beginPath(); g.moveTo(k * 32, h); g.lineTo(k * 32 + 14, h); g.lineTo(k * 32 + 14 + h, 0); g.lineTo(k * 32 + h, 0); g.fill(); }
+  });
+
+  // 재질
+  const wallMat = new THREE.MeshStandardMaterial({ color: 0xf7f5f0, roughness: 0.95 });
+  const sideMat = new THREE.MeshStandardMaterial({ color: 0xf1eee8, roughness: 0.95 });
+  const cutMat = new THREE.MeshStandardMaterial({ color: 0xd9d3c8, roughness: 0.9 });
+  const slabMat = new THREE.MeshStandardMaterial({ color: 0xc9bfae, roughness: 0.85 });
+  const cabMat = new THREE.MeshStandardMaterial({ color: 0xdcd4c6, roughness: 0.6 });
+  const seamMat = new THREE.MeshStandardMaterial({ color: 0xa39d92, roughness: 0.8 });
+  const sillMat = new THREE.MeshStandardMaterial({ color: 0xd8d6d0, roughness: 0.35 });
+  const steelMat = new THREE.MeshStandardMaterial({ color: 0xd6d9dc, roughness: 0.28, metalness: 1 });
+  const railMat = new THREE.MeshStandardMaterial({ color: 0xb9bcbf, roughness: 0.35, metalness: 0.9 });
+  const slotMat = new THREE.MeshStandardMaterial({ color: 0x141414, roughness: 0.6 });
+  const tileMat = new THREE.MeshStandardMaterial({ map: tileTex, roughness: 0.32 });
+  const woodMat = new THREE.MeshStandardMaterial({ map: woodTex, roughness: 0.55 });
+
+  const box1 = new THREE.BoxGeometry(1, 1, 1), plane1 = new THREE.PlaneGeometry(1, 1);
+  const cyl = new THREE.CylinderGeometry(1, 1, 1, 20);
+  const SHARED = new Set([box1, plane1, cyl]);
+  const mesh = (geo, mat, cast = true) => { const m = new THREE.Mesh(geo, mat); m.castShadow = cast; m.receiveShadow = true; return m; };
+  const put = (parent, o, x = 0, y = 0, z = 0) => { o.position.set(x, y, z); parent.add(o); return o; };
+  const rbox = (w, h, d, r) => new RoundedBoxGeometry(w, h, d, 2, Math.max(0.0008, Math.min(r, Math.min(w, h, d) / 2 - 0.0005)));
+  function dispose(o) {
+    o.traverse(m => {
+      if (m.geometry && !SHARED.has(m.geometry)) m.geometry.dispose();
+    });
+  }
+
+  // ---------- 현관 조각: 바닥 판, 칸막이 벽, 양옆 벽 ----------
+  // 개구부는 x 0에서 W까지, 벽 두께 가운데가 z 0, 현관은 +z 쪽입니다.
+  const OPEN_A = 1.2, T = 0.14, ZF = 1.6, ZB = -1.0, XL = -0.62, XR_PAD = 0.42, WT = 0.12;
+  const room = new THREE.Group(); scene.add(room);
+  const B = (mat, cast = true) => { const m = mesh(box1, mat, cast); room.add(m); return m; };
+  const P = mat => { const m = new THREE.Mesh(plane1, mat); m.receiveShadow = true; m.rotation.x = -Math.PI / 2; room.add(m); return m; };
+  const slab = B(slabMat, false);
+  const tile = P(tileMat), wood = P(woodMat);
+  const sill = B(sillMat, false);
+  const partL = B(wallMat), partR = B(wallMat), partT = B(wallMat);
+  const wallL = B(sideMat), wallR = B(sideMat);
+  const cab = B(cabMat);
+  const seams = [B(seamMat, false), B(seamMat, false), B(seamMat, false)];
+  const led = new THREE.Mesh(plane1, new THREE.MeshBasicMaterial({ color: 0xffe2b8 })); led.rotation.x = Math.PI / 2; room.add(led);
+  const glow = new THREE.Mesh(plane1, new THREE.MeshBasicMaterial({ color: 0xffd9a0, transparent: true, opacity: 0.2, depthWrite: false })); glow.rotation.x = -Math.PI / 2; room.add(glow);
+  // 벽 윗단 잘린 면
+  const caps = [B(cutMat, false), B(cutMat, false), B(cutMat, false), B(cutMat, false), B(cutMat, false)];
+  // 거실 쪽 화분
+  const plant = new THREE.Group();
+  const prof = [[0, 0], [0.13, 0], [0.15, 0.3], [0.16, 0.32], [0, 0.32]].map(p => new THREE.Vector2(p[0], p[1]));
+  put(plant, mesh(new THREE.LatheGeometry(prof, 28), new THREE.MeshStandardMaterial({ color: 0xffffff, roughness: 0.5 })));
+  const leafA = new THREE.MeshStandardMaterial({ color: 0x4e8a4c, roughness: 0.55, side: THREE.DoubleSide });
+  const leafB = new THREE.MeshStandardMaterial({ color: 0x6aa35a, roughness: 0.55, side: THREE.DoubleSide });
+  const leafGeo = new THREE.SphereGeometry(1, 16, 10);
+  for (let s = 0; s < 3; s++) for (let i = 0; i < 6; i++) {
+    const tall = 0.7 + s * 0.2, ang = s * 2.1, y = 0.3 + tall * (0.35 + i * 0.12), a = ang + i * 2.4;
+    const lf = mesh(leafGeo, i % 2 ? leafA : leafB);
+    lf.scale.set(0.09 + i * 0.006, 0.014, 0.14 + i * 0.008);
+    lf.position.set(Math.cos(a) * 0.1, y, Math.sin(a) * 0.1); lf.rotation.set(0.5 * Math.sin(a), -a, 0.35);
+    plant.add(lf);
+  }
+  room.add(plant);
+  // 현관 슬리퍼 한 켤레
+  const mat2 = new THREE.MeshStandardMaterial({ color: 0x7c8f86, roughness: 0.9 });
+  const slip = new THREE.Group();
+  for (const s of [-1, 1]) {
+    const sole = mesh(new RoundedBoxGeometry(0.1, 0.025, 0.26, 2, 0.012), mat2); sole.position.set(s * 0.065, 0.0125, 0); slip.add(sole);
+    const strap = mesh(new RoundedBoxGeometry(0.1, 0.035, 0.08, 2, 0.015), mat2); strap.position.set(s * 0.065, 0.04, -0.07); slip.add(strap);
+  }
+  slip.rotation.y = 0.35; room.add(slip);
+
+  const BX = (m, x0, x1, y0, y1, z0, z1) => { m.scale.set(Math.max(1e-4, x1 - x0), Math.max(1e-4, y1 - y0), Math.max(1e-4, z1 - z0)); m.position.set((x0 + x1) / 2, (y0 + y1) / 2, (z0 + z1) / 2); };
+  let roomKey = '', CHc = 2.6, XR = 1.6;
+  function layoutRoom(W, H, DW, DH) {
+    const t = typeOf();
+    const k = [W, H, DW, DH, t.id].join();
+    if (k === roomKey) return;
+    roomKey = k;
+    XR = Math.max(W, DW) + XR_PAD;
+    // 여닫이 문짝이 열려 거실 쪽으로 들어가도 잘린 벽 위로 보이지 않을 만큼 벽을 올립니다
+    const cw = DW - 0.09, leafW = t.id === 's' ? (cw <= 1.12 ? cw : clamp(cw * 0.6, 0.9, 1.0)) : t.id === 'd' ? cw / 2 : 0;
+    CHc = Math.max(H, DH) + 0.3 + (leafW ? Math.max(0, leafW * Math.sin(OPEN_A) * 0.8 - 0.22) : 0);
+    const x0 = XL - WT, x1 = XR + WT;
+    BX(slab, x0, x1, -0.14, -0.001, ZB, ZF);
+    tile.scale.set(XR - XL, ZF - T / 2, 1); tile.position.set((XL + XR) / 2, 0, (T / 2 + ZF) / 2);
+    tileTex.repeat.set((XR - XL) / 1.2, (ZF - T / 2) / 1.2); tileTex.offset.set(((-XL / 1.2) % 1 + 1) % 1, 0);
+    wood.scale.set(XR - XL, -T / 2 - ZB, 1); wood.position.set((XL + XR) / 2, 0, (ZB - T / 2) / 2);
+    woodTex.repeat.set((XR - XL) / 2, (-T / 2 - ZB) / 1.2);
+    BX(sill, 0, W, 0, 0.006, -T / 2, T / 2);
+    BX(partL, XL, 0, 0, CHc, -T / 2, T / 2);
+    BX(partR, W, XR, 0, CHc, -T / 2, T / 2);
+    BX(partT, 0, W, H, CHc, -T / 2, T / 2);
+    BX(wallL, x0, XL, 0, CHc, ZB, ZF);
+    const lowH = 0.32;
+    BX(wallR, XR, x1, 0, lowH, ZB, ZF);
+    // 잘린 단면 (벽 윗면을 조금 진하게)
+    BX(caps[0], XL, XR, CHc, CHc + 0.004, -T / 2, T / 2);
+    BX(caps[1], x0, XL, CHc, CHc + 0.004, ZB, ZF);
+    BX(caps[2], XR, x1, lowH, lowH + 0.004, ZB, ZF);
+    caps[3].visible = caps[4].visible = false;
+    // 신발장 (띄움 시공, 하부 간접등)
+    const cabD = 0.38, cz0 = T / 2 + 0.02, cz1 = 1.32, cy0 = 0.26, cy1 = CHc - 0.02;
+    BX(cab, XL, XL + cabD, cy0, cy1, cz0, cz1);
+    const dw = (cz1 - cz0) / 3;
+    BX(seams[0], XL + cabD, XL + cabD + 0.002, cy0 + 0.02, cy1 - 0.02, cz0 + dw - 0.002, cz0 + dw + 0.002);
+    BX(seams[1], XL + cabD, XL + cabD + 0.002, cy0 + 0.02, cy1 - 0.02, cz0 + 2 * dw - 0.002, cz0 + 2 * dw + 0.002);
+    BX(seams[2], XL + cabD, XL + cabD + 0.002, 1.6, 1.604, cz0 + 0.01, cz1 - 0.01);
+    led.scale.set(cabD - 0.04, cz1 - cz0 - 0.04, 1); led.position.set(XL + cabD / 2, cy0 - 0.002, (cz0 + cz1) / 2);
+    glow.scale.set(cabD + 0.3, cz1 - cz0 + 0.2, 1); glow.position.set(XL + cabD / 2 + 0.05, 0.002, (cz0 + cz1) / 2);
+    plant.position.set(Math.max(0.5, W * 0.78), 0, -0.6);
+    slip.position.set(Math.min(W, DW) * 0.72, 0, 1.12);
+  }
+
+  // ---------- 줄자: 바닥(폭), 벽(높이) ----------
+  const RD = 0.26, RZ = T / 2 + 0.07 + RD / 2, HX0 = -0.215, HX1 = -0.035;
+  const rulerW = new THREE.Mesh(plane1, new THREE.MeshBasicMaterial({ transparent: true, toneMapped: false }));
+  rulerW.rotation.x = -Math.PI / 2; rulerW.renderOrder = 2; scene.add(rulerW);
+  const rulerH = new THREE.Mesh(plane1, new THREE.MeshBasicMaterial({ transparent: true, toneMapped: false }));
+  rulerH.renderOrder = 2; scene.add(rulerH);
+  const FONT = '"Pretendard", "Apple SD Gothic Neo", sans-serif';
+  function stripes(g, x, y, w, h, step) {
+    g.save(); g.beginPath(); g.rect(x, y, w, h); g.clip();
+    g.fillStyle = '#fff1e3'; g.fillRect(x, y, w, h);
+    g.fillStyle = '#e8771c';
+    const L = w + h;
+    for (let s = -L; s < L; s += step) { g.beginPath(); g.moveTo(x + s, y + h); g.lineTo(x + s + step * 0.45, y + h); g.lineTo(x + s + step * 0.45 + h, y); g.lineTo(x + s + h, y); g.fill(); }
+    g.restore();
+  }
+  function setMap(m, c) {
+    if (m.material.map) m.material.map.dispose();
+    const t = new THREE.CanvasTexture(c); t.colorSpace = THREE.SRGBColorSpace; t.anisotropy = 8;
+    m.material.map = t; m.material.needsUpdate = true;
+  }
+  function drawRulerW(W, DW) {
+    const span = Math.max(W, DW), pxm = 360, cw = Math.ceil(span * pxm), ch = Math.round(RD * pxm);
+    const c = document.createElement('canvas'); c.width = cw; c.height = ch;
+    const g = c.getContext('2d');
+    g.fillStyle = 'rgba(255,255,255,0.95)';
+    g.beginPath(); g.roundRect(0, 0, W * pxm, ch, 12); g.fill();
+    if (W !== DW) { const a = Math.min(W, DW) * pxm, b = Math.max(W, DW) * pxm; stripes(g, a, 0, b - a, ch, 30); }
+    g.fillStyle = '#26332f';
+    for (let k = 0; k * 0.1 <= W + 1e-6; k++) {
+      const x = k * 0.1 * pxm, hgt = k % 10 === 0 ? 0.5 : k % 5 === 0 ? 0.34 : 0.2;
+      g.fillRect(clamp(x, 0, W * pxm - 3) - 1.5 + (k === 0 ? 1.5 : 0), 0, 3, ch * hgt);
+    }
+    g.fillRect(W * pxm - 3, 0, 3, ch * 0.5);
+    g.font = `700 ${Math.round(ch * 0.33)}px ${FONT}`;
+    g.textBaseline = 'alphabetic';
+    for (let m = 1; m < W - 0.55; m++) { g.textAlign = 'center'; g.fillText(m + 'm', m * pxm, ch * 0.88); }
+    g.textAlign = 'left'; g.fillText('0', 10, ch * 0.88);
+    g.textAlign = 'right'; g.font = `800 ${Math.round(ch * 0.36)}px ${FONT}`;
+    const endT = mm(Math.round(W * 1000)), ew = g.measureText(endT).width;
+    if (W !== DW) { g.fillStyle = '#ffffff'; g.beginPath(); g.roundRect(W * pxm - ew - 18, ch * 0.5, ew + 12, ch * 0.46, 6); g.fill(); g.fillStyle = '#26332f'; }
+    g.fillText(endT, W * pxm - 12, ch * 0.88);
+    setMap(rulerW, c);
+    rulerW.scale.set(span, RD, 1); rulerW.position.set(span / 2, 0.004, RZ);
+  }
+  function drawRulerH(H, DH) {
+    const span = Math.max(H, DH), pxm = 420, cw = Math.round((HX1 - HX0) * pxm), ch = Math.ceil(span * pxm);
+    const c = document.createElement('canvas'); c.width = cw; c.height = ch;
+    const g = c.getContext('2d');
+    const Y = v => ch - v * pxm;
+    g.fillStyle = 'rgba(255,255,255,0.96)';
+    g.beginPath(); g.roundRect(0, Y(H), cw, H * pxm, 10); g.fill();
+    if (H !== DH) { const a = Math.max(H, DH), b = Math.min(H, DH); stripes(g, 0, Y(a), cw, (a - b) * pxm, 30); }
+    g.fillStyle = '#26332f';
+    for (let k = 0; k * 0.1 <= H + 1e-6; k++) {
+      const y = Y(k * 0.1), len = k % 10 === 0 ? 0.55 : k % 5 === 0 ? 0.38 : 0.22;
+      g.fillRect(cw - cw * len, clamp(y, Y(H) + 1.5, ch - 1.5) - 1.5, cw * len, 3);
+    }
+    g.fillRect(cw * 0.45, Y(H), cw * 0.55, 3);
+    g.font = `700 ${Math.round(cw * 0.3)}px ${FONT}`;
+    g.textAlign = 'left'; g.textBaseline = 'middle';
+    for (let m = 1; m < H - 0.5; m++) g.fillText(m + 'm', 6, Y(m) + cw * 0.22);
+    g.save(); g.translate(cw * 0.36, Y(H) + 14); g.rotate(-Math.PI / 2);
+    g.textAlign = 'right'; g.font = `800 ${Math.round(cw * 0.33)}px ${FONT}`; g.fillText(mm(Math.round(H * 1000)), 0, 0);
+    g.restore();
+    setMap(rulerH, c);
+    rulerH.scale.set(HX1 - HX0, span, 1); rulerH.position.set((HX0 + HX1) / 2, span / 2, T / 2 + 0.003);
+  }
+  // 넘친 자리: 개구부 안 줄무늬 판과 숫자
+  const overMat = new THREE.MeshBasicMaterial({ map: stripeTex, transparent: true, depthWrite: false, side: THREE.DoubleSide, toneMapped: false });
+  const overW = new THREE.Mesh(plane1, overMat), overH = new THREE.Mesh(plane1, overMat);
+  overW.renderOrder = overH.renderOrder = 3; scene.add(overW); scene.add(overH);
+  function pill(text) {
+    const c = document.createElement('canvas'), g = c.getContext('2d');
+    g.font = `800 46px ${FONT}`;
+    const tw = Math.ceil(g.measureText(text).width) + 40; c.width = tw; c.height = 76;
+    g.fillStyle = '#c25a0c'; g.beginPath(); g.roundRect(2, 2, tw - 4, 72, 16); g.fill();
+    g.fillStyle = '#fff'; g.font = `800 46px ${FONT}`; g.textAlign = 'center'; g.textBaseline = 'middle'; g.fillText(text, tw / 2, 40);
+    const t = new THREE.CanvasTexture(c); t.colorSpace = THREE.SRGBColorSpace;
+    const sp = new THREE.Sprite(new THREE.SpriteMaterial({ map: t, depthTest: false, depthWrite: false, transparent: true, toneMapped: false }));
+    sp.scale.set(0.13 * tw / 76, 0.13, 1); sp.renderOrder = 30;
+    return sp;
+  }
+  let pillW = null, pillH = null;
+  function setPill(old, text, x, y, z) {
+    if (old) { scene.remove(old); old.material.map.dispose(); old.material.dispose(); }
+    if (!text) return null;
+    const p = pill(text); p.position.set(x, y, z); scene.add(p); return p;
+  }
+  let rulerKey = '';
+  function layoutRulers(W, H, DW, DH, force) {
+    const k = [W, H, DW, DH].join();
+    if (k === rulerKey && !force) return;
+    rulerKey = k;
+    drawRulerW(W, DW); drawRulerH(H, DH);
+    const sg = v => (v > 0 ? '+' : '-') + Math.round(Math.abs(v) * 1000) + 'mm';
+    overW.visible = W > DW + 1e-6;
+    if (overW.visible) { overW.scale.set(W - DW, Math.min(H, DH), 1); overW.position.set((W + DW) / 2, Math.min(H, DH) / 2, 0); }
+    overH.visible = H > DH + 1e-6;
+    if (overH.visible) { overH.scale.set(Math.min(W, DW), H - DH, 1); overH.position.set(Math.min(W, DW) / 2, (H + DH) / 2, 0); }
+    pillW = setPill(pillW, W !== DW ? sg(W - DW) : '', (W + DW) / 2, 0.16, RZ);
+    pillH = setPill(pillH, H !== DH ? sg(H - DH) : '', Math.min(W, DW) / 2, (H + DH) / 2, T / 2 + 0.05);
+  }
+
+  // ---------- 문짝 ----------
+  const FW = 0.032, FR = 0.044, FD = 0.034;
+  const cur = { f: null, g: null };
+  function frameLook() { const f = byId(FRAMES, state.frame); return { c: new THREE.Color(f.color), m: f.metal, r: f.rough }; }
+  function glassLook() { const g = byId(GLASSES, state.glass); return { c: new THREE.Color(g.color), o: g.opacity, r: g.rough, bump: g.id === 'a' }; }
+  function newFM() { const l = cur.f; return new THREE.MeshStandardMaterial({ color: l.c.clone(), metalness: l.m, roughness: l.r }); }
+  function newGM() {
+    const l = cur.g;
+    return new THREE.MeshStandardMaterial({ color: l.c.clone(), transparent: true, opacity: l.o, roughness: l.r, metalness: 0, side: THREE.DoubleSide, depthWrite: false, envMapIntensity: 1.3, bumpMap: l.bump ? aquaTex : null, bumpScale: 1.2 });
+  }
+  function makePanel(pw, ph, hs, pc) {
+    const g = new THREE.Group(), fm = pc.fm;
+    for (const s of [-1, 1]) put(g, mesh(rbox(FW, ph, FD, 0.004), fm), s * (pw / 2 - FW / 2), ph / 2, 0);
+    for (const y of [FR / 2, ph - FR / 2]) put(g, mesh(rbox(pw - 2 * FW + 0.002, FR, FD * 0.92, 0.003), fm), 0, y, 0);
+    const gw = pw - 2 * FW, gh = ph - 2 * FR;
+    const gl = new THREE.Mesh(new THREE.BoxGeometry(gw + 0.004, gh + 0.004, 0.005), pc.gm);
+    gl.position.set(0, ph / 2, 0); gl.renderOrder = 2; g.add(gl);
+    const bar = (w, h, x, y) => put(g, mesh(rbox(w, h, FD * 0.62, 0.002), fm), x, y, 0);
+    const vbars = n => { for (let i = 1; i < n; i++) bar(0.012, gh, -gw / 2 + gw * i / n, ph / 2); };
+    const hbars = n => { for (let i = 1; i < n; i++) bar(gw, 0.012, 0, FR + gh * i / n); };
+    if (state.design === 'v') vbars(Math.max(2, Math.round(gw / 0.16)));
+    else if (state.design === 'h') hbars(4);
+    else if (state.design === 'g') { vbars(Math.max(2, Math.round(gw / 0.2))); hbars(Math.max(4, Math.round(gh / 0.3))); }
+    if (hs) {
+      const hx = hs * (pw / 2 - FW / 2);
+      if (state.handle === 'r') {
+        put(g, mesh(rbox(0.016, 0.18, FD + 0.002, 0.004), slotMat, false), hx, 1.02, 0);
+      } else {
+        const len = state.handle === 'l' ? 1.2 : 0.3;
+        for (const s of [-1, 1]) {
+          const rod = mesh(cyl, steelMat); rod.scale.set(0.011, len, 0.011); rod.position.set(hx - hs * 0.004, 1.02, s * (FD / 2 + 0.028)); g.add(rod);
+          for (const e of [-1, 1]) {
+            const st = mesh(cyl, steelMat); st.rotation.x = Math.PI / 2; st.scale.set(0.006, 0.028, 0.006);
+            st.position.set(hx - hs * 0.004, 1.02 + e * (len / 2 - 0.04), s * (FD / 2 + 0.014)); g.add(st);
+          }
+        }
+      }
+    }
+    return g;
+  }
+  // 문틀(frame)과 문짝(panels)을 따로 만듭니다. 문짝만 위에서 내려와 끼워집니다.
+  function makeDoor(W, H) {
+    const t = typeOf();
+    const frame = new THREE.Group(), panels = new THREE.Group();
+    const pieces = [], drops = [];
+    const piece = (x, glass) => { const p = { fm: newFM(), gm: glass ? newGM() : null, x }; pieces.push(p); return p; };
+    const hanger = t.slide && state.o.hanger;
+    const FJ = 0.045, hh = t.slide ? (hanger ? 0.12 : 0.08) : 0.05;
+    for (const s of [-1, 1]) { const pc = piece(W / 2 + s * W / 2); put(frame, mesh(rbox(FJ, H - hh + 0.002, 0.1, 0.004), pc.fm), s * (W / 2 - FJ / 2), (H - hh) / 2, 0); drops.push({ o: frame.children[frame.children.length - 1], ord: 0 }); }
+    const hp = piece(W / 2);
+    drops.push({ o: put(frame, mesh(rbox(W, hh, t.slide ? 0.13 : 0.1, 0.004), hp.fm), 0, H - hh / 2, 0), ord: 1 });
+    const cw = W - 2 * FJ, ch = H - hh;
+    if (t.slide && !hanger) drops.push({ o: put(frame, mesh(rbox(cw, 0.012, 0.11, 0.003), railMat), 0, 0.006, 0), ord: 0 });
+    const gap = t.slide ? (hanger ? 0.012 : 0.018) : 0.012;
+    const ph = ch - gap - 0.006;
+    const addP = (o, ord) => { panels.add(o); drops.push({ o, ord, panel: true }); return o; };
+    let apply;
+    if (t.id === '3') {
+      const ov = 0.035, pw = (cw + 2 * ov) / 3;
+      const zs = [0.036, 0, -0.036];
+      const closed = [-cw / 2 + pw / 2, 0, cw / 2 - pw / 2], open = cw / 2 - pw / 2;
+      const ps = [0, 1, 2].map(i => { const p = makePanel(pw, ph, i === 0 ? -1 : 0, piece(W / 2 + closed[i], true)); p.position.set(closed[i], gap, zs[i]); return addP(p, 2 + i); });
+      apply = e => ps.forEach((p, i) => { p.position.x = closed[i] + (open - closed[i]) * e; });
+    } else if (t.id === '1') {
+      const ov = 0.04, pw = (cw + ov) / 2;
+      const fx = makePanel(pw, ph, 0, piece(W / 2 + cw / 2 - pw / 2, true)); fx.position.set(cw / 2 - pw / 2, gap, -0.026); addP(fx, 2);
+      const dr = makePanel(pw, ph, -1, piece(W / 2 - cw / 2 + pw / 2, true)); dr.position.set(-cw / 2 + pw / 2, gap, 0.026); addP(dr, 3);
+      const c0 = -cw / 2 + pw / 2, c1 = cw / 2 - pw / 2 - 0.02;
+      apply = e => { dr.position.x = c0 + (c1 - c0) * e; };
+    } else if (t.id === 's') {
+      const dw = cw <= 1.12 ? cw : clamp(cw * 0.6, 0.9, 1.0);
+      const pivot = new THREE.Group(); pivot.position.set(-cw / 2, gap, 0);
+      const leaf = makePanel(dw - 0.006, ph, 1, piece(W / 2 - cw / 2 + dw / 2, true)); leaf.position.x = dw / 2; pivot.add(leaf);
+      for (const y of [0.25, ph / 2, ph - 0.25]) put(pivot, mesh(rbox(0.014, 0.1, 0.02, 0.004), steelMat), 0.004, y, 0);
+      if (cw - dw > 0.1) {
+        const mx = -cw / 2 + dw + 0.02;
+        const mp = piece(W / 2 + mx);
+        drops.push({ o: put(frame, mesh(rbox(0.04, ch, 0.09, 0.004), mp.fm), mx, ch / 2, 0), ord: 1 });
+        const fpw = cw - dw - 0.04;
+        const fx = makePanel(fpw, ph, 0, piece(W / 2 + mx + 0.02 + fpw / 2, true)); fx.position.set(mx + 0.02 + fpw / 2, gap, 0); addP(fx, 2);
+      }
+      addP(pivot, 3);
+      apply = e => { pivot.rotation.y = e * OPEN_A; };
+    } else {
+      const lw = cw / 2 - 0.004;
+      const pv = [-1, 1].map((s, i) => {
+        const p = new THREE.Group(); p.position.set(s * cw / 2, gap, 0);
+        const leaf = makePanel(lw, ph, -s, piece(W / 2 + s * cw / 4, true)); leaf.position.x = -s * lw / 2 - s * 0.002; p.add(leaf);
+        for (const y of [0.25, ph / 2, ph - 0.25]) put(p, mesh(rbox(0.014, 0.1, 0.02, 0.004), steelMat), -s * 0.004, y, 0);
+        return addP(p, 2 + i);
+      });
+      apply = e => { pv[0].rotation.y = e * OPEN_A; pv[1].rotation.y = -e * OPEN_A; };
+    }
+    frame.position.x = panels.position.x = W / 2;
+    return { frame, panels, apply, pieces, drops };
+  }
+
+  const ease = t => t * t * (3 - 2 * t);
+  let D = null, dying = [], doorKey = '', first = true, now = performance.now() / 1000;
+  let doorT = 0, doorTarget = 0, showAt = -1, showStage = 0;
+  function setDoor(v) { doorTarget = v; onDoorState(v); }
+  function disposeDoor(d) {
+    for (const g of [d.frame, d.panels]) { scene.remove(g); dispose(g); }
+    for (const p of d.pieces) { p.fm.dispose(); if (p.gm) p.gm.dispose(); }
+  }
+  // 문 방식을 고르면 여닫는 모습을 한 번 보여 줍니다
+  function showMove(delay = 0.4) {
+    if (reduce) return;
+    setDoor(0); showAt = now + delay; showStage = 0;
+  }
+  function toggleDoor() { showAt = -1; setDoor(doorTarget ? 0 : 1); }
+
+  // 화면 맞춤: 보여 줄 상자를 위 정보와 아래 트레이 사이 빈 자리에 맞춥니다
+  const focus = { min: new THREE.Vector3(), max: new THREE.Vector3() };
+  const goal = { min: new THREE.Vector3(), max: new THREE.Vector3() };
+  const fr = { S: 3, cx: 0, cy: 0, init: false };
+  let cur3 = { W: 1.2, H: 2.3, DW: 1.2, DH: 2.3 };
+
+  function build(opts = {}) {
+    now = performance.now() / 1000;
+    const d = door();
+    const W = state.w / 1000, H = state.h / 1000, DW = d.dw / 1000, DH = d.dh / 1000;
+    cur3 = { W, H, DW, DH };
+    layoutRoom(W, H, DW, DH);
+    layoutRulers(W, H, DW, DH, opts.relabel);
+
+    // 색: 왼쪽에서 오른쪽으로 순서대로 번집니다
+    const nf = frameLook(), ng = glassLook();
+    if (!cur.f || first || reduce) { cur.f = nf; cur.g = ng; }
+    if (opts.paint && D && !reduce) {
+      for (const p of D.pieces) {
+        p.col = { t0: now + 0.03 + p.x * 0.28, f0: { c: p.fm.color.clone(), m: p.fm.metalness, r: p.fm.roughness }, g0: p.gm ? { c: p.gm.color.clone(), o: p.gm.opacity, r: p.gm.roughness } : null, f1: nf, g1: ng, started: false };
+      }
+    }
+    cur.f = nf; cur.g = ng;
+    if (reduce && D) for (const p of D.pieces) paintNow(p);
+
+    const key = [state.type, d.dw, d.dh, state.design, state.handle, state.o.hanger ? 1 : 0].join();
+    if (key !== doorKey || !D) {
+      doorKey = key;
+      const old = D;
+      D = makeDoor(DW, DH);
+      if (!opts.paint) for (const p of D.pieces) paintNow(p);
+      scene.add(D.frame); scene.add(D.panels);
+      if (old && opts.drop && !reduce) {
+        // 원래 문짝은 집어 올리듯 위로 빠집니다
+        scene.remove(old.frame); dispose(old.frame);
+        dying.push({ d: old, vy: 5 });
+      } else if (old) disposeDoor(old);
+      const animate = !reduce && (first || opts.drop || opts.first);
+      if (animate) {
+        const base = now + (first ? 0.5 : old && opts.drop ? 0.34 : 0.12);
+        for (const it of D.drops) {
+          if (!first && !it.panel) continue;
+          it.y0 = it.o.position.y; it.t0 = base + it.ord * (first ? 0.2 : 0.1); it.y = 1.5; it.vy = 0; it.b = 0;
+          it.o.visible = false;
+        }
+        D.drops = D.drops.filter(it => it.t0 !== undefined);
+        const last = Math.max(...D.drops.map(it => it.t0));
+        doorT = 0; setDoor(0); showAt = last + 0.75; showStage = 0;
+      } else D.drops = [];
+      D.apply(ease(doorT));
+    }
+    if (!ui.drag) setGoal();
+    sun.target.position.set(Math.max(W, DW) / 2, 0, 0.4); sun.position.copy(sun.target.position).add(SUN_OFF);
+    first = false;
+  }
+  function paintNow(p) {
+    p.fm.color.copy(cur.f.c); p.fm.metalness = cur.f.m; p.fm.roughness = cur.f.r;
+    if (p.gm) {
+      p.gm.color.copy(cur.g.c); p.gm.opacity = cur.g.o; p.gm.roughness = cur.g.r;
+      const bm = cur.g.bump ? aquaTex : null;
+      if (p.gm.bumpMap !== bm) { p.gm.bumpMap = bm; p.gm.needsUpdate = true; }
+    }
+    p.col = null;
+  }
+  function setGoal() {
+    const { W, DW } = cur3, span = Math.max(W, DW);
+    if (wide()) { goal.min.set(XL - 0.15, 0, ZB); goal.max.set(XR + 0.15, CHc, ZF); }
+    else { goal.min.set(-0.3, 0, -0.35); goal.max.set(span + 0.32, CHc, ZF - 0.05); }
+    if (!fr.init) { focus.min.copy(goal.min); focus.max.copy(goal.max); }
+  }
+  // 줄자 방향이 화면에서 몇 px/m 인지
+  const _a = new THREE.Vector3(), _b = new THREE.Vector3();
+  function toScreen(v) { v.project(camera); return { x: (v.x + 1) / 2 * innerWidth, y: (1 - v.y) / 2 * innerHeight }; }
+  function axisPx(k) {
+    const { W, H } = cur3;
+    const p0 = k === 'w' ? _a.set(W, 0, RZ) : _a.set((HX0 + HX1) / 2, H, T / 2);
+    const s0 = toScreen(p0.clone());
+    const s1 = toScreen(k === 'w' ? _b.set(W + 1, 0, RZ) : _b.set((HX0 + HX1) / 2, H + 1, T / 2));
+    return { x: s1.x - s0.x, y: s1.y - s0.y };
+  }
+
+  // 처음 카메라 방향
+  const startDir = dirOf(reduce ? DEF_AZ : DEF_AZ + 0.5, reduce ? DEF_POLAR : DEF_POLAR - 0.3);
+  controls.target.set(0.6, 1, 0.3);
+  camera.position.copy(controls.target).addScaledVector(startDir, DIST);
+  let introCam = !reduce;
+  const goalDir = dirOf(DEF_AZ, DEF_POLAR);
+
+  // 누르기와 돌리기 구분
+  const ray = new THREE.Raycaster(), ndc = new THREE.Vector2();
+  let down = null;
+  function pickDoor(e) {
+    if (!D) return false;
+    const r = canvas.getBoundingClientRect();
+    ndc.set(((e.clientX - r.left) / r.width) * 2 - 1, -((e.clientY - r.top) / r.height) * 2 + 1);
+    ray.setFromCamera(ndc, camera);
+    return ray.intersectObjects([D.frame, D.panels], true).length > 0;
+  }
+  canvas.addEventListener('pointerdown', e => { down = { x: e.clientX, y: e.clientY }; });
+  controls.addEventListener('start', () => { introCam = false; });
+  canvas.addEventListener('pointerup', e => {
+    if (!down) return;
+    const moved = Math.hypot(e.clientX - down.x, e.clientY - down.y);
+    down = null;
+    if (moved > 6) return;
+    closeFan(); closePops();
+    const hit = pickDoor(e);
+    if (hit && !ui.sel) setSel(true);
+    else if (!hit && ui.sel) setSel(false);
+    else if (hit) toggleDoor();
+  });
+  canvas.addEventListener('pointermove', e => {
+    if (e.pointerType !== 'mouse' || e.buttons) return;
+    canvas.style.cursor = pickDoor(e) ? 'pointer' : 'grab';
+  });
+
+  function size() { renderer.setSize(innerWidth, innerHeight, false); }
+  addEventListener('resize', size); size();
+
+  const v3 = new THREE.Vector3(), corners = Array.from({ length: 8 }, () => new THREE.Vector3()), _p = new THREE.Vector3();
+  const actEl = $('act');
+  const clock = new THREE.Clock();
+  let actShown = false, knobShown = false;
+  renderer.setAnimationLoop(() => {
+    const dt = Math.min(clock.getDelta(), 0.04);
+    now = performance.now() / 1000;
+
+    // 여닫는 모습 보여 주기
+    if (showAt > 0 && now >= showAt) {
+      if (showStage === 0) { setDoor(1); showStage = 1; showAt = now + 1.75; }
+      else { setDoor(0); showAt = -1; }
+    }
+    if (doorT !== doorTarget) doorT = reduce ? doorTarget : doorTarget > doorT ? Math.min(doorTarget, doorT + dt / 1.1) : Math.max(doorTarget, doorT - dt / 1.1);
+    if (D) {
+      D.apply(ease(doorT));
+      // 문짝이 위에서 떨어져 레일에 끼워지며 살짝 튕깁니다
+      for (let i = D.drops.length - 1; i >= 0; i--) {
+        const it = D.drops[i];
+        if (now < it.t0) { it.o.visible = false; continue; }
+        it.o.visible = true;
+        it.vy -= 15 * dt; it.y += it.vy * dt;
+        if (it.y <= 0) {
+          if (!it.b) { it.b = 1; it.y = 0; it.vy = -it.vy * 0.16; }
+          else { it.y = 0; it.o.position.y = it.y0; D.drops.splice(i, 1); continue; }
+        }
+        it.o.position.y = it.y0 + it.y;
+      }
+      // 색 번짐
+      for (const p of D.pieces) {
+        if (!p.col || now < p.col.t0) continue;
+        const c = p.col;
+        if (!c.started) { c.started = true; if (p.gm) { const bm = c.g1.bump ? aquaTex : null; if (p.gm.bumpMap !== bm) { p.gm.bumpMap = bm; p.gm.needsUpdate = true; } } }
+        const t = Math.min(1, (now - c.t0) / 0.34), e = t * t * (3 - 2 * t);
+        p.fm.color.copy(c.f0.c).lerp(c.f1.c, e); p.fm.metalness = c.f0.m + (c.f1.m - c.f0.m) * e; p.fm.roughness = c.f0.r + (c.f1.r - c.f0.r) * e;
+        if (p.gm && c.g0) { p.gm.color.copy(c.g0.c).lerp(c.g1.c, e); p.gm.opacity = c.g0.o + (c.g1.o - c.g0.o) * e; p.gm.roughness = c.g0.r + (c.g1.r - c.g0.r) * e; }
+        if (t >= 1) p.col = null;
+      }
+    }
+    for (let i = dying.length - 1; i >= 0; i--) {
+      const x = dying[i], o = x.d.panels;
+      x.vy += dt * 40; o.position.y += x.vy * dt;
+      if (o.position.y > 1.6) { disposeDoor(x.d); dying.splice(i, 1); }
+    }
+
+    // 카메라
+    if (introCam) {
+      const f = 1 - Math.exp(-dt * 1.6);
+      v3.copy(camera.position).sub(controls.target).normalize().lerp(goalDir, f).normalize();
+      camera.position.copy(controls.target).addScaledVector(v3, DIST);
+      if (v3.distanceTo(goalDir) < 0.002) introCam = false;
+    }
+    const fk = reduce ? 1 : 1 - Math.exp(-dt * 4.2);
+    focus.min.lerp(goal.min, fk); focus.max.lerp(goal.max, fk);
+    _p.copy(focus.min).add(focus.max).multiplyScalar(0.5);
+    v3.copy(_p).sub(controls.target);
+    controls.target.add(v3); camera.position.add(v3);
+    controls.update();
+    camera.updateMatrixWorld();
+    const cw = innerWidth, ch = innerHeight, aspect = cw / ch;
+    let i = 0;
+    for (const x of [focus.min.x, focus.max.x]) for (const y of [focus.min.y, focus.max.y]) for (const z of [focus.min.z, focus.max.z]) corners[i++].set(x, y, z).applyMatrix4(camera.matrixWorldInverse);
+    let x0 = Infinity, x1 = -Infinity, y0 = Infinity, y1 = -Infinity;
+    for (const c of corners) { x0 = Math.min(x0, c.x); x1 = Math.max(x1, c.x); y0 = Math.min(y0, c.y); y1 = Math.max(y1, c.y); }
+    const Wd = wide();
+    const mt = Wd ? 96 : 126, mb = Wd ? 130 : 100, ms = Wd ? 80 : 6;
+    const S = Math.max((y1 - y0) * ch / (2 * (ch - mt - mb)), (x1 - x0) * ch / (2 * (cw - 2 * ms)));
+    const yc = mt + (ch - mt - mb) / 2, ny = 1 - 2 * yc / ch;
+    const cy = (y0 + y1) / 2 - ny * S, cx = (x0 + x1) / 2;
+    if (!fr.init || reduce) { fr.S = S; fr.cx = cx; fr.cy = cy; fr.init = true; }
+    else if (!ui.drag) { fr.S += (S - fr.S) * fk; fr.cx += (cx - fr.cx) * fk; fr.cy += (cy - fr.cy) * fk; }
+    camera.left = fr.cx - fr.S * aspect; camera.right = fr.cx + fr.S * aspect;
+    camera.top = fr.cy + fr.S; camera.bottom = fr.cy - fr.S;
+    camera.updateProjectionMatrix();
+
+    // 줄자 손잡이 자리 (줄자 끝에서 바깥으로 조금)
+    const { W, H, DW, DH } = cur3;
+    const sheetOpen = $('sheet').open;
+    const kShow = !sheetOpen && !introCam;
+    if (kShow) {
+      const sw0 = toScreen(_a.set(W, 0.005, RZ)), sw1 = toScreen(_b.set(W + 0.3, 0.005, RZ));
+      let dx = sw1.x - sw0.x, dy = sw1.y - sw0.y, l = Math.hypot(dx, dy) || 1;
+      knobs.w.style.transform = `translate(${Math.round(sw0.x + dx / l * 26)}px, ${Math.round(sw0.y + dy / l * 26)}px)`;
+      const sh0 = toScreen(_a.set((HX0 + HX1) / 2, H, T / 2)), sh1 = toScreen(_b.set((HX0 + HX1) / 2, H + 0.3, T / 2));
+      dx = sh1.x - sh0.x; dy = sh1.y - sh0.y; l = Math.hypot(dx, dy) || 1;
+      knobs.h.style.transform = `translate(${Math.round(sh0.x + dx / l * 26)}px, ${Math.round(sh0.y + dy / l * 26)}px)`;
+      knobs.w.classList.toggle('over', W !== DW); knobs.h.classList.toggle('over', H !== DH);
+      if (ui.drag && ui.drag.on) {
+        const k = ui.drag.k, el = knobs[k], r = el.getBoundingClientRect();
+        const over = k === 'w' ? W !== DW : H !== DH;
+        kval.textContent = (k === 'w' ? '폭 ' : '높이 ') + mm(state[k]);
+        kval.classList.toggle('over', over);
+        kval.style.transform = `translate(${Math.round(clamp(r.left + 22 - kval.offsetWidth / 2, 8, cw - kval.offsetWidth - 8))}px, ${Math.round(r.top - kval.offsetHeight - 8)}px)`;
+        kval.style.visibility = 'visible';
+      } else kval.style.visibility = 'hidden';
+    }
+    if (kShow !== knobShown) { knobShown = kShow; knobs.w.style.visibility = knobs.h.style.visibility = kShow ? 'visible' : 'hidden'; if (!kShow) kval.style.visibility = 'hidden'; }
+
+    // 문 위 도구
+    const show = ui.sel && actEl.childElementCount > 0 && !ui.drag;
+    if (show) {
+      _p.set(DW / 2, Math.min(H, DH) * 0.62, 0.1).project(camera);
+      const x = (_p.x + 1) / 2 * cw, y = (1 - _p.y) / 2 * ch;
+      const aw = actEl.offsetWidth, ah = actEl.offsetHeight;
+      const lx = clamp(x - aw / 2, 8, cw - aw - 8), ly = clamp(y - ah / 2, Wd ? 90 : 128, ch - ah - (Wd ? 130 : 100));
+      actEl.style.transform = `translate(${Math.round(lx)}px, ${Math.round(ly)}px)`;
+    }
+    if (show !== actShown) { actShown = show; actEl.style.visibility = show ? 'visible' : 'hidden'; }
+
+    renderer.render(scene, camera);
+  });
+
+  return { build, showMove: () => showMove(0.05), toggleDoor, axisPx };
+}
+</script>
+</body>
+</html>

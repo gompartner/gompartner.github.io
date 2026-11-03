@@ -20,15 +20,15 @@ const section = "scroll-mt-20 border-t border-[#e6e9ee] md:scroll-mt-24";
 
 // 앱 제작, 키오스크 화면 제작 공용 페이지(11-01). 랜딩, 업무 프로그램 페이지와 같은 틀
 export function MakeExtraPage({ s }: { s: MakeExtra }) {
-  const path = `/classic/${s.id}`;
+  const path = `/${s.id}`;
   const samples = samplesIn(s.id);
   return (
     <>
-      <LdScript data={[serviceLd(s.title, s.metaDescription, path), breadcrumbLd([{ name: "서비스", path: "/classic/homepage" }, { name: s.title, path }])]} />
+      <LdScript data={[serviceLd(s.title, s.metaDescription, path), breadcrumbLd([{ name: "제작", path: "/homepage" }, { name: s.title, path }])]} />
       <PageHead
         title={s.title}
         trail={[
-          { href: "/classic/homepage", label: "서비스" },
+          { href: "/homepage", label: "제작" },
           { href: path, label: s.title },
         ]}
       />
@@ -107,7 +107,7 @@ export function MakeExtraPage({ s }: { s: MakeExtra }) {
               <h2 id={`${s.id}-samples`} className={h2}>
                 카탈로그
               </h2>
-              <Link href={`/classic/works/${s.id}`} className={more}>
+              <Link href={`/works/${s.id}`} className={more}>
                 전체 카탈로그 <ChevronRight size={16} aria-hidden />
               </Link>
             </div>

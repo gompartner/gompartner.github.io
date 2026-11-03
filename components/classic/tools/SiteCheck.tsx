@@ -128,7 +128,7 @@ export function SiteCheck() {
                 여기서 못 보는 보안 인증서 만료일, 도메인 만료일, 휴대폰과 PC에서 실제로 보이는 화면 캡처까지 넣은 PDF를 하루 안에 보내 드려요. 고칠 때 드는 비용도 같이 적어 드려요.
               </p>
               <Link
-                href={`/classic/contact?site=${encodeURIComponent(result.host)}`}
+                href={`/contact?site=${encodeURIComponent(result.host)}`}
                 data-gtm-cta="tool_site_check_contact"
                 className="mt-4 inline-flex h-11 items-center rounded-md bg-[#15171c] px-4 text-[15px] font-bold text-white hover:bg-[#256ef4]"
               >
@@ -141,7 +141,7 @@ export function SiteCheck() {
 
       <p className="mt-8 text-[15px] leading-[1.7] text-[#5b6370]">
         공개된 첫 화면만 읽어서 판단해요. 관리자 화면, 결제, 회원 정보처럼 로그인해야 보이는 곳은 전체 보고서에서도 사이트 주인의 동의를 받은 뒤에만 봐요.{" "}
-        <Link href="/classic/tools/php-check" className="underline underline-offset-2">
+        <Link href="/tools/php-check" className="underline underline-offset-2">
           PHP 취약점만 따로 보기
         </Link>
       </p>

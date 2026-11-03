@@ -6,7 +6,7 @@ export const toolCategories = ["운영 문서", "홈페이지 점검", "비용 �
 
 export const tools = [
   {
-    href: "/classic/tools/privacy-policy",
+    href: "/tools/privacy-policy",
     need: "개인정보처리방침이 없어요",
     who: ["사장님", "담당자"],
     category: "운영 문서",
@@ -15,7 +15,7 @@ export const tools = [
     for: "쇼핑몰·홈페이지 운영자",
   },
   {
-    href: "/classic/tools/terms",
+    href: "/tools/terms",
     need: "회원가입 약관을 써야 해요",
     who: ["사장님", "담당자"],
     category: "운영 문서",
@@ -24,7 +24,7 @@ export const tools = [
     for: "쇼핑몰·홈페이지 운영자",
   },
   {
-    href: "/classic/tools/accessibility-check",
+    href: "/tools/accessibility-check",
     need: "웹접근성 점검을 받아야 해요",
     who: ["담당자"],
     category: "홈페이지 점검",
@@ -33,7 +33,7 @@ export const tools = [
     for: "공공기관·학교 홈페이지 담당자",
   },
   {
-    href: "/classic/tools/site-check",
+    href: "/tools/site-check",
     need: "홈페이지에 문제가 있는지 모르겠어요",
     who: ["사장님", "담당자"],
     category: "홈페이지 점검",
@@ -42,7 +42,7 @@ export const tools = [
     for: "가게·회사 홈페이지, 쇼핑몰 운영자",
   },
   {
-    href: "/classic/tools/php-check",
+    href: "/tools/php-check",
     need: "PHP 취약점 뉴스를 봤어요",
     who: ["사장님", "담당자"],
     category: "홈페이지 점검",
@@ -51,7 +51,7 @@ export const tools = [
     for: "그누보드, 영카트, 워드프레스 사이트 운영자",
   },
   {
-    href: "/classic/tools/search-preview",
+    href: "/tools/search-preview",
     need: "검색하면 어떻게 보이는지 궁금해요",
     who: ["사장님", "담당자"],
     category: "홈페이지 점검",
@@ -60,7 +60,7 @@ export const tools = [
     for: "가게·회사 홈페이지 운영자",
   },
   {
-    href: "/classic/tools/estimate-questions",
+    href: "/tools/estimate-questions",
     need: "홈페이지 견적을 받으려고 해요",
     who: ["사장님"],
     category: "비용 계산",
@@ -69,7 +69,7 @@ export const tools = [
     for: "홈페이지를 새로 여는 사장님",
   },
   {
-    href: "/classic/tools/hosting-cost",
+    href: "/tools/hosting-cost",
     need: "홈페이지 유지비가 얼마인지 궁금해요",
     who: ["사장님"],
     category: "비용 계산",
@@ -78,7 +78,7 @@ export const tools = [
     for: "홈페이지를 새로 여는 사장님",
   },
   {
-    href: "/classic/tools/qr-code",
+    href: "/tools/qr-code",
     need: "가게에 붙일 QR코드가 필요해요",
     who: ["사장님"],
     category: "이미지·QR",
@@ -87,7 +87,7 @@ export const tools = [
     for: "가게·매장 운영자",
   },
   {
-    href: "/classic/tools/image-compress",
+    href: "/tools/image-compress",
     need: "사진이 너무 무거워요",
     who: ["사장님", "담당자"],
     category: "이미지·QR",
@@ -96,7 +96,7 @@ export const tools = [
     for: "가게·회사 홈페이지 운영자",
   },
   {
-    href: "/classic/tools/jwt-parser",
+    href: "/tools/jwt-parser",
     need: "JWT 토큰 안을 보고 싶어요",
     who: ["개발자"],
     category: "개발 도구",
@@ -105,7 +105,7 @@ export const tools = [
     for: "개발자",
   },
   {
-    href: "/classic/tools/unix-time",
+    href: "/tools/unix-time",
     need: "타임스탬프를 날짜로 바꿔야 해요",
     who: ["개발자"],
     category: "개발 도구",
@@ -114,7 +114,7 @@ export const tools = [
     for: "개발자",
   },
   {
-    href: "/classic/tools/cron",
+    href: "/tools/cron",
     need: "cron 식이 언제 도는지 모르겠어요",
     who: ["개발자"],
     category: "개발 도구",

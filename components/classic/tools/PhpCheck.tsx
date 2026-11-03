@@ -108,7 +108,7 @@ export function PhpCheck() {
             <p className="mt-2 text-[16px] leading-[1.7] text-[#3d4550]">{c.body}</p>
             {result.verdict !== "safe" && result.verdict !== "unreachable" && (
               <p className="mt-5">
-                <Link href="/classic/contact" data-gtm-cta="tool_php_check_contact" className="inline-flex h-11 items-center rounded-md bg-[#15171c] px-4 text-[15px] font-bold text-white hover:bg-[#256ef4]">
+                <Link href="/contact" data-gtm-cta="tool_php_check_contact" className="inline-flex h-11 items-center rounded-md bg-[#15171c] px-4 text-[15px] font-bold text-white hover:bg-[#256ef4]">
                   점검과 업데이트 상담 신청하기
                 </Link>
               </p>
@@ -118,7 +118,7 @@ export function PhpCheck() {
       </div>
       <p className="mt-8 text-[15px] leading-[1.7] text-[#5b6370]">
         밖에서 보이는 정보만으로 판단해서, 버전을 숨긴 서버는 확인할 수 없어요. 인터넷에 도는 &quot;취약점 확인 코드&quot;는 악성코드가 섞인 경우가 있어 직접 돌리지 마세요.{" "}
-        <Link href="/classic/guide/php-vulnerability-check" className="underline underline-offset-2">
+        <Link href="/guide/php-vulnerability-check" className="underline underline-offset-2">
           확인 순서 자세히 보기
         </Link>
       </p>

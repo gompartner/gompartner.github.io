@@ -1,0 +1,2528 @@
+<!doctype html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<script>
+  // 11-03 사이트 /3d 페이지가 이 섬 화면을 위쪽에 끼워 쓴다(embed). 사이트에서 /3d/ 를 바로 열면 /3d 로 옮긴다
+  (function () {
+    var inFrame = window.top !== window.self;
+    if (inFrame) document.documentElement.classList.add('embed');
+    else if (/^\/3d\/(island(\.html)?)?$/.test(location.pathname)) location.replace('/3d' + location.hash);
+  })();
+</script>
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>3D 웹 제작 | 곰파트너</title>
+<meta name="description" content="가구, 중문, 간판, 인테리어 업체 홈페이지에 붙는 3D 견적 화면. 손님이 제품을 직접 구성하면 3D와 견적이 바로 나오고 그대로 접수됩니다. 180만 원부터.">
+<link rel="canonical" href="https://gompartner.co.kr/3d">
+<meta name="robots" content="noindex, follow">
+<meta property="og:type" content="website">
+<meta property="og:site_name" content="곰파트너">
+<meta property="og:url" content="https://gompartner.co.kr/3d/">
+<meta property="og:title" content="3D 웹 제작 | 곰파트너">
+<meta property="og:description" content="손님이 홈페이지에서 제품을 직접 구성하면 3D와 견적이 바로 나오고, 고른 구성 그대로 견적 요청이 접수됩니다.">
+<meta property="og:image" content="https://gompartner.co.kr/3d/assets/og.jpg">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="theme-color" content="#ffffff">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 32 32%22%3E%3Crect width=%2232%22 height=%2232%22 rx=%226%22 fill=%22%23256ef4%22/%3E%3Cpath d=%22M16 6l9 5v10l-9 5-9-5V11z M16 6v10m0 0l9-5m-9 5l-9-5m9 5v10%22 fill=%22none%22 stroke=%22white%22 stroke-width=%222%22 stroke-linejoin=%22round%22/%3E%3C/svg%3E">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/static/pretendard.min.css">
+<style>
+  :root {
+    --bg: #1c1815;
+    --panel: #221d19;
+    --card: #2a2420;
+    --card-2: #342c26;
+    --ink: #f3ece2;
+    --ink-2: #c9bdb0;
+    --ink-3: #a3968a;
+    --line: rgba(243, 236, 226, 0.14);
+    --line-2: rgba(243, 236, 226, 0.32);
+    --focus: #f2c98a;
+  }
+  * { box-sizing: border-box; }
+  [hidden] { display: none !important; }
+  html { scroll-behavior: smooth; }
+  body {
+    margin: 0; background: var(--bg); color: var(--ink);
+    font-family: Pretendard, -apple-system, "Apple SD Gothic Neo", sans-serif;
+    font-size: 17px; line-height: 1.5; word-break: keep-all;
+    -webkit-text-size-adjust: 100%;
+    font-variant-ligatures: no-contextual; font-feature-settings: "calt" 0;
+    overflow-x: hidden;
+  }
+  button { font: inherit; color: inherit; font-feature-settings: "calt" 0; cursor: pointer; -webkit-tap-highlight-color: transparent; }
+  a { color: inherit; }
+  img, svg { display: block; }
+  :focus-visible { outline: 2px solid var(--focus); outline-offset: 2px; }
+
+  /* 머리글 */
+  .top {
+    position: fixed; z-index: 20; top: 0; left: 0; right: 0;
+    display: flex; align-items: center; justify-content: space-between; gap: 8px;
+    padding: calc(env(safe-area-inset-top) + 6px) 8px 10px 16px;
+    transition: background 0.3s; pointer-events: none;
+  }
+  .top > * { pointer-events: auto; }
+  .scrolled .top { background: linear-gradient(rgba(28, 24, 21, 0.94), rgba(28, 24, 21, 0)); }
+  .brand { display: flex; align-items: center; gap: 8px; min-height: 44px; text-decoration: none; }
+  .brand svg { width: 22px; height: 22px; }
+  .brand b { font-size: 17px; font-weight: 800; letter-spacing: -0.01em; }
+  .brand small { font-size: 13px; font-weight: 600; color: var(--ink-2); white-space: nowrap; }
+  .top .r { display: flex; align-items: center; gap: 2px; }
+  .ask { display: inline-flex; align-items: center; height: 44px; padding: 0 12px; font-size: 15px; font-weight: 700; text-decoration: none; white-space: nowrap; }
+  .ask:hover { text-decoration: underline; text-underline-offset: 4px; }
+  .icon-btn { width: 44px; height: 44px; display: grid; place-items: center; border: 0; border-radius: 8px; background: transparent; color: var(--ink); }
+  .icon-btn svg { width: 24px; height: 24px; }
+  .icon-btn:hover { background: rgba(243, 236, 226, 0.08); }
+  .menu {
+    position: fixed; z-index: 21; top: calc(env(safe-area-inset-top) + 56px); right: 12px;
+    width: 220px; background: var(--panel); border: 1px solid var(--line); border-radius: 10px; padding: 6px;
+    box-shadow: 0 12px 32px rgba(0, 0, 0, 0.45);
+  }
+  .menu a { display: flex; align-items: center; min-height: 48px; padding: 0 12px; border-radius: 6px; text-decoration: none; font-weight: 600; color: var(--ink-2); }
+  .menu a:hover { background: var(--card); color: var(--ink); }
+
+  /* 첫 화면: 마을 */
+  .hero { position: relative; height: 100vh; height: 100svh; min-height: 580px; overflow: hidden; background: #221d19; }
+  #gl { position: absolute; inset: 0; width: 100%; height: 100%; display: block; touch-action: pan-y; cursor: grab; }
+  #gl.drag { cursor: grabbing; }
+  #gl.hot { cursor: pointer; }
+  .hero h1 {
+    position: absolute; z-index: 5; left: 16px; right: 16px; top: calc(env(safe-area-inset-top) + 60px); margin: 0;
+    font-size: 27px; font-weight: 800; line-height: 1.2; letter-spacing: -0.025em; pointer-events: none;
+    text-shadow: 0 2px 18px rgba(0, 0, 0, 0.45);
+  }
+  .draft { position: absolute; inset: 0; z-index: 1; pointer-events: none; transition: opacity 0.8s; }
+  .draft path { fill: none; stroke: #efe6d8; stroke-width: 1; stroke-dasharray: 1; stroke-dashoffset: 1; opacity: 0.55; animation: draw 1.6s 0.1s cubic-bezier(0.6, 0, 0.2, 1) forwards; }
+  .draft path + path { animation-delay: 0.4s; }
+  @keyframes draw { to { stroke-dashoffset: 0; } }
+  .gl-on .draft { opacity: 0; }
+
+  .pins { position: absolute; inset: 0; z-index: 4; pointer-events: none; }
+  .pin {
+    position: absolute; left: 0; top: 0; pointer-events: auto;
+    display: inline-flex; align-items: center; gap: 6px; height: 30px; padding: 0 11px 0 9px; border-radius: 15px;
+    background: rgba(28, 24, 21, 0.82); border: 1px solid var(--line-2); color: var(--ink);
+    font-size: 13px; font-weight: 700; white-space: nowrap; transition: background 0.25s, color 0.25s, border-color 0.25s;
+    will-change: transform;
+  }
+  .pin::before { content: ""; position: absolute; inset: -8px -4px; }
+  .pin i { width: 7px; height: 7px; border-radius: 50%; background: var(--focus); flex: 0 0 auto; }
+  .pin.now { background: var(--ink); color: #1d1916; border-color: var(--ink); }
+  .pin.now i { background: #c4703f; }
+  .pin.hot { border-color: var(--focus); }
+  .pin[aria-expanded="true"] { background: var(--focus); color: #1d1916; border-color: var(--focus); }
+  .sel .pin:not([aria-expanded="true"]) { opacity: 0.45; }
+  .pin.off { opacity: 0 !important; pointer-events: none; }
+  .lite:not(.scrolled) .top, .lite .hero h1 { color: #1d1916; text-shadow: 0 1px 14px rgba(255, 255, 255, 0.55); }
+  .lite:not(.scrolled) .top .brand small { color: #4a4038; }
+  .lite:not(.scrolled) .top .icon-btn { color: #1d1916; }
+
+  /* 하루 진행 줄 */
+  .day {
+    position: absolute; z-index: 6; left: 50%; bottom: calc(env(safe-area-inset-bottom) + 10px); transform: translateX(-50%);
+    width: min(520px, calc(100% - 24px)); height: 52px; display: flex; align-items: center; gap: 6px;
+    padding: 0 10px 0 4px; border-radius: 26px; background: rgba(28, 24, 21, 0.78); border: 1px solid var(--line);
+  }
+  .day .icon-btn { flex: 0 0 auto; border-radius: 22px; }
+  .day .icon-btn svg { width: 20px; height: 20px; }
+  .track { position: relative; flex: 1; height: 44px; }
+  .track::before { content: ""; position: absolute; left: 0; right: 0; top: 21px; height: 2px; background: var(--line); border-radius: 1px; }
+  .track .fill { position: absolute; left: 0; top: 21px; height: 2px; width: 100%; background: var(--ink-2); transform-origin: left; transform: scaleX(0); border-radius: 1px; }
+  .track button {
+    position: absolute; top: 0; width: 44px; height: 44px; margin-left: -22px; border: 0; border-radius: 22px; background: transparent;
+    display: grid; place-items: center; color: var(--ink-3);
+  }
+  .track button span { width: 30px; height: 30px; border-radius: 15px; display: grid; place-items: center; background: #221d19; border: 1px solid var(--line); transition: background 0.25s, color 0.25s; }
+  .track button svg { width: 17px; height: 17px; }
+  .track button[aria-pressed="true"] { color: #1d1916; }
+  .track button[aria-pressed="true"] span { background: var(--ink); border-color: var(--ink); }
+  .track button:hover span { border-color: var(--line-2); }
+
+  /* 건물 카드 */
+  .sheet {
+    position: absolute; z-index: 7; left: 12px; right: 12px; bottom: calc(env(safe-area-inset-bottom) + 72px);
+    background: var(--panel); border: 1px solid var(--line-2); border-radius: 14px; padding: 16px 16px 16px;
+    box-shadow: 0 18px 48px rgba(0, 0, 0, 0.5);
+    transform: translateY(16px); opacity: 0; transition: transform 0.35s cubic-bezier(0.2, 0.8, 0.2, 1), opacity 0.25s; pointer-events: none;
+  }
+  .sheet.on { transform: none; opacity: 1; pointer-events: auto; }
+  .sheet h2 { margin: 0; font-size: 22px; font-weight: 800; line-height: 1.25; padding-right: 44px; }
+  .sheet .k { margin: 2px 0 14px; font-size: 14px; color: var(--ink-3); font-weight: 600; }
+  .sheet .x { position: absolute; right: 6px; top: 6px; }
+  .go { display: flex; flex-wrap: wrap; gap: 8px; }
+  .go a {
+    display: inline-flex; align-items: center; gap: 6px; height: 48px; padding: 0 16px; border-radius: 10px; flex: 1 1 auto; justify-content: center;
+    background: var(--ink); color: #1d1916; font-weight: 800; font-size: 15px; text-decoration: none; white-space: nowrap;
+  }
+  .go a + a { background: transparent; color: var(--ink); box-shadow: inset 0 0 0 1px var(--line-2); }
+  .go a:hover { filter: brightness(1.08); }
+  .go a svg { width: 16px; height: 16px; }
+
+  /* 3D가 안 뜨거나 동작 줄이기 설정일 때만 보이는 목록 */
+  .list { padding: 48px 0 0; }
+  .list h2 { margin: 0 0 16px; font-size: 26px; font-weight: 800; letter-spacing: -0.01em; line-height: 1.3; }
+  .no-gl .list { display: block; }
+  .no-gl .hero { height: auto; min-height: 0; padding: 120px 0 8px; }
+  .no-gl #gl, .no-gl .pins, .no-gl .day, .no-gl .draft { display: none; }
+  .no-gl .hero h1 { position: static; padding: 0 16px; }
+  .list ul { list-style: none; margin: 0; padding: 0; display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 10px; }
+  .list a { display: flex; flex-direction: column; gap: 6px; text-decoration: none; min-height: 44px; }
+  .list .th { display: block; aspect-ratio: 4 / 3; border-radius: 8px; overflow: hidden; background: var(--card); }
+  .list img { width: 100%; height: 100%; object-fit: cover; }
+  .list b { font-size: 14px; font-weight: 700; line-height: 1.35; }
+
+  /* 일반 구간 */
+  .after { position: relative; padding-top: 24px; }
+  .wrap { max-width: 1200px; margin: 0 auto; padding: 0 16px; }
+  section.blk { padding: 64px 0 0; }
+  section.blk h2 { margin: 0 0 20px; font-size: 26px; font-weight: 800; letter-spacing: -0.01em; line-height: 1.3; }
+  .prices { display: grid; grid-template-columns: 1fr; gap: 8px; }
+  .pc {
+    position: relative; text-align: left; background: var(--card); border: 1px solid var(--line); border-radius: 12px; padding: 14px 16px 16px;
+    display: grid; grid-template-columns: 1fr auto; align-items: end; gap: 4px 12px; min-height: 44px;
+  }
+  .pc:hover { border-color: var(--line-2); }
+  .pc[aria-pressed="true"] { border-color: var(--ink); box-shadow: inset 0 0 0 1px var(--ink); background: var(--card-2); }
+  .pc .nm { grid-column: 1 / -1; font-size: 15px; font-weight: 700; line-height: 1.3; }
+  .pc .num { display: flex; align-items: flex-end; font-size: 52px; font-weight: 800; line-height: 1; letter-spacing: -0.02em; font-variant-numeric: tabular-nums; }
+  .pc .u { font-size: 14px; color: var(--ink-2); font-weight: 600; line-height: 1.3; text-align: right; padding-bottom: 4px; }
+  .pc .u b { color: var(--ink); font-weight: 800; }
+  .sr-num { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; }
+  .dg { display: inline-block; height: 1em; overflow: hidden; }
+  .col { display: flex; flex-direction: column; transition: transform 1.1s cubic-bezier(0.2, 0.8, 0.2, 1); }
+  .col span { height: 1em; line-height: 1; }
+  .incl { margin: 14px 0 0; font-size: 16px; color: var(--ink-2); min-height: 3em; }
+  .incl b { color: var(--ink); font-weight: 700; margin-right: 6px; }
+  .vat { margin: 4px 0 12px; font-size: 14px; color: var(--ink-3); }
+  details { border-top: 1px solid var(--line); }
+  details:last-of-type { border-bottom: 1px solid var(--line); }
+  summary { list-style: none; display: flex; align-items: center; justify-content: space-between; gap: 12px; min-height: 56px; padding: 8px 0; font-weight: 700; cursor: pointer; }
+  summary::-webkit-details-marker { display: none; }
+  summary svg { flex: 0 0 auto; width: 20px; height: 20px; color: var(--ink-3); transition: transform 0.2s; }
+  details[open] summary svg { transform: rotate(180deg); }
+  details ul { margin: 0 0 16px; padding-left: 20px; color: var(--ink-2); font-size: 16px; }
+  details li + li { margin-top: 4px; }
+  details p { margin: 0 0 18px; color: var(--ink-2); font-size: 16px; line-height: 1.6; }
+  .checks { list-style: none; margin: 0; padding: 0; display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 8px; }
+  .checks li { display: flex; align-items: center; gap: 12px; background: var(--card); border-radius: 10px; padding: 14px 12px; font-size: 15px; font-weight: 700; line-height: 1.35; min-height: 64px; }
+  .checks svg { flex: 0 0 auto; width: 24px; height: 24px; color: var(--ink-2); }
+  .steps { list-style: none; margin: 0; padding: 0; display: grid; gap: 0; }
+  .steps li { position: relative; display: grid; grid-template-columns: 64px 1fr; align-items: center; min-height: 52px; padding-left: 22px; }
+  .steps li::before { content: ""; position: absolute; left: 4px; top: 50%; width: 9px; height: 9px; margin-top: -5px; border-radius: 5px; background: var(--ink); }
+  .steps li::after { content: ""; position: absolute; left: 8px; top: 50%; bottom: -50%; width: 1px; background: var(--line-2); }
+  .steps li:last-child::after { display: none; }
+  .steps em { font-style: normal; font-size: 14px; color: var(--ink-3); font-weight: 600; }
+  .steps b { font-size: 17px; font-weight: 700; }
+  .cta { margin: 72px 0 0; padding: 32px 20px; background: var(--card); border-radius: 14px; display: flex; flex-direction: column; gap: 20px; }
+  .cta h2 { margin: 0; font-size: 24px; font-weight: 800; line-height: 1.35; }
+  .cta p { margin: -8px 0 0; color: var(--ink-2); font-size: 16px; }
+  .cta .row { display: flex; flex-wrap: wrap; gap: 8px; }
+
+  /* 견적 접수 */
+  .mail { background: var(--card); border-radius: 12px; padding: 20px 16px; max-width: 640px; }
+  .mail .mh { display: flex; flex-direction: column; gap: 4px; padding-bottom: 12px; border-bottom: 1px solid var(--line); }
+  .mail .mh b { font-size: 18px; font-weight: 800; }
+  .mail .mh span { font-size: 14px; color: var(--ink-3); }
+  .mail dl { margin: 0 0 18px; }
+  .mail dl div { display: grid; grid-template-columns: 56px minmax(0, 1fr); gap: 12px; padding: 11px 0; border-bottom: 1px solid var(--line); }
+  .mail dt { color: var(--ink-3); font-size: 14px; font-weight: 600; line-height: 1.6; }
+  .mail dd { margin: 0; font-size: 16px; font-weight: 600; line-height: 1.5; }
+  .mail .sum { font-size: 22px; font-weight: 800; font-variant-numeric: tabular-nums; }
+  .btn.line { background: transparent; color: var(--ink); box-shadow: inset 0 0 0 1px var(--line-2); }
+  .btn.line:hover { background: var(--card-2); }
+  .mail .btn { width: 100%; }
+  .to { margin: 14px 0 0; font-size: 15px; color: var(--ink-2); }
+  .to b { color: var(--ink); margin-right: 6px; }
+
+  /* 업종별 예상 비용 */
+  .sub { margin: 40px 0 14px; font-size: 20px; font-weight: 800; line-height: 1.3; }
+  .ind { list-style: none; margin: 0; padding: 0; display: grid; gap: 8px; }
+  .ind li { background: var(--card); border-radius: 10px; padding: 16px; }
+  .ind .h { display: flex; justify-content: space-between; align-items: baseline; gap: 12px; margin-bottom: 10px; }
+  .ind .h b, .ind .h span { font-size: 18px; font-weight: 800; }
+  .ind .h span { font-variant-numeric: tabular-nums; white-space: nowrap; }
+  .ind dl { margin: 0; display: grid; grid-template-columns: 36px minmax(0, 1fr); gap: 6px 12px; font-size: 15px; line-height: 1.5; }
+  .ind dt { color: var(--ink-3); font-weight: 600; }
+  .ind dd { margin: 0; color: var(--ink-2); }
+
+  /* 사양 */
+  .cmp-pick { display: flex; gap: 8px; margin: 0 0 12px; }
+  .cmp-pick button { height: 44px; padding: 0 16px; border-radius: 22px; border: 1px solid var(--line-2); background: transparent; color: var(--ink-2); font: inherit; font-size: 15px; font-weight: 700; cursor: pointer; }
+  .cmp-pick button[aria-pressed="true"] { background: var(--ink); border-color: var(--ink); color: #1d1916; }
+  .cmp-pick button:focus-visible { outline: 2px solid var(--focus); outline-offset: 2px; }
+  .cmp-box { max-width: 1040px; }
+  .cmp { width: 100%; border-collapse: separate; border-spacing: 0; table-layout: fixed; font-size: 15px; line-height: 1.5; }
+  .cmp th, .cmp td { padding: 14px 12px; text-align: left; vertical-align: top; border-bottom: 1px solid var(--line); }
+  .cmp thead th { font-size: 15px; font-weight: 800; color: var(--ink-2); border-bottom: 1px solid var(--line-2); }
+  .cmp tbody th { width: 34%; color: var(--ink-3); font-weight: 700; }
+  .cmp .me { background: var(--card-2); color: var(--ink); }
+  .cmp thead .me { color: var(--ink); border-radius: 10px 10px 0 0; }
+  .cmp tbody tr:last-child .me { border-radius: 0 0 10px 10px; }
+  .cmp td:not(.me) { color: var(--ink-2); }
+  .cmp[data-v="a"] .b, .cmp[data-v="b"] .a { display: none; }
+  .sr { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; }
+  .spec { margin: 0; max-width: 880px; }
+  .spec div { display: grid; grid-template-columns: 92px minmax(0, 1fr); gap: 16px; padding: 14px 0; border-bottom: 1px solid var(--line); }
+  .spec div:first-child { border-top: 1px solid var(--line); }
+  .spec dt { color: var(--ink-3); font-weight: 700; font-size: 15px; line-height: 1.6; }
+  .spec dd { margin: 0; font-size: 16px; line-height: 1.6; }
+  .btn { display: inline-flex; align-items: center; justify-content: center; height: 52px; padding: 0 24px; border-radius: 10px; background: var(--ink); color: #1d1916; font-weight: 800; text-decoration: none; }
+  .btn:hover { background: #fff; }
+
+  /* 11-03 본 사이트와 같은 머리글, 서비스 탭, 바닥글(흰 머리글 64/76px, 탭, 어두운 바닥글) */
+  .top { display: none !important; }
+  .gp-h, .gp-tabs, .gp-f { font-family: Pretendard, -apple-system, "Apple SD Gothic Neo", sans-serif; }
+  .gp-h { position: sticky; top: 0; z-index: 60; background: #fff; color: #15171c; border-bottom: 1px solid #e6e9ee; }
+  .gp-in { max-width: 1248px; margin: 0 auto; padding: 0 16px; }
+  .gp-h nav { height: 64px; display: flex; align-items: center; justify-content: space-between; gap: 24px; }
+  .gp-logo { font-size: 21px; font-weight: 800; letter-spacing: -0.04em; text-decoration: none; color: #15171c; }
+  .gp-menu { display: none; list-style: none; margin: 0; padding: 0; height: 100%; flex: 1; justify-content: space-around; }
+  .gp-menu > li { position: relative; display: flex; align-items: center; }
+  .gp-menu > li > a { display: inline-flex; align-items: center; gap: 4px; height: 100%; padding: 0 8px; font-size: 17px; font-weight: 800; letter-spacing: -0.02em; text-decoration: none; color: #15171c; }
+  .gp-menu > li > a[aria-current], .gp-menu > li > a:hover { color: #256ef4; }
+  .gp-menu svg { display: inline-block; opacity: 0.7; }
+  .gp-menu ul { display: none; position: absolute; top: 100%; left: 50%; transform: translateX(-50%); min-width: 200px; list-style: none; margin: 0; padding: 10px 0; background: #fff; border: 1px solid #e6e9ee; border-radius: 0 0 8px 8px; box-shadow: 0 12px 24px rgba(21, 23, 28, 0.08); }
+  .gp-menu li.dd:hover ul, .gp-menu li.dd:focus-within ul { display: block; }
+  .gp-menu ul a { display: flex; align-items: center; height: 44px; padding: 0 20px; white-space: nowrap; font-size: 16px; color: #3d4450; text-decoration: none; }
+  .gp-menu ul a:hover, .gp-menu ul a[aria-current] { color: #256ef4; }
+  .gp-r { display: flex; align-items: center; gap: 8px; }
+  .gp-q { display: none; height: 44px; width: 220px; align-items: center; padding-left: 12px; border: 1px solid #d9dee5; border-radius: 6px; background: #fff; color: #6b7280; }
+  .gp-q:focus-within { border-color: #15171c; }
+  .gp-q svg { display: inline-block; flex: 0 0 auto; }
+  .gp-q input { flex: 1; min-width: 0; height: 100%; border: 0; outline: 0; background: transparent; padding: 0 10px; font: inherit; font-size: 15px; color: #15171c; }
+  .gp-qi { display: inline-flex; width: 44px; height: 44px; align-items: center; justify-content: center; color: #15171c; }
+  .gp-cta { display: inline-flex; align-items: center; justify-content: center; height: 44px; padding: 0 14px; border-radius: 6px; background: #256ef4; color: #fff; font-size: 15px; font-weight: 700; text-decoration: none; white-space: nowrap; }
+  .gp-cta:hover { background: #1d5ad0; }
+  .gp-burger { display: inline-flex; width: 44px; height: 44px; align-items: center; justify-content: center; border: 1px solid #d9dee5; border-radius: 6px; background: #fff; color: #15171c; }
+  .gp-mob { position: fixed; left: 0; right: 0; top: 65px; bottom: 0; overflow-y: auto; background: #fff; color: #15171c; padding: 8px 16px 32px; border-top: 1px solid #e6e9ee; }
+  .gp-mob > ul { list-style: none; margin: 0; padding: 0; }
+  .gp-mob > ul > li { padding: 16px 0; border-bottom: 1px solid #e6e9ee; }
+  .gp-mob > ul > li > a { font-size: 18px; font-weight: 800; text-decoration: none; color: #15171c; }
+  .gp-mob ul ul { list-style: none; margin: 8px 0 0; padding: 0; display: grid; grid-template-columns: 1fr 1fr; }
+  .gp-mob ul ul a { display: block; padding: 8px 0; font-size: 15px; color: #3d4450; text-decoration: none; }
+  .gp-mob ul ul a[aria-current] { color: #256ef4; font-weight: 700; }
+  .gp-mob .wide { display: flex; margin-top: 24px; height: 48px; font-size: 16px; }
+  .gp-tabs { background: #fff; border-bottom: 1px solid #e6e9ee; }
+  .gp-tabs ul { display: flex; gap: 24px; overflow-x: auto; list-style: none; margin: 0 auto; scrollbar-width: none; }
+  .gp-tabs ul::-webkit-scrollbar { display: none; }
+  .gp-tabs li { flex: 0 0 auto; }
+  .gp-tabs a { display: block; padding: 16px 0; border-bottom: 2px solid transparent; font-size: 16px; font-weight: 700; color: #3d4450; text-decoration: none; }
+  .gp-tabs a:hover { color: #15171c; }
+  .gp-tabs a[aria-current] { color: #256ef4; border-bottom-color: #256ef4; }
+  .gp-h :focus-visible, .gp-tabs :focus-visible { outline: 2px solid #256ef4; outline-offset: 2px; }
+  /* 히어로는 머리글과 탭을 뺀 높이 */
+  .hero { height: calc(100vh - 118px); height: calc(100svh - 118px); min-height: 520px; }
+  .hero h1 { top: 24px; }
+  @media (min-width: 768px) {
+    .gp-in { padding: 0 24px; }
+    .gp-h nav { height: 76px; }
+    .gp-mob { top: 77px; }
+    .hero { height: calc(100vh - 134px); height: calc(100svh - 134px); }
+  }
+  @media (min-width: 900px) { .hero h1 { top: 36px; } }
+  @media (min-width: 1024px) {
+    .gp-menu { display: flex; }
+    .gp-burger, .gp-mob { display: none !important; }
+    .gp-cta { padding: 0 20px; font-size: 16px; }
+  }
+  @media (min-width: 1280px) { .gp-q { display: flex; } .gp-qi { display: none; } }
+  /* 바닥글 */
+  footer.gp-f { background: #15171c; color: #aeb4bd; font-size: 15px; padding: 0; }
+  .gp-f a { display: inline; min-height: 0; color: inherit; text-decoration: none; }
+  .gp-f a:hover { color: #fff; }
+  .gp-f .gp-top { display: grid; gap: 32px; padding-top: 48px; padding-bottom: 32px; }
+  .gp-f .gp-name { display: flex; align-items: center; gap: 10px; margin: 0 0 16px; color: #fff; font-size: 19px; font-weight: 800; }
+  .gp-f .gp-name img { width: 32px; height: 32px; border-radius: 50%; }
+  .gp-f p { margin: 0 0 8px; }
+  .gp-f h2 { margin: 0 0 12px; color: #fff; font-size: 15px; font-weight: 800; }
+  .gp-f ul { list-style: none; margin: 0; padding: 0; display: grid; gap: 10px; }
+  .gp-f .gp-bot { border-top: 1px solid rgba(255, 255, 255, 0.12); }
+  .gp-f .gp-bot .gp-in { display: flex; flex-wrap: wrap; justify-content: space-between; gap: 12px; padding-top: 20px; padding-bottom: calc(env(safe-area-inset-bottom) + 28px); font-size: 14px; }
+  .gp-f .gp-pv { color: #fff; font-weight: 700; margin-right: 16px; }
+  .gp-f .gp-bot p { margin: 0 0 4px; }
+  @media (min-width: 768px) { .gp-f .gp-top { grid-template-columns: 1.4fr repeat(4, 1fr); padding-top: 56px; padding-bottom: 40px; } }
+  footer { padding: 40px 0 calc(env(safe-area-inset-bottom) + 40px); color: var(--ink-3); font-size: 14px; }
+  footer a { display: inline-flex; align-items: center; min-height: 44px; }
+
+  @media (min-width: 900px) {
+    .top { padding: 16px 20px 12px 32px; }
+    .brand b { font-size: 18px; }
+    .hero h1 { left: 32px; top: 84px; font-size: 46px; letter-spacing: -0.03em; }
+    .pin { height: 32px; font-size: 14px; padding: 0 13px 0 11px; border-radius: 16px; }
+    .day { bottom: 22px; }
+    .sheet { left: 32px; right: auto; bottom: 96px; width: 380px; padding: 20px; }
+    .sheet h2 { font-size: 26px; }
+    .list ul { grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 16px; max-width: 900px; }
+    .wrap { padding: 0 32px; }
+    section.blk { padding-top: 96px; }
+    section.blk h2 { font-size: 32px; margin-bottom: 28px; }
+    .prices { grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 16px; max-width: 1040px; }
+    .pc { display: flex; flex-direction: column; align-items: flex-start; padding: 24px 24px 26px; gap: 14px; }
+    .pc .nm { font-size: 18px; }
+    .pc .num { font-size: 96px; }
+    .pc .u { font-size: 16px; text-align: left; padding: 0; }
+    .incl { font-size: 18px; min-height: 0; margin-top: 20px; }
+    .price-area > *:not(h2) { max-width: 1040px; }
+    .checks { grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 12px; }
+    .ind { grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 12px; max-width: 1040px; }
+    .ind li { padding: 20px 22px; }
+    .mail { padding: 24px 28px; }
+    .spec div { grid-template-columns: 160px minmax(0, 1fr); }
+    .cmp-pick { display: none; }
+    .cmp { font-size: 16px; }
+    .cmp th, .cmp td { padding: 16px 18px; }
+    .cmp tbody th { width: 22%; }
+    .cmp[data-v] .a, .cmp[data-v] .b { display: table-cell; }
+    .checks li { padding: 18px 18px; font-size: 16px; }
+    .steps { grid-template-columns: repeat(5, minmax(0, 1fr)); }
+    .steps li { grid-template-columns: 1fr; align-content: start; padding: 26px 12px 0 0; min-height: 0; gap: 2px; }
+    .steps li::before { left: 0; top: 0; margin-top: 0; }
+    .steps li::after { left: 9px; right: 0; top: 4px; bottom: auto; width: auto; height: 1px; }
+    .faq > *:not(h2) { max-width: 860px; }
+    .cta { flex-direction: row; align-items: center; justify-content: space-between; padding: 40px 44px; margin-top: 112px; }
+    .cta h2 { font-size: 30px; }
+  }
+  @media (prefers-reduced-motion: reduce) {
+    html { scroll-behavior: auto; }
+    .list { display: block; }
+    .draft path { animation: none; stroke-dashoffset: 0; }
+    .col, .sheet, .pin, .draft { transition: none; }
+  }
+  /* 11-03 히어로 아래 본문은 본 사이트 톤(흰 바탕, 회색 구간, 검정 제목, 파란 강조, 남색 상담 띠). 히어로와 건물 카드는 위 어두운 토큰을 그대로 쓴다 */
+  body { background: #fff; }
+  main, .list {
+    --bg: #fff; --panel: #fff; --card: #f6f7f9; --card-2: #eef3ff;
+    --ink: #15171c; --ink-2: #3d4450; --ink-3: #5b6370;
+    --line: #e6e9ee; --line-2: #c9cfd8; --focus: #256ef4;
+    background: #fff; color: var(--ink);
+  }
+  main :focus-visible, .list :focus-visible { outline-color: #256ef4; }
+  main .wrap, .list .wrap { max-width: 1248px; }
+  .after { padding-top: 0; }
+  main section.blk { padding: 64px 0; border-top: 1px solid #e6e9ee; }
+  main section.blk:first-child { border-top: 0; }
+  main section.blk.gray { background: #f4f6f9; border-top: 0; }
+  main section.blk.gray + section.blk { border-top: 0; }
+  main section.blk h2, .list h2 { font-size: 30px; font-weight: 800; line-height: 1.25; letter-spacing: -0.04em; margin: 0 0 32px; }
+  .list { padding: 64px 0; }
+  .list .th { background: #f4f6f9; border: 1px solid #e6e9ee; }
+  .list b { font-size: 16px; }
+  .spec { border-top: 2px solid #15171c; }
+  .spec div:first-child { border-top: 0; }
+  .spec dt { color: #15171c; font-weight: 800; }
+  .spec dd { color: #3d4450; }
+  .mail { background: #fff; border: 1px solid #e6e9ee; border-top: 2px solid #15171c; border-radius: 0; }
+  .mail .sum { color: #256ef4; }
+  .to b { color: #15171c; }
+  .pc { background: #fff; border: 1px solid #e6e9ee; border-radius: 8px; }
+  .pc:hover { border-color: #c9cfd8; }
+  .pc[aria-pressed="true"] { background: #fff; border-color: #256ef4; box-shadow: inset 0 0 0 1px #256ef4; }
+  .pc .num { color: #256ef4; }
+  .pc .nm { font-weight: 800; }
+  .incl b { color: #256ef4; }
+  .sub { font-size: 22px; letter-spacing: -0.03em; margin-top: 48px; }
+  .ind { border-top: 2px solid #15171c; gap: 0; }
+  .ind li { background: #fff; border-radius: 0; border-bottom: 1px solid #e6e9ee; padding: 20px 4px; }
+  .ind .h span { color: #256ef4; }
+  details:first-of-type { border-top: 2px solid #15171c; }
+  details { border-top: 1px solid #e6e9ee; }
+  summary { min-height: 64px; font-size: 17px; }
+  summary svg { color: #6b7280; }
+  .faq summary { justify-content: flex-start; }
+  .faq summary::before { content: "Q"; flex: 0 0 auto; color: #256ef4; font-weight: 800; font-size: 17px; }
+  .faq summary svg { margin-left: auto; }
+  .faq details p { padding-left: 28px; color: #3d4450; }
+  .cmp-pick button { border-radius: 6px; border-color: #c9cfd8; color: #3d4450; background: #fff; }
+  .cmp-pick button[aria-pressed="true"] { background: #256ef4; border-color: #256ef4; color: #fff; }
+  .cmp { border-top: 2px solid #15171c; }
+  .cmp thead th { color: #15171c; border-bottom-color: #e6e9ee; }
+  .cmp .me { background: #eef3ff; }
+  .cmp thead .me { color: #256ef4; border-radius: 0; }
+  .cmp tbody tr:last-child .me { border-radius: 0; }
+  .cmp tbody th { color: #5b6370; }
+  .checks li { background: #fff; border: 1px solid #e6e9ee; border-radius: 8px; }
+  .checks svg { color: #256ef4; }
+  .steps li::before { background: #fff; border: 2px solid #256ef4; width: 12px; height: 12px; margin-top: -6px; left: 2px; border-radius: 50%; }
+  .steps li::after { background: #c9d6f5; width: 2px; left: 7px; top: calc(50% + 6px); bottom: calc(-50% + 6px); }
+  .steps em { color: #256ef4; font-weight: 700; }
+  .btn { height: 48px; border-radius: 6px; background: #256ef4; color: #fff; font-weight: 700; font-size: 16px; }
+  .btn:hover { background: #0b50d0; }
+  .btn.line { background: #fff; color: #15171c; box-shadow: inset 0 0 0 1px #c9cfd8; }
+  .btn.line:hover { background: #fff; box-shadow: inset 0 0 0 1px #15171c; }
+  main section.band { background: #0f1b3d; color: #fff; }
+  .band .cta { margin: 0; padding: 48px 0; background: transparent; border-radius: 0; }
+  .band .cta h2 { letter-spacing: -0.04em; }
+  .band .cta p { color: #aebbd6; }
+  .band .btn { background: #fff; color: #15171c; }
+  .band .btn:hover { background: #e8efff; }
+  .band .btn.line { background: transparent; color: #fff; box-shadow: none; }
+  .band .btn.line:hover { background: rgba(255, 255, 255, 0.1); }
+  .band :focus-visible { outline-color: #fff; }
+  @media (min-width: 900px) {
+    main section.blk { padding: 96px 0; }
+    main section.blk h2, .list h2 { font-size: 44px; margin-bottom: 40px; }
+    .list { padding: 96px 0; }
+    .pc { padding: 28px 28px 30px; }
+    .ind { grid-template-columns: 1fr 1fr; column-gap: 32px; }
+    .ind li { padding: 24px 4px; }
+    .steps li::before { left: 0; top: 0; margin-top: 0; }
+    .steps li::after { left: 12px; top: 5px; height: 2px; width: auto; }
+    .band .cta { padding: 56px 0; margin: 0; }
+    .band .cta h2 { font-size: 32px; }
+  }
+  /* 11-03 사이트 /3d 페이지 안에 끼울 때는 섬 화면만 */
+  .embed .gp-h, .embed .gp-tabs, .embed .gp-f, .embed main, .embed .list, .embed .top, .embed .menu { display: none !important; }
+  /* 11-04 3D가 뜨기 전 바탕은 사이트 제목 띠와 같은 남색 */
+  .embed body { background: #0f1b3d; overflow: hidden; }
+  .embed .hero { height: 100vh; min-height: 0; background: #0f1b3d; }
+  .embed .hero h1 { visibility: hidden; }
+  .embed.no-gl .list, .embed .no-gl .list { display: block !important; }
+  /* 11-04 3D가 0.6초 안에 안 뜰 때만 곰 로딩(키오스크 3D 체험과 같은 모양). 빨리 뜨면 나오지 않는다 */
+  .boot { position: absolute; inset: 0; z-index: 3; display: none; flex-direction: column; align-items: center; justify-content: center; gap: 14px; pointer-events: none; }
+  .boot.on { display: flex; }
+  .gl-on .boot, .no-gl .boot { display: none !important; }
+  .boot img { width: 88px; height: 88px; border-radius: 50%; box-shadow: 0 6px 16px rgba(0, 0, 0, 0.25); animation: boot-bob 1.6s ease-in-out infinite; }
+  .boot p { margin: 0; font-size: 14px; font-weight: 700; color: rgba(243, 236, 226, 0.85); }
+  .boot i { display: block; width: 160px; height: 4px; border-radius: 2px; background: rgba(243, 236, 226, 0.15); overflow: hidden; }
+  .boot i::after { content: ""; display: block; width: 40%; height: 100%; border-radius: 2px; background: rgba(243, 236, 226, 0.55); animation: boot-run 1.2s ease-in-out infinite; }
+  @keyframes boot-bob { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(-8px); } }
+  @keyframes boot-run { 0% { transform: translateX(-100%); } 100% { transform: translateX(250%); } }
+  @media (prefers-reduced-motion: reduce) { .boot img, .boot i::after { animation: none; } }
+</style>
+<script type="importmap">
+{ "imports": {
+  "three": "https://cdn.jsdelivr.net/npm/three@0.160.0/build/three.module.js",
+  "three/addons/": "https://cdn.jsdelivr.net/npm/three@0.160.0/examples/jsm/"
+} }
+</script>
+</head>
+<body>
+<!-- 11-03 본 사이트(gompartner.co.kr)와 같은 머리글, 서비스 탭. 메뉴를 바꾸면 포트폴리오-사이트 components/classic/ClassicHeader.tsx, pricing/tabs.ts 와 같이 맞춘다 -->
+<header class="gp-h">
+  <nav class="gp-in" aria-label="주 메뉴">
+    <a class="gp-logo" href="/">곰파트너</a>
+    <ul class="gp-menu" role="list"><li><a href="/story">회사소개</a></li><li class="dd"><a href="/homepage" aria-current="true">제작<svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m6 9 6 6 6-6"/></svg></a><ul><li><a href="/homepage">홈페이지 제작</a></li><li><a href="/landing-page">랜딩페이지 제작</a></li><li><a href="/program">업무 프로그램 제작</a></li><li><a href="/app">앱 제작</a></li><li><a href="/kiosk">키오스크 화면 제작</a></li><li><a href="/3d/" aria-current="page">3D 웹 제작</a></li></ul></li><li class="dd"><a href="/maintenance">유지보수<svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m6 9 6 6 6-6"/></svg></a><ul><li><a href="/maintenance/fix">오류 수정</a></li><li><a href="/maintenance/takeover">업체 이관</a></li><li><a href="/maintenance/update">보안 업데이트</a></li><li><a href="/maintenance/monthly">월 관리</a></li></ul></li><li class="dd"><a href="/works">카탈로그<svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m6 9 6 6 6-6"/></svg></a><ul><li><a href="/works">전체</a></li><li><a href="/works/hospital">병원, 약국</a></li><li><a href="/works/store">카페, 가게</a></li><li><a href="/works/professional">법률, 세무, 부동산</a></li><li><a href="/works/company">기업, 제조</a></li><li><a href="/works/academy">학원, 교육</a></li><li><a href="/works/landing">랜딩페이지</a></li><li><a href="/works/app">앱</a></li><li><a href="/works/kiosk">키오스크</a></li></ul></li><li class="dd"><a href="/faq">고객지원<svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m6 9 6 6 6-6"/></svg></a><ul><li><a href="/notice">공지사항</a></li><li><a href="/faq">자주 묻는 질문</a></li><li><a href="/contact">상담 신청</a></li></ul></li></ul>
+    <div class="gp-r">
+      <form class="gp-q" action="/search" method="get" role="search"><label for="gp-q" class="sr">통합검색</label><svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><circle cx="11" cy="11" r="7"/><path d="m20 20-3.5-3.5"/></svg><input id="gp-q" name="q" type="search" placeholder="서비스, 카탈로그 검색" autocomplete="off"></form>
+      <a class="gp-qi" href="/search" aria-label="통합검색"><svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><circle cx="11" cy="11" r="7"/><path d="m20 20-3.5-3.5"/></svg></a>
+      <a class="gp-cta" href="/contact">상담 신청</a>
+      <button type="button" class="gp-burger" id="gp-burger" aria-label="전체 메뉴" aria-expanded="false" aria-controls="gp-mob"><svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><path d="M4 7h16M4 12h16M4 17h16"/></svg></button>
+    </div>
+  </nav>
+  <div class="gp-mob" id="gp-mob" hidden><ul role="list"><li><a href="/story">회사소개</a></li><li><a href="/homepage">제작</a><ul><li><a href="/homepage">홈페이지 제작</a></li><li><a href="/landing-page">랜딩페이지 제작</a></li><li><a href="/program">업무 프로그램 제작</a></li><li><a href="/app">앱 제작</a></li><li><a href="/kiosk">키오스크 화면 제작</a></li><li><a href="/3d/" aria-current="page">3D 웹 제작</a></li></ul></li><li><a href="/maintenance">유지보수</a><ul><li><a href="/maintenance/fix">오류 수정</a></li><li><a href="/maintenance/takeover">업체 이관</a></li><li><a href="/maintenance/update">보안 업데이트</a></li><li><a href="/maintenance/monthly">월 관리</a></li></ul></li><li><a href="/works">카탈로그</a><ul><li><a href="/works">전체</a></li><li><a href="/works/hospital">병원, 약국</a></li><li><a href="/works/store">카페, 가게</a></li><li><a href="/works/professional">법률, 세무, 부동산</a></li><li><a href="/works/company">기업, 제조</a></li><li><a href="/works/academy">학원, 교육</a></li><li><a href="/works/landing">랜딩페이지</a></li><li><a href="/works/app">앱</a></li><li><a href="/works/kiosk">키오스크</a></li></ul></li><li><a href="/faq">고객지원</a><ul><li><a href="/notice">공지사항</a></li><li><a href="/faq">자주 묻는 질문</a></li><li><a href="/contact">상담 신청</a></li></ul></li></ul><a class="gp-cta wide" href="/contact">상담 신청</a></div>
+</header>
+<div class="gp-tabs"><ul class="gp-in" role="list"><li><a href="/homepage">홈페이지 제작</a></li><li><a href="/landing-page">랜딩페이지 제작</a></li><li><a href="/program">업무 프로그램 제작</a></li><li><a href="/app">앱 제작</a></li><li><a href="/kiosk">키오스크 화면 제작</a></li><li><a href="/3d/" aria-current="page">3D 웹 제작</a></li><li><a href="/maintenance">유지보수</a></li></ul></div>
+<header class="top">
+  <a class="brand" href="./">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linejoin="round" aria-hidden="true"><path d="M12 2.5l8.5 4.75v9.5L12 21.5l-8.5-4.75v-9.5z M12 12v9.5 M12 12l8.5-4.75 M12 12L3.5 7.25"/></svg>
+    <b>곰파트너</b><small>3D 웹 제작</small>
+  </a>
+  <div class="r">
+    <a class="ask" href="/contact">상담 신청</a>
+    <button type="button" class="icon-btn" id="menu-btn" aria-label="메뉴" aria-expanded="false" aria-controls="menu">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><path d="M4 8h16M4 16h16"/></svg>
+    </button>
+  </div>
+</header>
+<nav class="menu" id="menu" aria-label="주요 메뉴" hidden>
+  <a href="#catalog">카탈로그</a>
+  <a href="#lead">견적 접수</a>
+  <a href="#price">비용</a>
+  <a href="#compare">비교</a>
+  <a href="#spec">사양</a>
+  <a href="#process">진행 방식</a>
+  <a href="/contact">상담 신청</a>
+</nav>
+
+<div class="hero" id="hero">
+  <div class="boot" id="boot" aria-live="polite"><img src="/images/bear-avatar.webp" alt="" width="88" height="88"><i></i><p id="boot-t">3D 마을 준비 중</p></div>
+  <script>
+    // 0.6초가 지나도 3D가 안 떴으면 곰 로딩을 보인다
+    setTimeout(function () {
+      if (document.body.classList.contains('gl-on') || document.body.classList.contains('no-gl')) return;
+      if (new URLSearchParams(location.search).get('lang') === 'en') document.getElementById('boot-t').textContent = 'Loading the 3D village';
+      document.getElementById('boot').classList.add('on');
+    }, 600);
+  </script>
+  <canvas id="gl" aria-label="카탈로그 마을 3D 화면. 건물 이름표를 누르면 해당 카탈로그를 엽니다."></canvas>
+  <svg class="draft" viewBox="0 0 100 100" preserveAspectRatio="none" aria-hidden="true">
+    <path pathLength="1" vector-effect="non-scaling-stroke" d="M10 62 L50 44 L90 62 L50 80 Z"/>
+    <path pathLength="1" vector-effect="non-scaling-stroke" d="M30 53 L70 71 M30 71 L70 53"/>
+  </svg>
+  <h1>고객이 직접 구성하는 3D 견적 화면</h1>
+  <div class="pins" id="pins"></div>
+  <div class="sheet" id="sheet" role="dialog" aria-labelledby="sheet-t" aria-hidden="true">
+    <h2 id="sheet-t"></h2>
+    <p class="k" id="sheet-k"></p>
+    <div class="go" id="sheet-go"></div>
+    <button type="button" class="icon-btn x" id="sheet-x" aria-label="닫기">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><path d="M6 6l12 12M18 6L6 18"/></svg>
+    </button>
+  </div>
+  <div class="day" id="day">
+    <button type="button" class="icon-btn" id="play" aria-label="일시 정지">
+      <svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true" id="play-i"><rect x="6" y="5" width="4" height="14" rx="1"/><rect x="14" y="5" width="4" height="14" rx="1"/></svg>
+    </button>
+    <div class="track" id="track">
+      <i class="fill" id="fill"></i>
+      <button type="button" data-t="0.0" aria-label="아침" aria-pressed="true" style="left:4%"><span><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><path d="M3 18h18M7 18a5 5 0 0 1 10 0M12 4v4M5 9l2 2M19 9l-2 2"/></svg></span></button>
+      <button type="button" data-t="0.5" aria-label="오후" aria-pressed="false" style="left:50%"><span><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><circle cx="12" cy="12" r="4"/><path d="M12 2v2M12 20v2M2 12h2M20 12h2M5 5l1.5 1.5M17.5 17.5L19 19M5 19l1.5-1.5M17.5 6.5L19 5"/></svg></span></button>
+      <button type="button" data-t="0.64" aria-label="저녁" aria-pressed="false" style="left:66%"><span><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><path d="M3 17h18M7 17a5 5 0 0 1 10 0M4 21h16"/></svg></span></button>
+      <button type="button" data-t="0.8" aria-label="밤" aria-pressed="false" style="left:84%"><span><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20 14.5A8 8 0 1 1 9.5 4a6.5 6.5 0 0 0 10.5 10.5z"/></svg></span></button>
+    </div>
+  </div>
+</div>
+
+<section class="list" id="catalog" aria-labelledby="catalog-t">
+  <div class="wrap">
+    <h2 id="catalog-t">업종별 카탈로그</h2>
+    <ul>
+      <li><a href="sofa/"><span class="th"><img src="assets/thumb/sm/sofa.jpg" alt="" width="720" height="450" loading="lazy"></span><b>가구 쇼룸 모듈 소파</b></a></li>
+      <li><a href="configurator/"><span class="th"><img src="assets/thumb/sm/configurator.jpg" alt="" width="720" height="450" loading="lazy"></span><b>가구 쇼룸 시스템 선반</b></a></li>
+      <li><a href="space/"><span class="th"><img src="assets/thumb/sm/space.jpg" alt="" width="720" height="450" loading="lazy"></span><b>인테리어 시공 사례</b></a></li>
+      <li><a href="door/"><span class="th"><img src="assets/thumb/sm/door.jpg" alt="" width="720" height="450" loading="lazy"></span><b>인테리어 현관 중문</b></a></li>
+      <li><a href="sign/"><span class="th"><img src="assets/thumb/sm/sign.jpg" alt="" width="720" height="450" loading="lazy"></span><b>간판 제작 채널 간판</b></a></li>
+      <li><a href="hanok/"><span class="th"><img src="assets/thumb/sm/hanok.jpg" alt="" width="720" height="450" loading="lazy"></span><b>한옥 찻집</b></a></li>
+    </ul>
+  </div>
+</section>
+
+<main>
+  <div class="after" id="after">
+    <section class="blk" id="gain">
+      <div class="wrap">
+        <h2>업체가 얻는 것</h2>
+        <dl class="spec">
+          <div><dt>3D 구성</dt><dd>손님이 폭과 높이를 넣고 모듈, 색상, 소재를 바꾸며 360도로 확인합니다. "우리 집에 맞는지, 어울리는지"를 사기 전에 직접 봅니다.</dd></div>
+          <div><dt>견적 접수</dt><dd>단가표와 옵션 규칙을 연결해 고르는 즉시 합계가 나오고, 고른 구성과 금액이 이름, 연락처와 함께 접수됩니다. 같은 가격 문의에 매번 답하지 않아도 됩니다.</dd></div>
+          <div><dt>실측 전 확정</dt><dd>접수된 구성을 3D로 다시 열어 보고 실측을 갑니다. 디자인과 예산이 정해진 손님만 방문해 계약 안 되는 실측이 줄어듭니다.</dd></div>
+        </dl>
+      </div>
+    </section>
+
+    <section class="blk gray" id="lead">
+      <div class="wrap">
+        <h2>견적 요청은 이렇게 들어옵니다</h2>
+        <article class="mail" aria-labelledby="mail-t">
+          <div class="mh"><b id="mail-t">[견적 요청] 모듈 소파</b><span>가구 쇼룸 홈페이지에서 접수</span></div>
+          <dl>
+            <div><dt>이름</dt><dd>정ㅇ호</dd></div>
+            <div><dt>연락처</dt><dd>010-****-5678</dd></div>
+            <div><dt>지역</dt><dd>서울 관악구</dd></div>
+            <div><dt>구성</dt><dd>1인 모듈 3, 암 레스트 2, 생활방수 패브릭 오트밀, 오크 원목 다리</dd></div>
+            <div><dt>합계</dt><dd class="sum">3,604,000원</dd></div>
+          </dl>
+          <a class="btn line" href="sofa/">고객이 고른 구성 3D로 열기</a>
+        </article>
+        <p class="to"><b>받는 곳</b>메일, 구글 시트, 사용 중인 관리자 화면(협의)</p>
+      </div>
+    </section>
+
+    <section class="blk" id="price">
+      <div class="wrap price-area">
+        <h2>비용</h2>
+        <div class="prices" id="prices">
+          <button type="button" class="pc" data-i="0" aria-pressed="true"><span class="nm">공간 3D 뷰어</span><span class="num" data-v="180" aria-hidden="true"></span><span class="u"><span class="sr-num">180</span>만 원부터, <b>3주</b></span></button>
+          <button type="button" class="pc" data-i="1" aria-pressed="false"><span class="nm">브랜드 3D 홈페이지</span><span class="num" data-v="250" aria-hidden="true"></span><span class="u"><span class="sr-num">250</span>만 원부터, <b>4주</b></span></button>
+          <button type="button" class="pc" data-i="2" aria-pressed="false"><span class="nm">제품 3D 컨피규레이터</span><span class="num" data-v="450" aria-hidden="true"></span><span class="u"><span class="sr-num">450</span>만 원부터, <b>5주</b></span></button>
+        </div>
+        <p class="incl" id="incl" aria-live="polite"><b>기본 포함</b>3D 파일 1개 표시, 3D, 평면도, 둘러보기 전환, 링크 공유</p>
+        <p class="vat">부가세 별도, 3D 파일을 주시는 기준입니다.</p>
+        <h3 class="sub">업종별 예상 비용</h3>
+        <ul class="ind">
+          <li><div class="h"><b>가구</b><span>480만 원부터</span></div><dl><dt>구성</dt><dd>컨피규레이터, 모델링 1종</dd><dt>자료</dt><dd>제품 사진, 치수, 원단 목록, 단가표</dd></dl></li>
+          <li><div class="h"><b>중문, 창호</b><span>480만 원부터</span></div><dl><dt>구성</dt><dd>컨피규레이터, 모델링 1종</dd><dt>자료</dt><dd>도면(DWG, DXF), 단가표</dd></dl></li>
+          <li><div class="h"><b>간판</b><span>450만 원부터</span></div><dl><dt>구성</dt><dd>컨피규레이터, 입력한 글자로 간판 생성</dd><dt>자료</dt><dd>단가표, 사용 서체</dd></dl></li>
+          <li><div class="h"><b>인테리어, 숙박</b><span>180만 원부터</span></div><dl><dt>구성</dt><dd>공간 3D 뷰어, 공간 모델링 별도 견적</dd><dt>자료</dt><dd>평면도, 현장 사진</dd></dl></li>
+        </ul>
+        <details>
+          <summary>따로 드는 비용<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M6 9l6 6 6-6"/></svg></summary>
+          <ul>
+            <li>3D 모델링 (파일이 없을 때): 제품 1종 30만 원부터</li>
+            <li>옵션과 가격을 직접 고치는 관리자 화면: 80만 원</li>
+            <li>제품 추가: 1종 60만 원부터</li>
+            <li>영문 화면: 20만 원</li>
+            <li>월 운영(호스팅, 제품과 가격 수정): 월 10만 원부터</li>
+          </ul>
+        </details>
+        <details>
+          <summary>모든 분야 공통<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M6 9l6 6 6-6"/></svg></summary>
+          <ul>
+            <li>원본 소스와 3D 원본 파일 제공</li>
+            <li>실기기 점검표 제공</li>
+            <li>완료 후 1개월 무상 오류 수정</li>
+            <li>기존 홈페이지(아임웹, 카페24, 워드프레스)에 붙이는 작업 포함</li>
+          </ul>
+        </details>
+      </div>
+    </section>
+
+    <section class="blk" id="compare">
+      <div class="wrap">
+        <h2>제작 방식 비교</h2>
+        <div class="cmp-pick" role="group" aria-label="비교할 방식">
+          <button type="button" data-v="a" aria-pressed="true">3D 전문 제작사</button>
+          <button type="button" data-v="b" aria-pressed="false">3D 모델링 외주</button>
+        </div>
+        <div class="cmp-box">
+          <table class="cmp" id="cmp" data-v="a">
+            <thead>
+              <tr><th scope="col"><span class="sr">항목</span></th><th scope="col" class="me">곰파트너</th><th scope="col" class="a">3D 전문 제작사</th><th scope="col" class="b">3D 모델링 외주</th></tr>
+            </thead>
+            <tbody>
+              <tr><th scope="row">비용</th><td class="me"><b>180만 원부터</b></td><td class="a">2,000만 원부터</td><td class="b">제품별 건별 견적</td></tr>
+              <tr><th scope="row">받는 것</th><td class="me">3D 화면, 견적 접수, 홈페이지 연결</td><td class="a">3D 화면, 구매 연동</td><td class="b">3D 파일</td></tr>
+              <tr><th scope="row">견적 자동 계산</th><td class="me">포함</td><td class="a">포함</td><td class="b">없음, 따로 개발</td></tr>
+              <tr><th scope="row">지금 홈페이지에 붙이기</th><td class="me">아임웹, 카페24, 워드프레스 포함</td><td class="a">협의</td><td class="b">따로 개발</td></tr>
+              <tr><th scope="row">옵션, 가격 수정</th><td class="me">표 파일로 직접 수정, 관리자 화면 80만 원</td><td class="a">협의</td><td class="b">다시 의뢰</td></tr>
+              <tr><th scope="row">중문, 간판 견본</th><td class="me">있음</td><td class="a">공개 사례 없음</td><td class="b">해당 없음</td></tr>
+              <tr><th scope="row">원본 소유</th><td class="me">원본 소스와 3D 파일 모두 고객</td><td class="a">계약에 따라 다름</td><td class="b">3D 파일 고객</td></tr>
+            </tbody>
+          </table>
+        </div>
+        <p class="vat">3D 전문 제작사 비용은 국내 업체가 공개한 가장 작은 프로젝트 가격(2026년 11월).</p>
+      </div>
+    </section>
+
+    <section class="blk gray">
+      <div class="wrap">
+        <h2>납품 전에 확인하는 것</h2>
+        <ul class="checks">
+          <li><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><rect x="7" y="2" width="10" height="20" rx="2"/><path d="M11 18h2"/></svg>실기기 확인</li>
+          <li><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M12 3v12"/><path d="M7 10l5 5 5-5"/><path d="M4 20h16"/></svg>3D 파일 용량</li>
+          <li><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="M9 9h6v6H9z"/></svg>동작 줄이기 설정</li>
+          <li><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><rect x="3" y="5" width="18" height="14" rx="2"/><path d="M3 15l5-4 4 3 3-2 6 4"/></svg>3D가 안 뜨는 환경 대비</li>
+          <li><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M4 7h16M4 12h10M4 17h7"/></svg>검색 노출</li>
+          <li><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M8 6l-6 6 6 6M16 6l6 6-6 6"/></svg>원본 소스와 인계 문서</li>
+        </ul>
+      </div>
+    </section>
+
+    <section class="blk" id="spec">
+      <div class="wrap">
+        <h2>사양</h2>
+        <dl class="spec">
+          <div><dt>받는 파일</dt><dd>GLB, GLTF, FBX, OBJ, 도면 DWG, DXF, PDF</dd></div>
+          <div><dt>동작 환경</dt><dd>크롬, 사파리, 삼성 인터넷, 엣지 최신 버전. PC, 휴대폰, 태블릿</dd></div>
+          <div><dt>견적 접수</dt><dd>메일, 구글 시트. 사용 중인 관리자 화면 연동은 협의</dd></div>
+          <div><dt>3D가 안 뜰 때</dt><dd>사진과 옵션 표로 같은 견적 요청을 받습니다</dd></div>
+          <div><dt>소유권</dt><dd>원본 소스와 3D 파일은 납품 후 고객 소유</dd></div>
+        </dl>
+      </div>
+    </section>
+
+    <section class="blk" id="process">
+      <div class="wrap">
+        <h2>진행 방식</h2>
+        <ol class="steps">
+          <li><em>1일</em><b>자료 확인</b></li>
+          <li><em>1주</em><b>3D 시안</b></li>
+          <li><em>2~3주</em><b>개발</b></li>
+          <li><em>3일</em><b>실기기 점검</b></li>
+          <li><em>1개월</em><b>납품과 오류 수정</b></li>
+        </ol>
+      </div>
+    </section>
+
+    <section class="blk">
+      <div class="wrap faq">
+        <h2>자주 묻는 질문</h2>
+        <details><summary>3D 파일이 없어도 만들 수 있습니까?<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M6 9l6 6 6-6"/></svg></summary><p>제품 사진과 치수, 또는 도면(DWG, DXF, PDF)이 있으면 모델링부터 진행합니다. 모델링 비용은 형태가 복잡한 정도에 따라 달라서 자료를 본 뒤 견적을 드립니다.</p></details>
+        <details><summary>지금 쓰는 홈페이지에 붙일 수 있습니까?<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M6 9l6 6 6-6"/></svg></summary><p>네. 3D 화면을 별도 페이지로 만들고 기존 홈페이지에 메뉴나 버튼으로 연결하거나, 페이지 안에 넣는 코드로 드립니다. 아임웹, 카페24, 워드프레스 모두 가능합니다.</p></details>
+        <details><summary>휴대폰에서 느리지 않습니까?<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M6 9l6 6 6-6"/></svg></summary><p>모델의 면 수와 텍스처 크기를 줄이고, 화면 해상도를 기기에 맞춰 제한합니다. 시안 단계에서 휴대폰으로 먼저 열어 보시고 속도를 확인한 뒤 개발을 진행합니다.</p></details>
+        <details><summary>납품 후 옵션이나 가격이 바뀌면 어떻게 합니까?<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M6 9l6 6 6-6"/></svg></summary><p>옵션과 가격은 코드와 분리된 표 형식 파일로 관리해 직접 고칠 수 있게 드립니다. 관리자 화면을 추가하면 웹에서 바로 바꿀 수 있습니다. 직접 고치기 어려우면 월 운영(월 10만 원부터)으로 호스팅과 제품, 가격 수정을 맡습니다.</p></details>
+      </div>
+    </section>
+
+    <section class="band">
+      <div class="wrap">
+        <div class="cta">
+          <h2>도면이나 제품 사진으로 상담합니다</h2>
+          <p>상담 뒤 견적서와 일정표를 PDF로 드립니다.</p>
+          <div class="row">
+            <a class="btn" href="/contact">상담 신청</a>
+            <a class="btn line" href="mailto:contact@gompartner.co.kr">메일 보내기</a>
+          </div>
+        </div>
+      </div>
+    </section>
+  </div>
+</main>
+
+<footer class="gp-f">
+  <div class="gp-in gp-top">
+    <div>
+      <p class="gp-name"><img src="/images/bear-avatar.webp" alt="곰파트너 곰 캐릭터" width="32" height="32" loading="lazy">곰파트너</p>
+      <p><a href="tel:050713984044">전화 0507-1398-4044</a></p>
+      <p>팩스 0504-491-4044</p>
+      <p><a href="mailto:contact@gompartner.co.kr">이메일 contact@gompartner.co.kr</a></p>
+    </div>
+    <nav aria-label="바닥글 제작 메뉴"><h2>제작</h2><ul role="list"><li><a href="/homepage">홈페이지 제작</a></li><li><a href="/landing-page">랜딩페이지 제작</a></li><li><a href="/program">업무 프로그램 제작</a></li><li><a href="/app">앱 제작</a></li><li><a href="/kiosk">키오스크 화면 제작</a></li><li><a href="/3d/" aria-current="page">3D 웹 제작</a></li></ul></nav>
+    <nav aria-label="바닥글 유지보수 메뉴"><h2>유지보수</h2><ul role="list"><li><a href="/maintenance/fix">오류 수정</a></li><li><a href="/maintenance/takeover">업체 이관</a></li><li><a href="/maintenance/update">보안 업데이트</a></li><li><a href="/maintenance/monthly">월 관리</a></li></ul></nav>
+    <nav aria-label="바닥글 곰파트너 메뉴"><h2>곰파트너</h2><ul role="list"><li><a href="/story">회사소개</a></li><li><a href="/works">카탈로그</a></li><li><a href="/notice">공지사항</a></li><li><a href="/faq">자주 묻는 질문</a></li><li><a href="/contact">상담 신청</a></li></ul></nav>
+    <div><h2>채널</h2><ul role="list"><li><a href="https://www.instagram.com/gompartner.co.kr" target="_blank" rel="noopener noreferrer">인스타그램 @gompartner.co.kr<span class="sr"> (새 창)</span></a></li><li><a href="https://www.youtube.com/@gompartner" target="_blank" rel="noopener noreferrer">유튜브 @gompartner<span class="sr"> (새 창)</span></a></li><li><a href="https://clip.naver.com/@gompartner" target="_blank" rel="noopener noreferrer">네이버 클립 @gompartner<span class="sr"> (새 창)</span></a></li><li><a href="https://blog.naver.com/gompartner" target="_blank" rel="noopener noreferrer">네이버 블로그 gompartner<span class="sr"> (새 창)</span></a></li></ul></div>
+  </div>
+  <div class="gp-bot"><div class="gp-in"><div><a class="gp-pv" href="/privacy">개인정보처리방침</a><a href="/en" lang="en" hreflang="en">English</a></div><div><p>상호 곰파트너 | 사업자등록번호 725-40-01614</p><p>Copyright 2026 곰파트너. All rights reserved.</p></div></div></div>
+</footer>
+
+<script>
+// 3D가 못 떠도 메뉴와 비용 선택은 동작합니다
+(function () {
+  const $ = id => document.getElementById(id);
+  // 11-03 사이트 머리글 전체 메뉴(좁은 화면)
+  const gb = $('gp-burger'), gm = $('gp-mob');
+  const gset = on => { gm.hidden = !on; gb.setAttribute('aria-expanded', String(on)); gb.setAttribute('aria-label', on ? '전체 메뉴 닫기' : '전체 메뉴'); document.body.style.overflow = on ? 'hidden' : ''; };
+  gb.addEventListener('click', () => gset(gm.hidden));
+  // 좁은 화면에서 현재 탭(3D 웹 제작)이 보이게 탭 줄을 민다
+  { const t = document.querySelector('.gp-tabs a[aria-current]'), ul = t && t.closest('ul'); if (ul && ul.scrollWidth > ul.clientWidth) ul.scrollLeft = t.offsetLeft - (ul.clientWidth - t.offsetWidth) / 2; }
+  document.addEventListener('keydown', e => { if (e.key === 'Escape' && !gm.hidden) { gset(false); gb.focus(); } });
+  const reduce = matchMedia('(prefers-reduced-motion: reduce)').matches;
+  document.querySelectorAll('.cmp-pick button').forEach(b => b.addEventListener('click', () => {
+    $('cmp').dataset.v = b.dataset.v;
+    document.querySelectorAll('.cmp-pick button').forEach(x => x.setAttribute('aria-pressed', x === b ? 'true' : 'false'));
+  }));
+  const menu = $('menu'), menuBtn = $('menu-btn');
+  const setMenu = open => { menu.hidden = !open; menuBtn.setAttribute('aria-expanded', String(open)); };
+  menuBtn.addEventListener('click', () => setMenu(menu.hidden));
+  menu.addEventListener('click', e => { if (e.target.closest('a')) setMenu(false); });
+  document.addEventListener('pointerdown', e => { if (!menu.hidden && !menu.contains(e.target) && !menuBtn.contains(e.target)) setMenu(false); });
+  document.addEventListener('keydown', e => { if (e.key === 'Escape' && !menu.hidden) { setMenu(false); menuBtn.focus(); } });
+  addEventListener('scroll', () => document.body.classList.toggle('scrolled', scrollY > innerHeight * 0.6), { passive: true });
+
+  const INCL = [
+    '3D 파일 1개 표시, 3D, 평면도, 둘러보기 전환, 링크 공유',
+    '3D 장면 1개, 스크롤 카메라 4장면, 메뉴, 예약 폼',
+    '제품 1종, 옵션 4가지, 실시간 견적, 구성 공유, 견적 요청 접수'
+  ];
+  const nums = [...document.querySelectorAll('.pc .num')];
+  nums.forEach(el => {
+    el.innerHTML = [...el.dataset.v].map(() => `<span class="dg"><span class="col">${'0123456789'.split('').map(n => `<span>${n}</span>`).join('')}</span></span>`).join('');
+  });
+  function roll(on) {
+    nums.forEach((el, k) => {
+      const v = el.dataset.v;
+      el.querySelectorAll('.col').forEach((c, j) => {
+        c.style.transitionDelay = on ? (k * 0.14 + j * 0.1) + 's' : '0s';
+        c.style.transform = `translateY(${on ? -v[j] : 0}em)`;
+      });
+    });
+  }
+  if (reduce || !('IntersectionObserver' in window)) roll(true);
+  else {
+    const io = new IntersectionObserver(es => { if (es[0].isIntersecting) { roll(true); io.disconnect(); } }, { threshold: 0.35 });
+    io.observe($('prices'));
+  }
+  const pcs = [...document.querySelectorAll('.pc')];
+  $('prices').addEventListener('click', e => {
+    const b = e.target.closest('.pc'); if (!b) return;
+    const i = +b.dataset.i;
+    pcs.forEach((p, k) => p.setAttribute('aria-pressed', String(k === i)));
+    $('incl').innerHTML = '<b>기본 포함</b>' + INCL[i];
+  });
+})();
+</script>
+<script type="module">
+import * as THREE from 'three';
+import { RoomEnvironment } from 'three/addons/environments/RoomEnvironment.js';
+import { RoundedBoxGeometry } from 'three/addons/geometries/RoundedBoxGeometry.js';
+import { mergeGeometries } from 'three/addons/utils/BufferGeometryUtils.js';
+import { EffectComposer } from 'three/addons/postprocessing/EffectComposer.js';
+import { RenderPass } from 'three/addons/postprocessing/RenderPass.js';
+import { UnrealBloomPass } from 'three/addons/postprocessing/UnrealBloomPass.js';
+import { OutlinePass } from 'three/addons/postprocessing/OutlinePass.js';
+import { ShaderPass } from 'three/addons/postprocessing/ShaderPass.js';
+import { OutputPass } from 'three/addons/postprocessing/OutputPass.js';
+
+const $ = id => document.getElementById(id);
+const reduce = matchMedia('(prefers-reduced-motion: reduce)').matches;
+const clamp = (v, a, b) => Math.max(a, Math.min(b, v));
+const lerp = (a, b, t) => a + (b - a) * t;
+const sm = t => { t = clamp(t, 0, 1); return t * t * (3 - 2 * t); };
+const io = t => { t = clamp(t, 0, 1); return t < 0.5 ? 4 * t * t * t : 1 - Math.pow(-2 * t + 2, 3) / 2; };
+const range = (v, a, b) => clamp((v - a) / (b - a), 0, 1);
+const bump = (v, a, b, f = 0.15) => range(v, a, a + (b - a) * f) * (1 - range(v, b - (b - a) * f, b));
+const MOBILE = matchMedia('(pointer: coarse)').matches || innerWidth < 700;
+const V = (x, y, z) => new THREE.Vector3(x, y, z);
+
+const canvas = $('gl');
+let renderer = null;
+// WebGL2가 없으면 사진 목록만 보여 주고 3D는 시작하지 않습니다
+if (document.createElement('canvas').getContext('webgl2')) {
+  try { renderer = new THREE.WebGLRenderer({ canvas, antialias: false, powerPreference: 'high-performance' }); } catch (e) { renderer = null; }
+}
+if (!renderer) { document.body.classList.add('no-gl'); await new Promise(() => {}); }
+const DPR = Math.min(devicePixelRatio, MOBILE ? 2 : 1.75); // 11-03 휴대폰 1.5는 가는 선이 돌릴 때 반짝여 2로
+renderer.setPixelRatio(DPR);
+renderer.shadowMap.enabled = true;
+renderer.shadowMap.type = THREE.PCFSoftShadowMap;
+renderer.outputColorSpace = THREE.SRGBColorSpace;
+renderer.toneMapping = THREE.ACESFilmicToneMapping;
+
+const scene = new THREE.Scene();
+const pmrem = new THREE.PMREMGenerator(renderer);
+scene.environment = pmrem.fromScene(new RoomEnvironment(), 0.04).texture;
+pmrem.dispose();
+const camera = new THREE.PerspectiveCamera(24, innerWidth / innerHeight, 0.5, 260);
+
+// ---------- 하늘 ----------
+const skyU = { uTop: { value: new THREE.Color() }, uHor: { value: new THREE.Color() }, uH: { value: 800 } };
+const sky = new THREE.Mesh(new THREE.SphereGeometry(200, 32, 16), new THREE.ShaderMaterial({
+  uniforms: skyU, side: THREE.BackSide, depthWrite: false, fog: false,
+  vertexShader: 'varying vec3 vD; void main(){ vD = normalize(position); gl_Position = projectionMatrix * modelViewMatrix * vec4(position,1.0); }',
+  fragmentShader: 'uniform vec3 uTop, uHor; uniform float uH; varying vec3 vD; void main(){ float h = clamp(gl_FragCoord.y / uH, 0.0, 1.0); gl_FragColor = vec4(mix(uHor, uTop, smoothstep(0.15, 1.0, h)), 1.0); }'
+}));
+scene.add(sky);
+
+// ---------- 빛 ----------
+const hemi = new THREE.HemisphereLight(0xfff4e6, 0x5a4a3a, 0.6);
+scene.add(hemi);
+const sun = new THREE.DirectionalLight(0xfff1de, 3);
+sun.castShadow = true;
+sun.shadow.mapSize.set(MOBILE ? 1024 : 2048, MOBILE ? 1024 : 2048);
+sun.shadow.bias = -0.0008; sun.shadow.normalBias = 0.045; sun.shadow.radius = 3;
+Object.assign(sun.shadow.camera, { left: -15.5, right: 15.5, top: 15, bottom: -15, near: 8, far: 50 });
+scene.add(sun, sun.target);
+const PL = (c, d) => { const l = new THREE.PointLight(c, 0, d, 2); scene.add(l); return l; };
+const showLight = PL(0xffe2bd, 4.2), homeLight = PL(0xffc583, 9), teaLight = PL(0xff9f55, 10);
+
+// ---------- 텍스처 ----------
+let seed = 11;
+const rnd = () => (seed = (seed * 9301 + 49297) % 233280) / 233280;
+const texs = [];
+function ctex(w, h, draw, srgb = true) {
+  const c = document.createElement('canvas'); c.width = w; c.height = h;
+  const t = new THREE.CanvasTexture(c);
+  if (srgb) t.colorSpace = THREE.SRGBColorSpace;
+  t.anisotropy = Math.min(8, renderer.capabilities.getMaxAnisotropy());
+  t.wrapS = t.wrapT = THREE.RepeatWrapping;
+  t.userData.redraw = () => { draw(c.getContext('2d'), w, h); t.needsUpdate = true; };
+  t.userData.redraw();
+  texs.push(t);
+  return t;
+}
+const brickTex = ctex(256, 256, (g, w, h) => {
+  g.fillStyle = '#b9a28c'; g.fillRect(0, 0, w, h);
+  const bh = 16, bw = 42;
+  for (let r = 0; r < h / bh; r++) for (let c = -1; c < w / bw + 1; c++) {
+    const t = 0.88 + ((r * 7 + c * 13) % 9) / 40;
+    g.fillStyle = `rgb(${Math.round(176 * t)},${Math.round(104 * t)},${Math.round(80 * t)})`;
+    g.fillRect(c * bw + (r % 2) * bw / 2 + 1.5, r * bh + 1.5, bw - 3, bh - 3);
+  }
+});
+brickTex.repeat.set(1.6, 1.6);
+const boardTex = ctex(256, 256, (g, w, h) => {
+  for (let i = 0; i < 8; i++) { const t = 0.9 + (i * 37 % 10) / 50; g.fillStyle = `rgb(${Math.round(150 * t)},${Math.round(104 * t)},${Math.round(70 * t)})`; g.fillRect(i * 32, 0, 32, h); g.fillStyle = 'rgba(60,36,20,0.5)'; g.fillRect(i * 32, 0, 2, h); }
+});
+const latticeTex = ctex(128, 256, (g, w, h) => {
+  g.fillStyle = '#f4ecd8'; g.fillRect(0, 0, w, h);
+  g.fillStyle = '#7b4f32';
+  for (let x = 0; x <= w; x += 21) g.fillRect(x - 2, 0, 4, h);
+  for (let y = 0; y <= h; y += 21) g.fillRect(0, y - 2, w, 4);
+  g.fillRect(0, 0, w, 8); g.fillRect(0, h - 8, w, 8); g.fillRect(0, 0, 8, h); g.fillRect(w - 8, 0, 8, h);
+});
+const awningTex = ctex(256, 64, (g, w, h) => { for (let i = 0; i < 8; i++) { g.fillStyle = i % 2 ? '#f3ece0' : '#2f5d50'; g.fillRect(i * 32, 0, 32, h); } });
+const awningTex2 = ctex(256, 64, (g, w, h) => { for (let i = 0; i < 8; i++) { g.fillStyle = i % 2 ? '#f3ece0' : '#c4703f'; g.fillRect(i * 32, 0, 32, h); } });
+const tileTex = ctex(256, 256, (g, w, h) => {
+  g.fillStyle = '#3f4247'; g.fillRect(0, 0, w, h);
+  for (let x = 0; x < w; x += 16) { g.fillStyle = 'rgba(0,0,0,0.35)'; g.fillRect(x, 0, 4, h); g.fillStyle = 'rgba(255,255,255,0.06)'; g.fillRect(x + 6, 0, 3, h); }
+});
+const glowTex = ctex(128, 128, (g, w, h) => {
+  const gr = g.createRadialGradient(w / 2, h / 2, 0, w / 2, h / 2, w / 2);
+  gr.addColorStop(0, 'rgba(255,255,255,1)'); gr.addColorStop(0.35, 'rgba(255,255,255,0.35)'); gr.addColorStop(1, 'rgba(255,255,255,0)');
+  g.fillStyle = gr; g.fillRect(0, 0, w, h);
+}, false);
+glowTex.wrapS = glowTex.wrapT = THREE.ClampToEdgeWrapping;
+const signTexs = [];
+function signTex(text, bg, fg, w = 512, h = 128, size = 0.62) {
+  const t = ctex(w, h, (g) => {
+    g.fillStyle = bg; g.fillRect(0, 0, w, h);
+    g.fillStyle = fg; g.font = `800 ${Math.round(h * size)}px Pretendard, sans-serif`;
+    g.textAlign = 'center'; g.textBaseline = 'middle';
+    g.fillText(text, w / 2, h * 0.54);
+  });
+  t.wrapS = t.wrapT = THREE.ClampToEdgeWrapping;
+  signTexs.push(t);
+  return t;
+}
+
+// ---------- 재질 ----------
+const M = (c, o = {}) => new THREE.MeshStandardMaterial({ color: c, roughness: 0.85, ...o });
+const mat = {
+  grass: M(0x93b06c), grass2: M(0x86a35f), soil: M(0x8a6748), soil2: M(0x5f4633), rock: M(0x6f675f, { flatShading: true }),
+  road: M(0x4f4e54, { roughness: 0.95 }), walk: M(0xd7cdbd), seam: M(0xc4baa9), curb: M(0xb3a999), mark: M(0xf2ead8, { roughness: 0.7 }),
+  white: M(0xf2ede4), cream: M(0xe8dcc8), plaster: M(0xefe6d8), stone: M(0xc4bbad), stone2: M(0x9c958b, { flatShading: true }),
+  wood: M(0x9a6b45, { roughness: 0.7 }), woodD: M(0x6a4630, { roughness: 0.7 }), wood2: M(0xc79a6a, { roughness: 0.6 }),
+  dark: M(0x2a2826, { roughness: 0.45, metalness: 0.5 }), metal: M(0x9aa0a4, { roughness: 0.35, metalness: 0.7 }),
+  brick: M(0xffffff, { map: brickTex }), board: M(0xffffff, { map: boardTex }), roofTile: M(0x6a6e75, { roughness: 0.7 }), roofLine: M(0x45484e, { roughness: 0.6 }),
+  roof: M(0x565a60, { roughness: 0.7 }), cap: M(0x2b2420, { roughness: 0.8 }), green: M(0x2f5d50), terra: M(0xc4703f),
+  leaf: M(0x6c9a4e, { flatShading: true }), leaf2: M(0x58864a, { flatShading: true }), leaf3: M(0x8fb35a, { flatShading: true }), pine: M(0x3f6b44, { flatShading: true }),
+  trunk: M(0x7a5a3e), flowerR: M(0xd9604c), flowerY: M(0xf0c04a), flowerW: M(0xf5f0e6),
+  floorW: M(0xd8b98e, { roughness: 0.6 }), floorT: M(0xd9d4cc, { roughness: 0.5 }), rug: M(0xe9e2d6, { roughness: 1 }),
+  sand: M(0xd9ccb2, { roughness: 1 }),
+  win: M(0x39424c, { roughness: 0.15, metalness: 0.3, emissive: new THREE.Color(0xffc480), emissiveIntensity: 0 }),
+  win2: M(0x39424c, { roughness: 0.15, metalness: 0.3, emissive: new THREE.Color(0xffd7a0), emissiveIntensity: 0 }),
+  lamp: M(0xfff3dc, { emissive: new THREE.Color(0xffd9a0), emissiveIntensity: 0 }),
+  paper: M(0xf6e7c8, { emissive: new THREE.Color(0xffa860), emissiveIntensity: 0 }),
+  lattice: M(0xffffff, { map: latticeTex, emissive: new THREE.Color(0xffb870), emissiveMap: latticeTex, emissiveIntensity: 0 }),
+  head: M(0xfff4dc, { emissive: new THREE.Color(0xfff0d0), emissiveIntensity: 0 }),
+  tail: M(0x9a1f1a, { emissive: new THREE.Color(0xff3020), emissiveIntensity: 0 }),
+  glassC: M(0x2d3640, { roughness: 0.15, metalness: 0.4 }),
+  water: new THREE.MeshPhysicalMaterial({ color: 0x4f97b0, roughness: 0.06, metalness: 0.1, clearcoat: 1, transparent: true, opacity: 0.88 }),
+  glass: new THREE.MeshPhysicalMaterial({ color: 0xcfe0e6, roughness: 0.03, metalness: 0, transparent: true, opacity: 0.16, depthWrite: false, envMapIntensity: 1.5 }),
+  awning: M(0xffffff, { map: awningTex, roughness: 0.9, side: THREE.DoubleSide }), awning2: M(0xffffff, { map: awningTex2, roughness: 0.9, side: THREE.DoubleSide })
+};
+const signMat = (tex, glow = 0xffffff) => M(0xffffff, { map: tex, emissive: new THREE.Color(glow), emissiveMap: tex, emissiveIntensity: 0, roughness: 0.5 });
+const nightMats = [];
+
+// ---------- 정적 형상 합치기 ----------
+const OB = new THREE.Object3D();
+function Kit() {
+  const map = new Map();
+  const k = {
+    add(geo, m, x = 0, y = 0, z = 0, ry = 0, rx = 0, rz = 0, sx = 1, sy = 1, sz = 1) {
+      OB.position.set(x, y, z); OB.rotation.set(rx, ry, rz); OB.scale.set(sx, sy, sz); OB.updateMatrix();
+      let g = geo.index ? geo.toNonIndexed() : geo.clone();
+      g.applyMatrix4(OB.matrix);
+      for (const n of Object.keys(g.attributes)) if (!['position', 'normal', 'uv'].includes(n)) g.deleteAttribute(n);
+      if (!g.attributes.uv) g.setAttribute('uv', new THREE.Float32BufferAttribute(new Float32Array(g.attributes.position.count * 2), 2));
+      g.clearGroups();
+      if (!map.has(m)) map.set(m, []);
+      map.get(m).push(g);
+      return k;
+    },
+    box(w, h, d, m, x, y, z, ry = 0) { return k.add(new THREE.BoxGeometry(w, h, d), m, x, y + h / 2, z, ry); },
+    rbox(w, h, d, r, m, x, y, z, ry = 0) { return k.add(new RoundedBoxGeometry(w, h, d, 2, r), m, x, y + h / 2, z, ry); },
+    cyl(rt, rb, h, m, x, y, z, seg = 12) { return k.add(new THREE.CylinderGeometry(rt, rb, h, seg), m, x, y + h / 2, z); },
+    flush(parent, cast = true) {
+      for (const [m, list] of map) {
+        const me = new THREE.Mesh(mergeGeometries(list, false), m);
+        me.castShadow = cast && !m.transparent; me.receiveShadow = !m.transparent;
+        parent.add(me);
+      }
+      map.clear();
+      return parent;
+    }
+  };
+  return k;
+}
+// 창: 벽 앞에 붙는 틀과 유리 (앞면 +z)
+function win(k, x, y, z, w, h, opt = {}) {
+  const f = opt.frame || mat.white, t = 0.05;
+  k.box(w, h, 0.03, opt.glass || mat.win, x, y, z + 0.015);
+  k.box(w + t * 2, t, 0.07, f, x, y - t, z + 0.03);
+  k.box(w + t * 2, t, 0.07, f, x, y + h, z + 0.03);
+  k.box(t, h, 0.07, f, x - w / 2 - t / 2, y, z + 0.03);
+  k.box(t, h, 0.07, f, x + w / 2 + t / 2, y, z + 0.03);
+  if (opt.mull !== false) k.box(0.03, h, 0.05, f, x, y, z + 0.035);
+  if (opt.sill) k.box(w + 0.2, 0.05, 0.16, mat.stone, x, y - t - 0.05, z + 0.08);
+  if (opt.box) { k.box(w, 0.16, 0.2, mat.woodD, x, y - t - 0.22, z + 0.12); for (let i = 0; i < 5; i++) k.add(ico, i % 2 ? mat.flowerR : mat.leaf, x - w / 2 + 0.1 + i * (w - 0.2) / 4, y - t - 0.03, z + 0.12, 0, 0, 0, 0.09, 0.08, 0.09); }
+}
+const ico = new THREE.IcosahedronGeometry(1, 0);
+const ico1 = new THREE.IcosahedronGeometry(1, 1);
+const sph = new THREE.SphereGeometry(1, 14, 10);
+function planter(k, x, z, w = 0.5) {
+  k.box(w, 0.32, w, mat.woodD, x, 0.08, z);
+  k.add(ico1, mat.leaf, x, 0.58, z, 0, 0, 0, w * 0.5, w * 0.55, w * 0.5);
+  k.add(ico, mat.flowerY, x + w * 0.18, 0.7, z + w * 0.2, 0, 0, 0, 0.06, 0.06, 0.06);
+}
+// 작은 소파 (쇼룸, 모델하우스 거실)
+function miniSofa(m) {
+  const g = new THREE.Group();
+  const add = (geo, x, y, z) => { const me = new THREE.Mesh(geo, m); me.position.set(x, y, z); me.castShadow = me.receiveShadow = true; g.add(me); };
+  add(new RoundedBoxGeometry(1.9, 0.24, 0.8, 2, 0.04), 0, 0.2, 0);
+  add(new RoundedBoxGeometry(1.9, 0.46, 0.2, 2, 0.06), 0, 0.45, -0.3);
+  for (const s of [-1, 1]) add(new RoundedBoxGeometry(0.18, 0.4, 0.8, 2, 0.06), s * 0.95, 0.3, 0);
+  for (let i = 0; i < 3; i++) add(new RoundedBoxGeometry(0.56, 0.12, 0.6, 2, 0.05), -0.58 + i * 0.58, 0.37, 0.07);
+  const legM = mat.woodD;
+  for (const [x, z] of [[-0.9, -0.33], [0.9, -0.33], [-0.9, 0.33], [0.9, 0.33]]) { const l = new THREE.Mesh(new THREE.CylinderGeometry(0.025, 0.02, 0.1, 8), legM); l.position.set(x, 0.05, z); g.add(l); }
+  return g;
+}
+
+// ---------- 섬과 길 ----------
+const IX0 = -13.5, IX1 = 13.5, IZ0 = -9, IZ1 = 10;
+const world = new THREE.Group(); scene.add(world);
+{
+  const rr = (x0, z0, x1, z1, r) => {
+    const s = new THREE.Shape();
+    s.moveTo(x0 + r, -z0); s.lineTo(x1 - r, -z0); s.quadraticCurveTo(x1, -z0, x1, -z0 - r);
+    s.lineTo(x1, -z1 + r); s.quadraticCurveTo(x1, -z1, x1 - r, -z1);
+    s.lineTo(x0 + r, -z1); s.quadraticCurveTo(x0, -z1, x0, -z1 + r);
+    s.lineTo(x0, -z0 - r); s.quadraticCurveTo(x0, -z0, x0 + r, -z0);
+    return s;
+  };
+  const slab = (inset, y0, y1, m) => {
+    const g = new THREE.ExtrudeGeometry(rr(IX0 + inset, IZ0 + inset, IX1 - inset, IZ1 - inset, 2.2 - inset * 0.5), { depth: y1 - y0, bevelEnabled: false, curveSegments: 8 });
+    g.rotateX(-Math.PI / 2); g.translate(0, y0, 0);
+    const me = new THREE.Mesh(g, m); me.receiveShadow = true; me.castShadow = false; world.add(me); return me;
+  };
+  slab(0, -0.16, 0, mat.grass);
+  slab(0.02, -1.0, -0.16, mat.soil);
+  slab(0.35, -1.7, -1.0, mat.soil2);
+  const k = Kit();
+  for (let i = 0; i < 26; i++) {
+    const x = lerp(IX0 + 2, IX1 - 2, rnd()), z = lerp(IZ0 + 2, IZ1 - 2, rnd()), s = 0.8 + rnd() * 1.6;
+    k.add(ico, mat.stone2, x, -1.7 - s * 0.3, z, rnd() * 3, rnd(), 0, s * 1.4, s, s * 1.2);
+  }
+  // 길: 차도, 보도, 연석, 중앙선, 횡단보도
+  k.box(IX1 - IX0, 0.02, 2.6, mat.road, 0, 0, 0);
+  for (const s of [-1, 1]) {
+    k.box(IX1 - IX0, 0.08, 0.9, mat.walk, 0, 0, s * 1.75);
+    k.box(IX1 - IX0, 0.09, 0.08, mat.curb, 0, 0, s * 1.33);
+  }
+  for (let x = IX0 + 0.6; x < IX1 - 0.6; x += 1.4) if ([-6.4, 2.1, 7.4].every(c => Math.abs(x - c) > 1.0)) k.box(0.7, 0.025, 0.07, mat.mark, x, 0, 0);
+  for (const cx of [-6.4, 2.1, 7.4]) for (let z = -1.1; z <= 1.11; z += 0.44) k.box(0.9, 0.026, 0.24, mat.mark, cx, 0, z);
+  // 11-03 줄눈 폭 2cm는 휴대폰에서 1px 안팎이라 돌릴 때 생겼다 사라지며 반짝였다. 4cm로 넓히고 보도색에 가깝게
+  for (let x = IX0 + 0.5; x < IX1; x += 0.9) for (const s of [-1, 1]) k.box(0.04, 0.083, 0.88, mat.seam, x, 0, s * 1.75);
+  // 공원 바닥과 분수대 자리
+  k.cyl(2.4, 2.4, 0.05, mat.stone, 0.4, 0, 5.8, 40);
+  k.box(0.9, 0.044, 2.9, mat.stone, 0.4, 0, 2.95);
+  // 사무소로 가는 디딤돌
+  for (let i = 0; i < 4; i++) k.cyl(0.22, 0.22, 0.04, mat.stone, 3.2 + i * 0.75, 0, 6.6 + Math.sin(i) * 0.15, 10);
+  // 언덕
+  for (const [x, z, s] of [[-12, -7.5, 2.6], [11.8, -7.6, 2.2], [12.2, 8.6, 1.8], [-1.5, 9, 1.5]]) k.add(ico1, mat.grass2, x, 0, z, 0, 0, 0, s, s * 0.45, s * 0.8);
+  k.flush(world);
+}
+
+// 섬 아래: 떠 있는 느낌을 주는 낮은 구름과 옅은 그림자
+{
+  const shadowTex = ctex(128, 128, (g, w, h) => { const gr = g.createRadialGradient(w / 2, h / 2, 0, w / 2, h / 2, w / 2); gr.addColorStop(0, 'rgba(0,0,0,0.5)'); gr.addColorStop(1, 'rgba(0,0,0,0)'); g.fillStyle = gr; g.fillRect(0, 0, w, h); }, false);
+  const sh = new THREE.Mesh(new THREE.PlaneGeometry(40, 30), new THREE.MeshBasicMaterial({ map: shadowTex, transparent: true, depthWrite: false, fog: false, opacity: 0.5 }));
+  sh.rotation.x = -Math.PI / 2; sh.position.set(0, -6, 1.5); world.add(sh);
+  const lowMat = M(0xffffff, { flatShading: true, roughness: 1, transparent: true, opacity: 0.85 });
+  for (const [x, z, s] of MOBILE ? [] : [[-12, 10.5, 1.4], [9, 11, 1.2], [14.5, -2, 1.1], [-15, -3, 1.3], [2, 12, 1.0]]) {
+    const k = Kit(), g = new THREE.Group();
+    for (let j = 0; j < 4; j++) k.add(ico1, lowMat, j * 0.9 - 1.4, Math.sin(j * 2) * 0.2, (j % 2) * 0.5, j, 0, 0, 0.9, 0.55, 0.7);
+    k.flush(g, false); g.position.set(x, -2.6, z); g.scale.setScalar(s); world.add(g);
+  }
+}
+
+// 나무: 바람에 흔들리는 머리
+const trees = [];
+function tree(x, z, s = 1, kind = 0) {
+  const g = new THREE.Group(); g.position.set(x, 0, z);
+  const tr = new THREE.Mesh(new THREE.CylinderGeometry(0.07 * s, 0.11 * s, 1.0 * s, 7), mat.trunk); tr.position.y = 0.5 * s; tr.castShadow = true; g.add(tr);
+  const crown = new THREE.Group(); crown.position.y = 0.9 * s; g.add(crown);
+  const k = Kit();
+  if (kind === 1) {
+    for (let i = 0; i < 3; i++) k.add(new THREE.ConeGeometry((0.75 - i * 0.18) * s, 0.8 * s, 7), mat.pine, 0, (0.25 + i * 0.42) * s, 0, i);
+  } else {
+    const m = [mat.leaf, mat.leaf2, mat.leaf3][(Math.abs(Math.round(x * 3 + z)) % 3)];
+    k.add(ico1, m, 0, 0.45 * s, 0, 0, 0, 0, 0.62 * s, 0.6 * s, 0.62 * s);
+    k.add(ico1, m, 0.32 * s, 0.25 * s, 0.1 * s, 1, 0, 0, 0.42 * s, 0.4 * s, 0.42 * s);
+    k.add(ico1, m, -0.28 * s, 0.3 * s, -0.12 * s, 2, 0, 0, 0.45 * s, 0.42 * s, 0.45 * s);
+  }
+  k.flush(crown);
+  world.add(g);
+  trees.push({ crown, ph: x * 1.3 + z * 0.7 });
+  return g;
+}
+for (const [x, z, s, k] of [
+  [-12.4, -5.2, 1.3, 0], [-11.6, -8, 1.1, 1], [-5, -7.9, 1.2, 0], [-3.6, -7.4, 1.0, 1], [1.8, -8, 1.3, 0], [2.7, -6.1, 1.0, 1], [10.6, -6.4, 1.2, 0], [12.4, -4.2, 1.0, 1],
+  [-2.2, 4.2, 1.1, 0], [3.0, 4.4, 1.2, 0], [-1.8, 8.4, 1.3, 0], [2.6, 8.9, 1.0, 1], [4.4, 9.0, 1.1, 0], [11.6, 5.5, 1.3, 0], [12.4, 3.6, 1.0, 1], [9.9, 9.0, 1.1, 0], [-12.6, 9.3, 0.9, 1]
+]) tree(x, z, s, k);
+
+// 가로등
+const lamps = [];
+const glowMat = new THREE.MeshBasicMaterial({ map: glowTex, color: 0xffc27a, transparent: true, opacity: 0, blending: THREE.AdditiveBlending, depthWrite: false, fog: false });
+{
+  const k = Kit();
+  for (const [x, z] of [[-11.2, -1.98], [-5.0, -1.98], [0.9, -1.98], [10.2, -1.98], [-9.2, 1.98], [-3.0, 1.98], [5.0, 1.98], [12.4, 1.98]]) {
+    const s = Math.sign(z);
+    k.cyl(0.05, 0.06, 2.4, mat.dark, x, 0.08, z, 8);
+    k.box(0.04, 0.04, 0.42, mat.dark, x, 2.44, z - s * 0.2);
+    k.box(0.16, 0.08, 0.26, mat.dark, x, 2.4, z - s * 0.4);
+    k.box(0.12, 0.03, 0.2, mat.lamp, x, 2.37, z - s * 0.4);
+    // 11-03 불빛 원이 뒤쪽 건물 바닥판(높이 0.25)까지 넘어가 일자로 잘려 보이던 것을, 차도와 보도 안에서 옅어지는 가로 타원으로
+    const d = new THREE.Mesh(new THREE.PlaneGeometry(2.8, 1.5), glowMat); d.rotation.x = -Math.PI / 2; d.position.set(x, 0.1, s * 1.42); world.add(d);
+  }
+  // 버스 정류장
+  const bx = 10.6, bz = 2.05;
+  for (const dx of [-0.8, 0.8]) k.box(0.05, 2.1, 0.05, mat.dark, bx + dx, 0.08, bz + 0.05);
+  k.box(1.9, 0.06, 0.7, mat.dark, bx, 2.18, bz - 0.05);
+  k.box(1.6, 1.2, 0.03, mat.glass, bx, 0.7, bz + 0.08);
+  k.box(1.3, 0.06, 0.3, mat.wood, bx, 0.48, bz - 0.02);
+  k.box(0.5, 0.7, 0.06, mat.green, bx + 1.2, 1.3, bz + 0.05);
+  k.flush(world);
+}
+
+// ---------- 건물 ----------
+const B = {};
+function building(id, x, z, ry = 0) {
+  const g = new THREE.Group(); g.position.set(x, 0, z); g.rotation.y = ry;
+  world.add(g);
+  B[id] = { id, g, lift: 0, liftT: 0, base: V(x, 0, z) };
+  return g;
+}
+
+// 1. 가구 쇼룸
+const showSofaMat = new THREE.MeshStandardMaterial({ color: 0xc9bba4, roughness: 0.9 });
+{
+  const g = building('neru', -8.2, -2.45);
+  const k = Kit(), W = 5.4, D = 4.2, H = 3.9;
+  k.box(W - 0.2, 0.1, D - 0.2, mat.floorW, 0, 0, -D / 2);
+  k.box(W, H, 0.16, mat.brick, 0, 0, -D + 0.08);
+  k.box(W - 0.4, H - 0.12, 0.02, mat.plaster, 0, 0.11, -D + 0.176);
+  for (const sx of [-1, 1]) k.box(0.02, H - 0.12, D - 0.45, mat.plaster, sx * (W / 2 - 0.176), 0.11, -D / 2 - 0.1);
+  k.box(0.16, H, D - 0.17, mat.brick, -W / 2 + 0.08, 0, -D / 2 - 0.085);
+  k.box(0.16, H, D - 0.17, mat.brick, W / 2 - 0.08, 0, -D / 2 - 0.085);
+  k.box(W + 0.12, 0.16, D + 0.12, mat.roof, 0, H, -D / 2);
+  for (const [w, d, x, zz] of [[W + 0.12, 0.1, 0, 0.0], [W + 0.12, 0.1, 0, -D - 0.06], [0.1, D, -W / 2, -D / 2], [0.1, D, W / 2, -D / 2]]) k.box(w, 0.3, d, mat.cream, x, H + 0.16, zz);
+  // 정면: 큰 진열창과 출입문
+  const ft = 0.16, fz = -0.08;
+  k.box(3.35, 0.35, ft, mat.cream, -0.78, 0, fz);
+  k.box(0.25, 2.45, ft, mat.cream, -2.575, 0, fz);
+  k.box(0.4, 2.45, ft, mat.cream, 1.1, 0, fz);
+  k.box(0.4, 2.45, ft, mat.cream, 2.5, 0, fz);
+  k.box(W, H - 2.45, ft, mat.cream, 0, 2.45, fz);
+  for (const [w, h, xx, y] of [[3.35, 0.05, -0.78, 0.33], [3.35, 0.05, -0.78, 2.4], [0.05, 2.1, -2.43, 0.35], [0.05, 2.1, 0.88, 0.35], [0.04, 2.1, -0.78, 0.35], [0.05, 2.45, 1.32, 0], [0.05, 2.45, 2.28, 0], [1.0, 0.05, 1.8, 2.4]]) k.box(w, h, 0.08, mat.dark, xx, y, 0.0);
+  k.box(3.3, 2.05, 0.02, mat.glass, -0.78, 0.37, -0.03);
+  k.box(0.9, 2.4, 0.02, mat.glass, 1.8, 0, -0.03);
+  k.box(0.03, 0.6, 0.04, mat.metal, 1.45, 0.9, 0.05);
+  // 차양
+  k.add(new THREE.BoxGeometry(3.7, 0.03, 0.85), mat.awning, -0.78, 2.62, 0.36, 0, 0.42);
+  k.box(3.7, 0.16, 0.02, mat.awning, -0.78, 2.3, 0.75);
+  // 간판 판
+  k.box(2.6, 0.78, 0.08, mat.green, -0.6, 2.86, 0.02);
+  planter(k, 2.45, 0.4, 0.42);
+  planter(k, -3.0, 0.38, 0.42);
+  // 지붕 실외기
+  k.box(0.8, 0.5, 0.5, mat.metal, 1.6, H + 0.16, -3.0);
+  k.cyl(0.18, 0.18, 0.02, mat.dark, 1.6, H + 0.4, -2.74, 16);
+  // 안: 조명, 선반, 러그, 스탠드
+  for (const xx of [-1.6, -0.6, 0.4]) { k.cyl(0.006, 0.006, 0.9, mat.dark, xx, H - 0.9, -1.6, 4); k.cyl(0.08, 0.14, 0.14, mat.lamp, xx, H - 1.0, -1.6, 14); }
+  k.box(2.6, 0.012, 1.6, mat.rug, -0.8, 0.1, -1.7);
+  const sx = 1.6, sz = -3.75;
+  for (const dx of [-0.65, 0.65]) for (const dz of [-0.18, 0.18]) k.box(0.035, 2.0, 0.035, mat.dark, sx + dx, 0.1, sz + dz);
+  const items = [mat.terra, mat.white, mat.green, mat.wood2, mat.flowerY];
+  for (let i = 0; i < 5; i++) {
+    k.box(1.34, 0.03, 0.42, mat.wood2, sx, 0.25 + i * 0.44, sz);
+    if (i < 4) for (let j = 0; j < 3; j++) {
+      const m2 = items[(i + j) % 5];
+      if ((i + j) % 2) k.cyl(0.07, 0.09, 0.22, m2, sx - 0.4 + j * 0.4, 0.28 + i * 0.44, sz, 10);
+      else k.box(0.24, 0.18, 0.24, m2, sx - 0.4 + j * 0.4, 0.28 + i * 0.44, sz);
+    }
+  }
+  k.flush(g);
+  const sofa = miniSofa(showSofaMat); sofa.position.set(-0.85, 0.1, -1.5); g.add(sofa);
+  const st = new THREE.Mesh(new THREE.PlaneGeometry(2.4, 0.66), signMat(signTex('가구', '#2f5d50', '#f3ece0', 512, 140, 0.66), 0xfff0d6));
+  st.position.set(-0.6, 3.25, 0.065); g.add(st); nightMats.push(st.material);
+  B.neru.pin = V(-8.2, 4.7, -4.4); B.neru.view = { t: V(-8.2, 1.7, -3.4), az: 0.22, el: 0.42, fw: 10, fh: 7 };
+  showLight.position.set(-8.6, 2.1, -3.4);
+}
+
+// 2. 간판 제작 상가 (낮에 간판 글자가 하나씩 붙습니다)
+const letterSlots = [];
+{
+  const g = building('saevit', -1.6, -2.45);
+  const k = Kit(), W = 5, D = 3.6, H = 4.7;
+  k.box(W - 0.2, 0.1, D - 0.2, mat.floorT, 0, 0, -D / 2);
+  k.box(W, H, 0.16, mat.brick, 0, 0, -D + 0.08);
+  k.box(0.16, H, D - 0.17, mat.brick, -W / 2 + 0.08, 0, -D / 2 - 0.085);
+  k.box(0.16, H, D - 0.17, mat.brick, W / 2 - 0.08, 0, -D / 2 - 0.085);
+  k.box(W + 0.1, 0.14, D + 0.1, mat.roof, 0, H, -D / 2);
+  for (const [w, d, x, zz] of [[W + 0.1, 0.08, 0, 0], [W + 0.1, 0.08, 0, -D - 0.05], [0.08, D, -W / 2, -D / 2], [0.08, D, W / 2, -D / 2]]) k.box(w, 0.22, d, mat.stone, x, H + 0.14, zz);
+  const fz = -0.08, ft = 0.16;
+  k.box(3.1, 0.25, ft, mat.stone, -0.65, 0, fz);
+  k.box(0.3, 2.35, ft, mat.stone, -2.35, 0, fz);
+  k.box(0.4, 2.35, ft, mat.stone, 1.1, 0, fz);
+  k.box(0.35, 2.35, ft, mat.stone, 2.33, 0, fz);
+  k.box(W, 0.15, ft, mat.stone, 0, 2.35, fz);
+  k.box(W, H - 2.5, ft, mat.brick, 0, 2.5, fz);
+  for (const [w, h, xx, y] of [[3.1, 0.05, -0.65, 0.23], [3.1, 0.05, -0.65, 2.3], [0.05, 2.1, -2.2, 0.25], [0.05, 2.1, 0.9, 0.25], [0.05, 2.35, 1.3, 0], [0.05, 2.35, 2.15, 0]]) k.box(w, h, 0.08, mat.dark, xx, y, 0);
+  k.box(3.05, 2.05, 0.02, mat.glass, -0.65, 0.27, -0.03);
+  k.box(0.82, 2.3, 0.02, mat.glass, 1.72, 0, -0.03);
+  // 간판 판 (글자 자리)
+  k.box(W - 0.3, 0.78, 0.1, mat.dark, 0, 2.5, 0.05);
+  // 2층 창
+  for (const xx of [-1.6, 0, 1.6]) win(k, xx, 3.55, 0, 0.9, 0.8, { frame: mat.cream, sill: true, box: xx !== 0, glass: xx === 0 ? mat.win2 : mat.win });
+  k.cyl(0.04, 0.04, H, mat.metal, 2.42, 0, 0.06, 6);
+  // 옥상 물탱크
+  for (const dx of [-0.3, 0.3]) k.box(0.06, 0.4, 0.06, mat.dark, 1.4 + dx, H + 0.14, -2.3);
+  k.cyl(0.45, 0.45, 0.75, mat.white, 1.4, H + 0.54, -2.3, 18);
+  // 안: 막 들어온 상자들과 사다리
+  for (const [xx, zz, s] of [[-1.6, -2.4, 0.5], [-1.1, -2.6, 0.4], [-1.45, -2.5, 0.35], [0.2, -2.8, 0.45]]) k.box(s, s * 0.8, s, mat.wood2, xx, 0.1 + (s === 0.35 ? 0.4 : 0), zz);
+  k.flush(g);
+  B.saevit.pin = V(-1.6, 5.6, -4.2); B.saevit.view = { t: V(-1.6, 2.3, -3.0), az: 0.14, el: 0.36, fw: 9.4, fh: 7.4 };
+  B.saevit.signY = 2.89; B.saevit.signZ = 0.1;
+}
+
+// 3. 인테리어 모델하우스 (앞벽과 지붕을 잘라 안이 보입니다)
+const homeSofaMat = new THREE.MeshStandardMaterial({ color: 0x8d9a80, roughness: 0.9 });
+let slideDoor, homeSofa;
+{
+  const g = building('onjib', 6.4, -2.6);
+  const k = Kit(), W = 6, D = 5, F = 0.25, H = 2.5, T = 0.15;
+  k.box(W + 0.2, F, D + 0.2, mat.stone, 0, 0, -D / 2);
+  k.box(3.8, 0.02, D - 0.3, mat.floorW, -1.0, F, -D / 2);
+  k.box(1.5, 0.02, D - 0.3, mat.floorT, 2.15, F, -D / 2);
+  const wall = (w, h, d, x, y, zz) => { k.box(w, h, d, mat.plaster, x, y, zz); k.box(w + 0.002, 0.02, d + 0.002, mat.cap, x, y + h, zz); };
+  wall(W, H, T, 0, F, -D + T / 2);
+  wall(T, H, D - T, -W / 2 + T / 2, F, -D / 2 + T / 2);
+  wall(T, H, D - T, W / 2 - T / 2, F, -D / 2 + T / 2);
+  wall(3.6, 0.6, T, -1.2, F, -T / 2);
+  wall(1.0, 0.6, T, 2.5, F, -T / 2);
+  // 중문 칸막이
+  const px = 1.3;
+  wall(T, H, 1.85, px, F, -D + T + 0.925);
+  wall(T, H, 1.25, px, F, -0.15 - 0.625 - 0.15);
+  k.box(T, 0.4, 1.4, mat.plaster, px, F + 2.1, -2.3);
+  for (const [h, zz, w2] of [[2.1, -3.0, 0.05], [2.1, -1.6, 0.05]]) k.box(0.1, h, w2, mat.dark, px, F, zz);
+  k.box(0.1, 0.05, 1.4, mat.dark, px, F + 2.08, -2.3);
+  // 고정 문짝
+  k.box(0.035, 2.05, 0.7, new THREE.MeshStandardMaterial({ color: 0xdbe6ea, roughness: 0.2, transparent: true, opacity: 0.45, depthWrite: false }), px - 0.03, F, -2.65);
+  // 뒷벽 창과 거실 소품
+  win(k, -1.6, F + 0.9, -D + T, 1.4, 1.1, { frame: mat.white });
+  win(k, 2.2, F + 1.0, -D + T, 0.8, 0.9, { frame: mat.white, mull: false });
+  k.box(2.6, 0.012, 1.8, mat.rug, -1.0, F + 0.02, -3.2);
+  k.box(0.4, 0.45, 1.6, mat.wood, -2.72, F, -2.4);
+  k.box(0.05, 0.7, 1.2, mat.dark, -2.8, F + 0.75, -2.4);
+  k.cyl(0.14, 0.16, 0.03, mat.dark, 0.6, F, -4.4, 16); k.cyl(0.012, 0.012, 1.4, mat.dark, 0.6, F, -4.4, 6); k.cyl(0.14, 0.2, 0.26, mat.lamp, 0.6, F + 1.4, -4.4, 16);
+  k.cyl(0.22, 0.25, 0.42, mat.white, -2.6, F, -4.5, 16); k.add(ico1, mat.leaf, -2.6, F + 0.85, -4.5, 0, 0, 0, 0.32, 0.45, 0.32);
+  k.box(0.9, 0.04, 0.5, mat.wood2, -1.0, F + 0.38, -2.7); for (const dx of [-0.4, 0.4]) k.box(0.04, 0.38, 0.04, mat.dark, -1.0 + dx, F, -2.7);
+  // 현관: 신발장, 벤치
+  k.box(0.38, 2.0, 1.4, mat.white, W / 2 - 0.35, F + 0.25, -4.1);
+  k.box(0.02, 1.9, 0.01, mat.cap, W / 2 - 0.54, F + 0.3, -4.1);
+  k.add(new THREE.PlaneGeometry(0.34, 1.36), mat.lamp, W / 2 - 0.35, F + 0.22, -4.1, 0, Math.PI / 2);
+  k.box(0.9, 0.06, 0.36, mat.wood2, 2.2, F + 0.4, -0.6);
+  // 앞마당: 산울타리, 우편함, 디딤돌
+  k.box(3.2, 0.5, 0.36, mat.leaf2, -1.3, F, 0.25);
+  k.box(0.7, 0.5, 0.36, mat.leaf2, 2.8, F, 0.25);
+  k.box(0.08, 0.9, 0.08, mat.dark, 1.85, 0, 0.42); k.box(0.3, 0.22, 0.2, mat.terra, 1.85, 0.9, 0.42);
+  k.flush(g);
+  // 미닫이 문짝
+  slideDoor = new THREE.Group();
+  const pk = Kit();
+  pk.box(0.035, 2.05, 0.7, new THREE.MeshStandardMaterial({ color: 0xdbe6ea, roughness: 0.15, transparent: true, opacity: 0.4, depthWrite: false }) /* 11-03 고정 문 유리와 겹칠 때 그리는 순서가 바뀌며 깜빡여 깊이 기록을 끔 */, 0, 0, 0);
+  for (const [h, zz] of [[2.05, -0.34], [2.05, 0.34]]) pk.box(0.045, h, 0.03, mat.dark, 0, 0, zz);
+  pk.box(0.045, 0.03, 0.7, mat.dark, 0, 2.02, 0); pk.box(0.045, 0.03, 0.7, mat.dark, 0, 0, 0); pk.box(0.045, 0.03, 0.7, mat.dark, 0, 1.0, 0);
+  pk.flush(slideDoor);
+  slideDoor.position.set(px + 0.03, F, -1.95);
+  g.add(slideDoor);
+  homeSofa = miniSofa(homeSofaMat); homeSofa.position.set(-1.0, F + 0.02, -4.25); homeSofa.scale.setScalar(0.0001); homeSofa.visible = false; g.add(homeSofa);
+  { const sb = new THREE.Mesh(new THREE.PlaneGeometry(2.0, 0.44), signMat(signTex('인테리어', '#f2ede4', '#2b2420', 512, 112, 0.6), 0xfff0d6)); sb.position.set(-1.0, F + H + 0.27, -D + 0.16); g.add(sb); nightMats.push(sb.material);
+    const sk2 = Kit(); sk2.box(2.1, 0.52, 0.06, mat.cap, -1.0, F + H + 0.01, -D + 0.1); for (const dx of [-0.8, 0.8]) sk2.box(0.05, 0.05, 0.05, mat.dark, -1.0 + dx, F + H, -D + 0.1); sk2.flush(g); }
+  B.onjib.pin = V(6.4, 3.7, -5.2); B.onjib.view = { t: V(6.3, 1.1, -4.3), az: 0.3, el: 0.68, fw: 10, fh: 6.4 };
+  homeLight.position.set(5.6, 2.6, -5.3);
+}
+
+// 4. 한옥 찻집 (마당, 소나무, 굴뚝)
+const lanterns = [];
+let chimneyTop;
+{
+  const g = building('hanok', -8.3, 6.05);
+  const k = Kit();
+  // 마당 바닥과 담장
+  k.box(7.6, 0.03, 6.1, mat.sand, 0.1, 0, 0);
+  const wallSeg = (x0, x1, z0, z1) => {
+    const w = Math.abs(x1 - x0) || 0.24, d = Math.abs(z1 - z0) || 0.24, x = (x0 + x1) / 2, zz = (z0 + z1) / 2;
+    k.box(w, 0.35, d, mat.stone2, x, 0, zz);
+    k.box(w, 0.6, d, mat.plaster, x, 0.35, zz);
+    k.box(w + (d > w ? 0.16 : 0), 0.1, d + (w > d ? 0.16 : 0), mat.roof, x, 0.95, zz);
+  };
+  const X0 = -3.9, X1 = 3.95, Z0 = -3.1, Z1 = 3.1;
+  wallSeg(X0, 1.45, Z0, Z0); wallSeg(2.55, X1, Z0, Z0);
+  wallSeg(X0, X1, Z1, Z1);
+  wallSeg(X1, X1, Z0, Z1);
+  wallSeg(X0, X0, Z0, Z1);
+  // 대문
+  for (const dx of [1.45, 2.55]) k.box(0.16, 1.7, 0.16, mat.woodD, dx, 0, Z0);
+  k.add(new THREE.CylinderGeometry(0.01, 0.01, 1.6, 3), mat.roof, 2.0, 1.84, Z0, 0, 0, Math.PI / 2, 1, 1, 1);
+  k.box(1.5, 0.08, 0.6, mat.roof, 2.0, 1.72, Z0);
+  k.box(1.1, 0.12, 0.08, mat.woodD, 2.0, 1.55, Z0);
+  // 소나무와 평상
+  k.box(1.6, 0.08, 1.1, mat.wood2, 0.9, 0.38, 1.1); for (const [dx, dz] of [[-0.7, -0.45], [0.7, -0.45], [-0.7, 0.45], [0.7, 0.45]]) k.box(0.07, 0.38, 0.07, mat.woodD, 0.9 + dx, 0, 1.1 + dz);
+  k.box(1.4, 0.08, 1.0, mat.wood2, 2.7, 0.38, 1.8); for (const [dx, dz] of [[-0.6, -0.4], [0.6, -0.4], [-0.6, 0.4], [0.6, 0.4]]) k.box(0.07, 0.38, 0.07, mat.woodD, 2.7 + dx, 0, 1.8 + dz);
+  k.box(0.5, 0.04, 0.34, mat.woodD, 0.9, 0.46, 1.1);
+  for (let i = 0; i < 7; i++) k.cyl(0.22, 0.26, 0.06, mat.stone, -0.9 + i * 0.5, 0, -0.1 + Math.sin(i) * 0.12, 9);
+  // 굴뚝
+  k.box(0.45, 2.3, 0.45, mat.stone2, -3.3, 0, 2.6);
+  k.box(0.6, 0.08, 0.6, mat.roof, -3.3, 2.3, 2.6);
+  k.flush(g);
+  chimneyTop = V(-8.3 - 3.3, 2.5, 6.05 + 2.6);
+  const pine = tree(-8.3 + 2.6, 6.05 - 1.6, 1.25, 1);
+  // 본채: 앞이 +x를 보도록 돌려 둡니다
+  const hall = new THREE.Group(); hall.rotation.y = Math.PI / 2; hall.position.set(-1.25, 0, 0.0); g.add(hall);
+  const h = Kit(), W = 5.2, D = 2.4;
+  h.box(W + 0.6, 0.4, D + 0.9, mat.stone, 0, 0, -D / 2 + 0.2);
+  h.box(1.2, 0.2, 0.4, mat.stone, 0, 0, 0.85);
+  h.box(W - 0.2, 0.08, 0.6, mat.wood2, 0, 0.4, -0.3);
+  const cols = [-2.4, -1.2, 0, 1.2, 2.4];
+  for (const cx of cols) { h.cyl(0.085, 0.095, 2.0, mat.woodD, cx, 0.4, 0, 10); h.cyl(0.085, 0.095, 2.0, mat.woodD, cx, 0.4, -D, 10); }
+  h.box(W, 0.18, 0.18, mat.woodD, 0, 2.3, 0); h.box(W, 0.18, 0.18, mat.woodD, 0, 2.3, -D);
+  h.box(0.18, 0.18, D, mat.woodD, -2.4, 2.3, -D / 2); h.box(0.18, 0.18, D, mat.woodD, 2.4, 2.3, -D / 2);
+  h.box(W - 0.1, 1.85, 0.1, mat.plaster, 0, 0.45, -D);
+  for (const s of [-1, 1]) h.box(0.1, 1.85, D, mat.plaster, s * 2.4, 0.45, -D / 2);
+  for (const cx of [-1.8, -0.6, 0.6, 1.8]) h.add(new THREE.PlaneGeometry(1.08, 1.7), mat.lattice, cx, 1.35, -0.62);
+  h.box(W, 1.85, 0.04, mat.woodD, 0, 0.45, -0.66);
+  // 기와 지붕: 처마가 휘어 오르는 단면을 밀어 만듭니다
+  const sh = new THREE.Shape();
+  const P = (z, y) => [-z, y];
+  sh.moveTo(...P(1.05, 2.42)); sh.quadraticCurveTo(...P(0.1, 2.48), ...P(-1.2, 3.45));
+  sh.quadraticCurveTo(...P(-2.5, 2.48), ...P(-3.45, 2.42));
+  sh.lineTo(...P(-3.45, 2.56)); sh.quadraticCurveTo(...P(-2.5, 2.62), ...P(-1.2, 3.6));
+  sh.quadraticCurveTo(...P(0.1, 2.62), ...P(1.05, 2.56)); sh.closePath();
+  const rg = new THREE.ExtrudeGeometry(sh, { depth: W + 1.6, bevelEnabled: false, curveSegments: 10 });
+  rg.rotateY(Math.PI / 2); rg.translate(-(W + 1.6) / 2, 0, 0);
+  h.add(rg, mat.roofTile);
+  // 기와 골: 용마루에서 처마로 내려오는 줄
+  {
+    const q = (a0, c, b0, u) => [(1 - u) * (1 - u) * a0[0] + 2 * (1 - u) * u * c[0] + u * u * b0[0], (1 - u) * (1 - u) * a0[1] + 2 * (1 - u) * u * c[1] + u * u * b0[1]];
+    const slopes = [[[1.05, 2.58], [0.1, 2.64], [-1.2, 3.62]], [[-3.45, 2.58], [-2.5, 2.64], [-1.2, 3.62]]];
+    const L2 = W + 1.6;
+    for (const [a0, c, b0] of slopes) {
+      const pts = []; for (let i = 0; i <= 8; i++) { const [zz, yy] = q(a0, c, b0, i / 8); pts.push(V(0, yy, zz)); }
+      const tube = new THREE.TubeGeometry(new THREE.CatmullRomCurve3(pts), 10, 0.035, 4, false);
+      for (let x = -L2 / 2 + 0.12; x < L2 / 2 - 0.05; x += 0.2) h.add(tube, mat.roofLine, x, 0, 0);
+      h.add(new THREE.CylinderGeometry(0.05, 0.05, L2, 6).rotateZ(Math.PI / 2), mat.roofLine, 0, a0[1] + 0.02, a0[0]);
+    }
+  }
+  h.box(W + 1.2, 0.2, 0.22, mat.roof, 0, 3.5, -1.2);
+  h.box(W + 1.2, 0.04, 0.24, mat.white, 0, 3.46, -1.2);
+  for (const s of [-1, 1]) h.add(new THREE.ConeGeometry(0.12, 0.3, 6), mat.roof, s * (W / 2 + 0.6), 3.72, -1.2, 0, 0, s * -0.5);
+  h.flush(hall);
+  for (const cx of [-1.8, -0.6, 0.6, 1.8]) {
+    const l = new THREE.Group();
+    const cord = new THREE.Mesh(new THREE.CylinderGeometry(0.006, 0.006, 0.25, 4), mat.dark); cord.position.y = 0.12; l.add(cord);
+    const b = new THREE.Mesh(new THREE.CylinderGeometry(0.11, 0.11, 0.24, 12), mat.paper); l.add(b);
+    l.position.set(cx, 2.05, 0.35); hall.add(l); lanterns.push(l);
+  }
+  { const hb = new THREE.Mesh(new THREE.PlaneGeometry(0.9, 0.34), signMat(signTex('찻집', '#6a4630', '#f4ecd8', 256, 96, 0.62), 0xffd9a8)); hb.position.set(0, 2.08, 0.1); hall.add(hb); nightMats.push(hb.material);
+    const gb = new THREE.Mesh(new THREE.PlaneGeometry(0.8, 0.3), hb.material); gb.position.set(2.0, 1.36, -3.0); g.add(gb);
+    const gb2 = gb.clone(); gb2.rotation.y = Math.PI; gb2.position.z = -3.2; g.add(gb2); }
+  B.hanok.pin = V(-8.6, 4.6, 6.1); B.hanok.view = { t: V(-8.2, 1.2, 6.0), az: 0.95, el: 0.62, fw: 11.5, fh: 7.4 };
+  teaLight.position.set(-7.2, 2.6, 6.3);
+}
+
+// 5. 곰파트너 사옥: 유리 커튼월, 금속 패널, 옥상 테라스, 모니터가 빛나는 사무실
+const codeTex = ctex(256, 160, (g, w, h) => {
+  g.fillStyle = '#10151c'; g.fillRect(0, 0, w, h);
+  const cols = ['#7fb3ff', '#e8c36a', '#9ad19a', '#c9c2b8', '#f08a6a'];
+  for (let i = 0; i < 12; i++) { let x = 14 + ((i * 7) % 4) * 14; const y = 12 + i * 12; for (let j = 0; j < 3; j++) { const len = 18 + ((i * 13 + j * 29) % 60); g.fillStyle = cols[(i + j) % 5]; g.fillRect(x, y, len, 5); x += len + 8; } }
+});
+const wireTex = ctex(256, 160, (g, w, h) => {
+  g.fillStyle = '#0f141b'; g.fillRect(0, 0, w, h);
+  g.strokeStyle = '#8fd0ff'; g.lineWidth = 2;
+  const P = (x, y) => [w / 2 + x, h / 2 + y];
+  const box = (x, y, bw, bh, d) => { const q = [[x, y], [x + bw, y], [x + bw, y + bh], [x, y + bh]]; g.beginPath(); q.forEach((p, i) => g[i ? 'lineTo' : 'moveTo'](...P(p[0], p[1]))); g.closePath(); g.stroke(); g.beginPath(); q.forEach((p, i) => g[i ? 'lineTo' : 'moveTo'](...P(p[0] + d, p[1] - d))); g.closePath(); g.stroke(); q.forEach(p => { g.beginPath(); g.moveTo(...P(p[0], p[1])); g.lineTo(...P(p[0] + d, p[1] - d)); g.stroke(); }); };
+  box(-70, -6, 140, 34, 22); box(-70, -34, 22, 62, 22); box(48, -34, 22, 62, 22); box(-48, -40, 96, 34, 22);
+  g.strokeStyle = 'rgba(143,208,255,0.35)'; for (let x = 0; x < w; x += 16) { g.beginPath(); g.moveTo(x, h - 20); g.lineTo(x + 30, h); g.stroke(); }
+});
+const flatTex = ctex(256, 160, (g, w, h) => {
+  g.fillStyle = '#efe9df'; g.fillRect(0, 0, w, h);
+  g.fillStyle = '#c9bba4'; g.fillRect(40, 70, 176, 50); g.fillRect(40, 44, 176, 30); g.fillRect(28, 60, 22, 60); g.fillRect(206, 60, 22, 60);
+  g.fillStyle = '#2f5d50'; g.fillRect(0, h - 18, w, 18);
+});
+const screenMat = (tex, k = 1) => { const m = M(0x111111, { map: tex, emissive: new THREE.Color(0xffffff), emissiveMap: tex, emissiveIntensity: 0.8, roughness: 0.3 }); m.userData.screen = k; return m; };
+const codeMat = screenMat(codeTex), wireMat = screenMat(wireTex);
+const panelMat = M(0x3a3e44, { roughness: 0.45, metalness: 0.6 }), whiteMetal = M(0xeceae6, { roughness: 0.35, metalness: 0.5 });
+const solarMat = M(0x23324a, { roughness: 0.2, metalness: 0.6 }), beacon = M(0x9a1f1a, { emissive: new THREE.Color(0xff3020), emissiveIntensity: 0.6 });
+const cwGlass = new THREE.MeshPhysicalMaterial({ color: 0xb9d4e2, roughness: 0.05, metalness: 0.1, transparent: true, opacity: 0.28, depthWrite: false, envMapIntensity: 1.6 });
+{
+  const g = building('gom', 7.6, 7.7);
+  const k = Kit(), W = 4.4, D = 3.2, H = 4.3, F1 = 0.12, F2 = 2.3;
+  k.box(W + 0.3, F1, D + 0.3, mat.stone, 0, 0, -D / 2);
+  k.box(W - 0.2, 0.02, D - 0.2, mat.floorT, 0, F1, -D / 2);
+  k.box(W, H, 0.14, panelMat, 0, F1, -D + 0.07);
+  k.box(0.14, H, D - 0.14, panelMat, -W / 2 + 0.07, F1, -(D - 0.14) / 2);
+  // 층 사이 판과 옥상
+  k.box(W - 0.14, 0.14, D - 0.14, whiteMetal, 0.07, F2, -(D - 0.14) / 2 - 0.0);
+  k.box(W + 0.12, 0.16, D + 0.12, whiteMetal, 0, F1 + H, -D / 2);
+  // 커튼월: 남쪽(+z)과 동쪽(+x) 유리면, 세로 멀리언
+  k.box(W - 0.16, H - 0.05, 0.02, cwGlass, 0.07, F1, -0.07);
+  k.box(0.02, H - 0.05, D - 0.16, cwGlass, W / 2 - 0.07, F1, -D / 2 - 0.07);
+  for (let x = -W / 2 + 0.14; x <= W / 2 + 0.001; x += (W - 0.14) / 8) k.box(0.05, H, 0.1, whiteMetal, Math.min(x, W / 2 - 0.03), F1, -0.03);
+  for (let z = -D + 0.14; z <= 0.001; z += (D - 0.14) / 6) k.box(0.1, H, 0.05, whiteMetal, W / 2 - 0.03, F1, Math.min(z, -0.03));
+  k.box(W, 0.6, 0.12, panelMat, 0, F1 + H - 0.6, 0.0);
+  for (const y of [F1, F2 - 0.02, F1 + H - 0.2]) { k.box(W + 0.006, 0.2, 0.12, whiteMetal, 0, y, -0.04); k.box(0.12, 0.2, D + 0.006, whiteMetal, W / 2 - 0.04, y, -D / 2); } // 11-03 옆면이 벽, 위쪽 판과 같은 평면이라 깜빡여 3mm씩 내밈
+  // 출입구 (동쪽), 차양
+  k.box(0.06, 2.2, 0.05, mat.dark, W / 2 + 0.02, F1, -0.6); k.box(0.06, 2.2, 0.05, mat.dark, W / 2 + 0.02, F1, -1.6); k.box(0.06, 0.05, 1.0, mat.dark, W / 2 + 0.02, F1 + 2.18, -1.1);
+  k.box(0.9, 0.08, 1.5, whiteMetal, W / 2 + 0.42, F1 + 2.35, -1.1);
+  k.box(0.5, 0.04, 1.2, mat.stone, W / 2 + 0.3, 0, -1.1);
+  // 1층 로비: 책상과 모니터, 안내 데스크
+  const desk = (x, z, yb, scr) => {
+    k.box(1.0, 0.04, 0.5, mat.white, x, yb + 0.48, z);
+    for (const dx of [-0.46, 0.46]) k.box(0.04, 0.48, 0.46, mat.white, x + dx, yb, z);
+    k.box(0.04, 0.14, 0.04, mat.dark, x, yb + 0.52, z - 0.12);
+    k.box(0.46, 0.28, 0.03, mat.dark, x, yb + 0.66, z - 0.14);
+    k.add(new THREE.PlaneGeometry(0.42, 0.24), scr, x, yb + 0.8, z - 0.12);
+    k.box(0.36, 0.44, 0.36, mat.dark, x, yb, z + 0.42);
+  };
+  desk(-1.3, -1.9, F1, codeMat); desk(-0.1, -1.9, F1, wireMat); desk(-1.3, -0.9, F1, wireMat);
+  k.box(0.5, 0.95, 1.2, mat.wood2, 1.55, F1, -1.2);
+  k.cyl(0.2, 0.24, 0.4, mat.white, 1.6, F1, -2.9, 14); k.add(ico1, mat.leaf, 1.6, F1 + 0.8, -2.9, 0, 0, 0, 0.3, 0.42, 0.3);
+  // 2층: 책상과 벽 화면
+  desk(-1.2, -1.5, F2 + 0.14, codeMat); desk(0.1, -1.5, F2 + 0.14, codeMat); desk(1.3, -1.5, F2 + 0.14, wireMat);
+  k.box(1.8, 1.0, 0.04, mat.dark, 0, F2 + 0.95, -D + 0.16);
+  k.add(new THREE.PlaneGeometry(1.7, 0.92), wireMat, 0, F2 + 1.45, -D + 0.185);
+  // 옥상 테라스, 태양광 판, 안테나
+  const R0 = F1 + H + 0.16;
+  k.box(W / 2 - 0.1, 0.05, D - 0.2, mat.wood2, -W / 4, R0, -D / 2);
+  for (const [w2, d2, x, z] of [[W, 0.03, 0, 0.02], [W, 0.03, 0, -D - 0.02], [0.03, D, -W / 2 - 0.02, -D / 2], [0.03, D, W / 2 + 0.02, -D / 2]]) k.box(w2, 0.5, d2, cwGlass, x, R0, z);
+  for (let i = 0; i < 3; i++) k.add(new THREE.BoxGeometry(0.9, 0.04, 0.6), solarMat, W / 4 + 0.1, R0 + 0.3, -0.7 - i * 0.95, 0, -0.5);
+  for (const [x, z] of [[-1.7, -0.5], [-0.5, -3.0]]) { k.box(0.4, 0.3, 0.4, mat.woodD, x, R0, z); k.add(ico1, mat.leaf3, x, R0 + 0.5, z, 0, 0, 0, 0.26, 0.3, 0.26); }
+  k.box(1.0, 0.06, 0.4, mat.wood2, -1.0, R0 + 0.4, -1.8); for (const dx of [-0.4, 0.4]) k.box(0.05, 0.4, 0.35, mat.dark, -1.0 + dx, R0, -1.8);
+  k.cyl(0.025, 0.035, 1.5, mat.metal, W / 2 - 0.3, R0, -D + 0.3, 8); k.add(sph, beacon, W / 2 - 0.3, R0 + 1.55, -D + 0.3, 0, 0, 0, 0.06, 0.06, 0.06);
+  // 출입구 쪽 디딤돌
+  k.flush(g);
+  const st = Kit(); for (let i = 0; i < 5; i++) st.cyl(0.22, 0.22, 0.04, mat.stone, 10.25, 0, 2.6 + i * 0.85, 10); st.flush(world);
+  B.gom.pin = V(7.6, 5.7, 6.1); B.gom.view = { t: V(7.8, 2.4, 6.0), az: 0.5, el: 0.36, fw: 9.5, fh: 7.6 };
+  B.gom.signY = F1 + H - 0.3; B.gom.signZ = 0.065;
+}
+// 가구 쇼룸 진열창 화면: 곰파트너에 다녀온 뒤 3D 화면으로 바뀝니다
+const neruScreen = new THREE.Mesh(new THREE.PlaneGeometry(0.62, 0.42), screenMat(flatTex));
+neruScreen.position.set(0.25, 1.35, -0.25); B.neru.g.add(neruScreen);
+{ const k = Kit(); k.box(0.68, 0.48, 0.04, mat.dark, 0.25, 1.11, -0.28); k.box(0.04, 1.1, 0.04, mat.dark, 0.25, 0.1, -0.3); k.box(0.4, 0.03, 0.3, mat.dark, 0.25, 0.1, -0.3); k.flush(B.neru.g); }
+
+// 공원 분수
+const fountain = {};
+{
+  const g = new THREE.Group(); g.position.set(0.4, 0.05, 5.8); world.add(g);
+  const k = Kit();
+  const prof = [[0, 0], [1.35, 0], [1.4, 0.05], [1.4, 0.38], [1.25, 0.42], [1.2, 0.1], [0, 0.1]].map(p => new THREE.Vector2(p[0], p[1]));
+  k.add(new THREE.LatheGeometry(prof, 40), mat.stone);
+  k.cyl(0.14, 0.2, 0.9, mat.stone, 0, 0.1, 0, 14);
+  const bowl = [[0, 0], [0.5, 0.06], [0.55, 0.18], [0.5, 0.2], [0, 0.12]].map(p => new THREE.Vector2(p[0], p[1]));
+  k.add(new THREE.LatheGeometry(bowl, 28), mat.stone, 0, 0.95);
+  for (const a of [0.6, 2.2, 3.8, 5.2]) { const bx = Math.cos(a) * 2.05, bz = Math.sin(a) * 2.05; k.box(0.9, 0.06, 0.34, mat.wood2, bx, 0.4, bz, -a + Math.PI / 2); k.box(0.06, 0.4, 0.3, mat.dark, bx, 0, bz, -a + Math.PI / 2); }
+  for (const [x, z, m] of [[-1.9, -1.8, mat.flowerR], [2.2, -1.5, mat.flowerY], [-2.1, 1.6, mat.flowerW]]) { k.box(0.9, 0.18, 0.5, mat.stone, x, 0, z); for (let i = 0; i < 6; i++) k.add(ico, i % 2 ? m : mat.leaf, x - 0.35 + i * 0.14, 0.24, z + (i % 2 ? 0.08 : -0.08), 0, 0, 0, 0.08, 0.08, 0.08); }
+  k.flush(g);
+  const water = new THREE.Mesh(new THREE.CircleGeometry(1.22, 40), mat.water); water.rotation.x = -Math.PI / 2; water.position.y = 0.3; g.add(water);
+  const w2 = new THREE.Mesh(new THREE.CircleGeometry(0.48, 24), mat.water); w2.rotation.x = -Math.PI / 2; w2.position.y = 1.12; g.add(w2);
+  const ringMat = new THREE.MeshBasicMaterial({ color: 0xffffff, transparent: true, opacity: 0.4, depthWrite: false });
+  fountain.rings = [0, 1, 2].map(i => { const r = new THREE.Mesh(new THREE.RingGeometry(0.9, 1, 40), ringMat.clone()); r.rotation.x = -Math.PI / 2; r.position.y = 0.31; g.add(r); return r; });
+  const N = MOBILE ? 60 : 120, pos = new Float32Array(N * 3);
+  const pg = new THREE.BufferGeometry(); pg.setAttribute('position', new THREE.BufferAttribute(pos, 3));
+  fountain.pts = new THREE.Points(pg, new THREE.PointsMaterial({ color: 0xeaf6ff, size: 0.09, transparent: true, opacity: 0.7, depthWrite: false }));
+  fountain.seed = Array.from({ length: N }, () => [Math.random(), Math.random() * Math.PI * 2, 0.7 + Math.random() * 0.5]);
+  fountain.N = N;
+  g.add(fountain.pts);
+}
+
+// ---------- 사람 ----------
+const cmCache = new Map();
+const cm = c => { if (!cmCache.has(c)) cmCache.set(c, M(c, { roughness: 0.8 })); return cmCache.get(c); };
+const PG = {
+  body: new THREE.CylinderGeometry(0.075, 0.1, 0.34, 8), head: new THREE.SphereGeometry(0.075, 12, 10),
+  hair: new THREE.SphereGeometry(0.08, 12, 8, 0, Math.PI * 2, 0, Math.PI * 0.55),
+  leg: new THREE.BoxGeometry(0.055, 0.24, 0.065).translate(0, -0.12, 0), arm: new THREE.BoxGeometry(0.04, 0.22, 0.05).translate(0, -0.11, 0)
+};
+const skin = M(0xe5bf9a), hairM = M(0x2a221d);
+const people = [];
+function person(top, bottom = 0x3a3f4a, s = 1) {
+  const g = new THREE.Group(), inner = new THREE.Group(); inner.scale.setScalar(s); g.add(inner);
+  const add = (geo, m, x, y, z) => { const me = new THREE.Mesh(geo, m); me.position.set(x, y, z); me.castShadow = true; inner.add(me); return me; };
+  add(PG.body, cm(top), 0, 0.41, 0);
+  add(PG.head, skin, 0, 0.66, 0);
+  add(PG.hair, hairM, 0, 0.675, -0.004);
+  const legs = [add(PG.leg, cm(bottom), -0.04, 0.25, 0), add(PG.leg, cm(bottom), 0.04, 0.25, 0)];
+  const arms = [add(PG.arm, cm(top), -0.105, 0.56, 0), add(PG.arm, cm(top), 0.105, 0.56, 0)];
+  g.visible = false; world.add(g);
+  const p = { g, inner, legs, arms, ph: Math.random() * 6, x: 0, z: 0, carry: false };
+  people.push(p);
+  return p;
+}
+function groundY(x, z) {
+  if (x > 3.3 && x < 9.5 && z < -2.55 && z > -7.7) return 0.27;
+  if (x > -10.9 && x < -5.5 && z < -2.45 && z > -6.6) return 0.1;
+  if (x > 5.3 && x < 9.9 && z > 4.4 && z < 7.8) return 0.14;
+  if (Math.abs(z) > 1.32 && Math.abs(z) < 2.21) return 0.08;
+  if (x > -12.2 && x < -4.4 && z > 2.95 && z < 9.15) return 0.03;
+  return 0.02;
+}
+function setPerson(p, x, z, vis, dx, dz, dt, sit = 0) {
+  p.g.visible = vis > 0.01;
+  if (!p.g.visible) return;
+  const moving = Math.hypot(dx, dz) > 1e-4;
+  p.g.position.set(x, groundY(x, z), z);
+  p.g.scale.setScalar(Math.max(0.0001, vis));
+  if (moving) { p.face = Math.atan2(dx, dz); p.ph += dt * 10; }
+  if (p.face !== undefined) {
+    let d = p.face - p.g.rotation.y; d = Math.atan2(Math.sin(d), Math.cos(d));
+    p.g.rotation.y += d * Math.min(1, dt * 10);
+  }
+  const sw = moving && !reduce ? Math.sin(p.ph) * 0.55 : 0;
+  p.legs[0].rotation.x = sw - sit * 1.4; p.legs[1].rotation.x = -sw - sit * 1.4;
+  p.arms[0].rotation.x = p.carry ? -1.1 : -sw * 0.8; p.arms[1].rotation.x = p.carry ? -1.1 : sw * 0.8;
+  p.inner.position.y = (moving && !reduce ? Math.abs(Math.cos(p.ph)) * 0.02 : 0) - sit * 0.16;
+  p.x = x; p.z = z;
+}
+// 키프레임 길: [t, x, z]
+function along(keys, t) {
+  if (t <= keys[0][0]) return [keys[0][1], keys[0][2]];
+  for (let i = 0; i < keys.length - 1; i++) {
+    const a = keys[i], b = keys[i + 1];
+    if (t <= b[0]) { const u = (t - a[0]) / (b[0] - a[0] || 1); return [lerp(a[1], b[1], u), lerp(a[2], b[2], u)]; }
+  }
+  const l = keys[keys.length - 1]; return [l[1], l[2]];
+}
+
+// 가족: 모델하우스를 둘러보고, 쇼룸에서 소파를 고르고, 집에서 소파를 받고, 저녁에 찻집으로
+const family = [person(0x3e4757, 0x2b2f38), person(0xc4703f, 0x5b4a3e), person(0xf0c04a, 0x3e4757, 0.7)];
+const FAM = [
+  [0.0, 6.0, -1.85], [0.12, 6.0, -1.85], [0.27, -6.4, -1.85], [0.29, -6.4, -2.6], [0.31, -8.4, -3.7], [0.37, -8.4, -3.7],
+  [0.39, -6.4, -2.6], [0.40, -6.4, -1.85], [0.47, 7.4, -1.85], [0.49, 7.4, -2.6], [0.51, 7.2, -3.6], [0.53, 5.5, -5.3],
+  [0.64, 5.5, -5.3], [0.655, 7.2, -3.6], [0.665, 7.4, -2.6], [0.675, 7.4, -1.85], [0.695, 2.1, -1.85], [0.715, 2.1, 1.85],
+  [0.75, -6.3, 1.85], [0.76, -6.3, 3.3], [0.78, -7.2, 6.9], [1.0, -7.2, 6.9]
+];
+const FAM_OFF = [[0, 0], [0.3, 0.12], [-0.22, 0.24]];
+// 배송 기사 두 사람
+const movers = [person(0x2f5d50, 0x2b2f38), person(0x2f5d50, 0x2b2f38)];
+// 찻집 손님
+const guests = [person(0x8d9a80), person(0xd9604c, 0x2b2f38), person(0xe9e2d6, 0x5b4a3e), person(0x6b4a33), person(0x3f6b8a, 0x2b2f38)];
+const GUEST_SPOT = [[-6.9, 5.7], [-6.0, 6.5], [-5.4, 7.6], [-6.2, 8.1], [-7.8, 7.6]];
+// 오가는 사람
+const walkers = [];
+for (let i = 0; i < (MOBILE ? 4 : 7); i++) {
+  const p = person([0x6b4a33, 0xe9e2d6, 0x3e4757, 0xb3504a, 0x8d9a80, 0x4a6f8a, 0xc9a77a][i], [0x2b2f38, 0x3e4757, 0x5b4a3e][i % 3]);
+  walkers.push({ p, side: i % 2 ? 1 : -1, x: lerp(-12, 12, (i * 0.37) % 1), v: 0.55 + (i % 3) * 0.12, dir: i % 3 === 1 ? -1 : 1, lane: (i % 2 ? 1 : -1) * (1.62 + (i % 3) * 0.1) });
+}
+const crosser = person(0xf0c04a, 0x2b2f38);
+const neruStaff = person(0x2f5d50, 0xe9e2d6);
+const itStaff = [person(0x3a3e44, 0x2b2f38), person(0xeceae6, 0x3e4757)];
+itStaff.forEach(p => { const lap = new THREE.Mesh(new THREE.BoxGeometry(0.2, 0.02, 0.14), mat.metal); lap.position.set(0, 0.46, 0.13); p.inner.add(lap); p.carry = true; });
+window.__staff = [neruStaff, ...itStaff];
+
+// ---------- 차 ----------
+const vehicles = [];
+const wheelGeo = new THREE.CylinderGeometry(0.13, 0.13, 0.08, 14).rotateX(Math.PI / 2);
+function wheels(k, xs, zs) { for (const x of xs) for (const z of zs) k.add(wheelGeo, mat.dark, x, 0.13, z); }
+function car(color) {
+  const g = new THREE.Group(), k = Kit();
+  k.rbox(1.55, 0.36, 0.74, 0.08, cm(color), 0, 0.14, 0);
+  k.rbox(0.86, 0.32, 0.66, 0.08, mat.glassC, -0.12, 0.46, 0);
+  k.rbox(0.9, 0.04, 0.68, 0.02, cm(color), -0.12, 0.76, 0);
+  wheels(k, [-0.48, 0.48], [-0.34, 0.34]);
+  k.box(0.02, 0.07, 0.14, mat.head, 0.78, 0.36, 0.24); k.box(0.02, 0.07, 0.14, mat.head, 0.78, 0.36, -0.24);
+  k.box(0.02, 0.06, 0.12, mat.tail, -0.78, 0.38, 0.25); k.box(0.02, 0.06, 0.12, mat.tail, -0.78, 0.38, -0.25);
+  k.flush(g); world.add(g);
+  return g;
+}
+function bus() {
+  const g = new THREE.Group(), k = Kit();
+  k.rbox(3.4, 0.95, 0.9, 0.08, cm(0x3f8a66), 0, 0.16, 0);
+  k.box(3.0, 0.32, 0.92, mat.win2, -0.1, 0.62, 0);
+  k.box(0.04, 0.5, 0.8, mat.win2, 1.7, 0.5, 0);
+  k.rbox(3.3, 0.06, 0.86, 0.02, mat.white, 0, 1.11, 0);
+  wheels(k, [-1.1, 1.1], [-0.42, 0.42]);
+  k.box(0.02, 0.08, 0.16, mat.head, 1.71, 0.3, 0.3); k.box(0.02, 0.08, 0.16, mat.head, 1.71, 0.3, -0.3);
+  k.box(0.02, 0.08, 0.14, mat.tail, -1.71, 0.3, 0.32); k.box(0.02, 0.08, 0.14, mat.tail, -1.71, 0.3, -0.32);
+  k.flush(g); world.add(g);
+  return g;
+}
+const LANE = 0.62;
+for (const [c, lane, x, v] of [[0xe9e2d6, 1, -8, 2.4], [0xb3504a, -1, 4, 2.2], [0x3e4757, 1, 6, 2.6], [0xf0c04a, -1, -10, 2.0]].slice(0, MOBILE ? 3 : 4)) {
+  vehicles.push({ g: car(c), lane, x, v, vmax: v, len: 1.6 });
+}
+vehicles.push({ g: bus(), lane: 1, x: -2, v: 1.8, vmax: 1.8, len: 3.4, bus: true, stopT: 0 });
+// 자전거
+const bike = { g: new THREE.Group(), x: -12, v: 1.4 };
+{
+  const k = Kit(), tor = new THREE.TorusGeometry(0.17, 0.018, 6, 16);
+  k.add(tor, mat.dark, -0.32, 0.18, 0); k.add(tor, mat.dark, 0.32, 0.18, 0);
+  k.add(new THREE.BoxGeometry(0.66, 0.025, 0.025), cm(0xb3504a), 0, 0.36, 0, 0, 0, 0.1);
+  k.add(new THREE.BoxGeometry(0.025, 0.34, 0.025), cm(0xb3504a), -0.05, 0.3, 0, 0, 0, 0.35);
+  k.flush(bike.g);
+  const r = person(0x4a6f8a, 0x2b2f38, 0.92); world.remove(r.g); r.g.visible = true; r.g.position.set(-0.08, 0.12, 0); r.g.rotation.y = Math.PI / 2; bike.g.add(r.g); bike.r = r;
+  people.splice(people.indexOf(r), 1);
+  world.add(bike.g);
+}
+
+// 이야기 차: 가구 배송 트럭, 간판 사다리차
+function truck() {
+  const g = new THREE.Group(), k = Kit();
+  k.rbox(0.72, 0.8, 0.86, 0.06, mat.white, 0.95, 0.14, 0);
+  k.box(0.04, 0.32, 0.76, mat.glassC, 1.3, 0.5, 0);
+  k.rbox(1.75, 1.05, 0.92, 0.03, mat.cream, -0.32, 0.18, 0);
+  wheels(k, [-0.8, 0.95], [-0.4, 0.4]);
+  k.box(0.02, 0.07, 0.14, mat.head, 1.31, 0.32, 0.28); k.box(0.02, 0.07, 0.14, mat.head, 1.31, 0.32, -0.28);
+  k.flush(g);
+  const st = signTex('가구', '#2f5d50', '#f3ece0', 384, 128, 0.6);
+  for (const s of [-1, 1]) { const p = new THREE.Mesh(new THREE.PlaneGeometry(1.2, 0.4), M(0xffffff, { map: st })); p.position.set(-0.32, 0.75, s * 0.465); p.rotation.y = s > 0 ? 0 : Math.PI; g.add(p); }
+  world.add(g); g.visible = false;
+  return g;
+}
+const delivery = { g: truck(), x: -14, z: LANE, len: 2.6 };
+const sofaBox = new THREE.Mesh(new RoundedBoxGeometry(1.0, 0.4, 0.5, 2, 0.03), M(0xc9a77a)); sofaBox.castShadow = true; sofaBox.visible = false; world.add(sofaBox);
+const ladderTruck = { g: new THREE.Group(), x: 14, z: -LANE, len: 2.8 };
+let ladderArm, ladderBasket;
+{
+  const g = ladderTruck.g, k = Kit();
+  k.rbox(0.7, 0.78, 0.86, 0.06, cm(0xe39b3a), 1.05, 0.14, 0);
+  k.box(0.04, 0.3, 0.76, mat.glassC, 1.4, 0.5, 0);
+  k.box(2.0, 0.14, 0.86, mat.dark, -0.25, 0.3, 0);
+  k.box(0.5, 0.36, 0.5, cm(0xe39b3a), -0.9, 0.44, 0);
+  wheels(k, [-0.8, 1.0], [-0.4, 0.4]);
+  k.box(0.02, 0.07, 0.14, mat.head, 1.41, 0.32, 0.28); k.box(0.02, 0.07, 0.14, mat.head, 1.41, 0.32, -0.28);
+  k.flush(g);
+  const yaw = new THREE.Group(); yaw.position.set(-0.9, 0.82, 0); g.add(yaw);
+  ladderArm = new THREE.Group(); yaw.add(ladderArm); ladderArm.userData.yaw = yaw;
+  // 11-03 사다리 2.9m는 바구니가 베이커리 벽 안으로 0.4m 들어가 겹쳤다. 2.2m로 줄이고 더 세워 간판 앞(벽에서 0.4m)에 선다
+  const a = Kit(), L = 2.2;
+  for (const s of [-1, 1]) a.box(L, 0.05, 0.04, mat.metal, L / 2, 0, s * 0.14);
+  for (let i = 0; i < 10; i++) a.box(0.03, 0.03, 0.28, mat.metal, 0.15 + i * 0.22, 0.01, 0);
+  a.flush(ladderArm);
+  ladderBasket = new THREE.Group(); ladderBasket.position.set(L, 0, 0); ladderArm.add(ladderBasket);
+  const bk = Kit(); bk.box(0.42, 0.3, 0.42, cm(0xe39b3a), 0, -0.15, 0); bk.flush(ladderBasket);
+  const worker = person(0xe39b3a, 0x2b2f38, 0.85); world.remove(worker.g); worker.g.visible = true; worker.g.position.set(0, -0.1, 0); ladderBasket.add(worker.g);
+  people.splice(people.indexOf(worker), 1);
+  world.add(g); g.visible = false;
+}
+
+// ---------- 구름, 연기 ----------
+const clouds = [];
+{
+  const cMat = M(0xffffff, { flatShading: true, roughness: 1, transparent: true, opacity: 0.92 });
+  for (let i = 0; i < (MOBILE ? 4 : 6); i++) {
+    const g = new THREE.Group(), k = Kit();
+    const n = 3 + (i % 3);
+    for (let j = 0; j < n; j++) k.add(ico1, cMat, j * 0.8 - n * 0.4, Math.sin(j * 2) * 0.2, (j % 2) * 0.4, j, 0, 0, 0.7 + (j % 2) * 0.3, 0.5 + (j % 2) * 0.2, 0.6);
+    k.flush(g);
+    g.position.set(-18 + i * 7, 11.5 + (i % 3) * 0.8, MOBILE ? -26 - (i % 2) * 3 : -8 + (i * 5.3) % 12); g.scale.setScalar(0.75);
+    world.add(g); clouds.push({ g, v: 0.25 + (i % 3) * 0.08 });
+  }
+}
+const smoke = [];
+{
+  const sMat = M(0xe8e4de, { flatShading: true, roughness: 1, transparent: true, opacity: 0.6, depthWrite: false });
+  for (let i = 0; i < 9; i++) { const m = new THREE.Mesh(ico, sMat.clone()); world.add(m); smoke.push({ m, off: i / 9 }); }
+}
+
+// ---------- 사다리차가 붙이는 간판 글자 ----------
+const FS = 220;
+const fontCss = px => `800 ${px}px Pretendard, sans-serif`;
+const tcan = document.createElement('canvas');
+const tctx = tcan.getContext('2d', { willReadFrequently: true });
+function rdp(pts, eps) {
+  const n = pts.length;
+  if (n < 3) return pts.slice();
+  const keep = new Uint8Array(n); keep[0] = keep[n - 1] = 1;
+  const stack = [[0, n - 1]];
+  while (stack.length) {
+    const [i, j] = stack.pop();
+    const [ax, ay] = pts[i], [bx, by] = pts[j];
+    const dx = bx - ax, dy = by - ay, len = Math.hypot(dx, dy) || 1e-9;
+    let md = 0, mi = -1;
+    for (let k = i + 1; k < j; k++) { const d = Math.abs((pts[k][0] - ax) * dy - (pts[k][1] - ay) * dx) / len; if (d > md) { md = d; mi = k; } }
+    if (md > eps && mi > 0) { keep[mi] = 1; stack.push([i, mi], [mi, j]); }
+  }
+  return pts.filter((_, k) => keep[k]);
+}
+function simplifyClosed(pts, eps) {
+  let far = 0, fd = -1;
+  for (let k = 1; k < pts.length; k++) { const d = (pts[k][0] - pts[0][0]) ** 2 + (pts[k][1] - pts[0][1]) ** 2; if (d > fd) { fd = d; far = k; } }
+  const a = rdp(pts.slice(0, far + 1), eps), b = rdp(pts.slice(far).concat([pts[0]]), eps);
+  return a.slice(0, -1).concat(b.slice(0, -1));
+}
+const area = p => { let s = 0; for (let i = 0, j = p.length - 1; i < p.length; j = i++) s += (p[j][0] - p[i][0]) * (p[j][1] + p[i][1]); return s / 2; };
+function inside(pt, poly) {
+  let c = false;
+  for (let i = 0, j = poly.length - 1; i < poly.length; j = i++) {
+    const [xi, yi] = poly[i], [xj, yj] = poly[j];
+    if ((yi > pt[1]) !== (yj > pt[1]) && pt[0] < (xj - xi) * (pt[1] - yi) / (yj - yi) + xi) c = !c;
+  }
+  return c;
+}
+function traceGlyph(ch) {
+  tctx.font = fontCss(FS);
+  const m = tctx.measureText(ch);
+  const res = { adv: m.width, shapes: [], box: null };
+  if (!ch.trim()) return res;
+  const pad = 3;
+  const L = Math.ceil(m.actualBoundingBoxLeft) + 2, R = Math.ceil(m.actualBoundingBoxRight) + 2;
+  const A = Math.ceil(m.actualBoundingBoxAscent) + 2, D = Math.ceil(m.actualBoundingBoxDescent) + 2;
+  const w = Math.max(4, L + R + pad * 2), h = Math.max(4, A + D + pad * 2);
+  tcan.width = w; tcan.height = h;
+  tctx.font = fontCss(FS); tctx.fillStyle = '#fff'; tctx.textBaseline = 'alphabetic';
+  tctx.fillText(ch, pad + L, pad + A);
+  const data = tctx.getImageData(0, 0, w, h).data;
+  const F = new Float32Array(w * h);
+  for (let i = 0; i < F.length; i++) F[i] = data[i * 4 + 3] / 255;
+  const T = 0.502;
+  const ept = id => {
+    const idx = id >> 1, x = idx % w, y = (idx / w) | 0, f0 = F[idx];
+    if ((id & 1) === 0) { const t = (T - f0) / (F[idx + 1] - f0); return [x + t, y]; }
+    const t = (T - f0) / (F[idx + w] - f0); return [x, y + t];
+  };
+  const next = new Map();
+  for (let y = 0; y < h - 1; y++) for (let x = 0; x < w - 1; x++) {
+    const a = F[y * w + x], b = F[y * w + x + 1], c = F[(y + 1) * w + x + 1], d = F[(y + 1) * w + x];
+    const code = (a >= T ? 8 : 0) | (b >= T ? 4 : 0) | (c >= T ? 2 : 0) | (d >= T ? 1 : 0);
+    if (code === 0 || code === 15) continue;
+    const eT = (y * w + x) * 2, eB = ((y + 1) * w + x) * 2, eL = (y * w + x) * 2 + 1, eR = (y * w + x + 1) * 2 + 1;
+    let segs;
+    switch (code) {
+      case 8: case 7: segs = [[eL, eT, 0]]; break;
+      case 4: case 11: segs = [[eT, eR, 1]]; break;
+      case 2: case 13: segs = [[eR, eB, 2]]; break;
+      case 1: case 14: segs = [[eB, eL, 3]]; break;
+      case 12: case 3: segs = [[eL, eR, 0]]; break;
+      case 6: case 9: segs = [[eT, eB, 0]]; break;
+      case 10: segs = (a + b + c + d) / 4 >= T ? [[eT, eR, 1], [eB, eL, 3]] : [[eL, eT, 0], [eR, eB, 2]]; break;
+      case 5: segs = (a + b + c + d) / 4 >= T ? [[eL, eT, 0], [eR, eB, 2]] : [[eT, eR, 1], [eB, eL, 3]]; break;
+    }
+    const vals = [a, b, c, d];
+    for (const [p, q, k] of segs) {
+      const P = ept(p), Q = ept(q);
+      const cx = x + (k === 1 || k === 2 ? 1 : 0), cy = y + (k >= 2 ? 1 : 0);
+      const cr = (Q[0] - P[0]) * (cy - P[1]) - (Q[1] - P[1]) * (cx - P[0]);
+      if ((cr > 0) === (vals[k] >= T)) next.set(p, q); else next.set(q, p);
+    }
+  }
+  const seen = new Set(), loops = [];
+  const ox = pad + L - 0.5, oy = pad + A - 0.5;
+  for (const s of next.keys()) {
+    if (seen.has(s)) continue;
+    const pts = [];
+    let e = s;
+    while (e !== undefined && !seen.has(e)) { seen.add(e); const p = ept(e); pts.push([p[0] - ox, oy - p[1]]); e = next.get(e); }
+    if (pts.length < 6) continue;
+    const sp = simplifyClosed(pts, 0.35);
+    if (sp.length < 3) continue;
+    const ar = area(sp);
+    if (Math.abs(ar) < 6) continue;
+    loops.push({ pts: sp, ar });
+  }
+  if (!loops.length) return res;
+  const big = loops.reduce((m2, l) => Math.abs(l.ar) > Math.abs(m2.ar) ? l : m2);
+  const sgn = Math.sign(big.ar);
+  const outers = loops.filter(l => Math.sign(l.ar) === sgn).map(l => ({ ...l, holes: [] }));
+  for (const l of loops) {
+    if (Math.sign(l.ar) === sgn) continue;
+    let best = null;
+    for (const o of outers) if (Math.abs(o.ar) > Math.abs(l.ar) && inside(l.pts[0], o.pts) && (!best || Math.abs(o.ar) < Math.abs(best.ar))) best = o;
+    if (best) best.holes.push(l.pts);
+  }
+  let x0 = Infinity, x1 = -Infinity, yy0 = Infinity, yy1 = -Infinity;
+  for (const o of outers) for (const [x, y] of o.pts) { x0 = Math.min(x0, x); x1 = Math.max(x1, x); yy0 = Math.min(yy0, y); yy1 = Math.max(yy1, y); }
+  res.shapes = outers.map(o => ({ outer: o.pts, holes: o.holes }));
+  res.box = { x0, x1, y0: yy0, y1: yy1 };
+  return res;
+}
+function glyphGlow(ch, k) {
+  const GF = 110, B = 26;
+  const c = document.createElement('canvas'), g = c.getContext('2d');
+  g.font = fontCss(GF);
+  const m = g.measureText(ch);
+  const pad = B * 2 + 4;
+  const L = Math.ceil(m.actualBoundingBoxLeft), R = Math.ceil(m.actualBoundingBoxRight);
+  const A = Math.ceil(m.actualBoundingBoxAscent), D = Math.ceil(m.actualBoundingBoxDescent);
+  const w = L + R + pad * 2, h = A + D + pad * 2;
+  c.width = w; c.height = h;
+  g.font = fontCss(GF); g.fillStyle = '#fff'; g.shadowColor = '#fff'; g.shadowOffsetX = w;
+  g.shadowBlur = B; g.fillText(ch, pad + L - w, pad + A);
+  g.globalCompositeOperation = 'lighter'; g.shadowBlur = B * 0.4; g.fillText(ch, pad + L - w, pad + A);
+  const tex = new THREE.CanvasTexture(c);
+  return { tex, w, h, ox: pad + L, oy: pad + A, k: FS / GF };
+}
+const SIGN_TXT = '베이커리';
+const letters = [];
+let lettersReady = false;
+const letterSide = M(0x2e2b28, { roughness: 0.4, metalness: 0.7 });
+async function buildLetters() {
+  try { await Promise.race([document.fonts.load(fontCss(FS), SIGN_TXT + '가구인테리어찻집곰파트너'), new Promise(r => setTimeout(r, 2500))]); } catch (e) { /* 기본 글꼴로 그립니다 */ }
+  signTexs.forEach(t => t.userData.redraw());
+  const ref = traceGlyph('한');
+  const refH = ref.box ? ref.box.y1 - ref.box.y0 : FS * 0.8;
+  const s = 0.5 / refH;
+  let pen = 0, x0 = Infinity, x1 = -Infinity, y0 = Infinity, y1 = -Infinity;
+  const placed = [];
+  for (const ch of SIGN_TXT) {
+    const gl = traceGlyph(ch);
+    placed.push({ ch, gl, x: pen });
+    if (gl.box) { x0 = Math.min(x0, pen + gl.box.x0); x1 = Math.max(x1, pen + gl.box.x1); y0 = Math.min(y0, gl.box.y0); y1 = Math.max(y1, gl.box.y1); }
+    pen += gl.adv + FS * 0.06;
+  }
+  const cx = (x0 + x1) / 2, cy = (y0 + y1) / 2;
+  const sg = B.saevit.g;
+  for (const p of placed) {
+    if (!p.gl.shapes.length) continue;
+    const shapes = p.gl.shapes.map(sh => {
+      const shp = new THREE.Shape(sh.outer.map(q => new THREE.Vector2(q[0], q[1])));
+      for (const ho of sh.holes) shp.holes.push(new THREE.Path(ho.map(q => new THREE.Vector2(q[0], q[1]))));
+      return shp;
+    });
+    const geo = new THREE.ExtrudeGeometry(shapes, { depth: 0.07 / s, bevelEnabled: false, curveSegments: 1 });
+    geo.scale(s, s, s);
+    const face = M(0xf6f1e8, { roughness: 0.35, emissive: new THREE.Color(0xfff0d6), emissiveIntensity: 0 });
+    const m = new THREE.Mesh(geo, [face, letterSide]); m.castShadow = true;
+    const grp = new THREE.Group();
+    const slot = V((p.x - cx) * s, B.saevit.signY - cy * s, B.saevit.signZ);
+    grp.position.copy(slot); grp.add(m);
+    const gg = glyphGlow(p.ch);
+    const gsc = s * gg.k;
+    const halo = new THREE.Mesh(new THREE.PlaneGeometry(1, 1), new THREE.MeshBasicMaterial({ map: gg.tex, color: 0xffd9a8, transparent: true, opacity: 0, blending: THREE.AdditiveBlending, depthWrite: false, fog: false }));
+    halo.scale.set(gg.w * gsc * 1.1, gg.h * gsc * 1.1, 1);
+    halo.position.set((gg.w / 2 - gg.ox) * gsc, -(gg.h / 2 - gg.oy) * gsc, 0.006);
+    grp.add(halo);
+    grp.visible = false;
+    sg.add(grp);
+    letters.push({ grp, face, halo, slot });
+  }
+  buildGomSign();
+  lettersReady = true;
+}
+const gomLetters = [];
+function buildGomSign() {
+  const txt = '곰파트너', ref = traceGlyph('한');
+  const s = 0.34 / (ref.box ? ref.box.y1 - ref.box.y0 : FS * 0.8);
+  let pen = 0, x0 = Infinity, x1 = -Infinity, y0 = Infinity, y1 = -Infinity;
+  const placed = [];
+  for (const ch of txt) { const gl = traceGlyph(ch); placed.push({ gl, x: pen }); if (gl.box) { x0 = Math.min(x0, pen + gl.box.x0); x1 = Math.max(x1, pen + gl.box.x1); y0 = Math.min(y0, gl.box.y0); y1 = Math.max(y1, gl.box.y1); } pen += gl.adv + FS * 0.05; }
+  const cx = (x0 + x1) / 2, cy = (y0 + y1) / 2;
+  const face = M(0xffffff, { roughness: 0.3, emissive: new THREE.Color(0xffffff), emissiveIntensity: 0.1 });
+  for (const p of placed) {
+    if (!p.gl.shapes.length) continue;
+    const shapes = p.gl.shapes.map(sh => { const shp = new THREE.Shape(sh.outer.map(q => new THREE.Vector2(q[0], q[1]))); for (const ho of sh.holes) shp.holes.push(new THREE.Path(ho.map(q => new THREE.Vector2(q[0], q[1])))); return shp; });
+    const geo = new THREE.ExtrudeGeometry(shapes, { depth: 0.05 / s, bevelEnabled: false, curveSegments: 1 });
+    geo.scale(s, s, s);
+    const m = new THREE.Mesh(geo, [face, letterSide]); m.castShadow = true;
+    m.position.set((p.x - cx) * s - 0.3, B.gom.signY - cy * s, B.gom.signZ);
+    B.gom.g.add(m);
+  }
+  gomLetters.push(face);
+}
+
+// ---------- 후처리 ----------
+const rt = new THREE.WebGLRenderTarget(innerWidth * DPR, innerHeight * DPR, { type: THREE.HalfFloatType, samples: 4 });
+const composer = new EffectComposer(renderer, rt);
+composer.setPixelRatio(DPR);
+composer.addPass(new RenderPass(scene, camera));
+const outline = new OutlinePass(new THREE.Vector2(innerWidth, innerHeight), scene, camera);
+Object.assign(outline, { edgeStrength: 5, edgeGlow: 0.6, edgeThickness: 1.6, pulsePeriod: 0 });
+outline.visibleEdgeColor.set(0xffd59a); outline.hiddenEdgeColor.set(0x5a3a1a);
+outline.enabled = false;
+composer.addPass(outline);
+const bloom = new UnrealBloomPass(new THREE.Vector2(innerWidth / 2, innerHeight / 2), 0.2, 0.55, 0.92);
+if (MOBILE) { const o = bloom.setSize.bind(bloom); bloom.setSize = (w, h) => o(Math.round(w / 2), Math.round(h / 2)); }
+composer.addPass(bloom);
+composer.addPass(new OutputPass());
+const finalPass = new ShaderPass({
+  uniforms: { tDiffuse: { value: null }, uRes: { value: new THREE.Vector2(1, 1) }, uTime: { value: 0 }, uGrain: { value: 0.0 }, uVig: { value: 0.32 } },
+  vertexShader: 'varying vec2 vUv; void main(){ vUv = uv; gl_Position = projectionMatrix * modelViewMatrix * vec4(position, 1.0); }',
+  fragmentShader: `uniform sampler2D tDiffuse; uniform vec2 uRes; uniform float uTime, uGrain, uVig; varying vec2 vUv;
+    void main(){
+      vec2 d = vUv - 0.5; float r2 = dot(d, d);
+      vec3 c = texture2D(tDiffuse, vUv).rgb;
+      c *= 1.0 - uVig * smoothstep(0.1, 0.65, r2);
+      gl_FragColor = vec4(c, 1.0);
+    }`
+});
+composer.addPass(finalPass);
+
+// ---------- 건물 정보, 이름표, 카드 ----------
+const INFO = {
+  neru: { name: '가구 쇼룸', kind: '소파와 선반', go: [['모듈 소파 열어 보기', 'sofa/'], ['시스템 선반 열어 보기', 'configurator/']] },
+  saevit: { name: '간판 제작', kind: '채널 간판', go: [['열어 보기', 'sign/']] },
+  onjib: { name: '인테리어', kind: '시공 사례와 현관 중문', go: [['시공 사례 열어 보기', 'space/'], ['현관 중문 열어 보기', 'door/']] },
+  hanok: { name: '한옥 찻집', kind: '찻집 홈페이지', go: [['열어 보기', 'hanok/']] },
+  gom: { name: '곰파트너', kind: '3D 웹 제작', go: [['비용 보기', '#price'], ['상담 신청', '/contact']] }
+};
+// 11-04 영문 페이지(/en/3d)가 ?lang=en 으로 끼우면 이름표, 카드, 버튼 이름을 영어로
+const EN = new URLSearchParams(location.search).get('lang') === 'en';
+if (EN) {
+  document.documentElement.lang = 'en';
+  Object.assign(INFO, {
+    neru: { name: 'Furniture showroom', kind: 'Sofa and shelving', go: [['Open modular sofa', 'sofa/'], ['Open shelving system', 'configurator/']] },
+    saevit: { name: 'Sign maker', kind: 'Channel letter sign', go: [['Open', 'sign/']] },
+    onjib: { name: 'Interior', kind: 'Project case and entrance door', go: [['Open project case', 'space/'], ['Open entrance door', 'door/']] },
+    hanok: { name: 'Hanok tea house', kind: 'Tea house website', go: [['Open', 'hanok/']] },
+    gom: { name: 'GOMPARTNER', kind: '3D web development', go: [['See prices', '#price'], ['Contact', '/contact']] }
+  });
+  const L = { '아침': 'Morning', '오후': 'Afternoon', '저녁': 'Evening', '밤': 'Night', '닫기': 'Close', '일시 정지': 'Pause' };
+  document.querySelectorAll('[aria-label]').forEach(el => { const t = L[el.getAttribute('aria-label')]; if (t) el.setAttribute('aria-label', t); });
+  $('gl').setAttribute('aria-label', 'Catalog village in 3D. Select a building label to open that catalog.');
+}
+const ORDER = ['neru', 'saevit', 'onjib', 'hanok', 'gom'];
+const hits = [];
+const box3 = new THREE.Box3();
+for (const id of ORDER) {
+  const b = B[id];
+  box3.setFromObject(b.g);
+  const size = box3.getSize(V(0, 0, 0)), c = box3.getCenter(V(0, 0, 0));
+  const h = new THREE.Mesh(new THREE.BoxGeometry(size.x + 0.3, size.y + 0.4, size.z + 0.3), new THREE.MeshBasicMaterial({ visible: false }));
+  h.position.copy(c); h.userData.id = id; scene.add(h); hits.push(h);
+  const el = document.createElement('button');
+  el.type = 'button'; el.className = 'pin';
+  el.innerHTML = `<i aria-hidden="true"></i>${INFO[id].name}`;
+  el.setAttribute('aria-expanded', 'false'); el.setAttribute('aria-controls', 'sheet');
+  el.addEventListener('click', () => (selected === id ? deselect() : select(id, true)));
+  el.addEventListener('pointerenter', e => { if (e.pointerType === 'mouse') setHover(id); });
+  el.addEventListener('pointerleave', e => { if (e.pointerType === 'mouse') setHover(null); });
+  $('pins').appendChild(el);
+  b.pinEl = el;
+}
+let hovered = null, selected = null;
+const hero = $('hero'), sheet = $('sheet');
+function setHover(id) {
+  if (hovered === id) return;
+  hovered = id;
+  canvas.classList.toggle('hot', !!id);
+  ORDER.forEach(k => B[k].pinEl.classList.toggle('hot', k === id));
+}
+function select(id, fromPin) {
+  selected = id;
+  const inf = INFO[id];
+  $('sheet-t').textContent = inf.name;
+  $('sheet-k').textContent = inf.kind;
+  const EMBED = document.documentElement.classList.contains('embed');
+  $('sheet-go').innerHTML = inf.go.map(([t, h]) => `<a href="${EMBED && h === '#price' ? (EN ? '/en/3d#plans' : '/3d#plans') : EMBED && EN && h === '/contact' ? '/en/3d#contact' : h}"${EMBED ? ' target="_top"' : ''}>${t}<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M9 5l7 7-7 7"/></svg></a>`).join('');
+  sheet.classList.add('on'); sheet.setAttribute('aria-hidden', 'false');
+  hero.classList.add('sel');
+  ORDER.forEach(k => B[k].pinEl.setAttribute('aria-expanded', String(k === id)));
+  if (fromPin) $('sheet-go').querySelector('a').focus({ preventScroll: true });
+  user.idle = 0;
+}
+function deselect() {
+  if (!selected) return;
+  const pin = B[selected].pinEl;
+  const hadFocus = sheet.contains(document.activeElement);
+  selected = null;
+  sheet.classList.remove('on'); sheet.setAttribute('aria-hidden', 'true');
+  hero.classList.remove('sel');
+  ORDER.forEach(k => B[k].pinEl.setAttribute('aria-expanded', 'false'));
+  if (hadFocus) pin.focus({ preventScroll: true });
+  user.idle = 0;
+}
+$('sheet-x').addEventListener('click', deselect);
+$('sheet-go').addEventListener('click', e => { const a = e.target.closest('a'); if (a && /#(price|plans)$/.test(a.getAttribute('href'))) deselect(); });
+document.addEventListener('keydown', e => { if (e.key === 'Escape' && selected) deselect(); });
+
+// ---------- 하루 진행 줄 ----------
+// 11-03 보는 사람의 지금 시각에 맞는 구간에서 시작: 06~12시 아침, 12~17시 오후, 17~19시 저녁, 그 밖은 밤
+const startT = (h => h >= 6 && h < 12 ? 0.0 : h >= 12 && h < 17 ? 0.5 : h >= 17 && h < 19 ? 0.64 : 0.8)(new Date().getHours());
+const day = { t: startT + (reduce ? 0.06 : 0.001), playing: !reduce };
+const CYCLE = 56;
+const tPos = t => 4 + t * 92;
+const dayBtns = [...$('track').querySelectorAll('button')];
+dayBtns.forEach(b => { b.style.left = tPos(+b.dataset.t) + '%'; b.addEventListener('click', () => { day.t = +b.dataset.t + 0.001; dirty = true; }); });
+function setPlay(on) {
+  day.playing = on;
+  $('play').setAttribute('aria-label', EN ? (on ? 'Pause' : 'Play') : (on ? '일시 정지' : '재생'));
+  $('play-i').innerHTML = on ? '<rect x="6" y="5" width="4" height="14" rx="1"/><rect x="14" y="5" width="4" height="14" rx="1"/>' : '<path d="M8 5.5v13a1 1 0 0 0 1.5.86l10.5-6.5a1 1 0 0 0 0-1.72L9.5 4.64A1 1 0 0 0 8 5.5z"/>';
+}
+setPlay(day.playing);
+$('play').addEventListener('click', () => { setPlay(!day.playing); dirty = true; });
+$('track').addEventListener('click', e => {
+  if (e.target.closest('button')) return;
+  const r = $('track').getBoundingClientRect();
+  day.t = clamp(((e.clientX - r.left) / r.width * 100 - 4) / 92, 0, 0.999); dirty = true;
+});
+let phaseNow = -1;
+function dayUI() {
+  $('fill').style.transform = `scaleX(${tPos(day.t) / 100})`;
+  const ph = day.t < 0.5 ? 0 : day.t < 0.64 ? 1 : day.t < 0.8 ? 2 : 3;
+  if (ph !== phaseNow) { phaseNow = ph; dayBtns.forEach((b, i) => b.setAttribute('aria-pressed', String(i === ph))); }
+}
+
+// ---------- 끌어서 돌리기, 고르기 ----------
+const user = { az: 0, el: 0, idle: 99 };
+const ray = new THREE.Raycaster(), ndc = new THREE.Vector2();
+function pick(e) {
+  const r = canvas.getBoundingClientRect();
+  ndc.set((e.clientX - r.left) / r.width * 2 - 1, -((e.clientY - r.top) / r.height) * 2 + 1);
+  ray.setFromCamera(ndc, camera);
+  const h = ray.intersectObjects(hits, false)[0];
+  return h ? h.object.userData.id : null;
+}
+let drag = null;
+canvas.addEventListener('pointerdown', e => { drag = { id: e.pointerId, x: e.clientX, y: e.clientY, lx: e.clientX, ly: e.clientY, moved: false, type: e.pointerType }; });
+addEventListener('pointermove', e => {
+  if (drag && e.pointerId === drag.id) {
+    if (!drag.moved && Math.hypot(e.clientX - drag.x, e.clientY - drag.y) > 7) {
+      // 휴대폰은 가로로 끌 때만 돌립니다. 세로는 페이지 스크롤에 맡깁니다
+      if (drag.type !== 'mouse' && Math.abs(e.clientY - drag.y) > Math.abs(e.clientX - drag.x)) { drag = null; return; }
+      drag.moved = true; canvas.classList.add('drag');
+      try { canvas.setPointerCapture(e.pointerId); } catch (err) { /* 캡처 없이도 동작합니다 */ }
+    }
+    if (drag.moved) {
+      user.az -= (e.clientX - drag.lx) * 0.0055;
+      if (drag.type === 'mouse') user.el += (e.clientY - drag.ly) * 0.003;
+      user.az = clamp(user.az, -1.0, 1.0); user.el = clamp(user.el, -0.3, 0.3);
+      user.idle = 0; dirty = true;
+    }
+    drag.lx = e.clientX; drag.ly = e.clientY;
+  } else if (e.pointerType === 'mouse' && e.target === canvas) setHover(pick(e));
+}, { passive: true });
+addEventListener('pointerup', e => {
+  if (!drag || e.pointerId !== drag.id) return;
+  if (!drag.moved) { const id = pick(e); if (id) select(id, false); else deselect(); }
+  canvas.classList.remove('drag');
+  drag = null;
+});
+addEventListener('pointercancel', () => { drag = null; canvas.classList.remove('drag'); });
+canvas.addEventListener('pointerleave', e => { if (e.pointerType === 'mouse' && !drag) setHover(null); });
+
+// ---------- 카메라 ----------
+const cam = { t: V(0, 0, 0.6), az: 0.3, el: 0.78, fw: 25, fh: 15, ox: 0, oy: 0, ah: 0.7, aw: 1 };
+let camInit = false, camInit2 = false;
+const PH = window.__PH = { az: 0.92, el: 0.72, oy: 0.05, aw: 1.85, ah: 0.86 };
+const des = { t: V(), az: 0, el: 0, fw: 0, fh: 0, ox: 0, oy: 0, ah: 0, aw: 0 };
+function storyFocus(t) {
+  if (t < 0.12) return 'onjib';
+  if (t >= 0.13 && t < 0.2) return 'gom';
+  if (t < 0.38) return t < 0.18 ? 'onjib' : 'neru';
+  if (t < 0.5) return 'onjib';
+  if (t < 0.64) return 'saevit';
+  if (t < 0.8) return 'hanok';
+  if (t < 0.93) return 'saevit';
+  return null;
+}
+function placeCamera(dt) {
+  const W = hero.clientWidth, H = hero.clientHeight, wide = W >= 900, asp = W / H;
+  const focus = storyFocus(day.t);
+  if (selected) {
+    const v = B[selected].view;
+    des.t.copy(v.t); des.az = v.az + user.az * 0.6; des.el = v.el + user.el; des.fw = v.fw; des.fh = v.fh;
+    if (wide) { des.ox = 0.16; des.oy = 0; des.aw = 0.62; des.ah = 0.8; } else { des.ox = 0; des.oy = 0.17; des.aw = 1; des.ah = 0.5; }
+  } else {
+    des.t.set(wide ? -0.9 : 0, wide ? 0.2 : 1.2, wide ? 0.4 : 0.5); des.az = (wide ? 0.3 : PH.az) + user.az; des.el = (wide ? 0.74 : PH.el) + user.el;
+    des.fw = wide ? 32.5 : 18.5; des.fh = wide ? 18 : 17;
+    des.ox = 0; des.oy = wide ? 0.035 : PH.oy; des.aw = wide ? 1.0 : PH.aw; des.ah = wide ? 0.84 : PH.ah;
+    if (focus && !reduce && wide) { des.t.lerp(B[focus].view.t, 0.08); des.az += (B[focus].view.az - 0.3) * 0.12; }
+  }
+  const rate = selected ? 2.4 : user.idle < 4 ? 6 : 0.55;
+  const k = camInit && !reduce ? 1 - Math.exp(-dt * rate) : 1;
+  camInit = true;
+  cam.t.lerp(des.t, k);
+  for (const n of ['az', 'el', 'fw', 'fh', 'ox', 'oy', 'aw', 'ah']) cam[n] += (des[n] - cam[n]) * k;
+  // 11-03 목표에 거의 닿으면 붙여서 멈춘다. 끝없이 조금씩 다가가면 바닥 무늬와 라벨이 가만히 있어도 떨렸다
+  if (cam.t.distanceToSquared(des.t) < 1e-8) cam.t.copy(des.t);
+  for (const n of ['az', 'el', 'fw', 'fh', 'ox', 'oy', 'aw', 'ah']) if (Math.abs(des[n] - cam[n]) < 1e-5) cam[n] = des[n];
+  camera.fov = asp < 1 ? 30 : 24;
+  const tanV = Math.tan(THREE.MathUtils.degToRad(camera.fov / 2)), tanH = tanV * asp;
+  let distDes = Math.max(cam.fh / 2 / (tanV * cam.ah), cam.fw / 2 / (tanH * cam.aw));
+  if (!selected) {
+    const f = V(-Math.sin(cam.az) * Math.cos(cam.el), -Math.sin(cam.el), -Math.cos(cam.az) * Math.cos(cam.el));
+    const r = V(0, 1, 0).cross(f).normalize().negate(), u = r.clone().cross(f).negate();
+    distDes = 0;
+    for (const x of [IX0, IX1]) for (const z of [IZ0, IZ1]) for (const y of [0, 4.6]) {
+      const rel = V(x, y, z).sub(cam.t);
+      distDes = Math.max(distDes, Math.abs(rel.dot(r)) / (tanH * cam.aw) - rel.dot(f), Math.abs(rel.dot(u) - cam.oy * 0) / (tanV * cam.ah) - rel.dot(f));
+    }
+  }
+  if (!cam.dist || !camInit2) { cam.dist = distDes; camInit2 = true; }
+  cam.dist += (distDes - cam.dist) * k;
+  if (Math.abs(distDes - cam.dist) < 1e-4) cam.dist = distDes;
+  const dist = cam.dist;
+  camera.position.set(cam.t.x + Math.sin(cam.az) * Math.cos(cam.el) * dist, cam.t.y + Math.sin(cam.el) * dist, cam.t.z + Math.cos(cam.az) * Math.cos(cam.el) * dist);
+  camera.lookAt(cam.t);
+  camera.aspect = asp;
+  camera.setViewOffset(W, H, -cam.ox * W, cam.oy * H, W, H);
+  camera.updateProjectionMatrix();
+  scene.fog && (scene.fog.near = dist * 0.9, scene.fog.far = dist * 2.4);
+  camera.near = Math.max(0.5, dist * 0.35); camera.far = dist * 2.6;
+  camera.updateProjectionMatrix();
+  sky.scale.setScalar(dist * 2.2 / 200);
+}
+scene.fog = new THREE.Fog(0x221d19, 40, 120);
+
+// ---------- 하루: 하늘과 빛 ----------
+const DAYK = [
+  // t, 해 세기, 하늘빛 세기, 위 하늘, 지평선, 해 색, 밤
+  [0.0, 1.8, 0.5, 0x6f9be0, 0xf7b88c, 0xffc890, 0.15],
+  [0.1, 2.9, 0.65, 0x4a90e2, 0xf6d2b0, 0xfff0da, 0],
+  [0.45, 3.2, 0.7, 0x2f7fd6, 0x8cc8ef, 0xfffaf0, 0],
+  [0.62, 2.8, 0.62, 0x4b88cc, 0xf0c99a, 0xffe0b0, 0],
+  [0.72, 1.7, 0.45, 0x4a4f86, 0xf08a52, 0xff8c48, 0.3],
+  [0.8, 0.35, 0.22, 0x070b18, 0x1d2746, 0x7d90c8, 1],
+  [0.95, 0.35, 0.22, 0x070b18, 0x1d2746, 0x7d90c8, 1],
+  [1.0, 1.8, 0.5, 0x6f9be0, 0xf7b88c, 0xffc890, 0.15]
+];
+const cA = new THREE.Color(), cB = new THREE.Color();
+const L = { night: 0 };
+function sampleDay(t) {
+  let i = 0; while (i < DAYK.length - 2 && t > DAYK[i + 1][0]) i++;
+  const a = DAYK[i], b = DAYK[i + 1], u = sm((t - a[0]) / (b[0] - a[0]));
+  sun.intensity = lerp(a[1], b[1], u);
+  hemi.intensity = lerp(a[2], b[2], u);
+  skyU.uTop.value.copy(cA.setHex(a[3])).lerp(cB.setHex(b[3]), u);
+  skyU.uHor.value.copy(cA.setHex(a[4])).lerp(cB.setHex(b[4]), u);
+  sun.color.copy(cA.setHex(a[5])).lerp(cB.setHex(b[5]), u);
+  L.night = lerp(a[6], b[6], u);
+  scene.fog.color.copy(skyU.uHor.value).lerp(skyU.uTop.value, 0.5);
+  const lite = L.night < 0.2 && !(t > 0.68 && t < 0.8);
+  if (lite !== L.lite) { L.lite = lite; document.body.classList.toggle('lite', lite); if (window.top !== window.self) parent.postMessage({ gp3d: 'lite', v: lite }, location.origin); }
+  // 해는 동쪽에서 서쪽으로, 밤에는 달빛
+  if (t < 0.8) {
+    const SUNK = [[0, 0.18], [0.1, 0.3], [0.42, 0.3], [0.5, 0.52], [0.62, 0.52], [0.7, 0.8], [0.8, 0.86]];
+    let j = 0; while (j < SUNK.length - 2 && t > SUNK[j + 1][0]) j++;
+    const ang = lerp(SUNK[j][1], SUNK[j + 1][1], sm((t - SUNK[j][0]) / (SUNK[j + 1][0] - SUNK[j][0]))) * Math.PI;
+    sun.position.set(Math.cos(ang) * 22, Math.sin(ang) * 20 + 3, 10);
+  }
+  else sun.position.set(-8, 22, 12);
+  sun.target.position.set(0, 0, 0.5);
+  hemi.color.copy(sun.color).lerp(cA.setHex(0xffffff), 0.5);
+  setEnv(lerp(0.55, 0.06, L.night));
+}
+// three 0.160에는 장면 전체 환경광 세기가 없어 재질마다 맞춥니다
+let envNow = -1, envMats = null;
+function setEnv(v) {
+  if (Math.abs(v - envNow) < 0.01) return;
+  envNow = v;
+  if (!envMats) { envMats = new Set(); scene.traverse(o => { if (o.material) [].concat(o.material).forEach(m => { if ('envMapIntensity' in m) envMats.add(m); }); }); }
+  envMats.forEach(m => { m.envMapIntensity = m === mat.glass ? v * 3 : v; });
+}
+
+// ---------- 이야기 ----------
+const FAB = ['#c9bba4', '#3e4757', '#b9a084', '#8d9a80'].map(c => new THREE.Color(c));
+const prevPos = new Map();
+const TV = new THREE.Vector3();
+function moveP(p, x, z, vis, dt, sit = 0) {
+  const pr = prevPos.get(p) || [x, z];
+  setPerson(p, x, z, vis, x - pr[0], z - pr[1], dt, sit);
+  prevPos.set(p, [x, z]);
+}
+const famVis = t => t < 0.01 ? t / 0.01 : t > 0.955 ? Math.max(0, 1 - (t - 0.955) / 0.01) : 1;
+function truckPose(t) {
+  // [t, x, z] 배송 트럭 길
+  const K = [[0.29, -14.5, LANE], [0.315, -6.6, LANE], [0.33, -4.3, 0.8], [0.392, -4.3, 0.8], [0.405, -2, LANE], [0.43, 7.0, LANE], [0.442, 9.4, 0.8], [0.506, 9.4, 0.8], [0.516, 11.5, LANE], [0.54, 15, LANE]];
+  if (t < K[0][0] || t > K[K.length - 1][0]) return null;
+  const [x, z] = along(K, t), [x2, z2] = along(K, t + 0.002);
+  return { x, z, yaw: Math.hypot(x2 - x, z2 - z) > 1e-4 ? Math.atan2(-(z2 - z), x2 - x) : null };
+}
+function ladderPose(t) {
+  const K = [[0.49, 15, -LANE], [0.525, -1.4, -0.74], [0.635, -1.4, -0.74], [0.68, -15, -LANE]];
+  if (t < K[0][0] || t > K[K.length - 1][0]) return null;
+  const [x, z] = along(K, sm(range(t, 0.49, 0.525)) * 0 + t);
+  return { x, z };
+}
+const basketW = new THREE.Vector3();
+function story(t, dt, time) {
+  sampleDay(t);
+  const night = L.night;
+  // 창문, 가로등, 간판 판
+  mat.win.emissiveIntensity = night * 0.85; mat.win2.emissiveIntensity = night * 0.75;
+  mat.lamp.emissiveIntensity = 0.6 + night * 2.6;
+  mat.head.emissiveIntensity = 0.3 + night * 3; mat.tail.emissiveIntensity = 0.3 + night * 2.5;
+  glowMat.opacity = night * 0.55;
+  for (const m of nightMats) m.emissiveIntensity = 0.05 + night * 0.5;
+  codeMat.emissiveIntensity = wireMat.emissiveIntensity = 0.55 + night * 0.7;
+  const nextScr = t > 0.3 && t < 0.97 ? wireTex : flatTex;
+  if (neruScreen.material.map !== nextScr) { neruScreen.material.map = neruScreen.material.emissiveMap = nextScr; neruScreen.material.needsUpdate = true; }
+  neruScreen.material.emissiveIntensity = nextScr === wireTex ? 0.9 + night * 0.6 : 0.35;
+  for (const f of gomLetters) f.emissiveIntensity = 0.08 + night * 1.5;
+  beacon.emissiveIntensity = 0.4 + night * 2 * (Math.sin(time * 3) > 0 ? 1 : 0.3);
+  showLight.intensity = 14 + night * 6;
+  // 1. 아침: 모델하우스에 불이 켜지고 중문이 열렸다 닫힙니다
+  homeLight.intensity = Math.max(bump(t, 0.015, 0.16, 0.12) * 7, bump(t, 0.47, 0.66, 0.08) * 5, night * 7);
+  const op = bump(t, 0.04, 0.13, 0.3);
+  slideDoor.position.z = -1.95 - op * 0.66;
+  // 가족
+  family.forEach((p, i) => {
+    const [x, z] = along(FAM, t);
+    const o = FAM_OFF[i];
+    const inside = t > 0.31 && t < 0.37 || t > 0.53 && t < 0.64 || t > 0.78;
+    moveP(p, x + o[0] * (inside ? 2.2 : 1), z + o[1] * (inside ? 2.2 : 1), famVis(t), dt);
+  });
+  // 1-2. 가구 쇼룸 직원이 곰파트너 사옥에 들렀다 돌아갑니다
+  {
+    const SK = [[0.0, -6.4, -2.6], [0.008, -6.4, -1.85], [0.07, 2.1, -1.85], [0.085, 2.1, 1.85], [0.115, 9.9, 1.85], [0.125, 10.3, 4.0], [0.135, 10.3, 6.6], [0.14, 9.7, 6.6], [0.15, 8.4, 6.4],
+      [0.2, 8.4, 6.4], [0.21, 9.7, 6.6], [0.215, 10.3, 6.6], [0.225, 10.3, 4.0], [0.235, 9.9, 1.85], [0.265, 2.1, 1.85], [0.28, 2.1, -1.85], [0.315, -6.4, -1.85], [0.322, -6.4, -2.6]];
+    const [x, z] = along(SK, t);
+    const vis = t > 0.323 ? 0 : Math.min(range(t, 0, 0.004), 1 - range(t, 0.318, 0.323));
+    moveP(neruStaff, x, z, Math.max(0.0001, vis), dt);
+    if (vis <= 0) neruStaff.g.visible = false;
+  }
+  // 2. 쇼룸: 소파 원단을 고르는 중
+  const pickU = range(t, 0.31, 0.37) * 3;
+  const ci = Math.min(2, Math.floor(pickU)), cu = sm((pickU - ci) * 1.6);
+  showSofaMat.color.copy(FAB[ci]).lerp(FAB[ci + 1], t > 0.37 ? 1 : cu);
+  if (t > 0.37 || t < 0.31) showSofaMat.color.copy(t > 0.37 && t < 0.96 ? FAB[3] : FAB[0]);
+  // 3. 배송: 트럭이 소파를 싣고 모델하우스로
+  const tp = truckPose(t);
+  delivery.g.visible = !!tp;
+  if (tp) {
+    delivery.sx = tp.x; delivery.z = tp.z;
+    if (!delivery.on) { delivery.on = true; delivery.x = tp.x; }
+    delivery.g.position.set(delivery.x, 0.0, tp.z);
+    if (tp.yaw !== null) delivery.g.rotation.y = tp.yaw;
+    delivery.g.scale.setScalar(Math.max(0.0001, range(13.6 - Math.abs(delivery.x), 0, 0.8)));
+  } else delivery.on = false;
+  // 기사와 상자
+  let boxAt = null;
+  const carry = (u, ax, az, bx, bz) => { const x = lerp(ax, bx, u), z = lerp(az, bz, u); boxAt = [x, z]; return [x, z]; };
+  let mv = null;
+  const tx = delivery.on ? delivery.x : -4.3;
+  const LOAD = [[0.333, -6.4, -2.6], [0.338, -6.4, -1.85], [0.365, -6.4, 1.62], [0.385, Math.max(-6.2, tx - 0.3), 1.62]];
+  const UNLOAD = [[0.446, Math.max(7.6, delivery.on ? delivery.x : 9.4), 1.62], [0.456, 7.4, 1.62], [0.478, 7.4, -1.85], [0.484, 7.4, -2.6], [0.49, 7.2, -3.6], [0.503, 5.4, -6.2]];
+  if (t > 0.33 && t < 0.388) mv = along(LOAD, t);
+  else if (t > 0.443 && t < 0.506) mv = along(UNLOAD, t);
+  if (mv) boxAt = mv;
+  movers.forEach((p, i) => {
+    p.carry = !!mv;
+    if (!mv) { p.g.visible = false; prevPos.delete(p); return; }
+    const vis = Math.min(range(t, 0.33, 0.334), 1 - range(t, 0.385, 0.388)) > 0 && t < 0.4 ? Math.min(range(t, 0.33, 0.334), 1 - range(t, 0.385, 0.388)) : Math.min(range(t, 0.443, 0.447), 1 - range(t, 0.502, 0.506));
+    moveP(p, mv[0] + (i ? 0.3 : -0.3), mv[1], Math.max(0.0001, vis), dt);
+  });
+  sofaBox.visible = !!boxAt && t < 0.503;
+  if (boxAt) { sofaBox.position.set(boxAt[0], groundY(boxAt[0], boxAt[1]) + 0.52, boxAt[1]); sofaBox.rotation.y = Math.PI / 2 * 0; }
+  const sk = sm(range(t, 0.5, 0.515)) * (t < 0.99 ? 1 : 0);
+  homeSofa.visible = sk > 0.001 && t < 0.995; homeSofa.scale.setScalar(Math.max(0.0001, sk));
+  // 4. 오후: 사다리차가 서고 간판 글자가 하나씩 붙습니다
+  const lp = ladderPose(t);
+  ladderTruck.g.visible = !!lp;
+  if (lp) {
+    ladderTruck.sx = lp.x; ladderTruck.z = lp.z;
+    if (!ladderTruck.on) { ladderTruck.on = true; ladderTruck.x = lp.x; }
+    ladderTruck.g.position.set(ladderTruck.x, 0, lp.z); ladderTruck.g.rotation.y = Math.PI;
+    ladderTruck.g.scale.setScalar(Math.max(0.0001, range(13.6 - Math.abs(ladderTruck.x), 0, 0.8)));
+    const up = sm(range(t, 0.527, 0.545)) * (1 - sm(range(t, 0.62, 0.635)));
+    ladderArm.userData.yaw.rotation.y = up * -Math.PI / 2;
+    ladderArm.rotation.z = up * 0.98;
+    ladderBasket.rotation.z = -ladderArm.rotation.z;
+  } else ladderTruck.on = false;
+  if (lettersReady) {
+    ladderBasket.getWorldPosition(basketW);
+    const sg = B.saevit.g;
+    sg.worldToLocal(basketW);
+    letters.forEach((Lt, i) => {
+      const a0 = 0.548 + i * 0.017, u = range(t, a0, a0 + 0.012);
+      const placed = t >= a0 && t < 0.999;
+      Lt.grp.visible = placed;
+      if (!placed) return;
+      Lt.grp.position.lerpVectors(basketW, Lt.slot, sm(u));
+      Lt.grp.position.y += Math.sin(Math.PI * u) * 0.25;
+      Lt.grp.position.z += (1 - sm(u)) * 0.3;
+      Lt.grp.rotation.y = (1 - sm(u)) * 0.6;
+      // 6. 밤: 글자에 불이 순서대로
+      const l0 = 0.815 + i * 0.012, lu = range(t, l0, l0 + 0.01);
+      const fl = lu <= 0 ? 0 : lu >= 1 ? 1 : lu < 0.3 ? 0.8 : lu < 0.5 ? 0.1 : lu < 0.7 ? 1 : 0.4;
+      const lit = fl * (t < 0.975 ? 1 : 1 - range(t, 0.975, 0.99)) * clamp(night * 1.3, 0, 1);
+      Lt.face.emissiveIntensity = lit * 1.5;
+      Lt.halo.material.opacity = lit * 0.22;
+    });
+  }
+  // 5. 저녁: 찻집 마당에 사람들이 모이고 등이 켜집니다
+  const eve = sm(range(t, 0.64, 0.7)) * (1 - sm(range(t, 0.96, 0.99)));
+  mat.paper.emissiveIntensity = eve * 2.6; mat.lattice.emissiveIntensity = eve * 0.9;
+  teaLight.intensity = eve * 6;
+  guests.forEach((p, i) => {
+    const t0 = 0.655 + i * 0.022;
+    if (t < t0 || t > 0.965) { p.g.visible = false; prevPos.delete(p); return; }
+    const fromW = i % 2 === 0;
+    const K = [[t0, fromW ? -13.2 : 0.5, 1.75 + (i % 3) * 0.08], [t0 + 0.05, -6.3 + (i - 2) * 0.12, 1.8], [t0 + 0.06, -6.3, 3.3], [t0 + 0.08, GUEST_SPOT[i][0], GUEST_SPOT[i][1]]];
+    const [x, z] = along(K, t);
+    const vis = Math.min(range(t, t0, t0 + 0.006), 1 - range(t, 0.955, 0.965), fromW ? range(13.4 - Math.abs(x), 0, 0.6) : 1);
+    moveP(p, x, z, Math.max(vis, 0.0001), dt);
+  });
+  // 굴뚝 연기
+  const smk = 0.35 + eve * 0.65;
+  smoke.forEach((s, i) => {
+    const u = ((reduce ? 0.5 : time * 0.12) + s.off) % 1;
+    s.m.position.set(chimneyTop.x + Math.sin(u * 5 + i) * 0.2 + u * 0.8, chimneyTop.y + u * 2.6, chimneyTop.z - u * 0.3);
+    s.m.scale.setScalar((0.12 + u * 0.38) * (0.6 + smk * 0.4));
+    s.m.material.opacity = (1 - u) * 0.55 * smk * (1 - night * 0.4);
+    s.m.rotation.set(u * 2, i, 0);
+  });
+  // 렌즈 효과
+  bloom.strength = lerp(0.12, 0.62, night) + eve * 0.1;
+  bloom.threshold = lerp(1.15, 0.95, night);
+  renderer.toneMappingExposure = lerp(1.0, 1.25, night);
+}
+
+// 배경: 차, 버스, 자전거, 행인
+const CW = 2.1, CWS = [-6.4, 2.1, 7.4];
+const peds = () => [crosser, ...family, ...movers, ...(window.__staff || [])];
+const SPAWN = 14.5;
+function traffic(dt, busy) {
+  const story = [];
+  if (delivery.on) story.push({ ref: delivery, lane: 1, len: delivery.len, story: true });
+  if (ladderTruck.on) story.push({ ref: ladderTruck, lane: -1, len: ladderTruck.len, story: true });
+  for (const lane of [1, -1]) {
+    const list = [...vehicles.filter(v => v.lane === lane && !v.wait).map(v => ({ ref: v, lane, len: v.len })), ...story.filter(a => a.lane === lane)];
+    list.forEach(a => { a.s = a.ref.x * lane; });
+    list.sort((p, q) => q.s - p.s);
+    for (let i = 0; i < list.length; i++) {
+      const a = list[i], lead = list[i - 1];
+      let lim = lead ? lead.s - (lead.len + a.len) / 2 - 0.45 : Infinity;
+      CWS.forEach((c, k) => {
+        if (!busy[k]) return;
+        const stop = lane > 0 ? c - 0.75 : -(c + 0.75);
+        if (a.s + a.len / 2 <= stop + 0.05) lim = Math.min(lim, stop - a.len / 2);
+      });
+      const v = a.ref;
+      if (a.story) {
+        const want = v.sx * lane;
+        a.s = want < a.s - 0.5 ? want : Math.min(want, a.s + 5 * dt, Math.max(a.s, lim));
+      } else {
+        if (v.bus) {
+          const stopS = 10.6 * lane;
+          if (v.stopT > 0) { v.stopT -= dt; lim = Math.min(lim, a.s); }
+          else if (!v.stopped && a.s < stopS && a.s > stopS - 0.25) { v.stopT = 3.5; v.stopped = true; }
+          else if (!v.stopped && a.s < stopS) lim = Math.min(lim, stopS);
+          if (a.s > stopS + 3) v.stopped = false;
+        }
+        const target = Math.min(v.vmax, Math.max(0, (lim - a.s) * 1.6 - 0.05));
+        v.v += clamp(target - v.v, -7 * dt, 2 * dt);
+        a.s = Math.min(a.s + Math.max(0, v.v) * dt, Math.max(a.s, lim));
+        if (a.s >= lim - 1e-3) v.v = Math.min(v.v, 0.3);
+      }
+      v.x = a.s * lane;
+      if (!a.story && a.s > SPAWN) { v.wait = true; v.x = 99 * lane; v.g.visible = false; }
+    }
+    // 섬 끝에서 다시 나올 때: 출발 자리가 비었을 때만
+    for (const v of vehicles) {
+      if (v.lane !== lane || !v.wait) continue;
+      const free = [...vehicles.filter(o => o !== v && o.lane === lane && !o.wait), ...story.filter(o => o.lane === lane).map(o => ({ x: o.ref.x, len: o.len }))]
+        .every(o => o.x * lane - o.len / 2 > -SPAWN + v.len / 2 + 0.8);
+      if (free) { v.wait = false; v.x = -SPAWN * lane; v.v = v.vmax * 0.6; v.g.visible = true; }
+    }
+  }
+  for (const v of vehicles) {
+    if (v.wait) continue;
+    v.g.position.set(v.x, 0.0, v.lane * LANE);
+    v.g.rotation.y = v.lane > 0 ? 0 : Math.PI;
+    v.g.scale.setScalar(Math.max(0.0001, range(13.5 - Math.abs(v.x), 0, 0.9)));
+  }
+  if (delivery.on) { delivery.g.position.x = delivery.x; delivery.g.scale.setScalar(Math.max(0.0001, range(13.6 - Math.abs(delivery.x), 0, 0.8))); }
+  if (ladderTruck.on) { ladderTruck.g.position.x = ladderTruck.x; ladderTruck.g.scale.setScalar(Math.max(0.0001, range(13.6 - Math.abs(ladderTruck.x), 0, 0.8))); }
+}
+// 확인용: 하루를 0.1초씩 돌리며 같은 차선에서 차끼리 겹친 횟수를 셉니다
+function simCheck(days = 1) {
+  let bad = 0, samples = 0, minGap = 99, tm = 0;
+  const steps = Math.round(CYCLE * days / 0.1);
+  for (let i = 0; i < steps; i++) {
+    for (let k = 0; k < 5; k++) { day.t = (day.t + 0.02 / CYCLE) % 1; tm += 0.02; story(day.t, 0.02, tm); background(0.02, tm); }
+    const ag = [...vehicles.filter(v => !v.wait).map(v => ({ x: v.x, lane: v.lane, len: v.len })), ...(delivery.on ? [{ x: delivery.x, lane: 1, len: delivery.len }] : []), ...(ladderTruck.on ? [{ x: ladderTruck.x, lane: -1, len: ladderTruck.len }] : [])].filter(a => Math.abs(a.x) < 14.6);
+    for (let a = 0; a < ag.length; a++) for (let b = a + 1; b < ag.length; b++) {
+      if (ag[a].lane !== ag[b].lane) continue;
+      const gap = Math.abs(ag[a].x - ag[b].x) - (ag[a].len + ag[b].len) / 2;
+      minGap = Math.min(minGap, gap); samples++;
+      if (gap < 0) bad++;
+    }
+  }
+  return { bad, samples, minGap: +minGap.toFixed(2) };
+}
+function background(dt, time) {
+  // 행인
+  for (const w of walkers) {
+    w.x += w.v * w.dir * dt;
+    if (w.x > 13.2) w.x = -13.2; if (w.x < -13.2) w.x = 13.2;
+    const vis = range(13.2 - Math.abs(w.x), 0, 0.6);
+    moveP(w.p, w.x, w.lane, Math.max(0.0001, vis), dt);
+  }
+  // 곰파트너 직원: 노트북을 들고 공원과 사옥을 오갑니다
+  itStaff.forEach((p, i) => {
+    const c = ((time + i * 13) % 26) / 26;
+    const K2 = [[0, 9.7, 6.4 - i * 0.4], [0.06, 10.3, 6.4], [0.1, 10.3, 7.9], [0.3, 4.6, 8.3], [0.42, 2.9, 6.9 + i * 0.3], [0.62, 2.9, 6.9 + i * 0.3], [0.74, 4.6, 8.3], [0.92, 10.3, 7.9], [0.96, 10.3, 6.4], [1, 9.7, 6.4 - i * 0.4]];
+    const [x, z] = along(K2, c);
+    moveP(p, x, z, Math.max(0.0001, Math.min(range(c, 0, 0.02), 1 - range(c, 0.98, 1))), dt);
+  });
+  // 횡단보도를 건너는 사람: 기다렸다가 건넙니다
+  const cyc = (time % 22) / 22;
+  const K = [[0, -5, -1.85], [0.24, CW, -1.85], [0.33, CW, -1.85], [0.46, CW, 1.85], [0.7, 8.5, 1.85], [1, 8.5, 1.85]];
+  const [cx, cz] = along(K, cyc);
+  const cv = Math.min(range(cyc, 0, 0.03), 1 - range(cyc, 0.67, 0.7));
+  moveP(crosser, cx, cz, Math.max(0.0001, cv), dt);
+  // 차: 방향별 차선, 앞차 따라가기, 줄 서서 기다리기
+  const busy = CWS.map(c => peds().some(p => p.g.visible && Math.abs(p.x - c) < 0.75 && Math.abs(p.z) < 1.5)) ;
+  if (cyc > 0.3 && cyc < 0.47) busy[1] = true;
+  traffic(dt, busy);
+  // 자전거: 차선 가장자리, 갓길에 선 트럭과 횡단보도 앞에서는 기다립니다
+  let bl = Infinity;
+  if (delivery.on && delivery.z > 0.7 && delivery.x > bike.x) bl = delivery.x - delivery.len / 2 - 0.6;
+  CWS.forEach((c, i) => { if (busy[i] && bike.x < c - 0.75) bl = Math.min(bl, c - 0.95); });
+  bike.v += clamp((bl - bike.x < 1.2 ? 0 : 1.4) - bike.v, -4 * dt, 2 * dt);
+  bike.x = Math.min(bike.x + bike.v * dt, bl); if (bike.x > 14) bike.x = -14;
+  bike.g.position.set(bike.x, 0, 1.15); bike.g.scale.setScalar(Math.max(0.0001, range(13.4 - Math.abs(bike.x), 0, 0.6)));
+  bike.r.legs[0].rotation.x = Math.sin(time * 8) * 0.6 - 0.9; bike.r.legs[1].rotation.x = -Math.sin(time * 8) * 0.6 - 0.9;
+  bike.r.arms[0].rotation.x = bike.r.arms[1].rotation.x = -1.2;
+  // 나무, 구름, 분수
+  for (const tr of trees) { tr.crown.rotation.z = Math.sin(time * 1.1 + tr.ph) * 0.035; tr.crown.rotation.x = Math.sin(time * 0.8 + tr.ph * 1.7) * 0.025; }
+  for (const c of clouds) { c.g.position.x += c.v * dt; if (c.g.position.x > 20) c.g.position.x = -20; }
+  fountain.rings.forEach((r, i) => { const u = (time * 0.35 + i / 3) % 1; r.scale.setScalar(0.25 + u * 0.95); r.material.opacity = (1 - u) * 0.35; });
+  const pos = fountain.pts.geometry.attributes.position;
+  for (let i = 0; i < fountain.N; i++) {
+    const [o, a, sp] = fountain.seed[i];
+    const u = (time * 0.9 * sp + o) % 1;
+    const r = u * 0.55 * sp;
+    pos.setXYZ(i, Math.cos(a) * r, 1.2 + u * 0.9 - u * u * 1.6, Math.sin(a) * r);
+  }
+  pos.needsUpdate = true;
+}
+
+// ---------- 이름표 위치 ----------
+const pv = new THREE.Vector3();
+let h1Box = { bottom: 0, right: 0 };
+function placePins() {
+  const W = hero.clientWidth, H = hero.clientHeight;
+  const focus = storyFocus(day.t);
+  for (const id of ORDER) {
+    const b = B[id];
+    pv.copy(b.pin); pv.y += b.lift;
+    pv.project(camera);
+    const x = (pv.x * 0.5 + 0.5) * W, y = (-pv.y * 0.5 + 0.5) * H;
+    const el = b.pinEl;
+    if (!b.pw) b.pw = el.offsetWidth;
+    const cx = clamp(x - b.pw / 2, 6, W - b.pw - 6), cy = clamp(y - 30, 54, H - 120);
+    // 제목과 겹치는 이름표는 잠시 숨깁니다
+    const cy2 = cy < h1Box.bottom + 6 && cx < h1Box.right ? h1Box.bottom + 6 : cy;
+    el.classList.toggle('off', !!selected && id !== selected);
+    el.style.transform = `translate3d(${cx.toFixed(2)}px, ${cy2.toFixed(2)}px, 0)`; // 11-03 반올림하면 카메라가 천천히 움직일 때 1px씩 튀어 떨려 보였다
+    el.classList.toggle('now', id === focus && !selected);
+  }
+}
+
+// ---------- 크기, 반복 ----------
+function size() {
+  const W = hero.clientWidth, H = hero.clientHeight;
+  renderer.setSize(W, H, false);
+  composer.setSize(W, H);
+  outline.setSize(W * DPR, H * DPR);
+  finalPass.uniforms.uRes.value.set(W * DPR, H * DPR);
+  skyU.uH.value = H * DPR;
+  ORDER.forEach(id => { B[id].pw = 0; });
+  const hb = hero.querySelector('h1').getBoundingClientRect(), r0 = hero.getBoundingClientRect();
+  h1Box = { bottom: hb.bottom - r0.top, right: hb.right - r0.left };
+  dirty = true;
+}
+let dirty = true;
+addEventListener('resize', size);
+size();
+let heroOn = true, visible = !document.hidden, running = false;
+new IntersectionObserver(es => { heroOn = es[0].isIntersecting; kick(); }).observe(hero);
+document.addEventListener('visibilitychange', () => { visible = !document.hidden; kick(); });
+function kick() { if (!running && heroOn && visible) { running = true; last = performance.now(); requestAnimationFrame(loop); } }
+let last = performance.now(), frames = 0, fpsT = performance.now(), first = true;
+window.__fps = 0;
+window.__v = { dbg: () => ({ t: +day.t.toFixed(3), del: delivery.on ? +delivery.x.toFixed(2) : null, delS: delivery.sx, lad: ladderTruck.on ? +ladderTruck.x.toFixed(2) : null, cars: vehicles.map(v => v.wait ? "w" : +v.x.toFixed(1) + "@" + v.v.toFixed(1)) }), simCheck, day, B, select, deselect, setPlay, composer, bloom, outline, renderer, sun, hemi, scene, mat, get selected() { return selected; } };
+function loop(now) {
+  if (!heroOn || !visible) { running = false; return; }
+  requestAnimationFrame(loop);
+  const dt = clamp((now - last) / 1000, 0, 0.05); // 첫 프레임 시각이 last보다 앞서면 음수가 되어 하루가 뒤로 감기므로 0 아래로 내려가지 않게
+  last = now;
+  frames++;
+  if (now - fpsT > 1000) { window.__fps = Math.round(frames * 1000 / (now - fpsT)); frames = 0; fpsT = now; }
+  const time = now / 1000;
+  user.idle += dt;
+  if (user.idle > 4 && !selected && !drag) { const k = 1 - Math.exp(-dt * 0.5); user.az -= user.az * k; user.el -= user.el * k; if (Math.abs(user.az) < 1e-5) user.az = 0; if (Math.abs(user.el) < 1e-5) user.el = 0; }
+  if (reduce && !dirty && !drag) return;
+  if (window.__freeze) { composer.render(); placePins(); return; }
+  if (day.playing) day.t = (day.t + dt / CYCLE) % 1;
+  story(day.t, dt, reduce ? 0 : time);
+  if (!reduce) background(dt, time);
+  else if (first) background(0.016, 3);
+  for (const id of ORDER) {
+    const b = B[id];
+    const want = (hovered === id || selected === id) ? 0.16 : 0;
+    b.lift += (want - b.lift) * (reduce ? 1 : 1 - Math.exp(-dt * 10));
+    b.g.position.y = b.lift;
+  }
+  const sel = selected || hovered;
+  outline.enabled = !!sel;
+  outline.selectedObjects = sel ? [B[sel].g] : [];
+  placeCamera(dt);
+  sky.position.copy(camera.position);
+  finalPass.uniforms.uTime.value = time;
+  composer.render();
+  placePins();
+  dayUI();
+  if (first) { first = false; document.body.classList.add('gl-on'); buildLetters().then(() => { envMats = null; envNow = -1; }); }
+  dirty = false;
+}
+kick();
+</script>
+</body>
+</html>

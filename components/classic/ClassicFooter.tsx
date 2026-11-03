@@ -1,5 +1,6 @@
 import Image from "next/image";
 import Link from "next/link";
+import { NavLink } from "@/components/classic/NavLink";
 import { Globe, Mail, Phone, Printer } from "lucide-react";
 import { ChannelIcon, type ChannelIconName } from "@/components/layout/Footer";
 import { profile } from "@/data/classic/profile";
@@ -10,30 +11,33 @@ const groups = [
   {
     title: "제작",
     items: [
-      { href: "/classic/homepage", label: "홈페이지 제작" },
-      { href: "/classic/landing", label: "랜딩페이지 제작" },
-      { href: "/classic/program", label: "업무 프로그램 제작" },
-      { href: "/classic/app", label: "앱 제작" },
-      { href: "/classic/kiosk", label: "키오스크 화면 제작" },
+      { href: "/homepage", label: "홈페이지 제작" },
+      { href: "/landing-page", label: "랜딩페이지 제작" },
+      { href: "/program", label: "업무 프로그램 제작" },
+      { href: "/app", label: "앱 제작" },
+      { href: "/kiosk", label: "키오스크 화면 제작" },
+      { href: "/3d", label: "3D 웹 제작" },
     ],
   },
   {
     title: "유지보수",
     items: [
-      { href: "/classic/maintenance/fix", label: "오류 수정" },
-      { href: "/classic/maintenance/takeover", label: "업체 이관" },
-      { href: "/classic/maintenance/update", label: "보안 업데이트" },
-      { href: "/classic/maintenance/monthly", label: "월 관리" },
+      { href: "/maintenance/fix", label: "오류 수정" },
+      { href: "/maintenance/takeover", label: "업체 이관" },
+      { href: "/maintenance/update", label: "보안 업데이트" },
+      { href: "/maintenance/monthly", label: "월 관리" },
     ],
   },
   {
     title: "곰파트너",
     items: [
-      { href: "/classic/story", label: "회사소개" },
-      { href: "/classic/works", label: "카탈로그" },
-      { href: "/classic/notice", label: "공지사항" },
-      { href: "/classic/faq", label: "자주 묻는 질문" },
-      { href: "/classic/contact", label: "상담 신청" },
+      { href: "/story", label: "회사소개" },
+      { href: "/works", label: "카탈로그" },
+      { href: "/notice", label: "공지사항" },
+      { href: "/insight", label: "인사이트" },
+      { href: "/tools", label: "자료실" },
+      { href: "/faq", label: "자주 묻는 질문" },
+      { href: "/contact", label: "상담 신청" },
     ],
   },
 ];
@@ -84,9 +88,9 @@ export function ClassicFooter() {
             <ul className="mt-4 grid gap-y-2.5" role="list">
               {g.items.map((m) => (
                 <li key={m.href}>
-                  <Link href={m.href} className="-my-1.5 inline-block py-1.5 hover:text-white">
+                  <NavLink href={m.href} className="-my-1.5 inline-block py-1.5 hover:text-white">
                     {m.label}
-                  </Link>
+                  </NavLink>
                 </li>
               ))}
             </ul>
@@ -115,7 +119,7 @@ export function ClassicFooter() {
       <div className="border-t border-white/10">
         <div className="mx-auto flex w-full max-w-[1248px] flex-col gap-2 px-4 py-6 text-[14px] md:flex-row md:justify-between md:px-6">
           <div className="flex flex-wrap items-center gap-x-5">
-            <Link href="/classic/privacy" className="inline-flex min-h-11 items-center self-start font-bold text-white hover:underline">
+            <Link href="/privacy" className="inline-flex min-h-11 items-center self-start font-bold text-white hover:underline">
               개인정보처리방침
             </Link>
             <Link href="/en" lang="en" hrefLang="en" className="inline-flex min-h-11 items-center gap-1.5 self-start hover:text-white hover:underline">

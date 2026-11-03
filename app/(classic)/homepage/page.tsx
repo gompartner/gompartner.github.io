@@ -1,0 +1,181 @@
+import type { Metadata } from "next";
+import Image from "next/image";
+import Link from "next/link";
+import { ChevronRight, Factory, GraduationCap, Scale, Stethoscope, Store } from "lucide-react";
+import { CompareTable } from "@/components/classic/CompareTable";
+import { FaqBlock } from "@/components/classic/FaqBlock";
+import { PlanTable } from "@/components/classic/pricing/PlanTable";
+import { DeliverBlock } from "@/components/classic/DeliverBlock";
+import { OtherServices } from "@/components/classic/OtherServices";
+import { replyTerm } from "@/data/classic/maintenance";
+import { AddonList } from "@/components/classic/pricing/AddonList";
+import { StepList } from "@/components/classic/pricing/StepList";
+import { serviceTabs } from "@/components/classic/pricing/tabs";
+import { PageHead, SubTabs, h2, more, wrap } from "@/components/classic/ui";
+import { SampleGrid } from "@/components/classic/works/SampleGrid";
+import { demoProjects } from "@/components/classic/works/samples";
+import { faqFor, processSteps } from "@/data/classic/faq";
+import { industries } from "@/data/classic/industries";
+import { plans, runningCostNote, samplesForPlan } from "@/data/classic/pricing";
+import { projects } from "@/data/classic/projects";
+import { pageMeta } from "@/lib/seo";
+import { siteUrl } from "@/lib/site";
+
+// 홈페이지 제작 서비스 상세. 패키지 데이터(data/classic/pricing)를 쓴다.
+
+export const metadata: Metadata = pageMeta({
+  title: "홈페이지 제작",
+  description: "병원, 매장, 전문직, 기업, 학원 업종별 홈페이지 제작. 반응형 화면, 검색엔진 등록, 원본 소스, 점검 결과표, 인계 문서 납품.",
+  path: "/homepage",
+});
+
+// 패키지마다 견적 기준이 된 샘플을 두 개씩
+const related = plans
+  .flatMap((p) => samplesForPlan(p.id).slice(0, 2))
+  .map((s) => demoProjects.find((p) => p.id === s.id))
+  .filter((p) => !!p)
+  .slice(0, 6);
+
+const section = "scroll-mt-20 border-t border-[#e6e9ee] md:scroll-mt-24";
+
+// 이 페이지의 디자인 포인트(10-30): 실제 카탈로그의 PC와 휴대폰 화면 한 쌍, 업종 아이콘
+const shot = projects.find((p) => p.id === "company")!;
+const shotSlug = shot.demoUrl.replace("/demo/", "");
+const industryIcon = { hospital: Stethoscope, store: Store, professional: Scale, company: Factory, academy: GraduationCap } as const;
+
+const ld = [
+  {
+    "@context": "https://schema.org",
+    "@type": "Service",
+    name: "홈페이지 제작",
+    serviceType: "홈페이지 제작",
+    description: "병원, 매장, 전문직 사무실, 기업, 학원 반응형 홈페이지 제작. 검색엔진 등록, 원본 소스, 점검 결과표, 인계 문서 납품.",
+    areaServed: "KR",
+    url: `${siteUrl}/homepage`,
+    provider: { "@id": `${siteUrl}/#org` },
+  },
+  {
+    "@context": "https://schema.org",
+    "@type": "BreadcrumbList",
+    itemListElement: [
+      { "@type": "ListItem", position: 1, name: "홈", item: `${siteUrl}/` },
+      { "@type": "ListItem", position: 2, name: "홈페이지 제작", item: `${siteUrl}/homepage` },
+    ],
+  },
+];
+
+export default function ClassicHomepagePage() {
+  return (
+    <>
+      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(ld) }} />
+      <PageHead
+        title="홈페이지 제작"
+        trail={[
+          { href: "/homepage", label: "제작" },
+          { href: "/homepage", label: "홈페이지 제작" },
+        ]}
+      />
+      <SubTabs items={serviceTabs} current="/homepage" />
+
+      <section aria-labelledby="hp-lead" className={`${wrap} py-12 md:py-16`}>
+        <div className="grid items-center gap-10 border-t-2 border-[#15171c] pt-6 md:grid-cols-[1fr_1.1fr] md:gap-12">
+          <div>
+            <h2 id="hp-lead" className="break-keep text-[26px] font-[800] leading-[1.35] tracking-[-0.04em] md:text-[34px]">
+              병원, 매장, 전문직, 기업, 학원 홈페이지를 업종에 맞게 만듭니다
+            </h2>
+            <p className="mt-4 break-keep text-[16px] leading-[1.7] text-[#5b6370] md:text-[17px]">반응형 화면, 검색엔진 등록, 원본 소스까지 함께 드립니다</p>
+            <p className="mt-3 text-[15px] font-bold text-[#256ef4]">{replyTerm}</p>
+          </div>
+          {/* PC 화면 위에 휴대폰 화면을 겹친다. 실제 카탈로그 캡처 */}
+          <div aria-hidden className="relative aspect-[16/11] w-full">
+            <div className="absolute left-0 top-0 w-[88%] overflow-hidden rounded-lg border border-[#e1e5eb] bg-white shadow-[0_20px_40px_rgba(21,23,28,.12)]">
+              <div className="flex h-6 items-center gap-1.5 bg-[#eef0f3] px-3">
+                <span className="h-2 w-2 rounded-full bg-[#c5cbd4]" />
+                <span className="h-2 w-2 rounded-full bg-[#c5cbd4]" />
+                <span className="h-2 w-2 rounded-full bg-[#c5cbd4]" />
+              </div>
+              <Image src={shot.imageUrl} alt={`${shot.title} PC 화면`} width={1440} height={900} sizes="(min-width: 768px) 560px, 90vw" className="aspect-[16/10] w-full object-cover object-top" />
+            </div>
+            <div className="absolute bottom-0 right-0 w-[27%] overflow-hidden rounded-[16px] border-[4px] border-[#15171c] bg-white shadow-[0_20px_40px_rgba(21,23,28,.2)]">
+              <Image src={`/images/demos/m/${shotSlug}.jpg`} alt={`${shot.title} 휴대폰 화면`} width={390} height={736} sizes="160px" className="aspect-[9/17] w-full object-cover object-top" />
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <section aria-labelledby="hp-whom" className={section}>
+        <div className={`${wrap} py-16 md:py-24`}>
+          <h2 id="hp-whom" className={h2}>
+            업종별 구성
+          </h2>
+          <ul className="mt-10 border-t-2 border-[#15171c]" role="list">
+            {industries.map((i) => (
+              <li key={i.slug} className="border-b border-[#e6e9ee]">
+                <Link href={`/works/${i.slug}`} className="group relative flex flex-col gap-1 py-5 pr-8 md:flex-row md:items-center md:gap-8 md:py-6 md:pr-0">
+                  <span className="flex shrink-0 items-center gap-3 text-[19px] font-[800] tracking-[-0.03em] group-hover:text-[#256ef4] md:w-[260px] md:text-[21px]">
+                    {(() => {
+                      const Icon = industryIcon[i.slug as keyof typeof industryIcon];
+                      return Icon ? (
+                        <span className="grid h-10 w-10 shrink-0 place-items-center rounded-full bg-[#e8efff] text-[#256ef4]">
+                          <Icon size={20} aria-hidden />
+                        </span>
+                      ) : null;
+                    })()}
+                    {i.label}
+                  </span>
+                  <span className="min-w-0 flex-1 text-[16px] leading-[1.6] text-[#5b6370]">{i.needs.join(", ")}</span>
+                  <ChevronRight size={20} aria-hidden className="absolute right-0 top-1/2 shrink-0 -translate-y-1/2 text-[#6b7280] group-hover:text-[#256ef4] md:static md:translate-y-0" />
+                </Link>
+              </li>
+            ))}
+          </ul>
+        </div>
+      </section>
+
+      <section id="plans" aria-labelledby="hp-plans" className={section}>
+        <div className={`${wrap} py-16 md:py-24`}>
+          <h2 id="hp-plans" className={h2}>
+            패키지
+          </h2>
+          <PlanTable plans={plans} product="홈페이지" />
+          <AddonList id="hp-addons" />
+          <p className="mt-6 text-[15px] leading-[1.65] text-[#5b6370] md:text-[16px]">{runningCostNote}</p>
+        </div>
+      </section>
+
+      {related.length > 0 && (
+        <section id="samples" aria-labelledby="hp-samples" className={section}>
+          <div className={`${wrap} py-16 md:py-24`}>
+            <div className="flex flex-wrap items-end justify-between gap-4">
+              <h2 id="hp-samples" className={h2}>
+                카탈로그
+              </h2>
+              <Link href="/works" className={more}>
+                전체 카탈로그 <ChevronRight size={16} aria-hidden />
+              </Link>
+            </div>
+            <div className="mt-10">
+              <SampleGrid items={related} cols={3} />
+            </div>
+          </div>
+        </section>
+      )}
+
+      <CompareTable />
+
+      <StepList steps={processSteps} title="진행 절차" id="process" />
+
+      <DeliverBlock
+        id="hp-deliver"
+        name="홈페이지와 인계 자료"
+        items={["홈페이지(PC, 모바일)", "원본 소스", "화면과 웹 접근성 점검 결과표", "계정 목록과 수정 방법을 정리한 인계 문서", "오픈 후 1개월 무상 하자보수"]}
+        photo="/images/site/scene-make.jpg"
+      />
+
+      <FaqBlock items={faqFor("make")} id="hp-faq" />
+
+      <OtherServices current="/homepage" />
+
+    </>
+  );
+}

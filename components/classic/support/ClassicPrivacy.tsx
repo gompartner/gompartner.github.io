@@ -3,7 +3,7 @@ import { PageHead, wrap } from "@/components/classic/ui";
 import { privacyVersions, type PolicyVersion, type Table } from "@/data/classic/privacyPolicy";
 
 // 개인정보처리방침 본문(클래식 보기). 내용은 웹툰 쪽과 같은 data/privacyPolicy 를 쓴다.
-const hrefOf = (id: string) => (id === privacyVersions[0].id ? "/classic/privacy" : `/classic/privacy/${id}`);
+const hrefOf = (id: string) => (id === privacyVersions[0].id ? "/privacy" : `/privacy/${id}`);
 
 function DataTable({ head, rows, caption }: Table) {
   // 좁은 화면에서 가로로 스크롤하는 상자. 키보드로도 스크롤할 수 있게 초점을 받고, 이름을 붙인다.
@@ -48,7 +48,7 @@ export function ClassicPrivacy({ version }: { version: PolicyVersion }) {
             <span>시행일 {version.date}</span>
             <span>{version.id}번째 버전</span>
             {!isLatest && (
-              <Link href="/classic/privacy" className="font-bold text-[#256ef4] underline underline-offset-4">
+              <Link href="/privacy" className="font-bold text-[#256ef4] underline underline-offset-4">
                 현재 버전 보기
               </Link>
             )}

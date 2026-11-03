@@ -7,11 +7,11 @@ import { join } from "node:path";
 
 const SITE = "https://gompartner.co.kr";
 const HOME = "/";
-const CONTACT = "/classic/contact";
-const CARE = "/classic/maintenance";
-const FIX = "/classic/maintenance/fix";
-const UPDATE = "/classic/maintenance/update";
-const ESTIMATE = "/classic/jaryo/estimate";
+const CONTACT = "/contact";
+const CARE = "/maintenance";
+const FIX = "/maintenance/fix";
+const UPDATE = "/maintenance/update";
+const ESTIMATE = "/jaryo/estimate";
 
 const tools = {
   "": CARE,
@@ -44,11 +44,11 @@ const guides = {
   "web-accessibility-check": FIX,
 };
 
-// 공지사항 게시판은 살아 있다(4e2a5e5 복구). 공지 아래(app/classic/notice)에는 파일을 만들지 않는다
+// 공지사항 게시판은 살아 있다(4e2a5e5 복구). 공지 아래(app/(classic)/notice)에는 파일을 만들지 않는다
 const map = { "/pricing": CONTACT, "/classic/pricing": CONTACT };
 for (const [k, v] of Object.entries(tools)) {
-  map[k ? `/tools/${k}` : "/tools"] = v;
-  map[k ? `/classic/tools/${k}` : "/classic/tools"] = v;
+  // 11-04 자료실(/tools)을 되살려 옛 /classic/tools 주소만 새 주소로 넘긴다
+  map[k ? `/classic/tools/${k}` : "/classic/tools"] = k ? `/tools/${k}` : "/tools";
 }
 for (const [k, v] of Object.entries(guides)) {
   map[k ? `/guide/${k}` : "/guide"] = v;

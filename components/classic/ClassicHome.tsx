@@ -3,8 +3,10 @@
 import Image from "next/image";
 import { useEffect, useRef, useState } from "react";
 import Link from "next/link";
+import { NavLink } from "@/components/classic/NavLink";
 import {
   ArrowUpRight,
+  Box,
   CalendarCheck,
   CheckCircle2,
   ChevronLeft,
@@ -38,43 +40,49 @@ import { FlowSteps } from "@/components/classic/pricing/StepList";
 
 const NAVY = "#0f1b3d";
 
-// 11-01 제작(홈페이지, 랜딩, 업무 프로그램, 앱, 키오스크)과 유지보수. 유지보수는 세부 페이지 네 개로
+// 11-01 제작(홈페이지, 랜딩, 업무 프로그램, 앱, 키오스크, 11-03 3D)과 유지보수. 유지보수는 세부 페이지 네 개로
 // 서비스 목록 아이콘(홈페이지 제작 쪽 업종별 구성과 같은 모양)
 const serviceIcon: Record<string, LucideIcon> = { fix: Wrench, takeover: Repeat, update: ShieldCheck, monthly: CalendarCheck };
 
 const services = [
   {
-    href: "/classic/homepage",
+    href: "/homepage",
     name: "홈페이지 제작",
     what: "병원, 매장, 전문직, 기업, 학원 홈페이지를 업종에 맞게 만듭니다",
     icon: MonitorSmartphone,
   },
   {
-    href: "/classic/landing",
+    href: "/landing-page",
     name: "랜딩페이지 제작",
     what: "광고로 들어온 고객의 상담, 예약 신청을 바로 받는 홍보용 페이지를 만듭니다",
     icon: Megaphone,
   },
   {
-    href: "/classic/program",
+    href: "/program",
     name: "업무 프로그램 제작",
     what: "엑셀로 하던 주문 취합, 관리, 출력 업무를 웹 프로그램으로 만듭니다",
     icon: Workflow,
   },
   {
-    href: "/classic/app",
+    href: "/app",
     name: "앱 제작",
     what: "아이폰, 안드로이드 앱과 설치형 웹앱을 업무에 맞게 만듭니다",
     icon: Smartphone,
   },
   {
-    href: "/classic/kiosk",
+    href: "/kiosk",
     name: "키오스크 화면 제작",
     what: "병원 접수, 출결, 체크인, 안내처럼 직접 누르는 화면을 만듭니다",
     icon: TabletSmartphone,
   },
+  {
+    href: "/3d",
+    name: "3D 웹 제작",
+    what: "가구, 중문, 간판 제품을 손님이 3D로 구성하고 바로 견적을 받는 화면을 만듭니다",
+    icon: Box,
+  },
   ...maintenanceServices.map((m) => ({
-    href: `/classic/maintenance/${m.id}`,
+    href: `/maintenance/${m.id}`,
     name: m.h1,
     what: m.term,
     icon: serviceIcon[m.id] ?? Wrench,
@@ -136,7 +144,7 @@ const heroSlides = [
       "반응형, 검색엔진 등록",
       "카탈로그 기준 견적",
     ],
-    href: "/classic/homepage",
+    href: "/homepage",
   },
   {
     key: "fix",
@@ -146,7 +154,7 @@ const heroSlides = [
     title: "오류 수정",
     sub: "홈페이지가 열리지 않거나 화면이 깨질 때 원인을 찾아 고칩니다",
     points: ["영업일 24시간 이내 회신", "원인 확인 후 견적", "장애 처리 내역서"],
-    href: "/classic/maintenance/fix",
+    href: "/maintenance/fix",
   },
   {
     key: "takeover",
@@ -160,7 +168,7 @@ const heroSlides = [
       "전체 백업과 구성 정리",
       "인수 점검 보고서",
     ],
-    href: "/classic/maintenance/takeover",
+    href: "/maintenance/takeover",
   },
   {
     key: "update",
@@ -170,7 +178,7 @@ const heroSlides = [
     title: "보안 업데이트",
     sub: "워드프레스, 그누보드, PHP를 최신 버전으로 안전하게 올립니다",
     points: ["작업 전 전체 백업", "협의한 시간에 작업", "업데이트 결과서"],
-    href: "/classic/maintenance/update",
+    href: "/maintenance/update",
   },
   {
     key: "monthly",
@@ -180,7 +188,7 @@ const heroSlides = [
     title: "월 관리",
     sub: "문구, 사진, 공지 수정과 정기 점검을 매달 맡습니다",
     points: ["월 건수 단위 계약", "도메인, SSL 만료 알림", "월간 점검 보고서"],
-    href: "/classic/maintenance/monthly",
+    href: "/maintenance/monthly",
   },
 ];
 const HERO_MS = 7000;
@@ -318,7 +326,7 @@ function Hero() {
                   {sl.key === "make" ? (
                   <div className="mt-8 flex flex-wrap gap-3">
                     <Link
-                      href="/classic/contact"
+                      href="/contact"
                       tabIndex={i === pos ? 0 : -1}
                       data-gtm-cta={`classic_hero_contact_${sl.key}`}
                       className="inline-flex h-12 items-center rounded-md bg-[#256ef4] px-6 text-[16px] font-bold text-white transition-colors hover:bg-[#0b50d0]"
@@ -336,7 +344,7 @@ function Hero() {
                   ) : (
                     // 11-01 유지보수 슬라이드: 주소를 넣고 바로 점검 요청(상담 신청서가 ?site= 를 읽어 미리 채운다)
                     <div className="mt-8">
-                      <form action="/classic/contact" method="get" className="flex max-w-[520px] overflow-hidden rounded-md bg-white">
+                      <form action="/contact" method="get" className="flex max-w-[520px] overflow-hidden rounded-md bg-white">
                         <label htmlFor={`hero-site-${sl.key}`} className="sr-only">
                           홈페이지 주소
                         </label>
@@ -538,17 +546,17 @@ function Services() {
       {/* 11-01 제작과 유지보수 두 묶음으로 나눈다 */}
       <div className="mt-10 space-y-12">
         {[
-          { label: "제작", items: services.filter((x) => !x.href.startsWith("/classic/maintenance")) },
-          { label: "유지보수", items: services.filter((x) => x.href.startsWith("/classic/maintenance")) },
+          { label: "제작", items: services.filter((x) => !x.href.startsWith("/maintenance")) },
+          { label: "유지보수", items: services.filter((x) => x.href.startsWith("/maintenance")) },
         ].map((g) => (
           <div key={g.label}>
             <h3 className="mb-4 text-[15px] font-bold text-[#256ef4]">{g.label}</h3>
           <ul className="border-t-2 border-[#15171c]" role="list">
             {g.items.map((s) => (
           <li key={s.name} className="border-b border-[#d9dee5]">
-            <Link
+            <NavLink
               href={s.href}
-              data-gtm-cta={`classic_service_${s.href.split("/").pop()}`}
+              data-gtm-cta={`classic_service_${s.href.split("/").filter(Boolean).pop()}`}
               className="group grid grid-cols-[1fr_auto] items-center gap-x-6 gap-y-1 py-6 md:grid-cols-[minmax(0,460px)_1fr_auto] md:py-7"
             >
               <h3 className="col-start-1 row-start-1 flex items-center gap-3 text-[20px] font-[800] tracking-[-0.04em] transition-colors group-hover:text-[#256ef4] md:gap-4 md:text-[26px]">
@@ -565,7 +573,7 @@ function Services() {
                 aria-hidden
                 className="col-start-2 row-span-2 row-start-1 self-center text-[#6b7280] transition-[color,transform] duration-200 group-hover:-translate-y-0.5 group-hover:translate-x-0.5 group-hover:text-[#256ef4] md:col-start-3 md:row-span-1"
               />
-            </Link>
+            </NavLink>
           </li>
         ))}
       </ul>
@@ -584,14 +592,14 @@ function Catalog() {
           <h2 id="c-catalog" className={h2}>
             업종별 카탈로그
           </h2>
-          <Link href="/classic/works" aria-label={`업종별 카탈로그 ${live.length}개 전체 보기`} className={cn(more, "min-h-11")}>
+          <Link href="/works" aria-label={`업종별 카탈로그 ${live.length}개 전체 보기`} className={cn(more, "min-h-11")}>
             전체 {live.length}개 <ChevronRight size={16} aria-hidden />
           </Link>
         </div>
         <ul className="mt-10 grid grid-cols-2 gap-3 md:grid-cols-3 md:gap-5" role="list">
           {picks.map((p) => (
             <li key={p.id}>
-              <Link href={`/classic/sample/${p.demoUrl.replace("/demo/", "")}`} className="group block overflow-hidden rounded-md border border-[#d9dee5] bg-white transition-colors hover:border-[#256ef4]">
+              <Link href={`/sample/${p.demoUrl.replace("/demo/", "")}`} className="group block overflow-hidden rounded-md border border-[#d9dee5] bg-white transition-colors hover:border-[#256ef4]">
                 <Image src={`/images/demos/sm/${p.demoUrl.replace("/demo/", "")}.jpg`} alt={`${p.title} 카탈로그 화면`} width={720} height={450} sizes="(min-width: 768px) 400px, 50vw" className="aspect-[16/10] w-full object-cover object-top" />
                 <span className="block px-4 py-3 md:px-5 md:py-4">
                   <span className="block text-[13px] font-bold text-[#5b6370] md:text-[14px]">{p.category}</span>
@@ -644,7 +652,7 @@ function Faq() {
           <h2 id="c-faq" className={h2}>
             자주 묻는 질문
           </h2>
-          <Link href="/classic/faq" aria-label="자주 묻는 질문 더보기" className={cn(more, "min-h-11")}>
+          <Link href="/faq" aria-label="자주 묻는 질문 더보기" className={cn(more, "min-h-11")}>
             더보기 <Plus size={15} strokeWidth={2.5} aria-hidden />
           </Link>
         </div>
