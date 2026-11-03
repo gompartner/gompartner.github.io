@@ -19,6 +19,7 @@ const FILTERS: { id: "all" | InsightRow["kind"]; label: string }[] = [
   { id: "tistory", label: "티스토리" },
   { id: "youtube", label: "유튜브" },
 ];
+const PAGE = 20;
 const ICON: Record<"naver" | "tistory" | "youtube", ChannelIconName> = { naver: "naverBlog", tistory: "tistory", youtube: "youtube" };
 
 // 11-04 바깥 채널 썸네일. 틀은 곰파트너 글과 같은 16:9로 두고, 사진 비율이 달라도 잘리거나 빈칸이 생기지 않게 한다.
@@ -45,6 +46,8 @@ function Thumb({ src, shorts }: { src: string; shorts: boolean }) {
 
 export function InsightList({ rows }: { rows: InsightRow[] }) {
   const [f, setF] = useState<(typeof FILTERS)[number]["id"]>("all");
+  // 11-04 처음 20건만 펼치고 "더 보기"로 20건씩 더 보인다. 나머지도 HTML에는 모두 두고 화면에서만 접는다(구글이 링크를 다 찾도록)
+  const [shown, setShown] = useState(PAGE);
   const list = f === "all" ? rows : rows.filter((r) => r.kind === f);
   return (
     <>
@@ -54,7 +57,7 @@ export function InsightList({ rows }: { rows: InsightRow[] }) {
             key={x.id}
             type="button"
             aria-pressed={f === x.id}
-            onClick={() => setF(x.id)}
+            onClick={() => { setF(x.id); setShown(PAGE); }}
             className={`min-h-10 rounded-md border px-4 text-[15px] font-bold transition-colors ${f === x.id ? "border-[#15171c] bg-[#15171c] text-white" : "border-[#d9dee5] bg-white text-[#464c53] hover:border-[#15171c]"}`}
           >
             {x.label}
@@ -65,7 +68,7 @@ export function InsightList({ rows }: { rows: InsightRow[] }) {
         전체 <span className="font-bold tabular-nums text-[#15171c]">{list.length}</span>건
       </p>
       <ul className="border-t-2 border-[#15171c]" role="list">
-        {list.map((n) => {
+        {list.map((n, idx) => {
           const ext = n.kind !== "own";
           const body = (
             <>
@@ -104,7 +107,7 @@ export function InsightList({ rows }: { rows: InsightRow[] }) {
             </>
           );
           return (
-            <li key={n.key} className="border-b border-[#e6e9ee]">
+            <li key={n.key} className={`border-b border-[#e6e9ee] ${idx >= shown ? "hidden" : ""}`}>
               {ext ? (
                 <a href={n.href} target="_blank" rel="noopener noreferrer" className="group flex items-center gap-4 py-6 md:items-start md:gap-10 md:py-8">{body}</a>
               ) : (
@@ -114,6 +117,17 @@ export function InsightList({ rows }: { rows: InsightRow[] }) {
           );
         })}
       </ul>
+      {list.length > shown ? (
+        <div className="mt-8 flex justify-center">
+          <button
+            type="button"
+            onClick={() => setShown((s) => s + PAGE)}
+            className="min-h-12 rounded-md border border-[#15171c] bg-white px-8 text-[16px] font-bold text-[#15171c] transition-colors hover:bg-[#15171c] hover:text-white"
+          >
+            더 보기 <span className="ml-1 font-normal tabular-nums text-current">{Math.min(shown, list.length)} / {list.length}</span>
+          </button>
+        </div>
+      ) : null}
     </>
   );
 }
