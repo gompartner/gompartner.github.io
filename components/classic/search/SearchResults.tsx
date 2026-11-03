@@ -5,7 +5,7 @@ import { NavLink as Link } from "@/components/classic/NavLink";
 import { ArrowUpRight } from "lucide-react";
 import type { SearchItem, SearchKind } from "./index";
 
-const ORDER: SearchKind[] = ["서비스", "카탈로그", "인사이트", "네이버 블로그", "자료실", "자주 묻는 질문", "공지사항"];
+const ORDER: SearchKind[] = ["서비스", "카탈로그", "인사이트", "네이버 블로그", "티스토리", "유튜브", "자료실", "자주 묻는 질문", "공지사항"];
 
 /** 검색 결과 묶음. 종류별로 나눠 보여 준다 */
 export function SearchResults({ items, grouped = true }: { items: SearchItem[]; grouped?: boolean }) {
@@ -37,10 +37,11 @@ export function SearchResults({ items, grouped = true }: { items: SearchItem[]; 
             <ul role="list">
               {g.list.map((i) => (
                 <li key={`${i.href}-${i.title}`} className="border-b border-[#e6e9ee]">
-                  <Link href={i.href} className="group flex items-start justify-between gap-4 py-5">
+                  <Link href={i.href} {...(/^https?:\/\//.test(i.href) ? { target: "_blank", rel: "noopener noreferrer" } : {})} className="group flex items-start justify-between gap-4 py-5">
                     <span className="min-w-0">
                       <span className="block text-[17px] font-bold leading-[1.45] group-hover:text-[#256ef4]">{i.title}</span>
                       <span className="mt-1 line-clamp-2 block text-[15px] leading-[1.6] text-[#5b6370]">{i.desc}</span>
+                      {/^https?:\/\//.test(i.href) ? <span className="sr-only">(새 창 열림)</span> : null}
                     </span>
                     <ArrowUpRight size={20} aria-hidden className="mt-1 shrink-0 text-[#6b7280] group-hover:text-[#256ef4]" />
                   </Link>

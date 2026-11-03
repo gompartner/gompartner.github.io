@@ -28,8 +28,8 @@ jobs:
           node-version: 22
           cache: npm
       - run: npm ci
-      # 인사이트 페이지의 네이버 블로그 글 목록을 새로 받는다. 실패하면 저장소에 있는 목록으로 빌드한다.
-      - run: node ops/naver-posts.mjs || echo "네이버 글 목록 갱신 실패, 기존 목록 사용"
+      # 인사이트 페이지와 통합검색의 채널 글(네이버 블로그, 티스토리, 유튜브) 목록을 새로 받는다. 실패하면 저장소에 있는 목록으로 빌드한다.
+      - run: node ops/channel-posts.mjs || echo "채널 글 목록 갱신 실패, 기존 목록 사용"
       # 구글 폰트 내려받기가 가끔 끊겨 빌드가 실패한다. 세 번까지 다시 시도한다.
       - run: |
           for i in 1 2 3; do
