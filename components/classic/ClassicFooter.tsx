@@ -47,6 +47,7 @@ export const channels: { href: string; label: string; handle: string; icon: Chan
   { href: "https://www.youtube.com/@gompartner", label: "유튜브", handle: "@gompartner", icon: "youtube" },
   { href: "https://clip.naver.com/@gompartner", label: "네이버 클립", handle: "@gompartner", icon: "naverClip" },
   { href: "https://blog.naver.com/gompartner", label: "네이버 블로그", handle: "gompartner", icon: "naverBlog" },
+  { href: "https://gompartner.tistory.com", label: "티스토리", handle: "gompartner", icon: "tistory" },
 ];
 
 const contactRow = "-my-1.5 inline-flex items-center gap-2 py-1.5";
