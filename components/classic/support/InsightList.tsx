@@ -21,6 +21,28 @@ const FILTERS: { id: "all" | InsightRow["kind"]; label: string }[] = [
 ];
 const ICON: Record<"naver" | "tistory" | "youtube", ChannelIconName> = { naver: "naverBlog", tistory: "tistory", youtube: "youtube" };
 
+// 11-04 바깥 채널 썸네일. 틀은 곰파트너 글과 같은 16:9로 두고, 사진 비율이 달라도 잘리거나 빈칸이 생기지 않게 한다.
+// 가로형, 세로형 사진: 같은 사진을 흐리게 깔아 틀을 채우고 원래 비율 그대로 위에 올린다.
+// 유튜브 쇼츠: hqdefault가 양옆 검은 띠가 붙은 4:3이라 높이를 틀에 맞추면 가운데 세로 화면 폭(높이 x 9/16)이 9:16 칸과 딱 맞는다. 그 칸만 보인다.
+// 바깥 주소 사진이라 이미지 최적화(next/image)를 거치지 않는다(정적 내보내기).
+function Thumb({ src, shorts }: { src: string; shorts: boolean }) {
+  return (
+    <span aria-hidden className="relative mt-1 block aspect-[16/9] w-[120px] shrink-0 overflow-hidden rounded-md border border-[#e6e9ee] bg-[#15171c] md:w-[280px]">
+      {/* eslint-disable-next-line @next/next/no-img-element */}
+      <img src={src} alt="" loading="lazy" referrerPolicy="no-referrer" className="absolute inset-0 h-full w-full scale-110 object-cover opacity-60 blur-md" />
+      {shorts ? (
+        <span className="absolute inset-y-0 left-1/2 aspect-[9/16] h-full -translate-x-1/2 overflow-hidden">
+          {/* eslint-disable-next-line @next/next/no-img-element */}
+          <img src={src} alt="" loading="lazy" referrerPolicy="no-referrer" className="absolute left-1/2 top-1/2 h-full max-w-none -translate-x-1/2 -translate-y-1/2" />
+        </span>
+      ) : (
+        // eslint-disable-next-line @next/next/no-img-element
+        <img src={src} alt="" loading="lazy" referrerPolicy="no-referrer" className="absolute inset-0 h-full w-full object-contain" />
+      )}
+    </span>
+  );
+}
+
 export function InsightList({ rows }: { rows: InsightRow[] }) {
   const [f, setF] = useState<(typeof FILTERS)[number]["id"]>("all");
   const list = f === "all" ? rows : rows.filter((r) => r.kind === f);
@@ -77,9 +99,7 @@ export function InsightList({ rows }: { rows: InsightRow[] }) {
               {n.kind === "own" ? (
                 <Image src={n.image} alt={n.title} width={1200} height={675} sizes="(min-width: 768px) 280px, 120px" className="mt-1 w-[120px] shrink-0 rounded-md border border-[#e6e9ee] md:w-[280px]" />
               ) : n.image ? (
-                // 바깥 채널 사진은 그 채널 주소 그대로 쓴다(정적 내보내기라 이미지 최적화를 거치지 않음)
-                // eslint-disable-next-line @next/next/no-img-element
-                <img src={n.image} alt="" loading="lazy" referrerPolicy="no-referrer" className={`mt-1 aspect-[16/9] w-[120px] shrink-0 rounded-md border border-[#e6e9ee] md:w-[280px] ${n.kind === "youtube" ? "bg-[#15171c] object-contain" : "object-cover"}`} />
+                <Thumb src={n.image} shorts={n.kind === "youtube" && n.href.includes("/shorts/")} />
               ) : null}
             </>
           );
