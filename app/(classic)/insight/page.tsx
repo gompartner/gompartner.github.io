@@ -4,6 +4,7 @@ import Link from "next/link";
 import { PageHead, wrap } from "@/components/classic/ui";
 import { SupportTabs } from "@/components/classic/support/SupportTabs";
 import { insights, readMinutes } from "@/data/classic/insights";
+import { naverPosts } from "@/data/classic/naverPosts";
 import { pageMeta } from "@/lib/seo";
 
 export const metadata: Metadata = pageMeta({
@@ -63,6 +64,30 @@ export default function ClassicInsightPage() {
             </li>
           ))}
         </ul>
+
+        {/* 11-04 네이버 블로그 글 목록. 구글이 blog.naver.com 글을 찾도록 각 글 주소를 그대로 건다(ops/naver-posts.mjs로 갱신) */}
+        <section aria-labelledby="naver-posts" className="mt-16 md:mt-24">
+          <h2 id="naver-posts" className="text-[22px] font-[800] tracking-[-0.02em] md:text-[26px]">
+            네이버 블로그
+          </h2>
+          <p className="mt-2 text-[15px] text-[#5b6370]">
+            전체{" "}
+            <span className="font-bold tabular-nums text-[#15171c]">{naverPosts.length}</span>
+            건
+          </p>
+          <ul className="mt-4 border-t-2 border-[#15171c]" role="list">
+            {naverPosts.map((p) => (
+              <li key={p.logNo} className="border-b border-[#e6e9ee]">
+                <a
+                  href={`https://blog.naver.com/gompartner/${p.logNo}`}
+                  className="block py-4 text-[16px] font-bold leading-[1.5] hover:text-[#256ef4] hover:underline md:text-[17px]"
+                >
+                  {p.title}
+                </a>
+              </li>
+            ))}
+          </ul>
+        </section>
       </div>
     </>
   );
