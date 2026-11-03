@@ -27,7 +27,7 @@ const ICON: Record<"naver" | "tistory" | "youtube", ChannelIconName> = { naver: 
 // 바깥 주소 사진이라 이미지 최적화(next/image)를 거치지 않는다(정적 내보내기).
 function Thumb({ src, shorts }: { src: string; shorts: boolean }) {
   return (
-    <span aria-hidden className="relative mt-1 block aspect-[16/9] w-[120px] shrink-0 overflow-hidden rounded-md border border-[#e6e9ee] bg-[#15171c] md:w-[280px]">
+    <span aria-hidden className="relative block aspect-[16/9] md:mt-1 w-[120px] shrink-0 overflow-hidden rounded-md border border-[#e6e9ee] bg-[#15171c] md:w-[280px]">
       {/* eslint-disable-next-line @next/next/no-img-element */}
       <img src={src} alt="" loading="lazy" referrerPolicy="no-referrer" className="absolute inset-0 h-full w-full scale-110 object-cover opacity-60 blur-md" />
       {shorts ? (
@@ -97,7 +97,7 @@ export function InsightList({ rows }: { rows: InsightRow[] }) {
                 {n.kind === "own" ? <span className="mt-2 block text-[14px] tabular-nums text-[#6b7280]">읽는 시간 {n.minutes}분</span> : null}
               </div>
               {n.kind === "own" ? (
-                <Image src={n.image} alt={n.title} width={1200} height={675} sizes="(min-width: 768px) 280px, 120px" className="mt-1 w-[120px] shrink-0 rounded-md border border-[#e6e9ee] md:w-[280px]" />
+                <Image src={n.image} alt={n.title} width={1200} height={675} sizes="(min-width: 768px) 280px, 120px" className="w-[120px] shrink-0 rounded-md border border-[#e6e9ee] md:mt-1 md:w-[280px]" />
               ) : n.image ? (
                 <Thumb src={n.image} shorts={n.kind === "youtube" && n.href.includes("/shorts/")} />
               ) : null}
@@ -106,9 +106,9 @@ export function InsightList({ rows }: { rows: InsightRow[] }) {
           return (
             <li key={n.key} className="border-b border-[#e6e9ee]">
               {ext ? (
-                <a href={n.href} target="_blank" rel="noopener noreferrer" className="group flex items-start gap-4 py-6 md:gap-10 md:py-8">{body}</a>
+                <a href={n.href} target="_blank" rel="noopener noreferrer" className="group flex items-center gap-4 py-6 md:items-start md:gap-10 md:py-8">{body}</a>
               ) : (
-                <Link href={n.href} className="group flex items-start gap-4 py-6 md:gap-10 md:py-8">{body}</Link>
+                <Link href={n.href} className="group flex items-center gap-4 py-6 md:items-start md:gap-10 md:py-8">{body}</Link>
               )}
             </li>
           );
