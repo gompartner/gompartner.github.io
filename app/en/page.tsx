@@ -5,6 +5,7 @@ import { ArrowUpRight, CreditCard, FileCheck2, Search, Check } from "lucide-reac
 import { EnContact } from "@/components/en/EnContact";
 import { profile } from "@/data/classic/profile";
 import { siteUrl } from "@/lib/site";
+import { OG_IMAGE } from "@/lib/seo";
 
 // 해외 회사용 영문 소개 한 장. 업워크 프로필(01_Work/01_Active/업워크/프로필.md)과 같은 내용으로 맞춘다.
 const title = "Web development for companies launching in Korea";
@@ -14,7 +15,7 @@ export const metadata: Metadata = {
   title: { absolute: `${title} | ${profile.nameEn}` },
   description,
   alternates: { canonical: `${siteUrl}/en`, languages: { ko: siteUrl, en: `${siteUrl}/en` } },
-  openGraph: { type: "website", locale: "en_US", siteName: profile.nameEn, url: `${siteUrl}/en`, title, description },
+  openGraph: { images: [OG_IMAGE], type: "website", locale: "en_US", siteName: profile.nameEn, url: `${siteUrl}/en`, title, description },
 };
 
 import { h2, wrap } from "@/components/en/EnShell";

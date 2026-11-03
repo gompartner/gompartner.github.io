@@ -48,7 +48,7 @@ export default function ClassicInsightPage() {
                     {n.summary}
                   </span>
                   <span className="mt-2 block text-[14px] tabular-nums text-[#6b7280]">
-                    {readMinutes(n)}분
+                    읽는 시간 {readMinutes(n)}분
                   </span>
                 </div>
                 <Image

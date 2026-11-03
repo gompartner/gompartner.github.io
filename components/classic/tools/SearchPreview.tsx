@@ -99,7 +99,10 @@ export function SearchPreview() {
       const m = await res.json();
       if (!res.ok) throw new Error(m.error);
       setLive(m);
-      setF((s) => ({ ...s, name: m.siteName || "", region: "", industry: "", strengths: "", url: m.finalUrl, title: m.title, desc: m.description }));
+      // 11-04 지금 제목, 설명은 칸 아래 '지금 제목'으로만 보여 준다. 칸에 넣어 두면 상호, 지역을 고쳐도 코드가 그대로라서 비워 둔다
+      // 처음 보여 주던 치과 예시 값은 비우고, 사용자가 직접 넣은 값만 남긴다
+      const own = (k: "name" | "region" | "industry" | "strengths", v: string) => (v === EXAMPLE[k] ? "" : v);
+      setF((s) => ({ ...s, name: m.siteName || own("name", s.name), region: own("region", s.region), industry: own("industry", s.industry), strengths: own("strengths", s.strengths), url: m.finalUrl, title: "", desc: "" }));
     } catch (err) {
       setLive(null);
       setLoadError(err instanceof Error && err.message ? err.message : "불러오지 못했어요. 주소를 확인해 주세요.");
@@ -144,6 +147,7 @@ export function SearchPreview() {
     `<meta property="og:title" content="${escapeAttr(title)}">`,
     `<meta property="og:description" content="${escapeAttr(desc)}">`,
     `<meta property="og:url" content="${escapeAttr(url.full)}">`,
+    ...(live?.ogImage ? [`<meta property="og:image" content="${escapeAttr(live.ogImage)}">`] : []),
   ].join("\n");
 
   const copy = async () => {
@@ -208,20 +212,36 @@ export function SearchPreview() {
 
         <fieldset className="mt-8 grid gap-4">
           <legend className="w-full border-b-2 border-foreground pb-2 text-[19px] font-bold">검색 결과 문구</legend>
-          <p className="text-[15px] leading-[1.6] text-foreground-secondary">비워 두면 위 정보로 추천 문구를 만듭니다.</p>
+          <p className="text-[15px] leading-[1.6] text-foreground-secondary">비워 두면 위 상호, 지역, 업종, 자랑할 점으로 추천 문구를 만들고, 미리보기와 개발자에게 보낼 코드에 바로 들어갑니다.</p>
           <label className="block text-[16px] font-bold">
             <span className="flex justify-between">
               제목<span className="font-normal tabular-nums text-foreground-secondary">{len(title)}자</span>
             </span>
             <input value={f.title} onChange={set("title")} className={input} placeholder={suggestTitle(f)} />
           </label>
+          {live?.title && (
+            <p className="-mt-2 flex flex-wrap items-baseline gap-x-2 text-[14px] leading-[1.5] text-foreground-secondary">
+              <span>지금 제목: {live.title}</span>
+              <button type="button" onClick={() => setF((s) => ({ ...s, title: live.title }))} className="font-bold text-foreground underline underline-offset-4">
+                그대로 넣기
+              </button>
+            </p>
+          )}
           <label className="block text-[16px] font-bold">
             <span className="flex justify-between">
               설명<span className="font-normal tabular-nums text-foreground-secondary">{len(desc)}자</span>
             </span>
             <textarea value={f.desc} onChange={set("desc")} rows={3} className={`${input} h-auto py-2 leading-[1.5]`} placeholder={suggestDesc(f)} />
           </label>
-          <button type="button" onClick={() => setF({ ...EXAMPLE, name: "", region: "", industry: "", url: "", strengths: "" })} className="justify-self-start text-[15px] text-foreground-secondary underline underline-offset-4 hover:text-foreground">
+          {live?.description && (
+            <p className="-mt-2 flex flex-wrap items-baseline gap-x-2 text-[14px] leading-[1.5] text-foreground-secondary">
+              <span>지금 설명: {live.description}</span>
+              <button type="button" onClick={() => setF((s) => ({ ...s, desc: live.description }))} className="font-bold text-foreground underline underline-offset-4">
+                그대로 넣기
+              </button>
+            </p>
+          )}
+          <button type="button" onClick={() => { setF({ ...EXAMPLE, name: "", region: "", industry: "", url: "", strengths: "" }); setLive(null); }} className="justify-self-start text-[15px] text-foreground-secondary underline underline-offset-4 hover:text-foreground">
             모두 지우고 새로 쓰기
           </button>
         </fieldset>

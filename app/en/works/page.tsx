@@ -7,6 +7,7 @@ import { h2, wrap } from "@/components/en/EnShell";
 import { profile } from "@/data/classic/profile";
 import { enThree, enWorks } from "@/data/en/site";
 import { siteUrl } from "@/lib/site";
+import { OG_IMAGE } from "@/lib/seo";
 
 // 11-04 영문 카탈로그. 데모는 한국어 화면 그대로 열고(한국 손님이 보는 모습), 제목과 설명만 영어로 쓴다
 const title = "Korean website samples";
@@ -16,7 +17,7 @@ export const metadata: Metadata = {
   title: { absolute: `${title} | ${profile.nameEn}` },
   description,
   alternates: { canonical: `${siteUrl}/en/works`, languages: { ko: `${siteUrl}/works`, en: `${siteUrl}/en/works` } },
-  openGraph: { type: "website", locale: "en_US", siteName: profile.nameEn, url: `${siteUrl}/en/works`, title, description },
+  openGraph: { images: [OG_IMAGE], type: "website", locale: "en_US", siteName: profile.nameEn, url: `${siteUrl}/en/works`, title, description },
 };
 
 const card = "group block";

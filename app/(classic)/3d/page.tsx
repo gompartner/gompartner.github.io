@@ -35,7 +35,7 @@ export const metadata: Metadata = pageMeta({
   title: s.metaTitle,
   description: s.metaDescription,
   path,
-  image: { src: "/3d/assets/og.jpg", alt: "곰파트너 3D 웹 제작 카탈로그 마을" },
+  image: { src: "/3d/assets/og.jpg", alt: "곰파트너 3D 웹 제작 카탈로그 마을", width: 1200, height: 630 },
 });
 
 const section = "scroll-mt-20 border-t border-[#e6e9ee] md:scroll-mt-24";

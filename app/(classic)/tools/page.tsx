@@ -4,13 +4,10 @@ import { ChevronRight } from "lucide-react";
 import { PageHead, wrap } from "@/components/classic/ui";
 import { SupportTabs } from "@/components/classic/support/SupportTabs";
 import { toolCategories, tools } from "@/data/classic/tools";
-import { fitDescription } from "@/lib/seo";
+import { pageMeta } from "@/lib/seo";
 
-export const metadata: Metadata = {
-  title: "자료실",
-  description: fitDescription("개인정보처리방침·이용약관 생성기, 웹접근성 점검표, QR코드, 이미지 용량 줄이기 같은 무료 도구입니다."),
-  alternates: { canonical: "/tools" },
-};
+// 11-04 공유 미리보기(카톡 등)도 이 도구의 제목, 설명, 주소로 나오게 pageMeta를 쓴다
+export const metadata: Metadata = pageMeta({ title: "자료실", description: "개인정보처리방침·이용약관 생성기, 웹접근성 점검표, QR코드, 이미지 용량 줄이기 같은 무료 도구입니다.", path: "/tools" });
 
 export default function ClassicToolsPage() {
   return (

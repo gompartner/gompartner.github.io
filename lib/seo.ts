@@ -9,11 +9,11 @@ export const OG_IMAGE = { url: "/og-image.png?v=20261102", width: 1200, height: 
 
 // 하위 페이지가 openGraph를 따로 정하지 않으면 홈 제목과 설명이 그대로 공유된다.
 // 페이지 제목과 설명으로 openGraph, twitter를 같이 채운다.
-export function pageMeta(opts: { title: string; description: string; path: string; image?: { src: string; alt: string }; article?: boolean }) {
+export function pageMeta(opts: { title: string; description: string; path: string; image?: { src: string; alt: string; width?: number; height?: number }; article?: boolean }) {
   const description = fitDescription(opts.description);
   const title = `${opts.title} | 곰파트너`;
   const url = opts.path;
-  const image = opts.image ? { url: opts.image.src, width: 1200, height: 675, alt: opts.image.alt } : OG_IMAGE;
+  const image = opts.image ? { url: opts.image.src, width: opts.image.width ?? 1200, height: opts.image.height ?? 675, alt: opts.image.alt } : OG_IMAGE;
   return {
     title: opts.title,
     description,

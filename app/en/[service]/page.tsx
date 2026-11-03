@@ -7,6 +7,7 @@ import { h2, wrap } from "@/components/en/EnShell";
 import { profile } from "@/data/classic/profile";
 import { enNav, enServices, enSteps } from "@/data/en/site";
 import { siteUrl } from "@/lib/site";
+import { OG_IMAGE } from "@/lib/seo";
 
 // 11-04 영문 서비스 상세 3종(네이버 설정, 국내 결제, 현지화). 내용은 data/en/site.ts
 type Props = { params: Promise<{ service: string }> };
@@ -26,7 +27,7 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
     title: { absolute: `${s.metaTitle} | ${profile.nameEn}` },
     description: s.description,
     alternates: { canonical: url },
-    openGraph: { type: "website", locale: "en_US", siteName: profile.nameEn, url, title: s.metaTitle, description: s.description },
+    openGraph: { images: [OG_IMAGE], type: "website", locale: "en_US", siteName: profile.nameEn, url, title: s.metaTitle, description: s.description },
   };
 }
 

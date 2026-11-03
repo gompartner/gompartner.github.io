@@ -54,8 +54,9 @@ export function ChannelIcon({ name }: { name: ChannelIconName }) {
     case "youtube":
       return (
         <svg viewBox="0 0 20 20" className={box} aria-hidden>
-          <rect y="3" width="20" height="14" rx="4" fill="#ff0000" />
-          <path d="M8 6.8v6.4l5.4-3.2L8 6.8Z" fill="#fff" />
+          <rect width="20" height="20" rx="5" fill="#ff0000" />
+          {/* 11-04 다른 채널 아이콘과 같은 20x20 둥근 정사각형으로 맞춤(가로 직사각형이라 잘려 보였다) */}
+          <path d="M7.8 6v8l6.6-4-6.6-4Z" fill="#fff" />
         </svg>
       );
     case "naverClip":
