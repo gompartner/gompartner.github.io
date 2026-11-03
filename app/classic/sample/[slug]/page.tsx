@@ -202,7 +202,7 @@ export default async function ClassicSamplePage({ params }: Props) {
             <Link href={p.demoUrl} prefetch={false} data-gtm-cta={`classic_sample_open_${p.id}`} className={btnLine}>
               체험하기
             </Link>
-            {/* 11-02 키오스크는 장소 무대 3D 체험을 별도 버튼으로. 공개 주소에서는 숨김(Kiosk3dLink) */}
+            {/* 11-02 키오스크는 장소 무대 3D 체험을 별도 버튼으로 */}
             {p.category === "키오스크" ? (
               <Kiosk3dLink href={`${p.demoUrl}/3d`} id={p.id} className={btnLine} />
             ) : null}
