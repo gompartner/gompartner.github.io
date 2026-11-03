@@ -6,6 +6,10 @@ export interface MakeExtra {
   metaTitle: string;
   metaDescription: string;
   lead: string;
+  /** 한 줄 설명 아래 보충 문장 */
+  leadNote?: string;
+  /** 가격표 바로 위 안내 */
+  planNote?: string;
   forWhom: string[];
   scope: { title: string; items: string[] }[];
   steps: { title: string; body: string }[];
@@ -56,6 +60,8 @@ export const makeExtras: MakeExtra[] = [
     metaTitle: "키오스크 화면 제작 (접수, 출결, 안내)",
     metaDescription: "병원 접수, 학원 출결, 무인 매장 체크인, 시설 안내, 행사 등록 키오스크 화면 제작. 큰 글씨, 음성 안내 등 배리어프리 화면, 관리자 웹, 프린터, QR 연동.",
     lead: "병원 접수, 출결, 체크인, 안내처럼 직접 누르는 키오스크 화면을 만듭니다",
+    leadNote: "장비는 판매하지 않고, 쓰시는 장비에 화면 프로그램을 설치합니다",
+    planNote: "금액은 화면 프로그램 제작비이며 키오스크 기기값은 포함되지 않습니다.",
     forWhom: [
       "접수 대기 줄이 길어 창구가 바쁜 경우",
       "학원 출결, 시설 입장을 손으로 기록하는 경우",
@@ -78,6 +84,7 @@ export const makeExtras: MakeExtra[] = [
     deliver: { name: "키오스크 프로그램과 인계 자료", items: ["키오스크 화면 프로그램", "관리자 웹", "원본 소스", "장비 설치와 연결 설정", "사용 방법과 계정 목록을 정리한 인계 문서"] },
     photo: "/images/site/scene-kiosk.jpg",
     faq: [
+      { q: "키오스크 기기도 파나요?", a: "기기는 판매하지 않습니다. 이미 있는 장비에 설치하거나, 새로 사실 장비의 사양(화면 크기, 프린터, 스캐너)을 골라 드립니다." },
       { q: "지금 있는 키오스크 장비에도 설치할 수 있나요?", a: "안드로이드, 윈도우 기반 키오스크는 화면 프로그램을 설치해 쓸 수 있습니다. 화면 크기와 프린터, 스캐너 사양을 먼저 확인합니다." },
       { q: "카드 결제도 받을 수 있나요?", a: "결제 단말 연동은 사용 중인 VAN사의 연동 방식에 맞춰 진행합니다. 연동 범위는 상담 때 확인해 견적서에 함께 안내합니다." },
       { q: "배리어프리 기준도 맞추나요?", a: "큰 글씨, 높은 대비, 음성 안내, 낮은 위치 버튼처럼 누구나 쓸 수 있는 화면으로 만들고, 웹 접근성 점검 기준으로 확인합니다." },

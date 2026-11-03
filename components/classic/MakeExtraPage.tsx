@@ -36,9 +36,12 @@ export function MakeExtraPage({ s }: { s: MakeExtra }) {
 
       <section aria-labelledby={`${s.id}-lead`} className={`${wrap} py-12 md:py-16`}>
         <div className="flex flex-col gap-2 border-b-2 border-[#15171c] pb-5 md:flex-row md:items-end md:justify-between">
-          <h2 id={`${s.id}-lead`} className={h3}>
-            {s.lead}
-          </h2>
+          <div>
+            <h2 id={`${s.id}-lead`} className={h3}>
+              {s.lead}
+            </h2>
+            {s.leadNote && <p className="mt-2 text-[16px] leading-[1.6] text-[#5b6370] md:text-[17px]">{s.leadNote}</p>}
+          </div>
           <p className="shrink-0 text-[15px] font-bold text-[#256ef4]">{replyTerm}</p>
         </div>
       </section>
@@ -87,6 +90,7 @@ export function MakeExtraPage({ s }: { s: MakeExtra }) {
           <h2 id={`${s.id}-plans`} className={h2}>
             패키지
           </h2>
+          {s.planNote && <p className="mt-4 text-[16px] leading-[1.6] text-[#3d4450] md:text-[17px]">{s.planNote}</p>}
           <PlanTable plans={s.id === "app" ? appPlans : kioskPlans} product={s.title} common={s.id === "app" ? appCommon : kioskCommon} />
           <p className="mt-6 text-[15px] leading-[1.65] text-[#5b6370] md:text-[16px]">
             {s.id === "app"
