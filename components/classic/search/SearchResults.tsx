@@ -5,7 +5,7 @@ import { NavLink as Link } from "@/components/classic/NavLink";
 import { ArrowUpRight } from "lucide-react";
 import type { SearchItem, SearchKind } from "./index";
 
-const ORDER: SearchKind[] = ["서비스", "카탈로그", "인사이트", "자료실", "자주 묻는 질문", "공지사항"];
+const ORDER: SearchKind[] = ["서비스", "카탈로그", "인사이트", "네이버 블로그", "자료실", "자주 묻는 질문", "공지사항"];
 
 /** 검색 결과 묶음. 종류별로 나눠 보여 준다 */
 export function SearchResults({ items, grouped = true }: { items: SearchItem[]; grouped?: boolean }) {
