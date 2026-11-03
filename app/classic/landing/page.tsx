@@ -14,7 +14,7 @@ import { replyTerm } from "@/data/classic/maintenance";
 import { SampleGrid } from "@/components/classic/works/SampleGrid";
 import { samplesIn } from "@/components/classic/works/samples";
 import { processSteps } from "@/data/classic/faq";
-import { landingPlans } from "@/data/classic/pricing";
+import { landingPlans, runningCostNote } from "@/data/classic/pricing";
 import { fitDescription } from "@/lib/seo";
 
 // 광고 랜딩페이지 서비스 상세. 홈페이지 제작, 업무 프로그램, 유지보수 페이지와 같은 틀(페이지 머리, 서비스 탭, 한 줄 소개, 구획)을 쓴다(10-30).
@@ -138,6 +138,7 @@ export default function ClassicLandingServicePage() {
           </h2>
           <PlanTable plans={landingPlans} product="랜딩페이지" />
           <AddonList id="ld-addons" only={["page", "tool", "pay", "map", "lang"]} />
+          <p className="mt-6 text-[15px] leading-[1.65] text-[#5b6370] md:text-[16px]">{runningCostNote}</p>
         </div>
       </section>
 

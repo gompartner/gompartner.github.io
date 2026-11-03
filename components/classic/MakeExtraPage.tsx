@@ -5,6 +5,8 @@ import { OtherServices } from "@/components/classic/OtherServices";
 import Link from "next/link";
 import { ChevronRight } from "lucide-react";
 import { StepList } from "@/components/classic/pricing/StepList";
+import { PlanTable } from "@/components/classic/pricing/PlanTable";
+import { appCommon, appPlans, kioskCommon, kioskPlans } from "@/data/classic/pricing";
 import { SampleGrid } from "@/components/classic/works/SampleGrid";
 import { samplesIn } from "@/components/classic/works/samples";
 import { serviceTabs } from "@/components/classic/pricing/tabs";
@@ -77,6 +79,20 @@ export function MakeExtraPage({ s }: { s: MakeExtra }) {
               </div>
             ))}
           </div>
+        </div>
+      </section>
+
+      <section id="plans" aria-labelledby={`${s.id}-plans`} className={section}>
+        <div className={`${wrap} py-16 md:py-24`}>
+          <h2 id={`${s.id}-plans`} className={h2}>
+            패키지
+          </h2>
+          <PlanTable plans={s.id === "app" ? appPlans : kioskPlans} product={s.title} common={s.id === "app" ? appCommon : kioskCommon} />
+          <p className="mt-6 text-[15px] leading-[1.65] text-[#5b6370] md:text-[16px]">
+            {s.id === "app"
+              ? "애플(연 99달러), 구글(1회 25달러) 개발자 계정 비용과 서버, 호스팅 비용은 고객 명의로 따로 듭니다. 표시한 금액 외에 별도로 받는 비용은 없고, 기능을 더할 때만 추가 비용이 발생합니다."
+              : "키오스크 장비, 프린터, 스캐너는 고객이 준비하시고, 사양을 먼저 확인해 맞춥니다. 표시한 금액 외에 별도로 받는 비용은 없고, 기능을 더할 때만 추가 비용이 발생합니다."}
+          </p>
         </div>
       </section>
 

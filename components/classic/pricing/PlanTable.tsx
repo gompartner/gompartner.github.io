@@ -1,13 +1,13 @@
 import Link from "next/link";
 import { Check } from "lucide-react";
-import { planCommon, samplesForPlan, type Plan } from "@/data/classic/pricing";
+import { formatWon, planCommon, samplesForPlan, type Plan } from "@/data/classic/pricing";
 import { projects } from "@/data/classic/projects";
 
 const th = "sticky left-0 z-[1] w-[112px] bg-[#f6f7f9] px-4 py-4 text-left align-top text-[15px] font-bold text-[#3d4450] md:w-[180px] md:px-5";
 const td = "px-4 py-4 align-top text-[16px] leading-[1.6] md:px-6";
 
-/** 패키지 비교표. 열은 패키지, 행은 수정 횟수, 구성, 포함 항목. 금액과 기간은 상담 뒤에 안내한다(10-30). 휴대폰에서는 표만 가로로 밀어 본다. */
-export function PlanTable({ plans, product }: { plans: Plan[]; product: string }) {
+/** 패키지 비교표. 열은 패키지, 행은 금액, 작업 기간, 수정 횟수, 구성, 포함 항목. 11-03 금액과 기간 다시 공개. 휴대폰에서는 표만 가로로 밀어 본다. */
+export function PlanTable({ plans, product, common = planCommon }: { plans: Plan[]; product: string; common?: string[] }) {
   const list = (items: string[]) => (
     <ul className="space-y-1.5">
       {items.map((item) => (
@@ -44,6 +44,26 @@ export function PlanTable({ plans, product }: { plans: Plan[]; product: string }
         <tbody>
           <tr className="border-b border-[#e6e9ee]">
             <th scope="row" className={th}>
+              금액
+            </th>
+            {plans.map((p) => (
+              <td key={p.id} className={td}>
+                <span className="text-[24px] font-extrabold tabular-nums tracking-[-0.03em] text-[#256ef4] md:text-[28px]">{formatWon(p.price)}</span>
+              </td>
+            ))}
+          </tr>
+          <tr className="border-b border-[#e6e9ee]">
+            <th scope="row" className={th}>
+              작업 기간
+            </th>
+            {plans.map((p) => (
+              <td key={p.id} className={`${td} tabular-nums`}>
+                {p.days}일
+              </td>
+            ))}
+          </tr>
+          <tr className="border-b border-[#e6e9ee]">
+            <th scope="row" className={th}>
               수정 횟수
             </th>
             {plans.map((p) => (
@@ -78,7 +98,7 @@ export function PlanTable({ plans, product }: { plans: Plan[]; product: string }
             </th>
             {plans.map((p) => (
               <td key={p.id} className={td}>
-                {list(planCommon)}
+                {list(common)}
               </td>
             ))}
           </tr>
@@ -108,6 +128,7 @@ export function PlanTable({ plans, product }: { plans: Plan[]; product: string }
           )}
         </tbody>
       </table>
+      <p className="mt-3 text-right text-[14px] text-[#5b6370]">부가세 별도, 작업 기간은 자료 전달일 기준</p>
     </div>
   );
 }

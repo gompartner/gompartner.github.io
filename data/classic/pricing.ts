@@ -1,13 +1,15 @@
-// 홈페이지 제작 패키지. 크몽 서비스(#796239)의 가격, 작업 기간과 같게 맞춘다. 10-30부터 사이트에는 금액과 기간을 싣지 않는다.
+// 홈페이지 제작 패키지. 크몽 서비스(#796239)의 가격, 작업 기간과 같게 맞춘다. 10-30에 숨겼다가 11-03 홈페이지, 랜딩 가격표에 금액과 기간을 다시 싣는다.
 // 업무 프로그램(결과지, 관리자, 자동화, LMS 등)은 패키지 없이 별도 견적이다.
 import { hiddenIds } from "@/data/projects";
 
 export type PlanId = "basic" | "standard" | "premium";
 /** 한 쪽짜리 랜딩페이지. 크몽 랜딩페이지 서비스와 같게 맞춘다. */
 export type LandingPlanId = "landing-basic" | "landing-standard" | "landing-premium";
+/** 11-03 앱, 키오스크 화면 패키지. 크몽 시세(웹앱 55만~, 하이브리드 앱 평균 150만, 키오스크 100만~, 주문형 300~450만)를 보고 정했다. */
+export type ExtraPlanId = "app-basic" | "app-standard" | "app-premium" | "kiosk-basic" | "kiosk-standard" | "kiosk-premium";
 
 export interface Plan {
-  id: PlanId | LandingPlanId;
+  id: PlanId | LandingPlanId | ExtraPlanId;
   name: string;
   /** 크몽 패키지 제목과 같게 맞춘다. */
   title: string;
@@ -85,14 +87,83 @@ export const landingPlans: Plan[] = [
   },
 ];
 
+export const appPlans: Plan[] = [
+  {
+    id: "app-basic",
+    name: "설치형 웹앱",
+    title: "설치형 웹앱",
+    price: 990_000,
+    days: 10,
+    revisions: 2,
+    summary: "스토어 심사 없이 휴대폰 홈 화면에 설치",
+    includes: ["기본 5개 화면 구성", "아이폰, 안드로이드 홈 화면 설치", "문의, 예약 신청 접수", "관리자 웹(공지, 접수 내역)"],
+  },
+  {
+    id: "app-standard",
+    name: "스토어 출시 앱",
+    title: "스토어 출시 앱",
+    price: 1_990_000,
+    days: 20,
+    revisions: 3,
+    summary: "앱스토어, 플레이스토어에 출시하는 앱",
+    includes: ["기본 10개 화면 구성", "설치형 웹앱 구성 전부", "회원가입, 로그인", "푸시 알림", "스토어 등록 자료와 심사 제출"],
+  },
+  {
+    id: "app-premium",
+    name: "예약, 주문, 결제 앱",
+    title: "예약, 주문, 결제 앱",
+    price: 3_900_000,
+    days: 30,
+    revisions: 4,
+    summary: "예약, 주문, 결제와 적립까지 운영하는 앱",
+    includes: ["기본 15개 화면 구성", "스토어 출시 앱 구성 전부", "예약, 주문 접수", "온라인 결제 연동", "적립, 쿠폰", "관리자 웹(회원, 주문, 통계)"],
+  },
+];
+
+export const kioskPlans: Plan[] = [
+  {
+    id: "kiosk-basic",
+    name: "안내 화면",
+    title: "안내 화면",
+    price: 990_000,
+    days: 10,
+    revisions: 2,
+    summary: "시설, 매장 이용 안내 터치 화면",
+    includes: ["기본 5개 화면 구성", "큰 글씨, 높은 대비 화면", "관리자 웹(문구, 운영시간 변경)", "전체 화면 고정 모드"],
+  },
+  {
+    id: "kiosk-standard",
+    name: "접수, 출결",
+    title: "접수, 출결",
+    price: 1_990_000,
+    days: 15,
+    revisions: 3,
+    summary: "병원 접수, 학원 출결, 체크인",
+    includes: ["기본 10개 화면 구성", "안내 화면 구성 전부", "대기번호 발급, 번호표 출력", "바코드, QR 스캔", "접수, 출결 내역과 통계"],
+  },
+  {
+    id: "kiosk-premium",
+    name: "결제, 연동",
+    title: "결제, 연동",
+    price: 3_900_000,
+    days: 25,
+    revisions: 4,
+    summary: "결제 단말과 외부 시스템 연동",
+    includes: ["기본 15개 화면 구성", "접수, 출결 구성 전부", "카드 결제 단말 연동", "외부 시스템 연동(예약, 회원)", "원격 업데이트, 자동 재시작"],
+  },
+];
+
+export const appCommon = ["원본 소스 제공", "점검 결과표, 인계 문서", "출시 후 1개월 무상 하자보수"];
+export const kioskCommon = ["원본 소스 제공", "현장 장비 설치와 연결 설정", "점검 결과표, 인계 문서", "설치 후 1개월 무상 하자보수"];
+
 export const planCommon = ["업종별 법정 고지 검토", "원본 소스 제공", "점검 결과표, 인계 문서", "오픈 후 1개월 무상 하자보수"];
 
 /** 패키지 금액 밖에서 드는 돈. 숫자는 /tools/hosting-cost(data/hostingPrices.ts) 조사값에서 나온 범위다. */
 export const runningCostNote =
-  "도메인과 호스팅은 고객 명의로 계약하고 관리 권한만 공유받습니다. 연간 비용은 호스팅 종류에 따라 견적서에 함께 안내합니다.";
+  "도메인과 호스팅은 고객 명의로 계약하고 관리 권한만 공유받습니다. 비용을 전달해 주시면 대리 구매도 가능합니다. 저렴한 웹호스팅이면 1년 3~4만 원, 아임웹 같은 구독형이면 1년 18~21만 원쯤 듭니다. 표시한 금액 외에 별도로 받는 비용은 없고, 기능을 더할 때만 추가 비용이 발생합니다.";
 
 /** 이 패키지를 바탕으로 만든 샘플(견적 기준). 가격표 카드에 예시로 붙인다. */
-export function samplesForPlan(planId: PlanId | LandingPlanId) {
+export function samplesForPlan(planId: PlanId | LandingPlanId | ExtraPlanId) {
   return Object.entries(estimateSource)
     .filter(([id, src]) => src.plan === planId && !hiddenIds.has(id))
     .map(([id]) => ({ id, total: estimateFor(id)!.total }))
