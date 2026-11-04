@@ -11,6 +11,8 @@ export const careerGroups: { group: string; items: CareerItem[] }[] = [
     group: "공공기관",
     items: [
       { period: "2010~2012", client: "통일부, 교육과학기술부, 환경부, 국립중앙도서관, 한국무역보험공사", work: "홈페이지 개편 참여" },
+      { period: "2010~2011", client: "성북구청", work: "홈페이지 콘텐츠 개선과 유지보수" },
+      { period: "2016", client: "한국소공인진흥협회", work: "숙련기술인 종합정보시스템 구축" },
       { period: "2021", client: "구로구 교육통합포털", work: "유지보수, 웹접근성 인증마크 갱신" },
       { period: "2017", client: "친환경농업 의무자조금", work: "홈페이지와 인증 관리 시스템 유지보수" },
     ],
@@ -25,6 +27,8 @@ export const careerGroups: { group: string; items: CareerItem[] }[] = [
   {
     group: "기업, 서비스",
     items: [
+      { period: "2011", client: "두산", work: "GTMS 고도화" },
+      { period: "2016", client: "핀마트", work: "중계 서버 구축" },
       { period: "2016", client: "곤지암 이엔지", work: "기업 홈페이지 제작" },
       { period: "2017~2019", client: "하나투어클럽", work: "멤버십 앱 제작" },
       { period: "2018~2022", client: "에닥, 벼룩시장 부동산, pancryp", work: "앱 제작과 유지보수" },

@@ -92,13 +92,12 @@ export default function ClassicStoryPage() {
           <h3 className="mt-16 text-[22px] font-[800] tracking-[-0.03em] md:text-[26px]">수상</h3>
           <ul className="mt-6 grid gap-4 md:grid-cols-2" role="list">
             {awards.map((a) => (
-              <li key={a.year} className="flex gap-4 rounded-md border border-[#d9dee5] p-6">
+              <li key={a.prize} className="flex gap-4 rounded-md border border-[#d9dee5] p-6">
                 <span className="grid h-11 w-11 shrink-0 place-items-center rounded-full bg-[#e8efff] text-[#256ef4]">
                   <Award size={22} aria-hidden />
                 </span>
                 <span>
-                  <span className="block text-[15px] font-bold tabular-nums text-[#5b6370]">{a.year}</span>
-                  <span className="mt-1 block break-keep text-[19px] font-[800] tracking-[-0.03em]">{a.prize}</span>
+                  <span className="block break-keep text-[19px] font-[800] tracking-[-0.03em]">{a.prize}</span>
                   <span className="mt-1 block break-keep text-[16px] leading-[1.6] text-[#3d4450]">{a.name}, {a.note}</span>
                 </span>
               </li>
