@@ -10,13 +10,14 @@ export const careerGroups: { group: string; items: CareerItem[] }[] = [
   {
     group: "공공기관",
     items: [
-      { period: "2010", client: "통일부", work: "대표 홈페이지 개편 참여, 콘텐츠 유지보수" },
+      { period: "2010", client: "통일부", work: "대표 홈페이지 개편 참여, 아이폰 앱 제작" },
       { period: "2010~2011", client: "교육과학기술부", work: "홈페이지 개편 참여" },
       { period: "2011~2012", client: "환경부", work: "웹사이트 운영관리, 물사랑 홈페이지 개편 참여" },
       { period: "2011", client: "국립중앙도서관", work: "홈페이지 제작 참여" },
       { period: "2012", client: "한국무역보험공사", work: "홈페이지 개편 참여" },
       { period: "2017", client: "한국시설안전공단", work: "홈페이지 제작 참여" },
       { period: "2010~2011", client: "성북구청", work: "홈페이지 콘텐츠 개선과 유지보수" },
+      { period: "2017", client: "행정자치부", work: "1365 나눔포털 고도화 참여, 1365 앱 제작" },
       { period: "2016", client: "한국소공인진흥협회", work: "숙련기술인 종합정보시스템 제작 참여" },
       { period: "2017~2018", client: "건설근로자공제회", work: "스마트 앱 제작, 모바일 공인인증서 연동" },
       { period: "2020", client: "지자체 사랑방 공유공간", work: "지도 안내 서비스 제작 참여" },
@@ -35,6 +36,7 @@ export const careerGroups: { group: string; items: CareerItem[] }[] = [
   {
     group: "기업, 서비스",
     items: [
+      { period: "2017", client: "미래에셋생명", work: "연금나무 앱 제작 참여" },
       { period: "2011", client: "두산", work: "GTMS 고도화" },
       { period: "2016", client: "핀마트", work: "중계 서버 제작 참여" },
       { period: "2016", client: "곤지암 이엔지", work: "기업 홈페이지 제작" },
