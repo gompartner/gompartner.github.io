@@ -3,7 +3,7 @@ import { ArrowUpRight, Award, ClipboardCheck, FileText, KeyRound, ScrollText, Sh
 import { NavLink } from "@/components/classic/NavLink";
 import { PageHead, h2, wrap } from "@/components/classic/ui";
 import { aboutLead, aboutTitle, principles } from "@/data/classic/about";
-import { awards, careerItems } from "@/data/classic/career";
+import { awards, careerGroups, careerIntro } from "@/data/classic/career";
 import { profile } from "@/data/classic/profile";
 import { LdScript } from "@/components/seo/JsonLd";
 import { breadcrumbLd, pageMeta } from "@/lib/seo";
@@ -72,17 +72,22 @@ export default function ClassicStoryPage() {
           <h2 id="st-career" className={h2}>
             주요 경력
           </h2>
-          <ul className="mt-10 border-t-2 border-[#15171c]" role="list">
-            {careerItems.map((c) => (
-              <li key={c.client + c.period} className="grid gap-x-6 gap-y-1 border-b border-[#d9dee5] py-5 md:grid-cols-[120px_minmax(0,300px)_1fr] md:py-6">
-                <span className="text-[15px] font-bold tabular-nums text-[#5b6370]">{c.period}</span>
-                <h3 className="break-keep text-[19px] font-[800] tracking-[-0.03em] md:text-[21px]">{c.client}</h3>
-                <p className="break-keep text-[16px] leading-[1.7] text-[#3d4450] md:text-[17px]">
-                  {c.work}
-                </p>
-              </li>
+          <p className="mt-3 max-w-[760px] break-keep text-[17px] leading-[1.75] text-[#3d4450]">{careerIntro}</p>
+          <div className="mt-10 grid gap-10">
+            {careerGroups.map((g) => (
+              <div key={g.group}>
+                <h3 className="text-[15px] font-bold text-[#256ef4]">{g.group}</h3>
+                <ul className="mt-3 border-t-2 border-[#15171c]" role="list">
+                  {g.items.map((c) => (
+                    <li key={c.client} className="grid gap-x-6 gap-y-1 border-b border-[#d9dee5] py-5 md:grid-cols-[minmax(0,420px)_1fr] md:py-6">
+                      <span className="break-keep text-[19px] font-[800] tracking-[-0.03em] md:text-[21px]">{c.client}</span>
+                      <span className="break-keep text-[16px] leading-[1.7] text-[#3d4450] md:text-[17px]">{c.work}</span>
+                    </li>
+                  ))}
+                </ul>
+              </div>
             ))}
-          </ul>
+          </div>
 
           <h3 className="mt-16 text-[22px] font-[800] tracking-[-0.03em] md:text-[26px]">수상</h3>
           <ul className="mt-6 grid gap-4 md:grid-cols-2" role="list">
