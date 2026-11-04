@@ -20,6 +20,7 @@ export const careerGroups: { group: string; items: CareerItem[] }[] = [
       { period: "2016", client: "한국소공인진흥협회", work: "숙련기술인 종합정보시스템 제작 참여" },
       { period: "2017~2018", client: "건설근로자공제회", work: "스마트 앱 제작, 모바일 공인인증서 연동" },
       { period: "2020", client: "지자체 사랑방 공유공간", work: "지도 안내 서비스 제작 참여" },
+      { period: "2018~2019", client: "WE두드림", work: "구인구직 사업 신청 시스템 제작 참여" },
       { period: "2021", client: "구로구 교육통합포털", work: "유지보수, 웹접근성 인증마크 갱신" },
       { period: "2017", client: "친환경농업 의무자조금", work: "홈페이지와 인증 관리 시스템 유지보수" },
     ],
@@ -27,7 +28,7 @@ export const careerGroups: { group: string; items: CareerItem[] }[] = [
   {
     group: "대학, 문화",
     items: [
-      { period: "2020", client: "한국체육대학교", work: "홈페이지 유지보수" },
+      { period: "2020", client: "한국체육대학교", work: "홈페이지 유지보수, 올림픽연구센터 홈페이지 제작" },
       { period: "2017", client: "강동아트센터", work: "홈페이지와 앱 유지보수" },
     ],
   },
@@ -39,6 +40,7 @@ export const careerGroups: { group: string; items: CareerItem[] }[] = [
       { period: "2016", client: "곤지암 이엔지", work: "기업 홈페이지 제작" },
       { period: "2017~2019", client: "하나투어클럽", work: "멤버십 앱 제작" },
       { period: "2018~2019", client: "에닥", work: "에어컨 설치 서비스 앱 제작" },
+      { period: "2019", client: "BITNARA", work: "하이브리드 앱 제작" },
       { period: "2019", client: "벼룩시장 부동산", work: "iOS 앱 추가 개발, 유지보수" },
       { period: "2019~2022", client: "pancryp", work: "안드로이드, iOS 앱 제작과 유지보수" },
       { period: "2016~2018", client: "모바일 상품권 중계 서비스", work: "제작, 편의점, 카드사, 오픈마켓 연동" },
