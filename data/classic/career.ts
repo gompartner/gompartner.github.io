@@ -49,7 +49,7 @@ export const careerGroups: { group: string; items: CareerItem[] }[] = [
       { period: "2018~2019", client: "에닥", work: "에어컨 설치 서비스 앱 제작" },
       { period: "2019", client: "BITNARA", work: "하이브리드 앱 제작" },
       { period: "2019", client: "벼룩시장 부동산", work: "iOS 앱 추가 개발, 유지보수" },
-      { period: "2019~2022", client: "pancryp", work: "안드로이드, iOS 앱 제작과 유지보수" },
+      { period: "2019~2022", client: "팬크립", work: "안드로이드, iOS 앱 제작과 유지보수" },
       { period: "2016~2018", client: "모바일 상품권 중계 서비스", work: "제작, 편의점, 카드사, 오픈마켓 연동" },
       { period: "2017~2018", client: "중소기업 기술혁신개발사업", work: "원격 접근제어, 다중 인증 보안 앱 제작, TTA 시험인증" },
       { period: "2017", client: "영어 스피킹 트레이닝 서비스", work: "학습 앱 제작" },
