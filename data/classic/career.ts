@@ -4,16 +4,21 @@
 // period는 기록 확인용으로만 남긴다. 화면에 쓰지 않는다.
 export type CareerItem = { period: string; client: string; work: string };
 
-export const careerIntro = "공공기관, 대학, 기업의 홈페이지와 앱을 만들고 맡아 왔습니다.";
+export const careerIntro = "공공기관, 대학, 기업의 홈페이지와 앱을 제작하고 운영해 왔습니다.";
 
 export const careerGroups: { group: string; items: CareerItem[] }[] = [
   {
     group: "공공기관",
     items: [
-      { period: "2010~2012", client: "통일부, 교육과학기술부, 환경부, 국립중앙도서관, 한국무역보험공사", work: "홈페이지 개편 참여" },
+      { period: "2010", client: "통일부", work: "대표 홈페이지 개편 참여, 콘텐츠 유지보수" },
+      { period: "2010~2011", client: "교육과학기술부", work: "홈페이지 개편 참여" },
+      { period: "2011~2012", client: "환경부", work: "웹사이트 운영관리, 물사랑 홈페이지 개편 참여" },
+      { period: "2011", client: "국립중앙도서관", work: "홈페이지 제작 참여" },
+      { period: "2012", client: "한국무역보험공사", work: "K-Sure 홈페이지 개편 참여" },
       { period: "2010~2011", client: "성북구청", work: "홈페이지 콘텐츠 개선과 유지보수" },
-      { period: "2016", client: "한국소공인진흥협회", work: "숙련기술인 종합정보시스템 구축" },
+      { period: "2016", client: "한국소공인진흥협회", work: "숙련기술인 종합정보시스템 제작 참여" },
       { period: "2017~2018", client: "건설근로자공제회", work: "스마트 앱 제작, 모바일 공인인증서 연동" },
+      { period: "2020", client: "지자체 사랑방 공유공간", work: "지도 안내 서비스 제작 참여" },
       { period: "2021", client: "구로구 교육통합포털", work: "유지보수, 웹접근성 인증마크 갱신" },
       { period: "2017", client: "친환경농업 의무자조금", work: "홈페이지와 인증 관리 시스템 유지보수" },
     ],
@@ -29,10 +34,12 @@ export const careerGroups: { group: string; items: CareerItem[] }[] = [
     group: "기업, 서비스",
     items: [
       { period: "2011", client: "두산", work: "GTMS 고도화" },
-      { period: "2016", client: "핀마트", work: "중계 서버 구축" },
+      { period: "2016", client: "핀마트", work: "중계 서버 제작 참여" },
       { period: "2016", client: "곤지암 이엔지", work: "기업 홈페이지 제작" },
       { period: "2017~2019", client: "하나투어클럽", work: "멤버십 앱 제작" },
-      { period: "2018~2022", client: "에닥, 벼룩시장 부동산, pancryp", work: "앱 제작과 유지보수" },
+      { period: "2018~2019", client: "에닥", work: "에어컨 설치 서비스 앱 제작" },
+      { period: "2019", client: "벼룩시장 부동산", work: "iOS 앱 추가 개발, 유지보수" },
+      { period: "2019~2022", client: "pancryp", work: "안드로이드, iOS 앱 제작과 유지보수" },
       { period: "2016~2018", client: "모바일 상품권 중계 서비스", work: "제작, 편의점, 카드사, 오픈마켓 연동" },
       { period: "2017~2018", client: "중소기업 기술혁신개발사업", work: "원격 접근제어, 다중 인증 보안 앱 제작, TTA 시험인증" },
       { period: "2017", client: "영어 스피킹 트레이닝 서비스", work: "학습 앱 제작" },
