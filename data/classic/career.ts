@@ -17,6 +17,10 @@ export const careerGroups: { group: string; items: CareerItem[] }[] = [
       { period: "2012", client: "한국무역보험공사", work: "홈페이지 개편 참여" },
       { period: "2017", client: "한국시설안전공단", work: "홈페이지 제작 참여" },
       { period: "2010~2011", client: "성북구청", work: "홈페이지 콘텐츠 개선과 유지보수" },
+      { period: "2018", client: "서울시의회", work: "의정플러스시스템 고도화 참여" },
+      { period: "2017~2018", client: "한국농수산식품유통공사", work: "농식품 수출정보(KATI) 제작 참여" },
+      { period: "2016~2017", client: "한국고용정보원", work: "워크넷 개편 참여" },
+      { period: "2016", client: "국토교통과학기술진흥원", work: "대외포털 운영 유지관리" },
       { period: "2017", client: "행정자치부", work: "1365 나눔포털 고도화 참여, 1365 앱 제작" },
       { period: "2016", client: "한국소공인진흥협회", work: "숙련기술인 종합정보시스템 제작 참여" },
       { period: "2017~2018", client: "건설근로자공제회", work: "스마트 앱 제작, 모바일 공인인증서 연동" },
@@ -37,6 +41,7 @@ export const careerGroups: { group: string; items: CareerItem[] }[] = [
     group: "기업, 서비스",
     items: [
       { period: "2017", client: "미래에셋생명", work: "연금나무 앱 제작 참여" },
+      { period: "2017", client: "한국시스템인증원", work: "시스템 개발과 유지보수" },
       { period: "2011", client: "두산", work: "GTMS 고도화" },
       { period: "2016", client: "핀마트", work: "중계 서버 제작 참여" },
       { period: "2016", client: "곤지암 이엔지", work: "기업 홈페이지 제작" },
