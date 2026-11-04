@@ -49,6 +49,6 @@ export const careerGroups: { group: string; items: CareerItem[] }[] = [
 ];
 
 export const awards = [
-  { year: "2015", prize: "미래창조과학부 장관상", name: "글로벌 이노베이터 페스타 해커톤 빅데이터 부문", note: "개인" },
-  { year: "2016", prize: "대구디지털산업진흥원장상", name: "글로벌 이노베이터 페스타 메이커톤 커뮤니티 매핑 부문", note: "팀" },
+  { year: "2015", prize: "미래창조과학부 장관상", name: "글로벌 이노베이터 페스타 해커톤", note: "개인" },
+  { year: "2016", prize: "대구디지털산업진흥원장상", name: "글로벌 이노베이터 페스타 메이커톤", note: "팀" },
 ];
