@@ -1,22 +1,22 @@
 // 회사소개(/story) 주요 경력과 수상. 11-05 사용자 결정: 부업은 실명, 본업은 회사 이름 없이, 현 직장은 넣지 않는다.
-// 근거: 02_Personal/03_Resource/메모/경력-자료 (복구 소스, 메일 기록, 상장). 한 일과 결과만 적고 문제 이야기는 넣지 않는다.
-export type CareerItem = { period: string; client: string; work: string; result?: string };
+// 근거: 02_Personal/03_Resource/메모/경력-자료. 설명은 담백하게 한 줄(11-05 사용자 "너무 디테일해").
+export type CareerItem = { period: string; client: string; work: string };
 
 export const careerItems: CareerItem[] = [
-  { period: "2009~2016", client: "서울 한 구청 포털", work: "포털사이트 유지관리, 해마다 재계약", result: "사이트 48곳으로 키워 다음 담당자에게 인계" },
-  { period: "2010~2012", client: "중앙부처, 공공기관 홈페이지", work: "통일부, 교육과학기술부, 환경부, 국립중앙도서관, 한국무역보험공사 홈페이지 개편", result: "개편 사업 개발 참여" },
-  { period: "2021", client: "구로구 교육통합포털", work: "혁신교육, 평생학습관, 학습지원센터, 진로직업체험지원센터 연간 유지보수", result: "웹접근성 인증마크 취득, 서버 이전, 인수인계" },
-  { period: "2020", client: "한국체육대학교", work: "홈페이지 유지보수", result: "플래시 메뉴 HTML 전환, 게시판 본인인증 추가" },
-  { period: "2017", client: "강동아트센터", work: "홈페이지 구축(국문, 영문, 관리자)", result: "공연, 아카데미 수강, 본인인증, VR 시설 안내" },
-  { period: "2017", client: "친환경농업 의무자조금", work: "홈페이지와 인증 관리 시스템 구축", result: "국문, 영문, 중문, 인증 정보와 납부 동의 관리" },
-  { period: "2016", client: "곤지암 이엔지", work: "전자파 시험 인증 업체 홈페이지 구축", result: "인증 업무 안내, 게시판, 견적 문의, 관리자" },
-  { period: "2017~2019", client: "하나투어클럽", work: "멤버십 앱 아이폰, 안드로이드", result: "QR, 바코드 읽기, 푸시 알림" },
-  { period: "2018~2022", client: "에닥, 벼룩시장 부동산, pancryp", work: "웹뷰 앱 개발과 유지보수", result: "본인인증, 알림톡, 위치 권한, 2년 넘는 운영 대응" },
-  { period: "2016~2018", client: "편의점 상품권 결제", work: "지류 상품권 결제 연계, 모바일 상품권 시스템", result: "승인 게이트웨이, 카카오 쿠폰 연동, 정산 배치" },
-  { period: "2018", client: "정부 과제 보안 앱", work: "다중 인증 보안드라이브 안드로이드, 아이폰 앱", result: "TTA 시험인증" },
+  { period: "2009~2016", client: "강동구청", work: "포털사이트 유지관리" },
+  { period: "2010~2012", client: "통일부, 교육과학기술부, 환경부, 국립중앙도서관, 한국무역보험공사", work: "홈페이지 개편 참여" },
+  { period: "2021", client: "구로구 교육통합포털", work: "유지보수, 웹접근성 인증마크 갱신" },
+  { period: "2020", client: "한국체육대학교", work: "홈페이지 유지보수" },
+  { period: "2017", client: "강동아트센터", work: "홈페이지 구축" },
+  { period: "2017", client: "친환경농업 의무자조금", work: "홈페이지와 인증 관리 시스템 구축" },
+  { period: "2016", client: "곤지암 이엔지", work: "기업 홈페이지 구축" },
+  { period: "2017~2019", client: "하나투어클럽", work: "멤버십 앱 개발" },
+  { period: "2018~2022", client: "에닥, 벼룩시장 부동산, pancryp", work: "앱 개발과 유지보수" },
+  { period: "2016~2018", client: "모바일 상품권", work: "편의점, 카드사, 오픈마켓 연동 시스템 운영" },
+  { period: "2017~2018", client: "중소기업 기술혁신개발사업", work: "원격 접근제어, 다중 인증 시스템 앱 개발, TTA 시험인증" },
 ];
 
 export const awards = [
-  { year: "2015", name: "글로벌 이노베이터 페스타 해커톤 빅데이터 부문", prize: "미래창조과학부 장관상", note: "혼자 출전, 공공데이터 조류 분포 지도 서비스" },
-  { year: "2016", name: "글로벌 이노베이터 페스타 메이커톤 커뮤니티 매핑 부문", prize: "대구디지털산업진흥원장상", note: "3인 팀, 생활 안전 신고 지도" },
+  { year: "2015", prize: "미래창조과학부 장관상", name: "글로벌 이노베이터 페스타 해커톤", note: "개인" },
+  { year: "2016", prize: "대구디지털산업진흥원장상", name: "글로벌 이노베이터 페스타 메이커톤", note: "팀" },
 ];

@@ -79,7 +79,6 @@ export default function ClassicStoryPage() {
                 <h3 className="break-keep text-[19px] font-[800] tracking-[-0.03em] md:text-[21px]">{c.client}</h3>
                 <p className="break-keep text-[16px] leading-[1.7] text-[#3d4450] md:text-[17px]">
                   {c.work}
-                  {c.result && <span className="block font-bold text-[#15171c]">{c.result}</span>}
                 </p>
               </li>
             ))}
@@ -95,8 +94,7 @@ export default function ClassicStoryPage() {
                 <span>
                   <span className="block text-[15px] font-bold tabular-nums text-[#5b6370]">{a.year}</span>
                   <span className="mt-1 block break-keep text-[19px] font-[800] tracking-[-0.03em]">{a.prize}</span>
-                  <span className="mt-1 block break-keep text-[16px] leading-[1.6] text-[#3d4450]">{a.name}</span>
-                  <span className="mt-1 block break-keep text-[15px] text-[#5b6370]">{a.note}</span>
+                  <span className="mt-1 block break-keep text-[16px] leading-[1.6] text-[#3d4450]">{a.name}, {a.note}</span>
                 </span>
               </li>
             ))}
