@@ -77,9 +77,9 @@ export default function ClassicStoryPage() {
             {careerGroups.map((g) => (
               <div key={g.group}>
                 <h3 className="text-[15px] font-bold text-[#256ef4]">{g.group}</h3>
-                <ul className="mt-3 border-t-2 border-[#15171c]" role="list">
+                <ul className="mt-3 grid border-t-2 border-[#15171c] md:grid-cols-2 md:gap-x-10" role="list">
                   {g.items.map((c) => (
-                    <li key={c.client} className="grid gap-x-6 gap-y-1 border-b border-[#d9dee5] py-5 md:grid-cols-[minmax(0,420px)_1fr] md:py-6">
+                    <li key={c.client} className="grid gap-y-1 border-b border-[#d9dee5] py-5 md:py-6">
                       <span className="break-keep text-[19px] font-[800] tracking-[-0.03em] md:text-[21px]">{c.client}</span>
                       <span className="break-keep text-[16px] leading-[1.7] text-[#3d4450] md:text-[17px]">{c.work}</span>
                     </li>
