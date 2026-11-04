@@ -1,8 +1,9 @@
 import type { Metadata } from "next";
-import { ArrowUpRight, ClipboardCheck, FileText, KeyRound, ScrollText, ShieldCheck } from "lucide-react";
+import { ArrowUpRight, Award, ClipboardCheck, FileText, KeyRound, ScrollText, ShieldCheck } from "lucide-react";
 import { NavLink } from "@/components/classic/NavLink";
 import { PageHead, h2, wrap } from "@/components/classic/ui";
 import { aboutLead, aboutTitle, principles } from "@/data/classic/about";
+import { awards, careerItems } from "@/data/classic/career";
 import { profile } from "@/data/classic/profile";
 import { LdScript } from "@/components/seo/JsonLd";
 import { breadcrumbLd, pageMeta } from "@/lib/seo";
@@ -63,6 +64,43 @@ export default function ClassicStoryPage() {
               );
             })}
           </ol>
+        </div>
+      </section>
+
+      <section id="career" aria-labelledby="st-career" className={section}>
+        <div className={`${wrap} py-16 md:py-24`}>
+          <h2 id="st-career" className={h2}>
+            주요 경력
+          </h2>
+          <ul className="mt-10 border-t-2 border-[#15171c]" role="list">
+            {careerItems.map((c) => (
+              <li key={c.client + c.period} className="grid gap-x-6 gap-y-1 border-b border-[#d9dee5] py-5 md:grid-cols-[120px_minmax(0,300px)_1fr] md:py-6">
+                <span className="text-[15px] font-bold tabular-nums text-[#5b6370]">{c.period}</span>
+                <h3 className="break-keep text-[19px] font-[800] tracking-[-0.03em] md:text-[21px]">{c.client}</h3>
+                <p className="break-keep text-[16px] leading-[1.7] text-[#3d4450] md:text-[17px]">
+                  {c.work}
+                  {c.result && <span className="block font-bold text-[#15171c]">{c.result}</span>}
+                </p>
+              </li>
+            ))}
+          </ul>
+
+          <h3 className="mt-16 text-[22px] font-[800] tracking-[-0.03em] md:text-[26px]">수상</h3>
+          <ul className="mt-6 grid gap-4 md:grid-cols-2" role="list">
+            {awards.map((a) => (
+              <li key={a.year} className="flex gap-4 rounded-md border border-[#d9dee5] p-6">
+                <span className="grid h-11 w-11 shrink-0 place-items-center rounded-full bg-[#e8efff] text-[#256ef4]">
+                  <Award size={22} aria-hidden />
+                </span>
+                <span>
+                  <span className="block text-[15px] font-bold tabular-nums text-[#5b6370]">{a.year}</span>
+                  <span className="mt-1 block break-keep text-[19px] font-[800] tracking-[-0.03em]">{a.prize}</span>
+                  <span className="mt-1 block break-keep text-[16px] leading-[1.6] text-[#3d4450]">{a.name}</span>
+                  <span className="mt-1 block break-keep text-[15px] text-[#5b6370]">{a.note}</span>
+                </span>
+              </li>
+            ))}
+          </ul>
         </div>
       </section>
 
