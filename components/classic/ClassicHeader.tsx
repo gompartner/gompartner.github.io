@@ -20,6 +20,18 @@ export const classicMenu = [
     match: ["/story"],
     items: [],
   },
+  // 11-06 이어받기 집중: 유지보수를 제작 앞에
+  {
+    label: "유지보수",
+    href: "/maintenance",
+    match: ["/maintenance"],
+    items: [
+      { href: "/maintenance/takeover", label: "업체 변경" },
+      { href: "/maintenance/fix", label: "오류 수정" },
+      { href: "/maintenance/update", label: "보안 업데이트" },
+      { href: "/maintenance/monthly", label: "월 관리" },
+    ],
+  },
   {
     label: "제작",
     href: "/homepage",
@@ -32,17 +44,6 @@ export const classicMenu = [
       { href: "/app", label: "앱 제작" },
       { href: "/kiosk", label: "키오스크 화면 제작" },
       { href: "/3d", label: "3D 웹 제작" },
-    ],
-  },
-  {
-    label: "유지보수",
-    href: "/maintenance",
-    match: ["/maintenance"],
-    items: [
-      { href: "/maintenance/fix", label: "오류 수정" },
-      { href: "/maintenance/takeover", label: "업체 이관" },
-      { href: "/maintenance/update", label: "보안 업데이트" },
-      { href: "/maintenance/monthly", label: "월 관리" },
     ],
   },
   // 업종(병원, 카페 등)은 카탈로그 화면 안의 탭에서 고른다. 카탈로그는 업종 홈페이지와 랜딩(11-01 되살림)

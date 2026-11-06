@@ -81,7 +81,7 @@ const services = [
     what: "가구, 중문, 간판 제품을 손님이 3D로 구성하고 바로 견적을 받는 화면을 만듭니다",
     icon: Box,
   },
-  ...maintenanceServices.map((m) => ({
+  ...[...maintenanceServices].sort((a, b) => (b.id === "takeover" ? 1 : 0) - (a.id === "takeover" ? 1 : 0)).map((m) => ({
     href: `/maintenance/${m.id}`,
     name: m.h1,
     what: m.term,
@@ -102,10 +102,10 @@ const live = projects.filter((p) => p.demoUrl.startsWith("/demo/") && !PROGRAM_I
 const PICKS = ["dental-homepage", "korean-restaurant", "law-firm", "company", "academy", "hanok-cafe"];
 const picks = PICKS.map((id) => projects.find((p) => p.id === id)).filter((p) => !!p);
 
-// 첫 화면 질문: 제작 2, 유지보수 2, 결제 1
+// 첫 화면 질문: 유지보수 2, 제작 2, 결제 1(11-06 이어받기 먼저)
 const homeFaq = [
-  ...faq.filter((f) => f.tag === "make").slice(0, 2),
   ...faq.filter((f) => f.tag === "care").slice(0, 2),
+  ...faq.filter((f) => f.tag === "make").slice(0, 2),
   ...faq.filter((f) => f.tag === "common").slice(0, 1),
 ];
 
@@ -129,22 +129,23 @@ export function ClassicHome() {
   );
 }
 
+// 11-06 이어받기 집중: 업체 변경 슬라이드가 처음, 제작은 맨 뒤
 // 첫 화면 서비스별 슬라이드(11-01): 서비스 5개, 화면 안은 서비스마다 납품하는 문서. 7초마다 넘어가고 아래 탭에 진행 막대.
 // 마우스를 올리거나 포커스가 있으면 멈추고, 움직임 줄이기 설정이면 자동으로 넘기지 않는다.
 const heroSlides = [
   {
-    key: "make",
-    tab: "제작",
-    w: 1440,
-    h: 900,
-    title: "홈페이지 제작",
-    sub: "병원, 매장, 전문직 사무실, 기업, 학원 홈페이지를 업종에 맞게 만듭니다",
+    key: "takeover",
+    tab: "업체 변경",
+    w: 1060,
+    h: 790,
+    title: "유지보수 업체 변경",
+    sub: "전 업체나 개발자와 연락이 끊긴 홈페이지와 앱을 이어받아 운영합니다",
     points: [
-      "업종별 법정 고지 검토",
-      "반응형, 검색엔진 등록",
-      "카탈로그 기준 견적",
+      "호스팅, 도메인 계정으로 인수",
+      "전체 백업과 구성 정리",
+      "인수 점검 보고서와 인계 문서",
     ],
-    href: "/homepage",
+    href: "/maintenance/takeover",
   },
   {
     key: "fix",
@@ -155,20 +156,6 @@ const heroSlides = [
     sub: "홈페이지가 열리지 않거나 화면이 깨질 때 원인을 찾아 고칩니다",
     points: ["영업일 24시간 이내 회신", "원인 확인 후 견적", "장애 처리 내역서"],
     href: "/maintenance/fix",
-  },
-  {
-    key: "takeover",
-    tab: "이관",
-    w: 1060,
-    h: 790,
-    title: "업체 이관",
-    sub: "기존 업체와 연락이 끊겼거나 관리 업체를 바꿀 때 인수합니다",
-    points: [
-      "호스팅, 도메인 계정으로 인수",
-      "전체 백업과 구성 정리",
-      "인수 점검 보고서",
-    ],
-    href: "/maintenance/takeover",
   },
   {
     key: "update",
@@ -189,6 +176,20 @@ const heroSlides = [
     sub: "문구, 사진, 공지 수정과 정기 점검을 매달 맡습니다",
     points: ["월 건수 단위 계약", "도메인, SSL 만료 알림", "월간 점검 보고서"],
     href: "/maintenance/monthly",
+  },
+  {
+    key: "make",
+    tab: "제작",
+    w: 1440,
+    h: 900,
+    title: "홈페이지 제작",
+    sub: "병원, 매장, 전문직 사무실, 기업, 학원 홈페이지를 업종에 맞게 만듭니다",
+    points: [
+      "업종별 법정 고지 검토",
+      "반응형, 검색엔진 등록",
+      "카탈로그 기준 견적",
+    ],
+    href: "/homepage",
   },
 ];
 const HERO_MS = 7000;
@@ -259,7 +260,7 @@ function Hero() {
       onBlur={() => setHold(false)}
     >
       <h1 id="c-hero" className="sr-only">
-        곰파트너 홈페이지 제작과 유지보수
+        곰파트너 홈페이지 유지보수와 제작
       </h1>
       {/* 옅은 모눈 배경 */}
       <div
@@ -546,8 +547,8 @@ function Services() {
       {/* 11-01 제작과 유지보수 두 묶음으로 나눈다 */}
       <div className="mt-10 space-y-12">
         {[
-          { label: "제작", items: services.filter((x) => !x.href.startsWith("/maintenance")) },
           { label: "유지보수", items: services.filter((x) => x.href.startsWith("/maintenance")) },
+          { label: "제작", items: services.filter((x) => !x.href.startsWith("/maintenance")) },
         ].map((g) => (
           <div key={g.label}>
             <h3 className="mb-4 text-[15px] font-bold text-[#256ef4]">{g.label}</h3>
@@ -615,7 +616,7 @@ function Catalog() {
 }
 
 function Process() {
-  const [kind, setKind] = useState<"make" | "care">("make");
+  const [kind, setKind] = useState<"make" | "care">("care");
   return (
     <section
       aria-labelledby="c-process"
@@ -626,7 +627,7 @@ function Process() {
           진행 절차
         </h2>
         <div className="inline-flex rounded-md border border-[#d9dee5] p-1" role="group" aria-label="절차 선택">
-          {([["make", "홈페이지 제작"], ["care", "유지보수"]] as const).map(([k, label]) => (
+          {([["care", "유지보수"], ["make", "홈페이지 제작"]] as const).map(([k, label]) => (
             <button
               key={k}
               type="button"

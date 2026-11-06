@@ -4,8 +4,8 @@ import { ArrowRight } from "lucide-react";
 // 11-03 메인 시작 금액 띠(사용자 요청). 제작은 크몽 소개 홈페이지와 같은 금액, 유지보수는 월 운영 시작 금액.
 // 정확한 금액은 상담 후 견적서로. 포함 내용은 서비스 기준 문서(03_Resource/곰파트너-서비스-정리.md)와 같게.
 const prices = [
-  { label: "홈페이지 제작", amount: "29.9만 원", note: "기본 5쪽, 반응형, 검색엔진 등록", href: "/homepage", cta: "price_homepage" },
   { label: "유지보수", amount: "월 9만 원", note: "월 1회 점검 보고서, 24시간 이내 회신", href: "/maintenance", cta: "price_maintenance" },
+  { label: "홈페이지 제작", amount: "29.9만 원", note: "기본 5쪽, 반응형, 검색엔진 등록", href: "/homepage", cta: "price_homepage" },
 ];
 
 /** 표 한 줄. 배경 없이 굵은 선 사이에 금액만 크게(11-03 시안 A 채택, 남색 띠와 문장형은 뺌) */
