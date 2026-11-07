@@ -33,7 +33,8 @@ import { DemoMakerInfo } from "@/components/demos/DemoMakerInfo";
 const IMG = "/images/demo-visa-agent";
 
 const ADDRESS = "서울 ㅇㅇ구 ㅇㅇ로 00, 3층";
-const KAKAO = "카카오톡 채널 비자 행정사사무소";
+// 11-08 English 화면에서도 한국어로 나오던 연락 창구를 언어별로
+const kakao = (lang: Lang) => tx(lang, "카카오톡 채널 비자 행정사사무소", "KakaoTalk channel: Visa Administrative Agency Office");
 
 /** 본문 색 */
 const C = {
@@ -453,7 +454,7 @@ function Consult({ lang, today, reduce }: { lang: Lang; today: Date; reduce: boo
     ) : null;
 
   if (done) {
-    const desk = done.method === "kakao" ? KAKAO : done.method === "phone" ? tx(lang, "전화로 연락드려요", "We will call you") : tx(lang, "방문 시간을 전화로 잡아 드려요", "We will call to set a visit time");
+    const desk = done.method === "kakao" ? kakao(lang) : done.method === "phone" ? tx(lang, "전화로 연락드려요", "We will call you") : tx(lang, "방문 시간을 전화로 잡아 드려요", "We will call to set a visit time");
     return (
       <motion.div
         initial={reduce ? false : { opacity: 0, y: 8 }}
@@ -597,7 +598,7 @@ function Visit({ lang, today }: { lang: Lang; today: Date }) {
           <li>{tx(lang, "ㅇㅇ출입국외국인사무소에서 걸어서 5분", "5 minutes walk from the ㅇㅇ immigration office")}</li>
           <li>{tx(lang, "지하철 ㅇㅇ역 2번 출구", "Subway ㅇㅇ station exit 2")}</li>
           <li>{tx(lang, "건물 주차 가능(1시간)", "Parking in the building (1 hour)")}</li>
-          <li>{KAKAO}</li>
+          <li>{kakao(lang)}</li>
         </ul>
       </div>
       <div className="rounded-[8px] border p-5 md:p-6" style={{ ...paperBg, borderColor: C.line }}>

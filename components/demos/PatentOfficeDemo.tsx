@@ -27,7 +27,7 @@ import { DemoMakerInfo } from "@/components/demos/DemoMakerInfo";
 
    구간
    1. 상표 출원 절차: 선행 조사부터 등록까지 단계와 기간, 키프리스 바로가기, 상표 조사 요청 버튼.
-   2. 비용 안내: 상표 관납료와 수수료 정적 표(부가세 별도). 특허, 디자인은 상담 뒤 견적.
+   2. 비용 안내: 상표 관납료와 수수료 정적 표(부가세 별도). 특허, 디자인은 사안별 안내(11-08 변리사 광고 규정 제4조: 견적, 무료 표방 문구 뺌).
    3. 특허 출원부터 등록까지: 단계별로 일반심사, 우선심사 기간을 함께 적은 표.
    4. 상담신청: 분야, 이름, 휴대폰, 내용. 접수 번호, 담당 창구, 회신 예정일을 보여 준다. */
 
@@ -432,8 +432,8 @@ function TrademarkGuide({ onConsult }: { onConsult: () => void }) {
 const FEE_ROWS: { label: string; gov: string; agent: string }[] = [
   { label: "상표 출원 (1상품류)", gov: `${won(FEE_FILE)}, 고시 상품명 ${won(FEE_FILE_NOTICED)}`, agent: `첫 류 ${won(AGENT_FILE_FIRST)}, 추가 류 ${won(AGENT_FILE_MORE)}` },
   { label: "상표 등록 (10년분, 1상품류)", gov: won(FEE_REG_10Y), agent: won(AGENT_REG) },
-  { label: "특허 출원", gov: "청구항 수에 따라", agent: "상담 뒤 견적" },
-  { label: "디자인 출원", gov: "디자인 수에 따라", agent: "상담 뒤 견적" },
+  { label: "특허 출원", gov: "청구항 수에 따라", agent: "사안별 안내" },
+  { label: "디자인 출원", gov: "디자인 수에 따라", agent: "사안별 안내" },
 ];
 
 function FeeTable({ onConsult }: { onConsult: () => void }) {
@@ -488,7 +488,7 @@ function FeeTable({ onConsult }: { onConsult: () => void }) {
           className={`inline-flex min-h-11 items-center rounded-[6px] border px-4 text-[15px] font-semibold ${focusRing}`}
           style={{ borderColor: C.field, color: C.ink, outlineColor: C.ink }}
         >
-          견적 상담
+          비용 문의
         </button>
       </div>
     </div>
@@ -584,7 +584,7 @@ function Office() {
           <p className="mt-1 text-[24px] font-bold">
             오ㅈ후
           </p>
-          <p className="mt-3 text-[16px] leading-relaxed">상담부터 출원서 작성, 의견서까지 변리사가 직접 봅니다. 상표 출원 전 조사는 따로 비용을 받지 않아요.</p>
+          <p className="mt-3 text-[16px] leading-relaxed">상담부터 출원서 작성, 의견서까지 변리사가 직접 봅니다.</p>
         </div>
       </div>
       <ul className="border-t" style={{ borderColor: C.line }}>
