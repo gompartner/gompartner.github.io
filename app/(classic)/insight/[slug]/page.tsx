@@ -100,6 +100,11 @@ export default async function ClassicInsightDetailPage({ params }: Props) {
                         {t}
                       </p>
                     ))}
+                  {b.code && (
+                    <pre className="overflow-x-auto rounded-md bg-[#1e2127] p-4 text-[13.5px] leading-[1.6] text-[#e6e6e6]">
+                      <code>{b.code}</code>
+                    </pre>
+                  )}
                   {b.steps && (
                     <ol className="space-y-4" role="list">
                       {b.steps.map((s, si) => (
