@@ -40,13 +40,13 @@ const groups = [
     ],
   },
 ];
-// 11-03 채널은 아이콘, 이름, 계정명. 계정명이 보여야 앱에서 바로 찾는다
+// 11-07 채널마다 그 채널에서만 하는 일을 이름으로, 서비스 이름은 아래 작은 줄로(채널끼리는 서로 잇지 않고 사이트에서만 모은다)
 export const channels: { href: string; label: string; handle: string; icon: ChannelIconName }[] = [
-  { href: "https://www.instagram.com/gompartner.co.kr", label: "인스타그램", handle: "@gompartner.co.kr", icon: "instagram" },
-  { href: "https://www.youtube.com/@gompartner", label: "유튜브", handle: "@gompartner", icon: "youtube" },
-  { href: "https://clip.naver.com/@gompartner", label: "네이버 클립", handle: "@gompartner", icon: "naverClip" },
-  { href: "https://blog.naver.com/gompartner", label: "네이버 블로그", handle: "gompartner", icon: "naverBlog" },
-  { href: "https://gompartner.tistory.com", label: "티스토리", handle: "gompartner", icon: "tistory" },
+  { href: "https://blog.naver.com/gompartner", label: "보안 경보 기록", handle: "네이버 블로그", icon: "naverBlog" },
+  { href: "https://gompartner.tistory.com", label: "업종별 제작기", handle: "티스토리", icon: "tistory" },
+  { href: "https://www.youtube.com/@gompartner", label: "홈페이지 사고 이야기", handle: "유튜브", icon: "youtube" },
+  { href: "https://www.instagram.com/gompartner.co.kr", label: "점검 카드", handle: "인스타그램", icon: "instagram" },
+  { href: "https://clip.naver.com/@gompartner", label: "30초 점검", handle: "네이버 클립", icon: "naverClip" },
 ];
 
 const contactRow = "-my-1.5 inline-flex items-center gap-2 py-1.5";
