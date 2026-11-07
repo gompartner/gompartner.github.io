@@ -23,7 +23,7 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
   const { slug } = await params;
   const p = findBySlug(slug);
   if (!p) return {};
-  const meta = pageMeta({ title: `${p.title} 카탈로그`, description: p.description, path: `/sample/${slug}` });
+  const meta = pageMeta({ title: `${p.title} 카탈로그`, description: p.description, path: `/sample/${slug}`, noindex: true });
   // 접은 서비스(랜딩, 업무 프로그램, 유지보수 화면) 카탈로그는 주소만 남기고 검색에서 뺀다
   return isFolded(p) ? { ...meta, robots: { index: false, follow: true }, alternates: undefined } : meta;
 }

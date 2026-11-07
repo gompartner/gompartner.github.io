@@ -1,4 +1,3 @@
-import { catalogProjects, slugOf } from "@/components/classic/works/samples";
 import { aboutLead, aboutTitle, principles } from "@/data/classic/about";
 import { faq } from "@/data/classic/faq";
 import { industries } from "@/data/classic/industries";
@@ -62,14 +61,6 @@ ${insights.map((n) => `- [${plain(n.title)}](${url(`/insight/${n.slug}`)}) (${n.
 ## 일하는 원칙
 
 ${principles.map((p) => `- ${plain(p.title)}: ${plain(p.body)}`).join("\n")}
-
-## 업종별 카탈로그
-
-${industries.map((i) => `- [${plain(i.title)}](${url(`/works/${i.slug}`)}): ${plain(i.description)}`).join("\n")}
-
-## 카탈로그 상세
-
-${catalogProjects.map((p) => `- [${plain(p.title)}](${url(`/sample/${slugOf(p.demoUrl)}`)}): ${plain(p.description)}`).join("\n")}
 
 ## 자주 묻는 질문
 

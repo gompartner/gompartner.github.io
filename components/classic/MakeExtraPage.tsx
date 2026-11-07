@@ -2,15 +2,11 @@ import { Check } from "lucide-react";
 import { DeliverBlock } from "@/components/classic/DeliverBlock";
 import { FaqBlock } from "@/components/classic/FaqBlock";
 import { OtherServices } from "@/components/classic/OtherServices";
-import Link from "next/link";
-import { ChevronRight } from "lucide-react";
 import { StepList } from "@/components/classic/pricing/StepList";
 import { PlanTable } from "@/components/classic/pricing/PlanTable";
 import { appCommon, appPlans, kioskCommon, kioskPlans } from "@/data/classic/pricing";
-import { SampleGrid } from "@/components/classic/works/SampleGrid";
-import { samplesIn } from "@/components/classic/works/samples";
 import { serviceTabs } from "@/components/classic/pricing/tabs";
-import { PageHead, SubTabs, h2, h3, more, wrap } from "@/components/classic/ui";
+import { PageHead, SubTabs, h2, h3, wrap } from "@/components/classic/ui";
 import { LdScript } from "@/components/seo/JsonLd";
 import { replyTerm } from "@/data/classic/maintenance";
 import type { MakeExtra } from "@/data/classic/makeExtra";
@@ -21,7 +17,6 @@ const section = "scroll-mt-20 border-t border-[#e6e9ee] md:scroll-mt-24";
 // 앱 제작, 키오스크 화면 제작 공용 페이지(11-01). 랜딩, 업무 프로그램 페이지와 같은 틀
 export function MakeExtraPage({ s }: { s: MakeExtra }) {
   const path = `/${s.id}`;
-  const samples = samplesIn(s.id);
   return (
     <>
       <LdScript data={[serviceLd(s.title, s.metaDescription, path), breadcrumbLd([{ name: "제작", path: "/homepage" }, { name: s.title, path }])]} />
@@ -100,23 +95,6 @@ export function MakeExtraPage({ s }: { s: MakeExtra }) {
         </div>
       </section>
 
-      {samples.length > 0 ? (
-        <section id="samples" aria-labelledby={`${s.id}-samples`} className={section}>
-          <div className={`${wrap} py-16 md:py-24`}>
-            <div className="flex flex-wrap items-end justify-between gap-4">
-              <h2 id={`${s.id}-samples`} className={h2}>
-                카탈로그
-              </h2>
-              <Link href={`/works/${s.id}`} className={more}>
-                전체 카탈로그 <ChevronRight size={16} aria-hidden />
-              </Link>
-            </div>
-            <div className="mt-10">
-              <SampleGrid items={samples} variant="mockup" />
-            </div>
-          </div>
-        </section>
-      ) : null}
 
       <StepList steps={s.steps} title="진행 절차" id="process" />
 

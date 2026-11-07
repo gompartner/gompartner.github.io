@@ -1,7 +1,5 @@
 import { execFileSync } from "node:child_process";
 import type { MetadataRoute } from "next";
-import { catalogProjects, demoProjects, isProgram, slugOf } from "@/components/classic/works/samples";
-import { industries } from "@/data/classic/industries";
 import { notices } from "@/data/classic/notices";
 import { tools } from "@/data/classic/tools";
 import { insights } from "@/data/classic/insights";
@@ -61,14 +59,7 @@ export default function sitemap(): MetadataRoute.Sitemap {
     { path: "/story", priority: 0.7, files: ["app/(classic)/story/page.tsx", "data/classic/about.ts"] },
     { path: "/faq", priority: 0.7, files: ["app/(classic)/faq/page.tsx", "data/classic/faq.ts"] },
     { path: "/contact", priority: 0.7, files: ["app/(classic)/contact/page.tsx"] },
-    { path: "/works", priority: 0.7, files: ["app/(classic)/works/page.tsx", "components/classic/works/samples.ts"] },
-    ...industries.map((i) => ({ path: `/works/${i.slug}`, priority: 0.7, files: ["app/(classic)/works/[slug]/page.tsx", "data/classic/industries.ts"] })),
-    { path: "/works/landing", priority: 0.6, files: ["app/(classic)/works/[slug]/page.tsx", "components/classic/works/samples.ts"] },
-    { path: "/works/app", priority: 0.6, files: ["app/(classic)/works/[slug]/page.tsx", "components/classic/works/samples.ts"] },
-    { path: "/works/kiosk", priority: 0.6, files: ["app/(classic)/works/[slug]/page.tsx", "components/classic/works/samples.ts"] },
-    { path: "/works/3d", priority: 0.6, files: ["app/(classic)/works/[slug]/page.tsx", "data/classic/three.ts"] },
 
-    ...[...catalogProjects, ...demoProjects.filter(isProgram)].map((p) => ({ path: `/sample/${slugOf(p.demoUrl)}`, priority: 0.5, files: ["app/(classic)/sample/[slug]/page.tsx", "components/classic/works/samples.ts"] })),
 
     { path: "/insight", priority: 0.6, files: ["app/(classic)/insight/page.tsx", "data/classic/insights.ts"] },
     ...insights.map((n) => ({ path: `/insight/${n.slug}`, priority: 0.6, date: new Date(`${n.date}T00:00:00+09:00`) })),

@@ -1,7 +1,5 @@
-import Link from "next/link";
 import { Check } from "lucide-react";
-import { formatWon, planCommon, samplesForPlan, type Plan } from "@/data/classic/pricing";
-import { projects } from "@/data/classic/projects";
+import { formatWon, planCommon, type Plan } from "@/data/classic/pricing";
 
 const th = "sticky left-0 z-[1] w-[112px] bg-[#f6f7f9] px-4 py-4 text-left align-top text-[15px] font-bold text-[#3d4450] md:w-[180px] md:px-5";
 const td = "px-4 py-4 align-top text-[16px] leading-[1.6] md:px-6";
@@ -18,13 +16,6 @@ export function PlanTable({ plans, product, common = planCommon }: { plans: Plan
       ))}
     </ul>
   );
-  const samples = plans.map((p) =>
-    samplesForPlan(p.id)
-      .slice(0, 3)
-      .map((s) => ({ ...s, project: projects.find((x) => x.id === s.id) }))
-      .filter((s) => s.project?.demoUrl.startsWith("/demo/"))
-  );
-
   return (
     <div tabIndex={0} className="-mx-4 mt-10 overflow-x-auto px-4 md:mx-0 md:px-0">
       <table className="w-full min-w-[720px] border-collapse border-t-2 border-[#15171c]">
@@ -104,30 +95,6 @@ export function PlanTable({ plans, product, common = planCommon }: { plans: Plan
               </td>
             ))}
           </tr>
-          {samples.some((s) => s.length > 0) && (
-            <tr className="border-b border-[#e6e9ee]">
-              <th scope="row" className={th}>
-                카탈로그
-              </th>
-              {samples.map((list, i) => (
-                <td key={plans[i].id} className={td}>
-                  {list.length ? (
-                    <ul className="space-y-1.5">
-                      {list.map((s) => (
-                        <li key={s.id}>
-                          <Link href={`/sample/${s.project!.demoUrl.replace("/demo/", "")}`} className="underline-offset-4 hover:text-[#256ef4] hover:underline">
-                            {s.project!.title}
-                          </Link>
-                        </li>
-                      ))}
-                    </ul>
-                  ) : (
-                    <span className="text-[#6b7280]">없음</span>
-                  )}
-                </td>
-              ))}
-            </tr>
-          )}
         </tbody>
       </table>
       <p className="mt-3 text-right text-[14px] text-[#5b6370]">부가세 별도, 작업 기간은 자료 전달일 기준</p>

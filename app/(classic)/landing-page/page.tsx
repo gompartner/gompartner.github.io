@@ -1,18 +1,15 @@
 import type { Metadata } from "next";
-import Link from "next/link";
 import { BellRing, ChartColumn, Check, ChevronRight, ClipboardList, MousePointerClick, Table2 } from "lucide-react";
 import { ClassicLeadScreens } from "@/components/classic/landing/ClassicLeadScreens";
 import { PlanTable } from "@/components/classic/pricing/PlanTable";
 import { AddonList } from "@/components/classic/pricing/AddonList";
 import { StepList } from "@/components/classic/pricing/StepList";
 import { serviceTabs } from "@/components/classic/pricing/tabs";
-import { PageHead, SubTabs, h2, h3, more, wrap } from "@/components/classic/ui";
+import { PageHead, SubTabs, h2, h3, wrap } from "@/components/classic/ui";
 import { DeliverBlock } from "@/components/classic/DeliverBlock";
 import { OtherServices } from "@/components/classic/OtherServices";
 import { FaqBlock } from "@/components/classic/FaqBlock";
 import { replyTerm } from "@/data/classic/maintenance";
-import { SampleGrid } from "@/components/classic/works/SampleGrid";
-import { samplesIn } from "@/components/classic/works/samples";
 import { processSteps } from "@/data/classic/faq";
 import { landingPlans, runningCostNote } from "@/data/classic/pricing";
 import { fitDescription } from "@/lib/seo";
@@ -58,7 +55,6 @@ const FLOW = [
 const section = "scroll-mt-20 border-t border-[#e6e9ee] md:scroll-mt-24";
 
 export default function ClassicLandingServicePage() {
-  const samples = samplesIn("landing");
   return (
     <>
       <PageHead
@@ -142,23 +138,6 @@ export default function ClassicLandingServicePage() {
         </div>
       </section>
 
-      {samples.length > 0 && (
-        <section id="samples" aria-labelledby="ld-samples" className={section}>
-          <div className={`${wrap} py-16 md:py-24`}>
-            <div className="flex flex-wrap items-end justify-between gap-4">
-              <h2 id="ld-samples" className={h2}>
-                카탈로그
-              </h2>
-              <Link href="/works/landing" className={more}>
-                전체 카탈로그 <ChevronRight size={16} aria-hidden />
-              </Link>
-            </div>
-            <div className="mt-10">
-              <SampleGrid items={samples} cols={3} />
-            </div>
-          </div>
-        </section>
-      )}
 
       <StepList steps={processSteps} title="진행 절차" id="process" />
 

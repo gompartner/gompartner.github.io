@@ -9,7 +9,7 @@ export const OG_IMAGE = { url: "/og-image.png?v=20261102", width: 1200, height: 
 
 // 하위 페이지가 openGraph를 따로 정하지 않으면 홈 제목과 설명이 그대로 공유된다.
 // 페이지 제목과 설명으로 openGraph, twitter를 같이 채운다.
-export function pageMeta(opts: { title: string; description: string; path: string; image?: { src: string; alt: string; width?: number; height?: number }; article?: boolean }) {
+export function pageMeta(opts: { title: string; description: string; path: string; image?: { src: string; alt: string; width?: number; height?: number }; article?: boolean; noindex?: boolean }) {
   const description = fitDescription(opts.description);
   const title = `${opts.title} | 곰파트너`;
   const url = opts.path;
@@ -18,6 +18,7 @@ export function pageMeta(opts: { title: string; description: string; path: strin
     title: opts.title,
     description,
     alternates: { canonical: url },
+    ...(opts.noindex ? { robots: { index: false, follow: true } } : {}),
     openGraph: { type: opts.article ? ("article" as const) : ("website" as const), locale: "ko_KR", siteName: "곰파트너", url, title, description, images: [image] },
     twitter: { card: "summary_large_image" as const, title, description, images: [image.url] },
   };

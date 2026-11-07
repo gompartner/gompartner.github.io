@@ -20,7 +20,7 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
   const { slug } = await params;
   const ind = industries.find((i) => i.slug === slug) ?? catalogGroups.find((g) => g.slug === slug);
   if (!ind) return {};
-  return { ...pageMeta({ title: `${ind.title} 카탈로그`, description: ind.description, path: `/works/${slug}` }), keywords: ind.keywords };
+  return { ...pageMeta({ title: `${ind.title} 카탈로그`, description: ind.description, path: `/works/${slug}`, noindex: true }), keywords: ind.keywords };
 }
 
 export default async function ClassicIndustryPage({ params }: Props) {

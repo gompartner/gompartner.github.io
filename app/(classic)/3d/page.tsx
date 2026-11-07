@@ -1,5 +1,4 @@
 import type { Metadata } from "next";
-import Image from "next/image";
 import { ArrowUpRight, Check } from "lucide-react";
 import { DeliverBlock } from "@/components/classic/DeliverBlock";
 import { FaqBlock } from "@/components/classic/FaqBlock";
@@ -16,7 +15,6 @@ import {
   threeCommon,
   threeCompare,
   threeDeliver,
-  threeDemos,
   threeExtras,
   threeFaq,
   threeForWhom,
@@ -229,27 +227,6 @@ export default function Page() {
         </div>
       </section>
 
-      <section id="samples" aria-labelledby="t3d-samples" className={section}>
-        <div className={`${wrap} py-16 md:py-24`}>
-          <h2 id="t3d-samples" className={h2}>
-            카탈로그
-          </h2>
-          <ul className="mt-10 grid gap-x-6 gap-y-10 sm:grid-cols-2 lg:grid-cols-3" role="list">
-            {threeDemos.map((d) => (
-              <li key={d.href}>
-                <a href={d.href} className="group block">
-                  <span className="block overflow-hidden rounded-md border border-[#e1e5eb] bg-[#f4f6f9]">
-                    <Image src={d.img} alt={`${d.title} 3D 화면`} width={1440} height={900} sizes="(min-width: 1024px) 400px, (min-width: 640px) 50vw, 100vw" className="aspect-[16/10] w-full object-cover transition-transform duration-500 group-hover:scale-[1.02] motion-reduce:transition-none" />
-                  </span>
-                  <span className="mt-4 block text-[14px] font-bold text-[#5b6370]">{d.category}</span>
-                  <span className="mt-0.5 block text-[19px] font-[800] tracking-[-0.03em] group-hover:text-[#256ef4] md:text-[21px]">{d.title}</span>
-                  <span className="mt-1 block text-[15px] leading-[1.55] text-[#5b6370]">{d.desc}</span>
-                </a>
-              </li>
-            ))}
-          </ul>
-        </div>
-      </section>
 
       <StepList steps={threeSteps} title="진행 절차" id="process" />
 

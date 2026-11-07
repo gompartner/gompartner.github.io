@@ -1,7 +1,6 @@
 import type { Metadata } from "next";
 import Image from "next/image";
-import Link from "next/link";
-import { ChevronRight, Factory, GraduationCap, Scale, Stethoscope, Store } from "lucide-react";
+import { Factory, GraduationCap, Scale, Stethoscope, Store } from "lucide-react";
 import { CompareTable } from "@/components/classic/CompareTable";
 import { FaqBlock } from "@/components/classic/FaqBlock";
 import { PlanTable } from "@/components/classic/pricing/PlanTable";
@@ -11,12 +10,10 @@ import { replyTerm } from "@/data/classic/maintenance";
 import { AddonList } from "@/components/classic/pricing/AddonList";
 import { StepList } from "@/components/classic/pricing/StepList";
 import { serviceTabs } from "@/components/classic/pricing/tabs";
-import { PageHead, SubTabs, h2, more, wrap } from "@/components/classic/ui";
-import { SampleGrid } from "@/components/classic/works/SampleGrid";
-import { demoProjects } from "@/components/classic/works/samples";
+import { PageHead, SubTabs, h2, wrap } from "@/components/classic/ui";
 import { faqFor, processSteps } from "@/data/classic/faq";
 import { industries } from "@/data/classic/industries";
-import { plans, runningCostNote, samplesForPlan } from "@/data/classic/pricing";
+import { plans, runningCostNote } from "@/data/classic/pricing";
 import { projects } from "@/data/classic/projects";
 import { pageMeta } from "@/lib/seo";
 import { siteUrl } from "@/lib/site";
@@ -29,12 +26,6 @@ export const metadata: Metadata = pageMeta({
   path: "/homepage",
 });
 
-// 패키지마다 견적 기준이 된 샘플을 두 개씩
-const related = plans
-  .flatMap((p) => samplesForPlan(p.id).slice(0, 2))
-  .map((s) => demoProjects.find((p) => p.id === s.id))
-  .filter((p) => !!p)
-  .slice(0, 6);
 
 const section = "scroll-mt-20 border-t border-[#e6e9ee] md:scroll-mt-24";
 
@@ -111,8 +102,8 @@ export default function ClassicHomepagePage() {
           <ul className="mt-10 border-t-2 border-[#15171c]" role="list">
             {industries.map((i) => (
               <li key={i.slug} className="border-b border-[#e6e9ee]">
-                <Link href={`/works/${i.slug}`} className="group relative flex flex-col gap-1 py-5 pr-8 md:flex-row md:items-center md:gap-8 md:py-6 md:pr-0">
-                  <span className="flex shrink-0 items-center gap-3 text-[19px] font-[800] tracking-[-0.03em] group-hover:text-[#256ef4] md:w-[260px] md:text-[21px]">
+                <div className="group relative flex flex-col gap-1 py-5 pr-8 md:flex-row md:items-center md:gap-8 md:py-6 md:pr-0">
+                  <span className="flex shrink-0 items-center gap-3 text-[19px] font-[800] tracking-[-0.03em] md:w-[260px] md:text-[21px]">
                     {(() => {
                       const Icon = industryIcon[i.slug as keyof typeof industryIcon];
                       return Icon ? (
@@ -124,8 +115,7 @@ export default function ClassicHomepagePage() {
                     {i.label}
                   </span>
                   <span className="min-w-0 flex-1 text-[16px] leading-[1.6] text-[#5b6370]">{i.needs.join(", ")}</span>
-                  <ChevronRight size={20} aria-hidden className="absolute right-0 top-1/2 shrink-0 -translate-y-1/2 text-[#6b7280] group-hover:text-[#256ef4] md:static md:translate-y-0" />
-                </Link>
+                </div>
               </li>
             ))}
           </ul>
@@ -143,23 +133,6 @@ export default function ClassicHomepagePage() {
         </div>
       </section>
 
-      {related.length > 0 && (
-        <section id="samples" aria-labelledby="hp-samples" className={section}>
-          <div className={`${wrap} py-16 md:py-24`}>
-            <div className="flex flex-wrap items-end justify-between gap-4">
-              <h2 id="hp-samples" className={h2}>
-                카탈로그
-              </h2>
-              <Link href="/works" className={more}>
-                전체 카탈로그 <ChevronRight size={16} aria-hidden />
-              </Link>
-            </div>
-            <div className="mt-10">
-              <SampleGrid items={related} cols={3} />
-            </div>
-          </div>
-        </section>
-      )}
 
       <CompareTable />
 

@@ -29,8 +29,6 @@ import { PhpPromo } from "@/components/classic/PhpPromo";
 import { PriceBand } from "@/components/classic/PriceBand";
 import { faq, processSteps } from "@/data/classic/faq";
 import { maintenanceServices, maintenanceSteps } from "@/data/classic/maintenance";
-import { projects } from "@/data/classic/projects";
-import { PROGRAM_IDS } from "@/data/classic/programIds";
 import { cn } from "@/lib/utils";
 import { FlowSteps } from "@/components/classic/pricing/StepList";
 
@@ -97,11 +95,6 @@ const strengths = [
   { name: "1개월 무상 하자보수", what: "오픈 후 1개월" },
 ];
 
-// 첫 화면 카탈로그: 업종마다 대표 1개씩 썸네일(11-01 점검: 글자 카드만 있어 약함)
-const live = projects.filter((p) => p.demoUrl.startsWith("/demo/") && !PROGRAM_IDS.includes(p.id) && p.kind !== "유지보수");
-const PICKS = ["dental-homepage", "korean-restaurant", "law-firm", "company", "academy", "hanok-cafe"];
-const picks = PICKS.map((id) => projects.find((p) => p.id === id)).filter((p) => !!p);
-
 // 첫 화면 질문: 유지보수 2, 제작 2, 결제 1(11-06 이어받기 먼저)
 const homeFaq = [
   ...faq.filter((f) => f.tag === "care").slice(0, 2),
@@ -122,7 +115,6 @@ export function ClassicHome() {
       <Strengths />
       <Services />
       <PriceBand />
-      <Catalog />
       <Process />
       <Faq />
     </div>
@@ -187,7 +179,7 @@ const heroSlides = [
     points: [
       "업종별 법정 고지 검토",
       "반응형, 검색엔진 등록",
-      "카탈로그 기준 견적",
+      "요구에 맞춘 견적",
     ],
     href: "/homepage",
   },
@@ -580,36 +572,6 @@ function Services() {
       </ul>
           </div>
         ))}
-      </div>
-    </section>
-  );
-}
-
-function Catalog() {
-  return (
-    <section aria-labelledby="c-catalog" className="bg-[#f4f6f9]">
-      <div className="mx-auto w-full max-w-[1248px] px-4 py-20 md:px-6 md:py-28">
-        <div className="flex items-end justify-between gap-4">
-          <h2 id="c-catalog" className={h2}>
-            업종별 카탈로그
-          </h2>
-          <Link href="/works" aria-label={`업종별 카탈로그 ${live.length}개 전체 보기`} className={cn(more, "min-h-11")}>
-            전체 {live.length}개 <ChevronRight size={16} aria-hidden />
-          </Link>
-        </div>
-        <ul className="mt-10 grid grid-cols-2 gap-3 md:grid-cols-3 md:gap-5" role="list">
-          {picks.map((p) => (
-            <li key={p.id}>
-              <Link href={`/sample/${p.demoUrl.replace("/demo/", "")}`} className="group block overflow-hidden rounded-md border border-[#d9dee5] bg-white transition-colors hover:border-[#256ef4]">
-                <Image src={`/images/demos/sm/${p.demoUrl.replace("/demo/", "")}.jpg`} alt={`${p.title} 카탈로그 화면`} width={720} height={450} sizes="(min-width: 768px) 400px, 50vw" className="aspect-[16/10] w-full object-cover object-top" />
-                <span className="block px-4 py-3 md:px-5 md:py-4">
-                  <span className="block text-[13px] font-bold text-[#5b6370] md:text-[14px]">{p.category}</span>
-                  <span className="mt-0.5 block text-[16px] font-[800] tracking-[-0.03em] group-hover:text-[#256ef4] md:text-[18px]">{p.title}</span>
-                </span>
-              </Link>
-            </li>
-          ))}
-        </ul>
       </div>
     </section>
   );

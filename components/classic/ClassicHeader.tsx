@@ -7,7 +7,6 @@ import { usePathname } from "next/navigation";
 import { useEffect, useRef, useState } from "react";
 import { ChevronDown, Menu, Search, X } from "lucide-react";
 import { cases } from "@/data/classic/cases";
-import { industries } from "@/data/classic/industries";
 import { cn } from "@/lib/utils";
 
 // 클래식 보기(/classic)의 머리글. 로고와 내림 메뉴만 둔다(10-30 채널 줄과 웹툰 전환 버튼 뺌).
@@ -46,21 +45,7 @@ export const classicMenu = [
       { href: "/3d", label: "3D 웹 제작" },
     ],
   },
-  // 업종(병원, 카페 등)은 카탈로그 화면 안의 탭에서 고른다. 카탈로그는 업종 홈페이지와 랜딩(11-01 되살림)
-  {
-    label: "카탈로그",
-    href: "/works",
-    match: ["/works", "/sample"],
-    // 11-01 카탈로그 탭과 같은 하위 메뉴(업종 5개, 랜딩, 앱, 키오스크, 11-04 3D)
-    items: [
-      { href: "/works", label: "전체" },
-      ...industries.map((i) => ({ href: `/works/${i.slug}`, label: i.label })),
-      { href: "/works/landing", label: "랜딩페이지" },
-      { href: "/works/app", label: "앱" },
-      { href: "/works/kiosk", label: "키오스크" },
-      { href: "/works/3d", label: "3D" },
-    ],
-  },
+  // 11-07 카탈로그는 메뉴에서 뺌. 티스토리, 크몽 링크로 들어온 사람만 본다(주소는 살아 있음)
   // 고객 사례는 실제 사례가 생기면 data/classic/cases.ts에 넣는 순간 메뉴에 나온다
   ...(cases.length > 0 ? [{ label: "고객 사례", href: "/cases", match: ["/cases"], items: [] }] : []),
   {
@@ -242,7 +227,7 @@ export function ClassicHeader() {
               <label htmlFor="header-q" className="sr-only">
                 통합검색
               </label>
-              <input id="header-q" name="q" type="search" placeholder="서비스, 카탈로그 검색" autoComplete="off" className="h-full min-w-0 flex-1 bg-transparent px-2.5 text-[15px] outline-none placeholder:text-[#8a94a6] [&::-webkit-search-cancel-button]:hidden" />
+              <input id="header-q" name="q" type="search" placeholder="서비스 검색" autoComplete="off" className="h-full min-w-0 flex-1 bg-transparent px-2.5 text-[15px] outline-none placeholder:text-[#8a94a6] [&::-webkit-search-cancel-button]:hidden" />
             </form>
             <Link
               href="/search"
