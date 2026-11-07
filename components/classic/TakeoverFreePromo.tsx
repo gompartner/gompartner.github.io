@@ -7,7 +7,7 @@ import { ChevronRight } from "lucide-react";
 export const TAKEOVER_FREE_LEFT = 3;
 // 11-07 모집 기간 2주(사용자). 연말로 묶음(입동은 이어받기와 관련 없어 안 씀, PHP 8.2 지원 종료 12-31이 근거). 마감일이 지나면 띠를 내린다
 export const TAKEOVER_FREE_END = "2026-11-22";
-export const TAKEOVER_FREE_END_LABEL = "11월 22일";
+export const TAKEOVER_FREE_PERIOD_LABEL = "11월 8일부터 22일까지";
 const ended = () => new Date() > new Date(`${TAKEOVER_FREE_END}T23:59:59+09:00`);
 
 export function TakeoverFreePromo({ id = "takeover-free" }: { id?: string }) {
@@ -16,7 +16,7 @@ export function TakeoverFreePromo({ id = "takeover-free" }: { id?: string }) {
     <section aria-labelledby={id} className="border-t border-white/10 bg-[#0f1b3d] text-white">
       <div className="mx-auto grid w-full max-w-[1248px] gap-6 px-4 py-8 md:px-6 md:py-10 lg:grid-cols-[1fr_480px] lg:items-center lg:gap-12">
         <div>
-          <p className="text-[14px] font-bold text-[#9fc0ff]">{TAKEOVER_FREE_END_LABEL}까지, 남은 자리 {TAKEOVER_FREE_LEFT}곳</p>
+          <p className="text-[14px] font-bold text-[#9fc0ff]">{TAKEOVER_FREE_PERIOD_LABEL}, 남은 자리 {TAKEOVER_FREE_LEFT}곳</p>
           <h2 id={id} className="mt-1 text-[24px] font-[800] leading-[1.3] tracking-[-0.04em] md:text-[30px]">
             연말 유지보수 업체 변경 무료 지원
           </h2>
