@@ -9,7 +9,7 @@ import { ExternalLink } from "lucide-react";
 import { ChannelIcon, type ChannelIconName } from "@/components/layout/Footer";
 
 export type InsightRow =
-  | { kind: "own"; key: string; href: string; title: string; summary: string; badge: string; minutes: number; image: string; date: string }
+  | { kind: "own"; key: string; href: string; title: string; summary: string; badge: string; minutes: number; image: string; date: string; no: number }
   | { kind: "naver" | "tistory" | "youtube"; key: string; href: string; title: string; summary: string; badge: string; image?: string; date: string };
 
 const FILTERS: { id: "all" | InsightRow["kind"]; label: string }[] = [

@@ -17,9 +17,10 @@ export const metadata: Metadata = pageMeta({
 // 11-04 네이버 블로그, 티스토리, 유튜브 글도 같은 목록에 섞는다(ops/channel-posts.mjs가 RSS로 받음). 바깥 글은 새 창으로 연다.
 export default function ClassicInsightPage() {
   const rows: InsightRow[] = [
-    ...insights.map((n) => ({ kind: "own" as const, key: `own-${n.slug}`, href: `/insight/${n.slug}`, title: n.title, summary: n.summary, badge: `${n.series} ${n.no}편`, minutes: readMinutes(n), image: n.image.src, date: n.date })),
+    ...insights.map((n) => ({ kind: "own" as const, key: `own-${n.slug}`, href: `/insight/${n.slug}`, title: n.title, summary: n.summary, badge: `${n.series} ${n.no}편`, minutes: readMinutes(n), image: n.image.src, date: n.date, no: n.no })),
     ...channelPosts.map((p) => ({ kind: p.source, key: `${p.source}-${p.id}`, href: p.url, title: p.title, summary: p.desc, badge: channelLabel[p.source], image: p.thumb, date: p.date })),
-  ].sort((a, b) => b.date.localeCompare(a.date));
+  // 같은 날 나간 글은 편 번호가 큰 것이 위로(11-08: 보안 경보 2, 3편이 2, 3, 1 순으로 보였음)
+  ].sort((a, b) => b.date.localeCompare(a.date) || (b.kind === "own" ? b.no : 0) - (a.kind === "own" ? a.no : 0));
   return (
     <>
       <PageHead
