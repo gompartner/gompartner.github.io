@@ -2,6 +2,7 @@ import { catalogProjects, slugOf } from "@/components/classic/works/samples";
 import { aboutLead, aboutTitle, principles } from "@/data/classic/about";
 import { faq } from "@/data/classic/faq";
 import { industries } from "@/data/classic/industries";
+import { insights } from "@/data/classic/insights";
 import { maintenanceServices, replyTerm } from "@/data/classic/maintenance";
 import { landingPlans, planCommon, plans } from "@/data/classic/pricing";
 import { profile } from "@/data/classic/profile";
@@ -51,6 +52,12 @@ ${landingPlans.map((p) => `- ${plain(p.title)}: ${plain(p.summary)}. ${plain(p.i
 엑셀로 하던 주문 취합, 관리자 화면, 결과지 출력 같은 반복 업무를 웹 프로그램으로 만듭니다. 자세히: [업무 프로그램 제작](${url("/program")})
 
 금액과 일정은 상담 신청을 받은 뒤 견적서로 안내합니다.
+
+## 인사이트
+
+운영과 유지보수, 보안 경보 대응을 실제 인수 경험으로 정리한 글입니다.
+
+${insights.map((n) => `- [${plain(n.title)}](${url(`/insight/${n.slug}`)}) (${n.date}): ${plain(n.summary)}`).join("\n")}
 
 ## 일하는 원칙
 
