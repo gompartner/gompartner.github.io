@@ -141,7 +141,7 @@ export default function ClassicHomepagePage() {
       <DeliverBlock
         id="hp-deliver"
         name="홈페이지와 인계 자료"
-        items={["홈페이지(PC, 모바일)", "원본 소스", "화면과 웹 접근성 점검 결과표", "계정 목록과 수정 방법을 정리한 인계 문서", "오픈 후 1개월 무상 하자보수"]}
+        items={["홈페이지(PC, 모바일)", "원본 소스", "화면과 웹 접근성 점검 결과표", "계정 목록과 수정 방법을 정리한 인계 문서", "오픈 후 1개월 무상 관리"]}
         photo="/images/site/scene-make.jpg"
       />
 

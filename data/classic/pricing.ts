@@ -155,10 +155,10 @@ export const kioskPlans: Plan[] = [
   },
 ];
 
-export const appCommon = ["원본 소스 제공", "점검 결과표, 인계 문서", "출시 후 1개월 무상 하자보수"];
-export const kioskCommon = ["원본 소스 제공", "현장 장비 설치와 연결 설정", "점검 결과표, 인계 문서", "설치 후 1개월 무상 하자보수"];
+export const appCommon = ["원본 소스 제공", "점검 결과표, 인계 문서", "출시 후 1개월 무상 관리"];
+export const kioskCommon = ["원본 소스 제공", "현장 장비 설치와 연결 설정", "점검 결과표, 인계 문서", "설치 후 1개월 무상 관리"];
 
-export const planCommon = ["업종별 법정 고지 검토", "원본 소스 제공", "점검 결과표, 인계 문서", "오픈 후 1개월 무상 하자보수"];
+export const planCommon = ["업종별 법정 고지 검토", "원본 소스 제공", "점검 결과표, 인계 문서", "오픈 후 1개월 무상 관리"];
 
 /** 패키지 금액 밖에서 드는 돈. 숫자는 /tools/hosting-cost(data/hostingPrices.ts) 조사값에서 나온 범위다. */
 export const runningCostNote =

@@ -26,6 +26,7 @@ import {
 } from "lucide-react";
 import { FaqBlock } from "@/components/classic/FaqBlock";
 import { PhpPromo } from "@/components/classic/PhpPromo";
+import { TakeoverFreePromo } from "@/components/classic/TakeoverFreePromo";
 import { PriceBand } from "@/components/classic/PriceBand";
 import { faq, processSteps } from "@/data/classic/faq";
 import { maintenanceServices, maintenanceSteps } from "@/data/classic/maintenance";
@@ -92,7 +93,7 @@ const strengths = [
   { name: "원본 소스 제공", what: "도메인, 호스팅 고객 명의" },
   { name: "점검 결과표", what: "PC, 태블릿, 모바일 화면과 웹 접근성" },
   { name: "인계 문서", what: "계정 목록과 수정 방법" },
-  { name: "1개월 무상 하자보수", what: "오픈 후 1개월" },
+  { name: "1개월 무상 관리", what: "오픈 후 하자 보수와 월 유지보수" },
 ];
 
 // 첫 화면 질문: 유지보수 2, 제작 2, 결제 1(11-06 이어받기 먼저)
@@ -111,6 +112,7 @@ export function ClassicHome() {
   return (
     <div className="bg-white text-[#15171c]">
       <Hero />
+      <TakeoverFreePromo />
       <PhpPromo />
       <Strengths />
       <Services />
