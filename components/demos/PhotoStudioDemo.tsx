@@ -277,7 +277,7 @@ function Poster({
       {/* 예약 가능한 가장 가까운 날. PC 왼쪽 아래는 사용법 버튼 자리라 오른쪽에 둔다 */}
       <div className="mx-auto flex max-w-[1200px] flex-wrap items-center justify-between gap-3 px-4 pb-8 pt-4 md:justify-end md:px-6 md:pb-10">
         <p className="text-[15px]" style={{ color: C.muted }}>
-          30분 단위 예약, 당일 촬영은 전화 문의
+          30분 단위 예약, 당일 촬영은 카카오톡 채널 문의
         </p>
         <button type="button" onClick={onOpenDay} className={`inline-flex min-h-11 items-center gap-2 rounded-[4px] border px-4 text-[15px] ${focusRing}`} style={{ borderColor: C.line, color: C.text }}>
           <span>{fmtKo(openDay)}</span>
@@ -341,6 +341,7 @@ export function PhotoStudioDemo() {
   const [people, setPeople] = useState(1);
   const [name, setName] = useState("");
   const [phone, setPhone] = useState("");
+  const [agree, setAgree] = useState(false);
   const [err, setErr] = useState<string | null>(null);
   const [booking, setBooking] = useState<Booking | null>(null);
 
@@ -354,6 +355,7 @@ export function PhotoStudioDemo() {
     if (slot === null) return setErr("시간대를 골라 주세요.");
     if (name.trim().length < 2) return setErr("이름을 두 글자 이상 적어 주세요.");
     if (phone.replace(/\D/g, "").length < 10) return setErr("휴대폰 번호를 확인해 주세요.");
+    if (!agree) return setErr("개인정보 수집, 이용에 동의해 주세요.");
     setErr(null);
     const seq = ((day.getDate() * 7 + slot * 3) % 90) + 10;
     setBooking({ no: seq, day, slot: SLOTS[slot], people, name, phone, pkg });
@@ -363,6 +365,7 @@ export function PhotoStudioDemo() {
     setSlot(null);
     setName("");
     setPhone("");
+    setAgree(false);
   };
 
   /* 5. 촬영 안내 */
@@ -680,7 +683,7 @@ export function PhotoStudioDemo() {
                 </p>
                 {(dayIdx ?? firstOpen) === 0 ? (
                   <p className="mt-2 rounded-[6px] border px-4 py-3 text-[15px]" style={{ borderColor: C.line }}>
-                    당일 예약은 {KAKAO}로 문의해 주세요.
+                    당일 예약은 {KAKAO}으로 문의해 주세요.
                   </p>
                 ) : (
                   <div role="radiogroup" aria-label="시간대" className="mt-2 grid grid-cols-3 gap-2 sm:grid-cols-4 md:grid-cols-6">
@@ -737,6 +740,15 @@ export function PhotoStudioDemo() {
                 <label className="grid gap-1 text-[15px] font-bold" style={{ color: C.muted }}>
                   휴대폰
                   <input value={phone} onChange={(e) => setPhone(e.target.value)} inputMode="numeric" autoComplete="tel" placeholder="010-0000-0000" className={`${input} font-normal`} style={inputStyle} />
+                </label>
+                <label className="flex min-h-11 cursor-pointer items-start gap-2.5 text-[15px] leading-[1.5]">
+                  <input type="checkbox" checked={agree} onChange={(e) => { setAgree(e.target.checked); setErr(null); }} className="mt-0.5 h-5 w-5 shrink-0 accent-[#b8956a]" />
+                  <span>
+                    개인정보 수집, 이용 동의 (필수)
+                    <span className="block text-[14px]" style={{ color: C.muted }}>
+                      이름, 휴대폰을 예약 확인 연락에만 쓰고 촬영 후 1년 안에 파기합니다.
+                    </span>
+                  </span>
                 </label>
                 {err && (
                   <p className="inline-flex items-center gap-1.5 text-[14px] font-bold" style={{ color: C.error }} role="alert">
@@ -871,6 +883,11 @@ export function PhotoStudioDemo() {
           <SampleLogo light />
         </p>
         <p>{ADDRESS}</p>
+        <p className="mt-2">
+          <button type="button" className={`font-bold hover:underline ${focusRing}`} style={{ color: C.text }}>
+            개인정보처리방침
+          </button>
+        </p>
         <DemoMakerInfo className="mt-6" />
       </footer>
     </div>
@@ -935,7 +952,7 @@ function StudioMap() {
       <text x="77" y="160" textAnchor="middle" fill={C.accentInk} fontSize="9" fontWeight="700">
         2번
       </text>
-      <text x="106" y="112" textAnchor="middle" fill={C.text} fontSize="13" fontWeight="700">
+      <text x="44" y="112" textAnchor="middle" fill={C.text} fontSize="13" fontWeight="700">
         ㅇㅇ역
       </text>
       <path d="M77 150 V 105 H 236" fill="none" stroke={C.accent} strokeWidth="3" strokeDasharray="6 6" />

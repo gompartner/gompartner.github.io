@@ -28,6 +28,16 @@ const SLUG = "furniture-workshop";
 const BRAND = "원목 가구 공방";
 const ADDRESS = "서울 ㅇㅇ구 ㅇㅇ로 00, 1층";
 const KAKAO = "카카오톡 채널 원목 가구 공방";
+/* 바닥글 사업자 정보: 전자상거래법 제10조 제1항, 제13조 제1항 표시 사항. 샘플이라 자리 표시로 둔다. */
+const BIZ: [string, string][] = [
+  ["상호", BRAND],
+  ["대표자", "ㅇㅇㅇ"],
+  ["주소", ADDRESS],
+  ["전화", "02-000-0000"],
+  ["메일", "help@example.com"],
+  ["사업자등록번호", "000-00-00000"],
+  ["통신판매업 신고", "제0000-서울ㅇㅇ-0000호(ㅇㅇ구청)"],
+];
 
 const EASE = [0.22, 1, 0.36, 1] as const;
 
@@ -501,6 +511,10 @@ export function FurnitureWorkshopDemo() {
                 </span>
               </span>
             </p>
+            {/* 전자상거래법 제17조 제2항 제6호, 시행령 제21조: 주문 제작 재화는 미리 따로 알리고 서면 동의를 받은 경우 청약철회 제한 */}
+            <p className="mt-2 rounded-[4px] px-3 py-2 text-[14px] leading-[1.55]" style={{ background: C.paper }}>
+              주문에 맞춰 한 점씩 만드는 가구라 제작을 시작하면 청약철회가 제한될 수 있습니다. 계약 전에 따로 알려 드리고 서면 동의를 받습니다.
+            </p>
             <AnimatePresence mode="wait" initial={false}>
               {lead ? (
                 <motion.div key="done" initial={reduce ? false : { opacity: 0, y: 8 }} animate={{ opacity: 1, y: 0 }} exit={reduce ? { opacity: 0 } : { opacity: 0, y: -8 }} transition={{ duration: 0.25, ease: EASE }}>
@@ -628,7 +642,25 @@ export function FurnitureWorkshopDemo() {
         <p>
           <SampleLogo />
         </p>
-        <p>{ADDRESS}</p>
+        <dl className="mt-3 flex flex-wrap gap-x-4 gap-y-0.5">
+          {BIZ.map(([k, v]) => (
+            <div key={k} className="flex gap-1.5">
+              <dt>{k}</dt>
+              <dd className="tabular-nums" style={{ color: C.body }}>
+                {v}
+              </dd>
+            </div>
+          ))}
+        </dl>
+        {/* 11-08 전자상거래법 제10조 이용약관 표시. 다른 샘플과 같이 눌러도 창은 열리지 않는다 */}
+        <p className="mt-2 flex gap-4">
+          <button type="button" className={`font-bold hover:underline ${focusRing}`} style={{ color: C.ink, outlineColor: C.accent }}>
+            이용약관
+          </button>
+          <button type="button" className={`font-bold hover:underline ${focusRing}`} style={{ color: C.ink, outlineColor: C.accent }}>
+            개인정보처리방침
+          </button>
+        </p>
         <DemoMakerInfo className="mt-6" />
       </footer>
     </div>

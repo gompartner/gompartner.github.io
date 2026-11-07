@@ -1283,12 +1283,25 @@ function InfoGrid() {
 }
 
 function RefundTable() {
-  const rows: [string, string][] = [
-    ["이용일 7일 전까지", "100% 환불"],
-    ["이용일 5~6일 전", "70% 환불"],
-    ["이용일 3~4일 전", "50% 환불"],
-    ["이용일 2일 전", "30% 환불"],
-    ["이용일 1일 전, 당일", "환불 불가"],
+  const groups: { title: string; rows: [string, string, string][] }[] = [
+    {
+      title: "성수기 (7.15~8.24, 12.20~2.20)",
+      rows: [
+        ["예약 후 24시간 이내, 이용일 10일 전까지", "계약금 환급", "계약금 환급"],
+        ["이용일 7일 전까지", "10% 공제", "20% 공제"],
+        ["이용일 5일 전까지", "30% 공제", "40% 공제"],
+        ["이용일 3일 전까지", "50% 공제", "60% 공제"],
+        ["이용일 1일 전, 당일", "80% 공제", "90% 공제"],
+      ],
+    },
+    {
+      title: "비수기",
+      rows: [
+        ["이용일 2일 전까지", "계약금 환급", "계약금 환급"],
+        ["이용일 1일 전까지", "10% 공제", "20% 공제"],
+        ["이용일 당일, 연락 없이 불참", "20% 공제", "30% 공제"],
+      ],
+    },
   ];
   const td = "border-b px-3 py-2.5 text-[15px]";
   return (
@@ -1298,24 +1311,48 @@ function RefundTable() {
           <caption className="px-3 py-2.5 text-left text-[18px] font-bold" style={{ background: C.paperDim, color: C.night }}>
             환불 규정
           </caption>
-          <tbody>
-            {rows.map(([when, rate]) => (
-              <tr key={when}>
-                <th scope="row" className={`${td} text-left font-bold`} style={{ borderColor: C.line }}>
-                  {when}
+          <thead>
+            <tr>
+              <th scope="col" className={`${td} text-left`} style={{ borderColor: C.line, color: C.muted }}>
+                취소 시점
+              </th>
+              <th scope="col" className={`${td} text-right`} style={{ borderColor: C.line, color: C.muted }}>
+                주중
+              </th>
+              <th scope="col" className={`${td} text-right`} style={{ borderColor: C.line, color: C.muted }}>
+                주말
+              </th>
+            </tr>
+          </thead>
+          {groups.map((g) => (
+            <tbody key={g.title}>
+              <tr>
+                <th scope="colgroup" colSpan={3} className={`${td} text-left font-bold`} style={{ borderColor: C.line, background: C.paperDim, color: C.night }}>
+                  {g.title}
                 </th>
-                <td className={`${td} text-right tabular-nums`} style={{ borderColor: C.line }}>
-                  {rate}
-                </td>
               </tr>
-            ))}
-          </tbody>
+              {g.rows.map(([when, weekday, weekend]) => (
+                <tr key={when}>
+                  <th scope="row" className={`${td} text-left font-bold`} style={{ borderColor: C.line }}>
+                    {when}
+                  </th>
+                  <td className={`${td} whitespace-nowrap text-right tabular-nums`} style={{ borderColor: C.line }}>
+                    {weekday}
+                  </td>
+                  <td className={`${td} whitespace-nowrap text-right tabular-nums`} style={{ borderColor: C.line }}>
+                    {weekend}
+                  </td>
+                </tr>
+              ))}
+            </tbody>
+          ))}
         </table>
       </div>
       <ul className="grid gap-2 self-start rounded-[8px] border bg-white p-4 text-[15px] leading-[1.6]" style={{ borderColor: C.line }}>
+        <li>공정거래위원회 소비자분쟁해결기준(숙박업)을 따라요. 공제 비율은 총요금 기준이에요. 주말은 금요일, 토요일, 공휴일 전날 숙박이에요.</li>
+        <li>이용일 당일 입실 시간까지 연락이 없으면 당일 취소로 봐요.</li>
+        <li>기상청이 강풍, 풍랑, 호우, 대설, 폭풍해일, 지진해일, 태풍, 화산 주의보 또는 경보(지진 포함)를 내려 캠핑장 이용이나 오시는 길 이동이 어려운 당일 취소는 계약금을 환급해요.</li>
         <li>취소는 관리사무소 전화 또는 {KAKAO}로 접수하고, 접수 시각 기준으로 계산해요.</li>
-        <li>호우, 태풍, 대설 특보로 캠핑장이 문을 닫으면 전액 환불해요. 손님 쪽 날씨 사정은 규정대로 처리해요.</li>
-        <li>날짜 변경은 1회, 이용일 3일 전까지 가능해요. 변경 뒤 취소는 변경 전 날짜 기준이에요.</li>
         <li>환불은 신청 뒤 3영업일 안에 입금 계좌로 돌려드려요.</li>
       </ul>
     </div>
@@ -1342,12 +1379,12 @@ function Directions() {
         <path d="M420 120 L470 80 L520 70" stroke="#dcdad2" strokeWidth="8" fill="none" strokeLinecap="round" />
         <path d="M380 10 C 420 60, 440 100, 470 140 C 490 170, 520 180, 560 230" stroke="#cfdbe2" strokeWidth="16" fill="none" />
         <rect x={440} y={92} width={22} height={10} fill="#fff" stroke={C.ink} strokeWidth={1.5} />
-        <text x={470} y={60} fontSize="13" fill={C.ink}>
+        <text x={478} y={106} fontSize="13" fill={C.ink}>
           ㅇㅇ교 건너 강변길 2km
         </text>
-        <g transform="translate(540 40)">
+        <g transform="translate(506 44)">
           <path d="M0 24 L14 2 L28 24 Z" fill={C.fire} stroke={C.ink} strokeWidth={1.5} />
-          <text x={14} y={44} textAnchor="middle" fontSize="14" fontWeight={700} fill={C.ink}>
+          <text x={36} y={20} fontSize="14" fontWeight={700} fill={C.ink}>
             오토캠핑장
           </text>
         </g>

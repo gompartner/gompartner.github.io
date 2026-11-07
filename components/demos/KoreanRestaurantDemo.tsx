@@ -23,7 +23,7 @@ import { DemoMakerInfo } from "@/components/demos/DemoMakerInfo";
    디자인: 백자색 바탕(#f8f5ee)에 먹색 글씨(#1e1b17), 국물 빛 붉은색(#a32a1d) 하나만 강조색으로 쓴다.
 
    사진 출처(public/images/demo-hansik):
-   AI 생성(Z-Image-Turbo, Apache 2.0) hero, gukbap, baekban, suyuk, interior */
+   AI 생성(Z-Image-Turbo, Apache 2.0) hero, gukbap, baekban, suyuk, interior(흐림 네모를 피해 아래쪽만 4:5로 자름) */
 
 const IMG = "/images/demo-hansik";
 const STORE = "동네 한식당";

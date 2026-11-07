@@ -174,6 +174,11 @@ export function CoworkingDemo() {
         <p>
           {BRANCH}, {ADDRESS}
         </p>
+        <p className="mt-2">
+          <button type="button" className={`font-bold hover:underline ${focusRing}`} style={{ color: C.ink, outlineColor: C.accent }}>
+            개인정보처리방침
+          </button>
+        </p>
         <DemoMakerInfo className="mt-6" />
       </footer>
     </div>
@@ -482,6 +487,7 @@ function TourForm({ today, reduce }: { today: Date; reduce: boolean }) {
   const [phone, setPhone] = useState("");
   const [people, setPeople] = useState(1);
   const [selected, setSelected] = useState<SeatType | null>(null);
+  const [agree, setAgree] = useState(false);
   const [errors, setErrors] = useState<string[]>([]);
   const [done, setDone] = useState<Tour | null>(null);
 
@@ -500,6 +506,7 @@ function TourForm({ today, reduce }: { today: Date; reduce: boolean }) {
     if (!time) e.push("시간을 골라 주세요.");
     if (name.trim().length < 2) e.push("이름을 적어 주세요.");
     if (phone.replace(/\D/g, "").length < 10) e.push("휴대폰 번호를 확인해 주세요.");
+    if (!agree) e.push("개인정보 수집, 이용에 동의해 주세요.");
     setErrors(e);
     if (e.length || day === null || !time) return;
     setDone({ day: days[day], time, name, phone, people, type: selected });
@@ -560,6 +567,7 @@ function TourForm({ today, reduce }: { today: Date; reduce: boolean }) {
             setPhone("");
             setPeople(1);
             setSelected(null);
+            setAgree(false);
           }}
           className={`mt-5 rounded-[4px] border px-4 py-2 text-[14px] font-bold ${focusRing}`}
           style={{ borderColor: C.edge, color: C.ink, outlineColor: C.accent }}
@@ -668,6 +676,16 @@ function TourForm({ today, reduce }: { today: Date; reduce: boolean }) {
             </div>
           </div>
         </div>
+
+        <label className="flex min-h-11 cursor-pointer items-start gap-2.5 text-[15px] leading-[1.5]" style={{ color: C.ink }}>
+          <input type="checkbox" checked={agree} onChange={(e) => setAgree(e.target.checked)} className="mt-0.5 h-5 w-5 shrink-0 accent-[#2c4f58]" />
+          <span>
+            개인정보 수집, 이용 동의 (필수)
+            <span className="block text-[14px]" style={{ color: C.muted }}>
+              이름, 휴대폰을 투어 일정 연락에만 쓰고 투어가 끝나면 1년 안에 파기합니다.
+            </span>
+          </span>
+        </label>
 
         {errors.length > 0 && (
           <ul className="grid gap-1 rounded-[4px] border px-4 py-3 text-[14px] font-bold" style={{ borderColor: C.error, color: C.error }} role="alert">
