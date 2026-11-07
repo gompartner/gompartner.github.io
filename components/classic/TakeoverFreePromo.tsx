@@ -5,7 +5,7 @@ import { ChevronRight } from "lucide-react";
 // 남은 자리는 신청을 받아 수락할 때마다 직접 줄인다. 0이 되면 띠를 내린다.
 // 주소 칸은 상담 신청서로 가고, 신청서가 ?site=&promo=takeover 를 읽어 문의 내용을 미리 채운다.
 export const TAKEOVER_FREE_LEFT = 3;
-// 11-07 모집 기간 2주(사용자). 마감일이 지나면 띠를 내린다
+// 11-07 모집 기간 2주(사용자). 연말로 묶음(입동은 이어받기와 관련 없어 안 씀, PHP 8.2 지원 종료 12-31이 근거). 마감일이 지나면 띠를 내린다
 export const TAKEOVER_FREE_END = "2026-11-22";
 export const TAKEOVER_FREE_END_LABEL = "11월 22일";
 const ended = () => new Date() > new Date(`${TAKEOVER_FREE_END}T23:59:59+09:00`);
@@ -18,7 +18,7 @@ export function TakeoverFreePromo({ id = "takeover-free" }: { id?: string }) {
         <div>
           <p className="text-[14px] font-bold text-[#9fc0ff]">{TAKEOVER_FREE_END_LABEL}까지, 남은 자리 {TAKEOVER_FREE_LEFT}곳</p>
           <h2 id={id} className="mt-1 text-[24px] font-[800] leading-[1.3] tracking-[-0.04em] md:text-[30px]">
-            유지보수 업체 변경 무료 지원
+            연말 유지보수 업체 변경 무료 지원
           </h2>
           <ul className="mt-3 flex flex-col gap-1 text-[16px] text-white md:flex-row md:flex-wrap md:gap-x-6" role="list">
             <li>인수 점검 보고서와 인계 문서</li>
