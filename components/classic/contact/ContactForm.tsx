@@ -2,7 +2,8 @@
 
 import { useEffect, useRef, useState, type KeyboardEvent } from "react";
 import { useSearchParams } from "next/navigation";
-import { Check, ChevronDown } from "lucide-react";
+import { Check, ChevronDown, MessageCircle } from "lucide-react";
+import { openChannelChat } from "@/components/layout/ChannelTalk";
 import { LEAD_ENDPOINT } from "@/data/classic/leadEndpoint";
 import { profile } from "@/data/classic/profile";
 import { projects } from "@/data/classic/projects";
@@ -181,6 +182,16 @@ export function ContactForm() {
             <dd>전화 {profile.phone}, 이메일 {profile.email}</dd>
           </div>
         </dl>
+        {/* 11-08 접수 뒤 채널톡으로 바로 이어서 묻기. 입력칸에 접수 번호를 채워 연다 */}
+        <button
+          type="button"
+          onClick={() => openChannelChat({ name: name.trim(), phone: phone.trim(), message: `[접수 번호 ${status.id}] ` })}
+          data-gtm-cta="contact_done_channel_chat"
+          className="mt-8 inline-flex h-12 items-center gap-2 rounded-md bg-[#256ef4] px-5 text-[16px] font-bold text-white transition-colors hover:bg-[#1b5bd1] focus-visible:outline focus-visible:outline-[3px] focus-visible:outline-offset-2 focus-visible:outline-[#15171c]"
+        >
+          <MessageCircle size={18} aria-hidden />
+          채팅으로 이어서 문의
+        </button>
       </div>
     );
   }

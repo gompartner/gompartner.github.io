@@ -1,7 +1,8 @@
 "use client";
 
 import { forwardRef, useEffect, useRef, useState } from "react";
-import { Check, ChevronDown } from "lucide-react";
+import { Check, ChevronDown, MessageCircle } from "lucide-react";
+import { openChannelChat } from "@/components/layout/ChannelTalk";
 import { LEAD_ENDPOINT } from "@/data/leadEndpoint";
 
 export const CHANNELS = ["네이버", "메타", "구글", "아직 안 함"] as const;
@@ -114,6 +115,16 @@ export const LeadForm = forwardRef<HTMLElement, { pkg: PackageName | ""; onPkg: 
             <p className={`text-[15px] font-bold tabular-nums ${status.id ? "" : "invisible"} text-accent`}>접수 번호 {status.id ?? "000000-000"}</p>
             <p className="mt-2 text-[24px] font-bold leading-[1.4]">신청이 접수되었습니다.</p>
             <p className="mt-2 text-[17px] leading-[1.6] text-foreground-secondary">영업일 기준 1일 이내 연락드립니다.</p>
+            {/* 11-08 접수 뒤 채널톡으로 바로 이어서 묻기 */}
+            <button
+              type="button"
+              onClick={() => openChannelChat({ name: name.trim(), phone: phone.trim(), message: status.id ? `[접수 번호 ${status.id}] ` : "[랜딩 상담 신청] " })}
+              data-gtm-cta="landing_done_channel_chat"
+              className="mt-5 inline-flex h-12 items-center gap-2 rounded-[6px] border-[2.5px] border-[#1d1d1f] bg-accent px-5 text-[16px] font-bold text-white shadow-[3px_3px_0_#1d1d1f] focus-visible:outline focus-visible:outline-[3px] focus-visible:outline-offset-2 focus-visible:outline-[#1d1d1f]"
+            >
+              <MessageCircle size={18} aria-hidden />
+              채팅으로 이어서 문의
+            </button>
           </div>
         ) : (
           <form onSubmit={submit} noValidate className="mt-6 space-y-6 border-[3px] border-[#1d1d1f] bg-white p-4 shadow-[8px_8px_0_#1d1d1f] min-[360px]:p-5 md:p-8">
