@@ -576,6 +576,12 @@ const allInsights: Insight[] = [
   },
 ];
 
+/** 예약된 다음 편(아직 공개 전)의 공개일. 글 끝 "다음 편"에 날짜만 보여 준다 */
+export const scheduledNext = (series: string, no: number) => {
+  const x = allInsights.find((n) => n.series === series && n.no === no);
+  return x && x.date > todayKst ? x.date : null;
+};
+
 export const insights = allInsights.filter(
   (n) => process.env.NODE_ENV === "development" || n.date <= todayKst,
 );

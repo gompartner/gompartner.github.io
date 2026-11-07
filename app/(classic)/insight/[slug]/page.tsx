@@ -2,7 +2,7 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import { PageHead, btnLine, btnPrimary, wrap } from "@/components/classic/ui";
-import { insightBySlug, insights } from "@/data/classic/insights";
+import { insightBySlug, insights, scheduledNext } from "@/data/classic/insights";
 import { LdScript } from "@/components/seo/JsonLd";
 import { ORG_ID, breadcrumbLd, pageMeta } from "@/lib/seo";
 import { siteUrl } from "@/lib/site";
@@ -36,6 +36,7 @@ export default async function ClassicInsightDetailPage({ params }: Props) {
     .filter((x) => x.series === n.series)
     .sort((a, b) => a.no - b.no);
   const nextOne = same.find((x) => x.no === n.no + 1);
+  const soon = nextOne ? null : scheduledNext(n.series, n.no + 1);
   const toc = n.blocks
     .map((b, bi) => ({ h: b.h, id: `s${bi}` }))
     .filter((t): t is { h: string; id: string } => !!t.h);
@@ -220,6 +221,10 @@ export default async function ClassicInsightDetailPage({ params }: Props) {
                   >
                     {nextOne.title}
                   </Link>
+                ) : soon ? (
+                  <p className="mt-2 text-[15px] font-bold text-[#256ef4]">
+                    {Number(soon.slice(5, 7))}월 {Number(soon.slice(8, 10))}일 공개
+                  </p>
                 ) : null}
                 <p className="mt-2 text-[16px] leading-[1.7] text-[#3d4450]">
                   {n.next}
