@@ -199,67 +199,70 @@ export const addons: Addon[] = [
 
 type Extra = [AddonId, number?];
 
-/** 데모 수준으로 만들 때의 패키지와 추가 기능. 없으면 별도 견적이다. 괄호 안은 패키지에 든 맞춤 기능. */
+/** 데모 수준으로 만들 때의 패키지와 추가 기능. 없으면 별도 견적이다. 괄호 안은 패키지에 든 맞춤 기능.
+    11-08 화면 대조 기준: tool은 입력을 받아 계산하거나 조회하는 도구(계산기, 검색, 날짜와 시각 칸을 고르는 예약 접수)만 센다.
+    단순 표, 고르는 안내(탭, 분류 전환), 정적 지도 그림, 상담 폼(날짜만 받거나 오전, 오후 같은 희망 시간대)은 기본에 포함이다.
+    page는 이번 대조에서 바꾸지 않았다. */
 const estimateSource: Record<string, { plan: PlanId | LandingPlanId; extras: Extra[] }> = {
   "landing-water-rental": { plan: "landing-basic", extras: [] },
   "landing-coding-camp": { plan: "landing-standard", extras: [] },
-  "landing-move-clean": { plan: "landing-premium", extras: [] }, // 견적 계산기
-  "landing-popup-store": { plan: "landing-premium", extras: [["tool", 2]] }, // 회차 발권, 더해서 현장 웨이팅, 돌림판 쿠폰
-  "landing-stamp-tour": { plan: "landing-premium", extras: [["tool", 2]] }, // 스탬프 투어, 더해서 해설사 회차 예약, 코스 선택 지도
-  "landing-zine-fair": { plan: "landing-premium", extras: [["tool", 2]] }, // 입장 회차 등록, 더해서 셀러 필터, 부스 지도, 미리 담기
-  "landing-leather-class": { plan: "landing-premium", extras: [["pay"], ["tool"]] }, // 회차 신청, 자동 마감, 더해서 결제 연동, 예약 변경 조회
+  "landing-move-clean": { plan: "landing-premium", extras: [] }, // (견적 계산기), 예약 날짜 칸은 신청 폼에 포함
+  "landing-popup-store": { plan: "landing-premium", extras: [] }, // (회차 예약), 현장 웨이팅과 경품은 안내 문구만
+  "landing-stamp-tour": { plan: "landing-premium", extras: [["tool"]] }, // (스탬프 투어와 코스 지도), 더해서 해설사 회차 예약
+  "landing-zine-fair": { plan: "landing-premium", extras: [["tool"]] }, // (부스 지도와 관심 부스 동선), 더해서 셀러 검색. 사전 등록은 신청 폼
+  "landing-leather-class": { plan: "landing-premium", extras: [["pay"]] }, // (회차 신청, 자동 마감), 더해서 결제 단계
   "clinic-homepage": { plan: "standard", extras: [["page", 5]] },
-  "dental-homepage": { plan: "standard", extras: [["tool"], ["page", 5]] }, // 증상 자가체크
-  pharmacy: { plan: "standard", extras: [["print"]] }, // 처방전 미리 보내기는 문의 폼으로
-  "law-firm": { plan: "standard", extras: [["board"]] }, // 사건별 절차 안내
-  "tax-office": { plan: "standard", extras: [["board", 2]] }, // 신고일정
-  "real-estate": { plan: "premium", extras: [["map"], ["tool"]] }, // 매물검색
-  pension: { plan: "premium", extras: [["page", 3]] }, // 실시간예약
-  "private-gym": { plan: "premium", extras: [["map"], ["pay"]] }, // 지점, 시간 예약
+  "dental-homepage": { plan: "standard", extras: [["page", 5]] }, // 증상 안내는 고르는 안내, 예약은 오전, 오후 시간대라 기본
+  pharmacy: { plan: "standard", extras: [] }, // 운영시간 표, 휴일지킴이 달력, 오시는 길. 인쇄 화면 없음
+  "law-firm": { plan: "standard", extras: [["board"]] }, // 성공사례 게시판(분야, 결과 거르기). 사건별 절차는 고르는 안내
+  "tax-office": { plan: "standard", extras: [["board", 2]] }, // 세무자료실 세무소식, 칼럼 게시판(검색 포함). 신고일정 달력은 기본
+  "real-estate": { plan: "premium", extras: [["tool"]] }, // (매물 조건 검색), 더해서 중개보수 계산
+  pension: { plan: "premium", extras: [["page", 3]] }, // (실시간 예약 현황표)
+  "private-gym": { plan: "premium", extras: [["pay"]] }, // (지점, 시간 칸 예약), 더해서 결제 단계. 지점은 카드 목록
   "korean-restaurant": { plan: "basic", extras: [] }, // 기본 패키지 범위 그대로
   interior: { plan: "standard", extras: [] }, // 표준 패키지 범위 그대로(시공사례, 공지 직접 올리기)
-  academy: { plan: "standard", extras: [["tool"], ["board"]] }, // 반 찾기, 시간표
-  "pilates-studio": { plan: "standard", extras: [["tool"]] }, // 시간표, 레슨 추천
-  "hanok-cafe": { plan: "standard", extras: [["tool"]] }, // 메뉴 찾기, 공간 예약
-  "bakery-cafe": { plan: "standard", extras: [["tool", 2]] }, // 빵 나오는 시간, 픽업 예약
-  company: { plan: "standard", extras: [["lang"], ["page", 5], ["tool"]] }, // 가공 가능 범위
-  "cert-lab": { plan: "premium", extras: [] }, // 시험진행현황 조회
-  "flower-expo": { plan: "basic", extras: [["tool"]] }, // 한 페이지 안내+관람요금 계산
-  "online-store": { plan: "premium", extras: [["cart"], ["pay"], ["member"]] }, // 유약 색, 각인 미리보기
-  "roastery": { plan: "standard", extras: [["tool", 2], ["cart"]] }, // 구독 금액 계산, 분쇄도와 맛 노트 고르기, 원두 담기와 주문 접수
-  "hair-salon": { plan: "standard", extras: [["tool"]] }, // 디자이너별 소요시간 합산 예약 시간표
-  "optical": { plan: "standard", extras: [["tool", 2], ["map"]] }, // 테와 렌즈 가격 계산기, 시력검사 예약 접수가 tool, 오시는 길 지도가 map
-  "furniture-workshop": { plan: "standard", extras: [["tool"]] }, // 치수, 목재별 견적 계산과 도면 PNG 첨부 문의가 tool
-  "coworking": { plan: "standard", extras: [["tool", 2]] }, // 요금 계산, 더해서 실시간 좌석 평면도와 회의실 현황 조회
-  "campsite": { plan: "premium", extras: [["tool", 2]] }, // 사이트별 날짜 예약현황 달력, 장비 대여와 인원 추가 요금 합산
-  "photo-studio": { plan: "standard", extras: [["tool"]] }, // 패키지 옵션 합산과 시간대별 예약 접수가 tool
-  "nail-shop": { plan: "standard", extras: [["tool"]] }, // 손톱 컬러 시뮬레이터와 금액 계산, 예약 접수가 tool
-  "car-detailing": { plan: "standard", extras: [["tool", 2]] }, // 차종별 시공 견적 계산, 입고 예약과 픽업 접수
-  "lighting-shop": { plan: "standard", extras: [["tool"]] }, // 색온도와 밝기 조절, 제품을 방에 걸어 보는 체험 도구
-  "liquor-shop": { plan: "standard", extras: [["tool", 2]] }, // 도수 단맛 가격 조건으로 병 고르기와 선물 세트 합계가 하나, 시음회 회차 예약이 하나
-  "small-wedding": { plan: "standard", extras: [["tool", 2]] }, // 하객 수 배치도 + 패키지 견적 계산이 tool, 달력과 상담 폼은 기본
-  "korean-medicine": { plan: "standard", extras: [["tool", 2]] }, // 아픈 부위별 진료 안내, 진료 예약(교통사고 접수번호 확인은 예약에 포함)
-  "orthopedics": { plan: "standard", extras: [["tool", 3]] }, // 부위별 증상 안내, 비급여 진료비 검색, 진료 예약(실시간 대기는 접수 프로그램 연동이라 live 로 따로 볼 수도 있음)
-  "pediatrics": { plan: "standard", extras: [["tool", 3]] }, // 실시간 대기와 진료 접수, 예방접종 일정 계산, 영유아검진 시기 계산
+  academy: { plan: "standard", extras: [["tool"]] }, // 레벨테스트 날짜, 시간 칸 예약. 학년별 시간표는 고르는 안내
+  "pilates-studio": { plan: "standard", extras: [] }, // 시간표와 수강료는 표, 체험 신청은 상담 후 시간 확정 폼
+  "hanok-cafe": { plan: "standard", extras: [] }, // 메뉴판, 좌석 예약은 네이버 예약 연결
+  "bakery-cafe": { plan: "standard", extras: [["tool"], ["cart"]] }, // 빵 담기와 픽업 주문이 cart, 굽는 시간 뒤로만 여는 픽업 시간 칸이 tool. 빵 나오는 시간은 표
+  company: { plan: "standard", extras: [["lang"], ["page", 5]] }, // 한국어, English 전환. 가공 사양은 표
+  "cert-lab": { plan: "premium", extras: [] }, // (성적서 진위확인 조회)
+  "flower-expo": { plan: "basic", extras: [["tool"]] }, // 관람요금 계산. 추천 코스는 고르는 안내
+  "online-store": { plan: "premium", extras: [["cart"], ["pay"]] }, // (유약, 크기, 각인 옵션), 회원 기능 없음
+  "roastery": { plan: "standard", extras: [["cart"]] }, // 원두 담기와 주문 접수. 구독은 요금표
+  "hair-salon": { plan: "standard", extras: [["tool"]] }, // 디자이너, 시술, 날짜, 시각을 고르는 예약 접수
+  "optical": { plan: "standard", extras: [["tool"]] }, // 시력검사 날짜, 시간 칸 예약. 테와 렌즈 가격은 표, 오시는 길은 그림
+  "furniture-workshop": { plan: "standard", extras: [] }, // 목재별 시작가 안내와 제작 문의 폼
+  "coworking": { plan: "standard", extras: [["tool"]] }, // 투어 날짜, 시간 칸 예약. 요금과 회의실은 표
+  "campsite": { plan: "premium", extras: [["tool", 2]] }, // (사이트 배치도와 마감 표시), 더해서 사이트별 예약 달력, 장비 대여와 인원 추가 요금 합산
+  "photo-studio": { plan: "standard", extras: [["tool", 2]] }, // 패키지 옵션 합산, 30분 칸 예약 접수
+  "nail-shop": { plan: "standard", extras: [["tool"]] }, // 날짜, 담당, 시각 칸 예약 접수와 금액
+  "car-detailing": { plan: "standard", extras: [["tool"]] }, // 입고 날짜, 시간 칸 예약과 픽업 접수. 차종별 가격은 표
+  "lighting-shop": { plan: "standard", extras: [["tool"]] }, // 견적 담기와 수량별 합계. 색온도는 안내 표
+  "liquor-shop": { plan: "standard", extras: [["tool"]] }, // 시음회 회차 예약(남은 자리, 인원별 금액)
+  "small-wedding": { plan: "standard", extras: [["tool"]] }, // 날짜, 시간대별 예약 가능 달력. 배치와 패키지는 표, 상담 폼은 기본
+  "korean-medicine": { plan: "standard", extras: [["tool"]] }, // 30분 칸 진료 예약(교통사고 접수번호는 예약에 포함)
+  "orthopedics": { plan: "standard", extras: [["tool"]] }, // 진료 시간 칸 예약. 부위별 안내와 비급여는 표
+  "pediatrics": { plan: "standard", extras: [] }, // 접수 안내, 예방접종과 검진 시기는 표
   "eye-clinic": { plan: "standard", extras: [["tool"]] }, // 상담 예약(날짜, 시간 칸 접수)이 tool. 수술 비교와 검사 단계는 고르는 안내라 세지 않음
-  "animal-hospital": { plan: "standard", extras: [["tool", 3]] }, // 지금 시각 기준 진료, 면회 상태 표시, 나이별 검진 추천, 진료 예약 접수
-  "nursing-hospital": { plan: "standard", extras: [["tool", 2]] }, // 병실별 월 비용 계산, 면회 시간 칸 예약
-  "labor-firm": { plan: "standard", extras: [["tool", 3]] }, // 구제신청 기한 계산, 임금체불 개략 계산, 직원 수별 자문 요금
-  "scrivener": { plan: "standard", extras: [["tool", 2]] }, // 등기 비용 계산, 준비 서류 체크리스트
-  "patent-office": { plan: "standard", extras: [["tool", 3]] }, // 상표 검색 예시, 출원 비용 계산, 심사 방식별 기간 막대
-  "family-law": { plan: "standard", extras: [["tool", 2]] }, // 양육비 개략 계산, 겹치지 않는 시간만 여는 상담 예약
-  "visa-agent": { plan: "standard", extras: [["tool", 2], ["lang"]] }, // 체류자격 찾기, 연장 신청일 계산, 한국어와 English 전환
-  "architect-office": { plan: "standard", extras: [["tool"]] }, // 대지 면적과 용도지역으로 건축면적, 연면적, 층수를 계산하는 규모 검토
-  "presale": { plan: "standard", extras: [["tool", 2], ["map"]] }, // 분양가와 납부 일정 계산, 견본주택 방문예약, 그린 입지 지도
-  "saas-startup": { plan: "standard", extras: [["tool", 2]] }, // 매장 수 요금 계산, 기능 비교표 다른 점만 보기
-  "logistics": { plan: "standard", extras: [["tool", 2], ["map"]] }, // 월 비용 견적 계산, 출고 마감 시계, 그린 센터 지도
-  "food-oem": { plan: "standard", extras: [["tool", 2]] }, // 수량별 단가 계산, 샘플 의뢰 접수
-  "piano-academy": { plan: "standard", extras: [["tool", 2]] }, // 요일별 시간표 남은 자리 조회, 체험 레슨 신청(시간표와 연결)
-  "taekwondo": { plan: "standard", extras: [["tool", 2]] }, // 정류장별 차량 시간 조회, 승급 심사 일정 계산
-  "art-academy": { plan: "standard", extras: [["tool", 2]] }, // 반별 교습비 안내와 방문 상담 예약(날짜, 시간 칸)
-  "english-talk": { plan: "standard", extras: [["tool", 2]] }, // 레벨테스트 채점과 반 추천, 수강료 계산과 연결된 체험 신청
-  "driving-school": { plan: "standard", extras: [["tool", 3]] }, // 면허별 비용 계산, 셔틀 다음 차 조회, 시험 일정 달력
-  "reading-academy": { plan: "standard", extras: [["tool"]] }, // 학년별 이번 달 읽는 책 고르기
+  "animal-hospital": { plan: "standard", extras: [["tool"]] }, // 진료 시간 칸 예약. 검진 추천과 면회 시간은 표
+  "nursing-hospital": { plan: "standard", extras: [["tool"]] }, // 면회 시간 칸 예약. 병실 비용은 표
+  "labor-firm": { plan: "standard", extras: [] }, // 구제신청, 임금체불, 자문 안내는 표와 상담 폼
+  "scrivener": { plan: "standard", extras: [] }, // 등기 비용과 준비 서류는 안내, 상담 폼
+  "patent-office": { plan: "standard", extras: [] }, // 상표, 출원 비용, 심사 단계는 안내, 상담 폼
+  "family-law": { plan: "standard", extras: [] }, // 분야 안내와 희망 시간대 상담 예약 폼
+  "visa-agent": { plan: "standard", extras: [["lang"]] }, // 한국어와 English 전환. 체류자격과 연장 안내는 표
+  "architect-office": { plan: "standard", extras: [] }, // 작업 목록 필터와 설계 과정 안내, 상담은 전화와 카카오톡
+  "presale": { plan: "standard", extras: [["tool"]] }, // 견본주택 방문 시간 칸 예약. 분양가는 표, 입지는 그림
+  "saas-startup": { plan: "standard", extras: [] }, // 월간, 연간 요금표와 기능 비교표, 도입 상담 폼
+  "logistics": { plan: "standard", extras: [] }, // 출고 일정과 요금은 표, 센터 안내, 도입 상담 폼
+  "food-oem": { plan: "standard", extras: [] }, // 포장별 품목과 최소 주문 수량은 표, 샘플 의뢰 폼
+  "piano-academy": { plan: "standard", extras: [["tool"]] }, // 과정과 요일별 시간 칸 체험 레슨 신청. 시간표는 표
+  "taekwondo": { plan: "standard", extras: [] }, // 차량 노선과 승급 심사는 표, 상담 폼
+  "art-academy": { plan: "standard", extras: [["tool"]] }, // 방문 상담 예약(날짜, 시간 칸). 교습비는 표
+  "english-talk": { plan: "standard", extras: [["tool", 2]] }, // 레벨테스트 날짜, 시각 예약, 반 수업일에 맞춘 체험 신청
+  "driving-school": { plan: "standard", extras: [] }, // 면허별 비용, 셔틀, 시험 안내는 표, 희망 시간대 등록 상담 폼
+  "reading-academy": { plan: "standard", extras: [["tool"]] }, // 날짜, 시각 칸 상담 예약. 학년별 책은 고르는 안내
 };
 
 /** 오픈 할인: 샘플에 이미 있는 기능은 다시 쓰므로 추가 기능 금액을 절반만 받는다. */

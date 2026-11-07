@@ -30,6 +30,15 @@ import { DemoMakerInfo } from "@/components/demos/DemoMakerInfo";
 const ADDRESS = "서울 ㅇㅇ구 ㅇㅇ로 00, 0층";
 const TEL = "02-000-0000";
 const KAKAO = "카카오톡 채널 재고 관리 서비스";
+/* 바닥글 사업자 정보: 전자상거래법 제10조 제1항(상호, 대표자, 주소, 전화, 메일, 사업자등록번호), 제13조 제1항 제3호(통신판매업 신고번호). 구독 결제라 통신판매업 신고 포함 */
+const BIZ: [string, string][] = [
+  ["상호", "재고 관리 서비스"],
+  ["대표자", "ㅇㅇㅇ"],
+  ["주소", ADDRESS],
+  ["메일", "help@example.com"],
+  ["사업자등록번호", "000-00-00000"],
+  ["통신판매업 신고", "제0000-서울ㅇㅇ-0000호(ㅇㅇ구청)"],
+];
 const SLUG = "saas-startup";
 const IMG = "/images/demo-saas-startup";
 
@@ -58,7 +67,7 @@ type PlanId = "starter" | "standard" | "pro";
 type Billing = "month" | "year";
 
 const PLANS: { id: PlanId; name: string; price: number; who: string; points: string[] }[] = [
-  { id: "starter", name: "스타터", price: 19000, who: "매장 1곳, 사장님 혼자 셀 때", points: ["재고 세기, 바코드 스캔", "품목 300개", "유통기한 알림", "직원 계정 2명"] },
+  { id: "starter", name: "스타터", price: 19000, who: "매장 1곳, 혼자 재고를 셀 때", points: ["재고 세기, 바코드 스캔", "품목 300개", "유통기한 알림", "직원 계정 2명"] },
   { id: "standard", name: "스탠다드", price: 39000, who: "발주까지 앱으로 할 때", points: ["스타터 기능 전부", "품목 무제한", "적정 재고 알림, 거래처 발주서", "메뉴별 원가율", "직원 계정 10명"] },
   { id: "pro", name: "프로", price: 59000, who: "매장이 두 곳 이상일 때", points: ["스탠다드 기능 전부", "여러 매장 한 화면", "매장 간 재고 이동", "POS 매출 연동", "전담 매니저"] },
 ];
@@ -246,13 +255,27 @@ export function SaasDemo() {
           <p>
             <SampleLogo size={18} />
           </p>
-          <p className="mt-2">주소 {ADDRESS}</p>
+          <dl className="mt-2 flex flex-wrap gap-x-4">
+            {BIZ.map(([k, v]) => (
+              <div key={k} className="flex gap-1.5">
+                <dt>{k}</dt>
+                <dd className="tabular-nums" style={{ color: C.body }}>
+                  {v}
+                </dd>
+              </div>
+            ))}
+          </dl>
           <p>
             고객센터 {TEL} (평일 10:00~18:00), {KAKAO}
           </p>
+          {/* 이용약관(전자상거래법 제10조 제1항), 개인정보처리방침(개인정보 보호법 제30조). 다른 샘플과 같이 눌러도 창은 열리지 않는다 */}
           <p className="mt-2 flex flex-wrap gap-x-4 font-semibold" style={{ color: C.ink }}>
-            <span>이용약관</span>
-            <span>개인정보처리방침</span>
+            <button type="button" className={`font-semibold hover:underline ${focusRing}`} style={{ color: C.ink, outlineColor: C.accent }}>
+              이용약관
+            </button>
+            <button type="button" className={`font-semibold hover:underline ${focusRing}`} style={{ color: C.ink, outlineColor: C.accent }}>
+              개인정보처리방침
+            </button>
           </p>
           <div style={{ color: C.ink }}>
             <DemoMakerInfo className="mt-6" />
@@ -1114,6 +1137,8 @@ function ContactForm({ prefill, today, reduce }: { prefill: Prefill; today: Date
             개인정보 수집, 이용 동의 (필수)
             <span className="mt-0.5 block text-[13.5px]" style={{ color: C.muted }}>
               상호, 이름, 휴대폰 번호를 상담 회신에만 쓰고 상담이 끝나면 1년 뒤 지워요.
+              {/* 개인정보 보호법 제15조 제2항 제4호: 거부권과 거부 시 불이익 */}
+              <span className="block">동의하지 않으실 수 있으며, 동의하지 않으면 도입 문의를 받을 수 없어요.</span>
             </span>
           </span>
         </label>

@@ -46,6 +46,15 @@ const IMG = "/images/demo-logistics";
 const ADDRESS = "경기 ㅇㅊ시 ㅇㅇ면 ㅇㅇ로 00";
 const TEL = "031-000-0000";
 const KAKAO = "카카오톡 채널 물류 대행";
+/* 바닥글 사업자 정보: 상호, 대표자, 주소, 전화, 메일, 사업자등록번호. 계약으로 맡는 B2B 대행이라 통신판매업 신고 줄은 두지 않는다 */
+const BIZ: [string, string][] = [
+  ["상호", "물류 대행"],
+  ["대표자", "ㅇㅇㅇ"],
+  ["주소", ADDRESS],
+  ["대표전화", TEL],
+  ["메일", "help@example.com"],
+  ["사업자등록번호", "000-00-00000"],
+];
 
 const C = {
   paper: "#ffffff",
@@ -188,10 +197,26 @@ export function LogisticsDemo() {
           <p>
             <SampleLogo size={18} />
           </p>
-          <p className="mt-3">
-            {ADDRESS} / 대표전화 <span className="tabular-nums">{TEL}</span> / {KAKAO}
+          <dl className="mt-3 flex flex-wrap gap-x-4">
+            {BIZ.map(([k, v]) => (
+              <div key={k} className="flex gap-1.5">
+                <dt>{k}</dt>
+                <dd className="tabular-nums" style={{ color: C.body }}>
+                  {v}
+                </dd>
+              </div>
+            ))}
+          </dl>
+          <p>{KAKAO}, 평일 09:00 ~ 18:00, 출고 마감 오후 2시, 토요일, 일요일, 공휴일 휴무</p>
+          {/* 개인정보 보호법 제30조 처리방침 공개, 이용약관. 다른 샘플과 같이 눌러도 창은 열리지 않는다 */}
+          <p className="mt-2 flex flex-wrap gap-x-4">
+            <button type="button" className={`font-bold hover:underline ${focusRing}`} style={{ color: C.ink, outlineColor: C.accent }}>
+              이용약관
+            </button>
+            <button type="button" className={`font-bold hover:underline ${focusRing}`} style={{ color: C.ink, outlineColor: C.accent }}>
+              개인정보처리방침
+            </button>
           </p>
-          <p>평일 09:00 ~ 18:00, 출고 마감 오후 2시, 토요일, 일요일, 공휴일 휴무</p>
           <DemoMakerInfo className="mt-6" />
         </div>
       </footer>
@@ -788,9 +813,18 @@ function Contact({ today, reduce }: { today: Date; reduce: boolean }) {
             </div>
             <div className="flex flex-col gap-4 md:col-span-2 md:flex-row md:items-center md:justify-between">
               <div>
-                <label className="inline-flex cursor-pointer items-center gap-2 text-[15px]">
-                  <input id="lg-f-agree" type="checkbox" checked={agree} onChange={(e) => setAgree(e.target.checked)} className={`h-5 w-5 ${focusRing}`} style={{ accentColor: C.accent, outlineColor: C.accent }} aria-describedby={err.agree ? "lg-e-agree" : undefined} />
-                  개인정보 수집, 이용 동의(상담 회신용, 1년 보관)
+                {/* 개인정보 보호법 제15조 제2항: 목적, 항목, 보유 기간, 거부권과 거부 시 불이익 */}
+                <label className="flex cursor-pointer items-start gap-2.5 text-[15px] leading-[1.5]">
+                  <input id="lg-f-agree" type="checkbox" checked={agree} onChange={(e) => setAgree(e.target.checked)} className={`mt-0.5 h-5 w-5 shrink-0 ${focusRing}`} style={{ accentColor: C.accent, outlineColor: C.accent }} aria-describedby={err.agree ? "lg-e-agree" : undefined} />
+                  <span>
+                    개인정보 수집, 이용 동의 (필수)
+                    <span className="block text-[14px]" style={{ color: C.muted }}>
+                      쇼핑몰 이름, 담당자 이름, 휴대폰 번호를 도입 상담 회신에만 쓰고 상담이 끝나면 1년 안에 파기합니다.
+                    </span>
+                    <span className="block text-[14px]" style={{ color: C.muted }}>
+                      동의하지 않으실 수 있으며, 동의하지 않으면 상담 신청을 받을 수 없습니다.
+                    </span>
+                  </span>
                 </label>
                 {errText("agree")}
               </div>

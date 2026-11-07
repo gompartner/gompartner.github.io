@@ -30,6 +30,15 @@ const IMG = "/images/demo-nail-shop";
 const BRAND = "네일샵";
 const ADDRESS = "서울 ㅇㅇ구 ㅇㅇ로 00, 3층";
 const KAKAO = "카카오톡 채널 네일샵";
+/* 바닥글 사업자 정보와 처리방침 버튼: 개인정보 보호법 제30조(처리방침 수립, 공개). 온라인 판매가 없어 통신판매업 신고는 두지 않는다 */
+const BIZ: [string, string][] = [
+  ["상호", BRAND],
+  ["대표자", "ㅇㅇㅇ"],
+  ["주소", ADDRESS],
+  ["전화", "02-000-0000"],
+  ["메일", "help@example.com"],
+  ["사업자등록번호", "000-00-00000"],
+];
 
 /** 320ms, 부드럽게 멈추는 곡선 */
 const DUR = 0.32;
@@ -87,9 +96,12 @@ const BASES = [
 ];
 const CARE = { price: 15000 };
 const REMOVE = { price: 10000 };
+/* 연장과 보수는 손톱 하나 단위. 열손 연장 6만원 안팎인 동네 샵 가격표를 손톱당으로 나눴다 */
+const EXTEND = { price: 6000 };
+const REPAIR = { price: 3000 };
 
 const MENU: { group: string; rows: [string, string][] }[] = [
-  { group: "손", rows: [["젤 제거", "10,000원"], ["손 케어", "15,000원"], ["젤 원컬러", "40,000원"], ["젤 그라데이션", "50,000원"], ["아트 (손톱당)", "3,000원~8,000원"]] },
+  { group: "손", rows: [["젤 제거", "10,000원"], ["손 케어", "15,000원"], ["젤 원컬러", "40,000원"], ["젤 그라데이션", "50,000원"], ["아트 (손톱당)", "3,000원~8,000원"], ["연장 (손톱당)", won(EXTEND.price)], ["보수 (손톱당)", won(REPAIR.price)]] },
   { group: "패디", rows: [["패디 케어", "25,000원"], ["패디 젤 원컬러", "50,000원"], ["패디 아트 (발톱당)", "3,000원~8,000원"]] },
 ];
 
@@ -102,6 +114,16 @@ const PASSES: [string, string][] = [
 
 /** 예약할 때 고르는 시술 */
 const SERVICES = ["젤 원컬러", "젤 그라데이션", "이달의 아트", "손 케어만", "패디 젤 원컬러", "패디 케어만"];
+/** 시술별 기본 금액. 이달의 아트는 젤 원컬러에 아트를 열 손톱 모두 올린 금액(첫 화면 크게 보기와 같은 계산) */
+const SERVICE_PRICE: Record<string, number> = {
+  "젤 원컬러": BASES[0].price,
+  "젤 그라데이션": BASES[1].price,
+  "손 케어만": CARE.price,
+  "패디 젤 원컬러": 50000,
+  "패디 케어만": 25000,
+};
+const monthlyTotal = (m: Monthly) => BASES[0].price + artOf(m.art).price * 10;
+const monthlyLine = (m: Monthly) => (m.art === "none" ? `${m.name} (아트 없음)` : `${m.name} (손톱당 ${won(artOf(m.art).price)} x 10)`);
 
 const STAFF = [
   { role: "원장", name: "박ㅅ연" },
@@ -176,7 +198,7 @@ export function NailShopDemo() {
           </div>
         </div>
         <p className="mt-3 text-[14px]" style={{ color: C.plumSoft }}>
-          부가세 포함. 연장과 보수는 상담 후 안내해요.
+          부가세 포함.
         </p>
 
         <div className="mt-6 rounded-[8px] border p-5" style={{ background: C.paper, borderColor: C.line }}>
@@ -215,7 +237,24 @@ export function NailShopDemo() {
         <p>
           <SampleLogo />
         </p>
-        <p>{ADDRESS}</p>
+        <dl className="mt-3 flex flex-wrap gap-x-4 gap-y-0.5">
+          {BIZ.map(([k, v]) => (
+            <div key={k} className="flex gap-1.5">
+              <dt>{k}</dt>
+              <dd className="tabular-nums" style={{ color: C.plum }}>
+                {v}
+              </dd>
+            </div>
+          ))}
+        </dl>
+        <p className="mt-2 flex gap-4">
+          <button type="button" className={`font-bold hover:underline ${focusRing}`} style={{ color: C.plum, outlineColor: C.accent }}>
+            이용약관
+          </button>
+          <button type="button" className={`font-bold hover:underline ${focusRing}`} style={{ color: C.plum, outlineColor: C.accent }}>
+            개인정보처리방침
+          </button>
+        </p>
         <DemoMakerInfo className="mt-6" />
       </footer>
     </div>
@@ -435,18 +474,23 @@ function ReserveForm({ today, reduce, artNote }: { today: Date; reduce: boolean;
   const [phone, setPhone] = useState("");
   const [memo, setMemo] = useState("");
   const [service, setService] = useState(SERVICES[0]);
+  const [pick, setPick] = useState(0);
+  const [agree, setAgree] = useState(false);
   // 첫 화면 이달의 아트에서 "이 아트로 예약"을 누르면 요청 사항 첫 줄에 아트 이름을 넣는다
   const [lastNote, setLastNote] = useState<string | null>(null);
   if (artNote !== lastNote) {
     setLastNote(artNote);
     if (artNote) {
       setService("이달의 아트");
+      setPick(Math.max(0, MONTHLY.findIndex((x) => x.name === artNote)));
       const rest = memo.startsWith("이달의 아트") ? memo.split("\n").slice(1).join("\n") : memo;
       setMemo(`이달의 아트 ${artNote}${rest ? `\n${rest}` : ""}`);
     }
   }
   const [err, setErr] = useState<string | null>(null);
-  const [done, setDone] = useState<{ no: string; date: Date; hour: number; staff: number; service: string; name: string; phone: string } | null>(null);
+  const [done, setDone] = useState<{ no: string; date: Date; hour: number; staff: number; service: string; art: string | null; total: number; name: string; phone: string } | null>(null);
+  const isMonthly = service === "이달의 아트";
+  const total = isMonthly ? monthlyTotal(MONTHLY[pick]) : SERVICE_PRICE[service];
   const [nowH, setNowH] = useState(0);
   useEffect(() => {
     const f = requestAnimationFrame(() => setNowH(new Date().getHours()));
@@ -464,9 +508,10 @@ function ReserveForm({ today, reduce, artNote }: { today: Date; reduce: boolean;
     if (staff === null) return setErr("담당을 골라 주세요.");
     if (name.trim().length < 2) return setErr("이름을 두 글자 이상 적어 주세요.");
     if (phone.replace(/\D/g, "").length < 10) return setErr("휴대폰 번호를 다시 확인해 주세요.");
+    if (!agree) return setErr("개인정보 수집, 이용에 동의해 주세요.");
     setErr(null);
     const no = `N${String(date.getFullYear()).slice(2)}${p2(date.getMonth() + 1)}${p2(date.getDate())}-${hour}${staff}${p2(name.trim().length + phone.length)}`;
-    setDone({ no, date, hour, staff, service, name, phone });
+    setDone({ no, date, hour, staff, service, art: isMonthly ? monthlyLine(MONTHLY[pick]) : null, total, name, phone });
   };
 
   const fade = reduce ? { duration: 0 } : { duration: DUR, ease: EASE };
@@ -495,6 +540,14 @@ function ReserveForm({ today, reduce, artNote }: { today: Date; reduce: boolean;
               <dd>
                 {done.service}
               </dd>
+              {done.art && (
+                <>
+                  <dt className="font-bold">아트</dt>
+                  <dd className="tabular-nums">{done.art}</dd>
+                </>
+              )}
+              <dt className="font-bold">합계</dt>
+              <dd className="font-bold tabular-nums">{won(done.total)}</dd>
               <dt className="font-bold">예약자</dt>
               <dd>
                 {maskName(done.name)} {maskPhone(done.phone)}
@@ -505,7 +558,7 @@ function ReserveForm({ today, reduce, artNote }: { today: Date; reduce: boolean;
               <p>변경과 취소는 예약 하루 전까지 {KAKAO} 또는 전화로 알려 주세요.</p>
               <p>디자인 상담은 방문 10분 전에 와 주시면 함께 봐요.</p>
             </div>
-            <button type="button" onClick={() => setDone(null)} className={`mt-5 rounded-[6px] border px-5 py-2.5 text-[15px] font-semibold ${focusRing}`} style={{ borderColor: C.line, outlineColor: C.plum }}>
+            <button type="button" onClick={() => { setDone(null); setAgree(false); }} className={`mt-5 rounded-[6px] border px-5 py-2.5 text-[15px] font-semibold ${focusRing}`} style={{ borderColor: C.line, outlineColor: C.plum }}>
               다른 예약 넣기
             </button>
           </motion.div>
@@ -609,6 +662,24 @@ function ReserveForm({ today, reduce, artNote }: { today: Date; reduce: boolean;
                   </option>
                 ))}
               </select>
+              {isMonthly && (
+                <>
+                  <label className="mt-4 block text-[16px] font-bold" htmlFor="ns-art">
+                    아트
+                  </label>
+                  <select id="ns-art" value={pick} onChange={(e) => setPick(Number(e.target.value))} className={`mt-1 w-full rounded-[8px] border px-3 py-2.5 text-[16px] ${focusRing}`} style={{ borderColor: C.line, outlineColor: C.plum, background: C.bg }}>
+                    {MONTHLY.map((x, i) => (
+                      <option key={x.img} value={i}>
+                        {x.name}
+                      </option>
+                    ))}
+                  </select>
+                </>
+              )}
+              <p className="mt-2 flex items-baseline justify-between gap-3 text-[15px]">
+                <span style={{ color: C.plumSoft }}>{isMonthly ? "열 손톱 합계" : "합계"}</span>
+                <b className="tabular-nums">{won(total)}</b>
+              </p>
               <label className="mt-4 block text-[16px] font-bold" htmlFor="ns-name">
                 이름
               </label>
@@ -622,6 +693,16 @@ function ReserveForm({ today, reduce, artNote }: { today: Date; reduce: boolean;
               </label>
               <textarea id="ns-memo" value={memo} onChange={(e) => setMemo(e.target.value)} rows={3} placeholder="손톱 길이, 보수할 손톱 등" className={`mt-1 w-full rounded-[8px] border px-3 py-2.5 text-[16px] ${focusRing}`} style={{ borderColor: C.line, outlineColor: C.plum, background: C.bg }} />
 
+              {/* 개인정보 보호법 제15조 제2항: 목적, 항목, 보유 기간, 거부권과 불이익 */}
+              <label className="mt-4 flex min-h-11 cursor-pointer items-start gap-2.5 text-[15px] leading-[1.5]">
+                <input type="checkbox" checked={agree} onChange={(e) => setAgree(e.target.checked)} className="mt-0.5 h-5 w-5 shrink-0 accent-[#9a5b6a]" />
+                <span>
+                  개인정보 수집, 이용 동의 (필수)
+                  <span className="block text-[14px]" style={{ color: C.plumSoft }}>
+                    이름, 휴대폰을 예약 확인과 변경 연락에만 쓰고 시술일로부터 1년 뒤 파기해요. 동의하지 않을 수 있고, 동의하지 않으면 예약을 받을 수 없어요.
+                  </span>
+                </span>
+              </label>
 
               {err && (
                 <p role="alert" className="mt-3 inline-flex items-center gap-1.5 text-[14px] font-bold" style={{ color: C.error }}>
@@ -718,12 +799,12 @@ function MiniMap() {
       <text x="64" y="150" textAnchor="middle" fontSize="13" fontWeight="700" fill={C.plum} fontFamily="Pretendard, sans-serif">
         ㅇㅇ역 2번 출구
       </text>
-      <path d="M84 110 H236 V60 H300" fill="none" stroke={C.accent} strokeWidth="3" strokeLinecap="round" strokeDasharray="2 8" />
-      <rect x="300" y="24" width="72" height="56" rx="4" fill={C.roseSoft} stroke={C.accent} strokeWidth="1.5" />
-      <text x="336" y="48" textAnchor="middle" fontSize="13" fontWeight="700" fill={C.plum} fontFamily="Pretendard, sans-serif">
+      <path d="M84 110 H236 V60 H290" fill="none" stroke={C.accent} strokeWidth="3" strokeLinecap="round" strokeDasharray="2 8" />
+      <rect x="290" y="24" width="96" height="56" rx="4" fill={C.roseSoft} stroke={C.accent} strokeWidth="1.5" />
+      <text x="338" y="48" textAnchor="middle" fontSize="13" fontWeight="700" fill={C.plum} fontFamily="Pretendard, sans-serif">
         네일샵
       </text>
-      <text x="336" y="66" textAnchor="middle" fontSize="12" fill={C.plumSoft} fontFamily="Pretendard, sans-serif">
+      <text x="338" y="66" textAnchor="middle" fontSize="12" fill={C.plumSoft} fontFamily="Pretendard, sans-serif">
         3층 (1층 약국)
       </text>
       <text x="150" y="192" textAnchor="middle" fontSize="12" fill={C.plumSoft} fontFamily="Pretendard, sans-serif">

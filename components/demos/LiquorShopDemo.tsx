@@ -2,7 +2,7 @@
 
 import { useEffect, useMemo, useRef, useState } from "react";
 import { AnimatePresence, motion } from "framer-motion";
-import { Car, ChevronLeft, ChevronRight, Clock, MapPin, Truck, X } from "lucide-react";
+import { Car, ChevronLeft, ChevronRight, Clock, MapPin, Store, X } from "lucide-react";
 import { useReducedMotionSafe } from "@/hooks/useReducedMotionSafe";
 import { daysAgo, fmtKo, useDemoToday } from "@/hooks/useDemoToday";
 import { maskName, maskPhone } from "@/components/demos/LeadReceivedPanel";
@@ -11,17 +11,27 @@ import { DemoMakerInfo } from "@/components/demos/DemoMakerInfo";
 /* 전통주 보틀숍 샘플: 가상의 전통주 보틀숍 곰파트너. 상호, 주소, 술 이름은 모두 가상이다.
    첫 화면과 병 사진 출처: AI 생성(Z-Image-Turbo, Apache 2.0)
 
-   국내 전통주 보틀숍과 전통주 쇼핑몰은 첫 진입에 성인 인증 창(만 19세 이상이십니까)을 먼저 띄운다.
+   국내 전통주 보틀숍과 전통주 쇼핑몰은 첫 진입에 성인 인증 창을 먼저 띄운다.
    메뉴는 막걸리, 약주, 청주, 증류주, 과실주로 종류별 분류, 첫 화면에 추천과 선물세트, 시음회 안내,
    오시는 길(주차, 영업시간)을 둔다. 상품 상세는 도수, 용량, 맛 설명, 어울리는 음식, 보관법을 적는다.
-   하단에는 지나친 음주 경고 문구를 둔다. 전통주는 온라인 주문과 택배가 가능해 택배 안내도 흔하다.
+   하단에는 지나친 음주 경고 문구를 둔다.
+
+   11-08 법령 확인(law.go.kr 원문)
+   - 국세청 「주류의 통신판매에 관한 명령위임 고시」 제3조: 통신판매(택배)는 승인받은 전통주 제조자 등만 할 수 있다.
+     이 매장은 소매점(보틀숍)이라 제3조 대상이 아니고, 제3조의2 제2호(통신판매 수단으로 주문받아 판매영업장 안에서
+     직접 대면 인도하는 주류소매업자)만 해당한다. 그래서 온라인 주문은 매장 픽업만 받고 택배, 배송 안내는 두지 않는다.
+   - 제6조: 제3조 사업자가 아니면 배송, 결제방법, 계좌번호 같은 판매 정보를 표시하지 않는다. 결제는 매장에서 받을 때 한다.
+   - 성인 확인: 제5조 제1항 제6호 다목(전자서명인증사업자가 제공하는 성인인증 서비스) 방식으로 휴대폰 본인인증 화면을 둔다.
+     실제 인증 연동은 없고 화면 흐름만 보여 준다. 픽업 때는 청소년 보호법 제28조 제4항대로 신분증으로 나이와 본인 여부를 확인한다.
+   - 청소년 보호법 제2조 제1호: 청소년은 19세 미만, 다만 19세가 되는 해의 1월 1일을 맞이한 사람은 제외(연 나이).
+     그래서 "만 19세" 대신 출생 연도 기준(올해 - 19년 12월 31일 이전 출생)으로 적는다.
 
    상호작용(모두 브라우저 안에서만 돈다. 실제로 보내지 않는다)
    1. 주종 탭: 막걸리, 약주, 청주, 증류주, 과실주로 목록을 나눈다.
-   2. 병 상세: 도수, 용량, 가격, 맛 설명, 어울리는 음식, 보관법. 이전, 다음 병으로 넘기기.
+   2. 병 상세: 도수, 용량, 가격, 맛 설명, 어울리는 음식, 보관법. 이전, 다음 병으로 넘기기. 매장 픽업 주문.
    3. 선물세트: 가격대별로 미리 꾸린 세트 세 가지.
    4. 시음회 예약: 다음 두 주 토요일 2회차, 인원, 이름, 휴대폰. 접수 완료 화면.
-   5. 매장 안내와 오시는 길: 영업시간(오늘 요일 진하게), 주차, 택배 안내.
+   5. 매장 안내와 오시는 길: 영업시간(오늘 요일 진하게), 주차, 픽업 주문 안내.
 
    첫 화면(성인 확인 뒤 처음 보이는 화면): 주종 메뉴, 매장 선반 사진, 이번 주 추천 술.
    확인을 누르면 사진만 1.6초 동안 천천히 다가온다. 반복 움직임은 없다. */
@@ -29,6 +39,17 @@ import { DemoMakerInfo } from "@/components/demos/DemoMakerInfo";
 const BRAND = "전통주 보틀숍";
 const ADDRESS = "서울 ㅇㅇ구 ㅇㅇ로 00, 1층";
 const KAKAO = "카카오톡 채널 전통주 보틀숍";
+
+/* 바닥글 사업자 정보: 전자상거래법 제10조 제1항, 제13조 제1항 제3호. 사이트에서 픽업 주문을 받아 통신판매업 신고 포함 */
+const BIZ: [string, string][] = [
+  ["상호", BRAND],
+  ["대표자", "ㅇㅇㅇ"],
+  ["주소", ADDRESS],
+  ["전화", "02-000-0000"],
+  ["메일", "help@example.com"],
+  ["사업자등록번호", "000-00-00000"],
+  ["통신판매업 신고", "제0000-서울ㅇㅇ-0000호(ㅇㅇ구청)"],
+];
 
 /* 로고: 메인 사이트와 같은 곰 로고 + 곰파트너(크게) + 업종(작게) */
 function SampleLogo({ light, small }: { light?: boolean; small?: boolean }) {
@@ -182,7 +203,7 @@ export function LiquorShopDemo() {
       className="min-h-screen overflow-x-clip pb-24 lg:pb-10"
       style={{ color: C.ink, backgroundColor: C.paper }}
     >
-      <AgeGate state={age} onAnswer={setAge} reduce={reduce} />
+      <AgeGate state={age} onAnswer={setAge} reduce={reduce} adultBorn={today.getFullYear() - 19} />
 
       <div aria-hidden={age !== "yes"}>
         <Poster
@@ -241,8 +262,25 @@ export function LiquorShopDemo() {
           <p>
             <SampleLogo />
           </p>
-          <p>
-            {ADDRESS} / {KAKAO}
+          <dl className="mt-3 flex flex-wrap gap-x-4 gap-y-0.5">
+            {BIZ.map(([k, v]) => (
+              <div key={k} className="flex gap-1.5">
+                <dt>{k}</dt>
+                <dd className="tabular-nums" style={{ color: C.body }}>
+                  {v}
+                </dd>
+              </div>
+            ))}
+          </dl>
+          <p>{KAKAO}</p>
+          {/* 전자상거래법 제10조 이용약관, 개인정보 보호법 제30조 처리방침. 다른 샘플과 같이 눌러도 창은 열리지 않는다 */}
+          <p className="mt-2 flex gap-4">
+            <button type="button" className={`font-bold hover:underline ${focusRing}`} style={{ color: C.ink }}>
+              이용약관
+            </button>
+            <button type="button" className={`font-bold hover:underline ${focusRing}`} style={{ color: C.ink }}>
+              개인정보처리방침
+            </button>
           </p>
           <p className="mt-3">경고: 지나친 음주는 뇌졸중, 기억력 손상이나 치매를 유발합니다. 임신 중 음주는 기형아 출생 위험을 높입니다.</p>
           <DemoMakerInfo className="mt-6" />
@@ -258,6 +296,7 @@ export function LiquorShopDemo() {
             reduce={reduce}
             onClose={() => setSelected(null)}
             onMove={setSelected}
+            today={today}
           />
         )}
       </AnimatePresence>
@@ -353,7 +392,7 @@ function Poster({
       <div className="mx-auto max-w-[1200px] px-4 pb-10 pt-5 md:px-6 md:pb-12 md:pt-7">
         <div className="flex flex-wrap items-end justify-between gap-x-6 gap-y-2">
           <h1 id="ls-poster-title" className="text-[24px] leading-[1.3] tracking-[-0.03em] [word-break:keep-all] md:text-[32px]" style={serifF}>
-            전국 양조장 전통주, 온라인 주문과 택배
+            전국 양조장 전통주, 주문하고 매장에서 받기
           </h1>
           <p className="text-[15px]" style={{ color: C.muted }}>
             화요일 ~ 일요일 영업
@@ -386,11 +425,21 @@ function Poster({
 }
 /* ── 성인 확인 ─────────────────────────────────────────── */
 
-function AgeGate({ state, onAnswer, reduce }: { state: "ask" | "yes" | "no"; onAnswer: (s: "yes" | "no") => void; reduce: boolean }) {
-  const yesRef = useRef<HTMLButtonElement>(null);
+function AgeGate({ state, onAnswer, reduce, adultBorn }: { state: "ask" | "yes" | "no"; onAnswer: (s: "yes" | "no") => void; reduce: boolean; adultBorn: number }) {
+  const authRef = useRef<HTMLButtonElement>(null);
+  const [checking, setChecking] = useState(false);
   useEffect(() => {
-    if (state === "ask") yesRef.current?.focus({ preventScroll: true });
+    if (state === "ask") authRef.current?.focus({ preventScroll: true });
   }, [state]);
+  // 실제로는 본인인증 업체 창에서 생년월일을 받아 성인 여부를 판단한다. 샘플은 잠깐 확인 중을 보여 주고 통과시킨다.
+  useEffect(() => {
+    if (!checking) return;
+    const t = window.setTimeout(() => {
+      setChecking(false);
+      onAnswer("yes");
+    }, reduce ? 0 : 900);
+    return () => window.clearTimeout(t);
+  }, [checking, onAnswer, reduce]);
   return (
     <AnimatePresence>
       {state !== "yes" && (
@@ -405,27 +454,40 @@ function AgeGate({ state, onAnswer, reduce }: { state: "ask" | "yes" | "no"; onA
           <div role="dialog" aria-modal="true" aria-labelledby="ls-age-title" className="w-full max-w-[440px] rounded-[8px] px-6 py-8 text-center md:px-10" style={{ background: C.white }}>
             <Seal size={44} />
             <h2 id="ls-age-title" className="mt-4 text-[26px] leading-[1.3]" style={serifF}>
-              {state === "ask" ? "만 19세 이상이십니까?" : "이용하실 수 없습니다"}
+              {state === "ask" ? "성인 인증이 필요합니다" : "이용하실 수 없습니다"}
             </h2>
             {state === "ask" ? (
               <>
-                <p className="mt-3 text-[16px] leading-[1.7]" style={{ color: C.body }}>
+                {/* 청소년 보호법 제2조 제1호: 19세가 되는 해의 1월 1일부터 청소년이 아니다(연 나이) */}
+                <p className="mt-3 text-[16px] leading-[1.7] [word-break:keep-all]" style={{ color: C.body }}>
                   {BRAND}은 주류를 판매합니다.
                   <br />
-                  만 19세 미만 청소년은 이용할 수 없습니다.
+                  {adultBorn}년 12월 31일 이전에 태어난 분만
+                  <br />
+                  이용할 수 있습니다.
                 </p>
-                <div className="mt-6 grid grid-cols-2 gap-3">
-                  <button ref={yesRef} type="button" onClick={() => onAnswer("yes")} className={`min-h-12 rounded-[6px] px-4 text-[16px] font-semibold ${focusRing}`} style={{ background: C.accent, color: C.white }}>
-                    예, 19세 이상입니다
-                  </button>
-                  <button type="button" onClick={() => onAnswer("no")} className={`min-h-12 rounded-[6px] border px-4 text-[16px] font-semibold ${focusRing}`} style={{ borderColor: "#cfcfcf", background: C.white }}>
-                    아니요
-                  </button>
-                </div>
+                {/* 고시 제5조 제1항 제6호 다목: 전자서명인증사업자가 제공하는 성인인증 서비스 */}
+                <button
+                  ref={authRef}
+                  type="button"
+                  disabled={checking}
+                  onClick={() => setChecking(true)}
+                  data-gtm-cta="liquor-shop_age_auth"
+                  className={`mt-6 min-h-12 w-full rounded-[6px] px-4 text-[16px] font-semibold disabled:opacity-80 ${focusRing}`}
+                  style={{ background: C.accent, color: C.white }}
+                >
+                  {checking ? "본인인증 확인 중" : "휴대폰 본인인증"}
+                </button>
+                <p className="mt-2 text-[14px]" style={{ color: C.muted }} aria-live="polite">
+                  통신사 본인인증으로 생년월일을 확인합니다.
+                </p>
+                <button type="button" onClick={() => onAnswer("no")} className={`mt-4 min-h-11 rounded-[6px] px-3 text-[15px] underline underline-offset-4 ${focusRing}`} style={{ color: C.body }}>
+                  청소년이에요
+                </button>
               </>
             ) : (
               <p className="mt-3 text-[16px] leading-[1.7]" style={{ color: C.muted }}>
-                만 19세 미만 청소년에게는 주류를 판매하지 않습니다.
+                청소년에게는 주류를 판매하지 않습니다.
                 <br />
                 이용에 불편을 드려 죄송합니다.
               </p>
@@ -503,12 +565,15 @@ function BottleCard({ b, onOpen }: { b: Bottle; onOpen: () => void }) {
 
 /* ── 2. 병 상세 ───────────────────────────────────────── */
 
-function DetailModal({ list, id, reduce, onClose, onMove }: { list: Bottle[]; id: string; reduce: boolean; onClose: () => void; onMove: (id: string) => void }) {
+function DetailModal({ list, id, reduce, onClose, onMove, today }: { list: Bottle[]; id: string; reduce: boolean; onClose: () => void; onMove: (id: string) => void; today: Date }) {
   const b = BOTTLES.find((x) => x.id === id)!;
   const idx = list.findIndex((x) => x.id === id);
   const prev = idx > 0 ? list[idx - 1] : null;
   const next = idx >= 0 && idx < list.length - 1 ? list[idx + 1] : null;
   const closeRef = useRef<HTMLButtonElement>(null);
+  const [qty, setQty] = useState(1);
+  const [ordered, setOrdered] = useState<{ id: string; qty: number } | null>(null);
+  const pickupDay = nextOpenDay(today);
 
   useEffect(() => {
     closeRef.current?.focus();
@@ -583,6 +648,40 @@ function DetailModal({ list, id, reduce, onClose, onMove }: { list: Bottle[]; id
             </div>
           </div>
 
+          {/* 고시 제3조의2 제2호: 소매점은 온라인으로 주문받고 매장 안에서 대면 인도만 한다. 결제도 매장에서 받을 때 */}
+          <div className="mt-6 rounded-[6px] p-4" style={{ background: C.paper }}>
+            {ordered?.id === b.id ? (
+              <div role="status" className="text-[15px] leading-[1.7]">
+                <p className="text-[17px] font-bold">
+                  픽업 주문이 접수됐어요 ({b.name} {ordered.qty}병)
+                </p>
+                <p style={{ color: C.body }}>
+                  {fmtKo(pickupDay)}부터 매장에서 받으실 수 있어요. 받으실 때 신분증으로 나이와 본인 여부를 확인한 뒤 결제합니다.
+                </p>
+              </div>
+            ) : (
+              <div className="flex flex-wrap items-center gap-3">
+                <div className="flex items-center rounded-[4px] border bg-white" style={{ borderColor: C.line }}>
+                  <button type="button" aria-label="수량 줄이기" onClick={() => setQty((q) => Math.max(1, q - 1))} className={`h-11 w-11 text-[20px] ${focusRing}`}>
+                    -
+                  </button>
+                  <span className="w-12 text-center text-[16px] tabular-nums" aria-live="polite">
+                    {qty}병
+                  </span>
+                  <button type="button" aria-label="수량 늘리기" onClick={() => setQty((q) => Math.min(12, q + 1))} className={`h-11 w-11 text-[20px] ${focusRing}`}>
+                    +
+                  </button>
+                </div>
+                <button type="button" onClick={() => setOrdered({ id: b.id, qty })} data-gtm-cta="liquor-shop_pickup_order" className={`min-h-11 flex-1 rounded-[6px] px-4 text-[16px] font-semibold sm:flex-none ${focusRing}`} style={{ background: C.accent, color: C.white }}>
+                  매장 픽업 주문
+                </button>
+                <p className="w-full text-[14px]" style={{ color: C.muted }}>
+                  {fmtKo(pickupDay)}부터 매장에서 받기, 결제는 받으실 때
+                </p>
+              </div>
+            )}
+          </div>
+
           <div className="mt-6 flex items-center justify-between gap-3 border-t pt-4 text-[15px]" style={{ borderColor: C.line }}>
             <button type="button" disabled={!prev} onClick={() => prev && onMove(prev.id)} className={`inline-flex min-h-11 items-center gap-1 pr-2 disabled:opacity-30 ${focusRing}`}>
               <ChevronLeft size={18} aria-hidden /> {prev ? prev.name : "처음"}
@@ -627,7 +726,7 @@ function GiftSets() {
         ))}
       </ul>
       <p className="mt-3 text-[14px] leading-[1.6]" style={{ color: C.muted }}>
-        원하는 술로 세트를 꾸리려면 매장이나 {KAKAO}로 문의해 주세요. 택배도 보내 드려요.
+        원하는 술로 세트를 꾸리려면 매장이나 {KAKAO}로 문의해 주세요. 세트도 매장 픽업으로 받으실 수 있어요.
       </p>
     </div>
   );
@@ -644,6 +743,7 @@ function TastingForm({ today, reduce }: { today: Date; reduce: boolean }) {
   const [people, setPeople] = useState(2);
   const [name, setName] = useState("");
   const [phone, setPhone] = useState("");
+  const [agree, setAgree] = useState(false);
   const [err, setErr] = useState<string | null>(null);
   const [done, setDone] = useState<Done | null>(null);
 
@@ -652,6 +752,7 @@ function TastingForm({ today, reduce }: { today: Date; reduce: boolean }) {
     if (!pick) return setErr("회차를 골라 주세요.");
     if (name.trim().length < 2) return setErr("이름을 두 글자 이상 적어 주세요.");
     if (phone.replace(/\D/g, "").length < 10) return setErr("휴대폰 번호를 확인해 주세요.");
+    if (!agree) return setErr("개인정보 수집, 이용에 동의해 주세요.");
     const left = TASTING_CAP - takenSeats(pick.d, pick.s);
     if (people > left) return setErr(`이 회차는 ${left}명까지 예약할 수 있어요.`);
     setErr(null);
@@ -693,7 +794,7 @@ function TastingForm({ today, reduce }: { today: Date; reduce: boolean }) {
           <dd>{fmtKo(reply)} 영업시간 안에 확인 메시지를 드려요</dd>
         </dl>
         <p className="mt-5 text-[15px] leading-[1.7]" style={{ color: C.muted }}>
-          시음회 당일 신분증을 꼭 지참해 주세요. 만 19세 미만은 입장할 수 없습니다.
+          시음회 당일 신분증을 꼭 지참해 주세요. 청소년은 입장할 수 없습니다.
         </p>
         <button type="button" onClick={() => setDone(null)} className={`mt-5 min-h-11 rounded-[6px] border px-4 text-[15px] font-semibold ${focusRing}`} style={{ borderColor: "#cfcfcf" }}>
           다른 회차 예약
@@ -765,6 +866,16 @@ function TastingForm({ today, reduce }: { today: Date; reduce: boolean }) {
           휴대폰
           <input value={phone} onChange={(e) => setPhone(e.target.value)} inputMode="tel" autoComplete="tel" placeholder="010-0000-0000" className={input} style={{ borderColor: C.line }} />
         </label>
+        {/* 개인정보 보호법 제15조: 수집 항목, 목적, 보유 기간, 거부권 */}
+        <label className="mt-4 flex min-h-11 cursor-pointer items-start gap-2.5 text-[15px] leading-[1.5]">
+          <input type="checkbox" checked={agree} onChange={(e) => setAgree(e.target.checked)} className="mt-0.5 h-5 w-5 shrink-0 accent-[#8a3a2e]" />
+          <span>
+            개인정보 수집, 이용 동의 (필수)
+            <span className="block text-[13px] leading-[1.6]" style={{ color: C.muted }}>
+              이름, 휴대폰을 시음회 예약 연락에만 쓰고 시음회가 끝나면 1년 안에 파기합니다. 동의하지 않으실 수 있으며, 동의하지 않으면 예약을 받을 수 없습니다.
+            </span>
+          </span>
+        </label>
         {err && (
           <p className="mt-3 text-[14px] font-bold" style={{ color: C.error }} role="alert">
             {err}
@@ -774,7 +885,7 @@ function TastingForm({ today, reduce }: { today: Date; reduce: boolean }) {
           시음회 예약하기
         </button>
         <p className="mt-3 text-[13px] leading-[1.6]" style={{ color: C.muted }}>
-          예약 확인은 카카오톡 채널로 드려요. 시음회는 만 19세 이상만 참석할 수 있어요.
+          예약 확인은 카카오톡 채널로 드려요. 시음회는 성인만 참석할 수 있어요.
         </p>
       </div>
     </form>
@@ -825,10 +936,11 @@ function StoreInfo({ today }: { today: Date }) {
         </div>
         <div className={box} style={{ borderColor: C.line, background: C.white }}>
           <p className={head}>
-            <Truck size={18} aria-hidden /> 택배
+            <Store size={18} aria-hidden /> 픽업 주문
           </p>
+          {/* 고시 제3조의2 제2호: 통신판매 수단으로 주문받고 판매영업장 안에서 직접 대면 인도 */}
           <p className="mt-2 text-[15px] leading-[1.7]" style={{ color: C.body }}>
-            전통주는 온라인 주문과 택배 배송이 가능합니다. 주문할 때 성인 인증을 거치고, 받는 분도 성인 확인 뒤 전달됩니다. 생막걸리는 아이스팩을 넣어 보내고 수도권은 다음 날 도착해요.
+            상품 상세에서 픽업 주문을 하면 다음 영업일부터 매장에서 받으실 수 있어요. 받으실 때 신분증으로 나이와 본인 여부를 확인한 뒤 결제하고 건네 드립니다.
           </p>
         </div>
       </div>
@@ -855,14 +967,14 @@ function MiniMap() {
       <path d="M0 120 H320" stroke="#e2e2e0" strokeWidth="26" />
       <path d="M0 120 H320" stroke={C.white} strokeWidth="1.5" strokeDasharray="10 8" />
       <path d="M110 120 V0 M200 120 V0 M260 120 V180" stroke="#ebebe9" strokeWidth="14" />
-      <rect x="18" y="128" width="54" height="34" rx="3" fill={C.white} stroke="#cfcfcf" strokeWidth="1" />
-      <text x="45" y="149" textAnchor="middle" fontSize="12" fontWeight="700" fill={C.ink}>
+      <rect x="10" y="128" width="72" height="34" rx="3" fill={C.white} stroke="#cfcfcf" strokeWidth="1" />
+      <text x="46" y="149" textAnchor="middle" fontSize="12" fontWeight="700" fill={C.ink}>
         ㅇㅇ역 3번
       </text>
-      <path d="M72 118 H200 V60" fill="none" stroke={C.body} strokeWidth="1.5" strokeDasharray="5 4" />
+      <path d="M82 118 H200 V60" fill="none" stroke={C.body} strokeWidth="1.5" strokeDasharray="5 4" />
       <rect x="206" y="40" width="46" height="30" rx="3" fill={C.accent} />
       <text x="229" y="59" textAnchor="middle" fontSize="11" fontWeight="700" fill={C.white}>
-        술도가
+        보틀숍
       </text>
       <text x="155" y="104" textAnchor="middle" fontSize="11" fill={C.muted}>
         ㅇㅇ로

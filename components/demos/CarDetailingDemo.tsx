@@ -29,6 +29,15 @@ const BRAND = "디테일링 샵";
 const ADDRESS = "서울 ㅇㅇ구 ㅇㅇ로 00, 1층";
 const KAKAO = "카카오톡 채널 디테일링 샵";
 const TEL = "02-000-0000";
+/* 바닥글 사업자 정보와 처리방침 버튼: 개인정보 보호법 제30조(처리방침 수립, 공개). 예약 폼이 차량 번호, 픽업 장소까지 받는다. 온라인 판매가 없어 통신판매업 신고는 두지 않는다 */
+const BIZ: [string, string][] = [
+  ["상호", BRAND],
+  ["대표자", "ㅇㅇㅇ"],
+  ["주소", ADDRESS],
+  ["전화", TEL],
+  ["메일", "help@example.com"],
+  ["사업자등록번호", "000-00-00000"],
+];
 
 const C = {
   bg: "#141414",
@@ -290,10 +299,25 @@ export function CarDetailingDemo() {
         <p>
           <SampleLogo light />
         </p>
-        <p>
-          {ADDRESS}. 전화 {TEL}. {KAKAO}.
+        <dl className="mt-3 flex flex-wrap gap-x-4 gap-y-0.5">
+          {BIZ.map(([k, v]) => (
+            <div key={k} className="flex gap-1.5">
+              <dt>{k}</dt>
+              <dd className="tabular-nums" style={{ color: C.text }}>
+                {v}
+              </dd>
+            </div>
+          ))}
+        </dl>
+        <p className="mt-1">월 ~ 금 09:00 ~ 19:00, 토 09:00 ~ 17:00, 일요일 휴무. {KAKAO}.</p>
+        <p className="mt-2 flex gap-4">
+          <button type="button" className={`font-bold hover:underline ${focusRing}`} style={{ color: C.text, outlineColor: C.accent }}>
+            이용약관
+          </button>
+          <button type="button" className={`font-bold hover:underline ${focusRing}`} style={{ color: C.text, outlineColor: C.accent }}>
+            개인정보처리방침
+          </button>
         </p>
-        <p>월 ~ 금 09:00 ~ 19:00, 토 09:00 ~ 17:00, 일요일 휴무</p>
         <DemoMakerInfo className="mt-6" />
       </footer>
     </div>
@@ -487,6 +511,7 @@ function BookingForm({ today, reduce }: { today: Date; reduce: boolean }) {
   const [name, setName] = useState("");
   const [phone, setPhone] = useState("");
   const [plate, setPlate] = useState("");
+  const [agree, setAgree] = useState(false);
   const [errors, setErrors] = useState<Record<string, string>>({});
   const [done, setDone] = useState<Booked | null>(null);
 
@@ -502,6 +527,7 @@ function BookingForm({ today, reduce }: { today: Date; reduce: boolean }) {
     if (phone.replace(/\D/g, "").length < 10) er.phone = "휴대폰 번호를 확인해 주세요.";
     if (!/^\d{2,3}[가-힣]\s?\d{4}$/.test(plate.trim())) er.plate = "차량 번호를 12가 3456 처럼 적어 주세요.";
     if (pickup && place.trim().length < 2) er.place = "픽업 장소를 적어 주세요.";
+    if (!agree) er.agree = "개인정보 수집, 이용에 동의해 주세요.";
     setErrors(er);
     if (Object.keys(er).length) return;
     const digits = phone.replace(/\D/g, "");
@@ -578,6 +604,7 @@ function BookingForm({ today, reduce }: { today: Date; reduce: boolean }) {
           onClick={() => {
             setDone(null);
             setSlot(null);
+            setAgree(false);
           }}
           className={`mt-5 rounded-[6px] border px-4 py-2 text-[15px] font-bold ${focusRing}`}
           style={{ borderColor: C.line, outlineColor: C.accent }}
@@ -734,7 +761,18 @@ function BookingForm({ today, reduce }: { today: Date; reduce: boolean }) {
             {fmtKo(day)} {slot !== null ? SLOTS[slot] : ""}
           </dd>
         </dl>
-        <button type="submit" data-gtm-cta="car-detailing_reserve" className={`mt-5 inline-flex w-full items-center justify-center rounded-[6px] px-4 py-3 text-[16px] font-semibold ${focusRing}`} style={{ background: C.accent, color: C.accentInk, outlineColor: C.text }}>
+        {/* 개인정보 보호법 제15조 제2항: 목적, 항목, 보유 기간, 거부권과 불이익 */}
+        <label className="mt-5 flex cursor-pointer items-start gap-2.5 border-t pt-4 text-[15px] leading-[1.5]" style={{ borderColor: C.line }}>
+          <input type="checkbox" checked={agree} onChange={(e) => setAgree(e.target.checked)} className={`mt-0.5 h-5 w-5 flex-none accent-[#6fa8a2] ${focusRing}`} style={{ outlineColor: C.accent }} />
+          <span>
+            개인정보 수집, 이용 동의 (필수)
+            <span className="mt-0.5 block text-[13px] leading-[1.6]" style={{ color: C.muted }}>
+              이름, 휴대폰, 차량 번호{pickup ? ", 픽업 장소" : ""}를 입고 확인과 {pickup ? "픽업, " : ""}출고 연락에만 쓰고 출고일로부터 1년 뒤 파기해요. 동의하지 않을 수 있고, 동의하지 않으면 예약을 받을 수 없어요.
+            </span>
+          </span>
+        </label>
+        {errors.agree && <Err>{errors.agree}</Err>}
+        <button type="submit" data-gtm-cta="car-detailing_reserve" className={`mt-4 inline-flex w-full items-center justify-center rounded-[6px] px-4 py-3 text-[16px] font-semibold ${focusRing}`} style={{ background: C.accent, color: C.accentInk, outlineColor: C.text }}>
           예약 접수
         </button>
         <p className="mt-3 text-[13px] leading-[1.6]" style={{ color: C.muted }}>
@@ -767,7 +805,7 @@ function WayAndHours({ today }: { today: Date }) {
           <path d="M0 200 L640 160" stroke={C.panel2} strokeWidth="2" strokeDasharray="14 12" />
           <path d="M420 0 L380 300" stroke={C.line} strokeWidth="22" />
           <path d="M120 0 L150 300" stroke={C.line} strokeWidth="14" />
-          <text x="300" y="240" fill={C.muted} fontSize="14" fontWeight="700">
+          <text x="24" y="238" fill={C.muted} fontSize="14" fontWeight="700">
             ㅇㅇ로
           </text>
           <rect x="520" y="110" width="78" height="28" rx="4" fill={C.panel2} />

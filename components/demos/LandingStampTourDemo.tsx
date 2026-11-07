@@ -217,7 +217,7 @@ export function LandingStampTourDemo() {
             스탬프 투어
           </h1>
           <p className="mt-6 max-w-[560px] text-[20px] leading-[1.6] md:text-[23px]" style={serifF}>
-            동네에 남은 여섯 자리를 걸어서 돌아요. 2.8km, 두 시간쯤 걸려요. 도장을 다 모으면 기록관에서 기념품을 드려요.
+            동네에 남은 여섯 자리를 걸어서 돌아요. 2.8km, 1시간 30분쯤 걸려요. 도장을 다 모으면 기록관에서 기념품을 드려요.
           </p>
           <dl className="mt-8 grid grid-cols-2 border-t md:grid-cols-4" style={{ borderColor: C.rule }}>
             {[
@@ -271,7 +271,7 @@ export function LandingStampTourDemo() {
       <section id="ib-course" aria-labelledby="ib-course-title" className="scroll-mt-2 border-t" style={{ borderColor: C.rule }}>
         <div className="mx-auto max-w-[1200px] px-4 py-12 md:px-6 md:py-16">
           <SectionHead id="ib-course-title" label="코스" title={course === "full" ? "여섯 곳, 2.8km" : "네 곳, 1.7km"} desc="장소 번호를 누르면 설명이 나와요. 현장 QR 표지판을 찍으면 도장이 찍혀요." />
-          <CourseAndStamps course={course} setCourse={setCourse} stamps={stamps} setStamps={setStamps} reduce={reduce} year={year} onGift={() => go("ib-gift")} />
+          <CourseAndStamps course={course} setCourse={setCourse} stamps={stamps} setStamps={setStamps} reduce={reduce} year={year} today={today} onGift={() => go("ib-gift")} />
         </div>
       </section>
 
@@ -279,7 +279,7 @@ export function LandingStampTourDemo() {
       <section id="ib-guide" aria-labelledby="ib-guide-title" className="scroll-mt-2 border-t" style={{ borderColor: C.rule, background: C.card }}>
         <div className="mx-auto grid max-w-[1200px] gap-10 px-4 py-12 md:px-6 md:py-16 lg:grid-cols-[minmax(0,4fr)_minmax(0,7fr)] lg:gap-14">
           <div>
-            <SectionHead id="ib-guide-title" label="해설사 동행" title="해설사와 같이 걷기" desc="회차마다 15명이에요. 장소마다 5분씩 이야기를 듣고 두 시간 동안 걸어요. 한낮은 더워서 아침과 저녁에만 해요." />
+            <SectionHead id="ib-guide-title" label="해설사 동행" title="해설사와 같이 걷기" desc="회차마다 15명이에요. 장소마다 5분씩 이야기를 듣고 1시간 30분쯤 걸어요. 한낮은 더워서 아침과 저녁에만 해요." />
             <p className="border-t pt-4 text-[14px] leading-[1.7]" style={{ borderColor: C.hair, color: C.muted }}>
               8월 15일 저녁 7시 반은 등불을 들고 걷는 특별 회차예요. 등불은 출발 지점에서 빌려 드려요.
             </p>
@@ -293,7 +293,7 @@ export function LandingStampTourDemo() {
         <div className="mx-auto grid max-w-[1200px] gap-10 px-4 py-12 md:px-6 md:py-16 lg:grid-cols-[minmax(0,4fr)_minmax(0,7fr)] lg:gap-14">
           <div>
             <SectionHead id="ib-gift-title" label="완주 기념품" title="다 모으면 받는 것" desc={`광복 ${anniv}주년 손수건과 완주 배지. 하루 300명분을 준비해요.`} />
-            <GiftArt anniv={anniv} />
+            <GiftArt anniv={anniv} got={got} need={need.length} />
           </div>
           <GiftForm complete={complete} got={got} need={need.length} year={year} reduce={reduce} onCourse={() => go("ib-course")} />
         </div>
@@ -382,6 +382,7 @@ function CourseAndStamps({
   setStamps,
   reduce,
   year,
+  today,
   onGift,
 }: {
   course: CourseId;
@@ -390,11 +391,14 @@ function CourseAndStamps({
   setStamps: React.Dispatch<React.SetStateAction<Record<string, number>>>;
   reduce: boolean;
   year: number;
+  today: Date;
   onGift: () => void;
 }) {
   const c = COURSES[course];
   const [sel, setSel] = useState<StopId>("market");
   const [checking, setChecking] = useState<StopId | null>(null);
+  const [locAgree, setLocAgree] = useState(false);
+  const [locErr, setLocErr] = useState(false);
   const timer = useRef<number | null>(null);
   useEffect(() => () => {
     if (timer.current) window.clearTimeout(timer.current);
@@ -412,6 +416,10 @@ function CourseAndStamps({
 
   const stampIt = () => {
     if (has || checking) return;
+    if (!locAgree) {
+      setLocErr(true);
+      return;
+    }
     setChecking(sel);
     const id = sel;
     timer.current = window.setTimeout(() => {
@@ -420,12 +428,20 @@ function CourseAndStamps({
     }, reduce ? 300 : 1100);
   };
 
-  const stampDate = (k: StopId) => {
+  /* 도장 날짜와 시각은 실제로 찍은 순간을 쓴다. 날짜만 행사 기간(8.13~8.17) 안으로 맞춘다.
+     기간 안이면 오늘, 기간 전이면 첫날, 지난 뒤면 마지막 날 */
+  const eventDay = (() => {
+    const t = new Date(today.getFullYear(), today.getMonth(), today.getDate()).getTime();
+    const a = new Date(year, 7, 13).getTime();
+    const b = new Date(year, 7, 17).getTime();
+    return new Date(Math.min(b, Math.max(a, t)));
+  })();
+  const stampDate = (k: StopId) => (stamps[k] ? `${eventDay.getMonth() + 1}.${eventDay.getDate()}` : undefined);
+  const stampTime = (k: StopId) => {
     const t = stamps[k];
-    if (!t) return undefined;
-    // 행사 기간 중 하루로 찍는다(데모)
-    const d = new Date(year, 7, 13 + (STOPS.findIndex((s) => s.id === k) % 5));
-    return `${d.getMonth() + 1}.${d.getDate()}`;
+    if (!t) return "";
+    const d = new Date(t);
+    return `${String(d.getHours()).padStart(2, "0")}:${String(d.getMinutes()).padStart(2, "0")}`;
   };
 
   return (
@@ -538,6 +554,29 @@ function CourseAndStamps({
               표지판에서 50m 안에 있어야 찍혀요. 이 화면에서는 버튼으로 해 볼 수 있어요.
             </p>
           )}
+          {/* 위치정보법 제15조 제1항, 제19조 제1항: 개인위치정보 이용 전 동의. 제25조 제1항: 14세 미만은 법정대리인 동의.
+              한 번 동의하면 다른 장소 도장에도 이어진다 */}
+          {inCourse && (
+            <label className="mt-4 flex cursor-pointer items-start gap-2 border-t pt-4 text-[14px] leading-[1.6]" style={{ borderColor: C.hair, color: C.muted }}>
+              <input
+                type="checkbox"
+                checked={locAgree}
+                onChange={(e) => {
+                  setLocAgree(e.target.checked);
+                  if (e.target.checked) setLocErr(false);
+                }}
+                className="mt-0.5 h-5 w-5 flex-none accent-[#b8142a]"
+              />
+              <span>
+                <b style={{ color: C.ink }}>위치정보 이용 동의 (필수)</b> 도장을 찍는 순간 휴대폰 위치가 표지판 50m 안인지 확인하는 데만 쓰고, 위치 값은 남기지 않아요. 동의하지 않을 수 있어요. 동의하지 않으면 도장을 찍을 수 없어요. 만 14세 미만은 보호자가 동의해 주세요.
+              </span>
+            </label>
+          )}
+          {inCourse && locErr && !locAgree && (
+            <p className="mt-1.5 text-[14px] font-semibold" style={{ color: C.error }} role="alert">
+              위치정보 이용에 동의해 주세요
+            </p>
+          )}
         </article>
 
         {/* 도장판 */}
@@ -569,6 +608,7 @@ function CourseAndStamps({
                   </button>
                   <p className="mt-1 text-[12px]" style={{ color: on ? C.ink : C.muted }}>
                     {s.name}
+                    {on && <span className="block tabular-nums">{stampTime(id)}</span>}
                   </p>
                 </li>
               );
@@ -718,6 +758,61 @@ function DistrictMap({ course }: { course: CourseId }) {
   );
 }
 
+/* ── 만 14세 미만 보호자 동의 (개인정보 보호법 제22조의2 제1항) ── */
+
+type Guardian = { on: boolean; name: string; phone: string; agree: boolean };
+const NO_GUARDIAN: Guardian = { on: false, name: "", phone: "", agree: false };
+const phoneRe = /^01[016789]-?\d{3,4}-?\d{4}$/;
+function guardianErrs(g: Guardian) {
+  if (!g.on) return { gName: "", gPhone: "", gAgree: "" };
+  return {
+    gName: g.name.trim() ? "" : "보호자 이름을 적어 주세요",
+    gPhone: phoneRe.test(g.phone.trim()) ? "" : "보호자 휴대폰 번호를 확인해 주세요",
+    gAgree: g.agree ? "" : "보호자 동의가 필요해요",
+  };
+}
+function GuardianFields({ g, setG, errs, tried, what }: { g: Guardian; setG: (g: Guardian) => void; errs: ReturnType<typeof guardianErrs>; tried: boolean; what: string }) {
+  const input = `mt-2 w-full border-b-[1.5px] bg-transparent px-1 py-2.5 text-[18px] ${focusRing}`;
+  const fieldStyle = { borderColor: C.ink, color: C.ink, outlineColor: C.red, letterSpacing: 0, fontWeight: 400 };
+  const e = (m: string) =>
+    tried && m ? (
+      <p className="mt-1.5 text-[14px] font-semibold" style={{ color: C.error }}>
+        {m}
+      </p>
+    ) : null;
+  return (
+    <div>
+      <label className="flex cursor-pointer items-start gap-2 text-[14px] leading-[1.6]" style={{ color: C.muted }}>
+        <input type="checkbox" checked={g.on} onChange={(ev) => setG({ ...g, on: ev.target.checked })} className="mt-0.5 h-5 w-5 flex-none accent-[#b8142a]" />
+        <span>신청하는 사람이 만 14세 미만이에요</span>
+      </label>
+      {g.on && (
+        <div className="mt-4 grid gap-5 border-l-2 pl-4" style={{ borderColor: C.hair }}>
+          <div className="grid gap-6 md:grid-cols-2">
+            <label className="block text-[13px] font-bold tracking-[0.1em]" style={{ color: C.red }}>
+              보호자 이름
+              <input value={g.name} onChange={(ev) => setG({ ...g, name: ev.target.value })} placeholder="이름" autoComplete="off" className={input} style={fieldStyle} />
+              {e(errs.gName)}
+            </label>
+            <label className="block text-[13px] font-bold tracking-[0.1em]" style={{ color: C.red }}>
+              보호자 휴대폰
+              <input value={g.phone} onChange={(ev) => setG({ ...g, phone: ev.target.value })} placeholder="010-0000-0000" inputMode="tel" autoComplete="off" className={input} style={fieldStyle} />
+              {e(errs.gPhone)}
+            </label>
+          </div>
+          <label className="flex cursor-pointer items-start gap-2 text-[14px] leading-[1.6]" style={{ color: C.muted }}>
+            <input type="checkbox" checked={g.agree} onChange={(ev) => setG({ ...g, agree: ev.target.checked })} className="mt-0.5 h-5 w-5 flex-none accent-[#b8142a]" />
+            <span>
+              <b style={{ color: C.ink }}>보호자 동의 (필수)</b> 보호자로서 아이의 {what}에 동의해요. 보호자 휴대폰으로 동의 확인 문자를 보내고, 보호자 이름과 휴대폰도 같은 날 지워요.
+            </span>
+          </label>
+          {e(errs.gAgree)}
+        </div>
+      )}
+    </div>
+  );
+}
+
 /* ── 3. 해설사 동행 회차 예약 ─────────────────────────── */
 
 const GUIDE_CAP = 15;
@@ -741,6 +836,7 @@ function GuideBooking({ days, reduce }: { days: Date[]; reduce: boolean }) {
   const [name, setName] = useState("");
   const [phone, setPhone] = useState("");
   const [agree, setAgree] = useState(false);
+  const [guard, setGuard] = useState<Guardian>(NO_GUARDIAN);
   const [tried, setTried] = useState(false);
   const [booked, setBooked] = useState<{ no: string; day: number; slot: number; people: number; name: string; phone: string } | null>(null);
   const [extra, setExtra] = useState<Record<string, number>>({});
@@ -750,14 +846,15 @@ function GuideBooking({ days, reduce }: { days: Date[]; reduce: boolean }) {
   const left = slot === null ? 0 : (avail(day, slot) ?? 0);
   const maxP = slot === null ? 4 : Math.max(1, Math.min(4, left));
   const p = Math.min(people, maxP);
-  const phoneOk = /^01[016789]-?\d{3,4}-?\d{4}$/.test(phone.trim());
+  const phoneOk = phoneRe.test(phone.trim());
   const errs = {
     slot: slot === null ? "시간을 골라 주세요" : "",
     name: name.trim() ? "" : "이름을 적어 주세요",
     phone: phoneOk ? "" : "휴대폰 번호를 확인해 주세요",
-    agree: agree ? "" : "개인정보 수집에 동의해 주세요",
+    agree: agree ? "" : "개인정보 수집, 이용에 동의해 주세요",
   };
-  const ok = Object.values(errs).every((e) => !e);
+  const gErrs = guardianErrs(guard);
+  const ok = Object.values(errs).every((e) => !e) && Object.values(gErrs).every((e) => !e);
   const err = (k: keyof typeof errs) =>
     tried && errs[k] ? (
       <p className="mt-1.5 text-[14px] font-semibold" style={{ color: C.error }}>
@@ -782,6 +879,7 @@ function GuideBooking({ days, reduce }: { days: Date[]; reduce: boolean }) {
     setName("");
     setPhone("");
     setAgree(false);
+    setGuard(NO_GUARDIAN);
   };
 
   const input = `mt-2 w-full border-b-[1.5px] bg-transparent px-1 py-2.5 text-[18px] ${focusRing}`;
@@ -926,9 +1024,15 @@ function GuideBooking({ days, reduce }: { days: Date[]; reduce: boolean }) {
           {err("phone")}
         </label>
       </div>
-      <label className="mt-6 flex cursor-pointer items-start gap-2 text-[14px] leading-[1.6]" style={{ color: C.muted }}>
+      <div className="mt-6">
+        <GuardianFields g={guard} setG={setGuard} errs={gErrs} tried={tried} what="해설사 동행 예약과 개인정보 수집, 이용" />
+      </div>
+      {/* 개인정보 보호법 제15조 제2항: 목적, 항목, 보유 기간, 거부권과 불이익 */}
+      <label className="mt-5 flex cursor-pointer items-start gap-2 text-[14px] leading-[1.6]" style={{ color: C.muted }}>
         <input type="checkbox" checked={agree} onChange={(e) => setAgree(e.target.checked)} className="mt-0.5 h-5 w-5 flex-none accent-[#b8142a]" />
-        <span>회차 안내 문자를 보내려고 이름과 휴대폰 번호를 받아요. 8월 말에 지워요. 동의합니다.</span>
+        <span>
+          <b style={{ color: C.ink }}>개인정보 수집, 이용 동의 (필수)</b> 이름과 휴대폰 번호를 회차 안내 문자에만 쓰고 8월 31일에 지워요. 동의하지 않을 수 있어요. 동의하지 않으면 해설사 동행을 예약할 수 없어요.
+        </span>
       </label>
       {err("agree")}
       <button type="submit" className={`${btnSolid} mt-6 w-full py-4 text-[17px]`} style={{ background: C.ink, color: C.paper, borderColor: C.ink, outlineColor: C.red }}>
@@ -940,10 +1044,10 @@ function GuideBooking({ days, reduce }: { days: Date[]; reduce: boolean }) {
 
 /* ── 4. 완주 기념품 ───────────────────────────────────── */
 
-function GiftArt({ anniv }: { anniv: number }) {
+function GiftArt({ anniv, got, need }: { anniv: number; got: number; need: number }) {
   return (
     <figure className="mt-2">
-      <svg viewBox="0 0 320 180" className="block h-auto w-full max-w-[380px]" role="img" aria-label="접힌 손수건과 둥근 완주 배지를 선으로 그린 그림">
+      <svg viewBox="0 0 320 180" className="block h-auto w-full max-w-[380px]" role="img" aria-label={`접힌 손수건과 둥근 완주 배지를 선으로 그린 그림. 지금 도장 ${got} / ${need}`}>
         {/* 손수건 */}
         <g transform="translate(20 20) rotate(-6 80 70)">
           <rect x="0" y="0" width="170" height="130" fill={C.card} stroke={C.ink} strokeWidth="1.5" />
@@ -962,8 +1066,8 @@ function GiftArt({ anniv }: { anniv: number }) {
           <text y="-2" textAnchor="middle" fontSize="15" fontWeight="900" fill={C.ink} style={serifF}>
             완주
           </text>
-          <text y="16" textAnchor="middle" fontSize="9" fill={C.muted}>
-            6 / 6
+          <text y="16" textAnchor="middle" fontSize="9" fill={C.muted} className="tabular-nums">
+            {got} / {need}
           </text>
         </g>
       </svg>
@@ -980,18 +1084,20 @@ function GiftForm({ complete, got, need, year, reduce, onCourse }: { complete: b
   const [how, setHow] = useState<"site" | "office" | "parcel">("site");
   const [addr, setAddr] = useState("");
   const [agree, setAgree] = useState(false);
+  const [guard, setGuard] = useState<Guardian>(NO_GUARDIAN);
   const [tried, setTried] = useState(false);
   const [done, setDone] = useState<{ no: string; name: string; phone: string; how: typeof how; addr: string } | null>(null);
   const doneRef = useRef<HTMLDivElement>(null);
 
-  const phoneOk = /^01[016789]-?\d{3,4}-?\d{4}$/.test(phone.trim());
+  const phoneOk = phoneRe.test(phone.trim());
   const errs = {
     name: name.trim() ? "" : "이름을 적어 주세요",
     phone: phoneOk ? "" : "휴대폰 번호를 확인해 주세요",
     addr: how !== "parcel" || addr.trim().length > 5 ? "" : "받을 주소를 적어 주세요",
-    agree: agree ? "" : "개인정보 수집에 동의해 주세요",
+    agree: agree ? "" : "개인정보 수집, 이용에 동의해 주세요",
   };
-  const ok = Object.values(errs).every((e) => !e);
+  const gErrs = guardianErrs(guard);
+  const ok = Object.values(errs).every((e) => !e) && Object.values(gErrs).every((e) => !e);
   const err = (k: keyof typeof errs) =>
     tried && errs[k] ? (
       <p className="mt-1.5 text-[14px] font-semibold" style={{ color: C.error }}>
@@ -1106,11 +1212,17 @@ function GiftForm({ complete, got, need, year, reduce, onCourse }: { complete: b
             {err("addr")}
           </label>
         )}
-        <label className="flex cursor-pointer items-start gap-2 text-[14px] leading-[1.6]" style={{ color: C.muted }}>
-          <input type="checkbox" checked={agree} onChange={(e) => setAgree(e.target.checked)} className="mt-0.5 h-5 w-5 flex-none accent-[#b8142a]" />
-          <span>기념품을 전하려고 이름, 휴대폰 번호, 주소를 받아요. 9월 말에 지워요. 동의합니다.</span>
-        </label>
-        {err("agree")}
+        <GuardianFields g={guard} setG={setGuard} errs={gErrs} tried={tried} what="기념품 신청과 개인정보 수집, 이용" />
+        {/* 개인정보 보호법 제15조 제2항: 목적, 항목, 보유 기간, 거부권과 불이익 */}
+        <div>
+          <label className="flex cursor-pointer items-start gap-2 text-[14px] leading-[1.6]" style={{ color: C.muted }}>
+            <input type="checkbox" checked={agree} onChange={(e) => setAgree(e.target.checked)} className="mt-0.5 h-5 w-5 flex-none accent-[#b8142a]" />
+            <span>
+              <b style={{ color: C.ink }}>개인정보 수집, 이용 동의 (필수)</b> 이름, 휴대폰 번호, 주소(택배로 받을 때)를 기념품 전달에만 쓰고 9월 30일에 지워요. 동의하지 않을 수 있어요. 동의하지 않으면 기념품을 신청할 수 없어요.
+            </span>
+          </label>
+          {err("agree")}
+        </div>
         <button type="submit" className={`${btnSolid} w-full py-4 text-[17px] disabled:cursor-not-allowed disabled:opacity-40`} style={{ background: C.red, color: C.paper, borderColor: C.red, outlineColor: C.ink }}>
           기념품 신청하기
         </button>
@@ -1158,7 +1270,8 @@ const FAQ = [
   { q: "하루에 다 못 돌면요?", a: "8월 13일부터 17일 사이라면 며칠에 나눠 모아도 돼요. 같은 휴대폰으로 들어오면 도장판이 이어져요." },
   { q: "유모차나 휠체어로도 돌 수 있나요?", a: "짧은 코스는 계단이 없어요. 전체 코스는 고개 위 우물터에 계단 64개가 있어요." },
   { q: "많이 더울 것 같아요", a: "이름비 공원과 기록관에 그늘 쉼터와 물이 있어요. 한낮에는 기록관 안에서 쉬었다 가세요." },
-  { q: "아이 혼자 와도 되나요?", a: "초등학생은 보호자와 같이 와 주세요. 중학생부터는 혼자 돌아도 기념품을 받을 수 있어요." },
+  /* 개인정보 보호법 제22조의2 제1항, 위치정보법 제25조 제1항: 만 14세 미만은 법정대리인 동의 */
+  { q: "아이 혼자 와도 되나요?", a: "초등학생은 보호자와 같이 와 주세요. 만 14세 미만은 도장 찍기 위치 확인, 해설사 동행 예약, 기념품 신청에 보호자 동의가 필요해요. 신청 칸에서 만 14세 미만을 고르면 보호자 이름과 휴대폰을 적는 칸이 열려요." },
   { q: "반려견과 걸어도 되나요?", a: "목줄을 하면 바깥 코스는 같이 걸을 수 있어요. 기록관 실내에는 들어갈 수 없어요." },
 ];
 

@@ -10,7 +10,7 @@ import { DemoMakerInfo } from "@/components/demos/DemoMakerInfo";
 
 /* 스몰웨딩 홀 홈페이지 샘플: 가상의 스몰웨딩 홀 곰파트너. 하객 30~120명, 홀 하나와 야외 정원, 식사와 꽃장식 패키지.
    상호, 주소, 직원, 손님 이름은 모두 가상이다.
-   첫 화면 사진 출처: Pexels 사진 33104578
+   첫 화면 사진(hero): AI 생성 (Z-Image-Turbo), 11-08 접시에 囍 글자가 있던 Pexels 사진 33104578 을 바꿨다
 
    국내 스몰웨딩 홀 사이트의 공통 구성을 따랐다. 메뉴는 공간 소개, 패키지와 비용, 예약 현황, 상담신청, 오시는 길.
    첫 화면에는 예약 가능한 날짜(토, 일 중심)와 시간대(11시, 13시, 15시, 17시)가 바로 보이고,
@@ -31,6 +31,17 @@ import { DemoMakerInfo } from "@/components/demos/DemoMakerInfo";
 const BRAND = "스몰웨딩 홀";
 const ADDRESS = "서울 ㅇㅇ구 ㅇㅇ로 00";
 const KAKAO = "카카오톡 채널 스몰웨딩 홀";
+/* 상담 운영시간은 이 한 줄을 바닥글, 운영시간 표, 상담신청 안내가 같이 쓴다. 월요일 휴무 */
+const HOURS = "10:00~19:00";
+/* 바닥글 사업자 정보: 전자상거래법 제10조 제1항 표시 사항. 샘플이라 자리 표시로 둔다. 통신판매는 하지 않아 신고번호는 없다 */
+const BIZ: [string, string][] = [
+  ["상호", BRAND],
+  ["대표자", "ㅇㅇㅇ"],
+  ["주소", ADDRESS],
+  ["전화", "02-000-0000"],
+  ["메일", "help@example.com"],
+  ["사업자등록번호", "000-00-00000"],
+];
 
 /* 로고: 메인 사이트와 같은 곰 로고 + 곰파트너(크게) + 업종(작게) */
 function SampleLogo({ light, small }: { light?: boolean; small?: boolean }) {
@@ -159,12 +170,12 @@ export function SmallWeddingDemo() {
     window.scrollTo({ top: Math.max(0, top), behavior: reduce ? "auto" : "smooth" });
   };
 
-  /* 메뉴 이름은 실제 스몰웨딩 홀 사이트 표기(공간, 식사, 예식 안내, 남은 날짜, 방문 상담)를 따른다 */
+  /* 메뉴 이름은 눌러서 닿는 섹션 제목과 같게 둔다(11-08) */
   const NAV = [
     ["sw-hero", "남은 날짜"],
-    ["sw-layout", "예식 안내"],
-    ["sw-package", "식사와 비용"],
-    ["sw-space", "공간"],
+    ["sw-layout", "홀과 수용 인원"],
+    ["sw-package", "패키지와 비용"],
+    ["sw-space", "공간 안내"],
   ] as const;
   const [menu, setMenu] = useState(false);
   const nav = (id: string) => {
@@ -357,7 +368,26 @@ export function SmallWeddingDemo() {
             <SampleLogo />
           </p>
           <p>
-            {ADDRESS}, 상담 화~일 10:00~19:00, 월요일 휴무, {KAKAO}
+            상담 화~일 {HOURS}, 월요일 휴무, {KAKAO}
+          </p>
+          <dl className="mt-3 flex flex-wrap gap-x-4 gap-y-0.5">
+            {BIZ.map(([k, v]) => (
+              <div key={k} className="flex gap-1.5">
+                <dt>{k}</dt>
+                <dd className="tabular-nums" style={{ color: C.body }}>
+                  {v}
+                </dd>
+              </div>
+            ))}
+          </dl>
+          {/* 이용약관, 개인정보처리방침 자리. 다른 샘플과 같이 눌러도 창은 열리지 않는다 */}
+          <p className="mt-2 flex gap-4">
+            <button type="button" className={`font-bold hover:underline ${focusRing}`} style={{ color: C.ink, outlineColor: C.olive }}>
+              이용약관
+            </button>
+            <button type="button" className={`font-bold hover:underline ${focusRing}`} style={{ color: C.ink, outlineColor: C.olive }}>
+              개인정보처리방침
+            </button>
           </p>
           <DemoMakerInfo className="mt-6" />
         </div>
@@ -373,7 +403,7 @@ export function SmallWeddingDemo() {
    휴대폰은 사진 4:3, 남은 날짜는 썸네일 아래 가로로 넘기는 칩, 첫 화면이 보이는 동안 하단에 방문 상담 버튼을 고정한다.
    동작 줄이기면 교차 없이 바로 바뀐다. */
 const VIEWS = [
-  { key: "table", img: "hero", sm: "hero-sm", label: "테이블", line: "기본 꽃장식, 테이블 센터피스 포함", alt: "분홍 장미와 유칼립투스로 꾸민 예식 테이블과 하객 의자", pos: "55% 45%" },
+  { key: "table", img: "hero", sm: "hero-sm", label: "테이블", line: "기본 꽃장식, 테이블 센터피스 포함", alt: "분홍 장미와 흰 꽃으로 꾸민 긴 예식 테이블과 원목 의자", pos: "50% 50%" },
   { key: "garden", img: "garden", sm: "garden", label: "가든", line: "야외 의자 40석, 식전 음료와 사진 촬영", alt: "잔디 위 흰 꽃 아치와 접이식 흰 의자 줄", pos: "45% 55%" },
   { key: "bride", img: "bride-room", sm: "bride-room", label: "신부대기실", line: "2실, 가족 대기 소파와 다과", alt: "흰 커튼 창 앞 아이보리 소파와 흰 장미 꽃병", pos: "50% 60%" },
   { key: "banquet", img: "banquet", sm: "banquet", label: "연회장", line: `${SEAT}인 원형 테이블, 하객 ${HALL_MAX}명까지`, alt: "흰 테이블보를 씌운 원형 테이블과 작은 꽃 센터피스", pos: "50% 50%" },
@@ -724,7 +754,58 @@ function PackageSection() {
       <p className="mt-6 text-[14px] leading-[1.6]" style={{ color: C.muted }}>
         부가세 별도. 식사는 최소 보증인원 30명 기준이며, 최종 견적은 방문 상담에서 하객 수와 날짜에 맞춰 드립니다.
       </p>
+      <RefundTable />
     </>
+  );
+}
+
+/* 계약 해제 위약금. 공정거래위원회고시 제2025-14호 소비자분쟁해결기준 별표 2 예식업, 소비자 귀책 해제와 청약철회 기준.
+   중요한 표시광고사항 고시(결혼서비스업)가 홈페이지에 위약금과 환급 산정기준 표시를 요구한다 */
+function RefundTable() {
+  const rows: [string, string][] = [
+    ["계약일부터 15일 안", "계약금 전액 환급"],
+    ["예식일 150일 전까지", "계약금 전액 환급"],
+    ["예식일 149~60일 전", "총비용의 10%"],
+    ["예식일 59~30일 전", "총비용의 20%"],
+    ["예식일 29~10일 전", "총비용의 40%"],
+    ["예식일 9~1일 전", "총비용의 50%"],
+    ["예식 당일", "총비용의 70%"],
+  ];
+  const td = "border-t px-3 py-2.5 text-[15px]";
+  return (
+    <div className="mt-10 grid gap-4 lg:grid-cols-[minmax(0,1fr)_minmax(0,1fr)] lg:gap-12">
+      <table className="w-full border-collapse leading-[1.5]">
+        <caption className="py-2 text-left text-[17px] font-bold">계약 해제와 위약금</caption>
+        <thead>
+          <tr style={{ color: C.muted }}>
+            <th scope="col" className={`${td} text-left`} style={{ borderColor: C.line }}>
+              해제 통보 시점
+            </th>
+            <th scope="col" className={`${td} text-right`} style={{ borderColor: C.line }}>
+              위약금
+            </th>
+          </tr>
+        </thead>
+        <tbody>
+          {rows.map(([when, fee]) => (
+            <tr key={when}>
+              <th scope="row" className={`${td} text-left font-bold`} style={{ borderColor: C.line }}>
+                {when}
+              </th>
+              <td className={`${td} whitespace-nowrap text-right tabular-nums`} style={{ borderColor: C.line }}>
+                {fee}
+              </td>
+            </tr>
+          ))}
+        </tbody>
+      </table>
+      <ul className="grid gap-2 self-start rounded-[6px] border p-4 text-[15px] leading-[1.6]" style={{ borderColor: C.line, background: C.ivory }}>
+        <li>공정거래위원회 소비자분쟁해결기준(예식업)을 따릅니다.</li>
+        <li>위약금은 계약금을 돌려 드린 뒤 총비용 기준으로 계산합니다.</li>
+        <li>홀 사정으로 해제하면 계약금을 돌려 드리고 같은 시점 기준으로 배상합니다. 예식일 29일 전부터는 총비용의 70%입니다.</li>
+        <li>해제 통보는 {KAKAO} 또는 전화로 받고, 접수한 날 기준으로 계산합니다.</li>
+      </ul>
+    </div>
   );
 }
 
@@ -736,15 +817,7 @@ function SpaceSection({ today }: { today: Date }) {
     { icon: Flower2, name: "신부 대기실", lines: ["2실, 메이크업 수정 공간", "가족 대기 소파와 다과", "예식 2시간 전부터 사용"] },
     { icon: Car, name: "주차", lines: ["건물 지하 1~3층 150대", "하객 주차 2시간 무료", "만차 시 옆 건물 공영주차장 안내"] },
   ];
-  const hours = [
-    ["월", "휴무"],
-    ["화", "10:00~19:00"],
-    ["수", "10:00~19:00"],
-    ["목", "10:00~19:00"],
-    ["금", "10:00~19:00"],
-    ["토", "09:00~18:00"],
-    ["일", "09:00~18:00"],
-  ];
+  const hours = ["월", "화", "수", "목", "금", "토", "일"].map((d) => [d, d === "월" ? "휴무" : HOURS]);
   const todayDow = DOW[today.getDay()];
 
   return (
@@ -869,12 +942,14 @@ function ConsultSection({ today, date }: { today: Date; date: Date }) {
   const [phone, setPhone] = useState("");
   const [wedding, setWedding] = useState("");
   const [visit, setVisit] = useState("");
+  const [agree, setAgree] = useState(false);
   const [errors, setErrors] = useState<Record<string, string>>({});
   const [lead, setLead] = useState<Lead | null>(null);
   const [count, setCount] = useState(17);
 
   const weddingValue = wedding || fmtDash(date);
-  const minVisit = fmtDash(daysAgo(today, -1));
+  /* 방문 희망일: 내일부터 2주. 상담을 쉬는 월요일은 고를 수 없다 */
+  const visitDays = Array.from({ length: 14 }, (_, i) => daysAgo(today, -(i + 1)));
 
   const submit = (e: React.FormEvent) => {
     e.preventDefault();
@@ -884,6 +959,7 @@ function ConsultSection({ today, date }: { today: Date; date: Date }) {
     const digits = phone.replace(/\D/g, "");
     if (digits.length < 10 || digits.length > 11) err.phone = "휴대폰 번호를 확인해 주세요";
     if (!visit) err.visit = "방문 희망일을 골라 주세요";
+    if (!agree) err.agree = "개인정보 수집, 이용에 동의해 주세요";
     setErrors(err);
     if (Object.keys(err).length) return;
     const no = `W-${fmtDash(today).replace(/-/g, "")}-${String(count).padStart(3, "0")}`;
@@ -942,7 +1018,7 @@ function ConsultSection({ today, date }: { today: Date; date: Date }) {
                   <dt style={{ color: C.muted }}>회신 예정일</dt>
                   <dd>{fmtKo(reply)}</dd>
                 </dl>
-                <button type="button" onClick={() => setLead(null)} className={`${btnBase} mt-5 rounded-[6px] border px-4 py-2 text-[14px]`} style={{ borderColor: C.olive, color: C.olive, background: C.paper, outlineColor: C.olive, fontWeight: 600 }}>
+                <button type="button" onClick={() => { setLead(null); setVisit(""); setAgree(false); }} className={`${btnBase} mt-5 rounded-[6px] border px-4 py-2 text-[14px]`} style={{ borderColor: C.olive, color: C.olive, background: C.paper, outlineColor: C.olive, fontWeight: 600 }}>
                   다른 날짜로 다시 신청
                 </button>
               </motion.div>
@@ -983,30 +1059,71 @@ function ConsultSection({ today, date }: { today: Date; date: Date }) {
                     </p>
                   )}
                 </div>
-                <div className="mt-4 grid gap-4 sm:grid-cols-2">
+                <div className="mt-4">
                   <div>
                     <label htmlFor="sw-wedding" className={lab}>
                       희망 예식일
                     </label>
                     <input id="sw-wedding" type="date" min={fmtDash(today)} value={weddingValue} onChange={(e) => setWedding(e.target.value)} className={`${field} ${focusRing}`} style={fieldStyle("wedding")} />
                   </div>
-                  <div>
-                    <label htmlFor="sw-visit" className={lab}>
-                      방문 희망일
-                    </label>
-                    <input id="sw-visit" type="date" min={minVisit} value={visit} onChange={(e) => setVisit(e.target.value)} aria-invalid={!!errors.visit} aria-describedby={errors.visit ? "sw-visit-err" : undefined} className={`${field} ${focusRing}`} style={fieldStyle("visit")} />
-                    {errors.visit && (
-                      <p id="sw-visit-err" className="mt-1 text-[13px]" style={{ color: C.error }}>
-                        {errors.visit}
-                      </p>
-                    )}
-                  </div>
                 </div>
+                <div className="mt-4">
+                  <p id="sw-visit-label" className={lab}>
+                    방문 희망일
+                  </p>
+                  <div role="group" aria-labelledby="sw-visit-label" aria-describedby={errors.visit ? "sw-visit-err" : undefined} className="mt-1 grid grid-cols-7 gap-1">
+                    {visitDays.map((d) => {
+                      const v = fmtDash(d);
+                      const off = d.getDay() === 1;
+                      const on = visit === v;
+                      return (
+                        <button
+                          key={v}
+                          type="button"
+                          disabled={off}
+                          aria-pressed={on}
+                          aria-label={`${d.getMonth() + 1}월 ${d.getDate()}일 ${DOW_FULL[d.getDay()]}${off ? " 휴무" : ""}`}
+                          onClick={() => setVisit(v)}
+                          className={`${focusRing} flex h-12 flex-col items-center justify-center rounded-[4px] border text-[14px] leading-[1.2] tabular-nums disabled:cursor-not-allowed`}
+                          style={{
+                            borderColor: on ? C.olive : errors.visit ? C.error : C.line,
+                            background: on ? C.olive : off ? C.ivoryDeep : C.paper,
+                            color: on ? C.paper : off ? C.muted : C.ink,
+                            outlineColor: C.olive,
+                          }}
+                        >
+                          <span className="font-bold">{d.getDate()}</span>
+                          <span className="text-[11px]">{off ? "휴무" : DOW[d.getDay()]}</span>
+                        </button>
+                      );
+                    })}
+                  </div>
+                  {errors.visit && (
+                    <p id="sw-visit-err" className="mt-1 text-[13px]" style={{ color: C.error }}>
+                      {errors.visit}
+                    </p>
+                  )}
+                </div>
+                {/* 개인정보 보호법 제15조 제1항 제1호, 제2항: 수집 항목, 목적, 보유 기간, 거부권과 불이익 고지 */}
+                <label className="mt-5 flex min-h-11 cursor-pointer items-start gap-2.5 text-[15px] leading-[1.5]">
+                  <input type="checkbox" checked={agree} onChange={(e) => setAgree(e.target.checked)} aria-invalid={!!errors.agree} aria-describedby={errors.agree ? "sw-agree-err" : undefined} className="mt-0.5 h-5 w-5 shrink-0 accent-[#3f5a36]" />
+                  <span>
+                    개인정보 수집, 이용 동의 (필수)
+                    <span className="block text-[14px]" style={{ color: C.muted }}>
+                      두 분 이름, 휴대폰, 희망 예식일을 상담 연락에만 쓰고 상담이 끝나면 1년 안에 파기합니다. 동의하지 않으실 수 있으며, 동의하지 않으면 상담신청을 받을 수 없습니다.
+                    </span>
+                  </span>
+                </label>
+                {errors.agree && (
+                  <p id="sw-agree-err" className="mt-1 text-[13px]" style={{ color: C.error }}>
+                    {errors.agree}
+                  </p>
+                )}
                 <button type="submit" data-gtm-cta="small-wedding_consult_submit" className={`${btnBase} mt-6 w-full rounded-[6px] py-3 text-[16px]`} style={{ background: C.olive, color: C.paper, outlineColor: C.olive, fontWeight: 600 }}>
                   상담신청
                 </button>
                 <p className="mt-2 text-[13px]" style={{ color: C.muted }}>
-                  방문 상담은 화~일 10:00~18:00 사이에 잡아 드려요.
+                  방문 상담은 화~일 {HOURS} 사이에 잡아 드려요.
                 </p>
               </motion.form>
             )}

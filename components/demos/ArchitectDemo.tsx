@@ -30,6 +30,15 @@ const IMG = "/images/demo-architect-office";
 const ADDRESS = "서울 ㅇㅇ구 ㅇㅇ로 00, 3층";
 const TEL = "02-000-0000";
 const KAKAO = "카카오톡 채널 건축사사무소";
+/* 바닥글 사업자 정보. 상호에 "건축사사무소"를 넣는다(건축사법 제23조 제6항). 개설신고 번호는 건축사법에 홈페이지 표시 의무가 없어 두지 않는다 */
+const BIZ: [string, string][] = [
+  ["상호", "건축사사무소"],
+  ["대표 건축사", "왕ㅎ진"],
+  ["주소", ADDRESS],
+  ["전화", TEL],
+  ["메일", "help@example.com"],
+  ["사업자등록번호", "000-00-00000"],
+];
 
 const C = {
   paper: "#ffffff",
@@ -566,7 +575,22 @@ export function ArchitectDemo() {
           <p className="inline-flex items-center gap-2 text-[16px] font-bold" style={{ color: C.ink }}>
             <SampleLogo size={18} />
           </p>
-          <p className="mt-2 text-[14px]">{ADDRESS}</p>
+          <dl className="mt-3 flex flex-wrap gap-x-4 gap-y-0.5 text-[14px] leading-[1.8]">
+            {BIZ.map(([k, v]) => (
+              <div key={k} className="flex gap-1.5">
+                <dt>{k}</dt>
+                <dd className="tabular-nums" style={{ color: C.body }}>
+                  {v}
+                </dd>
+              </div>
+            ))}
+          </dl>
+          {/* 개인정보 보호법 제30조 처리방침 공개. 다른 샘플과 같이 눌러도 창은 열리지 않는다 */}
+          <p className="mt-2 text-[14px]">
+            <button type="button" className={`font-bold hover:underline ${focusRing}`} style={{ color: C.ink, outlineColor: C.accent }}>
+              개인정보처리방침
+            </button>
+          </p>
           <DemoMakerInfo className="mt-6" />
         </div>
       </footer>
