@@ -9,7 +9,7 @@ import { PageHead, SubTabs, wrap } from "@/components/classic/ui";
 import { faqFor } from "@/data/classic/faq";
 import { maintenanceServices, maintenanceSteps } from "@/data/classic/maintenance";
 import { pageMeta } from "@/lib/seo";
-import { siteUrl } from "@/lib/site";
+import { KAKAO_COUPON_URL, siteUrl } from "@/lib/site";
 
 export const metadata: Metadata = pageMeta({
   title: "홈페이지 유지보수, 유지관리 (오류 수정, 업체 이관, 보안 업데이트, 월 관리)",
@@ -83,6 +83,13 @@ export default function ClassicMaintenancePage() {
             </div>
           ))}
         </dl>
+        {/* 11-08 카카오톡 채널 친구 쿠폰(사용자 승인): 월 유지보수 첫 달 50%, 12-31까지, 100장. 쿠폰 화면의 번호 등록은 /contact?promo=kakao&serial= 로 온다 */}
+        <p className="mt-4 text-[16px] leading-[1.6] text-[#3b4250]">
+          카카오톡 채널 친구는 월 유지보수 첫 달 관리비 50% 할인 쿠폰을 받을 수 있습니다(12월 31일까지).{" "}
+          <a href={KAKAO_COUPON_URL} target="_blank" rel="noopener noreferrer" data-gtm-cta="maintenance_kakao_coupon" className="font-bold text-[#256ef4] underline underline-offset-4">
+            쿠폰 받기
+          </a>
+        </p>
       </section>
 
       <section aria-labelledby="m-list" className={`${wrap} py-12 md:py-16`}>

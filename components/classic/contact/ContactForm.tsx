@@ -89,7 +89,10 @@ export function ContactForm() {
   const [currentSite, setCurrentSite] = useState(site);
   // 무료 이어받기 띠에서 오면 promo=takeover(11-07)
   const promoLabel = promo === "php" ? "PHP 무료 점검 요청" : promo === "takeover" ? "업체 변경 무료 지원 신청" : "홈페이지 점검 요청";
-  const [message, setMessage] = useState(site || promo === "php" || promo === "takeover" ? `${promoLabel}: ${site}` : msg);
+  // 11-08 카카오톡 채널 쿠폰(첫 달 유지보수 50%)의 "쿠폰번호 등록하기"는 ?promo=kakao&serial=12자리 번호 로 넘어온다
+  const serial = (params.get("serial") ?? "").replace(/\D/g, "").slice(0, 20);
+  const couponLine = promo === "kakao" ? `카카오톡 채널 쿠폰(첫 달 유지보수 50% 할인)${serial ? ` 번호 ${serial}` : ""}\n홈페이지 주소: ` : "";
+  const [message, setMessage] = useState(couponLine || (site || promo === "php" || promo === "takeover" ? `${promoLabel}: ${site}` : msg));
   const [agree, setAgree] = useState(false);
   const [website, setWebsite] = useState("");
   const [errors, setErrors] = useState<Record<string, string>>({});
