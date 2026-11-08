@@ -11,7 +11,7 @@ import { channels } from "@/components/classic/ClassicFooter";
 
 export type InsightRow =
   | { kind: "own"; key: string; href: string; title: string; summary: string; badge: string; minutes: number; image: string; date: string; no: number }
-  | { kind: "naver" | "tistory" | "youtube"; key: string; href: string; title: string; summary: string; badge: string; image?: string; date: string };
+  | { kind: "naver" | "tistory" | "youtube"; key: string; href: string; title: string; summary: string; badge: string; image?: string; date: string; no?: number };
 
 const ICON: Record<"naver" | "tistory" | "youtube", ChannelIconName> = { naver: "naverBlog", tistory: "tistory", youtube: "youtube" };
 // 11-08 채널 글은 바닥글과 같은 채널 이름(그 채널에서 하는 일)으로 부른다. 예: 네이버 블로그 = 보안 경보 기록
@@ -78,10 +78,11 @@ export function InsightList({ rows }: { rows: InsightRow[] }) {
             <>
               <div className="min-w-0 flex-1">
                 {ext ? (
-                  <span className="inline-flex h-7 items-center gap-1.5 rounded bg-[#f1f3f6] px-2.5 text-[13px] font-bold text-[#464c53]">
+                  <span className="inline-flex h-7 items-center gap-1.5 whitespace-nowrap rounded bg-[#f1f3f6] px-2.5 text-[13px] font-bold text-[#464c53]">
                     <span className="[&_svg]:h-4 [&_svg]:w-4"><ChannelIcon name={ICON[n.kind]} /></span>
-                    {NAME(n.kind)}
-                    <span className="font-normal text-[#6b7280]">{n.badge}</span>
+                    {/* 11-09 유튜브는 줄 이름표를 짧게: 강의는 "그누보드 운영 N편"만, 숏츠는 "사고 이야기 유튜브"(휴대폰에서 두 줄로 꺾이지 않게) */}
+                    {n.kind === "youtube" ? (n.no ? n.badge : "사고 이야기") : NAME(n.kind)}
+                    {!(n.kind === "youtube" && n.no) && <span className="font-normal text-[#6b7280]">{n.badge}</span>}
                   </span>
                 ) : (
                   <span className="inline-flex h-7 items-center rounded bg-[#eef4ff] px-2.5 text-[13px] font-bold text-[#1d5fd6]">{n.badge}</span>

@@ -4,6 +4,290 @@ export type ChannelPost = { source: ChannelSource; id: string; title: string; da
 export const channelPosts: ChannelPost[] = [
   {
     "source": "youtube",
+    "id": "ZmcN2qWTR8Q",
+    "title": "넣은 적 없는 광고, 모르는 주소로 튕김 | 그누보드 운영 노하우 7편",
+    "date": "2026-11-09",
+    "url": "https://www.youtube.com/watch?v=ZmcN2qWTR8Q",
+    "desc": "그누보드 운영 노하우 7편, 넣은 적 없는 광고, 모르는 주소로 튕김. 실제로 자주 올라오는 질문을 바탕으로 다시 꾸민 사례와, 연습 서버에서 직접 해 본 내용으로 설명합니다. 오늘 정리 1. 광고는 설정 칸부터 2. 튕김은 .htaccess부터 3. 원본과 통째 비교",
+    "tags": [
+      "그누보드",
+      "홈페이지관리"
+    ],
+    "thumb": "https://i.ytimg.com/vi/ZmcN2qWTR8Q/hqdefault.jpg"
+  },
+  {
+    "source": "youtube",
+    "id": "yOvyQGsrLo8",
+    "title": "느려진 사이트, 원인 찾는 순서 | 그누보드 운영 노하우 9편",
+    "date": "2026-11-09",
+    "url": "https://www.youtube.com/watch?v=yOvyQGsrLo8",
+    "desc": "그누보드 운영 노하우 9편, 느려진 사이트, 원인 찾는 순서. 실제로 자주 올라오는 질문을 바탕으로 다시 꾸민 사례와, 연습 서버에서 직접 해 본 내용으로 설명합니다. 오늘 정리 1. 전부인가, 한 페이지인가 2. 개발자 도구로 느린 줄 찾기 3. 게시물과 용량 확인",
+    "tags": [
+      "그누보드",
+      "홈페이지관리"
+    ],
+    "thumb": "https://i.ytimg.com/vi/yOvyQGsrLo8/hqdefault.jpg"
+  },
+  {
+    "source": "youtube",
+    "id": "wQn85pIymgA",
+    "title": "같은 서버 이웃 사이트까지 털렸다면 | 그누보드 운영 노하우 6편",
+    "date": "2026-11-09",
+    "url": "https://www.youtube.com/watch?v=wQn85pIymgA",
+    "desc": "그누보드 운영 노하우 6편, 같은 서버 이웃 사이트까지 털렸다면. 실제로 자주 올라오는 질문을 바탕으로 다시 꾸민 사례와, 연습 서버에서 직접 해 본 내용으로 설명합니다. 오늘 정리 1. 여러 사이트 동시면 업체에 먼저 2. 지우기 전에 남기기 3. 비밀번호는 깨끗한 컴퓨터에서",
+    "tags": [
+      "그누보드",
+      "홈페이지관리"
+    ],
+    "thumb": "https://i.ytimg.com/vi/wQn85pIymgA/hqdefault.jpg"
+  },
+  {
+    "source": "youtube",
+    "id": "lccfZsXNiTk",
+    "title": "넘겨받은 그누보드, 처음 30분에 볼 것 | 그누보드 운영 노하우 1편",
+    "date": "2026-11-09",
+    "url": "https://www.youtube.com/watch?v=lccfZsXNiTk",
+    "desc": "그누보드 운영 노하우 1편, 넘겨받은 그누보드, 처음 30분에 볼 것. 실제로 자주 올라오는 질문을 바탕으로 다시 꾸민 사례와, 연습 서버에서 직접 해 본 내용으로 설명합니다. 넘겨받은 날 적어 둘 다섯 가지 1. 그누보드 버전 2. 서버와 PHP 버전 3. 최고관리자와 권한 10 계정",
+    "tags": [
+      "그누보드",
+      "홈페이지관리"
+    ],
+    "thumb": "https://i.ytimg.com/vi/lccfZsXNiTk/hqdefault.jpg"
+  },
+  {
+    "source": "youtube",
+    "id": "KkA67jjoiFI",
+    "title": "관리자 비밀번호를 바꿔도 또 들어온다 | 그누보드 운영 노하우 5편",
+    "date": "2026-11-09",
+    "url": "https://www.youtube.com/watch?v=KkA67jjoiFI",
+    "desc": "그누보드 운영 노하우 5편, 관리자 비밀번호를 바꿔도 또 들어온다. 실제로 자주 올라오는 질문을 바탕으로 다시 꾸민 사례와, 연습 서버에서 직접 해 본 내용으로 설명합니다. 오늘 정리 1. 비밀번호는 앞문 열쇠 2. 권한 10과 빈 계정 확인 3. data 안 php 파일 4. 업데이트",
+    "tags": [
+      "그누보드",
+      "홈페이지관리"
+    ],
+    "thumb": "https://i.ytimg.com/vi/KkA67jjoiFI/hqdefault.jpg"
+  },
+  {
+    "source": "youtube",
+    "id": "kiLbneR_Td0",
+    "title": "PHP 서버가 AI 해킹에 17분 만에 뚫렸어요, 내 사이트 PHP 버전 1분 확인",
+    "date": "2026-11-09",
+    "url": "https://www.youtube.com/shorts/kiLbneR_Td0",
+    "desc": "11월 7일 MBC 뉴스데스크에 나온 AI 모의해킹 결과, PHP 서버가 17분 42초 만에 뚫렸습니다. 국내 서버의 85%가 아직 취약한 PHP를 쓴다고 합니다. 호스팅 관리 화면, 워드프레스 사이트 건강, 만든 업체에 한 줄 질문으로 내 사이트 PHP 버전을 확인하세요. 8.1 이하",
+    "tags": [
+      "사장님IT",
+      "홈페이지관리",
+      "PHP보안"
+    ],
+    "thumb": "https://i.ytimg.com/vi/kiLbneR_Td0/hqdefault.jpg"
+  },
+  {
+    "source": "youtube",
+    "id": "iV7i02i3va4",
+    "title": "PHP 버전 올리는 순서 | 그누보드 운영 노하우 3편",
+    "date": "2026-11-09",
+    "url": "https://www.youtube.com/watch?v=iV7i02i3va4",
+    "desc": "그누보드 운영 노하우 3편, PHP 버전 올리는 순서. 실제로 자주 올라오는 질문을 바탕으로 다시 꾸민 사례와, 연습 서버에서 직접 해 본 내용으로 설명합니다. 올리는 순서 1. 백업 받기 (2편) 2. 운영 서버를 복사한 시험 서버에 새 버전 3. 오류 기록에서 Fatal error ",
+    "tags": [
+      "그누보드",
+      "홈페이지관리"
+    ],
+    "thumb": "https://i.ytimg.com/vi/iV7i02i3va4/hqdefault.jpg"
+  },
+  {
+    "source": "youtube",
+    "id": "I_WGrn6ZUXg",
+    "title": "백업이 없으면 못 살립니다 | 그누보드 운영 노하우 2편",
+    "date": "2026-11-09",
+    "url": "https://www.youtube.com/watch?v=I_WGrn6ZUXg",
+    "desc": "그누보드 운영 노하우 2편, 백업이 없으면 못 살립니다. 실제로 자주 올라오는 질문을 바탕으로 다시 꾸민 사례와, 연습 서버에서 직접 해 본 내용으로 설명합니다. 오늘 정리 1. DB와 data 폴더, 같은 날짜로 같이 받기 2. 받은 백업은 연습 서버에 되살려 보기 3. 넘겨받은 날 ",
+    "tags": [
+      "그누보드",
+      "홈페이지관리"
+    ],
+    "thumb": "https://i.ytimg.com/vi/I_WGrn6ZUXg/hqdefault.jpg"
+  },
+  {
+    "source": "youtube",
+    "id": "a2PO1vtHAYg",
+    "title": "업데이트 뒤 기능 하나가 안 될 때 | 그누보드 운영 노하우 4편",
+    "date": "2026-11-09",
+    "url": "https://www.youtube.com/watch?v=a2PO1vtHAYg",
+    "desc": "그누보드 운영 노하우 4편, 업데이트 뒤 기능 하나가 안 될 때. 실제로 자주 올라오는 질문을 바탕으로 다시 꾸민 사례와, 연습 서버에서 직접 해 본 내용으로 설명합니다. 오늘 정리 1. 바꾸기 전에 백업 2. 추측 말고 오류 기록 한 줄 3. 본체는 한 버전으로 통째로",
+    "tags": [
+      "그누보드",
+      "홈페이지관리"
+    ],
+    "thumb": "https://i.ytimg.com/vi/a2PO1vtHAYg/hqdefault.jpg"
+  },
+  {
+    "source": "youtube",
+    "id": "3gPu9SkceGg",
+    "title": "매달 30분 점검표 | 그누보드 운영 노하우 10편",
+    "date": "2026-11-09",
+    "url": "https://www.youtube.com/watch?v=3gPu9SkceGg",
+    "desc": "그누보드 운영 노하우 10편, 매달 30분 점검표. 실제로 자주 올라오는 질문을 바탕으로 다시 꾸민 사례와, 연습 서버에서 직접 해 본 내용으로 설명합니다. 매달 30분 점검표 1. 버전: 그누보드, PHP 버전 (1, 3편) 2. 백업: 이번 달 DB와 data 폴더 (2편) 3. 계",
+    "tags": [
+      "그누보드",
+      "홈페이지관리"
+    ],
+    "thumb": "https://i.ytimg.com/vi/3gPu9SkceGg/hqdefault.jpg"
+  },
+  {
+    "source": "youtube",
+    "id": "-nX6Ka56NHs",
+    "title": "스팸 봇, 하루 트래픽이 수백 배 | 그누보드 운영 노하우 8편",
+    "date": "2026-11-09",
+    "url": "https://www.youtube.com/watch?v=-nX6Ka56NHs",
+    "desc": "그누보드 운영 노하우 8편, 스팸 봇, 하루 트래픽이 수백 배. 실제로 자주 올라오는 질문을 바탕으로 다시 꾸민 사례와, 연습 서버에서 직접 해 본 내용으로 설명합니다. 오늘 정리 1. 게시판 삭제는 마지막 수단 2. 권한, 캡챠, 단어, IP 순서 3. 트래픽 메일은 봇 신호",
+    "tags": [
+      "그누보드",
+      "홈페이지관리"
+    ],
+    "thumb": "https://i.ytimg.com/vi/-nX6Ka56NHs/hqdefault.jpg"
+  },
+  {
+    "source": "naver",
+    "id": "224468687164",
+    "title": "PHP 8.1 이하 홈페이지, 올리면 무엇이 깨질까요? 같은 코드를 세 버전에서 돌려 봤습니다",
+    "date": "2026-11-08",
+    "url": "https://blog.naver.com/gompartner/224468687164",
+    "desc": "PHP 보안 경보 대응 기록 3편이에요. 1편: blog.naver.com/gompartner/224468362362 2편: blog.naver.com/gompartner/224468547004 10월 PHP 긴급 패치는 8.2 이상에만 나왔어요. 8.1 이하는 공식 패치가 없어서 버전",
+    "tags": [
+      "PHP업그레이드",
+      "PHP버전",
+      "PHP8",
+      "그누보드",
+      "영카트",
+      "홈페이지유지보수",
+      "PHP보안",
+      "홈페이지오류"
+    ]
+  },
+  {
+    "source": "naver",
+    "id": "224468547004",
+    "title": "홈페이지 로그에 PHP 공격 흔적이 남을까요, 연습 서버에 직접 보내 봤습니다",
+    "date": "2026-11-07",
+    "url": "https://blog.naver.com/gompartner/224468547004",
+    "desc": "PHP 보안 경보 대응 기록 2편이에요. 1편에서는 보안 설정을 바꿔도 재시작 전에는 그대로라는 걸 직접 재 봤어요. 1편: blog.naver.com/gompartner/224468362362 이번에는 그다음 질문이에요. \"패치 전에 이미 누가 들어왔으면 어떡하죠?\" 업체에 물어보면 ",
+    "tags": [
+      "PHP보안",
+      "PHP2Shell",
+      "서버로그",
+      "해킹흔적",
+      "홈페이지보안",
+      "홈페이지유지보수",
+      "아파치로그",
+      "그누보드"
+    ]
+  },
+  {
+    "source": "naver",
+    "id": "224468362362",
+    "title": "PHP 보안 설정을 바꿨는데 그대로였어요, 재시작 전후를 직접 재 봤습니다",
+    "date": "2026-11-07",
+    "url": "https://blog.naver.com/gompartner/224468362362",
+    "desc": "PHP 보안 경보 대응 기록 1편이에요. \"설정은 바꿔 두었습니다.\" 10월 PHP 보안 경보 뒤에 업체에서 이런 답을 받은 곳이 꽤 있을 거예요. 그런데 설정을 바꾼 것과 설정이 실제로 적용된 것은 다른 일이에요. 정말 그런지 직접 재 봤어요. 무엇을 시험했나요? 10월 21일 PHP",
+    "tags": [
+      "PHP보안",
+      "PHP2Shell",
+      "PHP업데이트",
+      "홈페이지보안",
+      "서버재시작",
+      "보안조치확인",
+      "홈페이지유지보수",
+      "그누보드"
+    ]
+  },
+  {
+    "source": "naver",
+    "id": "224468342585",
+    "title": "아파치 보안 업데이트 권고, 우리 홈페이지도 해당될까",
+    "date": "2026-11-07",
+    "url": "https://blog.naver.com/gompartner/224468342585",
+    "desc": "\"아파치 보안 업데이트 권고\" 11월 6일 KISA 보호나라에 올라온 공지 제목이에요. 홈페이지를 아파치 서버에 올려 두셨다는 말을 들은 적이 있다면 놀라실 수 있어요. 이번 공지의 대상은? 이번 공지는 아파치 웹서버가 아니라 Apache Juneau라는 프로그램 부품이에요. Junea",
+    "tags": [
+      "아파치",
+      "아파치보안",
+      "KISA보안공지",
+      "홈페이지보안",
+      "웹서버",
+      "보안업데이트",
+      "홈페이지유지보수",
+      "보호나라"
+    ]
+  },
+  {
+    "source": "naver",
+    "id": "224468339781",
+    "title": "영카트 토스페이먼츠 쓰는 쇼핑몰, 5.6.47 업데이트 해야 할까",
+    "date": "2026-11-07",
+    "url": "https://blog.naver.com/gompartner/224468339781",
+    "desc": "11월 6일, 그누보드 5.6.47이 나왔어요. 영카트로 쇼핑몰을 운영하고 결제를 토스페이먼츠로 받는다면 해당되는 업데이트예요. 무엇이 바뀌었나요? 토스페이먼츠가 결제마다 붙는 거래번호를 앞으로 최대 200자까지 늘린다고 안내했어요. 긴 번호를 쇼핑몰이 그대로 저장하게 고친 판이에요. ",
+    "tags": [
+      "영카트",
+      "그누보드",
+      "토스페이먼츠",
+      "쇼핑몰업데이트",
+      "결제취소",
+      "가상계좌",
+      "쇼핑몰유지보수",
+      "홈페이지보안"
+    ]
+  },
+  {
+    "source": "youtube",
+    "id": "f0oMCIl8dlU",
+    "title": "홈페이지 메뉴, 태블릿으로 누르면 열리는지 30초 점검",
+    "date": "2026-11-05",
+    "url": "https://www.youtube.com/shorts/f0oMCIl8dlU",
+    "desc": "태블릿으로 홈페이지 위 메뉴를 눌러 보세요. 아래 메뉴가 안 펼쳐지고 바로 넘어가면 손님이 오시는 길, 회사 소개를 못 찾습니다. 한 번 누르면 펼치고 한 번 더 누르면 이동하게 고쳐 달라고 하세요.",
+    "tags": [
+      "사장님IT",
+      "홈페이지관리",
+      "태블릿메뉴"
+    ],
+    "thumb": "https://i.ytimg.com/vi/f0oMCIl8dlU/hqdefault.jpg"
+  },
+  {
+    "source": "tistory",
+    "id": "42",
+    "title": "운전학원 홈페이지 제작기, 면허 탭을 누르면 취득 순서가 바뀐다",
+    "date": "2026-11-04",
+    "url": "https://gompartner.tistory.com/42",
+    "desc": "퇴근하고 저녁 7시. 면허를 따려고 운전학원 사이트를 연다. 팝업이 서너 장 겹쳐 뜬다. 닫고 나면 배너 사진이 돌아간다. 알고 싶은 건 저녁에도 탈 수 있는지, 몇 시간 들으면 끝나는지다. 결국 대표번호를 누른다. 그 두 가지가 첫 화면에서 보이게, 1종 보통과 2종 보통, 2종 소형",
+    "tags": [
+      "카페&middot;가게",
+      "곰파트너",
+      "도로주행 시험 일정",
+      "셔틀버스 노선",
+      "운전전문학원 홈페이지 제작",
+      "운전학원 홈페이지",
+      "학원 홈페이지 제작"
+    ],
+    "thumb": "https://blog.kakaocdn.net/dn/bxYo7Q/dJMcairOwtq/Abv9FO1yLY9U9hWKNndoMk/img.png"
+  },
+  {
+    "source": "naver",
+    "id": "224464251233",
+    "title": "쇼핑몰 홈페이지 하단 사업자 정보, 무엇을 꼭 써야 할까",
+    "date": "2026-11-04",
+    "url": "https://blog.naver.com/gompartner/224464251233",
+    "desc": "처음 보는 쇼핑몰에서 3만 원짜리 그릇을 사기 전에 손님은 맨 아래로 내려가요. 사업자 정보가 있는지 보려고요. 거기가 비어 있으면 결제 전에 창을 닫습니다. 법으로도 꼭 써야 하는 자리예요. 무엇을 써야 하나요? 전자상거래법이 정한 것은 여덟 가지예요. 법은 첫 화면에 두라고 해요. ",
+    "tags": [
+      "쇼핑몰사업자정보",
+      "통신판매업신고번호",
+      "전자상거래법",
+      "쇼핑몰하단표시",
+      "사업자정보확인",
+      "호스팅서비스제공자",
+      "쇼핑몰과태료",
+      "쇼핑몰이용약관"
+    ]
+  },
+  {
+    "source": "youtube",
     "id": "GrGnkDDpPvA",
     "title": "거래처가 \"입금 계좌 바뀌었어요\" 문자를 보내면, 보내기 전에 할 일",
     "date": "2026-11-03",
