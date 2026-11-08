@@ -91,8 +91,10 @@ export default function RootLayout({
           />
         </noscript>
         {/* 첫 화면 미리보기(iframe) 안의 데모, 미리보기 주소·로컬, 자동 브라우저(로봇)는 방문으로 세지 않는다 */}
+        {/* 11-08 검수 기기 제외: 주소에 ?ga=off 를 붙여 한 번 열면 그 브라우저는 GA를 싣지 않는다(?ga=on 으로 되돌림). 저장소가 막힌 브라우저는 그냥 센다 */}
         <Script id="gtm" strategy="afterInteractive">
-          {`if(window.self===window.top&&/(^|\\.)gompartner\\.co\\.kr$/.test(location.hostname)&&!navigator.webdriver&&!/HeadlessChrome|bot|crawl|spider|Lighthouse/i.test(navigator.userAgent))(function(w,d,s,l,i){w[l]=w[l]||[];w[l].push({'gtm.start':
+          {`var gpOff=false;try{var gq=new URLSearchParams(location.search).get('ga');if(gq==='off')localStorage.setItem('gp_ga_off','1');if(gq==='on')localStorage.removeItem('gp_ga_off');gpOff=localStorage.getItem('gp_ga_off')==='1';if(gq==='off'||gq==='on'){var gu=new URL(location.href);gu.searchParams.delete('ga');history.replaceState(null,'',gu.pathname+gu.search+gu.hash);var gn=document.createElement('div');gn.textContent=gq==='off'?'이 브라우저의 방문은 GA에서 제외됩니다':'이 브라우저의 방문을 다시 GA에 기록합니다';gn.style.cssText='position:fixed;left:50%;bottom:24px;transform:translateX(-50%);z-index:99999;background:#15171c;color:#fff;padding:12px 18px;border-radius:8px;font-size:15px';document.body.appendChild(gn);setTimeout(function(){gn.remove()},4000)}}catch(e){}
+if(!gpOff&&window.self===window.top&&/(^|\\.)gompartner\\.co\\.kr$/.test(location.hostname)&&!navigator.webdriver&&!/HeadlessChrome|bot|crawl|spider|Lighthouse/i.test(navigator.userAgent))(function(w,d,s,l,i){w[l]=w[l]||[];w[l].push({'gtm.start':
 new Date().getTime(),event:'gtm.js'});var f=d.getElementsByTagName(s)[0],
 j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
 'https://www.googletagmanager.com/gtm.js?id='+i+dl;f.parentNode.insertBefore(j,f);
