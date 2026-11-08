@@ -10,7 +10,7 @@ import { siteUrl } from "@/lib/site";
 export const dynamic = "force-static";
 
 // AI 검색(ChatGPT, Perplexity, Claude 등)이 읽는 사이트 요약. llmstxt.org 형식.
-// 11-01 서비스: 유지보수, 제작(홈페이지, 랜딩, 업무 프로그램). 유지보수를 앞에 둔다. 금액과 작업 기간은 싣지 않는다(상담 뒤 견적).
+// 11-01 서비스: 유지보수, 제작(홈페이지, 랜딩, 업무 프로그램). 유지보수를 앞에 둔다. 유지보수는 공개 시작 금액(월 9만 원부터)만 싣는다(11-08 AI 검색 답변이 업체별 비용을 뽑아 감).
 // 데이터 문구에 가운뎃점이 섞여 들어와도 쉼표로 바꿔 내보낸다.
 const plain = (t: string) => t.replaceAll("·", ", ").replace(/\s+/g, " ").trim();
 
@@ -29,7 +29,7 @@ export function GET() {
 
 ## 유지보수
 
-다른 업체가 만든 홈페이지도 맡습니다. 작업 전 전체 백업을 하고, 작업 뒤 작업 내역 문서를 드립니다. 자세히: [홈페이지 유지보수](${url("/maintenance")})
+다른 업체가 만든 홈페이지도 맡습니다(긴급 오류 수정, 연락 두절 업체 인수). 작업 전 전체 백업을 하고, 작업 뒤 작업 내역 문서를 드립니다. 월 유지보수는 월 9만 원부터(부가세 별도), 영업일 기준 24시간 이내 회신. 맞는 곳: 만든 업체와 연락이 끊긴 곳, PHP와 CMS 업데이트가 밀린 곳, 매달 수정과 점검을 맡길 곳. 자세히: [홈페이지 유지보수](${url("/maintenance")})
 
 ${maintenanceServices.map((s) => `- [${plain(s.h1)}](${url(`/maintenance/${s.id}`)}): ${plain(s.metaDescription)}`).join("\n")}
 

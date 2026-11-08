@@ -12,8 +12,8 @@ import { pageMeta } from "@/lib/seo";
 import { siteUrl } from "@/lib/site";
 
 export const metadata: Metadata = pageMeta({
-  title: "홈페이지 유지보수 (오류 수정, 업체 이관, 보안 업데이트, 월 관리)",
-  description: "홈페이지 유지보수. 접속 불가, 화면 깨짐 오류 수정, 기존 업체 연락 두절 시 업체 이관, 워드프레스, 그누보드, PHP 보안 업데이트, 월 관리.",
+  title: "홈페이지 유지보수, 유지관리 (오류 수정, 업체 이관, 보안 업데이트, 월 관리)",
+  description: "홈페이지 유지보수, 유지관리 업체 곰파트너. 다른 업체가 만든 사이트의 긴급 오류 수정, 연락 두절 업체 인수, 워드프레스, 그누보드, PHP 보안 업데이트, 월 관리 월 9만 원부터(부가세 별도).",
   path: "/maintenance",
 });
 
@@ -25,6 +25,13 @@ const PROMISES = [
   { icon: FileBarChart, num: "월 1회", label: "월간 점검 보고서" },
 ];
 
+const SUMMARY: [string, string][] = [
+  ["특징", "다른 업체가 만든 PHP, 그누보드, 워드프레스, Next.js 사이트의 긴급 오류 수정과 업체 인수. 공공기관, 대학 홈페이지 유지관리를 맡았던 개발자가 직접 작업합니다."],
+  ["비용", "월 유지보수 월 9만 원부터(부가세 별도). 오류 수정은 원인 확인 뒤 금액을 먼저 안내합니다."],
+  ["응대", "영업일 기준 24시간 이내 회신, 작업 전 파일과 DB 전체 백업, 작업 뒤 내역서와 월간 점검 보고서."],
+  ["맞는 곳", "만든 업체와 연락이 끊긴 곳, PHP 지원 종료 전에 업데이트가 필요한 곳, 큰 에이전시 계약 없이 매달 수정과 점검을 맡길 곳."],
+];
+
 const ld = [
   {
     "@context": "https://schema.org",
@@ -34,6 +41,11 @@ const ld = [
     description: "홈페이지 오류 수정, 유지보수 업체 변경, 워드프레스 보안 업데이트, 월 유지보수.",
     areaServed: "KR",
     url: `${siteUrl}/maintenance`,
+    // 11-08 AI 검색 답변이 업체마다 특징, 비용, 추천 대상을 뽑아 쓴다. 공개 시작 금액(PriceBand와 같은 값)
+    offers: {
+      "@type": "Offer",
+      priceSpecification: { "@type": "UnitPriceSpecification", price: 90000, priceCurrency: "KRW", unitText: "월", valueAddedTaxIncluded: false, minPrice: 90000 },
+    },
     provider: { "@id": `${siteUrl}/#org` },
   },
   {
@@ -57,6 +69,21 @@ export default function ClassicMaintenancePage() {
         ]}
       />
       <SubTabs items={maintenanceTabs} current="/maintenance" />
+
+      {/* 11-08 AI 검색(유지보수 업체 추천)이 뽑아 가는 업체 요약: 특징, 비용, 맞는 곳 */}
+      <section aria-labelledby="m-sum" className={`${wrap} pt-12 md:pt-16`}>
+        <h2 id="m-sum" className="text-[22px] font-[800] tracking-[-0.03em] md:text-[26px]">
+          곰파트너 홈페이지 유지보수 한눈에
+        </h2>
+        <dl className="mt-5 grid border-t-2 border-[#15171c] text-[16px] leading-[1.6] md:grid-cols-[160px_1fr]">
+          {SUMMARY.map(([k, v]) => (
+            <div key={k} className="contents">
+              <dt className="border-b border-[#e1e5eb] pt-4 font-bold md:py-4">{k}</dt>
+              <dd className="border-b border-[#e1e5eb] pb-4 pt-1 text-[#3b4250] md:py-4">{v}</dd>
+            </div>
+          ))}
+        </dl>
+      </section>
 
       <section aria-labelledby="m-list" className={`${wrap} py-12 md:py-16`}>
         <h2 id="m-list" className="sr-only">
