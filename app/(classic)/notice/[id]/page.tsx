@@ -4,7 +4,7 @@ import Link from "next/link";
 import { notFound } from "next/navigation";
 import { PageHead, btnLine, wrap } from "@/components/classic/ui";
 import { SupportTabs } from "@/components/classic/support/SupportTabs";
-import { noticeById, notices } from "@/data/classic/notices";
+import { eventStatus, noticeById, notices } from "@/data/classic/notices";
 import { LdScript } from "@/components/seo/JsonLd";
 import { breadcrumbLd, pageMeta } from "@/lib/seo";
 
@@ -51,9 +51,19 @@ export default async function ClassicNoticeDetailPage({ params }: Props) {
       <SupportTabs current="/notice" />
       <article className={`${wrap} pb-16 pt-10 md:pb-24 md:pt-14`}>
         <header className="border-y-2 border-[#15171c] border-b-[#e6e9ee] py-4 md:border-b">
-          <time dateTime={n.date} className="block text-[15px] tabular-nums text-[#6b7280]">
-            {dot(n.date)}
-          </time>
+          {n.event ? (
+            <p className="flex flex-wrap gap-x-3 text-[15px]">
+              <span className="font-bold text-[#256ef4]">이벤트</span>
+              <span className="font-bold">{eventStatus(n)}</span>
+              <span className="tabular-nums text-[#6b7280]">
+                기간 <time dateTime={n.date}>{dot(n.date)}</time> - <time dateTime={n.event.end}>{dot(n.event.end)}</time>
+              </span>
+            </p>
+          ) : (
+            <time dateTime={n.date} className="block text-[15px] tabular-nums text-[#6b7280]">
+              {dot(n.date)}
+            </time>
+          )}
         </header>
         <div className="space-y-8 py-8 md:py-10">
           {n.sections.map((sec) => (

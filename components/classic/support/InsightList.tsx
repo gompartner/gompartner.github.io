@@ -7,20 +7,23 @@ import Link from "next/link";
 import { useState } from "react";
 import { ExternalLink } from "lucide-react";
 import { ChannelIcon, type ChannelIconName } from "@/components/layout/Footer";
+import { channels } from "@/components/classic/ClassicFooter";
 
 export type InsightRow =
   | { kind: "own"; key: string; href: string; title: string; summary: string; badge: string; minutes: number; image: string; date: string; no: number }
   | { kind: "naver" | "tistory" | "youtube"; key: string; href: string; title: string; summary: string; badge: string; image?: string; date: string };
 
-const FILTERS: { id: "all" | InsightRow["kind"]; label: string }[] = [
+const ICON: Record<"naver" | "tistory" | "youtube", ChannelIconName> = { naver: "naverBlog", tistory: "tistory", youtube: "youtube" };
+// 11-08 채널 글은 바닥글과 같은 채널 이름(그 채널에서 하는 일)으로 부른다. 예: 네이버 블로그 = 보안 경보 기록
+const NAME = (k: "naver" | "tistory" | "youtube") => channels.find((c) => c.icon === ICON[k])?.label ?? k;
+const FILTERS: { id: "all" | InsightRow["kind"]; label: string; icon?: ChannelIconName }[] = [
   { id: "all", label: "전체" },
-  { id: "own", label: "곰파트너" },
-  { id: "naver", label: "네이버 블로그" },
-  { id: "tistory", label: "티스토리" },
-  { id: "youtube", label: "유튜브" },
+  { id: "own", label: "곰파트너 글" },
+  { id: "naver", label: NAME("naver"), icon: ICON.naver },
+  { id: "tistory", label: NAME("tistory"), icon: ICON.tistory },
+  { id: "youtube", label: NAME("youtube"), icon: ICON.youtube },
 ];
 const PAGE = 20;
-const ICON: Record<"naver" | "tistory" | "youtube", ChannelIconName> = { naver: "naverBlog", tistory: "tistory", youtube: "youtube" };
 
 // 11-04 바깥 채널 썸네일. 틀은 곰파트너 글과 같은 16:9로 두고, 사진 비율이 달라도 잘리거나 빈칸이 생기지 않게 한다.
 // 가로형, 세로형 사진: 같은 사진을 흐리게 깔아 틀을 채우고 원래 비율 그대로 위에 올린다.
@@ -58,8 +61,9 @@ export function InsightList({ rows }: { rows: InsightRow[] }) {
             type="button"
             aria-pressed={f === x.id}
             onClick={() => { setF(x.id); setShown(PAGE); }}
-            className={`min-h-10 rounded-md border px-4 text-[15px] font-bold transition-colors ${f === x.id ? "border-[#15171c] bg-[#15171c] text-white" : "border-[#d9dee5] bg-white text-[#464c53] hover:border-[#15171c]"}`}
+            className={`inline-flex min-h-10 items-center gap-1.5 rounded-md border px-4 text-[15px] font-bold transition-colors ${f === x.id ? "border-[#15171c] bg-[#15171c] text-white" : "border-[#d9dee5] bg-white text-[#464c53] hover:border-[#15171c]"}`}
           >
+            {x.icon && <span className="[&_svg]:h-4 [&_svg]:w-4"><ChannelIcon name={x.icon} /></span>}
             {x.label}
           </button>
         ))}
@@ -76,7 +80,8 @@ export function InsightList({ rows }: { rows: InsightRow[] }) {
                 {ext ? (
                   <span className="inline-flex h-7 items-center gap-1.5 rounded bg-[#f1f3f6] px-2.5 text-[13px] font-bold text-[#464c53]">
                     <span className="[&_svg]:h-4 [&_svg]:w-4"><ChannelIcon name={ICON[n.kind]} /></span>
-                    {n.badge}
+                    {NAME(n.kind)}
+                    <span className="font-normal text-[#6b7280]">{n.badge}</span>
                   </span>
                 ) : (
                   <span className="inline-flex h-7 items-center rounded bg-[#eef4ff] px-2.5 text-[13px] font-bold text-[#1d5fd6]">{n.badge}</span>
