@@ -9,13 +9,16 @@ export function JaryoPreview({ it, size = "sm", priority = false }: { it: Jaryo;
   const group = size === "lg" ? "h-[330px] w-[340px] md:h-[470px] md:w-[480px]" : "h-[290px] w-[300px]";
   const front = size === "lg" ? "w-[210px] md:w-[300px]" : "w-[190px]";
   const back = size === "lg" ? "w-[196px] md:w-[280px]" : "w-[176px]";
+  const single = it.pages === 1;
   return (
     <div className={`relative flex items-center justify-center overflow-hidden bg-[#e9edf3] ${box}`}>
       <div className={`relative ${group}`}>
-        <div className={`absolute right-0 top-6 rotate-[3deg] shadow-[0_6px_18px_rgba(15,27,61,0.14)] ${back}`}>
-          <Image src={`/images/jaryo/${it.id}-2.jpg`} alt="" width={640} height={905} className="block h-auto w-full" />
-        </div>
-        <div className={`absolute left-0 top-0 -rotate-[2deg] shadow-[0_10px_28px_rgba(15,27,61,0.22)] ${front}`}>
+        {single ? null : (
+          <div className={`absolute right-0 top-6 rotate-[3deg] shadow-[0_6px_18px_rgba(15,27,61,0.14)] ${back}`}>
+            <Image src={`/images/jaryo/${it.id}-2.jpg`} alt="" width={640} height={905} className="block h-auto w-full" />
+          </div>
+        )}
+        <div className={`absolute top-0 -rotate-[2deg] shadow-[0_10px_28px_rgba(15,27,61,0.22)] ${single ? "left-1/2 -translate-x-1/2" : "left-0"} ${front}`}>
           <Image src={`/images/jaryo/${it.id}-1.jpg`} alt={`${it.title} 1쪽`} width={640} height={905} className="block h-auto w-full" priority={priority} />
         </div>
       </div>

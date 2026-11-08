@@ -35,7 +35,7 @@ export default function ClassicJaryoPage() {
                 </Link>
                 <div className="flex flex-1 flex-col p-6 md:p-7">
                   <p className="text-[14px] font-bold text-[#256ef4]">
-                    {it.when}, <span className="text-[#5b6370]">PDF 2쪽</span>
+                    {it.when}, <span className="text-[#5b6370]">PDF {it.pages ?? 2}쪽</span>
                   </p>
                   <h3 className="mt-1.5 text-[22px] font-[800] leading-[1.35] tracking-[-0.04em] md:text-[24px]">
                     <Link href={`/jaryo/${it.id}`} className="hover:text-[#256ef4]">

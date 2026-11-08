@@ -53,7 +53,7 @@ export default async function ClassicJaryoItemPage({ params }: { params: Promise
             </div>
             <div className="flex flex-col p-6 md:p-10">
               <p className="text-[15px] font-bold text-[#256ef4]">
-                {it.when}, <span className="text-[#5b6370]">PDF 2쪽</span>
+                {it.when}, <span className="text-[#5b6370]">PDF {it.pages ?? 2}쪽</span>
               </p>
               <h2 className="mt-2 text-[26px] font-[800] leading-[1.3] tracking-[-0.04em] md:text-[32px]">들어 있는 것</h2>
               <div className="mt-5">
@@ -67,7 +67,7 @@ export default async function ClassicJaryoItemPage({ params }: { params: Promise
 
           <h2 className="mt-14 text-[22px] font-[800] tracking-[-0.04em] md:text-[26px]">자료 보기</h2>
           <ol className="mt-5 grid gap-6 lg:grid-cols-2" role="list">
-            {[1, 2].map((n) => (
+            {Array.from({ length: it.pages ?? 2 }, (_, i) => i + 1).map((n) => (
               <li key={n}>
                 <p className="mb-2 text-[15px] font-bold text-[#5b6370]">{n}쪽</p>
                 <Image
