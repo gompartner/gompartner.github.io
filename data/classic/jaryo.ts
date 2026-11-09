@@ -52,6 +52,20 @@ export const jaryo: Jaryo[] = [
     parts: ["체크 항목 8줄", "이상하면 볼 강의 편", "반년, 1년에 한 번 할 일", "다섯 달 치 기록 칸"],
     pages: 1,
   },
+  {
+    id: "ai-handover",
+    title: "AI 사이트 넘겨받은 날 기록표",
+    when: "AI로 만든 사이트를 넘겨받은 날",
+    parts: ["적어 둘 다섯 가지와 같이 확인할 두 가지", "만든 사람에게 보낼 한 문장", "키 값을 적지 말아야 하는 이유"],
+    pages: 1,
+  },
+  {
+    id: "ai-monthly",
+    title: "AI 사이트 매달 30분 점검표",
+    when: "운영 중인 AI로 만든 사이트",
+    parts: ["체크 항목 8줄", "이상하면 볼 강의 편", "반년, 1년에 한 번 할 일", "다섯 달 치 기록 칸"],
+    pages: 1,
+  },
 ];
 
 export const pdfFor = (id: string) => `/files/jaryo/gompartner-${id}.pdf`;
