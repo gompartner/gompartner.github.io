@@ -1,5 +1,5 @@
 import type { Metadata } from "next";
-import { ArrowUpRight, Award, ClipboardCheck, FileText, KeyRound, ScrollText, ShieldCheck } from "lucide-react";
+import { ArrowUpRight, Award, ClipboardCheck, FileText, KeyRound, Lock, ScrollText, ShieldCheck } from "lucide-react";
 import { NavLink } from "@/components/classic/NavLink";
 import { PageHead, h2, wrap } from "@/components/classic/ui";
 import { aboutLead, aboutTitle, principles } from "@/data/classic/about";
@@ -49,7 +49,7 @@ export default function ClassicStoryPage() {
           <ol className="mt-10 grid gap-8 md:grid-cols-2 md:gap-x-12 md:gap-y-10">
             {principles.map((p, n) => {
               // 이 페이지의 디자인 포인트(10-30): 원칙마다 아이콘
-              const Icon = [ScrollText, KeyRound, ClipboardCheck, FileText, ShieldCheck][n] ?? ShieldCheck;
+              const Icon = [ScrollText, KeyRound, ClipboardCheck, FileText, Lock, ShieldCheck][n] ?? ShieldCheck;
               return (
               <li key={p.title} className="border-t-2 border-[#15171c] pt-5">
                 <span className="flex items-center gap-3">
