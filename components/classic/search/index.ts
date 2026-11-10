@@ -6,7 +6,6 @@ import { maintenanceFaq, maintenanceServices } from "@/data/classic/maintenance"
 import { notices } from "@/data/classic/notices";
 import { tools } from "@/data/classic/tools";
 import { insights } from "@/data/classic/insights";
-import { channelLabel, channelPosts } from "@/data/classic/channelPosts";
 import { makeExtras } from "@/data/classic/makeExtra";
 
 // 통합검색 색인. 서버에서 만들어 검색 페이지(클라이언트)에 넘긴다(11-01).
@@ -68,15 +67,7 @@ export function buildSearchIndex(): SearchItem[] {
     href: `/insight/${n.slug}`,
     hay: [n.series, ...n.blocks.flatMap((b) => [b.h ?? "", ...(b.p ?? []), ...(b.steps ?? []).flatMap((s) => [s.b, s.t]), ...(b.table?.rows.flat() ?? [])])].join(" "),
   }));
-  // 11-04 채널 글(ops/channel-posts.mjs가 RSS로 받음). 결과를 누르면 그 채널 글로 새 창이 열린다
-  const blog: SearchItem[] = channelPosts.map((p) => ({
-    kind: channelLabel[p.source] as SearchKind,
-    title: p.title,
-    desc: p.desc,
-    href: p.url,
-    hay: [channelLabel[p.source], ...p.tags].join(" "),
-  }));
-  return [...services, ...catalogs, ...kiosk3d, ...posts, ...blog, ...files, ...faqs, ...news];
+  return [...services, ...catalogs, ...kiosk3d, ...posts, ...files, ...faqs, ...news];
 }
 
 /** 카탈로그 검색용(카탈로그 목록 페이지) */

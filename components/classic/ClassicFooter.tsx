@@ -40,6 +40,7 @@ const groups = [
     ],
   },
 ];
+// 11-11 바닥글 채널 칸은 내림(사이트는 직접 쓴 글만, 채널 링크 없음). 아래 목록은 인사이트 이름표용으로만 남김
 // 11-07 채널마다 그 채널에서만 하는 일을 이름으로, 서비스 이름은 아래 작은 줄로(채널끼리는 서로 잇지 않고 사이트에서만 모은다)
 export const channels: { href: string; label: string; handle: string; icon: ChannelIconName }[] = [
   { href: "https://blog.naver.com/gompartner", label: "보안 경보 기록", handle: "네이버 블로그", icon: "naverBlog" },
@@ -55,8 +56,8 @@ const contactIcon = "shrink-0 text-[#7d8594]";
 export function ClassicFooter() {
   return (
     <footer className="bg-[#15171c] pb-24 text-[15px] text-[#a3abb8] md:pb-0">
-      <div className="mx-auto grid w-full max-w-[1248px] grid-cols-2 gap-x-6 gap-y-10 px-4 py-14 md:grid-cols-4 md:px-6 md:py-16 lg:grid-cols-[1.4fr_repeat(4,minmax(0,1fr))]">
-        <div className="col-span-2 md:col-span-4 lg:col-span-1">
+      <div className="mx-auto grid w-full max-w-[1248px] grid-cols-2 gap-x-6 gap-y-10 px-4 py-14 md:grid-cols-3 md:px-6 md:py-16 lg:grid-cols-[1.4fr_repeat(3,minmax(0,1fr))]">
+        <div className="col-span-2 md:col-span-3 lg:col-span-1">
           <p className="flex items-center gap-2.5 text-[21px] font-[800] tracking-[-0.04em] text-white">
             <Image src="/images/bear-avatar.webp" alt="곰파트너 곰 캐릭터" width={32} height={32} className="h-8 w-8 rounded-full object-cover" />
             {profile.name}
@@ -96,25 +97,6 @@ export function ClassicFooter() {
             </ul>
           </nav>
         ))}
-        <div>
-          <h2 className="text-[14px] font-bold text-white">채널</h2>
-          <ul className="mt-4 grid gap-y-2.5" role="list">
-            {channels.map((c) => (
-              <li key={c.href}>
-                <a href={c.href} target="_blank" rel="noopener noreferrer" data-gtm-cta={`classic_footer_${c.icon}`} className="group -my-1.5 flex items-start gap-2 py-1.5 hover:text-white">
-                  <span className="mt-[2px]">
-                    <ChannelIcon name={c.icon} />
-                  </span>
-                  <span className="min-w-0">
-                    <span className="block">{c.label}</span>
-                    <span className="block whitespace-nowrap text-[14px] text-[#7d8594] group-hover:text-[#c9ced8]">{c.handle}</span>
-                    <span className="sr-only"> (새 창)</span>
-                  </span>
-                </a>
-              </li>
-            ))}
-          </ul>
-        </div>
       </div>
       <div className="border-t border-white/10">
         <div className="mx-auto flex w-full max-w-[1248px] flex-col gap-2 px-4 py-6 text-[14px] md:flex-row md:justify-between md:px-6">

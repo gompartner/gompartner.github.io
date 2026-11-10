@@ -54,6 +54,7 @@ export function InsightList({ rows }: { rows: InsightRow[] }) {
   const list = f === "all" ? rows : rows.filter((r) => r.kind === f);
   return (
     <>
+      {new Set(rows.map((r) => r.kind)).size > 1 && (
       <div className="mb-5 flex flex-wrap gap-2" role="group" aria-label="출처">
         {FILTERS.filter((x) => x.id === "all" || rows.some((r) => r.kind === x.id)).map((x) => (
           <button
@@ -68,6 +69,7 @@ export function InsightList({ rows }: { rows: InsightRow[] }) {
           </button>
         ))}
       </div>
+      )}
       <p className="mb-4 text-[15px] text-[#5b6370]">
         전체 <span className="font-bold tabular-nums text-[#15171c]">{list.length}</span>건
       </p>
