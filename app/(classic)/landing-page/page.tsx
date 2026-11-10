@@ -23,7 +23,7 @@ export const metadata: Metadata = {
   openGraph: {
     title: "광고 신청 접수 랜딩페이지 제작",
     url: "/landing-page",
-    images: [{ url: "/og/landing-water-rental.png", width: 1200, height: 630, alt: "광고 신청 접수 랜딩페이지 카탈로그" }],
+    images: [{ url: "/og/landing-water-rental.jpg", width: 1200, height: 630, alt: "광고 신청 접수 랜딩페이지 카탈로그" }],
   },
 };
 

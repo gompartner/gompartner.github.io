@@ -197,9 +197,9 @@ export async function generateMetadata({ params }: DemoPageProps): Promise<Metad
       title,
       description,
       url: `/demo/${slug}`,
-      images: [{ url: `/og/${slug}.png`, width: 1200, height: 630, alt: `${demo.title} 첫 화면` }],
+      images: [{ url: `/og/${slug}.jpg`, width: 1200, height: 630, alt: `${demo.title} 첫 화면` }],
     },
-    twitter: { card: "summary_large_image", images: [`/og/${slug}.png`] },
+    twitter: { card: "summary_large_image", images: [`/og/${slug}.jpg`] },
   };
 }
 

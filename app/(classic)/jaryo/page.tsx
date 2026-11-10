@@ -12,7 +12,7 @@ export const metadata: Metadata = {
     title: "무료 자료",
     description: "홈페이지 견적 질문지, 우리 홈페이지 점검표, 사장님 AI 부탁 문장. 휴대폰으로 보고 PDF로 받을 수 있어요.",
     path: "/jaryo",
-    image: { src: "/og/jaryo.png", alt: "곰파트너 무료 자료" },
+    image: { src: "/og/jaryo.jpg", alt: "곰파트너 무료 자료" },
   }),
   robots: { index: false, follow: false },
 };

@@ -23,7 +23,7 @@ export async function generateMetadata({ params }: { params: Promise<{ id: strin
       title: it.title,
       description: `${it.title}. ${it.parts.join(", ")}. 휴대폰으로 보고 PDF로 받을 수 있어요.`,
       path: `/jaryo/${it.id}`,
-      image: { src: "/og/jaryo.png", alt: "곰파트너 무료 자료" },
+      image: { src: "/og/jaryo.jpg", alt: "곰파트너 무료 자료" },
     }),
     robots: { index: false, follow: false },
   };

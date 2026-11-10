@@ -1,4 +1,4 @@
-// 샘플 카드 썸네일(public/images/demos/<slug>.jpg, 1440x900)과 공유 이미지(public/og/<slug>.png, 1200x630)를 PC 첫 화면으로 찍는다.
+// 샘플 카드 썸네일(public/images/demos/<slug>.jpg, 1440x900)과 공유 이미지(public/og/<slug>.jpg, 1200x630)를 PC 첫 화면으로 찍는다.
 // 사용: npm run build 후 out 폴더를 띄우고(예: npx serve@14.2.4 out -l 5055) node scripts/capture-thumbs.mjs [slug ...]
 import { chromium } from "playwright";
 import path from "node:path";
@@ -17,7 +17,7 @@ const b = await chromium.launch({ channel: "chrome" });
 for (const slug of slugs) {
   for (const [w, h, file, type] of [
     [1440, 900, `public/images/demos/${slug}.jpg`, "jpeg"],
-    [1200, 630, `public/og/${slug}.png`, "png"],
+    [1200, 630, `public/og/${slug}.jpg`, "jpeg"],
   ]) {
     const ctx = await b.newContext({ viewport: { width: w, height: h }, deviceScaleFactor: 1, reducedMotion: "reduce" });
     const p = await ctx.newPage();
