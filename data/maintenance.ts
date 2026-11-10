@@ -29,7 +29,7 @@ export const maintenanceServices: MaintenanceService[] = [
   {
     id: "monthly",
     title: "월 유지보수",
-    price: "월 5만 원(3건), 월 15만 원(6건)",
+    price: "월 9만 원부터(부가세 별도)",
     term: "3개월 단위 계약",
     target: "곰파트너가 만든 홈페이지, 또는 인계 점검을 마친 홈페이지",
     unit: {
