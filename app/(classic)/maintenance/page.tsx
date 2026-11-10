@@ -7,7 +7,7 @@ import { StepList } from "@/components/classic/pricing/StepList";
 import { maintenanceTabs } from "@/components/classic/pricing/tabs";
 import { PageHead, SubTabs, wrap } from "@/components/classic/ui";
 import { faqFor } from "@/data/classic/faq";
-import { dataTerms, maintenanceServices, maintenanceSteps, severityTerms } from "@/data/classic/maintenance";
+import { dataTerms, maintenanceServices, maintenanceSteps, severityNote, severityTerms } from "@/data/classic/maintenance";
 import { pageMeta } from "@/lib/seo";
 import { KAKAO_COUPON_URL, siteUrl } from "@/lib/site";
 
@@ -166,6 +166,7 @@ export default function ClassicMaintenancePage() {
             </div>
           ))}
         </div>
+        <p className="mt-4 text-[16px] leading-[1.6] text-[#3b4250]">{severityNote}</p>
       </section>
 
       <section aria-labelledby="m-data" className={`${wrap} pt-12 md:pt-16`}>
