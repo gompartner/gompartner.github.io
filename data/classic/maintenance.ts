@@ -25,6 +25,22 @@ export interface MaintenanceService {
 /** 응대 기준. 1인 운영이라 영업일 기준으로 적는다 */
 export const replyTerm = "영업일 기준 24시간 이내 회신";
 
+// 11-10 ChatGPT 신뢰도 점검: "24시간 회신"만 있고 장애별 처리 기준, 계정 관리 기준이 없다는 지적으로 추가.
+/** 장애 등급별 처리 기준(허브 페이지 표) */
+export const severityTerms: { level: string; examples: string; reply: string; handle: string }[] = [
+  { level: "긴급 장애", examples: "사이트 접속 불가, 문의, 예약 접수 불가, 악성코드 의심", reply: "접수 당일 회신(주말, 공휴일 포함)", handle: "다른 요청보다 먼저 처리, 필요 시 백업본으로 우선 복구" },
+  { level: "일반 오류", examples: "화면 깨짐, 일부 기능 오류, 메일 미수신", reply: "영업일 기준 24시간 이내", handle: "회신 때 원인, 처리 기간, 금액 안내" },
+  { level: "콘텐츠 수정", examples: "문구, 가격, 사진, 공지", reply: "영업일 기준 24시간 이내", handle: "2영업일 이내 반영" },
+];
+
+/** 계정과 데이터 관리 기준(허브 페이지) */
+export const dataTerms: { label: string; body: string }[] = [
+  { label: "계정", body: "호스팅, 도메인, 관리자 계정은 고객 명의로 두고 작업용 권한만 사용합니다" },
+  { label: "백업", body: "작업 전 파일과 DB 전체 백업, 보관 위치는 보고서에 기록합니다" },
+  { label: "개인정보", body: "작업에 필요한 범위만 열람하고 외부로 반출하지 않습니다" },
+  { label: "계약 종료", body: "작업용 계정 삭제, 비밀번호 변경 안내, 보관 백업 삭제까지 마칩니다" },
+];
+
 /** 유지보수 공통 진행 절차(허브 페이지) */
 export const maintenanceSteps = [
   { title: "문의", body: "홈페이지 주소와 요청 내용을 받습니다" },

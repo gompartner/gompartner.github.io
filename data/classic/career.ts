@@ -4,7 +4,7 @@
 // period는 기록 확인용으로만 남긴다. 화면에 쓰지 않는다.
 export type CareerItem = { period: string; client: string; work: string };
 
-export const careerIntro = "공공기관, 대학, 기업의 홈페이지와 앱을 제작하고 운영해 왔습니다.";
+export const careerIntro = "공공기관, 대학, 기업의 홈페이지와 앱을 제작하고 운영해 왔습니다. 곰파트너 개업 전 개발사 소속과 프리랜서로 수행한 프로젝트이며, 참여는 여러 개발자가 함께한 프로젝트에서 개발을 맡은 건입니다.";
 
 export const careerGroups: { group: string; items: CareerItem[] }[] = [
   {

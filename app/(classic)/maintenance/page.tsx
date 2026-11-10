@@ -7,7 +7,7 @@ import { StepList } from "@/components/classic/pricing/StepList";
 import { maintenanceTabs } from "@/components/classic/pricing/tabs";
 import { PageHead, SubTabs, wrap } from "@/components/classic/ui";
 import { faqFor } from "@/data/classic/faq";
-import { maintenanceServices, maintenanceSteps } from "@/data/classic/maintenance";
+import { dataTerms, maintenanceServices, maintenanceSteps, severityTerms } from "@/data/classic/maintenance";
 import { pageMeta } from "@/lib/seo";
 import { KAKAO_COUPON_URL, siteUrl } from "@/lib/site";
 
@@ -142,6 +142,44 @@ export default function ClassicMaintenancePage() {
             ))}
           </ul>
         </div>
+      </section>
+
+      {/* 11-10 ChatGPT 신뢰도 점검 지적: 회신과 처리를 장애 등급별로 나누고, 계정과 데이터 관리 기준을 보인다 */}
+      <section aria-labelledby="m-severity" className={`${wrap} pt-14 md:pt-20`}>
+        <h2 id="m-severity" className="text-[22px] font-[800] tracking-[-0.03em] md:text-[26px]">
+          장애 등급별 처리 기준
+        </h2>
+        {/* 휴대폰은 등급마다 묶어 세로로, PC는 네 칸 표 */}
+        <div role="table" aria-label="장애 등급별 처리 기준" className="mt-5 border-t-2 border-[#15171c] text-[16px] leading-[1.6]">
+          <div role="row" className="hidden border-b border-[#d9dee5] bg-[#f4f6f9] font-bold md:grid md:grid-cols-[140px_1.3fr_1fr_1.2fr]">
+            <span role="columnheader" className="px-4 py-3">구분</span>
+            <span role="columnheader" className="px-4 py-3">해당 증상</span>
+            <span role="columnheader" className="px-4 py-3">회신</span>
+            <span role="columnheader" className="px-4 py-3">처리</span>
+          </div>
+          {severityTerms.map((t) => (
+            <div key={t.level} role="row" className="grid border-b border-[#e1e5eb] py-4 md:grid-cols-[140px_1.3fr_1fr_1.2fr] md:py-0">
+              <span role="rowheader" className="font-bold md:px-4 md:py-4">{t.level}</span>
+              <span role="cell" className="mt-1 text-[#3b4250] md:mt-0 md:px-4 md:py-4">{t.examples}</span>
+              <span role="cell" className="mt-2 text-[#3b4250] md:mt-0 md:px-4 md:py-4"><b className="mr-2 text-[#15171c] md:hidden">회신</b>{t.reply}</span>
+              <span role="cell" className="mt-1 text-[#3b4250] md:mt-0 md:px-4 md:py-4"><b className="mr-2 text-[#15171c] md:hidden">처리</b>{t.handle}</span>
+            </div>
+          ))}
+        </div>
+      </section>
+
+      <section aria-labelledby="m-data" className={`${wrap} pt-12 md:pt-16`}>
+        <h2 id="m-data" className="text-[22px] font-[800] tracking-[-0.03em] md:text-[26px]">
+          계정과 데이터 관리
+        </h2>
+        <dl className="mt-5 grid border-t-2 border-[#15171c] text-[16px] leading-[1.6] md:grid-cols-[160px_1fr]">
+          {dataTerms.map((t) => (
+            <div key={t.label} className="contents">
+              <dt className="border-b border-[#e1e5eb] pt-4 font-bold md:py-4">{t.label}</dt>
+              <dd className="border-b border-[#e1e5eb] pb-4 pt-1 text-[#3b4250] md:py-4">{t.body}</dd>
+            </div>
+          ))}
+        </dl>
       </section>
 
       <StepList steps={maintenanceSteps} title="진행 절차" id="maintenance-process" />
