@@ -27,15 +27,15 @@ export const replyTerm = "영업일 기준 24시간 이내 회신";
 
 // 11-10 사용자: SLA는 규모에 따라 값이 다르고 저가 월 관리에도 넣지 않는다. 표는 모든 고객 공통 기본 기준만, 주말 대응과 빠른 회신은 계약 등급(severityNote). 보안서약, 포트폴리오 동의, 핵심 기능 원칙은 사용자 문구.
 // 11-10 ChatGPT 신뢰도 점검: "24시간 회신"만 있고 장애별 처리 기준, 계정 관리 기준이 없다는 지적으로 추가.
-/** 장애 등급별 처리 기준(허브 페이지 표) */
-export const severityTerms: { level: string; examples: string; reply: string; handle: string }[] = [
-  { level: "긴급 장애", examples: "사이트 접속 불가, 문의, 예약 접수 불가, 악성코드 의심", reply: "영업일 접수 당일 회신", handle: "다른 요청보다 먼저 처리, 필요 시 백업본으로 우선 복구" },
-  { level: "일반 오류", examples: "화면 깨짐, 일부 기능 오류, 메일 미수신", reply: "영업일 기준 24시간 이내", handle: "회신 때 원인, 처리 기간, 금액 안내" },
-  { level: "콘텐츠 수정", examples: "문구, 가격, 사진, 공지", reply: "영업일 기준 24시간 이내", handle: "2영업일 이내 반영" },
+/** 장애 등급별 처리 순서(허브 페이지 표). 11-10 시세 조사: 저가 상품은 응답 시간 약속이 없거나 영업일 24~48시간, 빠른 응답은 상위 등급만. 회신 시간은 등급마다 다르게 약속하지 않는다 */
+export const severityTerms: { level: string; examples: string; handle: string }[] = [
+  { level: "긴급 장애", examples: "사이트 접속 불가, 문의, 예약 접수 불가, 악성코드 의심", handle: "다른 요청보다 먼저 처리, 필요 시 백업본으로 우선 복구" },
+  { level: "일반 오류", examples: "화면 깨짐, 일부 기능 오류, 메일 미수신", handle: "회신 때 원인, 처리 기간, 금액 안내" },
+  { level: "콘텐츠 수정", examples: "문구, 가격, 사진, 공지", handle: "2영업일 이내 반영" },
 ];
 
 /** 표 아래 한 줄. 금액은 쓰지 않는다 */
-export const severityNote = "주말, 공휴일 대응과 더 빠른 회신 기준은 계약 등급에 따라 정합니다.";
+export const severityNote = "회신은 모든 등급 영업일 기준 24시간 이내입니다. 주말, 공휴일 대응과 더 빠른 회신 기준은 계약 등급에 따라 정합니다.";
 
 /** 계정과 데이터 관리 기준(허브 페이지) */
 export const dataTerms: { label: string; body: string }[] = [
