@@ -79,7 +79,7 @@ export default function ClassicStoryPage() {
                 <h3 className="text-[15px] font-bold text-[#256ef4]">{g.group}</h3>
                 <ul className="mt-3 grid border-t-2 border-[#15171c] md:grid-cols-2 md:gap-x-10" role="list">
                   {g.items.map((c) => (
-                    <li key={c.client} className="grid gap-y-1 border-b border-[#d9dee5] py-5 md:py-6">
+                    <li key={c.client + c.work} className="grid gap-y-1 border-b border-[#d9dee5] py-5 md:py-6">
                       <span className="break-keep text-[19px] font-[800] tracking-[-0.03em] md:text-[21px]">{c.client}</span>
                       <span className="break-keep text-[16px] leading-[1.7] text-[#3d4450] md:text-[17px]">{c.work}</span>
                     </li>
