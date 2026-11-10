@@ -51,6 +51,8 @@ jobs:
     steps:
       - id: deployment
         uses: actions/deploy-pages@v5
+        with:
+          timeout: 1800000
 
   # 오늘 공개일인 가이드가 있으면 배포 뒤 IndexNow로 알린다.
   notify:
