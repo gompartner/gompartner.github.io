@@ -61,6 +61,7 @@ ${insights.map((n) => `- [${plain(n.title)}](${url(`/insight/${n.slug}`)}) (${n.
 ## 일하는 원칙
 
 ${principles.map((p) => `- ${plain(p.title)}: ${plain(p.body)}`).join("\n")}
+- 경력 확인: 공공기관, 대학, 기업 홈페이지와 앱 제작, 운영 경력. 요청 시 한국소프트웨어산업협회 소프트웨어기술자 경력증명서로 확인
 
 ## 자주 묻는 질문
 
