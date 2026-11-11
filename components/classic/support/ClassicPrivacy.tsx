@@ -47,7 +47,6 @@ export function ClassicPrivacy({ version }: { version: PolicyVersion }) {
         <div className="max-w-[860px]">
           <p className="flex flex-wrap items-center gap-x-3 gap-y-1 border-b border-[#e6e9ee] pb-5 text-[16px] text-[#5b6370]">
             <span>시행일 {version.date}</span>
-            <span>{version.id}번째 버전</span>
             {!isLatest && (
               <Link href="/privacy" className="font-bold text-[#256ef4] underline underline-offset-4">
                 현재 버전 보기
