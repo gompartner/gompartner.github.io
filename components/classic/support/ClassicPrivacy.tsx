@@ -1,6 +1,7 @@
 import Link from "next/link";
 import { PageHead, wrap } from "@/components/classic/ui";
 import { privacyVersions, type PolicyVersion, type Table } from "@/data/classic/privacyPolicy";
+import { PrivacyVersionSelect } from "@/components/classic/support/PrivacyVersionSelect";
 
 // 개인정보처리방침 본문(클래식 보기). 내용은 웹툰 쪽과 같은 data/privacyPolicy 를 쓴다.
 const hrefOf = (id: string) => (id === privacyVersions[0].id ? "/privacy" : `/privacy/${id}`);
@@ -77,25 +78,16 @@ export function ClassicPrivacy({ version }: { version: PolicyVersion }) {
             ))}
           </div>
 
-          <section className="mt-16 border-t-2 border-[#15171c] pt-6">
-            <h2 className="text-[21px] font-[800] tracking-[-0.03em]">변경 이력</h2>
-            <ul className="mt-2" role="list">
-              {privacyVersions.map((v) => (
-                <li key={v.id} className="flex flex-col gap-1 border-b border-[#e6e9ee] py-4 text-[16px] md:flex-row md:gap-6">
-                  {v.id === version.id ? (
-                    <span className="shrink-0 font-bold text-[#15171c]">
-                      {v.date} ({v.id}번째 버전, 지금 보는 문서)
-                    </span>
-                  ) : (
-                    <Link href={hrefOf(v.id)} className="shrink-0 font-bold text-[#256ef4] underline-offset-4 hover:underline">
-                      {v.date} ({v.id}번째 버전{v.id === privacyVersions[0].id ? ", 현재" : ""})
-                    </Link>
-                  )}
-                  <span className="text-[#5b6370]">{v.note}</span>
-                </li>
-              ))}
-            </ul>
-          </section>
+          <div className="mt-16 border-t-2 border-[#15171c] pt-6">
+            <PrivacyVersionSelect
+              current={version.id}
+              options={privacyVersions.map((v, i) => ({
+                id: v.id,
+                href: hrefOf(v.id),
+                label: `${v.date} 시행${i === 0 ? " (현재)" : ""}`,
+              }))}
+            />
+          </div>
         </div>
       </div>
     </>
