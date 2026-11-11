@@ -108,6 +108,7 @@ export const oldClassicPaths: string[] = [
 /** 옛 /classic 주소 뒤쪽(예: "works/hospital")을 새 주소로 바꾼다. 랜딩페이지 제작은 /landing-page (/landing은 크몽 광고 접수 랜딩). */
 export function newPathFor(rest: string): string {
   if (rest === "") return "/";
+  if (rest.startsWith("privacy/")) return "/privacy";
   if (rest === "landing" || rest.startsWith("landing/")) return "/landing-page" + rest.slice("landing".length);
   return "/" + rest;
 }

@@ -1,7 +1,6 @@
 import Link from "next/link";
 import { PageHead, wrap } from "@/components/classic/ui";
 import { privacyVersions, type PolicyVersion, type Table } from "@/data/classic/privacyPolicy";
-import { PrivacyVersionSelect } from "@/components/classic/support/PrivacyVersionSelect";
 
 // 개인정보처리방침 본문(클래식 보기). 내용은 웹툰 쪽과 같은 data/privacyPolicy 를 쓴다.
 const hrefOf = (id: string) => (id === privacyVersions[0].id ? "/privacy" : `/privacy/${id}`);
@@ -77,16 +76,6 @@ export function ClassicPrivacy({ version }: { version: PolicyVersion }) {
             ))}
           </div>
 
-          <div className="mt-16 border-t-2 border-[#15171c] pt-6">
-            <PrivacyVersionSelect
-              current={version.id}
-              options={privacyVersions.map((v, i) => ({
-                id: v.id,
-                href: hrefOf(v.id),
-                label: `${v.date} 시행${i === 0 ? " (현재)" : ""}`,
-              }))}
-            />
-          </div>
         </div>
       </div>
     </>
