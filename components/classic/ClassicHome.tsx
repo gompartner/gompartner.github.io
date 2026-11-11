@@ -108,7 +108,7 @@ const h2 =
 const more =
   "inline-flex items-center gap-1 text-[15px] font-bold text-[#5b6370] hover:text-[#15171c]";
 
-export function ClassicHome() {
+export function ClassicHome({ stories = [] }: { stories?: HomeStory[] }) {
   return (
     <div className="bg-white text-[#15171c]">
       <Hero />
@@ -116,6 +116,7 @@ export function ClassicHome() {
       <PhpPromo />
       <Strengths />
       <Services />
+      {stories.length > 0 && <OpsStories stories={stories} />}
       <PriceBand />
       <Process />
       <Faq />
@@ -605,6 +606,39 @@ function Process() {
         </div>
       </div>
       <FlowSteps steps={kind === "make" ? processSteps : maintenanceSteps} />
+    </section>
+  );
+}
+
+// 11-12 숏츠 끝 "홈페이지 운영 이야기는 곰파트너에서" 로 들어온 사람이 메인에서 바로 이어 읽게, 인사이트 최신 글 3편(서버에서 골라 넘긴다)
+export type HomeStory = { slug: string; date: string; title: string; image: string };
+
+function OpsStories({ stories }: { stories: HomeStory[] }) {
+  return (
+    <section aria-labelledby="c-stories" className="border-t border-[#e6e9ee]">
+      <div className="mx-auto w-full max-w-[1248px] px-4 py-20 md:px-6 md:py-24">
+        <div className="flex items-end justify-between gap-4">
+          <h2 id="c-stories" className={h2}>
+            운영 이야기
+          </h2>
+          <Link href="/insight" aria-label="운영 이야기 더보기" className={cn(more, "min-h-11")}>
+            더보기 <Plus size={15} strokeWidth={2.5} aria-hidden />
+          </Link>
+        </div>
+        <ul className="mt-10 grid gap-6 md:grid-cols-3" role="list">
+          {stories.map((n) => (
+            <li key={n.slug}>
+              <Link href={`/insight/${n.slug}`} className="group block">
+                <span className="block overflow-hidden rounded-lg border border-[#e6e9ee]">
+                  <Image src={n.image} alt="" width={1200} height={675} sizes="(min-width: 768px) 400px, 92vw" className="aspect-video w-full object-cover" />
+                </span>
+                <span className="mt-4 block text-[14px] text-[#5b6370]">{n.date.replaceAll("-", ".")}</span>
+                <span className="mt-1 block break-keep text-[18px] font-bold leading-[1.45] tracking-[-0.02em] group-hover:text-[#256ef4] md:text-[19px]">{n.title}</span>
+              </Link>
+            </li>
+          ))}
+        </ul>
+      </div>
     </section>
   );
 }

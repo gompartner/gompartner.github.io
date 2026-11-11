@@ -1,3 +1,4 @@
+import { insights } from "@/data/classic/insights";
 import type { Metadata } from "next";
 import { ClassicHome } from "@/components/classic/ClassicHome";
 import { homeDescription, homeTitle } from "@/data/seo";
@@ -12,5 +13,10 @@ export const metadata: Metadata = {
 };
 
 export default function HomePage() {
-  return <ClassicHome />;
+  // 11-12 메인 "운영 이야기": 인사이트 최신 3편
+  const stories = [...insights]
+    .sort((a, b) => b.date.localeCompare(a.date))
+    .slice(0, 3)
+    .map((n) => ({ slug: n.slug, date: n.date, title: n.title, image: n.image.src }));
+  return <ClassicHome stories={stories} />;
 }
