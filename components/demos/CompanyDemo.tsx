@@ -1099,7 +1099,7 @@ function Location() {
 
       <h3 className="mt-10 text-[18px] font-bold">{x("방문 안내", "Visiting")}</h3>
       <div className="mt-3 max-w-[760px] space-y-2">
-        <p>{x("정문으로 들어와 오른쪽 방문 주차장에 주차해 주십시오. 경비실에서 방문증을 받으시면 됩니다.", "Come in through the main gate and use the visitor lot on the right. Pick up a visitor pass at the guard house.")}</p>
+        <p>{x("정문으로 들어와 오른쪽 방문 주차장에 주차해 주세요. 경비실에서 방문증을 받으시면 됩니다.", "Come in through the main gate and use the visitor lot on the right. Pick up a visitor pass at the guard house.")}</p>
         <p style={{ color: C.muted }}>{x("방문 상담은 하루 전까지 전화로 예약해 주시기 바랍니다.", "Please book visits by phone at least one day ahead.")}</p>
       </div>
     </div>
@@ -1445,7 +1445,7 @@ function Quote() {
   const pickFile = (f: File | undefined) => {
     if (!f) return;
     const ext = f.name.split(".").pop()?.toLowerCase() ?? "";
-    const err = !FILE_EXT.includes(ext) ? x("도면 파일 형식이 아닙니다.", "This is not a supported drawing format.") : f.size > FILE_MAX ? x("30MB가 넘는 파일은 메일로 보내 주십시오.", "Files over 30 MB should be sent by email.") : undefined;
+    const err = !FILE_EXT.includes(ext) ? x("도면 파일 형식이 아닙니다.", "This is not a supported drawing format.") : f.size > FILE_MAX ? x("30MB가 넘는 파일은 메일로 보내 주세요.", "Files over 30 MB should be sent by email.") : undefined;
     setErrors((p) => ({ ...p, file: err }));
     if (err) {
       setFile(null);
@@ -1465,15 +1465,15 @@ function Quote() {
     const tomorrow = new Date();
     tomorrow.setHours(0, 0, 0, 0);
     tomorrow.setDate(tomorrow.getDate() + 1);
-    if (!company.trim()) next.company = x("회사명을 입력해 주십시오.", "Enter your company name.");
-    if (person.trim().length < 2) next.person = x("담당자명을 입력해 주십시오.", "Enter the contact person's name.");
-    if (phone.replace(/\D/g, "").length < 9) next.phone = x("연락처를 확인해 주십시오.", "Enter a phone number with at least 9 digits.");
-    if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email.trim())) next.email = x("이메일 형식을 확인해 주십시오.", "Check the email format.");
-    if (!subject.trim()) next.subject = x("문의제목을 입력해 주십시오.", "Enter a subject.");
-    if (due && new Date(`${due}T00:00:00`) < tomorrow) next.due = x("희망 납기는 내일 이후 날짜로 선택해 주십시오.", "Choose a date from tomorrow onward.");
-    if (memo.trim().length < 10) next.content = x("문의내용을 입력해 주십시오.", "Enter at least 10 characters.");
+    if (!company.trim()) next.company = x("회사명을 입력해 주세요.", "Enter your company name.");
+    if (person.trim().length < 2) next.person = x("담당자명을 입력해 주세요.", "Enter the contact person's name.");
+    if (phone.replace(/\D/g, "").length < 9) next.phone = x("연락처를 확인해 주세요.", "Enter a phone number with at least 9 digits.");
+    if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email.trim())) next.email = x("이메일 형식을 확인해 주세요.", "Check the email format.");
+    if (!subject.trim()) next.subject = x("문의제목을 입력해 주세요.", "Enter a subject.");
+    if (due && new Date(`${due}T00:00:00`) < tomorrow) next.due = x("희망 납기는 내일 이후 날짜로 선택해 주세요.", "Choose a date from tomorrow onward.");
+    if (memo.trim().length < 10) next.content = x("문의내용을 입력해 주세요.", "Enter at least 10 characters.");
     if (errors.file) next.file = errors.file;
-    if (!agree) next.agree = x("개인정보 수집, 이용에 동의해 주십시오.", "Please agree to the collection of personal data.");
+    if (!agree) next.agree = x("개인정보 수집, 이용에 동의해 주세요.", "Please agree to the collection of personal data.");
     setErrors(next);
     const order: Field[] = ["company", "person", "phone", "email", "subject", "due", "content", "file", "agree"];
     const first = order.find((f) => next[f]);
@@ -1588,7 +1588,7 @@ function Quote() {
               {Object.values(errors).some(Boolean) && (
                 <p role="alert" className="mb-4 flex items-center gap-2 rounded-[4px] px-3 py-2.5 text-[15px] font-semibold" style={{ background: "#fbeaea", color: C.error }}>
                   <CircleAlert size={18} aria-hidden />
-                  {x("입력 내용을 확인해 주십시오.", "Please check the highlighted fields.")}
+                  {x("입력 내용을 확인해 주세요.", "Please check the highlighted fields.")}
                 </p>
               )}
               <div className="grid gap-5 border-t-2 pt-6 sm:grid-cols-2" style={{ borderColor: C.steel }}>

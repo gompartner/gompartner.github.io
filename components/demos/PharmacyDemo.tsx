@@ -747,7 +747,7 @@ function Items() {
         ))}
       </ul>
       <p className="mt-3 text-[14px]" style={{ color: C.muted }}>
-        찾으시는 품목은 전화로 문의해 주십시오. {TEL}
+        찾으시는 품목은 전화로 문의해 주세요. {TEL}
       </p>
     </Panel>
   );

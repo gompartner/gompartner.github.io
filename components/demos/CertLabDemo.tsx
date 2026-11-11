@@ -533,7 +533,7 @@ function FloatingContact() {
         <div id="cl-kakao" className="absolute bottom-0 right-full mr-2 w-[220px] rounded-[10px] border bg-white p-4 text-[14px] leading-[1.55] shadow-[0_6px_18px_rgba(20,26,51,0.16)]" style={{ borderColor: C.line }}>
           <p className="font-bold">카카오톡 상담</p>
           <p className="mt-1" style={{ color: C.muted }}>
-            카카오톡에서 &lsquo;시험인증기관&rsquo; 채널을 추가해 주십시오. {HOURS}
+            카카오톡에서 &lsquo;시험인증기관&rsquo; 채널을 추가해 주세요. {HOURS}
           </p>
           <button type="button" onClick={() => setKakao(false)} className="mt-2 inline-flex h-9 items-center rounded-[6px] border px-3 text-[13px] font-bold" style={{ borderColor: C.line }}>
             닫기
@@ -549,17 +549,17 @@ function FloatingContact() {
 type BoardText = string | ((t: Date) => string);
 const boardText = (v: BoardText, t: Date) => (typeof v === "function" ? v(t) : v);
 const BOARD: { tab: "news" | "files"; title: string; ago: number; body: BoardText; file?: string }[] = [
-  { tab: "news", title: "전자파 시험수수료 조정 안내", ago: 7, body: (t) => `인건비와 장비 교정 비용 상승에 따라 전자파(EMC) 시험수수료를 항목별로 4~7% 조정합니다. ${daysAgo(t, -25).getFullYear()}년 ${agoKo(t, -25)} 접수분부터 적용하며, ${agoKo(t, -24)}까지 견적서를 받으신 건은 기존 수수료를 적용합니다. 항목별 수수료는 자료실의 시험항목별 수수료 및 시험처리기간 안내를 확인해 주십시오.` },
+  { tab: "news", title: "전자파 시험수수료 조정 안내", ago: 7, body: (t) => `인건비와 장비 교정 비용 상승에 따라 전자파(EMC) 시험수수료를 항목별로 4~7% 조정합니다. ${daysAgo(t, -25).getFullYear()}년 ${agoKo(t, -25)} 접수분부터 적용하며, ${agoKo(t, -24)}까지 견적서를 받으신 건은 기존 수수료를 적용합니다. 항목별 수수료는 자료실의 시험항목별 수수료 및 시험처리기간 안내를 확인해 주세요.` },
   { tab: "news", title: "명절 연휴 시료 접수 및 성적서 발행 일정 안내", ago: 22, body: (t) => `${agoKo(t, 13)}부터 ${agoKo(t, 9)}까지 시료 접수와 성적서 발행 업무를 하지 않습니다. 연휴 중 택배로 도착한 시료는 ${agoKo(t, 8)}부터 순서대로 접수하며, ${agoKo(t, 15)}까지 시험이 완료된 건은 ${agoKo(t, 14)}까지 성적서를 발행합니다.` },
   { tab: "news", title: "방송통신기자재 적합성평가 고시 개정 시행에 따른 무선충전기 시험 기준 변경", ago: 29, body: (t) => `개정 고시가 ${daysAgo(t, 6).getFullYear()}년 ${agoKo(t, 6)}부터 시행되어 출력 15W를 넘는 무선충전기는 적합등록에서 적합인증 대상으로 바뀝니다. 시행일 전 접수한 건은 종전 기준으로 시험합니다. 해당 품목은 담당 시험원이 개별로 안내해 드립니다.` },
-  { tab: "news", title: "전기용품 안전기준 KC 60335-2-30 개정판 시행 안내 (전기 히터)", ago: 40, body: (t) => `실내용 전기 히터의 표면 온도 상승 한도와 전도 시험 조건이 바뀝니다. ${daysAgo(t, -117).getFullYear()}년 ${daysAgo(t, -117).getMonth() + 1}월 출시 제품부터 개정판으로 시험하므로 출시 예정 제품은 일정을 미리 상담해 주십시오.` },
+  { tab: "news", title: "전기용품 안전기준 KC 60335-2-30 개정판 시행 안내 (전기 히터)", ago: 40, body: (t) => `실내용 전기 히터의 표면 온도 상승 한도와 전도 시험 조건이 바뀝니다. ${daysAgo(t, -117).getFullYear()}년 ${daysAgo(t, -117).getMonth() + 1}월 출시 제품부터 개정판으로 시험하므로 출시 예정 제품은 일정을 미리 상담해 주세요.` },
   { tab: "news", title: "3m 전파무향실 정기 검증에 따른 방사 시험 휴무 안내", ago: 56, body: (t) => `${agoKo(t, 43)}부터 ${agoKo(t, 41)}까지 무향실 정기 검증(NSA 측정)으로 방사 시험을 쉽니다. 해당 기간 예약 건은 담당 시험원이 일정을 다시 잡아 연락드립니다. 전도 시험과 전기안전 시험은 정상 진행합니다.` },
   { tab: "news", title: "KOLAS 정기 사후평가 결과 인정 범위 유지 및 무선 시험 항목 추가", ago: 78, body: "정기 사후평가를 마쳐 기존 인정 범위가 유지되었고, 블루투스 저전력(BLE) 송신 출력과 점유주파수폭 시험 항목이 인정 범위에 추가되었습니다." },
   { tab: "news", title: "ㅈㅅ진흥원 중소기업 인증 지원사업 2차 참여기업 모집 공고", ago: 97, body: (t) => `중소기업의 국내, 해외 인증 비용 일부를 지원하는 사업입니다. 신청 마감은 ${agoKo(t, 68)}이며, 신청 서류 작성은 견적문의로 요청하시면 도와 드립니다.` },
   { tab: "files", title: "시험항목별 수수료 및 시험처리기간 안내", ago: 17, body: "전자파, 무선, 전기안전 시험 항목별 기본 수수료와 처리 기간입니다.", file: "PDF, 412KB" },
-  { tab: "files", title: "[서식] 시험신청서", ago: 35, body: "시험 신청 시 시료와 함께 보내 주십시오.", file: "HWP, 48KB" },
+  { tab: "files", title: "[서식] 시험신청서", ago: 35, body: "시험 신청 시 시료와 함께 보내 주세요.", file: "HWP, 48KB" },
   { tab: "files", title: "중소기업 시험수수료 할인 안내", ago: 50, body: "중소기업 확인서를 내시면 시험수수료를 할인해 드립니다.", file: "PDF, 186KB" },
-  { tab: "files", title: "[서식] 시료 정보 및 시험 모드 기재표", ago: 69, body: "시료의 동작 모드와 연결 방법을 적어 주십시오.", file: "XLSX, 31KB" },
+  { tab: "files", title: "[서식] 시료 정보 및 시험 모드 기재표", ago: 69, body: "시료의 동작 모드와 연결 방법을 적어 주세요.", file: "XLSX, 31KB" },
   { tab: "files", title: "무선기기 적합인증 제출 기술 문서 목록", ago: 97, body: "적합인증 신청에 필요한 기술 문서 목록입니다.", file: "PDF, 286KB" },
   { tab: "files", title: "해외인증 국가별 표시 방법 정리", ago: 133, body: "국가별 인증 마크와 표시 위치를 정리했습니다.", file: "PDF, 1.2MB" },
 ];
@@ -1220,7 +1220,7 @@ function Location() {
                 {copied ? "주소를 복사했습니다" : ""}
               </span>
               <p className="text-[15px]" style={{ color: C.muted }}>
-                상자 겉면에 접수번호를 적어 주십시오.
+                상자 겉면에 접수번호를 적어 주세요.
               </p>
             </div>
           </div>
@@ -1768,7 +1768,7 @@ function Verify() {
   const submit = (e: FormEvent) => {
     e.preventDefault();
     if (!lookup(no, today)) {
-      setError("성적서 번호 끝 네 자리 숫자를 확인해 주십시오. 예: TR-2609-0412");
+      setError("성적서 번호 끝 네 자리 숫자를 확인해 주세요. 예: TR-2609-0412");
       setShown(null);
       return;
     }
@@ -1829,7 +1829,7 @@ function Verify() {
           ) : (
             <p key={`no-${shown}`} className="soft-in inline-flex items-center gap-2 rounded-[8px] px-3 py-2 font-bold" style={{ background: C.errorSoft, color: C.error }}>
               <CircleAlert size={18} aria-hidden />
-              발급 기록이 없는 번호입니다. {TEL}로 문의해 주십시오.
+              발급 기록이 없는 번호입니다. {TEL}로 문의해 주세요.
             </p>
           ))}
       </div>
@@ -1857,12 +1857,12 @@ interface Values {
 
 function validate(v: Values): Errors {
   const e: Errors = {};
-  if (!v.company.trim()) e.company = "회사명을 입력해 주십시오.";
-  if (v.person.trim().length < 2) e.person = "담당자명을 입력해 주십시오.";
-  if (v.phone.replace(/\D/g, "").length < 9) e.phone = "연락처를 확인해 주십시오.";
-  if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(v.email.trim())) e.email = "이메일 형식을 확인해 주십시오.";
-  if (!v.product.trim()) e.product = "제품명을 입력해 주십시오.";
-  if (!v.agree) e.agree = "개인정보 수집, 이용에 동의해 주십시오.";
+  if (!v.company.trim()) e.company = "회사명을 입력해 주세요.";
+  if (v.person.trim().length < 2) e.person = "담당자명을 입력해 주세요.";
+  if (v.phone.replace(/\D/g, "").length < 9) e.phone = "연락처를 확인해 주세요.";
+  if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(v.email.trim())) e.email = "이메일 형식을 확인해 주세요.";
+  if (!v.product.trim()) e.product = "제품명을 입력해 주세요.";
+  if (!v.agree) e.agree = "개인정보 수집, 이용에 동의해 주세요.";
   return e;
 }
 
@@ -1961,7 +1961,7 @@ function QuoteForm({ onList }: { onList: () => void }) {
   const pickFile = (f: File | undefined) => {
     if (!f) return;
     const ext = f.name.split(".").pop()?.toLowerCase() ?? "";
-    const err = !FILE_EXT.includes(ext) ? "PDF, 한글, 워드, 엑셀, 이미지, ZIP 파일만 첨부할 수 있습니다." : f.size > FILE_MAX ? "20MB가 넘는 파일은 메일로 보내 주십시오." : "";
+    const err = !FILE_EXT.includes(ext) ? "PDF, 한글, 워드, 엑셀, 이미지, ZIP 파일만 첨부할 수 있습니다." : f.size > FILE_MAX ? "20MB가 넘는 파일은 메일로 보내 주세요." : "";
     setFileErr(err);
     if (err) {
       setFile(null);
@@ -2103,7 +2103,7 @@ function QuoteForm({ onList }: { onList: () => void }) {
             {errorCount > 0 && tried && (
               <p role="alert" className="mb-5 flex items-center gap-2 rounded-[8px] px-3 py-2.5 text-[15px] font-semibold" style={{ background: C.errorSoft, color: C.error }}>
                 <CircleAlert size={18} aria-hidden />
-                입력 내용을 확인해 주십시오. 확인할 항목 {errorCount}개
+                입력 내용을 확인해 주세요. 확인할 항목 {errorCount}개
               </p>
             )}
             <div className="grid gap-5 border-t-2 pt-6 sm:grid-cols-2" style={{ borderColor: C.indigo }}>
@@ -2155,7 +2155,7 @@ function QuoteForm({ onList }: { onList: () => void }) {
                     </ul>
                   ) : (
                     <p className="text-[14px]" style={{ color: C.muted }}>
-                      아래에서 진행할 인증을 골라 주십시오. 정해지지 않았으면 상담 후 정합니다.
+                      아래에서 진행할 인증을 골라 주세요. 정해지지 않았으면 상담 후 정합니다.
                     </p>
                   )}
                   {extra.length > 0 && (

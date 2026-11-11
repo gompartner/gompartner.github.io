@@ -114,12 +114,12 @@ export function ContactForm() {
 
   const validate = () => {
     const e: Record<string, string> = {};
-    if (!name.trim()) e.name = "이름을 입력해 주십시오.";
-    if (!PHONE_RE.test(phone.trim())) e.phone = "휴대폰 번호를 확인해 주십시오.";
-    if (email.trim() && !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email.trim())) e.email = "이메일 주소를 확인해 주십시오.";
-    if (!business.trim()) e.business = "회사나 상호를 입력해 주십시오.";
-    if (!message.trim()) e.message = "문의 내용을 입력해 주십시오.";
-    if (!agree) e.agree = "개인정보 수집 및 이용에 동의해 주십시오.";
+    if (!name.trim()) e.name = "이름을 입력해 주세요.";
+    if (!PHONE_RE.test(phone.trim())) e.phone = "휴대폰 번호를 확인해 주세요.";
+    if (email.trim() && !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email.trim())) e.email = "이메일 주소를 확인해 주세요.";
+    if (!business.trim()) e.business = "회사나 상호를 입력해 주세요.";
+    if (!message.trim()) e.message = "문의 내용을 입력해 주세요.";
+    if (!agree) e.agree = "개인정보 수집 및 이용에 동의해 주세요.";
     setErrors(e);
     const keys = Object.keys(e);
     const first = Object.keys(FIELD_IDS).find((k) => e[k]);
@@ -133,7 +133,7 @@ export function ContactForm() {
     if (!validate()) return;
     if (!LEAD_ENDPOINT) {
       console.warn("LEAD_ENDPOINT가 비어 있어 신청을 보내지 않았습니다. data/classic/leadEndpoint.ts를 확인하세요.");
-      setStatus({ kind: "error", message: "지금은 신청을 받을 수 없습니다. 잠시 뒤 다시 시도해 주십시오." });
+      setStatus({ kind: "error", message: "지금은 신청을 받을 수 없습니다. 잠시 뒤 다시 시도해 주세요." });
       return;
     }
     const q = new URLSearchParams(window.location.search);
@@ -173,10 +173,10 @@ export function ContactForm() {
         window.dataLayer.push({ event: "generate_lead", lead_package: payload.pkg });
         window.scrollTo({ top: 0 });
       } else {
-        setStatus({ kind: "error", message: data.error || "신청을 저장하지 못했습니다. 다시 시도해 주십시오." });
+        setStatus({ kind: "error", message: data.error || "신청을 저장하지 못했습니다. 다시 시도해 주세요." });
       }
     } catch {
-      setStatus({ kind: "error", message: "신청을 보내지 못했습니다. 다시 시도해 주십시오." });
+      setStatus({ kind: "error", message: "신청을 보내지 못했습니다. 다시 시도해 주세요." });
     }
   };
 
@@ -213,7 +213,7 @@ export function ContactForm() {
     <form onSubmit={submit} noValidate className="space-y-7 border-t-2 border-[#15171c] pt-8">
       <div role="alert">
         {Object.keys(errors).length > 0 && (
-          <p className="rounded-md border border-[#d63d4a] bg-white px-4 py-3 text-[16px] font-bold text-[#d63d4a]">입력 내용 {Object.keys(errors).length}곳을 확인해 주십시오.</p>
+          <p className="rounded-md border border-[#d63d4a] bg-white px-4 py-3 text-[16px] font-bold text-[#d63d4a]">입력 내용 {Object.keys(errors).length}곳을 확인해 주세요.</p>
         )}
       </div>
       <fieldset>

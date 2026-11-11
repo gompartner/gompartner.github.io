@@ -28,7 +28,7 @@ export function SiteSearch({ index }: { index: SearchItem[] }) {
             <b className="text-[#15171c]">{q}</b> 검색 결과 <b className="tabular-nums text-[#15171c]">{found.length}</b>건
           </>
         ) : (
-          "검색어를 입력해 주십시오."
+          "검색어를 입력해 주세요."
         )}
       </p>
       {q && found.length > 0 ? (
@@ -36,7 +36,7 @@ export function SiteSearch({ index }: { index: SearchItem[] }) {
           <SearchResults items={found} />
         </div>
       ) : null}
-      {q && found.length === 0 ? <p className="mt-6 text-[16px]">다른 검색어로 찾아보시거나 상담 신청으로 문의해 주십시오.</p> : null}
+      {q && found.length === 0 ? <p className="mt-6 text-[16px]">다른 검색어로 찾아보시거나 상담 신청으로 문의해 주세요.</p> : null}
     </div>
   );
 }

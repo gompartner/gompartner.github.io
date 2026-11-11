@@ -1587,7 +1587,7 @@ function Reservation({ treatment, onTreatment }: { treatment: TreatmentId; onTre
           <HoursTable />
         </div>
         <p className="mt-4 text-[15px]" style={{ color: C.muted }}>
-          진료 시간 중에 확인 전화를 드리고, 통화가 되면 예약이 확정됩니다. 당일 예약은 전화로 문의해 주십시오.
+          진료 시간 중에 확인 전화를 드리고, 통화가 되면 예약이 확정됩니다. 당일 예약은 전화로 문의해 주세요.
         </p>
         <a href={`tel:${TEL}`} className="mt-4 inline-flex items-center gap-2 text-[24px] font-bold tabular-nums">
           <Phone size={20} aria-hidden style={{ color: C.accent }} />

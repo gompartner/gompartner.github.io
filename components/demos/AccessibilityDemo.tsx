@@ -527,7 +527,7 @@ function ApplyForm({ good }: { good: boolean }) {
         <div role="alert" className="mt-3 rounded border border-[#d9453a] bg-[#fdecea] px-3 py-2 text-[15px] text-[#8c1a10]">
           <p className="flex items-center gap-1 font-bold">
             <CircleAlert size={16} aria-hidden />
-            입력 내용을 확인하십시오.
+            입력 내용을 확인해 주세요.
           </p>
           <ul className="mt-1 list-disc pl-5">
             {Object.values(errors).map((m) => (

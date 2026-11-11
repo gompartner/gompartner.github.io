@@ -1462,7 +1462,7 @@ const NOTICES: Post[] = [
     no: 4,
     title: "주차 등록 안내",
     ago: 98,
-    body: ["건물 지하 주차장 2시간 무료입니다.", "안내 데스크에서 차량 번호를 등록해 주십시오."],
+    body: ["건물 지하 주차장 2시간 무료입니다.", "안내 데스크에서 차량 번호를 등록해 주세요."],
   },
   {
     no: 3,
@@ -1474,7 +1474,7 @@ const NOTICES: Post[] = [
     no: 2,
     title: "개인 사물함 배정 안내",
     ago: 140,
-    body: ["10회 이상 등록 회원께 개인 사물함을 배정합니다.", "사물함 번호는 안내 데스크에 문의해 주십시오."],
+    body: ["10회 이상 등록 회원께 개인 사물함을 배정합니다.", "사물함 번호는 안내 데스크에 문의해 주세요."],
   },
   {
     no: 1,
@@ -1504,7 +1504,7 @@ const EVENTS: Post[] = [
     title: "해피타임 무료기구체험",
     ago: 36,
     period: [36, 7],
-    body: ["평일 14:00 ~ 16:00 리포머 기구를 무료로 체험할 수 있습니다.", "방문 전 전화로 예약해 주십시오."],
+    body: ["평일 14:00 ~ 16:00 리포머 기구를 무료로 체험할 수 있습니다.", "방문 전 전화로 예약해 주세요."],
   },
   {
     no: 1,
@@ -1682,9 +1682,9 @@ function BookingDrawer({ target, onClose }: { target: BookingTarget | null; onCl
   const submit = (e: React.FormEvent) => {
     e.preventDefault();
     const digits = phone.replace(/\D/g, "");
-    if (name.trim().length < 2) return setError("이름을 입력해 주십시오.");
-    if (!/^01\d{8,9}$/.test(digits)) return setError("휴대전화 번호를 확인해 주십시오. 예: 010-1234-5678");
-    if (!agree) return setError("개인정보 수집, 이용에 동의해 주십시오.");
+    if (name.trim().length < 2) return setError("이름을 입력해 주세요.");
+    if (!/^01\d{8,9}$/.test(digits)) return setError("휴대전화 번호를 확인해 주세요. 예: 010-1234-5678");
+    if (!agree) return setError("개인정보 수집, 이용에 동의해 주세요.");
     setError("");
     const who = `${maskName(name)} 님`;
     setDone(

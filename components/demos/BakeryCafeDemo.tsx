@@ -948,10 +948,10 @@ function PickupOrder({
 
   const submit = (e: React.FormEvent) => {
     e.preventDefault();
-    if (!items.length) return setError("빵을 하나 이상 담아 주십시오.");
-    if (activeSlot === null) return setError("픽업 시간을 선택해 주십시오.");
-    if (name.trim().length < 2) return setError("성함을 입력해 주십시오.");
-    if (phone.replace(/\D/g, "").length < 10) return setError("휴대전화 번호를 입력해 주십시오.");
+    if (!items.length) return setError("빵을 하나 이상 담아 주세요.");
+    if (activeSlot === null) return setError("픽업 시간을 선택해 주세요.");
+    if (name.trim().length < 2) return setError("성함을 입력해 주세요.");
+    if (phone.replace(/\D/g, "").length < 10) return setError("휴대전화 번호를 입력해 주세요.");
     setError("");
     const now = new Date();
     const dayLabel = day === "today" ? `오늘 (${DAY_NAMES[now.getDay()]})` : `내일 (${DAY_NAMES[(now.getDay() + 1) % 7]})`;
@@ -1178,12 +1178,12 @@ function GroupOrder({ minute }: { minute: number }) {
 
   const submit = (e: React.FormEvent) => {
     e.preventDefault();
-    if (!date) return setError("희망 날짜를 선택해 주십시오.");
+    if (!date) return setError("희망 날짜를 선택해 주세요.");
     if (minDate && date < minDate) return setError("단체주문은 2일 전까지 예약해 주세요.");
     if (new Date(`${date}T00:00:00`).getDay() === 1) return setError("월요일은 정기휴무입니다.");
-    if (!qty) return setError("수량을 선택해 주십시오.");
-    if (name.trim().length < 2) return setError("성함을 입력해 주십시오.");
-    if (phone.replace(/\D/g, "").length < 10) return setError("휴대전화 번호를 입력해 주십시오.");
+    if (!qty) return setError("수량을 선택해 주세요.");
+    if (name.trim().length < 2) return setError("성함을 입력해 주세요.");
+    if (phone.replace(/\D/g, "").length < 10) return setError("휴대전화 번호를 입력해 주세요.");
     setError("");
     setDone({ name: maskName(name), date, qty });
   };

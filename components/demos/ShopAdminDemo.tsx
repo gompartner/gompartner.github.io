@@ -551,7 +551,7 @@ function OptionsPanel({
 
         {tooMany ? (
           <p className="p-6 text-[16px]" style={{ color: C.danger }}>
-            품목 수가 {MAX_COMBOS.toLocaleString("ko-KR")}개를 초과했습니다. 옵션값을 줄이거나 옵션을 합쳐 주십시오.
+            품목 수가 {MAX_COMBOS.toLocaleString("ko-KR")}개를 초과했습니다. 옵션값을 줄이거나 옵션을 합쳐 주세요.
           </p>
         ) : (
           <>
@@ -708,7 +708,7 @@ function OrdersPanel({ state, setState, notify }: { state: State; setState: SetS
     const ro = last >= 0 && (last % 28 !== 0 && last % 28 !== 8) ? "으로" : "로";
     notify(
       ok.size === 0
-        ? `송장번호 미입력 주문 ${blocked.length}건은 ${to}${ro} 변경할 수 없습니다. 송장번호를 먼저 입력하십시오.`
+        ? `송장번호 미입력 주문 ${blocked.length}건은 ${to}${ro} 변경할 수 없습니다. 송장번호를 먼저 입력해 주세요.`
         : blocked.length
           ? `${ok.size}건을 ${to}${ro} 변경했습니다. 송장번호 미입력 ${blocked.length}건은 제외했습니다.`
           : `${ok.size}건을 ${to}${ro} 변경했습니다.`,

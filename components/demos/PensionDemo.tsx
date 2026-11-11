@@ -1285,11 +1285,11 @@ function ReservePage({ sel, onPick, go }: { sel: Selection; onPick: (id: string,
 
   const submit = (e: React.FormEvent) => {
     e.preventDefault();
-    if (checkIn === null || !q) return setError("예약현황표에서 객실과 입실일을 선택해 주십시오.");
-    if (name.trim().length < 2) return setError("예약자 이름을 입력해 주십시오.");
-    if (phone.replace(/\D/g, "").length < 10) return setError("휴대전화 번호를 입력해 주십시오.");
-    if (!arrival) return setError("도착 예정 시간을 선택해 주십시오.");
-    if (!agree) return setError("환불규정에 동의해 주십시오.");
+    if (checkIn === null || !q) return setError("예약현황표에서 객실과 입실일을 선택해 주세요.");
+    if (name.trim().length < 2) return setError("예약자 이름을 입력해 주세요.");
+    if (phone.replace(/\D/g, "").length < 10) return setError("휴대전화 번호를 입력해 주세요.");
+    if (!arrival) return setError("도착 예정 시간을 선택해 주세요.");
+    if (!agree) return setError("환불규정에 동의해 주세요.");
     setError("");
     const p = parts(checkIn);
     const digits = Number(phone.replace(/\D/g, "").slice(-6));
@@ -1369,7 +1369,7 @@ function ReservePage({ sel, onPick, go }: { sel: Selection; onPick: (id: string,
                   </dl>
                   {!free && (
                     <p className="mt-3 text-[14px] font-semibold" style={{ color: C.coralDeep }} role="alert">
-                      선택한 날짜에 예약 완료된 객실입니다. 예약현황표에서 다시 선택해 주십시오.
+                      선택한 날짜에 예약 완료된 객실입니다. 예약현황표에서 다시 선택해 주세요.
                     </p>
                   )}
                   {q && (
