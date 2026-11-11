@@ -11,6 +11,13 @@ import { projects } from "@/data/classic/projects";
 // 클래식 상담 신청 폼. 보내는 방식과 필드명은 /landing 폼과 같다(같은 Apps Script 시트에 쌓인다).
 
 export const SERVICES = ["홈페이지 제작", "랜딩페이지 제작", "업무 프로그램 제작", "앱 제작", "키오스크 화면 제작", "유지보수", "상담 후 결정"] as const;
+// 11-11 신청 종류: 견적서를 받거나, 화면 시안을 먼저 받아 본다. ?type=draft 로 시안 의뢰를 미리 고른다
+export const KINDS = [
+  { id: "quote", title: "견적 의뢰", body: "작업 범위, 일정, 비용을 견적서로 받습니다." },
+  { id: "draft", title: "시안 의뢰", body: "첫 화면 시안을 무료로 먼저 보고 진행 여부를 정합니다." },
+] as const;
+type KindId = (typeof KINDS)[number]["id"];
+
 export const BUDGETS = ["30만 원 미만", "30만~50만 원", "50만~100만 원", "100만 원 이상", "협의"] as const;
 
 // 오류가 나면 이 순서대로 첫 칸에 초점을 옮긴다
@@ -82,6 +89,8 @@ export function ContactForm() {
   const msg = params.get("msg") ?? "";
   // 카탈로그 화면의 "이 카탈로그로 상담"은 ?sample=slug 를 붙인다. 이름을 찾아 참고 카탈로그 칸에 넣는다
   const sampleTitle = projects.find((p) => p.id === params.get("sample"))?.title ?? "";
+  const [kind, setKind] = useState<KindId>(params.get("type") === "draft" ? "draft" : "quote");
+  const kindTitle = KINDS.find((k) => k.id === kind)!.title;
   const [service, setService] = useState(site || promo ? "유지보수" : sampleTitle ? "홈페이지 제작" : "");
   const [sample, setSample] = useState(sampleTitle);
   const [budget, setBudget] = useState("");
@@ -130,6 +139,7 @@ export function ContactForm() {
     const q = new URLSearchParams(window.location.search);
     // 시트 칸은 /landing 폼과 같아서, 더한 항목은 문의 내용 앞에 줄로 붙인다
     const extra = [
+      `신청 종류: ${kindTitle}`,
       email.trim() && `이메일: ${email.trim()}`,
       sample.trim() && `참고 카탈로그: ${sample.trim()}`,
       budget && `예산: ${budget}`,
@@ -174,11 +184,11 @@ export function ContactForm() {
     return (
       <div role="status" className="border-t-2 border-[#15171c] pt-8">
         <p className="text-[15px] font-bold tabular-nums text-[#256ef4]">접수 번호 {status.id}</p>
-        <p className="mt-2 text-[26px] font-[800] leading-[1.35] tracking-[-0.03em] md:text-[32px]">상담 신청이 접수되었습니다.</p>
+        <p className="mt-2 text-[26px] font-[800] leading-[1.35] tracking-[-0.03em] md:text-[32px]">{kindTitle}가 접수되었습니다.</p>
         <dl className="mt-8 border-t border-[#e6e9ee] text-[16px]">
           <div className="flex flex-col gap-1 border-b border-[#e6e9ee] py-4 sm:flex-row sm:gap-6">
             <dt className="w-[120px] shrink-0 font-bold text-[#3d4450]">회신</dt>
-            <dd>영업일 기준 24시간 이내에 회신합니다.</dd>
+            <dd>{kind === "draft" ? "영업일 기준 24시간 이내에 시안 범위와 일정을 회신합니다." : "영업일 기준 24시간 이내에 회신합니다."}</dd>
           </div>
           <div className="flex flex-col gap-1 border-b border-[#e6e9ee] py-4 sm:flex-row sm:gap-6">
             <dt className="w-[120px] shrink-0 font-bold text-[#3d4450]">다른 연락 창구</dt>
@@ -206,6 +216,27 @@ export function ContactForm() {
           <p className="rounded-md border border-[#d63d4a] bg-white px-4 py-3 text-[16px] font-bold text-[#d63d4a]">입력 내용 {Object.keys(errors).length}곳을 확인해 주십시오.</p>
         )}
       </div>
+      <fieldset>
+        <legend className={label}>신청 종류</legend>
+        <div className="mt-2 grid gap-2 sm:grid-cols-2">
+          {KINDS.map((k) => {
+            const on = kind === k.id;
+            return (
+              <label
+                key={k.id}
+                className={`flex min-w-0 cursor-pointer gap-3 rounded-md border p-4 transition-colors has-[:focus-visible]:outline has-[:focus-visible]:outline-[3px] has-[:focus-visible]:outline-offset-2 has-[:focus-visible]:outline-[#15171c] motion-reduce:transition-none ${on ? "border-[#256ef4] bg-[#eef4ff]" : "border-[#c9cfd8] bg-white hover:border-[#15171c]"}`}
+              >
+                <input type="radio" name="cc-kind" value={k.id} checked={on} onChange={() => setKind(k.id)} className="mt-1 h-5 w-5 shrink-0 accent-[#256ef4]" />
+                <span className="min-w-0">
+                  <span className={`block text-[17px] font-bold ${on ? "text-[#256ef4]" : "text-[#15171c]"}`}>{k.title}</span>
+                  <span className="mt-1 block break-keep text-[15px] leading-[1.55] text-[#5b6370]">{k.body}</span>
+                </span>
+              </label>
+            );
+          })}
+        </div>
+      </fieldset>
+
       <div className="grid gap-7 md:grid-cols-2 md:gap-6">
         <div className="min-w-0">
           <label htmlFor="cc-name" className={label}>
@@ -285,7 +316,7 @@ export function ContactForm() {
           value={message}
           onChange={(e) => setMessage(e.target.value)}
           rows={6}
-          placeholder="필요한 기능, 고칠 곳, 궁금한 점"
+          placeholder={kind === "draft" ? "업종, 원하는 분위기, 첫 화면에 꼭 넣을 내용" : "필요한 기능, 고칠 곳, 궁금한 점"}
           className={`${field} h-auto py-3 leading-[1.6]`}
           aria-invalid={!!errors.message}
           aria-describedby={errors.message ? "cc-message-err" : undefined}
@@ -321,7 +352,7 @@ export function ContactForm() {
             <ChevronDown size={16} className="transition-transform group-open:rotate-180 motion-reduce:transition-none" aria-hidden />
           </summary>
           <ul className="mt-2 space-y-1">
-            <li>수집 항목: 이름, 휴대폰 번호, 이메일(선택), 회사 또는 상호(업종), 관심 서비스, 예산(선택), 희망 오픈일(선택), 기존 홈페이지 주소(선택), 참고 카탈로그(선택), 문의 내용, 유입 경로(접속 페이지 주소, 이전 페이지 주소)</li>
+            <li>수집 항목: 신청 종류, 이름, 휴대폰 번호, 이메일(선택), 회사 또는 상호(업종), 관심 서비스, 예산(선택), 희망 오픈일(선택), 기존 홈페이지 주소(선택), 참고 카탈로그(선택), 문의 내용, 유입 경로(접속 페이지 주소, 이전 페이지 주소)</li>
             <li>이용 목적: 상담 신청 확인 및 회신</li>
             <li>보관 기간: 상담 종료일부터 1년</li>
             <li>동의를 거부할 수 있으며 거부 시 신청이 제한됩니다.</li>
@@ -341,7 +372,7 @@ export function ContactForm() {
         disabled={status.kind === "sending"}
         className="flex h-14 w-full items-center justify-center rounded-md bg-[#256ef4] text-[18px] font-bold text-white transition-colors hover:bg-[#0b50d0] disabled:opacity-60 motion-reduce:transition-none md:w-[240px]"
       >
-        {status.kind === "sending" ? "접수 중" : "상담 신청"}
+        {status.kind === "sending" ? "접수 중" : `${kindTitle} 보내기`}
       </button>
     </form>
   );
