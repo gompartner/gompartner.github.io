@@ -25,7 +25,7 @@ const areas = [
   { href: "/app", name: "앱 제작", what: "아이폰, 안드로이드 앱과 설치형 웹앱" },
   { href: "/kiosk", name: "키오스크 화면 제작", what: "접수, 출결, 체크인, 안내 키오스크" },
   { href: "/3d", name: "3D 웹 제작", what: "손님이 직접 구성하는 3D 제품 화면과 견적 접수" },
-  { href: "/maintenance", name: "유지보수", what: "오류 수정, 업체 이관, 보안 업데이트, 월 관리" },
+  { href: "/maintenance", name: "유지보수", what: "오류 수정, 업체 이관, 보안 업데이트, 월 유지보수" },
 ];
 
 export default function ClassicStoryPage() {

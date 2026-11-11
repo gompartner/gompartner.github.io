@@ -114,7 +114,7 @@ const allInsights: Insight[] = [
     },
     service: {
       href: "/maintenance/monthly",
-      label: "월 관리 서비스 보기"
+      label: "월 유지보수 서비스 보기"
     }
   },
   {
@@ -1412,7 +1412,7 @@ const allInsights: Insight[] = [
     },
     service: {
       href: "/maintenance/monthly",
-      label: "월 관리 서비스 보기"
+      label: "월 유지보수 서비스 보기"
     }
   },
   {
@@ -1704,7 +1704,7 @@ const allInsights: Insight[] = [
     },
     service: {
       href: "/maintenance/monthly",
-      label: "월 관리 서비스 보기"
+      label: "월 유지보수 서비스 보기"
     }
   },
   {
@@ -2043,7 +2043,7 @@ const allInsights: Insight[] = [
     },
     service: {
       href: "/maintenance/monthly",
-      label: "월 관리 서비스 보기"
+      label: "월 유지보수 서비스 보기"
     }
   },
   {
@@ -2340,7 +2340,7 @@ const allInsights: Insight[] = [
     },
     service: {
       href: "/maintenance/monthly",
-      label: "월 관리 서비스 보기"
+      label: "월 유지보수 서비스 보기"
     }
   },
   {
@@ -2542,7 +2542,7 @@ const allInsights: Insight[] = [
     },
     service: {
       href: "/maintenance/monthly",
-      label: "월 관리 서비스 보기"
+      label: "월 유지보수 서비스 보기"
     }
   },
   {
@@ -2698,7 +2698,7 @@ const allInsights: Insight[] = [
     },
     service: {
       href: "/maintenance/monthly",
-      label: "월 관리 서비스 보기"
+      label: "월 유지보수 서비스 보기"
     }
   },
   {
@@ -2845,7 +2845,7 @@ const allInsights: Insight[] = [
     },
     service: {
       href: "/maintenance/monthly",
-      label: "월 관리 서비스 보기"
+      label: "월 유지보수 서비스 보기"
     }
   },
   {
@@ -3404,7 +3404,7 @@ const allInsights: Insight[] = [
     },
     service: {
       href: "/maintenance/monthly",
-      label: "월 관리 서비스 보기"
+      label: "월 유지보수 서비스 보기"
     }
   },
   {
@@ -3573,7 +3573,7 @@ const allInsights: Insight[] = [
     },
     service: {
       href: "/maintenance/monthly",
-      label: "월 관리 서비스 보기"
+      label: "월 유지보수 서비스 보기"
     }
   },
   {
@@ -4039,7 +4039,7 @@ const allInsights: Insight[] = [
     },
     service: {
       href: "/maintenance/monthly",
-      label: "월 관리 서비스 보기"
+      label: "월 유지보수 서비스 보기"
     }
   },
   {
@@ -5199,7 +5199,7 @@ const allInsights: Insight[] = [
     },
     service: {
       href: "/maintenance/monthly",
-      label: "월 관리 서비스 보기"
+      label: "월 유지보수 서비스 보기"
     }
   },
   {
@@ -5884,7 +5884,7 @@ const allInsights: Insight[] = [
     },
     service: {
       href: "/maintenance/monthly",
-      label: "월 관리 서비스 보기"
+      label: "월 유지보수 서비스 보기"
     }
   },
   {
@@ -6467,7 +6467,7 @@ const allInsights: Insight[] = [
     },
     service: {
       href: "/maintenance/monthly",
-      label: "월 관리 서비스 보기"
+      label: "월 유지보수 서비스 보기"
     }
   },
   {
@@ -7119,7 +7119,7 @@ const allInsights: Insight[] = [
     },
     service: {
       href: "/maintenance/monthly",
-      label: "월 관리 서비스 보기"
+      label: "월 유지보수 서비스 보기"
     }
   },
   {
@@ -7395,7 +7395,7 @@ const allInsights: Insight[] = [
     },
     service: {
       href: "/maintenance/monthly",
-      label: "월 관리 서비스 보기"
+      label: "월 유지보수 서비스 보기"
     }
   },
   {

@@ -163,10 +163,10 @@ const heroSlides = [
   },
   {
     key: "monthly",
-    tab: "월 관리",
+    tab: "월 유지보수",
     w: 1060,
     h: 714,
-    title: "월 관리",
+    title: "월 유지보수",
     sub: "문구, 사진, 공지 수정과 정기 점검을 매달 맡습니다",
     points: ["월 건수 단위 계약", "도메인, SSL 만료 알림", "월간 점검 보고서"],
     href: "/maintenance/monthly",

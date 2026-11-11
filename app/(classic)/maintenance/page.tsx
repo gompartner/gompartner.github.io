@@ -12,8 +12,8 @@ import { pageMeta } from "@/lib/seo";
 import { KAKAO_COUPON_URL, siteUrl } from "@/lib/site";
 
 export const metadata: Metadata = pageMeta({
-  title: "홈페이지 유지보수, 유지관리 (오류 수정, 업체 이관, 보안 업데이트, 월 관리)",
-  description: "홈페이지 유지보수, 유지관리 업체 곰파트너. 다른 업체가 만든 사이트의 긴급 오류 수정, 연락 두절 업체 인수, 워드프레스, 그누보드, PHP 보안 업데이트, 월 관리 월 9만 원부터(부가세 별도).",
+  title: "홈페이지 유지보수, 유지관리 (오류 수정, 업체 이관, 보안 업데이트, 월 유지보수)",
+  description: "홈페이지 유지보수, 유지관리 업체 곰파트너. 다른 업체가 만든 사이트의 긴급 오류 수정, 연락 두절 업체 인수, 워드프레스, 그누보드, PHP 보안 업데이트, 월 유지보수 월 9만 원부터(부가세 별도).",
   path: "/maintenance",
 });
 

@@ -30,7 +30,7 @@ export function buildSearchIndex(): SearchItem[] {
     ...makeExtras.map((m) => ({ kind: "서비스" as const, title: m.title, desc: m.lead, href: `/${m.id}`, hay: [m.metaDescription, ...m.scope.flatMap((g) => g.items), ...m.forWhom].join(" ") })),
     { kind: "서비스", title: threeMeta.title, desc: threeMeta.lead, href: "/3d", hay: ["3D 쓰리디 견적 컨피규레이터 쇼룸 가구 중문 간판 인테리어", threeMeta.metaDescription, ...threeScope.flatMap((g) => g.items), ...threeForWhom].join(" ") },
     ...threeFaq.map((f) => ({ kind: "자주 묻는 질문" as const, title: f.q, desc: f.a, href: "/3d#t3d-faq", hay: threeMeta.title })),
-    { kind: "서비스", title: "홈페이지 유지보수", desc: "오류 수정, 업체 변경, 보안 업데이트, 월 관리", href: "/maintenance", hay: "유지보수 관리 수정" },
+    { kind: "서비스", title: "홈페이지 유지보수", desc: "오류 수정, 업체 변경, 보안 업데이트, 월 유지보수", href: "/maintenance", hay: "유지보수 관리 수정" },
     ...maintenanceServices.map((s) => ({
       kind: "서비스" as const,
       title: s.h1,

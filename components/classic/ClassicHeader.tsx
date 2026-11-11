@@ -28,7 +28,7 @@ export const classicMenu = [
       { href: "/maintenance/takeover", label: "업체 변경" },
       { href: "/maintenance/fix", label: "오류 수정" },
       { href: "/maintenance/update", label: "보안 업데이트" },
-      { href: "/maintenance/monthly", label: "월 관리" },
+      { href: "/maintenance/monthly", label: "월 유지보수" },
     ],
   },
   {
