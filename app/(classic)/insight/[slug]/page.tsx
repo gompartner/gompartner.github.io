@@ -2,7 +2,7 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import { PageHead, btnLine, btnPrimary, wrap } from "@/components/classic/ui";
-import { insightBySlug, insights, scheduledNext } from "@/data/classic/insights";
+import { insightBySlug, insights, scheduledNext, readMinutes } from "@/data/classic/insights";
 import { LdScript } from "@/components/seo/JsonLd";
 import { ORG_ID, breadcrumbLd, pageMeta } from "@/lib/seo";
 import { siteUrl } from "@/lib/site";
@@ -78,6 +78,9 @@ export default async function ClassicInsightDetailPage({ params }: Props) {
               <span className="font-bold text-[#256ef4]">
                 {n.series} {n.no}편
               </span>
+              {/* 11-12 사용자: 인사이트에 날짜 넣기 */}
+              <time dateTime={n.date} className="tabular-nums text-[#5b6370]">{n.date.replaceAll("-", ".")}</time>
+              <span className="tabular-nums text-[#5b6370]">읽는 시간 {readMinutes(n)}분</span>
             </header>
             <div className="space-y-9 py-8 md:py-10">
               {n.blocks.map((b, bi) => (
@@ -134,26 +137,31 @@ export default async function ClassicInsightDetailPage({ params }: Props) {
                     <>
                       {/* 휴대폰은 줄마다 카드로, md부터 표로 */}
                       <ul className="space-y-2 md:hidden" role="list">
-                        {b.table.rows.map((r) => (
+                        {b.table.rows.map((r) => {
+                          // 첫 칸이 순번 숫자뿐이면 둘째 칸과 합쳐 제목으로 ("1. 장애")
+                          const num = /^\d+$/.test(r[0]) && r.length > 2;
+                          const start = num ? 2 : 1;
+                          return (
                           <li
                             key={r[0]}
                             className="rounded-md bg-[#f6f7f9] p-4"
                           >
                             <b className="block text-[17px] font-[800]">
-                              {r[0]}
+                              {num ? `${r[0]}. ${r[1]}` : r[0]}
                             </b>
                             <dl className="mt-2 grid grid-cols-[72px_minmax(0,1fr)] gap-x-3 gap-y-1.5 text-[15px] leading-[1.6]">
-                              {r.slice(1).map((c, ci) => (
+                              {r.slice(start).map((c, ci) => (
                                 <div key={ci} className="contents">
                                   <dt className="text-[#6b7280]">
-                                    {b.table!.head[ci + 1]}
+                                    {b.table!.head[ci + start]}
                                   </dt>
                                   <dd className="text-[#3d4450]">{c}</dd>
                                 </div>
                               ))}
                             </dl>
                           </li>
-                        ))}
+                          );
+                        })}
                       </ul>
                       <div className="hidden md:block">
                         <table className="w-full border-collapse border-t-2 border-[#15171c] text-left text-[15px] md:text-[16px]">
