@@ -9,7 +9,7 @@ export const PHP_PROMO_END = "2026년 12월 31일";
 export function PhpPromo({ id = "php-promo" }: { id?: string }) {
   return (
     <section aria-labelledby={id} className="bg-[#256ef4] text-white">
-      <div className="mx-auto grid w-full max-w-[1248px] gap-6 px-4 py-8 md:px-6 md:py-10 lg:grid-cols-[1fr_480px] lg:items-center lg:gap-12">
+      <div className="mx-auto grid w-full max-w-[1248px] grid-cols-1 gap-6 px-4 py-8 md:px-6 md:py-10 lg:grid-cols-[1fr_480px] lg:items-center lg:gap-12">
         <div>
           <p className="text-[14px] font-bold text-white">{PHP_PROMO_END}까지</p>
           <h2 id={id} className="mt-1 text-[24px] font-[800] leading-[1.3] tracking-[-0.04em] md:text-[30px]">

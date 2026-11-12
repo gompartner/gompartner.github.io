@@ -296,7 +296,7 @@ function Hero() {
               aria-hidden={i !== pos}
               className="w-full shrink-0"
             >
-              <div className="mx-auto grid w-full max-w-[1248px] items-center gap-10 px-4 pb-8 pt-12 md:min-h-[620px] md:grid-cols-[1fr_1.15fr] md:gap-14 md:px-6 md:pb-10 md:pt-16">
+              <div className="mx-auto grid w-full max-w-[1248px] grid-cols-1 items-center gap-10 px-4 pb-8 pt-12 md:min-h-[620px] md:grid-cols-[1fr_1.15fr] md:gap-14 md:px-6 md:pb-10 md:pt-16">
                 <div>
                   <p className="break-keep text-[40px] font-[800] leading-[1.12] tracking-[-0.05em] md:text-[64px]">
                     {sl.title}
