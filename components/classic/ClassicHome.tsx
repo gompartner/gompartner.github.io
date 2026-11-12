@@ -112,9 +112,10 @@ export function ClassicHome({ stories = [] }: { stories?: HomeStory[] }) {
   return (
     <div className="bg-white text-[#15171c]">
       <Hero />
+      {/* 11-12 리뉴얼: 두 번째 칸은 납품 기준(계약 실적이 생기기 전까지 사례 자리 대신). 프로모션 두 띠는 기간 끝나면 스스로 내려간다 */}
+      <Strengths />
       <TakeoverFreePromo />
       <PhpPromo />
-      <Strengths />
       <Services />
       {stories.length > 0 && <OpsStories stories={stories} />}
       <PriceBand />

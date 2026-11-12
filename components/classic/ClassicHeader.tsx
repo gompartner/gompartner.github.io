@@ -13,13 +13,7 @@ import { cn } from "@/lib/utils";
 
 // match는 그 메뉴를 켜는 주소. 한 주소가 두 메뉴를 켜지 않게 겹치지 않게 둔다.
 export const classicMenu = [
-  {
-    label: "회사소개",
-    href: "/story",
-    match: ["/story"],
-    items: [],
-  },
-  // 11-06 이어받기 집중: 유지보수를 제작 앞에
+  // 11-12 리뉴얼: 상단은 유지보수, 제작, 비용(+오른쪽 상담 신청 버튼). 회사소개, 공지, 인사이트, 자주 묻는 질문은 바닥글과 휴대폰 메뉴 아래로
   {
     label: "유지보수",
     href: "/maintenance",
@@ -45,22 +39,17 @@ export const classicMenu = [
       { href: "/3d", label: "3D 웹 제작" },
     ],
   },
-  // 11-07 카탈로그는 메뉴에서 뺌. 티스토리, 크몽 링크로 들어온 사람만 본다(주소는 살아 있음)
-  // 고객 사례는 실제 사례가 생기면 data/classic/cases.ts에 넣는 순간 메뉴에 나온다
+  { label: "비용", href: "/pricing", match: ["/pricing"], items: [] },
+  // 고객 사례는 계약 끝나고 게재 동의를 받은 실제 사례가 data/classic/cases.ts에 들어가는 순간 메뉴에 나온다(그 전엔 빈 값, 메뉴와 페이지 없음)
   ...(cases.length > 0 ? [{ label: "고객 사례", href: "/cases", match: ["/cases"], items: [] }] : []),
-  {
-    label: "고객지원",
-    href: "/faq",
-    match: ["/notice", "/insight", "/tools", "/faq", "/contact", "/privacy"],
-    // 11-04 인사이트는 글이 쌓일 때까지 고객지원 안(공지사항 옆)에 둔다
-    items: [
-      { href: "/notice", label: "공지사항" },
-      { href: "/insight", label: "인사이트" },
-      { href: "/tools", label: "자료실" },
-      { href: "/faq", label: "자주 묻는 질문" },
-      { href: "/contact", label: "상담 신청" },
-    ],
-  },
+];
+
+// 휴대폰 메뉴 아래 작은 줄(PC는 바닥글)
+const subMenu = [
+  { href: "/story", label: "회사소개" },
+  { href: "/notice", label: "공지사항" },
+  { href: "/insight", label: "인사이트" },
+  { href: "/faq", label: "자주 묻는 질문" },
 ];
 
 
@@ -286,6 +275,15 @@ export function ClassicHeader() {
               )}
             </section>
           ))}
+          <ul className="mt-4 grid grid-cols-2 gap-x-4" role="list">
+            {subMenu.map((i) => (
+              <li key={i.href}>
+                <NavLink href={i.href} aria-current={pathname === i.href ? "page" : undefined} className="block py-2 text-[15px] text-[#5b6370]">
+                  {i.label}
+                </NavLink>
+              </li>
+            ))}
+          </ul>
           <Link href="/contact" className="mt-6 flex h-12 items-center justify-center rounded-md bg-[#256ef4] text-[16px] font-bold text-white">
             상담 신청
           </Link>

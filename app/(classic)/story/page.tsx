@@ -70,7 +70,7 @@ export default function ClassicStoryPage() {
       <section id="career" aria-labelledby="st-career" className={section}>
         <div className={`${wrap} py-16 md:py-24`}>
           <h2 id="st-career" className={h2}>
-            주요 경력
+            대표 경력
           </h2>
           <p className="mt-3 max-w-[760px] break-keep text-[17px] leading-[1.75] text-[#3d4450]">{careerIntro}</p>
           <div className="mt-10 grid gap-10">

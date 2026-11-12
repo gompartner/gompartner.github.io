@@ -56,6 +56,7 @@ export default function sitemap(): MetadataRoute.Sitemap {
     { path: "/maintenance", priority: 0.9, files: ["app/(classic)/maintenance/page.tsx", maintenanceData] },
     ...maintenanceServices.map((m) => ({ path: `/maintenance/${m.id}`, priority: 0.9, files: ["app/(classic)/maintenance/[id]/page.tsx", maintenanceData] })),
 
+    { path: "/pricing", priority: 0.8, files: ["app/(classic)/pricing/page.tsx", "data/classic/pricing.ts"] },
     { path: "/story", priority: 0.7, files: ["app/(classic)/story/page.tsx", "data/classic/about.ts"] },
     { path: "/faq", priority: 0.7, files: ["app/(classic)/faq/page.tsx", "data/classic/faq.ts"] },
     { path: "/contact", priority: 0.7, files: ["app/(classic)/contact/page.tsx"] },
