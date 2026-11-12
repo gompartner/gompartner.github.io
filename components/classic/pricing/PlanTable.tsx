@@ -16,8 +16,38 @@ export function PlanTable({ plans, product, common = planCommon }: { plans: Plan
       ))}
     </ul>
   );
+  // 11-12 휴대폰은 옆으로 미는 표 대신 패키지마다 카드 한 장씩 아래로 쌓는다(사용자 요청). md부터 표
+  const row = "flex justify-between gap-4 border-b border-[#e6e9ee] py-3 text-[16px]";
   return (
-    <div tabIndex={0} className="-mx-4 mt-10 overflow-x-auto px-4 md:mx-0 md:px-0">
+    <>
+    <ul className="mt-10 space-y-6 md:hidden" role="list" aria-label={`${product} 패키지`}>
+      {plans.map((p) => (
+        <li key={p.id} className="border-t-2 border-[#15171c] pt-5">
+          <p className="text-[20px] font-[800] tracking-[-0.03em]">{p.title}</p>
+          <p className="mt-1 text-[15px] text-[#5b6370]">{p.summary}</p>
+          <p className="mt-3 text-[26px] font-extrabold tabular-nums tracking-[-0.03em] text-[#256ef4]">{formatWon(p.price)}</p>
+          <div className="mt-3 border-t border-[#e6e9ee]">
+            <div className={row}>
+              <span className="font-bold text-[#3d4450]">작업 기간</span>
+              <span className="tabular-nums">{p.period ?? `${p.days}일`}</span>
+            </div>
+            {p.revisions > 0 && (
+              <div className={row}>
+                <span className="font-bold text-[#3d4450]">수정 횟수</span>
+                <span className="tabular-nums">{p.revisions}회</span>
+              </div>
+            )}
+          </div>
+          <div className="mt-4 text-[16px] leading-[1.6]">{list(p.includes)}</div>
+        </li>
+      ))}
+      <li className="rounded-md bg-[#f6f7f9] p-4">
+        <p className="text-[15px] font-bold text-[#3d4450]">모든 패키지 공통 포함</p>
+        <div className="mt-2 text-[15px] leading-[1.6]">{list(common)}</div>
+      </li>
+      <li className="text-right text-[14px] text-[#5b6370]">부가세 별도, 작업 기간은 자료 전달일 기준</li>
+    </ul>
+    <div tabIndex={0} className="mt-10 hidden overflow-x-auto md:block">
       <table className="w-full min-w-[720px] border-collapse border-t-2 border-[#15171c]">
         <caption className="sr-only">{product} 패키지 비교</caption>
         <thead>
@@ -99,5 +129,6 @@ export function PlanTable({ plans, product, common = planCommon }: { plans: Plan
       </table>
       <p className="mt-3 text-right text-[14px] text-[#5b6370]">부가세 별도, 작업 기간은 자료 전달일 기준</p>
     </div>
+    </>
   );
 }
