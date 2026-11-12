@@ -105,7 +105,10 @@ export function InsightList({ rows }: { rows: InsightRow[] }) {
                   )}
                 </span>
                 {n.summary ? <span className="mt-2 hidden text-[16px] leading-[1.6] text-[#5b6370] md:line-clamp-2">{n.summary}</span> : null}
-                {n.kind === "own" ? <span className="mt-2 block text-[14px] tabular-nums text-[#6b7280]">읽는 시간 {n.minutes}분</span> : null}
+                <span className="mt-2 flex gap-3 text-[14px] tabular-nums text-[#6b7280]">
+                  <time dateTime={n.date}>{n.date.replaceAll("-", ".")}</time>
+                  {n.kind === "own" ? <span>읽는 시간 {n.minutes}분</span> : null}
+                </span>
               </div>
               {n.kind === "own" ? (
                 <Image src={n.image} alt={n.title} width={1200} height={675} sizes="(min-width: 768px) 280px, 120px" className="w-[120px] shrink-0 rounded-md border border-[#e6e9ee] md:mt-1 md:w-[280px]" />

@@ -4,6 +4,255 @@ export type ChannelPost = { source: ChannelSource; id: string; title: string; da
 export const channelPosts: ChannelPost[] = [
   {
     "source": "youtube",
+    "id": "8JJEExhkgJk",
+    "title": "후기 페이지에 손님 연락처가 2년 동안 열려 있었어요, 우리 후기 게시판 1분 점검",
+    "date": "2026-11-12",
+    "url": "https://www.youtube.com/shorts/8JJEExhkgJk",
+    "desc": "여행 예약 사이트 줌줌투어가 후기 페이지 데이터에 예약자 연락처, 동행자 이름과 나이 같은 정보가 들어 있었다고 11월 6일 공지했습니다(2024년 11월 6일부터 2026년 11월 4일까지). 화면엔 별점과 글만 보였지만, 방문자나 검색엔진이 받아볼 수 있는 상태였습니다. PC에서 우",
+    "tags": [
+      "사장님IT",
+      "홈페이지관리",
+      "개인정보"
+    ],
+    "thumb": "https://i.ytimg.com/vi/8JJEExhkgJk/hqdefault.jpg"
+  },
+  {
+    "source": "naver",
+    "id": "224472355292",
+    "title": "줌줌투어 후기 페이지 개인정보 노출, 우리 후기 게시판도 1분 점검",
+    "date": "2026-11-12",
+    "url": "https://blog.naver.com/gompartner/224472355292",
+    "desc": "화면에는 별점과 글만 보였어요. 그런데 그 페이지 데이터에는 예약자 연락처와 이메일, 동행자 이름과 나이까지 들어 있었어요. 여행 예약 사이트 줌줌투어의 후기 페이지예요. 무슨 일이 있었나요? 줌줌투어는 11월 6일 대표 이름으로 공지를 냈어요. 후기 페이지를 만들 때 개발 실수가 있었",
+    "tags": [
+      "줌줌투어",
+      "줌줌투어개인정보",
+      "후기게시판",
+      "리뷰개인정보",
+      "개인정보노출",
+      "쇼핑몰보안",
+      "개발자도구",
+      "홈페이지점검"
+    ]
+  },
+  {
+    "source": "youtube",
+    "id": "E5ZZ4BtUC4g",
+    "title": "클로드 코드에 넣은 키, 설정 파일에 그대로 남아요, settings.local.json 1분 점검",
+    "date": "2026-11-11",
+    "url": "https://www.youtube.com/shorts/E5ZZ4BtUC4g",
+    "desc": "보안 회사 Apiiro가 공개 GitHub 저장소에서 비밀값이 든 클로드 코드 설정 파일(.claude/settings.local.json) 1,122개를 찾았습니다(11월 5일 발표). 명령 앞에 키를 붙여 실행을 허락하면서 '다시 묻지 않기'를 고르면, 그 명령이 키째로 이 파일에 ",
+    "tags": [
+      "클로드코드",
+      "ClaudeCode",
+      "보안점검"
+    ],
+    "thumb": "https://i.ytimg.com/vi/E5ZZ4BtUC4g/hqdefault.jpg"
+  },
+  {
+    "source": "naver",
+    "id": "224472731352",
+    "title": "훔친 AI 키로 하루 10만 달러 요금, 우리 홈페이지 AI 상담봇 키도 1분 점검",
+    "date": "2026-11-11",
+    "url": "https://blog.naver.com/gompartner/224472731352",
+    "desc": "하루 만에 10만 달러가 넘는 요금이 청구됐어요. 회사가 쓴 게 아니에요. 누군가 훔친 AI 키로 대신 쓴 요금이에요. 구글이 이런 공격을 LLMjacking이라고 불러요. 무슨 일이 있었나요? 구글 위협정보그룹과 맨디언트가 보고서를 냈어요. 11월 3일 해외 보안 매체들이 일제히 다뤘",
+    "tags": [
+      "LLMjacking",
+      "AI키유출",
+      "API키유출",
+      "AI요금폭탄",
+      "오픈AI요금",
+      "AI상담봇",
+      "챗봇보안",
+      "홈페이지점검"
+    ]
+  },
+  {
+    "source": "naver",
+    "id": "224472232563",
+    "title": "클로드 코드 settings.local.json에 API 키가 그대로? 직접 해 봤습니다",
+    "date": "2026-11-11",
+    "url": "https://blog.naver.com/gompartner/224472232563",
+    "desc": "1,122개. 보안 회사 Apiiro가 공개 GitHub 저장소에서 클로드 코드 설정 파일 104,185개를 살펴봤어요. 그중 1,122개에 진짜 비밀값이 들어 있었어요. 정말 키가 그대로 남는지 직접 해 봤어요. 어떤 파일인가요? 프로젝트 폴더 안의 .claude/settings.lo",
+    "tags": [
+      "클로드코드",
+      "ClaudeCode",
+      "클로드코드설정",
+      "API키유출",
+      "깃허브비밀값",
+      "클로드코드보안",
+      "gitignore",
+      "Apiiro"
+    ]
+  },
+  {
+    "source": "naver",
+    "id": "224471012272",
+    "title": "아임웹 PC에서 고쳤는데 모바일은 그대로예요, 섹션이 따로인지부터 보세요",
+    "date": "2026-11-11",
+    "url": "https://blog.naver.com/gompartner/224471012272",
+    "desc": "PC에서 문구를 고치고 게시까지 눌렀는데, 휴대폰으로 열면 예전 글이 그대로예요. 고장은 아니에요. 아임웹 첫 화면이 PC용과 모바일용으로 나뉘어 있을 수 있어요. 왜 한쪽만 바뀌나요? 아임웹에는 모바일 전용 섹션이 있어요. 휴대폰에서만 보이는 칸이라 PC를 고쳐도 여기는 바뀌지 않아요",
+    "tags": [
+      "아임웹모바일",
+      "아임웹모바일수정",
+      "아임웹모바일전용섹션",
+      "아임웹디자인모드",
+      "아임웹템플릿",
+      "아임웹쇼핑몰",
+      "홈페이지모바일",
+      "아임웹수정"
+    ]
+  },
+  {
+    "source": "youtube",
+    "id": "YZ5yGGwSCZQ",
+    "title": "정부가 HWP를 HWPX로 바꾼대요, 우리 홈페이지 공지 1분 점검",
+    "date": "2026-11-10",
+    "url": "https://www.youtube.com/shorts/YZ5yGGwSCZQ",
+    "desc": "행정안전부가 공공문서를 HWPX로 전면 전환하는 방안을 검토하고 있습니다(11월 9일 보도). 정부 문서를 AI가 다루기 쉬운 형식으로 바꾸려는 것입니다. 우리 홈페이지 공지와 신청서가 HWP로만 올라가 있다면, 아이폰 손님은 앱을 깔아야 열 수 있습니다. 본문에 핵심 내용을 글로 적고",
+    "tags": [
+      "사장님IT",
+      "홈페이지관리",
+      "HWPX"
+    ],
+    "thumb": "https://i.ytimg.com/vi/YZ5yGGwSCZQ/hqdefault.jpg"
+  },
+  {
+    "source": "youtube",
+    "id": "Txl9HTNF6r0",
+    "title": "화면에 박힌 API 키 | AI로 만든 사이트 운영 노하우 2편",
+    "date": "2026-11-10",
+    "url": "https://www.youtube.com/watch?v=Txl9HTNF6r0",
+    "desc": "AI로 만든 사이트 운영 노하우 2편, 화면에 박힌 API 키. 실제로 공개된 사고와 취약점을 바탕으로, 코드를 몰라도 확인할 수 있는 방법을 설명합니다. 바탕 자료: RedHunt Labs 바이브코딩 사이트 약 13만 개 조사(OpenAI 키가 노출 비밀값의 12%), 연습 서버 재현",
+    "tags": [],
+    "thumb": "https://i.ytimg.com/vi/Txl9HTNF6r0/hqdefault.jpg"
+  },
+  {
+    "source": "youtube",
+    "id": "TrcGT0m41oM",
+    "title": "넘겨받은 AI 사이트, 처음 30분 | AI로 만든 사이트 운영 노하우 1편",
+    "date": "2026-11-10",
+    "url": "https://www.youtube.com/watch?v=TrcGT0m41oM",
+    "desc": "AI로 만든 사이트 운영 노하우 1편, 넘겨받은 AI 사이트, 처음 30분. 실제로 공개된 사고와 취약점을 바탕으로, 코드를 몰라도 확인할 수 있는 방법을 설명합니다. 바탕 자료: 곰파트너 바이브코딩 점검 항목 정리 오늘 정리 1. 다섯 조각(만든 도구, GitHub, 배포, DB, 도",
+    "tags": [],
+    "thumb": "https://i.ytimg.com/vi/TrcGT0m41oM/hqdefault.jpg"
+  },
+  {
+    "source": "youtube",
+    "id": "RYOUyRti210",
+    "title": "GitHub에 올라간 비밀값 | AI로 만든 사이트 운영 노하우 5편",
+    "date": "2026-11-10",
+    "url": "https://www.youtube.com/watch?v=RYOUyRti210",
+    "desc": "AI로 만든 사이트 운영 노하우 5편, GitHub에 올라간 비밀값. 실제로 공개된 사고와 취약점을 바탕으로, 코드를 몰라도 확인할 수 있는 방법을 설명합니다. 바탕 자료: 공개 GitHub 저장소 하드코딩 AI 키 다수 보고(보안 업체 조사), GitHub 비밀값 검사 기능 오늘 정리",
+    "tags": [],
+    "thumb": "https://i.ytimg.com/vi/RYOUyRti210/hqdefault.jpg"
+  },
+  {
+    "source": "youtube",
+    "id": "MF97P7KERNU",
+    "title": "매달 30분 점검표 | AI로 만든 사이트 운영 노하우 10편",
+    "date": "2026-11-10",
+    "url": "https://www.youtube.com/watch?v=MF97P7KERNU",
+    "desc": "AI로 만든 사이트 운영 노하우 10편, 매달 30분 점검표. 실제로 공개된 사고와 취약점을 바탕으로, 코드를 몰라도 확인할 수 있는 방법을 설명합니다. 바탕 자료: 1~9편 정리 오늘 정리 1. 계정과 키 (10분): 관리자 목록, 결제 카드, 화면 속 비밀 키 2. DB와 저장소 (",
+    "tags": [],
+    "thumb": "https://i.ytimg.com/vi/MF97P7KERNU/hqdefault.jpg"
+  },
+  {
+    "source": "youtube",
+    "id": "kWbDv0zmWXE",
+    "title": "AI로 만든 사이트 업데이트 | AI로 만든 사이트 운영 노하우 9편",
+    "date": "2026-11-10",
+    "url": "https://www.youtube.com/watch?v=kWbDv0zmWXE",
+    "desc": "AI로 만든 사이트 운영 노하우 9편, AI로 만든 사이트 업데이트. 실제로 공개된 사고와 취약점을 바탕으로, 코드를 몰라도 확인할 수 있는 방법을 설명합니다. 바탕 자료: 6편 Next.js 사례, npm 보안 점검 명령, GitHub Dependabot 기능 오늘 정리 1. 한 달에",
+    "tags": [],
+    "thumb": "https://i.ytimg.com/vi/kWbDv0zmWXE/hqdefault.jpg"
+  },
+  {
+    "source": "youtube",
+    "id": "jh0y3_hBwRs",
+    "title": "공개 키 하나로 열린 DB, RLS 잠금 | AI로 만든 사이트 운영 노하우 3편",
+    "date": "2026-11-10",
+    "url": "https://www.youtube.com/watch?v=jh0y3_hBwRs",
+    "desc": "AI로 만든 사이트 운영 노하우 3편, 공개 키 하나로 열린 DB, RLS 잠금. 실제로 공개된 사고와 취약점을 바탕으로, 코드를 몰라도 확인할 수 있는 방법을 설명합니다. 바탕 자료: CVE-2025-48757 (Lovable 앱 Supabase RLS 미설정, 공개 앱 170개) 오",
+    "tags": [],
+    "thumb": "https://i.ytimg.com/vi/jh0y3_hBwRs/hqdefault.jpg"
+  },
+  {
+    "source": "youtube",
+    "id": "eWQMQBPC2A4",
+    "title": "열려 있던 파일 저장소 | AI로 만든 사이트 운영 노하우 4편",
+    "date": "2026-11-10",
+    "url": "https://www.youtube.com/watch?v=eWQMQBPC2A4",
+    "desc": "AI로 만든 사이트 운영 노하우 4편, 열려 있던 파일 저장소. 실제로 공개된 사고와 취약점을 바탕으로, 코드를 몰라도 확인할 수 있는 방법을 설명합니다. 바탕 자료: Tea 앱 유출(2025년 7월, Firebase 저장소, 이미지 약 7만 2천 장) 오늘 정리 1. 사진과 파일은 저",
+    "tags": [],
+    "thumb": "https://i.ytimg.com/vi/eWQMQBPC2A4/hqdefault.jpg"
+  },
+  {
+    "source": "youtube",
+    "id": "8Y-RXwqsEqM",
+    "title": "관리자 페이지 잠금은 세 겹으로 | AI로 만든 사이트 운영 노하우 6편",
+    "date": "2026-11-10",
+    "url": "https://www.youtube.com/watch?v=8Y-RXwqsEqM",
+    "desc": "AI로 만든 사이트 운영 노하우 6편, 관리자 페이지 잠금은 세 겹으로. 실제로 공개된 사고와 취약점을 바탕으로, 코드를 몰라도 확인할 수 있는 방법을 설명합니다. 바탕 자료: Next.js CVE-2025-29927 (미들웨어 인증 우회, 고친 버전 12.3.5, 13.5.9, 14.",
+    "tags": [],
+    "thumb": "https://i.ytimg.com/vi/8Y-RXwqsEqM/hqdefault.jpg"
+  },
+  {
+    "source": "youtube",
+    "id": "5JOucc0wnTE",
+    "title": "AI가 운영 DB를 지웠을 때 | AI로 만든 사이트 운영 노하우 7편",
+    "date": "2026-11-10",
+    "url": "https://www.youtube.com/watch?v=5JOucc0wnTE",
+    "desc": "AI로 만든 사이트 운영 노하우 7편, AI가 운영 DB를 지웠을 때. 실제로 공개된 사고와 취약점을 바탕으로, 코드를 몰라도 확인할 수 있는 방법을 설명합니다. 바탕 자료: Replit AI 에이전트 운영 DB 삭제 (SaaStr, 2025년 7월) 오늘 정리 1. 개발 DB와 운영 ",
+    "tags": [],
+    "thumb": "https://i.ytimg.com/vi/5JOucc0wnTE/hqdefault.jpg"
+  },
+  {
+    "source": "tistory",
+    "id": "49",
+    "title": "아임웹 홈페이지 의뢰 글 120건을 세어 보니, 디자인보다 먼저 묻는 것",
+    "date": "2026-11-10",
+    "url": "https://gompartner.tistory.com/49",
+    "desc": "\"제작비와 아임웹 이용료, 도메인 같은 운영비를 구분해 안내해 주세요.\" 아임웹 의뢰 게시판에서 읽은 한 줄이다. 디자인 이야기보다 앞에 있었다. 1편에서 샘플 20개의 업종을 의뢰 글을 세어 정했다고 썼다. 이번 편은 그 글들을 다시 읽은 기록이다. 몇 건이 무엇을 물었는지 세었고, ",
+    "tags": [
+      "곰파트너",
+      "아임웹운영비",
+      "아임웹의뢰",
+      "아임웹전문가",
+      "아임웹홈페이지제작",
+      "홈페이지견적"
+    ],
+    "thumb": "https://blog.kakaocdn.net/dn/cao4v9/dJMcahTWaKG/W8nZxDW95VIgcVHhvPuiEk/img.png"
+  },
+  {
+    "source": "youtube",
+    "id": "4-FLXFBwzrs",
+    "title": "요금 폭탄 막기 | AI로 만든 사이트 운영 노하우 8편",
+    "date": "2026-11-10",
+    "url": "https://www.youtube.com/watch?v=4-FLXFBwzrs",
+    "desc": "AI로 만든 사이트 운영 노하우 8편, 요금 폭탄 막기. 실제로 공개된 사고와 취약점을 바탕으로, 코드를 몰라도 확인할 수 있는 방법을 설명합니다. 바탕 자료: 2편 키 노출 사례와 서비스별 사용 한도 기능 정리 오늘 정리 1. 서비스마다 월 한도와 알림 걸기 (평소 2배 알림, 5배 ",
+    "tags": [],
+    "thumb": "https://i.ytimg.com/vi/4-FLXFBwzrs/hqdefault.jpg"
+  },
+  {
+    "source": "naver",
+    "id": "224471030628",
+    "title": "HWP는 AI가 못 읽는다? ChatGPT는 읽는데 정부가 HWPX로 바꾸는 이유",
+    "date": "2026-11-10",
+    "url": "https://blog.naver.com/gompartner/224471030628",
+    "desc": "\"AI가 HWP를 못 읽는다.\" 11월 3일 국무회의에서 나온 보고예요. 정부는 공공문서를 HWPX로 바꾸는 걸 검토하고 있어요. 그런데 ChatGPT에 HWP 파일을 올려 보면 읽어요. 둘 중 누가 틀린 걸까요? 정부가 말한 것 하정우 국가인공지능전략위원회 부위원장의 보고는 정부 문서",
+    "tags": [
+      "HWP",
+      "HWPX",
+      "한글파일",
+      "HWP변환",
+      "공공문서",
+      "ChatGPT한글파일",
+      "홈페이지공지",
+      "HWPX전환"
+    ]
+  },
+  {
+    "source": "youtube",
     "id": "ZmcN2qWTR8Q",
     "title": "넣은 적 없는 광고, 모르는 주소로 튕김 | 그누보드 운영 노하우 7편",
     "date": "2026-11-09",
@@ -40,6 +289,26 @@ export const channelPosts: ChannelPost[] = [
       "홈페이지관리"
     ],
     "thumb": "https://i.ytimg.com/vi/wQn85pIymgA/hqdefault.jpg"
+  },
+  {
+    "source": "youtube",
+    "id": "wjsfYpjfwOk",
+    "title": "스팸 회원가입이 수백 건 들어올 때 | 워드프레스 운영 노하우 9편",
+    "date": "2026-11-09",
+    "url": "https://www.youtube.com/watch?v=wjsfYpjfwOk",
+    "desc": "워드프레스 운영 노하우 9편, 스팸 회원가입이 수백 건 들어올 때. 워드프레스 공식 포럼에 실제로 올라온 질문을 바탕으로 다시 꾸민 사례와, 연습 서버에서 직접 해 본 화면으로 설명합니다. 오늘 정리 1. 필요 없으면 회원가입 닫기 (설정, 일반) 2. 새 사용자 기본 역할은 구독자 3",
+    "tags": [],
+    "thumb": "https://i.ytimg.com/vi/wjsfYpjfwOk/hqdefault.jpg"
+  },
+  {
+    "source": "youtube",
+    "id": "smwhMAw8_gc",
+    "title": "느려진 워드프레스와 매달 30분 점검표 | 워드프레스 운영 노하우 10편",
+    "date": "2026-11-09",
+    "url": "https://www.youtube.com/watch?v=smwhMAw8_gc",
+    "desc": "워드프레스 운영 노하우 10편, 느려진 워드프레스와 매달 30분 점검표. 워드프레스 공식 포럼에 실제로 올라온 질문을 바탕으로 다시 꾸민 사례와, 연습 서버에서 직접 해 본 화면으로 설명합니다. 오늘 정리 1. 버전: 워드프레스, PHP, 사이트 건강 (1, 4편) 2. 백업: DB, ",
+    "tags": [],
+    "thumb": "https://i.ytimg.com/vi/smwhMAw8_gc/hqdefault.jpg"
   },
   {
     "source": "youtube",
@@ -132,6 +401,24 @@ export const channelPosts: ChannelPost[] = [
       "홈페이지관리"
     ],
     "thumb": "https://i.ytimg.com/vi/3gPu9SkceGg/hqdefault.jpg"
+  },
+  {
+    "source": "naver",
+    "id": "224470556108",
+    "title": "리뷰 답글 AI로 쓰는 법, 별점 1점부터 칭찬까지 상황별 문장 10개",
+    "date": "2026-11-09",
+    "url": "https://blog.naver.com/gompartner/224470556108",
+    "desc": "밤 11시, 마감 정리 중에 알림이 하나 떠요. 별점 1점. \"1시간 넘게 걸렸고 다 식었어요.\" 바로 답글을 쓰면 변명이 먼저 나오기 쉬워요. 그 답글은 다음 손님도 봅니다. AI에 맡기면 30초면 돼요. 그대로 붙여 넣을 문장과 상황별 한 줄 10개를 적었어요. AI에 무엇을 붙여 ",
+    "tags": [
+      "리뷰답글",
+      "리뷰답글AI",
+      "리뷰답글예시",
+      "악성리뷰답글",
+      "배달리뷰답글",
+      "챗GPT활용",
+      "네이버리뷰",
+      "사장님AI"
+    ]
   },
   {
     "source": "youtube",

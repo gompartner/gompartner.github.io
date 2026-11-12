@@ -3,6 +3,7 @@ import { PageHead, wrap } from "@/components/classic/ui";
 import { SupportTabs } from "@/components/classic/support/SupportTabs";
 import { InsightList, type InsightRow } from "@/components/classic/support/InsightList";
 import { insights, readMinutes } from "@/data/classic/insights";
+import { channelPosts } from "@/data/classic/channelPosts";
 import { pageMeta } from "@/lib/seo";
 
 export const metadata: Metadata = pageMeta({
@@ -12,13 +13,14 @@ export const metadata: Metadata = pageMeta({
   path: "/insight",
 });
 
-// 인사이트 목록. 토스, 요즘IT 글 목록처럼 왼쪽에 묶음 이름, 제목, 요약, 읽는 시간, 오른쪽에 대표 이미지(11-02). 날짜는 화면에 두지 않는다(11-02). date는 정렬과 사이트맵에만 쓴다.
+// 인사이트 목록. 토스, 요즘IT 글 목록처럼 왼쪽에 묶음 이름, 제목, 요약, 읽는 시간, 오른쪽에 대표 이미지(11-02). 11-12 사용자: 날짜도 보인다.
 // 11-04 네이버 블로그, 티스토리, 유튜브 글도 같은 목록에 섞는다(ops/channel-posts.mjs가 RSS로 받음). 바깥 글은 새 창으로 연다.
 
 export default function ClassicInsightPage() {
   const rows: InsightRow[] = [
     ...insights.map((n) => ({ kind: "own" as const, key: `own-${n.slug}`, href: `/insight/${n.slug}`, title: n.title, summary: n.summary, badge: `${n.series} ${n.no}편`, minutes: readMinutes(n), image: n.image.src, date: n.date, no: n.no })),
-    // 11-11 바깥 채널 글(네이버, 티스토리, 유튜브)은 빼고 사이트에서 쓴 글만 보인다
+    // 11-11 바깥 채널 글은 뺐다가, 11-12 사용자: 홈페이지 이야기는 네이버 블로그에 있으니 네이버 블로그 글만 다시 넣는다(새 창)
+    ...channelPosts.filter((p) => p.source === "naver").map((p) => ({ kind: "naver" as const, key: `naver-${p.id}`, href: p.url, title: p.title, summary: p.desc, badge: "", image: p.thumb, date: p.date, no: 0 })),
   // 같은 날 나간 글은 편 번호가 큰 것이 위로(11-08: 보안 경보 2, 3편이 2, 3, 1 순으로 보였음)
   ].sort((a, b) => b.date.localeCompare(a.date) || (b.no ?? 0) - (a.no ?? 0));
   return (

@@ -612,7 +612,7 @@ function Process() {
 }
 
 // 11-12 숏츠 끝 "홈페이지 운영 이야기는 곰파트너에서" 로 들어온 사람이 메인에서 바로 이어 읽게, 인사이트 최신 글 3편(서버에서 골라 넘긴다)
-export type HomeStory = { slug: string; date: string; title: string; image: string };
+export type HomeStory = { slug: string; date: string; title: string; image: string; minutes: number };
 
 function OpsStories({ stories }: { stories: HomeStory[] }) {
   return (
@@ -633,7 +633,10 @@ function OpsStories({ stories }: { stories: HomeStory[] }) {
                 <span className="block overflow-hidden rounded-lg border border-[#e6e9ee]">
                   <Image src={n.image} alt="" width={1200} height={675} sizes="(min-width: 768px) 400px, 92vw" className="aspect-video w-full object-cover" />
                 </span>
-                <span className="mt-4 block text-[14px] text-[#5b6370]">{n.date.replaceAll("-", ".")}</span>
+                <span className="mt-4 flex gap-3 text-[14px] tabular-nums text-[#5b6370]">
+                  <time dateTime={n.date}>{n.date.replaceAll("-", ".")}</time>
+                  <span>읽는 시간 {n.minutes}분</span>
+                </span>
                 <span className="mt-1 block break-keep text-[18px] font-bold leading-[1.45] tracking-[-0.02em] group-hover:text-[#256ef4] md:text-[19px]">{n.title}</span>
               </Link>
             </li>
