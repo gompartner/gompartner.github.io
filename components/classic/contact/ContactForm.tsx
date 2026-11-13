@@ -137,23 +137,20 @@ export function ContactForm() {
       return;
     }
     const q = new URLSearchParams(window.location.search);
-    // 시트 칸은 /landing 폼과 같아서, 더한 항목은 문의 내용 앞에 줄로 붙인다
-    const extra = [
-      `신청 종류: ${kindTitle}`,
-      email.trim() && `이메일: ${email.trim()}`,
-      sample.trim() && `참고 카탈로그: ${sample.trim()}`,
-      budget && `예산: ${budget}`,
-      openDate.trim() && `희망 오픈일: ${openDate.trim()}`,
-      currentSite.trim() && `기존 홈페이지: ${currentSite.trim()}`,
-    ].filter(Boolean);
-    const body = [...extra, message.trim()].join("\n");
+    // 11-14 시트 "상담 신청" 탭에 항목마다 칸이 따로 있다(form: "contact")
     const payload = {
+      form: "contact",
       name: name.trim(),
       phone: phone.trim(),
+      email: email.trim(),
       business: business.trim(),
-      channel: "",
-      pkg: service || "상담 후 결정",
-      message: body,
+      kind: kindTitle,
+      service: service || "상담 후 결정",
+      sample: sample.trim(),
+      budget,
+      openDate: openDate.trim(),
+      currentSite: currentSite.trim(),
+      message: message.trim(),
       agree,
       utm_source: q.get("utm_source") ?? "",
       utm_campaign: q.get("utm_campaign") ?? "",
@@ -170,7 +167,7 @@ export function ContactForm() {
       if (data.ok && data.id) {
         setStatus({ kind: "done", id: data.id });
         window.dataLayer ??= [];
-        window.dataLayer.push({ event: "generate_lead", lead_package: payload.pkg });
+        window.dataLayer.push({ event: "generate_lead", lead_package: payload.service });
         window.scrollTo({ top: 0 });
       } else {
         setStatus({ kind: "error", message: data.error || "신청을 저장하지 못했습니다. 다시 시도해 주세요." });

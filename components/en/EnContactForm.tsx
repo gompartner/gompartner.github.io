@@ -38,12 +38,12 @@ export function EnContactForm() {
 
     const q = new URLSearchParams(window.location.search);
     const payload = {
+      // 11-14 시트 "영문 문의" 탭
+      form: "en",
       name: name.trim(),
-      phone: email.trim(),
+      email: email.trim(),
       business: company.trim() || "-",
-      channel: "",
-      pkg: "English page",
-      message: `[EN] 이메일: ${email.trim()}\n${message.trim()}`,
+      message: message.trim(),
       agree,
       utm_source: q.get("utm_source") ?? "",
       utm_campaign: q.get("utm_campaign") ?? "",
@@ -59,7 +59,7 @@ export function EnContactForm() {
       if (data.ok && data.id) {
         setStatus({ kind: "done", id: data.id });
         window.dataLayer ??= [];
-        window.dataLayer.push({ event: "generate_lead", lead_package: payload.pkg });
+        window.dataLayer.push({ event: "generate_lead", lead_package: "English page" });
       } else {
         setStatus({ kind: "error", message: `Something went wrong. Please email ${profile.email}.` });
       }
