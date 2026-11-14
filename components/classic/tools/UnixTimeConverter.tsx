@@ -31,7 +31,7 @@ type Parsed = { ok: true; ms: number; unit: string } | { ok: false; error: strin
 function parseTimestamp(raw: string): Parsed | null {
   const t = raw.trim().replace(/[,_\s]/g, "");
   if (!t) return null;
-  if (!/^-?\d+(\.\d+)?$/.test(t)) return { ok: false, error: "숫자만 넣어 주세요. 예: 1759400000" };
+  if (!/^-?\d+(\.\d+)?$/.test(t)) return { ok: false, error: "숫자만 입력해 주십시오. 예: 1759400000" };
   const intDigits = t.replace(/^-/, "").split(".")[0].replace(/^0+/, "").length;
   // 자릿수로 단위를 고른다: 12자리 이하 초, 13~15 밀리초, 16~18 마이크로초, 19 이상 나노초
   const unit = intDigits <= 12 ? UNITS[0] : intDigits <= 15 ? UNITS[1] : intDigits <= 18 ? UNITS[2] : UNITS[3];
@@ -138,7 +138,7 @@ export function UnixTimeConverter() {
   if (date) {
     const m = /^(\d{4})-(\d{2})-(\d{2})$/.exec(date);
     const tm = /^(\d{1,2}):(\d{2})(?::(\d{2}))?$/.exec(time || "00:00");
-    if (!m || !tm) toTs = { ok: false, error: "날짜와 시각 형식을 확인해 주세요." };
+    if (!m || !tm) toTs = { ok: false, error: "날짜와 시각 형식을 확인해 주십시오." };
     else {
       const utc = Date.UTC(+m[1], +m[2] - 1, +m[3], +tm[1], +tm[2], +(tm[3] ?? 0));
       toTs = Number.isNaN(utc) ? { ok: false, error: "없는 날짜입니다." } : { ok: true, ms: zone === "kst" ? utc - KST_OFFSET : utc };
@@ -206,7 +206,7 @@ export function UnixTimeConverter() {
             placeholder="1759400000"
             className={`${input_} mt-1.5 font-mono`}
           />
-          <p className="mt-2 text-[14px] leading-[1.6] text-foreground-secondary">자릿수로 단위를 알아서 고릅니다. 초 10자리, 밀리초 13자리, 마이크로초 16자리, 나노초 19자리.</p>
+          <p className="mt-2 text-[14px] leading-[1.6] text-foreground-secondary">자릿수로 단위를 자동 판별합니다. 초 10자리, 밀리초 13자리, 마이크로초 16자리, 나노초 19자리.</p>
 
           <div className="mt-4" aria-live="polite">
             {parsed && !parsed.ok && (

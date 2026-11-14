@@ -58,7 +58,7 @@ function parse(token: string): Parsed | null {
   try {
     header = decodePart(parts[0]);
   } catch {
-    return { ok: false, error: "헤더를 읽을 수 없습니다. Base64URL로 인코딩된 JSON인지 확인하세요." };
+    return { ok: false, error: "헤더를 읽을 수 없습니다. Base64URL로 인코딩된 JSON인지 확인하십시오." };
   }
   try {
     payload = decodePart(parts[1]);

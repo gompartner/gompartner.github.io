@@ -128,7 +128,7 @@ export function HostingCostCalculator() {
         <table className="w-full min-w-[760px] text-left text-[15px]">
           <thead className="bg-surface">
             <tr>
-              {["업체·상품", "1년", "설치비", "https", "용량", "출처"].map((h) => (
+              {["업체, 상품", "1년", "설치비", "https", "용량", "출처"].map((h) => (
                 <th key={h} scope="col" className="px-4 py-3 font-bold">{h}</th>
               ))}
             </tr>
@@ -197,11 +197,11 @@ export function HostingCostCalculator() {
         </table>
       </div>
       <p className="mt-3 text-[14px] leading-[1.6] text-foreground-secondary">
-        요금은 업체 사정으로 바뀔 수 있으니 결제 전에 각 요금표를 확인하세요. 연장 요금을 따로 밝히지 않은 곳은 등록 요금으로 계산했습니다.
+        요금은 업체 사정으로 바뀔 수 있으니 결제 전에 각 요금표를 확인하십시오. 연장 요금을 따로 밝히지 않은 곳은 등록 요금으로 계산했습니다.
       </p>
 
       <div className="mt-8 flex flex-wrap items-center justify-between gap-3 rounded-[10px] bg-surface p-5">
-        <p className="text-[16px] font-bold">어느 호스팅이 맞을지 모르겠다면</p>
+        <p className="text-[16px] font-bold">호스팅 선택 상담</p>
         <KakaoChatButton cta="tool_hosting_chat" className="inline-flex h-11 items-center rounded-md bg-accent px-4 text-[15px] font-bold text-accent-foreground hover:bg-accent-hover">
           카카오톡 상담
         </KakaoChatButton>

@@ -104,10 +104,10 @@ export default function Page() {
         <div className={`${wrap} grid gap-10 py-16 md:grid-cols-[minmax(0,1fr)_minmax(0,1.15fr)] md:items-start md:gap-14 md:py-24`}>
           <div>
             <h2 id="t3d-mail" className={h2}>
-              견적 요청은 이렇게 들어옵니다
+              견적 요청 접수 예시
             </h2>
             <p className="mt-4 text-[16px] leading-[1.7] text-[#3d4450] md:text-[17px]">
-              손님이 고른 구성과 금액이 이름, 연락처와 함께 접수됩니다. 같은 가격 문의에 매번 답하지 않아도 되고, 접수된 구성을 3D로 다시 열어 보고 실측을 갑니다.
+              고객이 선택한 구성과 금액이 이름, 연락처와 함께 접수됩니다. 반복되는 가격 문의 응대가 줄고, 접수된 구성을 3D로 다시 확인한 뒤 실측을 진행합니다.
             </p>
             <p className="mt-6 flex gap-3 text-[16px] md:text-[17px]">
               <b className="shrink-0">받는 곳</b>
@@ -137,7 +137,7 @@ export default function Page() {
               href={threeLeadSample.open}
               className="mt-6 inline-flex h-12 w-full items-center justify-center gap-2 rounded-md border border-[#c9cfd8] bg-white px-6 text-[16px] font-bold text-[#15171c] transition-colors hover:border-[#15171c]"
             >
-              손님이 고른 구성 3D로 열기 <ArrowUpRight size={18} aria-hidden />
+              고객이 선택한 구성 3D로 열기 <ArrowUpRight size={18} aria-hidden />
             </a>
           </article>
         </div>
@@ -176,7 +176,7 @@ export default function Page() {
             </table>
           </div>
 
-          <h3 className={`${h3} mt-16`}>따로 드는 비용</h3>
+          <h3 className={`${h3} mt-16`}>별도 비용</h3>
           <ul className="mt-6 border-t-2 border-[#15171c]" role="list">
             {threeExtras.map((x) => (
               <li key={x.name} className="flex flex-col gap-1 border-b border-[#e6e9ee] py-4 text-[16px] md:flex-row md:items-center md:justify-between md:text-[17px]">
@@ -185,7 +185,7 @@ export default function Page() {
               </li>
             ))}
           </ul>
-          <p className="mt-6 text-[15px] leading-[1.65] text-[#5b6370] md:text-[16px]">표시한 금액 외에 별도로 받는 비용은 없고, 기능을 더할 때만 추가 비용이 발생합니다.</p>
+          <p className="mt-6 text-[15px] leading-[1.65] text-[#5b6370] md:text-[16px]">표시한 금액 외 별도 비용은 없으며, 기능 추가 시에만 추가 비용이 발생합니다.</p>
         </div>
       </section>
 

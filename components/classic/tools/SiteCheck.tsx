@@ -5,7 +5,7 @@ import Link from "next/link";
 import { ChevronDown } from "lucide-react";
 
 /* 홈페이지 진단. 주소를 넣으면 Workers(곰파트너-마케팅/php-check의 /check)가 공개된 첫 화면을 한 번 읽어
-   접속, 보안 설정, 휴대폰 화면 설정, 속도, 검색 노출을 급함, 주의, 양호로 나눠 준다.
+   접속, 보안 설정, 휴대폰 화면 설정, 속도, 검색 노출을 긴급, 주의, 양호로 나눠 준다.
    무엇이 문제인지만 보여 주고 고치는 방법은 쓰지 않는다. 인증서와 도메인 만료일, 휴대폰 화면 캡처는 전체 보고서(상담 신청)에서만. */
 
 const API = "https://php-check.gompartner.workers.dev/check";
@@ -14,7 +14,7 @@ type Level = "bad" | "warn" | "ok";
 type Item = { group: string; level: Level; title: string; seen: string; why: string };
 type Result = { host: string; url: string; platforms: string[]; items: Item[] };
 
-const LABEL: Record<Level, string> = { bad: "급함", warn: "주의", ok: "양호" };
+const LABEL: Record<Level, string> = { bad: "긴급", warn: "주의", ok: "양호" };
 const TONE: Record<Level, string> = { bad: "bg-[#fde8e8] text-[#c62828]", warn: "bg-[#fff4d6] text-[#8a5a00]", ok: "bg-[#e6f5ea] text-[#1d7a3a]" };
 const BOX: Record<Level, string> = { bad: "border-[#efc4c4] bg-[#fdf6f6]", warn: "border-[#f0d9b5] bg-[#fffaf0]", ok: "border-[#c9cfd8] bg-white" };
 
@@ -32,10 +32,10 @@ export function SiteCheck() {
     try {
       const res = await fetch(`${API}?url=${encodeURIComponent(url)}`);
       const data = await res.json();
-      if (!res.ok) setError(data.error ?? "다시 시도해 주세요");
+      if (!res.ok) setError(data.error ?? "다시 시도해 주십시오");
       else setResult(data);
     } catch {
-      setError("점검 서버에 연결하지 못했어요. 잠시 뒤 다시 시도해 주세요.");
+      setError("점검 서버에 연결하지 못했습니다. 잠시 뒤 다시 시도해 주십시오.");
     } finally {
       setBusy(false);
     }
@@ -48,7 +48,7 @@ export function SiteCheck() {
   return (
     <div className="max-w-[760px]">
       <p className="text-[17px] leading-[1.7] text-[#3d4550]">
-        홈페이지 주소를 넣으면 접속과 보안 설정, 휴대폰 화면 설정, 속도, 검색 노출을 한 번에 봐요. 손님이 보는 첫 화면을 평범하게 한 번 열어 볼 뿐이라 사이트에 부담을 주지 않아요.
+        홈페이지 주소를 입력하면 접속과 보안 설정, 모바일 화면 설정, 속도, 검색 노출을 한 번에 점검합니다. 방문 고객이 보는 첫 화면을 일반 접속으로 1회 열람하므로 사이트에 부담을 주지 않습니다.
       </p>
       <form onSubmit={check} className="mt-6 flex flex-col gap-3 sm:flex-row">
         <label htmlFor="site-url" className="sr-only">
@@ -60,7 +60,7 @@ export function SiteCheck() {
           inputMode="url"
           autoComplete="url"
           required
-          placeholder="예: www.우리가게.co.kr"
+          placeholder="예: www.우리매장.co.kr"
           value={url}
           onChange={(e) => setUrl(e.target.value)}
           className="h-12 min-w-0 rounded-md sm:flex-1 border border-[#6d7882] bg-white px-3 text-[17px]"
@@ -102,7 +102,7 @@ export function SiteCheck() {
                 ))}
               </ul>
             ) : (
-              <p className="mt-6 text-[18px] font-bold">밖에서 보이는 문제는 없어요.</p>
+              <p className="mt-6 text-[18px] font-bold">외부에서 확인되는 문제는 없습니다.</p>
             )}
 
             {oks.length > 0 && (
@@ -123,9 +123,9 @@ export function SiteCheck() {
             )}
 
             <div className="mt-8 rounded-md border border-[#c9cfd8] bg-white p-5 md:p-6">
-              <p className="text-[18px] font-extrabold tracking-[-0.02em]">전체 보고서는 상담 신청으로 받으세요</p>
+              <p className="text-[18px] font-extrabold tracking-[-0.02em]">전체 보고서는 상담 신청으로 요청하십시오</p>
               <p className="mt-2 text-[16px] leading-[1.7] text-[#3d4550]">
-                여기서 못 보는 보안 인증서 만료일, 도메인 만료일, 휴대폰과 PC에서 실제로 보이는 화면 캡처까지 넣은 PDF를 하루 안에 보내 드려요. 고칠 때 드는 비용도 같이 적어 드려요.
+                이 화면에서 확인되지 않는 보안 인증서 만료일, 도메인 만료일, 모바일과 PC 실제 화면 캡처를 담은 PDF를 1일 이내에 보내 드립니다. 수정 비용도 함께 기재합니다.
               </p>
               <Link
                 href={`/contact?site=${encodeURIComponent(result.host)}`}
@@ -140,7 +140,7 @@ export function SiteCheck() {
       </div>
 
       <p className="mt-8 text-[15px] leading-[1.7] text-[#5b6370]">
-        공개된 첫 화면만 읽어서 판단해요. 관리자 화면, 결제, 회원 정보처럼 로그인해야 보이는 곳은 전체 보고서에서도 사이트 주인의 동의를 받은 뒤에만 봐요.{" "}
+        공개된 첫 화면만 읽어 판단합니다. 관리자 화면, 결제, 회원 정보처럼 로그인이 필요한 영역은 전체 보고서에서도 사이트 소유자의 동의를 받은 뒤에만 점검합니다.{" "}
         <Link href="/tools/php-check" className="underline underline-offset-2">
           PHP 취약점만 따로 보기
         </Link>

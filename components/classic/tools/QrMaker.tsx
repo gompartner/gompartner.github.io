@@ -143,7 +143,7 @@ export function QrMaker() {
         setError("");
       })
       .catch(() => {
-        if (!cancelled) setError("내용이 너무 깁니다. 글자 수를 줄이거나 오류 복원 수준을 낮춰 주세요.");
+        if (!cancelled) setError("내용이 너무 깁니다. 글자 수를 줄이거나 오류 복원 수준을 낮춰 주십시오.");
       });
     return () => {
       cancelled = true;
@@ -281,13 +281,13 @@ export function QrMaker() {
             ))}
             <label className={chip(!COLORS.some((c) => c.value === color))}>
               <input type="color" value={color} onChange={(e) => setColor(e.target.value)} className="mr-2 h-5 w-6 cursor-pointer border-0 bg-transparent p-0" />
-              직접 고르기
+              직접 선택
             </label>
           </div>
           {lowContrast && (
             <p className="mt-2 flex gap-2 rounded-md bg-[#fff4e5] px-3 py-2 text-[15px] leading-[1.5] text-[#8a4b08]" role="status">
               <CircleAlert size={18} className="mt-0.5 shrink-0" aria-hidden />
-              색이 너무 연해서 휴대폰 카메라가 못 읽을 수 있습니다. 더 진한 색을 고르세요.
+              색이 너무 연해서 휴대폰 카메라가 못 읽을 수 있습니다. 더 진한 색을 선택하십시오.
             </p>
           )}
 
@@ -349,7 +349,7 @@ export function QrMaker() {
         </section>
 
         <div className="mt-4 flex flex-wrap items-center justify-between gap-3 rounded-[10px] bg-surface p-5">
-          <p className="text-[16px] font-bold">QR로 연결할 홈페이지가 필요하신가요?</p>
+          <p className="text-[16px] font-bold">QR로 연결할 홈페이지가 필요하십니까?</p>
           <KakaoChatButton cta="tool_qr_chat" className="inline-flex h-11 items-center rounded-md bg-accent px-4 text-[15px] font-bold text-accent-foreground hover:bg-accent-hover">
             카카오톡 상담
           </KakaoChatButton>

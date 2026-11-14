@@ -146,8 +146,8 @@ export function ImageCompressor() {
         patch = {
           status: "error",
           error: heic
-            ? "아이폰 HEIC 사진은 이 브라우저에서 열 수 없습니다. 아이폰 설정의 카메라, 포맷에서 '높은 호환성'을 고른 뒤 다시 찍거나 JPG로 저장해서 넣어 주세요."
-            : "사진을 열 수 없습니다. JPG, PNG, WebP 파일인지 확인해 주세요.",
+            ? "아이폰 HEIC 사진은 이 브라우저에서 열 수 없습니다. 아이폰 설정의 카메라, 포맷에서 '높은 호환성'을 선택한 뒤 다시 촬영하거나 JPG로 저장해 업로드해 주십시오."
+            : "사진을 열 수 없습니다. JPG, PNG, WebP 파일인지 확인해 주십시오.",
         };
       }
       setItems((prev) =>
@@ -245,7 +245,7 @@ export function ImageCompressor() {
           className={`flex min-h-[180px] cursor-pointer flex-col items-center justify-center gap-2 rounded-[10px] border-2 border-dashed p-6 text-center transition-colors focus-within:border-accent ${dragging ? "border-accent bg-accent-surface" : "border-[#8a949e] hover:bg-surface"}`}
         >
           <ImagePlus size={28} className="text-accent" aria-hidden />
-          <span className="text-[17px] font-bold">사진을 끌어다 놓거나 눌러서 고르세요</span>
+          <span className="text-[17px] font-bold">사진을 끌어다 놓거나 클릭해 선택하십시오</span>
           <span className="text-[15px] text-foreground-secondary">JPG, PNG, WebP 여러 장 가능</span>
           <input
             type="file"
@@ -439,7 +439,7 @@ export function ImageCompressor() {
         )}
 
         <div className="mt-6 flex flex-wrap items-center justify-between gap-3 rounded-[10px] bg-surface p-5">
-          <p className="text-[16px] font-bold">사진을 줄여도 홈페이지가 느린가요?</p>
+          <p className="text-[16px] font-bold">사진을 줄여도 홈페이지가 느립니까?</p>
           <KakaoChatButton cta="tool_image_chat" className="inline-flex h-11 items-center rounded-md bg-accent px-4 text-[15px] font-bold text-accent-foreground hover:bg-accent-hover">
             카카오톡 상담
           </KakaoChatButton>

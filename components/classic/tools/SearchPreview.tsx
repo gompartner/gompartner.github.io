@@ -105,7 +105,7 @@ export function SearchPreview() {
       setF((s) => ({ ...s, name: m.siteName || own("name", s.name), region: own("region", s.region), industry: own("industry", s.industry), strengths: own("strengths", s.strengths), url: m.finalUrl, title: "", desc: "" }));
     } catch (err) {
       setLive(null);
-      setLoadError(err instanceof Error && err.message ? err.message : "불러오지 못했어요. 주소를 확인해 주세요.");
+      setLoadError(err instanceof Error && err.message ? err.message : "불러오지 못했습니다. 주소를 확인해 주십시오.");
     } finally {
       setLoading(false);
     }
@@ -119,11 +119,11 @@ export function SearchPreview() {
   const len = (s: string) => [...s].length;
 
   const checks = [
-    { ok: !!f.name && title.includes(f.name), text: "제목에 상호가 들어 있습니다", fix: "제목 앞쪽에 상호를 넣으세요. 이름으로 찾는 손님이 가장 많습니다." },
-    { ok: !!f.region && title.includes(f.region), text: "제목에 지역이 들어 있습니다", fix: "\"강남역 치과\"처럼 지역과 업종으로 검색하는 손님이 많습니다. 제목에 지역을 넣으세요." },
+    { ok: !!f.name && title.includes(f.name), text: "제목에 상호가 들어 있습니다", fix: "제목 앞쪽에 상호를 넣으십시오. 상호로 검색하는 고객이 가장 많습니다." },
+    { ok: !!f.region && title.includes(f.region), text: "제목에 지역이 들어 있습니다", fix: "\"강남역 치과\"처럼 지역과 업종으로 검색하는 고객이 많습니다. 제목에 지역을 넣으십시오." },
     { ok: len(title) >= 8 && !clip(title, ENGINES.google.title).cut, text: `제목 길이가 적당합니다 (${len(title)}자)`, fix: `제목이 ${len(title) < 8 ? "너무 짧습니다" : "길어서 잘립니다"}. 한글 기준 15~28자가 알맞습니다.` },
-    { ok: len(desc) >= 40 && !clip(desc, ENGINES.naver.desc).cut, text: `설명 길이가 적당합니다 (${len(desc)}자)`, fix: `설명이 ${len(desc) < 40 ? "짧습니다" : "길어서 뒷부분이 잘립니다"}. 40~75자로 맞추세요.` },
-    { ok: !!desc && desc !== title && !desc.startsWith(title), text: "설명이 제목과 다른 내용입니다", fix: "설명에는 제목에 없는 정보(영업시간, 주차, 대표 서비스)를 넣으세요." },
+    { ok: len(desc) >= 40 && !clip(desc, ENGINES.naver.desc).cut, text: `설명 길이가 적당합니다 (${len(desc)}자)`, fix: `설명이 ${len(desc) < 40 ? "짧습니다" : "길어서 뒷부분이 잘립니다"}. 40~75자로 맞추십시오.` },
+    { ok: !!desc && desc !== title && !desc.startsWith(title), text: "설명이 제목과 다른 내용입니다", fix: "설명에는 제목에 없는 정보(영업시간, 주차, 대표 서비스)를 넣으십시오." },
   ];
   const passed = checks.filter((c) => c.ok).length;
 
@@ -172,9 +172,9 @@ export function SearchPreview() {
         <label htmlFor="sp-load" className="block text-[17px] font-bold">
           내 홈페이지 불러오기
         </label>
-        <p className="mt-1 text-[15px] leading-[1.6] text-foreground-secondary">주소를 넣으면 지금 들어 있는 제목과 설명을 읽어 옵니다.</p>
+        <p className="mt-1 text-[15px] leading-[1.6] text-foreground-secondary">주소를 입력하면 현재 설정된 제목과 설명을 읽어 옵니다.</p>
         <div className="mt-3 flex flex-col gap-2 sm:flex-row">
-          <input id="sp-load" value={loadUrl} onChange={(e) => setLoadUrl(e.target.value)} required inputMode="url" placeholder="www.우리가게.co.kr" className="h-12 min-w-0 rounded-md border border-[#8a949e] bg-background px-3 text-[17px] focus:border-accent sm:flex-1" />
+          <input id="sp-load" value={loadUrl} onChange={(e) => setLoadUrl(e.target.value)} required inputMode="url" placeholder="www.우리매장.co.kr" className="h-12 min-w-0 rounded-md border border-[#8a949e] bg-background px-3 text-[17px] focus:border-accent sm:flex-1" />
           <button type="submit" disabled={loading} className="h-12 shrink-0 rounded-md bg-accent px-5 text-[16px] font-bold text-accent-foreground hover:bg-accent-hover disabled:opacity-60">
             {loading ? "읽는 중" : "불러오기"}
           </button>
@@ -185,7 +185,7 @@ export function SearchPreview() {
       </form>
       <form onSubmit={(e) => e.preventDefault()}>
         <fieldset className="grid gap-4">
-          <legend className="w-full border-b-2 border-foreground pb-2 text-[19px] font-bold">가게 정보</legend>
+          <legend className="w-full border-b-2 border-foreground pb-2 text-[19px] font-bold">매장 정보</legend>
           <label className="block text-[16px] font-bold">
             상호
             <input value={f.name} onChange={set("name")} className={input} placeholder="곰파트너치과의원" />
@@ -317,7 +317,7 @@ export function SearchPreview() {
                 <li key={c.text} className={`flex gap-2.5 rounded-md px-3 py-2.5 text-[16px] leading-[1.5] ${c.ok ? "bg-[#e8f5eb]" : "bg-[#fff4e5]"}`}>
                   {c.ok ? <Check size={18} className="mt-0.5 shrink-0 text-[#228738]" aria-hidden /> : <CircleAlert size={18} className="mt-0.5 shrink-0 text-[#b45309]" aria-hidden />}
                   <span>
-                    <span className="sr-only">{c.ok ? "좋음: " : "고칠 점: "}</span>
+                    <span className="sr-only">{c.ok ? "좋음: " : "수정할 점: "}</span>
                     {c.ok ? c.text : c.fix}
                   </span>
                 </li>
@@ -338,7 +338,7 @@ export function SearchPreview() {
               <li key={c.text.split(" (")[0]} className={`flex gap-2.5 rounded-md px-3 py-2.5 text-[16px] leading-[1.5] ${c.ok ? "bg-[#e8f5eb]" : "bg-[#fff4e5]"}`}>
                 {c.ok ? <Check size={18} className="mt-0.5 shrink-0 text-[#228738]" aria-hidden /> : <CircleAlert size={18} className="mt-0.5 shrink-0 text-[#b45309]" aria-hidden />}
                 <span>
-                  <span className="sr-only">{c.ok ? "좋음: " : "고칠 점: "}</span>
+                  <span className="sr-only">{c.ok ? "좋음: " : "수정할 점: "}</span>
                   {c.ok ? c.text : c.fix}
                 </span>
               </li>
@@ -399,11 +399,11 @@ export function SearchPreview() {
               <a href="https://new.smartplace.naver.com" target="_blank" rel="noopener noreferrer" className="text-accent-hover underline underline-offset-4">
                 네이버 스마트플레이스
               </a>
-              에 가게 등록
+              에 매장 등록
             </li>
           </ul>
           <div className="mt-4 flex flex-wrap items-center justify-between gap-3 border-t border-border pt-4">
-            <p className="text-[16px] font-bold">등록이나 홈페이지 수정이 어려우신가요?</p>
+            <p className="text-[16px] font-bold">등록이나 홈페이지 수정이 필요하십니까?</p>
             <KakaoChatButton cta="tool_seo_chat" className="inline-flex h-11 items-center rounded-md bg-accent px-4 text-[15px] font-bold text-accent-foreground hover:bg-accent-hover">
               카카오톡 상담
             </KakaoChatButton>

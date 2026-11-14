@@ -93,7 +93,7 @@ export const groups: { slug: string; label: string; title: string; description: 
     slug: "3d",
     label: "3D",
     title: "3D 웹 제작",
-    description: "손님이 제품을 직접 구성하면 3D와 견적이 바로 나오는 카탈로그입니다. 가구, 중문, 간판, 인테리어 화면을 직접 돌려 볼 수 있습니다.",
+    description: "고객이 제품을 직접 구성하면 3D와 견적이 바로 나오는 카탈로그입니다. 가구, 중문, 간판, 인테리어 화면을 직접 돌려 볼 수 있습니다.",
     keywords: ["3D 웹 제작", "3D 견적", "제품 컨피규레이터", "3D 쇼룸"],
     needs: ["3D 구성", "실시간 견적", "견적 요청 접수", "기존 홈페이지 연결"],
     match: (p) => p.category === "3D",

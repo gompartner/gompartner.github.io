@@ -17,7 +17,7 @@ const STORAGE_KEY = "gs-tool:terms:v1";
 const SITE_TYPES = ["일반 홈페이지", "회원제 서비스", "쇼핑몰"] as const;
 type SiteType = (typeof SITE_TYPES)[number];
 
-const GOODS = ["배송 상품", "디지털 콘텐츠·온라인 서비스"] as const;
+const GOODS = ["배송 상품", "디지털 콘텐츠와 온라인 서비스"] as const;
 type Goods = (typeof GOODS)[number];
 
 const COURTS = ["이용자 주소지 관할 지방법원", "민사소송법에 따른 관할 법원"] as const;
@@ -40,7 +40,7 @@ interface Form {
 
 const PRESETS: Record<SiteType, Pick<Form, "membership" | "paid" | "goods" | "posts">> = {
   "일반 홈페이지": { membership: false, paid: false, goods: "배송 상품", posts: false },
-  "회원제 서비스": { membership: true, paid: false, goods: "디지털 콘텐츠·온라인 서비스", posts: true },
+  "회원제 서비스": { membership: true, paid: false, goods: "디지털 콘텐츠와 온라인 서비스", posts: true },
   쇼핑몰: { membership: true, paid: true, goods: "배송 상품", posts: true },
 };
 
@@ -79,7 +79,7 @@ function build(f: Form): Section[] {
   const site = blank(f.siteName, "사이트 이름");
   const url = f.siteUrl.trim() ? ` (${f.siteUrl.trim()})` : "";
   const shop = f.siteType === "쇼핑몰";
-  const digital = f.goods === "디지털 콘텐츠·온라인 서비스";
+  const digital = f.goods === "디지털 콘텐츠와 온라인 서비스";
   const days = Math.max(7, f.withdrawDays || 7);
   const fixDate = f.effectiveDate ? f.effectiveDate.replace(/-/g, ". ") + "." : "[시행일]";
 
@@ -90,7 +90,7 @@ function build(f: Form): Section[] {
       parts: [
         {
           kind: "p",
-          text: `이 약관은 ${co}(이하 "회사")가 운영하는 ${site}${url}(이하 "사이트")에서 제공하는 ${f.paid ? "인터넷 관련 서비스와 재화·용역의 거래" : "인터넷 관련 서비스"}(이하 "서비스")를 이용할 때 회사와 이용자의 권리, 의무 및 책임 사항을 정하는 것을 목적으로 합니다.`,
+          text: `이 약관은 ${co}(이하 "회사")가 운영하는 ${site}${url}(이하 "사이트")에서 제공하는 ${f.paid ? "인터넷 관련 서비스와 재화, 용역의 거래" : "인터넷 관련 서비스"}(이하 "서비스")를 이용할 때 회사와 이용자의 권리, 의무 및 책임 사항을 정하는 것을 목적으로 합니다.`,
         },
       ],
     },
@@ -248,7 +248,7 @@ function build(f: Form): Section[] {
             items: [
               `${item}의 검색 및 선택`,
               ...(shop ? ["받는 사람의 성명, 주소, 전화번호 입력"] : []),
-              `약관 내용, 청약철회권이 제한되는 서비스, ${shop ? "배송료·설치비 등 " : ""}비용 부담과 관련한 내용의 확인`,
+              `약관 내용, 청약철회권이 제한되는 서비스, ${shop ? "배송료, 설치비 등 " : ""}비용 부담과 관련한 내용의 확인`,
               "이 약관에 동의하고 위 사항을 확인하거나 거부하는 표시",
               `${item}의 ${shop ? "구매신청" : "이용 신청"} 및 이에 관한 확인 또는 회사의 확인에 대한 동의`,
               "결제 방법의 선택",
@@ -265,7 +265,7 @@ function build(f: Form): Section[] {
             items: [
               `회사는 신청 내용에 허위, 누락, 오기가 있거나 미성년자가 담배, 주류 등 청소년보호법에서 금지하는 ${item}을 구매하는 경우 등에는 승낙하지 않을 수 있습니다.`,
               "회사의 승낙이 수신확인통지 형태로 이용자에게 도달한 시점에 계약이 성립한 것으로 봅니다.",
-              "회사의 승낙 의사표시에는 이용자의 신청에 대한 확인, 판매 가능 여부, 신청의 정정·취소 등에 관한 정보를 포함합니다.",
+              "회사의 승낙 의사표시에는 이용자의 신청에 대한 확인, 판매 가능 여부, 신청의 정정, 취소 등에 관한 정보를 포함합니다.",
             ],
           },
         ],
@@ -328,7 +328,7 @@ function build(f: Form): Section[] {
                   "같은 성능을 지닌 재화 등으로 복제가 가능한 경우 그 원본인 재화 등의 포장을 훼손한 경우",
                 ],
               },
-              `${item}의 내용이 표시·광고 내용과 다르거나 계약 내용과 다르게 이행된 경우에는 ${item}을 공급받은 날부터 3개월 이내, 그 사실을 안 날 또는 알 수 있었던 날부터 30일 이내에 청약철회를 할 수 있습니다.`,
+              `${item}의 내용이 표시, 광고 내용과 다르거나 계약 내용과 다르게 이행된 경우에는 ${item}을 공급받은 날부터 3개월 이내, 그 사실을 안 날 또는 알 수 있었던 날부터 30일 이내에 청약철회를 할 수 있습니다.`,
             ],
           },
           {
@@ -348,7 +348,7 @@ function build(f: Form): Section[] {
               "이용자가 신용카드 또는 전자화폐 등으로 대금을 지급한 경우에는 회사는 지체 없이 해당 결제 수단을 제공한 사업자에게 대금 청구를 정지 또는 취소하도록 요청합니다.",
               ...(shop
                 ? [
-                    "청약철회 등의 경우 공급받은 재화 등의 반환에 필요한 비용은 이용자가 부담하며, 회사는 이용자에게 청약철회 등을 이유로 위약금 또는 손해배상을 청구하지 않습니다. 다만 재화 등의 내용이 표시·광고 내용과 다르거나 계약 내용과 다르게 이행되어 청약철회 등을 하는 경우 반환 비용은 회사가 부담합니다.",
+                    "청약철회 등의 경우 공급받은 재화 등의 반환에 필요한 비용은 이용자가 부담하며, 회사는 이용자에게 청약철회 등을 이유로 위약금 또는 손해배상을 청구하지 않습니다. 다만 재화 등의 내용이 표시, 광고 내용과 다르거나 계약 내용과 다르게 이행되어 청약철회 등을 하는 경우 반환 비용은 회사가 부담합니다.",
                   ]
                 : ["회사는 이용자에게 청약철회 등을 이유로 위약금 또는 손해배상을 청구하지 않습니다."]),
             ],
@@ -378,7 +378,7 @@ function build(f: Form): Section[] {
           items: [
             "회사는 법령과 이 약관이 금지하거나 공서양속에 반하는 행위를 하지 않으며, 지속적이고 안정적으로 서비스를 제공하기 위하여 노력합니다.",
             "회사는 이용자가 안전하게 서비스를 이용할 수 있도록 개인정보 보호를 위한 보안 시스템을 갖춥니다.",
-            ...(f.paid ? ["회사는 상품이나 용역에 대하여 「표시·광고의 공정화에 관한 법률」 제3조에서 정한 부당한 표시·광고 행위를 하여 이용자가 손해를 입은 경우 이를 배상할 책임을 집니다."] : []),
+            ...(f.paid ? ["회사는 상품이나 용역에 대하여 「표시·광고의 공정화에 관한 법률」 제3조에서 정한 부당한 표시, 광고 행위를 하여 이용자가 손해를 입은 경우 이를 배상할 책임을 집니다."] : []),
             "회사는 이용자가 원하지 않는 영리 목적의 광고성 전자우편이나 문자를 보내지 않습니다.",
           ],
         },
@@ -621,7 +621,7 @@ export function TermsGenerator() {
 
         <div className="mt-6 grid gap-4 sm:grid-cols-2">
           <label className={label}>
-            회사·상호명 <span className="text-[#b42318]">*</span>
+            회사명(상호) <span className="text-[#b42318]">*</span>
             <input value={form.company} onChange={(e) => set("company", e.target.value)} placeholder="예: 곰파트너상회" className={input} />
           </label>
           <label className={label}>
@@ -812,7 +812,7 @@ export function TermsGenerator() {
           공정거래위원회 표준약관 구성을 따른 초안이며 법률 자문을 대신하지 않습니다.
         </p>
         <div className="mt-4 flex flex-wrap items-center justify-between gap-3 rounded-[10px] bg-surface p-5">
-          <p className="text-[16px] font-bold">약관을 홈페이지 회원가입 화면에 붙여야 하나요?</p>
+          <p className="text-[16px] font-bold">회원가입 화면에 약관 적용이 필요하십니까?</p>
           <KakaoChatButton cta="tool_terms_chat" className="inline-flex h-11 items-center rounded-md bg-accent px-4 text-[15px] font-bold text-accent-foreground hover:bg-accent-hover">
             카카오톡 상담
           </KakaoChatButton>

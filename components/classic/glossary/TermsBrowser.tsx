@@ -62,7 +62,7 @@ export function TermsBrowser() {
         {words.length ? `"${q.trim()}" 찾은 용어 ` : ""}
         <span className="tabular-nums">{total}</span>개
       </p>
-      {shown.length === 0 ? <p className="py-16 text-center text-[16px] text-[#5b6370]">찾는 용어가 없습니다. 생김새로 다시 찾아보세요.</p> : null}
+      {shown.length === 0 ? <p className="py-16 text-center text-[16px] text-[#5b6370]">찾는 용어가 없습니다. 형태를 설명하는 말로 다시 검색하십시오.</p> : null}
       <div className="space-y-12">
         {shown.map((g) => (
           <section key={g.id} aria-labelledby={`${g.id}-h`} className="mt-8">
@@ -82,7 +82,7 @@ export function TermsBrowser() {
                 <li key={t.id} id={t.id} className="flex min-w-0 scroll-mt-28 flex-col gap-2 rounded-md border border-[#e1e5eb] bg-white p-5 target:border-[#256ef4] target:ring-2 target:ring-[#256ef4]/20">
                   <h3 className="text-[18px] font-[800] tracking-[-0.02em]">{t.name}</h3>
                   <p className="text-[14px] text-[#5b6370]">{t.alt}</p>
-                  <dl className="grid grid-cols-[4.2em_1fr] gap-x-2 gap-y-1 text-[15px] leading-[1.55]">
+                  <dl className="grid grid-cols-[5.2em_1fr] gap-x-2 gap-y-1 text-[15px] leading-[1.55]">
                     <dt className="text-[#5b6370]">{termLabels[g.sec][0]}</dt>
                     <dd className="min-w-0">{t.look}</dd>
                     <dt className="text-[#5b6370]">{termLabels[g.sec][1]}</dt>
@@ -90,7 +90,7 @@ export function TermsBrowser() {
                   </dl>
                   {t.say ? (
                     <p className="mt-1 rounded bg-[#eef3ff] px-3 py-2.5 text-[15px] leading-[1.55]">
-                      <span className="mb-0.5 block text-[12px] font-bold text-[#256ef4]">업체에 이렇게 말하세요</span>"{t.say}"
+                      <span className="mb-0.5 block text-[12px] font-bold text-[#256ef4]">요청 예시</span>"{t.say}"
                     </p>
                   ) : null}
                 </li>

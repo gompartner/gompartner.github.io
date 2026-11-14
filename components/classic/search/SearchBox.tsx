@@ -27,7 +27,7 @@ export function SearchBox({ id, value, onChange, placeholder, suggestions = [] }
         ) : null}
       </div>
       {suggestions.length > 0 ? (
-        <ul className="mt-3 flex flex-wrap gap-2" role="list" aria-label="자주 찾는 말">
+        <ul className="mt-3 flex flex-wrap gap-2" role="list" aria-label="자주 찾는 검색어">
           {suggestions.map((s) => (
             <li key={s}>
               <button type="button" onClick={() => onChange(s)} className="min-h-9 rounded-full border border-[#d9dee5] bg-white px-3.5 text-[14px] font-bold text-[#3d4450] hover:border-[#256ef4] hover:text-[#256ef4]">

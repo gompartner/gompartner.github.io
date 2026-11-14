@@ -147,7 +147,7 @@ export function parseCron(input: string): CronResult | null {
   if (tokens.length < 5 || tokens.length > 7) {
     return {
       ok: false,
-      error: `칸이 ${tokens.length}개입니다. 5칸(분 시 일 월 요일)이나 초를 붙인 6칸, 연도까지 붙인 7칸으로 입력하세요.`,
+      error: `칸이 ${tokens.length}개입니다. 5칸(분 시 일 월 요일)이나 초를 붙인 6칸, 연도까지 붙인 7칸으로 입력하십시오.`,
       badIndex: null,
       tokens,
       keys: [],
@@ -533,7 +533,7 @@ export function CronExplainer() {
               {!now ? (
                 <p className="px-4 py-3 text-[15px] text-foreground-secondary">계산하는 중입니다.</p>
               ) : runs.length === 0 ? (
-                <p className="px-4 py-3 text-[15px] text-foreground-secondary">앞으로 50년 안에 실행되는 날이 없습니다. 2월 30일처럼 없는 날짜인지 확인하세요.</p>
+                <p className="px-4 py-3 text-[15px] text-foreground-secondary">앞으로 50년 안에 실행되는 날이 없습니다. 2월 30일처럼 없는 날짜인지 확인하십시오.</p>
               ) : (
                 <ol className="divide-y divide-border">
                   {runs.map((r, i) => (

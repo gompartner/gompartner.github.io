@@ -10,7 +10,7 @@ const count = termGroups.reduce((a, g) => a + g.terms.length, 0);
 
 export const metadata: Metadata = pageMeta({
   title: "웹 용어 사전",
-  description: `홈페이지를 맡기고 관리할 때 나오는 말 ${count}개. 화면 부품, 디자인 용어, 운영과 유지보수 용어의 뜻과 다른 이름, 업체에 말할 때 쓰는 문장을 정리했습니다.`,
+  description: `홈페이지 제작 의뢰와 운영에 쓰는 용어 ${count}개. 화면 부품, 디자인 용어, 운영과 유지보수 용어의 정의와 다른 이름, 요청 예시를 정리했습니다.`,
   path: "/glossary",
 });
 
@@ -31,7 +31,7 @@ export default function ClassicTermsPage() {
       <PageHead title="웹 용어 사전" trail={[{ href: "/glossary", label: "웹 용어 사전" }]} />
       <div className={`${wrap} pb-16 pt-10 md:pb-24 md:pt-14`}>
         <p className="mb-8 max-w-[62ch] text-[17px] leading-[1.7] text-[#3d4450]">
-          홈페이지를 맡기고 관리할 때 나오는 말 {count}개를 모았습니다. 이름을 알면 업체에도, AI에게도 한 번에 전할 수 있습니다.
+          홈페이지 제작 의뢰와 운영에 쓰는 용어 {count}개를 정리했습니다. 정확한 명칭을 쓰면 업체와 AI에 요청 내용이 한 번에 전달됩니다.
         </p>
         <TermsBrowser />
       </div>
