@@ -7,9 +7,10 @@ import { notices } from "@/data/classic/notices";
 import { tools } from "@/data/classic/tools";
 import { insights } from "@/data/classic/insights";
 import { makeExtras } from "@/data/classic/makeExtra";
+import { termGroups } from "@/data/classic/glossary";
 
 // 통합검색 색인. 서버에서 만들어 검색 페이지(클라이언트)에 넘긴다(11-01).
-export type SearchKind = "서비스" | "카탈로그" | "인사이트" | "네이버 블로그" | "티스토리" | "유튜브" | "자료실" | "자주 묻는 질문" | "공지사항";
+export type SearchKind = "서비스" | "카탈로그" | "인사이트" | "네이버 블로그" | "티스토리" | "유튜브" | "자료실" | "용어 사전" | "자주 묻는 질문" | "공지사항";
 export interface SearchItem {
   kind: SearchKind;
   title: string;
@@ -67,7 +68,9 @@ export function buildSearchIndex(): SearchItem[] {
     href: `/insight/${n.slug}`,
     hay: [n.series, ...n.blocks.flatMap((b) => [b.h ?? "", ...(b.p ?? []), ...(b.steps ?? []).flatMap((s) => [s.b, s.t]), ...(b.table?.rows.flat() ?? [])])].join(" "),
   }));
-  return [...services, ...catalogs, ...kiosk3d, ...posts, ...files, ...faqs, ...news];
+  // 11-15 웹 용어 사전(/glossary): 용어 하나가 결과 한 줄, 누르면 그 용어 자리로 간다
+  const terms: SearchItem[] = termGroups.flatMap((g) => g.terms.map((t) => ({ kind: "용어 사전" as const, title: t.name, desc: `${t.look}. ${t.alt}`, href: `/glossary#${t.id}`, hay: [t.alt, t.use, t.say, g.title, g.cat, g.sec].join(" ") })));
+  return [...services, ...catalogs, ...kiosk3d, ...posts, ...files, ...terms, ...faqs, ...news];
 }
 
 /** 카탈로그 검색용(카탈로그 목록 페이지) */

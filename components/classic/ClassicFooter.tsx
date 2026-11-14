@@ -104,6 +104,9 @@ export function ClassicFooter() {
             <Link href="/privacy" className="inline-flex min-h-11 items-center self-start font-bold text-white hover:underline">
               개인정보처리방침
             </Link>
+            <Link href="/glossary" className="inline-flex min-h-11 items-center self-start hover:text-white hover:underline">
+              웹 용어 사전
+            </Link>
             <Link href="/en" lang="en" hrefLang="en" className="inline-flex min-h-11 items-center gap-1.5 self-start hover:text-white hover:underline">
               <Globe size={15} strokeWidth={2} aria-hidden />
               English
