@@ -5,7 +5,15 @@ import { ORG_ID, WEBSITE_ID } from "@/lib/seo";
 import { siteUrl } from "@/lib/site";
 
 // 같은 이름의 다른 회사와 구분되도록 회사가 운영하는 채널을 묶는다.
-const sameAs = ["https://blog.naver.com/gompartner", "https://www.youtube.com/@gompartner", "https://clip.naver.com/@gompartner"];
+const sameAs = [
+  "https://blog.naver.com/gompartner",
+  "https://www.youtube.com/@gompartner",
+  "https://clip.naver.com/@gompartner",
+  "https://www.instagram.com/gompartner.co.kr/",
+  "https://www.tiktok.com/@gompartner",
+  "https://gompartner.tistory.com/",
+  "https://pf.kakao.com/_JxntWX",
+];
 
 /** JSON-LD 한 덩어리(객체 또는 배열)를 script 태그로 넣는다. */
 export function LdScript({ data }: { data: object }) {
