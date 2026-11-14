@@ -1,6 +1,7 @@
 "use client";
 
 import { forwardRef, useEffect, useRef, useState } from "react";
+import { readAttribution } from "@/lib/attribution";
 import { Check, ChevronDown, MessageCircle } from "lucide-react";
 import { openChannelChat } from "@/components/layout/ChannelTalk";
 import { LEAD_ENDPOINT } from "@/data/leadEndpoint";
@@ -69,7 +70,6 @@ export const LeadForm = forwardRef<HTMLElement, { pkg: PackageName | ""; onPkg: 
       setStatus({ kind: "error", message: "지금은 신청을 받을 수 없습니다. 잠시 뒤 다시 시도해 주세요." });
       return;
     }
-    const q = new URLSearchParams(window.location.search);
     const payload = {
       name: name.trim(),
       phone: phone.trim(),
@@ -78,9 +78,7 @@ export const LeadForm = forwardRef<HTMLElement, { pkg: PackageName | ""; onPkg: 
       pkg: pkg || "잘 모르겠음",
       message: message.trim(),
       agree,
-      utm_source: q.get("utm_source") ?? "",
-      utm_campaign: q.get("utm_campaign") ?? "",
-      referrer: document.referrer,
+      ...readAttribution(),
       page: window.location.pathname,
       startedAt: startedAt.current,
       website,

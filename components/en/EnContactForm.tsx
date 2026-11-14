@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useRef, useState } from "react";
+import { readAttribution } from "@/lib/attribution";
 import Link from "next/link";
 import { LEAD_ENDPOINT } from "@/data/classic/leadEndpoint";
 import { profile } from "@/data/classic/profile";
@@ -36,7 +37,6 @@ export function EnContactForm() {
     setErrors(next);
     if (Object.keys(next).length) return;
 
-    const q = new URLSearchParams(window.location.search);
     const payload = {
       // 11-14 시트 "영문 문의" 탭
       form: "en",
@@ -45,9 +45,7 @@ export function EnContactForm() {
       business: company.trim() || "-",
       message: message.trim(),
       agree,
-      utm_source: q.get("utm_source") ?? "",
-      utm_campaign: q.get("utm_campaign") ?? "",
-      referrer: document.referrer,
+      ...readAttribution(),
       page: window.location.href,
       startedAt: startedAt.current,
       website,

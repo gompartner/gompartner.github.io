@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useRef, useState, type KeyboardEvent } from "react";
+import { readAttribution } from "@/lib/attribution";
 import { useSearchParams } from "next/navigation";
 import { Check, ChevronDown, MessageCircle } from "lucide-react";
 import { openChannelChat } from "@/components/layout/ChannelTalk";
@@ -136,7 +137,6 @@ export function ContactForm() {
       setStatus({ kind: "error", message: "지금은 신청을 받을 수 없습니다. 잠시 뒤 다시 시도해 주세요." });
       return;
     }
-    const q = new URLSearchParams(window.location.search);
     // 11-14 시트 "상담 신청" 탭에 항목마다 칸이 따로 있다(form: "contact")
     const payload = {
       form: "contact",
@@ -152,9 +152,7 @@ export function ContactForm() {
       currentSite: currentSite.trim(),
       message: message.trim(),
       agree,
-      utm_source: q.get("utm_source") ?? "",
-      utm_campaign: q.get("utm_campaign") ?? "",
-      referrer: document.referrer,
+      ...readAttribution(),
       page: window.location.href,
       startedAt: startedAt.current,
       website,

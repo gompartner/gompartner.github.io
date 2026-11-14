@@ -2,6 +2,7 @@ import type { Metadata, Viewport } from "next";
 import localFont from "next/font/local";
 import Script from "next/script";
 import { lookRedirectScript } from "@/lib/look";
+import { firstTouchScript } from "@/lib/attribution";
 import "./globals.css";
 import { CtaTracker } from "@/components/analytics/CtaTracker";
 import { ThemeProvider } from "@/components/layout/ThemeProvider";
@@ -82,6 +83,8 @@ export default function RootLayout({
       <body className="min-h-screen bg-background text-foreground antialiased">
         {/* 클래식 보기를 골랐으면 웹툰 화면을 그리기 전에 클래식 주소로 옮긴다 */}
         <script dangerouslySetInnerHTML={{ __html: lookRedirectScript }} />
+        {/* 처음 들어온 곳(utm, 바깥 이전 페이지)을 기억해 상담 신청서에 함께 보낸다 */}
+        <script dangerouslySetInnerHTML={{ __html: firstTouchScript }} />
         <noscript>
           <iframe
             src={`https://www.googletagmanager.com/ns.html?id=${GTM_ID}`}
