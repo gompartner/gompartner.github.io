@@ -10,7 +10,7 @@ import { pageMeta } from "@/lib/seo";
 export const metadata: Metadata = {
   ...pageMeta({
     title: "무료 자료",
-    description: "홈페이지 견적 질문지, 우리 홈페이지 점검표, 운영자용 AI 요청 문장. 휴대폰으로 열람하고 PDF로 내려받을 수 있습니다.",
+    description: "홈페이지 견적 질문지, 우리 홈페이지 점검표, 사장님 AI 부탁 문장. 휴대폰으로 열람하고 PDF로 내려받을 수 있습니다.",
     path: "/jaryo",
     image: { src: "/og/jaryo.jpg", alt: "곰파트너 무료 자료" },
   }),

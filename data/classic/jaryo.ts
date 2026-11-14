@@ -20,13 +20,13 @@ export const jaryo: Jaryo[] = [
   },
   {
     id: "ai-prompts",
-    title: "운영자용 AI 요청 문장 12가지",
+    title: "사장님 AI 부탁 문장 12가지",
     when: "매장 운영",
     parts: ["고객 응대 3개", "홍보 3개", "매장 운영 3개, 매출과 서류 3개", "AI 채팅창에 넣지 말 것"],
   },
   {
     id: "gnuboard-handover",
-    title: "그누보드 인수 당일 기록표",
+    title: "그누보드 넘겨받은 날 기록표",
     when: "사이트 인수 당일",
     parts: ["기록할 다섯 가지와 확인 위치", "제작자에게 보낼 확인 문장", "비밀번호를 기록하지 않는 이유"],
     pages: 1,
@@ -40,7 +40,7 @@ export const jaryo: Jaryo[] = [
   },
   {
     id: "wordpress-handover",
-    title: "워드프레스 인수 당일 기록표",
+    title: "워드프레스 넘겨받은 날 기록표",
     when: "사이트 인수 당일",
     parts: ["기록할 여섯 가지와 확인 위치", "인계자에게 보낼 확인 문장", "비밀번호를 기록하지 않는 이유"],
     pages: 1,
@@ -54,7 +54,7 @@ export const jaryo: Jaryo[] = [
   },
   {
     id: "ai-handover",
-    title: "AI 사이트 인수 당일 기록표",
+    title: "AI 사이트 넘겨받은 날 기록표",
     when: "AI로 만든 사이트 인수 당일",
     parts: ["기록할 다섯 가지와 함께 확인할 두 가지", "제작자에게 보낼 확인 문장", "키 값을 기록하지 않는 이유"],
     pages: 1,
