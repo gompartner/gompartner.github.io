@@ -23,7 +23,7 @@ const groups = [
     title: "유지보수",
     items: [
       { href: "/maintenance/fix", label: "오류 수정" },
-      { href: "/maintenance/takeover", label: "업체 이관" },
+      { href: "/maintenance/takeover", label: "업체 변경" },
       { href: "/maintenance/update", label: "보안 업데이트" },
       { href: "/maintenance/monthly", label: "월 유지보수" },
     ],
@@ -44,9 +44,9 @@ const groups = [
 // 11-07 채널마다 그 채널에서만 하는 일을 이름으로, 서비스 이름은 아래 작은 줄로(채널끼리는 서로 잇지 않고 사이트에서만 모은다)
 export const channels: { href: string; label: string; handle: string; icon: ChannelIconName }[] = [
   { href: "https://blog.naver.com/gompartner", label: "홈페이지 이야기", handle: "네이버 블로그", icon: "naverBlog" },
-  { href: "https://gompartner.tistory.com", label: "업종별 제작기", handle: "티스토리", icon: "tistory" },
+  { href: "https://gompartner.tistory.com", label: "웹 용어 사전 글", handle: "티스토리", icon: "tistory" },
   { href: "https://www.youtube.com/@gompartner", label: "사고 이야기와 운영 강의", handle: "유튜브", icon: "youtube" },
-  { href: "https://www.instagram.com/gompartner.co.kr", label: "점검 카드", handle: "인스타그램", icon: "instagram" },
+  { href: "https://www.instagram.com/gompartner.co.kr", label: "UI 용어 숏츠", handle: "인스타그램", icon: "instagram" },
   { href: "https://clip.naver.com/@gompartner", label: "30초 점검", handle: "네이버 클립", icon: "naverClip" },
 ];
 
