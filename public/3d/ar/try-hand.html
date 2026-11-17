@@ -71,9 +71,10 @@
   </main>
   <div class="bar"><div class="in"><div class="t"><small id="what"></small><b id="total">0원</b></div><a href="./">카탈로그</a></div></div>
 </div>
-<script type="importmap">{ "imports": { "three": "https://cdn.jsdelivr.net/npm/three@0.160.0/build/three.module.js" } }</script>
+<script type="importmap">{ "imports": { "three": "https://cdn.jsdelivr.net/npm/three@0.160.0/build/three.module.js", "three/addons/": "https://cdn.jsdelivr.net/npm/three@0.160.0/examples/jsm/" } }</script>
 <script type="module">
 import * as THREE from 'three';
+import { RoomEnvironment } from 'three/addons/environments/RoomEnvironment.js';
 import { HandLandmarker, FilesetResolver } from 'https://cdn.jsdelivr.net/npm/@mediapipe/tasks-vision@0.10.14/vision_bundle.mjs';
 
 const KINDS = {
@@ -111,8 +112,8 @@ function build() {
   if (state.kind === 'ring') {
     // 손가락 앞쪽 반만 보이게 (뒤쪽은 손가락에 가려짐)
     const w = state.model === 'w' ? 0.34 : 0.17;
-    const band = new THREE.Mesh(new THREE.CylinderGeometry(0.56, 0.56, w, 48, 1, true, -Math.PI / 2, Math.PI), metal.clone());
-    band.material.side = THREE.DoubleSide;
+    // 바깥면만 그리면 손가락 뒤로 돌아가는 쪽은 저절로 안 보인다
+    const band = new THREE.Mesh(new THREE.CylinderGeometry(0.56, 0.56, w, 64, 1, true), metal);
     rig.add(band);
     const rim = new THREE.TorusGeometry(0.56, 0.035, 8, 48, Math.PI);
     for (const y of [-w / 2, w / 2]) { const r = new THREE.Mesh(rim, metal); r.rotation.set(Math.PI / 2, 0, Math.PI); r.position.y = y; rig.add(r); }
@@ -140,6 +141,8 @@ function build() {
 // ---------- 화면과 손 인식 ----------
 const canvas = $('gl'), renderer = new THREE.WebGLRenderer({ canvas, alpha: true, antialias: true, preserveDrawingBuffer: true });
 renderer.outputColorSpace = THREE.SRGBColorSpace;
+// 금속이 비출 실내 조명 환경 (없으면 반지, 테가 검게 보임)
+scene.environment = new THREE.PMREMGenerator(renderer).fromScene(new RoomEnvironment(), 0.04).texture;
 const cam = new THREE.OrthographicCamera(0, 1, 0, -1, -1000, 1000);
 let src = null, mirror = false, lm = null, last = -1;
 function size() {
@@ -151,7 +154,8 @@ addEventListener('resize', size);
 function mapper() {
   const r = $('stage').getBoundingClientRect(), sw = src.videoWidth || src.naturalWidth, sh = src.videoHeight || src.naturalHeight;
   const k = Math.max(r.width / sw, r.height / sh), ox = (r.width - sw * k) / 2, oy = (r.height - sh * k) / 2;
-  return p => new THREE.Vector3((mirror ? 1 - p.x : p.x) * sw * k + ox, -(p.y * sh * k + oy), -p.z * sw * k);
+  // 손 인식의 깊이 값은 실제보다 크게 나와서 4분의 1만 쓴다 (안 그러면 반지가 위에서 본 것처럼 눕는다)
+  return p => new THREE.Vector3((mirror ? 1 - p.x : p.x) * sw * k + ox, -(p.y * sh * k + oy), -p.z * sw * k * 0.25);
 }
 // 축 하나(손가락이나 팔 방향)를 기준으로 고리를 세우고, 고리 앞면이 화면을 보게 돌린다
 function orient(a, b, at, scale) {
@@ -168,12 +172,12 @@ function place(h) {
     // 약지 첫 마디(13에서 14 사이 35% 지점), 굵기는 손가락 뿌리 간격으로 잡는다
     const a = P(13), b = P(14), at = a.clone().lerp(b, 0.35);
     const fw = P(9).distanceTo(P(13)) * 0.5;
-    orient(a, b, at, fw * 1.05);
+    orient(a, b, at, fw * 1.2);
   } else {
     // 손목: 손바닥 중심에서 손목 쪽으로 더 나간 자리, 굵기는 검지와 새끼 뿌리 간격
     const w = P(0), mid = P(9), dir = new THREE.Vector3().subVectors(w, mid);
     const at = w.clone().add(dir.clone().multiplyScalar(0.18));
-    const ww = P(5).distanceTo(P(17)) * 0.62;
+    const ww = P(5).distanceTo(P(17)) * 0.82;
     orient(at.clone().add(dir), at, at, ww);
   }
 }
