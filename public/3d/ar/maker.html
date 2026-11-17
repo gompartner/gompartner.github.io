@@ -1,0 +1,309 @@
+<!doctype html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>제품 등록 | 곰파트너 AR 카탈로그</title>
+<meta name="robots" content="noindex">
+<meta name="theme-color" content="#0f1b3d">
+<link rel="icon" href="icon-192.png">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/static/pretendard.min.css">
+<style>
+  :root { --navy: #0f1b3d; --ink: #1d1f22; --ink2: #5a6068; --line: #dde1e6; --bg: #f3f4f6; --blue: #256ef4; }
+  * { box-sizing: border-box; }
+  body { margin: 0; font-family: Pretendard, -apple-system, "Apple SD Gothic Neo", sans-serif; color: var(--ink); background: var(--bg); word-break: keep-all; }
+  header { background: var(--navy); color: #fff; padding: calc(10px + env(safe-area-inset-top)) 16px 12px; display: flex; align-items: center; gap: 10px; }
+  header a { color: #fff; text-decoration: none; font-size: 14px; opacity: .8; white-space: nowrap; }
+  header b { font-size: 18px; font-weight: 800; flex: 1; }
+  .layout { max-width: 1200px; margin: 0 auto; display: grid; grid-template-columns: 1fr; gap: 16px; padding: 16px; }
+  @media (min-width: 960px) { .layout { grid-template-columns: minmax(0, 1fr) 440px; align-items: start; } .pv { position: sticky; top: 16px; } }
+  section { background: #fff; border: 1px solid var(--line); border-radius: 10px; padding: 16px; margin-bottom: 12px; }
+  h2 { font-size: 16px; margin: 0 0 12px; display: flex; gap: 8px; align-items: baseline; }
+  h2 small { font-size: 13px; color: var(--ink2); font-weight: 500; }
+  label.f { display: block; font-size: 13px; font-weight: 700; color: var(--ink2); margin: 10px 0 4px; }
+  input, select, textarea { font: inherit; font-size: 15px; border: 1.5px solid var(--line); border-radius: 8px; padding: 9px 10px; width: 100%; background: #fff; color: var(--ink); min-width: 0; }
+  input:focus, select:focus, textarea:focus { outline: 2px solid var(--navy); border-color: var(--navy); }
+  input[type=checkbox] { width: 18px; height: 18px; padding: 0; accent-color: var(--navy); flex: none; }
+  .row { display: grid; gap: 8px; align-items: end; }
+  .r3 { grid-template-columns: 1fr 1fr 1fr; }
+  .r4 { grid-template-columns: 1.4fr 1fr 1fr 1fr; }
+  .r5 { grid-template-columns: 1.3fr 1fr 1fr 1fr 1fr auto; }
+  .row small { display: block; font-size: 12px; color: var(--ink2); margin-bottom: 3px; }
+  .dimname { font-weight: 700; font-size: 14px; padding-bottom: 10px; }
+  .opts { display: grid; grid-template-columns: repeat(auto-fill, minmax(190px, 1fr)); gap: 8px; }
+  .opt { display: flex; align-items: center; gap: 8px; border: 1px solid var(--line); border-radius: 8px; padding: 8px 10px; }
+  .opt .dot { width: 18px; height: 18px; border-radius: 50%; border: 1px solid rgba(0,0,0,.15); flex: none; }
+  .opt span { flex: 1; font-size: 14px; font-weight: 600; min-width: 0; }
+  .opt input[type=number] { width: 92px; flex: none; padding: 6px 8px; font-size: 14px; text-align: right; }
+  .grp { margin-top: 14px; }
+  .grp:first-child { margin-top: 0; }
+  .grp > b { display: block; font-size: 14px; margin-bottom: 6px; }
+  .btn { border: 0; border-radius: 8px; background: var(--navy); color: #fff; font: inherit; font-weight: 700; padding: 11px 14px; cursor: pointer; }
+  .btn.ghost { background: #fff; color: var(--navy); border: 1.5px solid var(--navy); }
+  .btn.sm { padding: 7px 10px; font-size: 13px; }
+  .drop { border: 2px dashed var(--line-2, #c7ccd3); border-radius: 10px; padding: 18px; text-align: center; color: var(--ink2); font-size: 14px; }
+  .drop.on { border-color: var(--blue); background: #eef4ff; }
+  .drop b { color: var(--ink); }
+  .pv section { padding: 0; overflow: hidden; }
+  .stage { height: 360px; background: linear-gradient(#eef0f3, #dfe3e8); position: relative; }
+  model-viewer { width: 100%; height: 100%; }
+  .msg { position: absolute; inset: 0; display: flex; align-items: center; justify-content: center; text-align: center; padding: 20px; color: var(--ink2); font-size: 14px; pointer-events: none; }
+  .ctl { padding: 12px 16px; display: flex; flex-direction: column; gap: 10px; border-top: 1px solid var(--line); }
+  .ctl .seg { display: flex; flex-wrap: wrap; gap: 6px; }
+  .ctl .seg button { border: 1.5px solid var(--line); background: #fff; border-radius: 999px; padding: 5px 10px; font: inherit; font-size: 13px; font-weight: 600; }
+  .ctl .seg button[aria-pressed=true] { border-color: var(--navy); background: #eef2fb; color: var(--navy); }
+  .ctl .range { display: flex; gap: 8px; align-items: center; font-size: 13px; }
+  .ctl .range input { flex: 1; padding: 0; border: 0; accent-color: var(--navy); }
+  .ctl .range span { width: 120px; text-align: right; font-variant-numeric: tabular-nums; }
+  table { width: 100%; border-collapse: collapse; font-size: 13.5px; }
+  td { padding: 6px 0; border-bottom: 1px solid var(--line); vertical-align: top; }
+  td small { display: block; color: var(--ink2); font-size: 12px; }
+  td.n { text-align: right; white-space: nowrap; padding-left: 8px; font-variant-numeric: tabular-nums; }
+  tfoot td { font-weight: 800; font-size: 16px; border: 0; }
+  .q { padding: 12px 16px 16px; border-top: 1px solid var(--line); }
+  .acts { display: flex; gap: 8px; padding: 0 16px 16px; flex-wrap: wrap; }
+  .acts .btn { flex: 1; }
+  .note { font-size: 12.5px; color: var(--ink2); padding: 0 16px 14px; margin: 0; }
+  .toast { position: fixed; left: 50%; bottom: 20px; transform: translateX(-50%); background: var(--navy); color: #fff; border-radius: 8px; padding: 10px 16px; font-size: 14px; font-weight: 600; display: none; z-index: 9; }
+  @media (max-width: 560px) { .r5 { grid-template-columns: 1fr 1fr 1fr; } .r4 { grid-template-columns: 1fr 1fr; } }
+</style>
+</head>
+<body>
+<header><b>제품 등록</b><a href="./">카탈로그 보기</a></header>
+<div class="layout">
+  <div>
+    <section>
+      <h2>1. 만드는 방식</h2>
+      <select id="src" aria-label="시작할 견본"></select>
+      <p style="font-size:13px;color:var(--ink2);margin:8px 0 0">비슷한 견본을 고르면 모양과 옵션을 그대로 가져옵니다. 모양이 복잡한 제품은 3D 파일로 등록합니다.</p>
+    </section>
+    <section>
+      <h2>2. 기본 정보</h2>
+      <label class="f" for="name">제품 이름</label><input id="name" maxlength="24">
+      <div class="row r3" style="grid-template-columns:1fr 2fr">
+        <div><label class="f" for="cat">분류</label><select id="cat"></select></div>
+        <div><label class="f" for="desc">한 줄 설명</label><input id="desc" maxlength="40"></div>
+      </div>
+    </section>
+    <section id="filebox" hidden>
+      <h2>3D 파일 <small>GLB, glTF. 스캔 앱이나 AI 생성 결과</small></h2>
+      <div class="drop" id="drop"><b>파일을 여기에 끌어다 놓거나</b><br><input type="file" id="file" accept=".glb,.gltf,model/gltf-binary" style="margin-top:8px;max-width:280px"></div>
+      <div class="grp"><b>규격 <small style="font-weight:500;color:var(--ink2)">실제 치수(mm)대로 3D 크기를 맞춥니다</small></b><div id="sizes"></div>
+      <button type="button" class="btn ghost sm" id="addsize" style="margin-top:8px">규격 추가</button></div>
+    </section>
+    <section id="dimbox">
+      <h2>3. 치수 범위 <small>mm, 고객이 이 안에서 조절합니다</small></h2>
+      <div id="dims"></div>
+    </section>
+    <section>
+      <h2>4. 옵션과 가산 금액 <small>체크한 것만 고객에게 보입니다</small></h2>
+      <div id="opts"></div>
+    </section>
+    <section>
+      <h2>5. 가격 규칙 <small>원, 부가세 포함</small></h2>
+      <div class="row r3">
+        <div><label class="f" for="base">기본 제품가</label><input id="base" type="number" step="1000" min="0"></div>
+        <div><label class="f" for="rate">면적 가산 (㎡당)</label><input id="rate" type="number" step="1000" min="0"></div>
+        <div><label class="f" for="install">설치비</label><input id="install" type="number" step="1000" min="0"></div>
+      </div>
+      <div id="steps"></div>
+    </section>
+  </div>
+  <div class="pv">
+    <section>
+      <div class="stage"><model-viewer id="mv" camera-controls shadow-intensity="1" environment-image="neutral" camera-orbit="-25deg 76deg auto" interaction-prompt="none" ar ar-modes="webxr scene-viewer quick-look"></model-viewer><div class="msg" id="msg"></div></div>
+      <div class="ctl" id="ctl"></div>
+      <div class="q"><table><tbody id="lines"></tbody><tfoot><tr><td>합계</td><td class="n" id="sum"></td></tr></tfoot></table></div>
+      <div class="acts"><button type="button" class="btn" id="save">이 기기 카탈로그에 등록</button><button type="button" class="btn ghost" id="dl">등록 파일 내려받기</button></div>
+      <p class="note">이 기기에 등록하면 이 브라우저의 카탈로그에 바로 나타납니다. 모든 사람에게 보이게 하려면 내려받은 파일을 곰파트너에 보내 주세요.</p>
+    </section>
+  </div>
+</div>
+<div class="toast" id="toast" role="status"></div>
+
+<script type="module" src="https://cdn.jsdelivr.net/npm/@google/model-viewer@3.5.0/dist/model-viewer.min.js"></script>
+<script type="importmap">{ "imports": { "three": "https://cdn.jsdelivr.net/npm/three@0.160.0/build/three.module.js", "three/addons/": "https://cdn.jsdelivr.net/npm/three@0.160.0/examples/jsm/" } }</script>
+<script type="module">
+import * as THREE from 'three';
+import { GLTFExporter } from 'three/addons/exporters/GLTFExporter.js';
+import { CATS, PRODUCTS, PALETTES, defaults, quote, build, rulePrice, fromPrice, putFile } from './engine.js';
+
+const $ = id => document.getElementById(id);
+const won = n => n.toLocaleString('ko-KR') + '원';
+const esc = t => String(t ?? '').replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
+const clone = o => JSON.parse(JSON.stringify(o));
+const BUILTIN = PRODUCTS.filter(p => !p.extra);
+
+let D, fileBlob = null, fileURL = null, view = {};
+
+$('src').innerHTML = `<option value="model">3D 파일로 등록 (모양 제한 없음)</option>` +
+  CATS.filter(c => BUILTIN.some(p => p.cat === c.id)).map(c => `<optgroup label="${c.name} 견본에서 시작">${BUILTIN.filter(p => p.cat === c.id).map(p => `<option value="${p.id}">${p.name}</option>`).join('')}</optgroup>`).join('');
+$('cat').innerHTML = CATS.map(c => `<option value="${c.id}">${c.name}</option>`).join('');
+
+function start(srcId) {
+  if (srcId === 'model') {
+    D = { cat: 'etc', tpl: 'model', name: '', desc: '', fixed: {}, params: [
+      { k: 'size', label: '규격', type: 'seg', def: 's1', options: [{ id: 's1', name: '기본', w: 1000, h: 800, d: 500, add: 0 }] },
+      { k: 'tint', label: '색', type: 'color', def: 'o', options: [{ id: 'o', name: '원래 색', hex: '', add: 0, on: true }, ...PALETTES.WOOD.map(o => ({ ...o, id: 'w' + o.id, on: false, add: 0 }))] }
+    ], rule: { base: 300000, area: { keys: ['w', 'h'], rate: 0 }, steps: [], install: 0 } };
+  } else {
+    const s = BUILTIN.find(p => p.id === srcId);
+    const params = clone(s.params).map(x => x.options ? { ...x, options: x.options.map(o => ({ ...o, add: o.add >= 1 ? o.add : 0, on: true })) } : x);
+    const keys = s.tpl === 'table' ? (params.some(x => x.k === 'd') ? ['w', 'd'] : ['w', 'w']) : ['w', 'h'];
+    D = { cat: s.cat, tpl: s.tpl, name: s.name + ' (새 제품)', desc: s.desc, fixed: clone(s.fixed || {}), params,
+      rule: { base: Math.round(fromPrice(s) * 0.7 / 10000) * 10000, area: { keys, rate: 0 }, steps: params.filter(x => x.type === 'range').map(x => ({ k: x.k, from: x.min, unit: 100, price: 0 })), install: 100000 } };
+  }
+  fileBlob = null; view = {};
+  form(); refresh(true);
+}
+
+// ---------- 왼쪽 입력 칸 ----------
+function form() {
+  $('name').value = D.name; $('cat').value = D.cat; $('desc').value = D.desc;
+  const model = D.tpl === 'model';
+  $('filebox').hidden = !model; $('dimbox').hidden = model;
+  $('dims').innerHTML = D.params.filter(x => x.type === 'range').map(x => `<div class="row r4" style="margin-bottom:8px"><div class="dimname">${esc(x.label)}</div>
+    <label><small>최소</small><input type="number" step="10" data-dim="${x.k}" data-f="min" value="${x.min}"></label>
+    <label><small>최대</small><input type="number" step="10" data-dim="${x.k}" data-f="max" value="${x.max}"></label>
+    <label><small>처음 값</small><input type="number" step="10" data-dim="${x.k}" data-f="def" value="${x.def}"></label></div>`).join('') +
+    D.params.filter(x => x.type === 'text').map(x => `<label class="f">${esc(x.label)} 처음 값</label><input data-text="${x.k}" maxlength="${x.max}" value="${esc(x.def)}">`).join('');
+  $('opts').innerHTML = D.params.filter(x => x.options && x.k !== 'size').map(x => `<div class="grp"><b>${esc(x.label)}</b><div class="opts">${x.options.map((o, i) =>
+    `<label class="opt">${o.hex ? `<i class="dot" style="background:${esc(o.hex)}"></i>` : ''}<input type="checkbox" data-opt="${x.k}" data-i="${i}"${o.on ? ' checked' : ''} aria-label="${esc(o.name)} 쓰기"><span>${esc(o.name)}</span>
+     <input type="number" step="1000" min="0" data-add="${x.k}" data-i="${i}" value="${o.rate ? o.rate : (o.add >= 1 ? o.add : 0)}" aria-label="${esc(o.name)} 가산 금액" title="${o.rate ? '㎡당 가산' : '가산 금액'}"></label>`).join('')}</div></div>`).join('');
+  $('base').value = D.rule.base; $('rate').value = D.rule.area.rate; $('install').value = D.rule.install;
+  $('steps').innerHTML = D.rule.steps.length ? `<label class="f">치수 가산</label>` + D.rule.steps.map((st, i) => {
+    const x = D.params.find(p => p.k === st.k);
+    return `<div class="row r3" style="margin-bottom:6px"><div class="dimname">${esc(x.label)}</div><label><small>이 치수를 넘으면(mm)</small><input type="number" step="10" data-step="${i}" data-f="from" value="${st.from}"></label><label><small>100mm마다(원)</small><input type="number" step="1000" min="0" data-step="${i}" data-f="price" value="${st.price}"></label></div>`;
+  }).join('') : '';
+  sizes();
+}
+function sizes() {
+  const sz = D.params.find(x => x.k === 'size'); if (!sz) return;
+  $('sizes').innerHTML = sz.options.map((o, i) => `<div class="row r5" style="margin-bottom:6px">
+    <label><small>규격 이름</small><input data-size="${i}" data-f="name" value="${esc(o.name)}" maxlength="12"></label>
+    <label><small>폭</small><input type="number" step="10" data-size="${i}" data-f="w" value="${o.w}"></label>
+    <label><small>높이</small><input type="number" step="10" data-size="${i}" data-f="h" value="${o.h}"></label>
+    <label><small>깊이</small><input type="number" step="10" data-size="${i}" data-f="d" value="${o.d}"></label>
+    <label><small>가산(원)</small><input type="number" step="1000" data-size="${i}" data-f="add" value="${o.add}"></label>
+    <button type="button" class="btn ghost sm" data-del="${i}" ${sz.options.length < 2 ? 'disabled' : ''}>빼기</button></div>`).join('');
+}
+$('addsize').onclick = () => { const sz = D.params.find(x => x.k === 'size'), l = sz.options.at(-1); sz.options.push({ ...l, id: 's' + (sz.options.length + 1) + Date.now() % 1000, name: '규격 ' + (sz.options.length + 1), add: (+l.add || 0) + 50000 }); sizes(); refresh(true); };
+$('sizes').addEventListener('click', e => { const b = e.target.closest('[data-del]'); if (!b) return; const sz = D.params.find(x => x.k === 'size'); sz.options.splice(+b.dataset.del, 1); sz.def = sz.options[0].id; sizes(); refresh(true); });
+
+document.querySelector('.layout > div').addEventListener('input', e => {
+  const t = e.target, v = t.value, n = +v;
+  if (t.id === 'name') D.name = v; else if (t.id === 'cat') D.cat = v; else if (t.id === 'desc') D.desc = v;
+  else if (t.id === 'base') D.rule.base = n || 0; else if (t.id === 'rate') D.rule.area.rate = n || 0; else if (t.id === 'install') D.rule.install = n || 0;
+  else if (t.dataset.dim) { const x = D.params.find(p => p.k === t.dataset.dim); x[t.dataset.f] = n || 0; }
+  else if (t.dataset.text) D.params.find(p => p.k === t.dataset.text).def = v;
+  else if (t.dataset.opt) D.params.find(p => p.k === t.dataset.opt).options[+t.dataset.i].on = t.checked;
+  else if (t.dataset.add) { const o = D.params.find(p => p.k === t.dataset.add).options[+t.dataset.i]; if (o.rate) o.rate = n || 0; else o.add = n || 0; }
+  else if (t.dataset.step) D.rule.steps[+t.dataset.step][t.dataset.f] = n || 0;
+  else if (t.dataset.size) { const o = D.params.find(x => x.k === 'size').options[+t.dataset.size]; o[t.dataset.f] = t.dataset.f === 'name' ? v : (n || 0); }
+  else return;
+  refresh(!['name', 'desc', 'cat', 'base', 'rate', 'install'].includes(t.id) && !t.dataset.step && !t.dataset.add);
+});
+
+// ---------- 3D 파일 ----------
+async function takeFile(f) {
+  if (!f) return;
+  if (!/\.(glb|gltf)$/i.test(f.name)) { toast('GLB나 glTF 파일만 넣을 수 있습니다'); return; }
+  if (f.size > 30e6) { toast('30MB 이하 파일만 넣을 수 있습니다'); return; }
+  fileBlob = f;
+  if (fileURL) URL.revokeObjectURL(fileURL);
+  fileURL = URL.createObjectURL(f);
+  if (!D.name) { D.name = f.name.replace(/\.(glb|gltf)$/i, ''); $('name').value = D.name; }
+  refresh(true);
+}
+$('file').onchange = e => takeFile(e.target.files[0]);
+const drop = $('drop');
+['dragenter', 'dragover'].forEach(ev => drop.addEventListener(ev, e => { e.preventDefault(); drop.classList.add('on'); }));
+['dragleave', 'drop'].forEach(ev => drop.addEventListener(ev, e => { e.preventDefault(); drop.classList.remove('on'); }));
+drop.addEventListener('drop', e => takeFile(e.dataTransfer.files[0]));
+
+// ---------- 완성품 만들기와 미리보기 ----------
+function finalProduct(id) {
+  const params = D.params.map(x => {
+    if (!x.options) return x.type === 'range' ? { ...x, min: Math.min(x.min, x.max), max: Math.max(x.min, x.max), def: Math.min(Math.max(x.def, Math.min(x.min, x.max)), Math.max(x.min, x.max)) } : { ...x };
+    const options = (x.k === 'size' ? x.options : x.options.filter(o => o.on)).map(({ on, ...o }) => o);
+    return { ...x, options: options.length ? options : [x.options.map(({ on, ...o }) => o)[0]], def: (options.find(o => o.id === x.def) || options[0] || x.options[0]).id };
+  }).filter(x => !(x.k === 'tint' && x.options.length < 2));
+  const p = { id, cat: D.cat, tpl: D.tpl, name: D.name || '이름 없는 제품', desc: D.desc, fixed: D.fixed, params, rule: clone(D.rule) };
+  if (D.tpl === 'model') p.file = fileURL || '';
+  p.price = function (s) { return rulePrice(this, s); };
+  return p;
+}
+const exporter = new GLTFExporter(), mv = $('mv');
+let job = 0, timer = 0, cur = null, mvURL = null;
+function refresh(rebuild) {
+  cur = finalProduct('preview');
+  const st = { ...defaults(cur), ...Object.fromEntries(Object.entries(view).filter(([k, v]) => cur.params.some(x => x.k === k && (!x.options || x.options.some(o => o.id === v))))) };
+  for (const x of cur.params) if (x.type === 'range') st[x.k] = Math.min(x.max, Math.max(x.min, st[x.k]));
+  view = st;
+  $('ctl').innerHTML = cur.params.filter(x => x.type !== 'text').map(x => x.type === 'range'
+    ? `<div class="range"><b style="width:44px">${esc(x.label)}</b><input type="range" min="${x.min}" max="${x.max}" step="10" value="${st[x.k]}" data-v="${x.k}" aria-label="${esc(x.label)}"><span>${st[x.k].toLocaleString('ko-KR')}mm</span></div>`
+    : `<div class="seg">${x.options.map(o => `<button type="button" data-v="${x.k}" data-id="${esc(o.id)}" aria-pressed="${st[x.k] === o.id}">${esc(o.name)}</button>`).join('')}</div>`).join('');
+  const q = quote(cur, st);
+  $('lines').innerHTML = q.lines.map(l => `<tr><td>${esc(l.name)}<small>${esc(l.sub)}</small></td><td class="n">${won(l.price)}</td></tr>`).join('');
+  $('sum').textContent = won(q.total);
+  if (rebuild) { clearTimeout(timer); timer = setTimeout(render, 150); }
+}
+$('ctl').addEventListener('input', e => { const k = e.target.dataset.v; if (k) { view[k] = +e.target.value; refresh(true); } });
+$('ctl').addEventListener('click', e => { const b = e.target.closest('button[data-v]'); if (b) { view[b.dataset.v] = b.dataset.id; refresh(true); } });
+async function render() {
+  const my = ++job;
+  if (cur.tpl === 'model' && !cur.file) { mv.src = ''; $('msg').textContent = '3D 파일을 넣으면 여기에 나타납니다'; return; }
+  $('msg').textContent = '';
+  let obj;
+  try { obj = await build(cur, view); } catch (e) { $('msg').textContent = '3D 파일을 읽지 못했습니다. 다른 파일로 해 보세요'; return; }
+  if (my !== job) return;
+  const sc = new THREE.Scene(); sc.add(obj);
+  const glb = await exporter.parseAsync(sc, { binary: true });
+  if (my !== job) return;
+  const u = URL.createObjectURL(new Blob([glb], { type: 'model/gltf-binary' }));
+  mv.src = u; if (mvURL) { const o = mvURL; setTimeout(() => URL.revokeObjectURL(o), 4000); } mvURL = u;
+}
+
+// ---------- 저장 ----------
+function toast(t) { const el = $('toast'); el.textContent = t; el.style.display = 'block'; clearTimeout(toast.t); toast.t = setTimeout(() => el.style.display = 'none', 2600); }
+function dataOf(id) {
+  const { price, ...p } = finalProduct(id);
+  if (p.tpl === 'model') p.file = `models/${id}.glb`;
+  return p;
+}
+const newId = () => 'x' + Date.now().toString(36);
+$('save').onclick = async () => {
+  if (D.tpl === 'model' && !fileBlob) { toast('3D 파일을 먼저 넣어 주세요'); return; }
+  const id = newId(), p = dataOf(id);
+  if (p.tpl === 'model') { await putFile(id, fileBlob); p.file = 'idb:' + id; }
+  // 대표 사진: 투명 배경을 흰 정사각형 판에 얹습니다
+  try {
+    const im = new Image(); im.src = await mv.toDataURL('image/png'); await im.decode();
+    const cv = document.createElement('canvas'); cv.width = cv.height = 400;
+    const g = cv.getContext('2d'); g.fillStyle = '#fff'; g.fillRect(0, 0, 400, 400);
+    const k = Math.min(400 / im.width, 400 / im.height); g.drawImage(im, (400 - im.width * k) / 2, (400 - im.height * k) / 2, im.width * k, im.height * k);
+    p.thumb = cv.toDataURL('image/jpeg', 0.82);
+  } catch (e) {}
+  try {
+    const list = JSON.parse(localStorage.getItem('ar-local') || '[]'); list.push(p);
+    localStorage.setItem('ar-local', JSON.stringify(list));
+  } catch (e) { toast('이 브라우저에는 저장할 수 없습니다. 파일로 내려받아 주세요'); return; }
+  toast('카탈로그에 등록했습니다');
+  setTimeout(() => location.href = `p.html?id=${id}`, 900);
+};
+$('dl').onclick = () => {
+  const id = newId(), p = dataOf(id);
+  const a = document.createElement('a');
+  a.href = URL.createObjectURL(new Blob([JSON.stringify(p, null, 2)], { type: 'application/json' }));
+  a.download = `${(p.name || '제품').replace(/[\\/:*?"<>|\s]+/g, '-')}-${id}.json`; a.click();
+  setTimeout(() => URL.revokeObjectURL(a.href), 2000);
+  toast(p.tpl === 'model' ? '등록 파일을 내려받았습니다. 3D 파일도 같이 보내 주세요' : '등록 파일을 내려받았습니다');
+};
+
+$('src').onchange = e => start(e.target.value);
+const first = new URLSearchParams(location.search).get('from');
+$('src').value = BUILTIN.some(p => p.id === first) ? first : 'door-3';
+start($('src').value);
+</script>
+</body>
+</html>

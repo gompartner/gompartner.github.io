@@ -3,6 +3,9 @@
 // 새 제품은 PRODUCTS에 한 칸 추가하면 카탈로그, 3D, AR, 견적이 같이 생깁니다.
 import * as THREE from 'three';
 import { RoundedBoxGeometry } from 'three/addons/geometries/RoundedBoxGeometry.js';
+import { GLTFLoader } from 'three/addons/loaders/GLTFLoader.js';
+import { DRACOLoader } from 'three/addons/loaders/DRACOLoader.js';
+import { MeshoptDecoder } from 'three/addons/libs/meshopt_decoder.module.js';
 
 // ---------- 공통 옵션 ----------
 const FRAME = [
@@ -40,11 +43,14 @@ const LIGHT = [
   { id: 'n', name: '조명 없음', add: 0 }
 ];
 
+export const PALETTES = { FRAME, GLASS, WOOD, STONE, SIGNC, LIGHT };
+
 export const CATS = [
   { id: 'door', name: '중문, 파티션' },
   { id: 'store', name: '수납 가구' },
   { id: 'table', name: '테이블' },
-  { id: 'sign', name: '간판' }
+  { id: 'sign', name: '간판' },
+  { id: 'etc', name: '기타' }
 ];
 
 // 치수 칸 만들기
@@ -173,6 +179,47 @@ export const PRODUCTS = [
 ];
 
 export const byIdP = id => PRODUCTS.find(p => p.id === id);
+
+// ---------- 등록 도구로 만든 제품 (데이터만, 가격은 규칙표) ----------
+// rule: { base, area: { keys: ['w','h'], rate }, steps: [{ k, from, unit, price }], install }
+// 옵션의 add: 1 이상이면 원, 1 미만이면 본체 금액 대비 비율. rate: ㎡당 원
+export function rulePrice(p, s) {
+  const r = p.rule || {}, won = n => n.toLocaleString('ko-KR');
+  const sz = p.tpl === 'model' ? (p.params.find(x => x.k === 'size')?.options.find(o => o.id === s.size) || {}) : s;
+  const keys = r.area?.keys || ['w', 'h'];
+  const area = (sz[keys[0]] || 0) * (sz[keys[1]] || 0) / 1e6;
+  const L = [{ name: `기본 제품가, ${p.name}`, sub: r.baseSub || '기본 규격', price: +r.base || 0 }];
+  if (r.area?.rate) L.push({ name: '면적 가산', sub: `㎡당 ${won(+r.area.rate)}원`, price: r1000(r.area.rate * area) });
+  for (const st of r.steps || []) {
+    const n = Math.max(0, Math.ceil(((+s[st.k] || 0) - st.from) / (st.unit || 100)));
+    if (n) L.push({ name: '치수 추가', sub: `${st.from.toLocaleString('ko-KR')}mm 넘는 ${st.unit || 100}mm당 ${won(+st.price)}원`, price: n * st.price });
+  }
+  const body = L.reduce((a, l) => a + l.price, 0);
+  for (const x of p.params) if (x.options) {
+    const o = x.options.find(o => o.id === s[x.k]); if (!o) continue;
+    const add = +o.add || 0, rate = +o.rate || 0;
+    const v = add >= 1 ? add : add > 0 ? r1000(body * add) : rate ? r1000(rate * area) : 0;
+    if (v) L.push({ name: `${x.label} ${o.name}`, sub: rate ? '면적 기준 가산' : '옵션 가산', price: v });
+  }
+  if (+r.install) L.push({ name: '설치비', sub: r.installSub || '실측, 설치', price: +r.install });
+  return L;
+}
+export function addProduct(d) {
+  const p = { ...d, price(s) { return rulePrice(this, s); }, extra: true };
+  const i = PRODUCTS.findIndex(x => x.id === p.id);
+  if (i >= 0) PRODUCTS[i] = p; else PRODUCTS.push(p);
+  return p;
+}
+// 정식 등록분(products.json)과 이 기기에서 등록한 것(브라우저 저장)을 불러옵니다
+export async function loadExtra() {
+  try { const r = await fetch(new URL('products.json', import.meta.url)); if (r.ok) for (const d of await r.json()) addProduct(d); } catch (e) {}
+  try { for (const d of JSON.parse(localStorage.getItem('ar-local') || '[]')) addProduct({ ...d, local: true }); } catch (e) {}
+}
+
+// 3D 파일 저장소 (이 기기, IndexedDB)
+function idb() { return new Promise((ok, no) => { const r = indexedDB.open('ar-files', 1); r.onupgradeneeded = () => r.result.createObjectStore('f'); r.onsuccess = () => ok(r.result); r.onerror = () => no(r.error); }); }
+export async function putFile(key, blob) { const db = await idb(); return new Promise((ok, no) => { const t = db.transaction('f', 'readwrite'); t.objectStore('f').put(blob, key); t.oncomplete = ok; t.onerror = () => no(t.error); }); }
+export async function getFile(key) { const db = await idb(); return new Promise((ok, no) => { const q = db.transaction('f').objectStore('f').get(key); q.onsuccess = () => ok(q.result); q.onerror = () => no(q.error); }); }
 export function defaults(p) { const s = {}; for (const x of p.params) s[x.k] = x.def; return s; }
 export function quote(p, s) { const lines = p.price(s); return { lines, total: lines.reduce((a, l) => a + l.price, 0) }; }
 // 가장 작은 치수에서 옵션마다 가장 싼 것을 고른 금액 ("~부터")
@@ -370,6 +417,33 @@ const TPL = {
     }
     return root;
   }
+};
+
+// 3D 파일 틀: 파일을 불러와 고른 규격의 실제 치수(mm)에 맞춰 크기를 맞춥니다
+const loaded = new Map();
+async function modelScene(p) {
+  const key = p.file;
+  if (!loaded.has(key)) loaded.set(key, (async () => {
+    let src = key;
+    if (key.startsWith('idb:')) { const b = await getFile(key.slice(4)); if (!b) throw new Error('3D 파일 없음'); src = URL.createObjectURL(b); }
+    else src = new URL(key, import.meta.url).href;
+    // 스캔 앱, AI 생성 파일은 압축(Draco, meshopt)된 경우가 많습니다
+    const ld = new GLTFLoader().setMeshoptDecoder(MeshoptDecoder)
+      .setDRACOLoader(new DRACOLoader().setDecoderPath('https://cdn.jsdelivr.net/npm/three@0.160.0/examples/jsm/libs/draco/gltf/'));
+    return (await ld.loadAsync(src)).scene;
+  })());
+  return loaded.get(key);
+}
+TPL.model = async (p, s) => {
+  const src = (await modelScene(p)).clone(true);
+  const sz = p.params.find(x => x.k === 'size')?.options.find(o => o.id === s.size);
+  const box = new THREE.Box3().setFromObject(src), dim = box.getSize(new THREE.Vector3()), c = box.getCenter(new THREE.Vector3());
+  src.position.set(-c.x, -box.min.y, -c.z);
+  const g = new THREE.Group(); g.add(src);
+  if (sz && dim.x && dim.y && dim.z) g.scale.set(sz.w / 1000 / dim.x, sz.h / 1000 / dim.y, (sz.d || sz.w) / 1000 / dim.z);
+  const col = p.params.find(x => x.k === 'tint')?.options.find(o => o.id === s.tint);
+  if (col && col.hex) g.traverse(o => { if (o.isMesh) { o.material = o.material.clone(); o.material.color.set(col.hex); } });
+  const root = new THREE.Group(); root.add(g); return root;
 };
 
 export function build(p, s) { return TPL[p.tpl](p, s); }

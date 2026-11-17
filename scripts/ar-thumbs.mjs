@@ -11,7 +11,7 @@ const b = await chromium.launch({ channel: 'chrome', args: ['--use-gl=angle', '-
 const p = await b.newPage({ viewport: { width: 400, height: 400 }, deviceScaleFactor: 1 });
 const list = await (async () => {
   await p.goto(base + '/3d/ar/');
-  return p.evaluate(async () => (await import('./engine.js')).PRODUCTS.map(x => x.id));
+  return p.evaluate(async () => { const e = await import('./engine.js'); await e.loadExtra(); return e.PRODUCTS.filter(x => !x.local).map(x => x.id); });
 })();
 let fail = 0;
 for (const id of list.filter(x => !only.length || only.includes(x))) {

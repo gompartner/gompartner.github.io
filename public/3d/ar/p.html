@@ -88,7 +88,8 @@
 <script type="module">
 import * as THREE from 'three';
 import { GLTFExporter } from 'three/addons/exporters/GLTFExporter.js';
-import { PRODUCTS, byIdP, defaults, quote, build } from './engine.js';
+import { PRODUCTS, byIdP, defaults, quote, build, loadExtra } from './engine.js';
+await loadExtra();
 
 const qs = new URLSearchParams(location.search);
 const P = byIdP(qs.get('id')) || PRODUCTS[0];
@@ -126,7 +127,9 @@ const exporter = new GLTFExporter(), mv = $('mv');
 let url = null, job = 0, timer = 0;
 async function render() {
   const my = ++job;
-  const scene = new THREE.Scene(); scene.add(build(P, state));
+  let obj; try { obj = await build(P, state); } catch (e) { $('size').textContent = '3D 파일을 불러오지 못했습니다'; return; }
+  if (my !== job) return;
+  const scene = new THREE.Scene(); scene.add(obj);
   const glb = await exporter.parseAsync(scene, { binary: true });
   if (my !== job) return;
   const next = URL.createObjectURL(new Blob([glb], { type: 'model/gltf-binary' }));
@@ -141,7 +144,9 @@ function update(rebuild) {
     else if (x.type === 'text') { const i = document.querySelector(`[data-k="${x.k}"]`); if (i.value !== state[x.k]) i.value = state[x.k]; }
     else document.querySelectorAll(`[data-g="${x.k}"] button`).forEach(b => b.setAttribute('aria-pressed', b.dataset.id === state[x.k]));
   }
-  const dims = ['w', 'h', 'd'].filter(k => state[k] != null).map(k => P.params.find(x => x.k === k).label + ' ' + mm(state[k]));
+  const sz = P.tpl === 'model' ? P.params.find(x => x.k === 'size')?.options.find(o => o.id === state.size) : null;
+  const dims = sz ? [['폭', sz.w], ['높이', sz.h], ['깊이', sz.d]].filter(d => d[1]).map(d => d[0] + ' ' + mm(+d[1]))
+    : ['w', 'h', 'd'].filter(k => state[k] != null).map(k => P.params.find(x => x.k === k).label + ' ' + mm(state[k]));
   $('size').textContent = dims.join(' x ');
   $('what').textContent = P.params.filter(x => x.options).map(x => x.options.find(o => o.id === state[x.k])?.name).join(', ');
   $('total').textContent = won(q.total);

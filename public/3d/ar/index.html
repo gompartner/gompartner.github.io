@@ -55,7 +55,7 @@
 </head>
 <body>
 <header><div class="wrap">
-  <div class="top"><b>곰파트너 AR 카탈로그</b><span>3D 견적 엔진</span></div>
+  <div class="top"><b>곰파트너 AR 카탈로그</b><a href="maker.html" style="color:#fff;font-size:13px;font-weight:700;text-decoration:none;border:1px solid rgba(255,255,255,.4);border-radius:6px;padding:6px 10px;white-space:nowrap">제품 등록</a></div>
   <h1>치수대로 골라 보고,<br>내 공간에 놓아 본 뒤 견적까지</h1>
   <p>제품을 누르면 폭, 높이, 색을 바꿀 수 있습니다. 휴대폰에서는 카메라로 실제 크기를 확인합니다.</p>
 </div></header>
@@ -63,15 +63,16 @@
 <main><div class="wrap" id="list"></div></main>
 <script type="importmap">{ "imports": { "three": "https://cdn.jsdelivr.net/npm/three@0.160.0/build/three.module.js", "three/addons/": "https://cdn.jsdelivr.net/npm/three@0.160.0/examples/jsm/" } }</script>
 <script type="module">
-import { CATS, PRODUCTS, fromPrice } from './engine.js';
+import { CATS, PRODUCTS, fromPrice, loadExtra } from './engine.js';
+await loadExtra();
 const won = n => n.toLocaleString('ko-KR') + '원';
 let cur = 'all';
 try { cur = sessionStorage.getItem('ar-cat') || 'all'; } catch (e) {}
 function draw() {
-  document.getElementById('cats').innerHTML = [{ id: 'all', name: '전체', n: PRODUCTS.length }, ...CATS.map(c => ({ ...c, n: PRODUCTS.filter(p => p.cat === c.id).length }))]
+  document.getElementById('cats').innerHTML = [{ id: 'all', name: '전체', n: PRODUCTS.length }, ...CATS.map(c => ({ ...c, n: PRODUCTS.filter(p => p.cat === c.id).length })).filter(c => c.n)]
     .map(c => `<button type="button" data-c="${c.id}" aria-pressed="${c.id === cur}">${c.name}<em>${c.n}</em></button>`).join('');
-  document.getElementById('list').innerHTML = CATS.filter(c => cur === 'all' || c.id === cur).map(c => `<h2>${c.name}</h2><div class="grid">${
-    PRODUCTS.filter(p => p.cat === c.id).map(p => `<a class="card" href="p.html?id=${p.id}"><div class="ph"><img src="thumbs/${p.id}.jpg" alt="" loading="lazy" width="400" height="400"><i>AR</i></div><div class="tx"><b>${p.name}</b><span>${p.desc}</span><strong>${won(Math.floor(fromPrice(p) / 10000) * 10000)}<small>부터</small></strong></div></a>`).join('')
+  document.getElementById('list').innerHTML = CATS.filter(c => (cur === 'all' || c.id === cur) && PRODUCTS.some(p => p.cat === c.id)).map(c => `<h2>${c.name}</h2><div class="grid">${
+    PRODUCTS.filter(p => p.cat === c.id).map(p => `<a class="card" href="p.html?id=${p.id}"><div class="ph"><img src="${p.thumb || `thumbs/${p.id}.jpg`}" alt="" loading="lazy" width="400" height="400"><i>${p.local ? '이 기기에서 등록' : 'AR'}</i></div><div class="tx"><b>${p.name}</b><span>${p.desc}</span><strong>${won(fromPrice(p))}<small>부터</small></strong></div></a>`).join('')
   }</div>`).join('');
 }
 document.getElementById('cats').addEventListener('click', e => {
