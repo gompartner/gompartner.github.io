@@ -204,7 +204,21 @@ export function rulePrice(p, s) {
   if (+r.install) L.push({ name: '설치비', sub: r.installSub || '실측, 설치', price: +r.install });
   return L;
 }
+// 외부에서 들어온 제품 데이터는 모양을 확인한 뒤에만 받습니다
+function valid(d) {
+  const str = v => typeof v === 'string', id = v => str(v) && /^[\w-]{1,40}$/.test(v);
+  if (!d || !id(d.id) || !str(d.name) || (d.desc != null && !str(d.desc)) || !['panel', 'box', 'table', 'sign', 'model'].includes(d.tpl)) return false;
+  if (d.thumb != null && !(str(d.thumb) && (/^data:image\/(jpeg|png|webp);base64,/.test(d.thumb) || /^[\w./-]+$/.test(d.thumb)))) return false;
+  if (d.file != null && !(str(d.file) && (/^idb:[\w-]+$/.test(d.file) || /^models\/[\w.-]+\.(glb|gltf)$/.test(d.file)))) return false;
+  if (!Array.isArray(d.params)) return false;
+  for (const x of d.params) {
+    if (!x || !id(x.k) || !str(x.label)) return false;
+    if (x.options && !(Array.isArray(x.options) && x.options.every(o => o && id(o.id) && str(o.name) && (o.hex == null || /^(#[0-9a-fA-F]{3,8})?$/.test(o.hex))))) return false;
+  }
+  return true;
+}
 export function addProduct(d) {
+  if (!valid(d)) return null;
   const p = { ...d, price(s) { return rulePrice(this, s); }, extra: true };
   const i = PRODUCTS.findIndex(x => x.id === p.id);
   if (i >= 0) PRODUCTS[i] = p; else PRODUCTS.push(p);

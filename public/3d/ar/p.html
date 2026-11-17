@@ -115,10 +115,11 @@ document.title = `${P.name} AR 견적 | 곰파트너 AR 카탈로그`;
 $('name').textContent = P.name; $('desc').textContent = P.desc;
 
 // 제품 정의의 칸 목록대로 조작 화면을 만듭니다
+const E = t => String(t ?? '').replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
 $('ctl').innerHTML = P.params.map(x => {
-  if (x.type === 'range') return `<fieldset><legend>${x.label}</legend><div class="range"><input type="range" data-k="${x.k}" min="${x.min}" max="${x.max}" step="${x.step}" aria-label="${x.label}"><output data-o="${x.k}"></output></div></fieldset>`;
-  if (x.type === 'text') return `<fieldset><legend>${x.label}</legend><input class="txt" data-k="${x.k}" maxlength="${x.max}" aria-label="${x.label}"></fieldset>`;
-  return `<fieldset><legend>${x.label}</legend><div class="seg" data-g="${x.k}">${x.options.map(o => `<button type="button" data-id="${o.id}">${x.type === 'color' ? `<i class="dot" style="background:${o.hex}"></i>` : ''}${o.name}</button>`).join('')}</div></fieldset>`;
+  if (x.type === 'range') return `<fieldset><legend>${E(x.label)}</legend><div class="range"><input type="range" data-k="${E(x.k)}" min="${+x.min}" max="${+x.max}" step="${+x.step || 10}" aria-label="${E(x.label)}"><output data-o="${E(x.k)}"></output></div></fieldset>`;
+  if (x.type === 'text') return `<fieldset><legend>${E(x.label)}</legend><input class="txt" data-k="${E(x.k)}" maxlength="${+x.max || 20}" aria-label="${E(x.label)}"></fieldset>`;
+  return `<fieldset><legend>${E(x.label)}</legend><div class="seg" data-g="${E(x.k)}">${x.options.map(o => `<button type="button" data-id="${E(o.id)}">${x.type === 'color' && o.hex ? `<i class="dot" style="background:${E(o.hex)}"></i>` : ''}${E(o.name)}</button>`).join('')}</div></fieldset>`;
 }).join('');
 $('ctl').addEventListener('input', e => { const k = e.target.dataset.k; if (!k) return; state[k] = e.target.type === 'range' ? +e.target.value : e.target.value; update(true); });
 $('ctl').addEventListener('click', e => { const b = e.target.closest('.seg button'); if (!b) return; state[b.closest('.seg').dataset.g] = b.dataset.id; update(true); });
