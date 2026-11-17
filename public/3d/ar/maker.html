@@ -231,11 +231,10 @@ drop.addEventListener('drop', e => takeFile(e.dataTransfer.files[0]));
 
 // ---------- 사진 스캔 (곰파트너 스캔 서버) ----------
 const LS = k => { try { return localStorage.getItem(k) || ''; } catch (e) { return ''; } };
-const qp = new URLSearchParams(location.search);
 // 키는 저장한 서버 주소와 짝으로만 쓴다. 주소창으로 들어온 다른 서버에는 키를 보내지 않는다
 const originOf = u => { try { return new URL(u).origin; } catch (e) { return ''; } };
-const saved = LS('ar-scan-url'), fromQ = qp.get('scan');
-$('scanUrl').value = saved || fromQ || '';
+// 서버 주소는 직접 넣은 것만 쓴다 (링크로 미리 채우지 않음)
+$('scanUrl').value = LS('ar-scan-url');
 $('scanKey').value = originOf($('scanUrl').value) && originOf($('scanUrl').value) === LS('ar-scan-origin') ? LS('ar-scan-key') : '';
 const keep = () => { try { localStorage.setItem('ar-scan-url', $('scanUrl').value.trim()); localStorage.setItem('ar-scan-key', $('scanKey').value.trim()); localStorage.setItem('ar-scan-origin', originOf($('scanUrl').value.trim())); } catch (e) {} };
 $('scanUrl').addEventListener('change', () => { $('scanKey').value = ''; keep(); });
