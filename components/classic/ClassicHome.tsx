@@ -421,7 +421,7 @@ function Hero() {
       <div className="relative border-t border-white/10">
         <div className="mx-auto flex w-full max-w-[1248px] items-stretch px-4 md:px-6">
           <div
-            className="grid min-w-0 flex-1 grid-cols-5 md:flex"
+            className="grid min-w-0 flex-1 grid-cols-5 lg:flex"
             role="group"
             aria-label="서비스 선택"
           >
@@ -432,12 +432,12 @@ function Hero() {
                 aria-current={i === cur ? "true" : undefined}
                 onClick={() => go(i)}
                 className={cn(
-                  "relative whitespace-nowrap px-1 py-4 text-center text-[13px] font-bold transition-colors md:flex-1 md:px-5 md:py-5 md:text-left md:text-[16px]",
+                  "relative whitespace-nowrap px-1 py-4 text-center text-[13px] font-bold transition-colors md:py-5 md:text-[15px] lg:flex-1 lg:px-5 lg:text-left lg:text-[16px]",
                   i === cur ? "text-white" : "text-white/55 hover:text-white",
                 )}
               >
-                <span className="md:hidden">{sl.tab}</span>
-                <span className="hidden md:inline">{sl.title}</span>
+                <span className="lg:hidden">{sl.tab}</span>
+                <span className="hidden lg:inline">{sl.title}</span>
                 <span
                   aria-hidden
                   className="absolute inset-x-0 top-0 h-[3px] bg-white/10"
