@@ -19,7 +19,7 @@ export function Hero3D({ title, src = "/3d/island", frameTitle = "카탈로그 �
       <iframe
         src={src}
         title={frameTitle}
-        className="absolute inset-0 h-full w-full border-0"
+        className="absolute left-0 top-0 h-full w-px min-w-full max-w-full border-0"
         allow="fullscreen"
       />
       <div className={`${wrap} pointer-events-none relative pt-6 md:pt-9`}>

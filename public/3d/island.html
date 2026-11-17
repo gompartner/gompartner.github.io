@@ -2481,6 +2481,9 @@ function size() {
 let dirty = true;
 addEventListener('resize', size);
 size();
+// 아이패드 회전 뒤 폭이 늦게 바뀌어도 다시 잰다
+new ResizeObserver(() => size()).observe(hero);
+addEventListener('orientationchange', () => setTimeout(size, 350));
 let heroOn = true, visible = !document.hidden, running = false;
 new IntersectionObserver(es => { heroOn = es[0].isIntersecting; kick(); }).observe(hero);
 document.addEventListener('visibilitychange', () => { visible = !document.hidden; kick(); });
