@@ -57,7 +57,7 @@
 <header><div class="wrap">
   <div class="top"><b>곰파트너 AR 카탈로그</b><a href="maker.html" style="color:#fff;font-size:13px;font-weight:700;text-decoration:none;border:1px solid rgba(255,255,255,.4);border-radius:6px;padding:6px 10px;white-space:nowrap">제품 등록</a></div>
   <h1>치수대로 골라 보고,<br>내 공간에 놓아 본 뒤 견적까지</h1>
-  <p>제품을 누르면 폭, 높이, 색을 바꿀 수 있습니다. 휴대폰에서는 카메라로 실제 크기를 확인합니다.</p>
+  <p>제품을 누르면 폭, 높이, 색을 바꿀 수 있습니다. 휴대폰에서는 카메라로 실제 크기를 확인하고, 안경은 얼굴에 써 봅니다.</p>
 </div></header>
 <nav aria-label="분류"><div class="wrap" id="cats"></div></nav>
 <main><div class="wrap" id="list"></div></main>
@@ -70,9 +70,10 @@ const esc = t => String(t ?? '').replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': 
 let cur = 'all';
 try { cur = sessionStorage.getItem('ar-cat') || 'all'; } catch (e) {}
 function draw() {
-  document.getElementById('cats').innerHTML = [{ id: 'all', name: '전체', n: PRODUCTS.length }, ...CATS.map(c => ({ ...c, n: PRODUCTS.filter(p => p.cat === c.id).length })).filter(c => c.n)]
+  document.getElementById('cats').innerHTML = [{ id: 'all', name: '전체', n: PRODUCTS.length + 1 }, { id: 'wear', name: '써 보기', n: 1 }, ...CATS.map(c => ({ ...c, n: PRODUCTS.filter(p => p.cat === c.id).length })).filter(c => c.n)]
     .map(c => `<button type="button" data-c="${c.id}" aria-pressed="${c.id === cur}">${c.name}<em>${c.n}</em></button>`).join('');
-  document.getElementById('list').innerHTML = CATS.filter(c => (cur === 'all' || c.id === cur) && PRODUCTS.some(p => p.cat === c.id)).map(c => `<h2>${c.name}</h2><div class="grid">${
+  const wear = (cur === 'all' || cur === 'wear') ? `<h2>몸에 써 보기</h2><div class="grid"><a class="card" href="try.html"><div class="ph"><img src="thumbs/try-glasses.jpg" alt="" loading="lazy" width="400" height="400"><i>카메라</i></div><div class="tx"><b>안경, 선글라스</b><span>얼굴에 바로 써 봅니다. 얼굴 사진은 기기 밖으로 나가지 않습니다</span><strong>${won(89000)}<small>부터</small></strong></div></a></div>` : '';
+  document.getElementById('list').innerHTML = wear + CATS.filter(c => (cur === 'all' || c.id === cur) && PRODUCTS.some(p => p.cat === c.id)).map(c => `<h2>${c.name}</h2><div class="grid">${
     PRODUCTS.filter(p => p.cat === c.id).map(p => `<a class="card" href="p.html?id=${encodeURIComponent(p.id)}"><div class="ph"><img src="${esc(p.thumb || `thumbs/${p.id}.jpg`)}" alt="" loading="lazy" width="400" height="400"><i>${p.local ? '이 기기에서 등록' : 'AR'}</i></div><div class="tx"><b>${esc(p.name)}</b><span>${esc(p.desc)}</span><strong>${won(fromPrice(p))}<small>부터</small></strong></div></a>`).join('')
   }</div>`).join('');
 }

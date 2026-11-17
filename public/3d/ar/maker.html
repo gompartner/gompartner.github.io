@@ -87,7 +87,15 @@
     </section>
     <section id="filebox" hidden>
       <h2>3D 파일 <small>GLB, glTF. 스캔 앱이나 AI 생성 결과</small></h2>
-      <div class="drop" id="drop"><b>파일을 여기에 끌어다 놓거나</b><br><input type="file" id="file" accept=".glb,.gltf,model/gltf-binary" style="margin-top:8px;max-width:280px"></div>
+      <div class="grp"><b>휴대폰 사진으로 스캔</b>
+        <p style="font-size:13px;color:var(--ink2);margin:0 0 8px;line-height:1.55">제품을 바닥에 두고 한 바퀴를 세 높이(낮게, 가슴 높이, 위에서)로 돌며 30~80장 찍습니다. 밝고 그림자 적은 곳에서, 사진끼리 많이 겹치게 찍을수록 좋습니다. 반짝이거나 투명한 제품은 잘 안 됩니다.</p>
+        <input type="file" id="photos" accept="image/jpeg,image/png,image/heic" multiple aria-label="스캔할 사진 고르기">
+        <details style="margin-top:8px"><summary style="font-size:13px;color:var(--ink2);cursor:pointer">스캔 서버 설정</summary>
+          <div class="row" style="grid-template-columns:2fr 1fr;margin-top:6px"><label><small>서버 주소</small><input id="scanUrl" placeholder="https://..."></label><label><small>키</small><input id="scanKey" type="password"></label></div></details>
+        <div id="scanState" style="font-size:14px;font-weight:600;margin-top:8px"></div>
+      </div>
+      <div class="grp"><b>또는 3D 파일 넣기</b>
+      <div class="drop" id="drop"><b>파일을 여기에 끌어다 놓거나</b><br><input type="file" id="file" accept=".glb,.gltf,model/gltf-binary" style="margin-top:8px;max-width:280px"></div></div>
       <div class="grp"><b>규격 <small style="font-weight:500;color:var(--ink2)">실제 치수(mm)대로 3D 크기를 맞춥니다</small></b><div id="sizes"></div>
       <button type="button" class="btn ghost sm" id="addsize" style="margin-top:8px">규격 추가</button></div>
     </section>
@@ -103,7 +111,7 @@
       <h2>5. 가격 규칙 <small>원, 부가세 포함</small></h2>
       <div class="row r3">
         <div><label class="f" for="base">기본 제품가</label><input id="base" type="number" step="1000" min="0"></div>
-        <div><label class="f" for="rate">면적 가산 (㎡당)</label><input id="rate" type="number" step="1000" min="0"></div>
+        <div><label class="f" for="rate">면적 가산 (제곱미터당)</label><input id="rate" type="number" step="1000" min="0"></div>
         <div><label class="f" for="install">설치비</label><input id="install" type="number" step="1000" min="0"></div>
       </div>
       <div id="steps"></div>
@@ -169,7 +177,7 @@ function form() {
     D.params.filter(x => x.type === 'text').map(x => `<label class="f">${esc(x.label)} 처음 값</label><input data-text="${x.k}" maxlength="${x.max}" value="${esc(x.def)}">`).join('');
   $('opts').innerHTML = D.params.filter(x => x.options && x.k !== 'size').map(x => `<div class="grp"><b>${esc(x.label)}</b><div class="opts">${x.options.map((o, i) =>
     `<label class="opt">${o.hex ? `<i class="dot" style="background:${esc(o.hex)}"></i>` : ''}<input type="checkbox" data-opt="${x.k}" data-i="${i}"${o.on ? ' checked' : ''} aria-label="${esc(o.name)} 쓰기"><span>${esc(o.name)}</span>
-     <input type="number" step="1000" min="0" data-add="${x.k}" data-i="${i}" value="${o.rate ? o.rate : (o.add >= 1 ? o.add : 0)}" aria-label="${esc(o.name)} 가산 금액" title="${o.rate ? '㎡당 가산' : '가산 금액'}"></label>`).join('')}</div></div>`).join('');
+     <input type="number" step="1000" min="0" data-add="${x.k}" data-i="${i}" value="${o.rate ? o.rate : (o.add >= 1 ? o.add : 0)}" aria-label="${esc(o.name)} 가산 금액" title="${o.rate ? '제곱미터당 가산' : '가산 금액'}"></label>`).join('')}</div></div>`).join('');
   $('base').value = D.rule.base; $('rate').value = D.rule.area.rate; $('install').value = D.rule.install;
   $('steps').innerHTML = D.rule.steps.length ? `<label class="f">치수 가산</label>` + D.rule.steps.map((st, i) => {
     const x = D.params.find(p => p.k === st.k);
@@ -220,6 +228,48 @@ const drop = $('drop');
 ['dragenter', 'dragover'].forEach(ev => drop.addEventListener(ev, e => { e.preventDefault(); drop.classList.add('on'); }));
 ['dragleave', 'drop'].forEach(ev => drop.addEventListener(ev, e => { e.preventDefault(); drop.classList.remove('on'); }));
 drop.addEventListener('drop', e => takeFile(e.dataTransfer.files[0]));
+
+// ---------- 사진 스캔 (곰파트너 스캔 서버) ----------
+const LS = k => { try { return localStorage.getItem(k) || ''; } catch (e) { return ''; } };
+const qp = new URLSearchParams(location.search);
+// 키는 저장한 서버 주소와 짝으로만 쓴다. 주소창으로 들어온 다른 서버에는 키를 보내지 않는다
+const originOf = u => { try { return new URL(u).origin; } catch (e) { return ''; } };
+const saved = LS('ar-scan-url'), fromQ = qp.get('scan');
+$('scanUrl').value = saved || fromQ || '';
+$('scanKey').value = originOf($('scanUrl').value) && originOf($('scanUrl').value) === LS('ar-scan-origin') ? LS('ar-scan-key') : '';
+const keep = () => { try { localStorage.setItem('ar-scan-url', $('scanUrl').value.trim()); localStorage.setItem('ar-scan-key', $('scanKey').value.trim()); localStorage.setItem('ar-scan-origin', originOf($('scanUrl').value.trim())); } catch (e) {} };
+$('scanUrl').addEventListener('change', () => { $('scanKey').value = ''; keep(); });
+$('scanKey').addEventListener('change', keep);
+const say = t => { $('scanState').textContent = t; };
+$('photos').onchange = async e => {
+  const list = [...e.target.files];
+  const base = $('scanUrl').value.trim().replace(/\/$/, ''), key = $('scanKey').value.trim();
+  const o = originOf(base), local = /^http:\/\/(localhost|127\.0\.0\.1)(:\d+)?$/.test(o);
+  if (!o || !(o.startsWith('https://') || local) || !key) { say('스캔 서버 설정을 먼저 채워 주세요 (https 주소)'); return; }
+  if (o !== LS('ar-scan-origin')) { say('서버 주소를 바꿨다면 키를 다시 넣어 주세요'); return; }
+  if (list.length < 20) { say(`사진이 ${list.length}장입니다. 20장 이상 골라 주세요`); return; }
+  const H = { 'X-Scan-Key': key };
+  try {
+    const r = await fetch(base + '/jobs', { method: 'POST', headers: H }); if (!r.ok) throw new Error((await r.json()).error);
+    const { id } = await r.json();
+    for (let i = 0; i < list.length; i++) {
+      say(`사진 올리는 중 ${i + 1} / ${list.length}`);
+      const u = await fetch(`${base}/jobs/${id}/photos/${i + 1}`, { method: 'PUT', headers: { ...H, 'Content-Type': list[i].type || 'image/jpeg' }, body: list[i] });
+      if (!u.ok) throw new Error((await u.json()).error);
+    }
+    const st = await fetch(`${base}/jobs/${id}/start`, { method: 'POST', headers: H }); if (!st.ok) throw new Error((await st.json()).error);
+    for (;;) {
+      await new Promise(ok => setTimeout(ok, 2500));
+      const j = await (await fetch(`${base}/jobs/${id}`, { headers: H })).json();
+      if (j.state === 'error') throw new Error(j.msg);
+      if (j.state === 'done') break;
+      say(j.ahead > 0 ? `앞에 ${j.ahead}건 기다리는 중` : `${j.msg} ${j.progress}%`);
+    }
+    const glb = await (await fetch(`${base}/jobs/${id}/model.glb`, { headers: H })).blob();
+    say('3D가 만들어졌습니다. 아래 규격에 실제 치수를 넣어 주세요');
+    takeFile(new File([glb], `스캔-${id.slice(0, 6)}.glb`, { type: 'model/gltf-binary' }));
+  } catch (err) { say('스캔 실패: ' + (err.message || '서버에 연결하지 못했습니다')); }
+};
 
 // ---------- 완성품 만들기와 미리보기 ----------
 function finalProduct(id) {

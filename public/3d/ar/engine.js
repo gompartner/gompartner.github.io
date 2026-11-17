@@ -91,7 +91,7 @@ export const PRODUCTS = [
     fixed: { slide: false, leaves: 0, glassy: true, panes: true },
     params: [R('w', '폭', 1200, 6000, 3000, 50), R('h', '높이', 2100, 2800, 2400), G('n', '분할', [{ id: '3', name: '3분할' }, { id: '2', name: '2분할' }, { id: '4', name: '4분할' }, { id: '5', name: '5분할' }]), C('frame', '프레임 색', FRAME), C('glass', '유리', GLASS, 'c')],
     price(s) { const g = by(GLASS, s.glass), f = by(FRAME, s.frame); return [
-      { name: '강화유리 파티션', sub: '10T 강화유리, ㎡당 210,000원', price: r1000(210000 * m2(s)) },
+      { name: '강화유리 파티션', sub: '10T 강화유리, 제곱미터당 210,000원', price: r1000(210000 * m2(s)) },
       { name: '알루미늄 프레임', sub: `${s.n}분할`, price: 40000 * (+s.n + 1) + (f.add || 0) },
       ...(g.rate ? [{ name: `유리 ${g.name}`, sub: '유리 면적 기준', price: r1000(g.rate * m2(s)) }] : []),
       { name: '시공비', sub: '실측, 설치', price: 250000 }]; }
@@ -101,7 +101,7 @@ export const PRODUCTS = [
     fixed: { slide: true, glassy: false },
     params: [R('w', '폭', 1200, 3600, 2400, 50), R('h', '높이', 2000, 2600, 2300), G('leaves', '문짝 수', [{ id: '2', name: '2짝' }, { id: '3', name: '3짝' }, { id: '4', name: '4짝' }]), C('frame', '프레임 색', FRAME, 'w'), C('wood', '문짝 면재', WOOD, 'h')],
     price(s) { const w = by(WOOD, s.wood); return [
-      { name: '슬라이딩 도어', sub: `${s.leaves}짝, ㎡당 160,000원`, price: r1000(160000 * m2(s) * (1 + (w.add || 0))) },
+      { name: '슬라이딩 도어', sub: `${s.leaves}짝, 제곱미터당 160,000원`, price: r1000(160000 * m2(s) * (1 + (w.add || 0))) },
       { name: '상부 레일, 하부 가이드', sub: '소프트 클로징', price: 90000 + 30000 * (+s.leaves) },
       { name: '시공비', sub: '실측, 설치', price: 120000 }]; }
   },
@@ -131,7 +131,7 @@ export const PRODUCTS = [
     price(s) {
       const w = fixed.metal ? { add: 0, name: by(FRAME, s.frame).name } : by(WOOD, s.wood);
       const face = s.w * s.h / 1e6, rate = fixed.doors === 'glass' ? 420000 : fixed.doors === 'solid' ? 330000 : fixed.metal ? 160000 : 260000;
-      const L = [{ name: `${name} 본체`, sub: `정면 ㎡당 ${rate.toLocaleString('ko-KR')}원, 깊이 ${s.d}mm`, price: r1000(rate * face * (0.8 + s.d / 1000)) }];
+      const L = [{ name: `${name} 본체`, sub: `정면 제곱미터당 ${rate.toLocaleString('ko-KR')}원, 깊이 ${s.d}mm`, price: r1000(rate * face * (0.8 + s.d / 1000)) }];
       if (w.add) L.push({ name: `${w.name} 마감`, sub: '마감재 가산', price: r1000(rate * face * w.add) });
       L.push({ name: '배송, 설치', sub: '수도권 기준', price: base > 200000 ? 120000 : 80000 });
       return L;
@@ -149,7 +149,7 @@ export const PRODUCTS = [
       C('top', '상판', STONE), C('frame', '다리 색', FRAME.slice(0, 3))],
     price(s) {
       const t = by(STONE, s.top), d = shape === 'round' ? s.w : s.d, area = s.w * d / 1e6;
-      const L = [{ name: `${name} 상판`, sub: `${t.name}, ㎡당 ${(base * 1.4).toLocaleString('ko-KR')}원`, price: r1000(base * 1.4 * area * (1 + t.add)) },
+      const L = [{ name: `${name} 상판`, sub: `${t.name}, 제곱미터당 ${(base * 1.4).toLocaleString('ko-KR')}원`, price: r1000(base * 1.4 * area * (1 + t.add)) },
         { name: '다리, 프레임', sub: by(FRAME, s.frame).name + ' 분체도장', price: r1000(base * 0.45) },
         { name: '배송, 조립', sub: '수도권 기준', price: 60000 }];
       return L;
@@ -170,7 +170,7 @@ export const PRODUCTS = [
       const L = [];
       if (kind === 'channel') L.push({ name: '채널 글자', sub: `${[...s.text].length}자, 글자 높이 ${s.h}mm`, price: r1000([...s.text].length * (60000 + s.h * 160)) });
       else if (kind === 'aframe') L.push({ name: 'A형 입간판', sub: '양면 실사 출력 포함', price: r1000(90000 + area * 120000) });
-      else L.push({ name: `${name} 본체`, sub: `㎡당 ${rate.toLocaleString('ko-KR')}원`, price: r1000(Math.max(1, area) * rate) });
+      else L.push({ name: `${name} 본체`, sub: `제곱미터당 ${rate.toLocaleString('ko-KR')}원`, price: r1000(Math.max(1, area) * rate) });
       if (lit) L.push({ name: 'LED 조명', sub: '방수 LED, 타이머', price: r1000(kind === 'channel' ? [...s.text].length * 25000 : 60000 + area * 40000) });
       if (kind !== 'aframe') L.push({ name: '설치비', sub: '고소 작업, 전기 연결', price: kind === 'blade' ? 200000 : 250000 });
       return L;
@@ -182,14 +182,14 @@ export const byIdP = id => PRODUCTS.find(p => p.id === id);
 
 // ---------- 등록 도구로 만든 제품 (데이터만, 가격은 규칙표) ----------
 // rule: { base, area: { keys: ['w','h'], rate }, steps: [{ k, from, unit, price }], install }
-// 옵션의 add: 1 이상이면 원, 1 미만이면 본체 금액 대비 비율. rate: ㎡당 원
+// 옵션의 add: 1 이상이면 원, 1 미만이면 본체 금액 대비 비율. rate: 제곱미터당 원
 export function rulePrice(p, s) {
   const r = p.rule || {}, won = n => n.toLocaleString('ko-KR');
   const sz = p.tpl === 'model' ? (p.params.find(x => x.k === 'size')?.options.find(o => o.id === s.size) || {}) : s;
   const keys = r.area?.keys || ['w', 'h'];
   const area = (sz[keys[0]] || 0) * (sz[keys[1]] || 0) / 1e6;
   const L = [{ name: `기본 제품가, ${p.name}`, sub: r.baseSub || '기본 규격', price: +r.base || 0 }];
-  if (r.area?.rate) L.push({ name: '면적 가산', sub: `㎡당 ${won(+r.area.rate)}원`, price: r1000(r.area.rate * area) });
+  if (r.area?.rate) L.push({ name: '면적 가산', sub: `제곱미터당 ${won(+r.area.rate)}원`, price: r1000(r.area.rate * area) });
   for (const st of r.steps || []) {
     const n = Math.max(0, Math.ceil(((+s[st.k] || 0) - st.from) / (st.unit || 100)));
     if (n) L.push({ name: '치수 추가', sub: `${st.from.toLocaleString('ko-KR')}mm 넘는 ${st.unit || 100}mm당 ${won(+st.price)}원`, price: n * st.price });
@@ -454,7 +454,11 @@ TPL.model = async (p, s) => {
   const box = new THREE.Box3().setFromObject(src), dim = box.getSize(new THREE.Vector3()), c = box.getCenter(new THREE.Vector3());
   src.position.set(-c.x, -box.min.y, -c.z);
   const g = new THREE.Group(); g.add(src);
-  if (sz && dim.x && dim.y && dim.z) g.scale.set(sz.w / 1000 / dim.x, sz.h / 1000 / dim.y, (sz.d || sz.w) / 1000 / dim.z);
+  // 실물을 찍은 모델이라 비율은 그대로 두고 높이에 맞춰 키운다. 폭, 깊이는 15% 안에서만 맞춘다
+  if (sz && dim.x && dim.y && dim.z) {
+    const k = sz.h / 1000 / dim.y, fit = (want, have) => Math.min(1.15, Math.max(0.85, want / 1000 / (have * k)));
+    g.scale.set(k * (sz.w ? fit(sz.w, dim.x) : 1), k, k * (sz.d ? fit(sz.d, dim.z) : 1));
+  }
   const col = p.params.find(x => x.k === 'tint')?.options.find(o => o.id === s.tint);
   if (col && col.hex) g.traverse(o => { if (o.isMesh) { o.material = o.material.clone(); o.material.color.set(col.hex); } });
   const root = new THREE.Group(); root.add(g); return root;

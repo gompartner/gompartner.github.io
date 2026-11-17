@@ -1,0 +1,231 @@
+<!doctype html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>안경 써 보기 | 곰파트너 AR 카탈로그</title>
+<meta name="description" content="휴대폰 카메라나 사진으로 안경과 선글라스를 얼굴에 써 봅니다. 얼굴 사진은 기기 밖으로 나가지 않습니다.">
+<meta name="robots" content="noindex">
+<meta name="theme-color" content="#0f1b3d">
+<link rel="icon" href="icon-192.png">
+<link rel="manifest" href="manifest.webmanifest">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/static/pretendard.min.css">
+<style>
+  :root { --navy: #0f1b3d; --ink: #1d1f22; --ink2: #5a6068; --line: #dde1e6; --bg: #f3f4f6; --blue: #256ef4; }
+  * { box-sizing: border-box; }
+  html, body { margin: 0; height: 100%; }
+  body { font-family: Pretendard, -apple-system, "Apple SD Gothic Neo", sans-serif; color: var(--ink); background: var(--bg); word-break: keep-all; }
+  .app { max-width: 560px; margin: 0 auto; min-height: 100%; background: #fff; display: flex; flex-direction: column; }
+  header { background: var(--navy); color: #fff; padding: calc(10px + env(safe-area-inset-top)) 8px 10px; display: flex; align-items: center; gap: 4px; }
+  header a { color: #fff; display: flex; width: 40px; height: 40px; align-items: center; justify-content: center; flex: none; }
+  header a svg { width: 22px; height: 22px; }
+  header b { display: block; font-size: 17px; font-weight: 800; }
+  header span { display: block; font-size: 12.5px; opacity: .72; }
+  .stage { position: relative; aspect-ratio: 3 / 4; background: #1b1f27; overflow: hidden; }
+  .stage video, .stage img.src, .stage canvas { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; }
+  .stage .mirror { transform: scaleX(-1); }
+  .start { position: absolute; inset: 0; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 10px; padding: 24px; color: #fff; text-align: center; }
+  .start p { margin: 0 0 6px; font-size: 14px; line-height: 1.6; color: #c9d6f2; }
+  .start button, .start label { border: 0; border-radius: 10px; background: var(--blue); color: #fff; font: inherit; font-size: 16px; font-weight: 700; padding: 13px 20px; min-width: 210px; cursor: pointer; text-align: center; }
+  .start label { background: #fff; color: var(--navy); }
+  .hint { position: absolute; left: 12px; right: 12px; top: 12px; background: rgba(15,27,61,.82); color: #fff; border-radius: 8px; padding: 8px 10px; font-size: 13px; text-align: center; display: none; }
+  .shot { position: absolute; right: 12px; bottom: 12px; border: 0; border-radius: 999px; background: #fff; color: var(--navy); font: inherit; font-weight: 700; font-size: 14px; padding: 10px 14px; display: none; }
+  main { padding: 6px 16px 110px; }
+  fieldset { border: 0; padding: 0; margin: 16px 0 0; }
+  legend { font-size: 14px; font-weight: 700; color: var(--ink2); margin-bottom: 8px; padding: 0; }
+  .seg { display: grid; grid-template-columns: repeat(4, 1fr); gap: 6px; }
+  .seg.three { grid-template-columns: repeat(3, 1fr); }
+  .seg button { border: 1.5px solid var(--line); background: #fff; border-radius: 8px; padding: 9px 4px; font: inherit; font-size: 13.5px; font-weight: 600; display: flex; flex-direction: column; align-items: center; gap: 5px; min-width: 0; }
+  .seg button[aria-pressed=true] { border-color: var(--navy); background: #eef2fb; color: var(--navy); }
+  .seg svg { width: 44px; height: 20px; }
+  .dot { width: 20px; height: 20px; border-radius: 50%; border: 1px solid rgba(0,0,0,.15); }
+  .priv { font-size: 12.5px; color: var(--ink2); margin: 14px 0 0; line-height: 1.55; }
+  .bar { position: fixed; left: 0; right: 0; bottom: 0; background: #fff; border-top: 1px solid var(--line); padding: 10px 16px calc(10px + env(safe-area-inset-bottom)); }
+  .bar .in { max-width: 528px; margin: 0 auto; display: flex; align-items: center; gap: 12px; }
+  .bar .t { flex: 1; min-width: 0; }
+  .bar small { display: block; font-size: 12px; color: var(--ink2); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+  .bar b { font-size: 22px; font-weight: 800; font-variant-numeric: tabular-nums; }
+  .bar a { border-radius: 10px; background: var(--navy); color: #fff; font-weight: 700; font-size: 15px; padding: 13px 16px; text-decoration: none; white-space: nowrap; }
+</style>
+</head>
+<body>
+<div class="app">
+  <header><a href="./" aria-label="카탈로그로"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M15 5l-7 7 7 7"/></svg></a><div><b>안경 써 보기</b><span>카메라나 사진으로 얼굴에 바로 써 봅니다</span></div></header>
+  <div class="stage" id="stage">
+    <video id="video" class="mirror" playsinline muted hidden></video>
+    <img id="photo" class="src" alt="" hidden>
+    <canvas id="gl" aria-label="안경을 쓴 얼굴 화면"></canvas>
+    <div class="start" id="start">
+      <p>얼굴은 이 기기 안에서만 인식합니다.<br>사진과 영상은 어디로도 보내지 않습니다.</p>
+      <button type="button" id="cam">카메라로 써 보기</button>
+      <label>사진으로 써 보기<input type="file" id="file" accept="image/*" hidden></label>
+    </div>
+    <div class="hint" id="hint" role="status"></div>
+    <button type="button" class="shot" id="shot">사진 저장</button>
+  </div>
+  <main>
+    <fieldset><legend>테 모양</legend><div class="seg" id="shape"></div></fieldset>
+    <fieldset><legend>테 색</legend><div class="seg" id="color"></div></fieldset>
+    <fieldset><legend>렌즈</legend><div class="seg three" id="lens"></div></fieldset>
+    <p class="priv">얼굴 인식은 휴대폰 브라우저 안에서 계산합니다. 곰파트너 서버에도 얼굴 사진이 남지 않습니다.</p>
+  </main>
+  <div class="bar"><div class="in"><div class="t"><small id="what"></small><b id="total">0원</b></div><a href="./">카탈로그</a></div></div>
+</div>
+<script type="importmap">{ "imports": { "three": "https://cdn.jsdelivr.net/npm/three@0.160.0/build/three.module.js" } }</script>
+<script type="module">
+import * as THREE from 'three';
+import { FaceLandmarker, FilesetResolver } from 'https://cdn.jsdelivr.net/npm/@mediapipe/tasks-vision@0.10.14/vision_bundle.mjs';
+
+// ---------- 제품 ----------
+const SHAPES = [
+  { id: 'r', name: '라운드', price: 89000, path: 'M4 10a6 6 0 1 0 12 0a6 6 0 1 0-12 0M28 10a6 6 0 1 0 12 0a6 6 0 1 0-12 0M16 9q6-3 12 0' },
+  { id: 's', name: '스퀘어', price: 99000, path: 'M3 4h14v12H3zM27 4h14v12H27zM17 8q5-2 10 0' },
+  { id: 'c', name: '캣아이', price: 119000, path: 'M3 6q7-4 15 0q-1 10-8 10q-7 0-7-10M26 6q8-4 15 0q0 10-7 10q-7 0-8-10M18 8q4-2 8 0' },
+  { id: 'a', name: '보잉', price: 129000, path: 'M3 5h15q0 11-7 11q-8 0-8-11M26 5h15q0 11-8 11q-7 0-7-11M18 6h8' }
+];
+const COLORS = [
+  { id: 'k', name: '블랙', hex: '#1d1d1f', metal: 0.2, add: 0 },
+  { id: 't', name: '호피', hex: '#6a4428', metal: 0.1, add: 10000 },
+  { id: 'g', name: '골드', hex: '#c8a35a', metal: 0.9, add: 20000 },
+  { id: 's', name: '실버', hex: '#b9bec4', metal: 0.9, add: 20000 }
+];
+const LENSES = [
+  { id: 'c', name: '투명', color: '#e9f1f4', opacity: 0.08, add: 0 },
+  { id: 'g', name: '그레이 선글라스', color: '#30353a', opacity: 0.72, add: 30000 },
+  { id: 'b', name: '브라운 선글라스', color: '#5a3a22', opacity: 0.62, add: 30000 }
+];
+const state = { shape: 'r', color: 'k', lens: 'c' };
+const by = (a, id) => a.find(x => x.id === id);
+const won = n => n.toLocaleString('ko-KR') + '원';
+const $ = id => document.getElementById(id);
+
+function seg(el, arr, key, draw) {
+  el.innerHTML = arr.map(x => `<button type="button" data-id="${x.id}" aria-pressed="${state[key] === x.id}">${draw(x)}${x.name}</button>`).join('');
+  el.onclick = e => { const b = e.target.closest('button'); if (!b) return; state[key] = b.dataset.id; ui(); glasses(); };
+}
+function ui() {
+  seg($('shape'), SHAPES, 'shape', x => `<svg viewBox="0 0 44 20" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="${x.path}"/></svg>`);
+  seg($('color'), COLORS, 'color', x => `<i class="dot" style="background:${x.hex}"></i>`);
+  seg($('lens'), LENSES, 'lens', x => `<i class="dot" style="background:${x.color};opacity:${Math.max(0.35, x.opacity)}"></i>`);
+  const s = by(SHAPES, state.shape), c = by(COLORS, state.color), l = by(LENSES, state.lens);
+  $('what').textContent = `${s.name} ${c.name}, ${l.name} 렌즈`;
+  $('total').textContent = won(s.price + c.add + l.add);
+}
+
+// ---------- 안경 3D (단위: 눈 사이 거리 1 기준) ----------
+const scene = new THREE.Scene();
+scene.add(new THREE.HemisphereLight(0xffffff, 0x666666, 2.2));
+const dl = new THREE.DirectionalLight(0xffffff, 1.6); dl.position.set(0.3, 0.6, 1); scene.add(dl);
+const rig = new THREE.Group(); scene.add(rig);
+function lensShape(id) {
+  const s = new THREE.Shape(), w = 0.46, h = 0.36;
+  if (id === 'r') s.absarc(0, 0, 0.22, 0, Math.PI * 2);
+  else if (id === 's') { const r = 0.05; s.moveTo(-w / 2 + r, -h / 2); s.lineTo(w / 2 - r, -h / 2); s.quadraticCurveTo(w / 2, -h / 2, w / 2, -h / 2 + r); s.lineTo(w / 2, h / 2 - r); s.quadraticCurveTo(w / 2, h / 2, w / 2 - r, h / 2); s.lineTo(-w / 2 + r, h / 2); s.quadraticCurveTo(-w / 2, h / 2, -w / 2, h / 2 - r); s.lineTo(-w / 2, -h / 2 + r); s.quadraticCurveTo(-w / 2, -h / 2, -w / 2 + r, -h / 2); }
+  else if (id === 'c') { s.moveTo(0.2, 0.06); s.quadraticCurveTo(0.02, 0.16, -0.25, 0.2); s.quadraticCurveTo(-0.26, -0.16, -0.04, -0.17); s.quadraticCurveTo(0.2, -0.17, 0.2, 0.06); }
+  else { s.moveTo(-0.24, 0.16); s.lineTo(0.24, 0.16); s.quadraticCurveTo(0.22, -0.22, 0, -0.2); s.quadraticCurveTo(-0.24, -0.18, -0.24, 0.16); }
+  return s;
+}
+function glasses() {
+  rig.clear();
+  const c = by(COLORS, state.color), l = by(LENSES, state.lens);
+  const fm = new THREE.MeshStandardMaterial({ color: c.hex, metalness: c.metal, roughness: 0.35 });
+  const lm = new THREE.MeshStandardMaterial({ color: l.color, transparent: true, opacity: l.opacity, roughness: 0.1, depthWrite: false });
+  const thick = c.metal > 0.5 ? 0.014 : 0.03;
+  for (const side of [-1, 1]) {
+    const sh = lensShape(state.shape), g = new THREE.Group();
+    const pts = sh.getSpacedPoints(80).map(p => new THREE.Vector3(p.x, p.y, 0));
+    g.add(new THREE.Mesh(new THREE.TubeGeometry(new THREE.CatmullRomCurve3(pts, true), 120, thick, 8, true), fm));
+    const lens = new THREE.Mesh(new THREE.ShapeGeometry(sh, 32), lm); lens.position.z = -0.005; g.add(lens);
+    // 눈동자 사이는 바깥 눈꼬리 사이의 약 70%
+    g.position.x = side * 0.36; g.scale.set(side > 0 ? -1.22 : 1.22, 1.22, 1);
+    rig.add(g);
+    // 다리: 테 바깥에서 귀 쪽으로
+    const arm = new THREE.Mesh(new THREE.BoxGeometry(thick * 1.4, thick * 1.6, 0.95), fm);
+    arm.position.set(side * 0.66, 0.1, -0.47); rig.add(arm);
+  }
+  const bridge = new THREE.Mesh(new THREE.TubeGeometry(new THREE.QuadraticBezierCurve3(new THREE.Vector3(-0.1, 0.06, 0), new THREE.Vector3(0, 0.12, 0.02), new THREE.Vector3(0.1, 0.06, 0)), 20, thick * 0.8, 8), fm);
+  rig.add(bridge);
+}
+
+// ---------- 화면과 얼굴 인식 ----------
+const canvas = $('gl'), renderer = new THREE.WebGLRenderer({ canvas, alpha: true, antialias: true, preserveDrawingBuffer: true });
+renderer.outputColorSpace = THREE.SRGBColorSpace;
+const cam = new THREE.OrthographicCamera(0, 1, 0, -1, -10, 10);
+let src = null, mirror = false, landmarker = null, last = -1;
+function size() {
+  const r = $('stage').getBoundingClientRect();
+  renderer.setPixelRatio(Math.min(2, devicePixelRatio)); renderer.setSize(r.width, r.height, false);
+  cam.left = 0; cam.right = r.width; cam.top = 0; cam.bottom = -r.height; cam.updateProjectionMatrix();
+}
+addEventListener('resize', size);
+// object-fit: cover 로 잘린 화면에서 원본 좌표를 화면 좌표로 바꾼다
+function mapper() {
+  const r = $('stage').getBoundingClientRect(), sw = src.videoWidth || src.naturalWidth, sh = src.videoHeight || src.naturalHeight;
+  const k = Math.max(r.width / sw, r.height / sh), ox = (r.width - sw * k) / 2, oy = (r.height - sh * k) / 2;
+  return p => ({ x: (mirror ? (1 - p.x) : p.x) * sw * k + ox, y: p.y * sh * k + oy, z: p.z * sw * k });
+}
+function place(lm) {
+  if (!lm) { rig.visible = false; return; }
+  const m = mapper(), L = m(lm[33]), R = m(lm[263]), N = m(lm[168]), C = m(lm[6]);
+  const eye = Math.hypot(R.x - L.x, R.y - L.y, R.z - L.z);
+  rig.visible = true;
+  rig.position.set((L.x + R.x) / 2 * 0.5 + N.x * 0.5, -((L.y + R.y) / 2 * 0.75 + N.y * 0.25), 0);
+  rig.scale.setScalar(eye * 1.02);
+  const roll = Math.atan2(R.y - L.y, R.x - L.x), yaw = Math.atan2(R.z - L.z, R.x - L.x);
+  rig.rotation.set(0, mirror ? yaw : -yaw, -roll, 'ZYX');
+}
+async function loadModel() {
+  if (landmarker) return;
+  hint('얼굴 인식 준비 중');
+  const fs = await FilesetResolver.forVisionTasks('https://cdn.jsdelivr.net/npm/@mediapipe/tasks-vision@0.10.14/wasm');
+  landmarker = await FaceLandmarker.createFromOptions(fs, { baseOptions: { modelAssetPath: 'mp/face_landmarker.task', delegate: 'GPU' }, runningMode: 'IMAGE', numFaces: 1 });
+}
+function hint(t) { $('hint').textContent = t; $('hint').style.display = t ? 'block' : 'none'; }
+function draw() { renderer.render(scene, cam); }
+async function loop() {
+  if (src !== $('video')) return;
+  const v = src;
+  if (v.readyState >= 2 && v.currentTime !== last) {
+    last = v.currentTime;
+    const r = landmarker.detectForVideo(v, performance.now());
+    place(r.faceLandmarks[0]); hint(r.faceLandmarks[0] ? '' : '얼굴을 화면 가운데에 맞춰 주세요');
+    draw();
+  }
+  requestAnimationFrame(loop);
+}
+$('cam').onclick = async () => {
+  try {
+    await loadModel(); await landmarker.setOptions({ runningMode: 'VIDEO' });
+    const v = $('video');
+    v.srcObject = await navigator.mediaDevices.getUserMedia({ video: { facingMode: 'user', width: { ideal: 960 } }, audio: false });
+    await v.play(); v.hidden = false; $('photo').hidden = true; src = v; mirror = true;
+    $('start').style.display = 'none'; $('shot').style.display = 'block'; size(); loop();
+  } catch (e) { hint('카메라를 쓸 수 없습니다. 사진으로 써 보세요'); }
+};
+$('file').onchange = async e => {
+  const f = e.target.files[0]; if (!f) return;
+  await loadModel(); await landmarker.setOptions({ runningMode: 'IMAGE' });
+  const img = $('photo'); img.src = URL.createObjectURL(f); await img.decode();
+  const v = $('video'); if (v.srcObject) { v.srcObject.getTracks().forEach(t => t.stop()); v.srcObject = null; }
+  v.hidden = true; img.hidden = false; src = img; mirror = false;
+  $('start').style.display = 'none'; $('shot').style.display = 'block'; size();
+  const r = landmarker.detect(img);
+  place(r.faceLandmarks[0]); hint(r.faceLandmarks[0] ? '' : '얼굴을 찾지 못했습니다. 정면 사진으로 해 보세요'); draw();
+  window.__faceFound = !!r.faceLandmarks[0];
+};
+// 다른 안경을 고르면 사진 화면도 다시 그린다
+const redraw = () => { if (src && src.tagName === 'IMG') { const r = landmarker.detect(src); place(r.faceLandmarks[0]); draw(); } };
+['shape', 'color', 'lens'].forEach(id => $(id).addEventListener('click', () => setTimeout(redraw, 0)));
+$('shot').onclick = () => {
+  const r = $('stage').getBoundingClientRect(), k = Math.min(2, devicePixelRatio);
+  const out = document.createElement('canvas'); out.width = r.width * k; out.height = r.height * k;
+  const g = out.getContext('2d'), sw = src.videoWidth || src.naturalWidth, sh = src.videoHeight || src.naturalHeight, s = Math.max(out.width / sw, out.height / sh);
+  g.save(); if (mirror) { g.translate(out.width, 0); g.scale(-1, 1); }
+  g.drawImage(src, (out.width - sw * s) / 2, (out.height - sh * s) / 2, sw * s, sh * s); g.restore();
+  g.drawImage(canvas, 0, 0, out.width, out.height);
+  const a = document.createElement('a'); a.href = out.toDataURL('image/jpeg', 0.9); a.download = '안경-써-보기.jpg'; a.click();
+};
+ui(); glasses(); size(); draw();
+</script>
+</body>
+</html>
