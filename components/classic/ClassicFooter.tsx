@@ -111,6 +111,11 @@ export function ClassicFooter() {
               <Globe size={15} strokeWidth={2} aria-hidden />
               English
             </Link>
+            {/* 11-18 채널 링크는 유튜브 하나만 다시 넣음(사이트 손님과 보는 사람이 같음) */}
+            <a href="https://www.youtube.com/@gompartner" target="_blank" rel="noopener noreferrer" data-gtm-cta="classic_footer_youtube" className="inline-flex min-h-11 items-center gap-1.5 self-start hover:text-white hover:underline">
+              <ChannelIcon name="youtube" />
+              유튜브
+            </a>
           </div>
           <div className="md:text-right">
             <p>
