@@ -95,7 +95,17 @@ const P = byIdP(qs.get('id')) || PRODUCTS[0];
 if (qs.has('shot')) document.body.classList.add('shot');
 const state = defaults(P);
 // 주소 뒤 # 에 고른 사양을 담아 그대로 공유됩니다
-try { Object.assign(state, JSON.parse(decodeURIComponent(location.hash.slice(1)) || '{}')); } catch (e) {}
+// 주소에서 읽은 값은 제품 정의에 맞는 것만 받습니다
+try {
+  const raw = JSON.parse(decodeURIComponent(location.hash.slice(1)) || '{}');
+  for (const x of P.params) {
+    const v = raw[x.k];
+    if (x.type === 'range' && Number.isFinite(+v)) state[x.k] = Math.min(x.max, Math.max(x.min, Math.round(+v)));
+    else if (x.options && x.options.some(o => o.id === v)) state[x.k] = v;
+    else if (x.type === 'text' && typeof v === 'string') state[x.k] = v.slice(0, x.max);
+  }
+} catch (e) {}
+const esc = t => String(t).replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
 
 const $ = id => document.getElementById(id);
 const won = n => n.toLocaleString('ko-KR') + '원';
@@ -135,7 +145,7 @@ function update(rebuild) {
   $('size').textContent = dims.join(' x ');
   $('what').textContent = P.params.filter(x => x.options).map(x => x.options.find(o => o.id === state[x.k])?.name).join(', ');
   $('total').textContent = won(q.total);
-  $('lines').innerHTML = q.lines.map(l => `<tr><td>${l.name}<small>${l.sub}</small></td><td class="n">${won(l.price)}</td></tr>`).join('');
+  $('lines').innerHTML = q.lines.map(l => `<tr><td>${esc(l.name)}<small>${esc(l.sub)}</small></td><td class="n">${won(l.price)}</td></tr>`).join('');
   $('sum').textContent = won(q.total);
   history.replaceState(null, '', location.pathname + location.search + '#' + encodeURIComponent(JSON.stringify(state)));
   if (rebuild) { clearTimeout(timer); timer = setTimeout(render, 120); }
