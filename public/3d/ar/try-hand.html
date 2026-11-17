@@ -1,0 +1,231 @@
+<!doctype html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>반지, 시계 써 보기 | 곰파트너 AR 카탈로그</title>
+<meta name="description" content="휴대폰 카메라나 손 사진으로 반지와 시계를 차 봅니다. 손 사진은 기기 밖으로 나가지 않습니다.">
+<meta name="robots" content="noindex">
+<meta name="theme-color" content="#0f1b3d">
+<link rel="icon" href="icon-192.png">
+<link rel="manifest" href="manifest.webmanifest">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/static/pretendard.min.css">
+<style>
+  :root { --navy: #0f1b3d; --ink: #1d1f22; --ink2: #5a6068; --line: #dde1e6; --bg: #f3f4f6; --blue: #256ef4; }
+  * { box-sizing: border-box; }
+  html, body { margin: 0; height: 100%; }
+  body { font-family: Pretendard, -apple-system, "Apple SD Gothic Neo", sans-serif; color: var(--ink); background: var(--bg); word-break: keep-all; }
+  .app { max-width: 560px; margin: 0 auto; min-height: 100%; background: #fff; display: flex; flex-direction: column; }
+  header { background: var(--navy); color: #fff; padding: calc(10px + env(safe-area-inset-top)) 8px 10px; display: flex; align-items: center; gap: 4px; }
+  header a { color: #fff; display: flex; width: 40px; height: 40px; align-items: center; justify-content: center; flex: none; }
+  header a svg { width: 22px; height: 22px; }
+  header b { display: block; font-size: 17px; font-weight: 800; }
+  header span { display: block; font-size: 12.5px; opacity: .72; }
+  .stage { position: relative; aspect-ratio: 3 / 4; background: #1b1f27; overflow: hidden; }
+  .stage video, .stage img.src, .stage canvas { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; }
+  .start { position: absolute; inset: 0; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 10px; padding: 24px; color: #fff; text-align: center; }
+  .start p { margin: 0 0 6px; font-size: 14px; line-height: 1.6; color: #c9d6f2; }
+  .start button, .start label { border: 0; border-radius: 10px; background: var(--blue); color: #fff; font: inherit; font-size: 16px; font-weight: 700; padding: 13px 20px; min-width: 210px; cursor: pointer; text-align: center; }
+  .start label { background: #fff; color: var(--navy); }
+  .hint { position: absolute; left: 12px; right: 12px; top: 12px; background: rgba(15,27,61,.82); color: #fff; border-radius: 8px; padding: 8px 10px; font-size: 13px; text-align: center; display: none; }
+  .shot { position: absolute; right: 12px; bottom: 12px; border: 0; border-radius: 999px; background: #fff; color: var(--navy); font: inherit; font-weight: 700; font-size: 14px; padding: 10px 14px; display: none; }
+  main { padding: 6px 16px 110px; }
+  .tabs { display: grid; grid-template-columns: 1fr 1fr; gap: 6px; margin-top: 14px; }
+  .tabs button { border: 1.5px solid var(--line); background: #fff; border-radius: 8px; padding: 11px; font: inherit; font-size: 15px; font-weight: 700; color: var(--ink2); }
+  .tabs button[aria-pressed=true] { background: var(--navy); border-color: var(--navy); color: #fff; }
+  fieldset { border: 0; padding: 0; margin: 16px 0 0; }
+  legend { font-size: 14px; font-weight: 700; color: var(--ink2); margin-bottom: 8px; padding: 0; }
+  .seg { display: grid; grid-template-columns: repeat(3, 1fr); gap: 6px; }
+  .seg button { border: 1.5px solid var(--line); background: #fff; border-radius: 8px; padding: 9px 4px; font: inherit; font-size: 13.5px; font-weight: 600; display: flex; flex-direction: column; align-items: center; gap: 5px; min-width: 0; }
+  .seg button[aria-pressed=true] { border-color: var(--navy); background: #eef2fb; color: var(--navy); }
+  .dot { width: 20px; height: 20px; border-radius: 50%; border: 1px solid rgba(0,0,0,.15); }
+  .priv { font-size: 12.5px; color: var(--ink2); margin: 14px 0 0; line-height: 1.55; }
+  .bar { position: fixed; left: 0; right: 0; bottom: 0; background: #fff; border-top: 1px solid var(--line); padding: 10px 16px calc(10px + env(safe-area-inset-bottom)); }
+  .bar .in { max-width: 528px; margin: 0 auto; display: flex; align-items: center; gap: 12px; }
+  .bar .t { flex: 1; min-width: 0; }
+  .bar small { display: block; font-size: 12px; color: var(--ink2); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+  .bar b { font-size: 22px; font-weight: 800; font-variant-numeric: tabular-nums; }
+  .bar a { border-radius: 10px; background: var(--navy); color: #fff; font-weight: 700; font-size: 15px; padding: 13px 16px; text-decoration: none; white-space: nowrap; }
+</style>
+</head>
+<body>
+<div class="app">
+  <header><a href="./" aria-label="카탈로그로"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M15 5l-7 7 7 7"/></svg></a><div><b>반지, 시계 써 보기</b><span>손등이 보이게 비추면 바로 채워집니다</span></div></header>
+  <div class="stage" id="stage">
+    <video id="video" playsinline muted hidden></video>
+    <img id="photo" class="src" alt="" hidden>
+    <canvas id="gl" aria-label="반지나 시계를 찬 손 화면"></canvas>
+    <div class="start" id="start">
+      <p>손은 이 기기 안에서만 인식합니다.<br>사진과 영상은 어디로도 보내지 않습니다.</p>
+      <button type="button" id="cam">카메라로 차 보기</button>
+      <label>손 사진으로 차 보기<input type="file" id="file" accept="image/*" hidden></label>
+    </div>
+    <div class="hint" id="hint" role="status"></div>
+    <button type="button" class="shot" id="shot">사진 저장</button>
+  </div>
+  <main>
+    <div class="tabs" id="kind"><button type="button" data-id="ring">반지</button><button type="button" data-id="watch">시계</button></div>
+    <fieldset><legend>디자인</legend><div class="seg" id="model"></div></fieldset>
+    <fieldset><legend>색</legend><div class="seg" id="color"></div></fieldset>
+    <p class="priv">손 인식은 휴대폰 브라우저 안에서 계산합니다. 곰파트너 서버에도 손 사진이 남지 않습니다.</p>
+  </main>
+  <div class="bar"><div class="in"><div class="t"><small id="what"></small><b id="total">0원</b></div><a href="./">카탈로그</a></div></div>
+</div>
+<script type="importmap">{ "imports": { "three": "https://cdn.jsdelivr.net/npm/three@0.160.0/build/three.module.js" } }</script>
+<script type="module">
+import * as THREE from 'three';
+import { HandLandmarker, FilesetResolver } from 'https://cdn.jsdelivr.net/npm/@mediapipe/tasks-vision@0.10.14/vision_bundle.mjs';
+
+const KINDS = {
+  ring: { name: '반지', models: [{ id: 'b', name: '심플 밴드', price: 59000 }, { id: 'w', name: '와이드 밴드', price: 79000 }, { id: 's', name: '큐빅 포인트', price: 99000 }],
+    colors: [{ id: 's', name: '실버', hex: '#d4d7db', add: 0 }, { id: 'g', name: '골드', hex: '#d8b25c', add: 20000 }, { id: 'r', name: '로즈골드', hex: '#d39a86', add: 20000 }] },
+  watch: { name: '시계', models: [{ id: 'r', name: '라운드', price: 189000 }, { id: 'q', name: '스퀘어', price: 209000 }, { id: 'd', name: '다이버', price: 259000 }],
+    colors: [{ id: 'k', name: '블랙', hex: '#222326', add: 0 }, { id: 's', name: '실버 메탈', hex: '#c3c7cc', add: 30000 }, { id: 'b', name: '브라운 가죽', hex: '#6b4429', add: 10000 }] }
+};
+const state = { kind: 'ring', model: 'b', color: 's' };
+const $ = id => document.getElementById(id);
+const won = n => n.toLocaleString('ko-KR') + '원';
+function ui() {
+  const K = KINDS[state.kind];
+  if (!K.models.some(m => m.id === state.model)) state.model = K.models[0].id;
+  if (!K.colors.some(c => c.id === state.color)) state.color = K.colors[0].id;
+  $('kind').querySelectorAll('button').forEach(b => b.setAttribute('aria-pressed', b.dataset.id === state.kind));
+  $('model').innerHTML = K.models.map(m => `<button type="button" data-id="${m.id}" aria-pressed="${m.id === state.model}">${m.name}</button>`).join('');
+  $('color').innerHTML = K.colors.map(c => `<button type="button" data-id="${c.id}" aria-pressed="${c.id === state.color}"><i class="dot" style="background:${c.hex}"></i>${c.name}</button>`).join('');
+  const m = K.models.find(x => x.id === state.model), c = K.colors.find(x => x.id === state.color);
+  $('what').textContent = `${K.name} ${m.name}, ${c.name}`; $('total').textContent = won(m.price + c.add);
+}
+$('kind').onclick = e => { const b = e.target.closest('button'); if (b) { state.kind = b.dataset.id; ui(); build(); redraw(); } };
+$('model').onclick = e => { const b = e.target.closest('button'); if (b) { state.model = b.dataset.id; ui(); build(); redraw(); } };
+$('color').onclick = e => { const b = e.target.closest('button'); if (b) { state.color = b.dataset.id; ui(); build(); redraw(); } };
+
+// ---------- 3D (단위: 손가락 굵기 1 기준) ----------
+const scene = new THREE.Scene();
+scene.add(new THREE.HemisphereLight(0xffffff, 0x777777, 2.4));
+const dl = new THREE.DirectionalLight(0xffffff, 2); dl.position.set(-0.4, 0.8, 1); scene.add(dl);
+const rig = new THREE.Group(); scene.add(rig);
+function build() {
+  rig.clear();
+  const c = KINDS[state.kind].colors.find(x => x.id === state.color);
+  const metal = new THREE.MeshStandardMaterial({ color: c.hex, metalness: state.kind === 'watch' && state.color === 'b' ? 0.1 : 0.95, roughness: state.color === 'b' ? 0.7 : 0.22 });
+  if (state.kind === 'ring') {
+    // 손가락 앞쪽 반만 보이게 (뒤쪽은 손가락에 가려짐)
+    const w = state.model === 'w' ? 0.34 : 0.17;
+    const band = new THREE.Mesh(new THREE.CylinderGeometry(0.56, 0.56, w, 48, 1, true, -Math.PI / 2, Math.PI), metal.clone());
+    band.material.side = THREE.DoubleSide;
+    rig.add(band);
+    const rim = new THREE.TorusGeometry(0.56, 0.035, 8, 48, Math.PI);
+    for (const y of [-w / 2, w / 2]) { const r = new THREE.Mesh(rim, metal); r.rotation.set(Math.PI / 2, 0, Math.PI); r.position.y = y; rig.add(r); }
+    if (state.model === 's') {
+      const gem = new THREE.Mesh(new THREE.OctahedronGeometry(0.16, 0), new THREE.MeshStandardMaterial({ color: '#ffffff', metalness: 0, roughness: 0.02, emissive: '#bcd6ff', emissiveIntensity: 0.25 }));
+      gem.position.set(0, 0, 0.66); gem.scale.set(1, 0.8, 0.7); rig.add(gem);
+    }
+  } else {
+    const strap = state.color === 'b' ? new THREE.MeshStandardMaterial({ color: '#6b4429', roughness: 0.75 }) : metal;
+    const band = new THREE.Mesh(new THREE.CylinderGeometry(0.5, 0.5, 0.42, 48, 1, true, -Math.PI / 2, Math.PI), strap.clone());
+    band.material.side = THREE.DoubleSide; rig.add(band);
+    const caseMat = new THREE.MeshStandardMaterial({ color: state.color === 'k' ? '#2a2b2e' : '#c9cdd2', metalness: 0.9, roughness: 0.25 });
+    const dial = new THREE.MeshStandardMaterial({ color: state.model === 'd' ? '#12263f' : '#f4f2ec', roughness: 0.4 });
+    let body, face;
+    if (state.model === 'q') { body = new THREE.Mesh(new THREE.BoxGeometry(0.62, 0.62, 0.14), caseMat); face = new THREE.Mesh(new THREE.PlaneGeometry(0.52, 0.52), dial); }
+    else { body = new THREE.Mesh(new THREE.CylinderGeometry(0.34, 0.34, 0.14, 48), caseMat); body.rotation.x = Math.PI / 2; face = new THREE.Mesh(new THREE.CircleGeometry(0.29, 48), dial); }
+    const g = new THREE.Group(); g.add(body); face.position.z = 0.072; g.add(face);
+    if (state.model === 'd') { const bz = new THREE.Mesh(new THREE.TorusGeometry(0.33, 0.035, 8, 48), new THREE.MeshStandardMaterial({ color: '#1d4e89', metalness: 0.6, roughness: 0.3 })); bz.position.z = 0.075; g.add(bz); }
+    const hand = (len, ang, wid) => { const h = new THREE.Mesh(new THREE.BoxGeometry(wid, len, 0.01), new THREE.MeshStandardMaterial({ color: state.model === 'd' ? '#ffffff' : '#222' })); h.geometry.translate(0, len / 2, 0); h.rotation.z = ang; h.position.z = 0.08; g.add(h); };
+    hand(0.17, -0.9, 0.025); hand(0.24, 2.2, 0.018);
+    g.position.z = 0.52; rig.add(g);
+  }
+}
+
+// ---------- 화면과 손 인식 ----------
+const canvas = $('gl'), renderer = new THREE.WebGLRenderer({ canvas, alpha: true, antialias: true, preserveDrawingBuffer: true });
+renderer.outputColorSpace = THREE.SRGBColorSpace;
+const cam = new THREE.OrthographicCamera(0, 1, 0, -1, -1000, 1000);
+let src = null, mirror = false, lm = null, last = -1;
+function size() {
+  const r = $('stage').getBoundingClientRect();
+  renderer.setPixelRatio(Math.min(2, devicePixelRatio)); renderer.setSize(r.width, r.height, false);
+  cam.left = 0; cam.right = r.width; cam.top = 0; cam.bottom = -r.height; cam.updateProjectionMatrix();
+}
+addEventListener('resize', size);
+function mapper() {
+  const r = $('stage').getBoundingClientRect(), sw = src.videoWidth || src.naturalWidth, sh = src.videoHeight || src.naturalHeight;
+  const k = Math.max(r.width / sw, r.height / sh), ox = (r.width - sw * k) / 2, oy = (r.height - sh * k) / 2;
+  return p => new THREE.Vector3((mirror ? 1 - p.x : p.x) * sw * k + ox, -(p.y * sh * k + oy), -p.z * sw * k);
+}
+// 축 하나(손가락이나 팔 방향)를 기준으로 고리를 세우고, 고리 앞면이 화면을 보게 돌린다
+function orient(a, b, at, scale) {
+  const axis = new THREE.Vector3().subVectors(b, a).normalize();
+  const view = new THREE.Vector3(0, 0, 1), front = view.clone().sub(axis.clone().multiplyScalar(view.dot(axis))).normalize();
+  const side = new THREE.Vector3().crossVectors(axis, front);
+  rig.matrix.makeBasis(side, axis, front).scale(new THREE.Vector3(scale, scale, scale)).setPosition(at);
+  rig.matrixAutoUpdate = false; rig.visible = true;
+}
+function place(h) {
+  if (!h) { rig.visible = false; return; }
+  const m = mapper(), P = i => m(h[i]);
+  if (state.kind === 'ring') {
+    // 약지 첫 마디(13에서 14 사이 35% 지점), 굵기는 손가락 뿌리 간격으로 잡는다
+    const a = P(13), b = P(14), at = a.clone().lerp(b, 0.35);
+    const fw = P(9).distanceTo(P(13)) * 0.5;
+    orient(a, b, at, fw * 1.05);
+  } else {
+    // 손목: 손바닥 중심에서 손목 쪽으로 더 나간 자리, 굵기는 검지와 새끼 뿌리 간격
+    const w = P(0), mid = P(9), dir = new THREE.Vector3().subVectors(w, mid);
+    const at = w.clone().add(dir.clone().multiplyScalar(0.18));
+    const ww = P(5).distanceTo(P(17)) * 0.62;
+    orient(at.clone().add(dir), at, at, ww);
+  }
+}
+function hint(t) { $('hint').textContent = t; $('hint').style.display = t ? 'block' : 'none'; }
+function draw() { renderer.render(scene, cam); }
+let landmarker = null;
+async function loadModel() {
+  if (landmarker) return;
+  hint('손 인식 준비 중');
+  const fs = await FilesetResolver.forVisionTasks('https://cdn.jsdelivr.net/npm/@mediapipe/tasks-vision@0.10.14/wasm');
+  landmarker = await HandLandmarker.createFromOptions(fs, { baseOptions: { modelAssetPath: 'mp/hand_landmarker.task', delegate: 'GPU' }, runningMode: 'IMAGE', numHands: 1 });
+}
+function redraw() { if (src && lm !== undefined) { place(lm); draw(); } }
+async function loop() {
+  if (src !== $('video')) return;
+  const v = src;
+  if (v.readyState >= 2 && v.currentTime !== last) {
+    last = v.currentTime;
+    lm = landmarker.detectForVideo(v, performance.now()).landmarks[0];
+    place(lm); hint(lm ? '' : '손등이 화면에 보이게 비춰 주세요'); draw();
+  }
+  requestAnimationFrame(loop);
+}
+$('cam').onclick = async () => {
+  try {
+    await loadModel(); await landmarker.setOptions({ runningMode: 'VIDEO' });
+    const v = $('video');
+    v.srcObject = await navigator.mediaDevices.getUserMedia({ video: { facingMode: 'environment', width: { ideal: 960 } }, audio: false });
+    await v.play(); v.hidden = false; $('photo').hidden = true; src = v; mirror = false;
+    $('start').style.display = 'none'; $('shot').style.display = 'block'; size(); loop();
+  } catch (e) { hint('카메라를 쓸 수 없습니다. 손 사진으로 해 보세요'); }
+};
+$('file').onchange = async e => {
+  const f = e.target.files[0]; if (!f) return;
+  await loadModel(); await landmarker.setOptions({ runningMode: 'IMAGE' });
+  const img = $('photo'); img.src = URL.createObjectURL(f); await img.decode();
+  const v = $('video'); if (v.srcObject) { v.srcObject.getTracks().forEach(t => t.stop()); v.srcObject = null; }
+  v.hidden = true; img.hidden = false; src = img; mirror = false;
+  $('start').style.display = 'none'; $('shot').style.display = 'block'; size();
+  lm = landmarker.detect(img).landmarks[0];
+  place(lm); hint(lm ? '' : '손을 찾지 못했습니다. 손등이 보이는 사진으로 해 보세요'); draw();
+  window.__handFound = !!lm;
+};
+$('shot').onclick = () => {
+  const r = $('stage').getBoundingClientRect(), k = Math.min(2, devicePixelRatio);
+  const out = document.createElement('canvas'); out.width = r.width * k; out.height = r.height * k;
+  const g = out.getContext('2d'), sw = src.videoWidth || src.naturalWidth, sh = src.videoHeight || src.naturalHeight, s = Math.max(out.width / sw, out.height / sh);
+  g.drawImage(src, (out.width - sw * s) / 2, (out.height - sh * s) / 2, sw * s, sh * s);
+  g.drawImage(canvas, 0, 0, out.width, out.height);
+  const a = document.createElement('a'); a.href = out.toDataURL('image/jpeg', 0.9); a.download = `${KINDS[state.kind].name}-써-보기.jpg`; a.click();
+};
+ui(); build(); size(); draw();
+</script>
+</body>
+</html>
