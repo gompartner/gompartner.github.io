@@ -3,220 +3,83 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-<title>현관 중문 AR 견적</title>
-<meta name="description" content="현관 중문의 방식, 치수, 색을 고르면 바로 견적이 나오고, 휴대폰 카메라로 우리 집 현관에 실제 크기로 세워 볼 수 있습니다.">
+<title>곰파트너 AR 카탈로그</title>
+<meta name="description" content="중문, 파티션, 수납 가구, 테이블, 간판을 치수대로 골라 3D로 보고, 휴대폰 카메라로 실제 공간에 놓아 본 뒤 바로 견적을 받습니다.">
 <meta name="theme-color" content="#0f1b3d">
 <meta name="robots" content="noindex">
 <meta name="apple-mobile-web-app-capable" content="yes">
-<meta name="apple-mobile-web-app-title" content="중문 AR">
+<meta name="apple-mobile-web-app-title" content="AR 카탈로그">
 <link rel="manifest" href="manifest.webmanifest">
 <link rel="apple-touch-icon" href="icon-192.png">
 <link rel="icon" href="icon-192.png">
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/static/pretendard.min.css">
+<script>
+  // 예전 중문 AR 주소(#3-k-b-1200-2300)로 들어오면 중문 화면으로 보냅니다
+  (function () { var m = location.hash.match(/^#([31sd])-/); if (m) location.replace('p.html?id=door-' + m[1]); })();
+</script>
 <style>
   :root { --navy: #0f1b3d; --ink: #1d1f22; --ink2: #5a6068; --line: #dde1e6; --bg: #f3f4f6; --blue: #256ef4; }
   * { box-sizing: border-box; }
-  html, body { margin: 0; height: 100%; }
-  body { font-family: Pretendard, -apple-system, "Apple SD Gothic Neo", sans-serif; color: var(--ink); background: var(--bg); word-break: keep-all; -webkit-tap-highlight-color: transparent; }
-  .app { max-width: 560px; margin: 0 auto; min-height: 100%; display: flex; flex-direction: column; background: #fff; }
-  header { background: var(--navy); color: #fff; padding: calc(12px + env(safe-area-inset-top)) 16px 12px; display: flex; align-items: center; justify-content: space-between; }
-  header b { font-size: 17px; font-weight: 800; letter-spacing: -0.02em; }
-  header span { font-size: 13px; opacity: .7; }
-  .stage { position: relative; height: 46vh; min-height: 300px; background: linear-gradient(#eef0f3, #dfe3e8); }
-  model-viewer { width: 100%; height: 100%; --poster-color: transparent; }
-  .size { position: absolute; left: 12px; top: 12px; background: rgba(255,255,255,.92); border-radius: 6px; padding: 6px 10px; font-size: 13px; font-weight: 700; }
-  .arbtn { position: absolute; left: 50%; bottom: 14px; transform: translateX(-50%); border: 0; border-radius: 10px; background: var(--blue); color: #fff; font: inherit; font-size: 16px; font-weight: 700; padding: 13px 20px; display: flex; gap: 8px; align-items: center; white-space: nowrap; box-shadow: 0 4px 14px rgba(37,110,244,.35); }
-  .arbtn svg { width: 20px; height: 20px; }
-  .noar { position: absolute; left: 12px; right: 12px; bottom: 14px; text-align: center; font-size: 13px; color: var(--ink2); background: rgba(255,255,255,.92); border-radius: 8px; padding: 9px 10px; display: none; }
-  main { padding: 6px 16px 120px; }
-  fieldset { border: 0; padding: 0; margin: 18px 0 0; }
-  legend { font-size: 14px; font-weight: 700; color: var(--ink2); margin-bottom: 8px; padding: 0; }
-  .seg { display: grid; grid-template-columns: repeat(4, 1fr); gap: 6px; }
-  .seg button { border: 1.5px solid var(--line); background: #fff; border-radius: 8px; padding: 10px 4px; font: inherit; font-size: 14px; font-weight: 600; display: flex; flex-direction: column; align-items: center; gap: 6px; }
-  .seg button[aria-pressed=true] { border-color: var(--navy); background: #eef2fb; color: var(--navy); }
-  .dot { width: 22px; height: 22px; border-radius: 50%; border: 1px solid rgba(0,0,0,.15); }
-  .range { display: flex; align-items: center; gap: 10px; }
-  .range input { flex: 1; accent-color: var(--navy); height: 28px; }
-  .range output { width: 78px; text-align: right; font-weight: 700; font-variant-numeric: tabular-nums; }
-  .hint { font-size: 13px; color: #b54708; margin-top: 4px; min-height: 18px; }
-  .bar { position: fixed; left: 0; right: 0; bottom: 0; background: #fff; border-top: 1px solid var(--line); padding: 10px 16px calc(10px + env(safe-area-inset-bottom)); }
-  .bar .in { max-width: 528px; margin: 0 auto; display: flex; align-items: center; gap: 12px; }
-  .bar .t { flex: 1; min-width: 0; }
-  .bar small { display: block; font-size: 12px; color: var(--ink2); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
-  .bar b { font-size: 22px; font-weight: 800; letter-spacing: -0.02em; font-variant-numeric: tabular-nums; }
-  .bar button { border: 0; border-radius: 10px; background: var(--navy); color: #fff; font: inherit; font-weight: 700; font-size: 15px; padding: 13px 16px; white-space: nowrap; }
-  dialog { border: 0; border-radius: 12px; padding: 0; width: min(92vw, 440px); }
-  dialog::backdrop { background: rgba(15,27,61,.45); }
-  .q { padding: 18px 18px 16px; }
-  .q h2 { margin: 0 0 10px; font-size: 18px; }
-  .q table { width: 100%; border-collapse: collapse; font-size: 14px; }
-  .q td { padding: 7px 0; border-bottom: 1px solid var(--line); vertical-align: top; }
-  .q td small { display: block; color: var(--ink2); font-size: 12px; }
-  .q td.n { text-align: right; white-space: nowrap; font-variant-numeric: tabular-nums; padding-left: 10px; }
-  .q tfoot td { font-weight: 800; font-size: 16px; border: 0; padding-top: 10px; }
-  .q p { font-size: 12px; color: var(--ink2); margin: 8px 0 14px; }
-  .q button { width: 100%; border: 0; border-radius: 10px; background: var(--navy); color: #fff; font: inherit; font-weight: 700; padding: 13px; }
-  @media (prefers-reduced-motion: reduce) { model-viewer { --progress-bar-height: 0; } }
+  body { margin: 0; font-family: Pretendard, -apple-system, "Apple SD Gothic Neo", sans-serif; color: var(--ink); background: var(--bg); word-break: keep-all; }
+  header { background: var(--navy); color: #fff; padding: calc(14px + env(safe-area-inset-top)) 16px 18px; }
+  .wrap { max-width: 1120px; margin: 0 auto; }
+  header .top { display: flex; align-items: center; justify-content: space-between; gap: 12px; }
+  header b { font-size: 18px; font-weight: 800; letter-spacing: -0.02em; }
+  header .top span { font-size: 13px; opacity: .7; white-space: nowrap; }
+  header h1 { margin: 18px 0 6px; font-size: clamp(22px, 4.4vw, 32px); line-height: 1.3; letter-spacing: -0.03em; }
+  header p { margin: 0; font-size: 15px; line-height: 1.55; color: #c9d6f2; }
+  nav { position: sticky; top: 0; z-index: 2; background: #fff; border-bottom: 1px solid var(--line); }
+  nav .wrap { display: flex; gap: 6px; overflow-x: auto; padding: 10px 16px; scrollbar-width: none; }
+  nav button { flex: none; border: 1.5px solid var(--line); background: #fff; border-radius: 999px; padding: 8px 14px; font: inherit; font-size: 14px; font-weight: 700; color: var(--ink2); }
+  nav button[aria-pressed=true] { background: var(--navy); border-color: var(--navy); color: #fff; }
+  nav em { font-style: normal; font-weight: 600; opacity: .7; margin-left: 4px; }
+  main { padding: 16px 16px 48px; }
+  h2 { font-size: 18px; margin: 22px 0 10px; letter-spacing: -0.02em; }
+  h2:first-child { margin-top: 4px; }
+  .grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 10px; }
+  @media (min-width: 720px) { .grid { grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 14px; } main { padding: 22px 24px 64px; } }
+  @media (min-width: 1000px) { .grid { grid-template-columns: repeat(4, minmax(0, 1fr)); } }
+  .card { display: flex; flex-direction: column; background: #fff; border: 1px solid var(--line); border-radius: 10px; overflow: hidden; color: inherit; text-decoration: none; }
+  .card:focus-visible { outline: 3px solid var(--blue); outline-offset: 2px; }
+  .ph { position: relative; aspect-ratio: 1; background: #fff; border-bottom: 1px solid #eef0f2; }
+  .ph img { width: 100%; height: 100%; object-fit: contain; display: block; }
+  .ph i { position: absolute; left: 8px; top: 8px; font-style: normal; font-size: 11.5px; font-weight: 800; color: var(--blue); background: #eef4ff; border-radius: 4px; padding: 3px 6px; }
+  .tx { padding: 10px 12px 12px; display: flex; flex-direction: column; gap: 3px; flex: 1; }
+  .tx b { font-size: 15.5px; letter-spacing: -0.02em; }
+  .tx span { font-size: 13px; color: var(--ink2); line-height: 1.45; flex: 1; }
+  .tx strong { font-size: 15px; margin-top: 6px; font-variant-numeric: tabular-nums; }
+  .tx strong small { font-weight: 500; color: var(--ink2); font-size: 12.5px; }
+  @media (hover: hover) { .card { transition: border-color .15s, transform .15s; } .card:hover { border-color: var(--navy); transform: translateY(-2px); } }
+  @media (prefers-reduced-motion: reduce) { .card { transition: none; } .card:hover { transform: none; } }
 </style>
 </head>
 <body>
-<div class="app">
-  <header><b>현관 중문 AR 견적</b><span>곰파트너 3D 견적 엔진</span></header>
-  <div class="stage">
-    <model-viewer id="mv" alt="고른 사양의 현관 중문 3D 모델" camera-controls touch-action="pan-y" shadow-intensity="1" exposure="1.05"
-      environment-image="neutral" ar ar-modes="webxr scene-viewer quick-look" ar-placement="floor" ar-scale="fixed"
-      camera-orbit="-25deg 80deg 115%" field-of-view="30deg" interaction-prompt="none">
-      <button slot="ar-button" class="arbtn" type="button"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 7V5a2 2 0 0 1 2-2h2M17 3h2a2 2 0 0 1 2 2v2M21 17v2a2 2 0 0 1-2 2h-2M7 21H5a2 2 0 0 1-2-2v-2"/><path d="M12 7l5 3v5l-5 3-5-3v-5z"/></svg>우리 집 현관에 세워 보기</button>
-    </model-viewer>
-    <div class="size" id="size"></div>
-    <div class="noar" id="noar">휴대폰으로 열면 카메라로 실제 크기를 볼 수 있습니다</div>
-  </div>
-  <main>
-    <fieldset><legend>문 방식</legend><div class="seg" id="type"></div></fieldset>
-    <fieldset><legend>개구부 폭</legend><div class="range"><input type="range" id="w" min="900" max="2000" step="10" aria-label="폭"><output id="wo"></output></div></fieldset>
-    <fieldset><legend>개구부 높이</legend><div class="range"><input type="range" id="h" min="2000" max="2500" step="10" aria-label="높이"><output id="ho"></output></div><div class="hint" id="hint"></div></fieldset>
-    <fieldset><legend>프레임 색</legend><div class="seg" id="frame"></div></fieldset>
-    <fieldset><legend>유리</legend><div class="seg" id="glass"></div></fieldset>
-  </main>
-  <div class="bar"><div class="in"><div class="t"><small id="what"></small><b id="total">0원</b></div><button type="button" id="open">견적 내역</button></div></div>
-</div>
-<dialog id="dlg"><div class="q"><h2>견적 내역</h2><table><tbody id="lines"></tbody><tfoot><tr><td>합계</td><td class="n" id="sum"></td></tr></tfoot></table>
-<p>부가세 포함, 수도권 시공 기준. 실측 뒤 확정됩니다.</p><button type="button" id="close">닫기</button></div></dialog>
-
-<script type="module" src="https://cdn.jsdelivr.net/npm/@google/model-viewer@3.5.0/dist/model-viewer.min.js"></script>
+<header><div class="wrap">
+  <div class="top"><b>곰파트너 AR 카탈로그</b><span>3D 견적 엔진</span></div>
+  <h1>치수대로 골라 보고,<br>내 공간에 놓아 본 뒤 견적까지</h1>
+  <p>제품을 누르면 폭, 높이, 색을 바꿀 수 있습니다. 휴대폰에서는 카메라로 실제 크기를 확인합니다.</p>
+</div></header>
+<nav aria-label="분류"><div class="wrap" id="cats"></div></nav>
+<main><div class="wrap" id="list"></div></main>
 <script type="importmap">{ "imports": { "three": "https://cdn.jsdelivr.net/npm/three@0.160.0/build/three.module.js", "three/addons/": "https://cdn.jsdelivr.net/npm/three@0.160.0/examples/jsm/" } }</script>
 <script type="module">
-import * as THREE from 'three';
-import { GLTFExporter } from 'three/addons/exporters/GLTFExporter.js';
-import { RoundedBoxGeometry } from 'three/addons/geometries/RoundedBoxGeometry.js';
-
-// 가격 규칙은 /3d/door 견본과 같습니다 (부가세 포함)
-const TYPES = [
-  { id: '3', name: '3연동 슬라이딩', short: '3연동', base: 720000, perW: 33000, wMin: 1000, wMax: 2000, slide: true, leaves: 3 },
-  { id: '1', name: '원슬라이딩', short: '원슬라이딩', base: 620000, perW: 30000, wMin: 900, wMax: 1800, slide: true, leaves: 2 },
-  { id: 's', name: '스윙 도어', short: '스윙', base: 850000, perW: 28000, wMin: 900, wMax: 1600, slide: false, leaves: 1 },
-  { id: 'd', name: '양개 여닫이', short: '양개', base: 690000, perW: 30000, wMin: 1100, wMax: 2000, slide: false, leaves: 2 }
-];
-const FRAMES = [
-  { id: 'w', name: '화이트', hex: '#efeeea', metal: 0.15, rough: 0.42, add: 0 },
-  { id: 'k', name: '블랙', hex: '#262626', metal: 0.5, rough: 0.4, add: 0 },
-  { id: 'b', name: '브론즈', hex: '#5d4838', metal: 0.7, rough: 0.36, add: 40000 },
-  { id: 'c', name: '샴페인골드', hex: '#c4ad80', metal: 0.82, rough: 0.3, add: 60000 }
-];
-const GLASSES = [
-  { id: 'c', name: '투명', hex: '#dbe6e4', rate: 0, color: '#e4eeec', opacity: 0.18, rough: 0.05 },
-  { id: 'b', name: '브론즈', hex: '#7d6a58', rate: 65000, color: '#5e5044', opacity: 0.5, rough: 0.06 },
-  { id: 's', name: '샤틴', hex: '#e6e9e6', rate: 55000, color: '#e3e8e6', opacity: 0.82, rough: 0.75 },
-  { id: 'a', name: '아쿠아', hex: '#cfdcdb', rate: 65000, color: '#d5e2e0', opacity: 0.66, rough: 0.28 }
-];
-const BASE_W = 1000, BASE_H = 2300, PER_H = 25000, INSTALL = 145000, H_MIN = 2000, H_MAX = 2500;
-const state = { type: '3', w: 1200, h: 2300, frame: 'k', glass: 'b' };
-const byId = (a, id) => a.find(x => x.id === id);
+import { CATS, PRODUCTS, fromPrice } from './engine.js';
 const won = n => n.toLocaleString('ko-KR') + '원';
-const mm = n => n.toLocaleString('ko-KR') + 'mm';
-const clamp = (v, a, b) => Math.min(b, Math.max(a, v));
-
-function door() {
-  const t = byId(TYPES, state.type);
-  return { t, dw: clamp(state.w, t.wMin, t.wMax), dh: clamp(state.h, H_MIN, H_MAX) };
+let cur = 'all';
+try { cur = sessionStorage.getItem('ar-cat') || 'all'; } catch (e) {}
+function draw() {
+  document.getElementById('cats').innerHTML = [{ id: 'all', name: '전체', n: PRODUCTS.length }, ...CATS.map(c => ({ ...c, n: PRODUCTS.filter(p => p.cat === c.id).length }))]
+    .map(c => `<button type="button" data-c="${c.id}" aria-pressed="${c.id === cur}">${c.name}<em>${c.n}</em></button>`).join('');
+  document.getElementById('list').innerHTML = CATS.filter(c => cur === 'all' || c.id === cur).map(c => `<h2>${c.name}</h2><div class="grid">${
+    PRODUCTS.filter(p => p.cat === c.id).map(p => `<a class="card" href="p.html?id=${p.id}"><div class="ph"><img src="thumbs/${p.id}.jpg" alt="" loading="lazy" width="400" height="400"><i>AR</i></div><div class="tx"><b>${p.name}</b><span>${p.desc}</span><strong>${won(Math.floor(fromPrice(p) / 10000) * 10000)}<small>부터</small></strong></div></a>`).join('')
+  }</div>`).join('');
 }
-function quote() {
-  const { t, dw, dh } = door(), f = byId(FRAMES, state.frame), g = byId(GLASSES, state.glass);
-  const sw = Math.max(0, Math.ceil((dw - BASE_W) / 100)), sh = Math.max(0, Math.ceil((dh - BASE_H) / 100));
-  const lines = [{ name: `기본 제품가, ${t.name}`, sub: `폭 ${mm(BASE_W)}, 높이 ${mm(BASE_H)}까지`, price: t.base }];
-  if (sw || sh) lines.push({ name: '치수 추가', sub: [sw && `폭 100mm당 ${won(t.perW)}`, sh && `높이 100mm당 ${won(PER_H)}`].filter(Boolean).join(', '), price: sw * t.perW + sh * PER_H });
-  if (f.add) lines.push({ name: `프레임 ${f.name}`, sub: '아노다이징 색상 가산', price: f.add });
-  if (g.rate) lines.push({ name: `유리 ${g.name}`, sub: '유리 면적 기준', price: Math.round(g.rate * dw * dh / 1e9) * 1000 });
-  lines.push({ name: '시공비', sub: '실측, 설치, 실리콘 마감', price: INSTALL });
-  return { lines, total: lines.reduce((s, l) => s + l.price, 0) };
-}
-
-// ---------- 3D 모델 (단위 m, 바닥이 y=0) ----------
-function model() {
-  const { t, dw, dh } = door(), f = byId(FRAMES, state.frame), g = byId(GLASSES, state.glass);
-  const W = dw / 1000, H = dh / 1000;
-  const fm = new THREE.MeshStandardMaterial({ color: f.hex, metalness: f.metal, roughness: f.rough, name: 'frame' });
-  const gm = new THREE.MeshStandardMaterial({ color: g.color, metalness: 0, roughness: g.rough, transparent: true, opacity: g.opacity, name: 'glass', side: THREE.DoubleSide, depthWrite: false });
-  const hm = new THREE.MeshStandardMaterial({ color: '#c9cdd2', metalness: 0.9, roughness: 0.25, name: 'handle' });
-  const root = new THREE.Group();
-  const box = (w, h, d, m, x, y, z) => { const o = new THREE.Mesh(new RoundedBoxGeometry(w, h, d, 2, Math.min(w, h, d) * 0.3), m); o.position.set(x, y, z); root.add(o); return o; };
-  const F = 0.045, D = 0.1;
-  // 바깥 틀
-  box(F, H, D, fm, -W / 2 + F / 2, H / 2, 0);
-  box(F, H, D, fm, W / 2 - F / 2, H / 2, 0);
-  box(W, t.slide ? 0.08 : F, D + 0.02, fm, 0, H - (t.slide ? 0.04 : F / 2), 0);
-  if (t.slide) box(W - 2 * F, 0.012, D, fm, 0, 0.006, 0);
-  // 문짝
-  const n = t.leaves, cw = W - 2 * F, top = H - (t.slide ? 0.08 : F), lh = top - 0.02;
-  const lw = t.slide ? (cw + (n - 1) * 0.05) / n : cw / n;
-  for (let i = 0; i < n; i++) {
-    const x = t.slide ? -cw / 2 + lw / 2 + i * (lw - 0.05) : -cw / 2 + lw / 2 + i * lw;
-    const z = t.slide ? (i - (n - 1) / 2) * 0.03 : 0;
-    const S = 0.04, y0 = 0.012;
-    box(S, lh, 0.03, fm, x - lw / 2 + S / 2, y0 + lh / 2, z);
-    box(S, lh, 0.03, fm, x + lw / 2 - S / 2, y0 + lh / 2, z);
-    box(lw, S, 0.03, fm, x, y0 + S / 2, z);
-    box(lw, S, 0.03, fm, x, y0 + lh - S / 2, z);
-    box(lw - 0.02, 0.03, 0.025, fm, x, y0 + 0.95, z);
-    const p = new THREE.Mesh(new THREE.PlaneGeometry(lw - 2 * S + 0.01, lh - 2 * S + 0.01), gm);
-    p.position.set(x, y0 + lh / 2, z); root.add(p);
-    // 손잡이: 마지막 문짝(슬라이딩), 경첩 반대쪽(스윙, 양개)
-    const hx = t.slide ? (i === n - 1 ? x + lw / 2 - 0.09 : null) : (n === 1 ? x + lw / 2 - 0.09 : (i === 0 ? x + lw / 2 - 0.08 : x - lw / 2 + 0.08));
-    if (hx !== null) { box(0.022, 0.9, 0.022, hm, hx, 1.05, z + 0.04); box(0.022, 0.9, 0.022, hm, hx, 1.05, z - 0.04); }
-  }
-  return root;
-}
-
-const exporter = new GLTFExporter();
-const mv = document.getElementById('mv');
-let url = null, job = 0;
-async function render() {
-  const my = ++job;
-  const scene = new THREE.Scene(); scene.add(model());
-  const glb = await exporter.parseAsync(scene, { binary: true });
-  if (my !== job) return;
-  const next = URL.createObjectURL(new Blob([glb], { type: 'model/gltf-binary' }));
-  mv.src = next;
-  if (url) setTimeout(((u) => () => URL.revokeObjectURL(u))(url), 4000);
-  url = next;
-}
-
-// ---------- 화면 ----------
-const $ = id => document.getElementById(id);
-function seg(el, arr, key, label, dot) {
-  el.innerHTML = arr.map(x => `<button type="button" data-id="${x.id}" aria-pressed="${state[key] === x.id}">${dot ? `<i class="dot" style="background:${x.hex}"></i>` : ''}${label(x)}</button>`).join('');
-  el.onclick = e => { const b = e.target.closest('button'); if (!b) return; state[key] = b.dataset.id; update(true); };
-}
-let timer = 0;
-function update(rebuild) {
-  const { t, dw, dh } = door(), q = quote(), f = byId(FRAMES, state.frame), g = byId(GLASSES, state.glass);
-  seg($('type'), TYPES, 'type', x => x.short);
-  seg($('frame'), FRAMES, 'frame', x => x.name, true);
-  seg($('glass'), GLASSES, 'glass', x => x.name, true);
-  $('w').value = state.w; $('h').value = state.h;
-  $('wo').textContent = mm(state.w); $('ho').textContent = mm(state.h);
-  $('size').textContent = `폭 ${mm(dw)} x 높이 ${mm(dh)}`;
-  $('hint').textContent = dw !== state.w ? `${t.name}${(t.name.charCodeAt(t.name.length - 1) - 0xac00) % 28 ? '은' : '는'} 폭 ${mm(t.wMin)}~${mm(t.wMax)}까지 만듭니다. ${mm(dw)}로 계산했습니다.` : '';
-  $('what').textContent = `${t.short}, ${f.name} 프레임, ${g.name} 유리`;
-  $('total').textContent = won(q.total);
-  $('lines').innerHTML = q.lines.map(l => `<tr><td>${l.name}<small>${l.sub}</small></td><td class="n">${won(l.price)}</td></tr>`).join('');
-  $('sum').textContent = won(q.total);
-  history.replaceState(null, '', '#' + [state.type, state.frame, state.glass, state.w, state.h].join('-'));
-  if (rebuild) { clearTimeout(timer); timer = setTimeout(render, 120); }
-}
-const m = location.hash.match(/^#([31sd])-([wkbc])-([cbsa])-(\d{3,4})-(\d{4})$/);
-if (m) Object.assign(state, { type: m[1], frame: m[2], glass: m[3], w: clamp(+m[4], 900, 2000), h: clamp(+m[5], 2000, 2500) });
-$('w').oninput = e => { state.w = +e.target.value; update(true); };
-$('h').oninput = e => { state.h = +e.target.value; update(true); };
-$('open').onclick = () => $('dlg').showModal();
-$('close').onclick = () => $('dlg').close();
-update(true);
-
-// AR이 안 되는 기기(PC)에서는 휴대폰으로 여는 QR을 보여 줍니다
-customElements.whenDefined('model-viewer').then(() => setTimeout(() => {
-  if (mv.canActivateAR) return;
-  $('noar').style.display = 'block';
-}, 1500));
+document.getElementById('cats').addEventListener('click', e => {
+  const b = e.target.closest('button'); if (!b) return;
+  cur = b.dataset.c; try { sessionStorage.setItem('ar-cat', cur); } catch (e) {}
+  draw();
+});
+draw();
 if ('serviceWorker' in navigator) navigator.serviceWorker.register('sw.js').catch(() => {});
 </script>
 </body>

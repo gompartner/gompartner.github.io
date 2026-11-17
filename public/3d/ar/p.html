@@ -1,0 +1,152 @@
+<!doctype html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>AR 견적 | 곰파트너 AR 카탈로그</title>
+<meta name="description" content="치수와 옵션을 고르면 3D 모델과 견적이 바로 바뀌고, 휴대폰 카메라로 실제 공간에 실물 크기로 놓아 볼 수 있습니다.">
+<meta name="theme-color" content="#0f1b3d">
+<meta name="robots" content="noindex">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-title" content="AR 카탈로그">
+<link rel="manifest" href="manifest.webmanifest">
+<link rel="apple-touch-icon" href="icon-192.png">
+<link rel="icon" href="icon-192.png">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/static/pretendard.min.css">
+<style>
+  :root { --navy: #0f1b3d; --ink: #1d1f22; --ink2: #5a6068; --line: #dde1e6; --bg: #f3f4f6; --blue: #256ef4; }
+  * { box-sizing: border-box; }
+  html, body { margin: 0; height: 100%; }
+  body { font-family: Pretendard, -apple-system, "Apple SD Gothic Neo", sans-serif; color: var(--ink); background: var(--bg); word-break: keep-all; -webkit-tap-highlight-color: transparent; }
+  .app { max-width: 560px; margin: 0 auto; min-height: 100%; display: flex; flex-direction: column; background: #fff; }
+  header { background: var(--navy); color: #fff; padding: calc(10px + env(safe-area-inset-top)) 8px 10px; display: flex; align-items: center; gap: 4px; }
+  header a { color: #fff; display: flex; width: 40px; height: 40px; align-items: center; justify-content: center; border-radius: 8px; flex: none; }
+  header a svg { width: 22px; height: 22px; }
+  header div { min-width: 0; }
+  header b { display: block; font-size: 17px; font-weight: 800; letter-spacing: -0.02em; }
+  header span { display: block; font-size: 12.5px; opacity: .72; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+  .stage { position: relative; height: 46vh; min-height: 300px; background: linear-gradient(#eef0f3, #dfe3e8); }
+  model-viewer { width: 100%; height: 100%; }
+  .size { position: absolute; left: 12px; top: 12px; background: rgba(255,255,255,.92); border-radius: 6px; padding: 6px 10px; font-size: 13px; font-weight: 700; }
+  .arbtn { position: absolute; left: 50%; bottom: 14px; transform: translateX(-50%); border: 0; border-radius: 10px; background: var(--blue); color: #fff; font: inherit; font-size: 16px; font-weight: 700; padding: 13px 20px; display: flex; gap: 8px; align-items: center; white-space: nowrap; box-shadow: 0 4px 14px rgba(37,110,244,.35); }
+  .arbtn svg { width: 20px; height: 20px; }
+  .noar { position: absolute; left: 12px; right: 12px; bottom: 14px; text-align: center; font-size: 13px; color: var(--ink2); background: rgba(255,255,255,.92); border-radius: 8px; padding: 9px 10px; display: none; }
+  main { padding: 6px 16px 120px; }
+  fieldset { border: 0; padding: 0; margin: 18px 0 0; }
+  legend { font-size: 14px; font-weight: 700; color: var(--ink2); margin-bottom: 8px; padding: 0; }
+  .seg { display: grid; grid-template-columns: repeat(4, 1fr); gap: 6px; }
+  .seg button { border: 1.5px solid var(--line); background: #fff; border-radius: 8px; padding: 10px 4px; font: inherit; font-size: 14px; font-weight: 600; display: flex; flex-direction: column; align-items: center; gap: 6px; min-width: 0; }
+  .seg button[aria-pressed=true] { border-color: var(--navy); background: #eef2fb; color: var(--navy); }
+  .dot { width: 22px; height: 22px; border-radius: 50%; border: 1px solid rgba(0,0,0,.15); }
+  .range { display: flex; align-items: center; gap: 10px; }
+  .range input { flex: 1; min-width: 0; accent-color: var(--navy); height: 28px; }
+  .range output { width: 78px; text-align: right; font-weight: 700; font-variant-numeric: tabular-nums; }
+  .txt { width: 100%; border: 1.5px solid var(--line); border-radius: 8px; padding: 11px 12px; font: inherit; font-size: 16px; }
+  .txt:focus { outline: 2px solid var(--navy); border-color: var(--navy); }
+  .bar { position: fixed; left: 0; right: 0; bottom: 0; background: #fff; border-top: 1px solid var(--line); padding: 10px 16px calc(10px + env(safe-area-inset-bottom)); }
+  .bar .in { max-width: 528px; margin: 0 auto; display: flex; align-items: center; gap: 12px; }
+  .bar .t { flex: 1; min-width: 0; }
+  .bar small { display: block; font-size: 12px; color: var(--ink2); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+  .bar b { font-size: 22px; font-weight: 800; letter-spacing: -0.02em; font-variant-numeric: tabular-nums; }
+  .bar button { border: 0; border-radius: 10px; background: var(--navy); color: #fff; font: inherit; font-weight: 700; font-size: 15px; padding: 13px 16px; white-space: nowrap; }
+  dialog { border: 0; border-radius: 12px; padding: 0; width: min(92vw, 440px); }
+  dialog::backdrop { background: rgba(15,27,61,.45); }
+  .q { padding: 18px 18px 16px; }
+  .q h2 { margin: 0 0 10px; font-size: 18px; }
+  .q table { width: 100%; border-collapse: collapse; font-size: 14px; }
+  .q td { padding: 7px 0; border-bottom: 1px solid var(--line); vertical-align: top; }
+  .q td small { display: block; color: var(--ink2); font-size: 12px; }
+  .q td.n { text-align: right; white-space: nowrap; font-variant-numeric: tabular-nums; padding-left: 10px; }
+  .q tfoot td { font-weight: 800; font-size: 16px; border: 0; padding-top: 10px; }
+  .q p { font-size: 12px; color: var(--ink2); margin: 8px 0 14px; }
+  .q button { width: 100%; border: 0; border-radius: 10px; background: var(--navy); color: #fff; font: inherit; font-weight: 700; padding: 13px; }
+  body.shot header, body.shot main, body.shot .bar, body.shot .size, body.shot .arbtn, body.shot .noar { display: none !important; }
+  body.shot .stage { height: 100vh; background: #fff; }
+  body.shot model-viewer::part(default-progress-bar) { display: none; }
+</style>
+</head>
+<body>
+<div class="app">
+  <header><a href="./" aria-label="카탈로그로"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M15 5l-7 7 7 7"/></svg></a><div><b id="name">AR 견적</b><span id="desc"></span></div></header>
+  <div class="stage">
+    <model-viewer id="mv" alt="고른 사양의 3D 모델" camera-controls touch-action="pan-y" shadow-intensity="1" exposure="1.05"
+      environment-image="neutral" ar ar-modes="webxr scene-viewer quick-look" ar-placement="floor" ar-scale="fixed"
+      camera-orbit="-25deg 76deg auto" interaction-prompt="none">
+      <button slot="ar-button" class="arbtn" type="button"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 7V5a2 2 0 0 1 2-2h2M17 3h2a2 2 0 0 1 2 2v2M21 17v2a2 2 0 0 1-2 2h-2M7 21H5a2 2 0 0 1-2-2v-2"/><path d="M12 7l5 3v5l-5 3-5-3v-5z"/></svg>내 공간에 놓아 보기</button>
+    </model-viewer>
+    <div class="size" id="size"></div>
+    <div class="noar" id="noar">휴대폰으로 열면 카메라로 실제 크기를 볼 수 있습니다</div>
+  </div>
+  <main id="ctl"></main>
+  <div class="bar"><div class="in"><div class="t"><small id="what"></small><b id="total">0원</b></div><button type="button" id="open">견적 내역</button></div></div>
+</div>
+<dialog id="dlg"><div class="q"><h2>견적 내역</h2><table><tbody id="lines"></tbody><tfoot><tr><td>합계</td><td class="n" id="sum"></td></tr></tfoot></table>
+<p>부가세 포함, 수도권 기준. 실측 뒤 확정됩니다.</p><button type="button" id="close">닫기</button></div></dialog>
+
+<script type="module" src="https://cdn.jsdelivr.net/npm/@google/model-viewer@3.5.0/dist/model-viewer.min.js"></script>
+<script type="importmap">{ "imports": { "three": "https://cdn.jsdelivr.net/npm/three@0.160.0/build/three.module.js", "three/addons/": "https://cdn.jsdelivr.net/npm/three@0.160.0/examples/jsm/" } }</script>
+<script type="module">
+import * as THREE from 'three';
+import { GLTFExporter } from 'three/addons/exporters/GLTFExporter.js';
+import { PRODUCTS, byIdP, defaults, quote, build } from './engine.js';
+
+const qs = new URLSearchParams(location.search);
+const P = byIdP(qs.get('id')) || PRODUCTS[0];
+if (qs.has('shot')) document.body.classList.add('shot');
+const state = defaults(P);
+// 주소 뒤 # 에 고른 사양을 담아 그대로 공유됩니다
+try { Object.assign(state, JSON.parse(decodeURIComponent(location.hash.slice(1)) || '{}')); } catch (e) {}
+
+const $ = id => document.getElementById(id);
+const won = n => n.toLocaleString('ko-KR') + '원';
+const mm = n => n.toLocaleString('ko-KR') + 'mm';
+document.title = `${P.name} AR 견적 | 곰파트너 AR 카탈로그`;
+$('name').textContent = P.name; $('desc').textContent = P.desc;
+
+// 제품 정의의 칸 목록대로 조작 화면을 만듭니다
+$('ctl').innerHTML = P.params.map(x => {
+  if (x.type === 'range') return `<fieldset><legend>${x.label}</legend><div class="range"><input type="range" data-k="${x.k}" min="${x.min}" max="${x.max}" step="${x.step}" aria-label="${x.label}"><output data-o="${x.k}"></output></div></fieldset>`;
+  if (x.type === 'text') return `<fieldset><legend>${x.label}</legend><input class="txt" data-k="${x.k}" maxlength="${x.max}" aria-label="${x.label}"></fieldset>`;
+  return `<fieldset><legend>${x.label}</legend><div class="seg" data-g="${x.k}">${x.options.map(o => `<button type="button" data-id="${o.id}">${x.type === 'color' ? `<i class="dot" style="background:${o.hex}"></i>` : ''}${o.name}</button>`).join('')}</div></fieldset>`;
+}).join('');
+$('ctl').addEventListener('input', e => { const k = e.target.dataset.k; if (!k) return; state[k] = e.target.type === 'range' ? +e.target.value : e.target.value; update(true); });
+$('ctl').addEventListener('click', e => { const b = e.target.closest('.seg button'); if (!b) return; state[b.closest('.seg').dataset.g] = b.dataset.id; update(true); });
+
+const exporter = new GLTFExporter(), mv = $('mv');
+let url = null, job = 0, timer = 0;
+async function render() {
+  const my = ++job;
+  const scene = new THREE.Scene(); scene.add(build(P, state));
+  const glb = await exporter.parseAsync(scene, { binary: true });
+  if (my !== job) return;
+  const next = URL.createObjectURL(new Blob([glb], { type: 'model/gltf-binary' }));
+  mv.src = next;
+  if (url) { const old = url; setTimeout(() => URL.revokeObjectURL(old), 4000); }
+  url = next;
+}
+function update(rebuild) {
+  const q = quote(P, state);
+  for (const x of P.params) {
+    if (x.type === 'range') { const i = document.querySelector(`[data-k="${x.k}"]`); if (+i.value !== state[x.k]) i.value = state[x.k]; document.querySelector(`[data-o="${x.k}"]`).textContent = mm(state[x.k]); }
+    else if (x.type === 'text') { const i = document.querySelector(`[data-k="${x.k}"]`); if (i.value !== state[x.k]) i.value = state[x.k]; }
+    else document.querySelectorAll(`[data-g="${x.k}"] button`).forEach(b => b.setAttribute('aria-pressed', b.dataset.id === state[x.k]));
+  }
+  const dims = ['w', 'h', 'd'].filter(k => state[k] != null).map(k => P.params.find(x => x.k === k).label + ' ' + mm(state[k]));
+  $('size').textContent = dims.join(' x ');
+  $('what').textContent = P.params.filter(x => x.options).map(x => x.options.find(o => o.id === state[x.k])?.name).join(', ');
+  $('total').textContent = won(q.total);
+  $('lines').innerHTML = q.lines.map(l => `<tr><td>${l.name}<small>${l.sub}</small></td><td class="n">${won(l.price)}</td></tr>`).join('');
+  $('sum').textContent = won(q.total);
+  history.replaceState(null, '', location.pathname + location.search + '#' + encodeURIComponent(JSON.stringify(state)));
+  if (rebuild) { clearTimeout(timer); timer = setTimeout(render, 120); }
+}
+$('open').onclick = () => $('dlg').showModal();
+$('close').onclick = () => $('dlg').close();
+document.fonts.ready.then(() => update(true));
+update(false);
+
+customElements.whenDefined('model-viewer').then(() => setTimeout(() => { if (!mv.canActivateAR && !qs.has('shot')) $('noar').style.display = 'block'; }, 1500));
+if ('serviceWorker' in navigator) navigator.serviceWorker.register('sw.js').catch(() => {});
+</script>
+</body>
+</html>

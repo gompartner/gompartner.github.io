@@ -1,6 +1,6 @@
 {
-  "name": "현관 중문 AR 견적",
-  "short_name": "중문 AR",
+  "name": "곰파트너 AR 카탈로그",
+  "short_name": "AR 카탈로그",
   "start_url": "./",
   "scope": "./",
   "display": "standalone",
