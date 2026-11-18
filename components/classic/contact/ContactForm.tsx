@@ -3,9 +3,10 @@
 import { useEffect, useRef, useState, type KeyboardEvent } from "react";
 import { readAttribution } from "@/lib/attribution";
 import { useSearchParams } from "next/navigation";
-import { Check, ChevronDown, MessageCircle } from "lucide-react";
+import { Check, ChevronDown, FileText, MessageCircle } from "lucide-react";
 import { openChannelChat } from "@/components/layout/ChannelTalk";
 import { LEAD_ENDPOINT } from "@/data/classic/leadEndpoint";
+import { profileLink } from "@/data/classic/companyProfile";
 import { profile } from "@/data/classic/profile";
 import { projects } from "@/data/classic/projects";
 
@@ -190,16 +191,29 @@ export function ContactForm() {
             <dd>전화 {profile.phone}, 이메일 {profile.email}</dd>
           </div>
         </dl>
+        <div className="mt-8 flex flex-wrap gap-3">
+        {/* 11-19 회사소개서. /profile 이 열람 시각을 남기고 드라이브 PDF로 넘긴다 */}
+        <a
+          href={profileLink(status.id, "done")}
+          target="_blank"
+          rel="noopener"
+          data-gtm-cta="contact_done_profile"
+          className="inline-flex h-12 items-center gap-2 rounded-md bg-[#256ef4] px-5 text-[16px] font-bold text-white transition-colors hover:bg-[#1b5bd1] focus-visible:outline focus-visible:outline-[3px] focus-visible:outline-offset-2 focus-visible:outline-[#15171c]"
+        >
+          <FileText size={18} aria-hidden />
+          회사소개서 보기
+        </a>
         {/* 11-08 접수 뒤 채널톡으로 바로 이어서 묻기. 입력칸에 접수 번호를 채워 연다 */}
         <button
           type="button"
           onClick={() => openChannelChat({ name: name.trim(), phone: phone.trim(), message: `[접수 번호 ${status.id}] ` })}
           data-gtm-cta="contact_done_channel_chat"
-          className="mt-8 inline-flex h-12 items-center gap-2 rounded-md bg-[#256ef4] px-5 text-[16px] font-bold text-white transition-colors hover:bg-[#1b5bd1] focus-visible:outline focus-visible:outline-[3px] focus-visible:outline-offset-2 focus-visible:outline-[#15171c]"
+          className="inline-flex h-12 items-center gap-2 rounded-md border border-[#15171c] bg-white px-5 text-[16px] font-bold text-[#15171c] transition-colors hover:bg-[#f3f5f8] focus-visible:outline focus-visible:outline-[3px] focus-visible:outline-offset-2 focus-visible:outline-[#15171c]"
         >
           <MessageCircle size={18} aria-hidden />
           채팅으로 이어서 문의
         </button>
+        </div>
       </div>
     );
   }
