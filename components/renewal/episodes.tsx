@@ -220,7 +220,7 @@ export function AdEpisode() {
         title="광고 신청 접수 랜딩페이지"
         price={`${manwon(basic.price)}부터 · 작업 ${basic.days}일`}
         items={["접수 즉시 알림", "구글 시트 상담 상태 기록", "광고별 신청·계약 집계", "원본 소스 제공"]}
-        sample={{ href: "/demo/landing-water-rental", label: "정수기 렌탈 샘플 보기" }}
+        sample={{ href: "/work/landing-water-rental", label: "정수기 렌탈 샘플 보기" }}
         consult={{ href: "/landing#apply", label: "상담 신청" }}
       />
     </>
@@ -315,7 +315,7 @@ export function CompanyEpisode() {
         title="회사·가게 홈페이지"
         price={`${manwon(basic.price)}부터 · 작업 ${basic.days}일`}
         items={plans.map((p) => `${p.title} ${manwon(p.price)} · ${p.days}일`)}
-        sample={{ href: "/demo/company", label: "정밀가공 회사 샘플 보기" }}
+        sample={{ href: "/work/company", label: "정밀가공 회사 샘플 보기" }}
         consult={{ href: chat("회사 홈페이지 상담을 원합니다."), label: "카카오톡 상담" }}
       />
     </>
@@ -466,7 +466,7 @@ export function ProgramEpisode() {
         title="업무 프로그램"
         price="별도 견적"
         items={["필요한 기능과 화면 수를 듣고 견적을 제공합니다.", "주문·엑셀 취합 자동화", "신청·심사 같은 내부 관리 화면", "온라인 강의(LMS)·결과지 출력"]}
-        sample={{ href: "/demo/excel-automation", label: "주문 엑셀 자동화 샘플 보기" }}
+        sample={{ href: "/work/excel-automation", label: "주문 엑셀 자동화 샘플 보기" }}
         consult={{ href: chat("업무 프로그램 견적 상담을 원합니다."), label: "카카오톡 상담" }}
       />
     </>

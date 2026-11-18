@@ -22,7 +22,7 @@ const ctx = await b.newContext({ viewport: { width: 390, height: 736 }, deviceSc
 for (const { id, slug } of pairs) {
   if (only && only !== slug) continue;
   const p = await ctx.newPage();
-  await p.goto(`${BASE}/demo/${slug}`, { waitUntil: "networkidle" });
+  await p.goto(`${BASE}/work/${slug}`, { waitUntil: "networkidle" });
   await p.addStyleTag({ content: "[data-gtm-cta^='demo_guide'], .demo-topbar, .print\\:hidden.fixed { display: none !important }" });
   // 성인 확인 창이 있는 샘플(술도가)은 확인을 누르고 찍는다
   const gate = p.getByRole("button", { name: /19세 이상/ });

@@ -14,7 +14,7 @@ const allProjects: Project[] = [
     features: ["등원, 하원 알림", "출결 달력", "숙제, 공지", "수강료 납부 안내", "상담 예약"],
     imageUrl: "/images/demos/app-academy.jpg",
     imageAlt: "학원 출결, 알림 앱 첫 화면",
-    demoUrl: "/demo/app-academy",
+    demoUrl: "/work/app-academy",
   },
   {
     id: "app-pilates",
@@ -26,7 +26,7 @@ const allProjects: Project[] = [
     features: ["수업 시간표와 남은 자리", "수업 예약, 취소", "회원권 잔여 횟수", "대기 예약 알림", "출석 기록"],
     imageUrl: "/images/demos/app-pilates.jpg",
     imageAlt: "필라테스 수업 예약 앱 첫 화면",
-    demoUrl: "/demo/app-pilates",
+    demoUrl: "/work/app-pilates",
   },
   {
     id: "kiosk-clinic",
@@ -38,7 +38,7 @@ const allProjects: Project[] = [
     features: ["초진, 재진 접수", "휴대폰 번호 본인 확인", "진료과, 증상 선택", "대기번호 출력", "큰 글씨, 음성 안내"],
     imageUrl: "/images/demos/kiosk-clinic.jpg",
     imageAlt: "병원 접수 키오스크 첫 화면",
-    demoUrl: "/demo/kiosk-clinic",
+    demoUrl: "/work/kiosk-clinic",
   },
   {
     id: "kiosk-academy",
@@ -50,7 +50,7 @@ const allProjects: Project[] = [
     features: ["번호, QR 출결", "등원, 하원 처리", "학부모 알림 문자", "오늘 출결 현황", "관리자 화면"],
     imageUrl: "/images/demos/kiosk-academy.jpg",
     imageAlt: "학원 출결 키오스크 첫 화면",
-    demoUrl: "/demo/kiosk-academy",
+    demoUrl: "/work/kiosk-academy",
   },
   {
     id: "online-store",
@@ -62,7 +62,7 @@ const allProjects: Project[] = [
     features: ["유약, 크기 옵션 선택", "각인 문구 옵션", "추가구성상품", "배송, 교환 안내", "장바구니, 주문"],
     imageUrl: "/images/demos/online-store.jpg",
     imageAlt: "자사 쇼핑몰 상품 목록 화면",
-    demoUrl: "/demo/online-store",
+    demoUrl: "/work/online-store",
   },
   {
     id: "shop-admin",
@@ -74,7 +74,7 @@ const allProjects: Project[] = [
     features: ["옵션 조합 자동 생성", "조합별 재고 관리", "주문 상태 일괄 변경", "송장번호, 엑셀 다운로드"],
     imageUrl: "/images/demos/shop-admin.jpg",
     imageAlt: "쇼핑몰 옵션, 주문 관리자 화면",
-    demoUrl: "/demo/shop-admin",
+    demoUrl: "/work/shop-admin",
   },
   {
     id: "pension",
@@ -86,7 +86,7 @@ const allProjects: Project[] = [
     features: ["객실 사진 안내", "객실, 날짜별 예약현황표", "요금 계산", "환불규정과 입금 안내"],
     imageUrl: "/images/demos/pension.jpg",
     imageAlt: "바다 펜션 홈페이지 첫 화면",
-    demoUrl: "/demo/pension",
+    demoUrl: "/work/pension",
   },
   {
     id: "company",
@@ -98,7 +98,7 @@ const allProjects: Project[] = [
     features: ["설비현황", "가공 사양 표", "도면 첨부 견적문의", "한영 전환"],
     imageUrl: "/images/demos/company.jpg",
     imageAlt: "정밀가공 회사 홈페이지 첫 화면",
-    demoUrl: "/demo/company",
+    demoUrl: "/work/company",
   },
   {
     id: "cert-lab",
@@ -110,7 +110,7 @@ const allProjects: Project[] = [
     features: ["국내, 해외 인증 안내", "성적서 진위확인", "고객 문의 안내", "견적문의 게시판"],
     imageUrl: "/images/demos/cert-lab.jpg",
     imageAlt: "시험인증기관 홈페이지 첫 화면",
-    demoUrl: "/demo/cert-lab",
+    demoUrl: "/work/cert-lab",
   },
   {
     id: "dental-homepage",
@@ -122,7 +122,7 @@ const allProjects: Project[] = [
     features: ["증상별 안내", "퀵메뉴", "비급여 진료비", "상담예약"],
     imageUrl: "/images/demos/dental-homepage.jpg",
     imageAlt: "야간진료 문구와 오른쪽 퀵메뉴가 있는 치과 홈페이지 첫 화면",
-    demoUrl: "/demo/dental-homepage",
+    demoUrl: "/work/dental-homepage",
   },
   {
     id: "clinic-homepage",
@@ -134,7 +134,7 @@ const allProjects: Project[] = [
     features: ["진료, 미용 안내", "요일별 진료시간", "시술 비용표", "장비소개"],
     imageUrl: "/images/demos/clinic-homepage.jpg",
     imageAlt: "피부과 홈페이지 첫 화면",
-    demoUrl: "/demo/clinic-homepage",
+    demoUrl: "/work/clinic-homepage",
   },
   {
     id: "pharmacy",
@@ -146,7 +146,7 @@ const allProjects: Project[] = [
     features: ["운영시간 안내", "휴일지킴이약국 운영일", "취급 품목 안내", "약사 소개", "공지사항"],
     imageUrl: "/images/demos/pharmacy.jpg",
     imageAlt: "약국 홈페이지 첫 화면",
-    demoUrl: "/demo/pharmacy",
+    demoUrl: "/work/pharmacy",
   },
   {
     id: "clinic-report",
@@ -158,7 +158,7 @@ const allProjects: Project[] = [
     features: ["연령대 평균 비교", "방사형 차트", "A4 인쇄, PDF 저장"],
     imageUrl: "/images/demos/clinic-report-input.jpg",
     imageAlt: "피부 진단 결과지 프로그램의 측정값 입력 화면",
-    demoUrl: "/demo/clinic-report",
+    demoUrl: "/work/clinic-report",
   },
   {
     id: "law-firm",
@@ -170,7 +170,7 @@ const allProjects: Project[] = [
     features: ["사건별 절차", "준비 서류 안내", "성공사례 게시판", "상담신청"],
     imageUrl: "/images/demos/law-firm.jpg",
     imageAlt: "법률사무소 홈페이지 첫 화면",
-    demoUrl: "/demo/law-firm",
+    demoUrl: "/work/law-firm",
   },
   {
     id: "tax-office",
@@ -182,7 +182,7 @@ const allProjects: Project[] = [
     features: ["이달 신고일정", "세무일정 달력", "기장료 요금표", "세무자료실 게시판", "상담신청"],
     imageUrl: "/images/demos/tax-office.jpg",
     imageAlt: "세무회계 사무소 홈페이지 첫 화면",
-    demoUrl: "/demo/tax-office",
+    demoUrl: "/work/tax-office",
   },
   {
     id: "real-estate",
@@ -194,7 +194,7 @@ const allProjects: Project[] = [
     features: ["매물검색", "매물 상세", "중개보수 계산", "매물 의뢰", "방문상담 신청"],
     imageUrl: "/images/demos/real-estate.jpg",
     imageAlt: "공인중개사사무소 홈페이지 매물 검색 화면",
-    demoUrl: "/demo/real-estate",
+    demoUrl: "/work/real-estate",
   },
   {
     id: "private-gym",
@@ -206,7 +206,7 @@ const allProjects: Project[] = [
     features: ["지점 목록", "시간 단위 예약", "시간대별 요금", "입장 QR", "예약 취소"],
     imageUrl: "/images/demos/private-gym.jpg",
     imageAlt: "프라이빗 짐 예약 서비스 첫 화면",
-    demoUrl: "/demo/small-business-homepage",
+    demoUrl: "/work/small-business-homepage",
   },
   {
     id: "korean-restaurant",
@@ -218,7 +218,7 @@ const allProjects: Project[] = [
     features: ["대표메뉴 소개", "메뉴 가격표", "원산지 표시", "영업시간 표", "오시는 길"],
     imageUrl: "/images/demos/korean-restaurant.jpg",
     imageAlt: "한식당 홈페이지 첫 화면",
-    demoUrl: "/demo/korean-restaurant",
+    demoUrl: "/work/korean-restaurant",
   },
   {
     id: "interior",
@@ -230,7 +230,7 @@ const allProjects: Project[] = [
     features: ["시공사례 게시판", "전후 사진 비교", "시공과정과 A/S 안내", "사진 첨부 견적문의", "관리자 글 등록"],
     imageUrl: "/images/demos/interior.jpg",
     imageAlt: "인테리어 시공 업체 홈페이지 첫 화면",
-    demoUrl: "/demo/interior",
+    demoUrl: "/work/interior",
   },
   {
     id: "academy",
@@ -242,7 +242,7 @@ const allProjects: Project[] = [
     features: ["반 편성 안내", "학년별 시간표", "레벨테스트 예약", "교습비 게시표", "차량 운행 노선"],
     imageUrl: "/images/demos/academy.jpg",
     imageAlt: "수학, 영어 학원 홈페이지 첫 화면",
-    demoUrl: "/demo/academy",
+    demoUrl: "/work/academy",
   },
   {
     id: "pilates-studio",
@@ -254,7 +254,7 @@ const allProjects: Project[] = [
     features: ["요일별 그룹 시간표", "레슨 비교 표", "수강료 안내", "강사 소개", "체험레슨 신청"],
     imageUrl: "/images/demos/pilates-studio.jpg",
     imageAlt: "필라테스 스튜디오 홈페이지 첫 화면",
-    demoUrl: "/demo/pilates-studio",
+    demoUrl: "/work/pilates-studio",
   },
   {
     id: "hanok-cafe",
@@ -266,7 +266,7 @@ const allProjects: Project[] = [
     features: ["공간별 사진 안내", "분류별 메뉴판", "네이버 예약 연결", "오시는 길", "공지사항"],
     imageUrl: "/images/demos/hanok-cafe.jpg",
     imageAlt: "한옥 찻집 홈페이지 첫 화면",
-    demoUrl: "/demo/hanok-cafe",
+    demoUrl: "/work/hanok-cafe",
   },
   {
     id: "bakery-cafe",
@@ -278,7 +278,7 @@ const allProjects: Project[] = [
     features: ["빵 나오는 시간표", "분류별 상품 목록", "픽업 예약", "단체주문 예약", "매장안내"],
     imageUrl: "/images/demos/bakery-cafe.jpg",
     imageAlt: "베이커리 카페 홈페이지 첫 화면",
-    demoUrl: "/demo/bakery-cafe",
+    demoUrl: "/work/bakery-cafe",
   },
   {
     id: "roastery",
@@ -290,7 +290,7 @@ const allProjects: Project[] = [
     features: ["이번 주 로스팅 원두", "로스팅 포인트 안내", "원두 주문", "정기 구독 가격표", "도매 문의"],
     imageUrl: "/images/demos/roastery.jpg",
     imageAlt: "로스터 드럼 속 볶은 원두 사진 위에 당일 로스팅 안내 문장",
-    demoUrl: "/demo/roastery",
+    demoUrl: "/work/roastery",
   },
   {
     id: "hair-salon",
@@ -302,7 +302,7 @@ const allProjects: Project[] = [
     features: ["디자이너 소개", "시술 가격표", "스타일북", "예약 신청"],
     imageUrl: "/images/demos/hair-salon.jpg",
     imageAlt: "의자가 줄지어 놓인 미용실 매장 사진 위에 오늘 예약 안내 문장",
-    demoUrl: "/demo/hair-salon",
+    demoUrl: "/work/hair-salon",
   },
   {
     id: "optical",
@@ -314,7 +314,7 @@ const allProjects: Project[] = [
     features: ["맞춘 안경 사례", "안경테 사진 목록", "렌즈 가격표", "시력검사 예약"],
     imageUrl: "/images/demos/optical.jpg",
     imageAlt: "유리 선반에 진열된 안경테 사진 위에 검사 시간 안내 문장",
-    demoUrl: "/demo/optical",
+    demoUrl: "/work/optical",
   },
   {
     id: "furniture-workshop",
@@ -326,7 +326,7 @@ const allProjects: Project[] = [
     features: ["수종별 가구 가격", "제작 가능 치수표", "주문 제작 사례", "견적 문의", "방문 예약 안내"],
     imageUrl: "/images/demos/furniture-workshop.jpg",
     imageAlt: "대패로 원목을 다듬는 손 사진 위에 맞춤 제작 안내 문장",
-    demoUrl: "/demo/furniture-workshop",
+    demoUrl: "/work/furniture-workshop",
   },
   {
     id: "coworking",
@@ -338,7 +338,7 @@ const allProjects: Project[] = [
     features: ["좌석 유형 소개", "멤버십 요금표", "회의실 안내", "투어 신청", "오시는 길"],
     imageUrl: "/images/demos/coworking.jpg",
     imageAlt: "공유오피스 라운지 사진 아래 지점 이름과 투어 신청 버튼",
-    demoUrl: "/demo/coworking",
+    demoUrl: "/work/coworking",
   },
   {
     id: "campsite",
@@ -350,7 +350,7 @@ const allProjects: Project[] = [
     features: ["구역별 사이트 안내", "사이트 배치도", "달력 예약현황", "장비 대여 합산", "입금 안내"],
     imageUrl: "/images/demos/campsite.jpg",
     imageAlt: "숲 사이 나무 데크 사이트가 놓인 캠핑장 전경 사진과 구역 목록",
-    demoUrl: "/demo/campsite",
+    demoUrl: "/work/campsite",
   },
   {
     id: "photo-studio",
@@ -362,7 +362,7 @@ const allProjects: Project[] = [
     features: ["촬영 상품 카드", "컨셉별 갤러리", "패키지 가격표", "촬영 예약", "촬영 안내"],
     imageUrl: "/images/demos/photo-studio.jpg",
     imageAlt: "조명이 켜진 빈 촬영 스튜디오 사진 위에 증명사진 안내 문장",
-    demoUrl: "/demo/photo-studio",
+    demoUrl: "/work/photo-studio",
   },
   {
     id: "nail-shop",
@@ -374,7 +374,7 @@ const allProjects: Project[] = [
     features: ["이달의 아트 사진", "시술 가격표", "회원권 안내", "담당별 예약", "오시는 길"],
     imageUrl: "/images/demos/nail-shop.jpg",
     imageAlt: "분홍 젤네일을 바른 손 사진 위에 젤네일 안내 문장",
-    demoUrl: "/demo/nail-shop",
+    demoUrl: "/work/nail-shop",
   },
   {
     id: "car-detailing",
@@ -386,7 +386,7 @@ const allProjects: Project[] = [
     features: ["차종별 가격표", "전후 사진 시공 사례", "입고 예약", "픽업 서비스", "보증 안내"],
     imageUrl: "/images/demos/car-detailing.jpg",
     imageAlt: "광택이 도는 검은 차 사진 위에 코팅 안내 문장",
-    demoUrl: "/demo/car-detailing",
+    demoUrl: "/work/car-detailing",
   },
   {
     id: "lighting-shop",
@@ -398,7 +398,7 @@ const allProjects: Project[] = [
     features: ["형태별 제품 목록", "색온도 안내", "공간별 추천", "견적 담기", "시공 상담 신청"],
     imageUrl: "/images/demos/lighting-shop.jpg",
     imageAlt: "창가에 매달린 펜던트 조명 사진 위에 설치 안내 문장",
-    demoUrl: "/demo/lighting-shop",
+    demoUrl: "/work/lighting-shop",
   },
   {
     id: "liquor-shop",
@@ -410,7 +410,7 @@ const allProjects: Project[] = [
     features: ["성인 확인", "주종별 상품 목록", "상품 상세 설명", "선물세트", "시음회 예약"],
     imageUrl: "/images/demos/liquor-shop.jpg",
     imageAlt: "원목 선반의 막걸리, 약주 병과 옹기 사진 위에 전통주 안내 문장",
-    demoUrl: "/demo/liquor-shop",
+    demoUrl: "/work/liquor-shop",
   },
   {
     id: "small-wedding",
@@ -422,7 +422,7 @@ const allProjects: Project[] = [
     features: ["예약 현황 달력", "공간 사진", "수용 인원 안내", "패키지 요금표", "상담신청"],
     imageUrl: "/images/demos/small-wedding.jpg",
     imageAlt: "꽃으로 꾸민 예식 테이블 사진 위에 하객 수와 홀 안내 문장",
-    demoUrl: "/demo/small-wedding",
+    demoUrl: "/work/small-wedding",
   },
   {
     id: "korean-medicine",
@@ -434,7 +434,7 @@ const allProjects: Project[] = [
     features: ["진료 과목", "교통사고 진료", "진료 시간표", "비급여 안내", "온라인 예약"],
     imageUrl: "/images/demos/korean-medicine.jpg",
     imageAlt: "흰 가운을 입은 대표원장 사진 옆에 교통사고 진료 안내 문장",
-    demoUrl: "/demo/korean-medicine",
+    demoUrl: "/work/korean-medicine",
   },
   {
     id: "orthopedics",
@@ -446,7 +446,7 @@ const allProjects: Project[] = [
     features: ["부위별 진료과목", "의료진 소개", "비급여 진료비 표", "진료 예약", "진료시간"],
     imageUrl: "/images/demos/orthopedics.jpg",
     imageAlt: "치료 침대가 놓인 밝은 물리치료실 사진 위에 토요일 진료 안내 문장",
-    demoUrl: "/demo/orthopedics",
+    demoUrl: "/work/orthopedics",
   },
   {
     id: "pediatrics",
@@ -458,7 +458,7 @@ const allProjects: Project[] = [
     features: ["진료 시간표", "진료 접수 안내", "예방접종 일정표", "영유아검진 시기표", "비급여 진료비"],
     imageUrl: "/images/demos/pediatrics.jpg",
     imageAlt: "아이 가슴에 청진기를 댄 사진 옆에 진료시간 안내",
-    demoUrl: "/demo/pediatrics",
+    demoUrl: "/work/pediatrics",
   },
   {
     id: "eye-clinic",
@@ -470,7 +470,7 @@ const allProjects: Project[] = [
     features: ["수술 비교표", "정밀검사 안내", "백내장 렌즈 안내", "비급여 진료비", "상담 예약"],
     imageUrl: "/images/demos/eye-clinic.jpg",
     imageAlt: "시력 검사용 시험테 사진 위에 수술 전 검사 안내 문장",
-    demoUrl: "/demo/eye-clinic",
+    demoUrl: "/work/eye-clinic",
   },
   {
     id: "animal-hospital",
@@ -482,7 +482,7 @@ const allProjects: Project[] = [
     features: ["24시 진료 안내", "진료과목", "건강검진 패키지", "면회 시간", "진료 예약"],
     imageUrl: "/images/demos/animal-hospital.jpg",
     imageAlt: "수의사가 골든 리트리버를 진찰하는 사진 위에 야간 진료 안내 문장",
-    demoUrl: "/demo/animal-hospital",
+    demoUrl: "/work/animal-hospital",
   },
   {
     id: "nursing-hospital",
@@ -494,7 +494,7 @@ const allProjects: Project[] = [
     features: ["병실 안내", "병실별 비용표", "면회 예약", "주간 식단표", "입원상담"],
     imageUrl: "/images/demos/nursing-hospital.jpg",
     imageAlt: "보호자가 어르신 손을 감싸 쥔 사진 위에 면회 안내 문장",
-    demoUrl: "/demo/nursing-hospital",
+    demoUrl: "/work/nursing-hospital",
   },
   {
     id: "labor-firm",
@@ -506,7 +506,7 @@ const allProjects: Project[] = [
     features: ["사업주, 근로자 갈래", "구제신청 안내", "임금체불 안내", "자문료 표", "상담신청"],
     imageUrl: "/images/demos/labor-firm.jpg",
     imageAlt: "사업주와 근로자 두 칸에 사진과 업무 목록이 놓인 첫 화면",
-    demoUrl: "/demo/labor-firm",
+    demoUrl: "/work/labor-firm",
   },
   {
     id: "scrivener",
@@ -518,7 +518,7 @@ const allProjects: Project[] = [
     features: ["업무별 처리 기간", "등기 비용 안내", "준비 서류", "개인회생 안내", "상담신청"],
     imageUrl: "/images/demos/scrivener.jpg",
     imageAlt: "업무별 처리 기간 목록 옆에 상담실 사진과 사무소 정보가 놓인 첫 화면",
-    demoUrl: "/demo/scrivener",
+    demoUrl: "/work/scrivener",
   },
   {
     id: "patent-office",
@@ -530,7 +530,7 @@ const allProjects: Project[] = [
     features: ["업무영역", "상표 출원 절차", "비용 안내", "특허 절차", "상담신청"],
     imageUrl: "/images/demos/patent-office.jpg",
     imageAlt: "도면 위 컴퍼스 사진 띠 아래 특허, 상표, 디자인 업무영역이 놓인 첫 화면",
-    demoUrl: "/demo/patent-office",
+    demoUrl: "/work/patent-office",
   },
   {
     id: "family-law",
@@ -542,7 +542,7 @@ const allProjects: Project[] = [
     features: ["분야별 절차 안내", "양육비 안내", "변호사 소개", "상담신청", "자주 묻는 질문"],
     imageUrl: "/images/demos/family-law.jpg",
     imageAlt: "대표 변호사 사진 옆에 이름과 업무분야 바로가기가 놓인 첫 화면",
-    demoUrl: "/demo/family-law",
+    demoUrl: "/work/family-law",
   },
   {
     id: "visa-agent",
@@ -554,7 +554,7 @@ const allProjects: Project[] = [
     features: ["체류자격 안내", "연장 신청 안내", "필요 서류", "영문 전환", "상담신청"],
     imageUrl: "/images/demos/visa-agent.jpg",
     imageAlt: "사무소 접수 창구 사진 옆에 체류자격 코드판이 놓인 첫 화면",
-    demoUrl: "/demo/visa-agent",
+    demoUrl: "/work/visa-agent",
   },
   {
     id: "architect-office",
@@ -566,7 +566,7 @@ const allProjects: Project[] = [
     features: ["작업 목록", "작업 상세", "설계 과정", "상담 안내", "오시는 길"],
     imageUrl: "/images/demos/architect-office.jpg",
     imageAlt: "단독주택과 근린생활시설 작업 사진이 격자로 놓인 첫 화면",
-    demoUrl: "/demo/architect-office",
+    demoUrl: "/work/architect-office",
   },
   {
     id: "presale",
@@ -578,7 +578,7 @@ const allProjects: Project[] = [
     features: ["분양개요", "타입별 평면도", "분양가표", "방문예약", "입지환경"],
     imageUrl: "/images/demos/presale.jpg",
     imageAlt: "아파트 세대 내부 사진과 분양개요 표, 관심고객 등록 패널이 놓인 첫 화면",
-    demoUrl: "/demo/presale",
+    demoUrl: "/work/presale",
   },
   {
     id: "saas-startup",
@@ -590,7 +590,7 @@ const allProjects: Project[] = [
     features: ["기능 탭 제품 화면", "월/연 결제 요금제", "요금제별 기능 비교표", "매장 수별 요금표", "도입 문의 폼"],
     imageUrl: "/images/demos/saas-startup.jpg",
     imageAlt: "흰 배경 위 재고 관리 서비스 제목과 기능 탭, 넓은 제품 화면, 창고 선반 앞 현장 사진",
-    demoUrl: "/demo/saas-startup",
+    demoUrl: "/work/saas-startup",
   },
   {
     id: "logistics",
@@ -602,7 +602,7 @@ const allProjects: Project[] = [
     features: ["당일 출고 일정 안내", "항목별 이용 요금표", "물류센터 안내", "도입 상담 신청"],
     imageUrl: "/images/demos/logistics.jpg",
     imageAlt: "물류 대행 회사 홈페이지 첫 화면",
-    demoUrl: "/demo/logistics",
+    demoUrl: "/work/logistics",
   },
   {
     id: "food-oem",
@@ -614,7 +614,7 @@ const allProjects: Project[] = [
     features: ["포장 형태별 제조 품목", "최소 주문 수량 안내", "생산 공정 소개", "샘플 의뢰 신청"],
     imageUrl: "/images/demos/food-oem.jpg",
     imageAlt: "소스 OEM 제조사 홈페이지 첫 화면",
-    demoUrl: "/demo/food-oem",
+    demoUrl: "/work/food-oem",
   },
   {
     id: "piano-academy",
@@ -626,7 +626,7 @@ const allProjects: Project[] = [
     features: ["교육과정 안내", "수업 시간표", "체험 레슨 신청", "교습비 안내", "연주회 소식"],
     imageUrl: "/images/demos/piano-academy.jpg",
     imageAlt: "피아노 건반 위 손 사진 아래 1:1 개인 레슨 안내",
-    demoUrl: "/demo/piano-academy",
+    demoUrl: "/work/piano-academy",
   },
   {
     id: "taekwondo",
@@ -638,7 +638,7 @@ const allProjects: Project[] = [
     features: ["차량 운행 노선표", "부별 시간표", "승급 심사 안내", "체험 수업", "상담 신청"],
     imageUrl: "/images/demos/taekwondo.jpg",
     imageAlt: "흰 도복과 검은 띠 사진 옆에 평일 수련 시간과 차량 정류장 안내",
-    demoUrl: "/demo/taekwondo",
+    demoUrl: "/work/taekwondo",
   },
   {
     id: "art-academy",
@@ -650,7 +650,7 @@ const allProjects: Project[] = [
     features: ["반 안내", "수업 작품", "실기 시간표", "교습비 안내", "상담 신청"],
     imageUrl: "/images/demos/art-academy.jpg",
     imageAlt: "연필 소묘 수업 작품 벽과 모집 중인 반 안내",
-    demoUrl: "/demo/art-academy",
+    demoUrl: "/work/art-academy",
   },
   {
     id: "english-talk",
@@ -662,7 +662,7 @@ const allProjects: Project[] = [
     features: ["레벨테스트 예약", "반별 시간표", "월 수강료 게시표", "강사 소개", "무료 체험 신청"],
     imageUrl: "/images/demos/english-talk.jpg",
     imageAlt: "새벽 회화반 안내 문장 아래 원어민, 한국인 강사 네 명 사진 카드",
-    demoUrl: "/demo/english-talk",
+    demoUrl: "/work/english-talk",
   },
   {
     id: "driving-school",
@@ -674,7 +674,7 @@ const allProjects: Project[] = [
     features: ["면허별 수강료", "셔틀 노선 시간표", "시험 일정 안내", "등록 예약"],
     imageUrl: "/images/demos/driving-school.jpg",
     imageAlt: "핸들을 잡은 손 사진 옆에 평일 저녁 연수 안내 문장과 바로가기",
-    demoUrl: "/demo/driving-school",
+    demoUrl: "/work/driving-school",
   },
   {
     id: "reading-academy",
@@ -686,7 +686,7 @@ const allProjects: Project[] = [
     features: ["이달의 도서", "수업 과정", "첨삭 수업 안내", "월 교습비", "상담 신청"],
     imageUrl: "/images/demos/reading-academy.jpg",
     imageAlt: "책을 받쳐 든 손 사진 옆에 독서 수업 안내 문장과 상담 버튼",
-    demoUrl: "/demo/reading-academy",
+    demoUrl: "/work/reading-academy",
   },
   {
     id: "landing-water-rental",
@@ -698,7 +698,7 @@ const allProjects: Project[] = [
     features: ["월 렌탈료 비교", "이번 달 혜택", "방문 관리 안내", "후기와 자주 묻는 질문", "상담 신청"],
     imageUrl: "/images/demos/landing-water-rental.jpg",
     imageAlt: "정수기 렌탈 상담 랜딩페이지 첫 화면",
-    demoUrl: "/demo/landing-water-rental",
+    demoUrl: "/work/landing-water-rental",
   },
   {
     id: "landing-coding-camp",
@@ -710,7 +710,7 @@ const allProjects: Project[] = [
     features: ["남은 자리 표시", "주차별 커리큘럼", "반별 수업료", "자주 묻는 질문", "신청 폼"],
     imageUrl: "/images/demos/landing-coding-camp.jpg",
     imageAlt: "코딩 교실 특강 모집 랜딩페이지 첫 화면",
-    demoUrl: "/demo/landing-coding-camp",
+    demoUrl: "/work/landing-coding-camp",
   },
   {
     id: "landing-move-clean",
@@ -722,7 +722,7 @@ const allProjects: Project[] = [
     features: ["견적 계산기", "평형별 가격표", "청소 전후 사진", "구역별 체크리스트", "예약 신청"],
     imageUrl: "/images/demos/landing-move-clean.jpg",
     imageAlt: "입주청소 견적 랜딩페이지 첫 화면",
-    demoUrl: "/demo/landing-move-clean",
+    demoUrl: "/work/landing-move-clean",
   },
   {
     id: "landing-popup-store",
@@ -734,7 +734,7 @@ const allProjects: Project[] = [
     features: ["회차 예약", "남은 자리 표시", "현장 입장 안내", "메뉴와 오시는 길", "자주 묻는 질문"],
     imageUrl: "/images/demos/landing-popup-store.jpg",
     imageAlt: "영수증 모양의 팝업스토어 사전예약 랜딩페이지 첫 화면",
-    demoUrl: "/demo/landing-popup-store",
+    demoUrl: "/work/landing-popup-store",
   },
   {
     id: "landing-stamp-tour",
@@ -746,7 +746,7 @@ const allProjects: Project[] = [
     features: ["코스 지도, 거리 시간", "스탬프 찍기", "해설사 동행 회차 예약", "완주 기념품 신청"],
     imageUrl: "/images/demos/landing-stamp-tour.jpg",
     imageAlt: "잡지 지면 모양의 광복절 스탬프 투어 랜딩페이지 첫 화면",
-    demoUrl: "/demo/landing-stamp-tour",
+    demoUrl: "/work/landing-stamp-tour",
   },
   {
     id: "landing-zine-fair",
@@ -758,7 +758,7 @@ const allProjects: Project[] = [
     features: ["사전 등록", "셀러 찾기", "부스 지도", "관심 부스 동선", "오시는 길"],
     imageUrl: "/images/demos/landing-zine-fair.jpg",
     imageAlt: "리소 포스터 모양의 독립출판 북페어 랜딩페이지 첫 화면",
-    demoUrl: "/demo/landing-zine-fair",
+    demoUrl: "/work/landing-zine-fair",
   },
   {
     id: "landing-leather-class",
@@ -770,7 +770,7 @@ const allProjects: Project[] = [
     features: ["회차별 남은 자리", "마감 회차 대기 신청", "완성작과 후기", "카드, 계좌이체 결제", "환불 규정 안내"],
     imageUrl: "/images/demos/landing-leather-class.jpg",
     imageAlt: "가죽을 손바느질하는 사진 위에 카드지갑 클래스 안내",
-    demoUrl: "/demo/landing-leather-class",
+    demoUrl: "/work/landing-leather-class",
   },
   {
     id: "excel-automation",
@@ -782,7 +782,7 @@ const allProjects: Project[] = [
     features: ["열 자동 맞춤", "오류 검사, 일괄 수정", "품목별 집계", "발주서 인쇄, 엑셀 다운로드"],
     imageUrl: "/images/demos/excel-automation.jpg",
     imageAlt: "거래처 주문 엑셀 취합 자동화 화면",
-    demoUrl: "/demo/excel-automation",
+    demoUrl: "/work/excel-automation",
   },
   {
     id: "lms",
@@ -794,7 +794,7 @@ const allProjects: Project[] = [
     features: ["구간 기반 진도", "진행단계평가", "학습독려 SMS", "수료증 출력", "차시별 이탈 통계"],
     imageUrl: "/images/demos/lms.jpg",
     imageAlt: "온라인 강의, 수료 관리 LMS 수강 화면",
-    demoUrl: "/demo/lms",
+    demoUrl: "/work/lms",
   },
   {
     id: "job-portal",
@@ -806,7 +806,7 @@ const allProjects: Project[] = [
     features: ["많이 찾은 검색어", "상세검색", "마감 D-day", "관심공고 저장"],
     imageUrl: "/images/demos/job-portal.jpg",
     imageAlt: "채용 정보 포털 검색 화면",
-    demoUrl: "/demo/job-portal",
+    demoUrl: "/work/job-portal",
   },
   {
     id: "maintenance-dashboard",
@@ -818,7 +818,7 @@ const allProjects: Project[] = [
     features: ["수정 요청 관리", "월간 점검표", "보안 점검 이력", "점검 보고서 출력"],
     imageUrl: "/images/demos/maintenance-dashboard.jpg",
     imageAlt: "홈페이지 유지보수 현황판 화면",
-    demoUrl: "/demo/maintenance-dashboard",
+    demoUrl: "/work/maintenance-dashboard",
   },
   {
     id: "maintenance-urgent-fix",
@@ -830,7 +830,7 @@ const allProjects: Project[] = [
     features: ["긴급 수리 접수, 캡처 첨부", "진행 상황 타임라인", "금액 동의 후 수리", "전후 화면 비교", "수리 보고서"],
     imageUrl: "/images/demos/maintenance-urgent-fix.jpg",
     imageAlt: "오늘 접수 목록과 처리 상태가 보이는 홈페이지 오류 수리 접수 화면",
-    demoUrl: "/demo/maintenance-urgent-fix",
+    demoUrl: "/work/maintenance-urgent-fix",
   },
   {
     id: "district-portal",
@@ -842,7 +842,7 @@ const allProjects: Project[] = [
     features: ["자주 찾는 서비스", "담당자 찾기", "구정소식 게시판", "알림판 멈춤"],
     imageUrl: "/images/demos/district-portal.jpg",
     imageAlt: "구청 홈페이지 첫 화면",
-    demoUrl: "/demo/district-portal",
+    demoUrl: "/work/district-portal",
   },
   {
     id: "program-application",
@@ -854,7 +854,7 @@ const allProjects: Project[] = [
     features: ["단계별 신청서", "관리자 심사", "신청 통계", "엑셀 다운로드"],
     imageUrl: "/images/demos/program-application.jpg",
     imageAlt: "지원사업 신청, 심사 시스템 관리자 화면",
-    demoUrl: "/demo/program-application",
+    demoUrl: "/work/program-application",
   },
   {
     id: "community-map",
@@ -866,7 +866,7 @@ const allProjects: Project[] = [
     features: ["지도, 목록 연동", "운영 중만 보기 필터", "상세검색", "예약 안내"],
     imageUrl: "/images/demos/community-map.jpg",
     imageAlt: "공유공간 지도 안내 서비스 화면",
-    demoUrl: "/demo/community-map",
+    demoUrl: "/work/community-map",
   },
   {
     id: "flower-expo",
@@ -878,7 +878,7 @@ const allProjects: Project[] = [
     features: ["추천 코스 지도", "개화 현황", "날짜별 프로그램", "입장료 계산"],
     imageUrl: "/images/demos/flower-expo.jpg",
     imageAlt: "꽃박람회 축제 홈페이지 첫 화면",
-    demoUrl: "/demo/flower-expo",
+    demoUrl: "/work/flower-expo",
   },
   {
     id: "accessibility-review",
@@ -890,7 +890,7 @@ const allProjects: Project[] = [
     features: ["개선 전후 전환", "점검 항목 12개", "준수율 비교"],
     imageUrl: "/images/demos/accessibility-review.jpg",
     imageAlt: "웹접근성 개선 전후 비교 화면",
-    demoUrl: "/demo/accessibility-review",
+    demoUrl: "/work/accessibility-review",
   },
   {
     id: "retirement-calculator",
@@ -902,7 +902,7 @@ const allProjects: Project[] = [
     features: ["연령별 자산 그래프", "투자 성향별 비교", "추가 저축액 계산"],
     imageUrl: "/images/demos/retirement-calculator.jpg",
     imageAlt: "노후준비 계산기 결과 화면",
-    demoUrl: "/demo/retirement-calculator",
+    demoUrl: "/work/retirement-calculator",
   },
 ];
 

@@ -8,7 +8,7 @@ import { SMALL_IMAGE_HEIGHT, SMALL_IMAGE_WIDTH, smallImage } from "@/lib/images"
 
 const h1 = "text-[32px] leading-[1.25] md:text-[44px]";
 const h2 = "text-[24px] font-bold leading-[1.5] tracking-[-0.01em] md:text-[32px]";
-const sampleHref = (demoUrl: string) => demoUrl.replace("/demo/", "/sample/");
+const sampleHref = (demoUrl: string) => demoUrl.replace("/work/", "/sample/");
 
 /**
  * 패키지 3종 카드와 나머지 상품 한 줄. primary 가 landing 이면 광고 랜딩 카드가 위, 홈페이지는 한 줄로 내려간다.

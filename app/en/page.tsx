@@ -130,7 +130,7 @@ export default function EnPage() {
             <ul className="mt-10 grid gap-8 md:grid-cols-3" role="list">
               {samples.map((s) => (
                 <li key={s.slug}>
-                  <a href={`/demo/${s.slug}`} target="_blank" rel="noopener" data-gtm-cta={`en_sample_${s.slug}`} className="group block">
+                  <a href={`/work/${s.slug}`} target="_blank" rel="noopener" data-gtm-cta={`en_sample_${s.slug}`} className="group block">
                     <span className="block overflow-hidden rounded-md border border-[#e1e5eb]">
                       <Image src={`/images/demos/sm/${s.slug}.jpg`} alt={`${s.title} sample screen`} width={720} height={450} sizes="(min-width: 768px) 400px, 92vw" className="aspect-[16/10] w-full object-cover object-top transition-transform duration-500 group-hover:scale-[1.03] motion-reduce:transition-none" />
                     </span>

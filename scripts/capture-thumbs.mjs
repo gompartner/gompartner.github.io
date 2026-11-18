@@ -21,7 +21,7 @@ for (const slug of slugs) {
   ]) {
     const ctx = await b.newContext({ viewport: { width: w, height: h }, deviceScaleFactor: 1, reducedMotion: "reduce" });
     const p = await ctx.newPage();
-    await p.goto(`${BASE}/demo/${slug}`, { waitUntil: "networkidle" });
+    await p.goto(`${BASE}/work/${slug}`, { waitUntil: "networkidle" });
     await p.addStyleTag({ content: HIDE });
     // 성인 확인 창이 있는 샘플(술도가)은 확인을 누르고 찍는다
     const gate = p.getByRole("button", { name: /19세 이상/ });

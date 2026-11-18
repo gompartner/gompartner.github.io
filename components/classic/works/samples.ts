@@ -9,8 +9,8 @@ import { threeDemos } from "@/data/classic/three";
 
 // 클래식 샘플 페이지 공용 계산. 서버에서만 쓴다(파일 존재 확인).
 
-export const slugOf = (demoUrl: string) => demoUrl.replace("/demo/", "");
-export const demoProjects = projects.filter((p) => p.demoUrl.startsWith("/demo/"));
+export const slugOf = (demoUrl: string) => demoUrl.replace("/work/", "");
+export const demoProjects = projects.filter((p) => p.demoUrl.startsWith("/work/"));
 export const findBySlug = (slug: string) => demoProjects.find((p) => slugOf(p.demoUrl) === slug);
 
 /** 11-04 3D 데모 6종(public/3d 정적 페이지). 상세 페이지(/sample) 없이 카드에서 데모로 바로 간다 */
@@ -28,7 +28,7 @@ export const threeProjects: Project[] = threeDemos.map((d) => ({
 }));
 
 /** 카드가 여는 주소: 일반 데모는 상세 페이지, 3D는 데모로 바로 */
-export const hrefOf = (p: Project) => (p.demoUrl.startsWith("/demo/") ? `/sample/${slugOf(p.demoUrl)}` : p.demoUrl);
+export const hrefOf = (p: Project) => (p.demoUrl.startsWith("/work/") ? `/sample/${slugOf(p.demoUrl)}` : p.demoUrl);
 
 const exists = (src: string) => fs.existsSync(path.join(process.cwd(), "public", src));
 

@@ -37,7 +37,7 @@ export function WorksGrid({ projects }: { projects: Project[] }) {
             transition={{ layout: { duration: 0.28, ease: EASE_IN_OUT } }}
             className="wt-card flex flex-col overflow-hidden rounded-[10px] border border-border bg-white"
           >
-            <Link href={w.demoUrl.replace("/demo/", "/sample/")} prefetch={false} aria-label={`${w.title} 샘플 보기`} className="relative block border-b border-border">
+            <Link href={w.demoUrl.replace("/work/", "/sample/")} prefetch={false} aria-label={`${w.title} 샘플 보기`} className="relative block border-b border-border">
               <Image
                 src={smallImage(w.imageUrl)}
                 alt={w.imageAlt}
@@ -54,7 +54,7 @@ export function WorksGrid({ projects }: { projects: Project[] }) {
               </p>
               <h3 className="mt-1 text-[19px] font-bold leading-[1.5]">{w.title}</h3>
               <div className="mt-auto flex items-end justify-between gap-3 pt-6">
-                <Link href={w.demoUrl.replace("/demo/", "/sample/")} prefetch={false} data-gtm-cta={`demo_open_${w.id}`} className={`${secondaryButton} shrink-0 whitespace-nowrap`}>
+                <Link href={w.demoUrl.replace("/work/", "/sample/")} prefetch={false} data-gtm-cta={`demo_open_${w.id}`} className={`${secondaryButton} shrink-0 whitespace-nowrap`}>
                   샘플 보기
                 </Link>
                 <PlanPrice projectId={w.id} />

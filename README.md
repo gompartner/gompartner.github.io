@@ -26,7 +26,7 @@ npm run lint
 | 경로 | 내용 |
 | --- | --- |
 | `app/(site)` | 첫 화면, 포트폴리오, 가격, 자주 묻는 질문, 주요 경력, 자료실 |
-| `app/demo/[slug]` | 데모 페이지 (사용법 가이드, 예상 가격 표시) |
+| `app/work/[slug]` | 화면 페이지(옛 /demo 주소는 app/demo에서 이동)  (사용법 가이드, 예상 가격 표시) |
 | `components/demos` | 데모 26개 |
 | `components/tools` | 자료실 도구 |
 | `data` | 포트폴리오 목록, 가격, 자주 묻는 질문, 업종, 도구 |

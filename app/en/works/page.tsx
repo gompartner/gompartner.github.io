@@ -48,7 +48,7 @@ export default function EnWorksPage() {
             <ul className="mt-8 grid gap-x-6 gap-y-10 sm:grid-cols-2 lg:grid-cols-3" role="list">
               {g.items.map((s) => (
                 <li key={s.slug}>
-                  <a href={`/demo/${s.slug}`} target="_blank" rel="noopener" data-gtm-cta={`en_works_${s.slug}`} className={card}>
+                  <a href={`/work/${s.slug}`} target="_blank" rel="noopener" data-gtm-cta={`en_works_${s.slug}`} className={card}>
                     <span className="block overflow-hidden rounded-md border border-[#e1e5eb] bg-white">
                       <Image src={`/images/demos/sm/${s.slug}.jpg`} alt={`${s.title} demo screen`} width={720} height={450} sizes="(min-width: 1024px) 400px, (min-width: 640px) 50vw, 92vw" className={thumb} />
                     </span>

@@ -10,7 +10,7 @@ export default async function DemoLayout({
   params: Promise<{ slug: string }>;
 }>) {
   const { slug } = await params;
-  const project = projects.find((p) => p.demoUrl === `/demo/${slug}`);
+  const project = projects.find((p) => p.demoUrl === `/work/${slug}`);
 
   return (
     <>

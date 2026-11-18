@@ -50,10 +50,10 @@ export function buildSearchIndex(): SearchItem[] {
     hay: [p.category, p.layout, industryOf(p)?.label ?? "", plain(p.description)].join(" "),
     thumb: thumbOf(p),
   }));
-  // 11-04 키오스크 3D 체험(/demo/<slug>/3d). 목록은 app/demo/[slug]/3d/page.tsx 의 demos3d 와 같게 둔다
+  // 11-04 키오스크 3D 체험(/work/<slug>/3d). 목록은 app/work/[slug]/3d/page.tsx 의 demos3d 와 같게 둔다
   const kiosk3d: SearchItem[] = ["kiosk-clinic", "kiosk-academy"].flatMap((slug) => {
-    const p = demoProjects.find((x) => x.demoUrl === `/demo/${slug}`);
-    return p ? [{ kind: "카탈로그" as const, title: `${plain(p.title)} 3D 체험`, desc: "실제 장소에 놓인 키오스크를 3D로 돌려 보며 화면을 눌러 봅니다", href: `/demo/${slug}/3d`, hay: ["키오스크 3D 쓰리디 체험", p.category, plain(p.description)].join(" "), thumb: thumbOf(p) }] : [];
+    const p = demoProjects.find((x) => x.demoUrl === `/work/${slug}`);
+    return p ? [{ kind: "카탈로그" as const, title: `${plain(p.title)} 3D 체험`, desc: "실제 장소에 놓인 키오스크를 3D로 돌려 보며 화면을 눌러 봅니다", href: `/work/${slug}/3d`, hay: ["키오스크 3D 쓰리디 체험", p.category, plain(p.description)].join(" "), thumb: thumbOf(p) }] : [];
   });
   const faqs: SearchItem[] = [
     ...faq.map((f) => ({ kind: "자주 묻는 질문" as const, title: f.q, desc: f.a, href: "/faq", hay: "" })),
@@ -75,7 +75,7 @@ export function buildSearchIndex(): SearchItem[] {
 
 /** 카탈로그 검색용(카탈로그 목록 페이지) */
 export function buildCatalogIndex(only?: { demoUrl: string }[]): SearchItem[] {
-  const ids = new Set((only ?? [...catalogProjects, ...threeProjects]).map((p) => (p.demoUrl.startsWith("/demo/") ? `/sample/${p.demoUrl.replace("/demo/", "")}` : p.demoUrl)));
+  const ids = new Set((only ?? [...catalogProjects, ...threeProjects]).map((p) => (p.demoUrl.startsWith("/work/") ? `/sample/${p.demoUrl.replace("/work/", "")}` : p.demoUrl)));
   return buildSearchIndex().filter((i) => i.kind === "카탈로그" && ids.has(i.href));
 }
 

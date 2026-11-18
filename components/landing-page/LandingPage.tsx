@@ -27,7 +27,7 @@ const strip = "px-4 md:px-8";
 const h2 = "font-[family-name:var(--font-sfx)] text-[30px] font-normal leading-[1.25] md:text-[38px]";
 const pressable =
   "border-[3px] shadow-[4px_4px_0_#1d1d1f] transition-[transform,box-shadow,background-color] duration-150 ease-out hover:-translate-x-0.5 hover:-translate-y-0.5 hover:shadow-[6px_6px_0_#1d1d1f] active:translate-x-1 active:translate-y-1 active:shadow-none motion-reduce:transition-none motion-reduce:hover:translate-x-0 motion-reduce:hover:translate-y-0";
-const sampleHref = (demoUrl: string) => demoUrl.replace("/demo/", "/sample/");
+const sampleHref = (demoUrl: string) => demoUrl.replace("/work/", "/sample/");
 
 const FOR_WHOM = [
   "광고 신청을 메일과 문자로 따로 확인하는 경우",
