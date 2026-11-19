@@ -23,7 +23,6 @@ function RuleRow() {
                   {p.amount}
                   <span className="ml-1.5 text-[20px] font-bold tracking-[-0.02em] text-[#15171c]">부터</span>
                 </span>
-                <span className="mt-3 block text-[15px] text-[#5b6370]">{p.note}</span>
               </span>
               <ArrowRight size={24} aria-hidden className="mb-1 shrink-0 transition-transform group-hover:translate-x-1 group-hover:text-[#256ef4] motion-reduce:transition-none" />
             </Link>
