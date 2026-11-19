@@ -33,7 +33,6 @@ const groups = [
     items: [
       { href: "/story", label: "회사소개" },
       { href: "/notice", label: "공지사항" },
-      { href: "/insight", label: "인사이트" },
       { href: "/tools", label: "자료실" },
       { href: "/glossary", label: "웹 용어 사전" },
       { href: "/faq", label: "자주 묻는 질문" },
