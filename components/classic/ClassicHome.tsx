@@ -69,9 +69,9 @@ function Hero() {
       <div className="relative mx-auto w-full max-w-[1248px] px-4 pb-16 pt-16 md:px-6 md:pb-24 md:pt-28">
         <h1
           id="c-hero"
-          className="max-w-[900px] break-keep text-[34px] font-[800] leading-[1.25] tracking-[-0.05em] md:text-[56px]"
+          className="max-w-[900px] break-keep text-[40px] font-[800] leading-[1.2] tracking-[-0.05em] md:text-[64px]"
         >
-          귀찮거나 번거롭거나 잘 모르거나, 오래 알아서 해 줄 곳이 필요하다면 맡기세요.
+          번거로운 홈페이지 일, 맡기세요.
         </h1>
         <form action="/contact" method="get" className="mt-10 flex max-w-[600px] overflow-hidden rounded-md bg-white md:mt-12">
           <label htmlFor="hero-site" className="sr-only">
