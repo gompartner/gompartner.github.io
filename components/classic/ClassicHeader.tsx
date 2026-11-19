@@ -227,6 +227,18 @@ export function ClassicHeader() {
             >
               <Search size={21} aria-hidden />
             </Link>
+            {/* 휴대폰과 태블릿은 작게, PC는 크게. 같은 버튼 하나를 폭에 따라 줄인다 */}
+            <Link
+              href="/contact"
+              data-gtm-cta="classic_header_contact"
+              aria-current={pathname === "/contact" ? "page" : undefined}
+              className={cn(
+                "inline-flex h-11 items-center whitespace-nowrap rounded-md px-3.5 text-[15px] font-bold transition-colors lg:px-5 lg:text-[16px]",
+                pathname === "/contact" ? "bg-[#0b50d0] text-white" : "bg-[#256ef4] text-white hover:bg-[#0b50d0]"
+              )}
+            >
+              상담 신청
+            </Link>
             <button
               ref={menuBtn}
               type="button"
@@ -271,6 +283,9 @@ export function ClassicHeader() {
               </li>
             ))}
           </ul>
+          <Link href="/contact" className="mt-6 flex h-12 items-center justify-center rounded-md bg-[#256ef4] text-[16px] font-bold text-white">
+            상담 신청
+          </Link>
         </div>
       )}
     </header>

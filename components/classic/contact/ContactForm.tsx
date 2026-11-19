@@ -121,8 +121,7 @@ export function ContactForm() {
         setStatus({ kind: "done", id: data.id });
         window.dataLayer ??= [];
         window.dataLayer.push({ event: "generate_lead", lead_package: payload.service });
-        // 메인 맨 아래에서도 완료 안내가 보이게 그 자리로 옮긴다
-        requestAnimationFrame(() => document.querySelector("[data-contact-done]")?.scrollIntoView({ block: "start" }));
+        window.scrollTo({ top: 0 });
       } else {
         setStatus({ kind: "error", message: data.error || "신청을 저장하지 못했습니다. 다시 시도해 주세요." });
       }
@@ -133,7 +132,7 @@ export function ContactForm() {
 
   if (status.kind === "done") {
     return (
-      <div role="status" data-contact-done className="scroll-mt-24 border-t-2 border-[#15171c] pt-8">
+      <div role="status" className="border-t-2 border-[#15171c] pt-8">
         <p className="text-[15px] font-bold tabular-nums text-[#256ef4]">접수 번호 {status.id}</p>
         <p className="mt-2 text-[26px] font-[800] leading-[1.35] tracking-[-0.03em] md:text-[32px]">접수되었습니다.</p>
         <dl className="mt-8 border-t border-[#e6e9ee] text-[16px]">
