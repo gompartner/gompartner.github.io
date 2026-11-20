@@ -198,7 +198,7 @@ export function ContactForm() {
 
       <div>
         <label htmlFor="cc-site" className={label}>
-          홈페이지 주소 <span className={opt}>(있으면)</span>
+          홈페이지 주소 <span className={opt}>(선택)</span>
         </label>
         <input id="cc-site" value={currentSite} onChange={(e) => setCurrentSite(e.target.value)} inputMode="url" autoComplete="url" placeholder="www.gompartner.co.kr" className={field} />
       </div>
@@ -223,7 +223,7 @@ export function ContactForm() {
 
       <div>
         <label htmlFor="cc-email" className={label}>
-          이메일 <span className={opt}>(회사소개서를 받으실 곳, 선택)</span>
+          회사소개서 받을 이메일 <span className={opt}>(선택)</span>
         </label>
         <input id="cc-email" type="email" value={email} onChange={(e) => setEmail(e.target.value)} autoComplete="email" placeholder={profile.email} className={field} aria-invalid={!!errors.email} aria-describedby={errors.email ? "cc-email-err" : undefined} />
         {errors.email && <p id="cc-email-err" className={err}>{errors.email}</p>}
