@@ -25,7 +25,7 @@ export function HostingCostCalculator() {
     { name: `${plan.provider} ${plan.product} 1년`, amount: plan.yearly },
     ...(plan.setup ? [{ name: "호스팅 설치비(한 번)", amount: plan.setup }] : []),
     { name: `${registrar} ${tld} 도메인 1년`, amount: domainCost },
-    ...(ssl && ssl.firstYear ? [{ name: "https(SSL)", amount: ssl.firstYear }] : []),
+    ...(ssl && ssl.firstYear ? [{ name: "SSL 인증서", amount: ssl.firstYear }] : []),
   ];
   const firstTotal = first.reduce((s, l) => s + l.amount, 0);
   const nextTotal = plan.yearly + domainCost + (ssl?.yearly ?? 0);
@@ -52,7 +52,7 @@ export function HostingCostCalculator() {
           </label>
           <div className="grid grid-cols-[1fr_auto] gap-3">
             <label className="block">
-              <span className="text-[17px] font-bold">도메인 살 곳</span>
+              <span className="text-[17px] font-bold">도메인 등록업체</span>
               <select value={registrar} onChange={(e) => setRegistrar(e.target.value)} className={`${select} mt-2`}>
                 {domainPrices.map((d) => (
                   <option key={d.registrar}>{d.registrar}</option>
@@ -60,7 +60,7 @@ export function HostingCostCalculator() {
               </select>
             </label>
             <label className="block">
-              <span className="text-[17px] font-bold">끝 주소</span>
+              <span className="text-[17px] font-bold">도메인 확장자</span>
               <select value={tld} onChange={(e) => setTld(e.target.value as Tld)} className={`${select} mt-2 w-[120px]`}>
                 {tlds.map((t) => (
                   <option key={t}>{t}</option>
@@ -70,7 +70,7 @@ export function HostingCostCalculator() {
           </div>
           <dl className="space-y-1.5 text-[15px] leading-[1.6] text-foreground-secondary">
             <div className="flex gap-2"><dt className="w-16 shrink-0 font-bold">용량</dt><dd>{plan.storage}, 트래픽 {plan.traffic}</dd></div>
-            <div className="flex gap-2"><dt className="w-16 shrink-0 font-bold">https</dt><dd>{ssl ? ssl.label : "공식 페이지에서 확인하지 못했습니다"}</dd></div>
+            <div className="flex gap-2"><dt className="w-16 shrink-0 font-bold">SSL</dt><dd>{ssl ? ssl.label : "공식 페이지에서 확인하지 못했습니다"}</dd></div>
             <div className="flex gap-2"><dt className="w-16 shrink-0 font-bold">부가세</dt><dd>{plan.vat === "별도" ? "별도(10%를 더해 계산)" : plan.vat === "포함" ? "포함" : "요금표에 표기 없음"}</dd></div>
             <div className="flex gap-2"><dt className="w-16 shrink-0 font-bold">참고</dt><dd>{plan.note}</dd></div>
           </dl>
@@ -88,11 +88,11 @@ export function HostingCostCalculator() {
             ))}
           </dl>
           <p className="mt-5 text-[17px] font-bold">
-            다음 해부터 <span className="tabular-nums">1년 {won(nextTotal)}</span>
+            2년 차부터 <span className="tabular-nums">연 {won(nextTotal)}</span>
           </p>
           <p className="mt-1 text-[15px] leading-[1.6] text-foreground-secondary">
             호스팅과 도메인{ssl?.yearly ? ", SSL" : ""}을 해마다 연장하는 값입니다.
-            {!ssl && " https 비용은 빠져 있습니다."}
+            {!ssl && " SSL 인증서 비용은 빠져 있습니다."}
           </p>
         </div>
       </div>
@@ -113,8 +113,8 @@ export function HostingCostCalculator() {
             <dl className="mt-2 grid grid-cols-[4.5rem_1fr] gap-x-2 gap-y-1 text-[14px]">
               <dt className="text-foreground-secondary">설치비</dt>
               <dd className="tabular-nums">{p.setup ? won(p.setup) : "없음"}</dd>
-              <dt className="text-foreground-secondary">https</dt>
-              <dd>{p.ssl ? p.ssl.label : "확인 못 함"}</dd>
+              <dt className="text-foreground-secondary">SSL</dt>
+              <dd>{p.ssl ? p.ssl.label : "공시 없음"}</dd>
               <dt className="text-foreground-secondary">용량</dt>
               <dd>{p.storage}</dd>
             </dl>
@@ -128,7 +128,7 @@ export function HostingCostCalculator() {
         <table className="w-full min-w-[760px] text-left text-[15px]">
           <thead className="bg-surface">
             <tr>
-              {["업체, 상품", "1년", "설치비", "https", "용량", "출처"].map((h) => (
+              {["업체, 상품", "1년", "설치비", "SSL", "용량", "출처"].map((h) => (
                 <th key={h} scope="col" className="px-4 py-3 font-bold">{h}</th>
               ))}
             </tr>
@@ -142,7 +142,7 @@ export function HostingCostCalculator() {
                 </th>
                 <td className="px-4 py-3 tabular-nums">{won(p.yearly)}</td>
                 <td className="px-4 py-3 tabular-nums">{p.setup ? won(p.setup) : "없음"}</td>
-                <td className="px-4 py-3">{p.ssl ? p.ssl.label : "확인 못 함"}</td>
+                <td className="px-4 py-3">{p.ssl ? p.ssl.label : "공시 없음"}</td>
                 <td className="px-4 py-3">{p.storage}</td>
                 <td className="px-4 py-3">
                   <a href={p.source} target="_blank" rel="noopener nofollow" className="inline-flex items-center gap-1 text-accent hover:underline">

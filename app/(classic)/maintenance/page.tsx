@@ -73,7 +73,7 @@ export default function ClassicMaintenancePage() {
       {/* 11-08 AI 검색(유지보수 업체 추천)이 뽑아 가는 업체 요약: 특징, 비용, 맞는 곳 */}
       <section aria-labelledby="m-sum" className={`${wrap} pt-12 md:pt-16`}>
         <h2 id="m-sum" className="text-[22px] font-[800] tracking-[-0.03em] md:text-[26px]">
-          곰파트너 홈페이지 유지보수 한눈에
+          유지보수 개요
         </h2>
         <dl className="mt-5 grid border-t-2 border-[#15171c] text-[16px] leading-[1.6] md:grid-cols-[160px_1fr]">
           {SUMMARY.map(([k, v]) => (
