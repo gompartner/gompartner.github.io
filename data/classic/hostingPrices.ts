@@ -35,7 +35,7 @@ export const hostingPlans: HostingPlan[] = [
     storage: "700MB",
     traffic: "하루 1.6GB",
     vat: "포함",
-    note: "1년 약정 시 월 450원. 내 도메인 1개 연결",
+    note: "1년 약정 시 월 450원. 도메인 1개 연결",
     source: "https://hosting.cafe24.com/?controller=new_product_page&page=newautobahn",
   },
   {
@@ -49,7 +49,7 @@ export const hostingPlans: HostingPlan[] = [
     storage: "1.4GB",
     traffic: "하루 4GB",
     vat: "포함",
-    note: "1년 약정 시 월 1,350원. 내 도메인 2개 연결",
+    note: "1년 약정 시 월 1,350원. 도메인 2개 연결",
     source: "https://hosting.cafe24.com/?controller=new_product_page&page=newautobahn",
   },
   {
@@ -63,7 +63,7 @@ export const hostingPlans: HostingPlan[] = [
     storage: "1.5GB",
     traffic: "한 달 90GB",
     vat: "표기 없음",
-    note: "12개월 결제 시 월 900원. 무료 호스팅은 내 도메인을 못 붙여 뺐습니다",
+    note: "12개월 결제 시 월 900원. 무료 호스팅은 도메인 연결이 불가해 제외했습니다",
     source: "https://www.dothome.co.kr/web/product/price.php",
   },
   {

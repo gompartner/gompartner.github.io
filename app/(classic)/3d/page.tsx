@@ -203,7 +203,7 @@ export default function Page() {
                     <span className="sr-only">항목</span>
                   </th>
                   {threeCompare.cols.map((c, i) => (
-                    <th key={c} scope="col" className={`px-4 py-5 text-left align-top text-[19px] font-[800] tracking-[-0.03em] md:px-6 md:text-[22px] ${i === 0 ? "bg-[#eef3ff] text-[#256ef4]" : ""}`}>
+                    <th key={c} scope="col" className={`px-4 py-5 text-left align-top text-[19px] font-[800] tracking-[-0.03em] md:px-6 md:text-[22px] ${i === 0 ? "w-[246px] bg-[#eef3ff] text-[#256ef4] md:w-auto" : ""}`}>
                       {c}
                     </th>
                   ))}

@@ -86,12 +86,14 @@ export default function ClassicMaintenancePage() {
         {/* 11-08 카카오톡 채널 친구 쿠폰(사용자 승인): 월 유지보수 첫 달 50%, 12-31까지, 100장. 쿠폰 화면의 번호 등록은 /contact?promo=kakao&serial= 로 온다 */}
         <p className="mt-4 text-[16px] leading-[1.6] text-[#3b4250]">
           카카오톡 채널 친구는 월 유지보수 첫 달 관리비 50% 할인 쿠폰을 받을 수 있습니다(12월 31일까지).{" "}
+          <span className="whitespace-nowrap">
           <a href={KAKAO_COUPON_URL} target="_blank" rel="noopener noreferrer" data-gtm-cta="maintenance_kakao_coupon" className="font-bold text-[#256ef4] underline underline-offset-4">
             쿠폰 받기
-          </a>{" "}
+          </a>
           <Link href="/notice/kakao-coupon-2026-11" className="ml-2 font-bold text-[#15171c] underline-offset-4 hover:underline">
             쿠폰 안내
           </Link>
+          </span>
         </p>
       </section>
 
