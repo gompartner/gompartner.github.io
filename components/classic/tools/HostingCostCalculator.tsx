@@ -70,7 +70,7 @@ export function HostingCostCalculator() {
           </div>
           <dl className="space-y-1.5 text-[15px] leading-[1.6] text-foreground-secondary">
             <div className="flex gap-2"><dt className="w-16 shrink-0 font-bold">용량</dt><dd>{plan.storage}, 트래픽 {plan.traffic}</dd></div>
-            <div className="flex gap-2"><dt className="w-16 shrink-0 font-bold">SSL</dt><dd>{ssl ? ssl.label : "공식 페이지에서 확인하지 못했습니다"}</dd></div>
+            <div className="flex gap-2"><dt className="w-16 shrink-0 font-bold">SSL</dt><dd>{ssl ? ssl.label : "요금표에 표기 없음"}</dd></div>
             <div className="flex gap-2"><dt className="w-16 shrink-0 font-bold">부가세</dt><dd>{plan.vat === "별도" ? "별도(10%를 더해 계산)" : plan.vat === "포함" ? "포함" : "요금표에 표기 없음"}</dd></div>
             <div className="flex gap-2"><dt className="w-16 shrink-0 font-bold">참고</dt><dd>{plan.note}</dd></div>
           </dl>
@@ -92,7 +92,7 @@ export function HostingCostCalculator() {
           </p>
           <p className="mt-1 text-[15px] leading-[1.6] text-foreground-secondary">
             호스팅과 도메인{ssl?.yearly ? ", SSL" : ""}을 해마다 연장하는 값입니다.
-            {!ssl && " SSL 인증서 비용은 빠져 있습니다."}
+            {!ssl && " SSL 인증서 비용은 제외했습니다."}
           </p>
         </div>
       </div>
@@ -114,7 +114,7 @@ export function HostingCostCalculator() {
               <dt className="text-foreground-secondary">설치비</dt>
               <dd className="tabular-nums">{p.setup ? won(p.setup) : "없음"}</dd>
               <dt className="text-foreground-secondary">SSL</dt>
-              <dd>{p.ssl ? p.ssl.label : "공시 없음"}</dd>
+              <dd>{p.ssl ? p.ssl.label : "요금표에 표기 없음"}</dd>
               <dt className="text-foreground-secondary">용량</dt>
               <dd>{p.storage}</dd>
             </dl>
@@ -142,7 +142,7 @@ export function HostingCostCalculator() {
                 </th>
                 <td className="px-4 py-3 tabular-nums">{won(p.yearly)}</td>
                 <td className="px-4 py-3 tabular-nums">{p.setup ? won(p.setup) : "없음"}</td>
-                <td className="px-4 py-3">{p.ssl ? p.ssl.label : "공시 없음"}</td>
+                <td className="px-4 py-3">{p.ssl ? p.ssl.label : "요금표에 표기 없음"}</td>
                 <td className="px-4 py-3">{p.storage}</td>
                 <td className="px-4 py-3">
                   <a href={p.source} target="_blank" rel="noopener nofollow" className="inline-flex items-center gap-1 text-accent hover:underline">
