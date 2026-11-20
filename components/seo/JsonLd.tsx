@@ -12,6 +12,7 @@ const sameAs = [
   "https://www.instagram.com/gompartner.co.kr/",
   "https://www.tiktok.com/@gompartner",
   "https://gompartner.tistory.com/",
+  "https://gompartner.blogspot.com/",
   "https://pf.kakao.com/_JxntWX",
 ];
 

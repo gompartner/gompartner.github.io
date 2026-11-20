@@ -1,7 +1,7 @@
 import Image from "next/image";
 import Link from "next/link";
 import { NavLink } from "@/components/classic/NavLink";
-import { Globe, Mail, Phone, Printer } from "lucide-react";
+import { Globe, Mail, PenLine, Phone, Printer } from "lucide-react";
 import { ChannelIcon, type ChannelIconName } from "@/components/layout/Footer";
 import { profile } from "@/data/classic/profile";
 
@@ -112,6 +112,11 @@ export function ClassicFooter() {
             <a href="https://www.youtube.com/@gompartner" target="_blank" rel="noopener noreferrer" data-gtm-cta="classic_footer_youtube" className="inline-flex min-h-11 items-center gap-1.5 self-start hover:text-white hover:underline">
               <ChannelIcon name="youtube" />
               유튜브
+            </a>
+            {/* 11-20 구글 블로그 첫 글 발행, 바닥글에 블로그 링크(11-19 결정) */}
+            <a href="https://gompartner.blogspot.com/" target="_blank" rel="noopener noreferrer" data-gtm-cta="classic_footer_blog" className="inline-flex min-h-11 items-center gap-1.5 self-start hover:text-white hover:underline">
+              <PenLine size={15} strokeWidth={2} aria-hidden />
+              블로그
             </a>
           </div>
           <div className="md:text-right">
