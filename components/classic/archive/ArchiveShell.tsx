@@ -127,9 +127,6 @@ export function ArchiveShell({ section, active, crumbs, toc, children }: { secti
             </ol>
           </nav>
           {children}
-          <p className="mt-16 border-t border-[#e6e9ee] pt-5 text-[13px] leading-[1.7] text-[#5b6370]">
-            본 콘텐츠의 저작권은 곰파트너에 있으며, 무단 전재 및 재배포를 금합니다. 출처를 밝힌 인용은 가능합니다.
-          </p>
         </main>
 
         {toc && toc.length > 0 ? (
