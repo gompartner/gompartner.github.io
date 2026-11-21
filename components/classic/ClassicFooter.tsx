@@ -33,7 +33,7 @@ const groups = [
     items: [
       { href: "/story", label: "회사소개" },
       { href: "/notice", label: "공지사항" },
-      { href: "/tools", label: "자료실" },
+      { href: "/jaryo", label: "자료" },
       { href: "/glossary", label: "웹 용어 사전" },
       { href: "/faq", label: "자주 묻는 질문" },
       { href: "/contact", label: "상담 신청" },

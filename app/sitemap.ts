@@ -65,7 +65,9 @@ export default function sitemap(): MetadataRoute.Sitemap {
 
     { path: "/insight", priority: 0.6, files: ["app/(classic)/insight/page.tsx", "data/classic/insights.ts"] },
     ...insights.map((n) => ({ path: `/insight/${n.slug}`, priority: 0.6, date: new Date(`${n.date}T00:00:00+09:00`) })),
-    // 11-04 자료실(무료 도구)을 고객지원으로 되살림
+    // 11-21 자료 허브(점검표, 용어, 인사이트, 도구, 샘플을 잇는 첫 화면)
+    { path: "/jaryo", priority: 0.6, files: ["app/(classic)/jaryo/page.tsx", "data/classic/jaryo.ts"] },
+    // 11-04 무료 도구를 고객지원으로 되살림
     { path: "/tools", priority: 0.5, files: ["app/(classic)/tools/page.tsx", "data/classic/tools.ts"] },
     ...tools.map((t) => ({ path: t.href, priority: 0.4, files: [`app/(classic)${t.href}/page.tsx`] })),
     { path: "/notice", priority: 0.3, files: ["app/(classic)/notice/page.tsx", "data/classic/notices.ts"] },

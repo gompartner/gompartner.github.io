@@ -8,13 +8,14 @@ import { tools } from "@/data/classic/tools";
 // 도구 컴포넌트 안쪽 꾸밈은 손대지 않는다.
 export function ToolFrame({ href, children }: { href: string; children: React.ReactNode }) {
   const tool = tools.find((t) => t.href === href);
-  const title = tool?.title ?? "자료실";
+  const title = tool?.title ?? "무료 도구";
   return (
     <>
       <PageHead
         title={title}
         trail={[
-          { href: "/tools", label: "자료실" },
+          { href: "/jaryo", label: "자료" },
+          { href: "/tools", label: "무료 도구" },
           { href, label: title },
         ]}
       />

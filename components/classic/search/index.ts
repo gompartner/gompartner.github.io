@@ -10,7 +10,7 @@ import { makeExtras } from "@/data/classic/makeExtra";
 import { termGroups } from "@/data/classic/glossary";
 
 // 통합검색 색인. 서버에서 만들어 검색 페이지(클라이언트)에 넘긴다(11-01).
-export type SearchKind = "서비스" | "카탈로그" | "인사이트" | "네이버 블로그" | "티스토리" | "유튜브" | "자료실" | "용어 사전" | "자주 묻는 질문" | "공지사항";
+export type SearchKind = "서비스" | "카탈로그" | "인사이트" | "네이버 블로그" | "티스토리" | "유튜브" | "무료 도구" | "용어 사전" | "자주 묻는 질문" | "공지사항";
 export interface SearchItem {
   kind: SearchKind;
   title: string;
@@ -59,7 +59,7 @@ export function buildSearchIndex(): SearchItem[] {
     ...faq.map((f) => ({ kind: "자주 묻는 질문" as const, title: f.q, desc: f.a, href: "/faq", hay: "" })),
     ...maintenanceServices.flatMap((s) => (maintenanceFaq[s.id] ?? []).map((f) => ({ kind: "자주 묻는 질문" as const, title: f.q, desc: f.a, href: `/maintenance/${s.id}#md-faq`, hay: s.h1 }))),
   ];
-  const files: SearchItem[] = tools.map((t) => ({ kind: "자료실", title: t.title, desc: t.description, href: t.href, hay: `자료실 무료 도구 ${t.category}` }));
+  const files: SearchItem[] = tools.map((t) => ({ kind: "무료 도구", title: t.title, desc: t.description, href: t.href, hay: `자료실 자료 무료 도구 ${t.category}` }));
   const news: SearchItem[] = notices.map((n) => ({ kind: "공지사항", title: n.title, desc: n.summary, href: `/notice/${n.id}`, hay: n.sections.flatMap((x) => [x.h, ...(x.p ?? []), ...(x.list ?? [])]).join(" ") }));
   const posts: SearchItem[] = insights.map((n) => ({
     kind: "인사이트",

@@ -7,12 +7,12 @@ import { toolCategories, tools } from "@/data/classic/tools";
 import { pageMeta } from "@/lib/seo";
 
 // 11-04 공유 미리보기(카톡 등)도 이 도구의 제목, 설명, 주소로 나오게 pageMeta를 쓴다
-export const metadata: Metadata = pageMeta({ title: "자료실", description: "개인정보처리방침, 이용약관 생성기, 웹접근성 점검표, QR코드, 이미지 용량 줄이기 같은 무료 도구입니다.", path: "/tools" });
+export const metadata: Metadata = pageMeta({ title: "무료 도구", description: "개인정보처리방침, 이용약관 생성기, 웹접근성 점검표, QR코드, 이미지 용량 줄이기 같은 무료 도구입니다.", path: "/tools" });
 
 export default function ClassicToolsPage() {
   return (
     <>
-      <PageHead title="자료실" trail={[{ href: "/tools", label: "자료실" }]} />
+      <PageHead title="무료 도구" trail={[{ href: "/jaryo", label: "자료" }, { href: "/tools", label: "무료 도구" }]} />
       <SupportTabs current="/tools" />
       <div className={`${wrap} space-y-14 pb-16 pt-10 md:space-y-16 md:pb-24 md:pt-14`}>
         {toolCategories.map((c) => {
