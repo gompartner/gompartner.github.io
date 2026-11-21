@@ -5085,7 +5085,7 @@ const allInsights: Insight[] = [
   },
   {
     slug: "ai-agent-deleted-production-database",
-    date: "2026-11-22",
+    date: "2026-11-21",
     series: "AI로 만든 서비스 운영",
     no: 4,
     title: "AI 코딩 에이전트가 운영 DB를 지운 사례와 막는 설정",
@@ -5204,7 +5204,7 @@ const allInsights: Insight[] = [
   },
   {
     slug: "eol-schedule-php-cms-runtime",
-    date: "2026-11-22",
+    date: "2026-11-21",
     series: "해외와 국내 동향",
     no: 4,
     title: "PHP, 워드프레스, Node.js, Tomcat 지원 종료 일정, 앞으로 1년 안에 오는 날짜",
@@ -5391,7 +5391,7 @@ const allInsights: Insight[] = [
   },
   {
     slug: "hacked-site-operator-liability",
-    date: "2026-11-23",
+    date: "2026-11-21",
     series: "관리 비용",
     no: 5,
     title: "홈페이지가 해킹돼 악성코드를 뿌리면 운영자 책임은 어디까지인가",
@@ -5516,7 +5516,7 @@ const allInsights: Insight[] = [
   },
   {
     slug: "tomcat-security-updates-2026-fall",
-    date: "2026-11-23",
+    date: "2026-11-21",
     series: "보안 경보",
     no: 8,
     title: "Tomcat 8~10월 보안 업데이트 세 차례, 설정별 확인 항목",
@@ -5759,7 +5759,7 @@ const allInsights: Insight[] = [
   },
   {
     slug: "vercel-netlify-free-plan-limits",
-    date: "2026-11-24",
+    date: "2026-11-21",
     series: "AI로 만든 서비스 운영",
     no: 5,
     title: "Vercel, Netlify 무료 요금제가 서비스를 멈추는 기준",
@@ -5889,7 +5889,7 @@ const allInsights: Insight[] = [
   },
   {
     slug: "eaa-and-korea-web-accessibility",
-    date: "2026-11-24",
+    date: "2026-11-21",
     series: "해외와 국내 동향",
     no: 5,
     title: "유럽 접근성법(EAA) 시행 1년, 국내 웹 접근성 의무와 무엇이 같고 다른가",
@@ -6031,7 +6031,7 @@ const allInsights: Insight[] = [
   },
   {
     slug: "free-template-hosting-plugin-cost",
-    date: "2026-11-25",
+    date: "2026-11-21",
     series: "관리 비용",
     no: 6,
     title: "무료 템플릿, 무료 호스팅, 무료 플러그인의 실제 비용",
@@ -6159,7 +6159,7 @@ const allInsights: Insight[] = [
   },
   {
     slug: "emudhra-certificate-distrust",
-    date: "2026-11-25",
+    date: "2026-11-21",
     series: "보안 경보",
     no: 9,
     title: "eMudhra 중간 인증서 침해와 브라우저 신뢰 철회, 우리 인증서 확인법",
@@ -6350,7 +6350,7 @@ const allInsights: Insight[] = [
   },
   {
     slug: "supabase-free-pause-no-backup",
-    date: "2026-11-26",
+    date: "2026-11-21",
     series: "AI로 만든 서비스 운영",
     no: 6,
     title: "Supabase 무료 프로젝트 일시 정지, 백업이 없는 서비스",
@@ -6472,7 +6472,7 @@ const allInsights: Insight[] = [
   },
   {
     slug: "passkey-login-adoption",
-    date: "2026-11-26",
+    date: "2026-11-21",
     series: "해외와 국내 동향",
     no: 6,
     title: "패스키 로그인, 해외 통계와 국내 사이트에 넣을 때 확인할 것",
@@ -6680,7 +6680,7 @@ const allInsights: Insight[] = [
   },
   {
     slug: "ai-built-site-second-year",
-    date: "2026-11-27",
+    date: "2026-11-21",
     series: "관리 비용",
     no: 7,
     title: "AI로 무료로 만든 홈페이지, 그다음 해에 드는 돈",
@@ -6818,7 +6818,7 @@ const allInsights: Insight[] = [
   },
   {
     slug: "app-data-breach-vibe-coding-korea-law",
-    date: "2026-11-27",
+    date: "2026-11-21",
     series: "AI로 만든 서비스 운영",
     no: 7,
     title: "앱 개인정보 유출 사례와 국내 개인정보 보호법에서 달라지는 점",
@@ -6916,7 +6916,7 @@ const allInsights: Insight[] = [
   },
   {
     slug: "maintenance-rate-public-guide",
-    date: "2026-11-28",
+    date: "2026-11-21",
     series: "관리 비용",
     no: 8,
     title: "유지보수 비용은 어떻게 정해지나, 공공 SW 대가산정 가이드의 유지관리 요율",
@@ -7124,7 +7124,7 @@ const allInsights: Insight[] = [
   },
   {
     slug: "ai-code-dependency-risks",
-    date: "2026-11-28",
+    date: "2026-11-21",
     series: "AI로 만든 서비스 운영",
     no: 8,
     title: "AI가 만든 코드의 의존성, 없는 패키지 이름과 오래된 버전",
@@ -7234,7 +7234,7 @@ const allInsights: Insight[] = [
   },
   {
     slug: "incident-cost-vs-monthly-fee",
-    date: "2026-11-29",
+    date: "2026-11-21",
     series: "관리 비용",
     no: 9,
     title: "사고 한 번의 비용과 월 관리비, 무엇을 비교해야 하나",
@@ -7400,7 +7400,7 @@ const allInsights: Insight[] = [
   },
   {
     slug: "korean-login-payment-for-ai-built-service",
-    date: "2026-11-29",
+    date: "2026-11-21",
     series: "AI로 만든 서비스 운영",
     no: 9,
     title: "AI로 만든 서비스의 로그인과 결제를 국내에 맞출 때 막히는 곳",
@@ -7546,7 +7546,7 @@ const allInsights: Insight[] = [
   },
   {
     slug: "diy-or-outsource-maintenance",
-    date: "2026-11-30",
+    date: "2026-11-21",
     series: "관리 비용",
     no: 10,
     title: "관리 업체 없이 직접 해도 되는 일과 의뢰해야 하는 일",
@@ -7752,7 +7752,7 @@ const allInsights: Insight[] = [
   },
   {
     slug: "ai-built-service-handover-checklist",
-    date: "2026-11-30",
+    date: "2026-11-21",
     series: "AI로 만든 서비스 운영",
     no: 10,
     title: "AI로 만든 서비스 출시 전 점검표, 인수하는 쪽이 먼저 보는 열 가지",

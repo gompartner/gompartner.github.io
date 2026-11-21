@@ -74,6 +74,7 @@ export function buildSearchIndex(): SearchItem[] {
   const terms: SearchItem[] = termGroups.flatMap((g) => g.terms.map((t) => ({ kind: "용어" as const, title: t.name, desc: `${t.look}. ${t.alt}`, href: `${termHref(g)}#${t.id}`, hay: [t.alt, t.use, t.say, g.title, g.cat, g.sec].join(" ") })));
   // 11-21 아카이브 문서: 트렌드, 용어 묶음 문서, 데이터
   const archive: SearchItem[] = [
+    { kind: "아카이브", title: "화면 예시: 페이지 종류별 와이어프레임", desc: "첫 화면, 회사 소개, 게시판, 로그인, 결제, 예약, 접수, 검색, 관리자", href: "/archive/screens", hay: "화면 예시 와이어프레임 시안 레이아웃 페이지 구성 디자인" },
     { kind: "아카이브", title: "곰파트너 아카이브", desc: "용어, 트렌드, 데이터, 운영 노트, 점검표와 도구", href: "/archive", hay: "아카이브 자료 자료실 문서 허브" },
     ...trendDocs.map((d) => ({ kind: "아카이브" as const, title: `트렌드: ${d.title}`, desc: d.desc, href: d.href, hay: "트렌드 한국 일본 미국 비교 차트 연도별 역사 변화" })),
     ...termGroups.map((g) => ({ kind: "아카이브" as const, title: `용어 문서: ${shortTitle(g)}`, desc: g.terms.map((t) => t.name).join(", "), href: termHref(g), hay: [g.title, g.cat, g.sec, ...(takeover[g.id] ?? []).flatMap((x) => [x.b, x.t]), takeover[g.id] ? "인수 시 확인 사항" : ""].join(" ") })),

@@ -74,8 +74,44 @@ export const exampleFlash2009: Example[] = [
   { country: "한국", site: "삼성전자", date: "2009-05-14", url: "https://web.archive.org/web/20090514022622/http://www.samsung.com/sec/", seen: "첫 화면 가운데 큰 영역이 플래시(swf)라 지금 열면 통째로 빈 칸. 아래 \"TV광고\" 칸도 비어 있음", alive: true, checked: "2026-11-21" },
 ];
 
+/** 8장: 휴대폰 OS 중 아이폰(iOS) 비율(StatCounter, 연간). 나머지는 대부분 안드로이드 */
+export const iosShare: Series[] = [
+  { ...KR, points: [[2012, 10.48], [2013, 8.6], [2014, 11.03], [2015, 20.65], [2016, 19.55], [2017, 20.57], [2018, 28.58], [2019, 28.18], [2020, 24.01], [2021, 26.8], [2022, 29.79], [2023, 30.38], [2024, 25.47], [2025, 23.47]] },
+  { ...JP, points: [[2012, 50.37], [2013, 56.93], [2014, 64.15], [2015, 66.06], [2016, 69.95], [2017, 67.51], [2018, 68.84], [2019, 69.34], [2020, 63.55], [2021, 66.55], [2022, 65.89], [2023, 68.76], [2024, 60.81], [2025, 60.6]] },
+  { ...US, points: [[2012, 50.06], [2013, 53.09], [2014, 52.48], [2015, 50.93], [2016, 53.3], [2017, 53.99], [2018, 54.88], [2019, 55.25], [2020, 59.55], [2021, 58.59], [2022, 56.75], [2023, 58.12], [2024, 56.53], [2025, 58.22]] },
+];
+
+/** 9장: PHP를 쓰는 사이트 중 주 버전 비율(W3Techs, 해마다 1월 1일, 전 세계) */
+export const phpVersions: Series[] = [
+  { key: "php5", label: "PHP 5", color: "#2a78d6", points: [[2015, 98.2], [2016, 98.7], [2017, 96.5], [2018, 88.5], [2019, 74.3], [2020, 54.3], [2021, 39.8], [2022, 28.0], [2023, 22.9], [2024, 17.5], [2025, 12.5], [2026, 9.3]] },
+  { key: "php7", label: "PHP 7", color: "#eb6834", points: [[2016, 0.1], [2017, 2.5], [2018, 10.7], [2019, 25.1], [2020, 45.3], [2021, 59.9], [2022, 69.9], [2023, 69.3], [2024, 59.5], [2025, 47.8], [2026, 35.7]] },
+  { key: "php8", label: "PHP 8", color: "#1baf7a", points: [[2022, 1.8], [2023, 7.6], [2024, 22.8], [2025, 39.6], [2026, 54.8]] },
+];
+
 // 데이터 분류 목록(위 숫자를 다 정의한 뒤에 둔다)
 export const datasets: Dataset[] = [
+  {
+    id: "php-versions",
+    title: "PHP 주 버전 비율(전 세계, PHP 사이트 중)",
+    unit: "%",
+    note: "W3Techs 조사 표본 기준, 버전을 숨긴 사이트는 빠짐",
+    desc: "PHP를 쓰는 사이트 중 5, 7, 8 버전 비율. 해마다 1월 1일 값.",
+    series: phpVersions,
+    source: { label: "W3Techs, PHP 버전 연도별 추이", href: "https://w3techs.com/technologies/history_details/pl-php/all/y" },
+    csv: [],
+    usedIn: [{ label: "트렌드 9. PHP 5에서 8까지, 유지보수가 바뀐 10년", href: "/archive/trends/php" }],
+  },
+  {
+    id: "ios-share",
+    title: "휴대폰 OS 중 아이폰 비율, 한국 일본 미국",
+    unit: "%",
+    note: "방문 표본 기반이라 해마다 튀는 값이 있습니다",
+    desc: "모바일 접속 중 iOS 비율. 나머지는 대부분 안드로이드. 연간 값.",
+    series: iosShare,
+    source: { label: "StatCounter Global Stats, Mobile Operating System Market Share", href: "https://gs.statcounter.com/os-market-share/mobile" },
+    csv: ["KR", "JP", "US"].map((c) => ({ label: `${c} 모바일 OS`, href: `/data/trend/mobile-os-${c}.csv` })),
+    usedIn: [{ label: "트렌드 8. 한국은 안드로이드, 일본과 미국은 아이폰", href: "/archive/trends/app" }],
+  },
   {
     id: "https-share",
     note: "크롬 사용 통계 제공에 동의한 사용자 기준, Windows만",
