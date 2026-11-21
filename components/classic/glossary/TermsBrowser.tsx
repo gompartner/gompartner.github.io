@@ -4,6 +4,7 @@ import { useEffect, useMemo, useState } from "react";
 import { ArrowUpRight } from "lucide-react";
 import { SearchBox } from "@/components/classic/search/SearchBox";
 import { termGroups, termLabels, termSections, type TermSection } from "@/data/classic/glossary";
+import { termImages } from "@/data/classic/glossaryImages";
 
 /** 웹 용어 사전 화면. 큰 분류 탭, 작은 분류 칩, 검색(세 분류를 함께 찾음) */
 export function TermsBrowser() {
@@ -80,6 +81,19 @@ export function TermsBrowser() {
             <ul role="list" className="mt-5 grid gap-4 md:grid-cols-2 lg:grid-cols-3">
               {g.terms.map((t) => (
                 <li key={t.id} id={t.id} className="flex min-w-0 scroll-mt-28 flex-col gap-2 rounded-md border border-[#e1e5eb] bg-white p-5 target:border-[#256ef4] target:ring-2 target:ring-[#256ef4]/20">
+                  {termImages[t.id] ? (
+                    // 11-21 티스토리 UI 이름 사전의 와이어프레임 그림
+                    // eslint-disable-next-line @next/next/no-img-element
+                    <img
+                      src={`/images/glossary/${t.id}.webp`}
+                      alt={`${t.name} 와이어프레임`}
+                      width={termImages[t.id][0]}
+                      height={termImages[t.id][1]}
+                      loading="lazy"
+                      decoding="async"
+                      className="-mx-5 -mt-5 mb-2 block h-auto w-[calc(100%+2.5rem)] max-w-none rounded-t-md border-b border-[#e1e5eb]"
+                    />
+                  ) : null}
                   <h3 className="text-[18px] font-[800] tracking-[-0.02em]">{t.name}</h3>
                   <p className="text-[14px] text-[#5b6370]">{t.alt}</p>
                   <dl className="grid grid-cols-[5.2em_1fr] gap-x-2 gap-y-1 text-[15px] leading-[1.55]">
