@@ -8,10 +8,11 @@ import { tools } from "@/data/classic/tools";
 import { insights } from "@/data/classic/insights";
 import { makeExtras } from "@/data/classic/makeExtra";
 import { termGroups } from "@/data/classic/glossary";
-import { termHref } from "@/data/classic/archive";
+import { shortTitle, takeover, termHref, trendDocs } from "@/data/classic/archive";
+import { datasets } from "@/data/classic/trendData";
 
 // 통합검색 색인. 서버에서 만들어 검색 페이지(클라이언트)에 넘긴다(11-01).
-export type SearchKind = "서비스" | "카탈로그" | "인사이트" | "네이버 블로그" | "티스토리" | "유튜브" | "무료 도구" | "용어 사전" | "자주 묻는 질문" | "공지사항";
+export type SearchKind = "서비스" | "카탈로그" | "아카이브" | "운영 노트" | "네이버 블로그" | "티스토리" | "유튜브" | "무료 도구" | "용어" | "자주 묻는 질문" | "공지사항";
 export interface SearchItem {
   kind: SearchKind;
   title: string;
@@ -63,15 +64,22 @@ export function buildSearchIndex(): SearchItem[] {
   const files: SearchItem[] = tools.map((t) => ({ kind: "무료 도구", title: t.title, desc: t.description, href: t.href, hay: `자료실 자료 무료 도구 ${t.category}` }));
   const news: SearchItem[] = notices.map((n) => ({ kind: "공지사항", title: n.title, desc: n.summary, href: `/notice/${n.id}`, hay: n.sections.flatMap((x) => [x.h, ...(x.p ?? []), ...(x.list ?? [])]).join(" ") }));
   const posts: SearchItem[] = insights.map((n) => ({
-    kind: "인사이트",
+    kind: "운영 노트",
     title: n.title,
     desc: n.summary,
     href: `/insight/${n.slug}`,
     hay: [n.series, ...n.blocks.flatMap((b) => [b.h ?? "", ...(b.p ?? []), ...(b.steps ?? []).flatMap((s) => [s.b, s.t]), ...(b.table?.rows.flat() ?? [])])].join(" "),
   }));
   // 11-15 용어: 용어 하나가 결과 한 줄, 누르면 그 용어 자리로 간다(11-21부터 아카이브 용어 문서)
-  const terms: SearchItem[] = termGroups.flatMap((g) => g.terms.map((t) => ({ kind: "용어 사전" as const, title: t.name, desc: `${t.look}. ${t.alt}`, href: `${termHref(g)}#${t.id}`, hay: [t.alt, t.use, t.say, g.title, g.cat, g.sec].join(" ") })));
-  return [...services, ...catalogs, ...kiosk3d, ...posts, ...files, ...terms, ...faqs, ...news];
+  const terms: SearchItem[] = termGroups.flatMap((g) => g.terms.map((t) => ({ kind: "용어" as const, title: t.name, desc: `${t.look}. ${t.alt}`, href: `${termHref(g)}#${t.id}`, hay: [t.alt, t.use, t.say, g.title, g.cat, g.sec].join(" ") })));
+  // 11-21 아카이브 문서: 트렌드, 용어 묶음 문서, 데이터
+  const archive: SearchItem[] = [
+    { kind: "아카이브", title: "곰파트너 아카이브", desc: "용어, 트렌드, 데이터, 운영 노트, 점검표와 도구", href: "/archive", hay: "아카이브 자료 자료실 문서 허브" },
+    ...trendDocs.map((d) => ({ kind: "아카이브" as const, title: `트렌드: ${d.title}`, desc: d.desc, href: d.href, hay: "트렌드 한국 일본 미국 비교 차트 연도별 역사 변화" })),
+    ...termGroups.map((g) => ({ kind: "아카이브" as const, title: `용어 문서: ${shortTitle(g)}`, desc: g.terms.map((t) => t.name).join(", "), href: termHref(g), hay: [g.title, g.cat, g.sec, ...(takeover[g.id] ?? []).flatMap((x) => [x.b, x.t]), takeover[g.id] ? "인수 시 확인 사항" : ""].join(" ") })),
+    ...datasets.map((d) => ({ kind: "아카이브" as const, title: `데이터: ${d.title}`, desc: d.desc, href: `/archive/data#${d.id}`, hay: `데이터 통계 차트 CSV ${d.source.label}` })),
+  ];
+  return [...services, ...catalogs, ...archive, ...kiosk3d, ...posts, ...files, ...terms, ...faqs, ...news];
 }
 
 /** 카탈로그 검색용(카탈로그 목록 페이지) */
