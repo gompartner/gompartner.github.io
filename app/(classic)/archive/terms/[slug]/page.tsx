@@ -50,7 +50,21 @@ export default async function TermDoc({ params }: { params: Promise<{ slug: stri
       />
 
       <h2 id="cmp" className={docH2}>한눈에 비교</h2>
-      <div className="mt-4">
+      {/* 휴대폰: 표 대신 용어마다 세로 칸(11-21 사용자: 가로 스크롤 말고 세로로) */}
+      <ul role="list" className="mt-4 border-t-2 border-[#15171c] md:hidden">
+        {g.terms.map((t) => (
+          <li key={t.id} className="border-b border-[#e6e9ee] py-3.5">
+            <a href={`#${t.id}`} className="text-[16px] font-[800] tracking-[-0.02em] hover:text-[#256ef4]">{t.name}</a>
+            <dl className="mt-1.5 grid grid-cols-[5.2em_minmax(0,1fr)] gap-x-2 gap-y-1 text-[14.5px] leading-[1.55]">
+              <dt className="text-[#5b6370]">{labels[0]}</dt>
+              <dd>{t.look}</dd>
+              <dt className="text-[#5b6370]">{labels[1]}</dt>
+              <dd>{t.use}</dd>
+            </dl>
+          </li>
+        ))}
+      </ul>
+      <div className="mt-4 hidden md:block">
         <table className="w-full border-collapse text-[14px] md:text-[15px]">
           <thead>
             <tr className="border-t-2 border-[#15171c] bg-[#f4f6f9] text-left">
