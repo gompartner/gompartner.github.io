@@ -2,6 +2,7 @@
 
 import Image from "next/image";
 import { ArrowRight } from "lucide-react";
+import { MonthSchedule } from "./MonthSchedule";
 
 // 치과 시안 A 화이트 미니멀(11-21). 회색과 흰색, 큰 여백과 얇은 선으로 정돈된 진료 이미지를 보여 준다. 메인 한 장, 기능 없음.
 // 사진: Unsplash 무료 라이선스(public/images/drafts/dent/a-*)
@@ -59,7 +60,24 @@ export function DentalA() {
         </div>
       </section>
 
-      <section className="px-5 py-24 md:px-10 md:py-36">
+      <section className="px-5 pt-16 md:px-10 md:pt-24">
+        <div className="mx-auto grid max-w-[1280px] gap-8 lg:grid-cols-[1fr_1.4fr] lg:items-center lg:gap-16">
+          <div>
+            <p className="text-[13px] font-bold tracking-[0.24em]" style={{ color: C.teal }}>SCHEDULE</p>
+            <h2 className="mt-4 text-[30px] font-bold leading-[1.3] tracking-[-0.03em] md:text-[42px]">
+              화, 목요일은
+              <br />
+              밤 9시까지 진료합니다
+            </h2>
+            <p className="mt-4" style={{ color: C.sub }}>퇴근 후에도 예약 없이 검진받으실 수 있습니다. 휴진일은 매달 이 달력에 먼저 공지합니다.</p>
+          </div>
+          <div className="border" style={{ borderColor: C.line }}>
+            <MonthSchedule accent="#c2412d" night={C.teal} rounded={0} />
+          </div>
+        </div>
+      </section>
+
+      <section className="px-5 py-24 md:px-10 md:py-32">
         <div className="mx-auto max-w-[1280px]">
           <div className="flex flex-col gap-4 md:flex-row md:items-end md:justify-between">
             <div>

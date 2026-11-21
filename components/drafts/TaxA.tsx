@@ -40,7 +40,7 @@ export function TaxA() {
         <Image src={`${IMG}/a-hero.jpg`} alt="아래에서 올려다본 유리 외벽 고층 빌딩" fill priority sizes="100vw" className="object-cover opacity-60" />
         <div className="absolute inset-0" style={{ background: "linear-gradient(90deg, rgba(11,31,58,0.95) 0%, rgba(11,31,58,0.7) 50%, rgba(11,31,58,0.25) 100%)" }} aria-hidden />
         <div className="relative mx-auto w-full max-w-[1240px] px-5 pt-20 md:px-8">
-          <p className="text-[13px] font-bold tracking-[0.24em]" style={{ color: C.mint }}>CORPORATE TAX PARTNER</p>
+          <p className="text-[13px] font-bold tracking-[0.24em]" style={{ color: C.mint }}>SINCE 2004, CORPORATE TAX PARTNER</p>
           <h1 className="mt-5 max-w-[820px] text-[36px] font-bold leading-[1.25] tracking-[-0.035em] md:text-[62px]">
             숫자가 보이면
             <br />
@@ -64,7 +64,7 @@ export function TaxA() {
           {[
             ["기장 고객사", "320", "곳"],
             ["법인 고객 비중", "64", "%"],
-            ["평균 거래 기간", "7.5", "년"],
+            ["누적 신고", "18,000", "건"],
             ["신고 기한 준수", "100", "%"],
           ].map(([k, v, u]) => (
             <div key={k} className="bg-white px-1 py-10 md:px-8 md:py-14">

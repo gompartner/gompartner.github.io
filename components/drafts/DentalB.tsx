@@ -2,6 +2,7 @@
 
 import Image from "next/image";
 import { ArrowRight, Clock, MapPin, Phone } from "lucide-react";
+import { MonthSchedule } from "./MonthSchedule";
 
 // 치과 시안 B 동네 가족 치과형(11-21). 따뜻한 주황 포인트와 둥근 모서리, 아이와 부모가 함께 오는 동네 치과 분위기. 메인 한 장, 기능 없음.
 // 사진: Unsplash 무료 라이선스(public/images/drafts/dent/b-*)
@@ -13,7 +14,7 @@ const CARE = [
   { t: "어린이 치과", d: "웃음가스와 짧은 진료로 아이가 겁먹지 않게 진행합니다.", tag: "만 12세 이하" },
   { t: "충치, 신경치료", d: "현미경으로 신경관을 확인하며 한 번에 정확하게 치료합니다.", tag: "보험 적용" },
   { t: "임플란트", d: "부분 틀니와 임플란트 중 나이와 잇몸 상태에 맞는 방법을 권해 드립니다.", tag: "65세 이상 보험" },
-  { t: "스케일링, 잇몸", d: "1년에 한 번 건강보험 스케일링과 잇몸 상태 점검을 받으세요.", tag: "연 1회 보험" },
+  { t: "스케일링, 잇몸", d: "1년에 한 번 건강보험 스케일링과 잇몸 상태 점검을 진행합니다.", tag: "연 1회 보험" },
 ];
 
 export function DentalB() {
@@ -76,7 +77,7 @@ export function DentalB() {
 
       <section className="px-5 py-20 md:px-8 md:py-28">
         <div className="mx-auto max-w-[1200px]">
-          <h2 className="text-[30px] font-bold leading-[1.3] tracking-[-0.04em] md:text-[44px]">이런 진료를 해요</h2>
+          <h2 className="text-[30px] font-bold leading-[1.3] tracking-[-0.04em] md:text-[44px]">진료 과목</h2>
           <ul className="mt-12 grid gap-4 sm:grid-cols-2">
             {CARE.map((c) => (
               <li key={c.t} className="flex flex-col justify-between rounded-[24px] p-8 md:p-10" style={{ background: C.card }}>
@@ -99,9 +100,9 @@ export function DentalB() {
         <div className="mx-auto grid max-w-[1200px] items-center gap-10 overflow-hidden rounded-[32px] md:grid-cols-2" style={{ background: C.green, color: "#fff" }}>
           <div className="px-8 py-14 md:px-14 md:py-20">
             <h2 className="text-[28px] font-bold leading-[1.35] tracking-[-0.04em] md:text-[40px]">
-              아이가 무서워하지 않게,
+              아이가 무서워하지 않도록,
               <br />
-              처음엔 구경만 해요
+              첫 방문은 구경부터 합니다
             </h2>
             <ul className="mt-8 grid gap-4 text-[16px] text-white/85 md:text-[17px]">
               <li>첫 방문은 의자에 앉아 보고 기구를 만져 보는 것으로 끝납니다.</li>
@@ -116,7 +117,7 @@ export function DentalB() {
       </section>
 
       <section className="px-5 py-20 md:px-8 md:py-28">
-        <div className="mx-auto grid max-w-[1200px] gap-10 md:grid-cols-[1.1fr_1fr] md:gap-16">
+        <div className="mx-auto max-w-[1200px]"><div className="mb-14"><MonthSchedule accent={C.orange} night={C.green} rounded={28} bg={C.card} marks={{ 6: "~15시" }} markLabel="토요일 오후 3시까지" /></div><div className="grid gap-10 md:grid-cols-[1.1fr_1fr] md:gap-16">
           <div className="relative aspect-[4/3] overflow-hidden rounded-[28px]">
             <Image src={`${IMG}/b-room.jpg`} alt="정돈된 진료실 내부" fill sizes="(min-width: 768px) 55vw, 100vw" className="object-cover" />
           </div>
@@ -140,6 +141,7 @@ export function DentalB() {
               <ArrowRight size={18} aria-hidden />
             </span>
           </div>
+        </div>
         </div>
       </section>
 

@@ -77,7 +77,7 @@ export function TaxB() {
 
       <section className="px-5 py-20 md:px-8 md:py-28" style={{ background: C.soft }}>
         <div className="mx-auto max-w-[1200px]">
-          <h2 className="text-[30px] font-bold tracking-[-0.04em] md:text-[44px]">이런 분들이 찾아오세요</h2>
+          <h2 className="text-[30px] font-bold tracking-[-0.04em] md:text-[44px]">이런 분들이 많이 찾으십니다</h2>
           <ul className="mt-12 grid gap-4 md:grid-cols-3">
             {FOR.map((f) => (
               <li key={f.t} className="rounded-[22px] bg-white p-8">
