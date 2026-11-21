@@ -170,3 +170,26 @@ export function DocHead({ title, meta, lead }: { title: string; meta?: [string, 
 }
 
 export const docH2 = "mt-12 scroll-mt-24 text-[24px] font-[800] tracking-[-0.035em] md:text-[26px]";
+
+/** 이어받을 때 볼 것 상자(우리 색깔). 용어 문서와 트렌드 문서가 같이 쓴다 */
+export function TakeoverBox({ sub, items }: { sub: string; items: { b: string; t: string }[] }) {
+  return (
+    <section id="take" aria-labelledby="take-h" className="mt-14 scroll-mt-24 overflow-hidden rounded-[10px] border-2 border-[#15171c]">
+      <div className="flex flex-wrap items-baseline gap-x-3 gap-y-1 bg-[#15171c] px-5 py-3.5 text-white">
+        <h2 id="take-h" className="text-[18px] font-[800] tracking-[-0.03em]">이어받을 때 볼 것</h2>
+        <span className="text-[13px] text-[#aebbd6]">{sub}</span>
+      </div>
+      <ol className="px-5 py-1">
+        {items.map((x, k) => (
+          <li key={x.b} className="grid grid-cols-[28px_minmax(0,1fr)] gap-1.5 border-b border-[#e6e9ee] py-3.5 last:border-b-0">
+            <span aria-hidden className="mt-0.5 grid h-[22px] w-[22px] place-items-center rounded-full bg-[#256ef4] text-[12px] font-[800] text-white">{k + 1}</span>
+            <div>
+              <p className="text-[15.5px] font-bold">{x.b}</p>
+              <p className="mt-0.5 text-[14.5px] leading-[1.6] text-[#5b6370]">{x.t}</p>
+            </div>
+          </li>
+        ))}
+      </ol>
+    </section>
+  );
+}

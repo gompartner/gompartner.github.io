@@ -2,7 +2,8 @@ import type { Metadata } from "next";
 import Image from "next/image";
 import Link from "next/link";
 import { ArchiveShell, docH2 } from "@/components/classic/archive/ArchiveShell";
-import { counts, recentLog, sections } from "@/data/classic/archive";
+import { counts, recentLog, sections, trendDocs } from "@/data/classic/archive";
+import { datasets } from "@/data/classic/trendData";
 import { insights } from "@/data/classic/insights";
 import { pageMeta } from "@/lib/seo";
 
@@ -14,11 +15,15 @@ export const metadata: Metadata = pageMeta({
 
 const pics: Record<string, string> = {
   terms: "/images/glossary/t1.webp",
+  trends: "/images/archive/trend-ie.png",
+  data: "/images/archive/data-mobile.png",
   notes: insights[0]?.image.src ?? "/images/glossary/t186.webp",
   checklists: "/images/jaryo/gnuboard-handover-1.jpg",
 };
 const amount: Record<string, string> = {
   terms: `${counts.groups}묶음 ${counts.terms}개`,
+  trends: `${trendDocs.length}편, 한국 일본 미국 비교`,
+  data: `차트 ${datasets.length}개, CSV 6개`,
   notes: `${counts.notes}편`,
   checklists: `점검표 ${counts.sheets}종, 도구 ${counts.tools}종`,
 };

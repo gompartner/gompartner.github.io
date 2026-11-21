@@ -7,6 +7,12 @@ import { termGroups, type TermGroup } from "@/data/classic/glossary";
 import { insights } from "@/data/classic/insights";
 import { jaryo } from "@/data/classic/jaryo";
 import { tools } from "@/data/classic/tools";
+import { datasets } from "@/data/classic/trendData";
+
+/** 트렌드 문서(만든 것만). 새 장을 쓰면 여기에 더한다 */
+export const trendDocs = [
+  { href: "/archive/trends/korea-ie", title: "한국만 IE를 오래 못 떠난 이유", desc: "PC 브라우저 중 IE 비율, 한국 일본 미국 2009~2025. 공인인증서, ActiveX, 2020년 전자서명법 개정, 2022년 IE 지원 종료." },
+];
 
 /** 용어 묶음 주소 이름. 묶음 id(g01...)는 바꾸지 않고 주소만 읽기 쉽게 둔다 */
 export const termSlugs: Record<string, string> = {
@@ -143,6 +149,8 @@ export const takeover: Record<string, { b: string; t: string }[]> = {
 export type ArchiveSection = { id: string; label: string; href: string; desc: string };
 export const sections: ArchiveSection[] = [
   { id: "terms", label: "용어", href: "/archive/terms", desc: "화면 부품, 디자인 용어, 운영 용어를 그림과 요청 문장으로" },
+  { id: "trends", label: "트렌드", href: "/archive/trends", desc: "한국, 일본, 미국의 홈페이지가 다르게 바뀐 과정을 차트와 와이어프레임으로" },
+  { id: "data", label: "데이터", href: "/archive/data", desc: "트렌드에 쓴 숫자의 원본. 차트, 출처, 확인일, CSV" },
   { id: "notes", label: "운영 노트", href: "/archive/notes", desc: "인수, 운영, 보안, 비용을 실제 순서대로 정리한 글" },
   { id: "checklists", label: "점검표와 도구", href: "/archive/checklists", desc: "넘겨받은 날 기록표, 매달 점검표, 무료 도구" },
 ];
@@ -171,15 +179,22 @@ export function archiveTree(): { section: ArchiveSection; groups: { title: strin
     { title: "점검표와 기록표", items: jaryo.map((j) => ({ label: j.title, href: `/jaryo/${j.id}` })) },
     { title: "무료 도구", items: [{ label: "도구 전체", href: "/archive/checklists#tools", count: tools.length }] },
   ];
+  const trends = [{ title: "같은 20년, 세 나라의 홈페이지", items: trendDocs.map((d, i) => ({ label: `${i + 1}. ${d.title}`, href: d.href })) }];
+  const data = [{ title: "자료", items: datasets.map((d) => ({ label: d.title, href: `/archive/data#${d.id}` })) }];
+  const by = (id: string) => sections.find((s) => s.id === id)!;
   return [
-    { section: sections[0], groups: terms },
-    { section: sections[1], groups: notes },
-    { section: sections[2], groups: checks },
+    { section: by("terms"), groups: terms },
+    { section: by("trends"), groups: trends },
+    { section: by("data"), groups: data },
+    { section: by("notes"), groups: notes },
+    { section: by("checklists"), groups: checks },
   ];
 }
 
 /** 최근 쌓인 기록. 인사이트는 글 날짜에서 자동으로, 나머지는 더한 날 직접 적는다(지어내지 않기) */
 const manualLog: { date: string; kind: string; title: string; href: string }[] = [
+  { date: "2026-11-21", kind: "트렌드", title: "한국만 IE를 오래 못 떠난 이유, 한국 일본 미국 2009~2025", href: "/archive/trends/korea-ie" },
+  { date: "2026-11-21", kind: "데이터", title: "PC 브라우저 중 IE 비율, 모바일 비율(한국 일본 미국, CSV)", href: "/archive/data" },
   { date: "2026-11-21", kind: "용어", title: "화면 부품, 디자인 용어 와이어프레임 225장", href: "/archive/terms" },
   { date: "2026-11-21", kind: "용어", title: "이어받을 때 볼 것 24묶음(화면 부품 20, 운영과 유지보수 4)", href: "/archive/terms" },
 ];
