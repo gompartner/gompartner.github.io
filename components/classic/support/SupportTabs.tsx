@@ -8,8 +8,8 @@ const items = [
   { href: "/contact", label: "상담 신청" },
 ];
 
-// 아카이브에 딸린 페이지(도구, 인사이트, 용어 사전)에서는 "아카이브" 탭을 켠다
-const underJaryo = ["/tools", "/insight", "/glossary"];
+// 아카이브에 딸린 페이지(도구, 인사이트)에서는 "아카이브" 탭을 켠다
+const underJaryo = ["/tools", "/insight"];
 
 export function SupportTabs({ current }: { current: string }) {
   return <SubTabs items={items} current={underJaryo.some((p) => current.startsWith(p)) ? "/archive" : current} />;

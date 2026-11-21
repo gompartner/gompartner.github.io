@@ -8,7 +8,7 @@ import { termGroups, termLabels } from "@/data/classic/glossary";
 import { termImages } from "@/data/classic/glossaryImages";
 import { pageMeta } from "@/lib/seo";
 
-// 용어 묶음 문서 한 장. 내용은 data/classic/glossary.ts(웹 용어 사전과 같은 원본), 이어받을 때 볼 것은 data/classic/archive.ts
+// 용어 묶음 문서 한 장. 내용은 data/classic/glossary.ts, 이어받을 때 볼 것은 data/classic/archive.ts
 const CHECKED = "2026-11-21";
 
 /** 을/를: 마지막 글자 받침으로 고른다(영문 UI는 "유아이"라 를) */

@@ -34,7 +34,6 @@ const groups = [
       { href: "/story", label: "회사소개" },
       { href: "/notice", label: "공지사항" },
       { href: "/archive", label: "아카이브" },
-      { href: "/glossary", label: "웹 용어 사전" },
       { href: "/faq", label: "자주 묻는 질문" },
       { href: "/contact", label: "상담 신청" },
     ],

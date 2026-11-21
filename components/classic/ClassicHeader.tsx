@@ -44,7 +44,7 @@ export const classicMenu = [
   {
     label: "아카이브",
     href: "/archive",
-    match: ["/archive", "/glossary", "/insight", "/tools", "/jaryo"],
+    match: ["/archive", "/insight", "/tools", "/jaryo"],
     items: [
       { href: "/archive/terms", label: "용어" },
       { href: "/archive/notes", label: "운영 노트" },

@@ -5,6 +5,9 @@ import { counts, shortTitle, takeover, termHref } from "@/data/classic/archive";
 import { termGroups, termSections } from "@/data/classic/glossary";
 import { termImages } from "@/data/classic/glossaryImages";
 import { pageMeta } from "@/lib/seo";
+import { siteUrl } from "@/lib/site";
+import { LdScript } from "@/components/seo/JsonLd";
+import { TermSearch, type TermRow } from "@/components/classic/archive/TermSearch";
 
 export const metadata: Metadata = pageMeta({
   title: "용어 | 아카이브",
@@ -12,17 +15,27 @@ export const metadata: Metadata = pageMeta({
   path: "/archive/terms",
 });
 
+// 11-21 웹 용어 사전(/glossary)을 여기로 합침. 용어 하나하나를 DefinedTermSet으로 알린다(검색, AI 답변 인용용)
+const termSetLd = {
+  "@context": "https://schema.org",
+  "@type": "DefinedTermSet",
+  name: "곰파트너 웹 용어",
+  url: `${siteUrl}/archive/terms`,
+  hasDefinedTerm: termGroups.flatMap((g) => g.terms.map((t) => ({ "@type": "DefinedTerm", name: t.name, alternateName: t.alt, description: t.look, url: `${siteUrl}${termHref(g)}#${t.id}`, inDefinedTermSet: `${siteUrl}/archive/terms` }))),
+};
+
+const rows: TermRow[] = termGroups.flatMap((g) => g.terms.map((t) => ({ id: t.id, name: t.name, alt: t.alt, look: t.look, hay: [t.use, t.say, g.cat, g.sec].join(" "), group: shortTitle(g), href: termHref(g) })));
+
 export default function ArchiveTerms() {
   return (
     <ArchiveShell section="terms" active="/archive/terms" crumbs={[{ href: "/archive", label: "아카이브" }, { href: "/archive/terms", label: "용어" }]} toc={termSections.map((s, i) => ({ id: `sec-${i}`, label: s }))}>
       <DocHead
         title="용어"
-        meta={[["묶음", `${counts.groups}개`], ["용어", `${counts.terms}개`], ["전체 검색", "웹 용어 사전"]]}
+        meta={[["묶음", `${counts.groups}개`], ["용어", `${counts.terms}개`]]}
         lead="이름을 정확히 말하면 업체와 AI에 요청이 한 번에 전달됩니다. 묶음마다 비교 표, 와이어프레임, 요청 문장을 함께 둡니다."
       />
-      <p className="mt-4 text-[14.5px]">
-        <Link href="/glossary" className="font-bold text-[#256ef4] hover:underline underline-offset-4">웹 용어 사전에서 {counts.terms}개 한 번에 검색하기</Link>
-      </p>
+      <LdScript data={termSetLd} />
+      <TermSearch rows={rows} />
       {termSections.map((sec, i) => {
         const gs = termGroups.filter((g) => g.sec === sec);
         return (
