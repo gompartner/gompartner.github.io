@@ -58,6 +58,11 @@ export default function TrendCompanyHomepage() {
       ]}
       extraTitle="한국 기업 홈페이지 연표"
       extra={<Timeline rows={rows} colA="일어난 일" />}
+      now={[
+        "구글에서 \"홈페이지 제작\"을 찾는 정도는 2025년 8.0, 2026년(11월까지) 8.2로 2016년 이후 가장 높습니다. 숫자는 작지만 10년 가까이 이어진 내림세가 멈췄습니다.",
+        "만드는 도구가 있는 한국어 사이트 중 카페24(39.6%)와 아임웹(16.7%)이 합쳐 절반을 넘습니다. 서버를 따로 두지 않는 임대형이라 계정 명의와 결제가 곧 사이트 소유권입니다.",
+        "법은 더 무거워졌습니다. 2023년 9월 15일 전면 개정된 개인정보 보호법이 시행돼 과징금 상한의 기준이 위반 관련 매출액에서 전체 매출액으로 바뀌었고, 온라인과 오프라인의 처리 기준이 하나로 합쳐졌습니다.",
+      ]}
       takeSub="오래된 회사 홈페이지를 넘겨받았다면"
       take={[
         { b: "남아 있는 플래시와 m. 사이트", t: "플래시 영역은 빈칸으로 보이고, 따로 만든 m. 사이트는 PC 쪽과 내용이 어긋나 있는 경우가 많습니다. 두 주소를 모두 열어 보고 하나로 합칠 계획을 세웁니다." },
@@ -75,6 +80,7 @@ export default function TrendCompanyHomepage() {
         { label: "Adobe, Flash Player End of Life", href: "https://www.adobe.com/products/flashplayer/end-of-life.html", note: "2020년 12월 31일 지원 종료" },
         { label: "StatCounter, Desktop vs Mobile vs Tablet(대한민국)", href: "https://gs.statcounter.com/platform-market-share/desktop-mobile-tablet", note: "2025년 모바일 57%" },
         { label: "W3Techs, 한국어 사이트 CMS", href: "https://w3techs.com/technologies/segmentation/cl-ko-/content_management", note: "Cafe24 39.6%, WordPress 24.1%, 아임웹 16.7%" },
+        { label: "보안뉴스, 전면 개정된 개인정보 보호법 9월 15일 시행(2023년 9월 5일)", href: "https://www.boannews.com/news/articleView.html?idxno=121647", note: "과징금 상한 기준을 전체 매출액으로, 온오프라인 기준 일원화" },
       ]}
     />
   );

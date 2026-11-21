@@ -21,6 +21,8 @@ export function TrendArticle(props: {
   story: string[];
   extraTitle?: string;
   extra?: React.ReactNode;
+  /** 연표 뒤 지금 모습(요즘) */
+  now?: string[];
   /** 차트 앞에 두는 개념 설명(처음 보는 말을 먼저 풀 때) */
   introTitle?: string;
   intro?: React.ReactNode;
@@ -36,6 +38,7 @@ export function TrendArticle(props: {
     { id: "chart", label: props.chartTitle },
     { id: "why", label: props.storyTitle },
     ...(props.extra ? [{ id: "wf", label: props.extraTitle ?? "그림" }] : []),
+    ...(props.now ? [{ id: "now", label: "요즘" }] : []),
     { id: "take", label: "인수 시 확인 사항" },
     { id: "src", label: "출처" },
     { id: "rel", label: "관련 문서" },
@@ -61,6 +64,14 @@ export function TrendArticle(props: {
         <>
           <h2 id="wf" className={docH2}>{props.extraTitle}</h2>
           {props.extra}
+        </>
+      ) : null}
+      {props.now ? (
+        <>
+          <h2 id="now" className={docH2}>요즘</h2>
+          {props.now.map((t, i) => (
+            <p key={i} className="mt-4 max-w-[760px] text-[16.5px] leading-[1.8] text-[#2b313b]">{t}</p>
+          ))}
         </>
       ) : null}
       <TakeoverBox sub={props.takeSub} items={props.take} />

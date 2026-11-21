@@ -75,6 +75,11 @@ export default function TrendServerLanguage() {
           </table>
         </div>
       }
+      now={[
+        "2026년 11월 21일 기준 서버 언어를 알 수 있는 사이트 중 PHP는 68.0%, JavaScript는 9.0%, Ruby는 7.3%, Java는 5.5%입니다. PHP는 같은 해 1월 72.4%에서 한 해 안에 4%p 넘게 줄었습니다.",
+        "Next.js도 버전 관리가 곧 보안입니다. 2025년 3월 미들웨어의 로그인 확인을 건너뛸 수 있는 취약점(CVE-2025-29927)이 공개돼, 직접 서버에 올린 Next.js는 12.3.5, 13.5.9, 14.2.25, 15.2.3 이상으로 올려야 했습니다.",
+        "지원 종료일도 계속 다가옵니다. PHP 8.2는 2026년 12월 31일에 보안 지원이 끝나고, Node.js 22는 2027년 4월 30일, Node.js 24는 2028년 4월 30일에 끝납니다.",
+      ]}
       takeSub="넘겨받은 사이트의 언어를 모를 때"
       take={[
         { b: "서버 언어와 버전", t: "응답 헤더(X-Powered-By, Server), 주소 끝(.php, .jsp, .do, .aspx), 호스팅 관리 화면에서 언어와 버전을 확인하고 지원 종료일과 대조합니다." },
@@ -93,6 +98,9 @@ export default function TrendServerLanguage() {
         { label: "Wikipedia, Node.js", href: "https://en.wikipedia.org/wiki/Node.js", note: "2009년 첫 공개, 11월 8일 JSConf EU 발표" },
         { label: "Vercel, Next.js 공개 글", href: "https://vercel.com/blog/next", note: "2016년 10월 25일" },
         { label: "Node.js, 지난 버전과 지원 종료", href: "https://nodejs.org/en/about/previous-releases", note: "LTS 버전별 지원 종료일" },
+        { label: "NVD, CVE-2025-29927", href: "https://nvd.nist.gov/vuln/detail/CVE-2025-29927", note: "2025년 3월 21일 공개, 12.3.5, 13.5.9, 14.2.25, 15.2.3에서 수정" },
+        { label: "Node.js 릴리스 일정", href: "https://github.com/nodejs/Release/blob/main/schedule.json", note: "22는 2027년 4월 30일, 24는 2028년 4월 30일 지원 종료" },
+        { label: "php.net, Supported Versions", href: "https://www.php.net/supported-versions.php", note: "8.2 보안 지원 2026년 12월 31일까지" },
       ]}
     />
   );
