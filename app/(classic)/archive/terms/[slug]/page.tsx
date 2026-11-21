@@ -11,6 +11,14 @@ import { pageMeta } from "@/lib/seo";
 // 용어 묶음 문서 한 장. 내용은 data/classic/glossary.ts(웹 용어 사전과 같은 원본), 이어받을 때 볼 것은 data/classic/archive.ts
 const CHECKED = "2026-11-21";
 
+/** 을/를: 마지막 글자 받침으로 고른다(영문 UI는 "유아이"라 를) */
+function eulReul(w: string) {
+  const c = w.trim().slice(-1);
+  const code = c.charCodeAt(0) - 0xac00;
+  if (code < 0 || code > 11171) return "를";
+  return code % 28 ? "을" : "를";
+}
+
 export function generateStaticParams() {
   return termGroups.map((g) => ({ slug: termSlugs[g.id] }));
 }
@@ -118,7 +126,7 @@ export default async function TermDoc({ params }: { params: Promise<{ slug: stri
         <section id="take" aria-labelledby="take-h" className="mt-14 scroll-mt-24 overflow-hidden rounded-[10px] border-2 border-[#15171c]">
           <div className="flex flex-wrap items-baseline gap-x-3 gap-y-1 bg-[#15171c] px-5 py-3.5 text-white">
             <h2 id="take-h" className="text-[18px] font-[800] tracking-[-0.03em]">이어받을 때 볼 것</h2>
-            <span className="text-[13px] text-[#aebbd6]">남이 만든 사이트의 {shortTitle(g)}를 넘겨받았다면</span>
+            <span className="text-[13px] text-[#aebbd6]">남이 만든 사이트의 {shortTitle(g)}{eulReul(shortTitle(g))} 넘겨받았다면</span>
           </div>
           <ol className="px-5 py-1">
             {take.map((x, k) => (
