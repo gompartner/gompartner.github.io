@@ -64,6 +64,18 @@ export const VARIANTS: Record<string, { id: string; label: string }[]> = {
     { id: "a", label: "시안 A 전통 브랜드" },
     { id: "b", label: "시안 B 증상 상담형" },
   ],
+  "eye-clinic": [
+    { id: "a", label: "시안 A 수술센터형" },
+    { id: "b", label: "시안 B 동네 안과형" },
+  ],
+  "animal-hospital": [
+    { id: "a", label: "시안 A 24시 진료" },
+    { id: "b", label: "시안 B 주치의형" },
+  ],
+  "labor-firm": [
+    { id: "a", label: "시안 A 기업 자문형" },
+    { id: "b", label: "시안 B 근로자 상담형" },
+  ],
   "clinic-homepage": [
     { id: "a", label: "시안 A 미니멀" },
     { id: "b", label: "시안 B 진료 안내형" },

@@ -30,6 +30,12 @@ import { PedA } from "./PedA";
 import { PedB } from "./PedB";
 import { KmA } from "./KmA";
 import { KmB } from "./KmB";
+import { EyeA } from "./EyeA";
+import { EyeB } from "./EyeB";
+import { VetA } from "./VetA";
+import { VetB } from "./VetB";
+import { LaborA } from "./LaborA";
+import { LaborB } from "./LaborB";
 
 // 컨셉 시안 두 장씩(11-21). 맨 위 줄에서 바꿔 본다. 기존 기능형 데모는 코드만 남긴다.
 export function TaxDrafts() {
@@ -211,6 +217,45 @@ export function KmDrafts() {
     <>
       <KmA />
       <QuickMenu accent="#4a3020" cta="진료 예약" tel="02-000-0000" />
+    </>
+  );
+}
+export function EyeDrafts() {
+  return useVariant("eye-clinic") === "b" ? (
+    <>
+      <EyeB />
+      <QuickMenu accent="#1677c9" cta="전화 걸기" tel="02-000-0000" />
+    </>
+  ) : (
+    <>
+      <EyeA />
+      <QuickMenu accent="#0d4a57" cta="검사 예약" tel="051-000-0000" />
+    </>
+  );
+}
+export function VetDrafts() {
+  return useVariant("animal-hospital") === "b" ? (
+    <>
+      <VetB />
+      <QuickMenu accent="#2e8b57" cta="진료 예약" tel="031-000-0000" />
+    </>
+  ) : (
+    <>
+      <VetA />
+      <QuickMenu accent="#ec6b2d" cta="응급 전화" tel="02-000-0000" />
+    </>
+  );
+}
+export function LaborDrafts() {
+  return useVariant("labor-firm") === "b" ? (
+    <>
+      <LaborB />
+      <QuickMenu accent="#1d5c4a" cta="상담 예약" tel="031-000-0000" />
+    </>
+  ) : (
+    <>
+      <LaborA />
+      <QuickMenu accent="#0f2a5c" cta="상담 신청" tel="02-000-0000" />
     </>
   );
 }
