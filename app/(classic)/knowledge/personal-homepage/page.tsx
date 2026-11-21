@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import { Timeline, type TimelineRow } from "@/components/classic/archive/Timeline";
 import { TrendArticle } from "@/components/classic/archive/TrendArticle";
 import { pageMeta } from "@/lib/seo";
 
@@ -11,16 +12,16 @@ export const metadata: Metadata = pageMeta({
 });
 
 // 한국과 일본에서 개인 홈페이지를 만들던 방법이 바뀐 때. 날짜는 출처에서 확인한 것만 적는다
-const rows: { when: string; kr: string; jp: string }[] = [
-  { when: "1997년", kr: "", jp: "지오시티즈 일본 법인 설립. HTML을 몰라도 만드는 무료 공간" },
-  { when: "1999년", kr: "인터넷 인구 400만 명. 포털과 PC통신 회사가 무료 홈페이지 공간을 줌(네띠앙, 채널아이 등). 나모 웹에디터로 화면을 만들고 FTP로 올림. 무료 PHP 게시판 제로보드가 이 무렵부터 퍼짐", jp: "" },
-  { when: "2000년 전후", kr: "Perl CGI 게시판 테크노트, PHP 제로보드가 개인 홈페이지와 동호회의 기본 게시판", jp: "무료 CGI 배포 사이트(KENT WEB)에서 게시판을 받아 담. 손님이 글을 남기고 주인이 답하는 게시판, 기념 방문 번호(키리반)를 밟으면 알리는 문화. 렌털 일기(사루사루 일기)" },
-  { when: "2001년 9월", kr: "싸이월드 미니홈피 등장. 계정, 게시판, 방명록을 직접 달 필요가 없어짐", jp: "" },
-  { when: "2003년", kr: "네이버 블로그 공개", jp: "블로그 본격 확산(하테나 다이어리, livedoor Blog, 코코로그 등)" },
-  { when: "2004년", kr: "미니홈피 회원 1천만 명(9월)", jp: "" },
-  { when: "2007년", kr: "제로보드 XE 오픈 베타(8월 13일). 게시판에서 사이트 제작 도구(XpressEngine)로", jp: "" },
-  { when: "2011년", kr: "XE, 국내 시장 점유율 52%(네이버 발표)", jp: "" },
-  { when: "2019년", kr: "", jp: "지오시티즈 종료(3월 31일). 남은 개인 사이트가 한꺼번에 사라짐" },
+const rows: TimelineRow[] = [
+  { when: "1997년", a: "", b: "지오시티즈 일본 법인 설립. HTML을 몰라도 만드는 무료 공간" },
+  { when: "1999년", a: "인터넷 인구 400만 명. 포털과 PC통신 회사가 무료 홈페이지 공간을 줌(네띠앙, 채널아이 등). 나모 웹에디터로 화면을 만들고 FTP로 올림. 무료 PHP 게시판 제로보드가 이 무렵부터 퍼짐", b: "" },
+  { when: "2000년 전후", a: "Perl CGI 게시판 테크노트, PHP 제로보드가 개인 홈페이지와 동호회의 기본 게시판", b: "무료 CGI 배포 사이트(KENT WEB)에서 게시판을 받아 담. 손님이 글을 남기고 주인이 답하는 게시판, 기념 방문 번호(키리반)를 밟으면 알리는 문화. 렌털 일기(사루사루 일기)" },
+  { when: "2001년 9월", a: "싸이월드 미니홈피 등장. 계정, 게시판, 방명록을 직접 달 필요가 없어짐", b: "" },
+  { when: "2003년", a: "네이버 블로그 공개", b: "블로그 본격 확산(하테나 다이어리, livedoor Blog, 코코로그 등)" },
+  { when: "2004년", a: "미니홈피 회원 1천만 명(9월)", b: "" },
+  { when: "2007년", a: "제로보드 XE 오픈 베타(8월 13일). 게시판에서 사이트 제작 도구(XpressEngine)로", b: "" },
+  { when: "2011년", a: "XE, 국내 시장 점유율 52%(네이버 발표)", b: "" },
+  { when: "2019년", a: "", b: "지오시티즈 종료(3월 31일). 남은 개인 사이트가 한꺼번에 사라짐" },
 ];
 
 export default function TrendPersonalHomepage() {
@@ -34,31 +35,7 @@ export default function TrendPersonalHomepage() {
       meta={[["범위", "한국, 일본"], ["기간", "1997~2019"], ["데이터", "당시 기사, 운영사 발표"]]}
       lead="1990년대 말 개인 홈페이지는 무료 계정 위에 CGI 게시판, 방명록, 방문자 카운터를 달아 만들었습니다. 한국은 제로보드를 거쳐 싸이월드 미니홈피와 네이버 블로그로, 일본은 무료 CGI 게시판을 거쳐 블로그로 옮겨 갔습니다."
       chartTitle="한국과 일본 연표"
-      chart={
-        <div className="mt-4 overflow-hidden rounded-[10px] border border-[#e6e9ee]">
-          <table className="w-full border-collapse text-left text-[14.5px] leading-[1.6]">
-            <thead>
-              <tr className="border-b border-[#d9dee5] bg-[#f5f7fa] text-[13.5px] text-[#5b6370]">
-                <th scope="col" className="w-[92px] px-3 py-2 font-bold md:w-[120px]">때</th>
-                <th scope="col" className="px-3 py-2 font-bold">한국</th>
-                <th scope="col" className="hidden px-3 py-2 font-bold md:table-cell">일본</th>
-              </tr>
-            </thead>
-            <tbody>
-              {rows.map((r) => (
-                <tr key={r.when} className="border-b border-[#eef0f3] align-top last:border-0">
-                  <th scope="row" className="px-3 py-2.5 font-bold">{r.when}</th>
-                  <td className="px-3 py-2.5 text-[#2b313b]">
-                    {r.kr || <span className="text-[#8a93a1] md:hidden">-</span>}
-                    {r.jp ? <span className="mt-1.5 block text-[13.5px] text-[#5b6370] md:hidden"><b className="font-bold text-[#3d4450]">일본</b> {r.jp}</span> : null}
-                  </td>
-                  <td className="hidden px-3 py-2.5 text-[#2b313b] md:table-cell">{r.jp}</td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
-        </div>
-      }
+      chart={<Timeline rows={rows} colA="한국" colB="일본" />}
       storyTitle="직접 달던 게시판이 서비스 안으로 들어갔다"
       story={[
         "1990년대 말에는 포털과 PC통신 회사가 회원에게 수십 MB의 무료 홈페이지 공간을 줬습니다. 나모 웹에디터나 프론트페이지로 화면을 만들고 FTP로 올렸습니다. 게시판, 방명록, 카운터는 CGI라서 계정마다 쓸 수 있는지가 달랐고, 대부분은 계정을 준 회사가 만들어 둔 것을 붙여 썼습니다.",

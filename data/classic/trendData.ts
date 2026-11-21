@@ -160,6 +160,7 @@ export const datasets: Dataset[] = [
     series: searchDemand,
     source: { label: "Google Trends(대한민국, 2004~2026)", href: "https://trends.google.com/trends/explore?date=all&geo=KR&q=%ED%99%88%ED%8E%98%EC%9D%B4%EC%A7%80%20%EC%A0%9C%EC%9E%91" },
     csv: [{ label: "월별 값(제작, 유지보수, 리뉴얼)", href: "/data/trend/google-trends-kr-homepage.csv" }],
+    usedIn: [{ label: "기업 홈페이지: 회사 소개서 화면에서 플래시, 모바일, 빌더까지", href: "/knowledge/company-homepage" }],
   },
   {
     id: "php-versions",
