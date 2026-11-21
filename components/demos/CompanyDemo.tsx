@@ -131,7 +131,7 @@ const MENUS: { id: MenuId; label: L; subs: { id: string; label: L }[] }[] = [
 ];
 
 const COMPANY = l("정밀가공 제조", "Precision Machining");
-const ADDRESS = l("ㅎㄷ시 ㅁㄹ구 ㅅㄴ산단로 00", "00 SN-sandan-ro, MR-gu, HD-si");
+const ADDRESS = l("경기도 화성시 정밀산업단지", "Precision Industrial Complex, Hwaseong, Gyeonggi-do");
 const HOURS = l("평일 08:30 ~ 17:30, 토, 일, 공휴일 휴무", "Weekdays 08:30 to 17:30, closed on weekends and holidays");
 
 /* ---------- 도우미 ---------- */
@@ -184,19 +184,19 @@ interface Machine {
 }
 
 const MACHINES: Machine[] = [
-  { type: "mc", mk: "vmc", name: "VMC-850", maker: l("ㄷㅅ공작기계 (국내)", "DS Machine Tools (Korea)"), spec: l("X850 x Y500 x Z500 mm", "X850 x Y500 x Z500 mm"), spindle: "12,000 rpm", count: 4, year: 2016 },
-  { type: "mc", mk: "large", name: "VMC-1300", maker: l("ㄷㅅ공작기계 (국내)", "DS Machine Tools (Korea)"), spec: l("X1,300 x Y650 x Z600 mm", "X1,300 x Y650 x Z600 mm"), spindle: "8,000 rpm", count: 2, year: 2019 },
-  { type: "mc", mk: "vmc", name: "HSC-500", maker: l("ㅂㄹ (일본)", "BR (Japan)"), spec: l("X500 x Y400 x Z300 mm", "X500 x Y400 x Z300 mm"), spindle: "24,000 rpm", count: 1, year: 2021 },
-  { type: "fiveAx", mk: "fiveAx", name: "5AX-600", maker: l("ㅎㅅ (독일)", "HS (Germany)"), spec: l("X600 x Y500 x Z400 mm, A +-120도, C 360도", "X600 x Y500 x Z400 mm, A +-120 deg, C 360 deg"), spindle: "20,000 rpm", count: 3, year: 2018 },
-  { type: "lathe", mk: "lathe", name: "TL-300", maker: l("ㅁㅇ기공 (국내)", "MY Machinery (Korea)"), spec: l("최대 D300 x 길이 500 mm", "Max. D300 x L500 mm"), spindle: "4,500 rpm", count: 5, year: 2016 },
-  { type: "lathe", mk: "turnMill", name: "TM-200", maker: l("ㅂㄹ (일본)", "BR (Japan)"), spec: l("최대 D200 x 길이 400 mm, Y축, 부 주축", "Max. D200 x L400 mm, Y-axis, sub spindle"), spindle: "6,000 rpm", count: 2, year: 2022 },
+  { type: "mc", mk: "vmc", name: "VMC-850", maker: l("국내 제조사", "Korean maker"), spec: l("X850 x Y500 x Z500 mm", "X850 x Y500 x Z500 mm"), spindle: "12,000 rpm", count: 4, year: 2016 },
+  { type: "mc", mk: "large", name: "VMC-1300", maker: l("국내 제조사", "Korean maker"), spec: l("X1,300 x Y650 x Z600 mm", "X1,300 x Y650 x Z600 mm"), spindle: "8,000 rpm", count: 2, year: 2019 },
+  { type: "mc", mk: "vmc", name: "HSC-500", maker: l("일본 제조사", "Japanese maker"), spec: l("X500 x Y400 x Z300 mm", "X500 x Y400 x Z300 mm"), spindle: "24,000 rpm", count: 1, year: 2021 },
+  { type: "fiveAx", mk: "fiveAx", name: "5AX-600", maker: l("독일 제조사", "German maker"), spec: l("X600 x Y500 x Z400 mm, A +-120도, C 360도", "X600 x Y500 x Z400 mm, A +-120 deg, C 360 deg"), spindle: "20,000 rpm", count: 3, year: 2018 },
+  { type: "lathe", mk: "lathe", name: "TL-300", maker: l("국내 제조사", "Korean maker"), spec: l("최대 D300 x 길이 500 mm", "Max. D300 x L500 mm"), spindle: "4,500 rpm", count: 5, year: 2016 },
+  { type: "lathe", mk: "turnMill", name: "TM-200", maker: l("일본 제조사", "Japanese maker"), spec: l("최대 D200 x 길이 400 mm, Y축, 부 주축", "Max. D200 x L400 mm, Y-axis, sub spindle"), spindle: "6,000 rpm", count: 2, year: 2022 },
 ];
 
 const MEASURES: { name: L; maker: L; range: L; acc: L; count: number; year: number }[] = [
-  { name: l("3차원 측정기 CMM-7106", "CMM 7106"), maker: l("ㄴㄹ (독일)", "NR (Germany)"), range: l("X700 x Y1,000 x Z600 mm", "X700 x Y1,000 x Z600 mm"), acc: l("1.9 + L/300 um", "1.9 + L/300 um"), count: 1, year: 2022 },
-  { name: l("윤곽, 표면 거칠기 측정기", "Contour and roughness tester"), maker: l("ㅈㅇ (일본)", "JY (Japan)"), range: l("측정 길이 100 mm", "Stroke 100 mm"), acc: l("Ra 0.01 um까지", "Down to Ra 0.01 um"), count: 1, year: 2022 },
-  { name: l("비접촉 영상 측정기", "Vision measuring system"), maker: l("ㄷㄹ (국내)", "DR (Korea)"), range: l("X300 x Y200 mm", "X300 x Y200 mm"), acc: l("+-2.5 um", "+-2.5 um"), count: 1, year: 2023 },
-  { name: l("하이트 게이지", "Height gauge"), maker: l("ㅈㅇ (일본)", "JY (Japan)"), range: l("높이 600 mm", "Height 600 mm"), acc: l("+-1.1 um", "+-1.1 um"), count: 2, year: 2017 },
+  { name: l("3차원 측정기 CMM-7106", "CMM 7106"), maker: l("독일 제조사", "German maker"), range: l("X700 x Y1,000 x Z600 mm", "X700 x Y1,000 x Z600 mm"), acc: l("1.9 + L/300 um", "1.9 + L/300 um"), count: 1, year: 2022 },
+  { name: l("윤곽, 표면 거칠기 측정기", "Contour and roughness tester"), maker: l("일본 제조사", "Japanese maker"), range: l("측정 길이 100 mm", "Stroke 100 mm"), acc: l("Ra 0.01 um까지", "Down to Ra 0.01 um"), count: 1, year: 2022 },
+  { name: l("비접촉 영상 측정기", "Vision measuring system"), maker: l("국내 제조사", "Korean maker"), range: l("X300 x Y200 mm", "X300 x Y200 mm"), acc: l("+-2.5 um", "+-2.5 um"), count: 1, year: 2023 },
+  { name: l("하이트 게이지", "Height gauge"), maker: l("일본 제조사", "Japanese maker"), range: l("높이 600 mm", "Height 600 mm"), acc: l("+-1.1 um", "+-1.1 um"), count: 2, year: 2017 },
 ];
 
 const MACHINE_TOTAL = MACHINES.reduce((n, m) => n + m.count, 0);
@@ -226,18 +226,18 @@ const HISTORY: { year: number; items: L[] }[] = [
   { year: 2021, items: [l("뿌리기업 확인 (정밀가공 분야)", "Confirmed as a root industry company (precision machining)")] },
   { year: 2020, items: [l("기업부설연구소 설립", "Opened the in-house R&D center")] },
   { year: 2018, items: [l("5축 가공기 도입, 반도체 장비 부품 납품 시작", "Added 5-axis machines, began supplying semiconductor equipment parts")] },
-  { year: 2016, items: [l("ㅅㄴ산업단지 지금 공장으로 이전", "Moved to the current plant in SN Industrial Complex")] },
+  { year: 2016, items: [l("정밀산업단지 지금 공장으로 이전", "Moved to the current plant in the industrial complex")] },
   { year: 2014, items: [l("ISO 9001 인증", "ISO 9001 certified")] },
   { year: 2012, items: [l("법인 전환", "Incorporated")] },
-  { year: 2009, items: [l("ㅎㄷ시에서 머시닝센터 2대로 창업", "Founded in HD with two machining centers")] },
+  { year: 2009, items: [l("화성시에서 머시닝센터 2대로 창업", "Founded in Hwaseong with two machining centers")] },
 ];
 
 const CERTS: { name: L; scope: L; org: L; year: number }[] = [
-  { name: l("ISO 9001", "ISO 9001"), scope: l("품질경영시스템", "Quality management system"), org: l("ㄱㅎ인증원", "GH Certification"), year: 2014 },
-  { name: l("ISO 14001", "ISO 14001"), scope: l("환경경영시스템", "Environmental management system"), org: l("ㄱㅎ인증원", "GH Certification"), year: 2023 },
-  { name: l("ISO 13485", "ISO 13485"), scope: l("의료기기 품질경영시스템", "Medical device quality management"), org: l("ㄱㅎ인증원", "GH Certification"), year: 2024 },
-  { name: l("기업부설연구소", "In-house R&D center"), scope: l("연구개발전담 조직 인정", "Recognized R&D organization"), org: l("ㅅㄹ협회", "SR Association"), year: 2020 },
-  { name: l("뿌리기업", "Root industry company"), scope: l("정밀가공 분야 확인", "Precision machining"), org: l("ㅈㅅ진흥원", "JS Agency"), year: 2021 },
+  { name: l("ISO 9001", "ISO 9001"), scope: l("품질경영시스템", "Quality management system"), org: l("국제 인증기관", "Accredited certification body"), year: 2014 },
+  { name: l("ISO 14001", "ISO 14001"), scope: l("환경경영시스템", "Environmental management system"), org: l("국제 인증기관", "Accredited certification body"), year: 2023 },
+  { name: l("ISO 13485", "ISO 13485"), scope: l("의료기기 품질경영시스템", "Medical device quality management"), org: l("국제 인증기관", "Accredited certification body"), year: 2024 },
+  { name: l("기업부설연구소", "In-house R&D center"), scope: l("연구개발전담 조직 인정", "Recognized R&D organization"), org: l("한국산업기술진흥협회", "KOITA"), year: 2020 },
+  { name: l("뿌리기업", "Root industry company"), scope: l("정밀가공 분야 확인", "Precision machining"), org: l("한국생산기술연구원", "KITECH"), year: 2021 },
 ];
 
 // 공지 작성일은 오늘 기준 며칠 전(ago)으로 두고, 본문의 날짜도 오늘에서 계산한다.
@@ -1056,7 +1056,7 @@ function HomeInfo() {
             <dl className="mt-2 grid gap-1 text-[15px]">
               <div className="grid grid-cols-[96px_1fr] gap-2">
                 <dt style={{ color: C.muted }}>{x("내비게이션", "Navigation")}</dt>
-                <dd>{x("정밀가공 제조 ㅎㄷ공장", "Precision Machining HD Plant")}</dd>
+                <dd>{x("정밀가공 제조 화성공장", "Precision Machining Hwaseong Plant")}</dd>
               </div>
               <div className="grid grid-cols-[96px_1fr] gap-2">
                 <dt style={{ color: C.muted }}>{x("주차", "Parking")}</dt>
@@ -1347,7 +1347,7 @@ function Location() {
         {(
           [
             [x("주소", "Address"), s(ADDRESS)],
-            [x("내비게이션", "Navigation"), x("정밀가공 제조 ㅎㄷ공장", "Precision Machining HD Plant")],
+            [x("내비게이션", "Navigation"), x("정밀가공 제조 화성공장", "Precision Machining Hwaseong Plant")],
             [x("전화", "Tel"), TEL],
             [x("팩스", "Fax"), FAX],
             [x("업무시간", "Office hours"), s(HOURS)],

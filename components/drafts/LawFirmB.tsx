@@ -130,9 +130,9 @@ export function LawFirmB() {
           <h2 className="text-[30px] font-bold tracking-[-0.04em] md:text-[44px]">변호사 소개</h2>
           <div className="mt-12 grid gap-4 md:grid-cols-3">
             {[
-              { n: "ㅎㄱㅈ 대표변호사", f: "민사, 부동산", c: "법원 조정위원, 15년간 임대차, 공사대금 사건" },
-              { n: "ㅇㅅㅁ 변호사", f: "형사, 노동", c: "검찰 수사관 출신, 수사 단계 대응" },
-              { n: "ㅂㅈㅇ 변호사", f: "이혼, 상속", c: "가정법원 가사조사관 출신" },
+              { n: "대표변호사", f: "민사, 부동산", c: "법원 조정위원, 15년간 임대차, 공사대금 사건" },
+              { n: "형사 전담 변호사", f: "형사, 노동", c: "검찰 수사관 출신, 수사 단계 대응" },
+              { n: "가사 전담 변호사", f: "이혼, 상속", c: "가정법원 가사조사관 출신" },
             ].map((a) => (
               <article key={a.n} className="rounded-[20px] border p-7 md:p-8" style={{ borderColor: C.line }}>
                 <p className="inline-flex rounded-full px-3 py-1 text-[13px] font-bold" style={{ background: C.soft, color: C.sub }}>{a.f}</p>
@@ -182,8 +182,8 @@ export function LawFirmB() {
 
       <footer className="border-t px-5 py-10 text-[14px] md:px-8" style={{ borderColor: C.line, color: C.sub }}>
         <div className="mx-auto flex max-w-[1240px] flex-col gap-2 md:flex-row md:justify-between">
-          <p>법률사무소, 서울특별시 서초구 법원로 00, 대표변호사 ㅎㄱㅈ</p>
-          <p>광고책임변호사 ㅎㄱㅈ</p>
+          <p>법률사무소, 서울특별시 서초구 서초동 법조타운</p>
+          <p>상담 문의 02-000-0000</p>
         </div>
       </footer>
     </div>

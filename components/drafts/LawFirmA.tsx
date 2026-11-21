@@ -130,13 +130,13 @@ export function LawFirmA() {
           <h2 className="mt-4 text-[30px] font-bold tracking-[-0.03em] md:text-[46px]">변호사</h2>
           <div className="mt-14 grid gap-5 md:grid-cols-3">
             {[
-              { r: "대표변호사", n: "ㅎㄱㅈ", c: ["사법연수원 수료", "서울중앙지방법원 조정위원", "민사, 부동산 사건 15년"] },
-              { r: "변호사", n: "ㅇㅅㅁ", c: ["변호사시험 합격", "검찰 수사관 출신", "형사, 노동 사건"] },
-              { r: "변호사", n: "ㅂㅈㅇ", c: ["변호사시험 합격", "가정법원 가사조사관 출신", "이혼, 상속 사건"] },
+              { r: "REPRESENTATIVE", n: "대표변호사", c: ["사법연수원 수료", "서울중앙지방법원 조정위원", "민사, 부동산 사건 15년"] },
+              { r: "CRIMINAL, LABOR", n: "형사, 노동 담당", c: ["변호사시험 합격", "검찰 수사관 출신", "형사, 노동 사건"] },
+              { r: "FAMILY", n: "이혼, 상속 담당", c: ["변호사시험 합격", "가정법원 가사조사관 출신", "이혼, 상속 사건"] },
             ].map((a) => (
               <article key={a.n} className="border p-8 md:p-10" style={{ borderColor: C.line, background: C.panel }}>
-                <p className="text-[14px] font-bold" style={{ color: C.gold }}>{a.r}</p>
-                <h3 className="mt-2 text-[28px] font-bold tracking-[0.04em]">{a.n}</h3>
+                <p className="text-[12px] font-bold tracking-[0.2em]" style={{ color: C.gold }}>{a.r}</p>
+                <h3 className="mt-2 text-[26px] font-bold tracking-[-0.02em]">{a.n}</h3>
                 <ul className="mt-6 grid gap-2 border-t pt-6 text-[15px]" style={{ borderColor: C.line, color: C.sub }}>
                   {a.c.map((x) => (
                     <li key={x}>{x}</li>
@@ -187,8 +187,8 @@ export function LawFirmA() {
 
       <footer className="border-t px-5 py-10 text-[14px] md:px-8" style={{ borderColor: C.line, color: C.sub }}>
         <div className="mx-auto flex max-w-[1240px] flex-col gap-2 md:flex-row md:justify-between">
-          <p>법률사무소, 서울특별시 서초구 법원로 00, 대표변호사 ㅎㄱㅈ</p>
-          <p>광고책임변호사 ㅎㄱㅈ</p>
+          <p>법률사무소, 서울특별시 서초구 서초동 법조타운</p>
+          <p>상담 문의 02-000-0000</p>
         </div>
       </footer>
     </div>
