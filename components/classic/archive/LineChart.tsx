@@ -42,7 +42,7 @@ export function LineChart({ title, sub, series, labelYear, unit = "%", max = 100
   }
 
   return (
-    <figure className="relative mt-4 rounded-[10px] border border-[#e6e9ee] px-4 pb-3 pt-4 md:px-5">
+    <figure className="relative mt-4 rounded-[10px] border border-[#e6e9ee] px-4 pb-8 pt-4 md:px-5">
       <figcaption>
         <span className="block text-[16px] font-[800] tracking-[-0.02em]">{title}</span>
         {sub ? <span className="block text-[13px] text-[#5b6370]">{sub}</span> : null}
@@ -95,7 +95,6 @@ export function LineChart({ title, sub, series, labelYear, unit = "%", max = 100
               })()
             : null}
           {hover ? <line x1={x(hover.year)} x2={x(hover.year)} y1={T} y2={H - B} stroke="#5b6370" strokeDasharray="3 3" /> : null}
-          <text x={W - 4} y={T + 2} fontSize="11" fill="#8a93a1" textAnchor="end" dominantBaseline="hanging">곰파트너 gompartner.co.kr</text>
           <rect x={L} y={T} width={W - L - R} height={H - T - B} fill="transparent" onMouseMove={onMove} onMouseLeave={() => setHover(null)} />
         </svg>
         {hover ? (
@@ -141,6 +140,8 @@ export function LineChart({ title, sub, series, labelYear, unit = "%", max = 100
           </table>
         </div>
       </details>
+      {/* 출처 표시: 그림과 같은 오른쪽 아래 */}
+      <p aria-hidden className="pointer-events-none absolute bottom-2.5 right-4 text-[11px] text-[#8a93a1] md:right-5">곰파트너 gompartner.co.kr</p>
     </figure>
   );
 }

@@ -6,7 +6,6 @@ export function BarGroups({ title, sub, groups, source }: { title: string; sub?:
         <span className="block text-[16px] font-[800] tracking-[-0.02em]">{title}</span>
         {sub ? <span className="block text-[13px] text-[#5b6370]">{sub}</span> : null}
       </figcaption>
-      <p aria-hidden className="mt-1 text-right text-[11px] text-[#8a93a1]">곰파트너 gompartner.co.kr</p>
       <div className="mt-4 grid gap-6 md:grid-cols-3">
         {groups.map((g) => (
           <div key={g.lang}>
@@ -32,6 +31,7 @@ export function BarGroups({ title, sub, groups, source }: { title: string; sub?:
         <a href={source.href} target="_blank" rel="noopener noreferrer" className="underline underline-offset-2 hover:text-[#15171c]">{source.label}</a>
         {source.note ? `. ${source.note}` : ""}
       </p>
+      <p aria-hidden className="mt-2 text-right text-[11px] text-[#8a93a1]">곰파트너 gompartner.co.kr</p>
     </figure>
   );
 }
