@@ -38,7 +38,7 @@ export function LawFirmB() {
         <div className="mx-auto flex h-[72px] max-w-[1240px] items-center justify-between px-5 md:px-8">
           <p className="text-[20px] font-bold tracking-[-0.03em]">법률사무소</p>
           <nav aria-label="주 메뉴" className="hidden gap-9 text-[15px] font-semibold lg:flex" style={{ color: "#333a45" }}>
-            {["사무소 소개", "상담 분야", "변호사", "상담 절차", "자주 묻는 질문"].map((m) => (
+            {["사무소 소개", "상담 분야", "상담 절차", "자주 묻는 질문", "오시는 길"].map((m) => (
               <span key={m}>{m}</span>
             ))}
           </nav>
@@ -121,25 +121,6 @@ export function LawFirmB() {
                 </li>
               ))}
             </ol>
-          </div>
-        </div>
-      </section>
-
-      <section className="px-5 md:px-8">
-        <div className="mx-auto max-w-[1240px] border-t pt-20 md:pt-28" style={{ borderColor: C.line }}>
-          <h2 className="text-[30px] font-bold tracking-[-0.04em] md:text-[44px]">변호사 소개</h2>
-          <div className="mt-12 grid gap-4 md:grid-cols-3">
-            {[
-              { n: "대표변호사", f: "민사, 부동산", c: "법원 조정위원, 15년간 임대차, 공사대금 사건" },
-              { n: "형사 전담 변호사", f: "형사, 노동", c: "검찰 수사관 출신, 수사 단계 대응" },
-              { n: "가사 전담 변호사", f: "이혼, 상속", c: "가정법원 가사조사관 출신" },
-            ].map((a) => (
-              <article key={a.n} className="rounded-[20px] border p-7 md:p-8" style={{ borderColor: C.line }}>
-                <p className="inline-flex rounded-full px-3 py-1 text-[13px] font-bold" style={{ background: C.soft, color: C.sub }}>{a.f}</p>
-                <h3 className="mt-5 text-[22px] font-bold tracking-[-0.02em]">{a.n}</h3>
-                <p className="mt-2 text-[15px]" style={{ color: C.sub }}>{a.c}</p>
-              </article>
-            ))}
           </div>
         </div>
       </section>

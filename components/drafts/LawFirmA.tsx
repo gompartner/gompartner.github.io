@@ -35,7 +35,7 @@ export function LawFirmA() {
             <span className="text-[11px] font-bold tracking-[0.2em]" style={{ color: C.gold }}>LAW OFFICE</span>
           </p>
           <nav aria-label="주 메뉴" className="hidden gap-10 text-[15px] font-semibold lg:flex">
-            {["사무소 소개", "업무분야", "변호사", "업무 사례", "오시는 길"].map((m) => (
+            {["사무소 소개", "업무분야", "업무 사례", "상담 안내", "오시는 길"].map((m) => (
               <span key={m} style={{ color: "#d5dae2" }}>{m}</span>
             ))}
           </nav>
@@ -120,30 +120,6 @@ export function LawFirmA() {
                 ))}
               </ul>
             </div>
-          </div>
-        </div>
-      </section>
-
-      <section className="px-5 py-24 md:px-8 md:py-36">
-        <div className="mx-auto max-w-[1240px]">
-          <p className="text-[13px] font-bold tracking-[0.24em]" style={{ color: C.gold }}>ATTORNEYS</p>
-          <h2 className="mt-4 text-[30px] font-bold tracking-[-0.03em] md:text-[46px]">변호사</h2>
-          <div className="mt-14 grid gap-5 md:grid-cols-3">
-            {[
-              { r: "REPRESENTATIVE", n: "대표변호사", c: ["사법연수원 수료", "서울중앙지방법원 조정위원", "민사, 부동산 사건 15년"] },
-              { r: "CRIMINAL, LABOR", n: "형사, 노동 담당", c: ["변호사시험 합격", "검찰 수사관 출신", "형사, 노동 사건"] },
-              { r: "FAMILY", n: "이혼, 상속 담당", c: ["변호사시험 합격", "가정법원 가사조사관 출신", "이혼, 상속 사건"] },
-            ].map((a) => (
-              <article key={a.n} className="border p-8 md:p-10" style={{ borderColor: C.line, background: C.panel }}>
-                <p className="text-[12px] font-bold tracking-[0.2em]" style={{ color: C.gold }}>{a.r}</p>
-                <h3 className="mt-2 text-[26px] font-bold tracking-[-0.02em]">{a.n}</h3>
-                <ul className="mt-6 grid gap-2 border-t pt-6 text-[15px]" style={{ borderColor: C.line, color: C.sub }}>
-                  {a.c.map((x) => (
-                    <li key={x}>{x}</li>
-                  ))}
-                </ul>
-              </article>
-            ))}
           </div>
         </div>
       </section>
