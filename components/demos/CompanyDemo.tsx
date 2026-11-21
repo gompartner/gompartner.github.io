@@ -7,6 +7,7 @@ import { ArrowRight, Check, ChevronDown, ChevronRight, CircleAlert, FileUp, Hous
 import { useReducedMotionSafe } from "@/hooks/useReducedMotionSafe";
 import { daysAgo, fmtDash, fmtKo, useDemoToday } from "@/hooks/useDemoToday";
 import { DemoMakerInfo } from "@/components/demos/DemoMakerInfo";
+import { useVariant } from "@/lib/useVariant";
 
 /* 기업 홈페이지 데모: 가상의 (주)곰파트너정밀, CNC 정밀 가공 제조업체.
    회사명, 대표자, 주소, 전화번호, 사업자 정보, 설비 모델명, 제조사, 거래처, 인증 기관은 모두 가상이다.
@@ -326,6 +327,8 @@ export function CompanyDemo() {
   const [lang, setLang] = useState<Lang>("ko");
   const [route, setRoute] = useState<Route>({ m: "home", s: "" });
   const moved = useRef(false);
+  // 시안 A 브랜드형(큰 사진, 한 문장), 시안 B 정보형(연락처 줄, 사양 숫자, 바로가기)
+  const brand = useVariant("company") === "brand";
 
   const go = (m: MenuId | "home", s?: string) => {
     const sub = m === "home" ? "" : (s ?? MENUS.find((n) => n.id === m)!.subs[0].id);
@@ -358,8 +361,9 @@ export function CompanyDemo() {
   return (
     <CoCtx.Provider value={ctx}>
       <div lang={lang} className="min-h-screen text-[16px] leading-[1.7] md:text-[17px]" style={{ background: C.white, color: C.ink }}>
-        <Header onLang={setLang} />
-        <main key={key} className="soft-in">{route.m === "home" ? <Home /> : <SubPage m={route.m} s={route.s} />}</main>
+        {!brand && <TopBar onLang={setLang} />}
+        <Header onLang={setLang} brand={brand} />
+        <main key={key} className="soft-in">{route.m === "home" ? brand ? <Home /> : <HomeInfo /> : <SubPage m={route.m} s={route.s} />}</main>
         <Footer />
       </div>
     </CoCtx.Provider>
@@ -379,7 +383,56 @@ function Logo() {
   );
 }
 
-function Header({ onLang }: { onLang: (v: Lang) => void }) {
+function TopBar({ onLang }: { onLang: (v: Lang) => void }) {
+  const { lang, x } = useCo();
+  return (
+    <div className="px-4 md:px-6" style={{ background: C.steel, color: "#c9ced6" }}>
+      <div className="mx-auto flex h-10 max-w-[1200px] items-center justify-between gap-3 text-[13px]">
+        <p className="min-w-0 truncate tabular-nums">
+          <span className="sm:hidden">
+            {x("전화", "Tel")} {TEL}
+          </span>
+          <span className="hidden sm:inline">
+            {x("대표전화", "Tel")} {TEL}
+            <span className="mx-2 opacity-40" aria-hidden>
+              |
+            </span>
+            {x("팩스", "Fax")} {FAX}
+          </span>
+        </p>
+        <div id="co-lang" role="group" aria-label={x("언어 선택", "Language")} className="flex shrink-0 items-center">
+          {(
+            [
+              ["ko", "KOR"],
+              ["en", "ENG"],
+            ] as const
+          ).map(([v, label], i) => (
+            <span key={v} className="flex items-center">
+              {i > 0 && (
+                <span className="opacity-40" aria-hidden>
+                  |
+                </span>
+              )}
+              <button
+                type="button"
+                lang={v}
+                aria-pressed={lang === v}
+                aria-label={v === "ko" ? "한국어" : "English"}
+                onClick={() => onLang(v)}
+                className="inline-flex h-10 items-center px-2.5 font-bold tracking-[0.04em]"
+                style={{ color: lang === v ? C.orange : "#c9ced6" }}
+              >
+                {label}
+              </button>
+            </span>
+          ))}
+        </div>
+      </div>
+    </div>
+  );
+}
+
+function Header({ onLang, brand }: { onLang: (v: Lang) => void; brand: boolean }) {
   const { x, s, go, route, lang } = useCo();
   const [mega, setMega] = useState(false);
   const [open, setOpen] = useState(false);
@@ -392,7 +445,7 @@ function Header({ onLang }: { onLang: (v: Lang) => void }) {
     return () => window.removeEventListener("scroll", f);
   }, []);
   // 첫 화면 맨 위에서는 큰 사진 위에 투명하게 얹고, 내리거나 메뉴를 열면 흰 바탕
-  const over = route.m === "home" && !scrolled && !mega && !open;
+  const over = brand && route.m === "home" && !scrolled && !mega && !open;
 
   useEffect(() => {
     if (!mega && !open) return;
@@ -483,7 +536,7 @@ function Header({ onLang }: { onLang: (v: Lang) => void }) {
         </nav>
 
         <div className="flex shrink-0 items-center gap-2">
-          <div id="co-lang" role="group" aria-label={x("언어 선택", "Language")} className="hidden items-center text-[13px] sm:flex">
+          <div id="co-lang" role="group" aria-label={x("언어 선택", "Language")} className={`${brand ? "sm:flex" : ""} hidden items-center text-[13px]`}>
             {(
               [
                 ["ko", "KOR"],
@@ -794,6 +847,229 @@ function Home() {
             <button type="button" onClick={() => go("about", "location")} className="mt-5 inline-flex h-11 items-center gap-1.5 border-b-2 font-bold" style={{ borderColor: C.ink }}>
               {x("오시는 길 자세히 보기", "Directions")}
               <ArrowRight size={17} aria-hidden />
+            </button>
+          </div>
+        </div>
+      </section>
+    </>
+  );
+}
+
+function HomeInfo() {
+  const { x, s, go } = useCo();
+  const notices = makeNotices(useDemoToday());
+
+  const specs = [
+    { k: x("최소 공차", "Tightest tolerance"), v: "+-0.01", u: "mm" },
+    { k: x("최대 가공 크기", "Max. part size"), v: "1,300x650x600", u: "mm" },
+    { k: x("선반 최대 지름", "Max. turning dia."), v: "300", u: "mm" },
+  ];
+
+  const links = [
+    { t: x("기계설비", "Machining Equipment"), to: () => go("equipment", "machines") },
+    { t: x("측정설비", "Measuring Equipment"), to: () => go("equipment", "measuring") },
+    { t: x("가공 사양", "Machining Specs"), to: () => go("equipment", "spec") },
+    { t: x("인증현황", "Certifications"), to: () => go("about", "certs") },
+    { t: x("오시는 길", "Location"), to: () => go("about", "location") },
+  ];
+
+  const featured = (["semi", "medical", "battery", "robot"] as const).map((c) => PRODUCTS.find((p) => p.cat === c)!);
+
+  return (
+    <>
+      <section aria-labelledby="co-page-title" className="relative overflow-hidden" style={{ background: C.steel, color: C.white }}>
+        <Image src={`${IMG}/hero.jpg`} alt="정밀가공 공장 내부" fill priority sizes="100vw" className="object-cover" />
+        <div className="absolute inset-0" style={{ background: "linear-gradient(90deg, rgba(20,24,29,0.9) 0%, rgba(20,24,29,0.72) 55%, rgba(20,24,29,0.45) 100%)" }} aria-hidden />
+        <div className="relative mx-auto max-w-[1200px] px-4 pb-14 pt-14 md:px-6 md:pb-20 md:pt-24">
+          <h1 id="co-page-title" tabIndex={-1} className="text-[34px] font-bold leading-[1.25] tracking-[-0.03em] outline-none md:text-[52px]">
+            {x("반도체, 의료기기 정밀부품 가공", "Precision parts for semiconductor and medical equipment")}
+          </h1>
+          <p className="mt-3 text-[18px] font-bold md:text-[22px]" style={{ color: C.orange }}>
+            {x("CNC 선반, MCT, 5축 정밀부품 가공", "CNC turning, MCT and 5-axis precision parts")}
+          </p>
+          <p className="mt-4 max-w-[560px] text-[16px] md:text-[18px]" style={{ color: "#d4d8de" }}>
+            {x("반도체 장비, 의료기기, 2차전지 설비 부품 정밀가공. 시제품 1개부터 양산까지 가능합니다.", "Parts for semiconductor equipment, medical devices and battery lines. Single prototypes welcome.")}
+          </p>
+          <div className="mt-8 flex flex-wrap gap-3">
+            <button type="button" onClick={() => go("equipment", "machines")} className="inline-flex h-12 items-center rounded-[4px] px-6 font-bold" style={{ background: C.orange, color: C.steel }}>
+              {x("설비현황 보기", "View Facilities")}
+            </button>
+            <button type="button" onClick={() => go("support", "quote")} className="inline-flex h-12 items-center rounded-[4px] border px-6 font-bold" style={{ borderColor: "rgba(255,255,255,0.5)", color: C.white }}>
+              {x("견적문의", "Request a Quote")}
+            </button>
+          </div>
+          <dl className="mt-12 flex max-w-[880px] flex-wrap gap-x-8 gap-y-3 border-t pt-4" style={{ borderColor: "rgba(255,255,255,0.18)" }}>
+            {specs.map((sp) => (
+              <div key={sp.k}>
+                <dt className="text-[13px]" style={{ color: "#a9b0b9" }}>
+                  {sp.k}
+                </dt>
+                <dd className="flex flex-wrap items-baseline gap-x-1">
+                  <span className="text-[18px] font-bold tabular-nums sm:text-[22px]">{sp.v}</span>
+                  <span className="text-[13px]" style={{ color: "#a9b0b9" }}>
+                    {sp.u}
+                  </span>
+                </dd>
+              </div>
+            ))}
+          </dl>
+        </div>
+      </section>
+
+      <section id="co-quick" aria-label={x("바로가기", "Quick links")} className="px-4 pt-10 md:px-6 md:pt-14">
+        <div className="mx-auto max-w-[1200px]">
+          <div className="grid gap-3 md:grid-cols-[1fr_1fr_0.9fr]">
+            <button type="button" onClick={() => go("business", "lathe")} className="group relative block h-[150px] overflow-hidden rounded-[4px] text-left md:h-[190px]" style={{ background: C.steel }}>
+              <Image src={`${IMG}/parts.jpg`} alt="선반으로 가공한 금속 부품" fill sizes="(min-width: 768px) 36vw, 100vw" className="object-cover opacity-70 transition-opacity group-hover:opacity-55" />
+              <span className="absolute inset-x-0 bottom-0 p-4 md:p-5" style={{ color: C.white, background: "linear-gradient(0deg, rgba(20,24,29,0.85), rgba(20,24,29,0))" }}>
+                <span className="block text-[13px]" style={{ color: "#d4d8de" }}>{x("사업분야", "Business")}</span>
+                <span className="block text-[20px] font-bold md:text-[23px]">{x("CNC 선반 가공", "CNC Turning")}</span>
+                <span className="block text-[14px]" style={{ color: "#d4d8de" }}>{x("최대 D300, 복합 선반 Y축 가공", "Up to D300, turn-mill with Y-axis")}</span>
+              </span>
+            </button>
+            <button type="button" onClick={() => go("business", "fiveAx")} className="group relative block h-[150px] overflow-hidden rounded-[4px] text-left md:h-[190px]" style={{ background: C.steel }}>
+              <Image src={`${IMG}/worker.jpg`} alt="5축 가공기를 다루는 작업자" fill sizes="(min-width: 768px) 36vw, 100vw" className="object-cover object-[70%_50%] opacity-70 transition-opacity group-hover:opacity-55" />
+              <span className="absolute inset-x-0 bottom-0 p-4 md:p-5" style={{ color: C.white, background: "linear-gradient(0deg, rgba(20,24,29,0.85), rgba(20,24,29,0))" }}>
+                <span className="block text-[13px]" style={{ color: "#d4d8de" }}>{x("사업분야", "Business")}</span>
+                <span className="block text-[20px] font-bold md:text-[23px]">{x("MCT, 5축 가공", "MCT and 5-Axis")}</span>
+                <span className="block text-[14px]" style={{ color: "#d4d8de" }}>{x("X1,300 대형 가공, 동시 5축", "Large parts to X1,300, simultaneous 5-axis")}</span>
+              </span>
+            </button>
+            <button type="button" onClick={() => go("support", "quote")} className="flex h-[150px] flex-col justify-between rounded-[4px] p-4 text-left transition-[filter] hover:brightness-95 md:h-[190px] md:p-5" style={{ background: C.orange, color: C.steel }}>
+              <span>
+                <span className="block text-[20px] font-bold md:text-[23px]">{x("견적문의", "Request a Quote")}</span>
+                <span className="mt-1 block text-[14px] leading-[1.5]">{x("도면 파일 첨부 접수", "Drawing files accepted")}</span>
+              </span>
+              <span className="text-[22px] font-bold tabular-nums">{TEL}</span>
+            </button>
+          </div>
+          <ul className="mt-4 flex flex-wrap items-center border-b pb-4 text-[15px]" style={{ borderColor: C.line }}>
+            {links.map((q, i) => (
+              <li key={q.t} className="flex items-center">
+                {i > 0 && <span className="mx-3 h-3 w-px" style={{ background: C.line }} aria-hidden />}
+                <button type="button" onClick={q.to} className="inline-flex h-10 items-center font-bold hover:underline" style={{ color: C.ink }}>
+                  {q.t}
+                </button>
+              </li>
+            ))}
+          </ul>
+        </div>
+      </section>
+
+      <section aria-labelledby="co-home-products" className="px-4 py-14 md:px-6 md:py-20">
+        <div className="mx-auto max-w-[1200px]">
+          <div className="flex items-end justify-between gap-3 border-b-2 pb-3" style={{ borderColor: C.steel }}>
+            <h2 id="co-home-products" className="text-[24px] font-bold tracking-[-0.03em] md:text-[30px]">
+              {x("주요 생산제품", "Main Products")}
+            </h2>
+            <button type="button" onClick={() => go("products", "all")} className="inline-flex h-10 shrink-0 items-center gap-1 text-[15px] font-bold" style={{ color: C.muted }}>
+              {x("전체보기", "View all")}
+              <ChevronRight size={17} aria-hidden />
+            </button>
+          </div>
+          <div className="mt-6 grid gap-6 lg:grid-cols-[1fr_2fr]">
+            <div className="relative aspect-[16/10] overflow-hidden rounded-[4px] lg:aspect-auto">
+              <Image src={`${IMG}/parts.jpg`} alt={x("가공을 마친 알루미늄과 스테인리스 정밀 부품", "Finished aluminum and stainless steel precision parts")} fill sizes="(min-width: 1024px) 33vw, 100vw" className="object-cover" />
+            </div>
+            <ul className="grid gap-3 sm:grid-cols-2">
+              {featured.map((p) => (
+                <li key={p.name.ko}>
+                  <ProductCard p={p} />
+                </li>
+              ))}
+            </ul>
+          </div>
+        </div>
+      </section>
+
+      <section aria-labelledby="co-home-certs" className="px-4 md:px-6" style={{ background: C.gray }}>
+        <div className="mx-auto flex max-w-[1200px] flex-col gap-3 py-6 md:flex-row md:items-center md:gap-8">
+          <h2 id="co-home-certs" className="shrink-0 text-[18px] font-bold">
+            {x("인증현황", "Certifications")}
+          </h2>
+          <ul className="flex flex-1 flex-wrap gap-x-5 gap-y-1.5 text-[15px]">
+            {CERTS.map((c) => (
+              <li key={c.name.ko} className="inline-flex items-center gap-1.5">
+                <Check size={16} style={{ color: C.orangeText }} aria-hidden />
+                {s(c.name)}
+              </li>
+            ))}
+          </ul>
+          <button type="button" onClick={() => go("about", "certs")} className="inline-flex h-10 shrink-0 items-center gap-1 self-start text-[15px] font-bold md:self-auto" style={{ color: C.muted }}>
+            {x("자세히 보기", "Details")}
+            <ChevronRight size={17} aria-hidden />
+          </button>
+        </div>
+      </section>
+
+      <section aria-label={x("공지사항, 고객센터, 오시는 길", "Notice, customer center, location")} className="px-4 py-14 md:px-6 md:py-20">
+        <div className="mx-auto grid max-w-[1200px] gap-10 md:grid-cols-3 md:gap-8">
+          <div>
+            <div className="flex items-center justify-between border-b-2 pb-2" style={{ borderColor: C.steel }}>
+              <h2 className="text-[20px] font-bold">{x("공지사항", "Notice")}</h2>
+              <button type="button" onClick={() => go("support", "notice")} className="inline-flex h-9 items-center gap-0.5 text-[14px] font-bold" style={{ color: C.muted }}>
+                {x("더 보기", "More")}
+                <ChevronRight size={16} aria-hidden />
+              </button>
+            </div>
+            <ul>
+              {notices.slice(0, 4).map((n) => (
+                <li key={n.date} className="flex items-baseline justify-between gap-3 border-b py-2.5 text-[15px]" style={{ borderColor: C.line }}>
+                  <span className="min-w-0 truncate">{s(n.title)}</span>
+                  <span className="shrink-0 text-[13px] tabular-nums" style={{ color: C.muted }}>
+                    {n.date.slice(5).replace("-", ".")}
+                  </span>
+                </li>
+              ))}
+            </ul>
+          </div>
+
+          <div>
+            <h2 className="border-b-2 pb-2 text-[20px] font-bold" style={{ borderColor: C.steel }}>
+              {x("고객센터", "Customer Center")}
+            </h2>
+            <a href={`tel:${TEL}`} className="mt-3 block text-[28px] font-bold tabular-nums tracking-[-0.02em]" style={{ color: C.orangeText }}>
+              {TEL}
+            </a>
+            <dl className="mt-2 grid gap-1 text-[15px]">
+              {(
+                [
+                  [x("팩스", "Fax"), FAX],
+                  [x("가공견적", "Quotes"), MAIL_QUOTE],
+                  [x("일반문의", "General"), MAIL_INFO],
+                  [x("업무시간", "Hours"), s(HOURS)],
+                ] as const
+              ).map(([k, v]) => (
+                <div key={k} className="grid grid-cols-[72px_1fr] gap-2">
+                  <dt style={{ color: C.muted }}>{k}</dt>
+                  <dd className="min-w-0 break-words tabular-nums">{v}</dd>
+                </div>
+              ))}
+            </dl>
+          </div>
+
+          <div id="co-visit">
+            <h2 className="border-b-2 pb-2 text-[20px] font-bold" style={{ borderColor: C.steel }}>
+              {x("오시는 길", "Location")}
+            </h2>
+            <p className="mt-3 font-bold">{s(ADDRESS)}</p>
+            <dl className="mt-2 grid gap-1 text-[15px]">
+              <div className="grid grid-cols-[96px_1fr] gap-2">
+                <dt style={{ color: C.muted }}>{x("내비게이션", "Navigation")}</dt>
+                <dd>{x("정밀가공 제조 ㅎㄷ공장", "Precision Machining HD Plant")}</dd>
+              </div>
+              <div className="grid grid-cols-[96px_1fr] gap-2">
+                <dt style={{ color: C.muted }}>{x("주차", "Parking")}</dt>
+                <dd>{x("정문 오른쪽 방문 주차장", "Visitor lot right of the main gate")}</dd>
+              </div>
+            </dl>
+            <button
+              type="button"
+              onClick={() => go("about", "location")}
+              className="mt-4 inline-flex h-11 items-center justify-center rounded-[4px] border px-4 text-[15px] font-bold"
+              style={{ background: C.steel, color: C.white, borderColor: C.steel }}
+            >
+              {x("오시는 길 자세히 보기", "Directions")}
             </button>
           </div>
         </div>
