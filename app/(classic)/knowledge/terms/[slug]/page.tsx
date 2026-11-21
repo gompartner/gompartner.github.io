@@ -1,7 +1,6 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 import { notFound } from "next/navigation";
-import { ArrowUpRight } from "lucide-react";
 import { TrendNav } from "@/components/classic/archive/TrendNav";
 import { ArchiveShell, DocHead, TakeoverBox, docH2 } from "@/components/classic/archive/ArchiveShell";
 import { groupBySlug, shortTitle, takeover, termHref, termSlugs } from "@/data/classic/archive";
@@ -122,13 +121,6 @@ export default async function TermDoc({ params }: { params: Promise<{ slug: stri
 
       {take ? <TakeoverBox sub={`다른 업체가 만든 사이트의 ${shortTitle(g)}${eulReul(shortTitle(g))} 인수했다면`} items={take} /> : null}
 
-      {g.post ? (
-        <p className="mt-8 text-[14.5px]">
-          <a href={g.post} target="_blank" rel="noopener noreferrer" className="inline-flex items-center gap-1 font-bold text-[#256ef4] hover:underline underline-offset-4">
-            같은 내용을 글로 읽기(기술 블로그) <ArrowUpRight size={15} aria-hidden />
-          </a>
-        </p>
-      ) : null}
 
       <TrendNav current={termHref(g)} />
     </ArchiveShell>
