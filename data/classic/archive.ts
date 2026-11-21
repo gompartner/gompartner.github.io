@@ -1,0 +1,124 @@
+// 곰파트너 아카이브(/archive). 11-21 사용자: 컨플루언스처럼 정돈된 문서 공간, 실적 대신 쌓인 기록을 보여 준다.
+// 틀은 문서 사이트형(왼쪽 분류 트리, 본문, 오른쪽 목차). 우리 색깔은 "이어받을 때 볼 것", "이렇게 요청하세요", 같은 그림체 와이어프레임, 확인일.
+// 원래 주소가 있는 자료(인사이트 /insight, 용어 사전 /glossary, 무료 도구 /tools, 점검표 /jaryo/<id>)는 주소를 그대로 두고 트리에서 잇는다.
+// 문서가 없는 분류(트렌드, 시안 작업)는 첫 문서가 생길 때 sections에 더한다. 빈 칸, 준비 중 표시는 두지 않는다.
+
+import { termGroups, type TermGroup } from "@/data/classic/glossary";
+import { insights } from "@/data/classic/insights";
+import { jaryo } from "@/data/classic/jaryo";
+import { tools } from "@/data/classic/tools";
+
+/** 용어 묶음 주소 이름. 묶음 id(g01...)는 바꾸지 않고 주소만 읽기 쉽게 둔다 */
+export const termSlugs: Record<string, string> = {
+  g01: "calendar", g02: "time-picker", g03: "date-range", g04: "popup", g05: "notification", g06: "tooltip",
+  g07: "menu", g08: "tabs", g09: "pagination", g10: "select", g11: "input", g12: "button",
+  g13: "accordion-carousel", g14: "list", g15: "loading", g16: "page-structure", g17: "floating", g18: "layout",
+  g19: "photo-view", g20: "photo-video", g21: "product-detail", g22: "cart-checkout", g23: "login", g24: "signup",
+  g25: "search-results", g26: "dashboard", g27: "board", g28: "editor", g29: "map-address", g30: "booking-schedule",
+  g31: "ui-states", g32: "comment-share", g33: "spacing", g34: "responsive", g35: "typography", g36: "image-ratio",
+  g37: "public-home", g38: "public-required", g39: "accessibility", g40: "online-application", g41: "company-about", g42: "trust",
+  g43: "careers", go1: "domain-server", go2: "admin-edit", go3: "contract-handover", go4: "search-records",
+};
+
+export const termHref = (g: TermGroup) => `/archive/terms/${termSlugs[g.id]}`;
+export const groupBySlug = (slug: string) => termGroups.find((g) => termSlugs[g.id] === slug);
+
+/** 묶음 제목에서 "종류 6가지" 같은 꼬리를 빼고 짧게(트리, 목록용) */
+export const shortTitle = (g: TermGroup) => g.title.replace(/ ?(UI )?(종류 )?\d+가지$/, (m) => (m.includes("UI") ? " UI" : "")).trim();
+
+/** 이어받을 때 볼 것. 남이 만든 사이트에서 그 부품을 넘겨받았을 때 먼저 확인할 것. 확인한 묶음만 적는다 */
+export const takeover: Record<string, { b: string; t: string }[]> = {
+  g01: [
+    { b: "달력 부품의 버전", t: "오래된 jQuery UI 달력은 보안 경고가 남은 버전이 많습니다. 소스에서 jquery-ui 파일 이름의 버전 숫자를 먼저 봅니다." },
+    { b: "공휴일과 휴무일이 적힌 곳", t: "코드 안에 날짜를 직접 적어 두었다면 해마다 누군가 고쳐야 합니다. 내년 공휴일이 들어가 있는지 확인합니다." },
+    { b: "마감 시간 기준", t: "\"당일 18시 마감\"이 서버 시간 기준인지 휴대폰 시간 기준인지에 따라 마감 뒤 예약이 들어올 수 있습니다." },
+    { b: "휴대폰에서 달력이 잘리는지", t: "PC용 팝오버 달력을 그대로 쓰면 작은 화면에서 오른쪽이 잘립니다. 휴대폰은 바텀시트로 바꾸는 경우가 많습니다." },
+  ],
+  g04: [
+    { b: "\"오늘 하루 보지 않기\"가 동작하는지", t: "쿠키 이름이 팝업마다 같으면 새 팝업도 함께 숨겨집니다. 팝업을 바꿀 때 쿠키 이름도 바뀌는지 봅니다." },
+    { b: "휴대폰에서 닫기 버튼이 보이는지", t: "PC 크기로 만든 팝업은 휴대폰 화면 밖으로 넘쳐 닫기 버튼이 가려집니다. 휴대폰으로 직접 열어 닫아 봅니다." },
+    { b: "글자를 이미지로만 넣었는지", t: "공지 내용이 이미지에만 있으면 화면 낭독기가 읽지 못합니다. 대체 텍스트에 같은 내용이 들어 있는지 확인합니다." },
+    { b: "새 창 팝업을 쓰는지", t: "브라우저가 새 창 팝업을 막는 경우가 많아 공지가 아예 안 보일 수 있습니다. 레이어 팝업으로 바꾸는 것이 보통입니다." },
+  ],
+  g07: [
+    { b: "메뉴를 어디서 바꾸는지", t: "관리자 화면에서 바꾸는지, 코드에 직접 적혀 있는지 확인합니다. 코드에 있으면 메뉴 하나 바꿀 때도 개발자가 필요합니다." },
+    { b: "휴대폰에서 하위 메뉴가 열리는지", t: "마우스를 올려야 열리는 메가 메뉴는 터치 화면에서 안 열리는 경우가 있습니다." },
+    { b: "끊긴 메뉴 링크", t: "페이지를 지우고 메뉴만 남겨 404로 가는 링크가 흔합니다. 메뉴 링크를 하나씩 눌러 봅니다." },
+  ],
+  g22: [
+    { b: "PG 계약 명의와 상점 아이디", t: "결제 대행사(PG) 계약이 고객 사업자 명의인지, 이전 업체 명의인지 먼저 확인합니다. 정산 계좌도 함께 봅니다." },
+    { b: "테스트 모드로 남아 있는지", t: "개발 때 쓴 테스트 키가 그대로 있으면 결제창은 뜨지만 실제로 돈이 들어오지 않습니다." },
+    { b: "결제 모듈 버전", t: "PG사가 지원을 끝낸 옛 결제 모듈이면 어느 날 결제창이 열리지 않습니다. PG사 관리자 공지와 모듈 버전을 대조합니다." },
+    { b: "결제 뒤 주문 상태가 바뀌는지", t: "결제는 됐는데 주문이 \"입금 대기\"로 남는다면 결제 완료 알림(웹훅) 주소가 옛 도메인을 가리키는 경우가 많습니다." },
+  ],
+  g23: [
+    { b: "소셜 로그인 앱의 소유 계정", t: "카카오, 네이버 개발자 센터의 앱이 이전 업체 계정에 있으면 키를 바꿀 수 없습니다. 고객 계정으로 옮기거나 새로 만듭니다." },
+    { b: "등록된 주소(Redirect URI)", t: "도메인이나 https를 바꾸면 소셜 로그인이 바로 멈춥니다. 개발자 센터에 등록된 주소를 같이 바꿉니다." },
+    { b: "비밀번호 저장 방식", t: "비밀번호가 평문이나 MD5로 저장돼 있으면 유출 때 그대로 노출됩니다. 회원 테이블의 비밀번호 칸 길이와 형식을 봅니다." },
+    { b: "로그인 시도 제한", t: "틀린 비밀번호를 무한히 넣을 수 있으면 대입 공격에 약합니다. 몇 번 틀리면 막히는지 확인합니다." },
+  ],
+  g24: [
+    { b: "본인 인증 계약", t: "휴대폰 본인 인증 서비스 계약이 누구 명의인지, 만료일이 언제인지 확인합니다. 만료되면 가입이 막힙니다." },
+    { b: "수집 항목과 처리방침", t: "가입 화면에서 받는 항목이 개인정보처리방침에 적힌 항목과 같은지 대조합니다. 다르면 방침을 고쳐야 합니다." },
+    { b: "약관 동의 기록", t: "누가 언제 어떤 약관에 동의했는지 저장되는지 봅니다. 선택 동의(마케팅 수신)는 따로 기록돼야 합니다." },
+  ],
+  g27: [
+    { b: "비밀글이 주소로 열리는지", t: "목록에서는 자물쇠가 보여도 글 주소를 직접 넣으면 열리는 게시판이 있습니다. 로그아웃 상태로 비밀글 주소를 열어 봅니다." },
+    { b: "첨부파일 확장자 제한", t: "php 같은 실행 파일을 올릴 수 있으면 서버가 장악됩니다. 허용 확장자 목록과 업로드 폴더 실행 권한을 확인합니다." },
+    { b: "스팸 방지", t: "자동 등록 방지가 꺼져 있으면 광고 글이 하루 수백 건씩 쌓입니다. 최근 글 목록과 설정을 봅니다." },
+  ],
+  g29: [
+    { b: "지도 API 키의 소유 계정", t: "카카오맵, 네이버 지도 키가 이전 업체 계정에 있으면 사용량이 넘거나 계정이 정리될 때 지도가 사라집니다." },
+    { b: "키에 등록된 도메인", t: "도메인을 바꾸면 지도가 회색 칸으로 나옵니다. 키 설정에 새 도메인을 더합니다." },
+    { b: "우편번호 검색 스크립트 주소", t: "옛 주소의 우편번호 스크립트를 쓰면 주소 검색 창이 뜨지 않습니다. 현재 안내된 스크립트 주소와 비교합니다." },
+  ],
+};
+
+/** 아카이브 분류(위 탭과 첫 화면 칸). 문서가 있는 분류만 둔다 */
+export type ArchiveSection = { id: string; label: string; href: string; desc: string };
+export const sections: ArchiveSection[] = [
+  { id: "terms", label: "용어", href: "/archive/terms", desc: "화면 부품, 디자인 용어, 운영 용어를 그림과 요청 문장으로" },
+  { id: "notes", label: "운영 노트", href: "/archive/notes", desc: "인수, 운영, 보안, 비용을 실제 순서대로 정리한 글" },
+  { id: "checklists", label: "점검표와 도구", href: "/archive/checklists", desc: "넘겨받은 날 기록표, 매달 점검표, 무료 도구" },
+];
+
+export const counts = {
+  terms: termGroups.reduce((a, g) => a + g.terms.length, 0),
+  groups: termGroups.length,
+  notes: insights.length,
+  sheets: jaryo.length,
+  tools: tools.length,
+};
+
+/** 왼쪽 트리. 분류마다 소제목과 링크 */
+export type TreeNode = { label: string; href?: string; count?: number; children?: TreeNode[] };
+export function archiveTree(): { section: ArchiveSection; groups: { title: string; items: TreeNode[] }[] }[] {
+  const secOrder = ["화면 부품", "디자인 용어", "운영과 유지보수"] as const;
+  const terms = secOrder.map((sec) => {
+    const gs = termGroups.filter((g) => g.sec === sec);
+    if (sec !== "화면 부품") return { title: sec, items: gs.map((g) => ({ label: shortTitle(g), href: termHref(g) })) };
+    const cats = [...new Set(gs.map((g) => g.cat))];
+    return { title: sec, items: cats.map((c) => ({ label: c, count: gs.filter((g) => g.cat === c).length, children: gs.filter((g) => g.cat === c).map((g) => ({ label: shortTitle(g), href: termHref(g) })) })) };
+  });
+  const seriesNames = [...new Set(insights.map((n) => n.series))];
+  const notes = [{ title: "묶음", items: seriesNames.map((s) => ({ label: s, href: `/archive/notes#${encodeURIComponent(s)}`, count: insights.filter((n) => n.series === s).length })) }];
+  const checks = [
+    { title: "점검표와 기록표", items: jaryo.map((j) => ({ label: j.title, href: `/jaryo/${j.id}` })) },
+    { title: "무료 도구", items: [{ label: "도구 전체", href: "/tools", count: tools.length }] },
+  ];
+  return [
+    { section: sections[0], groups: terms },
+    { section: sections[1], groups: notes },
+    { section: sections[2], groups: checks },
+  ];
+}
+
+/** 최근 쌓인 기록. 인사이트는 글 날짜에서 자동으로, 나머지는 더한 날 직접 적는다(지어내지 않기) */
+const manualLog: { date: string; kind: string; title: string; href: string }[] = [
+  { date: "2026-11-21", kind: "용어", title: "화면 부품, 디자인 용어 와이어프레임 225장", href: "/archive/terms" },
+  { date: "2026-11-21", kind: "용어", title: "이어받을 때 볼 것 8묶음(달력, 팝업, 메뉴, 장바구니와 결제, 로그인, 회원가입, 게시판, 지도와 주소)", href: "/archive/terms/calendar" },
+];
+export function recentLog(limit = 8) {
+  const fromNotes = insights.map((n) => ({ date: n.date, kind: "운영 노트", title: n.title, href: `/insight/${n.slug}` }));
+  return [...manualLog, ...fromNotes].sort((a, b) => b.date.localeCompare(a.date)).slice(0, limit);
+}

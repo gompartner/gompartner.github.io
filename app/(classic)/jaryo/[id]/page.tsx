@@ -40,7 +40,8 @@ export default async function ClassicJaryoItemPage({ params }: { params: Promise
       <PageHead
         title={it.title}
         trail={[
-          { href: "/jaryo", label: "무료 자료" },
+          { href: "/archive", label: "아카이브" },
+          { href: "/archive/checklists", label: "점검표와 도구" },
           { href: `/jaryo/${it.id}`, label: it.title },
         ]}
       />

@@ -14,7 +14,7 @@ export function ToolFrame({ href, children }: { href: string; children: React.Re
       <PageHead
         title={title}
         trail={[
-          { href: "/jaryo", label: "자료" },
+          { href: "/archive", label: "아카이브" },
           { href: "/tools", label: "무료 도구" },
           { href, label: title },
         ]}

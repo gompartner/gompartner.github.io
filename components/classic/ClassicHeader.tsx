@@ -40,16 +40,15 @@ export const classicMenu = [
     ],
   },
   { label: "비용", href: "/pricing", match: ["/pricing"], items: [] },
-  // 11-21 자료 허브를 상단에 둔다(용어 사전, 인사이트, 무료 도구는 원래 주소 그대로)
+  // 11-21 아카이브(문서 사이트형). 용어 사전, 인사이트, 무료 도구, 점검표는 원래 주소 그대로 두고 아카이브에서 잇는다
   {
-    label: "자료",
-    href: "/jaryo",
-    match: ["/jaryo", "/glossary", "/insight", "/tools"],
+    label: "아카이브",
+    href: "/archive",
+    match: ["/archive", "/glossary", "/insight", "/tools", "/jaryo"],
     items: [
-      { href: "/jaryo", label: "점검표와 기록표" },
-      { href: "/glossary", label: "웹 용어 사전" },
-      { href: "/insight", label: "인사이트" },
-      { href: "/tools", label: "무료 도구" },
+      { href: "/archive/terms", label: "용어" },
+      { href: "/archive/notes", label: "운영 노트" },
+      { href: "/archive/checklists", label: "점검표와 도구" },
     ],
   },
   // 고객 사례는 계약 끝나고 게재 동의를 받은 실제 사례가 data/classic/cases.ts에 들어가는 순간 메뉴에 나온다(그 전엔 빈 값, 메뉴와 페이지 없음)

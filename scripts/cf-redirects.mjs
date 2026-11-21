@@ -15,5 +15,7 @@ function walk(dir, rel) {
   }
 }
 walk(root, "");
+// 고정 넘김(11-21 자료 첫 화면은 아카이브 점검표로. 점검표 상세 /jaryo/<id> 는 그대로)
+lines.push("/jaryo /archive/checklists 301");
 writeFileSync(join(root, "_redirects"), lines.sort().join("\n") + "\n");
 console.log(`_redirects ${lines.length}줄`);
