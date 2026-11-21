@@ -11,7 +11,7 @@ const OnlineStoreDemo = dynamic(() => import("@/components/demos/OnlineStoreDemo
 const PensionDemo = dynamic(() => import("@/components/demos/PensionDemo").then((m) => m.PensionDemo));
 const CompanyDemo = dynamic(() => import("@/components/demos/CompanyDemo").then((m) => m.CompanyDemo));
 const CertLabDemo = dynamic(() => import("@/components/demos/CertLabDemo").then((m) => m.CertLabDemo));
-const LawFirmDemo = dynamic(() => import("@/components/demos/LawFirmDemo").then((m) => m.LawFirmDemo));
+const LawFirmDrafts = dynamic(() => import("@/components/drafts/LawFirmDrafts").then((m) => m.LawFirmDrafts));
 const TaxOfficeDemo = dynamic(() => import("@/components/demos/TaxOfficeDemo").then((m) => m.TaxOfficeDemo));
 const RealEstateDemo = dynamic(() => import("@/components/demos/RealEstateDemo").then((m) => m.RealEstateDemo));
 const BakeryCafeDemo = dynamic(() => import("@/components/demos/BakeryCafeDemo").then((m) => m.BakeryCafeDemo));
@@ -113,7 +113,7 @@ const demoComponents: Record<string, ComponentType> = {
   pension: PensionDemo,
   company: CompanyDemo,
   "cert-lab": CertLabDemo,
-  "law-firm": LawFirmDemo,
+  "law-firm": LawFirmDrafts,
   "tax-office": TaxOfficeDemo,
   "real-estate": RealEstateDemo,
   "community-map": CommunityMapDemo,

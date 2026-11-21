@@ -8,6 +8,10 @@ export const VARIANTS: Record<string, { id: string; label: string }[]> = {
     { id: "brand", label: "시안 A 브랜드형" },
     { id: "info", label: "시안 B 정보형" },
   ],
+  "law-firm": [
+    { id: "a", label: "시안 A 프리미엄" },
+    { id: "b", label: "시안 B 상담형" },
+  ],
 };
 
 export function setVariant(v: string) {
