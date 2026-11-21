@@ -25,6 +25,7 @@ export const techDocs: TrendDoc[] = [
   { href: "/knowledge/cms", title: "만드는 도구(CMS) 비교: 카페24, WordPress, 아임웹", desc: "CMS란 무엇인지, 설치형과 임대형의 차이, 한국어, 일본어, 영어 사이트의 만드는 도구 점유율 상위 3." },
   { href: "/knowledge/page-weight", title: "페이지 무게와 속도", desc: "페이지 한 장 용량 중앙값, PC 2011~2026 6배, 모바일 9배." },
   { href: "/knowledge/app", title: "앱: 안드로이드와 아이폰", desc: "휴대폰 OS 중 아이폰 비율, 한국 일본 미국 2012~2025. 앱 인수 시 계정, 서명 키, 스토어 요구." },
+  { href: "/knowledge/search-optimization", title: "검색 최적화의 역사: 디렉터리 등록에서 SEO, GEO까지", desc: "야후 디렉터리, 메타 키워드, PageRank, 판다와 펭귄, 모바일, 네이버 C-Rank, AI 개요와 AI 브리핑. 시대마다 검색엔진이 본 것과 꼼수." },
   { href: "/knowledge/ai-readable-web", title: "AI가 쓰는 웹사이트: UX 다음의 AX, SEO 다음의 GEO", desc: "AX, GEO, 제로 클릭, llms.txt, MCP, NLWeb, 에이전트 커머스. AI 요약이 뜨면 링크 클릭 15%에서 8%로, 홈페이지가 준비할 것." },
   { href: "/knowledge/ai-and-homepage", title: "AI 도구와 홈페이지: 산업 변화, 보안, 유출 사례, 앞으로", desc: "AI 빌더의 성장, AI가 만든 코드의 보안, Tea, Moltbook, 쿠팡, SK텔레콤 유출 사례, 개정 개인정보 보호법, 구글 2027 보안 전망." },
   { href: "/knowledge/company-homepage", title: "기업 홈페이지: 회사 소개서 화면에서 플래시, 모바일, 빌더까지", desc: "\"홈페이지 제작\" 검색 관심도 2004~2026, 한국 기업 홈페이지 연표. 플래시, m. 사이트, 개인정보 보호법, 웹 접근성, 빌더." },
@@ -341,7 +342,7 @@ export function topics(): Topic[] {
       { title: "도구", items: [tool("/tools/php-check"), tool("/tools/site-check")] },
     ] },
     { id: "search", label: "검색", desc: "검색 등록과 기록, 검색 결과에 보이는 모습, AI 검색과 인용", groups: [
-      { title: "문서", items: [doc("/knowledge/ai-readable-web"), term("go4"), tool("/tools/search-preview")] },
+      { title: "문서", items: [doc("/knowledge/search-optimization"), doc("/knowledge/ai-readable-web"), term("go4"), tool("/tools/search-preview")] },
     ] },
     { id: "ops", label: "운영과 유지보수", desc: "인수인계, 월 점검, 장애 대응, 관리 비용, 점검표", groups: [
       { title: "운영과 유지보수", items: series("운영과 유지보수") },
@@ -375,6 +376,7 @@ export function relatedOf(href: string, limit = 6): TreeNode[] {
 
 /** 최근 수정된 문서. 인사이트는 글 날짜에서 자동으로, 나머지는 더한 날 직접 적는다(지어내지 않기) */
 const manualLog: { date: string; kind: string; title: string; href: string }[] = [
+  { date: "2026-11-22", kind: "검색", title: "검색 최적화의 역사: 디렉터리 등록에서 SEO, GEO까지", href: "/knowledge/search-optimization" },
   { date: "2026-11-22", kind: "검색", title: "AI가 쓰는 웹사이트: UX 다음의 AX, SEO 다음의 GEO", href: "/knowledge/ai-readable-web" },
   { date: "2026-11-22", kind: "기획", title: "AI 도구와 홈페이지: 산업 변화, 보안, 유출 사례, 앞으로", href: "/knowledge/ai-and-homepage" },
   { date: "2026-11-22", kind: "기획", title: "기업 홈페이지: 회사 소개서 화면에서 플래시, 모바일, 빌더까지", href: "/knowledge/company-homepage" },
