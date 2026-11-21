@@ -1,7 +1,8 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 import { notFound } from "next/navigation";
-import { PageHead, btnLine, btnPrimary, wrap } from "@/components/classic/ui";
+import { btnLine, btnPrimary } from "@/components/classic/ui";
+import { ArchiveShell, DocHead } from "@/components/classic/archive/ArchiveShell";
 import { insightBySlug, insights, readMinutes } from "@/data/classic/insights";
 import { LdScript } from "@/components/seo/JsonLd";
 import { ORG_ID, breadcrumbLd, pageMeta } from "@/lib/seo";
@@ -26,7 +27,7 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
   });
 }
 
-// 인사이트 글. 본문 폭은 읽기 좋게 760px로 좁히고, xl부터 오른쪽 빈자리에 따라오는 목차를 둔다.
+// 인사이트 글(운영 노트). 11-21부터 아카이브 틀(왼쪽 분류 트리, 오른쪽 목차). 본문 폭은 읽기 좋게 760px. 주소 /insight/<slug>는 그대로.
 // 대표 이미지(scripts/insight-cards.mjs로 만든 제목 카드)는 공유 미리보기, 디스커버, 구조화 데이터에만 쓰고 본문에는 넣지 않는다. 끝에 맞는 유지보수 메뉴 한 줄. 11-21부터 글마다 독립(편 번호, 다음 편 없음).
 export default async function ClassicInsightDetailPage({ params }: Props) {
   const { slug } = await params;
@@ -46,7 +47,7 @@ export default async function ClassicInsightDetailPage({ params }: Props) {
           description: n.summary,
           image: [`${siteUrl}${n.image.src}`],
           datePublished: `${n.date}T09:00:00+09:00`,
-          dateModified: `${n.date}T09:00:00+09:00`,
+          dateModified: `${n.updated ?? n.date}T09:00:00+09:00`,
           author: { "@id": ORG_ID },
           publisher: { "@id": ORG_ID },
           mainEntityOfPage: `/insight/${slug}`,
@@ -59,32 +60,25 @@ export default async function ClassicInsightDetailPage({ params }: Props) {
           { name: n.title, path: `/insight/${slug}` },
         ])}
       />
-      <PageHead
-        title={n.title}
-        trail={[
+      <ArchiveShell
+        section="notes"
+        active={`/insight/${slug}`}
+        crumbs={[
           { href: "/archive", label: "아카이브" },
           { href: "/archive/notes", label: "운영 노트" },
           { href: `/insight/${slug}`, label: n.title },
         ]}
-      />
-      <article className={`${wrap} pb-16 pt-10 md:pb-24 md:pt-14`}>
-        <div className="mx-auto max-w-[760px] xl:grid xl:max-w-none xl:grid-cols-[minmax(0,760px)_220px] xl:justify-center xl:gap-16">
-          <div className="min-w-0">
-            <header className="flex flex-wrap items-center gap-x-3 gap-y-1 border-y-2 border-[#15171c] border-b-[#e6e9ee] py-4 text-[15px] md:border-b">
-              <span className="font-bold text-[#256ef4]">
-                {n.series}
-              </span>
-              {/* 11-12 사용자: 인사이트에 날짜 넣기 */}
-              <time dateTime={n.date} className="tabular-nums text-[#5b6370]">{n.date.replaceAll("-", ".")}</time>
-              <span className="tabular-nums text-[#5b6370]">읽는 시간 {readMinutes(n)}분</span>
-            </header>
+        toc={toc.map((t) => ({ id: t.id, label: t.h }))}
+      >
+        <article className="max-w-[760px]">
+          <DocHead title={n.title} meta={[["주제", n.series], ["최종 수정일", n.updated ?? n.date], ["읽는 시간", `${readMinutes(n)}분`]]} lead={n.summary} />
             <div className="space-y-9 py-8 md:py-10">
               {n.blocks.map((b, bi) => (
                 <section key={bi} className="space-y-4">
                   {b.h && (
                     <h2
                       id={`s${bi}`}
-                      className="scroll-mt-28 text-[21px] font-[800] leading-[1.4] tracking-[-0.02em] md:text-[24px]"
+                      className="scroll-mt-24 text-[21px] font-[800] leading-[1.4] tracking-[-0.02em] md:text-[24px]"
                     >
                       {b.h}
                     </h2>
@@ -228,28 +222,8 @@ export default async function ClassicInsightDetailPage({ params }: Props) {
                 목록
               </Link>
             </div>
-          </div>
-          {toc.length > 0 && (
-            <nav aria-label="이 글의 목차" className="hidden xl:block">
-              <div className="sticky top-28 border-l-2 border-[#e6e9ee] pl-5">
-                <p className="text-[14px] font-bold text-[#6b7280]">목차</p>
-                <ol className="mt-3 space-y-1" role="list">
-                  {toc.map((t) => (
-                    <li key={t.id}>
-                      <a
-                        href={`#${t.id}`}
-                        className="block py-1.5 text-[15px] leading-[1.5] text-[#3d4450] hover:text-[#256ef4] hover:underline"
-                      >
-                        {t.h}
-                      </a>
-                    </li>
-                  ))}
-                </ol>
-              </div>
-            </nav>
-          )}
-        </div>
-      </article>
+        </article>
+      </ArchiveShell>
     </>
   );
 }

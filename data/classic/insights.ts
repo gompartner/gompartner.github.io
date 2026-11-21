@@ -16,6 +16,8 @@ export interface Insight {
   slug: string;
   /** YYYY-MM-DD */
   date: string;
+  /** 공개 뒤 본문을 고친 날(최종 수정일). 없으면 date */
+  updated?: string;
   series: string;
   /** 묶음 안 순서 */
   no: number;
@@ -451,6 +453,7 @@ const allInsights: Insight[] = [
   {
     slug: "no-source-code",
     date: "2026-11-09",
+    updated: "2026-11-21",
     series: "운영과 유지보수",
     no: 4,
     title: '"소스가 없습니다"라는 답을 들었을 때',
@@ -1131,6 +1134,7 @@ const allInsights: Insight[] = [
   {
     slug: "repair-or-rebuild",
     date: "2026-11-10",
+    updated: "2026-11-21",
     series: "운영과 유지보수",
     no: 6,
     title: "보수할 것인가, 새로 만들 것인가",
@@ -1251,6 +1255,7 @@ const allInsights: Insight[] = [
   {
     slug: "monthly-inspection-checklist",
     date: "2026-11-10",
+    updated: "2026-11-21",
     series: "운영과 유지보수",
     no: 7,
     title: "월간 정기 점검 항목 열두 가지",
@@ -1576,6 +1581,7 @@ const allInsights: Insight[] = [
   {
     slug: "backup-but-no-restore",
     date: "2026-11-11",
+    updated: "2026-11-21",
     series: "운영과 유지보수",
     no: 9,
     title: "백업은 있는데 복구가 안 되는 이유",
@@ -1710,6 +1716,7 @@ const allInsights: Insight[] = [
   {
     slug: "site-down-first-30-minutes",
     date: "2026-11-12",
+    updated: "2026-11-21",
     series: "운영과 유지보수",
     no: 10,
     title: "사이트가 안 열릴 때 첫 30분",
@@ -1861,6 +1868,7 @@ const allInsights: Insight[] = [
   {
     slug: "expiry-calendar",
     date: "2026-11-12",
+    updated: "2026-11-21",
     series: "운영과 유지보수",
     no: 11,
     title: "인증서와 도메인 만료로 멈추는 사고 막기",
@@ -2209,6 +2217,7 @@ const allInsights: Insight[] = [
   {
     slug: "request-backlog-priority",
     date: "2026-11-13",
+    updated: "2026-11-21",
     series: "운영과 유지보수",
     no: 13,
     title: "수정 요청이 쌓였을 때 처리 순서",
@@ -2346,6 +2355,7 @@ const allInsights: Insight[] = [
   {
     slug: "monthly-ops-report",
     date: "2026-11-14",
+    updated: "2026-11-21",
     series: "운영과 유지보수",
     no: 14,
     title: "월간 운영 보고서로 윗선에 설명하기",
@@ -2548,6 +2558,7 @@ const allInsights: Insight[] = [
   {
     slug: "maintenance-contract-five-lines",
     date: "2026-11-14",
+    updated: "2026-11-21",
     series: "운영과 유지보수",
     no: 15,
     title: "유지보수 계약서에서 확인할 다섯 줄",
@@ -2704,6 +2715,7 @@ const allInsights: Insight[] = [
   {
     slug: "invisible-maintenance-cost",
     date: "2026-11-15",
+    updated: "2026-11-21",
     series: "관리 비용",
     no: 1,
     title: "홈페이지 관리비가 0원처럼 보이는 이유",
@@ -3410,6 +3422,7 @@ const allInsights: Insight[] = [
   {
     slug: "data-breach-penalty-72-hours",
     date: "2026-11-17",
+    updated: "2026-11-21",
     series: "관리 비용",
     no: 2,
     title: "개인정보 유출 한 건, 과징금과 72시간 신고는 얼마나 무거운가",
@@ -4045,6 +4058,7 @@ const allInsights: Insight[] = [
   {
     slug: "ecommerce-footer-withdrawal-notice",
     date: "2026-11-19",
+    updated: "2026-11-21",
     series: "관리 비용",
     no: 3,
     title: "쇼핑몰 하단 사업자 정보와 청약철회 안내, 빠지면 생기는 과태료",
@@ -4445,6 +4459,7 @@ const allInsights: Insight[] = [
   {
     slug: "frontend-api-key-cost-incidents",
     date: "2026-11-20",
+    updated: "2026-11-21",
     series: "AI로 만든 서비스 운영",
     no: 3,
     title: "프런트 코드에 들어간 API 키, 48시간 만에 쌓인 8만 달러 청구서",
@@ -4748,6 +4763,7 @@ const allInsights: Insight[] = [
   {
     slug: "web-accessibility-lawsuit",
     date: "2026-11-21",
+    updated: "2026-11-21",
     series: "관리 비용",
     no: 4,
     title: "웹 접근성, 장애인차별금지법 소송과 손해배상 판례",
@@ -5392,6 +5408,7 @@ const allInsights: Insight[] = [
   {
     slug: "hacked-site-operator-liability",
     date: "2026-11-21",
+    updated: "2026-11-21",
     series: "관리 비용",
     no: 5,
     title: "홈페이지가 해킹돼 악성코드를 뿌리면 운영자 책임은 어디까지인가",
@@ -6032,6 +6049,7 @@ const allInsights: Insight[] = [
   {
     slug: "free-template-hosting-plugin-cost",
     date: "2026-11-21",
+    updated: "2026-11-21",
     series: "관리 비용",
     no: 6,
     title: "무료 템플릿, 무료 호스팅, 무료 플러그인의 실제 비용",
@@ -6351,6 +6369,7 @@ const allInsights: Insight[] = [
   {
     slug: "supabase-free-pause-no-backup",
     date: "2026-11-21",
+    updated: "2026-11-21",
     series: "AI로 만든 서비스 운영",
     no: 6,
     title: "Supabase 무료 프로젝트 일시 정지, 백업이 없는 서비스",
@@ -6681,6 +6700,7 @@ const allInsights: Insight[] = [
   {
     slug: "ai-built-site-second-year",
     date: "2026-11-21",
+    updated: "2026-11-21",
     series: "관리 비용",
     no: 7,
     title: "AI로 무료로 만든 홈페이지, 그다음 해에 드는 돈",
@@ -6819,6 +6839,7 @@ const allInsights: Insight[] = [
   {
     slug: "app-data-breach-vibe-coding-korea-law",
     date: "2026-11-21",
+    updated: "2026-11-21",
     series: "AI로 만든 서비스 운영",
     no: 7,
     title: "앱 개인정보 유출 사례와 국내 개인정보 보호법에서 달라지는 점",
@@ -6917,6 +6938,7 @@ const allInsights: Insight[] = [
   {
     slug: "maintenance-rate-public-guide",
     date: "2026-11-21",
+    updated: "2026-11-21",
     series: "관리 비용",
     no: 8,
     title: "유지보수 비용은 어떻게 정해지나, 공공 SW 대가산정 가이드의 유지관리 요율",
@@ -7547,6 +7569,7 @@ const allInsights: Insight[] = [
   {
     slug: "diy-or-outsource-maintenance",
     date: "2026-11-21",
+    updated: "2026-11-21",
     series: "관리 비용",
     no: 10,
     title: "관리 업체 없이 직접 해도 되는 일과 의뢰해야 하는 일",
@@ -7753,6 +7776,7 @@ const allInsights: Insight[] = [
   {
     slug: "ai-built-service-handover-checklist",
     date: "2026-11-21",
+    updated: "2026-11-21",
     series: "AI로 만든 서비스 운영",
     no: 10,
     title: "AI로 만든 서비스 출시 전 점검표, 인수하는 쪽이 먼저 보는 열 가지",
