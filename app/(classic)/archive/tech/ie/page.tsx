@@ -11,7 +11,7 @@ import { pageMeta } from "@/lib/seo";
 export const metadata: Metadata = pageMeta({
   title: "한국만 IE를 오래 못 떠난 이유, 한국 일본 미국 2009~2025 | 아카이브",
   description: "PC 브라우저 중 IE 비율은 2015년 미국 28%, 일본 41%, 한국 68%였습니다. 공인인증서와 ActiveX, 2020년 전자서명법 개정, 2022년 IE 지원 종료까지 차트와 함께 정리했습니다.",
-  path: "/archive/trends/korea-ie",
+  path: "/archive/tech/ie",
   article: true,
 });
 
@@ -20,14 +20,14 @@ const p = "mt-4 max-w-[760px] text-[16.5px] leading-[1.8] text-[#2b313b]";
 export default function TrendKoreaIe() {
   return (
     <ArchiveShell
-      section="trends"
-      active="/archive/trends/korea-ie"
-      crumbs={[{ href: "/archive", label: "아카이브" }, { href: "/archive/trends", label: "트렌드" }, { href: "/archive/trends/korea-ie", label: "브라우저" }]}
+      section="tech"
+      active="/archive/tech/ie"
+      crumbs={[{ href: "/archive", label: "아카이브" }, { href: "/archive/tech", label: "기술 트렌드" }, { href: "/archive/tech/ie", label: "브라우저" }]}
       toc={[{ id: "chart", label: "PC 브라우저 중 IE 비율" }, { id: "why", label: "한국에만 있던 이유" }, { id: "wf", label: "2012년 무렵 첫 화면" }, { id: "take", label: "인수 시 확인 사항" }, { id: "src", label: "출처" }]}
     >
       <DocHead
         title="한국만 IE를 오래 못 떠난 이유"
-        meta={[["비교", "한국, 일본, 미국"], ["기간", "2009~2025"], ["데이터", "StatCounter"], ["확인일", TREND_CHECKED]]}
+        meta={[["비교", "한국, 일본, 미국"], ["기간", "2009~2025"], ["데이터", "StatCounter"], ["최종 수정일", TREND_CHECKED]]}
         lead="2009년에는 세 나라 모두 인터넷 익스플로러(IE)가 PC 브라우저의 절반이 넘었습니다. 미국은 2015년에 28%까지 내려왔지만, 한국은 같은 해에도 68%였습니다."
       />
 
@@ -82,7 +82,7 @@ export default function TrendKoreaIe() {
         </li>
       </ul>
 
-      <TrendNav current="/archive/trends/korea-ie" />
+      <TrendNav current="/archive/tech/ie" />
     </ArchiveShell>
   );
 }

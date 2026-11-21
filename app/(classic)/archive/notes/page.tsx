@@ -11,22 +11,21 @@ export const metadata: Metadata = pageMeta({
   path: "/archive/notes",
 });
 
-const series = [...new Set(insights.map((n) => n.series))].map((s) => ({ name: s, list: insights.filter((n) => n.series === s).sort((a, b) => a.no - b.no) }));
+const series = [...new Set(insights.map((n) => n.series))].map((s) => ({ name: s, list: insights.filter((n) => n.series === s).sort((a, b) => b.date.localeCompare(a.date) || a.no - b.no) }));
 
 export default function ArchiveNotes() {
   return (
     <ArchiveShell section="notes" active="/archive/notes" crumbs={[{ href: "/archive", label: "아카이브" }, { href: "/archive/notes", label: "운영 노트" }]} toc={series.map((s) => ({ id: encodeURIComponent(s.name), label: s.name }))}>
-      <DocHead title="운영 노트" meta={[["묶음", `${series.length}개`], ["글", `${insights.length}편`]]} lead="홈페이지를 넘겨받고 운영하며 겪는 일을 묶음마다 읽는 순서대로 정리했습니다." />
+      <DocHead title="운영 노트" meta={[["주제", `${series.length}개`], ["글", `${insights.length}개`]]} lead="홈페이지를 넘겨받고 운영하며 겪는 일을 주제별로 정리했습니다. 글마다 따로 읽어도 되게 썼습니다." />
       {series.map((s) => (
         <section key={s.name} aria-labelledby={encodeURIComponent(s.name)}>
           <h2 id={encodeURIComponent(s.name)} className={docH2}>
-            {s.name} <span className="text-[15px] font-bold text-[#5b6370]">{s.list.length}편</span>
+            {s.name} <span className="text-[15px] font-bold text-[#5b6370]">글 {s.list.length}개</span>
           </h2>
           <ol className="mt-3">
             {s.list.map((n) => (
               <li key={n.slug} className="border-b border-[#e6e9ee]">
-                <Link href={`/insight/${n.slug}`} className="group grid grid-cols-[44px_minmax(0,1fr)] gap-x-2 py-3.5 md:grid-cols-[44px_minmax(0,1fr)_100px]">
-                  <span className="text-[13.5px] font-bold text-[#256ef4]">{n.no}편</span>
+                <Link href={`/insight/${n.slug}`} className="group grid grid-cols-[minmax(0,1fr)] gap-x-2 py-3.5 md:grid-cols-[minmax(0,1fr)_100px]">
                   <span>
                     <span className="block text-[16px] font-bold leading-[1.45] group-hover:text-[#256ef4] group-hover:underline underline-offset-4">{n.title}</span>
                     <span className="mt-1 block text-[14px] leading-[1.55] text-[#5b6370]">{n.summary}</span>

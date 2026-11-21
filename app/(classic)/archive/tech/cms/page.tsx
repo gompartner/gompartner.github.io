@@ -4,7 +4,7 @@ import { TrendArticle } from "@/components/classic/archive/TrendArticle";
 import { cmsByLanguage } from "@/data/classic/trendData";
 import { pageMeta } from "@/lib/seo";
 
-const HREF = "/archive/trends/cms";
+const HREF = "/archive/tech/cms";
 export const metadata: Metadata = pageMeta({
   title: "한국은 카페24, 일본은 WordPress, 만드는 도구 비교 | 아카이브",
   description: "CMS를 알아낸 사이트 중 한국어 사이트는 Cafe24 39.6%, WordPress 24.1%, 아임웹 16.7%, 일본어 사이트는 WordPress 82.8%입니다. 나라마다 다른 도구가 인수할 때 무엇을 남기는지 정리했습니다.",

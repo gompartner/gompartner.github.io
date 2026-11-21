@@ -8,7 +8,7 @@ import { TREND_CHECKED, examplesMobile2012, mobileShare } from "@/data/classic/t
 import { pageMeta } from "@/lib/seo";
 
 // 트렌드 2장(11-21). 숫자는 StatCounter, 스마트폰 가입자 시점과 구글, 반응형 사례는 아래 출처.
-const HREF = "/archive/trends/mobile";
+const HREF = "/archive/design/mobile";
 export const metadata: Metadata = pageMeta({
   title: "한국이 모바일로 먼저 넘어간 길, 한국 일본 미국 2009~2025 | 아카이브",
   description: "2012년 전체 접속 중 모바일 비율은 한국 24%, 미국 10%, 일본 8%였습니다. m. 전용 사이트, PC 화면 그대로, 반응형으로 갈린 세 나라의 길을 차트와 실제 사례로 비교합니다.",
@@ -22,14 +22,14 @@ const a = "underline underline-offset-2 hover:text-[#256ef4]";
 export default function TrendMobile() {
   return (
     <ArchiveShell
-      section="trends"
+      section="design"
       active={HREF}
-      crumbs={[{ href: "/archive", label: "아카이브" }, { href: "/archive/trends", label: "트렌드" }, { href: HREF, label: "모바일" }]}
+      crumbs={[{ href: "/archive", label: "아카이브" }, { href: "/archive/design", label: "디자인 트렌드" }, { href: HREF, label: "모바일" }]}
       toc={[{ id: "chart", label: "모바일 접속 비율" }, { id: "why", label: "세 나라가 갈린 길" }, { id: "wf", label: "2012년 휴대폰으로 연 화면" }, { id: "take", label: "인수 시 확인 사항" }, { id: "src", label: "출처" }]}
     >
       <DocHead
         title="한국이 모바일로 먼저 넘어간 길"
-        meta={[["비교", "한국, 일본, 미국"], ["기간", "2009~2025"], ["데이터", "StatCounter"], ["확인일", TREND_CHECKED]]}
+        meta={[["비교", "한국, 일본, 미국"], ["기간", "2009~2025"], ["데이터", "StatCounter"], ["최종 수정일", TREND_CHECKED]]}
         lead="2012년 전체 접속 중 모바일 비율은 한국 24%, 미국 10%, 일본 8%였습니다. 한국은 세 나라 중 가장 먼저 휴대폰 화면을 따로 챙겨야 했습니다."
       />
 

@@ -1,7 +1,7 @@
 // 곰파트너 아카이브(/archive). 11-21 사용자: 컨플루언스처럼 정돈된 문서 공간, 실적 대신 쌓인 기록을 보여 준다.
 // 틀은 문서 사이트형(왼쪽 분류 트리, 본문, 오른쪽 목차). 우리 색깔은 "인수 시 확인 사항", "이렇게 요청하세요", 같은 그림체 와이어프레임, 확인일.
 // 원래 주소가 있는 자료(인사이트 /insight, 무료 도구 /tools, 점검표 /jaryo/<id>)는 주소를 그대로 두고 트리에서 잇는다.
-// 문서가 없는 분류(트렌드, 시안 작업)는 첫 문서가 생길 때 sections에 더한다. 빈 칸, 준비 중 표시는 두지 않는다.
+// 문서가 없는 분류(시안 작업 등)는 첫 문서가 생길 때 sections에 더한다. 빈 칸, 준비 중 표시는 두지 않는다.
 
 import { termGroups, type TermGroup } from "@/data/classic/glossary";
 import { insights } from "@/data/classic/insights";
@@ -10,17 +10,25 @@ import { tools } from "@/data/classic/tools";
 import { datasets } from "@/data/classic/trendData";
 
 /** 트렌드 문서(만든 것만). 새 장을 쓰면 여기에 더한다 */
-export const trendDocs = [
-  { href: "/archive/trends/korea-ie", title: "한국만 IE를 오래 못 떠난 이유", desc: "PC 브라우저 중 IE 비율, 한국 일본 미국 2009~2025. 공인인증서, ActiveX, 2020년 전자서명법 개정, 2022년 IE 지원 종료." },
-  { href: "/archive/trends/mobile", title: "한국이 모바일로 먼저 넘어간 길", desc: "전체 접속 중 모바일 비율, 한국 일본 미국 2009~2025. m. 전용 사이트, PC 화면 그대로, 반응형으로 갈린 길." },
-  { href: "/archive/trends/https", title: "주소창 자물쇠가 기본이 되기까지", desc: "크롬에서 https로 열린 페이지 비율, 일본 미국 2015~2026. 2018년 크롬 68 주의 요함 표시." },
-  { href: "/archive/trends/flash", title: "플래시가 사라진 자리", desc: "Flash, jQuery 사용 비율 2015~2025. 2020년 말 지원 종료, 2019년 국내 500대 사이트 28.4%가 플래시 사용." },
-  { href: "/archive/trends/cms", title: "한국은 카페24, 일본은 WordPress", desc: "한국어, 일본어, 영어 사이트의 만드는 도구 점유율 상위 3." },
-  { href: "/archive/trends/page-weight", title: "홈페이지는 얼마나 무거워졌나", desc: "페이지 한 장 용량 중앙값, PC 2011~2026 6배, 모바일 9배." },
-  { href: "/archive/trends/design", title: "입체에서 플랫, 카드, 벤토까지", desc: "웹 디자인 흐름을 바꾼 날짜(Bootstrap, iOS 7, Material Design, CSS Grid)와 시대별 첫 화면, 실제 사례." },
-  { href: "/archive/trends/app", title: "한국은 안드로이드, 일본과 미국은 아이폰", desc: "휴대폰 OS 중 아이폰 비율, 한국 일본 미국 2012~2025. 앱 인수 시 계정, 서명 키, 스토어 요구." },
-  { href: "/archive/trends/php", title: "PHP 5에서 8까지, 유지보수가 바뀐 10년", desc: "PHP 사이트 중 버전 비율 2015~2026, 공식 지원 종료일, 서버 앞단 CDN의 확산." },
+export type TrendDoc = { href: string; title: string; desc: string };
+/** 디자인 트렌드: 새 기기(휴대폰, 태블릿, 큰 모니터)가 생길 때마다 화면 크기, 배치, 모양이 어떻게 바뀌었나. 문서마다 독립(번호, 연재 없음) */
+export const designDocs: TrendDoc[] = [
+  { href: "/archive/design/styles", title: "입체에서 플랫, 카드, 벤토까지", desc: "웹 디자인 흐름을 바꾼 날짜(Bootstrap, iOS 7, Material Design, CSS Grid)와 시대별 첫 화면, 실제 사례." },
+  { href: "/archive/design/mobile", title: "한국이 모바일 화면으로 먼저 넘어간 길", desc: "전체 접속 중 모바일 비율, 한국 일본 미국 2009~2025. m. 전용 사이트, PC 화면 그대로, 반응형으로 갈린 길." },
+  { href: "/archive/design/screen-size", title: "1024에서 1920으로, 모니터가 커진 만큼 바뀐 화면", desc: "PC 화면 해상도 비율, 한국 일본 미국 2009~2025. 고정 폭 980px이 사라진 이유." },
 ];
+/** 기술 트렌드: 브라우저, 보안, 언어, 도구, 무게처럼 화면 뒤에서 바뀐 것. 문서마다 독립 */
+export const techDocs: TrendDoc[] = [
+  { href: "/archive/tech/ie", title: "한국만 IE를 오래 못 떠난 이유", desc: "PC 브라우저 중 IE 비율, 한국 일본 미국 2009~2025. 공인인증서, ActiveX, 2020년 전자서명법 개정, 2022년 IE 지원 종료." },
+  { href: "/archive/tech/https", title: "주소창 자물쇠가 기본이 되기까지", desc: "크롬에서 https로 열린 페이지 비율, 일본 미국 2015~2026. 2018년 크롬 68 주의 요함 표시." },
+  { href: "/archive/tech/flash", title: "플래시가 사라진 자리", desc: "Flash, jQuery 사용 비율 2015~2025. 2020년 말 지원 종료, 2019년 국내 500대 사이트 28.4%가 플래시 사용." },
+  { href: "/archive/tech/cms", title: "한국은 카페24, 일본은 WordPress", desc: "한국어, 일본어, 영어 사이트의 만드는 도구 점유율 상위 3." },
+  { href: "/archive/tech/page-weight", title: "홈페이지는 얼마나 무거워졌나", desc: "페이지 한 장 용량 중앙값, PC 2011~2026 6배, 모바일 9배." },
+  { href: "/archive/tech/app", title: "한국은 안드로이드, 일본과 미국은 아이폰", desc: "휴대폰 OS 중 아이폰 비율, 한국 일본 미국 2012~2025. 앱 인수 시 계정, 서명 키, 스토어 요구." },
+  { href: "/archive/tech/php", title: "PHP 5에서 8까지, 유지보수가 바뀐 10년", desc: "PHP 사이트 중 버전 비율 2015~2026, 공식 지원 종료일, 서버 앞단 CDN의 확산." },
+];
+export const trendDocs: TrendDoc[] = [...designDocs, ...techDocs];
+
 
 /** 용어 묶음 주소 이름. 묶음 id(g01...)는 바꾸지 않고 주소만 읽기 쉽게 둔다 */
 export const termSlugs: Record<string, string> = {
@@ -262,7 +270,8 @@ export type ArchiveSection = { id: string; label: string; href: string; desc: st
 export const sections: ArchiveSection[] = [
   { id: "terms", label: "용어", href: "/archive/terms", desc: "화면 부품, 디자인 용어, 운영 용어를 그림과 요청 문장으로" },
   { id: "screens", label: "화면 예시", href: "/archive/screens", desc: "첫 화면, 회사 소개, 게시판, 예약, 결제처럼 페이지 종류별 와이어프레임" },
-  { id: "trends", label: "트렌드", href: "/archive/trends", desc: "한국, 일본, 미국의 홈페이지가 다르게 바뀐 과정을 차트와 와이어프레임으로" },
+  { id: "design", label: "디자인 트렌드", href: "/archive/design", desc: "새 기기가 생길 때마다 바뀐 화면 크기, 배치, 모양. 한국 일본 미국 비교" },
+  { id: "tech", label: "기술 트렌드", href: "/archive/tech", desc: "브라우저, 보안, 언어, 만드는 도구, 페이지 무게. 화면 뒤에서 바뀐 것" },
   { id: "data", label: "데이터", href: "/archive/data", desc: "트렌드에 쓴 숫자의 원본. 차트, 출처, 확인일, CSV" },
   { id: "notes", label: "운영 노트", href: "/archive/notes", desc: "인수, 운영, 보안, 비용을 실제 순서대로 정리한 글" },
   { id: "checklists", label: "점검표와 도구", href: "/archive/checklists", desc: "넘겨받은 날 기록표, 매달 점검표, 무료 도구" },
@@ -287,19 +296,21 @@ export function archiveTree(): { section: ArchiveSection; groups: { title: strin
     return { title: sec, items: cats.map((c) => ({ label: c, count: gs.filter((g) => g.cat === c).length, children: gs.filter((g) => g.cat === c).map((g) => ({ label: shortTitle(g), href: termHref(g) })) })) };
   });
   const seriesNames = [...new Set(insights.map((n) => n.series))];
-  const notes = [{ title: "묶음", items: seriesNames.map((s) => ({ label: s, href: `/archive/notes#${encodeURIComponent(s)}`, count: insights.filter((n) => n.series === s).length })) }];
+  const notes = [{ title: "주제", items: seriesNames.map((s) => ({ label: s, href: `/archive/notes#${encodeURIComponent(s)}`, count: insights.filter((n) => n.series === s).length })) }];
   const checks = [
     { title: "점검표와 기록표", items: jaryo.map((j) => ({ label: j.title, href: `/jaryo/${j.id}` })) },
     { title: "무료 도구", items: [{ label: "도구 전체", href: "/archive/checklists#tools", count: tools.length }] },
   ];
   const screens = [{ title: "페이지 종류", items: screenTypes.map((t) => ({ label: t.title, href: `/archive/screens#${t.id}` })) }];
-  const trends = [{ title: "같은 20년, 세 나라의 홈페이지", items: trendDocs.map((d, i) => ({ label: `${i + 1}. ${d.title}`, href: d.href })) }];
+  const design = [{ title: "문서", items: designDocs.map((d) => ({ label: d.title, href: d.href })) }];
+  const tech = [{ title: "문서", items: techDocs.map((d) => ({ label: d.title, href: d.href })) }];
   const data = [{ title: "자료", items: datasets.map((d) => ({ label: d.title, href: `/archive/data#${d.id}` })) }];
   const by = (id: string) => sections.find((s) => s.id === id)!;
   return [
     { section: by("terms"), groups: terms },
     { section: by("screens"), groups: screens },
-    { section: by("trends"), groups: trends },
+    { section: by("design"), groups: design },
+    { section: by("tech"), groups: tech },
     { section: by("data"), groups: data },
     { section: by("notes"), groups: notes },
     { section: by("checklists"), groups: checks },
@@ -308,12 +319,10 @@ export function archiveTree(): { section: ArchiveSection; groups: { title: strin
 
 /** 최근 쌓인 기록. 인사이트는 글 날짜에서 자동으로, 나머지는 더한 날 직접 적는다(지어내지 않기) */
 const manualLog: { date: string; kind: string; title: string; href: string }[] = [
-  { date: "2026-11-21", kind: "트렌드", title: "7~9장: 디자인 흐름, 앱(안드로이드와 아이폰), PHP 버전과 유지보수", href: "/archive/trends" },
   { date: "2026-11-21", kind: "데이터", title: "수요 조사: \"홈페이지 제작\" 검색 관심도 2004~2026", href: "/archive/data#search-demand" },
-  { date: "2026-11-21", kind: "트렌드", title: "3~6장: https, 플래시, 만드는 도구, 페이지 무게", href: "/archive/trends" },
-  { date: "2026-11-21", kind: "트렌드", title: "한국이 모바일로 먼저 넘어간 길, 한국 일본 미국 2009~2025", href: "/archive/trends/mobile" },
-  { date: "2026-11-21", kind: "트렌드", title: "한국만 IE를 오래 못 떠난 이유, 한국 일본 미국 2009~2025", href: "/archive/trends/korea-ie" },
-  { date: "2026-11-21", kind: "데이터", title: "브라우저, 모바일, https, Flash와 jQuery, 페이지 무게 차트 5개", href: "/archive/data" },
+  { date: "2026-11-21", kind: "디자인 트렌드", title: "입체에서 플랫, 카드, 벤토까지, 모바일 화면, 화면 크기", href: "/archive/design" },
+  { date: "2026-11-21", kind: "기술 트렌드", title: "브라우저, https, 플래시, 만드는 도구, 페이지 무게, 앱, PHP", href: "/archive/tech" },
+  { date: "2026-11-21", kind: "데이터", title: "데이터 차트: 브라우저, 모바일, 화면 크기, https, Flash와 jQuery, 페이지 무게, 앱 OS, PHP, 검색 관심도", href: "/archive/data" },
   { date: "2026-11-21", kind: "용어", title: "화면 부품, 디자인 용어 와이어프레임 225장", href: "/archive/terms" },
   { date: "2026-11-21", kind: "화면 예시", title: "페이지 종류별 와이어프레임 9가지", href: "/archive/screens" },
   { date: "2026-11-21", kind: "용어", title: "인수 시 확인 사항 47묶음 전체", href: "/archive/terms" },

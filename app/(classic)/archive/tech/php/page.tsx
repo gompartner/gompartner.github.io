@@ -4,7 +4,7 @@ import { TrendArticle } from "@/components/classic/archive/TrendArticle";
 import { phpVersions } from "@/data/classic/trendData";
 import { pageMeta } from "@/lib/seo";
 
-const HREF = "/archive/trends/php";
+const HREF = "/archive/tech/php";
 export const metadata: Metadata = pageMeta({
   title: "PHP 5에서 8까지, 유지보수가 바뀐 10년 | 아카이브",
   description: "PHP를 쓰는 사이트 중 PHP 5는 2015년 98.2%에서 2026년 9.3%로 줄었고 PHP 8은 54.8%가 됐습니다. 버전마다 공식 지원 종료일이 있어 유지보수가 '고칠 때 부르는 일'에서 '정해진 날짜에 맞춰 올리는 일'로 바뀌었습니다.",

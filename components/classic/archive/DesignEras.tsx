@@ -1,9 +1,9 @@
 // 7장: 시대별 첫 화면 모양을 같은 그림체로 다시 그린 것(11-21). 통계가 아니라 관찰.
-const g = "absolute rounded-[3px] bg-[#dfe3e9]";
-const g2 = "absolute rounded-[3px] bg-[#eceff3]";
+const g = "absolute rounded-[3px] bg-[#c3cbd6]";
+const g2 = "absolute rounded-[3px] bg-[#d8dde5]";
 
 function Screen({ children }: { children: React.ReactNode }) {
-  return <div className="relative h-[190px] overflow-hidden rounded-md border border-[#cfd5dd] bg-white">{children}</div>;
+  return <div className="relative h-[190px] overflow-hidden rounded-md border border-[#aeb7c4] bg-white">{children}</div>;
 }
 
 export function DesignEras() {
@@ -18,7 +18,7 @@ export function DesignEras() {
           <div className="absolute left-[12%] right-[12%] top-9 h-[86px] rounded-[4px]" style={{ background: "linear-gradient(#ffffff,#dfe5ee)" }} />
           <div className="absolute left-[38%] top-[52px] h-10 w-[24%] rounded-[4px] bg-[#b9c2ce] shadow-[0_8px_10px_rgba(0,0,0,0.25)]" />
           {[0, 1, 2, 3].map((i) => (
-            <div key={i} className="absolute top-[134px] h-12 rounded-[4px] border border-[#cfd5dd]" style={{ left: `${12 + i * 19.5}%`, width: "17.5%", background: "linear-gradient(#fff,#eef1f5)" }} />
+            <div key={i} className="absolute top-[134px] h-12 rounded-[4px] border border-[#aeb7c4]" style={{ left: `${12 + i * 19.5}%`, width: "17.5%", background: "linear-gradient(#fff,#dde2ea)" }} />
           ))}
         </Screen>
       ),
@@ -30,10 +30,10 @@ export function DesignEras() {
       screen: (
         <Screen>
           <div className={g} style={{ left: 8, top: 8, width: 50, height: 9 }} />
-          <div className="absolute left-0 right-0 top-6 h-[100px] bg-[#256ef4] opacity-25" />
+          <div className="absolute left-0 right-0 top-6 h-[100px] bg-[#256ef4] opacity-45" />
           <div className="absolute left-[30%] right-[30%] top-[52px] h-2.5 bg-white" />
           {[0, 1, 2, 3].map((i) => (
-            <div key={i} className="absolute top-[132px] h-[50px]" style={{ left: `${i * 25}%`, width: "24.5%", background: ["#cfe0ff", "#eceff3", "#dfe3e9", "#eef3fe"][i] }} />
+            <div key={i} className="absolute top-[132px] h-[50px]" style={{ left: `${i * 25}%`, width: "24.5%", background: ["#b7d0ff", "#d8dde5", "#c3cbd6", "#d6e4fd"][i] }} />
           ))}
         </Screen>
       ),
@@ -47,7 +47,7 @@ export function DesignEras() {
           <div className={g} style={{ left: 8, top: 8, width: 50, height: 9 }} />
           {[0, 1, 2, 3, 4, 5].map((i) => (
             <div key={i} className="absolute rounded-[6px] bg-white shadow-[0_2px_6px_rgba(15,27,61,0.16)]" style={{ left: `${4 + (i % 3) * 32}%`, width: "28%", top: 28 + Math.floor(i / 3) * 80, height: 70 }}>
-              <div className="h-7 rounded-t-[6px] bg-[#eef3fe]" />
+              <div className="h-7 rounded-t-[6px] bg-[#d6e4fd]" />
             </div>
           ))}
         </Screen>
@@ -60,10 +60,10 @@ export function DesignEras() {
       screen: (
         <Screen>
           <div className={g} style={{ left: 8, top: 8, width: 50, height: 9 }} />
-          <div className="absolute left-[4%] top-7 h-[150px] w-[44%] rounded-[10px] bg-[#cfe0ff]" />
-          <div className="absolute left-[50%] top-7 h-[70px] w-[46%] rounded-[10px] bg-[#eceff3]" />
-          <div className="absolute left-[50%] top-[107px] h-[70px] w-[22%] rounded-[10px] bg-[#dfe3e9]" />
-          <div className="absolute left-[74%] top-[107px] h-[70px] w-[22%] rounded-[10px] bg-[#eef3fe]" />
+          <div className="absolute left-[4%] top-7 h-[150px] w-[44%] rounded-[10px] bg-[#b7d0ff]" />
+          <div className="absolute left-[50%] top-7 h-[70px] w-[46%] rounded-[10px] bg-[#d8dde5]" />
+          <div className="absolute left-[50%] top-[107px] h-[70px] w-[22%] rounded-[10px] bg-[#c3cbd6]" />
+          <div className="absolute left-[74%] top-[107px] h-[70px] w-[22%] rounded-[10px] bg-[#d6e4fd]" />
           <span className={g2} style={{ left: "8%", top: 120, width: "30%", height: 8 }} />
         </Screen>
       ),

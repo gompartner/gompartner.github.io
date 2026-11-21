@@ -54,7 +54,7 @@ export default async function TermDoc({ params }: { params: Promise<{ slug: stri
     >
       <DocHead
         title={g.title}
-        meta={[["분류", `${g.sec}, ${g.cat}`], ["용어", `${g.terms.length}개`], ...(imgCount ? ([["와이어프레임", `${imgCount}장`]] as [string, string][]) : []), ["확인일", CHECKED]]}
+        meta={[["분류", `${g.sec}, ${g.cat}`], ["용어", `${g.terms.length}개`], ...(imgCount ? ([["와이어프레임", `${imgCount}장`]] as [string, string][]) : []), ["최종 수정일", CHECKED]]}
       />
 
       <h2 id="cmp" className={docH2}>한눈에 비교</h2>

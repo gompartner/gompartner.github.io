@@ -15,7 +15,7 @@ export const metadata: Metadata = pageMeta({
 export default function ArchiveData() {
   return (
     <ArchiveShell section="data" active="/archive/data" crumbs={[{ href: "/archive", label: "아카이브" }, { href: "/archive/data", label: "데이터" }]} toc={datasets.map((d) => ({ id: d.id, label: d.title }))}>
-      <DocHead title="데이터" meta={[["자료", `${datasets.length}개`], ["확인일", TREND_CHECKED]]} lead="트렌드 문서에 쓴 숫자의 원본입니다. 차트마다 출처와 확인일을 적고, 받을 수 있는 원본은 CSV로 둡니다." />
+      <DocHead title="데이터" meta={[["자료", `${datasets.length}개`], ["최종 수정일", TREND_CHECKED]]} lead="트렌드 문서에 쓴 숫자의 원본입니다. 차트마다 출처와 확인일을 적고, 받을 수 있는 원본은 CSV로 둡니다." />
       {datasets.map((d) => (
         <section key={d.id} aria-labelledby={d.id}>
           <h2 id={d.id} className={docH2}>{d.title}</h2>

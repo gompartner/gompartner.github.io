@@ -22,5 +22,7 @@ lines.push("/glossary /archive/terms 301");
 // 11-21 옛 목록 페이지(글, 도구 상세 주소는 그대로)
 lines.push("/insight /archive/notes 301");
 lines.push("/tools /archive/checklists 301");
+// 11-21 트렌드를 디자인, 기술 두 분류로 나눔(같은 날 공개한 옛 주소)
+for (const [from, to] of [["/archive/trends", "/archive/tech"], ["/archive/trends/korea-ie", "/archive/tech/ie"], ["/archive/trends/mobile", "/archive/design/mobile"], ["/archive/trends/design", "/archive/design/styles"], ...["https", "flash", "cms", "page-weight", "app", "php"].map((d) => [`/archive/trends/${d}`, `/archive/tech/${d}`])]) lines.push(`${from} ${to} 301`);
 writeFileSync(join(root, "_redirects"), lines.sort().join("\n") + "\n");
 console.log(`_redirects ${lines.length}줄`);

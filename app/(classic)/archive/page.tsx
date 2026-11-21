@@ -2,21 +2,22 @@ import type { Metadata } from "next";
 import Image from "next/image";
 import Link from "next/link";
 import { ArchiveShell, docH2 } from "@/components/classic/archive/ArchiveShell";
-import { counts, recentLog, screenTypes, sections, trendDocs } from "@/data/classic/archive";
+import { counts, designDocs, recentLog, screenTypes, sections, techDocs } from "@/data/classic/archive";
 import { datasets } from "@/data/classic/trendData";
 import { insights } from "@/data/classic/insights";
 import { pageMeta } from "@/lib/seo";
 
 export const metadata: Metadata = pageMeta({
   title: "아카이브",
-  description: "홈페이지를 만들고 인수해 운영하며 정리한 용어, 와이어프레임, 운영 노트, 점검표입니다. 항목마다 확인한 날짜와 인수 시 확인 사항을 함께 적습니다.",
+  description: "홈페이지를 만들고 인수해 운영하며 정리한 용어, 와이어프레임, 운영 노트, 점검표입니다. 항목마다 최종 수정일과 인수 시 확인 사항을 함께 적습니다.",
   path: "/archive",
 });
 
 const pics: Record<string, string> = {
   terms: "/images/glossary/t1.webp",
   screens: "/images/glossary/t218.webp",
-  trends: "/images/archive/trend-ie.png",
+  design: "/images/glossary/t187.webp",
+  tech: "/images/archive/trend-ie.png",
   data: "/images/archive/data-mobile.png",
   notes: insights[0]?.image.src ?? "/images/glossary/t186.webp",
   checklists: "/images/jaryo/gnuboard-handover-1.jpg",
@@ -24,9 +25,10 @@ const pics: Record<string, string> = {
 const amount: Record<string, string> = {
   terms: `${counts.groups}묶음 ${counts.terms}개`,
   screens: `페이지 종류 ${screenTypes.length}가지`,
-  trends: `${trendDocs.length}편, 웹 20년 비교`,
+  design: `문서 ${designDocs.length}개`,
+  tech: `문서 ${techDocs.length}개`,
   data: `차트 ${datasets.length}개, 원본 CSV`,
-  notes: `${counts.notes}편`,
+  notes: `글 ${counts.notes}개`,
   checklists: `점검표 ${counts.sheets}종, 도구 ${counts.tools}종`,
 };
 
@@ -37,7 +39,7 @@ export default function ArchiveHome() {
       <header className="border-b border-[#e6e9ee] pb-7">
         <h1 className="mt-4 text-[34px] font-[800] leading-[1.2] tracking-[-0.045em] md:text-[44px]">곰파트너 아카이브</h1>
         <p className="mt-4 max-w-[760px] text-[17px] leading-[1.7] text-[#2b313b] md:text-[18px]">
-          홈페이지를 만들고 인수해 운영하며 정리한 용어, 화면, 운영 기록입니다. 항목마다 확인한 날짜와 인수 시 확인 사항을 함께 적습니다.
+          홈페이지를 만들고 인수해 운영하며 정리한 용어, 화면, 운영 기록입니다. 항목마다 최종 수정일과 인수 시 확인 사항을 함께 적습니다.
         </p>
         <dl className="mt-6 flex flex-wrap gap-x-8 gap-y-3">
           {[

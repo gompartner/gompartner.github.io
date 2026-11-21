@@ -100,8 +100,38 @@ export const examplesDesign: Example[] = [
   { country: "2016", site: "네이버", date: "2016-05-28", url: "https://web.archive.org/web/20160528005834/http://www.naver.com/", seen: "가운데 고정 폭, 초록 검색창과 메뉴 띠, 언론사 로고 칸(뉴스스탠드), 글꼴 설정 버튼", alive: true, checked: "2026-11-21" },
 ];
 
+/** 디자인: PC 화면 해상도 중 1920x1080 비율(StatCounter, 연도별 해상도 표에서 뽑음) */
+export const fullHdShare: Series[] = [
+  { ...KR, points: [[2009, 1.5], [2010, 4.39], [2011, 8.67], [2012, 13.83], [2013, 34.17], [2014, 47.43], [2015, 53.58], [2016, 42.84], [2017, 41.97], [2018, 43.48], [2019, 42.74], [2020, 48.94], [2021, 50.73], [2022, 52.04], [2023, 50.12], [2024, 50.4], [2025, 44.49]] },
+  { ...JP, points: [[2009, 2.58], [2010, 6.42], [2011, 11.26], [2012, 15.28], [2013, 17.3], [2014, 20.68], [2015, 23.93], [2016, 26.9], [2017, 28.26], [2018, 26.42], [2019, 25.45], [2020, 25.4], [2021, 25.27], [2022, 28.28], [2023, 26.31], [2024, 27.11], [2025, 24.97]] },
+  { ...US, points: [[2009, 0.81], [2010, 2.51], [2011, 4.36], [2012, 6.41], [2013, 8.26], [2014, 11.55], [2015, 14.5], [2016, 17.21], [2017, 17.54], [2018, 19.67], [2019, 20.36], [2020, 20.04], [2021, 21.21], [2022, 22.31], [2023, 20.27], [2024, 23.14], [2025, 24.13]] },
+];
+/** 디자인: PC 화면 해상도 중 1024x768 비율 */
+export const xgaShare: Series[] = [
+  { ...KR, points: [[2009, 30.34], [2010, 24.09], [2011, 16.71], [2012, 11.28], [2013, 5.32], [2014, 2.92], [2015, 1.79], [2016, 1.79], [2017, 1.69], [2018, 1.26], [2019, 1.1], [2020, 0.88], [2021, 0.46], [2022, 1.51], [2023, 0.0], [2024, 1.68], [2025, 2.79]] },
+  { ...JP, points: [[2009, 26.49], [2010, 19.55], [2011, 13.13], [2012, 8.41], [2013, 5.81], [2014, 3.13], [2015, 2.73], [2016, 2.59], [2017, 1.7], [2018, 1.47], [2019, 1.78], [2020, 1.11], [2021, 0.74], [2022, 0.68], [2023, 0.0], [2024, 0.0], [2025, 0.0]] },
+  { ...US, points: [[2009, 28.15], [2010, 21.8], [2011, 17.44], [2012, 17.43], [2013, 18.32], [2014, 7.65], [2015, 6.66], [2016, 5.04], [2017, 3.86], [2018, 4.17], [2019, 4.04], [2020, 3.58], [2021, 1.63], [2022, 1.94], [2023, 1.39], [2024, 0.0], [2025, 0.0]] },
+];
+/** 디자인: 전체 접속 중 태블릿 비율 */
+export const tabletShare: Series[] = [
+  { ...KR, points: [[2009, 0], [2010, 0], [2011, 0], [2012, 1.05], [2013, 1.7], [2014, 1.19], [2015, 1.03], [2016, 1.36], [2017, 1.2], [2018, 0.95], [2019, 0.96], [2020, 0.71], [2021, 0.79], [2022, 0.94], [2023, 1], [2024, 0.9], [2025, 0.75]] },
+  { ...JP, points: [[2009, 0], [2010, 0], [2011, 0], [2012, 0.79], [2013, 3.23], [2014, 4.49], [2015, 4.76], [2016, 4.45], [2017, 4.6], [2018, 4.55], [2019, 4.4], [2020, 3.41], [2021, 3.1], [2022, 2.47], [2023, 2.43], [2024, 2.17], [2025, 2.29]] },
+  { ...US, points: [[2009, 0], [2010, 0], [2011, 0], [2012, 2.06], [2013, 6.52], [2014, 8.91], [2015, 8.88], [2016, 8.42], [2017, 8.77], [2018, 7.96], [2019, 7.06], [2020, 4.33], [2021, 3.55], [2022, 3.04], [2023, 2.05], [2024, 2.59], [2025, 2.34]] },
+];
+
 // 데이터 분류 목록(위 숫자를 다 정의한 뒤에 둔다)
 export const datasets: Dataset[] = [
+  {
+    id: "fullhd-share",
+    title: "PC 화면 해상도 중 1920x1080 비율, 한국 일본 미국",
+    unit: "%",
+    note: "방문 표본 기반, 해마다 해상도 표에서 1920x1080 값만 뽑음",
+    desc: "PC로 들어온 방문 중 화면 해상도가 1920x1080인 비율. 연간 값.",
+    series: fullHdShare,
+    source: { label: "StatCounter Global Stats, Desktop Screen Resolution", href: "https://gs.statcounter.com/screen-resolution-stats/desktop" },
+    csv: [{ label: "연도별 해상도 5종(JSON)", href: "/data/trend/desktop-resolution-yearly.json" }],
+    usedIn: [{ label: "1024에서 1920으로, 모니터가 커진 만큼 바뀐 화면", href: "/archive/design/screen-size" }],
+  },
   {
     id: "search-demand",
     title: "수요 조사: \"홈페이지 제작\" 검색 관심도(대한민국, 구글)",
@@ -121,7 +151,7 @@ export const datasets: Dataset[] = [
     series: phpVersions,
     source: { label: "W3Techs, PHP 버전 연도별 추이", href: "https://w3techs.com/technologies/history_details/pl-php/all/y" },
     csv: [],
-    usedIn: [{ label: "트렌드 9. PHP 5에서 8까지, 유지보수가 바뀐 10년", href: "/archive/trends/php" }],
+    usedIn: [{ label: "PHP 5에서 8까지, 유지보수가 바뀐 10년", href: "/archive/tech/php" }],
   },
   {
     id: "ios-share",
@@ -132,7 +162,7 @@ export const datasets: Dataset[] = [
     series: iosShare,
     source: { label: "StatCounter Global Stats, Mobile Operating System Market Share", href: "https://gs.statcounter.com/os-market-share/mobile" },
     csv: ["KR", "JP", "US"].map((c) => ({ label: `${c} 모바일 OS`, href: `/data/trend/mobile-os-${c}.csv` })),
-    usedIn: [{ label: "트렌드 8. 한국은 안드로이드, 일본과 미국은 아이폰", href: "/archive/trends/app" }],
+    usedIn: [{ label: "한국은 안드로이드, 일본과 미국은 아이폰", href: "/archive/tech/app" }],
   },
   {
     id: "https-share",
@@ -143,7 +173,7 @@ export const datasets: Dataset[] = [
     series: httpsShare,
     source: { label: "Google 투명성 보고서, HTTPS encryption on the web", href: "https://transparencyreport.google.com/https/overview" },
     csv: [{ label: "나라별 주간 값", href: "/data/trend/https-pageload-by-country.csv" }],
-    usedIn: [{ label: "트렌드 3. 주소창 자물쇠가 기본이 되기까지", href: "/archive/trends/https" }],
+    usedIn: [{ label: "주소창 자물쇠가 기본이 되기까지", href: "/archive/tech/https" }],
   },
   {
     id: "flash-jquery",
@@ -154,7 +184,7 @@ export const datasets: Dataset[] = [
     series: flashJquery,
     source: { label: "W3Techs, 연도별 기술 사용 추이", href: "https://w3techs.com/technologies/history_overview/javascript_library/all/y" },
     csv: [],
-    usedIn: [{ label: "트렌드 4. 플래시가 사라진 자리", href: "/archive/trends/flash" }],
+    usedIn: [{ label: "플래시가 사라진 자리", href: "/archive/tech/flash" }],
   },
   {
     id: "page-weight",
@@ -166,7 +196,7 @@ export const datasets: Dataset[] = [
     series: pageWeight,
     source: { label: "HTTP Archive, Page Weight", href: "https://httparchive.org/reports/page-weight" },
     csv: [{ label: "1월 중앙값", href: "/data/trend/httparchive-january-medians.csv" }],
-    usedIn: [{ label: "트렌드 6. 홈페이지는 얼마나 무거워졌나", href: "/archive/trends/page-weight" }],
+    usedIn: [{ label: "홈페이지는 얼마나 무거워졌나", href: "/archive/tech/page-weight" }],
   },
   {
     id: "ie-share",
@@ -177,7 +207,7 @@ export const datasets: Dataset[] = [
     series: ieShare,
     source: { label: "StatCounter Global Stats, Desktop Browser Market Share", href: "https://gs.statcounter.com/browser-market-share/desktop" },
     csv: ["KR", "JP", "US"].map((c) => ({ label: `${c} 브라우저 전체`, href: `/data/trend/desktop-browser-${c}.csv` })),
-    usedIn: [{ label: "트렌드 1. 한국만 IE를 오래 못 떠난 이유", href: "/archive/trends/korea-ie" }],
+    usedIn: [{ label: "한국만 IE를 오래 못 떠난 이유", href: "/archive/tech/ie" }],
   },
   {
     id: "mobile-share",
@@ -188,6 +218,6 @@ export const datasets: Dataset[] = [
     series: mobileShare,
     source: { label: "StatCounter Global Stats, Desktop vs Mobile vs Tablet Market Share", href: "https://gs.statcounter.com/platform-market-share/desktop-mobile-tablet" },
     csv: ["KR", "JP", "US"].map((c) => ({ label: `${c} 기기별`, href: `/data/trend/platform-${c}.csv` })),
-    usedIn: [{ label: "트렌드 2. 한국이 모바일로 먼저 넘어간 길", href: "/archive/trends/mobile" }],
+    usedIn: [{ label: "한국이 모바일로 먼저 넘어간 길", href: "/archive/design/mobile" }],
   },
 ];

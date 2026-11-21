@@ -1,8 +1,12 @@
 import { ArchiveShell, DocHead, TakeoverBox, docH2 } from "@/components/classic/archive/ArchiveShell";
 import { TrendNav } from "@/components/classic/archive/TrendNav";
+import { designDocs } from "@/data/classic/archive";
 import { TREND_CHECKED } from "@/data/classic/trendData";
+import { LdScript } from "@/components/seo/JsonLd";
+import { ORG_ID } from "@/lib/seo";
+import { siteUrl } from "@/lib/site";
 
-// 트렌드 문서 공용 틀(11-21): 제목, 차트, 이야기, (그림), 인수 시 확인 사항, 출처, 이전 다음.
+// 트렌드 문서 공용 틀(11-21): 제목, 차트, 이야기, (그림), 인수 시 확인 사항, 출처, 같은 분류의 다른 문서. 번호와 연재 없음.
 export type Src = { label: string; href: string; note?: string };
 const a = "underline underline-offset-2 hover:text-[#256ef4]";
 
@@ -22,6 +26,7 @@ export function TrendArticle(props: {
   take: { b: string; t: string }[];
   sources: Src[];
 }) {
+  const sec = designDocs.some((d) => d.href === props.href) ? { id: "design", href: "/archive/design", label: "디자인 트렌드" } : { id: "tech", href: "/archive/tech", label: "기술 트렌드" };
   const toc = [
     { id: "chart", label: props.chartTitle },
     { id: "why", label: props.storyTitle },
@@ -30,8 +35,10 @@ export function TrendArticle(props: {
     { id: "src", label: "출처" },
   ];
   return (
-    <ArchiveShell section="trends" active={props.href} crumbs={[{ href: "/archive", label: "아카이브" }, { href: "/archive/trends", label: "트렌드" }, { href: props.href, label: props.crumb }]} toc={toc}>
-      <DocHead title={props.title} meta={[...props.meta, ["확인일", TREND_CHECKED]]} lead={props.lead} />
+    <ArchiveShell section={sec.id} active={props.href} crumbs={[{ href: "/archive", label: "아카이브" }, { href: sec.href, label: sec.label }, { href: props.href, label: props.crumb }]} toc={toc}>
+      {/* 최종 수정일을 검색엔진에도 알린다 */}
+      <LdScript data={{ "@context": "https://schema.org", "@type": "Article", headline: props.title, description: props.lead, datePublished: "2026-11-21", dateModified: TREND_CHECKED, author: { "@id": ORG_ID }, publisher: { "@id": ORG_ID }, mainEntityOfPage: `${siteUrl}${props.href}`, inLanguage: "ko" }} />
+      <DocHead title={props.title} meta={[...props.meta, ["최종 수정일", TREND_CHECKED]]} lead={props.lead} />
       <h2 id="chart" className={docH2}>{props.chartTitle}</h2>
       {props.chart}
       <h2 id="why" className={docH2}>{props.storyTitle}</h2>

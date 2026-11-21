@@ -5,7 +5,7 @@ import { ExampleCard } from "@/components/classic/archive/ExampleCard";
 import { examplesDesign } from "@/data/classic/trendData";
 import { pageMeta } from "@/lib/seo";
 
-const HREF = "/archive/trends/design";
+const HREF = "/archive/design/styles";
 export const metadata: Metadata = pageMeta({
   title: "입체에서 플랫, 카드, 벤토까지, 웹 디자인 흐름 | 아카이브",
   description: "2011년 Bootstrap, 2013년 iOS 7, 2014년 Material Design, 2017년 CSS Grid. 웹 디자인이 광택과 입체에서 플랫, 카드, 크기가 다른 칸으로 바뀐 흐름을 날짜와 실제 사례로 정리했습니다.",

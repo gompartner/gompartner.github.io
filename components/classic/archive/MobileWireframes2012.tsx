@@ -2,10 +2,10 @@ import type { Example } from "@/data/classic/trendData";
 import { ExampleCard } from "@/components/classic/archive/ExampleCard";
 
 // 2장: 2012년 무렵 같은 회사 사이트를 휴대폰으로 열면(11-21). 곰파트너가 다시 그린 관찰 그림, 실제 사례는 보관본.
-const g = "absolute rounded-[3px] bg-[#dfe3e9]";
-const g2 = "absolute rounded-[3px] bg-[#eceff3]";
+const g = "absolute rounded-[3px] bg-[#c3cbd6]";
+const g2 = "absolute rounded-[3px] bg-[#d8dde5]";
 const bl = "absolute rounded-[3px] bg-[#256ef4]";
-const tag = "absolute rounded-[3px] border border-[#cfd5dd] bg-white px-1 text-[9px] leading-[14px] text-[#5b6370]";
+const tag = "absolute rounded-[3px] border border-[#aeb7c4] bg-white px-1 text-[9px] leading-[14px] text-[#5b6370]";
 
 function Phone({ children, bar }: { children: React.ReactNode; bar: string }) {
   return (
@@ -26,7 +26,7 @@ export function MobileWireframes2012({ examples = [] }: { examples?: Example[] }
         <Phone bar="m.회사.co.kr">
           <div className={g} style={{ left: 8, top: 8, width: 50, height: 10 }} />
           <div className={g2} style={{ left: 8, right: 8, top: 26, height: 20 }} />
-          <div className={bl} style={{ left: 8, right: 8, top: 54, height: 60, opacity: 0.25 }} />
+          <div className={bl} style={{ left: 8, right: 8, top: 54, height: 60, opacity: 0.45 }} />
           {Array.from({ length: 7 }, (_, i) => (
             <div key={i} className={g2} style={{ left: 8, right: i % 2 ? 30 : 8, top: 124 + i * 18, height: 9 }} />
           ))}
@@ -43,7 +43,7 @@ export function MobileWireframes2012({ examples = [] }: { examples?: Example[] }
           <div style={{ position: "absolute", left: 0, top: 0, width: 300, height: 270, transform: "scale(0.62)", transformOrigin: "top left" }}>
             <div className={g} style={{ left: 8, top: 8, width: 70, height: 12 }} />
             <div className={g2} style={{ left: 8, top: 28, width: 70, height: 380 }} />
-            <div className={bl} style={{ left: 86, top: 28, width: 200, height: 60, opacity: 0.25 }} />
+            <div className={bl} style={{ left: 86, top: 28, width: 200, height: 60, opacity: 0.45 }} />
             {Array.from({ length: 18 }, (_, i) => (
               <div key={i} className={g2} style={{ left: 86, top: 98 + i * 14, width: i % 3 ? 200 : 150, height: 7 }} />
             ))}
@@ -60,7 +60,7 @@ export function MobileWireframes2012({ examples = [] }: { examples?: Example[] }
         <Phone bar="www.company.com">
           <div className={g} style={{ left: 8, top: 8, width: 50, height: 10 }} />
           <div className={g} style={{ right: 8, top: 8, width: 16, height: 10 }} />
-          <div className={bl} style={{ left: 0, right: 0, top: 26, height: 90, opacity: 0.25 }} />
+          <div className={bl} style={{ left: 0, right: 0, top: 26, height: 90, opacity: 0.45 }} />
           <div className={g} style={{ left: 8, top: 126, width: 120, height: 12 }} />
           <div className={g2} style={{ left: 8, right: 8, top: 146, height: 8 }} />
           <div className={g2} style={{ left: 8, right: 30, top: 160, height: 8 }} />

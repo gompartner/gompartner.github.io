@@ -2,7 +2,7 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import { PageHead, btnLine, btnPrimary, wrap } from "@/components/classic/ui";
-import { insightBySlug, insights, scheduledNext, readMinutes } from "@/data/classic/insights";
+import { insightBySlug, insights, readMinutes } from "@/data/classic/insights";
 import { LdScript } from "@/components/seo/JsonLd";
 import { ORG_ID, breadcrumbLd, pageMeta } from "@/lib/seo";
 import { siteUrl } from "@/lib/site";
@@ -27,16 +27,11 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
 }
 
 // 인사이트 글. 본문 폭은 읽기 좋게 760px로 좁히고, xl부터 오른쪽 빈자리에 따라오는 목차를 둔다.
-// 대표 이미지(scripts/insight-cards.mjs로 만든 제목 카드)는 공유 미리보기, 디스커버, 구조화 데이터에만 쓰고 본문에는 넣지 않는다. 끝에 다음 편 예고와 맞는 유지보수 메뉴 한 줄.
+// 대표 이미지(scripts/insight-cards.mjs로 만든 제목 카드)는 공유 미리보기, 디스커버, 구조화 데이터에만 쓰고 본문에는 넣지 않는다. 끝에 맞는 유지보수 메뉴 한 줄. 11-21부터 글마다 독립(편 번호, 다음 편 없음).
 export default async function ClassicInsightDetailPage({ params }: Props) {
   const { slug } = await params;
   const n = insightBySlug(slug);
   if (!n) notFound();
-  const same = insights
-    .filter((x) => x.series === n.series)
-    .sort((a, b) => a.no - b.no);
-  const nextOne = same.find((x) => x.no === n.no + 1);
-  const soon = nextOne ? null : scheduledNext(n.series, n.no + 1);
   const toc = n.blocks
     .map((b, bi) => ({ h: b.h, id: `s${bi}` }))
     .filter((t): t is { h: string; id: string } => !!t.h);
@@ -77,7 +72,7 @@ export default async function ClassicInsightDetailPage({ params }: Props) {
           <div className="min-w-0">
             <header className="flex flex-wrap items-center gap-x-3 gap-y-1 border-y-2 border-[#15171c] border-b-[#e6e9ee] py-4 text-[15px] md:border-b">
               <span className="font-bold text-[#256ef4]">
-                {n.series} {n.no}편
+                {n.series}
               </span>
               {/* 11-12 사용자: 인사이트에 날짜 넣기 */}
               <time dateTime={n.date} className="tabular-nums text-[#5b6370]">{n.date.replaceAll("-", ".")}</time>
@@ -223,28 +218,7 @@ export default async function ClassicInsightDetailPage({ params }: Props) {
                 </section>
               ))}
             </div>
-            {n.next && (
-              <aside className="border-t border-[#e6e9ee] py-8">
-                <h2 className="text-[15px] font-bold text-[#6b7280]">
-                  다음 편
-                </h2>
-                {nextOne ? (
-                  <Link
-                    href={`/insight/${nextOne.slug}`}
-                    className="mt-2 block text-[18px] font-[800] hover:text-[#256ef4] hover:underline"
-                  >
-                    {nextOne.title}
-                  </Link>
-                ) : soon ? (
-                  <p className="mt-2 text-[15px] font-bold text-[#256ef4]">
-                    {Number(soon.slice(5, 7))}월 {Number(soon.slice(8, 10))}일 공개
-                  </p>
-                ) : null}
-                <p className="mt-2 text-[16px] leading-[1.7] text-[#3d4450]">
-                  {n.next}
-                </p>
-              </aside>
-            )}
+            {/* 11-21 사용자: 시리즈 금지, 글마다 독립. 다음 편 예고 상자 뺌 */}
             <div className="flex flex-wrap justify-center gap-3 border-t border-[#e6e9ee] pt-8">
               <Link href={n.service.href} className={btnPrimary}>
                 {n.service.label}

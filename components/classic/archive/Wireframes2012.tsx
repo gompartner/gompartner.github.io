@@ -4,13 +4,13 @@
 import type { Example } from "@/data/classic/trendData";
 import { ExampleCard } from "@/components/classic/archive/ExampleCard";
 
-const g = "absolute rounded-[3px] bg-[#dfe3e9]";
-const g2 = "absolute rounded-[3px] bg-[#eceff3]";
+const g = "absolute rounded-[3px] bg-[#c3cbd6]";
+const g2 = "absolute rounded-[3px] bg-[#d8dde5]";
 const bl = "absolute rounded-[3px] bg-[#256ef4]";
-const tag = "absolute rounded-[3px] border border-[#cfd5dd] bg-white px-1 text-[9px] leading-[14px] text-[#5b6370]";
+const tag = "absolute rounded-[3px] border border-[#aeb7c4] bg-white px-1 text-[9px] leading-[14px] text-[#5b6370]";
 
 function Screen({ children }: { children: React.ReactNode }) {
-  return <div className="relative h-[280px] overflow-hidden rounded-md border border-[#cfd5dd] bg-white">{children}</div>;
+  return <div className="relative h-[280px] overflow-hidden rounded-md border border-[#aeb7c4] bg-white">{children}</div>;
 }
 
 export function Wireframes2012({ examples = [] }: { examples?: Example[] }) {
@@ -22,7 +22,7 @@ export function Wireframes2012({ examples = [] }: { examples?: Example[] }) {
         <Screen>
           <div className={g} style={{ left: 8, top: 8, width: 60, height: 12 }} />
           <div className={g2} style={{ right: 12, top: 10, width: 100, height: 8 }} />
-          <div className={bl} style={{ left: 8, right: 40, top: 28, height: 92, opacity: 0.25 }} />
+          <div className={bl} style={{ left: 8, right: 40, top: 28, height: 92, opacity: 0.45 }} />
           <span className={tag} style={{ left: 14, top: 34 }}>배너</span>
           <div className={g2} style={{ left: 8, top: 128, width: "42%", height: 70 }} />
           <div className={g2} style={{ left: "48%", right: 40, top: 128, height: 70 }} />
@@ -47,7 +47,7 @@ export function Wireframes2012({ examples = [] }: { examples?: Example[] }) {
           <div className={g} style={{ left: 8, top: 8, width: 60, height: 12 }} />
           <div className={g2} style={{ left: 8, top: 28, width: 66, bottom: 8 }} />
           <span className={tag} style={{ left: 12, top: 32 }}>왼쪽 메뉴</span>
-          <div className={bl} style={{ left: 82, right: 8, top: 28, height: 50, opacity: 0.25 }} />
+          <div className={bl} style={{ left: 82, right: 8, top: 28, height: 50, opacity: 0.45 }} />
           {Array.from({ length: 12 }, (_, i) => (
             <div key={i} className={g2} style={{ left: 82, right: i % 3 ? 8 : 50, top: 92 + i * 14, height: 7 }} />
           ))}
@@ -62,7 +62,7 @@ export function Wireframes2012({ examples = [] }: { examples?: Example[] }) {
         <Screen>
           <div className={g} style={{ left: 8, top: 8, width: 60, height: 12 }} />
           <div className={g2} style={{ right: 10, top: 10, width: 90, height: 8 }} />
-          <div className={bl} style={{ left: 0, right: 0, top: 28, height: 118, opacity: 0.25 }} />
+          <div className={bl} style={{ left: 0, right: 0, top: 28, height: 118, opacity: 0.45 }} />
           <span className={tag} style={{ left: 24, top: 36 }}>큰 사진 한 장</span>
           <div className={g} style={{ left: 24, top: 62, width: "55%", height: 14 }} />
           <div className={bl} style={{ left: 24, top: 90, width: 70, height: 18 }} />
