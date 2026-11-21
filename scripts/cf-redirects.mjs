@@ -19,5 +19,8 @@ walk(root, "");
 lines.push("/jaryo /archive/checklists 301");
 // 11-21 웹 용어 사전을 아카이브 용어로 합침(#용어 는 브라우저가 그대로 붙여 가고, 용어 첫 화면이 그 문서로 넘긴다)
 lines.push("/glossary /archive/terms 301");
+// 11-21 옛 목록 페이지(글, 도구 상세 주소는 그대로)
+lines.push("/insight /archive/notes 301");
+lines.push("/tools /archive/checklists 301");
 writeFileSync(join(root, "_redirects"), lines.sort().join("\n") + "\n");
 console.log(`_redirects ${lines.length}줄`);
