@@ -21,6 +21,9 @@ concurrency:
 jobs:
   build:
     runs-on: ubuntu-latest
+    env:
+      # Cloudflare 배포 토큰이 저장소 시크릿에 있을 때만 Cloudflare에도 올린다.
+      CF_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
     steps:
       - uses: actions/checkout@v7
       - uses: actions/setup-node@v6
@@ -38,6 +41,14 @@ jobs:
             sleep 30
           done
           exit 1
+      # Cloudflare는 끝 슬래시 넘김을 307로 해서 301 목록을 만든다.
+      - run: node scripts/cf-redirects.mjs
+      - name: Cloudflare에 올리기
+        if: env.CF_TOKEN != ''
+        env:
+          CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+          CLOUDFLARE_ACCOUNT_ID: 8e8272b5762622403950279a4424e693
+        run: npx -y wrangler@4.166.0 deploy
       - uses: actions/upload-pages-artifact@v5
         with:
           path: out

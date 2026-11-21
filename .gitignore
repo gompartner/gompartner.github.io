@@ -50,3 +50,6 @@ CLAUDE.md
 
 # 구글 폰트 원본(서브셋 재생성용)
 /.font-src/
+
+# Cloudflare 배포 도구 임시 파일
+.wrangler/
