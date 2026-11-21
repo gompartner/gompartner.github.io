@@ -3,7 +3,7 @@
 import { createContext, useContext, useEffect, useRef, useState, type FormEvent } from "react";
 import Image from "next/image";
 import { AnimatePresence, motion } from "framer-motion";
-import { Check, ChevronDown, ChevronRight, CircleAlert, FileUp, House, Menu, RotateCcw, Trash2, X } from "lucide-react";
+import { ArrowRight, Check, ChevronDown, ChevronRight, CircleAlert, FileUp, House, Menu, RotateCcw, Trash2, X } from "lucide-react";
 import { useReducedMotionSafe } from "@/hooks/useReducedMotionSafe";
 import { daysAgo, fmtDash, fmtKo, useDemoToday } from "@/hooks/useDemoToday";
 import { DemoMakerInfo } from "@/components/demos/DemoMakerInfo";
@@ -358,8 +358,7 @@ export function CompanyDemo() {
   return (
     <CoCtx.Provider value={ctx}>
       <div lang={lang} className="min-h-screen text-[16px] leading-[1.7] md:text-[17px]" style={{ background: C.white, color: C.ink }}>
-        <TopBar onLang={setLang} />
-        <Header />
+        <Header onLang={setLang} />
         <main key={key} className="soft-in">{route.m === "home" ? <Home /> : <SubPage m={route.m} s={route.s} />}</main>
         <Footer />
       </div>
@@ -380,60 +379,20 @@ function Logo() {
   );
 }
 
-function TopBar({ onLang }: { onLang: (v: Lang) => void }) {
-  const { lang, x } = useCo();
-  return (
-    <div className="px-4 md:px-6" style={{ background: C.steel, color: "#c9ced6" }}>
-      <div className="mx-auto flex h-10 max-w-[1200px] items-center justify-between gap-3 text-[13px]">
-        <p className="min-w-0 truncate tabular-nums">
-          <span className="sm:hidden">
-            {x("전화", "Tel")} {TEL}
-          </span>
-          <span className="hidden sm:inline">
-            {x("대표전화", "Tel")} {TEL}
-            <span className="mx-2 opacity-40" aria-hidden>
-              |
-            </span>
-            {x("팩스", "Fax")} {FAX}
-          </span>
-        </p>
-        <div id="co-lang" role="group" aria-label={x("언어 선택", "Language")} className="flex shrink-0 items-center">
-          {(
-            [
-              ["ko", "KOR"],
-              ["en", "ENG"],
-            ] as const
-          ).map(([v, label], i) => (
-            <span key={v} className="flex items-center">
-              {i > 0 && (
-                <span className="opacity-40" aria-hidden>
-                  |
-                </span>
-              )}
-              <button
-                type="button"
-                lang={v}
-                aria-pressed={lang === v}
-                aria-label={v === "ko" ? "한국어" : "English"}
-                onClick={() => onLang(v)}
-                className="inline-flex h-10 items-center px-2.5 font-bold tracking-[0.04em]"
-                style={{ color: lang === v ? C.orange : "#c9ced6" }}
-              >
-                {label}
-              </button>
-            </span>
-          ))}
-        </div>
-      </div>
-    </div>
-  );
-}
-
-function Header() {
-  const { x, s, go, route } = useCo();
+function Header({ onLang }: { onLang: (v: Lang) => void }) {
+  const { x, s, go, route, lang } = useCo();
   const [mega, setMega] = useState(false);
   const [open, setOpen] = useState(false);
+  const [scrolled, setScrolled] = useState(false);
   const reduce = useReducedMotionSafe();
+  useEffect(() => {
+    const f = () => setScrolled(window.scrollY > 40);
+    f();
+    window.addEventListener("scroll", f, { passive: true });
+    return () => window.removeEventListener("scroll", f);
+  }, []);
+  // 첫 화면 맨 위에서는 큰 사진 위에 투명하게 얹고, 내리거나 메뉴를 열면 흰 바탕
+  const over = route.m === "home" && !scrolled && !mega && !open;
 
   useEffect(() => {
     if (!mega && !open) return;
@@ -463,7 +422,7 @@ function Header() {
   };
 
   return (
-    <header className="sticky top-0 z-40 border-b bg-white" style={{ borderColor: C.line }} onMouseLeave={() => setMega(false)}>
+    <header className="sticky top-0 z-40 border-b transition-colors duration-300" style={{ background: over ? "transparent" : C.white, borderColor: over ? "rgba(255,255,255,0.18)" : C.line, color: over ? C.white : C.ink }} onMouseLeave={() => setMega(false)}>
       <div className="mx-auto flex h-[72px] max-w-[1200px] items-center justify-between gap-3 px-4 md:px-6">
         <button type="button" onClick={() => go("home")} aria-label={`${s(COMPANY)} ${x("처음으로", "home")}`} className="flex min-w-0">
           <Logo />
@@ -488,7 +447,7 @@ function Header() {
                     onClick={() => pick(m.id)}
                     aria-current={on ? "true" : undefined}
                     className="relative flex h-full w-full items-center justify-center text-[17px] font-bold"
-                    style={{ color: on ? C.orangeText : C.ink }}
+                    style={{ color: on ? (over ? C.orange : C.orangeText) : over ? C.white : C.ink }}
                   >
                     {s(m.label)}
                     {on && <span className="absolute inset-x-6 bottom-0 h-[3px]" style={{ background: C.orange }} aria-hidden />}
@@ -524,6 +483,27 @@ function Header() {
         </nav>
 
         <div className="flex shrink-0 items-center gap-2">
+          <div id="co-lang" role="group" aria-label={x("언어 선택", "Language")} className="hidden items-center text-[13px] sm:flex">
+            {(
+              [
+                ["ko", "KOR"],
+                ["en", "ENG"],
+              ] as const
+            ).map(([v, label]) => (
+              <button
+                key={v}
+                type="button"
+                lang={v}
+                aria-pressed={lang === v}
+                aria-label={v === "ko" ? "한국어" : "English"}
+                onClick={() => onLang(v)}
+                className="inline-flex h-11 items-center px-2 font-bold tracking-[0.04em]"
+                style={{ color: lang === v ? (over ? C.white : C.ink) : over ? "rgba(255,255,255,0.55)" : C.muted }}
+              >
+                {label}
+              </button>
+            ))}
+          </div>
           <button type="button" onClick={() => pick("support", "quote")} className="hidden h-11 items-center rounded-[4px] px-4 text-[15px] font-bold md:inline-flex" style={{ background: C.orange, color: C.steel }}>
             {x("견적문의", "Request a Quote")}
           </button>
@@ -595,134 +575,151 @@ function Home() {
   const notices = makeNotices(useDemoToday());
 
   const specs = [
-    { k: x("최소 공차", "Tightest tolerance"), v: "+-0.01", u: "mm" },
-    { k: x("최대 가공 크기", "Max. part size"), v: "1,300x650x600", u: "mm" },
+    { k: x("최소 공차", "Tightest tolerance"), v: "0.01", u: "mm" },
+    { k: x("최대 가공 길이", "Max. part length"), v: "1,300", u: "mm" },
     { k: x("선반 최대 지름", "Max. turning dia."), v: "300", u: "mm" },
+    { k: x("보유 가공기", "Machines"), v: "22", u: x("대", "units") },
   ];
 
-  const links = [
-    { t: x("기계설비", "Machining Equipment"), to: () => go("equipment", "machines") },
-    { t: x("측정설비", "Measuring Equipment"), to: () => go("equipment", "measuring") },
-    { t: x("가공 사양", "Machining Specs"), to: () => go("equipment", "spec") },
-    { t: x("인증현황", "Certifications"), to: () => go("about", "certs") },
-    { t: x("오시는 길", "Location"), to: () => go("about", "location") },
+  const fields = [
+    {
+      img: `${IMG}/lathe.jpg`,
+      alt: x("척에 물린 소재를 가공하는 CNC 선반", "CNC lathe turning a part held in the chuck"),
+      en: "CNC TURNING",
+      t: x("CNC 선반 가공", "CNC Turning"),
+      d: x("지름 300mm까지 축, 플랜지, 슬리브 부품을 가공합니다. 복합 선반으로 밀링 공정까지 한 번에 끝내 공정 수와 납기를 줄입니다.", "Shafts, flanges and sleeves up to 300mm in diameter. Turn-mill machines finish milling in the same setup."),
+      to: () => go("business", "lathe"),
+    },
+    {
+      img: `${IMG}/mill.jpg`,
+      alt: x("금속 블록을 절삭하는 머시닝센터 공구", "Machining center tool cutting a metal block"),
+      en: "MCT / 5-AXIS",
+      t: x("MCT, 5축 가공", "MCT and 5-Axis"),
+      d: x("길이 1,300mm 대형 부품부터 동시 5축 복잡 형상까지 가공합니다. 반도체 장비 프레임과 의료기기 하우징이 주력입니다.", "From 1,300mm frames to complex simultaneous 5-axis shapes. Main work is semiconductor frames and medical housings."),
+      to: () => go("business", "fiveAx"),
+    },
+    {
+      img: `${IMG}/parts.jpg`,
+      alt: x("가공을 마친 알루미늄과 스테인리스 정밀 부품", "Finished aluminum and stainless steel precision parts"),
+      en: "QUALITY",
+      t: x("측정과 품질 관리", "Measurement and Quality"),
+      d: x("측정기는 매년 공인 교정기관에서 교정하고, 측정 성적서는 요청하시면 제품과 함께 보내 드립니다. 시제품 1개도 같은 기준으로 검사합니다.", "Instruments are calibrated yearly by an accredited lab. Inspection reports ship with the parts on request, prototypes included."),
+      to: () => go("equipment", "measuring"),
+    },
   ];
 
   const featured = (["semi", "medical", "battery", "robot"] as const).map((c) => PRODUCTS.find((p) => p.cat === c)!);
 
   return (
     <>
-      <section aria-labelledby="co-page-title" className="relative overflow-hidden" style={{ background: C.steel, color: C.white }}>
-        <Image src={`${IMG}/hero.jpg`} alt="정밀가공 공장 내부" fill priority sizes="100vw" className="object-cover" />
-        <div className="absolute inset-0" style={{ background: "linear-gradient(90deg, rgba(20,24,29,0.9) 0%, rgba(20,24,29,0.72) 55%, rgba(20,24,29,0.45) 100%)" }} aria-hidden />
-        <div className="relative mx-auto max-w-[1200px] px-4 pb-14 pt-14 md:px-6 md:pb-20 md:pt-24">
-          <h1 id="co-page-title" tabIndex={-1} className="text-[34px] font-bold leading-[1.25] tracking-[-0.03em] outline-none md:text-[52px]">
-            {x("반도체, 의료기기 정밀부품 가공", "Precision parts for semiconductor and medical equipment")}
+      <section aria-labelledby="co-page-title" className="relative -mt-[72px] flex min-h-[640px] items-end overflow-hidden md:h-[100svh]" style={{ background: C.steel, color: C.white }}>
+        <Image src={`${IMG}/hero-drill.jpg`} alt={x("절삭유를 뿌리며 금속을 가공하는 드릴", "Drill machining metal with coolant")} fill priority sizes="100vw" className="object-cover" />
+        <div className="absolute inset-0" style={{ background: "linear-gradient(180deg, rgba(20,24,29,0.55) 0%, rgba(20,24,29,0.1) 35%, rgba(20,24,29,0.85) 100%)" }} aria-hidden />
+        <div className="relative mx-auto w-full max-w-[1200px] px-4 pb-16 pt-40 md:px-6 md:pb-24">
+          <p className="text-[13px] font-bold tracking-[0.18em] md:text-[15px]" style={{ color: C.orange }}>
+            CNC TURNING / MCT / 5-AXIS
+          </p>
+          <h1 id="co-page-title" tabIndex={-1} className="mt-4 text-[38px] font-bold leading-[1.2] tracking-[-0.035em] outline-none md:text-[68px]">
+            {x("0.01mm까지,", "To 0.01mm,")}
+            <br />
+            {x("도면 그대로 만듭니다", "exactly as drawn")}
           </h1>
-          <p className="mt-3 text-[18px] font-bold md:text-[22px]" style={{ color: C.orange }}>
-            {x("CNC 선반, MCT, 5축 정밀부품 가공", "CNC turning, MCT and 5-axis precision parts")}
+          <p className="mt-5 max-w-[560px] text-[16px] md:text-[19px]" style={{ color: "#d4d8de" }}>
+            {x("반도체 장비, 의료기기, 2차전지 설비 부품을 시제품 1개부터 양산까지 가공합니다.", "Parts for semiconductor equipment, medical devices and battery lines, from one prototype to volume production.")}
           </p>
-          <p className="mt-4 max-w-[560px] text-[16px] md:text-[18px]" style={{ color: "#d4d8de" }}>
-            {x("반도체 장비, 의료기기, 2차전지 설비 부품 정밀가공. 시제품 1개부터 양산까지 가능합니다.", "Parts for semiconductor equipment, medical devices and battery lines. Single prototypes welcome.")}
-          </p>
-          <div className="mt-8 flex flex-wrap gap-3">
-            <button type="button" onClick={() => go("equipment", "machines")} className="inline-flex h-12 items-center rounded-[4px] px-6 font-bold" style={{ background: C.orange, color: C.steel }}>
-              {x("설비현황 보기", "View Facilities")}
+          <div className="mt-9 flex flex-wrap gap-3">
+            <button type="button" onClick={() => go("support", "quote")} className="inline-flex h-[52px] items-center gap-2 rounded-[4px] px-7 font-bold" style={{ background: C.orange, color: C.steel }}>
+              {x("도면으로 견적받기", "Quote from Drawing")}
+              <ArrowRight size={18} aria-hidden />
             </button>
-            <button type="button" onClick={() => go("support", "quote")} className="inline-flex h-12 items-center rounded-[4px] border px-6 font-bold" style={{ borderColor: "rgba(255,255,255,0.5)", color: C.white }}>
-              {x("견적문의", "Request a Quote")}
+            <button type="button" onClick={() => go("equipment", "machines")} className="inline-flex h-[52px] items-center rounded-[4px] border px-7 font-bold" style={{ borderColor: "rgba(255,255,255,0.55)", color: C.white }}>
+              {x("설비현황", "Facilities")}
             </button>
           </div>
-          <dl className="mt-12 flex max-w-[880px] flex-wrap gap-x-8 gap-y-3 border-t pt-4" style={{ borderColor: "rgba(255,255,255,0.18)" }}>
-            {specs.map((sp) => (
-              <div key={sp.k}>
-                <dt className="text-[13px]" style={{ color: "#a9b0b9" }}>
-                  {sp.k}
-                </dt>
-                <dd className="flex flex-wrap items-baseline gap-x-1">
-                  <span className="text-[18px] font-bold tabular-nums sm:text-[22px]">{sp.v}</span>
-                  <span className="text-[13px]" style={{ color: "#a9b0b9" }}>
-                    {sp.u}
-                  </span>
-                </dd>
-              </div>
-            ))}
-          </dl>
         </div>
       </section>
 
-      <section id="co-quick" aria-label={x("바로가기", "Quick links")} className="px-4 pt-10 md:px-6 md:pt-14">
+      <section aria-labelledby="co-home-fields" className="px-4 py-20 md:px-6 md:py-32">
         <div className="mx-auto max-w-[1200px]">
-          <div className="grid gap-3 md:grid-cols-[1fr_1fr_0.9fr]">
-            <button type="button" onClick={() => go("business", "lathe")} className="group relative block h-[150px] overflow-hidden rounded-[4px] text-left md:h-[190px]" style={{ background: C.steel }}>
-              <Image src={`${IMG}/parts.jpg`} alt="선반으로 가공한 금속 부품" fill sizes="(min-width: 768px) 36vw, 100vw" className="object-cover opacity-70 transition-opacity group-hover:opacity-55" />
-              <span className="absolute inset-x-0 bottom-0 p-4 md:p-5" style={{ color: C.white, background: "linear-gradient(0deg, rgba(20,24,29,0.85), rgba(20,24,29,0))" }}>
-                <span className="block text-[13px]" style={{ color: "#d4d8de" }}>{x("사업분야", "Business")}</span>
-                <span className="block text-[20px] font-bold md:text-[23px]">{x("CNC 선반 가공", "CNC Turning")}</span>
-                <span className="block text-[14px]" style={{ color: "#d4d8de" }}>{x("최대 D300, 복합 선반 Y축 가공", "Up to D300, turn-mill with Y-axis")}</span>
-              </span>
-            </button>
-            <button type="button" onClick={() => go("business", "fiveAx")} className="group relative block h-[150px] overflow-hidden rounded-[4px] text-left md:h-[190px]" style={{ background: C.steel }}>
-              <Image src={`${IMG}/worker.jpg`} alt="5축 가공기를 다루는 작업자" fill sizes="(min-width: 768px) 36vw, 100vw" className="object-cover object-[70%_50%] opacity-70 transition-opacity group-hover:opacity-55" />
-              <span className="absolute inset-x-0 bottom-0 p-4 md:p-5" style={{ color: C.white, background: "linear-gradient(0deg, rgba(20,24,29,0.85), rgba(20,24,29,0))" }}>
-                <span className="block text-[13px]" style={{ color: "#d4d8de" }}>{x("사업분야", "Business")}</span>
-                <span className="block text-[20px] font-bold md:text-[23px]">{x("MCT, 5축 가공", "MCT and 5-Axis")}</span>
-                <span className="block text-[14px]" style={{ color: "#d4d8de" }}>{x("X1,300 대형 가공, 동시 5축", "Large parts to X1,300, simultaneous 5-axis")}</span>
-              </span>
-            </button>
-            <button type="button" onClick={() => go("support", "quote")} className="flex h-[150px] flex-col justify-between rounded-[4px] p-4 text-left transition-[filter] hover:brightness-95 md:h-[190px] md:p-5" style={{ background: C.orange, color: C.steel }}>
-              <span>
-                <span className="block text-[20px] font-bold md:text-[23px]">{x("견적문의", "Request a Quote")}</span>
-                <span className="mt-1 block text-[14px] leading-[1.5]">{x("도면 파일 첨부 접수", "Drawing files accepted")}</span>
-              </span>
-              <span className="text-[22px] font-bold tabular-nums">{TEL}</span>
-            </button>
-          </div>
-          <ul className="mt-4 flex flex-wrap items-center border-b pb-4 text-[15px]" style={{ borderColor: C.line }}>
-            {links.map((q, i) => (
-              <li key={q.t} className="flex items-center">
-                {i > 0 && <span className="mx-3 h-3 w-px" style={{ background: C.line }} aria-hidden />}
-                <button type="button" onClick={q.to} className="inline-flex h-10 items-center font-bold hover:underline" style={{ color: C.ink }}>
-                  {q.t}
-                </button>
-              </li>
+          <p className="text-[13px] font-bold tracking-[0.18em]" style={{ color: C.orangeText }}>WHAT WE DO</p>
+          <h2 id="co-home-fields" className="mt-3 text-[30px] font-bold leading-[1.3] tracking-[-0.03em] md:text-[44px]">
+            {x("설계 의도를 읽고 가공합니다", "We machine to the design intent")}
+          </h2>
+          <div className="mt-14 grid gap-16 md:mt-20 md:gap-28">
+            {fields.map((f, i) => (
+              <article key={f.en} className={`grid items-center gap-7 md:grid-cols-2 md:gap-16 ${i % 2 ? "md:[&>div:first-child]:order-2" : ""}`}>
+                <div className="relative aspect-[4/3] overflow-hidden rounded-[6px]" style={{ background: C.gray }}>
+                  <Image src={f.img} alt={f.alt} fill sizes="(min-width: 768px) 50vw, 100vw" className="object-cover" />
+                </div>
+                <div>
+                  <p className="text-[13px] font-bold tracking-[0.16em]" style={{ color: C.muted }}>{f.en}</p>
+                  <h3 className="mt-2 text-[26px] font-bold tracking-[-0.03em] md:text-[34px]">{f.t}</h3>
+                  <p className="mt-4 max-w-[460px] text-[16px] leading-[1.8] md:text-[17px]" style={{ color: C.muted }}>{f.d}</p>
+                  <button type="button" onClick={f.to} className="mt-7 inline-flex h-11 items-center gap-1.5 border-b-2 font-bold" style={{ borderColor: C.ink }}>
+                    {x("자세히 보기", "Learn more")}
+                    <ArrowRight size={17} aria-hidden />
+                  </button>
+                </div>
+              </article>
             ))}
-          </ul>
+          </div>
         </div>
       </section>
 
-      <section aria-labelledby="co-home-products" className="px-4 py-14 md:px-6 md:py-20">
+      <section aria-label={x("가공 능력", "Capability")} className="px-4 py-16 md:px-6 md:py-20" style={{ background: C.steel, color: C.white }}>
+        <dl className="mx-auto grid max-w-[1200px] grid-cols-2 gap-y-10 md:grid-cols-4">
+          {specs.map((sp) => (
+            <div key={sp.k} className="border-l pl-5 md:pl-7" style={{ borderColor: C.steelLine }}>
+              <dt className="text-[14px]" style={{ color: "#a9b0b9" }}>{sp.k}</dt>
+              <dd className="mt-2 flex items-baseline gap-1">
+                <span className="text-[34px] font-bold tabular-nums tracking-[-0.02em] md:text-[48px]">{sp.v}</span>
+                <span className="text-[15px]" style={{ color: "#a9b0b9" }}>{sp.u}</span>
+              </dd>
+            </div>
+          ))}
+        </dl>
+      </section>
+
+      <section aria-labelledby="co-home-facility" className="relative flex min-h-[460px] items-center overflow-hidden md:min-h-[560px]" style={{ background: C.steel, color: C.white }}>
+        <Image src={`${IMG}/floor.jpg`} alt={x("CNC 장비가 줄지어 선 가공 공장", "Rows of CNC machines on the shop floor")} fill sizes="100vw" className="object-cover" />
+        <div className="absolute inset-0" style={{ background: "linear-gradient(90deg, rgba(20,24,29,0.88) 0%, rgba(20,24,29,0.55) 60%, rgba(20,24,29,0.3) 100%)" }} aria-hidden />
+        <div className="relative mx-auto w-full max-w-[1200px] px-4 md:px-6">
+          <p className="text-[13px] font-bold tracking-[0.18em]" style={{ color: C.orange }}>FACILITY</p>
+          <h2 id="co-home-facility" className="mt-3 text-[30px] font-bold leading-[1.3] tracking-[-0.03em] md:text-[44px]">
+            {x("가공기 22대, 측정기 5대", "22 machines, 5 measuring systems")}
+          </h2>
+          <p className="mt-4 max-w-[520px] text-[16px] md:text-[18px]" style={{ color: "#d4d8de" }}>
+            {x("머시닝센터, 5축, 복합 선반과 3차원 측정기의 모델, 가공 범위, 대수를 모두 공개합니다.", "Model, travel and count of every machining center, 5-axis, turn-mill and CMM are listed.")}
+          </p>
+          <button type="button" onClick={() => go("equipment", "machines")} className="mt-8 inline-flex h-[52px] items-center gap-2 rounded-[4px] bg-white px-7 font-bold" style={{ color: C.steel }}>
+            {x("설비현황 보기", "View Facilities")}
+            <ArrowRight size={18} aria-hidden />
+          </button>
+        </div>
+      </section>
+
+      <section aria-labelledby="co-home-products" className="px-4 py-20 md:px-6 md:py-28">
         <div className="mx-auto max-w-[1200px]">
-          <div className="flex items-end justify-between gap-3 border-b-2 pb-3" style={{ borderColor: C.steel }}>
-            <h2 id="co-home-products" className="text-[24px] font-bold tracking-[-0.03em] md:text-[30px]">
-              {x("주요 생산제품", "Main Products")}
-            </h2>
-            <button type="button" onClick={() => go("products", "all")} className="inline-flex h-10 shrink-0 items-center gap-1 text-[15px] font-bold" style={{ color: C.muted }}>
+          <div className="flex items-end justify-between gap-3">
+            <div>
+              <p className="text-[13px] font-bold tracking-[0.18em]" style={{ color: C.orangeText }}>PRODUCTS</p>
+              <h2 id="co-home-products" className="mt-3 text-[30px] font-bold tracking-[-0.03em] md:text-[44px]">
+                {x("주요 생산제품", "Main Products")}
+              </h2>
+            </div>
+            <button type="button" onClick={() => go("products", "all")} className="inline-flex h-11 shrink-0 items-center gap-1 text-[15px] font-bold" style={{ color: C.muted }}>
               {x("전체보기", "View all")}
               <ChevronRight size={17} aria-hidden />
             </button>
           </div>
-          <div className="mt-6 grid gap-6 lg:grid-cols-[1fr_2fr]">
-            <div className="relative aspect-[16/10] overflow-hidden rounded-[4px] lg:aspect-auto">
-              <Image src={`${IMG}/parts.jpg`} alt={x("가공을 마친 알루미늄과 스테인리스 정밀 부품", "Finished aluminum and stainless steel precision parts")} fill sizes="(min-width: 1024px) 33vw, 100vw" className="object-cover" />
-            </div>
-            <ul className="grid gap-3 sm:grid-cols-2">
-              {featured.map((p) => (
-                <li key={p.name.ko}>
-                  <ProductCard p={p} />
-                </li>
-              ))}
-            </ul>
-          </div>
-        </div>
-      </section>
-
-      <section aria-labelledby="co-home-certs" className="px-4 md:px-6" style={{ background: C.gray }}>
-        <div className="mx-auto flex max-w-[1200px] flex-col gap-3 py-6 md:flex-row md:items-center md:gap-8">
-          <h2 id="co-home-certs" className="shrink-0 text-[18px] font-bold">
-            {x("인증현황", "Certifications")}
-          </h2>
-          <ul className="flex flex-1 flex-wrap gap-x-5 gap-y-1.5 text-[15px]">
+          <ul className="mt-10 grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
+            {featured.map((p) => (
+              <li key={p.name.ko}>
+                <ProductCard p={p} />
+              </li>
+            ))}
+          </ul>
+          <ul className="mt-12 flex flex-wrap gap-x-6 gap-y-2 border-t pt-6 text-[15px]" style={{ borderColor: C.line }}>
             {CERTS.map((c) => (
               <li key={c.name.ko} className="inline-flex items-center gap-1.5">
                 <Check size={16} style={{ color: C.orangeText }} aria-hidden />
@@ -730,15 +727,31 @@ function Home() {
               </li>
             ))}
           </ul>
-          <button type="button" onClick={() => go("about", "certs")} className="inline-flex h-10 shrink-0 items-center gap-1 self-start text-[15px] font-bold md:self-auto" style={{ color: C.muted }}>
-            {x("자세히 보기", "Details")}
-            <ChevronRight size={17} aria-hidden />
-          </button>
         </div>
       </section>
 
-      <section aria-label={x("공지사항, 고객센터, 오시는 길", "Notice, customer center, location")} className="px-4 py-14 md:px-6 md:py-20">
-        <div className="mx-auto grid max-w-[1200px] gap-10 md:grid-cols-3 md:gap-8">
+      <section aria-labelledby="co-home-quote" className="px-4 md:px-6" style={{ background: C.orange, color: C.steel }}>
+        <div className="mx-auto flex max-w-[1200px] flex-col gap-6 py-14 md:flex-row md:items-center md:justify-between md:py-16">
+          <div>
+            <h2 id="co-home-quote" className="text-[26px] font-bold leading-[1.35] tracking-[-0.03em] md:text-[36px]">
+              {x("도면 파일만 보내 주세요", "Just send the drawing")}
+            </h2>
+            <p className="mt-2 text-[16px] md:text-[18px]">{x("소재, 수량, 납기를 함께 적어 주시면 담당자가 검토 후 견적을 회신합니다.", "Add material, quantity and due date, and our engineer will reply with a quote.")}</p>
+          </div>
+          <div className="flex shrink-0 flex-wrap gap-3">
+            <button type="button" onClick={() => go("support", "quote")} className="inline-flex h-[52px] items-center gap-2 rounded-[4px] px-7 font-bold" style={{ background: C.steel, color: C.white }}>
+              {x("견적문의", "Request a Quote")}
+              <ArrowRight size={18} aria-hidden />
+            </button>
+            <a href={`tel:${TEL}`} className="inline-flex h-[52px] items-center rounded-[4px] border-2 px-6 font-bold tabular-nums" style={{ borderColor: C.steel }}>
+              {TEL}
+            </a>
+          </div>
+        </div>
+      </section>
+
+      <section aria-label={x("공지사항, 오시는 길", "Notice, location")} className="px-4 py-16 md:px-6 md:py-20">
+        <div className="mx-auto grid max-w-[1200px] gap-10 md:grid-cols-2 md:gap-14">
           <div>
             <div className="flex items-center justify-between border-b-2 pb-2" style={{ borderColor: C.steel }}>
               <h2 className="text-[20px] font-bold">{x("공지사항", "Notice")}</h2>
@@ -749,7 +762,7 @@ function Home() {
             </div>
             <ul>
               {notices.slice(0, 4).map((n) => (
-                <li key={n.date} className="flex items-baseline justify-between gap-3 border-b py-2.5 text-[15px]" style={{ borderColor: C.line }}>
+                <li key={n.date} className="flex items-baseline justify-between gap-3 border-b py-3 text-[15px]" style={{ borderColor: C.line }}>
                   <span className="min-w-0 truncate">{s(n.title)}</span>
                   <span className="shrink-0 text-[13px] tabular-nums" style={{ color: C.muted }}>
                     {n.date.slice(5).replace("-", ".")}
@@ -758,53 +771,29 @@ function Home() {
               ))}
             </ul>
           </div>
-
-          <div>
+          <div id="co-visit">
             <h2 className="border-b-2 pb-2 text-[20px] font-bold" style={{ borderColor: C.steel }}>
-              {x("고객센터", "Customer Center")}
+              {x("오시는 길", "Location")}
             </h2>
-            <a href={`tel:${TEL}`} className="mt-3 block text-[28px] font-bold tabular-nums tracking-[-0.02em]" style={{ color: C.orangeText }}>
-              {TEL}
-            </a>
-            <dl className="mt-2 grid gap-1 text-[15px]">
+            <p className="mt-4 font-bold">{s(ADDRESS)}</p>
+            <dl className="mt-3 grid gap-1.5 text-[15px]">
               {(
                 [
+                  [x("대표전화", "Tel"), TEL],
                   [x("팩스", "Fax"), FAX],
                   [x("가공견적", "Quotes"), MAIL_QUOTE],
-                  [x("일반문의", "General"), MAIL_INFO],
                   [x("업무시간", "Hours"), s(HOURS)],
                 ] as const
               ).map(([k, v]) => (
-                <div key={k} className="grid grid-cols-[72px_1fr] gap-2">
+                <div key={k} className="grid grid-cols-[80px_1fr] gap-2">
                   <dt style={{ color: C.muted }}>{k}</dt>
                   <dd className="min-w-0 break-words tabular-nums">{v}</dd>
                 </div>
               ))}
             </dl>
-          </div>
-
-          <div id="co-visit">
-            <h2 className="border-b-2 pb-2 text-[20px] font-bold" style={{ borderColor: C.steel }}>
-              {x("오시는 길", "Location")}
-            </h2>
-            <p className="mt-3 font-bold">{s(ADDRESS)}</p>
-            <dl className="mt-2 grid gap-1 text-[15px]">
-              <div className="grid grid-cols-[96px_1fr] gap-2">
-                <dt style={{ color: C.muted }}>{x("내비게이션", "Navigation")}</dt>
-                <dd>{x("정밀가공 제조 ㅎㄷ공장", "Precision Machining HD Plant")}</dd>
-              </div>
-              <div className="grid grid-cols-[96px_1fr] gap-2">
-                <dt style={{ color: C.muted }}>{x("주차", "Parking")}</dt>
-                <dd>{x("정문 오른쪽 방문 주차장", "Visitor lot right of the main gate")}</dd>
-              </div>
-            </dl>
-            <button
-              type="button"
-              onClick={() => go("about", "location")}
-              className="mt-4 inline-flex h-11 items-center justify-center rounded-[4px] border px-4 text-[15px] font-bold"
-              style={{ background: C.steel, color: C.white, borderColor: C.steel }}
-            >
+            <button type="button" onClick={() => go("about", "location")} className="mt-5 inline-flex h-11 items-center gap-1.5 border-b-2 font-bold" style={{ borderColor: C.ink }}>
               {x("오시는 길 자세히 보기", "Directions")}
+              <ArrowRight size={17} aria-hidden />
             </button>
           </div>
         </div>
