@@ -127,6 +127,9 @@ export function ArchiveShell({ section, active, crumbs, toc, children }: { secti
             </ol>
           </nav>
           {children}
+          <p className="mt-16 border-t border-[#e6e9ee] pt-5 text-[13px] leading-[1.7] text-[#5b6370]">
+            이 아카이브의 글, 와이어프레임, 차트 디자인, 시안은 곰파트너가 만들었습니다. 출처(곰파트너, 이 페이지 주소)를 밝히면 인용할 수 있습니다. 차트의 숫자는 각 차트 아래 적은 출처의 자료입니다.
+          </p>
         </main>
 
         {toc && toc.length > 0 ? (

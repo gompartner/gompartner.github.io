@@ -95,6 +95,7 @@ export function LineChart({ title, sub, series, labelYear, unit = "%", max = 100
               })()
             : null}
           {hover ? <line x1={x(hover.year)} x2={x(hover.year)} y1={T} y2={H - B} stroke="#5b6370" strokeDasharray="3 3" /> : null}
+          <text x={W - 4} y={T + 2} fontSize="11" fill="#8a93a1" textAnchor="end" dominantBaseline="hanging">곰파트너 gompartner.co.kr</text>
           <rect x={L} y={T} width={W - L - R} height={H - T - B} fill="transparent" onMouseMove={onMove} onMouseLeave={() => setHover(null)} />
         </svg>
         {hover ? (
