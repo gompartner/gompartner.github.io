@@ -1,26 +1,24 @@
 import Link from "next/link";
-import { designDocs, techDocs } from "@/data/classic/archive";
+import { relatedOf, topicOf } from "@/data/classic/archive";
 
-// 같은 분류의 다른 문서(11-21). 번호, 이전, 다음 없이 독립 문서끼리 나란히 잇는다(사용자: 시리즈 금지)
+// 관련 문서(11-21 컨플루언스식): 같은 주제의 다른 문서. 번호, 이전, 다음 없이 독립 문서끼리 잇는다
 export function TrendNav({ current }: { current: string }) {
-  const isDesign = designDocs.some((d) => d.href === current);
-  const list = (isDesign ? designDocs : techDocs).filter((d) => d.href !== current);
-  const other = isDesign ? { href: "/archive/tech", label: "기술 트렌드 보기" } : { href: "/archive/design", label: "디자인 트렌드 보기" };
+  const topic = topicOf(current);
+  const list = relatedOf(current);
+  if (!topic || !list.length) return null;
   return (
-    <nav aria-label="같은 분류의 다른 문서" className="mt-12 border-t border-[#e6e9ee] pt-6">
-      <p className="text-[14px] font-[800] text-[#5b6370]">{isDesign ? "디자인 트렌드" : "기술 트렌드"}의 다른 문서</p>
-      <ul role="list" className="mt-3 grid gap-2.5 sm:grid-cols-2">
+    <nav aria-label="관련 문서" className="mt-12">
+      <h2 className="border-b border-[#e6e9ee] pb-2 text-[22px] font-[800] tracking-[-0.035em] md:text-[24px]">관련 문서</h2>
+      <ul role="list" className="mt-4 grid gap-2.5 sm:grid-cols-2">
         {list.map((d) => (
           <li key={d.href}>
-            <Link href={d.href} className="block rounded-lg border border-[#d9dee5] px-4 py-3 text-[15px] font-bold leading-[1.45] hover:border-[#256ef4] hover:text-[#256ef4]">
-              {d.title}
+            <Link href={d.href!} className="block rounded-lg border border-[#d9dee5] px-4 py-3 hover:border-[#256ef4]">
+              <span className="block text-[15px] font-bold leading-[1.45] text-[#15171c]">{d.label}</span>
+              <span className="mt-0.5 block text-[12.5px] text-[#5b6370]">{topic.label}</span>
             </Link>
           </li>
         ))}
       </ul>
-      <p className="mt-4 text-[14px]">
-        <Link href={other.href} className="font-bold text-[#256ef4] hover:underline underline-offset-4">{other.label}</Link>
-      </p>
     </nav>
   );
 }

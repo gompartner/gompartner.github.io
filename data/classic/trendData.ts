@@ -130,7 +130,7 @@ export const datasets: Dataset[] = [
     series: fullHdShare,
     source: { label: "StatCounter Global Stats, Desktop Screen Resolution", href: "https://gs.statcounter.com/screen-resolution-stats/desktop" },
     csv: [{ label: "연도별 해상도 5종(JSON)", href: "/data/trend/desktop-resolution-yearly.json" }],
-    usedIn: [{ label: "1024에서 1920으로, 모니터가 커진 만큼 바뀐 화면", href: "/archive/design/screen-size" }],
+    usedIn: [{ label: "1024에서 1920으로, 모니터가 커진 만큼 바뀐 화면", href: "/knowledge/screen-size" }],
   },
   {
     id: "search-demand",
@@ -151,7 +151,7 @@ export const datasets: Dataset[] = [
     series: phpVersions,
     source: { label: "W3Techs, PHP 버전 연도별 추이", href: "https://w3techs.com/technologies/history_details/pl-php/all/y" },
     csv: [],
-    usedIn: [{ label: "PHP 5에서 8까지, 유지보수가 바뀐 10년", href: "/archive/tech/php" }],
+    usedIn: [{ label: "PHP 5에서 8까지, 유지보수가 바뀐 10년", href: "/knowledge/php" }],
   },
   {
     id: "ios-share",
@@ -162,7 +162,7 @@ export const datasets: Dataset[] = [
     series: iosShare,
     source: { label: "StatCounter Global Stats, Mobile Operating System Market Share", href: "https://gs.statcounter.com/os-market-share/mobile" },
     csv: ["KR", "JP", "US"].map((c) => ({ label: `${c} 모바일 OS`, href: `/data/trend/mobile-os-${c}.csv` })),
-    usedIn: [{ label: "한국은 안드로이드, 일본과 미국은 아이폰", href: "/archive/tech/app" }],
+    usedIn: [{ label: "한국은 안드로이드, 일본과 미국은 아이폰", href: "/knowledge/app" }],
   },
   {
     id: "https-share",
@@ -173,7 +173,7 @@ export const datasets: Dataset[] = [
     series: httpsShare,
     source: { label: "Google 투명성 보고서, HTTPS encryption on the web", href: "https://transparencyreport.google.com/https/overview" },
     csv: [{ label: "나라별 주간 값", href: "/data/trend/https-pageload-by-country.csv" }],
-    usedIn: [{ label: "주소창 자물쇠가 기본이 되기까지", href: "/archive/tech/https" }],
+    usedIn: [{ label: "주소창 자물쇠가 기본이 되기까지", href: "/knowledge/https" }],
   },
   {
     id: "flash-jquery",
@@ -184,7 +184,7 @@ export const datasets: Dataset[] = [
     series: flashJquery,
     source: { label: "W3Techs, 연도별 기술 사용 추이", href: "https://w3techs.com/technologies/history_overview/javascript_library/all/y" },
     csv: [],
-    usedIn: [{ label: "플래시가 사라진 자리", href: "/archive/tech/flash" }],
+    usedIn: [{ label: "플래시가 사라진 자리", href: "/knowledge/flash-jquery" }],
   },
   {
     id: "page-weight",
@@ -196,7 +196,7 @@ export const datasets: Dataset[] = [
     series: pageWeight,
     source: { label: "HTTP Archive, Page Weight", href: "https://httparchive.org/reports/page-weight" },
     csv: [{ label: "1월 중앙값", href: "/data/trend/httparchive-january-medians.csv" }],
-    usedIn: [{ label: "홈페이지는 얼마나 무거워졌나", href: "/archive/tech/page-weight" }],
+    usedIn: [{ label: "홈페이지는 얼마나 무거워졌나", href: "/knowledge/page-weight" }],
   },
   {
     id: "ie-share",
@@ -207,7 +207,7 @@ export const datasets: Dataset[] = [
     series: ieShare,
     source: { label: "StatCounter Global Stats, Desktop Browser Market Share", href: "https://gs.statcounter.com/browser-market-share/desktop" },
     csv: ["KR", "JP", "US"].map((c) => ({ label: `${c} 브라우저 전체`, href: `/data/trend/desktop-browser-${c}.csv` })),
-    usedIn: [{ label: "한국만 IE를 오래 못 떠난 이유", href: "/archive/tech/ie" }],
+    usedIn: [{ label: "한국만 IE를 오래 못 떠난 이유", href: "/knowledge/browser" }],
   },
   {
     id: "mobile-share",
@@ -218,6 +218,6 @@ export const datasets: Dataset[] = [
     series: mobileShare,
     source: { label: "StatCounter Global Stats, Desktop vs Mobile vs Tablet Market Share", href: "https://gs.statcounter.com/platform-market-share/desktop-mobile-tablet" },
     csv: ["KR", "JP", "US"].map((c) => ({ label: `${c} 기기별`, href: `/data/trend/platform-${c}.csv` })),
-    usedIn: [{ label: "한국이 모바일로 먼저 넘어간 길", href: "/archive/design/mobile" }],
+    usedIn: [{ label: "한국이 모바일로 먼저 넘어간 길", href: "/knowledge/mobile-screen" }],
   },
 ];

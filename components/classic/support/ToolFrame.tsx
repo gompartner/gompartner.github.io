@@ -12,8 +12,8 @@ export function ToolFrame({ href, children }: { href: string; children: React.Re
       section="checklists"
       active={href}
       crumbs={[
-        { href: "/archive", label: "아카이브" },
-        { href: "/archive/checklists", label: "점검표와 도구" },
+        { href: "/knowledge", label: "웹 지식" },
+        { href: "/knowledge/checklists", label: "점검표와 도구" },
         { href, label: title },
       ]}
     >
@@ -21,7 +21,7 @@ export function ToolFrame({ href, children }: { href: string; children: React.Re
       <div className="mt-8">{children}</div>
       <div className="mt-14 flex justify-end border-t border-[#e6e9ee] pt-6">
         <Link
-          href="/archive/checklists#tools"
+          href="/knowledge/checklists#tools"
           className="inline-flex h-12 items-center gap-2 rounded-md border border-[#c9cfd8] bg-white px-5 text-[16px] font-bold text-[#15171c] transition-colors hover:border-[#15171c]"
         >
           <List size={18} aria-hidden />

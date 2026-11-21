@@ -1,4 +1,4 @@
-// 용어 원본. 11-21부터 아카이브 용어(/archive/terms, 묶음 문서 /archive/terms/<slug>)가 쓴다(옛 /glossary 는 301). 화면 부품, 디자인 용어는 티스토리 UI 이름 사전 글에서, 운영과 유지보수는 따로 썼다(11-15).
+// 용어 원본. 11-21부터 아카이브 용어(/knowledge/terms, 묶음 문서 /archive/terms/<slug>)가 쓴다(옛 /glossary 는 301). 화면 부품, 디자인 용어는 티스토리 UI 이름 사전 글에서, 운영과 유지보수는 따로 썼다(11-15).
 // post: 해당 티스토리 글 주소(발행된 편만). 새 글이 발행되면 여기에 주소를 더한다.
 export type TermSection = "화면 부품" | "디자인 용어" | "운영과 유지보수";
 export interface Term { id: string; name: string; alt: string; look: string; use: string; say: string }

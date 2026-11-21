@@ -40,15 +40,16 @@ export const classicMenu = [
     ],
   },
   { label: "비용", href: "/pricing", match: ["/pricing"], items: [] },
-  // 11-21 아카이브(문서 사이트형). 용어 사전, 인사이트, 무료 도구, 점검표는 원래 주소 그대로 두고 아카이브에서 잇는다
+  // 11-21 웹 지식(컨플루언스식 공간). 인사이트, 무료 도구, 점검표는 원래 주소 그대로 두고 웹 지식 트리에서 잇는다
   {
-    label: "아카이브",
-    href: "/archive",
-    match: ["/archive", "/insight", "/tools", "/jaryo"],
+    label: "웹 지식",
+    href: "/knowledge",
+    match: ["/knowledge", "/insight", "/tools", "/jaryo"],
     items: [
-      { href: "/archive/terms", label: "용어" },
-      { href: "/archive/notes", label: "운영 노트" },
-      { href: "/archive/checklists", label: "점검표와 도구" },
+      { href: "/knowledge", label: "공간 홈" },
+      { href: "/knowledge/design", label: "디자인" },
+      { href: "/knowledge/frontend", label: "프론트엔드" },
+      { href: "/knowledge/ops", label: "운영과 유지보수" },
     ],
   },
   // 고객 사례는 계약 끝나고 게재 동의를 받은 실제 사례가 data/classic/cases.ts에 들어가는 순간 메뉴에 나온다(그 전엔 빈 값, 메뉴와 페이지 없음)

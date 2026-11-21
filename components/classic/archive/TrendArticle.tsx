@@ -1,6 +1,5 @@
 import { ArchiveShell, DocHead, TakeoverBox, docH2 } from "@/components/classic/archive/ArchiveShell";
 import { TrendNav } from "@/components/classic/archive/TrendNav";
-import { designDocs } from "@/data/classic/archive";
 import { TREND_CHECKED } from "@/data/classic/trendData";
 import { LdScript } from "@/components/seo/JsonLd";
 import { ORG_ID } from "@/lib/seo";
@@ -26,16 +25,16 @@ export function TrendArticle(props: {
   take: { b: string; t: string }[];
   sources: Src[];
 }) {
-  const sec = designDocs.some((d) => d.href === props.href) ? { id: "design", href: "/archive/design", label: "디자인 트렌드" } : { id: "tech", href: "/archive/tech", label: "기술 트렌드" };
   const toc = [
     { id: "chart", label: props.chartTitle },
     { id: "why", label: props.storyTitle },
     ...(props.extra ? [{ id: "wf", label: props.extraTitle ?? "그림" }] : []),
     { id: "take", label: "인수 시 확인 사항" },
     { id: "src", label: "출처" },
+    { id: "rel", label: "관련 문서" },
   ];
   return (
-    <ArchiveShell section={sec.id} active={props.href} crumbs={[{ href: "/archive", label: "아카이브" }, { href: sec.href, label: sec.label }, { href: props.href, label: props.crumb }]} toc={toc}>
+    <ArchiveShell active={props.href} crumbs={[{ href: props.href, label: props.title }]} toc={toc}>
       {/* 최종 수정일을 검색엔진에도 알린다 */}
       <LdScript data={{ "@context": "https://schema.org", "@type": "Article", headline: props.title, description: props.lead, datePublished: "2026-11-21", dateModified: TREND_CHECKED, author: { "@id": ORG_ID }, publisher: { "@id": ORG_ID }, mainEntityOfPage: `${siteUrl}${props.href}`, inLanguage: "ko" }} />
       <DocHead title={props.title} meta={[...props.meta, ["최종 수정일", TREND_CHECKED]]} lead={props.lead} />

@@ -55,8 +55,8 @@ export default async function ClassicInsightDetailPage({ params }: Props) {
       />
       <LdScript
         data={breadcrumbLd([
-          { name: "아카이브", path: "/archive" },
-          { name: "운영 노트", path: "/archive/notes" },
+          { name: "웹 지식", path: "/knowledge" },
+          { name: "운영 노트", path: "/knowledge/notes" },
           { name: n.title, path: `/insight/${slug}` },
         ])}
       />
@@ -64,8 +64,8 @@ export default async function ClassicInsightDetailPage({ params }: Props) {
         section="notes"
         active={`/insight/${slug}`}
         crumbs={[
-          { href: "/archive", label: "아카이브" },
-          { href: "/archive/notes", label: "운영 노트" },
+          { href: "/knowledge", label: "웹 지식" },
+          { href: "/knowledge/notes", label: "운영 노트" },
           { href: `/insight/${slug}`, label: n.title },
         ]}
         toc={toc.map((t) => ({ id: t.id, label: t.h }))}
@@ -218,7 +218,7 @@ export default async function ClassicInsightDetailPage({ params }: Props) {
                 {n.service.label}
               </Link>
               {/* 11-21 목록은 아카이브 운영 노트의 같은 묶음 자리로 */}
-              <Link href={`/archive/notes#${encodeURIComponent(n.series)}`} className={btnLine}>
+              <Link href={`/knowledge/notes#${encodeURIComponent(n.series)}`} className={btnLine}>
                 목록
               </Link>
             </div>

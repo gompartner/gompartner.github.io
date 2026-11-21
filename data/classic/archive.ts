@@ -1,4 +1,4 @@
-// 곰파트너 아카이브(/archive). 11-21 사용자: 컨플루언스처럼 정돈된 문서 공간, 실적 대신 쌓인 기록을 보여 준다.
+// 곰파트너 웹 지식(/knowledge, 11-21 아카이브에서 이름과 주소를 바꿈). 11-21 사용자: 컨플루언스처럼 정돈된 문서 공간, 실적 대신 쌓인 기록을 보여 준다.
 // 틀은 문서 사이트형(왼쪽 분류 트리, 본문, 오른쪽 목차). 우리 색깔은 "인수 시 확인 사항", "이렇게 요청하세요", 같은 그림체 와이어프레임, 확인일.
 // 원래 주소가 있는 자료(인사이트 /insight, 무료 도구 /tools, 점검표 /jaryo/<id>)는 주소를 그대로 두고 트리에서 잇는다.
 // 문서가 없는 분류(시안 작업 등)는 첫 문서가 생길 때 sections에 더한다. 빈 칸, 준비 중 표시는 두지 않는다.
@@ -13,19 +13,19 @@ import { datasets } from "@/data/classic/trendData";
 export type TrendDoc = { href: string; title: string; desc: string };
 /** 디자인 트렌드: 새 기기(휴대폰, 태블릿, 큰 모니터)가 생길 때마다 화면 크기, 배치, 모양이 어떻게 바뀌었나. 문서마다 독립(번호, 연재 없음) */
 export const designDocs: TrendDoc[] = [
-  { href: "/archive/design/styles", title: "입체에서 플랫, 카드, 벤토까지", desc: "웹 디자인 흐름을 바꾼 날짜(Bootstrap, iOS 7, Material Design, CSS Grid)와 시대별 첫 화면, 실제 사례." },
-  { href: "/archive/design/mobile", title: "한국이 모바일 화면으로 먼저 넘어간 길", desc: "전체 접속 중 모바일 비율, 한국 일본 미국 2009~2025. m. 전용 사이트, PC 화면 그대로, 반응형으로 갈린 길." },
-  { href: "/archive/design/screen-size", title: "1024에서 1920으로, 모니터가 커진 만큼 바뀐 화면", desc: "PC 화면 해상도 비율, 한국 일본 미국 2009~2025. 고정 폭 980px이 사라진 이유." },
+  { href: "/knowledge/design-styles", title: "디자인 흐름: 입체, 플랫, 카드, 벤토", desc: "웹 디자인 흐름을 바꾼 날짜(Bootstrap, iOS 7, Material Design, CSS Grid)와 시대별 첫 화면, 실제 사례." },
+  { href: "/knowledge/mobile-screen", title: "한국이 모바일 화면으로 먼저 넘어간 길", desc: "전체 접속 중 모바일 비율, 한국 일본 미국 2009~2025. m. 전용 사이트, PC 화면 그대로, 반응형으로 갈린 길." },
+  { href: "/knowledge/screen-size", title: "화면 크기와 해상도", desc: "PC 화면 해상도 비율, 한국 일본 미국 2009~2025. 고정 폭 980px이 사라진 이유." },
 ];
 /** 기술 트렌드: 브라우저, 보안, 언어, 도구, 무게처럼 화면 뒤에서 바뀐 것. 문서마다 독립 */
 export const techDocs: TrendDoc[] = [
-  { href: "/archive/tech/ie", title: "한국만 IE를 오래 못 떠난 이유", desc: "PC 브라우저 중 IE 비율, 한국 일본 미국 2009~2025. 공인인증서, ActiveX, 2020년 전자서명법 개정, 2022년 IE 지원 종료." },
-  { href: "/archive/tech/https", title: "주소창 자물쇠가 기본이 되기까지", desc: "크롬에서 https로 열린 페이지 비율, 일본 미국 2015~2026. 2018년 크롬 68 주의 요함 표시." },
-  { href: "/archive/tech/flash", title: "플래시가 사라진 자리", desc: "Flash, jQuery 사용 비율 2015~2025. 2020년 말 지원 종료, 2019년 국내 500대 사이트 28.4%가 플래시 사용." },
-  { href: "/archive/tech/cms", title: "한국은 카페24, 일본은 WordPress", desc: "한국어, 일본어, 영어 사이트의 만드는 도구 점유율 상위 3." },
-  { href: "/archive/tech/page-weight", title: "홈페이지는 얼마나 무거워졌나", desc: "페이지 한 장 용량 중앙값, PC 2011~2026 6배, 모바일 9배." },
-  { href: "/archive/tech/app", title: "한국은 안드로이드, 일본과 미국은 아이폰", desc: "휴대폰 OS 중 아이폰 비율, 한국 일본 미국 2012~2025. 앱 인수 시 계정, 서명 키, 스토어 요구." },
-  { href: "/archive/tech/php", title: "PHP 5에서 8까지, 유지보수가 바뀐 10년", desc: "PHP 사이트 중 버전 비율 2015~2026, 공식 지원 종료일, 서버 앞단 CDN의 확산." },
+  { href: "/knowledge/browser", title: "브라우저 호환", desc: "PC 브라우저 중 IE 비율, 한국 일본 미국 2009~2025. 공인인증서, ActiveX, 2020년 전자서명법 개정, 2022년 IE 지원 종료." },
+  { href: "/knowledge/https", title: "https와 인증서", desc: "크롬에서 https로 열린 페이지 비율, 일본 미국 2015~2026. 2018년 크롬 68 주의 요함 표시." },
+  { href: "/knowledge/flash-jquery", title: "플래시와 jQuery", desc: "Flash, jQuery 사용 비율 2015~2025. 2020년 말 지원 종료, 2019년 국내 500대 사이트 28.4%가 플래시 사용." },
+  { href: "/knowledge/cms", title: "CMS 비교: 카페24, WordPress, 아임웹", desc: "한국어, 일본어, 영어 사이트의 만드는 도구 점유율 상위 3." },
+  { href: "/knowledge/page-weight", title: "페이지 무게와 속도", desc: "페이지 한 장 용량 중앙값, PC 2011~2026 6배, 모바일 9배." },
+  { href: "/knowledge/app", title: "앱: 안드로이드와 아이폰", desc: "휴대폰 OS 중 아이폰 비율, 한국 일본 미국 2012~2025. 앱 인수 시 계정, 서명 키, 스토어 요구." },
+  { href: "/knowledge/php", title: "PHP 버전과 유지보수", desc: "PHP 사이트 중 버전 비율 2015~2026, 공식 지원 종료일, 서버 앞단 CDN의 확산." },
 ];
 export const trendDocs: TrendDoc[] = [...designDocs, ...techDocs];
 
@@ -42,7 +42,7 @@ export const termSlugs: Record<string, string> = {
   g43: "careers", go1: "domain-server", go2: "admin-edit", go3: "contract-handover", go4: "search-records",
 };
 
-export const termHref = (g: TermGroup) => `/archive/terms/${termSlugs[g.id]}`;
+export const termHref = (g: TermGroup) => `/knowledge/terms/${termSlugs[g.id]}`;
 export const groupBySlug = (slug: string) => termGroups.find((g) => termSlugs[g.id] === slug);
 
 /** 묶음 제목에서 "종류 6가지" 같은 꼬리를 빼고 짧게(트리, 목록용) */
@@ -276,19 +276,6 @@ export const draftSets: { slug: string; name: string; a: { id: string; label: st
   { slug: "interior", name: "인테리어 시공", a: { id: "a", label: "갤러리형", desc: "시공 사진을 화면 가득. 결과물로 설득하는 첫 화면" }, b: { id: "b", label: "비용 안심형", desc: "\"견적서 금액이 공사 끝까지 그대로\", 공사 전후 사진. 추가 비용을 걱정하는 고객 대상" } },
 ];
 
-/** 아카이브 분류(위 탭과 첫 화면 칸). 문서가 있는 분류만 둔다 */
-export type ArchiveSection = { id: string; label: string; href: string; desc: string };
-export const sections: ArchiveSection[] = [
-  { id: "terms", label: "용어", href: "/archive/terms", desc: "화면 부품, 디자인 용어, 운영 용어를 그림과 요청 문장으로" },
-  { id: "screens", label: "화면 예시", href: "/archive/screens", desc: "첫 화면, 회사 소개, 게시판, 예약, 결제처럼 페이지 종류별 와이어프레임" },
-  { id: "design", label: "디자인 트렌드", href: "/archive/design", desc: "새 기기가 생길 때마다 바뀐 화면 크기, 배치, 모양. 한국 일본 미국 비교" },
-  { id: "tech", label: "기술 트렌드", href: "/archive/tech", desc: "브라우저, 보안, 언어, 만드는 도구, 페이지 무게. 화면 뒤에서 바뀐 것" },
-  { id: "drafts", label: "시안 작업", href: "/archive/drafts", desc: "업종마다 방향이 다른 시안 두 장과 고른 이유, 사례 분석에서 반영한 것" },
-  { id: "data", label: "데이터", href: "/archive/data", desc: "트렌드에 쓴 숫자의 원본. 차트, 출처, 확인일, CSV" },
-  { id: "notes", label: "운영 노트", href: "/archive/notes", desc: "인수, 운영, 보안, 비용을 실제 순서대로 정리한 글" },
-  { id: "checklists", label: "점검표와 도구", href: "/archive/checklists", desc: "넘겨받은 날 기록표, 매달 점검표, 무료 도구" },
-];
-
 export const counts = {
   terms: termGroups.reduce((a, g) => a + g.terms.length, 0),
   groups: termGroups.length,
@@ -297,51 +284,98 @@ export const counts = {
   tools: tools.length,
 };
 
-/** 왼쪽 트리. 분류마다 소제목과 링크 */
+/** 왼쪽 트리 마디 */
 export type TreeNode = { label: string; href?: string; count?: number; children?: TreeNode[] };
-export function archiveTree(): { section: ArchiveSection; groups: { title: string; items: TreeNode[] }[] }[] {
-  const secOrder = ["화면 부품", "디자인 용어", "운영과 유지보수"] as const;
-  const terms = secOrder.map((sec) => {
-    const gs = termGroups.filter((g) => g.sec === sec);
-    if (sec !== "화면 부품") return { title: sec, items: gs.map((g) => ({ label: shortTitle(g), href: termHref(g) })) };
-    const cats = [...new Set(gs.map((g) => g.cat))];
-    return { title: sec, items: cats.map((c) => ({ label: c, count: gs.filter((g) => g.cat === c).length, children: gs.filter((g) => g.cat === c).map((g) => ({ label: shortTitle(g), href: termHref(g) })) })) };
-  });
-  const seriesNames = [...new Set(insights.map((n) => n.series))];
-  const notes = [{ title: "주제", items: seriesNames.map((s) => ({ label: s, href: `/archive/notes#${encodeURIComponent(s)}`, count: insights.filter((n) => n.series === s).length })) }];
-  const checks = [
-    { title: "점검표와 기록표", items: jaryo.map((j) => ({ label: j.title, href: `/jaryo/${j.id}` })) },
-    { title: "무료 도구", items: tools.map((t) => ({ label: t.title, href: t.href })) },
-  ];
-  const screens = [{ title: "페이지 종류", items: screenTypes.map((t) => ({ label: t.title, href: `/archive/screens#${t.id}` })) }];
-  const design = [{ title: "문서", items: designDocs.map((d) => ({ label: d.title, href: d.href })) }];
-  const tech = [{ title: "문서", items: techDocs.map((d) => ({ label: d.title, href: d.href })) }];
-  const data = [{ title: "자료", items: datasets.map((d) => ({ label: d.title, href: `/archive/data#${d.id}` })) }];
-  const by = (id: string) => sections.find((s) => s.id === id)!;
+
+/** 웹 지식 주제(11-21, 컨플루언스식 공간의 페이지 트리). 번호 없이, 문서마다 독립. 주제 페이지는 /knowledge/<id> */
+export type Topic = { id: string; label: string; desc: string; groups: { title: string; items: TreeNode[] }[] };
+
+const tool = (href: string) => {
+  const t = tools.find((x) => x.href === href)!;
+  return { label: t.title, href: t.href };
+};
+const series = (name: string) => insights.filter((n) => n.series === name).sort((a, b) => b.date.localeCompare(a.date) || a.no - b.no).map((n) => ({ label: n.title, href: `/insight/${n.slug}` }));
+const term = (id: string) => {
+  const g = termGroups.find((x) => x.id === id)!;
+  return { label: shortTitle(g), href: termHref(g) };
+};
+const doc = (href: string) => {
+  const d = trendDocs.find((x) => x.href === href)!;
+  return { label: d.title, href: d.href };
+};
+
+export function topics(): Topic[] {
+  const parts = termGroups.filter((g) => g.sec === "화면 부품");
+  const cats = [...new Set(parts.map((g) => g.cat))];
   return [
-    { section: by("terms"), groups: terms },
-    { section: by("screens"), groups: screens },
-    { section: by("design"), groups: design },
-    { section: by("tech"), groups: tech },
-    { section: by("drafts"), groups: [{ title: "업종", items: draftSets.map((d) => ({ label: d.name, href: `/archive/drafts#${d.slug}` })) }] },
-    { section: by("data"), groups: data },
-    { section: by("notes"), groups: notes },
-    { section: by("checklists"), groups: checks },
+    { id: "plan", label: "기획", desc: "만들기 전에 정할 것. 업체 고르기, 견적 질문, 유지비", groups: [
+      { title: "업체와 견적", items: [...series("업체 선정"), { label: "홈페이지 견적 질문지(PDF)", href: "/jaryo/estimate" }, tool("/tools/estimate-questions"), tool("/tools/hosting-cost")] },
+    ] },
+    { id: "design", label: "디자인", desc: "화면 부품의 이름, 디자인 용어, 페이지 종류별 화면, 시안, 기기에 따라 바뀐 화면", groups: [
+      { title: "화면 부품 용어", items: cats.map((c) => ({ label: c, count: parts.filter((g) => g.cat === c).length, children: parts.filter((g) => g.cat === c).map((g) => ({ label: shortTitle(g), href: termHref(g) })) })) },
+      { title: "디자인 용어", items: ["g33", "g34", "g35", "g36"].map(term) },
+      { title: "화면과 시안", items: [{ label: "화면 예시", href: "/knowledge/screens" }, { label: "시안 작업", href: "/knowledge/drafts" }] },
+      { title: "디자인 흐름", items: designDocs.map((d) => ({ label: d.title, href: d.href })) },
+    ] },
+    { id: "frontend", label: "프론트엔드", desc: "브라우저 호환, 움직이는 화면의 기술, 페이지 무게와 속도, 접근성", groups: [
+      { title: "문서", items: ["/knowledge/browser", "/knowledge/flash-jquery", "/knowledge/page-weight"].map(doc) },
+      { title: "도구", items: [tool("/tools/accessibility-check"), tool("/tools/image-compress")] },
+    ] },
+    { id: "dev", label: "CMS와 개발", desc: "만드는 도구(카페24, WordPress, 그누보드), PHP 버전, 앱, AI로 만든 서비스", groups: [
+      { title: "문서", items: ["/knowledge/cms", "/knowledge/php", "/knowledge/app"].map(doc) },
+      { title: "AI로 만든 서비스 운영", items: series("AI로 만든 서비스 운영") },
+      { title: "개발 도구", items: [tool("/tools/jwt-parser"), tool("/tools/unix-time"), tool("/tools/cron")] },
+    ] },
+    { id: "infra", label: "인프라", desc: "도메인, 서버, 호스팅, https와 인증서", groups: [
+      { title: "문서", items: [doc("/knowledge/https"), term("go1")] },
+    ] },
+    { id: "security", label: "보안", desc: "보안 경보와 점검", groups: [
+      { title: "보안 경보", items: series("보안 경보") },
+      { title: "도구", items: [tool("/tools/php-check"), tool("/tools/site-check")] },
+    ] },
+    { id: "search", label: "검색", desc: "검색 등록과 기록, 검색 결과에 보이는 모습", groups: [
+      { title: "문서", items: [term("go4"), tool("/tools/search-preview")] },
+    ] },
+    { id: "ops", label: "운영과 유지보수", desc: "인수인계, 월 점검, 장애 대응, 관리 비용, 점검표", groups: [
+      { title: "운영과 유지보수", items: series("운영과 유지보수") },
+      { title: "관리 비용", items: series("관리 비용") },
+      { title: "운영 용어", items: [term("go2"), term("go3")] },
+      { title: "점검표와 기록표", items: jaryo.filter((j) => j.id !== "estimate").map((j) => ({ label: j.title, href: `/jaryo/${j.id}` })) },
+    ] },
+    { id: "law", label: "법과 규정", desc: "개인정보처리방침, 이용약관처럼 사이트에 꼭 있어야 하는 문서", groups: [
+      { title: "도구", items: [tool("/tools/privacy-policy"), tool("/tools/terms")] },
+    ] },
+    { id: "reference", label: "참고", desc: "차트 원본 데이터, 해외와 국내 동향, 전체 목록", groups: [
+      { title: "자료", items: [{ label: "데이터", href: "/knowledge/data" }, { label: "용어 전체", href: "/knowledge/terms" }, { label: "운영 노트 전체", href: "/knowledge/notes" }, { label: "점검표와 도구 전체", href: "/knowledge/checklists" }, tool("/tools/qr-code")] },
+      { title: "해외와 국내 동향", items: series("해외와 국내 동향") },
+    ] },
   ];
 }
 
-/** 최근 쌓인 기록. 인사이트는 글 날짜에서 자동으로, 나머지는 더한 날 직접 적는다(지어내지 않기) */
+/** 주소가 들어 있는 주제(왼쪽 트리 펼침, 위치 표시용) */
+export function topicOf(href: string): Topic | undefined {
+  const has = (n: TreeNode): boolean => n.href === href || !!n.children?.some(has);
+  return topics().find((t) => t.groups.some((g) => g.items.some(has)));
+}
+
+/** 같은 주제의 다른 문서(관련 문서) */
+export function relatedOf(href: string, limit = 6): TreeNode[] {
+  const t = topicOf(href);
+  if (!t) return [];
+  const flat = (n: TreeNode): TreeNode[] => (n.children ? n.children.flatMap(flat) : n.href ? [n] : []);
+  return t.groups.flatMap((g) => g.items.flatMap(flat)).filter((n) => n.href !== href).slice(0, limit);
+}
+
+/** 최근 수정된 문서. 인사이트는 글 날짜에서 자동으로, 나머지는 더한 날 직접 적는다(지어내지 않기) */
 const manualLog: { date: string; kind: string; title: string; href: string }[] = [
-  { date: "2026-11-21", kind: "데이터", title: "수요 조사: \"홈페이지 제작\" 검색 관심도 2004~2026", href: "/archive/data#search-demand" },
-  { date: "2026-11-21", kind: "디자인 트렌드", title: "입체에서 플랫, 카드, 벤토까지, 모바일 화면, 화면 크기", href: "/archive/design" },
-  { date: "2026-11-21", kind: "기술 트렌드", title: "브라우저, https, 플래시, 만드는 도구, 페이지 무게, 앱, PHP", href: "/archive/tech" },
-  { date: "2026-11-21", kind: "데이터", title: "데이터 차트: 브라우저, 모바일, 화면 크기, https, Flash와 jQuery, 페이지 무게, 앱 OS, PHP, 검색 관심도", href: "/archive/data" },
-  { date: "2026-11-21", kind: "용어", title: "화면 부품, 디자인 용어 와이어프레임 225장", href: "/archive/terms" },
-  { date: "2026-11-21", kind: "시안 작업", title: "업종 7곳, 방향이 다른 시안 두 장씩", href: "/archive/drafts" },
-  { date: "2026-11-21", kind: "화면 예시", title: "페이지 종류별 와이어프레임 9가지", href: "/archive/screens" },
-  { date: "2026-11-21", kind: "용어", title: "인수 시 확인 사항 47묶음 전체", href: "/archive/terms" },
+  { date: "2026-11-21", kind: "디자인", title: "화면 크기: 1024에서 1920으로", href: "/knowledge/screen-size" },
+  { date: "2026-11-21", kind: "프론트엔드", title: "브라우저 호환: 한국만 IE를 오래 못 떠난 이유", href: "/knowledge/browser" },
+  { date: "2026-11-21", kind: "CMS와 개발", title: "CMS 비교: 한국은 카페24, 일본은 WordPress", href: "/knowledge/cms" },
+  { date: "2026-11-21", kind: "디자인", title: "시안 작업: 업종 7곳, 시안 두 장씩", href: "/knowledge/drafts" },
+  { date: "2026-11-21", kind: "디자인", title: "화면 예시: 페이지 종류별 와이어프레임", href: "/knowledge/screens" },
+  { date: "2026-11-21", kind: "참고", title: "데이터 차트와 원본 CSV", href: "/knowledge/data" },
 ];
 export function recentLog(limit = 8) {
-  const fromNotes = insights.map((n) => ({ date: n.date, kind: "운영 노트", title: n.title, href: `/insight/${n.slug}` }));
+  const fromNotes = insights.map((n) => ({ date: n.updated ?? n.date, kind: topicOf(`/insight/${n.slug}`)?.label ?? "운영 노트", title: n.title, href: `/insight/${n.slug}` }));
   return [...manualLog, ...fromNotes].sort((a, b) => b.date.localeCompare(a.date)).slice(0, limit);
 }
