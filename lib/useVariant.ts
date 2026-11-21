@@ -20,6 +20,18 @@ export const VARIANTS: Record<string, { id: string; label: string }[]> = {
     { id: "a", label: "시안 A 미니멀" },
     { id: "b", label: "시안 B 가족형" },
   ],
+  academy: [
+    { id: "a", label: "시안 A 입시형" },
+    { id: "b", label: "시안 B 초중등형" },
+  ],
+  interior: [
+    { id: "a", label: "시안 A 갤러리형" },
+    { id: "b", label: "시안 B 비용 안심형" },
+  ],
+  "clinic-homepage": [
+    { id: "a", label: "시안 A 미니멀" },
+    { id: "b", label: "시안 B 진료 안내형" },
+  ],
 };
 
 export function setVariant(v: string) {

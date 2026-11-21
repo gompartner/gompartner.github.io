@@ -17,7 +17,7 @@ const RealEstateDemo = dynamic(() => import("@/components/demos/RealEstateDemo")
 const BakeryCafeDemo = dynamic(() => import("@/components/demos/BakeryCafeDemo").then((m) => m.BakeryCafeDemo));
 const PharmacyDemo = dynamic(() => import("@/components/demos/PharmacyDemo").then((m) => m.PharmacyDemo));
 const ApplicationDemo = dynamic(() => import("@/components/demos/ApplicationDemo").then((m) => m.ApplicationDemo));
-const ClinicHomepageDemo = dynamic(() => import("@/components/demos/ClinicHomepageDemo").then((m) => m.ClinicHomepageDemo));
+const SkinDrafts = dynamic(() => import("@/components/drafts/Drafts").then((m) => m.SkinDrafts));
 const DentalDrafts = dynamic(() => import("@/components/drafts/Drafts").then((m) => m.DentalDrafts));
 const ClinicReportDemo = dynamic(() => import("@/components/demos/ClinicReportDemo").then((m) => m.ClinicReportDemo));
 const CommunityMapDemo = dynamic(() => import("@/components/demos/CommunityMapDemo").then((m) => m.CommunityMapDemo));
@@ -26,8 +26,8 @@ const DistrictPortalDemo = dynamic(() => import("@/components/demos/DistrictPort
 const FlowerExpoDemo = dynamic(() => import("@/components/demos/FlowerExpoDemo").then((m) => m.FlowerExpoDemo));
 const HanokCafeDemo = dynamic(() => import("@/components/demos/HanokCafeDemo").then((m) => m.HanokCafeDemo));
 const KoreanRestaurantDemo = dynamic(() => import("@/components/demos/KoreanRestaurantDemo").then((m) => m.KoreanRestaurantDemo));
-const InteriorDemo = dynamic(() => import("@/components/demos/InteriorDemo").then((m) => m.InteriorDemo));
-const AcademyDemo = dynamic(() => import("@/components/demos/AcademyDemo").then((m) => m.AcademyDemo));
+const InteriorDrafts = dynamic(() => import("@/components/drafts/Drafts").then((m) => m.InteriorDrafts));
+const AcademyDrafts = dynamic(() => import("@/components/drafts/Drafts").then((m) => m.AcademyDrafts));
 const PilatesStudioDemo = dynamic(() => import("@/components/demos/PilatesStudioDemo").then((m) => m.PilatesStudioDemo));
 const HomepageDemo = dynamic(() => import("@/components/demos/HomepageDemo").then((m) => m.HomepageDemo));
 const LmsDemo = dynamic(() => import("@/components/demos/LmsDemo").then((m) => m.LmsDemo));
@@ -88,12 +88,12 @@ interface DemoPageProps {
 
 const demoComponents: Record<string, ComponentType> = {
   "clinic-report": ClinicReportDemo,
-  "clinic-homepage": ClinicHomepageDemo,
+  "clinic-homepage": SkinDrafts,
   "dental-homepage": DentalDrafts,
   "hanok-cafe": HanokCafeDemo,
   "korean-restaurant": KoreanRestaurantDemo,
-  interior: InteriorDemo,
-  academy: AcademyDemo,
+  interior: InteriorDrafts,
+  academy: AcademyDrafts,
   "pilates-studio": PilatesStudioDemo,
   "flower-expo": FlowerExpoDemo,
   "bakery-cafe": BakeryCafeDemo,
