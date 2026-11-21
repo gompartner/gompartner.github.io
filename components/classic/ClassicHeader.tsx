@@ -126,6 +126,19 @@ export function ClassicHeader() {
     document.addEventListener("keydown", onKey);
     return () => document.removeEventListener("keydown", onKey);
   }, [open]);
+  // 11-21 태블릿 크롬: 스크롤을 내렸다 올려 주소창이 다시 펴지면 sticky 위치가 늦게 갱신돼 맨 위에서도 머리가 제목을 덮었다(사용자 제보).
+  // 맨 위에서는 sticky 대신 일반 배치(relative)로 둔다. 맨 위에서는 두 배치가 같아 보이고, 바뀔 때 위치를 새로 계산한다.
+  const [atTop, setAtTop] = useState(true);
+  useEffect(() => {
+    const on = () => setAtTop(window.scrollY <= 1);
+    on();
+    window.addEventListener("scroll", on, { passive: true });
+    window.visualViewport?.addEventListener("resize", on);
+    return () => {
+      window.removeEventListener("scroll", on);
+      window.visualViewport?.removeEventListener("resize", on);
+    };
+  }, []);
   useEffect(() => {
     document.body.style.overflow = open ? "hidden" : "";
     return () => {
@@ -136,7 +149,7 @@ export function ClassicHeader() {
   return (
     // 11-09 fixed에서 sticky로: 아이패드에서 뒤로 가기 뒤 화면 기준점이 어긋나면 고정 머리가 페이지 제목을 덮고 위로 안 올라갔다(사용자 제보).
     // sticky는 문서 흐름 안에 있어 맨 위에서는 제목을 덮지 않는다. 본문 위 여백(pt-16, md:pt-[76px])도 같이 뺐다.
-    <header className="sticky top-0 z-50 bg-white">
+    <header className={cn(atTop ? "relative" : "sticky", "top-0 z-50 bg-white")}>
       <div className="border-b border-[#e6e9ee]">
         <nav aria-label="주 메뉴" className="mx-auto flex h-16 w-full max-w-[1248px] items-center justify-between gap-6 px-4 md:h-[76px] md:px-6">
           <Link href="/" className="flex shrink-0 items-center gap-2.5 text-[21px] font-[800] tracking-[-0.04em] text-[#15171c]">
