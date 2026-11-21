@@ -126,36 +126,15 @@ export function ClassicHeader() {
     document.addEventListener("keydown", onKey);
     return () => document.removeEventListener("keydown", onKey);
   }, [open]);
-  // 11-21 태블릿 크롬: 스크롤을 내렸다 올려 주소창이 다시 펴지면 sticky 위치가 늦게 갱신돼 맨 위에서도 머리가 제목을 덮었다(사용자 제보).
-  // 맨 위에서는 sticky 대신 일반 배치(relative)로 둔다. 맨 위에서는 두 배치가 같아 보이고, 바뀔 때 위치를 새로 계산한다.
-  const [atTop, setAtTop] = useState(true);
+  // 11-21 태블릿(손가락 입력, 폭 768 이상)은 머리를 고정하지 않는다. 아이패드 크롬은 주소창이 접히고 펴질 때
+  // 고정 위치를 늦게 계산해 머리가 제목을 덮거나 머리 위에 빈칸이 생겼다(사용자 캡처, 녹화). 휴대폰과 PC는 그대로 고정.
+  const [tablet, setTablet] = useState(false);
   useEffect(() => {
-    const on = () => setAtTop(window.scrollY <= 1);
+    const mq = window.matchMedia("(pointer: coarse) and (min-width: 768px)");
+    const on = () => setTablet(mq.matches);
     on();
-    // 아이패드 크롬은 화면을 돌린 뒤 이전 방향의 폭과 스크롤 기준을 그대로 써서 오른쪽이 비거나 맨 위로 안 올라갔다(11-21 녹화).
-    // 돌릴 때 viewport 값을 잠깐 바꿨다 되돌려 크기를 다시 계산하게 한다
-    const meta = document.querySelector('meta[name="viewport"]');
-    const base = meta?.getAttribute("content") || "width=device-width, initial-scale=1";
-    let t: ReturnType<typeof setTimeout> | undefined;
-    const rotate = () => {
-      clearTimeout(t);
-      t = setTimeout(() => {
-        meta?.setAttribute("content", base + ", maximum-scale=1");
-        setTimeout(() => meta?.setAttribute("content", base), 300);
-        on();
-      }, 150);
-    };
-    window.addEventListener("orientationchange", rotate);
-    screen.orientation?.addEventListener("change", rotate);
-    window.addEventListener("scroll", on, { passive: true });
-    window.visualViewport?.addEventListener("resize", on);
-    return () => {
-      window.removeEventListener("scroll", on);
-      window.removeEventListener("orientationchange", rotate);
-      screen.orientation?.removeEventListener("change", rotate);
-      clearTimeout(t);
-      window.visualViewport?.removeEventListener("resize", on);
-    };
+    mq.addEventListener("change", on);
+    return () => mq.removeEventListener("change", on);
   }, []);
   useEffect(() => {
     document.body.style.overflow = open ? "hidden" : "";
@@ -167,7 +146,7 @@ export function ClassicHeader() {
   return (
     // 11-09 fixed에서 sticky로: 아이패드에서 뒤로 가기 뒤 화면 기준점이 어긋나면 고정 머리가 페이지 제목을 덮고 위로 안 올라갔다(사용자 제보).
     // sticky는 문서 흐름 안에 있어 맨 위에서는 제목을 덮지 않는다. 본문 위 여백(pt-16, md:pt-[76px])도 같이 뺐다.
-    <header className={cn(atTop ? "relative" : "sticky", "top-0 z-50 bg-white")}>
+    <header className={cn(tablet ? "relative" : "sticky", "top-0 z-50 bg-white")}>
       <div className="border-b border-[#e6e9ee]">
         <nav aria-label="주 메뉴" className="mx-auto flex h-16 w-full max-w-[1248px] items-center justify-between gap-6 px-4 md:h-[76px] md:px-6">
           <Link href="/" className="flex shrink-0 items-center gap-2.5 text-[21px] font-[800] tracking-[-0.04em] text-[#15171c]">
