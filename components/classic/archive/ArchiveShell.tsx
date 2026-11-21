@@ -3,6 +3,7 @@ import { ChevronDown, ChevronRight, Home, Search } from "lucide-react";
 import { topicOf, topics, type TreeNode } from "@/data/classic/archive";
 
 // 웹 지식 공용 틀(11-21 컨플루언스식): 사이트 머리글 아래, 왼쪽 공간 이름과 주제 페이지 트리, 가운데 문서, 오른쪽 목차.
+// 태블릿(손가락 입력, 768 이상)은 머리 메뉴가 고정되지 않으므로 트리와 목차를 위 5칸만 띄운다.
 // 위치 표시는 "웹 지식 > 주제 > 문서"로 자동으로 만든다(주제는 트리에서 찾음). 색과 글꼴은 사이트 톤 그대로.
 
 export type Crumb = { href: string; label: string };
@@ -90,7 +91,7 @@ export function ArchiveShell({ section, active, crumbs, toc, children }: { secti
   return (
     <div className={`mx-auto grid w-full max-w-[1248px] md:px-6 lg:min-h-[calc(100vh-4.75rem)] lg:grid-cols-[250px_minmax(0,1fr)] ${toc && toc.length > 0 ? "xl:grid-cols-[250px_minmax(0,1fr)_180px]" : ""}`}>
       <aside className="hidden border-r border-[#e6e9ee] bg-[#fafbfc] pb-12 pr-3 pt-5 lg:block">
-        <div className="sticky top-24 max-h-[calc(100vh-7rem)] overflow-y-auto overscroll-contain pl-1 pr-1">
+        <div className="sticky top-24 max-h-[calc(100vh-7rem)] overflow-y-auto overscroll-contain pl-1 pr-1 [@media(pointer:coarse)_and_(min-width:768px)]:top-5 [@media(pointer:coarse)_and_(min-width:768px)]:max-h-[calc(100vh-2.5rem)]">
           <Tree topicId={topic?.id} active={active} />
         </div>
       </aside>
@@ -127,7 +128,7 @@ export function ArchiveShell({ section, active, crumbs, toc, children }: { secti
 
       {toc && toc.length > 0 ? (
         <aside className="hidden px-5 pt-10 xl:block">
-          <div className="sticky top-24">
+          <div className="sticky top-24 [@media(pointer:coarse)_and_(min-width:768px)]:top-5">
             <p className="mb-2.5 text-[12px] font-[800] text-[#8a93a1]">이 페이지</p>
             <ul role="list">
               {toc.map((t) => (
