@@ -132,10 +132,28 @@ export function ClassicHeader() {
   useEffect(() => {
     const on = () => setAtTop(window.scrollY <= 1);
     on();
+    // 아이패드 크롬은 화면을 돌린 뒤 이전 방향의 폭과 스크롤 기준을 그대로 써서 오른쪽이 비거나 맨 위로 안 올라갔다(11-21 녹화).
+    // 돌릴 때 viewport 값을 잠깐 바꿨다 되돌려 크기를 다시 계산하게 한다
+    const meta = document.querySelector('meta[name="viewport"]');
+    const base = meta?.getAttribute("content") || "width=device-width, initial-scale=1";
+    let t: ReturnType<typeof setTimeout> | undefined;
+    const rotate = () => {
+      clearTimeout(t);
+      t = setTimeout(() => {
+        meta?.setAttribute("content", base + ", maximum-scale=1");
+        setTimeout(() => meta?.setAttribute("content", base), 300);
+        on();
+      }, 150);
+    };
+    window.addEventListener("orientationchange", rotate);
+    screen.orientation?.addEventListener("change", rotate);
     window.addEventListener("scroll", on, { passive: true });
     window.visualViewport?.addEventListener("resize", on);
     return () => {
       window.removeEventListener("scroll", on);
+      window.removeEventListener("orientationchange", rotate);
+      screen.orientation?.removeEventListener("change", rotate);
+      clearTimeout(t);
       window.visualViewport?.removeEventListener("resize", on);
     };
   }, []);
