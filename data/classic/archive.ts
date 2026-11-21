@@ -25,6 +25,7 @@ export const techDocs: TrendDoc[] = [
   { href: "/knowledge/cms", title: "CMS 비교: 카페24, WordPress, 아임웹", desc: "한국어, 일본어, 영어 사이트의 만드는 도구 점유율 상위 3." },
   { href: "/knowledge/page-weight", title: "페이지 무게와 속도", desc: "페이지 한 장 용량 중앙값, PC 2011~2026 6배, 모바일 9배." },
   { href: "/knowledge/app", title: "앱: 안드로이드와 아이폰", desc: "휴대폰 OS 중 아이폰 비율, 한국 일본 미국 2012~2025. 앱 인수 시 계정, 서명 키, 스토어 요구." },
+  { href: "/knowledge/server-language", title: "개발 언어: Perl CGI에서 Next.js까지", desc: "서버 언어 비율 2015~2026(PHP, ASP.NET, Java, Node.js). Perl CGI 게시판, PHP 공유 호스팅, 공공의 Java, 화면과 서버를 함께 쓰는 Next.js." },
   { href: "/knowledge/php", title: "PHP 버전과 유지보수", desc: "PHP 사이트 중 버전 비율 2015~2026, 공식 지원 종료일, 서버 앞단 CDN의 확산." },
 ];
 export const trendDocs: TrendDoc[] = [...designDocs, ...techDocs];
@@ -322,7 +323,7 @@ export function topics(): Topic[] {
       { title: "도구", items: [tool("/tools/accessibility-check"), tool("/tools/image-compress")] },
     ] },
     { id: "dev", label: "CMS와 개발", desc: "만드는 도구(카페24, WordPress, 그누보드), PHP 버전, 앱, AI로 만든 서비스", groups: [
-      { title: "문서", items: ["/knowledge/cms", "/knowledge/php", "/knowledge/app"].map(doc) },
+      { title: "문서", items: ["/knowledge/server-language", "/knowledge/cms", "/knowledge/php", "/knowledge/app"].map(doc) },
       { title: "AI로 만든 서비스 운영", items: series("AI로 만든 서비스 운영") },
       { title: "개발 도구", items: [tool("/tools/jwt-parser"), tool("/tools/unix-time"), tool("/tools/cron")] },
     ] },
@@ -368,6 +369,7 @@ export function relatedOf(href: string, limit = 6): TreeNode[] {
 
 /** 최근 수정된 문서. 인사이트는 글 날짜에서 자동으로, 나머지는 더한 날 직접 적는다(지어내지 않기) */
 const manualLog: { date: string; kind: string; title: string; href: string }[] = [
+  { date: "2026-11-22", kind: "CMS와 개발", title: "개발 언어: Perl CGI에서 Next.js까지", href: "/knowledge/server-language" },
   { date: "2026-11-21", kind: "디자인", title: "화면 크기: 1024에서 1920으로", href: "/knowledge/screen-size" },
   { date: "2026-11-21", kind: "프론트엔드", title: "브라우저 호환: 한국만 IE를 오래 못 떠난 이유", href: "/knowledge/browser" },
   { date: "2026-11-21", kind: "CMS와 개발", title: "CMS 비교: 한국은 카페24, 일본은 WordPress", href: "/knowledge/cms" },

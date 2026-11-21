@@ -24,6 +24,9 @@ export function TrendArticle(props: {
   takeSub: string;
   take: { b: string; t: string }[];
   sources: Src[];
+  /** 처음 쓴 날, 고친 날(없으면 공통 값) */
+  published?: string;
+  updated?: string;
 }) {
   const toc = [
     { id: "chart", label: props.chartTitle },
@@ -36,8 +39,8 @@ export function TrendArticle(props: {
   return (
     <ArchiveShell active={props.href} crumbs={[{ href: props.href, label: props.title }]} toc={toc}>
       {/* 최종 수정일을 검색엔진에도 알린다 */}
-      <LdScript data={{ "@context": "https://schema.org", "@type": "Article", headline: props.title, description: props.lead, datePublished: "2026-11-21", dateModified: TREND_CHECKED, author: { "@id": ORG_ID }, publisher: { "@id": ORG_ID }, mainEntityOfPage: `${siteUrl}${props.href}`, inLanguage: "ko" }} />
-      <DocHead title={props.title} meta={[...props.meta, ["최종 수정일", TREND_CHECKED]]} lead={props.lead} />
+      <LdScript data={{ "@context": "https://schema.org", "@type": "Article", headline: props.title, description: props.lead, datePublished: props.published ?? "2026-11-21", dateModified: props.updated ?? TREND_CHECKED, author: { "@id": ORG_ID }, publisher: { "@id": ORG_ID }, mainEntityOfPage: `${siteUrl}${props.href}`, inLanguage: "ko" }} />
+      <DocHead title={props.title} meta={[...props.meta, ["최종 수정일", props.updated ?? TREND_CHECKED]]} lead={props.lead} />
       <h2 id="chart" className={docH2}>{props.chartTitle}</h2>
       {props.chart}
       <h2 id="why" className={docH2}>{props.storyTitle}</h2>
