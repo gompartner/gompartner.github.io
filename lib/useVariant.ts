@@ -12,6 +12,14 @@ export const VARIANTS: Record<string, { id: string; label: string }[]> = {
     { id: "a", label: "시안 A 프리미엄" },
     { id: "b", label: "시안 B 상담형" },
   ],
+  "tax-office": [
+    { id: "a", label: "시안 A 법인형" },
+    { id: "b", label: "시안 B 사장님형" },
+  ],
+  "dental-homepage": [
+    { id: "a", label: "시안 A 미니멀" },
+    { id: "b", label: "시안 B 가족형" },
+  ],
 };
 
 export function setVariant(v: string) {

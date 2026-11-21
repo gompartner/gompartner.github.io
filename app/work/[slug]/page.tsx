@@ -12,13 +12,13 @@ const PensionDemo = dynamic(() => import("@/components/demos/PensionDemo").then(
 const CompanyDemo = dynamic(() => import("@/components/demos/CompanyDemo").then((m) => m.CompanyDemo));
 const CertLabDemo = dynamic(() => import("@/components/demos/CertLabDemo").then((m) => m.CertLabDemo));
 const LawFirmDrafts = dynamic(() => import("@/components/drafts/LawFirmDrafts").then((m) => m.LawFirmDrafts));
-const TaxOfficeDemo = dynamic(() => import("@/components/demos/TaxOfficeDemo").then((m) => m.TaxOfficeDemo));
+const TaxDrafts = dynamic(() => import("@/components/drafts/Drafts").then((m) => m.TaxDrafts));
 const RealEstateDemo = dynamic(() => import("@/components/demos/RealEstateDemo").then((m) => m.RealEstateDemo));
 const BakeryCafeDemo = dynamic(() => import("@/components/demos/BakeryCafeDemo").then((m) => m.BakeryCafeDemo));
 const PharmacyDemo = dynamic(() => import("@/components/demos/PharmacyDemo").then((m) => m.PharmacyDemo));
 const ApplicationDemo = dynamic(() => import("@/components/demos/ApplicationDemo").then((m) => m.ApplicationDemo));
 const ClinicHomepageDemo = dynamic(() => import("@/components/demos/ClinicHomepageDemo").then((m) => m.ClinicHomepageDemo));
-const DentalHomepageDemo = dynamic(() => import("@/components/demos/DentalHomepageDemo").then((m) => m.DentalHomepageDemo));
+const DentalDrafts = dynamic(() => import("@/components/drafts/Drafts").then((m) => m.DentalDrafts));
 const ClinicReportDemo = dynamic(() => import("@/components/demos/ClinicReportDemo").then((m) => m.ClinicReportDemo));
 const CommunityMapDemo = dynamic(() => import("@/components/demos/CommunityMapDemo").then((m) => m.CommunityMapDemo));
 const ExcelAutomationDemo = dynamic(() => import("@/components/demos/ExcelAutomationDemo").then((m) => m.ExcelAutomationDemo));
@@ -89,7 +89,7 @@ interface DemoPageProps {
 const demoComponents: Record<string, ComponentType> = {
   "clinic-report": ClinicReportDemo,
   "clinic-homepage": ClinicHomepageDemo,
-  "dental-homepage": DentalHomepageDemo,
+  "dental-homepage": DentalDrafts,
   "hanok-cafe": HanokCafeDemo,
   "korean-restaurant": KoreanRestaurantDemo,
   interior: InteriorDemo,
@@ -114,7 +114,7 @@ const demoComponents: Record<string, ComponentType> = {
   company: CompanyDemo,
   "cert-lab": CertLabDemo,
   "law-firm": LawFirmDrafts,
-  "tax-office": TaxOfficeDemo,
+  "tax-office": TaxDrafts,
   "real-estate": RealEstateDemo,
   "community-map": CommunityMapDemo,
   "program-application": ApplicationDemo,
