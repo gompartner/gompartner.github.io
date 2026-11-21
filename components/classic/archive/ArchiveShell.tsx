@@ -1,5 +1,5 @@
 import Link from "next/link";
-import { ChevronDown, ChevronRight, Home, Search } from "lucide-react";
+import { BookOpen, ChevronDown, ChevronRight, Home, Search } from "lucide-react";
 import { topicOf, topics, type TreeNode } from "@/data/classic/archive";
 
 // 웹 지식 공용 틀(11-21 컨플루언스식): 사이트 머리글 아래, 왼쪽 공간 이름과 주제 페이지 트리, 가운데 문서, 오른쪽 목차.
@@ -43,7 +43,7 @@ function Tree({ topicId, active }: { topicId?: string; active: string }) {
   return (
     <nav aria-label="웹 지식 페이지 트리">
       <Link href="/knowledge" className="mb-3 flex items-center gap-2.5 border-b border-[#e6e9ee] px-2 pb-3.5">
-        <span aria-hidden className="grid h-8 w-8 place-items-center rounded-md bg-[#256ef4] text-[13px] font-[800] text-white">웹</span>
+        <span aria-hidden className="grid h-8 w-8 place-items-center rounded-md bg-[#256ef4] text-white"><BookOpen size={17} strokeWidth={2.2} /></span>
         <span>
           <span className="block text-[15px] font-[800] text-[#15171c]">웹 지식</span>
           <span className="block text-[12px] text-[#5b6370]">곰파트너</span>
