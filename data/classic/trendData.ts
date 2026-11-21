@@ -48,3 +48,13 @@ export const datasets: Dataset[] = [
     csv: ["KR", "JP", "US"].map((c) => ({ label: `${c} 기기별`, href: `/data/trend/platform-${c}.csv` })),
   },
 ];
+
+/** 실제 사례(11-21 사용자 A안): 인터넷 아카이브 보관본 링크 + 그 화면에서 직접 확인한 문구. 캡처는 사이트에 올리지 않고
+ * 01_Work/03_Resource/아카이브-근거 에 둔다. 링크가 죽으면 alive를 false로 바꾸면 링크 대신 "보관본 확인 불가"가 보인다. */
+export type Example = { country: string; site: string; date: string; url: string; seen: string; alive: boolean; checked: string };
+
+export const examples2012: Example[] = [
+  { country: "한국", site: "KB국민은행", date: "2012-05-24", url: "https://web.archive.org/web/20120524151925/https://www.kbstar.com/", seen: "첫 화면 새소식에 \"공인인증서 발급/재발급 절차 강화 안내\", 자주 묻는 질문에 \"보안프로그램 설치 방법은 어떻게 되나요?\"", alive: true, checked: "2026-11-21" },
+  { country: "일본", site: "Yahoo! JAPAN", date: "2012-06-01", url: "https://web.archive.org/web/20120601191309/http://www.yahoo.co.jp/", seen: "첫 화면 위에 권장 환경 안내 \"Windows: Internet Explorer 6.0 이상 / Firefox 3.0 이상\". 메뉴와 뉴스 목록이 글자로 빽빽함", alive: true, checked: "2026-11-21" },
+  { country: "미국", site: "백악관(whitehouse.gov)", date: "2012-06-01", url: "https://web.archive.org/web/20120601224332/http://www.whitehouse.gov/", seen: "화면을 채운 큰 사진 위에 이메일 구독 문장 하나와 \"Learn More\" 버튼 하나", alive: true, checked: "2026-11-21" },
+];

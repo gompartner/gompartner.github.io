@@ -3,7 +3,7 @@ import Link from "next/link";
 import { ArchiveShell, DocHead, TakeoverBox, docH2 } from "@/components/classic/archive/ArchiveShell";
 import { LineChart } from "@/components/classic/archive/LineChart";
 import { Wireframes2012 } from "@/components/classic/archive/Wireframes2012";
-import { TREND_CHECKED, ieShare } from "@/data/classic/trendData";
+import { TREND_CHECKED, examples2012, ieShare } from "@/data/classic/trendData";
 import { pageMeta } from "@/lib/seo";
 
 // 트렌드 "같은 20년, 세 나라의 홈페이지" 1장(11-21). 숫자는 data/classic/trendData.ts(StatCounter), 법과 지원 종료일은 아래 출처.
@@ -51,7 +51,7 @@ export default function TrendKoreaIe() {
       </p>
 
       <h2 id="wf" className={docH2}>2012년 무렵 첫 화면, 나란히 보기</h2>
-      <Wireframes2012 />
+      <Wireframes2012 examples={examples2012} />
 
       <TakeoverBox
         sub="2010년대 초에 만든 한국 사이트를 인수했다면"
@@ -68,6 +68,11 @@ export default function TrendKoreaIe() {
         <li>
           <a href="https://gs.statcounter.com/browser-market-share/desktop" target="_blank" rel="noopener noreferrer" className="underline underline-offset-2 hover:text-[#256ef4]">StatCounter Global Stats, Desktop Browser Market Share</a>: 한국, 일본, 미국 연간 값(확인 {TREND_CHECKED})
         </li>
+        {examples2012.map((ex) => (
+          <li key={ex.url}>
+            <a href={ex.url} target="_blank" rel="noopener noreferrer" className="underline underline-offset-2 hover:text-[#256ef4]">인터넷 아카이브, {ex.site} {ex.date} 보관본</a>: 실제 사례(확인 {ex.checked})
+          </li>
+        ))}
         <li>
           <a href="https://m.boannews.com/html/detail.html?idx=93269" target="_blank" rel="noopener noreferrer" className="underline underline-offset-2 hover:text-[#256ef4]">보안뉴스, 10일부터 공인인증서 폐지(2020-12)</a>: 전자서명법 전부개정법 2020년 12월 10일 시행
         </li>
