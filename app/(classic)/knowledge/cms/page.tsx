@@ -6,20 +6,65 @@ import { pageMeta } from "@/lib/seo";
 
 const HREF = "/knowledge/cms";
 export const metadata: Metadata = pageMeta({
-  title: "CMS 비교: 한국은 카페24, 일본은 WordPress, 만드는 도구 비교 | 웹 지식",
-  description: "CMS를 알아낸 사이트 중 한국어 사이트는 Cafe24 39.6%, WordPress 24.1%, 아임웹 16.7%, 일본어 사이트는 WordPress 82.8%입니다. 나라마다 다른 도구가 인수할 때 무엇을 남기는지 정리했습니다.",
+  title: "만드는 도구(CMS) 비교: 한국은 카페24, 일본은 WordPress | 웹 지식",
+  description: "CMS는 개발자 없이 관리자 화면에서 글, 사진, 메뉴, 상품을 고치게 해 주는 홈페이지 관리 프로그램입니다. 만든 도구를 알아낸 사이트 중 한국어 사이트는 Cafe24 39.6%, WordPress 24.1%, 아임웹 16.7%, 일본어 사이트는 WordPress 82.8%입니다. 나라마다 다른 도구가 인수할 때 무엇을 남기는지 정리했습니다.",
   path: HREF,
   article: true,
 });
+
+// 설치형과 임대형(사이트 빌더) 비교
+const cmsKinds: [string, string, string][] = [
+  ["예", "WordPress, 그누보드, 라이믹스", "카페24, 아임웹, Wix, Shopify"],
+  ["서버", "호스팅이나 서버를 따로 빌려 설치", "빌더 회사가 서버까지 운영"],
+  ["비용", "호스팅비, 유료 테마와 플러그인", "월, 연 이용료와 유료 앱, 스킨"],
+  ["고칠 수 있는 범위", "소스 코드까지 고칠 수 있음", "빌더가 열어 둔 만큼만"],
+  ["옮기기", "파일과 DB를 통째로 옮길 수 있음", "디자인은 못 가져가고 데이터만 내보냄"],
+  ["관리할 것", "본체, 플러그인, PHP 버전 업데이트", "계정 명의, 결제, 요금제"],
+];
 
 export default function TrendCms() {
   return (
     <TrendArticle
       href={HREF}
       crumb="만드는 도구"
-      title="CMS 비교: 카페24, WordPress, 아임웹"
+      title="만드는 도구(CMS) 비교: 카페24, WordPress, 아임웹"
+      updated="2026-11-22"
       meta={[["비교", "한국어, 일본어, 영어 사이트"], ["기준", "2026-11"], ["데이터", "W3Techs"]]}
       lead="사이트를 만든 도구를 알아낸 곳만 놓고 보면, 한국어 사이트는 Cafe24가 39.6%로 가장 많고 일본어 사이트는 WordPress가 82.8%입니다. 같은 홈페이지라도 넘겨받을 때 받아야 할 것이 나라마다 다릅니다."
+      introTitle="CMS란"
+      intro={
+        <>
+          <p className="mt-4 max-w-[760px] text-[16.5px] leading-[1.8] text-[#2b313b]">
+            CMS(Content Management System, 콘텐츠 관리 시스템)는 개발자 없이 관리자 화면에서 글, 사진, 메뉴, 상품을 올리고 고치게 해 주는 홈페이지 관리 프로그램입니다. 게시판에 글을 쓰듯 홈페이지 내용을 바꿀 수 있습니다. CMS가 없으면 문구 하나를 바꿀 때도 개발자가 코드를 고쳐야 합니다.
+          </p>
+          <div className="mt-4 overflow-hidden rounded-[10px] border border-[#e6e9ee]">
+            <table className="w-full border-collapse text-left text-[14.5px] leading-[1.6]">
+              <thead className="hidden md:table-header-group">
+                <tr className="border-b border-[#d9dee5] bg-[#f5f7fa] text-[13.5px] text-[#5b6370]">
+                  <th scope="col" className="w-[130px] px-3 py-2 font-bold">구분</th>
+                  <th scope="col" className="px-3 py-2 font-bold">설치형</th>
+                  <th scope="col" className="px-3 py-2 font-bold">임대형(사이트 빌더)</th>
+                </tr>
+              </thead>
+              <tbody>
+                {cmsKinds.map(([k, a, b]) => (
+                  <tr key={k} className="block border-b border-[#eef0f3] px-3 py-2.5 last:border-0 md:table-row md:p-0">
+                    <th scope="row" className="block pb-1 font-bold md:table-cell md:px-3 md:py-2.5 md:align-top">{k}</th>
+                    <td className="block text-[#2b313b] md:table-cell md:px-3 md:py-2.5 md:align-top">
+                      <b className="mr-1.5 font-bold text-[#5b6370] md:hidden">설치형</b>
+                      {a}
+                    </td>
+                    <td className="block text-[#2b313b] md:table-cell md:px-3 md:py-2.5 md:align-top">
+                      <b className="mr-1.5 font-bold text-[#5b6370] md:hidden">임대형</b>
+                      {b}
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+        </>
+      }
       chartTitle="만드는 도구 점유율 상위 3"
       chart={
         <BarGroups

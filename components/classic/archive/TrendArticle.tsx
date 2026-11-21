@@ -21,6 +21,9 @@ export function TrendArticle(props: {
   story: string[];
   extraTitle?: string;
   extra?: React.ReactNode;
+  /** 차트 앞에 두는 개념 설명(처음 보는 말을 먼저 풀 때) */
+  introTitle?: string;
+  intro?: React.ReactNode;
   takeSub: string;
   take: { b: string; t: string }[];
   sources: Src[];
@@ -29,6 +32,7 @@ export function TrendArticle(props: {
   updated?: string;
 }) {
   const toc = [
+    ...(props.intro ? [{ id: "intro", label: props.introTitle ?? "먼저 알아 둘 말" }] : []),
     { id: "chart", label: props.chartTitle },
     { id: "why", label: props.storyTitle },
     ...(props.extra ? [{ id: "wf", label: props.extraTitle ?? "그림" }] : []),
@@ -41,6 +45,12 @@ export function TrendArticle(props: {
       {/* 최종 수정일을 검색엔진에도 알린다 */}
       <LdScript data={{ "@context": "https://schema.org", "@type": "Article", headline: props.title, description: props.lead, datePublished: props.published ?? "2026-11-21", dateModified: props.updated ?? TREND_CHECKED, author: { "@id": ORG_ID }, publisher: { "@id": ORG_ID }, mainEntityOfPage: `${siteUrl}${props.href}`, inLanguage: "ko" }} />
       <DocHead title={props.title} meta={[...props.meta, ["최종 수정일", props.updated ?? TREND_CHECKED]]} lead={props.lead} />
+      {props.intro ? (
+        <>
+          <h2 id="intro" className={docH2}>{props.introTitle ?? "먼저 알아 둘 말"}</h2>
+          {props.intro}
+        </>
+      ) : null}
       <h2 id="chart" className={docH2}>{props.chartTitle}</h2>
       {props.chart}
       <h2 id="why" className={docH2}>{props.storyTitle}</h2>
