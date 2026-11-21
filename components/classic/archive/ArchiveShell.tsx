@@ -127,17 +127,9 @@ export function ArchiveShell({ section, active, crumbs, toc, children }: { secti
             </ol>
           </nav>
           {children}
-          <section aria-labelledby="copyright-h" className="mt-16 border-t border-[#e6e9ee] pt-5 text-[13px] leading-[1.75] text-[#5b6370]">
-            <h2 id="copyright-h" className="text-[13.5px] font-bold text-[#3d4450]">저작권 및 이용 안내</h2>
-            <p className="mt-1.5">이 아카이브에 게시된 글, 와이어프레임, 차트 디자인, 시안 이미지의 저작권은 곰파트너에 있습니다.</p>
-            <p>출처(곰파트너, 해당 페이지 주소)를 밝히는 경우 저작권법이 허용하는 범위에서 인용할 수 있습니다.</p>
-            <p>그 범위를 넘는 복제, 변형, 재배포와 상업적 이용, 시안 디자인의 사용은 사전에 서면 동의를 받아야 합니다.</p>
-            <p>차트의 수치는 각 차트 하단에 표기한 출처의 자료이며, 해당 출처의 이용 조건을 따릅니다.</p>
-            <p>
-              이용 문의:{" "}
-              <a href="mailto:contact@gompartner.co.kr" className="underline underline-offset-2 hover:text-[#15171c]">contact@gompartner.co.kr</a>
-            </p>
-          </section>
+          <p className="mt-16 border-t border-[#e6e9ee] pt-5 text-[13px] leading-[1.7] text-[#5b6370]">
+            본 콘텐츠의 저작권은 곰파트너에 있으며, 무단 전재 및 재배포를 금합니다. 출처를 밝힌 인용은 가능합니다.
+          </p>
         </main>
 
         {toc && toc.length > 0 ? (
