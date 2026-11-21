@@ -88,9 +88,9 @@ export function ArchiveShell({ section, active, crumbs, toc, children }: { secti
   if (topic && active !== `/knowledge/${topic.id}`) trail.push({ href: `/knowledge/${topic.id}`, label: topic.label });
   if (last && last.href !== "/knowledge") trail.push(last);
   return (
-    <div className={`mx-auto grid w-full max-w-[1248px] md:px-6 lg:grid-cols-[250px_minmax(0,1fr)] ${toc && toc.length > 0 ? "xl:grid-cols-[250px_minmax(0,1fr)_180px]" : ""}`}>
+    <div className={`mx-auto grid w-full max-w-[1248px] md:px-6 lg:min-h-[calc(100vh-4.75rem)] lg:grid-cols-[250px_minmax(0,1fr)] ${toc && toc.length > 0 ? "xl:grid-cols-[250px_minmax(0,1fr)_180px]" : ""}`}>
       <aside className="hidden border-r border-[#e6e9ee] bg-[#fafbfc] pb-12 pr-3 pt-5 lg:block">
-        <div className="sticky top-24 max-h-[calc(100vh-7rem)] overflow-y-auto pl-1 pr-1">
+        <div className="sticky top-24 max-h-[calc(100vh-7rem)] overflow-y-auto overscroll-contain pl-1 pr-1">
           <Tree topicId={topic?.id} active={active} />
         </div>
       </aside>
