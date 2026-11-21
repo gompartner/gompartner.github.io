@@ -3,7 +3,6 @@
 import { useEffect, useRef, useState } from "react";
 import { AnimatePresence, motion } from "framer-motion";
 import { CircleAlert, Download, ImagePlus, Trash2 } from "lucide-react";
-import { KakaoChatButton } from "@/components/layout/KakaoChat";
 import { useReducedMotionSafe } from "@/hooks/useReducedMotionSafe";
 
 /* 이미지 용량 줄이기.
@@ -438,12 +437,6 @@ export function ImageCompressor() {
           </>
         )}
 
-        <div className="mt-6 flex flex-wrap items-center justify-between gap-3 rounded-[10px] bg-surface p-5">
-          <p className="text-[16px] font-bold">사진을 줄여도 홈페이지가 느립니까?</p>
-          <KakaoChatButton cta="tool_image_chat" className="inline-flex h-11 items-center rounded-md bg-accent px-4 text-[15px] font-bold text-accent-foreground hover:bg-accent-hover">
-            카카오톡 상담
-          </KakaoChatButton>
-        </div>
       </div>
     </div>
   );

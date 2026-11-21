@@ -2,7 +2,6 @@
 
 import { useState } from "react";
 import { ExternalLink } from "lucide-react";
-import { KakaoChatButton } from "@/components/layout/KakaoChat";
 import { checkedAt, domainPrices, hostingPlans, tlds, type Tld } from "@/data/classic/hostingPrices";
 
 /* 홈페이지 1년 유지비 계산. 호스팅 상품과 도메인을 고르면 첫해와 다음 해부터 드는 돈을 나눠 보여 준다.
@@ -200,12 +199,6 @@ export function HostingCostCalculator() {
         요금은 업체 사정으로 바뀔 수 있으니 결제 전에 각 요금표를 확인하십시오. 연장 요금을 따로 밝히지 않은 곳은 등록 요금으로 계산했습니다.
       </p>
 
-      <div className="mt-8 flex flex-wrap items-center justify-between gap-3 rounded-[10px] bg-surface p-5">
-        <p className="text-[16px] font-bold">호스팅 선택 상담</p>
-        <KakaoChatButton cta="tool_hosting_chat" className="inline-flex h-11 items-center rounded-md bg-accent px-4 text-[15px] font-bold text-accent-foreground hover:bg-accent-hover">
-          카카오톡 상담
-        </KakaoChatButton>
-      </div>
     </div>
   );
 }

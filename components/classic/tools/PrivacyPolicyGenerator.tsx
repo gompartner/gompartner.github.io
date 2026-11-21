@@ -3,7 +3,6 @@
 import { useEffect, useMemo, useState } from "react";
 import { AnimatePresence, motion } from "framer-motion";
 import { Check, Copy, Download, Plus, X } from "lucide-react";
-import { KakaoChatButton } from "@/components/layout/KakaoChat";
 import { useLocalStorage } from "@/hooks/useLocalStorage";
 import { useReducedMotionSafe } from "@/hooks/useReducedMotionSafe";
 
@@ -663,12 +662,6 @@ export function PrivacyPolicyGenerator() {
         <p className="mt-3 text-[14px] leading-[1.6] text-foreground-secondary">
           초안입니다. 실제로 수집하는 항목과 위탁 업체를 확인한 뒤 게시해 주십시오.
         </p>
-        <div className="mt-4 flex flex-wrap items-center justify-between gap-3 rounded-[10px] bg-surface p-5">
-          <p className="text-[16px] font-bold">홈페이지 게시나 쇼핑몰 푸터 수정이 필요하십니까?</p>
-          <KakaoChatButton cta="tool_privacy_chat" className="inline-flex h-11 items-center rounded-md bg-accent px-4 text-[15px] font-bold text-accent-foreground hover:bg-accent-hover">
-            카카오톡 상담
-          </KakaoChatButton>
-        </div>
       </section>
     </div>
   );

@@ -1,7 +1,6 @@
 import type { Metadata } from "next";
-import Link from "next/link";
 import { notFound } from "next/navigation";
-import { btnLine, btnPrimary } from "@/components/classic/ui";
+import { TrendNav } from "@/components/classic/archive/TrendNav";
 import { ArchiveShell, DocHead } from "@/components/classic/archive/ArchiveShell";
 import { insightBySlug, insights, readMinutes } from "@/data/classic/insights";
 import { LdScript } from "@/components/seo/JsonLd";
@@ -68,7 +67,7 @@ export default async function ClassicInsightDetailPage({ params }: Props) {
           { href: "/knowledge/notes", label: "운영 노트" },
           { href: `/insight/${slug}`, label: n.title },
         ]}
-        toc={toc.map((t) => ({ id: t.id, label: t.h }))}
+        toc={[...toc.map((t) => ({ id: t.id, label: t.h })), { id: "rel", label: "관련 문서" }]}
       >
         <article className="max-w-[760px]">
           <DocHead title={n.title} meta={[["주제", n.series], ["최종 수정일", n.updated ?? n.date], ["읽는 시간", `${readMinutes(n)}분`]]} lead={n.summary} />
@@ -213,15 +212,7 @@ export default async function ClassicInsightDetailPage({ params }: Props) {
               ))}
             </div>
             {/* 11-21 사용자: 시리즈 금지, 글마다 독립. 다음 편 예고 상자 뺌 */}
-            <div className="flex flex-wrap justify-center gap-3 border-t border-[#e6e9ee] pt-8">
-              <Link href={n.service.href} className={btnPrimary}>
-                {n.service.label}
-              </Link>
-              {/* 11-21 목록은 아카이브 운영 노트의 같은 묶음 자리로 */}
-              <Link href={`/knowledge/notes#${encodeURIComponent(n.series)}`} className={btnLine}>
-                목록
-              </Link>
-            </div>
+            <TrendNav current={`/insight/${n.slug}`} />
         </article>
       </ArchiveShell>
     </>

@@ -1,9 +1,8 @@
 import type { Metadata } from "next";
-import Link from "next/link";
+import { TrendNav } from "@/components/classic/archive/TrendNav";
 import { ArchiveShell, DocHead, docH2 } from "@/components/classic/archive/ArchiveShell";
 import { notFound } from "next/navigation";
 import Image from "next/image";
-import { ArrowRight } from "lucide-react";
 import { JaryoButtons, JaryoList, JaryoPreview } from "@/components/classic/JaryoParts";
 import { jaryo } from "@/data/classic/jaryo";
 import { pageMeta } from "@/lib/seo";
@@ -33,7 +32,6 @@ export default async function ClassicJaryoItemPage({ params }: { params: Promise
   const { id } = await params;
   const it = jaryo.find((j) => j.id === id);
   if (!it) notFound();
-  const others = jaryo.filter((j) => j.id !== it.id);
 
   return (
     <ArchiveShell
@@ -44,7 +42,7 @@ export default async function ClassicJaryoItemPage({ params }: { params: Promise
         { href: "/knowledge/checklists", label: "점검표와 도구" },
         { href: `/jaryo/${it.id}`, label: it.title },
       ]}
-      toc={[{ id: "inside", label: "들어 있는 것" }, { id: "view", label: "자료 보기" }, { id: "others", label: "다른 자료" }]}
+      toc={[{ id: "inside", label: "들어 있는 것" }, { id: "view", label: "자료 보기" }, { id: "rel", label: "관련 문서" }]}
     >
       <DocHead title={it.title} meta={[["쓰는 때", it.when], ["분량", `PDF ${it.pages ?? 2}쪽`]]} />
 
@@ -79,20 +77,7 @@ export default async function ClassicJaryoItemPage({ params }: { params: Promise
         ))}
       </ol>
 
-      <h2 id="others" className={docH2}>다른 자료</h2>
-      <ul className="mt-5 grid gap-3 md:grid-cols-2" role="list">
-        {others.map((o) => (
-          <li key={o.id}>
-            <Link href={`/jaryo/${o.id}`} className="group flex items-center justify-between gap-4 rounded-lg border border-[#d9dee5] bg-white px-4 py-3.5 transition-colors hover:border-[#256ef4]">
-              <span>
-                <span className="block text-[13.5px] font-bold text-[#256ef4]">{o.when}</span>
-                <span className="mt-0.5 block text-[16px] font-[800] tracking-[-0.03em] group-hover:text-[#256ef4]">{o.title}</span>
-              </span>
-              <ArrowRight size={20} aria-hidden className="shrink-0 text-[#6b7280] group-hover:text-[#256ef4]" />
-            </Link>
-          </li>
-        ))}
-      </ul>
+      <TrendNav current={`/jaryo/${it.id}`} />
     </ArchiveShell>
   );
 }

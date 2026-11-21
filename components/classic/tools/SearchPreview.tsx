@@ -3,7 +3,6 @@
 import { useState } from "react";
 import { AnimatePresence, motion } from "framer-motion";
 import { Check, ChevronDown, CircleAlert, Copy } from "lucide-react";
-import { KakaoChatButton } from "@/components/layout/KakaoChat";
 import { useReducedMotionSafe } from "@/hooks/useReducedMotionSafe";
 
 /* 검색 결과 미리보기.
@@ -402,12 +401,6 @@ export function SearchPreview() {
               에 매장 등록
             </li>
           </ul>
-          <div className="mt-4 flex flex-wrap items-center justify-between gap-3 border-t border-border pt-4">
-            <p className="text-[16px] font-bold">등록이나 홈페이지 수정이 필요하십니까?</p>
-            <KakaoChatButton cta="tool_seo_chat" className="inline-flex h-11 items-center rounded-md bg-accent px-4 text-[15px] font-bold text-accent-foreground hover:bg-accent-hover">
-              카카오톡 상담
-            </KakaoChatButton>
-          </div>
         </div>
       </div>
     </div>
