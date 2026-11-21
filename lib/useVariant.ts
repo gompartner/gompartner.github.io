@@ -40,6 +40,18 @@ export const VARIANTS: Record<string, { id: string; label: string }[]> = {
     { id: "a", label: "시안 A 단지 전문형" },
     { id: "b", label: "시안 B 매물 상담형" },
   ],
+  "hair-salon": [
+    { id: "a", label: "시안 A 프리미엄" },
+    { id: "b", label: "시안 B 가격표형" },
+  ],
+  "nail-shop": [
+    { id: "a", label: "시안 A 컬러형" },
+    { id: "b", label: "시안 B 1인 샵형" },
+  ],
+  roastery: [
+    { id: "a", label: "시안 A 원두 브랜드" },
+    { id: "b", label: "시안 B 카페 매장" },
+  ],
   "clinic-homepage": [
     { id: "a", label: "시안 A 미니멀" },
     { id: "b", label: "시안 B 진료 안내형" },

@@ -18,6 +18,12 @@ import { PilatesA } from "./PilatesA";
 import { PilatesB } from "./PilatesB";
 import { EstateA } from "./EstateA";
 import { EstateB } from "./EstateB";
+import { HairA } from "./HairA";
+import { HairB } from "./HairB";
+import { NailA } from "./NailA";
+import { NailB } from "./NailB";
+import { CoffeeA } from "./CoffeeA";
+import { CoffeeB } from "./CoffeeB";
 
 // 컨셉 시안 두 장씩(11-21). 맨 위 줄에서 바꿔 본다. 기존 기능형 데모는 코드만 남긴다.
 export function TaxDrafts() {
@@ -121,6 +127,45 @@ export function EstateDrafts() {
     <>
       <EstateA />
       <QuickMenu accent="#1d3557" cta="매물 문의" tel="02-000-0000" />
+    </>
+  );
+}
+export function HairDrafts() {
+  return useVariant("hair-salon") === "b" ? (
+    <>
+      <HairB />
+      <QuickMenu accent="#c2603e" cta="예약하기" tel="031-000-0000" />
+    </>
+  ) : (
+    <>
+      <HairA />
+      <QuickMenu accent="#1f3a32" cta="예약 문의" tel="02-000-0000" />
+    </>
+  );
+}
+export function NailDrafts() {
+  return useVariant("nail-shop") === "b" ? (
+    <>
+      <NailB />
+      <QuickMenu accent="#c94f6d" cta="예약하기" tel="031-000-0000" />
+    </>
+  ) : (
+    <>
+      <NailA />
+      <QuickMenu accent="#1a1718" cta="예약 문의" tel="02-000-0000" />
+    </>
+  );
+}
+export function CoffeeDrafts() {
+  return useVariant("roastery") === "b" ? (
+    <>
+      <CoffeeB />
+      <QuickMenu accent="#5b3a24" cta="원두 주문" tel="042-000-0000" />
+    </>
+  ) : (
+    <>
+      <CoffeeA />
+      <QuickMenu accent="#7a4a2a" cta="납품 상담" tel="02-000-0000" />
     </>
   );
 }

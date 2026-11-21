@@ -47,14 +47,14 @@ const KioskClinicDemo = dynamic(() => import("@/components/demos/KioskClinicDemo
 const KioskAcademyDemo = dynamic(() => import("@/components/demos/KioskAcademyDemo").then((m) => m.KioskAcademyDemo));
 const LandingWaterRentalDemo = dynamic(() => import("@/components/demos/LandingWaterRentalDemo").then((m) => m.LandingWaterRentalDemo));
 const ShopAdminDemo = dynamic(() => import("@/components/demos/ShopAdminDemo").then((m) => m.ShopAdminDemo));
-const RoasteryDemo = dynamic(() => import("@/components/demos/RoasteryDemo").then((m) => m.RoasteryDemo));
-const HairSalonDemo = dynamic(() => import("@/components/demos/HairSalonDemo").then((m) => m.HairSalonDemo));
+const CoffeeDrafts = dynamic(() => import("@/components/drafts/Drafts").then((m) => m.CoffeeDrafts));
+const HairDrafts = dynamic(() => import("@/components/drafts/Drafts").then((m) => m.HairDrafts));
 const OpticalDemo = dynamic(() => import("@/components/demos/OpticalDemo").then((m) => m.OpticalDemo));
 const FurnitureWorkshopDemo = dynamic(() => import("@/components/demos/FurnitureWorkshopDemo").then((m) => m.FurnitureWorkshopDemo));
 const CoworkingDemo = dynamic(() => import("@/components/demos/CoworkingDemo").then((m) => m.CoworkingDemo));
 const CampsiteDemo = dynamic(() => import("@/components/demos/CampsiteDemo").then((m) => m.CampsiteDemo));
 const PhotoStudioDemo = dynamic(() => import("@/components/demos/PhotoStudioDemo").then((m) => m.PhotoStudioDemo));
-const NailShopDemo = dynamic(() => import("@/components/demos/NailShopDemo").then((m) => m.NailShopDemo));
+const NailDrafts = dynamic(() => import("@/components/drafts/Drafts").then((m) => m.NailDrafts));
 const CarDetailingDemo = dynamic(() => import("@/components/demos/CarDetailingDemo").then((m) => m.CarDetailingDemo));
 const LightingShopDemo = dynamic(() => import("@/components/demos/LightingShopDemo").then((m) => m.LightingShopDemo));
 const LiquorShopDemo = dynamic(() => import("@/components/demos/LiquorShopDemo").then((m) => m.LiquorShopDemo));
@@ -128,14 +128,14 @@ const demoComponents: Record<string, ComponentType> = {
   "shop-admin": ShopAdminDemo,
   "excel-automation": ExcelAutomationDemo,
   lms: LmsDemo,
-  "roastery": RoasteryDemo,
-  "hair-salon": HairSalonDemo,
+  "roastery": CoffeeDrafts,
+  "hair-salon": HairDrafts,
   "optical": OpticalDemo,
   "furniture-workshop": FurnitureWorkshopDemo,
   "coworking": CoworkingDemo,
   "campsite": CampsiteDemo,
   "photo-studio": PhotoStudioDemo,
-  "nail-shop": NailShopDemo,
+  "nail-shop": NailDrafts,
   "car-detailing": CarDetailingDemo,
   "lighting-shop": LightingShopDemo,
   "liquor-shop": LiquorShopDemo,
