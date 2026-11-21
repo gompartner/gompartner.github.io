@@ -1,5 +1,5 @@
 // 곰파트너 아카이브(/archive). 11-21 사용자: 컨플루언스처럼 정돈된 문서 공간, 실적 대신 쌓인 기록을 보여 준다.
-// 틀은 문서 사이트형(왼쪽 분류 트리, 본문, 오른쪽 목차). 우리 색깔은 "이어받을 때 볼 것", "이렇게 요청하세요", 같은 그림체 와이어프레임, 확인일.
+// 틀은 문서 사이트형(왼쪽 분류 트리, 본문, 오른쪽 목차). 우리 색깔은 "인수 시 확인 사항", "이렇게 요청하세요", 같은 그림체 와이어프레임, 확인일.
 // 원래 주소가 있는 자료(인사이트 /insight, 무료 도구 /tools, 점검표 /jaryo/<id>)는 주소를 그대로 두고 트리에서 잇는다.
 // 문서가 없는 분류(트렌드, 시안 작업)는 첫 문서가 생길 때 sections에 더한다. 빈 칸, 준비 중 표시는 두지 않는다.
 
@@ -32,7 +32,7 @@ export const groupBySlug = (slug: string) => termGroups.find((g) => termSlugs[g.
 /** 묶음 제목에서 "종류 6가지" 같은 꼬리를 빼고 짧게(트리, 목록용) */
 export const shortTitle = (g: TermGroup) => g.title.replace(/ ?(UI )?(종류 )?\d+가지$/, (m) => (m.includes("UI") ? " UI" : "")).trim();
 
-/** 이어받을 때 볼 것. 남이 만든 사이트에서 그 부품을 넘겨받았을 때 먼저 확인할 것. 확인한 묶음만 적는다 */
+/** 인수 시 확인 사항. 남이 만든 사이트에서 그 부품을 넘겨받았을 때 먼저 확인할 것. 확인한 묶음만 적는다 */
 export const takeover: Record<string, { b: string; t: string }[]> = {
   g01: [
     { b: "달력 부품의 버전", t: "오래된 jQuery UI 달력은 보안 경고가 남은 버전이 많습니다. 소스에서 jquery-ui 파일 이름의 버전 숫자를 먼저 봅니다." },
@@ -196,7 +196,7 @@ const manualLog: { date: string; kind: string; title: string; href: string }[] =
   { date: "2026-11-21", kind: "트렌드", title: "한국만 IE를 오래 못 떠난 이유, 한국 일본 미국 2009~2025", href: "/archive/trends/korea-ie" },
   { date: "2026-11-21", kind: "데이터", title: "PC 브라우저 중 IE 비율, 모바일 비율(한국 일본 미국, CSV)", href: "/archive/data" },
   { date: "2026-11-21", kind: "용어", title: "화면 부품, 디자인 용어 와이어프레임 225장", href: "/archive/terms" },
-  { date: "2026-11-21", kind: "용어", title: "이어받을 때 볼 것 24묶음(화면 부품 20, 운영과 유지보수 4)", href: "/archive/terms" },
+  { date: "2026-11-21", kind: "용어", title: "인수 시 확인 사항 24묶음(화면 부품 20, 운영과 유지보수 4)", href: "/archive/terms" },
 ];
 export function recentLog(limit = 8) {
   const fromNotes = insights.map((n) => ({ date: n.date, kind: "운영 노트", title: n.title, href: `/insight/${n.slug}` }));

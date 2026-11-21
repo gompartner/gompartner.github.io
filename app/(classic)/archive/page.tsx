@@ -9,7 +9,7 @@ import { pageMeta } from "@/lib/seo";
 
 export const metadata: Metadata = pageMeta({
   title: "아카이브",
-  description: "홈페이지를 만들고 이어받아 운영하며 정리한 용어, 와이어프레임, 운영 노트, 점검표입니다. 항목마다 확인한 날짜와 이어받을 때 볼 것을 함께 적습니다.",
+  description: "홈페이지를 만들고 인수해 운영하며 정리한 용어, 와이어프레임, 운영 노트, 점검표입니다. 항목마다 확인한 날짜와 인수 시 확인 사항을 함께 적습니다.",
   path: "/archive",
 });
 
@@ -35,7 +35,7 @@ export default function ArchiveHome() {
       <header className="border-b border-[#e6e9ee] pb-7">
         <h1 className="mt-4 text-[34px] font-[800] leading-[1.2] tracking-[-0.045em] md:text-[44px]">곰파트너 아카이브</h1>
         <p className="mt-4 max-w-[760px] text-[17px] leading-[1.7] text-[#2b313b] md:text-[18px]">
-          홈페이지를 만들고 이어받아 운영하며 정리한 용어, 화면, 운영 기록입니다. 항목마다 확인한 날짜와 이어받을 때 볼 것을 함께 적습니다.
+          홈페이지를 만들고 인수해 운영하며 정리한 용어, 화면, 운영 기록입니다. 항목마다 확인한 날짜와 인수 시 확인 사항을 함께 적습니다.
         </p>
         <dl className="mt-6 flex flex-wrap gap-x-8 gap-y-3">
           {[

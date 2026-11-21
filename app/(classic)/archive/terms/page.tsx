@@ -56,7 +56,7 @@ export default function ArchiveTerms() {
                       <span className="min-w-0">
                         <span className="block text-[15.5px] font-[800] leading-[1.4] tracking-[-0.02em] group-hover:text-[#256ef4]">{shortTitle(g)}</span>
                         <span className="mt-1 block text-[13px] leading-[1.5] text-[#5b6370]">{g.terms.map((t) => t.name).slice(0, 4).join(", ")}</span>
-                        {takeover[g.id] ? <span className="mt-1.5 inline-block rounded bg-[#15171c] px-1.5 py-0.5 text-[11px] font-bold text-white">이어받을 때 볼 것</span> : null}
+                        {takeover[g.id] ? <span className="mt-1.5 inline-block rounded bg-[#15171c] px-1.5 py-0.5 text-[11px] font-bold text-white">인수 시 확인 사항</span> : null}
                       </span>
                     </Link>
                   </li>

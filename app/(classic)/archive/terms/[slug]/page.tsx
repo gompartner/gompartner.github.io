@@ -8,7 +8,7 @@ import { termGroups, termLabels } from "@/data/classic/glossary";
 import { termImages } from "@/data/classic/glossaryImages";
 import { pageMeta } from "@/lib/seo";
 
-// 용어 묶음 문서 한 장. 내용은 data/classic/glossary.ts, 이어받을 때 볼 것은 data/classic/archive.ts
+// 용어 묶음 문서 한 장. 내용은 data/classic/glossary.ts, 인수 시 확인 사항은 data/classic/archive.ts
 const CHECKED = "2026-11-21";
 
 /** 을/를: 마지막 글자 받침으로 고른다(영문 UI는 "유아이"라 를) */
@@ -43,7 +43,7 @@ export default async function TermDoc({ params }: { params: Promise<{ slug: stri
   const take = takeover[g.id];
   const labels = termLabels[g.sec];
   const imgCount = g.terms.filter((t) => termImages[t.id]).length;
-  const toc = [{ id: "cmp", label: "한눈에 비교" }, { id: "terms", label: "용어별로 보기" }, ...(take ? [{ id: "take", label: "이어받을 때 볼 것" }] : [])];
+  const toc = [{ id: "cmp", label: "한눈에 비교" }, { id: "terms", label: "용어별로 보기" }, ...(take ? [{ id: "take", label: "인수 시 확인 사항" }] : [])];
 
   return (
     <ArchiveShell
@@ -125,8 +125,8 @@ export default async function TermDoc({ params }: { params: Promise<{ slug: stri
       {take ? (
         <section id="take" aria-labelledby="take-h" className="mt-14 scroll-mt-24 overflow-hidden rounded-[10px] border-2 border-[#15171c]">
           <div className="flex flex-wrap items-baseline gap-x-3 gap-y-1 bg-[#15171c] px-5 py-3.5 text-white">
-            <h2 id="take-h" className="text-[18px] font-[800] tracking-[-0.03em]">이어받을 때 볼 것</h2>
-            <span className="text-[13px] text-[#aebbd6]">남이 만든 사이트의 {shortTitle(g)}{eulReul(shortTitle(g))} 넘겨받았다면</span>
+            <h2 id="take-h" className="text-[18px] font-[800] tracking-[-0.03em]">인수 시 확인 사항</h2>
+            <span className="text-[13px] text-[#aebbd6]">다른 업체가 만든 사이트의 {shortTitle(g)}{eulReul(shortTitle(g))} 인수했다면</span>
           </div>
           <ol className="px-5 py-1">
             {take.map((x, k) => (

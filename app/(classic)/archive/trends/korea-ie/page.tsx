@@ -22,7 +22,7 @@ export default function TrendKoreaIe() {
       section="trends"
       active="/archive/trends/korea-ie"
       crumbs={[{ href: "/archive", label: "아카이브" }, { href: "/archive/trends", label: "트렌드" }, { href: "/archive/trends/korea-ie", label: "브라우저" }]}
-      toc={[{ id: "chart", label: "PC 브라우저 중 IE 비율" }, { id: "why", label: "한국에만 있던 이유" }, { id: "wf", label: "2012년 무렵 첫 화면" }, { id: "take", label: "이어받을 때 볼 것" }, { id: "src", label: "출처" }]}
+      toc={[{ id: "chart", label: "PC 브라우저 중 IE 비율" }, { id: "why", label: "한국에만 있던 이유" }, { id: "wf", label: "2012년 무렵 첫 화면" }, { id: "take", label: "인수 시 확인 사항" }, { id: "src", label: "출처" }]}
     >
       <DocHead
         title="한국만 IE를 오래 못 떠난 이유"
@@ -54,7 +54,7 @@ export default function TrendKoreaIe() {
       <Wireframes2012 />
 
       <TakeoverBox
-        sub="2010년대 초에 만든 한국 사이트를 넘겨받았다면"
+        sub="2010년대 초에 만든 한국 사이트를 인수했다면"
         items={[
           { b: "호환성 보기 태그", t: "머리말에 X-UA-Compatible 태그가 IE 옛 모드를 강제하고 있으면 지금 브라우저에서 화면이 어긋날 수 있습니다." },
           { b: "IE 전용 조건문과 스크립트", t: "\"if IE\" 조건 주석이나 IE 전용 스크립트가 남아 있으면 지워도 되는지 확인합니다. 지금 PC 방문 중 IE 비율은 1% 아래입니다." },

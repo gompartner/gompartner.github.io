@@ -171,12 +171,12 @@ export function DocHead({ title, meta, lead }: { title: string; meta?: [string, 
 
 export const docH2 = "mt-12 scroll-mt-24 text-[24px] font-[800] tracking-[-0.035em] md:text-[26px]";
 
-/** 이어받을 때 볼 것 상자(우리 색깔). 용어 문서와 트렌드 문서가 같이 쓴다 */
+/** 인수 시 확인 사항 상자(우리 색깔). 용어 문서와 트렌드 문서가 같이 쓴다 */
 export function TakeoverBox({ sub, items }: { sub: string; items: { b: string; t: string }[] }) {
   return (
     <section id="take" aria-labelledby="take-h" className="mt-14 scroll-mt-24 overflow-hidden rounded-[10px] border-2 border-[#15171c]">
       <div className="flex flex-wrap items-baseline gap-x-3 gap-y-1 bg-[#15171c] px-5 py-3.5 text-white">
-        <h2 id="take-h" className="text-[18px] font-[800] tracking-[-0.03em]">이어받을 때 볼 것</h2>
+        <h2 id="take-h" className="text-[18px] font-[800] tracking-[-0.03em]">인수 시 확인 사항</h2>
         <span className="text-[13px] text-[#aebbd6]">{sub}</span>
       </div>
       <ol className="px-5 py-1">
