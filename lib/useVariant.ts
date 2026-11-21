@@ -76,6 +76,18 @@ export const VARIANTS: Record<string, { id: string; label: string }[]> = {
     { id: "a", label: "시안 A 기업 자문형" },
     { id: "b", label: "시안 B 근로자 상담형" },
   ],
+  scrivener: [
+    { id: "a", label: "시안 A 등기 전문형" },
+    { id: "b", label: "시안 B 회생 상담형" },
+  ],
+  "architect-office": [
+    { id: "a", label: "시안 A 작품 갤러리" },
+    { id: "b", label: "시안 B 주택 건축주형" },
+  ],
+  "photo-studio": [
+    { id: "a", label: "시안 A 증명 프로필" },
+    { id: "b", label: "시안 B 가족 기념" },
+  ],
   "clinic-homepage": [
     { id: "a", label: "시안 A 미니멀" },
     { id: "b", label: "시안 B 진료 안내형" },

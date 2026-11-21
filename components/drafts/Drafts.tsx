@@ -36,6 +36,12 @@ import { VetA } from "./VetA";
 import { VetB } from "./VetB";
 import { LaborA } from "./LaborA";
 import { LaborB } from "./LaborB";
+import { ScrA } from "./ScrA";
+import { ScrB } from "./ScrB";
+import { ArcA } from "./ArcA";
+import { ArcB } from "./ArcB";
+import { PhoA } from "./PhoA";
+import { PhoB } from "./PhoB";
 
 // 컨셉 시안 두 장씩(11-21). 맨 위 줄에서 바꿔 본다. 기존 기능형 데모는 코드만 남긴다.
 export function TaxDrafts() {
@@ -256,6 +262,48 @@ export function LaborDrafts() {
     <>
       <LaborA />
       <QuickMenu accent="#0f2a5c" cta="상담 신청" tel="02-000-0000" />
+    </>
+  );
+}
+
+export function ScrivenerDrafts() {
+  return useVariant("scrivener") === "b" ? (
+    <>
+      <ScrB />
+      <QuickMenu accent="#34488c" cta="상담 신청" tel="031-000-0000" />
+    </>
+  ) : (
+    <>
+      <ScrA />
+      <QuickMenu accent="#1c2f5a" cta="등기 견적" tel="02-000-0000" />
+    </>
+  );
+}
+
+export function ArchitectDrafts() {
+  return useVariant("architect-office") === "b" ? (
+    <>
+      <ArcB />
+      <QuickMenu accent="#8a5a3c" cta="대지 상담" tel="031-000-0000" />
+    </>
+  ) : (
+    <>
+      <ArcA />
+      <QuickMenu accent="#111111" cta="설계 문의" tel="02-000-0000" />
+    </>
+  );
+}
+
+export function PhotoStudioDrafts() {
+  return useVariant("photo-studio") === "b" ? (
+    <>
+      <PhoB />
+      <QuickMenu accent="#8b5e3c" cta="촬영 문의" tel="031-000-0000" />
+    </>
+  ) : (
+    <>
+      <PhoA />
+      <QuickMenu accent="#111111" cta="오시는 길" tel="02-000-0000" />
     </>
   );
 }
