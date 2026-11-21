@@ -20,7 +20,7 @@ export default function ArchiveData() {
         <section key={d.id} aria-labelledby={d.id}>
           <h2 id={d.id} className={docH2}>{d.title}</h2>
           <p className="mt-2 text-[15px] text-[#3d4450]">{d.desc}</p>
-          <LineChart title={d.title} sub={`단위 ${d.unit}`} series={d.series} unit={d.unit === "KB" ? "KB" : "%"} max={d.max ?? 100} source={{ label: d.source.label, href: d.source.href, note: d.note }} />
+          <LineChart title={d.title} sub={d.unit ? `단위 ${d.unit}` : "상대값(최고 100)"} series={d.series} unit={d.unit} max={d.max ?? 100} source={{ label: d.source.label, href: d.source.href, note: d.note }} />
           {d.csv.length ? <p className="mt-3 flex flex-wrap gap-x-4 gap-y-1 text-[13.5px]">
             <span className="text-[#5b6370]">원본 CSV</span>
             {d.csv.map((c) => (

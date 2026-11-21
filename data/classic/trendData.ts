@@ -88,8 +88,30 @@ export const phpVersions: Series[] = [
   { key: "php8", label: "PHP 8", color: "#1baf7a", points: [[2022, 1.8], [2023, 7.6], [2024, 22.8], [2025, 39.6], [2026, 54.8]] },
 ];
 
+/** 수요 조사: 구글 트렌드(대한민국) "홈페이지 제작" 검색 관심도 연평균(최고점 2004년 2월 = 100). 2026년은 11월까지 */
+export const searchDemand: Series[] = [
+  { key: "make", label: "홈페이지 제작", color: "#2a78d6", points: [[2004, 44.0], [2005, 33.2], [2006, 29.5], [2007, 20.8], [2008, 38.9], [2009, 35.2], [2010, 19.1], [2011, 15.0], [2012, 11.3], [2013, 9.0], [2014, 8.5], [2015, 9.0], [2016, 7.1], [2017, 7.3], [2018, 6.8], [2019, 6.2], [2020, 7.1], [2021, 6.1], [2022, 6.8], [2023, 7.1], [2024, 6.9], [2025, 8.0], [2026, 8.2]] },
+];
+
+/** 7장 디자인 흐름 실제 사례(보관본, 1280px로 열어 확인) */
+export const examplesDesign: Example[] = [
+  { country: "2008", site: "Apple", date: "2008-06-05", url: "https://web.archive.org/web/20080605045531/http://www.apple.com/", seen: "광택 나는 은색 메뉴 띠, 바닥에 반사되는 제품 사진, 가운데 고정 폭 화면", alive: true, checked: "2026-11-21" },
+  { country: "2014", site: "Apple", date: "2014-06-01", url: "https://web.archive.org/web/20140601225706/http://www.apple.com/", seen: "화면을 꽉 채운 사진 한 장과 문장 하나, 아래 4칸 타일. 메뉴 띠는 아직 회색 그라데이션", alive: true, checked: "2026-11-21" },
+  { country: "2016", site: "네이버", date: "2016-05-28", url: "https://web.archive.org/web/20160528005834/http://www.naver.com/", seen: "가운데 고정 폭, 초록 검색창과 메뉴 띠, 언론사 로고 칸(뉴스스탠드), 글꼴 설정 버튼", alive: true, checked: "2026-11-21" },
+];
+
 // 데이터 분류 목록(위 숫자를 다 정의한 뒤에 둔다)
 export const datasets: Dataset[] = [
+  {
+    id: "search-demand",
+    title: "수요 조사: \"홈페이지 제작\" 검색 관심도(대한민국, 구글)",
+    unit: "",
+    note: "구글 트렌드 상대값(최고점 2004년 2월 = 100), 표본 데이터라 다시 받으면 조금 다를 수 있음. \"홈페이지 유지보수\", \"홈페이지 리뉴얼\"은 대부분 달이 1 미만이라 그리지 않음. 국내 검색은 네이버 비중이 커서 전체 수요가 아니라 구글 안의 흐름",
+    desc: "구글에서 \"홈페이지 제작\"을 찾는 정도의 연평균. 2004년 44에서 2014년 8.5로 내려온 뒤 6~8 사이를 오갑니다. 같은 기간 \"유지보수\", \"리뉴얼\"은 거의 0입니다.",
+    series: searchDemand,
+    source: { label: "Google Trends(대한민국, 2004~2026)", href: "https://trends.google.com/trends/explore?date=all&geo=KR&q=%ED%99%88%ED%8E%98%EC%9D%B4%EC%A7%80%20%EC%A0%9C%EC%9E%91" },
+    csv: [{ label: "월별 값(제작, 유지보수, 리뉴얼)", href: "/data/trend/google-trends-kr-homepage.csv" }],
+  },
   {
     id: "php-versions",
     title: "PHP 주 버전 비율(전 세계, PHP 사이트 중)",

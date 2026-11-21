@@ -17,6 +17,7 @@ export const trendDocs = [
   { href: "/archive/trends/flash", title: "플래시가 사라진 자리", desc: "Flash, jQuery 사용 비율 2015~2025. 2020년 말 지원 종료, 2019년 국내 500대 사이트 28.4%가 플래시 사용." },
   { href: "/archive/trends/cms", title: "한국은 카페24, 일본은 WordPress", desc: "한국어, 일본어, 영어 사이트의 만드는 도구 점유율 상위 3." },
   { href: "/archive/trends/page-weight", title: "홈페이지는 얼마나 무거워졌나", desc: "페이지 한 장 용량 중앙값, PC 2011~2026 6배, 모바일 9배." },
+  { href: "/archive/trends/design", title: "입체에서 플랫, 카드, 벤토까지", desc: "웹 디자인 흐름을 바꾼 날짜(Bootstrap, iOS 7, Material Design, CSS Grid)와 시대별 첫 화면, 실제 사례." },
   { href: "/archive/trends/app", title: "한국은 안드로이드, 일본과 미국은 아이폰", desc: "휴대폰 OS 중 아이폰 비율, 한국 일본 미국 2012~2025. 앱 인수 시 계정, 서명 키, 스토어 요구." },
   { href: "/archive/trends/php", title: "PHP 5에서 8까지, 유지보수가 바뀐 10년", desc: "PHP 사이트 중 버전 비율 2015~2026, 공식 지원 종료일, 서버 앞단 CDN의 확산." },
 ];
@@ -307,7 +308,8 @@ export function archiveTree(): { section: ArchiveSection; groups: { title: strin
 
 /** 최근 쌓인 기록. 인사이트는 글 날짜에서 자동으로, 나머지는 더한 날 직접 적는다(지어내지 않기) */
 const manualLog: { date: string; kind: string; title: string; href: string }[] = [
-  { date: "2026-11-21", kind: "트렌드", title: "8, 9장: 앱(안드로이드와 아이폰), PHP 버전과 유지보수", href: "/archive/trends" },
+  { date: "2026-11-21", kind: "트렌드", title: "7~9장: 디자인 흐름, 앱(안드로이드와 아이폰), PHP 버전과 유지보수", href: "/archive/trends" },
+  { date: "2026-11-21", kind: "데이터", title: "수요 조사: \"홈페이지 제작\" 검색 관심도 2004~2026", href: "/archive/data#search-demand" },
   { date: "2026-11-21", kind: "트렌드", title: "3~6장: https, 플래시, 만드는 도구, 페이지 무게", href: "/archive/trends" },
   { date: "2026-11-21", kind: "트렌드", title: "한국이 모바일로 먼저 넘어간 길, 한국 일본 미국 2009~2025", href: "/archive/trends/mobile" },
   { date: "2026-11-21", kind: "트렌드", title: "한국만 IE를 오래 못 떠난 이유, 한국 일본 미국 2009~2025", href: "/archive/trends/korea-ie" },
