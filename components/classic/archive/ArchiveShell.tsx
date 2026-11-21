@@ -92,7 +92,7 @@ export function ArchiveShell({ section, active, crumbs, toc, children }: { secti
         </ul>
       </div>
 
-      <div className="mx-auto grid w-full max-w-[1248px] md:px-6 lg:grid-cols-[230px_minmax(0,1fr)] xl:grid-cols-[230px_minmax(0,1fr)_180px]">
+      <div className={`mx-auto grid w-full max-w-[1248px] md:px-6 lg:grid-cols-[230px_minmax(0,1fr)] ${toc && toc.length > 0 ? "xl:grid-cols-[230px_minmax(0,1fr)_180px]" : ""}`}>
         <aside className="hidden border-r border-[#e6e9ee] pb-12 pr-3 pt-6 lg:block">
           <div className="sticky top-24 max-h-[calc(100vh-7rem)] overflow-y-auto pr-1">
             <Tree section={section} active={active} />

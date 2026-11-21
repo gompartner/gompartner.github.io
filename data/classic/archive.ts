@@ -311,7 +311,7 @@ export function archiveTree(): { section: ArchiveSection; groups: { title: strin
   const notes = [{ title: "주제", items: seriesNames.map((s) => ({ label: s, href: `/archive/notes#${encodeURIComponent(s)}`, count: insights.filter((n) => n.series === s).length })) }];
   const checks = [
     { title: "점검표와 기록표", items: jaryo.map((j) => ({ label: j.title, href: `/jaryo/${j.id}` })) },
-    { title: "무료 도구", items: [{ label: "도구 전체", href: "/archive/checklists#tools", count: tools.length }] },
+    { title: "무료 도구", items: tools.map((t) => ({ label: t.title, href: t.href })) },
   ];
   const screens = [{ title: "페이지 종류", items: screenTypes.map((t) => ({ label: t.title, href: `/archive/screens#${t.id}` })) }];
   const design = [{ title: "문서", items: designDocs.map((d) => ({ label: d.title, href: d.href })) }];
