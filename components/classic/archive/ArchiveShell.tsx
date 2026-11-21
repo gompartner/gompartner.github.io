@@ -106,10 +106,10 @@ export function ArchiveShell({ section, active, crumbs, toc, children }: { secti
         </details>
 
         <nav aria-label="현재 위치">
-          <ol className="flex flex-wrap items-center gap-1.5 text-[13.5px] text-[#5b6370]">
-            <li>
-              <Link href="/" aria-label="처음" className="-m-2 inline-flex p-2 hover:text-[#15171c]">
-                <Home size={14} aria-hidden />
+          <ol className="flex flex-wrap items-center gap-1.5 text-[13.5px] leading-[20px] text-[#5b6370]">
+            <li className="inline-flex items-center">
+              <Link href="/" aria-label="처음" className="-m-1.5 inline-flex items-center p-1.5 hover:text-[#15171c]">
+                <Home size={14} aria-hidden className="block" />
               </Link>
             </li>
             {trail.map((c, i) => (
