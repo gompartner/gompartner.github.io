@@ -2,7 +2,7 @@ import type { Metadata } from "next";
 import Image from "next/image";
 import Link from "next/link";
 import { ArchiveShell, docH2 } from "@/components/classic/archive/ArchiveShell";
-import { counts, designDocs, recentLog, screenTypes, sections, techDocs } from "@/data/classic/archive";
+import { counts, designDocs, draftSets, recentLog, screenTypes, sections, techDocs } from "@/data/classic/archive";
 import { datasets } from "@/data/classic/trendData";
 import { insights } from "@/data/classic/insights";
 import { pageMeta } from "@/lib/seo";
@@ -18,6 +18,7 @@ const pics: Record<string, string> = {
   screens: "/images/glossary/t218.webp",
   design: "/images/glossary/t187.webp",
   tech: "/images/archive/trend-ie.png",
+  drafts: "/images/archive/drafts/dental-homepage-b.jpg",
   data: "/images/archive/data-mobile.png",
   notes: insights[0]?.image.src ?? "/images/glossary/t186.webp",
   checklists: "/images/jaryo/gnuboard-handover-1.jpg",
@@ -27,6 +28,7 @@ const amount: Record<string, string> = {
   screens: `페이지 종류 ${screenTypes.length}가지`,
   design: `문서 ${designDocs.length}개`,
   tech: `문서 ${techDocs.length}개`,
+  drafts: `업종 ${draftSets.length}곳, 시안 ${draftSets.length * 2}장`,
   data: `차트 ${datasets.length}개, 원본 CSV`,
   notes: `글 ${counts.notes}개`,
   checklists: `점검표 ${counts.sheets}종, 도구 ${counts.tools}종`,

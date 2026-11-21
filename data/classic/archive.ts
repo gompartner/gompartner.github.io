@@ -265,6 +265,17 @@ export const screenTypes: { id: string; title: string; desc: string; groups: str
   { id: "admin", title: "관리자와 대시보드", desc: "통계 카드, 차트, 상태 표시", groups: ["g26", "g31"] },
 ];
 
+/** 시안 작업(11-21): 업종마다 방향이 다른 시안 두 장. 첫 화면 사진은 public/images/archive/drafts/<slug>-<id>.jpg, 시안은 /work/<slug>?v=<id> */
+export const draftSets: { slug: string; name: string; a: { id: string; label: string; desc: string }; b: { id: string; label: string; desc: string } }[] = [
+  { slug: "company", name: "정밀가공 제조사", a: { id: "brand", label: "브랜드형", desc: "가공 장면 사진 한 장과 한 문장. 회사의 기술력을 먼저 느끼게 하는 첫 화면" }, b: { id: "info", label: "정보형", desc: "가공 분야, 장비 사양 숫자, 견적 문의를 첫 화면에. 구매 담당자가 바로 비교할 수 있게" } },
+  { slug: "law-firm", name: "법률사무소", a: { id: "a", label: "프리미엄", desc: "도시 야경 사진과 \"판결까지 맡는다\"는 약속. 기업, 큰 사건 의뢰인 대상" }, b: { id: "b", label: "상담형", desc: "\"혼자 판단하기 전에 먼저 물어보세요\", 상담 시간 칸. 처음 상담하는 개인 대상" } },
+  { slug: "tax-office", name: "세무회계 사무소", a: { id: "a", label: "법인형", desc: "숫자와 경영 판단을 앞세우고 연혁, 누적 신고 건수를 첫 화면에. 법인 대상" }, b: { id: "b", label: "사장님형", desc: "\"세금은 맡기고 장사에 집중\", 밝은 사진과 기장료 문의. 개인사업자 대상" } },
+  { slug: "dental-homepage", name: "치과", a: { id: "a", label: "미니멀", desc: "조용한 사진과 짧은 문구, 넓은 여백. 진료 철학을 보여 주는 첫 화면" }, b: { id: "b", label: "가족형", desc: "진료실 사진과 \"아이도 부모님도\", 진료 시간과 위치 칸. 동네 가족 환자 대상" } },
+  { slug: "clinic-homepage", name: "피부과", a: { id: "a", label: "미니멀", desc: "제품 사진과 \"진단이 먼저\"라는 한 문장. 시술보다 상담을 앞세우는 병원" }, b: { id: "b", label: "진료 안내형", desc: "진료 시간, 진료 항목, 위치를 첫 화면 바로 아래에. 처음 오는 환자가 바로 찾게" } },
+  { slug: "academy", name: "수학, 영어 학원", a: { id: "a", label: "입시형", desc: "큰 문구와 성과 숫자, 수강료 안내 칸. 고등 입시 학부모 대상" }, b: { id: "b", label: "초중등형", desc: "\"매주 문자로 진도 확인\", 교실 사진. 초중등 학부모가 안심하게" } },
+  { slug: "interior", name: "인테리어 시공", a: { id: "a", label: "갤러리형", desc: "시공 사진을 화면 가득. 결과물로 설득하는 첫 화면" }, b: { id: "b", label: "비용 안심형", desc: "\"견적서 금액이 공사 끝까지 그대로\", 공사 전후 사진. 추가 비용을 걱정하는 고객 대상" } },
+];
+
 /** 아카이브 분류(위 탭과 첫 화면 칸). 문서가 있는 분류만 둔다 */
 export type ArchiveSection = { id: string; label: string; href: string; desc: string };
 export const sections: ArchiveSection[] = [
@@ -272,6 +283,7 @@ export const sections: ArchiveSection[] = [
   { id: "screens", label: "화면 예시", href: "/archive/screens", desc: "첫 화면, 회사 소개, 게시판, 예약, 결제처럼 페이지 종류별 와이어프레임" },
   { id: "design", label: "디자인 트렌드", href: "/archive/design", desc: "새 기기가 생길 때마다 바뀐 화면 크기, 배치, 모양. 한국 일본 미국 비교" },
   { id: "tech", label: "기술 트렌드", href: "/archive/tech", desc: "브라우저, 보안, 언어, 만드는 도구, 페이지 무게. 화면 뒤에서 바뀐 것" },
+  { id: "drafts", label: "시안 작업", href: "/archive/drafts", desc: "업종마다 방향이 다른 시안 두 장과 고른 이유, 사례 분석에서 반영한 것" },
   { id: "data", label: "데이터", href: "/archive/data", desc: "트렌드에 쓴 숫자의 원본. 차트, 출처, 확인일, CSV" },
   { id: "notes", label: "운영 노트", href: "/archive/notes", desc: "인수, 운영, 보안, 비용을 실제 순서대로 정리한 글" },
   { id: "checklists", label: "점검표와 도구", href: "/archive/checklists", desc: "넘겨받은 날 기록표, 매달 점검표, 무료 도구" },
@@ -311,6 +323,7 @@ export function archiveTree(): { section: ArchiveSection; groups: { title: strin
     { section: by("screens"), groups: screens },
     { section: by("design"), groups: design },
     { section: by("tech"), groups: tech },
+    { section: by("drafts"), groups: [{ title: "업종", items: draftSets.map((d) => ({ label: d.name, href: `/archive/drafts#${d.slug}` })) }] },
     { section: by("data"), groups: data },
     { section: by("notes"), groups: notes },
     { section: by("checklists"), groups: checks },
@@ -324,6 +337,7 @@ const manualLog: { date: string; kind: string; title: string; href: string }[] =
   { date: "2026-11-21", kind: "기술 트렌드", title: "브라우저, https, 플래시, 만드는 도구, 페이지 무게, 앱, PHP", href: "/archive/tech" },
   { date: "2026-11-21", kind: "데이터", title: "데이터 차트: 브라우저, 모바일, 화면 크기, https, Flash와 jQuery, 페이지 무게, 앱 OS, PHP, 검색 관심도", href: "/archive/data" },
   { date: "2026-11-21", kind: "용어", title: "화면 부품, 디자인 용어 와이어프레임 225장", href: "/archive/terms" },
+  { date: "2026-11-21", kind: "시안 작업", title: "업종 7곳, 방향이 다른 시안 두 장씩", href: "/archive/drafts" },
   { date: "2026-11-21", kind: "화면 예시", title: "페이지 종류별 와이어프레임 9가지", href: "/archive/screens" },
   { date: "2026-11-21", kind: "용어", title: "인수 시 확인 사항 47묶음 전체", href: "/archive/terms" },
 ];
