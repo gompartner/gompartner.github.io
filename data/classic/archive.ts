@@ -25,6 +25,7 @@ export const techDocs: TrendDoc[] = [
   { href: "/knowledge/cms", title: "만드는 도구(CMS) 비교: 카페24, WordPress, 아임웹", desc: "CMS란 무엇인지, 설치형과 임대형의 차이, 한국어, 일본어, 영어 사이트의 만드는 도구 점유율 상위 3." },
   { href: "/knowledge/page-weight", title: "페이지 무게와 속도", desc: "페이지 한 장 용량 중앙값, PC 2011~2026 6배, 모바일 9배." },
   { href: "/knowledge/app", title: "앱: 안드로이드와 아이폰", desc: "휴대폰 OS 중 아이폰 비율, 한국 일본 미국 2012~2025. 앱 인수 시 계정, 서명 키, 스토어 요구." },
+  { href: "/knowledge/ai-and-homepage", title: "AI 도구와 홈페이지: 산업 변화, 보안, 유출 사례, 앞으로", desc: "AI 빌더의 성장, AI가 만든 코드의 보안, Tea, Moltbook, 쿠팡, SK텔레콤 유출 사례, 개정 개인정보 보호법, 구글 2027 보안 전망." },
   { href: "/knowledge/company-homepage", title: "기업 홈페이지: 회사 소개서 화면에서 플래시, 모바일, 빌더까지", desc: "\"홈페이지 제작\" 검색 관심도 2004~2026, 한국 기업 홈페이지 연표. 플래시, m. 사이트, 개인정보 보호법, 웹 접근성, 빌더." },
   { href: "/knowledge/public-homepage", title: "공공기관 홈페이지: 전자정부법에서 KRDS, 국정자원 화재까지", desc: "공공기관 홈페이지 연표 1996~2025. 전자정부법, 웹 접근성 의무, 표준프레임워크, 공인인증서 폐지, KRDS, 국정자원 화재." },
   { href: "/knowledge/personal-homepage", title: "개인 홈페이지: 무료 계정과 CGI 게시판에서 미니홈피, 블로그까지", desc: "한국과 일본 연표 1997~2019. 무료 계정, 나모 웹에디터, 테크노트와 제로보드, KENT WEB 무료 CGI, 미니홈피, 블로그, 지오시티즈 종료." },
@@ -313,7 +314,7 @@ export function topics(): Topic[] {
   const cats = [...new Set(parts.map((g) => g.cat))];
   return [
     { id: "plan", label: "기획", desc: "만들기 전에 정할 것. 업체 고르기, 견적 질문, 유지비, 홈페이지가 걸어온 길", groups: [
-      { title: "홈페이지가 걸어온 길", items: ["/knowledge/company-homepage", "/knowledge/public-homepage", "/knowledge/personal-homepage"].map(doc) },
+      { title: "홈페이지가 걸어온 길", items: ["/knowledge/company-homepage", "/knowledge/public-homepage", "/knowledge/personal-homepage", "/knowledge/ai-and-homepage"].map(doc) },
       { title: "업체와 견적", items: [...series("업체 선정"), { label: "홈페이지 견적 질문지(PDF)", href: "/jaryo/estimate" }, tool("/tools/estimate-questions"), tool("/tools/hosting-cost")] },
     ] },
     { id: "design", label: "디자인", desc: "화면 부품의 이름, 디자인 용어, 페이지 종류별 화면, 시안, 기기에 따라 바뀐 화면", groups: [
@@ -373,6 +374,7 @@ export function relatedOf(href: string, limit = 6): TreeNode[] {
 
 /** 최근 수정된 문서. 인사이트는 글 날짜에서 자동으로, 나머지는 더한 날 직접 적는다(지어내지 않기) */
 const manualLog: { date: string; kind: string; title: string; href: string }[] = [
+  { date: "2026-11-22", kind: "기획", title: "AI 도구와 홈페이지: 산업 변화, 보안, 유출 사례, 앞으로", href: "/knowledge/ai-and-homepage" },
   { date: "2026-11-22", kind: "기획", title: "기업 홈페이지: 회사 소개서 화면에서 플래시, 모바일, 빌더까지", href: "/knowledge/company-homepage" },
   { date: "2026-11-22", kind: "기획", title: "공공기관 홈페이지: 전자정부법에서 KRDS, 국정자원 화재까지", href: "/knowledge/public-homepage" },
   { date: "2026-11-22", kind: "기획", title: "개인 홈페이지: 무료 계정과 CGI 게시판에서 미니홈피, 블로그까지", href: "/knowledge/personal-homepage" },

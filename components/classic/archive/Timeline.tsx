@@ -17,9 +17,9 @@ export function Timeline({ rows, colA, colB }: { rows: TimelineRow[]; colA: stri
             <tr key={r.when + r.a} className="border-b border-[#eef0f3] align-top last:border-0">
               <th scope="row" className="px-3 py-2.5 font-bold">{r.when}</th>
               <td className="px-3 py-2.5 text-[#2b313b]">
-                {r.a || (colB ? <span className="text-[#8a93a1] md:hidden">-</span> : null)}
+                {r.a}
                 {colB && r.b ? (
-                  <span className="mt-1.5 block text-[13.5px] text-[#5b6370] md:hidden">
+                  <span className={`block text-[13.5px] text-[#5b6370] md:hidden ${r.a ? "mt-1.5" : ""}`}>
                     <b className="font-bold text-[#3d4450]">{colB}</b> {r.b}
                   </span>
                 ) : null}
