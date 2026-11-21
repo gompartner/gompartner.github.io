@@ -308,9 +308,9 @@ export function ImageCompressor() {
         </div>
       </div>
 
-      <div className="min-w-0">
+      <div className="flex min-w-0 flex-col">
         {items.length === 0 ? (
-          <div className="flex h-full min-h-[240px] items-center justify-center rounded-[10px] border border-dashed border-border p-6 text-center text-[17px] text-foreground-secondary">
+          <div className="flex min-h-[240px] flex-1 items-center justify-center rounded-[10px] border border-dashed border-border p-6 text-center text-[17px] text-foreground-secondary">
             선택한 사진이 없습니다.
           </div>
         ) : (
