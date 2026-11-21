@@ -13,7 +13,7 @@ const CompanyDemo = dynamic(() => import("@/components/demos/CompanyDemo").then(
 const CertLabDemo = dynamic(() => import("@/components/demos/CertLabDemo").then((m) => m.CertLabDemo));
 const LawFirmDrafts = dynamic(() => import("@/components/drafts/LawFirmDrafts").then((m) => m.LawFirmDrafts));
 const TaxDrafts = dynamic(() => import("@/components/drafts/Drafts").then((m) => m.TaxDrafts));
-const RealEstateDemo = dynamic(() => import("@/components/demos/RealEstateDemo").then((m) => m.RealEstateDemo));
+const EstateDrafts = dynamic(() => import("@/components/drafts/Drafts").then((m) => m.EstateDrafts));
 const BakeryCafeDemo = dynamic(() => import("@/components/demos/BakeryCafeDemo").then((m) => m.BakeryCafeDemo));
 const PharmacyDemo = dynamic(() => import("@/components/demos/PharmacyDemo").then((m) => m.PharmacyDemo));
 const ApplicationDemo = dynamic(() => import("@/components/demos/ApplicationDemo").then((m) => m.ApplicationDemo));
@@ -25,10 +25,10 @@ const ExcelAutomationDemo = dynamic(() => import("@/components/demos/ExcelAutoma
 const DistrictPortalDemo = dynamic(() => import("@/components/demos/DistrictPortalDemo").then((m) => m.DistrictPortalDemo));
 const FlowerExpoDemo = dynamic(() => import("@/components/demos/FlowerExpoDemo").then((m) => m.FlowerExpoDemo));
 const HanokCafeDemo = dynamic(() => import("@/components/demos/HanokCafeDemo").then((m) => m.HanokCafeDemo));
-const KoreanRestaurantDemo = dynamic(() => import("@/components/demos/KoreanRestaurantDemo").then((m) => m.KoreanRestaurantDemo));
+const FoodDrafts = dynamic(() => import("@/components/drafts/Drafts").then((m) => m.FoodDrafts));
 const InteriorDrafts = dynamic(() => import("@/components/drafts/Drafts").then((m) => m.InteriorDrafts));
 const AcademyDrafts = dynamic(() => import("@/components/drafts/Drafts").then((m) => m.AcademyDrafts));
-const PilatesStudioDemo = dynamic(() => import("@/components/demos/PilatesStudioDemo").then((m) => m.PilatesStudioDemo));
+const PilatesDrafts = dynamic(() => import("@/components/drafts/Drafts").then((m) => m.PilatesDrafts));
 const HomepageDemo = dynamic(() => import("@/components/demos/HomepageDemo").then((m) => m.HomepageDemo));
 const LmsDemo = dynamic(() => import("@/components/demos/LmsDemo").then((m) => m.LmsDemo));
 const JobPortalDemo = dynamic(() => import("@/components/demos/JobPortalDemo").then((m) => m.JobPortalDemo));
@@ -91,10 +91,10 @@ const demoComponents: Record<string, ComponentType> = {
   "clinic-homepage": SkinDrafts,
   "dental-homepage": DentalDrafts,
   "hanok-cafe": HanokCafeDemo,
-  "korean-restaurant": KoreanRestaurantDemo,
+  "korean-restaurant": FoodDrafts,
   interior: InteriorDrafts,
   academy: AcademyDrafts,
-  "pilates-studio": PilatesStudioDemo,
+  "pilates-studio": PilatesDrafts,
   "flower-expo": FlowerExpoDemo,
   "bakery-cafe": BakeryCafeDemo,
   "app-academy": AppAcademyDemo,
@@ -115,7 +115,7 @@ const demoComponents: Record<string, ComponentType> = {
   "cert-lab": CertLabDemo,
   "law-firm": LawFirmDrafts,
   "tax-office": TaxDrafts,
-  "real-estate": RealEstateDemo,
+  "real-estate": EstateDrafts,
   "community-map": CommunityMapDemo,
   "program-application": ApplicationDemo,
   "maintenance-dashboard": MaintenanceDemo,

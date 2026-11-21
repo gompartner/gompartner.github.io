@@ -28,6 +28,18 @@ export const VARIANTS: Record<string, { id: string; label: string }[]> = {
     { id: "a", label: "시안 A 갤러리형" },
     { id: "b", label: "시안 B 비용 안심형" },
   ],
+  "korean-restaurant": [
+    { id: "a", label: "시안 A 노포 브랜드형" },
+    { id: "b", label: "시안 B 동네 밥집형" },
+  ],
+  "pilates-studio": [
+    { id: "a", label: "시안 A 프리미엄" },
+    { id: "b", label: "시안 B 체험 상담형" },
+  ],
+  "real-estate": [
+    { id: "a", label: "시안 A 단지 전문형" },
+    { id: "b", label: "시안 B 매물 상담형" },
+  ],
   "clinic-homepage": [
     { id: "a", label: "시안 A 미니멀" },
     { id: "b", label: "시안 B 진료 안내형" },

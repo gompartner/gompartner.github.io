@@ -12,6 +12,12 @@ import { InteriorA } from "./InteriorA";
 import { InteriorB } from "./InteriorB";
 import { SkinA } from "./SkinA";
 import { SkinB } from "./SkinB";
+import { FoodA } from "./FoodA";
+import { FoodB } from "./FoodB";
+import { PilatesA } from "./PilatesA";
+import { PilatesB } from "./PilatesB";
+import { EstateA } from "./EstateA";
+import { EstateB } from "./EstateB";
 
 // 컨셉 시안 두 장씩(11-21). 맨 위 줄에서 바꿔 본다. 기존 기능형 데모는 코드만 남긴다.
 export function TaxDrafts() {
@@ -76,6 +82,45 @@ export function SkinDrafts() {
     <>
       <SkinA />
       <QuickMenu accent="#1f1d1b" cta="진료 예약" />
+    </>
+  );
+}
+export function FoodDrafts() {
+  return useVariant("korean-restaurant") === "b" ? (
+    <>
+      <FoodB />
+      <QuickMenu accent="#d8321f" cta="단체 예약" tel="02-000-0000" />
+    </>
+  ) : (
+    <>
+      <FoodA />
+      <QuickMenu accent="#a4271c" cta="단체 예약" tel="02-000-0000" />
+    </>
+  );
+}
+export function PilatesDrafts() {
+  return useVariant("pilates-studio") === "b" ? (
+    <>
+      <PilatesB />
+      <QuickMenu accent="#4f7a64" cta="체험 신청" tel="031-000-0000" />
+    </>
+  ) : (
+    <>
+      <PilatesA />
+      <QuickMenu accent="#141312" cta="상담 예약" tel="02-000-0000" />
+    </>
+  );
+}
+export function EstateDrafts() {
+  return useVariant("real-estate") === "b" ? (
+    <>
+      <EstateB />
+      <QuickMenu accent="#2563eb" cta="매물 문의" tel="02-000-0000" />
+    </>
+  ) : (
+    <>
+      <EstateA />
+      <QuickMenu accent="#1d3557" cta="매물 문의" tel="02-000-0000" />
     </>
   );
 }
