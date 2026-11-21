@@ -28,8 +28,8 @@ export function SkinB() {
       <section className="px-5 pb-14 pt-10 md:px-8 md:pb-20 md:pt-14">
         <div className="relative mx-auto max-w-[1200px] overflow-hidden rounded-[32px]">
           <div className="relative aspect-[4/5] sm:aspect-[16/10] md:aspect-[21/9]">
-            <Image src={`${IMG}/b-hero.jpg`} alt="분홍 배경 위에 정돈된 화장품과 상자" fill priority sizes="(min-width: 1200px) 1200px, 100vw" className="object-cover" />
-            <div className="absolute inset-0" style={{ background: "linear-gradient(90deg, rgba(255,255,255,0.92) 0%, rgba(255,255,255,0.6) 45%, rgba(255,255,255,0) 75%)" }} aria-hidden />
+            <Image src={`${IMG}/b-hero.jpg`} alt="분홍 배경 위에 정돈된 화장품과 상자" fill priority sizes="(min-width: 1200px) 1200px, 100vw" className="object-cover object-right" />
+            <div className="absolute inset-0" style={{ background: "linear-gradient(90deg, rgba(251,243,244,0.98) 0%, rgba(251,243,244,0.95) 40%, rgba(251,243,244,0.4) 62%, rgba(251,243,244,0) 80%)" }} aria-hidden />
           </div>
           <div className="absolute inset-0 flex items-center p-7 md:p-16">
             <div className="max-w-[520px]">
