@@ -1,7 +1,7 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 import { ArchiveShell, DocHead, docH2 } from "@/components/classic/archive/ArchiveShell";
-import { counts, shortTitle, takeover, termHref } from "@/data/classic/archive";
+import { counts, shortTitle, termHref } from "@/data/classic/archive";
 import { termGroups, termSections } from "@/data/classic/glossary";
 import { termImages } from "@/data/classic/glossaryImages";
 import { pageMeta } from "@/lib/seo";
@@ -43,7 +43,7 @@ export default function ArchiveTerms() {
             <h2 id={`sec-${i}`} className={docH2}>
               {sec} <span className="text-[15px] font-bold text-[#5b6370]">{gs.length}묶음</span>
             </h2>
-            <ul role="list" className="mt-4 grid gap-3 sm:grid-cols-2 xl:grid-cols-3">
+            <ul role="list" className="mt-4 grid gap-3 sm:grid-cols-2">
               {gs.map((g) => {
                 const img = g.terms.find((t) => termImages[t.id]);
                 return (
@@ -56,7 +56,6 @@ export default function ArchiveTerms() {
                       <span className="min-w-0">
                         <span className="block text-[15.5px] font-[800] leading-[1.4] tracking-[-0.02em] group-hover:text-[#256ef4]">{shortTitle(g)}</span>
                         <span className="mt-1 block text-[13px] leading-[1.5] text-[#5b6370]">{g.terms.map((t) => t.name).slice(0, 4).join(", ")}</span>
-                        {takeover[g.id] ? <span className="mt-1.5 inline-block rounded bg-[#15171c] px-1.5 py-0.5 text-[11px] font-bold text-white">인수 시 확인 사항</span> : null}
                       </span>
                     </Link>
                   </li>
