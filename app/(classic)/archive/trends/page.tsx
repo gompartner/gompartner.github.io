@@ -6,7 +6,7 @@ import { pageMeta } from "@/lib/seo";
 
 export const metadata: Metadata = pageMeta({
   title: "트렌드 | 아카이브",
-  description: "한국, 일본, 미국의 홈페이지가 브라우저, 모바일, 만드는 도구에 따라 어떻게 다르게 바뀌었는지 차트와 와이어프레임으로 비교합니다.",
+  description: "브라우저, 모바일, https, 플래시, 만드는 도구, 페이지 무게로 본 웹의 20년. 한국, 일본, 미국을 차트와 실제 사례로 비교합니다.",
   path: "/archive/trends",
 });
 

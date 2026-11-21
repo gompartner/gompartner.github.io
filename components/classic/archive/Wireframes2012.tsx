@@ -1,8 +1,8 @@
 // 2012년 무렵 한국, 일본, 미국 첫 화면을 같은 그림체(회색 칸, 파란 강조)로 다시 그린 것(11-21).
 // 통계가 아니라 그 시기 흔하던 모양의 관찰이다. 남의 사이트 캡처는 쓰지 않는다.
 // 칸마다 실제 사례(인터넷 아카이브 보관본 링크 + 확인한 문구)를 붙인다(11-21 사용자 A안).
-import { ArrowUpRight } from "lucide-react";
 import type { Example } from "@/data/classic/trendData";
+import { ExampleCard } from "@/components/classic/archive/ExampleCard";
 
 const g = "absolute rounded-[3px] bg-[#dfe3e9]";
 const g2 = "absolute rounded-[3px] bg-[#eceff3]";
@@ -81,23 +81,7 @@ export function Wireframes2012({ examples = [] }: { examples?: Example[] }) {
             <div aria-hidden>{it.screen}</div>
             <p className="mt-2.5 text-[15px] font-[800]">{it.name}</p>
             <p className="mt-0.5 text-[13.5px] leading-[1.55] text-[#5b6370]">{it.desc}</p>
-            {examples
-              .filter((ex) => ex.country === it.name)
-              .map((ex) => (
-                <div key={ex.url} className="mt-3 rounded-md border border-[#d9dee5] bg-white px-3 py-2.5">
-                  <p className="text-[12px] font-[800] text-[#256ef4]">실제 사례</p>
-                  <p className="mt-0.5 text-[14px] font-bold">{ex.site}</p>
-                  <p className="text-[12.5px] tabular-nums text-[#5b6370]">{ex.date} 화면</p>
-                  <p className="mt-1 text-[13px] leading-[1.55] text-[#3d4450]">{ex.seen}</p>
-                  {ex.alive ? (
-                    <a href={ex.url} target="_blank" rel="noopener noreferrer" className="mt-1.5 inline-flex items-center gap-1 text-[13px] font-bold text-[#256ef4] hover:underline underline-offset-4">
-                      보관본 보기(인터넷 아카이브) <ArrowUpRight size={14} aria-hidden />
-                    </a>
-                  ) : (
-                    <p className="mt-1.5 text-[12.5px] text-[#8a93a1]">보관본 확인 불가({ex.checked} 확인)</p>
-                  )}
-                </div>
-              ))}
+            {examples.filter((ex) => ex.country === it.name).map((ex) => <ExampleCard key={ex.url} ex={ex} />)}
           </li>
         ))}
       </ul>

@@ -1,5 +1,5 @@
 import { termGroups } from "@/data/classic/glossary";
-import { termHref } from "@/data/classic/archive";
+import { termHref, trendDocs } from "@/data/classic/archive";
 import { execFileSync } from "node:child_process";
 import type { MetadataRoute } from "next";
 import { notices } from "@/data/classic/notices";
@@ -68,7 +68,7 @@ export default function sitemap(): MetadataRoute.Sitemap {
     // 11-21 아카이브(문서 사이트형). /jaryo 첫 화면은 /archive/checklists 로 넘긴다
     { path: "/archive", priority: 0.7, files: ["app/(classic)/archive/page.tsx", "data/classic/archive.ts"] },
     ...["terms", "trends", "data", "notes", "checklists"].map((s) => ({ path: `/archive/${s}`, priority: 0.6, files: [`app/(classic)/archive/${s}/page.tsx`, "data/classic/archive.ts"] })),
-    { path: "/archive/trends/korea-ie", priority: 0.6, files: ["app/(classic)/archive/trends/korea-ie/page.tsx", "data/classic/trendData.ts"] },
+    ...trendDocs.map((d) => ({ path: d.href, priority: 0.6, files: [`app/(classic)${d.href}/page.tsx`, "data/classic/trendData.ts"] })),
     ...termGroups.map((g) => ({ path: termHref(g), priority: 0.6, files: ["app/(classic)/archive/terms/[slug]/page.tsx", "data/classic/glossary.ts", "data/classic/archive.ts"] })),
     // 11-04 무료 도구를 고객지원으로 되살림
     ...tools.map((t) => ({ path: t.href, priority: 0.4, files: [`app/(classic)${t.href}/page.tsx`] })),

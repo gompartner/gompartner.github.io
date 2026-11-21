@@ -18,17 +18,18 @@ export function LineChart({ title, sub, series, labelYear, unit = "%", max = 100
     return () => ro.disconnect();
   }, []);
 
-  const years = series[0].points.map((p) => p[0]);
+  const years = [...new Set(series.flatMap((s) => s.points.map((p) => p[0])))].sort((a, b) => a - b);
   const y0 = years[0];
   const y1 = years[years.length - 1];
   const narrow = W < 500;
   const H = narrow ? 280 : 300;
-  const L = 34;
+  const L = max >= 1000 ? 46 : 34;
   const R = narrow ? 72 : 60;
   const T = 14;
   const B = 30;
   const x = (yr: number) => L + ((yr - y0) / (y1 - y0)) * (W - L - R);
   const y = (v: number) => T + ((max - v) / max) * (H - T - B);
+  const fmt = (v: number) => (max >= 1000 ? Math.round(v).toLocaleString("ko-KR") : String(Math.round(v)));
   const ticks = narrow ? [y0, Math.round((y0 + y1) / 2), y1] : [y0, ...[1, 2, 3].map((i) => Math.round(y0 + ((y1 - y0) * i) / 4)), y1];
   const valueAt = (s: Series, yr: number) => s.points.find((p) => p[0] === yr)?.[1];
 
@@ -60,7 +61,7 @@ export function LineChart({ title, sub, series, labelYear, unit = "%", max = 100
             <g key={v}>
               <line x1={L} x2={W - R} y1={y((v / 100) * max)} y2={y((v / 100) * max)} stroke="#e6e9ee" />
               <text x={L - 8} y={y((v / 100) * max) + 4} fontSize="11" fill="#8a93a1" textAnchor="end">
-                {Math.round((v / 100) * max)}
+                {fmt((v / 100) * max)}
               </text>
             </g>
           ))}
@@ -73,19 +74,25 @@ export function LineChart({ title, sub, series, labelYear, unit = "%", max = 100
             <polyline key={s.key} points={s.points.map(([a, b]) => `${x(a)},${y(b)}`).join(" ")} fill="none" stroke={s.color} strokeWidth={2} strokeLinejoin="round" strokeLinecap="round" />
           ))}
           {labelYear
-            ? series.map((s) => {
-                const v = valueAt(s, labelYear);
-                if (v === undefined) return null;
-                return (
+            ? (() => {
+                // 라벨끼리 14px 안으로 붙으면 위아래로 벌린다. 오른쪽 끝 해는 점 왼쪽에 적는다
+                const ls = series
+                  .map((s) => ({ s, v: valueAt(s, labelYear) }))
+                  .filter((d): d is { s: Series; v: number } => d.v !== undefined)
+                  .map((d) => ({ ...d, ty: y(d.v) + 4 }))
+                  .sort((p, q) => p.ty - q.ty);
+                for (let k = 1; k < ls.length; k++) if (ls[k].ty - ls[k - 1].ty < 14) ls[k].ty = ls[k - 1].ty + 14;
+                const atEnd = x(labelYear) > W - R - 10;
+                return ls.map(({ s, v, ty }) => (
                   <g key={s.key}>
                     <circle cx={x(labelYear)} cy={y(v)} r={4} fill={s.color} stroke="#fff" strokeWidth={2} />
-                    <text x={x(labelYear) + 8} y={y(v) + 4} fontSize="12" fontWeight={700} fill="#15171c">
-                      {s.label} {Math.round(v)}
+                    <text x={atEnd ? x(labelYear) - 8 : x(labelYear) + 8} y={atEnd ? ty + 12 : ty} fontSize="12" fontWeight={700} fill="#15171c" textAnchor={atEnd ? "end" : "start"}>
+                      {s.label} {fmt(v)}
                       {unit}
                     </text>
                   </g>
-                );
-              })
+                ));
+              })()
             : null}
           {hover ? <line x1={x(hover.year)} x2={x(hover.year)} y1={T} y2={H - B} stroke="#5b6370" strokeDasharray="3 3" /> : null}
           <rect x={L} y={T} width={W - L - R} height={H - T - B} fill="transparent" onMouseMove={onMove} onMouseLeave={() => setHover(null)} />
@@ -95,8 +102,7 @@ export function LineChart({ title, sub, series, labelYear, unit = "%", max = 100
             <b>{hover.year}</b>
             {series.map((s) => (
               <span key={s.key} className="block">
-                {s.label} {valueAt(s, hover.year)}
-                {unit}
+                {s.label} {valueAt(s, hover.year) === undefined ? "자료 없음" : `${valueAt(s, hover.year)}${unit}`}
               </span>
             ))}
           </div>
@@ -126,7 +132,7 @@ export function LineChart({ title, sub, series, labelYear, unit = "%", max = 100
                 <tr key={yr} className="border-b border-[#eef0f3]">
                   <th scope="row" className="py-1.5 pr-2 text-left font-normal">{yr}</th>
                   {series.map((s) => (
-                    <td key={s.key} className="px-2 py-1.5">{valueAt(s, yr)}</td>
+                    <td key={s.key} className="px-2 py-1.5">{valueAt(s, yr) ?? "-"}</td>
                   ))}
                 </tr>
               ))}

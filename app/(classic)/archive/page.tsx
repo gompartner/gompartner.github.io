@@ -22,8 +22,8 @@ const pics: Record<string, string> = {
 };
 const amount: Record<string, string> = {
   terms: `${counts.groups}묶음 ${counts.terms}개`,
-  trends: `${trendDocs.length}편, 한국 일본 미국 비교`,
-  data: `차트 ${datasets.length}개, CSV 6개`,
+  trends: `${trendDocs.length}편, 웹 20년 비교`,
+  data: `차트 ${datasets.length}개, 원본 CSV`,
   notes: `${counts.notes}편`,
   checklists: `점검표 ${counts.sheets}종, 도구 ${counts.tools}종`,
 };

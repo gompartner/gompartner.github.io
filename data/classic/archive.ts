@@ -12,6 +12,11 @@ import { datasets } from "@/data/classic/trendData";
 /** 트렌드 문서(만든 것만). 새 장을 쓰면 여기에 더한다 */
 export const trendDocs = [
   { href: "/archive/trends/korea-ie", title: "한국만 IE를 오래 못 떠난 이유", desc: "PC 브라우저 중 IE 비율, 한국 일본 미국 2009~2025. 공인인증서, ActiveX, 2020년 전자서명법 개정, 2022년 IE 지원 종료." },
+  { href: "/archive/trends/mobile", title: "한국이 모바일로 먼저 넘어간 길", desc: "전체 접속 중 모바일 비율, 한국 일본 미국 2009~2025. m. 전용 사이트, PC 화면 그대로, 반응형으로 갈린 길." },
+  { href: "/archive/trends/https", title: "주소창 자물쇠가 기본이 되기까지", desc: "크롬에서 https로 열린 페이지 비율, 일본 미국 2015~2026. 2018년 크롬 68 주의 요함 표시." },
+  { href: "/archive/trends/flash", title: "플래시가 사라진 자리", desc: "Flash, jQuery 사용 비율 2015~2025. 2020년 말 지원 종료, 2019년 국내 500대 사이트 28.4%가 플래시 사용." },
+  { href: "/archive/trends/cms", title: "한국은 카페24, 일본은 WordPress", desc: "한국어, 일본어, 영어 사이트의 만드는 도구 점유율 상위 3." },
+  { href: "/archive/trends/page-weight", title: "홈페이지는 얼마나 무거워졌나", desc: "페이지 한 장 용량 중앙값, PC 2011~2026 6배, 모바일 9배." },
 ];
 
 /** 용어 묶음 주소 이름. 묶음 id(g01...)는 바꾸지 않고 주소만 읽기 쉽게 둔다 */
@@ -193,8 +198,10 @@ export function archiveTree(): { section: ArchiveSection; groups: { title: strin
 
 /** 최근 쌓인 기록. 인사이트는 글 날짜에서 자동으로, 나머지는 더한 날 직접 적는다(지어내지 않기) */
 const manualLog: { date: string; kind: string; title: string; href: string }[] = [
+  { date: "2026-11-21", kind: "트렌드", title: "3~6장: https, 플래시, 만드는 도구, 페이지 무게", href: "/archive/trends" },
+  { date: "2026-11-21", kind: "트렌드", title: "한국이 모바일로 먼저 넘어간 길, 한국 일본 미국 2009~2025", href: "/archive/trends/mobile" },
   { date: "2026-11-21", kind: "트렌드", title: "한국만 IE를 오래 못 떠난 이유, 한국 일본 미국 2009~2025", href: "/archive/trends/korea-ie" },
-  { date: "2026-11-21", kind: "데이터", title: "PC 브라우저 중 IE 비율, 모바일 비율(한국 일본 미국, CSV)", href: "/archive/data" },
+  { date: "2026-11-21", kind: "데이터", title: "브라우저, 모바일, https, Flash와 jQuery, 페이지 무게 차트 5개", href: "/archive/data" },
   { date: "2026-11-21", kind: "용어", title: "화면 부품, 디자인 용어 와이어프레임 225장", href: "/archive/terms" },
   { date: "2026-11-21", kind: "용어", title: "인수 시 확인 사항 24묶음(화면 부품 20, 운영과 유지보수 4)", href: "/archive/terms" },
 ];

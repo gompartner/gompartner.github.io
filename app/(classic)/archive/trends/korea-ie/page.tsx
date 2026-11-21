@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import { ArchiveShell, DocHead, TakeoverBox, docH2 } from "@/components/classic/archive/ArchiveShell";
 import { LineChart } from "@/components/classic/archive/LineChart";
+import { TrendNav } from "@/components/classic/archive/TrendNav";
 import { Wireframes2012 } from "@/components/classic/archive/Wireframes2012";
 import { TREND_CHECKED, examples2012, ieShare } from "@/data/classic/trendData";
 import { pageMeta } from "@/lib/seo";
@@ -81,12 +82,7 @@ export default function TrendKoreaIe() {
         </li>
       </ul>
 
-      <nav aria-label="이전, 다음 문서" className="mt-10 grid gap-3 sm:grid-cols-2">
-        <Link href="/archive/trends" className="rounded-lg border border-[#d9dee5] px-4 py-3.5 hover:border-[#256ef4]">
-          <span className="block text-[13px] text-[#5b6370]">목록</span>
-          <span className="text-[15.5px] font-bold">트렌드 전체</span>
-        </Link>
-      </nav>
+      <TrendNav current="/archive/trends/korea-ie" />
     </ArchiveShell>
   );
 }
