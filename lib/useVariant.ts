@@ -52,6 +52,18 @@ export const VARIANTS: Record<string, { id: string; label: string }[]> = {
     { id: "a", label: "시안 A 원두 브랜드" },
     { id: "b", label: "시안 B 카페 매장" },
   ],
+  orthopedics: [
+    { id: "a", label: "시안 A 척추관절형" },
+    { id: "b", label: "시안 B 동네 의원형" },
+  ],
+  pediatrics: [
+    { id: "a", label: "시안 A 진료시간형" },
+    { id: "b", label: "시안 B 검진 접종형" },
+  ],
+  "korean-medicine": [
+    { id: "a", label: "시안 A 전통 브랜드" },
+    { id: "b", label: "시안 B 증상 상담형" },
+  ],
   "clinic-homepage": [
     { id: "a", label: "시안 A 미니멀" },
     { id: "b", label: "시안 B 진료 안내형" },

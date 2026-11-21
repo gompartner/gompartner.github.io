@@ -24,6 +24,12 @@ import { NailA } from "./NailA";
 import { NailB } from "./NailB";
 import { CoffeeA } from "./CoffeeA";
 import { CoffeeB } from "./CoffeeB";
+import { OrthoA } from "./OrthoA";
+import { OrthoB } from "./OrthoB";
+import { PedA } from "./PedA";
+import { PedB } from "./PedB";
+import { KmA } from "./KmA";
+import { KmB } from "./KmB";
 
 // 컨셉 시안 두 장씩(11-21). 맨 위 줄에서 바꿔 본다. 기존 기능형 데모는 코드만 남긴다.
 export function TaxDrafts() {
@@ -166,6 +172,45 @@ export function CoffeeDrafts() {
     <>
       <CoffeeA />
       <QuickMenu accent="#7a4a2a" cta="납품 상담" tel="02-000-0000" />
+    </>
+  );
+}
+export function OrthoDrafts() {
+  return useVariant("orthopedics") === "b" ? (
+    <>
+      <OrthoB />
+      <QuickMenu accent="#1f6fe5" cta="전화 걸기" tel="031-000-0000" />
+    </>
+  ) : (
+    <>
+      <OrthoA />
+      <QuickMenu accent="#13294b" cta="진료 예약" tel="02-000-0000" />
+    </>
+  );
+}
+export function PedDrafts() {
+  return useVariant("pediatrics") === "b" ? (
+    <>
+      <PedB />
+      <QuickMenu accent="#1f9d62" cta="검진 예약" tel="031-000-0000" />
+    </>
+  ) : (
+    <>
+      <PedA />
+      <QuickMenu accent="#1b8fd6" cta="진료 접수" tel="02-000-0000" />
+    </>
+  );
+}
+export function KmDrafts() {
+  return useVariant("korean-medicine") === "b" ? (
+    <>
+      <KmB />
+      <QuickMenu accent="#4e6b3a" cta="상담 예약" tel="031-000-0000" />
+    </>
+  ) : (
+    <>
+      <KmA />
+      <QuickMenu accent="#4a3020" cta="진료 예약" tel="02-000-0000" />
     </>
   );
 }
