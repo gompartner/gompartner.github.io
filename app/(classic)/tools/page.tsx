@@ -12,7 +12,7 @@ export const metadata: Metadata = pageMeta({ title: "무료 도구", description
 export default function ClassicToolsPage() {
   return (
     <>
-      <PageHead title="무료 도구" trail={[{ href: "/archive", label: "아카이브" }, { href: "/tools", label: "무료 도구" }]} />
+      <PageHead title="무료 도구" trail={[{ href: "/archive", label: "아카이브" }, { href: "/archive/checklists", label: "점검표와 도구" }, { href: "/tools", label: "무료 도구" }]} />
       <SupportTabs current="/tools" />
       <div className={`${wrap} space-y-14 pb-16 pt-10 md:space-y-16 md:pb-24 md:pt-14`}>
         {toolCategories.map((c) => {

@@ -27,7 +27,7 @@ export default function ClassicInsightPage() {
     <>
       <PageHead
         title="인사이트"
-        trail={[{ href: "/notice", label: "고객지원" }, { href: "/insight", label: "인사이트" }]}
+        trail={[{ href: "/archive", label: "아카이브" }, { href: "/archive/notes", label: "운영 노트" }, { href: "/insight", label: "인사이트" }]}
       />
       <SupportTabs current="/insight" />
       <div className={`${wrap} pb-16 pt-10 md:pb-24 md:pt-14`}>

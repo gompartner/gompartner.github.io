@@ -59,15 +59,16 @@ export default async function ClassicInsightDetailPage({ params }: Props) {
       />
       <LdScript
         data={breadcrumbLd([
-          { name: "인사이트", path: "/insight" },
+          { name: "아카이브", path: "/archive" },
+          { name: "운영 노트", path: "/archive/notes" },
           { name: n.title, path: `/insight/${slug}` },
         ])}
       />
       <PageHead
         title={n.title}
         trail={[
-          { href: "/notice", label: "고객지원" },
-          { href: "/insight", label: "인사이트" },
+          { href: "/archive", label: "아카이브" },
+          { href: "/archive/notes", label: "운영 노트" },
           { href: `/insight/${slug}`, label: n.title },
         ]}
       />
@@ -248,7 +249,8 @@ export default async function ClassicInsightDetailPage({ params }: Props) {
               <Link href={n.service.href} className={btnPrimary}>
                 {n.service.label}
               </Link>
-              <Link href="/insight" className={btnLine}>
+              {/* 11-21 목록은 아카이브 운영 노트의 같은 묶음 자리로 */}
+              <Link href={`/archive/notes#${encodeURIComponent(n.series)}`} className={btnLine}>
                 목록
               </Link>
             </div>
