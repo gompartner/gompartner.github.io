@@ -52,12 +52,12 @@ const HairDrafts = dynamic(() => import("@/components/drafts/Drafts").then((m) =
 const OpticalDrafts = dynamic(() => import("@/components/drafts/Drafts").then((m) => m.OpticalDrafts));
 const FurnitureWorkshopDrafts = dynamic(() => import("@/components/drafts/Drafts").then((m) => m.FurnitureWorkshopDrafts));
 const CoworkingDrafts = dynamic(() => import("@/components/drafts/Drafts").then((m) => m.CoworkingDrafts));
-const CampsiteDemo = dynamic(() => import("@/components/demos/CampsiteDemo").then((m) => m.CampsiteDemo));
+const CampsiteDrafts = dynamic(() => import("@/components/drafts/Drafts").then((m) => m.CampsiteDrafts));
 const PhotoStudioDrafts = dynamic(() => import("@/components/drafts/Drafts").then((m) => m.PhotoStudioDrafts));
 const NailDrafts = dynamic(() => import("@/components/drafts/Drafts").then((m) => m.NailDrafts));
 const CarDetailingDrafts = dynamic(() => import("@/components/drafts/Drafts").then((m) => m.CarDetailingDrafts));
-const LightingShopDemo = dynamic(() => import("@/components/demos/LightingShopDemo").then((m) => m.LightingShopDemo));
-const LiquorShopDemo = dynamic(() => import("@/components/demos/LiquorShopDemo").then((m) => m.LiquorShopDemo));
+const LightingShopDrafts = dynamic(() => import("@/components/drafts/Drafts").then((m) => m.LightingShopDrafts));
+const LiquorShopDrafts = dynamic(() => import("@/components/drafts/Drafts").then((m) => m.LiquorShopDrafts));
 const SmallWeddingDemo = dynamic(() => import("@/components/demos/SmallWeddingDemo").then((m) => m.SmallWeddingDemo));
 const KmDrafts = dynamic(() => import("@/components/drafts/Drafts").then((m) => m.KmDrafts));
 const OrthoDrafts = dynamic(() => import("@/components/drafts/Drafts").then((m) => m.OrthoDrafts));
@@ -133,12 +133,12 @@ const demoComponents: Record<string, ComponentType> = {
   "optical": OpticalDrafts,
   "furniture-workshop": FurnitureWorkshopDrafts,
   "coworking": CoworkingDrafts,
-  "campsite": CampsiteDemo,
+  "campsite": CampsiteDrafts,
   "photo-studio": PhotoStudioDrafts,
   "nail-shop": NailDrafts,
   "car-detailing": CarDetailingDrafts,
-  "lighting-shop": LightingShopDemo,
-  "liquor-shop": LiquorShopDemo,
+  "lighting-shop": LightingShopDrafts,
+  "liquor-shop": LiquorShopDrafts,
   "small-wedding": SmallWeddingDemo,
   "korean-medicine": KmDrafts,
   "orthopedics": OrthoDrafts,

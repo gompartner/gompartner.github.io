@@ -160,6 +160,18 @@ export const VARIANTS: Record<string, { id: string; label: string }[]> = {
     { id: "a", label: "시안 A 코워킹" },
     { id: "b", label: "시안 B 비상주 사무실" },
   ],
+  campsite: [
+    { id: "a", label: "시안 A 오토캠핑" },
+    { id: "b", label: "시안 B 글램핑" },
+  ],
+  "lighting-shop": [
+    { id: "a", label: "시안 A 조명 쇼룸" },
+    { id: "b", label: "시안 B 조명 교체" },
+  ],
+  "liquor-shop": [
+    { id: "a", label: "시안 A 와인 보틀샵" },
+    { id: "b", label: "시안 B 전통주" },
+  ],
   "clinic-homepage": [
     { id: "a", label: "시안 A 미니멀" },
     { id: "b", label: "시안 B 진료 안내형" },

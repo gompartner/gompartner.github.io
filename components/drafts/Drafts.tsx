@@ -78,6 +78,12 @@ import { FwA } from "./FwA";
 import { FwB } from "./FwB";
 import { CwA } from "./CwA";
 import { CwB } from "./CwB";
+import { CpA } from "./CpA";
+import { CpB } from "./CpB";
+import { LtA } from "./LtA";
+import { LtB } from "./LtB";
+import { LqA } from "./LqA";
+import { LqB } from "./LqB";
 
 // 컨셉 시안 두 장씩(11-21). 맨 위 줄에서 바꿔 본다. 기존 기능형 데모는 코드만 남긴다.
 export function TaxDrafts() {
@@ -592,6 +598,48 @@ export function CoworkingDrafts() {
     <>
       <CwA />
       <QuickMenu accent="#1f6b47" cta="공간 투어" tel="02-000-0000" />
+    </>
+  );
+}
+
+export function CampsiteDrafts() {
+  return useVariant("campsite") === "b" ? (
+    <>
+      <CpB />
+      <QuickMenu accent="#9a6b3c" cta="예약 문의" tel="041-000-0000" />
+    </>
+  ) : (
+    <>
+      <CpA />
+      <QuickMenu accent="#2c5a36" cta="예약 문의" tel="031-000-0000" />
+    </>
+  );
+}
+
+export function LightingShopDrafts() {
+  return useVariant("lighting-shop") === "b" ? (
+    <>
+      <LtB />
+      <QuickMenu accent="#17150f" cta="출장 문의" tel="042-000-0000" />
+    </>
+  ) : (
+    <>
+      <LtA />
+      <QuickMenu accent="#141312" cta="조명 상담" tel="02-000-0000" />
+    </>
+  );
+}
+
+export function LiquorShopDrafts() {
+  return useVariant("liquor-shop") === "b" ? (
+    <>
+      <LqB />
+      <QuickMenu accent="#3f7d73" cta="선물 문의" tel="02-000-0000" />
+    </>
+  ) : (
+    <>
+      <LqA />
+      <QuickMenu accent="#7a1f2b" cta="매장 안내" tel="02-000-0000" />
     </>
   );
 }
