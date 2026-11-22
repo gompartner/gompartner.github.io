@@ -30,17 +30,20 @@ export const threeProjects: Project[] = threeDemos.map((d) => ({
 /** 카드가 여는 주소: 일반 데모는 상세 페이지, 3D는 데모로 바로 */
 export const hrefOf = (p: Project) => (p.demoUrl.startsWith("/work/") ? `/sample/${slugOf(p.demoUrl)}` : p.demoUrl);
 
+/** 썸네일을 다시 찍으면 올린다. /images는 하루 캐시라 같은 이름이면 휴대폰에 예전 사진이 남는다(11-22). */
+const IMG_VER = "1122";
+
 const exists = (src: string) => fs.existsSync(path.join(process.cwd(), "public", src));
 
 /** 목록 썸네일. 작은 캡처가 없으면 PC 캡처를 쓴다. */
 export function thumbOf(p: Project) {
   const sm = `/images/demos/sm/${slugOf(p.demoUrl)}.jpg`;
-  return exists(sm) ? sm : p.imageUrl;
+  return exists(sm) ? `${sm}?v=${IMG_VER}` : p.imageUrl;
 }
 
 export function mobileShotOf(p: Project) {
   const m = `/images/demos/m/${slugOf(p.demoUrl)}.jpg`;
-  return exists(m) ? m : null;
+  return exists(m) ? `${m}?v=${IMG_VER}` : null;
 }
 
 export const isMaintenance = (p: Project) => p.kind === "유지보수" || ["maintenance-dashboard", "maintenance-urgent-fix", "accessibility-review"].includes(p.id);
