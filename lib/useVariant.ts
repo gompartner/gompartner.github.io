@@ -124,6 +124,18 @@ export const VARIANTS: Record<string, { id: string; label: string }[]> = {
     { id: "a", label: "시안 A 입시 미술" },
     { id: "b", label: "시안 B 어린이 미술" },
   ],
+  "english-talk": [
+    { id: "a", label: "시안 A 성인 회화" },
+    { id: "b", label: "시안 B 어린이 영어" },
+  ],
+  "driving-school": [
+    { id: "a", label: "시안 A 면허 취득" },
+    { id: "b", label: "시안 B 도로 연수" },
+  ],
+  "reading-academy": [
+    { id: "a", label: "시안 A 초등 독서" },
+    { id: "b", label: "시안 B 중고등 국어" },
+  ],
   "clinic-homepage": [
     { id: "a", label: "시안 A 미니멀" },
     { id: "b", label: "시안 B 진료 안내형" },

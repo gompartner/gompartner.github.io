@@ -78,9 +78,9 @@ const FoodOemDemo = dynamic(() => import("@/components/demos/FoodOemDemo").then(
 const PianoDrafts = dynamic(() => import("@/components/drafts/Drafts").then((m) => m.PianoDrafts));
 const TaekwondoDrafts = dynamic(() => import("@/components/drafts/Drafts").then((m) => m.TaekwondoDrafts));
 const ArtAcademyDrafts = dynamic(() => import("@/components/drafts/Drafts").then((m) => m.ArtAcademyDrafts));
-const EnglishTalkDemo = dynamic(() => import("@/components/demos/EnglishTalkDemo").then((m) => m.EnglishTalkDemo));
-const DrivingSchoolDemo = dynamic(() => import("@/components/demos/DrivingSchoolDemo").then((m) => m.DrivingSchoolDemo));
-const ReadingAcademyDemo = dynamic(() => import("@/components/demos/ReadingAcademyDemo").then((m) => m.ReadingAcademyDemo));
+const EnglishTalkDrafts = dynamic(() => import("@/components/drafts/Drafts").then((m) => m.EnglishTalkDrafts));
+const DrivingSchoolDrafts = dynamic(() => import("@/components/drafts/Drafts").then((m) => m.DrivingSchoolDrafts));
+const ReadingAcademyDrafts = dynamic(() => import("@/components/drafts/Drafts").then((m) => m.ReadingAcademyDrafts));
 
 interface DemoPageProps {
   params: Promise<{ slug: string }>;
@@ -159,9 +159,9 @@ const demoComponents: Record<string, ComponentType> = {
   "piano-academy": PianoDrafts,
   "taekwondo": TaekwondoDrafts,
   "art-academy": ArtAcademyDrafts,
-  "english-talk": EnglishTalkDemo,
-  "driving-school": DrivingSchoolDemo,
-  "reading-academy": ReadingAcademyDemo,
+  "english-talk": EnglishTalkDrafts,
+  "driving-school": DrivingSchoolDrafts,
+  "reading-academy": ReadingAcademyDrafts,
 };
 
 function findDemo(slug: string) {
