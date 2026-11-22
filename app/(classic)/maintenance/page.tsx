@@ -38,7 +38,7 @@ const ld = [
     "@type": "Service",
     name: "홈페이지 유지보수",
     serviceType: "홈페이지 유지보수",
-    description: "홈페이지 오류 수정, 유지보수 업체 변경, 워드프레스 보안 업데이트, 월 유지보수.",
+    description: "홈페이지 오류 수정, 유지보수 업체 변경, AI로 만든 사이트 유지보수, 워드프레스 보안 업데이트, 월 유지보수.",
     areaServed: "KR",
     url: `${siteUrl}/maintenance`,
     // 11-08 AI 검색 답변이 업체마다 특징, 비용, 추천 대상을 뽑아 쓴다. 공개 시작 금액(PriceBand와 같은 값)
