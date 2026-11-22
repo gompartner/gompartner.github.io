@@ -60,13 +60,13 @@ export function LineChart({ title, sub, series, labelYear, unit = "%", max = 100
           {[0, 25, 50, 75, 100].map((v) => (
             <g key={v}>
               <line x1={L} x2={W - R} y1={y((v / 100) * max)} y2={y((v / 100) * max)} stroke="#e6e9ee" />
-              <text x={L - 8} y={y((v / 100) * max) + 4} fontSize="11" fill="#8a93a1" textAnchor="end">
+              <text x={L - 8} y={y((v / 100) * max) + 4} fontSize="11" fill="#6b7380" textAnchor="end">
                 {fmt((v / 100) * max)}
               </text>
             </g>
           ))}
           {ticks.map((t) => (
-            <text key={t} x={x(t)} y={H - 10} fontSize="11" fill="#8a93a1" textAnchor="middle">
+            <text key={t} x={x(t)} y={H - 10} fontSize="11" fill="#6b7380" textAnchor="middle">
               {t}
             </text>
           ))}

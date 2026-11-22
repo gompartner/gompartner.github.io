@@ -33,6 +33,7 @@ export const techDocs: TrendDoc[] = [
   { href: "/knowledge/personal-homepage", title: "개인 홈페이지: 무료 계정과 CGI 게시판에서 미니홈피, 블로그까지", desc: "한국과 일본 연표 1997~2019. 무료 계정, 나모 웹에디터, 테크노트와 제로보드, KENT WEB 무료 CGI, 미니홈피, 블로그, 지오시티즈 종료." },
   { href: "/knowledge/server-language", title: "개발 언어: Perl CGI에서 Next.js까지", desc: "서버 언어 비율 2015~2026(PHP, ASP.NET, Java, Node.js). Perl CGI 게시판, PHP 공유 호스팅, 공공의 Java, 화면과 서버를 함께 쓰는 Next.js." },
   { href: "/knowledge/php", title: "PHP 버전과 유지보수", desc: "PHP 사이트 중 버전 비율 2015~2026, 공식 지원 종료일, 서버 앞단 CDN의 확산." },
+  { href: "/knowledge/infra-cloud", title: "서버 인프라: 온프레미스에서 클라우드, 프라이빗 클라우드까지", desc: "사이트 앞단 CDN 비율 2016~2026. 전산실과 웹호스팅, 2006년 AWS, 국내 리전, 공공 클라우드 전환 2030년 연기, 국정자원 화재, 클라우드 탈출과 하이브리드." },
 ];
 export const trendDocs: TrendDoc[] = [...designDocs, ...techDocs];
 
@@ -339,7 +340,7 @@ export function topics(): Topic[] {
       { title: "개발 도구", items: [tool("/tools/jwt-parser"), tool("/tools/unix-time"), tool("/tools/cron")] },
     ] },
     { id: "infra", label: "인프라", desc: "도메인, 서버, 호스팅, https와 인증서", groups: [
-      { title: "문서", items: [doc("/knowledge/https"), term("go1")] },
+      { title: "문서", items: [doc("/knowledge/infra-cloud"), doc("/knowledge/https"), term("go1")] },
       { title: "운영 노트", items: [note("security-headers-check"), note("domain-server-ownership"), note("expiry-calendar"), note("backup-but-no-restore"), note("takeover-first-week-server")] },
     ] },
     { id: "security", label: "보안", desc: "PHP, 워드프레스, 그누보드, 인증서 보안 경보와 대응, 취약점 점검 도구", groups: [
@@ -383,6 +384,7 @@ export function relatedOf(href: string, limit = 6): TreeNode[] {
 
 /** 최근 수정된 문서. 인사이트는 글 날짜에서 자동으로, 나머지는 더한 날 직접 적는다(지어내지 않기) */
 const manualLog: { date: string; kind: string; title: string; href: string }[] = [
+  { date: "2026-11-22", kind: "인프라", title: "서버 인프라: 온프레미스에서 클라우드, 프라이빗 클라우드까지", href: "/knowledge/infra-cloud" },
   { date: "2026-11-22", kind: "검색", title: "검색 최적화의 역사: 디렉터리 등록에서 SEO, GEO까지", href: "/knowledge/search-optimization" },
   { date: "2026-11-22", kind: "검색", title: "AI가 쓰는 웹사이트: UX 다음의 AX, SEO 다음의 GEO", href: "/knowledge/ai-readable-web" },
   { date: "2026-11-22", kind: "기획", title: "AI 도구와 홈페이지: 산업 변화, 보안, 유출 사례, 앞으로", href: "/knowledge/ai-and-homepage" },

@@ -127,8 +127,26 @@ export const serverLanguages: Series[] = [
   { key: "js", label: "JavaScript(Node.js)", color: "#8a5cd6", points: [[2015, 0.1], [2016, 0.2], [2017, 0.3], [2018, 0.4], [2019, 0.7], [2020, 0.8], [2021, 1.2], [2022, 1.8], [2023, 2.3], [2024, 3.1], [2025, 4.0], [2026, 5.4]] },
 ];
 
+// 11-22 사이트 앞단 리버스 프록시(CDN) 사용 비율. W3Techs, 해마다 1월 1일, 전체 사이트 중 %(2026-11-22 브라우저로 원표 확인)
+export const proxyShares: Series[] = [
+  { key: "cloudflare", label: "Cloudflare", color: "#2a78d6", points: [[2016, 3.9], [2017, 5.3], [2018, 6.6], [2019, 7.6], [2020, 11.2], [2021, 15.4], [2022, 19.4], [2023, 18.0], [2024, 18.9], [2025, 19.2], [2026, 20.9]] },
+  { key: "cloudfront", label: "Amazon CloudFront", color: "#eb6834", points: [[2016, 0.2], [2017, 0.3], [2018, 0.5], [2019, 0.6], [2020, 0.8], [2021, 1.0], [2022, 1.3], [2023, 1.4], [2024, 1.5], [2025, 1.6], [2026, 1.6]] },
+  { key: "fastly", label: "Fastly", color: "#1baf7a", points: [[2016, 0.1], [2017, 0.2], [2018, 0.3], [2019, 0.4], [2020, 0.6], [2021, 0.8], [2022, 1.5], [2023, 1.8], [2024, 1.4], [2025, 0.9], [2026, 0.9]] },
+];
+
 // 데이터 분류 목록(위 숫자를 다 정의한 뒤에 둔다)
 export const datasets: Dataset[] = [
+  {
+    id: "proxy-shares",
+    title: "사이트 앞단 CDN(리버스 프록시) 사용 비율(전 세계)",
+    unit: "%",
+    note: "W3Techs 조사 표본 기준, 전체 사이트 중",
+    desc: "Cloudflare, Amazon CloudFront, Fastly를 앞단에 둔 사이트 비율. 해마다 1월 1일 값.",
+    series: proxyShares,
+    source: { label: "W3Techs, 리버스 프록시 연도별 추이", href: "https://w3techs.com/technologies/history_overview/proxy/all/y" },
+    csv: [],
+    usedIn: [{ label: "서버 인프라: 온프레미스에서 클라우드, 프라이빗 클라우드까지", href: "/knowledge/infra-cloud" }],
+  },
   {
     id: "server-languages",
     title: "서버 언어 비율(전 세계)",
