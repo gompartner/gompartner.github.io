@@ -7,6 +7,7 @@ export const toolCategories = ["운영 문서", "홈페이지 점검", "비용 �
 export const tools = [
   {
     href: "/tools/privacy-policy",
+    tags: ["개인정보처리방침", "개인정보 보호법", "처리방침 작성", "쇼핑몰 필수 페이지", "개인정보 수집 동의"],
     need: "개인정보처리방침 작성 필요",
     who: ["대표", "담당자"],
     category: "운영 문서",
@@ -16,6 +17,7 @@ export const tools = [
   },
   {
     href: "/tools/terms",
+    tags: ["이용약관", "표준약관", "회원가입 약관", "쇼핑몰 약관", "전자상거래법"],
     need: "회원가입 이용약관 작성 필요",
     who: ["대표", "담당자"],
     category: "운영 문서",
@@ -25,6 +27,7 @@ export const tools = [
   },
   {
     href: "/tools/accessibility-check",
+    tags: ["웹접근성", "접근성 점검", "KWCAG", "WCAG", "대체 텍스트", "명도 대비", "인증마크"],
     need: "웹접근성 점검 대응",
     who: ["담당자"],
     category: "홈페이지 점검",
@@ -34,6 +37,7 @@ export const tools = [
   },
   {
     href: "/tools/site-check",
+    tags: ["홈페이지 점검", "사이트 진단", "SSL", "https", "보안 헤더", "속도", "깨진 링크"],
     need: "홈페이지 오류 여부 확인",
     who: ["대표", "담당자"],
     category: "홈페이지 점검",
@@ -43,6 +47,7 @@ export const tools = [
   },
   {
     href: "/tools/php-check",
+    tags: ["PHP 버전", "PHP 지원 종료", "EOL", "그누보드", "워드프레스", "서버 점검"],
     need: "PHP 취약점 패치 여부 확인",
     who: ["대표", "담당자"],
     category: "홈페이지 점검",
@@ -52,6 +57,7 @@ export const tools = [
   },
   {
     href: "/tools/search-preview",
+    tags: ["SEO", "검색엔진 최적화", "검색 노출", "메타 태그", "title", "description", "og:image", "오픈그래프", "네이버 검색", "구글 검색", "카카오톡 공유", "서치어드바이저", "서치 콘솔"],
     need: "검색 결과 노출 화면 확인",
     who: ["대표", "담당자"],
     category: "홈페이지 점검",
@@ -61,6 +67,7 @@ export const tools = [
   },
   {
     href: "/tools/estimate-questions",
+    tags: ["견적 요청", "견적서", "RFP", "제안요청서", "외주 발주", "홈페이지 제작 비용"],
     need: "홈페이지 견적 요청 준비",
     who: ["대표"],
     category: "비용 계산",
@@ -70,6 +77,7 @@ export const tools = [
   },
   {
     href: "/tools/hosting-cost",
+    tags: ["호스팅 비용", "웹호스팅", "서버 비용", "도메인", "SSL 인증서", "카페24", "가비아"],
     need: "홈페이지 유지비 산정",
     who: ["대표"],
     category: "비용 계산",
@@ -79,6 +87,7 @@ export const tools = [
   },
   {
     href: "/tools/qr-code",
+    tags: ["QR 코드", "QR 만들기", "명함", "전단지", "메뉴판"],
     need: "매장 부착용 QR코드 제작",
     who: ["대표"],
     category: "이미지와 QR",
@@ -88,6 +97,7 @@ export const tools = [
   },
   {
     href: "/tools/image-compress",
+    tags: ["이미지 압축", "사진 용량", "WebP", "페이지 속도", "이미지 최적화"],
     need: "이미지 용량 축소",
     who: ["대표", "담당자"],
     category: "이미지와 QR",
@@ -97,6 +107,7 @@ export const tools = [
   },
   {
     href: "/tools/jwt-parser",
+    tags: ["JWT", "토큰", "로그인 인증", "Base64", "개발 도구"],
     need: "JWT 토큰 내용 확인",
     who: ["개발자"],
     category: "개발 도구",
@@ -106,6 +117,7 @@ export const tools = [
   },
   {
     href: "/tools/unix-time",
+    tags: ["유닉스 시간", "timestamp", "타임스탬프", "날짜 변환", "개발 도구"],
     need: "타임스탬프 날짜 변환",
     who: ["개발자"],
     category: "개발 도구",
@@ -115,6 +127,7 @@ export const tools = [
   },
   {
     href: "/tools/cron",
+    tags: ["cron", "크론", "예약 작업", "스케줄", "서버 자동화"],
     need: "cron 실행 시점 확인",
     who: ["개발자"],
     category: "개발 도구",

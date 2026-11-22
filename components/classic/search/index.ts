@@ -61,7 +61,7 @@ export function buildSearchIndex(): SearchItem[] {
     ...faq.map((f) => ({ kind: "자주 묻는 질문" as const, title: f.q, desc: f.a, href: "/faq", hay: "" })),
     ...maintenanceServices.flatMap((s) => (maintenanceFaq[s.id] ?? []).map((f) => ({ kind: "자주 묻는 질문" as const, title: f.q, desc: f.a, href: `/maintenance/${s.id}#md-faq`, hay: s.h1 }))),
   ];
-  const files: SearchItem[] = tools.map((t) => ({ kind: "무료 도구", title: t.title, desc: t.description, href: t.href, hay: `자료실 자료 무료 도구 ${t.category}` }));
+  const files: SearchItem[] = tools.map((t) => ({ kind: "무료 도구", title: t.title, desc: t.description, href: t.href, hay: `자료실 자료 무료 도구 ${t.category} ${t.need} ${t.for} ${t.tags.join(" ")}` }));
   const news: SearchItem[] = notices.map((n) => ({ kind: "공지사항", title: n.title, desc: n.summary, href: `/notice/${n.id}`, hay: n.sections.flatMap((x) => [x.h, ...(x.p ?? []), ...(x.list ?? [])]).join(" ") }));
   const posts: SearchItem[] = insights.map((n) => ({
     kind: "운영 노트",
