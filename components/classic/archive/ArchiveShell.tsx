@@ -49,9 +49,6 @@ function Tree({ topicId, active }: { topicId?: string; active: string }) {
       <Link href="/search" className="mx-1 mb-3 flex items-center gap-2 rounded-md border border-[#d9dee5] bg-white px-2.5 py-2 text-[13px] text-[#6b7380] hover:border-[#256ef4]">
         <Search size={14} aria-hidden /> 이 공간에서 찾기
       </Link>
-      <Link href="/knowledge" aria-current={active === "/knowledge" ? "page" : undefined} className={`block rounded-md px-2.5 py-1.5 text-[14px] ${active === "/knowledge" ? "bg-[#eef3ff] font-[800] text-[#256ef4]" : "font-bold text-[#3d4450] hover:bg-[#eef1f5]"}`}>
-        공간 홈
-      </Link>
       <p className="mb-1.5 mt-4 px-2.5 text-[12px] font-[800] tracking-[0.02em] text-[#6b7380]">페이지</p>
       <ul role="list" className="space-y-0.5">
         {topics().map((t) => {

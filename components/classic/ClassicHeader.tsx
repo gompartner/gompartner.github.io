@@ -48,7 +48,9 @@ export const classicMenu = [
     items: [
       { href: "/knowledge/design", label: "디자인" },
       { href: "/knowledge/frontend", label: "프론트엔드" },
-      { href: "/knowledge/ops", label: "운영과 유지보수" },
+      { href: "/knowledge/dev", label: "개발" },
+      { href: "/knowledge/infra", label: "인프라" },
+      { href: "/knowledge/ops", label: "유지보수" },
     ],
   },
   // 고객 사례는 계약 끝나고 게재 동의를 받은 실제 사례가 data/classic/cases.ts에 들어가는 순간 메뉴에 나온다(그 전엔 빈 값, 메뉴와 페이지 없음)
