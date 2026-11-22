@@ -31,7 +31,7 @@ export const notices: Notice[] = [
   {
     id: "kakao-coupon-2026-11",
     date: "2026-11-08",
-    event: { end: "2026-12-31" },
+    event: { end: "2026-11-21" },
     title: "카카오톡 채널 친구 월 유지보수 첫 달 50% 할인 쿠폰",
     summary: "곰파트너 카카오톡 채널 친구에게 월 유지보수 첫 달 관리비 50% 할인 쿠폰을 드립니다. 12월 31일까지, 선착순 100장입니다.",
     sections: [
@@ -56,7 +56,7 @@ export const notices: Notice[] = [
   {
     id: "takeover-free-2026-11",
     date: "2026-11-08",
-    event: { end: "2026-11-22" },
+    event: { end: "2026-11-21" },
     title: "연말 유지보수 업체 변경 무료 지원 3곳 모집",
     summary: "11월 8일부터 22일까지 기존 업체나 개발자가 떠난 홈페이지 3곳을 무료로 인수합니다. 인수 점검과 첫 달 월 유지보수를 비용 없이 진행합니다.",
     sections: [
@@ -101,7 +101,7 @@ export const notices: Notice[] = [
   {
     id: "php-promo-2026-11",
     date: "2026-11-01",
-    event: { end: "2026-12-31" },
+    event: { end: "2026-11-21" },
     title: "PHP 8.2 보안 지원 종료 대비 프로모션",
     summary: "2026년 12월 31일까지 PHP 버전 무료 점검과 월 유지보수 3개월 계약 시 PHP 업그레이드를 무상으로 진행합니다.",
     sections: [

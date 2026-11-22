@@ -14,8 +14,6 @@ import {
   Wrench,
   type LucideIcon,
 } from "lucide-react";
-import { PhpPromo } from "@/components/classic/PhpPromo";
-import { TakeoverFreePromo } from "@/components/classic/TakeoverFreePromo";
 import { PriceBand } from "@/components/classic/PriceBand";
 import { maintenanceServices } from "@/data/classic/maintenance";
 
@@ -45,8 +43,6 @@ export function ClassicHome() {
   return (
     <div className="bg-white text-[#15171c]">
       <Hero />
-      <TakeoverFreePromo />
-      <PhpPromo />
       <Services />
       <PriceBand />
       <Strengths />
