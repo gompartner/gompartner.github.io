@@ -67,9 +67,9 @@ const VetDrafts = dynamic(() => import("@/components/drafts/Drafts").then((m) =>
 const NursingHospitalDemo = dynamic(() => import("@/components/demos/NursingHospitalDemo").then((m) => m.NursingHospitalDemo));
 const LaborDrafts = dynamic(() => import("@/components/drafts/Drafts").then((m) => m.LaborDrafts));
 const ScrivenerDrafts = dynamic(() => import("@/components/drafts/Drafts").then((m) => m.ScrivenerDrafts));
-const PatentOfficeDemo = dynamic(() => import("@/components/demos/PatentOfficeDemo").then((m) => m.PatentOfficeDemo));
-const FamilyLawDemo = dynamic(() => import("@/components/demos/FamilyLawDemo").then((m) => m.FamilyLawDemo));
-const VisaAgentDemo = dynamic(() => import("@/components/demos/VisaAgentDemo").then((m) => m.VisaAgentDemo));
+const PatentDrafts = dynamic(() => import("@/components/drafts/Drafts").then((m) => m.PatentDrafts));
+const FamilyLawDrafts = dynamic(() => import("@/components/drafts/Drafts").then((m) => m.FamilyLawDrafts));
+const VisaDrafts = dynamic(() => import("@/components/drafts/Drafts").then((m) => m.VisaDrafts));
 const ArchitectDrafts = dynamic(() => import("@/components/drafts/Drafts").then((m) => m.ArchitectDrafts));
 const PresaleDemo = dynamic(() => import("@/components/demos/PresaleDemo").then((m) => m.PresaleDemo));
 const SaasDemo = dynamic(() => import("@/components/demos/SaasDemo").then((m) => m.SaasDemo));
@@ -148,9 +148,9 @@ const demoComponents: Record<string, ComponentType> = {
   "nursing-hospital": NursingHospitalDemo,
   "labor-firm": LaborDrafts,
   "scrivener": ScrivenerDrafts,
-  "patent-office": PatentOfficeDemo,
-  "family-law": FamilyLawDemo,
-  "visa-agent": VisaAgentDemo,
+  "patent-office": PatentDrafts,
+  "family-law": FamilyLawDrafts,
+  "visa-agent": VisaDrafts,
   "architect-office": ArchitectDrafts,
   "presale": PresaleDemo,
   "saas-startup": SaasDemo,

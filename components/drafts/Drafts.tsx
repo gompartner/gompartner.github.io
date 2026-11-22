@@ -42,6 +42,12 @@ import { ArcA } from "./ArcA";
 import { ArcB } from "./ArcB";
 import { PhoA } from "./PhoA";
 import { PhoB } from "./PhoB";
+import { PatA } from "./PatA";
+import { PatB } from "./PatB";
+import { FamA } from "./FamA";
+import { FamB } from "./FamB";
+import { VisaA } from "./VisaA";
+import { VisaB } from "./VisaB";
 
 // 컨셉 시안 두 장씩(11-21). 맨 위 줄에서 바꿔 본다. 기존 기능형 데모는 코드만 남긴다.
 export function TaxDrafts() {
@@ -304,6 +310,48 @@ export function PhotoStudioDrafts() {
     <>
       <PhoA />
       <QuickMenu accent="#111111" cta="오시는 길" tel="02-000-0000" />
+    </>
+  );
+}
+
+export function PatentDrafts() {
+  return useVariant("patent-office") === "b" ? (
+    <>
+      <PatB />
+      <QuickMenu accent="#d9541e" cta="무료 검토" tel="031-000-0000" />
+    </>
+  ) : (
+    <>
+      <PatA />
+      <QuickMenu accent="#14407a" cta="출원 상담" tel="02-000-0000" />
+    </>
+  );
+}
+
+export function FamilyLawDrafts() {
+  return useVariant("family-law") === "b" ? (
+    <>
+      <FamB />
+      <QuickMenu accent="#6b2f4a" cta="상담 예약" tel="031-000-0000" />
+    </>
+  ) : (
+    <>
+      <FamA />
+      <QuickMenu accent="#24304f" cta="비공개 상담" tel="02-000-0000" />
+    </>
+  );
+}
+
+export function VisaDrafts() {
+  return useVariant("visa-agent") === "b" ? (
+    <>
+      <VisaB />
+      <QuickMenu accent="#13795b" cta="비자 상담" tel="032-000-0000" />
+    </>
+  ) : (
+    <>
+      <VisaA />
+      <QuickMenu accent="#13265a" cta="채용 비자" tel="02-000-0000" />
     </>
   );
 }

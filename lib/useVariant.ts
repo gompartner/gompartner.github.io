@@ -88,6 +88,18 @@ export const VARIANTS: Record<string, { id: string; label: string }[]> = {
     { id: "a", label: "시안 A 증명 프로필" },
     { id: "b", label: "시안 B 가족 기념" },
   ],
+  "patent-office": [
+    { id: "a", label: "시안 A 기술 특허형" },
+    { id: "b", label: "시안 B 상표 출원형" },
+  ],
+  "family-law": [
+    { id: "a", label: "시안 A 이혼 절차형" },
+    { id: "b", label: "시안 B 재산 양육형" },
+  ],
+  "visa-agent": [
+    { id: "a", label: "시안 A 기업 고용형" },
+    { id: "b", label: "시안 B 개인 체류형" },
+  ],
   "clinic-homepage": [
     { id: "a", label: "시안 A 미니멀" },
     { id: "b", label: "시안 B 진료 안내형" },
