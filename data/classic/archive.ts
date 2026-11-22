@@ -303,9 +303,15 @@ const term = (id: string) => {
   const g = termGroups.find((x) => x.id === id)!;
   return { label: shortTitle(g), href: termHref(g) };
 };
+// 주제에 직접 꽂은 글(note). 같은 글이 묶음(series) 목록에도 있으면 묶음 쪽에서 뺀다(트리에 한 글은 한 곳만, 11-22).
+const pinned = new Set<string>();
+const pinnedItems = new WeakSet<object>();
 const note = (slug: string) => {
   const n = insights.find((x) => x.slug === slug)!;
-  return { label: n.title, href: `/insight/${n.slug}` };
+  const item = { label: n.title, href: `/insight/${n.slug}` };
+  pinned.add(item.href);
+  pinnedItems.add(item);
+  return item;
 };
 const doc = (href: string) => {
   const d = trendDocs.find((x) => x.href === href)!;
@@ -313,6 +319,29 @@ const doc = (href: string) => {
 };
 
 export function topics(): Topic[] {
+  pinned.clear();
+  const raw = rawTopics();
+  // 한 글은 한 곳에만: 직접 꽂은 자리가 있으면 그곳만, 없으면 처음 나온 자리만 남긴다
+  const seen = new Set<string>();
+  return raw.map((t) => ({
+    ...t,
+    groups: t.groups
+      .map((g) => ({
+        ...g,
+        items: g.items.filter((i) => {
+          const h = (i as { href?: string }).href;
+          if (!h || !h.startsWith("/insight/")) return true;
+          if (seen.has(h)) return false;
+          if (!pinnedItems.has(i) && pinned.has(h)) return false;
+          seen.add(h);
+          return true;
+        }),
+      }))
+      .filter((g) => g.items.length > 0),
+  }));
+}
+
+function rawTopics(): Topic[] {
   const parts = termGroups.filter((g) => g.sec === "화면 부품");
   const cats = [...new Set(parts.map((g) => g.cat))];
   return [
@@ -332,7 +361,7 @@ export function topics(): Topic[] {
     ] },
     { id: "infra", label: "인프라", desc: "도메인, 서버, 호스팅, https와 인증서", groups: [
       { title: "문서", items: [doc("/knowledge/infra-cloud"), doc("/knowledge/https"), term("go1")] },
-      { title: "운영 노트", items: [note("security-headers-check"), note("domain-server-ownership"), note("expiry-calendar"), note("backup-but-no-restore"), note("takeover-first-week-server")] },
+      { title: "운영 노트", items: [note("domain-server-ownership"), note("expiry-calendar"), note("backup-but-no-restore"), note("takeover-first-week-server")] },
     ] },
     { id: "security", label: "보안", desc: "PHP, 워드프레스, 그누보드, 인증서 보안 경보와 대응", groups: [
       { title: "점검", items: [note("exposed-files-check"), note("security-headers-check")] },
