@@ -15,6 +15,7 @@ import {
   Wrench,
   type LucideIcon,
 } from "lucide-react";
+import { OnepageFreePromo } from "@/components/classic/OnepageFreePromo";
 import { PriceBand } from "@/components/classic/PriceBand";
 import { maintenanceServices } from "@/data/classic/maintenance";
 
@@ -44,6 +45,7 @@ export function ClassicHome() {
   return (
     <div className="bg-white text-[#15171c]">
       <Hero />
+      <OnepageFreePromo />
       <Services />
       <PriceBand />
       <Strengths />

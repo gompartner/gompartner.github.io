@@ -54,12 +54,12 @@ export function ContactForm() {
   const [service] = useState(site || promo ? "유지보수" : sampleTitle ? "홈페이지 제작" : "");
   const [sample] = useState(sampleTitle);
   const [currentSite, setCurrentSite] = useState(site);
-  // 무료 이어받기 띠에서 오면 promo=takeover(11-07)
-  const promoLabel = promo === "php" ? "PHP 무료 점검 요청" : promo === "takeover" ? "업체 변경 무료 지원 신청" : "홈페이지 점검 요청";
+  // 무료 이어받기 띠에서 오면 promo=takeover(11-07), 원페이지 무료 제작 띠에서 오면 promo=onepage(11-23, site 칸에 업종)
+  const promoLabel = promo === "php" ? "PHP 무료 점검 요청" : promo === "takeover" ? "업체 변경 무료 지원 신청" : promo === "onepage" ? "원페이지 무료 제작 신청" : "홈페이지 점검 요청";
   // 11-08 카카오톡 채널 쿠폰(첫 달 유지보수 50%)의 "쿠폰번호 등록하기"는 ?promo=kakao&serial=12자리 번호 로 넘어온다
   const serial = (params.get("serial") ?? "").replace(/\D/g, "").slice(0, 20);
   const couponLine = promo === "kakao" ? `카카오톡 채널 쿠폰(첫 달 유지보수 50% 할인)${serial ? ` 번호 ${serial}` : ""}\n홈페이지 주소: ` : "";
-  const [message, setMessage] = useState(couponLine || (site || promo === "php" || promo === "takeover" ? `${promoLabel}: ${site}` : msg));
+  const [message, setMessage] = useState(couponLine || (site || promo === "php" || promo === "takeover" || promo === "onepage" ? `${promoLabel}: ${site}` : msg));
   const [agree, setAgree] = useState(false);
   // 11-22 마케팅 정보 수신 선택 동의. 동의하지 않아도 신청은 된다.
   const [marketing, setMarketing] = useState(false);
