@@ -6,6 +6,7 @@ import { projects } from "@/data/classic/projects";
 import { fieldsById } from "@/data/classic/workFilters";
 import { PROGRAM_IDS } from "@/data/classic/programIds";
 import { threeDemos } from "@/data/classic/three";
+import { VARIANTS } from "@/lib/variants";
 
 // 클래식 샘플 페이지 공용 계산. 서버에서만 쓴다(파일 존재 확인).
 
@@ -43,6 +44,8 @@ export function thumbOf(p: Project) {
 
 /** 11-22 시안 A, B가 있는 업종 홈페이지(메인 한 장 디자인 제안) */
 export const isDraft = (p: Project) => p.layout === "시안 2종";
+/** 시안이 둘 이상 있는 샘플(업종 홈페이지와 랜딩). 카드와 상세 첫 화면에 두 시안을 나란히 둔다 */
+export const hasPair = (p: Project) => (VARIANTS[slugOf(p.demoUrl)]?.length ?? 0) >= 2;
 
 /** 시안 B 첫 화면 작은 캡처(public/images/demos/sm-b). 없으면 null */
 export function thumbBOf(p: Project) {

@@ -7,7 +7,7 @@ import { Check, Plus, Pointer } from "lucide-react";
 import { PageHead, btnLine, btnPrimary, h2, h3, more, wrap } from "@/components/classic/ui";
 import { SampleGrid } from "@/components/classic/works/SampleGrid";
 import { Kiosk3dLink } from "@/components/classic/works/Kiosk3dLink";
-import { isDeviceCatalog, isProgram, catalogProjects, demoProjects, findBySlug, groupOf, industryOf, isMaintenance, mobileShotOf, samplesIn, slugOf, thumbBOf } from "@/components/classic/works/samples";
+import { isDeviceCatalog, isProgram, catalogProjects, demoProjects, findBySlug, groupOf, industryOf, isMaintenance, mobileShotOf, samplesIn, slugOf, thumbBOf, hasPair } from "@/components/classic/works/samples";
 import { VARIANTS } from "@/lib/variants";
 import { estimateFor } from "@/data/classic/pricing";
 import { designConcepts } from "@/data/classic/designConcepts";
@@ -40,6 +40,8 @@ export default async function ClassicSamplePage({ params }: Props) {
   if (!p) notFound();
   // 11-22 시안 A, B가 있는 업종(메인 한 장 디자인 제안)은 예전 데모 기능 기준 견적 대신 상담 안내를 둔다.
   const isDraft = p.layout === "시안 2종";
+  // 랜딩은 시안 A가 기능이 도는 기존 랜딩이라 견적, 체험 표시는 그대로 두고 첫 화면만 두 시안을 나란히
+  const pair = hasPair(p);
   const est = isDraft ? null : estimateFor(p.id);
   const concept = designConcepts[slug];
   const mobileShot = mobileShotOf(p);
@@ -61,14 +63,14 @@ export default async function ClassicSamplePage({ params }: Props) {
       {/* PC 화면에 휴대폰 화면을 겹친다. 앱, 키오스크는 기기 캡처만. 누르면 샘플이 열린다 */}
       <section aria-label="카탈로그 화면" className="bg-[#f4f6f9]">
         <div className={`${wrap} py-10 md:py-16`}>
-          {isDraft ? (
+          {pair ? (
             // 11-22 시안 A, B를 나란히. 각 화면을 누르면 그 시안이 열린다. 휴대폰은 위아래로 쌓는다
             <div className="mx-auto grid max-w-[1120px] gap-6 md:grid-cols-2 md:gap-6">
               {[
                 { id: VARIANTS[slug]?.[0]?.id ?? "a", label: VARIANTS[slug]?.[0]?.label ?? "시안 A", src: p.imageUrl, w: 1440, h: 900 },
                 { id: VARIANTS[slug]?.[1]?.id ?? "b", label: VARIANTS[slug]?.[1]?.label ?? "시안 B", src: thumbBOf(p) ?? p.imageUrl, w: 1080, h: 675 },
               ].map((x, n) => (
-                <Link key={x.id} href={`${p.demoUrl}?v=${x.id}&from=c`} prefetch={false} aria-label={`${p.title} ${x.label} 보기`} className="group block min-w-0">
+                <Link key={x.id} href={`${p.demoUrl}?v=${x.id}&from=c`} prefetch={false} aria-label={`${p.title} ${x.label} ${isDraft || n === 1 ? "보기" : "체험하기"}`} className="group block min-w-0">
                   <span className="relative block overflow-hidden rounded-lg border border-[#d9dee5] bg-white">
                     <span aria-hidden className="flex h-6 items-center gap-1.5 border-b border-[#e6e9ee] bg-[#eef1f5] px-3 md:h-7">
                       <span className="h-2 w-2 rounded-full bg-[#c5cbd4]" />
@@ -76,11 +78,11 @@ export default async function ClassicSamplePage({ params }: Props) {
                       <span className="h-2 w-2 rounded-full bg-[#c5cbd4]" />
                     </span>
                     <Image src={x.src} alt={`${p.title} ${x.label} 첫 화면`} width={x.w} height={x.h} priority={n === 0} sizes="(min-width: 1168px) 548px, (min-width: 768px) 46vw, 92vw" className="aspect-[16/10] w-full object-cover object-top" />
-                    <TapHint label="눌러서 시안 보기" />
+                    <TapHint label={isDraft || n === 1 ? "눌러서 시안 보기" : "눌러서 체험하기"} />
                   </span>
                   <span className="mt-3 flex items-center justify-between gap-3">
                     <span className="text-[17px] font-bold md:text-[18px]">{x.label}</span>
-                    <span className="text-[15px] font-bold text-[#256ef4] group-hover:underline">시안 보기</span>
+                    <span className="text-[15px] font-bold text-[#256ef4] group-hover:underline">{isDraft || n === 1 ? "시안 보기" : "체험하기"}</span>
                   </span>
                 </Link>
               ))}

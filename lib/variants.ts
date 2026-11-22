@@ -201,6 +201,30 @@ export const VARIANTS: Record<string, { id: string; label: string }[]> = {
     { id: "a", label: "시안 A 축제 안내" },
     { id: "b", label: "시안 B 개화 현황" },
   ],
+  "landing-water-rental": [
+    { id: "a", label: "시안 A 상담 신청형" },
+    { id: "b", label: "시안 B 요금표형" },
+  ],
+  "landing-coding-camp": [
+    { id: "a", label: "시안 A 모집 안내형" },
+    { id: "b", label: "시안 B 안내문형" },
+  ],
+  "landing-move-clean": [
+    { id: "a", label: "시안 A 견적 계산형" },
+    { id: "b", label: "시안 B 가격표형" },
+  ],
+  "landing-popup-store": [
+    { id: "a", label: "시안 A 회차 예약형" },
+    { id: "b", label: "시안 B 포스터형" },
+  ],
+  "landing-zine-fair": [
+    { id: "a", label: "시안 A 부스 지도형" },
+    { id: "b", label: "시안 B 행사 안내형" },
+  ],
+  "landing-leather-class": [
+    { id: "a", label: "시안 A 회차 결제형" },
+    { id: "b", label: "시안 B 도구 사진형" },
+  ],
   "clinic-homepage": [
     { id: "a", label: "시안 A 미니멀" },
     { id: "b", label: "시안 B 진료 안내형" },

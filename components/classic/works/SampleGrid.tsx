@@ -1,13 +1,13 @@
 import Image from "next/image";
 import { NavLink as Link } from "@/components/classic/NavLink";
 import type { Project } from "@/lib/types";
-import { hrefOf, isDeviceCatalog, isDraft, mobileShotOf, thumbBOf, thumbOf } from "./samples";
+import { hasPair, hrefOf, isDeviceCatalog, mobileShotOf, thumbBOf, thumbOf } from "./samples";
 import { VARIANTS } from "@/lib/variants";
 
 // 샘플 카드 격자. 홈 화면 샘플 목록과 같은 모양(썸네일 선 하나, 그림자 없음).
 // variant="mockup"은 카탈로그 목록용: PC 화면을 크게 두고 휴대폰 화면을 오른쪽 아래에 걸친다(10-31 C안).
 export function SampleGrid({ items, cols = 4, variant = "plain", mobileMax }: { items: Project[]; cols?: 3 | 4; variant?: "plain" | "mockup"; /** 휴대폰에서 보여 줄 개수(나머지는 숨김) */ mobileMax?: number }) {
-  if (variant === "mockup") return items.length > 0 && items.every(isDraft) ? <PairGrid items={items} mobileMax={mobileMax} /> : <MockupGrid items={items} />;
+  if (variant === "mockup") return items.length > 0 && items.every(hasPair) ? <PairGrid items={items} mobileMax={mobileMax} /> : <MockupGrid items={items} />;
   return (
     <ul className={`grid grid-cols-2 gap-x-4 gap-y-8 md:gap-x-6 md:gap-y-12 ${cols === 4 ? "md:grid-cols-3 lg:grid-cols-4" : "md:grid-cols-3"}`} role="list">
       {items.map((p) => (

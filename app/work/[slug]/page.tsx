@@ -34,18 +34,18 @@ const LmsDemo = dynamic(() => import("@/components/demos/LmsDemo").then((m) => m
 const JobPortalDemo = dynamic(() => import("@/components/demos/JobPortalDemo").then((m) => m.JobPortalDemo));
 const MaintenanceDemo = dynamic(() => import("@/components/demos/MaintenanceDemo").then((m) => m.MaintenanceDemo));
 const RetirementDemo = dynamic(() => import("@/components/demos/RetirementDemo").then((m) => m.RetirementDemo));
-const LandingCodingCampDemo = dynamic(() => import("@/components/demos/LandingCodingCampDemo").then((m) => m.LandingCodingCampDemo));
-const LandingMoveCleanDemo = dynamic(() => import("@/components/demos/LandingMoveCleanDemo").then((m) => m.LandingMoveCleanDemo));
-const LandingPopupStoreDemo = dynamic(() => import("@/components/demos/LandingPopupStoreDemo").then((m) => m.LandingPopupStoreDemo));
+const LandingCodingCampDrafts = dynamic(() => import("@/components/drafts/LandingDrafts").then((m) => m.LandingCodingCampDrafts));
+const LandingMoveCleanDrafts = dynamic(() => import("@/components/drafts/LandingDrafts").then((m) => m.LandingMoveCleanDrafts));
+const LandingPopupStoreDrafts = dynamic(() => import("@/components/drafts/LandingDrafts").then((m) => m.LandingPopupStoreDrafts));
 const LandingStampTourDemo = dynamic(() => import("@/components/demos/LandingStampTourDemo").then((m) => m.LandingStampTourDemo));
-const LandingZineFairDemo = dynamic(() => import("@/components/demos/LandingZineFairDemo").then((m) => m.LandingZineFairDemo));
-const LandingLeatherClassDemo = dynamic(() => import("@/components/demos/LandingLeatherClassDemo").then((m) => m.LandingLeatherClassDemo));
+const LandingZineFairDrafts = dynamic(() => import("@/components/drafts/LandingDrafts").then((m) => m.LandingZineFairDrafts));
+const LandingLeatherClassDrafts = dynamic(() => import("@/components/drafts/LandingDrafts").then((m) => m.LandingLeatherClassDrafts));
 const MaintenanceUrgentFixDemo = dynamic(() => import("@/components/demos/MaintenanceUrgentFixDemo").then((m) => m.MaintenanceUrgentFixDemo));
 const AppAcademyDemo = dynamic(() => import("@/components/demos/AppAcademyDemo").then((m) => m.AppAcademyDemo));
 const AppPilatesDemo = dynamic(() => import("@/components/demos/AppPilatesDemo").then((m) => m.AppPilatesDemo));
 const KioskClinicDemo = dynamic(() => import("@/components/demos/KioskClinicDemo").then((m) => m.KioskClinicDemo));
 const KioskAcademyDemo = dynamic(() => import("@/components/demos/KioskAcademyDemo").then((m) => m.KioskAcademyDemo));
-const LandingWaterRentalDemo = dynamic(() => import("@/components/demos/LandingWaterRentalDemo").then((m) => m.LandingWaterRentalDemo));
+const LandingWaterRentalDrafts = dynamic(() => import("@/components/drafts/LandingDrafts").then((m) => m.LandingWaterRentalDrafts));
 const ShopAdminDemo = dynamic(() => import("@/components/demos/ShopAdminDemo").then((m) => m.ShopAdminDemo));
 const CoffeeDrafts = dynamic(() => import("@/components/drafts/Drafts").then((m) => m.CoffeeDrafts));
 const HairDrafts = dynamic(() => import("@/components/drafts/Drafts").then((m) => m.HairDrafts));
@@ -101,13 +101,13 @@ const demoComponents: Record<string, ComponentType> = {
   "app-pilates": AppPilatesDemo,
   "kiosk-clinic": KioskClinicDemo,
   "kiosk-academy": KioskAcademyDemo,
-  "landing-water-rental": LandingWaterRentalDemo,
-  "landing-coding-camp": LandingCodingCampDemo,
-  "landing-move-clean": LandingMoveCleanDemo,
-  "landing-popup-store": LandingPopupStoreDemo,
+  "landing-water-rental": LandingWaterRentalDrafts,
+  "landing-coding-camp": LandingCodingCampDrafts,
+  "landing-move-clean": LandingMoveCleanDrafts,
+  "landing-popup-store": LandingPopupStoreDrafts,
   "landing-stamp-tour": LandingStampTourDemo,
-  "landing-zine-fair": LandingZineFairDemo,
-  "landing-leather-class": LandingLeatherClassDemo,
+  "landing-zine-fair": LandingZineFairDrafts,
+  "landing-leather-class": LandingLeatherClassDrafts,
   pharmacy: PharmacyDrafts,
   "online-store": OnlineStoreDrafts,
   pension: PensionDrafts,
