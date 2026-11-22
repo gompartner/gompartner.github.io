@@ -6,7 +6,7 @@ import { matches } from "./match";
 import { SearchBox } from "./SearchBox";
 import { SearchResults } from "./SearchResults";
 
-const SUGGEST = ["예약", "견적 계산", "시간표", "지도", "결제", "영문", "병원", "학원"];
+const SUGGEST = ["병원", "학원", "카페", "법률", "제조", "랜딩", "앱", "키오스크"];
 
 // 카탈로그 목록 위 검색. 검색어가 없으면 원래 목록(children)을, 있으면 걸러 낸 결과를 보여 준다
 export function CatalogSearch({ index, children, bare = false, suggestions = SUGGEST }: { index: SearchItem[]; children: ReactNode; /** 업종 탭처럼 이미 감싼 칸 안에 넣을 때 */ bare?: boolean; suggestions?: string[] }) {
