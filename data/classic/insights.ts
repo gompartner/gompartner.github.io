@@ -8457,6 +8457,273 @@ const allInsights: Insight[] = [
       href: "/maintenance/monthly",
       label: "월 유지보수 서비스 보기"
     }
+  },
+  {
+    slug: "exposed-files-check",
+    date: "2026-11-22",
+    series: "운영과 유지보수",
+    no: 17,
+    title: "주소 뒤에 붙여 열기만 해도 새는 파일들, .env와 .git과 백업 압축 파일",
+    summary: "OWASP 2025 웹 위험 순위에서 설정 실수가 2위로 올랐습니다. 홈페이지 주소 뒤에 붙여 직접 확인할 수 있는 노출 파일 7가지와 막는 방법, 요청 문구를 정리했습니다.",
+    blocks: [
+      {
+        p: [
+          "해킹이라고 하면 복잡한 공격을 떠올리지만, 실제로는 열려 있으면 안 되는 파일이 주소 하나로 열리는 경우가 많습니다. 작업하다 남긴 백업 압축 파일, 서버 설정 파일, 소스 관리 폴더가 그렇습니다.",
+          "웹 보안 단체 OWASP가 2025년에 낸 웹 애플리케이션 10대 위험에서 보안 설정 실수(Security Misconfiguration)는 2021년 5위에서 2위로 올랐습니다. 꺼 두지 않은 디렉터리 목록, 바꾸지 않은 기본 계정, 지우지 않은 예제 페이지, 자세한 오류 화면이 예로 나옵니다."
+        ]
+      },
+      {
+        h: "어떤 파일이 열리면 안 됩니까?",
+        table: {
+          head: [
+            "주소 뒤에 붙는 것",
+            "들어 있는 것",
+            "열리면 생기는 일"
+          ],
+          rows: [
+            [
+              ".env",
+              "DB 비밀번호, 결제와 문자 발송 API 키",
+              "DB 접속, 키 도용"
+            ],
+            [
+              ".git/",
+              "소스 코드와 수정 이력 전체",
+              "소스 복원, 이력에 남은 비밀번호 노출"
+            ],
+            [
+              "백업 압축 파일(.zip, .tar.gz, .sql)",
+              "사이트 전체 또는 DB 내용",
+              "회원 정보 통째로 유출"
+            ],
+            [
+              "설정 백업(.bak, .old, ~)",
+              "wp-config.php.bak 같은 설정 사본",
+              "PHP로 실행되지 않고 글자 그대로 내려받힘"
+            ],
+            [
+              "phpinfo.php",
+              "서버 설정, 버전, 경로",
+              "공격에 쓸 버전 정보 노출"
+            ],
+            [
+              "디렉터리 목록",
+              "폴더 안 파일 이름 전체",
+              "숨겨 둔 파일 위치 노출"
+            ],
+            [
+              "자세한 오류 화면",
+              "서버 경로, 프로그램 버전, 쿼리",
+              "취약한 버전과 구조 노출"
+            ]
+          ]
+        },
+        p: [
+          "설정 백업 파일이 특히 위험합니다. config.php는 서버가 실행해서 내용이 안 보이지만, config.php.bak은 실행되지 않고 글자 그대로 내려받힙니다. 편집기로 서버에서 바로 고칠 때 자동으로 생기는 사본도 같습니다."
+        ]
+      },
+      {
+        h: "우리 홈페이지는 어떻게 확인합니까?",
+        p: [
+          "주소 뒤에 붙여 응답 코드를 봅니다. 404(없음)나 403(막힘)이면 괜찮고, 200(열림)이면 바로 확인이 필요합니다. 아래는 곰파트너 사이트에서 시험한 결과입니다. 확인은 우리 회사 홈페이지에만 합니다."
+        ],
+        code: "$ for p in .env .git/config .git/HEAD backup.zip wp-config.php.bak phpinfo.php .DS_Store; do\n    echo \"$(curl -s -o /dev/null -w '%{http_code}' https://gompartner.co.kr/$p) /$p\"\n  done\n404 /.env\n404 /.git/config\n404 /.git/HEAD\n404 /backup.zip\n403 /wp-config.php.bak\n404 /phpinfo.php\n404 /.DS_Store"
+      },
+      {
+        h: "막으려면 무엇을 합니까?",
+        steps: [
+          {
+            b: "공개 폴더 밖에 두기",
+            t: ".env와 설정 파일은 웹에서 열리는 폴더(public_html, www) 바깥에 둡니다. 가장 확실한 방법입니다."
+          },
+          {
+            b: "배포에서 빼기",
+            t: ".git 폴더와 작업용 파일은 서버에 올리지 않습니다. 서버에서 git으로 받는 방식이면 웹서버가 점(.)으로 시작하는 경로를 막게 설정합니다."
+          },
+          {
+            b: "백업은 서버 밖으로",
+            t: "백업 파일을 웹 폴더에 만들지 않습니다. 만들었다면 내려받은 뒤 바로 지웁니다."
+          },
+          {
+            b: "디렉터리 목록 끄기",
+            t: "아파치는 Options -Indexes, 엔진엑스는 autoindex off가 기본인지 확인합니다."
+          },
+          {
+            b: "운영 서버 오류 표시 끄기",
+            t: "PHP는 display_errors를 끄고 오류는 로그 파일에만 남깁니다."
+          },
+          {
+            b: "남은 시험 파일 지우기",
+            t: "phpinfo.php, test.php, 설치 마법사(install) 폴더처럼 작업 때 만든 파일을 지웁니다."
+          }
+        ]
+      },
+      {
+        h: "관리업체에 무엇을 요청합니까?",
+        table: {
+          head: [
+            "확인 항목",
+            "받을 답"
+          ],
+          rows: [
+            [
+              "노출 파일",
+              ".env, .git, 백업 파일, phpinfo 접근 시험 결과"
+            ],
+            [
+              "설정",
+              "디렉터리 목록, 운영 오류 표시 설정 값"
+            ],
+            [
+              "백업 위치",
+              "백업 파일이 저장되는 경로와 웹 공개 여부"
+            ],
+            [
+              "정리 이력",
+              "작업 뒤 지운 시험 파일과 날짜"
+            ]
+          ]
+        },
+        p: [
+          "요청 문구 예시입니다.",
+          "> 홈페이지에서 .env, .git, 백업 압축 파일, 설정 백업(.bak), phpinfo 파일이 주소로 열리는지 시험한 결과와, 디렉터리 목록과 운영 오류 표시 설정, 백업 파일 저장 위치를 정리해 회신 부탁드립니다.",
+          "참고: OWASP Top 10 2025 소개 (https://owasp.org/Top10/2025/0x00_2025-Introduction/) / OWASP Top 10 2025, A02 보안 설정 실수 (https://top10.owasp.org/2025/A02_2025-Security_Misconfiguration) / OWASP 웹 보안 시험 가이드 (https://owasp.org/www-project-web-security-testing-guide/) / 시험: 곰파트너 사이트, 2026-11-22"
+        ]
+      }
+    ],
+    image: {
+      src: "/images/insight/exposed-files-check.jpg",
+      alt: "곰파트너 인사이트 제목 카드"
+    },
+    service: {
+      href: "/maintenance/update",
+      label: "보안 업데이트 서비스 보기"
+    }
+  },
+  {
+    slug: "security-headers-check",
+    date: "2026-11-22",
+    series: "운영과 유지보수",
+    no: 18,
+    title: "보안 헤더 6가지, 우리 홈페이지에 붙어 있는지 1분 만에 확인하는 법",
+    summary: "HSTS, CSP 같은 보안 헤더는 화면에 보이지 않아 빠져 있어도 모릅니다. 헤더별 역할과 확인 명령, 곰파트너 사이트에 넣은 값, 업체에 받을 답을 정리했습니다.",
+    blocks: [
+      {
+        p: [
+          "보안 헤더는 서버가 페이지와 함께 브라우저에 보내는 지시입니다. \"이 사이트는 https로만 열어라\", \"다른 사이트 안에 끼워 넣지 마라\" 같은 내용입니다. 화면에는 아무것도 보이지 않아서 빠져 있어도 알아채기 어렵습니다.",
+          "OWASP 2025 웹 위험 순위 2위인 보안 설정 실수에도 보안 헤더를 보내지 않거나 안전하지 않은 값으로 둔 경우가 들어 있습니다."
+        ]
+      },
+      {
+        h: "6가지 헤더는 각각 무엇을 합니까?",
+        table: {
+          head: [
+            "헤더",
+            "하는 일",
+            "예시 값"
+          ],
+          rows: [
+            [
+              "Strict-Transport-Security(HSTS)",
+              "한 번 들어온 브라우저는 다음부터 https로만 접속",
+              "max-age=31536000"
+            ],
+            [
+              "Content-Security-Policy(CSP)",
+              "불러올 수 있는 스크립트, 이미지, 끼워 넣기 범위를 제한",
+              "frame-ancestors 'self'; object-src 'none'"
+            ],
+            [
+              "X-Frame-Options",
+              "다른 사이트가 우리 페이지를 틀 안에 넣어 속이는 것 차단",
+              "SAMEORIGIN"
+            ],
+            [
+              "X-Content-Type-Options",
+              "파일 종류를 브라우저가 멋대로 짐작하지 않게 함",
+              "nosniff"
+            ],
+            [
+              "Referrer-Policy",
+              "다른 사이트로 넘어갈 때 넘기는 주소 정보 줄이기",
+              "strict-origin-when-cross-origin"
+            ],
+            [
+              "Permissions-Policy",
+              "카메라, 마이크, 위치 같은 기능 사용 범위 제한",
+              "camera=(self), microphone=()"
+            ]
+          ]
+        },
+        p: [
+          "예전 점검표에 있던 X-XSS-Protection은 넣지 않습니다. MDN은 이 헤더를 더 이상 쓰지 않는 표준 외 기능으로 분류하고, 오히려 취약점을 만들 수 있다며 CSP를 쓰라고 안내합니다."
+        ]
+      },
+      {
+        h: "우리 홈페이지는 어떻게 확인합니까?",
+        p: [
+          "브라우저 개발자 도구의 네트워크 탭에서 첫 요청의 응답 헤더를 보거나, 터미널에서 아래 명령을 씁니다. 11월 22일 곰파트너 사이트를 점검했을 때 아래 6가지 가운데 HSTS, CSP, Permissions-Policy 세 가지가 빠져 있어 같은 날 넣었습니다. 아래는 넣은 뒤 결과입니다."
+        ],
+        code: "$ curl -sI https://gompartner.co.kr/ | grep -iE 'strict-transport|content-security|x-frame|x-content-type|referrer-policy|permissions-policy'\nreferrer-policy: strict-origin-when-cross-origin\nx-content-type-options: nosniff\nx-frame-options: SAMEORIGIN\nstrict-transport-security: max-age=31536000\ncontent-security-policy: frame-ancestors 'self'; base-uri 'self'; object-src 'none'; upgrade-insecure-requests\npermissions-policy: camera=(self), microphone=(), geolocation=(), payment=(), usb=()"
+      },
+      {
+        h: "넣을 때 조심할 것은 무엇입니까?",
+        steps: [
+          {
+            b: "HSTS의 includeSubDomains, preload",
+            t: "하위 도메인 전체에 적용됩니다. http로만 열리는 하위 도메인이 있으면 접속이 막힙니다. MDN도 http로만 제공되는 하위 도메인이 막힌다고 안내합니다. 하위 도메인을 모두 확인한 뒤 붙입니다."
+          },
+          {
+            b: "CSP는 좁게 시작",
+            t: "스크립트 출처까지 막는 CSP는 분석 도구, 채팅, 지도, 결제 창을 멈추게 할 수 있습니다. 끼워 넣기 차단처럼 영향이 적은 항목부터 넣고, 스크립트 제한은 Content-Security-Policy-Report-Only로 먼저 기록만 받아 봅니다."
+          },
+          {
+            b: "Permissions-Policy는 쓰는 기능 확인",
+            t: "카메라로 가구를 비춰 보는 체험, 지도 위치 같은 기능이 있으면 그 기능은 허용해 둡니다. 곰파트너 사이트는 AR 체험이 카메라를 써서 camera=(self)로 두었습니다."
+          }
+        ]
+      },
+      {
+        h: "관리업체에 무엇을 요청합니까?",
+        table: {
+          head: [
+            "확인 항목",
+            "받을 답"
+          ],
+          rows: [
+            [
+              "현재 값",
+              "6가지 보안 헤더의 현재 응답 값"
+            ],
+            [
+              "설정 위치",
+              "웹서버, CDN, 호스팅 관리 화면 중 어디서 설정하는지"
+            ],
+            [
+              "영향 범위",
+              "CSP와 Permissions-Policy 적용 시 멈출 수 있는 기능 목록"
+            ],
+            [
+              "하위 도메인",
+              "https 적용 여부(HSTS 확대 전)"
+            ]
+          ]
+        },
+        p: [
+          "요청 문구 예시입니다.",
+          "> 홈페이지의 보안 헤더(HSTS, CSP, X-Frame-Options, X-Content-Type-Options, Referrer-Policy, Permissions-Policy) 현재 응답 값과 설정 위치, 빠진 항목을 넣을 때 영향을 받는 기능, 하위 도메인별 https 적용 여부를 정리해 회신 부탁드립니다.",
+          "참고: OWASP Top 10 2025, A02 보안 설정 실수 (https://top10.owasp.org/2025/A02_2025-Security_Misconfiguration) / MDN, Strict-Transport-Security (https://developer.mozilla.org/en-US/docs/Web/HTTP/Reference/Headers/Strict-Transport-Security) / MDN, Content-Security-Policy (https://developer.mozilla.org/en-US/docs/Web/HTTP/Reference/Headers/Content-Security-Policy) / MDN, X-XSS-Protection (https://developer.mozilla.org/en-US/docs/Web/HTTP/Reference/Headers/X-XSS-Protection) / MDN, Permissions-Policy (https://developer.mozilla.org/en-US/docs/Web/HTTP/Reference/Headers/Permissions-Policy) / OWASP Secure Headers Project (https://owasp.org/www-project-secure-headers/) / 시험: 곰파트너 사이트, 2026-11-22"
+        ]
+      }
+    ],
+    image: {
+      src: "/images/insight/security-headers-check.jpg",
+      alt: "곰파트너 인사이트 제목 카드"
+    },
+    service: {
+      href: "/maintenance/update",
+      label: "보안 업데이트 서비스 보기"
+    }
   }
 ];
 
