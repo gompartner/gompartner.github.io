@@ -217,5 +217,24 @@ function Para({ t }: { t: string }) {
         {t.slice(2)}
       </blockquote>
     );
+  // 11-22 출처는 한 줄만 보이고 더보기로 펼침
+  if (t.startsWith("참고: ")) {
+    const src = t.slice(4).split(" / ");
+    return (
+      <details className="group border-t border-[#e6e9ee] pt-3 text-[14px] leading-[1.7] text-[#5b6370]">
+        <summary className="flex cursor-pointer list-none items-center gap-2 [&::-webkit-details-marker]:hidden">
+          <span className="shrink-0 font-bold text-[#15171c]">출처 {src.length}</span>
+          <span className="min-w-0 flex-1 truncate group-open:invisible">{src[0]}</span>
+          <span className="shrink-0 font-bold text-[#256ef4] group-open:hidden">더보기</span>
+          <span className="hidden shrink-0 font-bold text-[#256ef4] group-open:inline">접기</span>
+        </summary>
+        <ul className="mt-2 list-disc space-y-1 break-all pl-5">
+          {src.map((s) => (
+            <li key={s}>{s}</li>
+          ))}
+        </ul>
+      </details>
+    );
+  }
   return <p className="text-[17px] leading-[1.8] text-[#3d4450]">{t}</p>;
 }
