@@ -2,7 +2,7 @@ import { aboutLead, aboutTitle, principles } from "@/data/classic/about";
 import { faq } from "@/data/classic/faq";
 import { industries } from "@/data/classic/industries";
 import { insights } from "@/data/classic/insights";
-import { trendDocs, termHref } from "@/data/classic/archive";
+import { topics, trendDocs, termHref } from "@/data/classic/archive";
 import { termGroups } from "@/data/classic/glossary";
 import { tools } from "@/data/classic/tools";
 import { maintenanceServices, replyTerm } from "@/data/classic/maintenance";
@@ -58,6 +58,13 @@ ${landingPlans.map((p) => `- ${plain(p.title)}: ${plain(p.summary)}. ${plain(p.i
 ## 웹 지식
 
 홈페이지 화면 부품, 디자인 용어, 운영 용어를 와이어프레임과 요청 문장, 넘겨받을 때 확인할 것으로 정리한 문서 공간입니다. 자세히: [웹 지식](${url("/knowledge")}), [용어](${url("/knowledge/terms")}), [점검표와 도구](${url("/knowledge/checklists")}), [디자인](${url("/knowledge/design")}), [프론트엔드](${url("/knowledge/frontend")}), [운영과 유지보수](${url("/knowledge/ops")}), [데이터](${url("/knowledge/data")})
+
+주제별 문서 목록:
+
+${topics().map((t) => `- [${plain(t.label)}](${url(`/knowledge/${t.id}`)}): ${plain(t.desc)}`).join("\n")}
+- [화면 예시](${url("/knowledge/screens")}): 페이지 종류별 와이어프레임
+- [시안 작업](${url("/knowledge/drafts")}): 업종별 시안 두 장 비교
+- [운영 노트](${url("/knowledge/notes")}): 인사이트 글 목록
 
 웹 지식 문서(차트와 연표, 출처, 넘겨받을 때 확인 사항, 곰파트너 전망이 들어 있습니다):
 

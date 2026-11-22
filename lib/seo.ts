@@ -1,3 +1,5 @@
+import { existsSync } from "node:fs";
+import { join } from "node:path";
 import { siteUrl } from "@/lib/site";
 
 // 검색 결과 설명은 80자 안쪽으로 맞춘다(네이버·구글 모두 그 뒤는 잘린다).
@@ -9,11 +11,23 @@ export const OG_IMAGE = { url: "/og-image.png?v=20261102", width: 1200, height: 
 
 // 하위 페이지가 openGraph를 따로 정하지 않으면 홈 제목과 설명이 그대로 공유된다.
 // 페이지 제목과 설명으로 openGraph, twitter를 같이 채운다.
+// 11-22 페이지 대표 이미지: 따로 정하지 않은 페이지는 scripts/page-cards.mjs 가 만든 public/og/page/<주소>.jpg 를 쓴다
+export const ogKey = (path: string) => path.replace(/^\/|\/$/g, "").replaceAll("/", "--") || "home";
+/** 만든 페이지 카드 주소(없으면 undefined). 구조화 데이터 image에 쓴다 */
+export function pageCardUrl(path: string) {
+  const file = `/og/page/${ogKey(path)}.jpg`;
+  return existsSync(join(process.cwd(), "public", file)) ? file : undefined;
+}
+function pageCard(path: string, alt: string) {
+  const file = `/og/page/${ogKey(path)}.jpg`;
+  return existsSync(join(process.cwd(), "public", file)) ? { url: file, width: 1200, height: 675, alt } : null;
+}
+
 export function pageMeta(opts: { title: string; description: string; path: string; image?: { src: string; alt: string; width?: number; height?: number }; article?: boolean; noindex?: boolean }) {
   const description = fitDescription(opts.description);
   const title = `${opts.title} | 곰파트너`;
   const url = opts.path;
-  const image = opts.image ? { url: opts.image.src, width: opts.image.width ?? 1200, height: opts.image.height ?? 675, alt: opts.image.alt } : OG_IMAGE;
+  const image = opts.image ? { url: opts.image.src, width: opts.image.width ?? 1200, height: opts.image.height ?? 675, alt: opts.image.alt } : (pageCard(opts.path, opts.title) ?? OG_IMAGE);
   return {
     title: opts.title,
     description,
@@ -33,11 +47,12 @@ export function fitDescription(text: string, max = DESCRIPTION_MAX): string {
     if (next.length > max) break;
     out = next;
   }
-  if (out.length >= 30) return out;
+  if (out.length >= 50) return out;
   // 첫 문장이 짧은 이름표뿐이면 이어지는 나열을 쉼표에서 끊는다.
   const cut = s.slice(0, max);
   const comma = cut.lastIndexOf(", ");
-  const at = comma > 0 ? comma : cut.lastIndexOf(" ");
+  // 쉼표가 너무 앞(50자 전)이면 쉼표 대신 마지막 띄어쓰기에서 끊는다(11-22 설명 22자로 잘린 일)
+  const at = comma >= 50 ? comma : cut.lastIndexOf(" ");
   return cut.slice(0, at > 0 ? at : max).replace(/[,·.]$/, "") + ".";
 }
 

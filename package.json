@@ -7,7 +7,8 @@
     "build": "next build",
     "start": "next start",
     "lint": "eslint",
-    "prebuild": "node scripts/blog-links.mjs"
+    "prebuild": "node scripts/blog-links.mjs",
+    "postbuild": "node scripts/check-pages.mjs"
   },
   "dependencies": {
     "@react-three/drei": "10.7.9",

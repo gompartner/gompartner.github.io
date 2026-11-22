@@ -337,7 +337,7 @@ export function topics(): Topic[] {
     { id: "infra", label: "인프라", desc: "도메인, 서버, 호스팅, https와 인증서", groups: [
       { title: "문서", items: [doc("/knowledge/https"), term("go1")] },
     ] },
-    { id: "security", label: "보안", desc: "보안 경보와 점검", groups: [
+    { id: "security", label: "보안", desc: "PHP, 워드프레스, 그누보드, 인증서 보안 경보와 대응, 취약점 점검 도구", groups: [
       { title: "보안 경보", items: series("보안 경보") },
       { title: "도구", items: [tool("/tools/php-check"), tool("/tools/site-check")] },
     ] },

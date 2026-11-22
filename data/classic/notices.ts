@@ -140,7 +140,7 @@ export const notices: Notice[] = [
     id: "renewal-2026-10",
     date: "2026-10-31",
     title: "견적서 안내 방식 변경",
-    summary: "제작과 유지보수 금액은 상담 신청 후 견적서로 안내합니다.",
+    summary: "제작과 유지보수 금액은 상담 신청 후 작업 범위를 확인해 견적서로 안내합니다.",
     sections: [
       {
         h: "",
@@ -152,7 +152,7 @@ export const notices: Notice[] = [
     id: "design-4",
     date: "2026-10-22",
     title: "서비스별 상세 안내 페이지 오픈",
-    summary: "서비스마다 작업 범위와 진행 절차를 안내하는 페이지를 열었습니다.",
+    summary: "홈페이지 제작, 오류 수정, 업체 변경, 보안 업데이트, 월 유지보수마다 작업 범위와 진행 절차를 안내하는 페이지를 열었습니다.",
     sections: [
       {
         h: "",
@@ -176,7 +176,7 @@ export const notices: Notice[] = [
     id: "design-1",
     date: "2026-07-13",
     title: "곰파트너 홈페이지 오픈",
-    summary: "곰파트너 홈페이지를 열었습니다.",
+    summary: "곰파트너 홈페이지를 열었습니다. 홈페이지 제작과 유지보수 상담은 상담 신청 페이지에서 받습니다.",
     sections: [
       {
         h: "",
