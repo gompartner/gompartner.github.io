@@ -334,7 +334,7 @@ export function topics(): Topic[] {
       { title: "문서", items: ["/knowledge/browser", "/knowledge/flash-jquery", "/knowledge/page-weight"].map(doc) },
       { title: "도구", items: [tool("/tools/accessibility-check"), tool("/tools/image-compress")] },
     ] },
-    { id: "dev", label: "만드는 도구와 개발", desc: "홈페이지를 만드는 도구(CMS: 카페24, 아임웹, WordPress, 그누보드), 개발 언어, PHP 버전, 앱, AI로 만든 서비스", groups: [
+    { id: "dev", label: "개발", desc: "홈페이지를 만드는 도구(CMS: 카페24, 아임웹, WordPress, 그누보드), 개발 언어, PHP 버전, 앱, AI로 만든 서비스", groups: [
       { title: "문서", items: ["/knowledge/cms", "/knowledge/server-language", "/knowledge/php", "/knowledge/app"].map(doc) },
       { title: "AI로 만든 서비스 운영", items: series("AI로 만든 서비스 운영") },
       { title: "개발 도구", items: [tool("/tools/jwt-parser"), tool("/tools/unix-time"), tool("/tools/cron")] },
@@ -391,10 +391,10 @@ const manualLog: { date: string; kind: string; title: string; href: string }[] =
   { date: "2026-11-22", kind: "기획", title: "기업 홈페이지: 회사 소개서 화면에서 플래시, 모바일, 빌더까지", href: "/knowledge/company-homepage" },
   { date: "2026-11-22", kind: "기획", title: "공공기관 홈페이지: 전자정부법에서 KRDS, 국정자원 화재까지", href: "/knowledge/public-homepage" },
   { date: "2026-11-22", kind: "기획", title: "개인 홈페이지: 무료 계정과 CGI 게시판에서 미니홈피, 블로그까지", href: "/knowledge/personal-homepage" },
-  { date: "2026-11-22", kind: "만드는 도구와 개발", title: "개발 언어: Perl CGI에서 Next.js까지", href: "/knowledge/server-language" },
+  { date: "2026-11-22", kind: "개발", title: "개발 언어: Perl CGI에서 Next.js까지", href: "/knowledge/server-language" },
   { date: "2026-11-21", kind: "디자인", title: "화면 크기: 1024에서 1920으로", href: "/knowledge/screen-size" },
   { date: "2026-11-21", kind: "프론트엔드", title: "브라우저 호환: 한국만 IE를 오래 못 떠난 이유", href: "/knowledge/browser" },
-  { date: "2026-11-21", kind: "만드는 도구와 개발", title: "만드는 도구(CMS) 비교: 한국은 카페24, 일본은 WordPress", href: "/knowledge/cms" },
+  { date: "2026-11-21", kind: "개발", title: "만드는 도구(CMS) 비교: 한국은 카페24, 일본은 WordPress", href: "/knowledge/cms" },
   { date: "2026-11-21", kind: "디자인", title: "시안 작업: 업종 7곳, 시안 두 장씩", href: "/knowledge/drafts" },
   { date: "2026-11-21", kind: "디자인", title: "화면 예시: 페이지 종류별 와이어프레임", href: "/knowledge/screens" },
   { date: "2026-11-21", kind: "참고", title: "데이터 차트와 원본 CSV", href: "/knowledge/data" },

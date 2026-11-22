@@ -76,7 +76,7 @@ export function buildSearchIndex(): SearchItem[] {
   const archive: SearchItem[] = [
     { kind: "웹 지식", title: "화면 예시: 페이지 종류별 와이어프레임", desc: "첫 화면, 회사 소개, 게시판, 로그인, 결제, 예약, 접수, 검색, 관리자", href: "/knowledge/screens", hay: "화면 예시 와이어프레임 시안 레이아웃 페이지 구성 디자인" },
     { kind: "웹 지식", title: "시안 작업: 업종별 시안 두 장", desc: "제조사, 법률사무소, 세무회계, 치과, 피부과, 학원, 인테리어", href: "/knowledge/drafts", hay: "시안 디자인 첫 화면 비교 A안 B안 컨셉 업종" },
-    { kind: "웹 지식", title: "웹 지식 공간 홈", desc: "기획, 디자인, 프론트엔드, 만드는 도구와 개발, 인프라, 보안, 검색, 운영과 유지보수, 법과 규정", href: "/knowledge", hay: "웹 지식 아카이브 자료 자료실 문서 허브 위키" },
+    { kind: "웹 지식", title: "웹 지식 공간 홈", desc: "기획, 디자인, 프론트엔드, 개발, 인프라, 보안, 검색, 운영과 유지보수, 법과 규정", href: "/knowledge", hay: "웹 지식 아카이브 자료 자료실 문서 허브 위키" },
     ...designDocs.map((d) => ({ kind: "웹 지식" as const, title: d.title, desc: d.desc, href: d.href, hay: "트렌드 디자인 화면 기기 한국 일본 미국 비교 차트 연도별 역사 변화" })),
     ...techDocs.map((d) => ({ kind: "웹 지식" as const, title: d.title, desc: d.desc, href: d.href, hay: "트렌드 기술 한국 일본 미국 비교 차트 연도별 역사 변화" })),
     ...termGroups.map((g) => ({ kind: "웹 지식" as const, title: `용어 문서: ${shortTitle(g)}`, desc: g.terms.map((t) => t.name).join(", "), href: termHref(g), hay: [g.title, g.cat, g.sec, ...(takeover[g.id] ?? []).flatMap((x) => [x.b, x.t]), takeover[g.id] ? "인수 시 확인 사항" : ""].join(" ") })),
