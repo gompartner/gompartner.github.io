@@ -306,6 +306,10 @@ const term = (id: string) => {
   const g = termGroups.find((x) => x.id === id)!;
   return { label: shortTitle(g), href: termHref(g) };
 };
+const note = (slug: string) => {
+  const n = insights.find((x) => x.slug === slug)!;
+  return { label: n.title, href: `/insight/${n.slug}` };
+};
 const doc = (href: string) => {
   const d = trendDocs.find((x) => x.href === href)!;
   return { label: d.title, href: d.href };
@@ -343,6 +347,7 @@ export function topics(): Topic[] {
     ] },
     { id: "search", label: "검색", desc: "검색 등록과 기록, 검색 결과에 보이는 모습, AI 검색과 인용", groups: [
       { title: "문서", items: [doc("/knowledge/search-optimization"), doc("/knowledge/ai-readable-web"), term("go4"), tool("/tools/search-preview")] },
+      { title: "운영 노트", items: [note("homepage-seo-basic-settings"), note("ai-crawler-access-check"), note("ai-search-google-naver")] },
     ] },
     { id: "ops", label: "운영과 유지보수", desc: "인수인계, 월 점검, 장애 대응, 관리 비용, 점검표", groups: [
       { title: "운영과 유지보수", items: series("운영과 유지보수") },

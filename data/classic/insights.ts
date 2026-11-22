@@ -8081,6 +8081,270 @@ const allInsights: Insight[] = [
       label: "보안 업데이트 서비스 보기"
     }
   },
+  {
+    slug: "homepage-seo-basic-settings",
+    date: "2026-11-22",
+    series: "운영과 유지보수",
+    no: 16,
+    title: "홈페이지 검색 노출 기본 설정 9가지, 관리업체에 무엇을 확인받습니까",
+    summary: "검색에 잘 안 나오는 홈페이지는 기본 설정이 빠진 경우가 많습니다. 구글 공식 안내를 기준으로 9가지 항목과 직접 확인하는 방법, 요청 문구를 정리했습니다.",
+    blocks: [
+      {
+        p: [
+          "\"검색해도 우리 홈페이지가 안 나온다\"는 문의를 받으면 먼저 기본 설정부터 봅니다. 순위를 올리는 요령보다 앞선 단계입니다. 검색엔진이 페이지를 찾고, 읽고, 무슨 내용인지 알 수 있게 하는 설정입니다.",
+          "SEO(검색엔진 최적화)는 이 기본 설정과 내용, 연결을 함께 다룹니다. 이 글은 관리업체에 맡긴 홈페이지라면 계약 범위 안에서 갖춰져 있어야 할 기본 설정만 다룹니다."
+        ]
+      },
+      {
+        h: "기본 설정 9가지는 무엇입니까?",
+        table: {
+          head: [
+            "항목",
+            "하는 일",
+            "확인할 곳"
+          ],
+          rows: [
+            [
+              "검색엔진 등록",
+              "구글 서치 콘솔, 네이버 서치어드바이저에 사이트 소유를 확인하고 등록",
+              "두 서비스의 관리 화면"
+            ],
+            [
+              "사이트맵",
+              "검색엔진에 알릴 페이지 주소 목록(sitemap.xml) 제출",
+              "주소 뒤에 /sitemap.xml"
+            ],
+            [
+              "robots.txt",
+              "검색엔진이 수집해도 되는 범위 안내",
+              "주소 뒤에 /robots.txt, 전체 차단(Disallow: /) 여부"
+            ],
+            [
+              "페이지 제목(title)",
+              "검색 결과 제목. 페이지마다 다르고 짧게",
+              "브라우저 탭 이름"
+            ],
+            [
+              "설명(meta description)",
+              "검색 결과 아래 요약 후보. 페이지마다 다르게",
+              "페이지 소스의 description"
+            ],
+            [
+              "대표 주소(canonical)",
+              "같은 내용이 여러 주소로 열릴 때 기준 주소 하나를 지정",
+              "페이지 소스의 rel=\"canonical\""
+            ],
+            [
+              "대표 이미지(og:image)",
+              "카카오톡 공유, 검색 썸네일에 쓰는 이미지",
+              "카카오톡에 주소를 보내 미리보기 확인"
+            ],
+            [
+              "이미지 대체 텍스트(alt)",
+              "이미지가 무엇인지 글로 설명. 웹 접근성 항목이기도 함",
+              "페이지 소스의 img alt"
+            ],
+            [
+              "구조화 데이터",
+              "회사, 글, 자주 묻는 질문 같은 정보를 정해진 형식으로 표시",
+              "구글 리치 결과 테스트"
+            ]
+          ]
+        },
+        p: [
+          "구글 검색 센터의 SEO 기본 가이드는 제목을 페이지마다 고유하고 명확하고 간결하게, 설명은 짧고 페이지마다 다르게 쓰라고 안내합니다. 같은 내용은 주소 하나로 두고, 여러 주소가 있으면 기준 주소를 지정하거나 넘겨주라고 합니다."
+        ]
+      },
+      {
+        h: "관리업체에서 자주 듣는 말은 어떻게 봅니까?",
+        steps: [
+          {
+            b: "\"메타 키워드를 넣었습니다\"",
+            t: "구글은 keywords 메타 태그를 검색에 쓰지 않는다고 밝혔습니다. 넣어도 손해는 없지만 SEO 작업으로 내세울 항목은 아닙니다."
+          },
+          {
+            b: "\"사이트맵만 제출하면 됩니다\"",
+            t: "구글 안내에서 사이트맵은 선택 사항입니다. 사이트맵이 있어도 제목, 설명, robots.txt가 잘못돼 있으면 소용이 적습니다."
+          },
+          {
+            b: "\"검색 1위를 보장합니다\"",
+            t: "구글은 누구도 구글 1위를 보장할 수 없다고 안내합니다. 보장 문구보다 어떤 설정을 언제 바꿨는지 기록을 받는 편이 낫습니다."
+          },
+          {
+            b: "\"리뉴얼하면서 주소가 바뀌었습니다\"",
+            t: "옛 주소에서 새 주소로 넘겨주는 설정(301 이동)이 없으면 쌓인 검색 노출이 끊깁니다. 리뉴얼 전후 주소 대조표를 받습니다."
+          }
+        ]
+      },
+      {
+        h: "직접 확인하려면 어떻게 합니까?",
+        p: [
+          "터미널이 익숙하면 아래 명령으로 바로 볼 수 있습니다. 익숙하지 않으면 곰파트너 무료 도구 \"검색 결과 미리보기\"에 주소를 넣으면 제목, 설명, 공유 이미지를 읽어 보여 줍니다."
+        ],
+        code: "# 수집 허용 범위(전체 차단 여부)\ncurl -s https://example.com/robots.txt\n\n# 사이트맵이 열리는지\ncurl -s -o /dev/null -w \"%{http_code}\\n\" https://example.com/sitemap.xml\n\n# 첫 화면 제목, 설명, 기준 주소\ncurl -s https://example.com/ | grep -o -E '<title>[^<]*|name=\"description\" content=\"[^\"]*|rel=\"canonical\" href=\"[^\"]*'"
+      },
+      {
+        h: "관리업체에 무엇을 요청합니까?",
+        table: {
+          head: [
+            "확인 항목",
+            "받을 답"
+          ],
+          rows: [
+            [
+              "검색엔진 등록",
+              "구글 서치 콘솔, 네이버 서치어드바이저 등록 여부와 관리 계정 명의"
+            ],
+            [
+              "수집 설정",
+              "robots.txt 내용, 사이트맵 주소와 마지막 제출일"
+            ],
+            [
+              "페이지 설정",
+              "제목과 설명이 비었거나 겹치는 페이지 목록"
+            ],
+            [
+              "주소 변경",
+              "리뉴얼 때 옛 주소 넘김(301) 적용 목록"
+            ]
+          ]
+        },
+        p: [
+          "요청 문구 예시입니다.",
+          "> 구글 서치 콘솔과 네이버 서치어드바이저 등록 여부와 계정 명의, robots.txt와 사이트맵 제출 현황, 제목과 설명이 비었거나 겹치는 페이지 목록, 주소가 바뀐 페이지의 301 넘김 적용 여부를 정리해 회신 부탁드립니다.",
+          "참고: 구글 검색 센터, SEO 기본 가이드 (https://developers.google.com/search/docs/fundamentals/seo-starter-guide) / 구글 검색 센터, SEO 전문가가 필요한가요 (https://developers.google.com/search/docs/fundamentals/do-i-need-seo) / 구글 검색 센터, 사이트맵 안내 (https://developers.google.com/search/docs/crawling-indexing/sitemaps/overview) / 구글 검색 센터, 중복 주소와 기준 주소 (https://developers.google.com/search/docs/crawling-indexing/consolidate-duplicate-urls) / 구글 리치 결과 테스트 (https://search.google.com/test/rich-results)"
+        ]
+      }
+    ],
+    image: {
+      src: "/images/insight/homepage-seo-basic-settings.jpg",
+      alt: "곰파트너 인사이트 제목 카드"
+    },
+    service: {
+      href: "/maintenance/monthly",
+      label: "월 유지보수 서비스 보기"
+    }
+  },
+  {
+    slug: "ai-crawler-access-check",
+    date: "2026-11-22",
+    series: "해외와 국내 동향",
+    no: 8,
+    title: "ChatGPT와 퍼플렉시티 답변에 홈페이지가 안 나온다면, AI 크롤러 차단부터 확인합니다",
+    summary: "AI 검색은 회사마다 검색용과 학습용 크롤러가 따로 있습니다. 학습은 막고 검색은 여는 robots.txt 설정과 클라우드플레어 기본값 변경을 정리했습니다.",
+    blocks: [
+      {
+        p: [
+          "구글 AI 개요는 일반 구글 검색 색인을 기준으로 합니다. ChatGPT 검색, 퍼플렉시티, 클로드는 각 회사가 자기 크롤러(사이트를 읽어 가는 프로그램)로 페이지를 모읍니다. 그래서 AI 답변에 출처로 나오려면 먼저 그 크롤러가 홈페이지에 들어올 수 있어야 합니다.",
+          "문제는 \"AI 학습이 싫어서\" 막은 설정이 검색용 크롤러까지 막는 경우입니다. 회사별 공식 문서를 기준으로 정리했습니다."
+        ]
+      },
+      {
+        h: "회사별 크롤러는 무엇입니까?",
+        table: {
+          head: [
+            "회사",
+            "검색용",
+            "학습용",
+            "사용자 요청 때 방문"
+          ],
+          rows: [
+            [
+              "OpenAI(ChatGPT)",
+              "OAI-SearchBot",
+              "GPTBot",
+              "ChatGPT-User"
+            ],
+            [
+              "퍼플렉시티",
+              "PerplexityBot",
+              "따로 없음(PerplexityBot은 기초 모델 학습에 쓰지 않는다고 밝힘)",
+              "Perplexity-User"
+            ],
+            [
+              "앤트로픽(클로드)",
+              "Claude-SearchBot",
+              "ClaudeBot",
+              "Claude-User"
+            ],
+            [
+              "구글",
+              "Googlebot(일반 검색과 같음)",
+              "Google-Extended(별도 크롤러가 아니라 제어용 표시)",
+              "없음"
+            ]
+          ]
+        },
+        p: [
+          "세 회사 모두 크롤러 설정은 서로 따로 동작한다고 안내합니다. OpenAI 문서에 따르면 GPTBot을 막아도 OAI-SearchBot을 열어 두면 ChatGPT 검색 답변에 나올 수 있고, OAI-SearchBot을 막으면 검색 답변에는 나오지 않습니다. robots.txt를 바꾸면 반영까지 약 24시간이 걸린다고 OpenAI와 퍼플렉시티 모두 밝혔습니다.",
+          "구글은 Google-Extended가 구글 검색 포함 여부와 순위에 영향을 주지 않는다고 밝혔습니다. 다만 Google-Extended는 제미나이 모델 학습과 함께 답변할 때 검색 색인을 쓰는 그라운딩에도 적용됩니다.",
+          "사용자 요청 때 방문하는 봇(ChatGPT-User, Perplexity-User)은 사람이 직접 요청한 방문이라 robots.txt를 따르지 않을 수 있다고 각 회사가 적어 두었습니다."
+        ]
+      },
+      {
+        h: "학습은 막고 검색은 열어 두려면 robots.txt를 어떻게 씁니까?",
+        p: [
+          "아래는 예시입니다. 학습을 허용할지는 회사가 정할 일이고, 검색용 크롤러만은 막지 않는 것이 핵심입니다."
+        ],
+        code: "User-agent: GPTBot\nDisallow: /\n\nUser-agent: ClaudeBot\nDisallow: /\n\nUser-agent: Google-Extended\nDisallow: /\n\nUser-agent: OAI-SearchBot\nAllow: /\n\nUser-agent: PerplexityBot\nAllow: /\n\nUser-agent: Claude-SearchBot\nAllow: /\n\nUser-agent: *\nAllow: /\n\nSitemap: https://example.com/sitemap.xml"
+      },
+      {
+        h: "robots.txt가 열려 있는데도 안 들어온다면?",
+        p: [
+          "robots.txt 앞에서 막히는 경우가 있습니다. 클라우드플레어 같은 CDN, 웹 방화벽(WAF), 호스팅사 보안 설정이 크롤러를 먼저 차단하면 robots.txt는 읽히지도 않습니다.",
+          "클라우드플레어는 2025년 7월 1일부터 새로 등록하는 도메인에 AI 크롤러 허용 여부를 묻기 시작했습니다. 2026년 7월 1일에는 크롤러를 검색(Search), 대리 작업(Agent), 학습(Training) 세 갈래로 나눠 고르는 설정을 내놓았고, 9월 15일부터 새 도메인은 광고가 있는 페이지에서 학습과 대리 작업을 기본 차단, 검색은 기본 허용으로 바뀐다고 공지했습니다.",
+          "같은 공지에서 학습 차단을 고르면 구글봇, 애플봇, 빙봇처럼 검색과 학습을 같이 하는 크롤러도 막힌다고 밝혔습니다. 클라우드플레어를 쓰는 홈페이지라면 AI 크롤러 설정에서 무엇을 골랐는지 먼저 봅니다. 퍼플렉시티는 방화벽을 쓰는 경우 공개한 IP 대역으로 허용 규칙을 따로 만들어야 할 수 있다고 안내합니다."
+        ]
+      },
+      {
+        h: "직접 확인하려면 어떻게 합니까?",
+        p: [
+          "크롤러 이름으로 접속해 응답 코드를 봅니다. 200이면 들어오고, 403이나 503이면 어딘가에서 막고 있습니다. 실제 크롤러는 IP로도 확인하므로 이 시험이 200이어도 방화벽 규칙은 따로 봐야 합니다. 아래는 곰파트너 사이트에서 시험한 결과입니다."
+        ],
+        code: "$ for ua in OAI-SearchBot GPTBot PerplexityBot Claude-SearchBot ClaudeBot; do\n    echo \"$ua $(curl -s -o /dev/null -w '%{http_code}' -A \"Mozilla/5.0 (compatible; $ua/1.0)\" https://gompartner.co.kr/)\"\n  done\nOAI-SearchBot 200\nGPTBot 200\nPerplexityBot 200\nClaude-SearchBot 200\nClaudeBot 200"
+      },
+      {
+        h: "관리업체에 무엇을 요청합니까?",
+        table: {
+          head: [
+            "확인 항목",
+            "받을 답"
+          ],
+          rows: [
+            [
+              "robots.txt",
+              "AI 크롤러별 허용, 차단 내용"
+            ],
+            [
+              "CDN과 방화벽",
+              "클라우드플레어 등 AI 크롤러 차단 설정 값"
+            ],
+            [
+              "호스팅 보안",
+              "봇 차단 플러그인이나 호스팅사 차단 규칙 유무"
+            ],
+            [
+              "회사 방침",
+              "학습 허용 여부를 누가 정했는지"
+            ]
+          ]
+        },
+        p: [
+          "요청 문구 예시입니다.",
+          "> robots.txt의 AI 크롤러별 허용, 차단 내용, 클라우드플레어 등 CDN과 웹 방화벽의 AI 크롤러 차단 설정, 호스팅사나 보안 플러그인의 봇 차단 규칙 유무를 정리해 회신 부탁드립니다. 검색용 크롤러(OAI-SearchBot, PerplexityBot, Claude-SearchBot)는 허용을 원합니다.",
+          "참고: OpenAI, 크롤러 안내 (https://developers.openai.com/api/docs/bots) / 퍼플렉시티, 크롤러 안내 (https://docs.perplexity.ai/guides/bots) / 앤트로픽 고객센터, 크롤러와 차단 방법 (https://support.claude.com/en/articles/8896518-does-anthropic-crawl-data-from-the-web-and-how-can-site-owners-block-the-crawler) / 구글 검색 센터, 구글 크롤러와 Google-Extended (https://developers.google.com/search/docs/crawling-indexing/google-common-crawlers) / 클라우드플레어 블로그, AI 트래픽 설정, 2026-07-01 (https://blog.cloudflare.com/content-independence-day-ai-options/) / 클라우드플레어 보도자료, AI 크롤러 기본 차단, 2025-07-01 (https://cloudflare.com/press-releases/2025/cloudflare-just-changed-how-ai-crawlers-scrape-the-internet-at-large) / 시험: 곰파트너 사이트, 2026-11-22"
+        ]
+      }
+    ],
+    image: {
+      src: "/images/insight/ai-crawler-access-check.jpg",
+      alt: "곰파트너 인사이트 제목 카드"
+    },
+    service: {
+      href: "/maintenance/monthly",
+      label: "월 유지보수 서비스 보기"
+    }
+  }
 ];
 
 /** 예약된 다음 편(아직 공개 전)의 공개일. 글 끝 "다음 편"에 날짜만 보여 준다 */
