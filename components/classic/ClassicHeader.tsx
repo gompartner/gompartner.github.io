@@ -46,6 +46,7 @@ export const classicMenu = [
     href: "/knowledge",
     match: ["/knowledge", "/insight", "/tools", "/jaryo"],
     items: [
+      { href: "/knowledge/plan", label: "기획" },
       { href: "/knowledge/design", label: "디자인" },
       { href: "/knowledge/frontend", label: "프론트엔드" },
       { href: "/knowledge/dev", label: "개발" },
