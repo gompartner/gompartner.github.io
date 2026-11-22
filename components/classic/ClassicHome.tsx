@@ -1,6 +1,7 @@
 import { NavLink } from "@/components/classic/NavLink";
 import {
   ArrowUpRight,
+  Bot,
   Box,
   CalendarCheck,
   CheckCircle2,
@@ -22,7 +23,7 @@ import { maintenanceServices } from "@/data/classic/maintenance";
 
 const NAVY = "#0f1b3d";
 
-const serviceIcon: Record<string, LucideIcon> = { fix: Wrench, takeover: Repeat, update: ShieldCheck, monthly: CalendarCheck };
+const serviceIcon: Record<string, LucideIcon> = { fix: Wrench, takeover: Repeat, "ai-site": Bot, update: ShieldCheck, monthly: CalendarCheck };
 
 const care = [...maintenanceServices]
   .sort((a, b) => (b.id === "takeover" ? 1 : 0) - (a.id === "takeover" ? 1 : 0))
