@@ -180,6 +180,18 @@ export const VARIANTS: Record<string, { id: string; label: string }[]> = {
     { id: "a", label: "시안 A 인증 안내" },
     { id: "b", label: "시안 B 시험분석" },
   ],
+  "saas-startup": [
+    { id: "a", label: "시안 A 제품 화면" },
+    { id: "b", label: "시안 B 업종별 도입" },
+  ],
+  logistics: [
+    { id: "a", label: "시안 A 풀필먼트" },
+    { id: "b", label: "시안 B 기업 3PL" },
+  ],
+  "food-oem": [
+    { id: "a", label: "시안 A 소스 OEM" },
+    { id: "b", label: "시안 B 건강식품" },
+  ],
   "clinic-homepage": [
     { id: "a", label: "시안 A 미니멀" },
     { id: "b", label: "시안 B 진료 안내형" },

@@ -88,6 +88,12 @@ import { WdA } from "./WdA";
 import { WdB } from "./WdB";
 import { CeA } from "./CeA";
 import { CeB } from "./CeB";
+import { SaA } from "./SaA";
+import { SaB } from "./SaB";
+import { LgA } from "./LgA";
+import { LgB } from "./LgB";
+import { FoA } from "./FoA";
+import { FoB } from "./FoB";
 
 // 컨셉 시안 두 장씩(11-21). 맨 위 줄에서 바꿔 본다. 기존 기능형 데모는 코드만 남긴다.
 export function TaxDrafts() {
@@ -672,6 +678,48 @@ export function CertLabDrafts() {
     <>
       <CeA />
       <QuickMenu accent="#16325c" cta="견적문의" tel="031-000-0000" />
+    </>
+  );
+}
+
+export function SaasDrafts() {
+  return useVariant("saas-startup") === "b" ? (
+    <>
+      <SaB />
+      <QuickMenu accent="#121212" cta="도입 문의" tel="1600-0000" />
+    </>
+  ) : (
+    <>
+      <SaA />
+      <QuickMenu accent="#1e3a8a" cta="도입 문의" tel="1600-0000" />
+    </>
+  );
+}
+
+export function LogisticsDrafts() {
+  return useVariant("logistics") === "b" ? (
+    <>
+      <LgB />
+      <QuickMenu accent="#141414" cta="견적 문의" tel="031-000-0000" />
+    </>
+  ) : (
+    <>
+      <LgA />
+      <QuickMenu accent="#12345e" cta="도입 상담" tel="031-000-0000" />
+    </>
+  );
+}
+
+export function FoodOemDrafts() {
+  return useVariant("food-oem") === "b" ? (
+    <>
+      <FoB />
+      <QuickMenu accent="#4c3bb4" cta="개발 상담" tel="031-000-0000" />
+    </>
+  ) : (
+    <>
+      <FoA />
+      <QuickMenu accent="#1f6f46" cta="샘플 의뢰" tel="043-000-0000" />
     </>
   );
 }
