@@ -39,8 +39,9 @@ const make = [
 
 const jump = [
   { href: "#care", label: "유지보수" },
-  ...make.map((m) => ({ href: `#${m.id}`, label: m.title })),
+  ...make.slice(0, 2).map((m) => ({ href: `#${m.id}`, label: m.title })),
   { href: "#program", label: "업무 프로그램 제작" },
+  ...make.slice(2).map((m) => ({ href: `#${m.id}`, label: m.title })),
 ];
 
 export default function PricingPage() {
@@ -82,7 +83,7 @@ export default function PricingPage() {
         </div>
       </section>
 
-      {make.map((m) => (
+      {make.slice(0, 2).map((m) => (
         <section key={m.id} id={m.id} aria-labelledby={`pr-${m.id}`} className={section}>
           <div className={`${wrap} py-16 md:py-24`}>
             <div className="flex flex-wrap items-end justify-between gap-3">
@@ -117,6 +118,29 @@ export default function PricingPage() {
           </NavLink>
         </div>
       </section>
+
+      {make.slice(2).map((m) => (
+        <section key={m.id} id={m.id} aria-labelledby={`pr-${m.id}`} className={section}>
+          <div className={`${wrap} py-16 md:py-24`}>
+            <div className="flex flex-wrap items-end justify-between gap-3">
+              <h2 id={`pr-${m.id}`} className={h2}>
+                {m.title}
+              </h2>
+              <NavLink href={m.href} className="inline-flex items-center gap-1 text-[15px] font-bold text-[#5b6370] hover:text-[#15171c]">
+                서비스 안내 <ArrowRight size={16} aria-hidden />
+              </NavLink>
+            </div>
+            <PlanTable plans={m.plans} product={m.title} common={m.common} />
+            {m.id === "homepage" && (
+              <>
+                <AddonList id="pr-addons" />
+                <p className="mt-6 text-[15px] leading-[1.65] text-[#5b6370] md:text-[16px]">{runningCostNote}</p>
+              </>
+            )}
+          </div>
+        </section>
+      ))}
+
     </>
   );
 }
