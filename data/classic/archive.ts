@@ -19,6 +19,7 @@ export const designDocs: TrendDoc[] = [
 ];
 /** 기술 트렌드: 브라우저, 보안, 언어, 도구, 무게처럼 화면 뒤에서 바뀐 것. 문서마다 독립 */
 export const techDocs: TrendDoc[] = [
+  { href: "/knowledge/history", title: "한국 웹 30년: 무료 계정에서 AI 빌더까지", desc: "한국 홈페이지가 걸어온 길을 시대 네 장(무료 계정과 게시판, 포털과 플래시, 휴대폰과 법, 클라우드와 AI)으로 엮은 연표와 이야기." },
   { href: "/knowledge/browser", title: "브라우저 호환", desc: "PC 브라우저 중 IE 비율, 한국 일본 미국 2009~2025. 공인인증서, ActiveX, 2020년 전자서명법 개정, 2022년 IE 지원 종료." },
   { href: "/knowledge/https", title: "https와 인증서", desc: "크롬에서 https로 열린 페이지 비율, 일본 미국 2015~2026. 2018년 크롬 68 주의 요함 표시." },
   { href: "/knowledge/flash-jquery", title: "플래시와 jQuery", desc: "Flash, jQuery 사용 비율 2015~2025. 2020년 말 지원 종료, 2019년 국내 500대 사이트 28.4%가 플래시 사용." },
@@ -321,7 +322,7 @@ export function topics(): Topic[] {
   const cats = [...new Set(parts.map((g) => g.cat))];
   return [
     { id: "plan", label: "기획", desc: "만들기 전에 정할 것. 업체 고르기, 견적 질문, 유지비, 홈페이지가 걸어온 길", groups: [
-      { title: "홈페이지가 걸어온 길", items: ["/knowledge/company-homepage", "/knowledge/public-homepage", "/knowledge/personal-homepage", "/knowledge/ai-and-homepage"].map(doc) },
+      { title: "홈페이지가 걸어온 길", items: ["/knowledge/history", "/knowledge/company-homepage", "/knowledge/public-homepage", "/knowledge/personal-homepage", "/knowledge/ai-and-homepage"].map(doc) },
       { title: "업체와 견적", items: [...series("업체 선정"), { label: "홈페이지 견적 질문지(PDF)", href: "/jaryo/estimate" }, tool("/tools/estimate-questions"), tool("/tools/hosting-cost")] },
     ] },
     { id: "design", label: "디자인", desc: "화면 부품의 이름, 디자인 용어, 페이지 종류별 화면, 시안, 기기에 따라 바뀐 화면", groups: [
@@ -396,6 +397,7 @@ export function relatedOf(href: string, limit = 6): TreeNode[] {
 
 /** 최근 수정된 문서. 인사이트는 글 날짜에서 자동으로, 나머지는 더한 날 직접 적는다(지어내지 않기) */
 export const manualLog: { date: string; kind: string; title: string; href: string }[] = [
+  { date: "2026-11-22", kind: "기획", title: "한국 웹 30년: 무료 계정에서 AI 빌더까지", href: "/knowledge/history" },
   { date: "2026-11-22", kind: "개발", title: "만드는 도구(CMS) 비교: CMS란, 설치형과 임대형 추가", href: "/knowledge/cms" },
   { date: "2026-11-22", kind: "인프라", title: "서버 인프라: 온프레미스에서 클라우드, 프라이빗 클라우드까지", href: "/knowledge/infra-cloud" },
   { date: "2026-11-22", kind: "검색", title: "검색 최적화의 역사: 디렉터리 등록에서 SEO, GEO까지", href: "/knowledge/search-optimization" },

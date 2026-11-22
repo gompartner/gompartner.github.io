@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import { BarGroups } from "@/components/classic/archive/BarGroups";
-import { Timeline, type TimelineRow } from "@/components/classic/archive/Timeline";
+import { Timeline } from "@/components/classic/archive/Timeline";
+import { aiWebRows } from "@/data/classic/timelines";
 import { TrendArticle } from "@/components/classic/archive/TrendArticle";
 import { pageMeta } from "@/lib/seo";
 
@@ -26,17 +27,7 @@ const terms: [string, string, string][] = [
   ["에이전트 커머스", "AI가 대신 상품을 찾고 결제까지 하는 구매. OpenAI와 Stripe의 ACP가 첫 공개 표준입니다.", "장바구니, 결제창"],
 ];
 
-const rows: TimelineRow[] = [
-  { when: "2023년 11월", a: "GEO 논문 공개(프린스턴 등). 출처, 인용문, 통계를 넣으면 생성형 엔진 답에서 노출이 최대 40% 오른다고 보고" },
-  { when: "2024년 9월", a: "llms.txt 제안(Answer.AI, 9월 3일)" },
-  { when: "2024년 11월", a: "Anthropic, MCP 공개(11월 25일)" },
-  { when: "2025년 초", a: "Netlify 대표가 AX(에이전트 경험)라는 말을 제안" },
-  { when: "2025년 3월", a: "네이버 AI 브리핑 정식 출시(3월 27일)" },
-  { when: "2025년 5월", a: "마이크로소프트 NLWeb 공개(5월 19일)" },
-  { when: "2025년 7월", a: "Cloudflare, 새 고객 사이트에서 AI 크롤러 기본 차단과 크롤링 유료화 시험(7월 1일). Pew, AI 요약이 뜨면 링크 클릭이 절반으로 준다고 발표(7월 22일)" },
-  { when: "2025년 9월", a: "구글 AI 모드 한국어 지원. ChatGPT 안에서 바로 결제(Instant Checkout)와 에이전트 커머스 표준 ACP 공개(9월 29일)" },
-  { when: "2025년 10월", a: "ChatGPT Atlas 브라우저 출시(10월 21일). 에이전트 모드가 사람 대신 사이트를 열고 누름" },
-];
+const rows = aiWebRows;
 
 export default function TrendAiReadableWeb() {
   return (

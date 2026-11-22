@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import { LineChart } from "@/components/classic/archive/LineChart";
-import { Timeline, type TimelineRow } from "@/components/classic/archive/Timeline";
+import { Timeline } from "@/components/classic/archive/Timeline";
+import { companyRows } from "@/data/classic/timelines";
 import { TrendArticle } from "@/components/classic/archive/TrendArticle";
 import { searchDemand } from "@/data/classic/trendData";
 import { pageMeta } from "@/lib/seo";
@@ -14,17 +15,7 @@ export const metadata: Metadata = pageMeta({
 });
 
 // 한국 기업 홈페이지에 영향을 준 일. 날짜는 출처에서 확인한 것만 적는다
-const rows: TimelineRow[] = [
-  { when: "2000년대", a: "첫 화면 플래시 인트로와 플래시 메뉴. 메뉴는 회사 소개서 순서 그대로(인사말, 연혁, 사업 영역, 오시는 길)" },
-  { when: "2009년 11월", a: "아이폰 국내 출시(KT, 11월 28일). 휴대폰 전용 m. 사이트를 따로 만들기 시작" },
-  { when: "2011년 9월", a: "개인정보 보호법 시행(9월 30일). 문의, 회원가입이 있는 홈페이지마다 개인정보처리방침" },
-  { when: "2013년 4월", a: "웹 접근성 의무가 모든 기업으로 확대(장애인차별금지법, 2009년 공공기관부터 단계 적용)" },
-  { when: "2014년 8월", a: "주민등록번호 수집 원칙 금지(8월 7일). 회원가입에서 주민번호 칸이 빠짐" },
-  { when: "2019년", a: "국내 민간 500대 사이트 중 142곳(28.4%)이 아직 플래시 사용(과학기술정보통신부 조사)" },
-  { when: "2020년 12월", a: "플래시 지원 종료(12월 31일). 플래시로 만든 첫 화면과 메뉴가 열리지 않음" },
-  { when: "2025년", a: "한국 전체 접속 중 모바일 57%" },
-  { when: "2026년", a: "만드는 도구가 있는 한국어 사이트 중 카페24 39.6%, WordPress 24.1%, 아임웹 16.7%" },
-];
+const rows = companyRows;
 
 export default function TrendCompanyHomepage() {
   return (

@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
-import { Timeline, type TimelineRow } from "@/components/classic/archive/Timeline";
+import { Timeline } from "@/components/classic/archive/Timeline";
+import { aiHomeRows } from "@/data/classic/timelines";
 import { TrendArticle } from "@/components/classic/archive/TrendArticle";
 import { pageMeta } from "@/lib/seo";
 
@@ -12,18 +13,7 @@ export const metadata: Metadata = pageMeta({
 });
 
 // 산업 변화와 보안 사고를 같은 때로 나란히. 날짜와 숫자는 출처에서 확인한 것만 적는다
-const rows: TimelineRow[] = [
-  { when: "2025년 3월", a: "Y Combinator 2025년 겨울 기수의 약 4분의 1이 코드 대부분(95%)을 AI로 작성", b: "Next.js 미들웨어 인증 우회 취약점(CVE-2025-29927) 공개" },
-  { when: "2025년 7월", a: "AI 빌더 Lovable, 출시 8개월 만에 연 반복 매출 1억 달러", b: "Tea 앱 이미지 약 7만 2천 장 유출(신분증, 셀카 약 1만 3천 장). Veracode 시험에서 AI가 만든 코드의 45%가 보안 시험 실패" },
-  { when: "2025년 8월", a: "", b: "SK텔레콤 2,324만 명 정보 유출에 과징금 약 1,347억 원" },
-  { when: "2025년 11월", a: "Lovable 연 반복 매출 2억 달러", b: "쿠팡 계정 약 3,370만 개 노출 확인(11월 29일)" },
-  { when: "2026년 1월", a: "", b: "AI가 만든 서비스 Moltbook, 데이터베이스 접근 규칙(RLS) 없이 이메일 3만 5천 개 노출" },
-  { when: "2026년 2월", a: "Lovable 연 반복 매출 4억 달러, 정규 직원 146명", b: "" },
-  { when: "2026년 4월", a: "", b: "Lovable, 공개 프로젝트의 채팅 기록과 코드가 2월 3일부터 4월 20일까지 보였다고 발표" },
-  { when: "2026년 6월", a: "", b: "개인정보보호위원회, 쿠팡에 과징금 약 6,247억 원(회원 3,322만 명, 비회원 433만 명 이상 유출)" },
-  { when: "2026년 9월", a: "", b: "개정 개인정보 보호법 시행(9월 11일). 반복 위반, 1천만 명 이상 중대 유출은 전체 매출액의 10%까지" },
-  { when: "2026년 11월", a: "구글 클라우드 2027 보안 전망: 보안 검토 없이 붙이는 AI 도구가 새 관리 밖 시스템이 된다", b: "" },
-];
+const rows = aiHomeRows;
 
 export default function TrendAiAndHomepage() {
   return (

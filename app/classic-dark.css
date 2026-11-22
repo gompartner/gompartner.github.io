@@ -11,6 +11,7 @@ html.gp-dark .cl svg [fill="#15171c"], html.gp-dark .cl svg [fill="#3d4450"] { f
 html.gp-dark .cl svg [fill="#fff"]:not(.keep-light *), html.gp-dark .cl svg [fill="white"]:not(.keep-light *), html.gp-dark .cl svg [fill="#ffffff"]:not(.keep-light *) { fill: #161a22; }
 html.gp-dark .cl input:not([type=checkbox]):not([type=radio]):not([class*="bg-transparent"]), html.gp-dark .cl textarea, html.gp-dark .cl select { background-color: #1c212b; color: #e8ebf0; }
 html.gp-dark .cl .bg-\[\#15171c\]:not(.keep-light *) { background-color: #2a303b; }
+html.gp-dark .cl .bg-\[\#9aa3b0\]:not(.keep-light *) { background-color: #44484c; }
 html.gp-dark .cl .bg-\[\#9aa6ba\]:not(.keep-light *) { background-color: #40444c; }
 html.gp-dark .cl .bg-\[\#b7d0ff\]:not(.keep-light *) { background-color: #18253e; }
 html.gp-dark .cl .bg-\[\#b9c2ce\]:not(.keep-light *) { background-color: #33373c; }

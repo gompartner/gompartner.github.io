@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
-import { Timeline, type TimelineRow } from "@/components/classic/archive/Timeline";
+import { Timeline } from "@/components/classic/archive/Timeline";
+import { searchOptRows } from "@/data/classic/timelines";
 import { TrendArticle } from "@/components/classic/archive/TrendArticle";
 import { pageMeta } from "@/lib/seo";
 
@@ -12,21 +13,7 @@ export const metadata: Metadata = pageMeta({
 });
 
 // 세계(구글 중심)와 한국(네이버 중심). 날짜는 출처에서 확인한 것만 적는다
-const rows: TimelineRow[] = [
-  { when: "1994년", a: "야후 디렉터리 시작. 사람이 사이트를 주제별로 분류해 목록에 올림", b: "" },
-  { when: "1998년", a: "오픈 디렉터리(DMOZ) 시작(6월). 구글이 링크를 추천 표로 세는 PageRank를 내세움", b: "" },
-  { when: "2003년", a: "", b: "네이버 블로그 공개(10월 14일). 블로그 글이 검색 결과의 큰 몫이 되기 시작" },
-  { when: "2009년 9월", a: "구글, 메타 키워드 태그를 순위에 쓰지 않는다고 발표(9월 21일)", b: "" },
-  { when: "2011년 2월", a: "판다 업데이트. 얕고 품질 낮은 글의 순위를 내림", b: "" },
-  { when: "2012년 4월", a: "펭귄 업데이트. 링크 조작과 키워드 반복을 제재", b: "" },
-  { when: "2014년 12월", a: "야후 디렉터리 종료", b: "" },
-  { when: "2015년", a: "모바일 친화 업데이트(4월 21일). 휴대폰에서 보기 좋은 페이지를 모바일 검색에서 우대", b: "C-Rank 적용. 글보다 글쓴이(출처)의 신뢰도와 인기도를 봄" },
-  { when: "2017년 3월", a: "DMOZ 종료", b: "" },
-  { when: "2022년 8월", a: "도움이 되는 콘텐츠 업데이트. 검색엔진이 아니라 사람을 위해 쓴 글을 우대", b: "" },
-  { when: "2023년 11월", a: "GEO(생성형 엔진 최적화) 논문 공개", b: "" },
-  { when: "2024년 5월", a: "구글 AI 개요 미국 출시(5월 14일). 검색 결과 맨 위에 AI 요약", b: "" },
-  { when: "2025년", a: "구글 AI 모드 한국어 지원(9월)", b: "네이버 AI 브리핑 출시(3월 27일)" },
-];
+const rows = searchOptRows;
 
 // 시대마다 검색엔진이 본 것과 그것을 노린 꼼수. 시대 구분은 곰파트너 정리
 const eras: [string, string, string, string][] = [

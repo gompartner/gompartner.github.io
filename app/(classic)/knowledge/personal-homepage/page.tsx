@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
-import { Timeline, type TimelineRow } from "@/components/classic/archive/Timeline";
+import { Timeline } from "@/components/classic/archive/Timeline";
+import { personalRows } from "@/data/classic/timelines";
 import { TrendArticle } from "@/components/classic/archive/TrendArticle";
 import { pageMeta } from "@/lib/seo";
 
@@ -12,17 +13,7 @@ export const metadata: Metadata = pageMeta({
 });
 
 // 한국과 일본에서 개인 홈페이지를 만들던 방법이 바뀐 때. 날짜는 출처에서 확인한 것만 적는다
-const rows: TimelineRow[] = [
-  { when: "1997년", a: "", b: "지오시티즈 일본 법인 설립. HTML을 몰라도 만드는 무료 공간" },
-  { when: "1999년", a: "인터넷 인구 400만 명. 포털과 PC통신 회사가 무료 홈페이지 공간을 줌(네띠앙, 채널아이 등). 나모 웹에디터로 화면을 만들고 FTP로 올림. 무료 PHP 게시판 제로보드가 이 무렵부터 퍼짐", b: "" },
-  { when: "2000년 전후", a: "Perl CGI 게시판 테크노트, PHP 제로보드가 개인 홈페이지와 동호회의 기본 게시판", b: "무료 CGI 배포 사이트(KENT WEB)에서 게시판을 받아 담. 손님이 글을 남기고 주인이 답하는 게시판, 기념 방문 번호(키리반)를 밟으면 알리는 문화. 렌털 일기(사루사루 일기)" },
-  { when: "2001년 9월", a: "싸이월드 미니홈피 등장. 계정, 게시판, 방명록을 직접 달 필요가 없어짐", b: "" },
-  { when: "2003년", a: "네이버 블로그 공개(10월 14일, 페이퍼 서비스 개편)", b: "블로그 본격 확산(하테나 다이어리, livedoor Blog, 코코로그 등)" },
-  { when: "2004년", a: "미니홈피 회원 1천만 명(9월)", b: "초대받아야 가입하는 SNS mixi 공개(3월 3일)" },
-  { when: "2007년", a: "제로보드 XE 오픈 베타(8월 13일). 게시판에서 사이트 제작 도구(XpressEngine)로", b: "" },
-  { when: "2011년", a: "XE, 국내 시장 점유율 52%(네이버 발표)", b: "" },
-  { when: "2019년", a: "", b: "지오시티즈 종료(3월 31일). 남은 개인 사이트가 한꺼번에 사라짐" },
-];
+const rows = personalRows;
 
 export default function TrendPersonalHomepage() {
   return (

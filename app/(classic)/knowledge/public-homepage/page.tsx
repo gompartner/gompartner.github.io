@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
-import { Timeline, type TimelineRow } from "@/components/classic/archive/Timeline";
+import { Timeline } from "@/components/classic/archive/Timeline";
+import { publicHomeRows } from "@/data/classic/timelines";
 import { TrendArticle } from "@/components/classic/archive/TrendArticle";
 import { pageMeta } from "@/lib/seo";
 
@@ -12,20 +13,7 @@ export const metadata: Metadata = pageMeta({
 });
 
 // 공공기관 홈페이지를 바꾼 법, 지침, 사건. 날짜는 출처에서 확인한 것만 적는다
-const rows: TimelineRow[] = [
-  { when: "1996년 6월", a: "정보화촉진기본계획 확정. 전자정부라는 말이 정책에 들어옴" },
-  { when: "1999년", a: "전자서명법으로 공인전자서명 제도 시작. 공인인증서가 공공, 금융 웹사이트 로그인의 기본이 됨" },
-  { when: "2001년 3월", a: "전자정부법 제정(전자정부 구현을 위한 행정업무 등의 전자화 촉진에 관한 법률)" },
-  { when: "2002년 11월", a: "전자정부 출범 발표(11월 13일). 민원, 행정 업무를 온라인으로" },
-  { when: "2009년", a: "웹 접근성 의무 적용 시작(장애인차별금지법, 공공기관부터)" },
-  { when: "2009년 6월", a: "전자정부 표준프레임워크 1.0. 공공 시스템을 Java, Spring 위의 같은 틀로" },
-  { when: "2011년 9월", a: "개인정보 보호법 시행(9월 30일). 공공기관의 개인정보보호에 관한 법률을 대신함" },
-  { when: "2014년 8월", a: "주민등록번호 수집 원칙 금지(8월 7일). 법령 근거가 없으면 받을 수 없음" },
-  { when: "2020년 12월", a: "공인인증서 제도 폐지(12월 10일). 민간 인증서와 간편 인증, 프로그램 설치 없는 로그인" },
-  { when: "2022년 12월", a: "한국형 웹 콘텐츠 접근성 지침 2.2(12월 28일)" },
-  { when: "2024년 4월", a: "범정부 UI/UX 디자인 시스템(KRDS) 공개. 글자 크기, 색 대비, 부품을 정부가 정함" },
-  { when: "2025년 9월", a: "대전 국가정보자원관리원 화재(9월 26일). 정부 업무시스템 647개가 한꺼번에 멈춤" },
-];
+const rows = publicHomeRows;
 
 export default function TrendPublicHomepage() {
   return (

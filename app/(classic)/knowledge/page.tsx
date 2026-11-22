@@ -34,6 +34,14 @@ export default function KnowledgeHome() {
         lead="홈페이지를 기획하고, 만들고, 넘겨받아 운영하는 데 필요한 것을 주제별로 정리한 문서 모음입니다. 왼쪽 페이지 트리에서 주제를 고르거나 검색으로 찾습니다."
       />
 
+      {/* 11-22 첫 읽을거리: 문서를 시대 한 줄기로 엮은 연표 */}
+      <Link href="/knowledge/history" className="group mt-8 block rounded-xl bg-[#0f1b3d] px-5 py-5 text-white md:px-7 md:py-6">
+        <span className="block text-[13px] font-bold text-[#9fc0ff]">처음부터 읽기</span>
+        <span className="mt-1 block text-[21px] font-[800] tracking-[-0.03em] md:text-[24px]">한국 웹 30년: 무료 계정에서 AI 빌더까지</span>
+        <span className="mt-2 block max-w-[640px] text-[14.5px] leading-[1.65] text-[#d6def0]">무료 계정과 게시판, 포털과 플래시, 휴대폰과 법, 클라우드와 AI. 시대 네 장으로 이어 읽고, 장마다 깊이 읽을 문서로 넘어갑니다.</span>
+        <span className="mt-3 inline-block text-[14px] font-bold text-white underline-offset-4 group-hover:underline">읽기 시작</span>
+      </Link>
+
       <h2 id="start" className={docH2}>처음 오셨다면</h2>
       <ul role="list" className="mt-4 grid gap-3 sm:grid-cols-2">
         {starts.map((s) => {
