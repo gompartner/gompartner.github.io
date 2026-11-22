@@ -1,4 +1,5 @@
 import { ArchiveShell, DocHead, TakeoverBox, docH2 } from "@/components/classic/archive/ArchiveShell";
+import { SourceFold } from "@/components/classic/archive/SourceFold";
 import { TrendNav } from "@/components/classic/archive/TrendNav";
 import { TREND_CHECKED } from "@/data/classic/trendData";
 import { LdScript } from "@/components/seo/JsonLd";
@@ -77,14 +78,14 @@ export function TrendArticle(props: {
       ) : null}
       <TakeoverBox sub={props.takeSub} items={props.take} />
       <h2 id="src" className={docH2}>출처</h2>
-      <ul role="list" className="mt-3 space-y-2 text-[14.5px] leading-[1.6]">
+      <SourceFold>
         {props.sources.map((s) => (
           <li key={s.href}>
             <a href={s.href} target="_blank" rel="noopener noreferrer" className={a}>{s.label}</a>
             {s.note ? `: ${s.note}` : ""}
           </li>
         ))}
-      </ul>
+      </SourceFold>
       <TrendNav current={props.href} />
     </ArchiveShell>
   );

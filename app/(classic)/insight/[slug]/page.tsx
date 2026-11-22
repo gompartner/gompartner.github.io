@@ -228,13 +228,24 @@ function Para({ t }: { t: string }) {
           <span className="shrink-0 font-bold text-[#256ef4] group-open:hidden">더보기</span>
           <span className="hidden shrink-0 font-bold text-[#256ef4] group-open:inline">접기</span>
         </summary>
-        <ul className="mt-2 list-disc space-y-1 break-all pl-5">
+        <ul className="mt-2 list-disc space-y-1 pl-5">
           {src.map((s) => (
-            <li key={s}>{s}</li>
+            <li key={s}>{srcLink(s)}</li>
           ))}
         </ul>
       </details>
     );
   }
   return <p className="text-[17px] leading-[1.8] text-[#3d4450]">{t}</p>;
+}
+
+// "이름 (https://...)" 꼴이면 이름에 링크를 건다
+function srcLink(s: string) {
+  const m = s.match(/^(.*?)\s*\((https?:\/\/[^)\s]+)\)$/);
+  if (!m) return s;
+  return (
+    <a href={m[2]} target="_blank" rel="noopener noreferrer" className="underline underline-offset-2 hover:text-[#256ef4]">
+      {m[1]}
+    </a>
+  );
 }

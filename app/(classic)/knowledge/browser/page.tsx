@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import { SourceFold } from "@/components/classic/archive/SourceFold";
 import Link from "next/link";
 import { ArchiveShell, DocHead, TakeoverBox, docH2 } from "@/components/classic/archive/ArchiveShell";
 import { LineChart } from "@/components/classic/archive/LineChart";
@@ -65,7 +66,7 @@ export default function TrendKoreaIe() {
       />
 
       <h2 id="src" className={docH2}>출처</h2>
-      <ul role="list" className="mt-3 space-y-2 text-[14.5px] leading-[1.6]">
+      <SourceFold>
         <li>
           <a href="https://gs.statcounter.com/browser-market-share/desktop" target="_blank" rel="noopener noreferrer" className="underline underline-offset-2 hover:text-[#256ef4]">StatCounter Global Stats, Desktop Browser Market Share</a>: 한국, 일본, 미국 연간 값(확인 {TREND_CHECKED})
         </li>
@@ -80,7 +81,7 @@ export default function TrendKoreaIe() {
         <li>
           <a href="https://learn.microsoft.com/en-us/lifecycle/announcements/internet-explorer-11-end-of-support-windows-10" target="_blank" rel="noopener noreferrer" className="underline underline-offset-2 hover:text-[#256ef4]">Microsoft Learn, Internet Explorer 11 desktop app support ended for certain versions of Windows 10</a>: 2022년 6월 15일 지원 종료(LTSC, Windows Server 제외)
         </li>
-      </ul>
+      </SourceFold>
 
       <TrendNav current="/knowledge/browser" />
     </ArchiveShell>

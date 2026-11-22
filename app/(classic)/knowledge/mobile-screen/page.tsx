@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import { SourceFold } from "@/components/classic/archive/SourceFold";
 import Link from "next/link";
 import { ArchiveShell, DocHead, TakeoverBox, docH2 } from "@/components/classic/archive/ArchiveShell";
 import { LineChart } from "@/components/classic/archive/LineChart";
@@ -70,7 +71,7 @@ export default function TrendMobile() {
       />
 
       <h2 id="src" className={docH2}>출처</h2>
-      <ul role="list" className="mt-3 space-y-2 text-[14.5px] leading-[1.6]">
+      <SourceFold>
         <li><a href="https://gs.statcounter.com/platform-market-share/desktop-mobile-tablet" target="_blank" rel="noopener noreferrer" className={a}>StatCounter Global Stats, Desktop vs Mobile vs Tablet Market Share</a>: 한국, 일본, 미국 연간 값(확인 {TREND_CHECKED})</li>
         <li><a href="https://m.seoul.co.kr/news/2011/10/30/20111030800026" target="_blank" rel="noopener noreferrer" className={a}>서울신문, 스마트폰 2천만 시대(2011-10-30)</a>: 방송통신위원회 발표, 2011년 10월 28일 2천만 명</li>
         <li><a href="https://www.khan.co.kr/article/201208212210115" target="_blank" rel="noopener noreferrer" className={a}>경향신문(2012-08-21)</a>: 스마트폰 가입자 3천만 명, 1천만 명은 2011년 3월 말</li>
@@ -79,7 +80,7 @@ export default function TrendMobile() {
         {examplesMobile2012.map((ex) => (
           <li key={ex.url}><a href={ex.url} target="_blank" rel="noopener noreferrer" className={a}>인터넷 아카이브, {ex.site} {ex.date} 보관본</a>: 실제 사례(확인 {ex.checked})</li>
         ))}
-      </ul>
+      </SourceFold>
       <TrendNav current={HREF} />
     </ArchiveShell>
   );
