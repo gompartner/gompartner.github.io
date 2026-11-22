@@ -6,8 +6,17 @@ import { ChannelIcon, type ChannelIconName } from "@/components/layout/Footer";
 import { profile } from "@/data/classic/profile";
 
 // 클래식 보기 바닥글. 사업자 정보는 상호와 번호만 둔다(통신판매업 신고 전).
-// 11-02 머리글 메뉴(제작, 유지보수, 고객지원)와 같은 묶음으로 맞춘다
+// 11-02 머리글 메뉴와 같은 묶음으로 맞춘다. 11-22 순서도 머리글대로(유지보수 먼저, 업체 변경부터)
 const groups = [
+  {
+    title: "유지보수",
+    items: [
+      { href: "/maintenance/takeover", label: "업체 변경" },
+      { href: "/maintenance/fix", label: "오류 수정" },
+      { href: "/maintenance/update", label: "보안 업데이트" },
+      { href: "/maintenance/monthly", label: "월 유지보수" },
+    ],
+  },
   {
     title: "제작",
     items: [
@@ -17,15 +26,6 @@ const groups = [
       { href: "/app", label: "앱 제작" },
       { href: "/kiosk", label: "키오스크 화면 제작" },
       { href: "/3d", label: "3D 웹 제작" },
-    ],
-  },
-  {
-    title: "유지보수",
-    items: [
-      { href: "/maintenance/fix", label: "오류 수정" },
-      { href: "/maintenance/takeover", label: "업체 변경" },
-      { href: "/maintenance/update", label: "보안 업데이트" },
-      { href: "/maintenance/monthly", label: "월 유지보수" },
     ],
   },
   {
