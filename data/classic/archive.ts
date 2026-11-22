@@ -330,13 +330,10 @@ export function topics(): Topic[] {
       { title: "디자인 용어", items: ["g33", "g34", "g35", "g36"].map(term) },
       { title: "화면과 시안", items: [{ label: "화면 예시", href: "/knowledge/screens" }, { label: "시안 작업", href: "/knowledge/drafts" }] },
       { title: "디자인 흐름", items: designDocs.map((d) => ({ label: d.title, href: d.href })) },
-    ] },
-    { id: "frontend", label: "프론트엔드", desc: "브라우저 호환, 움직이는 화면의 기술, 페이지 무게와 속도, 접근성", groups: [
-      { title: "문서", items: ["/knowledge/browser", "/knowledge/flash-jquery", "/knowledge/page-weight"].map(doc) },
       { title: "도구", items: [tool("/tools/accessibility-check"), tool("/tools/image-compress")] },
     ] },
-    { id: "dev", label: "개발", desc: "홈페이지를 만드는 도구(CMS: 카페24, 아임웹, WordPress, 그누보드), 개발 언어, PHP 버전, 앱, AI로 만든 서비스", groups: [
-      { title: "문서", items: ["/knowledge/cms", "/knowledge/server-language", "/knowledge/php", "/knowledge/app"].map(doc) },
+    { id: "dev", label: "개발", desc: "만드는 도구(CMS), 서버 언어와 버전, 브라우저 호환, 화면 기술(플래시, jQuery), 페이지 무게, 앱, AI로 만든 서비스", groups: [
+      { title: "문서", items: ["/knowledge/cms", "/knowledge/server-language", "/knowledge/browser", "/knowledge/flash-jquery", "/knowledge/page-weight", "/knowledge/php", "/knowledge/app"].map(doc) },
       { title: "AI로 만든 서비스 운영", items: series("AI로 만든 서비스 운영") },
       { title: "개발 도구", items: [tool("/tools/jwt-parser"), tool("/tools/unix-time"), tool("/tools/cron")] },
     ] },
@@ -408,7 +405,7 @@ export const manualLog: { date: string; kind: string; title: string; href: strin
   { date: "2026-11-22", kind: "기획", title: "개인 홈페이지: 무료 계정과 CGI 게시판에서 미니홈피, 블로그까지", href: "/knowledge/personal-homepage" },
   { date: "2026-11-22", kind: "개발", title: "개발 언어: Perl CGI에서 Next.js까지", href: "/knowledge/server-language" },
   { date: "2026-11-21", kind: "디자인", title: "화면 크기: 1024에서 1920으로", href: "/knowledge/screen-size" },
-  { date: "2026-11-21", kind: "프론트엔드", title: "브라우저 호환: 한국만 IE를 오래 못 떠난 이유", href: "/knowledge/browser" },
+  { date: "2026-11-21", kind: "개발", title: "브라우저 호환: 한국만 IE를 오래 못 떠난 이유", href: "/knowledge/browser" },
   { date: "2026-11-21", kind: "개발", title: "만드는 도구(CMS) 비교: 한국은 카페24, 일본은 WordPress", href: "/knowledge/cms" },
   { date: "2026-11-21", kind: "디자인", title: "시안 작업: 업종 7곳, 시안 두 장씩", href: "/knowledge/drafts" },
   { date: "2026-11-21", kind: "디자인", title: "화면 예시: 페이지 종류별 와이어프레임", href: "/knowledge/screens" },

@@ -24,7 +24,7 @@ lines.push("/insight /knowledge/notes 301");
 lines.push("/tools /knowledge/checklists 301");
 // 11-21 아카이브(/archive)를 웹 지식(/knowledge)으로 옮김. 같은 날 공개한 옛 주소를 모두 새 주소로
 const moved = [
-  ["/archive", "/knowledge"], ["/archive/trends", "/knowledge"], ["/archive/design", "/knowledge/design"], ["/archive/tech", "/knowledge/frontend"],
+  ["/archive", "/knowledge"], ["/archive/trends", "/knowledge"], ["/archive/design", "/knowledge/design"], ["/archive/tech", "/knowledge/dev"], ["/knowledge/frontend", "/knowledge/dev"],
   ["/archive/design/styles", "/knowledge/design-styles"], ["/archive/design/mobile", "/knowledge/mobile-screen"], ["/archive/design/screen-size", "/knowledge/screen-size"],
   ["/archive/tech/ie", "/knowledge/browser"], ["/archive/tech/flash", "/knowledge/flash-jquery"], ["/archive/trends/korea-ie", "/knowledge/browser"],
   ["/archive/trends/mobile", "/knowledge/mobile-screen"], ["/archive/trends/design", "/knowledge/design-styles"], ["/archive/trends/flash", "/knowledge/flash-jquery"],

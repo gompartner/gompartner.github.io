@@ -49,9 +49,9 @@ export const classicMenu = [
     items: [
       { href: "/knowledge/plan", label: "기획" },
       { href: "/knowledge/design", label: "디자인" },
-      { href: "/knowledge/frontend", label: "프론트엔드" },
       { href: "/knowledge/dev", label: "개발" },
       { href: "/knowledge/infra", label: "인프라" },
+      { href: "/knowledge/search", label: "검색" },
       { href: "/knowledge/ops", label: "유지보수" },
     ],
   },
