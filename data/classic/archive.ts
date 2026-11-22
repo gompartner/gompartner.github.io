@@ -13,6 +13,7 @@ import { datasets } from "@/data/classic/trendData";
 export type TrendDoc = { href: string; title: string; desc: string };
 /** 디자인 트렌드: 새 기기(휴대폰, 태블릿, 큰 모니터)가 생길 때마다 화면 크기, 배치, 모양이 어떻게 바뀌었나. 문서마다 독립(번호, 연재 없음) */
 export const designDocs: TrendDoc[] = [
+  { href: "/knowledge/web-award", title: "웹어워드 수상작으로 본 한국 웹 디자인 22년", desc: "웹어워드코리아 2004~2025 최고대상과 새로 생긴 부문. 브랜드 프로모션에서 모바일웹, 웹표준, 반응형, 소셜, AI 서비스로 옮겨 간 심사 축." },
   { href: "/knowledge/design-styles", title: "디자인 흐름: 입체, 플랫, 카드, 벤토", desc: "웹 디자인 흐름을 바꾼 날짜(Bootstrap, iOS 7, Material Design, CSS Grid)와 시대별 첫 화면, 실제 사례." },
   { href: "/knowledge/mobile-screen", title: "한국이 모바일 화면으로 먼저 넘어간 길", desc: "전체 접속 중 모바일 비율, 한국 일본 미국 2009~2025. m. 전용 사이트, PC 화면 그대로, 반응형으로 갈린 길." },
   { href: "/knowledge/screen-size", title: "화면 크기와 해상도", desc: "PC 화면 해상도 비율, 한국 일본 미국 2009~2025. 고정 폭 980px이 사라진 이유." },
@@ -394,6 +395,7 @@ export function relatedOf(href: string, limit = 6): TreeNode[] {
 
 /** 최근 수정된 문서. 인사이트는 글 날짜에서 자동으로, 나머지는 더한 날 직접 적는다(지어내지 않기) */
 export const manualLog: { date: string; kind: string; title: string; href: string }[] = [
+  { date: "2026-11-22", kind: "디자인", title: "웹어워드 수상작으로 본 한국 웹 디자인 22년", href: "/knowledge/web-award" },
   { date: "2026-11-22", kind: "기획", title: "한국 웹 30년: 무료 계정에서 AI 빌더까지", href: "/knowledge/history" },
   { date: "2026-11-22", kind: "개발", title: "만드는 도구(CMS) 비교: CMS란, 설치형과 임대형 추가", href: "/knowledge/cms" },
   { date: "2026-11-22", kind: "인프라", title: "서버 인프라: 온프레미스에서 클라우드, 프라이빗 클라우드까지", href: "/knowledge/infra-cloud" },

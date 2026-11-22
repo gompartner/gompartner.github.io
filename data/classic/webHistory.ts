@@ -34,6 +34,11 @@ const auto: HistoryEvent[] = [
 ];
 
 const hand: HistoryEvent[] = [
+  { year: 2004, when: "2004년", text: "제1회 웹어워드코리아. 최고대상은 네이버, 평가 항목은 디자인, 인터랙티비티, 내비게이션 등 7개", topic: "화면", href: "/knowledge/web-award" },
+  { year: 2009, when: "2009년", text: "웹어워드에 모바일웹 부문이 생김. 이듬해 모바일앱 최고대상(네이버 웹툰 앱)", topic: "화면", href: "/knowledge/web-award" },
+  { year: 2011, when: "2011년", text: "웹어워드 주최 측 화두: 모바일 확산에 따른 웹호환성과 웹표준. 웹표준, UI/UX 이노베이션 대상 신설", topic: "기술", href: "/knowledge/web-award" },
+  { year: 2012, when: "2012년", text: "웹어워드 모바일웹 최고대상이 반응형 웹 디자인 모바일 홈페이지(삼성증권 MPOP)", topic: "화면", href: "/knowledge/web-award" },
+  { year: 2024, when: "2024년", text: "웹어워드와 별도로 AI서비스어워드 첫 시상. 이노베이션대상은 혁신대상으로", topic: "검색과 AI", href: "/knowledge/web-award" },
   { year: 1995, when: "1995년 6월", text: "PHP 1.0 공개(Personal Home Page Tools). 값싼 공유 호스팅에서 바로 돌아가는 서버 언어", topic: "기술", region: "세계", href: "/knowledge/server-language" },
   { year: 2006, when: "2006년", text: "AWS S3(3월), EC2(8월) 시작. 서버를 쓴 만큼 돈 내고 빌리는 방식", topic: "기술", region: "세계", href: "/knowledge/infra-cloud" },
   { year: 2009, when: "2009년", text: "한국, 일본, 미국 모두 PC 브라우저의 절반 넘게 인터넷 익스플로러(IE)", topic: "기술", href: "/knowledge/browser" },
@@ -66,7 +71,6 @@ const sourced: HistoryEvent[] = [
   ev(2002, "2002년 11월", "프리챌, 커뮤니티 전면 유료화(11월 14일). 회원 이탈로 2003년 6월 다시 무료화", "홈페이지", "프리챌 유료화 전략 연구(KoreaScience)", "https://koreascience.kr/article/JAKO200416637999092.page"),
   ev(2003, "2003년 8월", "한글.kr 도입(8월 19일). 상표권자 우선 등록부터", "법과 공공", "KISA 발표자료", "https://new.icann.org/en/news/presentations/ahngu-idn-kl-21jul04-en.pdf"),
   ev(2003, "2003년 10월", "인터파크 구스닥, 이름을 G마켓으로 변경", "홈페이지", "아이뉴스24", "https://www.inews24.com/view/100310"),
-  ev(2004, "2004년", "제1회 웹어워드코리아. 기업 홈페이지 디자인을 겨루는 상", "화면", "전자신문", "https://m.etnews.com/200410250092"),
   ev(2006, "2006년 9월", "2단계 .kr 도메인 개방, 정부기관부터 등록", "법과 공공", "전자신문", "https://m.etnews.com/200611100034"),
   ev(2008, "2008년 6월", "CSS Design Korea, 제1회 웹표준 경진대회 시상", "기술", "전자신문", "https://m.etnews.com/200806190202"),
   ev(2008, "2008년 10월", "네이버, 한글날에 나눔고딕과 나눔명조 무료 배포. 무료 한글 웹 글꼴의 시작", "화면", "NHN 보도자료", "https://navercorp.com/media/pressReleasesDetail?seq=27958"),
@@ -116,7 +120,7 @@ export const eras = [
       "결제도 이때 바뀌었습니다. 2014년 30만 원 이상 카드 결제의 공인인증서 의무가 풀리고 같은 해 카카오페이, 2015년 네이버페이가 나왔습니다. 2014년 W3C가 HTML5를 정식 권고하고 본고딕이 공개되면서 플래시와 이미지 글자를 대신할 도구가 갖춰졌습니다.",
       "검색에서는 2015년 네이버 C-Rank와 구글 모바일 친화 업데이트가 같은 해에 나왔습니다. 곰파트너가 보기에 이때부터 홈페이지는 한 번 만들고 끝나는 것이 아니라 법과 기기에 맞춰 계속 고치는 것이 됐습니다.",
     ],
-    read: ["/knowledge/mobile-screen", "/knowledge/design-styles", "/knowledge/app", "/knowledge/page-weight"],
+    read: ["/knowledge/mobile-screen", "/knowledge/web-award", "/knowledge/design-styles", "/knowledge/app", "/knowledge/page-weight"],
   },
   {
     id: "e4", from: 2017, to: 2026, title: "클라우드, 빌더, AI",
