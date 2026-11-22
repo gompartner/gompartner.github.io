@@ -8,14 +8,14 @@ import { fitDescription } from "@/lib/seo";
 // 데모를 각각 따로 불러와, 데모 하나를 열 때 다른 데모 코드까지 받지 않게 한다.
 const AccessibilityDemo = dynamic(() => import("@/components/demos/AccessibilityDemo").then((m) => m.AccessibilityDemo));
 const OnlineStoreDemo = dynamic(() => import("@/components/demos/OnlineStoreDemo").then((m) => m.OnlineStoreDemo));
-const PensionDemo = dynamic(() => import("@/components/demos/PensionDemo").then((m) => m.PensionDemo));
+const PensionDrafts = dynamic(() => import("@/components/drafts/Drafts").then((m) => m.PensionDrafts));
 const CompanyDemo = dynamic(() => import("@/components/demos/CompanyDemo").then((m) => m.CompanyDemo));
 const CertLabDemo = dynamic(() => import("@/components/demos/CertLabDemo").then((m) => m.CertLabDemo));
 const LawFirmDrafts = dynamic(() => import("@/components/drafts/LawFirmDrafts").then((m) => m.LawFirmDrafts));
 const TaxDrafts = dynamic(() => import("@/components/drafts/Drafts").then((m) => m.TaxDrafts));
 const EstateDrafts = dynamic(() => import("@/components/drafts/Drafts").then((m) => m.EstateDrafts));
-const BakeryCafeDemo = dynamic(() => import("@/components/demos/BakeryCafeDemo").then((m) => m.BakeryCafeDemo));
-const PharmacyDemo = dynamic(() => import("@/components/demos/PharmacyDemo").then((m) => m.PharmacyDemo));
+const BakeryCafeDrafts = dynamic(() => import("@/components/drafts/Drafts").then((m) => m.BakeryCafeDrafts));
+const PharmacyDrafts = dynamic(() => import("@/components/drafts/Drafts").then((m) => m.PharmacyDrafts));
 const ApplicationDemo = dynamic(() => import("@/components/demos/ApplicationDemo").then((m) => m.ApplicationDemo));
 const SkinDrafts = dynamic(() => import("@/components/drafts/Drafts").then((m) => m.SkinDrafts));
 const DentalDrafts = dynamic(() => import("@/components/drafts/Drafts").then((m) => m.DentalDrafts));
@@ -96,7 +96,7 @@ const demoComponents: Record<string, ComponentType> = {
   academy: AcademyDrafts,
   "pilates-studio": PilatesDrafts,
   "flower-expo": FlowerExpoDemo,
-  "bakery-cafe": BakeryCafeDemo,
+  "bakery-cafe": BakeryCafeDrafts,
   "app-academy": AppAcademyDemo,
   "app-pilates": AppPilatesDemo,
   "kiosk-clinic": KioskClinicDemo,
@@ -108,9 +108,9 @@ const demoComponents: Record<string, ComponentType> = {
   "landing-stamp-tour": LandingStampTourDemo,
   "landing-zine-fair": LandingZineFairDemo,
   "landing-leather-class": LandingLeatherClassDemo,
-  pharmacy: PharmacyDemo,
+  pharmacy: PharmacyDrafts,
   "online-store": OnlineStoreDemo,
-  pension: PensionDemo,
+  pension: PensionDrafts,
   company: CompanyDemo,
   "cert-lab": CertLabDemo,
   "law-firm": LawFirmDrafts,

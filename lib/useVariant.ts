@@ -136,6 +136,18 @@ export const VARIANTS: Record<string, { id: string; label: string }[]> = {
     { id: "a", label: "시안 A 초등 독서" },
     { id: "b", label: "시안 B 중고등 국어" },
   ],
+  pharmacy: [
+    { id: "a", label: "시안 A 동네 약국" },
+    { id: "b", label: "시안 B 복약 상담" },
+  ],
+  pension: [
+    { id: "a", label: "시안 A 바다 전망" },
+    { id: "b", label: "시안 B 숲속 독채" },
+  ],
+  "bakery-cafe": [
+    { id: "a", label: "시안 A 동네 빵집" },
+    { id: "b", label: "시안 B 베이커리 카페" },
+  ],
   "clinic-homepage": [
     { id: "a", label: "시안 A 미니멀" },
     { id: "b", label: "시안 B 진료 안내형" },

@@ -66,6 +66,12 @@ import { DrvA } from "./DrvA";
 import { DrvB } from "./DrvB";
 import { ReadA } from "./ReadA";
 import { ReadB } from "./ReadB";
+import { PhA } from "./PhA";
+import { PhB } from "./PhB";
+import { PenA } from "./PenA";
+import { PenB } from "./PenB";
+import { BkA } from "./BkA";
+import { BkB } from "./BkB";
 
 // 컨셉 시안 두 장씩(11-21). 맨 위 줄에서 바꿔 본다. 기존 기능형 데모는 코드만 남긴다.
 export function TaxDrafts() {
@@ -496,6 +502,48 @@ export function ReadingAcademyDrafts() {
     <>
       <ReadA />
       <QuickMenu accent="#2a7a5c" cta="체험 수업" tel="02-000-0000" />
+    </>
+  );
+}
+
+export function PharmacyDrafts() {
+  return useVariant("pharmacy") === "b" ? (
+    <>
+      <PhB />
+      <QuickMenu accent="#0f6e6a" cta="상담 문의" tel="031-000-0000" />
+    </>
+  ) : (
+    <>
+      <PhA />
+      <QuickMenu accent="#1d7a4e" cta="전화 문의" tel="02-000-0000" />
+    </>
+  );
+}
+
+export function PensionDrafts() {
+  return useVariant("pension") === "b" ? (
+    <>
+      <PenB />
+      <QuickMenu accent="#2f5a3c" cta="예약 문의" tel="033-000-0000" />
+    </>
+  ) : (
+    <>
+      <PenA />
+      <QuickMenu accent="#173a63" cta="예약 문의" tel="033-000-0000" />
+    </>
+  );
+}
+
+export function BakeryCafeDrafts() {
+  return useVariant("bakery-cafe") === "b" ? (
+    <>
+      <BkB />
+      <QuickMenu accent="#151311" cta="단체 문의" tel="031-000-0000" />
+    </>
+  ) : (
+    <>
+      <BkA />
+      <QuickMenu accent="#8a4b22" cta="케이크 주문" tel="02-000-0000" />
     </>
   );
 }
