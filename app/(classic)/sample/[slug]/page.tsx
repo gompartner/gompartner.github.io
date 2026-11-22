@@ -68,7 +68,7 @@ export default async function ClassicSamplePage({ params }: Props) {
                 { id: VARIANTS[slug]?.[0]?.id ?? "a", label: VARIANTS[slug]?.[0]?.label ?? "시안 A", src: p.imageUrl, w: 1440, h: 900 },
                 { id: VARIANTS[slug]?.[1]?.id ?? "b", label: VARIANTS[slug]?.[1]?.label ?? "시안 B", src: thumbBOf(p) ?? p.imageUrl, w: 1080, h: 675 },
               ].map((x, n) => (
-                <Link key={x.id} href={`${p.demoUrl}?v=${x.id}&from=c`} prefetch={false} aria-label={`${p.title} ${x.label} 체험하기`} className="group block min-w-0">
+                <Link key={x.id} href={`${p.demoUrl}?v=${x.id}&from=c`} prefetch={false} aria-label={`${p.title} ${x.label} 보기`} className="group block min-w-0">
                   <span className="relative block overflow-hidden rounded-lg border border-[#d9dee5] bg-white">
                     <span aria-hidden className="flex h-6 items-center gap-1.5 border-b border-[#e6e9ee] bg-[#eef1f5] px-3 md:h-7">
                       <span className="h-2 w-2 rounded-full bg-[#c5cbd4]" />
@@ -76,11 +76,11 @@ export default async function ClassicSamplePage({ params }: Props) {
                       <span className="h-2 w-2 rounded-full bg-[#c5cbd4]" />
                     </span>
                     <Image src={x.src} alt={`${p.title} ${x.label} 첫 화면`} width={x.w} height={x.h} priority={n === 0} sizes="(min-width: 1168px) 548px, (min-width: 768px) 46vw, 92vw" className="aspect-[16/10] w-full object-cover object-top" />
-                    <TapHint />
+                    <TapHint label="눌러서 시안 보기" />
                   </span>
                   <span className="mt-3 flex items-center justify-between gap-3">
                     <span className="text-[17px] font-bold md:text-[18px]">{x.label}</span>
-                    <span className="text-[15px] font-bold text-[#256ef4] group-hover:underline">체험하기</span>
+                    <span className="text-[15px] font-bold text-[#256ef4] group-hover:underline">시안 보기</span>
                   </span>
                 </Link>
               ))}
@@ -239,7 +239,7 @@ export default async function ClassicSamplePage({ params }: Props) {
               {isDraft ? "이 시안으로 상담" : "이 구성으로 상담"}
             </Link>
             <Link href={isDraft ? `${p.demoUrl}?from=c` : p.demoUrl} prefetch={false} data-gtm-cta={`classic_sample_open_${p.id}`} className={btnLine}>
-              체험하기
+              {isDraft ? "시안 보기" : "체험하기"}
             </Link>
             {/* 11-02 키오스크는 장소 무대 3D 체험을 별도 버튼으로 */}
             {p.category === "키오스크" ? (
@@ -271,11 +271,11 @@ export default async function ClassicSamplePage({ params }: Props) {
 }
 
 /** 캡처를 누르면 체험 화면이 열린다는 걸 알리는 가운데 알약. 휴대폰은 늘 보이고 PC는 올렸을 때 */
-function TapHint() {
+function TapHint({ label = "눌러서 체험하기" }: { label?: string }) {
   return (
     <span aria-hidden className="pointer-events-none absolute left-1/2 top-1/2 inline-flex h-12 -translate-x-1/2 -translate-y-1/2 items-center gap-2 whitespace-nowrap rounded-full bg-[#256ef4] px-5 text-[16px] font-bold text-white shadow-[0_8px_24px_rgba(15,27,61,.35)] transition-opacity duration-200 md:h-14 md:px-6 md:text-[17px] md:opacity-0 md:group-hover:opacity-100 md:group-focus-visible:opacity-100">
       <Pointer size={20} strokeWidth={2.5} />
-      눌러서 체험하기
+      {label}
     </span>
   );
 }

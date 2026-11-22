@@ -98,7 +98,7 @@ function MockupGrid({ items }: { items: Project[] }) {
   );
 }
 
-/** 11-22 시안 A, B 나란히 카드. 두 화면은 각 시안 체험으로 바로, 제목은 상세 페이지로 간다. PC 3열, 태블릿 2열, 휴대폰 1열 */
+/** 11-22 시안 A, B 나란히 카드. 두 화면은 각 시안 화면으로 바로, 제목은 상세 페이지로 간다. PC 3열, 태블릿 2열, 휴대폰 1열 */
 function PairGrid({ items, mobileMax }: { items: Project[]; mobileMax?: number }) {
   return (
     <ul className="grid gap-y-12 md:grid-cols-2 md:gap-x-8 md:gap-y-14 lg:grid-cols-3" role="list">
@@ -112,7 +112,7 @@ function PairGrid({ items, mobileMax }: { items: Project[]; mobileMax?: number }
           <li key={p.id} className={`min-w-0 ${mobileMax !== undefined && n >= mobileMax ? "max-md:hidden" : ""}`}>
             <div className="grid grid-cols-2 gap-2 rounded-xl bg-[#eef1f5] p-2">
               {shots.map((s) => (
-                <Link key={s.id} href={`${p.demoUrl}?v=${s.id}&from=c`} prefetch={false} className="group/s block min-w-0" aria-label={`${shortTitle(p.title)} 시안 ${s.label} 체험하기`}>
+                <Link key={s.id} href={`${p.demoUrl}?v=${s.id}&from=c`} prefetch={false} className="group/s block min-w-0" aria-label={`${shortTitle(p.title)} 시안 ${s.label} 보기`}>
                   <span className="block overflow-hidden rounded-md bg-white shadow-[0_1px_2px_rgba(17,24,39,0.08)]">
                     <Image src={s.src} alt="" width={540} height={338} sizes="(min-width: 1024px) 180px, (min-width: 768px) 22vw, 45vw" className="aspect-[16/10] w-full object-cover object-top transition-transform duration-500 group-hover/s:scale-[1.05] motion-reduce:transition-none" />
                   </span>
