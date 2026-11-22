@@ -930,7 +930,7 @@ export const archivedIds = new Set([
   "job-portal",
   "accessibility-review",
   "district-portal",
-  "small-business-homepage",
+  "private-gym",
   "shop-admin",
   "excel-automation",
   "lms",
