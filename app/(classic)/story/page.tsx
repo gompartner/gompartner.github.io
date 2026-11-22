@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import { ArrowUpRight, Award, ClipboardCheck, FileText, KeyRound, Lock, ScrollText, ShieldCheck } from "lucide-react";
 import { NavLink } from "@/components/classic/NavLink";
 import { PageHead, h2, wrap } from "@/components/classic/ui";
+import { SupportTabs } from "@/components/classic/support/SupportTabs";
 import { aboutLead, aboutTitle, principles } from "@/data/classic/about";
 import { awards, careerGroups, careerIntro } from "@/data/classic/career";
 import { profile } from "@/data/classic/profile";
@@ -32,7 +33,8 @@ export default function ClassicStoryPage() {
   return (
     <>
       <LdScript data={breadcrumbLd([{ name: "회사소개", path: "/story" }])} />
-      <PageHead title="회사소개" trail={[{ href: "/story", label: "회사소개" }]} />
+      <PageHead title="회사소개" trail={[{ href: "/story", label: "곰파트너" }, { href: "/story", label: "회사소개" }]} />
+      <SupportTabs current="/story" />
 
       <section aria-labelledby="st-lead" className={`${wrap} py-14 md:py-20`}>
         <h2 id="st-lead" className="break-keep text-[28px] font-[800] leading-[1.35] tracking-[-0.04em] md:text-[40px]">

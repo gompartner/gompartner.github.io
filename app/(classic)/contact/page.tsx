@@ -19,7 +19,7 @@ export default function ClassicContactPage() {
       <PageHead
         title="상담 신청"
         trail={[
-          { href: "/faq", label: "고객지원" },
+          { href: "/story", label: "곰파트너" },
           { href: "/contact", label: "상담 신청" },
         ]}
       />
