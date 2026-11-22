@@ -5,8 +5,8 @@ import { useEffect, useState } from "react";
 // 사례마다 시안을 두 개 이상 두고 맨 위 줄에서 바꿔 본다(11-21). 주소의 ?v=a 로 고정해 링크로 보낼 수 있다.
 export const VARIANTS: Record<string, { id: string; label: string }[]> = {
   company: [
-    { id: "brand", label: "시안 A 브랜드형" },
-    { id: "info", label: "시안 B 정보형" },
+    { id: "a", label: "시안 A 가공 사양" },
+    { id: "b", label: "시안 B 기업 소개" },
   ],
   "law-firm": [
     { id: "a", label: "시안 A 프리미엄" },

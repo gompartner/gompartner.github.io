@@ -100,6 +100,8 @@ import { PsA } from "./PsA";
 import { PsB } from "./PsB";
 import { FxA } from "./FxA";
 import { FxB } from "./FxB";
+import { CoA } from "./CoA";
+import { CoB } from "./CoB";
 
 // 컨셉 시안 두 장씩(11-21). 맨 위 줄에서 바꿔 본다. 기존 기능형 데모는 코드만 남긴다.
 export function TaxDrafts() {
@@ -768,6 +770,20 @@ export function FlowerExpoDrafts() {
     <>
       <FxA />
       <QuickMenu accent="#d6336c" cta="축제 안내" tel="031-000-0000" />
+    </>
+  );
+}
+
+export function CompanyDrafts() {
+  return useVariant("company") === "b" ? (
+    <>
+      <CoB />
+      <QuickMenu accent="#1b2f5e" cta="거래 문의" tel="031-000-0000" />
+    </>
+  ) : (
+    <>
+      <CoA />
+      <QuickMenu accent="#10141c" cta="견적문의" tel="031-000-0000" />
     </>
   );
 }

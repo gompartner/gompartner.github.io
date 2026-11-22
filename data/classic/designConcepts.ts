@@ -36,11 +36,11 @@ export const designConcepts: Record<string, DesignConcept> = {
     font: "Pretendard",
   },
   "company": {
-    keywords: ["정밀가공", "설비 사양", "도면 견적"],
+    keywords: ["가공 사양", "기업 소개"],
     colors: [
-      { role: "메인", name: "시그널 오렌지", hex: "#F26A1B" },
-      { role: "보조", name: "스틸 차콜", hex: "#1E2329" },
-      { role: "바탕", name: "라이트 그레이", hex: "#F2F3F5" },
+      { role: "시안 A", name: "블랙", hex: "#10141C" },
+      { role: "시안 B", name: "네이비", hex: "#1B2F5E" },
+      { role: "바탕", name: "화이트", hex: "#FFFFFF" },
     ],
     font: "Pretendard",
   },

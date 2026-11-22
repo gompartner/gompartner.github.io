@@ -9,7 +9,7 @@ import { fitDescription } from "@/lib/seo";
 const AccessibilityDemo = dynamic(() => import("@/components/demos/AccessibilityDemo").then((m) => m.AccessibilityDemo));
 const OnlineStoreDrafts = dynamic(() => import("@/components/drafts/Drafts").then((m) => m.OnlineStoreDrafts));
 const PensionDrafts = dynamic(() => import("@/components/drafts/Drafts").then((m) => m.PensionDrafts));
-const CompanyDemo = dynamic(() => import("@/components/demos/CompanyDemo").then((m) => m.CompanyDemo));
+const CompanyDrafts = dynamic(() => import("@/components/drafts/Drafts").then((m) => m.CompanyDrafts));
 const CertLabDrafts = dynamic(() => import("@/components/drafts/Drafts").then((m) => m.CertLabDrafts));
 const LawFirmDrafts = dynamic(() => import("@/components/drafts/LawFirmDrafts").then((m) => m.LawFirmDrafts));
 const TaxDrafts = dynamic(() => import("@/components/drafts/Drafts").then((m) => m.TaxDrafts));
@@ -111,7 +111,7 @@ const demoComponents: Record<string, ComponentType> = {
   pharmacy: PharmacyDrafts,
   "online-store": OnlineStoreDrafts,
   pension: PensionDrafts,
-  company: CompanyDemo,
+  company: CompanyDrafts,
   "cert-lab": CertLabDrafts,
   "law-firm": LawFirmDrafts,
   "tax-office": TaxDrafts,
