@@ -112,7 +112,7 @@ function PairGrid({ items, mobileMax }: { items: Project[]; mobileMax?: number }
           <li key={p.id} className={`min-w-0 ${mobileMax !== undefined && n >= mobileMax ? "max-md:hidden" : ""}`}>
             <div className="grid grid-cols-2 gap-2 rounded-xl bg-[#eef1f5] p-2">
               {shots.map((s) => (
-                <Link key={s.id} href={`${p.demoUrl}?v=${s.id}`} prefetch={false} className="group/s block min-w-0" aria-label={`${shortTitle(p.title)} 시안 ${s.label} 체험하기`}>
+                <Link key={s.id} href={`${p.demoUrl}?v=${s.id}&from=c`} prefetch={false} className="group/s block min-w-0" aria-label={`${shortTitle(p.title)} 시안 ${s.label} 체험하기`}>
                   <span className="block overflow-hidden rounded-md bg-white shadow-[0_1px_2px_rgba(17,24,39,0.08)]">
                     <Image src={s.src} alt="" width={540} height={338} sizes="(min-width: 1024px) 180px, (min-width: 768px) 22vw, 45vw" className="aspect-[16/10] w-full object-cover object-top transition-transform duration-500 group-hover/s:scale-[1.05] motion-reduce:transition-none" />
                   </span>

@@ -7,7 +7,8 @@ import { Check, Plus, Pointer } from "lucide-react";
 import { PageHead, btnLine, btnPrimary, h2, h3, more, wrap } from "@/components/classic/ui";
 import { SampleGrid } from "@/components/classic/works/SampleGrid";
 import { Kiosk3dLink } from "@/components/classic/works/Kiosk3dLink";
-import { isDeviceCatalog, isProgram, catalogProjects, demoProjects, findBySlug, groupOf, industryOf, isMaintenance, mobileShotOf, samplesIn, slugOf } from "@/components/classic/works/samples";
+import { isDeviceCatalog, isProgram, catalogProjects, demoProjects, findBySlug, groupOf, industryOf, isMaintenance, mobileShotOf, samplesIn, slugOf, thumbBOf } from "@/components/classic/works/samples";
+import { VARIANTS } from "@/lib/variants";
 import { estimateFor } from "@/data/classic/pricing";
 import { designConcepts } from "@/data/classic/designConcepts";
 import { maintenanceServices } from "@/data/classic/maintenance";
@@ -60,7 +61,31 @@ export default async function ClassicSamplePage({ params }: Props) {
       {/* PC 화면에 휴대폰 화면을 겹친다. 앱, 키오스크는 기기 캡처만. 누르면 샘플이 열린다 */}
       <section aria-label="카탈로그 화면" className="bg-[#f4f6f9]">
         <div className={`${wrap} py-10 md:py-16`}>
-          {isDeviceCatalog(p) ? (
+          {isDraft ? (
+            // 11-22 시안 A, B를 나란히. 각 화면을 누르면 그 시안이 열린다. 휴대폰은 위아래로 쌓는다
+            <div className="mx-auto grid max-w-[1120px] gap-6 md:grid-cols-2 md:gap-6">
+              {[
+                { id: VARIANTS[slug]?.[0]?.id ?? "a", label: VARIANTS[slug]?.[0]?.label ?? "시안 A", src: p.imageUrl, w: 1440, h: 900 },
+                { id: VARIANTS[slug]?.[1]?.id ?? "b", label: VARIANTS[slug]?.[1]?.label ?? "시안 B", src: thumbBOf(p) ?? p.imageUrl, w: 1080, h: 675 },
+              ].map((x, n) => (
+                <Link key={x.id} href={`${p.demoUrl}?v=${x.id}&from=c`} prefetch={false} aria-label={`${p.title} ${x.label} 체험하기`} className="group block min-w-0">
+                  <span className="relative block overflow-hidden rounded-lg border border-[#d9dee5] bg-white">
+                    <span aria-hidden className="flex h-6 items-center gap-1.5 border-b border-[#e6e9ee] bg-[#eef1f5] px-3 md:h-7">
+                      <span className="h-2 w-2 rounded-full bg-[#c5cbd4]" />
+                      <span className="h-2 w-2 rounded-full bg-[#c5cbd4]" />
+                      <span className="h-2 w-2 rounded-full bg-[#c5cbd4]" />
+                    </span>
+                    <Image src={x.src} alt={`${p.title} ${x.label} 첫 화면`} width={x.w} height={x.h} priority={n === 0} sizes="(min-width: 1168px) 548px, (min-width: 768px) 46vw, 92vw" className="aspect-[16/10] w-full object-cover object-top" />
+                    <TapHint />
+                  </span>
+                  <span className="mt-3 flex items-center justify-between gap-3">
+                    <span className="text-[17px] font-bold md:text-[18px]">{x.label}</span>
+                    <span className="text-[15px] font-bold text-[#256ef4] group-hover:underline">체험하기</span>
+                  </span>
+                </Link>
+              ))}
+            </div>
+          ) : isDeviceCatalog(p) ? (
             <Link href={p.demoUrl} prefetch={false} aria-label={`${p.title} 체험하기`} className="group relative mx-auto block max-w-[1040px] overflow-hidden rounded-lg bg-[#eef0f3]">
               <Image src={p.imageUrl} alt={p.imageAlt} width={1440} height={900} priority sizes="(min-width: 1088px) 1040px, 92vw" className="aspect-[16/10] w-full object-cover object-center" />
               <TapHint />
@@ -213,7 +238,7 @@ export default async function ClassicSamplePage({ params }: Props) {
             <Link href={`/contact?sample=${slug}`} data-gtm-cta={`classic_sample_contact_${p.id}`} className={btnPrimary}>
               {isDraft ? "이 시안으로 상담" : "이 구성으로 상담"}
             </Link>
-            <Link href={p.demoUrl} prefetch={false} data-gtm-cta={`classic_sample_open_${p.id}`} className={btnLine}>
+            <Link href={isDraft ? `${p.demoUrl}?from=c` : p.demoUrl} prefetch={false} data-gtm-cta={`classic_sample_open_${p.id}`} className={btnLine}>
               체험하기
             </Link>
             {/* 11-02 키오스크는 장소 무대 3D 체험을 별도 버튼으로 */}
