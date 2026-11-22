@@ -75,9 +75,9 @@ const PresaleDemo = dynamic(() => import("@/components/demos/PresaleDemo").then(
 const SaasDemo = dynamic(() => import("@/components/demos/SaasDemo").then((m) => m.SaasDemo));
 const LogisticsDemo = dynamic(() => import("@/components/demos/LogisticsDemo").then((m) => m.LogisticsDemo));
 const FoodOemDemo = dynamic(() => import("@/components/demos/FoodOemDemo").then((m) => m.FoodOemDemo));
-const PianoAcademyDemo = dynamic(() => import("@/components/demos/PianoAcademyDemo").then((m) => m.PianoAcademyDemo));
-const TaekwondoDemo = dynamic(() => import("@/components/demos/TaekwondoDemo").then((m) => m.TaekwondoDemo));
-const ArtAcademyDemo = dynamic(() => import("@/components/demos/ArtAcademyDemo").then((m) => m.ArtAcademyDemo));
+const PianoDrafts = dynamic(() => import("@/components/drafts/Drafts").then((m) => m.PianoDrafts));
+const TaekwondoDrafts = dynamic(() => import("@/components/drafts/Drafts").then((m) => m.TaekwondoDrafts));
+const ArtAcademyDrafts = dynamic(() => import("@/components/drafts/Drafts").then((m) => m.ArtAcademyDrafts));
 const EnglishTalkDemo = dynamic(() => import("@/components/demos/EnglishTalkDemo").then((m) => m.EnglishTalkDemo));
 const DrivingSchoolDemo = dynamic(() => import("@/components/demos/DrivingSchoolDemo").then((m) => m.DrivingSchoolDemo));
 const ReadingAcademyDemo = dynamic(() => import("@/components/demos/ReadingAcademyDemo").then((m) => m.ReadingAcademyDemo));
@@ -156,9 +156,9 @@ const demoComponents: Record<string, ComponentType> = {
   "saas-startup": SaasDemo,
   "logistics": LogisticsDemo,
   "food-oem": FoodOemDemo,
-  "piano-academy": PianoAcademyDemo,
-  "taekwondo": TaekwondoDemo,
-  "art-academy": ArtAcademyDemo,
+  "piano-academy": PianoDrafts,
+  "taekwondo": TaekwondoDrafts,
+  "art-academy": ArtAcademyDrafts,
   "english-talk": EnglishTalkDemo,
   "driving-school": DrivingSchoolDemo,
   "reading-academy": ReadingAcademyDemo,

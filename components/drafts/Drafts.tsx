@@ -54,6 +54,12 @@ import { OptA } from "./OptA";
 import { OptB } from "./OptB";
 import { CarA } from "./CarA";
 import { CarB } from "./CarB";
+import { PiaA } from "./PiaA";
+import { PiaB } from "./PiaB";
+import { TkA } from "./TkA";
+import { TkB } from "./TkB";
+import { ArtA } from "./ArtA";
+import { ArtB } from "./ArtB";
 
 // 컨셉 시안 두 장씩(11-21). 맨 위 줄에서 바꿔 본다. 기존 기능형 데모는 코드만 남긴다.
 export function TaxDrafts() {
@@ -400,6 +406,48 @@ export function CarDetailingDrafts() {
     <>
       <CarA />
       <QuickMenu accent="#d6322b" cta="견적 문의" tel="031-000-0000" />
+    </>
+  );
+}
+
+export function PianoDrafts() {
+  return useVariant("piano-academy") === "b" ? (
+    <>
+      <PiaB />
+      <QuickMenu accent="#a8823e" cta="체험 레슨" tel="02-000-0000" />
+    </>
+  ) : (
+    <>
+      <PiaA />
+      <QuickMenu accent="#147a72" cta="상담 신청" tel="02-000-0000" />
+    </>
+  );
+}
+
+export function TaekwondoDrafts() {
+  return useVariant("taekwondo") === "b" ? (
+    <>
+      <TkB />
+      <QuickMenu accent="#d92b2b" cta="상담 신청" tel="031-000-0000" />
+    </>
+  ) : (
+    <>
+      <TkA />
+      <QuickMenu accent="#e0342e" cta="체험 수업" tel="02-000-0000" />
+    </>
+  );
+}
+
+export function ArtAcademyDrafts() {
+  return useVariant("art-academy") === "b" ? (
+    <>
+      <ArtB />
+      <QuickMenu accent="#6a3fc8" cta="체험 수업" tel="031-000-0000" />
+    </>
+  ) : (
+    <>
+      <ArtA />
+      <QuickMenu accent="#121212" cta="입시 상담" tel="02-000-0000" />
     </>
   );
 }

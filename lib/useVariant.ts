@@ -112,6 +112,18 @@ export const VARIANTS: Record<string, { id: string; label: string }[]> = {
     { id: "a", label: "시안 A PPF 스튜디오" },
     { id: "b", label: "시안 B 동네 세차형" },
   ],
+  "piano-academy": [
+    { id: "a", label: "시안 A 어린이 피아노" },
+    { id: "b", label: "시안 B 성인 취미" },
+  ],
+  taekwondo: [
+    { id: "a", label: "시안 A 유초등부" },
+    { id: "b", label: "시안 B 품새 심사" },
+  ],
+  "art-academy": [
+    { id: "a", label: "시안 A 입시 미술" },
+    { id: "b", label: "시안 B 어린이 미술" },
+  ],
   "clinic-homepage": [
     { id: "a", label: "시안 A 미니멀" },
     { id: "b", label: "시안 B 진료 안내형" },
