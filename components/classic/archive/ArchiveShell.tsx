@@ -85,7 +85,7 @@ function Tree({ topicId, active }: { topicId?: string; active: string }) {
   );
 }
 
-export type DocLd = { title: string; description: string; published?: string; modified: string };
+export type DocLd = { title: string; description: string; published?: string; modified: string; image?: string };
 
 export function ArchiveShell({ section, active, crumbs, toc, article, children }: { section?: string; active: string; crumbs: Crumb[]; toc?: TocItem[]; article?: DocLd; children: React.ReactNode }) {
   const topic = topics().find((t) => t.id === section) ?? topicOf(active);
@@ -105,7 +105,7 @@ export function ArchiveShell({ section, active, crumbs, toc, article, children }
         {/* 11-22 웹 지식 문서는 모두 검색엔진에 위치(BreadcrumbList), 글(Article)로 알린다 */}
         <LdScript data={breadcrumbLd(trail.map((c) => ({ name: c.label, path: c.href })))} />
         {article ? (
-          <LdScript data={{ "@context": "https://schema.org", "@type": "Article", headline: article.title, description: article.description, datePublished: article.published ?? "2026-11-21", dateModified: article.modified, author: { "@id": ORG_ID }, publisher: { "@id": ORG_ID }, mainEntityOfPage: `${siteUrl}${active}`, inLanguage: "ko" }} />
+          <LdScript data={{ "@context": "https://schema.org", "@type": "Article", headline: article.title, description: article.description, datePublished: article.published ?? "2026-11-21", dateModified: article.modified, author: { "@id": ORG_ID }, publisher: { "@id": ORG_ID }, mainEntityOfPage: `${siteUrl}${active}`, inLanguage: "ko", ...(article.image ? { image: [`${siteUrl}${article.image}`] } : {}) }} />
         ) : null}
         <details className="mb-5 rounded-md border border-[#d9dee5] lg:hidden">
           <summary className="flex cursor-pointer list-none items-center justify-between px-3.5 py-3 text-[14.5px] font-bold text-[#3d4450]">
