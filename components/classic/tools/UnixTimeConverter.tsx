@@ -315,7 +315,7 @@ export function UnixTimeConverter() {
                       <h3 className="text-[15px] font-bold">{s.lang}</h3>
                       <CopyButton label={s.lang} text={s.code} copied={copied} onCopy={copy} />
                     </div>
-                    <pre className="mt-2 overflow-x-auto rounded-md bg-surface p-3 text-[13px] leading-[1.6]">
+                    <pre tabIndex={0} className="mt-2 overflow-x-auto rounded-md bg-surface p-3 text-[13px] leading-[1.6]">
                       <code>{s.code}</code>
                     </pre>
                   </div>

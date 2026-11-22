@@ -75,13 +75,13 @@ export function DesignEras() {
         {eras.map((e) => (
           <li key={e.name} className="rounded-lg border border-[#e1e5eb] bg-[#f5f7fa] p-3">
             <div aria-hidden>{e.screen}</div>
-            <p className="mt-2.5 text-[12.5px] font-bold text-[#256ef4]">{e.when}</p>
+            <p className="mt-2.5 text-[12.5px] font-bold text-[#1d5fd6]">{e.when}</p>
             <p className="text-[15px] font-[800]">{e.name}</p>
             <p className="mt-0.5 text-[13.5px] leading-[1.55] text-[#5b6370]">{e.desc}</p>
           </li>
         ))}
       </ul>
-      <p className="mt-2 text-[12.5px] text-[#8a93a1]">위 네 화면은 그 시기 흔하던 모양을 곰파트너가 다시 그린 것입니다. 시기는 대략이고, 나라와 업종마다 겹칩니다.</p>
+      <p className="mt-2 text-[12.5px] text-[#6b7380]">위 네 화면은 그 시기 흔하던 모양을 곰파트너가 다시 그린 것입니다. 시기는 대략이고, 나라와 업종마다 겹칩니다.</p>
     </div>
   );
 }

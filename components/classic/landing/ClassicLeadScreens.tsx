@@ -137,7 +137,7 @@ function SheetView() {
         <table className="w-full min-w-[620px] border-collapse text-[12.5px]">
           <thead>
             <tr className="bg-[#f8f9fa] text-[11px] text-[#5b6370]">
-              <th className="w-8 border border-[#e2e3e3] font-normal" />
+              <th className="w-8 border border-[#e2e3e3] font-normal"><span className="sr-only">번호</span></th>
               {cols.map((c) => (
                 <th key={c} className="border border-[#e2e3e3] py-0.5 font-normal">
                   {c}

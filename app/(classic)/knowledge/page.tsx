@@ -42,7 +42,7 @@ export default function KnowledgeHome() {
               <Link href={`/knowledge/${t.id}`} className="group block h-full rounded-lg border border-[#d9dee5] bg-white px-4 py-3.5 hover:border-[#256ef4]">
                 <span className="block text-[16px] font-[800] group-hover:text-[#256ef4]">{s.title}</span>
                 <span className="mt-1 block text-[14px] text-[#5b6370]">{s.desc}</span>
-                <span className="mt-2 block text-[12.5px] font-bold text-[#256ef4]">{t.label}</span>
+                <span className="mt-2 block text-[12.5px] font-bold text-[#1d5fd6]">{t.label}</span>
               </Link>
             </li>
           );

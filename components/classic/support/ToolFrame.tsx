@@ -2,6 +2,9 @@ import Link from "next/link";
 import { TrendNav } from "@/components/classic/archive/TrendNav";
 import { ArchiveShell, DocHead } from "@/components/classic/archive/ArchiveShell";
 import { tools } from "@/data/classic/tools";
+import { LdScript } from "@/components/seo/JsonLd";
+import { ORG_ID } from "@/lib/seo";
+import { siteUrl } from "@/lib/site";
 
 // 무료 도구 페이지 틀(11-21 아카이브 틀로): 왼쪽 분류 트리, 제목, 도구 본체. 도구 컴포넌트 안쪽 꾸밈은 손대지 않는다.
 export function ToolFrame({ href, children }: { href: string; children: React.ReactNode }) {
@@ -17,6 +20,10 @@ export function ToolFrame({ href, children }: { href: string; children: React.Re
         { href, label: title },
       ]}
     >
+      {tool ? (
+        // 11-22 도구는 검색엔진에 웹 앱(무료)으로 알린다
+        <LdScript data={{ "@context": "https://schema.org", "@type": "WebApplication", name: tool.title, description: tool.description, url: `${siteUrl}${href}`, applicationCategory: "UtilitiesApplication", operatingSystem: "Web", inLanguage: "ko", isAccessibleForFree: true, offers: { "@type": "Offer", price: "0", priceCurrency: "KRW" }, keywords: tool.tags.join(", "), publisher: { "@id": ORG_ID } }} />
+      ) : null}
       <DocHead title={title} meta={tool ? [["분류", tool.category], ["대상", tool.for]] : undefined} lead={tool?.description} />
       <div className="mt-8">{children}</div>
       {tool?.tags?.length ? (

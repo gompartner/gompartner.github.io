@@ -88,7 +88,7 @@ export default async function ClassicInsightDetailPage({ params }: Props) {
                       <Para key={t} t={t} />
                     ))}
                   {b.code && (
-                    <pre className="overflow-x-auto rounded-md bg-[#1e2127] p-4 text-[13.5px] leading-[1.6] text-[#e6e6e6]">
+                    <pre tabIndex={0} className="overflow-x-auto rounded-md bg-[#1e2127] p-4 text-[13.5px] leading-[1.6] text-[#e6e6e6]">
                       <code>{b.code}</code>
                     </pre>
                   )}

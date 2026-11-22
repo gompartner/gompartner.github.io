@@ -119,7 +119,7 @@ export default function ClassicMaintenancePage() {
                   <div>
                     <h3 className="text-[20px] font-[800] tracking-[-0.04em] transition-colors group-hover:text-[#256ef4] md:text-[24px]">{s.h1}</h3>
                     <p className="mt-1.5 text-[16px] text-[#5b6370]">{s.term}</p>
-                    <p className="mt-3 text-[14px] font-bold text-[#256ef4]">{s.report.name}</p>
+                    <p className="mt-3 text-[14px] font-bold text-[#1d5fd6]">{s.report.name}</p>
                   </div>
                   <ArrowUpRight size={24} aria-hidden className="mt-1 shrink-0 text-[#6b7280] group-hover:text-[#256ef4]" />
                 </div>

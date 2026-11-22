@@ -2,7 +2,9 @@ import { aboutLead, aboutTitle, principles } from "@/data/classic/about";
 import { faq } from "@/data/classic/faq";
 import { industries } from "@/data/classic/industries";
 import { insights } from "@/data/classic/insights";
-import { trendDocs } from "@/data/classic/archive";
+import { trendDocs, termHref } from "@/data/classic/archive";
+import { termGroups } from "@/data/classic/glossary";
+import { tools } from "@/data/classic/tools";
 import { maintenanceServices, replyTerm } from "@/data/classic/maintenance";
 import { landingPlans, planCommon, plans } from "@/data/classic/pricing";
 import { profile } from "@/data/classic/profile";
@@ -60,6 +62,14 @@ ${landingPlans.map((p) => `- ${plain(p.title)}: ${plain(p.summary)}. ${plain(p.i
 웹 지식 문서(차트와 연표, 출처, 넘겨받을 때 확인 사항, 곰파트너 전망이 들어 있습니다):
 
 ${trendDocs.map((d) => `- [${plain(d.title)}](${url(d.href)}): ${plain(d.desc)}`).join("\n")}
+
+용어 문서(화면 부품과 운영 용어의 형태, 적용 사례, 와이어프레임, 업체와 AI에 요청하는 문장):
+
+${termGroups.map((g) => `- [${plain(g.title)}](${url(termHref(g))}): ${g.terms.map((t) => plain(t.name)).join(", ")}`).join("\n")}
+
+무료 도구(설치 없이 브라우저에서 바로 씁니다):
+
+${tools.map((t) => `- [${plain(t.title)}](${url(t.href)}): ${plain(t.description)} 관련 검색어: ${t.tags.join(", ")}`).join("\n")}
 
 ## 인사이트
 

@@ -31,7 +31,7 @@ export function BarGroups({ title, sub, groups, source }: { title: string; sub?:
         <a href={source.href} target="_blank" rel="noopener noreferrer" className="underline underline-offset-2 hover:text-[#15171c]">{source.label}</a>
         {source.note ? `. ${source.note}` : ""}
       </p>
-      <p aria-hidden className="mt-2 text-right text-[11px] text-[#8a93a1]">곰파트너 gompartner.co.kr</p>
+      <p aria-hidden className="mt-2 text-right text-[11px] text-[#6b7380]">곰파트너 gompartner.co.kr</p>
     </figure>
   );
 }

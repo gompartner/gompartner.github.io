@@ -24,12 +24,12 @@ function TreeLinks({ items, active }: { items: TreeNode[]; active: string }) {
               className={`flex items-center justify-between gap-2 rounded-md px-2.5 py-1.5 text-[14px] leading-[1.45] ${n.href === active ? "bg-[#eef3ff] font-[800] text-[#256ef4]" : "text-[#3d4450] hover:bg-[#eef1f5]"}`}
             >
               <span>{n.label}</span>
-              {n.count ? <span className="text-[12px] font-semibold text-[#8a93a1]">{n.count}</span> : null}
+              {n.count ? <span className="text-[12px] font-semibold text-[#6b7380]">{n.count}</span> : null}
             </Link>
           ) : (
             <p className="flex items-center justify-between px-2.5 py-1.5 text-[14px] font-bold text-[#15171c]">
               <span>{n.label}</span>
-              {n.count ? <span className="text-[12px] font-semibold text-[#8a93a1]">{n.count}</span> : null}
+              {n.count ? <span className="text-[12px] font-semibold text-[#6b7380]">{n.count}</span> : null}
             </p>
           )}
           {n.children ? (
@@ -46,13 +46,13 @@ function TreeLinks({ items, active }: { items: TreeNode[]; active: string }) {
 function Tree({ topicId, active }: { topicId?: string; active: string }) {
   return (
     <nav aria-label="웹 지식 페이지 트리">
-      <Link href="/search" className="mx-1 mb-3 flex items-center gap-2 rounded-md border border-[#d9dee5] bg-white px-2.5 py-2 text-[13px] text-[#8a93a1] hover:border-[#256ef4]">
+      <Link href="/search" className="mx-1 mb-3 flex items-center gap-2 rounded-md border border-[#d9dee5] bg-white px-2.5 py-2 text-[13px] text-[#6b7380] hover:border-[#256ef4]">
         <Search size={14} aria-hidden /> 이 공간에서 찾기
       </Link>
       <Link href="/knowledge" aria-current={active === "/knowledge" ? "page" : undefined} className={`block rounded-md px-2.5 py-1.5 text-[14px] ${active === "/knowledge" ? "bg-[#eef3ff] font-[800] text-[#256ef4]" : "font-bold text-[#3d4450] hover:bg-[#eef1f5]"}`}>
         공간 홈
       </Link>
-      <p className="mb-1.5 mt-4 px-2.5 text-[12px] font-[800] tracking-[0.02em] text-[#8a93a1]">페이지</p>
+      <p className="mb-1.5 mt-4 px-2.5 text-[12px] font-[800] tracking-[0.02em] text-[#6b7380]">페이지</p>
       <ul role="list" className="space-y-0.5">
         {topics().map((t) => {
           const open = t.id === topicId;
@@ -64,14 +64,14 @@ function Tree({ topicId, active }: { topicId?: string; active: string }) {
                 aria-current={active === href ? "page" : undefined}
                 className={`flex items-center gap-1.5 rounded-md px-2 py-1.5 text-[14px] ${active === href ? "bg-[#eef3ff] font-[800] text-[#256ef4]" : open ? "font-[800] text-[#15171c] hover:bg-[#eef1f5]" : "text-[#3d4450] hover:bg-[#eef1f5]"}`}
               >
-                {open ? <ChevronDown size={14} aria-hidden className="shrink-0 text-[#8a93a1]" /> : <ChevronRight size={14} aria-hidden className="shrink-0 text-[#8a93a1]" />}
+                {open ? <ChevronDown size={14} aria-hidden className="shrink-0 text-[#6b7380]" /> : <ChevronRight size={14} aria-hidden className="shrink-0 text-[#6b7380]" />}
                 {t.label}
               </Link>
               {open ? (
                 <div className="mb-2 ml-4 mt-1">
                   {t.groups.map((g) => (
                     <div key={g.title} className="mt-2">
-                      <p className="mb-1 px-2.5 text-[11.5px] font-[800] text-[#8a93a1]">{g.title}</p>
+                      <p className="mb-1 px-2.5 text-[11.5px] font-[800] text-[#6b7380]">{g.title}</p>
                       <TreeLinks items={g.items} active={active} />
                     </div>
                   ))}
@@ -101,7 +101,7 @@ export function ArchiveShell({ section, active, crumbs, toc, article, children }
         </div>
       </aside>
 
-      <main id="archive-main" className="min-w-0 px-4 pb-20 pt-6 md:px-0 md:pt-8 lg:pl-12 xl:pr-10">
+      <div id="archive-main" className="min-w-0 px-4 pb-20 pt-6 md:px-0 md:pt-8 lg:pl-12 xl:pr-10">
         {/* 11-22 웹 지식 문서는 모두 검색엔진에 위치(BreadcrumbList), 글(Article)로 알린다 */}
         <LdScript data={breadcrumbLd(trail.map((c) => ({ name: c.label, path: c.href })))} />
         {article ? (
@@ -134,12 +134,12 @@ export function ArchiveShell({ section, active, crumbs, toc, article, children }
           </ol>
         </nav>
         {children}
-      </main>
+      </div>
 
       {toc && toc.length > 0 ? (
         <aside className="hidden px-5 pt-10 xl:block">
           <div className="sticky top-24 [@media(pointer:coarse)_and_(min-width:768px)]:top-5">
-            <p className="mb-2.5 text-[12px] font-[800] text-[#8a93a1]">이 페이지</p>
+            <p className="mb-2.5 text-[12px] font-[800] text-[#6b7380]">이 페이지</p>
             <ul role="list">
               {toc.map((t) => (
                 <li key={t.id}>
@@ -179,7 +179,7 @@ export function DocHead({ title, meta, lead, labels, leadLabel = "요약" }: { t
       ) : null}
       {lead ? (
         <div className="mt-5 max-w-[820px] rounded-md border-l-4 border-[#256ef4] bg-[#eef3ff] px-4 py-3.5">
-          <p className="text-[13px] font-[800] text-[#256ef4]">{leadLabel}</p>
+          <p className="text-[13px] font-[800] text-[#1d5fd6]">{leadLabel}</p>
           <p className="mt-0.5 text-[15.5px] leading-[1.7] text-[#2b313b]">{lead}</p>
         </div>
       ) : null}

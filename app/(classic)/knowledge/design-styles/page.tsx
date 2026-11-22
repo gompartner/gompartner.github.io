@@ -57,7 +57,7 @@ export default function TrendDesign() {
           <div className="mt-6 grid gap-3 md:grid-cols-3">
             {examplesDesign.map((ex) => <ExampleCard key={ex.url} ex={ex} />)}
           </div>
-          <p className="mt-2 text-[12.5px] text-[#8a93a1]">실제 사례 문구는 인터넷 아카이브 보관본에서 직접 확인했습니다.</p>
+          <p className="mt-2 text-[12.5px] text-[#6b7380]">실제 사례 문구는 인터넷 아카이브 보관본에서 직접 확인했습니다.</p>
         </>
       }
       takeSub="오래된 디자인의 사이트를 인수했다면"

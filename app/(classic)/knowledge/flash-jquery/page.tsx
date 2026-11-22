@@ -40,7 +40,7 @@ export default function TrendFlash() {
       extra={
         <div className="max-w-[420px]">
           {exampleFlash2009.map((ex) => <ExampleCard key={ex.url} ex={ex} />)}
-          <p className="mt-2 text-[12.5px] text-[#8a93a1]">문구는 인터넷 아카이브 보관본에서 직접 확인했습니다.</p>
+          <p className="mt-2 text-[12.5px] text-[#6b7380]">문구는 인터넷 아카이브 보관본에서 직접 확인했습니다.</p>
         </div>
       }
       takeSub="2010년대 이전에 만든 사이트를 인수했다면"

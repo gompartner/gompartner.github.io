@@ -80,7 +80,7 @@ export default function TrendSearchOptimization() {
               ))}
             </tbody>
           </table>
-          <p className="border-t border-[#eef0f3] px-3 py-2 text-[12.5px] text-[#8a93a1]">시대 구분은 곰파트너가 정리한 것입니다. 실제로는 시대가 겹치며 이어졌습니다.</p>
+          <p className="border-t border-[#eef0f3] px-3 py-2 text-[12.5px] text-[#6b7380]">시대 구분은 곰파트너가 정리한 것입니다. 실제로는 시대가 겹치며 이어졌습니다.</p>
         </div>
       }
       nowTitle="곰파트너 전망"

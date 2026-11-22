@@ -368,7 +368,7 @@ export function SearchPreview() {
                 transition={{ duration: 0.22, ease: EASE }}
                 className="overflow-hidden"
               >
-                <pre className="overflow-x-auto border-t border-border bg-surface p-4 text-[13px] leading-[1.6]">
+                <pre tabIndex={0} className="overflow-x-auto border-t border-border bg-surface p-4 text-[13px] leading-[1.6]">
                   <code>{code}</code>
                 </pre>
               </motion.div>

@@ -141,7 +141,7 @@ export function LineChart({ title, sub, series, labelYear, unit = "%", max = 100
         </div>
       </details>
       {/* 출처 표시: 그림과 같은 오른쪽 아래 */}
-      <p aria-hidden className="pointer-events-none absolute bottom-2.5 right-4 text-[11px] text-[#8a93a1] md:right-5">곰파트너 gompartner.co.kr</p>
+      <p aria-hidden className="pointer-events-none absolute bottom-2.5 right-4 text-[11px] text-[#6b7380] md:right-5">곰파트너 gompartner.co.kr</p>
     </figure>
   );
 }

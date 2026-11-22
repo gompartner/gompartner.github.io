@@ -18,7 +18,7 @@ export function SourceFold({ children }: { children: ReactNode }) {
           type="button"
           aria-expanded={open}
           onClick={() => setOpen(!open)}
-          className="mt-2 text-[14px] font-bold text-[#256ef4]"
+          className="mt-2 text-[14px] font-bold text-[#1d5fd6]"
         >
           {open ? "접기" : `더보기 (${n})`}
         </button>

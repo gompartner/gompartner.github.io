@@ -112,7 +112,7 @@ export default async function TermDoc({ params }: { params: Promise<{ slug: stri
               </dl>
               {t.say ? (
                 <p className="mt-4 rounded-md bg-[#eef3ff] px-3.5 py-3 text-[15px] leading-[1.6]">
-                  <span className="mb-0.5 block text-[12px] font-bold text-[#256ef4]">이렇게 요청하세요</span>&quot;{t.say}&quot;
+                  <span className="mb-0.5 block text-[12px] font-bold text-[#1d5fd6]">이렇게 요청하세요</span>&quot;{t.say}&quot;
                 </p>
               ) : null}
             </div>

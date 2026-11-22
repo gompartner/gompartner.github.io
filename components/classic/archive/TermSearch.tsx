@@ -33,7 +33,7 @@ export function TermSearch({ rows }: { rows: TermRow[] }) {
                 <li key={r.id} className="border-b border-[#e6e9ee]">
                   <Link href={`${r.href}#${r.id}`} className="group block py-3">
                     <span className="text-[16px] font-[800] group-hover:text-[#256ef4]">{r.name}</span>
-                    <span className="ml-2 text-[13px] font-bold text-[#256ef4]">{r.group}</span>
+                    <span className="ml-2 text-[13px] font-bold text-[#1d5fd6]">{r.group}</span>
                     <span className="mt-0.5 block text-[14px] leading-[1.55] text-[#5b6370]">{r.look}. {r.alt}</span>
                   </Link>
                 </li>

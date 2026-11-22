@@ -84,7 +84,7 @@ export function MobileWireframes2012({ examples = [] }: { examples?: Example[] }
           </li>
         ))}
       </ul>
-      <p className="mt-2 text-[12.5px] text-[#8a93a1]">위 세 화면은 그 시기 흔하던 모양을 곰파트너가 다시 그린 것입니다. 실제 사례는 인터넷 아카이브에 남은 그날의 화면을 휴대폰 폭으로 열어 확인했습니다.</p>
+      <p className="mt-2 text-[12.5px] text-[#6b7380]">위 세 화면은 그 시기 흔하던 모양을 곰파트너가 다시 그린 것입니다. 실제 사례는 인터넷 아카이브에 남은 그날의 화면을 휴대폰 폭으로 열어 확인했습니다.</p>
     </div>
   );
 }

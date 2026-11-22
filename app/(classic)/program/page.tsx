@@ -174,7 +174,7 @@ export default function ClassicProgramPage() {
             {programs.map((p) => (
               <li key={p.id} className="flex flex-col gap-3 border-b border-[#e6e9ee] py-5 md:flex-row md:gap-8 md:py-6">
                 <div className="shrink-0 md:w-[260px]">
-                  <span className="block text-[14px] font-bold text-[#256ef4]">{plain(p.category)}</span>
+                  <span className="block text-[14px] font-bold text-[#1d5fd6]">{plain(p.category)}</span>
                   <h3 className="mt-0.5 break-keep text-[17px] font-bold leading-[1.4]">{plain(p.title)}</h3>
                 </div>
                 <ul className="flex min-w-0 flex-wrap gap-x-6 gap-y-2 text-[16px] md:pt-5" role="list">
