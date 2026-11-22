@@ -280,10 +280,10 @@ export function ContactForm() {
             <ChevronDown size={16} className="transition-transform group-open:rotate-180 motion-reduce:transition-none" aria-hidden />
           </summary>
           <ul className="mt-2 space-y-1">
-            <li>수집 항목: 이름, 휴대폰 번호, 이메일(선택)</li>
-            <li>이용 목적: 새 서비스, 이벤트, 자료 안내(문자, 이메일)</li>
+            <li>수집 항목: 이메일(위에 적은 경우)</li>
+            <li>이용 목적: 곰파트너의 새 서비스, 이벤트 안내 메일</li>
             <li>보관 기간: 동의 철회 시까지</li>
-            <li>동의하지 않아도 상담 신청은 할 수 있습니다. 동의 후에도 언제든 철회할 수 있습니다.</li>
+            <li>안내 메일 아래의 수신 거부 링크를 누르면 바로 철회됩니다. 동의하지 않아도 상담 신청은 할 수 있습니다.</li>
           </ul>
         </details>
       </div>
