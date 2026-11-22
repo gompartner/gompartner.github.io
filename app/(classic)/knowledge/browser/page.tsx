@@ -25,6 +25,7 @@ export default function TrendKoreaIe() {
       active="/knowledge/browser"
       crumbs={[{ href: "/knowledge", label: "웹 지식" }, { href: "/knowledge/frontend", label: "기술 트렌드" }, { href: "/knowledge/browser", label: "브라우저 호환" }]}
       toc={[{ id: "chart", label: "PC 브라우저 중 IE 비율" }, { id: "why", label: "한국에만 있던 이유" }, { id: "wf", label: "2012년 무렵 첫 화면" }, { id: "take", label: "인수 시 확인 사항" }, { id: "src", label: "출처" }]}
+      article={{ title: "브라우저 호환", description: "2009년에는 세 나라 모두 인터넷 익스플로러(IE)가 PC 브라우저의 절반이 넘었습니다. 미국은 2015년에 28%까지 내려왔지만, 한국은 같은 해에도 68%였습니다.", modified: TREND_CHECKED }}
     >
       <DocHead
         title="브라우저 호환"

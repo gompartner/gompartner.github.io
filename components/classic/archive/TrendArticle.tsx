@@ -2,9 +2,6 @@ import { ArchiveShell, DocHead, TakeoverBox, docH2 } from "@/components/classic/
 import { SourceFold } from "@/components/classic/archive/SourceFold";
 import { TrendNav } from "@/components/classic/archive/TrendNav";
 import { TREND_CHECKED } from "@/data/classic/trendData";
-import { LdScript } from "@/components/seo/JsonLd";
-import { ORG_ID } from "@/lib/seo";
-import { siteUrl } from "@/lib/site";
 
 // 트렌드 문서 공용 틀(11-21): 제목, 차트, 이야기, (그림), 인수 시 확인 사항, 출처, 같은 분류의 다른 문서. 번호와 연재 없음.
 export type Src = { label: string; href: string; note?: string };
@@ -46,9 +43,7 @@ export function TrendArticle(props: {
     { id: "rel", label: "관련 문서" },
   ];
   return (
-    <ArchiveShell active={props.href} crumbs={[{ href: props.href, label: props.title }]} toc={toc}>
-      {/* 최종 수정일을 검색엔진에도 알린다 */}
-      <LdScript data={{ "@context": "https://schema.org", "@type": "Article", headline: props.title, description: props.lead, datePublished: props.published ?? "2026-11-21", dateModified: props.updated ?? TREND_CHECKED, author: { "@id": ORG_ID }, publisher: { "@id": ORG_ID }, mainEntityOfPage: `${siteUrl}${props.href}`, inLanguage: "ko" }} />
+    <ArchiveShell active={props.href} crumbs={[{ href: props.href, label: props.title }]} toc={toc} article={{ title: props.title, description: props.lead, published: props.published, modified: props.updated ?? TREND_CHECKED }}>
       <DocHead title={props.title} meta={[...props.meta, ["최종 수정일", props.updated ?? TREND_CHECKED]]} lead={props.lead} />
       {props.intro ? (
         <>

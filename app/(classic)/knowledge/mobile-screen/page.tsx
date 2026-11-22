@@ -27,6 +27,7 @@ export default function TrendMobile() {
       active={HREF}
       crumbs={[{ href: "/knowledge", label: "웹 지식" }, { href: "/knowledge/design", label: "디자인 트렌드" }, { href: HREF, label: "모바일" }]}
       toc={[{ id: "chart", label: "모바일 접속 비율" }, { id: "why", label: "세 나라가 갈린 길" }, { id: "wf", label: "2012년 휴대폰으로 연 화면" }, { id: "take", label: "인수 시 확인 사항" }, { id: "src", label: "출처" }]}
+      article={{ title: "모바일 화면: m. 사이트에서 반응형으로", description: "2012년 전체 접속 중 모바일 비율은 한국 24%, 미국 10%, 일본 8%였습니다. 한국은 세 나라 중 가장 먼저 휴대폰 화면을 따로 챙겨야 했습니다.", modified: TREND_CHECKED }}
     >
       <DocHead
         title="모바일 화면: m. 사이트에서 반응형으로"

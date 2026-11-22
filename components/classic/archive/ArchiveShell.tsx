@@ -1,6 +1,9 @@
 import Link from "next/link";
 import { ChevronDown, ChevronRight, Home, Search } from "lucide-react";
 import { topicOf, topics, type TreeNode } from "@/data/classic/archive";
+import { LdScript } from "@/components/seo/JsonLd";
+import { ORG_ID, breadcrumbLd } from "@/lib/seo";
+import { siteUrl } from "@/lib/site";
 
 // 웹 지식 공용 틀(11-21 컨플루언스식): 사이트 머리글 아래, 왼쪽 공간 이름과 주제 페이지 트리, 가운데 문서, 오른쪽 목차.
 // 태블릿(손가락 입력, 768 이상)은 머리 메뉴가 고정되지 않으므로 트리와 목차를 위 5칸만 띄운다.
@@ -82,7 +85,9 @@ function Tree({ topicId, active }: { topicId?: string; active: string }) {
   );
 }
 
-export function ArchiveShell({ section, active, crumbs, toc, children }: { section?: string; active: string; crumbs: Crumb[]; toc?: TocItem[]; children: React.ReactNode }) {
+export type DocLd = { title: string; description: string; published?: string; modified: string };
+
+export function ArchiveShell({ section, active, crumbs, toc, article, children }: { section?: string; active: string; crumbs: Crumb[]; toc?: TocItem[]; article?: DocLd; children: React.ReactNode }) {
   const topic = topics().find((t) => t.id === section) ?? topicOf(active);
   const last = crumbs[crumbs.length - 1];
   const trail: Crumb[] = [{ href: "/knowledge", label: "웹 지식" }];
@@ -97,6 +102,11 @@ export function ArchiveShell({ section, active, crumbs, toc, children }: { secti
       </aside>
 
       <main id="archive-main" className="min-w-0 px-4 pb-20 pt-6 md:px-0 md:pt-8 lg:pl-12 xl:pr-10">
+        {/* 11-22 웹 지식 문서는 모두 검색엔진에 위치(BreadcrumbList), 글(Article)로 알린다 */}
+        <LdScript data={breadcrumbLd(trail.map((c) => ({ name: c.label, path: c.href })))} />
+        {article ? (
+          <LdScript data={{ "@context": "https://schema.org", "@type": "Article", headline: article.title, description: article.description, datePublished: article.published ?? "2026-11-21", dateModified: article.modified, author: { "@id": ORG_ID }, publisher: { "@id": ORG_ID }, mainEntityOfPage: `${siteUrl}${active}`, inLanguage: "ko" }} />
+        ) : null}
         <details className="mb-5 rounded-md border border-[#d9dee5] lg:hidden">
           <summary className="flex cursor-pointer list-none items-center justify-between px-3.5 py-3 text-[14.5px] font-bold text-[#3d4450]">
             웹 지식 페이지 보기 <ChevronDown size={16} aria-hidden />
