@@ -368,6 +368,18 @@ export function topics(): Topic[] {
   ];
 }
 
+/** 11-22 종류 태그(문서, 운영 노트, 용어, 도구, 자료). 묶음 제목 대신 항목마다 붙인다 */
+export const kinds = ["문서", "운영 노트", "용어", "도구", "자료"] as const;
+export type Kind = (typeof kinds)[number];
+export function kindOf(href?: string): Kind {
+  if (!href) return "용어";
+  if (href.startsWith("/knowledge/terms/")) return "용어";
+  if (href.startsWith("/insight/")) return "운영 노트";
+  if (href.startsWith("/tools/")) return "도구";
+  if (href.startsWith("/jaryo/") || ["/knowledge/data", "/knowledge/terms", "/knowledge/notes", "/knowledge/checklists"].includes(href)) return "자료";
+  return "문서";
+}
+
 /** 주소가 들어 있는 주제(왼쪽 트리 펼침, 위치 표시용) */
 export function topicOf(href: string): Topic | undefined {
   const has = (n: TreeNode): boolean => n.href === href || !!n.children?.some(has);

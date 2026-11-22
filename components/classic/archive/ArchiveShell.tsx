@@ -1,6 +1,6 @@
 import Link from "next/link";
 import { ChevronDown, ChevronRight, Home, Search } from "lucide-react";
-import { topicOf, topics, type TreeNode } from "@/data/classic/archive";
+import { kindOf, kinds, topicOf, topics, type Topic, type TreeNode } from "@/data/classic/archive";
 import { LdScript } from "@/components/seo/JsonLd";
 import { ORG_ID, breadcrumbLd, pageCardUrl } from "@/lib/seo";
 import { siteUrl } from "@/lib/site";
@@ -21,9 +21,10 @@ function TreeLinks({ items, active }: { items: TreeNode[]; active: string }) {
             <Link
               href={n.href}
               aria-current={n.href === active ? "page" : undefined}
-              className={`flex items-center justify-between gap-2 rounded-md px-2.5 py-1.5 text-[14px] leading-[1.45] ${n.href === active ? "bg-[#eef3ff] font-[800] text-[#256ef4]" : "text-[#3d4450] hover:bg-[#eef1f5]"}`}
+              title={n.label}
+              className={`flex items-center justify-between gap-2 rounded-md px-2.5 py-1.5 text-[13.5px] leading-[1.45] ${n.href === active ? "bg-[#eef3ff] font-[800] text-[#256ef4]" : "text-[#3d4450] hover:bg-[#eef1f5]"}`}
             >
-              <span>{n.label}</span>
+              <span className="line-clamp-2">{n.label}</span>
               {n.count ? <span className="text-[12px] font-semibold text-[#6b7380]">{n.count}</span> : null}
             </Link>
           ) : (
@@ -41,6 +42,14 @@ function TreeLinks({ items, active }: { items: TreeNode[]; active: string }) {
       ))}
     </ul>
   );
+}
+
+function flatTopic(t: Topic): TreeNode[] {
+  const seen = new Set<string>();
+  return t.groups
+    .flatMap((g) => g.items)
+    .filter((n) => (n.href ? !seen.has(n.href) && !!seen.add(n.href) : true))
+    .sort((a, b) => kinds.indexOf(kindOf(a.href)) - kinds.indexOf(kindOf(b.href)));
 }
 
 function Tree({ topicId, active }: { topicId?: string; active: string }) {
@@ -65,13 +74,21 @@ function Tree({ topicId, active }: { topicId?: string; active: string }) {
                 {t.label}
               </Link>
               {open ? (
-                <div className="mb-2 ml-4 mt-1">
-                  {t.groups.map((g) => (
-                    <div key={g.title} className="mt-2">
-                      <p className="mb-1 px-2.5 text-[11.5px] font-[800] text-[#6b7380]">{g.title}</p>
-                      <TreeLinks items={g.items} active={active} />
-                    </div>
-                  ))}
+                <div className="mb-2 ml-[15px] mt-1 border-l border-[#e1e5eb] pl-1.5">
+                  {/* 11-22 묶음 제목(문서, 운영 노트) 없이 한 목록, 긴 제목은 두 줄까지 */}
+                  {(() => {
+                    const all = flatTopic(t);
+                    if (all.length <= 10) return <TreeLinks items={all} active={active} />;
+                    const head = all.slice(0, 8);
+                    const cur = all.find((n) => n.href === active);
+                    if (cur && !head.includes(cur)) head.push(cur);
+                    return (
+                      <>
+                        <TreeLinks items={head} active={active} />
+                        <Link href={href} className="mt-0.5 block rounded-md px-2.5 py-1.5 text-[13px] font-bold text-[#1d5fd6] hover:bg-[#eef1f5]">전체 {all.length}개 보기</Link>
+                      </>
+                    );
+                  })()}
                 </div>
               ) : null}
             </li>
