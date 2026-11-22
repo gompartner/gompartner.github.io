@@ -23,14 +23,14 @@ export function HistoryView({ eras, events, topics }: { eras: EraView[]; events:
   const pass = (e: EventView) => (sel === "전체" || e.topic === sel) && (!korea || !e.region);
   return (
     <div>
-      <div className="sticky top-16 z-10 -mx-4 mt-6 border-b border-[#e6e9ee] bg-white/95 px-4 py-3 backdrop-blur md:top-[76px] md:mx-0 md:px-0 [@media(pointer:coarse)_and_(min-width:768px)]:top-0">
-        <div role="group" aria-label="주제로 거르기" className="flex flex-wrap gap-1.5">
+      <div className="sticky top-16 z-10 -mx-4 mt-6 border-b border-[#e6e9ee] bg-white px-4 py-2.5 md:top-[76px] md:mx-0 md:px-0 [@media(pointer:coarse)_and_(min-width:768px)]:top-0">
+        <div role="group" aria-label="주제로 거르기" className="-mx-4 flex gap-1.5 overflow-x-auto px-4 [scrollbar-width:none] md:mx-0 md:flex-wrap md:overflow-visible md:px-0">
           {["전체", ...topics].map((t) => (
-            <button key={t} type="button" aria-pressed={sel === t} onClick={() => setSel(t)} className={`min-h-[34px] rounded-full border px-3 text-[13.5px] font-bold ${sel === t ? "border-[#15171c] bg-[#15171c] text-white" : "border-[#d9dee5] bg-white text-[#3d4450] hover:border-[#256ef4]"}`}>
+            <button key={t} type="button" aria-pressed={sel === t} onClick={() => setSel(t)} className={`min-h-[34px] shrink-0 whitespace-nowrap rounded-full border px-3 text-[13.5px] font-bold ${sel === t ? "border-[#256ef4] bg-[#256ef4] text-white" : "border-[#d9dee5] bg-white text-[#3d4450] hover:border-[#256ef4]"}`}>
               {t}
             </button>
           ))}
-          <button type="button" aria-pressed={korea} onClick={() => setKorea(!korea)} className={`min-h-[34px] rounded-full border px-3 text-[13.5px] font-bold ${korea ? "border-[#256ef4] bg-[#eef3ff] text-[#1d5fd6]" : "border-[#d9dee5] bg-white text-[#3d4450]"}`}>
+          <button type="button" aria-pressed={korea} onClick={() => setKorea(!korea)} className={`min-h-[34px] shrink-0 whitespace-nowrap rounded-full border px-3 text-[13.5px] font-bold ${korea ? "border-[#256ef4] bg-[#eef3ff] text-[#1d5fd6]" : "border-[#d9dee5] bg-white text-[#3d4450]"}`}>
             한국만
           </button>
         </div>

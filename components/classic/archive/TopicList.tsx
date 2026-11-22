@@ -22,7 +22,7 @@ function Chip({ on, label, n, onClick }: { on: boolean; label: string; n: number
       type="button"
       aria-pressed={on}
       onClick={onClick}
-      className={`inline-flex min-h-[36px] items-center gap-1.5 rounded-full border px-3.5 text-[14px] font-bold ${on ? "border-[#15171c] bg-[#15171c] text-white" : "border-[#d9dee5] bg-white text-[#3d4450] hover:border-[#256ef4] hover:text-[#256ef4]"}`}
+      className={`inline-flex min-h-[36px] items-center gap-1.5 rounded-full border px-3.5 text-[14px] font-bold ${on ? "border-[#256ef4] bg-[#256ef4] text-white" : "border-[#d9dee5] bg-white text-[#3d4450] hover:border-[#256ef4] hover:text-[#256ef4]"}`}
     >
       {label}
       <span className={`text-[12.5px] font-semibold tabular-nums ${on ? "text-white/75" : "text-[#6b7380]"}`}>{n}</span>
