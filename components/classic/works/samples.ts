@@ -41,6 +41,15 @@ export function thumbOf(p: Project) {
   return exists(sm) ? `${sm}?v=${IMG_VER}` : p.imageUrl;
 }
 
+/** 11-22 시안 A, B가 있는 업종 홈페이지(메인 한 장 디자인 제안) */
+export const isDraft = (p: Project) => p.layout === "시안 2종";
+
+/** 시안 B 첫 화면 작은 캡처(public/images/demos/sm-b). 없으면 null */
+export function thumbBOf(p: Project) {
+  const b = `/images/demos/sm-b/${slugOf(p.demoUrl)}.jpg`;
+  return exists(b) ? `${b}?v=${IMG_VER}` : null;
+}
+
 export function mobileShotOf(p: Project) {
   const m = `/images/demos/m/${slugOf(p.demoUrl)}.jpg`;
   return exists(m) ? `${m}?v=${IMG_VER}` : null;

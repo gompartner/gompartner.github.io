@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import { PageHead, SubTabs, h2, wrap } from "@/components/classic/ui";
 import { SampleGrid } from "@/components/classic/works/SampleGrid";
 import { catalogGroups, catalogProjects, homepageProjects, samplesIn, worksTabs } from "@/components/classic/works/samples";
+import { industries } from "@/data/classic/industries";
 import { pageMeta } from "@/lib/seo";
 import { buildCatalogIndex } from "@/components/classic/search/index";
 import { CatalogSearch } from "@/components/classic/search/CatalogSearch";
@@ -20,9 +21,11 @@ export default function ClassicWorksPage() {
       <SubTabs items={worksTabs} current="/works" />
       <CatalogSearch index={buildCatalogIndex()}>
       {[
-        { id: "c-all", title: "업종별 홈페이지", items: homepageProjects },
+        // 11-22 업종 홈페이지는 업종별로 묶는다(한 목록에 50개를 섞지 않는다)
+        ...industries.map((i) => ({ id: `c-${i.slug}`, title: i.label, items: samplesIn(i.slug) })),
+        { id: "c-etc", title: "그 밖의 업종", items: homepageProjects.filter((p) => !industries.some((i) => samplesIn(i.slug).includes(p))) },
         ...catalogGroups.map((g) => ({ id: `c-${g.slug}`, title: g.label, items: samplesIn(g.slug) })),
-      ].map((sec, n) => (
+      ].filter((sec) => sec.items.length > 0).map((sec, n) => (
         <section key={sec.id} aria-labelledby={sec.id} className={`${wrap} ${n === 0 ? "py-14 md:py-20" : "pb-14 md:pb-20"}`}>
           <div className="flex items-baseline gap-3 border-b-2 border-[#15171c] pb-4">
             <h2 id={sec.id} className={h2}>

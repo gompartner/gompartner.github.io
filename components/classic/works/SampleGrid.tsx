@@ -1,12 +1,13 @@
 import Image from "next/image";
 import { NavLink as Link } from "@/components/classic/NavLink";
 import type { Project } from "@/lib/types";
-import { hrefOf, isDeviceCatalog, mobileShotOf, thumbOf } from "./samples";
+import { hrefOf, isDeviceCatalog, isDraft, mobileShotOf, thumbBOf, thumbOf } from "./samples";
+import { VARIANTS } from "@/lib/variants";
 
 // 샘플 카드 격자. 홈 화면 샘플 목록과 같은 모양(썸네일 선 하나, 그림자 없음).
 // variant="mockup"은 카탈로그 목록용: PC 화면을 크게 두고 휴대폰 화면을 오른쪽 아래에 걸친다(10-31 C안).
 export function SampleGrid({ items, cols = 4, variant = "plain" }: { items: Project[]; cols?: 3 | 4; variant?: "plain" | "mockup" }) {
-  if (variant === "mockup") return <MockupGrid items={items} />;
+  if (variant === "mockup") return items.length > 0 && items.every(isDraft) ? <PairGrid items={items} /> : <MockupGrid items={items} />;
   return (
     <ul className={`grid grid-cols-2 gap-x-4 gap-y-8 md:gap-x-6 md:gap-y-12 ${cols === 4 ? "md:grid-cols-3 lg:grid-cols-4" : "md:grid-cols-3"}`} role="list">
       {items.map((p) => (
@@ -89,6 +90,39 @@ function MockupGrid({ items }: { items: Project[] }) {
                 </span>
                 <span className="block break-keep text-[15px] leading-[1.5] text-[#4b5563] lg:max-w-[55%] lg:text-right">{p.features.slice(0, 3).join(", ")}</span>
               </span>
+            </Link>
+          </li>
+        );
+      })}
+    </ul>
+  );
+}
+
+/** 11-22 시안 A, B 나란히 카드. 두 화면은 각 시안 체험으로 바로, 제목은 상세 페이지로 간다. PC 3열, 태블릿 2열, 휴대폰 1열 */
+function PairGrid({ items }: { items: Project[] }) {
+  return (
+    <ul className="grid gap-y-12 md:grid-cols-2 md:gap-x-8 md:gap-y-14 lg:grid-cols-3" role="list">
+      {items.map((p) => {
+        const list = VARIANTS[p.demoUrl.replace("/work/", "")] ?? [];
+        const shots = [
+          { id: list[0]?.id ?? "a", label: (list[0]?.label ?? "시안 A").replace(/^시안 /, ""), src: thumbOf(p) },
+          { id: list[1]?.id ?? "b", label: (list[1]?.label ?? "시안 B").replace(/^시안 /, ""), src: thumbBOf(p) ?? thumbOf(p) },
+        ];
+        return (
+          <li key={p.id} className="min-w-0">
+            <div className="grid grid-cols-2 gap-2 rounded-xl bg-[#eef1f5] p-2">
+              {shots.map((s) => (
+                <Link key={s.id} href={`${p.demoUrl}?v=${s.id}`} prefetch={false} className="group/s block min-w-0" aria-label={`${shortTitle(p.title)} 시안 ${s.label} 체험하기`}>
+                  <span className="block overflow-hidden rounded-md bg-white shadow-[0_1px_2px_rgba(17,24,39,0.08)]">
+                    <Image src={s.src} alt="" width={540} height={338} sizes="(min-width: 1024px) 180px, (min-width: 768px) 22vw, 45vw" className="aspect-[16/10] w-full object-cover object-top transition-transform duration-500 group-hover/s:scale-[1.05] motion-reduce:transition-none" />
+                  </span>
+                  <span className="mt-1.5 block truncate px-0.5 text-[13px] font-bold text-[#3b4350] group-hover/s:text-[#1d5fd6] md:text-[14px]">{s.label}</span>
+                </Link>
+              ))}
+            </div>
+            <Link href={hrefOf(p)} className="group mt-3 block">
+              <span className="block break-keep text-[19px] font-bold leading-[1.35] tracking-[-0.03em] group-hover:underline md:text-[20px]">{shortTitle(p.title)}</span>
+              <span className="mt-1 block break-keep text-[15px] leading-[1.5] text-[#5b6370]">{p.features.slice(0, 3).join(", ")}</span>
             </Link>
           </li>
         );
