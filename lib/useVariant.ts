@@ -148,6 +148,18 @@ export const VARIANTS: Record<string, { id: string; label: string }[]> = {
     { id: "a", label: "시안 A 동네 빵집" },
     { id: "b", label: "시안 B 베이커리 카페" },
   ],
+  "hanok-cafe": [
+    { id: "a", label: "시안 A 전통 찻집" },
+    { id: "b", label: "시안 B 한옥 커피" },
+  ],
+  "furniture-workshop": [
+    { id: "a", label: "시안 A 맞춤 제작" },
+    { id: "b", label: "시안 B 쇼룸 컬렉션" },
+  ],
+  coworking: [
+    { id: "a", label: "시안 A 코워킹" },
+    { id: "b", label: "시안 B 비상주 사무실" },
+  ],
   "clinic-homepage": [
     { id: "a", label: "시안 A 미니멀" },
     { id: "b", label: "시안 B 진료 안내형" },

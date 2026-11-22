@@ -24,7 +24,7 @@ const CommunityMapDemo = dynamic(() => import("@/components/demos/CommunityMapDe
 const ExcelAutomationDemo = dynamic(() => import("@/components/demos/ExcelAutomationDemo").then((m) => m.ExcelAutomationDemo));
 const DistrictPortalDemo = dynamic(() => import("@/components/demos/DistrictPortalDemo").then((m) => m.DistrictPortalDemo));
 const FlowerExpoDemo = dynamic(() => import("@/components/demos/FlowerExpoDemo").then((m) => m.FlowerExpoDemo));
-const HanokCafeDemo = dynamic(() => import("@/components/demos/HanokCafeDemo").then((m) => m.HanokCafeDemo));
+const HanokCafeDrafts = dynamic(() => import("@/components/drafts/Drafts").then((m) => m.HanokCafeDrafts));
 const FoodDrafts = dynamic(() => import("@/components/drafts/Drafts").then((m) => m.FoodDrafts));
 const InteriorDrafts = dynamic(() => import("@/components/drafts/Drafts").then((m) => m.InteriorDrafts));
 const AcademyDrafts = dynamic(() => import("@/components/drafts/Drafts").then((m) => m.AcademyDrafts));
@@ -50,8 +50,8 @@ const ShopAdminDemo = dynamic(() => import("@/components/demos/ShopAdminDemo").t
 const CoffeeDrafts = dynamic(() => import("@/components/drafts/Drafts").then((m) => m.CoffeeDrafts));
 const HairDrafts = dynamic(() => import("@/components/drafts/Drafts").then((m) => m.HairDrafts));
 const OpticalDrafts = dynamic(() => import("@/components/drafts/Drafts").then((m) => m.OpticalDrafts));
-const FurnitureWorkshopDemo = dynamic(() => import("@/components/demos/FurnitureWorkshopDemo").then((m) => m.FurnitureWorkshopDemo));
-const CoworkingDemo = dynamic(() => import("@/components/demos/CoworkingDemo").then((m) => m.CoworkingDemo));
+const FurnitureWorkshopDrafts = dynamic(() => import("@/components/drafts/Drafts").then((m) => m.FurnitureWorkshopDrafts));
+const CoworkingDrafts = dynamic(() => import("@/components/drafts/Drafts").then((m) => m.CoworkingDrafts));
 const CampsiteDemo = dynamic(() => import("@/components/demos/CampsiteDemo").then((m) => m.CampsiteDemo));
 const PhotoStudioDrafts = dynamic(() => import("@/components/drafts/Drafts").then((m) => m.PhotoStudioDrafts));
 const NailDrafts = dynamic(() => import("@/components/drafts/Drafts").then((m) => m.NailDrafts));
@@ -90,7 +90,7 @@ const demoComponents: Record<string, ComponentType> = {
   "clinic-report": ClinicReportDemo,
   "clinic-homepage": SkinDrafts,
   "dental-homepage": DentalDrafts,
-  "hanok-cafe": HanokCafeDemo,
+  "hanok-cafe": HanokCafeDrafts,
   "korean-restaurant": FoodDrafts,
   interior: InteriorDrafts,
   academy: AcademyDrafts,
@@ -131,8 +131,8 @@ const demoComponents: Record<string, ComponentType> = {
   "roastery": CoffeeDrafts,
   "hair-salon": HairDrafts,
   "optical": OpticalDrafts,
-  "furniture-workshop": FurnitureWorkshopDemo,
-  "coworking": CoworkingDemo,
+  "furniture-workshop": FurnitureWorkshopDrafts,
+  "coworking": CoworkingDrafts,
   "campsite": CampsiteDemo,
   "photo-studio": PhotoStudioDrafts,
   "nail-shop": NailDrafts,
