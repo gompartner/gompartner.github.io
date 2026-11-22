@@ -85,12 +85,7 @@ export default async function ClassicInsightDetailPage({ params }: Props) {
                   {b.p &&
                     !b.table &&
                     b.p.map((t) => (
-                      <p
-                        key={t}
-                        className="text-[17px] leading-[1.8] text-[#3d4450]"
-                      >
-                        {t}
-                      </p>
+                      <Para key={t} t={t} />
                     ))}
                   {b.code && (
                     <pre className="overflow-x-auto rounded-md bg-[#1e2127] p-4 text-[13.5px] leading-[1.6] text-[#e6e6e6]">
@@ -201,12 +196,7 @@ export default async function ClassicInsightDetailPage({ params }: Props) {
                   {b.p &&
                     b.table &&
                     b.p.map((t) => (
-                      <p
-                        key={t}
-                        className="text-[17px] leading-[1.8] text-[#3d4450]"
-                      >
-                        {t}
-                      </p>
+                      <Para key={t} t={t} />
                     ))}
                 </section>
               ))}
@@ -217,4 +207,15 @@ export default async function ClassicInsightDetailPage({ params }: Props) {
       </ArchiveShell>
     </>
   );
+}
+
+// 11-22 "> "로 시작하는 문단은 관리업체에 보낼 요청 문구. 꺾쇠를 그대로 찍지 않고 인용 상자로
+function Para({ t }: { t: string }) {
+  if (t.startsWith("> "))
+    return (
+      <blockquote className="rounded-md border border-[#dfe3ea] bg-[#f5f7fa] px-5 py-4 text-[16px] leading-[1.75] text-[#15171c]">
+        {t.slice(2)}
+      </blockquote>
+    );
+  return <p className="text-[17px] leading-[1.8] text-[#3d4450]">{t}</p>;
 }
