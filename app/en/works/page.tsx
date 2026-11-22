@@ -50,7 +50,7 @@ export default function EnWorksPage() {
                 <li key={s.slug}>
                   <a href={`/work/${s.slug}`} target="_blank" rel="noopener" data-gtm-cta={`en_works_${s.slug}`} className={card}>
                     <span className="block overflow-hidden rounded-md border border-[#e1e5eb] bg-white">
-                      <Image src={`/images/demos/sm/${s.slug}.jpg`} alt={`${s.title} demo screen`} width={720} height={450} sizes="(min-width: 1024px) 400px, (min-width: 640px) 50vw, 92vw" className={thumb} />
+                      <Image src={`/images/demos/sm/${s.slug}.jpg?v=1122`} alt={`${s.title} demo screen`} width={720} height={450} sizes="(min-width: 1024px) 400px, (min-width: 640px) 50vw, 92vw" className={thumb} />
                     </span>
                     <span className="mt-4 flex items-center gap-1 text-[19px] font-[800] group-hover:text-[#256ef4]">
                       {s.title}

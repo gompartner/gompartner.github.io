@@ -105,29 +105,28 @@ export const enSteps = [
 /** 영문 카탈로그. 데모는 한국어 화면 그대로(한국 손님이 보는 모습) */
 export const enWorks: { title: string; items: { slug: string; title: string; text: string }[] }[] = [
   {
-    title: "Online stores",
+    title: "Shops and cafes",
     items: [
-      { slug: "online-store", title: "Ceramics studio web store", text: "Glaze and size options, engraving text, add-on products and shipping info." },
-      { slug: "shop-admin", title: "Store order admin", text: "Option combinations, stock per combination, bulk order status and tracking number export." },
-      { slug: "liquor-shop", title: "Traditional liquor shop", text: "Age check, products by type, gift sets and tasting bookings." },
+      { slug: "online-store", title: "Ceramics studio web store", text: "Two designs: a product grid with engraving and shipping info, or a studio story with the making process." },
+      { slug: "liquor-shop", title: "Wine and Korean liquor shop", text: "Two designs: wine picks by price range, or Korean liquor types and holiday gift sets. Age notice included." },
+      { slug: "bakery-cafe", title: "Bakery cafe", text: "Two designs: bread times and cake orders, or a large bakery cafe with floors and seating." },
     ],
   },
   {
-    title: "Bookings",
+    title: "Stays and spaces",
     items: [
-      { slug: "pension", title: "Seaside guesthouse", text: "Room photos, availability by room and date, price calculator and refund policy." },
-      { slug: "small-business-homepage", title: "Private gym booking", text: "Hourly booking by location, card or bank transfer, and a QR code for entry." },
-      { slug: "campsite", title: "Campsite booking", text: "Site map, six-week availability calendar and equipment rental totals." },
-      { slug: "pilates-studio", title: "Pilates studio", text: "Weekly class timetable, lesson comparison, fees and trial lesson request." },
+      { slug: "pension", title: "Seaside guesthouse", text: "Two designs: sea-view rooms and facilities, or two private forest cabins." },
+      { slug: "campsite", title: "Campsite", text: "Two designs: auto-camping sites and facilities, or glamping tents with everything provided." },
+      { slug: "coworking", title: "Coworking space", text: "Two designs: desk plans and meeting rooms, or a virtual office with mail handling." },
     ],
   },
   {
     title: "Companies and B2B",
     items: [
-      { slug: "company", title: "Precision machining company", text: "Equipment list, machining specs and a quote form with drawing upload. Korean and English." },
-      { slug: "saas-startup", title: "Restaurant inventory SaaS", text: "Feature tabs, monthly and yearly plans, comparison table and demo request." },
-      { slug: "logistics", title: "Fulfillment company", text: "Same-day shipping schedule, prices per service and warehouse info." },
-      { slug: "food-oem", title: "Food OEM manufacturer", text: "Products by package type, minimum order quantity, process and sample requests." },
+      { slug: "company", title: "Precision machining company", text: "Two designs: equipment and machining specs with a drawing quote flow, or a company profile with quality system and history. Korean and English." },
+      { slug: "saas-startup", title: "Inventory SaaS", text: "Two designs: product screen and plans, or use by industry and price by number of stores." },
+      { slug: "logistics", title: "Logistics company", text: "Two designs: same-day fulfillment schedule and fees, or pallet storage and B2B delivery." },
+      { slug: "food-oem", title: "Food OEM manufacturer", text: "Two designs: products by package type with minimum order, or health supplement formats and development steps." },
     ],
   },
   {
@@ -141,9 +140,9 @@ export const enWorks: { title: string; items: { slug: string; title: string; tex
   {
     title: "Clinics and services",
     items: [
-      { slug: "clinic-homepage", title: "Dermatology clinic", text: "Treatments and cosmetic procedures, opening hours by day and a price list." },
-      { slug: "dental-homepage", title: "Dental clinic", text: "Guides by symptom, non-insured fees, evening hours and booking." },
-      { slug: "visa-agent", title: "Visa agency for foreigners", text: "Visa types, extension guide, document lists and consultation request. Korean and English." },
+      { slug: "clinic-homepage", title: "Dermatology clinic", text: "Two designs: a calm minimal clinic, or seasonal skin care and opening hours up front." },
+      { slug: "dental-homepage", title: "Dental clinic", text: "Two designs: evening hours and private rooms, or a family clinic for a child's first visit." },
+      { slug: "visa-agent", title: "Visa agency for foreigners", text: "Two designs: work visas for employers, or stay visas and extension documents for individuals." },
     ],
   },
   {
@@ -154,6 +153,7 @@ export const enWorks: { title: string; items: { slug: string; title: string; tex
     ],
   },
 ];
+
 
 /** 영문 3D 페이지. 금액과 기간은 한국어 /3d(data/classic/three.ts)와 같다 */
 export const enThree = {

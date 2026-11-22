@@ -165,6 +165,8 @@ export default function ClassicProgramPage() {
         </div>
       </section>
 
+      {/* 11-22 업무 프로그램 샘플은 보관해서 목록이 비면 이 칸을 감춘다 */}
+      {programs.length > 0 && (
       <section id="cases" aria-labelledby="pg-cases" className={section}>
         <div className={`${wrap} py-16 md:py-24`}>
           <h2 id="pg-cases" className={h2}>
@@ -190,6 +192,7 @@ export default function ClassicProgramPage() {
           </ul>
         </div>
       </section>
+      )}
 
       <StepList steps={STEPS} title="진행 절차" id="process" />
 
