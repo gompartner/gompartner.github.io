@@ -1,7 +1,7 @@
 // 샘플을 "OO에서 쓰는 OO 기능" 문장으로 선택하기 위한 분류.
 // 새 샘플을 추가하면 fieldsById에 업종을 적는다. 기능은 기능 태그, 제목, 설명에서 keywords로 찾는다.
 
-export const fields = ["병원", "전문직과 부동산", "학원과 교육", "매장", "기업"] as const;
+export const fields = ["병원", "전문직과 부동산", "학원과 교육", "매장", "숙박과 공간", "기업"] as const;
 export type Field = (typeof fields)[number];
 
 export const fieldsById: Record<string, Field[]> = {
@@ -14,7 +14,7 @@ export const fieldsById: Record<string, Field[]> = {
   academy: ["학원과 교육"],
   "pilates-studio": ["매장", "학원과 교육"],
   "online-store": ["매장", "기업"],
-  pension: ["매장"],
+  pension: ["숙박과 공간"],
   company: ["기업"],
   "cert-lab": ["기업"],
   "law-firm": ["전문직과 부동산"],
@@ -36,14 +36,14 @@ export const fieldsById: Record<string, Field[]> = {
   "hair-salon": ["매장"],
   "optical": ["매장"],
   "furniture-workshop": ["매장"],
-  "coworking": ["기업", "매장"],
-  "campsite": ["매장"],
+  "coworking": ["숙박과 공간"],
+  "campsite": ["숙박과 공간"],
   "photo-studio": ["매장"],
   "nail-shop": ["매장"],
   "car-detailing": ["매장"],
   "lighting-shop": ["매장"],
   "liquor-shop": ["매장"],
-  "small-wedding": ["매장"],
+  "small-wedding": ["숙박과 공간"],
   "korean-medicine": ["병원"],
   "orthopedics": ["병원"],
   "pediatrics": ["병원"],

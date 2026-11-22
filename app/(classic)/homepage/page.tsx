@@ -1,6 +1,6 @@
 import type { Metadata } from "next";
 import Image from "next/image";
-import { Factory, GraduationCap, Scale, Stethoscope, Store } from "lucide-react";
+import { Factory, GraduationCap, Scale, Stethoscope, Store, Tent } from "lucide-react";
 import { CompareTable } from "@/components/classic/CompareTable";
 import { FaqBlock } from "@/components/classic/FaqBlock";
 import { PlanTable } from "@/components/classic/pricing/PlanTable";
@@ -32,7 +32,7 @@ const section = "scroll-mt-20 border-t border-[#e6e9ee] md:scroll-mt-24";
 // 이 페이지의 디자인 포인트(10-30): 실제 카탈로그의 PC와 휴대폰 화면 한 쌍, 업종 아이콘
 const shot = projects.find((p) => p.id === "company")!;
 const shotSlug = shot.demoUrl.replace("/work/", "");
-const industryIcon = { hospital: Stethoscope, store: Store, professional: Scale, company: Factory, academy: GraduationCap } as const;
+const industryIcon = { hospital: Stethoscope, store: Store, stay: Tent, professional: Scale, company: Factory, academy: GraduationCap } as const;
 
 const ld = [
   {
