@@ -258,3 +258,5 @@ input[type="time"]::-webkit-date-and-time-value {
   .cl h2, .cl h3 { break-after: avoid; }
   .cl table, .cl pre, .cl figure, .cl img { break-inside: avoid; }
 }
+/* 11-22 웹 지식 표: 한글을 낱자로 자르지 않고 띄어쓰기에서 줄바꿈(아이패드 좁은 칸에서 "횟수(" 같은 깨짐) */
+#archive-main table { word-break: keep-all; overflow-wrap: break-word; }

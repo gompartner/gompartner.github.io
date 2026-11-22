@@ -155,7 +155,7 @@ export default async function ClassicInsightDetailPage({ params }: Props) {
                                 <th
                                   key={h}
                                   scope="col"
-                                  className="px-4 py-3 font-bold text-[#3d4450]"
+                                  className="px-3 py-3 font-bold text-[#3d4450] xl:px-4"
                                 >
                                   {h}
                                 </th>
@@ -173,14 +173,14 @@ export default async function ClassicInsightDetailPage({ params }: Props) {
                                     <th
                                       key={ci}
                                       scope="row"
-                                      className="whitespace-nowrap px-4 py-3.5 font-bold"
+                                      className="whitespace-nowrap px-3 py-3.5 font-bold xl:px-4"
                                     >
                                       {c}
                                     </th>
                                   ) : (
                                     <td
                                       key={ci}
-                                      className="px-4 py-3.5 leading-[1.6] text-[#3d4450]"
+                                      className="px-3 py-3.5 leading-[1.6] text-[#3d4450] xl:px-4"
                                     >
                                       {c}
                                     </td>
