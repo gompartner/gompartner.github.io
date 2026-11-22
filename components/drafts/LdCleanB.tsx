@@ -2,7 +2,7 @@
 
 import Image from "next/image";
 
-// 입주청소 견적 랜딩 시안 B 가격표 우선형(11-22. 시안 A는 기존 견적 계산기 랜딩. 숨고, 청소 업체 비교 글처럼 평형별 가격과 추가 요금이 붙는 조건을 첫 화면 바로 아래 표로 먼저 보여 준다. 계산기 대신 표 한 장). 흰 바탕, 민트와 검정. 인물 없음. 메인 한 장, 신청 폼은 모양만.
+// 입주청소 견적 랜딩 시안 B 가격표 우선형(11-22. 시안 A는 기존 견적 계산기 랜딩. 청소요정처럼 머리글에 전화번호와 청소 종류, 숨고 청소 업체 글처럼 평형별 가격과 추가 요금 조건을 첫 화면 바로 아래 표로. 계산기 대신 표 한 장). 흰 바탕, 민트와 검정. 인물 없음. 메인 한 장, 신청 폼은 모양만.
 // 사진: Unsplash 무료 라이선스(public/images/drafts/ld/clean-*)
 const IMG = "/images/drafts/ld";
 const C = { ink: "#101816", sub: "#5c6865", line: "#e1ebe8", soft: "#f1f7f5", mint: "#12a37f" };
@@ -24,11 +24,21 @@ const EXTRA = [
 export function LdCleanB() {
   return (
     <div className="min-h-screen bg-white text-[16px] leading-[1.75] md:text-[17px]" style={{ color: C.ink }}>
+      <header className="border-b" style={{ borderColor: C.line }}>
+        <div className="mx-auto flex h-16 max-w-[1120px] items-center justify-between px-5 md:px-8">
+          <p className="text-[18px] font-bold tracking-[-0.03em]">맑은집 <span style={{ color: C.mint }}>입주청소</span></p>
+          <span className="text-[15px] font-bold tabular-nums">031-000-0000</span>
+        </div>
+      </header>
       <section className="relative flex min-h-[560px] items-end overflow-hidden bg-[#dfe6e4] md:h-[80svh]">
         <Image src={`${IMG}/clean-hero.jpg`} alt="창으로 빛이 드는 텅 빈 흰 방" fill priority sizes="100vw" className="object-cover" />
         <div className="absolute inset-0 bg-gradient-to-t from-white via-white/40 to-transparent" aria-hidden />
         <div className="relative mx-auto w-full max-w-[1120px] px-5 pb-12 md:px-8 md:pb-16">
-          <p className="text-[15px] font-bold" style={{ color: C.mint }}>맑은집 입주청소</p>
+          <ul className="flex flex-wrap gap-2 text-[14px] font-bold">
+            {["입주청소", "이사청소", "거주청소"].map((t) => (
+              <li key={t} className="rounded-full bg-white px-3 py-1" style={{ color: C.mint }}>{t}</li>
+            ))}
+          </ul>
           <h1 className="mt-3 text-[38px] font-bold leading-[1.22] tracking-[-0.045em] md:text-[64px]">
             30평대 52만 원,
             <br />

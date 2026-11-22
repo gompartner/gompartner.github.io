@@ -2,7 +2,7 @@
 
 import Image from "next/image";
 
-// 가죽 공방 원데이 클래스 신청 랜딩 시안 B 도구 사진형(11-22. 시안 A는 기존 회차 신청, 결제 랜딩. 공방 클래스 소개처럼 도구가 놓인 작업대 사진 한 장, 2시간 수업 순서, 이번 주 회차와 남은 자리, 환불 규정을 짧게). 흰 바탕, 가죽 갈색. 인물 없음. 메인 한 장, 신청은 버튼만.
+// 가죽 공방 원데이 클래스 신청 랜딩 시안 B 도구 사진형(11-22. 시안 A는 기존 회차 신청, 결제 랜딩. 피버 원데이 클래스 티켓 페이지처럼 수강료, 소요 시간, 정원을 첫 화면에 숫자로, 도구가 놓인 작업대 사진 한 장, 2시간 수업 순서, 이번 주 회차와 남은 자리, 환불 규정을 짧게). 흰 바탕, 가죽 갈색. 인물 없음. 메인 한 장, 신청은 버튼만.
 // 사진: Unsplash 무료 라이선스(public/images/drafts/ld/leather-*)
 const IMG = "/images/drafts/ld";
 const C = { ink: "#1e1712", sub: "#6b6158", line: "#ece5de", soft: "#f7f3ef", brown: "#8a5228" };
@@ -26,7 +26,15 @@ export function LdLeatherB() {
               <br />
               카드지갑 하나
             </h1>
-            <p className="mt-5 max-w-[440px]" style={{ color: C.sub }}>처음이어도 됩니다. 바늘 두 개로 한 땀씩, 마지막에 이니셜을 새겨 가져갑니다. 재료와 도구 포함 5만 5천 원.</p>
+            <p className="mt-5 max-w-[440px]" style={{ color: C.sub }}>처음이어도 됩니다. 바늘 두 개로 한 땀씩, 마지막에 이니셜을 새겨 가져갑니다.</p>
+            <dl className="mt-6 grid max-w-[440px] grid-cols-3 gap-px overflow-hidden rounded-xl border text-center" style={{ borderColor: C.line, background: C.line }}>
+              {[["수강료", "55,000원"], ["소요", "2시간"], ["정원", "6명"]].map(([k, v]) => (
+                <div key={k} className="bg-white px-2 py-3">
+                  <dt className="text-[13px]" style={{ color: C.sub }}>{k}</dt>
+                  <dd className="font-bold tabular-nums">{v}</dd>
+                </div>
+              ))}
+            </dl>
           </div>
           <div className="relative aspect-[4/3] overflow-hidden rounded-[20px]">
             <Image src={`${IMG}/leather-hero.jpg`} alt="작업 매트 위에 가지런히 놓인 가죽 공예 도구" fill priority sizes="(min-width: 1024px) 52vw, 100vw" className="object-cover" />
