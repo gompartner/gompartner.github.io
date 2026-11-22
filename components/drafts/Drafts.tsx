@@ -94,6 +94,12 @@ import { LgA } from "./LgA";
 import { LgB } from "./LgB";
 import { FoA } from "./FoA";
 import { FoB } from "./FoB";
+import { OsA } from "./OsA";
+import { OsB } from "./OsB";
+import { PsA } from "./PsA";
+import { PsB } from "./PsB";
+import { FxA } from "./FxA";
+import { FxB } from "./FxB";
 
 // 컨셉 시안 두 장씩(11-21). 맨 위 줄에서 바꿔 본다. 기존 기능형 데모는 코드만 남긴다.
 export function TaxDrafts() {
@@ -720,6 +726,48 @@ export function FoodOemDrafts() {
     <>
       <FoA />
       <QuickMenu accent="#1f6f46" cta="샘플 의뢰" tel="043-000-0000" />
+    </>
+  );
+}
+
+export function OnlineStoreDrafts() {
+  return useVariant("online-store") === "b" ? (
+    <>
+      <OsB />
+      <QuickMenu accent="#9a5a33" cta="공방 문의" tel="031-000-0000" />
+    </>
+  ) : (
+    <>
+      <OsA />
+      <QuickMenu accent="#1c1a17" cta="공방 문의" tel="031-000-0000" />
+    </>
+  );
+}
+
+export function PresaleDrafts() {
+  return useVariant("presale") === "b" ? (
+    <>
+      <PsB />
+      <QuickMenu accent="#a8874a" cta="분양문의" tel="1600-0000" />
+    </>
+  ) : (
+    <>
+      <PsA />
+      <QuickMenu accent="#173a6b" cta="분양문의" tel="1600-0000" />
+    </>
+  );
+}
+
+export function FlowerExpoDrafts() {
+  return useVariant("flower-expo") === "b" ? (
+    <>
+      <FxB />
+      <QuickMenu accent="#d9412f" cta="축제 안내" tel="041-000-0000" />
+    </>
+  ) : (
+    <>
+      <FxA />
+      <QuickMenu accent="#d6336c" cta="축제 안내" tel="031-000-0000" />
     </>
   );
 }

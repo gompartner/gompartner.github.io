@@ -7,7 +7,7 @@ import { fitDescription } from "@/lib/seo";
 
 // 데모를 각각 따로 불러와, 데모 하나를 열 때 다른 데모 코드까지 받지 않게 한다.
 const AccessibilityDemo = dynamic(() => import("@/components/demos/AccessibilityDemo").then((m) => m.AccessibilityDemo));
-const OnlineStoreDemo = dynamic(() => import("@/components/demos/OnlineStoreDemo").then((m) => m.OnlineStoreDemo));
+const OnlineStoreDrafts = dynamic(() => import("@/components/drafts/Drafts").then((m) => m.OnlineStoreDrafts));
 const PensionDrafts = dynamic(() => import("@/components/drafts/Drafts").then((m) => m.PensionDrafts));
 const CompanyDemo = dynamic(() => import("@/components/demos/CompanyDemo").then((m) => m.CompanyDemo));
 const CertLabDrafts = dynamic(() => import("@/components/drafts/Drafts").then((m) => m.CertLabDrafts));
@@ -23,7 +23,7 @@ const ClinicReportDemo = dynamic(() => import("@/components/demos/ClinicReportDe
 const CommunityMapDemo = dynamic(() => import("@/components/demos/CommunityMapDemo").then((m) => m.CommunityMapDemo));
 const ExcelAutomationDemo = dynamic(() => import("@/components/demos/ExcelAutomationDemo").then((m) => m.ExcelAutomationDemo));
 const DistrictPortalDemo = dynamic(() => import("@/components/demos/DistrictPortalDemo").then((m) => m.DistrictPortalDemo));
-const FlowerExpoDemo = dynamic(() => import("@/components/demos/FlowerExpoDemo").then((m) => m.FlowerExpoDemo));
+const FlowerExpoDrafts = dynamic(() => import("@/components/drafts/Drafts").then((m) => m.FlowerExpoDrafts));
 const HanokCafeDrafts = dynamic(() => import("@/components/drafts/Drafts").then((m) => m.HanokCafeDrafts));
 const FoodDrafts = dynamic(() => import("@/components/drafts/Drafts").then((m) => m.FoodDrafts));
 const InteriorDrafts = dynamic(() => import("@/components/drafts/Drafts").then((m) => m.InteriorDrafts));
@@ -71,7 +71,7 @@ const PatentDrafts = dynamic(() => import("@/components/drafts/Drafts").then((m)
 const FamilyLawDrafts = dynamic(() => import("@/components/drafts/Drafts").then((m) => m.FamilyLawDrafts));
 const VisaDrafts = dynamic(() => import("@/components/drafts/Drafts").then((m) => m.VisaDrafts));
 const ArchitectDrafts = dynamic(() => import("@/components/drafts/Drafts").then((m) => m.ArchitectDrafts));
-const PresaleDemo = dynamic(() => import("@/components/demos/PresaleDemo").then((m) => m.PresaleDemo));
+const PresaleDrafts = dynamic(() => import("@/components/drafts/Drafts").then((m) => m.PresaleDrafts));
 const SaasDrafts = dynamic(() => import("@/components/drafts/Drafts").then((m) => m.SaasDrafts));
 const LogisticsDrafts = dynamic(() => import("@/components/drafts/Drafts").then((m) => m.LogisticsDrafts));
 const FoodOemDrafts = dynamic(() => import("@/components/drafts/Drafts").then((m) => m.FoodOemDrafts));
@@ -95,7 +95,7 @@ const demoComponents: Record<string, ComponentType> = {
   interior: InteriorDrafts,
   academy: AcademyDrafts,
   "pilates-studio": PilatesDrafts,
-  "flower-expo": FlowerExpoDemo,
+  "flower-expo": FlowerExpoDrafts,
   "bakery-cafe": BakeryCafeDrafts,
   "app-academy": AppAcademyDemo,
   "app-pilates": AppPilatesDemo,
@@ -109,7 +109,7 @@ const demoComponents: Record<string, ComponentType> = {
   "landing-zine-fair": LandingZineFairDemo,
   "landing-leather-class": LandingLeatherClassDemo,
   pharmacy: PharmacyDrafts,
-  "online-store": OnlineStoreDemo,
+  "online-store": OnlineStoreDrafts,
   pension: PensionDrafts,
   company: CompanyDemo,
   "cert-lab": CertLabDrafts,
@@ -152,7 +152,7 @@ const demoComponents: Record<string, ComponentType> = {
   "family-law": FamilyLawDrafts,
   "visa-agent": VisaDrafts,
   "architect-office": ArchitectDrafts,
-  "presale": PresaleDemo,
+  "presale": PresaleDrafts,
   "saas-startup": SaasDrafts,
   "logistics": LogisticsDrafts,
   "food-oem": FoodOemDrafts,

@@ -192,6 +192,18 @@ export const VARIANTS: Record<string, { id: string; label: string }[]> = {
     { id: "a", label: "시안 A 소스 OEM" },
     { id: "b", label: "시안 B 건강식품" },
   ],
+  "online-store": [
+    { id: "a", label: "시안 A 상품 진열" },
+    { id: "b", label: "시안 B 공방 이야기" },
+  ],
+  presale: [
+    { id: "a", label: "시안 A 분양 정보" },
+    { id: "b", label: "시안 B 프리미엄" },
+  ],
+  "flower-expo": [
+    { id: "a", label: "시안 A 축제 안내" },
+    { id: "b", label: "시안 B 개화 현황" },
+  ],
   "clinic-homepage": [
     { id: "a", label: "시안 A 미니멀" },
     { id: "b", label: "시안 B 진료 안내형" },
