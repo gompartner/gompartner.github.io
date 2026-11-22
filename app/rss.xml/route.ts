@@ -15,7 +15,7 @@ export function GET() {
   const xml = `<?xml version="1.0" encoding="UTF-8"?>
 <rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
 <channel>
-<title>곰파트너 인사이트와 웹 지식</title>
+<title>곰파트너 웹 지식</title>
 <link>${siteUrl}/knowledge</link>
 <atom:link href="${siteUrl}/rss.xml" rel="self" type="application/rss+xml"/>
 <description>홈페이지 유지보수, 보안, 검색, 인프라 실무 글과 연도별 웹 트렌드 문서</description>

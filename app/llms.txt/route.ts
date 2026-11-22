@@ -63,7 +63,7 @@ ${landingPlans.map((p) => `- ${plain(p.title)}: ${plain(p.summary)}. ${plain(p.i
 ${topics().map((t) => `- [${plain(t.label)}](${url(`/knowledge/${t.id}`)}): ${plain(t.desc)}`).join("\n")}
 - [화면 예시](${url("/knowledge/screens")}): 페이지 종류별 와이어프레임
 - [시안 작업](${url("/knowledge/drafts")}): 업종별 시안 두 장 비교
-- [운영 노트](${url("/knowledge/notes")}): 인사이트 글 목록
+- [운영 노트](${url("/knowledge/notes")}): 실제 사례와 점검 글 목록
 
 웹 지식 문서(차트와 연표, 출처, 넘겨받을 때 확인 사항, 곰파트너 전망이 들어 있습니다):
 
@@ -73,7 +73,7 @@ ${trendDocs.map((d) => `- [${plain(d.title)}](${url(d.href)}): ${plain(d.desc)}`
 
 ${termGroups.map((g) => `- [${plain(g.title)}](${url(termHref(g))}): ${g.terms.map((t) => plain(t.name)).join(", ")}`).join("\n")}
 
-## 인사이트
+## 운영 노트
 
 운영과 유지보수, 보안 경보 대응을 실제 인수 경험으로 정리한 글입니다.
 
@@ -84,7 +84,7 @@ ${insights.map((n) => `- [${plain(n.title)}](${url(`/insight/${n.slug}`)}) (${n.
 ${principles.map((p) => `- ${plain(p.title)}: ${plain(p.body)}`).join("\n")}
 - 경력 확인: 공공기관, 대학, 기업 홈페이지와 앱 제작, 운영 경력. 요청 시 한국소프트웨어산업협회 소프트웨어기술자 경력증명서로 확인
 - 카탈로그: 사이트의 카탈로그는 상담 때 보여 드리는 업종별 화면 견본입니다. 고객에게 납품한 결과물은 비밀유지 원칙에 따라 고객 동의 없이 공개하지 않으며, 상담 때 경력증명서와 함께 설명합니다.
-- 금액 기준: 월 유지보수는 월 9만 원부터, 오류 수정은 원인 확인 뒤 건별로 금액을 먼저 안내합니다(부가세 별도). 다른 업체 가격을 비교한 인사이트 글의 금액은 곰파트너 가격이 아닙니다.
+- 금액 기준: 월 유지보수는 월 9만 원부터, 오류 수정은 원인 확인 뒤 건별로 금액을 먼저 안내합니다(부가세 별도). 다른 업체 가격을 비교한 운영 노트의 금액은 곰파트너 가격이 아닙니다.
 
 ## 자주 묻는 질문
 
