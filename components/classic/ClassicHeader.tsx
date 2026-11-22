@@ -6,6 +6,7 @@ import { NavLink } from "@/components/classic/NavLink";
 import { usePathname } from "next/navigation";
 import { useEffect, useRef, useState } from "react";
 import { ChevronDown, Menu, Search, X } from "lucide-react";
+import { ThemeToggle } from "@/components/classic/ThemeToggle";
 import { cases } from "@/data/classic/cases";
 import { cn } from "@/lib/utils";
 
@@ -110,7 +111,7 @@ export function ClassicHeader() {
   // 휴대폰 메뉴: 열면 첫 항목으로 초점, Tab은 메뉴 버튼과 메뉴 안에서만 돌고, Esc는 닫고 메뉴 버튼으로 돌아간다
   useEffect(() => {
     if (!open) return;
-    const links = () => [menuBtn.current, ...Array.from(panel.current?.querySelectorAll<HTMLElement>("a[href]") ?? [])].filter((el): el is HTMLElement => !!el);
+    const links = () => [menuBtn.current, ...Array.from(panel.current?.querySelectorAll<HTMLElement>("a[href], button") ?? [])].filter((el): el is HTMLElement => !!el);
     links()[1]?.focus();
     const onKey = (e: KeyboardEvent) => {
       if (e.key === "Escape") {
@@ -158,7 +159,7 @@ export function ClassicHeader() {
     // sticky는 문서 흐름 안에 있어 맨 위에서는 제목을 덮지 않는다. 본문 위 여백(pt-16, md:pt-[76px])도 같이 뺐다.
     <header className={cn(tablet ? "relative" : "sticky", "top-0 z-50 bg-white")}>
       <div className="border-b border-[#e6e9ee]">
-        <nav aria-label="주 메뉴" className="mx-auto flex h-16 w-full max-w-[1248px] items-center justify-between gap-6 px-4 md:h-[76px] md:px-6">
+        <nav aria-label="주 메뉴" className="mx-auto flex h-16 w-full max-w-[1248px] items-center justify-between gap-2 px-4 md:h-[76px] md:gap-6 md:px-6">
           <Link href="/" className="flex shrink-0 items-center gap-2.5 text-[21px] font-[800] tracking-[-0.04em] text-[#15171c]">
             {/* 11-04 곰 얼굴 다시(11-01에 메뉴가 늘어 뺐던 것). 채널 프로필과 같은 곰 */}
             <Image src="/images/bear-avatar.webp" alt="" width={32} height={32} className="h-8 w-8 rounded-full object-cover" />
@@ -254,10 +255,11 @@ export function ClassicHeader() {
               href="/search"
               aria-label="통합검색"
               aria-current={pathname === "/search" ? "page" : undefined}
-              className="grid h-11 w-11 place-items-center rounded-md text-[#15171c] transition-colors hover:bg-[#f1f3f6] xl:hidden"
+              className="hidden h-11 w-11 place-items-center rounded-md text-[#15171c] transition-colors hover:bg-[#f1f3f6] min-[360px]:grid xl:hidden"
             >
               <Search size={21} aria-hidden />
             </Link>
+            <ThemeToggle className="hidden h-11 w-11 place-items-center rounded-md text-[#15171c] transition-colors hover:bg-[#f1f3f6] lg:grid" />
             {/* 휴대폰과 태블릿은 작게, PC는 크게. 같은 버튼 하나를 폭에 따라 줄인다 */}
             <Link
               href="/contact"
@@ -287,6 +289,10 @@ export function ClassicHeader() {
 
       {open && (
         <nav id="classic-menu" ref={panel} aria-label="전체 메뉴" className="fixed inset-x-0 bottom-0 top-16 overflow-y-auto bg-white px-4 pb-10 md:top-[77px] lg:hidden">
+          {/* 11-22 좁은 화면(360px 미만)은 머리글 돋보기를 빼므로 메뉴 맨 위에 통합검색을 둔다 */}
+          <Link href="/search" className="mt-4 flex h-12 items-center gap-2 rounded-md border border-[#d9dee5] px-4 text-[15px] text-[#5b6370] min-[360px]:hidden">
+            <Search size={18} aria-hidden /> 통합검색
+          </Link>
           {classicMenu.map((m) => (
             <section key={m.label} className="border-b border-[#e6e9ee] py-4">
               <Link href={m.href} aria-current={pathname === m.href ? "page" : undefined} className="text-[18px] font-[800] tracking-[-0.02em] text-[#15171c]">
@@ -317,6 +323,7 @@ export function ClassicHeader() {
           <Link href="/contact" className="mt-6 flex h-12 items-center justify-center rounded-md bg-[#256ef4] text-[16px] font-bold text-white">
             상담 신청
           </Link>
+          <ThemeToggle withLabel className="mt-3 flex h-12 w-full items-center justify-center gap-2 rounded-md border border-[#d9dee5] text-[15px] font-bold text-[#15171c]" />
         </nav>
       )}
     </header>

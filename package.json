@@ -7,7 +7,7 @@
     "build": "next build",
     "start": "next start",
     "lint": "eslint",
-    "prebuild": "node scripts/blog-links.mjs",
+    "prebuild": "node scripts/blog-links.mjs && node scripts/dark-css.mjs > app/classic-dark.css",
     "postbuild": "node scripts/check-pages.mjs"
   },
   "dependencies": {

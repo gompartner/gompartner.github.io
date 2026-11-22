@@ -68,6 +68,8 @@ export const metadata: Metadata = {
   },
 };
 
+const themeScript = `(function(){try{var m=matchMedia("(prefers-color-scheme: dark)"),t=localStorage.getItem("gp-theme");document.documentElement.classList.toggle("gp-dark",t?t==="dark":m.matches);m.addEventListener("change",function(e){if(!localStorage.getItem("gp-theme"))document.documentElement.classList.toggle("gp-dark",e.matches)})}catch(e){}})();`;
+
 export default function RootLayout({
   children,
 }: Readonly<{
@@ -81,6 +83,8 @@ export default function RootLayout({
       suppressHydrationWarning
     >
       <body className="min-h-screen bg-background text-foreground antialiased">
+        {/* 11-22 다크모드: 저장한 선택(gp-theme)이 없으면 기기 설정을 따른다. 그리기 전에 html에 dark를 붙인다 */}
+        <script dangerouslySetInnerHTML={{ __html: themeScript }} />
         {/* 클래식 보기를 골랐으면 웹툰 화면을 그리기 전에 클래식 주소로 옮긴다 */}
         <script dangerouslySetInnerHTML={{ __html: lookRedirectScript }} />
         {/* 처음 들어온 곳(utm, 바깥 이전 페이지)을 기억해 상담 신청서에 함께 보낸다 */}

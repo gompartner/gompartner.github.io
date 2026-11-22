@@ -395,7 +395,7 @@ export function relatedOf(href: string, limit = 6): TreeNode[] {
 }
 
 /** 최근 수정된 문서. 인사이트는 글 날짜에서 자동으로, 나머지는 더한 날 직접 적는다(지어내지 않기) */
-const manualLog: { date: string; kind: string; title: string; href: string }[] = [
+export const manualLog: { date: string; kind: string; title: string; href: string }[] = [
   { date: "2026-11-22", kind: "개발", title: "만드는 도구(CMS) 비교: CMS란, 설치형과 임대형 추가", href: "/knowledge/cms" },
   { date: "2026-11-22", kind: "인프라", title: "서버 인프라: 온프레미스에서 클라우드, 프라이빗 클라우드까지", href: "/knowledge/infra-cloud" },
   { date: "2026-11-22", kind: "검색", title: "검색 최적화의 역사: 디렉터리 등록에서 SEO, GEO까지", href: "/knowledge/search-optimization" },
