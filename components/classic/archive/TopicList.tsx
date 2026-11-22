@@ -46,7 +46,7 @@ export function TopicList({ rows, kinds }: { rows: TopicRow[]; kinds: string[] }
         <div className="mb-5 max-w-[820px]">
           <p className="flex flex-wrap items-baseline gap-x-3 text-[14px] text-[#3d4450]">
             <b className="text-[15px] font-[800] text-[#15171c]">{docs.length}개 중 {done}개 읽음</b>
-            {changed ? <span className="font-bold text-[#1d5fd6]">읽은 뒤 바뀐 문서 {changed}개</span> : null}
+            {changed ? <span className="font-bold text-[#1d5fd6]">업데이트 {changed}개</span> : null}
           </p>
           <div aria-hidden className="mt-2 h-[6px] overflow-hidden rounded-full bg-[#e6e9ee]">
             <div className="h-full rounded-full bg-[#17734a]" style={{ width: `${Math.round((done / Math.max(1, docs.length)) * 100)}%` }} />

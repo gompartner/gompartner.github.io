@@ -1,6 +1,6 @@
 import Link from "next/link";
 import { ChevronDown, ChevronRight, Home, Search } from "lucide-react";
-import { docChanges, docUpdated, kindOf, kinds, topicOf, topics, type Topic, type TreeNode } from "@/data/classic/archive";
+import { docUpdated, kindOf, kinds, topicOf, topics, type Topic, type TreeNode } from "@/data/classic/archive";
 import { ReadMark } from "@/components/classic/archive/ReadMark";
 import { ReadTracker } from "@/components/classic/archive/ReadTracker";
 import { LdScript } from "@/components/seo/JsonLd";
@@ -182,7 +182,7 @@ export function ArchiveShell({ section, active, crumbs, toc, article, children }
             ))}
           </ol>
         </nav>
-        {isDoc ? <ReadTracker href={active} ver={docUpdated(active) ?? article?.modified} changes={docChanges[active]} /> : null}
+        {isDoc ? <ReadTracker href={active} ver={docUpdated(active) ?? article?.modified} /> : null}
         {children}
       </div>
 

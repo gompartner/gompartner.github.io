@@ -246,8 +246,3 @@ input[type="time"]::-webkit-date-and-time-value {
 /* 첫 화면 서비스 슬라이드 진행 막대 */
 @keyframes hero-progress { from { width: 0% } to { width: 100% } }
 
-/* 11-22 웹 지식: 읽은 뒤 바뀐 절을 본문에서 바로 칠한다(ReadTracker) */
-[data-changed-block] { background: #eef4ff; box-shadow: 0 0 0 12px #eef4ff; }
-[data-changed-block] + [data-changed-block] { box-shadow: 0 -14px 0 12px #eef4ff; }
-[data-changed-toc] { border-left-color: #256ef4 !important; color: #1d5fd6 !important; font-weight: 700; }
-[data-changed-toc]::after { content: ""; display: inline-block; width: 6px; height: 6px; margin-left: 6px; border-radius: 9999px; background: #256ef4; vertical-align: middle; }

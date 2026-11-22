@@ -419,11 +419,6 @@ export function docUpdated(href: string): string | undefined {
   return manualLog.filter((l) => l.href === href).map((l) => l.date).sort().pop();
 }
 
-/** 11-22 문서 안에서 바뀐 곳(id는 그 문서의 h2 id). 고친 날 직접 적는다. 읽은 뒤 바뀐 곳으로 안내한다 */
-export const docChanges: Record<string, { date: string; id?: string; text: string }[]> = {
-  "/knowledge/cms": [{ date: "2026-11-22", id: "intro", text: "CMS란, 설치형과 임대형 비교표 추가" }],
-};
-
 export function recentLog(limit = 8) {
   const fromNotes = insights.map((n) => ({ date: n.updated ?? n.date, kind: topicOf(`/insight/${n.slug}`)?.label ?? "운영 노트", title: n.title, href: `/insight/${n.slug}` }));
   return [...manualLog, ...fromNotes].sort((a, b) => b.date.localeCompare(a.date)).slice(0, limit);
