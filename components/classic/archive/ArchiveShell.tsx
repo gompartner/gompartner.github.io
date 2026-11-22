@@ -9,6 +9,7 @@ import { siteUrl } from "@/lib/site";
 
 // 웹 지식 공용 틀(11-21 컨플루언스식): 사이트 머리글 아래, 왼쪽 공간 이름과 주제 페이지 트리, 가운데 문서, 오른쪽 목차.
 // 태블릿(손가락 입력, 768 이상)은 머리 메뉴가 고정되지 않으므로 트리와 목차를 위 5칸만 띄운다.
+// 11-22 sidebar, breadcrumbs 클래스는 브라우저 읽기 모드(Readability)가 트리, 목차, 위치 표시를 본문에서 빼게 하는 표시다. 지우지 않는다.
 // 위치 표시는 "웹 지식 > 주제 > 문서"로 자동으로 만든다(주제는 트리에서 찾음). 색과 글꼴은 사이트 톤 그대로.
 
 export type Crumb = { href: string; label: string };
@@ -112,7 +113,7 @@ export function ArchiveShell({ section, active, crumbs, toc, article, children }
   if (last && last.href !== "/knowledge") trail.push(last);
   return (
     <div className={`mx-auto grid w-full max-w-[1248px] md:px-6 lg:min-h-[calc(100vh-4.75rem)] lg:grid-cols-[250px_minmax(0,1fr)] ${toc && toc.length > 0 ? "xl:grid-cols-[250px_minmax(0,1fr)_180px]" : ""}`}>
-      <aside className="hidden border-r border-[#e6e9ee] bg-[#fafbfc] pb-12 pr-3 pt-5 lg:block">
+      <aside className="sidebar hidden border-r border-[#e6e9ee] bg-[#fafbfc] pb-12 pr-3 pt-5 lg:block">
         <div className="sticky top-24 max-h-[calc(100vh-7rem)] overflow-y-auto overscroll-contain pl-1 pr-1 [@media(pointer:coarse)_and_(min-width:768px)]:top-5 [@media(pointer:coarse)_and_(min-width:768px)]:max-h-[calc(100vh-2.5rem)]">
           <Tree topicId={topic?.id} active={active} />
         </div>
@@ -125,7 +126,7 @@ export function ArchiveShell({ section, active, crumbs, toc, article, children }
           <LdScript data={{ "@context": "https://schema.org", "@type": "Article", headline: article.title, description: article.description, datePublished: article.published ?? "2026-11-21", dateModified: article.modified, author: { "@id": ORG_ID }, publisher: { "@id": ORG_ID }, mainEntityOfPage: `${siteUrl}${active}`, inLanguage: "ko", ...((article.image ?? pageCardUrl(active)) ? { image: [`${siteUrl}${article.image ?? pageCardUrl(active)}`] } : {}) }} />
         ) : null}
         {/* 11-22 휴대폰 메뉴: 주제는 두 칸 버튼, 지금 주제의 문서는 읽음 표시와 함께 */}
-        <details className="mb-5 rounded-md border border-[#d9dee5] lg:hidden">
+        <details className="sidebar mb-5 rounded-md border border-[#d9dee5] lg:hidden">
           <summary className="flex min-h-[48px] cursor-pointer list-none items-center justify-between gap-3 px-3.5 text-[14.5px] font-bold text-[#3d4450]">
             <span>웹 지식 메뉴</span>
             <span className="flex items-center gap-1.5 text-[#256ef4]">{topic?.label ?? "주제 고르기"}<ChevronDown size={16} aria-hidden /></span>
@@ -165,7 +166,7 @@ export function ArchiveShell({ section, active, crumbs, toc, article, children }
           </div>
         </details>
 
-        <nav aria-label="현재 위치">
+        <nav aria-label="현재 위치" className="breadcrumbs">
           <ol className="flex flex-wrap items-center gap-1.5 text-[13.5px] leading-[20px] text-[#5b6370]">
             <li className="inline-flex items-center">
               <Link href="/" aria-label="처음" className="-m-1.5 inline-flex items-center p-1.5 hover:text-[#15171c]">
@@ -183,11 +184,12 @@ export function ArchiveShell({ section, active, crumbs, toc, article, children }
           </ol>
         </nav>
         {isDoc ? <ReadTracker href={active} ver={docUpdated(active) ?? article?.modified} /> : null}
-        {children}
+        {/* 11-22 글 문서(article 값이 있는 페이지)는 본문을 article로 감싸 브라우저 읽기 모드가 본문을 찾게 한다 */}
+        {article ? <article>{children}</article> : children}
       </div>
 
       {toc && toc.length > 0 ? (
-        <aside className="hidden px-5 pt-10 xl:block">
+        <aside className="sidebar hidden px-5 pt-10 xl:block">
           <div className="sticky top-24 [@media(pointer:coarse)_and_(min-width:768px)]:top-5">
             <p className="mb-2.5 text-[12px] font-[800] text-[#6b7380]">이 페이지</p>
             <ul role="list">
