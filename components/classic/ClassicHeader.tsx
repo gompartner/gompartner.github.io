@@ -78,7 +78,7 @@ export function ClassicHeader() {
   // 키보드로 메뉴 안에 들어오면 하위 항목을 연다(초점이 메뉴 밖으로 나가거나 Esc를 누르면 닫는다)
   const [kb, setKb] = useState(false);
   const menuBtn = useRef<HTMLButtonElement>(null);
-  const panel = useRef<HTMLDivElement>(null);
+  const panel = useRef<HTMLElement>(null);
   const escaped = useRef(false);
   const [prev, setPrev] = useState(pathname);
   if (prev !== pathname) {
@@ -137,6 +137,13 @@ export function ClassicHeader() {
     mq.addEventListener("change", on);
     return () => mq.removeEventListener("change", on);
   }, []);
+  // 11-22 휴대폰 메뉴가 열려 있으면 뒤 화면(본문, 바닥글)을 inert로 막아 화면 읽기 프로그램이 메뉴 뒤 내용을 읽지 않게 한다
+  useEffect(() => {
+    if (!open) return;
+    const back = Array.from(document.querySelectorAll<HTMLElement>("#main, body > footer, footer[role=contentinfo], body footer")).filter((el) => !el.closest("header"));
+    back.forEach((el) => el.setAttribute("inert", ""));
+    return () => back.forEach((el) => el.removeAttribute("inert"));
+  }, [open]);
   useEffect(() => {
     document.body.style.overflow = open ? "hidden" : "";
     return () => {
@@ -277,7 +284,7 @@ export function ClassicHeader() {
       </div>
 
       {open && (
-        <div id="classic-menu" ref={panel} className="fixed inset-x-0 bottom-0 top-16 overflow-y-auto bg-white px-4 pb-10 md:top-[77px] lg:hidden">
+        <nav id="classic-menu" ref={panel} aria-label="전체 메뉴" className="fixed inset-x-0 bottom-0 top-16 overflow-y-auto bg-white px-4 pb-10 md:top-[77px] lg:hidden">
           {classicMenu.map((m) => (
             <section key={m.label} className="border-b border-[#e6e9ee] py-4">
               <Link href={m.href} aria-current={pathname === m.href ? "page" : undefined} className="text-[18px] font-[800] tracking-[-0.02em] text-[#15171c]">
@@ -308,7 +315,7 @@ export function ClassicHeader() {
           <Link href="/contact" className="mt-6 flex h-12 items-center justify-center rounded-md bg-[#256ef4] text-[16px] font-bold text-white">
             상담 신청
           </Link>
-        </div>
+        </nav>
       )}
     </header>
   );
