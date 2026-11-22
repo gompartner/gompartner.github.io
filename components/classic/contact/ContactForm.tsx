@@ -61,6 +61,8 @@ export function ContactForm() {
   const couponLine = promo === "kakao" ? `카카오톡 채널 쿠폰(첫 달 유지보수 50% 할인)${serial ? ` 번호 ${serial}` : ""}\n홈페이지 주소: ` : "";
   const [message, setMessage] = useState(couponLine || (site || promo === "php" || promo === "takeover" ? `${promoLabel}: ${site}` : msg));
   const [agree, setAgree] = useState(false);
+  // 11-22 마케팅 정보 수신 선택 동의. 동의하지 않아도 신청은 된다.
+  const [marketing, setMarketing] = useState(false);
   const [website, setWebsite] = useState("");
   const [errors, setErrors] = useState<Record<string, string>>({});
   const [status, setStatus] = useState<Status>({ kind: "idle" });
@@ -107,6 +109,7 @@ export function ContactForm() {
       currentSite: currentSite.trim(),
       message: message.trim(),
       agree,
+      marketing: marketing ? "동의" : "미동의",
       ...readAttribution(),
       page: window.location.href,
       startedAt: startedAt.current,
@@ -264,6 +267,25 @@ export function ContactForm() {
           </ul>
         </details>
         {errors.agree && <p id="cc-agree-err" className={err}>{errors.agree}</p>}
+
+        <div className="mt-6 flex items-start gap-3">
+          <input id="cc-marketing" type="checkbox" checked={marketing} onChange={(e) => setMarketing(e.target.checked)} className="mt-1 h-5 w-5 shrink-0 accent-[#256ef4]" />
+          <label htmlFor="cc-marketing" className="text-[16px] font-bold leading-[1.6]">
+            마케팅 정보 수신에 동의합니다. <span className={opt}>(선택)</span>
+          </label>
+        </div>
+        <details className="group mt-3 rounded-md border border-[#e6e9ee] bg-[#f6f7f9] px-4 py-3 text-[15px] leading-[1.6] text-[#5b6370]">
+          <summary className="flex cursor-pointer list-none items-center gap-1 font-bold text-[#3d4450] [&::-webkit-details-marker]:hidden">
+            자세히 보기
+            <ChevronDown size={16} className="transition-transform group-open:rotate-180 motion-reduce:transition-none" aria-hidden />
+          </summary>
+          <ul className="mt-2 space-y-1">
+            <li>수집 항목: 이름, 휴대폰 번호, 이메일(선택)</li>
+            <li>이용 목적: 새 서비스, 이벤트, 자료 안내(문자, 이메일)</li>
+            <li>보관 기간: 동의 철회 시까지</li>
+            <li>동의하지 않아도 상담 신청은 할 수 있습니다. 동의 후에도 언제든 철회할 수 있습니다.</li>
+          </ul>
+        </details>
       </div>
 
       {status.kind === "error" && (

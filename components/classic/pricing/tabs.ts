@@ -10,4 +10,4 @@ export const serviceTabs = [
 ];
 
 /** 유지보수 묶음 하위 탭: 전체 안내와 세부 4개(11-04) */
-export const maintenanceTabs = [{ href: "/maintenance", label: "전체" }, ...maintenanceServices.map((m) => ({ href: `/maintenance/${m.id}`, label: m.title }))];
+export const maintenanceTabs = [{ href: "/maintenance", label: "전체" }, ...maintenanceServices.map((m) => ({ href: `/maintenance/${m.id}`, label: m.title })), { href: "/maintenance/standard", label: "운영 기준" }];

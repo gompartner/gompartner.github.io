@@ -53,3 +53,6 @@ CLAUDE.md
 
 # Cloudflare 배포 도구 임시 파일
 .wrangler/
+
+# 빌드 때 만드는 운영 상태(scripts/ops-status.mjs)
+data/classic/ops-status.json
