@@ -1,6 +1,8 @@
 import Link from "next/link";
 import { ChevronDown, ChevronRight, Home, Search } from "lucide-react";
-import { kindOf, kinds, topicOf, topics, type Topic, type TreeNode } from "@/data/classic/archive";
+import { docChanges, docUpdated, kindOf, kinds, topicOf, topics, type Topic, type TreeNode } from "@/data/classic/archive";
+import { ReadMark } from "@/components/classic/archive/ReadMark";
+import { ReadTracker } from "@/components/classic/archive/ReadTracker";
 import { LdScript } from "@/components/seo/JsonLd";
 import { ORG_ID, breadcrumbLd, pageCardUrl } from "@/lib/seo";
 import { siteUrl } from "@/lib/site";
@@ -25,7 +27,7 @@ function TreeLinks({ items, active }: { items: TreeNode[]; active: string }) {
               className={`flex items-center justify-between gap-2 rounded-md px-2.5 py-1.5 text-[13.5px] leading-[1.45] ${n.href === active ? "bg-[#eef3ff] font-[800] text-[#256ef4]" : "text-[#3d4450] hover:bg-[#eef1f5]"}`}
             >
               <span className="line-clamp-2">{n.label}</span>
-              {n.count ? <span className="text-[12px] font-semibold text-[#6b7380]">{n.count}</span> : null}
+              {n.count ? <span className="text-[12px] font-semibold text-[#6b7380]">{n.count}</span> : <ReadMark href={n.href} ver={docUpdated(n.href)} />}
             </Link>
           ) : (
             <p className="flex items-center justify-between px-2.5 py-1.5 text-[14px] font-bold text-[#15171c]">
@@ -104,6 +106,7 @@ export type DocLd = { title: string; description: string; published?: string; mo
 export function ArchiveShell({ section, active, crumbs, toc, article, children }: { section?: string; active: string; crumbs: Crumb[]; toc?: TocItem[]; article?: DocLd; children: React.ReactNode }) {
   const topic = topics().find((t) => t.id === section) ?? topicOf(active);
   const last = crumbs[crumbs.length - 1];
+  const isDoc = active !== "/knowledge" && !topics().some((t) => active === `/knowledge/${t.id}`);
   const trail: Crumb[] = [{ href: "/knowledge", label: "웹 지식" }];
   if (topic && active !== `/knowledge/${topic.id}`) trail.push({ href: `/knowledge/${topic.id}`, label: topic.label });
   if (last && last.href !== "/knowledge") trail.push(last);
@@ -121,12 +124,44 @@ export function ArchiveShell({ section, active, crumbs, toc, article, children }
         {article ? (
           <LdScript data={{ "@context": "https://schema.org", "@type": "Article", headline: article.title, description: article.description, datePublished: article.published ?? "2026-11-21", dateModified: article.modified, author: { "@id": ORG_ID }, publisher: { "@id": ORG_ID }, mainEntityOfPage: `${siteUrl}${active}`, inLanguage: "ko", ...((article.image ?? pageCardUrl(active)) ? { image: [`${siteUrl}${article.image ?? pageCardUrl(active)}`] } : {}) }} />
         ) : null}
+        {/* 11-22 휴대폰 메뉴: 주제는 두 칸 버튼, 지금 주제의 문서는 읽음 표시와 함께 */}
         <details className="mb-5 rounded-md border border-[#d9dee5] lg:hidden">
-          <summary className="flex cursor-pointer list-none items-center justify-between px-3.5 py-3 text-[14.5px] font-bold text-[#3d4450]">
-            웹 지식 페이지 보기 <ChevronDown size={16} aria-hidden />
+          <summary className="flex min-h-[48px] cursor-pointer list-none items-center justify-between gap-3 px-3.5 text-[14.5px] font-bold text-[#3d4450]">
+            <span>웹 지식 메뉴</span>
+            <span className="flex items-center gap-1.5 text-[#256ef4]">{topic?.label ?? "주제 고르기"}<ChevronDown size={16} aria-hidden /></span>
           </summary>
-          <div className="border-t border-[#e6e9ee] px-2 pb-3 pt-3">
-            <Tree topicId={topic?.id} active={active} />
+          <div className="border-t border-[#e6e9ee] px-3 pb-3 pt-3">
+            <Link href="/search" className="mb-3 flex min-h-[44px] items-center gap-2 rounded-md border border-[#d9dee5] bg-white px-3 text-[14px] text-[#6b7380]">
+              <Search size={15} aria-hidden /> 이 공간에서 찾기
+            </Link>
+            <ul role="list" className="grid grid-cols-2 gap-1.5">
+              {topics().map((t) => (
+                <li key={t.id}>
+                  <Link href={`/knowledge/${t.id}`} aria-current={active === `/knowledge/${t.id}` ? "page" : undefined} className={`flex min-h-[44px] items-center rounded-md border px-3 text-[14px] font-bold ${t.id === topic?.id ? "border-[#256ef4] bg-[#eef3ff] text-[#1d5fd6]" : "border-[#e1e5eb] text-[#2b313b]"}`}>
+                    {t.label}
+                  </Link>
+                </li>
+              ))}
+            </ul>
+            {topic ? (
+              <div className="mt-4">
+                <p className="px-1 text-[12.5px] font-[800] text-[#6b7380]">{topic.label} 문서</p>
+                <div className="mt-1.5">
+                  {(() => {
+                    const all = flatTopic(topic);
+                    const head = all.length <= 10 ? all : all.slice(0, 8);
+                    const cur = all.find((n) => n.href === active);
+                    if (cur && !head.includes(cur)) head.push(cur);
+                    return (
+                      <>
+                        <TreeLinks items={head} active={active} />
+                        {all.length > head.length ? <Link href={`/knowledge/${topic.id}`} className="mt-0.5 block rounded-md px-2.5 py-2 text-[13.5px] font-bold text-[#1d5fd6]">전체 {all.length}개 보기</Link> : null}
+                      </>
+                    );
+                  })()}
+                </div>
+              </div>
+            ) : null}
           </div>
         </details>
 
@@ -147,6 +182,7 @@ export function ArchiveShell({ section, active, crumbs, toc, article, children }
             ))}
           </ol>
         </nav>
+        {isDoc ? <ReadTracker href={active} ver={docUpdated(active) ?? article?.modified} changes={docChanges[active]} /> : null}
         {children}
       </div>
 

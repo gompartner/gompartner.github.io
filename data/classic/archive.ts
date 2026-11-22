@@ -396,6 +396,7 @@ export function relatedOf(href: string, limit = 6): TreeNode[] {
 
 /** 최근 수정된 문서. 인사이트는 글 날짜에서 자동으로, 나머지는 더한 날 직접 적는다(지어내지 않기) */
 const manualLog: { date: string; kind: string; title: string; href: string }[] = [
+  { date: "2026-11-22", kind: "개발", title: "만드는 도구(CMS) 비교: CMS란, 설치형과 임대형 추가", href: "/knowledge/cms" },
   { date: "2026-11-22", kind: "인프라", title: "서버 인프라: 온프레미스에서 클라우드, 프라이빗 클라우드까지", href: "/knowledge/infra-cloud" },
   { date: "2026-11-22", kind: "검색", title: "검색 최적화의 역사: 디렉터리 등록에서 SEO, GEO까지", href: "/knowledge/search-optimization" },
   { date: "2026-11-22", kind: "검색", title: "AI가 쓰는 웹사이트: UX 다음의 AX, SEO 다음의 GEO", href: "/knowledge/ai-readable-web" },
@@ -411,6 +412,18 @@ const manualLog: { date: string; kind: string; title: string; href: string }[] =
   { date: "2026-11-21", kind: "디자인", title: "화면 예시: 페이지 종류별 와이어프레임", href: "/knowledge/screens" },
   { date: "2026-11-21", kind: "참고", title: "데이터 차트와 원본 CSV", href: "/knowledge/data" },
 ];
+/** 11-22 문서 최종 수정일(읽은 뒤 바뀌었는지 비교). 인사이트는 글 날짜, 나머지는 manualLog에서 가장 늦은 날 */
+export function docUpdated(href: string): string | undefined {
+  const n = href.startsWith("/insight/") ? insights.find((x) => `/insight/${x.slug}` === href) : undefined;
+  if (n) return n.updated ?? n.date;
+  return manualLog.filter((l) => l.href === href).map((l) => l.date).sort().pop();
+}
+
+/** 11-22 문서 안에서 바뀐 곳(id는 그 문서의 h2 id). 고친 날 직접 적는다. 읽은 뒤 바뀐 곳으로 안내한다 */
+export const docChanges: Record<string, { date: string; id?: string; text: string }[]> = {
+  "/knowledge/cms": [{ date: "2026-11-22", id: "intro", text: "CMS란, 설치형과 임대형 비교표 추가" }],
+};
+
 export function recentLog(limit = 8) {
   const fromNotes = insights.map((n) => ({ date: n.updated ?? n.date, kind: topicOf(`/insight/${n.slug}`)?.label ?? "운영 노트", title: n.title, href: `/insight/${n.slug}` }));
   return [...manualLog, ...fromNotes].sort((a, b) => b.date.localeCompare(a.date)).slice(0, limit);

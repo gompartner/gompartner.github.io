@@ -2,7 +2,7 @@ import type { Metadata } from "next";
 import { notFound } from "next/navigation";
 import { ArchiveShell, DocHead } from "@/components/classic/archive/ArchiveShell";
 import { TopicList, type TopicRow } from "@/components/classic/archive/TopicList";
-import { kindOf, kinds, topics } from "@/data/classic/archive";
+import { docUpdated, kindOf, kinds, topics } from "@/data/classic/archive";
 import { pageMeta } from "@/lib/seo";
 
 // 웹 지식 주제 페이지(부모 페이지). 11-22 묶음 제목 대신 종류 태그와 태그 필터
@@ -22,10 +22,12 @@ export default async function TopicPage({ params }: { params: Promise<{ topic: s
   const t = topics().find((x) => x.id === id);
   if (!t) notFound();
   const seen = new Set<string>();
+  // 묶음 제목이 종류 이름(문서, 도구)이면 태그로 충분하고, 주제 안 소분류(보안 경보, 관리 비용)면 두 번째 태그로 붙인다
+  const plain = new Set(["문서", "도구", "개발 도구", "운영 노트", "자료"]);
   const rows: TopicRow[] = t.groups
-    .flatMap((g) => g.items)
-    .filter((n) => (n.href ? !seen.has(n.href) && !!seen.add(n.href) : true))
-    .map((n) => ({ label: n.label, href: n.href, kind: kindOf(n.href), children: n.children?.map((c) => ({ label: c.label, href: c.href! })) }))
+    .flatMap((g) => g.items.map((n) => ({ n, group: plain.has(g.title) ? undefined : g.title })))
+    .filter(({ n }) => (n.href ? !seen.has(n.href) && !!seen.add(n.href) : true))
+    .map(({ n, group }) => ({ label: n.label, href: n.href, kind: kindOf(n.href), group, ver: n.href ? docUpdated(n.href) : undefined, children: n.children?.map((c) => ({ label: c.label, href: c.href! })) }))
     .sort((a, b) => kinds.indexOf(a.kind as never) - kinds.indexOf(b.kind as never));
   return (
     <ArchiveShell section={t.id} active={`/knowledge/${t.id}`} crumbs={[{ href: `/knowledge/${t.id}`, label: t.label }]}>

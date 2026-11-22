@@ -1,7 +1,8 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 import { ArchiveShell, DocHead, docH2 } from "@/components/classic/archive/ArchiveShell";
-import { recentLog, topics, type TreeNode } from "@/data/classic/archive";
+import { docUpdated, recentLog, topics, type TreeNode } from "@/data/classic/archive";
+import { ReadMark } from "@/components/classic/archive/ReadMark";
 import { pageMeta } from "@/lib/seo";
 
 // 웹 지식 공간 홈(11-21 컨플루언스식): 이 공간 안내, 상황별 시작점, 주제 표, 최근 수정된 문서
@@ -80,7 +81,7 @@ export default function KnowledgeHome() {
           <li key={i} className="border-b border-[#e6e9ee]">
             <Link href={l.href} className="group grid grid-cols-[88px_minmax(0,1fr)] gap-x-3 py-3 text-[15px] md:grid-cols-[100px_minmax(0,1fr)_120px]">
               <time dateTime={l.date} className="text-[13.5px] tabular-nums text-[#5b6370]">{l.date}</time>
-              <span className="font-bold leading-[1.5] group-hover:text-[#256ef4] group-hover:underline underline-offset-4">{l.title}</span>
+              <span className="flex items-start justify-between gap-2"><span className="font-bold leading-[1.5] group-hover:text-[#256ef4] group-hover:underline underline-offset-4">{l.title}</span><span className="mt-0.5"><ReadMark href={l.href} ver={docUpdated(l.href)} /></span></span>
               <span className="hidden text-right text-[13px] text-[#5b6370] md:block">{l.kind}</span>
             </Link>
           </li>
