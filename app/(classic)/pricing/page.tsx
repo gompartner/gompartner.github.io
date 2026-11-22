@@ -22,11 +22,11 @@ const section = "scroll-mt-20 border-t border-[#e6e9ee] md:scroll-mt-24";
 
 // 유지보수는 패키지 대신 시작 금액과 견적 방식
 const care = [
-  { href: "/maintenance/monthly", name: "월 유지보수", amount: "월 9만 원부터", note: "3개월 단위 계약, 월간 점검 보고서" },
-  { href: "/maintenance/fix", name: "오류 수정", amount: "원인 확인 뒤 견적", note: "금액을 먼저 안내하고, 동의 후 작업" },
-  { href: "/maintenance/update", name: "보안 업데이트", amount: "범위 확인 뒤 견적", note: "적용 범위와 금액, 작업 시간 안내" },
   { href: "/maintenance/takeover", name: "업체 변경", amount: "범위 확인 뒤 견적", note: "계정과 서버 확인 뒤 인수 범위 안내" },
   { href: "/maintenance/ai-site", name: "AI 사이트", amount: "인수 점검 뒤 견적", note: "공개 설정, DB 접근 규칙, 키 노출 점검 뒤 범위 안내" },
+  { href: "/maintenance/fix", name: "오류 수정", amount: "원인 확인 뒤 견적", note: "금액을 먼저 안내하고, 동의 후 작업" },
+  { href: "/maintenance/update", name: "보안 업데이트", amount: "범위 확인 뒤 견적", note: "적용 범위와 금액, 작업 시간 안내" },
+  { href: "/maintenance/monthly", name: "월 유지보수", amount: "월 9만 원부터", note: "3개월 단위 계약, 월간 점검 보고서" },
 ];
 
 const make = [
