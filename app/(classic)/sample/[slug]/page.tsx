@@ -37,7 +37,9 @@ export default async function ClassicSamplePage({ params }: Props) {
   const { slug } = await params;
   const p = findBySlug(slug);
   if (!p) notFound();
-  const est = estimateFor(p.id);
+  // 11-22 시안 A, B가 있는 업종(메인 한 장 디자인 제안)은 예전 데모 기능 기준 견적 대신 상담 안내를 둔다.
+  const isDraft = p.layout === "시안 2종";
+  const est = isDraft ? null : estimateFor(p.id);
   const concept = designConcepts[slug];
   const mobileShot = mobileShotOf(p);
   const ind = industryOf(p);
@@ -152,7 +154,19 @@ export default async function ClassicSamplePage({ params }: Props) {
         </div>
 
         <section aria-labelledby="c-price" className="min-w-0">
-          {est ? (
+          {isDraft ? (
+            <>
+              <h2 id="c-price" className="border-b-2 border-[#15171c] pb-3 text-[18px] font-[800] tracking-[-0.02em]">
+                구성
+              </h2>
+              <p className="mt-5 break-keep text-[16px] leading-[1.7] md:text-[17px]">
+                이 시안은 메인 화면입니다. 필요한 페이지와 기능(예약, 게시판 등)은 상담에서 정하고 견적서로 안내합니다.
+              </p>
+              <Link href="/pricing" className={`${more} mt-4 inline-flex min-h-11 items-center`}>
+                패키지별 비용 보기 <Plus size={15} strokeWidth={2.5} aria-hidden />
+              </Link>
+            </>
+          ) : est ? (
             <>
               <h2 id="c-price" className="border-b-2 border-[#15171c] pb-3 text-[18px] font-[800] tracking-[-0.02em]">
                 구성
@@ -193,11 +207,11 @@ export default async function ClassicSamplePage({ params }: Props) {
               </p>
             </>
           )}
-          <p className="mt-5 text-[15px] leading-[1.65] text-[#5b6370] md:text-[16px]">금액과 일정은 상담 신청 내용을 검토한 뒤 견적서로 안내합니다.</p>
+          {!isDraft && <p className="mt-5 text-[15px] leading-[1.65] text-[#5b6370] md:text-[16px]">금액과 일정은 상담 신청 내용을 검토한 뒤 견적서로 안내합니다.</p>}
 
           <div className="mt-8 grid gap-3">
             <Link href={`/contact?sample=${slug}`} data-gtm-cta={`classic_sample_contact_${p.id}`} className={btnPrimary}>
-              이 구성으로 상담
+              {isDraft ? "이 시안으로 상담" : "이 구성으로 상담"}
             </Link>
             <Link href={p.demoUrl} prefetch={false} data-gtm-cta={`classic_sample_open_${p.id}`} className={btnLine}>
               체험하기
