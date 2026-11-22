@@ -25,8 +25,8 @@ export function PageHead({ title, trail = [] }: { title: string; trail?: { href:
       <div className={`${wrap} pb-12 pt-10 md:pb-16 md:pt-14`}>
         <nav aria-label="현재 위치">
           <ol className="flex flex-wrap items-center gap-1.5 text-[14px] text-[#aebbd6]">
-            <li>
-              <Link href="/" aria-label="처음" className="-m-[14.5px] inline-flex p-[14.5px] hover:text-white">
+            <li className="flex items-center">
+              <Link href="/" aria-label="처음" className="-m-[14.5px] flex p-[14.5px] hover:text-white">
                 <Home size={15} aria-hidden />
               </Link>
             </li>
