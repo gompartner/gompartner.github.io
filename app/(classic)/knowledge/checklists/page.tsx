@@ -3,21 +3,20 @@ import Image from "next/image";
 import Link from "next/link";
 import { ArchiveShell, DocHead, docH2 } from "@/components/classic/archive/ArchiveShell";
 import { jaryo } from "@/data/classic/jaryo";
-import { toolCategories, tools } from "@/data/classic/tools";
 import { pageMeta } from "@/lib/seo";
 
-// 점검표와 도구. 점검표 상세(/jaryo/<id>)와 도구(/tools/...) 주소는 그대로. 인스타 '자료' DM으로 들어오는 /jaryo 는 여기로 넘긴다.
+// 점검표. 점검표 상세(/jaryo/<id>) 주소는 그대로. 11-22 무료 도구는 내리고 사이트 지킴이로 잇는다. 인스타 '자료' DM으로 들어오는 /jaryo 는 여기로 넘긴다.
 export const metadata: Metadata = pageMeta({
-  title: "점검표와 도구 | 웹 지식",
-  description: "홈페이지 견적 질문지, 점검표, 넘겨받은 날 기록표와 매달 점검표, 개인정보처리방침 생성기 같은 무료 도구입니다.",
+  title: "점검표와 기록표 | 웹 지식",
+  description: "홈페이지 견적 질문지, 넘겨받은 날 기록표, 매달 점검표를 휴대폰으로 보고 PDF로 내려받습니다.",
   path: "/knowledge/checklists",
-  image: { src: "/og/jaryo.jpg", alt: "곰파트너 점검표와 도구" },
+  image: { src: "/og/jaryo.jpg", alt: "곰파트너 점검표와 기록표" },
 });
 
 export default function ArchiveChecklists() {
   return (
-    <ArchiveShell section="checklists" active="/knowledge/checklists" crumbs={[{ href: "/knowledge", label: "웹 지식" }, { href: "/knowledge/checklists", label: "점검표와 도구" }]} toc={[{ id: "sheets", label: "점검표와 기록표" }, { id: "tools", label: "무료 도구" }]}>
-      <DocHead title="점검표와 도구" meta={[["점검표", `${jaryo.length}종`], ["도구", `${tools.length}종`]]} lead="휴대폰으로 열어 보고 PDF로 내려받을 수 있습니다. 도구는 설치 없이 바로 씁니다." />
+    <ArchiveShell section="checklists" active="/knowledge/checklists" crumbs={[{ href: "/knowledge", label: "웹 지식" }, { href: "/knowledge/checklists", label: "점검표와 기록표" }]} toc={[{ id: "sheets", label: "점검표와 기록표" }, { id: "watch", label: "사이트 감시" }]}>
+      <DocHead title="점검표와 기록표" meta={[["점검표", `${jaryo.length}종`]]} lead="휴대폰으로 열어 보고 PDF로 내려받을 수 있습니다." />
       <h2 id="sheets" className={docH2}>점검표와 기록표</h2>
       <ul role="list" className="mt-4 grid gap-3 sm:grid-cols-2 xl:grid-cols-3">
         {jaryo.map((it, i) => (
@@ -35,21 +34,10 @@ export default function ArchiveChecklists() {
           </li>
         ))}
       </ul>
-      <h2 id="tools" className={docH2}>무료 도구</h2>
-      <div className="mt-4 grid grid-cols-2 gap-x-4 gap-y-7 md:grid-cols-3">
-        {toolCategories.map((c) => (
-          <div key={c}>
-            <h3 className="text-[14px] font-[800] text-[#5b6370]">{c}</h3>
-            <ul role="list" className="mt-2.5 space-y-2">
-              {tools.filter((t) => t.category === c).map((t) => (
-                <li key={t.href}>
-                  <Link href={t.href} className="text-[15.5px] font-bold hover:text-[#256ef4] hover:underline underline-offset-4">{t.title}</Link>
-                </li>
-              ))}
-            </ul>
-          </div>
-        ))}
-      </div>
+      <h2 id="watch" className={docH2}>사이트 감시</h2>
+      <p className="mt-3 text-[16px] leading-[1.7] text-[#3a404b]">
+        인증서와 도메인 만료, 접속 장애는 <a href="https://jikimi.gompartner.co.kr/" className="font-bold text-[#256ef4] underline underline-offset-4">사이트 지킴이</a>에 주소를 등록하면 만료 전에 알림으로 받습니다.
+      </p>
     </ArchiveShell>
   );
 }

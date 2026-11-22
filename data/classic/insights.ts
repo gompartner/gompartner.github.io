@@ -8179,7 +8179,7 @@ const allInsights: Insight[] = [
       {
         h: "직접 확인하려면 어떻게 합니까?",
         p: [
-          "터미널이 익숙하면 아래 명령으로 바로 볼 수 있습니다. 익숙하지 않으면 곰파트너 무료 도구 \"검색 결과 미리보기\"에 주소를 넣으면 제목, 설명, 공유 이미지를 읽어 보여 줍니다."
+          "터미널이 익숙하면 아래 명령으로 바로 볼 수 있습니다."
         ],
         code: "# 수집 허용 범위(전체 차단 여부)\ncurl -s https://example.com/robots.txt\n\n# 사이트맵이 열리는지\ncurl -s -o /dev/null -w \"%{http_code}\\n\" https://example.com/sitemap.xml\n\n# 첫 화면 제목, 설명, 기준 주소\ncurl -s https://example.com/ | grep -o -E '<title>[^<]*|name=\"description\" content=\"[^\"]*|rel=\"canonical\" href=\"[^\"]*'"
       },

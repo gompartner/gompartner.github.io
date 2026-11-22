@@ -4,7 +4,6 @@ import { industries } from "@/data/classic/industries";
 import { insights } from "@/data/classic/insights";
 import { topics, trendDocs, termHref } from "@/data/classic/archive";
 import { termGroups } from "@/data/classic/glossary";
-import { tools } from "@/data/classic/tools";
 import { maintenanceServices, replyTerm } from "@/data/classic/maintenance";
 import { landingPlans, planCommon, plans } from "@/data/classic/pricing";
 import { profile } from "@/data/classic/profile";
@@ -57,7 +56,7 @@ ${landingPlans.map((p) => `- ${plain(p.title)}: ${plain(p.summary)}. ${plain(p.i
 
 ## 웹 지식
 
-홈페이지 화면 부품, 디자인 용어, 운영 용어를 와이어프레임과 요청 문장, 넘겨받을 때 확인할 것으로 정리한 문서 공간입니다. 자세히: [웹 지식](${url("/knowledge")}), [용어](${url("/knowledge/terms")}), [점검표와 도구](${url("/knowledge/checklists")}), [디자인](${url("/knowledge/design")}), [개발](${url("/knowledge/dev")}), [한국 웹 30년](${url("/knowledge/history")}), [운영과 유지보수](${url("/knowledge/ops")}), [데이터](${url("/knowledge/data")})
+홈페이지 화면 부품, 디자인 용어, 운영 용어를 와이어프레임과 요청 문장, 넘겨받을 때 확인할 것으로 정리한 문서 공간입니다. 자세히: [웹 지식](${url("/knowledge")}), [용어](${url("/knowledge/terms")}), [점검표](${url("/knowledge/checklists")}), [디자인](${url("/knowledge/design")}), [개발](${url("/knowledge/dev")}), [한국 웹 30년](${url("/knowledge/history")}), [운영과 유지보수](${url("/knowledge/ops")}), [데이터](${url("/knowledge/data")})
 
 주제별 문서 목록:
 
@@ -73,10 +72,6 @@ ${trendDocs.map((d) => `- [${plain(d.title)}](${url(d.href)}): ${plain(d.desc)}`
 용어 문서(화면 부품과 운영 용어의 형태, 적용 사례, 와이어프레임, 업체와 AI에 요청하는 문장):
 
 ${termGroups.map((g) => `- [${plain(g.title)}](${url(termHref(g))}): ${g.terms.map((t) => plain(t.name)).join(", ")}`).join("\n")}
-
-무료 도구(설치 없이 브라우저에서 바로 씁니다):
-
-${tools.map((t) => `- [${plain(t.title)}](${url(t.href)}): ${plain(t.description)} 관련 검색어: ${t.tags.join(", ")}`).join("\n")}
 
 ## 인사이트
 

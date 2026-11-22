@@ -3,7 +3,6 @@ import { termHref, topics, trendDocs } from "@/data/classic/archive";
 import { execFileSync } from "node:child_process";
 import type { MetadataRoute } from "next";
 import { notices } from "@/data/classic/notices";
-import { tools } from "@/data/classic/tools";
 import { insights } from "@/data/classic/insights";
 import { maintenanceServices } from "@/data/classic/maintenance";
 import { siteUrl } from "@/lib/site";
@@ -71,8 +70,6 @@ export default function sitemap(): MetadataRoute.Sitemap {
     ...topics().map((t) => ({ path: `/knowledge/${t.id}`, priority: 0.6, files: ["data/classic/archive.ts"] })),
     ...trendDocs.map((d) => ({ path: d.href, priority: 0.6, files: [`app/(classic)${d.href}/page.tsx`, "data/classic/trendData.ts"] })),
     ...termGroups.map((g) => ({ path: termHref(g), priority: 0.6, files: ["app/(classic)/knowledge/terms/[slug]/page.tsx", "data/classic/glossary.ts", "data/classic/archive.ts"] })),
-    // 11-04 무료 도구를 고객지원으로 되살림
-    ...tools.map((t) => ({ path: t.href, priority: 0.4, files: [`app/(classic)${t.href}/page.tsx`] })),
     { path: "/notice", priority: 0.3, files: ["app/(classic)/notice/page.tsx", "data/classic/notices.ts"] },
     // 공지 글은 글에 적힌 날짜가 내용이 바뀐 날이다
     ...notices.map((n) => ({ path: `/notice/${n.id}`, priority: 0.3, date: new Date(`${n.date}T00:00:00+09:00`) })),

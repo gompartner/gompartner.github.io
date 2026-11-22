@@ -1,12 +1,11 @@
 // 곰파트너 웹 지식(/knowledge, 11-21 아카이브에서 이름과 주소를 바꿈). 11-21 사용자: 컨플루언스처럼 정돈된 문서 공간, 실적 대신 쌓인 기록을 보여 준다.
 // 틀은 문서 사이트형(왼쪽 분류 트리, 본문, 오른쪽 목차). 우리 색깔은 "인수 시 확인 사항", "이렇게 요청하세요", 같은 그림체 와이어프레임, 확인일.
-// 원래 주소가 있는 자료(인사이트 /insight, 무료 도구 /tools, 점검표 /jaryo/<id>)는 주소를 그대로 두고 트리에서 잇는다.
+// 원래 주소가 있는 자료(인사이트 /insight, 점검표 /jaryo/<id>)는 주소를 그대로 두고 트리에서 잇는다.
 // 문서가 없는 분류(시안 작업 등)는 첫 문서가 생길 때 sections에 더한다. 빈 칸, 준비 중 표시는 두지 않는다.
 
 import { termGroups, type TermGroup } from "@/data/classic/glossary";
 import { insights } from "@/data/classic/insights";
 import { jaryo } from "@/data/classic/jaryo";
-import { tools } from "@/data/classic/tools";
 import { datasets } from "@/data/classic/trendData";
 
 /** 트렌드 문서(만든 것만). 새 장을 쓰면 여기에 더한다 */
@@ -291,7 +290,6 @@ export const counts = {
   groups: termGroups.length,
   notes: insights.length,
   sheets: jaryo.length,
-  tools: tools.length,
 };
 
 /** 왼쪽 트리 마디 */
@@ -300,10 +298,6 @@ export type TreeNode = { label: string; href?: string; count?: number; children?
 /** 웹 지식 주제(11-21, 컨플루언스식 공간의 페이지 트리). 번호 없이, 문서마다 독립. 주제 페이지는 /knowledge/<id> */
 export type Topic = { id: string; label: string; desc: string; groups: { title: string; items: TreeNode[] }[] };
 
-const tool = (href: string) => {
-  const t = tools.find((x) => x.href === href)!;
-  return { label: t.title, href: t.href };
-};
 const series = (name: string) => insights.filter((n) => n.series === name).sort((a, b) => b.date.localeCompare(a.date) || a.no - b.no).map((n) => ({ label: n.title, href: `/insight/${n.slug}` }));
 const term = (id: string) => {
   const g = termGroups.find((x) => x.id === id)!;
@@ -324,31 +318,28 @@ export function topics(): Topic[] {
   return [
     { id: "plan", label: "기획", desc: "만들기 전에 정할 것. 업체 고르기, 견적 질문, 유지비, 웹 변천사", groups: [
       { title: "웹 변천사", items: ["/knowledge/history", "/knowledge/company-homepage", "/knowledge/public-homepage", "/knowledge/personal-homepage", "/knowledge/ai-and-homepage"].map(doc) },
-      { title: "업체와 견적", items: [...series("업체 선정"), { label: "홈페이지 견적 질문지(PDF)", href: "/jaryo/estimate" }, tool("/tools/estimate-questions"), tool("/tools/hosting-cost")] },
+      { title: "업체와 견적", items: [...series("업체 선정"), { label: "홈페이지 견적 질문지(PDF)", href: "/jaryo/estimate" }] },
     ] },
     { id: "design", label: "디자인", desc: "화면 부품의 이름, 디자인 용어, 페이지 종류별 화면, 시안, 기기에 따라 바뀐 화면", groups: [
       { title: "화면 부품 용어", items: cats.map((c) => ({ label: c, count: parts.filter((g) => g.cat === c).length, children: parts.filter((g) => g.cat === c).map((g) => ({ label: shortTitle(g), href: termHref(g) })) })) },
       { title: "디자인 용어", items: ["g33", "g34", "g35", "g36"].map(term) },
       { title: "화면과 시안", items: [{ label: "화면 예시", href: "/knowledge/screens" }, { label: "시안 작업", href: "/knowledge/drafts" }] },
       { title: "디자인 흐름", items: designDocs.map((d) => ({ label: d.title, href: d.href })) },
-      { title: "도구", items: [tool("/tools/accessibility-check"), tool("/tools/image-compress")] },
     ] },
     { id: "dev", label: "개발", desc: "만드는 도구(CMS), 서버 언어와 버전, 브라우저 호환, 화면 기술(플래시, jQuery), 페이지 무게, 앱, AI로 만든 서비스", groups: [
       { title: "문서", items: ["/knowledge/cms", "/knowledge/server-language", "/knowledge/browser", "/knowledge/flash-jquery", "/knowledge/page-weight", "/knowledge/php", "/knowledge/app"].map(doc) },
       { title: "AI로 만든 서비스 운영", items: series("AI로 만든 서비스 운영") },
-      { title: "개발 도구", items: [tool("/tools/jwt-parser"), tool("/tools/unix-time"), tool("/tools/cron")] },
     ] },
     { id: "infra", label: "인프라", desc: "도메인, 서버, 호스팅, https와 인증서", groups: [
       { title: "문서", items: [doc("/knowledge/infra-cloud"), doc("/knowledge/https"), term("go1")] },
       { title: "운영 노트", items: [note("security-headers-check"), note("domain-server-ownership"), note("expiry-calendar"), note("backup-but-no-restore"), note("takeover-first-week-server")] },
     ] },
-    { id: "security", label: "보안", desc: "PHP, 워드프레스, 그누보드, 인증서 보안 경보와 대응, 취약점 점검 도구", groups: [
+    { id: "security", label: "보안", desc: "PHP, 워드프레스, 그누보드, 인증서 보안 경보와 대응", groups: [
       { title: "점검", items: [note("exposed-files-check"), note("security-headers-check")] },
       { title: "보안 경보", items: series("보안 경보") },
-      { title: "도구", items: [tool("/tools/php-check"), tool("/tools/site-check")] },
     ] },
     { id: "search", label: "검색", desc: "검색 등록과 기록, 검색 결과에 보이는 모습, AI 검색과 인용", groups: [
-      { title: "문서", items: [doc("/knowledge/search-optimization"), doc("/knowledge/ai-readable-web"), term("go4"), tool("/tools/search-preview")] },
+      { title: "문서", items: [doc("/knowledge/search-optimization"), doc("/knowledge/ai-readable-web"), term("go4")] },
       { title: "운영 노트", items: [note("homepage-seo-basic-settings"), note("ai-crawler-access-check"), note("ai-search-google-naver")] },
     ] },
     { id: "ops", label: "운영과 유지보수", desc: "인수인계, 월 점검, 장애 대응, 관리 비용, 점검표", groups: [
@@ -357,24 +348,23 @@ export function topics(): Topic[] {
       { title: "운영 용어", items: [term("go2"), term("go3")] },
       { title: "점검표와 기록표", items: jaryo.filter((j) => j.id !== "estimate").map((j) => ({ label: j.title, href: `/jaryo/${j.id}` })) },
     ] },
-    { id: "law", label: "법과 규정", desc: "개인정보처리방침, 이용약관처럼 사이트에 꼭 있어야 하는 문서", groups: [
-      { title: "도구", items: [tool("/tools/privacy-policy"), tool("/tools/terms")] },
+    { id: "law", label: "법과 규정", desc: "개인정보 유출 신고와 과징금, 웹 접근성 의무와 소송", groups: [
+      { title: "운영 노트", items: [note("data-breach-penalty-72-hours"), note("app-data-breach-vibe-coding-korea-law"), note("web-accessibility-lawsuit"), note("eaa-and-korea-web-accessibility"), note("web-accessibility-public-site")] },
     ] },
     { id: "reference", label: "참고", desc: "차트 원본 데이터, 해외와 국내 동향, 전체 목록", groups: [
-      { title: "자료", items: [{ label: "데이터", href: "/knowledge/data" }, { label: "용어 전체", href: "/knowledge/terms" }, { label: "운영 노트 전체", href: "/knowledge/notes" }, { label: "점검표와 도구 전체", href: "/knowledge/checklists" }, tool("/tools/qr-code")] },
+      { title: "자료", items: [{ label: "데이터", href: "/knowledge/data" }, { label: "용어 전체", href: "/knowledge/terms" }, { label: "운영 노트 전체", href: "/knowledge/notes" }, { label: "점검표 전체", href: "/knowledge/checklists" }] },
       { title: "해외와 국내 동향", items: series("해외와 국내 동향") },
     ] },
   ];
 }
 
-/** 11-22 종류 태그(문서, 운영 노트, 용어, 도구, 자료). 묶음 제목 대신 항목마다 붙인다 */
-export const kinds = ["문서", "운영 노트", "용어", "도구", "자료"] as const;
+/** 11-22 종류 태그(문서, 운영 노트, 용어, 자료). 묶음 제목 대신 항목마다 붙인다 */
+export const kinds = ["문서", "운영 노트", "용어", "자료"] as const;
 export type Kind = (typeof kinds)[number];
 export function kindOf(href?: string): Kind {
   if (!href) return "용어";
   if (href.startsWith("/knowledge/terms/")) return "용어";
   if (href.startsWith("/insight/")) return "운영 노트";
-  if (href.startsWith("/tools/")) return "도구";
   if (href.startsWith("/jaryo/") || ["/knowledge/data", "/knowledge/terms", "/knowledge/notes", "/knowledge/checklists"].includes(href)) return "자료";
   return "문서";
 }

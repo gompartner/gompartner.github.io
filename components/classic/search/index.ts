@@ -4,7 +4,6 @@ import { industries } from "@/data/classic/industries";
 import { faq } from "@/data/classic/faq";
 import { maintenanceFaq, maintenanceServices } from "@/data/classic/maintenance";
 import { notices } from "@/data/classic/notices";
-import { tools } from "@/data/classic/tools";
 import { insights } from "@/data/classic/insights";
 import { makeExtras } from "@/data/classic/makeExtra";
 import { termGroups } from "@/data/classic/glossary";
@@ -61,7 +60,6 @@ export function buildSearchIndex(): SearchItem[] {
     ...faq.map((f) => ({ kind: "자주 묻는 질문" as const, title: f.q, desc: f.a, href: "/faq", hay: "" })),
     ...maintenanceServices.flatMap((s) => (maintenanceFaq[s.id] ?? []).map((f) => ({ kind: "자주 묻는 질문" as const, title: f.q, desc: f.a, href: `/maintenance/${s.id}#md-faq`, hay: s.h1 }))),
   ];
-  const files: SearchItem[] = tools.map((t) => ({ kind: "무료 도구", title: t.title, desc: t.description, href: t.href, hay: `자료실 자료 무료 도구 ${t.category} ${t.need} ${t.for} ${t.tags.join(" ")}` }));
   const news: SearchItem[] = notices.map((n) => ({ kind: "공지사항", title: n.title, desc: n.summary, href: `/notice/${n.id}`, hay: n.sections.flatMap((x) => [x.h, ...(x.p ?? []), ...(x.list ?? [])]).join(" ") }));
   const posts: SearchItem[] = insights.map((n) => ({
     kind: "운영 노트",
@@ -82,7 +80,7 @@ export function buildSearchIndex(): SearchItem[] {
     ...termGroups.map((g) => ({ kind: "웹 지식" as const, title: `용어 문서: ${shortTitle(g)}`, desc: g.terms.map((t) => t.name).join(", "), href: termHref(g), hay: [g.title, g.cat, g.sec, ...(takeover[g.id] ?? []).flatMap((x) => [x.b, x.t]), takeover[g.id] ? "인수 시 확인 사항" : ""].join(" ") })),
     ...datasets.map((d) => ({ kind: "웹 지식" as const, title: `데이터: ${d.title}`, desc: d.desc, href: `/knowledge/data#${d.id}`, hay: `데이터 통계 차트 CSV ${d.source.label}` })),
   ];
-  return [...services, ...catalogs, ...archive, ...kiosk3d, ...posts, ...files, ...terms, ...faqs, ...news];
+  return [...services, ...catalogs, ...archive, ...kiosk3d, ...posts, ...terms, ...faqs, ...news];
 }
 
 /** 카탈로그 검색용(카탈로그 목록 페이지) */

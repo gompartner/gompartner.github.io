@@ -25,8 +25,8 @@ html.gp-dark .cl .bg-\[\#d4edda\]:not(.keep-light *) { background-color: #202f24
 html.gp-dark .cl .bg-\[\#d6e4fd\]:not(.keep-light *) { background-color: #151f31; }
 html.gp-dark .cl .bg-\[\#d8dde5\]:not(.keep-light *),
 html.gp-dark .cl .bg-\[\#d9dee5\]:not(.keep-light *) { background-color: #25282c; }
+html.gp-dark .cl .bg-\[\#dfe6e4\]:not(.keep-light *) { background-color: #242928; }
 html.gp-dark .cl .bg-\[\#e6e9ee\]:not(.keep-light *) { background-color: #202225; }
-html.gp-dark .cl .bg-\[\#e6f5ea\]:not(.keep-light *) { background-color: #1a271e; }
 html.gp-dark .cl .bg-\[\#e8eaed\]:not(.keep-light *) { background-color: #202224; }
 html.gp-dark .cl .bg-\[\#e8efff\]:not(.keep-light *),
 html.gp-dark .cl .hover\:bg-\[\#e8efff\]:hover:not(.keep-light *) { background-color: #10182a; }
@@ -52,17 +52,13 @@ html.gp-dark .cl .bg-\[\#f8f9fa\]:not(.keep-light *) { background-color: #181a1c
 html.gp-dark .cl .bg-\[\#fafbfc\]:not(.keep-light *) { background-color: #16191c; }
 html.gp-dark .cl .bg-\[\#fde2e1\]:not(.keep-light *) { background-color: #2c1413; }
 html.gp-dark .cl .bg-\[\#fde7e9\]:not(.keep-light *) { background-color: #2a1315; }
-html.gp-dark .cl .bg-\[\#fde8e8\]:not(.keep-light *) { background-color: #291313; }
-html.gp-dark .cl .bg-\[\#fdf6f6\]:not(.keep-light *) { background-color: #211313; }
 html.gp-dark .cl .bg-\[\#fef3c7\]:not(.keep-light *) { background-color: #373116; }
 html.gp-dark .cl .bg-\[\#ffd43b\]:not(.keep-light *) { background-color: #6f602a; }
 html.gp-dark .cl .bg-\[\#ffe45c\]:not(.keep-light *) { background-color: #625825; }
 html.gp-dark .cl .bg-\[\#fff3b0\]:not(.keep-light *),
 html.gp-dark .cl .hover\:bg-\[\#fff3b0\]:hover:not(.keep-light *) { background-color: #413b19; }
 html.gp-dark .cl .bg-\[\#fff4ce\]:not(.keep-light *) { background-color: #352d14; }
-html.gp-dark .cl .bg-\[\#fff4d6\]:not(.keep-light *) { background-color: #322913; }
 html.gp-dark .cl .bg-\[\#fff4e5\]:not(.keep-light *) { background-color: #2c2011; }
-html.gp-dark .cl .bg-\[\#fffaf0\]:not(.keep-light *) { background-color: #271f0f; }
 html.gp-dark .cl .bg-\[\#fffbe6\]:not(.keep-light *) { background-color: #2b2710; }
 html.gp-dark .cl .bg-\[\#fffdf8\]:not(.keep-light *) { background-color: #241e0e; }
 html.gp-dark .cl .bg-white:not(.keep-light *),
@@ -94,8 +90,6 @@ html.gp-dark .cl .border-\[\#dfe3ea\]:not(.keep-light *) { border-color: #3a3d42
 html.gp-dark .cl .border-\[\#e1e5eb\]:not(.keep-light *) { border-color: #393c41; }
 html.gp-dark .cl .border-\[\#e2e3e3\]:not(.keep-light *) { border-color: #3e3f3f; }
 html.gp-dark .cl .border-\[\#eef0f3\]:not(.keep-light *) { border-color: #35373b; }
-html.gp-dark .cl .border-\[\#efc4c4\]:not(.keep-light *) { border-color: #4f3838; }
-html.gp-dark .cl .border-\[\#f0d9b5\]:not(.keep-light *) { border-color: #554a39; }
 html.gp-dark .cl .group:hover .group-hover\:text-\[\#256ef4\]:not(.keep-light *),
 html.gp-dark .cl .hover\:text-\[\#256ef4\]:hover:not(.keep-light *),
 html.gp-dark .cl .text-\[\#1d5fd6\]:not(.keep-light *),
@@ -117,15 +111,15 @@ html.gp-dark .cl .text-\[\#1b6b2d\]:not(.keep-light *) { color: #48d167; }
 html.gp-dark .cl .text-\[\#1b7a3e\]:not(.keep-light *) { color: #43d579; }
 html.gp-dark .cl .text-\[\#1d1916\]:not(.keep-light *) { color: #9c8a7d; }
 html.gp-dark .cl .text-\[\#1d1d1f\]:not(.keep-light *) { color: #8e8e95; }
-html.gp-dark .cl .text-\[\#1d7a3a\]:not(.keep-light *) { color: #46d372; }
 html.gp-dark .cl .text-\[\#202124\]:not(.keep-light *) { color: #868993; }
 html.gp-dark .cl .text-\[\#228738\]:not(.keep-light *) { color: #48d166; }
 html.gp-dark .cl .text-\[\#2b2f36\]:not(.keep-light *) { color: #858e9e; }
 html.gp-dark .cl .text-\[\#2b313b\]:not(.keep-light *),
 html.gp-dark .cl .text-\[\#3d4450\]:not(.keep-light *) { color: #c9d0da; }
+html.gp-dark .cl .text-\[\#3a404b\]:not(.keep-light *) { color: #838d9f; }
 html.gp-dark .cl .text-\[\#3b4250\]:not(.keep-light *) { color: #818ca2; }
+html.gp-dark .cl .text-\[\#3b4350\]:not(.keep-light *) { color: #818da2; }
 html.gp-dark .cl .text-\[\#3c4043\]:not(.keep-light *) { color: #868d93; }
-html.gp-dark .cl .text-\[\#3d4550\]:not(.keep-light *) { color: #838fa0; }
 html.gp-dark .cl .text-\[\#404040\]:not(.keep-light *) { color: #8c8c8c; }
 html.gp-dark .cl .text-\[\#464c53\]:not(.keep-light *) { color: #838b96; }
 html.gp-dark .cl .text-\[\#4b5563\]:not(.keep-light *) { color: #828fa0; }
@@ -139,20 +133,4 @@ html.gp-dark .cl .text-\[\#a50e0e\]:not(.keep-light *),
 html.gp-dark .cl .text-\[\#cc0000\]:not(.keep-light *) { color: #e75a5a; }
 html.gp-dark .cl .text-\[\#b42318\]:not(.keep-light *) { color: #e7645a; }
 html.gp-dark .cl .text-\[\#b45309\]:not(.keep-light *) { color: #e28136; }
-html.gp-dark .cl .text-\[\#c62828\]:not(.keep-light *) { color: #df6262; }
 html.gp-dark .cl .text-\[\#d63d4a\]:not(.keep-light *) { color: #de636e; }
-html.gp-dark .cl [style*="color:#0369a1"]:not([style*="background"]) { color: #36a5e2 !important; }
-html.gp-dark .cl [style*="color:#0b6664"]:not([style*="background"]) { color: #36e2df !important; }
-html.gp-dark .cl [style*="color:#0f766e"]:not([style*="background"]) { color: #36e2d5 !important; }
-html.gp-dark .cl [style*="color:#111111"]:not([style*="background"]) { color: #8c8c8c !important; }
-html.gp-dark .cl [style*="color:#15803d"]:not([style*="background"]) { color: #3adf77 !important; }
-html.gp-dark .cl [style*="color:#1e2124"]:not([style*="background"]) { color: #828c97 !important; }
-html.gp-dark .cl [style*="color:#1e3a8a"]:not([style*="background"]) { color: #6c8adf !important; }
-html.gp-dark .cl [style*="color:#4d5156"]:not([style*="background"]) { color: #868c93 !important; }
-html.gp-dark .cl [style*="color:#5b3a1e"]:not([style*="background"]) { color: #c68852 !important; }
-html.gp-dark .cl [style*="color:#6d7882"]:not([style*="background"]) { color: #828d96 !important; }
-html.gp-dark .cl [style*="color:#7a1f4b"]:not([style*="background"]) { color: #d7609a !important; }
-html.gp-dark .cl [style*="color:#7c3aed"]:not([style*="background"]) { color: #a075eb !important; }
-html.gp-dark .cl [style*="color:#b42318"]:not([style*="background"]) { color: #e7645a !important; }
-html.gp-dark .cl [style*="color:#be185d"]:not([style*="background"]) { color: #e75a95 !important; }
-html.gp-dark .cl [style*="color:#c2410c"]:not([style*="background"]) { color: #e26836 !important; }

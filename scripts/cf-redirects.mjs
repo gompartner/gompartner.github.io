@@ -21,7 +21,10 @@ lines.push("/jaryo /knowledge/checklists 301");
 lines.push("/glossary /knowledge/terms 301");
 // 11-21 옛 목록 페이지(글, 도구 상세 주소는 그대로)
 lines.push("/insight /knowledge/notes 301");
+// 11-22 자료실 도구 13개를 내림. 진단 도구는 사이트 지킴이로, 나머지는 점검표로
 lines.push("/tools /knowledge/checklists 301");
+for (const t of ["site-check", "php-check"]) lines.push(`/tools/${t} https://jikimi.gompartner.co.kr/ 301`);
+for (const t of ["accessibility-check", "cron", "estimate-questions", "hosting-cost", "image-compress", "jwt-parser", "privacy-policy", "qr-code", "search-preview", "terms", "unix-time"]) lines.push(`/tools/${t} /knowledge/checklists 301`);
 // 11-21 아카이브(/archive)를 웹 지식(/knowledge)으로 옮김. 같은 날 공개한 옛 주소를 모두 새 주소로
 const moved = [
   ["/archive", "/knowledge"], ["/archive/trends", "/knowledge"], ["/archive/design", "/knowledge/design"], ["/archive/tech", "/knowledge/dev"], ["/knowledge/frontend", "/knowledge/dev"],

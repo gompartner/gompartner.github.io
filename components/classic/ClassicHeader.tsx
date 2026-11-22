@@ -41,11 +41,11 @@ export const classicMenu = [
     ],
   },
   { label: "비용", href: "/pricing", match: ["/pricing"], items: [] },
-  // 11-21 웹 지식(컨플루언스식 공간). 인사이트, 무료 도구, 점검표는 원래 주소 그대로 두고 웹 지식 트리에서 잇는다
+  // 11-21 웹 지식(컨플루언스식 공간). 인사이트, 점검표는 원래 주소 그대로 두고 웹 지식 트리에서 잇는다
   {
     label: "웹 지식",
     href: "/knowledge",
-    match: ["/knowledge", "/insight", "/tools", "/jaryo"],
+    match: ["/knowledge", "/insight", "/jaryo"],
     items: [
       { href: "/knowledge/plan", label: "기획" },
       { href: "/knowledge/design", label: "디자인" },

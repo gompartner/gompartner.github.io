@@ -9,7 +9,7 @@ const items = [
 ];
 
 // 아카이브에 딸린 페이지(도구, 인사이트)에서는 "웹 지식" 탭을 켠다
-const underJaryo = ["/tools", "/insight"];
+const underJaryo = ["/insight"];
 
 export function SupportTabs({ current }: { current: string }) {
   return <SubTabs items={items} current={underJaryo.some((p) => current.startsWith(p)) ? "/knowledge" : current} />;
