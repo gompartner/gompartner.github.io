@@ -2,7 +2,7 @@ import type { Metadata } from "next";
 import type { ComponentType } from "react";
 import { notFound } from "next/navigation";
 import dynamic from "next/dynamic";
-import { allProjects as projects, hiddenIds } from "@/data/projects";
+import { liveProjects as projects, hiddenIds } from "@/data/projects";
 import { fitDescription } from "@/lib/seo";
 
 // 데모를 각각 따로 불러와, 데모 하나를 열 때 다른 데모 코드까지 받지 않게 한다.

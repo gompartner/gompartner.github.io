@@ -1,6 +1,6 @@
 import { DemoTopBar } from "@/components/demos/DemoTopBar";
 import { HideInFrame } from "@/components/demos/HideInFrame";
-import { allProjects as projects } from "@/data/projects";
+import { liveProjects as projects } from "@/data/projects";
 
 export default async function DemoLayout({
   children,

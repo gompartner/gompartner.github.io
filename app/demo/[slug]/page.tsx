@@ -1,8 +1,9 @@
 import type { Metadata } from "next";
-import { allProjects as projects } from "@/data/projects";
+import { liveProjects as projects } from "@/data/projects";
 import { MoveToWork } from "./MoveToWork";
 
 export const metadata: Metadata = { robots: { index: false, follow: true } };
+export const dynamicParams = false;
 
 export function generateStaticParams() {
   return projects.filter((p) => p.demoUrl.startsWith("/work/")).map((p) => ({ slug: p.demoUrl.replace("/work/", "") }));

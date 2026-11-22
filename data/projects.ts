@@ -919,6 +919,25 @@ export const hiddenIds = new Set([
   "job-portal",
   "retirement-calculator",
 ]);
+// 11-22 보관: 기능형 샘플 13개는 목록, 검색뿐 아니라 체험 주소(/work, /demo)도 열지 않는다. 코드는 components/demos에 그대로 둔다.
+export const archivedIds = new Set([
+  "clinic-report",
+  "community-map",
+  "program-application",
+  "maintenance-dashboard",
+  "maintenance-urgent-fix",
+  "retirement-calculator",
+  "job-portal",
+  "accessibility-review",
+  "district-portal",
+  "small-business-homepage",
+  "shop-admin",
+  "excel-automation",
+  "lms",
+]);
+for (const id of archivedIds) hiddenIds.add(id);
+// 체험 주소를 만들 대상: 보관한 것만 뺀다(목록에서만 내린 hiddenIds는 주소를 남긴다).
+export const liveProjects = allProjects.filter((p) => !archivedIds.has(p.id));
 export const projects = allProjects.filter((p) => !hiddenIds.has(p.id));
 
 // 실제 작업 이력: SW기술자 경력관리시스템에 기업 확인된 기술경력과 업무 메일 기준.
