@@ -100,6 +100,18 @@ export const VARIANTS: Record<string, { id: string; label: string }[]> = {
     { id: "a", label: "시안 A 기업 고용형" },
     { id: "b", label: "시안 B 개인 체류형" },
   ],
+  "nursing-hospital": [
+    { id: "a", label: "시안 A 재활 진료형" },
+    { id: "b", label: "시안 B 생활 안내형" },
+  ],
+  optical: [
+    { id: "a", label: "시안 A 누진 검안형" },
+    { id: "b", label: "시안 B 셀렉트숍형" },
+  ],
+  "car-detailing": [
+    { id: "a", label: "시안 A PPF 스튜디오" },
+    { id: "b", label: "시안 B 동네 세차형" },
+  ],
   "clinic-homepage": [
     { id: "a", label: "시안 A 미니멀" },
     { id: "b", label: "시안 B 진료 안내형" },

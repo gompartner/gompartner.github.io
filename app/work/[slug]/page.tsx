@@ -49,13 +49,13 @@ const LandingWaterRentalDemo = dynamic(() => import("@/components/demos/LandingW
 const ShopAdminDemo = dynamic(() => import("@/components/demos/ShopAdminDemo").then((m) => m.ShopAdminDemo));
 const CoffeeDrafts = dynamic(() => import("@/components/drafts/Drafts").then((m) => m.CoffeeDrafts));
 const HairDrafts = dynamic(() => import("@/components/drafts/Drafts").then((m) => m.HairDrafts));
-const OpticalDemo = dynamic(() => import("@/components/demos/OpticalDemo").then((m) => m.OpticalDemo));
+const OpticalDrafts = dynamic(() => import("@/components/drafts/Drafts").then((m) => m.OpticalDrafts));
 const FurnitureWorkshopDemo = dynamic(() => import("@/components/demos/FurnitureWorkshopDemo").then((m) => m.FurnitureWorkshopDemo));
 const CoworkingDemo = dynamic(() => import("@/components/demos/CoworkingDemo").then((m) => m.CoworkingDemo));
 const CampsiteDemo = dynamic(() => import("@/components/demos/CampsiteDemo").then((m) => m.CampsiteDemo));
 const PhotoStudioDrafts = dynamic(() => import("@/components/drafts/Drafts").then((m) => m.PhotoStudioDrafts));
 const NailDrafts = dynamic(() => import("@/components/drafts/Drafts").then((m) => m.NailDrafts));
-const CarDetailingDemo = dynamic(() => import("@/components/demos/CarDetailingDemo").then((m) => m.CarDetailingDemo));
+const CarDetailingDrafts = dynamic(() => import("@/components/drafts/Drafts").then((m) => m.CarDetailingDrafts));
 const LightingShopDemo = dynamic(() => import("@/components/demos/LightingShopDemo").then((m) => m.LightingShopDemo));
 const LiquorShopDemo = dynamic(() => import("@/components/demos/LiquorShopDemo").then((m) => m.LiquorShopDemo));
 const SmallWeddingDemo = dynamic(() => import("@/components/demos/SmallWeddingDemo").then((m) => m.SmallWeddingDemo));
@@ -64,7 +64,7 @@ const OrthoDrafts = dynamic(() => import("@/components/drafts/Drafts").then((m) 
 const PedDrafts = dynamic(() => import("@/components/drafts/Drafts").then((m) => m.PedDrafts));
 const EyeDrafts = dynamic(() => import("@/components/drafts/Drafts").then((m) => m.EyeDrafts));
 const VetDrafts = dynamic(() => import("@/components/drafts/Drafts").then((m) => m.VetDrafts));
-const NursingHospitalDemo = dynamic(() => import("@/components/demos/NursingHospitalDemo").then((m) => m.NursingHospitalDemo));
+const NursingDrafts = dynamic(() => import("@/components/drafts/Drafts").then((m) => m.NursingDrafts));
 const LaborDrafts = dynamic(() => import("@/components/drafts/Drafts").then((m) => m.LaborDrafts));
 const ScrivenerDrafts = dynamic(() => import("@/components/drafts/Drafts").then((m) => m.ScrivenerDrafts));
 const PatentDrafts = dynamic(() => import("@/components/drafts/Drafts").then((m) => m.PatentDrafts));
@@ -130,13 +130,13 @@ const demoComponents: Record<string, ComponentType> = {
   lms: LmsDemo,
   "roastery": CoffeeDrafts,
   "hair-salon": HairDrafts,
-  "optical": OpticalDemo,
+  "optical": OpticalDrafts,
   "furniture-workshop": FurnitureWorkshopDemo,
   "coworking": CoworkingDemo,
   "campsite": CampsiteDemo,
   "photo-studio": PhotoStudioDrafts,
   "nail-shop": NailDrafts,
-  "car-detailing": CarDetailingDemo,
+  "car-detailing": CarDetailingDrafts,
   "lighting-shop": LightingShopDemo,
   "liquor-shop": LiquorShopDemo,
   "small-wedding": SmallWeddingDemo,
@@ -145,7 +145,7 @@ const demoComponents: Record<string, ComponentType> = {
   "pediatrics": PedDrafts,
   "eye-clinic": EyeDrafts,
   "animal-hospital": VetDrafts,
-  "nursing-hospital": NursingHospitalDemo,
+  "nursing-hospital": NursingDrafts,
   "labor-firm": LaborDrafts,
   "scrivener": ScrivenerDrafts,
   "patent-office": PatentDrafts,

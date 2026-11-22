@@ -48,6 +48,12 @@ import { FamA } from "./FamA";
 import { FamB } from "./FamB";
 import { VisaA } from "./VisaA";
 import { VisaB } from "./VisaB";
+import { NhA } from "./NhA";
+import { NhB } from "./NhB";
+import { OptA } from "./OptA";
+import { OptB } from "./OptB";
+import { CarA } from "./CarA";
+import { CarB } from "./CarB";
 
 // 컨셉 시안 두 장씩(11-21). 맨 위 줄에서 바꿔 본다. 기존 기능형 데모는 코드만 남긴다.
 export function TaxDrafts() {
@@ -352,6 +358,48 @@ export function VisaDrafts() {
     <>
       <VisaA />
       <QuickMenu accent="#13265a" cta="채용 비자" tel="02-000-0000" />
+    </>
+  );
+}
+
+export function NursingDrafts() {
+  return useVariant("nursing-hospital") === "b" ? (
+    <>
+      <NhB />
+      <QuickMenu accent="#c8682c" cta="입원 상담" tel="031-000-0000" />
+    </>
+  ) : (
+    <>
+      <NhA />
+      <QuickMenu accent="#1f5e45" cta="입원 상담" tel="031-000-0000" />
+    </>
+  );
+}
+
+export function OpticalDrafts() {
+  return useVariant("optical") === "b" ? (
+    <>
+      <OptB />
+      <QuickMenu accent="#111111" cta="매장 안내" tel="02-000-0000" />
+    </>
+  ) : (
+    <>
+      <OptA />
+      <QuickMenu accent="#1d3366" cta="검사 예약" tel="031-000-0000" />
+    </>
+  );
+}
+
+export function CarDetailingDrafts() {
+  return useVariant("car-detailing") === "b" ? (
+    <>
+      <CarB />
+      <QuickMenu accent="#0f6fd6" cta="전화 예약" tel="02-000-0000" />
+    </>
+  ) : (
+    <>
+      <CarA />
+      <QuickMenu accent="#d6322b" cta="견적 문의" tel="031-000-0000" />
     </>
   );
 }
