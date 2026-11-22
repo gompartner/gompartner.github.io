@@ -46,23 +46,33 @@ export function ReadTracker({ href, ver, changes = [] }: { href: string; ver?: s
     };
   }, [href, ver]);
 
-  // 지난번에 읽은 판(v) 뒤에 바뀐 곳
-  const fresh = prev?.v ? changes.filter((c) => c.date > prev.v!) : [];
+  // 지난번에 읽은 판(v) 뒤에 바뀐 절은 본문에서 바로 칠한다(설명 글 없이). 제목부터 다음 제목 전까지, 오른쪽 목차에도 점
+  const fresh = prev?.v ? changes.filter((c) => c.date > prev.v! && c.id) : [];
+  const key = fresh.map((c) => c.id).join();
   useEffect(() => {
-    const marks: HTMLElement[] = [];
+    const undo: (() => void)[] = [];
     for (const c of fresh) {
-      const el = c.id ? document.getElementById(c.id) : null;
-      if (el && !el.querySelector("[data-changed]")) {
-        const b = document.createElement("span");
-        b.dataset.changed = "1";
-        b.textContent = "바뀜";
-        b.className = "ml-2 inline-block translate-y-[-3px] rounded bg-[#256ef4] px-1.5 py-0.5 align-middle text-[12px] font-bold tracking-normal text-white";
-        el.appendChild(b);
-        marks.push(b);
+      const h = document.getElementById(c.id!);
+      if (!h) continue;
+      const els: HTMLElement[] = [h];
+      for (let n = h.nextElementSibling as HTMLElement | null; n && !/^H2$/.test(n.tagName) && !n.querySelector("h2"); n = n.nextElementSibling as HTMLElement | null) els.push(n);
+      els.forEach((el) => {
+        el.dataset.changedBlock = "1";
+        undo.push(() => delete el.dataset.changedBlock);
+      });
+      const b = document.createElement("span");
+      b.textContent = "바뀜";
+      b.className = "ml-2 inline-block translate-y-[-3px] rounded bg-[#256ef4] px-1.5 py-0.5 align-middle text-[12px] font-bold tracking-normal text-white";
+      h.appendChild(b);
+      undo.push(() => b.remove());
+      const t = document.querySelector<HTMLElement>(`aside a[href="#${c.id}"]`);
+      if (t) {
+        t.dataset.changedToc = "1";
+        undo.push(() => delete t.dataset.changedToc);
       }
     }
-    return () => marks.forEach((m) => m.remove());
-  }, [fresh.map((c) => c.id).join()]); // eslint-disable-line react-hooks/exhaustive-deps
+    return () => undo.forEach((f) => f());
+  }, [key]); // eslint-disable-line react-hooks/exhaustive-deps
 
   // 안내는 문서 머리(제목, 요약) 바로 아래에 끼운다
   const [slot, setSlot] = useState<HTMLElement | null>(null);
@@ -82,24 +92,13 @@ export function ReadTracker({ href, ver, changes = [] }: { href: string; ver?: s
       <div aria-hidden className="fixed inset-x-0 top-0 z-[60] h-[3px] bg-transparent">
         <div className="h-full bg-[#256ef4] transition-[width] duration-150" style={{ width: `${p}%` }} />
       </div>
-      {slot ? createPortal(<>{!fresh.length && prev?.v && ver && ver > prev.v ? (
-        <p className="mt-5 max-w-[820px] rounded-md border border-[#256ef4] bg-white px-4 py-3 text-[14.5px] text-[#2b313b]">
-          <b className="font-[800] text-[#1d5fd6]">{prev.d}에 읽은 뒤 {ver}에 고쳐졌습니다.</b>
-        </p>
-      ) : null}{fresh.length ? (
-        <div className="mt-5 max-w-[820px] rounded-md border border-[#256ef4] bg-white px-4 py-3">
-          <p className="text-[13px] font-[800] text-[#1d5fd6]">{prev!.d}에 읽은 뒤 바뀐 곳</p>
-          <ul role="list" className="mt-1.5 space-y-1">
-            {fresh.map((c, i) => (
-              <li key={i} className="text-[14.5px] leading-[1.6] text-[#2b313b]">
-                <span className="mr-2 tabular-nums text-[#5b6370]">{c.date}</span>
-                {c.id ? <a href={`#${c.id}`} className="font-bold underline underline-offset-4 hover:text-[#256ef4]">{c.text}</a> : c.text}
-              </li>
-            ))}
-          </ul>
-        </div>
+      {slot && fresh.length ? createPortal(
+        <a href={`#${fresh[0].id}`} className="mt-5 inline-flex min-h-[36px] items-center gap-2 rounded-full bg-[#256ef4] px-4 text-[14px] font-bold text-white hover:bg-[#1d5fd6]">
+          바뀐 곳 {fresh.length}곳으로
+        </a>,
+        slot,
       ) : null}
-      {resume ? (
+      {slot && resume ? createPortal(
         <div className="mt-5 flex max-w-[820px] flex-wrap items-center gap-3 rounded-md bg-[#f4f6f9] px-4 py-3 text-[14.5px]">
           <span className="text-[#3d4450]">{prev!.d}에 {prev!.p}%까지 읽었습니다.</span>
           <button type="button" onClick={() => { scrollTo({ top: prev!.y }); setHideResume(true); }} className="min-h-[36px] rounded-md bg-[#15171c] px-3.5 text-[14px] font-bold text-white">
@@ -108,8 +107,9 @@ export function ReadTracker({ href, ver, changes = [] }: { href: string; ver?: s
           <button type="button" onClick={() => setHideResume(true)} className="min-h-[36px] px-1 text-[13.5px] text-[#5b6370] underline underline-offset-4">
             처음부터
           </button>
-        </div>
-      ) : null}</>, slot) : null}
+        </div>,
+        slot,
+      ) : null}
     </>
   );
 }
