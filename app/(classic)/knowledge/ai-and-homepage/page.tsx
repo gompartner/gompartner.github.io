@@ -31,11 +31,12 @@ export default function TrendAiAndHomepage() {
       story={[
         "말로 설명하면 화면과 기능을 만들어 주는 AI 빌더가 빠르게 퍼졌습니다. Lovable은 출시 8개월에 연 반복 매출 1억 달러, 2026년 2월에는 4억 달러를 넘겼습니다. 2025년 3월에는 Y Combinator 겨울 기수의 약 4분의 1이 코드 대부분을 AI로 작성했다는 보도가 나왔습니다. 회사 소개 홈페이지나 예약 페이지 정도는 비개발자도 하루 안에 만들 수 있게 됐습니다.",
         "홈페이지 업계의 일도 옮겨 가고 있습니다. 화면을 처음 만드는 값은 내려가는 반면, AI로 만든 사이트를 넘겨받아 계정, 결제, 개인정보, 보안 설정을 바로잡는 일이 새로 생겼습니다. 「AI로 만든 서비스 운영」 노트에서 다룬 사례 대부분이 출시 뒤에 생긴 일입니다.",
+        "국내에서도 같은 흐름이 숫자로 보입니다. 서프 디지털 분석에서 Lovable, Emergent, Base44로 만든 홈페이지는 2025년 12월 5,309개에서 2026년 9월 13,939개로 2.6배 늘었습니다. 카페24 AI 스페이스에 배포된 웹서비스 344개 가운데 291개(84.6%)가 사업, 업무용이었고, 그중 166개(57.0%)는 소개 페이지가 아닌 웹앱이었으며 웹앱의 70%에 로그인 기능이 있었습니다. 크몽에서는 바이브코딩 후속 개발 문의가 2026년 2분기에 직전 분기보다 약 200% 늘었습니다. 회원 정보를 받는 서비스가 늘어난 만큼, 출시 뒤 운영과 보안을 맡길 곳을 찾는 수요도 같이 늘고 있다고 봅니다.",
         "AI가 만든 코드는 빠르지만 안전하다는 보장이 없습니다. Veracode가 100개 넘는 AI 모델로 80가지 과제를 시험한 결과 45%에서 보안 취약점이 들어갔고, 문법 품질은 나아져도 보안 성적은 나아지지 않았습니다.",
         "실제 사고는 대부분 설정에서 났습니다. Tea 앱은 보호 없이 열린 저장소에서 신분증 사진이 새어 나갔고, AI가 만든 Moltbook은 데이터베이스 접근 규칙(RLS)이 꺼진 채 출시됐습니다. AI 개발 도구 Lovable 자체에서도 공개 프로젝트의 채팅 기록과 코드가 두 달 넘게 보였습니다. 채팅에 붙여 넣은 DB 주소와 키까지 함께 보였을 수 있습니다.",
         "국내 대형 유출도 고도의 해킹보다 기본 관리가 문제였습니다. 개인정보보호위원회는 쿠팡 사건에서 퇴사한 직원의 인증 서명키가 갱신, 폐기되지 않은 점을, SK텔레콤 사건에서 인터넷망과 내부망 사이 기본 접근통제가 없던 점을 지적했습니다. 과징금은 SK텔레콤 약 1,347억 원, 쿠팡 약 6,247억 원으로 커졌습니다.",
       ]}
-      nowTitle="곰파트너 전망"
+      nowTitle="앞으로 2~3년"
       now={[
         "위 사실을 바탕으로 앞으로 2~3년은 이렇게 내다봅니다. 전망이라 틀릴 수 있고, 맞는지는 해마다 이 칸에서 다시 확인합니다.",
         "소개형 홈페이지를 처음 만드는 값은 계속 내려갑니다. 회사 소개, 예약, 문의 정도의 사이트는 대표나 직원이 AI 도구로 직접 만드는 경우가 늘고, 제작 업체에 맡기는 이유는 디자인보다 \"맡겨도 안전한가\"로 옮겨 갈 것으로 봅니다.",
@@ -55,6 +56,7 @@ export default function TrendAiAndHomepage() {
         { label: "TechCrunch, YC 현재 기수 4분의 1의 코드가 거의 AI 작성(2025년 3월 6일)", href: "https://techcrunch.com/2025/03/06/a-quarter-of-startups-in-ycs-current-cohort-have-codebases-that-are-almost-entirely-ai-generated", note: "2025년 겨울 기수" },
         { label: "TechCrunch, Lovable 8개월 만에 ARR 1억 달러(2025년 7월 23일)", href: "https://techcrunch.com/2025/07/23/eight-months-in-swedish-unicorn-lovable-crosses-the-100m-arr-milestone", note: "출시 8개월" },
         { label: "TechCrunch, Lovable 한 달에 1억 달러 추가(2026년 3월 11일)", href: "https://techcrunch.com/2026/03/11/lovable-says-it-added-100m-in-revenue-last-month-alone-with-just-146-employees/", note: "2025년 11월 2억, 2026년 2월 4억 달러, 직원 146명" },
+        { label: "지디넷코리아, 코딩 몰라도 앱 만든다, 국내 IT업계 바이브코딩 시장 공략(2026년 11월 22일)", href: "https://zdnet.co.kr/view/?no=20261122122614", note: "서프 디지털 홈페이지 수, 카페24 AI 스페이스 344개 분석, 크몽 후속 개발 문의" },
         { label: "Veracode, 2025 GenAI Code Security Report 발표(2025년 7월 30일)", href: "https://www.veracode.com/press-release/ai-generated-code-poses-major-security-risks-in-nearly-half-of-all-development-tasks-veracode-research-reveals/", note: "100개 넘는 모델, 80개 과제, 45%에서 취약점" },
         { label: "NVD, CVE-2025-29927", href: "https://nvd.nist.gov/vuln/detail/CVE-2025-29927", note: "Next.js 미들웨어 인증 우회" },
         { label: "BleepingComputer, Tea 앱 두 번째 DB 노출(2025년 7월 28일)", href: "https://www.bleepingcomputer.com/news/security/tea-app-leak-worsens-with-second-database-exposing-user-chats/", note: "이미지 약 7만 2천 장, 메시지 약 110만 건" },
