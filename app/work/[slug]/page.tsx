@@ -3,6 +3,7 @@ import type { ComponentType } from "react";
 import { notFound } from "next/navigation";
 import dynamic from "next/dynamic";
 import { liveProjects as projects, hiddenIds } from "@/data/projects";
+import { VARIANTS } from "@/lib/variants";
 import { fitDescription } from "@/lib/seo";
 
 // 데모를 각각 따로 불러와, 데모 하나를 열 때 다른 데모 코드까지 받지 않게 한다.
@@ -185,7 +186,8 @@ export async function generateMetadata({ params }: DemoPageProps): Promise<Metad
   }
 
   // "치과 홈페이지 제작 카탈로그"처럼 사장님이 찾는 말로 제목을 짓는다. 금액과 기간은 싣지 않는다(10-30).
-  const title = `${demo.title}${/(홈페이지|쇼핑몰)$/.test(demo.title) ? " 제작" : ""} 카탈로그`;
+  // 11-22 제목 규칙: 시안이 둘이면 "OO 시안", 앱, 키오스크는 "OO 체험"(뒤에 "| 곰파트너")
+  const title = `${demo.title} ${(VARIANTS[slug]?.length ?? 0) >= 2 ? "시안" : "체험"}`;
   const description = fitDescription(demo.description);
   return {
     title,

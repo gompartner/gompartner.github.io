@@ -24,7 +24,8 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
   const { slug } = await params;
   const p = findBySlug(slug);
   if (!p) return {};
-  const meta = pageMeta({ title: `${p.title} 카탈로그`, description: p.description, path: `/sample/${slug}`, noindex: true });
+  // 11-22 제목 규칙: 시안이 둘이면 "OO 시안", 앱, 키오스크는 "OO 체험". 뒤에 "| 곰파트너"가 붙어 곰파트너가 만든 예시임이 드러난다
+  const meta = pageMeta({ title: hasPair(p) ? `${p.title} 시안` : `${p.title} 체험`, description: p.description, path: `/sample/${slug}`, noindex: true });
   // 접은 서비스(랜딩, 업무 프로그램, 유지보수 화면) 카탈로그는 주소만 남기고 검색에서 뺀다
   return isFolded(p) ? { ...meta, robots: { index: false, follow: true }, alternates: undefined } : meta;
 }
