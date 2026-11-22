@@ -34,7 +34,6 @@ const groups = [
     title: "곰파트너",
     items: [
       { href: "/pricing", label: "비용" },
-      { href: "/knowledge", label: "웹 지식" },
       { href: "/story", label: "회사소개" },
       { href: "/notice", label: "공지사항" },
       { href: "/faq", label: "자주 묻는 질문" },
