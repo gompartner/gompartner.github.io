@@ -5,7 +5,8 @@ import type { TimelineRow } from "@/components/classic/archive/Timeline";
 
 export const historyTopics = ["홈페이지", "화면", "기술", "보안과 사고", "검색과 AI", "법과 공공"] as const;
 export type HistoryTopic = (typeof historyTopics)[number];
-export type HistoryEvent = { year: number; when: string; text: string; topic: HistoryTopic; region?: string; href: string };
+/** href는 우리 문서, 우리 문서가 없는 사건은 src(원 출처)로 잇는다 */
+export type HistoryEvent = { year: number; when: string; text: string; topic: HistoryTopic; region?: string; href?: string; src?: { label: string; url: string } };
 
 const yearOf = (w: string) => Number(w.match(/(19|20)\d\d/)?.[0] ?? 0);
 
@@ -26,7 +27,7 @@ const auto: HistoryEvent[] = [
   ...from(publicHomeRows, "/knowledge/public-homepage", (t) => ({ topic: /화재/.test(t) ? "보안과 사고" : "법과 공공" })),
   // 기업 홈페이지의 법 줄은 공공기관 연표와 겹치는 것(개인정보 보호법, 주민번호)은 빼고 웹 접근성 확대만 남긴다
   ...from(companyRows, "/knowledge/company-homepage", (t) => (/개인정보 보호법|주민등록번호/.test(t) ? null : { topic: law.test(t) ? "법과 공공" : /플래시|모바일/.test(t) ? "화면" : "홈페이지" })),
-  ...from(searchOptRows, "/knowledge/search-optimization", (_, c) => ({ topic: "검색과 AI", region: c === "a" ? "세계" : undefined })),
+  ...from(searchOptRows, "/knowledge/search-optimization", (t, c) => (/네이버 블로그 공개/.test(t) ? null : { topic: "검색과 AI", region: c === "a" ? "세계" : undefined })),
   // AI가 쓰는 웹사이트 연표는 검색 최적화와 겹치는 줄(GEO 논문, AI 브리핑, AI 모드)을 뺀다
   ...from(aiWebRows, "/knowledge/ai-readable-web", (t) => (/^GEO|AI 브리핑|^구글 AI 모드/.test(t) ? null : { topic: "검색과 AI", region: "세계" })),
   ...from(aiHomeRows, "/knowledge/ai-and-homepage", (t, c) => ({ topic: c === "b" ? (law.test(t) ? "법과 공공" : "보안과 사고") : "홈페이지", region: /쿠팡|SK텔레콤|개인정보|개인정보보호위원회/.test(t) ? undefined : "세계" })),
@@ -52,8 +53,38 @@ const hand: HistoryEvent[] = [
   { year: 2022, when: "2022년", text: "인터넷 익스플로러 지원 종료", topic: "기술", region: "세계", href: "/knowledge/browser" },
 ];
 
+
+// 11-22 조사 보강: 우리 문서가 아직 없는 시대의 빈 곳. 1차 자료나 언론 기사로 날짜를 확인한 것만(엇갈리는 것은 뺌)
+const ev = (year: number, when: string, text: string, topic: HistoryTopic, label: string, url: string, region?: string): HistoryEvent => ({ year, when, text, topic, region, src: { label, url } });
+const sourced: HistoryEvent[] = [
+  ev(1997, "1997년 5월", "다음, 무료 전자우편 한메일넷 시작", "홈페이지", "다음 사례 연구(KoreaScience)", "https://koreascience.kr/article/JAKO200463369808920.pdf"),
+  ev(1998, "1998년 4월", "옥션, 인터넷 경매 서비스 시작", "홈페이지", "전자신문", "https://m.etnews.com/199909110033"),
+  ev(1999, "1999년", "다음 카페(카페한메일) 오픈. 2주 만에 동호회 2,200개", "홈페이지", "다음커뮤니케이션 보도자료", "https://www.kakaocorp.com/page/detail/5247"),
+  ev(2000, "2000년 11월", "세이클럽, 유료 아바타 서비스 시작(11월 7일)", "홈페이지", "디지털타임스", "https://www.dt.co.kr/article/10143777"),
+  ev(2002, "2002년 3월", "전자상거래소비자보호법 제정(법률 제6687호)", "법과 공공", "국가법령정보센터", "https://www.law.go.kr/LSW/lsInfoP.do?lsiSeq=140566"),
+  ev(2002, "2002년 10월", "네이버 지식iN 출시(10월 7일). 검색과 묻고 답하기를 결합", "검색과 AI", "네이버 보도자료", "https://navercorp.com/media/pressReleasesDetail?seq=30903"),
+  ev(2002, "2002년 11월", "프리챌, 커뮤니티 전면 유료화(11월 14일). 회원 이탈로 2003년 6월 다시 무료화", "홈페이지", "프리챌 유료화 전략 연구(KoreaScience)", "https://koreascience.kr/article/JAKO200416637999092.page"),
+  ev(2003, "2003년 8월", "한글.kr 도입(8월 19일). 상표권자 우선 등록부터", "법과 공공", "KISA 발표자료", "https://new.icann.org/en/news/presentations/ahngu-idn-kl-21jul04-en.pdf"),
+  ev(2003, "2003년 10월", "인터파크 구스닥, 이름을 G마켓으로 변경", "홈페이지", "아이뉴스24", "https://www.inews24.com/view/100310"),
+  ev(2004, "2004년", "제1회 웹어워드코리아. 기업 홈페이지 디자인을 겨루는 상", "화면", "전자신문", "https://m.etnews.com/200410250092"),
+  ev(2006, "2006년 9월", "2단계 .kr 도메인 개방, 정부기관부터 등록", "법과 공공", "전자신문", "https://m.etnews.com/200611100034"),
+  ev(2008, "2008년 6월", "CSS Design Korea, 제1회 웹표준 경진대회 시상", "기술", "전자신문", "https://m.etnews.com/200806190202"),
+  ev(2008, "2008년 10월", "네이버, 한글날에 나눔고딕과 나눔명조 무료 배포. 무료 한글 웹 글꼴의 시작", "화면", "NHN 보도자료", "https://navercorp.com/media/pressReleasesDetail?seq=27958"),
+  ev(2011, "2011년 10월", ".한국 도메인 일반 등록 시작(10월 6일)", "법과 공공", "YTN", "https://www.ytn.co.kr/_ln/0102_201109250604242580"),
+  ev(2012, "2012년 12월", "야후코리아, 15년 만에 국내 서비스 종료(12월 31일)", "검색과 AI", "보안뉴스", "https://m.boannews.com/html/detail.html?idx=34275"),
+  ev(2013, "2013년 2월", "프리챌 커뮤니티 서비스 종료(2월 18일)", "홈페이지", "경향 위클리", "https://weekly.khan.co.kr/article/201302251623051"),
+  ev(2014, "2014년 5월", "30만 원 이상 카드 결제의 공인인증서 의무 폐지(5월 20일)", "법과 공공", "오마이뉴스", "https://m.ohmynews.com/NWS_Web/Mobile/at_pg.aspx?CNTN_CD=A0001993271"),
+  ev(2014, "2014년 7월", "구글과 어도비, 본고딕(Noto Sans CJK) 공개(7월 15일)", "화면", "구글 개발자 블로그", "https://developers-kr.googleblog.com/2014/07/cjkfont.html", "세계"),
+  ev(2014, "2014년 9월", "카카오페이 출시(9월 5일). 간편결제의 시작", "기술", "카카오 보도자료", "https://www.kakaocorp.com/page/detail/7577"),
+  ev(2014, "2014년 10월", "W3C, HTML5를 정식 권고안으로 발표(10월 28일)", "기술", "W3C", "https://www.w3.org/2014/10/html5-rec.html", "세계"),
+  ev(2015, "2015년 3월", "금융위원회, 전자금융 공인인증서 의무 사용 폐지 의결(3월 18일)", "법과 공공", "법률신문", "https://www.lawtimes.co.kr/news/articleView.html?idxno=91892"),
+  ev(2015, "2015년 6월", "네이버페이 정식 출시(2009년 체크아웃 기반)", "기술", "한국경제", "https://www.hankyung.com/amp/201606291558g"),
+  ev(2017, "2017년 4월", "본명조(Source Han Serif) 공개(4월 3일)", "화면", "어도비 Typekit 블로그", "https://blog.typekit.com/2017/04/03/introducing-source-han-serif", "세계"),
+  ev(2025, "2025년 6월", "네이버 모두(modoo) 무료 홈페이지 서비스 종료", "홈페이지", "전자신문", "https://m.etnews.com/20241226000326"),
+];
+
 const monthOf = (w: string) => Number(w.match(/(\d{1,2})월/)?.[1] ?? 0);
-export const historyEvents: HistoryEvent[] = [...auto, ...hand].sort((a, b) => a.year - b.year || monthOf(a.when) - monthOf(b.when));
+export const historyEvents: HistoryEvent[] = [...auto, ...hand, ...sourced].sort((a, b) => a.year - b.year || monthOf(a.when) - monthOf(b.when));
 
 /** 시대 네 장. 이야기는 연표와 각 문서에 출처가 있는 사실로만 쓰고, 해석은 "곰파트너가 보기에"로 밝힌다 */
 export const eras = [
@@ -61,6 +92,7 @@ export const eras = [
     id: "e1", from: 1994, to: 2002, title: "무료 계정과 게시판",
     story: [
       "인터넷 인구가 400만 명이던 1999년 무렵, 개인 홈페이지는 포털과 PC통신 회사가 내준 무료 공간에 나모 웹에디터로 만든 화면을 FTP로 올리는 일이었습니다. 게시판은 Perl CGI 테크노트나 PHP 제로보드를 받아 달았습니다.",
+      "포털이 이 판을 키웠습니다. 1997년 다음 한메일, 1999년 다음 카페가 열렸고 카페는 두 주 만에 동호회 2,200개가 생겼습니다. 1998년에는 옥션이 경매를 시작해 개인이 웹에서 물건을 사고팔기 시작했습니다.",
       "공공에서는 1999년 전자서명법으로 공인인증서가 시작됐고, 2001년 전자정부법과 2002년 전자정부 출범으로 민원이 온라인으로 옮겨 갔습니다. 검색은 사람이 사이트를 주제별로 분류해 올리는 디렉터리 등록이 먼저였습니다.",
       "곰파트너가 보기에 이때 자리 잡은 게시판 중심 사이트와 공인인증서 로그인이 이후 10년 넘게 한국 웹의 모양을 정했습니다.",
     ],
@@ -70,6 +102,7 @@ export const eras = [
     id: "e2", from: 2003, to: 2009, title: "포털, 블로그, 플래시",
     story: [
       "2001년 미니홈피, 2003년 네이버 블로그가 열리면서 개인은 직접 만들기보다 서비스 안에 공간을 여는 쪽으로 옮겼습니다. 회사 홈페이지는 회사 소개서 순서의 메뉴에 플래시 인트로가 기본이었고, 1024x768 화면에 맞춰 본문 폭을 980px 안팎으로 고정했습니다.",
+      "2002년 네이버 지식iN이 나오며 검색은 사람이 묻고 답한 글을 찾는 일이 됐고, 같은 해 프리챌이 커뮤니티를 유료로 바꿨다가 이듬해 되돌렸습니다. 2003년 G마켓, 한글.kr이 이어졌고, 2008년 네이버 나눔고딕이 무료로 풀리며 한글 웹 글꼴의 선택지가 처음 생겼습니다.",
       "2009년에는 PC 브라우저의 절반 넘게 인터넷 익스플로러였습니다. 같은 해 공공기관부터 웹 접근성 의무가 시작됐고, 6월 전자정부 표준프레임워크가 나오며 공공 시스템은 Java로 된 같은 틀 위로 모였습니다.",
       "곰파트너가 보기에 이 시기에 만든 사이트를 넘겨받으면 플래시, IE 전용 코드, 오래된 게시판이 함께 남아 있는 경우가 많습니다.",
     ],
@@ -80,6 +113,7 @@ export const eras = [
     story: [
       "2009년 11월 아이폰이 들어오고, 2012년에는 한국 전체 접속의 24%가 휴대폰이었습니다. 미국 10%, 일본 8%보다 빨라서 m. 전용 사이트를 따로 만드는 회사가 늘었습니다.",
       "2011년 개인정보 보호법, 2013년 모든 기업으로 넓어진 웹 접근성 의무, 2014년 주민등록번호 수집 금지가 이어지며 홈페이지에 법이 들어왔습니다. 화면은 2013년 iOS 7과 2014년 Material Design 전후로 평평해졌고, 한국은 2015년 1920x1080 모니터가 54%가 되며 와이드 화면으로 먼저 넘어갔습니다.",
+      "결제도 이때 바뀌었습니다. 2014년 30만 원 이상 카드 결제의 공인인증서 의무가 풀리고 같은 해 카카오페이, 2015년 네이버페이가 나왔습니다. 2014년 W3C가 HTML5를 정식 권고하고 본고딕이 공개되면서 플래시와 이미지 글자를 대신할 도구가 갖춰졌습니다.",
       "검색에서는 2015년 네이버 C-Rank와 구글 모바일 친화 업데이트가 같은 해에 나왔습니다. 곰파트너가 보기에 이때부터 홈페이지는 한 번 만들고 끝나는 것이 아니라 법과 기기에 맞춰 계속 고치는 것이 됐습니다.",
     ],
     read: ["/knowledge/mobile-screen", "/knowledge/design-styles", "/knowledge/app", "/knowledge/page-weight"],

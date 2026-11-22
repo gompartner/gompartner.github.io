@@ -23,7 +23,7 @@ export default function HistoryPage() {
       <HistoryView
         topics={[...historyTopics]}
         eras={eras.map((e) => ({ id: e.id, label: `${e.from}~${e.to === 2026 ? "지금" : e.to}`, title: e.title, story: [...e.story], read: e.read.map((h) => ({ href: h, title: title(h), ver: docUpdated(h) })) }))}
-        events={historyEvents.map((e) => ({ era: eraOf(e.year), when: e.when, text: e.text, topic: e.topic, region: e.region, href: e.href, doc: short(title(e.href)) }))}
+        events={historyEvents.map((e) => ({ era: eraOf(e.year), when: e.when, text: e.text, topic: e.topic, region: e.region, href: e.href, doc: e.href ? short(title(e.href)) : undefined, src: e.src }))}
       />
     </ArchiveShell>
   );

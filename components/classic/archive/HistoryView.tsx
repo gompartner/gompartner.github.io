@@ -6,7 +6,7 @@ import { ReadMark } from "@/components/classic/archive/ReadMark";
 
 // 11-22 한국 웹 연표: 시대마다 이야기, 깊이 읽기, 그 시대 사건. 위 주제 태그로 사건을 거른다(이야기는 그대로)
 export type EraView = { id: string; label: string; title: string; story: string[]; read: { href: string; title: string; ver?: string }[] };
-export type EventView = { era: string; when: string; text: string; topic: string; region?: string; href: string; doc: string };
+export type EventView = { era: string; when: string; text: string; topic: string; region?: string; href?: string; doc?: string; src?: { label: string; url: string } };
 
 const tone: Record<string, string> = {
   홈페이지: "text-[#1d5fd6]",
@@ -69,7 +69,11 @@ export function HistoryView({ eras, events, topics }: { eras: EraView[]; events:
                   </p>
                   <p className="mt-0.5 max-w-[760px] text-[15px] leading-[1.65] text-[#2b313b]">
                     {e.text}{" "}
-                    <Link href={e.href} className="whitespace-nowrap text-[13px] font-bold text-[#5b6370] underline-offset-4 hover:text-[#256ef4] hover:underline">{e.doc}</Link>
+                    {e.href ? (
+                      <Link href={e.href} className="whitespace-nowrap text-[13px] font-bold text-[#5b6370] underline-offset-4 hover:text-[#256ef4] hover:underline">{e.doc}</Link>
+                    ) : e.src ? (
+                      <a href={e.src.url} target="_blank" rel="noopener noreferrer" className="whitespace-nowrap text-[13px] text-[#6b7380] underline underline-offset-4 hover:text-[#256ef4]">출처: {e.src.label}</a>
+                    ) : null}
                   </p>
                 </li>
               ))}
