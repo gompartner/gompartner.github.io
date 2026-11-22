@@ -84,6 +84,10 @@ import { LtA } from "./LtA";
 import { LtB } from "./LtB";
 import { LqA } from "./LqA";
 import { LqB } from "./LqB";
+import { WdA } from "./WdA";
+import { WdB } from "./WdB";
+import { CeA } from "./CeA";
+import { CeB } from "./CeB";
 
 // 컨셉 시안 두 장씩(11-21). 맨 위 줄에서 바꿔 본다. 기존 기능형 데모는 코드만 남긴다.
 export function TaxDrafts() {
@@ -640,6 +644,34 @@ export function LiquorShopDrafts() {
     <>
       <LqA />
       <QuickMenu accent="#7a1f2b" cta="매장 안내" tel="02-000-0000" />
+    </>
+  );
+}
+
+export function SmallWeddingDrafts() {
+  return useVariant("small-wedding") === "b" ? (
+    <>
+      <WdB />
+      <QuickMenu accent="#b4606c" cta="상담 신청" tel="02-000-0000" />
+    </>
+  ) : (
+    <>
+      <WdA />
+      <QuickMenu accent="#59663a" cta="투어 상담" tel="031-000-0000" />
+    </>
+  );
+}
+
+export function CertLabDrafts() {
+  return useVariant("cert-lab") === "b" ? (
+    <>
+      <CeB />
+      <QuickMenu accent="#4b3aa8" cta="분석 의뢰" tel="042-000-0000" />
+    </>
+  ) : (
+    <>
+      <CeA />
+      <QuickMenu accent="#16325c" cta="견적문의" tel="031-000-0000" />
     </>
   );
 }

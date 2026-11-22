@@ -172,6 +172,14 @@ export const VARIANTS: Record<string, { id: string; label: string }[]> = {
     { id: "a", label: "시안 A 와인 보틀샵" },
     { id: "b", label: "시안 B 전통주" },
   ],
+  "small-wedding": [
+    { id: "a", label: "시안 A 가든 하우스" },
+    { id: "b", label: "시안 B 레스토랑 예식" },
+  ],
+  "cert-lab": [
+    { id: "a", label: "시안 A 인증 안내" },
+    { id: "b", label: "시안 B 시험분석" },
+  ],
   "clinic-homepage": [
     { id: "a", label: "시안 A 미니멀" },
     { id: "b", label: "시안 B 진료 안내형" },

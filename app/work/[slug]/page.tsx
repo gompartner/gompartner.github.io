@@ -10,7 +10,7 @@ const AccessibilityDemo = dynamic(() => import("@/components/demos/Accessibility
 const OnlineStoreDemo = dynamic(() => import("@/components/demos/OnlineStoreDemo").then((m) => m.OnlineStoreDemo));
 const PensionDrafts = dynamic(() => import("@/components/drafts/Drafts").then((m) => m.PensionDrafts));
 const CompanyDemo = dynamic(() => import("@/components/demos/CompanyDemo").then((m) => m.CompanyDemo));
-const CertLabDemo = dynamic(() => import("@/components/demos/CertLabDemo").then((m) => m.CertLabDemo));
+const CertLabDrafts = dynamic(() => import("@/components/drafts/Drafts").then((m) => m.CertLabDrafts));
 const LawFirmDrafts = dynamic(() => import("@/components/drafts/LawFirmDrafts").then((m) => m.LawFirmDrafts));
 const TaxDrafts = dynamic(() => import("@/components/drafts/Drafts").then((m) => m.TaxDrafts));
 const EstateDrafts = dynamic(() => import("@/components/drafts/Drafts").then((m) => m.EstateDrafts));
@@ -58,7 +58,7 @@ const NailDrafts = dynamic(() => import("@/components/drafts/Drafts").then((m) =
 const CarDetailingDrafts = dynamic(() => import("@/components/drafts/Drafts").then((m) => m.CarDetailingDrafts));
 const LightingShopDrafts = dynamic(() => import("@/components/drafts/Drafts").then((m) => m.LightingShopDrafts));
 const LiquorShopDrafts = dynamic(() => import("@/components/drafts/Drafts").then((m) => m.LiquorShopDrafts));
-const SmallWeddingDemo = dynamic(() => import("@/components/demos/SmallWeddingDemo").then((m) => m.SmallWeddingDemo));
+const SmallWeddingDrafts = dynamic(() => import("@/components/drafts/Drafts").then((m) => m.SmallWeddingDrafts));
 const KmDrafts = dynamic(() => import("@/components/drafts/Drafts").then((m) => m.KmDrafts));
 const OrthoDrafts = dynamic(() => import("@/components/drafts/Drafts").then((m) => m.OrthoDrafts));
 const PedDrafts = dynamic(() => import("@/components/drafts/Drafts").then((m) => m.PedDrafts));
@@ -112,7 +112,7 @@ const demoComponents: Record<string, ComponentType> = {
   "online-store": OnlineStoreDemo,
   pension: PensionDrafts,
   company: CompanyDemo,
-  "cert-lab": CertLabDemo,
+  "cert-lab": CertLabDrafts,
   "law-firm": LawFirmDrafts,
   "tax-office": TaxDrafts,
   "real-estate": EstateDrafts,
@@ -139,7 +139,7 @@ const demoComponents: Record<string, ComponentType> = {
   "car-detailing": CarDetailingDrafts,
   "lighting-shop": LightingShopDrafts,
   "liquor-shop": LiquorShopDrafts,
-  "small-wedding": SmallWeddingDemo,
+  "small-wedding": SmallWeddingDrafts,
   "korean-medicine": KmDrafts,
   "orthopedics": OrthoDrafts,
   "pediatrics": PedDrafts,
