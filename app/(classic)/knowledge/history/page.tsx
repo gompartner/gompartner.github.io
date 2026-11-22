@@ -8,7 +8,7 @@ import { pageMeta } from "@/lib/seo";
 // 11-22 한국 웹 연표: 그때그때 쓴 웹 지식 문서를 시대 네 장으로 엮은 첫 읽을거리
 const HREF = "/knowledge/history";
 const TITLE = "한국 웹 30년: 무료 계정에서 AI 빌더까지";
-const LEAD = "1990년대 무료 홈페이지 공간부터 지금의 AI 빌더까지, 한국 홈페이지가 걸어온 길을 시대 네 장으로 정리했습니다. 장마다 그 시대 이야기, 깊이 읽을 문서, 그때 일어난 일을 모았습니다.";
+const LEAD = "1990년대 무료 홈페이지 공간부터 지금의 AI 빌더까지, 한국 웹의 변천사를 시대 네 장으로 정리했습니다. 장마다 그 시대 이야기, 깊이 읽을 문서, 그때 일어난 일을 모았습니다.";
 
 export const metadata: Metadata = pageMeta({ title: `${TITLE} | 웹 지식`, description: LEAD, path: HREF });
 
