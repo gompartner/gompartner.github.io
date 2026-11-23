@@ -81,7 +81,7 @@ export function EnShell({ children }: { children: React.ReactNode }) {
           <div>
             <p className="font-bold text-white">Company</p>
             <p className="mt-3">{profile.nameEn} ({profile.name})</p>
-            <p className="mt-1">Business registration no. {profile.bizNo}</p>
+            <p className="mt-1">Business registration no. {profile.bizNo}, Gwanak-gu, Seoul</p>
             <p className="mt-1">Seoul, Korea</p>
           </div>
         </div>

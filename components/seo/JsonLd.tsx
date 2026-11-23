@@ -53,7 +53,7 @@ export function SiteJsonLd() {
         faxNumber: profile.fax,
         taxID: profile.bizNo,
         areaServed: "KR",
-        address: { "@type": "PostalAddress", addressLocality: "서울", addressCountry: "KR" },
+        address: { "@type": "PostalAddress", addressRegion: "서울특별시", addressLocality: "관악구", addressCountry: "KR" },
         sameAs,
         hasOfferCatalog: {
           "@type": "OfferCatalog",

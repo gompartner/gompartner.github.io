@@ -118,7 +118,7 @@ export function ClassicFooter() {
           </div>
           <div className="md:text-right">
             <p>
-              상호 {profile.name} | 사업자등록번호 {profile.bizNo}
+              상호 {profile.name} | 사업자등록번호 {profile.bizNo} | 서울 관악구
             </p>
             {/* 키보드로 칠 수 있는 기호만 쓴다(저작권 기호 대신 Copyright) */}
             <p className="mt-1">Copyright {new Date().getFullYear()} {profile.name}. All rights reserved.</p>

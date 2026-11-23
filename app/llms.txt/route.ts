@@ -27,7 +27,7 @@ export function GET() {
 - 회사소개: ${url("/story")}
 - 상담 신청: ${url("/contact")} (${replyTerm})
 - 전화 ${profile.phone}, 이메일 ${profile.email}
-- 사업자: ${profile.name}, 사업자등록번호 ${profile.bizNo}
+- 사업자: ${profile.name}, 사업자등록번호 ${profile.bizNo}, 서울 관악구
 
 ## 유지보수
 
