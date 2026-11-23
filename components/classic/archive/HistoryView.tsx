@@ -22,7 +22,7 @@ export function HistoryView({ eras, events, topics }: { eras: EraView[]; events:
   const [korea, setKorea] = useState(false);
   const pass = (e: EventView) => (sel === "전체" || e.topic === sel) && (!korea || !e.region);
   return (
-    <div>
+    <>
       <div className="sticky top-16 z-10 -mx-4 mt-6 border-b border-[#e6e9ee] bg-white px-4 py-2.5 md:top-[76px] md:mx-0 md:px-0 [@media(pointer:coarse)_and_(min-width:768px)]:top-0">
         <div role="group" aria-label="주제로 거르기" className="-mx-4 flex gap-1.5 overflow-x-auto px-4 [scrollbar-width:none] md:mx-0 md:flex-wrap md:overflow-visible md:px-0">
           {["전체", ...topics].map((t) => (
@@ -82,6 +82,6 @@ export function HistoryView({ eras, events, topics }: { eras: EraView[]; events:
           </section>
         );
       })}
-    </div>
+    </>
   );
 }

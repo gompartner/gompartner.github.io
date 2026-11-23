@@ -215,9 +215,10 @@ export function DocHead({ title, meta, lead, labels, leadLabel = "요약" }: { t
       <h1 className="mt-4 text-[30px] font-[800] leading-[1.25] tracking-[-0.04em] md:text-[38px]">{title}</h1>
       {meta ? (
         <p className="mt-3 flex flex-wrap gap-x-4 gap-y-1 text-[13.5px] text-[#5b6370]">
-          {meta.map(([k, v]) => (
+          {meta.map(([k, v], i) => (
             <span key={k}>
               {k} <b className="font-bold text-[#15171c]">{v}</b>
+              {i < meta.length - 1 ? <span className="sr-only">, </span> : null}
             </span>
           ))}
         </p>
