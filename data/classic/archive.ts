@@ -364,7 +364,7 @@ function rawTopics(): Topic[] {
       { title: "운영 노트", items: [note("domain-server-ownership"), note("expiry-calendar"), note("backup-but-no-restore"), note("takeover-first-week-server")] },
     ] },
     { id: "security", label: "보안", desc: "PHP, 워드프레스, 그누보드, 인증서 보안 경보와 대응", groups: [
-      { title: "점검", items: [note("exposed-files-check"), note("security-headers-check")] },
+      { title: "점검", items: [note("exposed-files-check"), note("security-headers-check"), note("safari-reader-mode-missing-content")] },
       { title: "보안 경보", items: series("보안 경보") },
     ] },
     { id: "search", label: "검색", desc: "검색 등록과 기록, 검색 결과에 보이는 모습, AI 검색과 인용", groups: [
