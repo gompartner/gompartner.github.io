@@ -53,20 +53,38 @@ export function ClassicPrivacy({ version }: { version: PolicyVersion }) {
             )}
           </p>
 
+          {version.intro && (
+            <p className="mt-8 rounded-lg border border-[#e6e9ee] bg-[#f6f7f9] px-5 py-4 text-[16px] leading-[1.7] text-[#3d4450]">{version.intro}</p>
+          )}
+
+          {/* 목차: 거래장부, 사이트 지킴이 처리방침과 같은 형식 */}
+          <nav aria-label="목차" className="mt-6 rounded-lg border border-[#e6e9ee] px-5 py-4">
+            <b className="block text-[15px]">목차</b>
+            <ol className="mt-2 gap-x-6 text-[15px] leading-[1.8] md:columns-2">
+              {version.sections.map((s, i) => (
+                <li key={s.title} className="break-inside-avoid">
+                  <a href={`#a${i + 1}`} className="text-[#5b6370] hover:text-[#256ef4]">
+                    {s.title}
+                  </a>
+                </li>
+              ))}
+            </ol>
+          </nav>
+
           <div className="mt-10 space-y-12">
-            {version.sections.map((s) => (
-              <section key={s.title}>
+            {version.sections.map((s, i) => (
+              <section key={s.title} id={`a${i + 1}`} className="scroll-mt-24">
                 <h2 className="text-[21px] font-[800] leading-[1.45] tracking-[-0.03em] md:text-[23px]">{s.title}</h2>
                 <div className="mt-4 space-y-3 text-[17px] leading-[1.7] text-[#3d4450]">
                   {s.body.map((b, i) =>
                     typeof b === "string" ? (
                       <p key={i}>{b}</p>
                     ) : Array.isArray(b) ? (
-                      <ul key={i} className="list-disc space-y-1 pl-5">
+                      <ol key={i} className="list-decimal space-y-1 pl-6">
                         {b.map((item) => (
                           <li key={item}>{item}</li>
                         ))}
-                      </ul>
+                      </ol>
                     ) : (
                       <DataTable key={i} {...b} />
                     ),
