@@ -77,7 +77,7 @@ export default async function ClassicInsightDetailPage({ params }: Props) {
                   {b.h && (
                     <h2
                       id={`s${bi}`}
-                      className="scroll-mt-24 text-[21px] font-[800] leading-[1.4] tracking-[-0.02em] md:text-[24px]"
+                      className="anchor-24 text-[21px] font-[800] leading-[1.4] tracking-[-0.02em] md:text-[24px]"
                     >
                       {b.h}
                     </h2>

@@ -260,3 +260,7 @@ input[type="time"]::-webkit-date-and-time-value {
 }
 /* 11-22 웹 지식 표: 한글을 낱자로 자르지 않고 띄어쓰기에서 줄바꿈(아이패드 좁은 칸에서 "횟수(" 같은 깨짐) */
 #archive-main table { word-break: keep-all; overflow-wrap: break-word; }
+
+/* 11-23 문서 본문 앵커 여백. Safari 읽기 모드가 이름에 scroll이 든 요소를 본문에서 버려서 scroll-mt 대신 이 이름을 쓴다 */
+.anchor-24 { scroll-margin-top: 6rem; }
+.anchor-40 { scroll-margin-top: 10rem; }

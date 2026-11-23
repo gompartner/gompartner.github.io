@@ -7,7 +7,7 @@ export function TrendNav({ current }: { current: string }) {
   const list = relatedOf(current);
   if (!topic || !list.length) return null;
   return (
-    <nav id="rel" aria-label="관련 문서" className="mt-12 scroll-mt-24">
+    <nav id="rel" aria-label="관련 문서" className="mt-12 anchor-24">
       <h2 className="border-b border-[#e6e9ee] pb-2 text-[22px] font-[800] tracking-[-0.035em] md:text-[24px]">관련 문서</h2>
       <ul role="list" className="mt-4 grid gap-2.5 sm:grid-cols-2">
         {list.map((d) => (

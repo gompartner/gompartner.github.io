@@ -96,7 +96,7 @@ export default async function TermDoc({ params }: { params: Promise<{ slug: stri
       <h2 id="terms" className={docH2}>용어별로 보기</h2>
       <div className="mt-2">
         {g.terms.map((t) => (
-          <article key={t.id} id={t.id} className="grid scroll-mt-24 gap-5 border-b border-[#e6e9ee] py-7 md:grid-cols-[minmax(0,340px)_minmax(0,1fr)] md:gap-7">
+          <section key={t.id} id={t.id} className="grid anchor-24 gap-5 border-b border-[#e6e9ee] py-7 md:grid-cols-[minmax(0,340px)_minmax(0,1fr)] md:gap-7">
             {termImages[t.id] ? (
               // eslint-disable-next-line @next/next/no-img-element
               <img src={`/images/glossary/${t.id}.webp`} alt={`${t.name} 와이어프레임`} width={termImages[t.id][0]} height={termImages[t.id][1]} loading="lazy" decoding="async" className="block h-auto w-full rounded-lg border border-[#e1e5eb] bg-[#f5f7fa]" />
@@ -116,7 +116,7 @@ export default async function TermDoc({ params }: { params: Promise<{ slug: stri
                 </p>
               ) : null}
             </div>
-          </article>
+          </section>
         ))}
       </div>
 

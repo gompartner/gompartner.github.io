@@ -184,7 +184,7 @@ export function ArchiveShell({ section, active, crumbs, toc, article, children }
           </ol>
         </nav>
         {isDoc ? <ReadTracker href={active} ver={docUpdated(active) ?? article?.modified} /> : null}
-        {/* 11-22 글 문서(article 값이 있는 페이지)는 본문을 article로 감싸 브라우저 읽기 모드가 본문을 찾게 한다 */}
+        {/* 11-22 글 문서(article 값이 있는 페이지)는 본문을 article로 감싸 브라우저 읽기 모드가 본문을 찾게 한다. 본문 안 클래스에 scroll, comment, sidebar 같은 단어를 쓰면 Safari가 그 요소를 버린다 */}
         {article ? <article>{children}</article> : children}
       </div>
 
@@ -240,13 +240,13 @@ export function DocHead({ title, meta, lead, labels, leadLabel = "요약" }: { t
   );
 }
 
-export const docH2 = "mt-12 scroll-mt-24 border-b border-[#e6e9ee] pb-2 text-[22px] font-[800] tracking-[-0.035em] md:text-[24px]";
+export const docH2 = "mt-12 anchor-24 border-b border-[#e6e9ee] pb-2 text-[22px] font-[800] tracking-[-0.035em] md:text-[24px]";
 
 /** 인수 시 확인 사항(우리 색깔). 확인할 때 하나씩 지워 가는 체크 칸 모양 */
 export function TakeoverBox({ sub, items }: { sub: string; items: { b: string; t: string }[] }) {
   return (
-    <section id="take" aria-labelledby="take-h" className="mt-12 scroll-mt-24">
-      <h2 id="take-h" className="scroll-mt-24 border-b border-[#e6e9ee] pb-2 text-[22px] font-[800] tracking-[-0.035em] md:text-[24px]">인수 시 확인 사항</h2>
+    <section id="take" aria-labelledby="take-h" className="mt-12 anchor-24">
+      <h2 id="take-h" className="anchor-24 border-b border-[#e6e9ee] pb-2 text-[22px] font-[800] tracking-[-0.035em] md:text-[24px]">인수 시 확인 사항</h2>
       <p className="mt-2 text-[14px] text-[#5b6370]">{sub}</p>
       <ul role="list" className="mt-3">
         {items.map((x) => (

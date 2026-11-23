@@ -39,9 +39,9 @@ export function HistoryView({ eras, events, topics }: { eras: EraView[]; events:
       {eras.map((era) => {
         const list = events.filter((e) => e.era === era.id && pass(e));
         return (
-          <section key={era.id} aria-labelledby={era.id} className="mt-12 scroll-mt-40">
+          <section key={era.id} aria-labelledby={era.id} className="mt-12 anchor-40">
             <p className="text-[14px] font-[800] tabular-nums text-[#256ef4]">{era.label}</p>
-            <h2 id={era.id} className="mt-1 scroll-mt-40 text-[24px] font-[800] tracking-[-0.035em] md:text-[28px]">{era.title}</h2>
+            <h2 id={era.id} className="mt-1 anchor-40 text-[24px] font-[800] tracking-[-0.035em] md:text-[28px]">{era.title}</h2>
             {era.story.map((t, i) => (
               <p key={i} className="mt-4 max-w-[760px] text-[16.5px] leading-[1.8] text-[#2b313b]">{t}</p>
             ))}
