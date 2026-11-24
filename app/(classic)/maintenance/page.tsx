@@ -1,20 +1,18 @@
 import type { Metadata } from "next";
-import Image from "next/image";
 import Link from "next/link";
 import { ArrowUpRight, CalendarClock, FileBarChart, MessageSquareReply, Wrench } from "lucide-react";
 import { FaqBlock } from "@/components/classic/FaqBlock";
-import { MaintenanceStory } from "@/components/classic/MaintenanceStory";
 import { StepList } from "@/components/classic/pricing/StepList";
 import { maintenanceTabs } from "@/components/classic/pricing/tabs";
 import { PageHead, SubTabs, wrap } from "@/components/classic/ui";
 import { faqFor } from "@/data/classic/faq";
-import { dataTerms, maintenanceServices, maintenanceSteps, severityNote, severityTerms } from "@/data/classic/maintenance";
+import { dataTerms, maintenanceSteps, severityNote, severityTerms } from "@/data/classic/maintenance";
 import { pageMeta } from "@/lib/seo";
 import { siteUrl } from "@/lib/site";
 
 export const metadata: Metadata = pageMeta({
   title: "홈페이지 유지보수, 유지관리 (오류 수정, 업체 변경, 보안 업데이트, 월 유지보수)",
-  description: "홈페이지 유지보수, 유지관리 업체 곰파트너. 다른 업체가 만든 사이트의 긴급 오류 수정, 연락 두절 업체 인수, 워드프레스, 그누보드, PHP 보안 업데이트, 월 유지보수 월 9만 원부터(부가세 별도).",
+  description: "홈페이지 유지보수, 유지관리 업체 곰파트너. 다른 업체가 만든 사이트의 긴급 오류 수정, 연락 두절 업체 인수, 워드프레스, 그누보드, PHP 보안 업데이트, 유지보수, 유지관리, 성능 개선, 고도화로 나눠 수행합니다.",
   path: "/maintenance",
 });
 
@@ -26,12 +24,38 @@ const PROMISES = [
   { icon: FileBarChart, num: "월 1회", label: "월간 점검 보고서" },
 ];
 
-const SUMMARY: [string, string][] = [
-  ["특징", "다른 업체가 만든 PHP, 그누보드, 워드프레스, Next.js 사이트의 긴급 오류 수정과 업체 인수. 공공기관, 대학 홈페이지 유지관리를 담당했던 개발자가 직접 작업합니다."],
-  ["비용", "월 유지보수 월 9만 원부터(부가세 별도). 오류 수정은 원인 확인 뒤 금액을 먼저 안내합니다."],
-  ["응대", "영업일 기준 24시간 이내 회신, 작업 전 파일과 DB 전체 백업, 작업 뒤 내역서와 월간 점검 보고서."],
-  ["적합한 고객", "제작 업체와 연락이 끊긴 곳, AI 도구로 만든 사이트를 운영에 넘길 곳, PHP 지원 종료 전에 업데이트가 필요한 곳, 대형 에이전시 계약 없이 매월 수정과 점검을 위탁할 곳."],
+const KINDS: { id?: string; name: string; who: string; what: string; rows: [string, string][]; links: [string, string][] }[] = [
+  {
+    name: "유지보수",
+    who: "소규모 홈페이지",
+    what: "수정 요청을 건별로 처리합니다.",
+    rows: [["작업", "문구, 이미지, 메뉴 수정, 오류 수정"], ["계약", "건별, 월 계약 없음"], ["비용", "건별 1만 원부터"]],
+    links: [["/maintenance/fix", "오류 수정"], ["/contact", "수정 요청"]],
+  },
+  {
+    name: "유지관리",
+    who: "기관, 기업 홈페이지",
+    what: "수정 요청 처리와 정기 점검을 월 단위로 수행합니다.",
+    rows: [["작업", "요청 처리, 백업, 보안 업데이트, 만료 관리, 월간 보고서"], ["계약", "월 계약"], ["비용", "월 방문자 수, 회원 수, 사이트 수 기준 견적"]],
+    links: [["/maintenance/monthly", "월 유지관리"], ["/maintenance/update", "보안 업데이트"], ["/maintenance/standard", "운영 기준"]],
+  },
+  {
+    id: "perf",
+    name: "성능 개선",
+    who: "속도가 느려진 서비스",
+    what: "원인을 진단하고 개선합니다.",
+    rows: [["작업", "성능 진단, 쿼리 튜닝, 캐시, 서버 설정"], ["산출물", "진단 보고서, 개선 전후 측정값"], ["비용", "진단 후 견적"]],
+    links: [["/contact", "진단 문의"]],
+  },
+  {
+    name: "고도화",
+    who: "MVP, 시제품, 인수한 서비스",
+    what: "운영 가능한 수준으로 기능과 구조를 보완합니다.",
+    rows: [["작업", "현황 분석, 아키텍처 설계, 개발, 이관"], ["산출물", "시스템 구성도, 원본 소스, 인계 문서"], ["비용", "프로젝트 견적"]],
+    links: [["/maintenance/ai-site", "AI로 만든 서비스"], ["/maintenance/takeover", "업체 변경, 인수"]],
+  },
 ];
+
 
 const ld = [
   {
@@ -71,57 +95,38 @@ export default function ClassicMaintenancePage() {
       />
       <SubTabs items={maintenanceTabs} current="/maintenance" />
 
-      {/* 11-25 맡긴 뒤 달라지는 과정: 경고, 계정 인수, 점검, 조치, 월 점검 보고서 */}
-      <section aria-label="유지보수 진행 과정" className={`${wrap} pt-10 md:pt-14`}>
-        <MaintenanceStory />
-      </section>
-
-      {/* 11-08 AI 검색(유지보수 업체 추천)이 뽑아 가는 업체 요약: 특징, 비용, 맞는 곳 */}
-      <section aria-labelledby="m-sum" className={`${wrap} pt-12 md:pt-16`}>
-        <h2 id="m-sum" className="text-[22px] font-[800] tracking-[-0.03em] md:text-[26px]">
-          유지보수 개요
+      {/* 11-25 일의 성격대로 네 가지로 나눔(사용자 결정): 유지보수(요청 처리), 유지관리(정기 운영), 성능 개선, 고도화. 하자보수는 제작 상품의 조건 */}
+      <section aria-labelledby="m-kinds" className={`${wrap} py-12 md:py-16`}>
+        <h2 id="m-kinds" className="sr-only">
+          유지보수 서비스 구분
         </h2>
-        <dl className="mt-5 grid border-t-2 border-[#15171c] text-[16px] leading-[1.6] md:grid-cols-[160px_1fr]">
-          {SUMMARY.map(([k, v]) => (
-            <div key={k} className="contents">
-              <dt className="border-b border-[#e1e5eb] pt-4 font-bold md:py-4">{k}</dt>
-              <dd className="border-b border-[#e1e5eb] pb-4 pt-1 text-[#3b4250] md:py-4">{v}</dd>
-            </div>
-          ))}
-        </dl>
-        {/* 11-22 이벤트 종료(사용자): 카카오톡 채널 쿠폰 안내 줄 내림 */}
-      </section>
-
-      <section aria-labelledby="m-list" className={`${wrap} py-12 md:py-16`}>
-        <h2 id="m-list" className="sr-only">
-          유지보수 서비스
-        </h2>
-        {/* 11-01 서비스마다 작업 장면 사진 카드 */}
-        <ul className="grid gap-5 md:grid-cols-2" role="list">
-          {maintenanceServices.map((s) => (
-            <li key={s.id}>
-              <Link href={`/maintenance/${s.id}`} data-gtm-cta={`maintenance_${s.id}`} className="group flex h-full flex-col overflow-hidden rounded-lg border border-[#d9dee5] bg-white transition-colors hover:border-[#256ef4]">
-                <div className="relative aspect-[16/9] overflow-hidden bg-[#0f1b3d]">
-                  <Image
-                    src={`/images/site/scene-${s.id}.jpg`}
-                    alt={`${s.title} 작업 장면`}
-                    fill
-                    sizes="(min-width: 768px) 600px, 92vw"
-                    className="object-cover transition-transform duration-500 group-hover:scale-[1.03] motion-reduce:transition-none"
-                  />
-                </div>
-                <div className="flex flex-1 items-start justify-between gap-4 border-t border-[#d9dee5] p-6 md:p-7">
-                  <div>
-                    <h3 className="text-[20px] font-[800] tracking-[-0.04em] transition-colors group-hover:text-[#256ef4] md:text-[24px]">{s.h1}</h3>
-                    <p className="mt-1.5 text-[16px] text-[#5b6370]">{s.term}</p>
-                    <p className="mt-3 text-[14px] font-bold text-[#1d5fd6]">{s.report.name}</p>
+        <ul className="grid border-l border-t border-[#15171c] md:grid-cols-2" role="list">
+          {KINDS.map((k) => (
+            <li key={k.name} id={k.id} className="scroll-mt-24 border-b border-r border-[#15171c] px-5 py-7 md:px-8 md:py-9">
+              <p className="text-[15px] font-bold text-[#1552cc]">{k.who}</p>
+              <h3 className="mt-1 text-[26px] font-[800] tracking-[-0.05em] md:text-[32px]">{k.name}</h3>
+              <p className="mt-1.5 break-keep text-[16px] text-[#3d4450] md:text-[17px]">{k.what}</p>
+              <dl className="mt-5 border-t border-[#d9dee5] text-[15.5px] md:text-[16px]">
+                {k.rows.map(([a, b]) => (
+                  <div key={a} className="grid grid-cols-[84px_1fr] gap-3 border-b border-[#e1e5eb] py-2.5">
+                    <dt className="text-[#5b6370]">{a}</dt>
+                    <dd className="break-keep font-bold">{b}</dd>
                   </div>
-                  <ArrowUpRight size={24} aria-hidden className="mt-1 shrink-0 text-[#6b7280] group-hover:text-[#256ef4]" />
-                </div>
-              </Link>
+                ))}
+              </dl>
+              <ul className="mt-4 flex flex-wrap gap-x-5 gap-y-1" role="list">
+                {k.links.map(([href, label]) => (
+                  <li key={href}>
+                    <Link href={href} className="inline-flex min-h-11 items-center gap-1 text-[15.5px] font-bold text-[#1552cc] hover:underline">
+                      {label} <ArrowUpRight size={16} aria-hidden />
+                    </Link>
+                  </li>
+                ))}
+              </ul>
             </li>
           ))}
         </ul>
+        <p className="mt-4 break-keep text-[15px] text-[#5b6370]">곰파트너가 제작한 결과물의 결함은 상품별 하자보수 기간 동안 무상으로 수정합니다. 부가세 별도.</p>
       </section>
 
       <section aria-labelledby="m-promise" className="bg-[#0f1b3d] text-white">

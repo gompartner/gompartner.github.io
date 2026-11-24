@@ -4,7 +4,6 @@ import { ArrowUpRight, CheckCircle2 } from "lucide-react";
 import { OnepageFreePromo } from "@/components/classic/OnepageFreePromo";
 import { SiteBuilder } from "@/components/classic/SiteBuilder";
 import { builderItems } from "@/components/classic/works/samples";
-import { maintenanceServices } from "@/data/classic/maintenance";
 import { manualLog } from "@/data/classic/archive";
 import { appPlans, kioskPlans, landingPlans, manwon, plans } from "@/data/classic/pricing";
 
@@ -13,7 +12,6 @@ import { appPlans, kioskPlans, landingPlans, manwon, plans } from "@/data/classi
 
 const wrap = "mx-auto w-full max-w-[1248px] px-4 md:px-6";
 const h2c = "text-[26px] font-[800] tracking-[-0.05em] md:text-[38px]";
-const hl = "shadow-[inset_0_-0.34em_0_#cfe0ff] [.gp-dark_&]:shadow-[inset_0_-0.34em_0_#1f3f8a]";
 
 const make = [
   { href: "/homepage", name: "홈페이지 제작", body: "병원, 매장, 전문직, 기업, 학원", price: manwon(plans[0].price), from: true },
@@ -24,9 +22,12 @@ const make = [
   { href: "/3d", name: "3D 웹 제작", body: "제품 옵션 견적, 공간 3D", price: "180만 원", from: true },
 ];
 
-const care = [...maintenanceServices]
-  .sort((a, b) => (b.id === "takeover" ? 1 : 0) - (a.id === "takeover" ? 1 : 0))
-  .map((m) => ({ href: `/maintenance/${m.id}`, name: m.h1 }));
+const care = [
+  { href: "/maintenance/fix", name: "유지보수", body: "수정 요청 건별 처리" },
+  { href: "/maintenance/monthly", name: "유지관리", body: "정기 점검, 월간 보고" },
+  { href: "/maintenance#perf", name: "성능 개선", body: "속도 진단, 쿼리 튜닝" },
+  { href: "/maintenance/ai-site", name: "고도화", body: "MVP, 시제품 완제품화" },
+];
 
 const portfolio = [
   { href: "/sample/app-pilates", img: "/images/demos/app-pilates.jpg", kind: "앱", name: "필라테스 예약, 회원권 앱", alt: "필라테스 예약, 회원권 앱 화면" },
@@ -35,13 +36,7 @@ const portfolio = [
   { href: "/sample/landing-water-rental", img: "/images/demos/landing-water-rental.jpg", kind: "랜딩페이지", name: "정수기 렌탈 상담 신청", alt: "정수기 렌탈 상담 랜딩페이지 화면" },
 ];
 
-const steps = [
-  { when: "계약~오픈", name: "제작", body: "기획, 디자인, 퍼블리싱, 개발, 검수" },
-  { when: "오픈 후 100일", name: "무상 유지보수", body: "기능 수정, 개선, 접속 통계 분석, 주간 보고", on: true },
-  { when: "이후", name: "월 유지보수", body: "정기 점검, 수정 요청 처리, 월간 점검 보고서" },
-];
-
-const strengths = ["업종별 법정 고지 검토", "원본 소스 제공", "점검 결과표", "인계 문서"];
+const strengths = ["원본 소스 제공", "점검 결과표", "인계 문서", "무상 하자보수"];
 
 export function ClassicHome() {
   return (
@@ -99,15 +94,15 @@ function Products() {
         <div>
           <h3 className="text-[16px] font-bold text-[#256ef4]">유지보수</h3>
           <p className="mt-3 text-[30px] font-[800] leading-none tracking-[-0.04em] tabular-nums md:text-[40px]">
-            월 9만 원<span className="ml-1.5 text-[18px] font-bold tracking-[-0.02em]">부터</span>
+            건별 1만 원<span className="ml-1.5 text-[18px] font-bold tracking-[-0.02em]">부터</span>
           </p>
           <p className="mt-2 text-[15px] text-[#5b6370]">부가세 별도</p>
         </div>
         <ul className="mt-6 border-t-2 border-[#15171c] md:mt-0" role="list">
           {care.map((s) => (
             <li key={s.href} className="border-b border-[#d9dee5]">
-              <NavLink href={s.href} data-gtm-cta={`classic_service_${s.href.split("/").pop()}`} className="group flex min-h-14 items-center justify-between gap-3 py-3.5">
-                <span className="text-[17px] font-[800] tracking-[-0.03em] transition-colors group-hover:text-[#256ef4] md:text-[19px]">{s.name}</span>
+              <NavLink href={s.href} data-gtm-cta={`classic_service_${s.href.split(/[/#]/).pop()}`} className="group flex min-h-14 items-center justify-between gap-3 py-3.5">
+                <span className="flex flex-wrap items-baseline gap-x-3"><span className="text-[17px] font-[800] tracking-[-0.03em] transition-colors group-hover:text-[#256ef4] md:text-[19px]">{s.name}</span><span className="text-[15px] text-[#5b6370]">{s.body}</span></span>
                 <ArrowUpRight size={20} aria-hidden className="shrink-0 text-[#6b7280] group-hover:text-[#256ef4]" />
               </NavLink>
             </li>
@@ -121,28 +116,17 @@ function Products() {
 function Promise() {
   return (
     <section aria-labelledby="c-promise" className="border-y border-[#e6e9ee] bg-[#f4f6fa]">
-      <div className={`${wrap} py-14 md:py-24`}>
-        <h2 id="c-promise" className="break-keep text-[30px] font-[800] leading-[1.25] tracking-[-0.05em] md:text-[52px]">
-          <span className="inline-block">오픈 후 100일,</span> <span className={`inline-block ${hl}`}>무상 유지보수</span>
-        </h2>
-        <ol className="mt-8 grid border-t-2 border-[#15171c] md:mt-12 lg:grid-cols-3 lg:gap-7 lg:border-t-0" role="list">
-          {steps.map((s) => (
-            <li key={s.name} className="border-b border-[#d9dee5] py-5 lg:border-b-0 lg:border-t-2 lg:border-[#15171c]">
-              <p className={`text-[15px] font-bold ${s.on ? "text-[#1552cc]" : "text-[#4a5361]"}`}>{s.when}</p>
-              <h3 className="mt-1 text-[21px] font-[800] tracking-[-0.04em] md:text-[23px]">{s.name}</h3>
-              <p className="mt-1.5 text-[16px] text-[#5b6370] md:text-[17px]">{s.body}</p>
-            </li>
-          ))}
-        </ol>
-        <ul className="mt-8 grid grid-cols-2 gap-x-4 gap-y-3 md:mt-12 lg:grid-cols-4" role="list">
-          {strengths.map((s) => (
-            <li key={s} className="flex items-center gap-2 text-[16px] font-[800] tracking-[-0.03em] md:text-[19px]">
-              <CheckCircle2 aria-hidden className="size-5 shrink-0 text-[#256ef4] md:size-6" />
-              {s}
-            </li>
-          ))}
-        </ul>
-      </div>
+      <h2 id="c-promise" className="sr-only">
+        납품 기준
+      </h2>
+      <ul className={`${wrap} grid grid-cols-2 gap-x-4 gap-y-3 py-9 md:py-12 lg:grid-cols-4`} role="list">
+        {strengths.map((s) => (
+          <li key={s} className="flex items-center gap-2 text-[16px] font-[800] tracking-[-0.03em] md:text-[19px]">
+            <CheckCircle2 aria-hidden className="size-5 shrink-0 text-[#256ef4] md:size-6" />
+            {s}
+          </li>
+        ))}
+      </ul>
     </section>
   );
 }

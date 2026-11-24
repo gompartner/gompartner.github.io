@@ -78,7 +78,7 @@ export const threePlans: Plan[] = [
   },
 ];
 
-export const threeCommon = ["원본 소스와 3D 원본 파일 제공", "기존 홈페이지 연동", "실기기 점검표", "완료 후 100일 무상 유지보수"];
+export const threeCommon = ["원본 소스와 3D 원본 파일 제공", "기존 홈페이지 연동", "실기기 점검표", "완료 후 1개월 무상 하자보수"];
 
 export const threePlanNote = "3D 파일을 주시는 기준입니다. 파일이 없으면 모델링 비용이 더해집니다.";
 
