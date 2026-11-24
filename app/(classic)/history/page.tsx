@@ -16,17 +16,14 @@ export const metadata: Metadata = pageMeta({
 // 11-25 달 단위로 묶는다(날짜마다 한 줄이면 자주 바뀌는 사이트로만 보임). 큰 일만 보이고 날짜별 내역은 접어 둔다
 const months = Array.from(new Set(history.map((h) => h.date.slice(0, 7)))).map((ym) => {
   const items = history.filter((h) => h.date.startsWith(ym));
-  return { ym, items, cover: items.find((h) => h.cover) ?? items[0] };
+  // 그 달의 대표 화면은 그 달 마지막 개편(목록 맨 위) 화면
+  return { ym, items, cover: items[0] };
 });
 
 function Shot({ h, priority = false, small = false }: { h: HistoryItem; priority?: boolean; small?: boolean }) {
   return (
     <div className="relative aspect-[1100/725] overflow-hidden rounded-lg border border-[#d9dee5] bg-[#f4f6fa]">
-      {h.video && !small ? (
-        // 움직이는 화면: 소리 없는 반복 재생. 동작 줄이기 설정이면 첫 장면 그림만 보인다
-        <video src={`/images/history/${h.img}.mp4`} poster={`/images/history/${h.img}.jpg`} aria-label={h.alt} autoPlay muted loop playsInline preload="metadata" className="absolute inset-0 h-full w-full object-cover object-top motion-reduce:hidden" />
-      ) : null}
-      <Image src={`/images/history/${h.img}.jpg`} alt={h.alt} fill priority={priority} sizes={small ? "220px" : "(min-width: 768px) 520px, 100vw"} className={`object-cover object-top ${h.video && !small ? "motion-safe:hidden" : ""}`} />
+      <Image src={`/images/history/${h.img}.jpg`} alt={h.alt} fill priority={priority} sizes={small ? "220px" : "(min-width: 768px) 520px, 100vw"} className="object-cover object-top" />
     </div>
   );
 }
@@ -65,7 +62,7 @@ export default function ClassicHistoryPage() {
                           <h3 className="break-keep text-[17px] font-[800] tracking-[-0.03em] md:text-[18px]">{h.title}</h3>
                           <p className="mt-1 break-keep text-[15.5px] leading-[1.7] text-[#3d4450]">{h.body}</p>
                         </div>
-                        {h === m.cover ? null : <Shot h={h} small />}
+                        <Shot h={h} small />
                       </li>
                     ))}
                   </ul>
