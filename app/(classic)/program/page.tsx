@@ -199,7 +199,7 @@ export default function ClassicProgramPage() {
       <DeliverBlock
         id="pg-deliver"
         name="업무 프로그램과 인계 자료"
-        items={["업무 프로그램(관리자, 사용자 화면)", "기존 엑셀 데이터 이관", "원본 소스", "사용 방법과 계정 목록을 정리한 인계 문서", "납품 후 1개월 무상 관리"]}
+        items={["업무 프로그램(관리자, 사용자 화면)", "기존 엑셀 데이터 이관", "원본 소스", "사용 방법과 계정 목록을 정리한 인계 문서", "납품 후 100일 무상 유지보수"]}
         photo="/images/site/scene-program.jpg"
       />
 

@@ -85,7 +85,7 @@ export const landingPlans: Plan[] = [
   },
 ];
 
-export const planCommon = ["원본 소스 제공", "완료 후 1개월 무상 오류 수정"];
+export const planCommon = ["원본 소스 제공", "완료 후 100일 무상 유지보수"];
 
 /** 결제 전에 보내는 미리보기. 고른 샘플에 상호와 색만 입힌 첫 화면 한 장이다. */
 export const previewPromise = "결제 전에 첫 화면 미리 보기";
