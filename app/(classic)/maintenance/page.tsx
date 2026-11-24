@@ -6,7 +6,7 @@ import { StepList } from "@/components/classic/pricing/StepList";
 import { maintenanceTabs } from "@/components/classic/pricing/tabs";
 import { PageHead, SubTabs, wrap } from "@/components/classic/ui";
 import { faqFor } from "@/data/classic/faq";
-import { dataTerms, maintenanceSteps, severityNote, severityTerms } from "@/data/classic/maintenance";
+import { dataTerms, maintenanceSteps } from "@/data/classic/maintenance";
 import { pageMeta } from "@/lib/seo";
 import { siteUrl } from "@/lib/site";
 
@@ -24,6 +24,22 @@ const PROMISES = [
   { icon: FileBarChart, num: "월 1회", label: "월간 점검 보고서" },
 ];
 
+// 장애 처리 절차. 판정은 세 가지: 바로 조치, 임시 조치 뒤 수정, 외부 요인(호스팅사, 도메인, 외부 서비스)
+const INCIDENT: { title: string; body: string; cases?: [string, string][] }[] = [
+  { title: "접수", body: "주소와 증상, 발생 시점을 받습니다." },
+  { title: "원인 확인", body: "접속 상태, 오류 기록, 최근 변경 내역을 확인합니다." },
+  {
+    title: "판정, 안내",
+    body: "확인 결과와 조치 방법을 회신합니다.",
+    cases: [
+      ["조치 가능", "원인과 처리 기간, 금액을 안내하고 수정합니다"],
+      ["임시 조치", "백업본 복구나 안내 화면으로 먼저 정상화하고 수정 일정을 안내합니다"],
+      ["외부 요인", "호스팅사, 도메인, 외부 서비스 장애는 해당 업체에 접수하고 진행 상황을 안내합니다"],
+    ],
+  },
+  { title: "결과 보고", body: "원인, 조치 내용, 재발 방지 설정을 작업 내역서로 드립니다." },
+];
+
 const KINDS: { id?: string; name: string; who: string; what: string; rows: [string, string][]; links: [string, string][] }[] = [
   {
     name: "유지보수",
@@ -34,9 +50,9 @@ const KINDS: { id?: string; name: string; who: string; what: string; rows: [stri
   },
   {
     name: "유지관리",
-    who: "기관, 기업 홈페이지",
-    what: "수정 요청 처리와 정기 점검을 월 단위로 수행합니다.",
-    rows: [["작업", "요청 처리, 백업, 보안 업데이트, 만료 관리, 월간 보고서"], ["계약", "월 계약"], ["비용", "월 방문자 수, 회원 수, 사이트 수 기준 견적"]],
+    who: "기업, 기관 홈페이지",
+    what: "월 1회 정기 점검과 수정 요청 처리를 월 단위로 수행합니다.",
+    rows: [["작업", "정기 점검 월 1회, 수정 요청 처리, 만료 관리, 월간 보고서"], ["계약", "월 계약, 영업일 기준 대응"], ["비용", "월 방문자 수, 회원 수, 사이트 수 기준 견적"]],
     links: [["/maintenance/monthly", "유지관리"], ["/maintenance/update", "보안 업데이트"]],
   },
   {
@@ -146,27 +162,31 @@ export default function ClassicMaintenancePage() {
         </div>
       </section>
 
-      {/* 11-10 ChatGPT 신뢰도 점검 지적: 회신과 처리를 장애 등급별로 나누고, 계정과 데이터 관리 기준을 보인다 */}
-      <section aria-labelledby="m-severity" className={`${wrap} pt-14 md:pt-20`}>
-        <h2 id="m-severity" className="text-[22px] font-[800] tracking-[-0.03em] md:text-[26px]">
-          장애 등급별 처리 순서
+      {/* 11-25 장애 처리 절차(사용자): 접수하면 먼저 확인하고, 조치 가능 여부를 판정해 안내한다. 긴급 조치를 시간으로 약속하지 않고 절차를 보여 준다 */}
+      <section aria-labelledby="m-incident" className={`${wrap} pt-14 md:pt-20`}>
+        <h2 id="m-incident" className="text-[22px] font-[800] tracking-[-0.03em] md:text-[26px]">
+          장애 처리 절차
         </h2>
-        {/* 휴대폰은 등급마다 묶어 세로로, PC는 네 칸 표 */}
-        <div role="table" aria-label="장애 등급별 처리 순서" className="mt-5 border-t-2 border-[#15171c] text-[16px] leading-[1.6]">
-          <div role="row" className="hidden border-b border-[#d9dee5] bg-[#f4f6f9] font-bold md:grid md:grid-cols-[140px_1.3fr_1.2fr]">
-            <span role="columnheader" className="px-4 py-3">구분</span>
-            <span role="columnheader" className="px-4 py-3">해당 증상</span>
-            <span role="columnheader" className="px-4 py-3">처리</span>
-          </div>
-          {severityTerms.map((t) => (
-            <div key={t.level} role="row" className="grid border-b border-[#e1e5eb] py-4 md:grid-cols-[140px_1.3fr_1.2fr] md:py-0">
-              <span role="rowheader" className="font-bold md:px-4 md:py-4">{t.level}</span>
-              <span role="cell" className="mt-1 text-[#3b4250] md:mt-0 md:px-4 md:py-4">{t.examples}</span>
-              <span role="cell" className="mt-2 text-[#3b4250] md:mt-0 md:px-4 md:py-4"><b className="mr-2 text-[#15171c] md:hidden">처리</b>{t.handle}</span>
-            </div>
+        <ol className="mt-5 grid border-t-2 border-[#15171c] md:grid-cols-[1fr_1fr_1.9fr_1fr] md:border-l md:border-t-0 md:border-[#15171c]" role="list">
+          {INCIDENT.map((st, i) => (
+            <li key={st.title} className="border-b border-[#d9dee5] py-5 md:border-b-0 md:border-r md:border-t-2 md:border-[#15171c] md:px-5 md:py-6">
+              <p className="text-[15px] font-[800] tabular-nums text-[#1552cc]">{i + 1}</p>
+              <h3 className="mt-0.5 text-[20px] font-[800] tracking-[-0.04em] md:text-[22px]">{st.title}</h3>
+              <p className="mt-1.5 break-keep text-[15.5px] leading-[1.6] text-[#3b4250] md:text-[16px]">{st.body}</p>
+              {st.cases ? (
+                <dl className="mt-3 border-t border-[#d9dee5] text-[15px] md:text-[15.5px]">
+                  {st.cases.map(([k, v]) => (
+                    <div key={k} className="grid grid-cols-[92px_1fr] gap-3 border-b border-[#e1e5eb] py-2.5">
+                      <dt className="font-[800]">{k}</dt>
+                      <dd className="break-keep text-[#3b4250]">{v}</dd>
+                    </div>
+                  ))}
+                </dl>
+              ) : null}
+            </li>
           ))}
-        </div>
-        <p className="mt-4 text-[16px] leading-[1.6] text-[#3b4250]">{severityNote}</p>
+        </ol>
+        <p className="mt-4 break-keep text-[16px] leading-[1.6] text-[#3b4250]">접속 불가, 접수 불가 같은 장애는 다른 요청보다 먼저 확인합니다. 회신은 영업일 기준 24시간 이내입니다.</p>
       </section>
 
       <section aria-labelledby="m-data" className={`${wrap} pt-12 md:pt-16`}>
