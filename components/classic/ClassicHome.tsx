@@ -2,6 +2,8 @@ import Image from "next/image";
 import { NavLink } from "@/components/classic/NavLink";
 import { ArrowUpRight, CheckCircle2 } from "lucide-react";
 import { OnepageFreePromo } from "@/components/classic/OnepageFreePromo";
+import { SiteBuilder } from "@/components/classic/SiteBuilder";
+import { builderItems } from "@/components/classic/works/samples";
 import { maintenanceServices } from "@/data/classic/maintenance";
 import { manualLog } from "@/data/classic/archive";
 import { appPlans, kioskPlans, landingPlans, manwon, plans } from "@/data/classic/pricing";
@@ -57,35 +59,11 @@ export function ClassicHome() {
 function Hero() {
   return (
     <section aria-labelledby="c-hero" className="border-b border-[#e6e9ee]">
-      <div className={`${wrap} grid gap-7 pb-10 pt-9 md:pb-16 md:pt-14 lg:grid-cols-[1fr_1.35fr] lg:items-center lg:gap-12`}>
-        <div>
-          <h1 id="c-hero" className="break-keep text-[38px] font-[800] leading-[1.18] tracking-[-0.055em] md:text-[60px]">
-            <span className="inline-block">홈페이지, 앱 제작과</span> <span className="inline-block">유지보수</span>
-          </h1>
-          <p className="mt-4 text-[19px] font-[800] tracking-[-0.03em] md:mt-6 md:text-[24px]">
-            <span className={hl}>오픈 후 100일 무상 유지보수</span>
-          </p>
-          <div className="mt-7 flex flex-wrap gap-2.5 md:mt-9">
-            <NavLink href="/contact" data-gtm-cta="classic_hero_contact" className="inline-flex h-14 items-center rounded-md bg-[#256ef4] px-7 text-[17px] font-bold text-white transition-colors hover:bg-[#0b50d0] md:text-[18px]">
-              상담 신청
-            </NavLink>
-            <NavLink href="/pricing" data-gtm-cta="classic_hero_pricing" className="inline-flex h-14 items-center rounded-md px-7 text-[17px] font-bold shadow-[inset_0_0_0_1.5px_#15171c] [.gp-dark_&]:shadow-[inset_0_0_0_1.5px_#e8ebf0] md:text-[18px]">
-              비용 안내
-            </NavLink>
-          </div>
-        </div>
-        <figure className="m-0">
-          <div className="keep-light relative h-[70svh] max-h-[680px] min-h-[560px] overflow-hidden rounded-[14px] border border-[#d9dee5] bg-[#e4ecea] md:h-[620px]">
-            <iframe src="/3d/sofa/index.html?embed=1" title="가구 3D 견적: 소파 구성과 원단을 바꾸면 폭과 금액이 바뀝니다" loading="eager" className="absolute inset-0 h-full w-full border-0" />
-          </div>
-          <figcaption className="flex items-baseline gap-2.5 pt-3">
-            <span className="shrink-0 text-[14px] font-bold text-[#256ef4]">3D 웹 제작</span>
-            <span className="min-w-0 flex-1 text-[17px] font-[800] tracking-[-0.04em] md:text-[19px]">가구 3D 견적</span>
-            <NavLink href="/3d/sofa/" data-gtm-cta="classic_hero_3d" className="flex min-h-11 shrink-0 items-center gap-1 text-[15px] font-bold text-[#5b6370] hover:text-[#256ef4]">
-              크게 보기 <ArrowUpRight size={17} aria-hidden />
-            </NavLink>
-          </figcaption>
-        </figure>
+      <div className={`${wrap} pb-10 pt-8 md:pb-16 md:pt-12`}>
+        <h1 id="c-hero" className="mb-6 break-keep text-[17px] font-bold tracking-[-0.02em] text-[#3d4450] md:mb-8 md:text-[19px]">
+          홈페이지, 앱 제작과 유지보수
+        </h1>
+        <SiteBuilder items={builderItems()} />
       </div>
     </section>
   );

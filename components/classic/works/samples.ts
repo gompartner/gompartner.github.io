@@ -173,3 +173,12 @@ export function shelfItems() {
     }
   return out;
 }
+
+/** 11-24 메인 "시안 고르기"에 넘길 목록: 업종 묶음별 업종 홈페이지와 시안 이름 */
+export function builderItems() {
+  return industries.flatMap((i) =>
+    samplesIn(i.slug)
+      .map((p) => ({ group: i.label, id: p.id, slug: slugOf(p.demoUrl), name: p.title.replace(/ 홈페이지$/, ""), variants: (VARIANTS[slugOf(p.demoUrl)] ?? []).map((v) => ({ id: v.id, label: v.label.replace(/^시안 \S+ /, "") })) }))
+      .filter((x) => x.variants.length >= 2),
+  );
+}
