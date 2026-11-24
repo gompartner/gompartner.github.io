@@ -14,7 +14,7 @@ export const VARIANTS: Record<string, { id: string; label: string }[]> = {
     { id: "b", label: "시안 B 사장님형" },
   ],
   "dental-homepage": [
-    { id: "a", label: "시안 A 미니멀" },
+    { id: "a", label: "시안 A 모던형" },
     { id: "b", label: "시안 B 가족형" },
   ],
   academy: [
