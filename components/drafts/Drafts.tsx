@@ -6,6 +6,7 @@ import { TaxB } from "./TaxB";
 import { DentalA } from "./DentalA";
 import { DentalB } from "./DentalB";
 import { Dental2026 } from "./Dental2026";
+import { Dental2027 } from "./Dental2027";
 import { QuickMenu } from "./QuickMenu";
 import { AcademyA } from "./AcademyA";
 import { AcademyB } from "./AcademyB";
@@ -122,6 +123,7 @@ export function DentalDrafts() {
   const v = useVariant("dental-homepage");
   // 11-25 연도별 시안(2026형, 2027형). 예약 기능 대신 3D 장면으로 차이를 둔다
   if (v === "2026") return <Dental2026 />;
+  if (v === "2027") return <Dental2027 />;
   return v === "b" ? (
     <>
       <DentalB />
