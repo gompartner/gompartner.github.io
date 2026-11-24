@@ -14,12 +14,12 @@ const h2c = "text-[26px] font-[800] tracking-[-0.05em] md:text-[38px]";
 const hl = "shadow-[inset_0_-0.34em_0_#cfe0ff] [.gp-dark_&]:shadow-[inset_0_-0.34em_0_#1f3f8a]";
 
 const make = [
-  { href: "/homepage", name: "홈페이지 제작", body: "병원, 매장, 전문직, 기업, 학원", price: `${manwon(plans[0].price)}부터` },
-  { href: "/landing-page", name: "랜딩페이지 제작", body: "광고 상담, 예약 신청 접수", price: `${manwon(landingPlans[0].price)}부터` },
-  { href: "/program", name: "업무 프로그램 제작", body: "엑셀 반복 업무를 웹 프로그램으로", price: "견적 문의" },
-  { href: "/app", name: "앱 제작", body: "예약, 주문, 적립, 현장 보고", price: `${manwon(appPlans[0].price)}부터` },
-  { href: "/kiosk", name: "키오스크 화면 제작", body: "접수, 출결, 안내", price: `${manwon(kioskPlans[0].price)}부터` },
-  { href: "/3d", name: "3D 웹 제작", body: "제품 옵션 견적, 공간 3D", price: "180만 원부터" },
+  { href: "/homepage", name: "홈페이지 제작", body: "병원, 매장, 전문직, 기업, 학원", price: manwon(plans[0].price), from: true },
+  { href: "/landing-page", name: "랜딩페이지 제작", body: "광고 상담, 예약 신청 접수", price: manwon(landingPlans[0].price), from: true },
+  { href: "/program", name: "업무 프로그램 제작", body: "엑셀 반복 업무를 웹 프로그램으로", price: "견적 문의", from: false },
+  { href: "/app", name: "앱 제작", body: "예약, 주문, 적립, 현장 보고", price: manwon(appPlans[0].price), from: true },
+  { href: "/kiosk", name: "키오스크 화면 제작", body: "접수, 출결, 안내", price: manwon(kioskPlans[0].price), from: true },
+  { href: "/3d", name: "3D 웹 제작", body: "제품 옵션 견적, 공간 3D", price: "180만 원", from: true },
 ];
 
 const care = [...maintenanceServices]
@@ -35,11 +35,11 @@ const portfolio = [
 
 const steps = [
   { when: "계약~오픈", name: "제작", body: "기획, 디자인, 퍼블리싱, 개발, 검수" },
-  { when: "오픈 후 100일", name: "100일 무상 유지보수", body: "기능 수정, 개선, 접속 통계 분석, 주간 보고", on: true },
+  { when: "오픈 후 100일", name: "무상 유지보수", body: "기능 수정, 개선, 접속 통계 분석, 주간 보고", on: true },
   { when: "이후", name: "월 유지보수", body: "정기 점검, 수정 요청 처리, 월간 점검 보고서" },
 ];
 
-const strengths = ["원본 소스 제공", "점검 결과표", "인계 문서", "100일 무상 유지보수"];
+const strengths = ["업종별 법정 고지 검토", "원본 소스 제공", "점검 결과표", "인계 문서"];
 
 export function ClassicHome() {
   return (
@@ -75,7 +75,7 @@ function Hero() {
           </div>
         </div>
         <figure className="m-0">
-          <div className="keep-light relative h-[62svh] min-h-[420px] overflow-hidden rounded-[14px] border border-[#d9dee5] bg-[#e4ecea] md:h-[620px]">
+          <div className="keep-light relative h-[70svh] max-h-[680px] min-h-[560px] overflow-hidden rounded-[14px] border border-[#d9dee5] bg-[#e4ecea] md:h-[620px]">
             <iframe src="/3d/sofa/index.html?embed=1" title="가구 3D 견적: 소파 구성과 원단을 바꾸면 폭과 금액이 바뀝니다" loading="eager" className="absolute inset-0 h-full w-full border-0" />
           </div>
           <figcaption className="flex items-baseline gap-2.5 pt-3">
@@ -109,7 +109,10 @@ function Products() {
                 </span>
                 <ArrowUpRight size={22} aria-hidden className="mt-1 shrink-0 text-[#6b7280] transition-[color,transform] duration-200 group-hover:-translate-y-0.5 group-hover:translate-x-0.5 group-hover:text-[#256ef4] motion-reduce:transition-none" />
               </span>
-              <span className="mt-auto text-[22px] font-[800] tracking-[-0.04em] tabular-nums md:text-[26px]">{s.price}</span>
+              <span className="mt-auto text-[22px] font-[800] tracking-[-0.04em] tabular-nums md:text-[26px]">
+                {s.price}
+                {s.from ? <span className="ml-1 text-[15px] font-bold tracking-[-0.02em] md:text-[16px]">부터</span> : null}
+              </span>
             </NavLink>
           </li>
         ))}
@@ -147,7 +150,7 @@ function Promise() {
         <ol className="mt-8 grid border-t-2 border-[#15171c] md:mt-12 lg:grid-cols-3 lg:gap-7 lg:border-t-0" role="list">
           {steps.map((s) => (
             <li key={s.name} className="border-b border-[#d9dee5] py-5 lg:border-b-0 lg:border-t-2 lg:border-[#15171c]">
-              <p className={`text-[15px] font-bold ${s.on ? "text-[#256ef4]" : "text-[#5b6370]"}`}>{s.when}</p>
+              <p className={`text-[15px] font-bold ${s.on ? "text-[#1552cc]" : "text-[#4a5361]"}`}>{s.when}</p>
               <h3 className="mt-1 text-[21px] font-[800] tracking-[-0.04em] md:text-[23px]">{s.name}</h3>
               <p className="mt-1.5 text-[16px] text-[#5b6370] md:text-[17px]">{s.body}</p>
             </li>

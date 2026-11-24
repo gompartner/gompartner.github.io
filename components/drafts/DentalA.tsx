@@ -59,7 +59,7 @@ export function DentalA() {
             <Tooth />
             치과의원
           </p>
-          <span className="grid h-11 w-11 place-items-center justify-self-end" aria-label={`전화 ${TEL}`}>
+          <span className="grid h-11 w-11 place-items-center justify-self-end" role="img" aria-label={`전화 ${TEL}`}>
             <Phone size={20} aria-hidden />
           </span>
         </div>

@@ -26,6 +26,7 @@ html.gp-dark .cl .bg-\[\#d6e4fd\]:not(.keep-light *) { background-color: #151f31
 html.gp-dark .cl .bg-\[\#d8dde5\]:not(.keep-light *),
 html.gp-dark .cl .bg-\[\#d9dee5\]:not(.keep-light *) { background-color: #25282c; }
 html.gp-dark .cl .bg-\[\#dfe6e4\]:not(.keep-light *) { background-color: #242928; }
+html.gp-dark .cl .bg-\[\#e4ecea\]:not(.keep-light *) { background-color: #212625; }
 html.gp-dark .cl .bg-\[\#e6e9ee\]:not(.keep-light *) { background-color: #202225; }
 html.gp-dark .cl .bg-\[\#e8eaed\]:not(.keep-light *) { background-color: #202224; }
 html.gp-dark .cl .bg-\[\#e8efff\]:not(.keep-light *),
@@ -35,6 +36,7 @@ html.gp-dark .cl .bg-\[\#e8f5e9\]:not(.keep-light *) { background-color: #1a261b
 html.gp-dark .cl .bg-\[\#e8f5eb\]:not(.keep-light *) { background-color: #1a261d; }
 html.gp-dark .cl .bg-\[\#e9edf3\]:not(.keep-light *) { background-color: #1c1f25; }
 html.gp-dark .cl .bg-\[\#e9f6ef\]:not(.keep-light *) { background-color: #1a251f; }
+html.gp-dark .cl .bg-\[\#eee\]:not(.keep-light *) { background-color: #202020; }
 html.gp-dark .cl .bg-\[\#eef0f3\]:not(.keep-light *) { background-color: #1d1e21; }
 html.gp-dark .cl .bg-\[\#eef1f5\]:not(.keep-light *),
 html.gp-dark .cl .hover\:bg-\[\#eef1f5\]:hover:not(.keep-light *) { background-color: #1b1e22; }
@@ -105,6 +107,7 @@ html.gp-dark .cl .text-\[\#6b7380\]:not(.keep-light *) { color: #a3adbb; }
 html.gp-dark .cl .text-\[\#0000ee\]:not(.keep-light *) { color: #7e7eed; }
 html.gp-dark .cl .text-\[\#0c43b7\]:not(.keep-light *) { color: #5a87e7; }
 html.gp-dark .cl .text-\[\#0d652d\]:not(.keep-light *) { color: #36e275; }
+html.gp-dark .cl .text-\[\#1552cc\]:not(.keep-light *) { color: #5a89e7; }
 html.gp-dark .cl .text-\[\#17734a\]:not(.keep-light *) { color: #40d995; }
 html.gp-dark .cl .text-\[\#188038\]:not(.keep-light *) { color: #3edb6e; }
 html.gp-dark .cl .text-\[\#1a0dab\]:not(.keep-light *) { color: #877eed; }
@@ -123,6 +126,7 @@ html.gp-dark .cl .text-\[\#3b4350\]:not(.keep-light *) { color: #818da2; }
 html.gp-dark .cl .text-\[\#3c4043\]:not(.keep-light *) { color: #868d93; }
 html.gp-dark .cl .text-\[\#404040\]:not(.keep-light *) { color: #8c8c8c; }
 html.gp-dark .cl .text-\[\#464c53\]:not(.keep-light *) { color: #838b96; }
+html.gp-dark .cl .text-\[\#4a5361\]:not(.keep-light *) { color: #838ea0; }
 html.gp-dark .cl .text-\[\#4b5563\]:not(.keep-light *) { color: #828fa0; }
 html.gp-dark .cl .text-\[\#4d5156\]:not(.keep-light *) { color: #868c93; }
 html.gp-dark .cl .text-\[\#5b3fb0\]:not(.keep-light *) { color: #9783d3; }

@@ -313,7 +313,7 @@
 </script>
 </head>
 <body>
-<div class="gp-bar" role="navigation" aria-label="곰파트너"><div><a href="/">‹ 곰파트너 바로가기</a></div></div>
+<div class="gp-bar" role="navigation" aria-label="곰파트너"><div><a href="/">곰파트너 바로가기</a></div></div>
 <main style="display:contents">
 <h1 class="sr">시스템 선반 구성하기</h1>
 <canvas id="scene" aria-label="선반 3D 화면. 칸을 누르면 그 칸의 높이와 부속을 고칠 수 있습니다. 화살표 키로 칸을 옮겨 고릅니다." tabindex="0"></canvas>
@@ -846,7 +846,7 @@ $('pbtn').addEventListener('click', openSheet);
 $('sheet-close').addEventListener('click', () => sheet.close());
 sheet.addEventListener('click', e => { if (e.target === sheet) sheet.close(); });
 $('depths').addEventListener('change', e => { if (e.target.name === 'depth') { state.depth = +e.target.value; update(); } });
-form.elements.place.innerHTML = '<option value="">골라 주십시오</option>' + REGIONS.map(r => `<option>${r}</option>`).join('');
+form.elements.place.innerHTML = '<option value="">선택</option>' + REGIONS.map(r => `<option>${r}</option>`).join('');
 function fmtTel(v) {
   const d = v.replace(/\D/g, '').slice(0, 11);
   if (d.startsWith('02')) {
