@@ -37,7 +37,8 @@ export function Dental2026() {
   const [still, setStill] = useState(false);
 
   useEffect(() => {
-    setStill(matchMedia("(prefers-reduced-motion: reduce)").matches);
+    const still0 = matchMedia("(prefers-reduced-motion: reduce)").matches;
+    queueMicrotask(() => setStill(still0));
     let raf = 0;
     const on = () => {
       cancelAnimationFrame(raf);
@@ -85,7 +86,7 @@ export function Dental2026() {
       <section ref={box} aria-label="임플란트 구조" className="relative" style={{ height: "420vh" }}>
         <div className="sticky top-0 h-[100svh] overflow-hidden">
           <div className="absolute inset-x-0 top-[56px] bottom-[36svh] md:inset-0 md:left-[30%]">
-            <Implant3D progress={progress} drag={drag} still={still} />
+            <Implant3D progress={progress} dragRef={drag} still={still} />
           </div>
 
           {/* 1 첫 화면 */}

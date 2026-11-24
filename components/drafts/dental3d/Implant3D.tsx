@@ -85,7 +85,7 @@ function fixtureThread() {
   return new THREE.TubeGeometry(new THREE.CatmullRomCurve3(pts), 1100, 0.034, 8, false);
 }
 
-function Implant({ progress, drag, still }: { progress: React.RefObject<number>; drag: React.RefObject<number>; still: boolean }) {
+function Implant({ progress, dragRef, still }: { progress: React.RefObject<number>; dragRef: React.RefObject<number>; still: boolean }) {
   const root = useRef<THREE.Group>(null);
   const crown = useRef<THREE.Group>(null);
   const abut = useRef<THREE.Group>(null);
@@ -109,7 +109,7 @@ function Implant({ progress, drag, still }: { progress: React.RefObject<number>;
       root.current.position.x = THREE.MathUtils.lerp(root.current.position.x, wide ? aside * 1.5 : 0, 0.12);
       root.current.position.y = THREE.MathUtils.lerp(root.current.position.y, wide ? 0.2 : 0.2 + aside * 0.6, 0.12);
       root.current.rotation.z = THREE.MathUtils.lerp(root.current.rotation.z, -aside * 0.35, 0.12);
-      root.current.rotation.y = spin.current + (drag.current ?? 0) + p * Math.PI * 1.2;
+      root.current.rotation.y = spin.current + (dragRef.current ?? 0) + p * Math.PI * 1.2;
       const s = 0.92 - open * 0.08 - aside * 0.12;
       root.current.scale.setScalar(THREE.MathUtils.lerp(root.current.scale.x, s, 0.1));
     }
@@ -140,7 +140,7 @@ function Implant({ progress, drag, still }: { progress: React.RefObject<number>;
 }
 
 /** 손으로 돌리는 각도는 바깥 ref에 쌓는다. 세로 스크롤은 막지 않는다(touch-action: pan-y) */
-export default function Implant3D({ progress, drag, still }: { progress: React.RefObject<number>; drag: React.RefObject<number>; still: boolean }) {
+export default function Implant3D({ progress, dragRef, still }: { progress: React.RefObject<number>; dragRef: React.RefObject<number>; still: boolean }) {
   const last = useRef<number | null>(null);
   return (
     <Canvas
@@ -155,7 +155,7 @@ export default function Implant3D({ progress, drag, still }: { progress: React.R
       }}
       onPointerMove={(e) => {
         if (last.current == null) return;
-        drag.current = (drag.current ?? 0) + (e.clientX - last.current) * 0.01;
+        dragRef.current = (dragRef.current ?? 0) + (e.clientX - last.current) * 0.01;
         last.current = e.clientX;
       }}
       onPointerUp={() => (last.current = null)}
@@ -163,7 +163,7 @@ export default function Implant3D({ progress, drag, still }: { progress: React.R
     >
       <ambientLight intensity={0.6} />
       <directionalLight position={[3, 5, 4]} intensity={1.6} castShadow shadow-mapSize={[1024, 1024]} />
-      <Implant progress={progress} drag={drag} still={still} />
+      <Implant progress={progress} dragRef={dragRef} still={still} />
       <ContactShadows position={[0, -2.1, 0]} opacity={0.28} scale={8} blur={2.6} far={4} />
       <Environment resolution={256}>
         <Lightformer form="rect" intensity={3} position={[0, 4, 3]} scale={[8, 2, 1]} />

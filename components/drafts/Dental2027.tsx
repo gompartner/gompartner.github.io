@@ -40,7 +40,7 @@ export function Dental2027() {
     // 움직임 줄이기 설정, 코어 4개 이하 기기는 3D 대신 정지 그림
     const reduce = matchMedia("(prefers-reduced-motion: reduce)").matches;
     const weak = (navigator.hardwareConcurrency ?? 8) <= 4;
-    setLite(reduce || weak);
+    queueMicrotask(() => setLite(reduce || weak));
     let raf = 0;
     const on = () => {
       cancelAnimationFrame(raf);
