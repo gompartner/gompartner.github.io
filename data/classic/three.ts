@@ -116,12 +116,12 @@ export const threeCompare = {
 
 /** 카탈로그(public/3d 데모) */
 export const threeDemos = [
-  { href: "/3d/sofa/", img: "/3d/assets/thumb/sofa.jpg", category: "가구 쇼룸", title: "모듈 소파", desc: "모듈 수, 원단, 다리를 바꾸면 견적이 바로 나옵니다", features: ["3D 구성", "모듈 바꾸기", "원단, 다리 선택", "실시간 견적", "견적 요청 접수"] },
-  { href: "/3d/configurator/", img: "/3d/assets/thumb/configurator.jpg", category: "가구 쇼룸", title: "시스템 선반", desc: "벽 폭에 맞춰 칸, 서랍, 도어를 붙이고 견적을 받습니다", features: ["3D 구성", "폭 입력", "서랍, 도어, 행거봉", "실시간 견적", "견적 요청 접수"] },
-  { href: "/3d/door/", img: "/3d/assets/thumb/door.jpg", category: "인테리어", title: "현관 중문", desc: "문 방식, 프레임 색, 유리를 선택해 견적을 받습니다", features: ["3D 구성", "폭, 높이 입력", "프레임 색, 유리 선택", "실시간 견적", "견적 요청 접수"] },
-  { href: "/3d/space/", img: "/3d/assets/thumb/space.jpg", category: "인테리어", title: "시공 사례", desc: "시공한 공간을 3D, 평면도, 둘러보기로 보여 줍니다", features: ["공간 3D 뷰어", "평면도", "둘러보기", "시공 사례"] },
-  { href: "/3d/sign/", img: "/3d/assets/thumb/sign.jpg", category: "간판 제작", title: "채널 간판", desc: "상호를 입력하면 외벽에 글자가 붙고 간판 견적이 나옵니다", features: ["3D 구성", "상호 입력", "간판 종류, 글자 높이", "실시간 견적", "견적 요청 접수"] },
-  { href: "/3d/hanok/", img: "/3d/assets/thumb/hanok.jpg", category: "브랜드 홈페이지", title: "한옥 찻집", desc: "스크롤하면 카메라가 공간을 따라가는 홈페이지입니다", features: ["3D 장면", "스크롤 카메라", "메뉴", "예약 폼"] },
+  { href: "/3d/sofa/", img: "/3d/assets/thumb/sofa.jpg?v=1125", category: "가구 쇼룸", title: "모듈 소파", desc: "모듈 수, 원단, 다리를 바꾸면 견적이 바로 나옵니다", features: ["3D 구성", "모듈 바꾸기", "원단, 다리 선택", "실시간 견적", "견적 요청 접수"] },
+  { href: "/3d/configurator/", img: "/3d/assets/thumb/configurator.jpg?v=1125", category: "가구 쇼룸", title: "시스템 선반", desc: "벽 폭에 맞춰 칸, 서랍, 도어를 붙이고 견적을 받습니다", features: ["3D 구성", "폭 입력", "서랍, 도어, 행거봉", "실시간 견적", "견적 요청 접수"] },
+  { href: "/3d/door/", img: "/3d/assets/thumb/door.jpg?v=1125", category: "인테리어", title: "현관 중문", desc: "문 방식, 프레임 색, 유리를 선택해 견적을 받습니다", features: ["3D 구성", "폭, 높이 입력", "프레임 색, 유리 선택", "실시간 견적", "견적 요청 접수"] },
+  { href: "/3d/space/", img: "/3d/assets/thumb/space.jpg?v=1125", category: "인테리어", title: "시공 사례", desc: "시공한 공간을 3D, 평면도, 둘러보기로 보여 줍니다", features: ["공간 3D 뷰어", "평면도", "둘러보기", "시공 사례"] },
+  { href: "/3d/sign/", img: "/3d/assets/thumb/sign.jpg?v=1125", category: "간판 제작", title: "채널 간판", desc: "상호를 입력하면 외벽에 글자가 붙고 간판 견적이 나옵니다", features: ["3D 구성", "상호 입력", "간판 종류, 글자 높이", "실시간 견적", "견적 요청 접수"] },
+  { href: "/3d/hanok/", img: "/3d/assets/thumb/hanok.jpg?v=1125", category: "브랜드 홈페이지", title: "한옥 찻집", desc: "스크롤하면 카메라가 공간을 따라가는 홈페이지입니다", features: ["3D 장면", "스크롤 카메라", "메뉴", "예약 폼"] },
 ];
 
 export const threeSteps = [
