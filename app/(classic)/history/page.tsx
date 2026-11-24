@@ -29,7 +29,11 @@ export default function ClassicHistoryPage() {
                 <p className="mt-2 break-keep text-[16px] leading-[1.7] text-[#3d4450] md:text-[17px]">{h.body}</p>
               </div>
               <div className="relative aspect-[1100/725] overflow-hidden rounded-lg border border-[#d9dee5] bg-[#f4f6fa]">
-                <Image src={`/images/history/${h.img}.jpg`} alt={h.alt} fill priority={i === 0} sizes="(min-width: 768px) 520px, 100vw" className="object-cover object-top" />
+                {h.video ? (
+                  // 움직이는 화면: 소리 없는 반복 재생(GIF보다 가볍다). 동작 줄이기 설정이면 첫 장면 그림만 보인다
+                  <video src={`/images/history/${h.img}.mp4`} poster={`/images/history/${h.img}.jpg`} aria-label={h.alt} autoPlay muted loop playsInline preload="metadata" className="absolute inset-0 h-full w-full object-cover object-top motion-reduce:hidden" />
+                ) : null}
+                <Image src={`/images/history/${h.img}.jpg`} alt={h.alt} fill priority={i === 0} sizes="(min-width: 768px) 520px, 100vw" className={`object-cover object-top ${h.video ? "motion-safe:hidden" : ""}`} />
               </div>
             </li>
           ))}
