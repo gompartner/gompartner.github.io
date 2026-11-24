@@ -35,11 +35,10 @@ export default function ArchiveDrafts() {
             {[d.a, d.b].map((v, i) => (
               <figure key={v.id} className="overflow-hidden rounded-lg border border-[#d9dee5] bg-white">
                 <Link href={`/work/${d.slug}?v=${v.id}`} className="group block">
-                  <Image src={`/images/archive/drafts/${d.slug}-${v.id}.jpg`} alt={`${d.name} 시안 ${i ? "B" : "A"} ${v.label} 첫 화면`} width={1200} height={750} sizes="(min-width: 768px) 45vw, 92vw" className="block h-auto w-full border-b border-[#e6e9ee] transition-opacity group-hover:opacity-90" />
+                  <Image src={`/images/archive/drafts/${d.slug}-${v.id}.jpg`} alt={`${d.name} 시안 ${i ? "B" : "A"} 첫 화면`} width={1200} height={750} sizes="(min-width: 768px) 45vw, 92vw" className="block h-auto w-full border-b border-[#e6e9ee] transition-opacity group-hover:opacity-90" />
                 </Link>
                 <figcaption className="px-4 pb-4 pt-3">
-                  <p className="text-[12.5px] font-[800] text-[#1d5fd6]">시안 {i ? "B" : "A"}</p>
-                  <p className="text-[16px] font-[800]">{v.label}</p>
+                  <p className="text-[16px] font-[800]">시안 {i ? "B" : "A"}</p>
                   <p className="mt-1 text-[14px] leading-[1.6] text-[#3d4450]">{v.desc}</p>
                   <Link href={`/work/${d.slug}?v=${v.id}`} className="mt-2 inline-block text-[13.5px] font-bold text-[#256ef4] hover:underline underline-offset-4">시안 열어 보기</Link>
                 </figcaption>

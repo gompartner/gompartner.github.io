@@ -48,7 +48,7 @@ export function CatalogShelf({ items }: { items: ShelfItem[] }) {
 
   if (!item) return null;
   return (
-    <section aria-label="카탈로그 슬라이드" className={s.shelf}>
+    <section aria-label="포트폴리오 슬라이드" className={s.shelf}>
       <div className={wrap}>
         <div className={s.chips} role="group" aria-label="카테고리">
           {groups.map((g) => (
@@ -95,8 +95,7 @@ export function CatalogShelf({ items }: { items: ShelfItem[] }) {
               {item.variants.length > 1
                 ? item.variants.map((v, k) => (
                     <button key={v.ab} type="button" className={s.abBtn} aria-pressed={k === sel} onClick={() => setSide((p) => ({ ...p, [item.id]: k }))}>
-                      <b>{v.ab}</b>
-                      {v.label}
+                      {v.label} <b>{v.ab}</b>
                     </button>
                   ))
                 : null}

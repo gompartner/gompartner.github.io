@@ -20,7 +20,7 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
   const { slug } = await params;
   const ind = industries.find((i) => i.slug === slug) ?? catalogGroups.find((g) => g.slug === slug);
   if (!ind) return {};
-  return { ...pageMeta({ title: `${ind.title} 카탈로그`, description: ind.description, path: `/works/${slug}`, noindex: true }), keywords: ind.keywords };
+  return { ...pageMeta({ title: `${ind.title} 포트폴리오`, description: ind.description, path: `/works/${slug}`, noindex: true }), keywords: ind.keywords };
 }
 
 export default async function ClassicIndustryPage({ params }: Props) {
@@ -39,7 +39,7 @@ export default async function ClassicIndustryPage({ params }: Props) {
       <PageHead
         title={ind.label}
         trail={[
-          { href: "/works", label: "카탈로그" },
+          { href: "/works", label: "포트폴리오" },
           { href, label: ind.label },
         ]}
       />
@@ -73,7 +73,7 @@ export default async function ClassicIndustryPage({ params }: Props) {
         <div className={`${wrap} py-14 md:py-20`}>
           <div className="flex items-baseline gap-3">
             <h2 id="c-ind-list" className={h2}>
-              카탈로그
+              포트폴리오
             </h2>
             <span className="text-[16px] font-bold tabular-nums text-[#5b6370] md:text-[18px]">{list.length}개</span>
           </div>
@@ -88,7 +88,7 @@ export default async function ClassicIndustryPage({ params }: Props) {
 
       <section aria-labelledby="c-ind-more" className={`${wrap} py-14 md:py-20`}>
         <h2 id="c-ind-more" className={h2}>
-          다른 분야 카탈로그
+          다른 분야 포트폴리오
         </h2>
         {others.map((c) => (
           <div key={c.slug} className="mt-12 first-of-type:mt-8 md:mt-16">

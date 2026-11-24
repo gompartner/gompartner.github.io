@@ -20,6 +20,7 @@ const groups = [
   {
     title: "제작",
     items: [
+      { href: "/works", label: "포트폴리오" },
       { href: "/homepage", label: "홈페이지 제작" },
       { href: "/landing-page", label: "랜딩페이지 제작" },
       { href: "/program", label: "업무 프로그램 제작" },

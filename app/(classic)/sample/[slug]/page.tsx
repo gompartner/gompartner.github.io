@@ -55,14 +55,14 @@ export default async function ClassicSamplePage({ params }: Props) {
       <PageHead
         title={p.title}
         trail={[
-          { href: "/works", label: "카탈로그" },
+          { href: "/works", label: "포트폴리오" },
           ...(ind ? [{ href: `/works/${ind.slug}`, label: ind.label }] : []),
           { href: `/sample/${slug}`, label: p.title },
         ]}
       />
 
       {/* PC 화면에 휴대폰 화면을 겹친다. 앱, 키오스크는 기기 캡처만. 누르면 샘플이 열린다 */}
-      <section aria-label="카탈로그 화면" className="bg-[#f4f6f9]">
+      <section aria-label="포트폴리오 화면" className="bg-[#f4f6f9]">
         <div className={`${wrap} py-10 md:py-16`}>
           {pair ? (
             // 11-22 시안 A, B를 나란히. 각 화면을 누르면 그 시안이 열린다. 휴대폰은 위아래로 쌓는다
@@ -137,6 +137,7 @@ export default async function ClassicSamplePage({ params }: Props) {
                 디자인 컨셉
               </h2>
               <dl className="text-[16px] md:text-[17px]">
+{!pair && (
                 <div className="grid grid-cols-[88px_1fr] items-start gap-4 border-b border-[#e6e9ee] py-4">
                   <dt className="pt-1 text-[15px] font-bold text-[#5b6370]">키워드</dt>
                   <dd className="flex flex-wrap gap-2">
@@ -147,6 +148,7 @@ export default async function ClassicSamplePage({ params }: Props) {
                     ))}
                   </dd>
                 </div>
+                )}
                 <div className="grid grid-cols-[88px_1fr] items-start gap-4 border-b border-[#e6e9ee] py-4">
                   <dt className="pt-1 text-[15px] font-bold text-[#5b6370]">컬러</dt>
                   <dd className="grid gap-3 sm:grid-cols-3">
@@ -257,9 +259,9 @@ export default async function ClassicSamplePage({ params }: Props) {
           <div className={`${wrap} py-14 md:py-20`}>
             <div className="flex items-end justify-between gap-4">
               <h2 id="c-others" className={`${h2} break-keep`}>
-                {ind ? `${ind.label} 카탈로그` : "다른 카탈로그"}
+                {ind ? `${ind.label} 포트폴리오` : "다른 포트폴리오"}
               </h2>
-              <Link href={ind ? `/works/${ind.slug}` : "/works"} aria-label={`${ind ? ind.label : "다른"} 카탈로그 더보기`} className={`${more} min-h-11 shrink-0`}>
+              <Link href={ind ? `/works/${ind.slug}` : "/works"} aria-label={`${ind ? ind.label : "다른"} 포트폴리오 더보기`} className={`${more} min-h-11 shrink-0`}>
                 더보기 <Plus size={15} strokeWidth={2.5} aria-hidden />
               </Link>
             </div>

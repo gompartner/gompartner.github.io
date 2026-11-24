@@ -30,9 +30,10 @@ export const classicMenu = [
   {
     label: "제작",
     href: "/homepage",
-    match: ["/homepage", "/landing-page", "/program", "/app", "/kiosk", "/3d"],
+    match: ["/works", "/sample", "/homepage", "/landing-page", "/program", "/app", "/kiosk", "/3d"],
     // 11-01 랜딩, 업무 프로그램은 제작 안에 둔다(10-29 사용자 결정)
     items: [
+      { href: "/works", label: "포트폴리오" },
       { href: "/homepage", label: "홈페이지 제작" },
       { href: "/landing-page", label: "랜딩페이지 제작" },
       { href: "/program", label: "업무 프로그램 제작" },

@@ -11,7 +11,7 @@ import { designDocs, shortTitle, takeover, techDocs, termHref } from "@/data/cla
 import { datasets } from "@/data/classic/trendData";
 
 // 통합검색 색인. 서버에서 만들어 검색 페이지(클라이언트)에 넘긴다(11-01).
-export type SearchKind = "서비스" | "카탈로그" | "웹 지식" | "운영 노트" | "네이버 블로그" | "티스토리" | "유튜브" | "무료 도구" | "용어" | "자주 묻는 질문" | "공지사항";
+export type SearchKind = "서비스" | "포트폴리오" | "웹 지식" | "운영 노트" | "네이버 블로그" | "티스토리" | "유튜브" | "무료 도구" | "용어" | "자주 묻는 질문" | "공지사항";
 export interface SearchItem {
   kind: SearchKind;
   title: string;
@@ -44,7 +44,7 @@ export function buildSearchIndex(): SearchItem[] {
     ...industries.map((i) => ({ kind: "서비스" as const, title: i.title, desc: i.needs.join(", "), href: `/works/${i.slug}`, hay: [i.label, i.description, ...i.needs].join(" ") })),
   ];
   const catalogs: SearchItem[] = [...catalogProjects, ...demoProjects.filter(isProgram), ...threeProjects].map((p) => ({
-    kind: "카탈로그",
+    kind: "포트폴리오",
     title: plain(p.title),
     desc: plain(p.features.join(", ")),
     href: hrefOf(p),
@@ -54,7 +54,7 @@ export function buildSearchIndex(): SearchItem[] {
   // 11-04 키오스크 3D 체험(/work/<slug>/3d). 목록은 app/work/[slug]/3d/page.tsx 의 demos3d 와 같게 둔다
   const kiosk3d: SearchItem[] = ["kiosk-clinic", "kiosk-academy"].flatMap((slug) => {
     const p = demoProjects.find((x) => x.demoUrl === `/work/${slug}`);
-    return p ? [{ kind: "카탈로그" as const, title: `${plain(p.title)} 3D 체험`, desc: "실제 장소에 놓인 키오스크를 3D로 돌려 보며 화면을 눌러 봅니다", href: `/work/${slug}/3d`, hay: ["키오스크 3D 쓰리디 체험", p.category, plain(p.description)].join(" "), thumb: thumbOf(p) }] : [];
+    return p ? [{ kind: "포트폴리오" as const, title: `${plain(p.title)} 3D 체험`, desc: "실제 장소에 놓인 키오스크를 3D로 돌려 보며 화면을 눌러 봅니다", href: `/work/${slug}/3d`, hay: ["키오스크 3D 쓰리디 체험", p.category, plain(p.description)].join(" "), thumb: thumbOf(p) }] : [];
   });
   const faqs: SearchItem[] = [
     ...faq.map((f) => ({ kind: "자주 묻는 질문" as const, title: f.q, desc: f.a, href: "/faq", hay: "" })),
@@ -86,7 +86,7 @@ export function buildSearchIndex(): SearchItem[] {
 /** 카탈로그 검색용(카탈로그 목록 페이지) */
 export function buildCatalogIndex(only?: { demoUrl: string }[]): SearchItem[] {
   const ids = new Set((only ?? [...catalogProjects, ...threeProjects]).map((p) => (p.demoUrl.startsWith("/work/") ? `/sample/${p.demoUrl.replace("/work/", "")}` : p.demoUrl)));
-  return buildSearchIndex().filter((i) => i.kind === "카탈로그" && ids.has(i.href));
+  return buildSearchIndex().filter((i) => i.kind === "포트폴리오" && ids.has(i.href));
 }
 
 /** 업종 탭 추천 검색어: 그 탭 카탈로그 기능 이름에 두 번 이상 나오는 낱말(눌렀을 때 결과가 있는 말만) */

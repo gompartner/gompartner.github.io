@@ -72,7 +72,7 @@ export const groups: { slug: string; label: string; title: string; description: 
     slug: "program",
     label: "업무 프로그램",
     title: "업무 프로그램 제작",
-    description: "주문 취합, 쇼핑몰 관리, 결과지 출력, 강의 운영처럼 엑셀로 처리하던 반복 업무를 웹 프로그램으로 옮긴 카탈로그입니다. 실제 화면을 직접 사용해 볼 수 있습니다.",
+    description: "주문 취합, 쇼핑몰 관리, 결과지 출력, 강의 운영처럼 엑셀로 처리하던 반복 업무를 웹 프로그램으로 옮긴 포트폴리오입니다. 실제 화면을 직접 사용해 볼 수 있습니다.",
     keywords: ["업무 프로그램 제작", "관리자 페이지 제작", "업무 자동화 프로그램", "엑셀 자동화"],
     needs: ["엑셀 업로드와 취합", "관리자 화면", "결과지, 문서 출력", "권한별 화면"],
     match: isProgram,
@@ -81,7 +81,7 @@ export const groups: { slug: string; label: string; title: string; description: 
     slug: "landing",
     label: "랜딩페이지",
     title: "광고 신청 접수 랜딩페이지 제작",
-    description: "광고로 유입된 고객이 상담이나 예약을 신청하는 단일 페이지 카탈로그입니다. 신청이 담당자 메일과 구글 시트에 바로 기록되는 흐름을 직접 확인할 수 있습니다.",
+    description: "광고로 유입된 고객이 상담이나 예약을 신청하는 단일 페이지 포트폴리오입니다. 신청이 담당자 메일과 구글 시트에 바로 기록되는 흐름을 직접 확인할 수 있습니다.",
     keywords: ["랜딩페이지 제작", "광고 랜딩페이지", "상담 신청 페이지", "이벤트 페이지 제작"],
     needs: ["첫 화면에 신청 버튼", "신청 접수 알림", "남은 자리, 마감일 표시", "견적 계산기"],
     match: isLanding,
@@ -90,7 +90,7 @@ export const groups: { slug: string; label: string; title: string; description: 
     slug: "app",
     label: "앱",
     title: "앱 제작",
-    description: "예약, 출결, 회원권처럼 고객이 휴대폰으로 쓰는 앱 카탈로그입니다. 화면을 직접 눌러 볼 수 있습니다.",
+    description: "예약, 출결, 회원권처럼 고객이 휴대폰으로 쓰는 앱 포트폴리오입니다. 화면을 직접 눌러 볼 수 있습니다.",
     keywords: ["앱 제작", "앱 개발", "예약 앱", "학원 앱"],
     needs: ["푸시 알림", "예약, 출결", "회원권, 적립", "관리자 웹"],
     match: (p) => p.category === "앱",
@@ -99,7 +99,7 @@ export const groups: { slug: string; label: string; title: string; description: 
     slug: "kiosk",
     label: "키오스크",
     title: "키오스크 화면 제작",
-    description: "병원 접수, 학원 출결처럼 현장에서 직접 누르는 키오스크 화면 카탈로그입니다.",
+    description: "병원 접수, 학원 출결처럼 현장에서 직접 누르는 키오스크 화면 포트폴리오입니다.",
     keywords: ["키오스크 제작", "접수 키오스크", "출결 키오스크", "키오스크 프로그램"],
     needs: ["큰 글씨, 음성 안내", "대기번호 출력", "QR, 번호 입력", "관리자 화면"],
     match: (p) => p.category === "키오스크",
@@ -108,7 +108,7 @@ export const groups: { slug: string; label: string; title: string; description: 
     slug: "3d",
     label: "3D",
     title: "3D 웹 제작",
-    description: "고객이 제품을 직접 구성하면 3D와 견적이 바로 나오는 카탈로그입니다. 가구, 중문, 간판, 인테리어 화면을 직접 돌려 볼 수 있습니다.",
+    description: "고객이 제품을 직접 구성하면 3D와 견적이 바로 나오는 포트폴리오입니다. 가구, 중문, 간판, 인테리어 화면을 직접 돌려 볼 수 있습니다.",
     keywords: ["3D 웹 제작", "3D 견적", "제품 컨피규레이터", "3D 쇼룸"],
     needs: ["3D 구성", "실시간 견적", "견적 요청 접수", "기존 홈페이지 연결"],
     match: (p) => p.category === "3D",
@@ -117,7 +117,7 @@ export const groups: { slug: string; label: string; title: string; description: 
     slug: "maintenance",
     label: "유지보수",
     title: "홈페이지 유지보수",
-    description: "운영 중인 홈페이지의 유지보수 카탈로그입니다. 긴급 오류 접수부터 처리 완료까지의 과정을 직접 확인할 수 있습니다.",
+    description: "운영 중인 홈페이지의 유지보수 포트폴리오입니다. 긴급 오류 접수부터 처리 완료까지의 과정을 직접 확인할 수 있습니다.",
     keywords: ["홈페이지 유지보수", "홈페이지 수정", "홈페이지 오류 수정"],
     needs: ["급한 오류 접수", "처리 과정 공유", "월 점검 기록"],
     match: isMaintenance,
@@ -166,7 +166,7 @@ export function shelfItems() {
       const slug = is3d ? p.demoUrl.split("/").filter(Boolean).pop()! : slugOf(p.demoUrl);
       const vs = is3d ? [] : VARIANTS[slug] ?? [];
       const variants = (vs.length >= 2
-        ? vs.map((v) => ({ ab: v.id.toUpperCase(), label: v.label.replace(/^시안 \S+ /, ""), href: `${p.demoUrl}?v=${v.id}`, img: `/images/shelf/${slug}-${v.id}.jpg` }))
+        ? vs.map((v) => ({ ab: v.id.toUpperCase(), label: "시안", href: `${p.demoUrl}?v=${v.id}`, img: `/images/shelf/${slug}-${v.id}.jpg` }))
         : [{ ab: "", label: "", href: p.demoUrl, img: `/images/shelf/${is3d ? "3d-" : ""}${slug}.jpg` }]
       ).filter((v) => exists(v.img));
       if (variants.length) out.push({ id: p.id, name: p.title, group: sec.label, variants });
@@ -178,7 +178,7 @@ export function shelfItems() {
 export function builderItems() {
   return industries.flatMap((i) =>
     samplesIn(i.slug)
-      .map((p) => ({ group: i.label, id: p.id, slug: slugOf(p.demoUrl), name: p.title.replace(/ 홈페이지$/, ""), variants: (VARIANTS[slugOf(p.demoUrl)] ?? []).map((v) => ({ id: v.id, label: v.label.replace(/^시안 \S+ /, "") })) }))
+      .map((p) => ({ group: i.label, id: p.id, slug: slugOf(p.demoUrl), name: p.title.replace(/ 홈페이지$/, ""), variants: (VARIANTS[slugOf(p.demoUrl)] ?? []).map((v) => ({ id: v.id, label: v.label })) }))
       .filter((x) => x.variants.length >= 2),
   );
 }

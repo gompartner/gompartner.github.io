@@ -83,7 +83,7 @@ export function SiteBuilder({ items }: { items: BuilderItem[] }) {
   const mw = Math.max(92, w * 0.24), sm = mw / MW;
   const done = phase >= 3 ? (name.trim() ? 2 : 1) : 0;
   const shown = typed || item.name;
-  const msg = `${item.name} 홈페이지, 시안 ${variant.id.toUpperCase()} ${variant.label}${name.trim() ? `, 상호 ${name.trim()}` : ""}`;
+  const msg = `${item.name} 홈페이지, 시안 ${variant.id.toUpperCase()}${name.trim() ? `, 상호 ${name.trim()}` : ""}`;
 
   return (
     <div className="grid grid-cols-[minmax(0,1fr)] gap-6 lg:grid-cols-[minmax(0,0.9fr)_minmax(0,1.3fr)] lg:items-start lg:gap-x-12 lg:gap-y-8">
@@ -155,6 +155,9 @@ export function SiteBuilder({ items }: { items: BuilderItem[] }) {
           <a href={src} data-gtm-cta="classic_builder_open" className="inline-flex h-14 items-center gap-1 rounded-md px-4 text-[16px] font-bold shadow-[inset_0_0_0_1.5px_#15171c] [.gp-dark_&]:shadow-[inset_0_0_0_1.5px_#e8ebf0] md:text-[18px]">
             시안 전체 보기 <ArrowUpRight size={18} aria-hidden />
           </a>
+          <NavLink href="/works" data-gtm-cta="classic_builder_works" className="inline-flex h-14 items-center px-2 text-[16px] font-bold text-[#1552cc] hover:underline md:text-[18px]">
+            포트폴리오
+          </NavLink>
         </div>
         <ol className="mt-8 grid grid-cols-2 gap-x-4 border-t-2 border-[#15171c] md:mt-10 md:grid-cols-3" role="list">
           {STEPS.map((t, k) => (

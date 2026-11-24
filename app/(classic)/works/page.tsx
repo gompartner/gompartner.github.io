@@ -11,8 +11,8 @@ import { buildCatalogIndex } from "@/components/classic/search/index";
 import { CatalogSearch } from "@/components/classic/search/CatalogSearch";
 
 export const metadata: Metadata = pageMeta({
-  title: "홈페이지 제작 카탈로그",
-  description: `병원, 매장, 전문직, 기업, 학원 업종별 홈페이지 제작 카탈로그 ${catalogProjects.length}개. 화면 구성과 주요 기능을 직접 사용해 볼 수 있습니다.`,
+  title: "홈페이지 제작 포트폴리오",
+  description: `병원, 매장, 전문직, 기업, 학원 업종별 홈페이지 제작 포트폴리오 ${catalogProjects.length}개. 화면 구성과 주요 기능을 직접 사용해 볼 수 있습니다.`,
   path: "/works",
   noindex: true,
 });
@@ -22,7 +22,7 @@ const LIMIT = 6;
 export default function ClassicWorksPage() {
   return (
     <>
-      <PageHead title="카탈로그" trail={[{ href: "/works", label: "카탈로그" }]} />
+      <PageHead title="포트폴리오" trail={[{ href: "/works", label: "포트폴리오" }]} />
       <CatalogShelf items={shelfItems()} />
       <CatalogSearch index={buildCatalogIndex()}>
       {[

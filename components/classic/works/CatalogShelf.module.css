@@ -20,7 +20,7 @@
 .ab{display:flex;gap:6px;flex:1;min-width:0}
 .abBtn{flex:1;min-width:0;height:48px;border-radius:8px;border:1px solid #d9dee5;background:#fff;font-size:15px;font-weight:700;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;padding:0 8px;color:#15171c}
 .abBtn[aria-pressed="true"]{border-color:#15171c;box-shadow:inset 0 0 0 1px #15171c}
-.abBtn b{color:#256ef4;margin-right:4px}
+.abBtn b{color:#256ef4}
 .open{flex:none;display:inline-flex;align-items:center;justify-content:center;height:48px;padding:0 20px;border-radius:8px;background:#256ef4;color:#fff;font-weight:700;font-size:16px}
 .open:hover{background:#0b50d0}
 .scrub{width:100%;margin:8px 0 0;accent-color:#15171c;height:28px}

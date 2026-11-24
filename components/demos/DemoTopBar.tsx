@@ -27,8 +27,8 @@ export function DemoTopBar({ projectId }: { projectId: string }) {
       <div className="mx-auto flex h-10 w-full max-w-[1248px] items-center justify-between gap-3 px-4 md:px-6">
         <Link href={home} onClick={backToCatalog} data-gtm-cta={`demo_home_${projectId}`} className="inline-flex shrink-0 items-center gap-1 text-[14px] font-bold hover:text-[#8fb4ff]">
           <ChevronLeft size={16} aria-hidden />
-          <span className="hidden sm:inline">카탈로그로 돌아가기</span>
-          <span className="sm:hidden">카탈로그</span>
+          <span className="hidden sm:inline">포트폴리오로 돌아가기</span>
+          <span className="sm:hidden">포트폴리오</span>
         </Link>
         {list && (
           <div role="group" aria-label="시안 선택" className="flex min-w-0 items-center gap-1 rounded-full bg-white/10 p-[3px]">
