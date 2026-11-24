@@ -94,7 +94,7 @@ function Products() {
         <div>
           <h3 className="text-[16px] font-bold text-[#256ef4]">유지보수</h3>
           <p className="mt-3 text-[30px] font-[800] leading-none tracking-[-0.04em] tabular-nums md:text-[40px]">
-            건별 1만 원<span className="ml-1.5 text-[18px] font-bold tracking-[-0.02em]">부터</span>
+            건별 10,000원<span className="ml-1.5 text-[18px] font-bold tracking-[-0.02em]">부터</span>
           </p>
           <p className="mt-2 text-[15px] text-[#5b6370]">부가세 별도</p>
         </div>

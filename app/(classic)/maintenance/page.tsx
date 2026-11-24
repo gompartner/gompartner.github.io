@@ -29,7 +29,7 @@ const KINDS: { id?: string; name: string; who: string; what: string; rows: [stri
     name: "유지보수",
     who: "소규모 홈페이지",
     what: "수정 요청을 건별로 처리합니다.",
-    rows: [["작업", "문구, 이미지, 메뉴 수정, 오류 수정"], ["계약", "건별, 월 계약 없음"], ["비용", "건별 1만 원부터"]],
+    rows: [["작업", "문구, 이미지, 메뉴 수정, 오류 수정"], ["계약", "건별, 월 계약 없음"], ["비용", "건별 10,000원부터"]],
     links: [["/maintenance/fix", "오류 수정"], ["/contact", "수정 요청"]],
   },
   {
