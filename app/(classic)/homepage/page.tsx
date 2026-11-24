@@ -16,6 +16,8 @@ import { industries } from "@/data/classic/industries";
 import { plans, runningCostNote } from "@/data/classic/pricing";
 import { projects } from "@/data/classic/projects";
 import { pageMeta } from "@/lib/seo";
+import { NavLink } from "@/components/classic/NavLink";
+import { hrefOf, samplesIn, thumbOf } from "@/components/classic/works/samples";
 import { siteUrl } from "@/lib/site";
 
 // 홈페이지 제작 서비스 상세. 패키지 데이터(data/classic/pricing)를 쓴다.
@@ -116,6 +118,24 @@ export default function ClassicHomepagePage() {
                   </span>
                   <span className="min-w-0 flex-1 text-[16px] leading-[1.6] text-[#5b6370]">{i.needs.join(", ")}</span>
                 </div>
+                {/* 11-24 업종마다 실제 시안 화면 세 장과 전체 보기(상품 페이지에 결과물이 안 보이던 것 보완) */}
+                <ul className="grid grid-cols-3 gap-2 pb-5 md:gap-4 md:pb-7 md:pl-[292px]" role="list">
+                  {samplesIn(i.slug).slice(0, 3).map((p) => (
+                    <li key={p.id}>
+                      <NavLink href={hrefOf(p)} className="group/s block">
+                        <span className="relative block aspect-[16/10] overflow-hidden rounded-md border border-[#e1e5eb] bg-[#f4f6fa]">
+                          <Image src={thumbOf(p)} alt={p.imageAlt} fill sizes="(min-width: 768px) 280px, 33vw" className="object-cover object-top" />
+                        </span>
+                        <span className="mt-1.5 block truncate text-[13px] font-bold text-[#3d4450] group-hover/s:text-[#256ef4] md:text-[15px]">{p.title.replace(/ 홈페이지$/, "")}</span>
+                      </NavLink>
+                    </li>
+                  ))}
+                </ul>
+                <p className="pb-5 md:pb-7 md:pl-[292px]">
+                  <NavLink href={`/works/${i.slug}`} className="inline-flex min-h-11 items-center text-[15px] font-bold text-[#256ef4] hover:underline">
+                    {i.label} 시안 {samplesIn(i.slug).length}개 보기
+                  </NavLink>
+                </p>
               </li>
             ))}
           </ul>
