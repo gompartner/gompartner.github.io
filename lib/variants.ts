@@ -22,7 +22,7 @@ export const VARIANTS: Record<string, { id: string; label: string }[]> = {
     { id: "b", label: "시안 B 초중등형" },
   ],
   interior: [
-    { id: "a", label: "시안 A 갤러리형" },
+    { id: "a", label: "시안 A 시공 사례형" },
     { id: "b", label: "시안 B 비용 안심형" },
   ],
   "korean-restaurant": [
