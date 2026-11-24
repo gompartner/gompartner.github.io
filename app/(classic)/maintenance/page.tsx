@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import { ArrowUpRight, CalendarClock, FileBarChart, MessageSquareReply, Wrench } from "lucide-react";
 import { FaqBlock } from "@/components/classic/FaqBlock";
+import { ReviewRequest } from "@/components/classic/ReviewRequest";
 import { StepList } from "@/components/classic/pricing/StepList";
 import { maintenanceTabs } from "@/components/classic/pricing/tabs";
 import { PageHead, SubTabs, wrap } from "@/components/classic/ui";
@@ -110,6 +111,10 @@ export default function ClassicMaintenancePage() {
         ]}
       />
       <SubTabs items={maintenanceTabs} current="/maintenance" />
+
+      <section aria-label="사전 검토 신청" className={`${wrap} pt-10 md:pt-14`}>
+        <ReviewRequest />
+      </section>
 
       {/* 11-25 일의 성격대로 네 가지로 나눔(사용자 결정): 유지보수(요청 처리), 유지관리(정기 운영), 성능 개선, 고도화. 하자보수는 제작 상품의 조건 */}
       <section aria-labelledby="m-kinds" className={`${wrap} py-12 md:py-16`}>

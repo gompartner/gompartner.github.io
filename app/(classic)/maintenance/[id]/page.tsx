@@ -7,7 +7,7 @@ import { ArrowUpRight, Check, FileText } from "lucide-react";
 import { FaqBlock } from "@/components/classic/FaqBlock";
 import { StepList } from "@/components/classic/pricing/StepList";
 import { PageHead, SubTabs, h2, h3, wrap } from "@/components/classic/ui";
-import { ManageStory } from "@/components/classic/ManageStory";
+import { ReviewRequest } from "@/components/classic/ReviewRequest";
 import { maintenanceFaq, maintenanceServices, replyTerm } from "@/data/classic/maintenance";
 import { pageMeta } from "@/lib/seo";
 import { siteUrl } from "@/lib/site";
@@ -95,13 +95,10 @@ export default async function MaintenanceDetailPage({ params }: Props) {
         </dl>
       </section>
 
-      {/* 11-25 유지관리: 맡으면 하는 일(현황 분석과 작성 문서) */}
+      {/* 11-25 유지관리: 계약 전 사전 검토 신청 */}
       {s.id === "monthly" ? (
-        <section aria-labelledby="md-manage" className={`${wrap} pb-14 md:pb-20`}>
-          <h2 id="md-manage" className={`${h2} mb-6 md:mb-8`}>
-            유지관리 착수 절차
-          </h2>
-          <ManageStory />
+        <section aria-label="사전 검토 신청" className={`${wrap} pb-14 md:pb-20`}>
+          <ReviewRequest />
         </section>
       ) : null}
 

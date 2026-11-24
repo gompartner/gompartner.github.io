@@ -55,7 +55,7 @@ export function ContactForm() {
   const [sample] = useState(sampleTitle);
   const [currentSite, setCurrentSite] = useState(site);
   // 무료 이어받기 띠에서 오면 promo=takeover(11-07), 원페이지 무료 제작 띠에서 오면 promo=onepage(11-23, site 칸에 업종)
-  const promoLabel = promo === "php" ? "PHP 무료 점검 요청" : promo === "takeover" ? "업체 변경 무료 지원 신청" : promo === "onepage" ? "원페이지 무료 제작 신청" : "홈페이지 점검 요청";
+  const promoLabel = promo === "php" ? "PHP 무료 점검 요청" : promo === "takeover" ? "업체 변경 무료 지원 신청" : promo === "onepage" ? "원페이지 무료 제작 신청" : "홈페이지 사전 검토 신청";
   // 11-08 카카오톡 채널 쿠폰(첫 달 유지보수 50%)의 "쿠폰번호 등록하기"는 ?promo=kakao&serial=12자리 번호 로 넘어온다
   const serial = (params.get("serial") ?? "").replace(/\D/g, "").slice(0, 20);
   const couponLine = promo === "kakao" ? `카카오톡 채널 쿠폰(첫 달 유지보수 50% 할인)${serial ? ` 번호 ${serial}` : ""}\n홈페이지 주소: ` : "";
