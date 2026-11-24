@@ -148,7 +148,7 @@ export function LawFirmB() {
           <div className="relative flex flex-col gap-8 md:flex-row md:items-center md:justify-between">
             <div>
               <h2 className="text-[28px] font-bold leading-[1.35] tracking-[-0.04em] md:text-[40px]">지금 상황, 30분이면 정리됩니다</h2>
-              <p className="mt-3 text-[16px] text-white/80 md:text-[18px]">상담 내용은 사건 수임 여부와 관계없이 비밀로 지킵니다.</p>
+              <p className="mt-3 text-[16px] text-white/80 md:text-[18px]">상담 내용은 사건 수임 여부와 관계없이 외부에 알리지 않습니다.</p>
             </div>
             <div className="flex flex-col gap-2 md:items-end">
               <span className="inline-flex h-[56px] items-center gap-2 rounded-full bg-white px-8 text-[17px] font-bold" style={{ color: C.blue }}>

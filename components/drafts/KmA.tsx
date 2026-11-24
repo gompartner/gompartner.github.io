@@ -76,7 +76,7 @@ export function KmA() {
             </div>
             <div className="flex flex-col justify-center p-8 text-white md:p-10" style={{ background: "rgba(255,255,255,0.07)" }}>
               <p className="text-[13px] font-bold tracking-[0.26em] text-white/55">원내 탕전</p>
-              <h2 className="mt-3 text-[26px] font-bold leading-[1.4] tracking-[-0.03em] md:text-[32px]">약재는 원산지를 적고, 한약은 이곳에서 달입니다</h2>
+              <h2 className="mt-3 text-[26px] font-bold leading-[1.4] tracking-[-0.03em] md:text-[32px]">약재는 원산지를 밝히고, 한약은 원내에서 달입니다</h2>
               <p className="mt-3 text-white/70">식약처 기준 검사를 거친 규격 약재만 씁니다. 처방 후 이틀 안에 받으실 수 있습니다.</p>
             </div>
           </div>

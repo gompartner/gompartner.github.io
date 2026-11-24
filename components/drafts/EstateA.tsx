@@ -89,12 +89,12 @@ export function EstateA() {
             <Image src={`${IMG}/a-room.jpg`} alt="큰 창으로 빛이 드는 빈 거실" fill sizes="(min-width: 768px) 55vw, 100vw" className="object-cover" />
           </div>
           <div>
-            <h2 className="text-[28px] font-bold leading-[1.35] tracking-[-0.04em] md:text-[40px]">계약서에 쓰기 전에 먼저 확인합니다</h2>
+            <h2 className="text-[28px] font-bold leading-[1.35] tracking-[-0.04em] md:text-[40px]">계약서 쓰기 전에 먼저 확인합니다</h2>
             <ol className="mt-8 border-t" style={{ borderColor: C.ink }}>
               {[
                 ["등기부 확인", "소유자, 근저당, 압류를 계약 당일 다시 뗍니다."],
                 ["시세 비교", "같은 단지, 같은 평형의 최근 실거래가를 함께 봅니다."],
-                ["특약 정리", "수리, 입주일, 잔금 조건을 문장으로 남깁니다."],
+                ["특약 정리", "수리, 입주일, 잔금 조건을 특약 문구로 적어 둡니다."],
                 ["잔금, 입주", "잔금일 등기 이전과 관리비 정산까지 챙깁니다."],
               ].map(([t, d], i) => (
                 <li key={t} className="flex gap-5 border-b py-5" style={{ borderColor: C.line }}>

@@ -36,7 +36,7 @@ export function InteriorA() {
           <h1 className="text-[40px] font-bold leading-[1.18] tracking-[-0.045em] md:text-[76px]">
             오래 머물고 싶은
             <br />
-            집을 짓습니다
+            집을 만듭니다
           </h1>
           <p className="max-w-[360px] text-[16px] text-white/85 md:text-[17px]">설계부터 시공, 입주 후 1년 하자 점검까지 한 팀이 끝까지 맡습니다.</p>
         </div>

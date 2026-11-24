@@ -65,7 +65,7 @@ export function NailA() {
               <p className="text-[13px] font-bold tracking-[0.26em]" style={{ color: C.sub }}>COLOR OF THE MONTH</p>
               <h2 className="mt-4 text-[30px] font-bold tracking-[-0.04em] md:text-[46px]">12월의 컬러</h2>
             </div>
-            <p className="text-[15px]" style={{ color: C.sub }}>이달의 컬러로 원컬러를 하시면 아트 한 개를 더해 드립니다.</p>
+            <p className="text-[15px]" style={{ color: C.sub }}>이달의 컬러로 원컬러를 하시면 아트 한 개를 서비스로 해 드립니다.</p>
           </div>
           <ul className="mt-12 grid grid-cols-3 gap-4 md:grid-cols-6 md:gap-6">
             {COLORS.map((c) => (

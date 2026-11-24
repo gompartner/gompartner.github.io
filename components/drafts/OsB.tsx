@@ -109,7 +109,7 @@ export function OsB() {
             <ul className="mt-5 grid gap-2.5" style={{ color: C.sub }}>
               <li>처음 쓰기 전 쌀뜨물에 한 번 끓여 주세요</li>
               <li>식기세척기, 전자레인지 사용 가능, 오븐 직화는 피해 주세요</li>
-              <li>차 물이 들면 베이킹소다로 닦으면 지워집니다</li>
+              <li>찻물이 들면 베이킹소다로 닦으면 지워집니다</li>
             </ul>
           </div>
           <div className="flex flex-col justify-between rounded-[28px] p-8 text-white md:p-10" style={{ background: C.ink }}>

@@ -39,7 +39,7 @@ export function PilatesA() {
             <br />
             몸이 기억합니다
           </h1>
-          <p className="mx-auto mt-6 max-w-[440px] text-[16px] text-white/85 md:text-[18px]">체형 평가로 시작해 한 사람의 몸에 맞춘 순서로 수업합니다.</p>
+          <p className="mx-auto mt-6 max-w-[440px] text-[16px] text-white/85 md:text-[18px]">체형 평가로 시작해 회원님 몸에 맞춘 순서로 수업합니다.</p>
         </div>
       </section>
 

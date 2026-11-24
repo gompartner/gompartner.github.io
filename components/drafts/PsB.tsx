@@ -54,7 +54,7 @@ export function PsB() {
           <div className="mt-12 grid gap-px md:grid-cols-3" style={{ background: C.line }}>
             {[
               ["천장고 2.6m", "일반 아파트보다 30cm 높게"],
-              ["3면 개방 코너 창", "거실과 주방 모두 바깥을 봅니다"],
+              ["3면 개방 코너 창", "거실과 주방 모두 외부 조망"],
               ["세대 창고", "지하 1층, 세대별 4㎡"],
             ].map(([t, d]) => (
               <div key={t} className="bg-white p-6 md:p-8">

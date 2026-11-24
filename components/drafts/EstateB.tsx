@@ -98,7 +98,7 @@ export function EstateB() {
               <ShieldCheck size={18} aria-hidden />
               전세 안전 확인
             </p>
-            <h2 className="mt-3 text-[28px] font-bold leading-[1.35] tracking-[-0.04em] md:text-[40px]">보증금을 지키는 확인, 계약 전에 같이 봅니다</h2>
+            <h2 className="mt-3 text-[28px] font-bold leading-[1.35] tracking-[-0.04em] md:text-[40px]">보증금을 지키려면, 계약 전에 이것부터 봅니다</h2>
             <p className="mt-4" style={{ color: C.sub }}>확인 결과는 계약서 특약과 중개대상물 확인설명서에 그대로 적습니다.</p>
           </div>
           <ul className="grid gap-3 sm:grid-cols-2">

@@ -39,7 +39,7 @@ export function NailB() {
             <h1 className="mt-5 text-[34px] font-bold leading-[1.22] tracking-[-0.045em] md:text-[54px]">
               기다리지 않는
               <br />
-              조용한 네일
+              1인 네일샵
             </h1>
             <p className="mt-4 max-w-[420px] text-[16px] md:text-[18px]" style={{ color: C.sub }}>한 번에 한 분만 받습니다. 예약 시간에 오시면 바로 시작합니다.</p>
           </div>
@@ -95,7 +95,7 @@ export function NailB() {
           <div>
             <h2 className="text-[28px] font-bold leading-[1.35] tracking-[-0.04em] md:text-[38px]">예약 전에 알아 두세요</h2>
             <ul className="mt-7 grid gap-3">
-              {["15분 넘게 늦으시면 다음 시간으로 옮깁니다", "다른 샵 젤 제거는 5,000원이 더해집니다", "도구는 손님마다 소독하고 파일은 1회용을 씁니다", "주차는 건물 뒤 공영주차장을 이용해 주세요"].map((x) => (
+              {["15분 넘게 늦으시면 다음 시간으로 옮깁니다", "다른 샵 젤 제거는 5,000원이 추가됩니다", "도구는 손님마다 소독하고 파일은 1회용을 씁니다", "주차는 건물 뒤 공영주차장을 이용해 주세요"].map((x) => (
                 <li key={x} className="border-b pb-3" style={{ borderColor: C.line, color: C.sub }}>{x}</li>
               ))}
             </ul>

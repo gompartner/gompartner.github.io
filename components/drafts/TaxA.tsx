@@ -13,7 +13,7 @@ const SERVICES = [
   { en: "BOOKKEEPING", t: "법인, 개인 기장", d: "매월 장부 작성과 부가세, 원천세 신고를 정해진 날짜에 처리하고 결과를 리포트로 보내 드립니다." },
   { en: "TAX FILING", t: "법인세, 종합소득세 신고", d: "공제와 감면 항목을 빠짐없이 검토해 신고 전 예상 세액과 근거를 먼저 설명드립니다." },
   { en: "ADVISORY", t: "세무 자문, 조사 대응", d: "가업승계, 법인 전환, 세무조사 사전 점검과 소명 자료 작성을 맡습니다." },
-  { en: "PAYROLL", t: "급여, 4대보험 아웃소싱", d: "급여 계산, 명세서 발송, 4대보험 취득과 상실 신고를 대신 처리합니다." },
+  { en: "PAYROLL", t: "급여, 4대보험 대행", d: "급여 계산, 명세서 발송, 4대보험 취득과 상실 신고를 대신 처리합니다." },
 ];
 
 export function TaxA() {
@@ -47,7 +47,7 @@ export function TaxA() {
             경영 판단이 빨라집니다
           </h1>
           <p className="mt-6 max-w-[540px] text-[16px] text-white/75 md:text-[19px]">
-            매달 손익과 예상 세액을 한 장으로 정리해 드립니다. 신고 기한이 아니라 대표님의 다음 결정에 맞춰 일합니다.
+            매달 손익과 예상 세액을 한 장으로 정리해 드립니다. 신고 기한만 챙기지 않고 대표님의 다음 결정까지 함께 봅니다.
           </p>
           <div className="mt-10 flex flex-wrap gap-3">
             <span className="inline-flex h-[54px] items-center gap-2 rounded-[4px] px-7 font-bold" style={{ background: C.accent }}>

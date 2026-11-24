@@ -105,7 +105,7 @@ export function BkA() {
               <ul className="mt-5 grid gap-2.5" style={{ color: C.sub }}>
                 <li>3일 전까지 전화로 주문, 크기는 1호와 2호</li>
                 <li>딸기 생크림, 초코, 고구마 세 가지</li>
-                <li>문구 판은 열 글자까지 써 드립니다</li>
+                <li>케이크 문구는 열 글자까지 써 드립니다</li>
               </ul>
             </div>
           </div>

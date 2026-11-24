@@ -39,7 +39,7 @@ export function HkA() {
             <br />
             차 한 잔
           </h1>
-          <p className="max-w-[360px] text-white/75">1930년대 도시 한옥을 고쳐 찻집으로 엽니다. 마루에 앉아 마당을 보며 차를 드십니다.</p>
+          <p className="max-w-[360px] text-white/75">1930년대 도시 한옥을 고쳐 찻집으로 꾸몄습니다. 마루에 앉아 마당을 보며 차를 드실 수 있습니다.</p>
         </div>
       </section>
 
@@ -93,7 +93,7 @@ export function HkA() {
                 ["대청마루", "좌식, 방석과 낮은 상 6개"],
                 ["사랑방", "입식, 4인 테이블 3개"],
                 ["마당", "봄, 가을 평상 2개"],
-                ["단체", "10인 이상은 사랑방을 통째로 씁니다"],
+                ["단체", "10인 이상은 사랑방을 통째로 내어 드립니다"],
               ].map(([k, v]) => (
                 <div key={k} className="grid grid-cols-[100px_1fr] gap-3 border-b py-4" style={{ borderColor: C.line }}>
                   <dt className="font-bold">{k}</dt>

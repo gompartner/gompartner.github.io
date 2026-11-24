@@ -131,7 +131,7 @@ export function PsA() {
           <div className="flex flex-col justify-between gap-8 p-8 text-white md:p-10" style={{ background: C.navy }}>
             <div>
               <h2 className="text-[24px] font-bold tracking-[-0.04em] md:text-[30px]">견본주택</h2>
-              <p className="mt-3 text-white/75">구리시 인창동 일대, 매일 10:00 ~ 18:00. 59A, 84A 유니트를 지어 두었습니다.</p>
+              <p className="mt-3 text-white/75">구리시 인창동 일대, 매일 10:00 ~ 18:00. 59A, 84A 유니트를 전시하고 있습니다.</p>
             </div>
             <p className="text-[28px] font-bold tabular-nums">1600-0000</p>
           </div>

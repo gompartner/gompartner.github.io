@@ -45,12 +45,12 @@ export function PhA() {
           <div>
             <p className="text-[15px] font-bold" style={{ color: C.green }}>평일 밤 9시까지</p>
             <h1 className="mt-4 text-[36px] font-bold leading-[1.24] tracking-[-0.045em] md:text-[56px]">
-              진료 끝나고 와도
+              진료 끝나고 오셔도
               <br />
               문 열려 있습니다
             </h1>
             <p className="mt-5 max-w-[460px] text-[17px] md:text-[18px]" style={{ color: C.sub }}>
-              처방전 사진을 미리 보내 주시면 도착하실 때 약을 준비해 둡니다. 복용법은 약 봉투와 말로 한 번 더 설명합니다.
+              처방전 사진을 미리 보내 주시면 도착하실 때 약을 준비해 둡니다. 복용법은 약 봉투에 적고 한 번 더 설명해 드립니다.
             </p>
           </div>
           <div className="relative aspect-[4/3] overflow-hidden rounded-[28px]">

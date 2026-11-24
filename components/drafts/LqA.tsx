@@ -39,7 +39,7 @@ export function LqA() {
             <br />
             말씀해 주세요
           </h1>
-          <p className="max-w-[360px] text-white/75">와인 600여 종. 드실 음식과 예산을 들으면 소믈리에가 두세 병으로 좁혀 드립니다.</p>
+          <p className="max-w-[360px] text-white/75">와인 600여 종. 드실 음식과 예산을 말씀해 주시면 소믈리에가 두세 병 골라 드립니다.</p>
         </div>
       </section>
 

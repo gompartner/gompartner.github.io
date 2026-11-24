@@ -60,7 +60,7 @@ export function CarA() {
               </li>
             ))}
           </ul>
-          <p className="mt-5 text-[15px]" style={{ color: C.sub }}>견적은 차종, 연식, 필름 브랜드에 따라 달라 차량 번호와 원하시는 시공을 알려 주시면 회신합니다.</p>
+          <p className="mt-5 text-[15px]" style={{ color: C.sub }}>견적은 차종, 연식, 필름 브랜드에 따라 달라집니다. 차종과 원하시는 시공을 알려 주시면 회신합니다.</p>
         </div>
       </section>
 

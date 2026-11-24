@@ -64,7 +64,7 @@ export function CwB() {
               </li>
             ))}
           </ul>
-          <p className="mt-5 text-[15px]" style={{ color: C.sub }}>12개월 계약 기준, 부가세 별도. 6개월 계약은 월 1만 원이 더해집니다.</p>
+          <p className="mt-5 text-[15px]" style={{ color: C.sub }}>12개월 계약 기준, 부가세 별도. 6개월 계약은 월 1만 원이 추가됩니다.</p>
         </div>
       </section>
 

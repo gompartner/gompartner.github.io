@@ -38,7 +38,7 @@ export function WdA() {
             <br />
             정원을 통째로
           </h1>
-          <p className="max-w-[360px] text-white/80">예식은 하루 한 번만 엽니다. 앞뒤 예식에 쫓기지 않고 하객과 오후 내내 머무실 수 있습니다.</p>
+          <p className="max-w-[360px] text-white/80">예식은 하루 한 번만 진행합니다. 앞뒤 예식에 쫓기지 않고 하객과 오후 내내 머무실 수 있습니다.</p>
         </div>
       </section>
 
@@ -64,7 +64,7 @@ export function WdA() {
         <div className="mx-auto grid max-w-[1320px] gap-3 py-20 md:grid-cols-2 md:py-28">
           {[
             { f: "a-table", alt: "촛불과 꽃이 놓인 긴 연회 테이블", t: "하우스 홀", d: "통창 실내 홀, 긴 테이블 연회, 비 오는 날 예식 장소" },
-            { f: "a-bouquet", alt: "노을빛 들판 앞 분홍 장미 부케", t: "꽃 장식", d: "계절 꽃으로 버진로드, 테이블, 부케까지 한 플로리스트가" },
+            { f: "a-bouquet", alt: "노을빛 들판 앞 분홍 장미 부케", t: "꽃 장식", d: "계절 꽃으로 버진로드, 테이블, 부케까지 한 플로리스트가 맡습니다" },
           ].map((x) => (
             <div key={x.t} className="bg-white">
               <div className="relative aspect-[16/9]">

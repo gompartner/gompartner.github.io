@@ -83,7 +83,7 @@ export function CoffeeB() {
             {[
               { img: "b-bag", alt: "나무 판 위의 원두와 분쇄한 커피", t: "하우스 블렌드", d: "고소하고 단맛이 긴 라테용", p: "200g 12,000" },
               { img: "b-drip", alt: "유리 서버에 내린 핸드드립 커피", t: "이번 주 싱글 오리진", d: "산미가 밝은 드립용 3종", p: "200g 15,000 ~" },
-              { img: "b-latte", alt: "나무 판 위의 라테 두 잔", t: "디카페인", d: "저녁에도 마시는 콜롬비아", p: "200g 14,000" },
+              { img: "b-latte", alt: "나무 판 위의 라테 두 잔", t: "디카페인", d: "저녁에도 부담 없는 콜롬비아", p: "200g 14,000" },
             ].map((b) => (
               <li key={b.t}>
                 <div className="relative aspect-[4/3] overflow-hidden rounded-[20px]">

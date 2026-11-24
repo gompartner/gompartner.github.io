@@ -96,7 +96,7 @@ export function SkinB() {
             <h2 className="mt-2 text-[28px] font-bold leading-[1.35] tracking-[-0.04em] md:text-[38px]">
               겨울철 건조 피부,
               <br />
-              보습 장벽 관리
+              피부 장벽 관리
             </h2>
             <p className="mt-5" style={{ color: C.sub }}>
               난방으로 건조해지는 겨울에는 각질 제거보다 장벽 회복이 먼저입니다. 피부 수분도 측정 후 맞는 관리를 안내합니다.

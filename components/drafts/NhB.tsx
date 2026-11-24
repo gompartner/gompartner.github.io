@@ -88,7 +88,7 @@ export function NhB() {
               {[
                 ["일반식", "제철 반찬, 국과 밥"],
                 ["치료식", "당뇨식, 저염식, 신장식"],
-                ["연하식", "삼키기 어려운 분께 다진 죽, 갈음식"],
+                ["연하식", "삼키기 어려운 분께 다진식, 미음"],
                 ["경관식", "콧줄, 위루관 영양 공급"],
               ].map(([k, v]) => (
                 <li key={k} className="flex justify-between gap-4 border-b pb-3" style={{ borderColor: C.line }}>

@@ -392,7 +392,7 @@ function ReserveForm({ today, reduce, pick, setPick }: { today: Date; reduce: bo
   return (
     <Receipt tilt={0.4} pad="px-5 pb-9 pt-9 md:px-9">
       <form onSubmit={submit} noValidate>
-        <PaperTitle id="rc-reserve-title" sub="날짜와 시간을 고르면 남은 자리가 나와요. 한 번에 4명까지 예약해요.">
+        <PaperTitle id="rc-reserve-title" sub="날짜와 시간을 고르면 남은 자리가 나와요. 한 번에 4명까지 예약할 수 있어요.">
           사전 예약
         </PaperTitle>
         <Dash className="mt-6" />

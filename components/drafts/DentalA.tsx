@@ -42,9 +42,9 @@ export function DentalA() {
           <div className="lg:py-28">
             <p className="text-[13px] font-bold tracking-[0.24em]" style={{ color: C.teal }}>QUIET, PRECISE CARE</p>
             <h1 className="mt-6 text-[38px] font-bold leading-[1.25] tracking-[-0.04em] md:text-[62px]">
-              조용하고 정확하게,
+              과잉진료 없이,
               <br />
-              필요한 만큼만
+              필요한 치료만
             </h1>
             <p className="mt-6 max-w-[440px] text-[16px] md:text-[18px]" style={{ color: C.sub }}>
               당장 필요한 치료와 나중에 해도 되는 치료를 나눠서 말씀드립니다. 진료 전에 비용과 횟수를 먼저 확인하실 수 있습니다.

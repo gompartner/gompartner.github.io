@@ -38,9 +38,9 @@ export function CeB() {
           <div>
             <p className="inline-flex rounded-full px-3 py-1 text-[14px] font-bold" style={{ background: C.violetSoft, color: C.violet }}>KOLAS 공인 시험기관</p>
             <h1 className="mt-5 text-[36px] font-bold leading-[1.24] tracking-[-0.045em] md:text-[56px]">
-              시료를 보내면
+              시료를 보내 주시면
               <br />
-              성적서로 돌려드립니다
+              성적서로 회신합니다
             </h1>
             <p className="mt-5 max-w-[460px] text-[17px] md:text-[18px]" style={{ color: C.sub }}>
               식품, 화장품, 환경, 소재 분석 300여 항목. 접수하면 담당 연구원이 정해지고 진행 상황을 문자로 알려 드립니다.

@@ -102,7 +102,7 @@ export function OptA() {
               {[
                 "처음 1 ~ 2주는 계단에서 고개를 숙여 보세요",
                 "2주가 지나도 어지러우면 다시 측정합니다",
-                "도수 재조정은 착용 3개월 안 1회 비용 없이 합니다",
+                "도수 재조정은 착용 후 3개월 안에 1회 무료입니다",
               ].map((x) => (
                 <li key={x} className="border-b pb-3" style={{ borderColor: C.line }}>{x}</li>
               ))}

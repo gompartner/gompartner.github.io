@@ -427,7 +427,7 @@ function SellerSection({ reduce, wish, toggleWish, setWish }: { reduce: boolean;
         <Riso as="h2" id="zf-sellers-title" className="text-[56px] leading-[0.95] md:text-[84px]">
           참가 셀러
         </Riso>
-        <p className="mt-4 max-w-[560px] text-[17px] font-medium leading-[1.7]">부스를 누르면 셀러가 열려요. 사고 싶은 진은 하트로 담아 두세요.</p>
+        <p className="mt-4 max-w-[560px] text-[17px] font-medium leading-[1.7]">부스를 누르면 셀러 소개가 열려요. 사고 싶은 진은 하트로 담아 두세요.</p>
 
         {/* 검색 */}
         <label className="mt-8 flex max-w-[420px] items-center gap-2 rounded-full border-[3px] bg-white px-4 focus-within:outline focus-within:outline-[3px] focus-within:outline-offset-2" style={{ borderColor: C.black, outlineColor: C.blue }}>
@@ -584,7 +584,7 @@ function BoothMap({ open, wishBooths, onPick }: { open: string | null; wishBooth
         </text>
       </svg>
       <p className="px-2 pb-1 pt-2 text-[13px] font-bold" style={{ color: C.muted }}>
-        노란 칸은 지금 연 셀러, 파란 점은 진을 담아 둔 부스예요.
+        노란 칸은 지금 보고 있는 셀러, 파란 점은 진을 담아 둔 부스예요.
       </p>
     </div>
   );
@@ -606,7 +606,7 @@ function WishList({ wish, toggleWish, setWish, onOpen }: { wish: string[]; toggl
       </div>
       {items.length === 0 ? (
         <p className="mt-3 text-[15px] leading-[1.6]" style={{ color: C.muted }}>
-          셀러를 열고 하트를 누르면 여기 모여요. 입구에서부터 도는 순서로 정리해 드려요.
+          셀러 소개에서 하트를 누르면 여기 모여요. 입구에서부터 도는 순서로 정리해 드려요.
         </p>
       ) : (
         <>

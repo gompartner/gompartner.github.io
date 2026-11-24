@@ -42,7 +42,7 @@ export function WdB() {
               올리는 결혼식
             </h1>
             <p className="mt-5 max-w-[460px] text-[17px] md:text-[18px]" style={{ color: C.sub }}>
-              레스토랑 한 공간에서 예식과 코스 식사를 함께 합니다. 하객 한 분 한 분과 인사할 시간이 남습니다.
+              레스토랑 한 공간에서 예식과 코스 식사를 함께 합니다. 하객 한 분 한 분과 인사할 시간이 충분합니다.
             </p>
           </div>
           <div className="relative aspect-[4/3] overflow-hidden rounded-[28px]">
@@ -84,7 +84,7 @@ export function WdB() {
                 <li key={m} className="rounded-full border px-4 py-1.5 font-semibold" style={{ borderColor: C.line }}>{m}</li>
               ))}
             </ul>
-            <p className="mt-6 text-[15px]" style={{ color: C.sub }}>드레스, 메이크업, 사진은 원하시는 곳을 쓰시면 됩니다. 자주 함께하는 업체 목록도 드립니다.</p>
+            <p className="mt-6 text-[15px]" style={{ color: C.sub }}>드레스, 메이크업, 사진은 원하시는 곳을 쓰시면 됩니다. 제휴 업체 목록도 안내해 드립니다.</p>
           </div>
         </div>
       </section>

@@ -42,7 +42,7 @@ export function TkA() {
             <h1 className="mt-4 text-[36px] font-bold leading-[1.24] tracking-[-0.045em] md:text-[56px]">
               인사부터 배우고
               <br />
-              끝까지 해 보는 힘
+              끝까지 해냅니다
             </h1>
             <p className="mt-5 max-w-[460px] text-[17px] md:text-[18px]" style={{ color: C.sub }}>
               학년별로 반을 나눠 50분 수업합니다. 학교와 유치원 앞에서 차량으로 모시고, 수업이 끝나면 집 앞까지 모셔다 드립니다.

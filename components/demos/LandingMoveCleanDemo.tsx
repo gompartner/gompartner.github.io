@@ -53,7 +53,7 @@ const TYPES: { id: HomeType; label: string; perPy: number }[] = [
 
 const OPTIONS: { id: OptId; label: string; price: (py: number) => number; note: string }[] = [
   { id: "veranda", label: "베란다, 발코니", price: () => 30_000, note: "3만 원" },
-  { id: "air", label: "새집증후군 케어", price: (py) => py * 3_000, note: "평당 3천 원" },
+  { id: "air", label: "새집증후군 시공", price: (py) => py * 3_000, note: "평당 3천 원" },
   { id: "mold", label: "욕실 곰팡이 제거", price: () => 50_000, note: "5만 원" },
   { id: "grout", label: "줄눈 오염 제거", price: () => 40_000, note: "4만 원" },
   { id: "builtin", label: "붙박이장, 냉장고장 안쪽", price: () => 30_000, note: "3만 원" },

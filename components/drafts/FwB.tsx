@@ -95,7 +95,7 @@ export function FwB() {
             <h2 className="text-[24px] font-bold tracking-[-0.04em] md:text-[30px]">관리</h2>
             <ul className="mt-5 grid gap-2.5" style={{ color: C.sub }}>
               <li>물기는 바로 마른 천으로 닦아 주세요</li>
-              <li>6개월에 한 번 동봉한 오일로 얇게 바릅니다</li>
+              <li>6개월에 한 번 동봉한 오일을 얇게 발라 주세요</li>
               <li>찍힘, 긁힘은 1년 안에 무료로 손봐 드립니다</li>
             </ul>
           </div>

@@ -41,7 +41,7 @@ export function PenA() {
             <br />
             바다가 보입니다
           </h1>
-          <p className="max-w-[360px] text-white/75">네 객실 모두 정면이 바다입니다. 해변까지 걸어서 2분, 해 지는 쪽으로 창을 냈습니다.</p>
+          <p className="max-w-[360px] text-white/75">네 객실 모두 정면이 바다입니다. 해변까지 걸어서 2분, 해 뜨는 쪽으로 창을 냈습니다.</p>
         </div>
       </section>
 

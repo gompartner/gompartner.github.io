@@ -112,7 +112,7 @@ export function FamA() {
             </p>
             <h2 className="mt-4 text-[26px] font-bold leading-[1.35] tracking-[-0.04em] md:text-[34px]">상담 내용은 밖으로 나가지 않습니다</h2>
             <ul className="mt-6 grid gap-2.5 text-white/80">
-              <li>상담실은 독립된 방에서 변호사가 직접 진행합니다</li>
+              <li>상담은 독립된 상담실에서 변호사가 직접 진행합니다</li>
               <li>문자와 전화는 원하시는 번호, 시간에만 드립니다</li>
               <li>퇴근 뒤 평일 21:00까지 상담 가능합니다</li>
             </ul>

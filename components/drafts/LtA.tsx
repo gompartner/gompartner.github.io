@@ -48,7 +48,7 @@ export function LtA() {
               고르는 쇼룸
             </h1>
             <p className="max-w-[380px]" style={{ color: C.sub }}>
-              300여 종을 실제로 걸어 두었습니다. 디머로 밝기를 바꿔 보며 집에서 어떻게 보일지 확인합니다.
+              300여 종을 실제로 걸어 두었습니다. 디머로 밝기를 바꿔 보며 집에서 어떻게 보일지 확인하실 수 있습니다.
             </p>
           </div>
           <div className="relative mt-10 aspect-[4/3] overflow-hidden md:aspect-[21/9]">

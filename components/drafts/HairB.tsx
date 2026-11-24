@@ -68,7 +68,7 @@ export function HairB() {
         <div className="mx-auto max-w-[1200px]">
           <div className="flex flex-col gap-3 md:flex-row md:items-end md:justify-between">
             <h2 className="text-[30px] font-bold tracking-[-0.04em] md:text-[44px]">가격표</h2>
-            <p className="text-[15px]" style={{ color: C.sub }}>어깨 아래 기장은 펌, 염색에 20,000원이 더해집니다.</p>
+            <p className="text-[15px]" style={{ color: C.sub }}>어깨 아래 기장은 펌, 염색에 20,000원이 추가됩니다.</p>
           </div>
           <div className="mt-10 grid gap-5 md:grid-cols-2">
             {PRICE.map((p) => (

@@ -45,7 +45,7 @@ export function LtB() {
               LED로 바꿔 드립니다
             </h1>
             <p className="mt-5 max-w-[460px] text-[17px] md:text-[18px]" style={{ color: C.sub }}>
-              등기구를 가지고 가서 그 자리에서 달아 드립니다. 떼어 낸 옛 등은 저희가 가져갑니다.
+              등기구를 가지고 가서 그 자리에서 달아 드립니다. 떼어 낸 기존 등은 저희가 가져갑니다.
             </p>
           </div>
           <div className="relative aspect-[4/3] overflow-hidden rounded-[28px]">
