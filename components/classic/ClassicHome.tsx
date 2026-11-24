@@ -60,14 +60,14 @@ function Hero() {
       <div className="mx-auto w-full max-w-[1248px] px-4 pb-12 pt-14 md:px-6 md:pb-20 md:pt-24">
         <h1 id="c-hero" className="max-w-[15em] break-keep text-[36px] font-[800] leading-[1.2] tracking-[-0.055em] md:text-[68px]">
           <span className="inline-block">홈페이지, 앱 제작과</span>{" "}
-          <span className="inline-block shadow-[inset_0_-0.34em_0_#cfe0ff]">오픈 후 100일</span>{" "}
-          <span className="inline-block shadow-[inset_0_-0.34em_0_#cfe0ff]">무상 유지보수</span>
+          <span className="inline-block shadow-[inset_0_-0.34em_0_#cfe0ff] [.gp-dark_&]:shadow-[inset_0_-0.34em_0_#1f3f8a]">오픈 후 100일</span>{" "}
+          <span className="inline-block shadow-[inset_0_-0.34em_0_#cfe0ff] [.gp-dark_&]:shadow-[inset_0_-0.34em_0_#1f3f8a]">무상 유지보수</span>
         </h1>
         <div className="mt-8 flex flex-wrap gap-2.5 md:mt-10">
           <NavLink href="/contact" data-gtm-cta="classic_hero_contact" className="inline-flex h-14 items-center rounded-md bg-[#256ef4] px-7 text-[17px] font-bold text-white transition-colors hover:bg-[#0b50d0] md:text-[18px]">
             상담 신청
           </NavLink>
-          <NavLink href="/works" data-gtm-cta="classic_hero_works" className="inline-flex h-14 items-center rounded-md px-7 text-[17px] font-bold shadow-[inset_0_0_0_1.5px_#15171c] md:text-[18px]">
+          <NavLink href="/works" data-gtm-cta="classic_hero_works" className="inline-flex h-14 items-center rounded-md px-7 text-[17px] font-bold shadow-[inset_0_0_0_1.5px_#15171c] [.gp-dark_&]:shadow-[inset_0_0_0_1.5px_#e8ebf0] md:text-[18px]">
             포트폴리오 보기
           </NavLink>
         </div>
@@ -134,7 +134,7 @@ function Process() {
             <li key={s.name} className="border-b border-[#d9dee5] py-5 lg:border-b-0 lg:border-t-2 lg:border-[#15171c]">
               <p className={`text-[15px] font-bold ${s.on ? "text-[#256ef4]" : "text-[#5b6370]"}`}>{s.when}</p>
               <h3 className="mt-1 text-[21px] font-[800] tracking-[-0.04em] md:text-[23px]">
-                {s.on ? <span className="shadow-[inset_0_-0.34em_0_#cfe0ff]">{s.name}</span> : s.name}
+                {s.on ? <span className="shadow-[inset_0_-0.34em_0_#cfe0ff] [.gp-dark_&]:shadow-[inset_0_-0.34em_0_#1f3f8a]">{s.name}</span> : s.name}
               </h3>
               <p className="mt-1.5 text-[16px] text-[#5b6370] md:text-[17px]">{s.body}</p>
             </li>

@@ -171,5 +171,11 @@ export function shelfItems() {
       ).filter((v) => exists(v.img));
       if (variants.length) out.push({ id: p.id, name: p.title, group: sec.label, variants });
     }
+  // 11-24 독립 시안(public/estimate): 업종 묶음 끝에 붙인다
+  const extra = [{ id: "estimate-interior", name: "인테리어 예상 견적", group: "카페, 매장", variants: [{ ab: "", label: "", href: "/estimate/interior/", img: "/images/shelf/estimate-interior.jpg" }] }];
+  for (const e of extra) {
+    const at = out.map((o) => o.group).lastIndexOf(e.group);
+    out.splice(at < 0 ? out.length : at + 1, 0, e);
+  }
   return out;
 }

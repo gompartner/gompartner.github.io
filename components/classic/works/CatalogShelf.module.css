@@ -28,3 +28,14 @@
 @media (prefers-reduced-motion:reduce){.card,.card img{transition:none}}
 .track:focus-visible{outline:none}
 .track:focus-visible .on{box-shadow:0 0 0 3px #256ef4,0 18px 44px rgba(15,27,61,.2)}
+/* 다크 모드(html.gp-dark) */
+:global(.gp-dark) .chip{background:#161a22;border-color:#2a303b;color:#e8ebf0}
+:global(.gp-dark) .chip small{color:#a3adbb}
+:global(.gp-dark) .chip[aria-pressed="true"]{background:#e8ebf0;border-color:#e8ebf0;color:#0f1218}
+:global(.gp-dark) .chip[aria-pressed="true"] small{color:#3d4450}
+:global(.gp-dark) .card{border-color:#2a303b;background:#1c212b}
+:global(.gp-dark) .g,:global(.gp-dark) .abBtn b{color:#7aa7ff}
+:global(.gp-dark) .pos{color:#a3adbb}
+:global(.gp-dark) .abBtn{background:#161a22;border-color:#2a303b;color:#e8ebf0}
+:global(.gp-dark) .abBtn[aria-pressed="true"]{border-color:#e8ebf0;box-shadow:inset 0 0 0 1px #e8ebf0}
+:global(.gp-dark) .scrub{accent-color:#e8ebf0}

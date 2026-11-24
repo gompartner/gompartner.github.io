@@ -1,0 +1,321 @@
+<!doctype html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>리모델링 인테리어 | 아파트 리모델링 예상 견적</title>
+<meta name="description" content="평형과 공정, 자재 등급을 선택하면 아파트 리모델링 예상 견적과 공사 기간, 공정표를 바로 확인합니다.">
+<meta name="robots" content="noindex">
+<link rel="canonical" href="https://gompartner.co.kr/estimate/interior/">
+<link rel="icon" href="/icon.png" type="image/png">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/static/pretendard.min.css">
+<style>
+/* 인테리어 견적 시안(11-24, 독립 페이지). 첫 화면이 견적서다: 왼쪽에서 고르고 오른쪽 견적서가 바뀐다. 다른 시안의 헤더, 하단 버튼, 구성 순서를 가져오지 않는다 */
+:root{--ink:#191919;--sub:#6a6a68;--line:#dcdcd8;--soft:#f4f4f2;--wood:#9a6a35;--woodsoft:#f3ece3;--paper:#fff}
+*{box-sizing:border-box}
+html{-webkit-text-size-adjust:100%}
+body{margin:0;background:#fff;color:var(--ink);font-family:Pretendard,-apple-system,"Apple SD Gothic Neo","Malgun Gothic",sans-serif;font-size:16px;line-height:1.55;letter-spacing:-0.02em;word-break:keep-all}
+button,input{font:inherit;color:inherit;letter-spacing:inherit}
+button{cursor:pointer}
+a{color:inherit}
+:focus-visible{outline:3px solid var(--wood);outline-offset:2px}
+.w{max-width:1160px;margin:0 auto;padding:0 max(16px,env(safe-area-inset-left)) 0 max(16px,env(safe-area-inset-right))}
+@media (min-width:768px){.w{padding:0 28px}}
+
+.bar{border-bottom:1px solid var(--ink)}
+.bar .w{display:flex;align-items:center;gap:14px;height:60px}
+.bar .co{font-size:19px;font-weight:800;letter-spacing:-0.04em;flex:1}
+.bar .back{font-size:13px;color:var(--sub);text-decoration:none;border:1px solid var(--line);border-radius:4px;padding:5px 9px}
+.bar .tel{font-weight:700;font-variant-numeric:tabular-nums;font-size:16px;text-decoration:none}
+@media (max-width:520px){.bar .tel{display:none}}
+
+.head{padding:34px 0 22px}
+.head h1{margin:0;font-size:clamp(28px,6.6vw,46px);font-weight:800;letter-spacing:-0.05em;line-height:1.2}
+.head p{margin:8px 0 0;color:var(--sub);font-size:16px}
+
+.calc{display:grid;gap:26px;padding-bottom:40px}
+@media (min-width:960px){.calc{grid-template-columns:1fr 420px;gap:44px;align-items:start}}
+fieldset{border:0;margin:0;padding:0;min-width:0}
+legend{padding:0;font-size:18px;font-weight:800;letter-spacing:-0.04em;margin-bottom:12px;display:flex;align-items:baseline;gap:8px;width:100%}
+legend small{font-size:14px;font-weight:500;color:var(--sub)}
+.step+.step{margin-top:30px}
+
+.py{display:flex;align-items:center;gap:14px}
+.py output{font-size:34px;font-weight:800;letter-spacing:-0.04em;font-variant-numeric:tabular-nums;min-width:3.1em}
+.py output small{font-size:17px;font-weight:700;margin-left:2px}
+.py input[type=range]{flex:1;accent-color:var(--ink);height:32px;min-width:0}
+.quick{display:flex;gap:6px;margin-top:8px;flex-wrap:wrap}
+.quick button{height:38px;padding:0 14px;border:1px solid var(--line);background:#fff;border-radius:4px;font-size:14.5px;font-weight:700}
+.quick button[aria-pressed=true]{background:var(--ink);border-color:var(--ink);color:#fff}
+
+.grade{display:grid;grid-template-columns:repeat(3,1fr);border:1px solid var(--ink);border-radius:4px;overflow:hidden}
+.grade label{display:block;position:relative;cursor:pointer}
+.grade input{position:absolute;opacity:0;inset:0;cursor:pointer}
+.grade span{display:block;padding:11px 8px;text-align:center;font-weight:700;font-size:15.5px;border-left:1px solid var(--ink)}
+.grade label:first-child span{border-left:0}
+.grade em{display:block;font-style:normal;font-weight:500;font-size:12.5px;color:var(--sub);margin-top:1px}
+.grade input:checked+span{background:var(--ink);color:#fff}
+.grade input:checked+span em{color:#cfcfcb}
+.grade input:focus-visible+span{outline:3px solid var(--wood);outline-offset:-3px}
+
+.works{border-top:1px solid var(--ink)}
+.work{display:grid;grid-template-columns:auto 1fr auto;gap:2px 12px;align-items:center;padding:12px 2px;border-bottom:1px solid var(--line);cursor:pointer}
+.work input[type=checkbox]{width:22px;height:22px;accent-color:var(--ink);margin:0}
+.work b{font-size:16.5px;font-weight:700}
+.work i{font-style:normal;font-size:13.5px;color:var(--sub);grid-column:2}
+.work .amt{grid-row:1/3;grid-column:3;font-weight:700;font-variant-numeric:tabular-nums;font-size:15.5px;text-align:right;white-space:nowrap}
+.work.off .amt{color:#6f6f6c;font-weight:500}
+.cnt{display:inline-flex;align-items:center;gap:0;margin-left:8px;vertical-align:middle;border:1px solid var(--line);border-radius:4px;overflow:hidden}
+.cnt button{width:30px;height:28px;border:0;background:var(--soft);font-weight:700;font-size:16px;line-height:1}
+.cnt span{min-width:30px;text-align:center;font-size:14px;font-weight:700;font-variant-numeric:tabular-nums}
+
+/* 견적서 */
+.sheet{border:1px solid var(--ink);background:var(--paper);position:relative}
+@media (min-width:960px){.sheet{position:sticky;top:20px}}
+.sheet header{padding:16px 18px 12px;border-bottom:3px double var(--ink);display:flex;align-items:baseline;justify-content:space-between;gap:10px}
+.sheet h2{margin:0;font-size:22px;font-weight:800;letter-spacing:0.5em;padding-left:0.2em}
+.sheet header span{font-size:13px;color:var(--sub);font-variant-numeric:tabular-nums}
+.sheet table{width:100%;border-collapse:collapse;font-size:15px}
+.sheet td{padding:8px 18px;border-bottom:1px solid var(--line)}
+.sheet td:last-child{text-align:right;font-variant-numeric:tabular-nums;white-space:nowrap;font-weight:600}
+.sheet tr.none td{color:var(--sub);text-align:center;padding:26px 18px}
+.sum{padding:14px 18px 6px;display:grid;gap:4px}
+.sum div{display:flex;justify-content:space-between;align-items:baseline;gap:10px}
+.sum .total{font-weight:800;font-size:15.5px}
+.sum .total strong{font-size:30px;letter-spacing:-0.04em;font-variant-numeric:tabular-nums}
+.sum .total strong small{font-size:16px;margin-left:2px}
+.sum .note{font-size:13px;color:var(--sub)}
+.sum .term{font-size:15px}
+.sum .term b{font-variant-numeric:tabular-nums}
+.req{display:block;margin:12px 18px 18px;height:54px;border:0;border-radius:4px;background:var(--wood);color:#fff;font-weight:800;font-size:17px;width:calc(100% - 36px)}
+.req:hover{background:#7f5527}
+
+section.blk{border-top:1px solid var(--ink);padding:44px 0}
+section.blk h2{margin:0 0 6px;font-size:clamp(22px,5vw,30px);font-weight:800;letter-spacing:-0.05em}
+section.blk .lead{margin:0 0 20px;color:var(--sub);font-size:15.5px}
+
+/* 공정표 */
+.gantt{border:1px solid var(--line);border-radius:4px;overflow:hidden}
+.gantt .wk{display:grid;background:var(--soft);border-bottom:1px solid var(--line);font-size:12.5px;color:var(--sub);font-weight:700}
+.gantt .wk span{padding:6px 0 6px 8px;border-left:1px solid var(--line)}
+.gantt .wk span:first-child{border-left:0}
+.gantt .rows{position:relative;padding:8px 0}
+.gantt .r{display:grid;grid-template-columns:5.6em 1fr;align-items:center;gap:8px;padding:4px 10px 4px 10px;font-size:14px}
+.gantt .r b{font-weight:700;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.gantt .lane{position:relative;height:18px;background:repeating-linear-gradient(90deg,transparent 0,transparent calc(100%/var(--weeks) - 1px),var(--line) calc(100%/var(--weeks) - 1px),var(--line) calc(100%/var(--weeks)))}
+.gantt .lane u{position:absolute;top:2px;bottom:2px;border-radius:2px;background:var(--wood);text-decoration:none;transition:left .3s,width .3s}
+.gantt .wk{grid-template-columns:repeat(var(--weeks),1fr);margin-left:calc(5.6em + 18px);border-left:1px solid var(--line)}
+
+/* 시공 전후 */
+.ba{display:grid;gap:14px}
+@media (min-width:860px){.ba{grid-template-columns:1.5fr 1fr;gap:28px;align-items:end}}
+.ba figure{margin:0;position:relative;aspect-ratio:3/2;overflow:hidden;background:var(--soft)}
+.ba img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;transition:opacity .3s}
+.ba img.af{opacity:0}.ba.after img.af{opacity:1}
+.ba .tg{position:absolute;left:12px;bottom:12px;display:inline-flex;background:#fff;border:1px solid var(--ink);border-radius:4px;overflow:hidden}
+.ba .tg button{height:40px;padding:0 16px;border:0;background:#fff;font-weight:700;font-size:15px}
+.ba .tg button[aria-pressed=true]{background:var(--ink);color:#fff}
+.ba dl{margin:0;border-top:1px solid var(--ink)}
+.ba dl div{display:flex;justify-content:space-between;gap:12px;padding:10px 2px;border-bottom:1px solid var(--line);font-size:15.5px}
+.ba dt{color:var(--sub)}.ba dd{margin:0;font-weight:700;text-align:right}
+
+.as{display:grid;gap:0;border-top:1px solid var(--ink);margin:0;padding:0;list-style:none}
+@media (min-width:760px){.as{grid-template-columns:repeat(3,1fr);border-top:0}.as li{border-top:1px solid var(--ink);border-bottom:0!important;padding-right:20px!important}}
+.as li{padding:14px 2px;border-bottom:1px solid var(--line)}
+.as b{display:block;font-size:17.5px;font-weight:800;letter-spacing:-0.03em}
+.as span{color:var(--sub);font-size:15px}
+
+footer{border-top:1px solid var(--ink);padding:22px 0 calc(100px + env(safe-area-inset-bottom));font-size:13.5px;color:var(--sub)}
+@media (min-width:960px){footer{padding-bottom:36px}}
+
+/* 모바일 합계 띠 */
+.dock{position:fixed;left:0;right:0;bottom:0;background:#fff;border-top:1px solid var(--ink);display:flex;align-items:center;gap:12px;padding:10px max(16px,env(safe-area-inset-right)) calc(10px + env(safe-area-inset-bottom)) max(16px,env(safe-area-inset-left));z-index:10}
+.dock div{flex:1;min-width:0;line-height:1.25}
+.dock small{display:block;font-size:12.5px;color:var(--sub)}
+.dock strong{font-size:22px;font-weight:800;letter-spacing:-0.04em;font-variant-numeric:tabular-nums}
+.dock a{flex:none;display:inline-flex;align-items:center;height:48px;padding:0 18px;border-radius:4px;background:var(--wood);color:#fff;font-weight:800;text-decoration:none;font-size:16px}
+@media (min-width:960px){.dock{display:none}}
+
+dialog{border:1px solid var(--ink);border-radius:4px;padding:22px;max-width:min(420px,calc(100vw - 32px));width:100%}
+dialog::backdrop{background:rgba(0,0,0,.45)}
+dialog h3{margin:0 0 4px;font-size:20px;font-weight:800;letter-spacing:-0.04em}
+dialog p{margin:0 0 14px;color:var(--sub);font-size:15px}
+dialog label{display:block;font-size:14px;font-weight:700;margin-top:10px}
+dialog input{display:block;width:100%;height:48px;border:1px solid var(--ink);border-radius:4px;padding:0 12px;font-size:16px;margin-top:4px}
+dialog .act{display:flex;gap:8px;margin-top:16px}
+dialog .act button{flex:1;height:50px;border-radius:4px;border:1px solid var(--ink);background:#fff;font-weight:800;font-size:16px}
+dialog .act button.go{background:var(--wood);border-color:var(--wood);color:#fff}
+@media (prefers-reduced-motion:reduce){.gantt .lane u,.ba img{transition:none}}
+</style>
+</head>
+<body>
+<div class="bar"><div class="w">
+  <span class="co">리모델링 인테리어</span>
+  <a class="tel" href="tel:02-000-0000">02-000-0000</a>
+  <a class="back" href="/works">곰파트너 카탈로그</a>
+</div></div>
+
+<main class="w">
+  <div class="head">
+    <h1>아파트 리모델링 예상 견적</h1>
+    <p>평형, 자재 등급, 공정을 선택하면 견적서와 공정표가 바뀝니다.</p>
+  </div>
+
+  <div class="calc">
+    <form id="f" onsubmit="return false">
+      <fieldset class="step">
+        <legend>평형 <small>공급면적 기준</small></legend>
+        <div class="py"><output id="pyOut" for="py">32<small>평</small></output><input type="range" id="py" min="18" max="60" step="1" value="32" aria-label="평형"></div>
+        <div class="quick" id="quick"><button type="button" data-p="24">24평</button><button type="button" data-p="32">32평</button><button type="button" data-p="34">34평</button><button type="button" data-p="45">45평</button></div>
+      </fieldset>
+
+      <fieldset class="step">
+        <legend>자재 등급</legend>
+        <div class="grade">
+          <label><input type="radio" name="grade" value="0.85"><span>실속형<em>국산 보급 자재</em></span></label>
+          <label><input type="radio" name="grade" value="1" checked><span>표준형<em>국산 브랜드 자재</em></span></label>
+          <label><input type="radio" name="grade" value="1.3"><span>고급형<em>수입, 주문 제작</em></span></label>
+        </div>
+      </fieldset>
+
+      <fieldset class="step">
+        <legend>공정 <small id="workCnt"></small></legend>
+        <div class="works" id="works"></div>
+      </fieldset>
+    </form>
+
+    <aside class="sheet" aria-label="견적서" aria-live="polite">
+      <header><h2>견적서</h2><span id="sheetMeta"></span></header>
+      <table><tbody id="rows"></tbody></table>
+      <div class="sum">
+        <div class="total"><span>합계</span><strong id="total"></strong></div>
+        <div class="note"><span>부가세 별도, 실측 후 확정</span><span id="perPy"></span></div>
+        <div class="term"><span>예상 공사 기간</span><b id="term"></b></div>
+      </div>
+      <button type="button" class="req" id="req">이 견적으로 상담 신청</button>
+    </aside>
+  </div>
+</main>
+
+<section class="blk"><div class="w">
+  <h2>공정표</h2>
+  <p class="lead" id="ganttLead"></p>
+  <div class="gantt" id="gantt"></div>
+</div></section>
+
+<section class="blk"><div class="w">
+  <h2>시공 사례</h2>
+  <p class="lead">32평 아파트 전체 리모델링</p>
+  <div class="ba" id="ba">
+    <figure>
+      <img src="/images/drafts/int/b-before.jpg" alt="철거 중인 아파트 내부" loading="lazy">
+      <img class="af" src="/images/drafts/int/b-after.jpg" alt="흰 벽과 원목 바닥으로 마감한 거실" loading="lazy">
+      <div class="tg" role="group" aria-label="시공 전후"><button type="button" data-v="before" aria-pressed="true">시공 전</button><button type="button" data-v="after" aria-pressed="false">시공 후</button></div>
+    </figure>
+    <dl>
+      <div><dt>평형</dt><dd>32평, 1998년 준공</dd></div>
+      <div><dt>공정</dt><dd>철거, 샷시, 목공, 욕실 2곳, 주방, 도배, 바닥</dd></div>
+      <div><dt>자재 등급</dt><dd>표준형</dd></div>
+      <div><dt>공사 기간</dt><dd>6주</dd></div>
+      <div><dt>계약 금액</dt><dd>4,870만 원</dd></div>
+    </dl>
+  </div>
+</div></section>
+
+<section class="blk"><div class="w">
+  <h2>계약, A/S 안내</h2>
+  <p class="lead">견적서와 계약서 기준</p>
+  <ul class="as">
+    <li><b>공정별 견적서</b><span>공정, 자재, 수량, 단가를 항목별로 적습니다.</span></li>
+    <li><b>추가 비용</b><span>계약 후 변경 요청 건만 서면으로 합의합니다.</span></li>
+    <li><b>하자보수 1년</b><span>준공일부터 1년간 무상으로 보수합니다.</span></li>
+  </ul>
+</div></section>
+
+<footer><div class="w">리모델링 인테리어 | 서울 양천구 | 실내건축공사업 등록 | 상담 02-000-0000</div></footer>
+
+<div class="dock" aria-hidden="false">
+  <div><small id="dockMeta"></small><strong id="dockTotal"></strong></div>
+  <a href="#" id="dockReq">상담 신청</a>
+</div>
+
+<dialog id="dlg" aria-labelledby="dlgT">
+  <form method="dialog" id="dlgF">
+    <h3 id="dlgT">상담 신청</h3>
+    <p id="dlgSum"></p>
+    <label for="nm">이름</label><input id="nm" autocomplete="name" required>
+    <label for="ph">연락처</label><input id="ph" inputmode="tel" autocomplete="tel" placeholder="010-0000-0000" required>
+    <div class="act"><button type="button" id="dlgX">닫기</button><button class="go" id="dlgGo">신청</button></div>
+  </form>
+</dialog>
+
+<script>
+// 단가(만 원). py: 평당, fix: 고정, each: 1곳당. days: 작업일. 이 업체의 예시 단가표다.
+const WORKS = [
+  { id: 'demo', n: '철거', d: '기존 마감재, 설비 철거와 폐기물 처리', py: 10, days: 3, on: true },
+  { id: 'sash', n: '샷시', d: '전체 창호 교체, 이중창', py: 38, days: 2, on: true },
+  { id: 'ext', n: '발코니 확장', d: '단열, 바닥 난방 연장', each: 280, days: 3, count: 1, max: 3, on: false },
+  { id: 'wood', n: '목공', d: '천장, 몰딩, 문, 문틀, 붙박이장', py: 26, days: 7, on: true },
+  { id: 'elec', n: '전기, 조명', d: '배선, 스위치, 콘센트, 조명 교체', py: 11, days: 3, on: true },
+  { id: 'bath', n: '욕실', d: '방수, 타일, 도기, 수전', each: 380, days: 4, count: 2, max: 3, on: true },
+  { id: 'kit', n: '주방', d: '싱크대, 상판, 벽 타일, 후드', fix: 450, days: 3, on: true },
+  { id: 'paper', n: '도배', d: '실크 벽지, 전체', py: 7, days: 3, on: true },
+  { id: 'floor', n: '바닥', d: '강마루, 걸레받이', py: 13, days: 3, on: true },
+  { id: 'door', n: '중문', d: '3연동 슬라이딩', fix: 130, days: 1, on: false },
+];
+const state = { py: 32, grade: 1, on: Object.fromEntries(WORKS.map((w) => [w.id, w.on])), count: Object.fromEntries(WORKS.filter((w) => w.count).map((w) => [w.id, w.count])) };
+const $ = (id) => document.getElementById(id);
+const won = (man) => man.toLocaleString('ko-KR');
+const gradeName = () => ({ 0.85: '실속형', 1: '표준형', 1.3: '고급형' })[state.grade];
+function price(w) {
+  const base = w.py ? w.py * state.py : w.fix ? w.fix : w.each * state.count[w.id];
+  return Math.round(base * state.grade / 10) * 10;
+}
+function days(w) { return w.each ? w.days + (state.count[w.id] - 1) * 2 : w.py ? Math.max(w.days, Math.round(w.days * state.py / 32)) : w.days; }
+
+function paintWorks() {
+  $('works').innerHTML = WORKS.map((w) => `<label class="work ${state.on[w.id] ? '' : 'off'}"><input type="checkbox" data-w="${w.id}" ${state.on[w.id] ? 'checked' : ''}><b>${w.n}${w.each ? `<span class="cnt" data-c="${w.id}"><button type="button" data-d="-1" aria-label="${w.n} 줄이기">-</button><span>${state.count[w.id]}곳</span><button type="button" data-d="1" aria-label="${w.n} 늘리기">+</button></span>` : ''}</b><i>${w.d}</i><span class="amt">${won(price(w))}만 원</span></label>`).join('');
+}
+function paint() {
+  const sel = WORKS.filter((w) => state.on[w.id]);
+  const total = sel.reduce((s, w) => s + price(w), 0);
+  $('pyOut').innerHTML = `${state.py}<small>평</small>`;
+  document.querySelectorAll('#quick button').forEach((b) => b.setAttribute('aria-pressed', +b.dataset.p === state.py));
+  $('workCnt').textContent = `${sel.length}개 선택`;
+  paintWorks();
+  $('sheetMeta').textContent = `${state.py}평, ${gradeName()}`;
+  $('rows').innerHTML = sel.length ? sel.map((w) => `<tr><td>${w.n}${w.each ? ` ${state.count[w.id]}곳` : ''}</td><td>${won(price(w))}만 원</td></tr>`).join('') : '<tr class="none"><td colspan="2">공정을 선택해 주세요</td></tr>';
+  $('total').innerHTML = `${won(total)}<small>만 원</small>`;
+  $('perPy').textContent = total ? `평당 ${won(Math.round(total / state.py))}만 원` : '';
+  // 공정표: 선택한 공정을 순서대로 잇고, 전기는 목공 끝 이틀과 겹친다. 주 6일 작업
+  let t = 0; const bars = [];
+  sel.forEach((w) => { let s = t; const d = days(w); if (w.id === 'elec' && state.on.wood) s = Math.max(0, t - 2); bars.push({ n: w.n, s, d }); t = s + d; });
+  if (sel.length) { bars.push({ n: '입주 청소', s: t, d: 1 }); t += 1; }
+  const weeks = Math.max(1, Math.ceil(t / 6));
+  $('term').textContent = sel.length ? `${weeks}주 (작업일 ${t}일)` : '-';
+  $('ganttLead').textContent = sel.length ? `선택한 공정 기준 ${weeks}주, 주 6일 작업` : '공정을 선택하면 일정이 표시됩니다.';
+  const g = $('gantt'); g.style.setProperty('--weeks', weeks);
+  g.innerHTML = `<div class="wk">${Array.from({ length: weeks }, (_, i) => `<span>${i + 1}주</span>`).join('')}</div><div class="rows">${bars.map((b) => `<div class="r"><b>${b.n}</b><div class="lane"><u style="left:${b.s / (weeks * 6) * 100}%;width:${b.d / (weeks * 6) * 100}%"></u></div></div>`).join('')}</div>`;
+  $('dockMeta').textContent = `${state.py}평, ${gradeName()}, ${sel.length ? weeks + '주' : '-'}`;
+  $('dockTotal').textContent = `${won(total)}만 원`;
+  $('dlgSum').textContent = `${state.py}평, ${gradeName()}, ${sel.map((w) => w.n).join(', ') || '공정 미선택'}, 합계 ${won(total)}만 원`;
+}
+$('py').addEventListener('input', (e) => { state.py = +e.target.value; paint(); });
+$('quick').addEventListener('click', (e) => { const b = e.target.closest('button'); if (!b) return; state.py = +b.dataset.p; $('py').value = state.py; paint(); });
+document.querySelectorAll('input[name=grade]').forEach((r) => r.addEventListener('change', () => { state.grade = +r.value; paint(); }));
+$('works').addEventListener('click', (e) => {
+  const d = e.target.closest('[data-d]');
+  if (d) { e.preventDefault(); const id = d.parentElement.dataset.c, w = WORKS.find((x) => x.id === id); state.count[id] = Math.max(1, Math.min(w.max, state.count[id] + +d.dataset.d)); state.on[id] = true; paint(); }
+});
+$('works').addEventListener('change', (e) => { const c = e.target.closest('[data-w]'); if (c) { state.on[c.dataset.w] = c.checked; paint(); } });
+$('ba').addEventListener('click', (e) => { const b = e.target.closest('[data-v]'); if (!b) return; $('ba').classList.toggle('after', b.dataset.v === 'after'); $('ba').querySelectorAll('[data-v]').forEach((x) => x.setAttribute('aria-pressed', x === b)); });
+const dlg = $('dlg');
+const openReq = (e) => { e.preventDefault(); $('dlgT').textContent = '상담 신청'; $('dlgF').hidden = false; dlg.showModal(); };
+$('req').addEventListener('click', openReq); $('dockReq').addEventListener('click', openReq);
+$('dlgX').addEventListener('click', () => dlg.close());
+$('dlgF').addEventListener('submit', (e) => { e.preventDefault(); $('dlgT').textContent = '접수되었습니다'; $('dlgSum').textContent = '영업일 1일 이내에 연락드립니다. 무료 실측 방문 일정을 안내합니다.'; $('nm').closest('form').querySelectorAll('label,input,.go').forEach((x) => (x.hidden = true)); });
+dlg.addEventListener('close', () => { $('dlgF').querySelectorAll('label,input,.go').forEach((x) => (x.hidden = false)); $('dlgF').reset(); paint(); });
+paint();
+</script>
+</body>
+</html>
