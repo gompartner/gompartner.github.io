@@ -1,9 +1,10 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 import { ArrowRight } from "lucide-react";
-import { PageHead, SubTabs, h2, more, wrap } from "@/components/classic/ui";
+import { PageHead, h2, more, wrap } from "@/components/classic/ui";
+import { CatalogShelf } from "@/components/classic/works/CatalogShelf";
 import { SampleGrid } from "@/components/classic/works/SampleGrid";
-import { catalogGroups, catalogProjects, homepageProjects, samplesIn, worksTabs } from "@/components/classic/works/samples";
+import { catalogGroups, catalogProjects, homepageProjects, samplesIn, shelfItems } from "@/components/classic/works/samples";
 import { industries } from "@/data/classic/industries";
 import { pageMeta } from "@/lib/seo";
 import { buildCatalogIndex } from "@/components/classic/search/index";
@@ -22,10 +23,7 @@ export default function ClassicWorksPage() {
   return (
     <>
       <PageHead title="카탈로그" trail={[{ href: "/works", label: "카탈로그" }]} />
-      <SubTabs items={worksTabs} current="/works" />
-      <p className={`${wrap} pt-10 text-[17px] font-bold leading-[1.6] md:pt-12 md:text-[19px]`}>
-        업종마다 시안 두 가지를 준비했습니다. 화면을 누르면 그 시안이 바로 열립니다.
-      </p>
+      <CatalogShelf items={shelfItems()} />
       <CatalogSearch index={buildCatalogIndex()}>
       {[
         // 11-22 업종 홈페이지는 업종별로 묶는다(한 목록에 50개를 섞지 않는다)

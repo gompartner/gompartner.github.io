@@ -1,0 +1,30 @@
+/* 카탈로그 진열대(11-24): 휴대폰 화면 그대로를 한 장씩 넘겨 본다. 가운데 한 장이 주인공 */
+.shelf{--cw:max(190px,min(64vw,300px,calc((100svh - 330px)*0.4863)));padding-top:24px}
+.chips{display:flex;gap:6px;overflow-x:auto;scrollbar-width:none;padding-bottom:8px}
+.chips::-webkit-scrollbar{display:none}
+.chip{flex:none;height:40px;padding:0 15px;border-radius:20px;border:1px solid #d9dee5;background:#fff;font-size:15px;font-weight:700;white-space:nowrap;color:#15171c}
+.chip small{font-weight:500;color:#5b6370;margin-left:5px;font-size:13px}
+.chip[aria-pressed="true"]{background:#15171c;border-color:#15171c;color:#fff}
+.chip[aria-pressed="true"] small{color:#c9cfdb}
+.track{display:flex;align-items:center;gap:14px;overflow-x:auto;scroll-snap-type:x mandatory;scrollbar-width:none;padding:22px calc(50% - var(--cw)/2) 40px;overscroll-behavior-x:contain}
+.track::-webkit-scrollbar{display:none}
+.card{flex:none;width:var(--cw);aspect-ratio:390/802;scroll-snap-align:center;border-radius:22px;overflow:hidden;border:1px solid #d9dee5;background:#f3f5f8;padding:0;position:relative;transform:scale(.9);opacity:.55;transition:transform .32s cubic-bezier(.2,.7,.2,1),opacity .32s,box-shadow .32s}
+.card.on{transform:none;opacity:1;box-shadow:0 18px 44px rgba(15,27,61,.2)}
+.card img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;object-position:top;display:block;transition:opacity .22s}
+.card img.b{opacity:0}
+.card.showb img.b{opacity:1}
+.row{display:flex;align-items:center;gap:10px;min-height:48px}
+.g{font-size:14px;font-weight:700;color:#256ef4;flex:none}
+.name{margin:0;font-size:21px;font-weight:800;letter-spacing:-0.04em;flex:1;min-width:0;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.pos{font-size:14px;color:#5b6370;font-variant-numeric:tabular-nums;flex:none}
+.ab{display:flex;gap:6px;flex:1;min-width:0}
+.abBtn{flex:1;min-width:0;height:48px;border-radius:8px;border:1px solid #d9dee5;background:#fff;font-size:15px;font-weight:700;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;padding:0 8px;color:#15171c}
+.abBtn[aria-pressed="true"]{border-color:#15171c;box-shadow:inset 0 0 0 1px #15171c}
+.abBtn b{color:#256ef4;margin-right:4px}
+.open{flex:none;display:inline-flex;align-items:center;justify-content:center;height:48px;padding:0 20px;border-radius:8px;background:#256ef4;color:#fff;font-weight:700;font-size:16px}
+.open:hover{background:#0b50d0}
+.scrub{width:100%;margin:8px 0 0;accent-color:#15171c;height:28px}
+@media (min-width:900px){.shelf{--cw:max(210px,min(300px,calc((100svh - 400px)*0.4863)))}.track{gap:22px}.info{max-width:720px;margin:0 auto}}
+@media (prefers-reduced-motion:reduce){.card,.card img{transition:none}}
+.track:focus-visible{outline:none}
+.track:focus-visible .on{box-shadow:0 0 0 3px #256ef4,0 18px 44px rgba(15,27,61,.2)}

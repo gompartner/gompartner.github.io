@@ -151,3 +151,25 @@ export const worksTabs = [
   ...industries.map((i) => ({ href: `/works/${i.slug}`, label: i.label })),
   ...catalogGroups.map((g) => ({ href: `/works/${g.slug}`, label: g.label })),
 ];
+
+/** 11-24 진열대(넘겨 보기)에 올릴 목록. 휴대폰 첫 화면 캡처(public/images/shelf)가 있는 것만. 3D를 맨 앞에 둔다 */
+export function shelfItems() {
+  const secs = [
+    ...catalogGroups.filter((g) => g.slug === "3d").map((g) => ({ label: g.label, items: samplesIn(g.slug) })),
+    ...industries.map((i) => ({ label: i.label, items: samplesIn(i.slug) })),
+    ...catalogGroups.filter((g) => g.slug !== "3d").map((g) => ({ label: g.label, items: samplesIn(g.slug) })),
+  ];
+  const out: { id: string; name: string; group: string; variants: { ab: string; label: string; href: string; img: string }[] }[] = [];
+  for (const sec of secs)
+    for (const p of sec.items) {
+      const is3d = !p.demoUrl.startsWith("/work/");
+      const slug = is3d ? p.demoUrl.split("/").filter(Boolean).pop()! : slugOf(p.demoUrl);
+      const vs = is3d ? [] : VARIANTS[slug] ?? [];
+      const variants = (vs.length >= 2
+        ? vs.map((v) => ({ ab: v.id.toUpperCase(), label: v.label.replace(/^시안 \S+ /, ""), href: `${p.demoUrl}?v=${v.id}`, img: `/images/shelf/${slug}-${v.id}.jpg` }))
+        : [{ ab: "", label: "", href: p.demoUrl, img: `/images/shelf/${is3d ? "3d-" : ""}${slug}.jpg` }]
+      ).filter((v) => exists(v.img));
+      if (variants.length) out.push({ id: p.id, name: p.title, group: sec.label, variants });
+    }
+  return out;
+}
